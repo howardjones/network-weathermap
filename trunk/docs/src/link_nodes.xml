@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configentry>
+	<keyword>NODES</keyword>
+	<scope>LINK</scope>
+	<anchor>LINK_NODES</anchor>
+    <definition>NODES <meta>nodename{:compassoffset}</meta> <meta>nodename{:compassoffset}</meta></definition>
+    <definition>NODES <meta>nodename{:xoffset:yoffset}</meta> <meta>nodename{:xoffset:yoffset}</meta></definition>
+    <description  xmlns="http://www.w3.org/1999/xhtml">
+    <p>These are the NODEs that this link joins. There can be
+      only two. They are the 'nodename's from the NODE line for
+      each node.</p>
+    <p>Optionally, you can add an offset after a nodename, to move the location of that end of the link. This can help with crowded areas of the map, and also in making parallel links. Valid offsets are named after compass-points: N,S,E,W,NE,NE,SE,SW, or they can be numeric values, to indicate the relative position in pixels from the centre of the node.</p>
+	<p>The order of the nodes is significant. When reading data sources, the flow from the first node to the second is considered 'out' and from second-to-first is 'in'.</p>
+    </description>
+    <changes>
+        <change version="0.9">Added numeric pixel offsets.</change>
+		<change version="0.8">Added ability to specify node offset.</change>
+    </changes>
+	<examples>
+	   <example><caption>Defining a simple link</caption>
+	   <content>LINK mylink
+  NODES node1 node2</content>
+	   </example>
+	   <example><caption>Two parallel links, using offsets</caption>
+	   <content>LINK firstlink
+  NODES node1:E node2:E
+
+LINK secondlink
+  NODES node1:W node2:W</content>
+	   </example>
+        <example><caption>An offset link using pixel offsets</caption>
+	   <content>LINK firstlink
+  NODES node1:-10:10 node2:20:12
+        </content>
+	   </example>
+	</examples>
+    
+</configentry>

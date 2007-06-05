@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configentry>
+	<keyword>KEYSTYLE</keyword>
+	<scope>GLOBAL</scope>
+	<anchor>GLOBAL_KEYSTYLE</anchor>
+    	<definition>KEYSTYLE <meta>stylename</meta></definition>
+        <definition>KEYSTYLE <meta>stylename</meta> <meta>size</meta></definition>
+        <definition>KEYSTYLE <meta>scalename</meta> <meta>stylename</meta></definition>
+        <definition>KEYSTYLE <meta>scalename</meta> <meta>stylename</meta> <meta>size</meta></definition>
+    <description  xmlns="http://www.w3.org/1999/xhtml">
+        <p>Specifies the style of the key, or legend, that shows what each colour-range means. If a scalename is not given,
+        then "DEFAULT" is assumed. Valid stylenames are: 'classic', 'horizontal' and 'vertical'.</p>
+        <p>Classic has a line for each SCALE range defined. 'vertical' and 'horizontal' are fixed-size, showing a
+            continuous block from 0-100% usage, which is much more useful when gradient SCALEs are used, or when you have
+            a large number of SCALE lines in one scale.</p>
+			<p>
+				For 'horizontal' and 'vertical' styles, you can optionally add an additional parameter, which specifies the longer dimension of the legend in pixels. That is, for a horizontal legend, it specifies the width. The other dimension is calculated from the size of the font used (see KEYFONT).
+			</p>
+			<p><img src="../images/keystyle-classic.png" />Classic Style</p>
+			<p><img src="../images/keystyle-horizontal.png" />Horizontal Style</p>
+			<p><img src="../images/keystyle-vertical.png" />Vertical Style</p>
+
+    </description>
+
+    <changes>
+    <change version="0.9">Added support for multiple key styles.</change>
+    </changes>
+</configentry>

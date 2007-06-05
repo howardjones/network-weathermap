@@ -1,0 +1,73 @@
+<freetext>
+  <description xmlns="http://www.w3.org/1999/xhtml">
+    <div id="contents">
+      <h4 xmlns="" class="configsection">Node-specific Configuration Directives</h4>
+      <p xmlns="" id="context_NODE">
+        <a href="#NODE_NODE">NODE</a>
+        <a href="#NODE_POSITION">POSITION</a>
+        <a href="#NODE_LABEL">LABEL</a>
+        <a href="#NODE_TARGET">TARGET</a>
+        <a href="#NODE_USESCALE">USESCALE</a>
+        <a href="#NODE_MAXVALUE">MAXVALUE</a>
+        <a href="#NODE_ICON">ICON</a>
+        <a href="#NODE_LABELOFFSET">LABELOFFSET</a>
+        <a href="#NODE_LABELFONT">LABELFONT</a>
+        <a href="#NODE_COLORS">*COLOR</a>
+        <a href="#NODE_INFOURL">INFOURL</a>
+        <a href="#NODE_OVERLIBGRAPH">OVERLIBGRAPH</a>
+        <a href="#NODE_OVERLIBWIDTH">OVERLIBWIDTH</a>
+        <a href="#NODE_OVERLIBHEIGHT">OVERLIBHEIGHT</a>
+        <a href="#NODE_OVERLIBCAPTION">OVERLIBCAPTION</a>
+        <a href="#NODE_NOTES">NOTES</a>
+        <a href="#NODE_SET">SET</a>
+      </p>
+      <h4 xmlns="" class="configsection">Link-specific Configuration Directives</h4>
+      <p xmlns="" id="context_LINK">
+        <a href="#LINK_LINK">LINK</a>
+        <a href="#LINK_NODES">NODES</a>
+        <a href="#LINK_TARGET">TARGET</a>
+        <a href="#LINK_USESCALE">USESCALE</a>
+        <a href="#LINK_WIDTH">WIDTH</a>
+        <a href="#LINK_BANDWIDTH">BANDWIDTH</a>
+        <a href="#LINK_BWLABEL">BWLABEL</a>
+        <a href="#LINK_BWSTYLE">BWSTYLE</a>
+        <a href="#LINK_BWLABELPOS">BWLABELPOS</a>
+        <a href="#LINK_BWFONT">BWFONT</a>
+        <a href="#LINK_INCOMMENT">INCOMMENT</a>
+        <a href="#LINK_OUTCOMMENT">OUTCOMMENT</a>
+        <a href="#LINK_COMMENTFONT">COMMENTFONT</a>
+        <a href="#LINK_COMMENTPOS">COMMENTPOS</a>
+        <a href="#LINK_COLORS">*COLOR</a>
+        <a href="#LINK_INFOURL">INFOURL</a>
+        <a href="#LINK_OVERLIBGRAPH">OVERLIBGRAPH</a>
+        <a href="#LINK_OVERLIBWIDTH">OVERLIBWIDTH</a>
+        <a href="#LINK_OVERLIBHEIGHT">OVERLIBHEIGHT</a>
+        <a href="#LINK_OVERLIBCAPTION">OVERLIBCAPTION</a>
+        <a href="#LINK_NOTES">NOTES</a>
+        <a href="#LINK_VIA">VIA</a>
+        <a href="#LINK_ARROWSTYLE">ARROWSTYLE</a>
+        <a href="#LINK_SET">SET</a>
+      </p>
+      <h4 xmlns="" class="configsection">Global Configuration Directives</h4>
+      <p xmlns="" id="context_GLOBAL">
+        <a href="#GLOBAL_BACKGROUND">BACKGROUND</a>
+        <a href="#GLOBAL_WIDTH">WIDTH</a>
+        <a href="#GLOBAL_HEIGHT">HEIGHT</a>
+        <a href="#GLOBAL_HTMLOUTPUTFILE">HTMLOUTPUTFILE</a>
+        <a href="#GLOBAL_IMAGEOUTPUTFILE">IMAGEOUTPUTFILE</a>
+        <a href="#GLOBAL_FONTDEFINE">FONTDEFINE</a>
+        <a href="#GLOBAL_FONT">*FONT</a>
+        <a href="#GLOBAL_COLORS">*COLOR</a>
+        <a href="#GLOBAL_TIMEPOS">TIMEPOS</a>
+        <a href="#GLOBAL_TITLE">TITLE</a>
+        <a href="#GLOBAL_TITLEPOS">TITLEPOS</a>
+        <a href="#GLOBAL_KILO">KILO</a>
+        <a href="#GLOBAL_HTMLSTYLE">HTMLSTYLE</a>
+        <a href="#GLOBAL_SCALE">SCALE</a>
+        <a href="#GLOBAL_KEYPOS">KEYPOS</a>
+        <a href="#GLOBAL_KEYSTYLE">KEYSTYLE</a>
+        <a href="#GLOBAL_SET">SET</a>
+      </p>
+    </div>
+  </description>
+</freetext>

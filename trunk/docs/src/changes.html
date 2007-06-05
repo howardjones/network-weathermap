@@ -1,0 +1,158 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html lang="en" xml:lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+      <link rel="stylesheet" type="text/css" media="screen" href="weathermap.css" />
+  <meta name="generator" content=
+  "HTML Tidy for Mac OS X (vers 12 April 2006), see www.w3.org" />
+
+  <title>PHP Weathermap <!--#echo var="WM_VERSION"--> - Changes For This Version</title>
+<style type="text/css" media="print">
+/*<![CDATA[*/
+body { font-size: 12pt; }
+a { color: black; text-decoration: underline; font-weight: normal;}
+/*]]>*/
+</style>
+
+</head>
+
+<body>
+  <div id="frame">
+
+<!--#include file="common-top-nav.html" -->
+
+    <h2><a name="changes092">Changes For This Version (0.91 to 0.92)</a></h2>
+    <h3>New Features</h3>
+    <ul>
+    <li>BWSTYLE allows you to align the BWLABEL boxes with their links. Looks nice!</li>
+    <li>COMMENTPOS allows you to move comments, much like BWLABELPOS for BWLABELs</li>
+    <li>The editor works the way you'd expect for defaults now.</li>
+    <li>The editor does a bunch of clever maths when moving a node that is part of a curved link to make a sensible result (I like this one).</li>
+    <li>The editor will let you pick an INFOURL and OVERLIBGRAPH for a NODE from your Cacti graphs (but not a TARGET yet).</li>
+    <li>The editor doesn't <em>require</em> an <tt>editor-config.php</tt> anymore, but if you <em>do</em> have one, <strong>make sure it's based on the editor-config.php-dist in this version</strong>. This file has changed.</li>
+    <li>Secret SET codes: key_hidepercent_<em>scalename</em> and key_hidezero_<em>scalename</em><br />
+    You can set these at the top of the config file, for each scale (change <em>scalename</em> to the scale name). <tt>SET key_hidezero_DEFAULT 1</tt> hides the 0->0 line if there is one, in a 'classic' style legend for that scale.
+<tt>SET key_hidepercent_scalename 1</tt> hides the percentage signs in the 'classic' style legend for that scale.</li>
+    </ul>
+    <h3>Fixes</h3>
+    <ul>
+    <li>SET in a DEFAULT node or link wasn't inherited properly.</li>
+    <li>weathermap.conf is a simple map again. I accidentally packaged my test map for 0.9 and 0.91</li>
+    <li>Any unreadable files in the configs/ directory would kill the editor</li>
+    <li>One PHP short_tag remained, which upsets some PHP installs (seems to be mainly Windows)</li>
+    </ul>
+
+
+    <h2><a name="changes091">Changes For This Version (0.9 to 0.91)</a></h2>
+    
+    <p>After all the big changes (below for 0.9), there are a whole bunch of bugs that no-one spotted in the testing, so this release is
+    mostly a clean-up of those. There are a couple of small changes for new features, and a bit more diagnostic stuff for installation problems.</p>
+    
+    <h3>New Features</h3>
+<ul>
+<li>'Quiet Mode' Logging - in the Cacti plugin, there is a new setting to make Weathermap log <em>only</em> errors in the standard 'LOW' logging setting.<li>
+<li>Subtractive Aggregation - if one of the clauses in a TARGET line begins with a '-', then that value is subtracted from the result instead of added. This can be useful to calculate a value that couldn't be measured directly. For example, Netscreen firewalls don't give per-policy bandwidth stats, so to find out how much traffic is going to the internet, and how much to a VPN, you can start with the total interface traffic, and take out the VPN traffic (which you can measure), to leave the Internet traffic.</li>
+<li>There is a new <em>check.php</em> script, that verifies some basic requirements of your PHP installation. It's mainly useful during installation, so it's described in the installation instructions.</li>
+<li>A couple of additional variables are available in the 'special string tokens' - 'inscalekey' and 'outscalekey' store the internal names of the SCALE line that was triggered for the 'in' and 'out' values of a map object. You can use this to do some things like changing icons based on a value, without needing to write a plugin yourself. It's pretty obscure, but could be handy.</li>
+</ul>    
+   
+    <h3>Fixes</h3>
+<ul>
+<li>RRD bug with '-' DS names. This was fixed in 0.9pre3, but somehow slipped through.<li>
+<li>ReadConfig doesn't complain about KEYPOS DEFAULT -1 -1 (as written by WriteConfig) anymore</li>
+<li>The MRTG plugin made some assumptions that broke handling of MRTG html files on remote systems. It doesn't now.</li>
+<li>NOTES was not fully tested, and broke cactihost: targets, at least.</li>
+<li>KILO was broken - fixed now.</li>
+<li>BWLABELPOS was handled badly by the editor - it would swap them over</li>
+</ul>    
+
+	<h2><a name="changes09">Changes For This Version (0.82 to 0.9)</a></h2>
+
+<p>I've divided the changes up into chunks. Most of the serious work was done in the <a href="#structural">Structural Changes</a> section, but there are plenty of things for everyone. These are brief descriptions - see the Config Reference for the full detail. I've mentioned the appropriate configuration keywords if there are any.</p>
+
+<h3><a name="graphical">Graphical Changes</a></h3>
+<p>These tend to be smaller things, but together they make a lot of useful additions.</p>
+<h4>Link comments</h4>
+<p>You can add a comment string which runs down the side of link arrows. This is intended for use for circuit references, or interface names. There are 4 new directives to make this happen: INCOMMENT, OUTCOMMENT, COMMENTFONT and COMMENTFONTCOLOR. You <em>must</em> use a TrueType COMMENTFONT to use this feature, as none of the other font types allow for rotation of text.</p>
+<h4>Bandwidth Label Positioning</h4>
+<p>You can now move the bandwidth labels (those little boxes) up and down the link arrow. You set a percentage position with BWLABELPOS.</p>
+<h4>Pixel-Offsets</h4>
+<p>You can make links end at arbitrary positions relative to a node now. Previously you could use compass-points, now you can also use pixels for the offsets in a NODES line</p>
+<h4>JPEG & GIF Support</h4>
+<p>If your GD library supports it, then Weathermap now understands JPEG and GIF files for BACKGROUND, ICON and IMAGEOUTPUTFILE.</p>
+<h4>NOTES &amp; OVERLIBCAPTION</h4>
+<p>You can specify a caption string for the 'popup' overlib window now, per-node/link. You can <em>also</em> have HTML-formatted text in that window, with or without the graph. See NOTES and OVERLIBCAPTION.</p>
+<h4>New Legend Styles</h4>
+<p>The new KEYSTYLE directive allows you to choose between 'classic' and two new styles of Legend. The new styles are neater for showing gradient scales, or when you have a <em>lot</em> of different bands.</p>
+<h4>Relative Positioning</h4>
+<p>You can position a node relative to another node. This is handy for maintaining big rows of nodes, where only one needs to be fixed in position now.<p>
+<p>Use it with String Tokens to make captions for your nodes, with additional information.</p>
+
+<h3><a name="structural">Structural Changes</a></h3>
+<p>The internal structure of Weathermap has changed quite a lot in this version. It started as a few small changes, but each one showed that another was required.</p>
+
+<h4>Datasource Plugins</h4>
+<p>All the data-reading parts of Weathermap are now in plugins. This is to allow users to add their own external data sources more easily, without having to change the Weathermap code. All the previous TARGET strings will work as before, and I've added a few new ones for 0.9:
+<ul>
+<li><strong>static</strong> - if you need to fix a data value, you can do it without an external text file.</li>
+<li><strong>cactihost</strong> - read the up/down status of a host in Cacti</li>
+<li><strong>gauge</strong> - Read RRD values without any special treatment.</li>
+</ul>
+The RRD plugin also has some improvements in dealing with error conditions in this release.
+</p>
+<p>There are planned plugins for Cacti (reading directly from the Cact database), Nagios Host Status, SNMP directly and others.</p>
+
+<h4>NODE Targets</h4>
+<p>NODEs can have data now. This means you can have them change colour according to a SCALE, just like a LINK does. Since a NODE only has one value, you can
+choose which one to use (of the two that a TARGET provides), with USEVALUE.</p>
+
+<h4>Multiple SCALEs</h4>
+<p>Because you probably don't want your nodes to change colour with the same values as your links, you can now have multiple SCALE sets too. The default one is DEFAULT, but you can define others and use them with USESCALE in a NODE or LINK section.</p>
+
+<h4>String Tokens</h4>
+<p>You can embed information from Weathermap, and from your own data, in almost any string in Weathermap. This allows you to do things like:<ul>
+<li>Show percentage CPU usage in a node LABEL</li>
+<li>Change which ICON is used depending on a datasource value</li>
+<li>Add extra "sub-NODEs" around a NODE, with addional information</li>
+<li>Use generic TARGET, INFOURL, OVERLIBGRAPH lines in the DEFAULT link and node</li>
+</ul></p>
+
+<h4>Arbitrary Parameters</h4>
+<p>The new SET directive lets you define new 'variables' per-NODE, per-LINK or for the whole map. These can be used to give fine-tuning parameters to the data source plugins, and also as additional data in String Tokens.</p>
+
+<h3><a name="cacti">>Cacti Plugin</a></h3>
+<p>Most of the Cacti Plugin changes are bugfixes or for more advanced users.</p>
+
+<h4>Non-Standard Poller Cycle Times</h4>
+<p>If you are using the "&lt;5 minute poller" patch from TheWitness, then you may not want the time-consuming Weathermap process to run every poller cycle. There is now an option to choose how often Weathermap redraws it's maps, including 'Never'.</p>
+
+<h4>Async Map Generation</h4>
+<p>If you choose 'Never' above, then you need some way to redraw. The new <tt>weathermap-cacti-rebuild.php</tt> script allows you to run a separate cron job for Weathermap, but in the environment it would have inside the poller process.</p>
+
+<h4>Recalculate Now</h4>
+<p>If you have your permissions set up correctly, then you can force the redraw of all maps from within the Cacti UI, instead of waiting for a poller cycle.</p>
+
+<h3><a name="editor">Editor</a></h3>
+<p>There are no new features in the Editor for 0.9, although a few annoying bugs have been squashed. I have big plans for the editor, but they are a whole project by themselves, so I've put it to one side. Otherwise 0.9 would never have appeared :-) Now this version is released, the Editor is one the main focus areas for the next release. </p>
+
+<h3><a name="bugs">Bugfixes</a></h3>
+<p>There were a lot of bugs fixed along the way. Most were new ones, but a few are things that existed in 0.82 too:
+<ul>
+<li>Wierd bug in HTML_ImageMap if you have a lot of similarly-named NODEs or LINKs.</li>
+<li>Floating-point limits in SCALEs work correctly now. Also, you can specify a 0-0 SCALE line and it will always take precedence.</li>
+<li>Cacti plugin doesn't assume 'admin' user always exists, and that users are never deleted.</li>
+<li>Cacti plugin's Cycle mode works in IE now.</li>
+<li>KILO was ignored in some places.</li>
+<li>Editor will let you rename nodes now!</li>
+<li>Editor deals properly with ' in node labels</li>
+<li>Editor deals properly with pathnames containing '\' on Windows.</li>
+<li>Editor lets you pick JPG and GIF images too, since we now support them</li>
+<li>Close-together nodes don't crash the curve-drawing anymore</li>
+</ul>
+</p>
+
+
+  </div>
+</body>
+</html>

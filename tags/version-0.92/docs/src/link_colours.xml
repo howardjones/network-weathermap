@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configentry>
+	<keyword>*COLOR</keyword>
+	<scope>LINK</scope>
+	<anchor>LINK_COLORS</anchor>
+    <definition>OUTLINECOLOR <meta>red</meta> <meta>green</meta> <meta>blue</meta></definition>
+    <definition>BWOUTLINECOLOR <meta>red</meta> <meta>green</meta> <meta>blue</meta></definition>
+    <definition>BWFONTCOLOR <meta>red</meta> <meta>green</meta> <meta>blue</meta></definition>
+    <definition>BWBOXCOLOR <meta>red</meta> <meta>green</meta> <meta>blue</meta></definition>
+    <definition>COMMENTCOLOR <meta>red</meta> <meta>green</meta> <meta>blue</meta></definition>
+
+    <description  xmlns="http://www.w3.org/1999/xhtml">
+        <p>Specify the colours used for drawing the link.</p>
+        <p>red, green and blue are numbers from 0 to 255.</p>
+        <p>OUTLINECOLOR, BWOUTLINECOLOR and BWBOXCOLOR have an additional option - 'none' - which stops that element of the link being drawn. </p>
+	   <p>The colours are used as follows:<ul><li>OUTLINECOLOR is the colour of the line around the edge of the arrow.</li>
+	   <li>BWOUTLINECOLOR is the colour of the line surrounding the 'bandwidth label' box</li>
+	   <li>BWBOXCOLOR is the background colour for the same box</li>
+	   <li>BWFONTCOLOR is the colour used for text within that box</li>
+	   <li>COMMENTCOLOR is the colour used for the text produced by INCOMMENT and OUTCOMMENT, along the side of a link arrow</li></ul></p>
+    </description>
+    <changes>
+	    <change version="0.9">Added COMMENTCOLOR.</change>
+	    <change version="0.8">Added OUTLINECOLOR, BWOUTLINECOLOR, BWFONTCOLOR and BWBOXCOLOR.</change>
+    </changes>
+</configentry>

@@ -1,0 +1,117 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html lang="en" xml:lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+      <link rel="stylesheet" type="text/css" media="screen" href="weathermap.css" />
+  <meta name="generator" content=
+  "HTML Tidy for Mac OS X (vers 12 April 2006), see www.w3.org" />
+
+  <title>PHP Weathermap <!--#echo var="WM_VERSION"--> - Changes For This Version</title>
+<style type="text/css" media="print">
+/*<![CDATA[*/
+body { font-size: 12pt; }
+a { color: black; text-decoration: underline; font-weight: normal;}
+/*]]>*/
+</style>
+
+</head>
+
+<body>
+  <div id="frame">
+
+<!--#include file="common-top-nav.html" -->
+
+        <h2><a name="targets">Specifying TARGET lines</a></h2>
+
+<p>The actual data-reading part of Weathermap is handled by Data Source Plugins since version 0.9. These allow users or third-parties to easily add new data sources into Weathermap without altering the core code.</p>
+<p>There are a number of plugins supplied as standard, which will be described here. Each one uses a different format of TARGET string, which contains the parameters the plugin needs to find your data. <em>All</em> plugins return an 'in' and 'out' value, and some may set other variables that can be accessed by <a href="advanced.html#tokens">Special Tokens</a> in strings. For situations where there is only really one output, the 'out' value may just be the same as the 'in'.</p>
+
+<p>Here are the details of the standard data source plugins:</p>
+
+<hr />
+
+<h3><a name="static"></a>Static value</h3>
+
+<div class="definition">TARGET static:<em>invalue</em>:<em>outvalue</em></div>
+<div class="definition">TARGET static:<em>value</em></div>
+
+<p>The simplest of all the plugins, static allows you to just set a value in the config file itself. Sometimes this is useful for testing, or simple maps of things like OSPF metrics. If only a single value is specified, it is used for <em>both</em> input and output, just like the BANDWIDTH parameter.</p>
+
+<p>The values in the target string can use the same K,M,G,T suffixes as BANDWIDTH.</p>
+
+<h3><a name="rrd"></a>RRDtool files</h3>
+
+<div class="definition">TARGET <em>rrdfile.rrd</em>:<em>in_ds</em>:<em>out_ds</em></div>
+<div class="definition">TARGET gauge:<em>rrdfile.rrd</em>:<em>in_ds</em>:<em>out_ds</em></div>
+<div class="definition">TARGET rrd:<em>rrdfile.rrd</em>:<em>in_ds</em>:<em>out_ds</em></div>
+
+<p>This is the 'core' plugin for Weathermap. It reads data from rrd files, created using <a href="http://www.rrdtool.org/">Tobi Oetiker's RRDtool</a>, by tools like Cacti, MRTG, Cricket, NRG and so on.</p>
+
+<p>If you only specify a filename, and no DS-names, the default DS names for RRD files are 'traffic_in' and 'traffic_out', which works with
+       the majority of Cacti RRD files. For MRTG-produced RRD files, the names are
+       'DS0' and 'DS1'.
+       </p><p>You can also specify '-' for either DS name, which tells Weathermap to ignore
+       this rrd file for the purposes of the input or output value.
+       This is mainly useful in combination with the aggregation feature, where you can take the input data from one rrd file, and the output data from another.</p>
+       <p>With no prefix, or with just 'rrd:' as a prefix, the data read from the rrd file is assumed to be a standard SNMP interface counter, which is a byte-rate. It automatically multiplies these by 8 to get a bit-rate for the map. With the 'gauge:' prefix, this multiplication doesn't happen, which is useful for non-bandwidth values, like SNR or session-counts.</p>
+
+<p>By default, the plugin will read the last 800 seconds of data, and find the most recent within that to use. You might need to make it read back further, if you are updating your rrd files slowly. You can do this with the SET command, by adding 'SET rrd_period 3000' (any value in seconds) at the top of your map config file, before any NODE or LINK lines.</p>
+<p>Similarly, you can change the time that the plugin looks for data at from the present to the past, by using 'SET rrd_start -1d' in the top section of the config file. The full range of time-specification strings is at the bottom of the <a href="http://oss.oetiker.ch/rrdtool/doc/rrdfetch.en.html">rrdfetch manual page</a>.</p>
+
+<h3><a name="tabs"></a>Tab-separated text</h3>
+<div class="definition">TARGET <em>textfile</em></div>
+
+       <p>For tab-delimited data files, the format is plain-text, with three tab-seperated columns.
+       The first one is a linkname, and the second and third are traffic-in and traffic-out, respectively.
+       The linkname should match the name in the configuration file. This allows you to create one text file
+       for the entire map from some outside source. Traffic in &amp; out values can use the same "K,M,G,T" abbreviated forms
+       as the BANDWIDTH configuration command. The file should have an extension of .txt or .tsv to be
+       recognised as a tab-delimited file by Weathermap.</p>
+
+
+<h3><a name="mrtg"></a>MRTG .html file</h3>
+<div class="definition">TARGET <em>htmlfile</em></div>
+
+<p>This plugin reads data from special comments in the HTML files generated by MRTG. This is intended mainly for people using the 'old-style' MRTG .log files. If you are using MRTG with an RRDtool backend, then it's probably better to use the RRDtool plugin. </p>
+<p>The file should have an extension of .html or .htm to be
+       recognised as an MRTG file by Weathermap.</p>
+
+<h3><a name="cactihost"></a>Cacti host status</h3>
+<div class="definition">TARGET cactihost:<em>hostid</em></div>
+
+<p>This plugin reads the current status of a host from your Cacti database. The hostid is visible in Cacti URLs when you click on links in the Devices page. The return values for this plugin are numeric codes. It also sets a Hint Variable called 'state' to a string, that can be nicer to use in an ICON filename, for example</p>
+<table>
+<thead><tr><th>Code</th><th><tt>state</tt> value</th></tr></thead>
+<tbody>
+<tr><td>0</td><td>disabled</td></tr>
+<tr><td>1</td><td>down</td></tr>
+<tr><td>2</td><td>recovering</td></tr>
+<tr><td>3</td><td>up</td></tr>
+</tbody>
+</table>
+
+<p>An appropriate SCALE definition to get red, green, yellow and grey labels based on the state of a host would be:
+<pre>SCALE cactiupdown 0 0.5  192 192 192 
+SCALE cactiupdown 0.5 1.5 255 0 0 
+SCALE cactiupdown 1.5 2.5 0 0 255 
+SCALE cactiupdown 2.5 3.5 0 255 0 </pre>
+</p>
+
+<h3><a name="snmp"></a>SNMP value</h3>
+
+<div class="definition">TARGET static:<em>invalue</em>:<em>outvalue</em></div>
+
+<p>This is a fairly experimental plugin. It requires the PHP snmp extension to be installed and enabled. Even then, it's hit & miss whether it will work on a particular system - some versions of PHP have better support for SNMP than others, and on some platforms it is different to others, too.</p>
+<p>This plugin can directly query an SNMP-manageable device and fetch an OID from it.</p>
+
+<h3><a name="script"></a>External script</h3>
+
+<div class="definition">TARGET !<em>scriptname</em></div>
+
+<p>This plugin is fairly experimental and not thoroughly tested.</p>
+<p>This plugin allows you to write small external scripts, and pass the value from the script into Weathermap. The output format of the script is the same one that MRTG uses for <em>it's</em> external scripts, so it's possible that you can even find an existing script to do what you want, somewhere else.</p>
+
+  </div>
+</body>
+</html>

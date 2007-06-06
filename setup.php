@@ -12,7 +12,7 @@
 
 function weathermap_version () {
 	return array( 	'name'    	=> 'weathermap',
-		'version'       => '0.91',
+		'version'       => '0.92',
 		'longname'      => 'PHP Network Weathermap',
 		'author'        => 'Howard Jones',
 		'homepage'      => 'http://wotsit.thingy.com/haj/cacti/php-weathermap/',

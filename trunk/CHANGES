@@ -1,3 +1,6 @@
+0.93    Added - weathermap-cacti-plugin.php?action=viewmap&id=mapfilename  works as well as a map number - useful for crosslinks
+        
+
 0.92 - FIXED weathermap CLI help said --random-data instead of --randomdata
        FIXED one last php short_tag in poller_common.php - thanks Bernado Diez
        FIXED a SET in DEFAULT node/link is inherited by all node/links now.

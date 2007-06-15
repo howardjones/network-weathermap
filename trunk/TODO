@@ -21,6 +21,8 @@ INBWFORMAT/OUTBWFORMAT - ProcessString strings for the bwlabels
 - should be something like BWLABELIN and BWLABELOUT. Each one needs different vars.
 - This is starting to get ugly.
 
+
+
 DONE Refactor draw_curve/draw_label - store the spine in the link?
 DONE  - allow for tangential labels, moving comments, etc, without making draw_curve even bigger
 

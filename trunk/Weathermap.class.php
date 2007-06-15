@@ -2402,6 +2402,13 @@ class WeatherMapLink extends WeatherMapItem
 		$js.="overlibheight:'" . $this->overlibwidth . "', ";
 		$js.="overlibcaption:" . js_escape($this->overlibcaption) . ", ";
 
+		$vias = "via: [";
+		foreach ($this->vialist as $via)
+				$vias .= sprintf("[%d,%d],", $via[0], $via[1]);
+		$vias .= "],";
+		$vias = str_replace("],]","]]",$vias);
+		$js .= $vias;
+
 		$js.="infourl:" . js_escape($this->infourl) . ", ";
 		$js.="overliburl:" . js_escape($this->overliburl);
 		$js.="},\n";

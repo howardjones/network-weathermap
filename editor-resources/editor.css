@@ -14,7 +14,7 @@ body { font-family: 'Lucida Grande', Arial, sans-serif; margin: 0; padding: 0; b
 
 #toolbar { position: fixed; top:0px; left: 0px; height: 48px; width: 100%;
 	background: #2D3E70; color: white; border-bottom: gray solid 1px;
-	z-index: 1; opacity: 0.9; display: none; 
+	z-index: 10; opacity: 0.9; display: none; 
 	}
 
 #version { font-size: 70%; padding-left: 10px; padding-right: 10px; float:right; }
@@ -22,8 +22,8 @@ body { font-family: 'Lucida Grande', Arial, sans-serif; margin: 0; padding: 0; b
 
 /****************************************/
 
-#themap { margin-left: auto; margin-right: auto; padding: 0; width: 800px; padding-top: 10px; display: none; }
-#existingdata { border: none; }
+/* #themap { margin-left: auto; margin-right: auto; padding: 0; width: 800px; padding-top: 10px; display: none; } */
+#existingdata { border: none; position: absolute; left: 10px; top: 58px; }
 
 /****************************************/
 
@@ -45,5 +45,36 @@ body { font-family: 'Lucida Grande', Arial, sans-serif; margin: 0; padding: 0; b
 #filelist li a { padding: 4px; text-decoration: none; color: black; width: 99%; display: block; }
 #filelist li a:hover { color: white; background: #2D3E70; }
 #filelist li a img { border: none; padding: 2px; }
+#filelist li#status em { font-size: 90%; font-weight: normal; font-family: serif; }
+
 
 /****************************************/
+
+
+.draggablenode { cursor: move; }
+
+#toolbar ul {
+  float:left;  width:100%;
+  margin:0;   padding:0;
+  font-size:11px;   color:#fff;
+  background:#ccc;   background: #1958b7;
+  margin-bottom: 10px; }
+  
+#toolbar ul li {
+  display:inline;
+}
+
+#toolbar ul li {
+  float:left; padding:5px 10px; text-decoration:none;
+    
+    color:#fff;
+  background-image: url('editor-resources/slider_black_bg.png');
+  background-repeat: repeat-x; 
+    
+  cursor: pointer; text-align: center;
+  /*
+   border-left: #508fc4 2px solid; border-right: #1958b7 2px solid;
+  border-top: #508fc4 2px solid;  border-bottom: #1958b7 2px solid;
+  background: #2175bc; */
+    
+}

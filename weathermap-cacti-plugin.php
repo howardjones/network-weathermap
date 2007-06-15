@@ -33,10 +33,23 @@ case 'viewmap':
 	print "<div id=\"overDiv\" style=\"position:absolute; visibility:hidden; z-index:1000;\"></div>\n";
 	print "<script type=\"text/javascript\" src=\"overlib.js\"><!-- overLIB (c) Erik Bosrup --></script> \n";
 
+	$id = -1;
+
+	if( isset($_REQUEST['id']) && !is_numeric($_REQUEST['id']) )
+	{
+		$id = weathermap_translate_id($_REQUEST['id']);
+	}
+
 	if( isset($_REQUEST['id']) && is_numeric($_REQUEST['id']) )
 	{
-		weathermap_singleview($_REQUEST['id']);
+		$id = intval($_REQUEST['id']);
 	}
+	
+	if($id>=0)
+	{	
+		weathermap_singleview($id);
+	}	
+	
 	weathermap_versionbox();
 
 	include_once($config["base_path"]."/include/bottom_footer.php");
@@ -406,6 +419,14 @@ function weathermap_fullview($cycle=FALSE)
 	}
 
 
+}
+
+function weathermap_translate_id($idname)
+{
+	$SQL = "select id from weathermap_maps where configfile='".mysql_real_escape_string($idname)."'";
+	$map = db_fetch_assoc($SQL);
+
+	return($map[0]['id']);	
 }
 
 function weathermap_versionbox()

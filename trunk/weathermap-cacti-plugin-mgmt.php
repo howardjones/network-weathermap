@@ -266,7 +266,7 @@ function maplist()
 
 	if($i>0)
 	{
-		print '<div align="center"><a href="?action=rebuildnow"><img src="images/btn_recalc.png" border="0" alt="Rebuild All Maps Right Now"><br />(Experimental)</a></div>';
+		print '<div align="center"><a href="?action=rebuildnow"><img src="images/btn_recalc.png" border="0" alt="Rebuild All Maps Right Now"><br />(Experimental - You should NOT need to use this normally)</a></div>';
 	}
 
 

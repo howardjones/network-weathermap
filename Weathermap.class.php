@@ -3279,9 +3279,12 @@ function DrawLegend_Classic($im,$scalename="DEFAULT")
 	$hide_zero = intval($this->get_hint("key_hidezero_".$scalename));
 	$hide_percent = intval($this->get_hint("key_hidepercent_".$scalename));
 
+	// did we actually hide anything?
+	$hid_zero = FALSE;
 	if( ($hide_zero == 1) && isset($colours['0_0']) )
 	{
 		$nscales--;
+		$hid_zero = TRUE;
 	}
 
 	$font=$this->keyfont;
@@ -3337,12 +3340,21 @@ function DrawLegend_Classic($im,$scalename="DEFAULT")
 					$y=$boxy + $tilespacing * $i + 8;
 					$x=$boxx + 6;
 	
+					$fudgefactor = 0;
+					if( $hid_zero && $colour['bottom']==0 )
+					{
+						// calculate a small offset that can be added, which will hide the zero-value in a
+						// gradient, but not make the scale incorrect. A quarter of a pixel should do it.
+						$fudgefactor = ($colour['top'] - $colour['bottom'])/($tilewidth*4);
+						# warn("FUDGING $fudgefactor\n");
+					}					
+	
 					if (isset($colour['red2']))
 					{
 						for ($n=0; $n <= $tilewidth; $n++)
 						{
 							$percent
-								=$colour['bottom'] + ($n / $tilewidth) * ($colour['top'] - $colour['bottom']);
+								=  $fudgefactor + $colour['bottom'] + ($n / $tilewidth) * ($colour['top'] - $colour['bottom']);
 							list($col,$junk) = $this->ColourFromPercent($percent,$scalename);
 							imagefilledrectangle($im, $x + $n, $y, $x + $n, $y + $tileheight,
 								$col);

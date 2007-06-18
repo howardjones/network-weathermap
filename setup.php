@@ -232,8 +232,8 @@ function weathermap_setup_table () {
 function weathermap_config_arrays () {
 	global $user_auth_realms, $user_auth_realm_filenames, $menu;
 
-	$user_auth_realms[42]='Configure Weathermap';
-	$user_auth_realms[43]='View Weathermaps';
+	$user_auth_realms[42]='Plugin -> Weathermap: Configure/Manage';
+	$user_auth_realms[43]='Plugin -> Weathermap: View';
 	$user_auth_realm_filenames['weathermap-cacti-plugin.php'] = 43;
 	$user_auth_realm_filenames['weathermap-cacti-plugin-mgmt.php'] = 42;
 

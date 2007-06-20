@@ -11,6 +11,7 @@ class WeatherMapDataSource_rrd extends WeatherMapDataSource {
 		if (extension_loaded('RRDTool')) // fetch the values via the RRDtool Extension
 		{
 			debug("RRD DS: Using RRDTool php extension.\n");
+			return(TRUE);
 		}
 		else
 		{
@@ -94,8 +95,6 @@ class WeatherMapDataSource_rrd extends WeatherMapDataSource {
 		// cacti polling cycle we get run. This ought to stop the 'some lines are grey' problem that some
 		// people were seeing
 
-		// $item->add_note("rrdversion","1.3");
-
 		if(file_exists($rrdfile))
 		{
 			if(1==1)
@@ -121,6 +120,18 @@ class WeatherMapDataSource_rrd extends WeatherMapDataSource {
 					$rrdreturn = rrd_fetch ($rrdfile,$rrdparams,count($rrdparams));
 					print_r($rrdreturn);
 					// XXX - figure out what to do with the results here
+				 	$now = $rrdreturn['start'];
+					$n=0;
+					do {
+						$now += $rrdreturn['step'];
+						print "$now - ";
+						for($i=0;$i<$rrdreturn['ds_cnt'];$i++)
+						{
+							print $rrdreturn['ds_namv'][$i] . ' = '.$rrdreturn['data'][$n++]." ";
+						}
+						print "\n";
+					} while($now <= $rrdreturn['end']);
+						
 				}
 				else
 				{

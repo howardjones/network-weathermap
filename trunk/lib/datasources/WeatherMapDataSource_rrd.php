@@ -8,24 +8,31 @@ class WeatherMapDataSource_rrd extends WeatherMapDataSource {
 
 	function Init(&$map)
 	{
-		if (file_exists($map->rrdtool)) {
-			if((function_exists('is_executable')) && (!is_executable($map->rrdtool)))
-			{
-				warn("RRD DS: RRDTool exists but is not executable?\n");
-				return(FALSE);
-			}
-			$map->rrdtool_check="FOUND";
-			return(TRUE); 
-		}
-		// normally, DS plugins shouldn't really pollute the logs
-		// this particular one is important to most users though...
-		if($map->context=='cli')
+		if (extension_loaded('RRDTool')) // fetch the values via the RRDtool Extension
 		{
-			warn("RRD DS: Can't find RRDTOOL. Check line 29 of the 'weathermap' script.\nRRD-based TARGETs will fail.\n");
+			debug("RRD DS: Using RRDTool php extension.\n");
 		}
-		if($map->context=='cacti')
-		{    // unlikely to ever occur
-			warn("RRD DS: Can't find RRDTOOL. Check your Cacti config.\n");
+		else
+		{
+			if (file_exists($map->rrdtool)) {
+				if((function_exists('is_executable')) && (!is_executable($map->rrdtool)))
+				{
+					warn("RRD DS: RRDTool exists but is not executable?\n");
+					return(FALSE);
+				}
+				$map->rrdtool_check="FOUND";
+				return(TRUE); 
+			}
+			// normally, DS plugins shouldn't really pollute the logs
+			// this particular one is important to most users though...
+			if($map->context=='cli')
+			{
+				warn("RRD DS: Can't find RRDTOOL. Check line 29 of the 'weathermap' script.\nRRD-based TARGETs will fail.\n");
+			}
+			if($map->context=='cacti')
+			{    // unlikely to ever occur
+				warn("RRD DS: Can't find RRDTOOL. Check your Cacti config.\n");
+			}
 		}
 
 		return(FALSE);
@@ -107,72 +114,85 @@ class WeatherMapDataSource_rrd extends WeatherMapDataSource {
 				    $end = "start+".$period;
 				}
 
-				$command = '"'.$map->rrdtool . '" fetch "'.$rrdfile.'" AVERAGE --start '.$start.' --end '.$end;
-                $command=$map->rrdtool . " fetch $rrdfile AVERAGE --start $start --end $end";
-
-				debug ("RRD ReadData: Running: $command\n");
-				$pipe=popen($command, "r");
-				
-				$lines=array ();
-				$count = 0;
-				$linecount = 0;
-
-				if (isset($pipe))
+				if (extension_loaded('RRDTool')) // fetch the values via the RRDtool Extension
 				{
-					$headings=fgets($pipe, 4096);
-					fgets($pipe, 4096); // skip the blank line
-					$buffer='';
-
-					while (!feof($pipe))
-					{
-						$line=fgets($pipe, 4096);
-						debug ("> " . $line);
-						$buffer.=$line;
-						$lines[]=$line;
-						$linecount++;
-					}				
-					pclose ($pipe);
-					
-					debug("RRD ReadData: Read $linecount lines from rrdtool\n");
-
-					$rlines=array_reverse($lines);
-					$gotline=0;
-					$theline='';
-
-					foreach ($rlines as $line)
-					{
-						debug ("--" . $line . "\n");
-						$cols=preg_split("/\s+/", $line);
-						$dataok=1;
-						$ii=0;
-
-						foreach ($cols as $col)
-						{
-							# if( ! is_numeric($col) ) { $dataok=0; }
-							if (trim($col) != '' && !preg_match('/^\d+\.?\d*e?[+-]?\d*:?$/i', $col))
-							{
-								$dataok=0;
-								debug ("RRD ReadData: $ii: This isn't a number: [$col]\n");
-							}
-
-							# if($col=='nan') { $dataok=0; }
-							$ii++;
-						}
-
-						if ($gotline == 0 && $dataok == 1 && trim($line) != '')
-						{
-							debug ("RRD ReadData: Found a good line: $line ($headings)\n");
-							$theline=$line;
-							$gotline=1;
-							$countwas=$count;
-						}
-
-						$count++;
-					}				
+					// for the php-rrdtool module, we use an array instead...
+					$rrdparams = array("AVERAGE","--start",$start,"--end",$end);
+					$rrdreturn = rrd_fetch ($rrdfile,$rrdparams,count($rrdparams));
+					print_r($rrdreturn);
+					// XXX - figure out what to do with the results here
 				}
 				else
 				{
-					warn("RRD ReadData: failed to open pipe to RRDTool: ".$php_errormsg."\n");
+
+			#		$command = '"'.$map->rrdtool . '" fetch "'.$rrdfile.'" AVERAGE --start '.$start.' --end '.$end;
+					$command=$map->rrdtool . " fetch $rrdfile AVERAGE --start $start --end $end";
+		
+	
+					debug ("RRD ReadData: Running: $command\n");
+					$pipe=popen($command, "r");
+					
+					$lines=array ();
+					$count = 0;
+					$linecount = 0;
+	
+					if (isset($pipe))
+					{
+						$headings=fgets($pipe, 4096);
+						fgets($pipe, 4096); // skip the blank line
+						$buffer='';
+	
+						while (!feof($pipe))
+						{
+							$line=fgets($pipe, 4096);
+							debug ("> " . $line);
+							$buffer.=$line;
+							$lines[]=$line;
+							$linecount++;
+						}				
+						pclose ($pipe);
+						
+						debug("RRD ReadData: Read $linecount lines from rrdtool\n");
+	
+						$rlines=array_reverse($lines);
+						$gotline=0;
+						$theline='';
+	
+						foreach ($rlines as $line)
+						{
+							debug ("--" . $line . "\n");
+							$cols=preg_split("/\s+/", $line);
+							$dataok=1;
+							$ii=0;
+	
+							foreach ($cols as $col)
+							{
+								# if( ! is_numeric($col) ) { $dataok=0; }
+								if (trim($col) != '' && !preg_match('/^\d+\.?\d*e?[+-]?\d*:?$/i', $col))
+								{
+									$dataok=0;
+									debug ("RRD ReadData: $ii: This isn't a number: [$col]\n");
+								}
+	
+								# if($col=='nan') { $dataok=0; }
+								$ii++;
+							}
+	
+							if ($gotline == 0 && $dataok == 1 && trim($line) != '')
+							{
+								debug ("RRD ReadData: Found a good line: $line ($headings)\n");
+								$theline=$line;
+								$gotline=1;
+								$countwas=$count;
+							}
+	
+							$count++;
+						}
+					}
+					else
+					{
+						warn("RRD ReadData: failed to open pipe to RRDTool: ".$php_errormsg."\n");
+					}
 				}
 
 				if ($theline != '')

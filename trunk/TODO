@@ -1,3 +1,5 @@
+
+
 Refactor scale/colour picking stuff, so we can get inscalekey/outscalekey early
 
 Cacti poller_output support (Boost) - lots of reworking
@@ -6,9 +8,19 @@ Editor QuickWin(tm): Upload images
 Editor QuickWin(tm): Grid Snap
 Editor QuickWin(tm): Node Targets picker
 
+Error Codes - error code linked to explanatory page on website. Getting tired of explaining the english errors again and again!
+
 Memory Leaks?
 
 RRDserv-compatible target?  rrdfile.rrd@hostname:portnumber   rrdremote:host:port:file.rrd (need to learn PHP sockets)
+
+php-rrdtool support in rrd DS plugin
+
+Cacti THold DS plugin
+Cacti Manage DS plugin (if I can get Manage to work)
+Cacti Report DS plugin?
+WhatsUp Gold 8 & 11 DS plugins
+Nagios DS plugin
 
 BWLABELS nonzero   to hide bwlabel boxes for (exactly) zero values. (grangenet weathermap)
 
@@ -20,8 +32,6 @@ INBWFORMAT/OUTBWFORMAT - ProcessString strings for the bwlabels
 - Some way to format BWLABELs? I want milliseconds, someone else wanted  "x% of yMb"
 - should be something like BWLABELIN and BWLABELOUT. Each one needs different vars.
 - This is starting to get ugly.
-
-
 
 DONE Refactor draw_curve/draw_label - store the spine in the link?
 DONE  - allow for tangential labels, moving comments, etc, without making draw_curve even bigger

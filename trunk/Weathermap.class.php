@@ -1,12 +1,12 @@
 <?php
-// PHP Weathermap 0.92
+// PHP Weathermap 0.93
 // Copyright Howard Jones, 2005-2007 howie@thingy.com
 // http://www.network-weathermap.com/
 // Released under the GNU Public License
 
 require_once "HTML_ImageMap.class.php";
 
-$WEATHERMAP_VERSION="0.92";
+$WEATHERMAP_VERSION="0.93";
 $weathermap_debugging=FALSE;
 
 // Turn on ALL error reporting for now.

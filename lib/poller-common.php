@@ -89,7 +89,7 @@ function weathermap_run_maps($mydir) {
 							// $wmap->imageuri = $config['url_path'].'/plugins/weathermap/output/weathermap_'.$map['id'].".".$imageformat;
 							$wmap->imageuri = 'output/weathermap_'.$map['id'].".".$imageformat;
 
-							if($quietlogging==0) warn("About to write image file. If this is the last message in your log, increase memory_limit in php.ini");
+							if($quietlogging==0) warn("About to write image file. If this is the last message in your log, increase memory_limit in php.ini [WMPOLL01]");
 							weathermap_memory_check("MEM pre-render $mapcount");
 							
 							$wmap->DrawMap($imagefile,$thumbimagefile,read_config_option("weathermap_thumbsize"));
@@ -106,11 +106,11 @@ function weathermap_run_maps($mydir) {
 							{
 								if(file_exists($htmlfile))
 								{
-									warn("Failed to overwrite $htmlfile - permissions of existing file are wrong?\n");
+									warn("Failed to overwrite $htmlfile - permissions of existing file are wrong? [WMPOLL02]\n");
 								}
 								else
 								{
-									warn("Failed to create $htmlfile - permissions of output directory are wrong?\n");
+									warn("Failed to create $htmlfile - permissions of output directory are wrong? [WMPOLL03]\n");
 								}
 							}
 
@@ -122,24 +122,24 @@ function weathermap_run_maps($mydir) {
 						}
 						else
 						{
-							warn("Mapfile $mapfile is not readable or doesn't exist");
+							warn("Mapfile $mapfile is not readable or doesn't exist [WMPOLL04]");
 						}
 					}
 					debug("Iterated all $mapcount maps.");
 				}
 				else
 				{
-					if($quietlogging==0) warn("No activated maps found.");
+					if($quietlogging==0) warn("No activated maps found. [WMPOLL05]");
 				}
 			}
 			else
 			{
-				warn("Output directory ($outdir) isn't writable (tried to create '$testfile'). No maps created. You probably need to make it writable by the poller process (like you did with the RRA directory)");
+				warn("Output directory ($outdir) isn't writable (tried to create '$testfile'). No maps created. You probably need to make it writable by the poller process (like you did with the RRA directory) [WMPOLL06]");
 			}
 		}
 		else
 		{
-			warn("Output directory ($outdir) doesn't exist!. No maps created. You probably need to create that directory, and make it writable by the poller process (like you did with the RRA directory)");
+			warn("Output directory ($outdir) doesn't exist!. No maps created. You probably need to create that directory, and make it writable by the poller process (like you did with the RRA directory) [WMPOLL07]");
 		}
 		weathermap_memory_check("MEM Final");
 		chdir($orig_cwd);
@@ -147,7 +147,7 @@ function weathermap_run_maps($mydir) {
 	}
 	else
 	{
-		warn("Required modules for PHP Weathermap $WEATHERMAP_VERSION were not present. Not running.");
+		warn("Required modules for PHP Weathermap $WEATHERMAP_VERSION were not present. Not running. [WMPOLL08]");
 	}
 }
 

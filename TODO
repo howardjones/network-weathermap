@@ -1,4 +1,4 @@
-
+USESCALE none produces an error
 
 Refactor scale/colour picking stuff, so we can get inscalekey/outscalekey early
 

@@ -57,10 +57,14 @@ function show_editor_startpage()
 			while ($file=readdir($dh))
 			{
 				$realfile=$mapdir . DIRECTORY_SEPARATOR . $file;
-
+				$note = "";
 // if(is_file($realfile) && ( preg_match('/\.conf$/',$file) ))
 				if ( (is_file($realfile)) && (is_readable($realfile)) )
 				{
+					if(!is_writable($realfile))
+					{
+						$note .= "(read-only)";
+					}
 					$title='(no title)';
 					$fd=fopen($realfile, "r");
 					if($fd)
@@ -74,6 +78,7 @@ function show_editor_startpage()
 	
 						fclose ($fd);
 						$titles[$file] = $title;
+						$notes[$file] = $note;
 						# print "<li><a href=\"?mapname=$file\">$file</a> - <span class=\"comment\">$title</span></li>\n";
 						$n++;
 					}
@@ -89,7 +94,8 @@ function show_editor_startpage()
 		foreach ($titles as $file=>$title)
 		{
 			$title = $titles[$file];
-			print "<li><a href=\"?mapname=$file\">$file</a> - <span class=\"comment\">$title</span></li>\n";
+			$note = $notes[$file];
+			print "<li>$note<a href=\"?mapname=$file\">$file</a> - <span class=\"comment\">$title</span></li>\n";
 		}
 
 		if ($n == 0) { print "<LI>No files</LI>"; }

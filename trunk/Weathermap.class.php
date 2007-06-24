@@ -23,7 +23,7 @@ function module_checks()
 {
 	if (!extension_loaded('gd'))
 	{
-		warn ("\n\nNo image (gd) extension is loaded. This is required by weathermap.\n\n");
+		warn ("\n\nNo image (gd) extension is loaded. This is required by weathermap. [WMWARN20]\n\n");
 		warn ("\nrun check.php to check PHP requirements.\n\n");
 
 		return (FALSE);
@@ -31,21 +31,21 @@ function module_checks()
 
 	if (!function_exists('imagecreatefrompng'))
 	{
-		warn ("Your GD php module doesn't support PNG format.\n");
+		warn ("Your GD php module doesn't support PNG format. [WMWARN21]\n");
 		warn ("\nrun check.php to check PHP requirements.\n\n");
 		return (FALSE);
 	}
 
 	if (!function_exists('imagecreatetruecolor'))
 	{
-		warn ("Your GD php module doesn't support truecolor.\n");
+		warn ("Your GD php module doesn't support truecolor. [WMWARN22]\n");
 		warn ("\nrun check.php to check PHP requirements.\n\n");
 		return (FALSE);
 	}
 
 	if (!function_exists('imagecopyresampled'))
 	{
-		warn ("Your GD php module doesn't support thumbnail creation (imagecopyresampled).\n");
+		warn ("Your GD php module doesn't support thumbnail creation (imagecopyresampled). [WMWARN23]\n");
 	}
 	return (TRUE);
 }
@@ -162,7 +162,7 @@ function imagecreatefromfile($filename)
 			}
 			else
 			{
-				warn("Image file $filename is GIF, but GIF is not supported by your GD library.\n");    
+				warn("Image file $filename is GIF, but GIF is not supported by your GD library. [WMIMG01]\n");    
 			}
 			break;
 
@@ -173,7 +173,7 @@ function imagecreatefromfile($filename)
 			}
 			else
 			{
-				warn("Image file $filename is JPEG, but JPEG is not supported by your GD library.\n");    
+				warn("Image file $filename is JPEG, but JPEG is not supported by your GD library. [WMIMG02]\n");    
 			}
 			break;
 
@@ -184,18 +184,18 @@ function imagecreatefromfile($filename)
 			}
 			else
 			{
-				warn("Image file $filename is PNG, but PNG is not supported by your GD library.\n");    
+				warn("Image file $filename is PNG, but PNG is not supported by your GD library. [WMIMG03]\n");    
 			}
 			break;
 
 		default:
-			warn("Image file $filename wasn't recognised (type=$type). Check format is supported by your GD library.\n");
+			warn("Image file $filename wasn't recognised (type=$type). Check format is supported by your GD library. [WMIMG04]\n");
 			break;
 		}
 	}
 	else
 	{
-		warn("Image file $filename is unreadable. Check permissions.\n");    
+		warn("Image file $filename is unreadable. Check permissions. [WMIMG05]\n");    
 	}
 	return $bgimage;
 }
@@ -493,7 +493,7 @@ function draw_curve($image, &$curvepoints, $width, $outlinecolour, $comment_colo
 	# warn("$linkname: Total: $totaldistance $arrowsize $arrowwidth $minimumlength\n");
 	if($totaldistance <= $minimumlength)
 	{
-		warn("Skipping drawing very short link ($linkname). Impossible to draw! Try changing WIDTH or ARROWSTYLE?\n");
+		warn("Skipping drawing very short link ($linkname). Impossible to draw! Try changing WIDTH or ARROWSTYLE? [WMWARN01]\n");
 		return;
 	}
 
@@ -1067,63 +1067,102 @@ class WeatherMapNode extends WeatherMapItem
 		// figure out a bounding rectangle for the icon
 		if ($this->iconfile != '')
 		{
-			$this->iconfile = $map->ProcessString($this->iconfile ,$this);
-			if (is_readable($this->iconfile))
+			$icon_im = NULL;
+			$icon_w = 0;
+			$icon_h = 0;
+			
+			if($this->iconfile == 'inpie' || $this->iconfile == 'nink' || $this->iconfile == 'box' || $this->iconfile == 'outpie' || $this->iconfile == 'round')
 			{
-				imagealphablending($im, true);
-				// draw the supplied icon, instead of the labelled box
-
-				$icon_im = imagecreatefromfile($this->iconfile);
-				# $icon_im = imagecreatefrompng($this->iconfile);
-
-				if ($icon_im)
+				// this is an artificial icon - we don't load a file for it
+				
+				// XXX - add the actual DRAWING CODE!
+								
+				$icon_im = imagecreatetruecolor($this->iconscalew,$this->iconscaleh);
+				imageSaveAlpha($icon_im, TRUE);
+		
+				$nothing=imagecolorallocatealpha($icon_im,128,0,0,127);
+				imagefill($icon_im, 0, 0, $nothing);
+				
+				$ink = imagecolorallocate($icon_im,0,0,0);
+				$fill = imagecolorallocate($icon_im,255,255,255);
+				if($this->iconfile=='box')
 				{
-					$icon_w = imagesx($icon_im);
-					$icon_h = imagesy($icon_im);
-
-					if(($this->iconscalew * $this->iconscaleh) > 0)
-					{
-						imagealphablending($icon_im, true);
-
-						debug("SCALING ICON here\n");
-						if($icon_w > $icon_h)
-						{
-							$scalefactor = $icon_w/$this->iconscalew;
-						}
-						else
-						{
-							$scalefactor = $icon_h/$this->iconscaleh;
-						}
-						$new_width = $icon_w / $scalefactor;
-						$new_height = $icon_h / $scalefactor;
-						$scaled = imagecreatetruecolor($new_width, $new_height);
-						imagealphablending($scaled,false);
-						imagecopyresampled($scaled, $icon_im, 0, 0, 0, 0, $new_width, $new_height, $icon_w, $icon_h);
-						imagedestroy($icon_im);
-						$icon_im = $scaled;
-						$icon_w = imagesx($icon_im);
-						$icon_h = imagesy($icon_im);
-					}
-
-					$icon_x1 = $this->x - $icon_w / 2;
-					$icon_y1 = $this->y - $icon_h / 2;
-					$icon_x2 = $this->x + $icon_w / 2;
-					$icon_y2 = $this->y + $icon_h / 2;
-
-					# $this->width = imagesx($icon_im);
-					# $this->height = imagesy($icon_im);
-					$map->nodes[$this->name]->width = imagesx($icon_im);
-					$map->nodes[$this->name]->height = imagesy($icon_im);
-
-					$map->imap->addArea("Rectangle", "NODE:" . $this->name, '', array($icon_x1, $icon_y1, $icon_x2, $icon_y2));
-
+					imagefilledrectangle($icon_im, 0, 0, $this->iconscalew-1, $this->iconscaleh-1, $fill);
+					imagerectangle($icon_im, 0, 0, $this->iconscalew-1, $this->iconscaleh-1, $ink);
 				}
-				else { warn ("Couldn't open PNG ICON: " . $this->iconfile . " - is it a PNG?\n"); }
+				
+				if($this->iconfile=='round')
+				{
+					$rx = $this->iconscalew/2-1;
+					$ry = $this->iconscaleh/2-1;
+					imagefilledellipse($icon_im,$rx,$ry,$rx*2,$ry*2,$fill);
+					imageellipse($icon_im,$rx,$ry,$rx*2,$ry*2,$ink);
+				}
+				
 			}
 			else
 			{
-				warn ("ICON " . $this->iconfile . " does not exist, or is not readable. Check path and permissions.\n");
+				$this->iconfile = $map->ProcessString($this->iconfile ,$this);
+				if (is_readable($this->iconfile))
+				{
+					imagealphablending($im, true);
+					// draw the supplied icon, instead of the labelled box
+	
+					$icon_im = imagecreatefromfile($this->iconfile);
+					# $icon_im = imagecreatefrompng($this->iconfile);
+	
+					if ($icon_im)
+					{
+						$icon_w = imagesx($icon_im);
+						$icon_h = imagesy($icon_im);
+	
+						if(($this->iconscalew * $this->iconscaleh) > 0)
+						{
+							imagealphablending($icon_im, true);
+	
+							debug("SCALING ICON here\n");
+							if($icon_w > $icon_h)
+							{
+								$scalefactor = $icon_w/$this->iconscalew;
+							}
+							else
+							{
+								$scalefactor = $icon_h/$this->iconscaleh;
+							}
+							$new_width = $icon_w / $scalefactor;
+							$new_height = $icon_h / $scalefactor;
+							$scaled = imagecreatetruecolor($new_width, $new_height);
+							imagealphablending($scaled,false);
+							imagecopyresampled($scaled, $icon_im, 0, 0, 0, 0, $new_width, $new_height, $icon_w, $icon_h);
+							imagedestroy($icon_im);
+							$icon_im = $scaled;
+							
+						}
+					}
+					else { warn ("Couldn't open PNG ICON: " . $this->iconfile . " - is it a PNG?\n"); }
+				}
+				else
+				{
+					warn ("ICON " . $this->iconfile . " does not exist, or is not readable. Check path and permissions.\n");
+				}
 			}
+
+			if($icon_im)
+			{
+				$icon_w = imagesx($icon_im);
+				$icon_h = imagesy($icon_im);
+							
+				$icon_x1 = $this->x - $icon_w / 2;
+				$icon_y1 = $this->y - $icon_h / 2;
+				$icon_x2 = $this->x + $icon_w / 2;
+				$icon_y2 = $this->y + $icon_h / 2;
+				
+				$map->nodes[$this->name]->width = imagesx($icon_im);
+				$map->nodes[$this->name]->height = imagesy($icon_im);
+	
+				$map->imap->addArea("Rectangle", "NODE:" . $this->name, '', array($icon_x1, $icon_y1, $icon_x2, $icon_y2));
+			}
+			
 		}
 
 		// do any offset calculations
@@ -2588,15 +2627,15 @@ class WeatherMap extends WeatherMapBase
 		// if it's supposed to be a special font, and it hasn't been defined, then fall through
 		if ($fontnumber > 5 && !isset($this->fonts[$fontnumber]))
 		{
-			warn ("Using a non-existent special font ($fontnumber) - falling back to internal GD fonts\n");
-			if($angle != 0) warn("Angled text doesn't work with non-FreeType fonts\n");
+			warn ("Using a non-existent special font ($fontnumber) - falling back to internal GD fonts [WMWARN03]\n");
+			if($angle != 0) warn("Angled text doesn't work with non-FreeType fonts [WMWARN02]\n");
 			$fontnumber=5;
 		}
 
 		if (($fontnumber > 0) && ($fontnumber < 6))
 		{
 			imagestring($image, $fontnumber, $x, $y - imagefontheight($fontnumber), $string, $colour);
-			if($angle != 0) warn("Angled text doesn't work with non-FreeType fonts\n");
+			if($angle != 0) warn("Angled text doesn't work with non-FreeType fonts [WMWARN02]\n");
 		}
 		else
 		{
@@ -2612,7 +2651,7 @@ class WeatherMap extends WeatherMapBase
 				imagestring($image, $this->fonts[$fontnumber]->gdnumber,
 					$x,      $y - imagefontheight($this->fonts[$fontnumber]->gdnumber),
 					$string, $colour);
-				if($angle != 0) warn("Angled text doesn't work with non-FreeType fonts\n");
+				if($angle != 0) warn("Angled text doesn't work with non-FreeType fonts [WMWARN04]\n");
 			}
 		}
 	}
@@ -2711,7 +2750,7 @@ class WeatherMap extends WeatherMapBase
 
 				if(is_null($the_item))
 				{
-					warn("ProcessString: $key refers to unknown item\n");
+					warn("ProcessString: $key refers to unknown item [WMWARN05]\n");
 				}
 				else
 				{
@@ -2817,7 +2856,7 @@ function LoadPlugins( $type="data", $dir="lib/datasources" )
 	}
 	else
 	{
-		warn("Couldn't open $type Plugin directory ($dir). Things will probably go wrong.\n");
+		warn("Couldn't open $type Plugin directory ($dir). Things will probably go wrong. [WMWARN06]\n");
 	}
 }
 
@@ -2909,7 +2948,7 @@ function ReadData()
 										}
 										else
 										{
-											warn("ReadData: $type $name, target: $targetstring on config line $target[3] was recognised as a valid TARGET by a plugin that is unable to run ($ds_class)\n");
+											warn("ReadData: $type $name, target: $targetstring on config line $target[3] was recognised as a valid TARGET by a plugin that is unable to run ($ds_class) [WMWARN07]\n");
 										}
 										$matched = TRUE;
 										$matched_by = $ds_class;
@@ -2920,7 +2959,7 @@ function ReadData()
 							if(! $matched)
 							{
 								// **
-								warn("ReadData: $type $name, target: $target[4] on config line $target[3] was not recognised as a valid TARGET\n");
+								warn("ReadData: $type $name, target: $target[4] on config line $target[3] was not recognised as a valid TARGET [WMWARN08]\n");
 							}
 
 							if (($in < 0) || ($out < 0))
@@ -3113,7 +3152,7 @@ function ColourFromPercent($percent,$scalename="DEFAULT",$name="")
 	}
 	else
 	{
-		warn("ColourFromPercent: Attempted to use non-existent scale: $scalename for $name\n");
+		warn("ColourFromPercent: Attempted to use non-existent scale: $scalename for $name [WMWARN09]\n");
 	}
 
 	// you'll only get grey for a COMPLETELY quiet link if there's no 0 in the SCALE lines
@@ -3736,8 +3775,18 @@ function ReadConfig($filename)
 				{
 					if ($last_seen == 'NODE')
 					{
-						$curnode->iconfile=$matches[3];
-						$this->used_images[] = $matches[3];
+						// allow some special names - these produce "artificial" icons
+						if($matches[3]=='nink' || $matches[3]=='box' || $matches[3]=='round' || $matches[3]=='inpie' || $matches[3]=='outpie' )
+						{
+							// special icons aren't added to used_images, so they won't appear in picklist for editor
+							// (the editor doesn't do icon scaling, and these *require* a scale)
+							$curnode->iconfile=$matches[3];
+						}
+						else
+						{						
+							$curnode->iconfile=$matches[3];
+							$this->used_images[] = $matches[3];						
+						}
 						$curnode->iconscalew = $matches[1];
 						$curnode->iconscaleh = $matches[2];
 						$linematched++;
@@ -4386,7 +4435,7 @@ function ReadConfig($filename)
 				}
 				else
 				{
-					warn("NODE ".$node->name." has a relative position to an unknown node!\n");
+					warn("NODE ".$node->name." has a relative position to an unknown node! [WMWARN10]\n");
 				}
 			}
 		}
@@ -4396,7 +4445,7 @@ function ReadConfig($filename)
 	
 	if($skipped>0)	
 	{ 
-		warn("There are Circular dependencies in relative POSITION lines for $skipped nodes.\n");
+		warn("There are Circular dependencies in relative POSITION lines for $skipped nodes. [WMWARN11]\n");
 	}
 
 	# warn("---\n\nDEFAULT NODE AGAIN::".var_dump($this->defaultnode->hints)."::\n");
@@ -4713,7 +4762,7 @@ function DrawMap($filename = '', $thumbnailfile = '', $thumbnailmax = 250, $with
 				}
 				else
 				{
-					warn("Failed to write map image. No function existed for the image format you requested.\n");
+					warn("Failed to write map image. No function existed for the image format you requested. [WMWARN12]\n");
 					$functions = FALSE;
 				}
 				
@@ -4721,11 +4770,11 @@ function DrawMap($filename = '', $thumbnailfile = '', $thumbnailmax = 250, $with
 				{
 					if(file_exists($filename))
 					{
-						warn("Failed to overwrite existing image file $filename - permissions of existing file are wrong?");
+						warn("Failed to overwrite existing image file $filename - permissions of existing file are wrong? [WMWARN13]");
 					}
 					else
 					{
-						warn("Failed to create image file $filename - permissions of output directory are wrong?");
+						warn("Failed to create image file $filename - permissions of output directory are wrong? [WMWARN14]");
 					}
 				}
 			}
@@ -4761,18 +4810,18 @@ function DrawMap($filename = '', $thumbnailfile = '', $thumbnailmax = 250, $with
 				{
 					if(file_exists($filename))
 					{
-						warn("Failed to overwrite existing image file $filename - permissions of existing file are wrong?");
+						warn("Failed to overwrite existing image file $filename - permissions of existing file are wrong? [WMWARN15]");
 					}
 					else
 					{
-						warn("Failed to create image file $filename - permissions of output directory are wrong?");
+						warn("Failed to create image file $filename - permissions of output directory are wrong? [WMWARN16]");
 					}
 				}
 			}
 		}
 		else
 		{
-			warn("Skipping thumbnail creation, since we don't have the necessary function.");
+			warn("Skipping thumbnail creation, since we don't have the necessary function. [WMWARN17]");
 		}
 		imagedestroy ($image);
 	}

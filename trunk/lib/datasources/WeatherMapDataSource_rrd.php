@@ -18,7 +18,7 @@ class WeatherMapDataSource_rrd extends WeatherMapDataSource {
 			if (file_exists($map->rrdtool)) {
 				if((function_exists('is_executable')) && (!is_executable($map->rrdtool)))
 				{
-					warn("RRD DS: RRDTool exists but is not executable?\n");
+					warn("RRD DS: RRDTool exists but is not executable? [WMRRD01]\n");
 					return(FALSE);
 				}
 				$map->rrdtool_check="FOUND";
@@ -28,11 +28,11 @@ class WeatherMapDataSource_rrd extends WeatherMapDataSource {
 			// this particular one is important to most users though...
 			if($map->context=='cli')
 			{
-				warn("RRD DS: Can't find RRDTOOL. Check line 29 of the 'weathermap' script.\nRRD-based TARGETs will fail.\n");
+				warn("RRD DS: Can't find RRDTOOL. Check line 29 of the 'weathermap' script.\nRRD-based TARGETs will fail. [WMRRD02]\n");
 			}
 			if($map->context=='cacti')
 			{    // unlikely to ever occur
-				warn("RRD DS: Can't find RRDTOOL. Check your Cacti config.\n");
+				warn("RRD DS: Can't find RRDTOOL. Check your Cacti config. [WMRRD03]\n");
 			}
 		}
 
@@ -202,14 +202,14 @@ class WeatherMapDataSource_rrd extends WeatherMapDataSource {
 					}
 					else
 					{
-						warn("RRD ReadData: failed to open pipe to RRDTool: ".$php_errormsg."\n");
+						warn("RRD ReadData: failed to open pipe to RRDTool: ".$php_errormsg." [WMRRD04]\n");
 					}
 				}
 
 				if ($theline != '')
 				{
 					if ($countwas > 2) { warn
-						("RRD ReadData: Data is not most recent entry ($countwas) for link: $targetstring\n"); }
+						("RRD ReadData: Data is not most recent entry ($countwas) for link: $targetstring [WMRRD05]\n"); }
 
 					debug ("RRD ReadData: Our line is $theline\n");
 					$cols=preg_split("/\s+/", $theline);
@@ -231,14 +231,14 @@ class WeatherMapDataSource_rrd extends WeatherMapDataSource {
 					}
 					else
 					{
-						warn("RRD ReadData: Neither of your DS names ($in_ds & $out_ds) were found, even though there was a valid data line. Maybe they are wrong?");
+						warn("RRD ReadData: Neither of your DS names ($in_ds & $out_ds) were found, even though there was a valid data line. Maybe they are wrong? [WMRRD06]");
 					}
 				}
 			}
 		}
 		else
 		{
-			warn ("Target $rrdfile doesn't exist. Is it a file?\n");
+			warn ("Target $rrdfile doesn't exist. Is it a file? [WMRRD06]\n");
 		}
 
 		debug ("RRD ReadData: Returning ($inbw,$outbw,$data_time)\n");

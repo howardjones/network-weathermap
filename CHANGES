@@ -3,6 +3,7 @@
         CHANGE - the auth realm names for Cacti have been changed to match ReportIt and Aggregate - easier to tell who does what
         ADDED - unique code for each warning message, and a page to explain it on the website. Ugh.
         ADDED - warning in editor file-selector so you can tell if the file is read-only
+		ADDED - click config filename to edit in editor from Cacti (thanks to Brian Burgoon)
 
 0.92 - FIXED weathermap CLI help said --random-data instead of --randomdata
        FIXED one last php short_tag in poller_common.php - thanks Bernado Diez

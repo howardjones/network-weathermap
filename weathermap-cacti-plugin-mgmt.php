@@ -179,7 +179,6 @@ function maplist()
 {
 	global $colors;
 
-
 	html_start_box("<strong>Weathermaps</strong>", "78%", $colors["header"], "3", "center", "weathermap-cacti-plugin-mgmt.php?action=addmap_picker");
 
 	html_header(array("Config File", "Title", "Active", "Sort Order", "Accessible By",""));
@@ -203,7 +202,7 @@ function maplist()
 		{
 			form_alternate_row_color($colors["alternate"],$colors["light"],$i);
 
-			print '<td>'.htmlspecialchars($map['configfile']).'</td>';
+			print '<td><a href="editor.php?plug=1&mapname='.htmlspecialchars($map['configfile']).'">'.htmlspecialchars($map['configfile']).'</a></td>';
 			print '<td>'.htmlspecialchars($map['titlecache']).'</td>';
 			if($map['active'] == 'on')
 			{

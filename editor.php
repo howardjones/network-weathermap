@@ -65,6 +65,9 @@ else
 	$map = new WeatherMap;
 	$map->context = 'editor';
 
+	$fromplug = FALSE;
+	if(isset($_REQUEST['plug'])) { $fromplug = TRUE; }
+
 	switch($action)
 	{
 	case 'newmap':
@@ -576,6 +579,9 @@ if($use_jquery)
 }
 ?>
 	<script type="text/javascript">
+	
+	var fromplug=<?php echo ($fromplug ? 1:0); ?>;
+	
 	// the only javascript in here should be the objects representing the map itself
 	// all code should be in editor.js
 	<?php print $map->asJS() ?>
@@ -638,17 +644,18 @@ if($use_jquery)
 
   <form action="editor.php" method="post" name="frmMain">
 	<div align="center">
+		<input type="hidden" name="plug" value="<?php (fromplug?1:0) ?>">
 	 <input style="display:none" type="image"
 	  src="<?php echo  $imageurl; ?>" id="xycapture" /><img src=
 	  "<?php echo  $imageurl; ?>" id="existingdata" alt="Weathermap" usemap="#weathermap_imap"
 	   /><br />
-	   <div class="debug"><p><strong>Debug:</strong> <a href="?action=nothing&amp;mapname=<?php echo  $mapname ?>">Do Nothing</a> 
+	   <div class="debug"><p><strong>Debug:</strong> <a href="?<?php echo ($fromplug ? 'plug=1&amp;' : ''); ?>action=nothing&amp;mapname=<?php echo  $mapname ?>">Do Nothing</a> 
 	   <span><label for="mapname">mapfile</label><input type="text" name="mapname" value="<?php echo  $mapname; ?>" /></span>
 	   <span><label for="action">action</label><input type="text" id="action" name="action" value="<?php echo  $newaction ?>" /></span>
 	  <span><label for="param">param</label><input type="text" name="param" id="param" value="" /></span> 
 	  <span><label for="param2">param2</label><input type="text" name="param2" id="param2" value="<?php echo  $param2 ?>" /></span> 
 	  <span><label for="debug">debug</label><input id="debug" value="" name="debug" /></span> 
-	  <a target="configwindow" href="?action=show_config&amp;mapname=<?php echo  $mapname ?>">See config</a></p>
+	  <a target="configwindow" href="?<?php echo ($fromplug ? 'plug=1&amp;':''); ?>action=show_config&amp;mapname=<?php echo  $mapname ?>">See config</a></p>
 	<pre><?php echo  $log ?></pre>
 	  </div>
 	   <map name="weathermap_imap">

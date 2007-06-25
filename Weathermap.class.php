@@ -3195,14 +3195,18 @@ function DrawLegend_Horizontal($im,$scalename="DEFAULT",$width=400)
 
 	list($tilewidth, $tileheight)=$this->myimagestringsize($font, "100%");
 	$box_left = $x;
+	# $box_left = 0;
 	$scale_left = $box_left + 4 + $scalefactor/2;
 	$box_right = $scale_left + $width + $tilewidth + 4 + $scalefactor/2;
 	$scale_right = $scale_left + $width;
 
 	$box_top = $y;
+	# $box_top = 0;
 	$scale_top = $box_top + $tileheight + 6;
 	$scale_bottom = $scale_top + $tileheight * 1.5;
 	$box_bottom = $scale_bottom + $tileheight * 2 + 6;
+
+	# $scale_im = imagecreatetruecolor($box_right, $box_bottom);
 
 	imagefilledrectangle($im, $box_left, $box_top, $box_right, $box_bottom,
 		$this->colours['DEFAULT']['KEYBG']['gdref1']);
@@ -3231,6 +3235,8 @@ function DrawLegend_Horizontal($im,$scalename="DEFAULT",$width=400)
 			$scale_left + $dx + $scalefactor/2, $scale_bottom,
 			$col);
 	}
+
+	# imagecopy($im,$scale_im,$this->keyx[$scalename],$this->keyy[$scalename],0,0,imagesx($scale_im),imagesy($scale_im));
 
 	$this->imap->addArea("Rectangle", "LEGEND:$scalename", '',
 		array($box_left, $box_top, $box_right, $box_bottom));
@@ -4614,7 +4620,7 @@ function WriteConfig($filename)
 // this way, it's the pretty icons that suffer if there aren't enough colours, and
 // not the actual useful data
 // we skip any gradient scales
-function AllocateScaleColours($im)
+function AllocateScaleColours($im,$refname='gdref1')
 {
 	# $colours=$this->colours['DEFAULT'];
 	foreach ($this->colours as $scalename=>$colours)
@@ -4627,7 +4633,7 @@ function AllocateScaleColours($im)
 				$g=$colour['green1'];
 				$b=$colour['blue1'];
 				debug ("AllocateScaleColours: $scalename $key ($r,$g,$b)\n");
-				$this->colours[$scalename][$key]['gdref1']=myimagecolorallocate($im, $r, $g, $b);
+				$this->colours[$scalename][$key][$refname]=myimagecolorallocate($im, $r, $g, $b);
 			}
 		}
 	}

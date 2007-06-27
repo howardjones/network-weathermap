@@ -3206,15 +3206,17 @@ function DrawLegend_Horizontal($im,$scalename="DEFAULT",$width=400)
 	$scale_bottom = $scale_top + $tileheight * 1.5;
 	$box_bottom = $scale_bottom + $tileheight * 2 + 6;
 
-	# $scale_im = imagecreatetruecolor($box_right, $box_bottom);
+	$scale_im = imagecreatetruecolor($box_right, $box_bottom);
+	$scale_ref = 'gdref_legend_'.$scalename;
+	$this->AllocateScaleColours($scale_im,$scale_ref);
 
-	imagefilledrectangle($im, $box_left, $box_top, $box_right, $box_bottom,
-		$this->colours['DEFAULT']['KEYBG']['gdref1']);
-	imagerectangle($im, $box_left, $box_top, $box_right, $box_bottom,
-		$this->colours['DEFAULT']['KEYTEXT']['gdref1']);
+	imagefilledrectangle($scale_im, $box_left, $box_top, $box_right, $box_bottom,
+		$this->colours['DEFAULT']['KEYBG'][$scale_ref]);
+	imagerectangle($scale_im, $box_left, $box_top, $box_right, $box_bottom,
+		$this->colours['DEFAULT']['KEYTEXT'][$scale_ref]);
 
-	$this->myimagestring($im, $font, $scale_left, $scale_bottom + $tileheight * 2 + 2 , $title,
-		$this->colours['DEFAULT']['KEYTEXT']['gdref1']);
+	$this->myimagestring($scale_im, $font, $scale_left, $scale_bottom + $tileheight * 2 + 2 , $title,
+		$this->colours['DEFAULT']['KEYTEXT'][$scale_ref]);
 
 	for($p=0;$p<=100;$p++)
 	{
@@ -3222,21 +3224,21 @@ function DrawLegend_Horizontal($im,$scalename="DEFAULT",$width=400)
 
 		if( ($p % 25) == 0)
 		{
-			imageline($im, $scale_left + $dx, $scale_top - $tileheight,
+			imageline($scale_im, $scale_left + $dx, $scale_top - $tileheight,
 				$scale_left + $dx, $scale_bottom + $tileheight,
-				$this->colours['DEFAULT']['KEYTEXT']['gdref1']);
+				$this->colours['DEFAULT']['KEYTEXT'][$scale_ref]);
 			$labelstring=sprintf("%d%%", $p);
-			$this->myimagestring($im, $font, $scale_left + $dx + 2, $scale_top - 2, $labelstring,
-				$this->colours['DEFAULT']['KEYTEXT']['gdref1']);
+			$this->myimagestring($scale_im, $font, $scale_left + $dx + 2, $scale_top - 2, $labelstring,
+				$this->colours['DEFAULT']['KEYTEXT'][$scale_ref]);
 		}
 
 		list($col,$junk) = $this->ColourFromPercent($p,$scalename);
-		imagefilledrectangle($im, $scale_left + $dx - $scalefactor/2, $scale_top,
+		imagefilledrectangle($scale_im, $scale_left + $dx - $scalefactor/2, $scale_top,
 			$scale_left + $dx + $scalefactor/2, $scale_bottom,
 			$col);
 	}
 
-	# imagecopy($im,$scale_im,$this->keyx[$scalename],$this->keyy[$scalename],0,0,imagesx($scale_im),imagesy($scale_im));
+	imagecopy($im,$scale_im,$this->keyx[$scalename],$this->keyy[$scalename],0,0,imagesx($scale_im),imagesy($scale_im));
 
 	$this->imap->addArea("Rectangle", "LEGEND:$scalename", '',
 		array($box_left, $box_top, $box_right, $box_bottom));

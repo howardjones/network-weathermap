@@ -1,3 +1,7 @@
+Background image links: http://art.gnome.org/backgrounds/abstract/
+Background image generator: http://splintax.blogspot.com/2006/01/starfish-automatically-generated.html
+
+
 USESCALE none produces an error
 
 Refactor scale/colour picking stuff, so we can get inscalekey/outscalekey early

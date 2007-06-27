@@ -12,6 +12,8 @@ $ignore_cacti=FALSE;
 
 $config_loaded = @include_once 'editor-config.php';
 
+// XXX - if something from the old-style config is already defined by here, we need to warn.
+
 if( is_dir($cacti_base) && file_exists($cacti_base."/include/config.php") )
 {
 	// include the cacti-config, so we know about the database

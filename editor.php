@@ -492,8 +492,15 @@ else
 
 		$node->x = snap($x);
 		$node->y = snap($y);
-		$node->name = "node".time();
-		$node->label = "NODE";
+		
+		$newnodename = sprintf("node%05d",time()%10000);
+		while(array_key_exists($newnodename,$map->nodes))
+		{
+			$newnodename .= "a";
+		}
+		
+		$node->name = $newnodename;
+		$node->label = "Node";
 
 		$map->nodes[$node->name] = $node;
 
@@ -836,7 +843,7 @@ if($use_jquery)
 		<table>
 		  <tr>
 			<th>Map Title</th>
-			<td><input name="map_title" size="25" type="text" value="<?php echo  $map->title ?>"/></td>
+			<td><input id="map_title" name="map_title" size="25" type="text" value="<?php echo  $map->title ?>"/></td>
 		  </tr>
 		<tr>
 			<th>Legend Text</th>
@@ -920,7 +927,7 @@ if($use_jquery)
 		<table>
 		  <tr>
 			<th>Link Labels</th>
-			<td><select name="mapstyle_linklabels">
+			<td><select id="mapstyle_linklabels" name="mapstyle_linklabels">
 			  <option <?php echo ($map->defaultlink->labelstyle=='bits' ? 'selected' : '') ?> value="bits">Bits/sec</option>
 			  <option <?php echo ($map->defaultlink->labelstyle=='percent' ? 'selected' : '') ?> value="percent">Percentage</option>
 			  <option <?php echo ($map->defaultlink->labelstyle=='none' ? 'selected' : '') ?> value="none">None</option>

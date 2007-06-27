@@ -551,6 +551,7 @@ function map_properties()
     hide_all_dialogs();
     document.getElementById('action').value = "set_map_properties";
     show_dialog('dlgMapProperties');
+    document.getElementById('map_title').focus();
     }
 
 function map_style()
@@ -560,6 +561,7 @@ function map_style()
     hide_all_dialogs();
     document.getElementById('action').value = "set_map_style";
     show_dialog('dlgMapStyle');
+    document.getElementById('mapstyle_linklabels').focus();
     }
 
 function position_timestamp()
@@ -646,13 +648,13 @@ function show_node(name)
         else
         {
             document.frmMain.node_iconfilename.value = '--NONE--';
-        }
-        
+        }  
 
         // save this here, just in case they choose delete_node or move_node
         document.getElementById('param').value = mynode.name;
 
         show_dialog('dlgNodeProperties');
+        document.getElementById('node_new_name').focus();
         }
     }
 
@@ -699,6 +701,7 @@ function show_link(name)
         document.frmMain.action.value = "set_link_properties";
 
         show_dialog('dlgLinkProperties');
+        document.getElementById('link_bandwidth_in').focus();
         }
     }
 

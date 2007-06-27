@@ -46,7 +46,7 @@ class WeatherMapDataSource_cactihost extends WeatherMapDataSource {
 		{
 			$cacti_id = intval($matches[1]);
 
-			$SQL = "select status, disabled from host where id=$cacti_id";
+			$SQL = "select * from host where id=$cacti_id";
 			// 0=disabled
 			// 1=down
 			// 2=recovering
@@ -65,6 +65,17 @@ class WeatherMapDataSource_cactihost extends WeatherMapDataSource {
 				$inbw = $state;
 				$outbw = $state;
 				$item->add_note("state",$statename);
+				$item->add_note("cacti_description",$result['description']);
+				
+				$item->add_note("cacti_hostname",$result['hostname']);
+				$item->add_note("cacti_curtime",$result['cur_time']);
+				$item->add_note("cacti_avgtime",$result['avg_time']);
+				$item->add_note("cacti_mintime",$result['min_time']);
+				$item->add_note("cacti_maxtime",$result['max_time']);
+				$item->add_note("cacti_availability",$result['availability']);
+				
+				$item->add_note("cacti_faildate",$result['status_fail_date']);
+				$item->add_note("cacti_recdate",$result['status_rec_date']);
 			}
 		}
 

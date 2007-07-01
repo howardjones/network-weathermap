@@ -1270,7 +1270,7 @@ class WeatherMapNode extends WeatherMapItem
 				
 				// debug("Choosing NODE BGCOLOR for ".$this->name." based on $pc %\n");
 	
-				    list($col,$node_scalekey) = $map->ColourFromPercent($pc, $this->usescale,$this->name);
+				    list($col,$node_scalekey) = $map->ColourFromPercent($node_im, $pc, $this->usescale,$this->name);
 				    // $map->nodes[$this->name]->scalekey = $node_scalekey;
 			}
 			elseif($this->labelbgcolour != array(-1,-1,-1))
@@ -2074,8 +2074,8 @@ class WeatherMapLink extends WeatherMapItem
 		$xpoints[]=$x2;
 		$ypoints[]=$y2;
 
-		list($link_in_colour,$link_in_scalekey) = $map->ColourFromPercent($this->inpercent,$this->usescale,$this->name);
-		list($link_out_colour,$link_out_scalekey) = $map->ColourFromPercent($this->outpercent,$this->usescale,$this->name);
+		list($link_in_colour,$link_in_scalekey) = $map->ColourFromPercent($im, $this->inpercent,$this->usescale,$this->name);
+		list($link_out_colour,$link_out_scalekey) = $map->ColourFromPercent($im, $this->outpercent,$this->usescale,$this->name);
 		
 	//	$map->links[$this->name]->inscalekey = $link_in_scalekey;
 	//	$map->links[$this->name]->outscalekey = $link_out_scalekey;
@@ -2989,8 +2989,8 @@ function ReadData()
 				$myobj->outpercent = (($total_out) / ($myobj->max_bandwidth_out)) * 100;
 				$myobj->inpercent = (($total_in) / ($myobj->max_bandwidth_in)) * 100;		
 			
-				list($incol,$inscalekey) = $this->ColourFromPercent($myobj->inpercent,$myobj->usescale,$myobj->name);
-				list($outcol,$outscalekey) = $this->ColourFromPercent($myobj->outpercent,$myobj->usescale,$myobj->name);
+				list($incol,$inscalekey) = $this->ColourFromPercent(NULL, $myobj->inpercent,$myobj->usescale,$myobj->name);
+				list($outcol,$outscalekey) = $this->ColourFromPercent(NULL, $myobj->outpercent,$myobj->usescale,$myobj->name);
 				
 				// $myobj->incolour = $incol;
 				$myobj->inscalekey = $inscalekey;
@@ -3103,7 +3103,7 @@ function DrawLabelRotated($im, $x, $y, $angle, $text, $font, $padding, $linkname
 
 }
 
-function ColourFromPercent($percent,$scalename="DEFAULT",$name="")
+function ColourFromPercent($image, $percent,$scalename="DEFAULT",$name="")
 {
 	$col = NULL;
 	
@@ -3122,7 +3122,7 @@ function ColourFromPercent($percent,$scalename="DEFAULT",$name="")
 			if (($percent >= $colour['bottom']) and ($percent <= $colour['top']))
 			{
 				// we get called early now, so might not need to actually allocate a colour
-				if(isset($this->image))
+				if(isset($image))
 				{
 					if (isset($colour['red2']))
 					{
@@ -3139,10 +3139,15 @@ function ColourFromPercent($percent,$scalename="DEFAULT",$name="")
 						$g=$colour["green1"] + ($colour["green2"] - $colour["green1"]) * $ratio;
 						$b=$colour["blue1"] + ($colour["blue2"] - $colour["blue1"]) * $ratio;
 	
-						$col = myimagecolorallocate($this->image, $r, $g, $b);
+						$col = myimagecolorallocate($image, $r, $g, $b);
 					}
 					else {
-						$col = $colour['gdref1'];
+						$r=$colour["red1"];
+						$g=$colour["green1"];
+						$b=$colour["blue1"];
+	
+						$col = myimagecolorallocate($image, $r, $g, $b);
+						# $col = $colour['gdref1'];
 					}
 				}
 				
@@ -3187,8 +3192,10 @@ function DrawLegend_Horizontal($im,$scalename="DEFAULT",$width=400)
 
 	$font=$this->keyfont;
 
-	$x=$this->keyx[$scalename];
-	$y=$this->keyy[$scalename];
+	# $x=$this->keyx[$scalename];
+	# $y=$this->keyy[$scalename];
+	$x = 0;
+	$y = 0;
 
 	# $width = 400;
 	$scalefactor = $width/100;
@@ -3206,7 +3213,7 @@ function DrawLegend_Horizontal($im,$scalename="DEFAULT",$width=400)
 	$scale_bottom = $scale_top + $tileheight * 1.5;
 	$box_bottom = $scale_bottom + $tileheight * 2 + 6;
 
-	$scale_im = imagecreatetruecolor($box_right, $box_bottom);
+	$scale_im = imagecreatetruecolor($box_right+1, $box_bottom+1);
 	$scale_ref = 'gdref_legend_'.$scalename;
 	$this->AllocateScaleColours($scale_im,$scale_ref);
 
@@ -3232,7 +3239,7 @@ function DrawLegend_Horizontal($im,$scalename="DEFAULT",$width=400)
 				$this->colours['DEFAULT']['KEYTEXT'][$scale_ref]);
 		}
 
-		list($col,$junk) = $this->ColourFromPercent($p,$scalename);
+		list($col,$junk) = $this->ColourFromPercent($scale_im, $p,$scalename);
 		imagefilledrectangle($scale_im, $scale_left + $dx - $scalefactor/2, $scale_top,
 			$scale_left + $dx + $scalefactor/2, $scale_bottom,
 			$col);
@@ -3264,8 +3271,10 @@ function DrawLegend_Vertical($im,$scalename="DEFAULT",$height=400)
 
 	list($tilewidth, $tileheight)=$this->myimagestringsize($font, "100%");
 
-	$box_left = $x;
-	$box_top = $y;
+	# $box_left = $x;
+	# $box_top = $y;
+	$box_left = 0;
+	$box_top = 0;
 
 	$scale_left = $box_left+$scalefactor*2 +4 ;
 	$scale_right = $scale_left + $tileheight*2;
@@ -3281,12 +3290,16 @@ function DrawLegend_Vertical($im,$scalename="DEFAULT",$height=400)
 	$scale_bottom = $scale_top + $height;
 	$box_bottom = $scale_bottom + $scalefactor + $tileheight/2 + 4;
 
-	imagefilledrectangle($im, $box_left, $box_top, $box_right, $box_bottom,
+	$scale_im = imagecreatetruecolor($box_right+1, $box_bottom+1);
+	$scale_ref = 'gdref_legend_'.$scalename;
+	$this->AllocateScaleColours($scale_im,$scale_ref);
+
+	imagefilledrectangle($scale_im, $box_left, $box_top, $box_right, $box_bottom,
 		$this->colours['DEFAULT']['KEYBG']['gdref1']);
-	imagerectangle($im, $box_left, $box_top, $box_right, $box_bottom,
+	imagerectangle($scale_im, $box_left, $box_top, $box_right, $box_bottom,
 		$this->colours['DEFAULT']['KEYTEXT']['gdref1']);
 
-	$this->myimagestring($im, $font, $scale_left-$scalefactor, $scale_top - $tileheight , $title,
+	$this->myimagestring($scale_im, $font, $scale_left-$scalefactor, $scale_top - $tileheight , $title,
 		$this->colours['DEFAULT']['KEYTEXT']['gdref1']);
 
 	for($p=0;$p<=100;$p++)
@@ -3296,19 +3309,21 @@ function DrawLegend_Vertical($im,$scalename="DEFAULT",$height=400)
 
 		if( ($p % 25) == 0)
 		{
-			imageline($im, $scale_left - $scalefactor, $scale_top + $dy,
+			imageline($scale_im, $scale_left - $scalefactor, $scale_top + $dy,
 				$scale_right + $scalefactor, $scale_top + $dy,
-				$this->colours['DEFAULT']['KEYTEXT']['gdref1']);
+				$this->colours['DEFAULT']['KEYTEXT'][$scale_ref]);
 			$labelstring=sprintf("%d%%", $p);
-			$this->myimagestring($im, $font, $scale_right + $scalefactor*2 , $scale_top + $dy + $tileheight/2,
-				$labelstring,  $this->colours['DEFAULT']['KEYTEXT']['gdref1']);
+			$this->myimagestring($scale_im, $font, $scale_right + $scalefactor*2 , $scale_top + $dy + $tileheight/2,
+				$labelstring,  $this->colours['DEFAULT']['KEYTEXT'][$scale_ref]);
 		}
 
-		list($col,$junk) = $this->ColourFromPercent($p,$scalename);
-		imagefilledrectangle($im, $scale_left, $scale_top + $dy - $scalefactor/2,
+		list($col,$junk) = $this->ColourFromPercent($scale_im, $p,$scalename);
+		imagefilledrectangle($scale_im, $scale_left, $scale_top + $dy - $scalefactor/2,
 			$scale_right, $scale_top + $dy + $scalefactor/2,
 			$col);
 	}
+
+	imagecopy($im,$scale_im,$this->keyx[$scalename],$this->keyy[$scalename],0,0,imagesx($scale_im),imagesy($scale_im));
 
 	$this->imap->addArea("Rectangle", "LEGEND:$scalename", '',
 		array($box_left, $box_top, $box_right, $box_bottom));
@@ -3343,7 +3358,7 @@ function DrawLegend_Classic($im,$scalename="DEFAULT")
 	$tileheight=$tileheight * 1.1;
 	$tilespacing=$tileheight + 2;
 
-	if (($x >= 0) && ($y >= 0))
+	if (($this->keyx[$scalename] >= 0) && ($this->keyy[$scalename] >= 0))
 	{
 
 		# $minwidth = imagefontwidth($font) * strlen('XX 100%-100%')+10;
@@ -3358,20 +3373,25 @@ function DrawLegend_Classic($im,$scalename="DEFAULT")
 
 		$boxheight=$tilespacing * ($nscales + 1) + 10;
 
-		$boxx=$x;
-		$boxy=$y;
-
+		$boxx=$x; $boxy=$y;
+		$boxx=0;
+		$boxy=0;
+		
 		// allow for X11-style negative positioning
 		if ($boxx < 0) { $boxx+=$this->width; }
 
 		if ($boxy < 0) { $boxy+=$this->height; }
 
-		imagefilledrectangle($im, $boxx, $boxy, $boxx + $boxwidth, $boxy + $boxheight,
-			$this->colours['DEFAULT']['KEYBG']['gdref1']);
-		imagerectangle($im, $boxx, $boxy, $boxx + $boxwidth, $boxy + $boxheight,
-			$this->colours['DEFAULT']['KEYTEXT']['gdref1']);
-		$this->myimagestring($im, $font, $boxx + 4, $boxy + 4 + $tileheight, $title,
-			$this->colours['DEFAULT']['KEYTEXT']['gdref1']);
+		$scale_im = imagecreatetruecolor($boxwidth+1, $boxheight+1);
+		$scale_ref = 'gdref_legend_'.$scalename;
+		$this->AllocateScaleColours($scale_im,$scale_ref);
+
+		imagefilledrectangle($scale_im, $boxx, $boxy, $boxx + $boxwidth, $boxy + $boxheight,
+			$this->colours['DEFAULT']['KEYBG'][$scale_ref]);
+		imagerectangle($scale_im, $boxx, $boxy, $boxx + $boxwidth, $boxy + $boxheight,
+			$this->colours['DEFAULT']['KEYTEXT'][$scale_ref]);
+		$this->myimagestring($scale_im, $font, $boxx + 4, $boxy + 4 + $tileheight, $title,
+			$this->colours['DEFAULT']['KEYTEXT'][$scale_ref]);
 
 		usort($colours, array("Weathermap", "coloursort"));
 
@@ -3402,8 +3422,8 @@ function DrawLegend_Classic($im,$scalename="DEFAULT")
 						{
 							$percent
 								=  $fudgefactor + $colour['bottom'] + ($n / $tilewidth) * ($colour['top'] - $colour['bottom']);
-							list($col,$junk) = $this->ColourFromPercent($percent,$scalename);
-							imagefilledrectangle($im, $x + $n, $y, $x + $n, $y + $tileheight,
+							list($col,$junk) = $this->ColourFromPercent($scale_im, $percent,$scalename);
+							imagefilledrectangle($scale_im, $x + $n, $y, $x + $n, $y + $tileheight,
 								$col);
 						}
 					}
@@ -3411,22 +3431,24 @@ function DrawLegend_Classic($im,$scalename="DEFAULT")
 					{
 						// pick a percentage in the middle...
 						$percent=($colour['bottom'] + $colour['top']) / 2;
-						list($col,$junk) = $this->ColourFromPercent($percent,$scalename);
-						imagefilledrectangle($im, $x, $y, $x + $tilewidth, $y + $tileheight,
+						list($col,$junk) = $this->ColourFromPercent($scale_im, $percent,$scalename);
+						imagefilledrectangle($scale_im, $x, $y, $x + $tilewidth, $y + $tileheight,
 							$col);
 					}
 	
 					$labelstring=sprintf("%s-%s", $colour['bottom'], $colour['top']);
 					if($hide_percent==0) { $labelstring.="%"; }
-					$this->myimagestring($im, $font, $x + 4 + $tilewidth, $y + $tileheight, $labelstring,
-						$this->colours['DEFAULT']['KEYTEXT']['gdref1']);
+					$this->myimagestring($scale_im, $font, $x + 4 + $tilewidth, $y + $tileheight, $labelstring,
+						$this->colours['DEFAULT']['KEYTEXT'][$scale_ref]);
 					$i++;
 				}
+					imagecopy($im,$scale_im,$this->keyx[$scalename],$this->keyy[$scalename],0,0,imagesx($scale_im),imagesy($scale_im));
+
 			}
 		}
 
 		$this->imap->addArea("Rectangle", "LEGEND:$scalename", '',
-			array($boxx, $boxy, $boxx + $boxwidth, $boxy + $boxheight));
+			array($this->keyx[$scalename], $this->keyy[$scalename], $this->keyx[$scalename] + $boxwidth, $this->keyy[$scalename] + $boxheight));
 		# $this->imap->setProp("href","#","LEGEND");
 		# $this->imap->setProp("extrahtml","onclick=\"position_legend();\"","LEGEND");
 

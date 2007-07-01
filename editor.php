@@ -653,7 +653,7 @@ if($use_jquery)
 
   <form action="editor.php" method="post" name="frmMain">
 	<div align="center">
-		<input type="hidden" name="plug" value="<?php (fromplug?1:0) ?>">
+		<input type="hidden" name="plug" value="<?php ($fromplug?1:0) ?>">
 	 <input style="display:none" type="image"
 	  src="<?php echo  $imageurl; ?>" id="xycapture" /><img src=
 	  "<?php echo  $imageurl; ?>" id="existingdata" alt="Weathermap" usemap="#weathermap_imap"

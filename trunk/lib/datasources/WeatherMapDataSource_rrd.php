@@ -113,7 +113,7 @@ class WeatherMapDataSource_rrd extends WeatherMapDataSource {
 				    $end = "start+".$period;
 				}
 
-				if (extension_loaded('RRDTool')) // fetch the values via the RRDtool Extension
+				if ((1==0) && extension_loaded('RRDTool')) // fetch the values via the RRDtool Extension
 				{
 					// for the php-rrdtool module, we use an array instead...
 					$rrdparams = array("AVERAGE","--start",$start,"--end",$end);
@@ -231,7 +231,8 @@ class WeatherMapDataSource_rrd extends WeatherMapDataSource {
 					}
 					else
 					{
-						warn("RRD ReadData: Neither of your DS names ($in_ds & $out_ds) were found, even though there was a valid data line. Maybe they are wrong? [WMRRD06]");
+                                                $names = join(",",$heads);
+						warn("RRD ReadData: Neither of your DS names ($in_ds & $out_ds) were found, even though there was a valid data line. Maybe they are wrong? Valid DS names in this file are: $names [WMRRD06]");
 					}
 				}
 			}

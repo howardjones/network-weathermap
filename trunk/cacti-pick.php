@@ -91,23 +91,28 @@ if(isset($_REQUEST['command']) && $_REQUEST["command"]=='link_step1')
 	<script type="text/javascript" src="lib/javascript/jquery-latest.pack.js"></script>
 	<script type="text/javascript">
 
-	function filterlist()
+	function filterlist(previous)
 	{
-		filter = $('input#filterstring');
-		if(filter.val()=='')
+		var filterstring = $('input#filterstring').val();	
+		
+		if(filterstring=='')
 		{
 			$('ul#dslist > li').show();
+			return;
 		}
-		else
-		{
-			// alert(filter.val());
-			$('ul#dslist').find('li').hide();
-			$('ul#dslist').find('li').contains(filter.val()).show();
+		
+		if(filterstring!=previous)
+		{	
+				$('ul#dslist > li').hide();
+				$('ul#dslist > li').contains(filterstring).show();
 		}
 	}
 
 	$(document).ready( function() {
-		$('span.filter').keyup(function() {filterlist(); }).show();
+		$('span.filter').keyup(function() {
+			var previous = $('input#filterstring').val();
+			setTimeout(function () {filterlist(previous)}, 500);
+		}).show();
 	});
 
 	function update_source_step1(dataid,datasource)
@@ -160,7 +165,7 @@ ul li a { text-decoration: none; color: black; }
 <h3>Pick a data source:</h3>
 
 <form name="mini">
-<span class="filter" style="display: none;">Filter: <input id="filterstring" name="filterstring" size="20"><br /></span>
+<span class="filter" style="display: none;">Filter: <input id="filterstring" name="filterstring" size="20"> (case-sensitive)<br /></span>
 <input name="overlib" type="checkbox" value="yes" checked> Also set OVERLIBGRAPH and INFOURL.
 </form>
 <div class="listcontainer">
@@ -179,6 +184,7 @@ ul li a { text-decoration: none; color: black; }
 			$key = $line['local_data_id']."','".$line['data_source_path'];
 			echo "<a href=\"#\" onclick=\"update_source_step1('$key')\">". $line['name_cache'] . "</a>";
 			echo "</li>\n";
+			
 			$i++;
 		}
 	}

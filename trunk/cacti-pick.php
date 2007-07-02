@@ -53,7 +53,6 @@ if(isset($_REQUEST['command']) && $_REQUEST["command"]=='link_step2')
 ?>
 <html>
 <head>
-
 	<script type="text/javascript">
 	function update_source_step2(graphid)
 	{
@@ -89,7 +88,27 @@ if(isset($_REQUEST['command']) && $_REQUEST["command"]=='link_step1')
 ?>
 <html>
 <head>
+	<script type="text/javascript" src="lib/javascript/jquery-latest.pack.js"></script>
 	<script type="text/javascript">
+
+	function filterlist()
+	{
+		filter = $('input#filterstring');
+		if(filter.val()=='')
+		{
+			$('ul#dslist > li').show();
+		}
+		else
+		{
+			// alert(filter.val());
+			$('ul#dslist').find('li').hide();
+			$('ul#dslist').find('li').contains(filter.val()).show();
+		}
+	}
+
+	$(document).ready( function() {
+		$('span.filter').keyup(function() {filterlist(); }).show();
+	});
 
 	function update_source_step1(dataid,datasource)
 	{
@@ -126,25 +145,26 @@ ul li a { text-decoration: none; color: black; }
 <title>Pick a data source</title>
 </head>
 <body>
-
 <?php
 
-	// print "Cacti is ".$config["cacti_version"] = "0.8.6g";
+	# print "Cacti is ".$config["cacti_version"] = "0.8.6g";
 
-	$SQL_picklist = "select data_template_data.local_data_id, data_template_data.name_cache, data_template_data.active, data_template_data.data_source_path from data_local,data_template_data,data_input,data_template  left join data_input on data_input.id=data_template_data.data_input_id left join data_template on data_local.data_template_id=data_template.id where data_local.id=data_template_data.local_data_id order by name_cache;";
+#	$SQL_picklist = "select data_template_data.local_data_id, data_template_data.name_cache, data_template_data.active, data_template_data.data_source_path from data_local,data_template_data,data_input,data_template  left join data_input on data_input.id=data_template_data.data_input_id left join data_template on data_local.data_template_id=data_template.id where data_local.id=data_template_data.local_data_id order by name_cache;";
 	$SQL_picklist = "select data_template_data.local_data_id, data_template_data.name_cache, data_template_data.active, data_template_data.data_source_path from data_local,data_template_data,data_input,data_template where data_local.id=data_template_data.local_data_id and data_input.id=data_template_data.data_input_id and data_local.data_template_id=data_template.id order by name_cache;";
-	//$link = mysql_connect($database_hostname,$database_username,$database_password)
-	//  or die('Could not connect: ' . mysql_error());
-	//  mysql_selectdb($database_default,$link) or die('Could not select database: '.mysql_error());
+	#$link = mysql_connect($database_hostname,$database_username,$database_password)
+	#  or die('Could not connect: ' . mysql_error());
+	#  mysql_selectdb($database_default,$link) or die('Could not select database: '.mysql_error());
 
-	//$result = mysql_query($SQL_picklist) or die('Query failed: ' . mysql_error());
+	#$result = mysql_query($SQL_picklist) or die('Query failed: ' . mysql_error());
 ?>
 <h3>Pick a data source:</h3>
 
 <form name="mini">
+<span class="filter" style="display: none;">Filter: <input id="filterstring" name="filterstring" size="20"><br /></span>
 <input name="overlib" type="checkbox" value="yes" checked> Also set OVERLIBGRAPH and INFOURL.
 </form>
-<ul>
+<div class="listcontainer">
+<ul id="dslist">
 <?php
 	$queryrows = db_fetch_assoc($SQL_picklist);
 
@@ -164,7 +184,7 @@ ul li a { text-decoration: none; color: black; }
 	}
 	else
 	{
-		print "No results...";
+		print "<li>No results...</li>";
 	}
 
 	// Free resultset
@@ -175,6 +195,7 @@ ul li a { text-decoration: none; color: black; }
 
 ?>
 </ul>
+</div>
 </body>
 </html>
 <?php

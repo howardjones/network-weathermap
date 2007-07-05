@@ -203,7 +203,7 @@ function maplist()
 			form_alternate_row_color($colors["alternate"],$colors["light"],$i);
 
 			print '<td><a href="editor.php?plug=1&mapname='.htmlspecialchars($map['configfile']).'">'.htmlspecialchars($map['configfile']).'</a>';
-			print '<a href="?action=editor&plug=1&mapname='.htmlspecialchars($map['configfile']).'">[edit]</a></td>';
+	#		print '<a href="?action=editor&plug=1&mapname='.htmlspecialchars($map['configfile']).'">[edit]</a></td>';
 			print '<td>'.htmlspecialchars($map['titlecache']).'</td>';
 			if($map['active'] == 'on')
 			{

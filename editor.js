@@ -162,7 +162,7 @@ function attach_click_events()
             }
         }
 
-    if(fromplug==1)
+    if(fromplug===1)
     {
         addEvent(document.getElementById('tb_newfile'), 'click', function() { window.location = "weathermap-cacti-plugin-mgmt.php"; });
     }
@@ -170,6 +170,7 @@ function attach_click_events()
     {
         addEvent(document.getElementById('tb_newfile'), 'click', new_file);
     }
+    
     addEvent(document.getElementById('tb_addnode'), 'click', add_node);
     addEvent(document.getElementById('tb_mapprops'), 'click', map_properties);
     addEvent(document.getElementById('tb_mapstyle'), 'click', map_style);

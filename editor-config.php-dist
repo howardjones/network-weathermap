@@ -15,11 +15,9 @@ $cacti_base = 'C:/httpd-.2_x64/htdocs/cacti';
 // $cacti_base = "/var/www/html/cacti";
 
 
-
 // CHANGE: this to be the URL of the base of your Cacti install
 // it MUST end with a / character!
 $cacti_url = "http://support.company.net/cacti/";
-
 
 
 // where to look for config files. The directory must be readable 

@@ -10,6 +10,7 @@
         ADDED - Picking Cacti sources from editor has a javascript "live filter" feature now (needs a little work)
         ADDED - node coordinates are directly editable in the editor now
         ADDED - File picker allows you to use an existing map as a template
+        CHANGE - Editor warns about older editor-config.php format now
         
 0.92 - FIXED weathermap CLI help said --random-data instead of --randomdata
        FIXED one last php short_tag in poller_common.php - thanks Bernado Diez

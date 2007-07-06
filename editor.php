@@ -9,10 +9,16 @@ $mapdir='configs';
 $cacti_base = '../../';
 $cacti_url = '/';
 $ignore_cacti=FALSE;
+$configerror = '';
 
 $config_loaded = @include_once 'editor-config.php';
 
 // XXX - if something from the old-style config is already defined by here, we need to warn.
+
+if( isset($config) )
+{
+    $configerror = 'OLD editor config file format. The format of this file changed in version 0.92 - please check the new editor-config.php-dist and update your editor-config.php file.';
+}
 
 if( is_dir($cacti_base) && file_exists($cacti_base."/include/config.php") )
 {
@@ -21,8 +27,8 @@ if( is_dir($cacti_base) && file_exists($cacti_base."/include/config.php") )
 
 	// CHANGE: this to be the URL of the base of your Cacti install
 	// it MUST end with a / character!
-	$config['base_url']=$cacti_url;
-	$cacti_found=TRUE;
+	$config['base_url'] = $cacti_url;
+	$cacti_found = TRUE;
 }
 else
 {

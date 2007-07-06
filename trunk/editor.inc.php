@@ -33,7 +33,6 @@ function show_editor_startpage()
 	print 'Weathermap that you will be missing out on if you choose to use the editor only.';
 	print 'These include: curves, node offsets, font definitions, colour changing, per-node/per-link settings and image uploading. You CAN use the editor without damaging these features if you added them by hand, however.</div><p>';
 	
-	
 	print 'Do you want to:<p>';
 	print 'Create A New Map:<br>';
 	print '<form method="GET">';
@@ -41,6 +40,14 @@ function show_editor_startpage()
 
 	print '<input name="action" type="hidden" value="newmap">';
 	print '<input type="submit" value="Create">';
+	print '</form>';
+	print 'OR<br />Create A New Map as a copy of an existing map:<br>';
+	print '<form method="GET">';
+	print 'Named: <input type="text" name="mapname" size="20"> based on ';
+
+	print '<input name="action" type="hidden" value="newmapcopy">';
+	print '<select><option>Map names to go in here.</option></select>';
+	print '<input type="submit" value="Create Copy">';
 	print '</form>';
 	print 'OR<br />';
 	print 'Open An Existing Map (looking in ' . $mapdir . '):<ul class="filelist">';

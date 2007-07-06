@@ -553,6 +553,26 @@ else
 		$map->WriteConfig($mapfile);
 		break;
 
+	case "clone_node":
+		$map->ReadConfig($mapfile);
+
+		$target = $_REQUEST['param'];
+		$log = "clone node ".$target;
+
+        $newnodename = $target."_copy";
+                
+		$node = new WeatherMapNode;
+		$node->Reset($map);
+		$node->CopyFrom($map->nodes[$target]);
+
+        $node->name = $newnodename;
+        $node->x += 30;
+
+		$map->nodes[$newnodename] = $node;
+
+		$map->WriteConfig($mapfile);
+		break;
+
 		// no action was defined - starting a new map?
 	default:
 		$map->ReadConfig($mapfile);
@@ -761,7 +781,7 @@ if($use_jquery)
 		  </tr>
 		  <tr>
 			<th></th>
-			<td><a id="node_move" class="dlgTitlebar">Move Node</a><a class="dlgTitlebar" id="node_delete">Delete Node</a></td>
+			<td><a id="node_move" class="dlgTitlebar">Move Node</a><a class="dlgTitlebar" id="node_delete">Delete Node</a><a class="dlgTitlebar" id="node_clone">Clone Node</a></td>
 		  </tr>
 		</table>
 	  </div>

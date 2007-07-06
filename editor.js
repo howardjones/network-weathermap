@@ -635,6 +635,9 @@ function show_node(name)
         document.frmMain.node_name.value = name;
         document.frmMain.node_new_name.value = name;
 
+        document.frmMain.node_x.value = mynode.x;
+        document.frmMain.node_y.value = mynode.y;
+
         document.frmMain.node_name.value = mynode.name;
         document.frmMain.node_new_name.value = mynode.name;
         document.frmMain.node_label.value = mynode.label;

@@ -40,6 +40,7 @@
 ./lib/datasources/WeatherMapDataSource_static.php
 ./lib/datasources/WeatherMapDataSource_tabfile.php
 ./lib/datasources/WeatherMapDataSource_snmp.php
+./lib/javascript/jquery-latest.pack
 ./lib/poller-common.php
 ./lib/post/WeatherMapPostProcessorTest.php
 ./lib/pre/WeatherMapPreProcessorTest.php

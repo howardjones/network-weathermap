@@ -198,6 +198,9 @@ else
 		$map->nodes[$new_node_name]->label = $_REQUEST['node_label'];
 		$map->nodes[$new_node_name]->infourl = $_REQUEST['node_infourl'];
 		$map->nodes[$new_node_name]->overliburl = $_REQUEST['node_hover'];
+		
+		$map->nodes[$new_node_name]->x = intval($_REQUEST['node_x']);
+		$map->nodes[$new_node_name]->y = intval($_REQUEST['node_y']);
 
 		if($_REQUEST['node_iconfilename'] == '--NONE--')
 		{
@@ -695,6 +698,10 @@ if($use_jquery)
 
 	  <div class="dlgBody">
 		<table>
+		<tr>
+			<th>Position</th>
+			<td><input id="node_x" name="node_x" size=4 type="text" />,<input id="node_y" name="node_y" size=4 type="text" /></td>
+		</tr>
 		  <tr>
 			<th>Internal Name</th>
 			<td><input id="node_new_name" name="node_new_name" type="text" /></td>

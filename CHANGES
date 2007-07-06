@@ -8,7 +8,8 @@
         FIXED - keyboard focus switches nicely to the popup dialogs now.
         ADDED - cactihost: DS plugin fetches a bunch of other stats from Cacti's DB now, too (like availability and response times)
         ADDED - Picking Cacti sources from editor has a javascript "live filter" feature now (needs a little work)
-
+        ADDED - node coordinates are directly editable in the editor now
+        
 0.92 - FIXED weathermap CLI help said --random-data instead of --randomdata
        FIXED one last php short_tag in poller_common.php - thanks Bernado Diez
        FIXED a SET in DEFAULT node/link is inherited by all node/links now.

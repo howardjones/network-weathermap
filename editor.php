@@ -848,6 +848,49 @@ if($use_jquery)
 			  <th>'Hover' Graph URL</th>
 			  <td><input id="link_hover"  size="20" name="link_hover" type="text" /></td>
 			</tr>
+		  <tr>
+			<th>Link end offsets</th>
+			<td>
+				<table><tr><td>
+				<table cellpadding=0 cellspacing=0 border=0>
+					<tr><td><input type="radio" name="a_offset" value="NW"></td>
+						<td><input type="radio"  name="a_offset" value="N"></td>
+						<td><input type="radio"  name="a_offset" value="NE"></td>
+					</tr>
+				<tr><td><input  type="radio" name="a_offset" value="W"></td>
+						<td><input  type="radio" name="a_offset" value="C"></td>
+						<td><input  type="radio" name="a_offset" value="E"></td>
+					</tr>
+				<tr><td><input  type="radio" name="a_offset" value="SW"></td>
+						<td><input  type="radio" name="a_offset" value="S"></td>
+						<td><input  type="radio" name="a_offset" value="SE"></td>
+					</tr>
+					
+				</table>
+			
+				</td><td> to </td><td>
+				
+				<table cellpadding=0 cellspacing=0 border=0>
+					<tr><td><input type="radio" name="b_offset" value="NW"></td>
+						<td><input type="radio"  name="b_offset" value="N"></td>
+						<td><input type="radio"  name="b_offset" value="NE"></td>
+					</tr>
+				<tr><td><input  type="radio" name="b_offset" value="W"></td>
+						<td><input  type="radio" name="b_offset" value="C"></td>
+						<td><input  type="radio" name="b_offset" value="E"></td>
+					</tr>
+				<tr><td><input  type="radio" name="b_offset" value="SW"></td>
+						<td><input  type="radio" name="b_offset" value="S"></td>
+						<td><input  type="radio" name="b_offset" value="SE"></td>
+					</tr>
+					
+				</table>
+				
+				</td></tr></table>
+			
+			
+			</td>
+		</tr>
 			<tr>
 			  <th></th>
 			  <td>&nbsp;</td>
@@ -942,6 +985,7 @@ if($use_jquery)
 ?>
 			</select></td>
 		  </tr>
+		
 		</table>
 	  </div>
 

@@ -1,7 +1,7 @@
 <?php
 function show_editor_startpage()
 {
-	global $mapdir, $WEATHERMAP_VERSION, $config_loaded, $cacti_found, $ignore_cacti;
+	global $mapdir, $WEATHERMAP_VERSION, $config_loaded, $cacti_found, $ignore_cacti,$configerror;
 
 	$matches=0;
 
@@ -14,6 +14,11 @@ function show_editor_startpage()
 	print 'If it\'s a major issue for you, please feel free to complain. It\'s mainly laziness as I said, and there could be a fallback (not so smooth) mode for non-javascript browsers if it was seen to be worthwhile (I would take a bit of convincing, because I don\'t see a benefit, personally).</div>';
 	
 	$errormessage = "";
+
+    if($configerror!='')
+    {
+        $errormessage .= $configerror.'<p>';
+    }
 		
 	if(! $cacti_found && !$ignore_cacti)
 	{
@@ -29,7 +34,7 @@ function show_editor_startpage()
 	print '<div id="withjs">';
 	print '<div id="dlgStart" class="dlgProperties" ><div class="dlgTitlebar">Welcome</div><div class="dlgBody">';
 	print 'Welcome to the PHP Weathermap '.$WEATHERMAP_VERSION.' editor.<p>';
-	print '<div style="border: 3px dashed red; background: #055; padding: 5px; font-size: 97%;"><b>NOTE:</b> This editor is not finished! There are many features of ';
+	print '<div style="border: 3px dashed red; background: #055; padding: 5px; font-size: 90%;"><b>NOTE:</b> This editor is not finished! There are many features of ';
 	print 'Weathermap that you will be missing out on if you choose to use the editor only.';
 	print 'These include: curves, node offsets, font definitions, colour changing, per-node/per-link settings and image uploading. You CAN use the editor without damaging these features if you added them by hand, however.</div><p>';
 	

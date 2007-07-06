@@ -186,6 +186,7 @@ function attach_click_events()
     addEvent(document.getElementById('tb_node_submit'), 'click', do_submit);
     addEvent(document.getElementById('node_move'), 'click', move_node);
     addEvent(document.getElementById('node_delete'), 'click', delete_node);
+    addEvent(document.getElementById('node_clone'), 'click', clone_node);
 
     addEvent(document.getElementById('tb_link_cancel'), 'click', cancel_op);
     addEvent(document.getElementById('tb_link_submit'), 'click', do_submit);
@@ -519,6 +520,12 @@ function delete_node()
         document.getElementById('action').value = "delete_node";
         document.frmMain.submit();
         }
+    }
+
+function clone_node()
+    {
+        document.getElementById('action').value = "clone_node";
+        document.frmMain.submit();
     }
 
 function move_node()

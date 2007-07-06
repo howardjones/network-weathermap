@@ -41,18 +41,11 @@ function show_editor_startpage()
 	print '<input name="action" type="hidden" value="newmap">';
 	print '<input type="submit" value="Create">';
 	print '</form>';
-	print 'OR<br />Create A New Map as a copy of an existing map:<br>';
-	print '<form method="GET">';
-	print 'Named: <input type="text" name="mapname" size="20"> based on ';
 
-	print '<input name="action" type="hidden" value="newmapcopy">';
-	print '<select><option>Map names to go in here.</option></select>';
-	print '<input type="submit" value="Create Copy">';
-	print '</form>';
-	print 'OR<br />';
-	print 'Open An Existing Map (looking in ' . $mapdir . '):<ul class="filelist">';
 
 	$titles = array();
+
+	$errorstring="";
 
 	if (is_dir($mapdir))
 	{
@@ -65,7 +58,7 @@ function show_editor_startpage()
 			{
 				$realfile=$mapdir . DIRECTORY_SEPARATOR . $file;
 				$note = "";
-// if(is_file($realfile) && ( preg_match('/\.conf$/',$file) ))
+
 				if ( (is_file($realfile)) && (is_readable($realfile)) )
 				{
 					if(!is_writable($realfile))
@@ -86,7 +79,6 @@ function show_editor_startpage()
 						fclose ($fd);
 						$titles[$file] = $title;
 						$notes[$file] = $note;
-						# print "<li><a href=\"?mapname=$file\">$file</a> - <span class=\"comment\">$title</span></li>\n";
 						$n++;
 					}
 				}
@@ -94,22 +86,57 @@ function show_editor_startpage()
 
 			closedir ($dh);
 		}
-		else { print "<LI>Can't Open mapdir to read</LI>"; }
+		else { $errorstring = "Can't open mapdir to read."; }
 		
 		ksort($titles);
 		
+		if ($n == 0) { $errorstring = "No files in mapdir"; }
+	}
+	else { $errorstring = "NO DIRECTORY named $mapdir"; }
+
+
+	print 'OR<br />Create A New Map as a copy of an existing map:<br>';
+	print '<form method="GET">';
+	print 'Named: <input type="text" name="mapname" size="20"> based on ';
+
+	print '<input name="action" type="hidden" value="newmapcopy">';
+	print '<select name="sourcemap">';
+	
+	if($errorstring == '')
+	{
+		foreach ($titles as $file=>$title)
+		{
+			$nicefile = htmlspecialchars($file);
+			print "<option value=\"$nicefile\">$nicefile</option>\n";
+		}
+	}
+	else
+	{
+		print '<option value="">'.$errorstring.'</option>';
+	}
+	
+	print '</select>';
+	print '<input type="submit" value="Create Copy">';
+	print '</form>';
+	print 'OR<br />';
+	print 'Open An Existing Map (looking in ' . $mapdir . '):<ul class="filelist">';
+
+	if($errorstring == '')
+	{
 		foreach ($titles as $file=>$title)
 		{
 			$title = $titles[$file];
 			$note = $notes[$file];
-			print "<li>$note<a href=\"?mapname=$file\">$file</a> - <span class=\"comment\">$title</span></li>\n";
+			$nicefile = htmlspecialchars($file);
+			print "<li>$note<a href=\"?mapname=$nicefile\">$nicefile</a> - <span class=\"comment\">$title</span></li>\n";
 		}
-
-		if ($n == 0) { print "<LI>No files</LI>"; }
 	}
-	else { print "<LI>NO DIRECTORY named $mapdir</LI>"; }
+	else
+	{
+		print '<li>'.$errorstring.'</li>';
+	}
 
-	print "</UL>";
+	print "</ul>";
 
 	print "</div>"; // dlgbody
 	print '<div class="dlgHelp" id="start_help">PHP Weathermap ' . $WEATHERMAP_VERSION

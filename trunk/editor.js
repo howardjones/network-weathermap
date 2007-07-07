@@ -211,6 +211,12 @@ function attach_click_events()
     cp = document.getElementById('node_cactipick');
     addEvent(cp, 'click', nodecactipicker);
     cp.setAttribute('href', '#');
+
+    $('#xycapture').mouseover(function(event) {coord_capture(event);});
+    $('#xycapture').mousemove(function(event) {coord_update(event);});
+    $('#xycapture').mouseout(function(event) {coord_release(event);});
+    
+    
     }
 
 // used by the cancel button on each of the properties dialogs
@@ -739,3 +745,44 @@ function hide_all_dialogs()
     hide_dialog('dlgColours');
     hide_dialog('dlgImages');
     }
+
+function ElementPosition(param){
+  var x=0, y=0;
+  var obj = (typeof param == "string") ? document.getElementById(param) : param;
+  if (obj) {
+    x = obj.offsetLeft;
+    y = obj.offsetTop;
+    var body = document.getElementsByTagName('body')[0];
+    while (obj.offsetParent && obj!=body){
+      x += obj.offsetParent.offsetLeft;
+      y += obj.offsetParent.offsetTop;
+      obj = obj.offsetParent;
+    }
+  }
+  this.x = x;
+  this.y = y;
+}
+
+function coord_capture(event)
+{
+    // $('#tb_coords').html('+++');
+}
+
+function coord_update(event)
+{
+    var cursorx = event.pageX;
+    var cursory = event.pageY;
+ 
+    // Adjust for coords relative to the image, not the document
+    var p = new ElementPosition('xycapture');
+    cursorx -= p.x;
+    cursory -= p.y;
+    cursory++; // fudge to make coords match results from imagemap (not sure why this is needed)
+        
+    $('#tb_coords').html('Position<br />'+ cursorx + ', ' + cursory);
+}
+
+function coord_release(event)
+{
+    $('#tb_coords').html('Position<br />---, ---');
+}

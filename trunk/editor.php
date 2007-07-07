@@ -1132,15 +1132,16 @@ if($use_jquery)
 	?>
      <div class="contextMenu" id="linkMenu1">
       <ul>
-	<li id="properties"><img src="editor-resources/page_white_text.png" /> Link Properties</li>
-	<li id="delete"><img src="editor-resources/cross.png" /> Delete Link</li>
+	<li id="linkproperties"><img src="editor-resources/page_white_text.png" /> Link Properties</li>
+	<li id="linkdelete"><img src="editor-resources/cross.png" /> Delete Link</li>
       </ul>
     </div>
      <div class="contextMenu" id="nodeMenu1">
       <ul>
-	<li id="properties"><img src="editor-resources/page_white_text.png" /> Node Properties</li>
-      	<li id="move"><img src="editor-resources/arrow_out.png" /> Move Node</li>
-        <li id="delete"><img src="editor-resources/cross.png" /> Delete Node</li>
+	<li id="nodeproperties"><img src="editor-resources/page_white_text.png" /> Node Properties</li>
+      	<li id="nodemove"><img src="editor-resources/arrow_out.png" /> Move Node</li>
+        <li id="nodeclone"><img src="editor-resources/page_copy.png" /> Clone Node</li>
+        <li id="nodedelete"><img src="editor-resources/cross.png" /> Delete Node</li>
       </ul>
     </div>
      <div class="contextMenu" id="mapMenu1">
@@ -1150,12 +1151,14 @@ if($use_jquery)
     </div>
         <div class="contextMenu" id="legendMenu1">
       <ul>
+        <li id="scalemove"><img src="editor-resources/arrow_out.png" /> Move Node</li>
 	<li id="scaleproperties"><img src="editor-resources/page_white_text.png" /> Edit Scale</li>
 	<li id="legendproperties"><img src="editor-resources/page_white_text.png" /> Legend Properties</li>
       </ul>
     </div>
 	<div class="contextMenu" id="timeMenu1">
       <ul>
+                <li id="stampmove"><img src="editor-resources/arrow_out.png" /> Move Timestamp</li>
 		<li id="stampproperties"><img src="editor-resources/page_white_text.png" /> Timestamp Properties</li>
       </ul>
     </div>

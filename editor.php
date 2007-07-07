@@ -1,5 +1,5 @@
 <?php
-	$use_jquery = FALSE;
+	$use_jquery = TRUE;
 
 require_once 'editor.inc.php';
 require_once 'Weathermap.class.php';
@@ -673,7 +673,7 @@ if($use_jquery)
 <body id="mainview">
   <div id="toolbar">
 	<ul>
-	  <li class="tb_active" id="tb_newfile">Change<br />File</li>
+           <li class="tb_active" id="tb_newfile">Change<br />File</li>
 	  <li class="tb_active" id="tb_addnode">Add<br />Node</li>
 	  <li class="tb_active" id="tb_addlink">Add<br />Link</li>
 	  <li class="tb_active" id="tb_poslegend">Position<br />Legend</li>
@@ -683,22 +683,23 @@ if($use_jquery)
 	  <li class="tb_active" id="tb_colours">Manage<br />Colors</li>
 	  <li class="tb_active" id="tb_manageimages">Manage<br />Images</li>
 	  <li class="tb_active" id="tb_prefs">Editor<br />Settings</li>
+        <li class="tb_coords" id="tb_coords">Position<br />---, ---</li>
 	  <li class="tb_help"><span id="tb_help">or click a Node or Link to edit it's properties</span></li>
 	</ul>
   </div>
 
   <form action="editor.php" method="post" name="frmMain">
-	<div align="center">
+	<div align="center" id="mainarea">
 		<input type="hidden" name="plug" value="<?php echo ($fromplug==TRUE ? 1 : 0) ?>">
 	 <input style="display:none" type="image"
 	  src="<?php echo  $imageurl; ?>" id="xycapture" /><img src=
 	  "<?php echo  $imageurl; ?>" id="existingdata" alt="Weathermap" usemap="#weathermap_imap"
-	   /><br />
+	   />
 	   <div class="debug"><p><strong>Debug:</strong> <a href="?<?php echo ($fromplug==TRUE ? 'plug=1&amp;' : ''); ?>action=nothing&amp;mapname=<?php echo  $mapname ?>">Do Nothing</a> 
 	   <span><label for="mapname">mapfile</label><input type="text" name="mapname" value="<?php echo  $mapname; ?>" /></span>
 	   <span><label for="action">action</label><input type="text" id="action" name="action" value="<?php echo  $newaction ?>" /></span>
-	  <span><label for="param">param</label><input type="text" name="param" id="param" value="" /></span> 
-	  <span><label for="param2">param2</label><input type="text" name="param2" id="param2" value="<?php echo  $param2 ?>" /></span> 
+	  <span><label for="param">param</label><input type="text" name="param" id="param" value="" /></span>
+            <span><label for="param2">param2</label><input type="text" name="param2" id="param2" value="<?php echo  $param2 ?>" /></span> 
 	  <span><label for="debug">debug</label><input id="debug" value="" name="debug" /></span> 
 	  <a target="configwindow" href="?<?php echo ($fromplug==TRUE ? 'plug=1&amp;':''); ?>action=show_config&amp;mapname=<?php echo  $mapname ?>">See config</a></p>
 	<pre><?php echo  $log ?></pre>

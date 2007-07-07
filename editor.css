@@ -1,8 +1,13 @@
-#mainview { background: #ccc; }
+#mainview { background: #ccc; padding-top: 60px; }
 
 body { 		font-family: Gill Sans, Verdana, sans-serif; margin:0; }
 #toolbar { 		font-family: Verdana, sans-serif; }
 
+#toolbar { position: fixed; top:0px; left: 0px; width: 100%;
+	color: white; border-bottom: gray solid 1px;
+	z-index: 10; opacity: 0.9;
+        background: #1958b7;
+	}
 
 #dlgNodeProperties { display: none; z-index: 2; position: absolute;top: 100px;left: 100px;}
 #dlgLinkProperties { display: none; z-index: 3; position: absolute; top: 80px; left: 150px; }
@@ -91,9 +96,9 @@ a.dlgTitlebar:hover {
   padding:0;
   font-size:11px;
   color:#fff;
-  background:#ccc;
+/*  background:#ccc;*/ 
   background: #1958b7;
-  margin-bottom: 10px;
+  /* margin-bottom: 10px; */
 }
   
 #toolbar ul li.tb_help {
@@ -119,6 +124,19 @@ a.dlgTitlebar:hover {
   text-align: center;
 
   background: #2175bc;
+  color:#fff;
+}
+
+#toolbar ul li.tb_coords {
+  float:left;
+  padding:7px 12px;
+  text-decoration:none;
+  width: 70px;
+    
+  text-align: center;
+
+  
+  background: #1958b7;
   color:#fff;
 }
 

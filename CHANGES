@@ -13,6 +13,8 @@
         CHANGE - Editor warns about older editor-config.php format now
         ADDED - Editor now allows you to clone a node with all it's styling intact.
         ADDED - When picking coordinates (new node, move node, move timestamp etc), you can see the coordinates
+        ADDED - Editor toolbar fixed to window, to make it easier to scroll around large maps
+        ADDED - RRD Datasource has improved warnings for non-existent DS names
         
 0.92 - FIXED weathermap CLI help said --random-data instead of --randomdata
        FIXED one last php short_tag in poller_common.php - thanks Bernado Diez

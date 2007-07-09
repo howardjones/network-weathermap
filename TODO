@@ -1,8 +1,16 @@
 Background image links: http://art.gnome.org/backgrounds/abstract/
 Background image generator: http://splintax.blogspot.com/2006/01/starfish-automatically-generated.html
 
+BUG: USESCALE none produces an error - if no scale called 'none' is defined, it is not an error.
 
-USESCALE none produces an error
+WriteConfig should optionally just return a string (so the editor can fetch a config chunk)
+WriteConfig should optionally write the contents of a variable in place of the normal config (so the editor can update a chunk)
+
+Work out NODE-drawing code so that the bg colour is known earlier, so artificial icons can use it.
+
+Finish scale-drawing changes so that the cached image is stored somewhere.
+
+Editor - make the link offset radio buttons work (what about numeric offsets?)
 
 Refactor scale/colour picking stuff, so we can get inscalekey/outscalekey early
 

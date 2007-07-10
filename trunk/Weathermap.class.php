@@ -865,7 +865,6 @@ class WeatherMapBase
 		$this->notes[$name] = $value;
 	}
 
-
 	function get_note($name)
 	{
 		if(isset($this->notes[$name]))
@@ -909,9 +908,9 @@ class WeatherMapItem extends WeatherMapBase
 	var $overlibwidth, $overlibheight;
 	var $overlibcaption;
 	var $my_default;
+	var $config_override;	# used by the editor to allow text-editing
 
 	function my_type() {  return "ITEM"; }
-
 }
 
 
@@ -1461,168 +1460,176 @@ class WeatherMapNode extends WeatherMapItem
 		foreach (array_keys($this->inherit_fieldlist)as $fld) { $this->$fld=$source->$fld; }
 	}
 
-	function WriteConfig($fd)
+	function WriteConfig()
 	{
 		$output='';
-
-		$comparison=($this->name == 'DEFAULT'
-			? $this->inherit_fieldlist['label'] : $this->owner->defaultnode->label);
-
-		if ($this->label != $comparison) { $output.="\tLABEL " . $this->label . "\n"; }
-
-		$comparison=($this->name == 'DEFAULT'
-		? $this->inherit_fieldlist['infourl'] : $this->owner->defaultnode->infourl);
-
-		if ($this->infourl != $comparison) { $output.="\tINFOURL " . $this->infourl . "\n"; }
-
-		$comparison=($this->name == 'DEFAULT'
-		? $this->inherit_fieldlist['notestext'] : $this->owner->defaultnode->notestext);
-
-		if ($this->notestext != $comparison) { $output.="\tNOTES " . $this->notestext . "\n"; }
-
-		$comparison=($this->name == 'DEFAULT'
-		? $this->inherit_fieldlist['overliburl'] : $this->owner->defaultnode->overliburl);
-
-		if ($this->overliburl != $comparison) { $output.="\tOVERLIBGRAPH " . $this->overliburl . "\n"; }
-
-		$comparison=($this->name == 'DEFAULT'
-		? $this->inherit_fieldlist['iconfile'] : $this->owner->defaultnode->iconfile);
-		if ($this->iconfile != $comparison) { 
-			$output.="\tICON ";
-			if($this->iconscalew > 0) {
-				$output .= $this->iconscalew." ".$this->iconscaleh." ";
-			}
-			$output .= $this->iconfile . "\n"; 
-		}
-
-		$comparison=($this->name == 'DEFAULT'
-			? $this->inherit_fieldlist['labelfont'] : $this->owner->defaultnode->labelfont);
-
-		if ($this->labelfont != $comparison) { $output.="\tLABELFONT " . $this->labelfont . "\n"; }
-
-		$comparison=($this->name == 'DEFAULT'
-		? $this->inherit_fieldlist['labeloffset'] : $this->owner->defaultnode->labeloffset);
-
-		if ($this->labeloffset != $comparison) { $output.="\tLABELOFFSET " . $this->labeloffset . "\n"; }
-
-
-		$comparison=($this->name == 'DEFAULT'
-		? $this->inherit_fieldlist['targets'] : $this->owner->defaultnode->targets);
-
-		if ($this->targets != $comparison)
-		{
-			$output.="\tTARGET";
-
-			foreach ($this->targets as $target) { $output.=" " . $target[4]; }
-
-			$output.="\n";
-		}
-
-		$comparison = ($this->name == 'DEFAULT'
-			? $this->inherit_fieldlist['usescale'] : $this->owner->defaultnode->usescale);
-		$comparison2 = ($this->name == 'DEFAULT'
-			? $this->inherit_fieldlist['scalevar'] : $this->owner->defaultnode->scalevar);
-
-		if ( ($this->usescale != $comparison) || ($this->scalevar != $comparison2) )
-		{ $output.="\tUSESCALE " . $this->usescale . " " . $this->scalevar . "\n"; }
-
-
-
-		$comparison=($this->name == 'DEFAULT'
-		? $this->inherit_fieldlist['overlibcaption'] : $this->owner->defaultnode->overlibcaption);
-
-		if ($this->overlibcaption != $comparison) { $output.="\tOVERLIBCAPTION " . $this->overlibcaption . "\n"; }
-
-
-		$comparison=($this->name == 'DEFAULT'
-		? $this->inherit_fieldlist['overlibwidth'] : $this->owner->defaultnode->overlibwidth);
-
-		if ($this->overlibwidth != $comparison) { $output.="\tOVERLIBWIDTH " . $this->overlibwidth . "\n"; }
-
-		$comparison=($this->name == 'DEFAULT'
-		? $this->inherit_fieldlist['overlibheight'] : $this->owner->defaultnode->overlibheight);
-
-		if ($this->overlibheight != $comparison) { $output.="\tOVERLIBHEIGHT " . $this->overlibheight . "\n"; }
-
-		$comparison=($this->name == 'DEFAULT'
-		? $this->inherit_fieldlist['labelbgcolour'] : $this->owner->defaultnode->labelbgcolour);
-
-		if ($this->labelbgcolour != $comparison) { $output.="\tLABELBGCOLOR " . render_colour(
-			$this->labelbgcolour)
-			. "\n"; }
-
-		$comparison=($this->name == 'DEFAULT' ? $this->inherit_fieldlist['labelfontcolour']
-		: $this->owner->defaultnode->labelfontcolour);
-
-		if ($this->labelfontcolour != $comparison) { $output.="\tLABELFONTCOLOR " . render_colour(
-			$this->labelfontcolour)
-			. "\n"; }
-
-		$comparison=($this->name == 'DEFAULT' ? $this->inherit_fieldlist['labeloutlinecolour']
-		: $this->owner->defaultnode->labeloutlinecolour);
-
-		if ($this->labeloutlinecolour != $comparison) { $output.="\tLABELOUTLINECOLOR " . render_colour(
-			$this->labeloutlinecolour) . "\n";
-		}
-
-		$comparison=($this->name == 'DEFAULT' ? $this->inherit_fieldlist['labelfontshadowcolour']
-			: $this->owner->defaultnode->labelfontshadowcolour);
-
-		if ($this->labelfontshadowcolour != $comparison)
-		{ $output.="\tLABELFONTSHADOWCOLOR " . render_colour($this->labelfontshadowcolour) . "\n"; }
-
-		$comparison=($this->name == 'DEFAULT'
-		? $this->inherit_fieldlist['labeloffsetx'] : $this->owner->defaultnode->labeloffsetx);
-		$comparison2=($this->name == 'DEFAULT'
-			? $this->inherit_fieldlist['labeloffsety'] : $this->owner->defaultnode->labeloffsety);
-
-		if (($this->labeloffsetx != $comparison) || ($this->labeloffsety != $comparison2))
-		{ $output.="\tLABELOFFSET " . $this->labeloffsetx . " " . $this->labeloffsety . "\n"; }
-
-		$comparison=($this->name == 'DEFAULT' ? $this->inherit_fieldlist['x'] : $this->owner->defaultnode->x);
-		$comparison2=($this->name == 'DEFAULT' ? $this->inherit_fieldlist['y'] : $this->owner->defaultnode->y);
-
-		if (($this->x != $comparison) || ($this->y != $comparison2))
-		{
-			if($this->relative_to == '')
-			{ $output.="\tPOSITION " . $this->x . " " . $this->y . "\n"; }
-			else
-			{ $output.="\tPOSITION " . $this->relative_to . " " .  $this->original_x . " " . $this->original_y . "\n"; }
-		}
-
-		if (($this->max_bandwidth_in != $this->owner->defaultnode->max_bandwidth_in)
-			|| ($this->max_bandwidth_out != $this->owner->defaultnode->max_bandwidth_out)
-				|| ($this->name == 'DEFAULT'))
-		{
-			if ($this->max_bandwidth_in == $this->max_bandwidth_out)
-			{ $output.="\tMAXVALUE " . $this->max_bandwidth_in_cfg . "\n"; }
-			else { $output
-			.="\tMAXVALUE " . $this->max_bandwidth_in_cfg . " " . $this->max_bandwidth_out_cfg . "\n"; }
-		}
 		
-        foreach ($this->hints as $hintname=>$hint)
+		// This allows the editor to wholesale-replace a single node's configuration
+		// at write-time - it should include the leading NODE xyz line (to allow for renaming)
+		if($this->config_override != '')
 		{
-		  // all hints for DEFAULT node are for writing
-		  // only changed ones, or unique ones, otherwise
-		      if( 
-                    ($this->name == 'DEFAULT')
-                  ||
-		            (isset($this->owner->defaultnode->hints[$hintname]) 
-		            &&
-		            $this->owner->defaultnode->hints[$hintname] != $hint)
-		          ||
-		            (!isset($this->owner->defaultnode->hints[$hintname]))
-		        )
-		      {		      
-                    $output .= "\tSET $hintname $hint\n";
-		      }
+			$output  = $this->config_override;
 		}
-
-		if ($output != '')
+		else
 		{
-			fwrite($fd, "NODE " . $this->name . "\n");
-			fwrite($fd, "$output\n");
+			$comparison=($this->name == 'DEFAULT'
+				? $this->inherit_fieldlist['label'] : $this->owner->defaultnode->label);
+	
+			if ($this->label != $comparison) { $output.="\tLABEL " . $this->label . "\n"; }
+	
+			$comparison=($this->name == 'DEFAULT'
+			? $this->inherit_fieldlist['infourl'] : $this->owner->defaultnode->infourl);
+	
+			if ($this->infourl != $comparison) { $output.="\tINFOURL " . $this->infourl . "\n"; }
+	
+			$comparison=($this->name == 'DEFAULT'
+			? $this->inherit_fieldlist['notestext'] : $this->owner->defaultnode->notestext);
+	
+			if ($this->notestext != $comparison) { $output.="\tNOTES " . $this->notestext . "\n"; }
+	
+			$comparison=($this->name == 'DEFAULT'
+			? $this->inherit_fieldlist['overliburl'] : $this->owner->defaultnode->overliburl);
+	
+			if ($this->overliburl != $comparison) { $output.="\tOVERLIBGRAPH " . $this->overliburl . "\n"; }
+	
+			$comparison=($this->name == 'DEFAULT'
+			? $this->inherit_fieldlist['iconfile'] : $this->owner->defaultnode->iconfile);
+			if ($this->iconfile != $comparison) { 
+				$output.="\tICON ";
+				if($this->iconscalew > 0) {
+					$output .= $this->iconscalew." ".$this->iconscaleh." ";
+				}
+				$output .= $this->iconfile . "\n"; 
+			}
+	
+			$comparison=($this->name == 'DEFAULT'
+				? $this->inherit_fieldlist['labelfont'] : $this->owner->defaultnode->labelfont);
+	
+			if ($this->labelfont != $comparison) { $output.="\tLABELFONT " . $this->labelfont . "\n"; }
+	
+			$comparison=($this->name == 'DEFAULT'
+			? $this->inherit_fieldlist['labeloffset'] : $this->owner->defaultnode->labeloffset);
+	
+			if ($this->labeloffset != $comparison) { $output.="\tLABELOFFSET " . $this->labeloffset . "\n"; }
+	
+	
+			$comparison=($this->name == 'DEFAULT'
+			? $this->inherit_fieldlist['targets'] : $this->owner->defaultnode->targets);
+	
+			if ($this->targets != $comparison)
+			{
+				$output.="\tTARGET";
+	
+				foreach ($this->targets as $target) { $output.=" " . $target[4]; }
+	
+				$output.="\n";
+			}
+	
+			$comparison = ($this->name == 'DEFAULT'
+				? $this->inherit_fieldlist['usescale'] : $this->owner->defaultnode->usescale);
+			$comparison2 = ($this->name == 'DEFAULT'
+				? $this->inherit_fieldlist['scalevar'] : $this->owner->defaultnode->scalevar);
+	
+			if ( ($this->usescale != $comparison) || ($this->scalevar != $comparison2) )
+			{ $output.="\tUSESCALE " . $this->usescale . " " . $this->scalevar . "\n"; }
+	
+	
+	
+			$comparison=($this->name == 'DEFAULT'
+			? $this->inherit_fieldlist['overlibcaption'] : $this->owner->defaultnode->overlibcaption);
+	
+			if ($this->overlibcaption != $comparison) { $output.="\tOVERLIBCAPTION " . $this->overlibcaption . "\n"; }
+	
+	
+			$comparison=($this->name == 'DEFAULT'
+			? $this->inherit_fieldlist['overlibwidth'] : $this->owner->defaultnode->overlibwidth);
+	
+			if ($this->overlibwidth != $comparison) { $output.="\tOVERLIBWIDTH " . $this->overlibwidth . "\n"; }
+	
+			$comparison=($this->name == 'DEFAULT'
+			? $this->inherit_fieldlist['overlibheight'] : $this->owner->defaultnode->overlibheight);
+	
+			if ($this->overlibheight != $comparison) { $output.="\tOVERLIBHEIGHT " . $this->overlibheight . "\n"; }
+	
+			$comparison=($this->name == 'DEFAULT'
+			? $this->inherit_fieldlist['labelbgcolour'] : $this->owner->defaultnode->labelbgcolour);
+	
+			if ($this->labelbgcolour != $comparison) { $output.="\tLABELBGCOLOR " . render_colour(
+				$this->labelbgcolour)
+				. "\n"; }
+	
+			$comparison=($this->name == 'DEFAULT' ? $this->inherit_fieldlist['labelfontcolour']
+			: $this->owner->defaultnode->labelfontcolour);
+	
+			if ($this->labelfontcolour != $comparison) { $output.="\tLABELFONTCOLOR " . render_colour(
+				$this->labelfontcolour)
+				. "\n"; }
+	
+			$comparison=($this->name == 'DEFAULT' ? $this->inherit_fieldlist['labeloutlinecolour']
+			: $this->owner->defaultnode->labeloutlinecolour);
+	
+			if ($this->labeloutlinecolour != $comparison) { $output.="\tLABELOUTLINECOLOR " . render_colour(
+				$this->labeloutlinecolour) . "\n";
+			}
+	
+			$comparison=($this->name == 'DEFAULT' ? $this->inherit_fieldlist['labelfontshadowcolour']
+				: $this->owner->defaultnode->labelfontshadowcolour);
+	
+			if ($this->labelfontshadowcolour != $comparison)
+			{ $output.="\tLABELFONTSHADOWCOLOR " . render_colour($this->labelfontshadowcolour) . "\n"; }
+	
+			$comparison=($this->name == 'DEFAULT'
+			? $this->inherit_fieldlist['labeloffsetx'] : $this->owner->defaultnode->labeloffsetx);
+			$comparison2=($this->name == 'DEFAULT'
+				? $this->inherit_fieldlist['labeloffsety'] : $this->owner->defaultnode->labeloffsety);
+	
+			if (($this->labeloffsetx != $comparison) || ($this->labeloffsety != $comparison2))
+			{ $output.="\tLABELOFFSET " . $this->labeloffsetx . " " . $this->labeloffsety . "\n"; }
+	
+			$comparison=($this->name == 'DEFAULT' ? $this->inherit_fieldlist['x'] : $this->owner->defaultnode->x);
+			$comparison2=($this->name == 'DEFAULT' ? $this->inherit_fieldlist['y'] : $this->owner->defaultnode->y);
+	
+			if (($this->x != $comparison) || ($this->y != $comparison2))
+			{
+				if($this->relative_to == '')
+				{ $output.="\tPOSITION " . $this->x . " " . $this->y . "\n"; }
+				else
+				{ $output.="\tPOSITION " . $this->relative_to . " " .  $this->original_x . " " . $this->original_y . "\n"; }
+			}
+	
+			if (($this->max_bandwidth_in != $this->owner->defaultnode->max_bandwidth_in)
+				|| ($this->max_bandwidth_out != $this->owner->defaultnode->max_bandwidth_out)
+					|| ($this->name == 'DEFAULT'))
+			{
+				if ($this->max_bandwidth_in == $this->max_bandwidth_out)
+				{ $output.="\tMAXVALUE " . $this->max_bandwidth_in_cfg . "\n"; }
+				else { $output
+				.="\tMAXVALUE " . $this->max_bandwidth_in_cfg . " " . $this->max_bandwidth_out_cfg . "\n"; }
+			}
+			
+			foreach ($this->hints as $hintname=>$hint)
+			{
+			  // all hints for DEFAULT node are for writing
+			  // only changed ones, or unique ones, otherwise
+			      if( 
+			    ($this->name == 'DEFAULT')
+			  ||
+				    (isset($this->owner->defaultnode->hints[$hintname]) 
+				    &&
+				    $this->owner->defaultnode->hints[$hintname] != $hint)
+				  ||
+				    (!isset($this->owner->defaultnode->hints[$hintname]))
+				)
+			      {		      
+			    $output .= "\tSET $hintname $hint\n";
+			      }
+			}
+			if ($output != '')
+			{
+				$output = "NODE " . $this->name . "\n$output\n";
+			}
 		}
+		return ($output);
 	}
 
 	function asJS()
@@ -2174,207 +2181,214 @@ class WeatherMapLink extends WeatherMapItem
 		}
 	}
 
-	function WriteConfig($fd)
+	function WriteConfig()
 	{
 		$output='';
 
-		$comparison=($this->name == 'DEFAULT'
-			? $this->inherit_fieldlist['infourl'] : $this->owner->defaultlink->infourl);
-
-		if ($this->infourl != $comparison) { $output.="\tINFOURL " . $this->infourl . "\n"; }
-
-		$comparison=($this->name == 'DEFAULT'
-		? $this->inherit_fieldlist['notestext'] : $this->owner->defaultlink->notestext);
-
-		if ($this->notestext != $comparison) { $output.="\tNOTES " . $this->notestext . "\n"; }
-
-		$comparison=($this->name == 'DEFAULT'
-		? $this->inherit_fieldlist['overliburl'] : $this->owner->defaultlink->overliburl);
-
-		if ($this->overliburl != $comparison) { $output.="\tOVERLIBGRAPH " . $this->overliburl . "\n"; }
-
-		$comparison=($this->name == 'DEFAULT'
-		? $this->inherit_fieldlist['overlibcaption'] : $this->owner->defaultlink->overlibcaption);
-
-		if ($this->overlibcaption != $comparison) { $output.="\tOVERLIBCAPTION " . $this->overlibcaption . "\n"; }
-
-		$comparison=($this->name == 'DEFAULT'
-		? $this->inherit_fieldlist['overlibwidth'] : $this->owner->defaultlink->overlibwidth);
-
-		if ($this->overlibwidth != $comparison) { $output.="\tOVERLIBWIDTH " . $this->overlibwidth . "\n"; }
-
-		$comparison=($this->name == 'DEFAULT'
-		? $this->inherit_fieldlist['overlibheight'] : $this->owner->defaultlink->overlibheight);
-
-		if ($this->overlibheight != $comparison) { $output.="\tOVERLIBHEIGHT " . $this->overlibheight . "\n"; }
-
-		$comparison=($this->name == 'DEFAULT'
-		? $this->inherit_fieldlist['arrowstyle'] : $this->owner->defaultlink->arrowstyle);
-
-		if ($this->arrowstyle != $comparison) { $output.="\tARROWSTYLE " . $this->arrowstyle . "\n"; }
-
-		$comparison=($this->name == 'DEFAULT'
-		? ($this->inherit_fieldlist['labelstyle']) : ($this->owner->defaultlink->labelstyle));
-		if ($this->labelstyle != $comparison) { $output.="\tBWLABEL " . $this->labelstyle . "\n"; }
-
-		$comparison=($this->name == 'DEFAULT'
-		? ($this->inherit_fieldlist['labelboxstyle']) : ($this->owner->defaultlink->labelboxstyle));
-		if ($this->labelboxstyle != $comparison) { $output.="\tBWSTYLE " . $this->labelboxstyle . "\n"; }
-
-		$comparison = ($this->name == 'DEFAULT'
-		? $this->inherit_fieldlist['labeloffset_in'] : $this->owner->defaultlink->labeloffset_in);
-		$comparison2 = ($this->name == 'DEFAULT'
-			? $this->inherit_fieldlist['labeloffset_out'] : $this->owner->defaultlink->labeloffset_out);
-
-		if ( ($this->labeloffset_in != $comparison) || ($this->labeloffset_out != $comparison2) )
-		{ $output.="\tBWLABELPOS " . $this->labeloffset_in . " " . $this->labeloffset_out . "\n"; }
-
-		$comparison=($this->name == 'DEFAULT'
-		? ($this->inherit_fieldlist['commentoffset_in'].":".$this->inherit_fieldlist['commentoffset_out']) : ($this->owner->defaultlink->commentoffset_in.":".$this->owner->defaultlink->commentoffset_out));
-		$mine = $this->commentoffset_in.":".$this->commentoffset_out;
-		if ($mine != $comparison) { $output.="\tCOMMENTPOS " . $this->commentoffset_in." ".$this->commentoffset_out. "\n"; }
-
-
-		$comparison=($this->name == 'DEFAULT'
-		? $this->inherit_fieldlist['targets'] : $this->owner->defaultlink->targets);
-
-		if ($this->targets != $comparison)
+		if($this->config_override != '')
 		{
-			$output.="\tTARGET";
-
-			foreach ($this->targets as $target) { $output.=" " . $target[4]; }
-
-			$output.="\n";
+			$output  = $this->config_override;
 		}
-
-		$comparison=($this->name == 'DEFAULT'
+		else
+		{
+			$comparison=($this->name == 'DEFAULT'
+				? $this->inherit_fieldlist['infourl'] : $this->owner->defaultlink->infourl);
+	
+			if ($this->infourl != $comparison) { $output.="\tINFOURL " . $this->infourl . "\n"; }
+	
+			$comparison=($this->name == 'DEFAULT'
+			? $this->inherit_fieldlist['notestext'] : $this->owner->defaultlink->notestext);
+	
+			if ($this->notestext != $comparison) { $output.="\tNOTES " . $this->notestext . "\n"; }
+	
+			$comparison=($this->name == 'DEFAULT'
+			? $this->inherit_fieldlist['overliburl'] : $this->owner->defaultlink->overliburl);
+	
+			if ($this->overliburl != $comparison) { $output.="\tOVERLIBGRAPH " . $this->overliburl . "\n"; }
+	
+			$comparison=($this->name == 'DEFAULT'
+			? $this->inherit_fieldlist['overlibcaption'] : $this->owner->defaultlink->overlibcaption);
+	
+			if ($this->overlibcaption != $comparison) { $output.="\tOVERLIBCAPTION " . $this->overlibcaption . "\n"; }
+	
+			$comparison=($this->name == 'DEFAULT'
+			? $this->inherit_fieldlist['overlibwidth'] : $this->owner->defaultlink->overlibwidth);
+	
+			if ($this->overlibwidth != $comparison) { $output.="\tOVERLIBWIDTH " . $this->overlibwidth . "\n"; }
+	
+			$comparison=($this->name == 'DEFAULT'
+			? $this->inherit_fieldlist['overlibheight'] : $this->owner->defaultlink->overlibheight);
+	
+			if ($this->overlibheight != $comparison) { $output.="\tOVERLIBHEIGHT " . $this->overlibheight . "\n"; }
+	
+			$comparison=($this->name == 'DEFAULT'
+			? $this->inherit_fieldlist['arrowstyle'] : $this->owner->defaultlink->arrowstyle);
+	
+			if ($this->arrowstyle != $comparison) { $output.="\tARROWSTYLE " . $this->arrowstyle . "\n"; }
+	
+			$comparison=($this->name == 'DEFAULT'
+			? ($this->inherit_fieldlist['labelstyle']) : ($this->owner->defaultlink->labelstyle));
+			if ($this->labelstyle != $comparison) { $output.="\tBWLABEL " . $this->labelstyle . "\n"; }
+	
+			$comparison=($this->name == 'DEFAULT'
+			? ($this->inherit_fieldlist['labelboxstyle']) : ($this->owner->defaultlink->labelboxstyle));
+			if ($this->labelboxstyle != $comparison) { $output.="\tBWSTYLE " . $this->labelboxstyle . "\n"; }
+	
+			$comparison = ($this->name == 'DEFAULT'
+			? $this->inherit_fieldlist['labeloffset_in'] : $this->owner->defaultlink->labeloffset_in);
+			$comparison2 = ($this->name == 'DEFAULT'
+				? $this->inherit_fieldlist['labeloffset_out'] : $this->owner->defaultlink->labeloffset_out);
+	
+			if ( ($this->labeloffset_in != $comparison) || ($this->labeloffset_out != $comparison2) )
+			{ $output.="\tBWLABELPOS " . $this->labeloffset_in . " " . $this->labeloffset_out . "\n"; }
+	
+			$comparison=($this->name == 'DEFAULT'
+			? ($this->inherit_fieldlist['commentoffset_in'].":".$this->inherit_fieldlist['commentoffset_out']) : ($this->owner->defaultlink->commentoffset_in.":".$this->owner->defaultlink->commentoffset_out));
+			$mine = $this->commentoffset_in.":".$this->commentoffset_out;
+			if ($mine != $comparison) { $output.="\tCOMMENTPOS " . $this->commentoffset_in." ".$this->commentoffset_out. "\n"; }
+	
+	
+			$comparison=($this->name == 'DEFAULT'
+			? $this->inherit_fieldlist['targets'] : $this->owner->defaultlink->targets);
+	
+			if ($this->targets != $comparison)
+			{
+				$output.="\tTARGET";
+	
+				foreach ($this->targets as $target) { $output.=" " . $target[4]; }
+	
+				$output.="\n";
+			}
+	
+			$comparison=($this->name == 'DEFAULT'
+				? $this->inherit_fieldlist['usescale'] : $this->owner->defaultlink->usescale);
+			if ($this->usescale != $comparison) { $output.="\tUSESCALE " . $this->usescale . "\n"; }
+	
+	
+	
+			$comparison=($this->name == 'DEFAULT'
+			? $this->inherit_fieldlist['comments'][IN] : $this->owner->defaultlink->comments[IN]);
+			if ($this->comments[IN] != $comparison) { $output.="\tINCOMMENT " . $this->comments[IN] . "\n"; }
+	
+	
+			$comparison=($this->name == 'DEFAULT'
+			? $this->inherit_fieldlist['comments'][OUT] : $this->owner->defaultlink->comments[OUT]);
+			if ($this->comments[OUT] != $comparison) { $output.="\tOUTCOMMENT " . $this->comments[OUT] . "\n"; }
+	
+	
+	
+			$comparison=($this->name == 'DEFAULT'
 			? $this->inherit_fieldlist['usescale'] : $this->owner->defaultlink->usescale);
-		if ($this->usescale != $comparison) { $output.="\tUSESCALE " . $this->usescale . "\n"; }
-
-
-
-		$comparison=($this->name == 'DEFAULT'
-		? $this->inherit_fieldlist['comments'][IN] : $this->owner->defaultlink->comments[IN]);
-		if ($this->comments[IN] != $comparison) { $output.="\tINCOMMENT " . $this->comments[IN] . "\n"; }
-
-
-		$comparison=($this->name == 'DEFAULT'
-		? $this->inherit_fieldlist['comments'][OUT] : $this->owner->defaultlink->comments[OUT]);
-		if ($this->comments[OUT] != $comparison) { $output.="\tOUTCOMMENT " . $this->comments[OUT] . "\n"; }
-
-
-
-		$comparison=($this->name == 'DEFAULT'
-		? $this->inherit_fieldlist['usescale'] : $this->owner->defaultlink->usescale);
-		if ($this->usescale != $comparison) { $output.="\tUSESCALE " . $this->usescale . "\n"; }
-
-
-
-
-		$comparison=($this->name == 'DEFAULT'
-		? $this->inherit_fieldlist['bwfont'] : $this->owner->defaultlink->bwfont);
-
-		if ($this->bwfont != $comparison) { $output.="\tBWFONT " . $this->bwfont . "\n"; }
-
-		$comparison=($this->name == 'DEFAULT'
-		? $this->inherit_fieldlist['commentfont'] : $this->owner->defaultlink->commentfont);
-
-		if ($this->commentfont != $comparison) { $output.="\tCOMMENTFONT " . $this->commentfont . "\n"; }
-
-
-		$comparison=($this->name == 'DEFAULT'
-		? $this->inherit_fieldlist['width'] : $this->owner->defaultlink->width);
-
-		if ($this->width != $comparison) { $output.="\tWIDTH " . $this->width . "\n"; }
-
-		$comparison=($this->name == 'DEFAULT'
-		? $this->inherit_fieldlist['outlinecolour'] : $this->owner->defaultlink->outlinecolour);
-
-		if ($this->outlinecolour != $comparison) { $output.="\tOUTLINECOLOR " . render_colour(
-			$this->outlinecolour)
-			. "\n"; }
-
-		$comparison=($this->name == 'DEFAULT' ? $this->inherit_fieldlist['bwoutlinecolour']
-		: $this->owner->defaultlink->bwoutlinecolour);
-
-		if ($this->bwoutlinecolour != $comparison) { $output.="\tBWOUTLINECOLOR " . render_colour(
-			$this->bwoutlinecolour)
-			. "\n"; }
-
-		$comparison=($this->name == 'DEFAULT'
-		? $this->inherit_fieldlist['bwfontcolour'] : $this->owner->defaultlink->bwfontcolour);
-
-		if ($this->bwfontcolour != $comparison) { $output.="\tBWFONTCOLOR " . render_colour(
-			$this->bwfontcolour) . "\n"; }
-
-		$comparison=($this->name == 'DEFAULT'
-		? $this->inherit_fieldlist['commentfontcolour'] : $this->owner->defaultlink->commentfontcolour);
-
-		if ($this->commentfontcolour != $comparison) { $output.="\tCOMMENTFONTCOLOR " . render_colour(
-			$this->commentfontcolour) . "\n"; }
-
-
-		$comparison=($this->name == 'DEFAULT'
-		? $this->inherit_fieldlist['bwboxcolour'] : $this->owner->defaultlink->bwboxcolour);
-
-		if ($this->bwboxcolour != $comparison) { $output.="\tBWBOXCOLOR " . render_colour(
-			$this->bwboxcolour) . "\n"; }
-
-		if (isset($this->a) && isset($this->b))
-		{
-			$output.="\tNODES " . $this->a->name;
-
-			if ($this->a_offset != 'C')
-				$output.=":" . $this->a_offset;
-
-			$output.=" " . $this->b->name;
-
-			if ($this->b_offset != 'C')
-				$output.=":" . $this->b_offset;
-
-			$output.="\n";
+			if ($this->usescale != $comparison) { $output.="\tUSESCALE " . $this->usescale . "\n"; }
+	
+	
+	
+	
+			$comparison=($this->name == 'DEFAULT'
+			? $this->inherit_fieldlist['bwfont'] : $this->owner->defaultlink->bwfont);
+	
+			if ($this->bwfont != $comparison) { $output.="\tBWFONT " . $this->bwfont . "\n"; }
+	
+			$comparison=($this->name == 'DEFAULT'
+			? $this->inherit_fieldlist['commentfont'] : $this->owner->defaultlink->commentfont);
+	
+			if ($this->commentfont != $comparison) { $output.="\tCOMMENTFONT " . $this->commentfont . "\n"; }
+	
+	
+			$comparison=($this->name == 'DEFAULT'
+			? $this->inherit_fieldlist['width'] : $this->owner->defaultlink->width);
+	
+			if ($this->width != $comparison) { $output.="\tWIDTH " . $this->width . "\n"; }
+	
+			$comparison=($this->name == 'DEFAULT'
+			? $this->inherit_fieldlist['outlinecolour'] : $this->owner->defaultlink->outlinecolour);
+	
+			if ($this->outlinecolour != $comparison) { $output.="\tOUTLINECOLOR " . render_colour(
+				$this->outlinecolour)
+				. "\n"; }
+	
+			$comparison=($this->name == 'DEFAULT' ? $this->inherit_fieldlist['bwoutlinecolour']
+			: $this->owner->defaultlink->bwoutlinecolour);
+	
+			if ($this->bwoutlinecolour != $comparison) { $output.="\tBWOUTLINECOLOR " . render_colour(
+				$this->bwoutlinecolour)
+				. "\n"; }
+	
+			$comparison=($this->name == 'DEFAULT'
+			? $this->inherit_fieldlist['bwfontcolour'] : $this->owner->defaultlink->bwfontcolour);
+	
+			if ($this->bwfontcolour != $comparison) { $output.="\tBWFONTCOLOR " . render_colour(
+				$this->bwfontcolour) . "\n"; }
+	
+			$comparison=($this->name == 'DEFAULT'
+			? $this->inherit_fieldlist['commentfontcolour'] : $this->owner->defaultlink->commentfontcolour);
+	
+			if ($this->commentfontcolour != $comparison) { $output.="\tCOMMENTFONTCOLOR " . render_colour(
+				$this->commentfontcolour) . "\n"; }
+	
+	
+			$comparison=($this->name == 'DEFAULT'
+			? $this->inherit_fieldlist['bwboxcolour'] : $this->owner->defaultlink->bwboxcolour);
+	
+			if ($this->bwboxcolour != $comparison) { $output.="\tBWBOXCOLOR " . render_colour(
+				$this->bwboxcolour) . "\n"; }
+	
+			if (isset($this->a) && isset($this->b))
+			{
+				$output.="\tNODES " . $this->a->name;
+	
+				if ($this->a_offset != 'C')
+					$output.=":" . $this->a_offset;
+	
+				$output.=" " . $this->b->name;
+	
+				if ($this->b_offset != 'C')
+					$output.=":" . $this->b_offset;
+	
+				$output.="\n";
+			}
+	
+			if (count($this->vialist) > 0)
+			{
+				foreach ($this->vialist as $via)
+					$output.=sprintf("\tVIA %d %d\n", $via[0], $via[1]);
+			}
+	
+			if (($this->max_bandwidth_in != $this->owner->defaultlink->max_bandwidth_in)
+				|| ($this->max_bandwidth_out != $this->owner->defaultlink->max_bandwidth_out)
+					|| ($this->name == 'DEFAULT'))
+			{
+				if ($this->max_bandwidth_in == $this->max_bandwidth_out)
+				{ $output.="\tBANDWIDTH " . $this->max_bandwidth_in_cfg . "\n"; }
+				else { $output
+				.="\tBANDWIDTH " . $this->max_bandwidth_in_cfg . " " . $this->max_bandwidth_out_cfg . "\n"; }
+			}
+	
+	
+			foreach ($this->hints as $hintname=>$hint)
+			{
+			  // all hints for DEFAULT node are for writing
+			  // only changed ones, or unique ones, otherwise
+			      if( 
+			    ($this->name == 'DEFAULT')
+			  ||
+				    (isset($this->owner->defaultlink->hints[$hintname]) 
+				    &&
+				    $this->owner->defaultlink->hints[$hintname] != $hint)
+				  ||
+				    (!isset($this->owner->defaultlink->hints[$hintname]))
+				)
+			      {		      
+			    $output .= "\tSET $hintname $hint\n";
+			      }
+			}
+	
+			if ($output != '')
+			{
+				$output = "LINK " . $this->name . "\n".$output."\n";
+			}
 		}
-
-		if (count($this->vialist) > 0)
-		{
-			foreach ($this->vialist as $via)
-				$output.=sprintf("\tVIA %d %d\n", $via[0], $via[1]);
-		}
-
-		if (($this->max_bandwidth_in != $this->owner->defaultlink->max_bandwidth_in)
-			|| ($this->max_bandwidth_out != $this->owner->defaultlink->max_bandwidth_out)
-				|| ($this->name == 'DEFAULT'))
-		{
-			if ($this->max_bandwidth_in == $this->max_bandwidth_out)
-			{ $output.="\tBANDWIDTH " . $this->max_bandwidth_in_cfg . "\n"; }
-			else { $output
-			.="\tBANDWIDTH " . $this->max_bandwidth_in_cfg . " " . $this->max_bandwidth_out_cfg . "\n"; }
-		}
-
-
-        foreach ($this->hints as $hintname=>$hint)
-		{
-		  // all hints for DEFAULT node are for writing
-		  // only changed ones, or unique ones, otherwise
-		      if( 
-                    ($this->name == 'DEFAULT')
-                  ||
-		            (isset($this->owner->defaultlink->hints[$hintname]) 
-		            &&
-		            $this->owner->defaultlink->hints[$hintname] != $hint)
-		          ||
-		            (!isset($this->owner->defaultlink->hints[$hintname]))
-		        )
-		      {		      
-                    $output .= "\tSET $hintname $hint\n";
-		      }
-		}
-
-		if ($output != '')
-		{
-			fwrite($fd, "LINK " . $this->name . "\n");
-			fwrite($fd, "$output\n");
-		}
+		return($output);
 	}
 
 	function asJS()
@@ -4618,16 +4632,22 @@ function WriteConfig($filename)
 
 		fwrite($fd, $output);
 
-		$this->defaultnode->WriteConfig($fd);
-		$this->defaultlink->WriteConfig($fd);
+		fwrite($fd,$this->defaultnode->WriteConfig());
+		fwrite($fd,$this->defaultlink->WriteConfig());
 
 		fwrite($fd, "\n# End of DEFAULTS section\n\n# Node definitions:\n");
 
-		foreach ($this->nodes as $node) { $node->WriteConfig($fd); }
+		foreach ($this->nodes as $node)
+		{
+			fwrite($fd,$node->WriteConfig());
+		}
 
 		fwrite($fd, "\n# End of NODE section\n\n# Link definitions:\n");
 
-		foreach ($this->links as $link) { $link->WriteConfig($fd); }
+		foreach ($this->links as $link)
+		{
+			fwrite($fd,$link->WriteConfig());
+		}
 
 		fwrite($fd, "\n# End of LINK section\n\n# That's All Folks!\n");
 	}

@@ -782,7 +782,7 @@ if($use_jquery)
 		  </tr>
 		  <tr>
 			<th></th>
-			<td><a id="node_move" class="dlgTitlebar">Move Node</a><a class="dlgTitlebar" id="node_delete">Delete Node</a><a class="dlgTitlebar" id="node_clone">Clone Node</a></td>
+			<td><a id="node_move" class="dlgTitlebar">Move Node</a><a class="dlgTitlebar" id="node_delete">Delete Node</a><a class="dlgTitlebar" id="node_clone">Clone Node</a><a class="dlgTitlebar" id="node_edit">Text Edit</a></td>
 		  </tr>
 		</table>
 	  </div>

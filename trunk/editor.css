@@ -10,6 +10,7 @@ body { 		font-family: Gill Sans, Verdana, sans-serif; margin:0; }
 	}
 
 #dlgNodeProperties { display: none; z-index: 2; position: absolute;top: 100px;left: 100px;}
+#dlgTextEdit { display: none; z-index: 4; position: absolute;top: 150px;left: 150px;}
 #dlgLinkProperties { display: none; z-index: 3; position: absolute; top: 80px; left: 150px; }
 #dlgMapProperties { display: none; z-index: 1; position: absolute;top: 90px; left: 120px;}
 #dlgMapStyle { display: none; z-index: 1; position: absolute;top: 40px; left: 50px;}
@@ -17,6 +18,7 @@ body { 		font-family: Gill Sans, Verdana, sans-serif; margin:0; }
 #dlgColours { display: none; z-index: 1; position: absolute;top: 140px; left: 90px;}
 #dlgImages { display: none; z-index: 1; position: absolute;top: 120px; left: 70px;}
 
+#dlgTextEdit textarea { padding: 3px;}
 
 /* some fudges for the Welcome screen*/
 #dlgStart { z-index: 1; position: absolute; top: 90px; left: 60px; width: 600px;}
@@ -202,3 +204,6 @@ td { color: white; font-weight: normal; text-align: left; font-size: 8pt;}
 .fontsamples { height: 64px; width: 300px; overflow: auto; }
 
 .cactilink, .cactinode { white-space: nowrap; }
+
+
+#item_configtext { overflow: scroll; }

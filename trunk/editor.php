@@ -171,6 +171,36 @@ else
 
 		exit();
 		break;
+        
+        case 'fetch_config':
+                $map->ReadConfig($mapfile);
+		header('Content-type: text/plain');
+		$item_name = $_REQUEST['item_name'];
+                $item_type = $_REQUEST['item_type'];
+                $ok=FALSE;
+
+                if($item_type == 'node')
+                {
+                        if(isset($map->nodes[$item_name]))
+                        {
+                                print $map->nodes[$item_name]->WriteConfig();
+                                $ok=TRUE;
+                        }
+                }
+                if($item_type == 'link')
+                {
+                        if(isset($map->links[$item_name]))
+                        {
+                                print $map->links[$item_name]->WriteConfig();
+                                $ok=TRUE;
+                        }
+                }
+                
+                if(! $ok) { print "# the request item didn't exist. That's probably a bug.\n"; }
+		
+
+		exit();
+		break;
 
 	case "set_node_properties":
 		$map->ReadConfig($mapfile);
@@ -618,8 +648,8 @@ if($use_jquery)
 {
 ?>
   <script src="lib/javascript/jquery-latest.pack.js" type="text/javascript"></script>
-  <script src="lib/javascript/jquery.shortkeys.js" type="text/javascript"></script>
   <script src="lib/javascript/jquery.contextmenu.packed.js" type="text/javascript"></script>
+  <script src="lib/javascript/jquery.blockUI.js" type="text/javascript"></script>
 <?php
 }
 ?>
@@ -772,8 +802,6 @@ if($use_jquery)
 		}
 	}
 ?>
-
-
 		</select></td>
 		  </tr>
 		  <tr>
@@ -782,7 +810,7 @@ if($use_jquery)
 		  </tr>
 		  <tr>
 			<th></th>
-			<td><a id="node_move" class="dlgTitlebar">Move Node</a><a class="dlgTitlebar" id="node_delete">Delete Node</a><a class="dlgTitlebar" id="node_clone">Clone Node</a><a class="dlgTitlebar" id="node_edit">Text Edit</a></td>
+			<td><a id="node_move" class="dlgTitlebar">Move</a><a class="dlgTitlebar" id="node_delete">Delete</a><a class="dlgTitlebar" id="node_clone">Clone</a><a class="dlgTitlebar" id="node_edit">Edit</a></td>
 		  </tr>
 		</table>
 	  </div>
@@ -1124,6 +1152,27 @@ if($use_jquery)
 		necessary for it to do that.
 	  </div>
 	</div><!-- Images -->
+
+        <div id="dlgTextEdit" class="dlgProperties">
+	  <div class="dlgTitlebar">
+		Edit Map Object
+		<ul>
+		  <li><a title="Submit any changes made" id="tb_textedit_submit">Submit</a></li>
+		  <li><a title="Cancel any changes" id="tb_textedit_cancel">Cancel</a></li>
+		</ul>
+	  </div>
+
+	  <div class="dlgBody">
+		<p>You can edit the map items directly here.</p>
+                <textarea id="item_configtext" cols=40 rows=15></textarea>
+	  </div>
+
+	  <div class="dlgHelp" id="images_help">
+		Helpful text will appear here, depending on the current
+		item selected. It should wrap onto several lines, if it's
+		necessary for it to do that.
+	  </div>
+	</div><!-- TextEdit -->
 
   </form>
   	<?php

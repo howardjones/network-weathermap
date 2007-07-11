@@ -187,6 +187,11 @@ function attach_click_events()
     addEvent(document.getElementById('node_move'), 'click', move_node);
     addEvent(document.getElementById('node_delete'), 'click', delete_node);
     addEvent(document.getElementById('node_clone'), 'click', clone_node);
+    addEvent(document.getElementById('node_edit'), 'click', edit_node);
+    
+    addEvent(document.getElementById('tb_textedit_cancel'), 'click', cancel_op);
+    addEvent(document.getElementById('tb_textedit_submit'), 'click', do_submit);
+
 
     addEvent(document.getElementById('tb_link_cancel'), 'click', cancel_op);
     addEvent(document.getElementById('tb_link_submit'), 'click', do_submit);
@@ -534,6 +539,13 @@ function clone_node()
         document.frmMain.submit();
     }
 
+function edit_node()
+{
+        document.getElementById('action').value = "edit_node";
+        show_nodetext(document.frmMain.node_name.value);
+        // document.frmMain.submit();
+   }
+
 function move_node()
     {
     hide_dialog('dlgNodeProperties');
@@ -632,6 +644,38 @@ function real_position_legend(scalename)
     document.getElementById('action').value = "place_legend";
     document.getElementById('param').value = scalename;
     mapmode('xy');
+}
+
+function show_nodetext(name)
+    {
+    var found = -1;
+    mapmode('existing');
+
+    hide_all_dialogs();
+
+    // $('#dlgNodeProperties').block();
+    
+    $.blockUI.defaults.elementMessage = 'Please Wait';
+    
+    $('#item_configtext').val('');
+    $('#action').val('set_node_config');
+
+    show_dialog('dlgTextEdit');
+    
+    // $().ajaxStop($.unblockUI);    
+    $('#item_configtext').block();
+    $.ajax( { type: "GET",
+                url: 'editor.php',
+                data: {action: 'fetch_config',
+                        item_type: 'node',
+                        item_name: document.frmMain.node_name.value,
+                        mapname: document.frmMain.mapname.value},
+                success: function(text) {
+                        $('#item_configtext').val(text);
+                        document.getElementById('item_configtext').focus();
+                        $('#dlgTextEdit').unblock();
+                   }
+           } );
 }
 
 function show_node(name)
@@ -741,6 +785,7 @@ function hide_all_dialogs()
     hide_dialog('dlgMapProperties');
     hide_dialog('dlgMapStyle');
     hide_dialog('dlgLinkProperties');
+    hide_dialog('dlgTextEdit');
     hide_dialog('dlgNodeProperties');
     hide_dialog('dlgColours');
     hide_dialog('dlgImages');

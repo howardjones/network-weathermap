@@ -2,6 +2,10 @@ Background image links: http://art.gnome.org/backgrounds/abstract/
 Background image generator: http://splintax.blogspot.com/2006/01/starfish-automatically-generated.html
 
 BUG: USESCALE none produces an error - if no scale called 'none' is defined, it is not an error.
+BUG: COMMENTPOS 0 breaks things. LABELPOS 0 probably does too (binary search problem)
+BUG: WriteConfig KEYPOS *STILL* produces invalid config?
+
+RRD DS should look for lines with valid data *in the named DS*, not ALL valid.
 
 DONE WriteConfig should optionally just return a string (so the editor can fetch a config chunk)
 DONE WriteConfig should optionally write the contents of a variable in place of the normal config (so the editor can update a chunk)

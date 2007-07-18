@@ -4586,8 +4586,14 @@ function WriteConfig($filename)
 			|| ($this->keytext[$scalename] != $this->inherit_fieldlist['keytext'])
 			|| ($this->keyx[$scalename] != $this->inherit_fieldlist['keyx'])
 			|| ($this->keyy[$scalename] != $this->inherit_fieldlist['keyy']))
-				$output.="KEYPOS " . $scalename." ". $this->keyx[$scalename] . " " . $this->keyy[$scalename] . " " . $this->keytext[$scalename] . "\n";
+			{
+			     // sometimes a scale exists but without defaults. A proper scale object would sort this out...
+			     if($this->keyx[$scalename] == '') { $this->keyx[$scalename] = -1; }
+			     if($this->keyy[$scalename] == '') { $this->keyy[$scalename] = -1; }
 
+				$output.="KEYPOS " . $scalename." ". $this->keyx[$scalename] . " " . $this->keyy[$scalename] . " " . $this->keytext[$scalename] . "\n";
+            }
+            
 		if ( (isset($this->keystyle[$scalename])) &&  ($this->keystyle[$scalename] != $this->inherit_fieldlist['keystyle']['DEFAULT']) )
 		{
 			$extra='';

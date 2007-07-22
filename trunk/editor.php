@@ -202,6 +202,41 @@ else
 		exit();
 		break;
 
+	case "set_link_config":
+		$map->ReadConfig($mapfile);
+
+		$link_name = $_REQUEST['link_name'];
+		$link_config = $_REQUEST['item_configtext'];
+                
+                $map->nodes[$link_name]->config_override=$link_config;
+                
+		$map->WriteConfig($mapfile);
+                // now clear and reload the map object, because the in-memory one is out of sync
+                // - we don't know what changes the user made here, so we just have to reload.
+                unset($map);
+                $map = new WeatherMap;
+                $map->context = 'editor';
+                $map->ReadConfig($mapfile);
+		break;
+
+	case "set_node_config":
+		$map->ReadConfig($mapfile);
+
+		$node_name = $_REQUEST['node_name'];
+		$node_config = $_REQUEST['item_configtext'];
+                
+                $map->nodes[$node_name]->config_override=$node_config;
+                
+		$map->WriteConfig($mapfile);
+                // now clear and reload the map object, because the in-memory one is out of sync
+                // - we don't know what changes the user made here, so we just have to reload.
+                unset($map);
+                $map = new WeatherMap;
+                $map->context = 'editor';
+                $map->ReadConfig($mapfile);
+		break;
+
+
 	case "set_node_properties":
 		$map->ReadConfig($mapfile);
 
@@ -927,7 +962,7 @@ if($use_jquery)
 			<tr>
 			  <th></th>
 			  <td><a class="dlgTitlebar" id="link_delete">Delete
-			  Link</a></td>
+			  Link</a><a class="dlgTitlebar" id="link_edit">Edit</a></td>
 			</tr>
 		  </table>
 	  </div>
@@ -1164,7 +1199,7 @@ if($use_jquery)
 
 	  <div class="dlgBody">
 		<p>You can edit the map items directly here.</p>
-                <textarea id="item_configtext" cols=40 rows=15></textarea>
+                <textarea id="item_configtext" name="item_configtext" cols=40 rows=15></textarea>
 	  </div>
 
 	  <div class="dlgHelp" id="images_help">

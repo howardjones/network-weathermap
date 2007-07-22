@@ -188,7 +188,7 @@ function attach_click_events()
     addEvent(document.getElementById('node_delete'), 'click', delete_node);
     addEvent(document.getElementById('node_clone'), 'click', clone_node);
     addEvent(document.getElementById('node_edit'), 'click', edit_node);
-    
+        
     addEvent(document.getElementById('tb_textedit_cancel'), 'click', cancel_op);
     addEvent(document.getElementById('tb_textedit_submit'), 'click', do_submit);
 
@@ -196,6 +196,7 @@ function attach_click_events()
     addEvent(document.getElementById('tb_link_cancel'), 'click', cancel_op);
     addEvent(document.getElementById('tb_link_submit'), 'click', do_submit);
     addEvent(document.getElementById('link_delete'), 'click', delete_link);
+    addEvent(document.getElementById('link_edit'), 'click', edit_link);
 
     addEvent(document.getElementById('tb_map_cancel'), 'click', cancel_op);
     addEvent(document.getElementById('tb_map_submit'), 'click', do_submit);
@@ -542,9 +543,16 @@ function clone_node()
 function edit_node()
 {
         document.getElementById('action').value = "edit_node";
-        show_nodetext(document.frmMain.node_name.value);
+        show_itemtext('node',document.frmMain.node_name.value);
         // document.frmMain.submit();
    }
+
+function edit_link()
+{
+        document.getElementById('action').value = "edit_link";
+        show_itemtext('link',document.frmMain.link_name.value);
+        // document.frmMain.submit();
+}
 
 function move_node()
     {
@@ -646,7 +654,7 @@ function real_position_legend(scalename)
     mapmode('xy');
 }
 
-function show_nodetext(name)
+function show_itemtext(itemtype,name)
     {
     var found = -1;
     mapmode('existing');
@@ -658,17 +666,25 @@ function show_nodetext(name)
     $.blockUI.defaults.elementMessage = 'Please Wait';
     
     $('#item_configtext').val('');
-    $('#action').val('set_node_config');
-
+    
+    if(itemtype==='node')
+    {           
+        $('#action').val('set_node_config');
+    }
+    
+    if(itemtype==='link')
+    {           
+        $('#action').val('set_link_config');
+    }
     show_dialog('dlgTextEdit');
     
-    // $().ajaxStop($.unblockUI);    
     $('#item_configtext').block();
+    
     $.ajax( { type: "GET",
                 url: 'editor.php',
                 data: {action: 'fetch_config',
-                        item_type: 'node',
-                        item_name: document.frmMain.node_name.value,
+                        item_type: itemtype,
+                        item_name: name,
                         mapname: document.frmMain.mapname.value},
                 success: function(text) {
                         $('#item_configtext').val(text);

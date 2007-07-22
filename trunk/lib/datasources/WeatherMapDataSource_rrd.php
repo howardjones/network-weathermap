@@ -147,7 +147,7 @@ class WeatherMapDataSource_rrd extends WeatherMapDataSource {
 			else
 			{
 
-		#		$command = '"'.$map->rrdtool . '" fetch "'.$rrdfile.'" AVERAGE --start '.$start.' --end '.$end;
+		#	$command = '"'.$map->rrdtool . '" fetch "'.$rrdfile.'" AVERAGE --start '.$start.' --end '.$end;
 				$command=$map->rrdtool . " fetch $rrdfile AVERAGE --start $start --end $end";
 
 				debug ("RRD ReadData: Running: $command\n");
@@ -178,7 +178,7 @@ class WeatherMapDataSource_rrd extends WeatherMapDataSource {
 					pclose ($pipe);
 					
 					debug("RRD ReadData: Read $linecount lines from rrdtool\n");
-					debug("RRD ReadData: $headings\n");
+					debug("RRD ReadData: Headings are: $headings\n");
 
 					if( (in_array($in_ds,$heads) || $in_ds == '-') && (in_array($out_ds,$heads) || $out_ds == '-') )
 					{
@@ -189,10 +189,10 @@ class WeatherMapDataSource_rrd extends WeatherMapDataSource {
 					     {
 						 debug ("--" . $line . "\n");
 						 $cols=preg_split("/\s+/", $line);
-						 for ($i=1, $cnt=count($cols)-1; $i < $cnt; $i++) { 
+						 for ($i=0, $cnt=count($cols)-1; $i < $cnt; $i++) { 
 							$h = $heads[$i];
 							$v = $cols[$i];
-							print "|$h|,|$v|\n";
+							# print "|$h|,|$v|\n";
 							$values[$h] = trim($v); 
 						}
 		 
@@ -201,21 +201,23 @@ class WeatherMapDataSource_rrd extends WeatherMapDataSource {
 						foreach (array(IN,OUT) as $dir)
 						{
 							$n = $dsnames[$dir];
-							print "|$n|\n";
+							# print "|$n|\n";
 							if(array_key_exists($n,$values))
 							{
-							$candidate = $values[$n];
-							if(preg_match('/^\d+\.?\d*e?[+-]?\d*:?$/i', $candidate))
-							{
-								$data[$dir] = $candidate * $multiplier;
-								print "$candidate is OK\n";
-								$data_ok = TRUE;
-							}
+								$candidate = $values[$n];
+								if(preg_match('/^\d+\.?\d*e?[+-]?\d*:?$/i', $candidate))
+								{
+									$data[$dir] = $candidate * $multiplier;
+									debug("$candidate is OK value for $n\n");
+									$data_ok = TRUE;
+								}
 							}
 						}
 						
 						if($data_ok)
 						{
+							// at least one of the named DS had good data
+							$data_time = intval($values['timestamp']);	
 							// break out of the loop here   
 							break;
 						}

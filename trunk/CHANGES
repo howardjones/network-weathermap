@@ -16,6 +16,8 @@
         ADDED - Editor toolbar fixed to window, to make it easier to scroll around large maps
         ADDED - RRD Datasource has improved warnings for non-existent DS names
         FIXED - RRD doesn't consider DSes other than the ones you named when finding a valid line.
+	CHANGE - Formatted numbers (Mega, Kilo etc) now can include milli, micro and nano (m,u,n).
+	FIXED - COMMENTPOS 0 doesn't kill everything anymore
         
 0.92 - FIXED weathermap CLI help said --random-data instead of --randomdata
        FIXED one last php short_tag in poller_common.php - thanks Bernado Diez

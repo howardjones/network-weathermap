@@ -332,6 +332,9 @@ function find_distance(&$pointarray, $distance)
 	if ($left == $right)
 		return ($left);
 
+	// if the distance is zero, there's no need to search (and it doesn't work anyway)
+	 if($distance==0) return($left);
+
 	// if it's a point past the end of the line, then just return the end of the line
 	// Weathermap should *never* ask for this, anyway
 	if ($pointarray[$right][2] < $distance) { return ($right); }
@@ -696,13 +699,16 @@ function format_number($number, $precision = 2, $trailing_zeroes = 0)
 	else { return ($integer . "." . $decimal); }
 }
 
-function nice_bandwidth($number, $kilo = 1000,$decimals=1)
+function nice_bandwidth($number, $kilo = 1000,$decimals=1,$below_one=TRUE)
 {
 	$suffix='';
 
 	if ($number == 0)
 		return '0';
 
+	$milli = 1/$kilo;
+	$micro = 1/$milli;
+	$nano = 1/$micro;
 	$mega=$kilo * $kilo;
 	$giga=$mega * $kilo;
 	$tera=$giga * $kilo;
@@ -726,6 +732,21 @@ function nice_bandwidth($number, $kilo = 1000,$decimals=1)
 	{
 		$number/=$kilo;
 		$suffix="K";
+	}
+	elseif (($below_one==TRUE) && ($number > $milli))
+	{
+		$number/=$milli;
+		$suffix="m";
+	}
+	elseif (($below_one==TRUE) && ($number > $micro))
+	{
+		$number/=$micro;
+		$suffix="u";
+	}
+	elseif (($below_one==TRUE) && ($number > $nano))
+	{
+		$number/=$nano;
+		$suffix="n";
 	}
 
 	$result=format_number($number, $decimals) . $suffix;
@@ -1961,25 +1982,24 @@ class WeatherMapLink extends WeatherMapItem
 				# $comment_index = find_distance($curvepoints,$extra);
 				
 				list($x,$y,$comment_index,$angle) = find_distance_coords_angle($curvepoints,$extra);
+				if($comment_index!=0)
+				{
 				$dx = $x - $curvepoints[$comment_index][0];
 				$dy = $y - $curvepoints[$comment_index][1];
+				}
+				else
+				{
+				$dx = $curvepoints[$comment_index+1][0] - $x;
+				$dy = $curvepoints[$comment_index+1][1] - $y;
+				}
 								
-				#$ratio = ($extra - $curvepoints[$comment_index][2]) / ($curvepoints[$comment_index + 1][2] - $curvepoints[$comment_index][2]);
-				#$dx = -$curvepoints[$startindex][0] +  ($curvepoints[$comment_index][0] + $ratio * ($curvepoints[$comment_index + 1][0] - $curvepoints[$comment_index][0]));
-				#$dy = -$curvepoints[$startindex][1] +  ($curvepoints[$comment_index][1] + $ratio * ($curvepoints[$comment_index + 1][1] - $curvepoints[$comment_index][1]));
-				// we need the angle to draw the text 
-				#$angle = rad2deg(atan2(-$dy,$dx));
 				// find the normal to our link, so we can get outside the arrow
 				
 				$l=sqrt(($dx * $dx) + ($dy * $dy));
 				$dx = $dx/$l; 	$dy = $dy/$l;
 				$nx = $dy;  $ny = -$dx;
+				$flipped=FALSE;
 				
-				# warn($commentpos[$dir]." $extra/$totaldistance ".$comment_index."\n");
-				# warn("$dx/$dy  $nx/$ny\n");
-				#$edge_x = $x + $nudge*$dx + $nx * ($width + 4);
-				#$edge_y = $y + $nudge*$dy + $ny * ($width + 4);
-				$flipped = FALSE;				
 				// if the text will be upside-down, rotate it, flip it, and right-justify it
 				// not quite as catchy as Missy's version
 				if(abs($angle)>90)

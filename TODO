@@ -1,9 +1,9 @@
 Background image links: http://art.gnome.org/backgrounds/abstract/
 Background image generator: http://splintax.blogspot.com/2006/01/starfish-automatically-generated.html
 
-BUG: USESCALE none produces an error - if no scale called 'none' is defined, it is not an error.
+FIXED BUG: USESCALE none produces an error - if no scale called 'none' is defined, it is not an error.
 FIXED BUG: COMMENTPOS 0 breaks things. LABELPOS 0 probably does too (binary search problem)
-BUG: WriteConfig KEYPOS *STILL* produces invalid config?
+FIXED BUG: WriteConfig KEYPOS *STILL* produces invalid config?
 
 DONE RRD DS should look for lines with valid data *in the named DS*, not ALL valid.
 

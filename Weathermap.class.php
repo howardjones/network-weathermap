@@ -3191,7 +3191,10 @@ function ColourFromPercent($image, $percent,$scalename="DEFAULT",$name="")
 	}
 	else
 	{
-		warn("ColourFromPercent: Attempted to use non-existent scale: $scalename for $name [WMWARN09]\n");
+		if($scalename != 'none')
+		{
+			warn("ColourFromPercent: Attempted to use non-existent scale: $scalename for $name [WMWARN09]\n");
+		}
 	}
 
 	// you'll only get grey for a COMPLETELY quiet link if there's no 0 in the SCALE lines
@@ -4602,10 +4605,10 @@ function WriteConfig($filename)
 		foreach ($this->colours as $scalename=>$colours)
 		{
 		  // not all keys will have keypos but if they do, then all three vars should be defined
-		if ( (isset($this->keyx[$scalename]))
-			|| ($this->keytext[$scalename] != $this->inherit_fieldlist['keytext'])
+		if ( (isset($this->keyx[$scalename])) && (isset($this->keyy[$scalename])) && (isset($this->keytext[$scalename]))
+		    && (($this->keytext[$scalename] != $this->inherit_fieldlist['keytext'])
 			|| ($this->keyx[$scalename] != $this->inherit_fieldlist['keyx'])
-			|| ($this->keyy[$scalename] != $this->inherit_fieldlist['keyy']))
+			|| ($this->keyy[$scalename] != $this->inherit_fieldlist['keyy'])))
 			{
 			     // sometimes a scale exists but without defaults. A proper scale object would sort this out...
 			     if($this->keyx[$scalename] == '') { $this->keyx[$scalename] = -1; }

@@ -27,7 +27,7 @@ $defines=array();
 
 // **************************************************************************************
 // THIS IS THE ONE LINE IN HERE YOU MIGHT HAVE TO CHANGE!
-$map->rrdtool="/usr/local/rrdtool-1.2.15/bin/rrdtool";
+$map->rrdtool="/usr/local/bin/rrdtool";
 // (on Windows, use / instead of \ in pathnames - c:/rrdtool/bin/rrdtool.exe for example)
 // **************************************************************************************
 

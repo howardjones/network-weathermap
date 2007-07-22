@@ -82,7 +82,7 @@ class WeatherMapDataSource_rrd extends WeatherMapDataSource {
 			$dsnames[IN] = $matches[2];
 			$dsnames[OUT] = $matches[3];
 			
-			debug("Special DS names seen ($in_ds and $out_ds).\n");
+			debug("Special DS names seen (".$dsnames[IN]." and ".$dsnames[OUT].").\n");
 		}
 
 		if(preg_match("/^rrd:(.*)/",$rrdfile,$matches))
@@ -122,6 +122,8 @@ class WeatherMapDataSource_rrd extends WeatherMapDataSource {
 			    $end = "start+".$period;
 			}
 
+			$values=array();
+
 			if ((1==0) && extension_loaded('RRDTool')) // fetch the values via the RRDtool Extension
 			{
 				// for the php-rrdtool module, we use an array instead...
@@ -147,7 +149,6 @@ class WeatherMapDataSource_rrd extends WeatherMapDataSource {
 
 		#		$command = '"'.$map->rrdtool . '" fetch "'.$rrdfile.'" AVERAGE --start '.$start.' --end '.$end;
 				$command=$map->rrdtool . " fetch $rrdfile AVERAGE --start $start --end $end";
-	
 
 				debug ("RRD ReadData: Running: $command\n");
 				$pipe=popen($command, "r");
@@ -177,8 +178,9 @@ class WeatherMapDataSource_rrd extends WeatherMapDataSource {
 					pclose ($pipe);
 					
 					debug("RRD ReadData: Read $linecount lines from rrdtool\n");
+					debug("RRD ReadData: $headings\n");
 
-					if( (isset($heads[$in_ds]) || $in_ds == '-') && (isset($heads[$out_ds]) || $out_ds == '-') )
+					if( (in_array($in_ds,$heads) || $in_ds == '-') && (in_array($out_ds,$heads) || $out_ds == '-') )
 					{
 					    // deal with the data, starting with the last line of output
 					     $rlines=array_reverse($lines);
@@ -187,26 +189,35 @@ class WeatherMapDataSource_rrd extends WeatherMapDataSource {
 					     {
 						 debug ("--" . $line . "\n");
 						 $cols=preg_split("/\s+/", $line);
-						 for ($i=0, $cnt=count($cols); $i < $cnt; $i++) { $values[$heads[$i]] = trim($cols[$i]); }
+						 for ($i=1, $cnt=count($cols)-1; $i < $cnt; $i++) { 
+							$h = $heads[$i];
+							$v = $cols[$i];
+							print "|$h|,|$v|\n";
+							$values[$h] = trim($v); 
+						}
 		 
 						$data_ok=FALSE;
 		 
 						foreach (array(IN,OUT) as $dir)
 						{
-							$candidate = $values[$dsnames[$dir]];
+							$n = $dsnames[$dir];
+							print "|$n|\n";
+							if(array_key_exists($n,$values))
+							{
+							$candidate = $values[$n];
 							if(preg_match('/^\d+\.?\d*e?[+-]?\d*:?$/i', $candidate))
 							{
 								$data[$dir] = $candidate * $multiplier;
-							}
-							else
-							{
+								print "$candidate is OK\n";
 								$data_ok = TRUE;
+							}
 							}
 						}
 						
 						if($data_ok)
 						{
 							// break out of the loop here   
+							break;
 						}
 					     }
 					}
@@ -214,7 +225,7 @@ class WeatherMapDataSource_rrd extends WeatherMapDataSource {
 					{
 					    // report DS name error
 					     $names = join(",",$heads);
-						warn("RRD ReadData: Neither of your DS names ($in_ds & $out_ds) were found, even though there was a valid data line. Maybe they are wrong? Valid DS names in this file are: $names [WMRRD06]");
+						warn("RRD ReadData: Neither of your DS names ($in_ds & $out_ds) were found, even though there was a valid data line. Maybe they are wrong? Valid DS names in this file are: $names [WMRRD06]\n");
 					}
 		   
 				}
@@ -229,6 +240,9 @@ class WeatherMapDataSource_rrd extends WeatherMapDataSource {
 		{
 			warn ("Target $rrdfile doesn't exist. Is it a file? [WMRRD06]\n");
 		}
+
+		$inbw = $data[IN];
+		$outbw = $data[OUT];
 
 		debug ("RRD ReadData: Returning ($inbw,$outbw,$data_time)\n");
 

@@ -2,7 +2,7 @@
 ./COPYING
 ./HTML_ImageMap.class.php
 ./README
-./README-0.92
+./README-0.93
 ./Weathermap.class.php
 ./cacti-pick.php
 ./configs/simple.conf
@@ -40,7 +40,7 @@
 ./lib/datasources/WeatherMapDataSource_static.php
 ./lib/datasources/WeatherMapDataSource_tabfile.php
 ./lib/datasources/WeatherMapDataSource_snmp.php
-./lib/javascript/jquery-latest.pack
+./lib/javascript/jquery-latest.pack.js
 ./lib/poller-common.php
 ./lib/post/WeatherMapPostProcessorTest.php
 ./lib/pre/WeatherMapPreProcessorTest.php

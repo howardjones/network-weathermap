@@ -4929,11 +4929,18 @@ function PreloadMapHTML()
 			if ( ($link->overliburl != '') || ($link->notestext != '') )
 			{
 				# $overlibhtml = "onmouseover=\"return overlib('&lt;img src=".$link->overliburl."&gt;',DELAY,250,CAPTION,'".$link->name."');\"  onmouseout=\"return nd();\"";
-				$a_x=$link->a->x;
-				$b_x=$link->b->x;
+				# $a_x=$link->a->x;
+				# $b_x=$link->b->x;
+				# $a_y=$link->a->y;
+				# $b_y=$link->b->y;
+				
+				$a_x=$this->nodes[$link->a->name]->x;
+				$a_y=$this->nodes[$link->a->name]->y;
+			 
+				$b_x=$this->nodes[$link->b->name]->x;
+				$b_y=$this->nodes[$link->b->name]->y;
+				
 				$mid_x=($a_x + $b_x) / 2;
-				$a_y=$link->a->y;
-				$b_y=$link->b->y;
 				$mid_y=($a_y + $b_y) / 2;
 
 				# debug($link->overlibwidth."---".$link->overlibheight."---\n");

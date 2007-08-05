@@ -3,7 +3,7 @@
         CHANGE - the auth realm names for Cacti have been changed to match ReportIt and Aggregate - easier to tell who does what
         ADDED - unique code for each warning message, and a page to explain it on the website. Ugh.
         ADDED - warning in editor file-selector so you can tell if the file is read-only
-		ADDED - click config filename to edit in editor from Cacti (thanks to streaker69)
+	ADDED - click config filename to edit in editor from Cacti (thanks to streaker69)
         FIXED - editor-generated node names are a bit shorter (and easier to read) now.
         FIXED - keyboard focus switches nicely to the popup dialogs now.
         ADDED - cactihost: DS plugin fetches a bunch of other stats from Cacti's DB now, too (like availability and response times)
@@ -18,6 +18,7 @@
         FIXED - RRD doesn't consider DSes other than the ones you named when finding a valid line.
 	CHANGE - Formatted numbers (Mega, Kilo etc) now can include milli, micro and nano (m,u,n).
 	FIXED - COMMENTPOS 0 doesn't kill everything anymore
+        FIXED - OVERLIB would behave incorrectly with PHP4 and relatively positioned nodes (Bernd Ziller)
         
 0.92 - FIXED weathermap CLI help said --random-data instead of --randomdata
        FIXED one last php short_tag in poller_common.php - thanks Bernado Diez

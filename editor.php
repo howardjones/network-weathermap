@@ -1199,7 +1199,7 @@ if($use_jquery)
 
 	  <div class="dlgBody">
 		<p>You can edit the map items directly here.</p>
-                <textarea id="item_configtext" name="item_configtext" cols=40 rows=15></textarea>
+                <textarea wrap="no" id="item_configtext" name="item_configtext" cols=40 rows=15></textarea>
 	  </div>
 
 	  <div class="dlgHelp" id="images_help">

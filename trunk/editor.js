@@ -663,9 +663,9 @@ function show_itemtext(itemtype,name)
 
     // $('#dlgNodeProperties').block();
     
-    $.blockUI.defaults.elementMessage = 'Please Wait';
+  //  $.blockUI.defaults.elementMessage = 'Please Wait';
     
-    $('#item_configtext').val('');
+    $('textarea#item_configtext').val('');
     
     if(itemtype==='node')
     {           
@@ -678,7 +678,7 @@ function show_itemtext(itemtype,name)
     }
     show_dialog('dlgTextEdit');
     
-    $('#item_configtext').block();
+//    $('#item_configtext').block();
     
     $.ajax( { type: "GET",
                 url: 'editor.php',
@@ -689,7 +689,7 @@ function show_itemtext(itemtype,name)
                 success: function(text) {
                         $('#item_configtext').val(text);
                         document.getElementById('item_configtext').focus();
-                        $('#dlgTextEdit').unblock();
+                      //  $('#dlgTextEdit').unblock();
                    }
            } );
 }

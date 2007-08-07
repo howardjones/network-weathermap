@@ -14,11 +14,13 @@ body { font-family: 'Lucida Grande', Arial, sans-serif; margin: 0; padding: 0; b
 
 #toolbar { position: fixed; top:0px; left: 0px; height: 48px; width: 100%;
 	background: #2D3E70; color: white; border-bottom: gray solid 1px;
-	z-index: 10; opacity: 0.9; display: none; 
+	z-index: 1000; opacity: 0.9; display: none; 
 	}
 
 #version { font-size: 70%; padding-left: 10px; padding-right: 10px; float:right; }
 #busy { display: none; } 
+
+.viamarker { z-index: 500; position: absolute; }
 
 /****************************************/
 

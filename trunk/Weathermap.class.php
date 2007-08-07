@@ -583,7 +583,7 @@ function draw_curve($image, &$curvepoints, $width, $outlinecolour, $comment_colo
 		if (!is_null($fillcolours[$arrayindex]))
 			{ imagefilledpolygon($image, $there_points, count($there_points) / 2, $arrowsettings[$dir][4]); }
 		
-		$map->imap->addArea("Polygon", "LINK:" . $linkname, '', $there_points);
+		$map->imap->addArea("Polygon", "LINK:" . $linkname. ':'.($direction+1), '', $there_points);
 		debug ("Adding Poly imagemap for $linkname\n");
 
 		if (!is_null($outlinecolour))
@@ -1677,6 +1677,8 @@ class WeatherMapNode extends WeatherMapItem
 		$js .= "" . js_escape($this->name) . ": {";
 		$js .= "x:" . ($this->x - $this->centre_x). ", ";
 		$js .= "y:" . ($this->y - $this->centre_y) . ", ";
+		$js .= "cx:" . $this->centre_x. ", ";
+		$js .= "cy:" . $this->centre_y . ", ";
 		$js .= "name:" . js_escape($this->name) . ", ";
 		if($complete)
 		{
@@ -3139,6 +3141,7 @@ function DrawLabelRotated($im, $x, $y, $angle, $text, $font, $padding, $linkname
 	$textcol=myimagecolorallocate($im, $textcolour[0], $textcolour[1], $textcolour[2]);
 	$this->myimagestring($im, $font, $points[8], $points[9], $text, $textcol,$angle);
 
+	// XXX - THIS IS WRONG - should be a poly
 	$this->imap->addArea("Rectangle", "LINK:".$linkname, '', array($x1, $y1, $x2, $y2));
 
 }
@@ -5272,6 +5275,10 @@ function CacheUpdate($agelimit=600)
 		fputs($fd,$json);
 		fclose($fd);
 		
+		$fd = fopen($cachefolder.DIRECTORY_SEPARATOR.$cacheprefix."_imaphtml.json","w");
+		$json = $this->imap->subHTML("LINK:");
+		fputs($fd,$json);
+		fclose($fd);
 		
 
 		$fd = fopen($cachefolder.DIRECTORY_SEPARATOR.$cacheprefix."_imap.json","w");

@@ -7,22 +7,22 @@ var mapfile = '';
 var lastserial = 0;
 
 // we queue these up to make our one-at-a-time AJAX call work
-var AJAXRequest = {
-    params: {},
-    send: function()
-    {
-    }
-};
+//var AJAXRequest = {
+//    params: {},
+//    send: function()
+//    {
+//    }
+//};
 
-function printfire() {
-   if (document.createEvent)
-   {
-      printfire.args =  arguments;
-      var ev = document.createEvent("Events");
-      ev.initEvent("printfire", false, true );
-      dispatchEvent(ev);
-   }
-}
+//function printfire() {
+//   if (document.createEvent)
+//   {
+//      printfire.args =  arguments;
+//      var ev = document.createEvent("Events");
+//      ev.initEvent("printfire", false, true );
+//      dispatchEvent(ev);
+//   }
+//}
 
 function openmap(mapname)
 {
@@ -50,10 +50,9 @@ function showpicker()
     $('#filelist').empty();
     $('#filelist').append('<li id="status"><em><img src="editor-resources/activity-indicator.gif">Fetching File List...</em></li>');
     
-    $.getJSON("editor-backend.php",
+    $.getJSON("http://localhost/~howie/wm-public/editor-backend.php",
         { map: '', cmd: "maplist" },
           function(json){
-            
             if(json.status=='OK')  
             {
                 var i=0;
@@ -67,10 +66,15 @@ function showpicker()
                         locked = '<img src="editor-resources/lock.png" alt="Read-Only file" title="Read-Only file" />';
                     }
                     $('#filelist').append('<li><a>'+locked+'<span>' + json.files[i].file + '</span> <em>' + json.files[i].title + '</em></a></li>');
-                    
                 }
+                console.log("Built list");
                 $('#filelist li a').click(function() { openmap($(this).children("span").text()); });
-            }           
+                console.log("Added Actions");
+            }
+            else
+            {
+                console.log("list not OK - " + json.status);
+            }
         }
     );
 }
@@ -132,7 +136,7 @@ function syncmap()
             var newx = origin_x + map.nodes[node].x;
             var newy = origin_y + map.nodes[node].y;
             
-            existing.css({position: 'absolute', left: newx + "px", top: newy + "px", 'z-index': 3, opacity: '0.6'});
+            existing.css({position: 'absolute', left: newx + "px", top: newy + "px", 'z-index': 30});
         }
     }
         
@@ -172,10 +176,10 @@ $(document).ready( function() {
     $("body").ajaxStop(function(){
       $(this).css({border: 'none'});
     });
-    
+        
     $('#welcome').show();
     $('#filepicker').hide();
-    $('#toolbar').show();
+    $('#toolbar').hide();
     $('#themap').hide();
     $('#busy').hide();
     

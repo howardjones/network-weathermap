@@ -1671,21 +1671,24 @@ class WeatherMapNode extends WeatherMapItem
 		return $js;
 	}
 
-	function asJSON()
+	function asJSON($complete=TRUE)
 	{
 		$js = '';
 		$js .= "" . js_escape($this->name) . ": {";
 		$js .= "x:" . ($this->x - $this->centre_x). ", ";
 		$js .= "y:" . ($this->y - $this->centre_y) . ", ";
-		$js .= "label:" . js_escape($this->label) . ", ";
 		$js .= "name:" . js_escape($this->name) . ", ";
-		$js .= "infourl:" . js_escape($this->infourl) . ", ";
-		$js .= "overliburl:" . js_escape($this->overliburl) . ", ";
-		$js.="overlibcaption:" . js_escape($this->overlibcaption) . ", ";
-
-		$js .= "overlibwidth:" . $this->overlibheight . ", ";
-		$js .= "overlibheight:" . $this->overlibwidth . ", ";
-		$js .= "iconfile:" . js_escape($this->iconfile). ", ";
+		if($complete)
+		{
+			$js .= "label:" . js_escape($this->label) . ", ";
+			$js .= "infourl:" . js_escape($this->infourl) . ", ";
+			$js .= "overliburl:" . js_escape($this->overliburl) . ", ";
+			$js .= "overlibcaption:" . js_escape($this->overlibcaption) . ", ";
+	
+			$js .= "overlibwidth:" . $this->overlibheight . ", ";
+			$js .= "overlibheight:" . $this->overlibwidth . ", ";
+			$js .= "iconfile:" . js_escape($this->iconfile). ", ";
+		}
 		$js .= "iconcachefile:" . js_escape($this->cachefile);
 		$js .= "},\n";
 		return $js;
@@ -2446,7 +2449,7 @@ class WeatherMapLink extends WeatherMapItem
 		return $js;
 	}
 
-	function asJSON()
+	function asJSON($complete=TRUE)
 	{
 		$js='';
 		$js.="" . js_escape($this->name) . ": {";
@@ -2457,24 +2460,28 @@ class WeatherMapLink extends WeatherMapItem
 			$js.="b:'" . $this->b->name . "', ";
 		}
 
-		$js.="width:'" . $this->width . "', ";
-		$js.="target:";
-
-		$tgt='';
-
-		foreach ($this->targets as $target) { $tgt.=$target[4] . ' '; }
-
-		$js.=js_escape(trim($tgt));
-		$js.=",";
-
-		$js.="bw_in:" . js_escape($this->max_bandwidth_in_cfg) . ", ";
-		$js.="bw_out:" . js_escape($this->max_bandwidth_out_cfg) . ", ";
-
-		$js.="name:" . js_escape($this->name) . ", ";
-		$js.="overlibwidth:'" . $this->overlibheight . "', ";
-		$js.="overlibheight:'" . $this->overlibwidth . "', ";
-		$js.="overlibcaption:" . js_escape($this->overlibcaption) . ", ";
-
+		if($complete)
+		{
+			$js.="infourl:" . js_escape($this->infourl) . ", ";
+			$js.="overliburl:" . js_escape($this->overliburl). ", ";
+			$js.="width:'" . $this->width . "', ";
+			$js.="target:";
+	
+			$tgt='';
+	
+			foreach ($this->targets as $target) { $tgt.=$target[4] . ' '; }
+	
+			$js.=js_escape(trim($tgt));
+			$js.=",";
+	
+			$js.="bw_in:" . js_escape($this->max_bandwidth_in_cfg) . ", ";
+			$js.="bw_out:" . js_escape($this->max_bandwidth_out_cfg) . ", ";
+	
+			$js.="name:" . js_escape($this->name) . ", ";
+			$js.="overlibwidth:'" . $this->overlibheight . "', ";
+			$js.="overlibheight:'" . $this->overlibwidth . "', ";
+			$js.="overlibcaption:" . js_escape($this->overlibcaption) . ", ";
+		}
 		$vias = "via: [";
 		foreach ($this->vialist as $via)
 				$vias .= sprintf("[%d,%d],", $via[0], $via[1]);
@@ -2482,8 +2489,6 @@ class WeatherMapLink extends WeatherMapItem
 		$vias = str_replace("],]","]]",$vias);
 		$js .= $vias;
 
-		$js.="infourl:" . js_escape($this->infourl) . ", ";
-		$js.="overliburl:" . js_escape($this->overliburl);
 		$js.="},\n";
 		return $js;
 	}
@@ -2521,7 +2526,7 @@ class WeatherMap extends WeatherMapBase
 	var $width,
 		$height;
 	var $keyx,
-		$keyy;
+		$keyy, $keyimage;
 	var $titlex,
 		$titley;
 	var $keytext,
@@ -2535,7 +2540,7 @@ class WeatherMap extends WeatherMapBase
 	var $rrdtool_check;
 	var $inherit_fieldlist;
 	var $context;
-	var $cachefolder,$mapcache;
+	var $cachefolder,$mapcache,$cachefile_version;
 	var $name;
 	var $black,
 		$white,
@@ -2571,6 +2576,7 @@ class WeatherMap extends WeatherMapBase
 				'keytext' => array('DEFAULT' => 'Traffic Load'),
 				'keyx' => array('DEFAULT' => -1),
 				'keyy' => array('DEFAULT' => -1),
+				'keyimage' => array(),
 				'keysize' => array('DEFAULT' => 400),
 				'stamptext' => 'Created: %b %d %Y %H:%M:%S',
 				'keyfont' => 4,
@@ -3283,10 +3289,10 @@ function DrawLegend_Horizontal($im,$scalename="DEFAULT",$width=400)
 	}
 
 	imagecopy($im,$scale_im,$this->keyx[$scalename],$this->keyy[$scalename],0,0,imagesx($scale_im),imagesy($scale_im));
+	$this->keyimage[$scalename] = $scale_im;
 
 	$this->imap->addArea("Rectangle", "LEGEND:$scalename", '',
 		array($box_left, $box_top, $box_right, $box_bottom));
-
 }
 
 function DrawLegend_Vertical($im,$scalename="DEFAULT",$height=400)
@@ -3361,6 +3367,7 @@ function DrawLegend_Vertical($im,$scalename="DEFAULT",$height=400)
 	}
 
 	imagecopy($im,$scale_im,$this->keyx[$scalename],$this->keyy[$scalename],0,0,imagesx($scale_im),imagesy($scale_im));
+	$this->keyimage[$scalename] = $scale_im;
 
 	$this->imap->addArea("Rectangle", "LEGEND:$scalename", '',
 		array($box_left, $box_top, $box_right, $box_bottom));
@@ -3479,7 +3486,8 @@ function DrawLegend_Classic($im,$scalename="DEFAULT")
 						$this->colours['DEFAULT']['KEYTEXT'][$scale_ref]);
 					$i++;
 				}
-					imagecopy($im,$scale_im,$this->keyx[$scalename],$this->keyy[$scalename],0,0,imagesx($scale_im),imagesy($scale_im));
+				imagecopy($im,$scale_im,$this->keyx[$scalename],$this->keyy[$scalename],0,0,imagesx($scale_im),imagesy($scale_im));
+				$this->keyimage[$scalename] = $scale_im;
 
 			}
 		}
@@ -4715,6 +4723,7 @@ function AllocateScaleColours($im,$refname='gdref1')
 function DrawMap($filename = '', $thumbnailfile = '', $thumbnailmax = 250, $withnodes = TRUE)
 {
 	$bgimage=NULL;
+	$this->cachefile_version = crc32(file_get_contents($this->configfile));
 
 	debug("Running Post-Processing Plugins...\n");
 	foreach ($this->postprocessclasses as $post_class)
@@ -4795,7 +4804,7 @@ function DrawMap($filename = '', $thumbnailfile = '', $thumbnailmax = 250, $with
 			# debug("DEFAULT: ".var_dump($this->defaultnode->notes)."\n");
 		}
 
-        foreach ($this->colours as $scalename=>$colours)
+		  foreach ($this->colours as $scalename=>$colours)
 		{
 			debug("Drawing KEY for $scalename if necessary.\n");
 
@@ -4861,9 +4870,9 @@ function DrawMap($filename = '', $thumbnailfile = '', $thumbnailmax = 250, $with
 
 		if($this->context == 'editor2')
 		{
-			$cachefile = $this->cachefolder.DIRECTORY_SEPARATOR.dechex(crc32($this->configfile))."_bg.png";
+			$cachefile = $this->cachefolder.DIRECTORY_SEPARATOR.dechex(crc32($this->configfile))."_bg.".$this->cachefile_version.".png";
 			imagepng($image, $cachefile);
-			$cacheuri = $this->cachefolder.'/'.dechex(crc32($this->configfile))."_bg.png";
+			$cacheuri = $this->cachefolder.'/'.dechex(crc32($this->configfile))."_bg.".$this->cachefile_version.".png";
 			$this->mapcache = $cacheuri;
 		}
 
@@ -4929,7 +4938,7 @@ function PreloadMapHTML()
 			if ( ($link->overliburl != '') || ($link->notestext != '') )
 			{
 				# $overlibhtml = "onmouseover=\"return overlib('&lt;img src=".$link->overliburl."&gt;',DELAY,250,CAPTION,'".$link->name."');\"  onmouseout=\"return nd();\"";
-				# $a_x=$link->a->x;
+				#  $a_x=$link->a->x;
 				# $b_x=$link->b->x;
 				# $a_y=$link->a->y;
 				# $b_y=$link->b->y;
@@ -5210,6 +5219,14 @@ function CacheUpdate($agelimit=600)
 				imagepng($node->image,$cachefolder.DIRECTORY_SEPARATOR.$nodefile);
 			}
 		}
+		
+		foreach ($this->keyimage as $key=>$image)
+		{
+				$scalefile = $cacheprefix."_scale_".dechex(crc32($key)).".png";
+				$this->keycache[$key] = $scalefile;
+				imagepng($image,$cachefolder.DIRECTORY_SEPARATOR.$scalefile);
+		}
+
 
 		$json = "";
 		$fd = fopen($cachefolder.DIRECTORY_SEPARATOR.$cacheprefix."_map.json","w");
@@ -5222,20 +5239,40 @@ function CacheUpdate($agelimit=600)
 		$json = rtrim($json,", \n");
 		fputs($fd,$json);
 		fclose($fd);
+		
+		
 
 		$fd = fopen($cachefolder.DIRECTORY_SEPARATOR.$cacheprefix."_nodes.json","w");
-		$json = $this->defaultnode->asJSON();
-		foreach ($this->nodes as $node) { $json .= $node->asJSON(); }
+		$json = $this->defaultnode->asJSON(TRUE);
+		foreach ($this->nodes as $node) { $json .= $node->asJSON(TRUE); }
 		$json = rtrim($json,", \n");
 		fputs($fd,$json);
 		fclose($fd);
 
-		$fd = fopen($cachefolder.DIRECTORY_SEPARATOR.$cacheprefix."_links.json","w");
-		$json = $this->defaultlink->asJSON();
-		foreach ($this->links as $link) { $json .= $link->asJSON(); }
+		$fd = fopen($cachefolder.DIRECTORY_SEPARATOR.$cacheprefix."_nodes_lite.json","w");
+		$json = $this->defaultnode->asJSON(FALSE);
+		foreach ($this->nodes as $node) { $json .= $node->asJSON(FALSE); }
 		$json = rtrim($json,", \n");
 		fputs($fd,$json);
 		fclose($fd);
+		
+		
+
+		$fd = fopen($cachefolder.DIRECTORY_SEPARATOR.$cacheprefix."_links.json","w");
+		$json = $this->defaultlink->asJSON(TRUE);
+		foreach ($this->links as $link) { $json .= $link->asJSON(TRUE); }
+		$json = rtrim($json,", \n");
+		fputs($fd,$json);
+		fclose($fd);
+
+		$fd = fopen($cachefolder.DIRECTORY_SEPARATOR.$cacheprefix."_links_lite.json","w");
+		$json = $this->defaultlink->asJSON(FALSE);
+		foreach ($this->links as $link) { $json .= $link->asJSON(FALSE); }
+		$json = rtrim($json,", \n");
+		fputs($fd,$json);
+		fclose($fd);
+		
+		
 
 		$fd = fopen($cachefolder.DIRECTORY_SEPARATOR.$cacheprefix."_imap.json","w");
 		$json = '';

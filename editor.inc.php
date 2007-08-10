@@ -3,6 +3,9 @@ function show_editor_startpage()
 {
 	global $mapdir, $WEATHERMAP_VERSION, $config_loaded, $cacti_found, $ignore_cacti,$configerror;
 
+	$fromplug = FALSE;
+        if(isset($_REQUEST['plug']) && (intval($_REQUEST['plug'])==1) ) { $fromplug = TRUE; }
+
 	$matches=0;
 
 	print '<html xmlns="http://www.w3.org/1999/xhtml"><head><link rel="stylesheet" type="text/css" media="screen" href="editor.css" />  <script src="editor.js" type="text/javascript"></script><title>PHP Weathermap Editor ' . $WEATHERMAP_VERSION
@@ -44,6 +47,8 @@ function show_editor_startpage()
 	print 'Named: <input type="text" name="mapname" size="20">';
 
 	print '<input name="action" type="hidden" value="newmap">';
+	print '<input name="plug" type="hidden" value="'.$fromplug.'">';
+
 	print '<input type="submit" value="Create">';
 	print '</form>';
 
@@ -105,6 +110,7 @@ function show_editor_startpage()
 	print 'Named: <input type="text" name="mapname" size="20"> based on ';
 
 	print '<input name="action" type="hidden" value="newmapcopy">';
+	print '<input name="plug" type="hidden" value="'.$fromplug.'">';
 	print '<select name="sourcemap">';
 	
 	if($errorstring == '')
@@ -133,7 +139,7 @@ function show_editor_startpage()
 			$title = $titles[$file];
 			$note = $notes[$file];
 			$nicefile = htmlspecialchars($file);
-			print "<li>$note<a href=\"?mapname=$nicefile\">$nicefile</a> - <span class=\"comment\">$title</span></li>\n";
+			print "<li>$note<a href=\"?mapname=$nicefile&plug=$fromplug\">$nicefile</a> - <span class=\"comment\">$title</span></li>\n";
 		}
 	}
 	else

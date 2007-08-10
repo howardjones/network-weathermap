@@ -23,6 +23,7 @@
 	ADDED - Editor link in management page (warnesj)
 	ADDED - Docs link in management page too (streaker69)
 	ADDED - Editor has a better warning for unwriteable files and directory now.
+	ADDED - When you come TO the editor from Cacti, the Change File goes BACK to Cacti
         
 0.92 - FIXED weathermap CLI help said --random-data instead of --randomdata
        FIXED one last php short_tag in poller_common.php - thanks Bernado Diez

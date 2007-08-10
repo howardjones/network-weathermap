@@ -678,16 +678,7 @@ else
 	</style>
   <link rel="stylesheet" type="text/css" media="screen" href="editor.css" />
   <script src="editor.js" type="text/javascript"></script>
-<?php
-if($use_jquery)
-{
-?>
-  <script src="lib/javascript/jquery-latest.pack.js" type="text/javascript"></script>
-  <script src="lib/javascript/jquery.contextmenu.packed.js" type="text/javascript"></script>
-  <script src="lib/javascript/jquery.blockUI.js" type="text/javascript"></script>
-<?php
-}
-?>
+<script src="lib/javascript/jquery-latest.pack.js" type="text/javascript"></script>
 	<script type="text/javascript">
 	
 	var fromplug=<?php echo ($fromplug==TRUE ? 1:0); ?>;
@@ -707,29 +698,6 @@ if($use_jquery)
 	}
 
 	sort($imlist);
-
-	if($use_jquery)
-	{
-?>
-	$(document).ready(function(){
-
-		$.contextMenu.defaults({
-			   itemStyle : {
-			fontFamily : "arial narrow",
-			fontSize: "10px"
-			
-		      }
-		});
-
-	   $("area[@id^=NODE:]").contextMenu("#nodeMenu1", { });
-	   $("area[@id^=LINK:]").contextMenu("#linkMenu1", { });
-	   $("area[@id^=LEGEND:]").contextMenu("#legendMenu1", { });
-	   $("area#TIMESTAMP").contextMenu("#timeMenu1", { }); 
-	   $("img#existingdata").contextMenu("#mapMenu1", { } );
-	
-	 });
-<?php
-	}
 ?>
 	</script>
   <title>PHP Weathermap Editor <?php echo $WEATHERMAP_VERSION; ?></title>
@@ -1166,47 +1134,7 @@ if($use_jquery)
 		necessary for it to do that.
 	  </div>
 	</div><!-- TextEdit -->
-
-  </form>
-  	<?php
-if($use_jquery)
-{
-	?>
-     <div class="contextMenu" id="linkMenu1">
-      <ul>
-	<li id="linkproperties"><img src="editor-resources/page_white_text.png" /> Link Properties</li>
-	<li id="linkdelete"><img src="editor-resources/cross.png" /> Delete Link</li>
-      </ul>
-    </div>
-     <div class="contextMenu" id="nodeMenu1">
-      <ul>
-	<li id="nodeproperties"><img src="editor-resources/page_white_text.png" /> Node Properties</li>
-      	<li id="nodemove"><img src="editor-resources/arrow_out.png" /> Move Node</li>
-        <li id="nodeclone"><img src="editor-resources/page_copy.png" /> Clone Node</li>
-        <li id="nodedelete"><img src="editor-resources/cross.png" /> Delete Node</li>
-      </ul>
-    </div>
-     <div class="contextMenu" id="mapMenu1">
-      <ul>
-	<li id="properties"><img src="editor-resources/page_white_text.png" /> Map Properties</li>
-      </ul>
-    </div>
-        <div class="contextMenu" id="legendMenu1">
-      <ul>
-        <li id="scalemove"><img src="editor-resources/arrow_out.png" /> Move Node</li>
-	<li id="scaleproperties"><img src="editor-resources/page_white_text.png" /> Edit Scale</li>
-	<li id="legendproperties"><img src="editor-resources/page_white_text.png" /> Legend Properties</li>
-      </ul>
-    </div>
-	<div class="contextMenu" id="timeMenu1">
-      <ul>
-                <li id="stampmove"><img src="editor-resources/arrow_out.png" /> Move Timestamp</li>
-		<li id="stampproperties"><img src="editor-resources/page_white_text.png" /> Timestamp Properties</li>
-      </ul>
-    </div>
-	<?php
-}
-	?>
+    </form>
 </body>
 </html>
 <?php

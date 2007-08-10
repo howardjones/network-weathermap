@@ -36,8 +36,4 @@ $mapdir='configs';
 $ignore_cacti = FALSE;
 
 
-
-
-// for internal testing
-$use_jquery=FALSE;
 ?>

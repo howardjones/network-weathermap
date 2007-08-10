@@ -17,7 +17,7 @@ $config_loaded = @include_once 'editor-config.php';
 
 if( isset($config) )
 {
-    $configerror = 'OLD editor config file format. The format of this file changed in version 0.92 - please check the new editor-config.php-dist and update your editor-config.php file.';
+    $configerror = 'OLD editor config file format. The format of this file changed in version 0.92 - please check the new editor-config.php-dist and update your editor-config.php file. [WMEDIT02]';
 }
 
 if( is_dir($cacti_base) && file_exists($cacti_base."/include/config.php") )
@@ -33,6 +33,11 @@ if( is_dir($cacti_base) && file_exists($cacti_base."/include/config.php") )
 else
 {
 	$cacti_found = FALSE;
+}
+
+if(! is_writable($mapdir))
+{
+	$configerror = "The map config directory is not writable by the web server user. You will not be able to edit any files until this is corrected. [WMEDIT01]";
 }
 
 chdir(dirname(__FILE__));

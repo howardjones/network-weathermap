@@ -8,6 +8,10 @@ include_once($config["library_path"] . "/database.php");
 
 $weathermap_confdir = realpath(dirname(__FILE__).'/configs');
 
+// include the weathermap class so that we can get the version
+include_once(dirname(__FILE__)."/Weathermap.class.php");
+
+
 $action = "";
 if (isset($_POST['action'])) {
 	$action = $_POST['action'];
@@ -113,6 +117,18 @@ case 'editor':
 	break;
 
 case 'rebuildnow':
+	
+	include_once($config["base_path"]."/include/top_header.php");
+
+	print "<h3>REALLY Rebuild all maps?</h3><strong>NOTE: Because your Cacti poller process probably doesn't run as the same user as your webserver, it's possible this will fail with file permission problems even though the normal poller process runs fine. In some situations, it MAY have memory_limit problems, if your mod_php/ISAPI module uses a different php.ini to your command-line PHP.</strong><hr>";
+
+	print "<p>It is recommended that you don't use this feature, unless you understand and accept the problems it may cause.</p>";
+	print "<h4><a href=\"weathermap-cacti-plugin-mgmt.php?action=rebuildnow2\">YES</a></h4>";
+	print "<h1><a href=\"weathermap-cacti-plugin-mgmt.php\">NO</a></h1>";
+	include_once($config["base_path"]."/include/bottom_footer.php");
+	break;
+
+case 'rebuildnow2':
 	include_once(dirname(__FILE__).DIRECTORY_SEPARATOR."Weathermap.class.php");
 	include_once(dirname(__FILE__).DIRECTORY_SEPARATOR."lib".DIRECTORY_SEPARATOR."poller-common.php");
 
@@ -129,6 +145,12 @@ case 'rebuildnow':
 default:
 	include_once($config["base_path"]."/include/top_header.php");
 	maplist();
+
+print '<br />'; 
+    html_start_box("<center><a target=\"_blank\" class=\"linkOverDark\" href=\"docs/\">Local Documentation</a> | <a target=\"_blank\" class=\"linkOverDark\" href=\"http://www.network-weathermap.com/\">Weathermap Website</a> | <a target=\"_target\" class=\"linkOverDark\" href=\"editor.php?plug=1\">Weathermap Editor</a> | This is version $WEATHERMAP_VERSION</center>", "78%", $colors["header"], "2", "center", "");
+ html_end_box(); 
+
+
 	include_once($config["base_path"]."/include/bottom_footer.php");
 	break;
 }

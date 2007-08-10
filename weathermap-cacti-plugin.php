@@ -433,7 +433,7 @@ function weathermap_versionbox()
 {
 	global $WEATHERMAP_VERSION, $colors;
 	;
-	$pagefoot = "Powered by <a href=\"http://www.network-weathermap.com/?v=$WEATHERMAP_VERSION\">PHP Weathermap version $WEATHERMAP_VERSION</a> (<a href=\"docs/\">Documentation</a>)";
+	$pagefoot = "Powered by <a href=\"http://www.network-weathermap.com/?v=$WEATHERMAP_VERSION\">PHP Weathermap version $WEATHERMAP_VERSION</a>";
 
 	html_graph_start_box(1,true);
 

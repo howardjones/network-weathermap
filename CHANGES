@@ -20,6 +20,9 @@
 	FIXED - COMMENTPOS 0 doesn't kill everything anymore
         FIXED - OVERLIB would behave incorrectly with PHP4 and relatively positioned nodes (Bernd Ziller)
         ADDED - Editor allows you to edit raw text of nodes and links
+	ADDED - Editor link in management page (warnesj)
+	ADDED - Docs link in management page too (streaker69)
+	ADDED - Editor has a better warning for unwriteable files and directory now.
         
 0.92 - FIXED weathermap CLI help said --random-data instead of --randomdata
        FIXED one last php short_tag in poller_common.php - thanks Bernado Diez

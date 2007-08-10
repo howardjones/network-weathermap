@@ -17,6 +17,8 @@ var dragstop = {x: -1, y: -1};
 var dragitem = '';
 var dragoffset = {x:0, y:0};
 
+var interactmode='';
+
 // we queue these up to make our one-at-a-time AJAX call work
 //var AJAXRequest = {
 //    params: {},
@@ -46,6 +48,8 @@ function openmap(mapname)
 
     $('img.mapnode').remove();
     $('img.mapvia').remove();
+
+    $('#filename').html(mapname);
 
     map_refresh();   
 }
@@ -360,6 +364,22 @@ function reapplyDraggableEvents()
 
 }
 
+function nodeadd()
+{
+    console.log('Node Add - Initial');
+    interactmode='nodeadd';
+    $('#existingdata').click( function(ev) {
+        var x = ev.pageX - parseInt($('#existingdata').css('left'));
+        var y = ev.pageY - parseInt($('#existingdata').css('top'));
+        console.log('Ready to add a new node at ' + x + ',' + y);
+        return(false);
+    });    
+}
+
+function linkadd()
+{
+    console.log('Link Add - Initial');
+}
 
 
 
@@ -381,47 +401,41 @@ $(document).ready( function() {
     $('#busy').hide();
     
     $('#welcome').click( function() {
-            // $('#welcome').hide('slow');
-            // $('#filepicker').show('slow');
-            // $('#toolbar').show('slow');
-            
-            showpicker();
-            
-            } );
-   // $('#filepicker').fadeIn('slow');
-   // $('#themap').fadeIn('slow');   
-
+        
+        showpicker();
+        
+        } );
 
 // handle the release, which may not be over the original object anymore
 	$(document).mouseup( function (ev) { 
-		if(linkmdown===true) { 
-		    
-                    console.log("LINK mouseup");
-                    // retrieve positioning properties
-                    var pos    = getMousePosition(ev);
-                    dragstop.x = pos.x;
-                    dragstop.y = pos.y;
-                    linkmdown=false;
-                    //	$('#log').append('That was a drag. ');
-                    if(addedVia)
-                    {
-                        // give the temporary VIA a better name
-                        var now = new Date;
-                        $('#newvia').attr('class','deadvia');
-                        $('#newvia').attr('id','via_'+now.getTime());
-                        addedVia=false;
-                        console.log("Solidified ephemeral VIA");
+            if(linkmdown===true) { 
+                
+                console.log("LINK mouseup");
+                // retrieve positioning properties
+                var pos    = getMousePosition(ev);
+                dragstop.x = pos.x;
+                dragstop.y = pos.y;
+                linkmdown=false;
+                //	$('#log').append('That was a drag. ');
+                if(addedVia)
+                {
+                    // give the temporary VIA a better name
+                    var now = new Date;
+                    $('#newvia').attr('class','deadvia');
+                    $('#newvia').attr('id','via_'+now.getTime());
+                    addedVia=false;
+                    console.log("Solidified ephemeral VIA");
 
-                        reapplyDraggableEvents();
-                        reapplyLinkEvents();
-                        // XXX - do something to tell the editor serverside
-                        var origin_x = parseInt($('#existingdata').css('left'));
-                        var origin_y = parseInt($('#existingdata').css('top'));
-                        var linkname = dragitem.slice(5,dragitem.length);
-                         $.getJSON('editor-backend.php',{ map: mapfile, cmd: "add_via", x: pos.x-origin_x, y: pos.y-origin_y, linkname: linkname, startx: dragstart.x, starty: dragstart.y  },
-                            function() {map_refresh(); });
-                    }
-		}
+                    reapplyDraggableEvents();
+                    reapplyLinkEvents();
+                    // XXX - do something to tell the editor serverside
+                    var origin_x = parseInt($('#existingdata').css('left'));
+                    var origin_y = parseInt($('#existingdata').css('top'));
+                    var linkname = dragitem.slice(5,dragitem.length);
+                     $.getJSON('editor-backend.php',{ map: mapfile, cmd: "add_via", x: pos.x-origin_x, y: pos.y-origin_y, linkname: linkname, startx: dragstart.x, starty: dragstart.y  },
+                        function() {map_refresh(); });
+                }
+            }
 	} );
 	
 	$(document).mousemove( function (ev) { 
@@ -433,23 +447,20 @@ $(document).ready( function() {
 
 			if(dragmdown) { theItem = $('#'+dragitem);}
 			if(linkmdown) { theItem = $('#newvia');
-				if(!addedVia)
-				{
-                                        console.log("Created ephemeral VIA");
-					// we just left the reservation, and we're still dragging.
-					// - time to create a little marker
-					$('#nodecontainer').append('<img src="editor-resources/via-marker.png" id="newvia" class="viamarker draggable">');
-					theItem = $('#newvia');
-                                        dragoffset.x = -theItem.width()/2;
-                                        dragoffset.y = -theItem.height()/2;
-                                        addedVia = true;
-				}
+                            if(!addedVia)
+                            {
+                                console.log("Created ephemeral VIA");
+                                // we just left the reservation, and we're still dragging.
+                                // - time to create a little marker
+                                $('#nodecontainer').append('<img src="editor-resources/via-marker.png" id="newvia" class="viamarker draggable">');
+                                theItem = $('#newvia');
+                                dragoffset.x = -theItem.width()/2;
+                                dragoffset.y = -theItem.height()/2;
+                                addedVia = true;
+                            }
 			}
-			//var w = theItem.width(); 
-			//var h = theItem.height();
-                        var x = pos.x+dragoffset.x;
-                        var y = pos.y+dragoffset.y;
-                      //  console.log('Moved ' + dragitem + ' to ' + x + ',' + y);
+                        var x = pos.x + dragoffset.x;
+                        var y = pos.y + dragoffset.y;
 			theItem.css( { left: x, top: y});
                 }
 	} );
@@ -457,6 +468,10 @@ $(document).ready( function() {
     $('#btn_refresh').click( function() { map_refresh(); } );
     $('#btn_selectfile').click( function() { showpicker(); } );
     
+    $('#btn_addnode').click( function() { nodeadd(); } );
+    $('#btn_addlink').click( function() { linkadd(); } );
+
+
     reapplyDraggableEvents();
     reapplyLinkEvents();
     

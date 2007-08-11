@@ -60,7 +60,7 @@ function weathermap_config_settings () {
 			"friendly_name" => "Page style",
 			"description" => "How to display multiple maps.",
 			"method" => "drop_array",
-			"array" => array(0 => "Thumbnail Overview", 1 => "Full Images")
+			"array" => array(0 => "Thumbnail Overview", 1 => "Full Images", 2=> "Show Only First")
 		),
 		"weathermap_thumbsize" => array(
 			"friendly_name" => "Thumbnail Maximum Size",

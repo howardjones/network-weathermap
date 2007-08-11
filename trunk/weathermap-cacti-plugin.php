@@ -65,7 +65,11 @@ default:
 	}
 	if(read_config_option("weathermap_pagestyle") == 1)
 	{
-		weathermap_fullview();
+		weathermap_fullview(FALSE,TRUE);
+	}
+	if(read_config_option("weathermap_pagestyle") == 2)
+	{
+		weathermap_fullview(FALSE, TRUE);
 	}
 
 	weathermap_versionbox();
@@ -163,7 +167,7 @@ function weathermap_thumbview()
 	if(sizeof($maplist) == 1)
 	{
 		$pagetitle = "Network Weathermap";
-		weathermap_fullview();
+		weathermap_fullview(FALSE,FALSE);
 	}
 	else
 	{
@@ -228,13 +232,17 @@ function weathermap_thumbview()
 	}
 }
 
-function weathermap_fullview($cycle=FALSE)
+function weathermap_fullview($cycle=FALSE, $firstonly=FALSE)
 {
 	global $colors;
 
 	$_SESSION['custom']=false;
 
-	$maplist = db_fetch_assoc( "select distinct weathermap_maps.* from weathermap_auth,weathermap_maps where weathermap_maps.id=weathermap_auth.mapid and active='on' and (userid=".$_SESSION["sess_user_id"]." or userid=0) order by sortorder, id");
+	$query = "select distinct weathermap_maps.* from weathermap_auth,weathermap_maps where weathermap_maps.id=weathermap_auth.mapid and active='on' and (userid=".$_SESSION["sess_user_id"]." or userid=0) order by sortorder, id";
+
+	if($firstonly) { $query .= " LIMIT 1"; }
+
+	$maplist = db_fetch_assoc( $query );
 	html_graph_start_box(2,true);
 
 	if(sizeof($maplist) == 1)

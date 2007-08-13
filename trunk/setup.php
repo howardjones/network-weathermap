@@ -15,9 +15,9 @@ function weathermap_version () {
 		'version'       => '0.93',
 		'longname'      => 'PHP Network Weathermap',
 		'author'        => 'Howard Jones',
-		'homepage'      => 'http://wotsit.thingy.com/haj/cacti/php-weathermap/',
+		'homepage'      => 'http://www.network-weathermap.com/',
 		'email' 	=> 'howie@thingy.com',
-		'url'           => 'http://wotsit.thingy.com/haj/cacti/versions.php'
+		'url'           => 'http://www.network-weathermap.com/versions.php'
 	);
 }
 

@@ -39,6 +39,7 @@ var interactmode='';
 
 function openmap(mapname)
 {
+    console.log('Opening map: ' + mapname);
     mapfile = mapname;
     $('#welcome').hide();
     $('#filepicker').hide();
@@ -50,6 +51,8 @@ function openmap(mapname)
     $('img.mapvia').remove();
 
     $('#filename').html(mapname);
+
+    console.log('Refreshing map: ' + mapname);
 
     map_refresh();   
 }
@@ -83,7 +86,7 @@ function showpicker()
                     $('#filelist').append('<li><a>'+locked+'<span>' + json.files[i].file + '</span> <em>' + json.files[i].title + '</em></a></li>');
                 }
                 console.log("Built list");
-                $('#filelist li a').click(function() { openmap($(this).children("span").text()); });
+                $('#filelist li a').click(function() { var filename = $(this).children("span").text(); console.log('About to call openmap()');openmap(filename); });
                 console.log("Added Actions");
             }
             else
@@ -201,13 +204,18 @@ function syncmap()
 
 function map_refresh()
 {
+    console.log('Fetching JSON.');
     $.getJSON("editor-backend.php",
         { map: mapfile, cmd: "dump_map", serial: lastserial },
           function(json){
+            console.log('Inside JSON function');
             if(json.valid==1)
             {
                 map = json;
+                    console.log('Loaded JSON for ' + mapname + ' - about to syncmap()');
+
                 syncmap();
+                console.log('Map synced. Fetching bg image data.');
                 $('#existingdata').attr('src',json.map.mapcache + "?s=" + json.serial);
                 lastserial = json.serial;
                 // $('#existingdata').attr('src',json.map.mapcache);
@@ -228,6 +236,7 @@ function map_refresh()
             }
         }
     );
+    console.log('Done with map_refresh()');
 }
 
 function getMousePosition(event)

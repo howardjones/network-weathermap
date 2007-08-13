@@ -670,7 +670,7 @@ of the direction of the link. 'angled' rotates the box to follow the directiong 
 <div class="definition">COMMENTFONT <em class="meta">fontnumber</em>
 </div>
 <div class="description">
-<p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Specify the font used for drawing the <a href="#LINK_INCOMMENT">INCOMMENT</a> and <a href="#LINK_OUTCOMMENT">OUTCOMMENT</a> text.</p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Fonts are specified by number. The GD library that Weathermap uses has 5 built-in fonts, 1-5. You can define new fonts based on TrueType or GD fonts by using the <a href="#GLOBAL_FONTDEFINE">FONTDEFINE</a> directive.</p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">For Link Comments, you <em>must</em> define a TrueType font. These are the only font that can rotate text through any angle, as required by comments.</p><changes xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude"> 
+<p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Specify the font used for drawing the <a href="#LINK_INCOMMENT">INCOMMENT</a> and <a href="#LINK_OUTCOMMENT">OUTCOMMENT</a> text.</p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Fonts are specified by number. The GD library that Weathermap uses has 5 built-in fonts, 1-5. You can define new fonts based on TrueType or GD fonts by using the <a href="#GLOBAL_FONTDEFINE">FONTDEFINE</a> directive.</p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">For Link Comments, you <em>must</em> define a TrueType font. These are the only font that can rotate text through any angle, as required by comments. You can change the colour used to render the font with COMMENTFONTCOLOR</p><changes xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude"> 
  <change version="0.9">Added link comments</change> 
  </changes> 
 </div>
@@ -695,18 +695,20 @@ of the direction of the link. 'angled' rotates the box to follow the directiong 
 </div>
 <div class="definition">BWBOXCOLOR <em class="meta">red</em> <em class="meta">green</em> <em class="meta">blue</em>
 </div>
-<div class="definition">COMMENTCOLOR <em class="meta">red</em> <em class="meta">green</em> <em class="meta">blue</em>
+<div class="definition">COMMENTFONTCOLOR <em class="meta">red</em> <em class="meta">green</em> <em class="meta">blue</em>
 </div>
 <div class="description">
 <p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Specify the colours used for drawing the link.</p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">red, green and blue are numbers from 0 to 255.</p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">OUTLINECOLOR, BWOUTLINECOLOR and BWBOXCOLOR have an additional option - 'none' - which stops that element of the link being drawn. </p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">The colours are used as follows:<ul><li>OUTLINECOLOR is the colour of the line around the edge of the arrow.</li> 
  <li>BWOUTLINECOLOR is the colour of the line surrounding the 'bandwidth label' box</li> 
  <li>BWBOXCOLOR is the background colour for the same box</li> 
  <li>BWFONTCOLOR is the colour used for text within that box</li> 
- <li>COMMENTCOLOR is the colour used for the text produced by <a href="#LINK_INCOMMENT">INCOMMENT</a> and <a href="#LINK_OUTCOMMENT">OUTCOMMENT,</a> along the side of a link arrow</li></ul></p> 
+ <li>COMMENTFONTCOLOR is the colour used for the text produced by <a href="#LINK_INCOMMENT">INCOMMENT</a> and <a href="#LINK_OUTCOMMENT">OUTCOMMENT,</a> along the side of a link arrow</li></ul></p> 
 </div>
 <div class="changes">
 <h3>Change History</h3>
 <dl>
+<dt>0.93</dt>
+<dd>Added correction - COMMENTCOLOR was shown instead of COMMENTFONTCOLOR.</dd>
 <dt>0.9</dt>
 <dd>Added COMMENTCOLOR.</dd>
 <dt>0.8</dt>

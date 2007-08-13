@@ -60,7 +60,7 @@ function weathermap_config_settings () {
 			"friendly_name" => "Page style",
 			"description" => "How to display multiple maps.",
 			"method" => "drop_array",
-			"array" => array(0 => "Thumbnail Overview", 1 => "Full Images", 2=> "Show Only First")
+			"array" => array(0 => "Thumbnail Overview", 1 => "Full Images", 2 => "Show Only First")
 		),
 		"weathermap_thumbsize" => array(
 			"friendly_name" => "Thumbnail Maximum Size",
@@ -178,7 +178,7 @@ function weathermap_setup_table () {
 	// create the settings entries, if necessary
 
 	$pagestyle = read_config_option("weathermap_pagestyle");
-	if($pagestyle == '' or $pagestyle < 0 or $pagestyle >1)
+	if($pagestyle == '' or $pagestyle < 0 or $pagestyle >2)
 	{
 		$sql[] = "replace into settings values('weathermap_pagestyle',0)";
 	}

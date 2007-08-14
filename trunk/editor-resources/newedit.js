@@ -212,7 +212,7 @@ function map_refresh()
             if(json.valid==1)
             {
                 map = json;
-                    console.log('Loaded JSON for ' + mapname + ' - about to syncmap()');
+                    console.log('Loaded JSON for ' + mapfile + ' - about to syncmap()');
 
                 syncmap();
                 console.log('Map synced. Fetching bg image data.');
@@ -232,8 +232,10 @@ function map_refresh()
             }
             else
             {
+                console.log('Failed to get good JSON');
                 alert('Got invalid JSON map data');
             }
+            console.log('Leaving JSON function');
         }
     );
     console.log('Done with map_refresh()');

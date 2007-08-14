@@ -4149,10 +4149,10 @@ function ReadConfig($filename)
 							$this->fonts[$matches[1]]->size=$matches[3];
 						}
 						else { warn
-							("Failed to load ttf font " . $matches[2] . " - at config line $linecount\n"); }
+							("Failed to load ttf font " . $matches[2] . " - at config line $linecount\n [WMWARN30]"); }
 					}
 					else { warn
-						("imagettfbbox() is not a defined function. You don't seem to have FreeType compiled into your gd module.\n");
+						("imagettfbbox() is not a defined function. You don't seem to have FreeType compiled into your gd module. [WMWARN31]\n");
 					}
 
 					$linematched++;
@@ -4170,7 +4170,7 @@ function ReadConfig($filename)
 						$this->fonts[$matches[1]]->gdnumber=$newfont;
 					}
 					else { warn ("Failed to load GD font: " . $matches[2]
-						. " ($newfont) at config line $linecount\n"); }
+						. " ($newfont) at config line $linecount [WMWARN32]\n"); }
 
 					$linematched++;
 				}

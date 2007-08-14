@@ -15,6 +15,7 @@ config-reference.html: reference.xsl index.xml contents.xml $(GLOBALS) $(LINKS) 
 	xsltproc --xinclude reference.xsl index.xml | ./relink-reference.pl > config-reference.html
 	./process.pl $(VERSION)  < config-reference.html > ../pages/config-reference.html
 	./process.pl $(VERSION)   < main.html > ../pages/main.html
+	./process.pl $(VERSION)   < errorcodes.html | ./relink-reference.pl ALL > ../pages/errorcodes.html
 	./process.pl $(VERSION)   < index.html > ../index.html
 	./process.pl $(VERSION)  < cli-reference.html > ../pages/cli-reference.html
 	./process.pl $(VERSION)   < cacti-plugin.html > ../pages/cacti-plugin.html

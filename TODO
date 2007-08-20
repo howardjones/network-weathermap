@@ -1,3 +1,24 @@
+Before 0.94
+-----------------
+Boost support
+(Editor NG)
+Extra DS for WUG, Nagios, THold
+
+-----------------
+
+
+Before 0.93
+-----------------
+
+Editor testing, layout cleanup.
+Artificial Icons
+Verify rrdtool DS is OK
+(php-rrdtool support?)
+
+-----------------
+
+
+
 Background image links: http://art.gnome.org/backgrounds/abstract/
 Background image generator: http://splintax.blogspot.com/2006/01/starfish-automatically-generated.html
 
@@ -12,7 +33,7 @@ DONE WriteConfig should optionally write the contents of a variable in place of 
 
 Work out NODE-drawing code so that the bg colour is known earlier, so artificial icons can use it.
 
-Finish scale-drawing changes so that the cached image is stored somewhere.
+DONE Finish scale-drawing changes so that the cached image is stored somewhere.
 
 Editor - make the link offset radio buttons work (what about numeric offsets?)
 

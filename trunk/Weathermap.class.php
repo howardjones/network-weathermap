@@ -837,6 +837,75 @@ class Vector
 	}
 }
 
+class Colour
+{
+	var $r,$g,$b;
+	
+	// take in an existing value and create a Colour object for it
+	function Colour()
+	{
+		if(func_num_args() == 3) # a set of 3 colours
+		{
+			$this->r = func_get_arg(0); # r
+			$this->g = func_get_arg(1); # g
+			$this->b = func_get_arg(2); # b
+			#print "3 args";
+			#print $this->as_string()."--";
+		}
+		
+		if( (func_num_args() == 1) && gettype(func_get_arg(0))=='array' ) # an array of 3 colours
+		{
+			#print "1 args";
+			$ary = func_get_arg(0);
+			$this->r = $ary[0];
+			$this->g = $ary[1];
+			$this->b = $ary[2];
+		}
+	}
+	
+	// Is this a transparent/none colour?
+	function is_none()
+	{
+		if($this->r == -1 && $this->r == -1 && $this->r == -1)
+		{
+			return true;
+		}
+		else
+		{
+			return false;
+		}
+	}
+	
+	// allocate a colour in the appropriate image context
+	// - things like scale colours are used in multiple images now (the scale, several nodes, the main map...)
+	function gdallocate($image_ref)
+	{
+		return(myimagecolorallocate($image_ref, $this->r, $this->g, $this->b));
+	}
+	
+	// based on an idea from: http://www.bennadel.com/index.cfm?dax=blog:902.view
+	function contrast()
+	{
+		if( (($this->r + $this->g + $this->b) > 500)
+		 || ($this->g > 140)
+		)
+		{
+			return( array(0,0,0) );
+		}
+		else
+		{
+			return( array(255,255,255) );
+		}
+	}
+	
+	// make a printable version, for debugging
+	// - optionally take a format string, so we can use it for other things (like WriteConfig, or hex in stylesheets)
+	function as_string($format = "RGB(%d,%d,%d)")
+	{
+		return (sprintf($format, $this->r, $this->g, $this->b));
+	}
+}
+
 // ***********************************************
 
 // template class for data sources. All data sources extend this class.
@@ -1051,6 +1120,40 @@ class WeatherMapNode extends WeatherMapItem
 		$icon_w = 0;
 		$icon_h = 0;
 
+		$col = new Colour(-1,-1,-1);
+		# print $col->as_string();
+		   
+		// if a target is specified, and you haven't forced no background, then the background will
+		// come from the SCALE in USESCALE
+		if( !empty($this->targets) && $this->usescale != 'none' )
+		{
+			$pc = 0;
+			
+			if($this->scalevar == 'in')
+			{
+				$pc = $this->inpercent;
+				
+			}
+			if($this->scalevar == 'out')
+			{
+				$pc = $this->outpercent;
+				
+			}
+			
+			// debug("Choosing NODE BGCOLOR for ".$this->name." based on $pc %\n");
+
+			    list($col,$node_scalekey) = $map->NewColourFromPercent($pc, $this->usescale,$this->name);
+			    // $map->nodes[$this->name]->scalekey = $node_scalekey;
+		}
+		elseif($this->labelbgcolour != array(-1,-1,-1))
+		{
+			// $col=myimagecolorallocate($node_im, $this->labelbgcolour[0], $this->labelbgcolour[1], $this->labelbgcolour[2]);
+			$col = new Colour($this->labelbgcolour);
+		}
+
+		# print $col->as_string();
+		
+
 		// figure out a bounding rectangle for the label
 		if ($this->label != '')
 		{
@@ -1104,10 +1207,10 @@ class WeatherMapNode extends WeatherMapItem
 				imagefill($icon_im, 0, 0, $nothing);
 				
 				$ink = imagecolorallocate($icon_im,0,0,0);
-				$fill = imagecolorallocate($icon_im,255,255,255);
+				// $fill = imagecolorallocate($icon_im,255,255,255);
 				if($this->iconfile=='box')
 				{
-					imagefilledrectangle($icon_im, 0, 0, $this->iconscalew-1, $this->iconscaleh-1, $fill);
+					imagefilledrectangle($icon_im, 0, 0, $this->iconscalew-1, $this->iconscaleh-1, $col->gdallocate($icon_im));
 					imagerectangle($icon_im, 0, 0, $this->iconscalew-1, $this->iconscaleh-1, $ink);
 				}
 				
@@ -1115,9 +1218,12 @@ class WeatherMapNode extends WeatherMapItem
 				{
 					$rx = $this->iconscalew/2-1;
 					$ry = $this->iconscaleh/2-1;
-					imagefilledellipse($icon_im,$rx,$ry,$rx*2,$ry*2,$fill);
+					imagefilledellipse($icon_im,$rx,$ry,$rx*2,$ry*2,$col->gdallocate($icon_im));
 					imageellipse($icon_im,$rx,$ry,$rx*2,$ry*2,$ink);
 				}
+				
+				if($this->iconfile=='inpie') { warn('inpie not implemented yet'); }
+				if($this->iconfile=='outpie') { warn('outpie not implemented yet'); }
 				
 			}
 			else
@@ -1185,6 +1291,8 @@ class WeatherMapNode extends WeatherMapItem
 			
 		}
 
+		
+
 		// do any offset calculations
 
 		if ( ($this->labeloffset != '') && (($this->iconfile != '')) )
@@ -1236,6 +1344,8 @@ class WeatherMapNode extends WeatherMapItem
 
 		$nothing=imagecolorallocatealpha($node_im,128,0,0,127);
 		imagefill($node_im, 0, 0, $nothing);
+		
+		#$col = $col->gdallocate($node_im);
 
 		// imagefilledrectangle($node_im,0,0,$temp_width,$temp_height,  $nothing);
 
@@ -1269,38 +1379,11 @@ class WeatherMapNode extends WeatherMapItem
 
 			// if there's an icon, then you can choose to have no background
 			
-			$col = -1;
-		   
-			// if a target is specified, and you haven't forced no background, then the background will
-			// come from the SCALE in USESCALE
-			if( !empty($this->targets) && $this->usescale != 'none' )
-			{
-				$pc = 0;
-				
-				if($this->scalevar == 'in')
-				{
-					$pc = $this->inpercent;
-					
-				}
-				if($this->scalevar == 'out')
-				{
-					$pc = $this->outpercent;
-					
-				}
-				
-				// debug("Choosing NODE BGCOLOR for ".$this->name." based on $pc %\n");
-	
-				    list($col,$node_scalekey) = $map->ColourFromPercent($node_im, $pc, $this->usescale,$this->name);
-				    // $map->nodes[$this->name]->scalekey = $node_scalekey;
-			}
-			elseif($this->labelbgcolour != array(-1,-1,-1))
-			{
-				$col=myimagecolorallocate($node_im, $this->labelbgcolour[0], $this->labelbgcolour[1], $this->labelbgcolour[2]);
-			}
+			
 
-			if($col != -1)
+			if(! $col->is_none() )
 			{
-			    imagefilledrectangle($node_im, $label_x1, $label_y1, $label_x2, $label_y2, $col);
+			    imagefilledrectangle($node_im, $label_x1, $label_y1, $label_x2, $label_y2, $col->gdallocate($node_im));
 			}
 
 			if ($this->selected)
@@ -1489,7 +1572,7 @@ class WeatherMapNode extends WeatherMapItem
 		// at write-time - it should include the leading NODE xyz line (to allow for renaming)
 		if($this->config_override != '')
 		{
-			$output  = $this->config_override;
+			$output  = $this->config_override."\n";
 		}
 		else
 		{
@@ -2212,7 +2295,7 @@ class WeatherMapLink extends WeatherMapItem
 
 		if($this->config_override != '')
 		{
-			$output  = $this->config_override;
+			$output  = $this->config_override."\n";
 		}
 		else
 		{
@@ -3212,6 +3295,70 @@ function ColourFromPercent($image, $percent,$scalename="DEFAULT",$name="")
 	// and you'll only get white for a link with no colour assigned
 	return array($this->white,'');
 }
+
+
+function NewColourFromPercent($percent,$scalename="DEFAULT",$name="")
+{
+	$col = new Colour(0,0,0);
+	
+	if(isset($this->colours[$scalename]))
+	{
+		$colours=$this->colours[$scalename];
+
+		if ($percent > 100)
+		{
+			warn ("NewColourFromPercent: Clipped $name $percent% to 100%\n");
+			$percent=100;
+		}
+
+		foreach ($colours as $key => $colour)
+		{
+			if (($percent >= $colour['bottom']) and ($percent <= $colour['top']))
+			{
+				if (isset($colour['red2']))
+				{
+					if($colour["bottom"] == $colour["top"])
+					{
+						$ratio = 0;
+					}
+					else
+					{
+						$ratio=($percent - $colour["bottom"]) / ($colour["top"] - $colour["bottom"]);
+					}
+
+					$r=$colour["red1"] + ($colour["red2"] - $colour["red1"]) * $ratio;
+					$g=$colour["green1"] + ($colour["green2"] - $colour["green1"]) * $ratio;
+					$b=$colour["blue1"] + ($colour["blue2"] - $colour["blue1"]) * $ratio;
+				}
+				else {
+					$r=$colour["red1"];
+					$g=$colour["green1"];
+					$b=$colour["blue1"];
+
+					# $col = new Colour($r, $g, $b);
+					# $col = $colour['gdref1'];
+				}
+				$col = new Colour($r, $g, $b);
+								
+				return(array($col,$key));
+			}
+		}
+	}
+	else
+	{
+		if($scalename != 'none')
+		{
+			warn("ColourFromPercent: Attempted to use non-existent scale: $scalename for $name [WMWARN09]\n");
+		}
+	}
+
+	// you'll only get grey for a COMPLETELY quiet link if there's no 0 in the SCALE lines
+	if ($percent == 0) { return array(new Colour(192,255,192),''); }
+
+	// and you'll only get white for a link with no colour assigned
+	return array(new Colour(255,255,255),'');
+}
+
 
 function coloursort($a, $b)
 {

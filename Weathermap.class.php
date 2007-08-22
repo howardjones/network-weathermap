@@ -1211,7 +1211,14 @@ class WeatherMapNode extends WeatherMapItem
 				if($this->iconfile=='box')
 				{
 					imagefilledrectangle($icon_im, 0, 0, $this->iconscalew-1, $this->iconscaleh-1, $col->gdallocate($icon_im));
-					imagerectangle($icon_im, 0, 0, $this->iconscalew-1, $this->iconscaleh-1, $ink);
+					if ($this->labeloutlinecolour != array(-1,-1,-1))
+					{
+						$ink=myimagecolorallocate($icon_im,$this->labeloutlinecolour[0],
+							$this->labeloutlinecolour[1], $this->labeloutlinecolour[2]);
+						# imagerectangle($node_im, $label_x1, $label_y1, $label_x2, $label_y2, $ink);
+						imagerectangle($icon_im, 0, 0, $this->iconscalew-1, $this->iconscaleh-1, $ink);
+					}
+					
 				}
 				
 				if($this->iconfile=='round')
@@ -1219,7 +1226,13 @@ class WeatherMapNode extends WeatherMapItem
 					$rx = $this->iconscalew/2-1;
 					$ry = $this->iconscaleh/2-1;
 					imagefilledellipse($icon_im,$rx,$ry,$rx*2,$ry*2,$col->gdallocate($icon_im));
-					imageellipse($icon_im,$rx,$ry,$rx*2,$ry*2,$ink);
+					if ($this->labeloutlinecolour != array(-1,-1,-1))
+					{
+						$ink=myimagecolorallocate($icon_im,$this->labeloutlinecolour[0],
+							$this->labeloutlinecolour[1], $this->labeloutlinecolour[2]);
+						# imagerectangle($icon_im, 0, 0, $this->iconscalew-1, $this->iconscaleh-1, $ink);
+						imageellipse($icon_im,$rx,$ry,$rx*2,$ry*2,$ink);
+					}					
 				}
 				
 				if($this->iconfile=='inpie') { warn('inpie not implemented yet'); }
@@ -4006,6 +4019,7 @@ function ReadConfig($filename)
 							// special icons aren't added to used_images, so they won't appear in picklist for editor
 							// (the editor doesn't do icon scaling, and these *require* a scale)
 							$curnode->iconfile=$matches[3];
+							$this->used_images[] = $matches[3];						
 						}
 						else
 						{						

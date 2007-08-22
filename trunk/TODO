@@ -2,7 +2,9 @@ Before 0.94
 -----------------
 Boost support
 (Editor NG)
-Extra DS for WUG, Nagios, THold
+Extra DS for WUG, Nagios
+USESCALE can use any variable - USESCALE scalename {node:this:cactihost_latency}
+INBWFORMAT/OUTBWFORMAT
 
 -----------------
 
@@ -14,6 +16,10 @@ Editor testing, layout cleanup.
 Artificial Icons
 Verify rrdtool DS is OK
 (php-rrdtool support?)
+THold DS
+
+Editor shows absolute coordinates for relative-positioned nodes...
+Colours do wierd things with artificial icons - needs extra colour defs. How to make fit with USESCALE?
 
 -----------------
 
@@ -31,7 +37,7 @@ DONE RRD DS should look for lines with valid data *in the named DS*, not ALL val
 DONE WriteConfig should optionally just return a string (so the editor can fetch a config chunk)
 DONE WriteConfig should optionally write the contents of a variable in place of the normal config (so the editor can update a chunk)
 
-Work out NODE-drawing code so that the bg colour is known earlier, so artificial icons can use it.
+DONE Work out NODE-drawing code so that the bg colour is known earlier, so artificial icons can use it.
 
 DONE Finish scale-drawing changes so that the cached image is stored somewhere.
 

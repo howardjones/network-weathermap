@@ -104,6 +104,7 @@
 ./docs/pages/cli-reference.html
 ./docs/pages/config-reference.html
 ./docs/pages/editor.html
+./docs/pages/errorcodes.html
 ./docs/pages/faq.html
 ./docs/pages/install-cacti-editor.html
 ./docs/pages/install-cacti.html
@@ -135,3 +136,6 @@
 ./images/flag_orange.png
 ./images/wrench_orange.png
 ./images/cross.png
+./images/index.php
+./output/index.php
+./configs/index.php

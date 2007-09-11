@@ -1309,7 +1309,7 @@ class WeatherMapNode extends WeatherMapItem
 				$map->nodes[$this->name]->width = imagesx($icon_im);
 				$map->nodes[$this->name]->height = imagesy($icon_im);
 	
-				$map->imap->addArea("Rectangle", "NODE:" . $this->name, '', array($icon_x1, $icon_y1, $icon_x2, $icon_y2));
+				$map->imap->addArea("Rectangle", "NODE:" . $this->name . ':0', '', array($icon_x1, $icon_y1, $icon_x2, $icon_y2));
 			}
 			
 		}
@@ -1340,7 +1340,7 @@ class WeatherMapNode extends WeatherMapItem
 
 		if($this->label != '')
 		{
-			$map->imap->addArea("Rectangle", "NODE:" . $this->name, '', array($label_x1, $label_y1, $label_x2, $label_y2));
+			$map->imap->addArea("Rectangle", "NODE:" . $this->name .':1', '', array($label_x1, $label_y1, $label_x2, $label_y2));
 		}
 
 		// work out the bounding box of the whole thing
@@ -1851,7 +1851,7 @@ class WeatherMapNode extends WeatherMapItem
 					$y2=$this->y + $h / 2;
 
 					imagecopy($im, $temp_im, $x1, $y1, 0, 0, $w, $h);
-					$map->imap->addArea("Rectangle", "NODE:" . $this->name, '', array($x1, $y1, $x2, $y2));
+					$map->imap->addArea("Rectangle", "NODE:" . $this->name.':2', '', array($x1, $y1, $x2, $y2));
 					imagedestroy ($temp_im);
 
 					if ($this->labeloffset != '')
@@ -1936,7 +1936,7 @@ class WeatherMapNode extends WeatherMapItem
 				$this->labelfontcolour[2]);
 			$map->myimagestring($im, $font, $txt_x, $txt_y, $this->label, $col);
 
-			$map->imap->addArea("Rectangle", "NODE:" . $this->name, '', array($x1, $y1, $x2, $y2));
+			$map->imap->addArea("Rectangle", "NODE:" . $this->name. ':3', '', array($x1, $y1, $x2, $y2));
 		}
 	}
 }
@@ -2263,7 +2263,8 @@ class WeatherMapLink extends WeatherMapItem
 					0,
 					$this->outpercent,
 					$this->bandwidth_out,
-					$q1_angle
+					$q1_angle,
+					OUT
 				);
 
 			$inbound=array
@@ -2274,7 +2275,8 @@ class WeatherMapLink extends WeatherMapItem
 					0,
 					$this->inpercent,
 					$this->bandwidth_in,
-					$q3_angle
+					$q3_angle,
+					IN
 				);
 
 			if ($map->sizedebug)
@@ -2299,12 +2301,12 @@ class WeatherMapLink extends WeatherMapItem
 					if($this->labelboxstyle == 'angled')
 					{
 						$map->DrawLabelRotated($im, $task[0],            $task[1],$task[6],           $thelabel, $this->bwfont, $padding,
-							$this->name,  $this->bwfontcolour, $this->bwboxcolour, $this->bwoutlinecolour,$map);
+							$this->name,  $this->bwfontcolour, $this->bwboxcolour, $this->bwoutlinecolour,$map, $task[7]);
 					}
 					else
 					{
 						$map->DrawLabel($im, $task[0],            $task[1],           $thelabel, $this->bwfont, $padding,
-							$this->name,  $this->bwfontcolour, $this->bwboxcolour, $this->bwoutlinecolour,$map);
+							$this->name,  $this->bwfontcolour, $this->bwboxcolour, $this->bwoutlinecolour,$map, $task[7]);
 					}
 					
 				}
@@ -3154,7 +3156,7 @@ function ReadData()
 }
 
 // nodename is a vestigal parameter, from the days when nodes where just big labels
-function DrawLabel($im, $x, $y, $text, $font, $padding, $linkname, $textcolour, $bgcolour, $outlinecolour, &$map)
+function DrawLabel($im, $x, $y, $text, $font, $padding, $linkname, $textcolour, $bgcolour, $outlinecolour, &$map, $direction)
 {
 	list($strwidth, $strheight)=$this->myimagestringsize($font, $text);
 
@@ -3190,12 +3192,12 @@ function DrawLabel($im, $x, $y, $text, $font, $padding, $linkname, $textcolour, 
 	$textcol=myimagecolorallocate($im, $textcolour[0], $textcolour[1], $textcolour[2]);
 	$this->myimagestring($im, $font, $x - $strwidth / 2, $y + $strheight / 2 + 1, $text, $textcol);
 
-	$this->imap->addArea("Rectangle", "LINK:".$linkname, '', array($x1, $y1, $x2, $y2));
+	$this->imap->addArea("Rectangle", "LINK:".$linkname.':'.($direction+2), '', array($x1, $y1, $x2, $y2));
 
 }
 
 // nodename is a vestigal parameter, from the days when nodes where just big labels
-function DrawLabelRotated($im, $x, $y, $angle, $text, $font, $padding, $linkname, $textcolour, $bgcolour, $outlinecolour, &$map)
+function DrawLabelRotated($im, $x, $y, $angle, $text, $font, $padding, $linkname, $textcolour, $bgcolour, $outlinecolour, &$map, $direction)
 {
 	list($strwidth, $strheight)=$this->myimagestringsize($font, $text);
 
@@ -3247,8 +3249,8 @@ function DrawLabelRotated($im, $x, $y, $angle, $text, $font, $padding, $linkname
 	$textcol=myimagecolorallocate($im, $textcolour[0], $textcolour[1], $textcolour[2]);
 	$this->myimagestring($im, $font, $points[8], $points[9], $text, $textcol,$angle);
 
-	// XXX - THIS IS WRONG - should be a poly
-	$this->imap->addArea("Rectangle", "LINK:".$linkname, '', array($x1, $y1, $x2, $y2));
+	// XXX - THIS IS WRONG - should be a pole
+	$this->imap->addArea("Rectangle", "LINK:".$linkname.':'.($direction+2), '', array($x1, $y1, $x2, $y2));
 
 }
 

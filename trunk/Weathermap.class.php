@@ -733,6 +733,11 @@ function nice_bandwidth($number, $kilo = 1000,$decimals=1,$below_one=TRUE)
 		$number/=$kilo;
 		$suffix="K";
 	}
+        elseif ($number > 1)
+        {
+                $number = $number;
+                $suffix="";
+        }
 	elseif (($below_one==TRUE) && ($number > $milli))
 	{
 		$number/=$milli;
@@ -784,6 +789,11 @@ function nice_scalar($number, $kilo = 1000, $decimals=1)
 		$number/=$kilo;
 		$suffix="K";
 	}
+        elseif ($number > 1)
+        {
+                $number = $number;
+                $suffix="";
+        }
 	elseif ($number < (1 / ($kilo)))
 	{
 		$number=$number * $mega;

@@ -31,6 +31,7 @@ class HTML_ImageMap_Area
 		{
 			$h .= " href=\"".$this->href."\" ";
 		}
+		else { $h .= " nohref "; }
 		if($this->extrahtml != "")
 		{
 			$h .= " ".$this->extrahtml." ";

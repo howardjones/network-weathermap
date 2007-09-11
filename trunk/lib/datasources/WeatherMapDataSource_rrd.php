@@ -65,6 +65,8 @@ class WeatherMapDataSource_rrd extends WeatherMapDataSource {
 		$out_ds = "traffic_out";
 		$dsnames[IN] = "traffic_in";
 		$dsnames[OUT] = "traffic_out";
+		$data[IN] = 0;
+		$data[OUT] = 0;
 		$rrdfile = $targetstring;
 
 		$multiplier = 8;
@@ -96,6 +98,11 @@ class WeatherMapDataSource_rrd extends WeatherMapDataSource {
 			$multiplier = 1;
 		}
 
+                if(preg_match("/^scale:(\d*\.?\d*):(.*)/",$rrdfile,$matches)) 
+                {
+                        $rrdfile = $matches[2];
+                        $multiplier = $matches[1];
+                }
 
 		// we get the last 800 seconds of data - this might be 1 or 2 lines, depending on when in the
 		// cacti polling cycle we get run. This ought to stop the 'some lines are grey' problem that some

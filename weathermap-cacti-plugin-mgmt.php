@@ -309,6 +309,7 @@ function addmap_picker()
 			$loaded[]=$map['configfile'];
 		}
 	}
+	$loaded[]='index.php';
 
 	html_start_box("<strong>Available Weathermap Configuration Files</strong>", "78%", $colors["header"], "2", "center", "");
 

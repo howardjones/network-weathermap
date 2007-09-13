@@ -3,6 +3,8 @@
 // * popup dialogs
 // * scales
 
+/*extern $, console */
+
 // the map data structure - updated via JSON from the server
 var map = { valid: 0 };
 
@@ -15,9 +17,9 @@ var addedVia = false;
 var dragstart = {x: -1, y: -1};
 var dragstop = {x: -1, y: -1};
 var dragitem = '';
-var dragoffset = {x:0, y:0};
+var dragoffset = {x: 0, y: 0};
 
-var interactmode='';
+var interactmode = '';
 
 // we queue these up to make our one-at-a-time AJAX call work
 //var AJAXRequest = {
@@ -70,23 +72,23 @@ function showpicker()
     
     $.getJSON("editor-backend.php",
         { map: '', cmd: "maplist" },
-          function(json){
-            if(json.status=='OK')  
+          function (json) {
+            if (json.status === 'OK')  
             {
-                var i=0;
+                var i = 0;
                 var imax = json.files.length;
                 $('#filelist').empty();
-                for(i=0; i<imax; i++)
+                for (i = 0; i < imax; i++)
                 {
-                    locked = '';
-                    if(json.files[i].locked == 1)
+                    var locked = '';
+                    if (json.files[i].locked === 1)
                     {
                         locked = '<img src="editor-resources/lock.png" alt="Read-Only file" title="Read-Only file" />';
                     }
-                    $('#filelist').append('<li><a>'+locked+'<span>' + json.files[i].file + '</span> <em>' + json.files[i].title + '</em></a></li>');
+                    $('#filelist').append('<li><a>' + locked + '<span>' + json.files[i].file + '</span> <em>' + json.files[i].title + '</em></a></li>');
                 }
                 console.log("Built list");
-                $('#filelist li a').click(function() { var filename = $(this).children("span").text(); console.log('About to call openmap()');openmap(filename); });
+                $('#filelist li a').click(function () { var filename = $(this).children("span").text(); console.log('About to call openmap()'); openmap(filename); });
                 console.log("Added Actions");
             }
             else
@@ -101,12 +103,14 @@ function syncmap()
 {
     $('#busy').show();
 
+    var existing, newx,newy;
+
     var nodes = map.nodes;
     var links = map.links;
   
     // first, clear out the NODES that have disappeared...
     
-    if(1==0)
+    if (1===0)
     {
         // this doesn't flicker as much as you might expect
         $('img.mapnode').remove();
@@ -118,7 +122,7 @@ function syncmap()
             var myname = $(this).attr('id');
             myname = myname.replace('mapnode_','');
            // alert(myname);
-            if( map.nodes[myname] )
+            if ( map.nodes[myname] )
             //if(1==0)
             {
                 // it still exists, keep it around
@@ -130,18 +134,18 @@ function syncmap()
         });
     }
     
-    var origin_x = parseInt($('#existingdata').css('left'));
-    var origin_y = parseInt($('#existingdata').css('top'));
+    var origin_x = parseInt($('#existingdata').css('left'),10);
+    var origin_y = parseInt($('#existingdata').css('top'),10);
     
     // now go through the list and move around or add...
-    for(var node in nodes)
+    for (var node in nodes)
     {
-        if(map.nodes[node].name != 'DEFAULT')
+        if (map.nodes[node].name !== 'DEFAULT')
         {
             var nodeid = 'mapnode_'+map.nodes[node].name;
-            var existing = $('img#'+nodeid);
+             existing = $('img#'+nodeid);
             
-            if(existing.size() != 0)
+            if(existing.size() !== 0)
             {               
                 //alert('The node already exists called ' + nodeid);    
             }
@@ -152,8 +156,8 @@ function syncmap()
             }
             // one way or another, by here we have a node, I hope.
             
-            var newx = origin_x + map.nodes[node].x;
-            var newy = origin_y + map.nodes[node].y;
+             newx = origin_x + map.nodes[node].x;
+             newy = origin_y + map.nodes[node].y;
             
             existing.css({position: 'absolute', left: newx + "px", top: newy + "px", 'z-index': 30});
         }
@@ -163,23 +167,23 @@ function syncmap()
     
     $('.deadvia').remove();
     
-    for(var link in links)
+    for (var link in links)
     {
-        if(map.links[link].name != 'DEFAULT')
+        if (map.links[link].name !== 'DEFAULT')
         {
             console.log("LINK " + link);
 
-            if(map.links[link].via.length >0)
+            if (map.links[link].via.length >0)
             {
                 console.log(link + ' has VIAs');
                 var vs = map.links[link].via;
-                for(var i=0;i<vs.length;i++)
+                for (var i=0; i<vs.length; i++)
                 {
-                    console.log('VIA ' + vs[i][0] + ',' + vs[i][1])
+                    console.log('VIA ' + vs[i][0] + ',' + vs[i][1]);
                     var via_id='mapvia_' + link+'_via_'+i;
-                    var existing = $('img#'+via_id);
+                     existing = $('img#'+via_id);
 
-                    if(existing.size() != 0)
+                    if(existing.size() !== 0)
                     {               
 
                     }
@@ -188,8 +192,8 @@ function syncmap()
                         $('#nodecontainer').append('<img class="mapvia draggable" src="editor-resources/via-marker.png" id="'+via_id+'"/>');
                         existing = $('img#'+via_id);
                     }
-                    var newx = origin_x + vs[i][0] - 5;
-                    var newy = origin_y + vs[i][1] - 5;
+                     newx = origin_x + vs[i][0] - 5;
+                     newy = origin_y + vs[i][1] - 5;
                     existing.css({position: 'absolute', left: newx + "px", top: newy + "px", 'z-index': 30});
                     console.log("created " + via_id + ' at ' + newx + ',' + newy);
                 }
@@ -205,11 +209,12 @@ function syncmap()
 function map_refresh()
 {
     console.log('Fetching JSON.');
+
     $.getJSON("editor-backend.php",
-        { map: mapfile, cmd: "dump_map", serial: lastserial },
-          function(json){
+        { map: mapfile, "cmd": "dump_map", "serial": lastserial },
+          function (json) {
             console.log('Inside JSON function');
-            if(json.valid==1)
+            if (json.valid === 1)
             {
                 map = json;
                     console.log('Loaded JSON for ' + mapfile + ' - about to syncmap()');
@@ -221,7 +226,7 @@ function map_refresh()
                 // $('#existingdata').attr('src',json.map.mapcache);
                 $.get('editor-backend.php',{ map: mapfile, cmd: "imagemap" },
                       function(cont) {
-                        $('map#weathermap_imap').empty()
+                        $('map#weathermap_imap').empty();
                         // $('map#weathermap_imap').html(cont);
                         // Getting medieval here - jQuery doesn't seem to be interested in Imagemaps??
                         var oldskool = document.getElementById('weathermap_imap');
@@ -284,7 +289,7 @@ function reapplyLinkEvents()
 		var dx = Math.abs(dragstop.x - dragstart.x);
 		var dy = Math.abs(dragstop.y - dragstart.y);
 
-		if((dx+dy)<4)
+		if ((dx+dy) < 4)
 		{
 			// treat this is a click - we're still inside the link, and we didn't move far
 			alert('click on ' + dragitem);
@@ -306,6 +311,8 @@ function reapplyLinkEvents()
 
 function reapplyDraggableEvents()
 {
+    var origin_x, origin_y;
+
 	$('.draggable').unbind();
 		
 	$('.draggable').mousedown( function(ev) { 
@@ -317,8 +324,8 @@ function reapplyDraggableEvents()
 		dragitem = $(this).attr('id');
                 var w = $(this).width(); 
 		var h = $(this).height();
-                var t = parseInt($(this).css('top'));
-                var l = parseInt($(this).css('left'));
+                var t = parseInt($(this).css('top'),10);
+                var l = parseInt($(this).css('left'),10);
                 
                 dragoffset.x = -(w/2);
                 dragoffset.y = -(h/2);
@@ -345,20 +352,20 @@ function reapplyDraggableEvents()
 		}
 		else
 		{
-                    if(dragitem.slice(0,8)=='mapnode_')
+                    if(dragitem.slice(0,8) === 'mapnode_')
                     {
-                        var origin_x = parseInt($('#existingdata').css('left'));
-                       var origin_y = parseInt($('#existingdata').css('top'));
+                         origin_x = parseInt($('#existingdata').css('left'),10);
+                        origin_y = parseInt($('#existingdata').css('top'),10);
                         dragitem = dragitem.slice(8,dragitem.length);
                         $.getJSON('editor-backend.php',{ map: mapfile, cmd: "move_node", x: pos.x-origin_x, y: pos.y-origin_y, nodename: dragitem  },
                                   function() {map_refresh(); });
                     
                     }
                     
-                    if(dragitem.slice(0,7)=='mapvia_')
+                    if(dragitem.slice(0,7) === 'mapvia_')
                     {
-                        var origin_x = parseInt($('#existingdata').css('left'));
-                        var origin_y = parseInt($('#existingdata').css('top'));
+                         origin_x = parseInt($('#existingdata').css('left'),10);
+                         origin_y = parseInt($('#existingdata').css('top'),10);
                         dragitem = dragitem.slice(7,dragitem.length);
                         $.getJSON('editor-backend.php',{ map: mapfile, cmd: "move_via", x: pos.x-origin_x, y: pos.y-origin_y, vianame: dragitem  },
                                   function() {map_refresh(); });
@@ -380,8 +387,8 @@ function nodeadd()
     console.log('Node Add - Initial');
     interactmode='nodeadd';
     $('#existingdata').click( function(ev) {
-        var x = ev.pageX - parseInt($('#existingdata').css('left'));
-        var y = ev.pageY - parseInt($('#existingdata').css('top'));
+        var x = ev.pageX - parseInt($('#existingdata').css('left'),10);
+        var y = ev.pageY - parseInt($('#existingdata').css('top'),10);
         console.log('Ready to add a new node at ' + x + ',' + y);
         return(false);
     });    
@@ -419,7 +426,7 @@ $(document).ready( function() {
 
 // handle the release, which may not be over the original object anymore
 	$(document).mouseup( function (ev) { 
-            if(linkmdown===true) { 
+            if(linkmdown === true) { 
                 
                 console.log("LINK mouseup");
                 // retrieve positioning properties
@@ -431,7 +438,7 @@ $(document).ready( function() {
                 if(addedVia)
                 {
                     // give the temporary VIA a better name
-                    var now = new Date;
+                    var now = new Date();
                     $('#newvia').attr('class','deadvia');
                     $('#newvia').attr('id','via_'+now.getTime());
                     addedVia=false;
@@ -440,8 +447,8 @@ $(document).ready( function() {
                     reapplyDraggableEvents();
                     reapplyLinkEvents();
                     // XXX - do something to tell the editor serverside
-                    var origin_x = parseInt($('#existingdata').css('left'));
-                    var origin_y = parseInt($('#existingdata').css('top'));
+                    var origin_x = parseInt($('#existingdata').css('left'),10);
+                    var origin_y = parseInt($('#existingdata').css('top'),10);
                     var linkname = dragitem.slice(5,dragitem.length);
                      $.getJSON('editor-backend.php',{ map: mapfile, cmd: "add_via", x: pos.x-origin_x, y: pos.y-origin_y, linkname: linkname, startx: dragstart.x, starty: dragstart.y  },
                         function() {map_refresh(); });

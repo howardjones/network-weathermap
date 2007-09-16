@@ -25,6 +25,7 @@
 	ADDED - Editor has a better warning for unwriteable files and directory now.
 	ADDED - When you come TO the editor from Cacti, the Change File goes BACK to Cacti
 	ADDED - "Show Only First" mode in Cacti UI - useful for heirarchies of maps with a parent.
+	ADDED - scale: prefix for RRD datasource - multiply/divide by any value as you read an rrd datasource
         
 0.92 - FIXED weathermap CLI help said --random-data instead of --randomdata
        FIXED one last php short_tag in poller_common.php - thanks Bernado Diez

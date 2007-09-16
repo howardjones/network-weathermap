@@ -5170,7 +5170,10 @@ function PreloadMapHTML()
 				$overlibhtml .= "',DELAY,250,${left}${above}CAPTION,'" . $caption
 				. "');\"  onmouseout=\"return nd();\"";
 
-				$this->imap->setPropSub("extrahtml", $overlibhtml, "LINK:" . $link->name.':');
+				$this->imap->setProp("extrahtml", $overlibhtml, "LINK:" . $link->name.':0');
+				$this->imap->setProp("extrahtml", $overlibhtml, "LINK:" . $link->name.':1');
+				$this->imap->setProp("extrahtml", $overlibhtml, "LINK:" . $link->name.':2');
+				$this->imap->setProp("extrahtml", $overlibhtml, "LINK:" . $link->name.':3');
 			}
 		}
 
@@ -5224,7 +5227,11 @@ function PreloadMapHTML()
 
 				# $overlibhtml .= " onclick=\"return overlib('Some Test or other',CAPTION,'MENU',)\"";
 
-				$this->imap->setPropSub("extrahtml", $overlibhtml, "NODE:" . $node->name.':');
+				$this->imap->setProp("extrahtml", $overlibhtml, "NODE:" . $node->name.':0');
+				$this->imap->setProp("extrahtml", $overlibhtml, "NODE:" . $node->name.':1');
+				$this->imap->setProp("extrahtml", $overlibhtml, "NODE:" . $node->name.':2');
+				$this->imap->setProp("extrahtml", $overlibhtml, "NODE:" . $node->name.':3');
+
 			}
 		}
 	}

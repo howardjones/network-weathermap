@@ -369,6 +369,8 @@ function click_handler(e)
         // if we're waiting for a node specifically (e.g. "make link") then ignore links here
         if (objecttype == 'NODE')
             {
+                // chop off the suffix
+                objectname=objectname.slice(0,objectname.length-2);
                 show_node(objectname);
             }
 

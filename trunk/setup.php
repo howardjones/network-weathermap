@@ -127,7 +127,7 @@ function weathermap_setup_table () {
 	global $config, $database_default;
 	include_once($config["library_path"] . DIRECTORY_SEPARATOR . "database.php");
 
-	$sql = "show tables from " . $database_default;
+	$sql = "show tables";
 	$result = db_fetch_assoc($sql) or die (mysql_error());
 
 	$tables = array();

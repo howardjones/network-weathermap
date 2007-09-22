@@ -321,7 +321,7 @@ class HTML_ImageMap
 		return $count;
 	}
 
-        // update a property on all elements in the map that match a name
+        // update a property on all elements in the map that match a name as a substring
         // (use it for retro-actively adding in link information to a pre-built geometry before generating HTML)
         // returns the number of elements that were matched/changed
         function setPropSub($which, $what, $where)
@@ -330,8 +330,6 @@ class HTML_ImageMap
                 $count = 0;
                 for($i=0; $i<count($this->shapes); $i++)
                 {
-                        // this USED to be a substring match, but that broke some things
-                        // and wasn't actually used as one anywhere.
                         if( ($where == "") || ( strstr($this->shapes[$i]->name,$where)!=FALSE ) )
                         {
                                 switch($which)

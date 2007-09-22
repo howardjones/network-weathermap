@@ -312,7 +312,7 @@ function weathermap_poller_bottom () {
 	else
 	{
 		// if we're due, run the render updates
-		if( ($rendercounter % $renderperiod) == 0)
+		if( ( $renderperiod == 0) || ( ($rendercounter % $renderperiod) == 0) )
 		{
 			weathermap_run_maps(dirname(__FILE__) );
 		}

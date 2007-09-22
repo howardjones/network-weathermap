@@ -583,8 +583,9 @@ function draw_curve($image, &$curvepoints, $width, $outlinecolour, $comment_colo
 		if (!is_null($fillcolours[$arrayindex]))
 			{ imagefilledpolygon($image, $there_points, count($there_points) / 2, $arrowsettings[$dir][4]); }
 		
-		$map->imap->addArea("Polygon", "LINK:" . $linkname. ':'.($direction+1), '', $there_points);
-		debug ("Adding Poly imagemap for $linkname\n");
+		$areaname = "LINK:" . $linkname. ":$dir";
+		$map->imap->addArea("Polygon", $areaname, '', $there_points);
+		debug ("Adding Poly imagemap for $areaname\n");
 
 		if (!is_null($outlinecolour))
 			imagepolygon($image, $there_points, count($there_points) / 2, $arrowsettings[$dir][5]);
@@ -3249,7 +3250,7 @@ function DrawLabelRotated($im, $x, $y, $angle, $text, $font, $padding, $linkname
 	$textcol=myimagecolorallocate($im, $textcolour[0], $textcolour[1], $textcolour[2]);
 	$this->myimagestring($im, $font, $points[8], $points[9], $text, $textcol,$angle);
 
-	// XXX - THIS IS WRONG - should be a pole
+	// XXX - THIS IS WRONG - should be a poly
 	$this->imap->addArea("Rectangle", "LINK:".$linkname.':'.($direction+2), '', array($x1, $y1, $x2, $y2));
 
 }

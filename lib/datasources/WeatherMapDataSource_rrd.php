@@ -8,13 +8,13 @@ class WeatherMapDataSource_rrd extends WeatherMapDataSource {
 
 	function Init(&$map)
 	{
-		if (extension_loaded('RRDTool')) // fetch the values via the RRDtool Extension
-		{
-			debug("RRD DS: Using RRDTool php extension.\n");
-			return(TRUE);
-		}
-		else
-		{
+		#if (extension_loaded('RRDTool')) // fetch the values via the RRDtool Extension
+		#{
+	#		debug("RRD DS: Using RRDTool php extension.\n");
+#			return(TRUE);
+#		}
+#		else
+#		{
 			if (file_exists($map->rrdtool)) {
 				if((function_exists('is_executable')) && (!is_executable($map->rrdtool)))
 				{
@@ -34,7 +34,7 @@ class WeatherMapDataSource_rrd extends WeatherMapDataSource {
 			{    // unlikely to ever occur
 				warn("RRD DS: Can't find RRDTOOL. Check your Cacti config. [WMRRD03]\n");
 			}
-		}
+#		}
 
 		return(FALSE);
 	}
@@ -154,7 +154,7 @@ class WeatherMapDataSource_rrd extends WeatherMapDataSource {
 			else
 			{
 
-		#	$command = '"'.$map->rrdtool . '" fetch "'.$rrdfile.'" AVERAGE --start '.$start.' --end '.$end;
+				# $command = '"'.$map->rrdtool . '" fetch "'.$rrdfile.'" AVERAGE --start '.$start.' --end '.$end;
 				$command=$map->rrdtool . " fetch $rrdfile AVERAGE --start $start --end $end";
 
 				debug ("RRD ReadData: Running: $command\n");

@@ -4563,12 +4563,14 @@ function ReadConfig($filename)
 				if (preg_match("/^\s*HTMLOUTPUTFILE\s+(.*)\s*$/i", $buffer, $matches))
 				{
 					$this->htmloutputfile=trim($matches[1]);
+					debug("SET HTMLOUTPUTFILE to $matches[1]\n");
 					$linematched++;
 				}
 
 				if (preg_match("/^\s*IMAGEOUTPUTFILE\s+(.*)\s*$/i", $buffer, $matches))
 				{
 					$this->imageoutputfile=trim($matches[1]);
+					debug("SET IMAGEOUTPUTFILE to $matches[1]\n");
 					$linematched++;
 				}
 
@@ -5012,17 +5014,17 @@ function DrawMap($filename = '', $thumbnailfile = '', $thumbnailmax = 250, $with
 				$functions = TRUE;
 				if(function_exists('imagejpeg') && preg_match("/\.jpg/i",$filename))
 				{
-					debug("Writing JPEG file\n");
+					debug("Writing JPEG file to $filename\n");
 					$result = imagejpeg($image, $filename);
 				}
 				elseif(function_exists('imagegif') && preg_match("/\.gif/i",$filename))
 				{
-					debug("Writing GIF file\n");
+					debug("Writing GIF file to $filename\n");
 					$result = imagegif($image, $filename);
 				}
 				elseif(function_exists('imagepng') && preg_match("/\.png/i",$filename))
 				{
-					debug("Writing PNG file\n");
+					debug("Writing PNG file to $filename\n");
 					$result = imagepng($image, $filename);
 				}
 				else
@@ -5171,10 +5173,10 @@ function PreloadMapHTML()
 				$overlibhtml .= "',DELAY,250,${left}${above}CAPTION,'" . $caption
 				. "');\"  onmouseout=\"return nd();\"";
 
-				$this->imap->setProp("extrahtml", $overlibhtml, "LINK:" . $link->name.':0');
-				$this->imap->setProp("extrahtml", $overlibhtml, "LINK:" . $link->name.':1');
-				$this->imap->setProp("extrahtml", $overlibhtml, "LINK:" . $link->name.':2');
-				$this->imap->setProp("extrahtml", $overlibhtml, "LINK:" . $link->name.':3');
+				for($i=0; $i<4; $i++)
+				{
+					$this->imap->setProp("extrahtml", $overlibhtml, "LINK:" . $link->name.":$i");
+				}
 			}
 		}
 
@@ -5228,11 +5230,10 @@ function PreloadMapHTML()
 
 				# $overlibhtml .= " onclick=\"return overlib('Some Test or other',CAPTION,'MENU',)\"";
 
-				$this->imap->setProp("extrahtml", $overlibhtml, "NODE:" . $node->name.':0');
-				$this->imap->setProp("extrahtml", $overlibhtml, "NODE:" . $node->name.':1');
-				$this->imap->setProp("extrahtml", $overlibhtml, "NODE:" . $node->name.':2');
-				$this->imap->setProp("extrahtml", $overlibhtml, "NODE:" . $node->name.':3');
-
+				for($i=0; $i<4; $i++)
+				{
+					$this->imap->setProp("extrahtml", $overlibhtml, "NODE:" . $node->name.":$i");
+				}
 			}
 		}
 	}
@@ -5254,14 +5255,24 @@ function PreloadMapHTML()
 	{
 		foreach ($this->links as $link)
 		{
-			if ($link->infourl != '') { $this->imap->setProp("href", $this->ProcessString($link->infourl,$link),
-				"LINK:" . $link->name); }
+			if ($link->infourl != '') {
+				for($i=0; $i<4; $i++)
+				{
+					$areaname = "LINK:" . $link->name . ":$i";
+					$this->imap->setProp("href", $this->ProcessString($link->infourl,$link), $areaname);
+				}
+			}
 		}
 
 		foreach ($this->nodes as $node)
-		{
-			if ($node->infourl != '') { $this->imap->setProp("href", $this->ProcessString($node->infourl,$node),
-				"NODE:" . $node->name); }
+		{			
+			if ($node->infourl != '') {
+				for($i=0; $i<4; $i++)
+				{
+					$areaname = "NODE:" . $node->name . ":$i";
+					$this->imap->setProp("href", $this->ProcessString($node->infourl,$node), $areaname);
+				}
+			}
 		}
 	}
 }

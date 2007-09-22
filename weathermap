@@ -169,12 +169,12 @@ if ($map->ReadConfig($configfile))
 
 	if ($htmlfile == '')
 	{
-		if ($map->htmloutputfile != '') { $htmlfile=$map->htmloutputfile; }
+		if ($map->htmloutputfile != '') { $htmlfile = $map->htmloutputfile; }
 	}
 
     // feed in any command-line defaults, so that they appear as if SET lines in the config
     
-    // FIXME
+    // XXX FIXME
     foreach ($defines as $hintname=>$hint)
     {
         $map->add_hint($hintname,$hint);
@@ -194,6 +194,12 @@ if ($map->ReadConfig($configfile))
 
 	if ($htmlfile != '')
 	{
+		if ($DEBUG)
+		{
+			print "Writing HTML to $htmlfile\n";
+		}
+
+		
 		$fd=fopen($htmlfile, 'w');
 		fwrite($fd,
 			'<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><meta http-equiv="refresh" content="300" /><title>' . $map->title

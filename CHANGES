@@ -28,6 +28,9 @@
 	ADDED - scale: prefix for RRD datasource - multiply/divide by any value as you read an rrd datasource
 	FIXED - Non-unique IDs in imagemaps, in overlib mode.
 	FIXED - Better-validating HTML produced
+        FIXED - angled bwlabels have the correct imagemap
+        FIXED - divide-by-zero error for some (?) PHP versions in poller
+        ADDED - Warning for duplicate node or link names
         
 0.92 - FIXED weathermap CLI help said --random-data instead of --randomdata
        FIXED one last php short_tag in poller_common.php - thanks Bernado Diez

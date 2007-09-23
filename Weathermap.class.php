@@ -1246,8 +1246,8 @@ class WeatherMapNode extends WeatherMapItem
 					}					
 				}
 				
-				if($this->iconfile=='inpie') { warn('inpie not implemented yet'); }
-				if($this->iconfile=='outpie') { warn('outpie not implemented yet'); }
+				if($this->iconfile=='inpie') { warn('inpie not implemented yet [WMWARN99]'); }
+				if($this->iconfile=='outpie') { warn('outpie not implemented yet [WMWARN99]'); }
 				
 			}
 			else
@@ -2080,7 +2080,7 @@ class WeatherMapLink extends WeatherMapItem
 			if($comment != '')
 			{
 				// XXX - redundant extra variable
-				$startindex = $start[$dir];
+				// $startindex = $start[$dir];
 				$extra_percent = $commentpos[$dir];
 				
 				$font = $this->commentfont;
@@ -3250,8 +3250,9 @@ function DrawLabelRotated($im, $x, $y, $angle, $text, $font, $padding, $linkname
 	$textcol=myimagecolorallocate($im, $textcolour[0], $textcolour[1], $textcolour[2]);
 	$this->myimagestring($im, $font, $points[8], $points[9], $text, $textcol,$angle);
 
-	// XXX - THIS IS WRONG - should be a poly
-	$this->imap->addArea("Rectangle", "LINK:".$linkname.':'.($direction+2), '', array($x1, $y1, $x2, $y2));
+	$areaname = "LINK:".$linkname.':'.($direction+2);
+	$map->imap->addArea("Polygon", $areaname, '', $points);
+	debug ("Adding Poly imagemap for $areaname\n");
 
 }
 
@@ -3785,7 +3786,7 @@ function ReadConfig($filename)
 								debug ("Saving Link: " . $curlink->name . "\n");
 							}
 							else { warn
-								("Dropping LINK " . $curlink->name . " - it hasn't got 2 NODES!\n"); }
+								("Dropping LINK " . $curlink->name . " - it hasn't got 2 NODES! [WMWARN28]\n"); }
 						}
 					}
 
@@ -3794,7 +3795,7 @@ function ReadConfig($filename)
 						if ($matches[2] == 'DEFAULT')
 						{
 							if ($linksseen > 0) { warn
-								("LINK DEFAULT is not the first LINK. Defaults will not apply to earlier LINKs.\n");
+								("LINK DEFAULT is not the first LINK. Defaults will not apply to earlier LINKs. [WMWARN26]\n");
 							}
 							unset($curlink);
 							$curlink = $this->defaultlink;
@@ -3802,6 +3803,12 @@ function ReadConfig($filename)
 						else
 						{
 							unset($curlink);
+							
+							if(isset($this->links[$matches[2]]))
+							{
+								warn("Duplicate link name ".$matches[2]." at line $linecount - only the last one defined is used. [WMWARN25]\n");
+							}
+							
 							$curlink=new WeatherMapLink;
 							$curlink->name=$matches[2];
 							$curlink->Reset($this);
@@ -3818,7 +3825,7 @@ function ReadConfig($filename)
 						if ($matches[2] == 'DEFAULT')
 						{
 							if ($nodesseen > 0) { warn
-								("NODE DEFAULT is not the first NODE. Defaults will not apply to earlier NODEs.\n");
+								("NODE DEFAULT is not the first NODE. Defaults will not apply to earlier NODEs. [WMWARN27]\n");
 							}
 
 							unset($curnode);
@@ -3827,6 +3834,12 @@ function ReadConfig($filename)
 						else
 						{
 							unset($curnode);
+							
+							if(isset($this->nodes[$matches[2]]))
+							{
+								warn("Duplicate node name ".$matches[2]." at line $linecount - only the last one defined is used. [WMWARN24]\n");
+							}
+							
 							$curnode=new WeatherMapNode;
 							$curnode->name=$matches[2];
 							$curnode->Reset($this);

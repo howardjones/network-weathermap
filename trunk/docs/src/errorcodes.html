@@ -136,6 +136,38 @@ a { color: black; text-decoration: underline; font-weight: normal;}
 	<dd><p>"Your GD php module doesn't support thumbnail creation (imagecopyresampled). "</p>
 	<p></p>
 	</dd>
+  
+  
+  
+  
+  <dt><a name="WMWARN24">[WMWARN24]</a></dt>
+	<dd><p>"Duplicate node name <em>nodename</em> at line <em>linenumber</em> - only the last one defined is used. "</p>
+	<p></p>
+	</dd>
+  
+  <dt><a name="WMWARN25">[WMWARN25]</a></dt>
+	<dd><p>"Duplicate link name <em>linkname</em> at line <em>linenumber</em> - only the last one defined is used. "</p>
+	<p></p>
+	</dd>
+  
+  <dt><a name="WMWARN26">[WMWARN26]</a></dt>
+	<dd><p>"LINK DEFAULT is not the first LINK. Defaults will not apply to earlier LINKs. "</p>
+	<p></p>
+	</dd>
+  
+  <dt><a name="WMWARN27">[WMWARN27]</a></dt>
+	<dd><p>"NODE DEFAULT is not the first NODE. Defaults will not apply to earlier NODEs. "</p>
+	<p></p>
+	</dd>
+  
+  <dt><a name="WMWARN28">[WMWARN28]</a></dt>
+	<dd><p>"Dropping LINK <em>linkname</em> - it hasn't got 2 NODES!  "</p>
+	<p>You defined a link where one or both of the nodes in the NODES line don't exist.</p>
+	<p>Or you forgot to add a NODES line altogether.</p>
+	<p>A link goes between two nodes, so you need to tell weathermap which two nodes, and they need to exist.</p>
+	</dd>
+  
+  
 
 	<dt><a name="WMWARN30">[WMWARN30]</a></dt>
 	<dd><p>"Failed to load ttf font <em>filename</em> - at config line <em>linenumber</em>  "</p>
@@ -153,6 +185,12 @@ a { color: black; text-decoration: underline; font-weight: normal;}
 	</dd>
 
 
+      <dt><a name="WMWARN99">[WMWARN99]</a></dt>
+	<dd><p>"<em>something</em> not implemented yet"</p>
+	<p>A planned feature has been partially implemented, and you've tried to use it. Wait for the next release.</p>
+	<p>Because of the way I write Weathermap, there are sometimes parts of the code that are waiting ready for me
+	to finish writing a new feature. If it's the only thing holding back a release, I'll just disable that feature for now.</p>
+	</dd>
 
 
 	<dt><a name="WMIMG01">[WMIMG01]</a></dt>
@@ -204,7 +242,8 @@ a { color: black; text-decoration: underline; font-weight: normal;}
 	<dd><p>"Target <em>rrdfile</em> doesn't exist. Is it a file? "</p>
 	<p>You have given a TARGET which is a directory instead of a file, or something else unusual like that...</p>
 	</dd>
-  
+
+
   </div>
 </body>
 </html>

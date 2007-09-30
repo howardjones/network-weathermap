@@ -23,11 +23,48 @@ a { color: black; text-decoration: underline; font-weight: normal;}
 <!--#include file="common-top-nav.html" -->
 
     <h2><a name="changes093">Changes For This Version (0.92 to 0.93)</a></h2>
-    <h3>New Features</h3>
+    <h3>Changes</h3>
     <ul>
+        <li>The auth realm names for Cacti have been changed to match ReportIt and Aggregate - easier to tell who does what (Plugin -> Weathermap: View Maps)
+        <li>Editor warns about older editor-config.php format now
+        <li>Formatted numbers (Mega, Kilo etc) now can include milli, micro and nano (m,u,n).
+    </ul>
+<h3>New Features</h3>
+    <ul>
+     <li>weathermap-cacti-plugin.php?action=viewmap&id=mapfilename  works as well as a map number - useful for crosslinks
+     <li>Warning for duplicate node or link names
+        <li>unique code for each warning message, and a page to explain it on the website. Ugh.
+        <li>warning in editor file-selector so you can tell if the file is read-only
+        <li>click config filename to edit in editor from Cacti (thanks to streaker69)
+        <li>cactihost: DS plugin fetches a bunch of other stats from Cacti's DB now, too (like availability and response times)
+        <li>Picking Cacti sources from editor has a javascript "live filter" feature now (needs a little work)
+        <li>node coordinates are directly editable in the editor now
+        <li>File picker allows you to use an existing map as a template
+        <li>Editor now allows you to clone a node with all it's styling intact.
+        <li>When picking coordinates (new node, move node, move timestamp etc), you can see the coordinates
+        <li>Editor toolbar fixed to window, to make it easier to scroll around large maps
+        <li>RRD Datasource has improved warnings for non-existent DS names
+        <li>Editor allows you to edit raw text of nodes and links
+        <li>Editor link in management page (warnesj)
+        <li>Docs link in management page too (streaker69)
+        <li>Editor has a better warning for unwriteable files and directory now.
+        <li>When you come TO the editor from Cacti, the Change File goes BACK to Cacti
+        <li>"Show Only First" mode in Cacti UI - useful for heirarchies of maps with a parent.
+        <li>scale: prefix for RRD datasource - multiply/divide by any value as you read an rrd datasource
+
 	</ul>
     <h3>Fixes</h3>
     <ul>
+        <li>RRD doesn't consider DSes other than the ones you named when finding a valid line.
+        <li>editor-generated node names are a bit shorter (and easier to read) now.
+        <li>keyboard focus switches nicely to the popup dialogs now.
+        <li>Non-unique IDs in imagemaps, in overlib mode.
+        <li>COMMENTPOS 0 doesn't kill everything anymore
+        <li>OVERLIB would behave incorrectly with PHP4 and relatively positioned nodes (Bernd Ziller)
+        <li>Better-validating HTML produced
+        <li>angled bwlabels have the correct imagemap
+        <li>divide-by-zero error for some (?) PHP versions in poller
+        <li>the key_hidezero secret setting hides the zero in a gradient in a classic scale too.
 	</ul>
 
     <h2><a name="changes092">Changes For This Version (0.91 to 0.92)</a></h2>

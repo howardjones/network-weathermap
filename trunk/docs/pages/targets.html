@@ -8,8 +8,8 @@
  "HTML Tidy for Mac OS X (vers 12 April 2006), see www.w3.org" /> 
 
  <title>PHP Weathermap 
-v0.93beta1 
- - Changes For This Version</title> 
+v0.93 
+ - Targets Reference</title> 
 <style type="text/css" media="print"> 
 /*<![CDATA[*/ 
 body { font-size: 12pt; } 
@@ -41,7 +41,7 @@ a { color: black; text-decoration: underline; font-weight: normal;}
 
 <div id="header"> 
  <h1>PHP Weathermap 
-v0.93beta1 
+v0.93 
 </h1> 
  <h4>Copyright &copy; 2005-2007 Howard Jones, <tt><a 
 href="mailto:howie@thingy.com">howie@thingy.com</a></tt>. (<a 
@@ -72,6 +72,8 @@ href="http://www.network-weathermap.com/">Website</a>)</h4>
 <div class="definition">TARGET <em>rrdfile.rrd</em>:<em>in_ds</em>:<em>out_ds</em></div> 
 <div class="definition">TARGET gauge:<em>rrdfile.rrd</em>:<em>in_ds</em>:<em>out_ds</em></div> 
 <div class="definition">TARGET rrd:<em>rrdfile.rrd</em>:<em>in_ds</em>:<em>out_ds</em></div> 
+<div class="definition">TARGET scale:<em>factor</em>:<em>rrdfile.rrd</em>:<em>in_ds</em>:<em>out_ds</em></div> 
+
 
 <p>This is the 'core' plugin for Weathermap. It reads data from rrd files, created using <a href="http://www.rrdtool.org/">Tobi Oetiker's RRDtool</a>, by tools like Cacti, MRTG, Cricket, NRG and so on.</p> 
 
@@ -81,7 +83,7 @@ href="http://www.network-weathermap.com/">Website</a>)</h4>
  </p><p>You can also specify '-' for either DS name, which tells Weathermap to ignore 
  this rrd file for the purposes of the input or output value. 
  This is mainly useful in combination with the aggregation feature, where you can take the input data from one rrd file, and the output data from another.</p> 
- <p>With no prefix, or with just 'rrd:' as a prefix, the data read from the rrd file is assumed to be a standard SNMP interface counter, which is a byte-rate. It automatically multiplies these by 8 to get a bit-rate for the map. With the 'gauge:' prefix, this multiplication doesn't happen, which is useful for non-bandwidth values, like SNR or session-counts.</p> 
+ <p>With no prefix, or with just 'rrd:' as a prefix, the data read from the rrd file is assumed to be a standard SNMP interface counter, which is a byte-rate. It automatically multiplies these by 8 to get a bit-rate for the map. With the 'gauge:' prefix, this multiplication doesn't happen, which is useful for non-bandwidth values, like SNR or session-counts. Finally, you can use the 'scale:' prefix to multiply by any factor - suppose you have a value in seconds, and you want to show it in milliseconds for example. Of course, you can also divide using this, by using a scale factor that is less than 1 - multiplying by 1/x is the same as dividing by x.</p> 
 
 <p>By default, the plugin will read the last 800 seconds of data, and find the most recent within that to use. You might need to make it read back further, if you are updating your rrd files slowly. You can do this with the <a href="config-reference.html#GLOBAL_SET">SET</a> command, by adding <a href="config-reference.html#GLOBAL_SET">'SET</a> rrd_period 3000' (any value in seconds) at the top of your map config file, before any <a href="config-reference.html#NODE_NODE">NODE</a> or <a href="config-reference.html#LINK_LINK">LINK</a> lines.</p> 
 <p>Similarly, you can change the time that the plugin looks for data at from the present to the past, by using <a href="config-reference.html#GLOBAL_SET">'SET</a> rrd_start -1d' in the top section of the config file. The full range of time-specification strings is at the bottom of the <a href="http://oss.oetiker.ch/rrdtool/doc/rrdfetch.en.html">rrdfetch manual page</a>.</p> 

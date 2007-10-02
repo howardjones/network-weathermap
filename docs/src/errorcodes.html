@@ -30,9 +30,10 @@ a { color: black; text-decoration: underline; font-weight: normal;}
   <dl class="errorcodes">
 
 	<dt><a name="WMWARN01">[WMWARN01]</a></dt>
-	<dd><p>"Skipping drawing very short link (<em>$linkname</em>). Impossible to draw! Try changing WIDTH or ARROWSTYLE? "</p>
+	<dd><p>"Skipping drawing very short link (<em>linkname</em>). Impossible to draw! Try changing WIDTH or ARROWSTYLE? "</p>
 	<p>Weathermap draws the arrowheads on links in proportion to the width of the link. If your link is fat, then the arrowhead will be bigger. If you have a very short link (nodes close together), you can get a situation where there is not enough room to draw the arrowheads.</p><p>If you reduce the width of the link, using WIDTH then you might be able to make the arrowheads small enough so that they fit. You can also use ARROWSTYLE to choose a smaller style of arrowhead - ARROWSTYLE 1 1 is the smallest.</p>  
 	<p>The most common cause of this error is that you have accidentally placed two nodes on top of each other. In that case, move one of the nodes.</p>
+	<p>In previous versions (0.8 to 0.82), this would result in the infamous "FELL THROUGH Howie's crappy binary search is wrong after all" error message. The solution is the same - move the nodes, or change the link width</p>
 	</dd>
 
 	<dt><a name="WMWARN02">[WMWARN02]</a>, <a name="WMWARN04">[WMWARN04]</dt>
@@ -53,7 +54,7 @@ a { color: black; text-decoration: underline; font-weight: normal;}
 
 	<dt><a name="WMWARN05">[WMWARN05]</a></dt>
 	<dd><p>"ProcessString: <em>key</em> refers to unknown item "</p>
-	<p></p>
+	<p>You used a 'Special Token' string, like {node:this:something}, but the 'something' you used isn't defined for the node or link you specified. This is usually a typographical error.</p>
 	</dd>
 
 	<dt><a name="WMWARN06">[WMWARN06]</a></dt>
@@ -89,52 +90,48 @@ a { color: black; text-decoration: underline; font-weight: normal;}
 
 	<dt><a name="WMWARN12">[WMWARN12]</a></dt>
 	<dd><p>"Failed to write map image. No function existed for the image format you requested. "</p>
-	<p></p>
+	<p>You specified a particular format to write the map image with IMAGEFILE, but your php/GD installation doesn't have support for that image format.</p>
+	<p>You'll need to either choose a different image format, or recompile/reinstall your php, php-gd and GD libraries to support that image format.</p>
 	</dd>
 
-	<dt><a name="WMWARN13">[WMWARN13]</a></dt>
+	<dt><a name="WMWARN13">[WMWARN13],[WMWARN15],[WMWARN16]</a></dt>
 	<dd><p>"Failed to overwrite existing image file <em>filename</em> - permissions of existing file are wrong? "</p>
-	<p></p>
+	<p>Most likely when using the Cacti plugin. The files in the output/ directory are owned by a different user from the one running weathermap, and so it can't overwrite those files.</p>
+	<p>The most common way to get into this situation is by using the "Recalculate Now" button in the Cacti plugin. This creates files that are owned by the user that your webserver runs as. When the poller process comes along a few minutes later, it can no longer write over those files with the new data. Solution: make sure that the directory, and it's contents are owned by the poller user (or 'cactiuser') and don't use the 'Recalculate Now' button any more.</p>
 	</dd>
 
 	<dt><a name="WMWARN14">[WMWARN14]</a></dt>
 	<dd><p>"Failed to create image file <em>filename</em> - permissions of output directory are wrong? "</p>
-	<p></p>
-	</dd>
-
-	<dt><a name="WMWARN15">[WMWARN15]</a></dt>
-	<dd><p>"Failed to overwrite existing image file <em>filename</em> - permissions of existing file are wrong? "</p>
-	<p></p>
-	</dd>
-
-	<dt><a name="WMWARN16">[WMWARN16]</a></dt>
-	<dd><p>"Failed to create image file <em>filename</em> - permissions of output directory are wrong? "</p>
-	<p></p>
+	<p>Again, usually in Cacti plugin.</p>
+	<p>Weathermap is unable to create files in the directory that the output file should go - this is the plugins/weathermap/output/ directory if you are
+	using the Cacti plugin. Make sure that directory is owned/writable by the user that runs your poller process. This is the same permissions that you would have set on the rra/ directory when installing Cacti itself.</p>
 	</dd>
 
 	<dt><a name="WMWARN17">[WMWARN17]</a></dt>
 	<dd><p>"Skipping thumbnail creation, since we don't have the necessary function. "</p>
-	<p></p>
+	<p>Your php/php-gd/GD library doesn't include the imagecopyresampled() function, which is required to make the thumbnail images used in the Cacti plugin. To get that function , you'll need to update/recompile/reinstall your php, php-gd and GD libraries.</p>
 	</dd>
 
 	<dt><a name="WMWARN20">[WMWARN20]</a></dt>
 	<dd><p>"No image (gd) extension is loaded. This is required by weathermap. "</p>
-	<p></p>
+	<p>All the graphics work in Weathermap is done using the gd PHP extension. Your php installation doesn't have this extension, or it is not enabled.</p>
+	<p>You'll need to install or enable that extension to use Weathermap.</p>
 	</dd>
 
 	<dt><a name="WMWARN21">[WMWARN21]</a></dt>
 	<dd><p>"Your GD php module doesn't support PNG format. "</p>
-	<p></p>
+	<p>You specified an ICON or BACKGROUND image in PNG format, and your php-gd extension doesn't support PNG format images.</p>
+	<p>You'll need to either choose a different image format, or recompile/reinstall your php, php-gd and GD libraries to support that image format.</p>
 	</dd>
 
 	<dt><a name="WMWARN22">[WMWARN22]</a></dt>
 	<dd><p>"Your GD php module doesn't support truecolor. "</p>
-	<p></p>
+	<p>Weathermap requires that your GD library and php-gd extension support 24-bit colour (or "TrueColor"). To get that function , you'll need to update/recompile/reinstall your php, php-gd and GD libraries. Most likely, this is the result of an older version of GD.</p>
 	</dd>
 
 	<dt><a name="WMWARN23">[WMWARN23]</a></dt>
 	<dd><p>"Your GD php module doesn't support thumbnail creation (imagecopyresampled). "</p>
-	<p></p>
+		<p>See <a href="#WMWARN17">WMWARN17</a></p>
 	</dd>
   
   
@@ -142,23 +139,22 @@ a { color: black; text-decoration: underline; font-weight: normal;}
   
   <dt><a name="WMWARN24">[WMWARN24]</a></dt>
 	<dd><p>"Duplicate node name <em>nodename</em> at line <em>linenumber</em> - only the last one defined is used. "</p>
-	<p></p>
+	<p>You have used the same name for two or more NODE lines in your config. This is probably a typo or cut & paste error. One of the two NODEs will not show up in the map.</p>
 	</dd>
   
   <dt><a name="WMWARN25">[WMWARN25]</a></dt>
 	<dd><p>"Duplicate link name <em>linkname</em> at line <em>linenumber</em> - only the last one defined is used. "</p>
-	<p></p>
+	<p>You have used the same name for two or more LINK lines in your config. This is probably a typo or cut & paste error. One of the two LINKs will not show up in the map.</p>
 	</dd>
   
   <dt><a name="WMWARN26">[WMWARN26]</a></dt>
 	<dd><p>"LINK DEFAULT is not the first LINK. Defaults will not apply to earlier LINKs. "</p>
-	<p></p>
+	<p>You should usually specify your DEFAULT LINK <em>before</em> all your 'real' LINKs. The reason is that when a new LINK is defined, it copies whatever the default settings are at that point in reading down the config file, so you will end up with inconsistent results.</p>
 	</dd>
   
   <dt><a name="WMWARN27">[WMWARN27]</a></dt>
 	<dd><p>"NODE DEFAULT is not the first NODE. Defaults will not apply to earlier NODEs. "</p>
-	<p></p>
-	</dd>
+<p>You should usually specify your DEFAULT NODE <em>before</em> all your 'real' NODEs. The reason is that when a new NODE is defined, it copies whatever the default settings are at that point in reading down the config file, so you will end up with inconsistent results.</p>	</dd>
   
   <dt><a name="WMWARN28">[WMWARN28]</a></dt>
 	<dd><p>"Dropping LINK <em>linkname</em> - it hasn't got 2 NODES!  "</p>
@@ -167,22 +163,20 @@ a { color: black; text-decoration: underline; font-weight: normal;}
 	<p>A link goes between two nodes, so you need to tell weathermap which two nodes, and they need to exist.</p>
 	</dd>
   
-  
-
 	<dt><a name="WMWARN30">[WMWARN30]</a></dt>
-	<dd><p>"Failed to load ttf font <em>filename</em> - at config line <em>linenumber</em>  "</p>
-	<p></p>
+	<dd><p>"Failed to load ttf font <em>filename</em> - at config line <em>linenumber</em>"</p>
+	<p>You defined a TrueType/FreeType font with FONTDEFINE, but the file doesn't exist, or can't be loaded due to permissions issues.</p>
 	</dd>
 
 	<dt><a name="WMWARN31">[WMWARN31]</a></dt>
 	<dd><p>"imagettfbbox() is not a defined function. You don't seem to have FreeType compiled into your gd module. "</p>
-	<p></p>
+	<p>You tried to use a TrueType/FreeType font, but your GD library (and/or php-gd extension) don't understand FreeType. </p>
+	<p>You'll need to either choose a different font format, or recompile/reinstall your php, php-gd, GD and perhaps freetype2 libraries to support that font format.</p>
 	</dd>
 
 	<dt><a name="WMWARN32">[WMWARN32]</a></dt>
 	<dd><p>"Failed to load GD font: <em>filename</em> (<em>errorcode</em>) at config line <em>linenumber</em> "</p>
-	<p></p>
-	</dd>
+<p>You defined a .gdf font with FONTDEFINE, but the file doesn't exist, or can't be loaded due to permissions issues.</p>	</dd>
 
 
       <dt><a name="WMWARN99">[WMWARN99]</a></dt>
@@ -235,12 +229,12 @@ a { color: black; text-decoration: underline; font-weight: normal;}
 
 	<dt><a name="WMRRD04">[WMRRD04]</a></dt>
 	<dd><p>"RRD ReadData: failed to open pipe to RRDTool: <em>phperrormsg</em> "</p>
-	<p>This is probably a Weathermap bug. It was unable to get rrdtool to read a .rrd file.</p>
+	<p>This is probably a Weathermap bug. It was unable to get rrdtool to read a .rrd file even though the file exists. It <em>might</em> be that the user running Weathermap (or the poller) doesn't have execute permission for rrdtool.</p>
 	</dd>
 
 	<dt><a name="WMRRD06">[WMRRD06]</a></dt>
 	<dd><p>"Target <em>rrdfile</em> doesn't exist. Is it a file? "</p>
-	<p>You have given a TARGET which is a directory instead of a file, or something else unusual like that...</p>
+	<p>You have given an RRD TARGET which is a directory instead of a file, or something else unusual like that...</p>
 	</dd>
 
 

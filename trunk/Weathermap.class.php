@@ -1,12 +1,12 @@
 <?php
-// PHP Weathermap 0.93
+// PHP Weathermap 0.94dev
 // Copyright Howard Jones, 2005-2007 howie@thingy.com
 // http://www.network-weathermap.com/
 // Released under the GNU Public License
 
 require_once "HTML_ImageMap.class.php";
 
-$WEATHERMAP_VERSION="0.93";
+$WEATHERMAP_VERSION="0.94dev";
 $weathermap_debugging=FALSE;
 
 // Turn on ALL error reporting for now.
@@ -16,6 +16,15 @@ error_reporting (E_ALL);
 define("IN",0);
 define("OUT",1);
 define("WMCHANNELS",2);
+
+// some strings that are used in more than one place
+define('FMT_BITS_IN',"{link:this:bandwidth_in:%2k}");
+define('FMT_BITS_OUT',"{link:this:bandwidth_out:%2k}");
+define('FMT_UNFORM_IN',"{link:this:bandwidth_in}");
+define('FMT_UNFORM_OUT',"{link:this:bandwidth_out}");
+define('FMT_PERC_IN',"{link:this:inpercent:%.2f}%");
+define('FMT_PERC_OUT',"{link:this:outpercent:%.2f}%");
+
 
 // Utility functions
 // Check for GD & PNG support This is just in here so that both the editor and CLI can use it without the need for another file
@@ -1976,6 +1985,7 @@ class WeatherMapLink extends WeatherMapItem
 	var $bwfontcolour;
 	# var $incomment, $outcomment;
 	var $comments = array();
+	var $bwlabelformats = array();
 	var $curvepoints;
 	var $labeloffset_in, $labeloffset_out;
 	var $commentoffset_in, $commentoffset_out;
@@ -1998,6 +2008,7 @@ class WeatherMapLink extends WeatherMapItem
 			'notes' => array(),
 			'hints' => array(),
 			'comments' => array('',''),
+			'bwlabelformats' => array(FMT_PERC_IN,FMT_PERC_OUT),
 			'overliburl' => '',
 			'labelstyle' => 'percent',
 			'labelboxstyle' => 'classic',
@@ -2289,13 +2300,16 @@ class WeatherMapLink extends WeatherMapItem
 			foreach (array($inbound, $outbound)as $task)
 			{
 				$thelabel="";
-
-				if ($this->labelstyle != 'none')
+				
+				$thelabel = $map->ProcessString($this->bwlabelformats[$task[7]],$this);
+	
+				if ($thelabel != '')
 				{
 					debug("Bandwidth is ".$task[5]."\n");
-					if ($this->labelstyle == 'bits') { $thelabel=nice_bandwidth($task[5], $this->owner->kilo); }
-					elseif ($this->labelstyle == 'unformatted') { $thelabel=$task[5]; }
-					elseif ($this->labelstyle == 'percent') { $thelabel=format_number($task[4]) . "%"; }
+					# XXX - old bwstyle code
+					# if ($this->labelstyle == 'bits') { $thelabel=nice_bandwidth($task[5], $this->owner->kilo); }
+					# elseif ($this->labelstyle == 'unformatted') { $thelabel=$task[5]; }
+					# elseif ($this->labelstyle == 'percent') { $thelabel=format_number($task[4]) . "%"; }
 
 					$padding = intval($this->get_hint('bwlabel_padding'));		
 
@@ -2360,9 +2374,12 @@ class WeatherMapLink extends WeatherMapItem
 	
 			if ($this->arrowstyle != $comparison) { $output.="\tARROWSTYLE " . $this->arrowstyle . "\n"; }
 	
+			// TODO - handle IN/OUTBWFORMAT properly
 			$comparison=($this->name == 'DEFAULT'
 			? ($this->inherit_fieldlist['labelstyle']) : ($this->owner->defaultlink->labelstyle));
+			
 			if ($this->labelstyle != $comparison) { $output.="\tBWLABEL " . $this->labelstyle . "\n"; }
+						
 	
 			$comparison=($this->name == 'DEFAULT'
 			? ($this->inherit_fieldlist['labelboxstyle']) : ($this->owner->defaultlink->labelboxstyle));
@@ -3990,6 +4007,65 @@ function ReadConfig($filename)
 					$linematched++;
 				}
 
+				if ($last_seen == 'LINK' && preg_match(
+					"/^\s*BWLABEL\s+(bits|percent|unformatted|none)\s*$/i", $buffer,
+					$matches))
+				{
+					$format_in = '';
+					$format_out = '';
+					$style = strtolower($matches[1]);
+					if($style=='percent')
+					{
+						$format_in = FMT_PERC_IN;
+						$format_out = FMT_PERC_OUT;
+					}
+					if($style=='bits')
+					{
+						$format_in = FMT_BITS_IN;
+						$format_out = FMT_BITS_OUT;
+					}
+					if($style=='unformatted')
+					{
+						$format_in = FMT_UNFORM_IN;
+						$format_out = FMT_UNFORM_OUT;
+					}
+										
+					$curlink->labelstyle=$style;
+					$curlink->bwlabelformats[IN] = $format_in;
+					$curlink->bwlabelformats[OUT] = $format_out;
+					$linematched++;
+				}
+
+				if ($last_seen == 'LINK' && preg_match(
+					"/^\s*BWSTYLE\s+(classic|angled)\s*$/i", $buffer,
+					$matches))
+				{
+					$curlink->labelboxstyle=$matches[1];
+					$linematched++;
+				}
+
+				if ($last_seen == 'LINK' && preg_match(
+					"/^\s*BWLABELPOS\s+(\d+)\s(\d+)\s*$/i", $buffer,
+					$matches))
+				{
+					$curlink->labeloffset_in = $matches[1];
+					$curlink->labeloffset_out = $matches[2];
+					$linematched++;
+				}
+
+				if ( ($last_seen == 'LINK') && (preg_match("/^\s*INBWFORMAT\s+(.*)\s*$/i", $buffer, $matches)))
+				{
+					$curlink->bwlabelformats[IN] = $matches[1];
+					$curlink->bwstyle='--'; // mark that at least one direction is special
+					$linematched++;
+				}
+				
+				if ( ($last_seen == 'LINK') && (preg_match("/^\s*OUTBWFORMAT\s+(.*)\s*$/i", $buffer, $matches)))
+				{
+					$curlink->bwlabelformats[OUT] = $matches[1];
+					$curlink->bwstyle='--'; // mark that at least one direction is special
+					$linematched++;
+				}
 
 				if ( ($last_seen == 'LINK') && (preg_match("/^\s*(BANDWIDTH|MAXVALUE)\s+(\d+\.?\d*[KMGT]?)\s*$/i", $buffer, $matches)))
 				{
@@ -4177,30 +4253,6 @@ function ReadConfig($filename)
 					$linematched++;
 				}
 
-				if ($last_seen == 'LINK' && preg_match(
-					"/^\s*BWLABEL\s+(bits|percent|unformatted|none)\s*$/i", $buffer,
-					$matches))
-				{
-					$curlink->labelstyle=strtolower($matches[1]);
-					$linematched++;
-				}
-
-				if ($last_seen == 'LINK' && preg_match(
-					"/^\s*BWSTYLE\s+(classic|angled)\s*$/i", $buffer,
-					$matches))
-				{
-					$curlink->labelboxstyle=$matches[1];
-					$linematched++;
-				}
-
-				if ($last_seen == 'LINK' && preg_match(
-					"/^\s*BWLABELPOS\s+(\d+)\s(\d+)\s*$/i", $buffer,
-					$matches))
-				{
-					$curlink->labeloffset_in = $matches[1];
-					$curlink->labeloffset_out = $matches[2];
-					$linematched++;
-				}
 				
 				if ($last_seen == 'LINK' && preg_match(
 					"/^\s*COMMENTPOS\s+(\d+)\s(\d+)\s*$/i", $buffer,

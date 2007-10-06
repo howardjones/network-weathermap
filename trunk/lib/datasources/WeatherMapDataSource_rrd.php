@@ -233,8 +233,9 @@ class WeatherMapDataSource_rrd extends WeatherMapDataSource {
 					else
 					{
 					    // report DS name error
-					     $names = join(",",$heads);
-						warn("RRD ReadData: Neither of your DS names ($in_ds & $out_ds) were found, even though there was a valid data line. Maybe they are wrong? Valid DS names in this file are: $names [WMRRD06]\n");
+					    $names = join(",",$heads);
+					    $names = str_replace("timestamp,","",$names);
+					    warn("RRD ReadData: At least one of your DS names ($in_ds & $out_ds) were not found, even though there was a valid data line. Maybe they are wrong? Valid DS names in this file are: $names [WMRRD06]\n");
 					}
 		   
 				}

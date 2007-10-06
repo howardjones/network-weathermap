@@ -1,0 +1,208 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><title>Network Weathermap</title>
+<script src="lib/javascript/jquery-latest.pack.js" type="text/javascript"></script>
+<script type="text/javascript">
+
+
+	function getMousePosition(event)
+	{
+		var x = event.pageX || (event.clientX + (document.documentElement.scrollLeft || document.body.scrollLeft)) || 0;
+		var y = event.pageY || (event.clientY + (document.documentElement.scrollTop || document.body.scrollTop)) || 0;
+		return {x:x, y:y};
+	}
+
+function reapplyDraggableEvents()
+{
+	$('.draggable').unbind();
+		
+	$('.draggable').mousedown( function(ev) { 
+		dragmdown=true; 
+		console.log('mousedown');
+		$('#mousedown').css({ backgroundColor: 'red' });
+		var pos    = getMousePosition(ev);
+		dragstart.x = pos.x;
+		dragstart.y = pos.y;
+		dragitem = $(this).attr('id');
+
+		return(false);
+		
+	 } );
+	$('.draggable').mousemove( function(ev) {  
+		if(dragmdown)
+		{
+			$('#mousemove').css({ backgroundColor: 'red' });
+		}
+	} );
+	$('.draggable').mouseup( function(ev) { 
+		console.log('mouseup');	
+		dragmdown = false; 
+		$('#mousedown').css({ backgroundColor: 'white' });
+		$('#mousemove').css({ backgroundColor: 'white' });
+		$('#dragging').css({ backgroundColor: 'white'});
+		// verify if we've moved much since the down - if we did, it's not a click	
+			var pos    = getMousePosition(ev);
+			dragstop.x = pos.x;
+			dragstop.y = pos.y;
+
+		var dx = Math.abs(dragstop.x - dragstart.x);
+		var dy = Math.abs(dragstop.y - dragstart.y);
+
+		if((dx+dy)<4)
+		{
+			// treat this is a click - we're still inside the link, and we didn't move far
+			alert('click on ' + dragitem);
+		}
+		else
+		{
+			dragitem = '';
+			dragstart = {x: -1, y: -1};
+			dragstop = {x: -1, y: -1};
+		}
+		return(false);
+	} );
+
+}
+
+function reapplyLinkEvents()
+{
+		// unbind, then re-apply all events for links.
+		// is this actually necessary?
+		
+		$('area[@id^=LINK:]').unbind();
+
+		$('area[@id^=LINK:]').mousedown( function(ev) { 
+			$('#mousedown').css({ backgroundColor: 'red' });
+			console.log('mousedown'); 
+			linkmdown = true;
+			// retrieve positioning properties
+				var pos    = getMousePosition(ev);
+				dragstart.x = pos.x;
+				dragstart.y = pos.y;
+				dragitem = $(this).attr('id');
+			return(false);
+		});
+
+	$('area[@id^=LINK:]').mousemove( function() { 
+		if(linkmdown)
+		{
+			$('#mousemove').css({ backgroundColor: 'red' });
+			return(false);
+		}
+		});
+  
+  	$('area[@id^=LINK:]').mouseup( function(ev) {
+		$('#mousedown').css({ backgroundColor: 'white' });
+		$('#mousemove').css({ backgroundColor: 'white' });
+		$('#dragging').css({ backgroundColor: 'white'});
+
+		// verify if we've moved much since the down - if we did, it's not a click	
+		var pos    = getMousePosition(ev);
+		dragstop.x = pos.x;
+		dragstop.y = pos.y;
+
+		var dx = Math.abs(dragstop.x - dragstart.x);
+		var dy = Math.abs(dragstop.y - dragstart.y);
+
+		if((dx+dy)<4)
+		{
+			// treat this is a click - we're still inside the link, and we didn't move far
+			alert('click on ' + dragitem);
+		}
+		else
+		{
+			dragitem = '';
+			dragstart = {x: -1, y: -1};
+			dragstop = {x: -1, y: -1};
+			if(addedVia) { $('#newvia').remove(); addedVia=false; }
+		}
+	
+		console.log('mouseup');
+		linkmdown = false;
+		
+	} );
+	
+}
+	
+var linkmdown = false;
+var dragmdown = false;
+var addedVia = false;
+var dragstart = {x: -1, y: -1};
+var dragstop = {x: -1, y: -1};
+var dragitem = '';
+
+$(document).ready( function() {
+
+	reapplyLinkEvents();
+	reapplyDraggableEvents();
+
+	// handle the release, which may not be over the original object anymore
+	$(document).mouseup( function (ev) { 
+		if(linkmdown===true) { 
+			$('#mousedown').css({ backgroundColor: 'white'});
+			$('#mousemove').css({ backgroundColor: 'white'});
+			$('#dragging').css({ backgroundColor: 'white'});
+			// retrieve positioning properties
+				var pos    = getMousePosition(ev);
+				dragstop.x = pos.x;
+				dragstop.y = pos.y;
+				linkmdown=false;
+			//	$('#log').append('That was a drag. ');
+				if(addedVia)
+				{
+					// give the temporary VIA a better name
+					var now = new Date;
+					$('#newvia').attr('id','via_'+now.getTime());
+					addedVia=false;
+					reapplyDraggableEvents();
+					// do something to tell the editor serverside
+				}
+		} 
+	} );
+	
+	$(document).mousemove( function (ev) { 
+		var theItem;
+		
+		if(linkmdown || dragmdown)
+		{
+			$('#dragging').css({ backgroundColor: 'green'});
+			var pos = getMousePosition(ev);
+
+			if(dragmdown) { theItem = $('#'+dragitem);}
+			if(linkmdown) { theItem = $('#newvia');
+				if(!addedVia)
+				{
+					// we just left the reservation, and we're still dragging.
+					// - time to create a little marker
+					$('#mapcontainer').append('<img src="editor-resources/via-marker.gif" id="newvia" class="viamarker draggable">');
+					addedVia = true;
+				}
+			}
+			var w = theItem.width(); 
+			var h = theItem.height(); 
+			theItem.css( { left: pos.x-(w/2), top: pos.y-(h/2)});
+
+		}
+
+	} );
+	  
+});
+
+</script>
+<style type="text/css">
+.viamarker { position: absolute; z-index: 300; }
+</style></head><body>
+
+<span id="mousedown">Mousedown</span>
+<span id="mousemove">Mousemove</span>
+<span id="dragging">Dragging</span>
+<span id="log"></span>
+
+<div id="mapcontainer" class="weathermapimage" style="margin-left: auto; margin-right: auto; width: 800px;" ><img src="weathermap.png" width="800" height="600" border="0" usemap="#weathermap_imap" alt="network weathermap" /><img src="editor-resources/via-marker.gif" class="viamarker draggable" id="link1_via1" style="top: 100px; left: 100px; "/><img src="editcache/4290d1e4_85ef2540.png" class="draggable" id="dummynodea1" style="top: 200px; left: 300px; position: absolute; z-index: 200;"/><img src="scaledummy.png" class="draggable" id="dummynodea2" style="top: 300px; left: 400px; position: absolute; z-index: 200;"/></div><map name="weathermap_imap" id="weathermap_imap"><area alt="NODE:node2"  id="NODE:node2"  shape="rect" coords="480.5,191.5,519.5,208.5" />
+<area alt="NODE:node1"  id="NODE:node1"  shape="rect" coords="180.5,191.5,219.5,208.5" />
+<area alt="LINK:firstlink"  id="LINK:firstlink:4"  shape="rect" coords="266,190.5,284,209.5" />
+<area alt="LINK:firstlink"  id="LINK:firstlink:1"  shape="rect" coords="416,190.5,434,209.5" />
+<area alt="LINK:firstlink"  id="LINK:firstlink:3"  shape="poly" coords="500,193,484,193,463,193,439,193,411,193,381,193,378,193,378,186,350,200,378,214,378,207,381,207,411,207,439,207,463,207,484,207,500,207" />
+<area alt="LINK:firstlink"  id="LINK:firstlink:2"  shape="poly" coords="200,193,236,193,260,193,288,193,322,193,322,186,350,200,322,214,322,207,288,207,260,207,236,207,200,207" />
+</map><hr />Network Map created with <a href="http://www.network-weathermap.com/?vs=0.93">PHP Network Weathermap v0.93</a>
+
+
+</body></html>

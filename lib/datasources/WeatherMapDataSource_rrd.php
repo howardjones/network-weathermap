@@ -61,12 +61,16 @@ class WeatherMapDataSource_rrd extends WeatherMapDataSource {
 	// data_time is intended to allow more informed graphing in the future
 	function ReadData($targetstring, &$map, &$item)
 	{
+		global $config;
+		
 		$in_ds = "traffic_in";
 		$out_ds = "traffic_out";
 		$dsnames[IN] = "traffic_in";
 		$dsnames[OUT] = "traffic_out";
 		$data[IN] = 0;
 		$data[OUT] = 0;
+		$SQL[IN] = 'select null';
+		$SQL[OUT] = 'select null';
 		$rrdfile = $targetstring;
 
 		$multiplier = 8;
@@ -83,7 +87,7 @@ class WeatherMapDataSource_rrd extends WeatherMapDataSource {
 			
 			$dsnames[IN] = $matches[2];
 			$dsnames[OUT] = $matches[3];
-			
+						
 			debug("Special DS names seen (".$dsnames[IN]." and ".$dsnames[OUT].").\n");
 		}
 
@@ -103,15 +107,41 @@ class WeatherMapDataSource_rrd extends WeatherMapDataSource {
                         $rrdfile = $matches[2];
                         $multiplier = $matches[1];
                 }
+		
+		if(isset($config))
+		{
+			$db_rrdname = replace($config["base_path"]."/rra","<path_rra>",$rrdfile);
+			debug("******************************************************************\nChecking weathermap_data\n");
+			foreach (array(IN,OUT) as $dir)
+			{
+				if($dsnames[$dir] != '-')
+				{
+					$SQL = "select * from weathermap_data where rrdfile='".mysql_real_escape_string($db_rrdname)."' and data_source_name='".mysql_real_escape_string($dsnames[$dir])."'";
+					$SQLins = "insert into weathermap_data (rrdfile, data_source_name) values ('".mysql_real_escape_string($db_rrdname)."','".mysql_real_escape_string($dsnames[$dir])."')";
+					
+					$result = db_fetch_row($SQL);
+					if(isset($result))
+					{
+						debug("Data already found.\n");
+					}
+					else
+					{
+						debug("Creating a new data row\n");
+						db_execute($SQLins);
+					}					
+				}				
+			}
+		}
+		
 
 		// we get the last 800 seconds of data - this might be 1 or 2 lines, depending on when in the
 		// cacti polling cycle we get run. This ought to stop the 'some lines are grey' problem that some
 		// people were seeing
 
 
-// NEW PLAN - READ LINES (LIKE NOW), *THEN* CHECK IF REQUIRED DS NAMES EXIST (AND FAIL IF NOT),
-//     *THEN* GET THE LAST LINE WHERE THOSE TWO DS ARE VALID, *THEN* DO ANY PROCESSING.
-//  - this allows for early failure, and also tolerance of empty data in other parts of an rrd (like smokeping uptime)
+		// NEW PLAN - READ LINES (LIKE NOW), *THEN* CHECK IF REQUIRED DS NAMES EXIST (AND FAIL IF NOT),
+		//     *THEN* GET THE LAST LINE WHERE THOSE TWO DS ARE VALID, *THEN* DO ANY PROCESSING.
+		//  - this allows for early failure, and also tolerance of empty data in other parts of an rrd (like smokeping uptime)
 
 		if(file_exists($rrdfile))
 		{

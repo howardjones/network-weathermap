@@ -175,6 +175,14 @@ function weathermap_setup_table () {
 			mapid int(11) NOT NULL default '0'
 		) TYPE=MyISAM;";
 	}
+	
+	if (!in_array('weathermap_data', $tables)) {
+		$sql[] = "CREATE TABLE IF NOT EXISTS weathermap_data (id int(11) NOT NULL auto_increment,
+			rrdfile varchar(255) NOT NULL,data_source_name varchar(19) NOT NULL,
+			  last_time int(11) NOT NULL,last_value varchar(255) NOT NULL,
+			last_calc varchar(255) NOT NULL, PRIMARY KEY  (id), KEY rrdfile (rrdfile),
+			  KEY data_source_name (data_source_name) ) TYPE=MyISAM";
+	}
 
 	// create the settings entries, if necessary
 
@@ -295,7 +303,6 @@ function weathermap_poller_output ($rrd_update_array) {
 	// global $weathermap_debugging;
 
 	cacti_log("*****************************************************************\npoller_output starting\n",true,"WEATHERMAP");
-
 	
 	$requiredlist = db_fetch_assoc("select distinct weathermap_data.*, data_template_data.local_data_id, data_template_rrd.data_source_type_id from weathermap_data, data_template_data, data_template_rrd where weathermap_data.rrdfile=data_template_data.data_source_path and data_template_rrd.local_data_id=data_template_data.local_data_id");
 	

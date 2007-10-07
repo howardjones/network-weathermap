@@ -2,7 +2,6 @@
 ./COPYING
 ./HTML_ImageMap.class.php
 ./README
-./README-0.93
 ./Weathermap.class.php
 ./cacti-pick.php
 ./configs/simple.conf
@@ -33,6 +32,7 @@
 ./index.php
 ./lib/datasources/README.txt
 ./lib/datasources/WeatherMapDataSource_cactihost.php
+./lib/datasources/WeatherMapDataSource_cactithold.php
 ./lib/datasources/WeatherMapDataSource_dbsample.php
 ./lib/datasources/WeatherMapDataSource_external.php
 ./lib/datasources/WeatherMapDataSource_mrtg.php

@@ -2373,13 +2373,39 @@ class WeatherMapLink extends WeatherMapItem
 			? $this->inherit_fieldlist['arrowstyle'] : $this->owner->defaultlink->arrowstyle);
 	
 			if ($this->arrowstyle != $comparison) { $output.="\tARROWSTYLE " . $this->arrowstyle . "\n"; }
-	
-			// TODO - handle IN/OUTBWFORMAT properly
+
+			// if formats have been set, but they're just the longform of the built-in styles, set them back to the built-in styles
+			if($this->labelstyle=='--' && $this->bwlabelformats[IN] == FMT_PERC_IN && $this->bwlabelformats[OUT] == FMT_PERC_OUT)
+			{
+				$this->labelstyle = 'percent';
+			}
+			if($this->labelstyle=='--' && $this->bwlabelformats[IN] == FMT_BITS_IN && $this->bwlabelformats[OUT] == FMT_BITS_OUT)
+			{
+				$this->labelstyle = 'bits';
+			}
+			if($this->labelstyle=='--' && $this->bwlabelformats[IN] == FMT_UNFORM_IN && $this->bwlabelformats[OUT] == FMT_UNFORM_OUT)
+			{
+				$this->labelstyle = 'unformatted';
+			}
+
+			// if specific formats have been set, then the style will be '--'
+			// if it isn't then use the named style
 			$comparison=($this->name == 'DEFAULT'
 			? ($this->inherit_fieldlist['labelstyle']) : ($this->owner->defaultlink->labelstyle));
-			
-			if ($this->labelstyle != $comparison) { $output.="\tBWLABEL " . $this->labelstyle . "\n"; }
+			if ( ($this->labelstyle != $comparison) && ($this->labelstyle != '--') ) { $output.="\tBWLABEL " . $this->labelstyle . "\n"; }
 						
+			// if either IN or OUT field changes, then both must be written because a regular BWLABEL can't do it
+			$comparison = ($this->name == 'DEFAULT'
+			? ($this->inherit_fieldlist['bwlabelformats'][IN]) : ($this->owner->defaultlink->bwlabelformats[IN]));
+			$comparison2 = ($this->name == 'DEFAULT'
+			? ($this->inherit_fieldlist['bwlabelformats'][OUT]) : ($this->owner->defaultlink->bwlabelformats[OUT]));
+						
+			if ( ( $this->labelstyle == '--') && ( ($this->bwlabelformats[IN] != $comparison) || ($this->bwlabelformats[OUT]!= '--')) )
+			{
+				$output.="\tINBWFORMAT " . $this->bwlabelformats[IN]. "\n";
+				$output.="\tOUTBWFORMAT " . $this->bwlabelformats[OUT]. "\n";
+			}
+
 	
 			$comparison=($this->name == 'DEFAULT'
 			? ($this->inherit_fieldlist['labelboxstyle']) : ($this->owner->defaultlink->labelboxstyle));
@@ -4056,14 +4082,14 @@ function ReadConfig($filename)
 				if ( ($last_seen == 'LINK') && (preg_match("/^\s*INBWFORMAT\s+(.*)\s*$/i", $buffer, $matches)))
 				{
 					$curlink->bwlabelformats[IN] = $matches[1];
-					$curlink->bwstyle='--'; // mark that at least one direction is special
+					$curlink->labelstyle='--'; // mark that at least one direction is special
 					$linematched++;
 				}
 				
 				if ( ($last_seen == 'LINK') && (preg_match("/^\s*OUTBWFORMAT\s+(.*)\s*$/i", $buffer, $matches)))
 				{
 					$curlink->bwlabelformats[OUT] = $matches[1];
-					$curlink->bwstyle='--'; // mark that at least one direction is special
+					$curlink->labelstyle='--'; // mark that at least one direction is special
 					$linematched++;
 				}
 

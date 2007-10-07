@@ -11,7 +11,7 @@
 include_once 'editor-config.php';
 require_once 'Weathermap.class.php';
 
-$mapfile = "random-bits\\suite-2.conf";
+$mapfile = "configs\\094-test.conf";
 
 $map = new WeatherMap;
 

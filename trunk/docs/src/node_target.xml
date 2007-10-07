@@ -22,8 +22,6 @@ which is then displayed. Specify the targets on one TARGET line, seperated with 
 	<examples>
 	    <example><caption>Using multiple data sources for one link</caption><content>TARGET link1a.rrd  link1b.rrd</content></example>
   	    <example><caption>Taking the input from one file, and output from another</caption><content>TARGET poot.rrd:-:DS1 poot2.rrd:DS0:-</content></example>
-	    <example><caption>A suitable tab-delimited data file</caption><content>link1    3M    4M
-link2    66K   1.8M
-link3    34.6K 113</content></example>
+
     </examples>
 </configentry>

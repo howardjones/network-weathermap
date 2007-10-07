@@ -1,29 +1,28 @@
 Before 0.94
 -----------------
-Boost support
+Boost/poller_output support
 (Editor NG)
 Extra DS for WUG, Nagios
 USESCALE can use any variable - USESCALE scalename {node:this:cactihost_latency}
-INBWFORMAT/OUTBWFORMAT
+DONE!   INBWFORMAT/OUTBWFORMAT
+Unidirectional links
+(php-rrdtool support?)
+DONE!   THold DS
+Finish Artificial Icons
+Editor shows absolute coordinates for relative-positioned nodes...
+Colours do wierd things with artificial icons - needs extra colour defs. How to make fit with USESCALE?
+Angled VIAs
+RRD CF selection (0.92 patch from Ghozlane Toumi - needs rewrite now)
 
 -----------------
-
 
 Before 0.93
 -----------------
 
-Editor testing, layout cleanup.
-Artificial Icons
-Verify rrdtool DS is OK
-(php-rrdtool support?)
-THold DS
-
-Editor shows absolute coordinates for relative-positioned nodes...
-Colours do wierd things with artificial icons - needs extra colour defs. How to make fit with USESCALE?
+DONE Editor testing, layout cleanup.
+DONE Verify rrdtool DS is OK
 
 -----------------
-
-
 
 Background image links: http://art.gnome.org/backgrounds/abstract/
 Background image generator: http://splintax.blogspot.com/2006/01/starfish-automatically-generated.html

@@ -1,3 +1,7 @@
+0.94    ADDED - INBWFORMAT and OUTBWFORMAT allow you to format the text for BWLABEL, same as for COMMENTs
+        ADDED - New cactithold/cactimonitor data source plugin reads data from Cacti's Threshold plugin.
+                (Original development for this plugin was paid for by Stellar Consulting - Thanks!)
+                
 0.93    Added - weathermap-cacti-plugin.php?action=viewmap&id=mapfilename  works as well as a map number - useful for crosslinks
         FIXED - the key_hidezero secret setting hides the zero in a gradient in a classic scale too.
         CHANGE - the auth realm names for Cacti have been changed to match ReportIt and Aggregate - easier to tell who does what

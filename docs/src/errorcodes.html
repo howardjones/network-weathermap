@@ -47,7 +47,7 @@ a { color: black; text-decoration: underline; font-weight: normal;}
   	</dd>
 
 	<dt><a name="WMWARN03">[WMWARN03]</a></a></dt>
-	<dd><p>"Using a non-existent special font (<em>$fontnumber</em>) - falling back to internal GD fonts "</p>
+	<dd><p>"Using a non-existent special font (<em>fontnumber</em>) - falling back to internal GD fonts "</p>
     <p>If you use a font number that doesn't exist by default(e.g. larger than 5), and you haven't got a valid FONTDEFINE line, then you will get this error. Weathermap will use font 5 instead of the font you asked for.</p>
     <p>Most common reason for this error is that the font file could not be found, or could not be loaded. Check the log for another error (WMWARN30 or WMWARN31).</p>
 	</dd>

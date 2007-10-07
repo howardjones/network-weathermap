@@ -2406,7 +2406,6 @@ class WeatherMapLink extends WeatherMapItem
 				$output.="\tOUTBWFORMAT " . $this->bwlabelformats[OUT]. "\n";
 			}
 
-	
 			$comparison=($this->name == 'DEFAULT'
 			? ($this->inherit_fieldlist['labelboxstyle']) : ($this->owner->defaultlink->labelboxstyle));
 			if ($this->labelboxstyle != $comparison) { $output.="\tBWSTYLE " . $this->labelboxstyle . "\n"; }

@@ -82,7 +82,7 @@ a { color: black; text-decoration: underline; font-weight: normal;}
 <h3><a name="cactihost"></a>Cacti host status</h3>
 <div class="definition">TARGET cactihost:<em>hostid</em></div>
 
-<p>This plugin reads the current status of a host from your Cacti database. The hostid is visible in Cacti URLs when you click on links in the Devices page. The return values for this plugin are numeric codes. It also sets a Hint Variable called 'state' to a string, that can be nicer to use in an ICON filename, for example</p>
+<p>This plugin reads the current status of a host from your Cacti database. The hostid is visible in Cacti URLs when you click on links in the Devices page. The return values for this plugin are numeric codes. It also sets a Hint Variable called <em>state</em> to a string, that can be nicer to use in an ICON filename, for example - possible values are 'up','down','disabled', and 'recovering'.</p>
 <table>
 <thead><tr><th>Code</th><th><tt>state</tt> value</th></tr></thead>
 <tbody>
@@ -93,11 +93,51 @@ a { color: black; text-decoration: underline; font-weight: normal;}
 </tbody>
 </table>
 
+<p>It also sets the following additional Hint Variables, to use in a LABEL, COMMENT or NOTES section as you see fit: </p>
+
 <p>An appropriate SCALE definition to get red, green, yellow and grey labels based on the state of a host would be:
 <pre>SCALE cactiupdown 0 0.5  192 192 192 
 SCALE cactiupdown 0.5 1.5 255 0 0 
 SCALE cactiupdown 1.5 2.5 0 0 255 
 SCALE cactiupdown 2.5 3.5 0 255 0 </pre>
+</p>
+
+<h3><a name="cactithold"></a>Cacti threshold status</h3>
+<div class="definition">TARGET cactimonitor:<em>hostid</em></div>
+<div class="definition">TARGET cactithold:<em>tholdid</em></div>
+<div class="definition">TARGET cactithold:<em>rra_id</em>:<em>data_id</em></div>
+<p>When used with cactimonitor: prefix, this plugin takes data from both Cacti's host table and from the THold plugin's data to produce a composite state, similar to the one used by the Monitor plugin.</p>
+<p>It sets all the same Hint Variables as cactihost: plus a couple more: <em>thold_failcount</em> is the number of thresholds failing on this host,
+and <em>thold_failpercent</em> is the percentage of thresholds set on this host that are failing. Bear in mind that if you have both a minimum and
+maximum set on the same variable, then you will <em>never</em> get 100% failure.</p>
+<p>It also has a new value possible for the <em>state</em> Hint Variable - 'tholdbreached'.</p>
+<p>In the second and third forms, with the cactithold: prefix, the plugin simply returns either a 0 or 1 for the 'input bandwidth' value. 0 if the threshold has not been breached,
+1 if it has. You can supply either the internal THold id number for a threshold (not easily visible), the the rra_id and data_id values which can be seen at the end of URLs within
+THolds web pages.</p>
+
+<p>You can provide a similar output to the Monitor plugin by using the cactimonitor: TARGET and multiple icons. Create a set of coloured (or otherwise different) icons for youe node - they should have 'up','down','disabled','recovering' and 'tholdbreached' in the names. Then: <pre>
+
+NODE myserver
+      LABEL Server 1
+      POSITION 100 100
+      TARGET cactimonitor:77
+      ICON images/server_{node:this:state}.png
+      LABELOFFSET S
+      USESCALE none
+</pre>
+Will allow you to change the icon between images/server_up.png, images/server_down.png etc.. as the state in Cacti changes, and thresholds are breached. The 'USESCALE none' on the end
+stops the label for the node from changing colour as well.</p>
+
+<p>You can make use of the TARGET aggregation features of weathermap to make a value that is effectively a 'percentage badness' for a set of thresholds. Suppose you have a set of load-balanced firewalls,
+and you want to see how many of the set have exceeded their session count. You would set up thresholds on each firewall as normal, and then:
+<pre>
+      SCALE badness 0 100  0 255 0   255 0 0
+      NODE firewall_status
+            TARGET cactithold:334:22 cactithold:34:255 cactithold:337:235 cactithold:33:254
+            MAXVALUE 4
+            USESCALE badness in
+</pre>
+defines a scale where 0 is green and 100% is red and in between is a smooth gradient. Each target will return either 0 or 1, so 100% failed thresholds gives a value of 4. Setting the MAXVALUE to 4 makes that 100% within weathermap.
 </p>
 
 <h3><a name="snmp"></a>SNMP value</h3>

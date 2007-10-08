@@ -3,6 +3,7 @@ global $config;
 global $weathermap_debugging, $WEATHERMAP_VERSION;
 
 $cacti_base = "C:/Program Files/xampp/htdocs/cacti/";
+$cacti_base = "/usr/local/share/cacti/";
 
 include_once($cacti_base."/include/config.php");
 

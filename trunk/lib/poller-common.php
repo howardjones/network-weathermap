@@ -19,6 +19,8 @@ function weathermap_run_maps($mydir) {
 	include_once($mydir.DIRECTORY_SEPARATOR."HTML_ImageMap.class.php");
 	include_once($mydir.DIRECTORY_SEPARATOR."Weathermap.class.php");
 
+	$start_time = time();
+
 	$outdir = $mydir.DIRECTORY_SEPARATOR.'output';
 	$confdir = $mydir.DIRECTORY_SEPARATOR.'configs';
 
@@ -143,7 +145,8 @@ function weathermap_run_maps($mydir) {
 		}
 		weathermap_memory_check("MEM Final");
 		chdir($orig_cwd);
-		if($quietlogging==0) warn("Weathermap $WEATHERMAP_VERSION run complete - $mapcount maps were run");
+		$duration = time() - $start_time;
+		if($quietlogging==0) warn("Weathermap $WEATHERMAP_VERSION run complete - $mapcount maps were run in $duration seconds");
 	}
 	else
 	{

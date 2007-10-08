@@ -110,17 +110,17 @@ class WeatherMapDataSource_rrd extends WeatherMapDataSource {
 		
 		if(isset($config))
 		{
-			$db_rrdname = replace($config["base_path"]."/rra","<path_rra>",$rrdfile);
+			$db_rrdname = str_replace($config["base_path"]."/rra","<path_rra>",$rrdfile);
 			debug("******************************************************************\nChecking weathermap_data\n");
 			foreach (array(IN,OUT) as $dir)
 			{
 				if($dsnames[$dir] != '-')
 				{
 					$SQL = "select * from weathermap_data where rrdfile='".mysql_real_escape_string($db_rrdname)."' and data_source_name='".mysql_real_escape_string($dsnames[$dir])."'";
-					$SQLins = "insert into weathermap_data (rrdfile, data_source_name) values ('".mysql_real_escape_string($db_rrdname)."','".mysql_real_escape_string($dsnames[$dir])."')";
+					$SQLins = "insert into weathermap_data (rrdfile, data_source_name,sequence) values ('".mysql_real_escape_string($db_rrdname)."','".mysql_real_escape_string($dsnames[$dir])."', 0)";
 					
 					$result = db_fetch_row($SQL);
-					if(isset($result))
+					if(isset($result['id']))
 					{
 						debug("Data already found.\n");
 					}

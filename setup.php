@@ -180,7 +180,7 @@ function weathermap_setup_table () {
 		$sql[] = "CREATE TABLE IF NOT EXISTS weathermap_data (id int(11) NOT NULL auto_increment,
 			rrdfile varchar(255) NOT NULL,data_source_name varchar(19) NOT NULL,
 			  last_time int(11) NOT NULL,last_value varchar(255) NOT NULL,
-			last_calc varchar(255) NOT NULL, PRIMARY KEY  (id), KEY rrdfile (rrdfile),
+			last_calc varchar(255) NOT NULL, sequence int(11) NOT NULL, PRIMARY KEY  (id), KEY rrdfile (rrdfile),
 			  KEY data_source_name (data_source_name) ) TYPE=MyISAM";
 	}
 
@@ -302,6 +302,9 @@ function weathermap_poller_output ($rrd_update_array) {
 	global $config;
 	// global $weathermap_debugging;
 
+	// partially borrowed from Jimmy Conner's THold plugin.
+	// (although I do things slightly differently - I go from filenames, and don't use the poller_interval)
+
 	cacti_log("*****************************************************************\npoller_output starting\n",true,"WEATHERMAP");
 	
 	$requiredlist = db_fetch_assoc("select distinct weathermap_data.*, data_template_data.local_data_id, data_template_rrd.data_source_type_id from weathermap_data, data_template_data, data_template_rrd where weathermap_data.rrdfile=data_template_data.data_source_path and data_template_rrd.local_data_id=data_template_data.local_data_id");
@@ -339,12 +342,10 @@ function weathermap_poller_output ($rrd_update_array) {
 						}
 					}
 					$newvalue = $newvalue / $period;
-					db_execute("UPDATE weathermap_data SET last_time=$time, last_calc='$newvalue', last_value='$value' where id = " . $required['id']);
 					break;
 				
 				case 3: //DERIVE
 					$newvalue = ($value-$lastval) / $period;
-					db_execute("UPDATE weathermap_data SET last_time=$time, last_calc='$newvalue', last_value='$value' where id = " . $required['id']);
 					break;
 				
 				case 4: //ABSOLUTE
@@ -355,6 +356,7 @@ function weathermap_poller_output ($rrd_update_array) {
 					$newvalue = $value;
 					break;
 			}
+			db_execute("UPDATE weathermap_data SET last_time=$time, last_calc='$newvalue', last_value='$value',sequence=sequence+1  where id = " . $required['id']);
 			cacti_log("Final value is $newvalue (was $lastval, period was $period)\n",true,"WEATHERMAP");
 		}
 	}

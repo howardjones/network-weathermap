@@ -129,6 +129,7 @@ class WeatherMapDataSource_cactithold extends WeatherMapDataSource {
 			
 			if($type=='monitor')
 			{
+				debug("CactiTHold ReadData: Getting cacti basic state for host $id\n");
 				$SQL = "select * from host where id=$id";
 				
 				// 0=disabled
@@ -162,6 +163,7 @@ class WeatherMapDataSource_cactithold extends WeatherMapDataSource {
 					$item->add_note("cacti_faildate",$result['status_fail_date']);
 					$item->add_note("cacti_recdate",$result['status_rec_date']);
 				}
+				debug("CactiTHold ReadData: Basic state for host $id is $state/$statename\n");
 				
 				$numthresh = 0;
 				$numfailing = 0;
@@ -195,7 +197,7 @@ class WeatherMapDataSource_cactithold extends WeatherMapDataSource {
 					$item->add_note("thold_failpercent",($numfailing/$numthresh)*100);
 					$inbw = $state;
 					$outbw = $numfailing;
-					debug("CactiTHold ReadData: State is 4\n");
+					debug("CactiTHold ReadData: State is $state/$statename\n");
 				}
 				elseif( $numthresh>0 )
 				{

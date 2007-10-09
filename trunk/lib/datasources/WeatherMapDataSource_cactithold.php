@@ -165,19 +165,26 @@ class WeatherMapDataSource_cactithold extends WeatherMapDataSource {
 				}
 				debug("CactiTHold ReadData: Basic state for host $id is $state/$statename\n");
 				
+				debug("CactiTHold ReadData: Checking threshold states for host $id\n");
 				$numthresh = 0;
 				$numfailing = 0;
-				$SQL2 = "select thold_alert from thold_data where host_id=$id and thold_enabled='on'";
+				$SQL2 = "select rra_id, data_id, thold_alert from thold_data where host_id=$id and thold_enabled='on'";
 				# $result = db_fetch_row($SQL2);
 				$queryrows = db_fetch_assoc($SQL2);
 				if( is_array($queryrows) )
 				{
 					foreach ($queryrows as $th) {					
+						$desc = $th['rra_id']."/".$th['data_id'];
+						$v = $th['thold_alert'];
 						$numthresh++;
-						if($th['thold_alert'] > 0) 
+						if(intval($th['thold_alert']) > 0) 
 						{
-							debug("CactiTHold ReadData: Seen threshold failing for host $id\n");
+							debug("CactiTHold ReadData: Seen threshold $desc failing ($v)for host $id\n");
 							$numfailing++;
+						}
+						else
+						{
+							debug("CactiTHold ReadData: Seen threshold $desc OK ($v) for host $id\n");
 						}
 					}
 				}

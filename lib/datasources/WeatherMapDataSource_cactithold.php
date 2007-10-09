@@ -172,11 +172,19 @@ class WeatherMapDataSource_cactithold extends WeatherMapDataSource {
 				{
 					foreach ($queryrows as $th) {					
 						$numthresh++;
-						if($th['thold_alert'] > 0) $numfailing++;
+						if($th['thold_alert'] > 0) 
+						{
+							debug("CactiTHold ReadData: Seen threshold failing for host $id\n");
+							$numfailing++;
+						}
 					}
 				}
+				else
+				{
+					debug("CactiTHold ReadData: Failed to get thold info for host $id\n");
+				}
 				
-			//	debug("Checked $numthresh and found $numfailing failing\n");
+				debug("CactiTHold ReadData: Checked $numthresh and found $numfailing failing\n");
 				
 				if( ($numfailing > 0) && ($numthresh > 0) && ($state==3) )
 				{
@@ -187,11 +195,13 @@ class WeatherMapDataSource_cactithold extends WeatherMapDataSource {
 					$item->add_note("thold_failpercent",($numfailing/$numthresh)*100);
 					$inbw = $state;
 					$outbw = $numfailing;
+					debug("CactiTHold ReadData: State is 4\n");
 				}
 				elseif( $numthresh>0 )
 				{
 					$item->add_note("thold_failcount",0);
 					$item->add_note("thold_failpercent",0);
+					debug("CactiTHold ReadData: Leaving state as $state\n");
 				}
 			}		
 		}

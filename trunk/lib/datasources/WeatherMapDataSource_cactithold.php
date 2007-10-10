@@ -168,7 +168,7 @@ class WeatherMapDataSource_cactithold extends WeatherMapDataSource {
 				debug("CactiTHold ReadData: Checking threshold states for host $id\n");
 				$numthresh = 0;
 				$numfailing = 0;
-				$SQL2 = "select rra_id, data_id, thold_alert from thold_data where host_id=$id and thold_enabled='on'";
+				$SQL2 = "select rra_id, data_id, thold_alert from thold_data,data_local where thold_data.rra_id=data_local.id and data_local.host_id=$id and thold_enabled='on'";
 				# $result = db_fetch_row($SQL2);
 				$queryrows = db_fetch_assoc($SQL2);
 				if( is_array($queryrows) )

@@ -1774,6 +1774,9 @@ class WeatherMapNode extends WeatherMapItem
 		$js.="Nodes[" . js_escape($this->name) . "] = {";
 		$js.="x:" . $this->x . ", ";
 		$js.="y:" . $this->y . ", ";
+		$js.="ox:" . $this->original_x . ", ";
+		$js.="oy:" . $this->original_y . ", ";
+		$js.="relative_to:" . js_escape($this->relative_to) . ", ";
 		$js.="label:" . js_escape($this->label) . ", ";
 		$js.="name:" . js_escape($this->name) . ", ";
 		$js.="infourl:" . js_escape($this->infourl) . ", ";
@@ -1794,6 +1797,9 @@ class WeatherMapNode extends WeatherMapItem
 		$js .= "y:" . ($this->y - $this->centre_y) . ", ";
 		$js .= "cx:" . $this->centre_x. ", ";
 		$js .= "cy:" . $this->centre_y . ", ";
+		$js .= "ox:" . $this->original_x . ", ";
+		$js .= "oy:" . $this->original_y . ", ";
+		$js .= "relative_to:" . js_escape($this->relative_to) . ", ";
 		$js .= "name:" . js_escape($this->name) . ", ";
 		if($complete)
 		{

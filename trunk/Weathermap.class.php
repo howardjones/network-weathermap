@@ -470,12 +470,11 @@ function calc_arrowsize($width,&$map,$linkname)
 //    outlinecolour is a GD colour reference
 //    fillcolours is an array of two more colour references, one for the out, and one for the in spans
 function draw_curve($image, &$curvepoints, $width, $outlinecolour, $comment_colour, $fillcolours, $linkname, &$map,
-	$q2_percent=50)
+	$q2_percent=50, $unidirectional=FALSE)
 {
 	// now we have a 'spine' - all the central points for this curve.
 	// time to flesh it out to the right width, and figure out where to draw arrows and bandwidth boxes...
-	$unidirectional = FALSE;
-	
+		
 	// get the full length of the curve from the last point
 	$totaldistance = $curvepoints[count($curvepoints)-1][2];
 	// find where the in and out arrows will join (normally halfway point)
@@ -1958,7 +1957,7 @@ class WeatherMapLink extends WeatherMapItem
 	var $owner,                $name;
 	var $maphtml;
 	var $a,                    $b; // the ends - references to nodes
-	var $width,                $arrowstyle;
+	var $width,                $arrowstyle, $linkstyle;
 	var $bwfont,               $labelstyle, $labelboxstyle;
 	var $overliburl,           $infourl;
 	var $notes;
@@ -2012,6 +2011,7 @@ class WeatherMapLink extends WeatherMapItem
 			'overliburl' => '',
 			'labelstyle' => 'percent',
 			'labelboxstyle' => 'classic',
+			'linkstyle' => 'twoway',
 			'overlibwidth' => 0,
 			'overlibheight' => 0,
 			'outlinecolour' => array(0, 0, 0),
@@ -2245,13 +2245,13 @@ class WeatherMapLink extends WeatherMapItem
 			$link_out_width = (($link_out_width * $this->outpercent * 1.5 + 0.1) / 100) + 1;
 		}
 
-		
 		// Calculate the spine points - the actual curve	
 		$this->curvepoints = calc_curve($xpoints, $ypoints);
-				
+			
+		// then draw the curve itself
 		draw_curve($im, $this->curvepoints,
 			$link_width, $outline_colour, $comment_colour, array($link_in_colour, $link_out_colour),
-			$this->name, $map);
+			$this->name, $map, 50, ($this->linkstyle=='oneway'?TRUE:FALSE) );
 
 		$this->DrawComments($im,$comment_colour,$link_width*1.1);
 
@@ -2296,8 +2296,18 @@ class WeatherMapLink extends WeatherMapItem
 				$outbound[5]=$this->max_bandwidth_out;
 				$inbound[5]=$this->max_bandwidth_in;
 			}
+			
+			
+			if($this->linkstyle=='oneway')
+			{
+				$tasks = array($outbound);
+			}
+			else
+			{
+				$tasks = array($inbound,$outbound);
+			}
 
-			foreach (array($inbound, $outbound)as $task)
+			foreach ($tasks as $task)
 			{
 				$thelabel="";
 				
@@ -2371,8 +2381,11 @@ class WeatherMapLink extends WeatherMapItem
 	
 			$comparison=($this->name == 'DEFAULT'
 			? $this->inherit_fieldlist['arrowstyle'] : $this->owner->defaultlink->arrowstyle);
-	
 			if ($this->arrowstyle != $comparison) { $output.="\tARROWSTYLE " . $this->arrowstyle . "\n"; }
+			
+			$comparison=($this->name == 'DEFAULT'
+			? $this->inherit_fieldlist['linkstyle'] : $this->owner->defaultlink->linkstyle);
+			if ($this->linkstyle != $comparison) { $output.="\tLINKSTYLE " . $this->linkstyle . "\n"; }
 
 			// if formats have been set, but they're just the longform of the built-in styles, set them back to the built-in styles
 			if($this->labelstyle=='--' && $this->bwlabelformats[IN] == FMT_PERC_IN && $this->bwlabelformats[OUT] == FMT_PERC_OUT)
@@ -4058,6 +4071,14 @@ function ReadConfig($filename)
 					$curlink->labelstyle=$style;
 					$curlink->bwlabelformats[IN] = $format_in;
 					$curlink->bwlabelformats[OUT] = $format_out;
+					$linematched++;
+				}
+
+				if ($last_seen == 'LINK' && preg_match(
+					"/^\s*LINKSTYLE\s+(twoway|oneway)\s*$/i", $buffer,
+					$matches))
+				{
+					$curlink->linkstyle=$matches[1];
 					$linematched++;
 				}
 

@@ -55,6 +55,109 @@ class WeatherMapDataSource_rrd extends WeatherMapDataSource {
 		}
 	}
 
+	function wmrrd_read_from_poller_output($rrdfile,$cf,$start,$end,$dsnames,&$data)
+	{
+		
+	}
+	
+	function wmrrd_read_from_php_rrd($rrdfile,$cf,$start,$end,$dsnames,&$data)
+	{
+		
+	}
+
+	function wmrrd_read_from_realrrdtool($rrdfile,$cf,$start,$end,$dsnames,&$data)
+	{
+		# $command = '"'.$map->rrdtool . '" fetch "'.$rrdfile.'" AVERAGE --start '.$start.' --end '.$end;
+		$command=$map->rrdtool . " fetch $rrdfile $cf --start $start --end $end";
+
+		debug ("RRD ReadData: Running: $command\n");
+		$pipe=popen($command, "r");
+		
+		$lines=array ();
+		$count = 0;
+		$linecount = 0;
+
+		if (isset($pipe))
+		{
+			$headings=fgets($pipe, 4096);
+			// this replace fudges 1.2.x output to look like 1.0.x
+			// then we can treat them both the same.
+			$heads=preg_split("/\s+/", preg_replace("/^\s+/","timestamp ",$headings) );
+		
+			fgets($pipe, 4096); // skip the blank line
+			$buffer='';
+
+			while (!feof($pipe))
+			{
+				$line=fgets($pipe, 4096);
+				debug ("> " . $line);
+				$buffer.=$line;
+				$lines[]=$line;
+				$linecount++;
+			}				
+			pclose ($pipe);
+			
+			debug("RRD ReadData: Read $linecount lines from rrdtool\n");
+			debug("RRD ReadData: Headings are: $headings\n");
+
+			if( (in_array($dsnames[IN],$heads) || $dsnames[IN] == '-') && (in_array($dsnames[OUT],$heads) || $dsnames[OUT] == '-') )
+			{
+			    // deal with the data, starting with the last line of output
+			     $rlines=array_reverse($lines);
+     
+			     foreach ($rlines as $line)
+			     {
+				 debug ("--" . $line . "\n");
+				 $cols=preg_split("/\s+/", $line);
+				 for ($i=0, $cnt=count($cols)-1; $i < $cnt; $i++) { 
+					$h = $heads[$i];
+					$v = $cols[$i];
+					# print "|$h|,|$v|\n";
+					$values[$h] = trim($v); 
+				}
+ 
+				$data_ok=FALSE;
+ 
+				foreach (array(IN,OUT) as $dir)
+				{
+					$n = $dsnames[$dir];
+					# print "|$n|\n";
+					if(array_key_exists($n,$values))
+					{
+						$candidate = $values[$n];
+						if(preg_match('/^\d+\.?\d*e?[+-]?\d*:?$/i', $candidate))
+						{
+							$data[$dir] = $candidate * $multiplier;
+							debug("$candidate is OK value for $n\n");
+							$data_ok = TRUE;
+						}
+					}
+				}
+				
+				if($data_ok)
+				{
+					// at least one of the named DS had good data
+					$data_time = intval($values['timestamp']);	
+					// break out of the loop here   
+					break;
+				}
+			     }
+			}
+			else
+			{
+			    // report DS name error
+			    $names = join(",",$heads);
+			    $names = str_replace("timestamp,","",$names);
+			    warn("RRD ReadData: At least one of your DS names ($in_ds & $out_ds) were not found, even though there was a valid data line. Maybe they are wrong? Valid DS names in this file are: $names [WMRRD06]\n");
+			}
+   
+		}
+		else
+		{
+			warn("RRD ReadData: failed to open pipe to RRDTool: ".$php_errormsg." [WMRRD04]\n");
+		}
+	}
+
 	// Actually read data from a data source, and return it
 	// returns a 3-part array (invalue, outvalue and datavalid time_t)
 	// invalue and outvalue should be -1,-1 if there is no valid data
@@ -183,98 +286,9 @@ class WeatherMapDataSource_rrd extends WeatherMapDataSource {
 			}
 			else
 			{
-
-				# $command = '"'.$map->rrdtool . '" fetch "'.$rrdfile.'" AVERAGE --start '.$start.' --end '.$end;
-				$command=$map->rrdtool . " fetch $rrdfile AVERAGE --start $start --end $end";
-
-				debug ("RRD ReadData: Running: $command\n");
-				$pipe=popen($command, "r");
-				
-				$lines=array ();
-				$count = 0;
-				$linecount = 0;
-
-				if (isset($pipe))
-				{
-					$headings=fgets($pipe, 4096);
-					// this replace fudges 1.2.x output to look like 1.0.x
-					// then we can treat them both the same.
-					$heads=preg_split("/\s+/", preg_replace("/^\s+/","timestamp ",$headings) );
-				
-					fgets($pipe, 4096); // skip the blank line
-					$buffer='';
-
-					while (!feof($pipe))
-					{
-						$line=fgets($pipe, 4096);
-						debug ("> " . $line);
-						$buffer.=$line;
-						$lines[]=$line;
-						$linecount++;
-					}				
-					pclose ($pipe);
-					
-					debug("RRD ReadData: Read $linecount lines from rrdtool\n");
-					debug("RRD ReadData: Headings are: $headings\n");
-
-					if( (in_array($in_ds,$heads) || $in_ds == '-') && (in_array($out_ds,$heads) || $out_ds == '-') )
-					{
-					    // deal with the data, starting with the last line of output
-					     $rlines=array_reverse($lines);
-		     
-					     foreach ($rlines as $line)
-					     {
-						 debug ("--" . $line . "\n");
-						 $cols=preg_split("/\s+/", $line);
-						 for ($i=0, $cnt=count($cols)-1; $i < $cnt; $i++) { 
-							$h = $heads[$i];
-							$v = $cols[$i];
-							# print "|$h|,|$v|\n";
-							$values[$h] = trim($v); 
-						}
-		 
-						$data_ok=FALSE;
-		 
-						foreach (array(IN,OUT) as $dir)
-						{
-							$n = $dsnames[$dir];
-							# print "|$n|\n";
-							if(array_key_exists($n,$values))
-							{
-								$candidate = $values[$n];
-								if(preg_match('/^\d+\.?\d*e?[+-]?\d*:?$/i', $candidate))
-								{
-									$data[$dir] = $candidate * $multiplier;
-									debug("$candidate is OK value for $n\n");
-									$data_ok = TRUE;
-								}
-							}
-						}
-						
-						if($data_ok)
-						{
-							// at least one of the named DS had good data
-							$data_time = intval($values['timestamp']);	
-							// break out of the loop here   
-							break;
-						}
-					     }
-					}
-					else
-					{
-					    // report DS name error
-					    $names = join(",",$heads);
-					    $names = str_replace("timestamp,","",$names);
-					    warn("RRD ReadData: At least one of your DS names ($in_ds & $out_ds) were not found, even though there was a valid data line. Maybe they are wrong? Valid DS names in this file are: $names [WMRRD06]\n");
-					}
-		   
-				}
-				else
-				{
-					warn("RRD ReadData: failed to open pipe to RRDTool: ".$php_errormsg." [WMRRD04]\n");
-				}
+				// do this the old-fashioned way
+				wmrrd_read_from_real_rrdtool($rrdfile,"AVERAGE",$start,$end, $dsnames, $data);				
 			}
-		
 		}
 		else
 		{

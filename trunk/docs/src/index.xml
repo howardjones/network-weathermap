@@ -32,7 +32,9 @@
 	    	  <xi:include href="link_width.xml"/>
 	    	  <xi:include href="link_bandwidth.xml"/>
                 <xi:include href="link_bwlabel.xml"/>
-                <xi:include href="link_bwstyle.xml"/>
+		<xi:include href="link_inbwformat.xml"/>
+		<xi:include href="link_outbwformat.xml"/>
+                <xi:include href="link_bwstyle.xml"/>		
                 <xi:include href="link_bwlabelpos.xml"/>
                 <xi:include href="link_bwfont.xml"/>
                 <xi:include href="link_incomment.xml"/>
@@ -47,6 +49,7 @@
 	    	  <xi:include href="link_overlibcaption.xml"/>
                   <xi:include href="link_notes.xml"/>
   	    	  <xi:include href="link_via.xml"/>
+		  <xi:include href="link_linkstyle.xml"/>
 	    	  <xi:include href="link_arrowstyle.xml"/>
                 <xi:include href="link_set.xml"/>
     </section>

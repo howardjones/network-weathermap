@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configentry>
+	<keyword>INBWFORMAT</keyword>
+	<scope>LINK</scope>
+	<anchor>LINK_INBWFORMAT</anchor>
+    <definition>INBWFORMAT <meta>string</meta></definition>
+    <description  xmlns="http://www.w3.org/1999/xhtml">
+    
+    <p>Specifies a custom string to use for the inbound data BWLABEL bandwidth labels.</p>
+    <p>This command is intended as an advanced alternative to the BWLABEL command, for situations where
+    you want more control over the content of the labels.</p>
+    <p>Instead of using bits, percent, etc, you can use any string in the label. Most importantly, 
+    the text for the label can contain <a href="advanced.html#tokens">special tokens</a> to show map data.
+    In most normal situations you <em>need</em> to use the tokens, or the label won't do much useful</p>
+    <p>There is also a matching OUTBWFORMAT command to do the ame job for the outbound bandwidth label.</p>
+    
+    <examples>
+	<example><caption>Providing more information in the bwlabel</caption>
+	<content>INBWFORMAT {node:this:inpercent}% of {node:this:max_bandwidth_in:%k}b/sec</content>
+	</example>
+    </examples>
+
+    </description>
+    <changes>
+    <change version="0.94">Added INBWFORMAT.</change>
+    </changes>
+</configentry>

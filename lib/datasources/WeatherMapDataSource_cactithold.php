@@ -139,6 +139,7 @@ class WeatherMapDataSource_cactithold extends WeatherMapDataSource {
 				// 4=tholdbreached
 	
 				$state = -1;
+				$statename = '';
 				$result = db_fetch_row($SQL);
 				if(isset($result))
 				{

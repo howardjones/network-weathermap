@@ -41,6 +41,8 @@
         <a href="#LINK_WIDTH">WIDTH</a>
         <a href="#LINK_BANDWIDTH">BANDWIDTH</a>
         <a href="#LINK_BWLABEL">BWLABEL</a>
+        <a href="#LINK_INBWFORMAT">INBWFORMAT</a>
+        <a href="#LINK_OUTBWFORMAT">OUTBWFORMAT</a>
         <a href="#LINK_BWSTYLE">BWSTYLE</a>
         <a href="#LINK_BWLABELPOS">BWLABELPOS</a>
         <a href="#LINK_BWFONT">BWFONT</a>
@@ -56,6 +58,7 @@
         <a href="#LINK_OVERLIBCAPTION">OVERLIBCAPTION</a>
         <a href="#LINK_NOTES">NOTES</a>
         <a href="#LINK_VIA">VIA</a>
+        <a href="#LINK_LINKSTYLE">LINKSTYLE</a>
         <a href="#LINK_ARROWSTYLE">ARROWSTYLE</a>
         <a href="#LINK_SET">SET</a>
       </p>
@@ -584,6 +587,43 @@ given in the <a href="#LINK_NODES">NODES</a> line.</p><p xmlns="http://www.w3.or
 </dl>
 </div>
 </div>
+		<div class="referenceentry">
+<h2><a name="LINK_INBWFORMAT">INBWFORMAT</a></h2>
+<div class="definition">INBWFORMAT <em class="meta">string</em>
+</div>
+<div class="description">
+<p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Specifies a custom string to use for the inbound data <a href="#LINK_BWLABEL">BWLABEL</a> bandwidth labels.</p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">This command is intended as an advanced alternative to the <a href="#LINK_BWLABEL">BWLABEL</a> command, for situations where 
+ you want more control over the content of the labels.</p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Instead of using bits, percent, etc, you can use any string in the label. Most importantly, 
+ the text for the label can contain <a href="advanced.html#tokens">special tokens</a> to show map data. 
+ In most normal situations you <em>need</em> to use the tokens, or the label won't do much useful</p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">There is also a matching <a href="#LINK_OUTBWFORMAT">OUTBWFORMAT</a> command to do the ame job for the outbound bandwidth label.</p><examples xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude"> 
+ <example><caption>Providing more information in the bwlabel</caption> 
+ <content>INBWFORMAT {node:this:inpercent}% of {node:this:max_bandwidth_in:%k}b/sec</content> 
+ </example> 
+ </examples> 
+</div>
+<div class="changes">
+<h3>Change History</h3>
+<dl>
+<dt>0.94</dt>
+<dd>Added INBWFORMAT.</dd>
+</dl>
+</div>
+</div>
+		<div class="referenceentry">
+<h2><a name="LINK_OUTBWFORMAT">OUTBWFORMAT</a></h2>
+<div class="definition">OUTBWFORMAT <em class="meta">string</em>
+</div>
+<div class="description">
+<p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Specifies a custom string to use for the outbound data <a href="#LINK_BWLABEL">BWLABEL</a> bandwidth labels.</p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">See the <a href="#LINK_INBWFORMAT">INBWFORMAT</a> entry for more information.</p> 
+</div>
+<div class="changes">
+<h3>Change History</h3>
+<dl>
+<dt>0.94</dt>
+<dd>Added OUTBWFORMAT.</dd>
+</dl>
+</div>
+</div>
                 <div class="referenceentry">
 <h2><a name="LINK_BWSTYLE">BWSTYLE</a></h2>
 <div class="definition">BWSTYLE <em class="meta">formatname</em>
@@ -599,7 +639,7 @@ of the direction of the link. 'angled' rotates the box to follow the directiong 
 <dd>Added BWSTYLE.</dd>
 </dl>
 </div>
-</div>
+</div>		
                 <div class="referenceentry">
 <h2><a name="LINK_BWLABELPOS">BWLABELPOS</a></h2>
 <div class="definition">BWLABELPOS <em class="meta">inposition</em> <em class="meta">outposition</em>
@@ -819,6 +859,23 @@ of the direction of the link. 'angled' rotates the box to follow the directiong 
 <dl>
 <dt>0.8</dt>
 <dd>Originally added VIA.</dd>
+</dl>
+</div>
+</div>
+		  <div class="referenceentry">
+<h2><a name="LINK_LINKSTYLE">LINKSTYLE</a></h2>
+<div class="definition">LINKSTYLE oneway</div>
+<div class="definition">LINKSTYLE twoway</div>
+<div class="description">
+<p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Specifies the whether the link should be drawn with one or two arrows.</p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">A 'standard' (twoway) link has two arrows - one for inbound data and one for outbound data. In some 
+ situations (e.g. round-trip latency), you might only want an arrow in one direction.</p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">One-way arrows only show the outbound <a href="#LINK_BWLABEL">BWLABEL,</a> but they show it in the standard position - 25% of the way along. 
+ Change the position of the label with <a href="#LINK_BWLABELPOS">BWLABELPOS</a> as usual (you still need to specify <em>two</em> positions in the <a href="#LINK_BWLABELPOS">BWLABELPOS</a> line, however).</p> 
+</div>
+<div class="changes">
+<h3>Change History</h3>
+<dl>
+<dt>0.94</dt>
+<dd>Added LINKSTYLE.</dd>
 </dl>
 </div>
 </div>

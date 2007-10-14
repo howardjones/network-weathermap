@@ -30,6 +30,8 @@
         <a href="#LINK_WIDTH">WIDTH</a>
         <a href="#LINK_BANDWIDTH">BANDWIDTH</a>
         <a href="#LINK_BWLABEL">BWLABEL</a>
+        <a href="#LINK_INBWFORMAT">INBWFORMAT</a>
+        <a href="#LINK_OUTBWFORMAT">OUTBWFORMAT</a>
         <a href="#LINK_BWSTYLE">BWSTYLE</a>
         <a href="#LINK_BWLABELPOS">BWLABELPOS</a>
         <a href="#LINK_BWFONT">BWFONT</a>
@@ -45,6 +47,7 @@
         <a href="#LINK_OVERLIBCAPTION">OVERLIBCAPTION</a>
         <a href="#LINK_NOTES">NOTES</a>
         <a href="#LINK_VIA">VIA</a>
+        <a href="#LINK_LINKSTYLE">LINKSTYLE</a>
         <a href="#LINK_ARROWSTYLE">ARROWSTYLE</a>
         <a href="#LINK_SET">SET</a>
       </p>

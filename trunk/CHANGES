@@ -3,7 +3,8 @@
                 (Original development for this plugin was paid for by Stellar Consulting - Thanks!)
         ADDED - New LINKSTYLE command allows you to have one-way (one arrow) links.
         ADDED - RRD DS can use Cacti's poller_output to get data without running RRDtool at all.
-                (this means it can work with the Boost plugin for large installations)
+                (this also means it can work with the Boost plugin for large installations)
+                See targets.html for more info on this one.
                 
 0.93    Added - weathermap-cacti-plugin.php?action=viewmap&id=mapfilename  works as well as a map number - useful for crosslinks
         FIXED - the key_hidezero secret setting hides the zero in a gradient in a classic scale too.

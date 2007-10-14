@@ -55,18 +55,101 @@ class WeatherMapDataSource_rrd extends WeatherMapDataSource {
 		}
 	}
 
-	function wmrrd_read_from_poller_output($rrdfile,$cf,$start,$end,$dsnames,&$data)
+	function wmrrd_read_from_poller_output($rrdfile,$cf,$start,$end,$dsnames, &$data, &$map)
 	{
+		global $config;
 		
+		if(isset($config))
+		{
+			// force it to be a complete path first,
+			// then take away the cacti bit, to get the appropriate path for the table
+			$db_rrdname = realpath($rrdfile);
+			$db_rrdname = str_replace($config["base_path"]."/rra","<path_rra>",$db_rrdname);
+			debug("******************************************************************\nChecking weathermap_data\n");
+			foreach (array(IN,OUT) as $dir)
+			{
+				if($dsnames[$dir] != '-')
+				{
+					$SQL = "select * from weathermap_data where rrdfile='".mysql_real_escape_string($db_rrdname)."' and data_source_name='".mysql_real_escape_string($dsnames[$dir])."'";
+					$SQLins = "insert into weathermap_data (rrdfile, data_source_name,sequence) values ('".mysql_real_escape_string($db_rrdname)."','".mysql_real_escape_string($dsnames[$dir])."', 0)";
+					$SQLcheck = "select data_template_data.local_data_id from data_template_data,data_template_rrd where data_template_data.local_data_id=data_template_rrd.local_data_id and data_template_data.data_source_path='".mysql_real_escape_string($db_rrdname)."' and data_template_rrd.data_source_name='".mysql_real_escape_string($dsnames[$dir])."'";
+					$SQLvalid = "select data_template_rrd.data_source_name from data_template_data,data_template_rrd where data_template_data.local_data_id=data_template_rrd.local_data_id and data_template_data.data_source_path='".mysql_real_escape_string($db_rrdname)."'";
+					
+					$result = db_fetch_row($SQL);
+					if(!isset($result['id']))
+					{
+						debug("RRD ReadData: Adding new weathermap_data row for $db_rrdname:".$dsnames[$dir]."\n");
+						$result = db_fetch_row($SQLcheck);
+						if(!isset($result['local_data_id']))
+						{
+							$fields = array();
+							$results = db_fetch_assoc($SQLvalid);
+							foreach ($results as $result)
+							{
+								$fields[] = $result['data_source_name'];
+							}
+							if(count($fields) > 0)
+							{
+								warn("RRD ReadData: poller_output: ".$dsnames[$dir]." is not a valid DS name for $db_rrdname - valid names are: ".join(", ",$fields)."\n");
+							}
+							else
+							{
+								warn("RRD ReadData: poller_output: ".$dsnames[$dir]." is not a valid RRD filename within this Cacti install.\n");
+							}
+						}
+						else
+						{
+							db_execute($SQLins);
+						}
+					}
+					else
+					{
+						// if the result is valid, then use it
+						if( ($result['sequence'] > 2) && ((time() - $result['last_time']) < 800) )
+						{
+							$data[$dir] = $result['last_calc'];
+						}
+					}
+				}				
+			}
+		}
 	}
 	
-	function wmrrd_read_from_php_rrd($rrdfile,$cf,$start,$end,$dsnames,&$data)
+	function wmrrd_read_from_php_rrd($rrdfile,$cf,$start,$end,$dsnames, &$data ,&$map)
 	{
-		
+		if ((1==0) && extension_loaded('RRDTool')) // fetch the values via the RRDtool Extension
+		{
+			// for the php-rrdtool module, we use an array instead...
+			$rrdparams = array("AVERAGE","--start",$start,"--end",$end);
+			$rrdreturn = rrd_fetch ($rrdfile,$rrdparams,count($rrdparams));
+			print_r($rrdreturn);
+			// XXX - figure out what to do with the results here
+			$now = $rrdreturn['start'];
+			$n=0;
+			do {
+				$now += $rrdreturn['step'];
+				print "$now - ";
+				for($i=0;$i<$rrdreturn['ds_cnt'];$i++)
+				{
+					print $rrdreturn['ds_namv'][$i] . ' = '.$rrdreturn['data'][$n++]." ";
+				}
+				print "\n";
+			} while($now <= $rrdreturn['end']);
+		}
 	}
 
-	function wmrrd_read_from_realrrdtool($rrdfile,$cf,$start,$end,$dsnames,&$data)
+	function wmrrd_read_from_real_rrdtool($rrdfile,$cf,$start,$end,$dsnames, &$data, &$map)
 	{
+		// we get the last 800 seconds of data - this might be 1 or 2 lines, depending on when in the
+		// cacti polling cycle we get run. This ought to stop the 'some lines are grey' problem that some
+		// people were seeing
+
+		// NEW PLAN - READ LINES (LIKE NOW), *THEN* CHECK IF REQUIRED DS NAMES EXIST (AND FAIL IF NOT),
+		//     *THEN* GET THE LAST LINE WHERE THOSE TWO DS ARE VALID, *THEN* DO ANY PROCESSING.
+		//  - this allows for early failure, and also tolerance of empty data in other parts of an rrd (like smokeping uptime)
+		
+		$values=array();
+		
 		# $command = '"'.$map->rrdtool . '" fetch "'.$rrdfile.'" AVERAGE --start '.$start.' --end '.$end;
 		$command=$map->rrdtool . " fetch $rrdfile $cf --start $start --end $end";
 
@@ -127,7 +210,7 @@ class WeatherMapDataSource_rrd extends WeatherMapDataSource {
 						$candidate = $values[$n];
 						if(preg_match('/^\d+\.?\d*e?[+-]?\d*:?$/i', $candidate))
 						{
-							$data[$dir] = $candidate * $multiplier;
+							$data[$dir] = $candidate;
 							debug("$candidate is OK value for $n\n");
 							$data_ok = TRUE;
 						}
@@ -148,7 +231,7 @@ class WeatherMapDataSource_rrd extends WeatherMapDataSource {
 			    // report DS name error
 			    $names = join(",",$heads);
 			    $names = str_replace("timestamp,","",$names);
-			    warn("RRD ReadData: At least one of your DS names ($in_ds & $out_ds) were not found, even though there was a valid data line. Maybe they are wrong? Valid DS names in this file are: $names [WMRRD06]\n");
+			    warn("RRD ReadData: At least one of your DS names (".$dsnames[IN]." and ".$dsnames[OUT].") were not found, even though there was a valid data line. Maybe they are wrong? Valid DS names in this file are: $names [WMRRD06]\n");
 			}
    
 		}
@@ -166,12 +249,10 @@ class WeatherMapDataSource_rrd extends WeatherMapDataSource {
 	{
 		global $config;
 		
-		$in_ds = "traffic_in";
-		$out_ds = "traffic_out";
 		$dsnames[IN] = "traffic_in";
 		$dsnames[OUT] = "traffic_out";
-		$data[IN] = 0;
-		$data[OUT] = 0;
+		$data[IN] = -1;
+		$data[OUT] = -1;
 		$SQL[IN] = 'select null';
 		$SQL[OUT] = 'select null';
 		$rrdfile = $targetstring;
@@ -184,8 +265,6 @@ class WeatherMapDataSource_rrd extends WeatherMapDataSource {
 
 		if(preg_match("/^(.*\.rrd):([\-a-zA-Z0-9_]+):([\-a-zA-Z0-9_]+)$/",$targetstring,$matches))
 		{
-			$in_ds = $matches[2];
-			$out_ds = $matches[3];
 			$rrdfile = $matches[1];
 			
 			$dsnames[IN] = $matches[2];
@@ -210,93 +289,56 @@ class WeatherMapDataSource_rrd extends WeatherMapDataSource {
                         $rrdfile = $matches[2];
                         $multiplier = $matches[1];
                 }
-		
-		if(isset($config))
-		{
-			$db_rrdname = str_replace($config["base_path"]."/rra","<path_rra>",$rrdfile);
-			debug("******************************************************************\nChecking weathermap_data\n");
-			foreach (array(IN,OUT) as $dir)
-			{
-				if($dsnames[$dir] != '-')
-				{
-					$SQL = "select * from weathermap_data where rrdfile='".mysql_real_escape_string($db_rrdname)."' and data_source_name='".mysql_real_escape_string($dsnames[$dir])."'";
-					$SQLins = "insert into weathermap_data (rrdfile, data_source_name,sequence) values ('".mysql_real_escape_string($db_rrdname)."','".mysql_real_escape_string($dsnames[$dir])."', 0)";
-					
-					$result = db_fetch_row($SQL);
-					if(isset($result['id']))
-					{
-						debug("Data already found.\n");
-					}
-					else
-					{
-						debug("Creating a new data row\n");
-						db_execute($SQLins);
-					}					
-				}				
-			}
-		}
-		
 
-		// we get the last 800 seconds of data - this might be 1 or 2 lines, depending on when in the
-		// cacti polling cycle we get run. This ought to stop the 'some lines are grey' problem that some
-		// people were seeing
-
-
-		// NEW PLAN - READ LINES (LIKE NOW), *THEN* CHECK IF REQUIRED DS NAMES EXIST (AND FAIL IF NOT),
-		//     *THEN* GET THE LAST LINE WHERE THOSE TWO DS ARE VALID, *THEN* DO ANY PROCESSING.
-		//  - this allows for early failure, and also tolerance of empty data in other parts of an rrd (like smokeping uptime)
-
-		if(file_exists($rrdfile))
-		{
-			debug ("RRD ReadData: Target DS names are $in_ds and $out_ds\n");
-
-			$period = intval($map->get_hint('rrd_period'));
-			if($period == 0) $period = 800;
-			$start = $map->get_hint('rrd_start');
-			if($start == '') {
-			    $start = "now-$period";
-			    $end = "now";
-			}
-			else
-			{
-			    $end = "start+".$period;
-			}
-
-			$values=array();
-
-			if ((1==0) && extension_loaded('RRDTool')) // fetch the values via the RRDtool Extension
-			{
-				// for the php-rrdtool module, we use an array instead...
-				$rrdparams = array("AVERAGE","--start",$start,"--end",$end);
-				$rrdreturn = rrd_fetch ($rrdfile,$rrdparams,count($rrdparams));
-				print_r($rrdreturn);
-				// XXX - figure out what to do with the results here
-				$now = $rrdreturn['start'];
-				$n=0;
-				do {
-					$now += $rrdreturn['step'];
-					print "$now - ";
-					for($i=0;$i<$rrdreturn['ds_cnt'];$i++)
-					{
-						print $rrdreturn['ds_namv'][$i] . ' = '.$rrdreturn['data'][$n++]." ";
-					}
-					print "\n";
-				} while($now <= $rrdreturn['end']);
-					
-			}
-			else
-			{
-				// do this the old-fashioned way
-				wmrrd_read_from_real_rrdtool($rrdfile,"AVERAGE",$start,$end, $dsnames, $data);				
-			}
+		$period = intval($map->get_hint('rrd_period'));
+		if($period == 0) $period = 800;
+		$start = $map->get_hint('rrd_start');
+		if($start == '') {
+		    $start = "now-$period";
+		    $end = "now";
 		}
 		else
 		{
-			warn ("Target $rrdfile doesn't exist. Is it a file? [WMRRD06]\n");
+		    $end = "start+".$period;
 		}
 
-		$inbw = $data[IN];
-		$outbw = $data[OUT];
+		$use_poller_output = intval($map->get_hint('rrd_use_poller_output'));
+
+		if($use_poller_output == 1)
+		{
+			WeatherMapDataSource_rrd::wmrrd_read_from_poller_output($rrdfile,"AVERAGE",$start,$end, $dsnames, $data,$map);
+		}
+			
+		// if poller_output didn't get anything, or if it couldn't/didn't run, do it the old-fashioned way
+		// - this will still be the case for the first couple of runs after enabling poller_output support
+		//   because there won't be valid data in the weathermap_data table yet.
+		if( ($data[IN] < 0) || ($data[OUT] < 0) )
+		{
+			if(file_exists($rrdfile))
+			{
+				debug ("RRD ReadData: Target DS names are ".$dsnames[IN]." and ".$dsnames[OUT]."\n");
+	
+	
+				$values=array();
+	
+				if ((1==0) && extension_loaded('RRDTool')) // fetch the values via the RRDtool Extension
+				{
+					WeatherMapDataSource_rrd::wmrrd_read_from_php_rrd($rrdfile,"AVERAGE",$start,$end, $dsnames, $data,$map);								
+				}
+				else
+				{
+					// do this the tried and trusted old-fashioned way
+					WeatherMapDataSource_rrd::wmrrd_read_from_real_rrdtool($rrdfile,"AVERAGE",$start,$end, $dsnames, $data,$map);
+				}
+			}
+			else
+			{
+				warn ("Target $rrdfile doesn't exist. Is it a file? [WMRRD06]\n");
+			}
+		}
+
+		$inbw = $data[IN] * $multiplier;
+		$outbw = $data[OUT] * $multiplier;
 
 		debug ("RRD ReadData: Returning ($inbw,$outbw,$data_time)\n");
 

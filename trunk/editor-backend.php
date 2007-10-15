@@ -157,8 +157,8 @@
         // read cache
         $json .= fetch_cached_file("_imap.json",$mapfile);
         $json .= "\n],\n";
-        $json .= "serial: $newserial,\n";
-        $json .= "valid: 1}\n";
+        $json .= "'serial': $newserial,\n";
+        $json .= "'valid': 1}\n";
 
         print $json;
 

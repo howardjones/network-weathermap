@@ -1,0 +1,55 @@
+<html>
+<head>
+<script src="lib/javascript/jquery-latest.pack.js" type="text/javascript"></script>
+<script type="text/javascript">
+
+$(document).ready( function() {
+
+ $("#msg").ajaxError(function(request, settings){
+   $(this).append("<li>Error requesting page " + settings.url + "</li>");
+ });
+
+$('input#tester2').click( function() {
+            alert('parp');
+$.getJSON("editor-backend.php",
+        { map: 'ben-2006.conf', "cmd": "dump_map", "serial": 0 },
+          function (data) {
+            alert('poop');
+            $('#out').append(data);
+          }
+          );
+    } );
+
+
+$('input#tester').click( function() {
+            alert('parp');
+$.get("editor-backend.php",
+        { map: 'ben-2006.conf', "cmd": "dump_map", "serial": 0 },
+          function (data) {
+            alert('poop');
+            $('#out').append(data);
+          }
+          );
+    } );
+
+}
+
+);
+
+
+</script>
+</head>
+<body>
+
+<input id="tester" type="button" value="Start with Get">
+<input id="tester2" type="button" value="Start with JSON">
+
+<ul id="msg">
+<li>Log</li>
+</ul>
+
+<pre id="out"> 
+</pre>
+
+</body>
+</html>

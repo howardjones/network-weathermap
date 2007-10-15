@@ -61,7 +61,7 @@ class HTML_ImageMap_Area_Polygon extends HTML_ImageMap_Area
 
 	function asJSON()
 	{
-		$json = "{ 'shape':'poly', 'npoints':".$this->npoints.", 'name':'".$this->name."',";
+		$json = "{ \"shape\":'poly', \"npoints\":".$this->npoints.", \"name\":'".$this->name."',";
 
 		$xlist = '';
 		$ylist = '';
@@ -72,7 +72,7 @@ class HTML_ImageMap_Area_Polygon extends HTML_ImageMap_Area
 		}
 		$xlist = rtrim($xlist,", ");
 		$ylist = rtrim($ylist,", ");
-		$json .= " 'x': [ $xlist ], 'y':[ $ylist ], 'minx': ".$this->minx.", 'miny': ".$this->miny.", 'maxx':".$this->maxx.", 'maxy':".$this->maxy."}";
+		$json .= " \"x\": [ $xlist ], \"y\":[ $ylist ], \"minx\": ".$this->minx.", \"miny\": ".$this->miny.", \"maxx\":".$this->maxx.", \"maxy\":".$this->maxy."}";
 
 		return($json);
 	}
@@ -196,9 +196,9 @@ class HTML_ImageMap_Area_Rectangle extends HTML_ImageMap_Area
 
 	function asJSON()
 	{
-		$json = "{ 'shape':'rect', ";
+		$json = "{ \"shape\":'rect', ";
 
-		$json .= " 'x1':".$this->x1.", 'y1':".$this->y1.", 'x2':".$this->x2.", 'y2':".$this->y2.",'name':'".$this->name."'}";
+		$json .= " \"x1\":".$this->x1.", \"y1\":".$this->y1.", \"x2\":".$this->x2.", \"y2\":".$this->y2.", \"name\":'".$this->name."'}";
 
 		return($json);
 	}

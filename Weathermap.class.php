@@ -1793,26 +1793,26 @@ class WeatherMapNode extends WeatherMapItem
 	{
 		$js = '';
 		$js .= "" . js_escape($this->name) . ": {";
-		$js .= "'x':" . ($this->x - $this->centre_x). ", ";
-		$js .= "'y':" . ($this->y - $this->centre_y) . ", ";
-		$js .= "'cx':" . $this->centre_x. ", ";
-		$js .= "'cy':" . $this->centre_y . ", ";
-		$js .= "ox:" . $this->original_x . ", ";
-		$js .= "oy:" . $this->original_y . ", ";
-		$js .= "relative_to:" . js_escape($this->relative_to) . ", ";
-		$js .= "name:" . js_escape($this->name) . ", ";
+		$js .= "\"x\":" . ($this->x - $this->centre_x). ", ";
+		$js .= "\"y\":" . ($this->y - $this->centre_y) . ", ";
+		$js .= "\"cx\":" . $this->centre_x. ", ";
+		$js .= "\"cy\":" . $this->centre_y . ", ";
+		$js .= "\"ox\":" . $this->original_x . ", ";
+		$js .= "\"oy\":" . $this->original_y . ", ";
+		$js .= "\"relative_to\":" . js_escape($this->relative_to) . ", ";
+		$js .= "\"name\":" . js_escape($this->name) . ", ";
 		if($complete)
 		{
-			$js .= "'label':" . js_escape($this->label) . ", ";
-			$js .= "'infourl':" . js_escape($this->infourl) . ", ";
-			$js .= "'overliburl':" . js_escape($this->overliburl) . ", ";
-			$js .= "'overlibcaption':" . js_escape($this->overlibcaption) . ", ";
+			$js .= "\"label\":" . js_escape($this->label) . ", ";
+			$js .= "\"infourl\":" . js_escape($this->infourl) . ", ";
+			$js .= "\"overliburl\":" . js_escape($this->overliburl) . ", ";
+			$js .= "\"overlibcaption\":" . js_escape($this->overlibcaption) . ", ";
 	
-			$js .= "'overlibwidth':" . $this->overlibheight . ", ";
-			$js .= "'overlibheight':" . $this->overlibwidth . ", ";
-			$js .= "'iconfile':" . js_escape($this->iconfile). ", ";
+			$js .= "\"overlibwidth\":" . $this->overlibheight . ", ";
+			$js .= "\"overlibheight\":" . $this->overlibwidth . ", ";
+			$js .= "\"iconfile\":" . js_escape($this->iconfile). ", ";
 		}
-		$js .= "'iconcachefile':" . js_escape($this->cachefile);
+		$js .= "\"iconcachefile\":" . js_escape($this->cachefile);
 		$js .= "},\n";
 		return $js;
 	}
@@ -2626,39 +2626,40 @@ class WeatherMapLink extends WeatherMapItem
 		$js='';
 		$js.="" . js_escape($this->name) . ": {";
 
-		if ($this->name != 'DEFAULT')
+		if ($this->name != "DEFAULT")
 		{
-			$js.="'a':'" . $this->a->name . "', ";
-			$js.="'b':'" . $this->b->name . "', ";
+			$js.="\"a\":\"" . $this->a->name . "\", ";
+			$js.="\"b\":\"" . $this->b->name . "\", ";
 		}
 
 		if($complete)
 		{
-			$js.="'infourl':" . js_escape($this->infourl) . ", ";
-			$js.="'overliburl':" . js_escape($this->overliburl). ", ";
-			$js.="'width':'" . $this->width . "', ";
-			$js.="'target':";
+			$js.="\"infourl\":" . js_escape($this->infourl) . ", ";
+			$js.="\"overliburl\":" . js_escape($this->overliburl). ", ";
+			$js.="\"width\":\"" . $this->width . "\", ";
+			$js.="\"target\":";
 	
-			$tgt='';
+			$tgt="";
 	
-			foreach ($this->targets as $target) { $tgt.=$target[4] . ' '; }
+			foreach ($this->targets as $target) { $tgt.=$target[4] . " "; }
 	
 			$js.=js_escape(trim($tgt));
 			$js.=",";
 	
-			$js.="'bw_in':" . js_escape($this->max_bandwidth_in_cfg) . ", ";
-			$js.="'bw_out':" . js_escape($this->max_bandwidth_out_cfg) . ", ";
+			$js.="\"bw_in\":" . js_escape($this->max_bandwidth_in_cfg) . ", ";
+			$js.="\"bw_out\":" . js_escape($this->max_bandwidth_out_cfg) . ", ";
 	
-			$js.="'name':" . js_escape($this->name) . ", ";
-			$js.="'overlibwidth':'" . $this->overlibheight . "', ";
-			$js.="'overlibheight':'" . $this->overlibwidth . "', ";
-			$js.="'overlibcaption':" . js_escape($this->overlibcaption) . ", ";
+			$js.="\"name\":" . js_escape($this->name) . ", ";
+			$js.="\"overlibwidth\":\"" . $this->overlibheight . "\", ";
+			$js.="\"overlibheight\":\"" . $this->overlibwidth . "\", ";
+			$js.="\"overlibcaption\":" . js_escape($this->overlibcaption) . ", ";
 		}
-		$vias = "'via': [";
+		$vias = "\"via\": [";
 		foreach ($this->vialist as $via)
 				$vias .= sprintf("[%d,%d],", $via[0], $via[1]);
 		$vias .= "],";
-		$vias = str_replace("],]","]]",$vias);
+		$vias = str_replace("],],", "]]", $vias);
+		$vias = str_replace("[],", "[]", $vias);
 		$js .= $vias;
 
 		$js.="},\n";
@@ -5417,7 +5418,7 @@ function asJSON()
 
 	$json .= "{ \n";
 
-	$json .= "'map': {  \n";
+	$json .= "\"map\": {  \n";
 	foreach (array_keys($this->inherit_fieldlist)as $fld)
 	{
 		$json .= js_escape($fld).": ";
@@ -5427,7 +5428,7 @@ function asJSON()
 	$json = rtrim($json,", \n");
 	$json .= "\n},\n";
 
-	$json .= "'nodes': {\n";
+	$json .= "\"nodes\": {\n";
 	$json .= $this->defaultnode->asJSON();
 	foreach ($this->nodes as $node) { $json .= $node->asJSON(); }
 	$json = rtrim($json,", \n");
@@ -5435,7 +5436,7 @@ function asJSON()
 
 
 
-	$json .= "'links': {\n";
+	$json .= "\"links\": {\n";
 	$json .= $this->defaultlink->asJSON();
 	foreach ($this->links as $link) { $json .= $link->asJSON(); }
 	$json = rtrim($json,", \n");

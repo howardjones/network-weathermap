@@ -1,11 +1,11 @@
 Before 0.94
 -----------------
-DONE!   Boost/poller_output support
+MOSTLYDONE!   Boost/poller_output support
 DONE!   THold DS
 DONE!   INBWFORMAT/OUTBWFORMAT
 DONE!   Unidirectional links
 (php-rrdtool support?)
-(Editor NG)
+(Editor NG) -> IE6 styling and imagemap updating is totally wrong
 Extra DS for WUG, Nagios
 USESCALE can use any variable - USESCALE scalename {node:this:cactihost_latency}
 Finish Artificial Icons

@@ -594,6 +594,66 @@ else
 		$map->WriteConfig($mapfile);
 		break;
 
+        case "link_align_horiz":
+		$map->ReadConfig($mapfile);
+
+		$target = $_REQUEST['param'];
+		$log = "align link ".$target;
+
+		$a_y = $map->links[$target]->a->y;
+                $b_y = $map->links[$target]->b->y;
+                
+                $diff = $b_y - $a_y;
+                $newoffset = "0:$diff";
+                
+                // if we've already done this once, try the other way around...
+                if($map->links[$target]->a_offset == $newoffset)
+                {
+                    $diff = $a_y - $b_y;
+                    $newoffset = "0:$diff";
+                    $map->links[$target]->b_offset = $newoffset;
+                    $map->links[$target]->a_offset = "C";
+                }
+                else
+                {
+                    // the standard thing
+                    $map->links[$target]->a_offset = $newoffset;
+                    $map->links[$target]->b_offset = "C";
+                }     
+
+		$map->WriteConfig($mapfile);
+                break;
+
+        case "link_align_vertical":
+		$map->ReadConfig($mapfile);
+
+		$target = $_REQUEST['param'];
+		$log = "align link ".$target;
+
+		$a_x = $map->links[$target]->a->x;
+                $b_x = $map->links[$target]->b->x;
+                
+                $diff = $b_x - $a_x;
+                $newoffset = "$diff:0";
+                
+                // if we've already done this once, try the other way around...
+                if($map->links[$target]->a_offset == $newoffset)
+                {
+                    $diff = $a_x - $b_x;
+                    $newoffset = "$diff:0";
+                    $map->links[$target]->b_offset = $newoffset;
+                    $map->links[$target]->a_offset = "C";
+                }
+                else
+                {
+                    // the standard thing
+                    $map->links[$target]->a_offset = $newoffset;
+                    $map->links[$target]->b_offset = "C";
+                }     
+
+		$map->WriteConfig($mapfile);
+                break;
+
 	case "delete_link":
 		$map->ReadConfig($mapfile);
 
@@ -630,14 +690,14 @@ else
 		$target = $_REQUEST['param'];
 		$log = "clone node ".$target;
 
-        $newnodename = $target."_copy";
+                $newnodename = $target."_copy";
                 
 		$node = new WeatherMapNode;
 		$node->Reset($map);
 		$node->CopyFrom($map->nodes[$target]);
 
-        $node->name = $newnodename;
-        $node->x += 30;
+                $node->name = $newnodename;
+                $node->x += 30;
 
 		$map->nodes[$newnodename] = $node;
 
@@ -894,7 +954,10 @@ else
 			<tr>
 			  <th></th>
 			  <td><a class="dlgTitlebar" id="link_delete">Delete
-			  Link</a><a class="dlgTitlebar" id="link_edit">Edit</a></td>
+			  Link</a><a class="dlgTitlebar" id="link_edit">Edit</a><a
+                            class="dlgTitlebar" id="link_vert">Vert</a><a
+                            class="dlgTitlebar" id="link_horiz">Horiz</a>                          
+                        </td>
 			</tr>
 		  </table>
 	  </div>

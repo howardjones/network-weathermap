@@ -197,6 +197,9 @@ function attach_click_events()
     addEvent(document.getElementById('tb_link_submit'), 'click', do_submit);
     addEvent(document.getElementById('link_delete'), 'click', delete_link);
     addEvent(document.getElementById('link_edit'), 'click', edit_link);
+    
+    addEvent(document.getElementById('link_vert'), 'click', align_link_v);
+    addEvent(document.getElementById('link_horiz'), 'click', align_link_h);
 
     addEvent(document.getElementById('tb_map_cancel'), 'click', cancel_op);
     addEvent(document.getElementById('tb_map_submit'), 'click', do_submit);
@@ -850,4 +853,16 @@ function coord_update(event)
 function coord_release(event)
 {
     $('#tb_coords').html('Position<br />---, ---');
+}
+
+function align_link_h()
+{
+    document.getElementById('action').value = "link_align_horizontal";
+    document.frmMain.submit();
+}
+
+function align_link_v()
+{
+    document.getElementById('action').value = "link_align_vertical";
+    document.frmMain.submit();
 }

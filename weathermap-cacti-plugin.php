@@ -65,7 +65,7 @@ default:
 	}
 	if(read_config_option("weathermap_pagestyle") == 1)
 	{
-		weathermap_fullview(FALSE,TRUE);
+		weathermap_fullview(FALSE,FALSE);
 	}
 	if(read_config_option("weathermap_pagestyle") == 2)
 	{

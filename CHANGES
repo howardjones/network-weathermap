@@ -5,6 +5,7 @@
         ADDED - RRD DS can use Cacti's poller_output to get data without running RRDtool at all.
                 (this also means it can work with the Boost plugin for large installations)
                 See targets.html for more info on this one.
+	FIXED - "Full Screen Maps" mode in Cacti Plugin was broken by me adding the "View Only First" mode.
                 
 0.93    Added - weathermap-cacti-plugin.php?action=viewmap&id=mapfilename  works as well as a map number - useful for crosslinks
         FIXED - the key_hidezero secret setting hides the zero in a gradient in a classic scale too.

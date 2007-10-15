@@ -15,7 +15,8 @@ $.getJSON("editor-backend.php",
         { map: 'ben-2006.conf', "cmd": "dump_map", "serial": 0 },
           function (data) {
             alert('poop');
-            $('#out').append(data);
+            $('#out').append(data.valid);
+            alert('plip');
           }
           );
     } );

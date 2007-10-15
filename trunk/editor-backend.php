@@ -106,10 +106,10 @@
             
             case 'maplist':
                 $files = act_list_configs($mapdir);
-                $json = "{ status: 'OK', files: [";
+                $json = "{ \"status\": 'OK', \"files\": [";
                 foreach ($files as $file)
                 {
-                    $json .= "{file: ".js_escape($file[0]).", title:".js_escape($file[1]).", locked:".$file[2]." },\n";
+                    $json .= "{\"file\": ".js_escape($file[0]).", \"title\":".js_escape($file[1]).", \"locked\":".$file[2]." },\n";
                 }
                 $json = rtrim($json,", \n");
                 $json .=  "] }";
@@ -138,27 +138,27 @@
 
         $json = "{ \n";
 
-        $json .= "'map': {  \n";
+        $json .= "\"map\": {  \n";
         // read cache
         $json .= fetch_cached_file("_map.json",$mapfile);
         $json .= "\n},\n";
 
-        $json .= "'nodes': {\n";
+        $json .= "\"nodes\": {\n";
         // read cache
         $json .= fetch_cached_file("_nodes_lite.json",$mapfile);
         $json .= "\n},\n";
 
-        $json .= "'links': {\n";
+        $json .= "\"links\": {\n";
         // read cache
         $json .= fetch_cached_file("_links_lite.json",$mapfile);
         $json .= "\n},\n";
 
-        $json .= "'imap': [\n";
+        $json .= "\"imap\": [\n";
         // read cache
         $json .= fetch_cached_file("_imap.json",$mapfile);
         $json .= "\n],\n";
-        $json .= "'serial': $newserial,\n";
-        $json .= "'valid': 1}\n";
+        $json .= "\"serial\": $newserial,\n";
+        $json .= "\"valid\": 1}\n";
 
         print $json;
 

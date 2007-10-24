@@ -117,6 +117,7 @@ class WeatherMapDataSource_rrd extends WeatherMapDataSource {
 	
 	function wmrrd_read_from_php_rrd($rrdfile,$cf,$start,$end,$dsnames, &$data ,&$map)
 	{
+		// not yet implemented - use php-rrdtool to read rrd data. Should be quicker
 		if ((1==0) && extension_loaded('RRDTool')) // fetch the values via the RRDtool Extension
 		{
 			// for the php-rrdtool module, we use an array instead...

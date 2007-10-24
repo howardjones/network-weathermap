@@ -1,7 +1,7 @@
 <?php
 
 $type = 1;
-$width = 20;
+$width = 15;
 
 
 $im = imagecreatetruecolor(1024,1024);
@@ -36,8 +36,8 @@ if($type==2)
 if($type==3)
 {
     // sharp angle
-    $points_x = array(200,100,300,160);
-    $points_y = array(700,300,700,100);
+    $points_x = array(300,100,300,100);
+    $points_y = array(900,300,700,100);
 }
 
 $max_i = count($points_x)-1;
@@ -109,6 +109,7 @@ $reversepoints[] = $points_y[0];
 $numrpoints++;
 
 for ($i=0; $i <$max_start; $i++)
+//for ($i=0; $i<1; $i++)
 {
     
     $corner_x = $points_x[$i+1];
@@ -136,6 +137,21 @@ for ($i=0; $i <$max_start; $i++)
     
     $nx2 = $dy2 / $len2;
     $ny2 = -$dx2 / $len2;
+    
+    // figure out the angle between the lines.
+    // (actually, their normals, but the angle is the same)
+    
+    $dp =  $nx1*$nx2 + $ny1*$ny2;
+    $angle = rad2deg(acos($dp));
+    $angle = rad2deg(atan2($ny2,$nx2) - atan2($ny1,$nx1));
+    
+    $capping = FALSE;
+    print "Angle is $angle degrees\n";
+    if(abs($angle)>169)
+    {
+         // $capping = TRUE;
+    }
+    
     
     $line1_x = $points_x[$i] + $nx1*$width;
     $line1_y = $points_y[$i] + $ny1*$width;
@@ -167,39 +183,40 @@ for ($i=0; $i <$max_start; $i++)
     $b1 = -1;
     $b2 = -1;
     
-    // **********************
+    // **********************    
     
     $c1 = ($line1_y - $slope1 * $line1_x );
     $c2 = ($line3_y - $slope2 * $line3_x );
     
     $det_inv = 1/($a1*$b2 - $a2*$b1);
     
-    $xi = (($b1*$c2 - $b2*$c1)*$det_inv);
-    $yi = (($a2*$c1 - $a1*$c2)*$det_inv);
+    $xi1 = (($b1*$c2 - $b2*$c1)*$det_inv);
+    $yi1 = (($a2*$c1 - $a1*$c2)*$det_inv);
     
-    $finalpoints[] = $xi;
-    $finalpoints[] = $yi;
-    $numpoints++;
+    //$finalpoints[] = $xi;
+    //$finalpoints[] = $yi;
+    //$numpoints++;
     
-    imagearc($im,$xi,$yi,5,5,0,360,$red);
-    
+    imagearc($im,$xi1,$yi1,5,5,0,360,$red);
+
     $c1 = ($line2_y - $slope1 * $line2_x );
     $c2 = ($line4_y - $slope2 * $line4_x );
     
     $det_inv = 1/($a1*$b2 - $a2*$b1);
     
-    $xi = (($b1*$c2 - $b2*$c1)*$det_inv);
-    $yi = (($a2*$c1 - $a1*$c2)*$det_inv);
+    $xi2 = (($b1*$c2 - $b2*$c1)*$det_inv);
+    $yi2 = (($a2*$c1 - $a1*$c2)*$det_inv);
     
-    print "$xi $yi   $a1 $a2 $c1 $c2 $det_inv\n";
+    print "$xi2 $yi2   $a1 $a2 $c1 $c2 $det_inv\n";
     
-    $reversepoints[] = $xi;
-    $reversepoints[] = $yi;
-    $numrpoints++;
+    //$reversepoints[] = $xi2;
+    //$reversepoints[] = $yi2;
+    //$numrpoints++;
     
-    imagearc($im,$xi,$yi,20,20,0,360,$red);
-    
-    if($miterlimit==0)
+    imagearc($im,$xi2,$yi2,20,20,0,360,$red);
+  
+    // calculate the extra two points for capping  
+    if($capping)
     {
         // the next two are only needed for blunting very acute turns
         
@@ -208,21 +225,67 @@ for ($i=0; $i <$max_start; $i++)
         
         $det_inv = 1/($a1*$b2 - $a2*$b1);
         
-        $xi = (($b1*$c2 - $b2*$c1)*$det_inv);
-        $yi = (($a2*$c1 - $a1*$c2)*$det_inv);
-        
-        imagearc($im,$xi,$yi,12,12,0,360,$red);
+        $xi3 = (($b1*$c2 - $b2*$c1)*$det_inv);
+        $yi3 = (($a2*$c1 - $a1*$c2)*$det_inv);
+               
+        imagearc($im,$xi3,$yi3,12,12,0,360,$red);
         
         $c1 = ($line2_y - $slope1 * $line2_x );
         $c2 = ($line3_y - $slope2 * $line3_x );
         
         $det_inv = 1/($a1*$b2 - $a2*$b1);
         
-        $xi = (($b1*$c2 - $b2*$c1)*$det_inv);
-        $yi = (($a2*$c1 - $a1*$c2)*$det_inv);
+        $xi4 = (($b1*$c2 - $b2*$c1)*$det_inv);
+        $yi4 = (($a2*$c1 - $a1*$c2)*$det_inv);      
         
-        imagearc($im,$xi,$yi,12,12,0,360,$red);
-    }  
+        imagearc($im,$xi4,$yi4,12,12,0,360,$red);
+    }
+    
+    if($capping && $angle > 0)
+    {
+        $finalpoints[] = $xi3;
+        $finalpoints[] = $yi3;
+        $numpoints++;
+        
+        $finalpoints[] = $xi4;
+        $finalpoints[] = $yi4;
+        $numpoints++;
+        
+        $reversepoints[] = $xi2;
+        $reversepoints[] = $yi2;
+        $numrpoints++;
+    }
+    
+    if($capping && $angle < 0)
+    {
+        $reversepoints[] = $xi3;
+        $reversepoints[] = $yi3;
+        $numrpoints++;
+        
+        $reversepoints[] = $xi4;
+        $reversepoints[] = $yi4;
+        $numrpoints++;
+        
+        $finalpoints[] = $xi2;
+        $finalpoints[] = $yi2;
+        $numpoints++;
+    }
+    
+    if(!$capping)
+    {
+        $finalpoints[] = $xi1;
+        $finalpoints[] = $yi1;
+        $numpoints++;
+                
+        $reversepoints[] = $xi2;
+        $reversepoints[] = $yi2;
+        $numrpoints++;
+    }
+            
+        // in here, we need to decide which is the 'outside' of the corner,
+        // because that's what we flatten. The inside of the corner is left alone.
+        // - depending on the relative angle between the two segments, it could
+        //   be either one of these points.  
     
 }
 

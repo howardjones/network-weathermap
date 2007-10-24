@@ -14,8 +14,7 @@ Colours do wierd things with artificial icons - needs extra colour defs. How to 
 Angled VIAs
 RRD CF selection (0.92 patch from Ghozlane Toumi - needs rewrite now)
 
-BUG: RRD line with one NaN and one good value should still be a good line.
-BUG: angled bwlabels should flip like comments do
+BUG: RRD line with one NaN and one good value should still be a good line. -> Actual bug is that -1 is a magic value. Switch to NULL for 'no value'!
 BUG: poller_output should degrade when no new updates arrive, somehow.
 BUG: cacti-picker.php needs to include global.php if there is one, in preference to config.php (0.8.7 compat)
 

@@ -440,6 +440,59 @@ function calc_curve(&$in_xarray, &$in_yarray,$pointsperspan = 12)
 	return ($curvepoints);
 }
 
+// Give a list of key points, calculate a "curve" through them
+// return value is an array of triples (x,y,distance)
+// this is here to mirror the real 'curve' version when we're using angled VIAs
+// it means that all the stuff that expects an array of points with distances won't be upset.
+function calc_straight(&$in_xarray, &$in_yarray,$pointsperspan = 12)
+{
+
+	// search through the point list, for consecutive duplicate points
+	// (most common case will be a straight link with both NODEs at the same place, I think)
+	// strip those out, because they'll break the binary search/centre-point stuff
+
+	$last_x=NULL;
+	$last_y=NULL;
+
+	for ($i=0; $i < count($in_xarray); $i++)
+	{
+		if (($in_xarray[$i] == $last_x) && ($in_yarray[$i] == $last_y)) { debug
+			("Dumping useless duplicate point on curve\n"); }
+		else
+		{
+			$xarray[]=$in_xarray[$i];
+			$yarray[]=$in_yarray[$i];
+		}
+
+		$last_x=$in_xarray[$i];
+		$last_y=$in_yarray[$i];
+	}
+
+	// only proceed if we still have at least two points!
+	if(count($xarray) <= 1)
+	{
+		warn ("Arrow not drawn, as it's 1-dimensional.\n");
+		return (array(NULL, NULL, NULL, NULL));
+	}
+
+	$npoints=count($xarray);
+
+	$curvepoints=array();
+
+	$np=0;
+	$distance=0;
+	
+	for ($i=0; $i < ($npoints -1); $i++)
+	{
+		$curvepoints[] = array($xarray[$i],$yarray[$i],$distance);
+		// work out the next distance...		
+		$distance += sqrt( pow($xarray[$i+1] - $xarray[$i],2) + pow($yarray[$i+1] - $yarray[$i],2) );
+	}
+	$curvepoints[] = array($xarray[$npoints-1],$yarray[$npoints-1],$distance);
+	
+	return ($curvepoints);
+}
+
 function calc_arrowsize($width,&$map,$linkname)
 {
 	$arrowlengthfactor=4;
@@ -462,6 +515,8 @@ function calc_arrowsize($width,&$map,$linkname)
 	
 	return( array($arrowsize,$arrowwidth) );
 }
+
+
 
 // top-level function that takes a two lists to define some points, and draws a weathermap link
 // - this takes care of all the extras, like arrowheads, and where to put the bandwidth labels
@@ -1979,6 +2034,7 @@ class WeatherMapLink extends WeatherMapItem
 	var $inpercent,            $outpercent;
 	var $inherit_fieldlist;
 	var $vialist = array();
+	var $viastyle;
 	var $usescale; 
 	var $outlinecolour;
 	var $bwoutlinecolour;
@@ -2006,6 +2062,7 @@ class WeatherMapLink extends WeatherMapItem
 			'commentoffset_out' => 5,
 			'commentoffset_in' => 95,
 			'arrowstyle' => 'classic',
+			'viastyle' => 'curved',
 			'usescale' => 'DEFAULT',
 			'targets' => array(),
 			'infourl' => '',
@@ -2251,13 +2308,32 @@ class WeatherMapLink extends WeatherMapItem
 			$link_out_width = (($link_out_width * $this->outpercent * 1.5 + 0.1) / 100) + 1;
 		}
 
-		// Calculate the spine points - the actual curve	
-		$this->curvepoints = calc_curve($xpoints, $ypoints);
+
+		if($this->viastyle=='curved')
+		{
+			// Calculate the spine points - the actual curve	
+			$this->curvepoints = calc_curve($xpoints, $ypoints);
+				
+			// then draw the curve itself
+			draw_curve($im, $this->curvepoints,
+				$link_width, $outline_colour, $comment_colour, array($link_in_colour, $link_out_colour),
+				$this->name, $map, 50, ($this->linkstyle=='oneway'?TRUE:FALSE) );
+		}
+		
+		if($this->viastyle=='angled')
+		{
+			// Calculate the spine points - the actual not a curve really, but we
+			// need to create the array, and calculate the distance bits, otherwise
+			// things like bwlabels won't know where to go.
 			
-		// then draw the curve itself
-		draw_curve($im, $this->curvepoints,
-			$link_width, $outline_colour, $comment_colour, array($link_in_colour, $link_out_colour),
-			$this->name, $map, 50, ($this->linkstyle=='oneway'?TRUE:FALSE) );
+			$this->curvepoints = calc_straight($xpoints, $ypoints);
+				
+			// then draw the "curve" itself
+			// XXX - this is not correct either - should draw the straight version
+			draw_curve($im, $this->curvepoints,
+				$link_width, $outline_colour, $comment_colour, array($link_in_colour, $link_out_colour),
+				$this->name, $map, 50, ($this->linkstyle=='oneway'?TRUE:FALSE) );
+		}
 
 		$this->DrawComments($im,$comment_colour,$link_width*1.1);
 
@@ -2428,6 +2504,10 @@ class WeatherMapLink extends WeatherMapItem
 			$comparison=($this->name == 'DEFAULT'
 			? ($this->inherit_fieldlist['labelboxstyle']) : ($this->owner->defaultlink->labelboxstyle));
 			if ($this->labelboxstyle != $comparison) { $output.="\tBWSTYLE " . $this->labelboxstyle . "\n"; }
+	
+			$comparison=($this->name == 'DEFAULT'
+			? ($this->inherit_fieldlist['viastyle']) : ($this->owner->defaultlink->viastyle));
+			if ($this->viastyle != $comparison) { $output.="\tVIASTYLE " . $this->viastyle . "\n"; }
 	
 			$comparison = ($this->name == 'DEFAULT'
 			? $this->inherit_fieldlist['labeloffset_in'] : $this->owner->defaultlink->labeloffset_in);
@@ -3264,11 +3344,8 @@ function DrawLabelRotated($im, $x, $y, $angle, $text, $font, $padding, $linkname
 {
 	list($strwidth, $strheight)=$this->myimagestringsize($font, $text);
 
-	if(abs($angle)>90)
-	{
-		$angle -= 180;
-		if($angle < -180) $angle +=360;
-	}
+	if(abs($angle)>90)  $angle -= 180;
+	if($angle < -180) $angle +=360; 
 
 	$rangle = -deg2rad($angle);
 
@@ -4094,6 +4171,14 @@ function ReadConfig($filename)
 					$matches))
 				{
 					$curlink->labelboxstyle=$matches[1];
+					$linematched++;
+				}
+				
+				if ($last_seen == 'LINK' && preg_match(
+					"/^\s*VIASTYLE\s+(curved|angled)\s*$/i", $buffer,
+					$matches))
+				{
+					$curlink->viastyle=$matches[1];
 					$linematched++;
 				}
 

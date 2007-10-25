@@ -3607,8 +3607,11 @@ function DrawLegend_Horizontal($im,$scalename="DEFAULT",$width=400)
 	imagecopy($im,$scale_im,$this->keyx[$scalename],$this->keyy[$scalename],0,0,imagesx($scale_im),imagesy($scale_im));
 	$this->keyimage[$scalename] = $scale_im;
 
+    $rx = $this->keyx[$scalename];
+    $ry = $this->keyy[$scalename];
+
 	$this->imap->addArea("Rectangle", "LEGEND:$scalename", '',
-		array($box_left, $box_top, $box_right, $box_bottom));
+		array($rx+$box_left, $ry+$box_top, $rx+$box_right, $ry+$box_bottom));
 }
 
 function DrawLegend_Vertical($im,$scalename="DEFAULT",$height=400)
@@ -3685,8 +3688,10 @@ function DrawLegend_Vertical($im,$scalename="DEFAULT",$height=400)
 	imagecopy($im,$scale_im,$this->keyx[$scalename],$this->keyy[$scalename],0,0,imagesx($scale_im),imagesy($scale_im));
 	$this->keyimage[$scalename] = $scale_im;
 
+    $rx = $this->keyx[$scalename];
+    $ry = $this->keyy[$scalename];
 	$this->imap->addArea("Rectangle", "LEGEND:$scalename", '',
-		array($box_left, $box_top, $box_right, $box_bottom));
+		array($rx+$box_left, $ry+$box_top, $rx+$box_right, $ry+$box_bottom));
 }
 
 function DrawLegend_Classic($im,$scalename="DEFAULT")

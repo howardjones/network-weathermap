@@ -7,6 +7,7 @@
                 See targets.html for more info on this one.
         ADDED - Editor - Align horizontal and Align-vertical for links. Calculates link offsets to make link vertical/horizontal.
 	FIXED - "Full Screen Maps" mode in Cacti Plugin was broken by me adding the "View Only First" mode.
+	FIXED - Imagemaps for horiz/vert format legend were wrong in editor (thanks to Alex Moura for pointing this out)
                 
 0.93    Added - weathermap-cacti-plugin.php?action=viewmap&id=mapfilename  works as well as a map number - useful for crosslinks
         FIXED - the key_hidezero secret setting hides the zero in a gradient in a classic scale too.

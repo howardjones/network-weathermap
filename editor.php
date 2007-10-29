@@ -20,13 +20,19 @@ if( isset($config) )
     $configerror = 'OLD editor config file format. The format of this file changed in version 0.92 - please check the new editor-config.php-dist and update your editor-config.php file. [WMEDIT02]';
 }
 
-if( is_dir($cacti_base) && file_exists($cacti_base."/include/config.php") )
+// check if the goalposts have moved
+if( is_dir($cacti_base) && file_exists($cacti_base."/include/global.php") )
+{
+	// include the cacti-config, so we know about the database
+	include_once($cacti_base."/include/global.php");
+	$config['base_url'] = $cacti_url;
+	$cacti_found = TRUE;
+}
+elseif( is_dir($cacti_base) && file_exists($cacti_base."/include/config.php") )
 {
 	// include the cacti-config, so we know about the database
 	include_once($cacti_base."/include/config.php");
 
-	// CHANGE: this to be the URL of the base of your Cacti install
-	// it MUST end with a / character!
 	$config['base_url'] = $cacti_url;
 	$cacti_found = TRUE;
 }

@@ -9,20 +9,26 @@ $ignore_cacti=FALSE;
 
 @include_once('editor-config.php');
 
-if( is_dir($cacti_base) && file_exists($cacti_base."/include/config.php") )
+// check if the goalposts have moved
+if( is_dir($cacti_base) && file_exists($cacti_base."/include/global.php") )
 {
-	// include the cacti-config, so we know about the database
-	include_once($cacti_base."/include/config.php");
+	        // include the cacti-config, so we know about the database
+			        include_once($cacti_base."/include/global.php");
+					        $config['base_url'] = $cacti_url;
+							        $cacti_found = TRUE;
+								}
+								elseif( is_dir($cacti_base) && file_exists($cacti_base."/include/config.php") )
+								{
+									        // include the cacti-config, so we know about the database
+											        include_once($cacti_base."/include/config.php");
 
-	// CHANGE: this to be the URL of the base of your Cacti install
-	// it MUST end with a / character!
-	$config['base_url']=$cacti_url;
-	$cacti_found=TRUE;
-}
-else
-{
-	$cacti_found = FALSE;
-}
+													        $config['base_url'] = $cacti_url;
+															        $cacti_found = TRUE;
+																}
+																else
+																{
+																	        $cacti_found = FALSE;
+																		}
 
 // ******************************************
 

@@ -259,7 +259,9 @@ function weathermap_show_tab () {
 
 	if ((db_fetch_assoc("select user_auth_realm.realm_id from user_auth_realm where user_auth_realm.user_id='" . $_SESSION["sess_user_id"] . "' and user_auth_realm.realm_id='$realm_id2'")) || (empty($realm_id2))) {
 
-		print '<a href="' . $config['url_path'] . 'plugins/weathermap/weathermap-cacti-plugin.php"><img src="' . $config['url_path'] . 'plugins/weathermap/images/tab_wmap.gif" alt="Weathermap" align="absmiddle" border="0"></a>';
+		print '<a href="' . $config['url_path'] . 'plugins/weathermap/weathermap-cacti-plugin.php"><img src="' . $config['url_path'] . 'plugins/weathermap/images/tab_weathermap';
+		// XXX - if we're ON a weathermap page, print '_red'
+		print '.png" alt="Weathermap" align="absmiddle" border="0"></a>';
 
 	}
 

@@ -110,109 +110,55 @@ $numrpoints++;
 
 for ($i=0; $i <$max_start; $i++)
 //for ($i=0; $i<1; $i++)
-{
-    
-    $corner_x = $points_x[$i+1];
-    $corner_y = $points_y[$i+1];
-    
-    imagearc($im,$corner_x,$corner_y,120,120,0,360,$blue);
+{   
+    imagearc($im,$points_x[$i+1],$points_y[$i+1],120,120,0,360,$blue);
     
     $dx1 = $points_x[$i+1] - $points_x[$i];
     $dy1 = $points_y[$i+1] - $points_y[$i];
     
     $dx2 = $points_x[$i+2] - $points_x[$i+1];
     $dy2 = $points_y[$i+2] - $points_y[$i+1];
-    
+        
     $len1 = sqrt($dx1*$dx1 + $dy1*$dy1);
     $len2 = sqrt($dx2*$dx2 + $dy2*$dy2);
-    
-    if($dx1 != 0) { $slope1 = $dy1/$dx1; }
-    else { $slope1 = 1e10; print "Slope1 is infinite.\n";}
-    
-    if($dx2 != 0) { $slope2 = $dy2/$dx2; }
-    else { $slope2 = 1e10; print "Slope2 is infinite.\n";}
-        
+            
     $nx1 = $dy1 / $len1;
     $ny1 = -$dx1 / $len1;
     
     $nx2 = $dy2 / $len2;
     $ny2 = -$dx2 / $len2;
     
-    // figure out the angle between the lines.
-    // (actually, their normals, but the angle is the same)
-    
-    $dp =  $nx1*$nx2 + $ny1*$ny2;
-    $angle = rad2deg(acos($dp));
-    $angle = rad2deg(atan2($ny2,$nx2) - atan2($ny1,$nx1));
-    
     $capping = FALSE;
-    print "Angle is $angle degrees\n";
-    if(abs($angle)>169)
-    {
-         // $capping = TRUE;
-    }
+    // figure out the angle between the lines - for very sharp turns, we should do something special
+    // (actually, their normals, but the angle is the same and we need the normals later)
+    $angle = rad2deg(atan2($ny2,$nx2) - atan2($ny1,$nx1));
+    if(abs($angle)>169)  { $capping = TRUE; }
+    $capping = FALSE; // override that for now
     
-    
-    $line1_x = $points_x[$i] + $nx1*$width;
-    $line1_y = $points_y[$i] + $ny1*$width;
-    
-    $line2_x = $points_x[$i] - $nx1*$width;
-    $line2_y = $points_y[$i] - $ny1*$width;
-    
-    $line3_x = $points_x[$i+1] + $nx2*$width;
-    $line3_y = $points_y[$i+1] + $ny2*$width;
-    
-    $line4_x = $points_x[$i+1] - $nx2*$width;
-    $line4_y = $points_y[$i+1] - $ny2*$width;
-
-
     if($i==0)
     {
-        $finalpoints[] = $line1_x;
-        $finalpoints[] = $line1_y;
+        $finalpoints[] = $points_x[$i] + $nx1*$width;
+        $finalpoints[] = $points_y[$i] + $ny1*$width;
         $numpoints++;
         
-        $reversepoints[] = $line2_x;
-        $reversepoints[] = $line2_y;
+        $reversepoints[] = $points_x[$i] - $nx1*$width;
+        $reversepoints[] = $points_y[$i] - $ny1*$width;
         $numrpoints++;
-    }
+    } 
   
-  
-    $a1 = $slope1;
-    $a2 = $slope2;
-    $b1 = -1;
-    $b2 = -1;
+    list($xi1,$yi1) = line_crossing( $points_x[$i] + $nx1*$width, $points_y[$i] + $ny1*$width,
+                                $points_x[$i+1] + $nx1*$width, $points_y[$i+1] + $ny1*$width,
+                                $points_x[$i+1] + $nx2*$width, $points_y[$i+1] + $ny2*$width,
+                                $points_x[$i+2] + $nx2*$width, $points_y[$i+2] + $ny2*$width                                
+                                );
     
-    // **********************    
+    list($xi2,$yi2) = line_crossing( $points_x[$i] - $nx1*$width, $points_y[$i] - $ny1*$width,
+                                $points_x[$i+1] - $nx1*$width, $points_y[$i+1] - $ny1*$width,
+                                $points_x[$i+1] - $nx2*$width, $points_y[$i+1] - $ny2*$width,
+                                $points_x[$i+2] - $nx2*$width, $points_y[$i+2] - $ny2*$width                                
+                                );
     
-    $c1 = ($line1_y - $slope1 * $line1_x );
-    $c2 = ($line3_y - $slope2 * $line3_x );
-    
-    $det_inv = 1/($a1*$b2 - $a2*$b1);
-    
-    $xi1 = (($b1*$c2 - $b2*$c1)*$det_inv);
-    $yi1 = (($a2*$c1 - $a1*$c2)*$det_inv);
-    
-    //$finalpoints[] = $xi;
-    //$finalpoints[] = $yi;
-    //$numpoints++;
-    
-    imagearc($im,$xi1,$yi1,5,5,0,360,$red);
-
-    $c1 = ($line2_y - $slope1 * $line2_x );
-    $c2 = ($line4_y - $slope2 * $line4_x );
-    
-    $det_inv = 1/($a1*$b2 - $a2*$b1);
-    
-    $xi2 = (($b1*$c2 - $b2*$c1)*$det_inv);
-    $yi2 = (($a2*$c1 - $a1*$c2)*$det_inv);
-    
-    print "$xi2 $yi2   $a1 $a2 $c1 $c2 $det_inv\n";
-    
-    //$reversepoints[] = $xi2;
-    //$reversepoints[] = $yi2;
-    //$numrpoints++;
-    
+    imagearc($im,$xi1,$yi1,8,8,0,360,$red);        
     imagearc($im,$xi2,$yi2,20,20,0,360,$red);
   
     // calculate the extra two points for capping  
@@ -220,29 +166,29 @@ for ($i=0; $i <$max_start; $i++)
     {
         // the next two are only needed for blunting very acute turns
         
-        $c1 = ($line1_y - $slope1 * $line1_x );
-        $c2 = ($line4_y - $slope2 * $line4_x );
+        list($xi3,$yi3) = line_crossing( $points_x[$i] + $nx1*$width, $points_y[$i] + $ny1*$width,
+                                $points_x[$i+1] + $nx1*$width, $points_y[$i+1] + $ny1*$width,
+                                $points_x[$i+1] - $nx2*$width, $points_y[$i+1] - $ny2*$width,
+                                $points_x[$i+2] - $nx2*$width, $points_y[$i+2] - $ny2*$width                                
+                                );
+
+        list($xi4,$yi4) = line_crossing( $points_x[$i] - $nx1*$width, $points_y[$i] - $ny1*$width,
+                                $points_x[$i+1] - $nx1*$width, $points_y[$i+1] - $ny1*$width,
+                                $points_x[$i+1] + $nx2*$width, $points_y[$i+1] + $ny2*$width,
+                                $points_x[$i+2] + $nx2*$width, $points_y[$i+2] + $ny2*$width                                
+                                );
         
-        $det_inv = 1/($a1*$b2 - $a2*$b1);
-        
-        $xi3 = (($b1*$c2 - $b2*$c1)*$det_inv);
-        $yi3 = (($a2*$c1 - $a1*$c2)*$det_inv);
-               
         imagearc($im,$xi3,$yi3,12,12,0,360,$red);
-        
-        $c1 = ($line2_y - $slope1 * $line2_x );
-        $c2 = ($line3_y - $slope2 * $line3_x );
-        
-        $det_inv = 1/($a1*$b2 - $a2*$b1);
-        
-        $xi4 = (($b1*$c2 - $b2*$c1)*$det_inv);
-        $yi4 = (($a2*$c1 - $a1*$c2)*$det_inv);      
-        
         imagearc($im,$xi4,$yi4,12,12,0,360,$red);
     }
     
     if($capping && $angle > 0)
-    {
+    {        
+        // in here, we need to decide which is the 'outside' of the corner,
+        // because that's what we flatten. The inside of the corner is left alone.
+        // - depending on the relative angle between the two segments, it could
+        //   be either one of these points.
+        
         $finalpoints[] = $xi3;
         $finalpoints[] = $yi3;
         $numpoints++;
@@ -280,25 +226,15 @@ for ($i=0; $i <$max_start; $i++)
         $reversepoints[] = $xi2;
         $reversepoints[] = $yi2;
         $numrpoints++;
-    }
-            
-        // in here, we need to decide which is the 'outside' of the corner,
-        // because that's what we flatten. The inside of the corner is left alone.
-        // - depending on the relative angle between the two segments, it could
-        //   be either one of these points.  
-    
+    }   
 }
 
-$line5_x = $points_x[$i+1] + $nx2*$width;
-$line5_y = $points_y[$i+1] + $ny2*$width;
-$line6_x = $points_x[$i+1] - $nx2*$width;
-$line6_y = $points_y[$i+1] - $ny2*$width;
-
-$finalpoints[] = $line5_x;
-$finalpoints[] = $line5_y;
+$finalpoints[] = $points_x[$i+1] + $nx2*$width;
+$finalpoints[] = $points_y[$i+1] + $ny2*$width;
 $numpoints++;
-$reversepoints[] = $line6_x;
-$reversepoints[] = $line6_y;
+
+$reversepoints[] = $points_x[$i+1] - $nx2*$width;
+$reversepoints[] = $points_y[$i+1] - $ny2*$width;
 $numrpoints++;
 
 for($i=($numrpoints-1)*2; $i>=0; $i-=2)
@@ -310,6 +246,10 @@ for($i=($numrpoints-1)*2; $i>=0; $i-=2)
     $finalpoints[] = $y;
     $numpoints++;
 }
+
+// $finalpoints[] contains a complete outline of the line at this stage
+
+// ***********************************************************************************
 
 print "Drawing polygon and polyline for $numpoints points\n";
 print "Polygon: ".imagefilledpolygon($im,$finalpoints,count($finalpoints)/2,$grey)."\n";
@@ -327,5 +267,33 @@ function imagepolyline($image, $points, $npoints, $color)
 		$color); }
 }
 
-?>
 
+// find the point where a line from x1,y1 through x2,y2 cross another line through x3,y3 and x4,y4
+// (the point might not be between those points, but beyond them)
+function line_crossing($x1,$y1,$x2,$y2, $x3,$y3,$x4,$y4)
+{
+    
+    // First, check that the slope isn't infinite.
+    // if it is, tweak it to be merely huge
+    if($x1 != $x2) { $slope1 = ($y2-$y1)/($x2-$x1); }
+    else { $slope1 = 1e10; print "Slope1 is infinite.\n";}
+    
+    if($x3 != $x4) { $slope2 = ($y4-$y3)/($x4-$x3); }
+    else { $slope2 = 1e10; print "Slope2 is infinite.\n";}
+    
+    $a1 = $slope1;
+    $a2 = $slope2;
+    $b1 = -1;
+    $b2 = -1;   
+    $c1 = ($y1 - $slope1 * $x1 );
+    $c2 = ($y3 - $slope2 * $x3 );
+    
+    $det_inv = 1/($a1*$b2 - $a2*$b1);
+    
+    $xi = (($b1*$c2 - $b2*$c1)*$det_inv);
+    $yi = (($a2*$c1 - $a1*$c2)*$det_inv);
+    
+    return(array($xi,$yi));
+}
+
+?>

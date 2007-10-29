@@ -209,6 +209,37 @@ function imagecreatefromfile($filename)
 	return $bgimage;
 }
 
+
+// find the point where a line from x1,y1 through x2,y2 crosses another line through x3,y3 and x4,y4
+// (the point might not be between those points, but beyond them)
+// - doesn't handle parallel lines. In our case we will never get them.
+// XXX - make sure we remove colinear points, or this will not be true!
+function line_crossing($x1,$y1,$x2,$y2, $x3,$y3,$x4,$y4)
+{
+    
+    // First, check that the slope isn't infinite.
+    // if it is, tweak it to be merely huge
+    if($x1 != $x2) { $slope1 = ($y2-$y1)/($x2-$x1); }
+    else { $slope1 = 1e10; print "Slope1 is infinite.\n";}
+    
+    if($x3 != $x4) { $slope2 = ($y4-$y3)/($x4-$x3); }
+    else { $slope2 = 1e10; print "Slope2 is infinite.\n";}
+    
+    $a1 = $slope1;
+    $a2 = $slope2;
+    $b1 = -1;
+    $b2 = -1;   
+    $c1 = ($y1 - $slope1 * $x1 );
+    $c2 = ($y3 - $slope2 * $x3 );
+    
+    $det_inv = 1/($a1*$b2 - $a2*$b1);
+    
+    $xi = (($b1*$c2 - $b2*$c1)*$det_inv);
+    $yi = (($a2*$c1 - $a1*$c2)*$det_inv);
+    
+    return(array($xi,$yi));
+}
+
 // rotate a list of points around cx,cy by an angle in radians, IN PLACE
 function RotateAboutPoint(&$points, $cx,$cy, $angle=0)
 {

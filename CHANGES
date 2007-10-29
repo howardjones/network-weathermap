@@ -6,9 +6,11 @@
                 (this also means it can work with the Boost plugin for large installations)
                 See targets.html for more info on this one.
         ADDED - Editor - Align horizontal and Align-vertical for links. Calculates link offsets to make link vertical/horizontal.
-	FIXED - "Full Screen Maps" mode in Cacti Plugin was broken by me adding the "View Only First" mode.
-	FIXED - Imagemaps for horiz/vert format legend were wrong in editor (thanks to Alex Moura for pointing this out)
-                
+		CHANGE - Finally a better tab image, and a red 'active' one too, for the Cacti plugin.
+		FIXED - "Full Screen Maps" mode in Cacti Plugin was broken by me adding the "View Only First" mode.
+		FIXED - Imagemaps for horiz/vert format legend were wrong in editor (thanks to Alex Moura for pointing this out)
+		FIXED - Changes for compatibility with Cacti 0.8.7's moved config file.
+		                
 0.93    Added - weathermap-cacti-plugin.php?action=viewmap&id=mapfilename  works as well as a map number - useful for crosslinks
         FIXED - the key_hidezero secret setting hides the zero in a gradient in a classic scale too.
         CHANGE - the auth realm names for Cacti have been changed to match ReportIt and Aggregate - easier to tell who does what

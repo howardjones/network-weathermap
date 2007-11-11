@@ -74,7 +74,7 @@ class WeatherMapDataSource_rrd extends WeatherMapDataSource {
 					$SQLins = "insert into weathermap_data (rrdfile, data_source_name,sequence) values ('".mysql_real_escape_string($db_rrdname)."','".mysql_real_escape_string($dsnames[$dir])."', 0)";
 					$SQLcheck = "select data_template_data.local_data_id from data_template_data,data_template_rrd where data_template_data.local_data_id=data_template_rrd.local_data_id and data_template_data.data_source_path='".mysql_real_escape_string($db_rrdname)."' and data_template_rrd.data_source_name='".mysql_real_escape_string($dsnames[$dir])."'";
 					$SQLvalid = "select data_template_rrd.data_source_name from data_template_data,data_template_rrd where data_template_data.local_data_id=data_template_rrd.local_data_id and data_template_data.data_source_path='".mysql_real_escape_string($db_rrdname)."'";
-					
+					$worst_time = time() - 8*60;
 					$result = db_fetch_row($SQL);
 					if(!isset($result['id']))
 					{
@@ -105,9 +105,13 @@ class WeatherMapDataSource_rrd extends WeatherMapDataSource {
 					else
 					{
 						// if the result is valid, then use it
-						if( ($result['sequence'] > 2) && ((time() - $result['last_time']) < 800) )
+						if( ($result['sequence'] > 2) && ( $result['last_time'] > $worst_time) )
 						{
 							$data[$dir] = $result['last_calc'];
+						}
+						else
+						{
+							$data[$dir] = 0;
 						}
 					}
 				}				

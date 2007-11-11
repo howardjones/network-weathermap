@@ -4,6 +4,8 @@ MOSTLYDONE!   Boost/poller_output support
 DONE!   THold DS
 DONE!   INBWFORMAT/OUTBWFORMAT
 DONE!   Unidirectional links
+DONE! Fixes for Cacti 0.8.7 changes
+
 (php-rrdtool support?)
 (Editor NG) -> IE6 styling and imagemap updating is totally wrong
 Extra DS for WUG, Nagios
@@ -15,8 +17,8 @@ Angled VIAs
 RRD CF selection (0.92 patch from Ghozlane Toumi - needs rewrite now)
 
 BUG: RRD line with one NaN and one good value should still be a good line. -> Actual bug is that -1 is a magic value. Switch to NULL for 'no value'!
-BUG: poller_output should degrade when no new updates arrive, somehow.
-BUG: cacti-picker.php needs to include global.php if there is one, in preference to config.php (0.8.7 compat)
+FIXED BUG: poller_output should degrade when no new updates arrive, somehow.
+FIXED BUG: cacti-picker.php needs to include global.php if there is one, in preference to config.php (0.8.7 compat)
 
 -----------------
 

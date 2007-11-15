@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configentry>
+	<keyword>*COLOR</keyword>
+	<scope>GLOBAL</scope>
+	<anchor>GLOBAL_COLORS</anchor>
+    <definition>BGCOLOR <meta>red</meta> <meta>green</meta> <meta>blue</meta></definition>
+    <definition>TIMECOLOR <meta>red</meta> <meta>green</meta> <meta>blue</meta></definition>
+    <definition>TITLECOLOR <meta>red</meta> <meta>green</meta> <meta>blue</meta></definition>
+    <definition>KEYTEXTCOLOR <meta>red</meta> <meta>green</meta> <meta>blue</meta></definition>
+    <definition>KEYOUTLINECOLOR <meta>red</meta> <meta>green</meta> <meta>blue</meta></definition>
+    <definition>KEYBGCOLOR <meta>red</meta> <meta>green</meta> <meta>blue</meta></definition>
+
+    <description  xmlns="http://www.w3.org/1999/xhtml">
+        <p>Specify the colours used for drawing the global elements of the map.</p>
+        <p>red, green and blue are numbers from 0 to 255.</p>
+        <p>LABELFONTSHADOWCOLOR, LABELBGCOLOR and LABELOUTLINECOLOR have an additional option - 'none' - which stops that element of the LABEL being drawn. LABELFONTSHADOWCOLOR defaults to 'none'.</p>
+    </description>
+    <changes>
+    <change version="0.8">Added TIMECOLOR, TITLECOLOR, KEYTEXTCOLOR, KEYOUTLINECOLOR and KEYBGCOLOR.</change>
+    <change version="0.7">Added BGCOLOR.</change>
+    </changes>
+</configentry>

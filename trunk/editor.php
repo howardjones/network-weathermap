@@ -16,7 +16,7 @@ $config_loaded = @include_once 'editor-config.php';
 // XXX - if something from the old-style config is already defined by here, we need to warn.
 
 // set to TRUE to enable experimental overlay showing relative-positioning and VIAs
-$use_overlay=TRUE;
+$use_overlay=FALSE;
 
 if( isset($config) )
 {

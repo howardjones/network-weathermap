@@ -32,7 +32,7 @@ a { color: black; text-decoration: underline; font-weight: normal;}
 <p>You can then use the pre-install checker to see if your PHP environment has everything it needs. To do this, you need to run a special <tt>check.php</tt> script, twice...</p>
 <p>First, go to http://yourcactiserver/plugins/weathermap/check.php to see if your webserver PHP (mod_php, ISAPI etc) is OK. Then, from a command-prompt run <tt>php check.php</tt> to see if your command-line PHP is OK. If any modules or functions are missing, you will get a warning, and an explanation of what will be affected (not all of the things that are checked are deadly problems).</p>
 
-<p>Before you start using it, you might want to change one PHP setting. Weathermap uses a fair bit of memory by PHP standards, as it builds the image for the map in memory before saving it. As a result, your PHP process <i>may</i> run out of memory. PHP has a 'safety valve' built-in, to stop runaway scripts from killing your server, which defaults to 8MB in most versions (this has changed in 5.2.x). This is controlled by the 'memory_limit =' line in php.ini. You may need to increase this to 32MB or even more if you have problems.  These problems will typically show up as the poller process just dying with no warning or error message, as PHP kills the script.</p>
+<p>Before you start using it, you might want to change one PHP setting. Weathermap uses a fair bit of memory by PHP standards, as it builds the image for the map in memory before saving it. As a result, your PHP process <i>may</i> run out of memory. PHP has a 'safety valve' built-in, to stop runaway scripts from killing your server, which defaults to 8MB in most versions (this has changed in 5.2.x). This is controlled by the 'memory_limit =' line in php.ini. You may need to increase this to 32MB or even more if you have problems. In fact, the current Cacti manual suggests 128MB.  These problems will typically show up as the poller process just dying with no warning or error message, as PHP kills the script.</p>
 
 <h4>Installation</h4>
 <p>To use the Cacti plugin, you <i>must</i> unpack the zip file into a directory called '<i>&lt;cacti_root&gt;</i>/plugins/weathermap'. The zip contains a folder called 'weathermap' already, so unzipping it in the plugins folder should do the job.</p>
@@ -47,7 +47,7 @@ chown cactiuser output
 
 <h4>Getting Started</h4>
 
-<p>To actually enable the plugin, you need to add a line to your Cacti includes/config.php file:
+<p>To actually enable the plugin, you need to add a line to your Cacti config file. This file is includes/config.php for Cacti 0.8.6 and includes/global.php for Cacti 0.8.7:
 <div class="shell"><pre>
 $plugins = array();
 $plugins[] = 'monitor';
@@ -83,6 +83,7 @@ In a pinch, you can just <tt>chmod 777 configs</tt>, but this <em>really isn't</
 <p>
     You should now be able to go to http://your.server/cacti/plugins/weathermap/editor.php in a browser, and get a welcome page that offers to load or create a config file. That's it. All done. Please see the <a href="editor.html">editor manual page</a> for more about <i>using</i> the editor!
 </p>
+<p>You can also edit an existing map from the Cacti web interface, by choosing Manage..Weathermaps and then clicking on the name of a config file in the list of active maps. The editor will open with that map loaded.</p>
 <p>
     <strong>Important Security Note:</strong> The editor allows <i>anyone</i> who can access editor.php to change the configuration files for your network weathermaps. There is no authentication built-in for editing, even with the Cacti Plugin. This is why the configuration file doesn't exist by default - the editor won't work until you choose to make it work. It's recommended that you either: <ul><li>change the ownership of configuration files so that the editor can't write to them once they are complete, or </li><li>use your webserver's authentication and access control facilities to limit who can access the editor.php URL. On apache, this can be done using the FilesMatch directive and mod_access.</li></ul>
 </p>

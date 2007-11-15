@@ -14,13 +14,13 @@
     In most normal situations you <em>need</em> to use the tokens, or the label won't do much useful</p>
     <p>There is also a matching OUTBWFORMAT command to do the ame job for the outbound bandwidth label.</p>
     
+    </description>
     <examples>
 	<example><caption>Providing more information in the bwlabel</caption>
 	<content>INBWFORMAT {node:this:inpercent}% of {node:this:max_bandwidth_in:%k}b/sec</content>
 	</example>
     </examples>
 
-    </description>
     <changes>
     <change version="0.94">Added INBWFORMAT.</change>
     </changes>

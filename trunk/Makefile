@@ -24,7 +24,6 @@ sql:
 
 
 #
-# svn copy http://wotsit.thingy.com/svn/repos/php-weathermap/trunk http://wotsit.thingy.com/svn/repos/php-weathermap/tags/version-0.71 -m "Tagging for release"
-#
+# svn copy http://www.network-weathermap.com/svn/repos/trunk http://www.network-weathermap.com/svn/repos/tags/version-0.94 -m "Tagging 0.94 for release"
 #
 

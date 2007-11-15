@@ -4211,7 +4211,8 @@ function ReadConfig($filename)
 				}
 				
 				if ($last_seen == 'LINK' && preg_match(
-					"/^\s*VIASTYLE\s+(curved|angled)\s*$/i", $buffer,
+					// "/^\s*VIASTYLE\s+(curved|angled)\s*$/i", $buffer,
+					"/^\s*VIASTYLE\s+(curved)\s*$/i", $buffer,
 					$matches))
 				{
 					$curlink->viastyle=$matches[1];

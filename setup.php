@@ -261,7 +261,7 @@ function weathermap_show_tab () {
 
 		print '<a href="' . $config['url_path'] . 'plugins/weathermap/weathermap-cacti-plugin.php"><img src="' . $config['url_path'] . 'plugins/weathermap/images/tab_weathermap';
 		// if we're ON a weathermap page, print '_red'
-		if(preg_match('/plugins\/weathermap\//',$_SERVER['REQUEST_URI'] ,$matches))
+		if(preg_match('/plugins\/weathermap\/weathermap-cacti-plugin.php/',$_SERVER['REQUEST_URI'] ,$matches))
 		{
 			print "_red";
 		}

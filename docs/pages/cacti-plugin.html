@@ -8,7 +8,7 @@
   "HTML Tidy for Mac OS X (vers 12 April 2006), see www.w3.org" />
 
   <title>PHP Weathermap 
-v0.94dev
+v0.94
  - Cacti Plugin</title>
 <style type="text/css" media="print">
 /*<![CDATA[*/
@@ -41,7 +41,7 @@ a { color: black; text-decoration: underline; font-weight: normal;}
 
 <div id="header">
 	<h1>PHP Weathermap 
-v0.94dev
+v0.94
 </h1>
     <h4>Copyright &copy; 2005-2007 Howard Jones, <tt><a
 href="mailto:howie@thingy.com">howie@thingy.com</a></tt>. (<a
@@ -132,7 +132,7 @@ that the data is valid for (a poller cycle), and divides it evenly between the a
 */5 * * * *   cactiuser  /usr/bin/php   /your/cacti/path/plugins/weathermap/weathermap-cacti-rebuild.php
 </pre></div>
 
-You will need to change the paths to php and cacti, and the user that cacti runs as. If you use 'crontab -e', instead of editing /etc/crontab directly, then you should remove the 'cactiuser'.
+You will need to change the paths to php and cacti, and the user that cacti runs as. If you use 'crontab -e', instead of editing /etc/crontab directly, then you should remove the 'cactiuser'. <strong>In normal use, you don't need to add a cron job - the Cacti poller does this work for you.</strong>
 </p>
     
 <h3>Final Notes and Troubleshooting</h3>    

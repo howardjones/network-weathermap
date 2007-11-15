@@ -8,7 +8,7 @@
  "HTML Tidy for Mac OS X (vers 12 April 2006), see www.w3.org" /> 
 
  <title>PHP Weathermap 
-v0.94dev 
+v0.94 
  - Targets Reference</title> 
 <style type="text/css" media="print"> 
 /*<![CDATA[*/ 
@@ -41,7 +41,7 @@ a { color: black; text-decoration: underline; font-weight: normal;}
 
 <div id="header"> 
  <h1>PHP Weathermap 
-v0.94dev 
+v0.94 
 </h1> 
  <h4>Copyright &copy; 2005-2007 Howard Jones, <tt><a 
 href="mailto:howie@thingy.com">howie@thingy.com</a></tt>. (<a 
@@ -74,19 +74,30 @@ href="http://www.network-weathermap.com/">Website</a>)</h4>
 <div class="definition">TARGET rrd:<em>rrdfile.rrd</em>:<em>in_ds</em>:<em>out_ds</em></div> 
 <div class="definition">TARGET scale:<em>factor</em>:<em>rrdfile.rrd</em>:<em>in_ds</em>:<em>out_ds</em></div> 
 
-
 <p>This is the 'core' plugin for Weathermap. It reads data from rrd files, created using <a href="http://www.rrdtool.org/">Tobi Oetiker's RRDtool</a>, by tools like Cacti, MRTG, Cricket, NRG and so on.</p> 
-
+<p>First of all, Weathermap needs to be able to find your rrdtool executable. If you are using the Cacti plugin, then this information is taken automatically from Cacti. If you are using the command-line tool, you will need to edit <tt>weathermap</tt> around line 29 to point to your rrdtool executable.</p> 
+<h4>TARGET formats</h4> 
 <p>If you only specify a filename, and no DS-names, the default DS names for RRD files are 'traffic_in' and 'traffic_out', which works with 
- the majority of Cacti RRD files. For MRTG-produced RRD files, the names are 
- 'DS0' and 'DS1'. 
+ the majority of Cacti RRD files (those produced by the Interface Traffic template). For MRTG-produced RRD files, the names are 
+ 'DS0' and 'DS1'. For Cricket standard-interface RRD files, it would be 'ds0' and 'ds1'. 
  </p><p>You can also specify '-' for either DS name, which tells Weathermap to ignore 
  this rrd file for the purposes of the input or output value. 
  This is mainly useful in combination with the aggregation feature, where you can take the input data from one rrd file, and the output data from another.</p> 
  <p>With no prefix, or with just 'rrd:' as a prefix, the data read from the rrd file is assumed to be a standard SNMP interface counter, which is a byte-rate. It automatically multiplies these by 8 to get a bit-rate for the map. With the 'gauge:' prefix, this multiplication doesn't happen, which is useful for non-bandwidth values, like SNR or session-counts. Finally, you can use the 'scale:' prefix to multiply by any factor - suppose you have a value in seconds, and you want to show it in milliseconds for example. Of course, you can also divide using this, by using a scale factor that is less than 1 - multiplying by 1/x is the same as dividing by x.</p> 
 
+<h4>rrdtool adjustments</h4> 
 <p>By default, the plugin will read the last 800 seconds of data, and find the most recent within that to use. You might need to make it read back further, if you are updating your rrd files slowly. You can do this with the <a href="config-reference.html#GLOBAL_SET">SET</a> command, by adding <a href="config-reference.html#GLOBAL_SET">'SET</a> rrd_period 3000' (any value in seconds) at the top of your map config file, before any <a href="config-reference.html#NODE_NODE">NODE</a> or <a href="config-reference.html#LINK_LINK">LINK</a> lines.</p> 
 <p>Similarly, you can change the time that the plugin looks for data at from the present to the past, by using <a href="config-reference.html#GLOBAL_SET">'SET</a> rrd_start -1d' in the top section of the config file. The full range of time-specification strings is at the bottom of the <a href="http://oss.oetiker.ch/rrdtool/doc/rrdfetch.en.html">rrdfetch manual page</a>.</p> 
+
+<h4>Cacti poller_output support (aka Boost support)</h4> 
+<p>If you are using Cacti as your data collector, and running Weathermap from Cacti's poller, then there is another special feature, called poller_output. Weathermap can intercept data as it is collected by Cacti, and therefore avoid 
+running lots of external rrdtool processes to collect the data it needs to display your map. This is <em>especially</em> useful if you are using TheWitness' Boost plugin, as the data isn't written to the rrd files 
+until some time after it is collected. Even without Boost, it should provide a performance improvement, particularly with large installations of Weathermap.</p> 
+<p>To use this feature, a map-global variable needs to be set. Near the top of your map config file, add <a href="config-reference.html#GLOBAL_SET">'SET</a> rrd_use_poller_output 1'. The setting will take a few poller cycles to take effect: during the first one, the 
+appropriate cacti data sources are identified based on the rrd filenames, on the second cycle values will be collected, and on the third we'll have two values, so any COUNTER datasources will begin to work properly. If the poller_output feature 
+fails to collect data, then the regular rrdtool-running method will be attempted too.</p> 
+<p>Note that since the rrdtool program is not bein run in this mode, you <em>can't</em> use the "time-shifting" features described above - those rely on using <em>real</em> rrdtool files.</p> 
+
 
 <h3><a name="tabs"></a>Tab-separated text</h3> 
 <div class="definition">TARGET <em>textfile</em></div> 

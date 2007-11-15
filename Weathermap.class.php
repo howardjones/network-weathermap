@@ -1,12 +1,12 @@
 <?php
-// PHP Weathermap 0.94dev
+// PHP Weathermap 0.94
 // Copyright Howard Jones, 2005-2007 howie@thingy.com
 // http://www.network-weathermap.com/
 // Released under the GNU Public License
 
 require_once "HTML_ImageMap.class.php";
 
-$WEATHERMAP_VERSION="0.94dev";
+$WEATHERMAP_VERSION="0.94";
 $weathermap_debugging=FALSE;
 
 // Turn on ALL error reporting for now.
@@ -5138,7 +5138,7 @@ function AllocateScaleColours($im,$refname='gdref1')
 	}
 }
 
-function DrawMap($filename = '', $thumbnailfile = '', $thumbnailmax = 250, $withnodes = TRUE)
+function DrawMap($filename = '', $thumbnailfile = '', $thumbnailmax = 250, $withnodes = TRUE, $use_overlay = FALSE)
 {
 	$bgimage=NULL;
 	$this->cachefile_version = crc32(file_get_contents($this->configfile));
@@ -5238,6 +5238,45 @@ function DrawMap($filename = '', $thumbnailfile = '', $thumbnailmax = 250, $with
 		$this->DrawTitle($image, $this->titlefont, $this->colours['DEFAULT']['TITLE']['gdref1']);
 
 		# $this->DrawNINK($image,300,300,48);
+
+		// for the editor, we can optionally overlay some other stuff
+                if($this->context == 'editor')
+                {
+			if($use_overlay)
+			{
+			$overlay = myimagecolorallocate($image, 200, 0, 0);
+
+			// first, we can show relatively positioned NODEs
+                        foreach ($this->nodes as $node) {
+                                if($node->relative_to != '')
+                                {
+                                        $rel_x = $this->nodes[$node->relative_to]->x;
+                                        $rel_y = $this->nodes[$node->relative_to]->y;
+                                        imagearc($image,$node->x, $node->y,
+                                                15,15,0,360,$overlay);
+                                        imagearc($image,$node->x, $node->y,
+                                                16,16,0,360,$overlay);
+
+                                        imageline($image,$node->x, $node->y,
+                                                $rel_x, $rel_y, $overlay);
+                                }
+                        }
+		
+			// then overlay VIAs, so they can be seen	
+			foreach($this->links as $link)
+			{
+				foreach ($link->vialist as $via)
+				{
+                        		imagearc($image, $via[0],$via[1],10,10,0,360,$overlay);
+                        		imagearc($image, $via[0],$via[1],12,12,0,360,$overlay);
+               			 }
+
+		
+			}
+			}
+                }
+
+
 
 		// Ready to output the results...
 

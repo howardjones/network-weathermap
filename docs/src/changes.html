@@ -22,6 +22,35 @@ a { color: black; text-decoration: underline; font-weight: normal;}
 
 <!--#include file="common-top-nav.html" -->
 
+    <h2><a name="changes094">Changes For This Version (0.93 to 0.94)</a></h2>
+
+<p>0.94 was released early, to fix the one small issue caused by files moving around in the recent Cacti 0.8.7 release. However, there 
+are some nice new features even so - INBWFORMAT has been requested for quite a while, and so has poller_output support.</p>
+
+	<h3>Changes</h3>
+
+	<ul>
+<li>Finally a better tab image, and a red 'active' one too, for the Cacti plugin.</li>
+</ul>
+
+	<h3>New Features</h3>
+	<ul>
+<li>INBWFORMAT and OUTBWFORMAT allow you to format the text for BWLABEL, same as for COMMENTs</li>
+<li>New cactithold/cactimonitor data source plugin reads data from Cacti's Threshold plugin.
+                (Original development for this plugin was paid for by Stellar Consulting - Thanks!)</li>
+<li>New LINKSTYLE command allows you to have one-way (one arrow) links.</li>
+<li>RRD DS can use Cacti's poller_output to get data without running RRDtool at all.
+                (this also means it can work with the Boost plugin for large installations)
+                See <a href="targets.html">targets.html</a> for more info on this one.</li>
+<li>Editor - Align horizontal and Align-vertical for links. Calculates link offsets to make link vertical/horizontal.</li>
+</ul>
+	<h3>Fixes</h3>
+	<ul>
+<li>"Full Screen Maps" mode in Cacti Plugin was broken by me adding the "View Only First" mode.</li>
+<li>Imagemaps for horiz/vert format legend were wrong in editor (thanks to Alex Moura for pointing this out)</li>
+<li>Changes for compatibility with Cacti 0.8.7's moved config file.</li>
+	</ul>
+
     <h2><a name="changes093">Changes For This Version (0.92 to 0.93)</a></h2>
     <h3>Changes</h3>
     <ul>

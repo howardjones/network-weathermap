@@ -9,7 +9,7 @@
  "HTML Tidy for Mac OS X (vers 1st December 2004), see www.w3.org" /> 
 
  <title>PHP Weathermap 
-v0.94dev 
+v0.94 
  -FAQ</title> 
 <style type="text/css" media="print"> 
 /*<![CDATA[*/ 
@@ -40,7 +40,7 @@ a { color: black; text-decoration: underline; font-weight: normal;}
 
 <div id="header"> 
  <h1>PHP Weathermap 
-v0.94dev 
+v0.94 
 </h1> 
  <h4>Copyright &copy; 2005-2007 Howard Jones, <tt><a 
 href="mailto:howie@thingy.com">howie@thingy.com</a></tt>. (<a 
@@ -88,7 +88,7 @@ href="http://www.network-weathermap.com/">Website</a>)</h4>
  <dd><p>Check if this is still the case when Weathermap is the 
  only plugin. If a plugin dies completely, it takes the poller 
  and any remaining plugins with it. This appears to be a 
- problem with some versions of 'Reports' in particular, where 
+ problem with some older versions of 'Reports' in particular, where 
  anything listed after Reports in the plugins[] list will not 
  be run.</p> 
  </dd> 
@@ -116,7 +116,9 @@ href="http://www.network-weathermap.com/">Website</a>)</h4>
 
  <dt><a name="gauges"></a>The value from my RRD data is much too big!</dt> 
 
- <dd><p>Is it about 8 times too big, by any chance? Historically, Weathermap was mainly used for SNMP Interface statistics, which use bytes-per-second counters ("octet counters" in SNMP-speak). Because of this, the standard RRD datasource plugin multiplies everything by 8, to get back to bits-per-second. New in 0.9, you can get the 'raw' value from an RRD file by using <a href="targets.html#rrd">'gauge:' as a prefix</a>.</p></dd> 
+ <dd><p>Is it about 8 times too big, by any chance? Historically, Weathermap was mainly used for SNMP Interface statistics, which use bytes-per-second counters ("octet counters" in SNMP-speak). Because of this, the standard RRD datasource plugin multiplies everything by 8, to get back to bits-per-second. New in 0.9, you can get the 'raw' value from an RRD file by using <a href="targets.html#rrd">'gauge:' as a prefix</a>.</p><p>If the value is wrong by some other constant factor, you can use the 'scale:' prefix to multiply or divide by that factor - e.g divide by 1000 to turn a milliseconds value into a 'real' seconds value, or multiply by 1024 to get a kilobytes values from a megabytes one.</p></dd> 
+
+
 
  <dt><a name="timezone"></a>The timestamp on my map is all wrong!</dt> 
 
@@ -124,10 +126,11 @@ href="http://www.network-weathermap.com/">Website</a>)</h4>
  it seems that PHP doesn't always use your system timezone correctly. The fix is to edit php.ini to change date.timezone </p></dd> 
 
 
- <dt><a name="gdbug"></a>Weathermap just dies without warning on my Debian/Ubuntu system</dt> 
+ <dt><a name="gdbug"></a>Weathermap just dies without warning on my Debian/Ubuntu system<br/>OR... I get a blank screen in the editor when I add a node<br />OR... I get a segmentation fault when Weathermap runs</dt> 
 
  <dd><p> It's a GD bug. It's documented <a href="http://bugs.libgd.org/4">here</a>, and the reason it mainly affects Debian is that Debian links to the system GD (version 2.0.33) not the built-in PHP one (2.0.28ish). For whatever reason, the problems aren't present in the PHP GD library, which has a different alpha-blending implementation as far as I can see from the docs. </p> 
 <p>The bugs are apparently fixed in GD 2.0.34, which has been released and is in Debian unstable. Users report that upgrading to the version of libgd2-xpm from unstable will fix this problem if you can't wait, or recompile PHP to use it's own GD library.</p> 
+<p>There is more information about fixing this issue for Debian Etch (and perhaps also Ubuntu Edgy) in <a href="http://forums.cacti.net/viewtopic.php?t=21517">this Cacti Forum thread</a>.</p> 
 </dd> 
  <dt><a name="icons"></a>Where can I find some icons to use with Weathermap? Why 
  don't you have any supplied with it?</dt> 
@@ -228,7 +231,12 @@ href="http://www.network-weathermap.com/">Website</a>)</h4>
  program though, so <i>you</i> can <i>always</i> add your own 
  features! I try to keep a todo list on the website for 
  current work-in-progress. Obviously, things that <i>I</i> 
- want are <i>always</i> sensible and useful<tt>:-)</tt> .</p></dd> 
+ want are <i>always</i> sensible and useful<tt>:-)</tt> .</p> 
+
+ <p>In the past, people have paid to have features added. I have a day job which pays for my food and my mortgage, so this isn't 
+ <em>always</em> a possibility, but it sometimes is. If it's a good idea, then I'll probably add it anyway, but if it's something 
+ special to you, or that you want in a particular timescale, then maybe we can talk!</p> 
+</dd> 
 
  <dt><a name="repayme"></a>How can I possibly repay you for making my life and work 
  so much easier?</dt> 

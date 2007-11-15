@@ -15,6 +15,9 @@ $config_loaded = @include_once 'editor-config.php';
 
 // XXX - if something from the old-style config is already defined by here, we need to warn.
 
+// set to TRUE to enable experimental overlay showing relative-positioning and VIAs
+$use_overlay=TRUE;
+
 if( isset($config) )
 {
     $configerror = 'OLD editor config file format. The format of this file changed in version 0.92 - please check the new editor-config.php-dist and update your editor-config.php file. [WMEDIT02]';
@@ -165,7 +168,7 @@ else
 
 		$map->sizedebug = TRUE;
 		//            $map->RandomData();
-		$map->DrawMap();
+		$map->DrawMap('','',250,TRUE,$use_overlay);
 		exit();
 		break;
 

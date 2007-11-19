@@ -12,7 +12,7 @@
 
 function weathermap_version () {
 	return array( 	'name'    	=> 'weathermap',
-		'version'       => '0.94',
+		'version'       => '0.941',
 		'longname'      => 'PHP Network Weathermap',
 		'author'        => 'Howard Jones',
 		'homepage'      => 'http://www.network-weathermap.com/',
@@ -311,7 +311,7 @@ function weathermap_poller_output ($rrd_update_array) {
 	// partially borrowed from Jimmy Conner's THold plugin.
 	// (although I do things slightly differently - I go from filenames, and don't use the poller_interval)
 
-	cacti_log("*****************************************************************\npoller_output starting\n",true,"WEATHERMAP");
+//	debug("poller_output starting\n");
 	
 	$requiredlist = db_fetch_assoc("select distinct weathermap_data.*, data_template_data.local_data_id, data_template_rrd.data_source_type_id from weathermap_data, data_template_data, data_template_rrd where weathermap_data.rrdfile=data_template_data.data_source_path and data_template_rrd.local_data_id=data_template_data.local_data_id");
 	
@@ -363,11 +363,11 @@ function weathermap_poller_output ($rrd_update_array) {
 					break;
 			}
 			db_execute("UPDATE weathermap_data SET last_time=$time, last_calc='$newvalue', last_value='$value',sequence=sequence+1  where id = " . $required['id']);
-			cacti_log("Final value is $newvalue (was $lastval, period was $period)\n",true,"WEATHERMAP");
+//			debug("Final value is $newvalue (was $lastval, period was $period)\n");
 		}
 	}
 
-	cacti_log("poller_output done\n*****************************************************************\n",true,"WEATHERMAP");
+//	debug("poller_output done\n");
 	
 	return $rrd_update_array;
 }

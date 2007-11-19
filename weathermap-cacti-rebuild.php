@@ -5,7 +5,7 @@ global $weathermap_debugging, $WEATHERMAP_VERSION;
 $cacti_base = "C:/Program Files/xampp/htdocs/cacti/";
 $cacti_base = "/usr/local/share/cacti/";
 
-include_once($cacti_base."/include/config.php");
+include_once($cacti_base."/include/global.php");
 
 include_once($config["library_path"] . DIRECTORY_SEPARATOR."database.php");
 include_once(dirname(__FILE__).DIRECTORY_SEPARATOR."setup.php");

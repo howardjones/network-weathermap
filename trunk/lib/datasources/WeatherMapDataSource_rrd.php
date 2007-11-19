@@ -61,6 +61,8 @@ class WeatherMapDataSource_rrd extends WeatherMapDataSource {
 		
 		if(isset($config))
 		{
+			debug("RRD ReadData: poller_output style\n");
+
 			// force it to be a complete path first,
 			// then take away the cacti bit, to get the appropriate path for the table
 			$db_rrdname = realpath($rrdfile);
@@ -68,8 +70,10 @@ class WeatherMapDataSource_rrd extends WeatherMapDataSource {
 			debug("******************************************************************\nChecking weathermap_data\n");
 			foreach (array(IN,OUT) as $dir)
 			{
+				debug("RRD ReadData: poller_output - looking for $dir value\n");
 				if($dsnames[$dir] != '-')
 				{
+					debug("RRD ReadData: poller_output - DS name is ".$dsnames[$dir]."\n");
 					$SQL = "select * from weathermap_data where rrdfile='".mysql_real_escape_string($db_rrdname)."' and data_source_name='".mysql_real_escape_string($dsnames[$dir])."'";
 					$SQLins = "insert into weathermap_data (rrdfile, data_source_name,sequence) values ('".mysql_real_escape_string($db_rrdname)."','".mysql_real_escape_string($dsnames[$dir])."', 0)";
 					$SQLcheck = "select data_template_data.local_data_id from data_template_data,data_template_rrd where data_template_data.local_data_id=data_template_rrd.local_data_id and data_template_data.data_source_path='".mysql_real_escape_string($db_rrdname)."' and data_template_rrd.data_source_name='".mysql_real_escape_string($dsnames[$dir])."'";
@@ -78,7 +82,7 @@ class WeatherMapDataSource_rrd extends WeatherMapDataSource {
 					$result = db_fetch_row($SQL);
 					if(!isset($result['id']))
 					{
-						debug("RRD ReadData: Adding new weathermap_data row for $db_rrdname:".$dsnames[$dir]."\n");
+						debug("RRD ReadData: poller_output - Adding new weathermap_data row for $db_rrdname:".$dsnames[$dir]."\n");
 						$result = db_fetch_row($SQLcheck);
 						if(!isset($result['local_data_id']))
 						{
@@ -104,19 +108,37 @@ class WeatherMapDataSource_rrd extends WeatherMapDataSource {
 					}
 					else
 					{
+						debug("RRD ReadData: poller_output - found weathermap_data row\n");
 						// if the result is valid, then use it
 						if( ($result['sequence'] > 2) && ( $result['last_time'] > $worst_time) )
 						{
 							$data[$dir] = $result['last_calc'];
+							debug("RRD ReadData: poller_output - data looks valid\n");
 						}
 						else
 						{
 							$data[$dir] = 0;
+							debug("RRD ReadData: poller_output - data is either too old, or too new\n");
 						}
 					}
 				}				
+				else
+				{
+					debug("RRD ReadData: poller_output - DS name is '-'\n");
+				}
 			}
 		}
+		else
+		{
+			warn("RRD ReadData: poller_output - Cacti environment is not right [WMRRD12]\n");
+		}
+
+		// fudge the missing value, so data is valid. This is horrible.
+		if( ($data[IN] == -1) && ($data[OUT] >= 0) ) $data[IN] = 0;
+		if( ($data[OUT] == -1) && ($data[IN] >= 0) ) $data[OUT] = 0;
+
+		debug("RRD ReadData: poller_output - result is ".$data[IN].",".$data[OUT]."\n");
+		debug("RRD ReadData: poller_output - ended\n");
 	}
 	
 	function wmrrd_read_from_php_rrd($rrdfile,$cf,$start,$end,$dsnames, &$data ,&$map)
@@ -145,6 +167,9 @@ class WeatherMapDataSource_rrd extends WeatherMapDataSource {
 
 	function wmrrd_read_from_real_rrdtool($rrdfile,$cf,$start,$end,$dsnames, &$data, &$map)
 	{
+
+		debug("RRD ReadData: traditional style\n");
+
 		// we get the last 800 seconds of data - this might be 1 or 2 lines, depending on when in the
 		// cacti polling cycle we get run. This ought to stop the 'some lines are grey' problem that some
 		// people were seeing
@@ -226,6 +251,12 @@ class WeatherMapDataSource_rrd extends WeatherMapDataSource {
 				{
 					// at least one of the named DS had good data
 					$data_time = intval($values['timestamp']);	
+
+					// 'fix' a -1 value to 0, so the whole thing is valid
+					// (this needs a proper fix!)
+					if($data[IN]== -1) $data[IN]=0;
+					if($data[OUT]== -1) $data[OUT]=0;
+
 					// break out of the loop here   
 					break;
 				}

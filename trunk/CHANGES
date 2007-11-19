@@ -1,3 +1,6 @@
+0.941	FIXED - Issue with '-' DS names again.
+	FIXED - Added extra code to help discourage browser caching.
+
 0.94    ADDED - INBWFORMAT and OUTBWFORMAT allow you to format the text for BWLABEL, same as for COMMENTs
         ADDED - New cactithold/cactimonitor data source plugin reads data from Cacti's Threshold plugin.
                 (Original development for this plugin was paid for by Stellar Consulting - Thanks!)

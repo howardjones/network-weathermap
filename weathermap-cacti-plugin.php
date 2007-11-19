@@ -206,7 +206,7 @@ function weathermap_thumbview()
 				$i++;
 
 				$thumbfile = $outdir."weathermap_thumb_".$map['id'].".".$imageformat;
-				$thumburl = "output/weathermap_thumb_".$map['id'].".".$imageformat;
+				$thumburl = "output/weathermap_thumb_".$map['id'].".".$imageformat."?time=".time();
 				$maptitle = $map['titlecache'];
 				if($maptitle == '') $maptitle= "Map for config file: ".$map['configfile'];
 

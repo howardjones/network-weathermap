@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configentry>
+	<keyword>ICON</keyword>
+	<scope>NODE</scope>
+	<anchor>NODE_ICON</anchor>
+    <definition>ICON <meta>iconimagefile</meta></definition>
+    <definition>ICON <meta>maxwidth</meta> <meta>maxheight</meta> <meta>iconimagefile</meta></definition>
+      <definition>ICON none</definition>
+
+    <description xmlns="http://www.w3.org/1999/xhtml">
+        <p>Specifies an icon to use for the node.</p>
+		<p>The filename can either be a full path to the image, or a relative one. </p>
+		<p>The icon file must be in PNG, JPEG or GIF format. Alpha-transparency within the icon should be honoured by Weathermap for PNG icons, to create irregular shapes.</p>
+		<p>If you specify the word 'none' as the icon filename, then no icon is used. This  is useful if you have specified an ICON in the DEFAULT NODE, and want to override that for a few special cases.</p>
+		<p>The second form allows you to specify a maximum width and height for the icon. If the PNG file that you specify is bigger or smaller than this size, then it is automatically scaled up (or down) in proportion, so that it fits into a box of the size you specify.</p>
+		<p>The size of the icon image is used by LABELOFFSET to decided how far to move the label, if you use compass-point offsets.</p>
+<p>The text for the filename can contain <a href="advanced.html#tokens">special tokens</a> to select an icon based on  map data.</p>
+		</description>
+		    <changes>
+                <change version="0.9">Added 'special token' support.</change>
+<change version="0.9">Added JPEG and GIF support.</change>
+ .           <change version="0.9">Added special icon 'none', and automatic scaling.</change>
+    </changes>
+</configentry>

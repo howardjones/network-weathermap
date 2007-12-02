@@ -1145,6 +1145,7 @@ class WeatherMapNode extends WeatherMapItem
 	var $cachefile;
 	var $usescale;
 	var $inscalekey,$outscalekey;
+	var $inscaletag, $outscaletag;
 	# var $incolour,$outcolour;
 	var $scalevar;
 	var $notestext;
@@ -1247,7 +1248,7 @@ class WeatherMapNode extends WeatherMapItem
 			
 			// debug("Choosing NODE BGCOLOR for ".$this->name." based on $pc %\n");
 
-			    list($col,$node_scalekey) = $map->NewColourFromPercent($pc, $this->usescale,$this->name);
+			    list($col,$node_scalekey,$node_scaletag) = $map->NewColourFromPercent($pc, $this->usescale,$this->name);
 			    // $map->nodes[$this->name]->scalekey = $node_scalekey;
 		}
 		elseif($this->labelbgcolour != array(-1,-1,-1))
@@ -2072,6 +2073,7 @@ class WeatherMapLink extends WeatherMapItem
 	var $bwboxcolour;
 	var $commentfont,$notestext;
 	var $inscalekey,$outscalekey;
+	var $inscaletag, $outscaletag;
 	# var $incolour,$outcolour;
 	var $commentfontcolour;
 	var $bwfontcolour;
@@ -2318,8 +2320,8 @@ class WeatherMapLink extends WeatherMapItem
 		$xpoints[]=$x2;
 		$ypoints[]=$y2;
 
-		list($link_in_colour,$link_in_scalekey) = $map->ColourFromPercent($im, $this->inpercent,$this->usescale,$this->name);
-		list($link_out_colour,$link_out_scalekey) = $map->ColourFromPercent($im, $this->outpercent,$this->usescale,$this->name);
+		list($link_in_colour,$link_in_scalekey, $link_in_scaletag) = $map->ColourFromPercent($im, $this->inpercent,$this->usescale,$this->name);
+		list($link_out_colour,$link_out_scalekey, $link_out_scaletag) = $map->ColourFromPercent($im, $this->outpercent,$this->usescale,$this->name);
 		
 	//	$map->links[$this->name]->inscalekey = $link_in_scalekey;
 	//	$map->links[$this->name]->outscalekey = $link_out_scalekey;
@@ -3313,13 +3315,17 @@ function ReadData()
 				$myobj->outpercent = (($total_out) / ($myobj->max_bandwidth_out)) * 100;
 				$myobj->inpercent = (($total_in) / ($myobj->max_bandwidth_in)) * 100;		
 			
-				list($incol,$inscalekey) = $this->ColourFromPercent(NULL, $myobj->inpercent,$myobj->usescale,$myobj->name);
-				list($outcol,$outscalekey) = $this->ColourFromPercent(NULL, $myobj->outpercent,$myobj->usescale,$myobj->name);
+				list($incol,$inscalekey,$inscaletag) = $this->ColourFromPercent(NULL, $myobj->inpercent,$myobj->usescale,$myobj->name);
+				list($outcol,$outscalekey, $outscaletag) = $this->ColourFromPercent(NULL, $myobj->outpercent,$myobj->usescale,$myobj->name);
 				
 				// $myobj->incolour = $incol;
 				$myobj->inscalekey = $inscalekey;
+				$myobj->inscaletag = $inscaletag;
 				// $myobj->outcolour = $outcol;
 				$myobj->outscalekey = $outscalekey;
+				$myobj->outscaletag = $outscaletag;
+	
+				warn("TAGS (setting) |$inscaletag| |$outscaletag| \n");
 				
 				debug ("ReadData: Setting $total_in,$total_out\n");
 				unset($myobj);
@@ -3429,6 +3435,7 @@ function DrawLabelRotated($im, $x, $y, $angle, $text, $font, $padding, $linkname
 function ColourFromPercent($image, $percent,$scalename="DEFAULT",$name="")
 {
 	$col = NULL;
+	$tag = '';
 	
 	if(isset($this->colours[$scalename]))
 	{
@@ -3444,6 +3451,7 @@ function ColourFromPercent($image, $percent,$scalename="DEFAULT",$name="")
 		{
 			if (($percent >= $colour['bottom']) and ($percent <= $colour['top']))
 			{
+				$tag = $colour["tag"];
 				// we get called early now, so might not need to actually allocate a colour
 				if(isset($image))
 				{
@@ -3461,7 +3469,7 @@ function ColourFromPercent($image, $percent,$scalename="DEFAULT",$name="")
 						$r=$colour["red1"] + ($colour["red2"] - $colour["red1"]) * $ratio;
 						$g=$colour["green1"] + ($colour["green2"] - $colour["green1"]) * $ratio;
 						$b=$colour["blue1"] + ($colour["blue2"] - $colour["blue1"]) * $ratio;
-	
+
 						$col = myimagecolorallocate($image, $r, $g, $b);
 					}
 					else {
@@ -3474,7 +3482,9 @@ function ColourFromPercent($image, $percent,$scalename="DEFAULT",$name="")
 					}
 				}
 				
-				return(array($col,$key));
+				warn(">>TAGS CFPC $tag\n");
+				
+				return(array($col,$key,$tag));
 			}
 		}
 	}
@@ -3487,16 +3497,18 @@ function ColourFromPercent($image, $percent,$scalename="DEFAULT",$name="")
 	}
 
 	// you'll only get grey for a COMPLETELY quiet link if there's no 0 in the SCALE lines
-	if ($percent == 0) { return array($this->grey,''); }
+	if ($percent == 0) { return array($this->grey,'',''); }
 
 	// and you'll only get white for a link with no colour assigned
-	return array($this->white,'');
+	warn('ColourFromPercent: Scale $scalename doesn\'t cover '.$percent.'% [WMWARN29]\n');
+	return array($this->white,'','');
 }
 
 
 function NewColourFromPercent($percent,$scalename="DEFAULT",$name="")
 {
 	$col = new Colour(0,0,0);
+	$tag = '';
 	
 	if(isset($this->colours[$scalename]))
 	{
@@ -3536,8 +3548,10 @@ function NewColourFromPercent($percent,$scalename="DEFAULT",$name="")
 					# $col = $colour['gdref1'];
 				}
 				$col = new Colour($r, $g, $b);
+				$tag = $colour['tag'];
+				warn(">>NCFPC TAGS $tag\n");
 								
-				return(array($col,$key));
+				return(array($col,$key,$tag));
 			}
 		}
 	}
@@ -3550,10 +3564,11 @@ function NewColourFromPercent($percent,$scalename="DEFAULT",$name="")
 	}
 
 	// you'll only get grey for a COMPLETELY quiet link if there's no 0 in the SCALE lines
-	if ($percent == 0) { return array(new Colour(192,255,192),''); }
+	if ($percent == 0) { return array(new Colour(192,255,192),'',''); }
 
 	// and you'll only get white for a link with no colour assigned
-	return array(new Colour(255,255,255),'');
+	warn('ColourFromPercent: Scale $scalename doesn\'t cover '.$percent.'% [WMWARN29]\n');
+	return array(new Colour(255,255,255),'','');
 }
 
 
@@ -4473,7 +4488,8 @@ function ReadConfig($filename)
 				}
 
 				// one REGEXP to rule them all:
-				if(preg_match("/^\s*SCALE\s+([A-Za-z][A-Za-z0-9_]*\s+)?(\d+\.?\d*)\s+(\d+\.?\d*)\s+(\d+)\s+(\d+)\s+(\d+)(?:\s+(\d+)\s+(\d+)\s+(\d+))?\s*$/i",
+//				if(preg_match("/^\s*SCALE\s+([A-Za-z][A-Za-z0-9_]*\s+)?(\d+\.?\d*)\s+(\d+\.?\d*)\s+(\d+)\s+(\d+)\s+(\d+)(?:\s+(\d+)\s+(\d+)\s+(\d+))?\s*$/i",
+				if(preg_match("/^\s*SCALE\s+([A-Za-z][A-Za-z0-9_]*\s+)?(\d+\.?\d*)\s+(\d+\.?\d*)\s+(\d+)\s+(\d+)\s+(\d+)(?:\s+(\d+)\s+(\d+)\s+(\d+))?\s*(.*)$/i",
 					$buffer, $matches))
 				{
 					// The default scale name is DEFAULT
@@ -4483,6 +4499,11 @@ function ReadConfig($filename)
 					$key=$matches[2] . '_' . $matches[3];
 
 					$this->colours[$matches[1]][$key]['key']=$key;
+					
+					$tag = $matches[10];
+					warn("$key $tag\n");
+					$this->colours[$matches[1]][$key]['tag']=$tag;
+
 					$this->colours[$matches[1]][$key]['bottom'] = (float)($matches[2]);
 					$this->colours[$matches[1]][$key]['top'] = (float)($matches[3]);
 

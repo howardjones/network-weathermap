@@ -1,3 +1,6 @@
+0.95	ADDED - You can add a 'tag' to a SCALE line, to be used in ICON or LABELs later.
+
+
 0.941	FIXED - Issue with '-' DS names again.
 	FIXED - Added extra code to help discourage browser caching.
 	FIXED - Removed some extra chatty debugging code from poller_output.

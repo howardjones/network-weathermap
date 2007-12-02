@@ -1,3 +1,12 @@
+Before 0.95
+-----------
+Angled VIAs
+SCALE tags
+Artificial ICONs
+IN/OUT infourl/notes/overlibgraph stuff
+Reworking of DS plugins to use Null instead of -1
+
+
 Before 0.94
 -----------------
 MOSTLYDONE!   Boost/poller_output support

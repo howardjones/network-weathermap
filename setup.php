@@ -324,7 +324,8 @@ function weathermap_poller_output ($rrd_update_array) {
 		{
 			$value = $rrd_update_array{$file}['times'][key($rrd_update_array[$file]['times'])]{$dsname};
 			$time = key($rrd_update_array[$file]['times']);
-			cacti_log("Got one! $file:$dsname -> $time $value\n",true,"WEATHERMAP");
+			if (read_config_option("log_verbosity") >= POLLER_VERBOSITY_MEDIUM) 
+				cacti_log("poller_output: Got one! $file:$dsname -> $time $value\n",true,"WEATHERMAP");
 			
 			$period = $time - $required['last_time'];
 			$lastval = $required['last_value'];

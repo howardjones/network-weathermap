@@ -1144,10 +1144,11 @@ class WeatherMapNode extends WeatherMapItem
 	var $labelfontshadowcolour;
 	var $cachefile;
 	var $usescale;
+	var $useiconscale;
 	var $inscalekey,$outscalekey;
 	var $inscaletag, $outscaletag;
 	# var $incolour,$outcolour;
-	var $scalevar;
+	var $scalevar, $iconscalevar;
 	var $notestext;
 	var $image;
 	var $centre_x, $centre_y;
@@ -1161,7 +1162,9 @@ class WeatherMapNode extends WeatherMapItem
 				'label' => '',
 				'proclabel' => '',
 				'usescale' => 'DEFAULT',
+				'useiconscale' => 'none',
 				'scalevar' => 'in',
+				'iconscalevar' => 'in',
 				'labelfont' => 3,
 				'relative_to' => '',
 				'relative_resolved' => FALSE,
@@ -1257,6 +1260,21 @@ class WeatherMapNode extends WeatherMapItem
 			$col = new Colour($this->labelbgcolour);
 		}
 
+		$colicon = null;
+		if ( !empty($this->targets) && $this->useiconscale != 'none' )
+		{
+			// warn("Colorising the icon\n");
+			$pc = 0;
+
+			if($this->iconscalevar == 'in')
+				$pc = $this->inpercent;
+			if($this->iconscalevar == 'out')
+				$pc = $this->outpercent;
+
+			list($colicon,$node_iconscalekey) = $map->NewColourFromPercent($pc, $this->useiconscale,$this->name);
+		}
+
+
 		# print $col->as_string();
 		
 
@@ -1290,7 +1308,6 @@ class WeatherMapNode extends WeatherMapItem
 			$map->nodes[$this->name]->height = $boxheight;
 
 			# print "TEXT at $txt_x , $txt_y\n";
-
 		}                
 
 		// figure out a bounding rectangle for the icon
@@ -1355,6 +1372,19 @@ class WeatherMapNode extends WeatherMapItem
 	
 					$icon_im = imagecreatefromfile($this->iconfile);
 					# $icon_im = imagecreatefrompng($this->iconfile);
+					if(function_exists("imagefilter"))
+					{
+						// warn("Colorising?\n");
+						if (isset($colicon))
+						{
+						//	warn("YES\n");
+							imagefilter($icon_im, IMG_FILTER_COLORIZE, $colicon->r, $colicon->g, $colicon->b);
+						}
+					}
+					else
+					{
+						debug("Skipping unavailable imagefilter() call.\n");
+					}
 	
 					if ($icon_im)
 					{
@@ -1756,6 +1786,14 @@ class WeatherMapNode extends WeatherMapItem
 			if ( ($this->usescale != $comparison) || ($this->scalevar != $comparison2) )
 			{ $output.="\tUSESCALE " . $this->usescale . " " . $this->scalevar . "\n"; }
 	
+	
+			$comparison = ($this->name == 'DEFAULT'
+				? $this->inherit_fieldlist['useiconscale'] : $this->owner->defaultnode->useiconscale);
+			$comparison2 = ($this->name == 'DEFAULT'
+				? $this->inherit_fieldlist['iconscalevar'] : $this->owner->defaultnode->iconscalevar);
+	
+			if ( ($this->useiconscale != $comparison) || ($this->iconscalevar != $comparison2) )
+			{ $output.="\tUSEICONSCALE " . $this->useiconscale . " " . $this->iconscalevar . "\n"; }
 	
 	
 			$comparison=($this->name == 'DEFAULT'
@@ -3325,7 +3363,7 @@ function ReadData()
 				$myobj->outscalekey = $outscalekey;
 				$myobj->outscaletag = $outscaletag;
 	
-				warn("TAGS (setting) |$inscaletag| |$outscaletag| \n");
+				### warn("TAGS (setting) |$inscaletag| |$outscaletag| \n");
 				
 				debug ("ReadData: Setting $total_in,$total_out\n");
 				unset($myobj);
@@ -3482,7 +3520,7 @@ function ColourFromPercent($image, $percent,$scalename="DEFAULT",$name="")
 					}
 				}
 				
-				warn(">>TAGS CFPC $tag\n");
+				### warn(">>TAGS CFPC $tag\n");
 				
 				return(array($col,$key,$tag));
 			}
@@ -3549,7 +3587,7 @@ function NewColourFromPercent($percent,$scalename="DEFAULT",$name="")
 				}
 				$col = new Colour($r, $g, $b);
 				$tag = $colour['tag'];
-				warn(">>NCFPC TAGS $tag\n");
+				#### warn(">>NCFPC TAGS $tag\n");
 								
 				return(array($col,$key,$tag));
 			}
@@ -4453,33 +4491,41 @@ function ReadConfig($filename)
 					$linematched++;
 				}
 
-				if( ($last_seen == 'NODE') && preg_match("/^\s*USESCALE\s+([A-Za-z][A-Za-z0-9_]*)(\s+(in|out))?\s*$/i",$buffer,$matches))
+				if( ($last_seen == 'NODE') && preg_match("/^\s*USE(ICON)?SCALE\s+([A-Za-z][A-Za-z0-9_]*)(\s+(in|out))?\s*$/i",$buffer,$matches))
 				{
 					$svar = '';
-					if(isset($matches[2]))
+					if(isset($matches[3]))
 					{
-						$svar = trim($matches[2]);
+						$svar = trim($matches[3]);
+					}
+					// opens the door for other scaley things...
+					switch($matches[1])
+					{
+						case 'ICON':
+							$varname = 'iconscalevar';
+							$uvarname = 'useiconscale';
+							if(!function_exists("imagefilter"))
+							{
+								warn("ICON SCALEs require imagefilter, which is not present in your PHP [WMWARN040]\n");
+							}
+							break;
+						default:
+							$varname = 'scalevar';
+							$uvarname = 'usescale';
+							break;
 					}
 					
-					if($matches[1] == 'none')
+					if($svar != '')
 					{
-						$curnode->usescale = $matches[1];
-						if($svar != '')
-						{
-							$curnode->scalevar = $svar;
-						}
+						$curnode->$varname = $svar;
 					}
-					else
-					{
-						$curnode->usescale = $matches[1];
-						if($svar != '')
-						{
-							$curnode->scalevar = $svar;
-						}
-					}
+					$curnode->$uvarname= $matches[2];
+					
+					// warn("Set $varname and $uvarname\n");
+											
 					$linematched++;
 				}
-
+				
 				if( ($last_seen == 'LINK') && preg_match("/^\s*USESCALE\s+([A-Za-z][A-Za-z0-9_]*)\s*$/i",$buffer,$matches))
 				{
 					$curlink->usescale = $matches[1];
@@ -4501,7 +4547,7 @@ function ReadConfig($filename)
 					$this->colours[$matches[1]][$key]['key']=$key;
 					
 					$tag = $matches[10];
-					warn("$key $tag\n");
+###					warn("$key $tag\n");
 					$this->colours[$matches[1]][$key]['tag']=$tag;
 
 					$this->colours[$matches[1]][$key]['bottom'] = (float)($matches[2]);

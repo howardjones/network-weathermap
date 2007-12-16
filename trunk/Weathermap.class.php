@@ -1263,7 +1263,7 @@ class WeatherMapNode extends WeatherMapItem
 		$colicon = null;
 		if ( !empty($this->targets) && $this->useiconscale != 'none' )
 		{
-			// warn("Colorising the icon\n");
+			debug("Colorising the icon\n");
 			$pc = 0;
 
 			if($this->iconscalevar == 'in')
@@ -1271,7 +1271,7 @@ class WeatherMapNode extends WeatherMapItem
 			if($this->iconscalevar == 'out')
 				$pc = $this->outpercent;
 
-			list($colicon,$node_iconscalekey) = $map->NewColourFromPercent($pc, $this->useiconscale,$this->name);
+			list($colicon,$node_iconscalekey,$icontag) = $map->NewColourFromPercent($pc, $this->useiconscale,$this->name);
 		}
 
 
@@ -1379,6 +1379,10 @@ class WeatherMapNode extends WeatherMapItem
 						{
 						//	warn("YES\n");
 							imagefilter($icon_im, IMG_FILTER_COLORIZE, $colicon->r, $colicon->g, $colicon->b);
+						}
+						else
+						{
+						//	warn("NO\n");
 						}
 					}
 					else
@@ -3489,7 +3493,8 @@ function ColourFromPercent($image, $percent,$scalename="DEFAULT",$name="")
 		{
 			if (($percent >= $colour['bottom']) and ($percent <= $colour['top']))
 			{
-				$tag = $colour["tag"];
+				if(isset($colour['tag'])) $tag = $colour['tag'];
+
 				// we get called early now, so might not need to actually allocate a colour
 				if(isset($image))
 				{
@@ -3518,6 +3523,7 @@ function ColourFromPercent($image, $percent,$scalename="DEFAULT",$name="")
 						$col = myimagecolorallocate($image, $r, $g, $b);
 						# $col = $colour['gdref1'];
 					}
+					debug("CFPC $name $tag $key $r $g $b\n");
 				}
 				
 				### warn(">>TAGS CFPC $tag\n");
@@ -3538,7 +3544,7 @@ function ColourFromPercent($image, $percent,$scalename="DEFAULT",$name="")
 	if ($percent == 0) { return array($this->grey,'',''); }
 
 	// and you'll only get white for a link with no colour assigned
-	warn('ColourFromPercent: Scale $scalename doesn\'t cover '.$percent.'% [WMWARN29]\n');
+	warn("ColourFromPercent: Scale $scalename doesn't cover $percent% for $name [WMWARN29]\n");
 	return array($this->white,'','');
 }
 
@@ -3586,8 +3592,9 @@ function NewColourFromPercent($percent,$scalename="DEFAULT",$name="")
 					# $col = $colour['gdref1'];
 				}
 				$col = new Colour($r, $g, $b);
-				$tag = $colour['tag'];
+				if(isset($colour['tag'])) $tag = $colour['tag'];
 				#### warn(">>NCFPC TAGS $tag\n");
+				debug("NCFPC $name $tag $key $r $g $b\n");
 								
 				return(array($col,$key,$tag));
 			}
@@ -3605,7 +3612,7 @@ function NewColourFromPercent($percent,$scalename="DEFAULT",$name="")
 	if ($percent == 0) { return array(new Colour(192,255,192),'',''); }
 
 	// and you'll only get white for a link with no colour assigned
-	warn('ColourFromPercent: Scale $scalename doesn\'t cover '.$percent.'% [WMWARN29]\n');
+	warn("ColourFromPercent: Scale $scalename doesn't cover $percent% for $name [WMWARN29]\n");
 	return array(new Colour(255,255,255),'','');
 }
 
@@ -4558,7 +4565,7 @@ function ReadConfig($filename)
 					$this->colours[$matches[1]][$key]['blue1'] = (int)($matches[6]);
 
 					// this is the second colour, if there is one
-					if(isset($matches[7]))
+					if(isset($matches[7]) && $matches[7] != '')
 					{
 						$this->colours[$matches[1]][$key]['red2'] = (int) ($matches[7]);
 						$this->colours[$matches[1]][$key]['green2'] = (int) ($matches[8]);

@@ -1,5 +1,6 @@
 0.95	ADDED - You can add a 'tag' to a SCALE line, to be used in ICON or LABELs later.
         ADDED - USEICONSCALE - colorize icon images (based on patches from llow)
+	FIXED - KEYOUTLINECOLOR is actually used now (thanks again to llow)
 
 0.941	FIXED - Issue with '-' DS names again.
 	FIXED - Added extra code to help discourage browser caching.

@@ -2957,6 +2957,7 @@ class WeatherMap extends WeatherMapBase
 		$defaults=array
 			(
 				'KEYTEXT' => array('bottom' => -2, 'top' => -1, 'red1' => 0, 'green1' => 0, 'blue1' => 0),
+				'KEYOUTLINE' => array('bottom' => -2, 'top' => -1, 'red1' => 0, 'green1' => 0, 'blue1' => 0),
 				'KEYBG' => array('bottom' => -2, 'top' => -1, 'red1' => 255, 'green1' => 255, 'blue1' => 255),
 				'BG' => array('bottom' => -2, 'top' => -1, 'red1' => 255, 'green1' => 255, 'blue1' => 255),
 				'TITLE' => array('bottom' => -2, 'top' => -1, 'red1' => 0, 'green1' => 0, 'blue1' => 0),
@@ -3670,7 +3671,7 @@ function DrawLegend_Horizontal($im,$scalename="DEFAULT",$width=400)
 	imagefilledrectangle($scale_im, $box_left, $box_top, $box_right, $box_bottom,
 		$this->colours['DEFAULT']['KEYBG'][$scale_ref]);
 	imagerectangle($scale_im, $box_left, $box_top, $box_right, $box_bottom,
-		$this->colours['DEFAULT']['KEYTEXT'][$scale_ref]);
+		$this->colours['DEFAULT']['KEYOUTLINE'][$scale_ref]);
 
 	$this->myimagestring($scale_im, $font, $scale_left, $scale_bottom + $tileheight * 2 + 2 , $title,
 		$this->colours['DEFAULT']['KEYTEXT'][$scale_ref]);
@@ -3750,7 +3751,7 @@ function DrawLegend_Vertical($im,$scalename="DEFAULT",$height=400)
 	imagefilledrectangle($scale_im, $box_left, $box_top, $box_right, $box_bottom,
 		$this->colours['DEFAULT']['KEYBG']['gdref1']);
 	imagerectangle($scale_im, $box_left, $box_top, $box_right, $box_bottom,
-		$this->colours['DEFAULT']['KEYTEXT']['gdref1']);
+		$this->colours['DEFAULT']['KEYOUTLINE']['gdref1']);
 
 	$this->myimagestring($scale_im, $font, $scale_left-$scalefactor, $scale_top - $tileheight , $title,
 		$this->colours['DEFAULT']['KEYTEXT']['gdref1']);
@@ -3845,7 +3846,7 @@ function DrawLegend_Classic($im,$scalename="DEFAULT")
 		imagefilledrectangle($scale_im, $boxx, $boxy, $boxx + $boxwidth, $boxy + $boxheight,
 			$this->colours['DEFAULT']['KEYBG'][$scale_ref]);
 		imagerectangle($scale_im, $boxx, $boxy, $boxx + $boxwidth, $boxy + $boxheight,
-			$this->colours['DEFAULT']['KEYTEXT'][$scale_ref]);
+			$this->colours['DEFAULT']['KEYOUTLINE'][$scale_ref]);
 		$this->myimagestring($scale_im, $font, $boxx + 4, $boxy + 4 + $tileheight, $title,
 			$this->colours['DEFAULT']['KEYTEXT'][$scale_ref]);
 

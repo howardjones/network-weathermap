@@ -240,14 +240,53 @@ function weathermap_setup_table () {
 
 function weathermap_config_arrays () {
 	global $user_auth_realms, $user_auth_realm_filenames, $menu;
+	global $tree_item_types, $tree_item_handlers;
 
 	$user_auth_realms[42]='Plugin -> Weathermap: Configure/Manage';
 	$user_auth_realms[43]='Plugin -> Weathermap: View';
 	$user_auth_realm_filenames['weathermap-cacti-plugin.php'] = 43;
 	$user_auth_realm_filenames['weathermap-cacti-plugin-mgmt.php'] = 42;
 
+	// if there is support for custom graph tree types, then register ourselves
+	if(isset($tree_item_handlers))
+	{
+		$tree_item_types[10] = "Weathermap";
+		$tree_item_handlers[10] = array("render" => "weathermap_tree_item_render",
+					"list" => "weathermap_tree_item_list",
+					"edit" => "weathermap_tree_item_edit");
+	}
+
 	$menu["Management"]['plugins/weathermap/weathermap-cacti-plugin-mgmt.php'] = "Weathermaps";
 }
+
+function weathermap_tree_item_render()
+{
+}
+
+function weathermap_tree_item_list($leaf,$row_color,$transparent_indent)
+{
+	global $colors; 
+
+	$description = db_fetch_cell("select titlecache from weathermap_maps where id=".intval($leaf['item_id']));
+
+	print "<td bgcolor='#$row_color' bgcolor='#" . $colors["panel"] . "'>$transparent_indent<a href='tree.php?action=item_edit&tree_id=" . $_GET["id"] . "&id=" . $leaf["id"] . "'><strong>Weathermap:</strong> " . $description . "</a></td>\n";	
+	print "<td bgcolor='#$row_color' bgcolor='#" . $colors["panel"] . "'>Weathermap</td>";
+}
+
+function weathermap_tree_item_edit($tree_item)
+{
+	global $colors; 
+
+	form_alternate_row_color($colors["form_alternate1"],$colors["form_alternate2"],0);
+	print "<td width='50%'><font class='textEditTitle'>Map</font><br />Choose which weathermap to add to the tree.</td><td>";
+	form_dropdown("item_id", db_fetch_assoc("select id,CONCAT_WS('',titlecache,' (',configfile,')') as name from weathermap_maps where active='on' order by titlecache, configfile"), "name", "id", $tree_item['item_id'], "", "0");
+	print "</td></tr>";
+	form_alternate_row_color($colors["form_alternate1"],$colors["form_alternate2"],1);
+	print "<td width='50%'><font class='textEditTitle'>Style</font><br />How should the map be displayed?</td><td>";
+	print "<select name='item_options'><option value=1>Thumbnail</option><option value=2>Full Size</option></select>";
+	print "</td></tr>";
+}
+
 
 function weathermap_show_tab () {
 	global $config, $user_auth_realms, $user_auth_realm_filenames;

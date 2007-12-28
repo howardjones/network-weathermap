@@ -252,27 +252,67 @@ function weathermap_config_arrays () {
 	{
 		$tree_item_types[10] = "Weathermap";
 		$tree_item_handlers[10] = array("render" => "weathermap_tree_item_render",
-					"list" => "weathermap_tree_item_list",
+					"name" => "weathermap_tree_item_name",
 					"edit" => "weathermap_tree_item_edit");
 	}
 
 	$menu["Management"]['plugins/weathermap/weathermap-cacti-plugin-mgmt.php'] = "Weathermaps";
 }
 
-function weathermap_tree_item_render()
+function weathermap_tree_item_render($leaf)
 {
+	global $colors;
+
+        $outdir = dirname(__FILE__).'/output/';
+        $confdir = dirname(__FILE__).'/configs/';
+
+	$map = db_fetch_assoc("select weathermap_maps.* from weathermap_auth,weathermap_maps where weathermap_maps.id=weathermap_auth.mapid and active='on' and (userid=".$_SESSION["sess_user_id"]." or userid=0) and weathermap_maps.id=".$leaf['item_id']);
+
+	if(sizeof($map))
+        {
+                $htmlfile = $outdir."weathermap_".$map[0]['id'].".html";
+                $maptitle = $map[0]['titlecache'];
+                if($maptitle == '') $maptitle= "Map for config file: ".$map[0]['configfile'];
+	
+                html_graph_start_box(1,true);
+?>
+<tr bgcolor="<?php print $colors["panel"];?>">
+  <td>
+          <table width="100%" cellpadding="0" cellspacing="0">
+                <tr>
+                   <td class="textHeader" nowrap><?php print $maptitle; ?></td>
+                </tr>
+          </table>
+  </td>
+</tr>
+<?php
+                print "<tr><td>";
+	
+		if(file_exists($htmlfile))
+		{
+			include($htmlfile);
+		}
+		print "</td></tr>";
+		html_graph_end_box();
+
+	}
 }
 
-function weathermap_tree_item_list($leaf,$row_color,$transparent_indent)
+// calculate the name that cacti will use for this item in the tree views
+function weathermap_tree_item_name($item_id)
 {
-	global $colors; 
+        $description = db_fetch_cell("select titlecache from weathermap_maps where id=".intval($item_id));
+	if($description == '')
+	{
+        	$configfile = db_fetch_cell("select configfile from weathermap_maps where id=".intval($item_id));
+ 		$description = "Map for config file: ".$configfile;
+	}
+	
 
-	$description = db_fetch_cell("select titlecache from weathermap_maps where id=".intval($leaf['item_id']));
-
-	print "<td bgcolor='#$row_color' bgcolor='#" . $colors["panel"] . "'>$transparent_indent<a href='tree.php?action=item_edit&tree_id=" . $_GET["id"] . "&id=" . $leaf["id"] . "'><strong>Weathermap:</strong> " . $description . "</a></td>\n";	
-	print "<td bgcolor='#$row_color' bgcolor='#" . $colors["panel"] . "'>Weathermap</td>";
+	return $description;
 }
 
+// the edit form, for when you add or edit a map in a graph tree
 function weathermap_tree_item_edit($tree_item)
 {
 	global $colors; 

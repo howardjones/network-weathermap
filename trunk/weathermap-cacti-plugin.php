@@ -18,6 +18,110 @@ if (isset($_POST['action'])) {
 
 switch($action)
 {
+case 'liveviewimage':
+	$id = -1;
+
+	if( isset($_REQUEST['id']) && !is_numeric($_REQUEST['id']) )
+	{
+		$id = weathermap_translate_id($_REQUEST['id']);
+	}
+
+	if( isset($_REQUEST['id']) && is_numeric($_REQUEST['id']) )
+	{
+		$id = intval($_REQUEST['id']);
+	}
+	
+	if($id >=0)
+	{
+		$map = db_fetch_assoc("select weathermap_maps.* from weathermap_auth,weathermap_maps where weathermap_maps.id=weathermap_auth.mapid and active='on' and (userid=".$_SESSION["sess_user_id"]." or userid=0) and weathermap_maps.id=".$id);
+		
+		if(sizeof($map))
+		{
+		
+		$mapfile = dirname(__FILE__).'/configs/'.'/'.$map[0]['configfile'];
+		chdir(dirname(__FILE__));
+
+		header('Content-type: image/png');
+
+		$map = new WeatherMap;
+		$map->context = '';
+		$map->ReadConfig($mapfile);
+		$map->ReadData();
+		$map->DrawMap('','',250,TRUE,FALSE);
+		}
+
+	}
+	
+	break;
+case 'liveview':
+	include_once($config["base_path"]."/include/top_graph_header.php");
+	
+	$id = -1;
+
+	if( isset($_REQUEST['id']) && !is_numeric($_REQUEST['id']) )
+	{
+		$id = weathermap_translate_id($_REQUEST['id']);
+	}
+
+	if( isset($_REQUEST['id']) && is_numeric($_REQUEST['id']) )
+	{
+		$id = intval($_REQUEST['id']);
+	}
+	
+	if($id >=0)
+	{
+		$map = db_fetch_assoc("select weathermap_maps.* from weathermap_auth,weathermap_maps where weathermap_maps.id=weathermap_auth.mapid and active='on' and (userid=".$_SESSION["sess_user_id"]." or userid=0) and weathermap_maps.id=".$id);
+
+		if(sizeof($map))
+		{		
+			$maptitle = $map[0]['titlecache'];
+			
+			html_graph_start_box(1,true);
+	?>
+<tr bgcolor="<?php print $colors["panel"];?>"><td><table width="100%" cellpadding="0" cellspacing="0"><tr><td class="textHeader" nowrap><?php print $maptitle; ?></td></tr></table></td></tr>
+<?php
+			print "<tr><td>";		
+					
+			print "Generating map $id here now from ".$map[0]['configfile'];
+			
+			$confdir = dirname(__FILE__).'/configs/';
+			// everything else in this file is inside this else
+			$mapname = $map[0]['configfile'];
+			$mapfile = $confdir.'/'.$mapname;        
+	
+			chdir(dirname(__FILE__));	
+	
+			$map = new WeatherMap;
+			$map->context = "";
+			print "<pre>";
+			$map->ReadConfig($mapfile);
+			$map->ReadData();
+			$map->DrawMap('null');		
+			$map->PreloadMapHTML();
+			print "</pre>";
+			print "<img src='?action=liveviewimage&id=$id' />\n";
+			print $map->imap->subHTML("LEGEND:");
+			print $map->imap->subHTML("TIMESTAMP");
+			print $map->imap->subHTML("NODE:");
+			print $map->imap->subHTML("LINK:");
+			
+			print "</td></tr>";
+			html_graph_end_box();
+		}
+		else
+		{
+			print "Map unavailable.";
+		}
+	}
+	else
+	{
+		print "No ID, or unknown map name.";
+	}
+
+	
+	weathermap_versionbox();
+	include_once($config["base_path"]."/include/bottom_footer.php");
+	break;
 case 'viewmapcycle':
 	include_once($config["base_path"]."/include/top_graph_header.php");
 	print "<div id=\"overDiv\" style=\"position:absolute; visibility:hidden; z-index:1000;\"></div>\n";
@@ -90,7 +194,6 @@ function weathermap_singleview($mapid)
 	$outdir = dirname(__FILE__).'/output/';
 	$confdir = dirname(__FILE__).'/configs/';
 
-// $map = db_fetch_assoc("select * from weathermap_maps where id=".$mapid);
 	$map = db_fetch_assoc("select weathermap_maps.* from weathermap_auth,weathermap_maps where weathermap_maps.id=weathermap_auth.mapid and active='on' and (userid=".$_SESSION["sess_user_id"]." or userid=0) and weathermap_maps.id=".$mapid);
 
 	if(sizeof($map))
@@ -101,17 +204,8 @@ function weathermap_singleview($mapid)
 
 		html_graph_start_box(1,true);
 ?>
-<tr bgcolor="<?php print $colors["panel"];?>">
-  <td>
-	  <table width="100%" cellpadding="0" cellspacing="0">
-		<tr>
-		   <td class="textHeader" nowrap><?php print $maptitle; ?></td>
-		</tr>
-	  </table>
-  </td>
-</tr>
+<tr bgcolor="<?php print $colors["panel"];?>"><td><table width="100%" cellpadding="0" cellspacing="0"><tr><td class="textHeader" nowrap><?php print $maptitle; ?></td></tr></table></td></tr>
 <?php
-//  print "<tr><td><h2>".$maptitle."</h2></td></tr>";
 		print "<tr><td>";
 
 		if(file_exists($htmlfile))
@@ -219,6 +313,7 @@ function weathermap_thumbview()
 				{
 					print "(thumbnail for map ".$map['id']." not created yet)";
 				}
+				print "<a href='?action=liveview&id=".$map['id']."'>(live)</a>";
 				print '</div> ';
 			}
 			print "</td></tr>";

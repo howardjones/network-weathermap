@@ -1,12 +1,12 @@
 <?php
-// PHP Weathermap 0.941
-// Copyright Howard Jones, 2005-2007 howie@thingy.com
+// PHP Weathermap 0.95
+// Copyright Howard Jones, 2005-2008 howie@thingy.com
 // http://www.network-weathermap.com/
 // Released under the GNU Public License
 
 require_once "HTML_ImageMap.class.php";
 
-$WEATHERMAP_VERSION="0.941";
+$WEATHERMAP_VERSION="0.95";
 $weathermap_debugging=FALSE;
 
 // Turn on ALL error reporting for now.
@@ -81,7 +81,7 @@ function warn($string)
 {
 	// use Cacti's debug log, if we are running from the poller
 	if (function_exists('cacti_log') && (!function_exists('show_editor_startpage')))
-	{ cacti_log(rtrim($string), true, "WEATHERMAP"); }
+	{ cacti_log(rtrim($string), false, "WEATHERMAP"); }
 	else
 	{
 		$stderr=fopen('php://stderr', 'w');

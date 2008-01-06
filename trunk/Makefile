@@ -1,4 +1,4 @@
-VERSION=0.941
+VERSION=0.95
 RELBASE=../releases
 RELNAME=php-weathermap-$(VERSION)
 RELDIR=$(RELBASE)/weathermap

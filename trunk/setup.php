@@ -12,7 +12,7 @@
 
 function weathermap_version () {
 	return array( 	'name'    	=> 'weathermap',
-		'version'       => '0.941',
+		'version'       => '0.95',
 		'longname'      => 'PHP Network Weathermap',
 		'author'        => 'Howard Jones',
 		'homepage'      => 'http://www.network-weathermap.com/',
@@ -354,6 +354,8 @@ function weathermap_show_tab () {
 function weathermap_draw_navigation_text ($nav) {
 	$nav["weathermap-cacti-plugin.php:"] = array("title" => "Weathermap", "mapping" => "index.php:", "url" => "weathermap-cacti-plugin.php", "level" => "1");
 	$nav["weathermap-cacti-plugin.php:viewmap"] = array("title" => "Weathermap", "mapping" => "index.php:", "url" => "weathermap-cacti-plugin.php", "level" => "1");
+	$nav["weathermap-cacti-plugin.php:liveview"] = array("title" => "Weathermap", "mapping" => "index.php:", "url" => "weathermap-cacti-plugin.php", "level" => "1");
+	$nav["weathermap-cacti-plugin.php:liveviewimage"] = array("title" => "Weathermap", "mapping" => "index.php:", "url" => "weathermap-cacti-plugin.php", "level" => "1");
 	$nav["weathermap-cacti-plugin.php:viewmapcycle"] = array("title" => "Weathermap", "mapping" => "index.php:", "url" => "weathermap-cacti-plugin.php", "level" => "1");
 
 	$nav["weathermap-cacti-plugin-mgmt.php:"] = array("title" => "Weathermap Management", "mapping" => "index.php:", "url" => "weathermap-cacti-plugin-mgmt.php", "level" => "1");

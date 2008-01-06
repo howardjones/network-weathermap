@@ -1,8 +1,8 @@
 #!/usr/local/bin/php
 <?php
 
-// PHP Weathermap 0.94
-// Copyright Howard Jones, 2005-2007 howie@thingy.com
+// PHP Weathermap 0.95
+// Copyright Howard Jones, 2005-2008 howie@thingy.com
 // http://www.network-weathermap.com/
 // Released under the GNU Public License
 require_once 'Console/Getopt.php';

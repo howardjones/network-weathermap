@@ -3,6 +3,7 @@
         ADDED - a basic 'live view' function which generates a map on demand.
 	ADDED - improved data-source picker in editor: host filter
 	ADDED - improved data-source picker in editor: option to aggregate data sources
+	ADDED - SPLITPOS keyword to control position of midpoint in links
 	FIXED - KEYOUTLINECOLOR is actually used now (thanks again to llow)
 	FIXED - Editor doesn't throw away WIDTH and HEIGHT with no BG image
 	FIXED - Data-source picker doesn't restrict scrolling or resizing anymore

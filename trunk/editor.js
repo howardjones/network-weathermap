@@ -423,7 +423,7 @@ function cactipicker()
     // make sure it isn't already opened
     if (!newWindow || newWindow.closed)
         {
-        newWindow = window.open("", "cactipicker", "status,scrollbars=yes,height=400,width=400");
+        newWindow = window.open("", "cactipicker", "scrollbars=1,status=1,height=400,width=400,resizable=1");
         }
 
     else if (newWindow.focus)
@@ -432,7 +432,8 @@ function cactipicker()
         newWindow.focus();
         }
 
-    newWindow.location = "cacti-pick.php?command=link_step1";
+    // newWindow.location = "cacti-pick.php?command=link_step1";
+    newWindow.location = "cacti-pick-ng.php?command=link_step1";
     }
 
 

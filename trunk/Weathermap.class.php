@@ -2113,6 +2113,7 @@ class WeatherMapLink extends WeatherMapItem
 	var $outlinecolour;
 	var $bwoutlinecolour;
 	var $bwboxcolour;
+	var $splitpos;
 	var $commentfont,$notestext;
 	var $inscalekey,$outscalekey;
 	var $inscaletag, $outscaletag;
@@ -2132,6 +2133,7 @@ class WeatherMapLink extends WeatherMapItem
 			'width' => 7,
 			'commentfont' => 1,
 			'bwfont' => 2,
+			'splitpos'=>50,
 			'labeloffset_out' => 25,
 			'labeloffset_in' => 75,
 			'commentoffset_out' => 5,
@@ -2392,7 +2394,7 @@ class WeatherMapLink extends WeatherMapItem
 			// then draw the curve itself
 			draw_curve($im, $this->curvepoints,
 				$link_width, $outline_colour, $comment_colour, array($link_in_colour, $link_out_colour),
-				$this->name, $map, 50, ($this->linkstyle=='oneway'?TRUE:FALSE) );
+				$this->name, $map, $this->splitpos, ($this->linkstyle=='oneway'?TRUE:FALSE) );
 		}
 		
 		if($this->viastyle=='angled')
@@ -2544,6 +2546,10 @@ class WeatherMapLink extends WeatherMapItem
 			? $this->inherit_fieldlist['linkstyle'] : $this->owner->defaultlink->linkstyle);
 			if ($this->linkstyle != $comparison) { $output.="\tLINKSTYLE " . $this->linkstyle . "\n"; }
 
+			$comparison=($this->name == 'DEFAULT'
+			? $this->inherit_fieldlist['splitpos'] : $this->owner->defaultlink->splitpos);
+			if ($this->splitpos!= $comparison) { $output.="\tSPLITPOS " . $this->splitpos . "\n"; }
+			
 			// if formats have been set, but they're just the longform of the built-in styles, set them back to the built-in styles
 			if($this->labelstyle=='--' && $this->bwlabelformats[IN] == FMT_PERC_IN && $this->bwlabelformats[OUT] == FMT_PERC_OUT)
 			{
@@ -4280,6 +4286,22 @@ function ReadConfig($filename)
 					$linematched++;
 				}
 
+				if ($last_seen == 'LINK' && preg_match(
+					"/^\s*SPLITPOS\s+(\d+)\s*$/i", $buffer,
+					$matches))
+				{
+					$v = intval($matches[1]);
+					if($v<0) 
+					{ 
+						warn("SPLITPOS should be a percentage at line $linecount\n");
+					} elseif($v>100) { 
+						warn("SPLITPOS should be a percentage at line $linecount\n");
+					} else {
+						$curlink->splitpos = $matches[1];
+					}
+					$linematched++;
+				}
+				
 				if ($last_seen == 'LINK' && preg_match(
 					"/^\s*BWLABELPOS\s+(\d+)\s(\d+)\s*$/i", $buffer,
 					$matches))

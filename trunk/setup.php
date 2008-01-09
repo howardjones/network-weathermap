@@ -33,7 +33,28 @@ function plugin_init_weathermap() {
 	$plugin_hooks['poller_output']['weathermap'] = 'weathermap_poller_output';
 
 	$plugin_hooks['top_graph_refresh']['weathermap'] = 'weathermap_top_graph_refresh';
+	$plugin_hooks['page_title']['weathermap'] = 'weathermap_page_title';
 }
+
+
+function weathermap_page_title( $t )
+{
+        if(preg_match('/plugins\/weathermap\//',$_SERVER['REQUEST_URI'] ,$matches))
+        {
+                $t .= " - Weathermap";
+
+                if(preg_match('/plugins\/weathermap\/weathermap-cacti-plugin.php\?action=viewmap&id=(\d+)/',$_SERVER['REQUEST_URI'],$matches))
+                {
+                        $mapid = intval($matches[1]);
+                        $title = db_fetch_cell("SELECT titlecache from weathermap_maps where ID=$mapid");
+                        if(isset($title)) $t .= " - $title";
+                }
+
+        }
+        return($t);
+}
+
+
 
 function weathermap_top_graph_refresh($refresh)
 {

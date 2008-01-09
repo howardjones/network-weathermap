@@ -4,7 +4,7 @@ $guest_account = true;
 
 chdir('../../');
 include_once("./include/auth.php");
-include_once("./include/config.php");
+// include_once("./include/config.php");
 
 // include the weathermap class so that we can get the version
 include_once(dirname(__FILE__)."/Weathermap.class.php");
@@ -39,15 +39,19 @@ case 'liveviewimage':
 		{
 		
 		$mapfile = dirname(__FILE__).'/configs/'.'/'.$map[0]['configfile'];
+		$orig_cwd = getcwd();
 		chdir(dirname(__FILE__));
 
 		header('Content-type: image/png');
 
 		$map = new WeatherMap;
 		$map->context = '';
+			// $map->context = "cacti";
+			$map->rrdtool  = read_config_option("path_rrdtool");
 		$map->ReadConfig($mapfile);
 		$map->ReadData();
 		$map->DrawMap('','',250,TRUE,FALSE);
+		dir($orig_cwd);	
 		}
 
 	}
@@ -55,6 +59,8 @@ case 'liveviewimage':
 	break;
 case 'liveview':
 	include_once($config["base_path"]."/include/top_graph_header.php");
+	print "<div id=\"overDiv\" style=\"position:absolute; visibility:hidden; z-index:1000;\"></div>\n";
+	print "<script type=\"text/javascript\" src=\"overlib.js\"><!-- overLIB (c) Erik Bosrup --></script> \n";
 	
 	$id = -1;
 
@@ -82,28 +88,32 @@ case 'liveview':
 <?php
 			print "<tr><td>";		
 					
-			print "Generating map $id here now from ".$map[0]['configfile'];
+			# print "Generating map $id here now from ".$map[0]['configfile'];
 			
 			$confdir = dirname(__FILE__).'/configs/';
 			// everything else in this file is inside this else
 			$mapname = $map[0]['configfile'];
 			$mapfile = $confdir.'/'.$mapname;        
 	
+			$orig_cwd = getcwd();
 			chdir(dirname(__FILE__));	
 	
 			$map = new WeatherMap;
-			$map->context = "";
+			// $map->context = "cacti";
+			$map->rrdtool  = read_config_option("path_rrdtool");
 			print "<pre>";
 			$map->ReadConfig($mapfile);
 			$map->ReadData();
 			$map->DrawMap('null');		
 			$map->PreloadMapHTML();
 			print "</pre>";
+			print "";
 			print "<img src='?action=liveviewimage&id=$id' />\n";
 			print $map->imap->subHTML("LEGEND:");
 			print $map->imap->subHTML("TIMESTAMP");
 			print $map->imap->subHTML("NODE:");
 			print $map->imap->subHTML("LINK:");
+			chdir($orig_cwd);
 			
 			print "</td></tr>";
 			html_graph_end_box();

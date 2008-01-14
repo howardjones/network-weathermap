@@ -2357,8 +2357,16 @@ class WeatherMapLink extends WeatherMapItem
 		foreach ($this->vialist as $via)
 		{
 			# imagearc($im, $via[0],$via[1],20,20,0,360,$map->selected);
-			$xpoints[]=$via[0];
-			$ypoints[]=$via[1];
+			if(isset($via[2]))
+			{
+				$xpoints[]=$map->nodes[$via[2]]->x + $via[0];
+				$ypoints[]=$map->nodes[$via[2]]->y + $via[1];
+			}
+			else
+			{
+				$xpoints[]=$via[0];
+				$ypoints[]=$via[1];
+			}
 		}
 
 		$xpoints[]=$x2;
@@ -2706,8 +2714,14 @@ class WeatherMapLink extends WeatherMapItem
 	
 			if (count($this->vialist) > 0)
 			{
-				foreach ($this->vialist as $via)
+				if(isset($via[2]))
+				{
+					$output.=sprintf("\tVIA %s %d %d\n", $via[2],$via[0], $via[1]);
+				}
+				else
+				{
 					$output.=sprintf("\tVIA %d %d\n", $via[0], $via[1]);
+				}
 			}
 	
 			if (($this->max_bandwidth_in != $this->owner->defaultlink->max_bandwidth_in)
@@ -2817,7 +2831,7 @@ class WeatherMapLink extends WeatherMapItem
 		}
 		$vias = "\"via\": [";
 		foreach ($this->vialist as $via)
-				$vias .= sprintf("[%d,%d],", $via[0], $via[1]);
+				$vias .= sprintf("[%d,%d,'%s'],", $via[0], $via[1],$via[2]);
 		$vias .= "],";
 		$vias = str_replace("],],", "]]", $vias);
 		$vias = str_replace("[],", "[]", $vias);
@@ -4488,7 +4502,8 @@ function ReadConfig($filename)
 					$linematched++;
 				}
 
-				if ($last_seen == 'LINK' && preg_match("/^\s*VIA\s+(\d+)\s+(\d+)\s*$/i", $buffer, $matches))
+				// if ($last_seen == 'LINK' && preg_match("/^\s*VIA\s+(\d+)\s+(\d+)\s*$/i", $buffer, $matches))
+				if ($last_seen == 'LINK' && preg_match("/^\s*VIA\s+([-+]?\d+)\s+([-+]?\d+)\s*$/i", $buffer, $matches))
 				{
 					$curlink->vialist[]=array
 						(
@@ -4499,6 +4514,18 @@ function ReadConfig($filename)
 					$linematched++;
 				}
 
+				if ($last_seen == 'LINK' && preg_match("/^\s*VIA\s+(\S+)\s+([-+]?\d+)\s+([-+]?\d+)\s*$/i", $buffer, $matches))
+				{
+					$curlink->vialist[]=array
+						(
+							$matches[2],
+							$matches[3],
+							$matches[1]
+						);
+
+					$linematched++;
+				}
+				
 				if ($last_seen == 'LINK' && preg_match("/^\s*BWFONT\s+(\d+)\s*$/i", $buffer, $matches))
 				{
 					$curlink->bwfont=$matches[1];

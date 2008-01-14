@@ -3,7 +3,7 @@
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <link rel="stylesheet" type="text/css" media="screen" href="weathermap.css">
 <title>PHP Weathermap 
-v0.941
+v0.95
  Configuration Reference</title>
 </head>
 <body><div id="frame">
@@ -27,9 +27,9 @@ v0.941
 
 <div id="header">
 	<h1>PHP Weathermap 
-v0.941
+v0.95
 </h1>
-    <h4>Copyright &copy; 2005-2007 Howard Jones, <tt><a
+    <h4>Copyright &copy; 2005-2008 Howard Jones, <tt><a
 href="mailto:howie@thingy.com">howie@thingy.com</a></tt>. (<a
 href="http://www.network-weathermap.com/">Website</a>)</h4>
 </div>
@@ -37,7 +37,7 @@ href="http://www.network-weathermap.com/">Website</a>)</h4>
 
 <h2><a name="configref">Configuration Reference</a></h2>
 <p>This page is automatically compiled, and documents all the configuration directives that are available in PHP Weathermap 
-v0.941
+v0.95
 . </p>
 	<h1 class="configsection">Introduction</h1>
     	  <div class="preamble"><div id="contents">
@@ -79,6 +79,7 @@ v0.941
         <a href="#LINK_OUTCOMMENT">OUTCOMMENT</a>
         <a href="#LINK_COMMENTFONT">COMMENTFONT</a>
         <a href="#LINK_COMMENTPOS">COMMENTPOS</a>
+        <a href="#LINK_SPLITPOS">SPLITPOS</a>
         <a href="#LINK_COLORS">*COLOR</a>
         <a href="#LINK_INFOURL">INFOURL</a>
         <a href="#LINK_OVERLIBGRAPH">OVERLIBGRAPH</a>
@@ -742,6 +743,16 @@ of the direction of the link. 'angled' rotates the box to follow the directiong 
 <div class="description">
 <p>Specify the position along the link used for drawing the <a href="#LINK_INCOMMENT">INCOMMENT</a> and <a href="#LINK_OUTCOMMENT">OUTCOMMENT</a> text.</p><p>The positions are specified as a percentage position along the link, like <a href="#LINK_BWLABELPOS">BWLABELPOS.</a> The default positions are equivalent to <strong>COMMENTPOS 95 5</strong>.</p><changes> 
  <change version="0.92">Added COMMENTPOS</change> 
+ </changes> 
+</div>
+</div>
+                <div class="referenceentry">
+<h2><a name="LINK_SPLITPOS">SPLITPOS</a></h2>
+<div class="definition">SPLITPOS <em class="meta">position</em>
+</div>
+<div class="description">
+<p>Specify the position along the link used for drawing the <a href="#LINK_INCOMMENT">INCOMMENT</a> and <a href="#LINK_OUTCOMMENT">OUTCOMMENT</a> text.</p><changes> 
+ <change version="0.95">Added SPLITPOS</change> 
  </changes> 
 </div>
 </div>

@@ -7,6 +7,7 @@
 	FIXED - KEYOUTLINECOLOR is actually used now (thanks again to llow)
 	FIXED - Editor doesn't throw away WIDTH and HEIGHT with no BG image
 	FIXED - Data-source picker doesn't restrict scrolling or resizing anymore
+	ADDED - VIAs can be positioned relative to NODEs (like NODEs can) (thanks to llow once more)
 
 0.941	FIXED - Issue with '-' DS names again.
 	FIXED - Added extra code to help discourage browser caching.

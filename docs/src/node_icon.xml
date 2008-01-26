@@ -15,8 +15,10 @@
 		<p>The second form allows you to specify a maximum width and height for the icon. If the PNG file that you specify is bigger or smaller than this size, then it is automatically scaled up (or down) in proportion, so that it fits into a box of the size you specify.</p>
 		<p>The size of the icon image is used by LABELOFFSET to decided how far to move the label, if you use compass-point offsets.</p>
 <p>The text for the filename can contain <a href="advanced.html#tokens">special tokens</a> to select an icon based on  map data.</p>
+<p>You can adjust the colour of the icon according to a SCALE, by using USEICONSCALE.</p>
 		</description>
 		    <changes>
+			<change version="0.95">Added Icon colourising support.</change>
                 <change version="0.9">Added 'special token' support.</change>
 <change version="0.9">Added JPEG and GIF support.</change>
  .           <change version="0.9">Added special icon 'none', and automatic scaling.</change>

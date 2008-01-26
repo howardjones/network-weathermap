@@ -9,7 +9,7 @@
     <definition>SCALE <meta>scalename</meta> <meta>min</meta> <meta>max</meta> <meta>red</meta> <meta>green</meta> <meta>blue</meta> <meta>red2</meta> <meta>green2</meta> <meta>blue2</meta></definition>
     <description  xmlns="http://www.w3.org/1999/xhtml">
     <p>Defines one 'span' within the link colour-coding table.</p>
-    <p>SCALE is used to specify how LINKs are colour-coded according to their percent usage.
+    <p>SCALE is used to specify how NODEs and LINKs are colour-coded according to their percent usage.
     If the percentage usage falls between min and max then the colour specified by red, green and blue is used to colour the link.
     Colour values are between 0 and 255. Percentages are between 0 and 100, obviously.</p>
 	<p>If you specify <i>two</i> colours on the line (the third and fourth forms above), then the colour chosen for the link will be calculated as
@@ -18,6 +18,8 @@
     <p>If you don't add <i>any</i> SCALE lines to a configuration file, then a default set is added for you, but as soon as you add one, you'll need to make enough to cover the whole 0-100 range to get nice colours.
     Any percentage not matched by SCALE rules is rendered in grey.</p>
     <p>You can specify a colour for an <em>exact</em> percentage (e.g. zero) by using that value for both the min and max values. The scale lines are sorted by min then max, and scanned from top to bottom. The first match wins.</p>
+	<p>To show a legend in the map for a given SCALE, you should use KEYPOS and KEYSTYLE.</p>
+	<p>You can also apply SCALEs to colorise ICON images. You do this using USEICONSCALE.</p>
     </description>
     <examples>
     <example><caption>Setting up a (very simple) colour scale. Colours run smoothly from green to red.</caption><content>SCALE 0 100   0 255 0   255 0 0</content></example>
@@ -30,7 +32,8 @@ SCALE  70   85    255   192    0
 SCALE  85  100    255     0    0</content></example>
     </examples>
     <changes>
-    <change version="0.9">Added named scales.</change>
+	<change version="0.95">Added USEICONSCALE.</change>
+	<change version="0.9">Added named scales.</change>
     <change version="0.9">Added considtently sorted scales.</change>
     <change version="0.8">Added interpolated scale colours.</change>
     <change version="0.5">Changed to allow min and max to be fractional.</change>

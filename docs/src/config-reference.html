@@ -9,7 +9,7 @@
 %NAV IN HERE%
 
 <h2><a name="configref">Configuration Reference</a></h2>
-<p>This page is automatically compiled, and documents all the configuration directives that are available in PHP Weathermap %VERSION%. </p>
+<p>This page is automatically compiled, and documents all the configuration directives that are available in PHP Weathermap %VERSION%.  </p>
 	<h1 class="configsection">Introduction</h1>
     	  <div class="preamble"><div xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude" id="contents">
       <h4 xmlns="" class="configsection">Node-specific Configuration Directives</h4>
@@ -21,6 +21,7 @@
         <a href="#NODE_USESCALE">USESCALE</a>
         <a href="#NODE_MAXVALUE">MAXVALUE</a>
         <a href="#NODE_ICON">ICON</a>
+        <a href="#NODE_USEICONSCALE">USEICONSCALE</a>
         <a href="#NODE_LABELOFFSET">LABELOFFSET</a>
         <a href="#NODE_LABELFONT">LABELFONT</a>
         <a href="#NODE_COLORS">*COLOR</a>
@@ -31,7 +32,7 @@
         <a href="#NODE_OVERLIBCAPTION">OVERLIBCAPTION</a>
         <a href="#NODE_NOTES">NOTES</a>
         <a href="#NODE_SET">SET</a>
-      </p>
+       </p>
       <h4 xmlns="" class="configsection">Link-specific Configuration Directives</h4>
       <p xmlns="" id="context_LINK">
         <a href="#LINK_LINK">LINK</a>
@@ -62,7 +63,7 @@
         <a href="#LINK_LINKSTYLE">LINKSTYLE</a>
         <a href="#LINK_ARROWSTYLE">ARROWSTYLE</a>
         <a href="#LINK_SET">SET</a>
-      </p>
+       </p>
       <h4 xmlns="" class="configsection">Global Configuration Directives</h4>
       <p xmlns="" id="context_GLOBAL">
         <a href="#GLOBAL_BACKGROUND">BACKGROUND</a>
@@ -82,7 +83,7 @@
         <a href="#GLOBAL_KEYPOS">KEYPOS</a>
         <a href="#GLOBAL_KEYSTYLE">KEYSTYLE</a>
         <a href="#GLOBAL_SET">SET</a>
-      </p>
+       </p>
     </div></div>
 	
 
@@ -92,11 +93,11 @@
 <div class="definition">NODE <em class="meta">nodename</em>
 </div>
 <div class="description">
-<p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">The initial definition of a NODE. This must come before any other configuration related to this node.</p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">The 'nodename' is used in link definitions to specify which nodes the link joins. The nodename is must be a single 
- word, with no spaces.</p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">There is one special node name, 'DEFAULT', which allows for the setting of defaults. 
+<p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">The initial definition of a <a href="#NODE_NODE">NODE.</a> This must come before any other configuration related to this node. </p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">The 'nodename' is used in link definitions to specify which nodes the link joins. The nodename is must be a single 
+ word, with no spaces. </p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">There is one special node name, 'DEFAULT', which allows for the setting of defaults. 
  All nodes that are defined after this one in the configuration file will use the parameters 
  of this node as a starting point. For this reason, it is best to define the DEFAULT node at the 
- top of the configuration file, if you intend to use it.</p> 
+ top of the configuration file, if you intend to use it. </p> 
 </div>
 <div class="changes">
 <h3>Change History</h3>
@@ -113,7 +114,7 @@
 <div class="definition">POSITION <em class="meta">nodename</em> <em class="meta">x-coord</em> <em class="meta">y-coord</em>
 </div>
 <div class="description">
-<p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Specifies where to place the node on the map. Coordinates are in pixel units, with the origin at the top-left of the map.</p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Optionally, you can also specify another node that the coordinates are relative to. This allows you to have 'sub-nodes' that follow a master node around as you alter the map. Relative nodes can be relative to other relative nodes, as long as the node at the end of the chain is not relatively positioned!</p> 
+<p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Specifies where to place the node on the map. Coordinates are in pixel units, with the origin at the top-left of the map. </p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Optionally, you can also specify another node that the coordinates are relative to. This allows you to have 'sub-nodes' that follow a master node around as you alter the map. Relative nodes can be relative to other relative nodes, as long as the node at the end of the chain is not relatively positioned! </p> 
 </div>
 <div class="examples">
 <h3>Examples</h3>
@@ -143,7 +144,7 @@
 <div class="definition">LABEL <em class="meta">labeltext</em>
 </div>
 <div class="description">
-<p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Specifies a label for the node. Everything to the end of the line is used.</p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">If the node has an <a href="#NODE_ICON">ICON</a> defined as well, then you can specify the position of the label relative to the node's centre-point by using <a href="#NODE_LABELOFFSET">LABELOFFSET.</a> </p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">The text for the label can contain <a href="advanced.html#tokens">special tokens</a> to show map data.</p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">This is drawn using the font specified by <a href="#NODE_LABELFONT">LABELFONT</a> in the colours specified by LABELFONTCOLOR, LABELFONTSHADOWCOLOR, LABELBGCOLOR and LABELOUTLINECOLOR.</p> 
+<p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Specifies a label for the node. Everything to the end of the line is used. </p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">If the node has an <a href="#NODE_ICON">ICON</a> defined as well, then you can specify the position of the label relative to the node's centre-point by using <a href="#NODE_LABELOFFSET">LABELOFFSET.</a> </p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">The text for the label can contain <a href="advanced.html#tokens">special tokens</a> to show map data. </p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">This is drawn using the font specified by <a href="#NODE_LABELFONT">LABELFONT</a> in the colours specified by LABELFONTCOLOR, LABELFONTSHADOWCOLOR, LABELBGCOLOR and LABELOUTLINECOLOR. </p> 
 </div>
 <div class="changes">
 <h3>Change History</h3>
@@ -160,8 +161,8 @@
 <div class="description">
 <p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Specifies where to look for the current "throughput" 
  information for this <a href="#NODE_NODE">NODE.</a> You can also specify multiple targets, which will then be added together to make the aggregate result 
-which is then displayed. Specify the targets on one TARGET line, seperated with a space. If a targetspec starts with a '-', then it's value will be <i>subtracted</i> from the final result instead.</p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">It's important to note, especially for NODEs, that the value that is used does not have to be bandwidth. You can use data for temperature, session-counts, CPU usage or anything else you can get data for.</p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">The actual contents of the <em>targetspec</em> depend on the data source plugins that are 
- available. <a href="targets.html">The standard plugins are documented here</a>.</p> 
+which is then displayed. Specify the targets on one <a href="#NODE_TARGET">TARGET</a> line, seperated with a space. If a targetspec starts with a '-', then it's value will be <i>subtracted</i> from the final result instead. </p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">It's important to note, especially for NODEs, that the value that is used does not have to be bandwidth. You can use data for temperature, session-counts, CPU usage or anything else you can get data for. </p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">The actual contents of the <em>targetspec</em> depend on the data source plugins that are 
+ available. <a href="targets.html">The standard plugins are documented here</a>. </p> 
 </div>
 <div class="examples">
 <h3>Examples</h3>
@@ -195,27 +196,29 @@ which is then displayed. Specify the targets on one TARGET line, seperated with 
 <div class="definition">USESCALE <em class="meta">scalename</em> <em class="meta">{in,out}</em>
 </div>
 <div class="description">
-<p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Specify which <a href="#GLOBAL_SCALE">SCALE</a> to use to decide the colour of this node.</p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">After the percentage usage is calculated (using BANDWIDTH/MAXVALUE and data from the <a href="#NODE_TARGET">TARGET</a> line), 
- the colour is decided by looking up the percentage against this <a href="#GLOBAL_SCALE">SCALE.</a> If there is no USESCALE 
- line, then the default scale is used.</p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">For nodes, you can also specify a scalename of 'none'. This stops the node's colour from changing at all. This is useful if you want to 
- use the <a href="#NODE_TARGET">TARGET</a> line to fetch data that is used in the <a href="#NODE_LABEL">LABEL</a> or <a href="#NODE_ICON">ICON</a> of the node, for example, without changing the colour of the node itself.</p> 
+<p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Specify which <a href="#GLOBAL_SCALE">SCALE</a> to use to decide the colour of this node. </p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">After the percentage usage is calculated (using BANDWIDTH/MAXVALUE and data from the <a href="#NODE_TARGET">TARGET</a> line), 
+ the colour is decided by looking up the percentage against this <a href="#GLOBAL_SCALE">SCALE.</a> If there is no <a href="#NODE_USESCALE">USESCALE</a> 
+ line, then the default scale is used. </p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">For nodes, you can also specify a scalename of 'none'. This stops the node's colour from changing at all. This is useful if you want to 
+ use the <a href="#NODE_TARGET">TARGET</a> line to fetch data that is used in the <a href="#NODE_LABEL">LABEL</a> or <a href="#NODE_ICON">ICON</a> of the node, for example, without changing the colour of the node itself. </p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">You can also change the colour of the <a href="#NODE_ICON">ICON</a> associated with a <a href="#NODE_NODE">NODE</a> according to a different <a href="#GLOBAL_SCALE">SCALE,</a> by using <a href="#NODE_USEICONSCALE">USEICONSCALE.</a> </p> 
 </div>
 <div class="changes">
 <h3>Change History</h3>
 <dl>
+<dt>0.95</dt>
+<dd>Added USEICONSCALE.</dd>
 <dt>0.9</dt>
 <dd>Added named scales and USESCALE.</dd>
 </dl>
 </div>
 </div>
-            <div class="referenceentry">
+			<div class="referenceentry">
 <h2><a name="NODE_MAXVALUE">MAXVALUE</a></h2>
 <div class="definition">MAXVALUE <em class="meta">max-value</em>
 </div>
 <div class="definition">MAXVALUE <em class="meta">max-in-value</em> <em class="meta">max-out-value</em>
 </div>
 <div class="description">
-<p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Specifies the maximum value(s) for the node, in the same way that <a href="#LINK_BANDWIDTH">BANDWIDTH</a> does for a <a href="#LINK_LINK">LINK.</a> These are used to calculate the percentage usage value, which in turn is used to decide the NODE's colour, if it has a <a href="#NODE_TARGET">TARGET</a> defined.</p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">The default value is 100, which has the effect of not changing the input value ( (n/100)*100 = n ).</p> 
+<p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Specifies the maximum value(s) for the node, in the same way that <a href="#LINK_BANDWIDTH">BANDWIDTH</a> does for a <a href="#LINK_LINK">LINK.</a> These are used to calculate the percentage usage value, which in turn is used to decide the NODE's colour, if it has a <a href="#NODE_TARGET">TARGET</a> defined. </p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">The default value is 100, which has the effect of not changing the input value ( (n/100)*100 = n ). </p> 
 </div>
 <div class="changes">
 <h3>Change History</h3>
@@ -225,7 +228,7 @@ which is then displayed. Specify the targets on one TARGET line, seperated with 
 </dl>
 </div>
 </div>
-                        <div class="referenceentry">
+			<div class="referenceentry">
 <h2><a name="NODE_ICON">ICON</a></h2>
 <div class="definition">ICON <em class="meta">iconimagefile</em>
 </div>
@@ -233,17 +236,42 @@ which is then displayed. Specify the targets on one TARGET line, seperated with 
 </div>
 <div class="definition">ICON none</div>
 <div class="description">
-<p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Specifies an icon to use for the node.</p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">The filename can either be a full path to the image, or a relative one. </p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">The icon file must be in PNG, JPEG or GIF format. Alpha-transparency within the icon should be honoured by Weathermap for PNG icons, to create irregular shapes.</p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">If you specify the word 'none' as the icon filename, then no icon is used. This is useful if you have specified an ICON in the DEFAULT <a href="#NODE_NODE">NODE,</a> and want to override that for a few special cases.</p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">The second form allows you to specify a maximum width and height for the icon. If the PNG file that you specify is bigger or smaller than this size, then it is automatically scaled up (or down) in proportion, so that it fits into a box of the size you specify.</p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">The size of the icon image is used by <a href="#NODE_LABELOFFSET">LABELOFFSET</a> to decided how far to move the label, if you use compass-point offsets.</p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">The text for the filename can contain <a href="advanced.html#tokens">special tokens</a> to select an icon based on map data.</p> 
+<p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Specifies an icon to use for the node. </p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">The filename can either be a full path to the image, or a relative one. </p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">The icon file must be in PNG, JPEG or GIF format. Alpha-transparency within the icon should be honoured by Weathermap for PNG icons, to create irregular shapes. </p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">If you specify the word 'none' as the icon filename, then no icon is used. This is useful if you have specified an <a href="#NODE_ICON">ICON</a> in the DEFAULT <a href="#NODE_NODE">NODE,</a> and want to override that for a few special cases. </p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">The second form allows you to specify a maximum width and height for the icon. If the PNG file that you specify is bigger or smaller than this size, then it is automatically scaled up (or down) in proportion, so that it fits into a box of the size you specify. </p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">The size of the icon image is used by <a href="#NODE_LABELOFFSET">LABELOFFSET</a> to decided how far to move the label, if you use compass-point offsets. </p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">The text for the filename can contain <a href="advanced.html#tokens">special tokens</a> to select an icon based on map data. </p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">You can adjust the colour of the icon according to a <a href="#GLOBAL_SCALE">SCALE,</a> by using <a href="#NODE_USEICONSCALE">USEICONSCALE.</a> </p> 
 </div>
 <div class="changes">
 <h3>Change History</h3>
 <dl>
+<dt>0.95</dt>
+<dd>Added Icon colourising support.</dd>
 <dt>0.9</dt>
 <dd>Added 'special token' support.</dd>
 <dt>0.9</dt>
 <dd>Added JPEG and GIF support.</dd>
 <dt>0.9</dt>
 <dd>Added special icon 'none', and automatic scaling.</dd>
+</dl>
+</div>
+</div>
+			<div class="referenceentry">
+<h2><a name="NODE_USEICONSCALE">USEICONSCALE</a></h2>
+<div class="definition">USEICONSCALE <em class="meta">scalename</em>
+</div>
+<div class="definition">USEICONSCALE <em class="meta">scalename</em> <em class="meta">{in,out}</em>
+</div>
+<div class="description">
+<p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Specify which <a href="#GLOBAL_SCALE">SCALE</a> to use to decide the colour of the icon for this node. </p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">After the percentage usage is calculated (using BANDWIDTH/MAXVALUE and data from the <a href="#NODE_TARGET">TARGET</a> line), 
+ the colour is decided by looking up the percentage against this <a href="#GLOBAL_SCALE">SCALE.</a> If there is no <a href="#NODE_USEICONSCALE">USEICONSCALE</a> 
+ line, then no scale is used, and the icon colour does not change. </p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude"><strong>NOTE:</strong> Icon colourising uses the PHP <tt>imagefilter()</tt> function. This function 
+ is <em>only</em> available in the version of GD that is bundled with PHP, and not with the official GD library. Several 
+ popular operating systems (e.g. Debian/Ubuntu) use the official GD library rather than the bundled PHP library. <a href="#NODE_USEICONSCALE">USEICONSCALE</a> 
+ <em>will not work</em> on those systems. You should get a warning when the map is produced, and check.php should also tell you 
+ this. check.php will also tell you if you are using the bundled GD library or not. </p> 
+</div>
+<div class="changes">
+<h3>Change History</h3>
+<dl>
+<dt>0.95</dt>
+<dd>Added USEICONSCALE.</dd>
 </dl>
 </div>
 </div>
@@ -255,11 +283,11 @@ which is then displayed. Specify the targets on one TARGET line, seperated with 
 </div>
 <div class="description">
 <p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">If you specify an <a href="#NODE_ICON">ICON,</a> and also a <a href="#NODE_LABEL">LABEL,</a> then you will find that the label is often hard to read. 
- LABELOFFSET allows you to move the position of the <a href="#NODE_LABEL">LABEL,</a> so that it's not directly over the centre 
- of the node anymore. </p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">You can specify a compass-point (e.g. LABELOFFSET S). The compass-point method takes the size of the 
+ <a href="#NODE_LABELOFFSET">LABELOFFSET</a> allows you to move the position of the <a href="#NODE_LABEL">LABEL,</a> so that it's not directly over the centre 
+ of the node anymore. </p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">You can specify a compass-point (e.g. <a href="#NODE_LABELOFFSET">LABELOFFSET</a> S). The compass-point method takes the size of the 
  <a href="#NODE_ICON">ICON,</a> and uses that as the offset distance in the direction you specify. This way, you can change your 
  icon for something of a different size, and not need to change all your offsets. You can use the main 
- 8 points of the compass: N, E, S, W, NE, SE, NW, SW.</p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">For more control, you can specify an integer offset for the x and y positions of the label (e.g. LABELOFFSET -10 -20) instead.</p> 
+ 8 points of the compass: N, E, S, W, NE, SE, NW, SW. </p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">For more control, you can specify an integer offset for the x and y positions of the label (e.g. <a href="#NODE_LABELOFFSET">LABELOFFSET</a> -10 -20) instead. </p> 
 </div>
 <div class="changes">
 <h3>Change History</h3>
@@ -274,7 +302,7 @@ which is then displayed. Specify the targets on one TARGET line, seperated with 
 <div class="definition">LABELFONT <em class="meta">fontnumber</em>
 </div>
 <div class="description">
-<p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Specify the font used for drawing the LABEL.</p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Fonts are specified by number. The GD library that Weathermap uses has 5 built-in fonts, 1-5. You can define new fonts based on TrueType or GD fonts by using the <a href="#GLOBAL_FONTDEFINE">FONTDEFINE</a> directive.</p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude"><img src="../images/font-sizes.png"></img>The built-in GD fonts.</p> 
+<p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Specify the font used for drawing the <a href="#NODE_LABEL">LABEL.</a> </p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Fonts are specified by number. The GD library that Weathermap uses has 5 built-in fonts, 1-5. You can define new fonts based on TrueType or GD fonts by using the <a href="#GLOBAL_FONTDEFINE">FONTDEFINE</a> directive. </p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude"><img src="../images/font-sizes.png"></img>The built-in GD fonts. </p> 
 </div>
 <div class="changes">
 <h3>Change History</h3>
@@ -297,7 +325,7 @@ which is then displayed. Specify the targets on one TARGET line, seperated with 
 <div class="definition">LABELOUTLINECOLOR <em class="meta">red</em> <em class="meta">green</em> <em class="meta">blue</em>
 </div>
 <div class="description">
-<p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Specify the colours used for drawing the LABEL.</p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">red, green and blue are numbers from 0 to 255.</p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">LABELFONTSHADOWCOLOR, LABELBGCOLOR and LABELOUTLINECOLOR have an additional option - 'none' - which stops that element of the <a href="#NODE_LABEL">LABEL</a> being drawn. LABELFONTSHADOWCOLOR defaults to 'none'.</p> 
+<p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Specify the colours used for drawing the <a href="#NODE_LABEL">LABEL.</a> </p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">red, green and blue are numbers from 0 to 255. </p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">LABELFONTSHADOWCOLOR, LABELBGCOLOR and LABELOUTLINECOLOR have an additional option - 'none' - which stops that element of the <a href="#NODE_LABEL">LABEL</a> being drawn. LABELFONTSHADOWCOLOR defaults to 'none'. </p> 
 </div>
 <div class="changes">
 <h3>Change History</h3>
@@ -312,9 +340,9 @@ which is then displayed. Specify the targets on one TARGET line, seperated with 
 <div class="definition">INFOURL <em class="meta">url</em>
 </div>
 <div class="description">
-<p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Creates a hyperlink in the HTML output.</p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">If you are using the HTML output facility, then a link is added to the 
+<p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Creates a hyperlink in the HTML output. </p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">If you are using the HTML output facility, then a link is added to the 
  &lt;map&gt; section of the HTML so that when you click on the node, you are 
- taken to the url specified here.</p> 
+ taken to the url specified here. </p> 
 </div>
 </div>
 	    	  <div class="referenceentry">
@@ -322,9 +350,9 @@ which is then displayed. Specify the targets on one TARGET line, seperated with 
 <div class="definition">OVERLIBGRAPH <em class="meta">url</em>
 </div>
 <div class="description">
-<p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Creates a popup image in the HTML output.</p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">If you are using the HTML output facility, and <a href="#GLOBAL_HTMLSTYLE">HTMLSTYLE</a> is set to 'overlib', then a link is added to the 
+<p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Creates a popup image in the HTML output. </p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">If you are using the HTML output facility, and <a href="#GLOBAL_HTMLSTYLE">HTMLSTYLE</a> is set to 'overlib', then a link is added to the 
  &lt;map&gt; section of the HTML so that when you move the mouse pointer over the the node, a box will pop up 
- containing the image that you specify. Typically used to link to historical data in your network monitoring system.</p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">If a <a href="#NODE_NOTES">NOTES</a> line is also specified for a node, then the image specified here appears with the <a href="#NODE_NOTES">NOTES</a> text underneath it.</p> 
+ containing the image that you specify. Typically used to link to historical data in your network monitoring system. </p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">If a <a href="#NODE_NOTES">NOTES</a> line is also specified for a node, then the image specified here appears with the <a href="#NODE_NOTES">NOTES</a> text underneath it. </p> 
 </div>
 <div class="examples">
 <h3>Examples</h3>
@@ -339,10 +367,10 @@ which is then displayed. Specify the targets on one TARGET line, seperated with 
 <div class="definition">OVERLIBWIDTH <em class="meta">imagewidth</em>
 </div>
 <div class="description">
-<p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Specify the width, in pixels of the graph image referred to by <a href="#NODE_OVERLIBGRAPH">OVERLIBGRAPH</a> line.</p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">This is an optional extra that allows the OverLib library to make a better job of 
+<p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Specify the width, in pixels of the graph image referred to by <a href="#NODE_OVERLIBGRAPH">OVERLIBGRAPH</a> line. </p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">This is an optional extra that allows the OverLib library to make a better job of 
  positioning the 'popup' image so that it doesn't appear off the edge of the screen. 
  Typically, you would use this once, in the DEFAULT <a href="#NODE_NODE">NODE.</a> If you use this, you must 
- also use <a href="#NODE_OVERLIBHEIGHT">OVERLIBHEIGHT,</a> for either to have any effect.</p> 
+ also use <a href="#NODE_OVERLIBHEIGHT">OVERLIBHEIGHT,</a> for either to have any effect. </p> 
 </div>
 <div class="changes">
 <h3>Change History</h3>
@@ -357,10 +385,10 @@ which is then displayed. Specify the targets on one TARGET line, seperated with 
 <div class="definition">OVERLIBHEIGHT <em class="meta">imagewidth</em>
 </div>
 <div class="description">
-<p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Specify the width, in pixels of the graph image referred to by <a href="#NODE_OVERLIBGRAPH">OVERLIBGRAPH</a> line.</p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">This is an optional extra that allows the OverLib library to make a better job of 
+<p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Specify the width, in pixels of the graph image referred to by <a href="#NODE_OVERLIBGRAPH">OVERLIBGRAPH</a> line. </p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">This is an optional extra that allows the OverLib library to make a better job of 
  positioning the 'popup' image so that it doesn't appear off the edge of the screen. 
  Typically, you would use this once, in the DEFAULT <a href="#NODE_NODE">NODE.</a> If you use this, you must 
- also use <a href="#NODE_OVERLIBWIDTH">OVERLIBWIDTH,</a> for either to have any effect.</p> 
+ also use <a href="#NODE_OVERLIBWIDTH">OVERLIBWIDTH,</a> for either to have any effect. </p> 
 </div>
 <div class="changes">
 <h3>Change History</h3>
@@ -375,7 +403,7 @@ which is then displayed. Specify the targets on one TARGET line, seperated with 
 <div class="definition">OVERLIBCAPTION <em class="meta">caption text</em>
 </div>
 <div class="description">
-<p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Specify the caption used for the popup HTML 'window' if you have also specified an <a href="#NODE_OVERLIBGRAPH">OVERLIBGRAPH</a> line. By default, this is the name of the NODE.</p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">The text for the caption can contain <a href="advanced.html#tokens">special tokens</a> to show map data.</p> 
+<p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Specify the caption used for the popup HTML 'window' if you have also specified an <a href="#NODE_OVERLIBGRAPH">OVERLIBGRAPH</a> line. By default, this is the name of the <a href="#NODE_NODE">NODE.</a> </p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">The text for the caption can contain <a href="advanced.html#tokens">special tokens</a> to show map data. </p> 
 </div>
 <div class="changes">
 <h3>Change History</h3>
@@ -390,7 +418,7 @@ which is then displayed. Specify the targets on one TARGET line, seperated with 
 <div class="definition">NOTES <em class="meta">notes text</em>
 </div>
 <div class="description">
-<p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Specifies the text or HTML notes for a node. </p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">The <em>notes text</em> appears in a popup box when the user hovers their mouse over the node. If an <a href="#NODE_OVERLIBGRAPH">OVERLIBGRAPH</a> is specified too, then the text appears below the graph.</p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">The map <a href="#GLOBAL_HTMLSTYLE">HTMLSTYLE</a> must be set to 'overlib' to enable any of the mouse-hover functionality.</p> 
+<p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Specifies the text or HTML notes for a node. </p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">The <em>notes text</em> appears in a popup box when the user hovers their mouse over the node. If an <a href="#NODE_OVERLIBGRAPH">OVERLIBGRAPH</a> is specified too, then the text appears below the graph. </p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">The map <a href="#GLOBAL_HTMLSTYLE">HTMLSTYLE</a> must be set to 'overlib' to enable any of the mouse-hover functionality. </p> 
 </div>
 <div class="changes">
 <h3>Change History</h3>
@@ -405,9 +433,9 @@ which is then displayed. Specify the targets on one TARGET line, seperated with 
 <div class="definition">SET <em class="meta">hintname</em> <em class="meta">hintvalue</em>
 </div>
 <div class="description">
-<p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Specifies a value for a <em>hint variable</em>.</p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Hint Variables allow the user to pass settings to the internals of Weathermap that 
+<p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Specifies a value for a <em>hint variable</em>. </p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Hint Variables allow the user to pass settings to the internals of Weathermap that 
  wouldn't normally need to be changed, or that aren't part of the core Weathermap application. 
- Examples are: small rendering changes, parameters for datasources plugins and similar.</p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Hint Variables are either Global for the map, or assigned to a specific link or node.</p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">There is more about Hint Variables in the <a href="advanced.html">Advanced Topics</a> section.</p> 
+ Examples are: small rendering changes, parameters for datasources plugins and similar. </p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Hint Variables are either Global for the map, or assigned to a specific link or node. </p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">There is more about Hint Variables in the <a href="advanced.html">Advanced Topics</a> section. </p> 
 </div>
 <div class="changes">
 <h3>Change History</h3>
@@ -425,13 +453,13 @@ which is then displayed. Specify the targets on one TARGET line, seperated with 
 <div class="definition">LINK <em class="meta">linkname</em>
 </div>
 <div class="description">
-<p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">The first line of a LINK definition.</p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">The linkname must 
+<p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">The first line of a <a href="#LINK_LINK">LINK</a> definition. </p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">The linkname must 
  be unique within the map, and must not contain spaces. The only place it currently appears is 
  in the small title-bar of a popup graph if you specify an 
- <a href="#LINK_OVERLIBGRAPH">OVERLIBGRAPH</a> without an <a href="#LINK_OVERLIBCAPTION">OVERLIBCAPTION,</a> however.</p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">There is one special link name, 'DEFAULT', which allows for the setting of defaults. 
+ <a href="#LINK_OVERLIBGRAPH">OVERLIBGRAPH</a> without an <a href="#LINK_OVERLIBCAPTION">OVERLIBCAPTION,</a> however. </p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">There is one special link name, 'DEFAULT', which allows for the setting of defaults. 
  All links that are defined after this one in the configuration file will use the parameters 
  of this link as a starting point. For this reason, it is best to define the DEFAULT link at the 
- top of the configuration file, if you intend to use it.</p> 
+ top of the configuration file, if you intend to use it. </p> 
 </div>
 </div>
 	    	  <div class="referenceentry">
@@ -443,7 +471,7 @@ which is then displayed. Specify the targets on one TARGET line, seperated with 
 <div class="description">
 <p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">These are the NODEs that this link joins. There can be 
  only two. They are the 'nodename's from the <a href="#NODE_NODE">NODE</a> line for 
- each node.</p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Optionally, you can add an offset after a nodename, to move the location of that end of the link. This can help with crowded areas of the map, and also in making parallel links. Valid offsets are named after compass-points: N,S,E,W,NE,NE,SE,SW, or they can be numeric values, to indicate the relative position in pixels from the centre of the node.</p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">The order of the nodes is significant. When reading data sources, the flow from the first node to the second is considered 'out' and from second-to-first is 'in'.</p> 
+ each node. </p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Optionally, you can add an offset after a nodename, to move the location of that end of the link. This can help with crowded areas of the map, and also in making parallel links. Valid offsets are named after compass-points: N,S,E,W,NE,NE,SE,SW, or they can be numeric values, to indicate the relative position in pixels from the centre of the node. </p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">The order of the nodes is significant. When reading data sources, the flow from the first node to the second is considered 'out' and from second-to-first is 'in'. </p> 
 </div>
 <div class="examples">
 <h3>Examples</h3>
@@ -484,8 +512,8 @@ LINK secondlink
 <div class="description">
 <p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Specifies where to look for the current throughput 
  information for this <a href="#LINK_LINK">LINK.</a> You can also specify multiple targets, which will then be added together to make the aggregate bandwidth 
-which is then displayed. Specify the targets on one TARGET line, seperated with a space. If a targetspec starts with a '-', then it's value will be <i>subtracted</i> from the final result instead.</p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">The actual contents of the <em>targetspec</em> depend on the data source plugins that are 
- available. <a href="targets.html">The standard plugins are documented here</a>.</p> 
+which is then displayed. Specify the targets on one <a href="#LINK_TARGET">TARGET</a> line, seperated with a space. If a targetspec starts with a '-', then it's value will be <i>subtracted</i> from the final result instead. </p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">The actual contents of the <em>targetspec</em> depend on the data source plugins that are 
+ available. <a href="targets.html">The standard plugins are documented here</a>. </p> 
 </div>
 <div class="examples">
 <h3>Examples</h3>
@@ -517,9 +545,9 @@ which is then displayed. Specify the targets on one TARGET line, seperated with 
 <div class="definition">USESCALE <em class="meta">scalename</em>
 </div>
 <div class="description">
-<p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Specify which <a href="#GLOBAL_SCALE">SCALE</a> to use to decide the colour of this link.</p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">After the percentage usage is calculated (using <a href="#LINK_BANDWIDTH">BANDWIDTH</a> and data from the <a href="#LINK_TARGET">TARGET</a> line), 
- the colour is decided by looking up the percentage against this <a href="#GLOBAL_SCALE">SCALE.</a> If there is no USESCALE 
- line, then the default scale is used.</p> 
+<p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Specify which <a href="#GLOBAL_SCALE">SCALE</a> to use to decide the colour of this link. </p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">After the percentage usage is calculated (using <a href="#LINK_BANDWIDTH">BANDWIDTH</a> and data from the <a href="#LINK_TARGET">TARGET</a> line), 
+ the colour is decided by looking up the percentage against this <a href="#GLOBAL_SCALE">SCALE.</a> If there is no <a href="#LINK_USESCALE">USESCALE</a> 
+ line, then the default scale is used. </p> 
 </div>
 <div class="changes">
 <h3>Change History</h3>
@@ -533,7 +561,7 @@ which is then displayed. Specify the targets on one TARGET line, seperated with 
 <h2><a name="LINK_WIDTH">WIDTH</a></h2>
 <div class="definition">WIDTH <em class="meta">width</em>
 </div>
-<div class="description"><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Specifies the width of this link when drawn, in pixels.</p></div>
+<div class="description"><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Specifies the width of this link when drawn, in pixels. </p></div>
 </div>
 	    	  <div class="referenceentry">
 <h2><a name="LINK_BANDWIDTH">BANDWIDTH</a></h2>
@@ -542,10 +570,10 @@ which is then displayed. Specify the targets on one TARGET line, seperated with 
 <div class="definition">BANDWIDTH <em class="meta">max-in-bandwidth</em> <em class="meta">max-out-bandwidth</em>
 </div>
 <div class="description">
-<p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Specifies the maximum throughput of this link, in bits per second.</p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">This is used to calculate the percentage utilisation, which in turn is used to make the 
-colour for the link arrow, and optionally the label on the link.</p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">The second form allows you to have 'asymmetric' links, like an ADSL, where the first number is the maximum 
+<p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Specifies the maximum throughput of this link, in bits per second. </p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">This is used to calculate the percentage utilisation, which in turn is used to make the 
+colour for the link arrow, and optionally the label on the link. </p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">The second form allows you to have 'asymmetric' links, like an ADSL, where the first number is the maximum 
 bandwidth from node1 to node2 and the second is the maximum from node2 to node1, as they are 
-given in the <a href="#LINK_NODES">NODES</a> line.</p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Bandwidths can also use K,M,G and T suffixes to specify large values. Also see the <a href="#GLOBAL_KILO">KILO</a> global option though.</p> 
+given in the <a href="#LINK_NODES">NODES</a> line. </p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Bandwidths can also use K,M,G and T suffixes to specify large values. Also see the <a href="#GLOBAL_KILO">KILO</a> global option though. </p> 
 </div>
 <div class="examples">
 <h3>Examples</h3>
@@ -571,7 +599,7 @@ given in the <a href="#LINK_NODES">NODES</a> line.</p><p xmlns="http://www.w3.or
 <div class="definition">BWLABEL <em class="meta">formatname</em>
 </div>
 <div class="description">
-<p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Specifies the type of 'bandwidth' label shown on each link.</p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">The default is 'percent', but you can also have 'none', 'unformatted' or 'bits'. 
+<p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Specifies the type of 'bandwidth' label shown on each link. </p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">The default is 'percent', but you can also have 'none', 'unformatted' or 'bits'. 
  'bits' shows the actual bandwidth, formatted using K,M,T,G suffixes where appropriate. 
  'unformatted' takes the value from the <a href="#LINK_TARGET">TARGET</a> and displays it without any formatting - 
  this can be useful for mapping things other than bandwidth. 
@@ -593,10 +621,10 @@ given in the <a href="#LINK_NODES">NODES</a> line.</p><p xmlns="http://www.w3.or
 <div class="definition">INBWFORMAT <em class="meta">string</em>
 </div>
 <div class="description">
-<p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Specifies a custom string to use for the inbound data <a href="#LINK_BWLABEL">BWLABEL</a> bandwidth labels.</p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">This command is intended as an advanced alternative to the <a href="#LINK_BWLABEL">BWLABEL</a> command, for situations where 
- you want more control over the content of the labels.</p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Instead of using bits, percent, etc, you can use any string in the label. Most importantly, 
+<p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Specifies a custom string to use for the inbound data <a href="#LINK_BWLABEL">BWLABEL</a> bandwidth labels. </p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">This command is intended as an advanced alternative to the <a href="#LINK_BWLABEL">BWLABEL</a> command, for situations where 
+ you want more control over the content of the labels. </p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Instead of using bits, percent, etc, you can use any string in the label. Most importantly, 
  the text for the label can contain <a href="advanced.html#tokens">special tokens</a> to show map data. 
- In most normal situations you <em>need</em> to use the tokens, or the label won't do much useful</p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">There is also a matching <a href="#LINK_OUTBWFORMAT">OUTBWFORMAT</a> command to do the ame job for the outbound bandwidth label.</p> 
+ In most normal situations you <em>need</em> to use the tokens, or the label won't do much useful </p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">There is also a matching <a href="#LINK_OUTBWFORMAT">OUTBWFORMAT</a> command to do the ame job for the outbound bandwidth label. </p> 
 </div>
 <div class="examples">
 <h3>Examples</h3>
@@ -618,7 +646,7 @@ given in the <a href="#LINK_NODES">NODES</a> line.</p><p xmlns="http://www.w3.or
 <div class="definition">OUTBWFORMAT <em class="meta">string</em>
 </div>
 <div class="description">
-<p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Specifies a custom string to use for the outbound data <a href="#LINK_BWLABEL">BWLABEL</a> bandwidth labels.</p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">See the <a href="#LINK_INBWFORMAT">INBWFORMAT</a> entry for more information.</p> 
+<p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Specifies a custom string to use for the outbound data <a href="#LINK_BWLABEL">BWLABEL</a> bandwidth labels. </p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">See the <a href="#LINK_INBWFORMAT">INBWFORMAT</a> entry for more information. </p> 
 </div>
 <div class="changes">
 <h3>Change History</h3>
@@ -633,8 +661,8 @@ given in the <a href="#LINK_NODES">NODES</a> line.</p><p xmlns="http://www.w3.or
 <div class="definition">BWSTYLE <em class="meta">formatname</em>
 </div>
 <div class="description">
-<p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Specifies the style used to draw the box around the 'bandwidth' label shown on each link.</p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Two styles are currently available: 'classic' leaves the box horizontal, regardless 
-of the direction of the link. 'angled' rotates the box to follow the directiong of the link arrow.</p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">The <a href="#LINK_BWFONT">BWFONT</a> <em>must be a TrueType font</em> as these are the only font type to support rotating text.</p> 
+<p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Specifies the style used to draw the box around the 'bandwidth' label shown on each link. </p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Two styles are currently available: 'classic' leaves the box horizontal, regardless 
+of the direction of the link. 'angled' rotates the box to follow the directiong of the link arrow. </p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">The <a href="#LINK_BWFONT">BWFONT</a> <em>must be a TrueType font</em> as these are the only font type to support rotating text. </p> 
 </div>
 <div class="changes">
 <h3>Change History</h3>
@@ -649,7 +677,7 @@ of the direction of the link. 'angled' rotates the box to follow the directiong 
 <div class="definition">BWLABELPOS <em class="meta">inposition</em> <em class="meta">outposition</em>
 </div>
 <div class="description">
-<p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Specifies the position of the 'bandwidth' labels shown on each link.</p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">The two position values are percentages along the link arrow, from the first to the second node. Therefore <tt>BWLABELPOS 75 25</tt> is the default.</p> 
+<p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Specifies the position of the 'bandwidth' labels shown on each link. </p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">The two position values are percentages along the link arrow, from the first to the second node. Therefore <tt>BWLABELPOS 75 25</tt> is the default. </p> 
 </div>
 <div class="changes">
 <h3>Change History</h3>
@@ -664,7 +692,7 @@ of the direction of the link. 'angled' rotates the box to follow the directiong 
 <div class="definition">BWFONT <em class="meta">fontnumber</em>
 </div>
 <div class="description">
-<p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Specify the font used for drawing the <a href="#LINK_BWLABEL">BWLABEL</a> boxes.</p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Fonts are specified by number. The GD library that Weathermap uses has 5 built-in fonts, 1-5. You can define new fonts based on TrueType or GD fonts by using the <a href="#GLOBAL_FONTDEFINE">FONTDEFINE</a> directive.</p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude"><img src="../images/font-sizes.png"></img>The built-in GD fonts.</p> 
+<p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Specify the font used for drawing the <a href="#LINK_BWLABEL">BWLABEL</a> boxes. </p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Fonts are specified by number. The GD library that Weathermap uses has 5 built-in fonts, 1-5. You can define new fonts based on TrueType or GD fonts by using the <a href="#GLOBAL_FONTDEFINE">FONTDEFINE</a> directive. </p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude"><img src="../images/font-sizes.png"></img>The built-in GD fonts. </p> 
 </div>
 </div>
                 <div class="referenceentry">
@@ -672,7 +700,7 @@ of the direction of the link. 'angled' rotates the box to follow the directiong 
 <div class="definition">INCOMMENT <em class="meta">string</em>
 </div>
 <div class="description">
-<p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Specifies a comment for the input side of a LINK.</p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">The link comment appears as text running alongside the link arrow. The font used is governed by <a href="#LINK_COMMENTFONT">COMMENTFONT</a> and the colour by COMMENTFONTCOLOR.</p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">The text for the comment can contain <a href="advanced.html#tokens">special tokens</a> to show map data.</p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">The <a href="#LINK_COMMENTFONT">COMMENTFONT</a> <em>must be a TrueType font</em> as these are the only font type to support rotating text.</p> 
+<p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Specifies a comment for the input side of a <a href="#LINK_LINK">LINK.</a> </p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">The link comment appears as text running alongside the link arrow. The font used is governed by <a href="#LINK_COMMENTFONT">COMMENTFONT</a> and the colour by COMMENTFONTCOLOR. </p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">The text for the comment can contain <a href="advanced.html#tokens">special tokens</a> to show map data. </p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">The <a href="#LINK_COMMENTFONT">COMMENTFONT</a> <em>must be a TrueType font</em> as these are the only font type to support rotating text. </p> 
 </div>
 <div class="changes">
 <h3>Change History</h3>
@@ -687,7 +715,7 @@ of the direction of the link. 'angled' rotates the box to follow the directiong 
 <div class="definition">OUTCOMMENT <em class="meta">string</em>
 </div>
 <div class="description">
-<p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Specifies a comment for the output side of a LINK.</p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">The link comment appears as text running alongside the link arrow. The font used is governed by <a href="#LINK_COMMENTFONT">COMMENTFONT</a> and the colour by COMMENTFONTCOLOR.</p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">The text for the comment can contain <a href="advanced.html#tokens">special tokens</a> to show map data.</p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">The <a href="#LINK_COMMENTFONT">COMMENTFONT</a> <em>must be a TrueType font</em> as these are the only font type to support rotating text.</p> 
+<p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Specifies a comment for the output side of a <a href="#LINK_LINK">LINK.</a> </p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">The link comment appears as text running alongside the link arrow. The font used is governed by <a href="#LINK_COMMENTFONT">COMMENTFONT</a> and the colour by COMMENTFONTCOLOR. </p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">The text for the comment can contain <a href="advanced.html#tokens">special tokens</a> to show map data. </p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">The <a href="#LINK_COMMENTFONT">COMMENTFONT</a> <em>must be a TrueType font</em> as these are the only font type to support rotating text. </p> 
 </div>
 <div class="changes">
 <h3>Change History</h3>
@@ -702,7 +730,7 @@ of the direction of the link. 'angled' rotates the box to follow the directiong 
 <div class="definition">COMMENTFONT <em class="meta">fontnumber</em>
 </div>
 <div class="description">
-<p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Specify the font used for drawing the <a href="#LINK_INCOMMENT">INCOMMENT</a> and <a href="#LINK_OUTCOMMENT">OUTCOMMENT</a> text.</p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Fonts are specified by number. The GD library that Weathermap uses has 5 built-in fonts, 1-5. You can define new fonts based on TrueType or GD fonts by using the <a href="#GLOBAL_FONTDEFINE">FONTDEFINE</a> directive.</p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">For Link Comments, you <em>must</em> define a TrueType font. These are the only font that can rotate text through any angle, as required by comments. You can change the colour used to render the font with COMMENTFONTCOLOR</p><changes xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude"> 
+<p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Specify the font used for drawing the <a href="#LINK_INCOMMENT">INCOMMENT</a> and <a href="#LINK_OUTCOMMENT">OUTCOMMENT</a> text. </p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Fonts are specified by number. The GD library that Weathermap uses has 5 built-in fonts, 1-5. You can define new fonts based on TrueType or GD fonts by using the <a href="#GLOBAL_FONTDEFINE">FONTDEFINE</a> directive. </p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">For Link Comments, you <em>must</em> define a TrueType font. These are the only font that can rotate text through any angle, as required by comments. You can change the colour used to render the font with COMMENTFONTCOLOR </p><changes xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude"> 
  <change version="0.9">Added link comments</change> 
  </changes> 
 </div>
@@ -712,7 +740,7 @@ of the direction of the link. 'angled' rotates the box to follow the directiong 
 <div class="definition">COMMENTPOS <em class="meta">inposition</em> <em class="meta">outposition</em>
 </div>
 <div class="description">
-<p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Specify the position along the link used for drawing the <a href="#LINK_INCOMMENT">INCOMMENT</a> and <a href="#LINK_OUTCOMMENT">OUTCOMMENT</a> text.</p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">The positions are specified as a percentage position along the link, like <a href="#LINK_BWLABELPOS">BWLABELPOS.</a> The default positions are equivalent to <strong>COMMENTPOS 95 5</strong>.</p><changes xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude"> 
+<p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Specify the position along the link used for drawing the <a href="#LINK_INCOMMENT">INCOMMENT</a> and <a href="#LINK_OUTCOMMENT">OUTCOMMENT</a> text. </p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">The positions are specified as a percentage position along the link, like <a href="#LINK_BWLABELPOS">BWLABELPOS.</a> The default positions are equivalent to <strong>COMMENTPOS 95 5</strong>. </p><changes xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude"> 
  <change version="0.92">Added COMMENTPOS</change> 
  </changes> 
 </div>
@@ -722,7 +750,7 @@ of the direction of the link. 'angled' rotates the box to follow the directiong 
 <div class="definition">SPLITPOS <em class="meta">position</em>
 </div>
 <div class="description">
-<p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Specify the position along the link used for drawing the <a href="#LINK_INCOMMENT">INCOMMENT</a> and <a href="#LINK_OUTCOMMENT">OUTCOMMENT</a> text.</p><changes xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude"> 
+<p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Specify the position along the link used for drawing the <a href="#LINK_INCOMMENT">INCOMMENT</a> and <a href="#LINK_OUTCOMMENT">OUTCOMMENT</a> text. </p><changes xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude"> 
  <change version="0.95">Added SPLITPOS</change> 
  </changes> 
 </div>
@@ -740,11 +768,11 @@ of the direction of the link. 'angled' rotates the box to follow the directiong 
 <div class="definition">COMMENTFONTCOLOR <em class="meta">red</em> <em class="meta">green</em> <em class="meta">blue</em>
 </div>
 <div class="description">
-<p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Specify the colours used for drawing the link.</p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">red, green and blue are numbers from 0 to 255.</p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">OUTLINECOLOR, BWOUTLINECOLOR and BWBOXCOLOR have an additional option - 'none' - which stops that element of the link being drawn. </p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">The colours are used as follows:<ul><li>OUTLINECOLOR is the colour of the line around the edge of the arrow.</li> 
+<p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Specify the colours used for drawing the link. </p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">red, green and blue are numbers from 0 to 255. </p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">OUTLINECOLOR, BWOUTLINECOLOR and BWBOXCOLOR have an additional option - 'none' - which stops that element of the link being drawn. </p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">The colours are used as follows:<ul><li>OUTLINECOLOR is the colour of the line around the edge of the arrow.</li> 
  <li>BWOUTLINECOLOR is the colour of the line surrounding the 'bandwidth label' box</li> 
  <li>BWBOXCOLOR is the background colour for the same box</li> 
  <li>BWFONTCOLOR is the colour used for text within that box</li> 
- <li>COMMENTFONTCOLOR is the colour used for the text produced by <a href="#LINK_INCOMMENT">INCOMMENT</a> and <a href="#LINK_OUTCOMMENT">OUTCOMMENT,</a> along the side of a link arrow</li></ul></p> 
+ <li>COMMENTFONTCOLOR is the colour used for the text produced by <a href="#LINK_INCOMMENT">INCOMMENT</a> and <a href="#LINK_OUTCOMMENT">OUTCOMMENT,</a> along the side of a link arrow</li></ul> </p> 
 </div>
 <div class="changes">
 <h3>Change History</h3>
@@ -763,9 +791,9 @@ of the direction of the link. 'angled' rotates the box to follow the directiong 
 <div class="definition">INFOURL <em class="meta">url</em>
 </div>
 <div class="description">
-<p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Creates a hyperlink in the HTML output.</p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">If you are using the HTML output facility, then a link is added to the 
+<p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Creates a hyperlink in the HTML output. </p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">If you are using the HTML output facility, then a link is added to the 
  &lt;map&gt; section of the HTML so that when you click on the (weathermap) link, you are 
- taken to the url specified here.</p> 
+ taken to the url specified here. </p> 
 </div>
 </div>
 	    	  <div class="referenceentry">
@@ -773,9 +801,9 @@ of the direction of the link. 'angled' rotates the box to follow the directiong 
 <div class="definition">OVERLIBGRAPH <em class="meta">url</em>
 </div>
 <div class="description">
-<p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Creates a popup image in the HTML output.</p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">If you are using the HTML output facility, and <a href="#GLOBAL_HTMLSTYLE">HTMLSTYLE</a> is set to 'overlib', then a link is added to the 
+<p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Creates a popup image in the HTML output. </p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">If you are using the HTML output facility, and <a href="#GLOBAL_HTMLSTYLE">HTMLSTYLE</a> is set to 'overlib', then a link is added to the 
  &lt;map&gt; section of the HTML so that when you move the mouse pointer over the the (weathermap) link, a box will pop up 
- containing the image that you specify. Typically used to link to historical data in your network monitoring system.</p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">If a <a href="#LINK_NOTES">NOTES</a> line is also specified for a link, then the image specified here appears with the <a href="#LINK_NOTES">NOTES</a> text underneath it.</p> 
+ containing the image that you specify. Typically used to link to historical data in your network monitoring system. </p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">If a <a href="#LINK_NOTES">NOTES</a> line is also specified for a link, then the image specified here appears with the <a href="#LINK_NOTES">NOTES</a> text underneath it. </p> 
 </div>
 <div class="examples">
 <h3>Examples</h3>
@@ -798,10 +826,10 @@ of the direction of the link. 'angled' rotates the box to follow the directiong 
 <div class="definition">OVERLIBWIDTH <em class="meta">imagewidth</em>
 </div>
 <div class="description">
-<p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Specify the width, in pixels of the graph image referred to by <a href="#LINK_OVERLIBGRAPH">OVERLIBGRAPH</a> line.</p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">This is an optional extra that allows the OverLib library to make a better job of 
+<p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Specify the width, in pixels of the graph image referred to by <a href="#LINK_OVERLIBGRAPH">OVERLIBGRAPH</a> line. </p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">This is an optional extra that allows the OverLib library to make a better job of 
  positioning the 'popup' image so that it doesn't appear off the edge of the screen. 
  Typically, you would use this once, in the DEFAULT link. If you use this, you must 
- also use <a href="#LINK_OVERLIBHEIGHT">OVERLIBHEIGHT,</a> for either to have any effect.</p> 
+ also use <a href="#LINK_OVERLIBHEIGHT">OVERLIBHEIGHT,</a> for either to have any effect. </p> 
 </div>
 <div class="changes">
 <h3>Change History</h3>
@@ -816,10 +844,10 @@ of the direction of the link. 'angled' rotates the box to follow the directiong 
 <div class="definition">OVERLIBHEIGHT <em class="meta">imagewidth</em>
 </div>
 <div class="description">
-<p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Specify the width, in pixels of the graph image referred to by <a href="#LINK_OVERLIBGRAPH">OVERLIBGRAPH</a> line.</p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">This is an optional extra that allows the OverLib library to make a better job of 
+<p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Specify the width, in pixels of the graph image referred to by <a href="#LINK_OVERLIBGRAPH">OVERLIBGRAPH</a> line. </p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">This is an optional extra that allows the OverLib library to make a better job of 
  positioning the 'popup' image so that it doesn't appear off the edge of the screen. 
  Typically, you would use this once, in the DEFAULT link. If you use this, you must 
- also use <a href="#LINK_OVERLIBWIDTH">OVERLIBWIDTH,</a> for either to have any effect.</p> 
+ also use <a href="#LINK_OVERLIBWIDTH">OVERLIBWIDTH,</a> for either to have any effect. </p> 
 </div>
 <div class="changes">
 <h3>Change History</h3>
@@ -834,7 +862,7 @@ of the direction of the link. 'angled' rotates the box to follow the directiong 
 <div class="definition">OVERLIBCAPTION <em class="meta">caption text</em>
 </div>
 <div class="description">
-<p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Specify the caption used for the popup HTML 'window' if you have also specified an <a href="#LINK_OVERLIBGRAPH">OVERLIBGRAPH</a> line. By default, this is the name of the LINK.</p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">The text for the caption can contain <a href="advanced.html#tokens">special tokens</a> to show map data.</p> 
+<p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Specify the caption used for the popup HTML 'window' if you have also specified an <a href="#LINK_OVERLIBGRAPH">OVERLIBGRAPH</a> line. By default, this is the name of the <a href="#LINK_LINK">LINK.</a> </p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">The text for the caption can contain <a href="advanced.html#tokens">special tokens</a> to show map data. </p> 
 </div>
 <div class="changes">
 <h3>Change History</h3>
@@ -849,7 +877,7 @@ of the direction of the link. 'angled' rotates the box to follow the directiong 
 <div class="definition">NOTES <em class="meta">notes text</em>
 </div>
 <div class="description">
-<p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Specifies the text or HTML notes for a link. </p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">The <em>notes text</em> appears in a popup box when the user hovers their mouse over the link. If an <a href="#LINK_OVERLIBGRAPH">OVERLIBGRAPH</a> is specified too, then the text appears below the graph.</p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">The map <a href="#GLOBAL_HTMLSTYLE">HTMLSTYLE</a> must be set to 'overlib' to enable any of the mouse-hover functionality.</p> 
+<p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Specifies the text or HTML notes for a link. </p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">The <em>notes text</em> appears in a popup box when the user hovers their mouse over the link. If an <a href="#LINK_OVERLIBGRAPH">OVERLIBGRAPH</a> is specified too, then the text appears below the graph. </p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">The map <a href="#GLOBAL_HTMLSTYLE">HTMLSTYLE</a> must be set to 'overlib' to enable any of the mouse-hover functionality. </p> 
 </div>
 <div class="changes">
 <h3>Change History</h3>
@@ -864,9 +892,9 @@ of the direction of the link. 'angled' rotates the box to follow the directiong 
 <div class="definition">VIA <em class="meta">x-coord</em> <em class="meta">y-coord</em>
 </div>
 <div class="description">
-<p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Specify an additional point that a link must pass through.</p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">A link normally goes in a straight line between the two nodes listed in the <a href="#LINK_NODES">NODES</a> configuration line. 
+<p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Specify an additional point that a link must pass through. </p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">A link normally goes in a straight line between the two nodes listed in the <a href="#LINK_NODES">NODES</a> configuration line. 
  If you need it to go around something else, or to seperate two parallel links so that the bandwidth labels 
- are all visible, you can make the link curve.</p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">If you specify multiple VIA lines, then the link will pass through each in turn, in the order they are specified.</p> 
+ are all visible, you can make the link curve. </p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">If you specify multiple <a href="#LINK_VIA">VIA</a> lines, then the link will pass through each in turn, in the order they are specified. </p> 
 </div>
 <div class="changes">
 <h3>Change History</h3>
@@ -881,9 +909,9 @@ of the direction of the link. 'angled' rotates the box to follow the directiong 
 <div class="definition">LINKSTYLE oneway</div>
 <div class="definition">LINKSTYLE twoway</div>
 <div class="description">
-<p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Specifies the whether the link should be drawn with one or two arrows.</p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">A 'standard' (twoway) link has two arrows - one for inbound data and one for outbound data. In some 
- situations (e.g. round-trip latency), you might only want an arrow in one direction.</p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">One-way arrows only show the outbound <a href="#LINK_BWLABEL">BWLABEL,</a> but they show it in the standard position - 25% of the way along. 
- Change the position of the label with <a href="#LINK_BWLABELPOS">BWLABELPOS</a> as usual (you still need to specify <em>two</em> positions in the <a href="#LINK_BWLABELPOS">BWLABELPOS</a> line, however).</p> 
+<p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Specifies the whether the link should be drawn with one or two arrows. </p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">A 'standard' (twoway) link has two arrows - one for inbound data and one for outbound data. In some 
+ situations (e.g. round-trip latency), you might only want an arrow in one direction. </p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">One-way arrows only show the outbound <a href="#LINK_BWLABEL">BWLABEL,</a> but they show it in the standard position - 25% of the way along. 
+ Change the position of the label with <a href="#LINK_BWLABELPOS">BWLABELPOS</a> as usual (you still need to specify <em>two</em> positions in the <a href="#LINK_BWLABELPOS">BWLABELPOS</a> line, however). </p> 
 </div>
 <div class="changes">
 <h3>Change History</h3>
@@ -900,7 +928,7 @@ of the direction of the link. 'angled' rotates the box to follow the directiong 
 <div class="definition">ARROWSTYLE <em class="meta">width</em> <em class="meta">length</em>
 </div>
 <div class="description">
-<p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Specifies the style of arrowhead used for drawing links.</p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">The default is 'classic' which has a wide arrowhead. You can also choose 'compact' which gives narrower heads.</p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Finally, you can get finer control by adjusting the size yourself. The width and length of the head are in units of link-width.</p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Classic is equivalent to '4 2' and Compact is equivalent to '1 1'.</p> 
+<p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Specifies the style of arrowhead used for drawing links. </p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">The default is 'classic' which has a wide arrowhead. You can also choose 'compact' which gives narrower heads. </p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Finally, you can get finer control by adjusting the size yourself. The width and length of the head are in units of link-width. </p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Classic is equivalent to '4 2' and Compact is equivalent to '1 1'. </p> 
 </div>
 <div class="changes">
 <h3>Change History</h3>
@@ -917,9 +945,9 @@ of the direction of the link. 'angled' rotates the box to follow the directiong 
 <div class="definition">SET <em class="meta">hintname</em> <em class="meta">hintvalue</em>
 </div>
 <div class="description">
-<p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Specifies a value for a <em>hint variable</em>.</p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Hint Variables allow the user to pass settings to the internals of Weathermap that 
+<p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Specifies a value for a <em>hint variable</em>. </p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Hint Variables allow the user to pass settings to the internals of Weathermap that 
  wouldn't normally need to be changed, or that aren't part of the core Weathermap application. 
- Examples are: small rendering changes, parameters for datasources plugins and similar.</p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Hint Variables are either Global for the map, or assigned to a specific link or node.</p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">There is more about Hint Variables in the <a href="advanced.html">Advanced Topics</a> section.</p> 
+ Examples are: small rendering changes, parameters for datasources plugins and similar. </p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Hint Variables are either Global for the map, or assigned to a specific link or node. </p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">There is more about Hint Variables in the <a href="advanced.html">Advanced Topics</a> section. </p> 
 </div>
 <div class="changes">
 <h3>Change History</h3>
@@ -937,7 +965,7 @@ of the direction of the link. 'angled' rotates the box to follow the directiong 
 <div class="definition">BACKGROUND <em class="meta">imagefile</em>
 </div>
 <div class="description">
-<p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Specify an PNG, JPEG or GIF image file to be used as a background image.</p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Any <a href="#GLOBAL_WIDTH">WIDTH</a> and <a href="#GLOBAL_HEIGHT">HEIGHT</a> specifications will be ignored - the map will take the size of the background.</p> 
+<p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Specify an PNG, JPEG or GIF image file to be used as a background image. </p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Any <a href="#GLOBAL_WIDTH">WIDTH</a> and <a href="#GLOBAL_HEIGHT">HEIGHT</a> specifications will be ignored - the map will take the size of the background. </p> 
 </div>
 <div class="changes">
 <h3>Change History</h3>
@@ -952,9 +980,9 @@ of the direction of the link. 'angled' rotates the box to follow the directiong 
 <div class="definition">WIDTH <em class="meta">map-width</em>
 </div>
 <div class="description">
-<p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Specifies the width of the map image in pixels.</p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">If a <a href="#GLOBAL_BACKGROUND">BACKGROUND</a> is specified, and the imagefile is successfully loaded, then 
- any WIDTH specified is ignored. 
- If neither a <a href="#GLOBAL_BACKGROUND">BACKGROUND</a> or WIDTH is specified, then the default WIDTH is 800 pixels.</p> 
+<p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Specifies the width of the map image in pixels. </p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">If a <a href="#GLOBAL_BACKGROUND">BACKGROUND</a> is specified, and the imagefile is successfully loaded, then 
+ any <a href="#GLOBAL_WIDTH">WIDTH</a> specified is ignored. 
+ If neither a <a href="#GLOBAL_BACKGROUND">BACKGROUND</a> or <a href="#GLOBAL_WIDTH">WIDTH</a> is specified, then the default <a href="#GLOBAL_WIDTH">WIDTH</a> is 800 pixels. </p> 
 </div>
 </div>
 	  <div class="referenceentry">
@@ -962,9 +990,9 @@ of the direction of the link. 'angled' rotates the box to follow the directiong 
 <div class="definition">WIDTH <em class="meta">map-height</em>
 </div>
 <div class="description">
-<p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Specifies the height of the map image in pixels.</p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">If a <a href="#GLOBAL_BACKGROUND">BACKGROUND</a> is specified, and the imagefile is successfully loaded, then 
- any HEIGHT specified is ignored. 
- If neither a <a href="#GLOBAL_BACKGROUND">BACKGROUND</a> or HEIGHT is specified, then the default HEIGHT is 600 pixels.</p> 
+<p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Specifies the height of the map image in pixels. </p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">If a <a href="#GLOBAL_BACKGROUND">BACKGROUND</a> is specified, and the imagefile is successfully loaded, then 
+ any <a href="#GLOBAL_HEIGHT">HEIGHT</a> specified is ignored. 
+ If neither a <a href="#GLOBAL_BACKGROUND">BACKGROUND</a> or <a href="#GLOBAL_HEIGHT">HEIGHT</a> is specified, then the default <a href="#GLOBAL_HEIGHT">HEIGHT</a> is 600 pixels. </p> 
 </div>
 </div>
 	  <div class="referenceentry">
@@ -972,7 +1000,7 @@ of the direction of the link. 'angled' rotates the box to follow the directiong 
 <div class="definition">HTMLOUTPUTFILE <em class="meta">htmlfile</em>
 </div>
 <div class="description">
-<p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">This specifies the name of the HTML file that will be generated. </p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">The equivalent command-line option takes precedence over this configuration line, if both are used. If you are generating maps using the Cacti plugin, then this directive is ignored.</p> 
+<p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">This specifies the name of the HTML file that will be generated. </p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">The equivalent command-line option takes precedence over this configuration line, if both are used. If you are generating maps using the Cacti plugin, then this directive is ignored. </p> 
 </div>
 <div class="changes">
 <h3>Change History</h3>
@@ -989,7 +1017,7 @@ of the direction of the link. 'angled' rotates the box to follow the directiong 
 <div class="description">
 <p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">This specifies the name of the PNG, JPEG or GIF file that will be generated. The format chosen is based on the file-extension. </p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">The equivalent command-line option takes precedence over this configuration line, if 
  both are used. </p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">If you are generating maps using the Cacti plugin, then this directive is ignored. 
-You can set the output format in the Cacti Settings page.</p> 
+You can set the output format in the Cacti Settings page. </p> 
 </div>
 <div class="changes">
 <h3>Change History</h3>
@@ -1008,14 +1036,14 @@ You can set the output format in the Cacti Settings page.</p>
 <div class="definition">FONTDEFINE <em class="meta">fontnumber</em> <em class="meta">ttffontfile</em> <em class="meta">fontsize</em>
 </div>
 <div class="description">
-<p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Defines a custom font to be used for text within the map.</p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">By default, the GD library used by Weathermap has 5 fonts, numbered 1-5. FONTDEFINE allows you to 
- define new font numbers, and link them to fonts in two other formats.</p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">The first format is 'GD fonts', which are a bitmapped format used by GD alone. They are not scalable, and are also 
- platform-specific (they use a different byte-order depending on the host). You should specify the full filename including any extensions.</p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">The second format is TrueType fonts, which are scalable, standard and generally a lot nicer! This time, you need to specify the 
+<p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Defines a custom font to be used for text within the map. </p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">By default, the GD library used by Weathermap has 5 fonts, numbered 1-5. <a href="#GLOBAL_FONTDEFINE">FONTDEFINE</a> allows you to 
+ define new font numbers, and link them to fonts in two other formats. </p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">The first format is 'GD fonts', which are a bitmapped format used by GD alone. They are not scalable, and are also 
+ platform-specific (they use a different byte-order depending on the host). You should specify the full filename including any extensions. </p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">The second format is TrueType fonts, which are scalable, standard and generally a lot nicer! This time, you need to specify the 
  size that the font should be rendered at. The size is in pixels. You can load the same font into multiple fontnumbers with 
- different sizes to use in different parts of a map.</p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">The freetype library used in PHP makes a somewhat complex set of rules for where it will search for truetype fonts. The two easiest options are: 
+ different sizes to use in different parts of a map. </p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">The freetype library used in PHP makes a somewhat complex set of rules for where it will search for truetype fonts. The two easiest options are: 
  <ul><li>Use the full absolute path to your .ttf file</li> 
  <li>Keep your .ttf files in the Weathermap directory, and use the first part of the filename only, with no '.ttf' on the end.</li></ul> 
- The full set of rules is <a href="http://www.boutell.com/gd/manual2.0.33.html#gdImageStringFT">available here</a></p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Regardless of the format, the newly defined font can be used anywhere that you'd normally use a font number (for example, <a href="#LINK_BWFONT">BWFONT</a> or KEYFONT). 
+ The full set of rules is <a href="http://www.boutell.com/gd/manual2.0.33.html#gdImageStringFT">available here</a> </p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Regardless of the format, the newly defined font can be used anywhere that you'd normally use a font number (for example, <a href="#LINK_BWFONT">BWFONT</a> or KEYFONT). 
  </p> 
 </div>
 <div class="examples">
@@ -1042,7 +1070,7 @@ You can set the output format in the Cacti Settings page.</p>
 <div class="definition">TIMEFONT <em class="meta">fontnumber</em>
 </div>
 <div class="description">
-<p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Specify the fonts used for various text. </p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Fonts are specified by number. The GD library that Weathermap uses has 5 built-in fonts, 1-5. You can define new fonts based on TrueType or GD fonts by using the <a href="#GLOBAL_FONTDEFINE">FONTDEFINE</a> directive.</p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude"><img src="../images/font-sizes.png"></img>The built-in GD fonts.</p> 
+<p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Specify the fonts used for various text. </p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Fonts are specified by number. The GD library that Weathermap uses has 5 built-in fonts, 1-5. You can define new fonts based on TrueType or GD fonts by using the <a href="#GLOBAL_FONTDEFINE">FONTDEFINE</a> directive. </p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude"><img src="../images/font-sizes.png"></img>The built-in GD fonts. </p> 
 </div>
 <div class="changes">
 <h3>Change History</h3>
@@ -1071,7 +1099,7 @@ You can set the output format in the Cacti Settings page.</p>
 <div class="definition">KEYBGCOLOR <em class="meta">red</em> <em class="meta">green</em> <em class="meta">blue</em>
 </div>
 <div class="description">
-<p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Specify the colours used for drawing the global elements of the map.</p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">red, green and blue are numbers from 0 to 255.</p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">LABELFONTSHADOWCOLOR, LABELBGCOLOR and LABELOUTLINECOLOR have an additional option - 'none' - which stops that element of the <a href="#NODE_LABEL">LABEL</a> being drawn. LABELFONTSHADOWCOLOR defaults to 'none'.</p> 
+<p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Specify the colours used for drawing the global elements of the map. </p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">red, green and blue are numbers from 0 to 255. </p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">LABELFONTSHADOWCOLOR, LABELBGCOLOR and LABELOUTLINECOLOR have an additional option - 'none' - which stops that element of the <a href="#NODE_LABEL">LABEL</a> being drawn. LABELFONTSHADOWCOLOR defaults to 'none'. </p> 
 </div>
 <div class="changes">
 <h3>Change History</h3>
@@ -1090,10 +1118,10 @@ You can set the output format in the Cacti Settings page.</p>
 <div class="definition">TIMEPOS <em class="meta">x-pos</em> <em class="meta">y-pos</em> <em class="meta">formatstring</em>
 </div>
 <div class="description">
-<p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Specifies where to draw the timestamp on the map.</p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">If no TIMEPOS line is given, then the timestamp is drawn in the top-right corner. To hide it completely, set y to be <nobr>-200</nobr> or so.</p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">You can optionally specify an additional parameter to change the text of the timestamp. This text can 
+<p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Specifies where to draw the timestamp on the map. </p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">If no <a href="#GLOBAL_TIMEPOS">TIMEPOS</a> line is given, then the timestamp is drawn in the top-right corner. To hide it completely, set y to be <nobr>-200</nobr> or so. </p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">You can optionally specify an additional parameter to change the text of the timestamp. This text can 
  contain special tokens which are substituted with parts of the current time. The default timestamp 
  text is <nobr><tt>Created: %b %d %Y %H:%M:%S</tt></nobr>. The tokens used are those accepted by the PHP strftime 
- function. For a full list see the <a href="http://www.php.net/manual/en/function.strftime.php">PHP manual page</a>.</p> 
+ function. For a full list see the <a href="http://www.php.net/manual/en/function.strftime.php">PHP manual page</a>. </p> 
 </div>
 <div class="changes">
 <h3>Change History</h3>
@@ -1110,7 +1138,7 @@ You can set the output format in the Cacti Settings page.</p>
 <div class="definition">TITLEPOS <em class="meta">titlestring</em>
 </div>
 <div class="description">
-<p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Specifies the title text. </p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">The TITLE is shown in file-selectors for both the editor and the Cacti plugin. If you'd like the title to be shown on the map too, then add <a href="#GLOBAL_TITLEPOS">TITLEPOS</a> line also.</p> 
+<p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Specifies the title text. </p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">The <a href="#GLOBAL_TITLE">TITLE</a> is shown in file-selectors for both the editor and the Cacti plugin. If you'd like the title to be shown on the map too, then add <a href="#GLOBAL_TITLEPOS">TITLEPOS</a> line also. </p> 
 </div>
 <div class="changes">
 <h3>Change History</h3>
@@ -1127,7 +1155,7 @@ You can set the output format in the Cacti Settings page.</p>
 <div class="definition">TITLEPOS <em class="meta">x-pos</em> <em class="meta">y-pos</em> <em class="meta">headingstring</em>
 </div>
 <div class="description">
-<p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Specifies the position of the title text. </p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">If no TITLEPOS line is given, then no title is drawn. You can optionally specify an additional parameter, to change the title. Any text after the second coordinate is taken as a new TITLE.</p> 
+<p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Specifies the position of the title text. </p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">If no <a href="#GLOBAL_TITLEPOS">TITLEPOS</a> line is given, then no title is drawn. You can optionally specify an additional parameter, to change the title. Any text after the second coordinate is taken as a new <a href="#GLOBAL_TITLE">TITLE.</a> </p> 
 </div>
 <div class="changes">
 <h3>Change History</h3>
@@ -1142,7 +1170,7 @@ You can set the output format in the Cacti Settings page.</p>
 <div class="definition">KILO <em class="meta">number</em>
 </div>
 <div class="description">
-<p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Specifies base value for kilo, mega and giga abbreviations. </p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Both <a href="#LINK_BANDWIDTH">BANDWIDTH</a> and <a href="#LINK_BWLABEL">BWLABEL</a> can use K,M,G,T as abbreviations for thousands, millions and so on. You can define what the multiple used is. The default is 1000.</p> 
+<p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Specifies base value for kilo, mega and giga abbreviations. </p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Both <a href="#LINK_BANDWIDTH">BANDWIDTH</a> and <a href="#LINK_BWLABEL">BWLABEL</a> can use K,M,G,T as abbreviations for thousands, millions and so on. You can define what the multiple used is. The default is 1000. </p> 
 </div>
 <div class="changes">
 <h3>Change History</h3>
@@ -1157,7 +1185,7 @@ You can set the output format in the Cacti Settings page.</p>
 <div class="definition">HTMLSTYLE <em class="meta">formatname</em>
 </div>
 <div class="description">
-<p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Specifies the HTML output style. </p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">When HTML output is enabled, there are two variations, which you can choose between. 'static' is a basic HTML page with client-side imagemap, but no 'pop up' graphs. 'overlib' adds the use of the OverLib library to the page, so that pop up graphs can work, too. This requires Javascript, which is why 'static' is the default.</p> 
+<p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Specifies the HTML output style. </p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">When HTML output is enabled, there are two variations, which you can choose between. 'static' is a basic HTML page with client-side imagemap, but no 'pop up' graphs. 'overlib' adds the use of the OverLib library to the page, so that pop up graphs can work, too. This requires Javascript, which is why 'static' is the default. </p> 
 </div>
 </div>
       <div class="referenceentry">
@@ -1171,11 +1199,11 @@ You can set the output format in the Cacti Settings page.</p>
 <div class="definition">SCALE <em class="meta">scalename</em> <em class="meta">min</em> <em class="meta">max</em> <em class="meta">red</em> <em class="meta">green</em> <em class="meta">blue</em> <em class="meta">red2</em> <em class="meta">green2</em> <em class="meta">blue2</em>
 </div>
 <div class="description">
-<p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Defines one 'span' within the link colour-coding table.</p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">SCALE is used to specify how LINKs are colour-coded according to their percent usage. 
+<p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Defines one 'span' within the link colour-coding table. </p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">SCALE is used to specify how NODEs and LINKs are colour-coded according to their percent usage. 
  If the percentage usage falls between min and max then the colour specified by red, green and blue is used to colour the link. 
- Colour values are between 0 and 255. Percentages are between 0 and 100, obviously.</p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">If you specify <i>two</i> colours on the line (the third and fourth forms above), then the colour chosen for the link will be calculated as 
- a proportion between the two colours. You can avoid specifying many SCALE lines this way.</p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Without a <i>scalename</i>, the SCALE line will add a definition to the scale named 'DEFAULT'. If you define any other named scales, you can then use the <a href="#LINK_USESCALE">USESCALE</a> directive to specify that a particular <a href="#NODE_NODE">NODE</a> or <a href="#LINK_LINK">LINK</a> use your new scale.</p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">If you don't add <i>any</i> SCALE lines to a configuration file, then a default set is added for you, but as soon as you add one, you'll need to make enough to cover the whole 0-100 range to get nice colours. 
- Any percentage not matched by SCALE rules is rendered in grey.</p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">You can specify a colour for an <em>exact</em> percentage (e.g. zero) by using that value for both the min and max values. The scale lines are sorted by min then max, and scanned from top to bottom. The first match wins.</p> 
+ Colour values are between 0 and 255. Percentages are between 0 and 100, obviously. </p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">If you specify <i>two</i> colours on the line (the third and fourth forms above), then the colour chosen for the link will be calculated as 
+ a proportion between the two colours. You can avoid specifying many <a href="#GLOBAL_SCALE">SCALE</a> lines this way. </p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Without a <i>scalename</i>, the <a href="#GLOBAL_SCALE">SCALE</a> line will add a definition to the scale named 'DEFAULT'. If you define any other named scales, you can then use the <a href="#LINK_USESCALE">USESCALE</a> directive to specify that a particular <a href="#NODE_NODE">NODE</a> or <a href="#LINK_LINK">LINK</a> use your new scale. </p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">If you don't add <i>any</i> <a href="#GLOBAL_SCALE">SCALE</a> lines to a configuration file, then a default set is added for you, but as soon as you add one, you'll need to make enough to cover the whole 0-100 range to get nice colours. 
+ Any percentage not matched by <a href="#GLOBAL_SCALE">SCALE</a> rules is rendered in grey. </p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">You can specify a colour for an <em>exact</em> percentage (e.g. zero) by using that value for both the min and max values. The scale lines are sorted by min then max, and scanned from top to bottom. The first match wins. </p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">To show a legend in the map for a given <a href="#GLOBAL_SCALE">SCALE,</a> you should use <a href="#GLOBAL_KEYPOS">KEYPOS</a> and <a href="#GLOBAL_KEYSTYLE">KEYSTYLE.</a> </p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">You can also apply SCALEs to colorise <a href="#NODE_ICON">ICON</a> images. You do this using <a href="#NODE_USEICONSCALE">USEICONSCALE.</a> </p> 
 </div>
 <div class="examples">
 <h3>Examples</h3>
@@ -1197,6 +1225,8 @@ SCALE  85  100    255     0    0</pre>
 <div class="changes">
 <h3>Change History</h3>
 <dl>
+<dt>0.95</dt>
+<dd>Added USEICONSCALE.</dd>
 <dt>0.9</dt>
 <dd>Added named scales.</dd>
 <dt>0.9</dt>
@@ -1221,8 +1251,8 @@ SCALE  85  100    255     0    0</pre>
 <div class="description">
 <p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Specifies the position of the key, or legend, that shows what each colour-range in a scale means. If a scalename is not given, 
  then "DEFAULT" is assumed. 
- If no KEYPOS line is given for a scale, then no legend is drawn - handy if you have many many colour ranges.</p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">You can optionally specify an additional parameter, to change the heading above the colours in 
- the key. This can be used to change the language of the map, for example. If a scalename is given, then you <em>must also specify a title</em> - there is no useful default title for non-DEFAULT scales.</p> 
+ If no <a href="#GLOBAL_KEYPOS">KEYPOS</a> line is given for a scale, then no legend is drawn - handy if you have many many colour ranges. </p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">You can optionally specify an additional parameter, to change the heading above the colours in 
+ the key. This can be used to change the language of the map, for example. If a scalename is given, then you <em>must also specify a title</em> - there is no useful default title for non-DEFAULT scales. </p> 
 </div>
 <div class="changes">
 <h3>Change History</h3>
@@ -1246,15 +1276,25 @@ SCALE  85  100    255     0    0</pre>
 </div>
 <div class="description">
 <p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Specifies the style of the key, or legend, that shows what each colour-range means. If a scalename is not given, 
- then "DEFAULT" is assumed. Valid stylenames are: 'classic', 'horizontal' and 'vertical'.</p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Classic has a line for each <a href="#GLOBAL_SCALE">SCALE</a> range defined. 'vertical' and 'horizontal' are fixed-size, showing a 
+ then "DEFAULT" is assumed. Valid stylenames are: 'classic', 'horizontal' and 'vertical'. </p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Classic has a line for each <a href="#GLOBAL_SCALE">SCALE</a> range defined. 'vertical' and 'horizontal' are fixed-size, showing a 
  continuous block from 0-100% usage, which is much more useful when gradient SCALEs are used, or when you have 
- a large number of <a href="#GLOBAL_SCALE">SCALE</a> lines in one scale.</p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude"> 
+ a large number of <a href="#GLOBAL_SCALE">SCALE</a> lines in one scale. </p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude"> 
  For 'horizontal' and 'vertical' styles, you can optionally add an additional parameter, which specifies the longer dimension of the legend in pixels. That is, for a horizontal legend, it specifies the width. The other dimension is calculated from the size of the font used (see KEYFONT). 
- </p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude"><img src="../images/keystyle-classic.png"></img>Classic Style</p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude"><img src="../images/keystyle-horizontal.png"></img>Horizontal Style</p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude"><img src="../images/keystyle-vertical.png"></img>Vertical Style</p> 
+ </p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude"><img src="../images/keystyle-classic.png"></img>Classic Style </p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude"><img src="../images/keystyle-horizontal.png"></img>Horizontal Style </p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude"><img src="../images/keystyle-vertical.png"></img>Vertical Style </p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">You can hide the percentage signs in the key, by setting key_hidepercent_<em>scalename</em> to 1 </p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">If you have a 0-&gt;0 line in your <a href="#GLOBAL_SCALE">SCALE,</a> then you can hide that in the key, by setting key_hidezero_<em>scalename</em> to 1 </p> 
+</div>
+<div class="examples">
+<h3>Examples</h3>
+<div class="example">
+<h5>Hiding percentage signs, and the 'absolute zero' SCALE entry in a key.</h5>
+<pre>SET key_hidezero_DEFAULT 1
+SET key_hidepercent_DEFAULT 1</pre>
+</div>
 </div>
 <div class="changes">
 <h3>Change History</h3>
 <dl>
+<dt>0.92</dt>
+<dd>Added hidepercent and hidezero SET variables.</dd>
 <dt>0.9</dt>
 <dd>Added support for multiple key styles.</dd>
 </dl>
@@ -1265,9 +1305,9 @@ SCALE  85  100    255     0    0</pre>
 <div class="definition">SET <em class="meta">hintname</em> <em class="meta">hintvalue</em>
 </div>
 <div class="description">
-<p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Specifies a value for a <em>hint variable</em>.</p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Hint Variables allow the user to pass settings to the internals of Weathermap that 
+<p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Specifies a value for a <em>hint variable</em>. </p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Hint Variables allow the user to pass settings to the internals of Weathermap that 
  wouldn't normally need to be changed, or that aren't part of the core Weathermap application. 
- Examples are: small rendering changes, parameters for datasources plugins and similar.</p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Hint Variables are either Global for the map, or assigned to a specific link or node.</p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">There is more about Hint Variables in the <a href="advanced.html">Advanced Topics</a> section.</p> 
+ Examples are: small rendering changes, parameters for datasources plugins and similar. </p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Hint Variables are either Global for the map, or assigned to a specific link or node. </p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">There is more about Hint Variables in the <a href="advanced.html">Advanced Topics</a> section. </p> 
 </div>
 <div class="examples">
 <h3>Examples</h3>

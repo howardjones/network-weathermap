@@ -10,8 +10,9 @@
             <xi:include href="node_label.xml" />
             <xi:include href="node_target.xml" />
             <xi:include href="node_usescale.xml" />
-            <xi:include href="node_maxvalue.xml" />
-                        <xi:include href="node_icon.xml" />
+			<xi:include href="node_maxvalue.xml" />
+			<xi:include href="node_icon.xml" />
+			<xi:include href="node_useiconscale.xml" />
             <xi:include href="node_labeloffset.xml" />
             <xi:include href="node_labelfont.xml" />
                              <xi:include href="node_colours.xml" />

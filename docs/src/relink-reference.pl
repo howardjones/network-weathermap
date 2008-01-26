@@ -25,6 +25,7 @@ while (<STDIN>) {
 
     # we only want to autolink in the description sections
 
+	s/<\/p>/ <\/p>/g;
     if (m/id="s_scope_([^"]+)/) { $scope    = $1; }
     if (m/name="([^"]+)"/)      { $lastseen = $1; }
 
@@ -40,7 +41,8 @@ while (<STDIN>) {
                 $link = $map{"$scope|$bareword"};
                 $link ||= $map{$bareword};
 
-                if ( ($link ne '') && ($lastseen ne "${scope}_${bareword}") ) {
+                # if ( ($link ne '') && ($lastseen ne "${scope}_${bareword}") ) {
+                if ( ($link ne '') ) {
 
 			if($wholefile) { $link = "config-reference.html".$link; }
 			

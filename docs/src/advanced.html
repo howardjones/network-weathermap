@@ -134,6 +134,17 @@ The first node uses two targets to populate the 'in' and 'out' slots from differ
 
 </p>
 
+<h2><a name="tweaks">SETting Hint Variables to tweak maps</a></h2>
+<p>
+In addition to any variables that you define using SET, and the ones that Weathermap uses internally (like those listed above), there is a <em>third</em> place that 
+SET is used - to make small adjustments to the way a map is calculated.</p>
+<p>Whenever there is a request for a 'tweak' - a setting that doesn't really deserve creating yet another map config keyword - then that tweak is done by having a special SET variable to control it.</p>
+<p>These are documented in the relevant config keyword section in the <a href="config-reference.html">Config Reference</a>, but here's an example:</p>
+<p>When you are using KEYPOS and KEYSTYLE to draw the legend/key for a particular SCALE, you can choose to hide the percentage signs, by using
+<div class="example"><pre>SET key_hidepercent_DEFAULT 1</pre></div>
+(for the DEFAULT scale in this example), in the top section of the map config file.
+</p>
+<p>Another example of these 'hidden' tweaks is used in the <a href="targets.html#rrd">RRDtool datasource plugin</a> to select what data is extracted.</p>
       <h2><a name="plugins">Writing Plugins</a></h2>
 	<p>Version 0.9 of Weathermap introduces a plugin system for extending it's capabilities. This makes it possible for third parties to add new possible data sources and other functions to Weathermap without needing to alter the main code of the program.</p>
 	<p>Currently, there are two basic types of plugin - datasources and pre/post-processing. Datasource plugins allow you to add new TARGET data sources. Pre-processing plugins are called once per map, before datasources are read, but after the map configuration is loaded. Post-processing plugins are called once per map, after all the data sources have been read. The processing plugins are intended to allow you to add additional information into the Map Notes data structure so that it can be accessed by the <a href="#tokens">special string tokens</a> in NODE labels, for example. </p>

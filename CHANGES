@@ -1,15 +1,18 @@
 0.95	ADDED - You can add a 'tag' to a SCALE line, to be used in ICON or LABELs later.
         ADDED - USEICONSCALE - colorize icon images (based on patches from llow)
 	ADDED - Map titles show up in browser title now.
-        ADDED - a basic 'live view' function which generates a map on demand.
+	ADDED - a basic 'live view' function which generates a map on demand.
 	ADDED - improved data-source picker in editor: host filter
 	ADDED - improved data-source picker in editor: option to aggregate data sources
 	ADDED - Moved data-source picker changes across into the graph-picker for NODEs too.
 	ADDED - SPLITPOS keyword to control position of midpoint in links
-	FIXED - KEYOUTLINECOLOR is actually used now (thanks again to llow)
+	ADDED - VIAs can be positioned relative to NODEs (like NODEs can) (thanks again to llow) 
+	ADDED - Weathermap has a hook in the map viewing page to allow other plugins to add code there
+	FIXED - KEYOUTLINECOLOR is actually used now (thanks to llow once more)
 	FIXED - Editor doesn't throw away WIDTH and HEIGHT with no BG image
 	FIXED - Cacti Data-source and Graph picker doesn't restrict scrolling or resizing anymore
-	ADDED - VIAs can be positioned relative to NODEs (like NODEs can) (thanks to llow once more)
+	FIXED - weathermap-cacti-rebuild.php to work on both Cacti 0.8.6 and 0.8.7
+	
 	
 0.941	FIXED - Issue with '-' DS names again.
 	FIXED - Added extra code to help discourage browser caching.

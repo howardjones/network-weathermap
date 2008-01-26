@@ -208,6 +208,9 @@ function weathermap_singleview($mapid)
 
 	if(sizeof($map))
 	{
+ 		# print do_hook_function ('weathermap_page_top', array($map[0]['id'], $map[0]['titlecache']) );
+ 		print do_hook_function ('weathermap_page_top', '' );
+
 		$htmlfile = $outdir."weathermap_".$map[0]['id'].".html";
 		$maptitle = $map[0]['titlecache'];
 		if($maptitle == '') $maptitle= "Map for config file: ".$map[0]['configfile'];

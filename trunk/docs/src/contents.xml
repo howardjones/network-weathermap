@@ -10,6 +10,7 @@
         <a href="#NODE_USESCALE">USESCALE</a>
         <a href="#NODE_MAXVALUE">MAXVALUE</a>
         <a href="#NODE_ICON">ICON</a>
+        <a href="#NODE_USEICONSCALE">USEICONSCALE</a>
         <a href="#NODE_LABELOFFSET">LABELOFFSET</a>
         <a href="#NODE_LABELFONT">LABELFONT</a>
         <a href="#NODE_COLORS">*COLOR</a>

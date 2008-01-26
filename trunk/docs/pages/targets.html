@@ -51,10 +51,10 @@ href="http://www.network-weathermap.com/">Website</a>)</h4>
 
  <h2><a name="targets">Specifying <a href="config-reference.html#LINK_TARGET">TARGET</a> lines</a></h2> 
 
-<p>The actual data-reading part of Weathermap is handled by Data Source Plugins since version 0.9. These allow users or third-parties to easily add new data sources into Weathermap without altering the core code.</p> 
-<p>There are a number of plugins supplied as standard, which will be described here. Each one uses a different format of <a href="config-reference.html#LINK_TARGET">TARGET</a> string, which contains the parameters the plugin needs to find your data. <em>All</em> plugins return an 'in' and 'out' value, and some may set other variables that can be accessed by <a href="advanced.html#tokens">Special Tokens</a> in strings. For situations where there is only really one output, the 'out' value may just be the same as the 'in'.</p> 
+<p>The actual data-reading part of Weathermap is handled by Data Source Plugins since version 0.9. These allow users or third-parties to easily add new data sources into Weathermap without altering the core code. </p> 
+<p>There are a number of plugins supplied as standard, which will be described here. Each one uses a different format of <a href="config-reference.html#LINK_TARGET">TARGET</a> string, which contains the parameters the plugin needs to find your data. <em>All</em> plugins return an 'in' and 'out' value, and some may set other variables that can be accessed by <a href="advanced.html#tokens">Special Tokens</a> in strings. For situations where there is only really one output, the 'out' value may just be the same as the 'in'. </p> 
 
-<p>Here are the details of the standard data source plugins:</p> 
+<p>Here are the details of the standard data source plugins: </p> 
 
 <hr /> 
 
@@ -63,9 +63,9 @@ href="http://www.network-weathermap.com/">Website</a>)</h4>
 <div class="definition">TARGET static:<em>invalue</em>:<em>outvalue</em></div> 
 <div class="definition">TARGET static:<em>value</em></div> 
 
-<p>The simplest of all the plugins, static allows you to just set a value in the config file itself. Sometimes this is useful for testing, or simple maps of things like OSPF metrics. If only a single value is specified, it is used for <em>both</em> input and output, just like the <a href="config-reference.html#LINK_BANDWIDTH">BANDWIDTH</a> parameter.</p> 
+<p>The simplest of all the plugins, static allows you to just set a value in the config file itself. Sometimes this is useful for testing, or simple maps of things like OSPF metrics. If only a single value is specified, it is used for <em>both</em> input and output, just like the <a href="config-reference.html#LINK_BANDWIDTH">BANDWIDTH</a> parameter. </p> 
 
-<p>The values in the target string can use the same K,M,G,T suffixes as BANDWIDTH.</p> 
+<p>The values in the target string can use the same K,M,G,T suffixes as <a href="config-reference.html#LINK_BANDWIDTH">BANDWIDTH.</a> </p> 
 
 <h3><a name="rrd"></a>RRDtool files</h3> 
 
@@ -74,29 +74,29 @@ href="http://www.network-weathermap.com/">Website</a>)</h4>
 <div class="definition">TARGET rrd:<em>rrdfile.rrd</em>:<em>in_ds</em>:<em>out_ds</em></div> 
 <div class="definition">TARGET scale:<em>factor</em>:<em>rrdfile.rrd</em>:<em>in_ds</em>:<em>out_ds</em></div> 
 
-<p>This is the 'core' plugin for Weathermap. It reads data from rrd files, created using <a href="http://www.rrdtool.org/">Tobi Oetiker's RRDtool</a>, by tools like Cacti, MRTG, Cricket, NRG and so on.</p> 
-<p>First of all, Weathermap needs to be able to find your rrdtool executable. If you are using the Cacti plugin, then this information is taken automatically from Cacti. If you are using the command-line tool, you will need to edit <tt>weathermap</tt> around line 29 to point to your rrdtool executable.</p> 
+<p>This is the 'core' plugin for Weathermap. It reads data from rrd files, created using <a href="http://www.rrdtool.org/">Tobi Oetiker's RRDtool</a>, by tools like Cacti, MRTG, Cricket, NRG and so on. </p> 
+<p>First of all, Weathermap needs to be able to find your rrdtool executable. If you are using the Cacti plugin, then this information is taken automatically from Cacti. If you are using the command-line tool, you will need to edit <tt>weathermap</tt> around line 29 to point to your rrdtool executable. </p> 
 <h4>TARGET formats</h4> 
 <p>If you only specify a filename, and no DS-names, the default DS names for RRD files are 'traffic_in' and 'traffic_out', which works with 
  the majority of Cacti RRD files (those produced by the Interface Traffic template). For MRTG-produced RRD files, the names are 
  'DS0' and 'DS1'. For Cricket standard-interface RRD files, it would be 'ds0' and 'ds1'. 
  </p><p>You can also specify '-' for either DS name, which tells Weathermap to ignore 
  this rrd file for the purposes of the input or output value. 
- This is mainly useful in combination with the aggregation feature, where you can take the input data from one rrd file, and the output data from another.</p> 
- <p>With no prefix, or with just 'rrd:' as a prefix, the data read from the rrd file is assumed to be a standard SNMP interface counter, which is a byte-rate. It automatically multiplies these by 8 to get a bit-rate for the map. With the 'gauge:' prefix, this multiplication doesn't happen, which is useful for non-bandwidth values, like SNR or session-counts. Finally, you can use the 'scale:' prefix to multiply by any factor - suppose you have a value in seconds, and you want to show it in milliseconds for example. Of course, you can also divide using this, by using a scale factor that is less than 1 - multiplying by 1/x is the same as dividing by x.</p> 
+ This is mainly useful in combination with the aggregation feature, where you can take the input data from one rrd file, and the output data from another. </p> 
+ <p>With no prefix, or with just 'rrd:' as a prefix, the data read from the rrd file is assumed to be a standard SNMP interface counter, which is a byte-rate. It automatically multiplies these by 8 to get a bit-rate for the map. With the 'gauge:' prefix, this multiplication doesn't happen, which is useful for non-bandwidth values, like SNR or session-counts. Finally, you can use the 'scale:' prefix to multiply by any factor - suppose you have a value in seconds, and you want to show it in milliseconds for example. Of course, you can also divide using this, by using a scale factor that is less than 1 - multiplying by 1/x is the same as dividing by x. </p> 
 
 <h4>rrdtool adjustments</h4> 
-<p>By default, the plugin will read the last 800 seconds of data, and find the most recent within that to use. You might need to make it read back further, if you are updating your rrd files slowly. You can do this with the <a href="config-reference.html#GLOBAL_SET">SET</a> command, by adding <a href="config-reference.html#GLOBAL_SET">'SET</a> rrd_period 3000' (any value in seconds) at the top of your map config file, before any <a href="config-reference.html#NODE_NODE">NODE</a> or <a href="config-reference.html#LINK_LINK">LINK</a> lines.</p> 
-<p>Similarly, you can change the time that the plugin looks for data at from the present to the past, by using <a href="config-reference.html#GLOBAL_SET">'SET</a> rrd_start -1d' in the top section of the config file. The full range of time-specification strings is at the bottom of the <a href="http://oss.oetiker.ch/rrdtool/doc/rrdfetch.en.html">rrdfetch manual page</a>.</p> 
+<p>By default, the plugin will read the last 800 seconds of data, and find the most recent within that to use. You might need to make it read back further, if you are updating your rrd files slowly. You can do this with the <a href="config-reference.html#GLOBAL_SET">SET</a> command, by adding <a href="config-reference.html#GLOBAL_SET">'SET</a> rrd_period 3000' (any value in seconds) at the top of your map config file, before any <a href="config-reference.html#NODE_NODE">NODE</a> or <a href="config-reference.html#LINK_LINK">LINK</a> lines. </p> 
+<p>Similarly, you can change the time that the plugin looks for data at from the present to the past, by using <a href="config-reference.html#GLOBAL_SET">'SET</a> rrd_start -1d' in the top section of the config file. The full range of time-specification strings is at the bottom of the <a href="http://oss.oetiker.ch/rrdtool/doc/rrdfetch.en.html">rrdfetch manual page</a>. </p> 
 
 <h4>Cacti poller_output support (aka Boost support)</h4> 
 <p>If you are using Cacti as your data collector, and running Weathermap from Cacti's poller, then there is another special feature, called poller_output. Weathermap can intercept data as it is collected by Cacti, and therefore avoid 
 running lots of external rrdtool processes to collect the data it needs to display your map. This is <em>especially</em> useful if you are using TheWitness' Boost plugin, as the data isn't written to the rrd files 
-until some time after it is collected. Even without Boost, it should provide a performance improvement, particularly with large installations of Weathermap.</p> 
+until some time after it is collected. Even without Boost, it should provide a performance improvement, particularly with large installations of Weathermap. </p> 
 <p>To use this feature, a map-global variable needs to be set. Near the top of your map config file, add <a href="config-reference.html#GLOBAL_SET">'SET</a> rrd_use_poller_output 1'. The setting will take a few poller cycles to take effect: during the first one, the 
 appropriate cacti data sources are identified based on the rrd filenames, on the second cycle values will be collected, and on the third we'll have two values, so any COUNTER datasources will begin to work properly. If the poller_output feature 
-fails to collect data, then the regular rrdtool-running method will be attempted too.</p> 
-<p>Note that since the rrdtool program is not bein run in this mode, you <em>can't</em> use the "time-shifting" features described above - those rely on using <em>real</em> rrdtool files.</p> 
+fails to collect data, then the regular rrdtool-running method will be attempted too. </p> 
+<p>Note that since the rrdtool program is not bein run in this mode, you <em>can't</em> use the "time-shifting" features described above - those rely on using <em>real</em> rrdtool files. </p> 
 
 
 <h3><a name="tabs"></a>Tab-separated text</h3> 
@@ -107,7 +107,7 @@ fails to collect data, then the regular rrdtool-running method will be attempted
  The linkname should match the name in the configuration file. This allows you to create one text file 
  for the entire map from some outside source. Traffic in &amp; out values can use the same "K,M,G,T" abbreviated forms 
  as the <a href="config-reference.html#LINK_BANDWIDTH">BANDWIDTH</a> configuration command. The file should have an extension of .txt or .tsv to be 
- recognised as a tab-delimited file by Weathermap.</p> 
+ recognised as a tab-delimited file by Weathermap. </p> 
 
 <div class="example"> 
 <h5>A suitable tab-delimited data file</h5> 
@@ -122,12 +122,12 @@ link3 34.6K 113</pre>
 
 <p>This plugin reads data from special comments in the HTML files generated by MRTG. This is intended mainly for people using the 'old-style' MRTG .log files. If you are using MRTG with an RRDtool backend, then it's probably better to use the RRDtool plugin. </p> 
 <p>The file should have an extension of .html or .htm to be 
- recognised as an MRTG file by Weathermap.</p> 
+ recognised as an MRTG file by Weathermap. </p> 
 
 <h3><a name="cactihost"></a>Cacti host status</h3> 
 <div class="definition">TARGET cactihost:<em>hostid</em></div> 
 
-<p>This plugin reads the current status of a host from your Cacti database. The hostid is visible in Cacti URLs when you click on links in the Devices page. The return values for this plugin are numeric codes. It also sets a Hint Variable called <em>state</em> to a string, that can be nicer to use in an <a href="config-reference.html#NODE_ICON">ICON</a> filename, for example - possible values are 'up','down','disabled', and 'recovering'.</p> 
+<p>This plugin reads the current status of a host from your Cacti database. The hostid is visible in Cacti URLs when you click on links in the Devices page. The return values for this plugin are numeric codes. It also sets a Hint Variable called <em>state</em> to a string, that can be nicer to use in an <a href="config-reference.html#NODE_ICON">ICON</a> filename, for example - possible values are 'up','down','disabled', and 'recovering'. </p> 
 <table> 
 <thead><tr><th>Code</th><th><tt>state</tt> value</th></tr></thead> 
 <tbody> 
@@ -141,7 +141,7 @@ link3 34.6K 113</pre>
 <p>It also sets the following additional Hint Variables, to use in a <a href="config-reference.html#NODE_LABEL">LABEL,</a> COMMENT or <a href="config-reference.html#LINK_NOTES">NOTES</a> section as you see fit: 
 <em>cacti_hostname</em>, <em>cacti_description</em>, <em>cacti_curtime</em>, <em>cacti_avgtime</em>, 
 <em>cacti_mintime</em>, <em>cacti_maxtime</em>, <em>cacti_availability</em>, <em>cacti_faildate</em>, 
-and <em>cacti_recdate</em></p>. 
+and <em>cacti_recdate</em> </p>. 
 
 <p>An appropriate <a href="config-reference.html#GLOBAL_SCALE">SCALE</a> definition to get red, green, yellow and grey labels based on the state of a host would be: 
 <div class="example"><pre>SCALE cactiupdown 0 0.5 192 192 192 
@@ -149,20 +149,20 @@ and <em>cacti_recdate</em></p>.
 <a href="config-reference.html#GLOBAL_SCALE">SCALE</a> cactiupdown 1.5 2.5 0 0 255 
 <a href="config-reference.html#GLOBAL_SCALE">SCALE</a> cactiupdown 2.5 3.5 0 255 0 </pre> 
 </div> 
-</p> 
+ </p> 
 
 <h3><a name="cactithold"></a>Cacti threshold status</h3> 
 <div class="definition">TARGET cactimonitor:<em>hostid</em></div> 
 <div class="definition">TARGET cactithold:<em>tholdid</em></div> 
 <div class="definition">TARGET cactithold:<em>rra_id</em>:<em>data_id</em></div> 
-<p>When used with cactimonitor: prefix, this plugin takes data from both Cacti's host table and from the THold plugin's data to produce a composite state, similar to the one used by the Monitor plugin.</p> 
+<p>When used with cactimonitor: prefix, this plugin takes data from both Cacti's host table and from the THold plugin's data to produce a composite state, similar to the one used by the Monitor plugin. </p> 
 <p>It sets all the same Hint Variables as cactihost: plus a couple more: <em>thold_failcount</em> is the number of thresholds failing on this host, 
 and <em>thold_failpercent</em> is the percentage of thresholds set on this host that are failing. Bear in mind that if you have both a minimum and 
-maximum set on the same variable, then you will <em>never</em> get 100% failure.</p> 
-<p>It also has a new value possible for the <em>state</em> Hint Variable - 'tholdbreached', and adds a new state number 4, for "threshold breached".</p> 
+maximum set on the same variable, then you will <em>never</em> get 100% failure. </p> 
+<p>It also has a new value possible for the <em>state</em> Hint Variable - 'tholdbreached', and adds a new state number 4, for "threshold breached". </p> 
 <p>In the second and third forms, with the cactithold: prefix, the plugin simply returns either a 0 or 1 for the 'input bandwidth' value. 0 if the threshold has not been breached, 
 1 if it has. You can supply either the internal THold id number for a threshold (not easily visible), the the rra_id and data_id values which can be seen at the end of URLs within 
-THolds web pages.</p> 
+THolds web pages. </p> 
 
 <p>You can provide a similar output to the Monitor plugin by using the cactimonitor: <a href="config-reference.html#LINK_TARGET">TARGET</a> and multiple icons. Create a set of coloured (or otherwise different) icons for your node - they should have 'up','down','disabled','recovering' and 'tholdbreached' in the names. Then: <div class="example"><pre> 
  <a href="config-reference.html#NODE_NODE">NODE</a> myserver 
@@ -175,7 +175,7 @@ THolds web pages.</p>
 </pre> 
 </div> 
 Will allow you to change the icon between images/server_up.png, images/server_down.png etc.. as the state in Cacti changes and thresholds are breached. The <a href="config-reference.html#LINK_USESCALE">'USESCALE</a> none' on the end 
-stops the label for the node from changing colour as well.</p> 
+stops the label for the node from changing colour as well. </p> 
 
 <p>You can make use of the <a href="config-reference.html#LINK_TARGET">TARGET</a> aggregation features of weathermap to make a value that is effectively a 'percentage badness' for a set of thresholds. Suppose you have a set of load-balanced firewalls, 
 and you want to see how many of the set have exceeded their session count. You would set up thresholds on each firewall as normal, and then: 
@@ -189,21 +189,21 @@ and you want to see how many of the set have exceeded their session count. You w
 </pre> 
 </div> 
 defines a scale where 0 is green and 100% is red and in between is a smooth gradient. Each target will return either 0 or 1, so 100% failed thresholds gives a value of 4. Setting the <a href="config-reference.html#NODE_MAXVALUE">MAXVALUE</a> to 4 makes that 100% within weathermap. 
-</p> 
+ </p> 
 
 <h3><a name="snmp"></a>SNMP value</h3> 
 
 <div class="definition">TARGET static:<em>invalue</em>:<em>outvalue</em></div> 
 
-<p>This is a fairly experimental plugin. It requires the PHP snmp extension to be installed and enabled. Even then, it's hit & miss whether it will work on a particular system - some versions of PHP have better support for SNMP than others, and on some platforms it is different to others, too.</p> 
-<p>This plugin can directly query an SNMP-manageable device and fetch an OID from it.</p> 
+<p>This is a fairly experimental plugin. It requires the PHP snmp extension to be installed and enabled. Even then, it's hit & miss whether it will work on a particular system - some versions of PHP have better support for SNMP than others, and on some platforms it is different to others, too. </p> 
+<p>This plugin can directly query an SNMP-manageable device and fetch an OID from it. </p> 
 
 <h3><a name="script"></a>External script</h3> 
 
 <div class="definition">TARGET !<em>scriptname</em></div> 
 
-<p>This plugin is fairly experimental and not thoroughly tested.</p> 
-<p>This plugin allows you to write small external scripts, and pass the value from the script into Weathermap. The output format of the script is the same one that MRTG uses for <em>it's</em> external scripts, so it's possible that you can even find an existing script to do what you want, somewhere else.</p> 
+<p>This plugin is fairly experimental and not thoroughly tested. </p> 
+<p>This plugin allows you to write small external scripts, and pass the value from the script into Weathermap. The output format of the script is the same one that MRTG uses for <em>it's</em> external scripts, so it's possible that you can even find an existing script to do what you want, somewhere else. </p> 
 
  </div> 
 </body> 

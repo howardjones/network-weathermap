@@ -12,8 +12,10 @@
         line, then the default scale is used.</p>    
         <p>For nodes, you can also specify a scalename of 'none'. This stops the node's colour from changing at all. This is useful if you want to 
         use the TARGET line to fetch data that is used in the LABEL or ICON of the node, for example, without changing the colour of the node itself.</p>
+		<p>You can also change the colour of the ICON associated with a NODE according to a different SCALE, by using USEICONSCALE.</p>
         </description>
         <changes>
+		<change version="0.95">Added USEICONSCALE.</change>
         <change version="0.9">Added named scales and USESCALE.</change>
     </changes>
 </configentry>

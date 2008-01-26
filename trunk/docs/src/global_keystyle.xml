@@ -20,9 +20,17 @@
 			<p><img src="../images/keystyle-horizontal.png" />Horizontal Style</p>
 			<p><img src="../images/keystyle-vertical.png" />Vertical Style</p>
 
+			<p>You can hide the percentage signs in the key, by setting key_hidepercent_<em>scalename</em> to  1</p>
+			<p>If you have a 0->0 line in your SCALE, then you can hide that in the key, by setting key_hidezero_<em>scalename</em> to  1</p>
+			
     </description>
 
+	<examples>
+	<example><caption>Hiding percentage signs, and the 'absolute zero' SCALE entry in a key.</caption><content>SET key_hidezero_DEFAULT 1
+SET key_hidepercent_DEFAULT 1</content></example>
+	</examples>
     <changes>
+	<change version="0.92">Added hidepercent and hidezero SET variables.</change>
     <change version="0.9">Added support for multiple key styles.</change>
     </changes>
 </configentry>

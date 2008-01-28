@@ -1184,7 +1184,7 @@ class WeatherMapNode extends WeatherMapItem
 				'notestext' => '',
 				'notes' => array(),
 				'hints' => array(),
-				'overliburl' => '',
+				'overliburl' => array(array(),array()),
 				'overlibwidth' => 0,
 				'overlibheight' => 0,
 				'overlibcaption' => '',
@@ -2148,7 +2148,7 @@ class WeatherMapLink extends WeatherMapItem
 			'hints' => array(),
 			'comments' => array('',''),
 			'bwlabelformats' => array(FMT_PERC_IN,FMT_PERC_OUT),
-			'overliburl' => '',
+			'overliburl' => array(array(),array()),
 			'labelstyle' => 'percent',
 			'labelboxstyle' => 'classic',
 			'linkstyle' => 'twoway',
@@ -2483,11 +2483,7 @@ class WeatherMapLink extends WeatherMapItem
 				if ($thelabel != '')
 				{
 					debug("Bandwidth is ".$task[5]."\n");
-					# XXX - old bwstyle code
-					# if ($this->labelstyle == 'bits') { $thelabel=nice_bandwidth($task[5], $this->owner->kilo); }
-					# elseif ($this->labelstyle == 'unformatted') { $thelabel=$task[5]; }
-					# elseif ($this->labelstyle == 'percent') { $thelabel=format_number($task[4]) . "%"; }
-
+					
 					$padding = intval($this->get_hint('bwlabel_padding'));		
 
 					if($this->labelboxstyle == 'angled')
@@ -3092,7 +3088,7 @@ class WeatherMap extends WeatherMapBase
 			{
 				$type = $matches[1];
 				$args = $matches[2];
-		#		debug("ProcessString: type is ".$type.", arguments are ".$args."\n");
+				# debug("ProcessString: type is ".$type.", arguments are ".$args."\n");
 
 				if($type == 'map')
 				{
@@ -4441,13 +4437,28 @@ function ReadConfig($filename)
 						$linematched++;
 					}
 				}
-
-				if (preg_match("/^\s*OVERLIBGRAPH\s+(\S+)\s*$/i", $buffer, $matches))
+				
+				if (preg_match("/^\s*(IN|OUT)?OVERLIBGRAPH\s+(.+)$/i", $buffer, $matches))
+				# if (preg_match("/^\s*OVERLIBGRAPH\s+(\S+)\s*$/i", $buffer, $matches))
 				{
 					if($curobj)
 					{
-						$curobj->overliburl=$matches[1];
-						$linematched++;
+						if($last_seen == 'NODE' && $matches[1] != '') {
+							warn("IN/OUTOVERLIBGRAPH make no sense for a NODE!\n");
+						} else {
+							// XXX - *should* add each in turn to the appropriate array
+							$urls = preg_split('/\s+/', $matches[2], -1, PREG_SPLIT_NO_EMPTY);
+							
+							if($matches[1] == 'IN') $index = IN;
+							if($matches[1] == 'OUT') $index = OUT;
+							if($matches[1] == '') {
+								$curobj->overliburl[IN]=$urls;
+								$curobj->overliburl[OUT]=$urls;
+							} else {
+								$curobj->overliburl[$index]=$urls;
+							}
+							$linematched++;
+						}
 					}
 				}
 
@@ -5558,28 +5569,53 @@ function PreloadMapHTML()
 				$caption = ($link->overlibcaption != '' ? $link->overlibcaption : $link->name);
 				$caption = $this->ProcessString($caption,$link);
 
-				$overlibhtml = "onmouseover=\"return overlib('";
-				if($link->overliburl != '')
-				{
-					$overlibhtml .= "&lt;img src=" . $this->ProcessString($link->overliburl,$link) . "&gt;";
-				}
-				if($link->notestext != '')
-				{
-					# put in a linebreak if there was an image AND notes
-					if($link->overliburl != '') $overlibhtml .= '&lt;br /&gt;';
-					$note = $this->ProcessString($link->notestext,$link);
-					$note = htmlspecialchars($note, ENT_NOQUOTES);
-					$note=str_replace("'", "\\&apos;", $note);
-					$note=str_replace('"', "&quot;", $note);
-					$overlibhtml .= $note;
-				}
-				$overlibhtml .= "',DELAY,250,${left}${above}CAPTION,'" . $caption
-				. "');\"  onmouseout=\"return nd();\"";
+				print "\n\n---------------\nLINK:".$link->name."\n";
 
-				for($i=0; $i<4; $i++)
-				{
-					$this->imap->setProp("extrahtml", $overlibhtml, "LINK:" . $link->name.":$i");
+				foreach (array(IN,OUT) as $dir)
+				{				
+					$overlibhtml = "onmouseover=\"return overlib('";
+					
+					$n = 0;
+					if(sizeof($link->overliburl[$dir]) > 0)
+					{
+						print "ARRAY:".is_array($link->overliburl[$dir])."\n";
+						foreach ($link->overliburl[$dir] as $url)
+						{
+							if($n>0) { $overlibhtml .= '&lt;br /&gt;'; }
+							$overlibhtml .= "&lt;img src=" . $this->ProcessString($url,$link) . "&gt;";
+							$n++;
+						}
+					}
+					print "Added $n for $dir\n";
+					if($link->notestext != '')
+					{
+						# put in a linebreak if there was an image AND notes
+						if($n>0) $overlibhtml .= '&lt;br /&gt;';
+						$note = $this->ProcessString($link->notestext,$link);
+						$note = htmlspecialchars($note, ENT_NOQUOTES);
+						$note=str_replace("'", "\\&apos;", $note);
+						$note=str_replace('"', "&quot;", $note);
+						$overlibhtml .= $note;
+					}
+					$overlibhtml .= "',DELAY,250,${left}${above}CAPTION,'" . $caption
+					. "');\"  onmouseout=\"return nd();\"";
+					
+					if($dir == IN) {
+						$d = 'IN';
+						$this->imap->setProp("extrahtml", $overlibhtml, "LINK:" . $link->name.":0");
+						$this->imap->setProp("extrahtml", $overlibhtml, "LINK:" . $link->name.":2");
+						print "Adding for $d (0,2) now\n";
+						print "Adding $overlibhtml\n";
+					}
+					if($dir == OUT) {
+						$d = 'OUT';
+						$this->imap->setProp("extrahtml", $overlibhtml, "LINK:" . $link->name.":1");
+						$this->imap->setProp("extrahtml", $overlibhtml, "LINK:" . $link->name.":3");
+						print "Adding for $d (1,3) now\n";
+						print "Adding $overlibhtml\n";
+					}
 				}
+				
 			}
 		}
 

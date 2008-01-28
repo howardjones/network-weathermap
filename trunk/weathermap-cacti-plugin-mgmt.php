@@ -224,22 +224,22 @@ function maplist()
 		{
 			form_alternate_row_color($colors["alternate"],$colors["light"],$i);
 
-			print '<td><a href="editor.php?plug=1&mapname='.htmlspecialchars($map['configfile']).'">'.htmlspecialchars($map['configfile']).'</a>';
+			print '<td><a title="Click to start editor with this file" href="editor.php?plug=1&mapname='.htmlspecialchars($map['configfile']).'">'.htmlspecialchars($map['configfile']).'</a>';
 	#		print '<a href="?action=editor&plug=1&mapname='.htmlspecialchars($map['configfile']).'">[edit]</a></td>';
 			print '<td>'.htmlspecialchars($map['titlecache']).'</td>';
 			if($map['active'] == 'on')
 			{
-				print '<td><a href="?action=deactivate_map&id='.$map['id'].'"><font color="green">Yes</font></a></td>';
+				print '<td><a title="Click to Deactivate" href="?action=deactivate_map&id='.$map['id'].'"><font color="green">Yes</font></a></td>';
 			}
 			else
 			{
-				print '<td><a href="?action=activate_map&id='.$map['id'].'"><font color="red">No</font></a></td>';
+				print '<td><a title="Click to Activate" href="?action=activate_map&id='.$map['id'].'"><font color="red">No</font></a></td>';
 			}
 
 			print '<td>';
 
-			print '<a href="?action=move_map_up&order='.$map['sortorder'].'&id='.$map['id'].'"><img src="../../images/move_up.gif" width="14" height="10" border="0" alt="Move Map Up"></a>';
-			print '<a href="?action=move_map_down&order='.$map['sortorder'].'&id='.$map['id'].'"><img src="../../images/move_down.gif" width="14" height="10" border="0" alt="Move Map Down"></a>';
+			print '<a href="?action=move_map_up&order='.$map['sortorder'].'&id='.$map['id'].'"><img src="../../images/move_up.gif" width="14" height="10" border="0" alt="Move Map Up" title="Move Map Up"></a>';
+			print '<a href="?action=move_map_down&order='.$map['sortorder'].'&id='.$map['id'].'"><img src="../../images/move_down.gif" width="14" height="10" border="0" alt="Move Map Down" title="Move Map Down"></a>';
 // print $map['sortorder'];
 
 			print "</td>";
@@ -257,7 +257,7 @@ function maplist()
 				}
 			}
 
-			print '<a href="?action=perms_edit&id='.$map['id'].'">';
+			print '<a title="Click to edit permissions" href="?action=perms_edit&id='.$map['id'].'">';
 			if(count($mapusers) == 0)
 			{
 				print "(no users)";
@@ -271,7 +271,7 @@ function maplist()
 			print '</td>';
 			//  print '<td><a href="?action=editor&mapname='.urlencode($map['configfile']).'">Edit Map</a></td>';
 			print '<td>';
-			print '<a href="?action=delete_map&id='.$map['id'].'"><img src="../../images/delete_icon.gif" width="10" height="10" border="0" alt="Delete Map"></a>';
+			print '<a href="?action=delete_map&id='.$map['id'].'"><img src="../../images/delete_icon.gif" width="10" height="10" border="0" alt="Delete Map" title="Delete Map"></a>';
 			print '</td>';
 
 			print '</tr>';

@@ -3075,6 +3075,8 @@ class WeatherMap extends WeatherMapBase
 		$output = $input;
 
 		# debug("ProcessString: input is $input\n");
+		
+		assert('is_scalar($input)');
 
 		# while( preg_match("/(\{[^}]+\})/",$input,$matches) )
 		while( preg_match("/(\{(?:node|map|link)[^}]+\})/",$input,$matches) )
@@ -5622,7 +5624,7 @@ function PreloadMapHTML()
 
 		foreach ($this->nodes as $node)
 		{
-			if ( ($node->overliburl != '') || ($node->notestext != '') )
+			if ( ($node->overliburl[IN] != '') || ($node->notestext != '') )
 			{
 				# $overlibhtml = "onmouseover=\"return overlib('&lt;img src=".$node->overliburl."&gt;',DELAY,250,CAPTION,'".$node->name."');\"  onmouseout=\"return nd();\"";
 
@@ -5651,14 +5653,14 @@ function PreloadMapHTML()
 				$caption  = $this->ProcessString($caption,$node);
 
 				$overlibhtml = "onmouseover=\"return overlib('";
-				if($node->overliburl != '')
+				if($node->overliburl[IN] != '')
 				{
-					$overlibhtml .= "&lt;img src=" . $this->ProcessString($node->overliburl,$node) . "&gt;";
+					$overlibhtml .= "&lt;img src=" . $this->ProcessString($node->overliburl[IN],$node) . "&gt;";
 				}
 				if($node->notestext != '')
 				{
 					# put in a linebreak if there was an image AND notes
-					if($node->overliburl != '') $overlibhtml .= '&lt;br /&gt;';
+					if($node->overliburl[IN] != '') $overlibhtml .= '&lt;br /&gt;';
 					$note = $this->ProcessString($node->notestext,$node);
 					$note = htmlspecialchars($note, ENT_NOQUOTES);
 					$note=str_replace("'", "\\&apos;", $note);

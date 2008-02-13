@@ -15,6 +15,23 @@ if (!module_checks()) { die ("Quitting: Module checks failed.\n"); }
 $map=new Weathermap;
 $map->context="cli";
 
+assert_options(ASSERT_ACTIVE, 1);
+assert_options(ASSERT_WARNING, 0);
+assert_options(ASSERT_QUIET_EVAL, 1);
+
+// Create a handler function
+function my_assert_handler($file, $line, $code)
+{
+    echo "Assertion Failed:
+        File $file
+        Line $line
+        Code $code";
+     print_r(apd_callstack());
+}
+
+// Set up the callback
+assert_options(ASSERT_CALLBACK, 'my_assert_handler');
+
 $output="html";
 $configfile="weathermap.conf";
 $htmlfile='';

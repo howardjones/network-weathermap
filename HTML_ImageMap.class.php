@@ -298,7 +298,6 @@ class HTML_ImageMap
 	// returns the number of elements that were matched/changed
 	function setProp($which, $what, $where)
 	{
-
 		$count = 0;
 		for($i=0; $i<count($this->shapes); $i++)
 		{
@@ -313,6 +312,7 @@ class HTML_ImageMap
 					break;
 				case 'extrahtml':
 					$this->shapes[$i]->extrahtml= $what;
+					#print "IMAGEMAP: Found $where and adding $which\n";
 					break;
 				}
 				$count++;
@@ -358,7 +358,7 @@ class HTML_ImageMap
 		$html .=">\n";
 		foreach ($this->shapes as $shape)
 		{
-			$html .= $shape->asHTML();
+			$html .= $shape->asHTML()."\n";
 			$html .= "\n";
 		}
 		$html .= "</map>\n";

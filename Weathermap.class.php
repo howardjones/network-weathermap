@@ -5569,16 +5569,16 @@ function PreloadMapHTML()
 				$caption = ($link->overlibcaption != '' ? $link->overlibcaption : $link->name);
 				$caption = $this->ProcessString($caption,$link);
 
-				print "\n\n---------------\nLINK:".$link->name."\n";
-
-				foreach (array(IN,OUT) as $dir)
+	#			print "\n\n---------------\nLINK:".$link->name."\n";
+				
+				foreach (array(OUT,IN) as $dir)
 				{				
 					$overlibhtml = "onmouseover=\"return overlib('";
 					
 					$n = 0;
 					if(sizeof($link->overliburl[$dir]) > 0)
 					{
-						print "ARRAY:".is_array($link->overliburl[$dir])."\n";
+						// print "ARRAY:".is_array($link->overliburl[$dir])."\n";
 						foreach ($link->overliburl[$dir] as $url)
 						{
 							if($n>0) { $overlibhtml .= '&lt;br /&gt;'; }
@@ -5586,7 +5586,7 @@ function PreloadMapHTML()
 							$n++;
 						}
 					}
-					print "Added $n for $dir\n";
+					# print "Added $n for $dir\n";
 					if($link->notestext != '')
 					{
 						# put in a linebreak if there was an image AND notes
@@ -5601,19 +5601,20 @@ function PreloadMapHTML()
 					. "');\"  onmouseout=\"return nd();\"";
 					
 					if($dir == IN) {
-						$d = 'IN';
+						#$d = 'IN';
+						#print "Adding for $d (0,2) now\n";
 						$this->imap->setProp("extrahtml", $overlibhtml, "LINK:" . $link->name.":0");
 						$this->imap->setProp("extrahtml", $overlibhtml, "LINK:" . $link->name.":2");
-						print "Adding for $d (0,2) now\n";
-						print "Adding $overlibhtml\n";
+						// print "Adding $overlibhtml\n";
 					}
 					if($dir == OUT) {
-						$d = 'OUT';
+						#$d = 'OUT';
+						#print "Adding for $d (1,3) now\n";
 						$this->imap->setProp("extrahtml", $overlibhtml, "LINK:" . $link->name.":1");
-						$this->imap->setProp("extrahtml", $overlibhtml, "LINK:" . $link->name.":3");
-						print "Adding for $d (1,3) now\n";
-						print "Adding $overlibhtml\n";
+						$this->imap->setProp("extrahtml", $overlibhtml, "LINK:" . $link->name.":3");						
+						// print "Adding $overlibhtml\n";
 					}
+					#print "--\n";
 				}
 				
 			}

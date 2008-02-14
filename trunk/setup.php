@@ -162,7 +162,7 @@ function weathermap_setup_table () {
 	}
 
 	$sql[] = "update weathermap_maps set sortorder=id where sortorder is null;";
-
+	
 	if (!in_array('weathermap_maps', $tables)) {
 		$sql[] = "CREATE TABLE weathermap_maps (
 			id int(11) NOT NULL auto_increment,
@@ -172,6 +172,9 @@ function weathermap_setup_table () {
 			imagefile text NOT NULL,
 			htmlfile text NOT NULL,
 			titlecache text NOT NULL,
+			filehash varchar (40) NOT NULL,
+			warncount int(11) NOT NULL default 0,
+			config text NOT NULL,
 			PRIMARY KEY  (id)
 		) TYPE=MyISAM;";
 	}
@@ -179,17 +182,22 @@ function weathermap_setup_table () {
 	{
 		$colsql = "show columns from weathermap_maps from " . $database_default;
 		$result = mysql_query($colsql) or die (mysql_error());
-		$found = false;
+		$found_so = false;	$found_fh = false;
+		$found_wc = false;	$found_cf = false;
 		while ($row = mysql_fetch_array($result, MYSQL_ASSOC)) {
-			if ($row['Field'] == 'sortorder')
-				$found = true;
+			if ($row['Field'] == 'sortorder') $found_so = true;
+			if ($row['Field'] == 'filehash') $found_fh = true;
+			if ($row['Field'] == 'warncount') $found_wc = true;
+			if ($row['Field'] == 'config') $found_cf = true;
 		}
-		if (!$found)
-		{
-			$sql[] = "alter table weathermap_maps add sortorder int(11) NOT NULL default 0 after id";
-		}
+		if (!$found_so) $sql[] = "alter table weathermap_maps add sortorder int(11) NOT NULL default 0 after id";
+		if (!$found_fh) $sql[] = "alter table weathermap_maps add filehash varchar(40) NOT NULL default '' after titlecache";		
+		if (!$found_wc) $sql[] = "alter table weathermap_maps add warncount int(11) NOT NULL default 0 after filehash";		
+		if (!$found_cf) $sql[] = "alter table weathermap_maps add config text NOT NULL after warncount";		
 	}
 
+	$sql[] = "update weathermap_maps set filehash=LEFT(MD5(concat(id,configfile,rand())),20) where filehash = '';";
+	
 	if (!in_array('weathermap_auth', $tables)) {
 		$sql[] = "CREATE TABLE weathermap_auth (
 			userid mediumint(9) NOT NULL default '0',

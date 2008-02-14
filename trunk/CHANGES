@@ -8,6 +8,8 @@
 	ADDED - SPLITPOS keyword to control position of midpoint in links
 	ADDED - VIAs can be positioned relative to NODEs (like NODEs can) (thanks again to llow) 
 	ADDED - Weathermap has a hook in the map viewing page to allow other plugins to add code there
+	ADDED - .htaccess files bundled with Weathermap to restrict direct access to configs and output
+	ADDED - filenames for output are much less guessable now
 	FIXED - KEYOUTLINECOLOR is actually used now (thanks to llow once more)
 	FIXED - Editor doesn't throw away WIDTH and HEIGHT with no BG image
 	FIXED - Cacti Data-source and Graph picker doesn't restrict scrolling or resizing anymore

@@ -1,6 +1,5 @@
 Z-order - layers for drawing
 
-
 Before 0.95
 -----------
 Angled VIAs
@@ -9,7 +8,6 @@ Artificial ICONs
 IN/OUT infourl/notes/overlibgraph stuff
 (Reworking of DS plugins to use Null instead of -1)
 (Multilayered inheritance)
-
 
 Before 0.94
 -----------------

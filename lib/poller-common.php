@@ -90,7 +90,7 @@ function weathermap_run_maps($mydir) {
 
 							// why did I change this before? It's useful...
 							// $wmap->imageuri = $config['url_path'].'/plugins/weathermap/output/weathermap_'.$map['id'].".".$imageformat;
-							$wmap->imageuri = $config['url_path'].'plugins/weathermap/output/weathermap_'.$map['id'].".".$imageformat."?time=".time();
+							$wmap->imageuri = $config['url_path'].'plugins/weathermap/weathermap-cacti-plugin?action=showmapimage&id='.$map['id'].".".$imageformat."&time=".time();
 
 							if($quietlogging==0) warn("About to write image file. If this is the last message in your log, increase memory_limit in php.ini [WMPOLL01]");
 							weathermap_memory_check("MEM pre-render $mapcount");

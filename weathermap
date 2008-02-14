@@ -26,7 +26,8 @@ function my_assert_handler($file, $line, $code)
         File $file
         Line $line
         Code $code";
-     print_r(apd_callstack());
+	debug_print_backtrace();
+	exit();
 }
 
 // Set up the callback

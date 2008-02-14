@@ -69,9 +69,9 @@ function weathermap_run_maps($mydir) {
 
 					foreach ($queryrows as $map) {
 						$mapfile = $confdir.DIRECTORY_SEPARATOR.$map['configfile'];
-						$htmlfile = $outdir.DIRECTORY_SEPARATOR."weathermap_".$map['id'].".html";
-						$imagefile = $outdir.DIRECTORY_SEPARATOR."weathermap_".$map['id'].".".$imageformat;
-						$thumbimagefile = $outdir.DIRECTORY_SEPARATOR."weathermap_thumb_".$map['id'].".".$imageformat;
+						$htmlfile = $outdir.DIRECTORY_SEPARATOR.$map['filehash'].".html";
+						$imagefile = $outdir.DIRECTORY_SEPARATOR.$map['filehash'].".".$imageformat;
+						$thumbimagefile = $outdir.DIRECTORY_SEPARATOR.$map['filehash'].".thumb.".$imageformat;
 
 						if(file_exists($mapfile))
 						{
@@ -90,7 +90,7 @@ function weathermap_run_maps($mydir) {
 
 							// why did I change this before? It's useful...
 							// $wmap->imageuri = $config['url_path'].'/plugins/weathermap/output/weathermap_'.$map['id'].".".$imageformat;
-							$wmap->imageuri = $config['url_path'].'plugins/weathermap/weathermap-cacti-plugin?action=showmapimage&id='.$map['id'].".".$imageformat."&time=".time();
+							$wmap->imageuri = $config['url_path'].'plugins/weathermap/weathermap-cacti-plugin.php?action=viewimage&id='.$map['filehash']."&time=".time();
 
 							if($quietlogging==0) warn("About to write image file. If this is the last message in your log, increase memory_limit in php.ini [WMPOLL01]");
 							weathermap_memory_check("MEM pre-render $mapcount");
@@ -101,7 +101,7 @@ function weathermap_run_maps($mydir) {
 							$fd = @fopen($htmlfile, 'w');
 							if($fd != FALSE)
 							{
-								fwrite($fd, $wmap->MakeHTML('weathermap_'.$map['id'].'_imap'));
+								fwrite($fd, $wmap->MakeHTML('weathermap_'.$map['filehash'].'_imap'));
 								fclose($fd);
 								debug("Wrote HTML to $htmlfile");
 							}
@@ -154,7 +154,6 @@ function weathermap_run_maps($mydir) {
 		warn("Required modules for PHP Weathermap $WEATHERMAP_VERSION were not present. Not running. [WMPOLL08]");
 	}
 }
-
 
 // vim:ts=4:sw=4:
 ?>

@@ -141,3 +141,6 @@
 ./output/index.php
 ./configs/index.php
 ./lib/index.php
+./configs/.htaccess
+./output/.htaccess
+./lib/.htaccess

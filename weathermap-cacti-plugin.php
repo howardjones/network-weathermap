@@ -18,10 +18,50 @@ if (isset($_POST['action'])) {
 
 switch($action)
 {
+case 'viewthumb': // FALL THROUGH
+case 'viewimage':
+	$id = -1;
+
+	if( isset($_REQUEST['id']) && (!is_numeric($_REQUEST['id']) || strlen($_REQUEST['id'])==20) )
+	{
+		$id = weathermap_translate_id($_REQUEST['id']);
+	}
+	
+	if( isset($_REQUEST['id']) && is_numeric($_REQUEST['id']) )
+	{
+		$id = intval($_REQUEST['id']);
+	}
+	
+	if($id >=0)
+	{
+		$imageformat = strtolower(read_config_option("weathermap_output_format"));
+		
+		$map = db_fetch_assoc("select weathermap_maps.* from weathermap_auth,weathermap_maps where weathermap_maps.id=weathermap_auth.mapid and active='on' and (userid=".$_SESSION["sess_user_id"]." or userid=0) and weathermap_maps.id=".$id);
+		
+		if(sizeof($map))
+		{
+		
+		$imagefile = dirname(__FILE__).'/output/'.'/'.$map[0]['filehash'].".".$imageformat;
+		if($action == 'viewthumb') $imagefile = dirname(__FILE__).'/output/'.$map[0]['filehash'].".thumb.".$imageformat;
+		
+		$orig_cwd = getcwd();
+		chdir(dirname(__FILE__));
+
+		header('Content-type: image/png');
+		
+		readfile_chunked($imagefile);
+				
+		dir($orig_cwd);	
+		}
+
+	}
+	
+	break;
+
 case 'liveviewimage':
 	$id = -1;
 
-	if( isset($_REQUEST['id']) && !is_numeric($_REQUEST['id']) )
+	if( isset($_REQUEST['id']) && (!is_numeric($_REQUEST['id']) || strlen($_REQUEST['id'])==20) )
 	{
 		$id = weathermap_translate_id($_REQUEST['id']);
 	}
@@ -64,7 +104,7 @@ case 'liveview':
 	
 	$id = -1;
 
-	if( isset($_REQUEST['id']) && !is_numeric($_REQUEST['id']) )
+	if( isset($_REQUEST['id']) && (!is_numeric($_REQUEST['id']) || strlen($_REQUEST['id'])==20) )
 	{
 		$id = weathermap_translate_id($_REQUEST['id']);
 	}
@@ -149,7 +189,7 @@ case 'viewmap':
 
 	$id = -1;
 
-	if( isset($_REQUEST['id']) && !is_numeric($_REQUEST['id']) )
+	if( isset($_REQUEST['id']) && (!is_numeric($_REQUEST['id']) || strlen($_REQUEST['id'])==20) )
 	{
 		$id = weathermap_translate_id($_REQUEST['id']);
 	}
@@ -211,7 +251,7 @@ function weathermap_singleview($mapid)
  		# print do_hook_function ('weathermap_page_top', array($map[0]['id'], $map[0]['titlecache']) );
  		print do_hook_function ('weathermap_page_top', '' );
 
-		$htmlfile = $outdir."weathermap_".$map[0]['id'].".html";
+		$htmlfile = $outdir.$map[0]['filehash'].".html";
 		$maptitle = $map[0]['titlecache'];
 		if($maptitle == '') $maptitle= "Map for config file: ".$map[0]['configfile'];
 
@@ -312,21 +352,23 @@ function weathermap_thumbview()
 			foreach ($maplist as $map) {
 				$i++;
 
-				$thumbfile = $outdir."weathermap_thumb_".$map['id'].".".$imageformat;
-				$thumburl = "output/weathermap_thumb_".$map['id'].".".$imageformat."?time=".time();
+				# $thumbfile = $outdir."weathermap_thumb_".$map['id'].".".$imageformat;
+				# $thumburl = "output/weathermap_thumb_".$map['id'].".".$imageformat."?time=".time();
+				$thumbfile = $outdir.$map['filehash'].".thumb.".$imageformat;
+				$thumburl = "?action=viewthumb&id=".$map['filehash']."&time=".time();
 				$maptitle = $map['titlecache'];
 				if($maptitle == '') $maptitle= "Map for config file: ".$map['configfile'];
 
 				print '<div class="wm_thumbcontainer" style="margin: 2px; border: 1px solid #bbbbbb; padding: 2px; float:left;">';
 				if(file_exists($thumbfile))
 				{
-					print '<div class="wm_thumbtitle" style="font-size: 1.2em; font-weight: bold; text-align: center">'.$maptitle.'</div><a href="weathermap-cacti-plugin.php?action=viewmap&id='.$map['id'].'"><img class="wm_thumb" src="'.$thumburl.'" alt="'.$maptitle.'" border="0" hspace="5" vspace="5" title="'.$maptitle.'"/></a>';
+					print '<div class="wm_thumbtitle" style="font-size: 1.2em; font-weight: bold; text-align: center">'.$maptitle.'</div><a href="weathermap-cacti-plugin.php?action=viewmap&id='.$map['filehash'].'"><img class="wm_thumb" src="'.$thumburl.'" alt="'.$maptitle.'" border="0" hspace="5" vspace="5" title="'.$maptitle.'"/></a>';
 				}
 				else
 				{
-					print "(thumbnail for map ".$map['id']." not created yet)";
+					print "(thumbnail for map not created yet)";
 				}
-				print "<a href='?action=liveview&id=".$map['id']."'>(live)</a>";
+				print "<a href='?action=liveview&id=".$map['filehash']."'>(live)</a>";
 				print '</div> ';
 			}
 			print "</td></tr>";
@@ -391,18 +433,18 @@ function weathermap_fullview($cycle=FALSE, $firstonly=FALSE)
 		foreach ($maplist as $map)
 		{
 			$i++;
-			$htmlfile = $outdir."weathermap_".$map['id'].".html";
+			$htmlfile = $outdir.$map['filehash'].".html";
 			$maptitle = $map['titlecache'];
 			if($maptitle == '') $maptitle= "Map for config file: ".$map['configfile'];
 
-			print '<div class="weathermapholder" id="mapholder_'.$map['id'].'">';
+			print '<div class="weathermapholder" id="mapholder_'.$map['filehash'].'">';
 			html_graph_start_box(1,true);
 ?>
 		<tr bgcolor="#<?php print $colors["header_panel"];?>">
 				<td colspan="3">
 						<table width="100%" cellspacing="0" cellpadding="3" border="0">
 								<tr>
-										<td align="left" class="textHeaderDark"><a name="map_<?php echo $map['id']; ?>"></a>
+										<td align="left" class="textHeaderDark"><a name="map_<?php echo $map['filehash']; ?>"></a>
 									 <?php print htmlspecialchars($maptitle); ?>
 				</td>
 								</tr>
@@ -539,7 +581,7 @@ function weathermap_fullview($cycle=FALSE, $firstonly=FALSE)
 
 function weathermap_translate_id($idname)
 {
-	$SQL = "select id from weathermap_maps where configfile='".mysql_real_escape_string($idname)."'";
+	$SQL = "select id from weathermap_maps where configfile='".mysql_real_escape_string($idname)."' or filehash='".mysql_real_escape_string($idname)."'";
 	$map = db_fetch_assoc($SQL);
 
 	return($map[0]['id']);	
@@ -566,5 +608,26 @@ function weathermap_versionbox()
 <?php
 	html_graph_end_box();
 }
+
+
+function readfile_chunked($filename) {
+    $chunksize = 1*(1024*1024); // how many bytes per chunk
+    $buffer = '';
+    $cnt =0;
+	
+    $handle = fopen($filename, 'rb');
+    if ($handle === false) return false;
+	
+    while (!feof($handle)) {
+        $buffer = fread($handle, $chunksize);
+        echo $buffer;
+        if ($retbytes) {
+            $cnt += strlen($buffer);
+        }
+    }
+    $status = fclose($handle);
+    return $status;
+} 
+
 // vim:ts=4:sw=4:
 ?>

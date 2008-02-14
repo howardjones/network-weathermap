@@ -5652,11 +5652,22 @@ function PreloadMapHTML()
 				$caption = ($node->overlibcaption != '' ? $node->overlibcaption : $node->name);
 				$caption  = $this->ProcessString($caption,$node);
 
-				$overlibhtml = "onmouseover=\"return overlib('";
-				if($node->overliburl[IN] != '')
-				{
-					$overlibhtml .= "&lt;img src=" . $this->ProcessString($node->overliburl[IN],$node) . "&gt;";
-				}
+
+					$overlibhtml = "onmouseover=\"return overlib('";
+					
+					$n = 0;
+					if(sizeof($node->overliburl[IN]) > 0)
+					{
+						// print "ARRAY:".is_array($link->overliburl[IN])."\n";
+						foreach ($node->overliburl[IN] as $url)
+						{
+							if($n>0) { $overlibhtml .= '&lt;br /&gt;'; }
+							$overlibhtml .= "&lt;img src=" . $this->ProcessString($url,$node) . "&gt;";
+							$n++;
+						}
+					}
+					# print "Added $n for $dir\n";
+
 				if($node->notestext != '')
 				{
 					# put in a linebreak if there was an image AND notes

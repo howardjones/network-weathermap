@@ -55,7 +55,7 @@ class WeatherMapDataSource_rrd extends WeatherMapDataSource {
 		}
 	}
 
-	function wmrrd_read_from_poller_output($rrdfile,$cf,$start,$end,$dsnames, &$data, &$map)
+	function wmrrd_read_from_poller_output($rrdfile,$cf,$start,$end,$dsnames, &$data, &$map, &$data_time)
 	{
 		global $config;
 		
@@ -113,6 +113,7 @@ class WeatherMapDataSource_rrd extends WeatherMapDataSource {
 						if( ($result['sequence'] > 2) && ( $result['last_time'] > $worst_time) )
 						{
 							$data[$dir] = $result['last_calc'];
+							$data_time = $result['last_time'];
 							debug("RRD ReadData: poller_output - data looks valid\n");
 						}
 						else
@@ -134,14 +135,15 @@ class WeatherMapDataSource_rrd extends WeatherMapDataSource {
 		}
 
 		// fudge the missing value, so data is valid. This is horrible.
-		if( ($data[IN] == -1) && ($data[OUT] >= 0) ) $data[IN] = 0;
-		if( ($data[OUT] == -1) && ($data[IN] >= 0) ) $data[OUT] = 0;
+		// XXX - this should be unnecessary now that NULL is the No-Result
+		//if( ($data[IN] == -1) && ($data[OUT] >= 0) ) $data[IN] = 0;
+		//if( ($data[OUT] == -1) && ($data[IN] >= 0) ) $data[OUT] = 0;
 
 		debug("RRD ReadData: poller_output - result is ".$data[IN].",".$data[OUT]."\n");
 		debug("RRD ReadData: poller_output - ended\n");
 	}
 	
-	function wmrrd_read_from_php_rrd($rrdfile,$cf,$start,$end,$dsnames, &$data ,&$map)
+	function wmrrd_read_from_php_rrd($rrdfile,$cf,$start,$end,$dsnames, &$data ,&$map, &$data_time)
 	{
 		// not yet implemented - use php-rrdtool to read rrd data. Should be quicker
 		if ((1==0) && extension_loaded('RRDTool')) // fetch the values via the RRDtool Extension
@@ -165,7 +167,7 @@ class WeatherMapDataSource_rrd extends WeatherMapDataSource {
 		}
 	}
 
-	function wmrrd_read_from_real_rrdtool($rrdfile,$cf,$start,$end,$dsnames, &$data, &$map)
+	function wmrrd_read_from_real_rrdtool($rrdfile,$cf,$start,$end,$dsnames, &$data, &$map, &$data_time)
 	{
 
 		debug("RRD ReadData: traditional style\n");
@@ -219,47 +221,47 @@ class WeatherMapDataSource_rrd extends WeatherMapDataSource {
 			     $rlines=array_reverse($lines);
      
 			     foreach ($rlines as $line)
-			     {
-				 debug ("--" . $line . "\n");
-				 $cols=preg_split("/\s+/", $line);
-				 for ($i=0, $cnt=count($cols)-1; $i < $cnt; $i++) { 
-					$h = $heads[$i];
-					$v = $cols[$i];
-					# print "|$h|,|$v|\n";
-					$values[$h] = trim($v); 
-				}
- 
-				$data_ok=FALSE;
- 
-				foreach (array(IN,OUT) as $dir)
-				{
-					$n = $dsnames[$dir];
-					# print "|$n|\n";
-					if(array_key_exists($n,$values))
+				 {
+					 debug ("--" . $line . "\n");
+					 $cols=preg_split("/\s+/", $line);
+					 for ($i=0, $cnt=count($cols)-1; $i < $cnt; $i++) { 
+						$h = $heads[$i];
+						$v = $cols[$i];
+						# print "|$h|,|$v|\n";
+						$values[$h] = trim($v); 
+					}
+	 
+					$data_ok=FALSE;
+	 
+					foreach (array(IN,OUT) as $dir)
 					{
-						$candidate = $values[$n];
-						if(preg_match('/^\d+\.?\d*e?[+-]?\d*:?$/i', $candidate))
+						$n = $dsnames[$dir];
+						# print "|$n|\n";
+						if(array_key_exists($n,$values))
 						{
-							$data[$dir] = $candidate;
-							debug("$candidate is OK value for $n\n");
-							$data_ok = TRUE;
+							$candidate = $values[$n];
+							if(preg_match('/^\-?\d+\.?\d*e?[+-]?\d*:?$/i', $candidate))
+							{
+								$data[$dir] = $candidate;
+								debug("$candidate is OK value for $n\n");
+								$data_ok = TRUE;
+							}
 						}
 					}
-				}
-				
-				if($data_ok)
-				{
-					// at least one of the named DS had good data
-					$data_time = intval($values['timestamp']);	
+					
+					if($data_ok)
+					{
+						// at least one of the named DS had good data
+						$data_time = intval($values['timestamp']);	
 
-					// 'fix' a -1 value to 0, so the whole thing is valid
-					// (this needs a proper fix!)
-					if($data[IN]== -1) $data[IN]=0;
-					if($data[OUT]== -1) $data[OUT]=0;
+						// 'fix' a -1 value to 0, so the whole thing is valid
+						// (this needs a proper fix!)
+						if($data[IN] === NULL) $data[IN] = 0;
+						if($data[OUT] === NULL) $data[OUT] = 0;
 
-					// break out of the loop here   
-					break;
-				}
+						// break out of the loop here   
+						break;
+					}
 			     }
 			}
 			else
@@ -275,6 +277,7 @@ class WeatherMapDataSource_rrd extends WeatherMapDataSource {
 		{
 			warn("RRD ReadData: failed to open pipe to RRDTool: ".$php_errormsg." [WMRRD04]\n");
 		}
+		debug ("RRD ReadDataFromRealRRD: Returning (".($data[IN]===NULL?'NULL':$data[IN]).",".($data[OUT]===NULL?'NULL':$data[IN]).",$data_time)\n");
 	}
 
 	// Actually read data from a data source, and return it
@@ -287,16 +290,16 @@ class WeatherMapDataSource_rrd extends WeatherMapDataSource {
 		
 		$dsnames[IN] = "traffic_in";
 		$dsnames[OUT] = "traffic_out";
-		$data[IN] = -1;
-		$data[OUT] = -1;
+		$data[IN] = NULL;
+		$data[OUT] = NULL;
 		$SQL[IN] = 'select null';
 		$SQL[OUT] = 'select null';
 		$rrdfile = $targetstring;
 
 		$multiplier = 8;
 
-		$inbw=-1;
-		$outbw=-1;
+		$inbw = NULL;
+		$outbw = NULL;
 		$data_time = 0;
 
 		if(preg_match("/^(.*\.rrd):([\-a-zA-Z0-9_]+):([\-a-zA-Z0-9_]+)$/",$targetstring,$matches))
@@ -320,12 +323,14 @@ class WeatherMapDataSource_rrd extends WeatherMapDataSource {
 			$multiplier = 1;
 		}
 
-                if(preg_match("/^scale:(\d*\.?\d*):(.*)/",$rrdfile,$matches)) 
-                {
-                        $rrdfile = $matches[2];
-                        $multiplier = $matches[1];
-                }
+		if(preg_match("/^scale:([+-]?\d*\.?\d*):(.*)/",$rrdfile,$matches)) 
+		{
+				$rrdfile = $matches[2];
+				$multiplier = $matches[1];
+		}
 
+		debug("SCALING result by $multiplier\n");
+				
 		$period = intval($map->get_hint('rrd_period'));
 		if($period == 0) $period = 800;
 		$start = $map->get_hint('rrd_start');
@@ -342,29 +347,28 @@ class WeatherMapDataSource_rrd extends WeatherMapDataSource {
 
 		if($use_poller_output == 1)
 		{
-			WeatherMapDataSource_rrd::wmrrd_read_from_poller_output($rrdfile,"AVERAGE",$start,$end, $dsnames, $data,$map);
+			WeatherMapDataSource_rrd::wmrrd_read_from_poller_output($rrdfile,"AVERAGE",$start,$end, $dsnames, $data,$map, $data_time);
 		}
 			
 		// if poller_output didn't get anything, or if it couldn't/didn't run, do it the old-fashioned way
 		// - this will still be the case for the first couple of runs after enabling poller_output support
 		//   because there won't be valid data in the weathermap_data table yet.
-		if( ($data[IN] < 0) || ($data[OUT] < 0) )
+		if( ($data[IN] === NULL) || ($data[OUT] === NULL) )
 		{
 			if(file_exists($rrdfile))
 			{
 				debug ("RRD ReadData: Target DS names are ".$dsnames[IN]." and ".$dsnames[OUT]."\n");
-	
-	
+		
 				$values=array();
 	
 				if ((1==0) && extension_loaded('RRDTool')) // fetch the values via the RRDtool Extension
 				{
-					WeatherMapDataSource_rrd::wmrrd_read_from_php_rrd($rrdfile,"AVERAGE",$start,$end, $dsnames, $data,$map);								
+					WeatherMapDataSource_rrd::wmrrd_read_from_php_rrd($rrdfile,"AVERAGE",$start,$end, $dsnames, $data,$map, $data_time);								
 				}
 				else
 				{
 					// do this the tried and trusted old-fashioned way
-					WeatherMapDataSource_rrd::wmrrd_read_from_real_rrdtool($rrdfile,"AVERAGE",$start,$end, $dsnames, $data,$map);
+					WeatherMapDataSource_rrd::wmrrd_read_from_real_rrdtool($rrdfile,"AVERAGE",$start,$end, $dsnames, $data,$map, $data_time);
 				}
 			}
 			else
@@ -373,11 +377,11 @@ class WeatherMapDataSource_rrd extends WeatherMapDataSource {
 			}
 		}
 
-		$inbw = $data[IN] * $multiplier;
-		$outbw = $data[OUT] * $multiplier;
-
-		debug ("RRD ReadData: Returning ($inbw,$outbw,$data_time)\n");
-
+		if($data[IN] !== NULL) $data[IN] = $data[IN] * $multiplier;
+		if($data[OUT] !== NULL) $data[OUT] = $data[OUT] * $multiplier;
+				
+		debug ("RRD ReadData: Returning (".($data[IN]===NULL?'NULL':$data[IN]).",".($data[OUT]===NULL?'NULL':$data[IN]).",$data_time)\n");
+		
 		return( array($inbw, $outbw, $data_time) );
 	}
 }

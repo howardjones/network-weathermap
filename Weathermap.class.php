@@ -3174,8 +3174,9 @@ class WeatherMap extends WeatherMapBase
 
 			// format, and sanitise the value string here, before returning it
 
+			if($value===NULL) $value='NULL';
 			debug("ProcessString: replacing ".$key." with $value\n");
-
+			
 			# if($format != '') $value = sprintf($format,$value);
 			if($format != '') 
 			{
@@ -3349,7 +3350,7 @@ function ReadData()
 								warn("ReadData: $type $name, target: $target[4] on config line $target[3] was not recognised as a valid TARGET [WMWARN08]\n");
 							}
 
-							if (($in < 0) || ($out < 0))
+							if (($in === NULL) || ($out === NULL))
 							{
 								$in=0;
 								$out=0;

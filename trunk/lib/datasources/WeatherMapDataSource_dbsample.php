@@ -44,7 +44,7 @@ class WeatherMapDataSource_dbsample extends WeatherMapDataSource {
 			$SQL = "select in,out from table where host=$key LIMIT 1";
 			if(mysql_connect($database_host,$database_user,$database_pass))
 			{
-				if(mysql_select_db($database_name));
+				if(mysql_select_db($database_name))
 				{
 					$result = mysql_query($SQL);
 					if (!$result)

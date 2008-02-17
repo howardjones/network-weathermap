@@ -35,7 +35,7 @@ class WeatherMapDataSource_mrtg extends WeatherMapDataSource {
 				$buffer=fgets($fd, 4096);
 
 				if (preg_match("/<\!-- cuin d (\d+) -->/", $buffer, $matches)) { $data[IN] = $matches[1] * 8; }
-				if (preg_match("/<\!-- cuout d (\d+) -->/", $buffer, $matches)) { data[OUT] = $matches[1] * 8; }
+				if (preg_match("/<\!-- cuout d (\d+) -->/", $buffer, $matches)) { $data[OUT] = $matches[1] * 8; }
 			}
 			fclose($fd);
 			$data_time = filemtime($targetstring);

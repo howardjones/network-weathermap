@@ -34,8 +34,8 @@ class WeatherMapDataSource_external extends WeatherMapDataSource {
 
 	function ReadData($targetstring, &$map, &$item)
 	{
-		$inbw=-1;
-		$outbw=-1;
+		$data[IN] = NULL;
+		$data[OUT] = NULL;
 		$data_time = 0;
 
 		if(preg_match("/^!(.*)$/",$targetstring,$matches))
@@ -59,8 +59,8 @@ class WeatherMapDataSource_external extends WeatherMapDataSource {
 
 				if($i==5)
 				{
-					$inbw = floatval($lines[0]);
-					$outbw = floatval($lines[1]);
+					$data[IN] = floatval($lines[0]);
+					$data[OUT] = floatval($lines[1]);
 					$data_time = time();
 				}
 				else
@@ -70,9 +70,9 @@ class WeatherMapDataSource_external extends WeatherMapDataSource {
 			}
 		}
 
-		debug ("ExternalScript ReadData: Returning ($inbw,$outbw,$data_time)\n");
-
-		return( array($inbw, $outbw, $data_time) );
+		debug ("ExternalScript ReadData: Returning (".($data[IN]===NULL?'NULL':$data[IN]).",".($data[OUT]===NULL?'NULL':$data[IN]).",$data_time)\n");
+		
+		return( array($data[IN], $data[OUT], $data_time) );
 	}
 }
 

@@ -38,9 +38,9 @@ class WeatherMapDataSource_snmp extends WeatherMapDataSource {
 
 	function ReadData($targetstring, &$map, &$item)
 	{
-		$inbw=-1;
-		$outbw=-1;
-		$data_time=0;
+		$data[IN] = NULL;
+		$data[OUT] = NULL;
+		$data_time = 0;
 
 		if(preg_match("/^snmp:([^:]+):([^:]+):([^:]+):([^:]+)$/",$targetstring,$matches))
 		{
@@ -57,15 +57,15 @@ class WeatherMapDataSource_snmp extends WeatherMapDataSource {
 
 			debug ("SNMP ReadData: Got $in_result and $out_result\n");
 
-			if($in_result) { $in_bw = $in_result; }
-			if($out_result) { $out_bw = $out_result;}
+			if($in_result) { $data[IN] = $in_result; }
+			if($out_result) { $data[OUT] = $out_result;}
 			$data_time = time();
 			snmp_set_quick_print($was);
 		}
 
-		debug ("SNMP ReadData: Returning ($inbw,$outbw,$data_time)\n");
-
-		return ( array($inbw,$outbw,$data_time) );
+		debug ("SNMP ReadData: Returning (".($data[IN]===NULL?'NULL':$data[IN]).",".($data[OUT]===NULL?'NULL':$data[IN]).",$data_time)\n");
+		
+		return( array($data[IN], $data[OUT], $data_time) );
 	}
 }
 

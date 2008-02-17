@@ -86,8 +86,8 @@ class WeatherMapDataSource_cactithold extends WeatherMapDataSource {
 	function ReadData($targetstring, &$map, &$item)
 	{
 
-		$inbw = -1;
-		$outbw = -1;
+		$data[IN] = NULL;
+		$data[OUT] = NULL;
 		$data_time = 0;
 
 		if(preg_match("/^cactithold:(\d+):(\d+)$/",$targetstring,$matches))
@@ -103,9 +103,9 @@ class WeatherMapDataSource_cactithold extends WeatherMapDataSource {
 			$result = db_fetch_row($SQL2);
 			if(isset($result))
 			{
-				if($result['thold_alert'] > 0) { $inbw=1; }
-				else { $inbw = 0; }
-				$outbw = 0;
+				if($result['thold_alert'] > 0) { $data[IN]=1; }
+				else { $data[IN] = 0; }
+				$data[OUT] = 0;
 			}
 		}
 		elseif(preg_match("/^cacti(thold|monitor):(\d+)$/",$targetstring,$matches))
@@ -121,9 +121,9 @@ class WeatherMapDataSource_cactithold extends WeatherMapDataSource {
 				$result = db_fetch_row($SQL2);
 				if(isset($result))
 				{
-					if($result['thold_alert'] > 0) { $inbw=1; }
-					else { $inbw = 0; }
-					$outbw = 0;
+					if($result['thold_alert'] > 0) { $data[IN]=1; }
+					else { $data[IN] = 0; }
+					$data[OUT] = 0;
 				}
 			}
 			
@@ -149,8 +149,8 @@ class WeatherMapDataSource_cactithold extends WeatherMapDataSource {
 					if($result['status'] == 3) { $state = 3; $statename = 'up'; }
 					if($result['disabled'])  { $state = 0; $statename = 'disabled'; }
 	
-					$inbw = $state;
-					$outbw = 0;
+					$data[IN] = $state;
+					$data[OUT] = 0;
 					$item->add_note("state",$statename);
 					$item->add_note("cacti_description",$result['description']);
 					
@@ -203,8 +203,8 @@ class WeatherMapDataSource_cactithold extends WeatherMapDataSource {
 					$item->add_note("state",$statename);
 					$item->add_note("thold_failcount",$numfailing);
 					$item->add_note("thold_failpercent",($numfailing/$numthresh)*100);
-					$inbw = $state;
-					$outbw = $numfailing;
+					$data[IN] = $state;
+					$data[OUT] = $numfailing;
 					debug("CactiTHold ReadData: State is $state/$statename\n");
 				}
 				elseif( $numthresh>0 )
@@ -216,9 +216,9 @@ class WeatherMapDataSource_cactithold extends WeatherMapDataSource {
 			}		
 		}
 
-		debug ("CactiTHold ReadData: Returning ($inbw,$outbw,$data_time)\n");
+		debug ("CactiTHold ReadData: Returning (".($data[IN]===NULL?'NULL':$data[IN]).",".($data[OUT]===NULL?'NULL':$data[IN]).",$data_time)\n");
 
-		return( array($inbw, $outbw, $data_time) );
+		return( array($data[IN], $data[OUT], $data_time) );
 	}
 }
 

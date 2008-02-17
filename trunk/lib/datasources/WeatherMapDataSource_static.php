@@ -22,8 +22,8 @@ class WeatherMapDataSource_static extends WeatherMapDataSource {
 
 	function ReadData($targetstring, &$map, &$item)
 	{
-		$inbw=-1;
-		$outbw=-1;
+		$inbw = NULL;
+		$outbw = NULL;
 		$data_time=0;
 
 		if(preg_match("/^static:(\d+\.?\d*[KMGT]*):(\d+\.?\d*[KMGT]*)$/",$targetstring,$matches))

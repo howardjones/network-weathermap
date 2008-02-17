@@ -382,7 +382,7 @@ class WeatherMapDataSource_rrd extends WeatherMapDataSource {
 				
 		debug ("RRD ReadData: Returning (".($data[IN]===NULL?'NULL':$data[IN]).",".($data[OUT]===NULL?'NULL':$data[IN]).",$data_time)\n");
 		
-		return( array($inbw, $outbw, $data_time) );
+		return( array($data[IN], $data[OUT], $data_time) );
 	}
 }
 

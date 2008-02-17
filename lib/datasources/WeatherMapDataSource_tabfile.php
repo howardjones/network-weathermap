@@ -21,8 +21,8 @@ class WeatherMapDataSource_tabfile extends WeatherMapDataSource {
 	// function ReadData($targetstring, $configline, $itemtype, $itemname, $map)
 	function ReadData($targetstring, &$map, &$item)
 	{
-		$inbw=-1;
-		$outbw=-1;
+		$data[IN] = NULL;
+		$data[OUT] = NULL;
 		$data_time=0;
 		$itemname = $item->name;
 
@@ -40,8 +40,8 @@ class WeatherMapDataSource_tabfile extends WeatherMapDataSource {
 
 				if (preg_match("/^$itemname\t(\d+\.?\d*[KMGT]*)\t(\d+\.?\d*[KMGT]*)/", $buffer, $matches))
 				{
-					$inbw=unformat_number($matches[1]);
-					$outbw=unformat_number($matches[2]);
+					$data[IN]=unformat_number($matches[1]);
+					$data[OUT]=unformat_number($matches[2]);
 				}
 			}
 			$stats = stat($targetstring);
@@ -50,10 +50,10 @@ class WeatherMapDataSource_tabfile extends WeatherMapDataSource {
 		else {
 			// some error code to go in here
 			debug ("TabText ReadData: Couldn't open ($targetstring). \n"); }
-
-			debug ("TabText ReadData: Returning ($inbw,$outbw,$data_time)\n");
-
-			return ( array($inbw,$outbw,$data_time) );
+		
+			debug ("TabText ReadData: Returning (".($data[IN]===NULL?'NULL':$data[IN]).",".($data[OUT]===NULL?'NULL':$data[IN]).",$data_time)\n");
+		
+			return( array($data[IN], $data[OUT], $data_time) );
 	}
 }
 

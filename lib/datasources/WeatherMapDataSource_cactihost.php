@@ -38,8 +38,8 @@ class WeatherMapDataSource_cactihost extends WeatherMapDataSource {
 	function ReadData($targetstring, &$map, &$item)
 	{
 
-		$inbw = -1;
-		$outbw = -1;
+		$data[IN] = NULL;
+		$data[OUT] = NULL;
 		$data_time = 0;
 
 		if(preg_match("/^cactihost:(\d+)$/",$targetstring,$matches))
@@ -62,8 +62,8 @@ class WeatherMapDataSource_cactihost extends WeatherMapDataSource {
 				if($result['status'] == 3) { $state = 3; $statename = 'up'; }
 				if($result['disabled'])  { $state = 0; $statename = 'disabled'; }
 
-				$inbw = $state;
-				$outbw = $state;
+				$data[IN] = $state;
+				$data[OUT] = $state;
 				$item->add_note("state",$statename);
 				$item->add_note("cacti_description",$result['description']);
 				
@@ -79,9 +79,9 @@ class WeatherMapDataSource_cactihost extends WeatherMapDataSource {
 			}
 		}
 
-		debug ("CactiHost ReadData: Returning ($inbw,$outbw,$data_time)\n");
+		debug ("CactiHost ReadData: Returning (".($data[IN]===NULL?'NULL':$data[IN]).",".($data[OUT]===NULL?'NULL':$data[IN]).",$data_time)\n");
 
-		return( array($inbw, $outbw, $data_time) );
+		return( array($data[IN], $data[OUT], $data_time) );
 	}
 }
 

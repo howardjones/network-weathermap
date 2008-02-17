@@ -20,8 +20,8 @@ class WeatherMapDataSource_mrtg extends WeatherMapDataSource {
 
 	function ReadData($targetstring, &$map, &$item)
 	{
-		$inbw=-1;
-		$outbw=-1;
+		$data[IN] = NULL;
+		$data[OUT] = NULL;
 		$data_time = 0;
 
 		$matches=0;
@@ -34,20 +34,21 @@ class WeatherMapDataSource_mrtg extends WeatherMapDataSource {
 			{
 				$buffer=fgets($fd, 4096);
 
-				if (preg_match("/<\!-- cuin d (\d+) -->/", $buffer, $matches)) { $inbw=$matches[1] * 8; }
-
-				if (preg_match("/<\!-- cuout d (\d+) -->/", $buffer, $matches)) { $outbw=$matches[1] * 8; }
+				if (preg_match("/<\!-- cuin d (\d+) -->/", $buffer, $matches)) { $data[IN] = $matches[1] * 8; }
+				if (preg_match("/<\!-- cuout d (\d+) -->/", $buffer, $matches)) { data[OUT] = $matches[1] * 8; }
 			}
 			fclose($fd);
 			$data_time = filemtime($targetstring);
 		}
-		else {
+		else
+		{
 			// some error code to go in here
-			debug ("MRTG ReadData: Couldn't open ($targetstring). \n"); }
+			debug ("MRTG ReadData: Couldn't open ($targetstring). \n"); 
+		}
+			
+		debug ("MRTG ReadData: Returning (".($data[IN]===NULL?'NULL':$data[IN]).",".($data[OUT]===NULL?'NULL':$data[IN]).",$data_time)\n");
 
-			debug ("MRTG ReadData: Returning ($inbw,$outbw,$data_time)\n");
-
-			return ( array($inbw,$outbw,$data_time) );
+		return( array($data[IN], $data[OUT], $data_time) );
 	}
 }
 

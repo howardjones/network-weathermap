@@ -6,6 +6,8 @@ Angled VIAs
 DONE! SCALE tags
 Artificial ICONs
 IN/OUT infourl/notes/overlibgraph stuff
+Negative DS values
+Half-duplex links
 (Reworking of DS plugins to use Null instead of -1)
 (Multilayered inheritance)
 

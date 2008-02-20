@@ -24,6 +24,11 @@
 	FIXED - Editor doesn't throw away WIDTH and HEIGHT with no BG image
 	FIXED - Cacti Data-source and Graph picker doesn't restrict scrolling or resizing anymore
 	FIXED - weathermap-cacti-rebuild.php to work on both Cacti 0.8.6 and 0.8.7
+	FIXED - weathermap-cacti-rebuild.php to flat-out fail if Cacti environment is wrong.
+	FIXED - SNMP DS plugin had a typo that stopped it working at all (and no-one 
+                noticed for almost a year :-) ). (thanks to Fratissier Christophe for pointing it out)
+	FIXED - Added some better controls into SNMP DS plugin. You can correctly pull 
+                interface oper/admin status, for example, now.
 	
 	
 0.941	FIXED - Issue with '-' DS names again.

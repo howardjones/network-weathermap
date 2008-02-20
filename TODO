@@ -5,11 +5,11 @@ Before 0.95
 Angled VIAs
 DONE! SCALE tags
 Artificial ICONs
-IN/OUT infourl/notes/overlibgraph stuff
-Negative DS values
-Half-duplex links
-(Reworking of DS plugins to use Null instead of -1)
-(Multilayered inheritance)
+IN/OUT infourl/notes/overlibgraph stuff - DONE for overlibgraph
+DONE! Negative DS values
+DONE! Half-duplex links
+DONE! (Reworking of DS plugins to use Null instead of -1)
+(Multilayered inheritance) -> Parent property
 
 Before 0.94
 -----------------
@@ -18,6 +18,9 @@ DONE!   THold DS
 DONE!   INBWFORMAT/OUTBWFORMAT
 DONE!   Unidirectional links
 DONE! Fixes for Cacti 0.8.7 changes
+BUG: RRD line with one NaN and one good value should still be a good line. -> Actual bug is that -1 is a magic value. Switch to NULL for 'no value'!
+FIXED BUG: poller_output should degrade when no new updates arrive, somehow.
+FIXED BUG: cacti-picker.php needs to include global.php if there is one, in preference to config.php (0.8.7 compat)
 
 (php-rrdtool support?)
 (Editor NG) -> IE6 styling and imagemap updating is totally wrong
@@ -28,10 +31,6 @@ Editor shows absolute coordinates for relative-positioned nodes...
 Colours do wierd things with artificial icons - needs extra colour defs. How to make fit with USESCALE?
 Angled VIAs
 RRD CF selection (0.92 patch from Ghozlane Toumi - needs rewrite now)
-
-BUG: RRD line with one NaN and one good value should still be a good line. -> Actual bug is that -1 is a magic value. Switch to NULL for 'no value'!
-FIXED BUG: poller_output should degrade when no new updates arrive, somehow.
-FIXED BUG: cacti-picker.php needs to include global.php if there is one, in preference to config.php (0.8.7 compat)
 
 -----------------
 

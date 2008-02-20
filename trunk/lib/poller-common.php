@@ -15,6 +15,7 @@ function weathermap_memory_check($note="MEM")
 function weathermap_run_maps($mydir) {
 	global $config;
 	global $weathermap_debugging, $WEATHERMAP_VERSION;
+	global $weathermap_map;
 
 	include_once($mydir.DIRECTORY_SEPARATOR."HTML_ImageMap.class.php");
 	include_once($mydir.DIRECTORY_SEPARATOR."Weathermap.class.php");
@@ -68,6 +69,8 @@ function weathermap_run_maps($mydir) {
 					$imageformat = strtolower(read_config_option("weathermap_output_format"));
 
 					foreach ($queryrows as $map) {
+						$weathermap_map = "[Map ".$map['id']."] ".$map['configfile'];
+					
 						$mapfile = $confdir.DIRECTORY_SEPARATOR.$map['configfile'];
 						$htmlfile = $outdir.DIRECTORY_SEPARATOR.$map['filehash'].".html";
 						$imagefile = $outdir.DIRECTORY_SEPARATOR.$map['filehash'].".".$imageformat;

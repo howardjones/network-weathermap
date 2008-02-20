@@ -8,6 +8,8 @@ require_once "HTML_ImageMap.class.php";
 
 $WEATHERMAP_VERSION="0.95";
 $weathermap_debugging=FALSE;
+$weathermap_map="";
+$weathermap_debug_suppress = array("ProcessString","mysprintf");
 
 // Turn on ALL error reporting for now.
 error_reporting (E_ALL);
@@ -62,16 +64,34 @@ function module_checks()
 function debug($string)
 {
 	global $weathermap_debugging;
+	global $weathermap_map;
+	global $weathermap_debug_suppress;
 
 	if ($weathermap_debugging)
 	{
+		$calling_fn = "";
+		if(function_exists("debug_backtrace"))
+		{
+			$bt = debug_backtrace();
+			$index = 1;
+		# 	$class = (isset($bt[$index]['class']) ? $bt[$index]['class'] : '');
+        		$function = (isset($bt[$index]['function']) ? $bt[$index]['function'] : '');
+			$index = 0;
+			$file = (isset($bt[$index]['file']) ? basename($bt[$index]['file']) : '');
+        		$line = (isset($bt[$index]['line']) ? $bt[$index]['line'] : '');
+
+			$calling_fn = " [$function@$file:$line]";
+
+			if(in_array($function,$weathermap_debug_suppress)) return;
+		}
+
 		// use Cacti's debug log, if we are running from the poller
 		if (function_exists('debug_log_insert') && (!function_exists('show_editor_startpage')))
-		{ cacti_log(rtrim($string), true, "WEATHERMAP"); }
+		{ cacti_log("DEBUG:$calling_fn " . ($weathermap_map==''?'':$weathermap_map.": ") . rtrim($string), true, "WEATHERMAP"); }
 		else
 		{
 			$stderr=fopen('php://stderr', 'w');
-			fwrite($stderr, $string);
+			fwrite($stderr, "DEBUG:$calling_fn " . ($weathermap_map==''?'':$weathermap_map.": ") . $string);
 			fclose ($stderr);
 		}
 	}
@@ -79,13 +99,15 @@ function debug($string)
 
 function warn($string)
 {
+	global $weathermap_map;
+	
 	// use Cacti's debug log, if we are running from the poller
 	if (function_exists('cacti_log') && (!function_exists('show_editor_startpage')))
-	{ cacti_log(rtrim($string), false, "WEATHERMAP"); }
+	{ cacti_log(($weathermap_map==''?'':$weathermap_map.": ") . rtrim($string), false, "WEATHERMAP"); }
 	else
 	{
 		$stderr=fopen('php://stderr', 'w');
-		fwrite($stderr, $string);
+		fwrite($stderr, ($weathermap_map==''?'':$weathermap_map.": ") . $string);
 		fclose ($stderr);
 	}
 }
@@ -1120,12 +1142,12 @@ class WeatherMapNode extends WeatherMapItem
 	var $label, $proclabel,
 		$labelfont;
 	var $name;
-	var $infourl;
+	var $infourl = array();
 	var $notes;
 	var $overliburl;
 	var $overlibwidth,
 		$overlibheight;
-	var $overlibcaption;
+	var $overlibcaption = array();
 	var $maphtml;
 	var $selected = 0;
 	var $iconfile, $iconscalew, $iconscaleh;
@@ -1149,7 +1171,7 @@ class WeatherMapNode extends WeatherMapItem
 	var $inscaletag, $outscaletag;
 	# var $incolour,$outcolour;
 	var $scalevar, $iconscalevar;
-	var $notestext;
+	var $notestext = array();
 	var $image;
 	var $centre_x, $centre_y;
 	var $relative_to;
@@ -1180,14 +1202,14 @@ class WeatherMapNode extends WeatherMapItem
 				'iconscalew' => 0,
 				'iconscaleh' => 0,
 				'targets' => array(),
-				'infourl' => '',
-				'notestext' => '',
+				'infourl' => array('',''),
+				'notestext' => array('',''),
 				'notes' => array(),
 				'hints' => array(),
 				'overliburl' => array(array(),array()),
 				'overlibwidth' => 0,
 				'overlibheight' => 0,
-				'overlibcaption' => '',
+				'overlibcaption' => array('',''),
 				'labeloutlinecolour' => array(0, 0, 0),
 				'labelbgcolour' => array(255, 255, 255),
 				'labelfontcolour' => array(0, 0, 0),
@@ -1319,6 +1341,7 @@ class WeatherMapNode extends WeatherMapItem
 			
 			if($this->iconfile == 'inpie' || $this->iconfile == 'nink' || $this->iconfile == 'box' || $this->iconfile == 'outpie' || $this->iconfile == 'round')
 			{
+				debug("Artificial Icon");
 				// this is an artificial icon - we don't load a file for it
 				
 				// XXX - add the actual DRAWING CODE!
@@ -1389,7 +1412,8 @@ class WeatherMapNode extends WeatherMapItem
 					{
 						debug("Skipping unavailable imagefilter() call.\n");
 					}
-	
+
+					debug("If this is the last thing in your logs, you probably have a buggy GD library. Get > 2.0.33 or use PHP builtin.\n");	
 					if ($icon_im)
 					{
 						$icon_w = imagesx($icon_im);
@@ -2094,9 +2118,10 @@ class WeatherMapLink extends WeatherMapItem
 	var $a,                    $b; // the ends - references to nodes
 	var $width,                $arrowstyle, $linkstyle;
 	var $bwfont,               $labelstyle, $labelboxstyle;
-	var $overliburl,           $infourl;
+	var $overliburl = array();
+	var $infourl = array();
 	var $notes;
-	var $overlibcaption;
+	var $overlibcaption = array();
 	var $overlibwidth,         $overlibheight;
 	var $bandwidth_in,         $bandwidth_out;
 	var $max_bandwidth_in,     $max_bandwidth_out;
@@ -2109,12 +2134,13 @@ class WeatherMapLink extends WeatherMapItem
 	var $inherit_fieldlist;
 	var $vialist = array();
 	var $viastyle;
-	var $usescale; 
+	var $usescale, $duplex; 
 	var $outlinecolour;
 	var $bwoutlinecolour;
 	var $bwboxcolour;
 	var $splitpos;
-	var $commentfont,$notestext;
+	var $commentfont;
+	var $notestext = array();
 	var $inscalekey,$outscalekey;
 	var $inscaletag, $outscaletag;
 	# var $incolour,$outcolour;
@@ -2142,13 +2168,14 @@ class WeatherMapLink extends WeatherMapItem
 			'viastyle' => 'curved',
 			'usescale' => 'DEFAULT',
 			'targets' => array(),
-			'infourl' => '',
-			'notestext' => '',
+			'duplex' => 'full',
+			'infourl' => array('',''),
 			'notes' => array(),
 			'hints' => array(),
 			'comments' => array('',''),
 			'bwlabelformats' => array(FMT_PERC_IN,FMT_PERC_OUT),
 			'overliburl' => array(array(),array()),
+			'notestext' => array('',''),
 			'labelstyle' => 'percent',
 			'labelboxstyle' => 'classic',
 			'linkstyle' => 'twoway',
@@ -2166,7 +2193,7 @@ class WeatherMapLink extends WeatherMapItem
 			'b_offset' => 'C',
 			#'incomment' => '',
 			#'outcomment' => '',
-			'overlibcaption' => '',
+			'overlibcaption' => array('',''),
 			'max_bandwidth_in' => 100000000,
 			'max_bandwidth_out' => 100000000,
 			'max_bandwidth_in_cfg' => '100M',
@@ -2482,7 +2509,7 @@ class WeatherMapLink extends WeatherMapItem
 	
 				if ($thelabel != '')
 				{
-					debug("Bandwidth is ".$task[5]."\n");
+					debug("Bandwidth for label is ".$task[5]."\n");
 					
 					$padding = intval($this->get_hint('bwlabel_padding'));		
 
@@ -2553,6 +2580,10 @@ class WeatherMapLink extends WeatherMapItem
 			$comparison=($this->name == 'DEFAULT'
 			? $this->inherit_fieldlist['splitpos'] : $this->owner->defaultlink->splitpos);
 			if ($this->splitpos!= $comparison) { $output.="\tSPLITPOS " . $this->splitpos . "\n"; }
+			
+			$comparison=($this->name == 'DEFAULT'
+			? $this->inherit_fieldlist['duplex'] : $this->owner->defaultlink->duplex);
+			if ($this->duplex!= $comparison) { $output.="\tDUPLEX " . $this->duplex . "\n"; }
 			
 			// if formats have been set, but they're just the longform of the built-in styles, set them back to the built-in styles
 			if($this->labelstyle=='--' && $this->bwlabelformats[IN] == FMT_PERC_IN && $this->bwlabelformats[OUT] == FMT_PERC_OUT)
@@ -3265,7 +3296,8 @@ function ReadData()
 	}
 	debug("Finished Initialising Plugins...\n");
 
-	debug ("================== ReadData: Updating link data for all links and nodes\n");
+	debug ("======================================\n");
+	debug("ReadData: Updating link data for all links and nodes\n");
 
 	if ($this->sizedebug == 0)
 	{
@@ -3290,7 +3322,8 @@ function ReadData()
 				$total_in=0;
 				$total_out=0;
 				$name=$myobj->name;
-				debug ("\n\nReadData for $type $name: \n");
+				debug ("\n");
+				debug ("ReadData for $type $name: \n");
 
 				if (count($myobj->targets)>0)
 				{
@@ -3363,6 +3396,8 @@ function ReadData()
 							$total_out=$total_out + $multiply*$out;
 						}
 					}
+
+					debug ("ReadData complete for $type $name: $total_in $total_out\n");
 				}
 				else
 				{
@@ -3374,8 +3409,22 @@ function ReadData()
 				$myobj->bandwidth_in = $total_in;
 				$myobj->bandwidth_out = $total_out;
 				
-				$myobj->outpercent = (($total_out) / ($myobj->max_bandwidth_out)) * 100;
-				$myobj->inpercent = (($total_in) / ($myobj->max_bandwidth_in)) * 100;		
+				if($type == 'LINK' && $myobj->duplex=='half')
+				{
+					// in a half duplex link, in and out share a common bandwidth pool, so percentages need to include both
+					debug("Calculating percentage using half-duplex\n");
+					$myobj->outpercent = (($total_in + $total_out) / ($myobj->max_bandwidth_out)) * 100;
+					$myobj->inpercent = (($total_out + $total_in) / ($myobj->max_bandwidth_in)) * 100;		
+					if($myobj->max_bandwidth_out != $myobj->max_bandwidth_in)
+					{
+						warn("ReadData: $type $name: You're using asymmetric bandwidth AND half-duplex in the same link. That makes no sense.\n");
+					}
+				}
+				else
+				{
+					$myobj->outpercent = (($total_out) / ($myobj->max_bandwidth_out)) * 100;
+					$myobj->inpercent = (($total_in) / ($myobj->max_bandwidth_in)) * 100;		
+				}
 			
 				list($incol,$inscalekey,$inscaletag) = $this->ColourFromPercent(NULL, $myobj->inpercent,$myobj->usescale,$myobj->name);
 				list($outcol,$outscalekey, $outscaletag) = $this->ColourFromPercent(NULL, $myobj->outpercent,$myobj->usescale,$myobj->name);
@@ -3393,7 +3442,8 @@ function ReadData()
 				unset($myobj);
 			}
 		}
-		debug ("\nReadData Completed.\n--------------\n");		
+		debug ("ReadData Completed.\n");
+		debug("------------------------------\n");		
 	}
 }
 
@@ -4281,6 +4331,14 @@ function ReadConfig($filename)
 					$curlink->linkstyle=$matches[1];
 					$linematched++;
 				}
+				
+				if ($last_seen == 'LINK' && preg_match(
+					"/^\s*DUPLEX\s+(full|half)\s*$/i", $buffer,
+					$matches))
+				{
+					$curlink->duplex = strtolower($matches[1]);
+					$linematched++;
+				}
 
 				if ($last_seen == 'LINK' && preg_match(
 					"/^\s*BWSTYLE\s+(classic|angled)\s*$/i", $buffer,
@@ -4423,21 +4481,47 @@ function ReadConfig($filename)
 					}
 				}
 
-				if (preg_match("/^\s*NOTES\s+(.*)\s*$/i", $buffer, $matches))
+				if (preg_match("/^\s*(IN|OUT)?NOTES\s+(.*)\s*$/i", $buffer, $matches))
 				{
 					if($curobj)
 					{
-						$curobj->notestext=$matches[1];
-						$linematched++;
+						if($last_seen == 'NODE' && $matches[1] != '') {
+							warn("IN/OUTNOTES make no sense for a NODE!\n");
+						} else {
+							if($matches[1] == '') {
+								$curobj->notestext[IN]=$matches[2];
+								$curobj->notestext[OUT]=$matches[2];
+							}
+							if($matches[1] == 'IN') {
+								$curobj->notestext[IN]=$matches[2];
+							}
+							if($matches[1] == 'OUT') {
+								$curobj->notestext[OUT]=$matches[2];
+							}
+							$linematched++;
+						}
 					}
 				}
 
-				if (preg_match("/^\s*INFOURL\s+(\S+)\s*$/i", $buffer, $matches))
+				if (preg_match("/^\s*(IN|OUT)?INFOURL\s+(\S+)\s*$/i", $buffer, $matches))
 				{
 					if($curobj)
 					{
-						$curobj->infourl=$matches[1];
-						$linematched++;
+						if($last_seen == 'NODE' && $matches[1] != '') {
+							warn("IN/OUTINFOURL make no sense for a NODE!\n");
+						} else {
+							if($matches[1] == '') {
+								$curobj->infourl[IN]=$matches[2];
+								$curobj->infourl[OUT]=$matches[2];
+							}
+							if($matches[1] == 'IN') {
+								$curobj->infourl[IN]=$matches[2];
+							}
+							if($matches[1] == 'OUT') {
+								$curobj->infourl[OUT]=$matches[2];
+							}
+							$linematched++;
+						}
 					}
 				}
 				
@@ -4465,12 +4549,25 @@ function ReadConfig($filename)
 					}
 				}
 
-				if (preg_match("/^\s*OVERLIBCAPTION\s+(.+)\s*$/i", $buffer, $matches))
+				if (preg_match("/^\s*(IN|OUT)?OVERLIBCAPTION\s+(.+)\s*$/i", $buffer, $matches))
 				{
 					if($curobj)
 					{
-						$curobj->overlibcaption=$matches[1];
-						$linematched++;
+						if($last_seen == 'NODE' && $matches[1] != '') {
+							warn("IN/OUTOVERLIBGRAPH make no sense for a NODE!\n");
+						} else {
+							if($matches[1] == '') {
+								$curobj->overlibcaption[IN]=$matches[2];
+								$curobj->overlibcaption[OUT]=$matches[2];
+							}
+							if($matches[1] == 'IN') {
+								$curobj->overlibcaption[IN]=$matches[2];
+							}
+							if($matches[1] == 'OUT') {
+								$curobj->overlibcaption[OUT]=$matches[2];
+							}
+							$linematched++;
+						}
 					}
 				}
 
@@ -5002,11 +5099,13 @@ function ReadConfig($filename)
 	}
 
 	fclose ($fd);
+	debug("ReadConfig has finished reading the file ($linecount lines)\n");
+	debug("------------------------------------------\n");
 
 	// load some default colouring, otherwise it all goes wrong
 	if ($scalesseen == 0)
 	{
-		debug ("Adding default SCALE set.\n");
+		debug ("Adding default SCALE colour set (no SCALE lines seen).\n");
 		$defaults=array
 			(
 				'1_10' => array('bottom' => 1, 'top' => 10, 'red1' => 140, 'green1' => 0, 'blue1' => 255),
@@ -5031,7 +5130,8 @@ function ReadConfig($filename)
 
 	// calculate any relative positions here - that way, nothing else
 	// really needs to know about them
-
+	
+	debug("Resolving relative positions for NODEs...\n");
 	// safety net for cyclic dependencies
 	$i=100;
 	do
@@ -5071,7 +5171,7 @@ function ReadConfig($filename)
 				}
 			}
 		}
-		debug("Cycle $i - set $set and Skipped $skipped for unresolved dependencies\n");
+		debug("Relative Positions Cycle $i - set $set and Skipped $skipped for unresolved dependencies\n");
 		$i--;
 	} while( ($set>0) && ($i!=0)  );
 	
@@ -5079,6 +5179,8 @@ function ReadConfig($filename)
 	{ 
 		warn("There are Circular dependencies in relative POSITION lines for $skipped nodes. [WMWARN11]\n");
 	}
+
+	debug("-----------------------------------\n");
 
 	# warn("---\n\nDEFAULT NODE AGAIN::".var_dump($this->defaultnode->hints)."::\n");
 	#warn("DEFAULT NOW SAYS ".$this->defaultnode->hints['sigdigits']."\n");
@@ -5290,6 +5392,9 @@ function DrawMap($filename = '', $thumbnailfile = '', $thumbnailmax = 250, $with
 		
 	}
 	debug("Finished Post-Processing Plugins...\n");
+
+	debug("=====================================\n");
+	debug("Start of Map Drawing\n");
 
 	$this->datestamp = strftime($this->stamptext, time());
 
@@ -5529,9 +5634,33 @@ function PreloadMapHTML()
 		$center_x=$this->width / 2;
 		$center_y=$this->height / 2;
 
+		// loop through everything. Figure out along the way if it's a node or a link
+		$allitems = array(&$this->links, &$this->nodes);
+		reset($allitems);
+
+		while( list($kk,) = each($allitems))
+		{ 
+			unset($objects);
+			# $objects = &$this->links;
+			$objects = &$allitems[$kk];
+
+			reset($objects); 
+			while (list($k,) = each($objects))
+			{
+				unset($myobj);
+				$myobj = &$objects[$k];
+
+				$type = $myobj->my_type();
+				
+				$dirs = array();
+				if($type == 'LINK') $dirs = array(IN,OUT);
+				if($type == 'NODE') $dirs = array(IN);
+			}
+		}
+		
 		foreach ($this->links as $link)
 		{
-			if ( ($link->overliburl != '') || ($link->notestext != '') )
+			if ( ($link->overliburl[IN] != '') || ($link->notestext[IN] != '') || ($link->overliburl[OUT] != '') || ($link->notestext[OUT] != ''))
 			{
 				# $overlibhtml = "onmouseover=\"return overlib('&lt;img src=".$link->overliburl."&gt;',DELAY,250,CAPTION,'".$link->name."');\"  onmouseout=\"return nd();\"";
 				#  $a_x=$link->a->x;
@@ -5569,13 +5698,14 @@ function PreloadMapHTML()
 						$above.="ABOVE,";
 				}
 
-				$caption = ($link->overlibcaption != '' ? $link->overlibcaption : $link->name);
-				$caption = $this->ProcessString($caption,$link);
-
 	#			print "\n\n---------------\nLINK:".$link->name."\n";
+				$dirs = array(IN,OUT);
 				
-				foreach (array(OUT,IN) as $dir)
+				foreach ($dirs as $dir)
 				{				
+					$caption = ($link->overlibcaption[$dir] != '' ? $link->overlibcaption[$dir] : $link->name);
+					$caption = $this->ProcessString($caption,$link);
+					
 					$overlibhtml = "onmouseover=\"return overlib('";
 					
 					$n = 0;
@@ -5590,11 +5720,11 @@ function PreloadMapHTML()
 						}
 					}
 					# print "Added $n for $dir\n";
-					if($link->notestext != '')
+					if($link->notestext[$dir] != '')
 					{
 						# put in a linebreak if there was an image AND notes
 						if($n>0) $overlibhtml .= '&lt;br /&gt;';
-						$note = $this->ProcessString($link->notestext,$link);
+						$note = $this->ProcessString($link->notestext[$dir],$link);
 						$note = htmlspecialchars($note, ENT_NOQUOTES);
 						$note=str_replace("'", "\\&apos;", $note);
 						$note=str_replace('"', "&quot;", $note);
@@ -5602,22 +5732,19 @@ function PreloadMapHTML()
 					}
 					$overlibhtml .= "',DELAY,250,${left}${above}CAPTION,'" . $caption
 					. "');\"  onmouseout=\"return nd();\"";
-					
-					if($dir == IN) {
-						#$d = 'IN';
-						#print "Adding for $d (0,2) now\n";
-						$this->imap->setProp("extrahtml", $overlibhtml, "LINK:" . $link->name.":0");
-						$this->imap->setProp("extrahtml", $overlibhtml, "LINK:" . $link->name.":2");
-						// print "Adding $overlibhtml\n";
-					}
-					if($dir == OUT) {
-						#$d = 'OUT';
-						#print "Adding for $d (1,3) now\n";
-						$this->imap->setProp("extrahtml", $overlibhtml, "LINK:" . $link->name.":1");
-						$this->imap->setProp("extrahtml", $overlibhtml, "LINK:" . $link->name.":3");						
-						// print "Adding $overlibhtml\n";
-					}
-					#print "--\n";
+			
+
+					if($dir==IN) $parts = array(0,2);
+					if($dir==OUT) $parts = array(1,3);
+								
+					foreach ($parts as $part)
+					{
+						$areaname = "LINK:" . $link->name . ":" . $part;
+						$this->imap->setProp("extrahtml", $overlibhtml, $areaname);
+						if ( ($this->htmlstyle != 'editor') && ($link->infourl[$dir] != '') ) {
+							$this->imap->setProp("href", $this->ProcessString($link->infourl[$dir],$link), $areaname);
+						}			
+					}				
 				}
 				
 			}
@@ -5625,11 +5752,11 @@ function PreloadMapHTML()
 
 		foreach ($this->nodes as $node)
 		{
-			if ( ($node->overliburl[IN] != '') || ($node->notestext != '') )
+			if ( ($node->overliburl[IN] != '') || ($node->notestext[IN] != '') )
 			{
 				# $overlibhtml = "onmouseover=\"return overlib('&lt;img src=".$node->overliburl."&gt;',DELAY,250,CAPTION,'".$node->name."');\"  onmouseout=\"return nd();\"";
 
-				debug ($node->overlibwidth . "---" . $node->overlibheight . "---\n");
+				# debug ($node->overlibwidth . "---" . $node->overlibheight . "---\n");
 
 				$left="";
 				$above="";
@@ -5650,9 +5777,8 @@ function PreloadMapHTML()
 						$above.="ABOVE,";
 				}
 
-				$caption = ($node->overlibcaption != '' ? $node->overlibcaption : $node->name);
+				$caption = ($node->overlibcaption[IN] != '' ? $node->overlibcaption[IN] : $node->name);
 				$caption  = $this->ProcessString($caption,$node);
-
 
 					$overlibhtml = "onmouseover=\"return overlib('";
 					
@@ -5669,11 +5795,11 @@ function PreloadMapHTML()
 					}
 					# print "Added $n for $dir\n";
 
-				if($node->notestext != '')
+				if($node->notestext[IN] != '')
 				{
 					# put in a linebreak if there was an image AND notes
 					if($node->overliburl[IN] != '') $overlibhtml .= '&lt;br /&gt;';
-					$note = $this->ProcessString($node->notestext,$node);
+					$note = $this->ProcessString($node->notestext[IN],$node);
 					$note = htmlspecialchars($note, ENT_NOQUOTES);
 					$note=str_replace("'", "\\&apos;", $note);
 					$note=str_replace('"', "&quot;", $note);
@@ -5686,45 +5812,11 @@ function PreloadMapHTML()
 
 				for($i=0; $i<4; $i++)
 				{
-					$this->imap->setProp("extrahtml", $overlibhtml, "NODE:" . $node->name.":$i");
-				}
-			}
-		}
-	}
-
-	if ($this->htmlstyle == 'editor')
-	{
-		foreach ($this->links as $link) {
-			#   $this->imap->setProp("href","#","LINK:".$link->name);
-			#  $this->imap->setProp("extrahtml","onclick=\"click_handler('link','".$link->name."');\"","LINK:".$link->name);
-		}
-
-		foreach ($this->nodes as $node) {
-			#    $this->imap->setProp("href","#","NODE:".$node->name);
-			#    $this->imap->setProp("extrahtml","onclick=\"click_handler('node','".$node->name."');\"","NODE:".$node->name);
-			# $this->imap->setProp("extrahtml","onclick=\"alert('".$node->name."');\"","NODE:".$node->name);
-		}
-	}
-	else
-	{
-		foreach ($this->links as $link)
-		{
-			if ($link->infourl != '') {
-				for($i=0; $i<4; $i++)
-				{
-					$areaname = "LINK:" . $link->name . ":$i";
-					$this->imap->setProp("href", $this->ProcessString($link->infourl,$link), $areaname);
-				}
-			}
-		}
-
-		foreach ($this->nodes as $node)
-		{			
-			if ($node->infourl != '') {
-				for($i=0; $i<4; $i++)
-				{
 					$areaname = "NODE:" . $node->name . ":$i";
-					$this->imap->setProp("href", $this->ProcessString($node->infourl,$node), $areaname);
+					$this->imap->setProp("extrahtml", $overlibhtml, $areaname);
+					if ( ($this->htmlstyle != 'editor') && ($node->infourl[IN] != '') ) {
+						$this->imap->setProp("href", $this->ProcessString($node->infourl[IN],$node), $areaname);
+					}
 				}
 			}
 		}

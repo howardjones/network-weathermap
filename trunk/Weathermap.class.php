@@ -1877,10 +1877,23 @@ class WeatherMapNode extends WeatherMapItem
 	
 			if ($this->infourl != $comparison) { $output.="\tINFOURL " . $this->infourl . "\n"; }
 	
-			$comparison=($this->name == 'DEFAULT'
-			? $this->inherit_fieldlist['notestext'] : $this->owner->defaultnode->notestext);
-	
-			if ($this->notestext != $comparison) { $output.="\tNOTES " . $this->notestext . "\n"; }
+			if($this->notestext[IN]==$this->notestext[OUT])
+			{
+				// IN/OUT are the same, so we can use the simpler form here
+				$comparison=($this->name == 'DEFAULT'
+				? $this->inherit_fieldlist['notestext'][IN] : $this->owner->defaultnode->notestext[IN]);
+				if ($this->notestext[IN] != $comparison) { $output.="\tNOTES " . $this->notestext[IN] . "\n"; }
+			}
+			else
+			{
+				$comparison=($this->name == 'DEFAULT'
+				? $this->inherit_fieldlist['notestext'][IN] : $this->owner->defaultnode->notestext[IN]);
+				if ($this->notestext[IN] != $comparison) { $output.="\tINNOTES " . $this->notestext[IN] . "\n"; }
+				
+				$comparison=($this->name == 'DEFAULT'
+				? $this->inherit_fieldlist['notestext'][OUT] : $this->owner->defaultnode->notestext[OUT]);
+				if ($this->notestext[OUT] != $comparison) { $output.="\tOUTNOTES " . $this->notestext[OUT] . "\n"; }
+			}
 	
 			$comparison=($this->name == 'DEFAULT'
 			? $this->inherit_fieldlist['overliburl'] : $this->owner->defaultnode->overliburl);
@@ -2668,10 +2681,23 @@ class WeatherMapLink extends WeatherMapItem
 	
 			if ($this->infourl != $comparison) { $output.="\tINFOURL " . $this->infourl . "\n"; }
 	
-			$comparison=($this->name == 'DEFAULT'
-			? $this->inherit_fieldlist['notestext'] : $this->owner->defaultlink->notestext);
-	
-			if ($this->notestext != $comparison) { $output.="\tNOTES " . $this->notestext . "\n"; }
+			if($this->notestext[IN]==$this->notestext[OUT])
+			{
+				// IN/OUT are the same, so we can use the simpler form here
+				$comparison=($this->name == 'DEFAULT'
+				? $this->inherit_fieldlist['notestext'][IN] : $this->owner->defaultlink->notestext[IN]);
+				if ($this->notestext[IN] != $comparison) { $output.="\tNOTES " . $this->notestext[IN] . "\n"; }
+			}
+			else
+			{
+				$comparison=($this->name == 'DEFAULT'
+				? $this->inherit_fieldlist['notestext'][IN] : $this->owner->defaultlink->notestext[IN]);
+				if ($this->notestext[IN] != $comparison) { $output.="\tINNOTES " . $this->notestext[IN] . "\n"; }
+				
+				$comparison=($this->name == 'DEFAULT'
+				? $this->inherit_fieldlist['notestext'][OUT] : $this->owner->defaultlink->notestext[OUT]);
+				if ($this->notestext[OUT] != $comparison) { $output.="\tOUTNOTES " . $this->notestext[OUT] . "\n"; }
+			}
 	
 			$comparison=($this->name == 'DEFAULT'
 			? $this->inherit_fieldlist['overliburl'] : $this->owner->defaultlink->overliburl);
@@ -2865,13 +2891,16 @@ class WeatherMapLink extends WeatherMapItem
 	
 			if (count($this->vialist) > 0)
 			{
-				if(isset($via[2]))
+				foreach ($this->vialist as $via)
 				{
-					$output.=sprintf("\tVIA %s %d %d\n", $via[2],$via[0], $via[1]);
-				}
-				else
-				{
-					$output.=sprintf("\tVIA %d %d\n", $via[0], $via[1]);
+					if(isset($via[2]))
+					{
+						$output.=sprintf("\tVIA %s %d %d\n", $via[2],$via[0], $via[1]);
+					}
+					else
+					{
+						$output.=sprintf("\tVIA %d %d\n", $via[0], $via[1]);
+					}
 				}
 			}
 	

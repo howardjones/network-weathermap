@@ -179,6 +179,36 @@ function imagepolyline($image, $points, $npoints, $color)
 		$color); }
 }
 
+// draw a filled round-cornered rectangle
+function imagefilledroundedrectangle($image  , $x1  , $y1  , $x2  , $y2  , $radius, $color)
+{
+	imagefilledrectangle($image, $x1,$y1+$radius, $x2,$y2-$radius, $color);
+	imagefilledrectangle($image, $x1+$radius,$y1, $x2-$radius,$y2, $color);
+	
+	imagefilledarc($image, $x1+$radius, $y1+$radius, $radius*2, $radius*2, 0, 360, $color, IMG_ARC_PIE);
+	imagefilledarc($image, $x2-$radius, $y1+$radius, $radius*2, $radius*2, 0, 360, $color, IMG_ARC_PIE);
+	
+	imagefilledarc($image, $x1+$radius, $y2-$radius, $radius*2, $radius*2, 0, 360, $color, IMG_ARC_PIE);
+	imagefilledarc($image, $x2-$radius, $y2-$radius, $radius*2, $radius*2, 0, 360, $color, IMG_ARC_PIE);
+	
+	# bool imagefilledarc  ( resource $image  , int $cx  , int $cy  , int $width  , int $height  , int $start  , int $end  , int $color  , int $style  )
+}
+
+// draw a round-cornered rectangle
+function imageroundedrectangle( $image  , $x1  , $y1  , $x2  , $y2  , $radius, $color )
+{
+
+	imageline($image, $x1+$radius, $y1, $x2-$radius, $y1, $color);
+	imageline($image, $x1+$radius, $y2, $x2-$radius, $y2, $color);
+	imageline($image, $x1, $y1+$radius, $x1, $y2-$radius, $color);
+	imageline($image, $x2, $y1+$radius, $x2, $y2-$radius, $color);
+	
+	imagearc($image, $x1+$radius, $y1+$radius, $radius*2, $radius*2, 180, 270, $color);
+	imagearc($image, $x2-$radius, $y1+$radius, $radius*2, $radius*2, 270, 360, $color);
+	imagearc($image, $x1+$radius, $y2-$radius, $radius*2, $radius*2, 90, 180, $color);
+	imagearc($image, $x2-$radius, $y2-$radius, $radius*2, $radius*2, 0, 90, $color);
+}
+
 function imagecreatefromfile($filename)
 {
 	$bgimage=NULL;
@@ -1377,7 +1407,7 @@ class WeatherMapNode extends WeatherMapItem
 			$icon_w = 0;
 			$icon_h = 0;
 			
-			if($this->iconfile == 'inpie' || $this->iconfile == 'nink' || $this->iconfile == 'box' || $this->iconfile == 'outpie' || $this->iconfile == 'round')
+			if($this->iconfile == 'inpie' || $this->iconfile == 'nink' || $this->iconfile == 'rbox' || $this->iconfile == 'box' || $this->iconfile == 'outpie' || $this->iconfile == 'round')
 			{
 				debug("Artificial Icon for $this->name\n");
 				// this is an artificial icon - we don't load a file for it
@@ -1423,6 +1453,19 @@ class WeatherMapNode extends WeatherMapItem
 					if($ink !== NULL && !$ink->is_none())
 					{
 						imagerectangle($icon_im, 0, 0, $this->iconscalew-1, $this->iconscaleh-1, $ink->gdallocate($icon_im) );
+					}
+				}
+				
+				if($this->iconfile=='rbox')
+				{						
+					if($fill !== NULL && !$fill->is_none())
+					{
+						imagefilledroundedrectangle($icon_im, 0, 0, $this->iconscalew-1, $this->iconscaleh-1, 4, $fill->gdallocate($icon_im) );
+					}
+										
+					if($ink !== NULL && !$ink->is_none())
+					{
+						imageroundedrectangle($icon_im, 0, 0, $this->iconscalew-1, $this->iconscaleh-1, 4, $ink->gdallocate($icon_im) );
 					}
 				}
 				
@@ -1913,14 +1956,24 @@ class WeatherMapNode extends WeatherMapItem
 	
 			$comparison=($this->name == 'DEFAULT'
 			? $this->inherit_fieldlist['labelbgcolour'] : $this->owner->defaultnode->labelbgcolour);
-	
-			if ($this->labelbgcolour != $comparison) { $output.="\tLABELBGCOLOR " . render_colour(
+				if ($this->labelbgcolour != $comparison) { $output.="\tLABELBGCOLOR " . render_colour(
 				$this->labelbgcolour)
+				. "\n"; }
+				
+			$comparison=($this->name == 'DEFAULT'
+			? $this->inherit_fieldlist['aiconfillcolour'] : $this->owner->defaultnode->aiconfillcolour);
+				if ($this->aiconfillcolour != $comparison) { $output.="\tAICONFILLCOLOR " . render_colour(
+				$this->aiconfillcolour)
+				. "\n"; }
+			
+			$comparison=($this->name == 'DEFAULT'
+			? $this->inherit_fieldlist['aiconoutlinecolour'] : $this->owner->defaultnode->aiconoutlinecolour);
+				if ($this->aiconoutlinecolour != $comparison) { $output.="\tAICONFILLCOLOR " . render_colour(
+				$this->aiconoutlinecolour)
 				. "\n"; }
 	
 			$comparison=($this->name == 'DEFAULT' ? $this->inherit_fieldlist['labelfontcolour']
 			: $this->owner->defaultnode->labelfontcolour);
-	
 			if ($this->labelfontcolour != $comparison) { $output.="\tLABELFONTCOLOR " . render_colour(
 				$this->labelfontcolour)
 				. "\n"; }
@@ -4533,10 +4586,10 @@ function ReadConfig($filename)
 					if ($last_seen == 'NODE')
 					{
 						// allow some special names - these produce "artificial" icons
-						if($matches[3]=='nink' || $matches[3]=='box' || $matches[3]=='round' || $matches[3]=='inpie' || $matches[3]=='outpie' )
+						if($matches[3]=='nink' || $matches[3]=='box' || $matches[3]=='rbox' || $matches[3]=='round' || $matches[3]=='inpie' || $matches[3]=='outpie' )
 						{
 							// special icons aren't added to used_images, so they won't appear in picklist for editor
-							// (the editor doesn't do icon scaling, and these *require* a scale)
+							// (the editor doesn't do icon scaling, and these *require* a scale, aside from anything else)
 							$curnode->iconfile=$matches[3];
 							$this->used_images[] = $matches[3];						
 						}

@@ -1379,8 +1379,7 @@ class WeatherMapNode extends WeatherMapItem
 			
 			if($this->iconfile == 'inpie' || $this->iconfile == 'nink' || $this->iconfile == 'box' || $this->iconfile == 'outpie' || $this->iconfile == 'round')
 			{
-				debug("Artificial Icon");
-				print "AI for $this->name\n";
+				debug("Artificial Icon for $this->name\n");
 				// this is an artificial icon - we don't load a file for it
 				
 				// XXX - add the actual DRAWING CODE!
@@ -1399,21 +1398,18 @@ class WeatherMapNode extends WeatherMapItem
 																					
 				if ( $aifill->is_copy() && !$col->is_none() )
 				{
-					print "Copying colour from node label\n";
 					$fill = $col;
 				}
 				else
 				{
 					if($aifill->is_real())
 					{
-						print "Using own colour\n";
 						$fill=$aifill;
 					}
 				}
 				
 				if ($this->aiconoutlinecolour != array(-1,-1,-1))
 				{
-					print "using own ink\n";
 					$ink=$aiink;
 				}
 				
@@ -1428,7 +1424,6 @@ class WeatherMapNode extends WeatherMapItem
 					{
 						imagerectangle($icon_im, 0, 0, $this->iconscalew-1, $this->iconscaleh-1, $ink->gdallocate($icon_im) );
 					}
-					
 				}
 				
 				if($this->iconfile=='round')
@@ -1623,8 +1618,6 @@ class WeatherMapNode extends WeatherMapItem
 
 			// if there's an icon, then you can choose to have no background
 			
-			
-
 			if(! $col->is_none() )
 			{
 			    imagefilledrectangle($node_im, $label_x1, $label_y1, $label_x2, $label_y2, $col->gdallocate($node_im));
@@ -1638,27 +1631,36 @@ class WeatherMapNode extends WeatherMapItem
 			}
 			else
 			{
-				if ($this->labeloutlinecolour != array(-1,-1,-1))
+				$olcol = new Colour($this->labeloutlinecolour);
+				if ($olcol->is_real())
 				{
-					$col=myimagecolorallocate($node_im,$this->labeloutlinecolour[0],
-						$this->labeloutlinecolour[1], $this->labeloutlinecolour[2]);
-					imagerectangle($node_im, $label_x1, $label_y1, $label_x2, $label_y2, $col);
+					imagerectangle($node_im, $label_x1, $label_y1, $label_x2, $label_y2, $olcol->gdallocate($node_im));
 				}
 			}
 			#}
 
-			if ($this->labelfontshadowcolour != array(-1,-1,-1))
+			$shcol = new Colour($this->labelfontshadowcolour);
+			if ($shcol->is_real())
 			{
-				$col=myimagecolorallocate($im, $this->labelfontshadowcolour[0], $this->labelfontshadowcolour[1],
-					$this->labelfontshadowcolour[2]);
-				$map->myimagestring($node_im, $this->labelfont, $txt_x + 1, $txt_y + 1, $this->proclabel, $col);
+				$map->myimagestring($node_im, $this->labelfont, $txt_x + 1, $txt_y + 1, $this->proclabel, $shcol->gdallocate($node_im));
 			}
 
-			$col = new Colour($this->labelfontcolour[0],$this->labelfontcolour[1],$this->labelfontcolour[2]);
+			$txcol = new Colour($this->labelfontcolour[0],$this->labelfontcolour[1],$this->labelfontcolour[2]);
 			#$col=myimagecolorallocate($node_im, $this->labelfontcolour[0], $this->labelfontcolour[1],
 			#	$this->labelfontcolour[2]);
-			$c = $col->gdallocate($node_im);
-			$map->myimagestring($node_im, $this->labelfont, $txt_x, $txt_y, $this->proclabel, $c);
+			if($txcol->is_contrast())
+			{	
+				if($col->is_real())
+				{
+					$txcol = new Colour($col->contrast());
+				}
+				else				
+				{
+					warn("You can't make a contrast with 'none'.\n");
+					$txcol = new Colour(255,0,255);
+				}
+			}
+			$map->myimagestring($node_im, $this->labelfont, $txt_x, $txt_y, $this->proclabel, $txcol->gdallocate($node_im));
 		}
 
 		# imagerectangle($node_im,$label_x1,$label_y1,$label_x2,$label_y2,$map->black);

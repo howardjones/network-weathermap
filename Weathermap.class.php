@@ -9,7 +9,7 @@ require_once "HTML_ImageMap.class.php";
 $WEATHERMAP_VERSION="0.95";
 $weathermap_debugging=FALSE;
 $weathermap_map="";
-$weathermap_debug_suppress = array("ProcessString","mysprintf");
+$weathermap_debug_suppress = array("processstring","mysprintf");
 
 // Turn on ALL error reporting for now.
 error_reporting (E_ALL);
@@ -82,7 +82,7 @@ function debug($string)
 
 			$calling_fn = " [$function@$file:$line]";
 
-			if(in_array($function,$weathermap_debug_suppress)) return;
+			if(in_array(strtolower($function),$weathermap_debug_suppress)) return;
 		}
 
 		// use Cacti's debug log, if we are running from the poller

@@ -2926,6 +2926,8 @@ class WeatherMap extends WeatherMapBase
 	var $preprocessclasses;
 	var $postprocessclasses;
 	var $activedatasourceclasses;
+	
+	var $plugins = array();
 
 	function WeatherMap()
 	{
@@ -3266,6 +3268,15 @@ function LoadPlugins( $type="data", $dir="lib/datasources" )
 				if($type == 'post') $this->postprocessclasses [$class]= $class;
 
 				debug("Loaded $type Plugin class $class from $file\n");
+				$this->plugins[$type][$class] = new $class;
+				if(! isset($this->plugins[$type][$class]))
+				{
+					debug("** Failed to create an object for plugin $type/$class\n");
+				}
+				else
+				{
+					debug("Instantiated $class.\n");
+				}
 			}
 			else
 			{
@@ -3285,8 +3296,14 @@ function ReadData()
 	debug("Running Init() for Data Source Plugins...\n");
 	foreach ($this->datasourceclasses as $ds_class)
 	{
+		// make an instance of the class
+		$dsplugins[$ds_class] = new $ds_class;
 		debug("Running $ds_class"."->Init()\n");
-		$ret = call_user_func(array($ds_class, 'Init'), $this);
+		# $ret = call_user_func(array($ds_class, 'Init'), $this);
+		//assert('isset($plugins['data'][$ds_class])');
+		
+		$ret = $this->plugins['data'][$ds_class]->Init($this);
+		
 		if(! $ret)
 		{   
 			debug("Removing $ds_class from Data Source list, since Init() failed\n");
@@ -3331,8 +3348,6 @@ function ReadData()
 					{
 						debug ("ReadData: New Target: $target[0]\n");
 						
-						
-
 						$in = 0;
 						$out = 0;
 						if ($target[4] != '')
@@ -3355,7 +3370,8 @@ function ReadData()
 							{
 								if(!$matched)
 								{
-									$recognised = call_user_func(array($ds_class, 'Recognise'), $targetstring);
+									// $recognised = call_user_func(array($ds_class, 'Recognise'), $targetstring);
+									$recognised = $this->plugins['data'][$ds_class]->Recognise($targetstring);
 									
 									if( $recognised )
 									{
@@ -3365,7 +3381,8 @@ function ReadData()
 
 											// line number is in $target[3]
 											# list($in,$out,$datatime) =  call_user_func( array($ds_class, 'ReadData'), $targetstring, $this, $myobj );
-											list($in,$out,$datatime) =  call_user_func_array( array($ds_class, 'ReadData'), array($targetstring, &$this, &$myobj));
+											// list($in,$out,$datatime) =  call_user_func_array( array($ds_class, 'ReadData'), array($targetstring, &$this, &$myobj));
+											list($in,$out,$datatime) =  $this->plugins['data'][$ds_class]->ReadData($targetstring, &$this, &$myobj);
 										}
 										else
 										{
@@ -5192,7 +5209,8 @@ function ReadConfig($filename)
 	{
 		debug("Running $pre_class"."->run()\n");
 		# call_user_func(array($pre_class, 'run'), $this);
-		call_user_func_array(array($pre_class, 'run'), array(&$this));
+		//call_user_func_array(array($pre_class, 'run'), array(&$this));
+		$this->plugins['pre'][$pre_class]->run(&$this);
 
 	}
 	debug("Finished Pre-Processing Plugins...\n");
@@ -5341,7 +5359,7 @@ function WriteConfig($filename)
 		fwrite($fd, "\n# End of NODE section\n\n# Link definitions:\n");
 
 		foreach ($this->links as $link)
-		{
+		{	
 			fwrite($fd,$link->WriteConfig());
 		}
 
@@ -5388,7 +5406,8 @@ function DrawMap($filename = '', $thumbnailfile = '', $thumbnailmax = 250, $with
 	foreach ($this->postprocessclasses as $post_class)
 	{
 		debug("Running $post_class"."->run()\n");
-		call_user_func_array(array($post_class, 'run'), array(&$this));
+		//call_user_func_array(array($post_class, 'run'), array(&$this));
+		$this->plugins['post'][$post_class]->run(&$this);
 		
 	}
 	debug("Finished Post-Processing Plugins...\n");

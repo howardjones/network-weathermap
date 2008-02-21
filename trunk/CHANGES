@@ -2,7 +2,7 @@
 0.95	ADDED - You can add a 'tag' to a SCALE line, to be used in ICON or LABELs later.
         ADDED - USEICONSCALE - colorize icon images (based on patches from llow)
 	ADDED - Map titles show up in browser title now.
-	ADDED - a basic 'live view' function which generates a map on demand.
+	ADDED - a basic 'live view' function which generates a map on demand. Sometimes. It's not very useful.
 	ADDED - improved data-source picker in editor: host filter
 	ADDED - improved data-source picker in editor: option to aggregate data sources
 	ADDED - Moved data-source picker changes across into the graph-picker for NODEs too.
@@ -18,6 +18,8 @@
 	ADDED - OVERLIBGRAPH (and IN/OUT versions) can take multiple URLs separated by spaces (again from idea by llow)
 	ADDED - debug/warning log output contains the map name, and the debug output is marked DEBUG
 	ADDED - debug log output contains the calling function, file/line number, too. Making debugging-by-mail easier.
+	ADDED - fping: TARGET to do live pings of devices
+	ADDED - a sample 'skeleton' DS plugin
 	CHANGE - DS plugins are able to return negative results now ***breaks user-developed DS plugins***
 	CHANGE - the scale: prefix for the RRD DS plugin can take negative scale factors
 	FIXED - KEYOUTLINECOLOR is actually used now (thanks to llow once more)

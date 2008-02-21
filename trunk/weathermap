@@ -173,6 +173,8 @@ if ($DEBUG)
 
 $weathermap_map = $configfile;
 
+$map->Reset();
+
 if ($map->ReadConfig($configfile))
 {
 	// allow command-lines to override the config file, but provide a default if neither are present

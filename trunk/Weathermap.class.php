@@ -165,7 +165,9 @@ function myimagecolorallocate($image, $red, $green, $blue)
 
 function render_colour($col)
 {
-	if (($col[0] < 0) && ($col[1] < 0) && ($col[1] < 0)) { return 'none'; }
+	if (($col[0] == -1) && ($col[1] == -1) && ($col[1] == -1)) { return 'none'; }
+	else if (($col[0] == -2) && ($col[1] == -2) && ($col[1] == -2)) { return 'copy'; }
+	else if (($col[0] == -3) && ($col[1] == -3) && ($col[1] == -3)) { return 'contrast'; }
 	else { return sprintf("%d %d %d", $col[0], $col[1], $col[2]); }
 }
 
@@ -991,9 +993,48 @@ class Colour
 	}
 	
 	// Is this a transparent/none colour?
+	function is_real()
+	{
+		if($this->r >= 0 && $this->g >=0 && $this->b >= 0)
+		{
+			return true;
+		}
+		else
+		{
+			return false;
+		}
+	}
+	
+	// Is this a transparent/none colour?
 	function is_none()
 	{
-		if($this->r == -1 && $this->r == -1 && $this->r == -1)
+		if($this->r == -1 && $this->g == -1 && $this->b == -1)
+		{
+			return true;
+		}
+		else
+		{
+			return false;
+		}
+	}
+	
+	// Is this a contrast colour?
+	function is_contrast()
+	{
+		if($this->r == -3 && $this->g == -3 && $this->b == -3)
+		{
+			return true;
+		}
+		else
+		{
+			return false;
+		}
+	}
+	
+	// Is this a copy colour?
+	function is_copy()
+	{
+		if($this->r == -2 && $this->g == -2 && $this->b == -2)
 		{
 			return true;
 		}
@@ -1214,7 +1255,8 @@ class WeatherMapNode extends WeatherMapItem
 				'labelbgcolour' => array(255, 255, 255),
 				'labelfontcolour' => array(0, 0, 0),
 				'labelfontshadowcolour' => array(-1, -1, -1),
-				
+				'aiconoutlinecolour' => array(0,0,0),
+				'aiconfillcolour' => array(-2,-2,-2), // copy from the node label
 				'labeloffset' => '',
 				'labeloffsetx' => 0,
 				'labeloffsety' => 0,
@@ -1296,10 +1338,6 @@ class WeatherMapNode extends WeatherMapItem
 			list($colicon,$node_iconscalekey,$icontag) = $map->NewColourFromPercent($pc, $this->useiconscale,$this->name);
 		}
 
-
-		# print $col->as_string();
-		
-
 		// figure out a bounding rectangle for the label
 		if ($this->label != '')
 		{
@@ -1342,6 +1380,7 @@ class WeatherMapNode extends WeatherMapItem
 			if($this->iconfile == 'inpie' || $this->iconfile == 'nink' || $this->iconfile == 'box' || $this->iconfile == 'outpie' || $this->iconfile == 'round')
 			{
 				debug("Artificial Icon");
+				print "AI for $this->name\n";
 				// this is an artificial icon - we don't load a file for it
 				
 				// XXX - add the actual DRAWING CODE!
@@ -1352,17 +1391,42 @@ class WeatherMapNode extends WeatherMapItem
 				$nothing=imagecolorallocatealpha($icon_im,128,0,0,127);
 				imagefill($icon_im, 0, 0, $nothing);
 				
-				$ink = imagecolorallocate($icon_im,0,0,0);
-				// $fill = imagecolorallocate($icon_im,255,255,255);
-				if($this->iconfile=='box')
+				$fill = NULL;
+				$ink = NULL;
+													
+				$aifill = new Colour($this->aiconfillcolour);
+				$aiink = new Colour($this->aiconoutlinecolour);
+																					
+				if ( $aifill->is_copy() && !$col->is_none() )
 				{
-					imagefilledrectangle($icon_im, 0, 0, $this->iconscalew-1, $this->iconscaleh-1, $col->gdallocate($icon_im));
-					if ($this->labeloutlinecolour != array(-1,-1,-1))
+					print "Copying colour from node label\n";
+					$fill = $col;
+				}
+				else
+				{
+					if($aifill->is_real())
 					{
-						$ink=myimagecolorallocate($icon_im,$this->labeloutlinecolour[0],
-							$this->labeloutlinecolour[1], $this->labeloutlinecolour[2]);
-						# imagerectangle($node_im, $label_x1, $label_y1, $label_x2, $label_y2, $ink);
-						imagerectangle($icon_im, 0, 0, $this->iconscalew-1, $this->iconscaleh-1, $ink);
+						print "Using own colour\n";
+						$fill=$aifill;
+					}
+				}
+				
+				if ($this->aiconoutlinecolour != array(-1,-1,-1))
+				{
+					print "using own ink\n";
+					$ink=$aiink;
+				}
+				
+				if($this->iconfile=='box')
+				{						
+					if($fill !== NULL && !$fill->is_none())
+					{
+						imagefilledrectangle($icon_im, 0, 0, $this->iconscalew-1, $this->iconscaleh-1, $fill->gdallocate($icon_im) );
+					}
+										
+					if($ink !== NULL && !$ink->is_none())
+					{
+						imagerectangle($icon_im, 0, 0, $this->iconscalew-1, $this->iconscaleh-1, $ink->gdallocate($icon_im) );
 					}
 					
 				}
@@ -1371,16 +1435,19 @@ class WeatherMapNode extends WeatherMapItem
 				{
 					$rx = $this->iconscalew/2-1;
 					$ry = $this->iconscaleh/2-1;
-					imagefilledellipse($icon_im,$rx,$ry,$rx*2,$ry*2,$col->gdallocate($icon_im));
-					if ($this->labeloutlinecolour != array(-1,-1,-1))
+					
+					if($fill !== NULL && !$fill->is_none() )
 					{
-						$ink=myimagecolorallocate($icon_im,$this->labeloutlinecolour[0],
-							$this->labeloutlinecolour[1], $this->labeloutlinecolour[2]);
-						# imagerectangle($icon_im, 0, 0, $this->iconscalew-1, $this->iconscaleh-1, $ink);
-						imageellipse($icon_im,$rx,$ry,$rx*2,$ry*2,$ink);
+						imagefilledellipse($icon_im,$rx,$ry,$rx*2,$ry*2,$fill->gdallocate($icon_im) );
+					}	
+					
+					if($ink !== NULL && !$ink->is_none())
+					{
+						imageellipse($icon_im,$rx,$ry,$rx*2,$ry*2,$ink->gdallocate($icon_im) );
 					}					
 				}
 				
+				if($this->iconfile=='nink') { warn('inpie not implemented yet [WMWARN99]'); }
 				if($this->iconfile=='inpie') { warn('inpie not implemented yet [WMWARN99]'); }
 				if($this->iconfile=='outpie') { warn('outpie not implemented yet [WMWARN99]'); }
 				
@@ -1587,9 +1654,11 @@ class WeatherMapNode extends WeatherMapItem
 				$map->myimagestring($node_im, $this->labelfont, $txt_x + 1, $txt_y + 1, $this->proclabel, $col);
 			}
 
-			$col=myimagecolorallocate($node_im, $this->labelfontcolour[0], $this->labelfontcolour[1],
-				$this->labelfontcolour[2]);
-			$map->myimagestring($node_im, $this->labelfont, $txt_x, $txt_y, $this->proclabel, $col);
+			$col = new Colour($this->labelfontcolour[0],$this->labelfontcolour[1],$this->labelfontcolour[2]);
+			#$col=myimagecolorallocate($node_im, $this->labelfontcolour[0], $this->labelfontcolour[1],
+			#	$this->labelfontcolour[2]);
+			$c = $col->gdallocate($node_im);
+			$map->myimagestring($node_im, $this->labelfont, $txt_x, $txt_y, $this->proclabel, $c);
 		}
 
 		# imagerectangle($node_im,$label_x1,$label_y1,$label_x2,$label_y2,$map->black);
@@ -3300,7 +3369,7 @@ function ReadData()
 		$dsplugins[$ds_class] = new $ds_class;
 		debug("Running $ds_class"."->Init()\n");
 		# $ret = call_user_func(array($ds_class, 'Init'), $this);
-		//assert('isset($plugins['data'][$ds_class])');
+		assert('isset($this->plugins["data"][$ds_class])');
 		
 		$ret = $this->plugins['data'][$ds_class]->Init($this);
 		
@@ -4947,76 +5016,71 @@ function ReadConfig($filename)
 					$linematched++;
 				}
 
+				# "/^\s*(LABELFONT|LABELFONTSHADOW|LABELBG|LABELOUTLINE)COLOR\s+(\d+)\s+(\d+)\s+(\d+)\s*$/i",
 				if (($last_seen == 'NODE') && (preg_match(
-					"/^\s*(LABELFONT|LABELFONTSHADOW|LABELBG|LABELOUTLINE)COLOR\s+(\d+)\s+(\d+)\s+(\d+)\s*$/i",
+					"/^\s*(AICONOUTLINE|AICONFILL|LABELFONT|LABELFONTSHADOW|LABELBG|LABELOUTLINE)COLOR\s+((\d+)\s+(\d+)\s+(\d+)|none|contrast|copy)\s*$/i",
 					$buffer,
 					$matches)))
 				{
 					$key=$matches[1];
 					#   print "Found NODE colour line for $key\n";
 					$field=strtolower($matches[1]) . 'colour';
-					$curnode->$field=array
-						(
-							$matches[2],
-							$matches[3],
-							$matches[4]
-						);
-
-					$linematched++;
+					
+					print "$field $key\n";
+					if(isset($matches[3]))	// this is a regular colour setting thing
+					{
+						print "colour";
+						$curnode->$field=array(	$matches[3],$matches[4],$matches[5]);
+						$linematched++;
+					}
+					
+					if($matches[2] == 'none' && ($matches[1]=='LABELFONTSHADOW' || $matches[1]=='LABELBG' || $matches[1]=='LABELOUTLINE'))
+					{
+						print "none";
+						$curnode->$field=array(-1,-1,-1);
+						$linematched++;
+					}
+					
+					if($matches[2] == 'contrast' && $matches[1]=='LABELFONT')
+					{
+						print "contrast";
+						$curnode->$field=array(-3,-3,-3);
+						warn("contrast isn't implemented yet\n");
+						$linematched++;
+					}
+					
+					if($matches[2] == 'copy' && $matches[1]=='AICONFILL')
+					{
+						print "copy";
+						$curnode->$field=array(-2,-2,-2);
+						warn("copy isn't implemented yet\n");
+						$linematched++;
+					}
 				}
 
 				if (($last_seen == 'LINK') && (preg_match(
-					"/^\s*(COMMENTFONT|BWBOX|BWFONT|BWOUTLINE|OUTLINE)COLOR\s+(\d+)\s+(\d+)\s+(\d+)\s*$/i",
+					"/^\s*(COMMENTFONT|BWBOX|BWFONT|BWOUTLINE|OUTLINE)COLOR\s+((\d+)\s+(\d+)\s+(\d+)|none|contrast|copy)\s*$/i",
 					$buffer,
 					$matches)))
 				{
 					$key=$matches[1];
 					# print "Found LINK colour line for $key\n";
 					$field=strtolower($matches[1]) . 'colour';
-					$curlink->$field=array
-						(
-							$matches[2],
-							$matches[3],
-							$matches[4]
-						);
-
-					$linematched++;
-				}
-
-				if (($last_seen == 'NODE') && (preg_match(
-					"/^\s*(LABELFONTSHADOW|LABELBG|LABELOUTLINE)COLOR\s+none\s*$/i",
-					$buffer,
-					$matches)))
-				{
-					$key=$matches[1];
-					#  print "Found NODE non-colour line for $key\n";
-					$field=strtolower($matches[1]) . 'colour';
-					$curnode->$field=array
-						(
-							-1,
-							-1,
-							-1
-						);
-
-					$linematched++;
-				}
-
-				if (($last_seen == 'LINK') && (preg_match(
-					"/^\s*(BWBOX|BWOUTLINE|OUTLINE)COLOR\s+none\s*$/i", $buffer,
-					$matches)))
-				{
-					$key=$matches[1];
-					#  print "Found LINK non-colour line for $key\n";
-					$field=strtolower($matches[1]) . 'colour';
-					$curlink->$field=array
-						(
-							-1,
-							-1,
-							-1
-						);
-
-					$linematched++;
-				}
+					print "$field $key\n";
+					
+					if(isset($matches[3]))	// this is a regular colour setting thing
+					{
+						print "COLOR\n";
+						$curlink->$field=array(	$matches[3],$matches[4],$matches[5]);
+						$linematched++;
+					}
+					if($matches[2] == 'none' && ($matches[1]=='BWBOX' || $matches[1]=='BWOUTLINE' || $matches[1]=='OUTLINE'))
+					{
+						print "none";
+						$curnode->$field=array(-1,-1,-1);
+						$linematched++;
+					}
+				}			
 
 				if (preg_match("/^\s*HTMLSTYLE\s+(static|overlib)\s*$/i", $buffer, $matches))
 				{

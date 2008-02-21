@@ -19,7 +19,6 @@ $output="html";
 $configfile="weathermap.conf";
 $htmlfile='';
 $imagefile='';
-$DEBUG=0;
 $dumpafter=0;
 $randomdata=0;
 $dumpconfig='';
@@ -96,15 +95,14 @@ if (sizeof($gopts) > 0)
 			break;
 
 		case '--uberdebug':
+			// allow ALL trace messages (normally we block some of the chatty ones)
 			$weathermap_debug_suppress=array();
 			// FALL THROUGH
 		case '--debug':
-			$DEBUG=1;
-
-			// $map->debugging=TRUE;
 			$options_output['debugging'] = TRUE;
 			$weathermap_debugging=TRUE;
 			
+			// enable assertion handling
 			assert_options(ASSERT_ACTIVE, 1);
 			assert_options(ASSERT_WARNING, 0);
 			assert_options(ASSERT_QUIET_EVAL, 1);

@@ -10,13 +10,13 @@ release:
 	cd $(RELBASE); tar cvfz $(RELNAME).tgz weathermap
 	cd $(RELBASE); mv weathermap $(RELNAME)
 
-
-testdata: testdata/test1.rrd
+testdata: 
 	echo "Creating test data"
-	cd testdata; ./mk-rrd.pl
+	./mk-test-rrd.pl
 	
 test:	testdata
 	echo "Running test data set..."
+	./tester.sh
 
 sql:
 	mysqldump -n --add-drop-table --no-data -uroot -p cacti weathermap_maps > weathermap.sql

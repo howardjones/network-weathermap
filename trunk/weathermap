@@ -26,7 +26,7 @@ $defines=array();
 
 // **************************************************************************************
 // THIS IS THE ONE LINE IN HERE YOU MIGHT HAVE TO CHANGE!
-$map->rrdtool="/usr/local/bin/rrdtool";
+$rrdtool="/usr/local/bin/rrdtool";
 // (on Windows, use / instead of \ in pathnames - c:/rrdtool/bin/rrdtool.exe for example)
 // **************************************************************************************
 
@@ -179,6 +179,7 @@ if(isset($options_output['debugging']) && $options_output['debugging'])
 }
 
 $map=new Weathermap;
+$map->rrdtool = $rrdtool;
 $map->context="cli";
 
 // now stuff in all the others, that we got from getopts

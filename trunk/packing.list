@@ -1,6 +1,9 @@
 ./CHANGES
 ./COPYING
 ./HTML_ImageMap.class.php
+./WeatherMap.functions.php
+./WeatherMapLink.class.php
+./WeatherMapNode.class.php
 ./README
 ./Weathermap.class.php
 ./cacti-pick.php

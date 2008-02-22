@@ -24,7 +24,8 @@
 	ADDED - a sample 'skeleton' DS plugin
 	CHANGE - DS plugins are able to return negative results now ***breaks user-developed DS plugins***
 	CHANGE - the scale: prefix for the RRD DS plugin can take negative scale factors
-	CHANGE - plugins are each created as a single object now. Result: the plugin can cache results internally.
+	CHANGE - (internal) plugins are each created as a single object now. Result: the plugin can cache results internally.
+	CHANGE - (internal) broke out some of the larger classes (node, link) into separate files.
 	FIXED - KEYOUTLINECOLOR is actually used now (thanks to llow once more)
 	FIXED - Editor doesn't throw away WIDTH and HEIGHT with no BG image
 	FIXED - Cacti Data-source and Graph picker doesn't restrict scrolling or resizing anymore

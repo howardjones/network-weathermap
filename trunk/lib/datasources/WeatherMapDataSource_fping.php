@@ -40,9 +40,9 @@ class WeatherMapDataSource_fping extends WeatherMapDataSource {
 		$data[OUT] = NULL;
 		$data_time = 0;
 
-		debug("-------------------------\n");
-		print_r($this->addresscache);
-		debug("-------------------------\n");
+		#debug("-------------------------\n");
+		#print_r($this->addresscache);
+		#debug("-------------------------\n");
 		
 		if(preg_match("/^fping:(\S+)$/",$targetstring,$matches))
 		{

@@ -149,3 +149,4 @@
 ./configs/.htaccess
 ./output/.htaccess
 ./lib/.htaccess
+./check-gdbug.php

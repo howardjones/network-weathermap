@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 
-foreach $filename qw(test1.rrd test2.rrd test3.rrd) {
+foreach $filename qw(test_1.rrd test_2.rrd test_3.rrd) {
 
     (
         $dev,  $ino,   $mode,  $nlink, $uid,     $gid, $rdev,

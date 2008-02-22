@@ -22,6 +22,6 @@ for($i=0;$i<200;$i++)
 {
 	$j=$i+1;
 	$j= $j%200;
-	print "LINK lnk$i\nNODES centre edge$i\nBWLABEL bits\nTARGET test1.rrd\n\n";
-	print "LINK link$i\nNODES edge$i edge$j\nVIA edge$i 10 30\nVIA edge$j -10 -20\nBWLABEL none\nTARGET test2.rrd\n\n";
+	print "LINK lnk$i\nNODES centre edge$i\nBWLABEL bits\nTARGET test_1.rrd\n\n";
+	print "LINK link$i\nNODES edge$i edge$j\nVIA edge$i 10 30\nVIA edge$j -10 -20\nBWLABEL none\nTARGET test_2.rrd\n\n";
 }

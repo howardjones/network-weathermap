@@ -474,45 +474,43 @@ class WeatherMapLink extends WeatherMapItem
 			}		
 		
 			if($this->infourl[IN]==$this->infourl[OUT])
-			{
-				// IN/OUT are the same, so we can use the simpler form here
-				$comparison=($this->name == 'DEFAULT'
-				? $this->inherit_fieldlist['infourl'][IN] : $defdef->infourl[IN]);
-				if ($this->infourl[IN] != $comparison) { $output.="\tINFOURL " . $this->infourl[IN] . "\n"; }
-			}
+				$dirs = array(IN=>""); // only use the IN value, since they're both the same, but don't prefix the output keyword
 			else
+				$dirs = array( IN=>"IN", OUT=>"OUT" );// the full monty two-keyword version
+						
+			foreach ($dirs as $dir=>$tdir)
 			{
 				$comparison=($this->name == 'DEFAULT'
-				? $this->inherit_fieldlist['infourl'][IN] : $defdef->infourl[IN]);
-				if ($this->infourl[IN] != $comparison) { $output.="\tININFOURL " . $this->infourl[IN] . "\n"; }
-				
-				$comparison=($this->name == 'DEFAULT'
-				? $this->inherit_fieldlist['infourl'][OUT] : $defdef->infourl[OUT]);
-				if ($this->infourl[OUT] != $comparison) { $output.="\tOUTINFOURL " . $this->infourl[OUT] . "\n"; }
+				? $this->inherit_fieldlist['infourl'][$dir] : $defdef->infourl[$dir]);
+				if ($this->infourl[$dir] != $comparison) { $output.="\t".$tdir."INFOURL " . $this->infourl[$dir] . "\n"; }
 			}
+			
 	
 			if($this->notestext[IN]==$this->notestext[OUT])
-			{
-				// IN/OUT are the same, so we can use the simpler form here
-				$comparison=($this->name == 'DEFAULT'
-				? $this->inherit_fieldlist['notestext'][IN] : $defdef->notestext[IN]);
-				if ($this->notestext[IN] != $comparison) { $output.="\tNOTES " . $this->notestext[IN] . "\n"; }
-			}
+				$dirs = array(IN=>""); // only use the IN value, since they're both the same, but don't prefix the output keyword
 			else
+				$dirs = array( IN=>"IN", OUT=>"OUT" );// the full monty two-keyword version
+	
+			foreach ($dirs as $dir=>$tdir)
 			{
 				$comparison=($this->name == 'DEFAULT'
-				? $this->inherit_fieldlist['notestext'][IN] : $defdef->notestext[IN]);
-				if ($this->notestext[IN] != $comparison) { $output.="\tINNOTES " . $this->notestext[IN] . "\n"; }
-				
-				$comparison=($this->name == 'DEFAULT'
-				? $this->inherit_fieldlist['notestext'][OUT] : $defdef->notestext[OUT]);
-				if ($this->notestext[OUT] != $comparison) { $output.="\tOUTNOTES " . $this->notestext[OUT] . "\n"; }
+				? $this->inherit_fieldlist['notestext'][$dir] : $defdef->notestext[$dir]);
+				if ($this->notestext[$dir] != $comparison) { $output.="\t".$tdir."NOTES " . $this->notestext[$dir] . "\n"; }
 			}
 	
-			$comparison=($this->name == 'DEFAULT'
-			? $this->inherit_fieldlist['overliburl'] : $defdef->overliburl);
-	
-			if ($this->overliburl != $comparison) { $output.="\tOVERLIBGRAPH " . $this->overliburl . "\n"; }
+			
+			if($this->overliburl[IN]==$this->overliburl[OUT])
+				$dirs = array(IN=>""); // only use the IN value, since they're both the same, but don't prefix the output keyword
+			else
+				$dirs = array( IN=>"IN", OUT=>"OUT" );// the full monty two-keyword version
+			
+			foreach ($dirs as $dir=>$tdir)
+			{
+				$comparison=($this->name == 'DEFAULT'
+				? $this->inherit_fieldlist['overliburl'][$dir] : $defdef->overliburl[$dir]);
+				if ($this->overliburl[$dir] != $comparison) { $output.="\t".$tdir."OVERLIBGRAPH " . join(" ",$this->overliburl[$dir]) . "\n"; }
+			}	
+			
 				
 			
 			// if formats have been set, but they're just the longform of the built-in styles, set them back to the built-in styles
@@ -574,17 +572,16 @@ class WeatherMapLink extends WeatherMapItem
 				$output.="\n";
 			}
 	
-			$comparison=($this->name == 'DEFAULT'
-			? $this->inherit_fieldlist['comments'][IN] : $defdef->comments[IN]);
-			if ($this->comments[IN] != $comparison) { $output.="\tINCOMMENT " . $this->comments[IN] . "\n"; }
-	
-	
-			$comparison=($this->name == 'DEFAULT'
-			? $this->inherit_fieldlist['comments'][OUT] : $defdef->comments[OUT]);
-			if ($this->comments[OUT] != $comparison) { $output.="\tOUTCOMMENT " . $this->comments[OUT] . "\n"; }
-	
-	
-			
+			foreach (array(IN,OUT) as $dir)
+			{
+				if($dir==IN) $tdir="IN";
+				if($dir==OUT) $tdir="OUT";
+				
+				$comparison=($this->name == 'DEFAULT'
+				? $this->inherit_fieldlist['comments'][$dir] : $defdef->comments[$dir]);
+				if ($this->comments[$dir] != $comparison) { $output.="\t".$tdir."COMMENT " . $this->comments[$dir] . "\n"; }
+			}
+				
 	
 			if (isset($this->a) && isset($this->b))
 			{

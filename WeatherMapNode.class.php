@@ -704,48 +704,22 @@ class WeatherMapNode extends WeatherMapItem
 					if($param[2] == CONFIG_TYPE_LITERAL) $output.="\t$keyword " . $this->$field . "\n"; 
 				}
 			}		
+			
+			// IN/OUT are the same, so we can use the simpler form here
+			$comparison=($this->name == 'DEFAULT'
+			? $this->inherit_fieldlist['infourl'][IN] : $defdef->infourl[IN]);
+			if ($this->infourl[IN] != $comparison) { $output.="\tINFOURL " . $this->infourl[IN] . "\n"; }		
 	
-			if($this->infourl[IN]==$this->infourl[OUT])
-			{
-				// IN/OUT are the same, so we can use the simpler form here
-				$comparison=($this->name == 'DEFAULT'
-				? $this->inherit_fieldlist['infourl'][IN] : $defdef->infourl[IN]);
-				if ($this->infourl[IN] != $comparison) { $output.="\tINFOURL " . $this->infourl[IN] . "\n"; }
-			}
-			else
-			{
-				$comparison=($this->name == 'DEFAULT'
-				? $this->inherit_fieldlist['infourl'][IN] : $defdef->infourl[IN]);
-				if ($this->infourl[IN] != $comparison) { $output.="\tININFOURL " . $this->infourl[IN] . "\n"; }
-				
-				$comparison=($this->name == 'DEFAULT'
-				? $this->inherit_fieldlist['infourl'][OUT] : $defdef->infourl[OUT]);
-				if ($this->infourl[OUT] != $comparison) { $output.="\tOUTINFOURL " . $this->infourl[OUT] . "\n"; }
-			}
-	
-			if($this->notestext[IN]==$this->notestext[OUT])
-			{
-				// IN/OUT are the same, so we can use the simpler form here
-				$comparison=($this->name == 'DEFAULT'
-				? $this->inherit_fieldlist['notestext'][IN] : $defdef->notestext[IN]);
+			// IN/OUT are the same, so we can use the simpler form here
+			$comparison=($this->name == 'DEFAULT'
+			? $this->inherit_fieldlist['notestext'][IN] : $defdef->notestext[IN]);
 				if ($this->notestext[IN] != $comparison) { $output.="\tNOTES " . $this->notestext[IN] . "\n"; }
-			}
-			else
-			{
-				$comparison=($this->name == 'DEFAULT'
-				? $this->inherit_fieldlist['notestext'][IN] : $defdef->notestext[IN]);
-				if ($this->notestext[IN] != $comparison) { $output.="\tINNOTES " . $this->notestext[IN] . "\n"; }
-				
-				$comparison=($this->name == 'DEFAULT'
-				? $this->inherit_fieldlist['notestext'][OUT] : $defdef->notestext[OUT]);
-				if ($this->notestext[OUT] != $comparison) { $output.="\tOUTNOTES " . $this->notestext[OUT] . "\n"; }
-			}
 	
 			$comparison=($this->name == 'DEFAULT'
-			? $this->inherit_fieldlist['overliburl'] : $defdef->overliburl);
-			if ($this->overliburl != $comparison) { $output.="\tOVERLIBGRAPH " . $this->overliburl . "\n"; }
+			? $this->inherit_fieldlist['overliburl'][IN] : $defdef->overliburl[IN]);
+			if ($this->overliburl[IN] != $comparison) { $output.="\tOVERLIBGRAPH " . join(" ",$this->overliburl[IN]) . "\n"; }
 	
-			
+	
 			$val = $this->iconscalew. " " . $this->iconscaleh. " " .$this->iconfile;
 			
 			$comparison = ($this->name == 'DEFAULT' ? $this->inherit_fieldlist['iconscalew'] : $defdef->iconscalew)

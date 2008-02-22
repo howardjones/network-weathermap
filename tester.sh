@@ -7,40 +7,44 @@
 #
 # can extend this in the future to have 'reference' images for the suite-n.cfg files
 
+if [ ! -d tests ]; then
+	mkdir tests
+fi
+
 echo ========================================================================================
 echo "095-test.conf"
 echo
-time php weathermap --config configs/095-test.conf --dumpconfig test1.cfg --output first1.png --htmloutput first1.html
-time php weathermap --config test1.cfg --output test1.png --htmloutput test1.html
-compare first1.png test1.png compare1.png
+time php weathermap --config configs/095-test.conf --dumpconfig tests/test1.cfg --output tests/first1.png --htmloutput tests/first1.html
+time php weathermap --config tests/test1.cfg --output tests/test1.png --htmloutput tests/test1.html
+compare tests/first1.png tests/test1.png tests/compare1.png
 
-sed 's/first1/XXXX/g' < first1.html > first1a.html
-sed 's/test1/XXXX/g' < test1.html > test1a.html
-diff first1a.html test1a.html
+sed 's/first1/XXXX/g' < tests/first1.html > tests/first1a.html
+sed 's/test1/XXXX/g' < tests/test1.html > tests/test1a.html
+diff tests/first1a.html tests/test1a.html
 
 echo ========================================================================================
 echo "suite-1.conf"
 echo
 
-time php weathermap --config configs/suite-1.conf --dumpconfig test2.cfg --output first2.png --htmloutput first2.html
-time php weathermap --config test2.cfg --output test2.png --htmloutput test2.html
-compare first2.png test2.png compare2.png
-sed 's/first2/XXXX/g' < first2.html > first2a.html
-sed 's/test2/XXXX/g' < test2.html > test2a.html
-diff first2a.html test2a.html
+time php weathermap --config configs/suite-1.conf --dumpconfig tests/test2.cfg --output tests/first2.png --htmloutput tests/first2.html
+time php weathermap --config tests/test2.cfg --output tests/test2.png --htmloutput tests/test2.html
+compare tests/first2.png tests/test2.png tests/compare2.png
+sed 's/first2/XXXX/g' < tests/first2.html > tests/first2a.html
+sed 's/test2/XXXX/g' < tests/test2.html > tests/test2a.html
+diff tests/first2a.html tests/test2a.html
 
 echo ========================================================================================
 echo "suite-2.conf"
 echo
-time php weathermap --config configs/suite-2.conf --dumpconfig test3.cfg --output first3.png --htmloutput first3.html
-time php weathermap --config test3.cfg --output test3.png --htmloutput test3.html
-compare first3.png test3.png compare3.png
-sed 's/first3/XXXX/g' < first3.html > first3a.html
-sed 's/test3/XXXX/g' < test3.html > test3a.html
-diff first1a.html test1a.html
+time php weathermap --config configs/suite-2.conf --dumpconfig tests/test3.cfg --output tests/first3.png --htmloutput tests/first3.html
+time php weathermap --config tests/test3.cfg --output tests/test3.png --htmloutput tests/test3.html
+compare tests/first3.png tests/test3.png tests/compare3.png
+sed 's/first3/XXXX/g' < tests/first3.html > tests/first3a.html
+sed 's/test3/XXXX/g' < tests/test3.html > tests/test3a.html
+diff tests/first1a.html tests/test1a.html
 
 echo ========================================================================================
 echo "Torture test"
 echo
-./mk-torture.pl > torture.conf
-time php weathermap --config torture.conf --dumpconfig test4.cfg --output first4.png
+./mk-torture.pl > tests/torture.conf
+time php weathermap --config tests/torture.conf --dumpconfig tests/test4.cfg --output tests/first4.png

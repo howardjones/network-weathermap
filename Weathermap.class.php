@@ -882,6 +882,10 @@ function ColourFromPercent($image, $percent,$scalename="DEFAULT",$name="")
 		{
 			warn("ColourFromPercent: Attempted to use non-existent scale: $scalename for $name [WMWARN09]\n");
 		}
+		else
+		{
+			return array($this->white,'','');
+		}
 	}
 
 	// you'll only get grey for a COMPLETELY quiet link if there's no 0 in the SCALE lines
@@ -1470,6 +1474,7 @@ function ReadConfig($filename)
 						array('NODE', '/^\s*LABELOFFSET\s+([-+]?\d+)\s+([-+]?\d+)\s*$/i', array('labeloffsetx'=>1,'labeloffsety'=>2)),
 						array('NODE', '/^\s*LABELOFFSET\s+(C|NE|SE|NW|SW|N|S|E|W)\s*$/i', array('labeloffset'=>1)),
 						array('NODE', '/^\s*LABELFONT\s+(\d+)\s*$/i', array('labelfont'=>1)),
+						array('NODE', '/^\s*LABELANGLE\s+(0|90|180|270)\s*$/i', array('labelangle'=>1)),
 						
 						
 						array('LINK', '/^\s*OUTBWFORMAT\s+(.*)\s*$/i', array('bwlabelformats[OUT]'=>1,'labelstyle'=>'--')),

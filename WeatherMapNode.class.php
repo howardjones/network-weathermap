@@ -16,6 +16,7 @@ class WeatherMapNode extends WeatherMapItem
 		$height;
 	var $label, $proclabel,
 		$labelfont;
+	var $labelangle;
 	var $name;
 	var $infourl = array();
 	var $notes;
@@ -74,6 +75,7 @@ class WeatherMapNode extends WeatherMapItem
 				'original_y' => 0,
 				'inpercent'=>0,
 				'outpercent'=>0,
+				'labelangle'=>0,
 				'iconfile' => '',
 				'iconscalew' => 0,
 				'iconscaleh' => 0,
@@ -188,22 +190,54 @@ class WeatherMapNode extends WeatherMapItem
 			
 			list($strwidth, $strheight) = $map->myimagestringsize($this->labelfont, $this->proclabel);
 
-			$boxwidth = ($strwidth * $padfactor) + $padding;
-			$boxheight = ($strheight * $padfactor) + $padding;
+			if($this->labelangle==90 || $this->labelangle==270)
+			{
+				$boxwidth = ($strheight * $padfactor) + $padding;
+				$boxheight = ($strwidth * $padfactor) + $padding;
+				debug ("Node->pre_render: Label Metrics are: $strwidth x $strheight -> $boxwidth x $boxheight\n");
+				
+				$label_x1 = $this->x - ($boxwidth / 2);
+				$label_y1 = $this->y - ($boxheight / 2);
 
-			debug ("Node->pre_render: Label Metrics are: $strwidth x $strheight -> $boxwidth x $boxheight\n");
+				$label_x2 = $this->x + ($boxwidth / 2);
+				$label_y2 = $this->y + ($boxheight / 2);
 
-			$label_x1 = $this->x - ($boxwidth / 2);
-			$label_y1 = $this->y - ($boxheight / 2);
+				if($this->labelangle==90)
+				{
+					$txt_x = $this->x + ($strheight / 2);
+					$txt_y = $this->y + ($strwidth / 2);
+				}
+				if($this->labelangle==270)
+				{
+					$txt_x = $this->x - ($strheight / 2);
+					$txt_y = $this->y - ($strwidth / 2);
+				}
+			}
+			
+			if($this->labelangle==0 || $this->labelangle==180)
+			{
+				$boxwidth = ($strwidth * $padfactor) + $padding;
+				$boxheight = ($strheight * $padfactor) + $padding;
+				debug ("Node->pre_render: Label Metrics are: $strwidth x $strheight -> $boxwidth x $boxheight\n");
+							
+				$label_x1 = $this->x - ($boxwidth / 2);
+				$label_y1 = $this->y - ($boxheight / 2);
 
-			$label_x2 = $this->x + ($boxwidth / 2);
-			$label_y2 = $this->y + ($boxheight / 2);
+				$label_x2 = $this->x + ($boxwidth / 2);
+				$label_y2 = $this->y + ($boxheight / 2);
 
-			$txt_x = $this->x - ($strwidth / 2);
-			$txt_y = $this->y + ($strheight / 2);
+				$txt_x = $this->x - ($strwidth / 2);
+				$txt_y = $this->y + ($strheight / 2);
+				
+				if($this->labelangle==180)
+				{
+					$txt_x = $this->x + ($strwidth / 2);
+					$txt_y = $this->y - ($strheight / 2);
+				}
 
-			# $this->width = $boxwidth;
-			# $this->height = $boxheight;
+				# $this->width = $boxwidth;
+				# $this->height = $boxheight;
+			}
 			$map->nodes[$this->name]->width = $boxwidth;
 			$map->nodes[$this->name]->height = $boxheight;
 
@@ -496,7 +530,7 @@ class WeatherMapNode extends WeatherMapItem
 			$shcol = new Colour($this->labelfontshadowcolour);
 			if ($shcol->is_real())
 			{
-				$map->myimagestring($node_im, $this->labelfont, $txt_x + 1, $txt_y + 1, $this->proclabel, $shcol->gdallocate($node_im));
+				$map->myimagestring($node_im, $this->labelfont, $txt_x + 1, $txt_y + 1, $this->proclabel, $shcol->gdallocate($node_im),$this->labelangle);
 			}
 
 			$txcol = new Colour($this->labelfontcolour[0],$this->labelfontcolour[1],$this->labelfontcolour[2]);
@@ -514,7 +548,7 @@ class WeatherMapNode extends WeatherMapItem
 					$txcol = new Colour(255,0,255);
 				}
 			}
-			$map->myimagestring($node_im, $this->labelfont, $txt_x, $txt_y, $this->proclabel, $txcol->gdallocate($node_im));
+			$map->myimagestring($node_im, $this->labelfont, $txt_x, $txt_y, $this->proclabel, $txcol->gdallocate($node_im),$this->labelangle);
 			//$map->myimagestring($node_im, $this->labelfont, $txt_x, $txt_y, $this->proclabel, $txcol->gdallocate($node_im),90);
 		}
 
@@ -686,6 +720,7 @@ class WeatherMapNode extends WeatherMapItem
 					array('zorder','ZORDER',CONFIG_TYPE_LITERAL),
 					array('labeloffset','LABELOFFSET',CONFIG_TYPE_LITERAL),
 					array('labelfont','LABELFONT',CONFIG_TYPE_LITERAL),
+					array('labelangle','LABELANGLE',CONFIG_TYPE_LITERAL),
 					array('overlibwidth','OVERLIBWIDTH',CONFIG_TYPE_LITERAL),
 					array('overlibheight','OVERLIBHEIGHT',CONFIG_TYPE_LITERAL),
 

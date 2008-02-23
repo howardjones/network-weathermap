@@ -5,7 +5,7 @@ Before 0.95
 Angled VIAs
 DONE! SCALE tags
 DONE! Artificial ICONs
-IN/OUT infourl/notes/overlibgraph stuff - DONE for overlibgraph
+IN/OUT infourl/notes/overlibgraph stuff - OVERLIBCAPTION missed - check others with editor?
 DONE! Negative DS values
 DONE! Half-duplex links
 DONE! (Reworking of DS plugins to use Null instead of -1)

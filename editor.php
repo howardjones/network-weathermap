@@ -288,7 +288,8 @@ else
 		// by this point, and renaming has been done, and new_node_name will always be the right name
 		$map->nodes[$new_node_name]->label = $_REQUEST['node_label'];
 		$map->nodes[$new_node_name]->infourl = $_REQUEST['node_infourl'];
-		$map->nodes[$new_node_name]->overliburl = $_REQUEST['node_hover'];
+		$map->nodes[$new_node_name]->overliburl[IN] = $_REQUEST['node_hover'];
+		$map->nodes[$new_node_name]->overliburl[OUT] = $_REQUEST['node_hover'];
 		
 		$map->nodes[$new_node_name]->x = intval($_REQUEST['node_x']);
 		$map->nodes[$new_node_name]->y = intval($_REQUEST['node_y']);
@@ -310,8 +311,10 @@ else
 		$link_name = $_REQUEST['link_name'];
 
 		$map->links[$link_name]->width = intval($_REQUEST['link_width']);
-		$map->links[$link_name]->infourl = $_REQUEST['link_infourl'];
-		$map->links[$link_name]->overliburl = $_REQUEST['link_hover'];
+		$map->links[$link_name]->infourl[IN] = $_REQUEST['link_infourl'];
+		$map->links[$link_name]->infourl[OUT] = $_REQUEST['link_infourl'];
+		$map->links[$link_name]->overliburl[IN] = $_REQUEST['link_hover'];
+		$map->links[$link_name]->overliburl[OUT] = $_REQUEST['link_hover'];
 
 		// $map->links[$link_name]->target = $_REQUEST['link_target'];
 

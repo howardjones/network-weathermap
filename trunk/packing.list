@@ -150,3 +150,9 @@
 ./lib/.htaccess
 ./check-gdbug.php
 ./editor-resources/jquery-latest.pack.js
+./images/blue-ball-64.png
+./images/green-ball-64.png
+./images/grey-ball-64.png
+./images/red-ball-64.png
+./images/yellow-ball-64.png
+

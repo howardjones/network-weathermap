@@ -511,6 +511,7 @@ class WeatherMapNode extends WeatherMapItem
 				}
 			}
 			$map->myimagestring($node_im, $this->labelfont, $txt_x, $txt_y, $this->proclabel, $txcol->gdallocate($node_im));
+			//$map->myimagestring($node_im, $this->labelfont, $txt_x, $txt_y, $this->proclabel, $txcol->gdallocate($node_im),90);
 		}
 
 		# imagerectangle($node_im,$label_x1,$label_y1,$label_x2,$label_y2,$map->black);

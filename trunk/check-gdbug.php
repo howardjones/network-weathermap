@@ -7,7 +7,7 @@
 
 	print "Let's see if you have the GD transparency bug...\n";
 	print "If you see no more output, or a segfault, then you do,\nand you'll need to upgrade.\n\n";
-	print "If you get other errors, like 'function not found', then run check.php to\nmake sure that your PHP installation is otherwise OK.\n\nHere we go...\n";
+	print "If you get other errors, like 'undefined function', then run check.php to\nmake sure that your PHP installation is otherwise OK.\n\nHere we go...\n";
 
 	$temp_width = 10;
 	$temp_height = 10;

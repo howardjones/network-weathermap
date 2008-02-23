@@ -1,15 +1,16 @@
-Z-order - layers for drawing
+PARTIALLY DONE Z-order - layers for drawing
+Angled VIAs
+Get rid of defaultlink and defaultnode - use __DEFAULT in main array instead.
+(Multilayered inheritance) -> Parent property. Default parent is __DEFAULT
 
 Before 0.95
 -----------
-Angled VIAs
 DONE! SCALE tags
 DONE! Artificial ICONs
-IN/OUT infourl/notes/overlibgraph stuff - OVERLIBCAPTION missed - check others with editor?
+DONE! IN/OUT infourl/notes/overlibgraph stuff - OVERLIBCAPTION missed - check others with editor?
 DONE! Negative DS values
 DONE! Half-duplex links
 DONE! (Reworking of DS plugins to use Null instead of -1)
-(Multilayered inheritance) -> Parent property
 
 Before 0.94
 -----------------
@@ -22,14 +23,14 @@ BUG: RRD line with one NaN and one good value should still be a good line. -> Ac
 FIXED BUG: poller_output should degrade when no new updates arrive, somehow.
 FIXED BUG: cacti-picker.php needs to include global.php if there is one, in preference to config.php (0.8.7 compat)
 
+------------------------------------------------------------
 (php-rrdtool support?)
 (Editor NG) -> IE6 styling and imagemap updating is totally wrong
 Extra DS for WUG, Nagios
 USESCALE can use any variable - USESCALE scalename {node:this:cactihost_latency}
 Finish Artificial Icons
 Editor shows absolute coordinates for relative-positioned nodes...
-Colours do wierd things with artificial icons - needs extra colour defs. How to make fit with USESCALE?
-Angled VIAs
+DONE Colours do wierd things with artificial icons - needs extra colour defs. How to make fit with USESCALE?
 RRD CF selection (0.92 patch from Ghozlane Toumi - needs rewrite now)
 
 -----------------

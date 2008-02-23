@@ -139,6 +139,16 @@ function myimagecolorallocate($image, $red, $green, $blue)
 	return (imagecolorallocate($image, $red, $green, $blue));
 }
 
+function screenshotify($input)
+{
+	$tmp = $input;
+	
+	$tmp = preg_replace("/\b\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}\b/","127.0.0.1",$tmp);
+	$tmp = preg_replace("/([A-Za-z]{3,})/e","str_repeat('x',strlen('\\1'))",$tmp);
+				
+	return($tmp);
+}
+
 function render_colour($col)
 {
 	if (($col[0] == -1) && ($col[1] == -1) && ($col[1] == -1)) { return 'none'; }

@@ -498,84 +498,86 @@ else
 
 		$map->ReadConfig($mapfile);
 
-		if(1==1)
+		// This is a complicated bit. Find out if this node is involved in any
+		// links that have VIAs. If it is, we want to rotate those VIA points
+		// about the *other* node in the link
+		foreach ($map->links as $link)
 		{
-			// This is a complicated bit. Find out if this node is involved in any
-			// links that have VIAs. If it is, we want to rotate those VIA points
-			// about the *other* node in the link
-			foreach ($map->links as $link)
-			{
-				if( (count($link->vialist)>0)  && (($link->a->name == $node_name) || ($link->b->name == $node_name)) )
-				{	
-					// get the other node from us
-					if($link->a->name == $node_name) $pivot = $link->b;
-					if($link->b->name == $node_name) $pivot = $link->a; 
+			if( (count($link->vialist)>0)  && (($link->a->name == $node_name) || ($link->b->name == $node_name)) )
+			{	
+				// get the other node from us
+				if($link->a->name == $node_name) $pivot = $link->b;
+				if($link->b->name == $node_name) $pivot = $link->a; 
+				
+				if( ($link->a->name == $node_name) && ($link->b->name == $node_name) )
+				{
+					// this is a wierd special case, but it is possible
+					# $log .= "Special case for node1->node1 links\n";
+					$dx = $link->a->x - $x;
+					$dy = $link->a->y - $y;
 					
-					if( ($link->a->name == $node_name) && ($link->b->name == $node_name) )
+					for($i=0; $i<count($link->vialist); $i++)
 					{
-						// this is a wierd special case, but it is possible
-						# $log .= "Special case for node1->node1 links\n";
-						$dx = $link->a->x - $x;
-						$dy = $link->a->y - $y;
-						
-						for($i=0; $i<count($link->vialist); $i++)
-						{
-							$link->vialist[$i][0] = $link->vialist[$i][0]-$dx;
-							$link->vialist[$i][1] = $link->vialist[$i][1]-$dy;
-						}
+						$link->vialist[$i][0] = $link->vialist[$i][0]-$dx;
+						$link->vialist[$i][1] = $link->vialist[$i][1]-$dy;
 					}
-					else
-					{
-						$pivx = $pivot->x;
-						$pivy = $pivot->y;
-						
-						$dx_old = $pivx - $map->nodes[$node_name]->x;
-						$dy_old = $pivy - $map->nodes[$node_name]->y;
-						$dx_new = $pivx - $x;
-						$dy_new = $pivy - $y;
-						$l_old = sqrt($dx_old*$dx_old + $dy_old*$dy_old);
-						$l_new = sqrt($dx_new*$dx_new + $dy_new*$dy_new);
-						
-						$angle_old = rad2deg(atan2(-$dy_old,$dx_old));
-						$angle_new = rad2deg(atan2(-$dy_new,$dx_new));
-											
-						# $log .= "$pivx,$pivy\n$dx_old $dy_old $l_old => $angle_old\n";
-						# $log .= "$dx_new $dy_new $l_new => $angle_new\n";
+				}
+				else
+				{
+					$pivx = $pivot->x;
+					$pivy = $pivot->y;
 					
-						// the geometry stuff uses a different point format, helpfully
-						$points = array();
-						foreach($link->vialist as $via)
-						{
-							$points[] = $via[0];
-							$points[] = $via[1];
-						}
-						
-						$scalefactor = $l_new/$l_old;
-						# $log .= "Scale by $scalefactor along link-line";
-						
-						// rotate so that link is along the axis
-						RotateAboutPoint($points,$pivx, $pivy, deg2rad($angle_old));
-						// do the scaling in here
-						for($i=0; $i<(count($points)/2); $i++)
-						{
-							$basex = ($points[$i*2] - $pivx) * $scalefactor + $pivx;
-							$points[$i*2] = $basex;
-						}
-						// rotate back so that link is along the new direction
-						RotateAboutPoint($points,$pivx, $pivy, deg2rad(-$angle_new));
-						
-						// now put the modified points back into the vialist again
-						$v = 0; $i = 0;
-						foreach($points as $p)
+					$dx_old = $pivx - $map->nodes[$node_name]->x;
+					$dy_old = $pivy - $map->nodes[$node_name]->y;
+					$dx_new = $pivx - $x;
+					$dy_new = $pivy - $y;
+					$l_old = sqrt($dx_old*$dx_old + $dy_old*$dy_old);
+					$l_new = sqrt($dx_new*$dx_new + $dy_new*$dy_new);
+					
+					$angle_old = rad2deg(atan2(-$dy_old,$dx_old));
+					$angle_new = rad2deg(atan2(-$dy_new,$dx_new));
+										
+					# $log .= "$pivx,$pivy\n$dx_old $dy_old $l_old => $angle_old\n";
+					# $log .= "$dx_new $dy_new $l_new => $angle_new\n";
+				
+					// the geometry stuff uses a different point format, helpfully
+					$points = array();
+					foreach($link->vialist as $via)
+					{
+						$points[] = $via[0];
+						$points[] = $via[1];
+					}
+					
+					$scalefactor = $l_new/$l_old;
+					# $log .= "Scale by $scalefactor along link-line";
+					
+					// rotate so that link is along the axis
+					RotateAboutPoint($points,$pivx, $pivy, deg2rad($angle_old));
+					// do the scaling in here
+					for($i=0; $i<(count($points)/2); $i++)
+					{
+						$basex = ($points[$i*2] - $pivx) * $scalefactor + $pivx;
+						$points[$i*2] = $basex;
+					}
+					// rotate back so that link is along the new direction
+					RotateAboutPoint($points,$pivx, $pivy, deg2rad(-$angle_new));
+					
+					// now put the modified points back into the vialist again
+					$v = 0; $i = 0;
+					foreach($points as $p)
+					{
+						// skip a point if it positioned relative to a node. Those shouldn't be rotated (well, IMHO)
+						if($link->vialist[$v][2] == '')
 						{
 							$link->vialist[$v][$i]=$p;
-							$i++;
-							if($i==2) { $i=0; $v++;}
 						}
+						$i++;
+						if($i==2) { $i=0; $v++;}					
 					}
 				}
 			}
 		}
+		
 
 		$map->nodes[$node_name]->x = $x;
 		$map->nodes[$node_name]->y = $y;

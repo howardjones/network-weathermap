@@ -151,6 +151,10 @@ class WeatherMapLink extends WeatherMapItem
 		{
 			// Time to deal with Link Comments, if any
 			$comment = $this->owner->ProcessString($this->comments[$dir], $this);
+			
+			# print "COMMENT: $comment";
+			
+			if($this->owner->get_hint('screenshot_mode')==1)  $comment=screenshotify($comment);
 	
 			if($comment != '')
 			{
@@ -409,6 +413,10 @@ class WeatherMapLink extends WeatherMapItem
 					debug("Bandwidth for label is ".$task[5]."\n");
 					
 					$padding = intval($this->get_hint('bwlabel_padding'));		
+					
+					// if screenshot_mode is enabled, wipe any letters to X and wipe any IP address to 127.0.0.1
+					// hopefully that will preserve enough information to show cool stuff without leaking info
+					if($map->get_hint('screenshot_mode')==1)  $thelabel = screenshotify($thelabel);
 
 					if($this->labelboxstyle == 'angled')
 					{
@@ -440,7 +448,6 @@ class WeatherMapLink extends WeatherMapItem
 			$basic_params = array(
 					array('width','WIDTH',CONFIG_TYPE_LITERAL),
 					array('zorder','ZORDER',CONFIG_TYPE_LITERAL),
-					array('overlibcaption','OVERLIBCAPTION',CONFIG_TYPE_LITERAL),
 					array('overlibwidth','OVERLIBWIDTH',CONFIG_TYPE_LITERAL),
 					array('overlibheight','OVERLIBHEIGHT',CONFIG_TYPE_LITERAL),
 					array('arrowstyle','ARROWSTYLE',CONFIG_TYPE_LITERAL),
@@ -485,6 +492,18 @@ class WeatherMapLink extends WeatherMapItem
 				if ($this->infourl[$dir] != $comparison) { $output.="\t".$tdir."INFOURL " . $this->infourl[$dir] . "\n"; }
 			}
 			
+			if($this->overlibcaption[IN]==$this->overlibcaption[OUT])
+				$dirs = array(IN=>""); // only use the IN value, since they're both the same, but don't prefix the output keyword
+			else
+				$dirs = array( IN=>"IN", OUT=>"OUT" );// the full monty two-keyword version
+						
+			foreach ($dirs as $dir=>$tdir)
+			{
+				$comparison=($this->name == 'DEFAULT'
+				? $this->inherit_fieldlist['overlibcaption'][$dir] : $defdef->overlibcaption[$dir]);
+				if ($this->overlibcaption[$dir] != $comparison) { $output.="\t".$tdir."OVERLIBCAPTION " . $this->overlibcaption[$dir] . "\n"; }
+			}
+	
 	
 			if($this->notestext[IN]==$this->notestext[OUT])
 				$dirs = array(IN=>""); // only use the IN value, since they're both the same, but don't prefix the output keyword

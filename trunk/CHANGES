@@ -1,10 +1,11 @@
 
 0.95	ADDED - You can add a 'tag' to a SCALE line, to be used in ICON or LABELs later.
         ADDED - USEICONSCALE - colorize icon images (based on patches from llow)
+		ADDED - screenshot mode. "SET screenshot_mode 1" at the top of the map will anonymise all labels, comments and bwlabels.
 		ADDED - LABELFONTCOLOR can use a special value of 'contrast' to always contrast with the label colour.
 		ADDED - Artificial Icons. Special icon 'filenames' - 'box' 'round' 'rbox' create a shaped icon without any file.
 		ADDED - Map titles show up in browser title now.
-	ADDED - a basic 'live view' function which generates a map on demand. Sometimes. It's not very useful.
+		ADDED - a basic 'live view' function which generates a map on demand. Sometimes. It's not very useful.
 	ADDED - improved data-source picker in editor: host filter
 	ADDED - improved data-source picker in editor: option to aggregate data sources
 	ADDED - Moved data-source picker changes across into the graph-picker for NODEs too.

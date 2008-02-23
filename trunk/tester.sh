@@ -11,6 +11,10 @@ if [ ! -d tests ]; then
 	mkdir tests
 fi
 
+cp overlib.js tests/
+cp in.png in2.png in3.png tests/
+cp out.png out2.png out3.png tests/
+
 ./mk-torture.pl > tests/torture.conf
 
 CONFIGS="configs/095-test.conf configs/suite-1.conf configs/suite-2.conf tests/torture.conf"
@@ -29,8 +33,8 @@ for conf in ${CONFIGS}; do
 	TESTNAME=`echo $conf | sed -e 's/\//_/g' -e 's/\.conf//g' `
 	TEST2NAME="${TESTNAME}-2"
 
-	time php weathermap --config $conf --image-uri tests/${TESTNAME}.png --dumpconfig tests/${TESTNAME}.cfg --output tests/${TESTNAME}.png --htmloutput tests/${TESTNAME}.html
-	time php weathermap --config tests/${TESTNAME}.cfg --image-uri tests/${TEST2NAME}.png --dumpconfig tests/${TEST2NAME}.cfg --output tests/${TEST2NAME}.png --htmloutput tests/${TEST2NAME}.html
+	time php weathermap --config $conf --image-uri ${TESTNAME}.png --dumpconfig tests/${TESTNAME}.cfg --output tests/${TESTNAME}.png --htmloutput tests/${TESTNAME}.html
+	time php weathermap --config tests/${TESTNAME}.cfg --image-uri ${TEST2NAME}.png --dumpconfig tests/${TEST2NAME}.cfg --output tests/${TEST2NAME}.png --htmloutput tests/${TEST2NAME}.html
 	compare tests/${TESTNAME}.png tests/${TEST2NAME}.png tests/${TESTNAME}-compare.png
 
 	sed s/$TESTNAME/XXXX/g < tests/${TESTNAME}.html > tests/${TESTNAME}.clean.html

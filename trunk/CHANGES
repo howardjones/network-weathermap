@@ -22,6 +22,7 @@
 	ADDED - debug log output contains the calling function, file/line number, too. Making debugging-by-mail easier.
 	ADDED - fping: TARGET to do live pings of devices
 	ADDED - a sample 'skeleton' DS plugin
+	ADDED - an additional check-gdbug.php to spot bad GD installs
 	CHANGE - DS plugins are able to return negative results now ***breaks user-developed DS plugins***
 	CHANGE - the scale: prefix for the RRD DS plugin can take negative scale factors
 	CHANGE - (internal) plugins are each created as a single object now. Result: the plugin can cache results internally.

@@ -11,40 +11,29 @@ if [ ! -d tests ]; then
 	mkdir tests
 fi
 
-echo ========================================================================================
-echo "095-test.conf"
-echo
-time php weathermap --config configs/095-test.conf --dumpconfig tests/test1.cfg --output tests/first1.png --htmloutput tests/first1.html
-time php weathermap --config tests/test1.cfg --output tests/test1.png --htmloutput tests/test1.html
-compare tests/first1.png tests/test1.png tests/compare1.png
-
-sed 's/first1/XXXX/g' < tests/first1.html > tests/first1a.html
-sed 's/test1/XXXX/g' < tests/test1.html > tests/test1a.html
-diff tests/first1a.html tests/test1a.html
-
-echo ========================================================================================
-echo "suite-1.conf"
-echo
-
-time php weathermap --config configs/suite-1.conf --dumpconfig tests/test2.cfg --output tests/first2.png --htmloutput tests/first2.html
-time php weathermap --config tests/test2.cfg --output tests/test2.png --htmloutput tests/test2.html
-compare tests/first2.png tests/test2.png tests/compare2.png
-sed 's/first2/XXXX/g' < tests/first2.html > tests/first2a.html
-sed 's/test2/XXXX/g' < tests/test2.html > tests/test2a.html
-diff tests/first2a.html tests/test2a.html
-
-echo ========================================================================================
-echo "suite-2.conf"
-echo
-time php weathermap --config configs/suite-2.conf --dumpconfig tests/test3.cfg --output tests/first3.png --htmloutput tests/first3.html
-time php weathermap --config tests/test3.cfg --output tests/test3.png --htmloutput tests/test3.html
-compare tests/first3.png tests/test3.png tests/compare3.png
-sed 's/first3/XXXX/g' < tests/first3.html > tests/first3a.html
-sed 's/test3/XXXX/g' < tests/test3.html > tests/test3a.html
-diff tests/first1a.html tests/test1a.html
-
-echo ========================================================================================
-echo "Torture test"
-echo
 ./mk-torture.pl > tests/torture.conf
-time php weathermap --config tests/torture.conf --dumpconfig tests/test4.cfg --output tests/first4.png
+
+CONFIGS="configs/095-test.conf configs/suite-1.conf configs/suite-2.conf tests/torture.conf"
+
+for conf in ${CONFIGS}; do
+	echo ========================================================================================
+	echo $conf
+	echo
+
+	TESTNAME=`echo $conf | sed -e 's/\//_/g' -e 's/\.conf//g' `
+	TEST2NAME="${TESTNAME}-2"
+
+	time php weathermap --config $conf --image-uri tests/${TESTNAME}.png --dumpconfig tests/${TESTNAME}.cfg --output tests/${TESTNAME}.png --htmloutput tests/${TESTNAME}.html
+	time php weathermap --config tests/${TESTNAME}.cfg --image-uri tests/${TEST2NAME}.png --dumpconfig tests/${TEST2NAME}.cfg --output tests/${TEST2NAME}.png --htmloutput tests/${TEST2NAME}.html
+	compare tests/${TESTNAME}.png tests/${TEST2NAME}.png tests/${TESTNAME}-compare.png
+
+	sed s/$TESTNAME/XXXX/g < tests/${TESTNAME}.html > tests/${TESTNAME}.clean.html
+	sed s/$TEST2NAME/XXXX/g < tests/${TEST2NAME}.html > tests/${TEST2NAME}.clean.html
+	diff tests/${TESTNAME}.clean.html tests/${TEST2NAME}.clean.html
+	diff tests/${TESTNAME}.cfg tests/${TEST2NAME}.cfg
+
+#	sort < $conf > tests/${TESTNAME}.sorted
+#	sort < tests/${TESTNAME}.cfg > tests/${TESTNAME}.sorted2
+#	diff tests/${TESTNAME}.sorted tests/${TESTNAME}.sorted2
+	
+done

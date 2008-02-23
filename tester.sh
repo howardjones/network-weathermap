@@ -15,6 +15,8 @@ fi
 
 CONFIGS="configs/095-test.conf configs/suite-1.conf configs/suite-2.conf tests/torture.conf"
 
+echo > tests/results.html
+
 for conf in ${CONFIGS}; do
 	echo ========================================================================================
 	echo $conf
@@ -35,5 +37,7 @@ for conf in ${CONFIGS}; do
 #	sort < $conf > tests/${TESTNAME}.sorted
 #	sort < tests/${TESTNAME}.cfg > tests/${TESTNAME}.sorted2
 #	diff tests/${TESTNAME}.sorted tests/${TESTNAME}.sorted2
+
+	echo "<img src='${TESTNAME}-compare.png'><br />" >> tests/results.html
 	
 done

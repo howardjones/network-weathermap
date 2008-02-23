@@ -280,10 +280,6 @@ class WeatherMap extends WeatherMapBase
 		$this->imagefile='';
 		$this->imageuri='';
 
-		// $this->bg_r = 255;
-		// $this->bg_g = 255;
-		// $this->bg_b = 255;
-
 		$this->fonts=array();
 
 		// Adding these makes the editor's job a little easier, mainly
@@ -1440,6 +1436,7 @@ function ReadConfig($filename)
 				// these are all dealt with from this one array. The special-cases
 				// follow on from that
 				$config_keywords = array(
+						array('GLOBAL','/^\s*BACKGROUND\s+(.*)\s*$/i',array('background'=>1)),
 						array('GLOBAL','/^\s*HTMLOUTPUTFILE\s+(.*)\s*$/i',array('htmloutputfile'=>1)),
 						array('GLOBAL','/^\s*IMAGEOUTPUTFILE\s+(.*)\s*$/i',array('imageoutputfile'=>1)),
 						array('GLOBAL','/^\s*TITLE\s+(.*)\s*$/i',array('title'=>1)),
@@ -1475,7 +1472,10 @@ function ReadConfig($filename)
 						
 						array('LINK', '/^\s*OUTBWFORMAT\s+(.*)\s*$/i', array('bwlabelformats[OUT]'=>1,'labelstyle'=>'--')),
 						array('LINK', '/^\s*INBWFORMAT\s+(.*)\s*$/i', array('bwlabelformats[IN]'=>1,'labelstyle'=>'--')),
-
+						array('NODE','/^\s*ICON\s+none\s*$/i',array('iconfile'=>'')),
+						array('NODE','/^\s*ICON\s+(\S+)\s*$/i',array('iconfile'=>1)),
+						array('NODE','/^\s*ICON\s+(\d+)\s+(\d+)\s+(\S+)\s*$/i',array('iconfile'=>3, 'iconscalew'=>1, 'iconscaleh'=>2)),
+						
 						array('NODE','/^\s*NOTES\s+(.*)\s*$/i',array('notes[IN]'=>1,'notes[OUT]'=>1)),
 						array('LINK','/^\s*NOTES\s+(.*)\s*$/i',array('notes[IN]'=>1,'notes[OUT]'=>1)),
 						array('LINK','/^\s*INNOTES\s+(.*)\s*$/i',array('notes[IN]'=>1)),
@@ -1506,7 +1506,6 @@ function ReadConfig($filename)
 					{
 						if(preg_match($keyword[1],$buffer,$matches))
 						{
-							#print "NEW CODE MATCHED $buffer";
 							foreach ($keyword[2] as $key=>$val)
 							{
 								// if it's a number, then it;s a match number,
@@ -1517,420 +1516,19 @@ function ReadConfig($filename)
 								{
 									$index = constant($m[2]);
 									$key = $m[1];
-									# print "Setting $last_seen::".$curobj->name."::".$key."[[".$index."]] to $val\n";
 									$curobj->{$key}[$index] = $val;
 								}
 								else
 								{
-									##print "Setting $last_seen::$key to $val\n";
 									$curobj->$key = $val;
 								}
-								# print "Value is: ".$curobj->$key."\n";
 							}
 							$linematched++;
+							break;
 						}
 					}
 				}
 
-				################################################################
-				################################################################
-				################################################################
-				################################################################
-				################################################################
-				
-				if(1==0)
-				{
-					if (preg_match("/^\s*(IN|OUT)?OVERLIBCAPTION\s+(.+)\s*$/i", $buffer, $matches))
-					{
-						//if($curobj)
-						//{
-							if($last_seen == 'NODE' && $matches[1] != '') {
-								warn("IN/OUTOVERLIBCAPTION make no sense for a NODE!\n");
-							} else if($last_seen == 'LINK' ) {
-								if($matches[1] == '') {
-									$curobj->overlibcaption[IN]=$matches[2];
-									$curobj->overlibcaption[OUT]=$matches[2];
-								}
-								if($matches[1] == 'IN') {
-									$curobj->overlibcaption[IN]=$matches[2];
-								}
-								if($matches[1] == 'OUT') {
-									$curobj->overlibcaption[OUT]=$matches[2];
-								}
-								$linematched++;
-							}
-						//}
-					}				
-					if (preg_match("/^\s*(IN|OUT)?INFOURL\s+(\S+)\s*$/i", $buffer, $matches))
-					{
-						//if($curobj)
-						//{
-							if($last_seen == 'NODE' && $matches[1] != '') {
-								warn("IN/OUTINFOURL make no sense for a NODE!\n");
-							} else if($last_seen == 'LINK' ) {
-								if($matches[1] == '') {
-									$curobj->infourl[IN]=$matches[2];
-									$curobj->infourl[OUT]=$matches[2];
-								}
-								if($matches[1] == 'IN') {
-									$curobj->infourl[IN]=$matches[2];
-								}
-								if($matches[1] == 'OUT') {
-									$curobj->infourl[OUT]=$matches[2];
-								}
-								$linematched++;
-							}
-						//}
-					}
-
-					if (preg_match("/^\s*(IN|OUT)?NOTES\s+(.*)\s*$/i", $buffer, $matches))
-					{
-						//if($curobj)
-						//{
-							if($last_seen == 'NODE' && $matches[1] != '') {
-								warn("IN/OUTNOTES make no sense for a NODE!\n");
-							} else if($last_seen == 'LINK' ) {
-								if($matches[1] == '') {
-									$curobj->notestext[IN]=$matches[2];
-									$curobj->notestext[OUT]=$matches[2];
-								}
-								if($matches[1] == 'IN') {
-									$curobj->notestext[IN]=$matches[2];
-								}
-								if($matches[1] == 'OUT') {
-									$curobj->notestext[OUT]=$matches[2];
-								}
-								$linematched++;
-							}
-						//}
-					}
-					if ( ($last_seen == 'LINK') && (preg_match("/^\s*INBWFORMAT\s+(.*)\s*$/i", $buffer, $matches)))
-					{
-						$curobj->bwlabelformats[IN] = $matches[1];
-						$curobj->labelstyle='--'; // mark that at least one direction is special
-						$linematched++;
-					}
-
-					
-					if ( ($last_seen == 'LINK') && (preg_match("/^\s*OUTBWFORMAT\s+(.*)\s*$/i", $buffer, $matches)))
-					{
-						$curlink->bwlabelformats[OUT] = $matches[1];
-						$curlink->labelstyle='--'; // mark that at least one direction is special
-						$linematched++;
-					}
-					if ($last_seen == 'LINK' && preg_match(
-						"/^\s*SPLITPOS\s+(\d+)\s*$/i", $buffer,
-						$matches))
-					{
-						$v = intval($matches[1]);
-						if($v<0)
-						{
-							warn("SPLITPOS should be a percentage at line $linecount\n");
-						} elseif($v>100) {
-							warn("SPLITPOS should be a percentage at line $linecount\n");
-						} else {
-							$curobj->splitpos = $matches[1];
-						}
-						$linematched++;
-					}
-
-					if ($last_seen == 'LINK' && preg_match(
-						"/^\s*BWLABELPOS\s+(\d+)\s(\d+)\s*$/i", $buffer,
-						$matches))
-					{
-						$curlink->labeloffset_in = $matches[1];
-						$curlink->labeloffset_out = $matches[2];
-						$linematched++;
-					}
-					if (preg_match("/^\s*OVERLIBHEIGHT\s+(\d+)\s*$/i", $buffer, $matches))
-					{
-						if($curobj)
-						{
-							$curobj->overlibheight=$matches[1];
-							$linematched++;
-						}
-					}
-
-					if (preg_match("/^\s*OVERLIBWIDTH\s+(\d+)\s*$/i", $buffer, $matches))
-					{
-						if($curobj)
-						{
-							$curobj->overlibwidth=$matches[1];
-							$linematched++;
-						}
-					}
-					if( ($last_seen == 'LINK') && preg_match("/^\s*USESCALE\s+([A-Za-z][A-Za-z0-9_]*)\s*$/i",$buffer,$matches))
-					{
-						$curlink->usescale = $matches[1];
-
-						$linematched++;
-					}
-					if (preg_match("/^\s*TITLE\s+(.*)\s*$/i", $buffer, $matches))
-					{
-						$this->title=$matches[1];
-						$linematched++;
-					}
-
-					if (preg_match("/^\s*HTMLOUTPUTFILE\s+(.*)\s*$/i", $buffer, $matches))
-					{
-						$this->htmloutputfile=trim($matches[1]);
-						debug("SET HTMLOUTPUTFILE to $matches[1]\n");
-						$linematched++;
-					}
-
-					if (preg_match("/^\s*IMAGEOUTPUTFILE\s+(.*)\s*$/i", $buffer, $matches))
-					{
-						$this->imageoutputfile=trim($matches[1]);
-						debug("SET IMAGEOUTPUTFILE to $matches[1]\n");
-						$linematched++;
-					}
-					if ($last_seen == '---' && preg_match(
-						"/^\s*ARROWSTYLE\s+(classic|compact)\s*$/i", $buffer, $matches))
-					{
-						warn ("Global ARROWSTYLE is deprecated. Use LINK DEFAULT and ARROWSTYLE instead.\n");
-						$this->defaultlink->arrowstyle=$matches[1];
-						$linematched++;
-					}
-					
-					if (preg_match("/^\s*HTMLSTYLE\s+(static|overlib)\s*$/i", $buffer, $matches))
-					{
-						$this->htmlstyle=$matches[1];
-						$linematched++;
-					}
-
-					if ($last_seen == 'LINK' && preg_match(
-						"/^\s*ARROWSTYLE\s+(classic|compact)\s*$/i", $buffer, $matches))
-					{
-						$curlink->arrowstyle=$matches[1];
-						$linematched++;
-					}
-				
-					if (preg_match("/^\s*BWLABELS\s+(bits|percent|none)\s*$/i", $buffer, $matches))
-					{
-						# $this->labelstyle = strtolower($matches[1]);
-						$this->defaultlink->labelstyle=strtolower($matches[1]);
-						warn
-							("BWLABELS is deprecated. Use LINK DEFAULT and BWLABEL instead. config line $linecount\n");
-
-						$linematched++;
-					}
-
-					if (preg_match("/^\s*TIMEPOS\s+(\d+)\s+(\d+)(.*)\s*$/i", $buffer, $matches))
-					{
-						$this->timex=$matches[1];
-						$this->timey=$matches[2];
-						$extra=trim($matches[3]);
-
-						if ($extra != '')
-							$this->stamptext=$extra;
-
-						$linematched++;
-					}
-					if (preg_match("/^\s*KEYFONT\s+(\d+)\s*$/i", $buffer, $matches))
-					{
-						$this->keyfont=$matches[1];
-						$linematched++;
-					}
-
-					if (preg_match("/^\s*TIMEFONT\s+(\d+)\s*$/i", $buffer, $matches))
-					{
-						$this->timefont=$matches[1];
-						$linematched++;
-					}
-
-					if (preg_match("/^\s*TITLEFONT\s+(\d+)\s*$/i", $buffer, $matches))
-					{
-						$this->titlefont=$matches[1];
-						$linematched++;
-					}
-
-					if (preg_match("/^\s*NODEFONT\s+(\d+)\s*$/i", $buffer, $matches))
-					{
-						$this->nodefont=$matches[1];
-						$this->defaultnode->labelfont=$matches[1];
-						warn
-							("NODEFONT is deprecated. Use NODE DEFAULT and LABELFONT instead. config line $linecount\n");
-						$linematched++;
-					}
-
-					if (preg_match("/^\s*LINKFONT\s+(\d+)\s*$/i", $buffer, $matches))
-					{
-						$this->linkfont=$matches[1];
-						$this->defaultlink->bwfont=$matches[1];
-						warn
-							("LINKFONT is deprecated. Use LINK DEFAULT and BWFONT instead. config line $linecount\n");
-						$linematched++;
-					}
-					if (preg_match("/^\s*TITLEPOS\s+(-?\d+)\s+(-?\d+)\s+(.*)\s*$/i", $buffer, $matches))
-					{
-						$this->titlex=$matches[1];
-						$this->titley=$matches[2];
-						$extra=trim($matches[3]);
-
-						if ($extra != '')
-							$this->title=$extra;
-
-						$linematched++;
-					}
-
-					if ($last_seen == 'LINK' && preg_match(
-						"/^\s*COMMENTPOS\s+(\d+)\s(\d+)\s*$/i", $buffer,
-						$matches))
-					{
-						$curlink->commentoffset_in = $matches[1];
-						$curlink->commentoffset_out = $matches[2];
-						$linematched++;
-					}
-					if ($last_seen == 'NODE' && preg_match("/^\s*LABELFONT\s+(\d+)\s*$/i", $buffer, $matches))
-					{
-						$curnode->labelfont=$matches[1];
-						$linematched++;
-					}
-
-					if ($last_seen == 'NODE' && preg_match(
-						"/^\s*LABELOFFSET\s+([-+]?\d+)\s+([-+]?\d+)\s*$/i", $buffer,
-						$matches))
-					{
-						$curnode->labeloffsetx=$matches[1];
-						$curnode->labeloffsety=$matches[2];
-
-						$linematched++;
-					}
-
-					if ($last_seen == 'NODE' && preg_match(
-						"/^\s*LABELOFFSET\s+(C|NE|SE|NW|SW|N|S|E|W)\s*$/i", $buffer,
-						$matches))
-					{
-						$curnode->labeloffset=$matches[1];
-						$linematched++;
-					}
-					if ($last_seen == 'LINK' && preg_match(
-						// "/^\s*VIASTYLE\s+(curved|angled)\s*$/i", $buffer,
-						"/^\s*VIASTYLE\s+(curved)\s*$/i", $buffer,
-						$matches))
-					{
-						$curlink->viastyle=$matches[1];
-						$linematched++;
-					}
-				
-					if (preg_match("/^\s*POSITION\s+([-+]?\d+)\s+([-+]?\d+)\s*$/i", $buffer, $matches))
-					{
-						if ($last_seen == 'NODE')
-						{
-							$curnode->x=$matches[1];
-							$curnode->y=$matches[2];
-							$linematched++;
-						}
-					}
-
-					if (preg_match("/^\s*POSITION\s+(\S+)\s+([-+]?\d+)\s+([-+]?\d+)\s*$/i", $buffer, $matches))
-					{
-						if ($last_seen == 'NODE')
-						{
-							$curnode->relative_to = $matches[1];
-							$curnode->relative_resolved = FALSE;
-							$curnode->x = $matches[2];
-							$curnode->y = $matches[3];
-							$curnode->original_x = $matches[2];
-							$curnode->original_y = $matches[3];
-							$linematched++;
-						}
-					}
-
-					if (preg_match("/^\s*ZORDER\s+([-+]?\d+)$/i", $buffer, $matches))
-					{
-						$curobj->zorder = $matches[1];
-						$linematched++;
-					}
-
-					if (preg_match("/^\s*LABEL\s+(.*)\s*$/i", $buffer, $matches))
-					{
-						if ($last_seen == 'NODE')
-						{
-							$curnode->label=$matches[1];
-							$linematched++;
-						}
-					}
-					
-					if (preg_match("/^\s*WIDTH\s+(\d+)\s*$/i", $buffer, $matches))
-					{
-						if ($last_seen == 'LINK')
-						{
-							$curlink->width=$matches[1];
-							$linematched++;
-						}
-						else // we're talking about the global WIDTH
-						{
-							$this->width=$matches[1];
-							$linematched++;
-						}
-					}
-
-					if (preg_match("/^\s*HEIGHT\s+(\d+)\s*$/i", $buffer, $matches))
-					{
-						$this->height=$matches[1];
-						$linematched++;
-					}
-
-					if ($last_seen == 'LINK' && preg_match(
-					"/^\s*DUPLEX\s+(full|half)\s*$/i", $buffer,
-					$matches))
-					{
-						$curlink->duplex = strtolower($matches[1]);
-						$linematched++;
-					}
-					
-					if ( ($last_seen == 'LINK') && (preg_match("/^\s*INCOMMENT\s+(.*)\s*$/i", $buffer, $matches)))
-					{
-						# $curlink->incomment = $matches[1];
-						$curlink->comments[IN] = $matches[1];
-						$linematched++;
-					}
-
-					if ( ($last_seen == 'LINK') && (preg_match("/^\s*OUTCOMMENT\s+(.*)\s*$/i", $buffer, $matches)))
-					{
-						# $curlink->outcomment = $matches[1];
-						$curlink->comments[OUT] = $matches[1];
-						$linematched++;
-					}
-					
-					if ($last_seen == 'LINK' && preg_match("/^\s*BWFONT\s+(\d+)\s*$/i", $buffer, $matches))
-					{
-						$curlink->bwfont=$matches[1];
-						$linematched++;
-					}
-					
-					if ($last_seen == 'LINK' && preg_match("/^\s*COMMENTFONT\s+(\d+)\s*$/i", $buffer, $matches))
-					{
-						$curlink->commentfont=$matches[1];
-						$linematched++;
-					}
-					
-					if ($last_seen == 'LINK' && preg_match(
-					"/^\s*BWSTYLE\s+(classic|angled)\s*$/i", $buffer,
-					$matches))
-					{
-						$curlink->labelboxstyle=$matches[1];
-						$linematched++;
-					}
-					
-					if ($last_seen == 'LINK' && preg_match(
-					"/^\s*LINKSTYLE\s+(twoway|oneway)\s*$/i", $buffer,
-					$matches))
-					{
-						$curlink->linkstyle=$matches[1];
-						$linematched++;
-					}
-					
-					
-				}
-				
-				################################################################
-				################################################################
-				################################################################
-				################################################################
-				################################################################
-				
 				if (preg_match("/^\s*NODES\s+(\S+)\s+(\S+)\s*$/i", $buffer, $matches))
 				{
 					if ($last_seen == 'LINK')
@@ -1960,8 +1558,7 @@ function ReadConfig($filename)
 
 							if (!array_key_exists($nodenames[$i], $this->nodes))
 							{
-								warn ("Unknown node '" . $nodenames[$i]
-									. "' on line $linecount of config\n");
+								warn ("Unknown node '" . $nodenames[$i] . "' on line $linecount of config\n");
 								$valid_nodes--;
 							}
 						}
@@ -2000,7 +1597,6 @@ function ReadConfig($filename)
 					}
 				}
 				
-
 				if ($last_seen == 'LINK' && preg_match(
 					"/^\s*BWLABEL\s+(bits|percent|unformatted|none)\s*$/i", $buffer,
 					$matches))
@@ -2056,68 +1652,19 @@ function ReadConfig($filename)
 					$curobj->SetBandwidth($matches[2], $matches[2]);
 					$linematched++;
 				}
-
-				if (preg_match("/^\s*ICON\s+(\S+)\s*$/i", $buffer, $matches))
-				{
-					if ($last_seen == 'NODE')
-					{
-						if($matches[1]=='none')
-						{
-							$curnode->iconfile='';
-						}
-						else
-						{
-							$curnode->iconfile=$matches[1]; 
-							$this->used_images[] = $matches[1];
-						}
-						$linematched++;
-					}
-				}
-
-				if (preg_match("/^\s*ICON\s+(\d+)\s+(\d+)\s+(\S+)\s*$/i", $buffer, $matches))
-				{
-					if ($last_seen == 'NODE')
-					{
-						// allow some special names - these produce "artificial" icons
-						if($matches[3]=='nink' || $matches[3]=='box' || $matches[3]=='rbox' || $matches[3]=='round' || $matches[3]=='inpie' || $matches[3]=='outpie' )
-						{
-							// special icons aren't added to used_images, so they won't appear in picklist for editor
-							// (the editor doesn't do icon scaling, and these *require* a scale, aside from anything else)
-							$curnode->iconfile=$matches[3];
-							$this->used_images[] = $matches[3];
-						}
-						else
-						{
-							$curnode->iconfile=$matches[3];
-							$this->used_images[] = $matches[3];
-						}
-						$curnode->iconscalew = $matches[1];
-						$curnode->iconscaleh = $matches[2];
-						$linematched++;
-					}
-				}
-
+				
 				if (preg_match("/^\s*SET\s+(\S+)\s+(.*)\s*$/i", $buffer, $matches))
 				{
-//					if($curobj)
-	//				{
-						// THIS IS NOT UPDATING THE 'REAL' DEFAULT NODE
 						$curobj->add_hint($matches[1],$matches[2]);
 						$linematched++;
-						# warn("POST-SET ".$curobj->name."::".var_dump($curobj->hints)."::\n");
-						# warn("DEFAULT FIRST SAYS ".$this->defaultnode->hints['sigdigits']."\n");
-		//			}
 				}				
 				
 				if (preg_match("/^\s*(IN|OUT)?OVERLIBGRAPH\s+(.+)$/i", $buffer, $matches))
-				# if (preg_match("/^\s*OVERLIBGRAPH\s+(\S+)\s*$/i", $buffer, $matches))
 				{
-					//if($curobj)
-					//{
-						if($last_seen == 'NODE' && $matches[1] != '') {
+					if($last_seen == 'NODE' && $matches[1] != '') {
 							warn("IN/OUTOVERLIBGRAPH make no sense for a NODE!\n");
 						} else if($last_seen == 'LINK' || $last_seen=='NODE' ) {
-							// XXX - *should* add each in turn to the appropriate array
+					
 							$urls = preg_split('/\s+/', $matches[2], -1, PREG_SPLIT_NO_EMPTY);
 
 							if($matches[1] == 'IN') $index = IN;
@@ -2130,10 +1677,9 @@ function ReadConfig($filename)
 							}
 							$linematched++;
 						}
-					//}
 				}			
+				
 
-				// if ($last_seen == 'LINK' && preg_match("/^\s*VIA\s+(\d+)\s+(\d+)\s*$/i", $buffer, $matches))
 				if ($last_seen == 'LINK' && preg_match("/^\s*VIA\s+([-+]?\d+)\s+([-+]?\d+)\s*$/i", $buffer, $matches))
 				{
 					$curlink->vialist[]=array
@@ -2206,7 +1752,7 @@ function ReadConfig($filename)
 					$this->colours[$matches[1]][$key]['key']=$key;
 
 					$tag = $matches[10];
-###					warn("$key $tag\n");
+
 					$this->colours[$matches[1]][$key]['tag']=$tag;
 
 					$this->colours[$matches[1]][$key]['bottom'] = (float)($matches[2]);
@@ -2329,14 +1875,7 @@ function ReadConfig($filename)
 					$this->defaultlink->owner->kilo=$matches[1];
 					$linematched++;
 				}
-
-				if (preg_match("/^\s*BACKGROUND\s+(.+)\s*$/i", $buffer, $matches))
-				{
-					$this->background=$matches[1];
-					$this->used_images[] = $matches[1];
-					$linematched++;
-				}
-
+				
 				if (preg_match(
 					"/^\s*(TIME|TITLE|KEYBG|KEYTEXT|KEYOUTLINE|BG)COLOR\s+(\d+)\s+(\d+)\s+(\d+)\s*$/i",
 					$buffer,
@@ -2353,7 +1892,6 @@ function ReadConfig($filename)
 					$linematched++;
 				}
 
-				# "/^\s*(LABELFONT|LABELFONTSHADOW|LABELBG|LABELOUTLINE)COLOR\s+(\d+)\s+(\d+)\s+(\d+)\s*$/i",
 				if (($last_seen == 'NODE') && (preg_match(
 					"/^\s*(AICONOUTLINE|AICONFILL|LABELFONT|LABELFONTSHADOW|LABELBG|LABELOUTLINE)COLOR\s+((\d+)\s+(\d+)\s+(\d+)|none|contrast|copy)\s*$/i",
 					$buffer,
@@ -2426,7 +1964,6 @@ function ReadConfig($filename)
 
 		if ($last_seen == "NODE")
 		{
-			# $this->nodes[$curnode->name] = $curnode;
 			if ($curnode->name == 'DEFAULT')
 			{
 				$this->defaultnode=$curnode;
@@ -2441,7 +1978,6 @@ function ReadConfig($filename)
 
 		if ($last_seen == "LINK")
 		{
-			# $this->links[$curlink->name] = $curlink;
 			if ($curlink->name == 'DEFAULT')
 			{
 				$this->defaultlink=$curlink;
@@ -2490,7 +2026,7 @@ function ReadConfig($filename)
 		}
 	}
 	else { debug ("Already have $scalesseen scales, no defaults added.\n"); }
-
+	
 	$this->numscales['DEFAULT']=$scalesseen;
 	$this->configfile="$filename";
 
@@ -2548,19 +2084,12 @@ function ReadConfig($filename)
 
 	debug("-----------------------------------\n");
 
-	# warn("---\n\nDEFAULT NODE AGAIN::".var_dump($this->defaultnode->hints)."::\n");
-	#warn("DEFAULT NOW SAYS ".$this->defaultnode->hints['sigdigits']."\n");
-	#warn("North NOW SAYS ".$this->nodes['North']->hints['sigdigits']."\n");
-
 
 	debug("Running Pre-Processing Plugins...\n");
 	foreach ($this->preprocessclasses as $pre_class)
 	{
 		debug("Running $pre_class"."->run()\n");
-		# call_user_func(array($pre_class, 'run'), $this);
-		//call_user_func_array(array($pre_class, 'run'), array(&$this));
 		$this->plugins['pre'][$pre_class]->run(&$this);
-
 	}
 	debug("Finished Pre-Processing Plugins...\n");
 

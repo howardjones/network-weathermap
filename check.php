@@ -127,7 +127,7 @@
                   'imagecreatefromgif' => array(FALSE,FALSE,'GIF input support for ICON and BACKGROUND','an optional part of the GD library and the "gd" PHP extension'),
                   'imagejpeg' => array(FALSE,FALSE,'JPEG output support','an optional part of the GD library and the "gd" PHP extension'),
                   'imagegif' => array(FALSE,FALSE,'GIF output support','an optional part of the GD library and the "gd" PHP extension'),
-		  'imagefilter' => array(FALSE, FALSE, 'colorizing icons','a special function of the PHP-supplied GD library ONLY (not the external GD library)'),
+		  'imagefilter' => array(FALSE, FALSE, 'colorizing icons','a special function of the PHP-supplied GD library ONLY (not the external GD library'.($gdbuiltin?'':' that you are using').')'),
 		  'imagecopyresampled' => array(FALSE,FALSE,'Thumbnail creation in the Cacti plugin','an optional part of the GD library and the "gd" PHP extension'),
                   'imagettfbbox' => array(FALSE,FALSE,'TrueType font support','an optional part of the GD library and the "gd" PHP extension'),
                   'memory_get_usage' => array(FALSE,TRUE,'memory-usage debugging','not supported on all PHP versions and platforms')                 
@@ -232,7 +232,7 @@
     if($critical>0)
     {
         if($environment=='web') print "<div class=\"critical\">";
-		print wordwrap("There are problems with your PHP or server environment that will stop Weathermap from working. You need to correct this issues if you wish to use Weathermap.\n");
+		print wordwrap("There are problems with your PHP or server environment that will stop Weathermap from working. You need to correct these issues if you wish to use Weathermap.\n");
 		if($environment=='web') print "</div>";
     }
     else

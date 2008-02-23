@@ -181,7 +181,11 @@ class WeatherMapNode extends WeatherMapItem
 			$padfactor = 1.0;
 
 			$this->proclabel = $map->ProcessString($this->label,$this);
-
+			
+			// if screenshot_mode is enabled, wipe any letters to X and wipe any IP address to 127.0.0.1
+			// hopefully that will preserve enough information to show cool stuff without leaking info
+			if($map->get_hint('screenshot_mode')==1)  $this->proclabel = screenshotify($this->proclabel);
+			
 			list($strwidth, $strheight) = $map->myimagestringsize($this->labelfont, $this->proclabel);
 
 			$boxwidth = ($strwidth * $padfactor) + $padding;
@@ -682,7 +686,6 @@ class WeatherMapNode extends WeatherMapItem
 					array('zorder','ZORDER',CONFIG_TYPE_LITERAL),
 					array('labeloffset','LABELOFFSET',CONFIG_TYPE_LITERAL),
 					array('labelfont','LABELFONT',CONFIG_TYPE_LITERAL),
-					array('overlibcaption','OVERLIBCAPTION',CONFIG_TYPE_LITERAL),
 					array('overlibwidth','OVERLIBWIDTH',CONFIG_TYPE_LITERAL),
 					array('overlibheight','OVERLIBHEIGHT',CONFIG_TYPE_LITERAL),
 
@@ -711,6 +714,10 @@ class WeatherMapNode extends WeatherMapItem
 			$comparison=($this->name == 'DEFAULT'
 			? $this->inherit_fieldlist['infourl'][IN] : $defdef->infourl[IN]);
 			if ($this->infourl[IN] != $comparison) { $output.="\tINFOURL " . $this->infourl[IN] . "\n"; }
+			
+			$comparison=($this->name == 'DEFAULT'
+			? $this->inherit_fieldlist['overlibcaption'][IN] : $defdef->overlibcaption[IN]);
+			if ($this->overlibcaption[IN] != $comparison) { $output.="\tOVERLIBCAPTION " . $this->overlibcaption[IN] . "\n"; }
 
 			// IN/OUT are the same, so we can use the simpler form here
 			$comparison=($this->name == 'DEFAULT'
@@ -755,14 +762,11 @@ class WeatherMapNode extends WeatherMapItem
 
 
 			$comparison = ($this->name == 'DEFAULT'
-				? $this->inherit_fieldlist['useiconscale'] : $defdef->useiconscale);
-			$comparison2 = ($this->name == 'DEFAULT'
-				? $this->inherit_fieldlist['iconscalevar'] : $defdef->iconscalevar);
-
-			if ( ($this->useiconscale != $comparison) || ($this->iconscalevar != $comparison2) )
-			{ $output.="\tUSEICONSCALE " . $this->useiconscale . " " . $this->iconscalevar . "\n"; }
-
-
+				? $this->inherit_fieldlist['useiconscale'] : $defdef->useiconscale) . " " .
+				($this->name == 'DEFAULT' ? $this->inherit_fieldlist['iconscalevar'] : $defdef->iconscalevar);
+			$val = $this->useiconscale . " " . $this->iconscalevar;
+				
+			if ( $val != $comparison) { $output.="\tUSEICONSCALE " .$val . "\n"; }
 
 			$comparison = ($this->name == 'DEFAULT'
 			? $this->inherit_fieldlist['labeloffsetx'] : $defdef->labeloffsetx) . " " . ($this->name == 'DEFAULT'
@@ -771,13 +775,14 @@ class WeatherMapNode extends WeatherMapItem
 
 			if ($comparison != $val ) { $output.="\tLABELOFFSET " . $val . "\n"; }
 
-			$comparison=($this->name == 'DEFAULT' ? $this->inherit_fieldlist['x'] : $defdef->x);
-			$comparison2=($this->name == 'DEFAULT' ? $this->inherit_fieldlist['y'] : $defdef->y);
-
-			if (($this->x != $comparison) || ($this->y != $comparison2))
+			$comparison=($this->name == 'DEFAULT' ? $this->inherit_fieldlist['x'] : $defdef->x) . " " . 
+						($this->name == 'DEFAULT' ? $this->inherit_fieldlist['y'] : $defdef->y);
+			$val = $this->x . " " . $this->y;
+			
+			if ($val != $comparison)
 			{
 				if($this->relative_to == '')
-				{ $output.="\tPOSITION " . $this->x . " " . $this->y . "\n"; }
+				{ $output.="\tPOSITION " . $val . "\n"; }
 				else
 				{ $output.="\tPOSITION " . $this->relative_to . " " .  $this->original_x . " " . $this->original_y . "\n"; }
 			}

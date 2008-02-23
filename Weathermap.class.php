@@ -1281,6 +1281,8 @@ function DrawTimestamp($im, $font, $colour)
 function DrawTitle($im, $font, $colour)
 {
 	$string = $this->ProcessString($this->title,$this);
+	
+	if($this->get_hint('screenshot_mode')==1)  $string= screenshotify($string);
 
 	list($boxwidth, $boxheight)=$this->myimagestringsize($font, $string);
 
@@ -1453,12 +1455,12 @@ function ReadConfig($filename)
 						array('(LINK|GLOBAL)', "/^\s*HEIGHT\s+(\d+)\s*$/i", array('height'=>1)),
 						array('LINK', '/^\s*ARROWSTYLE\s+(classic|compact)\s*$/i', array('arrowstyle'=>1)),
 						array('LINK', '/^\s*VIASTYLE\s+(curved)\s*$/i', array('viastyle'=>1)),
-						array('LINK', '/^\s*INCOMMENT\s+(.*)\s*$/i', array('incomment'=>1)),
-						array('LINK', '/^\s*OUTCOMMENT\s+(.*)\s*$/i', array('outcomment'=>1)),
+						array('LINK', '/^\s*INCOMMENT\s+(.*)\s*$/i', array('comments[IN]'=>1)),
+						array('LINK', '/^\s*OUTCOMMENT\s+(.*)\s*$/i', array('comments[OUT]'=>1)),
 						array('LINK', '/^\s*BWFONT\s+(\d+)\s*$/i', array('bwfont'=>1)),
 						array('LINK', '/^\s*COMMENTFONT\s+(\d+)\s*$/i', array('commentfont'=>1)),
 						array('LINK', '/^\s*DUPLEX\s+(full|half)\s*$/i', array('duplex'=>1)),
-						array('LINK', '/^\s*BWSTYLE\s+(classic|angled)\s*$/i', array('bwstyle'=>1)),
+						array('LINK', '/^\s*BWSTYLE\s+(classic|angled)\s*$/i', array('labelboxstyle'=>1)),
 						array('LINK', '/^\s*LINKSTYLE\s+(twoway|oneway)\s*$/i', array('linkstyle'=>1)),
 						array('LINK', '/^\s*BWLABELPOS\s+(\d+)\s(\d+)\s*$/i', array('labeloffset_in'=>1,'labeloffset_out'=>2)),
 						array('LINK', '/^\s*COMMENTPOS\s+(\d+)\s(\d+)\s*$/i', array('commentoffset_in'=>1, 'commentoffset_out'=>2)),
@@ -1490,8 +1492,7 @@ function ReadConfig($filename)
 						array('LINK','/^\s*OVERLIBCAPTION\s+(.*)\s*$/i',array('overlibcaption[IN]'=>1,'overlibcaption[OUT]'=>1)),
 						array('LINK','/^\s*INOVERLIBCAPTION\s+(.*)\s*$/i',array('overlibcaption[IN]'=>1)),
 						array('LINK','/^\s*OUTOVERLIBCAPTION\s+(.*)\s*$/i',array('overlibcaption[OUT]'=>1)),
-						
-						
+												
 						array('(NODE|LINK)', "/^\s*ZORDER\s+([-+]?\d+)$/i", array('zorder'=>1)),
 						array('(NODE|LINK)', "/^\s*OVERLIBWIDTH\s+(\d+)\s*$/i", array('overlibwidth'=>1)),
 						array('(NODE|LINK)', "/^\s*OVERLIBHEIGHT\s+(\d+)\s*$/i", array('overlibheight'=>1)),
@@ -2523,6 +2524,7 @@ function PreloadMapHTML()
 	{
 		//   onmouseover="return overlib('<img src=graph.png>',DELAY,250,CAPTION,'$caption');"  onmouseout="return nd();"
 
+		// find the middle of the map
 		$center_x=$this->width / 2;
 		$center_y=$this->height / 2;
 
@@ -2545,171 +2547,94 @@ function PreloadMapHTML()
 				$type = $myobj->my_type();
 
 				$dirs = array();
-				if($type == 'LINK') $dirs = array(IN,OUT);
-				if($type == 'NODE') $dirs = array(IN);
-			}
-		}
-
-		foreach ($this->links as $link)
-		{
-			if ( ($link->overliburl[IN] != '') || ($link->notestext[IN] != '') || ($link->overliburl[OUT] != '') || ($link->notestext[OUT] != ''))
-			{
-				# $overlibhtml = "onmouseover=\"return overlib('&lt;img src=".$link->overliburl."&gt;',DELAY,250,CAPTION,'".$link->name."');\"  onmouseout=\"return nd();\"";
-				#  $a_x=$link->a->x;
-				# $b_x=$link->b->x;
-				# $a_y=$link->a->y;
-				# $b_y=$link->b->y;
-
-				$a_x=$this->nodes[$link->a->name]->x;
-				$a_y=$this->nodes[$link->a->name]->y;
-
-				$b_x=$this->nodes[$link->b->name]->x;
-				$b_y=$this->nodes[$link->b->name]->y;
-
-				$mid_x=($a_x + $b_x) / 2;
-				$mid_y=($a_y + $b_y) / 2;
-
-				# debug($link->overlibwidth."---".$link->overlibheight."---\n");
-
-				$left="";
-				$above="";
-
-				if ($link->overlibwidth != 0)
+				if($type == 'LINK') $dirs = array(IN=>array(0,2), OUT=>array(1,3));
+				if($type == 'NODE') $dirs = array(IN=>array(0,1,2,3));
+				
+				// check to see if any of the relevant things have a value
+				$change = "";
+				foreach ($dirs as $d=>$parts)
 				{
-					$left="WIDTH," . $link->overlibwidth . ",";
-
-					if ($mid_x > $center_x)
-						$left.="LEFT,";
+					$change .= join('',$myobj->overliburl[$d]);
+					$change .= $myobj->notestext[$d];
 				}
-
-				if ($link->overlibheight != 0)
+				if($change != '')
 				{
-					$above="HEIGHT," . $link->overlibheight . ",";
-
-					if ($mid_y > $center_y)
-						$above.="ABOVE,";
-				}
-
-	#			print "\n\n---------------\nLINK:".$link->name."\n";
-				$dirs = array(IN,OUT);
-
-				foreach ($dirs as $dir)
-				{
-					$caption = ($link->overlibcaption[$dir] != '' ? $link->overlibcaption[$dir] : $link->name);
-					$caption = $this->ProcessString($caption,$link);
-
-					$overlibhtml = "onmouseover=\"return overlib('";
-
-					$n = 0;
-					if(sizeof($link->overliburl[$dir]) > 0)
+					if($type=='NODE')
 					{
-						// print "ARRAY:".is_array($link->overliburl[$dir])."\n";
-						foreach ($link->overliburl[$dir] as $url)
+						$mid_x = $myobj->x;
+						$mid_y = $myobj->y;
+					}
+					if($type=='LINK')
+					{
+						$a_x=$this->nodes[$myobj->a->name]->x;
+						$a_y=$this->nodes[$myobj->a->name]->y;
+
+						$b_x=$this->nodes[$myobj->b->name]->x;
+						$b_y=$this->nodes[$myobj->b->name]->y;
+
+						$mid_x=($a_x + $b_x) / 2;
+						$mid_y=($a_y + $b_y) / 2;
+					}
+					$left=""; $above="";
+				
+					if ($myobj->overlibwidth != 0)
+					{
+						$left="WIDTH," . $myobj->overlibwidth . ",";
+
+						if ($mid_x > $center_x) $left.="LEFT,";
+					}
+					
+					if ($myobj->overlibheight != 0)
+					{
+						$above="HEIGHT," . $myobj->overlibheight . ",";
+
+						if ($mid_y > $center_y) $above.="ABOVE,";
+					}
+					
+					foreach ($dirs as $dir=>$parts)
+					{
+						$caption = ($myobj->overlibcaption[$dir] != '' ? $myobj->overlibcaption[$dir] : $myobj->name);
+						$caption = $this->ProcessString($caption,$myobj);
+
+						$overlibhtml = "onmouseover=\"return overlib('";
+
+						$n = 0;
+						if(sizeof($myobj->overliburl[$dir]) > 0)
 						{
-							if($n>0) { $overlibhtml .= '&lt;br /&gt;'; }
-							$overlibhtml .= "&lt;img src=" . $this->ProcessString($url,$link) . "&gt;";
-							$n++;
+							// print "ARRAY:".is_array($link->overliburl[$dir])."\n";
+							foreach ($myobj->overliburl[$dir] as $url)
+							{
+								if($n>0) { $overlibhtml .= '&lt;br /&gt;'; }
+								$overlibhtml .= "&lt;img src=" . $this->ProcessString($url,$myobj) . "&gt;";
+								$n++;
+							}
 						}
-					}
-					# print "Added $n for $dir\n";
-					if($link->notestext[$dir] != '')
-					{
-						# put in a linebreak if there was an image AND notes
-						if($n>0) $overlibhtml .= '&lt;br /&gt;';
-						$note = $this->ProcessString($link->notestext[$dir],$link);
-						$note = htmlspecialchars($note, ENT_NOQUOTES);
-						$note=str_replace("'", "\\&apos;", $note);
-						$note=str_replace('"', "&quot;", $note);
-						$overlibhtml .= $note;
-					}
-					$overlibhtml .= "',DELAY,250,${left}${above}CAPTION,'" . $caption
-					. "');\"  onmouseout=\"return nd();\"";
-
-
-					if($dir==IN) $parts = array(0,2);
-					if($dir==OUT) $parts = array(1,3);
-
-					foreach ($parts as $part)
-					{
-						$areaname = "LINK:" . $link->name . ":" . $part;
-						$this->imap->setProp("extrahtml", $overlibhtml, $areaname);
-						if ( ($this->htmlstyle != 'editor') && ($link->infourl[$dir] != '') ) {
-							$this->imap->setProp("href", $this->ProcessString($link->infourl[$dir],$link), $areaname);
-						}
-					}
-				}
-
-			}
-		}
-
-		foreach ($this->nodes as $node)
-		{
-			if ( ($node->overliburl[IN] != '') || ($node->notestext[IN] != '') )
-			{
-				# $overlibhtml = "onmouseover=\"return overlib('&lt;img src=".$node->overliburl."&gt;',DELAY,250,CAPTION,'".$node->name."');\"  onmouseout=\"return nd();\"";
-
-				# debug ($node->overlibwidth . "---" . $node->overlibheight . "---\n");
-
-				$left="";
-				$above="";
-
-				if ($node->overlibwidth != 0)
-				{
-					$left="WIDTH," . $node->overlibwidth . ",";
-
-					if ($node->x > $center_x)
-						$left.="LEFT,";
-				}
-
-				if ($node->overlibheight != 0)
-				{
-					$above="HEIGHT," . $node->overlibheight . ",";
-
-					if ($node->y > $center_y)
-						$above.="ABOVE,";
-				}
-
-				$caption = ($node->overlibcaption[IN] != '' ? $node->overlibcaption[IN] : $node->name);
-				$caption  = $this->ProcessString($caption,$node);
-
-					$overlibhtml = "onmouseover=\"return overlib('";
-
-					$n = 0;
-					if(sizeof($node->overliburl[IN]) > 0)
-					{
-						// print "ARRAY:".is_array($link->overliburl[IN])."\n";
-						foreach ($node->overliburl[IN] as $url)
+						# print "Added $n for $dir\n";
+						if($myobj->notestext[$dir] != '')
 						{
-							if($n>0) { $overlibhtml .= '&lt;br /&gt;'; }
-							$overlibhtml .= "&lt;img src=" . $this->ProcessString($url,$node) . "&gt;";
-							$n++;
+							# put in a linebreak if there was an image AND notes
+							if($n>0) $overlibhtml .= '&lt;br /&gt;';
+							$note = $this->ProcessString($myobj->notestext[$dir],$myobj);
+							$note = htmlspecialchars($note, ENT_NOQUOTES);
+							$note=str_replace("'", "\\&apos;", $note);
+							$note=str_replace('"', "&quot;", $note);
+							$overlibhtml .= $note;
+						}
+						$overlibhtml .= "',DELAY,250,${left}${above}CAPTION,'" . $caption
+						. "');\"  onmouseout=\"return nd();\"";
+						
+						foreach ($parts as $part)
+						{
+							$areaname = $type.":" . $myobj->name . ":" . $part;
+							$this->imap->setProp("extrahtml", $overlibhtml, $areaname);
+							if ( ($this->htmlstyle != 'editor') && ($myobj->infourl[$dir] != '') ) {
+								$this->imap->setProp("href", $this->ProcessString($myobj->infourl[$dir],$myobj), $areaname);
+							}
 						}
 					}
-					# print "Added $n for $dir\n";
-
-				if($node->notestext[IN] != '')
-				{
-					# put in a linebreak if there was an image AND notes
-					if($node->overliburl[IN] != '') $overlibhtml .= '&lt;br /&gt;';
-					$note = $this->ProcessString($node->notestext[IN],$node);
-					$note = htmlspecialchars($note, ENT_NOQUOTES);
-					$note=str_replace("'", "\\&apos;", $note);
-					$note=str_replace('"', "&quot;", $note);
-					$overlibhtml .= $note;
+				
 				}
-				$overlibhtml .= "',DELAY,250,${left}${above}CAPTION,'" . $caption
-				. "');\"  onmouseout=\"return nd();\"";
-
-				# $overlibhtml .= " onclick=\"return overlib('Some Test or other',CAPTION,'MENU',)\"";
-
-				for($i=0; $i<4; $i++)
-				{
-					$areaname = "NODE:" . $node->name . ":$i";
-					$this->imap->setProp("extrahtml", $overlibhtml, $areaname);
-					if ( ($this->htmlstyle != 'editor') && ($node->infourl[IN] != '') ) {
-						$this->imap->setProp("href", $this->ProcessString($node->infourl[IN],$node), $areaname);
-					}
-				}
+				
 			}
 		}
 	}

@@ -25,7 +25,8 @@ helptexts.map_default = 'This is where help appears for maps';
 helptexts.node_default = 'This is where help appears for nodes';
 helptexts.tb_defaults = 'or click a Node or Link to edit it\'s properties';
 
-addEvent(window, 'load', initJS);
+// addEvent(window, 'load', initJS);
+$(document).ready(initJS);
 addEvent(window, 'unload', cleanupJS);
 
 function addEvent(obj, evType, fn)
@@ -433,7 +434,7 @@ function cactipicker()
         }
 
     // newWindow.location = "cacti-pick.php?command=link_step1";
-    newWindow.location = "cacti-pick-ng.php?command=link_step1";
+    newWindow.location = "cacti-pick.php?command=link_step1";
     }
 
 
@@ -451,7 +452,7 @@ function nodecactipicker()
         newWindow.focus();
         }
 
-        newWindow.location = "cacti-pick-ng.php?command=node_step1";
+        newWindow.location = "cacti-pick.php?command=node_step1";
     }
 
 function show_context_help(itemid, targetid)
@@ -728,7 +729,15 @@ function show_node(name)
         
         if(mynode.iconfile != '')
         {
-            document.frmMain.node_iconfilename.value = mynode.iconfile;
+			console.log(mynode.iconfile.substring(0,2));
+			if(mynode.iconfile.substring(0,2)=='::')
+			{
+				document.frmMain.node_iconfilename.value = '--AICON--';
+			}
+			else
+			{
+				document.frmMain.node_iconfilename.value = mynode.iconfile;
+			}
         }
         else
         {

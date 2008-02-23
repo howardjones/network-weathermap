@@ -1,6 +1,5 @@
 <?php
-	$use_jquery = TRUE;
-
+	
 require_once 'editor.inc.php';
 require_once 'Weathermap.class.php';
 
@@ -287,9 +286,10 @@ else
 
 		// by this point, and renaming has been done, and new_node_name will always be the right name
 		$map->nodes[$new_node_name]->label = $_REQUEST['node_label'];
-		$map->nodes[$new_node_name]->infourl = $_REQUEST['node_infourl'];
-		$map->nodes[$new_node_name]->overliburl[IN] = $_REQUEST['node_hover'];
-		$map->nodes[$new_node_name]->overliburl[OUT] = $_REQUEST['node_hover'];
+		$map->nodes[$new_node_name]->infourl[IN] = $_REQUEST['node_infourl'];
+		$urls = preg_split('/\s+/', $_REQUEST['node_hover'], -1, PREG_SPLIT_NO_EMPTY);
+		$map->nodes[$new_node_name]->overliburl[IN] = $urls;
+		$map->nodes[$new_node_name]->overliburl[OUT] = $urls;
 		
 		$map->nodes[$new_node_name]->x = intval($_REQUEST['node_x']);
 		$map->nodes[$new_node_name]->y = intval($_REQUEST['node_y']);
@@ -300,7 +300,9 @@ else
 		}
 		else
 		{
-			$map->nodes[$new_node_name]->iconfile = stripslashes($_REQUEST['node_iconfilename']);
+			// AICONs mess this up, because they're not fully supported by the editor, but it can still break them
+			if($_REQUEST['node_iconfilename'] != '--AICON--')
+				$map->nodes[$new_node_name]->iconfile = stripslashes($_REQUEST['node_iconfilename']);
 		}
 
 		$map->WriteConfig($mapfile);
@@ -313,8 +315,9 @@ else
 		$map->links[$link_name]->width = intval($_REQUEST['link_width']);
 		$map->links[$link_name]->infourl[IN] = $_REQUEST['link_infourl'];
 		$map->links[$link_name]->infourl[OUT] = $_REQUEST['link_infourl'];
-		$map->links[$link_name]->overliburl[IN] = $_REQUEST['link_hover'];
-		$map->links[$link_name]->overliburl[OUT] = $_REQUEST['link_hover'];
+		$urls = preg_split('/\s+/', $_REQUEST['link_hover'], -1, PREG_SPLIT_NO_EMPTY);
+		$map->links[$link_name]->overliburl[IN] = $urls;
+		$map->links[$link_name]->overliburl[OUT] = $urls;
 
 		// $map->links[$link_name]->target = $_REQUEST['link_target'];
 
@@ -765,8 +768,8 @@ else
 ?>
 	</style>
   <link rel="stylesheet" type="text/css" media="screen" href="editor.css" />
-  <script src="editor.js" type="text/javascript"></script>
-<script src="lib/javascript/jquery-latest.pack.js" type="text/javascript"></script>
+<script src="editor-resources/jquery-latest.pack.js" type="text/javascript"></script>
+<script src="editor.js" type="text/javascript"></script>
 	<script type="text/javascript">
 	
 	var fromplug=<?php echo ($fromplug==TRUE ? 1:0); ?>;
@@ -886,6 +889,7 @@ else
 	else
 	{
 		print '<option value="--NONE--">--NO ICON--</option>';
+		print '<option value="--AICON--">--ARTIFICIAL ICON--</option>';
 		foreach ($imlist as $im)
 		{
 			print "<option ";

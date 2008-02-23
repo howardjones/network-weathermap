@@ -15,6 +15,10 @@ fi
 
 CONFIGS="configs/095-test.conf configs/suite-1.conf configs/suite-2.conf tests/torture.conf"
 
+if [ "X$@" != "X" ]; then
+	CONFIGS=$@
+fi
+
 echo > tests/results.html
 
 for conf in ${CONFIGS}; do

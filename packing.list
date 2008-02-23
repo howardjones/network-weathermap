@@ -46,7 +46,6 @@
 ./lib/datasources/WeatherMapDataSource_snmp.php
 ./lib/datasources/WeatherMapDataSource_fping.php
 ./lib/datasources/WeatherMapDataSource_skeleton.php.txt
-./lib/javascript/jquery-latest.pack.js
 ./lib/poller-common.php
 ./lib/post/WeatherMapPostProcessorTest.php
 ./lib/pre/WeatherMapPreProcessorTest.php
@@ -150,3 +149,4 @@
 ./output/.htaccess
 ./lib/.htaccess
 ./check-gdbug.php
+./editor-resources/jquery-latest.pack.js

@@ -78,14 +78,14 @@ class WeatherMapNode extends WeatherMapItem
 				'iconscalew' => 0,
 				'iconscaleh' => 0,
 				'targets' => array(),
-				'infourl' => array('',''),
-				'notestext' => array('',''),
-				'notes' => array(),
+				'infourl' => array(IN=>'',OUT=>''),
+				'notestext' => array(IN=>'',OUT=>''),
+				'notes' => array(IN=>'',OUT=>''),
 				'hints' => array(),
-				'overliburl' => array(array(),array()),
+				'overliburl' => array(IN=>array(),OUT=>array()),
 				'overlibwidth' => 0,
 				'overlibheight' => 0,
-				'overlibcaption' => array('',''),
+				'overlibcaption' => array(IN=>'',OUT=>''),
 				'labeloutlinecolour' => array(0, 0, 0),
 				'labelbgcolour' => array(255, 255, 255),
 				'labelfontcolour' => array(0, 0, 0),
@@ -707,6 +707,7 @@ class WeatherMapNode extends WeatherMapItem
 			}
 
 			// IN/OUT are the same, so we can use the simpler form here
+#			print_r($this->infourl);
 			$comparison=($this->name == 'DEFAULT'
 			? $this->inherit_fieldlist['infourl'][IN] : $defdef->infourl[IN]);
 			if ($this->infourl[IN] != $comparison) { $output.="\tINFOURL " . $this->infourl[IN] . "\n"; }
@@ -719,7 +720,6 @@ class WeatherMapNode extends WeatherMapItem
 			$comparison=($this->name == 'DEFAULT'
 			? $this->inherit_fieldlist['overliburl'][IN] : $defdef->overliburl[IN]);
 			if ($this->overliburl[IN] != $comparison) { $output.="\tOVERLIBGRAPH " . join(" ",$this->overliburl[IN]) . "\n"; }
-
 
 			$val = $this->iconscalew. " " . $this->iconscaleh. " " .$this->iconfile;
 
@@ -828,12 +828,20 @@ class WeatherMapNode extends WeatherMapItem
 		$js.="relative_to:" . js_escape($this->relative_to) . ", ";
 		$js.="label:" . js_escape($this->label) . ", ";
 		$js.="name:" . js_escape($this->name) . ", ";
-		$js.="infourl:" . js_escape($this->infourl) . ", ";
-		$js.="overlibcaption:" . js_escape($this->overlibcaption) . ", ";
-		$js.="overliburl:" . js_escape($this->overliburl) . ", ";
+		$js.="infourl:" . js_escape($this->infourl[IN]) . ", ";
+		$js.="overlibcaption:" . js_escape($this->overlibcaption[IN]) . ", ";
+		$js.="overliburl:" . js_escape(join(" ",$this->overliburl[IN])) . ", ";
 		$js.="overlibwidth:" . $this->overlibheight . ", ";
 		$js.="overlibheight:" . $this->overlibwidth . ", ";
-		$js.="iconfile:" . js_escape($this->iconfile);
+		if(preg_match("/(none|nink|inpie|outpie|box|rbox|round)/",$this->iconfile))
+		{
+			$js.="iconfile:" . js_escape("::".$this->iconfile);
+		}
+		else
+		{
+			$js.="iconfile:" . js_escape($this->iconfile);
+		}
+		
 		$js.="};\n";
 		return $js;
 	}

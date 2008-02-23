@@ -187,7 +187,7 @@ class WeatherMap extends WeatherMapBase
 	var $preprocessclasses;
 	var $postprocessclasses;
 	var $activedatasourceclasses;
-	
+
 	var $plugins = array();
 
 	function WeatherMap()
@@ -219,7 +219,7 @@ class WeatherMap extends WeatherMapBase
 				'stamptext' => 'Created: %b %d %Y %H:%M:%S',
 				'keyfont' => 4,
 				'titlefont' => 2,
-				'timefont' => 2,				
+				'timefont' => 2,
 				'timex' => 0,
 				'timey' => 0,
 				'titlex' => -1,
@@ -369,7 +369,7 @@ class WeatherMap extends WeatherMapBase
 		$output = $input;
 
 		# debug("ProcessString: input is $input\n");
-		
+
 		assert('is_scalar($input)');
 
 		# while( preg_match("/(\{[^}]+\})/",$input,$matches) )
@@ -413,7 +413,7 @@ class WeatherMap extends WeatherMapBase
 						}
 						elseif( ($itemname == "parent") && ($type == strtolower($context->my_type())) && ($type=='node') && ($context->relative_to != '') )
 						{
-							$the_item = $this->nodes[$context->relative_to]; 
+							$the_item = $this->nodes[$context->relative_to];
 						}
 						else
 						{
@@ -436,11 +436,11 @@ class WeatherMap extends WeatherMapBase
 				else
 				{
 				#	warn($the_item->name.": ".var_dump($the_item->hints)."\n");
-					debug("ProcessString: Found appropriate item: ".get_class($the_item)." ".$the_item->name."\n");				
-					
+					debug("ProcessString: Found appropriate item: ".get_class($the_item)." ".$the_item->name."\n");
+
 					# warn($the_item->name."/hints: ".var_dump($the_item->hints)."\n");
 					# warn($the_item->name."/notes: ".var_dump($the_item->notes)."\n");
-					
+
 					// SET and notes have precedent over internal properties
 					// this is my laziness - it saves me having a list of reserved words
 					// which are currently used for internal props. You can just 'overwrite' any of them.
@@ -456,13 +456,13 @@ class WeatherMap extends WeatherMapBase
 					{
 						$value = $the_item->notes[$args];
 						debug("ProcessString: used note\n");
-						
-					}					
+
+					}
 					elseif(isset($the_item->$args))
 					{
 						$value = $the_item->$args;
 						debug("ProcessString: used internal property\n");
-					}				
+					}
 				}
 			}
 
@@ -470,9 +470,9 @@ class WeatherMap extends WeatherMapBase
 
 			if($value===NULL) $value='NULL';
 			debug("ProcessString: replacing ".$key." with $value\n");
-			
+
 			# if($format != '') $value = sprintf($format,$value);
-			if($format != '') 
+			if($format != '')
 			{
 
 		#		debug("Formatting with mysprintf($format,$value)\n");
@@ -520,7 +520,7 @@ function LoadPlugins( $type="data", $dir="lib/datasources" )
 
 				include_once( $realfile );
 				$class = preg_replace( "/\.php$/", "", $file );
-				if($type == 'data') 
+				if($type == 'data')
 				{
 					$this->datasourceclasses [$class]= $class;
 					$this->activedatasourceclasses[$class]=1;
@@ -562,11 +562,11 @@ function ReadData()
 		debug("Running $ds_class"."->Init()\n");
 		# $ret = call_user_func(array($ds_class, 'Init'), $this);
 		assert('isset($this->plugins["data"][$ds_class])');
-		
+
 		$ret = $this->plugins['data'][$ds_class]->Init($this);
-		
+
 		if(! $ret)
-		{   
+		{
 			debug("Removing $ds_class from Data Source list, since Init() failed\n");
 			$this->activedatasourceclasses[$ds_class]=0;
 			# unset($this->datasourceclasses[$ds_class]);
@@ -584,19 +584,19 @@ function ReadData()
 		reset($allitems);
 
 		while( list($kk,) = each($allitems))
-		{ 
+		{
 			unset($objects);
 			# $objects = &$this->links;
 			$objects = &$allitems[$kk];
 
-			reset($objects); 
+			reset($objects);
 			while (list($k,) = each($objects))
 			{
 				unset($myobj);
 				$myobj = &$objects[$k];
 
 				$type = $myobj->my_type();
-				
+
 				$total_in=0;
 				$total_out=0;
 				$name=$myobj->name;
@@ -608,7 +608,7 @@ function ReadData()
 					foreach ($myobj->targets as $target)
 					{
 						debug ("ReadData: New Target: $target[0]\n");
-						
+
 						$in = 0;
 						$out = 0;
 						if ($target[4] != '')
@@ -616,7 +616,7 @@ function ReadData()
 							// processstring won't use notes (only hints) for this string
 							$targetstring = $this->ProcessString($target[4], $myobj, FALSE);
 							if($target[4] != $targetstring) debug("Targetstring is now $targetstring\n");
-						
+
 							// if the targetstring starts with a -, then we're taking this value OFF the aggregate
 							$multiply = 1;
 							if(preg_match("/^-(.*)/",$target[4],$matches))
@@ -624,7 +624,7 @@ function ReadData()
 								$targetstring = $matches[1];
 								$multiply = -1;
 							}
-						
+
 							$matched = FALSE;
 							$matched_by = '';
 							foreach ($this->datasourceclasses as $ds_class)
@@ -633,7 +633,7 @@ function ReadData()
 								{
 									// $recognised = call_user_func(array($ds_class, 'Recognise'), $targetstring);
 									$recognised = $this->plugins['data'][$ds_class]->Recognise($targetstring);
-									
+
 									if( $recognised )
 									{
 										if($this->activedatasourceclasses[$ds_class])
@@ -686,13 +686,13 @@ function ReadData()
 				# $this->links[$name]->bandwidth_out=$total_out;
 				$myobj->bandwidth_in = $total_in;
 				$myobj->bandwidth_out = $total_out;
-				
+
 				if($type == 'LINK' && $myobj->duplex=='half')
 				{
 					// in a half duplex link, in and out share a common bandwidth pool, so percentages need to include both
 					debug("Calculating percentage using half-duplex\n");
 					$myobj->outpercent = (($total_in + $total_out) / ($myobj->max_bandwidth_out)) * 100;
-					$myobj->inpercent = (($total_out + $total_in) / ($myobj->max_bandwidth_in)) * 100;		
+					$myobj->inpercent = (($total_out + $total_in) / ($myobj->max_bandwidth_in)) * 100;
 					if($myobj->max_bandwidth_out != $myobj->max_bandwidth_in)
 					{
 						warn("ReadData: $type $name: You're using asymmetric bandwidth AND half-duplex in the same link. That makes no sense.\n");
@@ -701,27 +701,27 @@ function ReadData()
 				else
 				{
 					$myobj->outpercent = (($total_out) / ($myobj->max_bandwidth_out)) * 100;
-					$myobj->inpercent = (($total_in) / ($myobj->max_bandwidth_in)) * 100;		
+					$myobj->inpercent = (($total_in) / ($myobj->max_bandwidth_in)) * 100;
 				}
-			
+
 				list($incol,$inscalekey,$inscaletag) = $this->ColourFromPercent(NULL, $myobj->inpercent,$myobj->usescale,$myobj->name);
 				list($outcol,$outscalekey, $outscaletag) = $this->ColourFromPercent(NULL, $myobj->outpercent,$myobj->usescale,$myobj->name);
-				
+
 				// $myobj->incolour = $incol;
 				$myobj->inscalekey = $inscalekey;
 				$myobj->inscaletag = $inscaletag;
 				// $myobj->outcolour = $outcol;
 				$myobj->outscalekey = $outscalekey;
 				$myobj->outscaletag = $outscaletag;
-	
+
 				### warn("TAGS (setting) |$inscaletag| |$outscaletag| \n");
-				
+
 				debug ("ReadData: Setting $total_in,$total_out\n");
 				unset($myobj);
 			}
 		}
 		debug ("ReadData Completed.\n");
-		debug("------------------------------\n");		
+		debug("------------------------------\n");
 	}
 }
 
@@ -772,7 +772,7 @@ function DrawLabelRotated($im, $x, $y, $angle, $text, $font, $padding, $linkname
 	list($strwidth, $strheight)=$this->myimagestringsize($font, $text);
 
 	if(abs($angle)>90)  $angle -= 180;
-	if($angle < -180) $angle +=360; 
+	if($angle < -180) $angle +=360;
 
 	$rangle = -deg2rad($angle);
 
@@ -782,13 +782,13 @@ function DrawLabelRotated($im, $x, $y, $angle, $text, $font, $padding, $linkname
 	$x2= $x + ($strwidth / 2) + $padding + $extra;
 	$y1= $y - ($strheight / 2) - $padding - $extra;
 	$y2= $y + ($strheight / 2) + $padding + $extra;
-	
+
 	// a box. the last point is the start point for the text.
 	$points = array($x1,$y1, $x1,$y2, $x2,$y2, $x2,$y1,   $x-$strwidth/2, $y+$strheight/2 + 1);
 	$npoints = count($points)/2;
-		
+
 	RotateAboutPoint($points, $x,$y, $rangle);
-	
+
 	if ($bgcolour != array
 		(
 			-1,
@@ -826,7 +826,7 @@ function ColourFromPercent($image, $percent,$scalename="DEFAULT",$name="")
 {
 	$col = NULL;
 	$tag = '';
-	
+
 	if(isset($this->colours[$scalename]))
 	{
 		$colours=$this->colours[$scalename];
@@ -856,7 +856,7 @@ function ColourFromPercent($image, $percent,$scalename="DEFAULT",$name="")
 						{
 							$ratio=($percent - $colour["bottom"]) / ($colour["top"] - $colour["bottom"]);
 						}
-	
+
 						$r=$colour["red1"] + ($colour["red2"] - $colour["red1"]) * $ratio;
 						$g=$colour["green1"] + ($colour["green2"] - $colour["green1"]) * $ratio;
 						$b=$colour["blue1"] + ($colour["blue2"] - $colour["blue1"]) * $ratio;
@@ -867,15 +867,15 @@ function ColourFromPercent($image, $percent,$scalename="DEFAULT",$name="")
 						$r=$colour["red1"];
 						$g=$colour["green1"];
 						$b=$colour["blue1"];
-	
+
 						$col = myimagecolorallocate($image, $r, $g, $b);
 						# $col = $colour['gdref1'];
 					}
 					debug("CFPC $name $tag $key $r $g $b\n");
 				}
-				
+
 				### warn(">>TAGS CFPC $tag\n");
-				
+
 				return(array($col,$key,$tag));
 			}
 		}
@@ -901,7 +901,7 @@ function NewColourFromPercent($percent,$scalename="DEFAULT",$name="")
 {
 	$col = new Colour(0,0,0);
 	$tag = '';
-	
+
 	if(isset($this->colours[$scalename]))
 	{
 		$colours=$this->colours[$scalename];
@@ -943,7 +943,7 @@ function NewColourFromPercent($percent,$scalename="DEFAULT",$name="")
 				if(isset($colour['tag'])) $tag = $colour['tag'];
 				#### warn(">>NCFPC TAGS $tag\n");
 				debug("NCFPC $name $tag $key $r $g $b\n");
-								
+
 				return(array($col,$key,$tag));
 			}
 		}
@@ -977,7 +977,7 @@ function coloursort($a, $b)
 	if ($a['bottom'] < $b['bottom']) { return -1; }
 
 	return 1;
-} 
+}
 
 function DrawLegend_Horizontal($im,$scalename="DEFAULT",$width=400)
 {
@@ -1180,7 +1180,7 @@ function DrawLegend_Classic($im,$scalename="DEFAULT")
 		$boxx=$x; $boxy=$y;
 		$boxx=0;
 		$boxy=0;
-		
+
 		// allow for X11-style negative positioning
 		if ($boxx < 0) { $boxx+=$this->width; }
 
@@ -1203,14 +1203,14 @@ function DrawLegend_Classic($im,$scalename="DEFAULT")
 
 		foreach ($colours as $colour)
 		{
-			if ($colour['bottom'] >= 0)  
-			{					
+			if ($colour['bottom'] >= 0)
+			{
 				#  debug("$i: drawing\n");
-				if( ($hide_zero == 0) || $colour['key'] != '0_0')	
+				if( ($hide_zero == 0) || $colour['key'] != '0_0')
 				{
 					$y=$boxy + $tilespacing * $i + 8;
 					$x=$boxx + 6;
-	
+
 					$fudgefactor = 0;
 					if( $hid_zero && $colour['bottom']==0 )
 					{
@@ -1218,8 +1218,8 @@ function DrawLegend_Classic($im,$scalename="DEFAULT")
 						// gradient, but not make the scale incorrect. A quarter of a pixel should do it.
 						$fudgefactor = ($colour['top'] - $colour['bottom'])/($tilewidth*4);
 						# warn("FUDGING $fudgefactor\n");
-					}					
-	
+					}
+
 					if (isset($colour['red2']))
 					{
 						for ($n=0; $n <= $tilewidth; $n++)
@@ -1239,7 +1239,7 @@ function DrawLegend_Classic($im,$scalename="DEFAULT")
 						imagefilledrectangle($scale_im, $x, $y, $x + $tilewidth, $y + $tileheight,
 							$col);
 					}
-	
+
 					$labelstring=sprintf("%s-%s", $colour['bottom'], $colour['top']);
 					if($hide_percent==0) { $labelstring.="%"; }
 					$this->myimagestring($scale_im, $font, $x + 4 + $tilewidth, $y + $tileheight, $labelstring,
@@ -1283,7 +1283,7 @@ function DrawTimestamp($im, $font, $colour)
 }
 
 function DrawTitle($im, $font, $colour)
-{   
+{
 	$string = $this->ProcessString($this->title,$this);
 
 	list($boxwidth, $boxheight)=$this->myimagestringsize($font, $string);
@@ -1311,7 +1311,7 @@ function ReadConfig($filename)
 	$linksseen=0;
 	$scalesseen=0;
 
-	$last_seen="---";
+	$last_seen="GLOBAL";
 	$fd=fopen($filename, "r");
 
 	if ($fd)
@@ -1336,6 +1336,7 @@ function ReadConfig($filename)
 				$curobj = NULL;
 				if($last_seen == "LINK") $curobj = &$curlink;
 				if($last_seen == "NODE") $curobj = &$curnode;
+				if($last_seen == "GLOBAL") $curobj = this;
 
 				if (preg_match("/^\s*(LINK|NODE)\s+(\S+)\s*$/i", $buffer, $matches))
 				{
@@ -1344,7 +1345,7 @@ function ReadConfig($filename)
 					{
 						if ($curnode->name == 'DEFAULT')
 						{
-							$this->defaultnode = $curnode;					
+							$this->defaultnode = $curnode;
 							debug ("Saving Default Node: " . $curnode->name . "\n");
 						}
 						else
@@ -1386,12 +1387,12 @@ function ReadConfig($filename)
 						else
 						{
 							unset($curlink);
-							
+
 							if(isset($this->links[$matches[2]]))
 							{
 								warn("Duplicate link name ".$matches[2]." at line $linecount - only the last one defined is used. [WMWARN25]\n");
 							}
-							
+
 							$curlink=new WeatherMapLink;
 							$curlink->name=$matches[2];
 							$curlink->Reset($this);
@@ -1417,12 +1418,12 @@ function ReadConfig($filename)
 						else
 						{
 							unset($curnode);
-							
+
 							if(isset($this->nodes[$matches[2]]))
 							{
 								warn("Duplicate node name ".$matches[2]." at line $linecount - only the last one defined is used. [WMWARN24]\n");
 							}
-							
+
 							$curnode=new WeatherMapNode;
 							$curnode->name=$matches[2];
 							$curnode->Reset($this);
@@ -1432,6 +1433,46 @@ function ReadConfig($filename)
 						$curnode->configline = $linecount;
 						$last_seen="NODE";
 						$linematched++;
+					}
+				}
+
+				// most of the config keywords just copy stuff into object properties.
+				// these are all dealt with from this one array. The special-cases
+				// follow on from that
+				$config_keywords = array(
+						array('(NODE)',"/^\s*LABEL\s+(.*)\s*$/i",array('label'=>1)),
+						array('(LINK|GLOBAL)',"/^\s*WIDTH\s+(\d+)\s*$/i",array('width'=>1)),
+						array('(LINK|GLOBAL)',"/^\s*HEIGHT\s+(\d+)\s*$/i",array('height'=>1)),
+						array('LINK','/^\s*VIASTYLE\s+(curved)\s*$/i',array('viastyle'=>1)),
+						array('LINK','/^\s*INCOMMENT\s+(.*)\s*$/i',array('incomment'=>1)),
+						array('LINK','/^\s*OUTCOMMENT\s+(.*)\s*$/i',array('outcomment'=>1)),
+						array('(NODE|LINK)',"/^\s*ZORDER\s+([-+]?\d+)$/i",array('zorder'=>1)),
+						array('NODE',"/^\s*POSITION\s+([-+]?\d+)\s+([-+]?\d+)\s*$/i",array('x'=>1,'y'=>2)),
+						array('NODE',"/^\s*POSITION\s+(\S+)\s+([-+]?\d+)\s+([-+]?\d+)\s*$/i",array('x'=>2,'y'=>3,'original_x'=>2,'original_y'=>3,'relative_to'=>1,'relative_resolved'=>FALSE))
+						);
+
+				foreach ($config_keywords as $keyword)
+				{
+					if(preg_match($keyword[0],$last_seen))
+					{
+						if($preg_match($keyword[1],$buffer,$matches))
+						{
+							print "NEW CODE MATCHED $buffer\n";
+							foreach ($keyword[2] as $param)
+							{
+								// if it's a number, then it;s a match number,
+								// otherwise it's a literal to be put into a variable
+								if(isdigit($param[1]))
+								{
+									$curobj[$param[0]] = $matches[$param[1]];
+								}
+								else
+								{
+									$curobj[$param[0]] = $param[1];
+								}
+							}
+							$linesmatched++;
+						}
 					}
 				}
 
@@ -1458,7 +1499,7 @@ function ReadConfig($filename)
 						$linematched++;
 					}
 				}
-				
+
 				if (preg_match("/^\s*ZORDER\s+([-+]?\d+)$/i", $buffer, $matches))
 				{
 					$curobj->zorder = $matches[1];
@@ -1599,7 +1640,7 @@ function ReadConfig($filename)
 						$format_in = FMT_UNFORM_IN;
 						$format_out = FMT_UNFORM_OUT;
 					}
-										
+
 					$curlink->labelstyle=$style;
 					$curlink->bwlabelformats[IN] = $format_in;
 					$curlink->bwlabelformats[OUT] = $format_out;
@@ -1613,7 +1654,7 @@ function ReadConfig($filename)
 					$curlink->linkstyle=$matches[1];
 					$linematched++;
 				}
-				
+
 				if ($last_seen == 'LINK' && preg_match(
 					"/^\s*DUPLEX\s+(full|half)\s*$/i", $buffer,
 					$matches))
@@ -1629,7 +1670,7 @@ function ReadConfig($filename)
 					$curlink->labelboxstyle=$matches[1];
 					$linematched++;
 				}
-				
+
 				if ($last_seen == 'LINK' && preg_match(
 					// "/^\s*VIASTYLE\s+(curved|angled)\s*$/i", $buffer,
 					"/^\s*VIASTYLE\s+(curved)\s*$/i", $buffer,
@@ -1644,17 +1685,17 @@ function ReadConfig($filename)
 					$matches))
 				{
 					$v = intval($matches[1]);
-					if($v<0) 
-					{ 
+					if($v<0)
+					{
 						warn("SPLITPOS should be a percentage at line $linecount\n");
-					} elseif($v>100) { 
+					} elseif($v>100) {
 						warn("SPLITPOS should be a percentage at line $linecount\n");
 					} else {
 						$curlink->splitpos = $matches[1];
 					}
 					$linematched++;
 				}
-				
+
 				if ($last_seen == 'LINK' && preg_match(
 					"/^\s*BWLABELPOS\s+(\d+)\s(\d+)\s*$/i", $buffer,
 					$matches))
@@ -1670,7 +1711,7 @@ function ReadConfig($filename)
 					$curlink->labelstyle='--'; // mark that at least one direction is special
 					$linematched++;
 				}
-				
+
 				if ( ($last_seen == 'LINK') && (preg_match("/^\s*OUTBWFORMAT\s+(.*)\s*$/i", $buffer, $matches)))
 				{
 					$curlink->bwlabelformats[OUT] = $matches[1];
@@ -1683,7 +1724,7 @@ function ReadConfig($filename)
 					$curlink->SetBandwidth($matches[2], $matches[2]);
 					$linematched++;
 				}
-				
+
 				if ( ($last_seen == 'LINK') && (preg_match("/^\s*(MAXVALUE|BANDWIDTH)\s+(\d+\.?\d*[KMGT]?)\s+(\d+\.?\d*[KMGT]?)\s*$/i", $buffer,
 					$matches)))
 				{
@@ -1732,12 +1773,12 @@ function ReadConfig($filename)
 							// special icons aren't added to used_images, so they won't appear in picklist for editor
 							// (the editor doesn't do icon scaling, and these *require* a scale, aside from anything else)
 							$curnode->iconfile=$matches[3];
-							$this->used_images[] = $matches[3];						
+							$this->used_images[] = $matches[3];
 						}
 						else
-						{						
+						{
 							$curnode->iconfile=$matches[3];
-							$this->used_images[] = $matches[3];						
+							$this->used_images[] = $matches[3];
 						}
 						$curnode->iconscalew = $matches[1];
 						$curnode->iconscaleh = $matches[2];
@@ -1806,7 +1847,7 @@ function ReadConfig($filename)
 						}
 					}
 				}
-				
+
 				if (preg_match("/^\s*(IN|OUT)?OVERLIBGRAPH\s+(.+)$/i", $buffer, $matches))
 				# if (preg_match("/^\s*OVERLIBGRAPH\s+(\S+)\s*$/i", $buffer, $matches))
 				{
@@ -1817,7 +1858,7 @@ function ReadConfig($filename)
 						} else {
 							// XXX - *should* add each in turn to the appropriate array
 							$urls = preg_split('/\s+/', $matches[2], -1, PREG_SPLIT_NO_EMPTY);
-							
+
 							if($matches[1] == 'IN') $index = IN;
 							if($matches[1] == 'OUT') $index = OUT;
 							if($matches[1] == '') {
@@ -1918,7 +1959,7 @@ function ReadConfig($filename)
 
 					$linematched++;
 				}
-				
+
 				if ($last_seen == 'LINK' && preg_match("/^\s*BWFONT\s+(\d+)\s*$/i", $buffer, $matches))
 				{
 					$curlink->bwfont=$matches[1];
@@ -1931,7 +1972,7 @@ function ReadConfig($filename)
 					$linematched++;
 				}
 
-				
+
 				if ($last_seen == 'LINK' && preg_match(
 					"/^\s*COMMENTPOS\s+(\d+)\s(\d+)\s*$/i", $buffer,
 					$matches))
@@ -1964,18 +2005,18 @@ function ReadConfig($filename)
 							$uvarname = 'usescale';
 							break;
 					}
-					
+
 					if($svar != '')
 					{
 						$curnode->$varname = $svar;
 					}
 					$curnode->$uvarname= $matches[2];
-					
+
 					// warn("Set $varname and $uvarname\n");
-											
+
 					$linematched++;
 				}
-				
+
 				if( ($last_seen == 'LINK') && preg_match("/^\s*USESCALE\s+([A-Za-z][A-Za-z0-9_]*)\s*$/i",$buffer,$matches))
 				{
 					$curlink->usescale = $matches[1];
@@ -1995,7 +2036,7 @@ function ReadConfig($filename)
 					$key=$matches[2] . '_' . $matches[3];
 
 					$this->colours[$matches[1]][$key]['key']=$key;
-					
+
 					$tag = $matches[10];
 ###					warn("$key $tag\n");
 					$this->colours[$matches[1]][$key]['tag']=$tag;
@@ -2015,7 +2056,7 @@ function ReadConfig($filename)
 						$this->colours[$matches[1]][$key]['blue2'] = (int) ($matches[9]);
 					}
 
-					
+
 					if(! isset($this->numscales[$matches[1]]))
 					{
 						$this->numscales[$matches[1]]=1;
@@ -2038,7 +2079,7 @@ function ReadConfig($filename)
 				{
 					$whichkey = trim($matches[1]);
 					if($whichkey == '') $whichkey = 'DEFAULT';
-					
+
 					$this->keyx[$whichkey]=$matches[2];
 					$this->keyy[$whichkey]=$matches[3];
 					$extra=trim($matches[4]);
@@ -2049,7 +2090,7 @@ function ReadConfig($filename)
 						$this->keytext[$whichkey] = "DEFAULT TITLE";
 					if(!isset($this->keystyle[$whichkey]))
 						$this->keystyle[$whichkey] = "classic";
-					
+
 					$linematched++;
 				}
 
@@ -2159,7 +2200,7 @@ function ReadConfig($filename)
 					$whichkey = trim($matches[1]);
 					if($whichkey == '') $whichkey = 'DEFAULT';
 					$this->keystyle[$whichkey] = strtolower($matches[2]);
-					
+
 					if(isset($matches[3]) && $matches[3] != '')
 					{
 						$this->keysize[$whichkey] = $matches[3];
@@ -2168,7 +2209,7 @@ function ReadConfig($filename)
 					{
 						$this->keysize[$whichkey] = $this->keysize['DEFAULT'];
 					}
-					
+
 					$linematched++;
 				}
 
@@ -2185,7 +2226,7 @@ function ReadConfig($filename)
 				if (preg_match("/^\s*KILO\s+(\d+)\s*$/i", $buffer, $matches))
 				{
 					$this->kilo=$matches[1];
-					$this->defaultlink->owner->kilo=$matches[1]; 
+					$this->defaultlink->owner->kilo=$matches[1];
 					$linematched++;
 				}
 
@@ -2220,25 +2261,25 @@ function ReadConfig($filename)
 				{
 					$key=$matches[1];
 					$field=strtolower($matches[1]) . 'colour';
-					
+
 					if(isset($matches[3]))	// this is a regular colour setting thing
 					{
 						$curnode->$field=array(	$matches[3],$matches[4],$matches[5]);
 						$linematched++;
 					}
-					
+
 					if($matches[2] == 'none' && ($matches[1]=='LABELFONTSHADOW' || $matches[1]=='LABELBG' || $matches[1]=='LABELOUTLINE'))
 					{
 						$curnode->$field=array(-1,-1,-1);
 						$linematched++;
 					}
-					
+
 					if($matches[2] == 'contrast' && $matches[1]=='LABELFONT')
 					{
 						$curnode->$field=array(-3,-3,-3);
 						$linematched++;
 					}
-					
+
 					if($matches[2] == 'copy' && $matches[1]=='AICONFILL')
 					{
 						$curnode->$field=array(-2,-2,-2);
@@ -2253,7 +2294,7 @@ function ReadConfig($filename)
 				{
 					$key=$matches[1];
 					$field=strtolower($matches[1]) . 'colour';
-									
+
 					if(isset($matches[3]))	// this is a regular colour setting thing
 					{
 						$curlink->$field=array(	$matches[3],$matches[4],$matches[5]);
@@ -2264,7 +2305,7 @@ function ReadConfig($filename)
 						$curnode->$field=array(-1,-1,-1);
 						$linematched++;
 					}
-				}			
+				}
 
 				if (preg_match("/^\s*HTMLSTYLE\s+(static|overlib)\s*$/i", $buffer, $matches))
 				{
@@ -2395,7 +2436,7 @@ function ReadConfig($filename)
 
 	// calculate any relative positions here - that way, nothing else
 	// really needs to know about them
-	
+
 	debug("Resolving relative positions for NODEs...\n");
 	// safety net for cyclic dependencies
 	$i=100;
@@ -2405,7 +2446,7 @@ function ReadConfig($filename)
 		foreach ($this->nodes as $node)
 		{
 			if( ($node->relative_to != '') && (!$node->relative_resolved))
-			{				
+			{
 				debug("Resolving relative position for NODE ".$node->name." to ".$node->relative_to."\n");
 				if(array_key_exists($node->relative_to,$this->nodes))
 				{
@@ -2420,12 +2461,12 @@ function ReadConfig($filename)
 					{
 						// save the relative coords, so that WriteConfig can work
 						// resolve the relative stuff
-						
+
 						$newpos_x = $this->nodes[$node->relative_to]->x + $this->nodes[$node->name]->x;
 						$newpos_y = $this->nodes[$node->relative_to]->y + $this->nodes[$node->name]->y;
 						debug("->$newpos_x,$newpos_y\n");
 						$this->nodes[$node->name]->x = $newpos_x;
-						$this->nodes[$node->name]->y = $newpos_y;				
+						$this->nodes[$node->name]->y = $newpos_y;
 						$this->nodes[$node->name]->relative_resolved=TRUE;
 						$set++;
 					}
@@ -2439,9 +2480,9 @@ function ReadConfig($filename)
 		debug("Relative Positions Cycle $i - set $set and Skipped $skipped for unresolved dependencies\n");
 		$i--;
 	} while( ($set>0) && ($i!=0)  );
-	
-	if($skipped>0)	
-	{ 
+
+	if($skipped>0)
+	{
 		warn("There are Circular dependencies in relative POSITION lines for $skipped nodes. [WMWARN11]\n");
 	}
 
@@ -2490,7 +2531,7 @@ function WriteConfig($filename)
 
 			$output.="\n";
 		}
-		
+
 		$basic_params = array(
 				array('background','BACKGROUND',CONFIG_TYPE_LITERAL),
 				array('width','WIDTH',CONFIG_TYPE_LITERAL),
@@ -2504,18 +2545,18 @@ function WriteConfig($filename)
 				array('htmloutputfile','HTMLOUTPUTFILE',CONFIG_TYPE_LITERAL),
 				array('imageoutputfile','IMAGEOUTPUTFILE',CONFIG_TYPE_LITERAL)
 			);
-					
+
 		foreach ($basic_params as $param)
 		{
 			$field = $param[0];
 			$keyword = $param[1];
-			
-			if ($this->$field != $this->inherit_fieldlist[$field]) 
-			{ 
-				if($param[2] == CONFIG_TYPE_COLOR) $output.="$keyword " . render_colour($this->$field) . "\n"; 
-				if($param[2] == CONFIG_TYPE_LITERAL) $output.="$keyword " . $this->$field . "\n"; 
+
+			if ($this->$field != $this->inherit_fieldlist[$field])
+			{
+				if($param[2] == CONFIG_TYPE_COLOR) $output.="$keyword " . render_colour($this->$field) . "\n";
+				if($param[2] == CONFIG_TYPE_LITERAL) $output.="$keyword " . $this->$field . "\n";
 			}
-		}		
+		}
 
 		if (($this->timex != $this->inherit_fieldlist['timex'])
 			|| ($this->timey != $this->inherit_fieldlist['timey'])
@@ -2542,7 +2583,7 @@ function WriteConfig($filename)
 
 				$output.="KEYPOS " . $scalename." ". $this->keyx[$scalename] . " " . $this->keyy[$scalename] . " " . $this->keytext[$scalename] . "\n";
             }
-            
+
 		if ( (isset($this->keystyle[$scalename])) &&  ($this->keystyle[$scalename] != $this->inherit_fieldlist['keystyle']['DEFAULT']) )
 		{
 			$extra='';
@@ -2559,7 +2600,7 @@ function WriteConfig($filename)
 				{
 					$top = rtrim(rtrim(sprintf("%f",$colour['top']),"0"),".");
 					$bottom= rtrim(rtrim(sprintf("%f",$colour['bottom']),"0"),".");
-					
+
 					$tag = (isset($colour['tag'])? $colour['tag']:'');
 
 					if (!isset($colour['red2']))
@@ -2602,7 +2643,7 @@ function WriteConfig($filename)
 		fwrite($fd, "\n# End of NODE section\n\n# Link definitions:\n");
 
 		foreach ($this->links as $link)
-		{	
+		{
 			fwrite($fd,$link->WriteConfig());
 		}
 
@@ -2651,7 +2692,7 @@ function DrawMap($filename = '', $thumbnailfile = '', $thumbnailmax = 250, $with
 		debug("Running $post_class"."->run()\n");
 		//call_user_func_array(array($post_class, 'run'), array(&$this));
 		$this->plugins['post'][$post_class]->run(&$this);
-		
+
 	}
 	debug("Finished Post-Processing Plugins...\n");
 
@@ -2714,7 +2755,7 @@ function DrawMap($filename = '', $thumbnailfile = '', $thumbnailmax = 250, $with
 
 		// Now it's time to draw a map
 
-		# foreach ($this->nodes as $node) { $this->nodes[$node->name]->calc_size(); }                    
+		# foreach ($this->nodes as $node) { $this->nodes[$node->name]->calc_size(); }
 
 		foreach ($this->nodes as $node) { $node->pre_render($image, $this); }
 		foreach ($this->links as $link) { $link->Draw($image, $this); }
@@ -2767,8 +2808,8 @@ function DrawMap($filename = '', $thumbnailfile = '', $thumbnailmax = 250, $with
                                                 $rel_x, $rel_y, $overlay);
                                 }
                         }
-		
-			// then overlay VIAs, so they can be seen	
+
+			// then overlay VIAs, so they can be seen
 			foreach($this->links as $link)
 			{
 				foreach ($link->vialist as $via)
@@ -2777,7 +2818,7 @@ function DrawMap($filename = '', $thumbnailfile = '', $thumbnailmax = 250, $with
                         		imagearc($image, $via[0],$via[1],12,12,0,360,$overlay);
                			 }
 
-		
+
 			}
 			}
                 }
@@ -2816,7 +2857,7 @@ function DrawMap($filename = '', $thumbnailfile = '', $thumbnailmax = 250, $with
 					warn("Failed to write map image. No function existed for the image format you requested. [WMWARN12]\n");
 					$functions = FALSE;
 				}
-				
+
 				if(($result==FALSE) && ($functions==TRUE))
 				{
 					if(file_exists($filename))
@@ -2856,7 +2897,7 @@ function DrawMap($filename = '', $thumbnailfile = '', $thumbnailmax = 250, $with
 					$this->width, $this->height);
 				$result = imagepng($imagethumb, $thumbnailfile);
 				imagedestroy($imagethumb);
-				
+
 				if(($result==FALSE))
 				{
 					if(file_exists($filename))
@@ -2901,25 +2942,25 @@ function PreloadMapHTML()
 		reset($allitems);
 
 		while( list($kk,) = each($allitems))
-		{ 
+		{
 			unset($objects);
 			# $objects = &$this->links;
 			$objects = &$allitems[$kk];
 
-			reset($objects); 
+			reset($objects);
 			while (list($k,) = each($objects))
 			{
 				unset($myobj);
 				$myobj = &$objects[$k];
 
 				$type = $myobj->my_type();
-				
+
 				$dirs = array();
 				if($type == 'LINK') $dirs = array(IN,OUT);
 				if($type == 'NODE') $dirs = array(IN);
 			}
 		}
-		
+
 		foreach ($this->links as $link)
 		{
 			if ( ($link->overliburl[IN] != '') || ($link->notestext[IN] != '') || ($link->overliburl[OUT] != '') || ($link->notestext[OUT] != ''))
@@ -2929,13 +2970,13 @@ function PreloadMapHTML()
 				# $b_x=$link->b->x;
 				# $a_y=$link->a->y;
 				# $b_y=$link->b->y;
-				
+
 				$a_x=$this->nodes[$link->a->name]->x;
 				$a_y=$this->nodes[$link->a->name]->y;
-			 
+
 				$b_x=$this->nodes[$link->b->name]->x;
 				$b_y=$this->nodes[$link->b->name]->y;
-				
+
 				$mid_x=($a_x + $b_x) / 2;
 				$mid_y=($a_y + $b_y) / 2;
 
@@ -2962,14 +3003,14 @@ function PreloadMapHTML()
 
 	#			print "\n\n---------------\nLINK:".$link->name."\n";
 				$dirs = array(IN,OUT);
-				
+
 				foreach ($dirs as $dir)
-				{				
+				{
 					$caption = ($link->overlibcaption[$dir] != '' ? $link->overlibcaption[$dir] : $link->name);
 					$caption = $this->ProcessString($caption,$link);
-					
+
 					$overlibhtml = "onmouseover=\"return overlib('";
-					
+
 					$n = 0;
 					if(sizeof($link->overliburl[$dir]) > 0)
 					{
@@ -2994,21 +3035,21 @@ function PreloadMapHTML()
 					}
 					$overlibhtml .= "',DELAY,250,${left}${above}CAPTION,'" . $caption
 					. "');\"  onmouseout=\"return nd();\"";
-			
+
 
 					if($dir==IN) $parts = array(0,2);
 					if($dir==OUT) $parts = array(1,3);
-								
+
 					foreach ($parts as $part)
 					{
 						$areaname = "LINK:" . $link->name . ":" . $part;
 						$this->imap->setProp("extrahtml", $overlibhtml, $areaname);
 						if ( ($this->htmlstyle != 'editor') && ($link->infourl[$dir] != '') ) {
 							$this->imap->setProp("href", $this->ProcessString($link->infourl[$dir],$link), $areaname);
-						}			
-					}				
+						}
+					}
 				}
-				
+
 			}
 		}
 
@@ -3043,7 +3084,7 @@ function PreloadMapHTML()
 				$caption  = $this->ProcessString($caption,$node);
 
 					$overlibhtml = "onmouseover=\"return overlib('";
-					
+
 					$n = 0;
 					if(sizeof($node->overliburl[IN]) > 0)
 					{
@@ -3203,7 +3244,7 @@ function CacheUpdate($agelimit=600)
 				//                                            if (is_file($realfile) )
 			{
 				debug("$realfile\n");
-				if( (filemtime($realfile) < $configchanged) || ((time() - filemtime($realfile)) > $agelimit) ) 
+				if( (filemtime($realfile) < $configchanged) || ((time() - filemtime($realfile)) > $agelimit) )
 				{
 					debug("Cache: deleting $realfile\n");
 					unlink($realfile);
@@ -3222,7 +3263,7 @@ function CacheUpdate($agelimit=600)
 				imagepng($node->image,$cachefolder.DIRECTORY_SEPARATOR.$nodefile);
 			}
 		}
-		
+
 		foreach ($this->keyimage as $key=>$image)
 		{
 				$scalefile = $cacheprefix."_scale_".dechex(crc32($key)).".png";
@@ -3242,8 +3283,8 @@ function CacheUpdate($agelimit=600)
 		$json = rtrim($json,", \n");
 		fputs($fd,$json);
 		fclose($fd);
-		
-		
+
+
 
 		$fd = fopen($cachefolder.DIRECTORY_SEPARATOR.$cacheprefix."_nodes.json","w");
 		$json = $this->defaultnode->asJSON(TRUE);
@@ -3258,8 +3299,8 @@ function CacheUpdate($agelimit=600)
 		$json = rtrim($json,", \n");
 		fputs($fd,$json);
 		fclose($fd);
-		
-		
+
+
 
 		$fd = fopen($cachefolder.DIRECTORY_SEPARATOR.$cacheprefix."_links.json","w");
 		$json = $this->defaultlink->asJSON(TRUE);
@@ -3274,12 +3315,12 @@ function CacheUpdate($agelimit=600)
 		$json = rtrim($json,", \n");
 		fputs($fd,$json);
 		fclose($fd);
-		
+
 		$fd = fopen($cachefolder.DIRECTORY_SEPARATOR.$cacheprefix."_imaphtml.json","w");
 		$json = $this->imap->subHTML("LINK:");
 		fputs($fd,$json);
 		fclose($fd);
-		
+
 
 		$fd = fopen($cachefolder.DIRECTORY_SEPARATOR.$cacheprefix."_imap.json","w");
 		$json = '';

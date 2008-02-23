@@ -69,7 +69,7 @@ function show_editor_startpage()
 				$realfile=$mapdir . DIRECTORY_SEPARATOR . $file;
 				$note = "";
 
-				if ( (is_file($realfile)) && (is_readable($realfile)) )
+				if ( (is_file($realfile)) && (is_readable($realfile)) && (!preg_match("/^\./",$file) ) )
 				{
 					if(!is_writable($realfile))
 					{

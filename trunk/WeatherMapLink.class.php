@@ -677,10 +677,10 @@ class WeatherMapLink extends WeatherMapItem
 		$js.="name:" . js_escape($this->name) . ", ";
 		$js.="overlibwidth:'" . $this->overlibheight . "', ";
 		$js.="overlibheight:'" . $this->overlibwidth . "', ";
-		$js.="overlibcaption:" . js_escape($this->overlibcaption) . ", ";
+		$js.="overlibcaption:" . js_escape($this->overlibcaption[IN]) . ", ";
 
-		$js.="infourl:" . js_escape($this->infourl) . ", ";
-		$js.="overliburl:" . js_escape($this->overliburl);
+		$js.="infourl:" . js_escape($this->infourl[IN]) . ", ";
+		$js.="overliburl:" . js_escape(join(" ",$this->overliburl[IN]));
 		$js.="};\n";
 		return $js;
 	}

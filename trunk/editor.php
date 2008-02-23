@@ -734,9 +734,19 @@ else
 
 	$imageurl .= '&amp;unique='.time();
 
+	// build up the editor's list of used images
+	if($map->background != '') $map->used_images[] = $map->background;
+	foreach ($map->nodes as $n)
+	{
+		if($n->iconfile != '' && ! preg_match("/(none|nink|inpie|outpie|box|rbox|round)/",$n->iconfile))
+			$map->used_images[] = $n->iconfile;		
+	}
+
+	// get the list from the images/ folder too
 	$imlist = get_imagelist("images");
 	
 	$fontlist = array();
+
 	
 
 ?>

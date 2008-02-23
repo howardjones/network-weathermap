@@ -718,7 +718,7 @@ class WeatherMapNode extends WeatherMapItem
 	
 			$comparison=($this->name == 'DEFAULT'
 			? $this->inherit_fieldlist['overliburl'][IN] : $defdef->overliburl[IN]);
-			if ($this->overliburl[IN] != $comparison) { $output.="\tOVERLIBGRAPH " . join(" ",$this->overliburl[IN]) . "\n"; }
+			if ($this->overliburl[IN] != $comparison) { $output.="\tOVERLIBGRAPH " . join(" ",array($this->overliburl[IN]," ") . "\n"; }
 	
 	
 			$val = $this->iconscalew. " " . $this->iconscaleh. " " .$this->iconfile;

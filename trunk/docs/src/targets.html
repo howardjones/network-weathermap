@@ -40,6 +40,7 @@ a { color: black; text-decoration: underline; font-weight: normal;}
 
 <p>The values in the target string can use the same K,M,G,T suffixes as BANDWIDTH.</p>
 
+<hr />
 <h3><a name="rrd"></a>RRDtool files</h3>
 
 <div class="definition">TARGET <em>rrdfile.rrd</em>:<em>in_ds</em>:<em>out_ds</em></div>
@@ -47,8 +48,11 @@ a { color: black; text-decoration: underline; font-weight: normal;}
 <div class="definition">TARGET rrd:<em>rrdfile.rrd</em>:<em>in_ds</em>:<em>out_ds</em></div>
 <div class="definition">TARGET scale:<em>factor</em>:<em>rrdfile.rrd</em>:<em>in_ds</em>:<em>out_ds</em></div>
 
-<p>This is the 'core' plugin for Weathermap. It reads data from rrd files, created using <a href="http://www.rrdtool.org/">Tobi Oetiker's RRDtool</a>, by tools like Cacti, MRTG, Cricket, NRG and so on.</p>
-<p>First of all, Weathermap needs to be able to find your rrdtool executable. If you are using the Cacti plugin, then this information is taken automatically from Cacti. If you are using the command-line tool, you will need to edit <tt>weathermap</tt> around line 29 to point to your rrdtool executable.</p>
+<p>This is the 'core' plugin for Weathermap. It reads data from rrd files, created using <a href="http://www.rrdtool.org/">Tobi Oetiker's 
+RRDtool</a>, by tools like Cacti, MRTG, Cricket, NRG and so on.</p>
+<p>First of all, Weathermap needs to be able to find your rrdtool executable. If you are using the Cacti plugin, then this 
+information is taken automatically from Cacti. If you are using the command-line tool, you will need to edit <tt>weathermap</tt> 
+around line 29 to point to your rrdtool executable.</p>
 <h4>TARGET formats</h4>
 <p>If you only specify a filename, and no DS-names, the default DS names for RRD files are 'traffic_in' and 'traffic_out', which works with
        the majority of Cacti RRD files (those produced by the Interface Traffic template). For MRTG-produced RRD files, the names are
@@ -56,7 +60,12 @@ a { color: black; text-decoration: underline; font-weight: normal;}
        </p><p>You can also specify '-' for either DS name, which tells Weathermap to ignore
        this rrd file for the purposes of the input or output value.
        This is mainly useful in combination with the aggregation feature, where you can take the input data from one rrd file, and the output data from another.</p>
-       <p>With no prefix, or with just 'rrd:' as a prefix, the data read from the rrd file is assumed to be a standard SNMP interface counter, which is a byte-rate. It automatically multiplies these by 8 to get a bit-rate for the map. With the 'gauge:' prefix, this multiplication doesn't happen, which is useful for non-bandwidth values, like SNR or session-counts. Finally, you can use the 'scale:' prefix to multiply by any factor - suppose you have a value in seconds, and you want to show it in milliseconds for example. Of course, you can also divide using this, by using a scale factor that is less than 1 - multiplying by 1/x is the same as dividing by x.</p>
+       <p>With no prefix, or with just '<b>rrd:</b>' as a prefix, the data read from the rrd file is assumed to be a standard SNMP 
+	   interface counter, which is a byte-rate. It automatically multiplies these by 8 to get a bit-rate for the map. 
+	   With the '<b>gauge:</b>' prefix, this multiplication doesn't happen, which is useful for non-bandwidth values, 
+	   like SNR or session-counts. Finally, you can use the '<b>scale:</b>' prefix to multiply by any factor - 
+	   suppose you have a value in seconds, and you want to show it in milliseconds for example. Of course, you can also divide using this, 
+	   by using a scale factor that is less than 1 - multiplying by 1/x is the same as dividing by x. Since 0.95, you can also use negative scale factors - useful to turn dB SNR into something weathermap can deal with.</p>
 
 <h4>rrdtool adjustments</h4>
 <p>By default, the plugin will read the last 800 seconds of data, and find the most recent within that to use. You might need to make it read back further, if you are updating your rrd files slowly. You can do this with the SET command, by adding 'SET rrd_period 3000' (any value in seconds) at the top of your map config file, before any NODE or LINK lines.</p>
@@ -71,7 +80,7 @@ appropriate cacti data sources are identified based on the rrd filenames, on the
 fails to collect data, then the regular rrdtool-running method will be attempted too.</p>
 <p>Note that since the rrdtool program is not bein run in this mode, you <em>can't</em> use the "time-shifting" features described above - those rely on using <em>real</em> rrdtool files.</p>
 
-
+<hr />
 <h3><a name="tabs"></a>Tab-separated text</h3>
 <div class="definition">TARGET <em>textfile</em></div>
 
@@ -89,14 +98,14 @@ link2    66K   1.8M
 link3    34.6K 113</pre>
 </div>
 
-
+<hr />
 <h3><a name="mrtg"></a>MRTG .html file</h3>
 <div class="definition">TARGET <em>htmlfile</em></div>
 
 <p>This plugin reads data from special comments in the HTML files generated by MRTG. This is intended mainly for people using the 'old-style' MRTG .log files. If you are using MRTG with an RRDtool backend, then it's probably better to use the RRDtool plugin. </p>
 <p>The file should have an extension of .html or .htm to be
        recognised as an MRTG file by Weathermap.</p>
-
+<hr />
 <h3><a name="cactihost"></a>Cacti host status</h3>
 <div class="definition">TARGET cactihost:<em>hostid</em></div>
 
@@ -123,7 +132,7 @@ SCALE cactiupdown 1.5 2.5 0 0 255
 SCALE cactiupdown 2.5 3.5 0 255 0 </pre>
 </div>
 </p>
-
+<hr />
 <h3><a name="cactithold"></a>Cacti threshold status</h3>
 <div class="definition">TARGET cactimonitor:<em>hostid</em></div>
 <div class="definition">TARGET cactithold:<em>tholdid</em></div>
@@ -163,14 +172,15 @@ and you want to see how many of the set have exceeded their session count. You w
 </div>
 defines a scale where 0 is green and 100% is red and in between is a smooth gradient. Each target will return either 0 or 1, so 100% failed thresholds gives a value of 4. Setting the MAXVALUE to 4 makes that 100% within weathermap.
 </p>
-
+<hr />
 <h3><a name="snmp"></a>SNMP value</h3>
 
-<div class="definition">TARGET static:<em>invalue</em>:<em>outvalue</em></div>
+<div class="definition">TARGET snmp:<em>community</em>:<em>host</em>:<em>in_oid</em>:<em>out_oid</em></div>
 
 <p>This is a fairly experimental plugin. It requires the PHP snmp extension to be installed and enabled. Even then, it's hit & miss whether it will work on a particular system - some versions of PHP have better support for SNMP than others, and on some platforms it is different to others, too.</p>
 <p>This plugin can directly query an SNMP-manageable device and fetch an OID from it.</p>
 
+<hr />
 <h3><a name="script"></a>External script</h3>
 
 <div class="definition">TARGET !<em>scriptname</em></div>
@@ -178,6 +188,15 @@ defines a scale where 0 is green and 100% is red and in between is a smooth grad
 <p>This plugin is fairly experimental and not thoroughly tested.</p>
 <p>This plugin allows you to write small external scripts, and pass the value from the script into Weathermap. The output format of the script is the same one that MRTG uses for <em>it's</em> external scripts, so it's possible that you can even find an existing script to do what you want, somewhere else.</p>
 
+<hr />
+<h3><a name="fping"></a>FPING</h3>
+
+<div class="definition">TARGET fping:<em>hostname</em></div>
+
+<p>This plugin is fairly experimental and not thoroughly tested. It's also rather slow, as each node takes 5 seconds or so to run. There are planned improvements to take advantage of fping's parallelisation support in a future version.</p>
+<p>This plugin uses the 'fping' command-line tool [<a href="http://fping.sourceforge.net/">http://fping.sourceforge.net/</a>] to ping a host, and returns
+various statistics about it's state.</p>
+<p>After it has been run, the 'in' value is the average ping time in milliseconds, the 'out' value is the percentage packet loss from 5 pings, the 'fping_min' Hint Variable is the minimum  ping time in milliseconds, and 'fping_max' is the maximum.</p>
   </div>
 </body>
 </html>

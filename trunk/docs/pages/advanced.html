@@ -58,7 +58,7 @@ href="http://www.network-weathermap.com/">Website</a>)</h4>
 <ul> 
 <li>You can have the value of a data source printed in the map.</li> 
 <li>You can have <a href="config-reference.html#NODE_ICON">ICON</a> filenames which change with the value of a datasource.</li> 
-<li>You can make more effective use of the DEFAULTs, by including parameterised LABELs, ICONs and OVERLIBCAPTIONs.</li> 
+<li>You can make more effective use of the DEFAULTs, by including parameterised <a href="config-reference.html#NODE_LABEL">LABELs,</a> <a href="config-reference.html#NODE_ICON">ICONs</a> and <a href="config-reference.html#LINK_OVERLIBCAPTION">OVERLIBCAPTIONs.</li></a> 
 </ul> 
 Finally, plugins can add internal 'notes' to objects in the map, which you can then use in the same way as the normal Weathermap data. For example, you could have a plugin that looks at the load-average on a server, categorises it as light, medium or heavy and saves that to a note, which can then be used to select an appropriate icon. 
  </p> 
@@ -96,7 +96,7 @@ Here is the list of valid <em>variablename</em>s and their meaning.
 <tbody> 
 <tr> 
  <th>bandwidth_in</th> 
- <td>The raw 'bandwidth' figure for the input side of the item. This isn't always an actual bandwidth figure, especially for NODEs. For bandwidth, you probably want to use the formatting modifiers listed below.</td> 
+ <td>The raw 'bandwidth' figure for the input side of the item. This isn't always an actual bandwidth figure, especially for <a href="config-reference.html#NODE_NODE">NODEs.</a> For bandwidth, you probably want to use the formatting modifiers listed below.</td> 
 </tr> 
 <tr> 
  <th>bandwidth_out</th> 
@@ -104,11 +104,11 @@ Here is the list of valid <em>variablename</em>s and their meaning.
 </tr> 
 <tr> 
  <th>max_bandwidth_in</th> 
- <td>The maximum input bandwidth, as defined by <a href="config-reference.html#NODE_MAXVALUE">MAXVALUE</a> or BANDWIDTH.</td> 
+ <td>The maximum input bandwidth, as defined by <a href="config-reference.html#NODE_MAXVALUE">MAXVALUE</a> or <a href="config-reference.html#LINK_BANDWIDTH">BANDWIDTH.</td></a> 
 </tr> 
 <tr> 
  <th>max_bandwidth_out</th> 
- <td>The maximum output bandwidth, as defined by <a href="config-reference.html#NODE_MAXVALUE">MAXVALUE</a> or BANDWIDTH.</td> 
+ <td>The maximum output bandwidth, as defined by <a href="config-reference.html#NODE_MAXVALUE">MAXVALUE</a> or <a href="config-reference.html#LINK_BANDWIDTH">BANDWIDTH.</td></a> 
 </tr> 
 <tr> 
  <th>inpercent</th> 
@@ -121,7 +121,7 @@ Here is the list of valid <em>variablename</em>s and their meaning.
 </tr> 
 <tr> 
  <th>name</th> 
- <td>The name of the <a href="config-reference.html#NODE_NODE">NODE</a> or LINK.</td> 
+ <td>The name of the <a href="config-reference.html#NODE_NODE">NODE</a> or <a href="config-reference.html#LINK_LINK">LINK.</td></a> 
 </tr> 
 
 </tbody> 
@@ -136,7 +136,7 @@ Say you have a data-collection system where each router has an ID, but the URL i
 <a href="config-reference.html#NODE_NODE">NODE</a> router_a 
  <a href="config-reference.html#NODE_LABEL">LABEL</a> Router A 
  <a href="config-reference.html#NODE_POSITION">POSITION</a> 100 200 
- <b>SET router_id 33</b> 
+ <a href="config-reference.html#GLOBAL_SET"><b>SET</a> router_id 33</b> 
  <a href="config-reference.html#LINK_INFOURL">INFOURL</a> http://my.monitoring.system/view.php?id=<b>{node:this:router_id}</b> 
  <a href="config-reference.html#LINK_TARGET">TARGET</a> somemonitoringplugin:<b>{node:this:router_id}</b> 
 </pre> 
@@ -161,14 +161,14 @@ The first node uses two targets to populate the 'in' and 'out' slots from differ
 
  </p> 
 
-<h2><a name="tweaks">SETting Hint Variables to tweak maps</a></h2> 
+<h2><a <a href="config-reference.html#GLOBAL_SET">name="tweaks">SETting</a> Hint Variables to tweak maps</a></h2> 
 <p> 
 In addition to any variables that you define using <a href="config-reference.html#GLOBAL_SET">SET,</a> and the ones that Weathermap uses internally (like those listed above), there is a <em>third</em> place that 
 <a href="config-reference.html#GLOBAL_SET">SET</a> is used - to make small adjustments to the way a map is calculated. </p> 
 <p>Whenever there is a request for a 'tweak' - a setting that doesn't really deserve creating yet another map config keyword - then that tweak is done by having a special <a href="config-reference.html#GLOBAL_SET">SET</a> variable to control it. </p> 
 <p>These are documented in the relevant config keyword section in the <a href="config-reference.html">Config Reference</a>, but here's an example: </p> 
 <p>When you are using <a href="config-reference.html#GLOBAL_KEYPOS">KEYPOS</a> and <a href="config-reference.html#GLOBAL_KEYSTYLE">KEYSTYLE</a> to draw the legend/key for a particular <a href="config-reference.html#GLOBAL_SCALE">SCALE,</a> you can choose to hide the percentage signs, by using 
-<div class="example"><pre>SET key_hidepercent_DEFAULT 1</pre></div> 
+<div <a href="config-reference.html#GLOBAL_SET">class="example"><pre>SET</a> key_hidepercent_DEFAULT 1</pre></div> 
 (for the DEFAULT scale in this example), in the top section of the map config file. 
  </p> 
 <p>Another example of these 'hidden' tweaks is used in the <a href="targets.html#rrd">RRDtool datasource plugin</a> to select what data is extracted. </p> 
@@ -184,7 +184,7 @@ In addition to any variables that you define using <a href="config-reference.htm
  <p>At startup, Weathermap calls the Init method of each plugin to see if it can run at all. The Init method should check for 
  the availability of appropriate config, or PHP functions or files. It should then return TRUE or FALSE, to indicate if it can run or not. For example, the SNMP DS plugin returns FALSE if it can't find the snmp_get PHP function, which is normally due to the SNMP module not being configured with PHP. 
  </p> 
- <p>For each map, after the configuration file has been read, the ReadData function inside Weathermap process <a href="config-reference.html#LINK_TARGET">TARGET</a> lines to get data, before starting to draw the map. To do this, it loops though all the objects in the map, taking each <a href="config-reference.html#LINK_TARGET">TARGET</a> of each object in turn (objects can have multiple aggregated targets), and for each of the TARGETs, it calls all of the DS plugins' Recgonise method. 
+ <p>For each map, after the configuration file has been read, the ReadData function inside Weathermap process <a href="config-reference.html#LINK_TARGET">TARGET</a> lines to get data, before starting to draw the map. To do this, it loops though all the objects in the map, taking each <a href="config-reference.html#LINK_TARGET">TARGET</a> of each object in turn (objects can have multiple aggregated targets), and for each of the <a href="config-reference.html#LINK_TARGET">TARGETs,</a> it calls all of the DS plugins' Recgonise method. 
  The Recognise method should return TRUE or FALSE, depending on if it thinks that the supplied <a href="config-reference.html#LINK_TARGET">TARGET</a> string is intended for it. This is normally decided by using preg_match to match a regular expression. It <em>should not</em> try and read any data source, or database, or file to validate the actual <a href="config-reference.html#LINK_TARGET">TARGET.</a> It should <em>only</em> decide if the <a href="config-reference.html#LINK_TARGET">TARGET</a> is the right 'shape' or not. </p> 
  <p>Recognise is called even for plugins that have previously returned FALSE for Init. This is so that Weathermap can tell the user that their <a href="config-reference.html#LINK_TARGET">TARGET</a> <em>would</em> have worked, if only the plugin was working OK, rather than mysteriously ignoring them. </p> 
  <p>Finally, once it has established which of the plugins should deal with the <a href="config-reference.html#LINK_TARGET">TARGET</a> string, it calls the ReadData method of that plugin, which should return a list() of three items - input value, output value and valid_time. </p> <p>The valid_time is a Unix time_t (as returned by time()), to indicate when the data was measured. This is mainly intended for things like RRDs where there may be a delay between the RRD being written and us reading the value, or for cached results. The input and output values are numeric, and are used as part of the final bandwidth values for the map object. If there is no valid result (e.g. the device id passed in the <a href="config-reference.html#LINK_TARGET">TARGET</a> string doesn't exist) then the plugin should return -1,-1 for those two values. </p> 

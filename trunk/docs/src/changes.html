@@ -22,6 +22,60 @@ a { color: black; text-decoration: underline; font-weight: normal;}
 
 <!--#include file="common-top-nav.html" -->
 
+	<h2><a name="changes095">Changes For This Version (0.941 to 0.95)</a></h2>
+<p>This release has a lot of changes - most of them are small 'polishing' tweaks, but there are a few interesting bigger ones too. Happily, although
+there are a quite a few more features, this release actually has <em>less</em> lines of code than 0.941, due to some internal cleaning up.</p>
+	<h3>Fixes</h3>
+	<ul>
+	<li>KEYOUTLINECOLOR is actually used now (thanks to llow once more)</li>
+	<li>Editor doesn't throw away WIDTH and HEIGHT with no BG image</li>
+	<li>Cacti Data-source and Graph picker doesn't restrict scrolling or resizing anymore</li>
+	<li>weathermap-cacti-rebuild.php to work on both Cacti 0.8.6 and 0.8.7</li>
+	<li>weathermap-cacti-rebuild.php to flat-out fail if Cacti environment is wrong.</li>
+	<li>SNMP DS plugin had a typo that stopped it working at all (and no-one 
+                noticed for almost a year :-) ). (thanks to Fratissier Christophe for pointing it out)</li>
+	<li>Added some better controls into SNMP DS plugin. You can correctly pull 
+                interface oper/admin status, for example, now.</li>
+	</ul>
+	
+	<h3>Changes</h3>
+	<ul>
+	<li>DS plugins are able to return negative results now <strong>(breaks user-developed DS plugins)</strong></li>
+	<li>the scale: prefix for the RRD DS plugin can take negative scale factors</li>
+	<li>(internal) plugins are each created as a single object now. Result: the plugin can cache results internally.</li>
+	<li>(internal) broke out some of the larger classes (node, link) into separate files.</li>
+	</ul>
+	
+	<h3>New Features</h3>
+	<ul>
+	<li>You can add a 'tag' to a SCALE line, to be used in ICON or LABELs later.</li>
+	<li>USEICONSCALE - colorize icon images (based on patches from llow)</li>
+	<li>screenshot mode. "SET screenshot_mode 1" at the top of the map will anonymise all labels, comments and bwlabels.</li>
+	<li>LABELFONTCOLOR can use a special value of 'contrast' to always contrast with the label colour.</li>
+	<li>Artificial Icons. Special icon 'filenames' - 'box' 'round' 'rbox' create a shaped icon without any file. See ICON and AICONFILLCOLOR for more.</li>
+	<li>Map titles show up in browser title now.</li>
+	<li>a basic 'live view' function which generates a map on demand. Sometimes. It's not very useful.</li>
+	<li>LABELANGLE allows you to rotate node labels to 90,180,270 degrees. Needs truetype font.</li>
+	<li>improved data-source picker in editor: host filter</li>
+	<li>improved data-source picker in editor: option to aggregate data sources</li>
+	<li>Moved data-source picker changes across into the graph-picker for NODEs too.</li>
+	<li>SPLITPOS keyword to control position of midpoint in links</li>
+	<li>VIA can be positioned relative to NODEs (like NODEs can) (thanks again to llow) </li>
+	<li>Weathermap has a hook in the map viewing page to allow other plugins to add code there</li>
+	<li>.htaccess files bundled with Weathermap to restrict direct access to configs and output</li>
+	<li>filenames for output are much less guessable now</li>
+	<li>You can use 'DUPLEX half' on a link to make the bandwidth percentage
+	        calculate work for half-duplex links</li>
+	<li>ININFOURL / OUTINFOURL, INOVERLIBGRAPH / OUTOVERLIBGRAPH, INNOTES / OUTNOTES, INOVERLIBCAPTION / OUTOVERLIBCAPTION </li>
+	        allow you to have different urls for the in and out side of links (based on idea from llow)</li>
+	<li>OVERLIBGRAPH (and IN/OUT versions) can take multiple URLs separated by spaces (again from idea by llow)</li>
+	<li>debug/warning log output contains the map name, and the debug output is marked DEBUG</li>
+	<li>debug log output contains the calling function, file/line number, too. Making debugging-by-mail easier.</li>
+	<li>fping: TARGET to do live pings of devices</li>
+	<li>a very basic sample 'skeleton' DS plugin</li>
+	<li>an additional check-gdbug.php to spot bad GD installs</li>
+	</ul>
+
     <h2><a name="changes0941">Changes For This Version (0.94 to 0.941)</a></h2>
 
 	<h3>Fixes</h3>

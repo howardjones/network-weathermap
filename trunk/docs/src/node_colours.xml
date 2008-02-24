@@ -7,13 +7,20 @@
     <definition>LABELFONTSHADOWCOLOR <meta>red</meta> <meta>green</meta> <meta>blue</meta></definition>
     <definition>LABELBGCOLOR <meta>red</meta> <meta>green</meta> <meta>blue</meta></definition>
     <definition>LABELOUTLINECOLOR <meta>red</meta> <meta>green</meta> <meta>blue</meta></definition>
+	<definition>AICONOUTLINECOLOR <meta>red</meta> <meta>green</meta> <meta>blue</meta></definition>
+	<definition>AICONFILLCOLOR <meta>red</meta> <meta>green</meta> <meta>blue</meta></definition>
 
     <description  xmlns="http://www.w3.org/1999/xhtml">
         <p>Specify the colours used for drawing the LABEL.</p>
         <p>red, green and blue are numbers from 0 to 255.</p>
         <p>LABELFONTSHADOWCOLOR, LABELBGCOLOR and LABELOUTLINECOLOR have an additional option - 'none' - which stops that element of the LABEL being drawn. LABELFONTSHADOWCOLOR defaults to 'none'.</p>
+		<p>LABELFONTCOLOR has an additional option 'contrast', which will select either black or white depending on the current LABELBGCOLOR. This is especially useful if you are using a SCALE to change the colour of your NODE LABELs.</p>
+		<p>AICONOUTLINECOLOR and AICONFILLCOLOR are used to colour an 'artificial ICON' if one is defined for this node. To allow the artifical icon to <em>also</em> follow the 
+		colour of the LABELBGCOLOR when you are using a SCALE, you can also specify 'copy' as the colour for AICONFILLCOLOR. See ICON for more about artificial icons.</p>
     </description>
     <changes>
-    <change version="0.8">Added LABELFONTCOLOR, LABELFONTSHADOWCOLOR, LABELBGCOLOR and LABELOUTLINECOLOR.</change>
+	<change version="0.95">Added 'contrast' and 'copy' options.</change>
+    <change version="0.95">Added AICONFILLCOLOR and AICONOUTLINECOLOR.</change>
+	<change version="0.8">Added LABELFONTCOLOR, LABELFONTSHADOWCOLOR, LABELBGCOLOR and LABELOUTLINECOLOR.</change>
     </changes>
 </configentry>

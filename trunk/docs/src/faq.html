@@ -87,11 +87,14 @@ a { color: black; text-decoration: underline; font-weight: normal;}
       graphs to appear you need to have 'HTMLSTYLE overlib' near
       the top of your map configuration file.</p></dd>
 
+<dt><a name="overliboffscreen"></a>When I use OVERLIBGRAPH and the pointer is near the right side of the screen, the floating graph disappears off the side of the screen...</dt>
+<dd><p>If you set OVERLIBWIDTH and OVERLIBHEIGHT correctly, then Weathermap can make a better guess about whether to show the map to the left or right. Be careful to set them to the correct value, or you may see strange 'flashing' graphs. The easiest way is to right-click on the graph in your browser and read the sizes from the Properties panel.</p>
+<p>Typically one size is right for all your graphs, so this is a good example of something you can add into NODE DEFAULT (or LINK DEFAULT).</p>
+</dd>	
       <dt><a name="gauges"></a>The value from my RRD data is much too big!</dt>
 
       <dd><p>Is it about 8 times too big, by any chance? Historically, Weathermap was mainly used for SNMP Interface statistics, which use bytes-per-second counters ("octet counters" in SNMP-speak). Because of this, the standard RRD datasource plugin multiplies everything by 8, to get back to bits-per-second. New in 0.9, you can get the 'raw' value from an RRD file by using <a href="targets.html#rrd">'gauge:' as a prefix</a>.</p><p>If the value is wrong by some other constant factor, you can use the 'scale:' prefix to multiply or divide by that factor - e.g divide by 1000 to turn a milliseconds value into a 'real' seconds value, or multiply by 1024 to get a kilobytes values from a megabytes one.</p></dd>
 
-	
 
       <dt><a name="timezone"></a>The timestamp on my map is all wrong!</dt>
 
@@ -103,6 +106,7 @@ a { color: black; text-decoration: underline; font-weight: normal;}
 
       <dd><p> It's a GD bug. It's documented <a href="http://bugs.libgd.org/4">here</a>, and the reason it mainly affects Debian is that Debian links to the system GD (version 2.0.33) not the built-in PHP one (2.0.28ish). For whatever reason, the problems aren't present in the PHP GD library, which has a different alpha-blending implementation as far as I can see from the docs. </p> 
 <p>The bugs are apparently fixed in GD 2.0.34, which has been released and is in Debian unstable. Users report that upgrading to the version of libgd2-xpm from unstable will fix this problem if you can't wait, or recompile PHP to use it's own GD library.</p>
+<p>Since 0.95, there is a small program supplied with Weathermap to test for this problem. Run <code>php check-gdbug.pgp</code> in the weathermap directory to see if it really is this problem that affects you.</p>
 <p>There is more information about fixing this issue for Debian Etch (and perhaps also Ubuntu Edgy) in <a href="http://forums.cacti.net/viewtopic.php?t=21517">this Cacti Forum thread</a>.</p>
 </dd>
       <dt><a name="icons"></a>Where can I find some icons to use with Weathermap? Why

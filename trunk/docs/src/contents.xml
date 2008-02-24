@@ -12,6 +12,7 @@
         <a href="#NODE_ICON">ICON</a>
         <a href="#NODE_USEICONSCALE">USEICONSCALE</a>
         <a href="#NODE_LABELOFFSET">LABELOFFSET</a>
+        <a href="#NODE_LABELANGLE">LABELANGLE</a>
         <a href="#NODE_LABELFONT">LABELFONT</a>
         <a href="#NODE_COLORS">*COLOR</a>
         <a href="#NODE_INFOURL">INFOURL</a>
@@ -30,6 +31,7 @@
         <a href="#LINK_USESCALE">USESCALE</a>
         <a href="#LINK_WIDTH">WIDTH</a>
         <a href="#LINK_BANDWIDTH">BANDWIDTH</a>
+        <a href="#LINK_DUPLEX">DUPLEX</a>
         <a href="#LINK_BWLABEL">BWLABEL</a>
         <a href="#LINK_INBWFORMAT">INBWFORMAT</a>
         <a href="#LINK_OUTBWFORMAT">OUTBWFORMAT</a>
@@ -44,6 +46,8 @@
         <a href="#LINK_COLORS">*COLOR</a>
         <a href="#LINK_INFOURL">INFOURL</a>
         <a href="#LINK_OVERLIBGRAPH">OVERLIBGRAPH</a>
+        <a href="#LINK_INOVERLIBGRAPH">INOVERLIBGRAPH</a>
+        <a href="#LINK_OUTOVERLIBGRAPH">OUTOVERLIBGRAPH</a>
         <a href="#LINK_OVERLIBWIDTH">OVERLIBWIDTH</a>
         <a href="#LINK_OVERLIBHEIGHT">OVERLIBHEIGHT</a>
         <a href="#LINK_OVERLIBCAPTION">OVERLIBCAPTION</a>

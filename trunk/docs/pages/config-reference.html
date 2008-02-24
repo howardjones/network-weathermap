@@ -52,6 +52,7 @@ v0.95
         <a href="#NODE_ICON">ICON</a>
         <a href="#NODE_USEICONSCALE">USEICONSCALE</a>
         <a href="#NODE_LABELOFFSET">LABELOFFSET</a>
+        <a href="#NODE_LABELANGLE">LABELANGLE</a>
         <a href="#NODE_LABELFONT">LABELFONT</a>
         <a href="#NODE_COLORS">*COLOR</a>
         <a href="#NODE_INFOURL">INFOURL</a>
@@ -70,6 +71,7 @@ v0.95
         <a href="#LINK_USESCALE">USESCALE</a>
         <a href="#LINK_WIDTH">WIDTH</a>
         <a href="#LINK_BANDWIDTH">BANDWIDTH</a>
+        <a href="#LINK_DUPLEX">DUPLEX</a>
         <a href="#LINK_BWLABEL">BWLABEL</a>
         <a href="#LINK_INBWFORMAT">INBWFORMAT</a>
         <a href="#LINK_OUTBWFORMAT">OUTBWFORMAT</a>
@@ -84,6 +86,8 @@ v0.95
         <a href="#LINK_COLORS">*COLOR</a>
         <a href="#LINK_INFOURL">INFOURL</a>
         <a href="#LINK_OVERLIBGRAPH">OVERLIBGRAPH</a>
+        <a href="#LINK_INOVERLIBGRAPH">INOVERLIBGRAPH</a>
+        <a href="#LINK_OUTOVERLIBGRAPH">OUTOVERLIBGRAPH</a>
         <a href="#LINK_OVERLIBWIDTH">OVERLIBWIDTH</a>
         <a href="#LINK_OVERLIBHEIGHT">OVERLIBHEIGHT</a>
         <a href="#LINK_OVERLIBCAPTION">OVERLIBCAPTION</a>
@@ -190,7 +194,7 @@ v0.95
 <div class="description">
 <p>Specifies where to look for the current "throughput" 
  information for this <a href="#NODE_NODE">NODE.</a> You can also specify multiple targets, which will then be added together to make the aggregate result 
-which is then displayed. Specify the targets on one <a href="#NODE_TARGET">TARGET</a> line, seperated with a space. If a targetspec starts with a '-', then it's value will be <i>subtracted</i> from the final result instead. </p><p>It's important to note, especially for NODEs, that the value that is used does not have to be bandwidth. You can use data for temperature, session-counts, CPU usage or anything else you can get data for. </p><p>The actual contents of the <em>targetspec</em> depend on the data source plugins that are 
+which is then displayed. Specify the targets on one <a href="#NODE_TARGET">TARGET</a> line, seperated with a space. If a targetspec starts with a '-', then it's value will be <i>subtracted</i> from the final result instead. </p><p>It's important to note, especially for <a href="#NODE_NODE">NODEs,</a> that the value that is used does not have to be bandwidth. You can use data for temperature, session-counts, CPU usage or anything else you can get data for. </p><p>The actual contents of the <em>targetspec</em> depend on the data source plugins that are 
  available. <a href="targets.html">The standard plugins are documented here</a>. </p> 
 </div>
 <div class="examples">
@@ -247,7 +251,7 @@ which is then displayed. Specify the targets on one <a href="#NODE_TARGET">TARGE
 <div class="definition">MAXVALUE <em class="meta">max-in-value</em> <em class="meta">max-out-value</em>
 </div>
 <div class="description">
-<p>Specifies the maximum value(s) for the node, in the same way that <a href="#LINK_BANDWIDTH">BANDWIDTH</a> does for a <a href="#LINK_LINK">LINK.</a> These are used to calculate the percentage usage value, which in turn is used to decide the NODE's colour, if it has a <a href="#NODE_TARGET">TARGET</a> defined. </p><p>The default value is 100, which has the effect of not changing the input value ( (n/100)*100 = n ). </p> 
+<p>Specifies the maximum value(s) for the node, in the same way that <a href="#LINK_BANDWIDTH">BANDWIDTH</a> does for a <a href="#LINK_LINK">LINK.</a> These are used to calculate the percentage usage value, which in turn is used to decide the <a href="#NODE_NODE">NODE's</a> colour, if it has a <a href="#NODE_TARGET">TARGET</a> defined. </p><p>The default value is 100, which has the effect of not changing the input value ( (n/100)*100 = n ). </p> 
 </div>
 <div class="changes">
 <h3>Change History</h3>
@@ -265,11 +269,17 @@ which is then displayed. Specify the targets on one <a href="#NODE_TARGET">TARGE
 </div>
 <div class="definition">ICON none</div>
 <div class="description">
-<p>Specifies an icon to use for the node. </p><p>The filename can either be a full path to the image, or a relative one. </p><p>The icon file must be in PNG, JPEG or GIF format. Alpha-transparency within the icon should be honoured by Weathermap for PNG icons, to create irregular shapes. </p><p>If you specify the word 'none' as the icon filename, then no icon is used. This is useful if you have specified an <a href="#NODE_ICON">ICON</a> in the DEFAULT <a href="#NODE_NODE">NODE,</a> and want to override that for a few special cases. </p><p>The second form allows you to specify a maximum width and height for the icon. If the PNG file that you specify is bigger or smaller than this size, then it is automatically scaled up (or down) in proportion, so that it fits into a box of the size you specify. </p><p>The size of the icon image is used by <a href="#NODE_LABELOFFSET">LABELOFFSET</a> to decided how far to move the label, if you use compass-point offsets. </p><p>The text for the filename can contain <a href="advanced.html#tokens">special tokens</a> to select an icon based on map data. </p><p>You can adjust the colour of the icon according to a <a href="#GLOBAL_SCALE">SCALE,</a> by using <a href="#NODE_USEICONSCALE">USEICONSCALE.</a> </p> 
+<p>Specifies an icon to use for the node. </p><p>The filename can either be a full path to the image, or a relative one. </p><p>The icon file must be in PNG, JPEG or GIF format. Alpha-transparency within the icon should be honoured by Weathermap for PNG icons, to create irregular shapes. </p><p>If you specify the word 'none' as the icon filename, then no icon is used. This is useful if you have specified an <a href="#NODE_ICON">ICON</a> in the DEFAULT <a href="#NODE_NODE">NODE,</a> and want to override that for a few special cases. </p><p>There are some special icon filenames that can be used to generate an icon image without using an external file. 
+ These all <em>require</em> you to specify a <em>maxwidth</em> and <em>maxheight</em> which are then used as the size of the 
+ icon. The 'magic filenames' are: <ul><li>'box' - to produce a square cornered box.</li><li>'rbox' - 
+ to produce a round-cornered box</li><li>'round' - to produce a circle or ellipse.</li></ul>The colours for these "artificial icons" are specified 
+ using the AICONFILLCOLOR and AICONOUTLINECOLOR keywords. </p><p>The second form allows you to specify a maximum width and height for the icon. If the PNG file that you specify is bigger or smaller than this size, then it is automatically scaled up (or down) in proportion, so that it fits into a box of the size you specify. </p><p>The size of the icon image is used by <a href="#NODE_LABELOFFSET">LABELOFFSET</a> to decided how far to move the label, if you use compass-point offsets. </p><p>The text for the filename can contain <a href="advanced.html#tokens">special tokens</a> to select an icon based on map data. </p><p>You can adjust the colour of the icon according to a <a href="#GLOBAL_SCALE">SCALE,</a> by using <a href="#NODE_USEICONSCALE">USEICONSCALE,</a> if you are using the PHP GD library (the function required is not present in the main GD library). </p> 
 </div>
 <div class="changes">
 <h3>Change History</h3>
 <dl>
+<dt>0.95</dt>
+<dd>Added Artificial Icon support.</dd>
 <dt>0.95</dt>
 <dd>Added Icon colourising support.</dd>
 <dt>0.9</dt>
@@ -326,6 +336,21 @@ which is then displayed. Specify the targets on one <a href="#NODE_TARGET">TARGE
 </dl>
 </div>
 </div>
+			<div class="referenceentry">
+<h2><a name="NODE_LABELANGLE">LABELANGLE</a></h2>
+<div class="definition">LABELANGLE <em class="meta">angle</em>
+</div>
+<div class="description">
+<p>Specifies a rotation angle of the label for a node. Allowed angles are 0, 90, 180 and 270 degrees. The rotation is around the centre of the label, after any <a href="#NODE_LABELOFFSET">LABELOFFSET</a> has been applied. </p><p>The <a href="#NODE_LABELFONT">LABELFONT</a> <em>must be a TrueType font</em> for angles other than 0 (the default) as these are the only font type to support rotating text. </p> 
+</div>
+<div class="changes">
+<h3>Change History</h3>
+<dl>
+<dt>0.95</dt>
+<dd>Added LABELANGLE.</dd>
+</dl>
+</div>
+</div>
             <div class="referenceentry">
 <h2><a name="NODE_LABELFONT">LABELFONT</a></h2>
 <div class="definition">LABELFONT <em class="meta">fontnumber</em>
@@ -353,12 +378,21 @@ which is then displayed. Specify the targets on one <a href="#NODE_TARGET">TARGE
 </div>
 <div class="definition">LABELOUTLINECOLOR <em class="meta">red</em> <em class="meta">green</em> <em class="meta">blue</em>
 </div>
+<div class="definition">AICONOUTLINECOLOR <em class="meta">red</em> <em class="meta">green</em> <em class="meta">blue</em>
+</div>
+<div class="definition">AICONFILLCOLOR <em class="meta">red</em> <em class="meta">green</em> <em class="meta">blue</em>
+</div>
 <div class="description">
-<p>Specify the colours used for drawing the <a href="#NODE_LABEL">LABEL.</a> </p><p>red, green and blue are numbers from 0 to 255. </p><p>LABELFONTSHADOWCOLOR, LABELBGCOLOR and LABELOUTLINECOLOR have an additional option - 'none' - which stops that element of the <a href="#NODE_LABEL">LABEL</a> being drawn. LABELFONTSHADOWCOLOR defaults to 'none'. </p> 
+<p>Specify the colours used for drawing the <a href="#NODE_LABEL">LABEL.</a> </p><p>red, green and blue are numbers from 0 to 255. </p><p>LABELFONTSHADOWCOLOR, LABELBGCOLOR and LABELOUTLINECOLOR have an additional option - 'none' - which stops that element of the <a href="#NODE_LABEL">LABEL</a> being drawn. LABELFONTSHADOWCOLOR defaults to 'none'. </p><p>LABELFONTCOLOR has an additional option 'contrast', which will select either black or white depending on the current LABELBGCOLOR. This is especially useful if you are using a <a href="#GLOBAL_SCALE">SCALE</a> to change the colour of your <a href="#NODE_NODE">NODE</a> <a href="#NODE_LABEL">LABELs.</a> </p><p>AICONOUTLINECOLOR and AICONFILLCOLOR are used to colour an 'artificial <a href="#NODE_ICON">ICON'</a> if one is defined for this node. To allow the artifical icon to <em>also</em> follow the 
+ colour of the LABELBGCOLOR when you are using a <a href="#GLOBAL_SCALE">SCALE,</a> you can also specify 'copy' as the colour for AICONFILLCOLOR. See <a href="#NODE_ICON">ICON</a> for more about artificial icons. </p> 
 </div>
 <div class="changes">
 <h3>Change History</h3>
 <dl>
+<dt>0.95</dt>
+<dd>Added 'contrast' and 'copy' options.</dd>
+<dt>0.95</dt>
+<dd>Added AICONFILLCOLOR and AICONOUTLINECOLOR.</dd>
 <dt>0.8</dt>
 <dd>Added LABELFONTCOLOR, LABELFONTSHADOWCOLOR, LABELBGCOLOR and LABELOUTLINECOLOR.</dd>
 </dl>
@@ -378,10 +412,11 @@ which is then displayed. Specify the targets on one <a href="#NODE_TARGET">TARGE
 <h2><a name="NODE_OVERLIBGRAPH">OVERLIBGRAPH</a></h2>
 <div class="definition">OVERLIBGRAPH <em class="meta">url</em>
 </div>
+<div class="definition">OVERLIBGRAPH <em class="meta">url</em> <em class="meta">url</em>...</div>
 <div class="description">
 <p>Creates a popup image in the HTML output. </p><p>If you are using the HTML output facility, and <a href="#GLOBAL_HTMLSTYLE">HTMLSTYLE</a> is set to 'overlib', then a link is added to the 
  &lt;map&gt; section of the HTML so that when you move the mouse pointer over the the node, a box will pop up 
- containing the image that you specify. Typically used to link to historical data in your network monitoring system. </p><p>If a <a href="#NODE_NOTES">NOTES</a> line is also specified for a node, then the image specified here appears with the <a href="#NODE_NOTES">NOTES</a> text underneath it. </p> 
+ containing the image that you specify. Typically used to link to historical data in your network monitoring system. </p><p>You can also specify more than one url, in which case the images are 'stacked' one after another in the popup box. </p><p>If a <a href="#NODE_NOTES">NOTES</a> line is also specified for a node, then the image(s) specified here appears with the <a href="#NODE_NOTES">NOTES</a> text underneath it. </p> 
 </div>
 <div class="examples">
 <h3>Examples</h3>
@@ -389,6 +424,13 @@ which is then displayed. Specify the targets on one <a href="#NODE_TARGET">TARGE
 <h5>Typical use of OVERLIBGRAPH</h5>
 <pre>OVERLIBGRAPH http://www.yoursite.net/mrtg/router1-cpu-daily.png</pre>
 </div>
+</div>
+<div class="changes">
+<h3>Change History</h3>
+<dl>
+<dt>0.95</dt>
+<dd>Added multiple URL support</dd>
+</dl>
 </div>
 </div>
             <div class="referenceentry">
@@ -498,7 +540,7 @@ which is then displayed. Specify the targets on one <a href="#NODE_TARGET">TARGE
 <div class="definition">NODES <em class="meta">nodename{:xoffset:yoffset}</em> <em class="meta">nodename{:xoffset:yoffset}</em>
 </div>
 <div class="description">
-<p>These are the NODEs that this link joins. There can be 
+<p>These are the <a href="#NODE_NODE">NODEs</a> that this link joins. There can be 
  only two. They are the 'nodename's from the <a href="#NODE_NODE">NODE</a> line for 
  each node. </p><p>Optionally, you can add an offset after a nodename, to move the location of that end of the link. This can help with crowded areas of the map, and also in making parallel links. Valid offsets are named after compass-points: N,S,E,W,NE,NE,SE,SW, or they can be numeric values, to indicate the relative position in pixels from the centre of the node. </p><p>The order of the nodes is significant. When reading data sources, the flow from the first node to the second is considered 'out' and from second-to-first is 'in'. </p> 
 </div>
@@ -623,6 +665,23 @@ given in the <a href="#LINK_NODES">NODES</a> line. </p><p>Bandwidths can also us
 </dl>
 </div>
 </div>
+			  <div class="referenceentry">
+<h2><a name="LINK_DUPLEX">DUPLEX</a></h2>
+<div class="definition">DUPLEX <em class="meta">full</em>
+</div>
+<div class="definition">DUPLEX <em class="meta">half</em>
+</div>
+<div class="description">
+<p>'half' indicates that the bandwidth specified by the <a href="#LINK_BANDWIDTH">BANDWIDTH</a> keyword is half-duplex rather than the default full. </p><p>This means that the percentages calculated are calculated as (in+out)/max instead of (in/max) and (out/max) separately. </p> 
+</div>
+<div class="changes">
+<h3>Change History</h3>
+<dl>
+<dt>0.95</dt>
+<dd>Added DUPLEX.</dd>
+</dl>
+</div>
+</div>
                 <div class="referenceentry">
 <h2><a name="LINK_BWLABEL">BWLABEL</a></h2>
 <div class="definition">BWLABEL <em class="meta">formatname</em>
@@ -706,7 +765,7 @@ of the direction of the link. 'angled' rotates the box to follow the directiong 
 <div class="definition">BWLABELPOS <em class="meta">inposition</em> <em class="meta">outposition</em>
 </div>
 <div class="description">
-<p>Specifies the position of the 'bandwidth' labels shown on each link. </p><p>The two position values are percentages along the link arrow, from the first to the second node. Therefore <tt>BWLABELPOS 75 25</tt> is the default. </p> 
+<p>Specifies the position of the 'bandwidth' labels shown on each link. </p><p>The two position values are percentages along the link arrow, from the first to the second node. Therefore <a href="#LINK_BWLABELPOS"><tt>BWLABELPOS</a> 75 25</tt> is the default. </p> 
 </div>
 <div class="changes">
 <h3>Change History</h3>
@@ -769,8 +828,8 @@ of the direction of the link. 'angled' rotates the box to follow the directiong 
 <div class="definition">COMMENTPOS <em class="meta">inposition</em> <em class="meta">outposition</em>
 </div>
 <div class="description">
-<p>Specify the position along the link used for drawing the <a href="#LINK_INCOMMENT">INCOMMENT</a> and <a href="#LINK_OUTCOMMENT">OUTCOMMENT</a> text. </p><p>The positions are specified as a percentage position along the link, like <a href="#LINK_BWLABELPOS">BWLABELPOS.</a> The default positions are equivalent to <strong>COMMENTPOS 95 5</strong>. </p><changes> 
- <change version="0.92">Added COMMENTPOS</change> 
+<p>Specify the position along the link used for drawing the <a href="#LINK_INCOMMENT">INCOMMENT</a> and <a href="#LINK_OUTCOMMENT">OUTCOMMENT</a> text. </p><p>The positions are specified as a percentage position along the link, like <a href="#LINK_BWLABELPOS">BWLABELPOS.</a> The default positions are equivalent to <a href="#LINK_COMMENTPOS"><strong>COMMENTPOS</a> 95 5</strong>. </p><changes> 
+ <change version="0.92">Added <a href="#LINK_COMMENTPOS">COMMENTPOS</change></a> 
  </changes> 
 </div>
 </div>
@@ -779,8 +838,8 @@ of the direction of the link. 'angled' rotates the box to follow the directiong 
 <div class="definition">SPLITPOS <em class="meta">position</em>
 </div>
 <div class="description">
-<p>Specify the position along the link used for drawing the <a href="#LINK_INCOMMENT">INCOMMENT</a> and <a href="#LINK_OUTCOMMENT">OUTCOMMENT</a> text. </p><changes> 
- <change version="0.95">Added SPLITPOS</change> 
+<p>Specify the position of the 'split' between the in and out arrows in a link. <em>position</em> is a percentage, and defaults to 50. </p><changes> 
+ <change version="0.95">Added <a href="#LINK_SPLITPOS">SPLITPOS</change></a> 
  </changes> 
 </div>
 </div>
@@ -832,7 +891,7 @@ of the direction of the link. 'angled' rotates the box to follow the directiong 
 <div class="description">
 <p>Creates a popup image in the HTML output. </p><p>If you are using the HTML output facility, and <a href="#GLOBAL_HTMLSTYLE">HTMLSTYLE</a> is set to 'overlib', then a link is added to the 
  &lt;map&gt; section of the HTML so that when you move the mouse pointer over the the (weathermap) link, a box will pop up 
- containing the image that you specify. Typically used to link to historical data in your network monitoring system. </p><p>If a <a href="#LINK_NOTES">NOTES</a> line is also specified for a link, then the image specified here appears with the <a href="#LINK_NOTES">NOTES</a> text underneath it. </p> 
+ containing the image that you specify. Typically used to link to historical data in your network monitoring system. </p><p>You can also specify more than one url, in which case the images are 'stacked' one after another in the popup box. </p><p>If a <a href="#LINK_NOTES">NOTES</a> line is also specified for a link, then the image specified here appears with the <a href="#LINK_NOTES">NOTES</a> text underneath it. </p><p>It is also possible to specify the <a href="#LINK_OVERLIBGRAPH">OVERLIBGRAPH</a> for the 'in' and 'out' halves of a link individually, using <a href="#LINK_INOVERLIBGRAPH">INOVERLIBGRAPH</a> and <a href="#LINK_OUTOVERLIBGRAPH">OUTOVERLIBGRAPH.</a> </p> 
 </div>
 <div class="examples">
 <h3>Examples</h3>
@@ -844,11 +903,47 @@ of the direction of the link. 'angled' rotates the box to follow the directiong 
 <div class="changes">
 <h3>Change History</h3>
 <dl>
+<dt>0.95</dt>
+<dd>Added multiple URL support</dd>
+<dt>0.95</dt>
+<dd>Added IN/OUT support</dd>
 <dt>0.0pre</dt>
 <dd>Odd fact: This command, and the accompanying code to generate overlib imagemaps, were the first modification I ever made to the GRNET perl weathermap,
 		and was what got me interested in writing my own version.</dd>
 </dl>
 </div>
+</div>
+			  <div class="referenceentry">
+<h2><a name="LINK_INOVERLIBGRAPH">INOVERLIBGRAPH</a></h2>
+<div class="definition">INOVERLIBGRAPH <em class="meta">url</em>
+</div>
+<div class="definition">INOVERLIBGRAPH <em class="meta">url</em> <em class="meta">url</em>...</div>
+<div class="description"><p>Same as OVERLIBGRAPH, but specifies a pop-up graph for only the 'in' side of a link. </p></div>
+<div class="changes"> 
+<h3>Change History</h3> 
+<dl> 
+<dt>0.95</dt> 
+<dd>Added multiple URL support</dd> 
+<dt>0.95</dt> 
+<dd>Added IN/OUT support</dd> 
+</dl> 
+</div> 
+</div>
+			  <div class="referenceentry">
+<h2><a name="LINK_OUTOVERLIBGRAPH">OUTOVERLIBGRAPH</a></h2>
+<div class="definition">OUTOVERLIBGRAPH <em class="meta">url</em>
+</div>
+<div class="definition">OUTOVERLIBGRAPH <em class="meta">url</em> <em class="meta">url</em>...</div>
+<div class="description"><p>Same as OVERLIBGRAPH, but specifies a pop-up graph for only the 'out' side of a link. </p></div>
+<div class="changes"> 
+<h3>Change History</h3> 
+<dl> 
+<dt>0.95</dt> 
+<dd>Added multiple URL support</dd> 
+<dt>0.95</dt> 
+<dd>Added IN/OUT support</dd> 
+</dl> 
+</div> 
 </div>
 	    	  <div class="referenceentry">
 <h2><a name="LINK_OVERLIBWIDTH">OVERLIBWIDTH</a></h2>
@@ -920,14 +1015,18 @@ of the direction of the link. 'angled' rotates the box to follow the directiong 
 <h2><a name="LINK_VIA">VIA</a></h2>
 <div class="definition">VIA <em class="meta">x-coord</em> <em class="meta">y-coord</em>
 </div>
+<div class="definition">VIA <em class="meta">nodename</em> <em class="meta">x-offset</em> <em class="meta">y-offset</em>
+</div>
 <div class="description">
 <p>Specify an additional point that a link must pass through. </p><p>A link normally goes in a straight line between the two nodes listed in the <a href="#LINK_NODES">NODES</a> configuration line. 
  If you need it to go around something else, or to seperate two parallel links so that the bandwidth labels 
- are all visible, you can make the link curve. </p><p>If you specify multiple <a href="#LINK_VIA">VIA</a> lines, then the link will pass through each in turn, in the order they are specified. </p> 
+ are all visible, you can make the link curve. </p><p>If you specify multiple <a href="#LINK_VIA">VIA</a> lines, then the link will pass through each in turn, in the order they are specified. </p><p>Any <a href="#LINK_VIA">VIA</a> can also be specified relative to a <a href="#NODE_NODE">NODE</a> on the map. This makes it easier to have curves keep the intended shape as you re-organise a map. </p> 
 </div>
 <div class="changes">
 <h3>Change History</h3>
 <dl>
+<dt>0.95</dt>
+<dd>Added relative-positioned VIA.</dd>
 <dt>0.8</dt>
 <dd>Originally added VIA.</dd>
 </dl>
@@ -1227,12 +1326,22 @@ You can set the output format in the Cacti Settings page. </p>
 </div>
 <div class="definition">SCALE <em class="meta">scalename</em> <em class="meta">min</em> <em class="meta">max</em> <em class="meta">red</em> <em class="meta">green</em> <em class="meta">blue</em> <em class="meta">red2</em> <em class="meta">green2</em> <em class="meta">blue2</em>
 </div>
+<div class="definition">SCALE <em class="meta">min</em> <em class="meta">max</em> <em class="meta">red</em> <em class="meta">green</em> <em class="meta">blue</em> <em class="meta">tagtext</em>
+</div>
+<div class="definition">SCALE <em class="meta">scalename</em> <em class="meta">min</em> <em class="meta">max</em> <em class="meta">red</em> <em class="meta">green</em> <em class="meta">blue</em> <em class="meta">tagtext</em>
+</div>
+<div class="definition">SCALE <em class="meta">min</em> <em class="meta">max</em> <em class="meta">red</em> <em class="meta">green</em> <em class="meta">blue</em> <em class="meta">red2</em> <em class="meta">green2</em> <em class="meta">blue2</em> <em class="meta">tagtext</em>
+</div>
+<div class="definition">SCALE <em class="meta">scalename</em> <em class="meta">min</em> <em class="meta">max</em> <em class="meta">red</em> <em class="meta">green</em> <em class="meta">blue</em> <em class="meta">red2</em> <em class="meta">green2</em> <em class="meta">blue2</em> <em class="meta">tagtext</em>
+</div>
 <div class="description">
-<p>Defines one 'span' within the link colour-coding table. </p><p>SCALE is used to specify how NODEs and LINKs are colour-coded according to their percent usage. 
+<p>Defines one 'span' within the link colour-coding table. </p><p>SCALE is used to specify how <a href="#NODE_NODE">NODEs</a> and <a href="#LINK_LINK">LINKs</a> are colour-coded according to their percent usage. 
  If the percentage usage falls between min and max then the colour specified by red, green and blue is used to colour the link. 
  Colour values are between 0 and 255. Percentages are between 0 and 100, obviously. </p><p>If you specify <i>two</i> colours on the line (the third and fourth forms above), then the colour chosen for the link will be calculated as 
- a proportion between the two colours. You can avoid specifying many <a href="#GLOBAL_SCALE">SCALE</a> lines this way. </p><p>Without a <i>scalename</i>, the <a href="#GLOBAL_SCALE">SCALE</a> line will add a definition to the scale named 'DEFAULT'. If you define any other named scales, you can then use the <a href="#LINK_USESCALE">USESCALE</a> directive to specify that a particular <a href="#NODE_NODE">NODE</a> or <a href="#LINK_LINK">LINK</a> use your new scale. </p><p>If you don't add <i>any</i> <a href="#GLOBAL_SCALE">SCALE</a> lines to a configuration file, then a default set is added for you, but as soon as you add one, you'll need to make enough to cover the whole 0-100 range to get nice colours. 
- Any percentage not matched by <a href="#GLOBAL_SCALE">SCALE</a> rules is rendered in grey. </p><p>You can specify a colour for an <em>exact</em> percentage (e.g. zero) by using that value for both the min and max values. The scale lines are sorted by min then max, and scanned from top to bottom. The first match wins. </p><p>To show a legend in the map for a given <a href="#GLOBAL_SCALE">SCALE,</a> you should use <a href="#GLOBAL_KEYPOS">KEYPOS</a> and <a href="#GLOBAL_KEYSTYLE">KEYSTYLE.</a> </p><p>You can also apply SCALEs to colorise <a href="#NODE_ICON">ICON</a> images. You do this using <a href="#NODE_USEICONSCALE">USEICONSCALE.</a> </p> 
+ a proportion between the two colours. You can avoid specifying many <a href="#GLOBAL_SCALE">SCALE</a> lines this way. </p><p>Without a <i>scalename</i>, the <a href="#GLOBAL_SCALE">SCALE</a> line will add a definition to the scale named 'DEFAULT'. If you define any other named scales, you can then use the <a href="#LINK_USESCALE">USESCALE</a> directive to specify that a particular <a href="#NODE_NODE">NODE</a> or <a href="#LINK_LINK">LINK</a> use your new scale. </p><p>With any of the formats, you can specify a 'tag' on the end of the line. When the colour is decided for the 'in' and 'out' parts of a <a href="#NODE_NODE">NODE</a> or <a href="#LINK_LINK">LINK,</a> 
+ then a special <a href="#GLOBAL_SET">SET</a> variable is defined called {node:this:inscaletag} (or outscaletag, or link:this...) which contains the tagtext from the <a href="#GLOBAL_SCALE">SCALE</a> line that 
+ matched. You can use this to do things like choose an icon, or change the label of a node or link based on a percentage. There are examples of this (and most other node-related formatting things) in the suite-1.conf map found in the random-bits/ folder of the weathermap distribution. </p><p>If you don't add <i>any</i> <a href="#GLOBAL_SCALE">SCALE</a> lines to a configuration file, then a default set is added for you, but as soon as you add one, you'll need to make enough to cover the whole 0-100 range to get nice colours. 
+ Any percentage not matched by <a href="#GLOBAL_SCALE">SCALE</a> rules is rendered in grey. </p><p>You can specify a colour for an <em>exact</em> percentage (e.g. zero) by using that value for both the min and max values. The scale lines are sorted by min then max, and scanned from top to bottom. The first match wins. </p><p>To show a legend in the map for a given <a href="#GLOBAL_SCALE">SCALE,</a> you should use <a href="#GLOBAL_KEYPOS">KEYPOS</a> and <a href="#GLOBAL_KEYSTYLE">KEYSTYLE.</a> </p><p>You can also apply <a href="#GLOBAL_SCALE">SCALEs</a> to colorise <a href="#NODE_ICON">ICON</a> images. You do this using <a href="#NODE_USEICONSCALE">USEICONSCALE.</a> </p> 
 </div>
 <div class="examples">
 <h3>Examples</h3>
@@ -1256,6 +1365,8 @@ SCALE  85  100    255     0    0</pre>
 <dl>
 <dt>0.95</dt>
 <dd>Added USEICONSCALE.</dd>
+<dt>0.95</dt>
+<dd>Added scale tags.</dd>
 <dt>0.9</dt>
 <dd>Added named scales.</dd>
 <dt>0.9</dt>
@@ -1306,7 +1417,7 @@ SCALE  85  100    255     0    0</pre>
 <div class="description">
 <p>Specifies the style of the key, or legend, that shows what each colour-range means. If a scalename is not given, 
  then "DEFAULT" is assumed. Valid stylenames are: 'classic', 'horizontal' and 'vertical'. </p><p>Classic has a line for each <a href="#GLOBAL_SCALE">SCALE</a> range defined. 'vertical' and 'horizontal' are fixed-size, showing a 
- continuous block from 0-100% usage, which is much more useful when gradient SCALEs are used, or when you have 
+ continuous block from 0-100% usage, which is much more useful when gradient <a href="#GLOBAL_SCALE">SCALEs</a> are used, or when you have 
  a large number of <a href="#GLOBAL_SCALE">SCALE</a> lines in one scale. </p><p> 
  For 'horizontal' and 'vertical' styles, you can optionally add an additional parameter, which specifies the longer dimension of the legend in pixels. That is, for a horizontal legend, it specifies the width. The other dimension is calculated from the size of the font used (see KEYFONT). 
  </p><p><img src="../images/keystyle-classic.png"></img>Classic Style </p><p><img src="../images/keystyle-horizontal.png"></img>Horizontal Style </p><p><img src="../images/keystyle-vertical.png"></img>Vertical Style </p><p>You can hide the percentage signs in the key, by setting key_hidepercent_<em>scalename</em> to 1 </p><p>If you have a 0-&gt;0 line in your <a href="#GLOBAL_SCALE">SCALE,</a> then you can hide that in the key, by setting key_hidezero_<em>scalename</em> to 1 </p> 
@@ -1343,6 +1454,10 @@ SET key_hidepercent_DEFAULT 1</pre>
 <div class="example">
 <h5>Enabling 'bulging link mode' in the link-rendering code.</h5>
 <pre>SET link_bulge 1</pre>
+</div>
+<div class="example">
+<h5>Enabling 'screenshot mode' to anonymise a map in 0.95 or newer.</h5>
+<pre>SET screenshot_mode 1</pre>
 </div>
 </div>
 <div class="changes">

@@ -17,5 +17,6 @@
     </changes>
 <examples>
             <example><caption>Enabling 'bulging link mode' in the link-rendering code.</caption><content>SET link_bulge 1</content></example>
+			<example><caption>Enabling 'screenshot mode' to anonymise a map in 0.95 or newer.</caption><content>SET screenshot_mode 1</content></example>
 </examples>
 </configentry>

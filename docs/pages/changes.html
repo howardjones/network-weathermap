@@ -49,6 +49,60 @@ href="http://www.network-weathermap.com/">Website</a>)</h4>
 </div> 
 
 
+ <h2><a name="changes095">Changes For This Version (0.941 to 0.95)</a></h2> 
+<p>This release has a lot of changes - most of them are small 'polishing' tweaks, but there are a few interesting bigger ones too. Happily, although 
+there are a quite a few more features, this release actually has <em>less</em> lines of code than 0.941, due to some internal cleaning up. </p> 
+ <h3>Fixes</h3> 
+ <ul> 
+ <li>KEYOUTLINECOLOR is actually used now (thanks to llow once more)</li> 
+ <li>Editor doesn't throw away <a href="config-reference.html#GLOBAL_WIDTH">WIDTH</a> and <a href="config-reference.html#GLOBAL_HEIGHT">HEIGHT</a> with no BG image</li> 
+ <li>Cacti Data-source and Graph picker doesn't restrict scrolling or resizing anymore</li> 
+ <li>weathermap-cacti-rebuild.php to work on both Cacti 0.8.6 and 0.8.7</li> 
+ <li>weathermap-cacti-rebuild.php to flat-out fail if Cacti environment is wrong.</li> 
+ <li>SNMP DS plugin had a typo that stopped it working at all (and no-one 
+ noticed for almost a year :-) ). (thanks to Fratissier Christophe for pointing it out)</li> 
+ <li>Added some better controls into SNMP DS plugin. You can correctly pull 
+ interface oper/admin status, for example, now.</li> 
+ </ul> 
+
+ <h3>Changes</h3> 
+ <ul> 
+ <li>DS plugins are able to return negative results now <strong>(breaks user-developed DS plugins)</strong></li> 
+ <li>the scale: prefix for the RRD DS plugin can take negative scale factors</li> 
+ <li>(internal) plugins are each created as a single object now. Result: the plugin can cache results internally.</li> 
+ <li>(internal) broke out some of the larger classes (node, link) into separate files.</li> 
+ </ul> 
+
+ <h3>New Features</h3> 
+ <ul> 
+ <li>You can add a 'tag' to a <a href="config-reference.html#GLOBAL_SCALE">SCALE</a> line, to be used in <a href="config-reference.html#NODE_ICON">ICON</a> or <a href="config-reference.html#NODE_LABEL">LABELs</a> later.</li> 
+ <a href="config-reference.html#NODE_USEICONSCALE"><li>USEICONSCALE</a> - colorize icon images (based on patches from llow)</li> 
+ <li>screenshot mode. <a href="config-reference.html#GLOBAL_SET">"SET</a> screenshot_mode 1" at the top of the map will anonymise all labels, comments and bwlabels.</li> 
+ <li>LABELFONTCOLOR can use a special value of 'contrast' to always contrast with the label colour.</li> 
+ <li>Artificial Icons. Special icon 'filenames' - 'box' 'round' 'rbox' create a shaped icon without any file. See <a href="config-reference.html#NODE_ICON">ICON</a> and AICONFILLCOLOR for more.</li> 
+ <li>Map titles show up in browser title now.</li> 
+ <li>a basic 'live view' function which generates a map on demand. Sometimes. It's not very useful.</li> 
+ <a href="config-reference.html#NODE_LABELANGLE"><li>LABELANGLE</a> allows you to rotate node labels to 90,180,270 degrees. Needs truetype font.</li> 
+ <li>improved data-source picker in editor: host filter</li> 
+ <li>improved data-source picker in editor: option to aggregate data sources</li> 
+ <li>Moved data-source picker changes across into the graph-picker for <a href="config-reference.html#NODE_NODE">NODEs</a> too.</li> 
+ <a href="config-reference.html#LINK_SPLITPOS"><li>SPLITPOS</a> keyword to control position of midpoint in links</li> 
+ <a href="config-reference.html#LINK_VIA"><li>VIA</a> can be positioned relative to <a href="config-reference.html#NODE_NODE">NODEs</a> (like <a href="config-reference.html#NODE_NODE">NODEs</a> can) (thanks again to llow) </li> 
+ <li>Weathermap has a hook in the map viewing page to allow other plugins to add code there</li> 
+ <li>.htaccess files bundled with Weathermap to restrict direct access to configs and output</li> 
+ <li>filenames for output are much less guessable now</li> 
+ <li>You can use <a href="config-reference.html#LINK_DUPLEX">'DUPLEX</a> half' on a link to make the bandwidth percentage 
+ calculate work for half-duplex links</li> 
+ <li>ININFOURL / OUTINFOURL, <a href="config-reference.html#LINK_INOVERLIBGRAPH">INOVERLIBGRAPH</a> / <a href="config-reference.html#LINK_OUTOVERLIBGRAPH">OUTOVERLIBGRAPH,</a> INNOTES / OUTNOTES, INOVERLIBCAPTION / OUTOVERLIBCAPTION </li> 
+ allow you to have different urls for the in and out side of links (based on idea from llow)</li> 
+ <a href="config-reference.html#LINK_OVERLIBGRAPH"><li>OVERLIBGRAPH</a> (and IN/OUT versions) can take multiple URLs separated by spaces (again from idea by llow)</li> 
+ <li>debug/warning log output contains the map name, and the debug output is marked DEBUG</li> 
+ <li>debug log output contains the calling function, file/line number, too. Making debugging-by-mail easier.</li> 
+ <li>fping: <a href="config-reference.html#LINK_TARGET">TARGET</a> to do live pings of devices</li> 
+ <li>a very basic sample 'skeleton' DS plugin</li> 
+ <li>an additional check-gdbug.php to spot bad GD installs</li> 
+ </ul> 
+
  <h2><a name="changes0941">Changes For This Version (0.94 to 0.941)</a></h2> 
 
  <h3>Fixes</h3> 
@@ -71,7 +125,7 @@ are some nice new features even so - <a href="config-reference.html#LINK_INBWFOR
 
  <h3>New Features</h3> 
  <ul> 
-<li>INBWFORMAT and <a href="config-reference.html#LINK_OUTBWFORMAT">OUTBWFORMAT</a> allow you to format the text for <a href="config-reference.html#LINK_BWLABEL">BWLABEL,</a> same as for COMMENTs</li> 
+<a href="config-reference.html#LINK_INBWFORMAT"><li>INBWFORMAT</a> and <a href="config-reference.html#LINK_OUTBWFORMAT">OUTBWFORMAT</a> allow you to format the text for <a href="config-reference.html#LINK_BWLABEL">BWLABEL,</a> same as for COMMENTs</li> 
 <li>New cactithold/cactimonitor data source plugin reads data from Cacti's Threshold plugin. 
  (Original development for this plugin was paid for by Stellar Consulting - Thanks!)</li> 
 <li>New <a href="config-reference.html#LINK_LINKSTYLE">LINKSTYLE</a> command allows you to have one-way (one arrow) links.</li> 
@@ -124,7 +178,7 @@ are some nice new features even so - <a href="config-reference.html#LINK_INBWFOR
  <li>editor-generated node names are a bit shorter (and easier to read) now. 
  <li>keyboard focus switches nicely to the popup dialogs now. 
  <li>Non-unique IDs in imagemaps, in overlib mode. 
- <li>COMMENTPOS 0 doesn't kill everything anymore 
+ <a href="config-reference.html#LINK_COMMENTPOS"><li>COMMENTPOS</a> 0 doesn't kill everything anymore 
  <li>OVERLIB would behave incorrectly with PHP4 and relatively positioned nodes (Bernd Ziller) 
  <li>Better-validating HTML produced 
  <li>angled bwlabels have the correct imagemap 
@@ -135,19 +189,19 @@ are some nice new features even so - <a href="config-reference.html#LINK_INBWFOR
  <h2><a name="changes092">Changes For This Version (0.91 to 0.92)</a></h2> 
  <h3>New Features</h3> 
  <ul> 
- <li>BWSTYLE allows you to align the <a href="config-reference.html#LINK_BWLABEL">BWLABEL</a> boxes with their links. Looks nice!</li> 
- <li>COMMENTPOS allows you to move comments, much like <a href="config-reference.html#LINK_BWLABELPOS">BWLABELPOS</a> for BWLABELs</li> 
+ <a href="config-reference.html#LINK_BWSTYLE"><li>BWSTYLE</a> allows you to align the <a href="config-reference.html#LINK_BWLABEL">BWLABEL</a> boxes with their links. Looks nice!</li> 
+ <a href="config-reference.html#LINK_COMMENTPOS"><li>COMMENTPOS</a> allows you to move comments, much like <a href="config-reference.html#LINK_BWLABELPOS">BWLABELPOS</a> for <a href="config-reference.html#LINK_BWLABEL">BWLABELs</li></a> 
  <li>The editor works the way you'd expect for defaults now.</li> 
  <li>The editor does a bunch of clever maths when moving a node that is part of a curved link to make a sensible result (I like this one).</li> 
  <li>The editor will let you pick an <a href="config-reference.html#LINK_INFOURL">INFOURL</a> and <a href="config-reference.html#LINK_OVERLIBGRAPH">OVERLIBGRAPH</a> for a <a href="config-reference.html#NODE_NODE">NODE</a> from your Cacti graphs (but not a <a href="config-reference.html#LINK_TARGET">TARGET</a> yet).</li> 
  <li>The editor doesn't <em>require</em> an <tt>editor-config.php</tt> anymore, but if you <em>do</em> have one, <strong>make sure it's based on the editor-config.php-dist in this version</strong>. This file has changed.</li> 
  <li>Secret <a href="config-reference.html#GLOBAL_SET">SET</a> codes: key_hidepercent_<em>scalename</em> and key_hidezero_<em>scalename</em><br /> 
- You can set these at the top of the config file, for each scale (change <em>scalename</em> to the scale name). <tt>SET key_hidezero_DEFAULT 1</tt> hides the 0->0 line if there is one, in a 'classic' style legend for that scale. 
-<tt>SET key_hidepercent_scalename 1</tt> hides the percentage signs in the 'classic' style legend for that scale.</li> 
+ You can set these at the top of the config file, for each scale (change <em>scalename</em> to the scale name). <a href="config-reference.html#GLOBAL_SET"><tt>SET</a> key_hidezero_DEFAULT 1</tt> hides the 0->0 line if there is one, in a 'classic' style legend for that scale. 
+<a href="config-reference.html#GLOBAL_SET"><tt>SET</a> key_hidepercent_scalename 1</tt> hides the percentage signs in the 'classic' style legend for that scale.</li> 
  </ul> 
  <h3>Fixes</h3> 
  <ul> 
- <li>SET in a DEFAULT node or link wasn't inherited properly.</li> 
+ <a href="config-reference.html#GLOBAL_SET"><li>SET</a> in a DEFAULT node or link wasn't inherited properly.</li> 
  <li>weathermap.conf is a simple map again. I accidentally packaged my test map for 0.9 and 0.91</li> 
  <li>Any unreadable files in the configs/ directory would kill the editor</li> 
  <li>One PHP short_tag remained, which upsets some PHP installs (seems to be mainly Windows)</li> 
@@ -172,9 +226,9 @@ are some nice new features even so - <a href="config-reference.html#LINK_INBWFOR
 <li>RRD bug with '-' DS names. This was fixed in 0.9pre3, but somehow slipped through.<li> 
 <li>ReadConfig doesn't complain about <a href="config-reference.html#GLOBAL_KEYPOS">KEYPOS</a> DEFAULT -1 -1 (as written by WriteConfig) anymore</li> 
 <li>The MRTG plugin made some assumptions that broke handling of MRTG html files on remote systems. It doesn't now.</li> 
-<li>NOTES was not fully tested, and broke cactihost: targets, at least.</li> 
-<li>KILO was broken - fixed now.</li> 
-<li>BWLABELPOS was handled badly by the editor - it would swap them over</li> 
+<a href="config-reference.html#LINK_NOTES"><li>NOTES</a> was not fully tested, and broke cactihost: targets, at least.</li> 
+<a href="config-reference.html#GLOBAL_KILO"><li>KILO</a> was broken - fixed now.</li> 
+<a href="config-reference.html#LINK_BWLABELPOS"><li>BWLABELPOS</a> was handled badly by the editor - it would swap them over</li> 
 </ul> 
 
  <h2><a name="changes09">Changes For This Version (0.82 to 0.9)</a></h2> 
@@ -191,7 +245,7 @@ are some nice new features even so - <a href="config-reference.html#LINK_INBWFOR
 <p>You can make links end at arbitrary positions relative to a node now. Previously you could use compass-points, now you can also use pixels for the offsets in a <a href="config-reference.html#LINK_NODES">NODES</a> line </p> 
 <h4>JPEG & GIF Support</h4> 
 <p>If your GD library supports it, then Weathermap now understands JPEG and GIF files for <a href="config-reference.html#GLOBAL_BACKGROUND">BACKGROUND,</a> <a href="config-reference.html#NODE_ICON">ICON</a> and <a href="config-reference.html#GLOBAL_IMAGEOUTPUTFILE">IMAGEOUTPUTFILE.</a> </p> 
-<h4>NOTES &amp; OVERLIBCAPTION</h4> 
+<a href="config-reference.html#LINK_NOTES"><h4>NOTES</a> &amp; <a href="config-reference.html#LINK_OVERLIBCAPTION">OVERLIBCAPTION</h4></a> 
 <p>You can specify a caption string for the 'popup' overlib window now, per-node/link. You can <em>also</em> have HTML-formatted text in that window, with or without the graph. See <a href="config-reference.html#LINK_NOTES">NOTES</a> and <a href="config-reference.html#LINK_OVERLIBCAPTION">OVERLIBCAPTION.</a> </p> 
 <h4>New Legend Styles</h4> 
 <p>The new <a href="config-reference.html#GLOBAL_KEYSTYLE">KEYSTYLE</a> directive allows you to choose between 'classic' and two new styles of Legend. The new styles are neater for showing gradient scales, or when you have a <em>lot</em> of different bands. </p> 
@@ -213,23 +267,23 @@ The RRD plugin also has some improvements in dealing with error conditions in th
  </p> 
 <p>There are planned plugins for Cacti (reading directly from the Cact database), Nagios Host Status, SNMP directly and others. </p> 
 
-<h4>NODE Targets</h4> 
-<p>NODEs can have data now. This means you can have them change colour according to a <a href="config-reference.html#GLOBAL_SCALE">SCALE,</a> just like a <a href="config-reference.html#LINK_LINK">LINK</a> does. Since a <a href="config-reference.html#NODE_NODE">NODE</a> only has one value, you can 
+<a href="config-reference.html#NODE_NODE"><h4>NODE</a> Targets</h4> 
+<a href="config-reference.html#NODE_NODE"><p>NODEs</a> can have data now. This means you can have them change colour according to a <a href="config-reference.html#GLOBAL_SCALE">SCALE,</a> just like a <a href="config-reference.html#LINK_LINK">LINK</a> does. Since a <a href="config-reference.html#NODE_NODE">NODE</a> only has one value, you can 
 choose which one to use (of the two that a <a href="config-reference.html#LINK_TARGET">TARGET</a> provides), with USEVALUE. </p> 
 
-<h4>Multiple SCALEs</h4> 
+<h4>Multiple <a href="config-reference.html#GLOBAL_SCALE">SCALEs</h4></a> 
 <p>Because you probably don't want your nodes to change colour with the same values as your links, you can now have multiple <a href="config-reference.html#GLOBAL_SCALE">SCALE</a> sets too. The default one is DEFAULT, but you can define others and use them with <a href="config-reference.html#LINK_USESCALE">USESCALE</a> in a <a href="config-reference.html#NODE_NODE">NODE</a> or <a href="config-reference.html#LINK_LINK">LINK</a> section. </p> 
 
 <h4>String Tokens</h4> 
 <p>You can embed information from Weathermap, and from your own data, in almost any string in Weathermap. This allows you to do things like:<ul> 
-<li>Show percentage CPU usage in a node LABEL</li> 
+<li>Show percentage CPU usage in a node <a href="config-reference.html#NODE_LABEL">LABEL</li></a> 
 <li>Change which <a href="config-reference.html#NODE_ICON">ICON</a> is used depending on a datasource value</li> 
-<li>Add extra "sub-NODEs" around a <a href="config-reference.html#NODE_NODE">NODE,</a> with addional information</li> 
+<li>Add extra <a href="config-reference.html#NODE_NODE">"sub-NODEs"</a> around a <a href="config-reference.html#NODE_NODE">NODE,</a> with addional information</li> 
 <li>Use generic <a href="config-reference.html#LINK_TARGET">TARGET,</a> <a href="config-reference.html#LINK_INFOURL">INFOURL,</a> <a href="config-reference.html#LINK_OVERLIBGRAPH">OVERLIBGRAPH</a> lines in the DEFAULT link and node</li> 
 </ul> </p> 
 
 <h4>Arbitrary Parameters</h4> 
-<p>The new <a href="config-reference.html#GLOBAL_SET">SET</a> directive lets you define new 'variables' per-NODE, per-LINK or for the whole map. These can be used to give fine-tuning parameters to the data source plugins, and also as additional data in String Tokens. </p> 
+<p>The new <a href="config-reference.html#GLOBAL_SET">SET</a> directive lets you define new 'variables' <a href="config-reference.html#NODE_NODE">per-NODE,</a> <a href="config-reference.html#LINK_LINK">per-LINK</a> or for the whole map. These can be used to give fine-tuning parameters to the data source plugins, and also as additional data in String Tokens. </p> 
 
 <h3><a name="cacti">>Cacti Plugin</a></h3> 
 <p>Most of the Cacti Plugin changes are bugfixes or for more advanced users. </p> 
@@ -249,11 +303,11 @@ choose which one to use (of the two that a <a href="config-reference.html#LINK_T
 <h3><a name="bugs">Bugfixes</a></h3> 
 <p>There were a lot of bugs fixed along the way. Most were new ones, but a few are things that existed in 0.82 too: 
 <ul> 
-<li>Wierd bug in HTML_ImageMap if you have a lot of similarly-named NODEs or LINKs.</li> 
-<li>Floating-point limits in SCALEs work correctly now. Also, you can specify a 0-0 <a href="config-reference.html#GLOBAL_SCALE">SCALE</a> line and it will always take precedence.</li> 
+<li>Wierd bug in HTML_ImageMap if you have a lot of similarly-named <a href="config-reference.html#NODE_NODE">NODEs</a> or <a href="config-reference.html#LINK_LINK">LINKs.</li></a> 
+<li>Floating-point limits in <a href="config-reference.html#GLOBAL_SCALE">SCALEs</a> work correctly now. Also, you can specify a 0-0 <a href="config-reference.html#GLOBAL_SCALE">SCALE</a> line and it will always take precedence.</li> 
 <li>Cacti plugin doesn't assume 'admin' user always exists, and that users are never deleted.</li> 
 <li>Cacti plugin's Cycle mode works in IE now.</li> 
-<li>KILO was ignored in some places.</li> 
+<a href="config-reference.html#GLOBAL_KILO"><li>KILO</a> was ignored in some places.</li> 
 <li>Editor will let you rename nodes now!</li> 
 <li>Editor deals properly with ' in node labels</li> 
 <li>Editor deals properly with pathnames containing '\' on Windows.</li> 

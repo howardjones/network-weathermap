@@ -68,7 +68,7 @@ href="http://www.network-weathermap.com/">Website</a>)</h4>
  <p>The standard fonts used by Weathermap are the ones bundled with the GD graphics library. These fonts (number 1-5 when you select fonts) can only be 
  drawn 'flat', and not at an angle. </p> 
  <p>If you are using link comments, or the 'angled' <a href="config-reference.html#LINK_BWSTYLE">BWSTYLE,</a> then Weathermap needs to be able to drawn text at any angle. To do this, it needs a Truetype font to be used for that part of the map (the bwlabel, or comment), which is drawn using the FreeType library. </p> 
- <p>To do this, you need to find a Truetype font, put it in your weathermap folder, and then define a new font in your map config file: <code>FONTDEFINE 100 Vera 9</code> </p> 
+ <p>To do this, you need to find a Truetype font, put it in your weathermap folder, and then define a new font in your map config file: <a href="config-reference.html#GLOBAL_FONTDEFINE"><code>FONTDEFINE</a> 100 Vera 9</code> </p> 
  <p>Then you can use that new font (no. 100) in <a href="config-reference.html#LINK_COMMENTFONT">COMMENTFONT</a> or <a href="config-reference.html#LINK_BWFONT">BWFONT</a> lines. </p> 
  <p>You can find some TrueType fonts, and an example.conf that does this in the docs/example folder. </p><p>The reason the default comment font is not a TrueType font is that the FreeType library is an <em>optional</em> part of the GD library, so I can't assume that it will be available. </p> 
  </dd> 
@@ -92,7 +92,7 @@ href="http://www.network-weathermap.com/">Website</a>)</h4>
  <dt><a name="WMWARN07">[WMWARN07]</a></dt> 
  <dd><p>"ReadData: <em>type</em> <em>name</em>, target: <em>targetstring</em> on config line <em>linenumber</em> was recognised as a valid <a href="config-reference.html#LINK_TARGET">TARGET</a> by a plugin that is unable to run (<em>pluginname</em>) " </p> 
  <p>When the datasource plugins are loaded, each one is given a chance to check if everything it needs is available. If something is missing, that plugin can decline to load. If you have a <a href="config-reference.html#LINK_TARGET">TARGET</a> line that is aimed at a particular plugin, and that plugin declined to load, you will get this message. </p> 
- <p>Examples of this type of problem would be: Using cactihost: TARGETs but with the command-line tool where cactihost: can't load, or using the rrdtool DS from the command-line, without correctly setting a path to rrdtool in the <tt>weathermap</tt> command-line tool. </p> 
+ <p>Examples of this type of problem would be: Using cactihost: <a href="config-reference.html#LINK_TARGET">TARGETs</a> but with the command-line tool where cactihost: can't load, or using the rrdtool DS from the command-line, without correctly setting a path to rrdtool in the <tt>weathermap</tt> command-line tool. </p> 
  </dd> 
 
  <dt><a name="WMWARN08">[WMWARN08]</a></dt> 
@@ -106,7 +106,7 @@ href="http://www.network-weathermap.com/">Website</a>)</h4>
  </dd> 
 
  <dt><a name="WMWARN10">[WMWARN10]</a></dt> 
- <dd><p>"NODE <em>nodename</em> has a relative position to an unknown node! " </p> 
+ <a href="config-reference.html#NODE_NODE"><dd><p>"NODE</a> <em>nodename</em> has a relative position to an unknown node! " </p> 
  <p>You have used the relative <a href="config-reference.html#NODE_POSITION">POSITION</a> for a <a href="config-reference.html#NODE_NODE">NODE,</a> but you did it relative to a node that doesn't exist. Probably you have a typographical error/spelling error... </p> 
  </dd> 
 
@@ -166,22 +166,22 @@ href="http://www.network-weathermap.com/">Website</a>)</h4>
 
  <dt><a name="WMWARN24">[WMWARN24]</a></dt> 
  <dd><p>"Duplicate node name <em>nodename</em> at line <em>linenumber</em> - only the last one defined is used. " </p> 
- <p>You have used the same name for two or more <a href="config-reference.html#NODE_NODE">NODE</a> lines in your config. This is probably a typo or cut & paste error. One of the two NODEs will not show up in the map. </p> 
+ <p>You have used the same name for two or more <a href="config-reference.html#NODE_NODE">NODE</a> lines in your config. This is probably a typo or cut & paste error. One of the two <a href="config-reference.html#NODE_NODE">NODEs</a> will not show up in the map. </p> 
  </dd> 
 
  <dt><a name="WMWARN25">[WMWARN25]</a></dt> 
  <dd><p>"Duplicate link name <em>linkname</em> at line <em>linenumber</em> - only the last one defined is used. " </p> 
- <p>You have used the same name for two or more <a href="config-reference.html#LINK_LINK">LINK</a> lines in your config. This is probably a typo or cut & paste error. One of the two LINKs will not show up in the map. </p> 
+ <p>You have used the same name for two or more <a href="config-reference.html#LINK_LINK">LINK</a> lines in your config. This is probably a typo or cut & paste error. One of the two <a href="config-reference.html#LINK_LINK">LINKs</a> will not show up in the map. </p> 
  </dd> 
 
  <dt><a name="WMWARN26">[WMWARN26]</a></dt> 
- <dd><p>"LINK DEFAULT is not the first <a href="config-reference.html#LINK_LINK">LINK.</a> Defaults will not apply to earlier LINKs. " </p> 
- <p>You should usually specify your DEFAULT <a href="config-reference.html#LINK_LINK">LINK</a> <em>before</em> all your 'real' LINKs. The reason is that when a new <a href="config-reference.html#LINK_LINK">LINK</a> is defined, it copies whatever the default settings are at that point in reading down the config file, so you will end up with inconsistent results. </p> 
+ <a href="config-reference.html#LINK_LINK"><dd><p>"LINK</a> DEFAULT is not the first <a href="config-reference.html#LINK_LINK">LINK.</a> Defaults will not apply to earlier <a href="config-reference.html#LINK_LINK">LINKs.</a> " </p> 
+ <p>You should usually specify your DEFAULT <a href="config-reference.html#LINK_LINK">LINK</a> <em>before</em> all your 'real' <a href="config-reference.html#LINK_LINK">LINKs.</a> The reason is that when a new <a href="config-reference.html#LINK_LINK">LINK</a> is defined, it copies whatever the default settings are at that point in reading down the config file, so you will end up with inconsistent results. </p> 
  </dd> 
 
  <dt><a name="WMWARN27">[WMWARN27]</a></dt> 
- <dd><p>"NODE DEFAULT is not the first <a href="config-reference.html#NODE_NODE">NODE.</a> Defaults will not apply to earlier NODEs. " </p> 
-<p>You should usually specify your DEFAULT <a href="config-reference.html#NODE_NODE">NODE</a> <em>before</em> all your 'real' NODEs. The reason is that when a new <a href="config-reference.html#NODE_NODE">NODE</a> is defined, it copies whatever the default settings are at that point in reading down the config file, so you will end up with inconsistent results. </p> </dd> 
+ <a href="config-reference.html#NODE_NODE"><dd><p>"NODE</a> DEFAULT is not the first <a href="config-reference.html#NODE_NODE">NODE.</a> Defaults will not apply to earlier <a href="config-reference.html#NODE_NODE">NODEs.</a> " </p> 
+<p>You should usually specify your DEFAULT <a href="config-reference.html#NODE_NODE">NODE</a> <em>before</em> all your 'real' <a href="config-reference.html#NODE_NODE">NODEs.</a> The reason is that when a new <a href="config-reference.html#NODE_NODE">NODE</a> is defined, it copies whatever the default settings are at that point in reading down the config file, so you will end up with inconsistent results. </p> </dd> 
 
  <dt><a name="WMWARN28">[WMWARN28]</a></dt> 
  <dd><p>"Dropping <a href="config-reference.html#LINK_LINK">LINK</a> <em>linkname</em> - it hasn't got 2 <a href="config-reference.html#LINK_NODES">NODES!</a> " </p> 
@@ -245,7 +245,7 @@ href="http://www.network-weathermap.com/">Website</a>)</h4>
  </dd> 
 
  <dt><a name="WMRRD02">[WMRRD02]</a></dt> 
- <dd><p>"RRD DS: Can't find RRDTOOL. Check line 29 of the 'weathermap' script. RRD-based TARGETs will fail. " </p> 
+ <dd><p>"RRD DS: Can't find RRDTOOL. Check line 29 of the 'weathermap' script. RRD-based <a href="config-reference.html#LINK_TARGET">TARGETs</a> will fail. " </p> 
  <p>You are using the command-line <tt>weathermap</tt> tool, but the path near the top of that file (around line 29) is not the correct path to your rrdtool binary. Edit that file and put in the correct path if you need Weathermap to be able to read .rrd files. </p> 
  </dd> 
 

@@ -35,11 +35,18 @@ while (<STDIN>) {
     if ($indesc || $wholefile) {
         foreach $word ( split( /\s+/, $_ ) ) {
 		$bareword = $word;
-		$bareword =~ tr/a-zA-Z//cd;
+		$bareword =~ tr/A-Z//cd;
 
             if ( $words{$bareword} ) {
+		# print "!";
                 $link = $map{"$scope|$bareword"};
                 $link ||= $map{$bareword};
+		if($wholefile)
+		{
+                $link ||= $map{"GLOBAL|$bareword"};
+                $link ||= $map{"LINK|$bareword"};
+                $link ||= $map{"NODE|$bareword"};
+		}
 
                 # if ( ($link ne '') && ($lastseen ne "${scope}_${bareword}") ) {
                 if ( ($link ne '') ) {

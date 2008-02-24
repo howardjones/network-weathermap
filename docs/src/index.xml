@@ -14,6 +14,7 @@
 			<xi:include href="node_icon.xml" />
 			<xi:include href="node_useiconscale.xml" />
             <xi:include href="node_labeloffset.xml" />
+			<xi:include href="node_labelangle.xml" />
             <xi:include href="node_labelfont.xml" />
                              <xi:include href="node_colours.xml" />
           <xi:include href="node_infourl.xml"/>
@@ -32,6 +33,7 @@
 	    	  <xi:include href="link_usescale.xml"/>
 	    	  <xi:include href="link_width.xml"/>
 	    	  <xi:include href="link_bandwidth.xml"/>
+			  <xi:include href="link_duplex.xml"/>
                 <xi:include href="link_bwlabel.xml"/>
 		<xi:include href="link_inbwformat.xml"/>
 		<xi:include href="link_outbwformat.xml"/>
@@ -46,6 +48,8 @@
             <xi:include href="link_colours.xml" />
 	    	  <xi:include href="link_infourl.xml"/>
 	    	  <xi:include href="link_overlibgraph.xml"/>
+			  <xi:include href="link_inoverlibgraph.xml"/>
+			  <xi:include href="link_outoverlibgraph.xml"/>
 	    	  <xi:include href="link_overlibwidth.xml"/>
 	    	  <xi:include href="link_overlibheight.xml"/>
 	    	  <xi:include href="link_overlibcaption.xml"/>

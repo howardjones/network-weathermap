@@ -58,7 +58,7 @@ function debug($string)
 
 			$calling_fn = " [$function@$file:$line]";
 
-			if(in_array(strtolower($function),$weathermap_debug_suppress)) return;
+			if(is_array($weathermap_debug_suppress) && in_array(strtolower($function),$weathermap_debug_suppress)) return;
 		}
 
 		// use Cacti's debug log, if we are running from the poller
@@ -79,7 +79,7 @@ function warn($string)
 	
 	// use Cacti's debug log, if we are running from the poller
 	if (function_exists('cacti_log') && (!function_exists('show_editor_startpage')))
-	{ cacti_log(($weathermap_map==''?'':$weathermap_map.": ") . rtrim($string), false, "WEATHERMAP"); }
+	{ cacti_log(($weathermap_map==''?'':$weathermap_map.": ") . rtrim($string), true, "WEATHERMAP"); }
 	else
 	{
 		$stderr=fopen('php://stderr', 'w');

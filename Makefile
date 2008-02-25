@@ -3,7 +3,7 @@ RELBASE=../releases
 RELNAME=php-weathermap-$(VERSION)
 RELDIR=$(RELBASE)/weathermap
 
-all: ready manual
+all: ready manual release
 
 random-bits/suite-1.png:  random-bits/suite-1.conf
 	php weathermap --config  random-bits/suite-1.conf --output random-bits/suite-1.png

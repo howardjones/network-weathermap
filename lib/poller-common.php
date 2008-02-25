@@ -39,7 +39,7 @@ function weathermap_run_maps($mydir) {
 	}
 	$quietlogging = read_config_option("weathermap_quiet_logging");  
 	// moved this outside the module_checks, so there should always be something in the logs!
-	if($quietlogging==0) cacti_log("Weathermap $WEATHERMAP_VERSION starting - $mode_message",true,"WEATHERMAP");
+	if($quietlogging==0) cacti_log("Weathermap $WEATHERMAP_VERSION starting - $mode_message",true,"WEATHERMAP\n");
 
 	if(module_checks())
 	{
@@ -78,7 +78,7 @@ function weathermap_run_maps($mydir) {
 
 						if(file_exists($mapfile))
 						{
-							if($quietlogging==0) warn("Map: $mapfile -> $htmlfile & $imagefile");
+							if($quietlogging==0) warn("Map: $mapfile -> $htmlfile & $imagefile\n");
 							weathermap_memory_check("MEM starting $mapcount");
 							$wmap = new Weathermap;
 							$wmap->context = "cacti";
@@ -95,12 +95,12 @@ function weathermap_run_maps($mydir) {
 							// $wmap->imageuri = $config['url_path'].'/plugins/weathermap/output/weathermap_'.$map['id'].".".$imageformat;
 							$wmap->imageuri = $config['url_path'].'plugins/weathermap/weathermap-cacti-plugin.php?action=viewimage&id='.$map['filehash']."&time=".time();
 
-							if($quietlogging==0) warn("About to write image file. If this is the last message in your log, increase memory_limit in php.ini [WMPOLL01]");
+							if($quietlogging==0) warn("About to write image file. If this is the last message in your log, increase memory_limit in php.ini [WMPOLL01]\n");
 							weathermap_memory_check("MEM pre-render $mapcount");
 							
 							$wmap->DrawMap($imagefile,$thumbimagefile,read_config_option("weathermap_thumbsize"));
 							
-							if($quietlogging==0) warn("Wrote map to $imagefile and $thumbimagefile");
+							if($quietlogging==0) warn("Wrote map to $imagefile and $thumbimagefile\n");
 							$fd = @fopen($htmlfile, 'w');
 							if($fd != FALSE)
 							{
@@ -128,33 +128,34 @@ function weathermap_run_maps($mydir) {
 						}
 						else
 						{
-							warn("Mapfile $mapfile is not readable or doesn't exist [WMPOLL04]");
+							warn("Mapfile $mapfile is not readable or doesn't exist [WMPOLL04]\n");
 						}
 					}
-					debug("Iterated all $mapcount maps.");
+					debug("Iterated all $mapcount maps.\n");
 				}
 				else
 				{
-					if($quietlogging==0) warn("No activated maps found. [WMPOLL05]");
+					if($quietlogging==0) warn("No activated maps found. [WMPOLL05]\n");
 				}
 			}
 			else
 			{
-				warn("Output directory ($outdir) isn't writable (tried to create '$testfile'). No maps created. You probably need to make it writable by the poller process (like you did with the RRA directory) [WMPOLL06]");
+				warn("Output directory ($outdir) isn't writable (tried to create '$testfile'). No maps created. You probably need to make it writable by the poller process (like you did with the RRA directory) [WMPOLL06]\n");
 			}
 		}
 		else
 		{
-			warn("Output directory ($outdir) doesn't exist!. No maps created. You probably need to create that directory, and make it writable by the poller process (like you did with the RRA directory) [WMPOLL07]");
+			warn("Output directory ($outdir) doesn't exist!. No maps created. You probably need to create that directory, and make it writable by the poller process (like you did with the RRA directory) [WMPOLL07]\n");
 		}
 		weathermap_memory_check("MEM Final");
 		chdir($orig_cwd);
 		$duration = time() - $start_time;
-		if($quietlogging==0) warn("Weathermap $WEATHERMAP_VERSION run complete - $mapcount maps were run in $duration seconds");
+
+		if($quietlogging==0) warn("Weathermap $WEATHERMAP_VERSION run complete - $mapcount maps were run in $duration seconds\n");
 	}
 	else
 	{
-		warn("Required modules for PHP Weathermap $WEATHERMAP_VERSION were not present. Not running. [WMPOLL08]");
+		warn("Required modules for PHP Weathermap $WEATHERMAP_VERSION were not present. Not running. [WMPOLL08]\n");
 	}
 }
 

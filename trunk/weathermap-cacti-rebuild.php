@@ -1,9 +1,9 @@
 <?php
-global $config;
-global $weathermap_debugging, $WEATHERMAP_VERSION;
-global $weathermap_debug_suppress;
 
-$cacti_base = "C:/Program Files/xampp/htdocs/cacti/";
+#
+# Change the uncommented line to point to your Cacti installation
+#
+# $cacti_base = "C:/Program Files/xampp/htdocs/cacti/";
 $cacti_base = "/usr/local/share/cacti/";
 
 // check if the goalposts have moved
@@ -22,15 +22,12 @@ else
 	print "Couldn't find a usable Cacti config";
 }
 
-//require_once($config["library_path"] . DIRECTORY_SEPARATOR."database.php");
 require_once(dirname(__FILE__).DIRECTORY_SEPARATOR."setup.php");
 require_once(dirname(__FILE__).DIRECTORY_SEPARATOR."lib".DIRECTORY_SEPARATOR."poller-common.php");
 
 weathermap_setup_table();
 
 weathermap_run_maps(dirname(__FILE__) );
-
-flush();
 
 // vim:ts=4:sw=4:
 ?>

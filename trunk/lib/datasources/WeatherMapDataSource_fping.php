@@ -86,7 +86,7 @@ class WeatherMapDataSource_fping extends WeatherMapDataSource {
 						}
 						if($cnt >0) $ave = $total/$cnt;
 						
-						debug("Result: $cnt $min->$max $ave $loss\n");
+						debug("Result: $cnt $min -> $max $ave $loss\n");
 					}
 				}
 				pclose ($pipe);

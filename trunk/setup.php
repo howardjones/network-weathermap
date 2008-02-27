@@ -43,10 +43,10 @@ function weathermap_page_title( $t )
         {
                 $t .= " - Weathermap";
 
-                if(preg_match('/plugins\/weathermap\/weathermap-cacti-plugin.php\?action=viewmap&id=(\d+)/',$_SERVER['REQUEST_URI'],$matches))
+		if(preg_match('/plugins\/weathermap\/weathermap-cacti-plugin.php\?action=viewmap&id=([^&]+)/',$_SERVER['REQUEST_URI'],$matches))
                 {
-                        $mapid = intval($matches[1]);
-                        $title = db_fetch_cell("SELECT titlecache from weathermap_maps where ID=$mapid");
+                        $mapid = $matches[1];
+                        $title = db_fetch_cell("SELECT titlecache from weathermap_maps where ID=".intval($mapid)." or filehash='".mysql_real_escape_string($mapid)."'");
                         if(isset($title)) $t .= " - $title";
                 }
 

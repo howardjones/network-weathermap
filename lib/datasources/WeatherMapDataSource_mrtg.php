@@ -23,9 +23,14 @@ class WeatherMapDataSource_mrtg extends WeatherMapDataSource {
 		$data[IN] = NULL;
 		$data[OUT] = NULL;
 		$data_time = 0;
-
-		$matches=0;
-
+		
+		$matchvalue= $item->get_hint('mrtg_value');
+		$matchperiod = $item->get_hint('mrtg_period');
+		$swap = intval($item->get_hint('mrtg_swap'));
+				
+		if($matchvalue =='') $matchvalue = "cu";
+		if($matchperiod =='') $matchperiod = "d";	
+		
 		$fd=fopen($targetstring, "r");
 
 		if ($fd)
@@ -33,9 +38,10 @@ class WeatherMapDataSource_mrtg extends WeatherMapDataSource {
 			while (!feof($fd))
 			{
 				$buffer=fgets($fd, 4096);
+				debug("MRTG ReadData: Matching on '${matchvalue}in $matchperiod' and '${matchvalue}out $matchperiod'\n");
 
-				if (preg_match("/<\!-- cuin d (\d+) -->/", $buffer, $matches)) { $data[IN] = $matches[1] * 8; }
-				if (preg_match("/<\!-- cuout d (\d+) -->/", $buffer, $matches)) { $data[OUT] = $matches[1] * 8; }
+				if (preg_match("/<\!-- ${matchvalue}in $matchperiod (\d+) -->/", $buffer, $matches)) { $data[IN] = $matches[1] * 8; }
+				if (preg_match("/<\!-- ${matchvalue}out $matchperiod (\d+) -->/", $buffer, $matches)) { $data[OUT] = $matches[1] * 8; }
 			}
 			fclose($fd);
 			$data_time = filemtime($targetstring);
@@ -45,7 +51,15 @@ class WeatherMapDataSource_mrtg extends WeatherMapDataSource {
 			// some error code to go in here
 			debug ("MRTG ReadData: Couldn't open ($targetstring). \n"); 
 		}
-			
+		
+		if($swap==1)
+		{
+			debug("MRTG ReadData: Swapping IN and OUT\n");
+			$t = $data[OUT];
+			$data[OUT] = $data[IN];
+			$data[IN] = $t;
+		}
+		
 		debug ("MRTG ReadData: Returning (".($data[IN]===NULL?'NULL':$data[IN]).",".($data[OUT]===NULL?'NULL':$data[IN]).",$data_time)\n");
 
 		return( array($data[IN], $data[OUT], $data_time) );

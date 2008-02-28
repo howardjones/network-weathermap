@@ -337,6 +337,7 @@ function weathermap_thumbview()
 </tr>
 <?php
 		html_graph_end_box();
+		$showlivelinks = intval(read_config_option("weathermap_live_view"));
 
 		$i = 0;
 		if (sizeof($maplist) > 0)
@@ -368,7 +369,10 @@ function weathermap_thumbview()
 				{
 					print "(thumbnail for map not created yet)";
 				}
-				print "<a href='?action=liveview&id=".$map['filehash']."'>(live)</a>";
+				if($showlivelinks==1)
+				{
+					print "<a href='?action=liveview&id=".$map['filehash']."'>(live)</a>";
+				}
 				print '</div> ';
 			}
 			print "</td></tr>";

@@ -139,29 +139,32 @@ function attach_click_events()
 
     for (i = 0; i < areas.length; ++i)
         {
-        alt = areas[i].getAttribute('alt');
-        type = alt.slice(0, 5);
+	        //alt = areas[i].getAttribute('id');
+			alt = areas[i].id;
+			if(alt != '')
+			{
+				type = alt.slice(0, 5);
+		        if (type == 'LINK:' || type == 'NODE:')
+		            {
+		            // we add the href so that the browser adds a 'hand' cursor
+		            areas[i].setAttribute('href', '#');
+		            // and the click_handler does the actual work
+		            addEvent(areas[i], 'click', click_handler);
+		            }
 
-        if (type == 'LINK:' || type == 'NODE:')
-            {
-            // we add the href so that the browser adds a 'hand' cursor
-            areas[i].setAttribute('href', '#');
-            // and the click_handler does the actual work
-            addEvent(areas[i], 'click', click_handler);
-            }
+		        if (type == 'TIMES')
+		            {
+		            areas[i].setAttribute('href', '#');
+		            addEvent(areas[i], 'click', position_timestamp);
+		            }
 
-        if (type == 'TIMES')
-            {
-            areas[i].setAttribute('href', '#');
-            addEvent(areas[i], 'click', position_timestamp);
-            }
-
-        if (type == 'LEGEN')
-            {
-            areas[i].setAttribute('href', '#');
-            addEvent(areas[i], 'click', position_legend);
-            }
-        }
+		        if (type == 'LEGEN')
+		            {
+		            areas[i].setAttribute('href', '#');
+		            addEvent(areas[i], 'click', position_legend);
+		            }
+	        }
+		}
 
     if(fromplug===1)
     {
@@ -361,7 +364,8 @@ function click_handler(e)
         return;
         }
 
-    alt = el.getAttribute('alt');
+    // alt = el.getAttribute('alt');
+	alt = el.id;
 
     objecttype = alt.slice(0, 4);
     objectname = alt.slice(5, alt.length);
@@ -642,7 +646,8 @@ function position_legend(e)
             }
         
         // we need to figure out WHICH legend, nowadays
-        alt = el.getAttribute('alt');
+        //alt = el.getAttribute('alt');
+		alt = el.id;
 
     // objecttype = alt.slice(0, 5);
     objectname = alt.slice(7, alt.length);

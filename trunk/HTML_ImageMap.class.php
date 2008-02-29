@@ -24,7 +24,7 @@ class HTML_ImageMap_Area
 		$h = "";
 		if($this->name != "")
 		{
-			$h .= " alt=\"".$this->name."\" ";
+			// $h .= " alt=\"".$this->name."\" ";
 			$h .= " id=\"".$this->name."\" ";
 		}
 		if($this->href != "")

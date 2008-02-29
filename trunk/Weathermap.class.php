@@ -2715,16 +2715,22 @@ function MakeHTML($imagemapname = "weathermap_imap")
 	$html .= '<div class="weathermapimage" style="margin-left: auto; margin-right: auto; width: '.$this->width.'px;" >';
 	if ($this->imageuri != '') { $html.=sprintf(
 		'<img src="%s" width="%s" height="%s" border="0" usemap="#'
-		. $imagemapname . '" alt="network weathermap" />',
+		. $imagemapname . '"',
 		$this->imageuri,
 		$this->width,
-		$this->height); }
+		$this->height); 
+		$html .=  'alt="network weathermap" ';
+		$html .= '/>';
+		}
 	else { $html.=sprintf(
 		'<img src="%s" width="%s" height="%s" border="0" usemap="#' . $imagemapname
-		. '" alt="network weathermap" />',
+		. '"',
 		$this->imagefile,
 		$this->width,
-		$this->height); }
+		$this->height); 
+		$html .=  'alt="network weathermap" ';
+		$html .= '/>';
+	}
 	$html .= '</div>';
 
 	$html.='<map name="' . $imagemapname . '" id="' . $imagemapname . '">';

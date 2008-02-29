@@ -8,7 +8,7 @@
  "HTML Tidy for Mac OS X (vers 12 April 2006), see www.w3.org" /> 
 
  <title>PHP Weathermap 
-v0.95 
+v0.95test 
  - Changes For This Version</title> 
 <style type="text/css" media="print"> 
 /*<![CDATA[*/ 
@@ -41,7 +41,7 @@ a { color: black; text-decoration: underline; font-weight: normal;}
 
 <div id="header"> 
  <h1>PHP Weathermap 
-v0.95 
+v0.95test 
 </h1> 
  <h4>Copyright &copy; 2005-2008 Howard Jones, <tt><a 
 href="mailto:howie@thingy.com">howie@thingy.com</a></tt>. (<a 
@@ -54,7 +54,7 @@ href="http://www.network-weathermap.com/">Website</a>)</h4>
 there are a quite a few more features, this release actually has <em>less</em> lines of code than 0.941, due to some internal cleaning up. </p> 
  <h3>Fixes</h3> 
  <ul> 
- <li>KEYOUTLINECOLOR is actually used now (thanks to llow once more)</li> 
+ <a href="config-reference.html#GLOBAL_COLORS"><li>KEYOUTLINECOLOR</a> is actually used now (thanks to llow once more)</li> 
  <li>Editor doesn't throw away <a href="config-reference.html#GLOBAL_WIDTH">WIDTH</a> and <a href="config-reference.html#GLOBAL_HEIGHT">HEIGHT</a> with no BG image</li> 
  <li>Cacti Data-source and Graph picker doesn't restrict scrolling or resizing anymore</li> 
  <li>weathermap-cacti-rebuild.php to work on both Cacti 0.8.6 and 0.8.7</li> 
@@ -78,8 +78,8 @@ there are a quite a few more features, this release actually has <em>less</em> l
  <li>You can add a 'tag' to a <a href="config-reference.html#GLOBAL_SCALE">SCALE</a> line, to be used in <a href="config-reference.html#NODE_ICON">ICON</a> or <a href="config-reference.html#NODE_LABEL">LABELs</a> later.</li> 
  <a href="config-reference.html#NODE_USEICONSCALE"><li>USEICONSCALE</a> - colorize icon images (based on patches from llow)</li> 
  <li>screenshot mode. <a href="config-reference.html#GLOBAL_SET">"SET</a> screenshot_mode 1" at the top of the map will anonymise all labels, comments and bwlabels.</li> 
- <li>LABELFONTCOLOR can use a special value of 'contrast' to always contrast with the label colour.</li> 
- <li>Artificial Icons. Special icon 'filenames' - 'box' 'round' 'rbox' create a shaped icon without any file. See <a href="config-reference.html#NODE_ICON">ICON</a> and AICONFILLCOLOR for more.</li> 
+ <a href="config-reference.html#NODE_COLORS"><li>LABELFONTCOLOR</a> can use a special value of 'contrast' to always contrast with the label colour.</li> 
+ <li>Artificial Icons. Special icon 'filenames' - 'box' 'round' 'rbox' create a shaped icon without any file. See <a href="config-reference.html#NODE_ICON">ICON</a> and <a href="config-reference.html#NODE_COLORS">AICONFILLCOLOR</a> for more.</li> 
  <li>Map titles show up in browser title now.</li> 
  <li>a basic 'live view' function which generates a map on demand. Sometimes. It's not very useful.</li> 
  <a href="config-reference.html#NODE_LABELANGLE"><li>LABELANGLE</a> allows you to rotate node labels to 90,180,270 degrees. Needs truetype font.</li> 
@@ -90,17 +90,18 @@ there are a quite a few more features, this release actually has <em>less</em> l
  <a href="config-reference.html#LINK_VIA"><li>VIA</a> can be positioned relative to <a href="config-reference.html#NODE_NODE">NODEs</a> (like <a href="config-reference.html#NODE_NODE">NODEs</a> can) (thanks again to llow) </li> 
  <li>Weathermap has a hook in the map viewing page to allow other plugins to add code there</li> 
  <li>.htaccess files bundled with Weathermap to restrict direct access to configs and output</li> 
- <li>filenames for output are much less guessable now</li> 
+ <li>filenames for output are much less guessable now <strong>(may break external references to maps)</strong></li> 
  <li>You can use <a href="config-reference.html#LINK_DUPLEX">'DUPLEX</a> half' on a link to make the bandwidth percentage 
  calculate work for half-duplex links</li> 
- <li>ININFOURL / OUTINFOURL, <a href="config-reference.html#LINK_INOVERLIBGRAPH">INOVERLIBGRAPH</a> / <a href="config-reference.html#LINK_OUTOVERLIBGRAPH">OUTOVERLIBGRAPH,</a> INNOTES / OUTNOTES, INOVERLIBCAPTION / OUTOVERLIBCAPTION </li> 
+ <a href="config-reference.html#LINK_ININFOURL"><li>ININFOURL</a> / <a href="config-reference.html#LINK_OUTINFOURL">OUTINFOURL,</a> <a href="config-reference.html#LINK_INOVERLIBGRAPH">INOVERLIBGRAPH</a> / <a href="config-reference.html#LINK_OUTOVERLIBGRAPH">OUTOVERLIBGRAPH,</a> <a href="config-reference.html#LINK_INNOTES">INNOTES</a> / <a href="config-reference.html#LINK_OUTNOTES">OUTNOTES,</a> INOVERLIBCAPTION / OUTOVERLIBCAPTION </li> 
  allow you to have different urls for the in and out side of links (based on idea from llow)</li> 
  <a href="config-reference.html#LINK_OVERLIBGRAPH"><li>OVERLIBGRAPH</a> (and IN/OUT versions) can take multiple URLs separated by spaces (again from idea by llow)</li> 
  <li>debug/warning log output contains the map name, and the debug output is marked DEBUG</li> 
  <li>debug log output contains the calling function, file/line number, too. Making debugging-by-mail easier.</li> 
- <li>fping: <a href="config-reference.html#LINK_TARGET">TARGET</a> to do live pings of devices</li> 
+ <li>fping: <a href="config-reference.html#LINK_TARGET">TARGET</a> to do live pings of devices. See targets.html</li> 
  <li>a very basic sample 'skeleton' DS plugin</li> 
  <li>an additional check-gdbug.php to spot bad GD installs</li> 
+ <li>MRTG DS plugin can do a few new tricks. See <a href="config-reference.html#LINK_TARGET">TARGET</a> and targets.html</li> 
  </ul> 
 
  <h2><a name="changes0941">Changes For This Version (0.94 to 0.941)</a></h2> 
@@ -238,7 +239,7 @@ are some nice new features even so - <a href="config-reference.html#LINK_INBWFOR
 <h3><a name="graphical">Graphical Changes</a></h3> 
 <p>These tend to be smaller things, but together they make a lot of useful additions. </p> 
 <h4>Link comments</h4> 
-<p>You can add a comment string which runs down the side of link arrows. This is intended for use for circuit references, or interface names. There are 4 new directives to make this happen: <a href="config-reference.html#LINK_INCOMMENT">INCOMMENT,</a> <a href="config-reference.html#LINK_OUTCOMMENT">OUTCOMMENT,</a> <a href="config-reference.html#LINK_COMMENTFONT">COMMENTFONT</a> and COMMENTFONTCOLOR. You <em>must</em> use a TrueType <a href="config-reference.html#LINK_COMMENTFONT">COMMENTFONT</a> to use this feature, as none of the other font types allow for rotation of text. </p> 
+<p>You can add a comment string which runs down the side of link arrows. This is intended for use for circuit references, or interface names. There are 4 new directives to make this happen: <a href="config-reference.html#LINK_INCOMMENT">INCOMMENT,</a> <a href="config-reference.html#LINK_OUTCOMMENT">OUTCOMMENT,</a> <a href="config-reference.html#LINK_COMMENTFONT">COMMENTFONT</a> and <a href="config-reference.html#LINK_COLORS">COMMENTFONTCOLOR.</a> You <em>must</em> use a TrueType <a href="config-reference.html#LINK_COMMENTFONT">COMMENTFONT</a> to use this feature, as none of the other font types allow for rotation of text. </p> 
 <h4>Bandwidth Label Positioning</h4> 
 <p>You can now move the bandwidth labels (those little boxes) up and down the link arrow. You set a percentage position with <a href="config-reference.html#LINK_BWLABELPOS">BWLABELPOS.</a> </p> 
 <h4>Pixel-Offsets</h4> 

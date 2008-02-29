@@ -56,6 +56,8 @@
         <a href="#LINK_SPLITPOS">SPLITPOS</a>
         <a href="#LINK_COLORS">*COLOR</a>
         <a href="#LINK_INFOURL">INFOURL</a>
+        <a href="#LINK_ININFOURL">ININFOURL</a>
+        <a href="#LINK_OUTINFOURL">OUTINFOURL</a>
         <a href="#LINK_OVERLIBGRAPH">OVERLIBGRAPH</a>
         <a href="#LINK_INOVERLIBGRAPH">INOVERLIBGRAPH</a>
         <a href="#LINK_OUTOVERLIBGRAPH">OUTOVERLIBGRAPH</a>
@@ -63,6 +65,8 @@
         <a href="#LINK_OVERLIBHEIGHT">OVERLIBHEIGHT</a>
         <a href="#LINK_OVERLIBCAPTION">OVERLIBCAPTION</a>
         <a href="#LINK_NOTES">NOTES</a>
+        <a href="#LINK_INNOTES">INNOTES</a>
+        <a href="#LINK_OUTNOTES">OUTNOTES</a>
         <a href="#LINK_VIA">VIA</a>
         <a href="#LINK_LINKSTYLE">LINKSTYLE</a>
         <a href="#LINK_ARROWSTYLE">ARROWSTYLE</a>
@@ -148,7 +152,7 @@
 <div class="definition">LABEL <em class="meta">labeltext</em>
 </div>
 <div class="description">
-<p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Specifies a label for the node. Everything to the end of the line is used. </p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">If the node has an <a href="#NODE_ICON">ICON</a> defined as well, then you can specify the position of the label relative to the node's centre-point by using <a href="#NODE_LABELOFFSET">LABELOFFSET.</a> </p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">The text for the label can contain <a href="advanced.html#tokens">special tokens</a> to show map data. </p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">This is drawn using the font specified by <a href="#NODE_LABELFONT">LABELFONT</a> in the colours specified by LABELFONTCOLOR, LABELFONTSHADOWCOLOR, LABELBGCOLOR and LABELOUTLINECOLOR. </p> 
+<p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Specifies a label for the node. Everything to the end of the line is used. </p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">If the node has an <a href="#NODE_ICON">ICON</a> defined as well, then you can specify the position of the label relative to the node's centre-point by using <a href="#NODE_LABELOFFSET">LABELOFFSET.</a> </p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">The text for the label can contain <a href="advanced.html#tokens">special tokens</a> to show map data. </p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">This is drawn using the font specified by <a href="#NODE_LABELFONT">LABELFONT</a> in the colours specified by <a href="#NODE_COLORS">LABELFONTCOLOR,</a> <a href="#NODE_COLORS">LABELFONTSHADOWCOLOR,</a> <a href="#NODE_COLORS">LABELBGCOLOR</a> and <a href="#NODE_COLORS">LABELOUTLINECOLOR.</a> </p> 
 </div>
 <div class="changes">
 <h3>Change History</h3>
@@ -244,7 +248,7 @@ which is then displayed. Specify the targets on one <a href="#NODE_TARGET">TARGE
  These all <em>require</em> you to specify a <em>maxwidth</em> and <em>maxheight</em> which are then used as the size of the 
  icon. The 'magic filenames' are: <ul><li>'box' - to produce a square cornered box.</li><li>'rbox' - 
  to produce a round-cornered box</li><li>'round' - to produce a circle or ellipse.</li></ul>The colours for these "artificial icons" are specified 
- using the AICONFILLCOLOR and AICONOUTLINECOLOR keywords. </p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">The second form allows you to specify a maximum width and height for the icon. If the PNG file that you specify is bigger or smaller than this size, then it is automatically scaled up (or down) in proportion, so that it fits into a box of the size you specify. </p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">The size of the icon image is used by <a href="#NODE_LABELOFFSET">LABELOFFSET</a> to decided how far to move the label, if you use compass-point offsets. </p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">The text for the filename can contain <a href="advanced.html#tokens">special tokens</a> to select an icon based on map data. </p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">You can adjust the colour of the icon according to a <a href="#GLOBAL_SCALE">SCALE,</a> by using <a href="#NODE_USEICONSCALE">USEICONSCALE,</a> if you are using the PHP GD library (the function required is not present in the main GD library). </p> 
+ using the <a href="#NODE_COLORS">AICONFILLCOLOR</a> and <a href="#NODE_COLORS">AICONOUTLINECOLOR</a> keywords. </p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">The second form allows you to specify a maximum width and height for the icon. If the PNG file that you specify is bigger or smaller than this size, then it is automatically scaled up (or down) in proportion, so that it fits into a box of the size you specify. </p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">The size of the icon image is used by <a href="#NODE_LABELOFFSET">LABELOFFSET</a> to decided how far to move the label, if you use compass-point offsets. </p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">The text for the filename can contain <a href="advanced.html#tokens">special tokens</a> to select an icon based on map data. </p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">You can adjust the colour of the icon according to a <a href="#GLOBAL_SCALE">SCALE,</a> by using <a href="#NODE_USEICONSCALE">USEICONSCALE,</a> if you are using the PHP GD library (the function required is not present in the main GD library). </p> 
 </div>
 <div class="changes">
 <h3>Change History</h3>
@@ -354,8 +358,8 @@ which is then displayed. Specify the targets on one <a href="#NODE_TARGET">TARGE
 <div class="definition">AICONFILLCOLOR <em class="meta">red</em> <em class="meta">green</em> <em class="meta">blue</em>
 </div>
 <div class="description">
-<p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Specify the colours used for drawing the <a href="#NODE_LABEL">LABEL.</a> </p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">red, green and blue are numbers from 0 to 255. </p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">LABELFONTSHADOWCOLOR, LABELBGCOLOR and LABELOUTLINECOLOR have an additional option - 'none' - which stops that element of the <a href="#NODE_LABEL">LABEL</a> being drawn. LABELFONTSHADOWCOLOR defaults to 'none'. </p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">LABELFONTCOLOR has an additional option 'contrast', which will select either black or white depending on the current LABELBGCOLOR. This is especially useful if you are using a <a href="#GLOBAL_SCALE">SCALE</a> to change the colour of your <a href="#NODE_NODE">NODE</a> <a href="#NODE_LABEL">LABELs.</a> </p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">AICONOUTLINECOLOR and AICONFILLCOLOR are used to colour an 'artificial <a href="#NODE_ICON">ICON'</a> if one is defined for this node. To allow the artifical icon to <em>also</em> follow the 
- colour of the LABELBGCOLOR when you are using a <a href="#GLOBAL_SCALE">SCALE,</a> you can also specify 'copy' as the colour for AICONFILLCOLOR. See <a href="#NODE_ICON">ICON</a> for more about artificial icons. </p> 
+<p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Specify the colours used for drawing the <a href="#NODE_LABEL">LABEL.</a> </p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">red, green and blue are numbers from 0 to 255. </p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">LABELFONTSHADOWCOLOR, <a href="#NODE_COLORS">LABELBGCOLOR</a> and <a href="#NODE_COLORS">LABELOUTLINECOLOR</a> have an additional option - 'none' - which stops that element of the <a href="#NODE_LABEL">LABEL</a> being drawn. <a href="#NODE_COLORS">LABELFONTSHADOWCOLOR</a> defaults to 'none'. </p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">LABELFONTCOLOR has an additional option 'contrast', which will select either black or white depending on the current <a href="#NODE_COLORS">LABELBGCOLOR.</a> This is especially useful if you are using a <a href="#GLOBAL_SCALE">SCALE</a> to change the colour of your <a href="#NODE_NODE">NODE</a> <a href="#NODE_LABEL">LABELs.</a> </p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">AICONOUTLINECOLOR and <a href="#NODE_COLORS">AICONFILLCOLOR</a> are used to colour an 'artificial <a href="#NODE_ICON">ICON'</a> if one is defined for this node. To allow the artifical icon to <em>also</em> follow the 
+ colour of the <a href="#NODE_COLORS">LABELBGCOLOR</a> when you are using a <a href="#GLOBAL_SCALE">SCALE,</a> you can also specify 'copy' as the colour for <a href="#NODE_COLORS">AICONFILLCOLOR.</a> See <a href="#NODE_ICON">ICON</a> for more about artificial icons. </p> 
 </div>
 <div class="changes">
 <h3>Change History</h3>
@@ -759,7 +763,7 @@ of the direction of the link. 'angled' rotates the box to follow the directiong 
 <div class="definition">INCOMMENT <em class="meta">string</em>
 </div>
 <div class="description">
-<p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Specifies a comment for the input side of a <a href="#LINK_LINK">LINK.</a> </p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">The link comment appears as text running alongside the link arrow. The font used is governed by <a href="#LINK_COMMENTFONT">COMMENTFONT</a> and the colour by COMMENTFONTCOLOR. </p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">The text for the comment can contain <a href="advanced.html#tokens">special tokens</a> to show map data. </p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">The <a href="#LINK_COMMENTFONT">COMMENTFONT</a> <em>must be a TrueType font</em> as these are the only font type to support rotating text. </p> 
+<p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Specifies a comment for the input side of a <a href="#LINK_LINK">LINK.</a> </p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">The link comment appears as text running alongside the link arrow. The font used is governed by <a href="#LINK_COMMENTFONT">COMMENTFONT</a> and the colour by <a href="#LINK_COLORS">COMMENTFONTCOLOR.</a> </p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">The text for the comment can contain <a href="advanced.html#tokens">special tokens</a> to show map data. </p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">The <a href="#LINK_COMMENTFONT">COMMENTFONT</a> <em>must be a TrueType font</em> as these are the only font type to support rotating text. </p> 
 </div>
 <div class="changes">
 <h3>Change History</h3>
@@ -774,7 +778,7 @@ of the direction of the link. 'angled' rotates the box to follow the directiong 
 <div class="definition">OUTCOMMENT <em class="meta">string</em>
 </div>
 <div class="description">
-<p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Specifies a comment for the output side of a <a href="#LINK_LINK">LINK.</a> </p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">The link comment appears as text running alongside the link arrow. The font used is governed by <a href="#LINK_COMMENTFONT">COMMENTFONT</a> and the colour by COMMENTFONTCOLOR. </p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">The text for the comment can contain <a href="advanced.html#tokens">special tokens</a> to show map data. </p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">The <a href="#LINK_COMMENTFONT">COMMENTFONT</a> <em>must be a TrueType font</em> as these are the only font type to support rotating text. </p> 
+<p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Specifies a comment for the output side of a <a href="#LINK_LINK">LINK.</a> </p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">The link comment appears as text running alongside the link arrow. The font used is governed by <a href="#LINK_COMMENTFONT">COMMENTFONT</a> and the colour by <a href="#LINK_COLORS">COMMENTFONTCOLOR.</a> </p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">The text for the comment can contain <a href="advanced.html#tokens">special tokens</a> to show map data. </p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">The <a href="#LINK_COMMENTFONT">COMMENTFONT</a> <em>must be a TrueType font</em> as these are the only font type to support rotating text. </p> 
 </div>
 <div class="changes">
 <h3>Change History</h3>
@@ -789,7 +793,7 @@ of the direction of the link. 'angled' rotates the box to follow the directiong 
 <div class="definition">COMMENTFONT <em class="meta">fontnumber</em>
 </div>
 <div class="description">
-<p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Specify the font used for drawing the <a href="#LINK_INCOMMENT">INCOMMENT</a> and <a href="#LINK_OUTCOMMENT">OUTCOMMENT</a> text. </p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Fonts are specified by number. The GD library that Weathermap uses has 5 built-in fonts, 1-5. You can define new fonts based on TrueType or GD fonts by using the <a href="#GLOBAL_FONTDEFINE">FONTDEFINE</a> directive. </p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">For Link Comments, you <em>must</em> define a TrueType font. These are the only font that can rotate text through any angle, as required by comments. You can change the colour used to render the font with COMMENTFONTCOLOR </p><changes xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude"> 
+<p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Specify the font used for drawing the <a href="#LINK_INCOMMENT">INCOMMENT</a> and <a href="#LINK_OUTCOMMENT">OUTCOMMENT</a> text. </p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Fonts are specified by number. The GD library that Weathermap uses has 5 built-in fonts, 1-5. You can define new fonts based on TrueType or GD fonts by using the <a href="#GLOBAL_FONTDEFINE">FONTDEFINE</a> directive. </p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">For Link Comments, you <em>must</em> define a TrueType font. These are the only font that can rotate text through any angle, as required by comments. You can change the colour used to render the font with <a href="#LINK_COLORS">COMMENTFONTCOLOR</a> </p><changes xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude"> 
  <change version="0.9">Added link comments</change> 
  </changes> 
 </div>
@@ -827,11 +831,11 @@ of the direction of the link. 'angled' rotates the box to follow the directiong 
 <div class="definition">COMMENTFONTCOLOR <em class="meta">red</em> <em class="meta">green</em> <em class="meta">blue</em>
 </div>
 <div class="description">
-<p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Specify the colours used for drawing the link. </p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">red, green and blue are numbers from 0 to 255. </p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">OUTLINECOLOR, BWOUTLINECOLOR and BWBOXCOLOR have an additional option - 'none' - which stops that element of the link being drawn. </p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">The colours are used as follows:<ul><li>OUTLINECOLOR is the colour of the line around the edge of the arrow.</li> 
- <li>BWOUTLINECOLOR is the colour of the line surrounding the 'bandwidth label' box</li> 
- <li>BWBOXCOLOR is the background colour for the same box</li> 
- <li>BWFONTCOLOR is the colour used for text within that box</li> 
- <li>COMMENTFONTCOLOR is the colour used for the text produced by <a href="#LINK_INCOMMENT">INCOMMENT</a> and <a href="#LINK_OUTCOMMENT">OUTCOMMENT,</a> along the side of a link arrow</li></ul> </p> 
+<p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Specify the colours used for drawing the link. </p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">red, green and blue are numbers from 0 to 255. </p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">OUTLINECOLOR, <a href="#LINK_COLORS">BWOUTLINECOLOR</a> and <a href="#LINK_COLORS">BWBOXCOLOR</a> have an additional option - 'none' - which stops that element of the link being drawn. </p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">The colours are used as <a href="#LINK_COLORS">follows:<ul><li>OUTLINECOLOR</a> is the colour of the line around the edge of the arrow.</li> 
+ <a href="#LINK_COLORS"><li>BWOUTLINECOLOR</a> is the colour of the line surrounding the 'bandwidth label' box</li> 
+ <a href="#LINK_COLORS"><li>BWBOXCOLOR</a> is the background colour for the same box</li> 
+ <a href="#LINK_COLORS"><li>BWFONTCOLOR</a> is the colour used for text within that box</li> 
+ <a href="#LINK_COLORS"><li>COMMENTFONTCOLOR</a> is the colour used for the text produced by <a href="#LINK_INCOMMENT">INCOMMENT</a> and <a href="#LINK_OUTCOMMENT">OUTCOMMENT,</a> along the side of a link arrow</li></ul> </p> 
 </div>
 <div class="changes">
 <h3>Change History</h3>
@@ -852,8 +856,43 @@ of the direction of the link. 'angled' rotates the box to follow the directiong 
 <div class="description">
 <p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Creates a hyperlink in the HTML output. </p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">If you are using the HTML output facility, then a link is added to the 
  &lt;map&gt; section of the HTML so that when you click on the (weathermap) link, you are 
- taken to the url specified here. </p> 
+ taken to the url specified here. </p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">It is also possible to specify the <a href="#LINK_INFOURL">INFOURL</a> for the 'in' and 'out' halves of a link individually, using <a href="#LINK_ININFOURL">ININFOURLand</a> <a href="#LINK_OUTINFOURL">OUTINFOURL.</a> </p> 
 </div>
+<div class="changes">
+<h3>Change History</h3>
+<dl>
+<dt>0.95</dt>
+<dd>Added IN/OUT support</dd>
+</dl>
+</div>
+</div>
+			  <div class="referenceentry">
+<h2><a name="LINK_ININFOURL">ININFOURL</a></h2>
+<div class="definition">ININFOURL <em class="meta">url</em>
+</div>
+<div class="definition">ININFOURL <em class="meta">url</em> <em class="meta">url</em>...</div>
+<div class="description"><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Same as INFOURL, but specifies a hyperlink for only the 'in' side of a link. </p></div>
+<div class="changes"> 
+<h3>Change History</h3> 
+<dl> 
+<dt>0.95</dt> 
+<dd>Added IN/OUT support</dd> 
+</dl> 
+</div> 
+</div>
+			  <div class="referenceentry">
+<h2><a name="LINK_OUTINFOURL">OUTINFOURL</a></h2>
+<div class="definition">OUTINFOURL <em class="meta">url</em>
+</div>
+<div class="definition">OUTINFOURL <em class="meta">url</em> <em class="meta">url</em>...</div>
+<div class="description"><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Same as INFOURL, but specifies a hyperlink for only the 'out' side of a link. </p></div>
+<div class="changes"> 
+<h3>Change History</h3> 
+<dl> 
+<dt>0.95</dt> 
+<dd>Added IN/OUT support</dd> 
+</dl> 
+</div> 
 </div>
 	    	  <div class="referenceentry">
 <h2><a name="LINK_OVERLIBGRAPH">OVERLIBGRAPH</a></h2>
@@ -972,15 +1011,45 @@ of the direction of the link. 'angled' rotates the box to follow the directiong 
 <div class="definition">NOTES <em class="meta">notes text</em>
 </div>
 <div class="description">
-<p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Specifies the text or HTML notes for a link. </p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">The <em>notes text</em> appears in a popup box when the user hovers their mouse over the link. If an <a href="#LINK_OVERLIBGRAPH">OVERLIBGRAPH</a> is specified too, then the text appears below the graph. </p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">The map <a href="#GLOBAL_HTMLSTYLE">HTMLSTYLE</a> must be set to 'overlib' to enable any of the mouse-hover functionality. </p> 
+<p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Specifies the text or HTML notes for a link. </p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">The <em>notes text</em> appears in a popup box when the user hovers their mouse over the link. If an <a href="#LINK_OVERLIBGRAPH">OVERLIBGRAPH</a> is specified too, then the text appears below the graph. </p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">The map <a href="#GLOBAL_HTMLSTYLE">HTMLSTYLE</a> must be set to 'overlib' to enable any of the mouse-hover functionality. </p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">It is also possible to specify the <a href="#LINK_NOTES">NOTES</a> for the 'in' and 'out' halves of a link individually, using <a href="#LINK_INNOTES">INNOTES</a> and <a href="#LINK_OUTNOTES">OUTNOTES.</a> </p> 
 </div>
 <div class="changes">
 <h3>Change History</h3>
 <dl>
+<dt>0.95</dt>
+<dd>Added IN/OUT support</dd>
 <dt>0.9</dt>
 <dd>Originally added NOTES.</dd>
 </dl>
 </div>
+</div>
+				  <div class="referenceentry">
+<h2><a name="LINK_INNOTES">INNOTES</a></h2>
+<div class="definition">INNOTES <em class="meta">url</em>
+</div>
+<div class="definition">INNOTES <em class="meta">url</em> <em class="meta">url</em>...</div>
+<div class="description"><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Same as NOTES, but specifies a pop-up graph for only the 'in' side of a link. </p></div>
+<div class="changes"> 
+<h3>Change History</h3> 
+<dl> 
+<dt>0.95</dt> 
+<dd>Added IN/OUT support</dd> 
+</dl> 
+</div> 
+</div>
+				  <div class="referenceentry">
+<h2><a name="LINK_OUTNOTES">OUTNOTES</a></h2>
+<div class="definition">OUTNOTES <em class="meta">url</em>
+</div>
+<div class="definition">OUTNOTES <em class="meta">url</em> <em class="meta">url</em>...</div>
+<div class="description"><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Same as NOTES, but specifies a pop-up graph for only the 'out' side of a link. </p></div>
+<div class="changes"> 
+<h3>Change History</h3> 
+<dl> 
+<dt>0.95</dt> 
+<dd>Added IN/OUT support</dd> 
+</dl> 
+</div> 
 </div>
   	    	  <div class="referenceentry">
 <h2><a name="LINK_VIA">VIA</a></h2>
@@ -1142,7 +1211,7 @@ You can set the output format in the Cacti Settings page. </p>
  different sizes to use in different parts of a map. </p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">The freetype library used in PHP makes a somewhat complex set of rules for where it will search for truetype fonts. The two easiest options are: 
  <ul><li>Use the full absolute path to your .ttf file</li> 
  <li>Keep your .ttf files in the Weathermap directory, and use the first part of the filename only, with no '.ttf' on the end.</li></ul> 
- The full set of rules is <a href="http://www.boutell.com/gd/manual2.0.33.html#gdImageStringFT">available here</a> </p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Regardless of the format, the newly defined font can be used anywhere that you'd normally use a font number (for example, <a href="#LINK_BWFONT">BWFONT</a> or KEYFONT). 
+ The full set of rules is <a href="http://www.boutell.com/gd/manual2.0.33.html#gdImageStringFT">available here</a> </p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Regardless of the format, the newly defined font can be used anywhere that you'd normally use a font number (for example, <a href="#LINK_BWFONT">BWFONT</a> or <a href="#GLOBAL_FONT">KEYFONT).</a> 
  </p> 
 </div>
 <div class="examples">
@@ -1175,7 +1244,7 @@ You can set the output format in the Cacti Settings page. </p>
 <h3>Change History</h3>
 <dl>
 <dt>0.8</dt>
-<dd>Originally added TIMEFONT.</dd>
+<dd>Originally added TITLEFONT.</dd>
 <dt>0.7</dt>
 <dd>Originally added TIMEFONT.</dd>
 <dt>0.6</dt>
@@ -1198,7 +1267,7 @@ You can set the output format in the Cacti Settings page. </p>
 <div class="definition">KEYBGCOLOR <em class="meta">red</em> <em class="meta">green</em> <em class="meta">blue</em>
 </div>
 <div class="description">
-<p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Specify the colours used for drawing the global elements of the map. </p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">red, green and blue are numbers from 0 to 255. </p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">LABELFONTSHADOWCOLOR, LABELBGCOLOR and LABELOUTLINECOLOR have an additional option - 'none' - which stops that element of the <a href="#NODE_LABEL">LABEL</a> being drawn. LABELFONTSHADOWCOLOR defaults to 'none'. </p> 
+<p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Specify the colours used for drawing the global elements of the map. </p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">red, green and blue are numbers from 0 to 255. </p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">LABELFONTSHADOWCOLOR, <a href="#NODE_COLORS">LABELBGCOLOR</a> and <a href="#NODE_COLORS">LABELOUTLINECOLOR</a> have an additional option - 'none' - which stops that element of the <a href="#NODE_LABEL">LABEL</a> being drawn. <a href="#NODE_COLORS">LABELFONTSHADOWCOLOR</a> defaults to 'none'. </p> 
 </div>
 <div class="changes">
 <h3>Change History</h3>
@@ -1220,7 +1289,7 @@ You can set the output format in the Cacti Settings page. </p>
 <p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Specifies where to draw the timestamp on the map. </p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">If no <a href="#GLOBAL_TIMEPOS">TIMEPOS</a> line is given, then the timestamp is drawn in the top-right corner. To hide it completely, set y to be <nobr>-200</nobr> or so. </p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">You can optionally specify an additional parameter to change the text of the timestamp. This text can 
  contain special tokens which are substituted with parts of the current time. The default timestamp 
  text is <nobr><tt>Created: %b %d %Y %H:%M:%S</tt></nobr>. The tokens used are those accepted by the PHP strftime 
- function. For a full list see the <a href="http://www.php.net/manual/en/function.strftime.php">PHP manual page</a>. </p> 
+ function. For a full list see the <a href="http://www.php.net/manual/en/function.strftime.php">PHP manual page</a>. </p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">You can control the font used to draw the timestamp with <a href="#GLOBAL_FONT">TIMEFONT,</a> and the colour that it is drawn in, using <a href="#GLOBAL_COLORS">TIMECOLOR.</a> </p> 
 </div>
 <div class="changes">
 <h3>Change History</h3>
@@ -1254,7 +1323,7 @@ You can set the output format in the Cacti Settings page. </p>
 <div class="definition">TITLEPOS <em class="meta">x-pos</em> <em class="meta">y-pos</em> <em class="meta">headingstring</em>
 </div>
 <div class="description">
-<p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Specifies the position of the title text. </p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">If no <a href="#GLOBAL_TITLEPOS">TITLEPOS</a> line is given, then no title is drawn. You can optionally specify an additional parameter, to change the title. Any text after the second coordinate is taken as a new <a href="#GLOBAL_TITLE">TITLE.</a> </p> 
+<p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Specifies the position of the title text. </p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">If no <a href="#GLOBAL_TITLEPOS">TITLEPOS</a> line is given, then no title is drawn. You can optionally specify an additional parameter, to change the title. Any text after the second coordinate is taken as a new <a href="#GLOBAL_TITLE">TITLE.</a> </p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">You can control the font used to draw the title with <a href="#GLOBAL_FONT">TITLEFONT,</a> and the colour that it is drawn in, using <a href="#GLOBAL_COLORS">TITLECOLOR.</a> </p> 
 </div>
 <div class="changes">
 <h3>Change History</h3>
@@ -1363,7 +1432,7 @@ SCALE  85  100    255     0    0</pre>
 <p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Specifies the position of the key, or legend, that shows what each colour-range in a scale means. If a scalename is not given, 
  then "DEFAULT" is assumed. 
  If no <a href="#GLOBAL_KEYPOS">KEYPOS</a> line is given for a scale, then no legend is drawn - handy if you have many many colour ranges. </p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">You can optionally specify an additional parameter, to change the heading above the colours in 
- the key. This can be used to change the language of the map, for example. If a scalename is given, then you <em>must also specify a title</em> - there is no useful default title for non-DEFAULT scales. </p> 
+ the key. This can be used to change the language of the map, for example. If a scalename is given, then you <em>must also specify a title</em> - there is no useful default title for non-DEFAULT scales. </p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">You can control the font used to draw the key with <a href="#GLOBAL_FONT">KEYFONT,</a> and the colours that it is drawn in, using <a href="#GLOBAL_COLORS">KEYTEXTCOLOR,</a> <a href="#GLOBAL_COLORS">KEYBGCOLOR</a> and <a href="#GLOBAL_COLORS">KEYOUTLINECOLOR.</a> </p> 
 </div>
 <div class="changes">
 <h3>Change History</h3>
@@ -1390,7 +1459,7 @@ SCALE  85  100    255     0    0</pre>
  then "DEFAULT" is assumed. Valid stylenames are: 'classic', 'horizontal' and 'vertical'. </p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Classic has a line for each <a href="#GLOBAL_SCALE">SCALE</a> range defined. 'vertical' and 'horizontal' are fixed-size, showing a 
  continuous block from 0-100% usage, which is much more useful when gradient <a href="#GLOBAL_SCALE">SCALEs</a> are used, or when you have 
  a large number of <a href="#GLOBAL_SCALE">SCALE</a> lines in one scale. </p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude"> 
- For 'horizontal' and 'vertical' styles, you can optionally add an additional parameter, which specifies the longer dimension of the legend in pixels. That is, for a horizontal legend, it specifies the width. The other dimension is calculated from the size of the font used (see KEYFONT). 
+ For 'horizontal' and 'vertical' styles, you can optionally add an additional parameter, which specifies the longer dimension of the legend in pixels. That is, for a horizontal legend, it specifies the width. The other dimension is calculated from the size of the font used (see <a href="#GLOBAL_FONT">KEYFONT).</a> 
  </p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude"><img src="../images/keystyle-classic.png"></img>Classic Style </p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude"><img src="../images/keystyle-horizontal.png"></img>Horizontal Style </p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude"><img src="../images/keystyle-vertical.png"></img>Vertical Style </p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">You can hide the percentage signs in the key, by setting key_hidepercent_<em>scalename</em> to 1 </p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">If you have a 0-&gt;0 line in your <a href="#GLOBAL_SCALE">SCALE,</a> then you can hide that in the key, by setting key_hidezero_<em>scalename</em> to 1 </p> 
 </div>
 <div class="examples">

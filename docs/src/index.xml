@@ -47,6 +47,8 @@
                 <xi:include href="link_splitpos.xml"/>
             <xi:include href="link_colours.xml" />
 	    	  <xi:include href="link_infourl.xml"/>
+			  <xi:include href="link_ininfourl.xml"/>
+			  <xi:include href="link_outinfourl.xml"/>
 	    	  <xi:include href="link_overlibgraph.xml"/>
 			  <xi:include href="link_inoverlibgraph.xml"/>
 			  <xi:include href="link_outoverlibgraph.xml"/>
@@ -54,6 +56,8 @@
 	    	  <xi:include href="link_overlibheight.xml"/>
 	    	  <xi:include href="link_overlibcaption.xml"/>
                   <xi:include href="link_notes.xml"/>
+				  <xi:include href="link_innotes.xml"/>
+				  <xi:include href="link_outnotes.xml"/>
   	    	  <xi:include href="link_via.xml"/>
 		  <xi:include href="link_linkstyle.xml"/>
 	    	  <xi:include href="link_arrowstyle.xml"/>

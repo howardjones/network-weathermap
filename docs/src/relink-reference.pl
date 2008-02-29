@@ -15,6 +15,18 @@ while (<CONTENTS>) {
 }
 close(CONTENTS);
 
+# seed the additional stuff that won't otherwise get autolinked.
+foreach $c ( qw(AICONFILLCOLOR AICONOUTLINECOLOR LABELFONTCOLOR LABELBGCOLOR LABELOUTLINECOLOR LABELFONTSHADOWCOLOR))
+{	$map{ "NODE|$c" } = "#NODE_COLORS"; $map{ $c } = "#NODE_COLORS"; $words{ $c } = 1; }
+
+foreach $c ( qw(OUTLINECOLOR BWOUTLINECOLOR BWFONTCOLOR BWBOXCOLOR COMMENTFONTCOLOR))
+{	$map{ "LINK|$c" } = "#LINK_COLORS"; $map{ $c } = "#LINK_COLORS"; $words{ $c } = 1;}
+
+foreach $c ( qw(BGCOLOR TIMECOLOR TITLECOLOR KEYTEXTCOLOR KEYOUTLINECOLOR KEYBGCOLOR))
+{	$map{ "GLOBAL|$c" } = "#GLOBAL_COLORS"; $map{ $c } = "#GLOBAL_COLORS"; $words{ $c } = 1;}
+foreach $c ( qw(TITLEFONT KEYFONT TIMEFONT))
+{	$map{ "GLOBAL|$c" } = "#GLOBAL_FONT"; $map{ $c } = "#GLOBAL_FONT"; $words{ $c } = 1;}
+
 $wholefile = 0;
 if($ARGV[0] eq 'ALL') { $wholefile=1; }
 
@@ -33,6 +45,7 @@ while (<STDIN>) {
     if ( $indesc && m/\/div>/ ) { $indesc--; }
 
     if ($indesc || $wholefile) {
+	
         foreach $word ( split( /\s+/, $_ ) ) {
 		$bareword = $word;
 		$bareword =~ tr/A-Z//cd;
@@ -57,6 +70,10 @@ while (<STDIN>) {
                 }
 
             }
+			if($word eq 'targets.html')
+			{
+				$word = '<a href="targets.html">targets.html</a>';
+			}
             print $word. " ";
         }
 

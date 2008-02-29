@@ -12,6 +12,7 @@
         contain special tokens which are substituted with parts of the current time. The default timestamp
         text is <nobr><tt>Created: %b %d %Y %H:%M:%S</tt></nobr>. The tokens used are those accepted by the PHP strftime
         function. For a full list see the <a href="http://www.php.net/manual/en/function.strftime.php">PHP manual page</a>.</p>
+		<p>You can control the font used to draw the timestamp with TIMEFONT, and the colour that it is drawn in, using TIMECOLOR.</p>
     </description>
     <changes>
     <change version="0.6">Added ability to change text.</change>

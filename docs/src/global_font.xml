@@ -13,7 +13,7 @@
 		<p><img src="../images/font-sizes.png" />The built-in GD fonts.</p>
     </description>
     <changes>
-     <change version="0.8">Originally added TIMEFONT.</change>
+     <change version="0.8">Originally added TITLEFONT.</change>
     <change version="0.7">Originally added TIMEFONT.</change>
     <change version="0.6">Originally added KEYFONT.</change>
     </changes>

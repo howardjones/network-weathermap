@@ -8,6 +8,7 @@
     <description  xmlns="http://www.w3.org/1999/xhtml">
         <p>Specifies the position of the title text. </p>
         <p>If no TITLEPOS line is given, then no title is drawn.  You can optionally specify an additional parameter, to change the title. Any text after the second coordinate is taken as a new TITLE.</p>
+		<p>You can control the font used to draw the title with TITLEFONT, and the colour that it is drawn in, using TITLECOLOR.</p>
     </description>
     <changes>
     <change version="0.8">Originally added TITLEPOS.</change>

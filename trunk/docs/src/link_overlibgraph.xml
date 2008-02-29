@@ -9,7 +9,8 @@
 		<p>If you are using the HTML output facility, and HTMLSTYLE is set to 'overlib', then a link is added to the
 		&lt;map&gt; section of the HTML so that when you move the mouse pointer over the the (weathermap) link, a box will pop up
 		containing the image that you specify. Typically used to link to historical data in your network monitoring system.</p>
-<p>You can also specify more than one url, in which case the images are 'stacked' one after another in the popup box.</p>	  <p>If a NOTES line is also specified for a link, then the image specified here appears with the NOTES text underneath it.</p>
+<p>You can also specify more than one url, in which case the images are 'stacked' one after another in the popup box.</p>	  
+<p>If a NOTES line is also specified for a link, then the image specified here appears with the NOTES text underneath it.</p>
 		<p>It is also possible to specify the OVERLIBGRAPH for the 'in' and 'out' halves of a link individually, using INOVERLIBGRAPH and OUTOVERLIBGRAPH.</p>
 		
 		</description>

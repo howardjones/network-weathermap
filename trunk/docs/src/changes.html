@@ -63,7 +63,7 @@ there are a quite a few more features, this release actually has <em>less</em> l
 	<li>VIA can be positioned relative to NODEs (like NODEs can) (thanks again to llow) </li>
 	<li>Weathermap has a hook in the map viewing page to allow other plugins to add code there</li>
 	<li>.htaccess files bundled with Weathermap to restrict direct access to configs and output</li>
-	<li>filenames for output are much less guessable now</li>
+	<li>filenames for output are much less guessable now <strong>(may break external references to maps)</strong></li>
 	<li>You can use 'DUPLEX half' on a link to make the bandwidth percentage
 	        calculate work for half-duplex links</li>
 	<li>ININFOURL / OUTINFOURL, INOVERLIBGRAPH / OUTOVERLIBGRAPH, INNOTES / OUTNOTES, INOVERLIBCAPTION / OUTOVERLIBCAPTION </li>
@@ -71,9 +71,10 @@ there are a quite a few more features, this release actually has <em>less</em> l
 	<li>OVERLIBGRAPH (and IN/OUT versions) can take multiple URLs separated by spaces (again from idea by llow)</li>
 	<li>debug/warning log output contains the map name, and the debug output is marked DEBUG</li>
 	<li>debug log output contains the calling function, file/line number, too. Making debugging-by-mail easier.</li>
-	<li>fping: TARGET to do live pings of devices</li>
+	<li>fping: TARGET to do live pings of devices. See targets.html</li>
 	<li>a very basic sample 'skeleton' DS plugin</li>
 	<li>an additional check-gdbug.php to spot bad GD installs</li>
+	<li>MRTG DS plugin can do a few new tricks. See TARGET and targets.html</li>
 	</ul>
 
     <h2><a name="changes0941">Changes For This Version (0.94 to 0.941)</a></h2>

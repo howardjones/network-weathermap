@@ -13,7 +13,7 @@
         If no KEYPOS line is given for a scale, then no legend is drawn - handy if you have many many colour ranges.</p>
         <p>You can optionally specify an additional parameter, to change the heading above the colours in
         the key. This can be used to change the language of the map, for example. If a scalename is given, then you <em>must also specify a title</em> - there is no useful default title for non-DEFAULT scales.</p>
-
+<p>You can control the font used to draw the key with KEYFONT, and the colours that it is drawn in, using KEYTEXTCOLOR, KEYBGCOLOR and KEYOUTLINECOLOR.</p>
     </description>
     <changes>
     <change version="0.9">Added support for multiple SCALEs.</change>

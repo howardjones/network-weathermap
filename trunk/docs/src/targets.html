@@ -27,7 +27,19 @@ a { color: black; text-decoration: underline; font-weight: normal;}
 <p>The actual data-reading part of Weathermap is handled by Data Source Plugins since version 0.9. These allow users or third-parties to easily add new data sources into Weathermap without altering the core code.</p>
 <p>There are a number of plugins supplied as standard, which will be described here. Each one uses a different format of TARGET string, which contains the parameters the plugin needs to find your data. <em>All</em> plugins return an 'in' and 'out' value, and some may set other variables that can be accessed by <a href="advanced.html#tokens">Special Tokens</a> in strings. For situations where there is only really one output, the 'out' value may just be the same as the 'in'.</p>
 
-<p>Here are the details of the standard data source plugins:</p>
+<p>Here are the details of the standard data source plugins:
+<ul>
+<li><a href="#static">Static value</a></li>
+<li><a href="#rrd">RRDtool files</a> (Cacti, Cricket, "new-style" MRTG, etc)</li>
+<li><a href="#tabs">Tab-separated text files</a></li>
+<li><a href="#mrtg">MRTG-generated HTML files</a></li>
+<li><a href="#cactihost">Cacti host status</a></li>
+<li><a href="#cactithold">Cacti threshold/monitor status</a></li>
+<li><a href="#script">MRTG-style external script</a></li>
+<li><a href="#snmp">SNMP OID</a></li>
+<li><a href="#fping">fping</a></li>
+</ul>
+</p>
 
 <hr />
 
@@ -107,6 +119,7 @@ link3    34.6K 113</pre>
 <p>Since 0.95, there are a few hint variables that will adjust the behaviour of this datasaource:
 <ul>
 <li><b>SET mrtg_swap 1</b> - (per-link/node) will swap the in and out values over</li>
+<li><b>SET mrtg_negate 1</b> - (per-link/node) will make negate the value from the MRTG file. Weathermap doesn't deal well with negative values yet, so this is sometimes useful.</li>
 <li><b>SET mrtg_period d</b> - (per-link/node) allows you to choose between daily, monthly, weekly, and yearly values - use 'd','m','w','y' - default is 'd'</li>
 <li><b>SET mrtg_value av</b> - (per-link/node) allows you to choose between average, minimum, maximum and current values - use 'av','min','max','cu' - default is 'cu'</li>
 </ul>

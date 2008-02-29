@@ -45,6 +45,8 @@
         <a href="#LINK_SPLITPOS">SPLITPOS</a>
         <a href="#LINK_COLORS">*COLOR</a>
         <a href="#LINK_INFOURL">INFOURL</a>
+        <a href="#LINK_ININFOURL">ININFOURL</a>
+        <a href="#LINK_OUTINFOURL">OUTINFOURL</a>
         <a href="#LINK_OVERLIBGRAPH">OVERLIBGRAPH</a>
         <a href="#LINK_INOVERLIBGRAPH">INOVERLIBGRAPH</a>
         <a href="#LINK_OUTOVERLIBGRAPH">OUTOVERLIBGRAPH</a>
@@ -52,6 +54,8 @@
         <a href="#LINK_OVERLIBHEIGHT">OVERLIBHEIGHT</a>
         <a href="#LINK_OVERLIBCAPTION">OVERLIBCAPTION</a>
         <a href="#LINK_NOTES">NOTES</a>
+        <a href="#LINK_INNOTES">INNOTES</a>
+        <a href="#LINK_OUTNOTES">OUTNOTES</a>
         <a href="#LINK_VIA">VIA</a>
         <a href="#LINK_LINKSTYLE">LINKSTYLE</a>
         <a href="#LINK_ARROWSTYLE">ARROWSTYLE</a>

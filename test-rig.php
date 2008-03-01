@@ -11,7 +11,7 @@
 include_once 'editor-config.php';
 require_once 'Weathermap.class.php';
 
-$mapfile = "configs\\094-test.conf";
+$mapfile = "configs/095-test.conf";
 
 $map = new WeatherMap;
 
@@ -44,6 +44,14 @@ foreach ($map->links as $link)
 //   print_r($map->nodes['main']);
 
 }
+
+$mynode = $map->nodes['node80111'];
+$ddnode = $map->inherit_fieldlist;
+$dnode = $map->defaultnode;
+
+print $mynode['usescale']."\n";
+print $dnode['usescale']."\n";
+print $ddnode['usescale']."\n";
 
 $map->WriteConfig("output.conf");
 

@@ -8,7 +8,7 @@
  "HTML Tidy for Mac OS X (vers 12 April 2006), see www.w3.org" /> 
 
  <title>PHP Weathermap 
-v0.95test 
+v0.95 
  - Changes For This Version</title> 
 <style type="text/css" media="print"> 
 /*<![CDATA[*/ 
@@ -41,7 +41,7 @@ a { color: black; text-decoration: underline; font-weight: normal;}
 
 <div id="header"> 
  <h1>PHP Weathermap 
-v0.95test 
+v0.95 
 </h1> 
  <h4>Copyright &copy; 2005-2008 Howard Jones, <tt><a 
 href="mailto:howie@thingy.com">howie@thingy.com</a></tt>. (<a 
@@ -52,6 +52,11 @@ href="http://www.network-weathermap.com/">Website</a>)</h4>
  <h2><a name="changes095">Changes For This Version (0.941 to 0.95)</a></h2> 
 <p>This release has a lot of changes - most of them are small 'polishing' tweaks, but there are a few interesting bigger ones too. Happily, although 
 there are a quite a few more features, this release actually has <em>less</em> lines of code than 0.941, due to some internal cleaning up. </p> 
+ <h3>Known Issues</h3> 
+ <ul> 
+ <a href="config-reference.html#LINK_ININFOURL"><li>ININFOURL</a> / <a href="config-reference.html#LINK_OUTINFOURL">OUTINFOURL,</a> <a href="config-reference.html#LINK_INOVERLIBGRAPH">INOVERLIBGRAPH</a> / <a href="config-reference.html#LINK_OUTOVERLIBGRAPH">OUTOVERLIBGRAPH</a> are not handled well by the editor. If you edit a map that uses these, 
+ then the 'in' side of the link will be copied to the 'out' side. New editor will handle this better.</li> 
+ </ul> 
  <h3>Fixes</h3> 
  <ul> 
  <a href="config-reference.html#GLOBAL_COLORS"><li>KEYOUTLINECOLOR</a> is actually used now (thanks to llow once more)</li> 

@@ -567,7 +567,7 @@ else
 					foreach($points as $p)
 					{
 						// skip a point if it positioned relative to a node. Those shouldn't be rotated (well, IMHO)
-						if($link->vialist[$v][2] == '')
+						if(!isset($link->vialist[$v][2]))
 						{
 							$link->vialist[$v][$i]=$p;
 						}

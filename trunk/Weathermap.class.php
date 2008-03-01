@@ -1475,7 +1475,7 @@ function ReadConfig($filename)
 						array('NODE', '/^\s*LABELOFFSET\s+(C|NE|SE|NW|SW|N|S|E|W)\s*$/i', array('labeloffset'=>1)),
 						array('NODE', '/^\s*LABELFONT\s+(\d+)\s*$/i', array('labelfont'=>1)),
 						array('NODE', '/^\s*LABELANGLE\s+(0|90|180|270)\s*$/i', array('labelangle'=>1)),
-						
+						array('(NODE|LINK)', '/^\s*TEMPLATE\s+(\S+)\s*$/i', array('template'=>1)),						
 						
 						array('LINK', '/^\s*OUTBWFORMAT\s+(.*)\s*$/i', array('bwlabelformats[OUT]'=>1,'labelstyle'=>'--')),
 						array('LINK', '/^\s*INBWFORMAT\s+(.*)\s*$/i', array('bwlabelformats[IN]'=>1,'labelstyle'=>'--')),
@@ -2714,21 +2714,21 @@ function MakeHTML($imagemapname = "weathermap_imap")
 
 	$html .= '<div class="weathermapimage" style="margin-left: auto; margin-right: auto; width: '.$this->width.'px;" >';
 	if ($this->imageuri != '') { $html.=sprintf(
-		'<img src="%s" width="%s" height="%s" border="0" usemap="#'
-		. $imagemapname . '"',
+		'<img src="%s" width="%d" height="%d" border="0" usemap="#%s"',
 		$this->imageuri,
 		$this->width,
-		$this->height); 
-		$html .=  'alt="network weathermap" ';
+		$this->height,
+		$imagemapname); 
+		//$html .=  'alt="network weathermap" ';
 		$html .= '/>';
 		}
 	else { $html.=sprintf(
-		'<img src="%s" width="%s" height="%s" border="0" usemap="#' . $imagemapname
-		. '"',
+		'<img src="%s" width="%d" height="%d" border="0" usemap="#%s"',
 		$this->imagefile,
 		$this->width,
-		$this->height); 
-		$html .=  'alt="network weathermap" ';
+		$this->height,
+		$imagemapname); 
+		//$html .=  'alt="network weathermap" ';
 		$html .= '/>';
 	}
 	$html .= '</div>';

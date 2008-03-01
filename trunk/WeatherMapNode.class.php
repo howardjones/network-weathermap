@@ -52,6 +52,7 @@ class WeatherMapNode extends WeatherMapItem
 	var $centre_x, $centre_y;
 	var $relative_to;
 	var $zorder;
+	var $template;
 
 	function WeatherMapNode()
 	{
@@ -63,6 +64,7 @@ class WeatherMapNode extends WeatherMapItem
 				'usescale' => 'DEFAULT',
 				'useiconscale' => 'none',
 				'scalevar' => 'in',
+				'template' => ':: DEFAULT ::',
 				'iconscalevar' => 'in',
 				'labelfont' => 3,
 				'relative_to' => '',
@@ -718,6 +720,7 @@ class WeatherMapNode extends WeatherMapItem
 			$basic_params = array(
 					array('label','LABEL',CONFIG_TYPE_LITERAL),
 					array('zorder','ZORDER',CONFIG_TYPE_LITERAL),
+					array('template','TEMPLATE',CONFIG_TYPE_LITERAL),
 					array('labeloffset','LABELOFFSET',CONFIG_TYPE_LITERAL),
 					array('labelfont','LABELFONT',CONFIG_TYPE_LITERAL),
 					array('labelangle','LABELANGLE',CONFIG_TYPE_LITERAL),

@@ -48,6 +48,7 @@ class WeatherMapLink extends WeatherMapItem
 	var $curvepoints;
 	var $labeloffset_in, $labeloffset_out;
 	var $commentoffset_in, $commentoffset_out;
+	var $template;
 
 	function WeatherMapLink() { $this->inherit_fieldlist=array
 		(
@@ -55,6 +56,7 @@ class WeatherMapLink extends WeatherMapItem
 			'width' => 7,
 			'commentfont' => 1,
 			'bwfont' => 2,
+			'template' => ':: DEFAULT ::',
 			'splitpos'=>50,
 			'labeloffset_out' => 25,
 			'labeloffset_in' => 75,
@@ -448,6 +450,7 @@ class WeatherMapLink extends WeatherMapItem
 			$basic_params = array(
 					array('width','WIDTH',CONFIG_TYPE_LITERAL),
 					array('zorder','ZORDER',CONFIG_TYPE_LITERAL),
+					array('template','TEMPLATE',CONFIG_TYPE_LITERAL),
 					array('overlibwidth','OVERLIBWIDTH',CONFIG_TYPE_LITERAL),
 					array('overlibheight','OVERLIBHEIGHT',CONFIG_TYPE_LITERAL),
 					array('arrowstyle','ARROWSTYLE',CONFIG_TYPE_LITERAL),

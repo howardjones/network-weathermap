@@ -49,9 +49,9 @@ $mynode = $map->nodes['node80111'];
 $ddnode = $map->inherit_fieldlist;
 $dnode = $map->defaultnode;
 
-print $mynode['usescale']."\n";
-print $dnode['usescale']."\n";
-print $ddnode['usescale']."\n";
+print $mynode->usescale."\n";
+print $dnode->usescale."\n";
+print $ddnode->usescale."\n";
 
 $map->WriteConfig("output.conf");
 

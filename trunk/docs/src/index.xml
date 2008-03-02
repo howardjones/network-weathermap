@@ -55,6 +55,8 @@
 	    	  <xi:include href="link_overlibwidth.xml"/>
 	    	  <xi:include href="link_overlibheight.xml"/>
 	    	  <xi:include href="link_overlibcaption.xml"/>
+	    	  <xi:include href="link_inoverlibcaption.xml"/>
+	    	  <xi:include href="link_outoverlibcaption.xml"/>
                   <xi:include href="link_notes.xml"/>
 				  <xi:include href="link_innotes.xml"/>
 				  <xi:include href="link_outnotes.xml"/>

@@ -40,18 +40,21 @@ case 'viewimage':
 		
 		if(sizeof($map))
 		{
-		
-		$imagefile = dirname(__FILE__).'/output/'.'/'.$map[0]['filehash'].".".$imageformat;
-		if($action == 'viewthumb') $imagefile = dirname(__FILE__).'/output/'.$map[0]['filehash'].".thumb.".$imageformat;
-		
-		$orig_cwd = getcwd();
-		chdir(dirname(__FILE__));
+			$imagefile = dirname(__FILE__).'/output/'.'/'.$map[0]['filehash'].".".$imageformat;
+			if($action == 'viewthumb') $imagefile = dirname(__FILE__).'/output/'.$map[0]['filehash'].".thumb.".$imageformat;
+			
+			$orig_cwd = getcwd();
+			chdir(dirname(__FILE__));
 
-		header('Content-type: image/png');
-		
-		readfile_chunked($imagefile);
-				
-		dir($orig_cwd);	
+			header('Content-type: image/png');
+			
+			readfile_chunked($imagefile);
+					
+			dir($orig_cwd);	
+		}
+		else
+		{
+			// no permission to view this map
 		}
 
 	}
@@ -172,6 +175,28 @@ case 'liveview':
 	weathermap_versionbox();
 	include_once($config["base_path"]."/include/bottom_footer.php");
 	break;
+
+case 'mrss':
+	header('Content-type: application/rss+xml');
+	print '<?xml version="1.0" encoding="utf-8" standalone="yes"?>'."\n";
+	print '<rss xmlns:media="http://search.yahoo.com/mrss" version="2.0"><channel><title>My Network Weathermaps</title>';
+	$maplist = db_fetch_assoc( "select distinct weathermap_maps.* from weathermap_auth,weathermap_maps where weathermap_maps.id=weathermap_auth.mapid and active='on' and (userid=".$_SESSION["sess_user_id"]." or userid=0) order by sortorder, id");	
+	foreach ($maplist as $map) {
+		$thumburl = "weathermap-cacti-plugin.php?action=viewthumb&id=".$map['filehash']."&time=".time();
+		$bigurl = "weathermap-cacti-plugin.php?action=viewimage&id=".$map['filehash']."&time=".time();
+		$linkurl = 'weathermap-cacti-plugin.php?action=viewmap&id='.$map['filehash'];
+		$maptitle = $map['titlecache'];
+		$guid = $map['filehash'];
+		if($maptitle == '') $maptitle= "Map for config file: ".$map['configfile'];
+		
+		printf('<item><title>%s</title><description>Network Weathermap named "%s"</description><link>%s</link><media:thumbnail url="%s"/><media:content url="%s"/><guid isPermaLink="false">%s%s</guid></item>',
+			$maptitle, $maptitle, $linkurl,$thumburl,$bigurl,$config['url_path'],$guid);
+		print "\n";
+	}
+	
+	print '</channel></rss>';
+	break;
+
 case 'viewmapcycle':
 	include_once($config["base_path"]."/include/top_graph_header.php");
 	print "<div id=\"overDiv\" style=\"position:absolute; visibility:hidden; z-index:1000;\"></div>\n";
@@ -349,7 +374,7 @@ function weathermap_thumbview()
 			$imageformat = strtolower(read_config_option("weathermap_output_format"));
 
 			html_graph_start_box(1,true);
-			print "<tr><td>";
+			print "<tr><td class='wm_gallery'>";
 			foreach ($maplist as $map) {
 				$i++;
 
@@ -377,7 +402,7 @@ function weathermap_thumbview()
 			}
 			print "</td></tr>";
 			html_graph_end_box();
-
+			
 		}
 		else
 		{

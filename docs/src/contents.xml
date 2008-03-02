@@ -53,6 +53,8 @@
         <a href="#LINK_OVERLIBWIDTH">OVERLIBWIDTH</a>
         <a href="#LINK_OVERLIBHEIGHT">OVERLIBHEIGHT</a>
         <a href="#LINK_OVERLIBCAPTION">OVERLIBCAPTION</a>
+        <a href="#LINK_INOVERLIBCAPTION">INOVERLIBCAPTION</a>
+        <a href="#LINK_OUTOVERLIBCAPTION">OUTOVERLIBCAPTION</a>
         <a href="#LINK_NOTES">NOTES</a>
         <a href="#LINK_INNOTES">INNOTES</a>
         <a href="#LINK_OUTNOTES">OUTNOTES</a>

@@ -448,9 +448,9 @@ class WeatherMapLink extends WeatherMapItem
 		{
 			$defdef = $this->owner->defaultlink;
 			$basic_params = array(
+					array('template','TEMPLATE',CONFIG_TYPE_LITERAL),
 					array('width','WIDTH',CONFIG_TYPE_LITERAL),
 					array('zorder','ZORDER',CONFIG_TYPE_LITERAL),
-					array('template','TEMPLATE',CONFIG_TYPE_LITERAL),
 					array('overlibwidth','OVERLIBWIDTH',CONFIG_TYPE_LITERAL),
 					array('overlibheight','OVERLIBHEIGHT',CONFIG_TYPE_LITERAL),
 					array('arrowstyle','ARROWSTYLE',CONFIG_TYPE_LITERAL),

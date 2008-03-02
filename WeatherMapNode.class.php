@@ -718,9 +718,9 @@ class WeatherMapNode extends WeatherMapItem
 			$defdef = $this->owner->defaultnode;
 			# $field = 'zorder'; $keyword = 'ZORDER';
 			$basic_params = array(
+					array('template','TEMPLATE',CONFIG_TYPE_LITERAL),
 					array('label','LABEL',CONFIG_TYPE_LITERAL),
 					array('zorder','ZORDER',CONFIG_TYPE_LITERAL),
-					array('template','TEMPLATE',CONFIG_TYPE_LITERAL),
 					array('labeloffset','LABELOFFSET',CONFIG_TYPE_LITERAL),
 					array('labelfont','LABELFONT',CONFIG_TYPE_LITERAL),
 					array('labelangle','LABELANGLE',CONFIG_TYPE_LITERAL),

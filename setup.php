@@ -34,8 +34,20 @@ function plugin_init_weathermap() {
 
 	$plugin_hooks['top_graph_refresh']['weathermap'] = 'weathermap_top_graph_refresh';
 	$plugin_hooks['page_title']['weathermap'] = 'weathermap_page_title';
+	$plugin_hooks['page_head']['weathermap'] = 'weathermap_page_head';
 }
 
+function weathermap_page_head()
+{
+	global $config;
+	
+	// Add in a Media RSS link on the thumbnail view
+	// - format isn't quite right, so it's disabled for now.
+	if(preg_match('/plugins\/weathermap\/weathermap\-cacti\-plugin\.php/',$_SERVER['REQUEST_URI'] ,$matches))
+	{
+//		print '<link id="media-rss" title="My Network Weathermaps" rel="alternate" href="?action=mrss" type="application/rss+xml">';
+	}
+}
 
 function weathermap_page_title( $t )
 {
@@ -386,6 +398,9 @@ function weathermap_draw_navigation_text ($nav) {
 	$nav["weathermap-cacti-plugin.php:liveview"] = array("title" => "Weathermap", "mapping" => "index.php:", "url" => "weathermap-cacti-plugin.php", "level" => "1");
 	$nav["weathermap-cacti-plugin.php:liveviewimage"] = array("title" => "Weathermap", "mapping" => "index.php:", "url" => "weathermap-cacti-plugin.php", "level" => "1");
 	$nav["weathermap-cacti-plugin.php:viewmapcycle"] = array("title" => "Weathermap", "mapping" => "index.php:", "url" => "weathermap-cacti-plugin.php", "level" => "1");
+	$nav["weathermap-cacti-plugin.php:mrss"] = array("title" => "Weathermap", "mapping" => "index.php:", "url" => "weathermap-cacti-plugin.php", "level" => "1");
+	$nav["weathermap-cacti-plugin.php:viewimage"] = array("title" => "Weathermap", "mapping" => "index.php:", "url" => "weathermap-cacti-plugin.php", "level" => "1");
+	$nav["weathermap-cacti-plugin.php:viewthumb"] = array("title" => "Weathermap", "mapping" => "index.php:", "url" => "weathermap-cacti-plugin.php", "level" => "1");
 
 	$nav["weathermap-cacti-plugin-mgmt.php:"] = array("title" => "Weathermap Management", "mapping" => "index.php:", "url" => "weathermap-cacti-plugin-mgmt.php", "level" => "1");
 	//   $nav["weathermap-cacti-plugin-mgmt.php:addmap_picker"] = array("title" => "Weathermap Management", "mapping" => "index.php:", "url" => "weathermap-cacti-plugin-mgmt.php", "level" => "1");

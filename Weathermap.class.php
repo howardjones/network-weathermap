@@ -1661,8 +1661,16 @@ function ReadConfig($filename)
 				
 				if (preg_match("/^\s*SET\s+(\S+)\s+(.*)\s*$/i", $buffer, $matches))
 				{
+					if($last_seen == 'GLOBAL')
+					{
+						$this->add_hint($matches[1],$matches[2]);
+						$linematched++;
+					}
+					else
+					{
 						$curobj->add_hint($matches[1],$matches[2]);
 						$linematched++;
+					}
 				}				
 				
 				if (preg_match("/^\s*(IN|OUT)?OVERLIBGRAPH\s+(.+)$/i", $buffer, $matches))

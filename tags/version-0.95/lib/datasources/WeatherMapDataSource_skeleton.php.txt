@@ -1,0 +1,49 @@
+<?php
+//
+// This is a sample 'empty' DS plugin, in case you want to make your own.
+// it's what the fping plugin looked like before I added the code in.
+//
+// Pluggable datasource for PHP Weathermap 0.9
+// - return a live ping result
+
+// TARGET fping:ipaddress
+// TARGET fping:hostname
+
+class WeatherMapDataSource_fping extends WeatherMapDataSource {
+
+	function Init(&$map)
+	{
+		return(TRUE);
+	}
+
+
+	function Recognise($targetstring)
+	{
+		if(preg_match("/^ping:(\S+)$/",$targetstring,$matches))
+		{
+			return TRUE;
+		}
+		else
+		{
+			return FALSE;
+		}
+	}
+
+	function ReadData($targetstring, &$map, &$item)
+	{
+		$data[IN] = NULL;
+		$data[OUT] = NULL;
+		$data_time = 0;
+
+		if(preg_match("/^ping:(\S+)$/",$targetstring,$matches))
+		{
+		}
+
+		debug ("FPing ReadData: Returning (".($data[IN]===NULL?'NULL':$data[IN]).",".($data[OUT]===NULL?'NULL':$data[IN]).",$data_time)\n");
+		
+		return( array($data[IN], $data[OUT], $data_time) );
+	}
+}
+
+// vim:ts=4:sw=4:
+?>

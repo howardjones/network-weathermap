@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configentry>
+	<keyword>TARGET</keyword>
+	<scope>LINK</scope>
+	<anchor>LINK_TARGET</anchor>
+    <definition>TARGET <meta>targetspec</meta></definition>
+    <description xmlns="http://www.w3.org/1999/xhtml">
+        <p>FIXME Specifies where to look for the current throughput
+      information for this LINK. Currently this can be done in 5
+      ways:
+
+      <ul>
+        <li>a path to a cacti-produced RRD file</li>
+        <li>a path to a non-cacti-produced RRD file and the DS names within that RRD</li>
+        <li>a path to an MRTG-produced HTML "graph holder"
+        page.</li>
+        <li>a path to a tab-delimited text file</li>
+        <li>a URL to an MRTG-produced HTML "graph holder" page.</li>
+
+      </ul>The last of these relies on your PHP installation having
+      the "fopen URL extension" enabled. As far I know, it is
+      enabled by default on a new install of current PHP version.</p>
+      
+       <p>The default DS names for RRD files are 'traffic_in' and 'traffic_out', which works with
+       the majority of Cacti RRD files. For MRTG-produced RRD files, the names are
+       'DS0' and 'DS1'. You can also specify '-' for either DS name, which tells Weathermap to ignore
+       this rrd file for the purposes of the input or output value.
+       This is mainly useful in combination with the aggregation feature.</p>
+       
+       <p>For tab-delimited data files, the format is plain-text, with three tab-seperated columns.
+       The first one is a linkname, and the second and third are traffic-in and traffic-out, respectively.
+       The linkname should match the name in the configuration file. This allows you to create one text file
+       for the entire map from some outside source. Traffic in &amp; out values can use the same "K,M,G,T" abbreviated forms
+       as the BANDWIDTH configuration command. The file should have an extension of .txt or .tsv to be
+       recognised as a tab-delimited file by Weathermap.</p>
+
+<p>You can also specify multiple targets, which will then be added together to make the aggregate bandwidth
+which is then displayed. Specify the targets on one TARGET line, seperated with a space.</p>
+
+    </description>
+    <changes>
+    <change version="0.9">Added plugin data sources, and added new plugins.</change>
+	    <change version="0.8">Added ability to specify multiple targets. Added tab-delimited data source. Added 'ignore' DS name.</change>
+  	    <change version="0.5">Added ability to specify DS names.</change>
+    </changes>
+	<examples>
+	    <example><caption>Using multiple data sources for one link</caption><content>TARGET link1a.rrd  link1b.rrd</content></example>
+  	    <example><caption>Taking the input from one file, and output from another</caption><content>TARGET poot.rrd:-:DS1 poot2.rrd:DS0:-</content></example>
+	    <example><caption>A suitable tab-delimited data file</caption><content>link1    3M    4M
+link2    66K   1.8M
+link3    34.6K 113</content></example>
+    </examples>
+</configentry>

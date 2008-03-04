@@ -1522,7 +1522,14 @@ function ReadConfig($filename)
 								{
 									$index = constant($m[2]);
 									$key = $m[1];
-									$curobj->{$key}[$index] = $val;
+									if($last_seen=="GLOBAL")
+									{
+										$this->{$key}[$index] = $val;
+									}
+									else
+									{
+										$curobj->{$key}[$index] = $val;
+									}
 								}
 								else
 								{

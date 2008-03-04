@@ -1,4 +1,4 @@
-0.95a	Fixed problem with global SET variables. Oops.
+0.95a	Fixed problem with global map variables. Oops.
 
 0.95	KNOWN ISSUE - ININFOURL/OUTINFOURL, INOVERLIBGRAPH/OUTOVERLIBGRAPH are not handled well by the editor. If you edit a map that uses these, 
 		then the 'in' side of the link will be copied to the 'out' side. New editor will handle this better.

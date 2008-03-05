@@ -1533,7 +1533,14 @@ function ReadConfig($filename)
 								}
 								else
 								{
-									$curobj->$key = $val;
+									if($last_seen=="GLOBAL")
+									{
+										$this->$key = $val;
+									}
+									else
+									{
+										$curobj->$key = $val;
+									}
 								}
 							}
 							$linematched++;

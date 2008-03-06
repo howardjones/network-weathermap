@@ -650,9 +650,6 @@ function readfile_chunked($filename) {
     while (!feof($handle)) {
         $buffer = fread($handle, $chunksize);
         echo $buffer;
-        if ($retbytes) {
-            $cnt += strlen($buffer);
-        }
     }
     $status = fclose($handle);
     return $status;

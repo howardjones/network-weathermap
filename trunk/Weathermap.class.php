@@ -2038,6 +2038,8 @@ function ReadConfig($filename)
 		debug ("Adding default SCALE colour set (no SCALE lines seen).\n");
 		$defaults=array
 			(
+				'0_0' => array('bottom' => 0, 'top' => 0, 'red1' => 192, 'green1' => 192, 'blue1' => 192),
+				'0_1' => array('bottom' => 0, 'top' => 0, 'red1' => 255, 'green1' => 255, 'blue1' => 255),
 				'1_10' => array('bottom' => 1, 'top' => 10, 'red1' => 140, 'green1' => 0, 'blue1' => 255),
 				'10_25' => array('bottom' => 10, 'top' => 25, 'red1' => 32, 'green1' => 32, 'blue1' => 255),
 				'25_40' => array('bottom' => 25, 'top' => 40, 'red1' => 0, 'green1' => 192, 'blue1' => 255),
@@ -2052,6 +2054,8 @@ function ReadConfig($filename)
 			$this->colours['DEFAULT'][$key]=$def;
 			$scalesseen++;
 		}
+		// we have a 0-0 line now, so we need to hide that.
+		$this->add_hint("key_hidezero_DEFAULT",1);
 	}
 	else { debug ("Already have $scalesseen scales, no defaults added.\n"); }
 	

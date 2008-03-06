@@ -3,7 +3,7 @@
 	<keyword>HEIGHT</keyword>
 	<scope>GLOBAL</scope>
 	<anchor>GLOBAL_HEIGHT</anchor>
-    <definition>WIDTH <meta>map-height</meta></definition>
+    <definition>HEIGHT <meta>map-height</meta></definition>
     <description  xmlns="http://www.w3.org/1999/xhtml">
     <p>Specifies the height of the map image in pixels.</p>
      <p>If a BACKGROUND is specified, and the imagefile is successfully loaded, then

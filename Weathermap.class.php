@@ -639,7 +639,7 @@ function ReadData()
 											// line number is in $target[3]
 											# list($in,$out,$datatime) =  call_user_func( array($ds_class, 'ReadData'), $targetstring, $this, $myobj );
 											// list($in,$out,$datatime) =  call_user_func_array( array($ds_class, 'ReadData'), array($targetstring, &$this, &$myobj));
-											list($in,$out,$datatime) =  $this->plugins['data'][$ds_class]->ReadData($targetstring, &$this, &$myobj);
+											list($in,$out,$datatime) =  $this->plugins['data'][$ds_class]->ReadData($targetstring, $this, $myobj);
 										}
 										else
 										{
@@ -2117,7 +2117,7 @@ function ReadConfig($filename)
 	foreach ($this->preprocessclasses as $pre_class)
 	{
 		debug("Running $pre_class"."->run()\n");
-		$this->plugins['pre'][$pre_class]->run(&$this);
+		$this->plugins['pre'][$pre_class]->run($this);
 	}
 	debug("Finished Pre-Processing Plugins...\n");
 
@@ -2308,7 +2308,7 @@ function DrawMap($filename = '', $thumbnailfile = '', $thumbnailmax = 250, $with
 	{
 		debug("Running $post_class"."->run()\n");
 		//call_user_func_array(array($post_class, 'run'), array(&$this));
-		$this->plugins['post'][$post_class]->run(&$this);
+		$this->plugins['post'][$post_class]->run($this);
 
 	}
 	debug("Finished Post-Processing Plugins...\n");

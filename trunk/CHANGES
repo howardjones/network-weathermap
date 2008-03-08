@@ -2,6 +2,7 @@
 	Fixed a few deprecated function references.
 	Fixed a couple of tiny docs errors.
 	Added in a SCALE line in the DEFAULT scale for between 0 and 1. Stops a lot of warnings on low-traffic links.
+	Tweaked node cloning in editor
 
 0.95	KNOWN ISSUE - ININFOURL/OUTINFOURL, INOVERLIBGRAPH/OUTOVERLIBGRAPH are not handled well by the editor. If you edit a map that uses these, 
 		then the 'in' side of the link will be copied to the 'out' side. New editor will handle this better.

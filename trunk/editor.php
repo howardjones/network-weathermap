@@ -611,7 +611,7 @@ else
 		$map->WriteConfig($mapfile);
 		break;
 
-        case "link_align_horiz":
+        case "link_align_horizontal":
 		$map->ReadConfig($mapfile);
 
 		$target = $_REQUEST['param'];
@@ -715,6 +715,7 @@ else
 
                 $node->name = $newnodename;
                 $node->x += 30;
+                $node->y += 30;
 
 		$map->nodes[$newnodename] = $node;
 

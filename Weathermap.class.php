@@ -1304,7 +1304,7 @@ function DrawTitle($im, $font, $colour)
 	$this->imap->addArea("Rectangle", "TITLE", '', array($x, $y, $x + $boxwidth, $y - $boxheight));
 }
 
-function ReadConfig($filename)
+function ReadConfig($input)
 {
 	$curnode=null;
 	$curlink=null;
@@ -1312,8 +1312,20 @@ function ReadConfig($filename)
 	$nodesseen=0;
 	$linksseen=0;
 	$scalesseen=0;
-
 	$last_seen="GLOBAL";
+	$filename = "";
+
+	$c = count_chars($input);
+	if(($c['\n'] + $c['\r'])>0) 
+	{
+		// we've been given a config fragment, rather than a filename
+	}
+	else
+	{
+		$filename = $input;
+	}
+	
+	
 	$fd=fopen($filename, "r");
 
 	if ($fd)
@@ -1325,6 +1337,7 @@ function ReadConfig($filename)
 			$buffer=fgets($fd, 4096);
 			// strip out any Windows line-endings that have gotten in here
 			$buffer=str_replace("\r", "", $buffer);
+			
 			$linematched=0;
 			$linecount++;
 

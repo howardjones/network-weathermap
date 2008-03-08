@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configentry>
+	<keyword>BWLABELPOS</keyword>
+	<scope>LINK</scope>
+	<anchor>LINK_BWLABELPOS</anchor>
+    <definition>BWLABELPOS <meta>inposition</meta> <meta>outposition</meta></definition>
+    <description  xmlns="http://www.w3.org/1999/xhtml">
+    
+    <p>Specifies the position of the 'bandwidth' labels shown on each link.</p>
+    <p>The two position values are percentages along the link arrow, from the first to the second node. Therefore <tt>BWLABELPOS 75 25</tt> is the default.</p>
+    </description>
+    <changes>
+    <change version="0.9">Added BWLABELPOS</change>
+    </changes>
+</configentry>

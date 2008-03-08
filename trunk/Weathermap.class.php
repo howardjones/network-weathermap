@@ -1315,17 +1315,9 @@ function ReadConfig($input)
 	$last_seen="GLOBAL";
 	$filename = "";
 
-	$c = count_chars($input);
-	if(($c['\n'] + $c['\r'])>0) 
-	{
-		// we've been given a config fragment, rather than a filename
-	}
-	else
-	{
-		$filename = $input;
-	}
-	
-	
+	// XXX - more to come, here.
+	$filename = $input;
+		
 	$fd=fopen($filename, "r");
 
 	if ($fd)
@@ -1351,7 +1343,7 @@ function ReadConfig($input)
 				$curobj = NULL;
 				if($last_seen == "LINK") $curobj = &$curlink;
 				if($last_seen == "NODE") $curobj = &$curnode;
-				if($last_seen == "GLOBAL") $curobj = $this;
+				if($last_seen == "GLOBAL") $curobj = &$this;
 
 				if (preg_match("/^\s*(LINK|NODE)\s+(\S+)\s*$/i", $buffer, $matches))
 				{
@@ -1525,38 +1517,28 @@ function ReadConfig($input)
 					{
 						if(preg_match($keyword[1],$buffer,$matches))
 						{
+							// print "MATCHED: ".$keyword[1]."\n";
 							foreach ($keyword[2] as $key=>$val)
 							{
 								// if it's a number, then it;s a match number,
 								// otherwise it's a literal to be put into a variable
 								if(is_numeric($val)) $val = $matches[$val];
 								
+								assert('is_object($curobj)');
+								
 								if(preg_match('/^(.*)\[([^\]]+)\]$/',$key,$m))
 								{
 									$index = constant($m[2]);
 									$key = $m[1];
-									if($last_seen=="GLOBAL")
-									{
-										$this->{$key}[$index] = $val;
-									}
-									else
-									{
-										$curobj->{$key}[$index] = $val;
-									}
+									$curobj->{$key}[$index] = $val;
 								}
 								else
 								{
-									if($last_seen=="GLOBAL")
-									{
-										$this->$key = $val;
-									}
-									else
-									{
-										$curobj->$key = $val;
-									}
+									$curobj->$key = $val;
 								}
 							}
 							$linematched++;
+							# print "\n\n";
 							break;
 						}
 					}
@@ -1688,16 +1670,16 @@ function ReadConfig($input)
 				
 				if (preg_match("/^\s*SET\s+(\S+)\s+(.*)\s*$/i", $buffer, $matches))
 				{
-					if($last_seen == 'GLOBAL')
-					{
-						$this->add_hint($matches[1],$matches[2]);
-						$linematched++;
-					}
-					else
-					{
+					//if($last_seen == 'GLOBAL')
+					//{
+					//	$this->add_hint($matches[1],$matches[2]);
+					//	$linematched++;
+					//}
+					//else
+					//{
 						$curobj->add_hint($matches[1],$matches[2]);
 						$linematched++;
-					}
+				//	}
 				}				
 				
 				if (preg_match("/^\s*(IN|OUT)?OVERLIBGRAPH\s+(.+)$/i", $buffer, $matches))
@@ -2573,7 +2555,7 @@ function PreloadMapHTML()
 		$center_y=$this->height / 2;
 
 		// loop through everything. Figure out along the way if it's a node or a link
-		$allitems = array(&$this->links, &$this->nodes);
+		$allitems = array(&$this->nodes, &$this->links);
 		reset($allitems);
 
 		while( list($kk,) = each($allitems))
@@ -2591,6 +2573,7 @@ function PreloadMapHTML()
 				$type = $myobj->my_type();
 
 				$dirs = array();
+				//print "\n\nConsidering a $type - ".$myobj->name.".\n";
 				if($type == 'LINK') $dirs = array(IN=>array(0,2), OUT=>array(1,3));
 				if($type == 'NODE') $dirs = array(IN=>array(0,1,2,3));
 				
@@ -2598,11 +2581,14 @@ function PreloadMapHTML()
 				$change = "";
 				foreach ($dirs as $d=>$parts)
 				{
+					//print "$d - ".join(" ",$parts)."\n";
 					$change .= join('',$myobj->overliburl[$d]);
 					$change .= $myobj->notestext[$d];
 				}
+				//print "CHANGE: $change\n";
 				if($change != '')
 				{
+					//print "Something to be done.\n";
 					if($type=='NODE')
 					{
 						$mid_x = $myobj->x;
@@ -2670,18 +2656,34 @@ function PreloadMapHTML()
 						foreach ($parts as $part)
 						{
 							$areaname = $type.":" . $myobj->name . ":" . $part;
+							//print "INFOURL for $areaname - ";
+						
 							$this->imap->setProp("extrahtml", $overlibhtml, $areaname);
-							if ( ($this->htmlstyle != 'editor') && ($myobj->infourl[$dir] != '') ) {
-								$this->imap->setProp("href", $this->ProcessString($myobj->infourl[$dir],$myobj), $areaname);
-							}
+						}
+					}			
+				} // if change
+				
+				// now look at inforurls
+				foreach ($dirs as $dir=>$parts)
+				{
+					foreach ($parts as $part)
+					{
+						$areaname = $type.":" . $myobj->name . ":" . $part;
+						//print "INFOURL for $areaname - ";
+												
+						if ( ($this->htmlstyle != 'editor') && ($myobj->infourl[$dir] != '') ) {
+							$this->imap->setProp("href", $this->ProcessString($myobj->infourl[$dir],$myobj), $areaname);
+							//print "Setting.\n";
+						}
+						else
+						{
+							//print "NOT Setting.\n";
 						}
 					}
-				
 				}
-				
 			}
 		}
-	}
+	} // overlib?
 }
 
 function asJS()

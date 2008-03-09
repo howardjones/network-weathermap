@@ -1318,7 +1318,19 @@ function ReadConfig($input)
 
 	// XXX - more to come, here.
 	$filename = $input;
-		
+	// check if $input is more than one line. if it is, it's a text of a config file
+	// if it isn't, it the filename
+			
+	if( (strchr($input,"\n")!=FALSE) || (strchr($input,"\r")!=FALSE ) )
+	{
+	     debug("ReadConfig Detected that this is a config fragment.\n");
+	}
+	else
+	{
+	     debug("ReadConfig Detected that this is a config filename.\n");
+	     $filename = $input;
+	}
+	   
 	$fd=fopen($filename, "r");
 
 	if ($fd)
@@ -2150,6 +2162,9 @@ function WriteConfig($filename)
 {
 	global $WEATHERMAP_VERSION;
 
+	// XXX - this should just return the output string, if $filename is empty/NULL
+	// so the config can be used in other ways
+
 	$fd=fopen($filename, "w");
 	$output="";
 
@@ -2609,47 +2624,6 @@ function CleanUp()
 	#foreach ($this->nodes as $node) { unset($node); }
 	#foreach ($this->links as $link) { unset($link); }
 
-}
-
-function LoopAllItems($filter="",$func=NULL)
-{
-	$allitems = array_merge($this->links, $this->nodes);
-	
-	foreach ($allitems as &$item)
-	{
-		$z = $item->zorder;
-		print "$z ".get_class($item). " " . $item->name. " ". $item->template . "\n";
-		$layer = $this->seen_zlayers[$z];
-		if(!is_array($layer))
-		{
-			print "New Z: $z\n";
-			$this->seen_zlayers[$z]=array();
-		}
-		else
-		{
-			print "Array for $z exists.\n";
-		}
-		
-		array_push($this->seen_zlayers[$z], $item);
-		
-	}
-	print "------\n";
-	foreach ($this->seen_zlayers as $z=>$l)
-	{
-		print "Z=$z\n";
-		if(is_array($l))
-		{
-			foreach ($l as $i)
-			{
-				print "  ".get_class($i)." ".$i->name."\n";
-			}
-		}
-		else
-		{
-			print "  NONE\n";
-		}
-	}
-	print sizeof($this->seen_zlayers);
 }
 
 function PreloadMapHTML()

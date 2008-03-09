@@ -1,5 +1,8 @@
+Implement warning counters in cacti plugin
+Implement db-stored config
 PARTIALLY DONE Z-order - layers for drawing
 Angled VIAs
+Unit Tests (needs config fragments)
 Get rid of defaultlink and defaultnode - use __DEFAULT in main array instead.
 (Multilayered inheritance) -> Parent property. Default parent is __DEFAULT
 

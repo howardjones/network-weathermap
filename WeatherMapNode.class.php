@@ -21,8 +21,7 @@ class WeatherMapNode extends WeatherMapItem
 	var $infourl = array();
 	var $notes;
 	var $overliburl;
-	var $overlibwidth,
-		$overlibheight;
+	var $overlibwidth, $overlibheight;
 	var $overlibcaption = array();
 	var $maphtml;
 	var $selected = 0;
@@ -69,8 +68,8 @@ class WeatherMapNode extends WeatherMapItem
 				'labelfont' => 3,
 				'relative_to' => '',
 				'relative_resolved' => FALSE,
-				'x' => 0,
-				'y' => 0,
+				'x' => NULL,
+				'y' => NULL,
 				'inscalekey'=>'', 'outscalekey'=>'',
 				#'incolour'=>-1,'outcolour'=>-1,
 				'original_x' => 0,
@@ -99,7 +98,7 @@ class WeatherMapNode extends WeatherMapItem
 				'labeloffset' => '',
 				'labeloffsetx' => 0,
 				'labeloffsety' => 0,
-				'zorder' => 10,
+				'zorder' => 60,
 				'max_bandwidth_in' => 100,
 				'max_bandwidth_out' => 100,
 				'max_bandwidth_in_cfg' => '100',
@@ -594,6 +593,10 @@ class WeatherMapNode extends WeatherMapItem
 		{
 			imagealphablending($im, true);
 			imagecopy ( $im, $this->image, $this->x - $this->centre_x, $this->y - $this->centre_y, 0, 0, imagesx($this->image), imagesy($this->image) );
+		}
+		else
+		{
+			debug("NO image for NODE ".$this->name."\n");
 		}
 
 	}

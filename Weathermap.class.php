@@ -1,5 +1,5 @@
 <?php
-// PHP Weathermap 0.95
+// PHP Weathermap 0.96
 // Copyright Howard Jones, 2005-2008 howie@thingy.com
 // http://www.network-weathermap.com/
 // Released under the GNU Public License
@@ -138,6 +138,7 @@ class WeatherMap extends WeatherMapBase
 	var $links = array(); // an array of WeatherMapLinks
 	var $texts = array(); // an array containing all the extraneous text bits
 	var $used_images = array(); // an array of image filenames referred to (used by editor)
+	var $seen_zlayers = array(0=>array(),100=>array()); // 0 is the background, 100 is the legends, title, etc
 	var $background;
 	var $htmlstyle;
 	var $imap;
@@ -2057,6 +2058,22 @@ function ReadConfig($input)
 	$this->numscales['DEFAULT']=$scalesseen;
 	$this->configfile="$filename";
 
+	debug("Building cache of z-layers.\n");
+
+	$allitems = array_merge($this->links, $this->nodes);
+	
+	foreach ($allitems as &$item)
+	{
+		$z = $item->zorder;
+		if(!isset($this->seen_zlayers[$z]) || !is_array($this->seen_zlayers[$z]))
+		{
+			$this->seen_zlayers[$z]=array();
+		}		
+		array_push($this->seen_zlayers[$z], $item);
+	}
+	
+	debug("Found ".sizeof($this->seen_zlayers)." z-layers including builtins (0,100).\n");
+	
 	// calculate any relative positions here - that way, nothing else
 	// really needs to know about them
 
@@ -2084,14 +2101,20 @@ function ReadConfig($input)
 					{
 						// save the relative coords, so that WriteConfig can work
 						// resolve the relative stuff
-
-						$newpos_x = $this->nodes[$node->relative_to]->x + $this->nodes[$node->name]->x;
-						$newpos_y = $this->nodes[$node->relative_to]->y + $this->nodes[$node->name]->y;
-						debug("->$newpos_x,$newpos_y\n");
-						$this->nodes[$node->name]->x = $newpos_x;
-						$this->nodes[$node->name]->y = $newpos_y;
-						$this->nodes[$node->name]->relative_resolved=TRUE;
-						$set++;
+						if(!is_null($this->nodes[$node->relative_to]))
+						{
+							$newpos_x = $this->nodes[$node->relative_to]->x + $this->nodes[$node->name]->x;
+							$newpos_y = $this->nodes[$node->relative_to]->y + $this->nodes[$node->name]->y;
+							debug("->$newpos_x,$newpos_y\n");
+							$this->nodes[$node->name]->x = $newpos_x;
+							$this->nodes[$node->name]->y = $newpos_y;
+							$this->nodes[$node->name]->relative_resolved=TRUE;
+							$set++;
+						}
+						else
+						{
+							warn("NODE ".$node->name." has a relative position to an template node! [WMWARN50]\n");
+						}
 					}
 				}
 				else
@@ -2373,32 +2396,76 @@ function DrawMap($filename = '', $thumbnailfile = '', $thumbnailmax = 250, $with
 
 		# foreach ($this->nodes as $node) { $this->nodes[$node->name]->calc_size(); }
 
-		foreach ($this->nodes as $node) { $node->pre_render($image, $this); }
-		foreach ($this->links as $link) { $link->Draw($image, $this); }
+		// do the node rendering stuff first, regardless of where they are actually drawn.
+		foreach ($this->nodes as $node)
+		{
+			// don't try and draw template nodes
+			if(!is_null($node->x)) $node->pre_render($image, $this);
+		}
+
+		$all_layers = array_keys($this->seen_zlayers);
+		sort($all_layers);
+		
+		foreach ($all_layers as $z)
+		{
+			$z_items = $this->seen_zlayers[$z];
+			debug("Drawing layer $z\n");
+			// all the map 'furniture' is fixed at z=100
+			if($z==100)
+			{
+				foreach ($this->colours as $scalename=>$colours)
+				{
+					debug("Drawing KEY for $scalename if necessary.\n");
+		
+					if( (isset($this->numscales[$scalename])) && (isset($this->keyx[$scalename])) && ($this->keyx[$scalename] >= 0) && ($this->keyy[$scalename] >= 0) )
+					{
+						if($this->keystyle[$scalename]=='classic') $this->DrawLegend_Classic($image,$scalename);
+						if($this->keystyle[$scalename]=='horizontal') $this->DrawLegend_Horizontal($image,$scalename,$this->keysize[$scalename]);
+						if($this->keystyle[$scalename]=='vertical') $this->DrawLegend_Vertical($image,$scalename,$this->keysize[$scalename]);
+					}
+				}
+		
+				$this->DrawTimestamp($image, $this->timefont, $this->colours['DEFAULT']['TIME']['gdref1']);
+				$this->DrawTitle($image, $this->titlefont, $this->colours['DEFAULT']['TITLE']['gdref1']);	
+			}
+			if(is_array($z_items))
+			{
+				foreach($z_items as $it)
+				{
+					if(strtolower(get_class($it))=='weathermaplink')
+					{
+						debug("Drawing LINK ".$it->name."\n");
+						$it->Draw($image, $this); 
+					}
+					if(strtolower(get_class($it))=='weathermapnode')
+					{
+						if($withnodes)
+						{
+							// don't try and draw template nodes
+							if(!is_null($it->x))
+							{
+								debug("Drawing NODE ".$it->name."\n");
+								$it->NewDraw($image, $this);
+							}
+						}
+					}
+				}
+			}
+		}
+
+		//foreach ($this->nodes as $node) { $node->pre_render($image, $this); }
+		// foreach ($this->links as $link) { $link->Draw($image, $this); }
 
 		if($withnodes)
 		{
-			foreach ($this->nodes as $node) {
-				$node->NewDraw($image, $this);
+		#	foreach ($this->nodes as $node) {
+		#		$node->NewDraw($image, $this);
 				# debug($node->name.": ".var_dump($node->notes)."\n");
-			}
+	#		}
 			# debug("DEFAULT: ".var_dump($this->defaultnode->notes)."\n");
 		}
 
-		  foreach ($this->colours as $scalename=>$colours)
-		{
-			debug("Drawing KEY for $scalename if necessary.\n");
-
-			if( (isset($this->numscales[$scalename])) && (isset($this->keyx[$scalename])) && ($this->keyx[$scalename] >= 0) && ($this->keyy[$scalename] >= 0) )
-			{
-				if($this->keystyle[$scalename]=='classic') $this->DrawLegend_Classic($image,$scalename);
-				if($this->keystyle[$scalename]=='horizontal') $this->DrawLegend_Horizontal($image,$scalename,$this->keysize[$scalename]);
-				if($this->keystyle[$scalename]=='vertical') $this->DrawLegend_Vertical($image,$scalename,$this->keysize[$scalename]);
-			}
-		}
-
-		$this->DrawTimestamp($image, $this->timefont, $this->colours['DEFAULT']['TIME']['gdref1']);
-		$this->DrawTitle($image, $this->titlefont, $this->colours['DEFAULT']['TITLE']['gdref1']);
+		
 
 		# $this->DrawNINK($image,300,300,48);
 
@@ -2544,6 +2611,47 @@ function CleanUp()
 
 }
 
+function LoopAllItems($filter="",$func=NULL)
+{
+	$allitems = array_merge($this->links, $this->nodes);
+	
+	foreach ($allitems as &$item)
+	{
+		$z = $item->zorder;
+		print "$z ".get_class($item). " " . $item->name. " ". $item->template . "\n";
+		$layer = $this->seen_zlayers[$z];
+		if(!is_array($layer))
+		{
+			print "New Z: $z\n";
+			$this->seen_zlayers[$z]=array();
+		}
+		else
+		{
+			print "Array for $z exists.\n";
+		}
+		
+		array_push($this->seen_zlayers[$z], $item);
+		
+	}
+	print "------\n";
+	foreach ($this->seen_zlayers as $z=>$l)
+	{
+		print "Z=$z\n";
+		if(is_array($l))
+		{
+			foreach ($l as $i)
+			{
+				print "  ".get_class($i)." ".$i->name."\n";
+			}
+		}
+		else
+		{
+			print "  NONE\n";
+		}
+	}
+	print sizeof($this->seen_zlayers);
+}
+
 function PreloadMapHTML()
 {
 	if ($this->htmlstyle == "overlib")
@@ -2663,7 +2771,7 @@ function PreloadMapHTML()
 					}			
 				} // if change
 				
-				// now look at inforurls
+				// now look at infourls
 				foreach ($dirs as $dir=>$parts)
 				{
 					foreach ($parts as $part)

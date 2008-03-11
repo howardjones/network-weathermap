@@ -57,13 +57,13 @@ class WeatherMapNode extends WeatherMapItem
 	{
 		$this->inherit_fieldlist=array
 			(
-				'my_default' => NULL,
+				// 'my_default' => NULL,
 				'label' => '',
 				'proclabel' => '',
 				'usescale' => 'DEFAULT',
 				'useiconscale' => 'none',
 				'scalevar' => 'in',
-				'template' => ':: DEFAULT ::',
+				// 'template' => ':: DEFAULT ::',
 				'iconscalevar' => 'in',
 				'labelfont' => 3,
 				'relative_to' => '',
@@ -113,6 +113,31 @@ class WeatherMapNode extends WeatherMapItem
 	}
 
 	function my_type() {  return "NODE"; }
+
+	function Reset(&$newowner)
+	{
+		$this->owner=$newowner;
+		$template = $this->template;
+		if($template == '') $template = "DEFAULT";
+
+		if($this->template == ':: DEFAULT ::')
+		{
+			foreach (array_keys($this->inherit_fieldlist)as
+				$fld) { $this->$fld=$this->inherit_fieldlist[$fld]; }
+		}
+		else
+		{
+			// use the defaults from DEFAULT
+			$this->CopyFrom($this->owner->links[$template]); 
+			// $this->my_default = $this->owner->defaultlink;
+		}
+	}
+
+	function CopyFrom(&$source)
+	{
+		assert('is_object($source)');
+		foreach (array_keys($this->inherit_fieldlist)as $fld) { $this->$fld=$source->$fld; }
+	}
 
 	// make a mini-image, containing this node and nothing else
 	// figure out where the real NODE centre is, relative to the top-left corner.
@@ -678,14 +703,14 @@ class WeatherMapNode extends WeatherMapItem
 		debug ("PRECALC $this->name: $this->width x $this->height\n");
 	}
 
-	function Reset(&$newowner)
+	function OldReset(&$newowner)
 	{
 		$this->owner=$newowner;
 
 		if (isset($this->owner->defaultnode) && $this->name != 'DEFAULT') {
 			// use the defaults from DEFAULT
 			$this->CopyFrom($this->owner->defaultnode);
-			$this->my_default = $this->owner->defaultnode;
+			// $this->my_default = $this->owner->defaultnode;
 		}
 		else
 		{
@@ -693,18 +718,9 @@ class WeatherMapNode extends WeatherMapItem
 			foreach (array_keys($this->inherit_fieldlist)as $fld)
 			{ $this->$fld = $this->inherit_fieldlist[$fld]; }
 		}
-		# warn($this->name.": ".var_dump($this->hints)."\n");
-		# warn("DEF: ".var_dump($this->owner->defaultnode->hints)."\n");
-		#if($this->name == 'North')
-		#{
-	#		warn("In Reset, North says: ".$this->nodes['North']->hints['sigdigits']."\n");
-	#	}
+		
 	}
 
-	function CopyFrom(&$source)
-	{
-		foreach (array_keys($this->inherit_fieldlist)as $fld) { $this->$fld=$source->$fld; }
-	}
 
 	function WriteConfig()
 	{
@@ -718,7 +734,7 @@ class WeatherMapNode extends WeatherMapItem
 		}
 		else
 		{
-			$defdef = $this->owner->defaultnode;
+			$defdef = $this->owner->nodes[$this->template];
 			# $field = 'zorder'; $keyword = 'ZORDER';
 			$basic_params = array(
 					array('template','TEMPLATE',CONFIG_TYPE_LITERAL),

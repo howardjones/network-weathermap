@@ -52,7 +52,7 @@ class WeatherMapLink extends WeatherMapItem
 
 	function WeatherMapLink() { $this->inherit_fieldlist=array
 		(
-			'my_default' => NULL,
+			// 'my_default' => NULL,
 			'width' => 7,
 			'commentfont' => 1,
 			'bwfont' => 2,
@@ -106,16 +106,19 @@ class WeatherMapLink extends WeatherMapItem
 	function Reset(&$newowner)
 	{
 		$this->owner=$newowner;
+		$template = $this->template;
+		if($template == '') $template = "DEFAULT";
 
-		if (isset($this->owner->defaultlink) && $this->name != 'DEFAULT') {
-			// use the defaults from DEFAULT
-			$this->CopyFrom($this->owner->defaultlink); 
-			$this->my_default = $this->owner->defaultlink;
-		}
-		else
+		if($this->template == ':: DEFAULT ::')
 		{
 			foreach (array_keys($this->inherit_fieldlist)as
 				$fld) { $this->$fld=$this->inherit_fieldlist[$fld]; }
+		}
+		else
+		{
+			// use the defaults from DEFAULT
+			$this->CopyFrom($this->owner->links[$template]); 
+			// $this->my_default = $this->owner->defaultlink;
 		}
 	}
 
@@ -123,7 +126,8 @@ class WeatherMapLink extends WeatherMapItem
 
 	function CopyFrom($source)
 	{
-		foreach (array_keys($this->inherit_fieldlist)as $fld) { $this->$fld = $source->$fld; }
+		assert('is_object($source)');
+		foreach (array_keys($this->inherit_fieldlist) as $fld) { $this->$fld = $source->$fld; }
 	}
 
 	// Set the bandwidth for this link. Convert from KMGT as necessary

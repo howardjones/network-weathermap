@@ -10,7 +10,7 @@ require_once "WeatherMap.functions.php";
 require_once "WeatherMapNode.class.php";
 require_once "WeatherMapLink.class.php";
 
-$WEATHERMAP_VERSION="0.95";
+$WEATHERMAP_VERSION="0.96dev";
 $weathermap_debugging=FALSE;
 $weathermap_map="";
 $weathermap_debug_suppress = array("processstring","mysprintf");
@@ -241,13 +241,20 @@ class WeatherMap extends WeatherMapBase
 		foreach (array_keys($this->inherit_fieldlist)as $fld) { $this->$fld=$this->inherit_fieldlist[$fld]; }
 
 		// these two are used for default settings
-		$this->defaultlink=new WeatherMapLink;
-		$this->defaultlink->name="DEFAULT";
-		$this->defaultlink->Reset($this);
+		$deflink = new WeatherMapLink;
+		$deflink->name="DEFAULT";
+		$deflink->template=":: DEFAULT ::";
+		$deflink->Reset($this);
+		$this->links['DEFAULT'] = $deflink;
+				
+		$defnode = new WeatherMapNode;
+		$defnode->name="DEFAULT";
+		$defnode->template=":: DEFAULT ::";
+		$defnode->Reset($this);
+		$this->nodes['DEFAULT'] = $defnode;
 
-		$this->defaultnode=new WeatherMapNode;
-		$this->defaultnode->name="DEFAULT";
-		$this->defaultnode->Reset($this);
+		//$this->defaultlink = $this->links['DEFAULT'];
+		//$this->defaultnode = $this->nodes['DEFAULT'];
 
 		$this->need_size_precalc=FALSE;
 
@@ -1363,27 +1370,27 @@ function ReadConfig($input)
 					// first, save the previous item, before starting work on the new one
 					if ($last_seen == "NODE")
 					{
-						if ($curnode->name == 'DEFAULT')
-						{
-							$this->defaultnode = $curnode;
-							debug ("Saving Default Node: " . $curnode->name . "\n");
-						}
-						else
-						{
+						//if ($curnode->name == 'DEFAULT')
+						//{
+						//	$this->defaultnode = $curnode;
+						//	debug ("Saving Default Node: " . $curnode->name . "\n");
+						//}
+						//else
+						//{
 							$this->nodes[$curnode->name]=$curnode;
 							debug ("Saving Node: " . $curnode->name . "\n");
-						}
+						//}
 					}
 
 					if ($last_seen == "LINK")
 					{
-						if ($curlink->name == 'DEFAULT')
-						{
-							$this->defaultlink=$curlink;
-							debug ("Saving Default Link: " . $curlink->name . "\n");
-						}
-						else
-						{
+						//if ($curlink->name == 'DEFAULT')
+						//{
+						//	$this->defaultlink=$curlink;
+					//		debug ("Saving Default Link: " . $curlink->name . "\n");
+					//	}
+					//	else
+					//	{
 							if (isset($curlink->a) && isset($curlink->b))
 							{
 								$this->links[$curlink->name]=$curlink;
@@ -1391,7 +1398,7 @@ function ReadConfig($input)
 							}
 							else { warn
 								("Dropping LINK " . $curlink->name . " - it hasn't got 2 NODES! [WMWARN28]\n"); }
-						}
+					//	}
 					}
 
 					if ($matches[1] == 'LINK')
@@ -1401,11 +1408,11 @@ function ReadConfig($input)
 							if ($linksseen > 0) { warn
 								("LINK DEFAULT is not the first LINK. Defaults will not apply to earlier LINKs. [WMWARN26]\n");
 							}
-							unset($curlink);
-							$curlink = $this->defaultlink;
+						//	unset($curlink);
+						//	$curlink = $this->defaultlink;
 						}
-						else
-						{
+						//else
+						//{
 							unset($curlink);
 
 							if(isset($this->links[$matches[2]]))
@@ -1414,10 +1421,11 @@ function ReadConfig($input)
 							}
 
 							$curlink=new WeatherMapLink;
+							$curlink->template = "DEFAULT";
 							$curlink->name=$matches[2];
 							$curlink->Reset($this);
 							$linksseen++;
-						}
+						// }
 
 						$last_seen="LINK";
 						$curlink->configline = $linecount;
@@ -1432,11 +1440,11 @@ function ReadConfig($input)
 								("NODE DEFAULT is not the first NODE. Defaults will not apply to earlier NODEs. [WMWARN27]\n");
 							}
 
-							unset($curnode);
-							$curnode = $this->defaultnode;
+						//	unset($curnode);
+						//	$curnode = $this->defaultnode;
 						}
-						else
-						{
+						//else
+						//{
 							unset($curnode);
 
 							if(isset($this->nodes[$matches[2]]))
@@ -1445,10 +1453,11 @@ function ReadConfig($input)
 							}
 
 							$curnode=new WeatherMapNode;
+							$curnode->template = "DEFAULT";
 							$curnode->name=$matches[2];
 							$curnode->Reset($this);
 							$nodesseen++;
-						}
+						//}
 
 						$curnode->configline = $linecount;
 						$last_seen="NODE";
@@ -2284,8 +2293,8 @@ function WriteConfig($filename)
 
 		fwrite($fd, $output);
 
-		fwrite($fd,$this->defaultnode->WriteConfig());
-		fwrite($fd,$this->defaultlink->WriteConfig());
+		fwrite($fd,$this->nodes['DEFAULT']->WriteConfig());
+		fwrite($fd,$this->links['DEFAULT']->WriteConfig());
 
 		fwrite($fd, "\n# End of DEFAULTS section\n\n# Node definitions:\n");
 

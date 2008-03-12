@@ -1,10 +1,12 @@
 Implement warning counters in cacti plugin
 Implement db-stored config
 PARTIALLY DONE Z-order - layers for drawing
+Z-layer aware imagemaps (reverse order)
 Angled VIAs
 Unit Tests (needs config fragments)
-Get rid of defaultlink and defaultnode - use __DEFAULT in main array instead.
-(Multilayered inheritance) -> Parent property. Default parent is __DEFAULT
+DONE? Get rid of defaultlink and defaultnode - use __DEFAULT in main array instead.
+DONE? (Multilayered inheritance) -> Parent property. Default parent is __DEFAULT
+Styled links (dotty, stripey, etc)
 
 Before 0.95
 -----------

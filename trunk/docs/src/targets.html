@@ -217,6 +217,7 @@ defines a scale where 0 is green and 100% is red and in between is a smooth grad
 <p>This plugin uses the 'fping' command-line tool [<a href="http://fping.sourceforge.net/">http://fping.sourceforge.net/</a>] to ping a host, and returns
 various statistics about it's state.</p>
 <p>After it has been run, the 'in' value is the average ping time in milliseconds, the 'out' value is the percentage packet loss from 5 pings, the 'fping_min' Hint Variable is the minimum  ping time in milliseconds, and 'fping_max' is the maximum.</p>
+<p><strong>Note:</strong> because this plugin uses the external fping binary, you <em>might</em> might need to edit <tt>lib/datasources/WeatherMapDataSource_fping.php</tt> around line 53, to include the full path to fping.</p>
   </div>
 </body>
 </html>

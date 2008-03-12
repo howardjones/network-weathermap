@@ -1,6 +1,7 @@
 0.96    ADDED - Control the drawing order with ZORDER.
         ADDED - Multiple levels of defaults with the TEMPLATE keyword.
-        CHANGE - A NODE with no POSITION is not drawn, instead of drawn at 0,0
+        ADDED - RRD datasource can take SET rrd_default_path to make configs a little easier to read.
+        CHANGE - A NODE with no POSITION is not drawn, instead of drawn at 0,0. Useful for templates.
 
 0.95a	FIXED - problem with global map variables. Oops.
 	FIXED - few deprecated function references.
@@ -14,7 +15,7 @@
 	
 	ADDED - you get a warning if you are using values outside of the defined SCALE now.
 	ADDED - You can add a 'tag' to a SCALE line, to be used in ICON or LABELs later.
-    ADDED - USEICONSCALE - colorize icon images (based on patches from llow)
+        ADDED - USEICONSCALE - colorize icon images (based on patches from llow)
 	ADDED - screenshot mode. "SET screenshot_mode 1" at the top of the map will anonymise all labels, comments and bwlabels.
 	ADDED - LABELFONTCOLOR can use a special value of 'contrast' to always contrast with the label colour.
 	ADDED - Artificial Icons. Special icon 'filenames' - 'box' 'round' 'rbox' create a shaped icon without any file.

@@ -240,31 +240,50 @@ class WeatherMap extends WeatherMapBase
 	{
 		foreach (array_keys($this->inherit_fieldlist)as $fld) { $this->$fld=$this->inherit_fieldlist[$fld]; }
 
+		$this->nodes=array(); // an array of WeatherMapNodes
+
+		$this->links=array(); // an array of WeatherMapLinks
+
+		// these are the default defaults
+		// by putting them into a normal object, we can use the
+		// same code for writing out LINK DEFAULT as any other link.
+		debug("Creating default DEFAULT LINK from :: DEFAULT ::\n");
 		// these two are used for default settings
 		$deflink = new WeatherMapLink;
-		$deflink->name="DEFAULT";
+		$deflink->name=":: DEFAULT ::";
 		$deflink->template=":: DEFAULT ::";
 		$deflink->Reset($this);
-		$this->links['DEFAULT'] = $deflink;
-				
+		$this->links[':: DEFAULT ::'] = &$deflink;
+		
+		debug("Creating default DEFAULT NODE from :: DEFAULT ::\n");		
 		$defnode = new WeatherMapNode;
-		$defnode->name="DEFAULT";
+		$defnode->name=":: DEFAULT ::";
 		$defnode->template=":: DEFAULT ::";
 		$defnode->Reset($this);
-		$this->nodes['DEFAULT'] = $defnode;
+		$this->nodes[':: DEFAULT ::'] = &$defnode;
+
+		// ************************************
+		$defnode2 = new WeatherMapNode;
+		$defnode2->name = "DEFAULT";
+		$defnode2->template = ":: DEFAULT ::";
+		$defnode2->Reset($this);
+		$this->nodes['DEFAULT'] = &$defnode2;
+
+		$deflink2 = new WeatherMapLink;
+		$deflink2->name = "DEFAULT";
+		$deflink2->template = ":: DEFAULT ::";
+		$deflink2->Reset($this);
+		$this->links['DEFAULT'] = &$deflink2;
 
 		//$this->defaultlink = $this->links['DEFAULT'];
 		//$this->defaultnode = $this->nodes['DEFAULT'];
+		
+		assert('is_object($this->nodes[":: DEFAULT ::"])');
+		assert('is_object($this->links[":: DEFAULT ::"])');
 
 		$this->need_size_precalc=FALSE;
 
-		$this->nodes=array
-			(
-				); // an array of WeatherMapNodes
-
-		$this->links=array
-			(
-				); // an array of WeatherMapLinks
+		
 
 		$this->imap=new HTML_ImageMap('weathermap');
 		$this->colours=array
@@ -2293,6 +2312,8 @@ function WriteConfig($filename)
 
 		fwrite($fd, $output);
 
+		assert('is_object($this->nodes["DEFAULT"])');
+		assert('is_object($this->links["DEFAULT"])');
 		fwrite($fd,$this->nodes['DEFAULT']->WriteConfig());
 		fwrite($fd,$this->links['DEFAULT']->WriteConfig());
 
@@ -2300,14 +2321,14 @@ function WriteConfig($filename)
 
 		foreach ($this->nodes as $node)
 		{
-			fwrite($fd,$node->WriteConfig());
+			if($node->name != 'DEFAULT') fwrite($fd,$node->WriteConfig());
 		}
 
 		fwrite($fd, "\n# End of NODE section\n\n# Link definitions:\n");
 
 		foreach ($this->links as $link)
 		{
-			fwrite($fd,$link->WriteConfig());
+			if($link->name != 'DEFAULT') fwrite($fd,$link->WriteConfig());
 		}
 
 		fwrite($fd, "\n# End of LINK section\n\n# That's All Folks!\n");

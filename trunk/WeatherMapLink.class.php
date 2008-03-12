@@ -56,7 +56,7 @@ class WeatherMapLink extends WeatherMapItem
 			'width' => 7,
 			'commentfont' => 1,
 			'bwfont' => 2,
-			'template' => ':: DEFAULT ::',
+			'template' => 'DEFAULT',
 			'splitpos'=>50,
 			'labeloffset_out' => 25,
 			'labeloffset_in' => 75,
@@ -109,10 +109,10 @@ class WeatherMapLink extends WeatherMapItem
 		$template = $this->template;
 		if($template == '') $template = "DEFAULT";
 
-		if($this->template == ':: DEFAULT ::')
+		if($this->name== ':: DEFAULT ::')
 		{
 			foreach (array_keys($this->inherit_fieldlist)as
-				$fld) { $this->$fld=$this->inherit_fieldlist[$fld]; }
+				$fld) {  $this->$fld = $this->inherit_fieldlist[$fld]; }
 		}
 		else
 		{
@@ -450,7 +450,7 @@ class WeatherMapLink extends WeatherMapItem
 		}
 		else
 		{
-			$defdef = $this->owner->defaultlink;
+			$defdef = $this->owner->links[$this->template];
 			$basic_params = array(
 					array('template','TEMPLATE',CONFIG_TYPE_LITERAL),
 					array('width','WIDTH',CONFIG_TYPE_LITERAL),
@@ -640,8 +640,8 @@ class WeatherMapLink extends WeatherMapItem
 			}
 	
 			if (($this->max_bandwidth_in != $defdef->max_bandwidth_in)
-				|| ($this->max_bandwidth_out != $defdef->max_bandwidth_out)
-					|| ($this->name == 'DEFAULT'))
+				|| ($this->max_bandwidth_out != $defdef->max_bandwidth_out))
+			//		|| ($this->name == 'DEFAULT'))
 			{
 				if ($this->max_bandwidth_in == $this->max_bandwidth_out)
 				{ $output.="\tBANDWIDTH " . $this->max_bandwidth_in_cfg . "\n"; }

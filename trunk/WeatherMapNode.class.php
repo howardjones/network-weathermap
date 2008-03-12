@@ -63,7 +63,7 @@ class WeatherMapNode extends WeatherMapItem
 				'usescale' => 'DEFAULT',
 				'useiconscale' => 'none',
 				'scalevar' => 'in',
-				// 'template' => ':: DEFAULT ::',
+				'template' => 'DEFAULT',
 				'iconscalevar' => 'in',
 				'labelfont' => 3,
 				'relative_to' => '',
@@ -120,16 +120,18 @@ class WeatherMapNode extends WeatherMapItem
 		$template = $this->template;
 		if($template == '') $template = "DEFAULT";
 
-		if($this->template == ':: DEFAULT ::')
+		if($this->name == ':: DEFAULT ::')
 		{
 			foreach (array_keys($this->inherit_fieldlist)as
-				$fld) { $this->$fld=$this->inherit_fieldlist[$fld]; }
+				$fld) {  $this->$fld = $this->inherit_fieldlist[$fld]; }
 		}
 		else
 		{
+			//print "filling in ".$this->name." FROM $template\n";
 			// use the defaults from DEFAULT
-			$this->CopyFrom($this->owner->links[$template]); 
+			$this->CopyFrom($this->owner->nodes[$template]); 
 			// $this->my_default = $this->owner->defaultlink;
+			
 		}
 	}
 
@@ -845,8 +847,8 @@ class WeatherMapNode extends WeatherMapItem
 			}
 
 			if (($this->max_bandwidth_in != $defdef->max_bandwidth_in)
-				|| ($this->max_bandwidth_out != $defdef->max_bandwidth_out)
-					|| ($this->name == 'DEFAULT'))
+				|| ($this->max_bandwidth_out != $defdef->max_bandwidth_out) )
+					// || ($this->name == 'DEFAULT'))
 			{
 				if ($this->max_bandwidth_in == $this->max_bandwidth_out)
 				{ $output.="\tMAXVALUE " . $this->max_bandwidth_in_cfg . "\n"; }

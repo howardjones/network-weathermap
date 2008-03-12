@@ -138,7 +138,10 @@ class WeatherMapNode extends WeatherMapItem
 	function CopyFrom(&$source)
 	{
 		assert('is_object($source)');
-		foreach (array_keys($this->inherit_fieldlist)as $fld) { $this->$fld=$source->$fld; }
+		foreach (array_keys($this->inherit_fieldlist)as $fld)
+		{
+			if($fld != 'template') $this->$fld = $source->$fld;
+		}
 	}
 
 	// make a mini-image, containing this node and nothing else
@@ -726,6 +729,8 @@ class WeatherMapNode extends WeatherMapItem
 
 	function WriteConfig()
 	{
+		if(substr($this->name,0,3) == ":: ") return '';
+		
 		$output='';
 
 		// This allows the editor to wholesale-replace a single node's configuration
@@ -770,28 +775,22 @@ class WeatherMapNode extends WeatherMapItem
 
 			// IN/OUT are the same, so we can use the simpler form here
 #			print_r($this->infourl);
-			$comparison=($this->name == 'DEFAULT'
-			? $this->inherit_fieldlist['infourl'][IN] : $defdef->infourl[IN]);
+			$comparison=$defdef->infourl[IN];
 			if ($this->infourl[IN] != $comparison) { $output.="\tINFOURL " . $this->infourl[IN] . "\n"; }
 			
-			$comparison=($this->name == 'DEFAULT'
-			? $this->inherit_fieldlist['overlibcaption'][IN] : $defdef->overlibcaption[IN]);
+			$comparison=$defdef->overlibcaption[IN];
 			if ($this->overlibcaption[IN] != $comparison) { $output.="\tOVERLIBCAPTION " . $this->overlibcaption[IN] . "\n"; }
 
 			// IN/OUT are the same, so we can use the simpler form here
-			$comparison=($this->name == 'DEFAULT'
-			? $this->inherit_fieldlist['notestext'][IN] : $defdef->notestext[IN]);
+			$comparison=$defdef->notestext[IN];
 				if ($this->notestext[IN] != $comparison) { $output.="\tNOTES " . $this->notestext[IN] . "\n"; }
 
-			$comparison=($this->name == 'DEFAULT'
-			? $this->inherit_fieldlist['overliburl'][IN] : $defdef->overliburl[IN]);
+			$comparison=$defdef->overliburl[IN];
 			if ($this->overliburl[IN] != $comparison) { $output.="\tOVERLIBGRAPH " . join(" ",$this->overliburl[IN]) . "\n"; }
 
 			$val = $this->iconscalew. " " . $this->iconscaleh. " " .$this->iconfile;
 
-			$comparison = ($this->name == 'DEFAULT' ? $this->inherit_fieldlist['iconscalew'] : $defdef->iconscalew)
-							. " " . ($this->name == 'DEFAULT' ? $this->inherit_fieldlist['iconscaleh'] : $defdef->iconscaleh)
-							. " " . ($this->name == 'DEFAULT' ? $this->inherit_fieldlist['iconfile'] : $defdef->iconfile);
+			$comparison = $defdef->iconscalew . " " . $defdef->iconscaleh . " " . $defdef->iconfile;
 
 			if ($val != $comparison) {
 				$output.="\tICON ";
@@ -801,8 +800,7 @@ class WeatherMapNode extends WeatherMapItem
 				$output .= ($this->iconfile=='' ?  'none' : $this->iconfile) . "\n";
 			}
 
-			$comparison=($this->name == 'DEFAULT'
-			? $this->inherit_fieldlist['targets'] : $defdef->targets);
+			$comparison=$defdef->targets;
 
 			if ($this->targets != $comparison)
 			{
@@ -813,29 +811,23 @@ class WeatherMapNode extends WeatherMapItem
 				$output.="\n";
 			}
 
-			$comparison = ($this->name == 'DEFAULT' ? $this->inherit_fieldlist['usescale'] : $defdef->usescale) . " " .
-				($this->name == 'DEFAULT' ? $this->inherit_fieldlist['scalevar'] : $defdef->scalevar);
+			$comparison = $defdef->usescale . " " . $defdef->scalevar;
 			$val = $this->usescale . " " . $this->scalevar;
 
 			if ( ($val != $comparison) ) { $output.="\tUSESCALE " . $val . "\n"; }
 
 
-			$comparison = ($this->name == 'DEFAULT'
-				? $this->inherit_fieldlist['useiconscale'] : $defdef->useiconscale) . " " .
-				($this->name == 'DEFAULT' ? $this->inherit_fieldlist['iconscalevar'] : $defdef->iconscalevar);
+			$comparison = $defdef->useiconscale . " " . $defdef->iconscalevar;
 			$val = $this->useiconscale . " " . $this->iconscalevar;
 				
 			if ( $val != $comparison) { $output.="\tUSEICONSCALE " .$val . "\n"; }
 
-			$comparison = ($this->name == 'DEFAULT'
-			? $this->inherit_fieldlist['labeloffsetx'] : $defdef->labeloffsetx) . " " . ($this->name == 'DEFAULT'
-				? $this->inherit_fieldlist['labeloffsety'] : $defdef->labeloffsety);
+			$comparison = $defdef->labeloffsetx . " " . $defdef->labeloffsety;
 			$val = $this->labeloffsetx . " " . $this->labeloffsety;
 
 			if ($comparison != $val ) { $output.="\tLABELOFFSET " . $val . "\n"; }
 
-			$comparison=($this->name == 'DEFAULT' ? $this->inherit_fieldlist['x'] : $defdef->x) . " " . 
-						($this->name == 'DEFAULT' ? $this->inherit_fieldlist['y'] : $defdef->y);
+			$comparison=$defdef->x . " " . $defdef->y;
 			$val = $this->x . " " . $this->y;
 			
 			if ($val != $comparison)

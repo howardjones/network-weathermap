@@ -1403,13 +1403,14 @@ function ReadConfig($input)
 
 					if ($last_seen == "LINK")
 					{
-						//if ($curlink->name == 'DEFAULT')
-						//{
-						//	$this->defaultlink=$curlink;
-					//		debug ("Saving Default Link: " . $curlink->name . "\n");
-					//	}
-					//	else
-					//	{
+						if ($curlink->name == 'DEFAULT')
+						{
+							# $this->defaultlink=$curlink;
+							$this->links[$curlink->name]=$curlink;
+							debug ("Saving Default Link: " . $curlink->name . "\n");
+						}
+						else
+						{
 							if (isset($curlink->a) && isset($curlink->b))
 							{
 								$this->links[$curlink->name]=$curlink;
@@ -1417,7 +1418,7 @@ function ReadConfig($input)
 							}
 							else { warn
 								("Dropping LINK " . $curlink->name . " - it hasn't got 2 NODES! [WMWARN28]\n"); }
-					//	}
+						}
 					}
 
 					if ($matches[1] == 'LINK')
@@ -1521,8 +1522,7 @@ function ReadConfig($input)
 						array('NODE', '/^\s*LABELOFFSET\s+(C|NE|SE|NW|SW|N|S|E|W)\s*$/i', array('labeloffset'=>1)),
 						array('NODE', '/^\s*LABELFONT\s+(\d+)\s*$/i', array('labelfont'=>1)),
 						array('NODE', '/^\s*LABELANGLE\s+(0|90|180|270)\s*$/i', array('labelangle'=>1)),
-						array('(NODE|LINK)', '/^\s*TEMPLATE\s+(\S+)\s*$/i', array('template'=>1)),						
-						
+												
 						array('LINK', '/^\s*OUTBWFORMAT\s+(.*)\s*$/i', array('bwlabelformats[OUT]'=>1,'labelstyle'=>'--')),
 						array('LINK', '/^\s*INBWFORMAT\s+(.*)\s*$/i', array('bwlabelformats[IN]'=>1,'labelstyle'=>'--')),
 						array('NODE','/^\s*ICON\s+none\s*$/i',array('iconfile'=>'')),
@@ -1634,7 +1634,16 @@ function ReadConfig($input)
 							$linematched++;
 					}
 				}
-
+				// array('(NODE|LINK)', '/^\s*TEMPLATE\s+(\S+)\s*$/i', array('template'=>1)),
+				
+				if ( ( $last_seen=='NODE' || $last_seen=='LINK' ) && preg_match("/^\s*TEMPLATE\s+(\S+)\s*$/i", $buffer, $matches))
+				{
+					$curobj->template = $matches[1];
+					debug("Resetting to template $last_seen ".$curobj->template."\n");
+					$curobj->Reset($this);
+					
+				}
+				
 				if ( ( $last_seen=='NODE' || $last_seen=='LINK' ) && preg_match("/^\s*TARGET\s+(.*)\s*$/i", $buffer, $matches))
 				{
 					$linematched++;

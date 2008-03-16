@@ -332,7 +332,7 @@ class WeatherMapDataSource_rrd extends WeatherMapDataSource {
 		debug("SCALING result by $multiplier\n");
 		
 		// try and make a complete path, if we've been given a clue
-		if(!preg_match("/^(\/|\.)",$rrdfile))
+		if(!preg_match("/^(\/|\.)/",$rrdfile))
 		{
 			$rrdbase = $map->get_hint('rrd_default_path');
 			if($rrdbase != '')

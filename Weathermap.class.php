@@ -1340,34 +1340,47 @@ function ReadConfig($input)
 	$linksseen=0;
 	$scalesseen=0;
 	$last_seen="GLOBAL";
-	$filename = "";
-
-	// XXX - more to come, here.
-	$filename = $input;
+	
 	// check if $input is more than one line. if it is, it's a text of a config file
 	// if it isn't, it the filename
 			
+	$lines = array();
+	
 	if( (strchr($input,"\n")!=FALSE) || (strchr($input,"\r")!=FALSE ) )
 	{
 	     debug("ReadConfig Detected that this is a config fragment.\n");
+		 // strip out any Windows line-endings that have gotten in here
+		 $input=str_replace("\r", "", $input);
+		 $lines = split("/n",$input);
 	}
 	else
 	{
 	     debug("ReadConfig Detected that this is a config filename.\n");
 	     $filename = $input;
+		 $fd=fopen($filename, "r");
+
+		if ($fd)
+		{
+			while (!feof($fd))
+			{
+				$buffer=fgets($fd, 4096);
+				// strip out any Windows line-endings that have gotten in here
+				$buffer=str_replace("\r", "", $buffer);
+				$lines[] = $buffer;
+			}
+			fclose($fd);
+		}
+				
 	}
 	   
-	$fd=fopen($filename, "r");
-
-	if ($fd)
-	{
 		$linecount = 0;
 
-		while (!feof($fd))
+		//while (!feof($fd))
+		foreach($lines as $buffer)
 		{
-			$buffer=fgets($fd, 4096);
+			//$buffer=fgets($fd, 4096);
 			// strip out any Windows line-endings that have gotten in here
-			$buffer=str_replace("\r", "", $buffer);
+			//$buffer=str_replace("\r", "", $buffer);
 			
 			$linematched=0;
 			$linecount++;
@@ -2033,7 +2046,7 @@ function ReadConfig($input)
 				("Same line ($linecount) interpreted twice. This is a program error. Please report to Howie with your config!\nThe line was: $buffer");
 				}
 			} // if blankline
-		}     // while
+		}     // while/foreach
 
 		if ($last_seen == "NODE")
 		{
@@ -2066,14 +2079,7 @@ function ReadConfig($input)
 				else { warn ("Dropping LINK " . $curlink->name . " - it hasn't got 2 NODES!"); }
 			}
 		}
-	} // if $fd
-	else
-	{
-		warn ("Couldn't open config file $filename for reading\n");
-		return (FALSE);
-	}
-
-	fclose ($fd);
+	
 	debug("ReadConfig has finished reading the file ($linecount lines)\n");
 	debug("------------------------------------------\n");
 

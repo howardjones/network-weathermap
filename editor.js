@@ -734,7 +734,7 @@ function show_node(name)
         
         if(mynode.iconfile != '')
         {
-			console.log(mynode.iconfile.substring(0,2));
+			// console.log(mynode.iconfile.substring(0,2));
 			if(mynode.iconfile.substring(0,2)=='::')
 			{
 				document.frmMain.node_iconfilename.value = '--AICON--';

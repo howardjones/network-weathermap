@@ -2,6 +2,9 @@ Implement warning counters in cacti plugin
 Implement db-stored config
 PARTIALLY DONE Z-order - layers for drawing
 Z-layer aware imagemaps (reverse order)
+INCLUDE
+Z-layer-based LOD - e.g. don't draw stuff in layers 80-100
+(Tiled output (multiple googlemaps like views, with LOD))
 Angled VIAs
 Unit Tests (needs config fragments)
 DONE? Get rid of defaultlink and defaultnode - use __DEFAULT in main array instead.

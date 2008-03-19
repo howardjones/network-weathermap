@@ -12,7 +12,7 @@
 
 function weathermap_version () {
 	return array( 	'name'    	=> 'weathermap',
-		'version'       => '0.96dev',
+		'version'       => '0.95b',
 		'longname'      => 'PHP Network Weathermap',
 		'author'        => 'Howard Jones',
 		'homepage'      => 'http://www.network-weathermap.com/',
@@ -58,7 +58,14 @@ function weathermap_page_title( $t )
 		if(preg_match('/plugins\/weathermap\/weathermap-cacti-plugin.php\?action=viewmap&id=([^&]+)/',$_SERVER['REQUEST_URI'],$matches))
                 {
                         $mapid = $matches[1];
-                        $title = db_fetch_cell("SELECT titlecache from weathermap_maps where ID=".intval($mapid)." or filehash='".mysql_real_escape_string($mapid)."'");
+						if(preg_match("/^\d+$/",$mapid))
+						{
+							$title = db_fetch_cell("SELECT titlecache from weathermap_maps where ID=".intval($mapid));
+						}
+						else
+						{
+							$title = db_fetch_cell("SELECT titlecache from weathermap_maps where filehash='".mysql_real_escape_string($mapid)."'");
+						}
                         if(isset($title)) $t .= " - $title";
                 }
 
@@ -205,7 +212,7 @@ function weathermap_setup_table () {
 		if (!$found_so) $sql[] = "alter table weathermap_maps add sortorder int(11) NOT NULL default 0 after id";
 		if (!$found_fh) $sql[] = "alter table weathermap_maps add filehash varchar(40) NOT NULL default '' after titlecache";		
 		if (!$found_wc) $sql[] = "alter table weathermap_maps add warncount int(11) NOT NULL default 0 after filehash";		
-		if (!$found_cf) $sql[] = "alter table weathermap_maps add config text NOT NULL default '' after warncount";		
+		if (!$found_cf) $sql[] = "alter table weathermap_maps add config text NOT NULL  default '' after warncount";		
 	}
 
 	$sql[] = "update weathermap_maps set filehash=LEFT(MD5(concat(id,configfile,rand())),20) where filehash = '';";
@@ -377,8 +384,9 @@ function weathermap_show_tab () {
 		$realm_id2 = $user_auth_realm_filenames[basename('weathermap-cacti-plugin.php')];
 	}
 
-	$userid = (isset($_SESSION["sess_user_id"]) ? intval($_SESSION["sess_user_id"]) : 1);
-	if ((db_fetch_assoc("select user_auth_realm.realm_id from user_auth_realm where user_auth_realm.user_id='$userid' and user_auth_realm.realm_id='$realm_id2'")) || (empty($realm_id2))) {
+    $userid = (isset($_SESSION["sess_user_id"]) ? intval($_SESSION["sess_user_id"]) : 1);
+	
+	if ((db_fetch_assoc("select user_auth_realm.realm_id from user_auth_realm where user_auth_realm.user_id='" . $userid . "' and user_auth_realm.realm_id='$realm_id2'")) || (empty($realm_id2))) {
 
 		print '<a href="' . $config['url_path'] . 'plugins/weathermap/weathermap-cacti-plugin.php"><img src="' . $config['url_path'] . 'plugins/weathermap/images/tab_weathermap';
 		// if we're ON a weathermap page, print '_red'

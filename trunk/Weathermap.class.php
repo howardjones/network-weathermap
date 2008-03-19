@@ -1,5 +1,5 @@
 <?php
-// PHP Weathermap 0.96
+// PHP Weathermap 0.95b
 // Copyright Howard Jones, 2005-2008 howie@thingy.com
 // http://www.network-weathermap.com/
 // Released under the GNU Public License
@@ -10,7 +10,7 @@ require_once "WeatherMap.functions.php";
 require_once "WeatherMapNode.class.php";
 require_once "WeatherMapLink.class.php";
 
-$WEATHERMAP_VERSION="0.96dev";
+$WEATHERMAP_VERSION="0.95b";
 $weathermap_debugging=FALSE;
 $weathermap_map="";
 $weathermap_debug_suppress = array("processstring","mysprintf");
@@ -138,7 +138,6 @@ class WeatherMap extends WeatherMapBase
 	var $links = array(); // an array of WeatherMapLinks
 	var $texts = array(); // an array containing all the extraneous text bits
 	var $used_images = array(); // an array of image filenames referred to (used by editor)
-	var $seen_zlayers = array(0=>array(),100=>array()); // 0 is the background, 100 is the legends, title, etc
 	var $background;
 	var $htmlstyle;
 	var $imap;
@@ -240,50 +239,24 @@ class WeatherMap extends WeatherMapBase
 	{
 		foreach (array_keys($this->inherit_fieldlist)as $fld) { $this->$fld=$this->inherit_fieldlist[$fld]; }
 
-		$this->nodes=array(); // an array of WeatherMapNodes
-
-		$this->links=array(); // an array of WeatherMapLinks
-
-		// these are the default defaults
-		// by putting them into a normal object, we can use the
-		// same code for writing out LINK DEFAULT as any other link.
-		debug("Creating default DEFAULT LINK from :: DEFAULT ::\n");
 		// these two are used for default settings
-		$deflink = new WeatherMapLink;
-		$deflink->name=":: DEFAULT ::";
-		$deflink->template=":: DEFAULT ::";
-		$deflink->Reset($this);
-		$this->links[':: DEFAULT ::'] = &$deflink;
-		
-		debug("Creating default DEFAULT NODE from :: DEFAULT ::\n");		
-		$defnode = new WeatherMapNode;
-		$defnode->name=":: DEFAULT ::";
-		$defnode->template=":: DEFAULT ::";
-		$defnode->Reset($this);
-		$this->nodes[':: DEFAULT ::'] = &$defnode;
+		$this->defaultlink=new WeatherMapLink;
+		$this->defaultlink->name="DEFAULT";
+		$this->defaultlink->Reset($this);
 
-		// ************************************
-		$defnode2 = new WeatherMapNode;
-		$defnode2->name = "DEFAULT";
-		$defnode2->template = ":: DEFAULT ::";
-		$defnode2->Reset($this);
-		$this->nodes['DEFAULT'] = &$defnode2;
-
-		$deflink2 = new WeatherMapLink;
-		$deflink2->name = "DEFAULT";
-		$deflink2->template = ":: DEFAULT ::";
-		$deflink2->Reset($this);
-		$this->links['DEFAULT'] = &$deflink2;
-
-		//$this->defaultlink = $this->links['DEFAULT'];
-		//$this->defaultnode = $this->nodes['DEFAULT'];
-		
-		assert('is_object($this->nodes[":: DEFAULT ::"])');
-		assert('is_object($this->links[":: DEFAULT ::"])');
+		$this->defaultnode=new WeatherMapNode;
+		$this->defaultnode->name="DEFAULT";
+		$this->defaultnode->Reset($this);
 
 		$this->need_size_precalc=FALSE;
 
-		
+		$this->nodes=array
+			(
+				); // an array of WeatherMapNodes
+
+		$this->links=array
+			(
+				); // an array of WeatherMapLinks
 
 		$this->imap=new HTML_ImageMap('weathermap');
 		$this->colours=array
@@ -1340,47 +1313,22 @@ function ReadConfig($input)
 	$linksseen=0;
 	$scalesseen=0;
 	$last_seen="GLOBAL";
-	
-	// check if $input is more than one line. if it is, it's a text of a config file
-	// if it isn't, it the filename
-			
-	$lines = array();
-	
-	if( (strchr($input,"\n")!=FALSE) || (strchr($input,"\r")!=FALSE ) )
-	{
-	     debug("ReadConfig Detected that this is a config fragment.\n");
-		 // strip out any Windows line-endings that have gotten in here
-		 $input=str_replace("\r", "", $input);
-		 $lines = split("/n",$input);
-	}
-	else
-	{
-	     debug("ReadConfig Detected that this is a config filename.\n");
-	     $filename = $input;
-		 $fd=fopen($filename, "r");
+	$filename = "";
 
-		if ($fd)
-		{
-			while (!feof($fd))
-			{
-				$buffer=fgets($fd, 4096);
-				// strip out any Windows line-endings that have gotten in here
-				$buffer=str_replace("\r", "", $buffer);
-				$lines[] = $buffer;
-			}
-			fclose($fd);
-		}
-				
-	}
-	   
+	// XXX - more to come, here.
+	$filename = $input;
+		
+	$fd=fopen($filename, "r");
+
+	if ($fd)
+	{
 		$linecount = 0;
 
-		//while (!feof($fd))
-		foreach($lines as $buffer)
+		while (!feof($fd))
 		{
-			//$buffer=fgets($fd, 4096);
+			$buffer=fgets($fd, 4096);
 			// strip out any Windows line-endings that have gotten in here
-			//$buffer=str_replace("\r", "", $buffer);
+			$buffer=str_replace("\r", "", $buffer);
 			
 			$linematched=0;
 			$linecount++;
@@ -1402,24 +1350,23 @@ function ReadConfig($input)
 					// first, save the previous item, before starting work on the new one
 					if ($last_seen == "NODE")
 					{
-						//if ($curnode->name == 'DEFAULT')
-						//{
-						//	$this->defaultnode = $curnode;
-						//	debug ("Saving Default Node: " . $curnode->name . "\n");
-						//}
-						//else
-						//{
+						if ($curnode->name == 'DEFAULT')
+						{
+							$this->defaultnode = $curnode;
+							debug ("Saving Default Node: " . $curnode->name . "\n");
+						}
+						else
+						{
 							$this->nodes[$curnode->name]=$curnode;
 							debug ("Saving Node: " . $curnode->name . "\n");
-						//}
+						}
 					}
 
 					if ($last_seen == "LINK")
 					{
 						if ($curlink->name == 'DEFAULT')
 						{
-							# $this->defaultlink=$curlink;
-							$this->links[$curlink->name]=$curlink;
+							$this->defaultlink=$curlink;
 							debug ("Saving Default Link: " . $curlink->name . "\n");
 						}
 						else
@@ -1441,11 +1388,11 @@ function ReadConfig($input)
 							if ($linksseen > 0) { warn
 								("LINK DEFAULT is not the first LINK. Defaults will not apply to earlier LINKs. [WMWARN26]\n");
 							}
-						//	unset($curlink);
-						//	$curlink = $this->defaultlink;
+							unset($curlink);
+							$curlink = $this->defaultlink;
 						}
-						//else
-						//{
+						else
+						{
 							unset($curlink);
 
 							if(isset($this->links[$matches[2]]))
@@ -1454,11 +1401,10 @@ function ReadConfig($input)
 							}
 
 							$curlink=new WeatherMapLink;
-							$curlink->template = "DEFAULT";
 							$curlink->name=$matches[2];
 							$curlink->Reset($this);
 							$linksseen++;
-						// }
+						}
 
 						$last_seen="LINK";
 						$curlink->configline = $linecount;
@@ -1473,11 +1419,11 @@ function ReadConfig($input)
 								("NODE DEFAULT is not the first NODE. Defaults will not apply to earlier NODEs. [WMWARN27]\n");
 							}
 
-						//	unset($curnode);
-						//	$curnode = $this->defaultnode;
+							unset($curnode);
+							$curnode = $this->defaultnode;
 						}
-						//else
-						//{
+						else
+						{
 							unset($curnode);
 
 							if(isset($this->nodes[$matches[2]]))
@@ -1486,11 +1432,10 @@ function ReadConfig($input)
 							}
 
 							$curnode=new WeatherMapNode;
-							$curnode->template = "DEFAULT";
 							$curnode->name=$matches[2];
 							$curnode->Reset($this);
 							$nodesseen++;
-						//}
+						}
 
 						$curnode->configline = $linecount;
 						$last_seen="NODE";
@@ -1535,17 +1480,18 @@ function ReadConfig($input)
 						array('NODE', '/^\s*LABELOFFSET\s+(C|NE|SE|NW|SW|N|S|E|W)\s*$/i', array('labeloffset'=>1)),
 						array('NODE', '/^\s*LABELFONT\s+(\d+)\s*$/i', array('labelfont'=>1)),
 						array('NODE', '/^\s*LABELANGLE\s+(0|90|180|270)\s*$/i', array('labelangle'=>1)),
-												
+						array('(NODE|LINK)', '/^\s*TEMPLATE\s+(\S+)\s*$/i', array('template'=>1)),						
+						
 						array('LINK', '/^\s*OUTBWFORMAT\s+(.*)\s*$/i', array('bwlabelformats[OUT]'=>1,'labelstyle'=>'--')),
 						array('LINK', '/^\s*INBWFORMAT\s+(.*)\s*$/i', array('bwlabelformats[IN]'=>1,'labelstyle'=>'--')),
 						array('NODE','/^\s*ICON\s+none\s*$/i',array('iconfile'=>'')),
 						array('NODE','/^\s*ICON\s+(\S+)\s*$/i',array('iconfile'=>1)),
 						array('NODE','/^\s*ICON\s+(\d+)\s+(\d+)\s+(\S+)\s*$/i',array('iconfile'=>3, 'iconscalew'=>1, 'iconscaleh'=>2)),
 						
-						array('NODE','/^\s*NOTES\s+(.*)\s*$/i',array('notes[IN]'=>1,'notes[OUT]'=>1)),
-						array('LINK','/^\s*NOTES\s+(.*)\s*$/i',array('notes[IN]'=>1,'notes[OUT]'=>1)),
-						array('LINK','/^\s*INNOTES\s+(.*)\s*$/i',array('notes[IN]'=>1)),
-						array('LINK','/^\s*OUTNOTES\s+(.*)\s*$/i',array('notes[OUT]'=>1)),
+						array('NODE','/^\s*NOTES\s+(.*)\s*$/i',array('notestext[IN]'=>1,'notestext[OUT]'=>1)),
+						array('LINK','/^\s*NOTES\s+(.*)\s*$/i',array('notestext[IN]'=>1,'notestext[OUT]'=>1)),
+						array('LINK','/^\s*INNOTES\s+(.*)\s*$/i',array('notestext[IN]'=>1)),
+						array('LINK','/^\s*OUTNOTES\s+(.*)\s*$/i',array('notestext[OUT]'=>1)),
 						
 						array('NODE','/^\s*INFOURL\s+(.*)\s*$/i',array('infourl[IN]'=>1,'infourl[OUT]'=>1)),
 						array('LINK','/^\s*INFOURL\s+(.*)\s*$/i',array('infourl[IN]'=>1,'infourl[OUT]'=>1)),
@@ -1647,16 +1593,7 @@ function ReadConfig($input)
 							$linematched++;
 					}
 				}
-				// array('(NODE|LINK)', '/^\s*TEMPLATE\s+(\S+)\s*$/i', array('template'=>1)),
-				
-				if ( ( $last_seen=='NODE' || $last_seen=='LINK' ) && preg_match("/^\s*TEMPLATE\s+(\S+)\s*$/i", $buffer, $matches))
-				{
-					$curobj->template = $matches[1];
-					debug("Resetting to template $last_seen ".$curobj->template."\n");
-					$curobj->Reset($this);
-					
-				}
-				
+
 				if ( ( $last_seen=='NODE' || $last_seen=='LINK' ) && preg_match("/^\s*TARGET\s+(.*)\s*$/i", $buffer, $matches))
 				{
 					$linematched++;
@@ -1985,6 +1922,7 @@ function ReadConfig($input)
 				{
 					$key=$matches[1];
 					$field=strtolower($matches[1]) . 'colour';
+					$val = strtolower($matches[2]);
 
 					if(isset($matches[3]))	// this is a regular colour setting thing
 					{
@@ -1992,13 +1930,13 @@ function ReadConfig($input)
 						$linematched++;
 					}
 
-					if($matches[2] == 'none' && ($matches[1]=='LABELFONTSHADOW' || $matches[1]=='LABELBG' || $matches[1]=='LABELOUTLINE'))
+					if($val == 'none' && ($matches[1]=='LABELFONTSHADOW' || $matches[1]=='LABELBG' || $matches[1]=='LABELOUTLINE'))
 					{
 						$curnode->$field=array(-1,-1,-1);
 						$linematched++;
 					}
-
-					if($matches[2] == 'contrast' && $matches[1]=='LABELFONT')
+					
+					if($val == 'contrast' && $matches[1]=='LABELFONT')
 					{
 						$curnode->$field=array(-3,-3,-3);
 						$linematched++;
@@ -2018,15 +1956,17 @@ function ReadConfig($input)
 				{
 					$key=$matches[1];
 					$field=strtolower($matches[1]) . 'colour';
+					$val = strtolower($matches[2]);
 
 					if(isset($matches[3]))	// this is a regular colour setting thing
 					{
 						$curlink->$field=array(	$matches[3],$matches[4],$matches[5]);
 						$linematched++;
 					}
-					if($matches[2] == 'none' && ($matches[1]=='BWBOX' || $matches[1]=='BWOUTLINE' || $matches[1]=='OUTLINE'))
+					if($val == 'none' && ($key=='BWBOX' || $key=='BWOUTLINE' || $key=='OUTLINE'))
 					{
-						$curnode->$field=array(-1,-1,-1);
+						// print "***********************************\n";
+						$curlink->$field=array(-1,-1,-1);
 						$linematched++;
 					}
 				}
@@ -2046,7 +1986,7 @@ function ReadConfig($input)
 				("Same line ($linecount) interpreted twice. This is a program error. Please report to Howie with your config!\nThe line was: $buffer");
 				}
 			} // if blankline
-		}     // while/foreach
+		}     // while
 
 		if ($last_seen == "NODE")
 		{
@@ -2079,7 +2019,14 @@ function ReadConfig($input)
 				else { warn ("Dropping LINK " . $curlink->name . " - it hasn't got 2 NODES!"); }
 			}
 		}
-	
+	} // if $fd
+	else
+	{
+		warn ("Couldn't open config file $filename for reading\n");
+		return (FALSE);
+	}
+
+	fclose ($fd);
 	debug("ReadConfig has finished reading the file ($linecount lines)\n");
 	debug("------------------------------------------\n");
 
@@ -2113,22 +2060,6 @@ function ReadConfig($input)
 	$this->numscales['DEFAULT']=$scalesseen;
 	$this->configfile="$filename";
 
-	debug("Building cache of z-layers.\n");
-
-	$allitems = array_merge($this->links, $this->nodes);
-	
-	foreach ($allitems as &$item)
-	{
-		$z = $item->zorder;
-		if(!isset($this->seen_zlayers[$z]) || !is_array($this->seen_zlayers[$z]))
-		{
-			$this->seen_zlayers[$z]=array();
-		}		
-		array_push($this->seen_zlayers[$z], $item);
-	}
-	
-	debug("Found ".sizeof($this->seen_zlayers)." z-layers including builtins (0,100).\n");
-	
 	// calculate any relative positions here - that way, nothing else
 	// really needs to know about them
 
@@ -2156,20 +2087,14 @@ function ReadConfig($input)
 					{
 						// save the relative coords, so that WriteConfig can work
 						// resolve the relative stuff
-						if(!is_null($this->nodes[$node->relative_to]))
-						{
-							$newpos_x = $this->nodes[$node->relative_to]->x + $this->nodes[$node->name]->x;
-							$newpos_y = $this->nodes[$node->relative_to]->y + $this->nodes[$node->name]->y;
-							debug("->$newpos_x,$newpos_y\n");
-							$this->nodes[$node->name]->x = $newpos_x;
-							$this->nodes[$node->name]->y = $newpos_y;
-							$this->nodes[$node->name]->relative_resolved=TRUE;
-							$set++;
-						}
-						else
-						{
-							warn("NODE ".$node->name." has a relative position to an template node! [WMWARN50]\n");
-						}
+
+						$newpos_x = $this->nodes[$node->relative_to]->x + $this->nodes[$node->name]->x;
+						$newpos_y = $this->nodes[$node->relative_to]->y + $this->nodes[$node->name]->y;
+						debug("->$newpos_x,$newpos_y\n");
+						$this->nodes[$node->name]->x = $newpos_x;
+						$this->nodes[$node->name]->y = $newpos_y;
+						$this->nodes[$node->name]->relative_resolved=TRUE;
+						$set++;
 					}
 				}
 				else
@@ -2204,9 +2129,6 @@ function ReadConfig($input)
 function WriteConfig($filename)
 {
 	global $WEATHERMAP_VERSION;
-
-	// XXX - this should just return the output string, if $filename is empty/NULL
-	// so the config can be used in other ways
 
 	$fd=fopen($filename, "w");
 	$output="";
@@ -2327,23 +2249,21 @@ function WriteConfig($filename)
 
 		fwrite($fd, $output);
 
-		assert('is_object($this->nodes["DEFAULT"])');
-		assert('is_object($this->links["DEFAULT"])');
-		fwrite($fd,$this->nodes['DEFAULT']->WriteConfig());
-		fwrite($fd,$this->links['DEFAULT']->WriteConfig());
+		fwrite($fd,$this->defaultnode->WriteConfig());
+		fwrite($fd,$this->defaultlink->WriteConfig());
 
 		fwrite($fd, "\n# End of DEFAULTS section\n\n# Node definitions:\n");
 
 		foreach ($this->nodes as $node)
 		{
-			if($node->name != 'DEFAULT') fwrite($fd,$node->WriteConfig());
+			fwrite($fd,$node->WriteConfig());
 		}
 
 		fwrite($fd, "\n# End of NODE section\n\n# Link definitions:\n");
 
 		foreach ($this->links as $link)
 		{
-			if($link->name != 'DEFAULT') fwrite($fd,$link->WriteConfig());
+			fwrite($fd,$link->WriteConfig());
 		}
 
 		fwrite($fd, "\n# End of LINK section\n\n# That's All Folks!\n");
@@ -2456,76 +2376,32 @@ function DrawMap($filename = '', $thumbnailfile = '', $thumbnailmax = 250, $with
 
 		# foreach ($this->nodes as $node) { $this->nodes[$node->name]->calc_size(); }
 
-		// do the node rendering stuff first, regardless of where they are actually drawn.
-		foreach ($this->nodes as $node)
-		{
-			// don't try and draw template nodes
-			if(!is_null($node->x)) $node->pre_render($image, $this);
-		}
-
-		$all_layers = array_keys($this->seen_zlayers);
-		sort($all_layers);
-		
-		foreach ($all_layers as $z)
-		{
-			$z_items = $this->seen_zlayers[$z];
-			debug("Drawing layer $z\n");
-			// all the map 'furniture' is fixed at z=100
-			if($z==100)
-			{
-				foreach ($this->colours as $scalename=>$colours)
-				{
-					debug("Drawing KEY for $scalename if necessary.\n");
-		
-					if( (isset($this->numscales[$scalename])) && (isset($this->keyx[$scalename])) && ($this->keyx[$scalename] >= 0) && ($this->keyy[$scalename] >= 0) )
-					{
-						if($this->keystyle[$scalename]=='classic') $this->DrawLegend_Classic($image,$scalename);
-						if($this->keystyle[$scalename]=='horizontal') $this->DrawLegend_Horizontal($image,$scalename,$this->keysize[$scalename]);
-						if($this->keystyle[$scalename]=='vertical') $this->DrawLegend_Vertical($image,$scalename,$this->keysize[$scalename]);
-					}
-				}
-		
-				$this->DrawTimestamp($image, $this->timefont, $this->colours['DEFAULT']['TIME']['gdref1']);
-				$this->DrawTitle($image, $this->titlefont, $this->colours['DEFAULT']['TITLE']['gdref1']);	
-			}
-			if(is_array($z_items))
-			{
-				foreach($z_items as $it)
-				{
-					if(strtolower(get_class($it))=='weathermaplink')
-					{
-						debug("Drawing LINK ".$it->name."\n");
-						$it->Draw($image, $this); 
-					}
-					if(strtolower(get_class($it))=='weathermapnode')
-					{
-						if($withnodes)
-						{
-							// don't try and draw template nodes
-							if(!is_null($it->x))
-							{
-								debug("Drawing NODE ".$it->name."\n");
-								$it->NewDraw($image, $this);
-							}
-						}
-					}
-				}
-			}
-		}
-
-		//foreach ($this->nodes as $node) { $node->pre_render($image, $this); }
-		// foreach ($this->links as $link) { $link->Draw($image, $this); }
+		foreach ($this->nodes as $node) { $node->pre_render($image, $this); }
+		foreach ($this->links as $link) { $link->Draw($image, $this); }
 
 		if($withnodes)
 		{
-		#	foreach ($this->nodes as $node) {
-		#		$node->NewDraw($image, $this);
+			foreach ($this->nodes as $node) {
+				$node->NewDraw($image, $this);
 				# debug($node->name.": ".var_dump($node->notes)."\n");
-	#		}
+			}
 			# debug("DEFAULT: ".var_dump($this->defaultnode->notes)."\n");
 		}
 
-		
+		  foreach ($this->colours as $scalename=>$colours)
+		{
+			debug("Drawing KEY for $scalename if necessary.\n");
+
+			if( (isset($this->numscales[$scalename])) && (isset($this->keyx[$scalename])) && ($this->keyx[$scalename] >= 0) && ($this->keyy[$scalename] >= 0) )
+			{
+				if($this->keystyle[$scalename]=='classic') $this->DrawLegend_Classic($image,$scalename);
+				if($this->keystyle[$scalename]=='horizontal') $this->DrawLegend_Horizontal($image,$scalename,$this->keysize[$scalename]);
+				if($this->keystyle[$scalename]=='vertical') $this->DrawLegend_Vertical($image,$scalename,$this->keysize[$scalename]);
+			}
+		}
+
+		$this->DrawTimestamp($image, $this->timefont, $this->colours['DEFAULT']['TIME']['gdref1']);
+		$this->DrawTitle($image, $this->titlefont, $this->colours['DEFAULT']['TITLE']['gdref1']);
 
 		# $this->DrawNINK($image,300,300,48);
 
@@ -2673,8 +2549,7 @@ function CleanUp()
 
 function PreloadMapHTML()
 {
-	if ($this->htmlstyle == "overlib")
-	{
+	
 		//   onmouseover="return overlib('<img src=graph.png>',DELAY,250,CAPTION,'$caption');"  onmouseout="return nd();"
 
 		// find the middle of the map
@@ -2712,85 +2587,89 @@ function PreloadMapHTML()
 					$change .= join('',$myobj->overliburl[$d]);
 					$change .= $myobj->notestext[$d];
 				}
-				//print "CHANGE: $change\n";
-				if($change != '')
+				
+				if ($this->htmlstyle == "overlib")
 				{
-					//print "Something to be done.\n";
-					if($type=='NODE')
+					//print "CHANGE: $change\n";
+					if($change != '')
 					{
-						$mid_x = $myobj->x;
-						$mid_y = $myobj->y;
-					}
-					if($type=='LINK')
-					{
-						$a_x=$this->nodes[$myobj->a->name]->x;
-						$a_y=$this->nodes[$myobj->a->name]->y;
-
-						$b_x=$this->nodes[$myobj->b->name]->x;
-						$b_y=$this->nodes[$myobj->b->name]->y;
-
-						$mid_x=($a_x + $b_x) / 2;
-						$mid_y=($a_y + $b_y) / 2;
-					}
-					$left=""; $above="";
-				
-					if ($myobj->overlibwidth != 0)
-					{
-						$left="WIDTH," . $myobj->overlibwidth . ",";
-
-						if ($mid_x > $center_x) $left.="LEFT,";
-					}
-					
-					if ($myobj->overlibheight != 0)
-					{
-						$above="HEIGHT," . $myobj->overlibheight . ",";
-
-						if ($mid_y > $center_y) $above.="ABOVE,";
-					}
-					
-					foreach ($dirs as $dir=>$parts)
-					{
-						$caption = ($myobj->overlibcaption[$dir] != '' ? $myobj->overlibcaption[$dir] : $myobj->name);
-						$caption = $this->ProcessString($caption,$myobj);
-
-						$overlibhtml = "onmouseover=\"return overlib('";
-
-						$n = 0;
-						if(sizeof($myobj->overliburl[$dir]) > 0)
+						//print "Something to be done.\n";
+						if($type=='NODE')
 						{
-							// print "ARRAY:".is_array($link->overliburl[$dir])."\n";
-							foreach ($myobj->overliburl[$dir] as $url)
+							$mid_x = $myobj->x;
+							$mid_y = $myobj->y;
+						}
+						if($type=='LINK')
+						{
+							$a_x=$this->nodes[$myobj->a->name]->x;
+							$a_y=$this->nodes[$myobj->a->name]->y;
+
+							$b_x=$this->nodes[$myobj->b->name]->x;
+							$b_y=$this->nodes[$myobj->b->name]->y;
+
+							$mid_x=($a_x + $b_x) / 2;
+							$mid_y=($a_y + $b_y) / 2;
+						}
+						$left=""; $above="";
+					
+						if ($myobj->overlibwidth != 0)
+						{
+							$left="WIDTH," . $myobj->overlibwidth . ",";
+
+							if ($mid_x > $center_x) $left.="LEFT,";
+						}
+						
+						if ($myobj->overlibheight != 0)
+						{
+							$above="HEIGHT," . $myobj->overlibheight . ",";
+
+							if ($mid_y > $center_y) $above.="ABOVE,";
+						}
+						
+						foreach ($dirs as $dir=>$parts)
+						{
+							$caption = ($myobj->overlibcaption[$dir] != '' ? $myobj->overlibcaption[$dir] : $myobj->name);
+							$caption = $this->ProcessString($caption,$myobj);
+
+							$overlibhtml = "onmouseover=\"return overlib('";
+
+							$n = 0;
+							if(sizeof($myobj->overliburl[$dir]) > 0)
 							{
-								if($n>0) { $overlibhtml .= '&lt;br /&gt;'; }
-								$overlibhtml .= "&lt;img src=" . $this->ProcessString($url,$myobj) . "&gt;";
-								$n++;
+								// print "ARRAY:".is_array($link->overliburl[$dir])."\n";
+								foreach ($myobj->overliburl[$dir] as $url)
+								{
+									if($n>0) { $overlibhtml .= '&lt;br /&gt;'; }
+									$overlibhtml .= "&lt;img src=" . $this->ProcessString($url,$myobj) . "&gt;";
+									$n++;
+								}
 							}
-						}
-						# print "Added $n for $dir\n";
-						if($myobj->notestext[$dir] != '')
-						{
-							# put in a linebreak if there was an image AND notes
-							if($n>0) $overlibhtml .= '&lt;br /&gt;';
-							$note = $this->ProcessString($myobj->notestext[$dir],$myobj);
-							$note = htmlspecialchars($note, ENT_NOQUOTES);
-							$note=str_replace("'", "\\&apos;", $note);
-							$note=str_replace('"', "&quot;", $note);
-							$overlibhtml .= $note;
-						}
-						$overlibhtml .= "',DELAY,250,${left}${above}CAPTION,'" . $caption
-						. "');\"  onmouseout=\"return nd();\"";
-						
-						foreach ($parts as $part)
-						{
-							$areaname = $type.":" . $myobj->name . ":" . $part;
-							//print "INFOURL for $areaname - ";
-						
-							$this->imap->setProp("extrahtml", $overlibhtml, $areaname);
-						}
-					}			
-				} // if change
+							# print "Added $n for $dir\n";
+							if(trim($myobj->notestext[$dir]) != '')
+							{
+								# put in a linebreak if there was an image AND notes
+								if($n>0) $overlibhtml .= '&lt;br /&gt;';
+								$note = $this->ProcessString($myobj->notestext[$dir],$myobj);
+								$note = htmlspecialchars($note, ENT_NOQUOTES);
+								$note=str_replace("'", "\\&apos;", $note);
+								$note=str_replace('"', "&quot;", $note);
+								$overlibhtml .= $note;
+							}
+							$overlibhtml .= "',DELAY,250,${left}${above}CAPTION,'" . $caption
+							. "');\"  onmouseout=\"return nd();\"";
+							
+							foreach ($parts as $part)
+							{
+								$areaname = $type.":" . $myobj->name . ":" . $part;
+								//print "INFOURL for $areaname - ";
+							
+								$this->imap->setProp("extrahtml", $overlibhtml, $areaname);
+							}
+						}			
+					} // if change
+				} // overlib?
 				
-				// now look at infourls
+				// now look at inforurls
 				foreach ($dirs as $dir=>$parts)
 				{
 					foreach ($parts as $part)
@@ -2808,9 +2687,10 @@ function PreloadMapHTML()
 						}
 					}
 				}
+			
 			}
 		}
-	} // overlib?
+	
 }
 
 function asJS()

@@ -45,16 +45,13 @@ foreach ($map->links as $link)
 
 }
 
+$mynode = $map->nodes['node80111'];
+$ddnode = $map->inherit_fieldlist;
+$dnode = $map->defaultnode;
 
-#$mynode = $map->nodes['node80111'];
-#$ddnode = $map->inherit_fieldlist;
-#$dnode = $map->defaultnode;
-
-#print $mynode->usescale."\n";
-#print $dnode->usescale."\n";
-#print $ddnode->usescale."\n";
-
-$map->LoopAllItems();
+print $mynode->usescale."\n";
+print $dnode->usescale."\n";
+print $ddnode->usescale."\n";
 
 $map->WriteConfig("output.conf");
 

@@ -1,5 +1,5 @@
 <?php
-// PHP Weathermap 0.95
+// PHP Weathermap 0.95b
 // Copyright Howard Jones, 2005-2008 howie@thingy.com
 // http://www.network-weathermap.com/
 // Released under the GNU Public License
@@ -52,11 +52,11 @@ class WeatherMapLink extends WeatherMapItem
 
 	function WeatherMapLink() { $this->inherit_fieldlist=array
 		(
-			// 'my_default' => NULL,
+			'my_default' => NULL,
 			'width' => 7,
 			'commentfont' => 1,
 			'bwfont' => 2,
-			'template' => 'DEFAULT',
+			'template' => ':: DEFAULT ::',
 			'splitpos'=>50,
 			'labeloffset_out' => 25,
 			'labeloffset_in' => 75,
@@ -91,7 +91,7 @@ class WeatherMapLink extends WeatherMapItem
 			'b_offset' => 'C',
 			#'incomment' => '',
 			#'outcomment' => '',
-			'zorder' => 30,
+			'zorder' => 5,
 			'overlibcaption' => array('',''),
 			'max_bandwidth_in' => 100000000,
 			'max_bandwidth_out' => 100000000,
@@ -106,31 +106,24 @@ class WeatherMapLink extends WeatherMapItem
 	function Reset(&$newowner)
 	{
 		$this->owner=$newowner;
-		$template = $this->template;
-		if($template == '') $template = "DEFAULT";
 
-		if($this->name== ':: DEFAULT ::')
-		{
-			foreach (array_keys($this->inherit_fieldlist)as
-				$fld) {  $this->$fld = $this->inherit_fieldlist[$fld]; }
+		if (isset($this->owner->defaultlink) && $this->name != 'DEFAULT') {
+			// use the defaults from DEFAULT
+			$this->CopyFrom($this->owner->defaultlink); 
+			$this->my_default = $this->owner->defaultlink;
 		}
 		else
 		{
-			// use the defaults from DEFAULT
-			$this->CopyFrom($this->owner->links[$template]); 
-			// $this->my_default = $this->owner->defaultlink;
+			foreach (array_keys($this->inherit_fieldlist)as
+				$fld) { $this->$fld=$this->inherit_fieldlist[$fld]; }
 		}
 	}
 
 	function my_type() {  return "LINK"; }
 
-	function CopyFrom(&$source)
+	function CopyFrom($source)
 	{
-		assert('is_object($source)');
-		foreach (array_keys($this->inherit_fieldlist)as $fld)
-		{
-			if($fld != 'template') $this->$fld = $source->$fld;
-		}
+		foreach (array_keys($this->inherit_fieldlist)as $fld) { $this->$fld = $source->$fld; }
 	}
 
 	// Set the bandwidth for this link. Convert from KMGT as necessary
@@ -247,7 +240,7 @@ class WeatherMapLink extends WeatherMapItem
 	{
 		// Get the positions of the end-points
 		$x1=$map->nodes[$this->a->name]->x;
-	        $y1=$map->nodes[$this->a->name]->y;
+	    $y1=$map->nodes[$this->a->name]->y;
 
 		$x2=$map->nodes[$this->b->name]->x;
 		$y2=$map->nodes[$this->b->name]->y;
@@ -272,11 +265,16 @@ class WeatherMapLink extends WeatherMapItem
 
 		if ($this->outlinecolour != array(-1,-1,-1))
 		{
+			debug("Outline colour is NOT none for ".$this->name." ".$this->outlinecolour."\n");
 				$outline_colour=myimagecolorallocate(
 					$im, $this->outlinecolour[0], $this->outlinecolour[1],
 					$this->outlinecolour[2]);
 		}
-
+		else
+		{
+			debug("Outline colour is none\n");
+		}
+		
 		if ($this->commentfontcolour != array(-1,-1,-1))
 		{
 				$comment_colour=myimagecolorallocate(
@@ -447,15 +445,13 @@ class WeatherMapLink extends WeatherMapItem
 	{
 		$output='';
 
-		if(substr($this->name,0,3) == ":: ") return '';
-
 		if($this->config_override != '')
 		{
 			$output  = $this->config_override."\n";
 		}
 		else
 		{
-			$defdef = $this->owner->links[$this->template];
+			$defdef = $this->owner->defaultlink;
 			$basic_params = array(
 					array('template','TEMPLATE',CONFIG_TYPE_LITERAL),
 					array('width','WIDTH',CONFIG_TYPE_LITERAL),
@@ -499,7 +495,8 @@ class WeatherMapLink extends WeatherMapItem
 						
 			foreach ($dirs as $dir=>$tdir)
 			{
-				$comparison=$defdef->infourl[$dir];
+				$comparison=($this->name == 'DEFAULT'
+				? $this->inherit_fieldlist['infourl'][$dir] : $defdef->infourl[$dir]);
 				if ($this->infourl[$dir] != $comparison) { $output.="\t".$tdir."INFOURL " . $this->infourl[$dir] . "\n"; }
 			}
 			
@@ -510,7 +507,8 @@ class WeatherMapLink extends WeatherMapItem
 						
 			foreach ($dirs as $dir=>$tdir)
 			{
-				$comparison=$defdef->overlibcaption[$dir];
+				$comparison=($this->name == 'DEFAULT'
+				? $this->inherit_fieldlist['overlibcaption'][$dir] : $defdef->overlibcaption[$dir]);
 				if ($this->overlibcaption[$dir] != $comparison) { $output.="\t".$tdir."OVERLIBCAPTION " . $this->overlibcaption[$dir] . "\n"; }
 			}
 	
@@ -522,7 +520,8 @@ class WeatherMapLink extends WeatherMapItem
 	
 			foreach ($dirs as $dir=>$tdir)
 			{
-				$comparison=$defdef->notestext[$dir];
+				$comparison=($this->name == 'DEFAULT'
+				? $this->inherit_fieldlist['notestext'][$dir] : $defdef->notestext[$dir]);
 				if ($this->notestext[$dir] != $comparison) { $output.="\t".$tdir."NOTES " . $this->notestext[$dir] . "\n"; }
 			}
 	
@@ -534,7 +533,8 @@ class WeatherMapLink extends WeatherMapItem
 			
 			foreach ($dirs as $dir=>$tdir)
 			{
-				$comparison=$defdef->overliburl[$dir];
+				$comparison=($this->name == 'DEFAULT'
+				? $this->inherit_fieldlist['overliburl'][$dir] : $defdef->overliburl[$dir]);
 				if ($this->overliburl[$dir] != $comparison) { $output.="\t".$tdir."OVERLIBGRAPH " . join(" ",$this->overliburl[$dir]) . "\n"; }
 			}	
 			
@@ -556,12 +556,15 @@ class WeatherMapLink extends WeatherMapItem
 
 			// if specific formats have been set, then the style will be '--'
 			// if it isn't then use the named style
-			$comparison=$defdef->labelstyle;
+			$comparison=($this->name == 'DEFAULT'
+			? ($this->inherit_fieldlist['labelstyle']) : ($defdef->labelstyle));
 			if ( ($this->labelstyle != $comparison) && ($this->labelstyle != '--') ) { $output.="\tBWLABEL " . $this->labelstyle . "\n"; }
 						
 			// if either IN or OUT field changes, then both must be written because a regular BWLABEL can't do it
-			$comparison = $defdef->bwlabelformats[IN];
-			$comparison2 = $defdef->bwlabelformats[OUT];
+			$comparison = ($this->name == 'DEFAULT'
+			? ($this->inherit_fieldlist['bwlabelformats'][IN]) : ($defdef->bwlabelformats[IN]));
+			$comparison2 = ($this->name == 'DEFAULT'
+			? ($this->inherit_fieldlist['bwlabelformats'][OUT]) : ($defdef->bwlabelformats[OUT]));
 						
 			if ( ( $this->labelstyle == '--') && ( ($this->bwlabelformats[IN] != $comparison) || ($this->bwlabelformats[OUT]!= '--')) )
 			{
@@ -570,8 +573,10 @@ class WeatherMapLink extends WeatherMapItem
 			}
 		
 	
-			$comparison = $defdef->labeloffset_in;
-			$comparison2 = $defdef->labeloffset_out;
+			$comparison = ($this->name == 'DEFAULT'
+			? $this->inherit_fieldlist['labeloffset_in'] : $defdef->labeloffset_in);
+			$comparison2 = ($this->name == 'DEFAULT'
+				? $this->inherit_fieldlist['labeloffset_out'] : $defdef->labeloffset_out);
 	
 			if ( ($this->labeloffset_in != $comparison) || ($this->labeloffset_out != $comparison2) )
 			{ $output.="\tBWLABELPOS " . $this->labeloffset_in . " " . $this->labeloffset_out . "\n"; }
@@ -582,7 +587,8 @@ class WeatherMapLink extends WeatherMapItem
 			if ($mine != $comparison) { $output.="\tCOMMENTPOS " . $this->commentoffset_in." ".$this->commentoffset_out. "\n"; }
 	
 	
-			$comparison=$defdef->targets;
+			$comparison=($this->name == 'DEFAULT'
+			? $this->inherit_fieldlist['targets'] : $defdef->targets);
 	
 			if ($this->targets != $comparison)
 			{
@@ -598,7 +604,8 @@ class WeatherMapLink extends WeatherMapItem
 				if($dir==IN) $tdir="IN";
 				if($dir==OUT) $tdir="OUT";
 				
-				$comparison=$defdef->comments[$dir];
+				$comparison=($this->name == 'DEFAULT'
+				? $this->inherit_fieldlist['comments'][$dir] : $defdef->comments[$dir]);
 				if ($this->comments[$dir] != $comparison) { $output.="\t".$tdir."COMMENT " . $this->comments[$dir] . "\n"; }
 			}
 				
@@ -634,8 +641,8 @@ class WeatherMapLink extends WeatherMapItem
 			}
 	
 			if (($this->max_bandwidth_in != $defdef->max_bandwidth_in)
-				|| ($this->max_bandwidth_out != $defdef->max_bandwidth_out))
-			//		|| ($this->name == 'DEFAULT'))
+				|| ($this->max_bandwidth_out != $defdef->max_bandwidth_out)
+					|| ($this->name == 'DEFAULT'))
 			{
 				if ($this->max_bandwidth_in == $this->max_bandwidth_out)
 				{ $output.="\tBANDWIDTH " . $this->max_bandwidth_in_cfg . "\n"; }

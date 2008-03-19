@@ -1,5 +1,5 @@
 <?php
-// PHP Weathermap 0.95
+// PHP Weathermap 0.95b
 // Copyright Howard Jones, 2005-2008 howie@thingy.com
 // http://www.network-weathermap.com/
 // Released under the GNU Public License
@@ -722,7 +722,9 @@ function draw_curve($image, &$curvepoints, $width, $outlinecolour, $comment_colo
 		debug ("Adding Poly imagemap for $areaname\n");
 
 		if (!is_null($outlinecolour))
+		{
 			imagepolygon($image, $there_points, count($there_points) / 2, $arrowsettings[$dir][5]);
+		}
 	}
 }
 

@@ -36,7 +36,8 @@ case 'viewimage':
 	{
 		$imageformat = strtolower(read_config_option("weathermap_output_format"));
 		
-		$map = db_fetch_assoc("select weathermap_maps.* from weathermap_auth,weathermap_maps where weathermap_maps.id=weathermap_auth.mapid and active='on' and (userid=".$_SESSION["sess_user_id"]." or userid=0) and weathermap_maps.id=".$id);
+		$userid = (isset($_SESSION["sess_user_id"]) ? intval($_SESSION["sess_user_id"]) : 1);
+		$map = db_fetch_assoc("select weathermap_maps.* from weathermap_auth,weathermap_maps where weathermap_maps.id=weathermap_auth.mapid and active='on' and (userid=".$userid." or userid=0) and weathermap_maps.id=".$id);
 		
 		if(sizeof($map))
 		{
@@ -76,7 +77,8 @@ case 'liveviewimage':
 	
 	if($id >=0)
 	{
-		$map = db_fetch_assoc("select weathermap_maps.* from weathermap_auth,weathermap_maps where weathermap_maps.id=weathermap_auth.mapid and active='on' and (userid=".$_SESSION["sess_user_id"]." or userid=0) and weathermap_maps.id=".$id);
+		$userid = (isset($_SESSION["sess_user_id"]) ? intval($_SESSION["sess_user_id"]) : 1);
+		$map = db_fetch_assoc("select weathermap_maps.* from weathermap_auth,weathermap_maps where weathermap_maps.id=weathermap_auth.mapid and active='on' and (userid=".$userid." or userid=0) and weathermap_maps.id=".$id);
 		
 		if(sizeof($map))
 		{
@@ -119,7 +121,8 @@ case 'liveview':
 	
 	if($id >=0)
 	{
-		$map = db_fetch_assoc("select weathermap_maps.* from weathermap_auth,weathermap_maps where weathermap_maps.id=weathermap_auth.mapid and active='on' and (userid=".$_SESSION["sess_user_id"]." or userid=0) and weathermap_maps.id=".$id);
+		$userid = (isset($_SESSION["sess_user_id"]) ? intval($_SESSION["sess_user_id"]) : 1);
+		$map = db_fetch_assoc("select weathermap_maps.* from weathermap_auth,weathermap_maps where weathermap_maps.id=weathermap_auth.mapid and active='on' and (userid=".$userid." or userid=0) and weathermap_maps.id=".$id);
 
 		if(sizeof($map))
 		{		
@@ -180,7 +183,8 @@ case 'mrss':
 	header('Content-type: application/rss+xml');
 	print '<?xml version="1.0" encoding="utf-8" standalone="yes"?>'."\n";
 	print '<rss xmlns:media="http://search.yahoo.com/mrss" version="2.0"><channel><title>My Network Weathermaps</title>';
-	$maplist = db_fetch_assoc( "select distinct weathermap_maps.* from weathermap_auth,weathermap_maps where weathermap_maps.id=weathermap_auth.mapid and active='on' and (userid=".$_SESSION["sess_user_id"]." or userid=0) order by sortorder, id");	
+	$userid = (isset($_SESSION["sess_user_id"]) ? intval($_SESSION["sess_user_id"]) : 1);
+	$maplist = db_fetch_assoc( "select distinct weathermap_maps.* from weathermap_auth,weathermap_maps where weathermap_maps.id=weathermap_auth.mapid and active='on' and (userid=".$userid." or userid=0) order by sortorder, id");	
 	foreach ($maplist as $map) {
 		$thumburl = "weathermap-cacti-plugin.php?action=viewthumb&id=".$map['filehash']."&time=".time();
 		$bigurl = "weathermap-cacti-plugin.php?action=viewimage&id=".$map['filehash']."&time=".time();
@@ -269,7 +273,8 @@ function weathermap_singleview($mapid)
 	$outdir = dirname(__FILE__).'/output/';
 	$confdir = dirname(__FILE__).'/configs/';
 
-	$map = db_fetch_assoc("select weathermap_maps.* from weathermap_auth,weathermap_maps where weathermap_maps.id=weathermap_auth.mapid and active='on' and (userid=".$_SESSION["sess_user_id"]." or userid=0) and weathermap_maps.id=".$mapid);
+	$userid = (isset($_SESSION["sess_user_id"]) ? intval($_SESSION["sess_user_id"]) : 1);
+	$map = db_fetch_assoc("select weathermap_maps.* from weathermap_auth,weathermap_maps where weathermap_maps.id=weathermap_auth.mapid and active='on' and (userid=".$userid." or userid=0) and weathermap_maps.id=".$mapid);
 
 	if(sizeof($map))
 	{
@@ -300,9 +305,10 @@ function weathermap_singleview($mapid)
 			if (isset($user_auth_realm_filenames[basename('weathermap-cacti-plugin.php')])) {
 				$realm_id2 = $user_auth_realm_filenames[basename('weathermap-cacti-plugin.php')];
 			}
-
+			
+			$userid = (isset($_SESSION["sess_user_id"]) ? intval($_SESSION["sess_user_id"]) : 1);
 			if ((db_fetch_assoc("select user_auth_realm.realm_id from user_auth_realm where user_auth_realm.us
-				er_id='" . $_SESSION["sess_user_id"] . "' and user_auth_realm.realm_id='$realm_id2'")) || (empty($realm_id2))) {
+				er_id='" . $userid . "' and user_auth_realm.realm_id='$realm_id2'")) || (empty($realm_id2))) {
 
 					print " (If this message stays here for more than one poller cycle, then check your cacti.log file for errors!)";
 
@@ -323,7 +329,8 @@ function weathermap_show_manage_tab()
 	if (isset($user_auth_realm_filenames['weathermap-cacti-plugin-mgmt.php'])) {
 		$realm_id2 = $user_auth_realm_filenames['weathermap-cacti-plugin-mgmt.php'];
 	}
-	if ((db_fetch_assoc("select user_auth_realm.realm_id from user_auth_realm where user_auth_realm.user_id='" . $_SESSION["sess_user_id"] . "' and user_auth_realm.realm_id='$realm_id2'")) || (empty($realm_id2))) {
+	$userid = (isset($_SESSION["sess_user_id"]) ? intval($_SESSION["sess_user_id"]) : 1);
+	if ((db_fetch_assoc("select user_auth_realm.realm_id from user_auth_realm where user_auth_realm.user_id='" . $userid . "' and user_auth_realm.realm_id='$realm_id2'")) || (empty($realm_id2))) {
 
 		print '<a href="' . $config['url_path'] . 'plugins/weathermap/weathermap-cacti-plugin-mgmt.php">Manage Maps</a>';
 	}
@@ -333,7 +340,8 @@ function weathermap_thumbview()
 {
 	global $colors;
 
-	$maplist = db_fetch_assoc( "select distinct weathermap_maps.* from weathermap_auth,weathermap_maps where weathermap_maps.id=weathermap_auth.mapid and active='on' and (userid=".$_SESSION["sess_user_id"]." or userid=0) order by sortorder, id");
+	$userid = (isset($_SESSION["sess_user_id"]) ? intval($_SESSION["sess_user_id"]) : 1);
+	$maplist = db_fetch_assoc( "select distinct weathermap_maps.* from weathermap_auth,weathermap_maps where weathermap_maps.id=weathermap_auth.mapid and active='on' and (userid=".$userid." or userid=0) order by sortorder, id");
 
 
 	if(sizeof($maplist) == 1)
@@ -417,7 +425,8 @@ function weathermap_fullview($cycle=FALSE, $firstonly=FALSE)
 
 	$_SESSION['custom']=false;
 
-	$query = "select distinct weathermap_maps.* from weathermap_auth,weathermap_maps where weathermap_maps.id=weathermap_auth.mapid and active='on' and (userid=".$_SESSION["sess_user_id"]." or userid=0) order by sortorder, id";
+	$userid = (isset($_SESSION["sess_user_id"]) ? intval($_SESSION["sess_user_id"]) : 1);
+	$query = "select distinct weathermap_maps.* from weathermap_auth,weathermap_maps where weathermap_maps.id=weathermap_auth.mapid and active='on' and (userid=".$userid." or userid=0) order by sortorder, id";
 
 	if($firstonly) { $query .= " LIMIT 1"; }
 

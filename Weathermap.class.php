@@ -1,5 +1,5 @@
 <?php
-// PHP Weathermap 0.95
+// PHP Weathermap 0.95b
 // Copyright Howard Jones, 2005-2008 howie@thingy.com
 // http://www.network-weathermap.com/
 // Released under the GNU Public License
@@ -10,7 +10,7 @@ require_once "WeatherMap.functions.php";
 require_once "WeatherMapNode.class.php";
 require_once "WeatherMapLink.class.php";
 
-$WEATHERMAP_VERSION="0.95";
+$WEATHERMAP_VERSION="0.95b";
 $weathermap_debugging=FALSE;
 $weathermap_map="";
 $weathermap_debug_suppress = array("processstring","mysprintf");
@@ -1488,10 +1488,10 @@ function ReadConfig($input)
 						array('NODE','/^\s*ICON\s+(\S+)\s*$/i',array('iconfile'=>1)),
 						array('NODE','/^\s*ICON\s+(\d+)\s+(\d+)\s+(\S+)\s*$/i',array('iconfile'=>3, 'iconscalew'=>1, 'iconscaleh'=>2)),
 						
-						array('NODE','/^\s*NOTES\s+(.*)\s*$/i',array('notes[IN]'=>1,'notes[OUT]'=>1)),
-						array('LINK','/^\s*NOTES\s+(.*)\s*$/i',array('notes[IN]'=>1,'notes[OUT]'=>1)),
-						array('LINK','/^\s*INNOTES\s+(.*)\s*$/i',array('notes[IN]'=>1)),
-						array('LINK','/^\s*OUTNOTES\s+(.*)\s*$/i',array('notes[OUT]'=>1)),
+						array('NODE','/^\s*NOTES\s+(.*)\s*$/i',array('notestext[IN]'=>1,'notestext[OUT]'=>1)),
+						array('LINK','/^\s*NOTES\s+(.*)\s*$/i',array('notestext[IN]'=>1,'notestext[OUT]'=>1)),
+						array('LINK','/^\s*INNOTES\s+(.*)\s*$/i',array('notestext[IN]'=>1)),
+						array('LINK','/^\s*OUTNOTES\s+(.*)\s*$/i',array('notestext[OUT]'=>1)),
 						
 						array('NODE','/^\s*INFOURL\s+(.*)\s*$/i',array('infourl[IN]'=>1,'infourl[OUT]'=>1)),
 						array('LINK','/^\s*INFOURL\s+(.*)\s*$/i',array('infourl[IN]'=>1,'infourl[OUT]'=>1)),
@@ -1922,6 +1922,7 @@ function ReadConfig($input)
 				{
 					$key=$matches[1];
 					$field=strtolower($matches[1]) . 'colour';
+					$val = strtolower($matches[2]);
 
 					if(isset($matches[3]))	// this is a regular colour setting thing
 					{
@@ -1929,13 +1930,13 @@ function ReadConfig($input)
 						$linematched++;
 					}
 
-					if($matches[2] == 'none' && ($matches[1]=='LABELFONTSHADOW' || $matches[1]=='LABELBG' || $matches[1]=='LABELOUTLINE'))
+					if($val == 'none' && ($matches[1]=='LABELFONTSHADOW' || $matches[1]=='LABELBG' || $matches[1]=='LABELOUTLINE'))
 					{
 						$curnode->$field=array(-1,-1,-1);
 						$linematched++;
 					}
-
-					if($matches[2] == 'contrast' && $matches[1]=='LABELFONT')
+					
+					if($val == 'contrast' && $matches[1]=='LABELFONT')
 					{
 						$curnode->$field=array(-3,-3,-3);
 						$linematched++;
@@ -1955,15 +1956,17 @@ function ReadConfig($input)
 				{
 					$key=$matches[1];
 					$field=strtolower($matches[1]) . 'colour';
+					$val = strtolower($matches[2]);
 
 					if(isset($matches[3]))	// this is a regular colour setting thing
 					{
 						$curlink->$field=array(	$matches[3],$matches[4],$matches[5]);
 						$linematched++;
 					}
-					if($matches[2] == 'none' && ($matches[1]=='BWBOX' || $matches[1]=='BWOUTLINE' || $matches[1]=='OUTLINE'))
+					if($val == 'none' && ($key=='BWBOX' || $key=='BWOUTLINE' || $key=='OUTLINE'))
 					{
-						$curnode->$field=array(-1,-1,-1);
+						// print "***********************************\n";
+						$curlink->$field=array(-1,-1,-1);
 						$linematched++;
 					}
 				}
@@ -2546,8 +2549,7 @@ function CleanUp()
 
 function PreloadMapHTML()
 {
-	if ($this->htmlstyle == "overlib")
-	{
+	
 		//   onmouseover="return overlib('<img src=graph.png>',DELAY,250,CAPTION,'$caption');"  onmouseout="return nd();"
 
 		// find the middle of the map
@@ -2585,83 +2587,87 @@ function PreloadMapHTML()
 					$change .= join('',$myobj->overliburl[$d]);
 					$change .= $myobj->notestext[$d];
 				}
-				//print "CHANGE: $change\n";
-				if($change != '')
-				{
-					//print "Something to be done.\n";
-					if($type=='NODE')
-					{
-						$mid_x = $myobj->x;
-						$mid_y = $myobj->y;
-					}
-					if($type=='LINK')
-					{
-						$a_x=$this->nodes[$myobj->a->name]->x;
-						$a_y=$this->nodes[$myobj->a->name]->y;
-
-						$b_x=$this->nodes[$myobj->b->name]->x;
-						$b_y=$this->nodes[$myobj->b->name]->y;
-
-						$mid_x=($a_x + $b_x) / 2;
-						$mid_y=($a_y + $b_y) / 2;
-					}
-					$left=""; $above="";
 				
-					if ($myobj->overlibwidth != 0)
+				if ($this->htmlstyle == "overlib")
+				{
+					//print "CHANGE: $change\n";
+					if($change != '')
 					{
-						$left="WIDTH," . $myobj->overlibwidth . ",";
-
-						if ($mid_x > $center_x) $left.="LEFT,";
-					}
-					
-					if ($myobj->overlibheight != 0)
-					{
-						$above="HEIGHT," . $myobj->overlibheight . ",";
-
-						if ($mid_y > $center_y) $above.="ABOVE,";
-					}
-					
-					foreach ($dirs as $dir=>$parts)
-					{
-						$caption = ($myobj->overlibcaption[$dir] != '' ? $myobj->overlibcaption[$dir] : $myobj->name);
-						$caption = $this->ProcessString($caption,$myobj);
-
-						$overlibhtml = "onmouseover=\"return overlib('";
-
-						$n = 0;
-						if(sizeof($myobj->overliburl[$dir]) > 0)
+						//print "Something to be done.\n";
+						if($type=='NODE')
 						{
-							// print "ARRAY:".is_array($link->overliburl[$dir])."\n";
-							foreach ($myobj->overliburl[$dir] as $url)
+							$mid_x = $myobj->x;
+							$mid_y = $myobj->y;
+						}
+						if($type=='LINK')
+						{
+							$a_x=$this->nodes[$myobj->a->name]->x;
+							$a_y=$this->nodes[$myobj->a->name]->y;
+
+							$b_x=$this->nodes[$myobj->b->name]->x;
+							$b_y=$this->nodes[$myobj->b->name]->y;
+
+							$mid_x=($a_x + $b_x) / 2;
+							$mid_y=($a_y + $b_y) / 2;
+						}
+						$left=""; $above="";
+					
+						if ($myobj->overlibwidth != 0)
+						{
+							$left="WIDTH," . $myobj->overlibwidth . ",";
+
+							if ($mid_x > $center_x) $left.="LEFT,";
+						}
+						
+						if ($myobj->overlibheight != 0)
+						{
+							$above="HEIGHT," . $myobj->overlibheight . ",";
+
+							if ($mid_y > $center_y) $above.="ABOVE,";
+						}
+						
+						foreach ($dirs as $dir=>$parts)
+						{
+							$caption = ($myobj->overlibcaption[$dir] != '' ? $myobj->overlibcaption[$dir] : $myobj->name);
+							$caption = $this->ProcessString($caption,$myobj);
+
+							$overlibhtml = "onmouseover=\"return overlib('";
+
+							$n = 0;
+							if(sizeof($myobj->overliburl[$dir]) > 0)
 							{
-								if($n>0) { $overlibhtml .= '&lt;br /&gt;'; }
-								$overlibhtml .= "&lt;img src=" . $this->ProcessString($url,$myobj) . "&gt;";
-								$n++;
+								// print "ARRAY:".is_array($link->overliburl[$dir])."\n";
+								foreach ($myobj->overliburl[$dir] as $url)
+								{
+									if($n>0) { $overlibhtml .= '&lt;br /&gt;'; }
+									$overlibhtml .= "&lt;img src=" . $this->ProcessString($url,$myobj) . "&gt;";
+									$n++;
+								}
 							}
-						}
-						# print "Added $n for $dir\n";
-						if($myobj->notestext[$dir] != '')
-						{
-							# put in a linebreak if there was an image AND notes
-							if($n>0) $overlibhtml .= '&lt;br /&gt;';
-							$note = $this->ProcessString($myobj->notestext[$dir],$myobj);
-							$note = htmlspecialchars($note, ENT_NOQUOTES);
-							$note=str_replace("'", "\\&apos;", $note);
-							$note=str_replace('"', "&quot;", $note);
-							$overlibhtml .= $note;
-						}
-						$overlibhtml .= "',DELAY,250,${left}${above}CAPTION,'" . $caption
-						. "');\"  onmouseout=\"return nd();\"";
-						
-						foreach ($parts as $part)
-						{
-							$areaname = $type.":" . $myobj->name . ":" . $part;
-							//print "INFOURL for $areaname - ";
-						
-							$this->imap->setProp("extrahtml", $overlibhtml, $areaname);
-						}
-					}			
-				} // if change
+							# print "Added $n for $dir\n";
+							if(trim($myobj->notestext[$dir]) != '')
+							{
+								# put in a linebreak if there was an image AND notes
+								if($n>0) $overlibhtml .= '&lt;br /&gt;';
+								$note = $this->ProcessString($myobj->notestext[$dir],$myobj);
+								$note = htmlspecialchars($note, ENT_NOQUOTES);
+								$note=str_replace("'", "\\&apos;", $note);
+								$note=str_replace('"', "&quot;", $note);
+								$overlibhtml .= $note;
+							}
+							$overlibhtml .= "',DELAY,250,${left}${above}CAPTION,'" . $caption
+							. "');\"  onmouseout=\"return nd();\"";
+							
+							foreach ($parts as $part)
+							{
+								$areaname = $type.":" . $myobj->name . ":" . $part;
+								//print "INFOURL for $areaname - ";
+							
+								$this->imap->setProp("extrahtml", $overlibhtml, $areaname);
+							}
+						}			
+					} // if change
+				} // overlib?
 				
 				// now look at inforurls
 				foreach ($dirs as $dir=>$parts)
@@ -2681,9 +2687,10 @@ function PreloadMapHTML()
 						}
 					}
 				}
+			
 			}
 		}
-	} // overlib?
+	
 }
 
 function asJS()

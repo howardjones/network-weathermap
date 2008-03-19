@@ -1,5 +1,5 @@
 <?php
-// PHP Weathermap 0.95
+// PHP Weathermap 0.95b
 // Copyright Howard Jones, 2005-2008 howie@thingy.com
 // http://www.network-weathermap.com/
 // Released under the GNU Public License
@@ -240,7 +240,7 @@ class WeatherMapLink extends WeatherMapItem
 	{
 		// Get the positions of the end-points
 		$x1=$map->nodes[$this->a->name]->x;
-	        $y1=$map->nodes[$this->a->name]->y;
+	    $y1=$map->nodes[$this->a->name]->y;
 
 		$x2=$map->nodes[$this->b->name]->x;
 		$y2=$map->nodes[$this->b->name]->y;
@@ -265,11 +265,16 @@ class WeatherMapLink extends WeatherMapItem
 
 		if ($this->outlinecolour != array(-1,-1,-1))
 		{
+			debug("Outline colour is NOT none for ".$this->name." ".$this->outlinecolour."\n");
 				$outline_colour=myimagecolorallocate(
 					$im, $this->outlinecolour[0], $this->outlinecolour[1],
 					$this->outlinecolour[2]);
 		}
-
+		else
+		{
+			debug("Outline colour is none\n");
+		}
+		
 		if ($this->commentfontcolour != array(-1,-1,-1))
 		{
 				$comment_colour=myimagecolorallocate(

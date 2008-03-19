@@ -454,7 +454,8 @@ function add_config($file)
 
 		// add auth for 'admin'
 		$last_id = mysql_insert_id();
-		$myuid = (int)$_SESSION["sess_user_id"];
+		// $myuid = (int)$_SESSION["sess_user_id"];
+		$myuid = (isset($_SESSION["sess_user_id"]) ? intval($_SESSION["sess_user_id"]) : 1);
 		$SQL = "insert into weathermap_auth (mapid,userid) VALUES ($last_id,$myuid)";
 		db_execute($SQL);
 

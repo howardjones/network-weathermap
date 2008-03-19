@@ -102,7 +102,7 @@ if(isset($_REQUEST['command']) && $_REQUEST["command"]=='link_step1')
 ?>
 <html>
 <head>
-	<script type="text/javascript" src="lib/javascript/jquery-latest.pack.js"></script>
+	<script type="text/javascript" src="editor-resources/jquery-latest.pack.js"></script>
 	<script type="text/javascript">
 
 	function filterlist(previous)
@@ -302,7 +302,7 @@ if(isset($_REQUEST['command']) && $_REQUEST["command"]=='node_step1')
 ?>
 <html>
 <head>
-<script type="text/javascript" src="lib/javascript/jquery-latest.pack.js"></script>
+<script type="text/javascript" src="editor-resources/jquery-latest.pack.js"></script>
 <script type="text/javascript">
 
 	function filterlist(previous)

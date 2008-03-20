@@ -1,11 +1,14 @@
+0.96	ADDED - RRD datasource can take SET rrd_default_path to make configs a little easier to read.
+	
+
 0.95b	FIXED - SQL schema issue that upset some mysql versions
-		FIXED - Removed sometime-problem debugging code in editor
+	FIXED - Removed sometime-problem debugging code in editor
         FIXED - incorrect jquery path in cacti-picker
         FIXED - INFOURL not used without overlib
-		FIXED - 'none' colours on LINKs were broken by typo.
-		FIXED - NOTES, INNOTES, OUTNOTES all just flat-out borken in 0.95 and 0.95a
-		FIXED - Page title can be incorrect if filehash starts with a digit.
-		FIXED - Cacti plugin behaves a little better with auth disabled.
+	FIXED - 'none' colours on LINKs were broken by typo.
+	FIXED - NOTES, INNOTES, OUTNOTES all just flat-out borken in 0.95 and 0.95a
+	FIXED - Page title can be incorrect if filehash starts with a digit.
+	FIXED - Cacti plugin behaves a little better with auth disabled.
 
 0.95a	FIXED - problem with global map variables. Oops.
 	FIXED - few deprecated function references.

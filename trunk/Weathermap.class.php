@@ -1315,719 +1315,732 @@ function ReadConfig($input)
 	$last_seen="GLOBAL";
 	$filename = "";
 
-	// XXX - more to come, here.
-	$filename = $input;
-		
-	$fd=fopen($filename, "r");
+	 // check if $input is more than one line. if it is, it's a text of a config file
+	// if it isn't, it's the filename
 
-	if ($fd)
+	$lines = array();
+
+	if( (strchr($input,"\n")!=FALSE) || (strchr($input,"\r")!=FALSE ) )
 	{
-		$linecount = 0;
-
-		while (!feof($fd))
-		{
-			$buffer=fgets($fd, 4096);
-			// strip out any Windows line-endings that have gotten in here
-			$buffer=str_replace("\r", "", $buffer);
-			
-			$linematched=0;
-			$linecount++;
-
-			if (preg_match("/^\s*#/", $buffer)) {
-				// this is a comment line
-			}
-			else
-			{
-				// for any other config elements that are shared between nodes and links, they can use this
-				unset($curobj);
-				$curobj = NULL;
-				if($last_seen == "LINK") $curobj = &$curlink;
-				if($last_seen == "NODE") $curobj = &$curnode;
-				if($last_seen == "GLOBAL") $curobj = &$this;
-
-				if (preg_match("/^\s*(LINK|NODE)\s+(\S+)\s*$/i", $buffer, $matches))
-				{
-					// first, save the previous item, before starting work on the new one
-					if ($last_seen == "NODE")
-					{
-						if ($curnode->name == 'DEFAULT')
-						{
-							$this->defaultnode = $curnode;
-							debug ("Saving Default Node: " . $curnode->name . "\n");
-						}
-						else
-						{
-							$this->nodes[$curnode->name]=$curnode;
-							debug ("Saving Node: " . $curnode->name . "\n");
-						}
-					}
-
-					if ($last_seen == "LINK")
-					{
-						if ($curlink->name == 'DEFAULT')
-						{
-							$this->defaultlink=$curlink;
-							debug ("Saving Default Link: " . $curlink->name . "\n");
-						}
-						else
-						{
-							if (isset($curlink->a) && isset($curlink->b))
-							{
-								$this->links[$curlink->name]=$curlink;
-								debug ("Saving Link: " . $curlink->name . "\n");
-							}
-							else { warn
-								("Dropping LINK " . $curlink->name . " - it hasn't got 2 NODES! [WMWARN28]\n"); }
-						}
-					}
-
-					if ($matches[1] == 'LINK')
-					{
-						if ($matches[2] == 'DEFAULT')
-						{
-							if ($linksseen > 0) { warn
-								("LINK DEFAULT is not the first LINK. Defaults will not apply to earlier LINKs. [WMWARN26]\n");
-							}
-							unset($curlink);
-							$curlink = $this->defaultlink;
-						}
-						else
-						{
-							unset($curlink);
-
-							if(isset($this->links[$matches[2]]))
-							{
-								warn("Duplicate link name ".$matches[2]." at line $linecount - only the last one defined is used. [WMWARN25]\n");
-							}
-
-							$curlink=new WeatherMapLink;
-							$curlink->name=$matches[2];
-							$curlink->Reset($this);
-							$linksseen++;
-						}
-
-						$last_seen="LINK";
-						$curlink->configline = $linecount;
-						$linematched++;
-					}
-
-					if ($matches[1] == 'NODE')
-					{
-						if ($matches[2] == 'DEFAULT')
-						{
-							if ($nodesseen > 0) { warn
-								("NODE DEFAULT is not the first NODE. Defaults will not apply to earlier NODEs. [WMWARN27]\n");
-							}
-
-							unset($curnode);
-							$curnode = $this->defaultnode;
-						}
-						else
-						{
-							unset($curnode);
-
-							if(isset($this->nodes[$matches[2]]))
-							{
-								warn("Duplicate node name ".$matches[2]." at line $linecount - only the last one defined is used. [WMWARN24]\n");
-							}
-
-							$curnode=new WeatherMapNode;
-							$curnode->name=$matches[2];
-							$curnode->Reset($this);
-							$nodesseen++;
-						}
-
-						$curnode->configline = $linecount;
-						$last_seen="NODE";
-						$linematched++;
-					}
-				}
-
-				// most of the config keywords just copy stuff into object properties.
-				// these are all dealt with from this one array. The special-cases
-				// follow on from that
-				$config_keywords = array(
-						array('GLOBAL','/^\s*BACKGROUND\s+(.*)\s*$/i',array('background'=>1)),
-						array('GLOBAL','/^\s*HTMLOUTPUTFILE\s+(.*)\s*$/i',array('htmloutputfile'=>1)),
-						array('GLOBAL','/^\s*IMAGEOUTPUTFILE\s+(.*)\s*$/i',array('imageoutputfile'=>1)),
-						array('GLOBAL','/^\s*TITLE\s+(.*)\s*$/i',array('title'=>1)),
-						array('GLOBAL','/^\s*HTMLSTYLE\s+(static|overlib)\s*$/i',array('htmlstyle'=>1)),
-						array('GLOBAL','/^\s*KEYFONT\s+(\d+)\s*$/i',array('keyfont'=>1)),
-						array('GLOBAL','/^\s*TITLEFONT\s+(\d+)\s*$/i',array('titlefont'=>1)),
-						array('GLOBAL','/^\s*TIMEFONT\s+(\d+)\s*$/i',array('timefont'=>1)),
-						array('GLOBAL','/^\s*TITLEPOS\s+(-?\d+)\s+(-?\d+)\s*$/i',array('titlex'=>1, 'titley'=>2)),
-						array('GLOBAL','/^\s*TITLEPOS\s+(-?\d+)\s+(-?\d+)\s+(.*)\s*$/i',array('titlex'=>1, 'titley'=>2, 'title'=>3)),
-						array('GLOBAL','/^\s*TIMEPOS\s+(-?\d+)\s+(-?\d+)\s*$/i',array('timex'=>1, 'timey'=>2)),
-						array('GLOBAL','/^\s*TIMEPOS\s+(-?\d+)\s+(-?\d+)\s+(.*)\s*$/i',array('timex'=>1, 'timey'=>2, 'stamptext'=>3)),
-						array('NODE', "/^\s*LABEL\s+(.*)\s*$/i", array('label'=>1)),
-						array('(LINK|GLOBAL)', "/^\s*WIDTH\s+(\d+)\s*$/i", array('width'=>1)),
-						array('(LINK|GLOBAL)', "/^\s*HEIGHT\s+(\d+)\s*$/i", array('height'=>1)),
-						array('LINK', '/^\s*ARROWSTYLE\s+(classic|compact)\s*$/i', array('arrowstyle'=>1)),
-						array('LINK', '/^\s*VIASTYLE\s+(curved)\s*$/i', array('viastyle'=>1)),
-						array('LINK', '/^\s*INCOMMENT\s+(.*)\s*$/i', array('comments[IN]'=>1)),
-						array('LINK', '/^\s*OUTCOMMENT\s+(.*)\s*$/i', array('comments[OUT]'=>1)),
-						array('LINK', '/^\s*BWFONT\s+(\d+)\s*$/i', array('bwfont'=>1)),
-						array('LINK', '/^\s*COMMENTFONT\s+(\d+)\s*$/i', array('commentfont'=>1)),
-						array('LINK', '/^\s*DUPLEX\s+(full|half)\s*$/i', array('duplex'=>1)),
-						array('LINK', '/^\s*BWSTYLE\s+(classic|angled)\s*$/i', array('labelboxstyle'=>1)),
-						array('LINK', '/^\s*LINKSTYLE\s+(twoway|oneway)\s*$/i', array('linkstyle'=>1)),
-						array('LINK', '/^\s*BWLABELPOS\s+(\d+)\s(\d+)\s*$/i', array('labeloffset_in'=>1,'labeloffset_out'=>2)),
-						array('LINK', '/^\s*COMMENTPOS\s+(\d+)\s(\d+)\s*$/i', array('commentoffset_in'=>1, 'commentoffset_out'=>2)),
-						array('LINK', '/^\s*USESCALE\s+([A-Za-z][A-Za-z0-9_]*)\s*$/i', array('usescale'=>1)),
-						array('LINK', '/^\s*SPLITPOS\s+(\d+)\s*$/i', array('splitpos'=>1)),
-						
-						array('NODE', '/^\s*LABELOFFSET\s+([-+]?\d+)\s+([-+]?\d+)\s*$/i', array('labeloffsetx'=>1,'labeloffsety'=>2)),
-						array('NODE', '/^\s*LABELOFFSET\s+(C|NE|SE|NW|SW|N|S|E|W)\s*$/i', array('labeloffset'=>1)),
-						array('NODE', '/^\s*LABELFONT\s+(\d+)\s*$/i', array('labelfont'=>1)),
-						array('NODE', '/^\s*LABELANGLE\s+(0|90|180|270)\s*$/i', array('labelangle'=>1)),
-						array('(NODE|LINK)', '/^\s*TEMPLATE\s+(\S+)\s*$/i', array('template'=>1)),						
-						
-						array('LINK', '/^\s*OUTBWFORMAT\s+(.*)\s*$/i', array('bwlabelformats[OUT]'=>1,'labelstyle'=>'--')),
-						array('LINK', '/^\s*INBWFORMAT\s+(.*)\s*$/i', array('bwlabelformats[IN]'=>1,'labelstyle'=>'--')),
-						array('NODE','/^\s*ICON\s+none\s*$/i',array('iconfile'=>'')),
-						array('NODE','/^\s*ICON\s+(\S+)\s*$/i',array('iconfile'=>1)),
-						array('NODE','/^\s*ICON\s+(\d+)\s+(\d+)\s+(\S+)\s*$/i',array('iconfile'=>3, 'iconscalew'=>1, 'iconscaleh'=>2)),
-						
-						array('NODE','/^\s*NOTES\s+(.*)\s*$/i',array('notestext[IN]'=>1,'notestext[OUT]'=>1)),
-						array('LINK','/^\s*NOTES\s+(.*)\s*$/i',array('notestext[IN]'=>1,'notestext[OUT]'=>1)),
-						array('LINK','/^\s*INNOTES\s+(.*)\s*$/i',array('notestext[IN]'=>1)),
-						array('LINK','/^\s*OUTNOTES\s+(.*)\s*$/i',array('notestext[OUT]'=>1)),
-						
-						array('NODE','/^\s*INFOURL\s+(.*)\s*$/i',array('infourl[IN]'=>1,'infourl[OUT]'=>1)),
-						array('LINK','/^\s*INFOURL\s+(.*)\s*$/i',array('infourl[IN]'=>1,'infourl[OUT]'=>1)),
-						array('LINK','/^\s*ININFOURL\s+(.*)\s*$/i',array('infourl[IN]'=>1)),
-						array('LINK','/^\s*OUTINFOURL\s+(.*)\s*$/i',array('infourl[OUT]'=>1)),
-						
-						array('NODE','/^\s*OVERLIBCAPTION\s+(.*)\s*$/i',array('overlibcaption[IN]'=>1,'overlibcaption[OUT]'=>1)),
-						array('LINK','/^\s*OVERLIBCAPTION\s+(.*)\s*$/i',array('overlibcaption[IN]'=>1,'overlibcaption[OUT]'=>1)),
-						array('LINK','/^\s*INOVERLIBCAPTION\s+(.*)\s*$/i',array('overlibcaption[IN]'=>1)),
-						array('LINK','/^\s*OUTOVERLIBCAPTION\s+(.*)\s*$/i',array('overlibcaption[OUT]'=>1)),
-												
-						array('(NODE|LINK)', "/^\s*ZORDER\s+([-+]?\d+)$/i", array('zorder'=>1)),
-						array('(NODE|LINK)', "/^\s*OVERLIBWIDTH\s+(\d+)\s*$/i", array('overlibwidth'=>1)),
-						array('(NODE|LINK)', "/^\s*OVERLIBHEIGHT\s+(\d+)\s*$/i", array('overlibheight'=>1)),
-						array('NODE', "/^\s*POSITION\s+([-+]?\d+)\s+([-+]?\d+)\s*$/i", array('x'=>1,'y'=>2)),
-						array('NODE', "/^\s*POSITION\s+(\S+)\s+([-+]?\d+)\s+([-+]?\d+)\s*$/i", array('x'=>2,'y'=>3,'original_x'=>2,'original_y'=>3,'relative_to'=>1,'relative_resolved'=>FALSE))
-						);
-
-				// this loop replaces a whole pile of duplicated ifs with something with consistent handling 
-				foreach ($config_keywords as $keyword)
-				{
-					if(preg_match("/".$keyword[0]."/",$last_seen))
-					{
-						if(preg_match($keyword[1],$buffer,$matches))
-						{
-							// print "MATCHED: ".$keyword[1]."\n";
-							foreach ($keyword[2] as $key=>$val)
-							{
-								// if it's a number, then it;s a match number,
-								// otherwise it's a literal to be put into a variable
-								if(is_numeric($val)) $val = $matches[$val];
-								
-								assert('is_object($curobj)');
-								
-								if(preg_match('/^(.*)\[([^\]]+)\]$/',$key,$m))
-								{
-									$index = constant($m[2]);
-									$key = $m[1];
-									$curobj->{$key}[$index] = $val;
-								}
-								else
-								{
-									$curobj->$key = $val;
-								}
-							}
-							$linematched++;
-							# print "\n\n";
-							break;
-						}
-					}
-				}
-
-				if (preg_match("/^\s*NODES\s+(\S+)\s+(\S+)\s*$/i", $buffer, $matches))
-				{
-					if ($last_seen == 'LINK')
-					{
-						$valid_nodes=2;
-
-						foreach (array(1, 2)as $i)
-						{
-							$endoffset[$i]='C';
-							$nodenames[$i]=$matches[$i];
-
-							if (preg_match("/:(NE|SE|NW|SW|N|S|E|W)$/i", $matches[$i], $submatches))
-							{
-								$endoffset[$i]=$submatches[1];
-								$nodenames[$i]=preg_replace("/:(NE|SE|NW|SW|N|S|E|W)$/i", '', $matches[$i]);
-								$this->need_size_precalc=TRUE;
-							}
-
-							if (preg_match("/:([-+]?\d+):([-+]?\d+)$/i", $matches[$i], $submatches))
-							{
-								$xoff = $submatches[1];
-								$yoff = $submatches[2];
-								$endoffset[$i]=$xoff.":".$yoff;
-								$nodenames[$i]=preg_replace("/:$xoff:$yoff$/i", '', $matches[$i]);
-								$this->need_size_precalc=TRUE;
-							}
-
-							if (!array_key_exists($nodenames[$i], $this->nodes))
-							{
-								warn ("Unknown node '" . $nodenames[$i] . "' on line $linecount of config\n");
-								$valid_nodes--;
-							}
-						}
-
-						// TODO - really, this should kill the whole link, and reset for the next one
-						if ($valid_nodes == 2)
-						{
-							$curlink->a=$this->nodes[$nodenames[1]];
-							$curlink->b=$this->nodes[$nodenames[2]];
-							$curlink->a_offset=$endoffset[1];
-							$curlink->b_offset=$endoffset[2];
-						}
-						else {
-							// this'll stop the current link being added
-							$last_seen="broken"; }
-
-							$linematched++;
-					}
-				}
-
-				if ( ( $last_seen=='NODE' || $last_seen=='LINK' ) && preg_match("/^\s*TARGET\s+(.*)\s*$/i", $buffer, $matches))
-				{
-					$linematched++;
-
-					$targets=preg_split('/\s+/', $matches[1], -1, PREG_SPLIT_NO_EMPTY);
-					// wipe any existing targets, otherwise things in the DEFAULT accumulate with the new ones
-					$curobj->targets = array();
-					foreach ($targets as $target)
-					{
-						// we store the original TARGET string, and line number, along with the breakdown, to make nicer error messages later
-						$newtarget=array($target,'','',$linecount,$target);
-						if ($curobj)
-						{
-							$curobj->targets[]=$newtarget;
-						}
-					}
-				}
-				
-				if ($last_seen == 'LINK' && preg_match(
-					"/^\s*BWLABEL\s+(bits|percent|unformatted|none)\s*$/i", $buffer,
-					$matches))
-				{
-					$format_in = '';
-					$format_out = '';
-					$style = strtolower($matches[1]);
-					if($style=='percent')
-					{
-						$format_in = FMT_PERC_IN;
-						$format_out = FMT_PERC_OUT;
-					}
-					if($style=='bits')
-					{
-						$format_in = FMT_BITS_IN;
-						$format_out = FMT_BITS_OUT;
-					}
-					if($style=='unformatted')
-					{
-						$format_in = FMT_UNFORM_IN;
-						$format_out = FMT_UNFORM_OUT;
-					}
-
-					$curobj->labelstyle=$style;
-					$curobj->bwlabelformats[IN] = $format_in;
-					$curobj->bwlabelformats[OUT] = $format_out;
-					$linematched++;
-				}			
-
-				if ( ($last_seen == 'LINK') && (preg_match("/^\s*(BANDWIDTH|MAXVALUE)\s+(\d+\.?\d*[KMGT]?)\s*$/i", $buffer, $matches)))
-				{
-					$curobj->SetBandwidth($matches[2], $matches[2]);
-					$linematched++;
-				}
-
-				if ( ($last_seen == 'LINK') && (preg_match("/^\s*(MAXVALUE|BANDWIDTH)\s+(\d+\.?\d*[KMGT]?)\s+(\d+\.?\d*[KMGT]?)\s*$/i", $buffer,
-					$matches)))
-				{
-					$curobj->SetBandwidth($matches[2], $matches[3]);
-					$linematched++;
-				}
-
-				if ( ($last_seen == 'NODE') && (preg_match("/^\s*(MAXVALUE)\s+(\d+\.?\d*[KMGT]?)\s+(\d+\.?\d*[KMGT]?)\s*$/i", $buffer,
-					$matches)))
-				{
-					$curobj->SetBandwidth($matches[2], $matches[3]);
-					$linematched++;
-				}
-
-				if ( ($last_seen == 'NODE') && (preg_match("/^\s*(MAXVALUE)\s+(\d+\.?\d*[KMGT]?)\s*$/i", $buffer,
-					$matches)))
-				{
-					$curobj->SetBandwidth($matches[2], $matches[2]);
-					$linematched++;
-				}
-				
-				if (preg_match("/^\s*SET\s+(\S+)\s+(.*)\s*$/i", $buffer, $matches))
-				{
-					//if($last_seen == 'GLOBAL')
-					//{
-					//	$this->add_hint($matches[1],$matches[2]);
-					//	$linematched++;
-					//}
-					//else
-					//{
-						$curobj->add_hint($matches[1],$matches[2]);
-						$linematched++;
-				//	}
-				}				
-				
-				if (preg_match("/^\s*(IN|OUT)?OVERLIBGRAPH\s+(.+)$/i", $buffer, $matches))
-				{
-					if($last_seen == 'NODE' && $matches[1] != '') {
-							warn("IN/OUTOVERLIBGRAPH make no sense for a NODE!\n");
-						} else if($last_seen == 'LINK' || $last_seen=='NODE' ) {
-					
-							$urls = preg_split('/\s+/', $matches[2], -1, PREG_SPLIT_NO_EMPTY);
-
-							if($matches[1] == 'IN') $index = IN;
-							if($matches[1] == 'OUT') $index = OUT;
-							if($matches[1] == '') {
-								$curobj->overliburl[IN]=$urls;
-								$curobj->overliburl[OUT]=$urls;
-							} else {
-								$curobj->overliburl[$index]=$urls;
-							}
-							$linematched++;
-						}
-				}			
-				
-
-				if ($last_seen == 'LINK' && preg_match("/^\s*VIA\s+([-+]?\d+)\s+([-+]?\d+)\s*$/i", $buffer, $matches))
-				{
-					$curlink->vialist[]=array
-						(
-							$matches[1],
-							$matches[2]
-						);
-
-					$linematched++;
-				}
-
-				if ($last_seen == 'LINK' && preg_match("/^\s*VIA\s+(\S+)\s+([-+]?\d+)\s+([-+]?\d+)\s*$/i", $buffer, $matches))
-				{
-					$curlink->vialist[]=array
-						(
-							$matches[2],
-							$matches[3],
-							$matches[1]
-						);
-
-					$linematched++;
-				}
-
-				if( ($last_seen == 'NODE') && preg_match("/^\s*USE(ICON)?SCALE\s+([A-Za-z][A-Za-z0-9_]*)(\s+(in|out))?\s*$/i",$buffer,$matches))
-				{
-					$svar = '';
-					if(isset($matches[3]))
-					{
-						$svar = trim($matches[3]);
-					}
-					// opens the door for other scaley things...
-					switch($matches[1])
-					{
-						case 'ICON':
-							$varname = 'iconscalevar';
-							$uvarname = 'useiconscale';
-							if(!function_exists("imagefilter"))
-							{
-								warn("ICON SCALEs require imagefilter, which is not present in your PHP [WMWARN040]\n");
-							}
-							break;
-						default:
-							$varname = 'scalevar';
-							$uvarname = 'usescale';
-							break;
-					}
-
-					if($svar != '')
-					{
-						$curnode->$varname = $svar;
-					}
-					$curnode->$uvarname= $matches[2];
-
-					// warn("Set $varname and $uvarname\n");
-
-					$linematched++;
-				}
-
-				// one REGEXP to rule them all:
-//				if(preg_match("/^\s*SCALE\s+([A-Za-z][A-Za-z0-9_]*\s+)?(\d+\.?\d*)\s+(\d+\.?\d*)\s+(\d+)\s+(\d+)\s+(\d+)(?:\s+(\d+)\s+(\d+)\s+(\d+))?\s*$/i",
-				if(preg_match("/^\s*SCALE\s+([A-Za-z][A-Za-z0-9_]*\s+)?(\d+\.?\d*)\s+(\d+\.?\d*)\s+(\d+)\s+(\d+)\s+(\d+)(?:\s+(\d+)\s+(\d+)\s+(\d+))?\s*(.*)$/i",
-					$buffer, $matches))
-				{
-					// The default scale name is DEFAULT
-					if($matches[1]=='') $matches[1] = 'DEFAULT';
-					else $matches[1] = trim($matches[1]);
-
-					$key=$matches[2] . '_' . $matches[3];
-
-					$this->colours[$matches[1]][$key]['key']=$key;
-
-					$tag = $matches[10];
-
-					$this->colours[$matches[1]][$key]['tag']=$tag;
-
-					$this->colours[$matches[1]][$key]['bottom'] = (float)($matches[2]);
-					$this->colours[$matches[1]][$key]['top'] = (float)($matches[3]);
-
-					$this->colours[$matches[1]][$key]['red1'] = (int)($matches[4]);
-					$this->colours[$matches[1]][$key]['green1'] = (int)($matches[5]);
-					$this->colours[$matches[1]][$key]['blue1'] = (int)($matches[6]);
-
-					// this is the second colour, if there is one
-					if(isset($matches[7]) && $matches[7] != '')
-					{
-						$this->colours[$matches[1]][$key]['red2'] = (int) ($matches[7]);
-						$this->colours[$matches[1]][$key]['green2'] = (int) ($matches[8]);
-						$this->colours[$matches[1]][$key]['blue2'] = (int) ($matches[9]);
-					}
-
-
-					if(! isset($this->numscales[$matches[1]]))
-					{
-						$this->numscales[$matches[1]]=1;
-					}
-					else
-					{
-						$this->numscales[$matches[1]]++;
-					}
-					// we count if we've seen any default scale, otherwise, we have to add
-					// one at the end.
-					if($matches[1]=='DEFAULT')
-					{
-						$scalesseen++;
-					}
-
-					$linematched++;
-				}
-
-				if (preg_match("/^\s*KEYPOS\s+([A-Za-z][A-Za-z0-9_]*\s+)?(-?\d+)\s+(-?\d+)(.*)/i", $buffer, $matches))
-				{
-					$whichkey = trim($matches[1]);
-					if($whichkey == '') $whichkey = 'DEFAULT';
-
-					$this->keyx[$whichkey]=$matches[2];
-					$this->keyy[$whichkey]=$matches[3];
-					$extra=trim($matches[4]);
-
-					if ($extra != '')
-						$this->keytext[$whichkey] = $extra;
-					if(!isset($this->keytext[$whichkey]))
-						$this->keytext[$whichkey] = "DEFAULT TITLE";
-					if(!isset($this->keystyle[$whichkey]))
-						$this->keystyle[$whichkey] = "classic";
-
-					$linematched++;
-				}
-
-				
-				// truetype font definition (actually, we don't really check if it's truetype) - filename + size
-				if (preg_match("/^\s*FONTDEFINE\s+(\d+)\s+(\S+)\s+(\d+)\s*$/i", $buffer, $matches))
-				{
-					if (function_exists("imagettfbbox"))
-					{
-						// test if this font is valid, before adding it to the font table...
-						$bounds=@imagettfbbox($matches[3], 0, $matches[2], "Ignore me");
-
-						if (isset($bounds[0]))
-						{
-							$this->fonts[$matches[1]]->type="truetype";
-							$this->fonts[$matches[1]]->file=$matches[2];
-							$this->fonts[$matches[1]]->size=$matches[3];
-						}
-						else { warn
-							("Failed to load ttf font " . $matches[2] . " - at config line $linecount\n [WMWARN30]"); }
-					}
-					else { warn
-						("imagettfbbox() is not a defined function. You don't seem to have FreeType compiled into your gd module. [WMWARN31]\n");
-					}
-
-					$linematched++;
-				}
-
-				// GD font definition (no size here)
-				if (preg_match("/^\s*FONTDEFINE\s+(\d+)\s+(\S+)\s*$/i", $buffer, $matches))
-				{
-					$newfont=imageloadfont($matches[2]);
-
-					if ($newfont)
-					{
-						$this->fonts[$matches[1]]->type="gd";
-						$this->fonts[$matches[1]]->file=$matches[2];
-						$this->fonts[$matches[1]]->gdnumber=$newfont;
-					}
-					else { warn ("Failed to load GD font: " . $matches[2]
-						. " ($newfont) at config line $linecount [WMWARN32]\n"); }
-
-					$linematched++;
-				}
-
-				if(preg_match("/^\s*KEYSTYLE\s+([A-Za-z][A-Za-z0-9_]+\s+)?(classic|horizontal|vertical)\s+?(\d+)?\s*$/i",$buffer, $matches))
-				{
-					$whichkey = trim($matches[1]);
-					if($whichkey == '') $whichkey = 'DEFAULT';
-					$this->keystyle[$whichkey] = strtolower($matches[2]);
-
-					if(isset($matches[3]) && $matches[3] != '')
-					{
-						$this->keysize[$whichkey] = $matches[3];
-					}
-					else
-					{
-						$this->keysize[$whichkey] = $this->keysize['DEFAULT'];
-					}
-
-					$linematched++;
-				}
-
-				
-				if (preg_match("/^\s*KILO\s+(\d+)\s*$/i", $buffer, $matches))
-				{
-					$this->kilo=$matches[1];
-					$this->defaultlink->owner->kilo=$matches[1];
-					$linematched++;
-				}
-				
-				if (preg_match(
-					"/^\s*(TIME|TITLE|KEYBG|KEYTEXT|KEYOUTLINE|BG)COLOR\s+(\d+)\s+(\d+)\s+(\d+)\s*$/i",
-					$buffer,
-					$matches))
-				{
-					$key=$matches[1];
-					# "Found colour line for $key\n";
-					$this->colours['DEFAULT'][$key]['red1']=$matches[2];
-					$this->colours['DEFAULT'][$key]['green1']=$matches[3];
-					$this->colours['DEFAULT'][$key]['blue1']=$matches[4];
-					$this->colours['DEFAULT'][$key]['bottom']=-2;
-					$this->colours['DEFAULT'][$key]['top']=-1;
-
-					$linematched++;
-				}
-
-				if (($last_seen == 'NODE') && (preg_match(
-					"/^\s*(AICONOUTLINE|AICONFILL|LABELFONT|LABELFONTSHADOW|LABELBG|LABELOUTLINE)COLOR\s+((\d+)\s+(\d+)\s+(\d+)|none|contrast|copy)\s*$/i",
-					$buffer,
-					$matches)))
-				{
-					$key=$matches[1];
-					$field=strtolower($matches[1]) . 'colour';
-					$val = strtolower($matches[2]);
-
-					if(isset($matches[3]))	// this is a regular colour setting thing
-					{
-						$curnode->$field=array(	$matches[3],$matches[4],$matches[5]);
-						$linematched++;
-					}
-
-					if($val == 'none' && ($matches[1]=='LABELFONTSHADOW' || $matches[1]=='LABELBG' || $matches[1]=='LABELOUTLINE'))
-					{
-						$curnode->$field=array(-1,-1,-1);
-						$linematched++;
-					}
-					
-					if($val == 'contrast' && $matches[1]=='LABELFONT')
-					{
-						$curnode->$field=array(-3,-3,-3);
-						$linematched++;
-					}
-
-					if($matches[2] == 'copy' && $matches[1]=='AICONFILL')
-					{
-						$curnode->$field=array(-2,-2,-2);
-						$linematched++;
-					}
-				}
-
-				if (($last_seen == 'LINK') && (preg_match(
-					"/^\s*(COMMENTFONT|BWBOX|BWFONT|BWOUTLINE|OUTLINE)COLOR\s+((\d+)\s+(\d+)\s+(\d+)|none|contrast|copy)\s*$/i",
-					$buffer,
-					$matches)))
-				{
-					$key=$matches[1];
-					$field=strtolower($matches[1]) . 'colour';
-					$val = strtolower($matches[2]);
-
-					if(isset($matches[3]))	// this is a regular colour setting thing
-					{
-						$curlink->$field=array(	$matches[3],$matches[4],$matches[5]);
-						$linematched++;
-					}
-					if($val == 'none' && ($key=='BWBOX' || $key=='BWOUTLINE' || $key=='OUTLINE'))
-					{
-						// print "***********************************\n";
-						$curlink->$field=array(-1,-1,-1);
-						$linematched++;
-					}
-				}
-
-				if ($last_seen == 'LINK' && preg_match(
-					"/^\s*ARROWSTYLE\s+(\d+)\s+(\d+)\s*$/i", $buffer, $matches))
-				{
-					$curlink->arrowstyle=$matches[1] . ' ' . $matches[2];
-					$linematched++;
-				}
-				
-
-				if ($linematched == 0 && trim($buffer) != '') { warn
-					("Unrecognised config on line $linecount: $buffer"); }
-
-				if ($linematched > 1) { warn
-				("Same line ($linecount) interpreted twice. This is a program error. Please report to Howie with your config!\nThe line was: $buffer");
-				}
-			} // if blankline
-		}     // while
-
-		if ($last_seen == "NODE")
-		{
-			if ($curnode->name == 'DEFAULT')
-			{
-				$this->defaultnode=$curnode;
-				debug ("Saving Default Node: " . $curnode->name . "\n");
-			}
-			else
-			{
-				$this->nodes[$curnode->name]=$curnode;
-				debug ("Saving Node: " . $curnode->name . "\n");
-			}
-		}
-
-		if ($last_seen == "LINK")
-		{
-			if ($curlink->name == 'DEFAULT')
-			{
-				$this->defaultlink=$curlink;
-				debug ("Saving Default Link: " . $curlink->name . "\n");
-			}
-			else
-			{
-				if (isset($curlink->a) && isset($curlink->b))
-				{
-					$this->links[$curlink->name]=$curlink;
-					debug ("Saving Link: " . $curlink->name . "\n");
-				}
-				else { warn ("Dropping LINK " . $curlink->name . " - it hasn't got 2 NODES!"); }
-			}
-		}
-	} // if $fd
+		 debug("ReadConfig Detected that this is a config fragment.\n");
+			 // strip out any Windows line-endings that have gotten in here
+			 $input=str_replace("\r", "", $input);
+			 $lines = split("/n",$input);
+	}
 	else
 	{
-		warn ("Couldn't open config file $filename for reading\n");
-		return (FALSE);
+		 debug("ReadConfig Detected that this is a config filename.\n");
+		 $filename = $input;
+		 $fd=fopen($filename, "r");
+
+		if ($fd)
+		{
+				while (!feof($fd))
+				{
+					$buffer=fgets($fd, 4096);
+					// strip out any Windows line-endings that have gotten in here
+					$buffer=str_replace("\r", "", $buffer);
+					$lines[] = $buffer;
+				}
+				fclose($fd);
+		}
+	}
+		
+	$linecount = 0;
+
+	foreach($lines as $buffer)
+	{
+		$linematched=0;
+		$linecount++;
+
+		if (preg_match("/^\s*#/", $buffer)) {
+			// this is a comment line
+		}
+		else
+		{
+			// for any other config elements that are shared between nodes and links, they can use this
+			unset($curobj);
+			$curobj = NULL;
+			if($last_seen == "LINK") $curobj = &$curlink;
+			if($last_seen == "NODE") $curobj = &$curnode;
+			if($last_seen == "GLOBAL") $curobj = &$this;
+
+			if (preg_match("/^\s*(LINK|NODE)\s+(\S+)\s*$/i", $buffer, $matches))
+			{
+				// first, save the previous item, before starting work on the new one
+				if ($last_seen == "NODE")
+				{
+					if ($curnode->name == 'DEFAULT')
+					{
+						$this->defaultnode = $curnode;
+						debug ("Saving Default Node: " . $curnode->name . "\n");
+					}
+					else
+					{
+						$this->nodes[$curnode->name]=$curnode;
+						debug ("Saving Node: " . $curnode->name . "\n");
+					}
+				}
+
+				if ($last_seen == "LINK")
+				{
+					if ($curlink->name == 'DEFAULT')
+					{
+						$this->defaultlink=$curlink;
+						debug ("Saving Default Link: " . $curlink->name . "\n");
+					}
+					else
+					{
+						if (isset($curlink->a) && isset($curlink->b))
+						{
+							$this->links[$curlink->name]=$curlink;
+							debug ("Saving Link: " . $curlink->name . "\n");
+						}
+						else { warn
+							("Dropping LINK " . $curlink->name . " - it hasn't got 2 NODES! [WMWARN28]\n"); }
+					}
+				}
+
+				if ($matches[1] == 'LINK')
+				{
+					if ($matches[2] == 'DEFAULT')
+					{
+						if ($linksseen > 0) { warn
+							("LINK DEFAULT is not the first LINK. Defaults will not apply to earlier LINKs. [WMWARN26]\n");
+						}
+						unset($curlink);
+						$curlink = $this->defaultlink;
+					}
+					else
+					{
+						unset($curlink);
+
+						if(isset($this->links[$matches[2]]))
+						{
+							warn("Duplicate link name ".$matches[2]." at line $linecount - only the last one defined is used. [WMWARN25]\n");
+						}
+
+						$curlink=new WeatherMapLink;
+						$curlink->name=$matches[2];
+						$curlink->Reset($this);
+						$linksseen++;
+					}
+
+					$last_seen="LINK";
+					$curlink->configline = $linecount;
+					$linematched++;
+				}
+
+				if ($matches[1] == 'NODE')
+				{
+					if ($matches[2] == 'DEFAULT')
+					{
+						if ($nodesseen > 0) { warn
+							("NODE DEFAULT is not the first NODE. Defaults will not apply to earlier NODEs. [WMWARN27]\n");
+						}
+
+						unset($curnode);
+						$curnode = $this->defaultnode;
+					}
+					else
+					{
+						unset($curnode);
+
+						if(isset($this->nodes[$matches[2]]))
+						{
+							warn("Duplicate node name ".$matches[2]." at line $linecount - only the last one defined is used. [WMWARN24]\n");
+						}
+
+						$curnode=new WeatherMapNode;
+						$curnode->name=$matches[2];
+						$curnode->Reset($this);
+						$nodesseen++;
+					}
+
+					$curnode->configline = $linecount;
+					$last_seen="NODE";
+					$linematched++;
+				}
+			}
+
+			// most of the config keywords just copy stuff into object properties.
+			// these are all dealt with from this one array. The special-cases
+			// follow on from that
+			$config_keywords = array(
+					array('GLOBAL','/^\s*BACKGROUND\s+(.*)\s*$/i',array('background'=>1)),
+					array('GLOBAL','/^\s*HTMLOUTPUTFILE\s+(.*)\s*$/i',array('htmloutputfile'=>1)),
+					array('GLOBAL','/^\s*IMAGEOUTPUTFILE\s+(.*)\s*$/i',array('imageoutputfile'=>1)),
+					array('GLOBAL','/^\s*TITLE\s+(.*)\s*$/i',array('title'=>1)),
+					array('GLOBAL','/^\s*HTMLSTYLE\s+(static|overlib)\s*$/i',array('htmlstyle'=>1)),
+					array('GLOBAL','/^\s*KEYFONT\s+(\d+)\s*$/i',array('keyfont'=>1)),
+					array('GLOBAL','/^\s*TITLEFONT\s+(\d+)\s*$/i',array('titlefont'=>1)),
+					array('GLOBAL','/^\s*TIMEFONT\s+(\d+)\s*$/i',array('timefont'=>1)),
+					array('GLOBAL','/^\s*TITLEPOS\s+(-?\d+)\s+(-?\d+)\s*$/i',array('titlex'=>1, 'titley'=>2)),
+					array('GLOBAL','/^\s*TITLEPOS\s+(-?\d+)\s+(-?\d+)\s+(.*)\s*$/i',array('titlex'=>1, 'titley'=>2, 'title'=>3)),
+					array('GLOBAL','/^\s*TIMEPOS\s+(-?\d+)\s+(-?\d+)\s*$/i',array('timex'=>1, 'timey'=>2)),
+					array('GLOBAL','/^\s*TIMEPOS\s+(-?\d+)\s+(-?\d+)\s+(.*)\s*$/i',array('timex'=>1, 'timey'=>2, 'stamptext'=>3)),
+					array('NODE', "/^\s*LABEL\s+(.*)\s*$/i", array('label'=>1)),
+					array('(LINK|GLOBAL)', "/^\s*WIDTH\s+(\d+)\s*$/i", array('width'=>1)),
+					array('(LINK|GLOBAL)', "/^\s*HEIGHT\s+(\d+)\s*$/i", array('height'=>1)),
+					array('LINK', '/^\s*ARROWSTYLE\s+(classic|compact)\s*$/i', array('arrowstyle'=>1)),
+					array('LINK', '/^\s*VIASTYLE\s+(curved)\s*$/i', array('viastyle'=>1)),
+					array('LINK', '/^\s*INCOMMENT\s+(.*)\s*$/i', array('comments[IN]'=>1)),
+					array('LINK', '/^\s*OUTCOMMENT\s+(.*)\s*$/i', array('comments[OUT]'=>1)),
+					array('LINK', '/^\s*BWFONT\s+(\d+)\s*$/i', array('bwfont'=>1)),
+					array('LINK', '/^\s*COMMENTFONT\s+(\d+)\s*$/i', array('commentfont'=>1)),
+					array('LINK', '/^\s*DUPLEX\s+(full|half)\s*$/i', array('duplex'=>1)),
+					array('LINK', '/^\s*BWSTYLE\s+(classic|angled)\s*$/i', array('labelboxstyle'=>1)),
+					array('LINK', '/^\s*LINKSTYLE\s+(twoway|oneway)\s*$/i', array('linkstyle'=>1)),
+					array('LINK', '/^\s*BWLABELPOS\s+(\d+)\s(\d+)\s*$/i', array('labeloffset_in'=>1,'labeloffset_out'=>2)),
+					array('LINK', '/^\s*COMMENTPOS\s+(\d+)\s(\d+)\s*$/i', array('commentoffset_in'=>1, 'commentoffset_out'=>2)),
+					array('LINK', '/^\s*USESCALE\s+([A-Za-z][A-Za-z0-9_]*)\s*$/i', array('usescale'=>1)),
+					array('LINK', '/^\s*SPLITPOS\s+(\d+)\s*$/i', array('splitpos'=>1)),
+					
+					array('NODE', '/^\s*LABELOFFSET\s+([-+]?\d+)\s+([-+]?\d+)\s*$/i', array('labeloffsetx'=>1,'labeloffsety'=>2)),
+					array('NODE', '/^\s*LABELOFFSET\s+(C|NE|SE|NW|SW|N|S|E|W)\s*$/i', array('labeloffset'=>1)),
+					array('NODE', '/^\s*LABELFONT\s+(\d+)\s*$/i', array('labelfont'=>1)),
+					array('NODE', '/^\s*LABELANGLE\s+(0|90|180|270)\s*$/i', array('labelangle'=>1)),
+					array('(NODE|LINK)', '/^\s*TEMPLATE\s+(\S+)\s*$/i', array('template'=>1)),						
+					
+					array('LINK', '/^\s*OUTBWFORMAT\s+(.*)\s*$/i', array('bwlabelformats[OUT]'=>1,'labelstyle'=>'--')),
+					array('LINK', '/^\s*INBWFORMAT\s+(.*)\s*$/i', array('bwlabelformats[IN]'=>1,'labelstyle'=>'--')),
+					array('NODE','/^\s*ICON\s+none\s*$/i',array('iconfile'=>'')),
+					array('NODE','/^\s*ICON\s+(\S+)\s*$/i',array('iconfile'=>1)),
+					array('NODE','/^\s*ICON\s+(\d+)\s+(\d+)\s+(\S+)\s*$/i',array('iconfile'=>3, 'iconscalew'=>1, 'iconscaleh'=>2)),
+					
+					array('NODE','/^\s*NOTES\s+(.*)\s*$/i',array('notestext[IN]'=>1,'notestext[OUT]'=>1)),
+					array('LINK','/^\s*NOTES\s+(.*)\s*$/i',array('notestext[IN]'=>1,'notestext[OUT]'=>1)),
+					array('LINK','/^\s*INNOTES\s+(.*)\s*$/i',array('notestext[IN]'=>1)),
+					array('LINK','/^\s*OUTNOTES\s+(.*)\s*$/i',array('notestext[OUT]'=>1)),
+					
+					array('NODE','/^\s*INFOURL\s+(.*)\s*$/i',array('infourl[IN]'=>1,'infourl[OUT]'=>1)),
+					array('LINK','/^\s*INFOURL\s+(.*)\s*$/i',array('infourl[IN]'=>1,'infourl[OUT]'=>1)),
+					array('LINK','/^\s*ININFOURL\s+(.*)\s*$/i',array('infourl[IN]'=>1)),
+					array('LINK','/^\s*OUTINFOURL\s+(.*)\s*$/i',array('infourl[OUT]'=>1)),
+					
+					array('NODE','/^\s*OVERLIBCAPTION\s+(.*)\s*$/i',array('overlibcaption[IN]'=>1,'overlibcaption[OUT]'=>1)),
+					array('LINK','/^\s*OVERLIBCAPTION\s+(.*)\s*$/i',array('overlibcaption[IN]'=>1,'overlibcaption[OUT]'=>1)),
+					array('LINK','/^\s*INOVERLIBCAPTION\s+(.*)\s*$/i',array('overlibcaption[IN]'=>1)),
+					array('LINK','/^\s*OUTOVERLIBCAPTION\s+(.*)\s*$/i',array('overlibcaption[OUT]'=>1)),
+											
+					array('(NODE|LINK)', "/^\s*ZORDER\s+([-+]?\d+)$/i", array('zorder'=>1)),
+					array('(NODE|LINK)', "/^\s*OVERLIBWIDTH\s+(\d+)\s*$/i", array('overlibwidth'=>1)),
+					array('(NODE|LINK)', "/^\s*OVERLIBHEIGHT\s+(\d+)\s*$/i", array('overlibheight'=>1)),
+					array('NODE', "/^\s*POSITION\s+([-+]?\d+)\s+([-+]?\d+)\s*$/i", array('x'=>1,'y'=>2)),
+					array('NODE', "/^\s*POSITION\s+(\S+)\s+([-+]?\d+)\s+([-+]?\d+)\s*$/i", array('x'=>2,'y'=>3,'original_x'=>2,'original_y'=>3,'relative_to'=>1,'relative_resolved'=>FALSE))
+					);
+
+			// this loop replaces a whole pile of duplicated ifs with something with consistent handling 
+			foreach ($config_keywords as $keyword)
+			{
+				if(preg_match("/".$keyword[0]."/",$last_seen))
+				{
+					if(preg_match($keyword[1],$buffer,$matches))
+					{
+						// print "MATCHED: ".$keyword[1]."\n";
+						foreach ($keyword[2] as $key=>$val)
+						{
+							// if it's a number, then it;s a match number,
+							// otherwise it's a literal to be put into a variable
+							if(is_numeric($val)) $val = $matches[$val];
+							
+							assert('is_object($curobj)');
+							
+							if(preg_match('/^(.*)\[([^\]]+)\]$/',$key,$m))
+							{
+								$index = constant($m[2]);
+								$key = $m[1];
+								$curobj->{$key}[$index] = $val;
+							}
+							else
+							{
+								$curobj->$key = $val;
+							}
+						}
+						$linematched++;
+						# print "\n\n";
+						break;
+					}
+				}
+			}
+
+			if (preg_match("/^\s*NODES\s+(\S+)\s+(\S+)\s*$/i", $buffer, $matches))
+			{
+				if ($last_seen == 'LINK')
+				{
+					$valid_nodes=2;
+
+					foreach (array(1, 2)as $i)
+					{
+						$endoffset[$i]='C';
+						$nodenames[$i]=$matches[$i];
+
+						if (preg_match("/:(NE|SE|NW|SW|N|S|E|W)$/i", $matches[$i], $submatches))
+						{
+							$endoffset[$i]=$submatches[1];
+							$nodenames[$i]=preg_replace("/:(NE|SE|NW|SW|N|S|E|W)$/i", '', $matches[$i]);
+							$this->need_size_precalc=TRUE;
+						}
+
+						if (preg_match("/:([-+]?\d+):([-+]?\d+)$/i", $matches[$i], $submatches))
+						{
+							$xoff = $submatches[1];
+							$yoff = $submatches[2];
+							$endoffset[$i]=$xoff.":".$yoff;
+							$nodenames[$i]=preg_replace("/:$xoff:$yoff$/i", '', $matches[$i]);
+							$this->need_size_precalc=TRUE;
+						}
+
+						if (!array_key_exists($nodenames[$i], $this->nodes))
+						{
+							warn ("Unknown node '" . $nodenames[$i] . "' on line $linecount of config\n");
+							$valid_nodes--;
+						}
+					}
+
+					// TODO - really, this should kill the whole link, and reset for the next one
+					if ($valid_nodes == 2)
+					{
+						$curlink->a=$this->nodes[$nodenames[1]];
+						$curlink->b=$this->nodes[$nodenames[2]];
+						$curlink->a_offset=$endoffset[1];
+						$curlink->b_offset=$endoffset[2];
+					}
+					else {
+						// this'll stop the current link being added
+						$last_seen="broken"; }
+
+						$linematched++;
+				}
+			}
+
+			if ( ( $last_seen=='NODE' || $last_seen=='LINK' ) && preg_match("/^\s*TARGET\s+(.*)\s*$/i", $buffer, $matches))
+			{
+				$linematched++;
+
+				$targets=preg_split('/\s+/', $matches[1], -1, PREG_SPLIT_NO_EMPTY);
+				// wipe any existing targets, otherwise things in the DEFAULT accumulate with the new ones
+				$curobj->targets = array();
+				foreach ($targets as $target)
+				{
+					// we store the original TARGET string, and line number, along with the breakdown, to make nicer error messages later
+					$newtarget=array($target,'','',$linecount,$target);
+					if ($curobj)
+					{
+						$curobj->targets[]=$newtarget;
+					}
+				}
+			}
+			
+			if ($last_seen == 'LINK' && preg_match(
+				"/^\s*BWLABEL\s+(bits|percent|unformatted|none)\s*$/i", $buffer,
+				$matches))
+			{
+				$format_in = '';
+				$format_out = '';
+				$style = strtolower($matches[1]);
+				if($style=='percent')
+				{
+					$format_in = FMT_PERC_IN;
+					$format_out = FMT_PERC_OUT;
+				}
+				if($style=='bits')
+				{
+					$format_in = FMT_BITS_IN;
+					$format_out = FMT_BITS_OUT;
+				}
+				if($style=='unformatted')
+				{
+					$format_in = FMT_UNFORM_IN;
+					$format_out = FMT_UNFORM_OUT;
+				}
+
+				$curobj->labelstyle=$style;
+				$curobj->bwlabelformats[IN] = $format_in;
+				$curobj->bwlabelformats[OUT] = $format_out;
+				$linematched++;
+			}			
+
+			if ( ($last_seen == 'LINK') && (preg_match("/^\s*(BANDWIDTH|MAXVALUE)\s+(\d+\.?\d*[KMGT]?)\s*$/i", $buffer, $matches)))
+			{
+				$curobj->SetBandwidth($matches[2], $matches[2]);
+				$linematched++;
+			}
+
+			if ( ($last_seen == 'LINK') && (preg_match("/^\s*(MAXVALUE|BANDWIDTH)\s+(\d+\.?\d*[KMGT]?)\s+(\d+\.?\d*[KMGT]?)\s*$/i", $buffer,
+				$matches)))
+			{
+				$curobj->SetBandwidth($matches[2], $matches[3]);
+				$linematched++;
+			}
+
+			if ( ($last_seen == 'NODE') && (preg_match("/^\s*(MAXVALUE)\s+(\d+\.?\d*[KMGT]?)\s+(\d+\.?\d*[KMGT]?)\s*$/i", $buffer,
+				$matches)))
+			{
+				$curobj->SetBandwidth($matches[2], $matches[3]);
+				$linematched++;
+			}
+
+			if ( ($last_seen == 'NODE') && (preg_match("/^\s*(MAXVALUE)\s+(\d+\.?\d*[KMGT]?)\s*$/i", $buffer,
+				$matches)))
+			{
+				$curobj->SetBandwidth($matches[2], $matches[2]);
+				$linematched++;
+			}
+			
+			if (preg_match("/^\s*SET\s+(\S+)\s+(.*)\s*$/i", $buffer, $matches))
+			{
+				//if($last_seen == 'GLOBAL')
+				//{
+				//	$this->add_hint($matches[1],$matches[2]);
+				//	$linematched++;
+				//}
+				//else
+				//{
+					$curobj->add_hint($matches[1],$matches[2]);
+					$linematched++;
+			//	}
+			}				
+			
+			if (preg_match("/^\s*(IN|OUT)?OVERLIBGRAPH\s+(.+)$/i", $buffer, $matches))
+			{
+				if($last_seen == 'NODE' && $matches[1] != '') {
+						warn("IN/OUTOVERLIBGRAPH make no sense for a NODE!\n");
+					} else if($last_seen == 'LINK' || $last_seen=='NODE' ) {
+				
+						$urls = preg_split('/\s+/', $matches[2], -1, PREG_SPLIT_NO_EMPTY);
+
+						if($matches[1] == 'IN') $index = IN;
+						if($matches[1] == 'OUT') $index = OUT;
+						if($matches[1] == '') {
+							$curobj->overliburl[IN]=$urls;
+							$curobj->overliburl[OUT]=$urls;
+						} else {
+							$curobj->overliburl[$index]=$urls;
+						}
+						$linematched++;
+					}
+			}			
+			
+
+			if ($last_seen == 'LINK' && preg_match("/^\s*VIA\s+([-+]?\d+)\s+([-+]?\d+)\s*$/i", $buffer, $matches))
+			{
+				$curlink->vialist[]=array
+					(
+						$matches[1],
+						$matches[2]
+					);
+
+				$linematched++;
+			}
+
+			if ($last_seen == 'LINK' && preg_match("/^\s*VIA\s+(\S+)\s+([-+]?\d+)\s+([-+]?\d+)\s*$/i", $buffer, $matches))
+			{
+				$curlink->vialist[]=array
+					(
+						$matches[2],
+						$matches[3],
+						$matches[1]
+					);
+
+				$linematched++;
+			}
+
+			if( ($last_seen == 'NODE') && preg_match("/^\s*USE(ICON)?SCALE\s+([A-Za-z][A-Za-z0-9_]*)(\s+(in|out))?\s*$/i",$buffer,$matches))
+			{
+				$svar = '';
+				if(isset($matches[3]))
+				{
+					$svar = trim($matches[3]);
+				}
+				// opens the door for other scaley things...
+				switch($matches[1])
+				{
+					case 'ICON':
+						$varname = 'iconscalevar';
+						$uvarname = 'useiconscale';
+						if(!function_exists("imagefilter"))
+						{
+							warn("ICON SCALEs require imagefilter, which is not present in your PHP [WMWARN040]\n");
+						}
+						break;
+					default:
+						$varname = 'scalevar';
+						$uvarname = 'usescale';
+						break;
+				}
+
+				if($svar != '')
+				{
+					$curnode->$varname = $svar;
+				}
+				$curnode->$uvarname= $matches[2];
+
+				// warn("Set $varname and $uvarname\n");
+
+				$linematched++;
+			}
+
+			// one REGEXP to rule them all:
+//				if(preg_match("/^\s*SCALE\s+([A-Za-z][A-Za-z0-9_]*\s+)?(\d+\.?\d*)\s+(\d+\.?\d*)\s+(\d+)\s+(\d+)\s+(\d+)(?:\s+(\d+)\s+(\d+)\s+(\d+))?\s*$/i",
+			if(preg_match("/^\s*SCALE\s+([A-Za-z][A-Za-z0-9_]*\s+)?(\d+\.?\d*)\s+(\d+\.?\d*)\s+(\d+)\s+(\d+)\s+(\d+)(?:\s+(\d+)\s+(\d+)\s+(\d+))?\s*(.*)$/i",
+				$buffer, $matches))
+			{
+				// The default scale name is DEFAULT
+				if($matches[1]=='') $matches[1] = 'DEFAULT';
+				else $matches[1] = trim($matches[1]);
+
+				$key=$matches[2] . '_' . $matches[3];
+
+				$this->colours[$matches[1]][$key]['key']=$key;
+
+				$tag = $matches[10];
+
+				$this->colours[$matches[1]][$key]['tag']=$tag;
+
+				$this->colours[$matches[1]][$key]['bottom'] = (float)($matches[2]);
+				$this->colours[$matches[1]][$key]['top'] = (float)($matches[3]);
+
+				$this->colours[$matches[1]][$key]['red1'] = (int)($matches[4]);
+				$this->colours[$matches[1]][$key]['green1'] = (int)($matches[5]);
+				$this->colours[$matches[1]][$key]['blue1'] = (int)($matches[6]);
+
+				// this is the second colour, if there is one
+				if(isset($matches[7]) && $matches[7] != '')
+				{
+					$this->colours[$matches[1]][$key]['red2'] = (int) ($matches[7]);
+					$this->colours[$matches[1]][$key]['green2'] = (int) ($matches[8]);
+					$this->colours[$matches[1]][$key]['blue2'] = (int) ($matches[9]);
+				}
+
+
+				if(! isset($this->numscales[$matches[1]]))
+				{
+					$this->numscales[$matches[1]]=1;
+				}
+				else
+				{
+					$this->numscales[$matches[1]]++;
+				}
+				// we count if we've seen any default scale, otherwise, we have to add
+				// one at the end.
+				if($matches[1]=='DEFAULT')
+				{
+					$scalesseen++;
+				}
+
+				$linematched++;
+			}
+
+			if (preg_match("/^\s*KEYPOS\s+([A-Za-z][A-Za-z0-9_]*\s+)?(-?\d+)\s+(-?\d+)(.*)/i", $buffer, $matches))
+			{
+				$whichkey = trim($matches[1]);
+				if($whichkey == '') $whichkey = 'DEFAULT';
+
+				$this->keyx[$whichkey]=$matches[2];
+				$this->keyy[$whichkey]=$matches[3];
+				$extra=trim($matches[4]);
+
+				if ($extra != '')
+					$this->keytext[$whichkey] = $extra;
+				if(!isset($this->keytext[$whichkey]))
+					$this->keytext[$whichkey] = "DEFAULT TITLE";
+				if(!isset($this->keystyle[$whichkey]))
+					$this->keystyle[$whichkey] = "classic";
+
+				$linematched++;
+			}
+
+			
+			// truetype font definition (actually, we don't really check if it's truetype) - filename + size
+			if (preg_match("/^\s*FONTDEFINE\s+(\d+)\s+(\S+)\s+(\d+)\s*$/i", $buffer, $matches))
+			{
+				if (function_exists("imagettfbbox"))
+				{
+					// test if this font is valid, before adding it to the font table...
+					$bounds=@imagettfbbox($matches[3], 0, $matches[2], "Ignore me");
+
+					if (isset($bounds[0]))
+					{
+						$this->fonts[$matches[1]]->type="truetype";
+						$this->fonts[$matches[1]]->file=$matches[2];
+						$this->fonts[$matches[1]]->size=$matches[3];
+					}
+					else { warn
+						("Failed to load ttf font " . $matches[2] . " - at config line $linecount\n [WMWARN30]"); }
+				}
+				else { warn
+					("imagettfbbox() is not a defined function. You don't seem to have FreeType compiled into your gd module. [WMWARN31]\n");
+				}
+
+				$linematched++;
+			}
+
+			// GD font definition (no size here)
+			if (preg_match("/^\s*FONTDEFINE\s+(\d+)\s+(\S+)\s*$/i", $buffer, $matches))
+			{
+				$newfont=imageloadfont($matches[2]);
+
+				if ($newfont)
+				{
+					$this->fonts[$matches[1]]->type="gd";
+					$this->fonts[$matches[1]]->file=$matches[2];
+					$this->fonts[$matches[1]]->gdnumber=$newfont;
+				}
+				else { warn ("Failed to load GD font: " . $matches[2]
+					. " ($newfont) at config line $linecount [WMWARN32]\n"); }
+
+				$linematched++;
+			}
+
+			if(preg_match("/^\s*KEYSTYLE\s+([A-Za-z][A-Za-z0-9_]+\s+)?(classic|horizontal|vertical)\s+?(\d+)?\s*$/i",$buffer, $matches))
+			{
+				$whichkey = trim($matches[1]);
+				if($whichkey == '') $whichkey = 'DEFAULT';
+				$this->keystyle[$whichkey] = strtolower($matches[2]);
+
+				if(isset($matches[3]) && $matches[3] != '')
+				{
+					$this->keysize[$whichkey] = $matches[3];
+				}
+				else
+				{
+					$this->keysize[$whichkey] = $this->keysize['DEFAULT'];
+				}
+
+				$linematched++;
+			}
+
+			
+			if (preg_match("/^\s*KILO\s+(\d+)\s*$/i", $buffer, $matches))
+			{
+				$this->kilo=$matches[1];
+				$this->defaultlink->owner->kilo=$matches[1];
+				$linematched++;
+			}
+			
+			if (preg_match(
+				"/^\s*(TIME|TITLE|KEYBG|KEYTEXT|KEYOUTLINE|BG)COLOR\s+(\d+)\s+(\d+)\s+(\d+)\s*$/i",
+				$buffer,
+				$matches))
+			{
+				$key=$matches[1];
+				# "Found colour line for $key\n";
+				$this->colours['DEFAULT'][$key]['red1']=$matches[2];
+				$this->colours['DEFAULT'][$key]['green1']=$matches[3];
+				$this->colours['DEFAULT'][$key]['blue1']=$matches[4];
+				$this->colours['DEFAULT'][$key]['bottom']=-2;
+				$this->colours['DEFAULT'][$key]['top']=-1;
+
+				$linematched++;
+			}
+
+			if (($last_seen == 'NODE') && (preg_match(
+				"/^\s*(AICONOUTLINE|AICONFILL|LABELFONT|LABELFONTSHADOW|LABELBG|LABELOUTLINE)COLOR\s+((\d+)\s+(\d+)\s+(\d+)|none|contrast|copy)\s*$/i",
+				$buffer,
+				$matches)))
+			{
+				$key=$matches[1];
+				$field=strtolower($matches[1]) . 'colour';
+				$val = strtolower($matches[2]);
+
+				if(isset($matches[3]))	// this is a regular colour setting thing
+				{
+					$curnode->$field=array(	$matches[3],$matches[4],$matches[5]);
+					$linematched++;
+				}
+
+				if($val == 'none' && ($matches[1]=='LABELFONTSHADOW' || $matches[1]=='LABELBG' || $matches[1]=='LABELOUTLINE'))
+				{
+					$curnode->$field=array(-1,-1,-1);
+					$linematched++;
+				}
+				
+				if($val == 'contrast' && $matches[1]=='LABELFONT')
+				{
+					$curnode->$field=array(-3,-3,-3);
+					$linematched++;
+				}
+
+				if($matches[2] == 'copy' && $matches[1]=='AICONFILL')
+				{
+					$curnode->$field=array(-2,-2,-2);
+					$linematched++;
+				}
+			}
+
+			if (($last_seen == 'LINK') && (preg_match(
+				"/^\s*(COMMENTFONT|BWBOX|BWFONT|BWOUTLINE|OUTLINE)COLOR\s+((\d+)\s+(\d+)\s+(\d+)|none|contrast|copy)\s*$/i",
+				$buffer,
+				$matches)))
+			{
+				$key=$matches[1];
+				$field=strtolower($matches[1]) . 'colour';
+				$val = strtolower($matches[2]);
+
+				if(isset($matches[3]))	// this is a regular colour setting thing
+				{
+					$curlink->$field=array(	$matches[3],$matches[4],$matches[5]);
+					$linematched++;
+				}
+				if($val == 'none' && ($key=='BWBOX' || $key=='BWOUTLINE' || $key=='OUTLINE'))
+				{
+					// print "***********************************\n";
+					$curlink->$field=array(-1,-1,-1);
+					$linematched++;
+				}
+			}
+
+			if ($last_seen == 'LINK' && preg_match(
+				"/^\s*ARROWSTYLE\s+(\d+)\s+(\d+)\s*$/i", $buffer, $matches))
+			{
+				$curlink->arrowstyle=$matches[1] . ' ' . $matches[2];
+				$linematched++;
+			}
+			
+
+			if ($linematched == 0 && trim($buffer) != '') { warn
+				("Unrecognised config on line $linecount: $buffer"); }
+
+			if ($linematched > 1) { warn
+			("Same line ($linecount) interpreted twice. This is a program error. Please report to Howie with your config!\nThe line was: $buffer");
+			}
+		} // if blankline
+	}     // while
+
+	if ($last_seen == "NODE")
+	{
+		if ($curnode->name == 'DEFAULT')
+		{
+			$this->defaultnode=$curnode;
+			debug ("Saving Default Node: " . $curnode->name . "\n");
+		}
+		else
+		{
+			$this->nodes[$curnode->name]=$curnode;
+			debug ("Saving Node: " . $curnode->name . "\n");
+		}
 	}
 
-	fclose ($fd);
-	debug("ReadConfig has finished reading the file ($linecount lines)\n");
+	if ($last_seen == "LINK")
+	{
+		if ($curlink->name == 'DEFAULT')
+		{
+			$this->defaultlink=$curlink;
+			debug ("Saving Default Link: " . $curlink->name . "\n");
+		}
+		else
+		{
+			if (isset($curlink->a) && isset($curlink->b))
+			{
+				$this->links[$curlink->name]=$curlink;
+				debug ("Saving Link: " . $curlink->name . "\n");
+			}
+			else { warn ("Dropping LINK " . $curlink->name . " - it hasn't got 2 NODES!"); }
+		}
+	}
+		
+	debug("ReadConfig has finished reading the config ($linecount lines)\n");
 	debug("------------------------------------------\n");
 
 	// load some default colouring, otherwise it all goes wrong

@@ -69,8 +69,8 @@ class WeatherMapNode extends WeatherMapItem
 				'labelfont' => 3,
 				'relative_to' => '',
 				'relative_resolved' => FALSE,
-				'x' => 0,
-				'y' => 0,
+				'x' => NULL,
+				'y' => NULL,
 				'inscalekey'=>'', 'outscalekey'=>'',
 				#'incolour'=>-1,'outcolour'=>-1,
 				'original_x' => 0,
@@ -119,6 +119,10 @@ class WeatherMapNode extends WeatherMapItem
 	// figure out where the real NODE centre is, relative to the top-left corner.
 	function pre_render($im, &$map)
 	{
+		// don't bother drawing if there's no position - it's a template
+		if( is_null($this->x) ) return;
+		if( is_null($this->y) ) return;
+		
 		// apparently, some versions of the gd extension will crash
 		// if we continue...
 		if($this->label == '' && $this->iconfile=='') return;

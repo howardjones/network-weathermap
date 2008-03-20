@@ -17,7 +17,8 @@ cp out.png out2.png out3.png tests/
 
 ./mk-torture.pl > tests/torture.conf
 
-CONFIGS="configs/096-test.conf configs/095-test.conf random-bits/suite-1.conf random-bits/suite-2.conf tests/torture.conf"
+# CONFIGS="configs/096-test.conf configs/095-test.conf random-bits/suite-1.conf random-bits/suite-2.conf tests/torture.conf"
+CONFIGS="configs/096-test.conf configs/095-test.conf"
 
 if [ "X$@" != "X" ]; then
 	CONFIGS=$@

@@ -91,7 +91,7 @@ class WeatherMapLink extends WeatherMapItem
 			'b_offset' => 'C',
 			#'incomment' => '',
 			#'outcomment' => '',
-			'zorder' => 5,
+			'zorder' => 300,
 			'overlibcaption' => array('',''),
 			'max_bandwidth_in' => 100000000,
 			'max_bandwidth_out' => 100000000,

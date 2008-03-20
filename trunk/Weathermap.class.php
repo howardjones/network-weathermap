@@ -138,6 +138,8 @@ class WeatherMap extends WeatherMapBase
 	var $links = array(); // an array of WeatherMapLinks
 	var $texts = array(); // an array containing all the extraneous text bits
 	var $used_images = array(); // an array of image filenames referred to (used by editor)
+	var $seen_zlayers = array(0=>array(),1000=>array()); // 0 is the background, 100 is the legends, title, etc
+
 	var $background;
 	var $htmlstyle;
 	var $imap;
@@ -1523,7 +1525,7 @@ function ReadConfig($input)
 					array('LINK','/^\s*INOVERLIBCAPTION\s+(.*)\s*$/i',array('overlibcaption[IN]'=>1)),
 					array('LINK','/^\s*OUTOVERLIBCAPTION\s+(.*)\s*$/i',array('overlibcaption[OUT]'=>1)),
 											
-					array('(NODE|LINK)', "/^\s*ZORDER\s+([-+]?\d+)$/i", array('zorder'=>1)),
+					array('(NODE|LINK)', "/^\s*ZORDER\s+([-+]?\d+)\s*$/i", array('zorder'=>1)),
 					array('(NODE|LINK)', "/^\s*OVERLIBWIDTH\s+(\d+)\s*$/i", array('overlibwidth'=>1)),
 					array('(NODE|LINK)', "/^\s*OVERLIBHEIGHT\s+(\d+)\s*$/i", array('overlibheight'=>1)),
 					array('NODE', "/^\s*POSITION\s+([-+]?\d+)\s+([-+]?\d+)\s*$/i", array('x'=>1,'y'=>2)),
@@ -2073,6 +2075,23 @@ function ReadConfig($input)
 	$this->numscales['DEFAULT']=$scalesseen;
 	$this->configfile="$filename";
 
+	
+	debug("Building cache of z-layers.\n");
+
+	$allitems = array_merge($this->links, $this->nodes);
+
+	foreach ($allitems as &$item)
+	{
+		$z = $item->zorder;
+		if(!isset($this->seen_zlayers[$z]) || !is_array($this->seen_zlayers[$z]))
+		{
+			$this->seen_zlayers[$z]=array();
+		}
+		array_push($this->seen_zlayers[$z], $item);
+	}
+
+	debug("Found ".sizeof($this->seen_zlayers)." z-layers including builtins (0,100).\n");
+
 	// calculate any relative positions here - that way, nothing else
 	// really needs to know about them
 
@@ -2389,33 +2408,68 @@ function DrawMap($filename = '', $thumbnailfile = '', $thumbnailmax = 250, $with
 
 		# foreach ($this->nodes as $node) { $this->nodes[$node->name]->calc_size(); }
 
-		foreach ($this->nodes as $node) { $node->pre_render($image, $this); }
-		foreach ($this->links as $link) { $link->Draw($image, $this); }
-
-		if($withnodes)
+		// do the node rendering stuff first, regardless of where they are actually drawn.
+		foreach ($this->nodes as $node)
 		{
-			foreach ($this->nodes as $node) {
-				$node->NewDraw($image, $this);
-				# debug($node->name.": ".var_dump($node->notes)."\n");
-			}
-			# debug("DEFAULT: ".var_dump($this->defaultnode->notes)."\n");
+			// don't try and draw template nodes
+			// if(!is_null($node->x)) $node->pre_render($image, $this);
 		}
+		
+		// foreach ($this->nodes as $node) { $node->pre_render($image, $this); }
+		// foreach ($this->links as $link) { $link->Draw($image, $this); }
 
-		  foreach ($this->colours as $scalename=>$colours)
+		$all_layers = array_keys($this->seen_zlayers);
+		sort($all_layers);
+
+		foreach ($all_layers as $z)
 		{
-			debug("Drawing KEY for $scalename if necessary.\n");
-
-			if( (isset($this->numscales[$scalename])) && (isset($this->keyx[$scalename])) && ($this->keyx[$scalename] >= 0) && ($this->keyy[$scalename] >= 0) )
+			$z_items = $this->seen_zlayers[$z];
+			debug("Drawing layer $z\n");
+			// all the map 'furniture' is fixed at z=1000
+			if($z==1000)
 			{
-				if($this->keystyle[$scalename]=='classic') $this->DrawLegend_Classic($image,$scalename);
-				if($this->keystyle[$scalename]=='horizontal') $this->DrawLegend_Horizontal($image,$scalename,$this->keysize[$scalename]);
-				if($this->keystyle[$scalename]=='vertical') $this->DrawLegend_Vertical($image,$scalename,$this->keysize[$scalename]);
+				foreach ($this->colours as $scalename=>$colours)
+				{
+					debug("Drawing KEY for $scalename if necessary.\n");
+
+					if( (isset($this->numscales[$scalename])) && (isset($this->keyx[$scalename])) && ($this->keyx[$scalename] >= 0) && ($this->keyy[$scalename] >= 0) )
+					{
+						if($this->keystyle[$scalename]=='classic') $this->DrawLegend_Classic($image,$scalename);
+						if($this->keystyle[$scalename]=='horizontal') $this->DrawLegend_Horizontal($image,$scalename,$this->keysize[$scalename]);
+						if($this->keystyle[$scalename]=='vertical') $this->DrawLegend_Vertical($image,$scalename,$this->keysize[$scalename]);
+					}
+				}
+
+				$this->DrawTimestamp($image, $this->timefont, $this->colours['DEFAULT']['TIME']['gdref1']);
+				$this->DrawTitle($image, $this->titlefont, $this->colours['DEFAULT']['TITLE']['gdref1']);
+			}
+			
+			if(is_array($z_items))
+			{
+				foreach($z_items as $it)
+				{
+					if(strtolower(get_class($it))=='weathermaplink')
+					{
+						debug("Drawing LINK ".$it->name."\n");
+						$it->Draw($image, $this);
+					}
+					if(strtolower(get_class($it))=='weathermapnode')
+					{
+						if(!is_null($it->x)) $it->pre_render($image, $this);
+						if($withnodes)
+						{
+							// don't try and draw template nodes
+							if(!is_null($it->x))
+							{
+								debug("Drawing NODE ".$it->name."\n");
+								$it->NewDraw($image, $this);
+							}
+						}
+					}
+				}
 			}
 		}
-
-		$this->DrawTimestamp($image, $this->timefont, $this->colours['DEFAULT']['TIME']['gdref1']);
-		$this->DrawTitle($image, $this->titlefont, $this->colours['DEFAULT']['TITLE']['gdref1']);
-
+				
 		# $this->DrawNINK($image,300,300,48);
 
 		// for the editor, we can optionally overlay some other stuff

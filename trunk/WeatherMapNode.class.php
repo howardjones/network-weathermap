@@ -99,7 +99,7 @@ class WeatherMapNode extends WeatherMapItem
 				'labeloffset' => '',
 				'labeloffsetx' => 0,
 				'labeloffsety' => 0,
-				'zorder' => 10,
+				'zorder' => 600,
 				'max_bandwidth_in' => 100,
 				'max_bandwidth_out' => 100,
 				'max_bandwidth_in_cfg' => '100',
@@ -868,8 +868,9 @@ class WeatherMapNode extends WeatherMapItem
 	{
 		$js='';
 		$js.="Nodes[" . js_escape($this->name) . "] = {";
-		$js.="x:" . $this->x . ", ";
-		$js.="y:" . $this->y . ", ";
+		$js.="x:" . (is_null($this->x)? "'null'" : $this->x) . ", ";
+		$js.="y:" . (is_null($this->y)? "'null'" : $this->y) . ", ";
+		// $js.="y:" . $this->y . ", ";
 		$js.="ox:" . $this->original_x . ", ";
 		$js.="oy:" . $this->original_y . ", ";
 		$js.="relative_to:" . js_escape($this->relative_to) . ", ";

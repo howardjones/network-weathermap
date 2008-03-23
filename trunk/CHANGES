@@ -4,8 +4,8 @@
 	
 0.95b	FIXED - SQL schema issue that upset some mysql versions
 	FIXED - Removed sometime-problem debugging code in editor
-        FIXED - incorrect jquery path in cacti-picker
-        FIXED - INFOURL not used without overlib
+	FIXED - incorrect jquery path in cacti-picker
+	FIXED - INFOURL not used without overlib
 	FIXED - 'none' colours on LINKs were broken by typo.
 	FIXED - NOTES, INNOTES, OUTNOTES all just flat-out borken in 0.95 and 0.95a
 	FIXED - Page title can be incorrect if filehash starts with a digit.

@@ -53,11 +53,13 @@ class WeatherMapNode extends WeatherMapItem
 	var $relative_to;
 	var $zorder;
 	var $template;
+	var $boundingboxes=array();
 
 	function WeatherMapNode()
 	{
 		$this->inherit_fieldlist=array
 			(
+				'boundingboxes'=>array(),
 				'my_default' => NULL,
 				'label' => '',
 				'proclabel' => '',
@@ -418,7 +420,8 @@ class WeatherMapNode extends WeatherMapItem
 				$map->nodes[$this->name]->width = imagesx($icon_im);
 				$map->nodes[$this->name]->height = imagesy($icon_im);
 
-				$map->imap->addArea("Rectangle", "NODE:" . $this->name . ':0', '', array($icon_x1, $icon_y1, $icon_x2, $icon_y2));
+				// $map->imap->addArea("Rectangle", "NODE:" . $this->name . ':0', '', array($icon_x1, $icon_y1, $icon_x2, $icon_y2));
+				$map->nodes[$this->name]->boundingboxes[] = array($icon_x1, $icon_y1, $icon_x2, $icon_y2);
 			}
 
 		}
@@ -450,7 +453,8 @@ class WeatherMapNode extends WeatherMapItem
 
 		if($this->label != '')
 		{
-			$map->imap->addArea("Rectangle", "NODE:" . $this->name .':1', '', array($label_x1, $label_y1, $label_x2, $label_y2));
+			// $map->imap->addArea("Rectangle", "NODE:" . $this->name .':1', '', array($label_x1, $label_y1, $label_x2, $label_y2));
+			$map->nodes[$this->name]->boundingboxes[] = array($label_x1, $label_y1, $label_x2, $label_y2);
 		}
 
 		// work out the bounding box of the whole thing
@@ -639,44 +643,6 @@ class WeatherMapNode extends WeatherMapItem
 		imagestring($im, $font, $x - imagefontwidth($font)*2, $y-$quarter-imagefontheight($font)/2,"2.5M",$outline);
 		imagestring($im, $font, $x - imagefontwidth($font)*2, $y+$quarter-imagefontheight($font)/2,"786M",$outline);
 
-	}
-
-	function calc_size()
-	{
-		$this->width=0;
-		$this->height=0;
-
-		// calculate the size of the NODE box, so we can make links end at corners.
-		if ($this->label != '')
-		{
-			$padding=0;
-			$font=$this->labelfont;
-
-			list($strwidth, $strheight)=$this->owner->myimagestringsize($font, $this->label);
-
-			$boxwidth=$strwidth * 1.1;
-			$boxheight=$strheight * 1.1;
-
-			$this->width=$boxwidth;
-			$this->height=$boxheight;
-		}
-
-		// if there's an icon, then that's what the corners relate to
-		if ($this->iconfile != '')
-		{
-			# $temp_im=imagecreatefrompng($this->iconfile);
-			$temp_im = imagecreatefromfile($this->iconfile);
-
-			if ($temp_im)
-			{
-				$this->width=imagesx($temp_im);
-				$this->height=imagesy($temp_im);
-			}
-
-			imagedestroy ($temp_im);
-		}
-
-		debug ("PRECALC $this->name: $this->width x $this->height\n");
 	}
 
 	function Reset(&$newowner)
@@ -932,132 +898,6 @@ class WeatherMapNode extends WeatherMapItem
 		$this->max_bandwidth_in_cfg=$inbw;
 		$this->max_bandwidth_out_cfg=$outbw;
 		debug (sprintf("Setting bandwidth (%s -> %d bps, %s -> %d bps, KILO = %d)\n", $inbw, $this->max_bandwidth_in, $outbw, $this->max_bandwidth_out, $kilo));
-	}
-
-	function Draw($im, &$map)
-	{
-		$strwidth=0;
-		$strheight=0;
-
-		// we do this little bit first, so that the label-offset stuff can know it
-		if ($this->label != '')
-		{
-			$padding=0;
-			$font=$this->labelfont;
-
-			list($strwidth, $strheight)=$map->myimagestringsize($font, $this->label);
-
-			$boxwidth=$strwidth * 1.0;
-			$boxheight=$strheight * 1.0;
-
-			debug ("Node->Draw: Metrics are: $font $strwidth x $strheight -> $boxwidth x $boxheight\n");
-		}
-
-		if ($this->iconfile != '')
-		{
-			if (is_readable($this->iconfile))
-			{
-				imagealphablending($im, true);
-				// draw the supplied icon, instead of the labelled box
-				$temp_im=imagecreatefrompng($this->iconfile);
-
-				if ($temp_im)
-				{
-					$w=imagesx($temp_im);
-					$h=imagesy($temp_im);
-					$x1=$this->x - $w / 2;
-					$y1=$this->y - $h / 2;
-					$x2=$this->x + $w / 2;
-					$y2=$this->y + $h / 2;
-
-					imagecopy($im, $temp_im, $x1, $y1, 0, 0, $w, $h);
-					$map->imap->addArea("Rectangle", "NODE:" . $this->name.':2', '', array($x1, $y1, $x2, $y2));
-					imagedestroy ($temp_im);
-
-					if ($this->labeloffset != '')
-					{
-						$this->labeloffsetx=0;
-						$this->labeloffsety=0;
-
-						list($dx, $dy)=calc_offset($this->labeloffset, ($w + $strwidth), ($h + $strheight));
-
-						$this->labeloffsetx=$dx;
-						$this->labeloffsety=$dy;
-					}
-				}
-				else { warn ("Couldn't open PNG ICON: " . $this->iconfile . " - is it a PNG?\n"); }
-			}
-			else { warn ("ICON " . $this->iconfile
-				. " does not exist, or is not readble. Check path and permissions.\n"); }
-		}
-
-		if ($this->label != '')
-		{
-			$x=$this->x + $this->labeloffsetx;
-			$y=$this->y + $this->labeloffsety;
-
-			$x1 = $x - ($boxwidth / 2) - 2;
-			$x2 = $x + ($boxwidth / 2) + 2;
-			$y1 = $y - ($boxheight / 2) - 2;
-			$y2 = $y + ($boxheight / 2) + 2;
-
-			$txt_x = $x - $strwidth / 2;
-			$txt_y = $y + $strheight / 2;
-
-			if ($this->iconfile == '')
-			{
-				if ($this->labelbgcolour != array
-					(
-						-1,
-						-1,
-						-1
-					))
-				{
-					$col=myimagecolorallocate($im, $this->labelbgcolour[0], $this->labelbgcolour[1],
-						$this->labelbgcolour[2]);
-					imagefilledrectangle($im, $x1, $y1, $x2, $y2, $col);
-				}
-
-				if ($this->selected)
-				{
-					imagerectangle($im, $x1, $y1, $x2, $y2, $map->selected);
-					// would be nice if it was thicker, too...
-					imagerectangle($im, $x1 - 1, $y1 - 1, $x2 + 1, $y2 + 1, $map->selected);
-				}
-				else
-				{
-					if ($this->labeloutlinecolour != array
-						(
-							-1,
-							-1,
-							-1
-						))
-					{
-						$col=myimagecolorallocate($im,                          $this->labeloutlinecolour[0],
-							$this->labeloutlinecolour[1], $this->labeloutlinecolour[2]);
-						imagerectangle($im, $x1, $y1, $x2, $y2, $col);
-					}
-				}
-			}
-
-			if ($this->labelfontshadowcolour != array
-				(
-					-1,
-					-1,
-					-1
-				))
-			{
-				$col=myimagecolorallocate($im, $this->labelfontshadowcolour[0], $this->labelfontshadowcolour[1],
-					$this->labelfontshadowcolour[2]);
-				$map->myimagestring($im, $font, $txt_x + 1, $txt_y + 1, $this->label, $col);
-			}
-
-			$col=myimagecolorallocate($im, $this->labelfontcolour[0], $this->labelfontcolour[1],
-				$this->labelfontcolour[2]);
-			$map->myimagestring($im, $font, $txt_x, $txt_y, $this->label, $col);
-
-			$map->imap->addArea("Rectangle", "NODE:" . $this->name. ':3', '', array($x1, $y1, $x2, $y2));
-		}
 	}
 };
 

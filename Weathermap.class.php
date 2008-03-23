@@ -1,5 +1,5 @@
 <?php
-// PHP Weathermap 0.95b
+// PHP Weathermap 0.96dev
 // Copyright Howard Jones, 2005-2008 howie@thingy.com
 // http://www.network-weathermap.com/
 // Released under the GNU Public License
@@ -10,7 +10,7 @@ require_once "WeatherMap.functions.php";
 require_once "WeatherMapNode.class.php";
 require_once "WeatherMapLink.class.php";
 
-$WEATHERMAP_VERSION="0.95b";
+$WEATHERMAP_VERSION="0.96dev";
 $weathermap_debugging=FALSE;
 $weathermap_map="";
 $weathermap_debug_suppress = array("processstring","mysprintf");
@@ -2334,6 +2334,7 @@ function AllocateScaleColours($im,$refname='gdref1')
 
 function DrawMap($filename = '', $thumbnailfile = '', $thumbnailmax = 250, $withnodes = TRUE, $use_overlay = FALSE)
 {
+	debug("Trace: DrawMap()\n");
 	$bgimage=NULL;
 	$this->cachefile_version = crc32(file_get_contents($this->configfile));
 
@@ -2406,18 +2407,14 @@ function DrawMap($filename = '', $thumbnailfile = '', $thumbnailmax = 250, $with
 
 		// Now it's time to draw a map
 
-		# foreach ($this->nodes as $node) { $this->nodes[$node->name]->calc_size(); }
-
 		// do the node rendering stuff first, regardless of where they are actually drawn.
+		// this is so we can get the size of the nodes, which links will need if they use offsets
 		foreach ($this->nodes as $node)
 		{
 			// don't try and draw template nodes
-			// if(!is_null($node->x)) $node->pre_render($image, $this);
+			if(!is_null($node->x)) $node->pre_render($image, $this);
 		}
 		
-		// foreach ($this->nodes as $node) { $node->pre_render($image, $this); }
-		// foreach ($this->links as $link) { $link->Draw($image, $this); }
-
 		$all_layers = array_keys($this->seen_zlayers);
 		sort($all_layers);
 
@@ -2455,7 +2452,7 @@ function DrawMap($filename = '', $thumbnailfile = '', $thumbnailmax = 250, $with
 					}
 					if(strtolower(get_class($it))=='weathermapnode')
 					{
-						if(!is_null($it->x)) $it->pre_render($image, $this);
+						// if(!is_null($it->x)) $it->pre_render($image, $this);
 						if($withnodes)
 						{
 							// don't try and draw template nodes
@@ -2463,6 +2460,12 @@ function DrawMap($filename = '', $thumbnailfile = '', $thumbnailmax = 250, $with
 							{
 								debug("Drawing NODE ".$it->name."\n");
 								$it->NewDraw($image, $this);
+								$ii=0;
+								foreach($it->boundingboxes as $bbox)
+								{
+									$this->imap->addArea("Rectangle", "NODE:" . $it->name . ':'.$ii, '', $bbox);
+									$ii++;
+								}
 							}
 						}
 					}
@@ -2473,41 +2476,39 @@ function DrawMap($filename = '', $thumbnailfile = '', $thumbnailmax = 250, $with
 		# $this->DrawNINK($image,300,300,48);
 
 		// for the editor, we can optionally overlay some other stuff
-                if($this->context == 'editor')
-                {
+        if($this->context == 'editor')
+        {
 			if($use_overlay)
 			{
-			$overlay = myimagecolorallocate($image, 200, 0, 0);
+				$overlay = myimagecolorallocate($image, 200, 0, 0);
 
-			// first, we can show relatively positioned NODEs
-                        foreach ($this->nodes as $node) {
-                                if($node->relative_to != '')
-                                {
-                                        $rel_x = $this->nodes[$node->relative_to]->x;
-                                        $rel_y = $this->nodes[$node->relative_to]->y;
-                                        imagearc($image,$node->x, $node->y,
-                                                15,15,0,360,$overlay);
-                                        imagearc($image,$node->x, $node->y,
-                                                16,16,0,360,$overlay);
+				// first, we can show relatively positioned NODEs
+				foreach ($this->nodes as $node) {
+						if($node->relative_to != '')
+						{
+								$rel_x = $this->nodes[$node->relative_to]->x;
+								$rel_y = $this->nodes[$node->relative_to]->y;
+								imagearc($image,$node->x, $node->y,
+										15,15,0,360,$overlay);
+								imagearc($image,$node->x, $node->y,
+										16,16,0,360,$overlay);
 
-                                        imageline($image,$node->x, $node->y,
-                                                $rel_x, $rel_y, $overlay);
-                                }
-                        }
+								imageline($image,$node->x, $node->y,
+										$rel_x, $rel_y, $overlay);
+						}
+				}
 
-			// then overlay VIAs, so they can be seen
-			foreach($this->links as $link)
-			{
-				foreach ($link->vialist as $via)
+				// then overlay VIAs, so they can be seen
+				foreach($this->links as $link)
 				{
-                        		imagearc($image, $via[0],$via[1],10,10,0,360,$overlay);
-                        		imagearc($image, $via[0],$via[1],12,12,0,360,$overlay);
-               			 }
-
-
+					foreach ($link->vialist as $via)
+					{
+						imagearc($image, $via[0],$via[1],10,10,0,360,$overlay);
+						imagearc($image, $via[0],$via[1],12,12,0,360,$overlay);
+					}
+				}
 			}
-			}
-                }
+        }
 
 
 
@@ -2616,7 +2617,7 @@ function CleanUp()
 
 function PreloadMapHTML()
 {
-	
+	debug("Trace: PreloadMapHTML()\n");
 		//   onmouseover="return overlib('<img src=graph.png>',DELAY,250,CAPTION,'$caption');"  onmouseout="return nd();"
 
 		// find the middle of the map
@@ -2820,9 +2821,14 @@ function asJSON()
 	return($json);
 }
 
-// imagemapname is a parameter, so we can stack up several maps in the Cacti plugin
+// This method MUST run *after* DrawMap. It relies on DrawMap to call the map-drawing bits
+// which will populate the ImageMap with regions.
+//
+// imagemapname is a parameter, so we can stack up several maps in the Cacti plugin with their own imagemaps
 function MakeHTML($imagemapname = "weathermap_imap")
 {
+	debug("Trace: MakeHTML()\n");
+	// PreloadMapHTML fills in the ImageMap info, ready for the HTML to be created.
 	$this->PreloadMapHTML();
 
 	$html='';

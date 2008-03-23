@@ -245,13 +245,11 @@ class WeatherMapLink extends WeatherMapItem
 		$x2=$map->nodes[$this->b->name]->x;
 		$y2=$map->nodes[$this->b->name]->y;
 		
-		// Adjust them if there's an offset requested
-		#$a_height=$map->nodes[$this->a->name]->height;
-		#$a_width=$map->nodes[$this->a->name]->width;
-
-#		$b_height=$map->nodes[$this->b->name]->height;
-#		$b_width=$map->nodes[$this->b->name]->width;
-
+		if(is_null($x1)) { warn("LINK ".$this->name." uses a NODE with no POSITION!\n"); return; }
+		if(is_null($y1)) { warn("LINK ".$this->name." uses a NODE with no POSITION!\n"); return; }
+		if(is_null($x2)) { warn("LINK ".$this->name." uses a NODE with no POSITION!\n"); return; }
+		if(is_null($y2)) { warn("LINK ".$this->name." uses a NODE with no POSITION!\n"); return; }
+		
 		list($dx, $dy)=calc_offset($this->a_offset, $map->nodes[$this->a->name]->width, $map->nodes[$this->a->name]->height);
 		$x1+=$dx;
 		$y1+=$dy;

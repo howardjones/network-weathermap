@@ -726,42 +726,8 @@ function ReadData()
 // nodename is a vestigal parameter, from the days when nodes where just big labels
 function DrawLabel($im, $x, $y, $text, $font, $padding, $linkname, $textcolour, $bgcolour, $outlinecolour, &$map, $direction)
 {
-	list($strwidth, $strheight)=$this->myimagestringsize($font, $text);
-
-	$extra=3;
-
-	$x1=$x - ($strwidth / 2) - $padding - $extra;
-	$x2=$x + ($strwidth / 2) + $padding + $extra;
-	$y1=$y - ($strheight / 2) - $padding - $extra;
-	$y2=$y + ($strheight / 2) + $padding + $extra;
-
-	if ($bgcolour != array
-		(
-			-1,
-			-1,
-			-1
-		))
-	{
-		$bgcol=myimagecolorallocate($im, $bgcolour[0], $bgcolour[1], $bgcolour[2]);
-		imagefilledrectangle($im, $x1, $y1, $x2, $y2, $bgcol);
-	}
-
-	if ($outlinecolour != array
-		(
-			-1,
-			-1,
-			-1
-		))
-	{
-		$outlinecol=myimagecolorallocate($im, $outlinecolour[0], $outlinecolour[1], $outlinecolour[2]);
-		imagerectangle($im, $x1, $y1, $x2, $y2, $outlinecol);
-	}
-
-	$textcol=myimagecolorallocate($im, $textcolour[0], $textcolour[1], $textcolour[2]);
-	$this->myimagestring($im, $font, $x - $strwidth / 2, $y + $strheight / 2 + 1, $text, $textcol);
-
-	$this->imap->addArea("Rectangle", "LINK:".$linkname.':'.($direction+2), '', array($x1, $y1, $x2, $y2));
-
+	$this->DrawLabelRotated($im, $x, $y, 0, $text, $font, $padding, $linkname, $textcolour, $bgcolour, $outlinecolour, &$map, $direction);
+	return;
 }
 
 // nodename is a vestigal parameter, from the days when nodes where just big labels
@@ -815,8 +781,18 @@ function DrawLabelRotated($im, $x, $y, $angle, $text, $font, $padding, $linkname
 	$this->myimagestring($im, $font, $points[8], $points[9], $text, $textcol,$angle);
 
 	$areaname = "LINK:".$linkname.':'.($direction+2);
-	$map->imap->addArea("Polygon", $areaname, '', $points);
-	debug ("Adding Poly imagemap for $areaname\n");
+	
+	// the rectangle is about half the size in the HTML, and easier to optimise/detect in the browser
+	if($angle==0)
+	{
+		$map->imap->addArea("Rectangle", $areaname, '', array($x1, $y1, $x2, $y2));
+		debug ("Adding Rectangle imagemap for $areaname\n");
+	}
+	else
+	{
+		$map->imap->addArea("Polygon", $areaname, '', $points);
+		debug ("Adding Poly imagemap for $areaname\n");
+	}
 
 }
 

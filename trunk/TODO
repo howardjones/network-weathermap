@@ -4,6 +4,9 @@ DONE Z-order - layers for drawing
 Angled VIAs
 Get rid of defaultlink and defaultnode - use __DEFAULT in main array instead.
 (Multilayered inheritance) -> Parent property. Default parent is __DEFAULT
+New Link styles
+more AICONs - NINK, PIE, GAUGE
+(multiline (bw)labels? - interpret \n)
 
 Before 0.95
 -----------

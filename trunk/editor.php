@@ -744,7 +744,7 @@ else
 	if($map->background != '') $map->used_images[] = $map->background;
 	foreach ($map->nodes as $n)
 	{
-		if($n->iconfile != '' && ! preg_match("/(none|nink|inpie|outpie|box|rbox|round)/",$n->iconfile))
+		if($n->iconfile != '' && ! preg_match("/^(none|nink|inpie|outpie|box|rbox|gauge|round)$/",$n->iconfile))
 			$map->used_images[] = $n->iconfile;		
 	}
 

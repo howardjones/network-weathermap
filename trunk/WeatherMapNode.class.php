@@ -259,9 +259,9 @@ class WeatherMapNode extends WeatherMapItem
 			$icon_w = 0;
 			$icon_h = 0;
 
-			if($this->iconfile == 'inpie' || $this->iconfile == 'nink' || $this->iconfile == 'rbox' || $this->iconfile == 'box' || $this->iconfile == 'outpie' || $this->iconfile == 'round')
+			if($this->iconfile == 'rbox' || $this->iconfile == 'box' || $this->iconfile == 'round' || $this->iconfile == 'inpie' || $this->iconfile == 'outpie' || $this->iconfile == 'gauge' || $this->iconfile == 'nink')
 			{
-				debug("Artificial Icon for $this->name\n");
+				debug("Artificial Icon type " .$this->iconfile. " for $this->name\n");
 				// this is an artificial icon - we don't load a file for it
 
 				// XXX - add the actual DRAWING CODE!
@@ -847,7 +847,7 @@ class WeatherMapNode extends WeatherMapItem
 		$js.="overliburl:" . js_escape(join(" ",$this->overliburl[IN])) . ", ";
 		$js.="overlibwidth:" . $this->overlibheight . ", ";
 		$js.="overlibheight:" . $this->overlibwidth . ", ";
-		if(preg_match("/(none|nink|inpie|outpie|box|rbox|round)/",$this->iconfile))
+		if(preg_match("/^(none|nink|inpie|outpie|box|rbox|gauge|round)$/",$this->iconfile))
 		{
 			$js.="iconfile:" . js_escape("::".$this->iconfile);
 		}

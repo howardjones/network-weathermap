@@ -1,12 +1,19 @@
-Check NULL coords in link code
-
+Before 0.96
+-----------
+DONE Check for NULL coords in link code
 DONE Z-order - layers for drawing
 Angled VIAs
+New Link styles
 Get rid of defaultlink and defaultnode - use __DEFAULT in main array instead.
 (Multilayered inheritance) -> Parent property. Default parent is __DEFAULT
-New Link styles
 more AICONs - NINK, PIE, GAUGE
 (multiline (bw)labels? - interpret \n)
+Coverage/Usage stats
+Per-map warning count in DB
+WUG DS
+Nagios DS
+RRD xport DS
+Some SETs to suppress warnings?
 
 Before 0.95
 -----------

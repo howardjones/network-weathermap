@@ -126,18 +126,6 @@ class WeatherMapLink extends WeatherMapItem
 		foreach (array_keys($this->inherit_fieldlist)as $fld) { $this->$fld = $source->$fld; }
 	}
 
-	// Set the bandwidth for this link. Convert from KMGT as necessary
-	function SetBandwidth($inbw, $outbw)
-	{
-		$kilo = $this->owner->kilo;
-                $this->max_bandwidth_in=unformat_number($inbw, $kilo);
-                $this->max_bandwidth_out=unformat_number($outbw, $kilo);
-                $this->max_bandwidth_in_cfg=$inbw;  
-                $this->max_bandwidth_out_cfg=$outbw;
-                debug (sprintf("Setting bandwidth (%s -> %d bps, %s -> %d bps, KILO = %d)\n", $inbw, $this->max_bandwidth_in, $outbw,
- $this->max_bandwidth_out, $kilo));
-	}
-
 	function DrawComments($image,$col,$width)
 	{
 		$curvepoints =& $this->curvepoints;
@@ -263,15 +251,11 @@ class WeatherMapLink extends WeatherMapItem
 
 		if ($this->outlinecolour != array(-1,-1,-1))
 		{
-			debug("Outline colour is NOT none for ".$this->name." ".$this->outlinecolour."\n");
+			//debug("Outline colour is NOT none for ".$this->name." ".$this->outlinecolour."\n");
 				$outline_colour=myimagecolorallocate(
 					$im, $this->outlinecolour[0], $this->outlinecolour[1],
 					$this->outlinecolour[2]);
-		}
-		else
-		{
-			debug("Outline colour is none\n");
-		}
+		}	
 		
 		if ($this->commentfontcolour != array(-1,-1,-1))
 		{
@@ -425,14 +409,16 @@ class WeatherMapLink extends WeatherMapItem
 
 					if($this->labelboxstyle == 'angled')
 					{
-						$map->DrawLabelRotated($im, $task[0],            $task[1],$task[6],           $thelabel, $this->bwfont, $padding,
-							$this->name,  $this->bwfontcolour, $this->bwboxcolour, $this->bwoutlinecolour,$map, $task[7]);
+						$angle = $task[6];
 					}
 					else
 					{
-						$map->DrawLabel($im, $task[0],            $task[1],           $thelabel, $this->bwfont, $padding,
-							$this->name,  $this->bwfontcolour, $this->bwboxcolour, $this->bwoutlinecolour,$map, $task[7]);
+						$angle = 0;
 					}
+					
+					$map->DrawLabelRotated($im, $task[0],            $task[1],$angle,           $thelabel, $this->bwfont, $padding,
+							$this->name,  $this->bwfontcolour, $this->bwboxcolour, $this->bwoutlinecolour,$map, $task[7]);
+					
 					
 				}
 			}

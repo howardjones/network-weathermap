@@ -20,6 +20,7 @@ $configfile="weathermap.conf";
 $htmlfile='';
 $imagefile='';
 $dumpafter=0;
+$dumpstats=0;
 $randomdata=0;
 $dumpconfig='';
 $defines=array();
@@ -42,6 +43,7 @@ $long_opts=array
 		"output=",
 		"debug",
 		"uberdebug",
+		"stats",
 		"define=",
 		"no-data",
 		"randomdata",
@@ -94,6 +96,10 @@ if (sizeof($gopts) > 0)
 			$randomdata=1;
 			break;
 
+		case '--stats':
+			$dumpstats=1;
+			break;
+			
 		case '--uberdebug':
 			// allow ALL trace messages (normally we block some of the chatty ones)
 			$weathermap_debug_suppress=array();
@@ -254,6 +260,9 @@ if ($map->ReadConfig($configfile))
 	if ($map->dumpconfig != '')
 		$map->WriteConfig($map->dumpconfig);
 
+	if ($dumpstats != '')
+		$map->DumpStats();
+		
 	if ($dumpafter == 1)
 		print_r ($map);
 }

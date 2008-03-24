@@ -9,8 +9,7 @@ require_once "HTML_ImageMap.class.php";
 class WeatherMapNode extends WeatherMapItem
 {
 	var $owner;
-	var $x,
-		$y;
+	var $x,	$y;
 	var $original_x, $original_y,$relative_resolved;
 	var $width,
 		$height;
@@ -337,9 +336,74 @@ class WeatherMapNode extends WeatherMapItem
 					}
 				}
 
-				if($this->iconfile=='nink') { warn('inpie not implemented yet [WMWARN99]'); }
-				if($this->iconfile=='inpie') { warn('inpie not implemented yet [WMWARN99]'); }
-				if($this->iconfile=='outpie') { warn('outpie not implemented yet [WMWARN99]'); }
+				if($this->iconfile=='nink') { 
+					print "**************************************************************\n";
+					$rx = $this->iconscalew/2-1;
+					$ry = $this->iconscaleh/2-1;
+					$size = $this->iconscalew;
+					$quarter = $size/4;				
+										
+					list($col1,$node_scalekey,$node_scaletag) = $map->NewColourFromPercent($this->inpercent, $this->usescale,$this->name);
+					list($col2,$node_scalekey,$node_scaletag) = $map->NewColourFromPercent($this->outpercent, $this->usescale,$this->name);
+					
+					assert('!is_null($col1)');
+					assert('!is_null($col2)');
+					
+					$font = 12;
+
+					imagefilledarc($icon_im, $rx,$ry,$size,$size, 270,90, $col1->gdallocate($icon_im), IMG_ARC_PIE);
+					imagefilledarc($icon_im, $rx,$ry,$size,$size, 90,270, $col2->gdallocate($icon_im), IMG_ARC_PIE);
+
+					imagefilledarc($icon_im, $rx,$ry+$quarter,$quarter*2,$quarter*2, 0,360, $col1->gdallocate($icon_im), IMG_ARC_PIE);
+					imagefilledarc($icon_im, $rx,$ry-$quarter,$quarter*2,$quarter*2, 0,360, $col2->gdallocate($icon_im), IMG_ARC_PIE);
+					
+					if($ink !== NULL && !$ink->is_none())
+					{
+						$instr = "2.5M";
+						$outstr = "786M";
+						
+						list($twid,$thgt) = $map->myimagestringsize($font,$instr);
+						$map->myimagestring($icon_im, $font, $rx - $twid/2, $ry- $quarter + ($thgt/2),$instr,$ink->gdallocate($icon_im));
+						
+						list($twid,$thgt) = $map->myimagestringsize($font,$outstr);
+						$map->myimagestring($icon_im, $font, $rx - $twid/2,  $ry + $quarter + ($thgt/2),$outstr,$ink->gdallocate($icon_im));
+						
+						imageellipse($icon_im,$rx,$ry,$rx*2,$rx*2,$ink->gdallocate($icon_im) );	
+						//imagearc($icon_im, $rx+1,$ry+1,$quarter*4,$quarter*4, 0,360, $ink->gdallocate($icon_im));
+					}
+					print "^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n";
+				}
+				
+				if($this->iconfile=='inpie' || $this->iconfile=='outpie') { 
+					# list($colpie,$node_iconscalekey,$icontag) = $map->NewColourFromPercent($pc, $this->useiconscale,$this->name);
+					
+					if($this->iconfile=='inpie') $segment_angle = (($this->inpercent)/100) * 360;
+					if($this->iconfile=='outpie') $segment_angle = (($this->outpercent)/100) * 360;
+					
+					$rx = $this->iconscalew/2-1;
+					$ry = $this->iconscaleh/2-1;
+										
+					if($fill !== NULL && !$fill->is_none() )
+					{
+						imagefilledellipse($icon_im,$rx,$ry,$rx*2,$ry*2,$fill->gdallocate($icon_im) );
+					}
+					
+					if($ink !== NULL && !$ink->is_none())
+					{
+						// imagefilledarc  ( resource $image  , int $cx  , int $cy  , int $width  , int $height  , int $start  , int $end  , int $color  , int $style  )
+						imagefilledarc($icon_im, $rx,$ry, $rx*2,$ry*2, 0, $segment_angle, $ink->gdallocate($icon_im) , IMG_ARC_PIE);
+					}
+					
+					if($fill !== NULL && !$fill->is_none() )
+					{
+						imageellipse($icon_im,$rx,$ry,$rx*2,$ry*2,$fill->gdallocate($icon_im) );
+					}
+					
+					// warn('inpie AICON not implemented yet [WMWARN99]'); 
+				}
+				
+				// if($this->iconfile=='outpie') { warn('outpie AICON not implemented yet [WMWARN99]'); }
+				if($this->iconfile=='gauge') { warn('gauge AICON not implemented yet [WMWARN99]'); }
 
 			}
 			else
@@ -612,39 +676,6 @@ class WeatherMapNode extends WeatherMapItem
 	{
 	}
 
-	function DrawNINK($im, &$map, $size=32)
-	{
-		$quarter = $size/4;
-
-		$x = $this->x;
-		$y = $this->y;
-
-		$col1 = imagecolorallocate($im,255,0,0);
-		$col2 = imagecolorallocate($im,0,255,0);
-		$outline = imagecolorallocate($im,255,255,255);
-		$font = 2;
-
-		imagefilledarc($im,$x,$y,$size,$size,270,90,$col1,IMG_ARC_PIE);
-		imagefilledarc($im,$x,$y,$size,$size,90,270,$col2,IMG_ARC_PIE);
-
-		imagefilledarc($im,$x,$y+$quarter,$quarter*2,$quarter*2,0,360,$col1,IMG_ARC_PIE);
-		imagefilledarc($im,$x,$y-$quarter,$quarter*2,$quarter*2,0,360,$col2,IMG_ARC_PIE);
-
-		// draw in the text shadows first, if needed
-		if ($this->labelfontshadowcolour != array(-1,-1,-1))
-		{
-			$col=myimagecolorallocate($im, $this->labelfontshadowcolour[0], $this->labelfontshadowcolour[1],
-				$this->labelfontshadowcolour[2]);
-
-			imagestring($im, $font, 1 + $x - imagefontwidth($font)*2, 1 + $y-$quarter-imagefontheight($font)/2,"2.5M",$col);
-			imagestring($im, $font, 1 + $x - imagefontwidth($font)*2, 1 + $y+$quarter-imagefontheight($font)/2,"786M",$col);
-		}
-
-		imagestring($im, $font, $x - imagefontwidth($font)*2, $y-$quarter-imagefontheight($font)/2,"2.5M",$outline);
-		imagestring($im, $font, $x - imagefontwidth($font)*2, $y+$quarter-imagefontheight($font)/2,"786M",$outline);
-
-	}
-
 	function Reset(&$newowner)
 	{
 		$this->owner=$newowner;
@@ -886,18 +917,6 @@ class WeatherMapNode extends WeatherMapItem
 		$js .= "\"iconcachefile\":" . js_escape($this->cachefile);
 		$js .= "},\n";
 		return $js;
-	}
-
-	// Set the bandwidth for this link. Convert from KMGT as necessary
-	function SetBandwidth($inbw, $outbw)
-	{
-
-		$kilo = $this->owner->kilo;
-		$this->max_bandwidth_in=unformat_number($inbw, $kilo);
-		$this->max_bandwidth_out=unformat_number($outbw, $kilo);
-		$this->max_bandwidth_in_cfg=$inbw;
-		$this->max_bandwidth_out_cfg=$outbw;
-		debug (sprintf("Setting bandwidth (%s -> %d bps, %s -> %d bps, KILO = %d)\n", $inbw, $this->max_bandwidth_in, $outbw, $this->max_bandwidth_out, $kilo));
 	}
 };
 

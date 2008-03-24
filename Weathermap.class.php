@@ -191,6 +191,7 @@ class WeatherMap extends WeatherMapBase
 	var $activedatasourceclasses;
 
 	var $plugins = array();
+	var $usage_stats = array();
 
 	function WeatherMap()
 	{
@@ -723,14 +724,7 @@ function ReadData()
 	}
 }
 
-// nodename is a vestigal parameter, from the days when nodes where just big labels
-function DrawLabel($im, $x, $y, $text, $font, $padding, $linkname, $textcolour, $bgcolour, $outlinecolour, &$map, $direction)
-{
-	$this->DrawLabelRotated($im, $x, $y, 0, $text, $font, $padding, $linkname, $textcolour, $bgcolour, $outlinecolour, &$map, $direction);
-	return;
-}
-
-// nodename is a vestigal parameter, from the days when nodes where just big labels
+// nodename is a vestigal parameter, from the days when nodes were just big labels
 function DrawLabelRotated($im, $x, $y, $angle, $text, $font, $padding, $linkname, $textcolour, $bgcolour, $outlinecolour, &$map, $direction)
 {
 	list($strwidth, $strheight)=$this->myimagestringsize($font, $text);
@@ -1445,6 +1439,10 @@ function ReadConfig($input)
 			// these are all dealt with from this one array. The special-cases
 			// follow on from that
 			$config_keywords = array(
+					array('LINK','/^\s*(MAXVALUE|BANDWIDTH)\s+(\d+\.?\d*[KMGT]?)\s+(\d+\.?\d*[KMGT]?)\s*$/i',array('max_bandwidth_in_cfg'=>2,'max_bandwidth_out_cfg'=>3)),
+					array('LINK','/^\s*(MAXVALUE|BANDWIDTH)\s+(\d+\.?\d*[KMGT]?)\s*$/i',array('max_bandwidth_in_cfg'=>2,'max_bandwidth_out_cfg'=>2)),
+					array('NODE','/^\s*(MAXVALUE)\s+(\d+\.?\d*[KMGT]?)\s+(\d+\.?\d*[KMGT]?)\s*$/i',array('max_bandwidth_in_cfg'=>2,'max_bandwidth_out_cfg'=>3)),
+					array('NODE','/^\s*(MAXVALUE)\s+(\d+\.?\d*[KMGT]?)\s*$/i',array('max_bandwidth_in_cfg'=>2,'max_bandwidth_out_cfg'=>2)),
 					array('GLOBAL','/^\s*BACKGROUND\s+(.*)\s*$/i',array('background'=>1)),
 					array('GLOBAL','/^\s*HTMLOUTPUTFILE\s+(.*)\s*$/i',array('htmloutputfile'=>1)),
 					array('GLOBAL','/^\s*IMAGEOUTPUTFILE\s+(.*)\s*$/i',array('imageoutputfile'=>1)),
@@ -1461,7 +1459,7 @@ function ReadConfig($input)
 					array('(LINK|GLOBAL)', "/^\s*WIDTH\s+(\d+)\s*$/i", array('width'=>1)),
 					array('(LINK|GLOBAL)', "/^\s*HEIGHT\s+(\d+)\s*$/i", array('height'=>1)),
 					array('LINK', '/^\s*ARROWSTYLE\s+(classic|compact)\s*$/i', array('arrowstyle'=>1)),
-					array('LINK', '/^\s*VIASTYLE\s+(curved)\s*$/i', array('viastyle'=>1)),
+					array('LINK', '/^\s*VIASTYLE\s+(curved|angled)\s*$/i', array('viastyle'=>1)),
 					array('LINK', '/^\s*INCOMMENT\s+(.*)\s*$/i', array('comments[IN]'=>1)),
 					array('LINK', '/^\s*OUTCOMMENT\s+(.*)\s*$/i', array('comments[OUT]'=>1)),
 					array('LINK', '/^\s*BWFONT\s+(\d+)\s*$/i', array('bwfont'=>1)),
@@ -1484,6 +1482,7 @@ function ReadConfig($input)
 					array('LINK', '/^\s*INBWFORMAT\s+(.*)\s*$/i', array('bwlabelformats[IN]'=>1,'labelstyle'=>'--')),
 					array('NODE','/^\s*ICON\s+none\s*$/i',array('iconfile'=>'')),
 					array('NODE','/^\s*ICON\s+(\S+)\s*$/i',array('iconfile'=>1)),
+					array('NODE','/^\s*ICON\s+(\d+)\s+(\d+)\s+(inpie|outpie|box|rbox|round|gauge|nink)\s*$/i',array('iconfile'=>3, 'iconscalew'=>1, 'iconscaleh'=>2)),
 					array('NODE','/^\s*ICON\s+(\d+)\s+(\d+)\s+(\S+)\s*$/i',array('iconfile'=>3, 'iconscalew'=>1, 'iconscaleh'=>2)),
 					
 					array('NODE','/^\s*NOTES\s+(.*)\s*$/i',array('notestext[IN]'=>1,'notestext[OUT]'=>1)),
@@ -1513,9 +1512,16 @@ function ReadConfig($input)
 			{
 				if(preg_match("/".$keyword[0]."/",$last_seen))
 				{
+					$statskey = $last_seen."-".$keyword[1];
+					$statskey = str_replace( array('/^\s*','\s*$/i'),array('',''), $statskey);
+					if(!isset($this->usage_stats[$statskey])) $this->usage_stats[$statskey] = 0;
+					
 					if(preg_match($keyword[1],$buffer,$matches))
 					{
-						// print "MATCHED: ".$keyword[1]."\n";
+						print "CONFIG MATCHED: ".$keyword[1]."\n";
+						
+						$this->usage_stats[$statskey]++;
+						
 						foreach ($keyword[2] as $key=>$val)
 						{
 							// if it's a number, then it;s a match number,
@@ -1638,46 +1644,11 @@ function ReadConfig($input)
 				$curobj->bwlabelformats[OUT] = $format_out;
 				$linematched++;
 			}			
-
-			if ( ($last_seen == 'LINK') && (preg_match("/^\s*(BANDWIDTH|MAXVALUE)\s+(\d+\.?\d*[KMGT]?)\s*$/i", $buffer, $matches)))
-			{
-				$curobj->SetBandwidth($matches[2], $matches[2]);
-				$linematched++;
-			}
-
-			if ( ($last_seen == 'LINK') && (preg_match("/^\s*(MAXVALUE|BANDWIDTH)\s+(\d+\.?\d*[KMGT]?)\s+(\d+\.?\d*[KMGT]?)\s*$/i", $buffer,
-				$matches)))
-			{
-				$curobj->SetBandwidth($matches[2], $matches[3]);
-				$linematched++;
-			}
-
-			if ( ($last_seen == 'NODE') && (preg_match("/^\s*(MAXVALUE)\s+(\d+\.?\d*[KMGT]?)\s+(\d+\.?\d*[KMGT]?)\s*$/i", $buffer,
-				$matches)))
-			{
-				$curobj->SetBandwidth($matches[2], $matches[3]);
-				$linematched++;
-			}
-
-			if ( ($last_seen == 'NODE') && (preg_match("/^\s*(MAXVALUE)\s+(\d+\.?\d*[KMGT]?)\s*$/i", $buffer,
-				$matches)))
-			{
-				$curobj->SetBandwidth($matches[2], $matches[2]);
-				$linematched++;
-			}
 			
 			if (preg_match("/^\s*SET\s+(\S+)\s+(.*)\s*$/i", $buffer, $matches))
 			{
-				//if($last_seen == 'GLOBAL')
-				//{
-				//	$this->add_hint($matches[1],$matches[2]);
-				//	$linematched++;
-				//}
-				//else
-				//{
 					$curobj->add_hint($matches[1],$matches[2]);
 					$linematched++;
-			//	}
 			}				
 			
 			if (preg_match("/^\s*(IN|OUT)?OVERLIBGRAPH\s+(.+)$/i", $buffer, $matches))
@@ -2052,10 +2023,10 @@ function ReadConfig($input)
 	$this->configfile="$filename";
 
 	
-	debug("Building cache of z-layers.\n");
+	debug("Building cache of z-layers and finalising bandwidth.\n");
 
 	$allitems = array_merge($this->links, $this->nodes);
-
+	
 	foreach ($allitems as &$item)
 	{
 		$z = $item->zorder;
@@ -2064,6 +2035,12 @@ function ReadConfig($input)
 			$this->seen_zlayers[$z]=array();
 		}
 		array_push($this->seen_zlayers[$z], $item);
+		
+		// while we're looping through, let's set the real bandwidths
+		$item->max_bandwidth_in=unformat_number($item->max_bandwidth_in_cfg, $this->kilo);
+		$item->max_bandwidth_out=unformat_number($item->max_bandwidth_out_cfg, $this->kilo);
+		
+		debug (sprintf("   Setting bandwidth (%s -> %d bps, %s -> %d bps, KILO = %d)\n", $item->max_bandwidth_in_cfg, $item->max_bandwidth_in, $item->max_bandwidth_out_cfg, $item->max_bandwidth_out, $this->kilo));		
 	}
 
 	debug("Found ".sizeof($this->seen_zlayers)." z-layers including builtins (0,100).\n");
@@ -2448,9 +2425,7 @@ function DrawMap($filename = '', $thumbnailfile = '', $thumbnailmax = 250, $with
 				}
 			}
 		}
-				
-		# $this->DrawNINK($image,300,300,48);
-
+		
 		// for the editor, we can optionally overlay some other stuff
         if($this->context == 'editor')
         {
@@ -2960,6 +2935,18 @@ function CacheUpdate($agelimit=600)
 	}
 	else { debug("Couldn't read cache folder.\n"); }
 }
+
+function DumpStats($filename="")
+{
+	$report = "Feature Statistics:\n\n";
+	foreach ($this->usage_stats as $key=>$val)
+	{
+		$report .= sprintf("%70s => %d\n",$key,$val);
+	}
+	
+	if($filename == "") print $report;
+}
+
 };
 // vim:ts=4:sw=4:
 ?>

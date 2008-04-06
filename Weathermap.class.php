@@ -1518,7 +1518,7 @@ function ReadConfig($input)
 					
 					if(preg_match($keyword[1],$buffer,$matches))
 					{
-						print "CONFIG MATCHED: ".$keyword[1]."\n";
+						# print "CONFIG MATCHED: ".$keyword[1]."\n";
 						
 						$this->usage_stats[$statskey]++;
 						

@@ -1732,7 +1732,8 @@ function ReadConfig($input)
 
 			// one REGEXP to rule them all:
 //				if(preg_match("/^\s*SCALE\s+([A-Za-z][A-Za-z0-9_]*\s+)?(\d+\.?\d*)\s+(\d+\.?\d*)\s+(\d+)\s+(\d+)\s+(\d+)(?:\s+(\d+)\s+(\d+)\s+(\d+))?\s*$/i",
-			if(preg_match("/^\s*SCALE\s+([A-Za-z][A-Za-z0-9_]*\s+)?(\d+\.?\d*)\s+(\d+\.?\d*)\s+(\d+)\s+(\d+)\s+(\d+)(?:\s+(\d+)\s+(\d+)\s+(\d+))?\s*(.*)$/i",
+//	0.95b		if(preg_match("/^\s*SCALE\s+([A-Za-z][A-Za-z0-9_]*\s+)?(\d+\.?\d*)\s+(\d+\.?\d*)\s+(\d+)\s+(\d+)\s+(\d+)(?:\s+(\d+)\s+(\d+)\s+(\d+))?\s*(.*)$/i",
+			if(preg_match("/^\s*SCALE\s+([A-Za-z][A-Za-z0-9_]*\s+)?(\d+\.?\d*)\s+(\d+\.?\d*)\s+(?:(\d+)\s+(\d+)\s+(\d+)(?:\s+(\d+)\s+(\d+)\s+(\d+))?|(none))\s*(.*)$",
 				$buffer, $matches))
 			{
 				// The default scale name is DEFAULT
@@ -1743,16 +1744,26 @@ function ReadConfig($input)
 
 				$this->colours[$matches[1]][$key]['key']=$key;
 
-				$tag = $matches[10];
+				$tag = $matches[11];
+				
 
 				$this->colours[$matches[1]][$key]['tag']=$tag;
 
 				$this->colours[$matches[1]][$key]['bottom'] = (float)($matches[2]);
 				$this->colours[$matches[1]][$key]['top'] = (float)($matches[3]);
 
-				$this->colours[$matches[1]][$key]['red1'] = (int)($matches[4]);
-				$this->colours[$matches[1]][$key]['green1'] = (int)($matches[5]);
-				$this->colours[$matches[1]][$key]['blue1'] = (int)($matches[6]);
+				if(isset($matches[10]) && $matches[10] == 'none')
+				{
+					$this->colours[$matches[1]][$key]['red1'] = -1;
+					$this->colours[$matches[1]][$key]['green1'] = -1;
+					$this->colours[$matches[1]][$key]['blue1'] = -1;
+				}
+				else
+				{
+					$this->colours[$matches[1]][$key]['red1'] = (int)($matches[4]);
+					$this->colours[$matches[1]][$key]['green1'] = (int)($matches[5]);
+					$this->colours[$matches[1]][$key]['blue1'] = (int)($matches[6]);
+				}
 
 				// this is the second colour, if there is one
 				if(isset($matches[7]) && $matches[7] != '')

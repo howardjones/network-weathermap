@@ -34,3 +34,9 @@ database. Requires the Perl DBI and DBD::mysql modules.
 Should work with both PHP and perl versions, but not tested with PHP 
 one. 
 
+cacti-integrate.php
+===================
+
+A script that reads in a weathermap config file, looks for special SET
+variables and uses them to populate as much as it can of TARGET, INFOURL,
+OVERLIBGRAPH, and BANDWIDTH.

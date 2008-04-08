@@ -82,7 +82,7 @@ function weathermap_run_maps($mydir) {
 
 						if(file_exists($mapfile))
 						{
-							if($quietlogging==0) warn("Map: $mapfile -> $htmlfile & $imagefile\n");
+							if($quietlogging==0) warn("Map: $mapfile -> $htmlfile & $imagefile\n",TRUE);
 							weathermap_memory_check("MEM starting $mapcount");
 							$wmap = new Weathermap;
 							$wmap->context = "cacti";
@@ -99,12 +99,12 @@ function weathermap_run_maps($mydir) {
 							// $wmap->imageuri = $config['url_path'].'/plugins/weathermap/output/weathermap_'.$map['id'].".".$imageformat;
 							$wmap->imageuri = 'weathermap-cacti-plugin.php?action=viewimage&id='.$map['filehash']."&time=".time();
 
-							if($quietlogging==0) warn("About to write image file. If this is the last message in your log, increase memory_limit in php.ini [WMPOLL01]\n");
+							if($quietlogging==0) warn("About to write image file. If this is the last message in your log, increase memory_limit in php.ini [WMPOLL01]\n",TRUE);
 							weathermap_memory_check("MEM pre-render $mapcount");
 							
 							$wmap->DrawMap($imagefile,$thumbimagefile,read_config_option("weathermap_thumbsize"));
 							
-							if($quietlogging==0) warn("Wrote map to $imagefile and $thumbimagefile\n");
+							if($quietlogging==0) warn("Wrote map to $imagefile and $thumbimagefile\n",TRUE);
 							$fd = @fopen($htmlfile, 'w');
 							if($fd != FALSE)
 							{

@@ -794,6 +794,9 @@ function ColourFromPercent($image, $percent,$scalename="DEFAULT",$name="")
 {
 	$col = NULL;
 	$tag = '';
+	
+	$nowarn_clipping = intval($this->get_hint("nowarn_clipping"));
+	$nowarn_scalemisses = intval($this->get_hint("nowarn_scalemisses"));
 
 	if(isset($this->colours[$scalename]))
 	{
@@ -801,7 +804,7 @@ function ColourFromPercent($image, $percent,$scalename="DEFAULT",$name="")
 
 		if ($percent > 100)
 		{
-			warn ("ColourFromPercent: Clipped $name $percent% to 100%\n");
+			if($nowarn_clipping==0) warn ("ColourFromPercent: Clipped $name $percent% to 100%\n");
 			$percent=100;
 		}
 
@@ -864,7 +867,7 @@ function ColourFromPercent($image, $percent,$scalename="DEFAULT",$name="")
 	if ($percent == 0) { return array($this->grey,'',''); }
 
 	// and you'll only get white for a link with no colour assigned
-	warn("ColourFromPercent: Scale $scalename doesn't cover $percent% for $name [WMWARN29]\n");
+	if($nowarn_scalemisses==0) warn("ColourFromPercent: Scale $scalename doesn't cover $percent% for $name [WMWARN29]\n");
 	return array($this->white,'','');
 }
 
@@ -874,13 +877,16 @@ function NewColourFromPercent($percent,$scalename="DEFAULT",$name="")
 	$col = new Colour(0,0,0);
 	$tag = '';
 
+	$nowarn_clipping = intval($this->get_hint("nowarn_clipping"));
+	$nowarn_scalemisses = intval($this->get_hint("nowarn_scalemisses"));
+
 	if(isset($this->colours[$scalename]))
 	{
 		$colours=$this->colours[$scalename];
 
 		if ($percent > 100)
 		{
-			warn ("NewColourFromPercent: Clipped $name $percent% to 100%\n");
+			if($nowarn_clipping==0) warn ("NewColourFromPercent: Clipped $name $percent% to 100%\n");
 			$percent=100;
 		}
 
@@ -932,7 +938,7 @@ function NewColourFromPercent($percent,$scalename="DEFAULT",$name="")
 	if ($percent == 0) { return array(new Colour(192,255,192),'',''); }
 
 	// and you'll only get white for a link with no colour assigned
-	warn("ColourFromPercent: Scale $scalename doesn't cover $percent% for $name [WMWARN29]\n");
+	if($nowarn_scalemisses==0) warn("ColourFromPercent: Scale $scalename doesn't cover $percent% for $name [WMWARN29]\n");
 	return array(new Colour(255,255,255),'','');
 }
 
@@ -1744,8 +1750,7 @@ function ReadConfig($input)
 
 				$this->colours[$matches[1]][$key]['key']=$key;
 
-				$tag = $matches[11];
-				
+				$tag = $matches[11];				
 
 				$this->colours[$matches[1]][$key]['tag']=$tag;
 

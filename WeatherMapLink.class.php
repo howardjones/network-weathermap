@@ -238,6 +238,11 @@ class WeatherMapLink extends WeatherMapItem
 		if(is_null($x2)) { warn("LINK ".$this->name." uses a NODE with no POSITION!\n"); return; }
 		if(is_null($y2)) { warn("LINK ".$this->name." uses a NODE with no POSITION!\n"); return; }
 		
+		if( ($this->labeloffset_in < $this->labeloffset_out) && intval($map->get_hint("nowarn_labelpos"))==0)
+		{
+			warn("LINK ".$this->name." has it's BWLABELPOSs the wrong way around [WMWARN50]\n");
+		}
+		
 		list($dx, $dy)=calc_offset($this->a_offset, $map->nodes[$this->a->name]->width, $map->nodes[$this->a->name]->height);
 		$x1+=$dx;
 		$y1+=$dy;

@@ -296,6 +296,15 @@ class WeatherMapDataSource_rrd extends WeatherMapDataSource {
 		$SQL[OUT] = 'select null';
 		$rrdfile = $targetstring;
 
+		if($map->get_hint("rrd_default_in_ds") != '') {
+			$dsnames[IN] = $map->get_hint("rrd_default_in_ds");
+			debug("Default 'in' DS name changed to ".$dsnames[IN].".\n");
+		}
+		if($map->get_hint("rrd_default_out_ds") != '') {
+			$dsnames[OUT] = $map->get_hint("rrd_default_out_ds");
+			debug("Default 'out' DS name changed to ".$dsnames[OUT].".\n");
+		}
+
 		$multiplier = 8; // default bytes-to-bits
 
 		$inbw = NULL;

@@ -73,12 +73,12 @@ function debug($string)
 	}
 }
 
-function warn($string)
+function warn($string,$notice_only=FALSE)
 {
 	global $weathermap_map;
 	global $weathermap_warncount;
 	
-	$weathermap_warncount++;
+	if(!$notice_only) $weathermap_warncount++;
 	
 	// use Cacti's debug log, if we are running from the poller
 	if (function_exists('cacti_log') && (!function_exists('show_editor_startpage')))

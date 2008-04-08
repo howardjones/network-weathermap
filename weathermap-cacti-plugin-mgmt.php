@@ -218,6 +218,7 @@ function maplist()
 	// or die (mysql_error("Could not connect to database") )
 
 	$previous_id = -2;
+	$had_warnings = 0;
 	if( is_array($queryrows) )
 	{
 		foreach ($queryrows as $map)
@@ -225,7 +226,14 @@ function maplist()
 			form_alternate_row_color($colors["alternate"],$colors["light"],$i);
 
 			print '<td><a title="Click to start editor with this file" href="editor.php?plug=1&mapname='.htmlspecialchars($map['configfile']).'">'.htmlspecialchars($map['configfile']).'</a>';
-	#		print '<a href="?action=editor&plug=1&mapname='.htmlspecialchars($map['configfile']).'">[edit]</a></td>';
+			if($map['warncount']>0)
+			{
+				$had_warnings++;
+				print ' <img src="images/exclamation.png" title="'.$map['warncount'].' warnings last time this map was run. Check your logs.">'.$map['warncount'];
+			}
+			print "</td>";
+
+			#		print '<a href="?action=editor&plug=1&mapname='.htmlspecialchars($map['configfile']).'">[edit]</a></td>';
 			print '<td>'.htmlspecialchars($map['titlecache']).'</td>';
 			if($map['active'] == 'on')
 			{
@@ -235,10 +243,7 @@ function maplist()
 			{
 				print '<td><a title="Click to Activate" href="?action=activate_map&id='.$map['id'].'"><font color="red">No</font></a>';
 			}
-			if($map['warncount']>0)
-			{
-				print '<img src="images/exclamation.png" title="'.$map['warncount'].' warnings last time this map was run. Check your logs.">';
-			}
+			
 			print '</td>';
 
 			print '<td>';
@@ -290,12 +295,16 @@ function maplist()
 	}
 
 	html_end_box();
-
+	
+	if($had_warnings>0)
+	{
+		print '<div align="center" style="padding:5px; width: 50%; border: 2px red solid; margin: 5px auto 15px auto; background-color: #fee;">'.$had_warnings.' of your maps had warnings last time '.($had_warnings>1?"they":"it").' ran. You can find these in your Cacti log file.</div>';
+	}
+		
 	if($i>0)
 	{
 		print '<div align="center"><a href="?action=rebuildnow"><img src="images/btn_recalc.png" border="0" alt="Rebuild All Maps Right Now"><br />(Experimental - You should NOT need to use this normally)</a></div>';
 	}
-
 
 }
 

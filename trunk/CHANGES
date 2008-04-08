@@ -1,7 +1,10 @@
 0.96	ADDED - RRD datasource can take SET rrd_default_path to make configs a little easier to read.
+        ADDED - RRD datasource can take SET rrd_default_in_ds and rrd_default_out_ds for non-Cacti users.
 	ADDED - Control the drawing order with ZORDER.
 	ADDED - New artificial icons: nink, inpie and outpie. See ICON in manual.
-	CHANGE - A NODE with no POSITION is not drawn, instead of drawn at 0,0. Useful for templates.
+        ADDED - Warning for probably-incorrect BWLABELPOS where in<out
+        ADDED - New global SET variables to disable some common warnings you may not care about :-)
+	CHANGE - A NODE with no POSITION is not drawn, instead of drawn at 0,0. Useful for templates.        
 		
 0.95b	FIXED - SQL schema issue that upset some mysql versions
 	FIXED - Removed sometime-problem debugging code in editor

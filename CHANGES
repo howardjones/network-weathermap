@@ -4,7 +4,8 @@
 	ADDED - New artificial icons: nink, inpie and outpie. See ICON in manual.
         ADDED - Warning for probably-incorrect BWLABELPOS where in<out
         ADDED - New global SET variables to disable some common warnings you may not care about :-)
-	CHANGE - A NODE with no POSITION is not drawn, instead of drawn at 0,0. Useful for templates.        
+	CHANGE - A NODE with no POSITION is not drawn, instead of drawn at 0,0. Useful for templates.
+        FIXED - Minor issue with CRLF in map title for Cacti Plugin
 		
 0.95b	FIXED - SQL schema issue that upset some mysql versions
 	FIXED - Removed sometime-problem debugging code in editor

@@ -2,8 +2,8 @@
 # Average over an arbitrary period...
 rrdtool graph /dev/null -f "" -s now-30d -e now DEF:in=../rra/atm-sl_traffic_in_5498.rrd:traffic_in:AVERAGE DEF:out=../rra/atm-sl_traffic_in_5498.rrd:traffic_out:AVERAGE VDEF:avg_in=in,AVERAGE VDEF:avg_out=out,AVERAGE PRINT:avg_in:%lf PRINT:avg_out:%lf
 
-warning for BWLABELPOS when in<out
-add SET nowarn_xxxxx for some of the more common warnings
+DONE!  warning for BWLABELPOS when in<out
+DONE!  add SET nowarn_xxxxx for some of the more common warnings
 
 Before 0.96
 -----------
@@ -20,7 +20,7 @@ Per-map warning count in DB
 WUG DS
 Nagios DS
 RRD xport DS
-Some SETs to suppress warnings?
+DONE!  Some SETs to suppress warnings?
 'none' for SCALE (not gradient)
 COMMENTSTYLE (edge|center)
 contrast for commentcolor (when using 'COMMENTSTYLE center')

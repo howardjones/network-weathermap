@@ -13,6 +13,7 @@ require_once "WeatherMapLink.class.php";
 $WEATHERMAP_VERSION="0.96dev";
 $weathermap_debugging=FALSE;
 $weathermap_map="";
+$weathermap_warncount=0;
 $weathermap_debug_suppress = array("processstring","mysprintf");
 
 // Turn on ALL error reporting for now.

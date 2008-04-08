@@ -16,6 +16,7 @@ function weathermap_run_maps($mydir) {
 	global $config;
 	global $weathermap_debugging, $WEATHERMAP_VERSION;
 	global $weathermap_map;
+	global $weathermap_warncount;
 
 	include_once($mydir.DIRECTORY_SEPARATOR."HTML_ImageMap.class.php");
 	include_once($mydir.DIRECTORY_SEPARATOR."Weathermap.class.php");
@@ -69,6 +70,9 @@ function weathermap_run_maps($mydir) {
 					$imageformat = strtolower(read_config_option("weathermap_output_format"));
 
 					foreach ($queryrows as $map) {
+						// reset the warning counter
+						$weathermap_warncount=0;
+						
 						$weathermap_map = "[Map ".$map['id']."] ".$map['configfile'];
 					
 						$mapfile = $confdir.DIRECTORY_SEPARATOR.$map['configfile'];
@@ -130,6 +134,7 @@ function weathermap_run_maps($mydir) {
 						{
 							warn("Mapfile $mapfile is not readable or doesn't exist [WMPOLL04]\n");
 						}
+						db_execute("update weathermap_maps set warncount=".intval($weathermap_warncount)." where id=".$map['id']);
 					}
 					debug("Iterated all $mapcount maps.\n");
 				}

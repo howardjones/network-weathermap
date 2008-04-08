@@ -229,12 +229,17 @@ function maplist()
 			print '<td>'.htmlspecialchars($map['titlecache']).'</td>';
 			if($map['active'] == 'on')
 			{
-				print '<td><a title="Click to Deactivate" href="?action=deactivate_map&id='.$map['id'].'"><font color="green">Yes</font></a></td>';
+				print '<td><a title="Click to Deactivate" href="?action=deactivate_map&id='.$map['id'].'"><font color="green">Yes</font></a>';
 			}
 			else
 			{
-				print '<td><a title="Click to Activate" href="?action=activate_map&id='.$map['id'].'"><font color="red">No</font></a></td>';
+				print '<td><a title="Click to Activate" href="?action=activate_map&id='.$map['id'].'"><font color="red">No</font></a>';
 			}
+			if($map['warncount']>0)
+			{
+				print '<img src="images/exclamation.png" title="'.$map['warncount'].' warnings last time this map was run. Check your logs.">';
+			}
+			print '</td>';
 
 			print '<td>';
 
@@ -320,7 +325,7 @@ function addmap_picker()
 		if($dh)
 		{
 			$i = 0; $skipped = 0;
-			html_header(array("Config File", "Title",""),2);
+			html_header(array("","","Config File", "Title",""),2);
 
 			while($file = readdir($dh))
 			{
@@ -354,10 +359,10 @@ function addmap_picker()
 				{
 					$title = $titles[$file];
 					form_alternate_row_color($colors["alternate"],$colors["light"],$i);
+					print '<td><a href="?action=addmap&amp;file='.$file.'" title="Add the configuration file">Add</a></td>';
+					print '<td><a href="?action=viewconfig&amp;file='.$file.'" title="View the configuration file in a new window" target="_blank">View</a></td>';
 					print '<td>'.htmlspecialchars($file).'</td>';
 					print '<td><em>'.htmlspecialchars($title).'</em></td>';
-					print '<td><a href="?action=viewconfig&amp;file='.$file.'" title="View the configuration file in a new window" target="_blank">View</a></td>';
-					print '<td><a href="?action=addmap&amp;file='.$file.'" title="Add the configuration file">Add</a></td>';
 					print '</tr>';
 					$i++;
 				}
@@ -449,7 +454,7 @@ function add_config($file)
 
 		$file = mysql_real_escape_string($file);
 		$title = mysql_real_escape_string($title);
-		$SQL = "insert into weathermap_maps (configfile,titlecache,active,imagefile,htmlfile) VALUES ('$file','$title','on','','')";
+		$SQL = "insert into weathermap_maps (configfile,titlecache,active,imagefile,htmlfile,filehash,config) VALUES ('$file','$title','on','','','','')";
 		db_execute($SQL);
 
 		// add auth for 'admin'
@@ -479,6 +484,8 @@ function wmap_get_title($filename)
 		{
 			$title = $matches[1];
 		}
+		// strip out any DOS line endings that got through
+		$title=str_replace("\r", "", $title);
 	}
 	fclose($fd);
 

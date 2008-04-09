@@ -229,7 +229,7 @@ function maplist()
 			if($map['warncount']>0)
 			{
 				$had_warnings++;
-				print ' <img src="images/exclamation.png" title="'.$map['warncount'].' warnings last time this map was run. Check your logs.">'.$map['warncount'];
+				print ' <img src="images/exclamation.png" title="'.$map['warncount'].' warnings last time this map was run. Check your logs."><a href="../../utilities.php?action=view_logfile&filter='.urlencode($map['configfile']).'" title="Check cacti.log for this map">'.$map['warncount']."</a>";
 			}
 			print "</td>";
 

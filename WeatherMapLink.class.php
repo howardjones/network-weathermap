@@ -126,7 +126,7 @@ class WeatherMapLink extends WeatherMapItem
 		foreach (array_keys($this->inherit_fieldlist)as $fld) { $this->$fld = $source->$fld; }
 	}
 
-	function DrawComments($image,$col,$width)
+	function DrawComments($image,$col,$widths)
 	{
 		$curvepoints =& $this->curvepoints;
 		$last = count($curvepoints)-1;
@@ -137,7 +137,16 @@ class WeatherMapLink extends WeatherMapItem
 		$commentpos[IN] = $this->commentoffset_in;
 		$start[IN] = $last;
 		
-		foreach (array(OUT,IN) as $dir)
+		if($this->linkstyle=="oneway")
+		{
+			$dirs = array(OUT);
+		}
+		else
+		{
+			$dirs = array(OUT,IN);
+		}
+		
+		foreach ($dirs as $dir)
 		{
 			// Time to deal with Link Comments, if any
 			$comment = $this->owner->ProcessString($this->comments[$dir], $this);
@@ -188,15 +197,15 @@ class WeatherMapLink extends WeatherMapItem
 					# $col = $map->selected;
 					$angle -= 180;
 					if($angle < -180) $angle +=360;
-					$edge_x = $x + $nudgealong*$dx - $nx * ($width + 4 + $nudgeout);
-					$edge_y = $y + $nudgealong*$dy - $ny * ($width + 4 + $nudgeout);
+					$edge_x = $x + $nudgealong*$dx - $nx * ($widths[$dir] + 4 + $nudgeout);
+					$edge_y = $y + $nudgealong*$dy - $ny * ($widths[$dir] + 4 + $nudgeout);
 					# $comment .= "@";
 					$flipped = TRUE;
 				}
 				else
 				{
-					$edge_x = $x + $nudgealong*$dx + $nx * ($width + 4 + $nudgeout);
-					$edge_y = $y + $nudgealong*$dy + $ny * ($width + 4 + $nudgeout);
+					$edge_x = $x + $nudgealong*$dx + $nx * ($widths[$dir] + 4 + $nudgeout);
+					$edge_y = $y + $nudgealong*$dy + $ny * ($widths[$dir] + 4 + $nudgeout);
 				}
 				
 				list($textlength, $textheight) = $this->owner->myimagestringsize($font, $comment);
@@ -320,11 +329,21 @@ class WeatherMapLink extends WeatherMapItem
 		{
 			// Calculate the spine points - the actual curve	
 			$this->curvepoints = calc_curve($xpoints, $ypoints);
-				
+										
 			// then draw the curve itself
 			draw_curve($im, $this->curvepoints,
-				$link_width, $outline_colour, $comment_colour, array($link_in_colour, $link_out_colour),
+				array($link_in_width,$link_out_width), $outline_colour, array($link_in_colour, $link_out_colour),
 				$this->name, $map, $this->splitpos, ($this->linkstyle=='oneway'?TRUE:FALSE) );
+			
+			for($i=0;$i<count($this->curvepoints)-1; $i++)
+			{
+				imagearc($im,$this->curvepoints[$i][0],$this->curvepoints[$i][1],5,5,0,360,$this->owner->selected);
+				imageline($im,
+					  $this->curvepoints[$i][0],$this->curvepoints[$i][1],
+					  $this->curvepoints[$i+1][0],$this->curvepoints[$i+1][1],
+					  $this->owner->selected
+					  );
+			}
 		}
 		
 		if($this->viastyle=='angled')
@@ -334,15 +353,25 @@ class WeatherMapLink extends WeatherMapItem
 			// things like bwlabels won't know where to go.
 			
 			$this->curvepoints = calc_straight($xpoints, $ypoints);
-				
+							
 			// then draw the "curve" itself
 			// XXX - this is not correct either - should draw the straight version
 			draw_curve($im, $this->curvepoints,
-				$link_width, $outline_colour, $comment_colour, array($link_in_colour, $link_out_colour),
+				array($link_in_width,$link_out_width), $outline_colour, array($link_in_colour, $link_out_colour),
 				$this->name, $map, 50, ($this->linkstyle=='oneway'?TRUE:FALSE) );
+			
+			for($i=0;$i<(count($this->curvepoints)-1); $i++)
+			{
+				imagearc($im,$this->curvepoints[$i][0],$this->curvepoints[$i][1],5,5,0,360,$this->owner->selected);
+				imageline($im,
+					  $this->curvepoints[$i][0],$this->curvepoints[$i][1],
+					  $this->curvepoints[$i+1][0],$this->curvepoints[$i+1][1],
+					  $this->owner->selected
+					  );
+			}
 		}
 
-		$this->DrawComments($im,$comment_colour,$link_width*1.1);
+		$this->DrawComments($im,$comment_colour,array($link_in_width*1.1,$link_out_width*1.1));
 
 		$curvelength = $this->curvepoints[count($this->curvepoints)-1][2];
 		// figure out where the labels should be, and what the angle of the curve is at that point

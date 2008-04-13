@@ -520,11 +520,9 @@ function calc_curve(&$in_xarray, &$in_yarray,$pointsperspan = 12)
 // it means that all the stuff that expects an array of points with distances won't be upset.
 function calc_straight(&$in_xarray, &$in_yarray,$pointsperspan = 12)
 {
-
 	// search through the point list, for consecutive duplicate points
 	// (most common case will be a straight link with both NODEs at the same place, I think)
 	// strip those out, because they'll break the binary search/centre-point stuff
-
 	$last_x=NULL;
 	$last_y=NULL;
 
@@ -558,11 +556,27 @@ function calc_straight(&$in_xarray, &$in_yarray,$pointsperspan = 12)
 	
 	for ($i=0; $i < ($npoints -1); $i++)
 	{
-		$curvepoints[] = array($xarray[$i],$yarray[$i],$distance);
-		// work out the next distance...		
-		$distance += sqrt( pow($xarray[$i+1] - $xarray[$i],2) + pow($yarray[$i+1] - $yarray[$i],2) );
+		// still subdivide the straight line, becuase other stuff makes assumptions about
+		// how often there is a point - at least find_distance_coords_angle breaks
+		$newdistance = sqrt( pow($xarray[$i+1] - $xarray[$i],2) + pow($yarray[$i+1] - $yarray[$i],2) );
+		$dx = ($xarray[$i+1] - $xarray[$i])/$pointsperspan;
+		$dy = ($yarray[$i+1] - $yarray[$i])/$pointsperspan;
+		$dd = $newdistance/$pointsperspan;
+		
+		for($j=0; $j< $pointsperspan; $j++)
+		{
+			$x = $xarray[$i]+$j*$dx;
+			$y = $yarray[$i]+$j*$dy;
+			$d = $distance + $j*$dd;
+			
+			$curvepoints[] = array($x,$y,$d);
+			$np++;
+		}
+		$distance += $newdistance;
 	}
 	$curvepoints[] = array($xarray[$npoints-1],$yarray[$npoints-1],$distance);
+
+#	print_r($curvepoints);
 	
 	return ($curvepoints);
 }
@@ -598,7 +612,7 @@ function calc_arrowsize($width,&$map,$linkname)
 //    width is the link width (the actual width is twice this)
 //    outlinecolour is a GD colour reference
 //    fillcolours is an array of two more colour references, one for the out, and one for the in spans
-function draw_curve($image, &$curvepoints, $width, $outlinecolour, $comment_colour, $fillcolours, $linkname, &$map,
+function draw_curve($image, &$curvepoints, $widths, $outlinecolour, $fillcolours, $linkname, &$map,
 	$q2_percent=50, $unidirectional=FALSE)
 {
 	// now we have a 'spine' - all the central points for this curve.
@@ -619,16 +633,17 @@ function draw_curve($image, &$curvepoints, $width, $outlinecolour, $comment_colo
 	}
 	
 	// loop increment, start point, width, labelpos, fillcolour, outlinecolour, commentpos
-	$arrowsettings[OUT] = array(+1, 0, $width, 0, $fillcolours[OUT], $outlinecolour, 5);
-	$arrowsettings[IN] = array(-1, count($curvepoints) - 1, $width, 0, $fillcolours[IN], $outlinecolour, 95);
+	$arrowsettings[OUT] = array(+1, 0, $widths[OUT], 0, $fillcolours[OUT], $outlinecolour, 5);
+	$arrowsettings[IN] = array(-1, count($curvepoints) - 1, $widths[IN], 0, $fillcolours[IN], $outlinecolour, 95);
 
 	// we calculate the arrow size up here, so that we can decide on the
 	// minimum length for a link. The arrowheads are the limiting factor.
-	list($arrowsize,$arrowwidth) = calc_arrowsize($width,$map,$linkname);
-	
-	// the 2.7 here is empirical. It ought to be 2 in theory.
+	list($arrowsize[IN],$arrowwidth[IN]) = calc_arrowsize($widths[IN], $map, $linkname);
+	list($arrowsize[OUT],$arrowwidth[OUT]) = calc_arrowsize($widths[OUT], $map, $linkname);
+			
+	// the 1.2 here is empirical. It ought to be 1 in theory.
 	// in practice, a link this short is useless anyway, especially with bwlabels.
-	$minimumlength = 2.7*$arrowsize;
+	$minimumlength = 1.2*($arrowsize[IN]+$arrowsize[OUT]);
 
 	# warn("$linkname: Total: $totaldistance $arrowsize $arrowwidth $minimumlength\n");
 	if($totaldistance <= $minimumlength)
@@ -647,8 +662,9 @@ function draw_curve($image, &$curvepoints, $width, $outlinecolour, $comment_colo
 	foreach ($dirs as $dir)
 	{
 		$direction = $arrowsettings[$dir][0];
+		// $width = $widths[$dir];
 		// this is the last index before the arrowhead starts
-		list($pre_mid_x,$pre_mid_y,$pre_midindex) = find_distance_coords($curvepoints,$halfway - $direction * $arrowsize);
+		list($pre_mid_x,$pre_mid_y,$pre_midindex) = find_distance_coords($curvepoints,$halfway - $direction * $arrowsize[$dir]);
 		
 		$there_points=array();
 		$back_points=array();
@@ -670,11 +686,11 @@ function draw_curve($image, &$curvepoints, $width, $outlinecolour, $comment_colo
 			$nx=$dy / $l;
 			$ny=-$dx / $l;
 
-			$there_points[]=$curvepoints[$i][0] + $direction * $width * $nx;
-			$there_points[]=$curvepoints[$i][1] + $direction * $width * $ny;
+			$there_points[]=$curvepoints[$i][0] + $direction * $widths[$dir] * $nx;
+			$there_points[]=$curvepoints[$i][1] + $direction * $widths[$dir] * $ny;
 
-			$back_points[]=$curvepoints[$i][0] - $direction * $width * $nx;
-			$back_points[]=$curvepoints[$i][1] - $direction * $width * $ny;
+			$back_points[]=$curvepoints[$i][0] - $direction * $widths[$dir] * $nx;
+			$back_points[]=$curvepoints[$i][1] - $direction * $widths[$dir] * $ny;
 		}
 
 		// all the normal line is done, now lets add an arrowhead on
@@ -686,20 +702,20 @@ function draw_curve($image, &$curvepoints, $width, $outlinecolour, $comment_colo
 		$anx=$ady / $l;
 		$any=-$adx / $l;
 
-		$there_points[]=$pre_mid_x + $direction * $width * $anx;
-		$there_points[]=$pre_mid_y + $direction * $width * $any;
+		$there_points[]=$pre_mid_x + $direction * $widths[$dir] * $anx;
+		$there_points[]=$pre_mid_y + $direction * $widths[$dir] * $any;
 
-		$there_points[]=$pre_mid_x + $direction * $arrowwidth * $anx;
-		$there_points[]=$pre_mid_y + $direction * $arrowwidth * $any;
+		$there_points[]=$pre_mid_x + $direction * $arrowwidth[$dir] * $anx;
+		$there_points[]=$pre_mid_y + $direction * $arrowwidth[$dir] * $any;
 
 		$there_points[]=$halfway_x;
 		$there_points[]=$halfway_y;
 
-		$there_points[]=$pre_mid_x - $direction * $arrowwidth * $anx;
-		$there_points[]=$pre_mid_y - $direction * $arrowwidth * $any;
+		$there_points[]=$pre_mid_x - $direction * $arrowwidth[$dir] * $anx;
+		$there_points[]=$pre_mid_y - $direction * $arrowwidth[$dir] * $any;
 
-		$there_points[]=$pre_mid_x - $direction * $width * $anx;
-		$there_points[]=$pre_mid_y - $direction * $width * $any;
+		$there_points[]=$pre_mid_x - $direction * $widths[$dir] * $anx;
+		$there_points[]=$pre_mid_y - $direction * $widths[$dir] * $any;
 
 		// all points done, now combine the lists, and produce the final result.
 

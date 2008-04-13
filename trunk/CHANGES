@@ -4,9 +4,12 @@
 	ADDED - New artificial icons: nink, inpie and outpie. See ICON in manual.
 	ADDED - Warning for probably-incorrect BWLABELPOS where in<out
 	ADDED - New global SET variables to disable some common warnings you may not care about :-)
-	ADDED - Cacti management screen shows number of warnings for each map last time it ran.
+	ADDED - Cacti management screen shows number of warnings for each map last time it ran
+	ADDED - Cacti management screen also has a link to the log entries for the map in question
 	CHANGE - A NODE with no POSITION is not drawn, instead of drawn at 0,0. Useful for templates.
+	CHANGE- The link_bulge secret mode bulges each side of a link independently now
 	FIXED - Minor issue with CRLF in map title for Cacti Plugin
+	FIXED - Oneway links don't draw the INCOMMENT anymore
 		
 0.95b	FIXED - SQL schema issue that upset some mysql versions
 	FIXED - Removed sometime-problem debugging code in editor
@@ -29,7 +32,7 @@
 	
 	ADDED - you get a warning if you are using values outside of the defined SCALE now.
 	ADDED - You can add a 'tag' to a SCALE line, to be used in ICON or LABELs later.
-    ADDED - USEICONSCALE - colorize icon images (based on patches from llow)
+	ADDED - USEICONSCALE - colorize icon images (based on patches from llow)
 	ADDED - screenshot mode. "SET screenshot_mode 1" at the top of the map will anonymise all labels, comments and bwlabels.
 	ADDED - LABELFONTCOLOR can use a special value of 'contrast' to always contrast with the label colour.
 	ADDED - Artificial Icons. Special icon 'filenames' - 'box' 'round' 'rbox' create a shaped icon without any file.

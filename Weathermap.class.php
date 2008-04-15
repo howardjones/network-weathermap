@@ -1375,8 +1375,14 @@ function ReadConfig($input)
 							$this->links[$curlink->name]=$curlink;
 							debug ("Saving Link: " . $curlink->name . "\n");
 						}
-						else { warn
-							("Dropping LINK " . $curlink->name . " - it hasn't got 2 NODES! [WMWARN28]\n"); }
+						else
+						{
+							$this->links[$curlink->name]=$curlink;
+							debug ("Saving Template-Only Link: " . $curlink->name . "\n");
+						}
+						#}
+						#else { warn
+						#	("Dropping LINK " . $curlink->name . " - it hasn't got 2 NODES! [WMWARN28]\n"); }
 					}
 				}
 
@@ -2016,7 +2022,7 @@ function ReadConfig($input)
 		$defaults=array
 			(
 				'0_0' => array('bottom' => 0, 'top' => 0, 'red1' => 192, 'green1' => 192, 'blue1' => 192),
-				'0_1' => array('bottom' => 0, 'top' => 0, 'red1' => 255, 'green1' => 255, 'blue1' => 255),
+				'0_1' => array('bottom' => 0, 'top' => 1, 'red1' => 255, 'green1' => 255, 'blue1' => 255),
 				'1_10' => array('bottom' => 1, 'top' => 10, 'red1' => 140, 'green1' => 0, 'blue1' => 255),
 				'10_25' => array('bottom' => 10, 'top' => 25, 'red1' => 32, 'green1' => 32, 'blue1' => 255),
 				'25_40' => array('bottom' => 25, 'top' => 40, 'red1' => 0, 'green1' => 192, 'blue1' => 255),
@@ -2417,8 +2423,12 @@ function DrawMap($filename = '', $thumbnailfile = '', $thumbnailmax = 250, $with
 				{
 					if(strtolower(get_class($it))=='weathermaplink')
 					{
-						debug("Drawing LINK ".$it->name."\n");
-						$it->Draw($image, $this);
+						// only draw LINKs if they have NODES defined (not templates)
+						if (isset($it->a) && isset($it->b))
+						{
+							debug("Drawing LINK ".$it->name."\n");
+							$it->Draw($image, $this);
+						}
 					}
 					if(strtolower(get_class($it))=='weathermapnode')
 					{

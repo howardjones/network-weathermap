@@ -10,6 +10,7 @@
 	CHANGE- The link_bulge secret mode bulges each side of a link independently now
 	FIXED - Minor issue with CRLF in map title for Cacti Plugin
 	FIXED - Oneway links don't draw the INCOMMENT anymore
+	FIXED - DEFAULT SCALE covers 0-100 properly (Thanks Dan Fusselman)
 		
 0.95b	FIXED - SQL schema issue that upset some mysql versions
 	FIXED - Removed sometime-problem debugging code in editor

@@ -472,6 +472,8 @@ function add_config($file)
 		$myuid = (isset($_SESSION["sess_user_id"]) ? intval($_SESSION["sess_user_id"]) : 1);
 		$SQL = "insert into weathermap_auth (mapid,userid) VALUES ($last_id,$myuid)";
 		db_execute($SQL);
+		
+		db_execute("update weathermap_maps set filehash=LEFT(MD5(concat(id,configfile,rand())),20) where id=$last_id");
 
 		map_resort();
 	}

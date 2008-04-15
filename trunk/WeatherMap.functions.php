@@ -604,7 +604,69 @@ function calc_arrowsize($width,&$map,$linkname)
 	return( array($arrowsize,$arrowwidth) );
 }
 
+function draw_straight($image, &$curvepoints, $widths, $outlinecolour, $fillcolours, $linkname, &$map,
+	$q2_percent=50, $unidirectional=FALSE)
+{
+	for($i=0;$i<(count($curvepoints)-1); $i++)
+	{
+		imagearc($image,$curvepoints[$i][0],$curvepoints[$i][1],5,5,0,360,$map->selected);
+		imageline($image,
+			  $curvepoints[$i][0],$curvepoints[$i][1],
+			  $curvepoints[$i+1][0],$curvepoints[$i+1][1],
+			  $map->selected
+			  );
+	}
+	
+	// get the full length of the curve from the last point
+	$totaldistance = $curvepoints[count($curvepoints)-1][2];
+	// find where the in and out arrows will join (normally halfway point)
+	$halfway = $totaldistance * ($q2_percent/100);
+	
+	$dirs = array(OUT,IN);
 
+	// for a unidirectional map, we just ignore the second half (direction = -1)
+	if($unidirectional)
+	{
+		$halfway = $totaldistance;
+		$dirs = array(OUT);
+	}
+	// loop increment, start point, width, labelpos, fillcolour, outlinecolour, commentpos
+	$arrowsettings[OUT] = array(+1, 0, $widths[OUT], 0, $fillcolours[OUT], $outlinecolour, 5);
+	$arrowsettings[IN] = array(-1, count($curvepoints) - 1, $widths[IN], 0, $fillcolours[IN], $outlinecolour, 95);
+
+	// we calculate the arrow size up here, so that we can decide on the
+	// minimum length for a link. The arrowheads are the limiting factor.
+	list($arrowsize[IN],$arrowwidth[IN]) = calc_arrowsize($widths[IN], $map, $linkname);
+	list($arrowsize[OUT],$arrowwidth[OUT]) = calc_arrowsize($widths[OUT], $map, $linkname);
+			
+	// the 1.2 here is empirical. It ought to be 1 in theory.
+	// in practice, a link this short is useless anyway, especially with bwlabels.
+	$minimumlength = 1.2*($arrowsize[IN]+$arrowsize[OUT]);
+
+	# warn("$linkname: Total: $totaldistance $arrowsize $arrowwidth $minimumlength\n");
+	if($totaldistance <= $minimumlength)
+	{
+		warn("Skipping drawing very short link ($linkname). Impossible to draw! Try changing WIDTH or ARROWSTYLE? [WMWARN01]\n");
+		return;
+	}
+
+	
+	list($halfway_x,$halfway_y,$halfwayindex) = find_distance_coords($curvepoints,$halfway);
+	imagearc($image,$halfway_x,$halfway_y,15,15,0,360,$map->selected);
+	
+	foreach ($dirs as $dir)
+	{
+		$direction = $arrowsettings[$dir][0];
+		// $width = $widths[$dir];
+		// this is the last index before the arrowhead starts
+		list($pre_mid_x,$pre_mid_y,$pre_midindex) = find_distance_coords($curvepoints,$halfway - $direction * $arrowsize[$dir]);
+		
+		imagearc($image,$pre_mid_x,$pre_mid_y,10,10,0,360,$map->selected);
+		
+		
+		
+	}
+}
 
 // top-level function that takes a two lists to define some points, and draws a weathermap link
 // - this takes care of all the extras, like arrowheads, and where to put the bandwidth labels

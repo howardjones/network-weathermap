@@ -334,16 +334,6 @@ class WeatherMapLink extends WeatherMapItem
 			draw_curve($im, $this->curvepoints,
 				array($link_in_width,$link_out_width), $outline_colour, array($link_in_colour, $link_out_colour),
 				$this->name, $map, $this->splitpos, ($this->linkstyle=='oneway'?TRUE:FALSE) );
-			
-			for($i=0;$i<count($this->curvepoints)-1; $i++)
-			{
-				imagearc($im,$this->curvepoints[$i][0],$this->curvepoints[$i][1],5,5,0,360,$this->owner->selected);
-				imageline($im,
-					  $this->curvepoints[$i][0],$this->curvepoints[$i][1],
-					  $this->curvepoints[$i+1][0],$this->curvepoints[$i+1][1],
-					  $this->owner->selected
-					  );
-			}
 		}
 		
 		if($this->viastyle=='angled')
@@ -355,20 +345,9 @@ class WeatherMapLink extends WeatherMapItem
 			$this->curvepoints = calc_straight($xpoints, $ypoints);
 							
 			// then draw the "curve" itself
-			// XXX - this is not correct either - should draw the straight version
-			draw_curve($im, $this->curvepoints,
+			draw_straight($im, $this->curvepoints,
 				array($link_in_width,$link_out_width), $outline_colour, array($link_in_colour, $link_out_colour),
 				$this->name, $map, 50, ($this->linkstyle=='oneway'?TRUE:FALSE) );
-			
-			for($i=0;$i<(count($this->curvepoints)-1); $i++)
-			{
-				imagearc($im,$this->curvepoints[$i][0],$this->curvepoints[$i][1],5,5,0,360,$this->owner->selected);
-				imageline($im,
-					  $this->curvepoints[$i][0],$this->curvepoints[$i][1],
-					  $this->curvepoints[$i+1][0],$this->curvepoints[$i+1][1],
-					  $this->owner->selected
-					  );
-			}
 		}
 
 		$this->DrawComments($im,$comment_colour,array($link_in_width*1.1,$link_out_width*1.1));

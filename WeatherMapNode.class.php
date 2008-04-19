@@ -679,29 +679,33 @@ class WeatherMapNode extends WeatherMapItem
 	function Reset(&$newowner)
 	{
 		$this->owner=$newowner;
+		$template = $this->template;
+                if($template == '') $template = "DEFAULT";
 
-		if (isset($this->owner->defaultnode) && $this->name != 'DEFAULT') {
-			// use the defaults from DEFAULT
-			$this->CopyFrom($this->owner->defaultnode);
-			$this->my_default = $this->owner->defaultnode;
+		debug("Resetting $this->name with $template\n");
+		
+		// the internal default-default gets it's values from inherit_fieldlist
+		// everything else comes from a node object - the template.
+		if($this->name==':: DEFAULT ::')
+		{
+			foreach (array_keys($this->inherit_fieldlist)as
+				$fld) { $this->$fld=$this->inherit_fieldlist[$fld]; }
 		}
 		else
 		{
-			// use the default defaults
-			foreach (array_keys($this->inherit_fieldlist)as $fld)
-			{ $this->$fld = $this->inherit_fieldlist[$fld]; }
+			$this->CopyFrom($this->owner->nodes[$template]); 
 		}
-		# warn($this->name.": ".var_dump($this->hints)."\n");
-		# warn("DEF: ".var_dump($this->owner->defaultnode->hints)."\n");
-		#if($this->name == 'North')
-		#{
-	#		warn("In Reset, North says: ".$this->nodes['North']->hints['sigdigits']."\n");
-	#	}
+		$this->template = $template;
 	}
 
 	function CopyFrom(&$source)
 	{
-		foreach (array_keys($this->inherit_fieldlist)as $fld) { $this->$fld=$source->$fld; }
+		debug("Initialising NODE $this->name from $source->name\n");
+		assert('is_object($source)');
+		
+		foreach (array_keys($this->inherit_fieldlist)as $fld) {
+			if($fld != 'template') $this->$fld=$source->$fld;
+		}
 	}
 
 	function WriteConfig()

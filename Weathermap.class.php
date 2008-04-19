@@ -244,23 +244,63 @@ class WeatherMap extends WeatherMapBase
 		foreach (array_keys($this->inherit_fieldlist)as $fld) { $this->$fld=$this->inherit_fieldlist[$fld]; }
 
 		// these two are used for default settings
-		$this->defaultlink=new WeatherMapLink;
-		$this->defaultlink->name="DEFAULT";
-		$this->defaultlink->Reset($this);
+		//$this->defaultlink=new WeatherMapLink;
+		//$this->defaultlink->name="DEFAULT";
+		//$this->defaultlink->Reset($this);
 
-		$this->defaultnode=new WeatherMapNode;
-		$this->defaultnode->name="DEFAULT";
-		$this->defaultnode->Reset($this);
+		//$this->defaultnode=new WeatherMapNode;
+		//$this->defaultnode->name="DEFAULT";
+		//$this->defaultnode->Reset($this);
 
 		$this->need_size_precalc=FALSE;
 
-		$this->nodes=array
-			(
-				); // an array of WeatherMapNodes
+		$this->nodes=array(); // an array of WeatherMapNodes
+		$this->links=array(); // an array of WeatherMapLinks
 
-		$this->links=array
-			(
-				); // an array of WeatherMapLinks
+		// these are the default defaults
+                // by putting them into a normal object, we can use the
+                // same code for writing out LINK DEFAULT as any other link.
+                debug("Creating ':: DEFAULT ::' DEFAULT LINK\n");
+                // these two are used for default settings
+                $deflink = new WeatherMapLink;
+                $deflink->name=":: DEFAULT ::";
+                $deflink->template=":: DEFAULT ::";
+                $deflink->Reset($this);
+                $this->links[':: DEFAULT ::'] = &$deflink;
+
+                debug("Creating ':: DEFAULT ::' DEFAULT NODE\n");
+                $defnode = new WeatherMapNode;
+                $defnode->name=":: DEFAULT ::";
+                $defnode->template=":: DEFAULT ::";
+                $defnode->Reset($this);
+                $this->nodes[':: DEFAULT ::'] = &$defnode;
+
+
+// ************************************
+		// now create the DEFAULT link and node, based on those.
+		// these can be modified by the user, but their template (and therefore comparison in WriteConfig) is ':: DEFAULT ::'
+		debug("Creating actual DEFAULT NODE from :: DEFAULT ::\n");
+                $defnode2 = new WeatherMapNode;
+                $defnode2->name = "DEFAULT";
+                $defnode2->template = ":: DEFAULT ::";
+                $defnode2->Reset($this);
+                $this->nodes['DEFAULT'] = &$defnode2;
+
+		debug("Creating actual DEFAULT LINK from :: DEFAULT ::\n");
+                $deflink2 = new WeatherMapLink;
+                $deflink2->name = "DEFAULT";
+                $deflink2->template = ":: DEFAULT ::";
+                $deflink2->Reset($this);
+                $this->links['DEFAULT'] = &$deflink2;
+
+		// XXX - for now, make the old defaultlink and defaultnode work too.
+                $this->defaultlink = $this->links['DEFAULT'];
+                $this->defaultnode = $this->nodes['DEFAULT'];
+
+                assert('is_object($this->nodes[":: DEFAULT ::"])');
+                assert('is_object($this->links[":: DEFAULT ::"])');
+
+// ************************************
 
 		$this->imap=new HTML_ImageMap('weathermap');
 		$this->colours=array
@@ -1349,41 +1389,22 @@ function ReadConfig($input)
 				// first, save the previous item, before starting work on the new one
 				if ($last_seen == "NODE")
 				{
-					if ($curnode->name == 'DEFAULT')
-					{
-						$this->defaultnode = $curnode;
-						debug ("Saving Default Node: " . $curnode->name . "\n");
-					}
-					else
-					{
-						$this->nodes[$curnode->name]=$curnode;
-						debug ("Saving Node: " . $curnode->name . "\n");
-					}
+					$this->nodes[$curnode->name]=$curnode;
+					debug ("Saving Node: " . $curnode->name . "\n");
 				}
 
 				if ($last_seen == "LINK")
 				{
-					if ($curlink->name == 'DEFAULT')
+					if (isset($curlink->a) && isset($curlink->b))
 					{
-						$this->defaultlink=$curlink;
-						debug ("Saving Default Link: " . $curlink->name . "\n");
+						$this->links[$curlink->name]=$curlink;
+						debug ("Saving Link: " . $curlink->name . "\n");
 					}
 					else
 					{
-						if (isset($curlink->a) && isset($curlink->b))
-						{
-							$this->links[$curlink->name]=$curlink;
-							debug ("Saving Link: " . $curlink->name . "\n");
-						}
-						else
-						{
-							$this->links[$curlink->name]=$curlink;
-							debug ("Saving Template-Only Link: " . $curlink->name . "\n");
-						}
-						#}
-						#else { warn
-						#	("Dropping LINK " . $curlink->name . " - it hasn't got 2 NODES! [WMWARN28]\n"); }
-					}
+						$this->links[$curlink->name]=$curlink;
+						debug ("Saving Template-Only Link: " . $curlink->name . "\n");
+					}				
 				}
 
 				if ($matches[1] == 'LINK')
@@ -1394,7 +1415,7 @@ function ReadConfig($input)
 							("LINK DEFAULT is not the first LINK. Defaults will not apply to earlier LINKs. [WMWARN26]\n");
 						}
 						unset($curlink);
-						$curlink = $this->defaultlink;
+						$curlink = $this->links['DEFAULT'];
 					}
 					else
 					{
@@ -1425,7 +1446,7 @@ function ReadConfig($input)
 						}
 
 						unset($curnode);
-						$curnode = $this->defaultnode;
+						$curnode = $this->nodes['DEFAULT'];
 					}
 					else
 					{
@@ -1887,7 +1908,8 @@ function ReadConfig($input)
 			if (preg_match("/^\s*KILO\s+(\d+)\s*$/i", $buffer, $matches))
 			{
 				$this->kilo=$matches[1];
-				$this->defaultlink->owner->kilo=$matches[1];
+				# $this->defaultlink->owner->kilo=$matches[1];
+				$this->links['DEFAULT']=$matches[1];
 				$linematched++;
 			}
 			
@@ -1982,34 +2004,18 @@ function ReadConfig($input)
 
 	if ($last_seen == "NODE")
 	{
-		if ($curnode->name == 'DEFAULT')
-		{
-			$this->defaultnode=$curnode;
-			debug ("Saving Default Node: " . $curnode->name . "\n");
-		}
-		else
-		{
-			$this->nodes[$curnode->name]=$curnode;
-			debug ("Saving Node: " . $curnode->name . "\n");
-		}
+		$this->nodes[$curnode->name]=$curnode;
+		debug ("Saving Node: " . $curnode->name . "\n");	
 	}
 
 	if ($last_seen == "LINK")
 	{
-		if ($curlink->name == 'DEFAULT')
+		if (isset($curlink->a) && isset($curlink->b))
 		{
-			$this->defaultlink=$curlink;
-			debug ("Saving Default Link: " . $curlink->name . "\n");
+			$this->links[$curlink->name]=$curlink;
+			debug ("Saving Link: " . $curlink->name . "\n");
 		}
-		else
-		{
-			if (isset($curlink->a) && isset($curlink->b))
-			{
-				$this->links[$curlink->name]=$curlink;
-				debug ("Saving Link: " . $curlink->name . "\n");
-			}
-			else { warn ("Dropping LINK " . $curlink->name . " - it hasn't got 2 NODES!"); }
-		}
+		else { warn ("Dropping LINK " . $curlink->name . " - it hasn't got 2 NODES!"); }
 	}
 		
 	debug("ReadConfig has finished reading the config ($linecount lines)\n");
@@ -2257,24 +2263,39 @@ function WriteConfig($filename)
 
 		fwrite($fd, $output);
 
-		fwrite($fd,$this->defaultnode->WriteConfig());
-		fwrite($fd,$this->defaultlink->WriteConfig());
+		## fwrite($fd,$this->nodes['DEFAULT']->WriteConfig());
+		## fwrite($fd,$this->links['DEFAULT']->WriteConfig());
 
 		fwrite($fd, "\n# End of DEFAULTS section\n\n# Node definitions:\n");
 
-		foreach ($this->nodes as $node)
+		foreach (array("template","normal") as $which)
 		{
-			fwrite($fd,$node->WriteConfig());
-		}
+			if($which == "template") fwrite($fd,"# TEMPLATE-only NODEs:\n");
+			if($which == "normal") fwrite($fd,"# regular NODEs:\n");
+			
+			foreach ($this->nodes as $node)
+			{
+				if(!preg_match("/^::\s/",$node->name))
+				{
+					if($which=="template" && $node->x === NULL) fwrite($fd,$node->WriteConfig());
+					if($which=="normal" && $node->x !== NULL) fwrite($fd,$node->WriteConfig());
+				}
+			}
+			
+			if($which == "template") fwrite($fd,"# TEMPLATE-only LINKs:\n");
+			if($which == "normal") fwrite($fd,"# regular LINKs:\n");
+			
+			foreach ($this->links as $link)
+			{
+				if(!preg_match("/^::\s/",$link->name))
+				{
+					if($which=="template" && $link->a === NULL) fwrite($fd,$link->WriteConfig());
+					if($which=="normal" && $link->a !== NULL) fwrite($fd,$link->WriteConfig());
+				}
+			}
+		}		
 
-		fwrite($fd, "\n# End of NODE section\n\n# Link definitions:\n");
-
-		foreach ($this->links as $link)
-		{
-			fwrite($fd,$link->WriteConfig());
-		}
-
-		fwrite($fd, "\n# End of LINK section\n\n# That's All Folks!\n");
+		fwrite($fd, "\n\n# That's All Folks!\n");
 	}
 	else
 	{

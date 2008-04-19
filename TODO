@@ -7,8 +7,8 @@ DONE!  add SET nowarn_xxxxx for some of the more common warnings
 
 Before 0.96
 -----------
-DONE Check for NULL coords in link code
-DONE Z-order - layers for drawing
+DONE!  Check for NULL coords in link code
+DONE!  Z-order - layers for drawing
 Angled VIAs
 New Link styles
 Get rid of defaultlink and defaultnode - use __DEFAULT in main array instead.
@@ -16,10 +16,11 @@ Get rid of defaultlink and defaultnode - use __DEFAULT in main array instead.
 more AICONs - NINK, PIE, GAUGE
 (multiline (bw)labels? - interpret \n)
 Coverage/Usage stats
-Per-map warning count in DB
+DONE!  Per-map warning count in DB
 WUG DS
 Nagios DS
 RRD xport DS
+Solarwinds Orion DS
 DONE!  Some SETs to suppress warnings?
 'none' for SCALE (not gradient)
 COMMENTSTYLE (edge|center)

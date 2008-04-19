@@ -2261,19 +2261,19 @@ function WriteConfig($filename)
 			$output .= "SET $hintname $hint\n";
 		}
 
-		$output.="\n# End of global section\n\n# DEFAULT definitions:\n";
+		$output.="\n# End of global section\n\n";
 
 		fwrite($fd, $output);
 
 		## fwrite($fd,$this->nodes['DEFAULT']->WriteConfig());
 		## fwrite($fd,$this->links['DEFAULT']->WriteConfig());
 
-		fwrite($fd, "\n# End of DEFAULTS section\n\n# Node definitions:\n");
+		# fwrite($fd, "\n\n# Node definitions:\n");
 
 		foreach (array("template","normal") as $which)
 		{
-			if($which == "template") fwrite($fd,"# TEMPLATE-only NODEs:\n");
-			if($which == "normal") fwrite($fd,"# regular NODEs:\n");
+			if($which == "template") fwrite($fd,"\n# TEMPLATE-only NODEs:\n");
+			if($which == "normal") fwrite($fd,"\n# regular NODEs:\n");
 			
 			foreach ($this->nodes as $node)
 			{
@@ -2284,8 +2284,8 @@ function WriteConfig($filename)
 				}
 			}
 			
-			if($which == "template") fwrite($fd,"# TEMPLATE-only LINKs:\n");
-			if($which == "normal") fwrite($fd,"# regular LINKs:\n");
+			if($which == "template") fwrite($fd,"\n# TEMPLATE-only LINKs:\n");
+			if($which == "normal") fwrite($fd,"\n# regular LINKs:\n");
 			
 			foreach ($this->links as $link)
 			{

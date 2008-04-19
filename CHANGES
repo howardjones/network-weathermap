@@ -1,5 +1,8 @@
-0.96	ADDED - RRD datasource can take SET rrd_default_path to make configs a little easier to read.
+0.96	ADDED - TEMPLATE allows a node or link to copy it's settings from another, instead of from DEFAULT.
+	ADDED - RRD datasource can take SET rrd_default_path to make configs a little easier to read.
 	ADDED - RRD datasource can take SET rrd_default_in_ds and rrd_default_out_ds for non-Cacti users.
+	ADDED - SNMP datasource also stores the raw data from the SNMP agent in snmp_raw_in/snmp_raw_out
+	ADDED - SNMP datasource allows '-' as an OID, similar to '-' targets in RRDs.
 	ADDED - Control the drawing order with ZORDER.
 	ADDED - New artificial icons: nink, inpie and outpie. See ICON in manual.
 	ADDED - Warning for probably-incorrect BWLABELPOS where in<out
@@ -7,6 +10,7 @@
 	ADDED - Cacti management screen shows number of warnings for each map last time it ran
 	ADDED - Cacti management screen also has a link to the log entries for the map in question
 	CHANGE - A NODE with no POSITION is not drawn, instead of drawn at 0,0. Useful for templates.
+	CHANGE - A LINK with no NODES is no longer an error. Also for templates.
 	CHANGE- The link_bulge secret mode bulges each side of a link independently now
 	FIXED - Minor issue with CRLF in map title for Cacti Plugin
 	FIXED - Oneway links don't draw the INCOMMENT anymore

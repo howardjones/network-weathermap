@@ -723,7 +723,7 @@ class WeatherMapNode extends WeatherMapItem
 			# $defdef = $this->owner->defaultnode;
 			$dd = $this->owner->nodes[$this->template];
 			
-			warn("Writing config for NODE $this->name against $this->template\n");
+			debug("Writing config for NODE $this->name against $this->template\n");
 			
 			# $field = 'zorder'; $keyword = 'ZORDER';
 			$basic_params = array(

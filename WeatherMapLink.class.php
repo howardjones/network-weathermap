@@ -464,7 +464,7 @@ class WeatherMapLink extends WeatherMapItem
 			# $defdef = $this->owner->defaultlink;
 			$dd = $this->owner->links[$this->template];
 			
-			warn("Writing config for LINK $this->name against $this->template\n");
+			debug("Writing config for LINK $this->name against $this->template\n");
 						
 			$basic_params = array(
 					array('width','WIDTH',CONFIG_TYPE_LITERAL),
@@ -489,7 +489,6 @@ class WeatherMapLink extends WeatherMapItem
 					array('bwfontcolour','BWFONTCOLOR',CONFIG_TYPE_COLOR)
 				);
 			
-			# array('template','TEMPLATE',CONFIG_TYPE_LITERAL),
 			# TEMPLATE must come first. DEFAULT
 			if($this->template != 'DEFAULT' && $this->template != ':: DEFAULT ::')
 			{

@@ -13,6 +13,11 @@ class WeatherMapDataSource_fping extends WeatherMapDataSource {
 
 	function Init(&$map)
 	{
+		# 
+		# You may need to change the line below to have something like "/usr/local/bin/fping" or "/usr/bin/fping" instead.
+		#
+		$this->fping_cmd = "/usr/local/sbin/fping";
+	
 		return(TRUE);
 	}
 
@@ -47,67 +52,72 @@ class WeatherMapDataSource_fping extends WeatherMapDataSource {
 		if(preg_match("/^fping:(\S+)$/",$targetstring,$matches))
 		{
 			$target = $matches[1];
-			# fping -t100 -r1 -u -C 5 -i10 -q www.google.com
-			# www.google.com : 13.94 13.97 13.96 14.11 18.34
 			
-			$command = "fping -t100 -r1 -u -C 5 -i10 -q $target 2>&1";
-			debug("Running $command\n");
-			$pipe=popen($command, "r");
-			                
-			$count = 0; $hitcount=0;
-			if (isset($pipe))
+			if(is_executable($this->fping_cmd))
 			{
-				while (!feof($pipe))
+				$command = $this->fping_cmd." -t100 -r1 -u -C 5 -i10 -q $target 2>&1";
+				debug("Running $command\n");
+				$pipe=popen($command, "r");
+				                
+				$count = 0; $hitcount=0;
+				if (isset($pipe))
 				{
-					$line=fgets($pipe, 4096);
-					$count++;
-					debug("Output: $line");
-					if(preg_match("/^$target\s:\s(\S+)\s(\S+)\s(\S+)\s(\S+)\s(\S+)/",$line,$matches))
+					while (!feof($pipe))
 					{
-						debug("Found output line for $target\n");
-						$hitcount++;
-						$loss = 0;
-						$ave = 0;
-						$total = 0;
-						$cnt = 0;
-						$min = 999999;
-						$max = 0;
-						for($i=1;$i<6;$i++)
+						$line=fgets($pipe, 4096);
+						$count++;
+						debug("Output: $line");
+						if(preg_match("/^$target\s:\s(\S+)\s(\S+)\s(\S+)\s(\S+)\s(\S+)/",$line,$matches))
 						{
-							if($matches[$i]=='-') 
-							{ $loss+=20; }
-							else
+							debug("Found output line for $target\n");
+							$hitcount++;
+							$loss = 0;
+							$ave = 0;
+							$total = 0;
+							$cnt = 0;
+							$min = 999999;
+							$max = 0;
+							for($i=1;$i<6;$i++)
 							{
-								$cnt++;
-								$total += $matches[$i];
-								$max = max($matches[$i],$max);
-								$min = min($matches[$i],$min);
+								if($matches[$i]=='-') 
+								{ $loss+=20; }
+								else
+								{
+									$cnt++;
+									$total += $matches[$i];
+									$max = max($matches[$i],$max);
+									$min = min($matches[$i],$min);
+								}
 							}
+							if($cnt >0) $ave = $total/$cnt;
+							
+							debug("Result: $cnt $min -> $max $ave $loss\n");
 						}
-						if($cnt >0) $ave = $total/$cnt;
-						
-						debug("Result: $cnt $min -> $max $ave $loss\n");
 					}
-				}
-				pclose ($pipe);
-				if($count==0)
-				{
-					warn("FPing ReadData: No lines read. Bad hostname? ($target)\n");
-				}
-				else
-				{
-					if($hitcount == 0)
+					pclose ($pipe);
+					if($count==0)
 					{
-						warn("FPing ReadData: Lines read. But nothing returned for target??? ($target)\n");
+						warn("FPing ReadData: No lines read. Bad hostname? ($target)\n");
 					}
 					else
 					{
-						$data[IN] = $ave;
-						$data[OUT] = $loss;
-						$item->add_note("fping_min",$min);
-						$item->add_note("fping_max",$max);
+						if($hitcount == 0)
+						{
+							warn("FPing ReadData: $count lines read. But nothing returned for target??? ($target) Try running with DEBUG to see output.  [WMFPING02]\n");
+						}
+						else
+						{
+							$data[IN] = $ave;
+							$data[OUT] = $loss;
+							$item->add_note("fping_min",$min);
+							$item->add_note("fping_max",$max);
+						}
 					}
 				}
+			}
+			else
+			{
+				warn("FPing ReadData: Can't find fping executable. Check path at line 19 of WeatherMapDataSource_fping.php [WMFPING01]\n");
 			}
 		}
 

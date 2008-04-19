@@ -106,24 +106,37 @@ class WeatherMapLink extends WeatherMapItem
 	function Reset(&$newowner)
 	{
 		$this->owner=$newowner;
+		
+		$template = $this->template;
+                if($template == '') $template = "DEFAULT";
 
-		if (isset($this->owner->defaultlink) && $this->name != 'DEFAULT') {
-			// use the defaults from DEFAULT
-			$this->CopyFrom($this->owner->defaultlink); 
-			$this->my_default = $this->owner->defaultlink;
+		debug("Resetting $this->name with $template\n");
+
+		// the internal default-default gets it's values from inherit_fieldlist
+		// everything else comes from a link object - the template.
+		if($this->name==':: DEFAULT ::')
+		{
+			foreach (array_keys($this->inherit_fieldlist) as $fld) {
+				$this->$fld=$this->inherit_fieldlist[$fld];
+			}
 		}
 		else
 		{
-			foreach (array_keys($this->inherit_fieldlist)as
-				$fld) { $this->$fld=$this->inherit_fieldlist[$fld]; }
+			$this->CopyFrom($this->owner->links[$template]); 
 		}
+		$this->template = $template;
 	}
 
 	function my_type() {  return "LINK"; }
 
-	function CopyFrom($source)
+	function CopyFrom(&$source)
 	{
-		foreach (array_keys($this->inherit_fieldlist)as $fld) { $this->$fld = $source->$fld; }
+		debug("Initialising LINK $this->name from $source->name\n");
+		assert('is_object($source)');
+				
+		foreach (array_keys($this->inherit_fieldlist) as $fld) {
+			 if($fld != 'template') $this->$fld = $source->$fld;
+		}
 	}
 
 	function DrawComments($image,$col,$widths)

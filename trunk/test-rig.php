@@ -11,7 +11,7 @@
 include_once 'editor-config.php';
 require_once 'Weathermap.class.php';
 
-$mapfile = "configs/095-test.conf";
+$mapfile = "configs/096-test.conf";
 
 $map = new WeatherMap;
 
@@ -22,36 +22,36 @@ $map = new WeatherMap;
 	if(1==0)
 	{
 	$nodename = "Centre";
-$newnodename = "dave";
-
-$newnode = $map->nodes[$nodename];
-$newnode->name = $newnodename;
-$map->nodes[$newnodename] = $newnode;
-unset($map->nodes[$nodename]);
-
-foreach ($map->links as $link)
-{
-	if($link->a->name == $nodename)
+	$newnodename = "dave";
+	
+	$newnode = $map->nodes[$nodename];
+	$newnode->name = $newnodename;
+	$map->nodes[$newnodename] = $newnode;
+	unset($map->nodes[$nodename]);
+	
+	foreach ($map->links as $link)
 	{
-		$map->links[$link->name]->a = $newnode;
+		if($link->a->name == $nodename)
+		{
+			$map->links[$link->name]->a = $newnode;
+		}
+		if($link->b->name == $nodename)
+		{
+			$map->links[$link->name]->b = $newnode;
+		}
 	}
-	if($link->b->name == $nodename)
-	{
-		$map->links[$link->name]->b = $newnode;
-	}
+	
+	//   print_r($map->nodes['main']);
+
 }
 
-//   print_r($map->nodes['main']);
+#$mynode = $map->nodes['node80111'];
+#$ddnode = $map->inherit_fieldlist;
+#$dnode = $map->defaultnode;
 
-}
-
-$mynode = $map->nodes['node80111'];
-$ddnode = $map->inherit_fieldlist;
-$dnode = $map->defaultnode;
-
-print $mynode->usescale."\n";
-print $dnode->usescale."\n";
-print $ddnode->usescale."\n";
+#print $mynode->usescale."\n";
+#print $dnode->usescale."\n";
+#print $ddnode->usescale."\n";
 
 $map->WriteConfig("output.conf");
 

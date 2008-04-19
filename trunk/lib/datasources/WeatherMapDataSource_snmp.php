@@ -56,15 +56,15 @@ class WeatherMapDataSource_snmp extends WeatherMapDataSource {
 			snmp_set_oid_output_format  ( SNMP_OID_OUTPUT_NUMERIC  );
 			snmp_set_valueretrieval(SNMP_VALUE_PLAIN);
 
-			$in_result = snmpget($host,$community,$in_oid,1000000,2);
-			$out_result = snmpget($host,$community,$out_oid,1000000,2);
+			if($in_oid != '-') $in_result = snmpget($host,$community,$in_oid,1000000,2);
+			if($out_oid != '-') $out_result = snmpget($host,$community,$out_oid,1000000,2);
 
 			debug ("SNMP ReadData: Got $in_result and $out_result\n");
 
 			// use floatval() here to force the output to be *some* kind of number
 			// just in case the stupid formatting stuff doesn't stop net-snmp returning 'down' instead of 2
-			if($in_result) { $data[IN] = floatval($in_result); }
-			if($out_result) { $data[OUT] = floatval($out_result);}
+			if($in_result) { $data[IN] = floatval($in_result); $item->add_hint("snmp_in_raw",$in_result); }
+			if($out_result) { $data[OUT] = floatval($out_result); $item->add_hint("snmp_out_raw",$out_result);}
 			$data_time = time();
 			snmp_set_quick_print($was);
 		}

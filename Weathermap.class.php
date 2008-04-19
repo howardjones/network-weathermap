@@ -284,6 +284,7 @@ class WeatherMap extends WeatherMapBase
                 $defnode2->name = "DEFAULT";
                 $defnode2->template = ":: DEFAULT ::";
                 $defnode2->Reset($this);
+		
                 $this->nodes['DEFAULT'] = &$defnode2;
 
 		debug("Creating actual DEFAULT LINK from :: DEFAULT ::\n");
@@ -291,6 +292,7 @@ class WeatherMap extends WeatherMapBase
                 $deflink2->name = "DEFAULT";
                 $deflink2->template = ":: DEFAULT ::";
                 $deflink2->Reset($this);
+		
                 $this->links['DEFAULT'] = &$deflink2;
 
 		// XXX - for now, make the old defaultlink and defaultnode work too.

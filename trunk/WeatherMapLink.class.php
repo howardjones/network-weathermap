@@ -461,10 +461,10 @@ class WeatherMapLink extends WeatherMapItem
 		}
 		else
 		{
-			$defdef = $this->owner->defaultlink;
+			# $defdef = $this->owner->defaultlink;
 			$dd = $this->owner->links[$this->template];
 			
-			warn("Writing config for $this->name against $this->template\n");
+			warn("Writing config for LINK $this->name against $this->template\n");
 						
 			$basic_params = array(
 					array('width','WIDTH',CONFIG_TYPE_LITERAL),
@@ -661,11 +661,11 @@ class WeatherMapLink extends WeatherMapItem
 			      if( 
 			    ($this->name == 'DEFAULT')
 			  ||
-				    (isset($defdef->hints[$hintname]) 
+				    (isset($dd->hints[$hintname]) 
 				    &&
-				    $defdef->hints[$hintname] != $hint)
+				    $dd->hints[$hintname] != $hint)
 				  ||
-				    (!isset($defdef->hints[$hintname]))
+				    (!isset($dd->hints[$hintname]))
 				)
 			      {		      
 			    $output .= "\tSET $hintname $hint\n";

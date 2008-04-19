@@ -720,10 +720,14 @@ class WeatherMapNode extends WeatherMapItem
 		}
 		else
 		{
-			$defdef = $this->owner->defaultnode;
+			# $defdef = $this->owner->defaultnode;
+			$dd = $this->owner->nodes[$this->template];
+			
+			warn("Writing config for NODE $this->name against $this->template\n");
+			
 			# $field = 'zorder'; $keyword = 'ZORDER';
 			$basic_params = array(
-					array('template','TEMPLATE',CONFIG_TYPE_LITERAL),
+					# array('template','TEMPLATE',CONFIG_TYPE_LITERAL),
 					array('label','LABEL',CONFIG_TYPE_LITERAL),
 					array('zorder','ZORDER',CONFIG_TYPE_LITERAL),
 					array('labeloffset','LABELOFFSET',CONFIG_TYPE_LITERAL),
@@ -739,13 +743,20 @@ class WeatherMapNode extends WeatherMapItem
 					array('labelbgcolour','LABELBGCOLOR',CONFIG_TYPE_COLOR),
 					array('labelfontcolour','LABELFONTCOLOR',CONFIG_TYPE_COLOR)
 				);
+			
+			# TEMPLATE must come first. DEFAULT
+			if($this->template != 'DEFAULT' && $this->template != ':: DEFAULT ::')
+			{
+				$output.="\tTEMPLATE " . $this->template . "\n";
+			}
+			
 			foreach ($basic_params as $param)
 			{
 				$field = $param[0];
 				$keyword = $param[1];
 
-				$comparison=($this->name == 'DEFAULT' ? $this->inherit_fieldlist[$field] : $defdef->$field);
-				if ($this->$field != $comparison)
+			#	$comparison=($this->name == 'DEFAULT' ? $this->inherit_fieldlist[$field] : $defdef->$field);
+				if ($this->$field != $dd->$field)
 				{
 					if($param[2] == CONFIG_TYPE_COLOR) $output.="\t$keyword " . render_colour($this->$field) . "\n";
 					if($param[2] == CONFIG_TYPE_LITERAL) $output.="\t$keyword " . $this->$field . "\n";
@@ -754,28 +765,26 @@ class WeatherMapNode extends WeatherMapItem
 
 			// IN/OUT are the same, so we can use the simpler form here
 #			print_r($this->infourl);
-			$comparison=($this->name == 'DEFAULT'
-			? $this->inherit_fieldlist['infourl'][IN] : $defdef->infourl[IN]);
-			if ($this->infourl[IN] != $comparison) { $output.="\tINFOURL " . $this->infourl[IN] . "\n"; }
+			#$comparison=($this->name == 'DEFAULT'
+			#? $this->inherit_fieldlist['infourl'][IN] : $defdef->infourl[IN]);
+			if ($this->infourl[IN] != $dd->infourl[IN]) { $output.="\tINFOURL " . $this->infourl[IN] . "\n"; }
 			
-			$comparison=($this->name == 'DEFAULT'
-			? $this->inherit_fieldlist['overlibcaption'][IN] : $defdef->overlibcaption[IN]);
-			if ($this->overlibcaption[IN] != $comparison) { $output.="\tOVERLIBCAPTION " . $this->overlibcaption[IN] . "\n"; }
+			#$comparison=($this->name == 'DEFAULT'
+			#? $this->inherit_fieldlist['overlibcaption'][IN] : $defdef->overlibcaption[IN]);
+			if ($this->overlibcaption[IN] != $dd->overlibcaption[IN]) { $output.="\tOVERLIBCAPTION " . $this->overlibcaption[IN] . "\n"; }
 
 			// IN/OUT are the same, so we can use the simpler form here
-			$comparison=($this->name == 'DEFAULT'
-			? $this->inherit_fieldlist['notestext'][IN] : $defdef->notestext[IN]);
-				if ($this->notestext[IN] != $comparison) { $output.="\tNOTES " . $this->notestext[IN] . "\n"; }
+			# $comparison=($this->name == 'DEFAULT'
+			# ? $this->inherit_fieldlist['notestext'][IN] : $defdef->notestext[IN]);
+			if ($this->notestext[IN] != $dd->notestext[IN]) { $output.="\tNOTES " . $this->notestext[IN] . "\n"; }
 
-			$comparison=($this->name == 'DEFAULT'
-			? $this->inherit_fieldlist['overliburl'][IN] : $defdef->overliburl[IN]);
-			if ($this->overliburl[IN] != $comparison) { $output.="\tOVERLIBGRAPH " . join(" ",$this->overliburl[IN]) . "\n"; }
+			# $comparison=($this->name == 'DEFAULT'
+			# ? $this->inherit_fieldlist['overliburl'][IN] : $defdef->overliburl[IN]);
+			if ($this->overliburl[IN] != $dd->overliburl[IN]) { $output.="\tOVERLIBGRAPH " . join(" ",$this->overliburl[IN]) . "\n"; }
 
 			$val = $this->iconscalew. " " . $this->iconscaleh. " " .$this->iconfile;
 
-			$comparison = ($this->name == 'DEFAULT' ? $this->inherit_fieldlist['iconscalew'] : $defdef->iconscalew)
-							. " " . ($this->name == 'DEFAULT' ? $this->inherit_fieldlist['iconscaleh'] : $defdef->iconscaleh)
-							. " " . ($this->name == 'DEFAULT' ? $this->inherit_fieldlist['iconfile'] : $defdef->iconfile);
+			$comparison = $dd->iconscalew. " " . $dd->iconscaleh . " " . $dd->iconfile;
 
 			if ($val != $comparison) {
 				$output.="\tICON ";
@@ -785,10 +794,10 @@ class WeatherMapNode extends WeatherMapItem
 				$output .= ($this->iconfile=='' ?  'none' : $this->iconfile) . "\n";
 			}
 
-			$comparison=($this->name == 'DEFAULT'
-			? $this->inherit_fieldlist['targets'] : $defdef->targets);
+			# $comparison=($this->name == 'DEFAULT'
+			# ? $this->inherit_fieldlist['targets'] : $defdef->targets);
 
-			if ($this->targets != $comparison)
+			if ($this->targets != $dd->targets)
 			{
 				$output.="\tTARGET";
 
@@ -797,30 +806,33 @@ class WeatherMapNode extends WeatherMapItem
 				$output.="\n";
 			}
 
-			$comparison = ($this->name == 'DEFAULT' ? $this->inherit_fieldlist['usescale'] : $defdef->usescale) . " " .
-				($this->name == 'DEFAULT' ? $this->inherit_fieldlist['scalevar'] : $defdef->scalevar);
+		#	$comparison = ($this->name == 'DEFAULT' ? $this->inherit_fieldlist['usescale'] : $defdef->usescale) . " " .
+		#		($this->name == 'DEFAULT' ? $this->inherit_fieldlist['scalevar'] : $defdef->scalevar);
 			$val = $this->usescale . " " . $this->scalevar;
+			$comparison = $dd->usescale . " " . $dd->scalevar;
 
 			if ( ($val != $comparison) ) { $output.="\tUSESCALE " . $val . "\n"; }
 
-
-			$comparison = ($this->name == 'DEFAULT'
-				? $this->inherit_fieldlist['useiconscale'] : $defdef->useiconscale) . " " .
-				($this->name == 'DEFAULT' ? $this->inherit_fieldlist['iconscalevar'] : $defdef->iconscalevar);
+#			$comparison = ($this->name == 'DEFAULT'
+#				? $this->inherit_fieldlist['useiconscale'] : $defdef->useiconscale) . " " .
+#				($this->name == 'DEFAULT' ? $this->inherit_fieldlist['iconscalevar'] : $defdef->iconscalevar);
 			$val = $this->useiconscale . " " . $this->iconscalevar;
+			$comparison= $dd->useiconscale . " " . $dd->iconscalevar;
 				
 			if ( $val != $comparison) { $output.="\tUSEICONSCALE " .$val . "\n"; }
 
-			$comparison = ($this->name == 'DEFAULT'
-			? $this->inherit_fieldlist['labeloffsetx'] : $defdef->labeloffsetx) . " " . ($this->name == 'DEFAULT'
-				? $this->inherit_fieldlist['labeloffsety'] : $defdef->labeloffsety);
+			#$comparison = ($this->name == 'DEFAULT'
+			#? $this->inherit_fieldlist['labeloffsetx'] : $defdef->labeloffsetx) . " " . ($this->name == 'DEFAULT'
+		#		? $this->inherit_fieldlist['labeloffsety'] : $defdef->labeloffsety);
 			$val = $this->labeloffsetx . " " . $this->labeloffsety;
+			$comparison = $dd->labeloffsetx . " " . $dd->labeloffsety;
 
 			if ($comparison != $val ) { $output.="\tLABELOFFSET " . $val . "\n"; }
 
-			$comparison=($this->name == 'DEFAULT' ? $this->inherit_fieldlist['x'] : $defdef->x) . " " . 
-						($this->name == 'DEFAULT' ? $this->inherit_fieldlist['y'] : $defdef->y);
+			#$comparison=($this->name == 'DEFAULT' ? $this->inherit_fieldlist['x'] : $defdef->x) . " " . 
+			#			($this->name == 'DEFAULT' ? $this->inherit_fieldlist['y'] : $defdef->y);
 			$val = $this->x . " " . $this->y;
+			$comparison = $dd->x . " " . $dd->y;
 			
 			if ($val != $comparison)
 			{
@@ -830,8 +842,8 @@ class WeatherMapNode extends WeatherMapItem
 				{ $output.="\tPOSITION " . $this->relative_to . " " .  $this->original_x . " " . $this->original_y . "\n"; }
 			}
 
-			if (($this->max_bandwidth_in != $defdef->max_bandwidth_in)
-				|| ($this->max_bandwidth_out != $defdef->max_bandwidth_out)
+			if (($this->max_bandwidth_in != $dd->max_bandwidth_in)
+				|| ($this->max_bandwidth_out != $dd->max_bandwidth_out)
 					|| ($this->name == 'DEFAULT'))
 			{
 				if ($this->max_bandwidth_in == $this->max_bandwidth_out)
@@ -847,11 +859,11 @@ class WeatherMapNode extends WeatherMapItem
 			      if(
 			    ($this->name == 'DEFAULT')
 			  ||
-				    (isset($defdef->hints[$hintname])
+				    (isset($dd->hints[$hintname])
 				    &&
-				    $defdef->hints[$hintname] != $hint)
+				    $dd->hints[$hintname] != $hint)
 				  ||
-				    (!isset($defdef->hints[$hintname]))
+				    (!isset($dd->hints[$hintname]))
 				)
 			      {
 			    $output .= "\tSET $hintname $hint\n";

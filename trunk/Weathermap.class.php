@@ -379,8 +379,21 @@ class WeatherMap extends WeatherMapBase
 
 	function myimagestringsize($fontnumber, $string)
 	{
+		$linecount = 1;
+		
+		$lines = split("\n",$string);
+		$linecount = sizeof($lines);
+		$maxlinelength=0;
+		foreach($lines as $line)
+		{
+			$l = strlen($line);
+			if($l > $maxlinelength) $maxlinelength = $l;
+		}
+		
+		// XXX - figure out if there is more than one line, and what the longest of the lines really is
+		
 		if (($fontnumber > 0) && ($fontnumber < 6))
-		{ return array(imagefontwidth($fontnumber) * strlen($string), imagefontheight($fontnumber)); }
+		{ return array(imagefontwidth($fontnumber) * $maxlinelength, $linecount * imagefontheight($fontnumber)); }
 		else
 		{
 			// look up what font is defined for this slot number
@@ -388,32 +401,55 @@ class WeatherMap extends WeatherMapBase
 			{
 				warn ("Using a non-existent special font ($fontnumber) - falling back to internal GD fonts\n");
 				$fontnumber=5;
-				return array(imagefontwidth($fontnumber) * strlen($string), imagefontheight($fontnumber));
+				return array(imagefontwidth($fontnumber) * $maxlinelength, $linecount * imagefontheight($fontnumber));
 			}
 			else
 			{
 				if ($this->fonts[$fontnumber]->type == 'truetype')
 				{
-					$bounds=imagettfbbox($this->fonts[$fontnumber]->size, 0, $this->fonts[$fontnumber]->file,
-						$string);
-					return (array($bounds[4] - $bounds[0], $bounds[1] - $bounds[5]));
+					$ysize = 0;
+					$xsize = 0;
+					foreach($lines as $line)
+					{
+						$bounds=imagettfbbox($this->fonts[$fontnumber]->size, 0, $this->fonts[$fontnumber]->file, $line);
+						$cx = $bounds[4] - $bounds[0];
+						$cy = $bounds[1] - $bounds[5];
+						if($cx > $xsize) $xsize = $cx;
+						$ysize += $cy;
+						warn("Adding $cy (x was $cx)\n");
+					}
+					#$bounds=imagettfbbox($this->fonts[$fontnumber]->size, 0, $this->fonts[$fontnumber]->file,
+					#	$string);
+					# return (array($bounds[4] - $bounds[0], $bounds[1] - $bounds[5]));
+					warn("Size of $string is $xsize x $ysize over $linecount lines\n");
+					
+					return(array($xsize,$ysize));
 				}
 
 				if ($this->fonts[$fontnumber]->type == 'gd')
-				{ return array(imagefontwidth($this->fonts[$fontnumber]->gdnumber) * strlen($string),
-					imagefontheight($this->fonts[$fontnumber]->gdnumber)); }
+				{ return array(imagefontwidth($this->fonts[$fontnumber]->gdnumber) * $maxlinelength,
+					$linecount * imagefontheight($this->fonts[$fontnumber]->gdnumber)); }
 			}
 		}
 	}
 
-	function ProcessString($input,&$context, $include_notes=TRUE)
+	function ProcessString($input,&$context, $include_notes=TRUE,$multiline=TRUE)
 	{
-		$output = $input;
+		
 
 		# debug("ProcessString: input is $input\n");
 
 		assert('is_scalar($input)');
 
+		if($multiline==TRUE)
+		{
+			$i = $input;
+			$input = str_replace("\\n","\n",$i);
+			if($i != $input)  warn("$i into $input\n");
+		}
+
+		$output = $input;
+		
 		# while( preg_match("/(\{[^}]+\})/",$input,$matches) )
 		while( preg_match("/(\{(?:node|map|link)[^}]+\})/",$input,$matches) )
 		{

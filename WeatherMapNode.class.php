@@ -189,7 +189,7 @@ class WeatherMapNode extends WeatherMapItem
 			$padding = 4.0;
 			$padfactor = 1.0;
 
-			$this->proclabel = $map->ProcessString($this->label,$this);
+			$this->proclabel = $map->ProcessString($this->label,$this,TRUE,TRUE);
 			
 			// if screenshot_mode is enabled, wipe any letters to X and wipe any IP address to 127.0.0.1
 			// hopefully that will preserve enough information to show cool stuff without leaking info

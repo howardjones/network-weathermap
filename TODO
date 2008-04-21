@@ -11,8 +11,8 @@ DONE!  Check for NULL coords in link code
 DONE!  Z-order - layers for drawing
 Angled VIAs
 New Link styles
-Get rid of defaultlink and defaultnode - use __DEFAULT in main array instead.
-(Multilayered inheritance) -> Parent property. Default parent is __DEFAULT
+DONE!  Get rid of defaultlink and defaultnode - use __DEFAULT in main array instead.
+DONE!  (Multilayered inheritance) -> Parent property. Default parent is __DEFAULT
 more AICONs - NINK, PIE, GAUGE
 (multiline (bw)labels? - interpret \n)
 Coverage/Usage stats

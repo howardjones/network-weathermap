@@ -75,10 +75,7 @@
 	FIXED - SNMP DS plugin had a typo that stopped it working at all (and no-one 
                 noticed for almost a year :-) ). (thanks to Fratissier Christophe for pointing it out)
 	FIXED - Added some better controls into SNMP DS plugin. You can correctly pull 
-                interface oper/admin status, for example, now.
-				
-	
-	
+                interface oper/admin status, for example, now.		
 	
 0.941	FIXED - Issue with '-' DS names again.
 	FIXED - Added extra code to help discourage browser caching.

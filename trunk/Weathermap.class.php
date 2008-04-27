@@ -389,9 +389,7 @@ class WeatherMap extends WeatherMapBase
 			$l = strlen($line);
 			if($l > $maxlinelength) $maxlinelength = $l;
 		}
-		
-		// XXX - figure out if there is more than one line, and what the longest of the lines really is
-		
+				
 		if (($fontnumber > 0) && ($fontnumber < 6))
 		{ return array(imagefontwidth($fontnumber) * $maxlinelength, $linecount * imagefontheight($fontnumber)); }
 		else
@@ -415,7 +413,7 @@ class WeatherMap extends WeatherMapBase
 						$cx = $bounds[4] - $bounds[0];
 						$cy = $bounds[1] - $bounds[5];
 						if($cx > $xsize) $xsize = $cx;
-						$ysize += $cy;
+						$ysize += ($cy*1.2);
 						warn("Adding $cy (x was $cx)\n");
 					}
 					#$bounds=imagettfbbox($this->fonts[$fontnumber]->size, 0, $this->fonts[$fontnumber]->file,

@@ -34,6 +34,11 @@ class WeatherMapDataSource_rrd extends WeatherMapDataSource {
 			{    // unlikely to ever occur
 				warn("RRD DS: Can't find RRDTOOL. Check your Cacti config. [WMRRD03]\n");
 			}
+			
+			if($map->context=='cacti')
+			{
+				debug("RRD DS: path_rra is ".$config["base_path"]."/rra - your rrd pathname must be exactly this to use poller_output\n");
+			}
 #		}
 
 		return(FALSE);
@@ -55,7 +60,7 @@ class WeatherMapDataSource_rrd extends WeatherMapDataSource {
 		}
 	}
 
-	function wmrrd_read_from_poller_output($rrdfile,$cf,$start,$end,$dsnames, &$data, &$map, &$data_time)
+	function wmrrd_read_from_poller_output($rrdfile,$cf,$start,$end,$dsnames, &$data, &$map, &$data_time, &$item)
 	{
 		global $config;
 		
@@ -63,9 +68,9 @@ class WeatherMapDataSource_rrd extends WeatherMapDataSource {
 		{
 			debug("RRD ReadData: poller_output style\n");
 
-			// force it to be a complete path first,
-			// then take away the cacti bit, to get the appropriate path for the table
-			$db_rrdname = realpath($rrdfile);
+			// take away the cacti bit, to get the appropriate path for the table
+			// $db_rrdname = realpath($rrdfile);
+			$db_rrdname = $rrdfile;
 			$db_rrdname = str_replace($config["base_path"]."/rra","<path_rra>",$db_rrdname);
 			debug("******************************************************************\nChecking weathermap_data\n");
 			foreach (array(IN,OUT) as $dir)
@@ -74,10 +79,12 @@ class WeatherMapDataSource_rrd extends WeatherMapDataSource {
 				if($dsnames[$dir] != '-')
 				{
 					debug("RRD ReadData: poller_output - DS name is ".$dsnames[$dir]."\n");
+					
 					$SQL = "select * from weathermap_data where rrdfile='".mysql_real_escape_string($db_rrdname)."' and data_source_name='".mysql_real_escape_string($dsnames[$dir])."'";
-					$SQLins = "insert into weathermap_data (rrdfile, data_source_name,sequence) values ('".mysql_real_escape_string($db_rrdname)."','".mysql_real_escape_string($dsnames[$dir])."', 0)";
+					
 					$SQLcheck = "select data_template_data.local_data_id from data_template_data,data_template_rrd where data_template_data.local_data_id=data_template_rrd.local_data_id and data_template_data.data_source_path='".mysql_real_escape_string($db_rrdname)."' and data_template_rrd.data_source_name='".mysql_real_escape_string($dsnames[$dir])."'";
 					$SQLvalid = "select data_template_rrd.data_source_name from data_template_data,data_template_rrd where data_template_data.local_data_id=data_template_rrd.local_data_id and data_template_data.data_source_path='".mysql_real_escape_string($db_rrdname)."'";
+					
 					$worst_time = time() - 8*60;
 					$result = db_fetch_row($SQL);
 					if(!isset($result['id']))
@@ -103,11 +110,15 @@ class WeatherMapDataSource_rrd extends WeatherMapDataSource {
 						}
 						else
 						{
+							// add the new data source (which we just checked exists) to the table. 
+							// Include the local_data_id as well, to make life easier in poller_output
+							// (and to allow the cacti: DS plugin to use the same table, too)
+							$SQLins = "insert into weathermap_data (rrdfile, data_source_name, sequence, local_data_id) values ('".mysql_real_escape_string($db_rrdname)."','".mysql_real_escape_string($dsnames[$dir])."', 0,".$result['local_data_id'].")";
 							db_execute($SQLins);
 						}
 					}
 					else
-					{
+					{	// the data table line already exists
 						debug("RRD ReadData: poller_output - found weathermap_data row\n");
 						// if the result is valid, then use it
 						if( ($result['sequence'] > 2) && ( $result['last_time'] > $worst_time) )
@@ -120,6 +131,32 @@ class WeatherMapDataSource_rrd extends WeatherMapDataSource {
 						{
 							$data[$dir] = 0;
 							debug("RRD ReadData: poller_output - data is either too old, or too new\n");
+						}
+						// now, we can use the local_data_id to get some other useful info
+						// first, see if the weathermap_data entry *has* a local_data_id. If not, we need to update this entry.
+						$ldi = 0;
+						if(!isset($result['local_data_id']))
+						{
+							$r2 = db_fetch_row($SQLcheck);
+							if(isset($r2['local_data_id']))
+							{
+								// put that in now, so that we can skip this step next time
+								db_execute("update weathermap_data set local_data_id=".$r2['local_data_id']." where id=".$result['id']);
+								$ldi = $r2['local_data_id'];
+							}
+						}
+						else
+						{
+							$ldi = $result['local_data_id'];
+						}
+						if($ldi>0)
+						{
+							$r3 = db_fetch_array(sprintf("select data_local.host_id, field_name,field_value from data_local,host_snmp_cache where data_local.id=%d and data_local.host_id=host_snmp_cache.host_id and data_local.snmp_index=host_snmp_cache.snmp_index and data_local.snmp_query_id=host_snmp_cache.snmp_query_id",$ldi));
+							foreach ($r3 as $vv)
+							{
+								$item->add_hint("cacti_".$vv['field_name'],$vv['field_value']);
+							}
+							$item->add_hint("cacti_host_id",$vv['host_id']);
 						}
 					}
 				}				
@@ -143,7 +180,7 @@ class WeatherMapDataSource_rrd extends WeatherMapDataSource {
 		debug("RRD ReadData: poller_output - ended\n");
 	}
 	
-	function wmrrd_read_from_php_rrd($rrdfile,$cf,$start,$end,$dsnames, &$data ,&$map, &$data_time)
+	function wmrrd_read_from_php_rrd($rrdfile,$cf,$start,$end,$dsnames, &$data ,&$map, &$data_time,&$item)
 	{
 		// not yet implemented - use php-rrdtool to read rrd data. Should be quicker
 		if ((1==0) && extension_loaded('RRDTool')) // fetch the values via the RRDtool Extension
@@ -167,7 +204,7 @@ class WeatherMapDataSource_rrd extends WeatherMapDataSource {
 		}
 	}
 
-	function wmrrd_read_from_real_rrdtool($rrdfile,$cf,$start,$end,$dsnames, &$data, &$map, &$data_time)
+	function wmrrd_read_from_real_rrdtool($rrdfile,$cf,$start,$end,$dsnames, &$data, &$map, &$data_time,&$item)
 	{
 
 		debug("RRD ReadData: traditional style\n");
@@ -341,6 +378,7 @@ class WeatherMapDataSource_rrd extends WeatherMapDataSource {
 		debug("SCALING result by $multiplier\n");
 		
 		// try and make a complete path, if we've been given a clue
+		// (if the path starts with a . or a / then assume the user knows what they are doing)
 		if(!preg_match("/^(\/|\.)/",$rrdfile))
 		{
 			$rrdbase = $map->get_hint('rrd_default_path');
@@ -366,7 +404,7 @@ class WeatherMapDataSource_rrd extends WeatherMapDataSource {
 
 		if($use_poller_output == 1)
 		{
-			WeatherMapDataSource_rrd::wmrrd_read_from_poller_output($rrdfile,"AVERAGE",$start,$end, $dsnames, $data,$map, $data_time);
+			WeatherMapDataSource_rrd::wmrrd_read_from_poller_output($rrdfile,"AVERAGE",$start,$end, $dsnames, $data,$map, $data_time,$item);
 		}
 			
 		// if poller_output didn't get anything, or if it couldn't/didn't run, do it the old-fashioned way
@@ -382,12 +420,12 @@ class WeatherMapDataSource_rrd extends WeatherMapDataSource {
 	
 				if ((1==0) && extension_loaded('RRDTool')) // fetch the values via the RRDtool Extension
 				{
-					WeatherMapDataSource_rrd::wmrrd_read_from_php_rrd($rrdfile,"AVERAGE",$start,$end, $dsnames, $data,$map, $data_time);								
+					WeatherMapDataSource_rrd::wmrrd_read_from_php_rrd($rrdfile,"AVERAGE",$start,$end, $dsnames, $data,$map, $data_time,$item);
 				}
 				else
 				{
 					// do this the tried and trusted old-fashioned way
-					WeatherMapDataSource_rrd::wmrrd_read_from_real_rrdtool($rrdfile,"AVERAGE",$start,$end, $dsnames, $data,$map, $data_time);
+					WeatherMapDataSource_rrd::wmrrd_read_from_real_rrdtool($rrdfile,"AVERAGE",$start,$end, $dsnames, $data,$map, $data_time,$item);
 				}
 			}
 			else

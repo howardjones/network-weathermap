@@ -212,7 +212,7 @@ function weathermap_setup_table () {
 		if (!$found_so) $sql[] = "alter table weathermap_maps add sortorder int(11) NOT NULL default 0 after id";
 		if (!$found_fh) $sql[] = "alter table weathermap_maps add filehash varchar(40) NOT NULL default '' after titlecache";		
 		if (!$found_wc) $sql[] = "alter table weathermap_maps add warncount int(11) NOT NULL default 0 after filehash";		
-		if (!$found_cf) $sql[] = "alter table weathermap_maps add config text NOT NULL  default '' after warncount";		
+		if (!$found_cf) $sql[] = "alter table weathermap_maps add config text NOT NULL  default '' after warncount";
 	}
 
 	$sql[] = "update weathermap_maps set filehash=LEFT(MD5(concat(id,configfile,rand())),20) where filehash = '';";
@@ -228,8 +228,23 @@ function weathermap_setup_table () {
 		$sql[] = "CREATE TABLE IF NOT EXISTS weathermap_data (id int(11) NOT NULL auto_increment,
 			rrdfile varchar(255) NOT NULL,data_source_name varchar(19) NOT NULL,
 			  last_time int(11) NOT NULL,last_value varchar(255) NOT NULL,
-			last_calc varchar(255) NOT NULL, sequence int(11) NOT NULL, PRIMARY KEY  (id), KEY rrdfile (rrdfile),
-			  KEY data_source_name (data_source_name) ) TYPE=MyISAM";
+			last_calc varchar(255) NOT NULL, sequence int(11) NOT NULL, local_data_id int(11) NOT NULL DEFAULT 0, PRIMARY KEY  (id), KEY rrdfile (rrdfile),
+			  KEY local_data_id (local_data_id), KEY data_source_name (data_source_name) ) TYPE=MyISAM";
+	}
+	else
+	{
+		$colsql = "show columns from weathermap_data from " . $database_default;
+		$result = mysql_query($colsql) or die (mysql_error());
+		$found_ldi = false;
+		
+		while ($row = mysql_fetch_array($result, MYSQL_ASSOC)) {
+			if ($row['Field'] == 'local_data_id') $found_ldi = true;
+		}
+		if (!$found_ldi) 
+		{
+			$sql[] = "alter table weathermap_data add local_data_id int(11) NOT NULL default 0 after sequence";
+			$sql[] = "alter table weathermap_data add index ( `local_data_id` )";
+		}
 	}
 
 	// create the settings entries, if necessary

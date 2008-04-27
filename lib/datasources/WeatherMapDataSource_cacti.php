@@ -1,6 +1,6 @@
 <?php
 
-class WeatherMapDataSource_cactids extends WeatherMapDataSource {
+class WeatherMapDataSource_cacti extends WeatherMapDataSource {
 
 	function Init(&$map)
 	{
@@ -12,12 +12,12 @@ class WeatherMapDataSource_cactids extends WeatherMapDataSource {
 			}
 			else
 			{
-				debug('ReadData cactids: Cacti database library not found.\n');
+				debug('ReadData cacti: Cacti database library not found.\n');
 			}
 		}
 		else
 		{
-			debug("ReadData cactids: Can only run from Cacti environment.\n");
+			debug("ReadData cacti: Can only run from Cacti environment.\n");
 		}
 
 		return(FALSE);
@@ -64,7 +64,7 @@ class WeatherMapDataSource_cactids extends WeatherMapDataSource {
 			}
 		}
 
-		debug ("cactids ReadData: Returning (".($data[IN]===NULL?'NULL':$data[IN]).",".($data[OUT]===NULL?'NULL':$data[IN]).",$data_time)\n");
+		debug ("cacti ReadData: Returning (".($data[IN]===NULL?'NULL':$data[IN]).",".($data[OUT]===NULL?'NULL':$data[OUT]).",$data_time)\n");
 
 		return( array($data[IN], $data[OUT], $data_time) );
 	}

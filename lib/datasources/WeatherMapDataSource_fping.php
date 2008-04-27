@@ -121,7 +121,7 @@ class WeatherMapDataSource_fping extends WeatherMapDataSource {
 			}
 		}
 
-		debug ("FPing ReadData: Returning (".($data[IN]===NULL?'NULL':$data[IN]).",".($data[OUT]===NULL?'NULL':$data[IN]).",$data_time)\n");
+		debug ("FPing ReadData: Returning (".($data[IN]===NULL?'NULL':$data[IN]).",".($data[OUT]===NULL?'NULL':$data[OUT]).",$data_time)\n");
 		
 		return( array($data[IN], $data[OUT], $data_time) );
 	}

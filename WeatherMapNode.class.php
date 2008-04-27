@@ -85,7 +85,7 @@ class WeatherMapNode extends WeatherMapItem
 				'targets' => array(),
 				'infourl' => array(IN=>'',OUT=>''),
 				'notestext' => array(IN=>'',OUT=>''),
-				'notes' => array(IN=>'',OUT=>''),
+				'notes' => array(),
 				'hints' => array(),
 				'overliburl' => array(IN=>array(),OUT=>array()),
 				'overlibwidth' => 0,

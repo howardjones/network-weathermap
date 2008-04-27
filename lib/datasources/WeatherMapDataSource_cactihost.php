@@ -79,7 +79,7 @@ class WeatherMapDataSource_cactihost extends WeatherMapDataSource {
 			}
 		}
 
-		debug ("CactiHost ReadData: Returning (".($data[IN]===NULL?'NULL':$data[IN]).",".($data[OUT]===NULL?'NULL':$data[IN]).",$data_time)\n");
+		debug ("CactiHost ReadData: Returning (".($data[IN]===NULL?'NULL':$data[IN]).",".($data[OUT]===NULL?'NULL':$data[OUT]).",$data_time)\n");
 
 		return( array($data[IN], $data[OUT], $data_time) );
 	}

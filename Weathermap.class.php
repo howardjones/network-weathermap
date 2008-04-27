@@ -82,6 +82,7 @@ class WeatherMapBase
 
 	function add_note($name,$value)
 	{
+		debug("Adding note $name='$value' to ".$this->name."\n");
 		$this->notes[$name] = $value;
 	}
 
@@ -89,16 +90,19 @@ class WeatherMapBase
 	{
 		if(isset($this->notes[$name]))
 		{
+		//	debug("Found note $name in ".$this->name." with value of ".$this->notes[$name].".\n");
 			return($this->notes[$name]);
 		}
 		else
 		{
+		//	debug("Looked for note $name in ".$this->name." which doesn't exist.\n");
 			return(NULL);
 		}
 	}
 
 	function add_hint($name,$value)
 	{
+		debug("Adding hint $name='$value' to ".$this->name."\n");
 		$this->hints[$name] = $value;
 		# warn("Adding hint $name to ".$this->my_type()."/".$this->name."\n");
 	}
@@ -108,10 +112,12 @@ class WeatherMapBase
 	{
 		if(isset($this->hints[$name]))
 		{
+		//	debug("Found hint $name in ".$this->name." with value of ".$this->hints[$name].".\n");
 			return($this->hints[$name]);
 		}
 		else
 		{
+		//	debug("Looked for hint $name in ".$this->name." which doesn't exist.\n");
 			return(NULL);
 		}
 	}
@@ -2801,12 +2807,12 @@ function asJS()
 	$js='';
 
 	$js.="var Links = new Array();\n";
-	$js.=$this->defaultlink->asJS();
+	# $js.=$this->defaultlink->asJS();
 
 	foreach ($this->links as $link) { $js.=$link->asJS(); }
 
 	$js.="var Nodes = new Array();\n";
-	$js.=$this->defaultnode->asJS();
+	# $js.=$this->defaultnode->asJS();
 
 	foreach ($this->nodes as $node) { $js.=$node->asJS(); }
 

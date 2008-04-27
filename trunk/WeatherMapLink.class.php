@@ -73,7 +73,7 @@ class WeatherMapLink extends WeatherMapItem
 			'comments' => array('',''),
 			'bwlabelformats' => array(FMT_PERC_IN,FMT_PERC_OUT),
 			'overliburl' => array(array(),array()),
-			'notestext' => array('',''),
+			'notestext' => array(IN=>'',OUT=>''),
 			'labelstyle' => 'percent',
 			'labelboxstyle' => 'classic',
 			'linkstyle' => 'twoway',
@@ -684,7 +684,7 @@ class WeatherMapLink extends WeatherMapItem
 		$js='';
 		$js.="Links[" . js_escape($this->name) . "] = {";
 
-		if ($this->name != 'DEFAULT')
+		if (isset($this->a))
 		{
 			$js.="a:'" . $this->a->name . "', ";
 			$js.="b:'" . $this->b->name . "', ";

@@ -70,7 +70,7 @@ class WeatherMapDataSource_external extends WeatherMapDataSource {
 			}
 		}
 
-		debug ("ExternalScript ReadData: Returning (".($data[IN]===NULL?'NULL':$data[IN]).",".($data[OUT]===NULL?'NULL':$data[IN]).",$data_time)\n");
+		debug ("ExternalScript ReadData: Returning (".($data[IN]===NULL?'NULL':$data[IN]).",".($data[OUT]===NULL?'NULL':$data[OUT]).",$data_time)\n");
 		
 		return( array($data[IN], $data[OUT], $data_time) );
 	}

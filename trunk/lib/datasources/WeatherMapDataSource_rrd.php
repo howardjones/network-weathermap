@@ -8,6 +8,7 @@ class WeatherMapDataSource_rrd extends WeatherMapDataSource {
 
 	function Init(&$map)
 	{
+		global $config;
 		#if (extension_loaded('RRDTool')) // fetch the values via the RRDtool Extension
 		#{
 	#		debug("RRD DS: Using RRDTool php extension.\n");
@@ -15,6 +16,13 @@ class WeatherMapDataSource_rrd extends WeatherMapDataSource {
 #		}
 #		else
 #		{
+			if($map->context=='cacti')
+			{
+				debug("RRD DS: path_rra is ".$config["base_path"]."/rra - your rrd pathname must be exactly this to use poller_output\n");
+				// save away a couple of useful global SET variables
+				$map->add_hint("cacti_path_rra",$config["base_path"]."/rra");
+				$map->add_hint("cacti_url",$config['url_path']);
+			}
 			if (file_exists($map->rrdtool)) {
 				if((function_exists('is_executable')) && (!is_executable($map->rrdtool)))
 				{
@@ -33,11 +41,6 @@ class WeatherMapDataSource_rrd extends WeatherMapDataSource {
 			if($map->context=='cacti')
 			{    // unlikely to ever occur
 				warn("RRD DS: Can't find RRDTOOL. Check your Cacti config. [WMRRD03]\n");
-			}
-			
-			if($map->context=='cacti')
-			{
-				debug("RRD DS: path_rra is ".$config["base_path"]."/rra - your rrd pathname must be exactly this to use poller_output\n");
 			}
 #		}
 
@@ -70,8 +73,9 @@ class WeatherMapDataSource_rrd extends WeatherMapDataSource {
 
 			// take away the cacti bit, to get the appropriate path for the table
 			// $db_rrdname = realpath($rrdfile);
+			$path_rra = $config["base_path"]."/rra";
 			$db_rrdname = $rrdfile;
-			$db_rrdname = str_replace($config["base_path"]."/rra","<path_rra>",$db_rrdname);
+			$db_rrdname = str_replace($path_rra,"<path_rra>",$db_rrdname);
 			debug("******************************************************************\nChecking weathermap_data\n");
 			foreach (array(IN,OUT) as $dir)
 			{
@@ -105,7 +109,7 @@ class WeatherMapDataSource_rrd extends WeatherMapDataSource {
 							}
 							else
 							{
-								warn("RRD ReadData: poller_output: ".$dsnames[$dir]." is not a valid RRD filename within this Cacti install.\n");
+								warn("RRD ReadData: poller_output: $rrdfile is not a valid RRD filename within this Cacti install. <path_rra> is $path_rra\n");
 							}
 						}
 						else
@@ -140,6 +144,7 @@ class WeatherMapDataSource_rrd extends WeatherMapDataSource {
 							$r2 = db_fetch_row($SQLcheck);
 							if(isset($r2['local_data_id']))
 							{
+								debug("RRD ReadData: updated local_data_id\n");
 								// put that in now, so that we can skip this step next time
 								db_execute("update weathermap_data set local_data_id=".$r2['local_data_id']." where id=".$result['id']);
 								$ldi = $r2['local_data_id'];
@@ -151,12 +156,40 @@ class WeatherMapDataSource_rrd extends WeatherMapDataSource {
 						}
 						if($ldi>0)
 						{
-							$r3 = db_fetch_array(sprintf("select data_local.host_id, field_name,field_value from data_local,host_snmp_cache where data_local.id=%d and data_local.host_id=host_snmp_cache.host_id and data_local.snmp_index=host_snmp_cache.snmp_index and data_local.snmp_query_id=host_snmp_cache.snmp_query_id",$ldi));
+							$set_speed = intval($item->get_hint("cacti_use_ifspeed"));
+							
+							$r3 = db_fetch_assoc(sprintf("select data_local.host_id, field_name,field_value from data_local,host_snmp_cache where data_local.id=%d and data_local.host_id=host_snmp_cache.host_id and data_local.snmp_index=host_snmp_cache.snmp_index and data_local.snmp_query_id=host_snmp_cache.snmp_query_id",$ldi));
 							foreach ($r3 as $vv)
 							{
-								$item->add_hint("cacti_".$vv['field_name'],$vv['field_value']);
+								$vname = "cacti_".$vv['field_name'];
+								$item->add_note($vname,$vv['field_value']);
+								
+								if($vname == 'cacti_ifSpeed')
+								{
+									// debug("XXXXX Got bandwidth on ".$item->name."$set_speed\n");
+									if($set_speed != 0)
+									{
+										# $item->max_bandwidth_in = $vv['field_value'];
+										# $item->max_bandwidth_out = $vv['field_value'];
+										
+										// might need to dust these off for php4...
+										if($item->my_type() == 'NODE') 
+										{
+											$map->nodes[$item->name]->max_bandwidth_in = $vv['field_value'];
+											$map->nodes[$item->name]->max_bandwidth_out = $vv['field_value'];
+										}
+										if($item->my_type() == 'LINK') 
+										{
+											$map->links[$item->name]->max_bandwidth_in = $vv['field_value'];
+											$map->links[$item->name]->max_bandwidth_out = $vv['field_value'];
+										}
+									}
+								}
 							}
-							$item->add_hint("cacti_host_id",$vv['host_id']);
+							if(isset($vv['host_id'])) $item->add_note("cacti_host_id",intval($vv['host_id']));
+							
+							$r4 = db_fetch_row(sprintf("SELECT DISTINCT graph_templates_item.local_graph_id,title_cache FROM graph_templates_item,graph_templates_graph,data_template_rrd WHERE data_template_rrd.id=task_item_id and graph_templates_graph.local_graph_id = graph_templates_item.local_graph_id and local_data_id=%d LIMIT 1",$ldi));
+							if(isset($r4['local_graph_id'])) $item->add_note("cacti_graph_id",intval($r4['local_graph_id']));
 						}
 					}
 				}				
@@ -171,12 +204,7 @@ class WeatherMapDataSource_rrd extends WeatherMapDataSource {
 			warn("RRD ReadData: poller_output - Cacti environment is not right [WMRRD12]\n");
 		}
 
-		// fudge the missing value, so data is valid. This is horrible.
-		// XXX - this should be unnecessary now that NULL is the No-Result
-		//if( ($data[IN] == -1) && ($data[OUT] >= 0) ) $data[IN] = 0;
-		//if( ($data[OUT] == -1) && ($data[IN] >= 0) ) $data[OUT] = 0;
-
-		debug("RRD ReadData: poller_output - result is ".$data[IN].",".$data[OUT]."\n");
+		debug("RRD ReadData: poller_output - result is ".($data[IN]===NULL?'NULL':$data[IN]).",".($data[OUT]===NULL?'NULL':$data[OUT])."\n");
 		debug("RRD ReadData: poller_output - ended\n");
 	}
 	
@@ -314,7 +342,7 @@ class WeatherMapDataSource_rrd extends WeatherMapDataSource {
 		{
 			warn("RRD ReadData: failed to open pipe to RRDTool: ".$php_errormsg." [WMRRD04]\n");
 		}
-		debug ("RRD ReadDataFromRealRRD: Returning (".($data[IN]===NULL?'NULL':$data[IN]).",".($data[OUT]===NULL?'NULL':$data[IN]).",$data_time)\n");
+		debug ("RRD ReadDataFromRealRRD: Returning (".($data[IN]===NULL?'NULL':$data[IN]).",".($data[OUT]===NULL?'NULL':$data[OUT]).",$data_time)\n");
 	}
 
 	// Actually read data from a data source, and return it
@@ -410,8 +438,12 @@ class WeatherMapDataSource_rrd extends WeatherMapDataSource {
 		// if poller_output didn't get anything, or if it couldn't/didn't run, do it the old-fashioned way
 		// - this will still be the case for the first couple of runs after enabling poller_output support
 		//   because there won't be valid data in the weathermap_data table yet.
-		if( ($data[IN] === NULL) || ($data[OUT] === NULL) )
+		if( ($dsnames[IN]!='-' && $data[IN] === NULL) || ($dsnames[OUT] !='-' && $data[OUT] === NULL) )
 		{
+			if($use_poller_output == 1)
+			{
+				debug("poller_output didn't get anything useful. Kicking it old skool.\n");
+			}
 			if(file_exists($rrdfile))
 			{
 				debug ("RRD ReadData: Target DS names are ".$dsnames[IN]." and ".$dsnames[OUT]."\n");
@@ -437,7 +469,7 @@ class WeatherMapDataSource_rrd extends WeatherMapDataSource {
 		if($data[IN] !== NULL) $data[IN] = $data[IN] * $multiplier;
 		if($data[OUT] !== NULL) $data[OUT] = $data[OUT] * $multiplier;
 				
-		debug ("RRD ReadData: Returning (".($data[IN]===NULL?'NULL':$data[IN]).",".($data[OUT]===NULL?'NULL':$data[IN]).",$data_time)\n");
+		debug ("RRD ReadData: Returning (".($data[IN]===NULL?'NULL':$data[IN]).",".($data[OUT]===NULL?'NULL':$data[OUT]).",$data_time)\n");
 		
 		return( array($data[IN], $data[OUT], $data_time) );
 	}

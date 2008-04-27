@@ -216,7 +216,7 @@ class WeatherMapDataSource_cactithold extends WeatherMapDataSource {
 			}		
 		}
 
-		debug ("CactiTHold ReadData: Returning (".($data[IN]===NULL?'NULL':$data[IN]).",".($data[OUT]===NULL?'NULL':$data[IN]).",$data_time)\n");
+		debug ("CactiTHold ReadData: Returning (".($data[IN]===NULL?'NULL':$data[IN]).",".($data[OUT]===NULL?'NULL':$data[OUT]).",$data_time)\n");
 
 		return( array($data[IN], $data[OUT], $data_time) );
 	}

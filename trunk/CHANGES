@@ -10,6 +10,7 @@
 	ADDED - New global SET variables to disable some common warnings you may not care about :-)
 	ADDED - Cacti management screen shows number of warnings for each map last time it ran
 	ADDED - Cacti management screen also has a link to the log entries for the map in question
+	ADDED - The TARGET aggregation thing can also take scale factors now: -5.5*myrrdfile.rrd
 	CHANGE - A NODE with no POSITION is not drawn, instead of drawn at 0,0. Useful for templates.
 	CHANGE - A LINK with no NODES is no longer an error. Also for templates.
 	CHANGE- The link_bulge secret mode bulges each side of a link independently now

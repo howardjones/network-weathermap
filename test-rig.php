@@ -10,6 +10,8 @@
 	//
 include_once 'editor-config.php';
 require_once 'Weathermap.class.php';
+      include('spyc.php');
+
 
 $mapfile = "configs/096-test.conf";
 
@@ -57,6 +59,10 @@ $map->WriteConfig("output.conf");
 
 print "Wrote config\n";
 //	print_r($map);
+
+$yaml = Spyc::YAMLDump($map);
+print $yaml;
+
 
 
 // vim:ts=4:sw=4:

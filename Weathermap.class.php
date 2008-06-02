@@ -420,12 +420,12 @@ class WeatherMap extends WeatherMapBase
 						$cy = $bounds[1] - $bounds[5];
 						if($cx > $xsize) $xsize = $cx;
 						$ysize += ($cy*1.2);
-						warn("Adding $cy (x was $cx)\n");
+						# warn("Adding $cy (x was $cx)\n");
 					}
 					#$bounds=imagettfbbox($this->fonts[$fontnumber]->size, 0, $this->fonts[$fontnumber]->file,
 					#	$string);
 					# return (array($bounds[4] - $bounds[0], $bounds[1] - $bounds[5]));
-					warn("Size of $string is $xsize x $ysize over $linecount lines\n");
+					# warn("Size of $string is $xsize x $ysize over $linecount lines\n");
 					
 					return(array($xsize,$ysize));
 				}
@@ -701,12 +701,24 @@ function ReadData()
 
 							// if the targetstring starts with a -, then we're taking this value OFF the aggregate
 							$multiply = 1;
-							if(preg_match("/^-(.*)/",$target[4],$matches))
+							if(preg_match("/^-(.*)/",$targetstring,$matches))
 							{
 								$targetstring = $matches[1];
-								$multiply = -1;
+								$multiply = -1 * $multiply;
+							}
+							
+							// if the remaining targetstring starts with a number and a *-, then this is a scale factor
+							if(preg_match("/^(\d+\.?\d*)\*(.*)/",$targetstring,$matches))
+							{
+								$targetstring = $matches[2];
+								$multiply = $multiply * floatval($matches[1]);
 							}
 
+							if($multiply != 1)
+							{
+								debug("Will multiply result by $multiply\n");
+							}
+							
 							$matched = FALSE;
 							$matched_by = '';
 							foreach ($this->datasourceclasses as $ds_class)
@@ -752,8 +764,18 @@ function ReadData()
 									("ReadData: $type $name, target: $targetstring on config line $target[3] had no valid data, according to $matched_by\n");
 							}
 
-							$total_in=$total_in + $multiply*$in;
-							$total_out=$total_out + $multiply*$out;
+							if($multiply != 1) {  
+								debug("Pre-multiply: $in $out\n"); 
+							
+								$in = $multiply*$in;
+								$out = $multiply*$out;
+							
+								debug("Post-multiply: $in $out\n"); 
+							}
+							
+							$total_in=$total_in + $in;
+							$total_out=$total_out + $out;
+							debug("Aggregate so far: $total_in $total_out\n");
 						}
 					}
 
@@ -1556,7 +1578,8 @@ function ReadConfig($input)
 					
 					array('LINK', '/^\s*OUTBWFORMAT\s+(.*)\s*$/i', array('bwlabelformats[OUT]'=>1,'labelstyle'=>'--')),
 					array('LINK', '/^\s*INBWFORMAT\s+(.*)\s*$/i', array('bwlabelformats[IN]'=>1,'labelstyle'=>'--')),
-					array('NODE','/^\s*ICON\s+none\s*$/i',array('iconfile'=>'')),
+					# array('NODE','/^\s*ICON\s+none\s*$/i',array('iconfile'=>'')),
+					array('NODE','/^\s*ICON\s+(\S+)\s*$/i',array('iconfile'=>1, 'iconscalew'=>'#0', 'iconscaleh'=>'#0')),
 					array('NODE','/^\s*ICON\s+(\S+)\s*$/i',array('iconfile'=>1)),
 					array('NODE','/^\s*ICON\s+(\d+)\s+(\d+)\s+(inpie|outpie|box|rbox|round|gauge|nink)\s*$/i',array('iconfile'=>3, 'iconscalew'=>1, 'iconscaleh'=>2)),
 					array('NODE','/^\s*ICON\s+(\d+)\s+(\d+)\s+(\S+)\s*$/i',array('iconfile'=>3, 'iconscalew'=>1, 'iconscaleh'=>2)),
@@ -1600,9 +1623,18 @@ function ReadConfig($input)
 						
 						foreach ($keyword[2] as $key=>$val)
 						{
-							// if it's a number, then it;s a match number,
-							// otherwise it's a literal to be put into a variable
-							if(is_numeric($val)) $val = $matches[$val];
+							// so we can poke in numbers too, if the value starts with #
+							// then take the # off, and treat the rest as a number literal
+							if(preg_match("/^#(.*)/",$val,$m))
+							{
+								$val = $m[1];
+							}	
+							elseif(is_numeric($val)) 
+							{
+								// if it's a number, then it;s a match number,
+								// otherwise it's a literal to be put into a variable
+								$val = $matches[$val];
+							}
 							
 							assert('is_object($curobj)');
 							
@@ -2515,13 +2547,15 @@ function DrawMap($filename = '', $thumbnailfile = '', $thumbnailmax = 250, $with
 				}
 			}
 		}
+
+		$overlay = myimagecolorallocate($image, 200, 0, 0);
 		
 		// for the editor, we can optionally overlay some other stuff
         if($this->context == 'editor')
         {
 			if($use_overlay)
 			{
-				$overlay = myimagecolorallocate($image, 200, 0, 0);
+		#		$overlay = myimagecolorallocate($image, 200, 0, 0);
 
 				// first, we can show relatively positioned NODEs
 				foreach ($this->nodes as $node) {
@@ -2551,7 +2585,10 @@ function DrawMap($filename = '', $thumbnailfile = '', $thumbnailmax = 250, $with
 			}
         }
 
-
+		$this->myimagestring($image, 3, 200, 100, "Test 1\nLine 2", $overlay,0);
+		
+		$this->myimagestring($image, 30, 100, 100, "Test 1\nLine 2", $overlay,0);
+		$this->myimagestring($image, 30, 200, 200, "Test 1\nLine 2", $overlay,45);
 
 		// Ready to output the results...
 

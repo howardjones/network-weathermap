@@ -109,7 +109,7 @@ class WeatherMapDataSource_rrd extends WeatherMapDataSource {
 							}
 							else
 							{
-								warn("RRD ReadData: poller_output: $rrdfile is not a valid RRD filename within this Cacti install. <path_rra> is $path_rra\n");
+								warn("RRD ReadData: poller_output: $db_rrdname is not a valid RRD filename within this Cacti install. <path_rra> is $path_rra\n");
 							}
 						}
 						else

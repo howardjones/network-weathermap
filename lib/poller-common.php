@@ -87,6 +87,16 @@ function weathermap_run_maps($mydir) {
 							$wmap = new Weathermap;
 							$wmap->context = "cacti";
 
+							$settingrows = db_fetch_assoc("select * from weathermap_settings where mapid=".intval($map['id']));
+							if( is_array($settingrows) )
+							{
+								foreach ($settingrows as $setting)
+								{
+									debug("Setting additional map-global option: ".$setting['optname']." to '".$setting['optvalue']."'\n");
+									$wmap->add_hint($setting['optname'],$setting['optvalue']);
+								}
+							}
+							
 							// we can grab the rrdtool path from Cacti's config, in this case
 							$wmap->rrdtool  = read_config_option("path_rrdtool");
 
@@ -124,7 +134,13 @@ function weathermap_run_maps($mydir) {
 								}
 							}
 
-							db_execute("update weathermap_maps set titlecache='".mysql_real_escape_string($wmap->title)."' where id=".$map['id']);
+							$processed_title = $wmap->ProcessString($wmap->title);
+							
+							db_execute("update weathermap_maps set titlecache='".mysql_real_escape_string($processed_title)."' where id=".intval($map['id']));
+							if(intval($wmap->thumb_width) > 0)
+							{
+								db_execute("update weathermap_maps set thumb_width=".intval($wmap->thumb_width).", thumb_height=".intval($wmap->thumb_height)." where id=".intval($map['id']));
+							}
 							
 							unset($wmap);
 							weathermap_memory_check("MEM after $mapcount");
@@ -134,7 +150,7 @@ function weathermap_run_maps($mydir) {
 						{
 							warn("Mapfile $mapfile is not readable or doesn't exist [WMPOLL04]\n");
 						}
-						db_execute("update weathermap_maps set warncount=".intval($weathermap_warncount)." where id=".$map['id']);
+						db_execute("update weathermap_maps set warncount=".intval($weathermap_warncount)." where id=".intval($map['id']));
 						$weathermap_map="";
 					}
 					debug("Iterated all $mapcount maps.\n");

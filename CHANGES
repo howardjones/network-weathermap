@@ -11,10 +11,15 @@
 	ADDED - Cacti management screen shows number of warnings for each map last time it ran
 	ADDED - Cacti management screen also has a link to the log entries for the map in question
 	ADDED - The TARGET aggregation thing can also take scale factors now: -5.5*myrrdfile.rrd
+	ADDED - Cacti plugin caches thumbnail sizes, improving thumbnail view rendering
+	ADDED - Cacti plugin allows adding the same map twice (more useful than it sounds)
+	ADDED - Cacti plugin allows setting of map-global variables in the management UI
+	CHANGE - Cacti plugin uses "processed" map title now (allows {} tokens in the title)
 	CHANGE - A NODE with no POSITION is not drawn, instead of drawn at 0,0. Useful for templates.
 	CHANGE - A LINK with no NODES is no longer an error. Also for templates.
 	CHANGE- The link_bulge secret mode bulges each side of a link independently now
 	FIXED - Minor issue with CRLF in map title for Cacti Plugin
+	FIXED - CLI tool set --define options incorrectly.
 	FIXED - Oneway links don't draw the INCOMMENT anymore
 	FIXED - DEFAULT SCALE covers 0-100 properly (Thanks Dan Fusselman)
 	FIXED - Scaled ICON in DEFAULT didn't get overwritten properly in nodes (Thanks Fabrizio Carusi)

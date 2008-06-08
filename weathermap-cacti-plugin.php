@@ -386,17 +386,19 @@ function weathermap_thumbview()
 			foreach ($maplist as $map) {
 				$i++;
 
+				$imgsize = "";
 				# $thumbfile = $outdir."weathermap_thumb_".$map['id'].".".$imageformat;
 				# $thumburl = "output/weathermap_thumb_".$map['id'].".".$imageformat."?time=".time();
 				$thumbfile = $outdir.$map['filehash'].".thumb.".$imageformat;
 				$thumburl = "?action=viewthumb&id=".$map['filehash']."&time=".time();
+				if($map['thumb_width'] > 0) { $imgsize = ' WIDTH="'.$map['thumb_width'].'" HEIGHT="'.$map['thumb_height'].'" '; }
 				$maptitle = $map['titlecache'];
 				if($maptitle == '') $maptitle= "Map for config file: ".$map['configfile'];
 
 				print '<div class="wm_thumbcontainer" style="margin: 2px; border: 1px solid #bbbbbb; padding: 2px; float:left;">';
 				if(file_exists($thumbfile))
 				{
-					print '<div class="wm_thumbtitle" style="font-size: 1.2em; font-weight: bold; text-align: center">'.$maptitle.'</div><a href="weathermap-cacti-plugin.php?action=viewmap&id='.$map['filehash'].'"><img class="wm_thumb" src="'.$thumburl.'" alt="'.$maptitle.'" border="0" hspace="5" vspace="5" title="'.$maptitle.'"/></a>';
+					print '<div class="wm_thumbtitle" style="font-size: 1.2em; font-weight: bold; text-align: center">'.$maptitle.'</div><a href="weathermap-cacti-plugin.php?action=viewmap&id='.$map['filehash'].'"><img class="wm_thumb" '.$imgsize.'src="'.$thumburl.'" alt="'.$maptitle.'" border="0" hspace="5" vspace="5" title="'.$maptitle.'"/></a>';
 				}
 				else
 				{
@@ -628,20 +630,22 @@ function weathermap_translate_id($idname)
 function weathermap_versionbox()
 {
 	global $WEATHERMAP_VERSION, $colors;
-	;
+	
+	
+	
 	$pagefoot = "Powered by <a href=\"http://www.network-weathermap.com/?v=$WEATHERMAP_VERSION\">PHP Weathermap version $WEATHERMAP_VERSION</a>";
 
 	html_graph_start_box(1,true);
 
 ?>
 <tr bgcolor="<?php print $colors["panel"];?>">
-				<td>
-						<table width="100%" cellpadding="0" cellspacing="0">
-								<tr>
-								   <td class="textHeader" nowrap> <?php print $pagefoot; ?> </td>
-				</tr>
-			</table>
-		</td>
+	<td>
+		<table width="100%" cellpadding="0" cellspacing="0">
+			<tr>
+			   <td class="textHeader" nowrap> <?php print $pagefoot; ?> </td>
+			</tr>
+		</table>
+	</td>
 </tr>
 <?php
 	html_graph_end_box();

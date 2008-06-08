@@ -1,3 +1,36 @@
+WISHES
+-------
+
+Hide Maps in Cacti Tab?
+http://forums.cacti.net/viewtopic.php?p=117591
+
+Processing Token - 95th percentile
+http://forums.cacti.net/viewtopic.php?p=135555
+
+weathermap / smokeping (editor picker)
+http://forums.cacti.net/viewtopic.php?t=27516
+
+I just want to add a newline to the TIMEPOS output
+http://forums.cacti.net/viewtopic.php?t=26885
+
+Cacti editor picker - if it's not traffic_in/traffic_out, let you pick the DSes
+
+Multi-line text, plus Mactrack DS
+http://forums.cacti.net/viewtopic.php?t=26790
+
+Non-percentage scales
+http://forums.cacti.net/viewtopic.php?t=16372
+
+Position as percentage along link? (fake labels etc)
+
+---------------------------------------
+
+
+Before 0.96
+-----------
+Documentation for printf tokens!
+Fix a few docs bugs with unclosed tags.
+
 BUG: ReadData should not be run for links with no nodes (templates) or nodes with no position.
 
 quotes, and escaped quotes
@@ -10,8 +43,6 @@ rrdtool graph /dev/null -f "" -s now-30d -e now DEF:in=../rra/atm-sl_traffic_in_
 DONE!  warning for BWLABELPOS when in<out
 DONE!  add SET nowarn_xxxxx for some of the more common warnings
 
-Before 0.96
------------
 DONE!  Check for NULL coords in link code
 DONE!  Z-order - layers for drawing
 Angled VIAs
@@ -360,3 +391,6 @@ DONE ProcessString for INFOURL, OVERLIBGRAPH?
 - Not TARGET? (any plugin could put strings into a command line for '!' plugin) 
 
 NON-BUG weathermap-cacti-rebuild.php has cacti-path hardcoded!
+
+
+

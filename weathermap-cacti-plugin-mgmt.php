@@ -113,7 +113,7 @@ case 'addmap':
 
 case 'editor':
 	chdir(dirname(__FILE__));
-	include_once('./editor.php');
+	include_once('./weathermap-cacti-plugin-editor.php');
 	break;
 
 case 'rebuildnow':
@@ -147,7 +147,7 @@ default:
 	maplist();
 
 print '<br />'; 
-    html_start_box("<center><a target=\"_blank\" class=\"linkOverDark\" href=\"docs/\">Local Documentation</a> -- <a target=\"_blank\" class=\"linkOverDark\" href=\"http://www.network-weathermap.com/\">Weathermap Website</a> -- <a target=\"_target\" class=\"linkOverDark\" href=\"editor.php?plug=1\">Weathermap Editor</a> -- This is version $WEATHERMAP_VERSION</center>", "78%", $colors["header"], "2", "center", "");
+    html_start_box("<center><a target=\"_blank\" class=\"linkOverDark\" href=\"docs/\">Local Documentation</a> -- <a target=\"_blank\" class=\"linkOverDark\" href=\"http://www.network-weathermap.com/\">Weathermap Website</a> -- <a target=\"_target\" class=\"linkOverDark\" href=\"weathermap-cacti-plugin-editor.php?plug=1\">Weathermap Editor</a> -- This is version $WEATHERMAP_VERSION</center>", "78%", $colors["header"], "2", "center", "");
  html_end_box(); 
 
 
@@ -225,7 +225,7 @@ function maplist()
 		{
 			form_alternate_row_color($colors["alternate"],$colors["light"],$i);
 
-			print '<td><a title="Click to start editor with this file" href="editor.php?plug=1&mapname='.htmlspecialchars($map['configfile']).'">'.htmlspecialchars($map['configfile']).'</a>';
+			print '<td><a title="Click to start editor with this file" href="weathermap-cacti-plugin-editor.php?plug=1&mapname='.htmlspecialchars($map['configfile']).'">'.htmlspecialchars($map['configfile']).'</a>';
 			if($map['warncount']>0)
 			{
 				$had_warnings++;

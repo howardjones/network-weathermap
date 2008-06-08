@@ -123,8 +123,8 @@ class HTML_ImageMap_Area_Polygon extends HTML_ImageMap_Area
 
 		for ($i=0; $i<count($c); $i+=2)
 		{
-			$x = intval($c[$i]);
-			$y = intval($c[$i+1]);
+			$x = round($c[$i]);
+			$y = round($c[$i+1]);
 			$point = array($x,$y);
 			$xlist[] = $x; // these two are used to get the bounding box in a moment
 			$ylist[] = $y;
@@ -150,10 +150,10 @@ class HTML_ImageMap_Area_Rectangle extends HTML_ImageMap_Area
 
 		$c = $coords[0];
 
-		$x1 = $c[0];
-		$y1 = $c[1];
-		$x2 = $c[2];
-		$y2 = $c[3];
+		$x1 = round($c[0]);
+		$y1 = round($c[1]);
+		$x2 = round($c[2]);
+		$y2 = round($c[3]);
 
 		// sort the points, so that the first is the top-left
 		if($x1>$x2)
@@ -232,10 +232,10 @@ class HTML_ImageMap_Area_Circle extends HTML_ImageMap_Area
 
 		$this->name = $name;
 		$this->href = $href;
-		$this->centx = $c[0];
-		$this->centy = $c[1];
-		$this->edgex = $c[2];
-		$this->edgey = $c[3];
+		$this->centx = round($c[0]);
+		$this->centy = round($c[1]);
+		$this->edgex = round($c[2]);
+		$this->edgey = round($c[3]);
 	}
 }
 

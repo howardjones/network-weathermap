@@ -43,6 +43,11 @@ else
 	$cacti_found = FALSE;
 }
 
+if($cacti_found && isset($plugins))
+{
+	# here, we know we're part of a plugin - do auth stuff
+}
+
 if(! is_writable($mapdir))
 {
 	$configerror = "The map config directory is not writable by the web server user. You will not be able to edit any files until this is corrected. [WMEDIT01]";

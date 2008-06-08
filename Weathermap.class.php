@@ -369,7 +369,7 @@ class WeatherMap extends WeatherMapBase
 			// look up what font is defined for this slot number
 			if ($this->fonts[$fontnumber]->type == 'truetype')
 			{
-				imagettftext($image, $this->fonts[$fontnumber]->size, $angle, $x, $y,
+				wimagettftext($image, $this->fonts[$fontnumber]->size, $angle, $x, $y,
 					$colour, $this->fonts[$fontnumber]->file, $string);
 			}
 
@@ -861,7 +861,7 @@ function DrawLabelRotated($im, $x, $y, $angle, $text, $font, $padding, $linkname
 	{
 		$bgcol=myimagecolorallocate($im, $bgcolour[0], $bgcolour[1], $bgcolour[2]);
 		# imagefilledrectangle($im, $x1, $y1, $x2, $y2, $bgcol);
-		imagefilledpolygon($im,$points,4,$bgcol);
+		wimagefilledpolygon($im,$points,4,$bgcol);
 	}
 
 	if ($outlinecolour != array
@@ -873,7 +873,7 @@ function DrawLabelRotated($im, $x, $y, $angle, $text, $font, $padding, $linkname
 	{
 		$outlinecol=myimagecolorallocate($im, $outlinecolour[0], $outlinecolour[1], $outlinecolour[2]);
 		# imagerectangle($im, $x1, $y1, $x2, $y2, $outlinecol);
-		imagepolygon($im,$points,4,$outlinecol);
+		wimagepolygon($im,$points,4,$outlinecol);
 	}
 
 	$textcol=myimagecolorallocate($im, $textcolour[0], $textcolour[1], $textcolour[2]);
@@ -1098,9 +1098,9 @@ function DrawLegend_Horizontal($im,$scalename="DEFAULT",$width=400)
 	$scale_ref = 'gdref_legend_'.$scalename;
 	$this->AllocateScaleColours($scale_im,$scale_ref);
 
-	imagefilledrectangle($scale_im, $box_left, $box_top, $box_right, $box_bottom,
+	wimagefilledrectangle($scale_im, $box_left, $box_top, $box_right, $box_bottom,
 		$this->colours['DEFAULT']['KEYBG'][$scale_ref]);
-	imagerectangle($scale_im, $box_left, $box_top, $box_right, $box_bottom,
+	wimagerectangle($scale_im, $box_left, $box_top, $box_right, $box_bottom,
 		$this->colours['DEFAULT']['KEYOUTLINE'][$scale_ref]);
 
 	$this->myimagestring($scale_im, $font, $scale_left, $scale_bottom + $tileheight * 2 + 2 , $title,
@@ -1121,7 +1121,7 @@ function DrawLegend_Horizontal($im,$scalename="DEFAULT",$width=400)
 		}
 
 		list($col,$junk) = $this->ColourFromPercent($scale_im, $p,$scalename);
-		imagefilledrectangle($scale_im, $scale_left + $dx - $scalefactor/2, $scale_top,
+		wimagefilledrectangle($scale_im, $scale_left + $dx - $scalefactor/2, $scale_top,
 			$scale_left + $dx + $scalefactor/2, $scale_bottom,
 			$col);
 	}
@@ -1178,9 +1178,9 @@ function DrawLegend_Vertical($im,$scalename="DEFAULT",$height=400)
 	$scale_ref = 'gdref_legend_'.$scalename;
 	$this->AllocateScaleColours($scale_im,$scale_ref);
 
-	imagefilledrectangle($scale_im, $box_left, $box_top, $box_right, $box_bottom,
+	wimagefilledrectangle($scale_im, $box_left, $box_top, $box_right, $box_bottom,
 		$this->colours['DEFAULT']['KEYBG']['gdref1']);
-	imagerectangle($scale_im, $box_left, $box_top, $box_right, $box_bottom,
+	wimagerectangle($scale_im, $box_left, $box_top, $box_right, $box_bottom,
 		$this->colours['DEFAULT']['KEYOUTLINE']['gdref1']);
 
 	$this->myimagestring($scale_im, $font, $scale_left-$scalefactor, $scale_top - $tileheight , $title,
@@ -1202,7 +1202,7 @@ function DrawLegend_Vertical($im,$scalename="DEFAULT",$height=400)
 		}
 
 		list($col,$junk) = $this->ColourFromPercent($scale_im, $p,$scalename);
-		imagefilledrectangle($scale_im, $scale_left, $scale_top + $dy - $scalefactor/2,
+		wimagefilledrectangle($scale_im, $scale_left, $scale_top + $dy - $scalefactor/2,
 			$scale_right, $scale_top + $dy + $scalefactor/2,
 			$col);
 	}
@@ -1273,9 +1273,9 @@ function DrawLegend_Classic($im,$scalename="DEFAULT")
 		$scale_ref = 'gdref_legend_'.$scalename;
 		$this->AllocateScaleColours($scale_im,$scale_ref);
 
-		imagefilledrectangle($scale_im, $boxx, $boxy, $boxx + $boxwidth, $boxy + $boxheight,
+		wimagefilledrectangle($scale_im, $boxx, $boxy, $boxx + $boxwidth, $boxy + $boxheight,
 			$this->colours['DEFAULT']['KEYBG'][$scale_ref]);
-		imagerectangle($scale_im, $boxx, $boxy, $boxx + $boxwidth, $boxy + $boxheight,
+		wimagerectangle($scale_im, $boxx, $boxy, $boxx + $boxwidth, $boxy + $boxheight,
 			$this->colours['DEFAULT']['KEYOUTLINE'][$scale_ref]);
 		$this->myimagestring($scale_im, $font, $boxx + 4, $boxy + 4 + $tileheight, $title,
 			$this->colours['DEFAULT']['KEYTEXT'][$scale_ref]);
@@ -1310,7 +1310,7 @@ function DrawLegend_Classic($im,$scalename="DEFAULT")
 							$percent
 								=  $fudgefactor + $colour['bottom'] + ($n / $tilewidth) * ($colour['top'] - $colour['bottom']);
 							list($col,$junk) = $this->ColourFromPercent($scale_im, $percent,$scalename);
-							imagefilledrectangle($scale_im, $x + $n, $y, $x + $n, $y + $tileheight,
+							wimagefilledrectangle($scale_im, $x + $n, $y, $x + $n, $y + $tileheight,
 								$col);
 						}
 					}
@@ -1319,7 +1319,7 @@ function DrawLegend_Classic($im,$scalename="DEFAULT")
 						// pick a percentage in the middle...
 						$percent=($colour['bottom'] + $colour['top']) / 2;
 						list($col,$junk) = $this->ColourFromPercent($scale_im, $percent,$scalename);
-						imagefilledrectangle($scale_im, $x, $y, $x + $tilewidth, $y + $tileheight,
+						wimagefilledrectangle($scale_im, $x, $y, $x + $tilewidth, $y + $tileheight,
 							$col);
 					}
 
@@ -1709,18 +1709,34 @@ function ReadConfig($input)
 			if ( ( $last_seen=='NODE' || $last_seen=='LINK' ) && preg_match("/^\s*TARGET\s+(.*)\s*$/i", $buffer, $matches))
 			{
 				$linematched++;
-
-				$targets=preg_split('/\s+/', $matches[1], -1, PREG_SPLIT_NO_EMPTY);
-				// wipe any existing targets, otherwise things in the DEFAULT accumulate with the new ones
-				$curobj->targets = array();
-				foreach ($targets as $target)
+				# $targets=preg_split('/\s+/', $matches[1], -1, PREG_SPLIT_NO_EMPTY);
+				$rawtargetlist = $matches[1]." ";
+							
+				if(preg_match_all('/"([^\"\\\\]*(?:\\\\.[^\"\\\\]*)*)"|(\S+)\s|\s/x',$rawtargetlist,$targets))
 				{
-					// we store the original TARGET string, and line number, along with the breakdown, to make nicer error messages later
-					$newtarget=array($target,'','',$linecount,$target);
-					if ($curobj)
+					# print_r ($targets);
+				
+					// wipe any existing targets, otherwise things in the DEFAULT accumulate with the new ones
+					$curobj->targets = array();
+					for ($i=0; $i<sizeof($targets[0]);$i++)
 					{
-						$curobj->targets[]=$newtarget;
+						$target = trim($targets[1][$i].$targets[2][$i]);
+						if($target != '')
+						{					
+							# print "### TARGET $target|\n";
+							// we store the original TARGET string, and line number, along with the breakdown, to make nicer error messages later
+							$newtarget=array($target,'','',$linecount,$target);
+							if ($curobj)
+							{
+								$curobj->targets[]=$newtarget;
+							}
+						}
 					}
+				}
+				else
+				{
+					# print "$rawtargetlist\n";
+					warn("ReadConfig - TARGET string error (unclosed quotes?) \n");
 				}
 			}
 			
@@ -2406,6 +2422,7 @@ function AllocateScaleColours($im,$refname='gdref1')
 function DrawMap($filename = '', $thumbnailfile = '', $thumbnailmax = 250, $withnodes = TRUE, $use_overlay = FALSE)
 {
 	debug("Trace: DrawMap()\n");
+	metadump("# start",true);
 	$bgimage=NULL;
 	$this->cachefile_version = crc32(file_get_contents($this->configfile));
 
@@ -2445,7 +2462,7 @@ function DrawMap($filename = '', $thumbnailfile = '', $thumbnailmax = 250, $with
 			. $this->background . "\n"); }
 	}
 
-	$image=imagecreatetruecolor($this->width, $this->height);
+	$image=wimagecreatetruecolor($this->width, $this->height);
 
 	# $image = imagecreate($this->width, $this->height);
 	if (!$image) { warn
@@ -2468,7 +2485,7 @@ function DrawMap($filename = '', $thumbnailfile = '', $thumbnailmax = 250, $with
 		$this->AllocateScaleColours($image);
 
 		// fill with background colour anyway, in case the background image failed to load
-		imagefilledrectangle($image, 0, 0, $this->width, $this->height, $this->colours['DEFAULT']['BG']['gdref1']);
+		wimagefilledrectangle($image, 0, 0, $this->width, $this->height, $this->colours['DEFAULT']['BG']['gdref1']);
 
 		if ($bgimage)
 		{
@@ -2585,10 +2602,10 @@ function DrawMap($filename = '', $thumbnailfile = '', $thumbnailmax = 250, $with
 			}
         }
 
-		$this->myimagestring($image, 3, 200, 100, "Test 1\nLine 2", $overlay,0);
+		#$this->myimagestring($image, 3, 200, 100, "Test 1\nLine 2", $overlay,0);
 		
-		$this->myimagestring($image, 30, 100, 100, "Test 1\nLine 2", $overlay,0);
-		$this->myimagestring($image, 30, 200, 200, "Test 1\nLine 2", $overlay,45);
+#	$this->myimagestring($image, 30, 100, 100, "Test 1\nLine 2", $overlay,0);
+		#$this->myimagestring($image, 30, 200, 200, "Test 1\nLine 2", $overlay,45);
 
 		// Ready to output the results...
 

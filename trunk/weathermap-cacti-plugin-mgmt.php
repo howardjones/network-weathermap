@@ -20,6 +20,33 @@ if (isset($_POST['action'])) {
 }
 
 switch ($action) {
+case 'map_settings_form':
+	if( isset($_REQUEST['id']) && is_numeric($_REQUEST['id']))
+	{
+		include_once($config["base_path"]."/include/top_header.php");
+		
+		if( isset($_REQUEST['sid']) && is_numeric($_REQUEST['sid']))
+		{
+			weathermap_map_settings_form(intval($_REQUEST['id']), intval($_REQUEST['sid']) );
+		}
+		else
+		{
+			weathermap_map_settings_form(intval($_REQUEST['id']));
+		}		
+		weathermap_footer_links();
+		include_once($config["base_path"]."/include/bottom_footer.php");
+	}
+	break;
+case 'map_settings':
+	if( isset($_REQUEST['id']) && is_numeric($_REQUEST['id']))
+	{
+		include_once($config["base_path"]."/include/top_header.php");
+		weathermap_map_settings(intval($_REQUEST['id']));
+		weathermap_footer_links();
+		include_once($config["base_path"]."/include/bottom_footer.php");
+	}
+	break;
+	
 case 'perms_add_user':
 	if( isset($_REQUEST['mapid']) && is_numeric($_REQUEST['mapid'])
 		&& isset($_REQUEST['userid']) && is_numeric($_REQUEST['userid'])
@@ -153,17 +180,21 @@ case 'rebuildnow2':
 default:
 	include_once($config["base_path"]."/include/top_header.php");
 	maplist();
-
-print '<br />'; 
-    html_start_box("<center><a target=\"_blank\" class=\"linkOverDark\" href=\"docs/\">Local Documentation</a> -- <a target=\"_blank\" class=\"linkOverDark\" href=\"http://www.network-weathermap.com/\">Weathermap Website</a> -- <a target=\"_target\" class=\"linkOverDark\" href=\"weathermap-cacti-plugin-editor.php?plug=1\">Weathermap Editor</a> -- This is version $WEATHERMAP_VERSION</center>", "78%", $colors["header"], "2", "center", "");
- html_end_box(); 
-
-
+	weathermap_footer_links();	
 	include_once($config["base_path"]."/include/bottom_footer.php");
 	break;
 }
 
 ///////////////////////////////////////////////////////////////////////////
+
+function weathermap_footer_links()
+{
+	global $colors;
+	global $WEATHERMAP_VERSION;
+	print '<br />'; 
+    html_start_box("<center><a target=\"_blank\" class=\"linkOverDark\" href=\"docs/\">Local Documentation</a> -- <a target=\"_blank\" class=\"linkOverDark\" href=\"http://www.network-weathermap.com/\">Weathermap Website</a> -- <a target=\"_target\" class=\"linkOverDark\" href=\"weathermap-cacti-plugin-editor.php?plug=1\">Weathermap Editor</a> -- This is version $WEATHERMAP_VERSION</center>", "78%", $colors["header"], "2", "center", "");
+	html_end_box(); 
+}
 
 // Repair the sort order column (for when something is deleted or inserted)
 function map_resort()
@@ -211,7 +242,7 @@ function maplist()
 
 	html_start_box("<strong>Weathermaps</strong>", "78%", $colors["header"], "3", "center", "weathermap-cacti-plugin-mgmt.php?action=addmap_picker");
 
-	html_header(array("Config File", "Title", "Active", "Sort Order", "Accessible By",""));
+	html_header(array("Config File", "Title", "Active", "Settings", "Sort Order", "Accessible By",""));
 
 	$query = db_fetch_assoc("select id,username from user_auth");
 	$users[0] = 'Anyone';
@@ -237,12 +268,13 @@ function maplist()
 			if($map['warncount']>0)
 			{
 				$had_warnings++;
-				print ' <img src="images/exclamation.png" title="'.$map['warncount'].' warnings last time this map was run. Check your logs."><a href="../../utilities.php?action=view_logfile&filter='.urlencode($map['configfile']).'" title="Check cacti.log for this map">'.$map['warncount']."</a>";
+				print '<a href="../../utilities.php?action=view_logfile&filter='.urlencode($map['configfile']).'" title="Check cacti.log for this map"><img border=0 src="images/exclamation.png" title="'.$map['warncount'].' warnings last time this map was run. Check your logs.">'.$map['warncount']."</a>";
 			}
 			print "</td>";
-
+			
 			#		print '<a href="?action=editor&plug=1&mapname='.htmlspecialchars($map['configfile']).'">[edit]</a></td>';
 			print '<td>'.htmlspecialchars($map['titlecache']).'</td>';
+						
 			if($map['active'] == 'on')
 			{
 				print '<td><a title="Click to Deactivate" href="?action=deactivate_map&id='.$map['id'].'"><font color="green">Yes</font></a>';
@@ -251,6 +283,23 @@ function maplist()
 			{
 				print '<td><a title="Click to Activate" href="?action=activate_map&id='.$map['id'].'"><font color="red">No</font></a>';
 			}
+			
+			print "<td>";
+			
+			print "<a href='?action=map_settings&id=".$map['id']."'>";
+			$setting_count = db_fetch_cell("select count(*) from weathermap_settings where mapid=".$map['id']);
+			if($setting_count > 0)
+			{
+				print $setting_count." special";
+				if($setting_count>1) print "s";
+			}
+			else
+			{
+				print "standard";
+			}
+			print "</a>";
+			
+			print "</td>";
 			
 			print '</td>';
 
@@ -335,7 +384,7 @@ function addmap_picker($show_all=false)
 	}
 	$loaded[]='index.php';
 
-	html_start_box("<strong>Available Weathermap Configuration Files</strong>", "78%", $colors["header"], "2", "center", "");
+	html_start_box("<strong>Available Weathermap Configuration Files</strong>", "78%", $colors["header"], "1", "center", "");
 
 	if( is_dir($weathermap_confdir))
 	{
@@ -382,7 +431,7 @@ function addmap_picker($show_all=false)
 					print '<td><a href="?action=addmap&amp;file='.$file.'" title="Add the configuration file">Add</a></td>';
 					print '<td><a href="?action=viewconfig&amp;file='.$file.'" title="View the configuration file in a new window" target="_blank">View</a></td>';
 					print '<td>'.htmlspecialchars($file);
-					if($flags[$file] == 'USED') print ' (USED)';
+					if($flags[$file] == 'USED') print ' <b>(USED)</b>';
 					print '</td>';
 					print '<td><em>'.htmlspecialchars($title).'</em></td>';
 					print '</tr>';
@@ -397,7 +446,7 @@ function addmap_picker($show_all=false)
 
 			if( ($i == 0) && $skipped>0)
 			{
-				print "<tr><td>($skipped files weren't shown because they are already in the database - you can <a href='?action=addmap_picker&show=all'>show those</a>)</td></tr>";
+				print "<tr><td>($skipped files weren't shown because they are already in the database</td></tr>";
 			}
 		}
 		else
@@ -412,6 +461,15 @@ function addmap_picker($show_all=false)
 
 	html_end_box();
 
+	if($skipped>0)
+	{
+		print "<p align=center>Some files are not shown because they have already been added. You can <a href='?action=addmap_picker&show=all'>show these files too</a>, if you need to.</p>";
+	}
+	if($show_all)
+	{
+		print "<p align=center>Some files are shown even though they have already been added. You can <a href='?action=addmap_picker'>hide those files too</a>, if you need to.</p>";
+	}
+	
 }
 
 function preview_config($file)
@@ -555,9 +613,9 @@ function perms_list($id)
 {
 	global $colors;
 
-	$title_sql = "select titlecache from weathermap_maps where id=$id";
-	$results = db_fetch_assoc($title_sql);
-	$title = $results[0]['titlecache'];
+	// $title_sql = "select titlecache from weathermap_maps where id=$id";
+	$title = db_fetch_cell("select titlecache from weathermap_maps where id=".intval($id));
+	// $title = $results[0]['titlecache'];
 
 	$auth_sql = "select * from weathermap_auth where mapid=$id order by userid";
 
@@ -620,5 +678,49 @@ function perms_list($id)
 	}
 	html_end_box();
 }
+
+function weathermap_map_settings($id)
+{
+	global $colors, $config;
+	
+	// print "Per-map settings for map $id";
+	$title = db_fetch_cell("select titlecache from weathermap_maps where id=".intval($id));		
+	
+	html_start_box("<strong>Edit per-map settings for Weathermap $id: $title</strong>", "70%", $colors["header"], "2", "center", "weathermap-cacti-plugin-mgmt.php?action=map_settings_form&id=".intval($id));
+	html_header(array("","Name", "Value",""));
+	
+	$n=0;
+	$settingrows = db_fetch_assoc("select * from weathermap_settings where mapid=".intval($id));
+	if( is_array($settingrows) )
+	{
+		if(sizeof($settingrows)>0)
+		{
+			foreach( $settingrows as $setting)
+			{
+				form_alternate_row_color($colors["alternate"],$colors["light"],$n);
+				print '<td><a href="?action=map_settings_form&id='.$id.'&sid='.intval($setting['id']).'"><img src="../../images/graph_properties.gif" width="16" height="16" border="0" alt="Edit this definition">Edit</a></td>';
+				print "<td>".htmlspecialchars($setting['optname'])."</td>";
+				print "<td>".htmlspecialchars($setting['optvalue'])."</td>";
+				print '<td><a href="?action=map_settings_delete&id='.$id.'&sid='.intval($setting['id']).'"><img src="../../images/delete_icon_large.gif" width="12" height="12" border="0" alt="Remove this definition from this map"></a></td>';
+				print "</tr>";
+				$n++;
+			}
+		}
+		else
+		{
+			print "<tr>";
+			print "<td colspan=2>There are no per-map settings for this map yet. You can add some by clicking Add up in the top-right.</td>";
+			print "</tr>";
+		}
+	}
+	
+	html_end_box();
+}
+
+function weathermap_map_settings_form($mapid,$settingid=0)
+{
+	print "Settings edit/add form.";
+}
+
 // vim:ts=4:sw=4:
 ?>

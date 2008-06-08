@@ -191,7 +191,8 @@ $map->context="cli";
 // now stuff in all the others, that we got from getopts
 foreach ($options_output as $key=>$value)
 {
-	$map->$key = $value;
+	// $map->$key = $value;
+	$map->add_hint($key,$value);
 }
 
 

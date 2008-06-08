@@ -196,6 +196,7 @@ class WeatherMap extends WeatherMapBase
 	var $preprocessclasses;
 	var $postprocessclasses;
 	var $activedatasourceclasses;
+	var $thumb_width, $thumb_height;
 
 	var $plugins = array();
 	var $usage_stats = array();
@@ -232,6 +233,8 @@ class WeatherMap extends WeatherMapBase
 				'timefont' => 2,
 				'timex' => 0,
 				'timey' => 0,
+				'thumb_width' => 0,
+				'thumb_height' => 0,
 				'titlex' => -1,
 				'titley' => -1,
 				'cachefolder' => 'cached',
@@ -449,7 +452,7 @@ class WeatherMap extends WeatherMapBase
 		{
 			$i = $input;
 			$input = str_replace("\\n","\n",$i);
-			if($i != $input)  warn("$i into $input\n");
+			# if($i != $input)  warn("$i into $input\n");
 		}
 
 		$output = $input;
@@ -2671,14 +2674,16 @@ function DrawMap($filename = '', $thumbnailfile = '', $thumbnailmax = 250, $with
 				if ($this->width > $this->height) { $factor=($thumbnailmax / $this->width); }
 				else { $factor=($thumbnailmax / $this->height); }
 
-				$twidth=$this->width * $factor;
-				$theight=$this->height * $factor;
+				$this->thumb_width = $this->width * $factor;
+				$this->thumb_height = $this->height * $factor;
 
-				$imagethumb=imagecreatetruecolor($twidth, $theight);
-				imagecopyresampled($imagethumb, $image, 0, 0, 0, 0, $twidth, $theight,
+				$imagethumb=imagecreatetruecolor($this->thumb_width, $this->thumb_height);
+				imagecopyresampled($imagethumb, $image, 0, 0, 0, 0, $this->thumb_width, $this->thumb_height,
 					$this->width, $this->height);
 				$result = imagepng($imagethumb, $thumbnailfile);
 				imagedestroy($imagethumb);
+				
+				
 
 				if(($result==FALSE))
 				{

@@ -20,18 +20,52 @@ if (isset($_POST['action'])) {
 }
 
 switch ($action) {
+
+case 'map_settings_delete':
+	if( isset($_REQUEST['mapid']) && is_numeric($_REQUEST['mapid']))  { $mapid = intval($_REQUEST['mapid']); }
+	if( isset($_REQUEST['id']) && is_numeric($_REQUEST['id']))  { $settingid = intval($_REQUEST['id']); }
+		
+	if($mapid>0 && $settingid>0)
+	{
+		// create setting
+		weathermap_setting_delete($mapid,$settingid);
+	}	
+	header("Location: weathermap-cacti-plugin-mgmt.php?action=map_settings&id=".$mapid);
+	break;
+
+// this is the save option from the map_settings_form
+case 'save':
+	$mapid=0; $settingid=0; $name=''; $value='';
+	if( isset($_REQUEST['mapid']) && is_numeric($_REQUEST['mapid']))  { $mapid = intval($_REQUEST['mapid']); }
+	if( isset($_REQUEST['id']) && is_numeric($_REQUEST['id']))  { $settingid = intval($_REQUEST['id']); }
+	if( isset($_REQUEST['name']) && $_REQUEST['name'])  { $name = $_REQUEST['name']; }
+	if( isset($_REQUEST['value']) && $_REQUEST['value'])  { $value = $_REQUEST['value']; }
+	
+	if($mapid>0 && $settingid==0)
+	{
+		// create setting
+		weathermap_setting_save($mapid,$name,$value);
+	}
+	elseif($mapid>0 && $settingid>0)
+	{
+		// update setting
+		weathermap_setting_update($mapid,$settingid,$name,$value);
+	}	
+	header("Location: weathermap-cacti-plugin-mgmt.php?action=map_settings&id=".$mapid);
+	break;
+
 case 'map_settings_form':
-	if( isset($_REQUEST['id']) && is_numeric($_REQUEST['id']))
+	if( isset($_REQUEST['mapid']) && is_numeric($_REQUEST['mapid']))
 	{
 		include_once($config["base_path"]."/include/top_header.php");
 		
-		if( isset($_REQUEST['sid']) && is_numeric($_REQUEST['sid']))
+		if( isset($_REQUEST['id']) && is_numeric($_REQUEST['id']))
 		{
-			weathermap_map_settings_form(intval($_REQUEST['id']), intval($_REQUEST['sid']) );
+			weathermap_map_settings_form(intval($_REQUEST['mapid']), intval($_REQUEST['id']) );
 		}
 		else
 		{
-			weathermap_map_settings_form(intval($_REQUEST['id']));
+			weathermap_map_settings_form(intval($_REQUEST['mapid']));
 		}		
 		weathermap_footer_links();
 		include_once($config["base_path"]."/include/bottom_footer.php");
@@ -52,8 +86,8 @@ case 'perms_add_user':
 		&& isset($_REQUEST['userid']) && is_numeric($_REQUEST['userid'])
 		)
 	{
-		perms_add_user($_REQUEST['mapid'],$_REQUEST['userid']);
-		header("Location: weathermap-cacti-plugin-mgmt.php?action=perms_edit&id=".$_REQUEST['mapid']);
+		perms_add_user(intval($_REQUEST['mapid']),intval($_REQUEST['userid']));
+		header("Location: weathermap-cacti-plugin-mgmt.php?action=perms_edit&id=".intval($_REQUEST['mapid']));
 	}
 	break;
 case 'perms_delete_user':
@@ -594,6 +628,9 @@ function map_delete($id)
 	$SQL = "delete from weathermap_auth where mapid=".$id;
 	db_execute($SQL);
 
+	$SQL = "delete from weathermap_settings where mapid=".$id;
+	db_execute($SQL);
+	
 	map_resort();
 }
 
@@ -686,7 +723,7 @@ function weathermap_map_settings($id)
 	// print "Per-map settings for map $id";
 	$title = db_fetch_cell("select titlecache from weathermap_maps where id=".intval($id));		
 	
-	html_start_box("<strong>Edit per-map settings for Weathermap $id: $title</strong>", "70%", $colors["header"], "2", "center", "weathermap-cacti-plugin-mgmt.php?action=map_settings_form&id=".intval($id));
+	html_start_box("<strong>Edit per-map settings for Weathermap $id: $title</strong>", "70%", $colors["header"], "2", "center", "weathermap-cacti-plugin-mgmt.php?action=map_settings_form&mapid=".intval($id));
 	html_header(array("","Name", "Value",""));
 	
 	$n=0;
@@ -698,10 +735,10 @@ function weathermap_map_settings($id)
 			foreach( $settingrows as $setting)
 			{
 				form_alternate_row_color($colors["alternate"],$colors["light"],$n);
-				print '<td><a href="?action=map_settings_form&id='.$id.'&sid='.intval($setting['id']).'"><img src="../../images/graph_properties.gif" width="16" height="16" border="0" alt="Edit this definition">Edit</a></td>';
+				print '<td><a href="?action=map_settings_form&mapid='.$id.'&id='.intval($setting['id']).'"><img src="../../images/graph_properties.gif" width="16" height="16" border="0" alt="Edit this definition">Edit</a></td>';
 				print "<td>".htmlspecialchars($setting['optname'])."</td>";
 				print "<td>".htmlspecialchars($setting['optvalue'])."</td>";
-				print '<td><a href="?action=map_settings_delete&id='.$id.'&sid='.intval($setting['id']).'"><img src="../../images/delete_icon_large.gif" width="12" height="12" border="0" alt="Remove this definition from this map"></a></td>';
+				print '<td><a href="?action=map_settings_delete&mapid='.$id.'&id='.intval($setting['id']).'"><img src="../../images/delete_icon_large.gif" width="12" height="12" border="0" alt="Remove this definition from this map"></a></td>';
 				print "</tr>";
 				$n++;
 			}
@@ -719,8 +756,59 @@ function weathermap_map_settings($id)
 
 function weathermap_map_settings_form($mapid,$settingid=0)
 {
-	print "Settings edit/add form.";
+	global $colors, $config;
+	
+	// print "Per-map settings for map $id";
+	$title = db_fetch_cell("select titlecache from weathermap_maps where id=".intval($mapid));		
+	// print "Settings edit/add form.";
+	
+	$name = "";
+	$value = "";
+	
+	if($settingid != 0)
+	{
+		$result = db_fetch_assoc("select * from weathermap_settings where id=".intval($settingid)." and mapid=".intval($mapid));
+		if(is_array($result) && sizeof($result)>0)
+		{
+			$name = $result[0]['optname'];
+			$value = $result[0]['optvalue'];
+		}
+	}
+	
+	$values_ar = array();
+	
+	$field_ar = array(
+		"mapid" => array("friendly_name" => "Style", "method" => "hidden", "value"=>$mapid ) ,
+		"id" => array("friendly_name" => "Style", "method" => "hidden", "value"=>$settingid ) ,
+		"name" => array("friendly_name" => "Name", "method" => "textbox", "max_length"=>20,"description"=>"The name of the map-global SET variable", "value"=>$name),
+		"value" => array("friendly_name" => "Value", "method" => "textbox", "max_length"=>20, "description"=>"What to set it to", "value"=>$value)		
+	);
+
+	$action = "Edit";
+	if($settingid == 0) $action ="Create";
+	
+	html_start_box("<strong>$action per-map settings for Weathermap $mapid: $title</strong>", "78%", $colors["header"], "3", "center", "");
+	draw_edit_form( array("config"=>$values_ar, "fields"=>$field_ar) );
+	html_end_box();
+
+	form_save_button("weathermap-cacti-plugin-mgmt.php?action=map_settings&id=".$mapid);	
+	
 }
+
+function weathermap_setting_save($mapid,$name,$value) 
+{
+	db_execute("insert into weathermap_settings (mapid, optname, optvalue) values ($mapid,'".mysql_real_escape_string($name)."','".mysql_real_escape_string($value)."')");
+} 
+function weathermap_setting_update($mapid,$settingid,$name,$value) 
+{
+	db_execute("update weathermap_settings set optname='".mysql_real_escape_string($name)."', optvalue='".mysql_real_escape_string($value)."' where id=".intval($settingid). " and mapid=".intval($mapid));
+} 
+
+function weathermap_setting_delete($mapid,$settingid) 
+{
+	db_execute("delete from weathermap_settings where id=".intval($settingid)." and mapid=".intval($mapid));
+} 
 
 // vim:ts=4:sw=4:
 ?>
+

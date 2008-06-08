@@ -82,15 +82,55 @@ around line 29 to point to your rrdtool executable.</p>
 <h4>rrdtool adjustments</h4>
 <p>By default, the plugin will read the last 800 seconds of data, and find the most recent within that to use. You might need to make it read back further, if you are updating your rrd files slowly. You can do this with the SET command, by adding 'SET rrd_period 3000' (any value in seconds) at the top of your map config file, before any NODE or LINK lines.</p>
 <p>Similarly, you can change the time that the plugin looks for data at from the present to the past, by using 'SET rrd_start -1d' in the top section of the config file. The full range of time-specification strings is at the bottom of the <a href="http://oss.oetiker.ch/rrdtool/doc/rrdfetch.en.html">rrdfetch manual page</a>.</p>
+<p>If you are using a tool other than Cacti, then the default DS names of traffic_in and traffic_out are probably wrong. You can change the defaults for the whole config file by adding two SET lines to the top of the map config file. For example, 'SET rrd_default_in_ds DS0' and 'SET rrd_default_in_ds DS1' will 
+make the default DS names DS0 and DS1 respecively so MRTG users don't need to specify the DS names in every TARGET line.
+<p>Finally, if the TARGET filename doesn't begin with a / it is usually assumed to be a relative path from the weathermap directory. If you SET rrd_default_path to some other path in the global (top) section of the map config file, you can
+change that assumption so that the DS plugin looks somewhere else.</p>
+
+<h4>Cacti-specific additions</h4>
+
+<p>If the plugin detects that it is running within the Cacti poller process, it defines a couple of useful global Hint Variables for Cacti users - {map:cacti_path_rra} contains the path to the rra/ directory in your Cacti installation, with no trailing slash, and {map:cacti_url} is
+the URL to the front page of your Cacti installation, as known to the Plugin Architecture. These can be used in the TARGET, INFOURL and OVERLIBGRAPH commands in particular, to reduce a lot of duplication.</p>
 
 <h4>Cacti poller_output support (aka Boost support)</h4>
+
 <p>If you are using Cacti as your data collector, and running Weathermap from Cacti's poller, then there is another special feature, called poller_output. Weathermap can intercept data as it is collected by Cacti, and therefore avoid
 running lots of external rrdtool processes to collect the data it needs to display your map. This is <em>especially</em> useful if you are using TheWitness' Boost plugin, as the data isn't written to the rrd files
 until some time after it is collected. Even without Boost, it should provide a performance improvement, particularly with large installations of Weathermap.</p>
 <p>To use this feature, a map-global variable needs to be set. Near the top of your map config file, add 'SET rrd_use_poller_output 1'. The setting will take a few poller cycles to take effect: during the first one, the
 appropriate cacti data sources are identified based on the rrd filenames, on the second cycle values will be collected, and on the third we'll have two values, so any COUNTER datasources will begin to work properly. If the poller_output feature
 fails to collect data, then the regular rrdtool-running method will be attempted too.</p>
-<p>Note that since the rrdtool program is not bein run in this mode, you <em>can't</em> use the "time-shifting" features described above - those rely on using <em>real</em> rrdtool files.</p>
+
+<p>Because in poller_output mode, Weathermap is pulling data directly from the Cacti database, it can also collect some other information that you might find useful in your map. It takes all the data stored in the host_snmp_cache table for the 
+specified datasource, and dumps that into Hint Variables. This table contains all the columns that you see when you are picking which datasource to graph in Cacti, so for
+normal interface traffic, it contains things like the interface speed, operational status, interface description (your 'comment' name, usually) and so on. These are stored in Hint Variables called 'cacti_<em>cache variable</em>' - e.g. cacti_ifSpeed, or cacti_ifIP. It also sets
+cacti_host_id to be the internal host_id from Cacti for the host containing this data source, and the cacti_graph_id to be the local_graph_id of a graph that uses this DS in Cacti. You can then use those to automatically add correct OVERLIBGRAPH and INFOURL lines:
+<div class="example">
+<pre>
+SET rrd_use_poller_output 1
+
+LINK DEFAULT
+	SET cacti_use_ifspeed 1
+	INFOURL {map:cacti_url}/graph.php?local_graph_id={link:this:cacti_graph_id}
+	OVERLIBGRAPH {map:cacti_url}/graph_image.php?local_graph_id={link:this:cacti_graph_id}&rra_id=0&graph_nolegend=true
+	
+LINK uplink1
+	NODES a b
+	TARGET {map:cacti_path_rra}/router1_345_traffic_in.rrd
+	
+LINK uplink2
+	NODES a c
+	TARGET {map:cacti_path_rra}/router1_377_traffic_in.rrd
+</pre>
+<p>In this example, all each link needs to have defined is the TARGET rrdfile, and which nodes it joins. The rest is supplied by this plugin.</p>
+</div>
+
+<p>As a final feature, if you add 'SET cacti_use_ifspeed 1' to either the link or node, or any item it inherits settings from (e.g. DEFAULT) then Weathermap will take the value of ifSpeed and use it 
+in place of the value defined in the map config file - this allows you to do some basic dynamic configuration of Weathermap based on Cacti, which in turn should pick
+up changes from the network device.</p>
+
+<p><strong>Note</strong> that since the rrdtool program is not being run in this mode, you <em>can't</em> use the "time-shifting" features described above - those rely on using <em>real</em> rrdtool files. If you are using poller_output
+to allow Weathermap to work alongside Boost, then there is no workaround - the data isn't in the .rrd files until Boost's own update process puts it there sometime later.</p>
 
 <hr />
 <h3><a name="tabs"></a>Tab-separated text</h3>
@@ -207,6 +247,9 @@ defines a scale where 0 is green and 100% is red and in between is a smooth grad
 
 <p>This plugin is fairly experimental and not thoroughly tested.</p>
 <p>This plugin allows you to write small external scripts, and pass the value from the script into Weathermap. The output format of the script is the same one that MRTG uses for <em>it's</em> external scripts, so it's possible that you can even find an existing script to do what you want, somewhere else.</p>
+<p>MRTG external scripts produce 4 lines of output. Line 1 is the state of the first (in) variable, line 2 is the state of the second (out) variable, line 3 is the uptime of the device, and line 4 is the name of the device. This plugin only cares about the first 2 lines, but it <em>does</em> expect there to be 4 lines.</p>
+<p>This plugin also sets a few Hint Variables - external_line1, external_line2, external_line3, and external_line4 are the raw output of your script. This can be useful
+if your script really is intended for MRTG, as the 3rd line would be the device uptime and the 4th line would be it's name.</p>
 
 <hr />
 <h3><a name="fping"></a>FPING</h3>

@@ -2,6 +2,8 @@
 	ADDED - RRD datasource can take SET rrd_default_path to make configs a little easier to read.
 	ADDED - RRD datasource can take SET rrd_default_in_ds and rrd_default_out_ds for non-Cacti users.
 	ADDED - RRD datasource can get Cacti query information (in poller_output mode ONLY) - like ifAlias, ifSpeed etc
+	ADDED - RRD datasource can take the ifSpeed from the above, and use it in the map.
+	ADDED - RRD datasource fills in Cacti cacti_path_rra and cacti_url with Cacti base path and URL
 	ADDED - SNMP datasource also stores the raw data from the SNMP agent in snmp_raw_in/snmp_raw_out
 	ADDED - SNMP datasource allows '-' as an OID, similar to '-' targets in RRDs.
 	ADDED - Control the drawing order with ZORDER.
@@ -14,6 +16,7 @@
 	ADDED - Cacti plugin caches thumbnail sizes, improving thumbnail view rendering
 	ADDED - Cacti plugin allows adding the same map twice (more useful than it sounds)
 	ADDED - Cacti plugin allows setting of map-global variables in the management UI
+	ADDED - Cacti plugin adds links in 'user' pages to management screen (if you are an admin)
 	CHANGE - Cacti plugin uses "processed" map title now (allows {} tokens in the title)
 	CHANGE - A NODE with no POSITION is not drawn, instead of drawn at 0,0. Useful for templates.
 	CHANGE - A LINK with no NODES is no longer an error. Also for templates.

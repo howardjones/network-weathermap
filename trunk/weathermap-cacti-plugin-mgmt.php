@@ -780,8 +780,8 @@ function weathermap_map_settings_form($mapid,$settingid=0)
 	$field_ar = array(
 		"mapid" => array("friendly_name" => "Style", "method" => "hidden", "value"=>$mapid ) ,
 		"id" => array("friendly_name" => "Style", "method" => "hidden", "value"=>$settingid ) ,
-		"name" => array("friendly_name" => "Name", "method" => "textbox", "max_length"=>20,"description"=>"The name of the map-global SET variable", "value"=>$name),
-		"value" => array("friendly_name" => "Value", "method" => "textbox", "max_length"=>20, "description"=>"What to set it to", "value"=>$value)		
+		"name" => array("friendly_name" => "Name", "method" => "textbox", "max_length"=>128,"description"=>"The name of the map-global SET variable", "value"=>$name),
+		"value" => array("friendly_name" => "Value", "method" => "textbox", "max_length"=>128, "description"=>"What to set it to", "value"=>$value)		
 	);
 
 	$action = "Edit";

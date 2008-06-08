@@ -61,6 +61,11 @@ class WeatherMapDataSource_external extends WeatherMapDataSource {
 				{
 					$data[IN] = floatval($lines[0]);
 					$data[OUT] = floatval($lines[1]);
+					
+					$item->add_hint("external_line1",$lines[0]);
+					$item->add_hint("external_line2",$lines[1]);
+					$item->add_hint("external_line3",$lines[2]);
+					$item->add_hint("external_line4",$lines[3]);
 					$data_time = time();
 				}
 				else

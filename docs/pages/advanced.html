@@ -113,7 +113,6 @@ Here is the list of valid <em>variablename</em>s and their meaning.
 <tr> 
  <th>inpercent</th> 
  <td>The percentage usage for the input side of the item, calculated using the previous two figures.</td> 
-
 </tr> 
 <tr> 
  <th>outpercent</th> 
@@ -123,11 +122,19 @@ Here is the list of valid <em>variablename</em>s and their meaning.
  <th>name</th> 
  <td>The name of the <a href="config-reference.html#NODE_NODE">NODE</a> or <a href="config-reference.html#LINK_LINK">LINK.</td></a> 
 </tr> 
+<tr> 
+ <th>inscaletag</th> 
+ <td>If the <a href="config-reference.html#GLOBAL_SCALE">SCALE</a> has <a href="config-reference.html#GLOBAL_SCALE">scale tag</a>, then this is the scale tag for the <a href="config-reference.html#GLOBAL_SCALE">SCALE</a> line that the inpercent value matched.</td> 
+</tr> 
+<tr> 
+ <th>outscaletag</th> 
+ <td>If the <a href="config-reference.html#GLOBAL_SCALE">SCALE</a> has <a href="config-reference.html#GLOBAL_SCALE">scale tag</a>, then this is the scale tag for the <a href="config-reference.html#GLOBAL_SCALE">SCALE</a> line that the outpercent value matched.</td> 
+</tr> 
 
 </tbody> 
 </table> 
  </p> 
-<p>In addition to the variables defined by Weathermap itself, there are two additional sources for variables, that greatly extend the usefulness of these string tokens: You, and Data Source Plugins. </p> 
+<p>In addition to the variables defined by Weathermap itself, there are two additional sources for variables that greatly extend the usefulness of these string tokens: You, and Data Source Plugins. </p> 
 <p> 
 Firstly, you can define addition variables for any <a href="config-reference.html#NODE_NODE">NODE,</a> <a href="config-reference.html#LINK_LINK">LINK</a> or for the map in general, using the <a href="config-reference.html#GLOBAL_SET">SET</a> command. This serves two purposes. One is to allow you to give parameters to some datasource plugins (like a database password for some external database), but the other is just so you can use those values elsewhere in the map. 
 Say you have a data-collection system where each router has an ID, but the URL is otherwise the same from one <a href="config-reference.html#NODE_NODE">NODE</a> to the next. You can define a new variable with the router ID, and then use a string token to insert that ID into the <a href="config-reference.html#LINK_INFOURL">INFOURL</a> or <a href="config-reference.html#LINK_TARGET">TARGET</a> strings. This makes it easier to edit the configuration, and easier to make global changes if you move the server than runs the other system, for example. 
@@ -159,6 +166,19 @@ Here is one more example, showing the use of relative node positions, node targe
 </div> 
 The first node uses two targets to populate the 'in' and 'out' slots from different RRD files. It uses the 'in' slot to change it's own color. The second node is positioned relative to the first, and uses tokens to show the number of sessions used (the 'out' slot) on the other node as it's label. In combination with the 'notes' available to plugins, you can display nearly anything in your weathermap. 
 
+ </p> 
+
+<h3><a name="formatting">Formatting in Special Tokens</a></h3> 
+<p>To allow you to control better how the values of special tokens are used, you can add a final part inside the token that specifies the format. </p> 
+<p>This borrows the '%' format from the printf() function in C, PHP, perl and many other languages, but adds a couple of Weathermap-specific extras: 
+
+<table> 
+<tr><th>{link:this:bandwidth_in:%d}</th><td>force to integer</td></tr> 
+<tr><th>{link:this:bandwidth_in:%04d}</th><td>force to integer, and padd to 4 digits with zeroes</td></tr> 
+<tr><th>{link:this:bandwidth_in:%0.2f}</th><td>floating-point with 2 decimal places</td></tr> 
+<tr><th>{link:this:bandwidth_in:%k}</th><td>Add a prefix for mega, kilo, giga, milli etc, and show the rest as a floating-point number - e.g. 2.3M (Weathermap special)</td></tr> 
+<tr><th>{link:this:bandwidth_in:%0.2k}</th><td>as above, but limit the floating-point part to 2 decimal places (Weathermap special)</td></tr> 
+</table> 
  </p> 
 
 <h2><a <a href="config-reference.html#GLOBAL_SET">name="tweaks">SETting</a> Hint Variables to tweak maps</a></h2> 

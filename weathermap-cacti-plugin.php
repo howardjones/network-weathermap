@@ -630,11 +630,24 @@ function weathermap_translate_id($idname)
 function weathermap_versionbox()
 {
 	global $WEATHERMAP_VERSION, $colors;
-	
-	
-	
+	global $config, $user_auth_realms, $user_auth_realm_filenames;
+		
 	$pagefoot = "Powered by <a href=\"http://www.network-weathermap.com/?v=$WEATHERMAP_VERSION\">PHP Weathermap version $WEATHERMAP_VERSION</a>";
+	
+	$realm_id2 = 0;
 
+	if (isset($user_auth_realm_filenames['weathermap-cacti-plugin-mgmt.php'])) {
+		$realm_id2 = $user_auth_realm_filenames['weathermap-cacti-plugin-mgmt.php'];
+	}
+	$userid = (isset($_SESSION["sess_user_id"]) ? intval($_SESSION["sess_user_id"]) : 1);
+	if ((db_fetch_assoc("select user_auth_realm.realm_id from user_auth_realm where user_auth_realm.user_id='" . $userid . "' and user_auth_realm.realm_id='$realm_id2'")) || (empty($realm_id2))) 
+	{
+		$pagefoot .= " --- <a href='weathermap-cacti-plugin-mgmt.php' title='Go to the map management page'>Weathermap Management</a>";
+		$pagefoot .= " | <a target=\"_blank\" href=\"docs/\">Local Documentation</a>";
+		$pagefoot .= " | <a target=\"_blank\" href=\"editor.php\">Editor</a>";
+	}
+			
+	
 	html_graph_start_box(1,true);
 
 ?>
@@ -667,6 +680,16 @@ function readfile_chunked($filename) {
     $status = fclose($handle);
     return $status;
 } 
+
+function weathermap_footer_links()
+{
+	global $colors;
+	global $WEATHERMAP_VERSION;
+	print '<br />'; 
+    html_start_box("<center><a target=\"_blank\" class=\"linkOverDark\" href=\"docs/\">Local Documentation</a> -- <a target=\"_blank\" class=\"linkOverDark\" href=\"http://www.network-weathermap.com/\">Weathermap Website</a> -- <a target=\"_target\" class=\"linkOverDark\" href=\"weathermap-cacti-plugin-editor.php?plug=1\">Weathermap Editor</a> -- This is version $WEATHERMAP_VERSION</center>", "78%", $colors["header"], "2", "center", "");
+	html_end_box(); 
+}
+
 
 // vim:ts=4:sw=4:
 ?>

@@ -28,6 +28,18 @@ Position as percentage along link? (fake labels etc)
 
 Before 0.96
 -----------
+
+multiple instances of same map in Cacti
+-> per-instance SET params in Cacti UI. e.g. a monthly average version
+store the dimensions of the thumbnail (better presentation in Cacti)
+
+editor.php security
+FIXED BUG imagemap floats
+rrdtool averaging
+rrdtool cdefs
+external script params
+spaces in filenames/targets where appropriate
+
 Documentation for printf tokens!
 Fix a few docs bugs with unclosed tags.
 

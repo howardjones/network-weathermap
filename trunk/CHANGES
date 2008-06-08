@@ -17,6 +17,8 @@
 	FIXED - Minor issue with CRLF in map title for Cacti Plugin
 	FIXED - Oneway links don't draw the INCOMMENT anymore
 	FIXED - DEFAULT SCALE covers 0-100 properly (Thanks Dan Fusselman)
+	FIXED - Scaled ICON in DEFAULT didn't get overwritten properly in nodes (Thanks Fabrizio Carusi)
+	FIXED - No more floating-point imagemap coords (Thanks Trond Aspelund)
 		
 0.95b	FIXED - SQL schema issue that upset some mysql versions
 	FIXED - Removed sometime-problem debugging code in editor

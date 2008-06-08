@@ -73,6 +73,27 @@ function debug($string)
 	}
 }
 
+function metadump($string, $truncate=FALSE)
+{
+
+	return; 
+	if($truncate)
+	{
+		$fd = fopen("metadump.txt","w+");
+	}
+	else
+	{
+		$fd = fopen("metadump.txt","a");
+	}
+	fputs($fd,$string."\n");
+	fclose($fd);
+}
+
+function metacolour(&$col)
+{
+	return ($col['red1']." ".$col['green1']." ".$col['blue1']);
+}
+
 function warn($string,$notice_only=FALSE)
 {
 	global $weathermap_map;
@@ -163,9 +184,11 @@ function render_colour($col)
 // take the same set of points that imagepolygon does, but don't close the shape
 function imagepolyline($image, $points, $npoints, $color)
 {
-	for ($i=0; $i < ($npoints - 1);
-	$i++) { imageline($image, $points[$i * 2], $points[$i * 2 + 1], $points[$i * 2 + 2], $points[$i * 2 + 3],
-		$color); }
+	for ($i=0; $i < ($npoints - 1); $i++) 
+	{ 
+		imageline($image, $points[$i * 2], $points[$i * 2 + 1], $points[$i * 2 + 2], $points[$i * 2 + 3],
+		$color); 
+	}
 }
 
 // draw a filled round-cornered rectangle
@@ -442,7 +465,7 @@ function find_distance(&$pointarray, $distance)
 
 // Give a list of key points, calculate a curve through them
 // return value is an array of triples (x,y,distance)
-function calc_curve(&$in_xarray, &$in_yarray,$pointsperspan = 12)
+function calc_curve(&$in_xarray, &$in_yarray,$pointsperspan = 32)
 {
 	// search through the point list, for consecutive duplicate points
 	// (most common case will be a straight link with both NODEs at the same place, I think)
@@ -780,11 +803,12 @@ function draw_curve($image, &$curvepoints, $widths, $outlinecolour, $fillcolours
 		$there_points[]=$pre_mid_y - $direction * $widths[$dir] * $any;
 
 		// all points done, now combine the lists, and produce the final result.
-
+		$metapts = "";
 		$y=array_pop($back_points);
 		$x=array_pop($back_points);
 		do
 		{
+			$metapts .= " $x $y";
 			$there_points[]=$x;
 			$there_points[]=$y;
 			$y=array_pop($back_points);
@@ -796,7 +820,9 @@ function draw_curve($image, &$curvepoints, $widths, $outlinecolour, $fillcolours
 		if ($direction < 0) $arrayindex=1;
 
 		if (!is_null($fillcolours[$arrayindex]))
-			{ imagefilledpolygon($image, $there_points, count($there_points) / 2, $arrowsettings[$dir][4]); }
+			{ wimagefilledpolygon($image, $there_points, count($there_points) / 2, $arrowsettings[$dir][4]); 
+				
+			}
 		
 		$areaname = "LINK:" . $linkname. ":$dir";
 		$map->imap->addArea("Polygon", $areaname, '', $there_points);
@@ -804,7 +830,7 @@ function draw_curve($image, &$curvepoints, $widths, $outlinecolour, $fillcolours
 
 		if (!is_null($outlinecolour))
 		{
-			imagepolygon($image, $there_points, count($there_points) / 2, $arrowsettings[$dir][5]);
+			wimagepolygon($image, $there_points, count($there_points) / 2, $arrowsettings[$dir][5]);
 		}
 	}
 }
@@ -1172,6 +1198,93 @@ class Colour
 		return (sprintf($format, $this->r, $this->g, $this->b));
 	}
 }
+
+function wimagecreate($width,$height)
+{
+	metadump("NEWIMAGE $width $height");
+	return(imagecreate($width,$height));
+}
+
+function wimagefilledrectangle( $image ,$x1, $y1, $x2, $y2, $color )
+{
+	$col = imagecolorsforindex($image, $color);
+	$r = $col['red']; $g = $col['green']; $b = $col['blue']; $a = $col['alpha'];
+	$r = $r/255; $g=$g/255; $b=$b/255; $a=(127-$a)/127;
+
+	metadump("FRECT $x1 $y1 $x2 $y2 $r $g $b $a");
+	return(imagefilledrectangle( $image ,$x1, $y1, $x2, $y2, $color ));
+}
+
+function wimagerectangle( $image ,$x1, $y1, $x2, $y2, $color )
+{
+	$col = imagecolorsforindex($image, $color);
+	$r = $col['red']; $g = $col['green']; $b = $col['blue']; $a = $col['alpha'];
+	$r = $r/255; $g=$g/255; $b=$b/255; $a=(127-$a)/127;
+
+	metadump("RECT $x1 $y1 $x2 $y2 $r $g $b $a");
+	return(imagerectangle( $image ,$x1, $y1, $x2, $y2, $color ));
+}
+
+function wimagepolygon($image, $points, $num_points, $color)
+{
+	$col = imagecolorsforindex($image, $color);
+	$r = $col['red']; $g = $col['green']; $b = $col['blue']; $a = $col['alpha'];
+	$r = $r/255; $g=$g/255; $b=$b/255; $a=(127-$a)/127;
+	
+	$pts = "";
+	for ($i=0; $i < $num_points; $i++)
+        {
+		$pts .= $points[$i * 2]." ";
+		$pts .= $points[$i * 2+1]." ";
+        }
+	
+	metadump("POLY $num_points ".$pts." $r $g $b $a");
+
+	return(imagepolygon($image, $points, $num_points, $color));
+}
+
+function wimagefilledpolygon($image, $points, $num_points, $color)
+{
+	$col = imagecolorsforindex($image, $color);
+	$r = $col['red']; $g = $col['green']; $b = $col['blue']; $a = $col['alpha'];
+	$r = $r/255; $g=$g/255; $b=$b/255; $a=(127-$a)/127;
+	
+	$pts = "";
+	for ($i=0; $i < $num_points; $i++)
+        {
+		$pts .= $points[$i * 2]." ";
+		$pts .= $points[$i * 2+1]." ";
+        }
+	
+	metadump("FPOLY $num_points ".$pts." $r $g $b $a");
+
+	return(imagefilledpolygon($image, $points, $num_points, $color));
+}
+
+function wimagecreatetruecolor($width, $height)
+{
+
+	metadump("BLANKIMAGE $width $height");
+
+	return imagecreatetruecolor($width,$height);
+
+}
+
+function wimagettftext($image, $size, $angle, $x, $y, $color, $file, $string)
+{
+
+	$col = imagecolorsforindex($image, $color);
+	$r = $col['red']; $g = $col['green']; $b = $col['blue']; $a = $col['alpha'];
+	$r = $r/255; $g=$g/255; $b=$b/255; $a=(127-$a)/127;
+
+	metadump("TEXT $x $y $angle $size $file $r $g $b $a $string");
+
+return(imagettftext($image, $size, $angle, $x, $y, $color, $file, $string));
+
+}
+
+
+
 
 // vim:ts=4:sw=4:
 ?>

@@ -194,6 +194,10 @@ function weathermap_setup_table () {
 			filehash varchar (40) NOT NULL default '',
 			warncount int(11) NOT NULL default 0,
 			config text NOT NULL default '',
+			thumb_width int(11) NOT NULL default 0,
+			thumb_height int(11) NOT NULL default 0,
+			schedule varchar(32) NOT NULL default '*',
+			archiving set('on','off') NOT NULL default 'off',
 			PRIMARY KEY  (id)
 		) TYPE=MyISAM;";
 	}
@@ -203,16 +207,27 @@ function weathermap_setup_table () {
 		$result = mysql_query($colsql) or die (mysql_error());
 		$found_so = false;	$found_fh = false;
 		$found_wc = false;	$found_cf = false;
+		$found_96changes = false;
+		
 		while ($row = mysql_fetch_array($result, MYSQL_ASSOC)) {
 			if ($row['Field'] == 'sortorder') $found_so = true;
 			if ($row['Field'] == 'filehash') $found_fh = true;
 			if ($row['Field'] == 'warncount') $found_wc = true;
 			if ($row['Field'] == 'config') $found_cf = true;
+			
+			if ($row['Field'] == 'thumb_width') $found_96changes = true;
 		}
 		if (!$found_so) $sql[] = "alter table weathermap_maps add sortorder int(11) NOT NULL default 0 after id";
 		if (!$found_fh) $sql[] = "alter table weathermap_maps add filehash varchar(40) NOT NULL default '' after titlecache";		
 		if (!$found_wc) $sql[] = "alter table weathermap_maps add warncount int(11) NOT NULL default 0 after filehash";		
 		if (!$found_cf) $sql[] = "alter table weathermap_maps add config text NOT NULL  default '' after warncount";
+		if (!$found_96changes)
+		{
+			$sql[] = "alter table weathermap_maps add thumb_width int(11) NOT NULL default 0 after config";
+			$sql[] = "alter table weathermap_maps add thumb_height int(11) NOT NULL default 0 after thumb_width";
+			$sql[] = "alter table weathermap_maps add schedule varchar(32) NOT NULL default '*' after thumb_height";
+			$sql[] = "alter table weathermap_maps add archiving set('on','off') NOT NULL default 'off' after schedule";
+		}
 	}
 
 	$sql[] = "update weathermap_maps set filehash=LEFT(MD5(concat(id,configfile,rand())),20) where filehash = '';";
@@ -221,6 +236,14 @@ function weathermap_setup_table () {
 		$sql[] = "CREATE TABLE weathermap_auth (
 			userid mediumint(9) NOT NULL default '0',
 			mapid int(11) NOT NULL default '0'
+		) TYPE=MyISAM;";
+	}
+	
+	if (!in_array('weathermap_settings', $tables)) {
+		$sql[] = "CREATE TABLE weathermap_settings (
+			mapid int(11) NOT NULL default '0',
+			optname varchar(128) NOT NULL default '',
+			optvalue varchar(128) NOT NULL default ''
 		) TYPE=MyISAM;";
 	}
 	

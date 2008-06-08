@@ -93,8 +93,16 @@ case 'viewconfig':
 	break;
 
 case 'addmap_picker':
+	
 	include_once($config["base_path"]."/include/top_header.php");
-	addmap_picker();
+	if(isset($_REQUEST['show']) && $_REQUEST['show']=='all')
+	{
+		addmap_picker(true);
+	}
+	else
+	{
+		addmap_picker(false);
+	}
 	include_once($config["base_path"]."/include/bottom_footer.php");
 	break;
 
@@ -298,7 +306,7 @@ function maplist()
 	
 	if($had_warnings>0)
 	{
-		print '<div align="center" style="padding:5px; width: 50%; border: 2px red solid; margin: 5px auto 15px auto; background-color: #fee;">'.$had_warnings.' of your maps had warnings last time '.($had_warnings>1?"they":"it").' ran. You can find these in your Cacti log file.</div>';
+		print '<div align="center" style="padding:5px; width: 50%; border: 2px red solid; margin: 5px auto 15px auto; background-color: #fee;">'.$had_warnings.' of your maps had warnings last time '.($had_warnings>1?"they":"it").' ran. You can find these in your Cacti log file or by clicking on the warning sign next to that map.</div>';
 	}
 		
 	if($i>0)
@@ -308,12 +316,13 @@ function maplist()
 
 }
 
-function addmap_picker()
+function addmap_picker($show_all=false)
 {
 	global $weathermap_confdir;
 	global $colors;
 
 	$loaded=array();
+	$flags=array();
 	// find out what maps are already in the database, so we can skip those
 	$queryrows = db_fetch_assoc("select * from weathermap_maps");
 	if( is_array($queryrows) )
@@ -321,6 +330,7 @@ function addmap_picker()
 		foreach ($queryrows as $map)
 		{
 			$loaded[]=$map['configfile'];
+			
 		}
 	}
 	$loaded[]='index.php';
@@ -339,20 +349,21 @@ function addmap_picker()
 			while($file = readdir($dh))
 			{
 				$realfile = $weathermap_confdir.'/'.$file;
-				if(is_file($realfile) && ! in_array($file,$loaded) )
+				
+				$used = in_array($file,$loaded);
+				$flags[$file] = '';
+				if($used) $flags[$file] = 'USED';
+				
+				if( is_file($realfile) )
 				{
-					if(in_array($file,$loaded))
+					if( $used && !$show_all)
 					{
 						$skipped++;
 					}
 					else
 					{
-						
-
 						$title = wmap_get_title($realfile);
 						$titles[$file] = $title;
-						
-
 						$i++;
 					}
 				}
@@ -370,7 +381,9 @@ function addmap_picker()
 					form_alternate_row_color($colors["alternate"],$colors["light"],$i);
 					print '<td><a href="?action=addmap&amp;file='.$file.'" title="Add the configuration file">Add</a></td>';
 					print '<td><a href="?action=viewconfig&amp;file='.$file.'" title="View the configuration file in a new window" target="_blank">View</a></td>';
-					print '<td>'.htmlspecialchars($file).'</td>';
+					print '<td>'.htmlspecialchars($file);
+					if($flags[$file] == 'USED') print ' (USED)';
+					print '</td>';
 					print '<td><em>'.htmlspecialchars($title).'</em></td>';
 					print '</tr>';
 					$i++;
@@ -384,7 +397,7 @@ function addmap_picker()
 
 			if( ($i == 0) && $skipped>0)
 			{
-				print "<tr><td>($skipped files weren't shown because they are already in the database)</td></tr>";
+				print "<tr><td>($skipped files weren't shown because they are already in the database - you can <a href='?action=addmap_picker&show=all'>show those</a>)</td></tr>";
 			}
 		}
 		else

@@ -231,10 +231,45 @@ class WeatherMapDataSource_rrd extends WeatherMapDataSource {
 			} while($now <= $rrdreturn['end']);
 		}
 	}
+	
+	# rrdtool graph /dev/null -f "" -s now-30d -e now DEF:in=../rra/atm-sl_traffic_in_5498.rrd:traffic_in:AVERAGE DEF:out=../rra/atm-sl_traffic_in_5498.rrd:traffic_out:AVERAGE VDEF:avg_in=in,AVERAGE VDEF:avg_out=out,AVERAGE PRINT:avg_in:%lf PRINT:avg_out:%lf
+
+	function wmrrd_read_from_real_rrdtool_aggregate($rrdfile,$cf,$aggregatefn,$start,$end,$dsnames, &$data, &$map, &$data_time,&$item)
+	{
+		debug("RRD ReadData: VDEF style\n");
+
+		$command=$map->rrdtool . " graph --start $start --end $end DEF:in=$rrdfile:".$dsnames[IN].":$cf DEF:out=".$dsnames[OUT].":$cf  VDEF:avg_in=in,$aggregatefn VDEF:avg_out=out,$aggregatefn PRINT:avg_in:%lf PRINT:avg_out:%lf";
+		debug ("RRD ReadData: Running: $command\n");
+		$pipe=popen($command, "r");
+		
+		$lines=array ();
+		$count = 0;
+		$linecount = 0;
+
+		if (isset($pipe))
+		{
+			fgets($pipe, 4096); // skip the blank line
+			$buffer='';
+
+			while (!feof($pipe))
+			{
+				$line=fgets($pipe, 4096);
+				debug ("> " . $line);
+				$buffer.=$line;
+				$lines[]=$line;
+				$linecount++;
+			}				
+			pclose ($pipe);
+		}
+		else
+		{
+			warn("RRD ReadData: failed to open pipe to RRDTool: ".$php_errormsg." [WMRRD04]\n");
+		}
+		debug ("RRD ReadDataFromRealRRD: Returning (".($data[IN]===NULL?'NULL':$data[IN]).",".($data[OUT]===NULL?'NULL':$data[OUT]).",$data_time)\n");
+	}
 
 	function wmrrd_read_from_real_rrdtool($rrdfile,$cf,$start,$end,$dsnames, &$data, &$map, &$data_time,&$item)
 	{
-
 		debug("RRD ReadData: traditional style\n");
 
 		// we get the last 800 seconds of data - this might be 1 or 2 lines, depending on when in the
@@ -274,6 +309,7 @@ class WeatherMapDataSource_rrd extends WeatherMapDataSource {
 				$buffer.=$line;
 				$lines[]=$line;
 				$linecount++;
+				
 			}				
 			pclose ($pipe);
 			
@@ -415,6 +451,9 @@ class WeatherMapDataSource_rrd extends WeatherMapDataSource {
 				$rrdfile = $rrdbase."/".$rrdfile;
 			}
 		}
+
+		$cfname = intval($map->get_hint('rrd_cf'));
+		if($cfname=='') $cfname='AVERAGE';
 		
 		$period = intval($map->get_hint('rrd_period'));
 		if($period == 0) $period = 800;
@@ -429,7 +468,14 @@ class WeatherMapDataSource_rrd extends WeatherMapDataSource {
 		}
 
 		$use_poller_output = intval($map->get_hint('rrd_use_poller_output'));
-
+		$aggregatefunction = $map->get_hint('rrd_aggregate_function');
+		
+		if($aggregatefunction != '')
+		{	
+			$use_poller_output=0;
+			warn("Can't use poller_output for rrd-aggregated data - disabling rrd_use_poller_output\n");
+		}
+		
 		if($use_poller_output == 1)
 		{
 			WeatherMapDataSource_rrd::wmrrd_read_from_poller_output($rrdfile,"AVERAGE",$start,$end, $dsnames, $data,$map, $data_time,$item);
@@ -452,12 +498,19 @@ class WeatherMapDataSource_rrd extends WeatherMapDataSource {
 	
 				if ((1==0) && extension_loaded('RRDTool')) // fetch the values via the RRDtool Extension
 				{
-					WeatherMapDataSource_rrd::wmrrd_read_from_php_rrd($rrdfile,"AVERAGE",$start,$end, $dsnames, $data,$map, $data_time,$item);
+					WeatherMapDataSource_rrd::wmrrd_read_from_php_rrd($rrdfile,$cfname,$start,$end, $dsnames, $data,$map, $data_time,$item);
 				}
 				else
 				{
-					// do this the tried and trusted old-fashioned way
-					WeatherMapDataSource_rrd::wmrrd_read_from_real_rrdtool($rrdfile,"AVERAGE",$start,$end, $dsnames, $data,$map, $data_time,$item);
+					if($aggregatefunction != '')
+					{
+						WeatherMapDataSource_rrd::wmrrd_read_from_real_rrdtool_aggregated($rrdfile,$cfname,$aggregatefunction, $start,$end, $dsnames, $data,$map, $data_time,$item);	
+					}
+					else
+					{
+						// do this the tried and trusted old-fashioned way
+						WeatherMapDataSource_rrd::wmrrd_read_from_real_rrdtool($rrdfile,$cfname,$start,$end, $dsnames, $data,$map, $data_time,$item);
+					}
 				}
 			}
 			else

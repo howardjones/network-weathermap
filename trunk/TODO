@@ -23,15 +23,18 @@ http://forums.cacti.net/viewtopic.php?t=16372
 
 Position as percentage along link? (fake labels etc)
 
+Cron-style control per-map (to allow for a monthly average map, run once a month)
+http://www.freebsd.org/cgi/cvsweb.cgi/src/usr.sbin/cron/lib/entry.c?rev=1.20
+
 ---------------------------------------
 
 
 Before 0.96
 -----------
 
-multiple instances of same map in Cacti
--> per-instance SET params in Cacti UI. e.g. a monthly average version
-store the dimensions of the thumbnail (better presentation in Cacti)
+DONE!  multiple instances of same map in Cacti
+DONE!  -> per-instance SET params in Cacti UI. e.g. a monthly average version
+DONE!  store the dimensions of the thumbnail (better presentation in Cacti)
 
 editor.php security
 FIXED BUG imagemap floats
@@ -40,8 +43,8 @@ rrdtool cdefs
 external script params
 spaces in filenames/targets where appropriate
 
-Documentation for printf tokens!
-Fix a few docs bugs with unclosed tags.
+DONE!  Documentation for printf tokens!
+Fix a few docs bugs with unclosed tags - actually this is some kind of processing bug to do with <div>s
 
 BUG: ReadData should not be run for links with no nodes (templates) or nodes with no position.
 

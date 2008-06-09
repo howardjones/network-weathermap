@@ -30,11 +30,26 @@ function plugin_init_weathermap() {
 	$plugin_hooks['draw_navigation_text']['weathermap'] = 'weathermap_draw_navigation_text';
 	$plugin_hooks['config_settings']['weathermap'] = 'weathermap_config_settings';
 	$plugin_hooks['poller_bottom']['weathermap'] = 'weathermap_poller_bottom';
+	$plugin_hooks['poller_top']['weathermap'] = 'weathermap_poller_top';
+
 	$plugin_hooks['poller_output']['weathermap'] = 'weathermap_poller_output';
 
+	
 	$plugin_hooks['top_graph_refresh']['weathermap'] = 'weathermap_top_graph_refresh';
 	$plugin_hooks['page_title']['weathermap'] = 'weathermap_page_title';
 	$plugin_hooks['page_head']['weathermap'] = 'weathermap_page_head';
+}
+
+// figure out if this poller run is hitting the 'cron' entry for any maps.
+function weathermap_poller_top()
+{
+	global $weathermap_poller_start_time;
+	
+	$n = time();
+	
+	// round to the nearest minute, since that's all we need for the crontab-style stuff
+	$weathermap_poller_start_time = $n - ($n%60);
+
 }
 
 function weathermap_page_head()
@@ -43,10 +58,10 @@ function weathermap_page_head()
 	
 	// Add in a Media RSS link on the thumbnail view
 	// - format isn't quite right, so it's disabled for now.
-	if(preg_match('/plugins\/weathermap\/weathermap\-cacti\-plugin\.php/',$_SERVER['REQUEST_URI'] ,$matches))
-	{
+//	if(preg_match('/plugins\/weathermap\/weathermap\-cacti\-plugin\.php/',$_SERVER['REQUEST_URI'] ,$matches))
+//	{
 //		print '<link id="media-rss" title="My Network Weathermaps" rel="alternate" href="?action=mrss" type="application/rss+xml">';
-	}
+//	}
 }
 
 function weathermap_page_title( $t )

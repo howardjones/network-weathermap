@@ -49,12 +49,24 @@ class WeatherMapDataSource_snmp extends WeatherMapDataSource {
 			$in_oid = $matches[3];
 			$out_oid = $matches[4];
 
-			$was = snmp_get_quick_print();
-			snmp_set_quick_print(1);
-			$was2 = snmp_get_valueretrieval();
-
-			snmp_set_oid_output_format  ( SNMP_OID_OUTPUT_NUMERIC  );
-			snmp_set_valueretrieval(SNMP_VALUE_PLAIN);
+			if(function_exists("snmp_get_quick_print"))
+			{
+				$was = snmp_get_quick_print();
+				snmp_set_quick_print(1);
+			}
+			if(function_exists("snmp_get_valueretrieval"))
+			{
+				$was2 = snmp_get_valueretrieval();
+			}
+	
+			if(function_exists('snmp_set_oid_output_format'))
+			{
+				snmp_set_oid_output_format  ( SNMP_OID_OUTPUT_NUMERIC  );
+			}
+			if(function_exists('snmp_set_valueretrieval'))
+			{
+				snmp_set_valueretrieval(SNMP_VALUE_PLAIN);
+			}
 
 			if($in_oid != '-') $in_result = snmpget($host,$community,$in_oid,1000000,2);
 			if($out_oid != '-') $out_result = snmpget($host,$community,$out_oid,1000000,2);
@@ -66,7 +78,11 @@ class WeatherMapDataSource_snmp extends WeatherMapDataSource {
 			if($in_result) { $data[IN] = floatval($in_result); $item->add_hint("snmp_in_raw",$in_result); }
 			if($out_result) { $data[OUT] = floatval($out_result); $item->add_hint("snmp_out_raw",$out_result);}
 			$data_time = time();
-			snmp_set_quick_print($was);
+
+			if(function_exists("snmp_set_quick_print"))
+			{
+				snmp_set_quick_print($was);
+			}
 		}
 
 		debug ("SNMP ReadData: Returning (".($data[IN]===NULL?'NULL':$data[IN]).",".($data[OUT]===NULL?'NULL':$data[OUT]).",$data_time)\n");

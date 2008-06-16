@@ -270,6 +270,8 @@ function weathermap_singleview($mapid)
 {
 	global $colors;
 
+	$is_wm_admin = false;
+
 	$outdir = dirname(__FILE__).'/output/';
 	$confdir = dirname(__FILE__).'/configs/';
 
@@ -287,7 +289,20 @@ function weathermap_singleview($mapid)
 
 		html_graph_start_box(1,true);
 ?>
-<tr bgcolor="<?php print $colors["panel"];?>"><td><table width="100%" cellpadding="0" cellspacing="0"><tr><td class="textHeader" nowrap><?php print $maptitle; ?></td></tr></table></td></tr>
+<tr bgcolor="<?php print $colors["panel"];?>"><td><table width="100%" cellpadding="0" cellspacing="0"><tr><td class="textHeader" nowrap><?php print $maptitle; 
+
+if($is_wm_admin)
+{
+
+	print "<span style='font-size: 80%'>";
+	print "[ <a href='weathermap-cacti-plugin-mgmt.php?action=map_settings&id=".$mapid."'>Map Settings</a> |";
+	print "<a href='weathermap-cacti-plugin-mgmt.php?action=perms_edit&id=".$mapid."'>Map Permissions</a> |";
+	print "<a href=''>Edit Map</a> ]";
+	print "</span>";
+}
+
+
+ ?></td></tr></table></td></tr>
 <?php
 		print "<tr><td>";
 

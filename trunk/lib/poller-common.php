@@ -119,13 +119,20 @@ function weathermap_run_maps($mydir) {
 								$wmap = new Weathermap;
 								$wmap->context = "cacti";
 
-								$settingrows = db_fetch_assoc("select * from weathermap_settings where mapid=".intval($map['id']));
+								$settingrows = db_fetch_assoc("select * from weathermap_settings where mapid=0 or mapid=".intval($map['id']) . " order by mapid");
 								if( is_array($settingrows) )
 								{
 									foreach ($settingrows as $setting)
 									{
-										debug("Setting additional map-global option: ".$setting['optname']." to '".$setting['optvalue']."'\n");
-										$wmap->add_hint($setting['optname'],$setting['optvalue']);
+										if($setting['mapid']==0)
+										{
+											debug("Setting additional (all maps) option: ".$setting['optname']." to '".$setting['optvalue']."'\n");
+											$wmap->add_hint($setting['optname'],$setting['optvalue']);
+										}
+										else
+										{	debug("Setting additional map-global option: ".$setting['optname']." to '".$setting['optvalue']."'\n");
+											$wmap->add_hint($setting['optname'],$setting['optvalue']);
+										}
 									}
 								}
 								

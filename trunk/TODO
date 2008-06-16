@@ -15,16 +15,22 @@ http://forums.cacti.net/viewtopic.php?t=26885
 
 Cacti editor picker - if it's not traffic_in/traffic_out, let you pick the DSes
 
+Editor picker - plugin-supplied picker listings - allow for Zabbix,Zenoss,Cricket,Groundwork,MRTG,Orion,Smokeping,WUG etc to supply useful picker info
+
+DS Plugins - pre-load hook. ReadData runs through loop twice - once for recignise, then a pre-Read hook, then all the ReadData. Allows for pre-caching where appropriate (fping, snmp, anything that uses remote calls)
+
 Multi-line text, plus Mactrack DS
 http://forums.cacti.net/viewtopic.php?t=26790
 
 Non-percentage scales
 http://forums.cacti.net/viewtopic.php?t=16372
 
-Position as percentage along link? (fake labels etc)
+Node Position as percentage along link? (fake labels etc)
 
 Cron-style control per-map (to allow for a monthly average map, run once a month)
 http://www.freebsd.org/cgi/cvsweb.cgi/src/usr.sbin/cron/lib/entry.c?rev=1.20
+
+Image archiving - for animation, previous months monthly reports, etc.
 
 ---------------------------------------
 

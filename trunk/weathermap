@@ -227,6 +227,8 @@ if ($map->ReadConfig($configfile))
 		else { $map->ReadData(); }
 	}
 
+	# exit();
+	
 	if ($imagefile != '')
 	{
 		$map->DrawMap($imagefile);

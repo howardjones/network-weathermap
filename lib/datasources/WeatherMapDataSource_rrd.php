@@ -1,4 +1,4 @@
-<?php
+i't<?php
 // RRDtool datasource plugin.
 //     gauge:filename.rrd:ds_in:ds_out
 //     filename.rrd:ds_in:ds_out
@@ -238,7 +238,7 @@ class WeatherMapDataSource_rrd extends WeatherMapDataSource {
 	{
 		debug("RRD ReadData: VDEF style\n");
 
-		$command=$map->rrdtool . " graph --start $start --end $end DEF:in=$rrdfile:".$dsnames[IN].":$cf DEF:out=".$dsnames[OUT].":$cf  VDEF:avg_in=in,$aggregatefn VDEF:avg_out=out,$aggregatefn PRINT:avg_in:%lf PRINT:avg_out:%lf";
+		$command=$map->rrdtool . " graph /dev/null -f ''  --start $start --end $end DEF:in=$rrdfile:".$dsnames[IN].":$cf DEF:out=$rrdfile:".$dsnames[OUT].":$cf  VDEF:agg_in=in,$aggregatefn VDEF:agg_out=out,$aggregatefn PRINT:agg_in:%lf PRINT:agg_out:%lf";
 		debug ("RRD ReadData: Running: $command\n");
 		$pipe=popen($command, "r");
 		
@@ -250,7 +250,8 @@ class WeatherMapDataSource_rrd extends WeatherMapDataSource {
 		{
 			fgets($pipe, 4096); // skip the blank line
 			$buffer='';
-
+			$data_ok = FALSE;
+			
 			while (!feof($pipe))
 			{
 				$line=fgets($pipe, 4096);
@@ -260,6 +261,24 @@ class WeatherMapDataSource_rrd extends WeatherMapDataSource {
 				$linecount++;
 			}				
 			pclose ($pipe);
+			if($linecount>2)
+			{			
+				if(preg_match('/^\-?\d+\.?\d*e?[+-]?\d*:?$/i', $lines[0]))
+				{
+					$data[IN] = floatval($lines[0]);
+					$data_ok = TRUE;
+				}
+				if(preg_match('/^\-?\d+\.?\d*e?[+-]?\d*:?$/i', $lines[1]))
+				{
+					$data[OUT] = floatval($lines[1]);
+					$data_ok = TRUE;
+				}
+				if($data_ok)
+				{
+					if($data[IN] === NULL) $data[IN] = 0;
+					if($data[OUT] === NULL) $data[OUT] = 0;
+				}
+			}
 		}
 		else
 		{
@@ -470,7 +489,7 @@ class WeatherMapDataSource_rrd extends WeatherMapDataSource {
 		$use_poller_output = intval($map->get_hint('rrd_use_poller_output'));
 		$aggregatefunction = $map->get_hint('rrd_aggregate_function');
 		
-		if($aggregatefunction != '')
+		if($aggregatefunction != '' && $use_poller_output==1)
 		{	
 			$use_poller_output=0;
 			warn("Can't use poller_output for rrd-aggregated data - disabling rrd_use_poller_output\n");
@@ -504,7 +523,7 @@ class WeatherMapDataSource_rrd extends WeatherMapDataSource {
 				{
 					if($aggregatefunction != '')
 					{
-						WeatherMapDataSource_rrd::wmrrd_read_from_real_rrdtool_aggregated($rrdfile,$cfname,$aggregatefunction, $start,$end, $dsnames, $data,$map, $data_time,$item);	
+						WeatherMapDataSource_rrd::wmrrd_read_from_real_rrdtool_aggregate($rrdfile,$cfname,$aggregatefunction, $start,$end, $dsnames, $data,$map, $data_time,$item);	
 					}
 					else
 					{

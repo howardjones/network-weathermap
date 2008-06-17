@@ -173,7 +173,7 @@ function weathermap_run_maps($mydir) {
 									}
 								}
 
-								$processed_title = $wmap->ProcessString($wmap->title);
+								$processed_title = $wmap->ProcessString($wmap->title,$wmap);
 								
 								db_execute("update weathermap_maps set titlecache='".mysql_real_escape_string($processed_title)."' where id=".intval($map['id']));
 								if(intval($wmap->thumb_width) > 0)

@@ -1,4 +1,4 @@
-i't<?php
+<?php
 // RRDtool datasource plugin.
 //     gauge:filename.rrd:ds_in:ds_out
 //     filename.rrd:ds_in:ds_out

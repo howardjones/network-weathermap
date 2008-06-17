@@ -178,6 +178,7 @@ class WeatherMap extends WeatherMapBase
 		$stamptext, $datestamp;
 	var $htmloutputfile,
 		$imageoutputfile;
+	var $htmlstylesheet;
 	var $defaultlink,
 		$defaultnode;
 	var $need_size_precalc;
@@ -218,6 +219,7 @@ class WeatherMap extends WeatherMapBase
 				'background' => '',
 				'imageoutputfile' => '',
 				'htmloutputfile' => '',
+				'htmlstylesheet' => '',
 				'labelstyle' => 'percent', // redundant?
 				'htmlstyle' => 'static',
 				'keystyle' => array('DEFAULT' => 'classic'),
@@ -312,6 +314,7 @@ class WeatherMap extends WeatherMapBase
                 assert('is_object($this->links[":: DEFAULT ::"])');
 
 // ************************************
+
 
 		$this->imap=new HTML_ImageMap('weathermap');
 		$this->colours=array
@@ -1546,6 +1549,7 @@ function ReadConfig($input)
 					array('NODE','/^\s*(MAXVALUE)\s+(\d+\.?\d*[KMGT]?)\s*$/i',array('max_bandwidth_in_cfg'=>2,'max_bandwidth_out_cfg'=>2)),
 					array('GLOBAL','/^\s*BACKGROUND\s+(.*)\s*$/i',array('background'=>1)),
 					array('GLOBAL','/^\s*HTMLOUTPUTFILE\s+(.*)\s*$/i',array('htmloutputfile'=>1)),
+					array('GLOBAL','/^\s*HTMLSTYLESHEET\s+(.*)\s*$/i',array('htmlstylesheet'=>1)),
 					array('GLOBAL','/^\s*IMAGEOUTPUTFILE\s+(.*)\s*$/i',array('imageoutputfile'=>1)),
 					array('GLOBAL','/^\s*TITLE\s+(.*)\s*$/i',array('title'=>1)),
 					array('GLOBAL','/^\s*HTMLSTYLE\s+(static|overlib)\s*$/i',array('htmlstyle'=>1)),
@@ -2269,6 +2273,7 @@ function WriteConfig($filename)
 				array('titlefont','TITLEFONT',CONFIG_TYPE_LITERAL),
 				array('title','TITLE',CONFIG_TYPE_LITERAL),
 				array('htmloutputfile','HTMLOUTPUTFILE',CONFIG_TYPE_LITERAL),
+				array('htmlstylesheet','HTMLSTYLESHEET',CONFIG_TYPE_LITERAL),
 				array('imageoutputfile','IMAGEOUTPUTFILE',CONFIG_TYPE_LITERAL)
 			);
 
@@ -2935,7 +2940,7 @@ function MakeHTML($imagemapname = "weathermap_imap")
 
 	$html .= '<div class="weathermapimage" style="margin-left: auto; margin-right: auto; width: '.$this->width.'px;" >';
 	if ($this->imageuri != '') { $html.=sprintf(
-		'<img src="%s" width="%d" height="%d" border="0" usemap="#%s"',
+		'<img id="wmapimage" src="%s" width="%d" height="%d" border="0" usemap="#%s"',
 		$this->imageuri,
 		$this->width,
 		$this->height,
@@ -2944,7 +2949,7 @@ function MakeHTML($imagemapname = "weathermap_imap")
 		$html .= '/>';
 		}
 	else { $html.=sprintf(
-		'<img src="%s" width="%d" height="%d" border="0" usemap="#%s"',
+		'<img id="wmapimage" src="%s" width="%d" height="%d" border="0" usemap="#%s"',
 		$this->imagefile,
 		$this->width,
 		$this->height,

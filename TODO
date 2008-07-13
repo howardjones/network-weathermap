@@ -32,56 +32,48 @@ http://www.freebsd.org/cgi/cvsweb.cgi/src/usr.sbin/cron/lib/entry.c?rev=1.20
 
 Image archiving - for animation, previous months monthly reports, etc.
 
+New Link styles - dotted, dashed, split
+
 ---------------------------------------
 
 
 Before 0.96
 -----------
 
-DONE!  multiple instances of same map in Cacti
-DONE!  -> per-instance SET params in Cacti UI. e.g. a monthly average version
-DONE!  store the dimensions of the thumbnail (better presentation in Cacti)
-
 editor.php security
-FIXED BUG imagemap floats
-rrdtool averaging
+rrdtool averaging   rrdtool graph /dev/null -f "" -s now-30d -e now DEF:in=../rra/atm-sl_traffic_in_5498.rrd:traffic_in:AVERAGE DEF:out=../rra/atm-sl_traffic_in_5498.rrd:traffic_out:AVERAGE VDEF:avg_in=in,AVERAGE VDEF:avg_out=out,AVERAGE PRINT:avg_in:%lf PRINT:avg_out:%lf
 rrdtool cdefs
-external script params
-spaces in filenames/targets where appropriate
-
-DONE!  Documentation for printf tokens!
-Fix a few docs bugs with unclosed tags - actually this is some kind of processing bug to do with <div>s
-
-BUG: ReadData should not be run for links with no nodes (templates) or nodes with no position.
-
-quotes, and escaped quotes
-"([^\"\\]*(?:\\.[^\"\\]*)*)" | (\S+)\s | \s
-
-
-# Average over an arbitrary period...
-rrdtool graph /dev/null -f "" -s now-30d -e now DEF:in=../rra/atm-sl_traffic_in_5498.rrd:traffic_in:AVERAGE DEF:out=../rra/atm-sl_traffic_in_5498.rrd:traffic_out:AVERAGE VDEF:avg_in=in,AVERAGE VDEF:avg_out=out,AVERAGE PRINT:avg_in:%lf PRINT:avg_out:%lf
-
-DONE!  warning for BWLABELPOS when in<out
-DONE!  add SET nowarn_xxxxx for some of the more common warnings
-
-DONE!  Check for NULL coords in link code
-DONE!  Z-order - layers for drawing
+external script params - needs spaces in targets
+spaces in filenames/targets where appropriate - quotes, and escaped quotes "([^\"\\]*(?:\\.[^\"\\]*)*)" | (\S+)\s | \s
 Angled VIAs
-New Link styles
-DONE!  Get rid of defaultlink and defaultnode - use __DEFAULT in main array instead.
-DONE!  (Multilayered inheritance) -> Parent property. Default parent is __DEFAULT
 more AICONs - NINK, PIE, GAUGE
 (multiline (bw)labels? - interpret \n)
 Coverage/Usage stats
-DONE!  Per-map warning count in DB
 WUG DS
 Nagios DS
-RRD xport DS (use rrdtool graph and PRINT in fact)
 Solarwinds Orion DS
-DONE!  Some SETs to suppress warnings?
+Nabbix DS
+RRD xport DS (use rrdtool graph and PRINT in fact)
 'none' for SCALE (not gradient)
 COMMENTSTYLE (edge|center)
 contrast for commentcolor (when using 'COMMENTSTYLE center')
+Fix a few docs bugs with unclosed tags - actually this is some kind of processing bug to do with <div>s
+
+FIXED BUG imagemap floats
+DONE!  BUG: ReadData should not be run for links with no nodes (templates) or nodes with no position.
+DONE!  Documentation for printf tokens!
+DONE!  multiple instances of same map in Cacti
+DONE!  -> per-instance SET params in Cacti UI. e.g. a monthly average version
+DONE!  store the dimensions of the thumbnail (better presentation in Cacti)
+DONE!  warning for BWLABELPOS when in<out
+DONE!  add SET nowarn_xxxxx for some of the more common warnings
+DONE!  Check for NULL coords in link code
+DONE!  Z-order - layers for drawing
+DONE!  Get rid of defaultlink and defaultnode - use __DEFAULT in main array instead.
+DONE!  (Multilayered inheritance) -> Parent property. Default parent is __DEFAULT
+DONE!  Per-map warning count in DB
+DONE!  Some SETs to suppress warnings?
+
 
 Before 0.95
 -----------

@@ -337,7 +337,7 @@ class WeatherMapNode extends WeatherMapItem
 				}
 
 				if($this->iconfile=='nink') { 
-					print "NINK **************************************************************\n";
+					// print "NINK **************************************************************\n";
 					$rx = $this->iconscalew/2-1;
 					$ry = $this->iconscaleh/2-1;
 					$size = $this->iconscalew;
@@ -371,7 +371,7 @@ class WeatherMapNode extends WeatherMapItem
 						imageellipse($icon_im,$rx,$ry,$rx*2,$rx*2,$ink->gdallocate($icon_im) );	
 						//imagearc($icon_im, $rx+1,$ry+1,$quarter*4,$quarter*4, 0,360, $ink->gdallocate($icon_im));
 					}
-					print "NINK ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n";
+					// print "NINK ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n";
 				}
 				
 				if($this->iconfile=='inpie' || $this->iconfile=='outpie') { 

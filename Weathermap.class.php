@@ -691,105 +691,108 @@ function ReadData()
 				debug ("\n");
 				debug ("ReadData for $type $name: \n");
 
-				if (count($myobj->targets)>0)
+				if( ($type=='LINK' && !isset($myobj->a)) || ($type=='NODE' && !is_null($myobj->x) ) )
 				{
-					foreach ($myobj->targets as $target)
+					if (count($myobj->targets)>0)
 					{
-						debug ("ReadData: New Target: $target[0]\n");
-
-						$in = 0;
-						$out = 0;
-						if ($target[4] != '')
+						foreach ($myobj->targets as $target)
 						{
-							// processstring won't use notes (only hints) for this string
-							$targetstring = $this->ProcessString($target[4], $myobj, FALSE);
-							if($target[4] != $targetstring) debug("Targetstring is now $targetstring\n");
-
-							// if the targetstring starts with a -, then we're taking this value OFF the aggregate
-							$multiply = 1;
-							if(preg_match("/^-(.*)/",$targetstring,$matches))
+							debug ("ReadData: New Target: $target[0]\n");
+	
+							$in = 0;
+							$out = 0;
+							if ($target[4] != '')
 							{
-								$targetstring = $matches[1];
-								$multiply = -1 * $multiply;
-							}
-							
-							// if the remaining targetstring starts with a number and a *-, then this is a scale factor
-							if(preg_match("/^(\d+\.?\d*)\*(.*)/",$targetstring,$matches))
-							{
-								$targetstring = $matches[2];
-								$multiply = $multiply * floatval($matches[1]);
-							}
-
-							if($multiply != 1)
-							{
-								debug("Will multiply result by $multiply\n");
-							}
-							
-							$matched = FALSE;
-							$matched_by = '';
-							foreach ($this->datasourceclasses as $ds_class)
-							{
-								if(!$matched)
+								// processstring won't use notes (only hints) for this string
+								$targetstring = $this->ProcessString($target[4], $myobj, FALSE);
+								if($target[4] != $targetstring) debug("Targetstring is now $targetstring\n");
+	
+								// if the targetstring starts with a -, then we're taking this value OFF the aggregate
+								$multiply = 1;
+								if(preg_match("/^-(.*)/",$targetstring,$matches))
 								{
-									// $recognised = call_user_func(array($ds_class, 'Recognise'), $targetstring);
-									$recognised = $this->plugins['data'][$ds_class]->Recognise($targetstring);
-
-									if( $recognised )
+									$targetstring = $matches[1];
+									$multiply = -1 * $multiply;
+								}
+								
+								// if the remaining targetstring starts with a number and a *-, then this is a scale factor
+								if(preg_match("/^(\d+\.?\d*)\*(.*)/",$targetstring,$matches))
+								{
+									$targetstring = $matches[2];
+									$multiply = $multiply * floatval($matches[1]);
+								}
+	
+								if($multiply != 1)
+								{
+									debug("Will multiply result by $multiply\n");
+								}
+								
+								$matched = FALSE;
+								$matched_by = '';
+								foreach ($this->datasourceclasses as $ds_class)
+								{
+									if(!$matched)
 									{
-										if($this->activedatasourceclasses[$ds_class])
+										// $recognised = call_user_func(array($ds_class, 'Recognise'), $targetstring);
+										$recognised = $this->plugins['data'][$ds_class]->Recognise($targetstring);
+	
+										if( $recognised )
 										{
-											debug("ReadData: Matched for $ds_class. Calling ${ds_class}->ReadData()\n");
-
-											// line number is in $target[3]
-											# list($in,$out,$datatime) =  call_user_func( array($ds_class, 'ReadData'), $targetstring, $this, $myobj );
-											// list($in,$out,$datatime) =  call_user_func_array( array($ds_class, 'ReadData'), array($targetstring, &$this, &$myobj));
-											list($in,$out,$datatime) =  $this->plugins['data'][$ds_class]->ReadData($targetstring, $this, $myobj);
+											if($this->activedatasourceclasses[$ds_class])
+											{
+												debug("ReadData: Matched for $ds_class. Calling ${ds_class}->ReadData()\n");
+	
+												// line number is in $target[3]
+												# list($in,$out,$datatime) =  call_user_func( array($ds_class, 'ReadData'), $targetstring, $this, $myobj );
+												// list($in,$out,$datatime) =  call_user_func_array( array($ds_class, 'ReadData'), array($targetstring, &$this, &$myobj));
+												list($in,$out,$datatime) =  $this->plugins['data'][$ds_class]->ReadData($targetstring, $this, $myobj);
+											}
+											else
+											{
+												warn("ReadData: $type $name, target: $targetstring on config line $target[3] was recognised as a valid TARGET by a plugin that is unable to run ($ds_class) [WMWARN07]\n");
+											}
+											$matched = TRUE;
+											$matched_by = $ds_class;
 										}
-										else
-										{
-											warn("ReadData: $type $name, target: $targetstring on config line $target[3] was recognised as a valid TARGET by a plugin that is unable to run ($ds_class) [WMWARN07]\n");
-										}
-										$matched = TRUE;
-										$matched_by = $ds_class;
 									}
 								}
+	
+								if(! $matched)
+								{
+									// **
+									warn("ReadData: $type $name, target: $target[4] on config line $target[3] was not recognised as a valid TARGET [WMWARN08]\n");
+								}
+	
+								if (($in === NULL) || ($out === NULL))
+								{
+									$in=0;
+									$out=0;
+									// **
+									warn
+										("ReadData: $type $name, target: $targetstring on config line $target[3] had no valid data, according to $matched_by\n");
+								}
+	
+								if($multiply != 1) {  
+									debug("Pre-multiply: $in $out\n"); 
+								
+									$in = $multiply*$in;
+									$out = $multiply*$out;
+								
+									debug("Post-multiply: $in $out\n"); 
+								}
+								
+								$total_in=$total_in + $in;
+								$total_out=$total_out + $out;
+								debug("Aggregate so far: $total_in $total_out\n");
 							}
-
-							if(! $matched)
-							{
-								// **
-								warn("ReadData: $type $name, target: $target[4] on config line $target[3] was not recognised as a valid TARGET [WMWARN08]\n");
-							}
-
-							if (($in === NULL) || ($out === NULL))
-							{
-								$in=0;
-								$out=0;
-								// **
-								warn
-									("ReadData: $type $name, target: $targetstring on config line $target[3] had no valid data, according to $matched_by\n");
-							}
-
-							if($multiply != 1) {  
-								debug("Pre-multiply: $in $out\n"); 
-							
-								$in = $multiply*$in;
-								$out = $multiply*$out;
-							
-								debug("Post-multiply: $in $out\n"); 
-							}
-							
-							$total_in=$total_in + $in;
-							$total_out=$total_out + $out;
-							debug("Aggregate so far: $total_in $total_out\n");
 						}
+	
+						debug ("ReadData complete for $type $name: $total_in $total_out\n");
 					}
-
-					debug ("ReadData complete for $type $name: $total_in $total_out\n");
-				}
-				else
-				{
-					debug("ReadData: No targets for $type $name\n");
+					else
+					{
+						debug("ReadData: No targets for $type $name\n");
+					}
 				}
 
 				# $this->links[$name]->bandwidth_in=$total_in;

@@ -321,7 +321,7 @@ function maplist()
 		{
 			form_alternate_row_color($colors["alternate"],$colors["light"],$i);
 
-			print '<td><a title="Click to start editor with this file" href="weathermap-cacti-plugin-editor.php?plug=1&mapname='.htmlspecialchars($map['configfile']).'">'.htmlspecialchars($map['configfile']).'</a>';
+			print '<td><a title="Click to start editor with this file" href="editor.php?plug=1&mapname='.htmlspecialchars($map['configfile']).'">'.htmlspecialchars($map['configfile']).'</a>';
 			if($map['warncount']>0)
 			{
 				$had_warnings++;

@@ -4,7 +4,7 @@
 # Change the uncommented line to point to your Cacti installation
 #
 # $cacti_base = "C:/Program Files/xampp/htdocs/cacti/";
-$cacti_base = "/usr/local/share/cacti/";
+$cacti_base = "/var/www/html/cacti/";
 
 // check if the goalposts have moved
 if( is_dir($cacti_base) && file_exists($cacti_base."/include/global.php") )

@@ -268,6 +268,16 @@ else
 				$map->nodes[$new_node_name] = $newnode;
 				unset($map->nodes[$node_name]);
 
+				// find the references elsewhere to the old node name.
+				// First, relatively-positioned NODEs	
+				foreach ($map->nodes as $node)
+				{
+					if($node->relative_to == $node_name)
+					{
+						$map->nodes[$node->name]->relative_to = $new_node_name;
+					}
+				}
+				// Next, LINKs that use this NODE as an end.	
 				foreach ($map->links as $link)
 				{
 					if($link->a->name == $node_name)
@@ -277,6 +287,13 @@ else
 					if($link->b->name == $node_name)
 					{
 						$map->links[$link->name]->b = $newnode;
+					}
+					// while we're here, VIAs can also be relative to a NODE,
+					// so check if any of those need to change
+					if( (count($link->vialist)>0) )
+                        		{
+						// XXX To Do	
+						
 					}
 				}
 			}

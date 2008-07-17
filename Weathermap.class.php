@@ -2180,8 +2180,19 @@ function ReadConfig($input)
 		array_push($this->seen_zlayers[$z], $item);
 		
 		// while we're looping through, let's set the real bandwidths
-		$item->max_bandwidth_in=unformat_number($item->max_bandwidth_in_cfg, $this->kilo);
-		$item->max_bandwidth_out=unformat_number($item->max_bandwidth_out_cfg, $this->kilo);
+		if($item->my_type() == "LINK")
+		{
+			$this->links[$item->name]->max_bandwidth_in = unformat_number($item->max_bandwidth_in_cfg, $this->kilo);
+			$this->links[$item->name]->max_bandwidth_out = unformat_number($item->max_bandwidth_out_cfg, $this->kilo);
+		}
+
+		if($item->my_type() == "NODE")
+		{
+			$this->nodes[$item->name]->max_bandwidth_in = unformat_number($item->max_bandwidth_in_cfg, $this->kilo);
+			$this->nodes[$item->name]->max_bandwidth_out = unformat_number($item->max_bandwidth_out_cfg, $this->kilo);
+		}
+		// $item->max_bandwidth_in=unformat_number($item->max_bandwidth_in_cfg, $this->kilo);
+		// $item->max_bandwidth_out=unformat_number($item->max_bandwidth_out_cfg, $this->kilo);
 		
 		debug (sprintf("   Setting bandwidth (%s -> %d bps, %s -> %d bps, KILO = %d)\n", $item->max_bandwidth_in_cfg, $item->max_bandwidth_in, $item->max_bandwidth_out_cfg, $item->max_bandwidth_out, $this->kilo));		
 	}
@@ -2622,8 +2633,8 @@ function DrawMap($filename = '', $thumbnailfile = '', $thumbnailmax = 250, $with
 					{
 						if(isset($via[2]))
 						{
-							$x = $map->nodes[$via[2]]->x + $via[0];
-							$y = $map->nodes[$via[2]]->y + $via[1];
+							$x = $this->nodes[$via[2]]->x + $via[0];
+							$y = $this->nodes[$via[2]]->y + $via[1];
 						}
 						else
 						{	

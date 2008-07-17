@@ -89,7 +89,8 @@ if (sizeof($gopts) > 0)
 
 		case '--dumpconfig':
 			//$map->dumpconfig=$o[1];
-			$options_output['dumpconfig'] = $o[1];
+			// $options_output['dumpconfig'] = $o[1];
+			$dumpconfig=$o[1];
 			break;
 
 		case '--randomdata':
@@ -260,8 +261,8 @@ if ($map->ReadConfig($configfile))
 		fclose ($fd);
 	}
 
-	if ($map->dumpconfig != '')
-		$map->WriteConfig($map->dumpconfig);
+	if ($dumpconfig != '')
+		$map->WriteConfig($dumpconfig);
 
 	if ($dumpstats != '')
 		$map->DumpStats();

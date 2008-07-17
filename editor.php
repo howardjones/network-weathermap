@@ -375,6 +375,9 @@ else
 		// $map->links[$link_name]->SetBandwidth($bwin,$bwout);
 		$map->links[$link_name]->max_bandwidth_in_cfg = $bwin;
 		$map->links[$link_name]->max_bandwidth_out_cfg = $bwout;
+		$map->links[$link_name]->max_bandwidth_in = unformat_number($bwin, $map->kilo);
+                $map->links[$link_name]->max_bandwidth_out = unformat_number($bwout, $map->kilo);
+
 
 		$map->WriteConfig($mapfile);
 		break;

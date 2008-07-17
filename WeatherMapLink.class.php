@@ -647,6 +647,13 @@ class WeatherMapLink extends WeatherMapItem
 				|| ($this->max_bandwidth_out != $dd->max_bandwidth_out)
 					|| ($this->name == 'DEFAULT'))
 			{
+				print ":: ". $dd->max_bandwidth_in."";	
+				print ".. ". $dd->max_bandwidth_out."\n";	
+				print ":: ". $this->max_bandwidth_in."";	
+				print ".. ". $this->max_bandwidth_out."\n";	
+				print ":: ". $this->max_bandwidth_in_cfg."";	
+				print ".. ". $this->max_bandwidth_out_cfg."\n";	
+				print "-----------\n";
 				if ($this->max_bandwidth_in == $this->max_bandwidth_out)
 				{ $output.="\tBANDWIDTH " . $this->max_bandwidth_in_cfg . "\n"; }
 				else { $output

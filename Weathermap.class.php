@@ -691,13 +691,13 @@ function ReadData()
 				debug ("\n");
 				debug ("ReadData for $type $name: \n");
 
-				if( ($type=='LINK' && !isset($myobj->a)) || ($type=='NODE' && !is_null($myobj->x) ) )
+				if( ($type=='LINK' && isset($myobj->a)) || ($type=='NODE' && !is_null($myobj->x) ) )
 				{
 					if (count($myobj->targets)>0)
 					{
 						foreach ($myobj->targets as $target)
 						{
-							debug ("ReadData: New Target: $target[0]\n");
+							debug ("ReadData: New Target: $target[4]\n");
 	
 							$in = 0;
 							$out = 0;
@@ -793,6 +793,10 @@ function ReadData()
 					{
 						debug("ReadData: No targets for $type $name\n");
 					}
+				}
+				else
+				{
+					debug("ReadData: Skipping $type $name that looks like a template\n.");
 				}
 
 				# $this->links[$name]->bandwidth_in=$total_in;
@@ -1738,6 +1742,7 @@ function ReadConfig($input)
 							$newtarget=array($target,'','',$linecount,$target);
 							if ($curobj)
 							{
+								debug("TARGET: $target\n");
 								$curobj->targets[]=$newtarget;
 							}
 						}

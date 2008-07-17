@@ -2620,8 +2620,18 @@ function DrawMap($filename = '', $thumbnailfile = '', $thumbnailmax = 250, $with
 				{
 					foreach ($link->vialist as $via)
 					{
-						imagearc($image, $via[0],$via[1],10,10,0,360,$overlay);
-						imagearc($image, $via[0],$via[1],12,12,0,360,$overlay);
+						if(isset($via[2]))
+						{
+							$x = $map->nodes[$via[2]]->x + $via[0];
+							$y = $map->nodes[$via[2]]->y + $via[1];
+						}
+						else
+						{	
+							$x = $via[0];
+							$y = $via[1];
+						}
+						imagearc($image, $x,$y, 10,10,0,360,$overlay);
+						imagearc($image, $x,$y, 12,12,0,360,$overlay);
 					}
 				}
 			}

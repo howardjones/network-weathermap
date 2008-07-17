@@ -332,6 +332,7 @@ else
 		$map->ReadConfig($mapfile);
 		$link_name = $_REQUEST['link_name'];
 
+
 		$map->links[$link_name]->width = intval($_REQUEST['link_width']);
 		$map->links[$link_name]->infourl[IN] = $_REQUEST['link_infourl'];
 		$map->links[$link_name]->infourl[OUT] = $_REQUEST['link_infourl'];
@@ -371,7 +372,9 @@ else
 			$bwout = $bwin;
 		}
 
-		$map->links[$link_name]->SetBandwidth($bwin,$bwout);
+		// $map->links[$link_name]->SetBandwidth($bwin,$bwout);
+		$map->links[$link_name]->max_bandwidth_in_cfg = $bwin;
+		$map->links[$link_name]->max_bandwidth_out_cfg = $bwout;
 
 		$map->WriteConfig($mapfile);
 		break;

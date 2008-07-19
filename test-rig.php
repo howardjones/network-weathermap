@@ -8,16 +8,18 @@
 	//
 	// A good test that WriteConfig and ReadConfig are really in sync
 	//
-include_once 'editor-config.php';
-require_once 'Weathermap.class.php';
-      include('spyc.php');
+	include_once 'editor-config.php';
+	require_once 'Weathermap.class.php';
+//      include('spyc.php');
 
 
-$mapfile = "configs/096-test.conf";
+$mapfile = "configs/template-debug.conf";
 
 $map = new WeatherMap;
 
 	//   $map->debugging = TRUE;
+	$weathermap_debugging=TRUE;
+
 
 	$map->ReadConfig($mapfile);
 
@@ -55,13 +57,15 @@ $map = new WeatherMap;
 #print $dnode->usescale."\n";
 #print $ddnode->usescale."\n";
 
+
+
 $map->WriteConfig("output.conf");
 
 print "Wrote config\n";
 //	print_r($map);
 
-$yaml = Spyc::YAMLDump($map);
-print $yaml;
+// $yaml = Spyc::YAMLDump($map);
+// print $yaml;
 
 
 

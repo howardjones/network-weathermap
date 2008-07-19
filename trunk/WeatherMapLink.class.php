@@ -642,22 +642,11 @@ class WeatherMapLink extends WeatherMapItem
 					}
 				}
 			}
-
-				print "DD :: ". $dd->max_bandwidth_in."";	
-				print ".. ". $dd->max_bandwidth_out."\n";	
-				print "THIS:: ". $this->max_bandwidth_in."";	
-				print ".. ". $this->max_bandwidth_out."\n";	
-				print "THISCFG:: ". $this->max_bandwidth_in_cfg."";	
-				print ".. ". $this->max_bandwidth_out_cfg."\n";	
-				print "-----------\n";
-
 	
 			if (($this->max_bandwidth_in != $dd->max_bandwidth_in)
 				|| ($this->max_bandwidth_out != $dd->max_bandwidth_out)
 					|| ($this->name == 'DEFAULT'))
 			{
-				print "WRITING\n-------------------------------\n";
-
 				if ($this->max_bandwidth_in == $this->max_bandwidth_out)
 				{ $output.="\tBANDWIDTH " . $this->max_bandwidth_in_cfg . "\n"; }
 				else { $output

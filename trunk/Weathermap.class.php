@@ -1492,6 +1492,7 @@ function ReadConfig($input)
 							("LINK DEFAULT is not the first LINK. Defaults will not apply to earlier LINKs. [WMWARN26]\n");
 						}
 						unset($curlink);
+						debug("Loaded LINK DEFAULT\n");
 						$curlink = $this->links['DEFAULT'];
 					}
 					else
@@ -1502,7 +1503,8 @@ function ReadConfig($input)
 						{
 							warn("Duplicate link name ".$matches[2]." at line $linecount - only the last one defined is used. [WMWARN25]\n");
 						}
-
+						
+						debug("New LINK ".$matches[2]."\n");
 						$curlink=new WeatherMapLink;
 						$curlink->name=$matches[2];
 						$curlink->Reset($this);
@@ -1523,6 +1525,7 @@ function ReadConfig($input)
 						}
 
 						unset($curnode);
+						debug("Loaded NODE DEFAULT\n");
 						$curnode = $this->nodes['DEFAULT'];
 					}
 					else
@@ -2168,7 +2171,17 @@ function ReadConfig($input)
 	
 	debug("Building cache of z-layers and finalising bandwidth.\n");
 
-	$allitems = array_merge($this->links, $this->nodes);
+// 	$allitems = array_merge($this->links, $this->nodes);
+
+	$allitems = array();
+	foreach ($this->nodes as $node)
+	{
+		$allitems[] = $node;
+	}
+	foreach ($this->links as $link)
+	{
+		$allitems[] = $link;
+	}
 	
 	foreach ($allitems as &$item)
 	{
@@ -2185,16 +2198,19 @@ function ReadConfig($input)
 			$this->links[$item->name]->max_bandwidth_in = unformat_number($item->max_bandwidth_in_cfg, $this->kilo);
 			$this->links[$item->name]->max_bandwidth_out = unformat_number($item->max_bandwidth_out_cfg, $this->kilo);
 		}
-
-		if($item->my_type() == "NODE")
+		elseif($item->my_type() == "NODE")
 		{
 			$this->nodes[$item->name]->max_bandwidth_in = unformat_number($item->max_bandwidth_in_cfg, $this->kilo);
 			$this->nodes[$item->name]->max_bandwidth_out = unformat_number($item->max_bandwidth_out_cfg, $this->kilo);
 		}
+		else
+		{
+			warn("Internal bug - found an item of type: ".$item->my_type()."\n");
+		}
 		// $item->max_bandwidth_in=unformat_number($item->max_bandwidth_in_cfg, $this->kilo);
 		// $item->max_bandwidth_out=unformat_number($item->max_bandwidth_out_cfg, $this->kilo);
 		
-		debug (sprintf("   Setting bandwidth (%s -> %d bps, %s -> %d bps, KILO = %d)\n", $item->max_bandwidth_in_cfg, $item->max_bandwidth_in, $item->max_bandwidth_out_cfg, $item->max_bandwidth_out, $this->kilo));		
+		debug (sprintf("   Setting bandwidth on ".$item->my_type()." $item->name (%s -> %d bps, %s -> %d bps, KILO = %d)\n", $item->max_bandwidth_in_cfg, $item->max_bandwidth_in, $item->max_bandwidth_out_cfg, $item->max_bandwidth_out, $this->kilo));		
 	}
 
 	debug("Found ".sizeof($this->seen_zlayers)." z-layers including builtins (0,100).\n");

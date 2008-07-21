@@ -12,7 +12,7 @@
 
 function weathermap_version () {
 	return array( 	'name'    	=> 'weathermap',
-		'version'       => '0.96dev',
+		'version'       => '0.96test1',
 		'longname'      => 'PHP Network Weathermap',
 		'author'        => 'Howard Jones',
 		'homepage'      => 'http://www.network-weathermap.com/',

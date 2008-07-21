@@ -746,12 +746,14 @@ function weathermap_map_settings($id)
 	if($id==0)
 	{
 		$title = "Additional settings for ALL maps";
+		$nonemsg = "There are no settings for all maps yet. You can add some by clicking Add up in the top-right, or choose a single map from the management screen to add settings for that map.";
 	}
 	else
 	{
 		// print "Per-map settings for map $id";
 		$title = db_fetch_cell("select titlecache from weathermap_maps where id=".intval($id));		
 		$title = "Edit per-map settings for Weathermap $id: " . $title;
+		$nonemsg = "There are no per-map settings for this map yet. You can add some by clicking Add up in the top-right.";
 	}
 	
 	html_start_box("<strong>$title</strong>", "70%", $colors["header"], "2", "center", "weathermap-cacti-plugin-mgmt.php?action=map_settings_form&mapid=".intval($id));
@@ -777,7 +779,7 @@ function weathermap_map_settings($id)
 		else
 		{
 			print "<tr>";
-			print "<td colspan=2>There are no per-map settings for this map yet. You can add some by clicking Add up in the top-right.</td>";
+			print "<td colspan=2>$nonemsg</td>";
 			print "</tr>";
 		}
 	}

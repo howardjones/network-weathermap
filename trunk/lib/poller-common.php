@@ -23,6 +23,7 @@ function weathermap_cron_part($value,$checkstring)
 
 function weathermap_check_cron($time,$string)
 {
+	if($string == '') return(true);
 	if($string == '*') return(true);
 	
 	$lt = localtime($time, true);

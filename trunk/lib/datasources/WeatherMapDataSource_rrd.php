@@ -487,12 +487,16 @@ class WeatherMapDataSource_rrd extends WeatherMapDataSource {
 		}
 
 		$use_poller_output = intval($map->get_hint('rrd_use_poller_output'));
+		$nowarn_po_agg = intval($map->get_hint("nowarn_rrd_poller_output_aggregation"));
 		$aggregatefunction = $map->get_hint('rrd_aggregate_function');
 		
 		if($aggregatefunction != '' && $use_poller_output==1)
 		{	
 			$use_poller_output=0;
-			warn("Can't use poller_output for rrd-aggregated data - disabling rrd_use_poller_output\n");
+			if($nowarn_po_agg==0)
+			{
+				warn("Can't use poller_output for rrd-aggregated data - disabling rrd_use_poller_output\n");
+			}
 		}
 		
 		if($use_poller_output == 1)

@@ -376,7 +376,7 @@ else
 		$map->links[$link_name]->max_bandwidth_in_cfg = $bwin;
 		$map->links[$link_name]->max_bandwidth_out_cfg = $bwout;
 		$map->links[$link_name]->max_bandwidth_in = unformat_number($bwin, $map->kilo);
-                $map->links[$link_name]->max_bandwidth_out = unformat_number($bwout, $map->kilo);
+        $map->links[$link_name]->max_bandwidth_out = unformat_number($bwout, $map->kilo);
 
 
 		$map->WriteConfig($mapfile);
@@ -420,12 +420,22 @@ else
 
 		if( ($bwin_old != $bwin) || ($bwout_old != $bwout) )
 		{
-			$map->defaultlink->SetBandwidth($bwin,$bwout);
+			$map->links['DEFAULT']->max_bandwidth_in_cfg = $bwin;
+			$map->links['DEFAULT']->max_bandwidth_out_cfg = $bwout;
+			$map->links['DEFAULT']->max_bandwidth_in = unformat_number($bwin, $map->kilo);
+	        $map->links['DEFAULT']->max_bandwidth_out = unformat_number($bwout, $map->kilo);
+			
+			// $map->defaultlink->SetBandwidth($bwin,$bwout);
 			foreach ($map->links as $link)
 			{
 				if( ($link->max_bandwidth_in_cfg == $bwin_old) || ($link->max_bandwidth_out_cfg == $bwout_old) )
 				{
-					$link->SetBandwidth($bwin,$bwout);
+		//			$link->SetBandwidth($bwin,$bwout);
+					$link_name = $link->name;
+					$map->links[$link_name]->max_bandwidth_in_cfg = $bwin;
+					$map->links[$link_name]->max_bandwidth_out_cfg = $bwout;
+					$map->links[$link_name]->max_bandwidth_in = unformat_number($bwin, $map->kilo);
+			        $map->links[$link_name]->max_bandwidth_out = unformat_number($bwout, $map->kilo);
 				}
 			}
 		}
@@ -475,7 +485,9 @@ else
 			$newlink->Reset($map);
 			$newlink->a = $map->nodes[$a];
 			$newlink->b = $map->nodes[$b];
-			$newlink->SetBandwidth($map->defaultlink->max_bandwidth_in_cfg, $map->defaultlink->max_bandwidth_out_cfg);
+			
+			// $newlink->SetBandwidth($map->defaultlink->max_bandwidth_in_cfg, $map->defaultlink->max_bandwidth_out_cfg);
+						
 			$newlink->width = $map->defaultlink->width;
 
 			// make sure the link name is unique. We can have multiple links between

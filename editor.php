@@ -280,6 +280,8 @@ else
 				// Next, LINKs that use this NODE as an end.	
 				foreach ($map->links as $link)
 				{
+				    if(isset($link->a))
+				    {
 					if($link->a->name == $node_name)
 					{
 						$map->links[$link->name]->a = $newnode;
@@ -292,9 +294,9 @@ else
 					// so check if any of those need to change
 					if( (count($link->vialist)>0) )
                         		{
-						// XXX To Do	
-						
+					    // XXX To Do	
 					}
+				    }
 				}
 			}
 			else

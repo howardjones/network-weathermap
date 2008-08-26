@@ -1620,7 +1620,8 @@ function ReadConfig($input)
 					array('(NODE|LINK)', "/^\s*OVERLIBWIDTH\s+(\d+)\s*$/i", array('overlibwidth'=>1)),
 					array('(NODE|LINK)', "/^\s*OVERLIBHEIGHT\s+(\d+)\s*$/i", array('overlibheight'=>1)),
 					array('NODE', "/^\s*POSITION\s+([-+]?\d+)\s+([-+]?\d+)\s*$/i", array('x'=>1,'y'=>2)),
-					array('NODE', "/^\s*POSITION\s+(\S+)\s+([-+]?\d+)\s+([-+]?\d+)\s*$/i", array('x'=>2,'y'=>3,'original_x'=>2,'original_y'=>3,'relative_to'=>1,'relative_resolved'=>FALSE))
+					array('NODE', "/^\s*POSITION\s+(\S+)\s+([-+]?\d+)\s+([-+]?\d+)\s*$/i", array('x'=>2,'y'=>3,'original_x'=>2,'original_y'=>3,'relative_to'=>1,'relative_resolved'=>FALSE)),
+					array('NODE', "/^\s*POSITION\s+(\S+)\s+([-+]?\d+)r(\d+)\s*$/i", array('x'=>2,'y'=>3,'original_x'=>2,'original_y'=>3,'relative_to'=>1,'polar'=>TRUE,'relative_resolved'=>FALSE))
 					);
 
 			// this loop replaces a whole pile of duplicated ifs with something with consistent handling 
@@ -1684,10 +1685,25 @@ function ReadConfig($input)
 						$endoffset[$i]='C';
 						$nodenames[$i]=$matches[$i];
 
-						if (preg_match("/:(NE|SE|NW|SW|N|S|E|W)$/i", $matches[$i], $submatches))
+						// percentage of compass - must be first
+						if (preg_match("/:(NE|SE|NW|SW|N|S|E|W|C)(\d\d)$/i", $matches[$i], $submatches))
+						{
+							$endoffset[$i]=$submatches[1].$submatches[2];
+							$nodenames[$i]=preg_replace("/:(NE|SE|NW|SW|N|S|E|W|C)\d\d$/i", '', $matches[$i]);
+							$this->need_size_precalc=TRUE;
+						}
+						
+						if (preg_match("/:(NE|SE|NW|SW|N|S|E|W|C)$/i", $matches[$i], $submatches))
 						{
 							$endoffset[$i]=$submatches[1];
-							$nodenames[$i]=preg_replace("/:(NE|SE|NW|SW|N|S|E|W)$/i", '', $matches[$i]);
+							$nodenames[$i]=preg_replace("/:(NE|SE|NW|SW|N|S|E|W|C)$/i", '', $matches[$i]);
+							$this->need_size_precalc=TRUE;
+						}
+
+						if( preg_match("/:(-?\d+r\d+)$/i", $matches[$i], $submatches) )
+						{
+							$endoffset[$i]=$submatches[1];
+							$nodenames[$i]=preg_replace("/:(-?\d+r\d+)$/i", '', $matches[$i]);
 							$this->need_size_precalc=TRUE;
 						}
 
@@ -2240,6 +2256,7 @@ function ReadConfig($input)
 				debug("Resolving relative position for NODE ".$node->name." to ".$node->relative_to."\n");
 				if(array_key_exists($node->relative_to,$this->nodes))
 				{
+					
 					// check if we are relative to another node which is in turn relative to something
 					// we need to resolve that one before we can resolve this one!
 					if(  ($this->nodes[$node->relative_to]->relative_to != '') && (!$this->nodes[$node->relative_to]->relative_resolved) )
@@ -2249,16 +2266,37 @@ function ReadConfig($input)
 					}
 					else
 					{
-						// save the relative coords, so that WriteConfig can work
-						// resolve the relative stuff
-
-						$newpos_x = $this->nodes[$node->relative_to]->x + $this->nodes[$node->name]->x;
-						$newpos_y = $this->nodes[$node->relative_to]->y + $this->nodes[$node->name]->y;
-						debug("->$newpos_x,$newpos_y\n");
-						$this->nodes[$node->name]->x = $newpos_x;
-						$this->nodes[$node->name]->y = $newpos_y;
-						$this->nodes[$node->name]->relative_resolved=TRUE;
-						$set++;
+						$rx = $this->nodes[$node->relative_to]->x;
+						$ry = $this->nodes[$node->relative_to]->y;
+						
+						if($node->polar)
+						{
+							// treat this one as a POLAR relative coordinate.
+							// - draw rings around a node!
+							$angle = $node->x;
+							$distance = $node->y;
+							$newpos_x = $rx + $distance * sin(deg2rad($angle));
+							$newpos_y = $ry - $distance * cos(deg2rad($angle));
+							debug("->$newpos_x,$newpos_y\n");
+							$this->nodes[$node->name]->x = $newpos_x;
+							$this->nodes[$node->name]->y = $newpos_y;
+							$this->nodes[$node->name]->relative_resolved=TRUE;
+							$set++;
+						}
+						else
+						{
+							
+							// save the relative coords, so that WriteConfig can work
+							// resolve the relative stuff
+	
+							$newpos_x = $rx + $this->nodes[$node->name]->x;
+							$newpos_y = $ry + $this->nodes[$node->name]->y;
+							debug("->$newpos_x,$newpos_y\n");
+							$this->nodes[$node->name]->x = $newpos_x;
+							$this->nodes[$node->name]->y = $newpos_y;
+							$this->nodes[$node->name]->relative_resolved=TRUE;
+							$set++;
+						}
 					}
 				}
 				else

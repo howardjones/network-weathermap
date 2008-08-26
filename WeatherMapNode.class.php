@@ -841,7 +841,16 @@ class WeatherMapNode extends WeatherMapItem
 				if($this->relative_to == '')
 				{ $output.="\tPOSITION " . $val . "\n"; }
 				else
-				{ $output.="\tPOSITION " . $this->relative_to . " " .  $this->original_x . " " . $this->original_y . "\n"; }
+				{
+					if($this->polar)
+					{
+						$output .= "\tPOSITION ".$this->relative_to . " " .  $this->original_x . "r" . $this->original_y . "\n";
+					}
+					else
+					{
+						$output.="\tPOSITION " . $this->relative_to . " " .  $this->original_x . " " . $this->original_y . "\n";
+					}
+				}
 			}
 
 			if (($this->max_bandwidth_in != $dd->max_bandwidth_in)

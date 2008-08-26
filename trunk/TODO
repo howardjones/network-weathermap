@@ -1,6 +1,28 @@
 WISHES
 -------
 
+COMMENTSTYLE center
+
+KEYBGCOLOR none
+
+KEYOUTLINECOLOR none
+
+{node:this_link_a:name}
+
+TAG + {node:tagged:name}
+
+POSITION relative to a variable {node:tagged:name} - means evaluating relative positions a lot later
+
+define inscalecolor_html as well
+
+Use OVERLIBGRAPH, OVERLIBHEIGHT in <IMG> tag. (glen walker)
+
+ProcessString for timepos string
+(+ some formatted date strings for use elsewhere?)
+
+
+
+
 Hide Maps in Cacti Tab?
 http://forums.cacti.net/viewtopic.php?p=117591
 

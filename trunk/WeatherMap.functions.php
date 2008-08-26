@@ -1093,7 +1093,8 @@ class Vector
 
 class Colour
 {
-	var $r,$g,$b;
+	var $r,$g,$b, $alpha;
+	
 	
 	// take in an existing value and create a Colour object for it
 	function Colour()
@@ -1196,6 +1197,16 @@ class Colour
 	function as_string($format = "RGB(%d,%d,%d)")
 	{
 		return (sprintf($format, $this->r, $this->g, $this->b));
+	}
+	
+	function as_config()
+	{
+		return $this->as_string("%d %d %d");
+	}
+	
+	function as_html()
+	{
+		return $this->as_string("#%02x%02x%02x");
 	}
 }
 

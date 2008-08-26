@@ -1789,7 +1789,7 @@ function ReadConfig($input)
 			
 			if (preg_match("/^\s*SET\s+(\S+)\s+(.*)\s*$/i", $buffer, $matches))
 			{
-					$curobj->add_hint($matches[1],$matches[2]);
+					$curobj->add_hint($matches[1],trim($matches[2]));
 					$linematched++;
 			}				
 			
@@ -1817,10 +1817,19 @@ function ReadConfig($input)
 				
 			if ( ( $last_seen=='NODE' || $last_seen=='LINK' ) && preg_match("/^\s*TEMPLATE\s+(\S+)\s*$/i", $buffer, $matches))
 			{
-				$curobj->template = $matches[1];
-				debug("Resetting to template $last_seen ".$curobj->template."\n");
-				$curobj->Reset($this);
+				$tname = $matches[1];
+				if( ($last_seen=='NODE' && isset($map->nodes[$tname])) || ($last_seen=='LINK' && isset($map->links[$tname])) )
+				{
+					$curobj->template = $matches[1];
+					debug("Resetting to template $last_seen ".$curobj->template."\n");
+					$curobj->Reset($this);
+				}
+				else
+				{
+					warn("$last_seen TEMPLATE '$tname' doesn't exist! (if it does exist, check it's defined first)\n");
+				}
 				$linematched++;	
+				
 			}
 
 			if ($last_seen == 'LINK' && preg_match("/^\s*VIA\s+([-+]?\d+)\s+([-+]?\d+)\s*$/i", $buffer, $matches))

@@ -52,6 +52,7 @@ class WeatherMapNode extends WeatherMapItem
 	var $relative_to;
 	var $zorder;
 	var $template;
+	var $polar;
 	var $boundingboxes=array();
 
 	function WeatherMapNode()
@@ -111,6 +112,7 @@ class WeatherMapNode extends WeatherMapItem
 		$this->height = 0;
 		$this->centre_x = 0;
 		$this->centre_y = 0;
+		$this->polar = FALSE;
 		$this->image = NULL;
 	}
 

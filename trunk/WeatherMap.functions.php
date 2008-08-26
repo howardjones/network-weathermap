@@ -865,9 +865,19 @@ function calc_offset($offsetstring, $width, $height)
 		debug("Numeric Offset found\n");
 		return(array($matches[1],$matches[2]));
 	}
-	else
+	elseif(preg_match("/(NE|SE|NW|SW|N|S|E|W|C)(\d\d)?$/",$offsetstring,$matches))
 	{
-		switch (strtoupper($offsetstring))
+		$multiply = 1;
+		if( isset($matches[2] ) )
+		{
+			$multiply = intval($matches[2])/100;
+			debug("Percentage compass offset: multiply by $multiply");
+		}
+	
+		$height = $height * $multiply;
+		$width = $width * $multiply;
+	
+		switch (strtoupper($matches[1]))
 		{
 		case 'N':
 			return (array(0, -$height / 2));
@@ -909,12 +919,31 @@ function calc_offset($offsetstring, $width, $height)
 
 			break;
 
+		case 'C':
 		default:
 			return (array(0, 0));
 
 			break;
 		}
 	}
+	elseif( preg_match("/(-?\d+)r(\d+)$/",$offsetstring,$matches) )
+	{
+		$angle = intval($matches[1]);
+		$distance = intval($matches[2]);
+		
+		$x = $distance * sin(deg2rad($angle));
+		$y = - $distance * cos(deg2rad($angle));
+				
+		return (array($x,$y));
+		
+	}
+	else
+	{
+		warn("Got a position offset that didn't make sense ($offsetstring).");
+		return (array(0, 0));
+	}
+	
+	
 }
 
 // These next two are based on perl's Number::Format module

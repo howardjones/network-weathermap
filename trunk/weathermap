@@ -243,7 +243,7 @@ if ($map->ReadConfig($configfile))
 		fwrite($fd,
 			'<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head>');
 		if($map->htmlstylesheet != '') fwrite($fd,'<link rel="stylesheet" type="text/css" href="'.$map->htmlstylesheet.'" />');
-		fwrite($fd,'<meta http-equiv="refresh" content="300" /><title>' . $map->title . '</title></head><body>');
+		fwrite($fd,'<meta http-equiv="refresh" content="300" /><title>' . $map->ProcessString($map->title, $map) . '</title></head><body>');
 
 		if ($map->htmlstyle == "overlib")
 		{

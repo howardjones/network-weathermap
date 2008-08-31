@@ -76,6 +76,8 @@ if(isset($_REQUEST['action'])) { $action = $_REQUEST['action']; }
 if(isset($_REQUEST['mapname'])) { $mapname = $_REQUEST['mapname'];  $mapname = str_replace('/','',$mapname); }
 if(isset($_REQUEST['selected'])) { $selected = $_REQUEST['selected']; }
 
+$weathermap_debugging=FALSE;
+
 if($mapname == '')
 {
 	// this is the file-picker/welcome page
@@ -86,12 +88,15 @@ else
 	// everything else in this file is inside this else
 	$mapfile = $mapdir.'/'.$mapname;        
 
+	debug("==========================================================================================================\n");
+	debug("Starting Edit Run: action is $action on $mapname\n");
+	debug("==========================================================================================================\n");
 	$map = new WeatherMap;
 	$map->context = 'editor';
-
+	
 	$fromplug = FALSE;
 	if(isset($_REQUEST['plug']) && (intval($_REQUEST['plug'])==1) ) { $fromplug = TRUE; }
-
+	
 	switch($action)
 	{
 	case 'newmap':
@@ -442,8 +447,6 @@ else
 			}
 		}
 
-		
-
 		$map->WriteConfig($mapfile);
 		break; 
 
@@ -501,6 +504,7 @@ else
 			}
 			$newlink->name = $newlinkname;
 			$map->links[$newlinkname] = $newlink;
+			array_push($map->seen_zlayers[$newlink->zorder], $newlink);
 
 			$map->WriteConfig($mapfile);
 		}          
@@ -618,40 +622,13 @@ else
 			}
 		}
 		
-
 		$map->nodes[$node_name]->x = $x;
 		$map->nodes[$node_name]->y = $y;
 
 		$map->WriteConfig($mapfile);
 		break;
 
-	case "add_node":
-		$x = intval($_REQUEST['x']);
-		$y = intval($_REQUEST['y']);
-
-		$map->ReadConfig($mapfile);
-
-		$node = new WeatherMapNode;
-		$node->Reset($map);
-
-		$node->x = snap($x);
-		$node->y = snap($y);
-		
-		$newnodename = sprintf("node%05d",time()%10000);
-		while(array_key_exists($newnodename,$map->nodes))
-		{
-			$newnodename .= "a";
-		}
-		
-		$node->name = $newnodename;
-		$node->label = "Node";
-
-		$map->nodes[$node->name] = $node;
-
-		$map->WriteConfig($mapfile);
-		break;
-
-        case "link_align_horizontal":
+    case "link_align_horizontal":
 		$map->ReadConfig($mapfile);
 
 		$target = $_REQUEST['param'];
@@ -681,7 +658,7 @@ else
 		$map->WriteConfig($mapfile);
                 break;
 
-        case "link_align_vertical":
+    case "link_align_vertical":
 		$map->ReadConfig($mapfile);
 
 		$target = $_REQUEST['param'];
@@ -718,10 +695,40 @@ else
 		$log = "delete link ".$target;
 
 		unset($map->links[$target]);
-
+		
 		$map->WriteConfig($mapfile);
 		break;
 
+	case "add_node":
+		$x = intval($_REQUEST['x']);
+		$y = intval($_REQUEST['y']);
+
+		$map->ReadConfig($mapfile);
+		
+		$newnodename = sprintf("node%05d",time()%10000);
+		while(array_key_exists($newnodename,$map->nodes))
+		{
+			$newnodename .= "a";
+		}
+		
+		$node = new WeatherMapNode;
+		$node->name = $newnodename;
+		$node->template = "DEFAULT";
+		$node->Reset($map);
+		
+		$node->x = snap($x);
+		$node->y = snap($y);
+		
+		array_push($map->seen_zlayers[$node->zorder], $node);			
+		
+		$node->label = "Node";
+
+		$map->nodes[$node->name] = $node;
+		
+		$map->WriteConfig($mapfile);
+		break;
+
+		
 	case "delete_node":
 		$map->ReadConfig($mapfile);
 
@@ -730,9 +737,12 @@ else
 
 		foreach ($map->links as $link)
 		{
-			if( ($target == $link->a->name) || ($target == $link->b->name) )
+			if( isset($link->a) )
 			{
-				unset($map->links[$link->name]);
+				if( ($target == $link->a->name) || ($target == $link->b->name) )
+				{
+					unset($map->links[$link->name]);
+				}
 			}
 		}           
 
@@ -747,17 +757,22 @@ else
 		$target = $_REQUEST['param'];
 		$log = "clone node ".$target;
 
-                $newnodename = $target."_copy";
-                
+		$newnodename = $target;
+		do
+		{
+			$newnodename = $newnodename."_copy";
+		} while(isset($map->nodes[$newnodename]));
+		
 		$node = new WeatherMapNode;
 		$node->Reset($map);
 		$node->CopyFrom($map->nodes[$target]);
 
-                $node->name = $newnodename;
-                $node->x += 30;
-                $node->y += 30;
+		$node->name = $newnodename;
+		$node->x += 30;
+		$node->y += 30;
 
 		$map->nodes[$newnodename] = $node;
+		array_push($map->seen_zlayers[$node->zorder], $node);
 
 		$map->WriteConfig($mapfile);
 		break;
@@ -766,11 +781,12 @@ else
 	default:
 		$map->ReadConfig($mapfile);
 		break;   
-	}
+	}	
+	
+	//by here, there should be a valid $map - either a blank one, the existing one, or the existing one with requested changes
+	debug("Finished modifying\n");
 
-
-	// now we'll just draw the full editor page, with our
-	// new knowledge
+	// now we'll just draw the full editor page, with our new knowledge
 
 	$imageurl = '?mapname='.$mapname . '&amp;action=draw';
 	if($selected != '')
@@ -792,8 +808,6 @@ else
 	$imlist = get_imagelist("images");
 	
 	$fontlist = array();
-
-	
 
 ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">

@@ -2635,7 +2635,8 @@ function DrawMap($filename = '', $thumbnailfile = '', $thumbnailmax = 250, $with
 					if(strtolower(get_class($it))=='weathermaplink')
 					{
 						// only draw LINKs if they have NODES defined (not templates)
-						if (isset($it->a) && isset($it->b))
+						// (also, check if the link still exists - if this is in the editor, it may have been deleted by now)
+						if ( isset($this->links[$it->name]) && isset($it->a) && isset($it->b))
 						{
 							debug("Drawing LINK ".$it->name."\n");
 							$it->Draw($image, $this);
@@ -2647,7 +2648,7 @@ function DrawMap($filename = '', $thumbnailfile = '', $thumbnailmax = 250, $with
 						if($withnodes)
 						{
 							// don't try and draw template nodes
-							if(!is_null($it->x))
+							if( isset($this->nodes[$it->name]) && !is_null($it->x))
 							{
 								debug("Drawing NODE ".$it->name."\n");
 								$it->NewDraw($image, $this);

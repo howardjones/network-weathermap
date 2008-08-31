@@ -203,7 +203,7 @@ class WeatherMapNode extends WeatherMapItem
 			{
 				$boxwidth = ($strheight * $padfactor) + $padding;
 				$boxheight = ($strwidth * $padfactor) + $padding;
-				debug ("Node->pre_render: Label Metrics are: $strwidth x $strheight -> $boxwidth x $boxheight\n");
+				debug ("Node->pre_render: ".$this->name." Label Metrics are: $strwidth x $strheight -> $boxwidth x $boxheight\n");
 				
 				$label_x1 = $this->x - ($boxwidth / 2);
 				$label_y1 = $this->y - ($boxheight / 2);
@@ -227,7 +227,7 @@ class WeatherMapNode extends WeatherMapItem
 			{
 				$boxwidth = ($strwidth * $padfactor) + $padding;
 				$boxheight = ($strheight * $padfactor) + $padding;
-				debug ("Node->pre_render: Label Metrics are: $strwidth x $strheight -> $boxwidth x $boxheight\n");
+				debug ("Node->pre_render: ".$this->name." Label Metrics are: $strwidth x $strheight -> $boxwidth x $boxheight\n");
 							
 				$label_x1 = $this->x - ($boxwidth / 2);
 				$label_y1 = $this->y - ($boxheight / 2);
@@ -682,7 +682,8 @@ class WeatherMapNode extends WeatherMapItem
 	{
 		$this->owner=$newowner;
 		$template = $this->template;
-                if($template == '') $template = "DEFAULT";
+        
+		if($template == '') $template = "DEFAULT";
 
 		debug("Resetting $this->name with $template\n");
 		

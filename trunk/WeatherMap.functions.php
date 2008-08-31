@@ -69,6 +69,14 @@ function debug($string)
 			$stderr=fopen('php://stderr', 'w');
 			fwrite($stderr, "DEBUG:$calling_fn " . ($weathermap_map==''?'':$weathermap_map.": ") . $string);
 			fclose ($stderr);
+
+			// mostly this is overkill, but it's sometimes useful (mainly in the editor)
+			if(1==0)
+			{
+				$log=fopen('debug.log', 'a');
+				fwrite($log, "DEBUG:$calling_fn " . ($weathermap_map==''?'':$weathermap_map.": ") . $string);
+				fclose ($log);
+			}
 		}
 	}
 }

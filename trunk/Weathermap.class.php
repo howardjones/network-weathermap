@@ -3140,14 +3140,16 @@ function CacheUpdate($agelimit=600)
 
 
 		$fd = fopen($cachefolder.DIRECTORY_SEPARATOR.$cacheprefix."_nodes.json","w");
-		$json = $this->defaultnode->asJSON(TRUE);
+		$json = "";
+//		$json = $this->defaultnode->asJSON(TRUE);
 		foreach ($this->nodes as $node) { $json .= $node->asJSON(TRUE); }
 		$json = rtrim($json,", \n");
 		fputs($fd,$json);
 		fclose($fd);
 
 		$fd = fopen($cachefolder.DIRECTORY_SEPARATOR.$cacheprefix."_nodes_lite.json","w");
-		$json = $this->defaultnode->asJSON(FALSE);
+		$json = "";
+//		$json = $this->defaultnode->asJSON(FALSE);
 		foreach ($this->nodes as $node) { $json .= $node->asJSON(FALSE); }
 		$json = rtrim($json,", \n");
 		fputs($fd,$json);
@@ -3156,14 +3158,16 @@ function CacheUpdate($agelimit=600)
 
 
 		$fd = fopen($cachefolder.DIRECTORY_SEPARATOR.$cacheprefix."_links.json","w");
-		$json = $this->defaultlink->asJSON(TRUE);
+		$json = "";
+//		$json = $this->defaultlink->asJSON(TRUE);
 		foreach ($this->links as $link) { $json .= $link->asJSON(TRUE); }
 		$json = rtrim($json,", \n");
 		fputs($fd,$json);
 		fclose($fd);
 
 		$fd = fopen($cachefolder.DIRECTORY_SEPARATOR.$cacheprefix."_links_lite.json","w");
-		$json = $this->defaultlink->asJSON(FALSE);
+		$json = "";
+//		$json = $this->defaultlink->asJSON(FALSE);
 		foreach ($this->links as $link) { $json .= $link->asJSON(FALSE); }
 		$json = rtrim($json,", \n");
 		fputs($fd,$json);

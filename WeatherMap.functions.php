@@ -123,9 +123,9 @@ function warn($string,$notice_only=FALSE)
 function js_escape($str, $wrap=TRUE)
 {
 	$str=str_replace('\\', '\\\\', $str);
-	$str=str_replace("'", "\\'", $str);
+	$str=str_replace('"', '\\"', $str);
 
-	if($wrap) $str="'" . $str . "'";
+	if($wrap) $str='"' . $str . '"';
 
 	return ($str);
 }

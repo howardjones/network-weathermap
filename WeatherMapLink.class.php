@@ -719,7 +719,7 @@ class WeatherMapLink extends WeatherMapItem
 		$js='';
 		$js.="" . js_escape($this->name) . ": {";
 
-		if ($this->name != "DEFAULT")
+		if (isset($this->a)) 
 		{
 			$js.="\"a\":\"" . $this->a->name . "\", ";
 			$js.="\"b\":\"" . $this->b->name . "\", ";

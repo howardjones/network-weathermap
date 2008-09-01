@@ -143,7 +143,7 @@
         $json .= fetch_cached_file("_map.json",$mapfile);
         $json .= "\n},\n";
 
-        $json .= "\"nodes\": {\n";
+        $json .= "\n\"nodes\": {\n";
         // read cache
         $json .= fetch_cached_file("_nodes_lite.json",$mapfile);
         $json .= "\n},\n";
@@ -153,10 +153,14 @@
         $json .= fetch_cached_file("_links_lite.json",$mapfile);
         $json .= "\n},\n";
 
+		if(1==0)
+		{
         $json .= "\"imap\": [\n";
         // read cache
         $json .= fetch_cached_file("_imap.json",$mapfile);
         $json .= "\n],\n";
+		}
+		
         $json .= "\"serial\": $newserial,\n";
         $json .= "\"valid\": 1}\n";
 

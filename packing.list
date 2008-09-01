@@ -149,7 +149,7 @@
 ./output/.htaccess
 ./lib/.htaccess
 ./check-gdbug.php
-./editor-resources/jquery-latest.pack.js
+./editor-resources/jquery-latest.min.js
 ./images/blue-ball-64.png
 ./images/green-ball-64.png
 ./images/grey-ball-64.png

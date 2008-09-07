@@ -1,3 +1,6 @@
+/*global $  */
+
+
 // * pixel offsets all over the place
 // * via cleanup
 // * popup dialogs
@@ -11,13 +14,23 @@ var map = { valid: 0 };
 var mapfile = '';
 var lastserial = 0;
 
-var linkmdown = false;
-var dragmdown = false;
-var addedVia = false;
-var dragstart = {x: -1, y: -1};
-var dragstop = {x: -1, y: -1};
-var dragitem = '';
-var dragoffset = {x: 0, y: 0};
+var dragstate = {
+			linkmdown: false,
+			dragmdown: false,
+			addedVia: false,
+			dragstart: {x: -1, y: -1},
+			dragstop: {x: -1, y: -1},
+			dragitem: '',
+			dragoffset: {x: 0, y: 0}
+				};
+
+// var linkmdown = false;
+// var dragmdown = false;
+// var addedVia = false;
+// var dragstart = {x: -1, y: -1};
+// var dragstop = {x: -1, y: -1};
+// var dragitem = '';
+// var dragoffset = {x: 0, y: 0};
 
 var interactmode = '';
 
@@ -39,74 +52,160 @@ var interactmode = '';
 //   }
 //}
 
-function openmap(mapname)
+function getMousePosition(event)
 {
-    console.log('Opening map: ' + mapname);
-    mapfile = mapname;
-    $('#welcome').hide();
-    $('#filepicker').hide();
-    $('#toolbar').show();
-    $('#themap').show();
-    $('#busy').hide();
+	var x,y;
 
-    $('img.mapnode').remove();
-    $('img.mapvia').remove();
-
-    $('#filename').html(mapname);
-
-    console.log('Refreshing map: ' + mapname);
-
-    map_refresh();   
+	x = event.pageX || (event.clientX + (document.documentElement.scrollLeft || document.body.scrollLeft)) || 0;
+	y = event.pageY || (event.clientY + (document.documentElement.scrollTop || document.body.scrollTop)) || 0;
+    
+	return {x:x, y:y};
 }
 
-function showpicker()
+
+function reapplyLinkEvents()
 {
-    $('#welcome').hide();
-    $('#filepicker').show();
-    $('#toolbar').hide();
-    $('#themap').hide();
-    $('#busy').show();
-    
-    $('#filelist').empty();
-    $('#filelist').append('<li id="status"><em><img src="editor-resources/activity-indicator.gif">Fetching File List...</em></li>');
-    
-    $.getJSON("editor-backend.php",
-        { map: '', cmd: "maplist" },
-          function (json) {
-            if (json.status === 'OK')  
-            {
-                var i = 0;
-                var imax = json.files.length;
-                $('#filelist').empty();
-                for (i = 0; i < imax; i++)
-                {
-                    var locked = '';
-                    if (json.files[i].locked === 1)
-                    {
-                        locked = '<img src="editor-resources/lock.png" alt="Read-Only file" title="Read-Only file" />';
-                    }
-                    $('#filelist').append('<li><a>' + locked + '<span>' + json.files[i].file + '</span> <em>' + json.files[i].title + '</em></a></li>');
-                }
-                console.log("Built list");
-                $('#filelist li a').click(function () { var filename = $(this).children("span").text(); console.log('About to call openmap()'); openmap(filename); });
-                console.log("Added Actions");
-            }
-            else
-            {
-                console.log("list not OK - " + json.status);
-            }
-        }
-    );
+		// unbind, then re-apply all events for links.
+		// is this actually necessary?
+		
+		$('area[@id^=LINK:]').unbind();
+
+		$('area[@id^=LINK:]').mousedown( function(ev) { 
+			var pos;
+			
+			console.log('LINK mousedown'); 
+			dragstate.linkmdown = true;
+			// retrieve positioning properties
+				pos    = getMousePosition(ev);
+				dragstate.dragstart.x = pos.x;
+				dragstate.dragstart.y = pos.y;
+				dragstate.dragitem = $(this).attr('id');
+			return(false);
+		});
+
+	$('area[@id^=LINK:]').mousemove( function() { 
+			if(dragstate.linkmdown)
+			{
+				return(false);
+			}
+			return(true);
+		});
+  
+  	$('area[@id^=LINK:]').mouseup( function(ev) {
+		var pos, dx, dy;
+		// verify if we've moved much since the down - if we did, it's not a click	
+		pos    = getMousePosition(ev);
+		dragstate.dragstop.x = pos.x;
+		dragstate.dragstop.y = pos.y;
+
+		dx = Math.abs(dragstate.dragstop.x - dragstate.dragstart.x);
+		dy = Math.abs(dragstate.dragstop.y - dragstate.dragstart.y);
+
+		if ((dx+dy) < 4)
+		{
+			// treat this is a click - we're still inside the link, and we didn't move far
+			alert('click on ' + dragstate.dragitem);
+		}
+		else
+		{
+			dragstate.dragitem = '';
+			dragstate.dragstart = {x: -1, y: -1};
+			dragstate.dragstop = {x: -1, y: -1};
+			if(dragstate.addedVia) { $('#newvia').remove(); dragstate.addedVia=false; }
+		}
+	
+		console.log('LINK mouseup');
+		dragstate.linkmdown = false;
+		
+	} );
+}
+
+
+function reapplyDraggableEvents()
+{
+    var origin_x, origin_y;
+
+	$('.draggable').unbind();
+		
+	$('.draggable').mousedown( function(ev) { 
+		var pos, w, h, t, l;
+	
+		dragstate.dragmdown=true; 
+		console.log('mousedown');
+		pos    = getMousePosition(ev);
+		dragstate.dragstart.x = pos.x;
+		dragstate.dragstart.y = pos.y;
+		dragstate.dragitem = $(this).attr('id');
+        
+		w = $(this).width(); 
+		h = $(this).height();
+		t = parseInt($(this).css('top'),10);
+		l = parseInt($(this).css('left'),10);
+                
+		dragstate.dragoffset.x = -(w/2);
+		dragstate.dragoffset.y = -(h/2);
+
+		return(false);
+		
+	 });
+	$('.draggable').mousemove( function(ev) {  } );
+	$('.draggable').mouseup( function(ev) { 
+		var pos ,dx, dy;
+		
+		console.log('mouseup');	
+		dragstate.dragmdown = false; 
+		// verify if we've moved much since the down - if we did, it's not a click	
+		pos    = getMousePosition(ev);
+		dragstate.dragstop.x = pos.x;
+		dragstate.dragstop.y = pos.y;
+
+		dx = Math.abs(dragstate.dragstop.x - dragstate.dragstart.x);
+		dy = Math.abs(dragstate.dragstop.y - dragstate.dragstart.y);
+
+		if((dx+dy)<4)
+		{
+			// treat this is a click - we're still inside the link, and we didn't move far
+			alert('click on ' + dragstate.dragitem);
+		}
+		else
+		{
+			if(dragstate.dragitem.slice(0,8) === 'mapnode_')
+			{
+				origin_x = parseInt($('#existingdata').css('left'),10);
+				origin_y = parseInt($('#existingdata').css('top'),10);
+				dragstate.dragitem = dragstate.dragitem.slice(8,dragstate.dragitem.length);
+				$.getJSON('editor-backend.php',{ map: mapfile, cmd: "move_node", x: pos.x-origin_x, y: pos.y-origin_y, nodename: dragstate.dragitem  },
+						  function() {map_refresh(); });
+			
+			}
+			
+			if(dragstate.dragitem.slice(0,7) === 'mapvia_')
+			{
+				origin_x = parseInt($('#existingdata').css('left'),10);
+				origin_y = parseInt($('#existingdata').css('top'),10);
+				dragstate.dragitem = dragstate.dragitem.slice(7,dragstate.dragitem.length);
+				$.getJSON('editor-backend.php',{ map: mapfile, cmd: "move_via", x: pos.x-origin_x, y: pos.y-origin_y, vianame: dragstate.dragitem  },
+						  function() {map_refresh(); });
+			}
+                        
+			dragstate.dragitem = '';
+			dragstate.dragstart = {x: -1, y: -1};
+			dragstate.dragstop = {x: -1, y: -1};
+			dragstate.addedVia = false;
+		}
+		return(false);
+	} );
+
 }
 
 function syncmap()
 {
-    $('#busy').show();
+	var i, existing, newx,newy, nodes, links, node, link, origin_x, origin_y, nodeid, via_id, vs;
 
-    var existing, newx,newy;
+    $('#busy').show();   
 
-    var nodes = map.nodes;
-    var links = map.links;
+    nodes = map.nodes;
+    links = map.links;
   
     // first, clear out the NODES that have disappeared...
     
@@ -134,16 +233,16 @@ function syncmap()
         });
     }
     
-    var origin_x = parseInt($('#existingdata').css('left'),10);
-    var origin_y = parseInt($('#existingdata').css('top'),10);
+    origin_x = parseInt($('#existingdata').css('left'),10);
+    origin_y = parseInt($('#existingdata').css('top'),10);
     
     // now go through the list and move around or add...
-    for (var node in nodes)
+    for (node in nodes)
     {
         if (map.nodes[node].name !== 'DEFAULT')
         {
-            var nodeid = 'mapnode_'+map.nodes[node].name;
-             existing = $('img#'+nodeid);
+			nodeid = 'mapnode_'+map.nodes[node].name;
+            existing = $('img#'+nodeid);
             
             if(existing.size() !== 0)
             {               
@@ -167,7 +266,7 @@ function syncmap()
     
     $('.deadvia').remove();
     
-    for (var link in links)
+    for (link in links)
     {
         if (map.links[link].name !== 'DEFAULT')
         {
@@ -176,11 +275,11 @@ function syncmap()
             if (map.links[link].via.length >0)
             {
                 console.log(link + ' has VIAs');
-                var vs = map.links[link].via;
-                for (var i=0; i<vs.length; i++)
+                vs = map.links[link].via;
+                for (i=0; i<vs.length; i+=1)
                 {
                     console.log('VIA ' + vs[i][0] + ',' + vs[i][1]);
-                    var via_id='mapvia_' + link+'_via_'+i;
+                    via_id='mapvia_' + link+'_via_'+i;
                      existing = $('img#'+via_id);
 
                     if(existing.size() !== 0)
@@ -205,6 +304,8 @@ function syncmap()
 
     $('#busy').hide();
 }
+
+
 
 function map_refresh()
 {
@@ -246,149 +347,84 @@ function map_refresh()
     console.log('Done with map_refresh()');
 }
 
-function getMousePosition(event)
+function openmap(mapname)
 {
-        var x = event.pageX || (event.clientX + (document.documentElement.scrollLeft || document.body.scrollLeft)) || 0;
-        var y = event.pageY || (event.clientY + (document.documentElement.scrollTop || document.body.scrollTop)) || 0;
-        return {x:x, y:y};
+    console.log('Opening map: ' + mapname);
+    mapfile = mapname;
+    $('#welcome').hide();
+    $('#filepicker').hide();
+    $('#toolbar').show();
+    $('#themap').show();
+    $('#busy').hide();
+
+    $('img.mapnode').remove();
+    $('img.mapvia').remove();
+
+    $('#filename').html(mapname);
+
+    console.log('Refreshing map: ' + mapname);
+
+    map_refresh();   
 }
 
-function reapplyLinkEvents()
+function showpicker()
 {
-		// unbind, then re-apply all events for links.
-		// is this actually necessary?
-		
-		$('area[@id^=LINK:]').unbind();
-
-		$('area[@id^=LINK:]').mousedown( function(ev) { 
-			console.log('LINK mousedown'); 
-			linkmdown = true;
-			// retrieve positioning properties
-				var pos    = getMousePosition(ev);
-				dragstart.x = pos.x;
-				dragstart.y = pos.y;
-				dragitem = $(this).attr('id');
-			return(false);
-		});
-
-	$('area[@id^=LINK:]').mousemove( function() { 
-		if(linkmdown)
-		{
-			return(false);
-		}
-                return(true);
-		});
-  
-  	$('area[@id^=LINK:]').mouseup( function(ev) {
-		
-		// verify if we've moved much since the down - if we did, it's not a click	
-		var pos    = getMousePosition(ev);
-		dragstop.x = pos.x;
-		dragstop.y = pos.y;
-
-		var dx = Math.abs(dragstop.x - dragstart.x);
-		var dy = Math.abs(dragstop.y - dragstart.y);
-
-		if ((dx+dy) < 4)
-		{
-			// treat this is a click - we're still inside the link, and we didn't move far
-			alert('click on ' + dragitem);
-		}
-		else
-		{
-			dragitem = '';
-			dragstart = {x: -1, y: -1};
-			dragstop = {x: -1, y: -1};
-			if(addedVia) { $('#newvia').remove(); addedVia=false; }
-		}
-	
-		console.log('LINK mouseup');
-		linkmdown = false;
-		
-	} );
-}
-
-
-function reapplyDraggableEvents()
-{
-    var origin_x, origin_y;
-
-	$('.draggable').unbind();
-		
-	$('.draggable').mousedown( function(ev) { 
-		dragmdown=true; 
-		console.log('mousedown');
-		var pos    = getMousePosition(ev);
-		dragstart.x = pos.x;
-		dragstart.y = pos.y;
-		dragitem = $(this).attr('id');
-                var w = $(this).width(); 
-		var h = $(this).height();
-                var t = parseInt($(this).css('top'),10);
-                var l = parseInt($(this).css('left'),10);
-                
-                dragoffset.x = -(w/2);
-                dragoffset.y = -(h/2);
-
-		return(false);
-		
-	 });
-	$('.draggable').mousemove( function(ev) {  } );
-	$('.draggable').mouseup( function(ev) { 
-		console.log('mouseup');	
-		dragmdown = false; 
-		// verify if we've moved much since the down - if we did, it's not a click	
-			var pos    = getMousePosition(ev);
-			dragstop.x = pos.x;
-			dragstop.y = pos.y;
-
-		var dx = Math.abs(dragstop.x - dragstart.x);
-		var dy = Math.abs(dragstop.y - dragstart.y);
-
-		if((dx+dy)<4)
-		{
-			// treat this is a click - we're still inside the link, and we didn't move far
-			alert('click on ' + dragitem);
-		}
-		else
-		{
-                    if(dragitem.slice(0,8) === 'mapnode_')
+    $('#welcome').hide();
+    $('#filepicker').show();
+    $('#toolbar').hide();
+    $('#themap').hide();
+    $('#busy').show();
+    
+    $('#filelist').empty();
+    $('#filelist').append('<li id="status"><em><img src="editor-resources/activity-indicator.gif">Fetching File List...</em></li>');
+    
+    $.getJSON("editor-backend.php",
+        { map: '', cmd: "maplist" },
+          function (json) {
+			var locked, i , imax;
+		  
+            if (json.status === 'OK')  
+            {
+                i = 0;
+				imax = json.files.length;
+				
+                $('#filelist').empty();
+                for (i = 0; i < imax; i += 1)
+                {
+                    locked = '';
+					
+                    if (json.files[i].locked === 1)
                     {
-                         origin_x = parseInt($('#existingdata').css('left'),10);
-                        origin_y = parseInt($('#existingdata').css('top'),10);
-                        dragitem = dragitem.slice(8,dragitem.length);
-                        $.getJSON('editor-backend.php',{ map: mapfile, cmd: "move_node", x: pos.x-origin_x, y: pos.y-origin_y, nodename: dragitem  },
-                                  function() {map_refresh(); });
-                    
+                        locked = '<img src="editor-resources/lock.png" alt="Read-Only file" title="Read-Only file" />';
                     }
-                    
-                    if(dragitem.slice(0,7) === 'mapvia_')
-                    {
-                         origin_x = parseInt($('#existingdata').css('left'),10);
-                         origin_y = parseInt($('#existingdata').css('top'),10);
-                        dragitem = dragitem.slice(7,dragitem.length);
-                        $.getJSON('editor-backend.php',{ map: mapfile, cmd: "move_via", x: pos.x-origin_x, y: pos.y-origin_y, vianame: dragitem  },
-                                  function() {map_refresh(); });
-                    
-                    }
-                        
-			dragitem = '';
-			dragstart = {x: -1, y: -1};
-			dragstop = {x: -1, y: -1};
-                        addedvia = false;
-		}
-		return(false);
-	} );
-
+                    $('#filelist').append('<li><a>' + locked + '<span>' + json.files[i].file + '</span> <em>' + json.files[i].title + '</em></a></li>');
+                }
+                console.log("Built list");
+                $('#filelist li a').click(function () { var filename = $(this).children("span").text(); console.log('About to call openmap()'); openmap(filename); });
+                console.log("Added Actions");
+            }
+            else
+            {
+                console.log("list not OK - " + json.status);
+            }
+        }
+    );
 }
+
+
+
+
+
 
 function nodeadd()
 {
     console.log('Node Add - Initial');
     interactmode='nodeadd';
     $('#existingdata').click( function(ev) {
-        var x = ev.pageX - parseInt($('#existingdata').css('left'),10);
-        var y = ev.pageY - parseInt($('#existingdata').css('top'),10);
+		var x,y;
+		
+        x = ev.pageX - parseInt($('#existingdata').css('left'),10);
+        y = ev.pageY - parseInt($('#existingdata').css('top'),10);
         console.log('Ready to add a new node at ' + x + ',' + y);
         return(false);
     });    
@@ -426,61 +462,63 @@ $(document).ready( function() {
 
 // handle the release, which may not be over the original object anymore
 	$(document).mouseup( function (ev) { 
-            if(linkmdown === true) { 
+			var pos, now, origin_x, origin_y, linkname;
+	
+            if(dragstate.linkmdown === true) { 
                 
                 console.log("LINK mouseup");
                 // retrieve positioning properties
-                var pos    = getMousePosition(ev);
-                dragstop.x = pos.x;
-                dragstop.y = pos.y;
-                linkmdown=false;
+                pos    = getMousePosition(ev);
+                dragstate.dragstop.x = pos.x;
+                dragstate.dragstop.y = pos.y;
+                dragstate.linkmdown=false;
                 //	$('#log').append('That was a drag. ');
-                if(addedVia)
+                if(dragstate.addedVia)
                 {
                     // give the temporary VIA a better name
-                    var now = new Date();
+                    now = new Date();
                     $('#newvia').attr('class','deadvia');
                     $('#newvia').attr('id','via_'+now.getTime());
-                    addedVia=false;
+                    dragstate.addedVia=false;
                     console.log("Solidified ephemeral VIA");
 
                     reapplyDraggableEvents();
                     reapplyLinkEvents();
                     // XXX - do something to tell the editor serverside
-                    var origin_x = parseInt($('#existingdata').css('left'),10);
-                    var origin_y = parseInt($('#existingdata').css('top'),10);
-                    var linkname = dragitem.slice(5,dragitem.length);
-                     $.getJSON('editor-backend.php',{ map: mapfile, cmd: "add_via", x: pos.x-origin_x, y: pos.y-origin_y, linkname: linkname, startx: dragstart.x, starty: dragstart.y  },
+                    origin_x = parseInt($('#existingdata').css('left'),10);
+                    origin_y = parseInt($('#existingdata').css('top'),10);
+                    linkname = dragstate.dragitem.slice(5,dragstate.dragitem.length);
+                     $.getJSON('editor-backend.php',{ map: mapfile, cmd: "add_via", x: pos.x-origin_x, y: pos.y-origin_y, linkname: linkname, startx: dragstate.dragstart.x, starty: dragstate.dragstart.y  },
                         function() {map_refresh(); });
                 }
             }
 	} );
 	
 	$(document).mousemove( function (ev) { 
-		var theItem;
+		var x,y, theItem, pos;
 		
-		if(linkmdown || dragmdown)
+		if(dragstate.linkmdown || dragstate.dragmdown)
 		{
-			var pos = getMousePosition(ev);
+			pos = getMousePosition(ev);
 
-			if(dragmdown) { theItem = $('#'+dragitem);}
-			if(linkmdown) { theItem = $('#newvia');
-                            if(!addedVia)
-                            {
-                                console.log("Created ephemeral VIA");
-                                // we just left the reservation, and we're still dragging.
-                                // - time to create a little marker
-                                $('#nodecontainer').append('<img src="editor-resources/via-marker.png" id="newvia" class="viamarker draggable">');
-                                theItem = $('#newvia');
-                                dragoffset.x = -theItem.width()/2;
-                                dragoffset.y = -theItem.height()/2;
-                                addedVia = true;
-                            }
+			if(dragstate.dragmdown) { theItem = $('#'+dragstate.dragitem);}
+			if(dragstate.linkmdown) { theItem = $('#newvia');
+				if(!dragstate.addedVia)
+				{
+					console.log("Created ephemeral VIA");
+					// we just left the reservation, and we're still dragging.
+					// - time to create a little marker
+					$('#nodecontainer').append('<img src="editor-resources/via-marker.png" id="newvia" class="viamarker draggable">');
+					theItem = $('#newvia');
+					dragstate.dragoffset.x = -theItem.width()/2;
+					dragstate.dragoffset.y = -theItem.height()/2;
+					dragstate.addedVia = true;
+				}
 			}
-                        var x = pos.x + dragoffset.x;
-                        var y = pos.y + dragoffset.y;
+			x = pos.x + dragstate.dragoffset.x;
+			y = pos.y + dragstate.dragoffset.y;
 			theItem.css( { left: x, top: y});
-                }
+        }
 	} );
 
     $('#btn_refresh').click( function() { map_refresh(); } );
@@ -495,3 +533,4 @@ $(document).ready( function() {
     
     }
 );
+

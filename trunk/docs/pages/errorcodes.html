@@ -8,7 +8,7 @@
  "HTML Tidy for Mac OS X (vers 12 April 2006), see www.w3.org" /> 
 
  <title>PHP Weathermap 
-v0.96test1 
+v0.95b 
  - Error Code Reference</title> 
 <style type="text/css" media="print"> 
 /*<![CDATA[*/ 
@@ -41,7 +41,7 @@ a { color: black; text-decoration: underline; font-weight: normal;}
 
 <div id="header"> 
  <h1>PHP Weathermap 
-v0.96test1 
+v0.95b 
 </h1> 
  <h4>Copyright &copy; 2005-2008 Howard Jones, <tt><a 
 href="mailto:howie@thingy.com">howie@thingy.com</a></tt>. (<a 
@@ -68,7 +68,7 @@ href="http://www.network-weathermap.com/">Website</a>)</h4>
  <p>The standard fonts used by Weathermap are the ones bundled with the GD graphics library. These fonts (number 1-5 when you select fonts) can only be 
  drawn 'flat', and not at an angle. </p> 
  <p>If you are using link comments, or the 'angled' <a href="config-reference.html#LINK_BWSTYLE">BWSTYLE,</a> then Weathermap needs to be able to drawn text at any angle. To do this, it needs a Truetype font to be used for that part of the map (the bwlabel, or comment), which is drawn using the FreeType library. </p> 
- <p>To do this, you need to find a Truetype font, put it in your weathermap folder, and then define a new font in your map config file: <a href="config-reference.html#GLOBAL_FONTDEFINE"><code>FONTDEFINE</a> 100 Vera 9</code> </p> 
+ <p>To do this, you need to find a Truetype font, put it in your weathermap folder, and then define a new font in your map config file: <code><a href="config-reference.html#GLOBAL_FONTDEFINE">FONTDEFINE</a> 100 Vera 9</code> </p> 
  <p>Then you can use that new font (no. 100) in <a href="config-reference.html#LINK_COMMENTFONT">COMMENTFONT</a> or <a href="config-reference.html#LINK_BWFONT">BWFONT</a> lines. </p> 
  <p>You can find some TrueType fonts, and an example.conf that does this in the docs/example folder. </p><p>The reason the default comment font is not a TrueType font is that the FreeType library is an <em>optional</em> part of the GD library, so I can't assume that it will be available. </p> 
  </dd> 
@@ -106,7 +106,7 @@ href="http://www.network-weathermap.com/">Website</a>)</h4>
  </dd> 
 
  <dt><a name="WMWARN10">[WMWARN10]</a></dt> 
- <a href="config-reference.html#NODE_NODE"><dd><p>"NODE</a> <em>nodename</em> has a relative position to an unknown node! " </p> 
+ <dd><p><a href="config-reference.html#NODE_NODE">"NODE</a> <em>nodename</em> has a relative position to an unknown node! " </p> 
  <p>You have used the relative <a href="config-reference.html#NODE_POSITION">POSITION</a> for a <a href="config-reference.html#NODE_NODE">NODE,</a> but you did it relative to a node that doesn't exist. Probably you have a typographical error/spelling error... </p> 
  </dd> 
 
@@ -175,12 +175,12 @@ href="http://www.network-weathermap.com/">Website</a>)</h4>
  </dd> 
 
  <dt><a name="WMWARN26">[WMWARN26]</a></dt> 
- <a href="config-reference.html#LINK_LINK"><dd><p>"LINK</a> DEFAULT is not the first <a href="config-reference.html#LINK_LINK">LINK.</a> Defaults will not apply to earlier <a href="config-reference.html#LINK_LINK">LINKs.</a> " </p> 
+ <dd><p><a href="config-reference.html#LINK_LINK">"LINK</a> DEFAULT is not the first <a href="config-reference.html#LINK_LINK">LINK.</a> Defaults will not apply to earlier <a href="config-reference.html#LINK_LINK">LINKs.</a> " </p> 
  <p>You should usually specify your DEFAULT <a href="config-reference.html#LINK_LINK">LINK</a> <em>before</em> all your 'real' <a href="config-reference.html#LINK_LINK">LINKs.</a> The reason is that when a new <a href="config-reference.html#LINK_LINK">LINK</a> is defined, it copies whatever the default settings are at that point in reading down the config file, so you will end up with inconsistent results. </p> 
  </dd> 
 
  <dt><a name="WMWARN27">[WMWARN27]</a></dt> 
- <a href="config-reference.html#NODE_NODE"><dd><p>"NODE</a> DEFAULT is not the first <a href="config-reference.html#NODE_NODE">NODE.</a> Defaults will not apply to earlier <a href="config-reference.html#NODE_NODE">NODEs.</a> " </p> 
+ <dd><p><a href="config-reference.html#NODE_NODE">"NODE</a> DEFAULT is not the first <a href="config-reference.html#NODE_NODE">NODE.</a> Defaults will not apply to earlier <a href="config-reference.html#NODE_NODE">NODEs.</a> " </p> 
 <p>You should usually specify your DEFAULT <a href="config-reference.html#NODE_NODE">NODE</a> <em>before</em> all your 'real' <a href="config-reference.html#NODE_NODE">NODEs.</a> The reason is that when a new <a href="config-reference.html#NODE_NODE">NODE</a> is defined, it copies whatever the default settings are at that point in reading down the config file, so you will end up with inconsistent results. </p> </dd> 
 
  <dt><a name="WMWARN28">[WMWARN28]</a></dt> 

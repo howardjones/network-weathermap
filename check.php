@@ -52,7 +52,7 @@
             else
             {
                   $gdstring="This PHP uses the system GD library, which MIGHT have alpha-blending bugs. Check that you have at least GD 2.0.34 installed, if you see problems with weathermap segfaulting.\n";
-		$gdstring .= "You can test for this specific fault by running check-gdbug.php\n";
+		  $gdstring .= "You can test for this specific fault by running check-gdbug.php\n";
             }
       }
       else
@@ -73,7 +73,7 @@
         print "";
 	print "PHP Functions\n-------------\n";
         print "Some parts of Weathermap need special support in your PHP\ninstallation to work.\n\n";
-        print wordwrap($gdstring)."\n";
+	print wordwrap($gdstring)."\n";
   }
   else
   {

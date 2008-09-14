@@ -81,27 +81,6 @@ function debug($string)
 	}
 }
 
-function metadump($string, $truncate=FALSE)
-{
-
-	return; 
-	if($truncate)
-	{
-		$fd = fopen("metadump.txt","w+");
-	}
-	else
-	{
-		$fd = fopen("metadump.txt","a");
-	}
-	fputs($fd,$string."\n");
-	fclose($fd);
-}
-
-function metacolour(&$col)
-{
-	return ($col['red1']." ".$col['green1']." ".$col['blue1']);
-}
-
 function warn($string,$notice_only=FALSE)
 {
 	global $weathermap_map;
@@ -1097,6 +1076,7 @@ function nice_scalar($number, $kilo = 1000, $decimals=1)
 class Point
 {
 	var $x, $y;
+	
 	function Point($x=0,$y=0)
 	{
 		$this->x = $x;
@@ -1247,6 +1227,33 @@ class Colour
 	}
 }
 
+// A series of wrapper functions around all the GD function calls
+// - I added these in so I could make a 'metafile' easily of all the
+//   drawing commands for a map. I have a basic Perl-Cairo script that makes
+//   anti-aliased maps from these, using Cairo instead of GD.
+
+function metadump($string, $truncate=FALSE)
+{
+	// comment this line to get a metafile for this map
+	return;
+
+	if($truncate)
+	{
+		$fd = fopen("metadump.txt","w+");
+	}
+	else
+	{
+		$fd = fopen("metadump.txt","a");
+	}
+	fputs($fd,$string."\n");
+	fclose($fd);
+}
+
+function metacolour(&$col)
+{
+	return ($col['red1']." ".$col['green1']." ".$col['blue1']);
+}
+
 function wimagecreate($width,$height)
 {
 	metadump("NEWIMAGE $width $height");
@@ -1327,12 +1334,8 @@ function wimagettftext($image, $size, $angle, $x, $y, $color, $file, $string)
 
 	metadump("TEXT $x $y $angle $size $file $r $g $b $a $string");
 
-return(imagettftext($image, $size, $angle, $x, $y, $color, $file, $string));
-
+	return(imagettftext($image, $size, $angle, $x, $y, $color, $file, $string));
 }
-
-
-
 
 // vim:ts=4:sw=4:
 ?>

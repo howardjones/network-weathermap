@@ -8,7 +8,7 @@
  "HTML Tidy for Mac OS X (vers 12 April 2006), see www.w3.org" /> 
 
  <title>PHP Weathermap 
-v0.96test1 
+v0.95b 
  - Advanced Topics</title> 
 <style type="text/css" media="print"> 
 /*<![CDATA[*/ 
@@ -41,7 +41,7 @@ a { color: black; text-decoration: underline; font-weight: normal;}
 
 <div id="header"> 
  <h1>PHP Weathermap 
-v0.96test1 
+v0.95b 
 </h1> 
  <h4>Copyright &copy; 2005-2008 Howard Jones, <tt><a 
 href="mailto:howie@thingy.com">howie@thingy.com</a></tt>. (<a 
@@ -58,7 +58,7 @@ href="http://www.network-weathermap.com/">Website</a>)</h4>
 <ul> 
 <li>You can have the value of a data source printed in the map.</li> 
 <li>You can have <a href="config-reference.html#NODE_ICON">ICON</a> filenames which change with the value of a datasource.</li> 
-<li>You can make more effective use of the DEFAULTs, by including parameterised <a href="config-reference.html#NODE_LABEL">LABELs,</a> <a href="config-reference.html#NODE_ICON">ICONs</a> and <a href="config-reference.html#LINK_OVERLIBCAPTION">OVERLIBCAPTIONs.</li></a> 
+<li>You can make more effective use of the DEFAULTs, by including parameterised <a href="config-reference.html#NODE_LABEL">LABELs,</a> <a href="config-reference.html#NODE_ICON">ICONs</a> and OVERLIBCAPTIONs.</li> 
 </ul> 
 Finally, plugins can add internal 'notes' to objects in the map, which you can then use in the same way as the normal Weathermap data. For example, you could have a plugin that looks at the load-average on a server, categorises it as light, medium or heavy and saves that to a note, which can then be used to select an appropriate icon. 
  </p> 
@@ -104,11 +104,11 @@ Here is the list of valid <em>variablename</em>s and their meaning.
 </tr> 
 <tr> 
  <th>max_bandwidth_in</th> 
- <td>The maximum input bandwidth, as defined by <a href="config-reference.html#NODE_MAXVALUE">MAXVALUE</a> or <a href="config-reference.html#LINK_BANDWIDTH">BANDWIDTH.</td></a> 
+ <td>The maximum input bandwidth, as defined by <a href="config-reference.html#NODE_MAXVALUE">MAXVALUE</a> or BANDWIDTH.</td> 
 </tr> 
 <tr> 
  <th>max_bandwidth_out</th> 
- <td>The maximum output bandwidth, as defined by <a href="config-reference.html#NODE_MAXVALUE">MAXVALUE</a> or <a href="config-reference.html#LINK_BANDWIDTH">BANDWIDTH.</td></a> 
+ <td>The maximum output bandwidth, as defined by <a href="config-reference.html#NODE_MAXVALUE">MAXVALUE</a> or BANDWIDTH.</td> 
 </tr> 
 <tr> 
  <th>inpercent</th> 
@@ -120,7 +120,7 @@ Here is the list of valid <em>variablename</em>s and their meaning.
 </tr> 
 <tr> 
  <th>name</th> 
- <td>The name of the <a href="config-reference.html#NODE_NODE">NODE</a> or <a href="config-reference.html#LINK_LINK">LINK.</td></a> 
+ <td>The name of the <a href="config-reference.html#NODE_NODE">NODE</a> or LINK.</td> 
 </tr> 
 <tr> 
  <th>inscaletag</th> 
@@ -143,7 +143,7 @@ Say you have a data-collection system where each router has an ID, but the URL i
 <a href="config-reference.html#NODE_NODE">NODE</a> router_a 
  <a href="config-reference.html#NODE_LABEL">LABEL</a> Router A 
  <a href="config-reference.html#NODE_POSITION">POSITION</a> 100 200 
- <a href="config-reference.html#GLOBAL_SET"><b>SET</a> router_id 33</b> 
+ <b><a href="config-reference.html#GLOBAL_SET">SET</a> router_id 33</b> 
  <a href="config-reference.html#LINK_INFOURL">INFOURL</a> http://my.monitoring.system/view.php?id=<b>{node:this:router_id}</b> 
  <a href="config-reference.html#LINK_TARGET">TARGET</a> somemonitoringplugin:<b>{node:this:router_id}</b> 
 </pre> 
@@ -181,14 +181,14 @@ The first node uses two targets to populate the 'in' and 'out' slots from differ
 </table> 
  </p> 
 
-<h2><a <a href="config-reference.html#GLOBAL_SET">name="tweaks">SETting</a> Hint Variables to tweak maps</a></h2> 
+<h2><a name="tweaks"><a href="config-reference.html#GLOBAL_SET">SETting</a> Hint Variables to tweak maps</a></h2> 
 <p> 
 In addition to any variables that you define using <a href="config-reference.html#GLOBAL_SET">SET,</a> and the ones that Weathermap uses internally (like those listed above), there is a <em>third</em> place that 
 <a href="config-reference.html#GLOBAL_SET">SET</a> is used - to make small adjustments to the way a map is calculated. </p> 
 <p>Whenever there is a request for a 'tweak' - a setting that doesn't really deserve creating yet another map config keyword - then that tweak is done by having a special <a href="config-reference.html#GLOBAL_SET">SET</a> variable to control it. </p> 
 <p>These are documented in the relevant config keyword section in the <a href="config-reference.html">Config Reference</a>, but here's an example: </p> 
 <p>When you are using <a href="config-reference.html#GLOBAL_KEYPOS">KEYPOS</a> and <a href="config-reference.html#GLOBAL_KEYSTYLE">KEYSTYLE</a> to draw the legend/key for a particular <a href="config-reference.html#GLOBAL_SCALE">SCALE,</a> you can choose to hide the percentage signs, by using 
-<div <a href="config-reference.html#GLOBAL_SET">class="example"><pre>SET</a> key_hidepercent_DEFAULT 1</pre></div> 
+<div class="example"><pre><a href="config-reference.html#GLOBAL_SET">SET</a> key_hidepercent_DEFAULT 1</pre></div> 
 (for the DEFAULT scale in this example), in the top section of the map config file. 
  </p> 
 <p>Another example of these 'hidden' tweaks is used in the <a href="targets.html#rrd">RRDtool datasource plugin</a> to select what data is extracted. </p> 

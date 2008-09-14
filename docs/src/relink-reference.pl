@@ -48,27 +48,39 @@ while (<STDIN>) {
 	
         foreach $word ( split( /\s+/, $_ ) ) {
 	    $bareword = $word;
+	    $prefix = "";
+	    if($bareword =~ m/(.*)>(.*)/)
+	    {
+		$bareword = $2;
+		$prefix = $1.">";
+	    }
 	    $bareword =~ tr/A-Z//cd;
 
-            if ( $words{$bareword} ) {
-		# print "!";
-                $link = $map{"$scope|$bareword"};
-                $link ||= $map{$bareword};
-		if($wholefile)
-		{
-		    $link ||= $map{"GLOBAL|$bareword"};
-		    $link ||= $map{"LINK|$bareword"};
-		    $link ||= $map{"NODE|$bareword"};
-		}
-
-                # if ( ($link ne '') && ($lastseen ne "${scope}_${bareword}") ) {
-                if ( ($link ne '') ) {
-
-		    if($wholefile) { $link = "config-reference.html".$link; }
+	    if($bareword ne "")
+	    {
+	        # print STDERR "|$bareword|$word\n";
+	    
+		if ( $words{$bareword} ) {
+		    # print "!";
+		    $link = $map{"$scope|$bareword"};
+		    $link ||= $map{$bareword};
+		    if($wholefile)
+		    {
+			$link ||= $map{"GLOBAL|$bareword"};
+			$link ||= $map{"LINK|$bareword"};
+			$link ||= $map{"NODE|$bareword"};
+		    }
+    
+		    # if ( ($link ne '') && ($lastseen ne "${scope}_${bareword}") ) {
+		    if ( ($link ne '') ) {
+    
+			if($wholefile) { $link = "config-reference.html".$link; }
 			
-                    $word = sprintf( "<a href=\"%s\">%s</a>", $link, $word );
-                }
-            }
+			$word =~ s/^$prefix//;    
+			$word = sprintf( "%s<a href=\"%s\">%s</a>", $prefix, $link, $word );
+		    }
+		}
+	    }
 	    if($word eq 'targets.html')
 	    {
 		$word = '<a href="targets.html">targets.html</a>';

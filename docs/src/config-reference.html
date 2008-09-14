@@ -360,7 +360,7 @@ which is then displayed. Specify the targets on one <a href="#NODE_TARGET">TARGE
 <div class="definition">AICONFILLCOLOR <em class="meta">red</em> <em class="meta">green</em> <em class="meta">blue</em>
 </div>
 <div class="description">
-<p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Specify the colours used for drawing the <a href="#NODE_LABEL">LABEL.</a> </p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">red, green and blue are numbers from 0 to 255. </p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">LABELFONTSHADOWCOLOR, <a href="#NODE_COLORS">LABELBGCOLOR</a> and <a href="#NODE_COLORS">LABELOUTLINECOLOR</a> have an additional option - 'none' - which stops that element of the <a href="#NODE_LABEL">LABEL</a> being drawn. <a href="#NODE_COLORS">LABELFONTSHADOWCOLOR</a> defaults to 'none'. </p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">LABELFONTCOLOR has an additional option 'contrast', which will select either black or white depending on the current <a href="#NODE_COLORS">LABELBGCOLOR.</a> This is especially useful if you are using a <a href="#GLOBAL_SCALE">SCALE</a> to change the colour of your <a href="#NODE_NODE">NODE</a> <a href="#NODE_LABEL">LABELs.</a> </p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">AICONOUTLINECOLOR and <a href="#NODE_COLORS">AICONFILLCOLOR</a> are used to colour an 'artificial <a href="#NODE_ICON">ICON'</a> if one is defined for this node. To allow the artifical icon to <em>also</em> follow the 
+<p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Specify the colours used for drawing the <a href="#NODE_LABEL">LABEL.</a> </p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">red, green and blue are numbers from 0 to 255. </p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude"><a href="#NODE_COLORS">LABELFONTSHADOWCOLOR,</a> <a href="#NODE_COLORS">LABELBGCOLOR</a> and <a href="#NODE_COLORS">LABELOUTLINECOLOR</a> have an additional option - 'none' - which stops that element of the <a href="#NODE_LABEL">LABEL</a> being drawn. <a href="#NODE_COLORS">LABELFONTSHADOWCOLOR</a> defaults to 'none'. </p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude"><a href="#NODE_COLORS">LABELFONTCOLOR</a> has an additional option 'contrast', which will select either black or white depending on the current <a href="#NODE_COLORS">LABELBGCOLOR.</a> This is especially useful if you are using a <a href="#GLOBAL_SCALE">SCALE</a> to change the colour of your <a href="#NODE_NODE">NODE</a> <a href="#NODE_LABEL">LABELs.</a> </p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude"><a href="#NODE_COLORS">AICONOUTLINECOLOR</a> and <a href="#NODE_COLORS">AICONFILLCOLOR</a> are used to colour an 'artificial <a href="#NODE_ICON">ICON'</a> if one is defined for this node. To allow the artifical icon to <em>also</em> follow the 
  colour of the <a href="#NODE_COLORS">LABELBGCOLOR</a> when you are using a <a href="#GLOBAL_SCALE">SCALE,</a> you can also specify 'copy' as the colour for <a href="#NODE_COLORS">AICONFILLCOLOR.</a> See <a href="#NODE_ICON">ICON</a> for more about artificial icons. </p> 
 </div>
 <div class="changes">
@@ -742,7 +742,7 @@ of the direction of the link. 'angled' rotates the box to follow the directiong 
 <div class="definition">BWLABELPOS <em class="meta">inposition</em> <em class="meta">outposition</em>
 </div>
 <div class="description">
-<p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Specifies the position of the 'bandwidth' labels shown on each link. </p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">The two position values are percentages along the link arrow, from the first to the second node. Therefore <a href="#LINK_BWLABELPOS"><tt>BWLABELPOS</a> 75 25</tt> is the default. </p> 
+<p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Specifies the position of the 'bandwidth' labels shown on each link. </p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">The two position values are percentages along the link arrow, from the first to the second node. Therefore <tt><a href="#LINK_BWLABELPOS">BWLABELPOS</a> 75 25</tt> is the default. </p> 
 </div>
 <div class="changes">
 <h3>Change History</h3>
@@ -810,7 +810,7 @@ of the direction of the link. 'angled' rotates the box to follow the directiong 
 <div class="definition">COMMENTPOS <em class="meta">inposition</em> <em class="meta">outposition</em>
 </div>
 <div class="description">
-<p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Specify the position along the link used for drawing the <a href="#LINK_INCOMMENT">INCOMMENT</a> and <a href="#LINK_OUTCOMMENT">OUTCOMMENT</a> text. </p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">The positions are specified as a percentage position along the link, like <a href="#LINK_BWLABELPOS">BWLABELPOS.</a> The default positions are equivalent to <a href="#LINK_COMMENTPOS"><strong>COMMENTPOS</a> 95 5</strong>. </p> 
+<p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Specify the position along the link used for drawing the <a href="#LINK_INCOMMENT">INCOMMENT</a> and <a href="#LINK_OUTCOMMENT">OUTCOMMENT</a> text. </p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">The positions are specified as a percentage position along the link, like <a href="#LINK_BWLABELPOS">BWLABELPOS.</a> The default positions are equivalent to <strong><a href="#LINK_COMMENTPOS">COMMENTPOS</a> 95 5</strong>. </p> 
 </div>
 <div class="changes">
 <h3>Change History</h3>
@@ -829,7 +829,7 @@ of the direction of the link. 'angled' rotates the box to follow the directiong 
 <h3>Change History</h3> 
 <dl> 
 <dt>0.95</dt> 
-<dd>Added <a href="#LINK_SPLITPOS">SPLITPOS</dd></a> 
+<dd>Added SPLITPOS</dd> 
 </dl> 
 </div> 
 </div>
@@ -846,12 +846,12 @@ of the direction of the link. 'angled' rotates the box to follow the directiong 
 <div class="definition">COMMENTFONTCOLOR <em class="meta">red</em> <em class="meta">green</em> <em class="meta">blue</em>
 </div>
 <div class="description">
-<p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Specify the colours used for drawing the link. </p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">red, green and blue are numbers from 0 to 255. </p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">OUTLINECOLOR, <a href="#LINK_COLORS">BWOUTLINECOLOR</a> and <a href="#LINK_COLORS">BWBOXCOLOR</a> have an additional option - 'none' - which stops that element of the link being drawn. </p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">The colours are used as follows:<ul> 
- <a href="#LINK_COLORS"><li>OUTLINECOLOR</a> is the colour of the line around the edge of the arrow.</li> 
- <a href="#LINK_COLORS"><li>BWOUTLINECOLOR</a> is the colour of the line surrounding the 'bandwidth label' box</li> 
- <a href="#LINK_COLORS"><li>BWBOXCOLOR</a> is the background colour for the same box</li> 
- <a href="#LINK_COLORS"><li>BWFONTCOLOR</a> is the colour used for text within that box</li> 
- <a href="#LINK_COLORS"><li>COMMENTFONTCOLOR</a> is the colour used for the text produced by <a href="#LINK_INCOMMENT">INCOMMENT</a> and <a href="#LINK_OUTCOMMENT">OUTCOMMENT,</a> along the side of a link arrow</li></ul> </p> 
+<p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Specify the colours used for drawing the link. </p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">red, green and blue are numbers from 0 to 255. </p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude"><a href="#LINK_COLORS">OUTLINECOLOR,</a> <a href="#LINK_COLORS">BWOUTLINECOLOR</a> and <a href="#LINK_COLORS">BWBOXCOLOR</a> have an additional option - 'none' - which stops that element of the link being drawn. </p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">The colours are used as follows:<ul> 
+ <li><a href="#LINK_COLORS">OUTLINECOLOR</a> is the colour of the line around the edge of the arrow.</li> 
+ <li><a href="#LINK_COLORS">BWOUTLINECOLOR</a> is the colour of the line surrounding the 'bandwidth label' box</li> 
+ <li><a href="#LINK_COLORS">BWBOXCOLOR</a> is the background colour for the same box</li> 
+ <li><a href="#LINK_COLORS">BWFONTCOLOR</a> is the colour used for text within that box</li> 
+ <li><a href="#LINK_COLORS">COMMENTFONTCOLOR</a> is the colour used for the text produced by <a href="#LINK_INCOMMENT">INCOMMENT</a> and <a href="#LINK_OUTCOMMENT">OUTCOMMENT,</a> along the side of a link arrow</li></ul> </p> 
 </div>
 <div class="changes">
 <h3>Change History</h3>
@@ -1033,7 +1033,7 @@ of the direction of the link. 'angled' rotates the box to follow the directiong 
 <dt>0.95</dt> 
 <dd>Added multiple URL support</dd> 
 <dt>0.9</dt> 
-<dd>Originally added <a href="#LINK_OVERLIBCAPTION">OVERLIBCAPTION.</dd></a> 
+<dd>Originally added OVERLIBCAPTION.</dd> 
 </dl> 
 </div> 
 </div>
@@ -1048,7 +1048,7 @@ of the direction of the link. 'angled' rotates the box to follow the directiong 
 <dt>0.95</dt> 
 <dd>Added multiple URL support</dd> 
 <dt>0.9</dt> 
-<dd>Originally added <a href="#LINK_OVERLIBCAPTION">OVERLIBCAPTION.</dd></a> 
+<dd>Originally added OVERLIBCAPTION.</dd> 
 </dl> 
 </div> 
 </div>
@@ -1313,7 +1313,7 @@ You can set the output format in the Cacti Settings page. </p>
 <div class="definition">KEYBGCOLOR <em class="meta">red</em> <em class="meta">green</em> <em class="meta">blue</em>
 </div>
 <div class="description">
-<p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Specify the colours used for drawing the global elements of the map. </p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">red, green and blue are numbers from 0 to 255. </p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">LABELFONTSHADOWCOLOR, <a href="#NODE_COLORS">LABELBGCOLOR</a> and <a href="#NODE_COLORS">LABELOUTLINECOLOR</a> have an additional option - 'none' - which stops that element of the <a href="#NODE_LABEL">LABEL</a> being drawn. <a href="#NODE_COLORS">LABELFONTSHADOWCOLOR</a> defaults to 'none'. </p> 
+<p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Specify the colours used for drawing the global elements of the map. </p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">red, green and blue are numbers from 0 to 255. </p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude"><a href="#NODE_COLORS">LABELFONTSHADOWCOLOR,</a> <a href="#NODE_COLORS">LABELBGCOLOR</a> and <a href="#NODE_COLORS">LABELOUTLINECOLOR</a> have an additional option - 'none' - which stops that element of the <a href="#NODE_LABEL">LABEL</a> being drawn. <a href="#NODE_COLORS">LABELFONTSHADOWCOLOR</a> defaults to 'none'. </p> 
 </div>
 <div class="changes">
 <h3>Change History</h3>
@@ -1421,7 +1421,7 @@ You can set the output format in the Cacti Settings page. </p>
 <div class="definition">SCALE <em class="meta">scalename</em> <em class="meta">min</em> <em class="meta">max</em> <em class="meta">red</em> <em class="meta">green</em> <em class="meta">blue</em> <em class="meta">red2</em> <em class="meta">green2</em> <em class="meta">blue2</em> <em class="meta">tagtext</em>
 </div>
 <div class="description">
-<p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Defines one 'span' within the link colour-coding table. </p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">SCALE is used to specify how <a href="#NODE_NODE">NODEs</a> and <a href="#LINK_LINK">LINKs</a> are colour-coded according to their percent usage. 
+<p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Defines one 'span' within the link colour-coding table. </p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude"><a href="#GLOBAL_SCALE">SCALE</a> is used to specify how <a href="#NODE_NODE">NODEs</a> and <a href="#LINK_LINK">LINKs</a> are colour-coded according to their percent usage. 
  If the percentage usage falls between min and max then the colour specified by red, green and blue is used to colour the link. 
  Colour values are between 0 and 255. Percentages are between 0 and 100, obviously. </p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">If you specify <i>two</i> colours on the line (the third and fourth forms above), then the colour chosen for the link will be calculated as 
  a proportion between the two colours. You can avoid specifying many <a href="#GLOBAL_SCALE">SCALE</a> lines this way. </p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Without a <i>scalename</i>, the <a href="#GLOBAL_SCALE">SCALE</a> line will add a definition to the scale named 'DEFAULT'. If you define any other named scales, you can then use the <a href="#LINK_USESCALE">USESCALE</a> directive to specify that a particular <a href="#NODE_NODE">NODE</a> or <a href="#LINK_LINK">LINK</a> use your new scale. </p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">With any of the formats, you can specify a 'tag' on the end of the line. When the colour is decided for the 'in' and 'out' parts of a <a href="#NODE_NODE">NODE</a> or <a href="#LINK_LINK">LINK,</a> 

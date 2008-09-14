@@ -22,35 +22,9 @@ var dragstate = {
 			dragstop: {x: -1, y: -1},
 			dragitem: '',
 			dragoffset: {x: 0, y: 0}
-				};
-
-// var linkmdown = false;
-// var dragmdown = false;
-// var addedVia = false;
-// var dragstart = {x: -1, y: -1};
-// var dragstop = {x: -1, y: -1};
-// var dragitem = '';
-// var dragoffset = {x: 0, y: 0};
+	};
 
 var interactmode = '';
-
-// we queue these up to make our one-at-a-time AJAX call work
-//var AJAXRequest = {
-//    params: {},
-//    send: function()
-//    {
-//    }
-//};
-
-//function printfire() {
-//   if (document.createEvent)
-//   {
-//      printfire.args =  arguments;
-//      var ev = document.createEvent("Events");
-//      ev.initEvent("printfire", false, true );
-//      dispatchEvent(ev);
-//   }
-//}
 
 function getMousePosition(event)
 {
@@ -61,6 +35,166 @@ function getMousePosition(event)
     
 	return {x:x, y:y};
 }
+
+
+
+var WMEditor = {
+	map: { valid: 0},	// the downloaded JSON data
+	mapfile: '',	// which file we're working with
+	lastserial: 0,	// last serial number for data synchronisation
+	node1: '',	// selected node for link creation
+	node2: '',	// second node for link creation
+	
+		
+	act_node_add: function() {},
+	act_node_add_click: function() {},
+	act_link_add: function() {},
+	act_link_add_click1: function() {},
+	act_link_add_click2: function() {},
+
+	syncnodes: function() {
+		var node, nodeid, existing, origin_x, origin_y, newx, newy;
+
+		origin_x = parseInt($('#existingdata').css('left'),10);
+	    origin_y = parseInt($('#existingdata').css('top'),10);
+		
+		// Destroy dead nodes as appropriate
+		$('img.mapnode').each( function(i) {
+			var myname = $(this).attr('id');
+			myname = myname.replace( /^mapnode_/, '' );
+		   
+			if ( map.nodes[myname] )
+			{
+				// it still exists, keep it around
+			}
+			else
+			{
+				$(this).remove();
+			}
+		});
+		
+		// now go through the list and move around or add new ones...
+		for (node in WMEditor.map.nodes)
+		{
+			if (WMEditor.map.nodes[node].name !== 'DEFAULT')
+			{
+				nodeid = 'mapnode_' + WMEditor.map.nodes[node].name;
+				existing = $('img#' + nodeid);
+				
+				if(existing.size() === 0)
+				{                   
+					$('#nodecontainer').append('<img class="mapnode draggable" src="editcache/' + WMEditor.map.nodes[node].iconcachefile + '" id="' + nodeid + '"/>');
+					existing = $('img#'+nodeid);
+				}
+				// one way or another, by here we have a node, I hope.
+				
+				 newx = origin_x + WMEditor.map.nodes[node].x;
+				 newy = origin_y + WMEditor.map.nodes[node].y;
+				
+				existing.css({position: 'absolute', left: newx + "px", top: newy + "px", 'z-index': 30});
+			}
+		}
+	},
+	
+	syncvias: function() {
+		var link, vs, newx, newy, origin_x, origin_y, existing, via_id, i;
+	
+		// something here needs to clear existing VIAs
+
+		origin_x = parseInt($('#existingdata').css('left'),10);
+		origin_y = parseInt($('#existingdata').css('top'),10);	
+		
+	    $('.deadvia').remove();
+	    
+	    for (link in WMEditor.map.links)
+	    {
+	        if (WMEditor.map.links[link].name !== 'DEFAULT')
+	        {
+	            console.log("LINK " + link);
+
+	            if (WMEditor.map.links[link].via.length >0)
+	            {
+	                console.log(link + ' has VIAs');
+	                vs = WMEditor.map.links[link].via;
+	                for (i=0; i<vs.length; i+=1)
+	                {
+	                    console.log('VIA ' + vs[i][0] + ',' + vs[i][1]);
+	                    via_id='mapvia_' + link+'_via_'+i;
+	                     existing = $('img#'+via_id);
+
+	                    if(existing.size() === 0)
+	                    {                   
+	                        $('#nodecontainer').append('<img class="mapvia draggable" src="editor-resources/via-marker.png" id="'+via_id+'"/>');
+	                        existing = $('img#'+via_id);
+	                    }
+	                     newx = origin_x + vs[i][0] - 5;
+	                     newy = origin_y + vs[i][1] - 5;
+	                    existing.css({position: 'absolute', left: newx + "px", top: newy + "px", 'z-index': 30});
+	                    console.log("created " + via_id + ' at ' + newx + ',' + newy);
+	                }
+	            }
+	        }
+	    }
+	},
+	
+	// Synchronise the JSON data with the DOM representation
+	syncmap: function() {
+			// only do anything if the data is valid
+			$('#busy').show();
+			if(WMEditor.map.valid===1)
+			{
+				WMEditor.syncnodes();
+				WMEditor.syncvias();				
+			}
+			$('#busy').hide();
+		},
+		
+	// Fetch the JSON data from the server for this map
+	loadmap: function() {
+		console.log('Fetching JSON.');
+
+	    $.getJSON("editor-backend.php",
+	        { map: WMEditor.mapfile, "cmd": "dump_map", "serial": WMEditor.lastserial },
+	          function (json) {
+	            console.log('Inside JSON function');
+	            if (json.valid === 1)
+	            {
+	                WMEditor.map = json;
+					
+	                console.log('Fetching bg image data.');
+	                $('#existingdata').attr('src',json.map.mapcache + "?s=" + json.serial);
+	                WMEditor.lastserial = json.serial;
+	                // $('#existingdata').attr('src',json.map.mapcache);
+	                $.get('editor-backend.php',{ map: WMEditor.mapfile, cmd: "imagemap" },
+	                      function(cont) {
+	                        $('map#weathermap_imap').empty();
+	                        // $('map#weathermap_imap').html(cont);
+	                        // Getting medieval here - jQuery doesn't seem to be interested in Imagemaps??
+	                        var oldskool = document.getElementById('weathermap_imap');
+	                        oldskool.innerHTML = cont;
+	                        
+	                        reapplyLinkEvents();
+	                      });
+					console.log('about to syncmap()');	  
+					WMEditor.syncmap();
+	            }
+	            else
+	            {
+	                console.log('Failed to get good JSON');
+	                alert('Got invalid JSON map data');
+	            }
+	            console.log('Leaving JSON function');
+	        }
+	    );
+	    console.log('Done with map_refresh()');
+	},
+	
+	// force a refresh of the map
+	refresh: function() {
+			WMEditor.loadmap();
+			WMEditor.syncmap();
+		}
+};
 
 
 function reapplyLinkEvents()
@@ -169,23 +303,21 @@ function reapplyDraggableEvents()
 		}
 		else
 		{
+			origin_x = parseInt($('#existingdata').css('left'),10);
+			origin_y = parseInt($('#existingdata').css('top'),10);
+			
 			if(dragstate.dragitem.slice(0,8) === 'mapnode_')
 			{
-				origin_x = parseInt($('#existingdata').css('left'),10);
-				origin_y = parseInt($('#existingdata').css('top'),10);
 				dragstate.dragitem = dragstate.dragitem.slice(8,dragstate.dragitem.length);
-				$.getJSON('editor-backend.php',{ map: mapfile, cmd: "move_node", x: pos.x-origin_x, y: pos.y-origin_y, nodename: dragstate.dragitem  },
-						  function() {map_refresh(); });
-			
+				$.getJSON('editor-backend.php',{ map: mapfile, cmd: "move_node", x: (pos.x - origin_x), y: (pos.y - origin_y), nodename: dragstate.dragitem  },
+						  function() { map_refresh(); } );
 			}
 			
 			if(dragstate.dragitem.slice(0,7) === 'mapvia_')
 			{
-				origin_x = parseInt($('#existingdata').css('left'),10);
-				origin_y = parseInt($('#existingdata').css('top'),10);
 				dragstate.dragitem = dragstate.dragitem.slice(7,dragstate.dragitem.length);
-				$.getJSON('editor-backend.php',{ map: mapfile, cmd: "move_via", x: pos.x-origin_x, y: pos.y-origin_y, vianame: dragstate.dragitem  },
-						  function() {map_refresh(); });
+				$.getJSON('editor-backend.php',{ map: mapfile, cmd: "move_via", x: (pos.x - origin_x), y: (pos.y - origin_y), vianame: dragstate.dragitem  },
+						  function() { map_refresh(); } );
 			}
                         
 			dragstate.dragitem = '';
@@ -200,12 +332,9 @@ function reapplyDraggableEvents()
 
 function syncmap()
 {
-	var i, existing, newx,newy, nodes, links, node, link, origin_x, origin_y, nodeid, via_id, vs;
+	var i, existing, newx,newy, node, link, origin_x, origin_y, nodeid, via_id, vs;
 
     $('#busy').show();   
-
-    nodes = map.nodes;
-    links = map.links;
   
     // first, clear out the NODES that have disappeared...
     
@@ -237,7 +366,7 @@ function syncmap()
     origin_y = parseInt($('#existingdata').css('top'),10);
     
     // now go through the list and move around or add...
-    for (node in nodes)
+    for (node in map.nodes)
     {
         if (map.nodes[node].name !== 'DEFAULT')
         {
@@ -266,7 +395,7 @@ function syncmap()
     
     $('.deadvia').remove();
     
-    for (link in links)
+    for (link in map.links)
     {
         if (map.links[link].name !== 'DEFAULT')
         {
@@ -315,13 +444,11 @@ function map_refresh()
         { map: mapfile, "cmd": "dump_map", "serial": lastserial },
           function (json) {
             console.log('Inside JSON function');
-            if (json.valid === 1)
+            if ( parseInt(json.valid,10) === 1)
             {
                 map = json;
-                    console.log('Loaded JSON for ' + mapfile + ' - about to syncmap()');
-
-                syncmap();
-                console.log('Map synced. Fetching bg image data.');
+				
+                console.log('Fetching bg image data.');
                 $('#existingdata').attr('src',json.map.mapcache + "?s=" + json.serial);
                 lastserial = json.serial;
                 // $('#existingdata').attr('src',json.map.mapcache);
@@ -335,6 +462,8 @@ function map_refresh()
                         
                         reapplyLinkEvents();
                       });
+				console.log('about to syncmap()');	  
+				syncmap();
             }
             else
             {
@@ -350,7 +479,9 @@ function map_refresh()
 function openmap(mapname)
 {
     console.log('Opening map: ' + mapname);
-    mapfile = mapname;
+    WMEditor.mapfile = mapname;
+	mapfile = mapname;
+	
     $('#welcome').hide();
     $('#filepicker').hide();
     $('#toolbar').show();
@@ -365,6 +496,7 @@ function openmap(mapname)
     console.log('Refreshing map: ' + mapname);
 
     map_refresh();   
+	// WMEditor.loadmap();
 }
 
 function showpicker()
@@ -526,7 +658,6 @@ $(document).ready( function() {
     
     $('#btn_addnode').click( function() { nodeadd(); } );
     $('#btn_addlink').click( function() { linkadd(); } );
-
 
     reapplyDraggableEvents();
     reapplyLinkEvents();

@@ -37,9 +37,9 @@ while (<STDIN>) {
 
     # we only want to autolink in the description sections
 
-	s/<\/p>/ <\/p>/g;
+    s/<\/p>/ <\/p>/g;
     if (m/id="s_scope_([^"]+)/) { $scope    = $1; }
-    if (m/name="([^"]+)"/)      { $lastseen = $1; }
+    if (m/name="([^"]+)"/) { $lastseen = $1; }
 
     if ($indesc && m/<div/) { $indesc++; }
     if ( $indesc && m/\/div>/ ) { $indesc--; }
@@ -47,8 +47,8 @@ while (<STDIN>) {
     if ($indesc || $wholefile) {
 	
         foreach $word ( split( /\s+/, $_ ) ) {
-		$bareword = $word;
-		$bareword =~ tr/A-Z//cd;
+	    $bareword = $word;
+	    $bareword =~ tr/A-Z//cd;
 
             if ( $words{$bareword} ) {
 		# print "!";
@@ -56,27 +56,25 @@ while (<STDIN>) {
                 $link ||= $map{$bareword};
 		if($wholefile)
 		{
-                $link ||= $map{"GLOBAL|$bareword"};
-                $link ||= $map{"LINK|$bareword"};
-                $link ||= $map{"NODE|$bareword"};
+		    $link ||= $map{"GLOBAL|$bareword"};
+		    $link ||= $map{"LINK|$bareword"};
+		    $link ||= $map{"NODE|$bareword"};
 		}
 
                 # if ( ($link ne '') && ($lastseen ne "${scope}_${bareword}") ) {
                 if ( ($link ne '') ) {
 
-			if($wholefile) { $link = "config-reference.html".$link; }
+		    if($wholefile) { $link = "config-reference.html".$link; }
 			
                     $word = sprintf( "<a href=\"%s\">%s</a>", $link, $word );
                 }
-
             }
-			if($word eq 'targets.html')
-			{
-				$word = '<a href="targets.html">targets.html</a>';
-			}
+	    if($word eq 'targets.html')
+	    {
+		$word = '<a href="targets.html">targets.html</a>';
+	    }
             print $word. " ";
         }
-
     }
     else {
         print $_;

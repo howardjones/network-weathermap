@@ -79,7 +79,8 @@ RRD xport DS (use rrdtool graph and PRINT in fact)
 'none' for SCALE (not gradient)
 COMMENTSTYLE (edge|center)
 contrast for commentcolor (when using 'COMMENTSTYLE center')
-Fix a few docs bugs with unclosed tags - actually this is some kind of processing bug to do with <div>s
+
+FIXED  Fix a few docs bugs with unclosed tags - actually this is some kind of processing bug to do with <div>s
 
 FIXED BUG imagemap floats
 DONE!  BUG: ReadData should not be run for links with no nodes (templates) or nodes with no position.

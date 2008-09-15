@@ -1149,7 +1149,7 @@ function DrawLegend_Horizontal($im,$scalename="DEFAULT",$width=400)
 		array($rx+$box_left, $ry+$box_top, $rx+$box_right, $ry+$box_bottom));
 }
 
-function DrawLegend_Vertical($im,$scalename="DEFAULT",$height=400)
+function DrawLegend_Vertical($im,$scalename="DEFAULT",$height=400,$inverted=false)
 {
 	$title=$this->keytext[$scalename];
 
@@ -1199,11 +1199,21 @@ function DrawLegend_Vertical($im,$scalename="DEFAULT",$height=400)
 	$this->myimagestring($scale_im, $font, $scale_left-$scalefactor, $scale_top - $tileheight , $title,
 		$this->colours['DEFAULT']['KEYTEXT']['gdref1']);
 
+	$updown = 1;
+	if($inverted) $updown = -1;
+		
+
 	for($p=0;$p<=100;$p++)
 	{
-		$dy = $p*$scalefactor;
-		$dx = $dy;
-
+		if($inverted)
+		{
+			$dy = (100-$p) * $scalefactor;
+		}
+		else
+		{
+			$dy = $p*$scalefactor;
+		}
+	
 		if( ($p % 25) == 0)
 		{
 			imageline($scale_im, $scale_left - $scalefactor, $scale_top + $dy,
@@ -1223,8 +1233,8 @@ function DrawLegend_Vertical($im,$scalename="DEFAULT",$height=400)
 	imagecopy($im,$scale_im,$this->keyx[$scalename],$this->keyy[$scalename],0,0,imagesx($scale_im),imagesy($scale_im));
 	$this->keyimage[$scalename] = $scale_im;
 
-    $rx = $this->keyx[$scalename];
-    $ry = $this->keyy[$scalename];
+	$rx = $this->keyx[$scalename];
+	$ry = $this->keyy[$scalename];
 	$this->imap->addArea("Rectangle", "LEGEND:$scalename", '',
 		array($rx+$box_left, $ry+$box_top, $rx+$box_right, $ry+$box_bottom));
 }
@@ -1579,6 +1589,7 @@ function ReadConfig($input)
 					array('LINK', '/^\s*OUTCOMMENT\s+(.*)\s*$/i', array('comments[OUT]'=>1)),
 					array('LINK', '/^\s*BWFONT\s+(\d+)\s*$/i', array('bwfont'=>1)),
 					array('LINK', '/^\s*COMMENTFONT\s+(\d+)\s*$/i', array('commentfont'=>1)),
+					array('LINK', '/^\s*COMMENTSTYLE\s+(edge|center)\s*$/i', array('commentstyle'=>1)),
 					array('LINK', '/^\s*DUPLEX\s+(full|half)\s*$/i', array('duplex'=>1)),
 					array('LINK', '/^\s*BWSTYLE\s+(classic|angled)\s*$/i', array('labelboxstyle'=>1)),
 					array('LINK', '/^\s*LINKSTYLE\s+(twoway|oneway)\s*$/i', array('linkstyle'=>1)),
@@ -1745,6 +1756,7 @@ function ReadConfig($input)
 				# $targets=preg_split('/\s+/', $matches[1], -1, PREG_SPLIT_NO_EMPTY);
 				$rawtargetlist = $matches[1]." ";
 							
+				// XXX - this needs some checking!
 				if(preg_match_all('/"([^\"\\\\]*(?:\\\\.[^\"\\\\]*)*)"|(\S+)\s|\s/x',$rawtargetlist,$targets))
 				{
 					# print_r ($targets);
@@ -1834,7 +1846,7 @@ function ReadConfig($input)
 			if ( ( $last_seen=='NODE' || $last_seen=='LINK' ) && preg_match("/^\s*TEMPLATE\s+(\S+)\s*$/i", $buffer, $matches))
 			{
 				$tname = $matches[1];
-				if( ($last_seen=='NODE' && isset($map->nodes[$tname])) || ($last_seen=='LINK' && isset($map->links[$tname])) )
+				if( ($last_seen=='NODE' && isset($this->nodes[$tname])) || ($last_seen=='LINK' && isset($this->links[$tname])) )
 				{
 					$curobj->template = $matches[1];
 					debug("Resetting to template $last_seen ".$curobj->template."\n");
@@ -1842,7 +1854,7 @@ function ReadConfig($input)
 				}
 				else
 				{
-					warn("$last_seen TEMPLATE '$tname' doesn't exist! (if it does exist, check it's defined first)\n");
+					warn("line $linecount: $last_seen TEMPLATE '$tname' doesn't exist! (if it does exist, check it's defined first)\n");
 				}
 				$linematched++;	
 				
@@ -2028,7 +2040,7 @@ function ReadConfig($input)
 				$linematched++;
 			}
 
-			if(preg_match("/^\s*KEYSTYLE\s+([A-Za-z][A-Za-z0-9_]+\s+)?(classic|horizontal|vertical)\s+?(\d+)?\s*$/i",$buffer, $matches))
+			if(preg_match("/^\s*KEYSTYLE\s+([A-Za-z][A-Za-z0-9_]+\s+)?(classic|horizontal|vertical|inverted)\s+?(\d+)?\s*$/i",$buffer, $matches))
 			{
 				$whichkey = trim($matches[1]);
 				if($whichkey == '') $whichkey = 'DEFAULT';
@@ -2621,6 +2633,7 @@ function DrawMap($filename = '', $thumbnailfile = '', $thumbnailmax = 250, $with
 						if($this->keystyle[$scalename]=='classic') $this->DrawLegend_Classic($image,$scalename);
 						if($this->keystyle[$scalename]=='horizontal') $this->DrawLegend_Horizontal($image,$scalename,$this->keysize[$scalename]);
 						if($this->keystyle[$scalename]=='vertical') $this->DrawLegend_Vertical($image,$scalename,$this->keysize[$scalename]);
+						if($this->keystyle[$scalename]=='inverted') $this->DrawLegend_Vertical($image,$scalename,$this->keysize[$scalename],true);
 					}
 				}
 

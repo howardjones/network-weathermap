@@ -22,6 +22,8 @@
 	ADDED - A few extra CSS id and class attributes, to make styling the page easier.
         ADDED - New NODES offset type - angle+radius
         ADDED - New NODES offset type - compass-point+percentage
+        ADDED - "KEYSTYLE inverted" - to get a thermometer-style vertical legend.
+        ADDED - "COMMENTSTYLE center" to make comments run along the centre of a link arrow. (and 'edge' for the usual)
 	CHANGE - Cacti plugin uses "processed" map title now (allows {} tokens in the title)
 	CHANGE - A NODE with no POSITION is not drawn, instead of drawn at 0,0. Useful for templates.
 	CHANGE - A LINK with no NODES is no longer an error. Also for templates.

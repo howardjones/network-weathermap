@@ -41,6 +41,7 @@ class WeatherMapLink extends WeatherMapItem
 	var $inscaletag, $outscaletag;
 	# var $incolour,$outcolour;
 	var $commentfontcolour;
+	var $commentstyle;
 	var $bwfontcolour;
 	# var $incomment, $outcomment;
 	var $comments = array();
@@ -62,6 +63,7 @@ class WeatherMapLink extends WeatherMapItem
 			'labeloffset_in' => 75,
 			'commentoffset_out' => 5,
 			'commentoffset_in' => 95,
+			'commentstyle' => 'edge',
 			'arrowstyle' => 'classic',
 			'viastyle' => 'curved',
 			'usescale' => 'DEFAULT',
@@ -170,16 +172,18 @@ class WeatherMapLink extends WeatherMapItem
 	
 			if($comment != '')
 			{
+				list($textlength, $textheight) = $this->owner->myimagestringsize($this->commentfont, $comment);
+				
 				// XXX - redundant extra variable
 				// $startindex = $start[$dir];
 				$extra_percent = $commentpos[$dir];
 				
-				$font = $this->commentfont;
+				// $font = $this->commentfont;
 				// nudge pushes the comment out along the link arrow a little bit
 				// (otherwise there are more problems with text disappearing underneath links)
 				# $nudgealong = 0; $nudgeout=0;
 				$nudgealong = intval($this->get_hint("comment_nudgealong"));
-				$nudgeout = intval($this->get_hint("comment_nudgeout"));
+				$nudgeout = intval($this->get_hint("comment_nudgeout"));		
 	
 				$extra = ($totaldistance * ($extra_percent/100));
 				# $comment_index = find_distance($curvepoints,$extra);
@@ -187,13 +191,19 @@ class WeatherMapLink extends WeatherMapItem
 				list($x,$y,$comment_index,$angle) = find_distance_coords_angle($curvepoints,$extra);
 				if($comment_index!=0)
 				{
-				$dx = $x - $curvepoints[$comment_index][0];
-				$dy = $y - $curvepoints[$comment_index][1];
+					$dx = $x - $curvepoints[$comment_index][0];
+					$dy = $y - $curvepoints[$comment_index][1];
 				}
 				else
 				{
-				$dx = $curvepoints[$comment_index+1][0] - $x;
-				$dy = $curvepoints[$comment_index+1][1] - $y;
+					$dx = $curvepoints[$comment_index+1][0] - $x;
+					$dy = $curvepoints[$comment_index+1][1] - $y;
+				}
+				
+				$centre_distance = $widths[$dir] + 4 + $nudgeout;
+				if($this->commentstyle == 'center')
+				{
+					$centre_distance = $nudgeout - ($textheight/2);
 				}
 								
 				// find the normal to our link, so we can get outside the arrow
@@ -210,18 +220,18 @@ class WeatherMapLink extends WeatherMapItem
 					# $col = $map->selected;
 					$angle -= 180;
 					if($angle < -180) $angle +=360;
-					$edge_x = $x + $nudgealong*$dx - $nx * ($widths[$dir] + 4 + $nudgeout);
-					$edge_y = $y + $nudgealong*$dy - $ny * ($widths[$dir] + 4 + $nudgeout);
+					$edge_x = $x + $nudgealong*$dx - $nx * $centre_distance;
+					$edge_y = $y + $nudgealong*$dy - $ny * $centre_distance;
 					# $comment .= "@";
 					$flipped = TRUE;
 				}
 				else
 				{
-					$edge_x = $x + $nudgealong*$dx + $nx * ($widths[$dir] + 4 + $nudgeout);
-					$edge_y = $y + $nudgealong*$dy + $ny * ($widths[$dir] + 4 + $nudgeout);
+					$edge_x = $x + $nudgealong*$dx + $nx * $centre_distance;
+					$edge_y = $y + $nudgealong*$dy + $ny * $centre_distance;
 				}
 				
-				list($textlength, $textheight) = $this->owner->myimagestringsize($font, $comment);
+				
 				
 				if( !$flipped && ($extra + $textlength) > $totaldistance)
 				{					
@@ -239,7 +249,7 @@ class WeatherMapLink extends WeatherMapItem
 				
 				// FINALLY, draw the text!
 				# imagefttext($image, $fontsize, $angle, $edge_x, $edge_y, $col, $font,$comment);
-				$this->owner->myimagestring($image, $font, $edge_x, $edge_y, $comment, $col, $angle);
+				$this->owner->myimagestring($image, $this->commentfont, $edge_x, $edge_y, $comment, $col, $angle);
 				#imagearc($image,$x,$y,10,10,0, 360,$this->owner->selected);
 				#imagearc($image,$edge_x,$edge_y,10,10,0, 360,$this->owner->selected);
 			}
@@ -476,6 +486,7 @@ class WeatherMapLink extends WeatherMapItem
 					array('linkstyle','LINKSTYLE',CONFIG_TYPE_LITERAL),
 					array('splitpos','SPLITPOS',CONFIG_TYPE_LITERAL),
 					array('duplex','DUPLEX',CONFIG_TYPE_LITERAL),
+					array('commentstyle','COMMENTSTYLE',CONFIG_TYPE_LITERAL),
 					array('labelboxstyle','BWSTYLE',CONFIG_TYPE_LITERAL),
 					array('usescale','USESCALE',CONFIG_TYPE_LITERAL),
 					

@@ -821,15 +821,30 @@ function ReadData()
 					$myobj->inpercent = (($total_in) / ($myobj->max_bandwidth_in)) * 100;
 				}
 
-				list($incol,$inscalekey,$inscaletag) = $this->ColourFromPercent(NULL, $myobj->inpercent,$myobj->usescale,$myobj->name);
-				list($outcol,$outscalekey, $outscaletag) = $this->ColourFromPercent(NULL, $myobj->outpercent,$myobj->usescale,$myobj->name);
+				# print $myobj->name."=>".$myobj->inpercent."%/".$myobj->outpercent."\n";
+				
+				list($incol,$inscalekey,$inscaletag) = $this->NewColourFromPercent($myobj->inpercent,$myobj->usescale,$myobj->name);
+				list($outcol,$outscalekey, $outscaletag) = $this->NewColourFromPercent($myobj->outpercent,$myobj->usescale,$myobj->name);
 
 				// $myobj->incolour = $incol;
-				$myobj->inscalekey = $inscalekey;
-				$myobj->inscaletag = $inscaletag;
+				# $myobj->inscalekey = $inscalekey;
+				# $myobj->inscaletag = $inscaletag;
 				// $myobj->outcolour = $outcol;
-				$myobj->outscalekey = $outscalekey;
-				$myobj->outscaletag = $outscaletag;
+				# $myobj->outscalekey = $outscalekey;
+				# $myobj->outscaletag = $outscaletag;
+				
+				
+				$myobj->add_hint("inscalekey",$inscalekey);
+				$myobj->add_hint("outscalekey",$outscalekey);
+				
+				$myobj->add_hint("inscaletag",$inscaletag);
+				$myobj->add_hint("outscaletag",$outscaletag);
+				
+				$myobj->add_hint("inscalecolor",$incol->as_html());
+				$myobj->add_hint("outscalecolor",$outcol->as_html());
+				
+				$myobj->colours[IN] = $incol;
+				$myobj->colours[OUT] = $outcol;
 
 				### warn("TAGS (setting) |$inscaletag| |$outscaletag| \n");
 
@@ -916,6 +931,12 @@ function ColourFromPercent($image, $percent,$scalename="DEFAULT",$name="")
 	$nowarn_clipping = intval($this->get_hint("nowarn_clipping"));
 	$nowarn_scalemisses = intval($this->get_hint("nowarn_scalemisses"));
 
+	$bt = debug_backtrace();
+	$function = (isset($bt[1]['function']) ? $bt[1]['function'] : '');
+	print "$function calls ColourFromPercent\n";
+
+	exit();
+
 	if(isset($this->colours[$scalename]))
 	{
 		$colours=$this->colours[$scalename];
@@ -998,6 +1019,7 @@ function NewColourFromPercent($percent,$scalename="DEFAULT",$name="")
 	$nowarn_clipping = intval($this->get_hint("nowarn_clipping"));
 	$nowarn_scalemisses = intval($this->get_hint("nowarn_scalemisses"));
 
+	
 	if(isset($this->colours[$scalename]))
 	{
 		$colours=$this->colours[$scalename];
@@ -1056,7 +1078,7 @@ function NewColourFromPercent($percent,$scalename="DEFAULT",$name="")
 	if ($percent == 0) { return array(new Colour(192,255,192),'',''); }
 
 	// and you'll only get white for a link with no colour assigned
-	if($nowarn_scalemisses==0) warn("ColourFromPercent: Scale $scalename doesn't cover $percent% for $name [WMWARN29]\n");
+	if($nowarn_scalemisses==0) warn("NewColourFromPercent: Scale $scalename doesn't cover $percent% for $name [WMWARN29]\n");
 	return array(new Colour(255,255,255),'','');
 }
 
@@ -1133,10 +1155,11 @@ function DrawLegend_Horizontal($im,$scalename="DEFAULT",$width=400)
 				$this->colours['DEFAULT']['KEYTEXT'][$scale_ref]);
 		}
 
-		list($col,$junk) = $this->ColourFromPercent($scale_im, $p,$scalename);
+		list($col,$junk) = $this->NewColourFromPercent($p,$scalename);
+		$cc = $col->gdallocate($scale_im);
 		wimagefilledrectangle($scale_im, $scale_left + $dx - $scalefactor/2, $scale_top,
 			$scale_left + $dx + $scalefactor/2, $scale_bottom,
-			$col);
+			$cc);
 	}
 
 	imagecopy($im,$scale_im,$this->keyx[$scalename],$this->keyy[$scalename],0,0,imagesx($scale_im),imagesy($scale_im));
@@ -1224,10 +1247,11 @@ function DrawLegend_Vertical($im,$scalename="DEFAULT",$height=400,$inverted=fals
 				$labelstring,  $this->colours['DEFAULT']['KEYTEXT'][$scale_ref]);
 		}
 
-		list($col,$junk) = $this->ColourFromPercent($scale_im, $p,$scalename);
+		list($col,$junk) = $this->NewColourFromPercent($p,$scalename);
+		$cc = $col->gdallocate($scale_im);
 		wimagefilledrectangle($scale_im, $scale_left, $scale_top + $dy - $scalefactor/2,
 			$scale_right, $scale_top + $dy + $scalefactor/2,
-			$col);
+			$cc);
 	}
 
 	imagecopy($im,$scale_im,$this->keyx[$scalename],$this->keyy[$scalename],0,0,imagesx($scale_im),imagesy($scale_im));
@@ -2131,10 +2155,18 @@ function ReadConfig($input)
 					$curlink->$field=array(	$matches[3],$matches[4],$matches[5]);
 					$linematched++;
 				}
+				
 				if($val == 'none' && ($key=='BWBOX' || $key=='BWOUTLINE' || $key=='OUTLINE'))
 				{
 					// print "***********************************\n";
 					$curlink->$field=array(-1,-1,-1);
+					$linematched++;
+				}
+				
+				if($val == 'contrast' && $key=='COMMENTFONT')
+				{
+					// print "***********************************\n";
+					$curlink->$field=array(-3,-3,-3);
 					$linematched++;
 				}
 			}
@@ -2899,10 +2931,12 @@ function PreloadMapHTML()
 							$mid_y=($a_y + $b_y) / 2;
 						}
 						$left=""; $above="";
+						$img_extra = "";
 					
 						if ($myobj->overlibwidth != 0)
 						{
 							$left="WIDTH," . $myobj->overlibwidth . ",";
+							$img_extra .= " WIDTH=$myobj->overlibwidth";
 
 							if ($mid_x > $center_x) $left.="LEFT,";
 						}
@@ -2910,6 +2944,7 @@ function PreloadMapHTML()
 						if ($myobj->overlibheight != 0)
 						{
 							$above="HEIGHT," . $myobj->overlibheight . ",";
+							$img_extra .= " HEIGHT=$myobj->overlibheight";
 
 							if ($mid_y > $center_y) $above.="ABOVE,";
 						}
@@ -2928,7 +2963,7 @@ function PreloadMapHTML()
 								foreach ($myobj->overliburl[$dir] as $url)
 								{
 									if($n>0) { $overlibhtml .= '&lt;br /&gt;'; }
-									$overlibhtml .= "&lt;img src=" . $this->ProcessString($url,$myobj) . "&gt;";
+									$overlibhtml .= "&lt;img $img_extra src=" . $this->ProcessString($url,$myobj) . "&gt;";
 									$n++;
 								}
 							}

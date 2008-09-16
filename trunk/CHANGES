@@ -20,10 +20,12 @@
 	ADDED - Cacti plugin adds links in 'user' pages to management screen (if you are an admin)
 	ADDED - HTMLSTYLESHEET keyword allows you to specify a URL for a CSS stylesheet (CLI tool only)
 	ADDED - A few extra CSS id and class attributes, to make styling the page easier.
+        ADDED - New token: in/outscalecolor contains HTML colour code of node/link colours for use in NOTES
         ADDED - New NODES offset type - angle+radius
         ADDED - New NODES offset type - compass-point+percentage
         ADDED - "KEYSTYLE inverted" - to get a thermometer-style vertical legend.
         ADDED - "COMMENTSTYLE center" to make comments run along the centre of a link arrow. (and 'edge' for the usual)
+        ADDED - COMMENTFONTCOLOR accepts 'contrast' as an option, for when it's 
 	CHANGE - Cacti plugin uses "processed" map title now (allows {} tokens in the title)
 	CHANGE - A NODE with no POSITION is not drawn, instead of drawn at 0,0. Useful for templates.
 	CHANGE - A LINK with no NODES is no longer an error. Also for templates.

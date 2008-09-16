@@ -25,6 +25,7 @@ class WeatherMapLink extends WeatherMapItem
 	var $targets = array();
 	var $a_offset,             $b_offset;
 	var $in_ds,                $out_ds;
+	var $colours = array();
 	var $selected;
 	var $inpercent,            $outpercent;
 	var $inherit_fieldlist;
@@ -141,6 +142,9 @@ class WeatherMapLink extends WeatherMapItem
 		}
 	}
 
+// image = GD image references
+// col = array of Colour objects
+// widths = array of link widths
 	function DrawComments($image,$col,$widths)
 	{
 		$curvepoints =& $this->curvepoints;
@@ -249,7 +253,7 @@ class WeatherMapLink extends WeatherMapItem
 				
 				// FINALLY, draw the text!
 				# imagefttext($image, $fontsize, $angle, $edge_x, $edge_y, $col, $font,$comment);
-				$this->owner->myimagestring($image, $this->commentfont, $edge_x, $edge_y, $comment, $col, $angle);
+				$this->owner->myimagestring($image, $this->commentfont, $edge_x, $edge_y, $comment, $col[$dir], $angle);
 				#imagearc($image,$x,$y,10,10,0, 360,$this->owner->selected);
 				#imagearc($image,$edge_x,$edge_y,10,10,0, 360,$this->owner->selected);
 			}
@@ -260,7 +264,7 @@ class WeatherMapLink extends WeatherMapItem
 	{
 		// Get the positions of the end-points
 		$x1=$map->nodes[$this->a->name]->x;
-	    $y1=$map->nodes[$this->a->name]->y;
+		$y1=$map->nodes[$this->a->name]->y;
 
 		$x2=$map->nodes[$this->b->name]->x;
 		$y2=$map->nodes[$this->b->name]->y;
@@ -283,24 +287,11 @@ class WeatherMapLink extends WeatherMapItem
 		$x2+=$dx;
 		$y2+=$dy;
 
-		$outline_colour=NULL;
-		$comment_colour=NULL;
-
-		if ($this->outlinecolour != array(-1,-1,-1))
-		{
-			//debug("Outline colour is NOT none for ".$this->name." ".$this->outlinecolour."\n");
-				$outline_colour=myimagecolorallocate(
-					$im, $this->outlinecolour[0], $this->outlinecolour[1],
-					$this->outlinecolour[2]);
-		}	
+		$outlinecol = new Colour($this->outlinecolour);
+		$commentcol = new Colour($this->commentfontcolour);
 		
-		if ($this->commentfontcolour != array(-1,-1,-1))
-		{
-				$comment_colour=myimagecolorallocate(
-					$im, $this->commentfontcolour[0], $this->commentfontcolour[1],
-					$this->commentfontcolour[2]);
-		}
-
+		$outline_colour = $outlinecol->gdallocate($im);
+				
 		$xpoints = array ( );
 		$ypoints = array ( );
 
@@ -326,8 +317,14 @@ class WeatherMapLink extends WeatherMapItem
 		$xpoints[]=$x2;
 		$ypoints[]=$y2;
 
-		list($link_in_colour,$link_in_scalekey, $link_in_scaletag) = $map->ColourFromPercent($im, $this->inpercent,$this->usescale,$this->name);
-		list($link_out_colour,$link_out_scalekey, $link_out_scaletag) = $map->ColourFromPercent($im, $this->outpercent,$this->usescale,$this->name);
+		# list($link_in_colour,$link_in_scalekey, $link_in_scaletag) = $map->NewColourFromPercent($this->inpercent,$this->usescale,$this->name);
+		# list($link_out_colour,$link_out_scalekey, $link_out_scaletag) = $map->NewColourFromPercent($this->outpercent,$this->usescale,$this->name);
+		
+		$link_in_colour = $this->colours[IN];
+		$link_out_colour = $this->colours[OUT];
+		
+		$gd_in_colour = $link_in_colour->gdallocate($im);
+		$gd_out_colour = $link_out_colour->gdallocate($im);
 		
 	//	$map->links[$this->name]->inscalekey = $link_in_scalekey;
 	//	$map->links[$this->name]->outscalekey = $link_out_scalekey;
@@ -355,7 +352,7 @@ class WeatherMapLink extends WeatherMapItem
 										
 			// then draw the curve itself
 			draw_curve($im, $this->curvepoints,
-				array($link_in_width,$link_out_width), $outline_colour, array($link_in_colour, $link_out_colour),
+				array($link_in_width,$link_out_width), $outline_colour, array($gd_in_colour, $gd_out_colour),
 				$this->name, $map, $this->splitpos, ($this->linkstyle=='oneway'?TRUE:FALSE) );
 		}
 		
@@ -369,11 +366,28 @@ class WeatherMapLink extends WeatherMapItem
 							
 			// then draw the "curve" itself
 			draw_straight($im, $this->curvepoints,
-				array($link_in_width,$link_out_width), $outline_colour, array($link_in_colour, $link_out_colour),
+				array($link_in_width,$link_out_width), $outline_colour, array($gd_in_colour, $gd_out_colour),
 				$this->name, $map, 50, ($this->linkstyle=='oneway'?TRUE:FALSE) );
 		}
 
-		$this->DrawComments($im,$comment_colour,array($link_in_width*1.1,$link_out_width*1.1));
+		if ( !$commentcol->is_none() )
+		{			
+			if($commentcol->is_contrast())
+			{
+				$commentcol_in = $link_in_colour->contrast();
+				$commentcol_out = $link_out_colour->contrast();
+			}
+			else
+			{
+				$commentcol_in = $commentcol;
+				$commentcol_out = $commentcol;
+			}
+		
+			$comment_colour_in = $commentcol_in->gdallocate($im);
+			$comment_colour_out = $commentcol_out->gdallocate($im);
+			
+			$this->DrawComments($im,array($comment_colour_in, $comment_colour_out),array($link_in_width*1.1,$link_out_width*1.1));
+		}
 
 		$curvelength = $this->curvepoints[count($this->curvepoints)-1][2];
 		// figure out where the labels should be, and what the angle of the curve is at that point

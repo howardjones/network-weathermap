@@ -1191,11 +1191,18 @@ class Colour
 	// - things like scale colours are used in multiple images now (the scale, several nodes, the main map...)
 	function gdallocate($image_ref)
 	{
-		return(myimagecolorallocate($image_ref, $this->r, $this->g, $this->b));
+		if($this->is_none())
+		{
+			return NULL;
+		}
+		else
+		{
+			return(myimagecolorallocate($image_ref, $this->r, $this->g, $this->b));
+		}
 	}
 	
 	// based on an idea from: http://www.bennadel.com/index.cfm?dax=blog:902.view
-	function contrast()
+	function contrast_ary()
 	{
 		if( (($this->r + $this->g + $this->b) > 500)
 		 || ($this->g > 140)
@@ -1207,6 +1214,11 @@ class Colour
 		{
 			return( array(255,255,255) );
 		}
+	}
+	
+	function contrast()
+	{
+		return( new Colour($this->contrast_ary() ) );
 	}
 	
 	// make a printable version, for debugging

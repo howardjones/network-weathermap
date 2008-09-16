@@ -13,9 +13,9 @@ TAG + {node:tagged:name}
 
 POSITION relative to a variable {node:tagged:name} - means evaluating relative positions a lot later
 
-define inscalecolor_html as well
+DONE!  define inscalecolor_html as well
 
-Use OVERLIBGRAPH, OVERLIBHEIGHT in <IMG> tag. (glen walker)
+DONE!  Use OVERLIBGRAPH, OVERLIBHEIGHT in <IMG> tag. (glen walker)
 
 ProcessString for timepos string
 (+ some formatted date strings for use elsewhere?)
@@ -70,15 +70,17 @@ spaces in filenames/targets where appropriate - quotes, and escaped quotes "([^\
 Angled VIAs
 more AICONs - NINK, PIE, GAUGE
 (multiline (bw)labels? - interpret \n)
+'none' for SCALE (not gradient)
+DONE!  COMMENTSTYLE (edge|center)
+DONE!  contrast for commentcolor (when using 'COMMENTSTYLE center')
+
 Coverage/Usage stats
 WUG DS
 Nagios DS
 Solarwinds Orion DS
 Nabbix DS
 RRD xport DS (use rrdtool graph and PRINT in fact)
-'none' for SCALE (not gradient)
-COMMENTSTYLE (edge|center)
-contrast for commentcolor (when using 'COMMENTSTYLE center')
+
 
 FIXED  Fix a few docs bugs with unclosed tags - actually this is some kind of processing bug to do with <div>s
 

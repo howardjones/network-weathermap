@@ -19,6 +19,7 @@ class WeatherMapNode extends WeatherMapItem
 	var $name;
 	var $infourl = array();
 	var $notes;
+	var $colours = array();
 	var $overliburl;
 	var $overlibwidth,
 		$overlibheight;
@@ -616,12 +617,12 @@ class WeatherMapNode extends WeatherMapItem
 			{
 				if($col->is_real())
 				{
-					$txcol = new Colour($col->contrast());
+					$txcol = $col->contrast();
 				}
 				else
 				{
 					warn("You can't make a contrast with 'none'.\n");
-					$txcol = new Colour(255,0,255);
+					$txcol = new Colour(0,0,0);
 				}
 			}
 			$map->myimagestring($node_im, $this->labelfont, $txt_x, $txt_y, $this->proclabel, $txcol->gdallocate($node_im),$this->labelangle);

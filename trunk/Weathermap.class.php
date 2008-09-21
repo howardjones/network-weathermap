@@ -834,14 +834,14 @@ function ReadData()
 				# $myobj->outscaletag = $outscaletag;
 				
 				
-				$myobj->add_hint("inscalekey",$inscalekey);
-				$myobj->add_hint("outscalekey",$outscalekey);
+				$myobj->add_note("inscalekey",$inscalekey);
+				$myobj->add_note("outscalekey",$outscalekey);
 				
-				$myobj->add_hint("inscaletag",$inscaletag);
-				$myobj->add_hint("outscaletag",$outscaletag);
+				$myobj->add_note("inscaletag",$inscaletag);
+				$myobj->add_note("outscaletag",$outscaletag);
 				
-				$myobj->add_hint("inscalecolor",$incol->as_html());
-				$myobj->add_hint("outscalecolor",$outcol->as_html());
+				$myobj->add_note("inscalecolor",$incol->as_html());
+				$myobj->add_note("outscalecolor",$outcol->as_html());
 				
 				$myobj->colours[IN] = $incol;
 				$myobj->colours[OUT] = $outcol;

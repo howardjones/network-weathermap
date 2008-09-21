@@ -153,17 +153,19 @@ class WeatherMapNode extends WeatherMapItem
 			if($this->scalevar == 'in')
 			{
 				$pc = $this->inpercent;
+				$col = $this->colours[IN];
 
 			}
 			if($this->scalevar == 'out')
 			{
 				$pc = $this->outpercent;
+				$col = $this->colours[OUT];
 
 			}
 
 			// debug("Choosing NODE BGCOLOR for ".$this->name." based on $pc %\n");
 
-			    list($col,$node_scalekey,$node_scaletag) = $map->NewColourFromPercent($pc, $this->usescale,$this->name);
+			    // list($col,$node_scalekey,$node_scaletag) = $map->NewColourFromPercent($pc, $this->usescale,$this->name);
 			    // $map->nodes[$this->name]->scalekey = $node_scalekey;
 		}
 		elseif($this->labelbgcolour != array(-1,-1,-1))
@@ -179,11 +181,17 @@ class WeatherMapNode extends WeatherMapItem
 			$pc = 0;
 
 			if($this->iconscalevar == 'in')
+			{
 				$pc = $this->inpercent;
+				$col = $this->colours[IN];
+			}
 			if($this->iconscalevar == 'out')
+			{
 				$pc = $this->outpercent;
+				$col = $this->colours[OUT];
+			}
 
-			list($colicon,$node_iconscalekey,$icontag) = $map->NewColourFromPercent($pc, $this->useiconscale,$this->name);
+			# list($colicon,$node_iconscalekey,$icontag) = $map->NewColourFromPercent($pc, $this->useiconscale,$this->name);
 		}
 
 		// figure out a bounding rectangle for the label
@@ -346,8 +354,11 @@ class WeatherMapNode extends WeatherMapItem
 					$size = $this->iconscalew;
 					$quarter = $size/4;				
 										
-					list($col1,$node_scalekey,$node_scaletag) = $map->NewColourFromPercent($this->inpercent, $this->usescale,$this->name);
-					list($col2,$node_scalekey,$node_scaletag) = $map->NewColourFromPercent($this->outpercent, $this->usescale,$this->name);
+					# list($col1,$node_scalekey,$node_scaletag) = $map->NewColourFromPercent($this->inpercent, $this->usescale,$this->name);
+					# list($col2,$node_scalekey,$node_scaletag) = $map->NewColourFromPercent($this->outpercent, $this->usescale,$this->name);
+					
+					$col1 = $this->colours[IN];
+					$col2 = $this->colours[OUT];
 					
 					assert('!is_null($col1)');
 					assert('!is_null($col2)');
@@ -377,6 +388,7 @@ class WeatherMapNode extends WeatherMapItem
 					// print "NINK ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n";
 				}
 				
+				// XXX - needs proper colours
 				if($this->iconfile=='inpie' || $this->iconfile=='outpie') { 
 					# list($colpie,$node_iconscalekey,$icontag) = $map->NewColourFromPercent($pc, $this->useiconscale,$this->name);
 					

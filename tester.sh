@@ -48,13 +48,30 @@ for conf in ${CONFIGS}; do
 #	sort < tests/${TESTNAME}.cfg > tests/${TESTNAME}.sorted2
 #	diff tests/${TESTNAME}.sorted tests/${TESTNAME}.sorted2
 
-	echo "<p><a href='${TESTNAME}.png'>This</a> vs <a href='${TESTNAME}-2.png'>This</a>.<br />"  >> tests/results.html
+	echo "<p><a href='${TESTNAME}.png'>This</a> vs <a href='${TEST2NAME}.png'>This</a>.<br />"  >> tests/results.html
 	echo "<img src='${TESTNAME}-compare.png'><br />" >> tests/results.html
 	
 done
 
-compare tests/last-release-suite-1.png tests/random-bits_suite-1-2.png tests/suite-1-release-compare.png
-compare tests/last-release-suite-2.png tests/random-bits_suite-2-2.png tests/suite-2-release-compare.png
 	echo "<h1>Against Previous Release Version:</h1>" >> tests/results.html
-	echo "<img src='suite-1-release-compare.png'><br />" >> tests/results.html
-	echo "<img src='suite-2-release-compare.png'><br />" >> tests/results.html
+
+TESTNAME=last-release-suite-1.png
+TEST2NAME=random-bits_suite-1-2.png
+RESULT=suite-1-release-compare.png
+
+compare tests/${TESTNAME} tests/${TEST2NAME} tests/${RESULT}
+echo "<p><a href='${TESTNAME}'>This</a> vs <a href='${TEST2NAME}'>This</a>.<br />"  >> tests/results.html
+echo "<img src='${RESULT}'><br />" >> tests/results.html
+
+
+TESTNAME=last-release-suite-2.png
+TEST2NAME=random-bits_suite-2-2.png
+RESULT=suite-2-release-compare.png
+
+compare tests/${TESTNAME} tests/${TEST2NAME} tests/${RESULT}
+echo "<p><a href='${TESTNAME}'>This</a> vs <a href='${TEST2NAME}'>This</a>.<br />"  >> tests/results.html
+echo "<img src='${RESULT}'><br />" >> tests/results.html
+
+
+
+

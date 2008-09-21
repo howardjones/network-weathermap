@@ -1074,11 +1074,14 @@ function NewColourFromPercent($percent,$scalename="DEFAULT",$name="")
 		}
 	}
 
+	// shouldn't really get down to here if there's a complete SCALE
+
 	// you'll only get grey for a COMPLETELY quiet link if there's no 0 in the SCALE lines
-	if ($percent == 0) { return array(new Colour(192,255,192),'',''); }
+	if ($percent == 0) { return array(new Colour(192,192,192),'',''); }
+
+	if($nowarn_scalemisses==0) warn("NewColourFromPercent: Scale $scalename doesn't cover $percent% for $name [WMWARN29]\n");
 
 	// and you'll only get white for a link with no colour assigned
-	if($nowarn_scalemisses==0) warn("NewColourFromPercent: Scale $scalename doesn't cover $percent% for $name [WMWARN29]\n");
 	return array(new Colour(255,255,255),'','');
 }
 

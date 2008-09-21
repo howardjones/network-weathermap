@@ -807,9 +807,9 @@ function draw_curve($image, &$curvepoints, $widths, $outlinecolour, $fillcolours
 		if ($direction < 0) $arrayindex=1;
 
 		if (!is_null($fillcolours[$arrayindex]))
-			{ wimagefilledpolygon($image, $there_points, count($there_points) / 2, $arrowsettings[$dir][4]); 
-				
-			}
+		{
+			wimagefilledpolygon($image, $there_points, count($there_points) / 2, $arrowsettings[$dir][4]); 
+		}
 		
 		$areaname = "LINK:" . $linkname. ":$dir";
 		$map->imap->addArea("Polygon", $areaname, '', $there_points);

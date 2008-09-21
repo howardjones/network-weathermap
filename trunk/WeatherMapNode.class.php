@@ -478,11 +478,14 @@ class WeatherMapNode extends WeatherMapItem
 
 						}
 					}
-					else { warn ("Couldn't open PNG ICON: " . $this->iconfile . " - is it a PNG?\n"); }
+					else { warn ("Couldn't open PNG ICON: '" . $this->iconfile . "' - is it a PNG, JPEG or GIF?\n"); }
 				}
 				else
 				{
-					warn ("ICON " . $this->iconfile . " does not exist, or is not readable. Check path and permissions.\n");
+					if($this->iconfile != 'none')
+					{
+						warn ("ICON '" . $this->iconfile . "' does not exist, or is not readable. Check path and permissions.\n");
+					}
 				}
 			}
 

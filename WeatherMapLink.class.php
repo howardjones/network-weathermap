@@ -1,4 +1,4 @@
-col<?php
+<?php
 // PHP Weathermap 0.95b
 // Copyright Howard Jones, 2005-2008 howie@thingy.com
 // http://www.network-weathermap.com/

@@ -1159,10 +1159,13 @@ function DrawLegend_Horizontal($im,$scalename="DEFAULT",$width=400)
 		}
 
 		list($col,$junk) = $this->NewColourFromPercent($p,$scalename);
-		$cc = $col->gdallocate($scale_im);
-		wimagefilledrectangle($scale_im, $scale_left + $dx - $scalefactor/2, $scale_top,
-			$scale_left + $dx + $scalefactor/2, $scale_bottom,
-			$cc);
+		if($col->is_real())
+		{
+			$cc = $col->gdallocate($scale_im);
+			wimagefilledrectangle($scale_im, $scale_left + $dx - $scalefactor/2, $scale_top,
+				$scale_left + $dx + $scalefactor/2, $scale_bottom,
+				$cc);
+		}
 	}
 
 	imagecopy($im,$scale_im,$this->keyx[$scalename],$this->keyy[$scalename],0,0,imagesx($scale_im),imagesy($scale_im));
@@ -1251,10 +1254,13 @@ function DrawLegend_Vertical($im,$scalename="DEFAULT",$height=400,$inverted=fals
 		}
 
 		list($col,$junk) = $this->NewColourFromPercent($p,$scalename);
-		$cc = $col->gdallocate($scale_im);
-		wimagefilledrectangle($scale_im, $scale_left, $scale_top + $dy - $scalefactor/2,
-			$scale_right, $scale_top + $dy + $scalefactor/2,
-			$cc);
+		if( $col->is_real())
+		{
+			$cc = $col->gdallocate($scale_im);
+			wimagefilledrectangle($scale_im, $scale_left, $scale_top + $dy - $scalefactor/2,
+				$scale_right, $scale_top + $dy + $scalefactor/2,
+				$cc);
+		}
 	}
 
 	imagecopy($im,$scale_im,$this->keyx[$scalename],$this->keyy[$scalename],0,0,imagesx($scale_im),imagesy($scale_im));
@@ -2472,17 +2478,26 @@ function WriteConfig($filename)
 
 					$tag = (isset($colour['tag'])? $colour['tag']:'');
 
-					if (!isset($colour['red2']))
+					if( ($colour['red1'] == -1) && ($colour['green1'] == -1) && ($colour['blue1'] == -1))
+					{
+						$output.=sprintf("SCALE %s %s %s   none  %s\n", $scalename,
+							$bottom, $top, $tag);
+					}
+					elseif (!isset($colour['red2']))
+					{
 						$output.=sprintf("SCALE %s %s %s   %d %d %d  %s\n", $scalename,
 							$bottom, $top,
 							$colour['red1'],            $colour['green1'], $colour['blue1'],$tag);
+					}
 					else
+					{
 						$output.=sprintf("SCALE %s %s %s   %d %d %d   %d %d %d  %s\n", $scalename,
 							$bottom, $top,
 							$colour['red1'],
 							$colour['green1'],                     $colour['blue1'],
 							$colour['red2'],                       $colour['green2'],
 							$colour['blue2'], $tag);
+					}
 				}
 				else { $output.=sprintf("%sCOLOR %d %d %d\n", $k, $colour['red1'], $colour['green1'],
 					$colour['blue1']); }

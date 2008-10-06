@@ -596,16 +596,20 @@ function calc_arrowsize($width,&$map,$linkname)
 	$arrowlengthfactor=4;
 	$arrowwidthfactor=2;
 
-	if ($map->links[$linkname]->arrowstyle == 'compact')
+	// this is so I can use it in some test code - sorry!
+	if($map !== NULL)
 	{
-		$arrowlengthfactor=1;
-		$arrowwidthfactor=1;
-	}
-
-	if (preg_match('/(\d+) (\d+)/', $map->links[$linkname]->arrowstyle, $matches))
-	{
-		$arrowlengthfactor=$matches[1];
-		$arrowwidthfactor=$matches[2];
+		if ($map->links[$linkname]->arrowstyle == 'compact')
+		{
+			$arrowlengthfactor=1;
+			$arrowwidthfactor=1;
+		}
+	
+		if (preg_match('/(\d+) (\d+)/', $map->links[$linkname]->arrowstyle, $matches))
+		{
+			$arrowlengthfactor=$matches[1];
+			$arrowwidthfactor=$matches[2];
+		}
 	}
 
 	$arrowsize = $width * $arrowlengthfactor;
@@ -1274,6 +1278,8 @@ function wimagecreate($width,$height)
 
 function wimagefilledrectangle( $image ,$x1, $y1, $x2, $y2, $color )
 {
+	if ($color===NULL) return;
+	
 	$col = imagecolorsforindex($image, $color);
 	$r = $col['red']; $g = $col['green']; $b = $col['blue']; $a = $col['alpha'];
 	$r = $r/255; $g=$g/255; $b=$b/255; $a=(127-$a)/127;
@@ -1284,6 +1290,8 @@ function wimagefilledrectangle( $image ,$x1, $y1, $x2, $y2, $color )
 
 function wimagerectangle( $image ,$x1, $y1, $x2, $y2, $color )
 {
+	if ($color===NULL) return;
+	
 	$col = imagecolorsforindex($image, $color);
 	$r = $col['red']; $g = $col['green']; $b = $col['blue']; $a = $col['alpha'];
 	$r = $r/255; $g=$g/255; $b=$b/255; $a=(127-$a)/127;
@@ -1294,6 +1302,8 @@ function wimagerectangle( $image ,$x1, $y1, $x2, $y2, $color )
 
 function wimagepolygon($image, $points, $num_points, $color)
 {
+	if ($color===NULL) return;
+	
 	$col = imagecolorsforindex($image, $color);
 	$r = $col['red']; $g = $col['green']; $b = $col['blue']; $a = $col['alpha'];
 	$r = $r/255; $g=$g/255; $b=$b/255; $a=(127-$a)/127;
@@ -1312,6 +1322,8 @@ function wimagepolygon($image, $points, $num_points, $color)
 
 function wimagefilledpolygon($image, $points, $num_points, $color)
 {
+	if ($color===NULL) return;
+	
 	$col = imagecolorsforindex($image, $color);
 	$r = $col['red']; $g = $col['green']; $b = $col['blue']; $a = $col['alpha'];
 	$r = $r/255; $g=$g/255; $b=$b/255; $a=(127-$a)/127;
@@ -1330,6 +1342,7 @@ function wimagefilledpolygon($image, $points, $num_points, $color)
 
 function wimagecreatetruecolor($width, $height)
 {
+	
 
 	metadump("BLANKIMAGE $width $height");
 
@@ -1339,6 +1352,7 @@ function wimagecreatetruecolor($width, $height)
 
 function wimagettftext($image, $size, $angle, $x, $y, $color, $file, $string)
 {
+	if ($color===NULL) return;
 
 	$col = imagecolorsforindex($image, $color);
 	$r = $col['red']; $g = $col['green']; $b = $col['blue']; $a = $col['alpha'];

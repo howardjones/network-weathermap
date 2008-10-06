@@ -45,7 +45,11 @@ class WeatherMapDataSource_mrtg extends WeatherMapDataSource {
 				if (preg_match("/<\!-- ${matchvalue}out $matchperiod ([-+]?\d+\.?\d*) -->/", $buffer, $matches)) { $data[OUT] = $matches[1] * 8; }
 			}
 			fclose($fd);
-			$data_time = filemtime($targetstring);
+			# don't bother with the modified time if the target is a URL
+			if(! preg_match('/^[a-z]+:\/\/',$targetstring) )
+			{
+				$data_time = filemtime($targetstring);
+			}
 		}
 		else
 		{

@@ -1177,6 +1177,16 @@ class Vector
 		$this->dy = $dy;
 	}
 	
+	function get_normal()
+	{
+		$len = $this->length();
+		
+		$nx1 = $this->dy / $len;
+		$ny1 = -$this->dx / $len;
+		
+		return( new Vector($nx1, $ny1));
+	}
+	
 	function normalise()
 	{
 		$len = $this->length();

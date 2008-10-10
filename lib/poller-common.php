@@ -102,7 +102,7 @@ function weathermap_run_maps($mydir) {
 					foreach ($queryrows as $map) {
 						// reset the warning counter
 						$weathermap_warncount=0;
-						
+						// this is what will prefix log entries for this map
 						$weathermap_map = "[Map ".$map['id']."] ".$map['configfile'];
 						
 						if(weathermap_check_cron($weathermap_poller_start_time,$map['schedule']))

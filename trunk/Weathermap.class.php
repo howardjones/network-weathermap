@@ -1685,6 +1685,9 @@ function ReadConfig($input)
 					array('NODE', "/^\s*POSITION\s+(\S+)\s+([-+]?\d+)r(\d+)\s*$/i", array('x'=>2,'y'=>3,'original_x'=>2,'original_y'=>3,'relative_to'=>1,'polar'=>TRUE,'relative_resolved'=>FALSE))
 					);
 
+			// alternative for use later where quoted strings are more useful
+			$args = ParseString($buffer);
+
 			// this loop replaces a whole pile of duplicated ifs with something with consistent handling 
 			foreach ($config_keywords as $keyword)
 			{

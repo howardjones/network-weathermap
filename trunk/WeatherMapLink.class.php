@@ -1,5 +1,5 @@
 <?php
-// PHP Weathermap 0.95b
+// PHP Weathermap 0.96dev
 // Copyright Howard Jones, 2005-2008 howie@thingy.com
 // http://www.network-weathermap.com/
 // Released under the GNU Public License
@@ -128,6 +128,10 @@ class WeatherMapLink extends WeatherMapItem
 			$this->CopyFrom($this->owner->links[$template]); 
 		}
 		$this->template = $template;
+		
+		// to stop the editor tanking, now that colours are decided earlier in ReadData
+		$this->colours[IN] = new Colour(192,192,192);
+		$this->colours[OUT] = new Colour(192,192,192);
 	}
 
 	function my_type() {  return "LINK"; }

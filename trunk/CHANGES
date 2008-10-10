@@ -30,6 +30,7 @@
 	CHANGE - A NODE with no POSITION is not drawn, instead of drawn at 0,0. Useful for templates.
 	CHANGE - A LINK with no NODES is no longer an error. Also for templates.
 	CHANGE - The link_bulge secret mode bulges each side of a link independently now
+        CHANGE - whitespace is stripped from the beginning and end of each line before parsing
 	FIXED - Renaming a node in the editor correctly handles other relatively-positioned nodes
 	FIXED - Minor issue with CRLF in map title for Cacti Plugin
 	FIXED - CLI tool set --define options incorrectly.

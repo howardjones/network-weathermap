@@ -1,5 +1,5 @@
 <?php
-// PHP Weathermap 0.95b
+// PHP Weathermap 0.96dev
 // Copyright Howard Jones, 2005-2008 howie@thingy.com
 // http://www.network-weathermap.com/
 // Released under the GNU Public License
@@ -11,26 +11,23 @@ class WeatherMapNode extends WeatherMapItem
 	var $owner;
 	var $x,	$y;
 	var $original_x, $original_y,$relative_resolved;
-	var $width,
-		$height;
-	var $label, $proclabel,
-		$labelfont;
+	var $width, $height;
+	var $label, $proclabel, $labelfont;
 	var $labelangle;
 	var $name;
 	var $infourl = array();
 	var $notes;
 	var $colours = array();
 	var $overliburl;
-	var $overlibwidth,
-		$overlibheight;
+	var $overlibwidth, $overlibheight;
 	var $overlibcaption = array();
 	var $maphtml;
 	var $selected = 0;
 	var $iconfile, $iconscalew, $iconscaleh;
 	var $targets = array();
-	var $bandwidth_in,         $bandwidth_out;
+	var $bandwidth_in, $bandwidth_out;
 	var $inpercent, $outpercent;
-	var $max_bandwidth_in,     $max_bandwidth_out;
+	var $max_bandwidth_in, $max_bandwidth_out;
 	var $max_bandwidth_in_cfg, $max_bandwidth_out_cfg;
 	var $labeloffset, $labeloffsetx, $labeloffsety;
 
@@ -711,6 +708,10 @@ class WeatherMapNode extends WeatherMapItem
 			$this->CopyFrom($this->owner->nodes[$template]); 
 		}
 		$this->template = $template;
+		
+		// to stop the editor tanking, now that colours are decided earlier in ReadData
+		$this->colours[IN] = new Colour(192,192,192);
+		$this->colours[OUT] = new Colour(192,192,192);
 	}
 
 	function CopyFrom(&$source)

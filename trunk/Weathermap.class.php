@@ -10,7 +10,7 @@ require_once "WeatherMap.functions.php";
 require_once "WeatherMapNode.class.php";
 require_once "WeatherMapLink.class.php";
 
-$WEATHERMAP_VERSION="0.96test1";
+$WEATHERMAP_VERSION="0.96test2";
 $weathermap_debugging=FALSE;
 $weathermap_map="";
 $weathermap_warncount=0;
@@ -498,6 +498,19 @@ class WeatherMap extends WeatherMapBase
 						if( ($itemname == "this") && ($type == strtolower($context->my_type())) )
 						{
 							$the_item = $context;
+						}
+						elseif( strtolower($context->my_type()) == "link" && $type == 'node' && ($itemname == '_linkstart_' || $itemname == '_linkend_') )
+						{
+							// this refers to the two nodes at either end of this link
+							if($itemname == '_linkstart_')
+							{
+								$the_item = $context->a;
+							}
+							
+							if($itemname == '_linkend_')
+							{
+								$the_item = $context->b;
+							}
 						}
 						elseif( ($itemname == "parent") && ($type == strtolower($context->my_type())) && ($type=='node') && ($context->relative_to != '') )
 						{
@@ -1365,7 +1378,8 @@ function DrawLegend_Classic($im,$scalename="DEFAULT")
 						{
 							$percent
 								=  $fudgefactor + $colour['bottom'] + ($n / $tilewidth) * ($colour['top'] - $colour['bottom']);
-							list($col,$junk) = $this->ColourFromPercent($scale_im, $percent,$scalename);
+							list($ccol,$junk) = $this->NewColourFromPercent($percent,$scalename);
+							$col = $ccol->gdallocate($scale_im);
 							wimagefilledrectangle($scale_im, $x + $n, $y, $x + $n, $y + $tileheight,
 								$col);
 						}
@@ -1374,7 +1388,8 @@ function DrawLegend_Classic($im,$scalename="DEFAULT")
 					{
 						// pick a percentage in the middle...
 						$percent=($colour['bottom'] + $colour['top']) / 2;
-						list($col,$junk) = $this->ColourFromPercent($scale_im, $percent,$scalename);
+						list($ccol,$junk) = $this->NewColourFromPercent($percent,$scalename);
+						$col = $ccol->gdallocate($scale_im);
 						wimagefilledrectangle($scale_im, $x, $y, $x + $tilewidth, $y + $tileheight,
 							$col);
 					}
@@ -1497,6 +1512,8 @@ function ReadConfig($input)
 		}
 		else
 		{
+			$buffer = trim($buffer);
+			
 			// for any other config elements that are shared between nodes and links, they can use this
 			unset($curobj);
 			$curobj = NULL;

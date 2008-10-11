@@ -35,6 +35,10 @@ define('FMT_UNFORM_OUT',"{link:this:bandwidth_out}");
 define('FMT_PERC_IN',"{link:this:inpercent:%.2f}%");
 define('FMT_PERC_OUT',"{link:this:outpercent:%.2f}%");
 
+// the fields within a spine triple
+define("X",0);
+define("Y",1);
+define("DISTANCE",2);
 
 // ***********************************************
 

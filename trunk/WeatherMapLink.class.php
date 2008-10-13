@@ -473,7 +473,7 @@ class WeatherMapLink extends WeatherMapItem
 					$map->DrawLabelRotated($im, $task[0],            $task[1],$angle,           $thelabel, $this->bwfont, $padding,
 							$this->name,  $this->bwfontcolour, $this->bwboxcolour, $this->bwoutlinecolour,$map, $task[7]);
 					
-					
+					// imagearc($im, $task[0], $task[1], 10,10,0,360,$map->selected);
 				}
 			}
 		}

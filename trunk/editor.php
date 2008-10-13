@@ -13,7 +13,7 @@ $configerror = '';
 $config_loaded = @include_once 'editor-config.php';
 
 // set to TRUE to enable experimental overlay showing relative-positioning and VIAs
-$use_overlay=FALSE;
+$use_overlay=TRUE;
 
 if( isset($config) )
 {

@@ -772,11 +772,15 @@ function draw_straight($image, &$curvepoints, $widths, $outlinecolour, $fillcolo
 	    }
 	    else
 	    {
-		$arrow_d = $l- $arrowsize[$dir];
+		$arrow_d = $l - $arrowsize[$dir];
 		list($pre_mid_x,$pre_mid_y,$pre_midindex) = find_distance_coords($spine[$dir], $arrow_d);
 		
 		$out = array_slice($spine[$dir], 0, $pre_midindex);
 		$out []= array($pre_mid_x, $pre_mid_y, $arrow_d);
+		
+	#	imagearc($image,$spine[$dir][$pre_midindex+1][X],$spine[$dir][$pre_midindex+1][Y],20,20,0,360,$map->selected);
+		# imagearc($image,$spine[$dir][$pre_midindex][X],$spine[$dir][$pre_midindex][Y],20,20,0,360,$map->selected);
+	#	imagearc($image,$pre_mid_x,$pre_mid_y,20,20,0,360,$map->selected);
 		
 		$spine[$dir] = $out;
 		
@@ -784,8 +788,8 @@ function draw_straight($image, &$curvepoints, $widths, $outlinecolour, $fillcolo
 		$ady=($halfway_y - $pre_mid_y);
 		$ll=sqrt(($adx * $adx) + ($ady * $ady));
 	
-		$anx=$ady / $ll;
-		$any=-$adx / $ll;
+		$anx = $ady / $ll;
+		$any = -$adx / $ll;
 		
 		$ax1 = $pre_mid_x + $widths[$dir] * $anx;
 		$ay1 = $pre_mid_y + $widths[$dir] * $any;
@@ -802,8 +806,14 @@ function draw_straight($image, &$curvepoints, $widths, $outlinecolour, $fillcolo
 		$ax4 = $pre_mid_x - $arrowwidth[$dir] * $anx;
 		$ay4 = $pre_mid_y - $arrowwidth[$dir] * $any;             
 		
+		# draw_spine($image,$spine[$dir],$map->selected);
+		
+		# print "$linkname/$dir\n";
 		$simple = simplify_spine($spine[$dir]);
 		$newn = count($simple);
+		
+		
+		# draw_spine($image,$simple,$map->selected);
 		
 		# print "Simplified to $newn points\n";
 		# if($draw_skeleton) draw_spine_chain($im,$simple,$blue, 12);
@@ -834,7 +844,7 @@ function draw_straight($image, &$curvepoints, $widths, $outlinecolour, $fillcolo
 		$i = 0;
 		$v1 = new Vector($simple[$i+1][X] - $simple[$i][X], $simple[$i+1][Y] - $simple[$i][Y]);
 		$n1 = $v1->get_normal();
-			
+					
 		$finalpoints[] = $simple[$i][X] + $n1->dx*$widths[$dir];
 		$finalpoints[] = $simple[$i][Y] + $n1->dy*$widths[$dir];
 		$numpoints++;
@@ -950,7 +960,7 @@ function draw_straight($image, &$curvepoints, $widths, $outlinecolour, $fillcolo
 		$finalpoints[] = $ax5;
 		$finalpoints[] = $ay5;
 		
-		$numpoints += 5;	
+		$numpoints += 5;
 	
 		// combine the forwards and backwards paths, to make a complete loop
 		for($i=($numrpoints-1)*2; $i>=0; $i-=2)
@@ -1134,7 +1144,7 @@ function draw_curve($image, &$curvepoints, $widths, $outlinecolour, $fillcolours
 }
 
 // Take a spine, and strip out all the points that are co-linear with the points either side of them
-function simplify_spine(&$input, $epsilon=0.00000000001)
+function simplify_spine(&$input, $epsilon=1e-10)
 {   
     $output = array();
     
@@ -1143,35 +1153,37 @@ function simplify_spine(&$input, $epsilon=0.00000000001)
     $c = count($input)-2;
     $skip=0;
     
-    for($n=1; $n<$c; $n++)
+    for($n=1; $n<=$c; $n++)
     {
-        // only copy the point if n-1, n and n+1 don't form a line
-        $dx1 = $input[$n][X] - $input[$n-1][X];
-        $dx2 = $input[$n+1][X] - $input[$n][X];
-        
-        $dy1 = $input[$n][Y] - $input[$n-1][Y];
-        $dy2 = $input[$n+1][Y] - $input[$n][Y];
-        
-        $r1 = 0;
-        $r2 = 0;
-      
-        // for non-vertical, get the slope
-        if($dx1 != 0) $r1 = ($dy1/$dx1);
-        if($dx2 != 0) $r2 = ($dy2/$dx2);
-        
-        if ( abs($r2-$r1) > $epsilon )
+	$x = $input[$n][X];
+	$y = $input[$n][Y];
+	
+	// figure out the area of the triangle formed by this point, and the one before and after
+	$a = 	abs($input[$n-1][X] * ( $input[$n][Y] - $input[$n+1][Y] )
+		+ $input[$n][X] * ( $input[$n+1][Y] - $input[$n-1][Y] )
+		+ $input[$n+1][X] * ( $input[$n-1][Y] - $input[$n][Y] ) );
+	
+	# print "$n  $x,$y    $a";
+	
+        if ( $a > $epsilon)
+	// if(1==1)
         {
             $output []= $input[$n];
+	#    print "  KEEP";
         }
         else
         {
             // ignore n
             $skip++;
+	#    print "  SKIP";
             
         }
+	# print "\n";
     }
-    
+        
     debug("Skipped $skip points of $c\n");
+    
+#    print "------------------------\n";
     
     $output []= $input[$c+1];
     return $output;

@@ -2213,7 +2213,7 @@ function ReadConfig($input)
 			
 
 			if ($linematched == 0 && trim($buffer) != '') { warn
-				("Unrecognised config on line $linecount: $buffer"); }
+				("Unrecognised config on line $linecount: $buffer\n"); }
 
 			if ($linematched > 1) { warn
 			("Same line ($linecount) interpreted twice. This is a program error. Please report to Howie with your config!\nThe line was: $buffer");

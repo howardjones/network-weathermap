@@ -16,6 +16,7 @@ function weathermap_version () {
 		'longname'      => 'PHP Network Weathermap',
 		'author'        => 'Howard Jones',
 		'homepage'      => 'http://www.network-weathermap.com/',
+		'webpage'      => 'http://www.network-weathermap.com/',
 		'email' 	=> 'howie@thingy.com',
 		'url'           => 'http://www.network-weathermap.com/versions.php'
 	);

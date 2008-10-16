@@ -389,7 +389,7 @@ function weathermap_setup_table () {
 		}
 
 		// update the version, so we can skip this next time
-		$sql[] = "replace into settings values('weathermap_db_version',$myversion)";
+		$sql[] = "replace into settings values('weathermap_db_version','$myversion')";
 		
 		// patch up the sortorder for any maps that don't have one.
 		$sql[] = "update weathermap_maps set sortorder=id where sortorder is null or sortorder=0;";
@@ -514,7 +514,7 @@ function weathermap_show_tab () {
 		{
 			print "_red";
 		}
-		print '.png" alt="Weathermap" align="absmiddle" border="0"></a>';
+		print '.png" alt="weathermap" align="absmiddle" border="0"></a>';
 
 	}
 

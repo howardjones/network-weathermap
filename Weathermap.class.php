@@ -2604,7 +2604,7 @@ function AllocateScaleColours($im,$refname='gdref1')
 	}
 }
 
-function DrawMap($filename = '', $thumbnailfile = '', $thumbnailmax = 250, $withnodes = TRUE, $use_overlay = FALSE)
+function DrawMap($filename = '', $thumbnailfile = '', $thumbnailmax = 250, $withnodes = TRUE, $use_via_overlay = FALSE, $use_rel_overlay=FALSE)
 {
 	debug("Trace: DrawMap()\n");
 	metadump("# start",true);
@@ -2757,46 +2757,49 @@ function DrawMap($filename = '', $thumbnailfile = '', $thumbnailmax = 250, $with
 		// for the editor, we can optionally overlay some other stuff
         if($this->context == 'editor')
         {
-			if($use_overlay)
-			{
+		if($use_rel_overlay)
+		{
 		#		$overlay = myimagecolorallocate($image, 200, 0, 0);
-
-				// first, we can show relatively positioned NODEs
-				foreach ($this->nodes as $node) {
-						if($node->relative_to != '')
-						{
-								$rel_x = $this->nodes[$node->relative_to]->x;
-								$rel_y = $this->nodes[$node->relative_to]->y;
-								imagearc($image,$node->x, $node->y,
-										15,15,0,360,$overlay);
-								imagearc($image,$node->x, $node->y,
-										16,16,0,360,$overlay);
-
-								imageline($image,$node->x, $node->y,
-										$rel_x, $rel_y, $overlay);
-						}
-				}
-
-				// then overlay VIAs, so they can be seen
-				foreach($this->links as $link)
-				{
-					foreach ($link->vialist as $via)
+		
+			// first, we can show relatively positioned NODEs
+			foreach ($this->nodes as $node) {
+					if($node->relative_to != '')
 					{
-						if(isset($via[2]))
-						{
-							$x = $this->nodes[$via[2]]->x + $via[0];
-							$y = $this->nodes[$via[2]]->y + $via[1];
-						}
-						else
-						{	
-							$x = $via[0];
-							$y = $via[1];
-						}
-						imagearc($image, $x,$y, 10,10,0,360,$overlay);
-						imagearc($image, $x,$y, 12,12,0,360,$overlay);
+							$rel_x = $this->nodes[$node->relative_to]->x;
+							$rel_y = $this->nodes[$node->relative_to]->y;
+							imagearc($image,$node->x, $node->y,
+									15,15,0,360,$overlay);
+							imagearc($image,$node->x, $node->y,
+									16,16,0,360,$overlay);
+		
+							imageline($image,$node->x, $node->y,
+									$rel_x, $rel_y, $overlay);
 					}
+			}
+		}
+		
+		if($use_via_overlay)
+		{
+			// then overlay VIAs, so they can be seen
+			foreach($this->links as $link)
+			{
+				foreach ($link->vialist as $via)
+				{
+					if(isset($via[2]))
+					{
+						$x = $this->nodes[$via[2]]->x + $via[0];
+						$y = $this->nodes[$via[2]]->y + $via[1];
+					}
+					else
+					{	
+						$x = $via[0];
+						$y = $via[1];
+					}
+					imagearc($image, $x,$y, 10,10,0,360,$overlay);
+					imagearc($image, $x,$y, 12,12,0,360,$overlay);
 				}
 			}
+		}
         }
 
 		#$this->myimagestring($image, 3, 200, 100, "Test 1\nLine 2", $overlay,0);

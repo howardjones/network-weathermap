@@ -504,17 +504,27 @@ function weathermap_show_tab () {
 		$realm_id2 = $user_auth_realm_filenames[basename('weathermap-cacti-plugin.php')];
 	}
 
-    $userid = (isset($_SESSION["sess_user_id"]) ? intval($_SESSION["sess_user_id"]) : 1);
+	$tabstyle = intval(read_config_option("superlinks_tabstyle"));
+	$userid = (isset($_SESSION["sess_user_id"]) ? intval($_SESSION["sess_user_id"]) : 1);
 	
 	if ((db_fetch_assoc("select user_auth_realm.realm_id from user_auth_realm where user_auth_realm.user_id='" . $userid . "' and user_auth_realm.realm_id='$realm_id2'")) || (empty($realm_id2))) {
 
-		print '<a href="' . $config['url_path'] . 'plugins/weathermap/weathermap-cacti-plugin.php"><img src="' . $config['url_path'] . 'plugins/weathermap/images/tab_weathermap';
+		if($tabstyle>0)
+		{
+			$prefix="s_";
+		}
+		else
+		{
+			$prefix="";
+		}
+
+		print '<a href="' . $config['url_path'] . 'plugins/weathermap/weathermap-cacti-plugin.php"><img src="' . $config['url_path'] . 'plugins/weathermap/images/'.$prefix.'tab_weathermap';
 		// if we're ON a weathermap page, print '_red'
 		if(preg_match('/plugins\/weathermap\/weathermap-cacti-plugin.php/',$_SERVER['REQUEST_URI'] ,$matches))
 		{
 			print "_red";
 		}
-		print '.png" alt="weathermap" align="absmiddle" border="0"></a>';
+		print '.gif" alt="weathermap" align="absmiddle" border="0"></a>';
 
 	}
 

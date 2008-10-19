@@ -68,6 +68,7 @@ http://forums.cacti.net/viewtopic.php?p=145866#145866
 Editor placeholder for dynamic icon? (glenp)
 http://forums.cacti.net/viewtopic.php?p=145749#145749
 
+ZORDER messes up imagemaps
 
 editor.php security
 rrdtool averaging   rrdtool graph /dev/null -f "" -s now-30d -e now DEF:in=../rra/atm-sl_traffic_in_5498.rrd:traffic_in:AVERAGE DEF:out=../rra/atm-sl_traffic_in_5498.rrd:traffic_out:AVERAGE VDEF:avg_in=in,AVERAGE VDEF:avg_out=out,AVERAGE PRINT:avg_in:%lf PRINT:avg_out:%lf

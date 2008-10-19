@@ -151,7 +151,7 @@ function show_editor_startpage()
 
 	print "</div>"; // dlgbody
 	print '<div class="dlgHelp" id="start_help">PHP Weathermap ' . $WEATHERMAP_VERSION
-		. ' Copyright &copy; 2005-2007 Howard Jones - howie@thingy.com<br />The current version should always be <a href="http://www.network-weathermap.com/">available here</a>, along with other related software. PHP Weathermap is licensed under the GNU Public License, version 2. See COPYING for details. This distribution also includes the Overlib library by Erik Bosrup.</div>';
+		. ' Copyright &copy; 2005-2008 Howard Jones - howie@thingy.com<br />The current version should always be <a href="http://www.network-weathermap.com/">available here</a>, along with other related software. PHP Weathermap is licensed under the GNU Public License, version 2. See COPYING for details. This distribution also includes the Overlib library by Erik Bosrup.</div>';
 
 	print "</div>"; // dlgStart
 	print "</div>"; // withjs

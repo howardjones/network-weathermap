@@ -12,8 +12,23 @@ $configerror = '';
 
 $config_loaded = @include_once 'editor-config.php';
 
-// set to TRUE to enable experimental overlay showing relative-positioning and VIAs
-$use_overlay=TRUE;
+// set to TRUE to enable experimental overlay showing VIAs
+$use_overlay = FALSE;
+// set to TRUE to enable experimental overlay showing relative-positioning
+$use_relative_overlay = FALSE;
+// set non-zero to snap to a grid of that spacing
+$grid_snap_value = 0;
+
+if( isset($_COOKIE['wmeditor']))
+{
+    $parts = split(":",$_COOKIE['wmeditor']);
+    
+    if( (isset($parts[0])) && (intval($parts[0]) == 1) ) { $use_overlay = TRUE; }
+    if( (isset($parts[1])) && (intval($parts[1]) == 1) ) { $use_relative_overlay = TRUE; }
+    if( (isset($parts[2])) && (intval($parts[2]) != 0) ) { $grid_snap_value = intval($parts[2]); }
+
+    
+}
 
 if( isset($config) )
 {
@@ -175,7 +190,7 @@ else
 
 		$map->sizedebug = TRUE;
 		//            $map->RandomData();
-		$map->DrawMap('','',250,TRUE,$use_overlay);
+		$map->DrawMap('','',250,TRUE,$use_overlay,$use_relative_overlay);
 		exit();
 		break;
 
@@ -346,6 +361,11 @@ else
 		$urls = preg_split('/\s+/', $_REQUEST['link_hover'], -1, PREG_SPLIT_NO_EMPTY);
 		$map->links[$link_name]->overliburl[IN] = $urls;
 		$map->links[$link_name]->overliburl[OUT] = $urls;
+		
+		$map->links[$link_name]->comments[IN] =  $_REQUEST['link_commentin'];
+		$map->links[$link_name]->comments[OUT] = $_REQUEST['link_commentout'];
+		$map->links[$link_name]->commentoffset_in =  intval($_REQUEST['link_commentposin']);
+		$map->links[$link_name]->commentoffset_out = intval($_REQUEST['link_commentposout']); 
 
 		// $map->links[$link_name]->target = $_REQUEST['link_target'];
 
@@ -511,8 +531,8 @@ else
 		break;
 
 	case "place_legend":
-		$x = intval($_REQUEST['x']);
-		$y = intval($_REQUEST['y']);
+		$x = snap( intval($_REQUEST['x']) ,$grid_snap_value);
+		$y = snap( intval($_REQUEST['y']) ,$grid_snap_value);
 		$scalename = $_REQUEST['param'];
 
 		$map->ReadConfig($mapfile);
@@ -524,8 +544,8 @@ else
 		break;
 
 	case "place_stamp":
-		$x = intval($_REQUEST['x']);
-		$y = intval($_REQUEST['y']);
+		$x = snap( intval($_REQUEST['x']), $grid_snap_value);
+		$y = snap( intval($_REQUEST['y']), $grid_snap_value);
 
 		$map->ReadConfig($mapfile);
 
@@ -536,8 +556,8 @@ else
 		break;
 
 	case "move_node":
-		$x = intval($_REQUEST['x']);
-		$y = intval($_REQUEST['y']);
+		$x = snap( intval($_REQUEST['x']),  $grid_snap_value);
+		$y = snap( intval($_REQUEST['y']), $grid_snap_value);
 		$node_name = $_REQUEST['node_name'];
 
 		$map->ReadConfig($mapfile);
@@ -700,8 +720,8 @@ else
 		break;
 
 	case "add_node":
-		$x = intval($_REQUEST['x']);
-		$y = intval($_REQUEST['y']);
+		$x = snap(intval($_REQUEST['x']), $grid_snap_value);
+		$y = snap(intval($_REQUEST['y']), $grid_snap_value);
 
 		$map->ReadConfig($mapfile);
 		
@@ -716,11 +736,12 @@ else
 		$node->template = "DEFAULT";
 		$node->Reset($map);
 		
-		$node->x = snap($x);
-		$node->y = snap($y);
+		$node->x = $x;
+		$node->y = $y;
 		
 		array_push($map->seen_zlayers[$node->zorder], $node);			
 		
+		// XXX - fix me - should use default!
 		$node->label = "Node";
 
 		$map->nodes[$node->name] = $node;
@@ -728,6 +749,12 @@ else
 		$map->WriteConfig($mapfile);
 		break;
 
+	case "editor_settings":
+	    $use_overlay = (isset($_REQUEST['editorsettings_showvias']) ? intval($_REQUEST['editorsettings_showvias']) : FALSE);
+	    $use_relative_overlay = (isset($_REQUEST['editorsettings_showrelative']) ? intval($_REQUEST['editorsettings_showrelative']) : FALSE);
+	    $grid_snap_value = (isset($_REQUEST['editorsettings_gridsnap']) ? intval($_REQUEST['editorsettings_gridsnap']) : 0);
+			    
+	    break;
 		
 	case "delete_node":
 		$map->ReadConfig($mapfile);
@@ -808,6 +835,8 @@ else
 	$imlist = get_imagelist("images");
 	
 	$fontlist = array();
+	
+	setcookie("wmeditor", ($use_overlay ? "1":"0") .":". ($use_relative_overlay ? "1":"0") . ":" . intval($grid_snap_value), time()+60*60*24*30 );
 
 ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
@@ -996,7 +1025,7 @@ else
 
 		<input size="6" name="link_name" type="hidden" />
 
-		  <table>
+		  <table width="100%">
 			<tr>
 			  <th>Maximum Bandwidth<br />
 			  Into '<span id="link_nodename1a">%NODE1%</span>'</th>
@@ -1023,12 +1052,39 @@ else
 			</tr>
 			<tr>
 			  <th>Info URL</th>
-			  <td><input id="link_infourl" size="20" name="link_infourl" type="text" /></td>
+			  <td><input id="link_infourl" size="30" name="link_infourl" type="text" /></td>
 			</tr>
 			<tr>
 			  <th>'Hover' Graph URL</th>
-			  <td><input id="link_hover"  size="20" name="link_hover" type="text" /></td>
+			  <td><input id="link_hover"  size="30" name="link_hover" type="text" /></td>
 			</tr>
+
+
+                        <tr>
+                               <th>IN Comment</th>
+                               <td><input id="link_commentin" size="25" name="link_commentin" type="text" />
+                                        <select id="link_commentposin" name="link_commentposin">
+                                                    <option value=95>95%</option>
+                                                    <option value=90>90%</option>
+                                                    <option value=80>80%</option>
+                                                    <option value=70>70%</option>
+                                                    <option value=60>60%</option>
+                                        </select>
+                               </td>
+                        </tr>
+                        <tr>
+                               <th>OUT Comment</th>
+                               <td><input id="link_commentout" size="25" name="link_commentout" type="text" />
+                                        <select id="link_commentposout" name="link_commentposout">
+                                                    <option value=5>5%</option>
+                                                    <option value=10>10%</option>
+                                                    <option value=20>20%</option>
+                                                    <option value=30>30%</option>
+                                                    <option value=40>40%</option>
+                                                    <option value=50>50%</option>
+                                        </select>
+                               </td>
+                        </tr> 
 		  
 			<tr>
 			  <th></th>
@@ -1286,6 +1342,60 @@ else
 		necessary for it to do that.
 	  </div>
 	</div><!-- TextEdit -->
+	
+	
+	<div id="dlgEditorSettings" class="dlgProperties">
+	  <div class="dlgTitlebar">
+		Editor Settings
+		<ul>
+		  <li><a title="Submit any changes made" id="tb_editorsettings_submit">Submit</a></li>
+		  <li><a title="Cancel any changes" id="tb_editorsettings_cancel">Cancel</a></li>
+		</ul>
+	  </div>
+
+	  <div class="dlgBody">
+		<table>
+		    <tr>
+			<th>Show VIAs overlay</th>
+			<td><select id="editorsettings_showvias" name="editorsettings_showvias">
+			  <option <?php echo ($use_overlay ? 'selected' : '') ?> value="1">Yes</option>
+			  <option <?php echo ($use_overlay ? '' : 'selected') ?> value="0">No</option>
+			    </select>
+			</td>
+		    </tr>
+		    <tr>
+			<th>Show Relative Positions overlay</th>
+			<td><select id="editorsettings_showrelative" name="editorsettings_showrelative">
+			  <option <?php echo ($use_relative_overlay ? 'selected' : '') ?> value="1">Yes</option>
+			  <option <?php echo ($use_relative_overlay ? '' : 'selected') ?> value="0">No</option>
+			    </select>
+			</td>
+		    </tr>
+		    <tr>
+			<th>Snap To Grid</th>
+			<td><select id="editorsettings_gridsnap" name="editorsettings_gridsnap">
+			    <option <?php echo ($grid_snap_value==0 ? 'selected' : '') ?> value="NO">No</option>
+			    <option <?php echo ($grid_snap_value==5 ? 'selected' : '') ?> value="5">5 pixels</option>
+			    <option <?php echo ($grid_snap_value==10 ? 'selected' : '') ?> value="10">10 pixels</option>
+			    <option <?php echo ($grid_snap_value==15 ? 'selected' : '') ?> value="15">15 pixels</option>
+			    <option <?php echo ($grid_snap_value==20 ? 'selected' : '') ?> value="20">20 pixels</option>
+			    <option <?php echo ($grid_snap_value==50 ? 'selected' : '') ?> value="50">50 pixels</option>
+			    <option <?php echo ($grid_snap_value==100 ? 'selected' : '') ?> value="100">100 pixels</option>
+			    </select>
+			</td>
+		    </tr>
+		</table>
+                
+	  </div>
+
+	  <div class="dlgHelp" id="images_help">
+		Helpful text will appear here, depending on the current
+		item selected. It should wrap onto several lines, if it's
+		necessary for it to do that.
+	  </div>
+	</div><!-- TextEdit -->
+	
+	
     </form>
 </body>
 </html>

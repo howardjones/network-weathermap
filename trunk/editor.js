@@ -192,6 +192,9 @@ function attach_click_events()
     addEvent(document.getElementById('node_delete'), 'click', delete_node);
     addEvent(document.getElementById('node_clone'), 'click', clone_node);
     addEvent(document.getElementById('node_edit'), 'click', edit_node);
+    
+    addEvent(document.getElementById('tb_editorsettings_cancel'), 'click', cancel_op);
+    addEvent(document.getElementById('tb_editorsettings_submit'), 'click', do_submit);
         
     addEvent(document.getElementById('tb_textedit_cancel'), 'click', cancel_op);
     addEvent(document.getElementById('tb_textedit_submit'), 'click', do_submit);
@@ -493,7 +496,9 @@ function manage_images()
 
 function prefs()
     {
-    alert("Not Yet");
+        hide_all_dialogs();
+        document.getElementById('action').value = "editor_settings";
+        show_dialog('dlgEditorSettings');
     }
 
 function default_toolbar()
@@ -789,6 +794,22 @@ function show_link(name)
         document.frmMain.link_infourl.value = mylink.infourl;
         document.frmMain.link_hover.value = mylink.overliburl;
 
+        document.frmMain.link_commentin.value = mylink.commentin;
+        document.frmMain.link_commentout.value = mylink.commentout;
+        document.frmMain.link_commentposin.value = mylink.commentposin;
+        document.frmMain.link_commentposout.value = mylink.commentposout; 
+
+        // if that didn't "stick", then we need to add the special value
+        if($('#link_commentposout').val() != mylink.commentposout)
+        {
+            $('#link_commentposout').prepend("<option selected value='" + mylink.commentposout + "'>" + mylink.commentposout + "%</option>");
+        }
+
+        if($('#link_commentposin').val() != mylink.commentposin)
+        {
+            $('#link_commentposin').prepend("<option selected value='" + mylink.commentposin + "'>" + mylink.commentposin + "%</option>");
+        }
+        
         document.getElementById('link_nodename1').firstChild.nodeValue = mylink.a;
         document.getElementById('link_nodename1a').firstChild.nodeValue = mylink.a;
         document.getElementById('link_nodename1b').firstChild.nodeValue = mylink.a;
@@ -827,6 +848,7 @@ function hide_all_dialogs()
     hide_dialog('dlgNodeProperties');
     hide_dialog('dlgColours');
     hide_dialog('dlgImages');
+    hide_dialog('dlgEditorSettings');
     }
 
 function ElementPosition(param){

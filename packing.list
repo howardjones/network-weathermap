@@ -68,7 +68,6 @@
 ./weathermap.conf
 ./weathermap-cacti-plugin-mgmt.php
 ./weathermap-cacti-plugin.php
-./weathermap-logo.png
 ./weathermap-cacti-rebuild.php
 ./docs/example/Gradient_BK_800.png
 ./docs/example/Vera.ttf

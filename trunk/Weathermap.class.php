@@ -2957,6 +2957,11 @@ function PreloadMapHTML()
 				if ($this->htmlstyle == "overlib")
 				{
 					//print "CHANGE: $change\n";
+
+					// skip all this if it's a template node
+					if($type=='LINK' && ! isset($myobj->a->name)) { $change = ''; }
+					if($type=='NODE' && ! isset($myobj->x)) { $change = ''; }
+
 					if($change != '')
 					{
 						//print "Something to be done.\n";
@@ -2967,11 +2972,11 @@ function PreloadMapHTML()
 						}
 						if($type=='LINK')
 						{
-							$a_x=$this->nodes[$myobj->a->name]->x;
-							$a_y=$this->nodes[$myobj->a->name]->y;
+							$a_x = $this->nodes[$myobj->a->name]->x;
+							$a_y = $this->nodes[$myobj->a->name]->y;
 
-							$b_x=$this->nodes[$myobj->b->name]->x;
-							$b_y=$this->nodes[$myobj->b->name]->y;
+							$b_x = $this->nodes[$myobj->b->name]->x;
+							$b_y = $this->nodes[$myobj->b->name]->y;
 
 							$mid_x=($a_x + $b_x) / 2;
 							$mid_y=($a_y + $b_y) / 2;

@@ -81,6 +81,7 @@ function initJS()
         attach_click_events();
         attach_help_events();
         show_context_help('node_label', 'node_help');
+	hide_all_dialogs();
 
         // set the mapmode, so we know where we stand.
         mapmode('existing');

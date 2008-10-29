@@ -2260,6 +2260,7 @@ function ReadConfig($input)
 		foreach ($defaults as $key => $def)
 		{
 			$this->colours['DEFAULT'][$key]=$def;
+			$this->colours['DEFAULT'][$key]['key']=$key;
 			$scalesseen++;
 		}
 		// we have a 0-0 line now, so we need to hide that.

@@ -1077,7 +1077,7 @@ function NewColourFromPercent($percent,$scalename="DEFAULT",$name="")
 				$col = new Colour($r, $g, $b);
 				if(isset($colour['tag'])) $tag = $colour['tag'];
 				#### warn(">>NCFPC TAGS $tag\n");
-				debug("NCFPC $name $tag $key $r $g $b\n");
+				debug("NCFPC $name '$tag' $key $r $g $b\n");
 
 				return(array($col,$key,$tag));
 			}

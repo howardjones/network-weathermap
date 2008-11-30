@@ -869,7 +869,11 @@ function draw_straight($image, &$curvepoints, $widths, $outlinecolour, $fillcolo
 		    if($angle > 180) $angle -= 360;
 		    if($angle < -180) $angle += 360;
 	    
-		    if(abs($angle)>169)  { $capping = TRUE; print "Would cap. ($angle)\n"; }
+		    if(abs($angle)>169)
+		    {
+			$capping = TRUE;
+			# print "Would cap. ($angle)\n";
+		    }
 		    
 		    // $capping = FALSE; // override that for now           
 				
@@ -980,7 +984,7 @@ function draw_straight($image, &$curvepoints, $widths, $outlinecolour, $fillcolo
 		}
 		else
 		{
-			debug("Not drawing $linkname fill because there is no fill colour\n");
+			debug("Not drawing $linkname ($dir) fill because there is no fill colour\n");
 		}
 		
 		$areaname = "LINK:" . $linkname. ":$dir";
@@ -993,7 +997,7 @@ function draw_straight($image, &$curvepoints, $widths, $outlinecolour, $fillcolo
 		}
 		else
 		{
-			debug("Not drawing $linkname outline because there is no outline colour\n");
+			debug("Not drawing $linkname ($dir) outline because there is no outline colour\n");
 		}
 	    }
 	}
@@ -1123,13 +1127,17 @@ function draw_curve($image, &$curvepoints, $widths, $outlinecolour, $fillcolours
 			$x=array_pop($back_points);
 		} while (!is_null($y));
 
-		$arrayindex=0;
+		$arrayindex=1;
 
-		if ($direction < 0) $arrayindex=1;
+		if ($direction < 0) $arrayindex=0;
 
 		if (!is_null($fillcolours[$arrayindex]))
 		{
 			wimagefilledpolygon($image, $there_points, count($there_points) / 2, $arrowsettings[$dir][4]); 
+		}
+		else
+		{
+			debug("Not drawing $linkname ($dir) fill because there is no fill colour\n");
 		}
 		
 		$areaname = "LINK:" . $linkname. ":$dir";
@@ -1139,6 +1147,10 @@ function draw_curve($image, &$curvepoints, $widths, $outlinecolour, $fillcolours
 		if (!is_null($outlinecolour))
 		{
 			wimagepolygon($image, $there_points, count($there_points) / 2, $arrowsettings[$dir][5]);
+		}
+		else
+		{
+			debug("Not drawing $linkname ($dir) outline because there is no outline colour\n");
 		}
 	}
 }
@@ -1612,7 +1624,14 @@ class Colour
 	
 	function as_html()
 	{
-		return $this->as_string("#%02x%02x%02x");
+		if($this->is_real())
+		{
+			return $this->as_string("#%02x%02x%02x");
+		}
+		else
+		{
+			return "";
+		}
 	}
 }
 

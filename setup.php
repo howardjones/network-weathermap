@@ -11,7 +11,7 @@
 *******************************************************************************/
 
 // who knows why this changed... not me.
-function plugin_weathermap_version()
+function disabled_plugin_weathermap_version()
 {
 	return(weathermap_version());
 }
@@ -28,13 +28,13 @@ function weathermap_version () {
 	);
 }
 
-function plugin_weathermap_uninstall() {
+function disabled_plugin_weathermap_uninstall() {
 	// doesn't really do anything. Here to remind me.
 	
 	// not sure what it should really do.
 }
 
-function plugin_weathermap_check_config() {
+function disabled_plugin_weathermap_check_config() {
 	// doesn't really do anything either because it's not implemented yet in PIA. Would be handy if it was.
 	
 	if(!function_exists("imagecreate")) return FALSE;
@@ -50,7 +50,7 @@ function plugin_weathermap_check_config() {
 	return TRUE;
 }
 
-function plugin_weathermap_install () {
+function disabled_plugin_weathermap_install () {
 
 	api_plugin_register_hook('weathermap', 'config_arrays',         'weathermap_config_arrays',        'setup.php');
 	api_plugin_register_hook('weathermap', 'draw_navigation_text',  'weathermap_draw_navigation_text', 'setup.php');

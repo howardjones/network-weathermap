@@ -78,7 +78,7 @@ spaces in filenames/targets where appropriate - quotes, and escaped quotes "([^\
 DONE!   Angled VIAs
 more AICONs - NINK, PIE, GAUGE
 (multiline (bw)labels? - interpret \n)
-'none' for SCALE (not gradient)
+DONE!  'none' for SCALE (not gradient)
 DONE!  COMMENTSTYLE (edge|center)
 DONE!  contrast for commentcolor (when using 'COMMENTSTYLE center')
 

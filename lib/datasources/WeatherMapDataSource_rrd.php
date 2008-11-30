@@ -263,12 +263,12 @@ class WeatherMapDataSource_rrd extends WeatherMapDataSource {
 			pclose ($pipe);
 			if($linecount>2)
 			{			
-				if(preg_match('/^\-?\d+\.?\d*e?[+-]?\d*:?$/i', $lines[0]))
+				if(preg_match('/^\-?\d+[\.,]?\d*e?[+-]?\d*:?$/i', $lines[0]))
 				{
 					$data[IN] = floatval($lines[0]);
 					$data_ok = TRUE;
 				}
-				if(preg_match('/^\-?\d+\.?\d*e?[+-]?\d*:?$/i', $lines[1]))
+				if(preg_match('/^\-?\d+[\.,]?\d*e?[+-]?\d*:?$/i', $lines[1]))
 				{
 					$data[OUT] = floatval($lines[1]);
 					$data_ok = TRUE;

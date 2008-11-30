@@ -314,7 +314,16 @@ else
 					// so check if any of those need to change
 					if( (count($link->vialist)>0) )
                         		{
-					    // XXX To Do	
+                                            $vv=0;
+					    foreach($link->vialist as $v)
+                                            {
+                                                if(isset($v[2]) && $v[2] == $node_name)
+                                                {
+                                                    // die PHP4, die!
+                                                    $map->links[$link->name]->vialist[$vv][2] = $new_node_name;
+                                                }
+                                                $vv++;
+                                            }                                            
 					}
 				    }
 				}
@@ -450,7 +459,7 @@ else
 			$map->links['DEFAULT']->max_bandwidth_in_cfg = $bwin;
 			$map->links['DEFAULT']->max_bandwidth_out_cfg = $bwout;
 			$map->links['DEFAULT']->max_bandwidth_in = unformat_number($bwin, $map->kilo);
-	        $map->links['DEFAULT']->max_bandwidth_out = unformat_number($bwout, $map->kilo);
+                        $map->links['DEFAULT']->max_bandwidth_out = unformat_number($bwout, $map->kilo);
 			
 			// $map->defaultlink->SetBandwidth($bwin,$bwout);
 			foreach ($map->links as $link)

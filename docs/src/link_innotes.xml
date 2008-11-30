@@ -4,9 +4,9 @@
 	<scope>LINK</scope>
 	<anchor>LINK_INNOTES</anchor>
     <definition>INNOTES <meta>url</meta></definition>
-	<definition>INNOTES <meta>url</meta> <meta>url</meta>...</definition>
+	<definition>INNOTES <meta>notes text</meta></definition>
     <description xmlns="http://www.w3.org/1999/xhtml">
-        <p>Same as NOTES, but specifies a pop-up graph for only the 'in' side of a link.</p>
+        <p>Same as NOTES, but specifies a text box for only the 'in' side of a link.</p>
 		</description>
 		<changes>
 		<change version="0.95">Added IN/OUT support</change>

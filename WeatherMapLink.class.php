@@ -280,7 +280,7 @@ class WeatherMapLink extends WeatherMapItem
 		
 		if( ($this->labeloffset_in < $this->labeloffset_out) && (intval($map->get_hint("nowarn_bwlabelpos"))==0) )
 		{
-			warn("LINK ".$this->name." has it's BWLABELPOSs the wrong way around [WMWARN50]\n");
+			warn("LINK ".$this->name." probably has it's BWLABELPOSs the wrong way around [WMWARN50]\n");
 		}
 		
 		list($dx, $dy)=calc_offset($this->a_offset, $map->nodes[$this->a->name]->width, $map->nodes[$this->a->name]->height);

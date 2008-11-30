@@ -4,7 +4,7 @@
 	<scope>LINK</scope>
 	<anchor>LINK_ININFOURL</anchor>
     <definition>ININFOURL <meta>url</meta></definition>
-	<definition>ININFOURL <meta>url</meta> <meta>url</meta>...</definition>
+	<definition>ININFOURL <meta>url</meta> </definition>
     <description xmlns="http://www.w3.org/1999/xhtml">
         <p>Same as INFOURL, but specifies a hyperlink for only the 'in' side of a link.</p>
 		</description>

@@ -49,13 +49,21 @@ class WeatherMapDataSource_fping extends WeatherMapDataSource {
 		#print_r($this->addresscache);
 		#debug("-------------------------\n");
 		
+		$ping_count = intval($map->get_hint("fping_ping_count"));
+		if($ping_count==0) $ping_count = 5;
+		
+		
 		if(preg_match("/^fping:(\S+)$/",$targetstring,$matches))
 		{
 			$target = $matches[1];
 			
+			$pattern = "/^$target\s:";
+			for($i=0;$i<$ping_count;$i++) $pattern .= "\s(\S+)";
+			$pattern .= "/";
+			
 			if(is_executable($this->fping_cmd))
 			{
-				$command = $this->fping_cmd." -t100 -r1 -u -C 5 -i10 -q $target 2>&1";
+				$command = $this->fping_cmd." -t100 -r1 -u -C $ping_count -i10 -q $target 2>&1";
 				debug("Running $command\n");
 				$pipe=popen($command, "r");
 				                
@@ -67,7 +75,8 @@ class WeatherMapDataSource_fping extends WeatherMapDataSource {
 						$line=fgets($pipe, 4096);
 						$count++;
 						debug("Output: $line");
-						if(preg_match("/^$target\s:\s(\S+)\s(\S+)\s(\S+)\s(\S+)\s(\S+)/",$line,$matches))
+						
+						if(preg_match($pattern, $line, $matches))
 						{
 							debug("Found output line for $target\n");
 							$hitcount++;
@@ -77,10 +86,10 @@ class WeatherMapDataSource_fping extends WeatherMapDataSource {
 							$cnt = 0;
 							$min = 999999;
 							$max = 0;
-							for($i=1;$i<6;$i++)
+							for($i=1;$i<=$ping_count;$i++)
 							{
 								if($matches[$i]=='-') 
-								{ $loss+=20; }
+								{ $loss+=(100/$ping_count); }
 								else
 								{
 									$cnt++;

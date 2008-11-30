@@ -21,6 +21,7 @@ clean:
 	rm random-bits/suite-1.png random-bits/suite-2.png docs/src/contents.xml
 
 release: 
+	mv $(RELDIR) $(RELDIR).$$
 	mkdir -p $(RELDIR)
 	tar cTf packing.list - | (cd $(RELDIR); tar xvf -)
 	cd $(RELBASE); zip -r $(RELNAME).zip weathermap/*

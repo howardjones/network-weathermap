@@ -233,7 +233,7 @@ function weathermap_setup_table () {
 
 	$dbversion = read_config_option("weathermap_db_version");
 
-	$myversioninfo = plugin_weathermap_version();
+	$myversioninfo = weathermap_version();
 	$myversion = $myversioninfo['version'];
 	
 	// only bother with all this if it's a new install, a new version, or we're in a development version

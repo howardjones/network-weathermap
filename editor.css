@@ -195,7 +195,7 @@ td { color: white; font-weight: normal; text-align: left; font-size: 8pt;}
 #xycapture { cursor: crosshair; }
 
 .alert {
-	background: #fff6bf url(images/alert.png) center no-repeat;
+	background: #fff6bf url(images/exclamation.png) center no-repeat;
 	background-position: 15px 50%; /* x-pos y-pos */
 	text-align: left;
 	padding: 5px 20px 5px 45px;

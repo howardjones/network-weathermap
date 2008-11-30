@@ -634,6 +634,7 @@ function weathermap_poller_output ($rrd_update_array) {
 				
 				default: // do something somewhat sensible in case something odd happens
 					$newvalue = $value;
+					warn("poller_output found an unknown data_source_type_id for $file:$dsname");
 					break;
 			}
 			db_execute("UPDATE weathermap_data SET last_time=$time, last_calc='$newvalue', last_value='$value',sequence=sequence+1  where id = " . $required['id']);

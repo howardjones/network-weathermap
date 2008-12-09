@@ -2286,8 +2286,10 @@ function ReadConfig($input)
 		$allitems[] = $link;
 	}
 	
-	foreach ($allitems as &$item)
+	# foreach ($allitems as &$item)
+	foreach ($allitems as $ky=>$vl)
 	{
+		$item =& $allitems[$ky];
 		$z = $item->zorder;
 		if(!isset($this->seen_zlayers[$z]) || !is_array($this->seen_zlayers[$z]))
 		{

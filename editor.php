@@ -509,7 +509,9 @@ else
 		$param2 = $_REQUEST['param'];
 		$param2 = substr($param2,0,-2);
 		$newaction = 'add_link2';
-		$selected = 'NODE:'.$param2;         
+                print $newaction;
+		$selected = 'NODE:'.$param2;
+                
 		break;
 
 	case "add_link2":
@@ -912,7 +914,6 @@ else
 	  <li class="tb_help"><span id="tb_help">or click a Node or Link to edit it's properties</span></li>
 	</ul>
   </div>
-
   <form action="editor.php" method="post" name="frmMain">
 	<div align="center" id="mainarea">
 		<input type="hidden" name="plug" value="<?php echo ($fromplug==TRUE ? 1 : 0) ?>">
@@ -922,9 +923,9 @@ else
 	   />
 	   <div class="debug"><p><strong>Debug:</strong> <a href="?<?php echo ($fromplug==TRUE ? 'plug=1&amp;' : ''); ?>action=nothing&amp;mapname=<?php echo  $mapname ?>">Do Nothing</a> 
 	   <span><label for="mapname">mapfile</label><input type="text" name="mapname" value="<?php echo  $mapname; ?>" /></span>
-	   <span><label for="action">action</label><input type="text" id="action" name="action" value="<?php echo  $newaction ?>" /></span>
+	   <span><label for="action">action</label><input type="text" id="action" name="action" value="<?php echo $newaction; ?>" /></span>
 	  <span><label for="param">param</label><input type="text" name="param" id="param" value="" /></span>
-            <span><label for="param2">param2</label><input type="text" name="param2" id="param2" value="<?php echo  $param2 ?>" /></span> 
+            <span><label for="param2">param2</label><input type="text" name="param2" id="param2" value="<?php echo $param2; ?>" /></span> 
 	  <span><label for="debug">debug</label><input id="debug" value="" name="debug" /></span> 
 	  <a target="configwindow" href="?<?php echo ($fromplug==TRUE ? 'plug=1&amp;':''); ?>action=show_config&amp;mapname=<?php echo  $mapname ?>">See config</a></p>
 	<pre><?php echo  $log ?></pre>
@@ -941,6 +942,7 @@ else
 	print $map->imap->subHTML("TIMESTAMP");
 	print $map->imap->subHTML("NODE:");
 	print $map->imap->subHTML("LINK:");
+                
 ?>
 		   </map>
 	</div><!-- Node Properties -->

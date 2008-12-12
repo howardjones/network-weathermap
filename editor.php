@@ -767,6 +767,9 @@ else
 		break;
 
 	case "editor_settings":
+            // have to do this, otherwise the editor will be unresponsive afterwards - not actually going to change anything!
+            $map->ReadConfig($mapfile);
+
 	    $use_overlay = (isset($_REQUEST['editorsettings_showvias']) ? intval($_REQUEST['editorsettings_showvias']) : FALSE);
 	    $use_relative_overlay = (isset($_REQUEST['editorsettings_showrelative']) ? intval($_REQUEST['editorsettings_showrelative']) : FALSE);
 	    $grid_snap_value = (isset($_REQUEST['editorsettings_gridsnap']) ? intval($_REQUEST['editorsettings_gridsnap']) : 0);

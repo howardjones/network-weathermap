@@ -412,7 +412,7 @@ function maplist()
 	
 	if($had_warnings>0)
 	{
-		print '<div align="center" style="padding:5px; width: 50%; border: 2px red solid; margin: 5px auto 15px auto; background-color: #fee;">'.$had_warnings.' of your maps had warnings last time '.($had_warnings>1?"they":"it").' ran. You can find these in your Cacti log file or by clicking on the warning sign next to that map.</div>';
+		print '<div align="center" style="padding:5px; width: 50%; border: 2px red solid; margin: 5px auto 15px auto; background-color: #fee;">'.$had_warnings.' of your maps had warnings last time '.($had_warnings>1?"they":"it").' ran. You can try to find these in your Cacti log file or by clicking on the warning sign next to that map (you might need to increase the log line count).</div>';
 	}
 		
 	if($i>0)

@@ -239,6 +239,7 @@ class WeatherMapDataSource_rrd extends WeatherMapDataSource {
 		debug("RRD ReadData: VDEF style\n");
 
 		$command=$map->rrdtool . " graph /dev/null -f ''  --start $start --end $end DEF:in=$rrdfile:".$dsnames[IN].":$cf DEF:out=$rrdfile:".$dsnames[OUT].":$cf  VDEF:agg_in=in,$aggregatefn VDEF:agg_out=out,$aggregatefn PRINT:agg_in:%lf PRINT:agg_out:%lf";
+		
 		debug ("RRD ReadData: Running: $command\n");
 		$pipe=popen($command, "r");
 		
@@ -360,7 +361,7 @@ class WeatherMapDataSource_rrd extends WeatherMapDataSource {
 						if(array_key_exists($n,$values))
 						{
 							$candidate = $values[$n];
-							if(preg_match('/^\-?\d+\.?\d*e?[+-]?\d*:?$/i', $candidate))
+							if(preg_match('/^\-?\d+[\.,]?\d*e?[+-]?\d*:?$/i', $candidate))
 							{
 								$data[$dir] = $candidate;
 								debug("$candidate is OK value for $n\n");

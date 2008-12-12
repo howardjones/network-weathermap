@@ -191,6 +191,7 @@ function weathermap_run_maps($mydir) {
 								warn("Mapfile $mapfile is not readable or doesn't exist [WMPOLL04]\n");
 							}
 							db_execute("update weathermap_maps set warncount=".intval($weathermap_warncount)." where id=".intval($map['id']));
+							$weathermap_warncount = 0;
 							$weathermap_map="";
 						}
 					}

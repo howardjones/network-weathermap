@@ -3,6 +3,16 @@
 require_once 'editor.inc.php';
 require_once 'Weathermap.class.php';
 
+// so that you can't have the editor active, and not know about it.
+$ENABLED=true;
+
+if(! $ENABLED)
+{
+    print "<p>The editor has not been enabled yet. You need to set ENABLED=true at the top of editor.php</p>";
+    print "<p>Before you do that, you should consider using FilesMatch (in Apache) or similar to limit who can access the editor.</p>";
+    exit();
+}
+
 // sensible defaults
 $mapdir='configs';
 $cacti_base = '../../';
@@ -12,12 +22,10 @@ $configerror = '';
 
 $config_loaded = @include_once 'editor-config.php';
 
-// set to TRUE to enable experimental overlay showing VIAs
-$use_overlay = FALSE;
-// set to TRUE to enable experimental overlay showing relative-positioning
-$use_relative_overlay = FALSE;
-// set non-zero to snap to a grid of that spacing
-$grid_snap_value = 0;
+// these are all set via the Editor Settings dialog, in the editor, now.
+$use_overlay = FALSE; // set to TRUE to enable experimental overlay showing VIAs
+$use_relative_overlay = FALSE; // set to TRUE to enable experimental overlay showing relative-positioning
+$grid_snap_value = 0; // set non-zero to snap to a grid of that spacing
 
 if( isset($_COOKIE['wmeditor']))
 {
@@ -25,9 +33,7 @@ if( isset($_COOKIE['wmeditor']))
     
     if( (isset($parts[0])) && (intval($parts[0]) == 1) ) { $use_overlay = TRUE; }
     if( (isset($parts[1])) && (intval($parts[1]) == 1) ) { $use_relative_overlay = TRUE; }
-    if( (isset($parts[2])) && (intval($parts[2]) != 0) ) { $grid_snap_value = intval($parts[2]); }
-
-    
+    if( (isset($parts[2])) && (intval($parts[2]) != 0) ) { $grid_snap_value = intval($parts[2]); }   
 }
 
 if( isset($config) )
@@ -944,8 +950,8 @@ else
 		Node Properties
 		<input size="6" name="node_name" type="hidden" />
 		<ul>
-		  <li><a id="tb_node_submit" title="Submit any changes made">Submit</a></li>
-		  <li><a id="tb_node_cancel" title="Cancel any changes">Cancel</a></li>
+		  <li><a id="tb_node_submit" class="wm_submit" title="Submit any changes made">Submit</a></li>
+		  <li><a id="tb_node_cancel" class="wm_cancel" title="Cancel any changes">Cancel</a></li>
 		</ul>
 	  </div>
 
@@ -1022,8 +1028,8 @@ else
 		Link Properties
 
 		<ul>
-		  <li><a title="Submit any changes made" id="tb_link_submit">Submit</a></li>
-		  <li><a title="Cancel any changes" id="tb_link_cancel">Cancel</a></li>
+		  <li><a title="Submit any changes made"  class="wm_submit" id="tb_link_submit">Submit</a></li>
+		  <li><a title="Cancel any changes" class="wm_cancel" id="tb_link_cancel">Cancel</a></li>
 		</ul>
 	  </div>
 
@@ -1124,8 +1130,8 @@ else
 		Map Properties
 
 		<ul>
-		  <li><a title="Submit any changes made" id="tb_map_submit">Submit</a></li>
-		  <li><a title="Cancel any changes" id="tb_map_cancel">Cancel</a></li>
+		  <li><a title="Submit any changes made"  class="wm_submit" id="tb_map_submit">Submit</a></li>
+		  <li><a title="Cancel any changes" class="wm_cancel" id="tb_map_cancel">Cancel</a></li>
 		</ul>
 	  </div>
 
@@ -1209,8 +1215,8 @@ else
 		Map Style
 
 		<ul>
-		  <li><a title="Submit any changes made" id="tb_mapstyle_submit">Submit</a></li>
-		  <li><a title="Cancel any changes" id="tb_mapstyle_cancel">Cancel</a></li>
+		  <li><a title="Submit any changes made" id="tb_mapstyle_submit" class="wm_submit" >Submit</a></li>
+		  <li><a title="Cancel any changes" class="wm_cancel" id="tb_mapstyle_cancel">Cancel</a></li>
 		</ul>
 	  </div>
 
@@ -1273,8 +1279,8 @@ else
 		Manage Colors
 
 		<ul>
-		  <li><a title="Submit any changes made" id="tb_colours_submit">Submit</a></li>
-		  <li><a title="Cancel any changes" id="tb_colours_cancel">Cancel</a></li>
+		  <li><a title="Submit any changes made" id="tb_colours_submit"  class="wm_submit" >Submit</a></li>
+		  <li><a title="Cancel any changes" class="wm_cancel" id="tb_colours_cancel">Cancel</a></li>
 		</ul>
 	  </div>
 
@@ -1313,8 +1319,8 @@ else
 		Manage Images
 
 		<ul>
-		  <li><a title="Submit any changes made" id="tb_images_submit">Submit</a></li>
-		  <li><a title="Cancel any changes" id="tb_images_cancel">Cancel</a></li>
+		  <li><a title="Submit any changes made" id="tb_images_submit"  class="wm_submit" >Submit</a></li>
+		  <li><a title="Cancel any changes" class="wm_cancel" id="tb_images_cancel">Cancel</a></li>
 		</ul>
 	  </div>
 
@@ -1335,8 +1341,8 @@ else
 	  <div class="dlgTitlebar">
 		Edit Map Object
 		<ul>
-		  <li><a title="Submit any changes made" id="tb_textedit_submit">Submit</a></li>
-		  <li><a title="Cancel any changes" id="tb_textedit_cancel">Cancel</a></li>
+		  <li><a title="Submit any changes made" id="tb_textedit_submit"  class="wm_submit" >Submit</a></li>
+		  <li><a title="Cancel any changes" class="wm_cancel" id="tb_textedit_cancel">Cancel</a></li>
 		</ul>
 	  </div>
 
@@ -1357,8 +1363,8 @@ else
 	  <div class="dlgTitlebar">
 		Editor Settings
 		<ul>
-		  <li><a title="Submit any changes made" id="tb_editorsettings_submit">Submit</a></li>
-		  <li><a title="Cancel any changes" id="tb_editorsettings_cancel">Cancel</a></li>
+		  <li><a title="Submit any changes made" id="tb_editorsettings_submit"  class="wm_submit" >Submit</a></li>
+		  <li><a title="Cancel any changes" class="wm_cancel" id="tb_editorsettings_cancel">Cancel</a></li>
 		</ul>
 	  </div>
 

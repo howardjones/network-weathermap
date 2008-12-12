@@ -17,6 +17,7 @@ class HTML_ImageMap_Area
 	var $name;
 	var $id;
 	var $alt;
+	var $z;
 	var $extrahtml;
 
 	function common_html()

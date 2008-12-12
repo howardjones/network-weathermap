@@ -2740,8 +2740,9 @@ function DrawMap($filename = '', $thumbnailfile = '', $thumbnailmax = 250, $with
 							// don't try and draw template nodes
 							if( isset($this->nodes[$it->name]) && !is_null($it->x))
 							{
+								# print "::".get_class($it)."\n";
 								debug("Drawing NODE ".$it->name."\n");
-								$it->NewDraw($image, $this);
+								$this->nodes[$it->name]->NewDraw($image, $this);
 								$ii=0;
 								foreach($it->boundingboxes as $bbox)
 								{
@@ -2749,7 +2750,7 @@ function DrawMap($filename = '', $thumbnailfile = '', $thumbnailmax = 250, $with
 									$ii++;
 								}
 							}
-						}
+						}						
 					}
 				}
 			}
@@ -3164,9 +3165,31 @@ function MakeHTML($imagemapname = "weathermap_imap")
 
 	$html.='<map name="' . $imagemapname . '" id="' . $imagemapname . '">';
 
-	$html.=$this->imap->subHTML("NODE:",true);
-	$html.=$this->imap->subHTML("LINK:",true);
+	# $html.=$this->imap->subHTML("NODE:",true);
+	# $html.=$this->imap->subHTML("LINK:",true);
 
+	$all_layers = array_keys($this->seen_zlayers);
+	rsort($all_layers);
+
+	// this is not precisely efficient, but it'll get us going
+	// XXX - get Imagemap to store Z order, or map items to store the imagemap
+	foreach ($all_layers as $z)
+	{
+		$z_items = $this->seen_zlayers[$z];
+		if(is_array($z_items))
+		{
+			foreach($z_items as $it)
+			{
+				$name = "";
+				if(strtolower(get_class($it))=='weathermaplink') $name = "LINK:";
+				if(strtolower(get_class($it))=='weathermapnode') $name = "NODE:";
+				$name .= $it->name . ":";
+				$this->imap->subHTML($name,true);
+			}
+		}
+	}
+	
+	
 	$html.='</map>';
 
 	return ($html);

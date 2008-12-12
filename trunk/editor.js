@@ -139,33 +139,33 @@ function attach_click_events()
     areas = document.getElementsByTagName('area');
 
     for (i = 0; i < areas.length; ++i)
+    {
+        //alt = areas[i].getAttribute('id');
+        alt = areas[i].id;
+        if(alt != '')
         {
-	        //alt = areas[i].getAttribute('id');
-			alt = areas[i].id;
-			if(alt != '')
-			{
-				type = alt.slice(0, 5);
-		        if (type == 'LINK:' || type == 'NODE:')
-		            {
-		            // we add the href so that the browser adds a 'hand' cursor
-		            areas[i].setAttribute('href', '#');
-		            // and the click_handler does the actual work
-		            addEvent(areas[i], 'click', click_handler);
-		            }
+            type = alt.slice(0, 5);
+            if (type == 'LINK:' || type == 'NODE:')
+                {
+                // we add the href so that the browser adds a 'hand' cursor
+                areas[i].setAttribute('href', '#');
+                // and the click_handler does the actual work
+                addEvent(areas[i], 'click', click_handler);
+                }
 
-		        if (type == 'TIMES')
-		            {
-		            areas[i].setAttribute('href', '#');
-		            addEvent(areas[i], 'click', position_timestamp);
-		            }
+            if (type == 'TIMES')
+                {
+                areas[i].setAttribute('href', '#');
+                addEvent(areas[i], 'click', position_timestamp);
+                }
 
-		        if (type == 'LEGEN')
-		            {
-		            areas[i].setAttribute('href', '#');
-		            addEvent(areas[i], 'click', position_legend);
-		            }
-	        }
-		}
+            if (type == 'LEGEN')
+                {
+                areas[i].setAttribute('href', '#');
+                addEvent(areas[i], 'click', position_legend);
+                }
+        }
+    }
 
     if(fromplug===1)
     {
@@ -187,48 +187,24 @@ function attach_click_events()
     addEvent(document.getElementById('tb_manageimages'), 'click', manage_images);
     addEvent(document.getElementById('tb_prefs'), 'click', prefs);
 
-    addEvent(document.getElementById('tb_node_cancel'), 'click', cancel_op);
-    addEvent(document.getElementById('tb_node_submit'), 'click', do_submit);
+    
     addEvent(document.getElementById('node_move'), 'click', move_node);
     addEvent(document.getElementById('node_delete'), 'click', delete_node);
     addEvent(document.getElementById('node_clone'), 'click', clone_node);
     addEvent(document.getElementById('node_edit'), 'click', edit_node);
     
-    addEvent(document.getElementById('tb_editorsettings_cancel'), 'click', cancel_op);
-    addEvent(document.getElementById('tb_editorsettings_submit'), 'click', do_submit);
-        
-    addEvent(document.getElementById('tb_textedit_cancel'), 'click', cancel_op);
-    addEvent(document.getElementById('tb_textedit_submit'), 'click', do_submit);
-
-
-    addEvent(document.getElementById('tb_link_cancel'), 'click', cancel_op);
-    addEvent(document.getElementById('tb_link_submit'), 'click', do_submit);
     addEvent(document.getElementById('link_delete'), 'click', delete_link);
     addEvent(document.getElementById('link_edit'), 'click', edit_link);
     
     addEvent(document.getElementById('link_vert'), 'click', align_link_v);
     addEvent(document.getElementById('link_horiz'), 'click', align_link_h);
-
-    addEvent(document.getElementById('tb_map_cancel'), 'click', cancel_op);
-    addEvent(document.getElementById('tb_map_submit'), 'click', do_submit);
-
-    addEvent(document.getElementById('tb_mapstyle_cancel'), 'click', cancel_op);
-    addEvent(document.getElementById('tb_mapstyle_submit'), 'click', do_submit);
-
-    addEvent(document.getElementById('tb_colours_cancel'), 'click', cancel_op);
-    addEvent(document.getElementById('tb_colours_submit'), 'click', do_submit);
-
-    addEvent(document.getElementById('tb_images_cancel'), 'click', cancel_op);
-    addEvent(document.getElementById('tb_images_submit'), 'click', do_submit);
-
-    var cp = document.getElementById('link_cactipick');
-    addEvent(cp, 'click', cactipicker);
-    cp.setAttribute('href', '#');
     
-    cp = document.getElementById('node_cactipick');
-    addEvent(cp, 'click', nodecactipicker);
-    cp.setAttribute('href', '#');
-
+    $('.wm_submit').click(do_submit);
+    $('.wm_cancel').click(cancel_op);
+    
+    $('#link_cactipick').click(cactipicker).attr("href","#");
+    $('#node_cactipick').click(nodecactipicker).attr("href","#");
+    
     $('#xycapture').mouseover(function(event) {coord_capture(event);});
     $('#xycapture').mousemove(function(event) {coord_update(event);});
     $('#xycapture').mouseout(function(event) {coord_release(event);});

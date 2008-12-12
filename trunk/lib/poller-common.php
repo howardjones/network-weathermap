@@ -50,6 +50,8 @@ function weathermap_run_maps($mydir) {
 	include_once($mydir.DIRECTORY_SEPARATOR."HTML_ImageMap.class.php");
 	include_once($mydir.DIRECTORY_SEPARATOR."Weathermap.class.php");
 
+	$total_warnings = 0;
+
 	$start_time = time();
 	if($weathermap_poller_start_time==0) $weathermap_poller_start_time = $start_time;
 
@@ -191,6 +193,7 @@ function weathermap_run_maps($mydir) {
 								warn("Mapfile $mapfile is not readable or doesn't exist [WMPOLL04]\n");
 							}
 							db_execute("update weathermap_maps set warncount=".intval($weathermap_warncount)." where id=".intval($map['id']));
+							$total_warnings += $weathermap_warncount;
 							$weathermap_warncount = 0;
 							$weathermap_map="";
 						}
@@ -215,7 +218,7 @@ function weathermap_run_maps($mydir) {
 		chdir($orig_cwd);
 		$duration = time() - $start_time;
 
-		if($quietlogging==0) warn("Weathermap $WEATHERMAP_VERSION run complete - $mapcount maps were run in $duration seconds\n");
+		if($quietlogging==0) warn("STATS Weathermap $WEATHERMAP_VERSION run complete - $mapcount maps were run in $duration seconds with $total_warnings warnings.\n");
 	}
 	else
 	{

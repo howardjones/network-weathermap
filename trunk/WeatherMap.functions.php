@@ -91,7 +91,7 @@ function warn($string,$notice_only=FALSE)
 	$message = "";
 	if(! $notice_only)
 	{
-		$message = "WARN#$weathermap_warncount: ";
+		$message .= "WARN ";
 	}
 	$message .= ($weathermap_map==''?'':$weathermap_map.": ") . rtrim($string);
 	

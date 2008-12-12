@@ -218,7 +218,7 @@ function weathermap_run_maps($mydir) {
 		chdir($orig_cwd);
 		$duration = time() - $start_time;
 
-		if($quietlogging==0) warn("STATS: Weathermap $WEATHERMAP_VERSION run complete - $mapcount maps were run in $duration seconds with $total_warnings warnings.\n");
+		if($quietlogging==0) warn("STATS: Weathermap $WEATHERMAP_VERSION run complete - $mapcount maps were run in $duration seconds with $total_warnings warnings.\n", TRUE);
 	}
 	else
 	{

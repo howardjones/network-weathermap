@@ -86,13 +86,14 @@ function warn($string,$notice_only=FALSE)
 	global $weathermap_map;
 	global $weathermap_warncount;
 	
-	if(!$notice_only) $weathermap_warncount++;
-	
 	$message = "";
-	if(! $notice_only)
+		
+	if(!$notice_only)
 	{
+		$weathermap_warncount++;
 		$message .= "WARNING: ";
 	}
+	
 	$message .= ($weathermap_map==''?'':$weathermap_map.": ") . rtrim($string);
 	
 	// use Cacti's debug log, if we are running from the poller

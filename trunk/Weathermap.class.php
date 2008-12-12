@@ -1790,7 +1790,7 @@ function ReadConfig($input)
 							$valid_nodes--;
 						}
 					}
-
+					
 					// TODO - really, this should kill the whole link, and reset for the next one
 					if ($valid_nodes == 2)
 					{

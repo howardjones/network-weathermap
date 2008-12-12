@@ -278,6 +278,12 @@ class WeatherMapLink extends WeatherMapItem
 		if(is_null($x2)) { warn("LINK ".$this->name." uses a NODE with no POSITION!\n"); return; }
 		if(is_null($y2)) { warn("LINK ".$this->name." uses a NODE with no POSITION!\n"); return; }
 		
+		if( ($x1==$x2) && ($y1==$y2) && sizeof($this->vialist)==0)
+		{
+			warn("Zero-length link ".$this->name." skipped.");
+			return;
+		}
+		
 		if( ($this->labeloffset_in < $this->labeloffset_out) && (intval($map->get_hint("nowarn_bwlabelpos"))==0) )
 		{
 			warn("LINK ".$this->name." probably has it's BWLABELPOSs the wrong way around [WMWARN50]\n");

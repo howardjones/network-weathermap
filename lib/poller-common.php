@@ -122,6 +122,11 @@ function weathermap_run_maps($mydir) {
 								$wmap = new Weathermap;
 								$wmap->context = "cacti";
 
+								// we can grab the rrdtool path from Cacti's config, in this case
+								$wmap->rrdtool  = read_config_option("path_rrdtool");
+
+								$wmap->ReadConfig($mapfile);							
+								
 								$settingrows = db_fetch_assoc("select * from weathermap_settings where mapid=0 or mapid=".intval($map['id']) . " order by mapid");
 								if( is_array($settingrows) )
 								{
@@ -137,12 +142,8 @@ function weathermap_run_maps($mydir) {
 											$wmap->add_hint($setting['optname'],$setting['optvalue']);
 										}
 									}
-								}
+								}								
 								
-								// we can grab the rrdtool path from Cacti's config, in this case
-								$wmap->rrdtool  = read_config_option("path_rrdtool");
-
-								$wmap->ReadConfig($mapfile);
 								weathermap_memory_check("MEM postread $mapcount");
 								$wmap->ReadData();
 								weathermap_memory_check("MEM postdata $mapcount");

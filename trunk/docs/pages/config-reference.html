@@ -3,7 +3,7 @@
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <link rel="stylesheet" type="text/css" media="screen" href="weathermap.css">
 <title>PHP Weathermap 
-v0.95b
+v0.96test2
  Configuration Reference</title>
 </head>
 <body><div id="frame">
@@ -27,7 +27,7 @@ v0.95b
 
 <div id="header">
 	<h1>PHP Weathermap 
-v0.95b
+v0.96test2
 </h1>
     <h4>Copyright &copy; 2005-2008 Howard Jones, <tt><a
 href="mailto:howie@thingy.com">howie@thingy.com</a></tt>. (<a
@@ -37,7 +37,7 @@ href="http://www.network-weathermap.com/">Website</a>)</h4>
 
 <h2><a name="configref">Configuration Reference</a></h2>
 <p>This page is automatically compiled, and documents all the configuration directives that are available in PHP Weathermap 
-v0.95b
+v0.96test2
 .  </p>
 	<h1 class="configsection">Introduction</h1>
     	  <div class="preamble"><div id="contents">
@@ -915,7 +915,7 @@ of the direction of the link. 'angled' rotates the box to follow the directiong 
 <h2><a name="LINK_ININFOURL">ININFOURL</a></h2>
 <div class="definition">ININFOURL <em class="meta">url</em>
 </div>
-<div class="definition">ININFOURL <em class="meta">url</em> <em class="meta">url</em>...</div>
+<div class="definition">ININFOURL <em class="meta">url</em> </div>
 <div class="description"><p>Same as INFOURL, but specifies a hyperlink for only the 'in' side of a link. </p></div>
 <div class="changes"> 
 <h3>Change History</h3> 
@@ -929,7 +929,8 @@ of the direction of the link. 'angled' rotates the box to follow the directiong 
 <h2><a name="LINK_OUTINFOURL">OUTINFOURL</a></h2>
 <div class="definition">OUTINFOURL <em class="meta">url</em>
 </div>
-<div class="definition">OUTINFOURL <em class="meta">url</em> <em class="meta">url</em>...</div>
+<div class="definition">OUTINFOURL <em class="meta">url</em>
+</div>
 <div class="description"><p>Same as INFOURL, but specifies a hyperlink for only the 'out' side of a link. </p></div>
 <div class="changes"> 
 <h3>Change History</h3> 
@@ -1102,8 +1103,9 @@ of the direction of the link. 'angled' rotates the box to follow the directiong 
 <h2><a name="LINK_INNOTES">INNOTES</a></h2>
 <div class="definition">INNOTES <em class="meta">url</em>
 </div>
-<div class="definition">INNOTES <em class="meta">url</em> <em class="meta">url</em>...</div>
-<div class="description"><p>Same as NOTES, but specifies a pop-up graph for only the 'in' side of a link. </p></div>
+<div class="definition">INNOTES <em class="meta">notes text</em>
+</div>
+<div class="description"><p>Same as NOTES, but specifies a text box for only the 'in' side of a link. </p></div>
 <div class="changes"> 
 <h3>Change History</h3> 
 <dl> 
@@ -1116,8 +1118,9 @@ of the direction of the link. 'angled' rotates the box to follow the directiong 
 <h2><a name="LINK_OUTNOTES">OUTNOTES</a></h2>
 <div class="definition">OUTNOTES <em class="meta">url</em>
 </div>
-<div class="definition">OUTNOTES <em class="meta">url</em> <em class="meta">url</em>...</div>
-<div class="description"><p>Same as NOTES, but specifies a pop-up graph for only the 'out' side of a link. </p></div>
+<div class="definition">OUTNOTES <em class="meta">notes text</em>
+</div>
+<div class="description"><p>Same as NOTES, but specifies a pop-up text box for only the 'out' side of a link. </p></div>
 <div class="changes"> 
 <h3>Change History</h3> 
 <dl> 
@@ -1342,7 +1345,7 @@ You can set the output format in the Cacti Settings page. </p>
 <div class="definition">KEYBGCOLOR <em class="meta">red</em> <em class="meta">green</em> <em class="meta">blue</em>
 </div>
 <div class="description">
-<p>Specify the colours used for drawing the global elements of the map. </p><p>red, green and blue are numbers from 0 to 255. </p><p><a href="#NODE_COLORS">LABELFONTSHADOWCOLOR,</a> <a href="#NODE_COLORS">LABELBGCOLOR</a> and <a href="#NODE_COLORS">LABELOUTLINECOLOR</a> have an additional option - 'none' - which stops that element of the <a href="#NODE_LABEL">LABEL</a> being drawn. <a href="#NODE_COLORS">LABELFONTSHADOWCOLOR</a> defaults to 'none'. </p> 
+<p>Specify the colours used for drawing the global elements of the map. </p><p>red, green and blue are numbers from 0 to 255. </p> 
 </div>
 <div class="changes">
 <h3>Change History</h3>
@@ -1378,17 +1381,10 @@ You can set the output format in the Cacti Settings page. </p>
 </div>
                   <div class="referenceentry">
 <h2><a name="GLOBAL_TITLE">TITLE</a></h2>
-<div class="definition">TITLEPOS <em class="meta">titlestring</em>
+<div class="definition">TITLE <em class="meta">titlestring</em>
 </div>
 <div class="description">
 <p>Specifies the title text. </p><p>The <a href="#GLOBAL_TITLE">TITLE</a> is shown in file-selectors for both the editor and the Cacti plugin. If you'd like the title to be shown on the map too, then add <a href="#GLOBAL_TITLEPOS">TITLEPOS</a> line also. </p> 
-</div>
-<div class="changes">
-<h3>Change History</h3>
-<dl>
-<dt>0.8</dt>
-<dd>Originally added TITLEPOS.</dd>
-</dl>
 </div>
 </div>
             <div class="referenceentry">

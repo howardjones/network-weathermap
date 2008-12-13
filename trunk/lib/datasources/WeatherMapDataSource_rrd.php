@@ -238,9 +238,29 @@ class WeatherMapDataSource_rrd extends WeatherMapDataSource {
 	{
 		debug("RRD ReadData: VDEF style\n");
 
-		$command=$map->rrdtool . " graph /dev/null -f ''  --start $start --end $end DEF:in=$rrdfile:".$dsnames[IN].":$cf DEF:out=$rrdfile:".$dsnames[OUT].":$cf  VDEF:agg_in=in,$aggregatefn VDEF:agg_out=out,$aggregatefn PRINT:agg_in:%lf PRINT:agg_out:%lf";
+		# assemble an appropriate RRDtool command line, skipping any '-' DS names.
+		$command = $map->rrdtool . " graph /dev/null -f ''  --start $start --end $end ";
+		$command_mid = "";
+		$command_end = "";
 		
-		debug ("RRD ReadData: Running: $command\n");
+		if($dsnames[IN] != '-')
+		{
+			$command .= "DEF:in=$rrdfile:".$dsnames[IN].":$cf ";
+			$command_mid .= "VDEF:agg_in=in,$aggregatefn ";
+			$command_end .= "PRINT:agg_in:'IN %lf' ";
+		}
+		
+		if($dsnames[OUT] != '-')
+		{
+			$command .= "DEF:out=$rrdfile:".$dsnames[OUT].":$cf ";
+			$command_mid .= "VDEF:agg_out=out,$aggregatefn ";
+			$command_end .= "PRINT:agg_in:'OUT %lf' ";
+		}
+						
+		$command .= $command_mid;
+		$command .= $command_end;
+		
+		warn ("RRD ReadData: Running: $command\n");
 		$pipe=popen($command, "r");
 		
 		$lines=array ();
@@ -264,15 +284,18 @@ class WeatherMapDataSource_rrd extends WeatherMapDataSource {
 			pclose ($pipe);
 			if($linecount>2)
 			{			
-				if(preg_match('/^\-?\d+[\.,]?\d*e?[+-]?\d*:?$/i', $lines[0]))
+				foreach ($lines as $line)
 				{
-					$data[IN] = floatval($lines[0]);
-					$data_ok = TRUE;
-				}
-				if(preg_match('/^\-?\d+[\.,]?\d*e?[+-]?\d*:?$/i', $lines[1]))
-				{
-					$data[OUT] = floatval($lines[1]);
-					$data_ok = TRUE;
+					if(preg_match('/^IN\s(\-?\d+[\.,]?\d*e?[+-]?\d*:?)$/i', $line))
+					{
+						$data[IN] = floatval($lines[0]);
+						$data_ok = TRUE;
+					}
+					if(preg_match('/^OUT\s(\-?\d+[\.,]?\d*e?[+-]?\d*:?)$/i', $line))
+					{
+						$data[OUT] = floatval($lines[1]);
+						$data_ok = TRUE;
+					}
 				}
 				if($data_ok)
 				{

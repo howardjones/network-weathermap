@@ -8,7 +8,7 @@
  "HTML Tidy for Mac OS X (vers 12 April 2006), see www.w3.org" /> 
 
  <title>PHP Weathermap 
-v0.95b 
+v0.96test2 
  - Targets Reference</title> 
 <style type="text/css" media="print"> 
 /*<![CDATA[*/ 
@@ -41,7 +41,7 @@ a { color: black; text-decoration: underline; font-weight: normal;}
 
 <div id="header"> 
  <h1>PHP Weathermap 
-v0.95b 
+v0.96test2 
 </h1> 
  <h4>Copyright &copy; 2005-2008 Howard Jones, <tt><a 
 href="mailto:howie@thingy.com">howie@thingy.com</a></tt>. (<a 
@@ -286,7 +286,8 @@ if your script really is intended for MRTG, as the 3rd line would be the device 
 <p>This plugin is fairly experimental and not thoroughly tested. It's also rather slow, as each node takes 5 seconds or so to run. There are planned improvements to take advantage of fping's parallelisation support in a future version. </p> 
 <p>This plugin uses the 'fping' command-line tool [<a href="http://fping.sourceforge.net/">http://fping.sourceforge.net/</a>] to ping a host, and returns 
 various statistics about it's state. </p> 
-<p>After it has been run, the 'in' value is the average ping time in milliseconds, the 'out' value is the percentage packet loss from 5 pings, the 'fping_min' Hint Variable is the minimum ping time in milliseconds, and 'fping_max' is the maximum. </p> 
+<p>You can adjust the number of pings (the default is 5), by setting the 'fping_ping_count' global variable to another number. </p> 
+<p>After it has been run, the 'in' value is the average ping time in milliseconds, the 'out' value is the percentage packet loss from 5 pings (or whatever you have set), the 'fping_min' Hint Variable is the minimum ping time in milliseconds, and 'fping_max' is the maximum. </p> 
  </div> 
 </body> 
 </html> 

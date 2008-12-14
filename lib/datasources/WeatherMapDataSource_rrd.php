@@ -236,7 +236,10 @@ class WeatherMapDataSource_rrd extends WeatherMapDataSource {
 
 	function wmrrd_read_from_real_rrdtool_aggregate($rrdfile,$cf,$aggregatefn,$start,$end,$dsnames, &$data, &$map, &$data_time,&$item)
 	{
-		debug("RRD ReadData: VDEF style\n");
+	
+		debug("RRD ReadData: VDEF style, for ".$item->my_type()." ".$item->name."\n");
+
+		$extra_options = $map->get_hint("rrd_options");
 
 		# assemble an appropriate RRDtool command line, skipping any '-' DS names.
 		$command = $map->rrdtool . " graph /dev/null -f ''  --start $start --end $end ";
@@ -254,13 +257,14 @@ class WeatherMapDataSource_rrd extends WeatherMapDataSource {
 		{
 			$command .= "DEF:out=$rrdfile:".$dsnames[OUT].":$cf ";
 			$command_mid .= "VDEF:agg_out=out,$aggregatefn ";
-			$command_end .= "PRINT:agg_in:'OUT %lf' ";
+			$command_end .= "PRINT:agg_out:'OUT %lf' ";
 		}
 						
 		$command .= $command_mid;
 		$command .= $command_end;
+		$command .= " ".$extra_options;
 		
-		warn ("RRD ReadData: Running: $command\n");
+		debug("RRD ReadData: Running: $command\n");
 		$pipe=popen($command, "r");
 		
 		$lines=array ();
@@ -282,18 +286,15 @@ class WeatherMapDataSource_rrd extends WeatherMapDataSource {
 				$linecount++;
 			}				
 			pclose ($pipe);
-			if($linecount>2)
+			if($linecount>1)
 			{			
 				foreach ($lines as $line)
 				{
-					if(preg_match('/^IN\s(\-?\d+[\.,]?\d*e?[+-]?\d*:?)$/i', $line))
+					if(preg_match('/^(IN|OUT)\s(\-?\d+[\.,]?\d*e?[+-]?\d*:?)$/i', $line, $matches))
 					{
-						$data[IN] = floatval($lines[0]);
-						$data_ok = TRUE;
-					}
-					if(preg_match('/^OUT\s(\-?\d+[\.,]?\d*e?[+-]?\d*:?)$/i', $line))
-					{
-						$data[OUT] = floatval($lines[1]);
+						debug("MATCHED: ".$matches[1]." ".$matches[2]."\n");
+						if($matches[1]=='IN') $data[IN] = floatval($matches[2]);
+						if($matches[1]=='OUT') $data[OUT] = floatval($matches[2]);
 						$data_ok = TRUE;
 					}
 				}
@@ -303,12 +304,17 @@ class WeatherMapDataSource_rrd extends WeatherMapDataSource {
 					if($data[OUT] === NULL) $data[OUT] = 0;
 				}
 			}
+			else
+			{
+				warn("Not enough output from RRDTool.\n");
+			}
 		}
 		else
 		{
 			warn("RRD ReadData: failed to open pipe to RRDTool: ".$php_errormsg." [WMRRD04]\n");
 		}
-		debug ("RRD ReadDataFromRealRRD: Returning (".($data[IN]===NULL?'NULL':$data[IN]).",".($data[OUT]===NULL?'NULL':$data[OUT]).",$data_time)\n");
+		debug ("RRD ReadDataFromRealRRDAggregate: Returning (".($data[IN]===NULL?'NULL':$data[IN]).",".($data[OUT]===NULL?'NULL':$data[OUT]).",$data_time)\n");
+
 	}
 
 	function wmrrd_read_from_real_rrdtool($rrdfile,$cf,$start,$end,$dsnames, &$data, &$map, &$data_time,&$item)
@@ -323,10 +329,12 @@ class WeatherMapDataSource_rrd extends WeatherMapDataSource {
 		//     *THEN* GET THE LAST LINE WHERE THOSE TWO DS ARE VALID, *THEN* DO ANY PROCESSING.
 		//  - this allows for early failure, and also tolerance of empty data in other parts of an rrd (like smokeping uptime)
 		
+		$extra_options = $map->get_hint("rrd_options");
+
 		$values=array();
 		
 		# $command = '"'.$map->rrdtool . '" fetch "'.$rrdfile.'" AVERAGE --start '.$start.' --end '.$end;
-		$command=$map->rrdtool . " fetch $rrdfile $cf --start $start --end $end";
+		$command=$map->rrdtool . " fetch $rrdfile $cf --start $start --end $end $extra_options";
 
 		debug ("RRD ReadData: Running: $command\n");
 		$pipe=popen($command, "r");

@@ -509,7 +509,7 @@ else
 		$param2 = $_REQUEST['param'];
 		$param2 = substr($param2,0,-2);
 		$newaction = 'add_link2';
-                print $newaction;
+              #  print $newaction;
 		$selected = 'NODE:'.$param2;
                 
 		break;

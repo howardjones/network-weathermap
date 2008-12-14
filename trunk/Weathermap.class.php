@@ -1877,6 +1877,13 @@ function ReadConfig($input)
 					$curobj->add_hint($matches[1],trim($matches[2]));
 					$linematched++;
 			}				
+
+			// allow setting a variable to ""
+			if (preg_match("/^\s*SET\s+(\S+)\s*$/i", $buffer, $matches))
+			{
+					$curobj->add_hint($matches[1],'');
+					$linematched++;
+			}				
 			
 			if (preg_match("/^\s*(IN|OUT)?OVERLIBGRAPH\s+(.+)$/i", $buffer, $matches))
 			{

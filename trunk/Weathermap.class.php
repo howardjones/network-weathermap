@@ -3178,20 +3178,27 @@ function MakeHTML($imagemapname = "weathermap_imap")
 	$all_layers = array_keys($this->seen_zlayers);
 	rsort($all_layers);
 
+	debug("Starting to dump imagemap in reverse Z-order...\n");
 	// this is not precisely efficient, but it'll get us going
 	// XXX - get Imagemap to store Z order, or map items to store the imagemap
 	foreach ($all_layers as $z)
 	{
+		debug("Writing HTML for layer $z\n");
 		$z_items = $this->seen_zlayers[$z];
 		if(is_array($z_items))
 		{
+			debug("   Found things for layer $z\n");
 			foreach($z_items as $it)
 			{
-				$name = "";
-				if(strtolower(get_class($it))=='weathermaplink') $name = "LINK:";
-				if(strtolower(get_class($it))=='weathermapnode') $name = "NODE:";
-				$name .= $it->name . ":";
-				$this->imap->subHTML($name,true);
+				if($it->name != 'DEFAULT' && $it->name != ":: DEFAULT ::")
+				{
+					$name = "";
+					if(strtolower(get_class($it))=='weathermaplink') $name = "LINK:";
+					if(strtolower(get_class($it))=='weathermapnode') $name = "NODE:";
+					$name .= $it->name . ":";
+					debug("      Writing $name from imagemap\n");
+					$html .= $this->imap->subHTML($name,true);
+				}
 			}
 		}
 	}

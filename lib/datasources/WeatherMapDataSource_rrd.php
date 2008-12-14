@@ -243,26 +243,22 @@ class WeatherMapDataSource_rrd extends WeatherMapDataSource {
 
 		# assemble an appropriate RRDtool command line, skipping any '-' DS names.
 		$command = $map->rrdtool . " graph /dev/null -f ''  --start $start --end $end ";
-		$command_mid = "";
-		$command_end = "";
 		
 		if($dsnames[IN] != '-')
 		{
 			$command .= "DEF:in=$rrdfile:".$dsnames[IN].":$cf ";
-			$command_mid .= "VDEF:agg_in=in,$aggregatefn ";
-			$command_end .= "PRINT:agg_in:'IN %lf' ";
+			$command .= "VDEF:agg_in=in,$aggregatefn ";
+			$command .= "PRINT:agg_in:'IN %lf' ";
 		}
 		
 		if($dsnames[OUT] != '-')
 		{
 			$command .= "DEF:out=$rrdfile:".$dsnames[OUT].":$cf ";
-			$command_mid .= "VDEF:agg_out=out,$aggregatefn ";
-			$command_end .= "PRINT:agg_out:'OUT %lf' ";
+			$command .= "VDEF:agg_out=out,$aggregatefn ";
+			$command .= "PRINT:agg_out:'OUT %lf' ";
 		}
 						
-		$command .= $command_mid;
-		$command .= $command_end;
-		$command .= " ".$extra_options;
+		$command .= $extra_options;
 		
 		debug("RRD ReadData: Running: $command\n");
 		$pipe=popen($command, "r");

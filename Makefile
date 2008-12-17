@@ -21,12 +21,13 @@ clean:
 	rm random-bits/suite-1.png random-bits/suite-2.png docs/src/contents.xml
 
 release: 
-	mv $(RELDIR) $(RELDIR).$$
+	echo Building release $(RELNAME)
+	# mv $(RELDIR) $(RELDIR).$$
 	mkdir -p $(RELDIR)
 	tar cTf packing.list - | (cd $(RELDIR); tar xvf -)
 	cd $(RELBASE); zip -r $(RELNAME).zip weathermap/*
 	cd $(RELBASE); tar cvfz $(RELNAME).tgz weathermap
-	cd $(RELBASE); mv weathermap $(RELNAME)
+	cd $(RELBASE); mv $(RELDIR) $(RELNAME)
 
 test:	
 	echo "Creating test data"

@@ -1089,6 +1089,10 @@ function NewColourFromPercent($percent,$scalename="DEFAULT",$name="")
 		{
 			warn("ColourFromPercent: Attempted to use non-existent scale: $scalename for $name [WMWARN09]\n");
 		}
+		else
+		{
+			return array(new Colour(255,255,255),'','');
+		}
 	}
 
 	// shouldn't really get down to here if there's a complete SCALE
@@ -2104,7 +2108,7 @@ function ReadConfig($input)
 				$linematched++;
 			}
 
-			if(preg_match("/^\s*KEYSTYLE\s+([A-Za-z][A-Za-z0-9_]+\s+)?(classic|horizontal|vertical|inverted)\s+?(\d+)?\s*$/i",$buffer, $matches))
+			if(preg_match("/^\s*KEYSTYLE\s+([A-Za-z][A-Za-z0-9_]+\s+)?(classic|horizontal|vertical|inverted)\s?(\d+)?\s*$/i",$buffer, $matches))
 			{
 				$whichkey = trim($matches[1]);
 				if($whichkey == '') $whichkey = 'DEFAULT';

@@ -32,6 +32,7 @@
         ADDED - Editor Settings dialog works, and allows you to set grid-snap and some overlays
         ADDED - SCALE allows 'none' as a colour (for non-gradients). Only affects LINKs so far.
         ADDED - fping plugin allows for changing the number of pings.
+        ADDED - TARGET strings can be enclosed in quotes, to allow spaces in them (mainly for external ! scripts)
 	CHANGE - Cacti plugin uses "processed" map title now (allows {} tokens in the title)
 	CHANGE - A NODE with no POSITION is not drawn, instead of drawn at 0,0. Useful for templates.
 	CHANGE - A LINK with no NODES is no longer an error. Also for templates.

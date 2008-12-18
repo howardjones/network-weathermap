@@ -1817,33 +1817,53 @@ function ReadConfig($input)
 				# $targets=preg_split('/\s+/', $matches[1], -1, PREG_SPLIT_NO_EMPTY);
 				$rawtargetlist = $matches[1]." ";
 							
-				// XXX - this needs some checking!
-				if(preg_match_all('/"([^\"\\\\]*(?:\\\\.[^\"\\\\]*)*)"|(\S+)\s|\s/x',$rawtargetlist,$targets))
+				if($args[0]=='TARGET')
 				{
-					# print_r ($targets);
-				
 					// wipe any existing targets, otherwise things in the DEFAULT accumulate with the new ones
 					$curobj->targets = array();
-					for ($i=0; $i<sizeof($targets[0]);$i++)
+					
+					foreach($args as $arg)
 					{
-						$target = trim($targets[1][$i].$targets[2][$i]);
-						if($target != '')
-						{					
-							# print "### TARGET $target|\n";
-							// we store the original TARGET string, and line number, along with the breakdown, to make nicer error messages later
-							$newtarget=array($target,'','',$linecount,$target);
-							if ($curobj)
-							{
-								debug("TARGET: $target\n");
-								$curobj->targets[]=$newtarget;
-							}
+						// we store the original TARGET string, and line number, along with the breakdown, to make nicer error messages later
+						$newtarget=array($arg,'','',$linecount,$arg);
+						if ($curobj)
+						{
+							debug("  TARGET: $target\n");
+							$curobj->targets[]=$newtarget;
 						}
 					}
 				}
-				else
+				
+				if(1==0)
 				{
-					# print "$rawtargetlist\n";
-					warn("ReadConfig - TARGET string error (unclosed quotes?) \n");
+					// XXX - this needs some checking!
+					if(preg_match_all('/"([^\"\\\\]*(?:\\\\.[^\"\\\\]*)*)"|(\S+)\s|\s/x',$rawtargetlist,$targets))
+					{
+						# print_r ($targets);
+					
+						// wipe any existing targets, otherwise things in the DEFAULT accumulate with the new ones
+						$curobj->targets = array();
+						for ($i=0; $i<sizeof($targets[0]);$i++)
+						{
+							$target = trim($targets[1][$i].$targets[2][$i]);
+							if($target != '')
+							{					
+								# print "### TARGET $target|\n";
+								// we store the original TARGET string, and line number, along with the breakdown, to make nicer error messages later
+								$newtarget=array($target,'','',$linecount,$target);
+								if ($curobj)
+								{
+									debug("TARGET: $target\n");
+									$curobj->targets[]=$newtarget;
+								}
+							}
+						}
+					}
+					else
+					{
+						# print "$rawtargetlist\n";
+						warn("ReadConfig - TARGET string error (unclosed quotes?) \n");
+					}
 				}
 			}
 			

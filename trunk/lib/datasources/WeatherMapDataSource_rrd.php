@@ -163,29 +163,36 @@ class WeatherMapDataSource_rrd extends WeatherMapDataSource {
 							{
 								$vname = "cacti_".$vv['field_name'];
 								$item->add_note($vname,$vv['field_value']);
+							}
+							
+							if($set_speed != 0)
+							{
+								# $item->max_bandwidth_in = $vv['field_value'];
+								# $item->max_bandwidth_out = $vv['field_value'];
 								
-								if($vname == 'cacti_ifSpeed')
+								$ifSpeed = intval($item->get_note('cacti_ifSpeed'));
+								$ifHighSpeed = intval($item->get_note('cacti_ifHighSpeed'));
+								$speed = 0;
+								if($ifSpeed > 0) $speed = $ifSpeed;
+								# see https://lists.oetiker.ch/pipermail/mrtg/2004-November/029312.html
+								if($ifHighSpeed > 20) $speed = $ifHighSpeed."M";
+								
+								if($speed >0)
 								{
-									// debug("XXXXX Got bandwidth on ".$item->name."$set_speed\n");
-									if($set_speed != 0)
+									// might need to dust these off for php4...
+									if($item->my_type() == 'NODE') 
 									{
-										# $item->max_bandwidth_in = $vv['field_value'];
-										# $item->max_bandwidth_out = $vv['field_value'];
-										
-										// might need to dust these off for php4...
-										if($item->my_type() == 'NODE') 
-										{
-											$map->nodes[$item->name]->max_bandwidth_in = $vv['field_value'];
-											$map->nodes[$item->name]->max_bandwidth_out = $vv['field_value'];
-										}
-										if($item->my_type() == 'LINK') 
-										{
-											$map->links[$item->name]->max_bandwidth_in = $vv['field_value'];
-											$map->links[$item->name]->max_bandwidth_out = $vv['field_value'];
-										}
+										$map->nodes[$item->name]->max_bandwidth_in = $speed;
+										$map->nodes[$item->name]->max_bandwidth_out = $speed;
+									}
+									if($item->my_type() == 'LINK') 
+									{
+										$map->links[$item->name]->max_bandwidth_in = $speed;
+										$map->links[$item->name]->max_bandwidth_out = $speed;
 									}
 								}
 							}
+							
 							if(isset($vv['host_id'])) $item->add_note("cacti_host_id",intval($vv['host_id']));
 							
 							$r4 = db_fetch_row(sprintf("SELECT DISTINCT graph_templates_item.local_graph_id,title_cache FROM graph_templates_item,graph_templates_graph,data_template_rrd WHERE data_template_rrd.id=task_item_id and graph_templates_graph.local_graph_id = graph_templates_item.local_graph_id and local_data_id=%d LIMIT 1",$ldi));

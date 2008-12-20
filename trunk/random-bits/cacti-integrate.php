@@ -151,12 +151,12 @@ foreach ($map->links as $link)
 		}
 		else
 		{
-			print "  No useful ends on this link\n";
+			print "  No useful ends on this link - fill in more detail (host id, IP) on either NODE $a or $b\n";
 		}
 		
 		if($tgt_host != "")
 		{
-			$int_list = explode(":::",$tgt_interface);		
+			$int_list = explode(":::",$tgt_interface);
 			$total_speed = 0;
 			$total_target = array();
 
@@ -182,7 +182,12 @@ foreach ($map->links as $link)
 					
 					$SQL_speed = "select field_value from host_snmp_cache where field_name='ifSpeed' and host_id=$tgt_host and snmp_index=$snmp_index";
 					$speed = db_fetch_cell($SQL_speed);
-					if($speed) $total_speed += $speed;
+					
+					$SQL_hspeed = "select field_value from host_snmp_cache where field_name='ifHighSpeed' and host_id=$tgt_host and snmp_index=$snmp_index";
+					$hspeed = db_fetch_cell($SQL_speed);
+					
+					if($hspeed && intval($hspeed)>20) $total_speed += ($hspeed*1000000);
+					else if($speed) $total_speed += intval($speed);
 					
 					$SQL_graphid = "select graph_templates_item.local_graph_id FROM graph_templates_item,graph_templates_graph,data_template_rrd where graph_templates_graph.local_graph_id = graph_templates_item.local_graph_id  and task_item_id=data_template_rrd.id and local_data_id=$local_data_id LIMIT 1;";
 					$graph_id = db_fetch_cell($SQL_graphid);

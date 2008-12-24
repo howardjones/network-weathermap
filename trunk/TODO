@@ -69,16 +69,20 @@ http://forums.cacti.net/viewtopic.php?p=145866#145866
 Editor placeholder for dynamic icon? (glenp)
 http://forums.cacti.net/viewtopic.php?p=145749#145749
 
-DONE!  ZORDER messes up imagemaps
-
 editor.php security
-DONE!  rrdtool averaging   rrdtool graph /dev/null -f "" -s now-30d -e now DEF:in=../rra/atm-sl_traffic_in_5498.rrd:traffic_in:AVERAGE DEF:out=../rra/atm-sl_traffic_in_5498.rrd:traffic_out:AVERAGE VDEF:avg_in=in,AVERAGE VDEF:avg_out=out,AVERAGE PRINT:avg_in:%lf PRINT:avg_out:%lf
+
 rrdtool cdefs
-DONE!  external script params - needs spaces in targets
+
 spaces in filenames/targets where appropriate - quotes, and escaped quotes "([^\"\\]*(?:\\.[^\"\\]*)*)" | (\S+)\s | \s
-DONE!   Angled VIAs
+
 more AICONs - NINK, PIE, GAUGE
+
 (multiline (bw)labels? - interpret \n)
+
+DONE!  ZORDER messes up imagemaps
+DONE!  external script params - needs spaces in targets
+DONE!  rrdtool averaging   rrdtool graph /dev/null -f "" -s now-30d -e now DEF:in=../rra/atm-sl_traffic_in_5498.rrd:traffic_in:AVERAGE DEF:out=../rra/atm-sl_traffic_in_5498.rrd:traffic_out:AVERAGE VDEF:avg_in=in,AVERAGE VDEF:avg_out=out,AVERAGE PRINT:avg_in:%lf PRINT:avg_out:%lf
+DONE!   Angled VIAs
 DONE!  'none' for SCALE (not gradient)
 DONE!  COMMENTSTYLE (edge|center)
 DONE!  contrast for commentcolor (when using 'COMMENTSTYLE center')
@@ -89,7 +93,6 @@ Nagios DS
 Solarwinds Orion DS
 Nabbix DS
 RRD xport DS (use rrdtool graph and PRINT in fact)
-
 
 FIXED  Fix a few docs bugs with unclosed tags - actually this is some kind of processing bug to do with <div>s
 

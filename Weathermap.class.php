@@ -1293,11 +1293,13 @@ function DrawLegend_Vertical($im,$scalename="DEFAULT",$height=400,$inverted=fals
 		array($rx+$box_left, $ry+$box_top, $rx+$box_right, $ry+$box_bottom));
 }
 
-function DrawLegend_Classic($im,$scalename="DEFAULT")
+function DrawLegend_Classic($im,$scalename="DEFAULT",$use_tags=FALSE)
 {
 	$title=$this->keytext[$scalename];
 
 	$colours=$this->colours[$scalename];
+	usort($colours, array("Weathermap", "coloursort"));
+	
 	$nscales=$this->numscales[$scalename];
 
 	debug("Drawing $nscales colours into SCALE\n");
@@ -1330,6 +1332,23 @@ function DrawLegend_Classic($im,$scalename="DEFAULT")
 		list($minwidth, $junk)=$this->myimagestringsize($font, 'MMMM 100%-100%');
 		list($boxwidth, $junk)=$this->myimagestringsize($font, $title);
 
+		$max_tag = 0;
+		if($use_tags)
+		{
+			foreach ($colours as $colour)
+			{
+				if ( isset($colour['tag']) )
+				{
+					list($w, $junk)=$this->myimagestringsize($font, $colour['tag']);
+					if($w > $max_tag) $max_tag = $w;
+				}
+			}
+			
+			// now we can tweak the widths, appropriately
+			
+			if($max_tag > $minwidth) $minwidth = $max_tag;
+		}
+
 		$minwidth+=10;
 		$boxwidth+=10;
 
@@ -1356,8 +1375,6 @@ function DrawLegend_Classic($im,$scalename="DEFAULT")
 			$this->colours['DEFAULT']['KEYOUTLINE'][$scale_ref]);
 		$this->myimagestring($scale_im, $font, $boxx + 4, $boxy + 4 + $tileheight, $title,
 			$this->colours['DEFAULT']['KEYTEXT'][$scale_ref]);
-
-		usort($colours, array("Weathermap", "coloursort"));
 
 		$i=1;
 
@@ -1402,8 +1419,17 @@ function DrawLegend_Classic($im,$scalename="DEFAULT")
 							$col);
 					}
 
-					$labelstring=sprintf("%s-%s", $colour['bottom'], $colour['top']);
-					if($hide_percent==0) { $labelstring.="%"; }
+					if($use_tags)
+					{
+						$labelstring = "";
+						if(isset($colour['tag'])) $labelstring = $colour['tag'];
+					}
+					else
+					{
+						$labelstring=sprintf("%s-%s", $colour['bottom'], $colour['top']);
+						if($hide_percent==0) { $labelstring.="%"; }
+					}
+										
 					$this->myimagestring($scale_im, $font, $x + 4 + $tilewidth, $y + $tileheight, $labelstring,
 						$this->colours['DEFAULT']['KEYTEXT'][$scale_ref]);
 					$i++;
@@ -1821,6 +1847,7 @@ function ReadConfig($input)
 				{
 					// wipe any existing targets, otherwise things in the DEFAULT accumulate with the new ones
 					$curobj->targets = array();
+					array_shift($args); // take off the actual TARGET keyword
 					
 					foreach($args as $arg)
 					{
@@ -1828,7 +1855,7 @@ function ReadConfig($input)
 						$newtarget=array($arg,'','',$linecount,$arg);
 						if ($curobj)
 						{
-							debug("  TARGET: $target\n");
+							debug("  TARGET: $arg\n");
 							$curobj->targets[]=$newtarget;
 						}
 					}
@@ -2128,7 +2155,7 @@ function ReadConfig($input)
 				$linematched++;
 			}
 
-			if(preg_match("/^\s*KEYSTYLE\s+([A-Za-z][A-Za-z0-9_]+\s+)?(classic|horizontal|vertical|inverted)\s?(\d+)?\s*$/i",$buffer, $matches))
+			if(preg_match("/^\s*KEYSTYLE\s+([A-Za-z][A-Za-z0-9_]+\s+)?(classic|horizontal|vertical|inverted|tags)\s?(\d+)?\s*$/i",$buffer, $matches))
 			{
 				$whichkey = trim($matches[1]);
 				if($whichkey == '') $whichkey = 'DEFAULT';
@@ -2738,10 +2765,11 @@ function DrawMap($filename = '', $thumbnailfile = '', $thumbnailmax = 250, $with
 
 					if( (isset($this->numscales[$scalename])) && (isset($this->keyx[$scalename])) && ($this->keyx[$scalename] >= 0) && ($this->keyy[$scalename] >= 0) )
 					{
-						if($this->keystyle[$scalename]=='classic') $this->DrawLegend_Classic($image,$scalename);
+						if($this->keystyle[$scalename]=='classic') $this->DrawLegend_Classic($image,$scalename,FALSE);
 						if($this->keystyle[$scalename]=='horizontal') $this->DrawLegend_Horizontal($image,$scalename,$this->keysize[$scalename]);
 						if($this->keystyle[$scalename]=='vertical') $this->DrawLegend_Vertical($image,$scalename,$this->keysize[$scalename]);
 						if($this->keystyle[$scalename]=='inverted') $this->DrawLegend_Vertical($image,$scalename,$this->keysize[$scalename],true);
+						if($this->keystyle[$scalename]=='tags') $this->DrawLegend_Classic($image,$scalename,TRUE);
 					}
 				}
 

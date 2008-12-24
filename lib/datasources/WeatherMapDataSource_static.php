@@ -9,8 +9,8 @@ class WeatherMapDataSource_static extends WeatherMapDataSource {
 
 	function Recognise($targetstring)
 	{
-		if( preg_match("/^static:(\d+\.?\d*[KMGT]*):(\d+\.?\d*[KMGT]*)$/",$targetstring,$matches) || 
-			preg_match("/^static:(\d+\.?\d*[KMGT]*)$/",$targetstring,$matches) )
+		if( preg_match("/^static:(\d+\.?\d*[KMGT]?):(\d+\.?\d*[KMGT]?)$/",$targetstring,$matches) || 
+			preg_match("/^static:(\d+\.?\d*[KMGT]?)$/",$targetstring,$matches) )
 		{
 			return TRUE;
 		}

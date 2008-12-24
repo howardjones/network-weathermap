@@ -9,10 +9,11 @@
         <definition>KEYSTYLE <meta>scalename</meta> <meta>stylename</meta> <meta>size</meta></definition>
     <description  xmlns="http://www.w3.org/1999/xhtml">
         <p>Specifies the style of the key, or legend, that shows what each colour-range means. If a scalename is not given,
-        then "DEFAULT" is assumed. Valid stylenames are: 'classic', 'horizontal' and 'vertical'.</p>
+        then "DEFAULT" is assumed. Valid stylenames are: 'classic', 'horizontal', 'vertical', 'inverted' and 'tags'.</p>
         <p>Classic has a line for each SCALE range defined. 'vertical' and 'horizontal' are fixed-size, showing a
             continuous block from 0-100% usage, which is much more useful when gradient SCALEs are used, or when you have
-            a large number of SCALE lines in one scale.</p>
+            a large number of SCALE lines in one scale. 'inverted' is the same as 'vertical', but with the zero point at the bottom, thermometer-style. Finally, 'tags' is the same style as 'classic', but
+	instead of percentages, it shows the tag string from the end of the SCALE lines, if there are any.</p>
 			<p>
 				For 'horizontal' and 'vertical' styles, you can optionally add an additional parameter, which specifies the longer dimension of the legend in pixels. That is, for a horizontal legend, it specifies the width. The other dimension is calculated from the size of the font used (see KEYFONT).
 			</p>
@@ -30,7 +31,8 @@
 SET key_hidepercent_DEFAULT 1</content></example>
 	</examples>
     <changes>
+	<change version="0.96">Added tags and inverted styles.</change>
 	<change version="0.92">Added hidepercent and hidezero SET variables.</change>
-    <change version="0.9">Added support for multiple key styles.</change>
+	<change version="0.9">Added support for multiple key styles (classic, horizontal, vertical).</change>
     </changes>
 </configentry>

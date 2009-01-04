@@ -50,8 +50,7 @@ class WeatherMapDataSource_fping extends WeatherMapDataSource {
 		#debug("-------------------------\n");
 		
 		$ping_count = intval($map->get_hint("fping_ping_count"));
-		if($ping_count==0) $ping_count = 5;
-		
+		if($ping_count==0) $ping_count = 5;		
 		
 		if(preg_match("/^fping:(\S+)$/",$targetstring,$matches))
 		{
@@ -63,7 +62,7 @@ class WeatherMapDataSource_fping extends WeatherMapDataSource {
 			
 			if(is_executable($this->fping_cmd))
 			{
-				$command = $this->fping_cmd." -t100 -r1 -u -C $ping_count -i10 -q $target 2>&1";
+				$command = $this->fping_cmd." -t100 -r1 -p20 -u -C $ping_count -i10 -q $target 2>&1";
 				debug("Running $command\n");
 				$pipe=popen($command, "r");
 				                

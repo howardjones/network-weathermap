@@ -83,7 +83,8 @@ around line 29 to point to your rrdtool executable.</p>
 <p>By default, the plugin will read the last 800 seconds of data, and find the most recent within that to use. You might need to make it read back further, if you are updating your rrd files slowly. You can do this with the SET command, by adding 'SET rrd_period 3000' (any value in seconds) at the top of your map config file, before any NODE or LINK lines.</p>
 <p>Similarly, you can change the time that the plugin looks for data at from the present to the past, by using 'SET rrd_start -1d' in the top section of the config file. The full range of time-specification strings is at the bottom of the <a href="http://oss.oetiker.ch/rrdtool/doc/rrdfetch.en.html">rrdfetch manual page</a>.</p>
 <p>If you are using a tool other than Cacti, then the default DS names of traffic_in and traffic_out are probably wrong. You can change the defaults for the whole config file by adding two SET lines to the top of the map config file. For example, 'SET rrd_default_in_ds DS0' and 'SET rrd_default_in_ds DS1' will 
-make the default DS names DS0 and DS1 respecively so MRTG users don't need to specify the DS names in every TARGET line.
+make the default DS names DS0 and DS1 respecively so MRTG users don't need to specify the DS names in every TARGET line.</p>
+<p>For any other special rrdtool 'tweaks', you can SET rrd_options to a string which is added directly to the rrdtool command-line. This should allow for any changes that I haven't expected!</p>
 <p>Finally, if the TARGET filename doesn't begin with a / it is usually assumed to be a relative path from the weathermap directory. If you SET rrd_default_path to some other path in the global (top) section of the map config file, you can
 change that assumption so that the DS plugin looks somewhere else.</p>
 
@@ -125,12 +126,15 @@ LINK uplink2
 <p>In this example, all each link needs to have defined is the TARGET rrdfile, and which nodes it joins. The rest is supplied by this plugin.</p>
 </div>
 
-<p>As a final feature, if you add 'SET cacti_use_ifspeed 1' to either the link or node, or any item it inherits settings from (e.g. DEFAULT) then Weathermap will take the value of ifSpeed and use it 
+<p>As a final feature, if you add 'SET cacti_use_ifspeed 1' to either the link or node, or any item it inherits settings from (e.g. DEFAULT) then Weathermap will take the value of ifSpeed (or ifHighSpeed for 4G+ links) and use it 
 in place of the value defined in the map config file - this allows you to do some basic dynamic configuration of Weathermap based on Cacti, which in turn should pick
 up changes from the network device.</p>
 
 <p><strong>Note</strong> that since the rrdtool program is not being run in this mode, you <em>can't</em> use the "time-shifting" features described above - those rely on using <em>real</em> rrdtool files. If you are using poller_output
 to allow Weathermap to work alongside Boost, then there is no workaround - the data isn't in the .rrd files until Boost's own update process puts it there sometime later.</p>
+
+<h4>RRDtool Aggregation</h4>
+<p>XXX THIS NEEDS TO BE WRITTEN!</p>
 
 <hr />
 <h3><a name="tabs"></a>Tab-separated text</h3>
@@ -238,7 +242,10 @@ defines a scale where 0 is green and 100% is red and in between is a smooth grad
 <div class="definition">TARGET snmp:<em>community</em>:<em>host</em>:<em>in_oid</em>:<em>out_oid</em></div>
 
 <p>This is a fairly experimental plugin. It requires the PHP snmp extension to be installed and enabled. Even then, it's hit & miss whether it will work on a particular system - some versions of PHP have better support for SNMP than others, and on some platforms it is different to others, too.</p>
-<p>This plugin can directly query an SNMP-manageable device and fetch an OID from it.</p>
+<p>This plugin can directly query an SNMP-manageable device and fetch an OID from it. You can specify '-' in place of either of the OIDs if you only need to fetch one value.</p>
+<p>It returns the numeric values for each OID as the in and out values. It <em>does not</em> currently understand COUNTER types, so you will
+just get the total bytes rather than a rate, for example.</p>
+<p>It also sets snmp_in_raw and snmp_out_raw to the 'raw' results from the SNMP library, before the plugin tried to force them to be numbers.</p>
 
 <hr />
 <h3><a name="script"></a>External script</h3>

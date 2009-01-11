@@ -39,4 +39,16 @@ cacti-integrate.php
 
 A script that reads in a weathermap config file, looks for special SET
 variables and uses them to populate as much as it can of TARGET, INFOURL,
-OVERLIBGRAPH, and BANDWIDTH.
+OVERLIBGRAPH, and BANDWIDTH. Requires a correct editor-config.php to access
+the Cacti database.
+
+
+cacti-mapper.php
+================
+
+A script that reads interface IPs from Cacti, and then uses Cacti's SNMP data
+to fetch a netmask for each interface. It then uses all this info to work out
+which interfaces are in the same address range as each other, and produces a
+map. The map positions are random, but the connections should be right. You need
+to run the results through cacti-integrate.php, to fill in the TARGET lines.
+Requires a correct editor-config.php to access the Cacti database.

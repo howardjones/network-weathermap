@@ -6,8 +6,10 @@
 
     <section scope="NODE" name="Node-specific Configuration Directives">
     	  <xi:include href="node_node.xml"/>
+	  <xi:include href="node_template.xml" />
     	              <xi:include href="node_position.xml" />
             <xi:include href="node_label.xml" />
+	    
             <xi:include href="node_target.xml" />
             <xi:include href="node_usescale.xml" />
 			<xi:include href="node_maxvalue.xml" />
@@ -24,10 +26,12 @@
 	    	  <xi:include href="node_overlibcaption.xml"/>
                   <xi:include href="node_notes.xml"/>
                   <xi:include href="node_set.xml"/>
+		  <xi:include href="node_zorder.xml"/>
     </section>
 
 	<section scope="LINK" name="Link-specific Configuration Directives">
 	    	  <xi:include href="link_link.xml"/>
+		  <xi:include href="link_template.xml" />
 	    	  <xi:include href="link_nodes.xml"/>
 	    	  <xi:include href="link_target.xml"/>
 	    	  <xi:include href="link_usescale.xml"/>
@@ -64,6 +68,7 @@
 		  <xi:include href="link_linkstyle.xml"/>
 	    	  <xi:include href="link_arrowstyle.xml"/>
                 <xi:include href="link_set.xml"/>
+		<xi:include href="link_zorder.xml"/>
     </section>
 	
 	<section scope="GLOBAL" name="Global Configuration Directives">
@@ -71,6 +76,7 @@
 	  <xi:include href="global_width.xml"/>
 	  <xi:include href="global_height.xml"/>
 	  <xi:include href="global_htmloutputfile.xml"/>
+	  <xi:include href="global_htmlstylesheet.xml"/>
  	  <xi:include href="global_imageoutputfile.xml"/>
       <xi:include href="global_fontdefine.xml"/>
             <xi:include href="global_font.xml"/>

@@ -58,6 +58,8 @@
 ./random-bits/README
 ./random-bits/auto-overlib.pl
 ./random-bits/map-split.php
+./random-bits/cacti-integrate.php
+./random-bits/cacti-mapper.php
 ./setup.php
 ./check.php
 ./random-bits/suite-1.conf

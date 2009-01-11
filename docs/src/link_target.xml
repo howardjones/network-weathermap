@@ -8,10 +8,14 @@
         <p>Specifies where to look for the current throughput
       information for this LINK. You can also specify multiple targets, which will then be added together to make the aggregate bandwidth
 which is then displayed. Specify the targets on one TARGET line, seperated with a space. If a targetspec starts with a '-', then it's value will be <i>subtracted</i> from the final result instead.</p>
+		<p>Also, if a targetspec starts with a number, then a *, then it's used a scaling factor on the result. You can do basic maths with this, especially if you remember that multiplying
+    by a number below 1 is the same as dividing by 1 divided by that number (0.5* is the same as divide by 2).</p>
+	<p>For both the '-' and '*' options, <em>there must be no spaces</em> between any modifiers and the actual target string after it.</p>
     <p>The actual contents of the <em>targetspec</em> depend on the data source plugins that are
     available. <a href="targets.html">The standard plugins are documented here</a>.</p>
     </description>
     <changes>
+	<change version="0.96">Added scale factors for all datasources.</change>
     <change version="0.91">Added 'negative' datasources.</change>
     <change version="0.9">Added plugin data sources, node targets, and added new plugins.</change>
 	    <change version="0.8">Added ability to specify multiple targets. Added tab-delimited data source. Added 'ignore' DS name.</change>

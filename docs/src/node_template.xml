@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configentry>
+	<keyword>TEMPLATE</keyword>
+	<scope>NODE</scope>
+	<anchor>NODE_TEMPLATE</anchor>
+    <definition>TEMPLATE<meta>linkname</meta></definition>
+    <description  xmlns="http://www.w3.org/1999/xhtml">
+	<p>XXX - FIX UP NEEDED</p>
+        <p>By default, each new link starts with the same set of properties. You
+	can change the default properties by defining a link called DEFAULT.</p>
+    <p>You can also use the TEMPLATE keyword to make a link inherit it's settings
+    from <em>any</em> other link. The link you use must be defined earlier in the
+    config file than where you use it.</p>
+    <p>You can make template-only links that are not visible in the map, by not
+    including a NODES line in the link. Template links can also use templates, to
+    build up a hierarchy of 'types'.</p>
+    <p><strong>NOTE:</strong> The TEMPLATE line should be the first line in the NODE
+    definition, as it will copy the configuration over the top of anything else you
+    have already defined for that NODE.</p>
+    </description>
+    <examples>
+		<example><caption>NODE Templates in use - with template-only nodes</caption><content>NODE server
+	
+
+		</content></example>
+		</examples>
+    <changes>
+	<change version="0.96">Added template support</change>
+    </changes>
+</configentry>

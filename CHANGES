@@ -21,7 +21,7 @@
 	ADDED - Cacti plugin adds links in 'user' pages to management screen (if you are an admin)
 	ADDED - HTMLSTYLESHEET keyword allows you to specify a URL for a CSS stylesheet (CLI tool only)
 	ADDED - A few extra CSS id and class attributes, to make styling the page easier.
-        ADDED - New token: in/outscalecolor contains HTML colour code of node/link colours for use in NOTES
+        # ADDED - New token: in/outscalecolor contains HTML colour code of node/link colours for use in NOTES
         ADDED - New NODES offset type - angle+radius
         ADDED - New NODES offset type - compass-point+percentage
         ADDED - "KEYSTYLE inverted" - to get a thermometer-style vertical legend.
@@ -34,6 +34,7 @@
         ADDED - fping plugin allows for changing the number of pings.
         ADDED - TARGET strings can be enclosed in quotes, to allow spaces in them (mainly for external ! scripts)
         ADDED - "KEYSTYLE tags" - like classic, but uses the scale tags instead of percentages.
+        ADDED - scripts in random-bits to help with automatic/assisted mapping.
 	CHANGE - Cacti plugin uses "processed" map title now (allows {} tokens in the title)
 	CHANGE - A NODE with no POSITION is not drawn, instead of drawn at 0,0. Useful for templates.
 	CHANGE - A LINK with no NODES is no longer an error. Also for templates.

@@ -67,10 +67,10 @@ class WeatherMapDataSource_rrd extends WeatherMapDataSource {
 	{
 		global $config;
 		
+		debug("RRD ReadData: poller_output style\n");
+		
 		if(isset($config))
-		{
-			debug("RRD ReadData: poller_output style\n");
-
+		{		
 			// take away the cacti bit, to get the appropriate path for the table
 			// $db_rrdname = realpath($rrdfile);
 			$path_rra = $config["base_path"]."/rra";
@@ -536,6 +536,7 @@ class WeatherMapDataSource_rrd extends WeatherMapDataSource {
 		
 		if($use_poller_output == 1)
 		{
+			debug("Going to try poller_output, as requested.\n");
 			WeatherMapDataSource_rrd::wmrrd_read_from_poller_output($rrdfile,"AVERAGE",$start,$end, $dsnames, $data,$map, $data_time,$item);
 		}
 			

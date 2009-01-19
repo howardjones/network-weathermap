@@ -593,12 +593,14 @@ function weathermap_poller_output ($rrd_update_array) {
 		$file = str_replace("<path_rra>", $path_rra, $required['data_source_path']);
 		$dsname = $required['data_source_name'];
 		
+		debug("WM poller_output: Looking for $file (".$required['data_source_path'].")\n");
+		
 		if( isset( $rrd_update_array{$file}['times'][key($rrd_update_array[$file]['times'])]{$dsname} ) )
 		{
 			$value = $rrd_update_array{$file}['times'][key($rrd_update_array[$file]['times'])]{$dsname};
 			$time = key($rrd_update_array[$file]['times']);
 			if (read_config_option("log_verbosity") >= POLLER_VERBOSITY_MEDIUM) 
-				cacti_log("poller_output: Got one! $file:$dsname -> $time $value\n",true,"WEATHERMAP");
+				cacti_log("WM poller_output: Got one! $file:$dsname -> $time $value\n",true,"WEATHERMAP");
 			
 			$period = $time - $required['last_time'];
 			$lastval = $required['last_value'];
@@ -639,6 +641,16 @@ function weathermap_poller_output ($rrd_update_array) {
 			}
 			db_execute("UPDATE weathermap_data SET last_time=$time, last_calc='$newvalue', last_value='$value',sequence=sequence+1  where id = " . $required['id']);
 //			debug("Final value is $newvalue (was $lastval, period was $period)\n");
+		}
+		else
+		{
+			debug("WM poller_output: Didn't find it.\n");
+			debug("WM poller_output: DID find these:\n");
+			
+			foreach (array_keys($rrd_update_array) as $key)
+			{
+				debug("WM poller_output:    $key\n");
+			}			
 		}
 	}
 

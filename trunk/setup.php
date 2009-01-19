@@ -577,10 +577,13 @@ function weathermap_poller_output ($rrd_update_array) {
 	global $config;
 	// global $weathermap_debugging;
 
+	$logging = read_config_option("log_verbosity");
+
+	if($logging >= POLLER_VERBOSITY_DEBUG) cacti_log("WM poller_output: STARTING\n",true,"WEATHERMAP");
+
 	// partially borrowed from Jimmy Conner's THold plugin.
 	// (although I do things slightly differently - I go from filenames, and don't use the poller_interval)
 
-//	debug("poller_output starting\n");
 	
 	// $requiredlist = db_fetch_assoc("select distinct weathermap_data.*, data_template_data.local_data_id, data_template_rrd.data_source_type_id from weathermap_data, data_template_data, data_template_rrd where weathermap_data.rrdfile=data_template_data.data_source_path and data_template_rrd.local_data_id=data_template_data.local_data_id");
 	// new version works with *either* a local_data_id or rrdfile in the weathermap_data table, and returns BOTH
@@ -593,7 +596,8 @@ function weathermap_poller_output ($rrd_update_array) {
 		$file = str_replace("<path_rra>", $path_rra, $required['data_source_path']);
 		$dsname = $required['data_source_name'];
 		
-		debug("WM poller_output: Looking for $file (".$required['data_source_path'].")\n");
+	        if($logging >= POLLER_VERBOSITY_DEBUG) cacti_log("WM poller_output: Looking for $file (".$required['data_source_path'].")\n",true,"WEATHERMAP");
+
 		
 		if( isset( $rrd_update_array{$file}['times'][key($rrd_update_array[$file]['times'])]{$dsname} ) )
 		{
@@ -640,21 +644,25 @@ function weathermap_poller_output ($rrd_update_array) {
 					break;
 			}
 			db_execute("UPDATE weathermap_data SET last_time=$time, last_calc='$newvalue', last_value='$value',sequence=sequence+1  where id = " . $required['id']);
-//			debug("Final value is $newvalue (was $lastval, period was $period)\n");
+	        	if($logging >= POLLER_VERBOSITY_DEBUG) cacti_log("WM poller_output: Final value is $newvalue (was $lastval, period was $period)\n",true,"WEATHERMAP");
 		}
 		else
 		{
-			debug("WM poller_output: Didn't find it.\n");
-			debug("WM poller_output: DID find these:\n");
+			if($logging > POLLER_VERBOSITY_DEBUG)
+			{
+			cacti_log("WM poller_output: ENDING\n",true,"WEATHERMAP");
+			cacti_log("WM poller_output: Didn't find it.\n",true,"WEATHERMAP");
+			cacti_log("WM poller_output: DID find these:\n",true,"WEATHERMAP");
 			
 			foreach (array_keys($rrd_update_array) as $key)
 			{
-				debug("WM poller_output:    $key\n");
+				cacti_log("WM poller_output:    $key\n",true,"WEATHERMAP");
 			}			
+			}
 		}
 	}
 
-//	debug("poller_output done\n");
+	if($logging >= POLLER_VERBOSITY_DEBUG) cacti_log("WM poller_output: ENDING\n",true,"WEATHERMAP");
 	
 	return $rrd_update_array;
 }

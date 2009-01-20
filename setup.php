@@ -648,7 +648,7 @@ function weathermap_poller_output ($rrd_update_array) {
 		}
 		else
 		{
-			if($logging > POLLER_VERBOSITY_DEBUG)
+			if($logging >= POLLER_VERBOSITY_DEBUG)
 			{
 			cacti_log("WM poller_output: ENDING\n",true,"WEATHERMAP");
 			cacti_log("WM poller_output: Didn't find it.\n",true,"WEATHERMAP");

@@ -589,17 +589,36 @@ function weathermap_poller_output ($rrd_update_array) {
 	// new version works with *either* a local_data_id or rrdfile in the weathermap_data table, and returns BOTH
 	$requiredlist = db_fetch_assoc("select distinct weathermap_data.id, weathermap_data.last_value, weathermap_data.last_time, weathermap_data.data_source_name, data_template_data.data_source_path, data_template_data.local_data_id, data_template_rrd.data_source_type_id from weathermap_data, data_template_data, data_template_rrd where ((weathermap_data.rrdfile=data_template_data.data_source_path and weathermap_data.rrdfile <> '') or (weathermap_data.local_data_id=data_template_data.local_data_id and weathermap_data.local_data_id>0)) and data_template_rrd.local_data_id=data_template_data.local_data_id;");
 	
-	$path_rra = $config['base_path'].'/rra';
+	$path_rra = $config["rra_path"];
+	
+	# especially on Windows, it seems that filenames are not reliable (sometimes \ and sometimes / even though path_rra is always /) .
+	# let's make an index from local_data_id to filename, and then use local_data_id as the key...
+	
+	foreach (array_keys($rrd_update_array) as $key)
+	{
+		if(isset( $rrd_update_array[$key]['times']) && is_array($rrd_update_array[$key]['times']) )
+		{
+			# if($logging >= POLLER_VERBOSITY_DEBUG) cacti_log("WM poller_output: Adding $key",true,"WEATHERMAP");
+			$knownfiles[ $rrd_update_array[$key]["local_data_id"] ] = $key;
+			
+		}
+	}
 	
 	foreach ($requiredlist as $required)
 	{
 		$file = str_replace("<path_rra>", $path_rra, $required['data_source_path']);
 		$dsname = $required['data_source_name'];
+		$local_data_id = $required['local_data_id'];
 		
-	        if($logging >= POLLER_VERBOSITY_DEBUG) cacti_log("WM poller_output: Looking for $file (".$required['data_source_path'].")\n",true,"WEATHERMAP");
-
+		if(isset($knownfiles[$local_data_id]))
+		{
+			$file2 = $knownfiles[$local_data_id];			
+			if($file2 != '') $file = $file2;
+		}
+				
+	    if($logging >= POLLER_VERBOSITY_DEBUG) cacti_log("WM poller_output: Looking for $file ($local_data_id) (".$required['data_source_path'].")\n",true,"WEATHERMAP");
 		
-		if( isset( $rrd_update_array{$file}['times'][key($rrd_update_array[$file]['times'])]{$dsname} ) )
+		if( is_array($rrd_update_array[$file]['times']) && isset( $rrd_update_array{$file}['times'][key($rrd_update_array[$file]['times'])]{$dsname} ) )
 		{
 			$value = $rrd_update_array{$file}['times'][key($rrd_update_array[$file]['times'])]{$dsname};
 			$time = key($rrd_update_array[$file]['times']);
@@ -648,16 +667,17 @@ function weathermap_poller_output ($rrd_update_array) {
 		}
 		else
 		{
-			if($logging >= POLLER_VERBOSITY_DEBUG)
+			if(1==0 && $logging >= POLLER_VERBOSITY_DEBUG)
 			{
-			cacti_log("WM poller_output: ENDING\n",true,"WEATHERMAP");
-			cacti_log("WM poller_output: Didn't find it.\n",true,"WEATHERMAP");
-			cacti_log("WM poller_output: DID find these:\n",true,"WEATHERMAP");
-			
-			foreach (array_keys($rrd_update_array) as $key)
-			{
-				cacti_log("WM poller_output:    $key\n",true,"WEATHERMAP");
-			}			
+			#	cacti_log("WM poller_output: ENDING\n",true,"WEATHERMAP");
+				cacti_log("WM poller_output: Didn't find it.\n",true,"WEATHERMAP");
+				cacti_log("WM poller_output: DID find these:\n",true,"WEATHERMAP");
+				
+				foreach (array_keys($rrd_update_array) as $key)
+				{
+					$local_data_id = $rrd_update_array[$key]["local_data_id"];
+					cacti_log("WM poller_output:    $key ($local_data_id)\n",true,"WEATHERMAP");
+				}			
 			}
 		}
 	}

@@ -18,9 +18,10 @@ class WeatherMapDataSource_rrd extends WeatherMapDataSource {
 #		{
 			if($map->context=='cacti')
 			{
-				debug("RRD DS: path_rra is ".$config["base_path"]."/rra - your rrd pathname must be exactly this to use poller_output\n");
+				
+				debug("RRD DS: path_rra is ".$config["rra_path"]." - your rrd pathname must be exactly this to use poller_output\n");
 				// save away a couple of useful global SET variables
-				$map->add_hint("cacti_path_rra",$config["base_path"]."/rra");
+				$map->add_hint("cacti_path_rra",$config["rra_path"]);
 				$map->add_hint("cacti_url",$config['url_path']);
 			}
 			if (file_exists($map->rrdtool)) {
@@ -73,7 +74,7 @@ class WeatherMapDataSource_rrd extends WeatherMapDataSource {
 		{		
 			// take away the cacti bit, to get the appropriate path for the table
 			// $db_rrdname = realpath($rrdfile);
-			$path_rra = $config["base_path"]."/rra";
+			$path_rra = $config["rra_path"];
 			$db_rrdname = $rrdfile;
 			$db_rrdname = str_replace($path_rra,"<path_rra>",$db_rrdname);
 			debug("******************************************************************\nChecking weathermap_data\n");

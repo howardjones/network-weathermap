@@ -21,25 +21,26 @@
 	ADDED - Cacti plugin adds links in 'user' pages to management screen (if you are an admin)
 	ADDED - HTMLSTYLESHEET keyword allows you to specify a URL for a CSS stylesheet (CLI tool only)
 	ADDED - A few extra CSS id and class attributes, to make styling the page easier.
-        # ADDED - New token: in/outscalecolor contains HTML colour code of node/link colours for use in NOTES
-        ADDED - New NODES offset type - angle+radius
-        ADDED - New NODES offset type - compass-point+percentage
-        ADDED - "KEYSTYLE inverted" - to get a thermometer-style vertical legend.
-        ADDED - "COMMENTSTYLE center" to make comments run along the centre of a link arrow. (and 'edge' for the usual)
-        ADDED - COMMENTFONTCOLOR accepts 'contrast' as an option, for when it's over a link
-        ADDED - VIASTYLE angled (or curved) - you can turn sharp corners now
-        ADDED - Comment (and pos) editing in editor (based on code by Zdolny)
-        ADDED - Editor Settings dialog works, and allows you to set grid-snap and some overlays
-        ADDED - SCALE allows 'none' as a colour (for non-gradients). Only affects LINKs so far.
-        ADDED - fping plugin allows for changing the number of pings.
-        ADDED - TARGET strings can be enclosed in quotes, to allow spaces in them (mainly for external ! scripts)
-        ADDED - "KEYSTYLE tags" - like classic, but uses the scale tags instead of percentages.
-        ADDED - scripts in random-bits to help with automatic/assisted mapping.
+	ADDED - New token: in/outscalecolor contains HTML colour code of node/link colours for use in NOTES
+	ADDED - New NODES offset type - angle+radius
+	ADDED - New NODES offset type - compass-point+percentage
+	ADDED - "KEYSTYLE inverted" - to get a thermometer-style vertical legend.
+	# ADDED - "COMMENTSTYLE center" to make comments run along the centre of a link arrow. (and 'edge' for the usual)
+	ADDED - COMMENTFONTCOLOR accepts 'contrast' as an option, for when it's over a link
+	ADDED - VIASTYLE angled (or curved) - you can turn sharp corners now
+	ADDED - Comment (and pos) editing in editor (based on code by Zdolny)
+	ADDED - Editor Settings dialog works, and allows you to set grid-snap and some overlays
+	ADDED - SCALE allows 'none' as a colour (for non-gradients). Only affects LINKs so far.
+	ADDED - fping plugin allows for changing the number of pings.
+	ADDED - TARGET strings can be enclosed in quotes, to allow spaces in them (mainly for external ! scripts)
+	ADDED - "KEYSTYLE tags" - like classic, but uses the scale tags instead of percentages.
+	ADDED - scripts in random-bits to help with automatic/assisted mapping.
 	CHANGE - Cacti plugin uses "processed" map title now (allows {} tokens in the title)
 	CHANGE - A NODE with no POSITION is not drawn, instead of drawn at 0,0. Useful for templates.
 	CHANGE - A LINK with no NODES is no longer an error. Also for templates.
 	CHANGE - The link_bulge secret mode bulges each side of a link independently now
-        CHANGE - whitespace is stripped from the beginning and end of each line before parsing
+	CHANGE - whitespace is stripped from the beginning and end of each line before parsing
+	FIXED - Cacti poller_output support works more reliably/at all on Windows
 	FIXED - Renaming a node in the editor correctly handles other relatively-positioned nodes and vias
 	FIXED - Minor issue with CRLF in map title for Cacti Plugin
 	FIXED - CLI tool set --define options incorrectly.

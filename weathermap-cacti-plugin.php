@@ -49,7 +49,8 @@ case 'viewimage':
 
 			header('Content-type: image/png');
 			
-			readfile_chunked($imagefile);
+			// readfile_chunked($imagefile);
+			readfile($imagefile);
 					
 			dir($orig_cwd);	
 		}

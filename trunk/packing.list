@@ -47,6 +47,7 @@
 ./lib/datasources/WeatherMapDataSource_tabfile.php
 ./lib/datasources/WeatherMapDataSource_snmp.php
 ./lib/datasources/WeatherMapDataSource_fping.php
+./lib/datasources/WeatherMapDataSource_time.php
 ./lib/datasources/WeatherMapDataSource_skeleton.php.txt
 ./lib/poller-common.php
 ./lib/post/WeatherMapPostProcessorTest.php

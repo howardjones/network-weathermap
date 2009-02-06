@@ -4,6 +4,7 @@
       <h4 xmlns="" class="configsection">Node-specific Configuration Directives</h4>
       <p xmlns="" id="context_NODE">
         <a href="#NODE_NODE">NODE</a>
+        <a href="#NODE_TEMPLATE">TEMPLATE</a>
         <a href="#NODE_POSITION">POSITION</a>
         <a href="#NODE_LABEL">LABEL</a>
         <a href="#NODE_TARGET">TARGET</a>
@@ -22,10 +23,12 @@
         <a href="#NODE_OVERLIBCAPTION">OVERLIBCAPTION</a>
         <a href="#NODE_NOTES">NOTES</a>
         <a href="#NODE_SET">SET</a>
+        <a href="#NODE_ZORDER">ZORDER</a>
       </p>
       <h4 xmlns="" class="configsection">Link-specific Configuration Directives</h4>
       <p xmlns="" id="context_LINK">
         <a href="#LINK_LINK">LINK</a>
+        <a href="#LINK_TEMPLATE">TEMPLATE</a>
         <a href="#LINK_NODES">NODES</a>
         <a href="#LINK_TARGET">TARGET</a>
         <a href="#LINK_USESCALE">USESCALE</a>
@@ -62,6 +65,7 @@
         <a href="#LINK_LINKSTYLE">LINKSTYLE</a>
         <a href="#LINK_ARROWSTYLE">ARROWSTYLE</a>
         <a href="#LINK_SET">SET</a>
+        <a href="#LINK_ZORDER">ZORDER</a>
       </p>
       <h4 xmlns="" class="configsection">Global Configuration Directives</h4>
       <p xmlns="" id="context_GLOBAL">
@@ -69,6 +73,7 @@
         <a href="#GLOBAL_WIDTH">WIDTH</a>
         <a href="#GLOBAL_HEIGHT">HEIGHT</a>
         <a href="#GLOBAL_HTMLOUTPUTFILE">HTMLOUTPUTFILE</a>
+        <a href="#GLOBAL_HTMLSTYLESHEET">HTMLSTYLESHEET</a>
         <a href="#GLOBAL_IMAGEOUTPUTFILE">IMAGEOUTPUTFILE</a>
         <a href="#GLOBAL_FONTDEFINE">FONTDEFINE</a>
         <a href="#GLOBAL_FONT">*FONT</a>

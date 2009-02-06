@@ -44,6 +44,7 @@ v0.96test2
       <h4 class="configsection">Node-specific Configuration Directives</h4>
       <p id="context_NODE">
         <a href="#NODE_NODE">NODE</a>
+        <a href="#NODE_TEMPLATE">TEMPLATE</a>
         <a href="#NODE_POSITION">POSITION</a>
         <a href="#NODE_LABEL">LABEL</a>
         <a href="#NODE_TARGET">TARGET</a>
@@ -62,10 +63,12 @@ v0.96test2
         <a href="#NODE_OVERLIBCAPTION">OVERLIBCAPTION</a>
         <a href="#NODE_NOTES">NOTES</a>
         <a href="#NODE_SET">SET</a>
+        <a href="#NODE_ZORDER">ZORDER</a>
        </p>
       <h4 class="configsection">Link-specific Configuration Directives</h4>
       <p id="context_LINK">
         <a href="#LINK_LINK">LINK</a>
+        <a href="#LINK_TEMPLATE">TEMPLATE</a>
         <a href="#LINK_NODES">NODES</a>
         <a href="#LINK_TARGET">TARGET</a>
         <a href="#LINK_USESCALE">USESCALE</a>
@@ -102,6 +105,7 @@ v0.96test2
         <a href="#LINK_LINKSTYLE">LINKSTYLE</a>
         <a href="#LINK_ARROWSTYLE">ARROWSTYLE</a>
         <a href="#LINK_SET">SET</a>
+        <a href="#LINK_ZORDER">ZORDER</a>
        </p>
       <h4 class="configsection">Global Configuration Directives</h4>
       <p id="context_GLOBAL">
@@ -109,6 +113,7 @@ v0.96test2
         <a href="#GLOBAL_WIDTH">WIDTH</a>
         <a href="#GLOBAL_HEIGHT">HEIGHT</a>
         <a href="#GLOBAL_HTMLOUTPUTFILE">HTMLOUTPUTFILE</a>
+        <a href="#GLOBAL_HTMLSTYLESHEET">HTMLSTYLESHEET</a>
         <a href="#GLOBAL_IMAGEOUTPUTFILE">IMAGEOUTPUTFILE</a>
         <a href="#GLOBAL_FONTDEFINE">FONTDEFINE</a>
         <a href="#GLOBAL_FONT">*FONT</a>
@@ -143,6 +148,38 @@ v0.96test2
 <dl>
 <dt>0.7</dt>
 <dd>Added DEFAULT node.</dd>
+</dl>
+</div>
+</div>
+	  <div class="referenceentry">
+<h2><a name="NODE_TEMPLATE">TEMPLATE</a></h2>
+<div class="definition">TEMPLATE<em class="meta">linkname</em>
+</div>
+<div class="description">
+<p>XXX - FIX UP NEEDED </p><p>By default, each new link starts with the same set of properties. You 
+ can change the default properties by defining a link called DEFAULT. </p><p>You can also use the <a href="#NODE_TEMPLATE">TEMPLATE</a> keyword to make a link inherit it's settings 
+ from <em>any</em> other link. The link you use must be defined earlier in the 
+ config file than where you use it. </p><p>You can make template-only links that are not visible in the map, by not 
+ including a <a href="#LINK_NODES">NODES</a> line in the link. Template links can also use templates, to 
+ build up a hierarchy of 'types'. </p><p><strong>NOTE:</strong> The <a href="#NODE_TEMPLATE">TEMPLATE</a> line should be the first line in the <a href="#NODE_NODE">NODE</a> 
+ definition, as it will copy the configuration over the top of anything else you 
+ have already defined for that <a href="#NODE_NODE">NODE.</a> </p> 
+</div>
+<div class="examples">
+<h3>Examples</h3>
+<div class="example">
+<h5>NODE Templates in use - with template-only nodes</h5>
+<pre>NODE server
+	
+
+		</pre>
+</div>
+</div>
+<div class="changes">
+<h3>Change History</h3>
+<dl>
+<dt>0.96</dt>
+<dd>Added template support</dd>
 </dl>
 </div>
 </div>
@@ -193,6 +230,7 @@ v0.96test2
 </dl>
 </div>
 </div>
+	    
             <div class="referenceentry">
 <h2><a name="NODE_TARGET">TARGET</a></h2>
 <div class="definition">TARGET <em class="meta">targetspec</em>
@@ -200,7 +238,8 @@ v0.96test2
 <div class="description">
 <p>Specifies where to look for the current "throughput" 
  information for this <a href="#NODE_NODE">NODE.</a> You can also specify multiple targets, which will then be added together to make the aggregate result 
-which is then displayed. Specify the targets on one <a href="#NODE_TARGET">TARGET</a> line, seperated with a space. If a targetspec starts with a '-', then it's value will be <i>subtracted</i> from the final result instead. </p><p>It's important to note, especially for <a href="#NODE_NODE">NODEs,</a> that the value that is used does not have to be bandwidth. You can use data for temperature, session-counts, CPU usage or anything else you can get data for. </p><p>The actual contents of the <em>targetspec</em> depend on the data source plugins that are 
+which is then displayed. Specify the targets on one <a href="#NODE_TARGET">TARGET</a> line, seperated with a space. If a targetspec starts with a '-', then it's value will be <i>subtracted</i> from the final result instead. </p><p>Also, if a targetspec starts with a number, then a *, then it's used a scaling factor on the result. You can do basic maths with this, especially if you remember that multiplying 
+ by a number below 1 is the same as dividing by 1 divided by that number (0.5* is the same as divide by 2). </p><p>For both the '-' and '*' options, <em>there must be no spaces</em> between any modifiers and the actual target string after it. </p><p>It's important to note, especially for <a href="#NODE_NODE">NODEs,</a> that the value that is used does not have to be bandwidth. You can use data for temperature, session-counts, CPU usage or anything else you can get data for. </p><p>The actual contents of the <em>targetspec</em> depend on the data source plugins that are 
  available. <a href="targets.html">The standard plugins are documented here</a>. </p> 
 </div>
 <div class="examples">
@@ -217,6 +256,8 @@ which is then displayed. Specify the targets on one <a href="#NODE_TARGET">TARGE
 <div class="changes">
 <h3>Change History</h3>
 <dl>
+<dt>0.96</dt>
+<dd>Added scale factors for all datasources.</dd>
 <dt>0.91</dt>
 <dd>Added 'negative' datasources.</dd>
 <dt>0.9</dt>
@@ -278,14 +319,19 @@ which is then displayed. Specify the targets on one <a href="#NODE_TARGET">TARGE
 <p>Specifies an icon to use for the node. </p><p>The filename can either be a full path to the image, or a relative one. </p><p>The icon file must be in PNG, JPEG or GIF format. Alpha-transparency within the icon should be honoured by Weathermap for PNG icons, to create irregular shapes. </p><p>If you specify the word 'none' as the icon filename, then no icon is used. This is useful if you have specified an <a href="#NODE_ICON">ICON</a> in the DEFAULT <a href="#NODE_NODE">NODE,</a> and want to override that for a few special cases. </p><p>There are some special icon filenames that can be used to generate an icon image without using an external file. 
  These all <em>require</em> you to specify a <em>maxwidth</em> and <em>maxheight</em> which are then used as the size of the 
  icon. The 'magic filenames' are: <ul><li>'box' - to produce a square cornered box.</li><li>'rbox' - 
- to produce a round-cornered box</li><li>'round' - to produce a circle or ellipse.</li></ul>The colours for these "artificial icons" are specified 
+ to produce a round-cornered box</li><li>'round' - to produce a circle or ellipse.</li> 
+ <li>'inpie' &amp; 'outpie' - to produce a pie-chart of either the in or out value relative to it's maximum. The colouring options on this are likely to change in a future version.</li> 
+ <li>'nink' - to produce a circular 'yin-yang'-style symbol, with each half showing the in and out values. The colouring options on this are likely to change in a future version.</li> 
+ </ul>The colours for these "artificial icons" are specified 
  using the <a href="#NODE_COLORS">AICONFILLCOLOR</a> and <a href="#NODE_COLORS">AICONOUTLINECOLOR</a> keywords. </p><p>The second form allows you to specify a maximum width and height for the icon. If the PNG file that you specify is bigger or smaller than this size, then it is automatically scaled up (or down) in proportion, so that it fits into a box of the size you specify. </p><p>The size of the icon image is used by <a href="#NODE_LABELOFFSET">LABELOFFSET</a> to decided how far to move the label, if you use compass-point offsets. </p><p>The text for the filename can contain <a href="advanced.html#tokens">special tokens</a> to select an icon based on map data. </p><p>You can adjust the colour of the icon according to a <a href="#GLOBAL_SCALE">SCALE,</a> by using <a href="#NODE_USEICONSCALE">USEICONSCALE,</a> if you are using the PHP GD library (the function required is not present in the main GD library). </p> 
 </div>
 <div class="changes">
 <h3>Change History</h3>
 <dl>
+<dt>0.96</dt>
+<dd>Added inpie, outpie and nink.</dd>
 <dt>0.95</dt>
-<dd>Added Artificial Icon support.</dd>
+<dd>Added Artificial Icon support - round, rbox and box.</dd>
 <dt>0.95</dt>
 <dd>Added Icon colourising support.</dd>
 <dt>0.9</dt>
@@ -522,6 +568,27 @@ which is then displayed. Specify the targets on one <a href="#NODE_TARGET">TARGE
 </dl>
 </div>
 </div>
+		  <div class="referenceentry">
+<h2><a name="NODE_ZORDER">ZORDER</a></h2>
+<div class="definition">ZORDER <em class="meta">z-coord</em> </div>
+<div class="description">
+<p>Specifies the order in which to draw this item on the map. </p><p>By default, all nodes are drawn above all links. 
+ There are some situations where you might like to change this, for example 
+ if you use a <a href="#NODE_NODE">NODE</a> as a background image, and you want links to show in front 
+ of that image. </p><p>By default, all nodes have a Z coordinate of 600, and all links have 300. The map legend 
+ is at 1000, which cannot be changed (you can move everything else above it, if you like, of course). 
+ Items are drawn from lowest Z up to highest Z, so if you want a particular node to appear underneath the 
+ default links, you can use <a href="#NODE_ZORDER">'ZORDER</a> 250' to do that. 
+ </p> 
+</div>
+<div class="changes">
+<h3>Change History</h3>
+<dl>
+<dt>0.96</dt>
+<dd>Added Z-ordering support.</dd>
+</dl>
+</div>
+</div>
     
 
 	<h1 id="s_scope_LINK" class="configsection">Link-specific Configuration Directives</h1>
@@ -539,16 +606,65 @@ which is then displayed. Specify the targets on one <a href="#NODE_TARGET">TARGE
  top of the configuration file, if you intend to use it. </p> 
 </div>
 </div>
+		  <div class="referenceentry">
+<h2><a name="LINK_TEMPLATE">TEMPLATE</a></h2>
+<div class="definition">TEMPLATE<em class="meta">linkname</em>
+</div>
+<div class="description">
+<p>By default, each new link starts with the same set of properties. You 
+ can change the default properties by defining a link called DEFAULT. </p><p>You can also use the <a href="#LINK_TEMPLATE">TEMPLATE</a> keyword to make a link inherit it's settings 
+ from <em>any</em> other link. The link you use must be defined earlier in the 
+ config file than where you use it. </p><p>You can make template-only links that are not visible in the map, by not 
+ including a <a href="#LINK_NODES">NODES</a> line in the link. Template links can also use templates, to 
+ build up a hierarchy of 'types'. </p><p><strong>NOTE:</strong> The <a href="#LINK_TEMPLATE">TEMPLATE</a> line should be the first line in the <a href="#LINK_LINK">LINK</a> 
+ definition, as it will copy the configuration over the top of anything else you 
+ have already defined for that <a href="#LINK_LINK">LINK.</a> </p> 
+</div>
+<div class="examples">
+<h3>Examples</h3>
+<div class="example">
+<h5>LINK Templates in use - with template-only links</h5>
+<pre>LINK bigpipe
+	WIDTH 8
+	ARROWSTYLE classic
+	
+LINK smallpipe
+	WIDTH 3
+	ARROWSTYLE compact
+	
+# this link uses the bigpipe template, so it doesn't need any formatting/styling commands
+LINK a_real_link
+	TEMPLATE bigpipe
+	NODES rtr1 rtr2	
+		</pre>
+</div>
+</div>
+<div class="changes">
+<h3>Change History</h3>
+<dl>
+<dt>0.96</dt>
+<dd>Added template support</dd>
+</dl>
+</div>
+</div>
 	    	  <div class="referenceentry">
 <h2><a name="LINK_NODES">NODES</a></h2>
 <div class="definition">NODES <em class="meta">nodename{:compassoffset}</em> <em class="meta">nodename{:compassoffset}</em>
 </div>
+<div class="definition">NODES <em class="meta">nodename{:compassoffset}{percentage}</em> <em class="meta">nodename{:compassoffset}{percentage}</em>
+</div>
 <div class="definition">NODES <em class="meta">nodename{:xoffset:yoffset}</em> <em class="meta">nodename{:xoffset:yoffset}</em>
+</div>
+<div class="definition">NODES <em class="meta">nodename{:angle}r{radius}</em> <em class="meta">nodename{:angle}r{radius}</em>
 </div>
 <div class="description">
 <p>These are the <a href="#NODE_NODE">NODEs</a> that this link joins. There can be 
  only two. They are the 'nodename's from the <a href="#NODE_NODE">NODE</a> line for 
- each node. </p><p>Optionally, you can add an offset after a nodename, to move the location of that end of the link. This can help with crowded areas of the map, and also in making parallel links. Valid offsets are named after compass-points: N,S,E,W,NE,NE,SE,SW, or they can be numeric values, to indicate the relative position in pixels from the centre of the node. </p><p>The order of the nodes is significant. When reading data sources, the flow from the first node to the second is considered 'out' and from second-to-first is 'in'. </p> 
+ each node. </p><p>Optionally, you can add an offset after a nodename, to move the location of that end of the link. This can help with crowded areas of the map, and also in making parallel links. Valid offsets can be numeric values, to indicate the relative position in pixels from the centre of the node, or are named after compass-points: N,S,E,W,NE,NE,SE,SW. The compass points 
+ describe locations around the edge of the box that contains the node. You can also specify a percentage after the compass point, to be a certain proportion of the way from the centre. The percentage must be two digits. 
+ Finally, you can also use polar coordinates to specify offsets, with an angle in degrees and a radius in pixels from the centre point. 0 degrees is straight up. 
+
+ </p><p>The order of the nodes is significant. When reading data sources, the flow from the first node to the second is considered 'out' and from second-to-first is 'in'. </p> 
 </div>
 <div class="examples">
 <h3>Examples</h3>
@@ -566,15 +682,33 @@ LINK secondlink
   NODES node1:W node2:W</pre>
 </div>
 <div class="example">
+<h5>Two parallel links, using percentage compass offsets to bring the links closer together</h5>
+<pre>LINK firstlink
+  NODES node1:E50 node2:E50
+
+LINK secondlink
+  NODES node1:W50 node2:W50</pre>
+</div>
+<div class="example">
 <h5>An offset link using pixel offsets</h5>
 <pre>LINK firstlink
   NODES node1:-10:10 node2:20:12
+        </pre>
+</div>
+<div class="example">
+<h5>An offset link using polar coordinates</h5>
+<pre>LINK firstlink
+  NODES node1:45r20 node2:225r20
         </pre>
 </div>
 </div>
 <div class="changes">
 <h3>Change History</h3>
 <dl>
+<dt>0.96</dt>
+<dd>Added polar offsets.</dd>
+<dt>0.96</dt>
+<dd>Added fractional compass offsets.</dd>
 <dt>0.9</dt>
 <dd>Added numeric pixel offsets.</dd>
 <dt>0.8</dt>
@@ -589,7 +723,8 @@ LINK secondlink
 <div class="description">
 <p>Specifies where to look for the current throughput 
  information for this <a href="#LINK_LINK">LINK.</a> You can also specify multiple targets, which will then be added together to make the aggregate bandwidth 
-which is then displayed. Specify the targets on one <a href="#LINK_TARGET">TARGET</a> line, seperated with a space. If a targetspec starts with a '-', then it's value will be <i>subtracted</i> from the final result instead. </p><p>The actual contents of the <em>targetspec</em> depend on the data source plugins that are 
+which is then displayed. Specify the targets on one <a href="#LINK_TARGET">TARGET</a> line, seperated with a space. If a targetspec starts with a '-', then it's value will be <i>subtracted</i> from the final result instead. </p><p>Also, if a targetspec starts with a number, then a *, then it's used a scaling factor on the result. You can do basic maths with this, especially if you remember that multiplying 
+ by a number below 1 is the same as dividing by 1 divided by that number (0.5* is the same as divide by 2). </p><p>For both the '-' and '*' options, <em>there must be no spaces</em> between any modifiers and the actual target string after it. </p><p>The actual contents of the <em>targetspec</em> depend on the data source plugins that are 
  available. <a href="targets.html">The standard plugins are documented here</a>. </p> 
 </div>
 <div class="examples">
@@ -606,6 +741,8 @@ which is then displayed. Specify the targets on one <a href="#LINK_TARGET">TARGE
 <div class="changes">
 <h3>Change History</h3>
 <dl>
+<dt>0.96</dt>
+<dd>Added scale factors for all datasources.</dd>
 <dt>0.91</dt>
 <dd>Added 'negative' datasources.</dd>
 <dt>0.9</dt>
@@ -771,11 +908,14 @@ of the direction of the link. 'angled' rotates the box to follow the directiong 
 <div class="definition">BWLABELPOS <em class="meta">inposition</em> <em class="meta">outposition</em>
 </div>
 <div class="description">
-<p>Specifies the position of the 'bandwidth' labels shown on each link. </p><p>The two position values are percentages along the link arrow, from the first to the second node. Therefore <tt><a href="#LINK_BWLABELPOS">BWLABELPOS</a> 75 25</tt> is the default. </p> 
+<p>Specifies the position of the 'bandwidth' labels shown on each link. </p><p>The two position values are percentages along the link arrow, from the first to the second node. Therefore <tt><a href="#LINK_BWLABELPOS">BWLABELPOS</a> 75 25</tt> is the default. </p><p>Weathermap will produce a warning if the outpostion is greater than the inposition. In most cases, you have probably made a mistake, but if you have 
+ a good reason to do this, then you can disable that warning using <a href="#LINK_SET">'SET</a> nowarn_bwlabelpos 1' in the top section of you map config file. </p> 
 </div>
 <div class="changes">
 <h3>Change History</h3>
 <dl>
+<dt>0.96</dt>
+<dd>Added warning for proably-wrong positions</dd>
 <dt>0.9</dt>
 <dd>Added BWLABELPOS</dd>
 </dl>
@@ -1203,6 +1343,27 @@ of the direction of the link. 'angled' rotates the box to follow the directiong 
 </dl>
 </div>
 </div>
+		<div class="referenceentry">
+<h2><a name="LINK_ZORDER">ZORDER</a></h2>
+<div class="definition">ZORDER <em class="meta">z-coord</em> </div>
+<div class="description">
+<p>Specifies the order in which to draw this item on the map. </p><p>By default, all nodes are drawn above all links. 
+ There are some situations where you might like to change this, for example 
+ if you use a <a href="#NODE_NODE">NODE</a> as a background image, and you want links to show in front 
+ of that image. </p><p>By default, all nodes have a Z coordinate of 600, and all links have 300. The map legend 
+ is at 1000, which cannot be changed (you can move everything else above it, if you like, of course). 
+ Items are drawn from lowest Z up to highest Z, so if you want a particular node to appear underneath the 
+ default links, you can use <a href="#LINK_ZORDER">'ZORDER</a> 250' to do that. 
+ </p> 
+</div>
+<div class="changes">
+<h3>Change History</h3>
+<dl>
+<dt>0.96</dt>
+<dd>Added Z-ordering support.</dd>
+</dl>
+</div>
+</div>
     
 	
 	<h1 id="s_scope_GLOBAL" class="configsection">Global Configuration Directives</h1>
@@ -1254,6 +1415,17 @@ of the direction of the link. 'angled' rotates the box to follow the directiong 
 <dt>0.7</dt>
 <dd>Added HTMLOUTPUTFILE.</dd>
 </dl>
+</div>
+</div>
+	  <div class="referenceentry">
+<h2><a name="GLOBAL_HTMLSTYLESHEET">HTMLSTYLESHEET</a></h2>
+<div class="definition">HTMLSTYLESHEET <em class="meta">URL</em>
+</div>
+<div class="description">
+<p>Specifies a CSS stylesheet to reference, when generating HTML. </p><p>When HTML output is enabled, this allows you to include your own CSS stylesheet in the result, allowing 
+ for customisation of the output without needing to use awk/perl/etc to modify the HTML. </p><p>If you are generating maps using the Cacti plugin, then this directive is ignored. </p><changes> 
+<change version="0.96">Added HTMLSTYLESHEET.</change> 
+</changes> 
 </div>
 </div>
  	  <div class="referenceentry">
@@ -1502,7 +1674,8 @@ SCALE  85  100    255     0    0</pre>
 <div class="description">
 <p>Specifies the position of the key, or legend, that shows what each colour-range in a scale means. If a scalename is not given, 
  then "DEFAULT" is assumed. 
- If no <a href="#GLOBAL_KEYPOS">KEYPOS</a> line is given for a scale, then no legend is drawn - handy if you have many many colour ranges. </p><p>You can optionally specify an additional parameter, to change the heading above the colours in 
+ If no <a href="#GLOBAL_KEYPOS">KEYPOS</a> line is given for a scale, then no legend is drawn - handy if you have many many colour ranges. You can also hide any legend by 
+ giving it a position with negative coordinates. </p><p>You can optionally specify an additional parameter, to change the heading above the colours in 
  the key. This can be used to change the language of the map, for example. If a scalename is given, then you <em>must also specify a title</em> - there is no useful default title for non-DEFAULT scales. </p><p>You can control the font used to draw the key with <a href="#GLOBAL_FONT">KEYFONT,</a> and the colours that it is drawn in, using <a href="#GLOBAL_COLORS">KEYTEXTCOLOR,</a> <a href="#GLOBAL_COLORS">KEYBGCOLOR</a> and <a href="#GLOBAL_COLORS">KEYOUTLINECOLOR.</a> </p> 
 </div>
 <div class="changes">
@@ -1527,9 +1700,10 @@ SCALE  85  100    255     0    0</pre>
 </div>
 <div class="description">
 <p>Specifies the style of the key, or legend, that shows what each colour-range means. If a scalename is not given, 
- then "DEFAULT" is assumed. Valid stylenames are: 'classic', 'horizontal' and 'vertical'. </p><p>Classic has a line for each <a href="#GLOBAL_SCALE">SCALE</a> range defined. 'vertical' and 'horizontal' are fixed-size, showing a 
+ then "DEFAULT" is assumed. Valid stylenames are: 'classic', 'horizontal', 'vertical', 'inverted' and 'tags'. </p><p>Classic has a line for each <a href="#GLOBAL_SCALE">SCALE</a> range defined. 'vertical' and 'horizontal' are fixed-size, showing a 
  continuous block from 0-100% usage, which is much more useful when gradient <a href="#GLOBAL_SCALE">SCALEs</a> are used, or when you have 
- a large number of <a href="#GLOBAL_SCALE">SCALE</a> lines in one scale. </p><p> 
+ a large number of <a href="#GLOBAL_SCALE">SCALE</a> lines in one scale. 'inverted' is the same as 'vertical', but with the zero point at the bottom, thermometer-style. Finally, 'tags' is the same style as 'classic', but 
+ instead of percentages, it shows the tag string from the end of the <a href="#GLOBAL_SCALE">SCALE</a> lines, if there are any. </p><p> 
  For 'horizontal' and 'vertical' styles, you can optionally add an additional parameter, which specifies the longer dimension of the legend in pixels. That is, for a horizontal legend, it specifies the width. The other dimension is calculated from the size of the font used (see <a href="#GLOBAL_FONT">KEYFONT).</a> 
  </p><p><img src="../images/keystyle-classic.png"></img>Classic Style </p><p><img src="../images/keystyle-horizontal.png"></img>Horizontal Style </p><p><img src="../images/keystyle-vertical.png"></img>Vertical Style </p><p>You can hide the percentage signs in the key, by setting key_hidepercent_<em>scalename</em> to 1 </p><p>If you have a 0-&gt;0 line in your <a href="#GLOBAL_SCALE">SCALE,</a> then you can hide that in the key, by setting key_hidezero_<em>scalename</em> to 1 </p> 
 </div>
@@ -1544,10 +1718,12 @@ SET key_hidepercent_DEFAULT 1</pre>
 <div class="changes">
 <h3>Change History</h3>
 <dl>
+<dt>0.96</dt>
+<dd>Added tags and inverted styles.</dd>
 <dt>0.92</dt>
 <dd>Added hidepercent and hidezero SET variables.</dd>
 <dt>0.9</dt>
-<dd>Added support for multiple key styles.</dd>
+<dd>Added support for multiple key styles (classic, horizontal, vertical).</dd>
 </dl>
 </div>
 </div>

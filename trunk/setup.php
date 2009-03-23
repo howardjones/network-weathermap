@@ -628,41 +628,56 @@ function weathermap_poller_output ($rrd_update_array) {
 			$period = $time - $required['last_time'];
 			$lastval = $required['last_value'];
 			
-			switch($required['data_source_type_id'])
+			// if the new value is a NaN, we'll give 0 instead, and pretend it didn't happen from the point
+			// of view of the counter etc. That way, we don't get those enormous spikes. Still doesn't deal with
+			// reboots very well, but it should improve it for drops.
+			if($value == 'U')
 			{
-				case 1: //GAUGE
-					$newvalue = $value;
-					break;
-				
-				case 2: //COUNTER
-					if ($value >= $lastval) {
-						// Everything is normal
-						$newvalue = $value - $lastval;
-					} else {
-						// Possible overflow, see if its 32bit or 64bit
-						if ($lastval > 4294967295) {
-							$newvalue = (18446744073709551615 - $lastval) + $value;
-						} else {
-							$newvalue = (4294967295 - $lastval) + $value;
-						}
-					}
-					$newvalue = $newvalue / $period;
-					break;
-				
-				case 3: //DERIVE
-					$newvalue = ($value-$lastval) / $period;
-					break;
-				
-				case 4: //ABSOLUTE
-					$newvalue = $value / $period;
-					break;
-				
-				default: // do something somewhat sensible in case something odd happens
-					$newvalue = $value;
-					warn("poller_output found an unknown data_source_type_id for $file:$dsname");
-					break;
+				$newvalue = 0;
+				$newlastvalue = $lastval;
+				$newtime = $required['last_time'];
 			}
-			db_execute("UPDATE weathermap_data SET last_time=$time, last_calc='$newvalue', last_value='$value',sequence=sequence+1  where id = " . $required['id']);
+			else
+			{
+				$newlastvalue = $value;
+				$newtime = $time;
+				
+				switch($required['data_source_type_id'])
+				{
+					case 1: //GAUGE
+						$newvalue = $value;
+						break;
+					
+					case 2: //COUNTER
+						if ($value >= $lastval) {
+							// Everything is normal
+							$newvalue = $value - $lastval;
+						} else {
+							// Possible overflow, see if its 32bit or 64bit
+							if ($lastval > 4294967295) {
+								$newvalue = (18446744073709551615 - $lastval) + $value;
+							} else {
+								$newvalue = (4294967295 - $lastval) + $value;
+							}
+						}
+						$newvalue = $newvalue / $period;
+						break;
+					
+					case 3: //DERIVE
+						$newvalue = ($value-$lastval) / $period;
+						break;
+					
+					case 4: //ABSOLUTE
+						$newvalue = $value / $period;
+						break;
+					
+					default: // do something somewhat sensible in case something odd happens
+						$newvalue = $value;
+						warn("poller_output found an unknown data_source_type_id for $file:$dsname");
+						break;
+				}
+			}
+			db_execute("UPDATE weathermap_data SET last_time=$newtime, last_calc='$newvalue', last_value='$newlastvalue',sequence=sequence+1  where id = " . $required['id']);
 	        	if($logging >= POLLER_VERBOSITY_DEBUG) cacti_log("WM poller_output: Final value is $newvalue (was $lastval, period was $period)\n",true,"WEATHERMAP");
 		}
 		else

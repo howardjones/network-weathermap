@@ -71,7 +71,7 @@ if (sizeof($gopts) > 0)
 		switch ($o[0])
 		{
 		case '--config':
-			$configfile=$o[1];
+			$configfile=$o[1];			
 			break;
 
 		case '--htmloutput':
@@ -136,11 +136,18 @@ if (sizeof($gopts) > 0)
 			
         case '--define':
             preg_match("/^([^=]+)=(.*)\s*$/",$o[1],$matches);
-            $varname = $matches[1];
-            $value = $matches[2];
-            debug(">> $varname = '$value'\n");
-            // save this for later, so that when the map object exists, it can be defined
-            $defines[$varname]=$value;
+			if(isset($matches[2]))
+			{
+	            $varname = $matches[1];
+	            $value = $matches[2];
+				debug(">> $varname = '$value'\n");
+	            // save this for later, so that when the map object exists, it can be defined
+	            $defines[$varname]=$value;
+			}
+			else
+			{
+				print "WARNING: --define format is:  --define name=value\n";
+			}            
             break;
 
 		case '--version': 
@@ -160,6 +167,9 @@ if (sizeof($gopts) > 0)
                         
                         print " --image-uri {uri}        -  URI to prefix <img> tags in HTML.\n";
                         print " --bulge                  -  Enable link-bulging mode. See manual.\n\n";
+						
+						print " --define name=value      -  Define internal variables\n";
+						print "                             (equivalent to global SET in config file)\n\n";
                         
                         print " --no-data                -  skip the data-reading process (just a 'grey' map)\n";
                         print " --randomdata            -  as above, but use random data\n";

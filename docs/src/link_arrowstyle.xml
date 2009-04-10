@@ -10,6 +10,8 @@
         <p>The default is 'classic' which has a wide arrowhead. You can also choose 'compact' which gives narrower heads.</p>
         <p>Finally, you can get finer control by adjusting the size yourself. The width and length of the head are in units of link-width.</p>
         <p>Classic is equivalent to '4 2' and Compact is equivalent to '1 1'.</p>
+		<p><img src="../images/arrowstyle-classic.png" /> Classic arrow style</p>
+		<p><img src="../images/arrowstyle-compact.png" /> Compact arrow style</p>
     </description>
     <changes>
 	    <change version="0.8">Added custom numeric form.</change>

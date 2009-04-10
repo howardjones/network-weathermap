@@ -16,6 +16,7 @@
     Finally, you can also use polar coordinates to specify offsets, with an angle in degrees and a radius in pixels from the centre point. 0 degrees is straight up.
     </p>
 	<p>The order of the nodes is significant. When reading data sources, the flow from the first node to the second is considered 'out' and from second-to-first is 'in'.</p>
+	<p><img src="../images/compass-points.png" /><br/>The compass points, relative to the node's bounding-box..</p>
 	<p><img src="../images/linkoffset-defaults.png" /><br/>The default - node centre to node centre.</p>
 	<p><img src="../images/linkoffset-eastwest.png" /><br/>Using compass points - <tt>NODES node1:E node2:W</tt></p>
 	<p><img src="../images/linkoffset-east50west50.png" /><br/>Using compass points with percentages - <tt>NODES node1:E50 node2:W50</tt></p>

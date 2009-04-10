@@ -378,7 +378,7 @@ which is then displayed. Specify the targets on one <a href="#NODE_TARGET">TARGE
  of the node anymore. </p><p>You can specify a compass-point (e.g. <a href="#NODE_LABELOFFSET">LABELOFFSET</a> S). The compass-point method takes the size of the 
  <a href="#NODE_ICON">ICON,</a> and uses that as the offset distance in the direction you specify. This way, you can change your 
  icon for something of a different size, and not need to change all your offsets. You can use the main 
- 8 points of the compass: N, E, S, W, NE, SE, NW, SW. </p><p>For more control, you can specify an integer offset for the x and y positions of the label (e.g. <a href="#NODE_LABELOFFSET">LABELOFFSET</a> -10 -20) instead. </p> 
+ 8 points of the compass: N, E, S, W, NE, SE, NW, SW. </p><p><img src="../images/compass-points.png"></img><br></br>The compass points, relative to the node's bounding-box.. </p><p>For more control, you can specify an integer offset for the x and y positions of the label (e.g. <a href="#NODE_LABELOFFSET">LABELOFFSET</a> -10 -20) instead. </p> 
 </div>
 <div class="changes">
 <h3>Change History</h3>
@@ -393,7 +393,7 @@ which is then displayed. Specify the targets on one <a href="#NODE_TARGET">TARGE
 <div class="definition">LABELANGLE <em class="meta">angle</em>
 </div>
 <div class="description">
-<p>Specifies a rotation angle of the label for a node. Allowed angles are 0, 90, 180 and 270 degrees. The rotation is around the centre of the label, after any <a href="#NODE_LABELOFFSET">LABELOFFSET</a> has been applied. </p><p>The <a href="#NODE_LABELFONT">LABELFONT</a> <em>must be a TrueType font</em> for angles other than 0 (the default) as these are the only font type to support rotating text. </p> 
+<p>Specifies a rotation angle of the label for a node. Allowed angles are 0, 90, 180 and 270 degrees. The rotation is around the centre of the label, after any <a href="#NODE_LABELOFFSET">LABELOFFSET</a> has been applied. </p><p>The <a href="#NODE_LABELFONT">LABELFONT</a> <em>must be a TrueType font</em> for angles other than 0 (the default) as these are the only font type to support rotating text. </p><p><img src="../images/labelangle+labeloffset.png"></img><br></br>Rotated label, using <tt><a href="#NODE_LABELANGLE">LABELANGLE</a> 90</tt> and <tt><a href="#NODE_LABELOFFSET">LABELOFFSET</a> E</tt> </p> 
 </div>
 <div class="changes">
 <h3>Change History</h3>
@@ -663,7 +663,7 @@ LINK a_real_link
  each node. </p><p>Optionally, you can add an offset after a nodename, to move the location of that end of the link. This can help with crowded areas of the map, and also in making parallel links. Valid offsets can be numeric values, to indicate the relative position in pixels from the centre of the node, or are named after compass-points: N,S,E,W,NE,NE,SE,SW. The compass points 
  describe locations around the edge of the box that contains the node. You can also specify a percentage after the compass point, to be a certain proportion of the way from the centre. The percentage must be two digits. 
  Finally, you can also use polar coordinates to specify offsets, with an angle in degrees and a radius in pixels from the centre point. 0 degrees is straight up. 
- </p><p>The order of the nodes is significant. When reading data sources, the flow from the first node to the second is considered 'out' and from second-to-first is 'in'. </p><p><img src="../images/linkoffset-defaults.png"></img><br></br>The default - node centre to node centre. </p><p><img src="../images/linkoffset-eastwest.png"></img><br></br>Using compass points - <tt><a href="#LINK_NODES">NODES</a> node1:E node2:W</tt> </p><p><img src="../images/linkoffset-east50west50.png"></img><br></br>Using compass points with percentages - <tt><a href="#LINK_NODES">NODES</a> node1:E50 node2:W50</tt> </p><p><img src="../images/linkoffset-radial.png"></img><br></br>Using polar offsets - <tt><a href="#LINK_NODES">NODES</a> node1:45r20 node2:225r20</tt> </p><p><img src="../images/linkoffset-parallel.png"></img><br></br>Using offsets to make parallel links- <tt><a href="#LINK_NODES">NODES</a> node1:NE50 node2:NW50</tt> for one link and <tt><a href="#LINK_NODES">NODES</a> node1:SE50 node2:SW50</tt> for the other. </p> 
+ </p><p>The order of the nodes is significant. When reading data sources, the flow from the first node to the second is considered 'out' and from second-to-first is 'in'. </p><p><img src="../images/compass-points.png"></img><br></br>The compass points, relative to the node's bounding-box.. </p><p><img src="../images/linkoffset-defaults.png"></img><br></br>The default - node centre to node centre. </p><p><img src="../images/linkoffset-eastwest.png"></img><br></br>Using compass points - <tt><a href="#LINK_NODES">NODES</a> node1:E node2:W</tt> </p><p><img src="../images/linkoffset-east50west50.png"></img><br></br>Using compass points with percentages - <tt><a href="#LINK_NODES">NODES</a> node1:E50 node2:W50</tt> </p><p><img src="../images/linkoffset-radial.png"></img><br></br>Using polar offsets - <tt><a href="#LINK_NODES">NODES</a> node1:45r20 node2:225r20</tt> </p><p><img src="../images/linkoffset-parallel.png"></img><br></br>Using offsets to make parallel links- <tt><a href="#LINK_NODES">NODES</a> node1:NE50 node2:NW50</tt> for one link and <tt><a href="#LINK_NODES">NODES</a> node1:SE50 node2:SW50</tt> for the other. </p> 
 </div>
 <div class="examples">
 <h3>Examples</h3>
@@ -892,7 +892,7 @@ given in the <a href="#LINK_NODES">NODES</a> line. </p><p>Bandwidths can also us
 </div>
 <div class="description">
 <p>Specifies the style used to draw the box around the 'bandwidth' label shown on each link. </p><p>Two styles are currently available: 'classic' leaves the box horizontal, regardless 
-of the direction of the link. 'angled' rotates the box to follow the directiong of the link arrow. </p><p>The <a href="#LINK_BWFONT">BWFONT</a> <em>must be a TrueType font</em> as these are the only font type to support rotating text. </p> 
+of the direction of the link. 'angled' rotates the box to follow the directiong of the link arrow. </p><p>The <a href="#LINK_BWFONT">BWFONT</a> <em>must be a TrueType font</em> as these are the only font type to support rotating text. </p><p>To change the contents of the label, use <a href="#LINK_BWLABEL">BWLABEL</a> or BWINFORMAT/BWOUTFORMAT. </p><p><img src="../images/bwstyle-classic.png"></img> Classic label style </p><p><img src="../images/bwstyle-angled.png"></img> Angled label style </p> 
 </div>
 <div class="changes">
 <h3>Change History</h3>
@@ -1332,7 +1332,7 @@ of the direction of the link. 'angled' rotates the box to follow the directiong 
 <div class="definition">ARROWSTYLE <em class="meta">width</em> <em class="meta">length</em>
 </div>
 <div class="description">
-<p>Specifies the style of arrowhead used for drawing links. </p><p>The default is 'classic' which has a wide arrowhead. You can also choose 'compact' which gives narrower heads. </p><p>Finally, you can get finer control by adjusting the size yourself. The width and length of the head are in units of link-width. </p><p>Classic is equivalent to '4 2' and Compact is equivalent to '1 1'. </p> 
+<p>Specifies the style of arrowhead used for drawing links. </p><p>The default is 'classic' which has a wide arrowhead. You can also choose 'compact' which gives narrower heads. </p><p>Finally, you can get finer control by adjusting the size yourself. The width and length of the head are in units of link-width. </p><p>Classic is equivalent to '4 2' and Compact is equivalent to '1 1'. </p><p><img src="../images/arrowstyle-classic.png"></img> Classic arrow style </p><p><img src="../images/arrowstyle-compact.png"></img> Compact arrow style </p> 
 </div>
 <div class="changes">
 <h3>Change History</h3>

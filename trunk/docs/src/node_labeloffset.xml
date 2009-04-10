@@ -13,6 +13,7 @@
     ICON, and uses that as the offset distance in the direction you specify. This way, you can change your
     icon for something of a different size, and not need to change all your offsets. You can use the main
     8 points of the compass: N, E, S, W, NE, SE, NW, SW.</p>
+	<p><img src="../images/compass-points.png" /><br/>The compass points, relative to the node's bounding-box..</p>
     <p>For more control, you can specify an integer offset for the x and y positions of the label (e.g. LABELOFFSET -10 -20) instead.</p>
     </description>
     <changes>

@@ -1330,23 +1330,26 @@ function DrawLegend_Classic($im,$scalename="DEFAULT",$use_tags=FALSE)
 		# $minwidth = imagefontwidth($font) * strlen('XX 100%-100%')+10;
 		# $boxwidth = imagefontwidth($font) * strlen($title) + 10;
 		list($minwidth, $junk)=$this->myimagestringsize($font, 'MMMM 100%-100%');
+		list($minminwidth, $junk)=$this->myimagestringsize($font, 'MMMM ');
 		list($boxwidth, $junk)=$this->myimagestringsize($font, $title);
-
-		$max_tag = 0;
+		
 		if($use_tags)
 		{
+			$max_tag = 0;
 			foreach ($colours as $colour)
 			{
 				if ( isset($colour['tag']) )
 				{
 					list($w, $junk)=$this->myimagestringsize($font, $colour['tag']);
+					# print $colour['tag']." $w \n";
 					if($w > $max_tag) $max_tag = $w;
 				}
 			}
 			
-			// now we can tweak the widths, appropriately
-			
-			if($max_tag > $minwidth) $minwidth = $max_tag;
+			// now we can tweak the widths, appropriately to allow for the tag strings
+			# print "$max_tag > $minwidth?\n";
+			if( ($max_tag + $minminwidth) > $minwidth) $minwidth = $minminwidth + $max_tag;
+			# print "minwidth is now $minwidth\n";
 		}
 
 		$minwidth+=10;
@@ -1459,14 +1462,13 @@ function DrawTimestamp($im, $font, $colour)
 	$x=$this->width - $boxwidth;
 	$y=$boxheight;
 
-	if (($this->timex > 0) && ($this->timey > 0))
+	if (($this->timex != 0) && ($this->timey != 0))
 	{
-		$x=$this->timex;
-		$y=$this->timey;
+		$x = $this->timex;
+		$y = $this->timey;
 	}
-
+		
 	$this->myimagestring($im, $font, $x, $y, $this->datestamp, $colour);
-
 	$this->imap->addArea("Rectangle", "TIMESTAMP", '', array($x, $y, $x + $boxwidth, $y - $boxheight));
 }
 

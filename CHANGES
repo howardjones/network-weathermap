@@ -35,6 +35,7 @@
 	ADDED - TARGET strings can be enclosed in quotes, to allow spaces in them (mainly for external ! scripts)
 	ADDED - "KEYSTYLE tags" - like classic, but uses the scale tags instead of percentages.
 	ADDED - scripts in random-bits to help with automatic/assisted mapping.
+	ADDED - lots more pretty pictures in the manual, so you can see what I mean.
 	CHANGE - Cacti plugin uses "processed" map title now (allows {} tokens in the title)
 	CHANGE - A NODE with no POSITION is not drawn, instead of drawn at 0,0. Useful for templates.
 	CHANGE - A LINK with no NODES is no longer an error. Also for templates.
@@ -45,11 +46,15 @@
 	FIXED - Minor issue with CRLF in map title for Cacti Plugin
 	FIXED - CLI tool set --define options incorrectly.
 	FIXED - Oneway links don't draw the INCOMMENT anymore
+	FIXED - negative TIMEPOS didn't hide the timestamp
 	FIXED - DEFAULT SCALE covers 0-100 properly (Thanks Dan Fusselman)
 	FIXED - Scaled ICON in DEFAULT didn't get overwritten properly in nodes (Thanks Fabrizio Carusi)
 	FIXED - No more floating-point imagemap coords (Thanks Trond Aspelund)
+	FIXED - RRDtool regional output (. vs ,) workaround
+	FIXED - Cacti poller_output handles NaN more gracefully now
 	FIXED - SNMP datasource should work with Windows SNMP again
 	FIXED - MRTG datasource tried to stat() URLs
+	FIXED - Error reporting for CLI --define was bad. --help text was out of date.
 		
 0.95b	FIXED - SQL schema issue that upset some mysql versions
 	FIXED - Removed sometime-problem debugging code in editor

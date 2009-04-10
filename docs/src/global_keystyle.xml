@@ -20,6 +20,8 @@
 			<p><img src="../images/keystyle-classic.png" />Classic Style</p>
 			<p><img src="../images/keystyle-horizontal.png" />Horizontal Style</p>
 			<p><img src="../images/keystyle-vertical.png" />Vertical Style</p>
+			<p><img src="../images/keystyle-inverted.png" />Inverted Style</p>
+			<p><img src="../images/keystyle-tags.png" />Tags Style</p>
 
 			<p>You can hide the percentage signs in the key, by setting key_hidepercent_<em>scalename</em> to  1</p>
 			<p>If you have a 0->0 line in your SCALE, then you can hide that in the key, by setting key_hidezero_<em>scalename</em> to  1</p>

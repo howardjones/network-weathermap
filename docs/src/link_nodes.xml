@@ -14,9 +14,14 @@
     <p>Optionally, you can add an offset after a nodename, to move the location of that end of the link. This can help with crowded areas of the map, and also in making parallel links. Valid offsets can be numeric values, to indicate the relative position in pixels from the centre of the node, or are named after compass-points: N,S,E,W,NE,NE,SE,SW. The compass points
     describe locations around the edge of the box that contains the node. You can also specify a percentage after the compass point, to be a certain proportion of the way from the centre. The percentage must be two digits.
     Finally, you can also use polar coordinates to specify offsets, with an angle in degrees and a radius in pixels from the centre point. 0 degrees is straight up.
-    
     </p>
 	<p>The order of the nodes is significant. When reading data sources, the flow from the first node to the second is considered 'out' and from second-to-first is 'in'.</p>
+	<p><img src="../images/linkoffset-defaults.png" /><br/>The default - node centre to node centre.</p>
+	<p><img src="../images/linkoffset-eastwest.png" /><br/>Using compass points - <tt>NODES node1:E node2:W</tt></p>
+	<p><img src="../images/linkoffset-east50west50.png" /><br/>Using compass points with percentages - <tt>NODES node1:E50 node2:W50</tt></p>
+	<p><img src="../images/linkoffset-radial.png" /><br/>Using polar offsets - <tt>NODES node1:45r20 node2:225r20</tt></p>
+	<p><img src="../images/linkoffset-parallel.png" /><br/>Using offsets to make parallel links- <tt>NODES node1:NE50 node2:NW50</tt> for one link and <tt>NODES node1:SE50 node2:SW50</tt> for the other.</p>
+	
     </description>
     <changes>
 	<change version="0.96">Added polar offsets.</change>

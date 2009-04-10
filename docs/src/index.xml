@@ -65,6 +65,7 @@
 				  <xi:include href="link_innotes.xml"/>
 				  <xi:include href="link_outnotes.xml"/>
   	    	  <xi:include href="link_via.xml"/>
+  	    	  <xi:include href="link_viastyle.xml"/>
 		  <xi:include href="link_linkstyle.xml"/>
 	    	  <xi:include href="link_arrowstyle.xml"/>
                 <xi:include href="link_set.xml"/>

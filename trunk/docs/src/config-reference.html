@@ -124,14 +124,14 @@
 </div>
 	  <div class="referenceentry">
 <h2><a name="NODE_TEMPLATE">TEMPLATE</a></h2>
-<div class="definition">TEMPLATE<em class="meta">linkname</em>
+<div class="definition">TEMPLATE<em class="meta">nodename</em>
 </div>
 <div class="description">
-<p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">XXX - FIX UP NEEDED </p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">By default, each new link starts with the same set of properties. You 
- can change the default properties by defining a link called DEFAULT. </p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">You can also use the <a href="#NODE_TEMPLATE">TEMPLATE</a> keyword to make a link inherit it's settings 
- from <em>any</em> other link. The link you use must be defined earlier in the 
- config file than where you use it. </p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">You can make template-only links that are not visible in the map, by not 
- including a <a href="#LINK_NODES">NODES</a> line in the link. Template links can also use templates, to 
+<p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">By default, each new node starts with the same set of properties. You 
+ can change the default properties by defining a node called DEFAULT. </p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">You can also use the <a href="#NODE_TEMPLATE">TEMPLATE</a> keyword to make a node inherit it's settings 
+ from <em>any</em> other node. The node you use must be defined earlier in the 
+ config file than where you use it. </p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">You can make template-only nodes that are not visible in the map, by not 
+ including a <a href="#LINK_NODES">NODES</a> line in the node. Template nodes can also use templates, to 
  build up a hierarchy of 'types'. </p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude"><strong>NOTE:</strong> The <a href="#NODE_TEMPLATE">TEMPLATE</a> line should be the first line in the <a href="#NODE_NODE">NODE</a> 
  definition, as it will copy the configuration over the top of anything else you 
  have already defined for that <a href="#NODE_NODE">NODE.</a> </p> 
@@ -634,8 +634,7 @@ LINK a_real_link
  each node. </p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Optionally, you can add an offset after a nodename, to move the location of that end of the link. This can help with crowded areas of the map, and also in making parallel links. Valid offsets can be numeric values, to indicate the relative position in pixels from the centre of the node, or are named after compass-points: N,S,E,W,NE,NE,SE,SW. The compass points 
  describe locations around the edge of the box that contains the node. You can also specify a percentage after the compass point, to be a certain proportion of the way from the centre. The percentage must be two digits. 
  Finally, you can also use polar coordinates to specify offsets, with an angle in degrees and a radius in pixels from the centre point. 0 degrees is straight up. 
-
- </p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">The order of the nodes is significant. When reading data sources, the flow from the first node to the second is considered 'out' and from second-to-first is 'in'. </p> 
+ </p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">The order of the nodes is significant. When reading data sources, the flow from the first node to the second is considered 'out' and from second-to-first is 'in'. </p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude"><img src="../images/linkoffset-defaults.png"></img><br></br>The default - node centre to node centre. </p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude"><img src="../images/linkoffset-eastwest.png"></img><br></br>Using compass points - <tt><a href="#LINK_NODES">NODES</a> node1:E node2:W</tt> </p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude"><img src="../images/linkoffset-east50west50.png"></img><br></br>Using compass points with percentages - <tt><a href="#LINK_NODES">NODES</a> node1:E50 node2:W50</tt> </p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude"><img src="../images/linkoffset-radial.png"></img><br></br>Using polar offsets - <tt><a href="#LINK_NODES">NODES</a> node1:45r20 node2:225r20</tt> </p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude"><img src="../images/linkoffset-parallel.png"></img><br></br>Using offsets to make parallel links- <tt><a href="#LINK_NODES">NODES</a> node1:NE50 node2:NW50</tt> for one link and <tt><a href="#LINK_NODES">NODES</a> node1:SE50 node2:SW50</tt> for the other. </p> 
 </div>
 <div class="examples">
 <h3>Examples</h3>
@@ -1249,15 +1248,34 @@ of the direction of the link. 'angled' rotates the box to follow the directiong 
 <div class="description">
 <p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Specify an additional point that a link must pass through. </p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">A link normally goes in a straight line between the two nodes listed in the <a href="#LINK_NODES">NODES</a> configuration line. 
  If you need it to go around something else, or to seperate two parallel links so that the bandwidth labels 
- are all visible, you can make the link curve. </p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">If you specify multiple <a href="#LINK_VIA">VIA</a> lines, then the link will pass through each in turn, in the order they are specified. </p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Any <a href="#LINK_VIA">VIA</a> can also be specified relative to a <a href="#NODE_NODE">NODE</a> on the map. This makes it easier to have curves keep the intended shape as you re-organise a map. </p> 
+ are all visible, you can make the link curve. </p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">If you specify multiple <a href="#LINK_VIA">VIA</a> lines, then the link will pass through each in turn, in the order they are specified. </p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">You can choose between curved or angled links with VIASTYLE. </p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Any <a href="#LINK_VIA">VIA</a> can also be specified relative to a <a href="#NODE_NODE">NODE</a> on the map. This makes it easier to have curves keep the intended shape as you re-organise a map. </p> 
 </div>
 <div class="changes">
 <h3>Change History</h3>
 <dl>
+<dt>0.96</dt>
+<dd>Added angled VIAs.</dd>
 <dt>0.95</dt>
 <dd>Added relative-positioned VIA.</dd>
 <dt>0.8</dt>
 <dd>Originally added VIA.</dd>
+</dl>
+</div>
+</div>
+  	    	  <div class="referenceentry">
+<h2><a name="LINK_VIASTYLE">VIASTYLE</a></h2>
+<div class="definition">VIASTYLE curved</div>
+<div class="definition">VIASTYLE angled</div>
+<div class="description">
+<p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">When using <a href="#LINK_VIA">VIA</a> to define a non-straight <a href="#LINK_LINK">LINK,</a> you can choose to have a curved link, where the 
+ curve passes through each <a href="#LINK_VIA">VIA</a> point, or an angled link where each <a href="#LINK_VIA">VIA</a> point is a 'corner'. The default 
+ is for a curved link. </p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude"><img src="../images/viastyle-curved.png"></img>Curved <a href="#LINK_VIA">VIA</a> </p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude"><img src="../images/viastyle-angled.png"></img>Angled <a href="#LINK_VIA">VIA</a> </p> 
+</div>
+<div class="changes">
+<h3>Change History</h3>
+<dl>
+<dt>0.96</dt>
+<dd>Added 'angled' style, and VIASTYLE.</dd>
 </dl>
 </div>
 </div>
@@ -1676,7 +1694,7 @@ SCALE  85  100    255     0    0</pre>
  a large number of <a href="#GLOBAL_SCALE">SCALE</a> lines in one scale. 'inverted' is the same as 'vertical', but with the zero point at the bottom, thermometer-style. Finally, 'tags' is the same style as 'classic', but 
  instead of percentages, it shows the tag string from the end of the <a href="#GLOBAL_SCALE">SCALE</a> lines, if there are any. </p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude"> 
  For 'horizontal' and 'vertical' styles, you can optionally add an additional parameter, which specifies the longer dimension of the legend in pixels. That is, for a horizontal legend, it specifies the width. The other dimension is calculated from the size of the font used (see <a href="#GLOBAL_FONT">KEYFONT).</a> 
- </p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude"><img src="../images/keystyle-classic.png"></img>Classic Style </p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude"><img src="../images/keystyle-horizontal.png"></img>Horizontal Style </p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude"><img src="../images/keystyle-vertical.png"></img>Vertical Style </p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">You can hide the percentage signs in the key, by setting key_hidepercent_<em>scalename</em> to 1 </p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">If you have a 0-&gt;0 line in your <a href="#GLOBAL_SCALE">SCALE,</a> then you can hide that in the key, by setting key_hidezero_<em>scalename</em> to 1 </p> 
+ </p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude"><img src="../images/keystyle-classic.png"></img>Classic Style </p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude"><img src="../images/keystyle-horizontal.png"></img>Horizontal Style </p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude"><img src="../images/keystyle-vertical.png"></img>Vertical Style </p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude"><img src="../images/keystyle-inverted.png"></img>Inverted Style </p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude"><img src="../images/keystyle-tags.png"></img>Tags Style </p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">You can hide the percentage signs in the key, by setting key_hidepercent_<em>scalename</em> to 1 </p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">If you have a 0-&gt;0 line in your <a href="#GLOBAL_SCALE">SCALE,</a> then you can hide that in the key, by setting key_hidezero_<em>scalename</em> to 1 </p> 
 </div>
 <div class="examples">
 <h3>Examples</h3>

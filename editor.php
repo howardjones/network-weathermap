@@ -758,8 +758,12 @@ else
 		
 		array_push($map->seen_zlayers[$node->zorder], $node);			
 		
-		// XXX - fix me - should use default!
-		$node->label = "Node";
+		// only insert a label if there's no LABEL in the DEFAULT node.
+		// otherwise, respect the template.
+		if($map->nodes['DEFAULT']->label == $map->nodes[':: DEFAULT ::']->label)
+		{
+			$node->label = "Node";
+		}
 
 		$map->nodes[$node->name] = $node;
 		

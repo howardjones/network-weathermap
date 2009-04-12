@@ -34,7 +34,7 @@
 	ADDED - fping plugin allows for changing the number of pings.
 	ADDED - TARGET strings can be enclosed in quotes, to allow spaces in them (mainly for external ! scripts)
 	ADDED - "KEYSTYLE tags" - like classic, but uses the scale tags instead of percentages.
-	# ADDED - scripts in random-bits to help with automatic/assisted mapping.
+	ADDED - scripts in random-bits to help with automatic/assisted mapping.
 	ADDED - lots more pretty pictures in the manual, so you can see what I mean.
 	CHANGE - Cacti plugin uses "processed" map title now (allows {} tokens in the title)
 	CHANGE - A NODE with no POSITION is not drawn, instead of drawn at 0,0. Useful for templates.
@@ -55,6 +55,7 @@
 	FIXED - SNMP datasource should work with Windows SNMP again
 	FIXED - MRTG datasource tried to stat() URLs
 	FIXED - Error reporting for CLI --define was bad. --help text was out of date.
+	FIXED - Editor will honour LABEL from NODE DEFAULT, if it is set.
 		
 0.95b	FIXED - SQL schema issue that upset some mysql versions
 	FIXED - Removed sometime-problem debugging code in editor

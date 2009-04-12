@@ -11,6 +11,7 @@
     <definition>SCALE <meta>scalename</meta> <meta>min</meta> <meta>max</meta> <meta>red</meta> <meta>green</meta> <meta>blue</meta> <meta>tagtext</meta></definition>
     <definition>SCALE <meta>min</meta> <meta>max</meta> <meta>red</meta> <meta>green</meta> <meta>blue</meta> <meta>red2</meta> <meta>green2</meta> <meta>blue2</meta> <meta>tagtext</meta></definition>
     <definition>SCALE <meta>scalename</meta> <meta>min</meta> <meta>max</meta> <meta>red</meta> <meta>green</meta> <meta>blue</meta> <meta>red2</meta> <meta>green2</meta> <meta>blue2</meta> <meta>tagtext</meta></definition>
+    <definition>SCALE <meta>min</meta> <meta>max</meta> none</definition>
     <description  xmlns="http://www.w3.org/1999/xhtml">
     <p>Defines one 'span' within the link colour-coding table.</p>
     <p>SCALE is used to specify how NODEs and LINKs are colour-coded according to their percent usage.
@@ -18,6 +19,7 @@
     Colour values are between 0 and 255. Percentages are between 0 and 100, obviously.</p>
 	<p>If you specify <i>two</i> colours on the line (the third and fourth forms above), then the colour chosen for the link will be calculated as
 	a proportion between the two colours. You can avoid specifying many SCALE lines this way.</p>
+	<p>If you specify the word 'none' instead of a colour, then a transparent colour is used for that range of values.</p>
 	<p>Without a <i>scalename</i>, the SCALE line will add a definition to the scale named 'DEFAULT'. If you define any other named scales, you can then use the USESCALE directive to specify that a particular NODE or LINK use your new scale.</p>
 	
 	<p>With any of the formats, you can specify a 'tag' on the end of the line. When the colour is decided for the 'in' and 'out' parts of a NODE or LINK, 
@@ -41,6 +43,7 @@ SCALE  70   85    255   192    0
 SCALE  85  100    255     0    0</content></example>
     </examples>
     <changes>
+	<change version="0.96">Added 'none' colour option.</change>
 	<change version="0.95">Added USEICONSCALE.</change>
 	<change version="0.95">Added scale tags.</change>
 	<change version="0.9">Added named scales.</change>

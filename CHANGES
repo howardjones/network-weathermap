@@ -25,7 +25,7 @@
 	ADDED - New NODES offset type - angle+radius
 	ADDED - New NODES offset type - compass-point+percentage
 	ADDED - "KEYSTYLE inverted" - to get a thermometer-style vertical legend.
-	# ADDED - "COMMENTSTYLE center" to make comments run along the centre of a link arrow. (and 'edge' for the usual)
+	ADDED - "COMMENTSTYLE center" to make comments run along the centre of a link arrow. (and 'edge' for the usual)
 	ADDED - COMMENTFONTCOLOR accepts 'contrast' as an option, for when it's over a link
 	ADDED - VIASTYLE angled (or curved) - you can turn sharp corners now
 	ADDED - Comment (and pos) editing in editor (based on code by Zdolny)
@@ -34,7 +34,7 @@
 	ADDED - fping plugin allows for changing the number of pings.
 	ADDED - TARGET strings can be enclosed in quotes, to allow spaces in them (mainly for external ! scripts)
 	ADDED - "KEYSTYLE tags" - like classic, but uses the scale tags instead of percentages.
-	ADDED - scripts in random-bits to help with automatic/assisted mapping.
+	# ADDED - scripts in random-bits to help with automatic/assisted mapping.
 	ADDED - lots more pretty pictures in the manual, so you can see what I mean.
 	CHANGE - Cacti plugin uses "processed" map title now (allows {} tokens in the title)
 	CHANGE - A NODE with no POSITION is not drawn, instead of drawn at 0,0. Useful for templates.

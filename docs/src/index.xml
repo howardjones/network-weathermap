@@ -48,6 +48,7 @@
                 <xi:include href="link_outcomment.xml"/>
                 <xi:include href="link_commentfont.xml"/>
                 <xi:include href="link_commentpos.xml"/>
+                <xi:include href="link_commentstyle.xml"/>
                 <xi:include href="link_splitpos.xml"/>
             <xi:include href="link_colours.xml" />
 	    	  <xi:include href="link_infourl.xml"/>

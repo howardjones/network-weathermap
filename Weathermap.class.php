@@ -1043,7 +1043,7 @@ function NewColourFromPercent($percent,$scalename="DEFAULT",$name="")
 
 		if ($percent > 100)
 		{
-			if($nowarn_clipping==0) warn ("NewColourFromPercent: Clipped $name $percent% to 100%\n");
+			if($nowarn_clipping==0) warn ("NewColourFromPercent: Clipped $percent% to 100% for item $name\n");
 			$percent=100;
 		}
 
@@ -1087,7 +1087,7 @@ function NewColourFromPercent($percent,$scalename="DEFAULT",$name="")
 	{
 		if($scalename != 'none')
 		{
-			warn("ColourFromPercent: Attempted to use non-existent scale: $scalename for $name [WMWARN09]\n");
+			warn("ColourFromPercent: Attempted to use non-existent scale: $scalename for item $name [WMWARN09]\n");
 		}
 		else
 		{
@@ -1100,7 +1100,7 @@ function NewColourFromPercent($percent,$scalename="DEFAULT",$name="")
 	// you'll only get grey for a COMPLETELY quiet link if there's no 0 in the SCALE lines
 	if ($percent == 0) { return array(new Colour(192,192,192),'',''); }
 
-	if($nowarn_scalemisses==0) warn("NewColourFromPercent: Scale $scalename doesn't cover $percent% for $name [WMWARN29]\n");
+	if($nowarn_scalemisses==0) warn("NewColourFromPercent: Scale $scalename doesn't include $percent% while drawing item $name [WMWARN29]\n");
 
 	// and you'll only get white for a link with no colour assigned
 	return array(new Colour(255,255,255),'','');

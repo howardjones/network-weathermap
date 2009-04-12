@@ -45,6 +45,7 @@
         <a href="#LINK_OUTCOMMENT">OUTCOMMENT</a>
         <a href="#LINK_COMMENTFONT">COMMENTFONT</a>
         <a href="#LINK_COMMENTPOS">COMMENTPOS</a>
+        <a href="#LINK_COMMENTSTYLE">COMMENTSTYLE</a>
         <a href="#LINK_SPLITPOS">SPLITPOS</a>
         <a href="#LINK_COLORS">*COLOR</a>
         <a href="#LINK_INFOURL">INFOURL</a>
@@ -62,6 +63,7 @@
         <a href="#LINK_INNOTES">INNOTES</a>
         <a href="#LINK_OUTNOTES">OUTNOTES</a>
         <a href="#LINK_VIA">VIA</a>
+        <a href="#LINK_VIASTYLE">VIASTYLE</a>
         <a href="#LINK_LINKSTYLE">LINKSTYLE</a>
         <a href="#LINK_ARROWSTYLE">ARROWSTYLE</a>
         <a href="#LINK_SET">SET</a>

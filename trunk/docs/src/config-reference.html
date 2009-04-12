@@ -56,6 +56,7 @@
         <a href="#LINK_OUTCOMMENT">OUTCOMMENT</a>
         <a href="#LINK_COMMENTFONT">COMMENTFONT</a>
         <a href="#LINK_COMMENTPOS">COMMENTPOS</a>
+        <a href="#LINK_COMMENTSTYLE">COMMENTSTYLE</a>
         <a href="#LINK_SPLITPOS">SPLITPOS</a>
         <a href="#LINK_COLORS">*COLOR</a>
         <a href="#LINK_INFOURL">INFOURL</a>
@@ -73,6 +74,7 @@
         <a href="#LINK_INNOTES">INNOTES</a>
         <a href="#LINK_OUTNOTES">OUTNOTES</a>
         <a href="#LINK_VIA">VIA</a>
+        <a href="#LINK_VIASTYLE">VIASTYLE</a>
         <a href="#LINK_LINKSTYLE">LINKSTYLE</a>
         <a href="#LINK_ARROWSTYLE">ARROWSTYLE</a>
         <a href="#LINK_SET">SET</a>
@@ -206,12 +208,20 @@
 <h2><a name="NODE_TARGET">TARGET</a></h2>
 <div class="definition">TARGET <em class="meta">targetspec</em>
 </div>
+<div class="definition">TARGET <em class="meta">targetspec</em> <em class="meta">targetspec</em>
+</div>
+<div class="definition">TARGET <em class="meta">targetspec</em> -<em class="meta">targetspec</em>
+</div>
+<div class="definition">TARGET <em class="meta">targetspec</em> n*<em class="meta">targetspec</em>
+</div>
+<div class="definition">TARGET "<em class="meta">targetspec</em>"</div>
 <div class="description">
 <p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Specifies where to look for the current "throughput" 
  information for this <a href="#NODE_NODE">NODE.</a> You can also specify multiple targets, which will then be added together to make the aggregate result 
 which is then displayed. Specify the targets on one <a href="#NODE_TARGET">TARGET</a> line, seperated with a space. If a targetspec starts with a '-', then it's value will be <i>subtracted</i> from the final result instead. </p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Also, if a targetspec starts with a number, then a *, then it's used a scaling factor on the result. You can do basic maths with this, especially if you remember that multiplying 
  by a number below 1 is the same as dividing by 1 divided by that number (0.5* is the same as divide by 2). </p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">For both the '-' and '*' options, <em>there must be no spaces</em> between any modifiers and the actual target string after it. </p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">It's important to note, especially for <a href="#NODE_NODE">NODEs,</a> that the value that is used does not have to be bandwidth. You can use data for temperature, session-counts, CPU usage or anything else you can get data for. </p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">The actual contents of the <em>targetspec</em> depend on the data source plugins that are 
- available. <a href="targets.html">The standard plugins are documented here</a>. </p> 
+ available. <a href="targets.html">The standard plugins are documented here</a>. </p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">To help with filenames that can contain spaces, or for the external script data source, you can enclose the entire 
+ targetspec in double-quotes (") to show that it is a single targetspec. <em>The quotes must be around the whole targetspec, including any prefixes.</em> </p> 
 </div>
 <div class="examples">
 <h3>Examples</h3>
@@ -227,6 +237,8 @@ which is then displayed. Specify the targets on one <a href="#NODE_TARGET">TARGE
 <div class="changes">
 <h3>Change History</h3>
 <dl>
+<dt>0.96</dt>
+<dd>Added quotes option for targets with spaces.</dd>
 <dt>0.96</dt>
 <dd>Added scale factors for all datasources.</dd>
 <dt>0.91</dt>
@@ -690,12 +702,20 @@ LINK secondlink
 <h2><a name="LINK_TARGET">TARGET</a></h2>
 <div class="definition">TARGET <em class="meta">targetspec</em>
 </div>
+<div class="definition">TARGET <em class="meta">targetspec</em> <em class="meta">targetspec</em>
+</div>
+<div class="definition">TARGET <em class="meta">targetspec</em> -<em class="meta">targetspec</em>
+</div>
+<div class="definition">TARGET <em class="meta">targetspec</em> n*<em class="meta">targetspec</em>
+</div>
+<div class="definition">TARGET "<em class="meta">targetspec</em>"</div>
 <div class="description">
 <p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Specifies where to look for the current throughput 
  information for this <a href="#LINK_LINK">LINK.</a> You can also specify multiple targets, which will then be added together to make the aggregate bandwidth 
 which is then displayed. Specify the targets on one <a href="#LINK_TARGET">TARGET</a> line, seperated with a space. If a targetspec starts with a '-', then it's value will be <i>subtracted</i> from the final result instead. </p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Also, if a targetspec starts with a number, then a *, then it's used a scaling factor on the result. You can do basic maths with this, especially if you remember that multiplying 
  by a number below 1 is the same as dividing by 1 divided by that number (0.5* is the same as divide by 2). </p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">For both the '-' and '*' options, <em>there must be no spaces</em> between any modifiers and the actual target string after it. </p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">The actual contents of the <em>targetspec</em> depend on the data source plugins that are 
- available. <a href="targets.html">The standard plugins are documented here</a>. </p> 
+ available. <a href="targets.html">The standard plugins are documented here</a>. </p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">To help with filenames that can contain spaces, or for the external script data source, you can enclose the entire 
+ targetspec in double-quotes (") to show that it is a single targetspec. <em>The quotes must be around the whole targetspec, including any prefixes.</em> </p> 
 </div>
 <div class="examples">
 <h3>Examples</h3>
@@ -711,6 +731,8 @@ which is then displayed. Specify the targets on one <a href="#LINK_TARGET">TARGE
 <div class="changes">
 <h3>Change History</h3>
 <dl>
+<dt>0.96</dt>
+<dd>Added quotes option for targets with spaces.</dd>
 <dt>0.96</dt>
 <dd>Added scale factors for all datasources.</dd>
 <dt>0.91</dt>
@@ -863,7 +885,7 @@ given in the <a href="#LINK_NODES">NODES</a> line. </p><p xmlns="http://www.w3.o
 </div>
 <div class="description">
 <p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Specifies the style used to draw the box around the 'bandwidth' label shown on each link. </p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Two styles are currently available: 'classic' leaves the box horizontal, regardless 
-of the direction of the link. 'angled' rotates the box to follow the directiong of the link arrow. </p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">The <a href="#LINK_BWFONT">BWFONT</a> <em>must be a TrueType font</em> as these are the only font type to support rotating text. </p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">To change the contents of the label, use <a href="#LINK_BWLABEL">BWLABEL</a> or BWINFORMAT/BWOUTFORMAT. </p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude"><img src="../images/bwstyle-classic.png"></img> Classic label style </p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude"><img src="../images/bwstyle-angled.png"></img> Angled label style </p> 
+of the direction of the link. 'angled' rotates the box to follow the directiong of the link arrow. </p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">The <a href="#LINK_BWFONT">BWFONT</a> <em>must be a TrueType font</em> as these are the only font type to support rotating text. </p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">To change the contents of the label, use <a href="#LINK_BWLABEL">BWLABEL</a> or INBWFORMAT/OUTBWFORMAT. </p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude"><img src="../images/bwstyle-classic.png"></img> Classic label style </p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude"><img src="../images/bwstyle-angled.png"></img> Angled label style </p> 
 </div>
 <div class="changes">
 <h3>Change History</h3>
@@ -960,6 +982,21 @@ of the direction of the link. 'angled' rotates the box to follow the directiong 
 </div>
 </div>
                 <div class="referenceentry">
+<h2><a name="LINK_COMMENTSTYLE">COMMENTSTYLE</a></h2>
+<div class="definition">COMMENTSTYLE edge</div>
+<div class="definition">COMMENTSTYLE center</div>
+<div class="description">
+<p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Specify whether link comments run along the outside edge of the link, or down the centre of the link arrow. </p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude"><img src="../images/commentstyle-edge.png"></img> 'edge' comment style </p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude"><img src="../images/commentstyle-center.png"></img> 'center' comment style </p> 
+</div>
+<div class="changes">
+<h3>Change History</h3>
+<dl>
+<dt>0.96</dt>
+<dd>Added COMMENTSTYLE</dd>
+</dl>
+</div>
+</div>
+                <div class="referenceentry">
 <h2><a name="LINK_SPLITPOS">SPLITPOS</a></h2>
 <div class="definition">SPLITPOS <em class="meta">position</em>
 </div>
@@ -985,16 +1022,18 @@ of the direction of the link. 'angled' rotates the box to follow the directiong 
 <div class="definition">COMMENTFONTCOLOR <em class="meta">red</em> <em class="meta">green</em> <em class="meta">blue</em>
 </div>
 <div class="description">
-<p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Specify the colours used for drawing the link. </p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">red, green and blue are numbers from 0 to 255. </p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude"><a href="#LINK_COLORS">OUTLINECOLOR,</a> <a href="#LINK_COLORS">BWOUTLINECOLOR</a> and <a href="#LINK_COLORS">BWBOXCOLOR</a> have an additional option - 'none' - which stops that element of the link being drawn. </p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">The colours are used as follows:<ul> 
+<p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Specify the colours used for drawing the link. </p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">red, green and blue are numbers from 0 to 255. </p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude"><a href="#LINK_COLORS">OUTLINECOLOR,</a> <a href="#LINK_COLORS">BWOUTLINECOLOR</a> and <a href="#LINK_COLORS">BWBOXCOLOR</a> have an additional option - 'none' - which stops that element of the link being drawn. </p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude"><a href="#LINK_COLORS">COMMENTFONTCOLOR</a> also has an extra option - 'contrast' - which will choose black or white, depending on the colour of the link. This is most useful with <a href="#LINK_COMMENTSTYLE">COMMENTSTYLE</a> center. </p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">The colours are used as follows:<ul> 
  <li><a href="#LINK_COLORS">OUTLINECOLOR</a> is the colour of the line around the edge of the arrow.</li> 
  <li><a href="#LINK_COLORS">BWOUTLINECOLOR</a> is the colour of the line surrounding the 'bandwidth label' box</li> 
  <li><a href="#LINK_COLORS">BWBOXCOLOR</a> is the background colour for the same box</li> 
  <li><a href="#LINK_COLORS">BWFONTCOLOR</a> is the colour used for text within that box</li> 
- <li><a href="#LINK_COLORS">COMMENTFONTCOLOR</a> is the colour used for the text produced by <a href="#LINK_INCOMMENT">INCOMMENT</a> and <a href="#LINK_OUTCOMMENT">OUTCOMMENT,</a> along the side of a link arrow</li></ul> </p> 
+ <li><a href="#LINK_COLORS">COMMENTFONTCOLOR</a> is the colour used for the text produced by <a href="#LINK_INCOMMENT">INCOMMENT</a> and <a href="#LINK_OUTCOMMENT">OUTCOMMENT,</a> along the side of a link arrow</li></ul> </p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude"><img src="../images/contrast.png"></img> <tt><a href="#LINK_COLORS">COMMENTFONTCOLOR</a> contrast</tt> with <tt><a href="#LINK_COMMENTSTYLE">COMMENTSTYLE</a> center</tt> </p> 
 </div>
 <div class="changes">
 <h3>Change History</h3>
 <dl>
+<dt>0.96</dt>
+<dd>Added COMMENTFONTCOLOR contrast.</dd>
 <dt>0.93</dt>
 <dd>Added correction - COMMENTCOLOR was shown instead of COMMENTFONTCOLOR.</dd>
 <dt>0.9</dt>
@@ -1248,7 +1287,7 @@ of the direction of the link. 'angled' rotates the box to follow the directiong 
 <div class="description">
 <p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Specify an additional point that a link must pass through. </p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">A link normally goes in a straight line between the two nodes listed in the <a href="#LINK_NODES">NODES</a> configuration line. 
  If you need it to go around something else, or to seperate two parallel links so that the bandwidth labels 
- are all visible, you can make the link curve. </p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">If you specify multiple <a href="#LINK_VIA">VIA</a> lines, then the link will pass through each in turn, in the order they are specified. </p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">You can choose between curved or angled links with VIASTYLE. </p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Any <a href="#LINK_VIA">VIA</a> can also be specified relative to a <a href="#NODE_NODE">NODE</a> on the map. This makes it easier to have curves keep the intended shape as you re-organise a map. </p> 
+ are all visible, you can make the link curve. </p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">If you specify multiple <a href="#LINK_VIA">VIA</a> lines, then the link will pass through each in turn, in the order they are specified. </p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">You can choose between curved or angled links with <a href="#LINK_VIASTYLE">VIASTYLE.</a> </p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Any <a href="#LINK_VIA">VIA</a> can also be specified relative to a <a href="#NODE_NODE">NODE</a> on the map. This makes it easier to have curves keep the intended shape as you re-organise a map. </p> 
 </div>
 <div class="changes">
 <h3>Change History</h3>
@@ -1606,11 +1645,12 @@ You can set the output format in the Cacti Settings page. </p>
 </div>
 <div class="definition">SCALE <em class="meta">scalename</em> <em class="meta">min</em> <em class="meta">max</em> <em class="meta">red</em> <em class="meta">green</em> <em class="meta">blue</em> <em class="meta">red2</em> <em class="meta">green2</em> <em class="meta">blue2</em> <em class="meta">tagtext</em>
 </div>
+<div class="definition">SCALE <em class="meta">min</em> <em class="meta">max</em> none</div>
 <div class="description">
 <p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Defines one 'span' within the link colour-coding table. </p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude"><a href="#GLOBAL_SCALE">SCALE</a> is used to specify how <a href="#NODE_NODE">NODEs</a> and <a href="#LINK_LINK">LINKs</a> are colour-coded according to their percent usage. 
  If the percentage usage falls between min and max then the colour specified by red, green and blue is used to colour the link. 
  Colour values are between 0 and 255. Percentages are between 0 and 100, obviously. </p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">If you specify <i>two</i> colours on the line (the third and fourth forms above), then the colour chosen for the link will be calculated as 
- a proportion between the two colours. You can avoid specifying many <a href="#GLOBAL_SCALE">SCALE</a> lines this way. </p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Without a <i>scalename</i>, the <a href="#GLOBAL_SCALE">SCALE</a> line will add a definition to the scale named 'DEFAULT'. If you define any other named scales, you can then use the <a href="#LINK_USESCALE">USESCALE</a> directive to specify that a particular <a href="#NODE_NODE">NODE</a> or <a href="#LINK_LINK">LINK</a> use your new scale. </p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">With any of the formats, you can specify a 'tag' on the end of the line. When the colour is decided for the 'in' and 'out' parts of a <a href="#NODE_NODE">NODE</a> or <a href="#LINK_LINK">LINK,</a> 
+ a proportion between the two colours. You can avoid specifying many <a href="#GLOBAL_SCALE">SCALE</a> lines this way. </p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">If you specify the word 'none' instead of a colour, then a transparent colour is used for that range of values. </p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Without a <i>scalename</i>, the <a href="#GLOBAL_SCALE">SCALE</a> line will add a definition to the scale named 'DEFAULT'. If you define any other named scales, you can then use the <a href="#LINK_USESCALE">USESCALE</a> directive to specify that a particular <a href="#NODE_NODE">NODE</a> or <a href="#LINK_LINK">LINK</a> use your new scale. </p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">With any of the formats, you can specify a 'tag' on the end of the line. When the colour is decided for the 'in' and 'out' parts of a <a href="#NODE_NODE">NODE</a> or <a href="#LINK_LINK">LINK,</a> 
  then a special <a href="#GLOBAL_SET">SET</a> variable is defined called {node:this:inscaletag} (or outscaletag, or link:this...) which contains the tagtext from the <a href="#GLOBAL_SCALE">SCALE</a> line that 
  matched. You can use this to do things like choose an icon, or change the label of a node or link based on a percentage. There are examples of this (and most other node-related formatting things) in the suite-1.conf map found in the random-bits/ folder of the weathermap distribution. </p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">If you don't add <i>any</i> <a href="#GLOBAL_SCALE">SCALE</a> lines to a configuration file, then a default set is added for you, but as soon as you add one, you'll need to make enough to cover the whole 0-100 range to get nice colours. 
  Any percentage not matched by <a href="#GLOBAL_SCALE">SCALE</a> rules is rendered in grey. </p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">You can specify a colour for an <em>exact</em> percentage (e.g. zero) by using that value for both the min and max values. The scale lines are sorted by min then max, and scanned from top to bottom. The first match wins. </p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">To show a legend in the map for a given <a href="#GLOBAL_SCALE">SCALE,</a> you should use <a href="#GLOBAL_KEYPOS">KEYPOS</a> and <a href="#GLOBAL_KEYSTYLE">KEYSTYLE.</a> </p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">You can also apply <a href="#GLOBAL_SCALE">SCALEs</a> to colorise <a href="#NODE_ICON">ICON</a> images. You do this using <a href="#NODE_USEICONSCALE">USEICONSCALE.</a> </p> 
@@ -1635,6 +1675,8 @@ SCALE  85  100    255     0    0</pre>
 <div class="changes">
 <h3>Change History</h3>
 <dl>
+<dt>0.96</dt>
+<dd>Added 'none' colour option.</dd>
 <dt>0.95</dt>
 <dd>Added USEICONSCALE.</dd>
 <dt>0.95</dt>

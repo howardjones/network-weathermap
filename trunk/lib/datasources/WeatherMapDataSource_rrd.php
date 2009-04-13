@@ -249,24 +249,57 @@ class WeatherMapDataSource_rrd extends WeatherMapDataSource {
 
 		$extra_options = $map->get_hint("rrd_options");
 
+		// Assemble an array of command args.
+		// In a real programming language, we'd be able to pass this directly to exec()
+		// However, this will at least allow us to put quotes around args that need them
+		$args = array();
+		$args[] = "graph";
+		$args[] = "/dev/null";
+		$args[] = "-f";
+		$args[] = "''";
+		$args[] = "--start";
+		$args[] = $start;
+		$args[] = "--end";
+		$args[] = $end;
+		
 		# assemble an appropriate RRDtool command line, skipping any '-' DS names.
-		$command = $map->rrdtool . " graph /dev/null -f ''  --start $start --end $end ";
+		# $command = $map->rrdtool . " graph /dev/null -f ''  --start $start --end $end ";
 		
 		if($dsnames[IN] != '-')
 		{
-			$command .= "DEF:in=$rrdfile:".$dsnames[IN].":$cf ";
-			$command .= "VDEF:agg_in=in,$aggregatefn ";
-			$command .= "PRINT:agg_in:'IN %lf' ";
+			# $command .= "DEF:in=$rrdfile:".$dsnames[IN].":$cf ";
+			# $command .= "VDEF:agg_in=in,$aggregatefn ";
+			# $command .= "PRINT:agg_in:'IN %lf' ";
+			
+			$args[] = "DEF:in=$rrdfile:".$dsnames[IN].":$cf";
+			$args[] = "VDEF:agg_in=in,$aggregatefn";
+			$args[] = "PRINT:agg_in:'IN %lf'";
 		}
 		
 		if($dsnames[OUT] != '-')
 		{
-			$command .= "DEF:out=$rrdfile:".$dsnames[OUT].":$cf ";
-			$command .= "VDEF:agg_out=out,$aggregatefn ";
-			$command .= "PRINT:agg_out:'OUT %lf' ";
+			# $command .= "DEF:out=$rrdfile:".$dsnames[OUT].":$cf ";
+			# $command .= "VDEF:agg_out=out,$aggregatefn ";
+			# $command .= "PRINT:agg_out:'OUT %lf' ";
+			
+			$args[] = "DEF:out=$rrdfile:".$dsnames[OUT].":$cf";
+			$args[] = "VDEF:agg_out=out,$aggregatefn";
+			$args[] = "PRINT:agg_out:'OUT %lf'";
 		}
-						
-		$command .= $extra_options;
+		
+		$command = $map->rrdtool;
+		foreach ($args as $arg)
+		{
+			if(strchr($arg," ") != FALSE)
+			{
+				$command .= ' "' . $arg . '"';
+			}
+			else
+			{
+				$command .= ' ' . $arg;
+			}
+		}
+		$command .= " " . $extra_options;
 		
 		debug("RRD ReadData: Running: $command\n");
 		$pipe=popen($command, "r");
@@ -335,11 +368,34 @@ class WeatherMapDataSource_rrd extends WeatherMapDataSource {
 		
 		$extra_options = $map->get_hint("rrd_options");
 
-		$values=array();
+		$values = array();
+		$args = array();
 		
-		# $command = '"'.$map->rrdtool . '" fetch "'.$rrdfile.'" AVERAGE --start '.$start.' --end '.$end;
-		$command=$map->rrdtool . " fetch $rrdfile $cf --start $start --end $end $extra_options";
-
+		#### $command = '"'.$map->rrdtool . '" fetch "'.$rrdfile.'" AVERAGE --start '.$start.' --end '.$end;
+		#$command=$map->rrdtool . " fetch $rrdfile $cf --start $start --end $end $extra_options";
+		$args[] = "fetch";
+		$args[] = $rrdfile;
+		$args[] = $cf;
+		$args[] = "--start";
+		$args[] = $start;
+		$args[] = "--end";
+		$args[] = $end;
+		
+		$command = $map->rrdtool;
+		foreach ($args as $arg)
+		{
+			if(strchr($arg," ") != FALSE)
+			{
+				$command .= ' "' . $arg . '"';
+			}
+			else
+			{
+				$command .= ' ' . $arg;
+			}
+		}
+		$command .= " " . $extra_options;
+		
+		
 		debug ("RRD ReadData: Running: $command\n");
 		$pipe=popen($command, "r");
 		

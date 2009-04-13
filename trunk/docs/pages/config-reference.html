@@ -117,10 +117,13 @@ v0.96
         <a href="#GLOBAL_HTMLOUTPUTFILE">HTMLOUTPUTFILE</a>
         <a href="#GLOBAL_HTMLSTYLESHEET">HTMLSTYLESHEET</a>
         <a href="#GLOBAL_IMAGEOUTPUTFILE">IMAGEOUTPUTFILE</a>
+        <a href="#GLOBAL_IMAGEURI">IMAGEURI</a>
         <a href="#GLOBAL_FONTDEFINE">FONTDEFINE</a>
         <a href="#GLOBAL_FONT">*FONT</a>
         <a href="#GLOBAL_COLORS">*COLOR</a>
         <a href="#GLOBAL_TIMEPOS">TIMEPOS</a>
+        <a href="#GLOBAL_MINTIMEPOS">MINTIMEPOS</a>
+        <a href="#GLOBAL_MAXTIMEPOS">MAXTIMEPOS</a>
         <a href="#GLOBAL_TITLE">TITLE</a>
         <a href="#GLOBAL_TITLEPOS">TITLEPOS</a>
         <a href="#GLOBAL_KILO">KILO</a>
@@ -1504,6 +1507,23 @@ You can set the output format in the Cacti Settings page. </p>
 </dl>
 </div>
 </div>
+ 	  <div class="referenceentry">
+<h2><a name="GLOBAL_IMAGEURI">IMAGEURI</a></h2>
+<div class="definition">IMAGEURI <em class="meta">image-uri</em>
+</div>
+<div class="description">
+<p>If you are generating output files using <a href="#GLOBAL_HTMLOUTPUTFILE">HTMLOUTPUTFILE</a> and <a href="#GLOBAL_IMAGEOUTPUTFILE">IMAGEOUTPUTFILE</a> that are in a different directory to the weathermap 
+ installation, then the HTML will probably contain an incorrect IMG tag. This keyword allows you to replace the IMG SRC attribute 
+ in the HTML output with a corrected one. </p><p>The equivalent command-line option (--image-uri) takes precedence over this configuration line, if both are used. </p><p>If you are generating maps using the Cacti plugin, then this directive is ignored, as the filename and uri are calculated instead. </p> 
+</div>
+<div class="changes">
+<h3>Change History</h3>
+<dl>
+<dt>0.96</dt>
+<dd>Added IMAGEURI.</dd>
+</dl>
+</div>
+</div>
       <div class="referenceentry">
 <h2><a name="GLOBAL_FONTDEFINE">FONTDEFINE</a></h2>
 <div class="definition">FONTDEFINE <em class="meta">fontnumber</em> <em class="meta">gdfontfile</em>
@@ -1605,6 +1625,52 @@ You can set the output format in the Cacti Settings page. </p>
 <dd>Added ability to change text.</dd>
 <dt>0.5</dt>
 <dd>Originally added TIMEPOS</dd>
+</dl>
+</div>
+</div>
+      <div class="referenceentry">
+<h2><a name="GLOBAL_MINTIMEPOS">MINTIMEPOS</a></h2>
+<div class="definition">MINTIMEPOS <em class="meta">x-pos</em> <em class="meta">y-pos</em>
+</div>
+<div class="definition">MINTIMEPOS <em class="meta">x-pos</em> <em class="meta">y-pos</em> <em class="meta">formatstring</em>
+</div>
+<div class="description">
+<p>Specifies where to draw the 'oldest data' timestamp on the map. </p><p>The data collection part of weathermap collects a timestamp for each piece of data, alongside the actual data. 
+ This is intended to signify the time that the data was actually valid - it would be the file modification date if 
+ it was a text file, or the current time if it was a live SNMP query. The minimum and maximum of these times are 
+ collated, and can be shown on the map with <a href="#GLOBAL_MINTIMEPOS">MINTIMEPOS</a> and <a href="#GLOBAL_MAXTIMEPOS">MAXTIMEPOS.</a> </p><p>If no <a href="#GLOBAL_MINTIMEPOS">MINTIMEPOS</a> line is given, then the timestamp is not drawn. </p><p>You can optionally specify an additional parameter to change the text of the timestamp. This text can 
+ contain special tokens which are substituted with parts of the current time. The default timestamp 
+ text is <nobr><tt>Oldest Data: %b %d %Y %H:%M:%S</tt></nobr>. The tokens used are those accepted by the PHP strftime 
+ function. For a full list see the <a href="http://www.php.net/manual/en/function.strftime.php">PHP manual page</a>. </p><p>You can control the font used to draw the timestamp with <a href="#GLOBAL_FONT">TIMEFONT,</a> and the colour that it is drawn in, using <a href="#GLOBAL_COLORS">TIMECOLOR.</a> </p> 
+</div>
+<div class="changes">
+<h3>Change History</h3>
+<dl>
+<dt>0.96</dt>
+<dd>Originally added MINTIMEPOS</dd>
+</dl>
+</div>
+</div>
+      <div class="referenceentry">
+<h2><a name="GLOBAL_MAXTIMEPOS">MAXTIMEPOS</a></h2>
+<div class="definition">MAXTIMEPOS <em class="meta">x-pos</em> <em class="meta">y-pos</em>
+</div>
+<div class="definition">MAXTIMEPOS <em class="meta">x-pos</em> <em class="meta">y-pos</em> <em class="meta">formatstring</em>
+</div>
+<div class="description">
+<p>Specifies where to draw the 'newest data' timestamp on the map. </p><p>The data collection part of weathermap collects a timestamp for each piece of data, alongside the actual data. 
+ This is intended to signify the time that the data was actually valid - it would be the file modification date if 
+ it was a text file, or the current time if it was a live SNMP query. The minimum and maximum of these times are 
+ collated, and can be shown on the map with <a href="#GLOBAL_MINTIMEPOS">MINTIMEPOS</a> and <a href="#GLOBAL_MAXTIMEPOS">MAXTIMEPOS.</a> </p><p>If no <a href="#GLOBAL_MAXTIMEPOS">MAXTIMEPOS</a> line is given, then the timestamp is not drawn. </p><p>You can optionally specify an additional parameter to change the text of the timestamp. This text can 
+ contain special tokens which are substituted with parts of the current time. The default timestamp 
+ text is <nobr><tt>Newest Data: %b %d %Y %H:%M:%S</tt></nobr>. The tokens used are those accepted by the PHP strftime 
+ function. For a full list see the <a href="http://www.php.net/manual/en/function.strftime.php">PHP manual page</a>. </p><p>You can control the font used to draw the timestamp with <a href="#GLOBAL_FONT">TIMEFONT,</a> and the colour that it is drawn in, using <a href="#GLOBAL_COLORS">TIMECOLOR.</a> </p> 
+</div>
+<div class="changes">
+<h3>Change History</h3>
+<dl>
+<dt>0.96</dt>
+<dd>Originally added MAXTIMEPOS</dd>
 </dl>
 </div>
 </div>

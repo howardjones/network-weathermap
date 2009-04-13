@@ -80,10 +80,13 @@
 	  <xi:include href="global_htmloutputfile.xml"/>
 	  <xi:include href="global_htmlstylesheet.xml"/>
  	  <xi:include href="global_imageoutputfile.xml"/>
+ 	  <xi:include href="global_imageuri.xml"/>
       <xi:include href="global_fontdefine.xml"/>
             <xi:include href="global_font.xml"/>
             <xi:include href="global_colours.xml"/>
       <xi:include href="global_timepos.xml"/>
+      <xi:include href="global_mintimepos.xml"/>
+      <xi:include href="global_maxtimepos.xml"/>
                   <xi:include href="global_title.xml"/>
             <xi:include href="global_titlepos.xml"/>
             <xi:include href="global_kilo.xml"/>

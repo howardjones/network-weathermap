@@ -36,6 +36,8 @@
 	ADDED - "KEYSTYLE tags" - like classic, but uses the scale tags instead of percentages.
 	ADDED - scripts in random-bits to help with automatic/assisted mapping.
 	ADDED - lots more pretty pictures in the manual, so you can see what I mean.
+	ADDED - IMAGEURI keyword to match --image-uri command-line option (ignored in Cacti plugin)
+	ADDED - MINTIMEPOS and MAXTIMEPOS to track data source times
 	CHANGE - Cacti plugin uses "processed" map title now (allows {} tokens in the title)
 	CHANGE - A NODE with no POSITION is not drawn, instead of drawn at 0,0. Useful for templates.
 	CHANGE - A LINK with no NODES is no longer an error. Also for templates.

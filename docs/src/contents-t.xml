@@ -77,10 +77,13 @@
         <a href="#GLOBAL_HTMLOUTPUTFILE">HTMLOUTPUTFILE</a>
         <a href="#GLOBAL_HTMLSTYLESHEET">HTMLSTYLESHEET</a>
         <a href="#GLOBAL_IMAGEOUTPUTFILE">IMAGEOUTPUTFILE</a>
+        <a href="#GLOBAL_IMAGEURI">IMAGEURI</a>
         <a href="#GLOBAL_FONTDEFINE">FONTDEFINE</a>
         <a href="#GLOBAL_FONT">*FONT</a>
         <a href="#GLOBAL_COLORS">*COLOR</a>
         <a href="#GLOBAL_TIMEPOS">TIMEPOS</a>
+        <a href="#GLOBAL_MINTIMEPOS">MINTIMEPOS</a>
+        <a href="#GLOBAL_MAXTIMEPOS">MAXTIMEPOS</a>
         <a href="#GLOBAL_TITLE">TITLE</a>
         <a href="#GLOBAL_TITLEPOS">TITLEPOS</a>
         <a href="#GLOBAL_KILO">KILO</a>

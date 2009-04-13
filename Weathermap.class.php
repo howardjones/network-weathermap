@@ -151,6 +151,8 @@ class WeatherMap extends WeatherMapBase
 	var $used_images = array(); // an array of image filenames referred to (used by editor)
 	var $seen_zlayers = array(0=>array(),1000=>array()); // 0 is the background, 100 is the legends, title, etc
 
+	var $min_ds_time;
+	var $max_ds_time;
 	var $background;
 	var $htmlstyle;
 	var $imap;
@@ -180,6 +182,7 @@ class WeatherMap extends WeatherMapBase
 		$titley;
 	var $keytext,
 		$stamptext, $datestamp;
+	var $min_data_time, $max_data_time;
 	var $htmloutputfile,
 		$imageoutputfile;
 	var $htmlstylesheet;
@@ -189,6 +192,9 @@ class WeatherMap extends WeatherMapBase
 	var $keystyle,$keysize;
 	var $rrdtool_check;
 	var $inherit_fieldlist;
+	var $mintimex, $maxtimex;
+	var $mintimey, $maxtimey;
+	var $minstamptext, $maxstamptext;
 	var $context;
 	var $cachefolder,$mapcache,$cachefile_version;
 	var $name;
@@ -222,6 +228,7 @@ class WeatherMap extends WeatherMapBase
 				'rrdtool_check' => '',
 				'background' => '',
 				'imageoutputfile' => '',
+				'imageuri' => '',
 				'htmloutputfile' => '',
 				'htmlstylesheet' => '',
 				'labelstyle' => 'percent', // redundant?
@@ -239,6 +246,14 @@ class WeatherMap extends WeatherMapBase
 				'timefont' => 2,
 				'timex' => 0,
 				'timey' => 0,
+				
+				'mintimex' => -10000,
+				'mintimey' => -10000,
+				'maxtimex' => -10000,
+				'maxtimey' => -10000,
+				'minstamptext' => 'Oldest Data: %b %d %Y %H:%M:%S',
+				'maxstamptext' => 'Newest Data: %b %d %Y %H:%M:%S',
+				
 				'thumb_width' => 0,
 				'thumb_height' => 0,
 				'titlex' => -1,
@@ -257,6 +272,9 @@ class WeatherMap extends WeatherMapBase
 	function Reset()
 	{
 		foreach (array_keys($this->inherit_fieldlist)as $fld) { $this->$fld=$this->inherit_fieldlist[$fld]; }
+		
+		$this->min_ds_time = NULL;
+		$this->max_ds_time = NULL;
 
 		// these two are used for default settings
 		//$this->defaultlink=new WeatherMapLink;
@@ -801,6 +819,15 @@ function ReadData()
 								$total_in=$total_in + $in;
 								$total_out=$total_out + $out;
 								debug("Aggregate so far: $total_in $total_out\n");
+								# keep a track of the range of dates for data sources (mainly for MRTG/textfile based DS)
+								if($datatime > 0)
+								{
+									if($this->max_data_time==NULL || $datatime > $this->max_data_time) $this->max_data_time = $datatime;
+									if($this->min_data_time==NULL || $datatime < $this->min_data_time) $this->min_data_time = $datatime;
+									
+									debug("DataTime MINMAX: ".$this->min_data_time." -> ".$this->max_data_time."\n");
+								}
+								
 							}
 						}
 	
@@ -1451,25 +1478,44 @@ function DrawLegend_Classic($im,$scalename="DEFAULT",$use_tags=FALSE)
 	}
 }
 
-function DrawTimestamp($im, $font, $colour)
+function DrawTimestamp($im, $font, $colour, $which="")
 {
 	// add a timestamp to the corner, so we can tell if it's all being updated
 	# $datestring = "Created: ".date("M d Y H:i:s",time());
 	# $this->datestamp=strftime($this->stamptext, time());
 
-	list($boxwidth, $boxheight)=$this->myimagestringsize($font, $this->datestamp);
+	switch($which)
+	{
+		case "MIN":
+			$stamp = strftime($this->minstamptext, $this->min_data_time);
+			$pos_x = $this->mintimex;
+			$pos_y = $this->mintimey;
+			break;
+		case "MAX":
+			$stamp = strftime($this->maxstamptext, $this->max_data_time);
+			$pos_x = $this->maxtimex;
+			$pos_y = $this->maxtimey;
+			break;	
+		default:
+			$stamp = $this->datestamp;
+			$pos_x = $this->timex;
+			$pos_y = $this->timey;
+			break;
+	}
+		
+	list($boxwidth, $boxheight)=$this->myimagestringsize($font, $stamp);
 
 	$x=$this->width - $boxwidth;
 	$y=$boxheight;
 
-	if (($this->timex != 0) && ($this->timey != 0))
+	if (($pos_x != 0) && ($pos_y != 0))
 	{
-		$x = $this->timex;
-		$y = $this->timey;
+		$x = $pos_x;
+		$y = $pos_y;
 	}
 		
-	$this->myimagestring($im, $font, $x, $y, $this->datestamp, $colour);
-	$this->imap->addArea("Rectangle", "TIMESTAMP", '', array($x, $y, $x + $boxwidth, $y - $boxheight));
+	$this->myimagestring($im, $font, $x, $y, $stamp, $colour);
+	$this->imap->addArea("Rectangle", $which."TIMESTAMP", '', array($x, $y, $x + $boxwidth, $y - $boxheight));
 }
 
 function DrawTitle($im, $font, $colour)
@@ -1657,6 +1703,7 @@ function ReadConfig($input)
 					array('GLOBAL','/^\s*HTMLOUTPUTFILE\s+(.*)\s*$/i',array('htmloutputfile'=>1)),
 					array('GLOBAL','/^\s*HTMLSTYLESHEET\s+(.*)\s*$/i',array('htmlstylesheet'=>1)),
 					array('GLOBAL','/^\s*IMAGEOUTPUTFILE\s+(.*)\s*$/i',array('imageoutputfile'=>1)),
+					array('GLOBAL','/^\s*IMAGEURI\s+(.*)\s*$/i',array('imageuri'=>1)),
 					array('GLOBAL','/^\s*TITLE\s+(.*)\s*$/i',array('title'=>1)),
 					array('GLOBAL','/^\s*HTMLSTYLE\s+(static|overlib)\s*$/i',array('htmlstyle'=>1)),
 					array('GLOBAL','/^\s*KEYFONT\s+(\d+)\s*$/i',array('keyfont'=>1)),
@@ -1666,6 +1713,11 @@ function ReadConfig($input)
 					array('GLOBAL','/^\s*TITLEPOS\s+(-?\d+)\s+(-?\d+)\s+(.*)\s*$/i',array('titlex'=>1, 'titley'=>2, 'title'=>3)),
 					array('GLOBAL','/^\s*TIMEPOS\s+(-?\d+)\s+(-?\d+)\s*$/i',array('timex'=>1, 'timey'=>2)),
 					array('GLOBAL','/^\s*TIMEPOS\s+(-?\d+)\s+(-?\d+)\s+(.*)\s*$/i',array('timex'=>1, 'timey'=>2, 'stamptext'=>3)),
+					array('GLOBAL','/^\s*MINTIMEPOS\s+(-?\d+)\s+(-?\d+)\s*$/i',array('mintimex'=>1, 'mintimey'=>2)),
+					array('GLOBAL','/^\s*MINTIMEPOS\s+(-?\d+)\s+(-?\d+)\s+(.*)\s*$/i',array('mintimex'=>1, 'mintimey'=>2, 'minstamptext'=>3)),
+					array('GLOBAL','/^\s*MAXTIMEPOS\s+(-?\d+)\s+(-?\d+)\s*$/i',array('maxtimex'=>1, 'maxtimey'=>2)),
+					array('GLOBAL','/^\s*MAXTIMEPOS\s+(-?\d+)\s+(-?\d+)\s+(.*)\s*$/i',array('maxtimex'=>1, 'maxtimey'=>2, 'maxstamptext'=>3)),
+					array('NODE', "/^\s*LABEL\s*$/i", array('label'=>'')),	# special case for blank labels
 					array('NODE', "/^\s*LABEL\s+(.*)\s*$/i", array('label'=>1)),
 					array('(LINK|GLOBAL)', "/^\s*WIDTH\s+(\d+)\s*$/i", array('width'=>1)),
 					array('(LINK|GLOBAL)', "/^\s*HEIGHT\s+(\d+)\s*$/i", array('height'=>1)),
@@ -1860,38 +1912,6 @@ function ReadConfig($input)
 							debug("  TARGET: $arg\n");
 							$curobj->targets[]=$newtarget;
 						}
-					}
-				}
-				
-				if(1==0)
-				{
-					// XXX - this needs some checking!
-					if(preg_match_all('/"([^\"\\\\]*(?:\\\\.[^\"\\\\]*)*)"|(\S+)\s|\s/x',$rawtargetlist,$targets))
-					{
-						# print_r ($targets);
-					
-						// wipe any existing targets, otherwise things in the DEFAULT accumulate with the new ones
-						$curobj->targets = array();
-						for ($i=0; $i<sizeof($targets[0]);$i++)
-						{
-							$target = trim($targets[1][$i].$targets[2][$i]);
-							if($target != '')
-							{					
-								# print "### TARGET $target|\n";
-								// we store the original TARGET string, and line number, along with the breakdown, to make nicer error messages later
-								$newtarget=array($target,'','',$linecount,$target);
-								if ($curobj)
-								{
-									debug("TARGET: $target\n");
-									$curobj->targets[]=$newtarget;
-								}
-							}
-						}
-					}
-					else
-					{
-						# print "$rawtargetlist\n";
-						warn("ReadConfig - TARGET string error (unclosed quotes?) \n");
 					}
 				}
 			}
@@ -2505,6 +2525,7 @@ function WriteConfig($filename)
 				array('title','TITLE',CONFIG_TYPE_LITERAL),
 				array('htmloutputfile','HTMLOUTPUTFILE',CONFIG_TYPE_LITERAL),
 				array('htmlstylesheet','HTMLSTYLESHEET',CONFIG_TYPE_LITERAL),
+				array('imageuri','IMAGEURI',CONFIG_TYPE_LITERAL),
 				array('imageoutputfile','IMAGEOUTPUTFILE',CONFIG_TYPE_LITERAL)
 			);
 
@@ -2525,6 +2546,16 @@ function WriteConfig($filename)
 			|| ($this->stamptext != $this->inherit_fieldlist['stamptext']))
 				$output.="TIMEPOS " . $this->timex . " " . $this->timey . " " . $this->stamptext . "\n";
 
+		if (($this->mintimex != $this->inherit_fieldlist['mintimex'])
+			|| ($this->mintimey != $this->inherit_fieldlist['mintimey'])
+			|| ($this->minstamptext != $this->inherit_fieldlist['minstamptext']))
+				$output.="MINTIMEPOS " . $this->mintimex . " " . $this->mintimey . " " . $this->minstamptext . "\n";
+		
+		if (($this->maxtimex != $this->inherit_fieldlist['maxtimex'])
+			|| ($this->maxtimey != $this->inherit_fieldlist['maxtimey'])
+			|| ($this->maxstamptext != $this->inherit_fieldlist['maxstamptext']))
+				$output.="MAXTIMEPOS " . $this->maxtimex . " " . $this->maxtimey . " " . $this->maxstamptext . "\n";
+						
 		if (($this->titlex != $this->inherit_fieldlist['titlex'])
 			|| ($this->titley != $this->inherit_fieldlist['titley']))
 				$output.="TITLEPOS " . $this->titlex . " " . $this->titley . "\n";
@@ -2776,6 +2807,11 @@ function DrawMap($filename = '', $thumbnailfile = '', $thumbnailmax = 250, $with
 				}
 
 				$this->DrawTimestamp($image, $this->timefont, $this->colours['DEFAULT']['TIME']['gdref1']);
+				if(! is_null($this->min_data_time))
+				{
+					$this->DrawTimestamp($image, $this->timefont, $this->colours['DEFAULT']['TIME']['gdref1'],"MIN");
+					$this->DrawTimestamp($image, $this->timefont, $this->colours['DEFAULT']['TIME']['gdref1'],"MAX");
+				}
 				$this->DrawTitle($image, $this->titlefont, $this->colours['DEFAULT']['TITLE']['gdref1']);
 			}
 			

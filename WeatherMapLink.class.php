@@ -631,7 +631,17 @@ class WeatherMapLink extends WeatherMapItem
 			{
 				$output.="\tTARGET";
 	
-				foreach ($this->targets as $target) { $output.=" " . $target[4]; }
+				foreach ($this->targets as $target) 
+				{ 
+					if(strpos($target[4]," ") == FALSE) 
+					{
+						$output.=" " . $target[4]; 
+					}
+					else
+					{
+						$output.=' "' . $target[4].'"'; 
+					}
+				}
 	
 				$output.="\n";
 			}

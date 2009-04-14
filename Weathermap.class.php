@@ -10,7 +10,7 @@ require_once "WeatherMap.functions.php";
 require_once "WeatherMapNode.class.php";
 require_once "WeatherMapLink.class.php";
 
-$WEATHERMAP_VERSION="0.96test2";
+$WEATHERMAP_VERSION="0.96test3";
 $weathermap_debugging=FALSE;
 $weathermap_map="";
 $weathermap_warncount=0;

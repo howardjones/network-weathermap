@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configentry>
+	<keyword>POSITION</keyword>
+	<scope>NODE</scope>
+	<anchor>NODE_POSITION</anchor>
+    <definition>POSITION <meta>x-coord</meta> <meta>y-coord</meta></definition>
+    <definition>POSITION <meta>nodename</meta> <meta>x-coord</meta> <meta>y-coord</meta></definition>
+    <description xmlns="http://www.w3.org/1999/xhtml">
+        <p>Specifies where to place the node on the map. Coordinates are in pixel units, with the origin at the top-left of the map.</p>
+        <p>Optionally, you can also specify another node that the coordinates are relative to. This allows you to have 'sub-nodes' that follow a master node around as you alter the map. Relative nodes can be relative to other relative nodes, as long as the node at the end of the chain is not relatively positioned!</p>
+    </description>
+    <examples>
+        <example><caption>Example of a 'sub-node', that will be 20 pixels above the main node, wherever that gets moved to. It is used to show additional information about the main node.</caption>
+        <content>
+        NODE main_node
+            POSITION 200 320
+            LABEL MAIN
+            
+        NODE sub_node
+            POSITION main_node 0 -20
+            LABEL {nodes:main_node:invalue}
+        </content>
+        </example>
+    </examples>
+      <changes>
+            <change version="0.9">Add relative position from other nodes.</change>
+    </changes>
+</configentry>

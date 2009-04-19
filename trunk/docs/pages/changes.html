@@ -43,11 +43,83 @@ a { color: black; text-decoration: underline; font-weight: normal;}
  <h1>PHP Weathermap 
 v0.96 
 </h1> 
- <h4>Copyright &copy; 2005-2008 Howard Jones, <tt><a 
+ <h4>Copyright &copy; 2005-2009 Howard Jones, <tt><a 
 href="mailto:howie@thingy.com">howie@thingy.com</a></tt>. (<a 
 href="http://www.network-weathermap.com/">Website</a>)</h4> 
 </div> 
 
+
+ <h2><a name="changes096">Changes For This Version (0.95b to 0.96)</a></h2> 
+
+ <h3>Fixes</h3> 
+ <ul> 
+ <li>Cacti poller_output support works more reliably/at all on Windows</li> 
+ <li>Renaming a node in the editor correctly handles other relatively-positioned nodes and vias</li> 
+ <li>Minor issue with CRLF in map title for Cacti Plugin</li> 
+ <li>CLI tool set --define options incorrectly.</li> 
+ <li>Oneway links don't draw the <a href="config-reference.html#LINK_INCOMMENT">INCOMMENT</a> anymore</li> 
+ <li>negative <a href="config-reference.html#GLOBAL_TIMEPOS">TIMEPOS</a> didn't hide the timestamp</li> 
+ <li>DEFAULT <a href="config-reference.html#GLOBAL_SCALE">SCALE</a> covers 0-100 properly (Thanks Dan Fusselman)</li> 
+ <li>Scaled <a href="config-reference.html#NODE_ICON">ICON</a> in DEFAULT didn't get overwritten properly in nodes (Thanks Fabrizio Carusi)</li> 
+ <li>No more floating-point imagemap coords (Thanks Trond Aspelund)</li> 
+ <li>RRDtool regional output (. vs ,) workaround</li> 
+ <li>Cacti poller_output handles NaN more gracefully now</li> 
+ <li>SNMP datasource should work with Windows SNMP again</li> 
+ <li>MRTG datasource tried to stat() URLs</li> 
+ <li>Error reporting for CLI --define was bad. --help text was out of date.</li> 
+ <li>Editor will honour <a href="config-reference.html#NODE_LABEL">LABEL</a> from <a href="config-reference.html#NODE_NODE">NODE</a> DEFAULT, if it is set.</li> 
+ </ul> 
+ <h3>Changes</h3> 
+ <ul> 
+ <li>Cacti plugin uses "processed" map title now (allows {} tokens in the title)</li> 
+ <li>A <a href="config-reference.html#NODE_NODE">NODE</a> with no <a href="config-reference.html#NODE_POSITION">POSITION</a> is not drawn, instead of drawn at 0,0. Useful for templates.</li> 
+ <li>A <a href="config-reference.html#LINK_LINK">LINK</a> with no <a href="config-reference.html#LINK_NODES">NODES</a> is no longer an error. Also for templates.</li> 
+ <li>The link_bulge secret mode bulges each side of a link independently now</li> 
+ <li>whitespace is stripped from the beginning and end of each line before parsing</li> 
+ </ul> 
+ <h3>New Features</h3> 
+ <ul> 
+ <li><a href="config-reference.html#LINK_TEMPLATE">TEMPLATE</a> allows a node or link to copy it's settings from another, instead of from DEFAULT.</li> 
+ <li>RRD datasource can take <a href="config-reference.html#GLOBAL_SET">SET</a> rrd_default_path to make configs a little easier to read.</li> 
+ <li>RRD datasource can take <a href="config-reference.html#GLOBAL_SET">SET</a> rrd_default_in_ds and rrd_default_out_ds for non-Cacti users.</li> 
+ <li>RRD datasource can get Cacti query information (in poller_output mode ONLY) - like ifAlias, ifSpeed etc</li> 
+ <li>RRD datasource can take the ifSpeed/ifHighSpeed from the above, and use it in the map.</li> 
+ <li>RRD datasource fills in Cacti cacti_path_rra and cacti_url with Cacti base path and URL</li> 
+ <li>RRD datasource can take global <a href="config-reference.html#GLOBAL_SET">SET</a> rrd_options to add extra options to rrdtool command lines</li> 
+ <li>SNMP datasource also stores the raw data from the SNMP agent in snmp_raw_in/snmp_raw_out</li> 
+ <li>SNMP datasource allows '-' as an OID, similar to '-' targets in RRDs.</li> 
+ <li>Control the drawing order with ZORDER.</li> 
+ <li>New artificial icons: nink, inpie and outpie. See <a href="config-reference.html#NODE_ICON">ICON</a> in manual.</li> 
+ <li>Warning for probably-incorrect <a href="config-reference.html#LINK_BWLABELPOS">BWLABELPOS</a> where in<out</li> 
+ <li>New global <a href="config-reference.html#GLOBAL_SET">SET</a> variables to disable some common warnings you may not care about :-)</li> 
+ <li>Cacti management screen shows number of warnings for each map last time it ran</li> 
+ <li>Cacti management screen also has a link to the log entries for the map in question</li> 
+ <li>The <a href="config-reference.html#LINK_TARGET">TARGET</a> aggregation thing can also take scale factors now: -5.5*myrrdfile.rrd</li> 
+ <li>Cacti plugin caches thumbnail sizes, improving thumbnail view rendering</li> 
+ <li>Cacti plugin allows adding the same map twice (more useful than it sounds)</li> 
+ <li>Cacti plugin allows setting of map-global variables in the management UI</li> 
+ <li>Cacti plugin allows settings of global map-global (across all maps) variables too</li> 
+ <li>Cacti plugin adds links in 'user' pages to management screen (if you are an admin)</li> 
+ <li><a href="config-reference.html#GLOBAL_HTMLSTYLESHEET">HTMLSTYLESHEET</a> keyword allows you to specify a URL for a CSS stylesheet (CLI tool only)</li> 
+ <li>A few extra CSS id and class attributes, to make styling the page easier.</li> 
+ <li>New token: in/outscalecolor contains HTML colour code of node/link colours for use in NOTES</li> 
+ <li>New <a href="config-reference.html#LINK_NODES">NODES</a> offset type - angle+radius</li> 
+ <li>New <a href="config-reference.html#LINK_NODES">NODES</a> offset type - compass-point+percentage</li> 
+ <li><a href="config-reference.html#GLOBAL_KEYSTYLE">"KEYSTYLE</a> inverted" - to get a thermometer-style vertical legend.</li> 
+ <li><a href="config-reference.html#LINK_COMMENTSTYLE">"COMMENTSTYLE</a> center" to make comments run along the centre of a link arrow. (and 'edge' for the usual)</li> 
+ <li><a href="config-reference.html#LINK_COLORS">COMMENTFONTCOLOR</a> accepts 'contrast' as an option, for when it's over a link</li> 
+ <li><a href="config-reference.html#LINK_VIASTYLE">VIASTYLE</a> angled (or curved) - you can turn sharp corners now</li> 
+ <li>Comment (and pos) editing in editor (based on code by Zdolny)</li> 
+ <li>Editor Settings dialog works, and allows you to set grid-snap and some overlays</li> 
+ <li><a href="config-reference.html#GLOBAL_SCALE">SCALE</a> allows 'none' as a colour (for non-gradients). Only affects <a href="config-reference.html#LINK_LINK">LINKs</a> so far.</li> 
+ <li>fping plugin allows for changing the number of pings.</li> 
+ <li><a href="config-reference.html#LINK_TARGET">TARGET</a> strings can be enclosed in quotes, to allow spaces in them (mainly for external ! scripts)</li> 
+ <li><a href="config-reference.html#GLOBAL_KEYSTYLE">"KEYSTYLE</a> tags" - like classic, but uses the scale tags instead of percentages.</li> 
+ <li>scripts in random-bits to help with automatic/assisted mapping.</li> 
+ <li>lots more pretty pictures in the manual, so you can see what I mean.</li> 
+ <li><a href="config-reference.html#GLOBAL_IMAGEURI">IMAGEURI</a> keyword to match --image-uri command-line option (ignored in Cacti plugin)</li> 
+ <li><a href="config-reference.html#GLOBAL_MINTIMEPOS">MINTIMEPOS</a> and <a href="config-reference.html#GLOBAL_MAXTIMEPOS">MAXTIMEPOS</a> to track data source times</li> 
+ </ul> 
 
  <h2><a name="changes095">Changes For This Version (0.941 to 0.95)</a></h2> 
 <p>This release has a lot of changes - most of them are small 'polishing' tweaks, but there are a few interesting bigger ones too. Happily, although 

@@ -2779,7 +2779,8 @@ function DrawMap($filename = '', $thumbnailfile = '', $thumbnailmax = 250, $with
 		foreach ($this->nodes as $node)
 		{
 			// don't try and draw template nodes
-			if(!is_null($node->x)) $node->pre_render($image, $this);
+			debug("Pre-rendering ".$node->name." to get bounding boxes.");
+			if(!is_null($node->x)) $this->nodes[$node->name]->pre_render($image, $this);
 		}
 		
 		$all_layers = array_keys($this->seen_zlayers);
@@ -2826,7 +2827,7 @@ function DrawMap($filename = '', $thumbnailfile = '', $thumbnailmax = 250, $with
 						if ( isset($this->links[$it->name]) && isset($it->a) && isset($it->b))
 						{
 							debug("Drawing LINK ".$it->name."\n");
-							$it->Draw($image, $this);
+							$this->links[$it->name]->Draw($image, $this);
 						}
 					}
 					if(strtolower(get_class($it))=='weathermapnode')
@@ -2841,11 +2842,13 @@ function DrawMap($filename = '', $thumbnailfile = '', $thumbnailmax = 250, $with
 								debug("Drawing NODE ".$it->name."\n");
 								$this->nodes[$it->name]->NewDraw($image, $this);
 								$ii=0;
-								foreach($it->boundingboxes as $bbox)
+								foreach($this->nodes[$it->name]->boundingboxes as $bbox)
 								{
 									$this->imap->addArea("Rectangle", "NODE:" . $it->name . ':'.$ii, '', $bbox);
+									debug("Adding imagemap area");
 									$ii++;
 								}
+								debug("Added $ii bounding boxes too\n");
 							}
 						}						
 					}

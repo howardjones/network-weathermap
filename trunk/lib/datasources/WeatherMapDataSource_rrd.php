@@ -50,6 +50,7 @@ class WeatherMapDataSource_rrd extends WeatherMapDataSource {
 
 	function Recognise($targetstring)
 	{
+		print "RECOG: |$targetstring|\n";
 		if(preg_match("/^(.*\.rrd):([\-a-zA-Z0-9_]+):([\-a-zA-Z0-9_]+)$/",$targetstring,$matches))
 		{
 			return TRUE;
@@ -60,6 +61,7 @@ class WeatherMapDataSource_rrd extends WeatherMapDataSource {
 		}
 		else
 		{
+			print "FAIL\n\n";
 			return FALSE;
 		}
 	}

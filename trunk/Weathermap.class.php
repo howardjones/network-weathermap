@@ -465,7 +465,7 @@ class WeatherMap extends WeatherMapBase
 		}
 	}
 
-	function ProcessString($input,&$context, $include_notes=TRUE,$multiline=TRUE)
+	function ProcessString($input,&$context, $include_notes=TRUE,$multiline=FALSE)
 	{
 		
 
@@ -739,7 +739,8 @@ function ReadData()
 							if ($target[4] != '')
 							{
 								// processstring won't use notes (only hints) for this string
-								$targetstring = $this->ProcessString($target[4], $myobj, FALSE);
+								
+								$targetstring = $this->ProcessString($target[4], $myobj, FALSE, FALSE);
 								if($target[4] != $targetstring) debug("Targetstring is now $targetstring\n");
 	
 								// if the targetstring starts with a -, then we're taking this value OFF the aggregate

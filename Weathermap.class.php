@@ -334,6 +334,8 @@ class WeatherMap extends WeatherMapBase
 
                 assert('is_object($this->nodes[":: DEFAULT ::"])');
                 assert('is_object($this->links[":: DEFAULT ::"])');
+				assert('is_object($this->nodes["DEFAULT"])');
+                assert('is_object($this->links["DEFAULT"])');
 
 // ************************************
 
@@ -2201,7 +2203,7 @@ function ReadConfig($input)
 			{
 				$this->kilo=$matches[1];
 				# $this->defaultlink->owner->kilo=$matches[1];
-				$this->links['DEFAULT']=$matches[1];
+				# $this->links['DEFAULT']=$matches[1];
 				$linematched++;
 			}
 			

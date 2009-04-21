@@ -184,7 +184,7 @@ class WeatherMapNode extends WeatherMapItem
 				$col = $this->colours[OUT];
 			}
 
-			# list($colicon,$node_iconscalekey,$icontag) = $map->NewColourFromPercent($pc, $this->useiconscale,$this->name);
+			list($colicon,$node_iconscalekey,$icontag) = $map->NewColourFromPercent($pc, $this->useiconscale,$this->name);
 		}
 
 		// figure out a bounding rectangle for the label

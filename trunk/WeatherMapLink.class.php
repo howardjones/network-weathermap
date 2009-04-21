@@ -153,8 +153,9 @@ class WeatherMapLink extends WeatherMapItem
 	{
 		$curvepoints =& $this->curvepoints;
 		$last = count($curvepoints)-1;
+				
 		$totaldistance = $curvepoints[$last][2];
-		
+				
 		$start[OUT] = 0;
 		$commentpos[OUT] = $this->commentoffset_out;
 		$commentpos[IN] = $this->commentoffset_in;
@@ -171,6 +172,8 @@ class WeatherMapLink extends WeatherMapItem
 		
 		foreach ($dirs as $dir)
 		{
+			
+		
 			// Time to deal with Link Comments, if any
 			$comment = $this->owner->ProcessString($this->comments[$dir], $this);
 			
@@ -180,6 +183,8 @@ class WeatherMapLink extends WeatherMapItem
 	
 			if($comment != '')
 			{
+				# print "\n\n----------------------------------------------------------------\nComment $dir for ".$this->name."\n";;
+			
 				list($textlength, $textheight) = $this->owner->myimagestringsize($this->commentfont, $comment);
 				
 				// XXX - redundant extra variable
@@ -197,17 +202,30 @@ class WeatherMapLink extends WeatherMapItem
 				# $comment_index = find_distance($curvepoints,$extra);
 				
 				list($x,$y,$comment_index,$angle) = find_distance_coords_angle($curvepoints,$extra);
-				if($comment_index!=0)
+							
+				#  print "$extra_percent => $extra ($totaldistance)\n";
+				#printf("  Point A is %f,%f\n",$curvepoints[$comment_index][0], $curvepoints[$comment_index][1]);
+				#printf("  Point B is %f,%f\n",$curvepoints[$comment_index+1][0], $curvepoints[$comment_index+1][1]);
+				#printf("  Point X is %f,%f\n",$x, $y);
+							
+				# if( ($comment_index != 0)) print "I ";
+				# if (($x != $curvepoints[$comment_index][0]) ) print "X ";
+				# if (($y != $curvepoints[$comment_index][1]) ) print "Y ";
+				# print "\n";
+							
+				if( ($comment_index != 0) && (($x != $curvepoints[$comment_index][0]) || ($y != $curvepoints[$comment_index][1])) )
 				{
+				#	print "  -> Path 1\n";
 					$dx = $x - $curvepoints[$comment_index][0];
 					$dy = $y - $curvepoints[$comment_index][1];
 				}
 				else
-				{
+				{			
+				#	print "  -> Path 2\n";
 					$dx = $curvepoints[$comment_index+1][0] - $x;
 					$dy = $curvepoints[$comment_index+1][1] - $y;
 				}
-				
+								
 				$centre_distance = $widths[$dir] + 4 + $nudgeout;
 				if($this->commentstyle == 'center')
 				{
@@ -217,6 +235,9 @@ class WeatherMapLink extends WeatherMapItem
 				// find the normal to our link, so we can get outside the arrow
 				
 				$l=sqrt(($dx * $dx) + ($dy * $dy));
+				
+				# print "$extra => $comment_index/$last => $x,$y => $dx,$dy => $l\n";
+				
 				$dx = $dx/$l; 	$dy = $dy/$l;
 				$nx = $dy;  $ny = -$dx;
 				$flipped=FALSE;

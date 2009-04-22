@@ -1239,7 +1239,7 @@ function calc_offset($offsetstring, $width, $height)
 		debug("Numeric Offset found\n");
 		return(array($matches[1],$matches[2]));
 	}
-	elseif(preg_match("/(NE|SE|NW|SW|N|S|E|W|C)(\d\d)?$/",$offsetstring,$matches))
+	elseif(preg_match("/(NE|SE|NW|SW|N|S|E|W|C)(\d\d)?$/i",$offsetstring,$matches))
 	{
 		$multiply = 1;
 		if( isset($matches[2] ) )
@@ -1300,7 +1300,7 @@ function calc_offset($offsetstring, $width, $height)
 			break;
 		}
 	}
-	elseif( preg_match("/(-?\d+)r(\d+)$/",$offsetstring,$matches) )
+	elseif( preg_match("/(-?\d+)r(\d+)$/i",$offsetstring,$matches) )
 	{
 		$angle = intval($matches[1]);
 		$distance = intval($matches[2]);

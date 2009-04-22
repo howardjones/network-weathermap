@@ -3,6 +3,7 @@
 	FIXED - KILO was broken completely between 0.95b and 0.96 (thanks Jethro Binks)
 	FIXED - Link comments in certain positions could cause div-by-zero errors. (thanks again Jethro)
 	FIXED - USEICONSCALE didn't colorise (broken between 0.95b and 0.96 again) (thanks colejv)
+	FIXED - Managed to make LABELOFFSET case-sensitive.
 
 0.96	ADDED - TEMPLATE allows a node or link to copy it's settings from another, instead of from DEFAULT.
 	ADDED - RRD datasource can take SET rrd_default_path to make configs a little easier to read.

@@ -1,6 +1,9 @@
 WISHES
 -------
 
+Some kind of special warning for if ALL the maps fail in a cycle. 
+Also some sort of highlight to show that the map wasn't updated successfully last time it ran (permissions problems).
+
 DONE!   COMMENTSTYLE center
 
 KEYBGCOLOR none

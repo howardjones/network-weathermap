@@ -8,7 +8,7 @@
  "HTML Tidy for Mac OS X (vers 12 April 2006), see www.w3.org" /> 
 
  <title>PHP Weathermap 
-v0.96 
+v0.96a 
  - Changes For This Version</title> 
 <style type="text/css" media="print"> 
 /*<![CDATA[*/ 
@@ -41,12 +41,27 @@ a { color: black; text-decoration: underline; font-weight: normal;}
 
 <div id="header"> 
  <h1>PHP Weathermap 
-v0.96 
+v0.96a 
 </h1> 
  <h4>Copyright &copy; 2005-2009 Howard Jones, <tt><a 
 href="mailto:howie@thingy.com">howie@thingy.com</a></tt>. (<a 
 href="http://www.network-weathermap.com/">Website</a>)</h4> 
 </div> 
+
+
+ <h2><a name="changes096a">Changes For This Version (0.96 to 0.96a)</a></h2> 
+
+<p>Just the usual post-release bug reports... </p> 
+
+<h3>Fixes</h3> 
+<ul> 
+<li>New z-ordering code did not work correctly on PHP4. This broke (at least) the editor. (thanks toe_cutter)</li> 
+<li> \n is no longer treated as a newline in <a href="config-reference.html#LINK_TARGET">TARGETs</a> (thanks NetAdmin)</li> 
+<li> <a href="config-reference.html#GLOBAL_KILO">KILO</a> was broken completely between 0.95b and 0.96 (thanks Jethro Binks)</li> 
+<li> Link comments in certain positions could cause div-by-zero errors. (thanks again Jethro)</li> 
+<li> <a href="config-reference.html#NODE_USEICONSCALE">USEICONSCALE</a> didn't colorise (broken between 0.95b and 0.96 again) (thanks colejv)</li> 
+<li> Managed to make <a href="config-reference.html#NODE_LABELOFFSET">LABELOFFSET</a> case-sensitive.</li> 
+</ul> 
 
 
  <h2><a name="changes096">Changes For This Version (0.95b to 0.96)</a></h2> 

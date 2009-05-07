@@ -2589,13 +2589,15 @@ function WriteConfig($filename)
 			}
 			$output.="KEYSTYLE  " . $scalename." ". $this->keystyle[$scalename] . $extra . "\n";
 		}
+		$locale = localeconv();
+		$decimal_point = $locale['decimal_point'];
 
 			foreach ($colours as $k => $colour)
 			{
 				if ($colour['top'] >= 0)
 				{
-					$top = rtrim(rtrim(sprintf("%f",$colour['top']),"0"),".");
-					$bottom= rtrim(rtrim(sprintf("%f",$colour['bottom']),"0"),".");
+					$top = rtrim(rtrim(sprintf("%f",$colour['top']),"0"),$decimal_point);
+					$bottom= rtrim(rtrim(sprintf("%f",$colour['bottom']),"0"),$decimal_point);
 
 					$tag = (isset($colour['tag'])? $colour['tag']:'');
 

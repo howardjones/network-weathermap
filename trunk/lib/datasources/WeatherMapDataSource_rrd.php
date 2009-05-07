@@ -327,7 +327,7 @@ class WeatherMapDataSource_rrd extends WeatherMapDataSource {
 			{			
 				foreach ($lines as $line)
 				{
-					if(preg_match('/^(IN|OUT)\s(\-?\d+[\.,]?\d*e?[+-]?\d*:?)$/i', $line, $matches))
+					if(preg_match('/^\'(IN|OUT)\s(\-?\d+[\.,]?\d*e?[+-]?\d*:?)\'$/i', $line, $matches))
 					{
 						debug("MATCHED: ".$matches[1]." ".$matches[2]."\n");
 						if($matches[1]=='IN') $data[IN] = floatval($matches[2]);

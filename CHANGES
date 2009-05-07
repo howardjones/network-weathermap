@@ -1,3 +1,6 @@
+0.96b	FIXED - RRD Aggregation regexp was failing (thanks to shd)
+	FIXED - Scale numerals honour locale (thanks again, shd)
+
 0.96a	FIXED - New z-ordering code did not work correctly on PHP4. This broke (at least) the editor. (thanks toe_cutter)
 	FIXED - \n is no longer treated as a newline in TARGETs (thanks NetAdmin)
 	FIXED - KILO was broken completely between 0.95b and 0.96 (thanks Jethro Binks)

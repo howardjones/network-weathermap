@@ -34,13 +34,23 @@ class WeatherMapDataSource_cactithold extends WeatherMapDataSource {
 				debug('ReadData CactiTHold: Cacti database library not found. [THOLD001]\n');
 				return(FALSE);
 			}
-			
-			if( !isset($plugins) || !in_array('thold',$plugins))
+			if(function_exists("api_plugin_is_enabled"))
 			{
-				debug('ReadData CactiTHold: THold plugin not enabled. [THOLD002]\n');
-				return(FALSE);
+        			if(api_plugin_is_enabled('thold'))
+        			{
+					debug('ReadData CactiTHold: THold plugin not enabled. [THOLD002]\n');
+					return(FALSE);
+       				 }
+
 			}
-			
+			else
+			{		
+				if( !isset($plugins) || !in_array('thold',$plugins))
+				{
+					debug('ReadData CactiTHold: THold plugin not enabled. [THOLD002]\n');
+					return(FALSE);
+				}
+			}		
 			$sql = "show tables";
 			$result = db_fetch_assoc($sql) or die (mysql_error());
 			$tables = array();

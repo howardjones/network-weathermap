@@ -10,7 +10,7 @@ require_once "WeatherMap.functions.php";
 require_once "WeatherMapNode.class.php";
 require_once "WeatherMapLink.class.php";
 
-$WEATHERMAP_VERSION="0.96a";
+$WEATHERMAP_VERSION="0.96dev";
 $weathermap_debugging=FALSE;
 $weathermap_map="";
 $weathermap_warncount=0;
@@ -738,6 +738,7 @@ function ReadData()
 	
 							$in = 0;
 							$out = 0;
+							$datatime = 0;
 							if ($target[4] != '')
 							{
 								// processstring won't use notes (only hints) for this string

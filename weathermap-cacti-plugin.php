@@ -279,6 +279,7 @@ function weathermap_singleview($mapid)
 	$userid = (isset($_SESSION["sess_user_id"]) ? intval($_SESSION["sess_user_id"]) : 1);
 	$map = db_fetch_assoc("select weathermap_maps.* from weathermap_auth,weathermap_maps where weathermap_maps.id=weathermap_auth.mapid and active='on' and (userid=".$userid." or userid=0) and weathermap_maps.id=".$mapid);
 
+
 	if(sizeof($map))
 	{
  		# print do_hook_function ('weathermap_page_top', array($map[0]['id'], $map[0]['titlecache']) );
@@ -287,6 +288,8 @@ function weathermap_singleview($mapid)
 		$htmlfile = $outdir.$map[0]['filehash'].".html";
 		$maptitle = $map[0]['titlecache'];
 		if($maptitle == '') $maptitle= "Map for config file: ".$map[0]['configfile'];
+
+		weathermap_mapselector($mapid);
 
 		html_graph_start_box(1,true);
 ?>
@@ -706,6 +709,54 @@ function weathermap_footer_links()
 	html_end_box(); 
 }
 
+function weathermap_mapselector($current_id = 0)
+{
+
+	global $colors;
+
+	return false;
+
+	$userid = (isset($_SESSION["sess_user_id"]) ? intval($_SESSION["sess_user_id"]) : 1);
+	$maps = db_fetch_assoc("select weathermap_maps.* from weathermap_auth,weathermap_maps where weathermap_maps.id=weathermap_auth.mapid and active='on' and (userid=".$userid." or userid=0)");
+
+	if(sizeof($maps)>1)
+{
+
+	/* include graph view filter selector */
+	html_graph_start_box(3, TRUE);
+	?>
+	<tr bgcolor="<?php print $colors["panel"];?>" class="noprint">
+			<form name="weathermap_select" method="post">
+			<input name="action" value="viewmap" type="hidden">
+			<td class="noprint">
+					<table width="100%" cellpadding="0" cellspacing="0">
+							<tr class="noprint">
+									<td nowrap style='white-space: nowrap;' width="40">
+										&nbsp;<strong>Jump To Map:</strong>&nbsp;
+									</td>
+									<td>
+										<select name="id">
+<?php
+foreach ($maps as $map)
+{
+	print '<option ';
+	if($current_id == $map['id']) print " SELECTED ";
+	print 'value="'.$map['filehash'].'">'.$map['titlecache'].'</option>';
+}
+?>
+										</select>
+											&nbsp;<input type="image" src="../../images/button_go.gif" alt="Go" border="0" align="absmiddle">										
+									</td>
+							</tr>
+					</table>
+			</td>
+			</form>
+	</tr>
+	<?php
+
+	html_graph_end_box(FALSE);
+	}
+}
 
 // vim:ts=4:sw=4:
 ?>

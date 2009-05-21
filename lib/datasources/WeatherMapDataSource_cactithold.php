@@ -31,14 +31,14 @@ class WeatherMapDataSource_cactithold extends WeatherMapDataSource {
 		{   
 			if( !function_exists('db_fetch_row') )
 			{
-				debug('ReadData CactiTHold: Cacti database library not found. [THOLD001]\n');
+				debug("ReadData CactiTHold: Cacti database library not found. [THOLD001]\n");
 				return(FALSE);
 			}
 			if(function_exists("api_plugin_is_enabled"))
 			{
-        			if(api_plugin_is_enabled('thold'))
+        			if(! api_plugin_is_enabled('thold'))
         			{
-					debug('ReadData CactiTHold: THold plugin not enabled. [THOLD002]\n');
+					debug("ReadData CactiTHold: THold plugin not enabled (new-style). [THOLD002B]\n");
 					return(FALSE);
        				 }
 
@@ -47,7 +47,7 @@ class WeatherMapDataSource_cactithold extends WeatherMapDataSource {
 			{		
 				if( !isset($plugins) || !in_array('thold',$plugins))
 				{
-					debug('ReadData CactiTHold: THold plugin not enabled. [THOLD002]\n');
+					debug("ReadData CactiTHold: THold plugin not enabled (old-style). [THOLD002A]\n");
 					return(FALSE);
 				}
 			}		

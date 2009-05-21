@@ -18,7 +18,7 @@ function disabled_plugin_weathermap_version()
 
 function weathermap_version () {
 	return array( 	'name'    	=> 'weathermap',
-		'version'       => '0.96a',
+		'version'       => '0.96dev',
 		'longname'      => 'PHP Network Weathermap',
 		'author'        => 'Howard Jones',
 		'homepage'      => 'http://www.network-weathermap.com/',
@@ -143,7 +143,7 @@ function weathermap_top_graph_refresh($refresh)
 		return $refresh;
 
 	// if we're cycling maps, then we want to handle reloads ourselves, thanks
-	if($_REQUEST["action"] == 'viewmapcycle')
+	if(isset($_REQUEST["action"]) && $_REQUEST["action"] == 'viewmapcycle')
 	{
 		return(86400);
 	}
@@ -309,6 +309,15 @@ function weathermap_setup_table () {
 				userid mediumint(9) NOT NULL default '0',
 				mapid int(11) NOT NULL default '0'
 			) TYPE=MyISAM;";
+		}
+
+		
+		if (!in_array('weathermap_groups', $tables)) {
+			$sql[] = "CREATE TABLE  weathermap_groups (
+				`id` INT NOT NULL AUTO_INCREMENT PRIMARY KEY ,
+				`name` VARCHAR( 80 ) NOT NULL default '',
+				`sortorder` INT NOT NULL default 0
+				) TYPE=MyISAM;";
 		}
 		
 		if (!in_array('weathermap_settings', $tables)) {

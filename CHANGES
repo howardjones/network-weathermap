@@ -2,6 +2,7 @@
 	FIXED - Scale numerals honour locale (thanks again, shd)
 	FIXED - THold plugin check failed with Thold 0.4.1 (PA 2.x, actually)
 	FIXED - Uninitialized variable in ReadData when plugin is disabled
+	ADDED - Option of a dropdown to navigate between maps (in full-size view)
 
 0.96a	FIXED - New z-ordering code did not work correctly on PHP4. This broke (at least) the editor. (thanks toe_cutter)
 	FIXED - \n is no longer treated as a newline in TARGETs (thanks NetAdmin)

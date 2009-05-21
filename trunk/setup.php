@@ -212,6 +212,12 @@ function weathermap_config_settings () {
 		),
 	),
 
+	"weathermap_map_selector" => array(
+		"friendly_name" => "Show Map Selector",
+		"description" => "Show a combo-box map selector on the full-screen map view.",
+		"method" => "drop_array",
+		"array" => array(0=>"No",1=>"Yes (default)")
+		),
 	"weathermap_quiet_logging" => array(
 		"friendly_name" => "Quiet Logging",
 		"description" => "By default, even in LOW level logging, Weathermap logs normal activity. This makes it REALLY log only errors in LOW mode.",
@@ -395,6 +401,12 @@ function weathermap_setup_table () {
 		if($tsize == '' or $tsize < 1)
 		{
 			$sql[] = "replace into settings values('weathermap_thumbsize',250)";
+		}
+
+		$ms = read_config_option("weathermap_map_selector");
+		if($ms == '' or intval($ms) < 0 or intval($ms) > 1)
+		{
+			$sql[] = "replace into settings values('weathermap_map_selector',1)";
 		}
 
 		// update the version, so we can skip this next time

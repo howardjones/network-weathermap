@@ -711,10 +711,12 @@ function weathermap_footer_links()
 
 function weathermap_mapselector($current_id = 0)
 {
-
 	global $colors;
 
-	return false;
+
+        $show_selector = intval(read_config_option("weathermap_map_selector"));
+
+	if($show_selector == 0) return false;
 
 	$userid = (isset($_SESSION["sess_user_id"]) ? intval($_SESSION["sess_user_id"]) : 1);
 	$maps = db_fetch_assoc("select weathermap_maps.* from weathermap_auth,weathermap_maps where weathermap_maps.id=weathermap_auth.mapid and active='on' and (userid=".$userid." or userid=0)");

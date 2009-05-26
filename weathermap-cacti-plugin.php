@@ -243,17 +243,23 @@ default:
 	print "<div id=\"overDiv\" style=\"position:absolute; visibility:hidden; z-index:1000;\"></div>\n";
 	print "<script type=\"text/javascript\" src=\"overlib.js\"><!-- overLIB (c) Erik Bosrup --></script> \n";
 
+	$group_id = -1;
+	if( isset($_REQUEST['group_id']) && (is_numeric($_REQUEST['group_id']) ) )
+	{
+		$group_id = intval($group_id);
+	}
+
 	if(read_config_option("weathermap_pagestyle") == 0)
 	{
-		weathermap_thumbview();
+		weathermap_thumbview($group_id);
 	}
 	if(read_config_option("weathermap_pagestyle") == 1)
 	{
-		weathermap_fullview(FALSE,FALSE);
+		weathermap_fullview(FALSE,FALSE,$group_id);
 	}
 	if(read_config_option("weathermap_pagestyle") == 2)
 	{
-		weathermap_fullview(FALSE, TRUE);
+		weathermap_fullview(FALSE, TRUE, $group_id);
 	}
 
 	weathermap_versionbox();
@@ -355,7 +361,7 @@ function weathermap_show_manage_tab()
 	}
 }
 
-function weathermap_thumbview()
+function weathermap_thumbview($limit_to_group = -1)
 {
 	global $colors;
 
@@ -391,6 +397,7 @@ function weathermap_thumbview()
 		html_graph_end_box();
 		$showlivelinks = intval(read_config_option("weathermap_live_view"));
 
+	weathermap_tabs($limit_to_group);
 		$i = 0;
 		if (sizeof($maplist) > 0)
 		{
@@ -440,7 +447,7 @@ function weathermap_thumbview()
 	}
 }
 
-function weathermap_fullview($cycle=FALSE, $firstonly=FALSE)
+function weathermap_fullview($cycle=FALSE, $firstonly=FALSE, $limit_to_group = -1)
 {
 	global $colors;
 
@@ -758,6 +765,36 @@ foreach ($maps as $map)
 
 	html_graph_end_box(FALSE);
 	}
+}
+
+function weathermap_tabs($current_tab)
+{
+	global $colors;
+
+	$current_tab=2;
+
+	$tabs = array();
+	$userid = (isset($_SESSION["sess_user_id"]) ? intval($_SESSION["sess_user_id"]) : 1);
+	$maps = db_fetch_assoc("select weathermap_maps.*, weathermap_groups.name as group_name from weathermap_auth,weathermap_maps, weathermap_groups where weathermap_groups.id=weathermap_maps.group_id and weathermap_maps.id=weathermap_auth.mapid and active='on' and (userid=".$userid." or userid=0)");
+
+	foreach ($maps as $map)
+	{
+		$tabs[$map['group_id']] = $map['group_name'];
+	}
+
+/* draw the categories tabs on the top of the page */
+        print "<p></p><table class='tabs' width='100%' cellspacing='0' cellpadding='3' align='center'><tr>\n";
+
+        if (sizeof($tabs) > 0) {
+        foreach (array_keys($tabs) as $tab_short_name) {
+                print "<td " . (($tab_short_name == $current_tab) ? "bgcolor='silver'" : "bgcolor='#DFDFDF'") . " nowrap='nowrap' width='" . (strlen($tabs[$tab_short_name]) * 9) . "' align='center' class='tab'>
+                                <span class='textHeader'><a href='weathermap-cacti-plugin.php?group_id=$tab_short_name'>$tabs[$tab_short_name]</a></span>
+                                </td>\n
+                                <td width='1'></td>\n";
+        }
+        }
+
+        print "<td></td>\n</tr></table>\n";
 }
 
 // vim:ts=4:sw=4:

@@ -244,8 +244,9 @@ function weathermap_setup_table () {
 	
 	// only bother with all this if it's a new install, a new version, or we're in a development version
 	// - saves a handful of db hits per request!
-	if( ($dbversion=="") || ( ($dbversion != $myversion) && !preg_match("/dev$/",$myversion) ) )
+	if( ($dbversion=="") || (preg_match("/dev$/",$myversion)) || ($dbversion != $myversion) )
 	{
+		# cacti_log("Doing setup_table() \n",true,"WEATHERMAP");
 		$sql = "show tables";
 		$result = db_fetch_assoc($sql) or die (mysql_error());
 
@@ -286,6 +287,7 @@ function weathermap_setup_table () {
 			$found_so = false;	$found_fh = false;
 			$found_wc = false;	$found_cf = false;
 			$found_96changes = false;
+			$found96achanges = true;
 			
 			while ($row = mysql_fetch_array($result, MYSQL_ASSOC)) {
 				if ($row['Field'] == 'sortorder') $found_so = true;
@@ -294,6 +296,7 @@ function weathermap_setup_table () {
 				if ($row['Field'] == 'config') $found_cf = true;
 				
 				if ($row['Field'] == 'thumb_width') $found_96changes = true;
+				if ($row['Field'] == 'group_id') $found_96achanges = true;
 			}
 			if (!$found_so) $sql[] = "alter table weathermap_maps add sortorder int(11) NOT NULL default 0 after id";
 			if (!$found_fh) $sql[] = "alter table weathermap_maps add filehash varchar(40) NOT NULL default '' after titlecache";		
@@ -305,6 +308,10 @@ function weathermap_setup_table () {
 				$sql[] = "alter table weathermap_maps add thumb_height int(11) NOT NULL default 0 after thumb_width";
 				$sql[] = "alter table weathermap_maps add schedule varchar(32) NOT NULL default '*' after thumb_height";
 				$sql[] = "alter table weathermap_maps add archiving set('on','off') NOT NULL default 'off' after schedule";
+			}
+			if (!$found_96achanges)
+			{
+				$sql[] = "alter table weathermap_maps add group_id int(11) NOT NULL default 1 after sortorder";
 			}
 		}
 
@@ -320,10 +327,12 @@ function weathermap_setup_table () {
 		
 		if (!in_array('weathermap_groups', $tables)) {
 			$sql[] = "CREATE TABLE  weathermap_groups (
-				`id` INT NOT NULL AUTO_INCREMENT PRIMARY KEY ,
-				`name` VARCHAR( 80 ) NOT NULL default '',
-				`sortorder` INT NOT NULL default 0
+				`id` INT(11) NOT NULL auto_increment,
+				`name` VARCHAR( 128 ) NOT NULL default '',
+				`sortorder` INT(11) NOT NULL default 0,
+				PRIMARY KEY (id)
 				) TYPE=MyISAM;";
+			$sql[] = "INSERT INTO weathermap_groups (id,name,sortorder) VALUES (1,'Weathermaps',1)";
 		}
 		
 		if (!in_array('weathermap_settings', $tables)) {
@@ -417,9 +426,14 @@ function weathermap_setup_table () {
 
 		if (!empty($sql)) {
 			for ($a = 0; $a < count($sql); $a++) {
+				# cacti_log("Executing SQL: ".$sql[$a]."\n",true,"WEATHERMAP");
 				$result = db_execute($sql[$a]);
 			}
 		}
+	}
+	else
+	{
+		# cacti_log("Skipping SQL updates\n",true,"WEATHERMAP");
 	}
 }
 

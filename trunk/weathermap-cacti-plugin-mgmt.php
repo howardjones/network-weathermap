@@ -276,7 +276,7 @@ function maplist()
 
 	html_start_box("<strong>Weathermaps</strong>", "78%", $colors["header"], "3", "center", "weathermap-cacti-plugin-mgmt.php?action=addmap_picker");
 
-	html_header(array("Config File", "Title", "Active", "Settings", "Sort Order", "Accessible By",""));
+	html_header(array("Config File", "Title", "Group", "Active", "Settings", "Sort Order", "Accessible By",""));
 
 	$query = db_fetch_assoc("select id,username from user_auth");
 	$users[0] = 'Anyone';
@@ -287,7 +287,7 @@ function maplist()
 	}
 
 	$i = 0;
-	$queryrows = db_fetch_assoc("select * from weathermap_maps order by sortorder");
+	$queryrows = db_fetch_assoc("select weathermap_maps.*, weathermap_groups.name as groupname from weathermap_maps, weathermap_groups where weathermap_maps.group_id=weathermap_groups.id order by sortorder");
 	// or die (mysql_error("Could not connect to database") )
 
 	$previous_id = -2;
@@ -295,7 +295,7 @@ function maplist()
 	if( is_array($queryrows) )
 	{
 		form_alternate_row_color($colors["alternate"],$colors["light"],$i);
-		print "<td>ALL MAPS</td><td>(special settings for all maps)</td><td></td>";
+		print "<td>ALL MAPS</td><td>(special settings for all maps)</td><td></td><td></td>";
 		
 		print "<td><a href='?action=map_settings&id=0'>";
 		$setting_count = db_fetch_cell("select count(*) from weathermap_settings where mapid=0");
@@ -332,6 +332,7 @@ function maplist()
 			
 			#		print '<a href="?action=editor&plug=1&mapname='.htmlspecialchars($map['configfile']).'">[edit]</a></td>';
 			print '<td>'.htmlspecialchars($map['titlecache']).'</td>';
+			print '<td>'.htmlspecialchars($map['groupname']).'</td>';
 						
 			if($map['active'] == 'on')
 			{

@@ -21,6 +21,18 @@ if (isset($_POST['action'])) {
 
 switch ($action) {
 
+case 'chgroup_action':
+	$mapid = -1;
+	$groupid = -1;
+
+	if( isset($_REQUEST['map_id']) && is_numeric($_REQUEST['map_id']))  { $mapid = intval($_REQUEST['map_id']); }
+	if( isset($_REQUEST['new_group']) && is_numeric($_REQUEST['new_group']))  { $groupid = intval($_REQUEST['new_group']); }
+
+	if( ($groupid > 0) && ($mapid >= 0)) { weathermap_set_group($mapid,$groupid); }
+	
+	header("Location: weathermap-cacti-plugin-mgmt.php");
+	break;
+
 case 'map_settings_delete':
 	if( isset($_REQUEST['mapid']) && is_numeric($_REQUEST['mapid']))  { $mapid = intval($_REQUEST['mapid']); }
 	if( isset($_REQUEST['id']) && is_numeric($_REQUEST['id']))  { $settingid = intval($_REQUEST['id']); }
@@ -104,6 +116,19 @@ case 'perms_edit':
 	{
 		include_once($config["base_path"]."/include/top_header.php");
 		perms_list($_REQUEST['id']);
+		include_once($config["base_path"]."/include/bottom_footer.php");
+	}
+	else
+	{
+		print "Something got lost back there.";
+	}
+	break;
+
+case 'chgroup':
+	if( isset($_REQUEST['id']) && is_numeric($_REQUEST['id']) )
+	{
+		include_once($config["base_path"]."/include/top_header.php");
+		weathermap_group_edit($_REQUEST['id']);
 		include_once($config["base_path"]."/include/bottom_footer.php");
 	}
 	else
@@ -332,7 +357,7 @@ function maplist()
 			
 			#		print '<a href="?action=editor&plug=1&mapname='.htmlspecialchars($map['configfile']).'">[edit]</a></td>';
 			print '<td>'.htmlspecialchars($map['titlecache']).'</td>';
-			print '<td>'.htmlspecialchars($map['groupname']).'</td>';
+			print '<td><a title="Click to change group" href="?action=chgroup&id='.$map['id'].'">'.htmlspecialchars($map['groupname']).'</a></td>';
 						
 			if($map['active'] == 'on')
 			{
@@ -659,6 +684,13 @@ function map_delete($id)
 	map_resort();
 }
 
+function weathermap_set_group($mapid,$groupid)
+{
+	print "UPDATING";
+	$SQL = sprintf("update weathermap_maps set group_id=%d where id=%d", $groupid, $mapid);
+	db_execute($SQL);
+}
+
 function perms_add_user($mapid,$userid)
 {
 	$SQL = "insert into weathermap_auth (mapid,userid) values($mapid,$userid)";
@@ -852,6 +884,42 @@ function weathermap_setting_delete($mapid,$settingid)
 {
 	db_execute("delete from weathermap_settings where id=".intval($settingid)." and mapid=".intval($mapid));
 } 
+
+function weathermap_group_edit($id)
+{
+	global $colors;
+
+	$title = db_fetch_cell("select titlecache from weathermap_maps where id=".intval($id));
+
+	$n=0;
+	
+	print "<form>";
+	print "<input type=hidden name='map_id' value='".$id."'>";
+	print "<input type=hidden name='action' value='chgroup_update'>";
+	html_start_box("<strong>Edit map group for Weathermap $id: $title</strong>", "70%", $colors["header"], "2", "center", "");
+
+	# html_header(array("Group Name", ""));
+	form_alternate_row_color($colors["alternate"],$colors["light"],$n++);
+	print "<td><strong>Choose an existing Group:</strong><select name='new_group'>";
+	$SQL = "select * from weathermap_groups order by sortorder";
+	$results = db_fetch_assoc($SQL);	
+	
+	foreach ($results as $grp)
+	{
+		print "<option value=".$grp['id'].">".htmlspecialchars($grp['name'])."</option>";
+	}
+	
+	print "</select>";
+	print '<input type="image" src="../../images/button_save.gif"  border="0" alt="Change Group" title="Change Group" />';
+	print "</td>";
+	print "</tr>\n";
+	form_alternate_row_color($colors["alternate"],$colors["light"],$n++);
+	print "<td>or create a new group in the <strong><a href='?action=groupadmin'>group management screen</a></strong></td>";
+	print "</tr>\n";
+
+	html_end_box();
+	print "</form>\n";
+}
 
 // vim:ts=4:sw=4:
 ?>

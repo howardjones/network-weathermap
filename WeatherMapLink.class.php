@@ -299,11 +299,6 @@ class WeatherMapLink extends WeatherMapItem
 		if(is_null($x2)) { warn("LINK ".$this->name." uses a NODE with no POSITION!\n"); return; }
 		if(is_null($y2)) { warn("LINK ".$this->name." uses a NODE with no POSITION!\n"); return; }
 		
-		if( ($x1==$x2) && ($y1==$y2) && sizeof($this->vialist)==0)
-		{
-			warn("Zero-length link ".$this->name." skipped.");
-			return;
-		}
 		
 		if( ($this->linkstyle=='twoway') && ($this->labeloffset_in < $this->labeloffset_out) && (intval($map->get_hint("nowarn_bwlabelpos"))==0) )
 		{
@@ -317,6 +312,12 @@ class WeatherMapLink extends WeatherMapItem
 		list($dx, $dy)=calc_offset($this->b_offset, $map->nodes[$this->b->name]->width, $map->nodes[$this->b->name]->height);
 		$x2+=$dx;
 		$y2+=$dy;
+
+		if( ($x1==$x2) && ($y1==$y2) && sizeof($this->vialist)==0)
+		{
+			warn("Zero-length link ".$this->name." skipped.");
+			return;
+		}
 
 		$outlinecol = new Colour($this->outlinecolour);
 		$commentcol = new Colour($this->commentfontcolour);

@@ -246,9 +246,17 @@ default:
 	$group_id = -1;
 	if( isset($_REQUEST['group_id']) && (is_numeric($_REQUEST['group_id']) ) )
 	{
-		$group_id = intval($group_id);
+		$group_id = intval($_REQUEST['group_id']);
 	}
 
+	$tabs = weathermap_get_valid_tabs();
+	$tab_ids = array_keys($tabs);
+	# print_r($tab_ids);
+	if( ($group_id == -1) && (sizeof($tabs)>1))
+	{
+		$group_id == $tab_ids[0];
+	}
+	
 	if(read_config_option("weathermap_pagestyle") == 0)
 	{
 		weathermap_thumbview($group_id);
@@ -366,13 +374,17 @@ function weathermap_thumbview($limit_to_group = -1)
 	global $colors;
 
 	$userid = (isset($_SESSION["sess_user_id"]) ? intval($_SESSION["sess_user_id"]) : 1);
-	$maplist = db_fetch_assoc( "select distinct weathermap_maps.* from weathermap_auth,weathermap_maps where weathermap_maps.id=weathermap_auth.mapid and active='on' and (userid=".$userid." or userid=0) order by sortorder, id");
-
-
+	$maplist_SQL = "select distinct weathermap_maps.* from weathermap_auth,weathermap_maps where weathermap_maps.id=weathermap_auth.mapid and active='on' and ";
+	if($limit_to_group >0) $maplist_SQL .= " weathermap_maps.group_id=".$limit_to_group." and ";
+	$maplist_SQL .= " (userid=".$userid." or userid=0) order by sortorder, id";
+	
+	$maplist = db_fetch_assoc( $maplist_SQL );
+	
+	// if there's only one map, ignore the thumbnail setting and show it fullsize
 	if(sizeof($maplist) == 1)
 	{
 		$pagetitle = "Network Weathermap";
-		weathermap_fullview(FALSE,FALSE);
+		weathermap_fullview(FALSE,FALSE, $limit_to_group);
 	}
 	else
 	{
@@ -397,7 +409,7 @@ function weathermap_thumbview($limit_to_group = -1)
 		html_graph_end_box();
 		$showlivelinks = intval(read_config_option("weathermap_live_view"));
 
-	weathermap_tabs($limit_to_group);
+		weathermap_tabs($limit_to_group);
 		$i = 0;
 		if (sizeof($maplist) > 0)
 		{
@@ -407,7 +419,7 @@ function weathermap_thumbview($limit_to_group = -1)
 
 			$imageformat = strtolower(read_config_option("weathermap_output_format"));
 
-			html_graph_start_box(1,true);
+			html_graph_start_box(1,false);
 			print "<tr><td class='wm_gallery'>";
 			foreach ($maplist as $map) {
 				$i++;
@@ -454,11 +466,14 @@ function weathermap_fullview($cycle=FALSE, $firstonly=FALSE, $limit_to_group = -
 	$_SESSION['custom']=false;
 
 	$userid = (isset($_SESSION["sess_user_id"]) ? intval($_SESSION["sess_user_id"]) : 1);
-	$query = "select distinct weathermap_maps.* from weathermap_auth,weathermap_maps where weathermap_maps.id=weathermap_auth.mapid and active='on' and (userid=".$userid." or userid=0) order by sortorder, id";
+	# $query = "select distinct weathermap_maps.* from weathermap_auth,weathermap_maps where weathermap_maps.id=weathermap_auth.mapid and active='on' and (userid=".$userid." or userid=0) order by sortorder, id";
+	$maplist_SQL = "select distinct weathermap_maps.* from weathermap_auth,weathermap_maps where weathermap_maps.id=weathermap_auth.mapid and active='on' and ";
+	if($limit_to_group >0) $maplist_SQL .= " weathermap_maps.group_id=".$limit_to_group." and ";
+	$maplist_SQL .= " (userid=".$userid." or userid=0) order by sortorder, id";
 
 	if($firstonly) { $query .= " LIMIT 1"; }
 
-	$maplist = db_fetch_assoc( $query );
+	$maplist = db_fetch_assoc( $maplist_SQL );
 	html_graph_start_box(2,true);
 
 	if(sizeof($maplist) == 1)
@@ -490,6 +505,8 @@ function weathermap_fullview($cycle=FALSE, $firstonly=FALSE, $limit_to_group = -
 <?php
 	html_graph_end_box();
 
+	weathermap_tabs($limit_to_group);
+	
 	$i = 0;
 	if (sizeof($maplist) > 0)
 	{
@@ -502,7 +519,7 @@ function weathermap_fullview($cycle=FALSE, $firstonly=FALSE, $limit_to_group = -
 			$htmlfile = $outdir.$map['filehash'].".html";
 			$maptitle = $map['titlecache'];
 			if($maptitle == '') $maptitle= "Map for config file: ".$map['configfile'];
-
+			
 			print '<div class="weathermapholder" id="mapholder_'.$map['filehash'].'">';
 			html_graph_start_box(1,true);
 ?>
@@ -767,12 +784,8 @@ foreach ($maps as $map)
 	}
 }
 
-function weathermap_tabs($current_tab)
+function weathermap_get_valid_tabs()
 {
-	global $colors;
-
-	$current_tab=2;
-
 	$tabs = array();
 	$userid = (isset($_SESSION["sess_user_id"]) ? intval($_SESSION["sess_user_id"]) : 1);
 	$maps = db_fetch_assoc("select weathermap_maps.*, weathermap_groups.name as group_name from weathermap_auth,weathermap_maps, weathermap_groups where weathermap_groups.id=weathermap_maps.group_id and weathermap_maps.id=weathermap_auth.mapid and active='on' and (userid=".$userid." or userid=0)");
@@ -782,19 +795,42 @@ function weathermap_tabs($current_tab)
 		$tabs[$map['group_id']] = $map['group_name'];
 	}
 
-/* draw the categories tabs on the top of the page */
+	return($tabs);
+}
+
+function weathermap_tabs($current_tab)
+{
+	global $colors;
+
+	// $current_tab=2;
+
+	$tabs = weathermap_get_valid_tabs();
+	
+	# print "Limiting to $current_tab\n";
+	
+	if(sizeof($tabs) > 1)
+	{
+		/* draw the categories tabs on the top of the page */
         print "<p></p><table class='tabs' width='100%' cellspacing='0' cellpadding='3' align='center'><tr>\n";
 
         if (sizeof($tabs) > 0) {
-        foreach (array_keys($tabs) as $tab_short_name) {
-                print "<td " . (($tab_short_name == $current_tab) ? "bgcolor='silver'" : "bgcolor='#DFDFDF'") . " nowrap='nowrap' width='" . (strlen($tabs[$tab_short_name]) * 9) . "' align='center' class='tab'>
-                                <span class='textHeader'><a href='weathermap-cacti-plugin.php?group_id=$tab_short_name'>$tabs[$tab_short_name]</a></span>
-                                </td>\n
-                                <td width='1'></td>\n";
-        }
+	        foreach (array_keys($tabs) as $tab_short_name) {
+	                print "<td " . (($tab_short_name == $current_tab) ? "bgcolor='silver'" : "bgcolor='#DFDFDF'") . " nowrap='nowrap' width='" . (strlen($tabs[$tab_short_name]) * 9) . "' align='center' class='tab'>
+	                                <span class='textHeader'><a href='weathermap-cacti-plugin.php?group_id=$tab_short_name'>$tabs[$tab_short_name]</a></span>
+	                                </td>\n
+	                                <td width='1'></td>\n";
+	        }
         }
 
         print "<td></td>\n</tr></table>\n";
+		
+		return(true);
+	}
+	else
+	{
+		return(false);
+	}		
+		
 }
 
 // vim:ts=4:sw=4:

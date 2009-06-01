@@ -251,10 +251,9 @@ default:
 
 	$tabs = weathermap_get_valid_tabs();
 	$tab_ids = array_keys($tabs);
-	# print_r($tab_ids);
-	if( ($group_id == -1) && (sizeof($tabs)>1))
+	if( ($group_id == -1) && (sizeof($tab_ids)>0))
 	{
-		$group_id == $tab_ids[0];
+		$group_id = $tab_ids[0];
 	}
 	
 	if(read_config_option("weathermap_pagestyle") == 0)
@@ -788,7 +787,8 @@ function weathermap_get_valid_tabs()
 {
 	$tabs = array();
 	$userid = (isset($_SESSION["sess_user_id"]) ? intval($_SESSION["sess_user_id"]) : 1);
-	$maps = db_fetch_assoc("select weathermap_maps.*, weathermap_groups.name as group_name from weathermap_auth,weathermap_maps, weathermap_groups where weathermap_groups.id=weathermap_maps.group_id and weathermap_maps.id=weathermap_auth.mapid and active='on' and (userid=".$userid." or userid=0)");
+	$maps = db_fetch_assoc("select weathermap_maps.*, weathermap_groups.name as group_name from weathermap_auth,weathermap_maps, weathermap_groups where weathermap_groups.id=weathermap_maps.group_id and weathermap_maps.id=weathermap_auth.mapid and active='on' and (userid=".$userid." or userid=0) order by weathermap_groups.sortorder");
+
 
 	foreach ($maps as $map)
 	{
@@ -814,12 +814,19 @@ function weathermap_tabs($current_tab)
         print "<p></p><table class='tabs' width='100%' cellspacing='0' cellpadding='3' align='center'><tr>\n";
 
         if (sizeof($tabs) > 0) {
+		$show_all = intval(read_config_option("weathermap_all_tab"));
+		if($show_all == 1)
+		{
+			$tabs['-2'] = "All Maps";
+		}
+
 	        foreach (array_keys($tabs) as $tab_short_name) {
 	                print "<td " . (($tab_short_name == $current_tab) ? "bgcolor='silver'" : "bgcolor='#DFDFDF'") . " nowrap='nowrap' width='" . (strlen($tabs[$tab_short_name]) * 9) . "' align='center' class='tab'>
 	                                <span class='textHeader'><a href='weathermap-cacti-plugin.php?group_id=$tab_short_name'>$tabs[$tab_short_name]</a></span>
 	                                </td>\n
 	                                <td width='1'></td>\n";
 	        }
+
         }
 
         print "<td></td>\n</tr></table>\n";

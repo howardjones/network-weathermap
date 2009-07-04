@@ -126,15 +126,29 @@ function weathermap_run_maps($mydir) {
 								$wmap->rrdtool  = read_config_option("path_rrdtool");
 
 								$wmap->ReadConfig($mapfile);							
-								
-								$settingrows = db_fetch_assoc("select * from weathermap_settings where mapid=0 or mapid=".intval($map['id']) . " order by mapid");
-								if( is_array($settingrows) )
+							
+								# in the order of precedence - global extras, group extras, and finally map extras
+								$queries = array();
+								$queries[] = "select * from weathermap_settings where mapid=0 and groupid=0";
+								$queries[] = "select * from weathermap_settings where mapid=0 and groupid=".intval($map['group_id']);
+								$queries[] = "select * from weathermap_settings where mapid=".intval($map['id']);
+
+								foreach ($queries as $sql)
 								{
+									$settingrows = db_fetch_assoc($sql);
+									if( is_array($settingrows) && count($settingrows) > 0 ) 
+									{ 
+
 									foreach ($settingrows as $setting)
 									{
-										if($setting['mapid']==0)
+										if($setting['mapid']==0 && $setting['groupid']==0)
 										{
 											debug("Setting additional (all maps) option: ".$setting['optname']." to '".$setting['optvalue']."'\n");
+											$wmap->add_hint($setting['optname'],$setting['optvalue']);
+										}
+										elseif($setting['groupid']!=0)
+										{
+											debug("Setting additional (all maps in group) option: ".$setting['optname']." to '".$setting['optvalue']."'\n");
 											$wmap->add_hint($setting['optname'],$setting['optvalue']);
 										}
 										else
@@ -142,7 +156,9 @@ function weathermap_run_maps($mydir) {
 											$wmap->add_hint($setting['optname'],$setting['optvalue']);
 										}
 									}
-								}								
+									}
+								}
+																
 								
 								weathermap_memory_check("MEM postread $mapcount");
 								$wmap->ReadData();

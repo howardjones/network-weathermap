@@ -271,6 +271,7 @@ function weathermap_setup_table () {
 			$sql[] = "CREATE TABLE weathermap_maps (
 				id int(11) NOT NULL auto_increment,
 				sortorder int(11) NOT NULL default 0,
+				group_id int(11) NOT NULL default 1,
 				active set('on','off') NOT NULL default 'on',
 				configfile text NOT NULL,
 				imagefile text NOT NULL,
@@ -293,7 +294,7 @@ function weathermap_setup_table () {
 			$found_so = false;	$found_fh = false;
 			$found_wc = false;	$found_cf = false;
 			$found_96changes = false;
-			$found96achanges = true;
+			$found_96bchanges = false;
 			
 			while ($row = mysql_fetch_array($result, MYSQL_ASSOC)) {
 				if ($row['Field'] == 'sortorder') $found_so = true;
@@ -302,7 +303,7 @@ function weathermap_setup_table () {
 				if ($row['Field'] == 'config') $found_cf = true;
 				
 				if ($row['Field'] == 'thumb_width') $found_96changes = true;
-				if ($row['Field'] == 'group_id') $found_96achanges = true;
+				if ($row['Field'] == 'group_id') $found_96bchanges = true;
 			}
 			if (!$found_so) $sql[] = "alter table weathermap_maps add sortorder int(11) NOT NULL default 0 after id";
 			if (!$found_fh) $sql[] = "alter table weathermap_maps add filehash varchar(40) NOT NULL default '' after titlecache";		
@@ -315,9 +316,10 @@ function weathermap_setup_table () {
 				$sql[] = "alter table weathermap_maps add schedule varchar(32) NOT NULL default '*' after thumb_height";
 				$sql[] = "alter table weathermap_maps add archiving set('on','off') NOT NULL default 'off' after schedule";
 			}
-			if (!$found_96achanges)
+			if (!$found_96bchanges)
 			{
 				$sql[] = "alter table weathermap_maps add group_id int(11) NOT NULL default 1 after sortorder";
+				$sql[] = "ALTER TABLE `weathermap_settings` ADD `groupid` INT NOT NULL DEFAULT '0' AFTER `mapid`";
 			}
 		}
 
@@ -345,6 +347,7 @@ function weathermap_setup_table () {
 			$sql[] = "CREATE TABLE weathermap_settings (
 				id int(11) NOT NULL auto_increment,
 				mapid int(11) NOT NULL default '0',
+				groupid int(11) NOT NULL default '0',
 				optname varchar(128) NOT NULL default '',
 				optvalue varchar(128) NOT NULL default '',
 				PRIMARY KEY  (id)
@@ -461,6 +464,7 @@ function weathermap_config_arrays () {
 		$user_auth_realms[43]='Plugin -> Weathermap: View';
 		$user_auth_realm_filenames['weathermap-cacti-plugin.php'] = 43;
 		$user_auth_realm_filenames['weathermap-cacti-plugin-mgmt.php'] = 42;
+#		$user_auth_realm_filenames['weathermap-cacti-plugin-mgmt-groups.php'] = 42;
 	}
 	// if there is support for custom graph tree types, then register ourselves
 	if(isset($tree_item_handlers))
@@ -471,7 +475,13 @@ function weathermap_config_arrays () {
 					"edit" => "weathermap_tree_item_edit");
 	}
 
-	$menu["Management"]['plugins/weathermap/weathermap-cacti-plugin-mgmt.php'] = "Weathermaps";
+	$wm_menu = array(
+		'plugins/weathermap/weathermap-cacti-plugin-mgmt.php' => "Weathermaps",
+		'plugins/weathermap/weathermap-cacti-plugin-mgmt-groups.php' => "Groups"
+	);
+	
+	$menu["Management"]['plugins/weathermap/weathermap-cacti-plugin-mgmt.php'] = $wm_menu;
+	
 }
 
 function weathermap_tree_item_render($leaf)
@@ -629,7 +639,7 @@ function weathermap_draw_navigation_text ($nav) {
 	return $nav;
 }
 
-function weathermap_poller_output ($rrd_update_array) {
+function weathermap_poller_output($rrd_update_array) {
 	global $config;
 	// global $weathermap_debugging;
 
@@ -674,7 +684,7 @@ function weathermap_poller_output ($rrd_update_array) {
 				
 	    if($logging >= POLLER_VERBOSITY_DEBUG) cacti_log("WM poller_output: Looking for $file ($local_data_id) (".$required['data_source_path'].")\n",true,"WEATHERMAP");
 		
-		if( is_array($rrd_update_array[$file]['times']) && isset( $rrd_update_array{$file}['times'][key($rrd_update_array[$file]['times'])]{$dsname} ) )
+		if( isset($rrd_update_array[$file]) && is_array($rrd_update_array[$file]) && isset($rrd_update_array[$file]['times']) && is_array($rrd_update_array[$file]['times']) && isset( $rrd_update_array{$file}['times'][key($rrd_update_array[$file]['times'])]{$dsname} ) )
 		{
 			$value = $rrd_update_array{$file}['times'][key($rrd_update_array[$file]['times'])]{$dsname};
 			$time = key($rrd_update_array[$file]['times']);
@@ -758,7 +768,7 @@ function weathermap_poller_output ($rrd_update_array) {
 	return $rrd_update_array;
 }
 
-function weathermap_poller_bottom () {
+function weathermap_poller_bottom() {
 	global $config;
 	global $weathermap_debugging, $WEATHERMAP_VERSION;
 

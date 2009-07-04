@@ -11,6 +11,7 @@ $weathermap_confdir = realpath(dirname(__FILE__).'/configs');
 // include the weathermap class so that we can get the version
 include_once(dirname(__FILE__)."/Weathermap.class.php");
 
+$i_understand_file_permissions_and_how_to_fix_them = FALSE;
 
 $action = "";
 if (isset($_POST['action'])) {
@@ -402,8 +403,13 @@ function weathermap_group_move($id,$junk,$direction)
 
 function maplist()
 {
-	global $colors;
+	global $colors, $menu;
+	global $i_understand_file_permissions_and_how_to_fix_them;
 
+	#print "<pre>";
+	#print_r($menu);
+	#print "</pre>";
+	
 	print "<a href='weathermap-cacti-plugin-mgmt.php?action=groupadmin'>Group Admin</a><p>";
 	
 	html_start_box("<strong>Weathermaps</strong>", "78%", $colors["header"], "3", "center", "weathermap-cacti-plugin-mgmt.php?action=addmap_picker");
@@ -549,7 +555,7 @@ function maplist()
 		print '<div align="center" style="padding:5px; width: 50%; border: 2px red solid; margin: 5px auto 15px auto; background-color: #fee;">'.$had_warnings.' of your maps had warnings last time '.($had_warnings>1?"they":"it").' ran. You can try to find these in your Cacti log file or by clicking on the warning sign next to that map (you might need to increase the log line count).</div>';
 	}
 		
-	if($i>0)
+	if($i>0 && $i_understand_file_permissions_and_how_to_fix_them)
 	{
 		print '<div align="center"><a href="?action=rebuildnow"><img src="images/btn_recalc.png" border="0" alt="Rebuild All Maps Right Now"><br />(Experimental - You should NOT need to use this normally)</a></div>';
 	}

@@ -727,6 +727,8 @@ class WeatherMapNode extends WeatherMapItem
 	function WriteConfig()
 	{
 		$output='';
+				
+		# $output .= "# first seen in ".$this->defined_in."\n";
 
 		// This allows the editor to wholesale-replace a single node's configuration
 		// at write-time - it should include the leading NODE xyz line (to allow for renaming)

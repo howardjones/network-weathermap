@@ -3,9 +3,14 @@
 	FIXED - THold plugin check failed with Thold 0.4.1 (PA 2.x, actually)
 	FIXED - Uninitialized variable in ReadData when plugin is disabled
 	FIXED - Zero-length link check didn't include offsets (thanks Ryan Botoluzzi)
+	FIXED - Cacti-pick should get right rra path for packagers that move the rra directory (e.g. Ubuntu, Debian *again*)
 	ADDED - Option of a dropdown selector to navigate between maps (in full-size view)
 	ADDED - Maps can be organised into groups in Cacti plugin. These appear
 			as tabs in the UI for viewing maps.
+	ADDED - Extra variables can be defined per-group, so all maps in a group can have similar settings.
+	ADDED - INCLUDE keyword to include a file of common definitions (based on work by BorisL)
+			(NOTE: this can confuse the editor sometimes - see the manual page for INCLUDE)
+	ADDED - Warning for maps that contain OVERLIBGRAPH but not 'HTMLSTYLE overlib'
 
 0.96a	FIXED - New z-ordering code did not work correctly on PHP4. This broke (at least) the editor. (thanks toe_cutter)
 	FIXED - \n is no longer treated as a newline in TARGETs (thanks NetAdmin)

@@ -134,10 +134,10 @@ if(isset($_REQUEST['command']) && $_REQUEST["command"]=='link_step1')
 		var newlocation;
 		var fullpath;
 
-		var rra_path = <?php echo js_escape($config['base_path']); ?>;
+		var rra_path = <?php echo js_escape($config['rra_path']); ?>;
 
 		if (typeof window.opener == "object") {
-			fullpath = datasource.replace(/<path_rra>/, rra_path + '/rra');
+			fullpath = datasource.replace(/<path_rra>/, rra_path);
 			if(document.forms['mini'].aggregate.checked)
 			{
 				opener.document.forms["frmMain"].link_target.value = opener.document.forms["frmMain"].link_target.value  + " " + fullpath;

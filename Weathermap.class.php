@@ -127,6 +127,14 @@ class WeatherMapBase
 	}
 }
 
+class WeatherMapConfigItem
+{
+	var $defined_in;
+	var $name;
+	var $value;
+	var $type;
+}
+
 // The 'things on the map' class. More common code (mainly variables, actually)
 class WeatherMapItem extends WeatherMapBase
 {
@@ -138,6 +146,7 @@ class WeatherMapItem extends WeatherMapBase
 	var $overlibwidth, $overlibheight;
 	var $overlibcaption;
 	var $my_default;
+	var $defined_in;
 	var $config_override;	# used by the editor to allow text-editing
 
 	function my_type() {  return "ITEM"; }
@@ -208,8 +217,11 @@ class WeatherMap extends WeatherMapBase
 	var $postprocessclasses;
 	var $activedatasourceclasses;
 	var $thumb_width, $thumb_height;
+	var $has_includes;
+	var $has_overlibs;
 
 	var $plugins = array();
+	var $included_files = array();
 	var $usage_stats = array();
 
 	function WeatherMap()
@@ -223,6 +235,7 @@ class WeatherMap extends WeatherMapBase
 				'datasourceclasses' => array(),
 				'preprocessclasses' => array(),
 				'postprocessclasses' => array(),
+				'included_files' => array(),
 				'context' => '',
 				'dumpconfig' => FALSE,
 				'rrdtool_check' => '',
@@ -263,12 +276,16 @@ class WeatherMap extends WeatherMapBase
 				'sizedebug' => FALSE,
 				'debugging' => FALSE,
 				'widthmod' => FALSE,
-				'name' => 'MAP'
+				'has_includes' => FALSE,
+				'has_overlibs' => FALSE,
+				'name' => 'MAP'				
 			);
 
 		$this->Reset();
 	}
 
+	function my_type() {  return "MAP"; }
+	
 	function Reset()
 	{
 		foreach (array_keys($this->inherit_fieldlist)as $fld) { $this->$fld=$this->inherit_fieldlist[$fld]; }
@@ -1544,7 +1561,7 @@ function DrawTitle($im, $font, $colour)
 	$this->imap->addArea("Rectangle", "TITLE", '', array($x, $y, $x + $boxwidth, $y - $boxheight));
 }
 
-function ReadConfig($input)
+function ReadConfig($input, $is_include=FALSE)
 {
 	$curnode=null;
 	$curlink=null;
@@ -1559,20 +1576,36 @@ function ReadConfig($input)
 	// if it isn't, it's the filename
 
 	$lines = array();
-
+	
 	if( (strchr($input,"\n")!=FALSE) || (strchr($input,"\r")!=FALSE ) )
 	{
 		 debug("ReadConfig Detected that this is a config fragment.\n");
 			 // strip out any Windows line-endings that have gotten in here
 			 $input=str_replace("\r", "", $input);
 			 $lines = split("/n",$input);
+			 $filename = "{text insert}";
 	}
 	else
 	{
-		 debug("ReadConfig Detected that this is a config filename.\n");
+		debug("ReadConfig Detected that this is a config filename.\n");
 		 $filename = $input;
-		 $fd=fopen($filename, "r");
-
+		 
+		if($is_include){ 
+			debug("ReadConfig Detected that this is an INCLUDED config filename.\n");
+			if($is_include && in_array($filename, $this->included_files))
+			{
+				warn("Attempt to include '$filename' twice! Skipping it.\n");
+				return(FALSE);
+			}
+			else
+			{
+				$this->included_files[] = $filename;
+				$this->has_includes = TRUE;
+			}
+		}
+		
+		$fd=fopen($filename, "r");
+		 
 		if ($fd)
 		{
 				while (!feof($fd))
@@ -1609,25 +1642,32 @@ function ReadConfig($input)
 
 			if (preg_match("/^\s*(LINK|NODE)\s+(\S+)\s*$/i", $buffer, $matches))
 			{
-				// first, save the previous item, before starting work on the new one
-				if ($last_seen == "NODE")
+				if(1==1)
 				{
-					$this->nodes[$curnode->name]=$curnode;
-					debug ("Saving Node: " . $curnode->name . "\n");
+					$this->ReadConfig_Commit($curobj);
 				}
-
-				if ($last_seen == "LINK")
+				else
 				{
-					if (isset($curlink->a) && isset($curlink->b))
+					// first, save the previous item, before starting work on the new one
+					if ($last_seen == "NODE")
 					{
-						$this->links[$curlink->name]=$curlink;
-						debug ("Saving Link: " . $curlink->name . "\n");
+						$this->nodes[$curnode->name]=$curnode;
+						debug ("Saving Node: " . $curnode->name . "\n");
 					}
-					else
+
+					if ($last_seen == "LINK")
 					{
-						$this->links[$curlink->name]=$curlink;
-						debug ("Saving Template-Only Link: " . $curlink->name . "\n");
-					}				
+						if (isset($curlink->a) && isset($curlink->b))
+						{
+							$this->links[$curlink->name]=$curlink;
+							debug ("Saving Link: " . $curlink->name . "\n");
+						}
+						else
+						{
+							$this->links[$curlink->name]=$curlink;
+							debug ("Saving Template-Only Link: " . $curlink->name . "\n");
+						}				
+					}
 				}
 
 				if ($matches[1] == 'LINK')
@@ -1660,6 +1700,7 @@ function ReadConfig($input)
 					$last_seen="LINK";
 					$curlink->configline = $linecount;
 					$linematched++;
+					$curobj = &$curlink;
 				}
 
 				if ($matches[1] == 'NODE')
@@ -1692,7 +1733,11 @@ function ReadConfig($input)
 					$curnode->configline = $linecount;
 					$last_seen="NODE";
 					$linematched++;
+					$curobj = &$curnode;
 				}
+				
+				# record where we first heard about this object
+				$curobj->defined_in = $filename;
 			}
 
 			// most of the config keywords just copy stuff into object properties.
@@ -1895,6 +1940,18 @@ function ReadConfig($input)
 				}
 			}
 
+			if ( $last_seen=='GLOBAL' && preg_match("/^\s*INCLUDE\s+(.*)\s*$/i", $buffer, $matches))
+			{
+				if(file_exists($matches[1])){
+					debug("Including '{$matches[1]}'\n");
+					$this->ReadConfig($matches[1], TRUE);
+					$last_seen = "GLOBAL";				
+				}else{
+					warn("INCLUDE File '{$matches[1]}' not found!\n");
+				}
+				$linematched++;
+			}
+			
 			if ( ( $last_seen=='NODE' || $last_seen=='LINK' ) && preg_match("/^\s*TARGET\s+(.*)\s*$/i", $buffer, $matches))
 			{
 				$linematched++;
@@ -1964,6 +2021,7 @@ function ReadConfig($input)
 			
 			if (preg_match("/^\s*(IN|OUT)?OVERLIBGRAPH\s+(.+)$/i", $buffer, $matches))
 			{
+				$this->has_overlibs = TRUE;
 				if($last_seen == 'NODE' && $matches[1] != '') {
 						warn("IN/OUTOVERLIBGRAPH make no sense for a NODE!\n");
 					} else if($last_seen == 'LINK' || $last_seen=='NODE' ) {
@@ -2305,6 +2363,12 @@ function ReadConfig($input)
 		} // if blankline
 	}     // while
 
+	if(1==1)
+	{
+		$this->ReadConfig_Commit($curobj);
+	}
+	else
+	{
 	if ($last_seen == "NODE")
 	{
 		$this->nodes[$curnode->name]=$curnode;
@@ -2320,6 +2384,8 @@ function ReadConfig($input)
 		}
 		else { warn ("Dropping LINK " . $curlink->name . " - it hasn't got 2 NODES!"); }
 	}
+	}
+	
 		
 	debug("ReadConfig has finished reading the config ($linecount lines)\n");
 	debug("------------------------------------------\n");
@@ -2355,6 +2421,10 @@ function ReadConfig($input)
 	$this->numscales['DEFAULT']=$scalesseen;
 	$this->configfile="$filename";
 
+	if($this->has_overlibs && $this->htmlstyle == 'static')
+	{
+		warn("OVERLIBGRAPH is used, but HTMLSTYLE is static. This is probably wrong.\n");
+	}
 	
 	debug("Building cache of z-layers and finalising bandwidth.\n");
 
@@ -2490,6 +2560,34 @@ function ReadConfig($input)
 	debug("Finished Pre-Processing Plugins...\n");
 
 	return (TRUE);
+}
+
+function ReadConfig_Commit(&$curobj)
+{
+	if(is_null($curobj)) return;
+	
+	$last_seen = $curobj->my_type();
+
+	// first, save the previous item, before starting work on the new one
+	if ($last_seen == "NODE")
+	{
+		$this->nodes[$curobj->name]=$curobj;
+		debug ("Saving Node: " . $curobj->name . "\n");
+	}
+
+	if ($last_seen == "LINK")
+	{
+		if (isset($curobj->a) && isset($curobj->b))
+		{
+			$this->links[$curobj->name]=$curobj;
+			debug ("Saving Link: " . $curobj->name . "\n");
+		}
+		else
+		{
+			$this->links[$curobj->name]=$curobj;
+			debug ("Saving Template-Only Link: " . $curobj->name . "\n");
+		}				
+	}
 }
 
 function WriteConfig($filename)
@@ -2633,6 +2731,16 @@ function WriteConfig($filename)
 		{
 			$output .= "SET $hintname $hint\n";
 		}
+		
+		// this doesn't really work right, but let's try anyway
+		if($this->has_includes)
+		{
+			$output .= "\n# Included files\n";
+			foreach ($this->included_files as $ifile)
+			{
+				$output .= "INCLUDE $ifile\n";
+			}
+		}
 
 		$output.="\n# End of global section\n\n";
 
@@ -2652,8 +2760,11 @@ function WriteConfig($filename)
 			{
 				if(!preg_match("/^::\s/",$node->name))
 				{
-					if($which=="template" && $node->x === NULL) fwrite($fd,$node->WriteConfig());
-					if($which=="normal" && $node->x !== NULL) fwrite($fd,$node->WriteConfig());
+					if($node->defined_in == $this->configfile)
+					{
+						if($which=="template" && $node->x === NULL) fwrite($fd,$node->WriteConfig());
+						if($which=="normal" && $node->x !== NULL) fwrite($fd,$node->WriteConfig());
+					}
 				}
 			}
 			
@@ -2664,8 +2775,11 @@ function WriteConfig($filename)
 			{
 				if(!preg_match("/^::\s/",$link->name))
 				{
-					if($which=="template" && $link->a === NULL) fwrite($fd,$link->WriteConfig());
-					if($which=="normal" && $link->a !== NULL) fwrite($fd,$link->WriteConfig());
+					if($link->defined_in == $this->configfile)
+					{
+						if($which=="template" && $link->a === NULL) fwrite($fd,$link->WriteConfig());
+						if($which=="normal" && $link->a !== NULL) fwrite($fd,$link->WriteConfig());
+					}
 				}
 			}
 		}		
@@ -3208,7 +3322,7 @@ function asJSON()
 	}
 	$json = rtrim($json,", \n");
 	$json .= "\n},\n";
-
+	
 	$json .= "\"nodes\": {\n";
 	$json .= $this->defaultnode->asJSON();
 	foreach ($this->nodes as $node) { $json .= $node->asJSON(); }

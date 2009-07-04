@@ -510,6 +510,7 @@ class WeatherMapLink extends WeatherMapItem
 	function WriteConfig()
 	{
 		$output='';
+		# $output .= "# first seen in ".$this->defined_in."\n";
 
 		if($this->config_override != '')
 		{

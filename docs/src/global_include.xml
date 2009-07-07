@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configentry>
+	<keyword>INCLUDE</keyword>
+	<scope>GLOBAL</scope>
+	<anchor>GLOBAL_INCLUDE</anchor>
+    <definition>INCLUDE <meta>filename</meta></definition>
+    <description  xmlns="http://www.w3.org/1999/xhtml">
+	<p>Fill me in!</p>
+    </description>
+    <changes>
+    <change version="0.96b">Originally added INCLUDE.</change>
+    </changes>
+</configentry>

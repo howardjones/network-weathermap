@@ -72,7 +72,7 @@ function weathermap_run_maps($mydir) {
 	}
 	$quietlogging = read_config_option("weathermap_quiet_logging");  
 	// moved this outside the module_checks, so there should always be something in the logs!
-	if($quietlogging==0) cacti_log("Weathermap $WEATHERMAP_VERSION starting - $mode_message",true,"WEATHERMAP\n");
+	if($quietlogging==0) cacti_log("Weathermap $WEATHERMAP_VERSION starting - $mode_message\n",true,"WEATHERMAP");
 
 	if(module_checks())
 	{

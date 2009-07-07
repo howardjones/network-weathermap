@@ -95,6 +95,7 @@
       <xi:include href="global_keypos.xml"/>
       <xi:include href="global_keystyle.xml"/>
       <xi:include href="global_set.xml"/>
+      <xi:include href="global_include.xml"/>
     </section>
     
 </references>

@@ -1,5 +1,5 @@
 <?php
-// PHP Weathermap 0.96a
+// PHP Weathermap 0.97
 // Copyright Howard Jones, 2005-2009 howie@thingy.com
 // http://www.network-weathermap.com/
 // Released under the GNU Public License
@@ -32,6 +32,7 @@ class WeatherMapLink extends WeatherMapItem
 	var $vialist = array();
 	var $viastyle;
 	var $usescale, $duplex; 
+	var $scaletype;
 	var $outlinecolour;
 	var $bwoutlinecolour;
 	var $bwboxcolour;
@@ -68,6 +69,7 @@ class WeatherMapLink extends WeatherMapItem
 			'arrowstyle' => 'classic',
 			'viastyle' => 'curved',
 			'usescale' => 'DEFAULT',
+			'scaletype' => 'percent',
 			'targets' => array(),
 			'duplex' => 'full',
 			'infourl' => array('',''),

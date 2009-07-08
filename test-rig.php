@@ -23,6 +23,17 @@ $map = new WeatherMap;
 
 	$map->ReadConfig($mapfile);
 
+	list($bottom, $top) = $map->FindScaleExtent("DEFAULT");
+	
+	print "SCALE goes from $bottom to $top\n";
+
+	$r2 = $map->NewColourFromPercent(104,"DEFAULT","test2",FALSE);
+	$r3 = $map->NewColourFromPercent(-5,"DEFAULT","test3",FALSE);
+	$r4 = $map->NewColourFromPercent(5,"DEFAULT","test4",FALSE);
+	$r5 = $map->NewColourFromPercent(-35,"DEFAULT","test5",FALSE);
+
+	print "Did tests\n";
+
 	if(1==0)
 	{
 	$nodename = "Centre";

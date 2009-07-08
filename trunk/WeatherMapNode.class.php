@@ -1,5 +1,5 @@
 <?php
-// PHP Weathermap 0.96a
+// PHP Weathermap 0.97
 // Copyright Howard Jones, 2005-2009 howie@thingy.com
 // http://www.network-weathermap.com/
 // Released under the GNU Public License
@@ -40,6 +40,7 @@ class WeatherMapNode extends WeatherMapItem
 	var $cachefile;
 	var $usescale;
 	var $useiconscale;
+	var $scaletype, $iconscaletype;
 	var $inscalekey,$outscalekey;
 	var $inscaletag, $outscaletag;
 	# var $incolour,$outcolour;
@@ -62,6 +63,8 @@ class WeatherMapNode extends WeatherMapItem
 				'label' => '',
 				'proclabel' => '',
 				'usescale' => 'DEFAULT',
+				'scaletype' => 'percent',
+				'iconscaletype' => 'percent',
 				'useiconscale' => 'none',
 				'scalevar' => 'in',
 				'template' => ':: DEFAULT ::',
@@ -172,19 +175,32 @@ class WeatherMapNode extends WeatherMapItem
 		{
 			debug("Colorising the icon\n");
 			$pc = 0;
+			$val = 0;
 
 			if($this->iconscalevar == 'in')
 			{
 				$pc = $this->inpercent;
 				$col = $this->colours[IN];
+				$val = $this->bandwidth_in;
 			}
 			if($this->iconscalevar == 'out')
 			{
 				$pc = $this->outpercent;
 				$col = $this->colours[OUT];
+				$val = $this->bandwidth_out;
 			}
 
-			list($colicon,$node_iconscalekey,$icontag) = $map->NewColourFromPercent($pc, $this->useiconscale,$this->name);
+			if($this->iconscaletype=='percent')
+			{
+				list($colicon,$node_iconscalekey,$icontag) = 
+					$map->NewColourFromPercent($pc, $this->useiconscale,$this->name );	
+			}
+			else
+			{
+				// use the absolute value if we aren't doing percentage scales.
+				list($colicon,$node_iconscalekey,$icontag) = 
+					$map->NewColourFromPercent($val, $this->useiconscale,$this->name, FALSE );
+			}
 		}
 
 		// figure out a bounding rectangle for the label

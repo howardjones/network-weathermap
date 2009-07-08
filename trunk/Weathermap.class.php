@@ -10,7 +10,7 @@ require_once "WeatherMap.functions.php";
 require_once "WeatherMapNode.class.php";
 require_once "WeatherMapLink.class.php";
 
-$WEATHERMAP_VERSION="0.96dev";
+$WEATHERMAP_VERSION="0.97dev";
 $weathermap_debugging=FALSE;
 $weathermap_map="";
 $weathermap_warncount=0;
@@ -888,16 +888,17 @@ function ReadData()
 
 				# print $myobj->name."=>".$myobj->inpercent."%/".$myobj->outpercent."\n";
 				
-				list($incol,$inscalekey,$inscaletag) = $this->NewColourFromPercent($myobj->inpercent,$myobj->usescale,$myobj->name);
-				list($outcol,$outscalekey, $outscaletag) = $this->NewColourFromPercent($myobj->outpercent,$myobj->usescale,$myobj->name);
-
-				// $myobj->incolour = $incol;
-				# $myobj->inscalekey = $inscalekey;
-				# $myobj->inscaletag = $inscaletag;
-				// $myobj->outcolour = $outcol;
-				# $myobj->outscalekey = $outscalekey;
-				# $myobj->outscaletag = $outscaletag;
-				
+				if($this->scaletype == 'percent')
+				{
+					list($incol,$inscalekey,$inscaletag) = $this->NewColourFromPercent($myobj->inpercent,$myobj->usescale,$myobj->name);
+					list($outcol,$outscalekey, $outscaletag) = $this->NewColourFromPercent($myobj->outpercent,$myobj->usescale,$myobj->name);
+				}
+				else
+				{
+					// use absolute values, if that's what is requested
+					list($incol,$inscalekey,$inscaletag) = $this->NewColourFromPercent($myobj->bandwidth_in,$myobj->usescale,$myobj->name, FALSE);
+					list($outcol,$outscalekey, $outscaletag) = $this->NewColourFromPercent($myobj->bandwidth_out,$myobj->usescale,$myobj->name, FALSE);	
+				}
 				
 				$myobj->add_note("inscalekey",$inscalekey);
 				$myobj->add_note("outscalekey",$outscalekey);
@@ -1075,8 +1076,7 @@ function ColourFromPercent($image, $percent,$scalename="DEFAULT",$name="")
 	return array($this->white,'','');
 }
 
-
-function NewColourFromPercent($percent,$scalename="DEFAULT",$name="")
+function NewColourFromPercent($value,$scalename="DEFAULT",$name="",$is_percent=TRUE)
 {
 	$col = new Colour(0,0,0);
 	$tag = '';
@@ -1089,15 +1089,15 @@ function NewColourFromPercent($percent,$scalename="DEFAULT",$name="")
 	{
 		$colours=$this->colours[$scalename];
 
-		if ($percent > 100)
+		if ($is_percent && $value > 100)
 		{
-			if($nowarn_clipping==0) warn ("NewColourFromPercent: Clipped $percent% to 100% for item $name\n");
-			$percent=100;
+			if($nowarn_clipping==0) warn ("NewColourFromPercent: Clipped $value% to 100% for item $name\n");
+			$value = 100;
 		}
 
 		foreach ($colours as $key => $colour)
 		{
-			if (($percent >= $colour['bottom']) and ($percent <= $colour['top']))
+			if ( ($colour['special'] == 0) and ($value >= $colour['bottom']) and ($value <= $colour['top']))
 			{
 				if (isset($colour['red2']))
 				{
@@ -1107,7 +1107,7 @@ function NewColourFromPercent($percent,$scalename="DEFAULT",$name="")
 					}
 					else
 					{
-						$ratio=($percent - $colour["bottom"]) / ($colour["top"] - $colour["bottom"]);
+						$ratio=($value - $colour["bottom"]) / ($colour["top"] - $colour["bottom"]);
 					}
 
 					$r=$colour["red1"] + ($colour["red2"] - $colour["red1"]) * $ratio;
@@ -1146,9 +1146,9 @@ function NewColourFromPercent($percent,$scalename="DEFAULT",$name="")
 	// shouldn't really get down to here if there's a complete SCALE
 
 	// you'll only get grey for a COMPLETELY quiet link if there's no 0 in the SCALE lines
-	if ($percent == 0) { return array(new Colour(192,192,192),'',''); }
+	if ($value == 0) { return array(new Colour(192,192,192),'',''); }
 
-	if($nowarn_scalemisses==0) warn("NewColourFromPercent: Scale $scalename doesn't include $percent% while drawing item $name [WMWARN29]\n");
+	if($nowarn_scalemisses==0) warn("NewColourFromPercent: Scale $scalename doesn't include a line for $value".($is_percent ? "%" : "")." while drawing item $name [WMWARN29]\n");
 
 	// and you'll only get white for a link with no colour assigned
 	return array(new Colour(255,255,255),'','');
@@ -1167,6 +1167,31 @@ function coloursort($a, $b)
 	if ($a['bottom'] < $b['bottom']) { return -1; }
 
 	return 1;
+}
+
+function FindScaleExtent($scalename="DEFAULT")
+{
+	$max = -999999999999999999999;
+	$min = - $max;
+	
+	if(isset($this->colours[$scalename]))
+	{
+		$colours=$this->colours[$scalename];
+
+		foreach ($colours as $key => $colour)
+		{
+			if(! $colour['special'])
+			{
+				$min = min($colour['bottom'], $min);
+				$max = max($colour['top'],  $max);
+			}
+		}
+	}
+	else
+	{
+		warn("FindScaleExtent: non-existent SCALE $scalename\n");
+	}
+	return array($min, $max);
 }
 
 function DrawLegend_Horizontal($im,$scalename="DEFAULT",$width=400)
@@ -1783,6 +1808,8 @@ function ReadConfig($input, $is_include=FALSE)
 					array('LINK', '/^\s*BWLABELPOS\s+(\d+)\s(\d+)\s*$/i', array('labeloffset_in'=>1,'labeloffset_out'=>2)),
 					array('LINK', '/^\s*COMMENTPOS\s+(\d+)\s(\d+)\s*$/i', array('commentoffset_in'=>1, 'commentoffset_out'=>2)),
 					array('LINK', '/^\s*USESCALE\s+([A-Za-z][A-Za-z0-9_]*)\s*$/i', array('usescale'=>1)),
+					array('LINK', '/^\s*USESCALE\s+([A-Za-z][A-Za-z0-9_]*)\s+(absolute|percent)\s*$/i', array('usescale'=>1,'scaletype'=>2)),
+
 					array('LINK', '/^\s*SPLITPOS\s+(\d+)\s*$/i', array('splitpos'=>1)),
 					
 					array('NODE', '/^\s*LABELOFFSET\s+([-+]?\d+)\s+([-+]?\d+)\s*$/i', array('labeloffsetx'=>1,'labeloffsety'=>2)),
@@ -2082,12 +2109,17 @@ function ReadConfig($input, $is_include=FALSE)
 				$linematched++;
 			}
 
-			if( ($last_seen == 'NODE') && preg_match("/^\s*USE(ICON)?SCALE\s+([A-Za-z][A-Za-z0-9_]*)(\s+(in|out))?\s*$/i",$buffer,$matches))
+			if( ($last_seen == 'NODE') && preg_match("/^\s*USE(ICON)?SCALE\s+([A-Za-z][A-Za-z0-9_]*)(\s+(in|out))?(\s+(absolute|percent))?\s*$/i",$buffer,$matches))
 			{
 				$svar = '';
+				$stype = 'percent';
 				if(isset($matches[3]))
 				{
 					$svar = trim($matches[3]);
+				}
+				if(isset($matches[6]))
+				{
+					$stype = strtolower(trim($matches[6]));
 				}
 				// opens the door for other scaley things...
 				switch($matches[1])
@@ -2095,6 +2127,8 @@ function ReadConfig($input, $is_include=FALSE)
 					case 'ICON':
 						$varname = 'iconscalevar';
 						$uvarname = 'useiconscale';
+						$tvarname = 'iconscaletype';
+						
 						if(!function_exists("imagefilter"))
 						{
 							warn("ICON SCALEs require imagefilter, which is not present in your PHP [WMWARN040]\n");
@@ -2103,6 +2137,7 @@ function ReadConfig($input, $is_include=FALSE)
 					default:
 						$varname = 'scalevar';
 						$uvarname = 'usescale';
+						$tvarname = 'scaletype';
 						break;
 				}
 
@@ -2110,9 +2145,12 @@ function ReadConfig($input, $is_include=FALSE)
 				{
 					$curnode->$varname = $svar;
 				}
-				$curnode->$uvarname= $matches[2];
+				$curnode->$tvarname = $stype;
+				$curnode->$uvarname = $matches[2];
 
 				// warn("Set $varname and $uvarname\n");
+
+				print ">> $stype $svar ".$matches[2]." ".$curnode->name." \n";
 
 				$linematched++;
 			}
@@ -2120,7 +2158,7 @@ function ReadConfig($input, $is_include=FALSE)
 			// one REGEXP to rule them all:
 //				if(preg_match("/^\s*SCALE\s+([A-Za-z][A-Za-z0-9_]*\s+)?(\d+\.?\d*)\s+(\d+\.?\d*)\s+(\d+)\s+(\d+)\s+(\d+)(?:\s+(\d+)\s+(\d+)\s+(\d+))?\s*$/i",
 //	0.95b		if(preg_match("/^\s*SCALE\s+([A-Za-z][A-Za-z0-9_]*\s+)?(\d+\.?\d*)\s+(\d+\.?\d*)\s+(\d+)\s+(\d+)\s+(\d+)(?:\s+(\d+)\s+(\d+)\s+(\d+))?\s*(.*)$/i",
-			if(preg_match("/^\s*SCALE\s+([A-Za-z][A-Za-z0-9_]*\s+)?(\d+\.?\d*)\s+(\d+\.?\d*)\s+(?:(\d+)\s+(\d+)\s+(\d+)(?:\s+(\d+)\s+(\d+)\s+(\d+))?|(none))\s*(.*)$/i",
+			if(preg_match("/^\s*SCALE\s+([A-Za-z][A-Za-z0-9_]*\s+)?(\-?\d+\.?\d*)\s+(\-?\d+\.?\d*)\s+(?:(\d+)\s+(\d+)\s+(\d+)(?:\s+(\d+)\s+(\d+)\s+(\d+))?|(none))\s*(.*)$/i",
 				$buffer, $matches))
 			{
 				// The default scale name is DEFAULT
@@ -2137,6 +2175,7 @@ function ReadConfig($input, $is_include=FALSE)
 
 				$this->colours[$matches[1]][$key]['bottom'] = (float)($matches[2]);
 				$this->colours[$matches[1]][$key]['top'] = (float)($matches[3]);
+				$this->colours[$matches[1]][$key]['special'] = 0;
 
 				if(isset($matches[10]) && $matches[10] == 'none')
 				{
@@ -2278,6 +2317,7 @@ function ReadConfig($input, $is_include=FALSE)
 				$this->colours['DEFAULT'][$key]['blue1']=$matches[4];
 				$this->colours['DEFAULT'][$key]['bottom']=-2;
 				$this->colours['DEFAULT'][$key]['top']=-1;
+				$this->colours['DEFAULT'][$key]['special']=1;
 
 				$linematched++;
 			}
@@ -2396,15 +2436,15 @@ function ReadConfig($input, $is_include=FALSE)
 		debug ("Adding default SCALE colour set (no SCALE lines seen).\n");
 		$defaults=array
 			(
-				'0_0' => array('bottom' => 0, 'top' => 0, 'red1' => 192, 'green1' => 192, 'blue1' => 192),
-				'0_1' => array('bottom' => 0, 'top' => 1, 'red1' => 255, 'green1' => 255, 'blue1' => 255),
-				'1_10' => array('bottom' => 1, 'top' => 10, 'red1' => 140, 'green1' => 0, 'blue1' => 255),
-				'10_25' => array('bottom' => 10, 'top' => 25, 'red1' => 32, 'green1' => 32, 'blue1' => 255),
-				'25_40' => array('bottom' => 25, 'top' => 40, 'red1' => 0, 'green1' => 192, 'blue1' => 255),
-				'40_55' => array('bottom' => 40, 'top' => 55, 'red1' => 0, 'green1' => 240, 'blue1' => 0),
-				'55_70' => array('bottom' => 55, 'top' => 70, 'red1' => 240, 'green1' => 240, 'blue1' => 0),
-				'70_85' => array('bottom' => 70, 'top' => 85, 'red1' => 255, 'green1' => 192, 'blue1' => 0),
-				'85_100' => array('bottom' => 85, 'top' => 100, 'red1' => 255, 'green1' => 0, 'blue1' => 0)
+				'0_0' => array('bottom' => 0, 'top' => 0, 'red1' => 192, 'green1' => 192, 'blue1' => 192, 'special'=>0),
+				'0_1' => array('bottom' => 0, 'top' => 1, 'red1' => 255, 'green1' => 255, 'blue1' => 255, 'special'=>0),
+				'1_10' => array('bottom' => 1, 'top' => 10, 'red1' => 140, 'green1' => 0, 'blue1' => 255, 'special'=>0),
+				'10_25' => array('bottom' => 10, 'top' => 25, 'red1' => 32, 'green1' => 32, 'blue1' => 255, 'special'=>0),
+				'25_40' => array('bottom' => 25, 'top' => 40, 'red1' => 0, 'green1' => 192, 'blue1' => 255, 'special'=>0),
+				'40_55' => array('bottom' => 40, 'top' => 55, 'red1' => 0, 'green1' => 240, 'blue1' => 0, 'special'=>0),
+				'55_70' => array('bottom' => 55, 'top' => 70, 'red1' => 240, 'green1' => 240, 'blue1' => 0, 'special'=>0),
+				'70_85' => array('bottom' => 70, 'top' => 85, 'red1' => 255, 'green1' => 192, 'blue1' => 0, 'special'=>0),
+				'85_100' => array('bottom' => 85, 'top' => 100, 'red1' => 255, 'green1' => 0, 'blue1' => 0, 'special'=>0)
 			);
 
 		foreach ($defaults as $key => $def)
@@ -2693,7 +2733,7 @@ function WriteConfig($filename)
 
 			foreach ($colours as $k => $colour)
 			{
-				if ($colour['top'] >= 0)
+				if (! $colour['special'] )
 				{
 					$top = rtrim(rtrim(sprintf("%f",$colour['top']),"0"),$decimal_point);
 					$bottom= rtrim(rtrim(sprintf("%f",$colour['bottom']),"0"),$decimal_point);

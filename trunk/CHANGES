@@ -1,4 +1,4 @@
-0.96b	FIXED - RRD Aggregation regexp was failing (thanks to shd)
+0.97	FIXED - RRD Aggregation regexp was failing (thanks to shd)
 	FIXED - Scale numerals honour locale (thanks again, shd)
 	FIXED - THold plugin check failed with Thold 0.4.1 (PA 2.x, actually)
 	FIXED - Uninitialized variable in ReadData when plugin is disabled
@@ -7,10 +7,12 @@
 	ADDED - Option of a dropdown selector to navigate between maps (in full-size view)
 	ADDED - Maps can be organised into groups in Cacti plugin. These appear
 			as tabs in the UI for viewing maps.
-	ADDED - Extra variables can be defined per-group, so all maps in a group can have similar settings.
+	ADDED - Extra variables can be defined per-group, so all maps in a group can have similar settings (e.g. a "24hr average" tab).
 	ADDED - INCLUDE keyword to include a file of common definitions (based on work by BorisL)
 			(NOTE: this can confuse the editor sometimes - see the manual page for INCLUDE)
 	ADDED - Warning for maps that contain OVERLIBGRAPH but not 'HTMLSTYLE overlib'
+	ADDED - SCALE will accept values below 0, and also above 100
+	ADDED - USESCALE has two new options: absolute and percent, which allows you to have a SCALE of absolute values
 
 0.96a	FIXED - New z-ordering code did not work correctly on PHP4. This broke (at least) the editor. (thanks toe_cutter)
 	FIXED - \n is no longer treated as a newline in TARGETs (thanks NetAdmin)

@@ -33,6 +33,7 @@
 	ADDED - Control the drawing order with ZORDER.
 	ADDED - New artificial icons: nink, inpie and outpie. See ICON in manual.
 	ADDED - Warning for probably-incorrect BWLABELPOS where in<out
+	ADDED - Warning for gaps in a SCALE
 	ADDED - New global SET variables to disable some common warnings you may not care about :-)
 	ADDED - Cacti management screen shows number of warnings for each map last time it ran
 	ADDED - Cacti management screen also has a link to the log entries for the map in question
@@ -66,6 +67,7 @@
 	CHANGE - A LINK with no NODES is no longer an error. Also for templates.
 	CHANGE - The link_bulge secret mode bulges each side of a link independently now
 	CHANGE - whitespace is stripped from the beginning and end of each line before parsing
+	CHANGE - OVERLIBWIDTH/HEIGHT are used for img tag width and height - so they must be *correct* now
 	FIXED - Cacti poller_output support works more reliably/at all on Windows
 	FIXED - Renaming a node in the editor correctly handles other relatively-positioned nodes and vias
 	FIXED - Minor issue with CRLF in map title for Cacti Plugin

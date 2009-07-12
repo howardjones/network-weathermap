@@ -13,7 +13,7 @@
 //      include('spyc.php');
 
 
-$mapfile = "configs/template-debug.conf";
+$mapfile = "configs/096-test.conf";
 
 $map = new WeatherMap;
 
@@ -21,8 +21,10 @@ $map = new WeatherMap;
 	$weathermap_debugging=TRUE;
 
 
-	$map->ReadConfig($mapfile);
+	$map->ReadConfigNG($mapfile);
 
+	exit();
+	
 	list($bottom, $top) = $map->FindScaleExtent("DEFAULT");
 	
 	print "SCALE goes from $bottom to $top\n";

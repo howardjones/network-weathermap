@@ -1586,6 +1586,105 @@ function DrawTitle($im, $font, $colour)
 	$this->imap->addArea("Rectangle", "TITLE", '', array($x, $y, $x + $boxwidth, $y - $boxheight));
 }
 
+function ReadConfigNG($input, $is_include=FALSE)
+{
+	$curnode=null;
+	$curlink=null;
+
+	if( (strchr($input,"\n")!=FALSE) || (strchr($input,"\r")!=FALSE ) )
+	{
+		 debug("ReadConfig Detected that this is a config fragment.\n");
+			 // strip out any Windows line-endings that have gotten in here
+			 $input=str_replace("\r", "", $input);
+			 $lines = split("/n",$input);
+			 $filename = "{text insert}";
+	}
+	else
+	{
+		debug("ReadConfig Detected that this is a config filename.\n");
+		 $filename = $input;
+		 
+		if($is_include){ 
+			debug("ReadConfig Detected that this is an INCLUDED config filename.\n");
+			if($is_include && in_array($filename, $this->included_files))
+			{
+				warn("Attempt to include '$filename' twice! Skipping it.\n");
+				return(FALSE);
+			}
+			else
+			{
+				$this->included_files[] = $filename;
+				$this->has_includes = TRUE;
+			}
+		}
+		
+		$fd=fopen($filename, "r");
+		 
+		if ($fd)
+		{
+				while (!feof($fd))
+				{
+					$buffer=fgets($fd, 4096);
+					// strip out any Windows line-endings that have gotten in here
+					$buffer=str_replace("\r", "", $buffer);
+					$lines[] = $buffer;
+				}
+				fclose($fd);
+		}
+	}
+		
+	$linecount = 0;
+	$context = "GLOBAL";
+
+	foreach($lines as $buffer)
+	{
+		$linematched=0;
+		$linecount++;
+		
+		$buffer = trim($buffer);
+		// alternative for use later where quoted strings are more useful
+		$args = ParseString($buffer);
+		
+		if(sizeof($args) > 0)
+		{		
+			$linematched++;		
+			$cmd = strtolower($args[0]);
+			
+			if($cmd == 'node')
+			{
+				$context = "NODE.".$args[1];
+			}
+			elseif($cmd == 'link')
+			{
+				$context = "LINK.".$args[1];
+			}
+			elseif($cmd == 'scale')
+			{
+				array_shift($args);
+				if( preg_match("/^[0-9\-]+/i",$args[0]) )
+				{
+					$scalename = "DEFAULT";
+				}
+				else
+				{
+					$scalename = array_shift($args);
+				}
+				$context = "SCALE.".$scalename;
+				
+				print "$context   ".join("|",$args)."\n";
+			}
+			else
+			{
+				# everything else
+				print "$context   ".join("|",$args)."\n";
+			}
+		}
+		
+		if ($linematched == 0 && trim($buffer) != '') { warn ("Unrecognised config on line $linecount: $buffer\n"); }
+		
+	}
+}
+
 function ReadConfig($input, $is_include=FALSE)
 {
 	$curnode=null;

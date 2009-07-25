@@ -2923,7 +2923,7 @@ function WriteConfig($filename)
 
 			foreach ($colours as $k => $colour)
 			{
-				if (! $colour['special'] )
+				if (!isset($colour['special']) || ! $colour['special'] )
 				{
 					$top = rtrim(rtrim(sprintf("%f",$colour['top']),"0"),$decimal_point);
 					$bottom= rtrim(rtrim(sprintf("%f",$colour['bottom']),"0"),$decimal_point);
@@ -3053,7 +3053,14 @@ function DrawMap($filename = '', $thumbnailfile = '', $thumbnailmax = 250, $with
 	debug("Trace: DrawMap()\n");
 	metadump("# start",true);
 	$bgimage=NULL;
-	$this->cachefile_version = crc32(file_get_contents($this->configfile));
+	if($this->configfile != "")
+	{
+		$this->cachefile_version = crc32(file_get_contents($this->configfile));
+	}
+	else
+	{
+		$this->cachefile_version = crc32("........");
+	}
 
 	debug("Running Post-Processing Plugins...\n");
 	foreach ($this->postprocessclasses as $post_class)

@@ -380,5 +380,12 @@ function get_fontlist(&$map,$name,$current)
 	return($output);
 }
 
+function editor_log($str)
+{
+	$f = fopen("editor.log","a");
+	fputs($f, $str);
+	fclose($f);
+}
+
 // vim:ts=4:sw=4:
 ?>

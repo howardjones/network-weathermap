@@ -3,6 +3,8 @@
 require_once 'editor.inc.php';
 require_once 'Weathermap.class.php';
 
+include "var_log.php";
+
 // so that you can't have the editor active, and not know about it.
 $ENABLED=true;
 
@@ -112,6 +114,10 @@ else
 	debug("==========================================================================================================\n");
 	debug("Starting Edit Run: action is $action on $mapname\n");
 	debug("==========================================================================================================\n");
+	
+	editor_log("\n\n-----------------------------------------------------------------------------\nNEW REQUEST:\n\n");
+	editor_log(var_log($_REQUEST));
+	
 	$map = new WeatherMap;
 	$map->context = 'editor';
 	
@@ -447,12 +453,13 @@ else
 			$map->background = stripslashes($_REQUEST['map_bgfile']);
 		}
 
-
 		$inheritables = array(
 			array('link','width','map_linkdefaultwidth'),
 		);
 
 		handle_inheritance($map, $inheritables);	
+		$map->links['DEFAULT']->width = intval($_REQUEST['map_linkdefaultwidth']);
+		$map->links['DEFAULT']->add_note("my_width", intval($_REQUEST['map_linkdefaultwidth']));
                 
 		$bwin = $_REQUEST['map_linkdefaultbwin'];
 		$bwout = $_REQUEST['map_linkdefaultbwout'];
@@ -530,7 +537,7 @@ else
 			
 			// $newlink->SetBandwidth($map->defaultlink->max_bandwidth_in_cfg, $map->defaultlink->max_bandwidth_out_cfg);
 						
-			$newlink->width = $map->defaultlink->width;
+			$newlink->width = $map->links['DEFAULT']->width;
 
 			// make sure the link name is unique. We can have multiple links between
 			// the same nodes, these days
@@ -540,6 +547,7 @@ else
 				$newlinkname .= "a";
 			}
 			$newlink->name = $newlinkname;
+			$newlink->defined_in = $map->configfile;
 			$map->links[$newlinkname] = $newlink;
 			array_push($map->seen_zlayers[$newlink->zorder], $newlink);
 
@@ -752,10 +760,11 @@ else
 		$node->name = $newnodename;
 		$node->template = "DEFAULT";
 		$node->Reset($map);
-		
+				
 		$node->x = $x;
 		$node->y = $y;
-		
+		$node->defined_in = $map->configfile;
+				
 		array_push($map->seen_zlayers[$node->zorder], $node);			
 		
 		// only insert a label if there's no LABEL in the DEFAULT node.
@@ -764,9 +773,10 @@ else
 		{
 			$node->label = "Node";
 		}
-
-		$map->nodes[$node->name] = $node;
 		
+		$map->nodes[$node->name] = $node;
+		$log = "added a node called $newnodename at $x,$y to $mapfile";
+						
 		$map->WriteConfig($mapfile);
 		break;
 
@@ -1161,12 +1171,12 @@ else
 
 		<tr>
 			<th>Default Link Width</th>
-			<td><input name="map_linkdefaultwidth" size="6" type="text" value="<?php echo  $map->defaultlink->width ?>" /> pixels</td>
+			<td><input name="map_linkdefaultwidth" size="6" type="text" value="<?php echo  $map->links['DEFAULT']->width ?>" /> pixels</td>
 		  </tr>
 
 		<tr>
 			<th>Default Link Bandwidth</th>
-			<td><input name="map_linkdefaultbwin" size="6" type="text" value="<?php echo  $map->defaultlink->max_bandwidth_in_cfg ?>" /> bit/sec in, <input name="map_linkdefaultbwout" size="6" type="text" value="<?php echo  $map->defaultlink->max_bandwidth_out_cfg ?>" /> bit/sec out</td>
+			<td><input name="map_linkdefaultbwin" size="6" type="text" value="<?php echo  $map->links['DEFAULT']->max_bandwidth_in_cfg ?>" /> bit/sec in, <input name="map_linkdefaultbwout" size="6" type="text" value="<?php echo  $map->links['DEFAULT']->max_bandwidth_out_cfg ?>" /> bit/sec out</td>
 		  </tr>
 
 
@@ -1234,9 +1244,9 @@ else
 		  <tr>
 			<th>Link Labels</th>
 			<td><select id="mapstyle_linklabels" name="mapstyle_linklabels">
-			  <option <?php echo ($map->defaultlink->labelstyle=='bits' ? 'selected' : '') ?> value="bits">Bits/sec</option>
-			  <option <?php echo ($map->defaultlink->labelstyle=='percent' ? 'selected' : '') ?> value="percent">Percentage</option>
-			  <option <?php echo ($map->defaultlink->labelstyle=='none' ? 'selected' : '') ?> value="none">None</option>
+			  <option <?php echo ($map->links['DEFAULT']->labelstyle=='bits' ? 'selected' : '') ?> value="bits">Bits/sec</option>
+			  <option <?php echo ($map->links['DEFAULT']->labelstyle=='percent' ? 'selected' : '') ?> value="percent">Percentage</option>
+			  <option <?php echo ($map->links['DEFAULT']->labelstyle=='none' ? 'selected' : '') ?> value="none">None</option>
 			</select></td>
 		  </tr>
 		  <tr>
@@ -1249,17 +1259,17 @@ else
 		  <tr>
 			<th>Arrow Style</th>
 			<td><select name="mapstyle_arrowstyle">
-			  <option <?php echo ($map->defaultlink->arrowstyle=='classic' ? 'selected' : '') ?> value="classic">Classic</option>
-			  <option <?php echo ($map->defaultlink->arrowstyle=='compact' ? 'selected' : '') ?> value="compact">Compact</option>
+			  <option <?php echo ($map->links['DEFAULT']->arrowstyle=='classic' ? 'selected' : '') ?> value="classic">Classic</option>
+			  <option <?php echo ($map->links['DEFAULT']->arrowstyle=='compact' ? 'selected' : '') ?> value="compact">Compact</option>
 			</select></td>
 		  </tr>
 		  <tr>
 			<th>Node Font</th>
-			<td><?php echo get_fontlist($map,'mapstyle_nodefont',$map->defaultnode->labelfont); ?></td>
+			<td><?php echo get_fontlist($map,'mapstyle_nodefont',$map->nodes['DEFAULT']->labelfont); ?></td>
 		  </tr>
 		  <tr>
 			<th>Link Label Font</th>
-			<td><?php echo get_fontlist($map,'mapstyle_linkfont',$map->defaultlink->bwfont); ?></td>
+			<td><?php echo get_fontlist($map,'mapstyle_linkfont',$map->links['DEFAULT']->bwfont); ?></td>
 		  </tr>
 		  <tr>
 			<th>Legend Font</th>

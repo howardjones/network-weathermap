@@ -160,6 +160,7 @@ class WeatherMap extends WeatherMapBase
 	var $used_images = array(); // an array of image filenames referred to (used by editor)
 	var $seen_zlayers = array(0=>array(),1000=>array()); // 0 is the background, 100 is the legends, title, etc
 
+	var $config;
 	var $min_ds_time;
 	var $max_ds_time;
 	var $background;
@@ -1586,11 +1587,44 @@ function DrawTitle($im, $font, $colour)
 	$this->imap->addArea("Rectangle", "TITLE", '', array($x, $y, $x + $boxwidth, $y - $boxheight));
 }
 
-function ReadConfigNG($input, $is_include=FALSE)
+function ReadConfigNG($input, $is_include=FALSE, $initial_context="GLOBAL")
 {
-	$curnode=null;
-	$curlink=null;
-
+	$valid_commands = array(
+			"GLOBAL.set", "LINK.set", "NODE.set",
+			"GLOBAL.#","LINK.#","NODE.#",
+			"GLOBAL.include", "NODE.include", "LINK.include",
+			
+			"GLOBAL.width", "GLOBAL.height", "GLOBAL.background",
+			"GLOBAL.scale", "GLOBAL.title", "GLOBAL.titlepos",
+			"GLOBAL.fontdefine",
+			"GLOBAL.keystyle", "GLOBAL.titlecolor", "GLOBAL.timecolor",
+			"GLOBAL.titlefont", "GLOBAL.timefont", "GLOBAL.htmloutputfile",
+			"GLOBAL.htmlstyle", "GLOBAL.imageoutputfile", "GLOBAL.keyfont",
+			"GLOBAL.keytextcolor", "GLOBAL.keyoutlinecolor", "GLOBAL.keybgcolor",
+			"GLOBAL.bgcolor",
+			
+			"SCALE.keypos", "SCALE.keystyle", "SCALE.scale",
+			
+			"LINK.width", "LINK.link", "LINK.nodes",
+			"LINK.target", "LINK.usescale", "LINK.infourl",
+			"LINK.linkstyle", "LINK.overlibcaption", "LINK.inoverlibcaption", "LINK.outoverlibcaption", 
+			"LINK.inoverlibgraph", "LINK.outoverlibgraph",
+			"LINK.overlibgraph", "LINK.overlibwidth", "LINK.overlibheight",
+			"LINK.bwlabel", "LINK.via", "LINK.zorder", "LINK.outlinecolor",
+			"LINK.notes", "LINK.innotes", "LINK.outnotes","LINK.ininfourl", "LINK.outinfourl",
+			"LINK.bwstyle", "LINK.template", "LINK.splitpos", "LINK.bwlabelpos", "LINK.incomment", "LINK.outcomment",
+			"LINK.viastyle", "LINK.bandwidth", "LINK.inbwformat", "LINK.outbwformat",
+			"LINK.commentstyle", "LINK.commentfont", "LINK.commentfontcolor", "LINK.bwfont",
+		
+			"NODE.icon", "NODE.target", "NODE.position", "NODE.infourl", "NODE.overlibgraph",
+			"NODE.zorder", "NODE.label", "NODE.template", "NODE.labelbgcolor",
+			"NODE.maxvalue",
+			"NODE.labeloutlinecolor", "NODE.aiconoutlinecolor", "NODE.aiconfillcolor", "NODE.usescale",
+			"NODE.labelfontcolor", "NODE.labelfont", "NODE.labelangle", "NODE.labelfontshadowcolor",
+			"NODE.node", "NODE.overlibwidth", "NODE.overlibheight", "NODE.labeloffset"
+		);
+	
+	
 	if( (strchr($input,"\n")!=FALSE) || (strchr($input,"\r")!=FALSE ) )
 	{
 		 debug("ReadConfig Detected that this is a config fragment.\n");
@@ -1603,20 +1637,6 @@ function ReadConfigNG($input, $is_include=FALSE)
 	{
 		debug("ReadConfig Detected that this is a config filename.\n");
 		 $filename = $input;
-		 
-		if($is_include){ 
-			debug("ReadConfig Detected that this is an INCLUDED config filename.\n");
-			if($is_include && in_array($filename, $this->included_files))
-			{
-				warn("Attempt to include '$filename' twice! Skipping it.\n");
-				return(FALSE);
-			}
-			else
-			{
-				$this->included_files[] = $filename;
-				$this->has_includes = TRUE;
-			}
-		}
 		
 		$fd=fopen($filename, "r");
 		 
@@ -1634,13 +1654,15 @@ function ReadConfigNG($input, $is_include=FALSE)
 	}
 		
 	$linecount = 0;
-	$context = "GLOBAL";
+	$context = $initial_context;
 
 	foreach($lines as $buffer)
 	{
 		$linematched=0;
 		$linecount++;
-		
+		$nextcontext = "";
+		$key = "";
+	
 		$buffer = trim($buffer);
 		// alternative for use later where quoted strings are more useful
 		$args = ParseString($buffer);
@@ -1648,19 +1670,23 @@ function ReadConfigNG($input, $is_include=FALSE)
 		if(sizeof($args) > 0)
 		{		
 			$linematched++;		
-			$cmd = strtolower($args[0]);
-			
-			if($cmd == 'node')
+			$cmd = strtolower(array_shift($args));
+						
+			if($cmd == 'include')
 			{
-				$context = "NODE.".$args[1];
+				$this->ReadConfigNG($args[0],TRUE, $context);
+			}
+			elseif($cmd == 'node')
+			{
+				$context = "NODE.".$args[0];
 			}
 			elseif($cmd == 'link')
 			{
-				$context = "LINK.".$args[1];
+				$context = "LINK.".$args[0];
+				$vcount = 0;	# reset the via-number counter, it's a new link
 			}
-			elseif($cmd == 'scale')
+			elseif($cmd == 'scale' || $cmd == 'keystyle' || $cmd == 'keypos')
 			{
-				array_shift($args);
 				if( preg_match("/^[0-9\-]+/i",$args[0]) )
 				{
 					$scalename = "DEFAULT";
@@ -1669,20 +1695,85 @@ function ReadConfigNG($input, $is_include=FALSE)
 				{
 					$scalename = array_shift($args);
 				}
+				if($cmd=="scale") $key = $args[0]."_".$args[1];
+				$nextcontext = $context;
 				$context = "SCALE.".$scalename;
-				
-				print "$context   ".join("|",$args)."\n";
+			}
+			
+			array_unshift($args,$cmd);
+			
+			if($context == 'GLOBAL')
+	 		{ 
+				$ctype='GLOBAL'; 
 			}
 			else
 			{
-				# everything else
-				print "$context   ".join("|",$args)."\n";
+				list($ctype,$junk) = split("\\.", $context, 2);
 			}
+			
+			$lookup = $ctype.".".$cmd;
+			
+			// Some things (scales, mainly) might define special keys
+			// the key should be unique for that object
+			// most (all?) things for a link or node are one-offs. 
+			if($key == "") $key = $cmd; 
+			if($cmd == 'set' || $cmd == 'fontdefine') $key .= "_".$args[1];
+			if($cmd == 'via')
+			{
+				$key .= "_".$vcount;
+				$vcount++;
+			}
+			
+			# everything else
+			if( substr($cmd, 0, 1) != '#')
+			{
+				if(! in_array($lookup, $valid_commands))
+				{
+					print "INVALID COMMAND: $lookup\n";
+				}
+				
+				if(isset($config[$context][$key]))
+				{
+					print "REDEFINED $key in $context\n";
+				}
+				else
+				{
+					array_unshift($args,$linecount);
+					array_unshift($args,$filename);
+					$this->config[$context][$key] = $args;
+				}
+			}
+			print "$context\\$key  $filename:$linecount ".join("|",$args)."\n";
+			
+			if($nextcontext != "") $context = $nextcontext;
 		}
 		
 		if ($linematched == 0 && trim($buffer) != '') { warn ("Unrecognised config on line $linecount: $buffer\n"); }
 		
 	}
+	
+	if(! $is_include)
+	{
+		print_r($this->config);
+	
+		foreach ($this->config as $context=>$values)
+		{
+			print "> $context\n";
+		}
+	}
+	
+	
+}
+
+function WriteConfigNG($filename)
+{
+	global $WEATHERMAP_VERSION;
+	
+	$fd = fopen($filename);
+	
+	
+	
+	fclose($fd);
 }
 
 function ReadConfig($input, $is_include=FALSE)

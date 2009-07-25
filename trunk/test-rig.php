@@ -13,7 +13,7 @@
 //      include('spyc.php');
 
 
-$mapfile = "configs/096-test.conf";
+$mapfile = "configs/097-test.conf";
 
 $map = new WeatherMap;
 

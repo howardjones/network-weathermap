@@ -1,6 +1,28 @@
-_DEFAULT_ link and node are built-in
+_DEFAULT_ link and node are built-in - the default defaults
 All others are initially empty, with just a reference to the parent.
 
+
+Per node:
+	list of properties
+	for each:
+		name
+		value
+		config filename (if any)
+		config line number (if any)
+		type? (so we can use a standard parser/writer)
+	special name/type for comments
+
+editor has set/get functions to alter the config.
+all map fns need to use the getter to get config info
+seperate array of nodes and links (as now) for *runtime* info
+ - e.g. the width of the image, the calculated position, the ReadData results	
+ - also store some kind of reference to the appropriate place in the DOM
+
+To avoid PHP4 reference rubbish, each DOM item is just stored in an array with a UID. The UID is used as a reference whenever one is needed. No circular references, no accidental pass-by-value. Use uniqid().
+
+WriteConfig then just enumerates the DOM.
+
+Maybe need a function to optimise the tree, making sure that the property value doesn't match the parent's value (i.e. it's redundant)
 
 LINK _DEFAULT_
 	LINK DEFAULT

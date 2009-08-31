@@ -820,13 +820,18 @@ function ReadData()
 									warn("ReadData: $type $name, target: $target[4] on config line $target[3] was not recognised as a valid TARGET [WMWARN08]\n");
 								}
 	
-								if (($in === NULL) || ($out === NULL))
+								if (($in === NULL) && ($out === NULL))
 								{
 									$in=0;
 									$out=0;
 									// **
 									warn
 										("ReadData: $type $name, target: $targetstring on config line $target[3] had no valid data, according to $matched_by\n");
+								}
+								else
+								{
+									if($in === NULL) $in = 0;
+									if($out === NULL) $out = 0;
 								}
 	
 								if($multiply != 1) {  

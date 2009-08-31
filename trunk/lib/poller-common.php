@@ -93,7 +93,7 @@ function weathermap_run_maps($mydir) {
 				fclose($testfd); 
 				unlink($testfile);
 
-				$queryrows = db_fetch_assoc("select m.* g.name as groupname from weathermap_maps m,weathermap_groups g where m.group_id=g.id and active='on' order by sortorder,id");
+				$queryrows = db_fetch_assoc("select m.*, g.name as groupname from weathermap_maps m,weathermap_groups g where m.group_id=g.id and active='on' order by sortorder,id");
 
 				if( is_array($queryrows) )
 				{

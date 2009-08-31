@@ -3,7 +3,7 @@
 require_once 'editor.inc.php';
 require_once 'Weathermap.class.php';
 
-include "var_log.php";
+# include "var_log.php";
 
 // so that you can't have the editor active, and not know about it.
 $ENABLED=true;
@@ -115,8 +115,8 @@ else
 	debug("Starting Edit Run: action is $action on $mapname\n");
 	debug("==========================================================================================================\n");
 	
-	editor_log("\n\n-----------------------------------------------------------------------------\nNEW REQUEST:\n\n");
-	editor_log(var_log($_REQUEST));
+	# editor_log("\n\n-----------------------------------------------------------------------------\nNEW REQUEST:\n\n");
+	# editor_log(var_log($_REQUEST));
 	
 	$map = new WeatherMap;
 	$map->context = 'editor';

@@ -1,3 +1,12 @@
+No filenames for weathermap_data
+Use weathermap_data in dsstats
+Docs for dsstats
+Test groups fully
+Add cron settings?
+Converter for rrd to ds
+Add snmp_cache stuff to dsstats
+
+
 WISHES
 -------
 

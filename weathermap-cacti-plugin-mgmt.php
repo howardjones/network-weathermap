@@ -94,14 +94,14 @@ case 'chgroup':
 		print "Something got lost back there.";
 	}
 	break;
-	
+	 
 case 'map_settings_delete':
-	$mapid = -1;
-	$settingid = -1;
+	$mapid = NULL;
+	$settingid = NULL;
 	if( isset($_REQUEST['mapid']) && is_numeric($_REQUEST['mapid']))  { $mapid = intval($_REQUEST['mapid']); }
 	if( isset($_REQUEST['id']) && is_numeric($_REQUEST['id']))  { $settingid = intval($_REQUEST['id']); }
 		
-	if($mapid>=0 && $settingid>0)
+	if(! is_null($mapid) && ! is_null($settingid) )
 	{
 		// create setting
 		weathermap_setting_delete($mapid,$settingid);
@@ -111,18 +111,20 @@ case 'map_settings_delete':
 
 // this is the save option from the map_settings_form
 case 'save':
-	$mapid=0; $settingid=0; $name=''; $value='';
+	$mapid = NULL;
+	$settingid = NULL;
+	$name=''; $value='';
 	if( isset($_REQUEST['mapid']) && is_numeric($_REQUEST['mapid']))  { $mapid = intval($_REQUEST['mapid']); }
 	if( isset($_REQUEST['id']) && is_numeric($_REQUEST['id']))  { $settingid = intval($_REQUEST['id']); }
 	if( isset($_REQUEST['name']) && $_REQUEST['name'])  { $name = $_REQUEST['name']; }
 	if( isset($_REQUEST['value']) && $_REQUEST['value'])  { $value = $_REQUEST['value']; }
 	
-	if($mapid>=0 && $settingid==0)
+	if(! is_null($mapid) && $settingid==0 )
 	{
 		// create setting
 		weathermap_setting_save($mapid,$name,$value);
 	}
-	elseif($mapid>0 && $settingid>0)
+	elseif(! is_null($mapid) && ! is_null($settingid) )
 	{
 		// update setting
 		weathermap_setting_update($mapid,$settingid,$name,$value);
@@ -895,6 +897,12 @@ function weathermap_map_settings($id)
 		$title = "Additional settings for ALL maps";
 		$nonemsg = "There are no settings for all maps yet. You can add some by clicking Add up in the top-right, or choose a single map from the management screen to add settings for that map.";
 	}
+	elseif($id<0)
+	{
+		$title = db_fetch_cell("select name from weathermap_groups where id=".intval(-$id));		
+		$title = "Edit per-map settings for Group ". intval(-$id) . ": " . $title;
+		$nonemsg = "There are no per-group settings for this group yet. You can add some by clicking Add up in the top-right.";
+	}
 	else
 	{
 		// print "Per-map settings for map $id";
@@ -939,7 +947,9 @@ function weathermap_map_settings_form($mapid,$settingid=0)
 	global $colors, $config;
 	
 	// print "Per-map settings for map $id";
-	$title = db_fetch_cell("select titlecache from weathermap_maps where id=".intval($mapid));		
+	
+	if($mapid > 0)	$title = db_fetch_cell("select titlecache from weathermap_maps where id=".intval( $mapid ));		
+	if($mapid < 0)	$title = db_fetch_cell("select name from weathermap_groups where id=".intval( -$mapid ));		
 	// print "Settings edit/add form.";
 	
 	$name = "";
@@ -970,6 +980,11 @@ function weathermap_map_settings_form($mapid,$settingid=0)
 	if($mapid == 0)
 	{
 		$title = "setting for ALL maps";
+	}
+	elseif($mapid < 0)
+	{
+		$grpid = -$mapid;
+		$title = "per-group setting for Group $grpid: $title";
 	}
 	else
 	{
@@ -1091,6 +1106,24 @@ function weathermap_group_editor()
 				print '<td><a href="weathermap-cacti-plugin-mgmt.php?action=group_form&id='.intval($group['id']).'"><img src="../../images/graph_properties.gif" width="16" height="16" border="0" alt="Rename This Group" title="Rename This Group">Rename</a></td>';
 				print "<td>".htmlspecialchars($group['name'])."</td>";
 
+				print "<td>";
+			
+			print "<a href='?action=map_settings&id=-".$group['id']."'>";
+			$setting_count = db_fetch_cell("select count(*) from weathermap_settings where mapid=-".$group['id']);
+			if($setting_count > 0)
+			{
+				print $setting_count." special";
+				if($setting_count>1) print "s";
+			}
+			else
+			{
+				print "standard";
+			}
+			print "</a>";
+			
+			print "</td>";
+				
+				
 				print '<td>';
 
 			print '<a href="weathermap-cacti-plugin-mgmt.php?action=move_group_up&order='.$group['sortorder'].'&id='.$group['id'].'"><img src="../../images/move_up.gif" width="14" height="10" border="0" alt="Move Group Up" title="Move Group Up"></a>';

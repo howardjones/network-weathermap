@@ -476,13 +476,12 @@ function maplist()
 						
 			if($map['active'] == 'on')
 			{
-				print '<td><a title="Click to Deactivate" href="?action=deactivate_map&id='.$map['id'].'"><font color="green">Yes</font></a>';
+				print '<td class="wm_enabled"><a title="Click to Deactivate" href="?action=deactivate_map&id='.$map['id'].'"><font color="green">Yes</font></a>';
 			}
 			else
 			{
-				print '<td><a title="Click to Activate" href="?action=activate_map&id='.$map['id'].'"><font color="red">No</font></a>';
-			}
-			
+				print '<td class="wm_disabled"><a title="Click to Activate" href="?action=activate_map&id='.$map['id'].'"><font color="red">No</font></a>';
+			}			
 			print "<td>";
 			
 			print "<a href='?action=map_settings&id=".$map['id']."'>";
@@ -554,7 +553,7 @@ function maplist()
 	
 	if($had_warnings>0)
 	{
-		print '<div align="center" style="padding:5px; width: 50%; border: 2px red solid; margin: 5px auto 15px auto; background-color: #fee;">'.$had_warnings.' of your maps had warnings last time '.($had_warnings>1?"they":"it").' ran. You can try to find these in your Cacti log file or by clicking on the warning sign next to that map (you might need to increase the log line count).</div>';
+		print '<div align="center" class="wm_warning">'.$had_warnings.' of your maps had warnings last time '.($had_warnings>1?"they":"it").' ran. You can try to find these in your Cacti log file or by clicking on the warning sign next to that map (you might need to increase the log line count).</div>';
 	}
 		
 	if($i>0 && $i_understand_file_permissions_and_how_to_fix_them)

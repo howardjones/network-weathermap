@@ -40,6 +40,7 @@
 ./lib/datasources/WeatherMapDataSource_cactihost.php
 ./lib/datasources/WeatherMapDataSource_cactithold.php
 ./lib/datasources/WeatherMapDataSource_dbsample.php
+./lib/datasources/WeatherMapDataSource_dsstats.php
 ./lib/datasources/WeatherMapDataSource_external.php
 ./lib/datasources/WeatherMapDataSource_mrtg.php
 ./lib/datasources/WeatherMapDataSource_rrd.php
@@ -50,6 +51,7 @@
 ./lib/datasources/WeatherMapDataSource_time.php
 ./lib/datasources/WeatherMapDataSource_skeleton.php.txt
 ./lib/poller-common.php
+./lib/ds-common.php
 ./lib/post/WeatherMapPostProcessorTest.php
 ./lib/pre/WeatherMapPreProcessorTest.php
 ./logout.php
@@ -178,4 +180,4 @@
 ./images/grey-ball-64.png
 ./images/red-ball-64.png
 ./images/yellow-ball-64.png
-
+./weathermap-cacti-plugin.css

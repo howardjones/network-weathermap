@@ -94,6 +94,7 @@ class WeatherMapDataSource_rrd extends WeatherMapDataSource {
 					
 					$worst_time = time() - 8*60;
 					$result = db_fetch_row($SQL);
+					// OK, the straightforward query for data failed, let's work out why, and add the new data source if necessary
 					if(!isset($result['id']))
 					{
 						debug("RRD ReadData: poller_output - Adding new weathermap_data row for $db_rrdname:".$dsnames[$dir]."\n");

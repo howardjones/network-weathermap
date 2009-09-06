@@ -31,7 +31,7 @@
             }
       }
       
-      $ini_file = $php_general['Configuration File (php.ini) Path'];
+      $ini_file = $php_general['Loaded Configuration File'];
       $extra_ini = php_ini_scanned_files();
       if($extra_ini != '')
       {     $extra_ini = "The following additional ini files were read: $extra_ini"; }

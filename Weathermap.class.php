@@ -1770,6 +1770,152 @@ function ReadConfigNG($input, $is_include=FALSE, $initial_context="GLOBAL")
 	
 }
 
+function ReadConfigNNG($input, $is_include=FALSE, $initial_context="GLOBAL")
+{
+	global $valid_commands;
+		
+	if( (strchr($input,"\n")!=FALSE) || (strchr($input,"\r")!=FALSE ) )
+	{
+		 debug("ReadConfig Detected that this is a config fragment.\n");
+			 // strip out any Windows line-endings that have gotten in here
+			 $input=str_replace("\r", "", $input);
+			 $lines = split("/n",$input);
+			 $filename = "{text insert}";
+	}
+	else
+	{
+		debug("ReadConfig Detected that this is a config filename.\n");
+		 $filename = $input;
+		
+		$fd=fopen($filename, "r");
+		 
+		if ($fd)
+		{
+			while (!feof($fd))
+			{
+				$buffer=fgets($fd, 4096);
+				// strip out any Windows line-endings that have gotten in here
+				$buffer=str_replace("\r", "", $buffer);
+				$lines[] = $buffer;
+			}
+			fclose($fd);
+		}
+	}
+		
+	$linecount = 0;
+	$context = $initial_context;
+
+	foreach($lines as $buffer)
+	{
+		$linematched=0;
+		$linecount++;
+		$nextcontext = "";
+		$key = "";
+	
+		$buffer = trim($buffer);
+		// alternative for use later where quoted strings are more useful
+		$args = ParseString($buffer);
+		
+		if(sizeof($args) > 0)
+		{		
+			$linematched++;		
+			$cmd = strtolower(array_shift($args));
+						
+			if($cmd == 'include')
+			{
+				$context = $this->ReadConfigNNG($args[0],TRUE, $context);
+			}
+			elseif($cmd == 'node')
+			{
+				$context = "NODE.".$args[0];
+			}
+			elseif($cmd == 'link')
+			{
+				$context = "LINK.".$args[0];
+				$vcount = 0;	# reset the via-number counter, it's a new link
+			}
+			elseif($cmd == 'scale' || $cmd == 'keystyle' || $cmd == 'keypos')
+			{
+				if( preg_match("/^[0-9\-]+/i",$args[0]) )
+				{
+					$scalename = "DEFAULT";
+				}
+				else
+				{
+					$scalename = array_shift($args);
+				}
+				if($cmd=="scale") $key = $args[0]."_".$args[1];
+				$nextcontext = $context;
+				$context = "SCALE.".$scalename;
+			}
+			
+			array_unshift($args,$cmd);
+			
+			if($context == 'GLOBAL')
+	 		{ 
+				$ctype='GLOBAL'; 
+			}
+			else
+			{
+				list($ctype,$junk) = split("\\.", $context, 2);
+			}
+			
+			$lookup = $ctype.".".$cmd;
+			
+			// Some things (scales, mainly) might define special keys
+			// the key should be unique for that object
+			// most (all?) things for a link or node are one-offs. 
+			if($key == "") $key = $cmd; 
+			if($cmd == 'set' || $cmd == 'fontdefine') $key .= "_".$args[1];
+			if($cmd == 'via')
+			{
+				$key .= "_".$vcount;
+				$vcount++;
+			}
+			
+			# everything else
+			if( substr($cmd, 0, 1) != '#')
+			{
+				if(! array_key_exists($lookup, $valid_commands))
+				{
+					print "INVALID COMMAND: $lookup\n";
+				}
+				
+				if(isset($config[$context][$key]))
+				{
+					print "REDEFINED $key in $context\n";
+				}
+				else
+				{
+					array_unshift($args,$linecount);
+					array_unshift($args,$filename);
+					$this->config[$context][$key] = $args;
+				}
+			}
+			print "$context\\$key  $filename:$linecount ".join("|",$args)."\n";
+			
+			if($nextcontext != "") $context = $nextcontext;
+		}
+		
+		if ($linematched == 0 && trim($buffer) != '') { warn ("Unrecognised config on line $linecount: $buffer\n"); }
+		
+	}
+	
+	if(! $is_include)
+	{
+		
+		# print_r($this->config);
+	
+		foreach ($this->config as $context=>$values)
+		{
+		#	print "> $context\n";
+		}
+	}
+	
+	return($context);
+}
+
+
 function WriteConfigNG($filename)
 {
 	global $WEATHERMAP_VERSION;

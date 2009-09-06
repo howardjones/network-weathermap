@@ -126,7 +126,6 @@ class WeatherMapDataSource_dsstats extends WeatherMapDataSource {
 		if( substr($datatype,-7) == "average" ) $field = "average";
 		if( substr($datatype,-4) == "peak" ) $field = "peak";
 
-
 		if($datatype == "last")
 		{
 			$field = "calculated";
@@ -139,8 +138,7 @@ class WeatherMapDataSource_dsstats extends WeatherMapDataSource {
 			$table = "weathermap_data";
 			$keyfield = "data_source_name";
 		}
-
-
+		
 		if($table != "" and $field != "")
 		{
 			$SQL = sprintf("select %s as name, %s as result from %s where local_data_id=%d and (%s='%s' or %s='%s')", 
@@ -156,11 +154,42 @@ class WeatherMapDataSource_dsstats extends WeatherMapDataSource {
 				{
 					foreach ( array(IN,OUT) as $dir)
 					{
-						if($dsnames[$dir] == $result['name'] && $result['result'] != -90909090909)
+						if($dsnames[$dir] == $result['name'] && ($result['result'] != -90909090909 || $result['result'] !='U'))
 						{
 							$data[$dir] = $result['result'];		
 						}
 					}
+				}
+			}
+			
+			if($datatype=='wm' && ($data[IN] == NULL || $data[OUT] == NULL) )
+			{
+				warn("Didn't get data for 'wm' source. Inserting new tasks.");
+				// insert the required details into weathermap_data, so it will be picked up next time
+				$SQL = sprintf("select data_template_data.data_source_path as path from data_template_data,data_template_rrd where data_template_data.local_data_id=data_template_rrd.local_data_id and data_template_rrd.local_data_id=%d",
+						$local_data_id
+						);
+				$result = db_fetch_row($SQL);
+				if(sizeof($result)>0)
+				{
+					$db_rrdname = $result['path'];
+					warn("Filename is $db_rrdname");
+					foreach (array(IN,OUT) as $dir)
+					{
+						if($data[$dir] === NULL)
+						{
+							$SQLins = "insert into weathermap_data (rrdfile, data_source_name, sequence, local_data_id) values ('" . 
+								mysql_real_escape_string($db_rrdname) . "','" . 
+								mysql_real_escape_string($dsnames[$dir]) . "', 0," . 
+								$local_data_id.")";
+							warn($SQLins);
+							db_execute($SQLins);
+						}
+					}
+				}
+				else
+				{
+					warn("Failed to find a filename.");
 				}
 			}
 		}

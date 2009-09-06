@@ -894,7 +894,7 @@ function ReadData()
 
 				# print $myobj->name."=>".$myobj->inpercent."%/".$myobj->outpercent."\n";
 				
-				if($this->scaletype == 'percent')
+				if($myobj->scaletype == 'percent')
 				{
 					list($incol,$inscalekey,$inscaletag) = $this->NewColourFromPercent($myobj->inpercent,$myobj->usescale,$myobj->name);
 					list($outcol,$outscalekey, $outscaletag) = $this->NewColourFromPercent($myobj->outpercent,$myobj->usescale,$myobj->name);
@@ -1860,7 +1860,7 @@ function ReadConfig($input, $is_include=FALSE)
 			if($last_seen == "NODE") $curobj = &$curnode;
 			if($last_seen == "GLOBAL") $curobj = &$this;
 
-			if (preg_match("/^\s*(LINK|NODE)\s+(\S+)\s*$/i", $buffer, $matches))
+			if (preg_match("/^\s*(LINK|NODE)\s+([A-Za-z][A-Za-z0-9_\.\-\:]*)\s*$/i", $buffer, $matches))
 			{
 				if(1==1)
 				{

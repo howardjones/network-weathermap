@@ -189,8 +189,6 @@ class WeatherMapLink extends WeatherMapItem
 			
 				list($textlength, $textheight) = $this->owner->myimagestringsize($this->commentfont, $comment);
 				
-				// XXX - redundant extra variable
-				// $startindex = $start[$dir];
 				$extra_percent = $commentpos[$dir];
 				
 				// $font = $this->commentfont;
@@ -639,7 +637,7 @@ class WeatherMapLink extends WeatherMapItem
 				$output.="\tINBWFORMAT " . $this->bwlabelformats[IN]. "\n";
 				$output.="\tOUTBWFORMAT " . $this->bwlabelformats[OUT]. "\n";
 			}
-		
+
 	
 			$comparison = $dd->labeloffset_in;
 			$comparison2 = $dd->labeloffset_out;

@@ -283,8 +283,6 @@ class WeatherMapNode extends WeatherMapItem
 				debug("Artificial Icon type " .$this->iconfile. " for $this->name\n");
 				// this is an artificial icon - we don't load a file for it
 
-				// XXX - add the actual DRAWING CODE!
-
 				$icon_im = imagecreatetruecolor($this->iconscalew,$this->iconscaleh);
 				imageSaveAlpha($icon_im, TRUE);
 

@@ -521,8 +521,8 @@ function weathermap_fullview($cycle=FALSE, $firstonly=FALSE, $limit_to_group = -
 			
 			print '<div class="weathermapholder" id="mapholder_'.$map['filehash'].'">';
 			html_graph_start_box(1,true);
+			print '<tr bgcolor="#' . $colors["header_panel"] . '">'; 
 ?>
-		<tr bgcolor="#<?php print $colors["header_panel"];?>">
 				<td colspan="3">
 						<table width="100%" cellspacing="0" cellpadding="3" border="0">
 								<tr>
@@ -533,8 +533,8 @@ function weathermap_fullview($cycle=FALSE, $firstonly=FALSE, $limit_to_group = -
 						</table>
 				</td>
 		</tr>
-	<tr>
-		<td>
+		<tr>
+			<td>
 <?php
 
 			if(file_exists($htmlfile))

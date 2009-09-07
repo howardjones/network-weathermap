@@ -113,7 +113,7 @@ SET rrd_use_poller_output 1
 LINK DEFAULT
 	SET cacti_use_ifspeed 1
 	INFOURL {map:cacti_url}/graph.php?local_graph_id={link:this:cacti_graph_id}
-	OVERLIBGRAPH {map:cacti_url}/graph_image.php?local_graph_id={link:this:cacti_graph_id}&rra_id=0&graph_nolegend=true
+	OVERLIBGRAPH {map:cacti_url}/graph_image.php?local_graph_id={link:this:cacti_graph_id}&amp;rra_id=0&amp;graph_nolegend=true
 	
 LINK uplink1
 	NODES a b

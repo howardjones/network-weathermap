@@ -98,8 +98,8 @@
     
     <p>This page checks for some common problems with your PHP and server environment that may stop Weathermap or the Editor from working.</p>
 	<p>NOTE: You should run this script as a web page AND from the command-line, as the environment can be different in each.</p>
-      <h2>PHP Basics</h2><p>This is the PHP version that is responsible for<ul>
-      <li>The web-based editor<li>Building maps with Rebuild Now from Cacti</ul></p>
+      <h2>PHP Basics</h2><p>This is the PHP version that is responsible for</p><ul>
+      <li>The web-based editor</li><li>Building maps with Rebuild Now from Cacti</li></ul>
       <p>This is PHP Version <?php echo $php_version ?> running on "<?php echo $php_os ?>" with a memory_limit of '<?php echo $mem_allowed ?>'. <?php echo $mem_warning ?></p>
       <p>The php.ini file was <?php echo $ini_file ?></p>
       <p><?php echo $extra_ini ?></p>
@@ -277,3 +277,6 @@
     return $val;
 }
 ?>
+</table>
+</body>
+</html>

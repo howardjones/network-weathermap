@@ -8,7 +8,7 @@
  "HTML Tidy for Mac OS X (vers 12 April 2006), see www.w3.org" /> 
 
  <title>PHP Weathermap 
-v0.96a 
+v0.97 
  - Error Code Reference</title> 
 <style type="text/css" media="print"> 
 /*<![CDATA[*/ 
@@ -41,7 +41,7 @@ a { color: black; text-decoration: underline; font-weight: normal;}
 
 <div id="header"> 
  <h1>PHP Weathermap 
-v0.96a 
+v0.97 
 </h1> 
  <h4>Copyright &copy; 2005-2009 Howard Jones, <tt><a 
 href="mailto:howie@thingy.com">howie@thingy.com</a></tt>. (<a 
@@ -63,7 +63,7 @@ href="http://www.network-weathermap.com/">Website</a>)</h4>
  <p>In previous versions (0.8 to 0.82), this would result in the infamous "FELL THROUGH Howie's crappy binary search is wrong after all" error message. The solution is the same - move the nodes, or change the link width </p> 
  </dd> 
 
- <dt><a name="WMWARN02">[WMWARN02]</a>, <a name="WMWARN04">[WMWARN04]</a></dt> 
+ <dt><a name="WMWARN02">[WMWARN02]</a>, <a name="WMWARN04">[WMWARN04]</dt> 
  <dd><p>"Angled text doesn't work with non-FreeType fonts " </p> 
  <p>The standard fonts used by Weathermap are the ones bundled with the GD graphics library. These fonts (number 1-5 when you select fonts) can only be 
  drawn 'flat', and not at an angle. </p> 
@@ -73,7 +73,7 @@ href="http://www.network-weathermap.com/">Website</a>)</h4>
  <p>You can find some TrueType fonts, and an example.conf that does this in the docs/example folder. </p><p>The reason the default comment font is not a TrueType font is that the FreeType library is an <em>optional</em> part of the GD library, so I can't assume that it will be available. </p> 
  </dd> 
 
- <dt><a name="WMWARN03">[WMWARN03]</a></dt> 
+ <dt><a name="WMWARN03">[WMWARN03]</a></a></dt> 
  <dd><p>"Using a non-existent special font (<em>fontnumber</em>) - falling back to internal GD fonts " </p> 
  <p>If you use a font number that doesn't exist by default(e.g. larger than 5), and you haven't got a valid <a href="config-reference.html#GLOBAL_FONTDEFINE">FONTDEFINE</a> line, then you will get this error. Weathermap will use font 5 instead of the font you asked for. </p> 
  <p>Most common reason for this error is that the font file could not be found, or could not be loaded. Check the log for another error (WMWARN30 or WMWARN31). </p> 

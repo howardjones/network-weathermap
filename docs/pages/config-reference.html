@@ -3,7 +3,7 @@
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <link rel="stylesheet" type="text/css" media="screen" href="weathermap.css">
 <title>PHP Weathermap 
-v0.96a
+v0.97
  Configuration Reference</title>
 </head>
 <body><div id="frame">
@@ -27,7 +27,7 @@ v0.96a
 
 <div id="header">
 	<h1>PHP Weathermap 
-v0.96a
+v0.97
 </h1>
     <h4>Copyright &copy; 2005-2009 Howard Jones, <tt><a
 href="mailto:howie@thingy.com">howie@thingy.com</a></tt>. (<a
@@ -37,7 +37,7 @@ href="http://www.network-weathermap.com/">Website</a>)</h4>
 
 <h2><a name="configref">Configuration Reference</a></h2>
 <p>This page is automatically compiled, and documents all the configuration directives that are available in PHP Weathermap 
-v0.96a
+v0.97
 .  </p>
 	<h1 class="configsection">Introduction</h1>
     	  <div class="preamble"><div id="contents">
@@ -132,6 +132,7 @@ v0.96a
         <a href="#GLOBAL_KEYPOS">KEYPOS</a>
         <a href="#GLOBAL_KEYSTYLE">KEYSTYLE</a>
         <a href="#GLOBAL_SET">SET</a>
+        <a href="#GLOBAL_INCLUDE">INCLUDE</a>
        </p>
     </div></div>
 	
@@ -1054,12 +1055,12 @@ of the direction of the link. 'angled' rotates the box to follow the directiong 
 <div class="definition">COMMENTFONTCOLOR <em class="meta">red</em> <em class="meta">green</em> <em class="meta">blue</em>
 </div>
 <div class="description">
-<p>Specify the colours used for drawing the link. </p><p>red, green and blue are numbers from 0 to 255. </p><p><a href="#LINK_COLORS">OUTLINECOLOR,</a> <a href="#LINK_COLORS">BWOUTLINECOLOR</a> and <a href="#LINK_COLORS">BWBOXCOLOR</a> have an additional option - 'none' - which stops that element of the link being drawn. </p><p><a href="#LINK_COLORS">COMMENTFONTCOLOR</a> also has an extra option - 'contrast' - which will choose black or white, depending on the colour of the link. This is most useful with <a href="#LINK_COMMENTSTYLE">COMMENTSTYLE</a> center. </p><p>The colours are used as follows:<ul> 
+<p>Specify the colours used for drawing the link. </p><p>red, green and blue are numbers from 0 to 255. </p><p><a href="#LINK_COLORS">OUTLINECOLOR,</a> <a href="#LINK_COLORS">BWOUTLINECOLOR</a> and <a href="#LINK_COLORS">BWBOXCOLOR</a> have an additional option - 'none' - which stops that element of the link being drawn. </p><p><a href="#LINK_COLORS">COMMENTFONTCOLOR</a> also has an extra option - 'contrast' - which will choose black or white, depending on the colour of the link. This is most useful with <a href="#LINK_COMMENTSTYLE">COMMENTSTYLE</a> center. </p><p>The colours are used as follows: </p><ul> 
  <li><a href="#LINK_COLORS">OUTLINECOLOR</a> is the colour of the line around the edge of the arrow.</li> 
  <li><a href="#LINK_COLORS">BWOUTLINECOLOR</a> is the colour of the line surrounding the 'bandwidth label' box</li> 
  <li><a href="#LINK_COLORS">BWBOXCOLOR</a> is the background colour for the same box</li> 
  <li><a href="#LINK_COLORS">BWFONTCOLOR</a> is the colour used for text within that box</li> 
- <li><a href="#LINK_COLORS">COMMENTFONTCOLOR</a> is the colour used for the text produced by <a href="#LINK_INCOMMENT">INCOMMENT</a> and <a href="#LINK_OUTCOMMENT">OUTCOMMENT,</a> along the side of a link arrow</li></ul> </p><p><img src="../images/contrast.png"></img> <tt><a href="#LINK_COLORS">COMMENTFONTCOLOR</a> contrast</tt> with <tt><a href="#LINK_COMMENTSTYLE">COMMENTSTYLE</a> center</tt> </p> 
+ <li><a href="#LINK_COLORS">COMMENTFONTCOLOR</a> is the colour used for the text produced by <a href="#LINK_INCOMMENT">INCOMMENT</a> and <a href="#LINK_OUTCOMMENT">OUTCOMMENT,</a> along the side of a link arrow</li></ul><p><img src="../images/contrast.png"></img> <tt><a href="#LINK_COLORS">COMMENTFONTCOLOR</a> contrast</tt> with <tt><a href="#LINK_COMMENTSTYLE">COMMENTSTYLE</a> center</tt> </p> 
 </div>
 <div class="changes">
 <h3>Change History</h3>
@@ -1878,6 +1879,30 @@ SET key_hidepercent_DEFAULT 1</pre>
 <dl>
 <dt>0.9</dt>
 <dd>Originally added SET.</dd>
+</dl>
+</div>
+</div>
+      <div class="referenceentry">
+<h2><a name="GLOBAL_INCLUDE">INCLUDE</a></h2>
+<div class="definition">INCLUDE <em class="meta">filename</em>
+</div>
+<div class="description">
+<p>Include the contents of an additional file within the current map configuration file. </p><p>Allows you to use a common set of definition across several map files. There are several restrictions: 
+ <ul> 
+ <li><a href="#GLOBAL_INCLUDE">INCLUDE</a> can <em>only</em> be used in the 'global' section of the the map configuration file - that is, before the first <a href="#NODE_NODE">NODE</a> or LINK.</li> 
+ <li>INCULDEd files must contain complete <a href="#NODE_NODE">NODE</a> or <a href="#LINK_LINK">LINK</a> definitions.</li> 
+ <li>If you intend to use the web-based editor, then you can't currently use any commands other than 
+ <a href="#NODE_NODE">NODE</a> or <a href="#LINK_LINK">LINK</a> definitions - that is, no <a href="#GLOBAL_SCALE">SCALEs</a> or <a href="#GLOBAL_FONTDEFINE">FONTDEFINEs</a> etc.</li> 
+ </ul> 
+ The <a href="#GLOBAL_INCLUDE">INCLUDE</a> file can still be useful to define a set of standard templates that can then be used across maps. Some of the other restrictions will hopefully be lifted in a future version. The reason for the restrictions is 
+ that the way config files are read and written doesn't keep track of where a particular setting came from, apart from at the NODE/LINK level. This is also the reason why comments are 'lost' by the editor. 
+ </p> 
+</div>
+<div class="changes">
+<h3>Change History</h3>
+<dl>
+<dt>0.96b</dt>
+<dd>Originally added INCLUDE.</dd>
 </dl>
 </div>
 </div>

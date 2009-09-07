@@ -8,7 +8,7 @@
  "HTML Tidy for Mac OS X (vers 12 April 2006), see www.w3.org" /> 
 
  <title>PHP Weathermap 
-v0.96a 
+v0.97 
  - Advanced Topics</title> 
 <style type="text/css" media="print"> 
 /*<![CDATA[*/ 
@@ -41,7 +41,7 @@ a { color: black; text-decoration: underline; font-weight: normal;}
 
 <div id="header"> 
  <h1>PHP Weathermap 
-v0.96a 
+v0.97 
 </h1> 
  <h4>Copyright &copy; 2005-2009 Howard Jones, <tt><a 
 href="mailto:howie@thingy.com">howie@thingy.com</a></tt>. (<a 
@@ -49,20 +49,20 @@ href="http://www.network-weathermap.com/">Website</a>)</h4>
 </div> 
 
 
- <h2><a name="editor" id="editor">Advanced Topics</h2> 
+ <h2><a name="editor" id="editor">Advanced Topics</a></h2> 
  <p>This page contains information for the more advanced corners of Weathermap usage. I assume that you are more familiar with the basics of map design here - there is less explanation of the simple stuff. </p> 
 
  <h2><a name="tokens">Special String Processing Tokens</a></h2> 
 
-<p>Most places where you can specify a string in Weathermap config files, you can now include data from within the Weathermap data model. Useful examples of this would be: 
+<p>Most places where you can specify a string in Weathermap config files, you can now include data from within the Weathermap data model. Useful examples of this would be: </p> 
 <ul> 
 <li>You can have the value of a data source printed in the map.</li> 
 <li>You can have <a href="config-reference.html#NODE_ICON">ICON</a> filenames which change with the value of a datasource.</li> 
 <li>You can make more effective use of the DEFAULTs, by including parameterised <a href="config-reference.html#NODE_LABEL">LABELs,</a> <a href="config-reference.html#NODE_ICON">ICONs</a> and OVERLIBCAPTIONs.</li> 
 </ul> 
-Finally, plugins can add internal 'notes' to objects in the map, which you can then use in the same way as the normal Weathermap data. For example, you could have a plugin that looks at the load-average on a server, categorises it as light, medium or heavy and saves that to a note, which can then be used to select an appropriate icon. 
+<p>Finally, plugins can add internal 'notes' to objects in the map, which you can then use in the same way as the normal Weathermap data. For example, you could have a plugin that looks at the load-average on a server, categorises it as light, medium or heavy and saves that to a note, which can then be used to select an appropriate icon. 
  </p> 
-<p>The format for the tokens is simple: 
+<p>The format for the tokens is simple: </p> 
 <div class="definition">{node:<em>nodename</em>:<em>variablename</em>}</div> 
 <div class="definition">{link:<em>linkname</em>:<em>variablename</em>}</div> 
 <div class="definition">{map:<em>variablename</em>}</div> 
@@ -86,11 +86,11 @@ will set the label for the node to be 'test', since that is the node's name. Usi
  <a href="config-reference.html#NODE_POSITION">POSITION</a> 150 100 
  </pre> 
 </div> 
-Each node will take it's name as the label, and a useful caption for it's Overlib pop-up graph. 
+<p>Each node will take it's name as the label, and a useful caption for it's Overlib pop-up graph. 
  </p> 
 <p>For nodes specifically, there is one other special 'nodename' - 'parent'. If a node is positioned relative to another one, then this refers to that other node. The idea is to allow a node to be used as an additional data label for another one. </p> 
 <p> 
-Here is the list of valid <em>variablename</em>s and their meaning. 
+Here is the list of valid <em>variablename</em>s and their meaning. </p> 
 <table class="biglist"> 
 <thead><tr><th>Variable Name</th><th>Meaning</th></tr></thead> 
 <tbody> 
@@ -142,7 +142,7 @@ Here is the list of valid <em>variablename</em>s and their meaning.
 
 </tbody> 
 </table> 
- </p> 
+
 <p>In addition to the variables defined by Weathermap itself, there are two additional sources for variables that greatly extend the usefulness of these string tokens: You, and Data Source Plugins. </p> 
 <p> 
 Firstly, you can define addition variables for any <a href="config-reference.html#NODE_NODE">NODE,</a> <a href="config-reference.html#LINK_LINK">LINK</a> or for the map in general, using the <a href="config-reference.html#GLOBAL_SET">SET</a> command. This serves two purposes. One is to allow you to give parameters to some datasource plugins (like a database password for some external database), but the other is just so you can use those values elsewhere in the map. 
@@ -160,7 +160,7 @@ Say you have a data-collection system where each router has an ID, but the URL i
 <p>Since information from these variables can also appear in the <a href="config-reference.html#LINK_NOTES">NOTES</a> popup for a <a href="config-reference.html#NODE_NODE">NODE</a> or <a href="config-reference.html#LINK_LINK">LINK,</a> then you can also use this as a more structured way to have that information in your config file, and still presented in the map. </p> 
 <p>The second additional source is Data Source Plugins. Some plugins may define additional variables, above and beyond the normal 'in bandwidth' and 'out bandwidth' that they normally would. For example, the Cacti Host data source plugin returns a "bandwidth" that is actually a number representing the state of the device, according to Cacti - up, down, disabled, recovering. Since you might want to show this as text somewhere, or use it to change the icon for a device, it <em>also</em> defines an additional variable called 'state' that contains a string - 'up','down','recovering', or 'disabled'. </p> 
 <p> 
-Here is one more example, showing the use of relative node positions, node targets and tokens working together: 
+Here is one more example, showing the use of relative node positions, node targets and tokens working together: </p> 
 <div class="example"><pre> 
 
 <a href="config-reference.html#NODE_NODE">NODE</a> fw_a 
@@ -173,13 +173,12 @@ Here is one more example, showing the use of relative node positions, node targe
  <a href="config-reference.html#NODE_LABEL">LABEL</a> {node:fw_a:outvalue} Sessions 
  </pre> 
 </div> 
-The first node uses two targets to populate the 'in' and 'out' slots from different RRD files. It uses the 'in' slot to change it's own color. The second node is positioned relative to the first, and uses tokens to show the number of sessions used (the 'out' slot) on the other node as it's label. In combination with the 'notes' available to plugins, you can display nearly anything in your weathermap. 
-
+<p>The first node uses two targets to populate the 'in' and 'out' slots from different RRD files. It uses the 'in' slot to change it's own color. The second node is positioned relative to the first, and uses tokens to show the number of sessions used (the 'out' slot) on the other node as it's label. In combination with the 'notes' available to plugins, you can display nearly anything in your weathermap. 
  </p> 
 
 <h3><a name="formatting">Formatting in Special Tokens</a></h3> 
 <p>To allow you to control better how the values of special tokens are used, you can add a final part inside the token that specifies the format. </p> 
-<p>This borrows the '%' format from the printf() function in C, PHP, perl and many other languages, but adds a couple of Weathermap-specific extras: 
+<p>This borrows the '%' format from the printf() function in C, PHP, perl and many other languages, but adds a couple of Weathermap-specific extras: </p> 
 
 <table> 
 <tr><th>{link:this:bandwidth_in:%d}</th><td>force to integer</td></tr> 
@@ -188,7 +187,7 @@ The first node uses two targets to populate the 'in' and 'out' slots from differ
 <tr><th>{link:this:bandwidth_in:%k}</th><td>Add a prefix for mega, kilo, giga, milli etc, and show the rest as a floating-point number - e.g. 2.3M (Weathermap special)</td></tr> 
 <tr><th>{link:this:bandwidth_in:%0.2k}</th><td>as above, but limit the floating-point part to 2 decimal places (Weathermap special)</td></tr> 
 </table> 
- </p> 
+
 
 <h2><a name="tweaks"><a href="config-reference.html#GLOBAL_SET">SETting</a> Hint Variables to tweak maps</a></h2> 
 <p> 
@@ -196,10 +195,10 @@ In addition to any variables that you define using <a href="config-reference.htm
 <a href="config-reference.html#GLOBAL_SET">SET</a> is used - to make small adjustments to the way a map is calculated. </p> 
 <p>Whenever there is a request for a 'tweak' - a setting that doesn't really deserve creating yet another map config keyword - then that tweak is done by having a special <a href="config-reference.html#GLOBAL_SET">SET</a> variable to control it. </p> 
 <p>These are documented in the relevant config keyword section in the <a href="config-reference.html">Config Reference</a>, but here's an example: </p> 
-<p>When you are using <a href="config-reference.html#GLOBAL_KEYPOS">KEYPOS</a> and <a href="config-reference.html#GLOBAL_KEYSTYLE">KEYSTYLE</a> to draw the legend/key for a particular <a href="config-reference.html#GLOBAL_SCALE">SCALE,</a> you can choose to hide the percentage signs, by using 
+<p>When you are using <a href="config-reference.html#GLOBAL_KEYPOS">KEYPOS</a> and <a href="config-reference.html#GLOBAL_KEYSTYLE">KEYSTYLE</a> to draw the legend/key for a particular <a href="config-reference.html#GLOBAL_SCALE">SCALE,</a> you can choose to hide the percentage signs, by using </p> 
 <div class="example"><pre><a href="config-reference.html#GLOBAL_SET">SET</a> key_hidepercent_DEFAULT 1</pre></div> 
 (for the DEFAULT scale in this example), in the top section of the map config file. 
- </p> 
+
 <p>Another example of these 'hidden' tweaks is used in the <a href="targets.html#rrd">RRDtool datasource plugin</a> to select what data is extracted. </p> 
  <h2><a name="plugins">Writing Plugins</a></h2> 
  <p>Version 0.9 of Weathermap introduces a plugin system for extending it's capabilities. This makes it possible for third parties to add new possible data sources and other functions to Weathermap without needing to alter the main code of the program. </p> 
@@ -217,7 +216,7 @@ In addition to any variables that you define using <a href="config-reference.htm
  The Recognise method should return TRUE or FALSE, depending on if it thinks that the supplied <a href="config-reference.html#LINK_TARGET">TARGET</a> string is intended for it. This is normally decided by using preg_match to match a regular expression. It <em>should not</em> try and read any data source, or database, or file to validate the actual <a href="config-reference.html#LINK_TARGET">TARGET.</a> It should <em>only</em> decide if the <a href="config-reference.html#LINK_TARGET">TARGET</a> is the right 'shape' or not. </p> 
  <p>Recognise is called even for plugins that have previously returned FALSE for Init. This is so that Weathermap can tell the user that their <a href="config-reference.html#LINK_TARGET">TARGET</a> <em>would</em> have worked, if only the plugin was working OK, rather than mysteriously ignoring them. </p> 
  <p>Finally, once it has established which of the plugins should deal with the <a href="config-reference.html#LINK_TARGET">TARGET</a> string, it calls the ReadData method of that plugin, which should return a list() of three items - input value, output value and valid_time. </p> <p>The valid_time is a Unix time_t (as returned by time()), to indicate when the data was measured. This is mainly intended for things like RRDs where there may be a delay between the RRD being written and us reading the value, or for cached results. The input and output values are numeric, and are used as part of the final bandwidth values for the map object. If there is no valid result (e.g. the device id passed in the <a href="config-reference.html#LINK_TARGET">TARGET</a> string doesn't exist) then the plugin should return -1,-1 for those two values. </p> 
- <p>The ReadData function can also set addtional variables for the map object, which can then be used in strings in the map config file. It can do this by calling the $map->add_note() function. </p> 
+ <p>The ReadData function can also set addtional variables for the map object, which can then be used in strings in the map config file. It can do this by calling the $map-&gt;add_note() function. </p> 
  <p>It can also <em>receive</em> addtional parameters that the user has defined with <a href="config-reference.html#GLOBAL_SET">SET</a> commands in the map config file. This is mainly intended for things like hostnames for the remote system that data is being read from, so that they don't have to be hardcoded, or appear in <em>every</em> <a href="config-reference.html#LINK_TARGET">TARGET</a> string. </p> 
  <h3><a name="prepostplugins">Pre- &amp; Post-Processing Plugins</a></h3> 
  <p>Post-processing plugins can be used to calculate additional global statistics for a map, which can then be used in elements on the map. For example, you could calculate an average latency across all links in the network, or a total network uptime based on the uptimes of all nodes. Currently, there aren't any of these plugins, but the hooks are available. </p> 

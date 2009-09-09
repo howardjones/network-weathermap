@@ -346,9 +346,9 @@ class WeatherMap extends WeatherMapBase
 		
                 $this->links['DEFAULT'] = &$deflink2;
 
-		// XXX - for now, make the old defaultlink and defaultnode work too.
-                $this->defaultlink = $this->links['DEFAULT'];
-                $this->defaultnode = $this->nodes['DEFAULT'];
+// for now, make the old defaultlink and defaultnode work too.
+//                $this->defaultlink = $this->links['DEFAULT'];
+//                $this->defaultnode = $this->nodes['DEFAULT'];
 
                 assert('is_object($this->nodes[":: DEFAULT ::"])');
                 assert('is_object($this->links[":: DEFAULT ::"])');

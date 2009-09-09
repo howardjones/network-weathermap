@@ -18,6 +18,12 @@ function weathermap_cron_part($value,$checkstring)
 	if($checkstring == '*') return(true);
 	if($checkstring == sprintf("%s",$value) ) return(true);
 	
+	if( preg_match("/\*\/(\d+)/",$checkstring, $matches))
+	{
+		$mod = $matches[1];
+		if( ($value % $mod ) == 0) return true;
+	}
+	
 	return (false);
 }
 

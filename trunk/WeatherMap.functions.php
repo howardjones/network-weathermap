@@ -352,7 +352,7 @@ function imagecreatefromfile($filename)
 // find the point where a line from x1,y1 through x2,y2 crosses another line through x3,y3 and x4,y4
 // (the point might not be between those points, but beyond them)
 // - doesn't handle parallel lines. In our case we will never get them.
-// XXX - make sure we remove colinear points, or this will not be true!
+// - make sure we remove colinear points, or this will not be true!
 function line_crossing($x1,$y1,$x2,$y2, $x3,$y3,$x4,$y4)
 {
     

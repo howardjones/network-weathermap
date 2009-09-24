@@ -164,7 +164,7 @@ class WeatherMapDataSource_dsstats extends WeatherMapDataSource {
 			
 			if($datatype=='wm' && ($data[IN] == NULL || $data[OUT] == NULL) )
 			{
-				warn("Didn't get data for 'wm' source. Inserting new tasks.");
+				debug("Didn't get data for 'wm' source. Inserting new tasks.");
 				// insert the required details into weathermap_data, so it will be picked up next time
 				$SQL = sprintf("select data_template_data.data_source_path as path from data_template_data,data_template_rrd where data_template_data.local_data_id=data_template_rrd.local_data_id and data_template_rrd.local_data_id=%d",
 						$local_data_id
@@ -173,7 +173,7 @@ class WeatherMapDataSource_dsstats extends WeatherMapDataSource {
 				if(sizeof($result)>0)
 				{
 					$db_rrdname = $result['path'];
-					warn("Filename is $db_rrdname");
+					debug("Filename is $db_rrdname");
 					foreach (array(IN,OUT) as $dir)
 					{
 						if($data[$dir] === NULL)
@@ -182,14 +182,14 @@ class WeatherMapDataSource_dsstats extends WeatherMapDataSource {
 								mysql_real_escape_string($db_rrdname) . "','" . 
 								mysql_real_escape_string($dsnames[$dir]) . "', 0," . 
 								$local_data_id.")";
-							warn($SQLins);
+							// warn($SQLins);
 							db_execute($SQLins);
 						}
 					}
 				}
 				else
 				{
-					warn("Failed to find a filename.");
+					warn("DSStats ReadData: Failed to find a filename for DS id $local_data_id");
 				}
 			}
 		}

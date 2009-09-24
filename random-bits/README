@@ -42,6 +42,14 @@ variables and uses them to populate as much as it can of TARGET, INFOURL,
 OVERLIBGRAPH, and BANDWIDTH. Requires a correct editor-config.php to access
 the Cacti database.
 
+You need SET one of 'cacti_id', 'hostname' or 'address' in each NODE so that
+it can find the Cacti Host ID for each node.
+
+You need to SET one of 'in_interface' or 'out_interface' to the interface name
+so that it can figure out which data sources are relevant. The interface name should
+match one of ifAlias, ifName or ifDescr from your router.
+
+More info here: http://forums.cacti.net/about26544.html
 
 cacti-mapper.php
 ================
@@ -52,3 +60,11 @@ which interfaces are in the same address range as each other, and produces a
 map. The map positions are random, but the connections should be right. You need
 to run the results through cacti-integrate.php, to fill in the TARGET lines.
 Requires a correct editor-config.php to access the Cacti database.
+
+bristle.php
+============
+
+Generates a section of Weathermap config useful for showing traffic for all switch 
+ports in a small space. Intended to work with cacti-integrate.php
+
+More info here: http://forums.cacti.net/post-152500.html#152500

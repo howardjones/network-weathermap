@@ -12,6 +12,7 @@
 	ADDED - INCLUDE keyword to include a file of common definitions (based on work by BorisL)
 			(NOTE: this can confuse the editor sometimes - see the manual page for INCLUDE)
 	ADDED - Warning for maps that contain OVERLIBGRAPH but not 'HTMLSTYLE overlib'
+	ADDED - Warning for use of TEMPLATE not as the first line of an object (overwrites settings otherwise)
 	ADDED - SCALE will accept values below 0, and also above 100
 	ADDED - USESCALE has two new options: absolute and percent, which allows you to have a SCALE of absolute values
 	ADDED - New datasource plugin to support statistics from TheWitness's DSStats Cacti Plugin. This gets you daily,weekly,monthly and annual stats with no complicated rrdtool stuff.

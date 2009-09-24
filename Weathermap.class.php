@@ -1103,7 +1103,7 @@ function NewColourFromPercent($value,$scalename="DEFAULT",$name="",$is_percent=T
 
 		foreach ($colours as $key => $colour)
 		{
-			if ( ($colour['special'] == 0) and ($value >= $colour['bottom']) and ($value <= $colour['top']))
+			if ( (!isset($colour['special']) || $colour['special'] == 0) and ($value >= $colour['bottom']) and ($value <= $colour['top']))
 			{
 				if (isset($colour['red2']))
 				{
@@ -1937,6 +1937,7 @@ function ReadConfig($input, $is_include=FALSE)
 	$scalesseen=0;
 	$last_seen="GLOBAL";
 	$filename = "";
+	$objectlinecount=0;
 
 	 // check if $input is more than one line. if it is, it's a text of a config file
 	// if it isn't, it's the filename
@@ -1986,18 +1987,19 @@ function ReadConfig($input, $is_include=FALSE)
 	}
 		
 	$linecount = 0;
+	$objectlinecount = 0;
 
 	foreach($lines as $buffer)
 	{
 		$linematched=0;
 		$linecount++;
-
+		
 		if (preg_match("/^\s*#/", $buffer)) {
 			// this is a comment line
 		}
 		else
 		{
-			$buffer = trim($buffer);
+			$buffer = trim($buffer);	
 			
 			// for any other config elements that are shared between nodes and links, they can use this
 			unset($curobj);
@@ -2005,9 +2007,12 @@ function ReadConfig($input, $is_include=FALSE)
 			if($last_seen == "LINK") $curobj = &$curlink;
 			if($last_seen == "NODE") $curobj = &$curnode;
 			if($last_seen == "GLOBAL") $curobj = &$this;
+			
+			$objectlinecount++;
 
 			if (preg_match("/^\s*(LINK|NODE)\s+([A-Za-z][A-Za-z0-9_\.\-\:]*)\s*$/i", $buffer, $matches))
 			{
+				$objectlinecount = 0;
 				if(1==1)
 				{
 					$this->ReadConfig_Commit($curobj);
@@ -2418,6 +2423,7 @@ function ReadConfig($input, $is_include=FALSE)
 					$curobj->template = $matches[1];
 					debug("Resetting to template $last_seen ".$curobj->template."\n");
 					$curobj->Reset($this);
+					if( $objectlinecount > 1 ) warn("line $linecount: TEMPLATE is not first line of object. Some data may be lost.\n");
 				}
 				else
 				{

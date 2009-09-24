@@ -1,11 +1,10 @@
 DONE No filenames for weathermap_data
-Use weathermap_data in dsstats
+DONE? Use weathermap_data in dsstats
 docs for dsstats
 Test groups fully
 Add cron settings?
-Converter for rrd to ds
+Converter for rrd to dsstats
 DONE Add snmp_cache stuff to dsstats
-
 
 WISHES
 -------

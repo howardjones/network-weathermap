@@ -220,6 +220,8 @@ class WeatherMap extends WeatherMapBase
 	var $thumb_width, $thumb_height;
 	var $has_includes;
 	var $has_overlibs;
+	var $node_template_tree;
+	var $link_template_tree;
 
 	var $plugins = array();
 	var $included_files = array();
@@ -307,7 +309,7 @@ class WeatherMap extends WeatherMapBase
 
 		$this->nodes=array(); // an array of WeatherMapNodes
 		$this->links=array(); // an array of WeatherMapLinks
-
+		
 		// these are the default defaults
                 // by putting them into a normal object, we can use the
                 // same code for writing out LINK DEFAULT as any other link.
@@ -325,6 +327,12 @@ class WeatherMap extends WeatherMapBase
                 $defnode->template=":: DEFAULT ::";
                 $defnode->Reset($this);
                 $this->nodes[':: DEFAULT ::'] = &$defnode;
+                
+       	$this->node_template_tree = array();
+       	$this->link_template_tree = array();
+       	
+		$this->node_template_tree['DEFAULT'] = array();
+		$this->link_template_tree['DEFAULT'] = array();
 
 
 // ************************************
@@ -2023,6 +2031,8 @@ function ReadConfig($input, $is_include=FALSE)
 					if ($last_seen == "NODE")
 					{
 						$this->nodes[$curnode->name]=$curnode;
+						if($curnode->template == 'DEFAULT') $this->node_template_tree[ "DEFAULT" ][]= $curnode->name;
+					
 						debug ("Saving Node: " . $curnode->name . "\n");
 					}
 
@@ -2037,7 +2047,8 @@ function ReadConfig($input, $is_include=FALSE)
 						{
 							$this->links[$curlink->name]=$curlink;
 							debug ("Saving Template-Only Link: " . $curlink->name . "\n");
-						}				
+						}
+						if($curlink->template == 'DEFAULT') $this->link_template_tree[ "DEFAULT" ][]= $curlink->name;				
 					}
 				}
 
@@ -2424,6 +2435,10 @@ function ReadConfig($input, $is_include=FALSE)
 					debug("Resetting to template $last_seen ".$curobj->template."\n");
 					$curobj->Reset($this);
 					if( $objectlinecount > 1 ) warn("line $linecount: TEMPLATE is not first line of object. Some data may be lost.\n");
+					// build up a list of templates - this will be useful later for the tree view
+					
+					if($last_seen == 'NODE') $this->node_template_tree[ $tname ][]= $curobj->name;
+					if($last_seen == 'LINK') $this->link_template_tree[ $tname ][]= $curobj->name;
 				}
 				else
 				{
@@ -2759,7 +2774,8 @@ function ReadConfig($input, $is_include=FALSE)
 	if ($last_seen == "NODE")
 	{
 		$this->nodes[$curnode->name]=$curnode;
-		debug ("Saving Node: " . $curnode->name . "\n");	
+		debug ("Saving Node: " . $curnode->name . "\n");
+		if($curnode->template == 'DEFAULT') $this->node_template_tree[ "DEFAULT" ][]= $curnode->name;	
 	}
 
 	if ($last_seen == "LINK")
@@ -2768,6 +2784,7 @@ function ReadConfig($input, $is_include=FALSE)
 		{
 			$this->links[$curlink->name]=$curlink;
 			debug ("Saving Link: " . $curlink->name . "\n");
+			if($curlink->template == 'DEFAULT') $this->link_template_tree[ "DEFAULT" ][]= $curlink->name;				
 		}
 		else { warn ("Dropping LINK " . $curlink->name . " - it hasn't got 2 NODES!"); }
 	}
@@ -2960,6 +2977,7 @@ function ReadConfig_Commit(&$curobj)
 	{
 		$this->nodes[$curobj->name]=$curobj;
 		debug ("Saving Node: " . $curobj->name . "\n");
+		if($curobj->template == 'DEFAULT') $this->node_template_tree[ "DEFAULT" ][]= $curobj->name;
 	}
 
 	if ($last_seen == "LINK")
@@ -2973,7 +2991,8 @@ function ReadConfig_Commit(&$curobj)
 		{
 			$this->links[$curobj->name]=$curobj;
 			debug ("Saving Template-Only Link: " . $curobj->name . "\n");
-		}				
+		}
+		if($curobj->template == 'DEFAULT') $this->link_template_tree[ "DEFAULT" ][]= $curobj->name;				
 	}
 }
 
@@ -3849,7 +3868,6 @@ function CacheUpdate($agelimit=600)
 				}
 			}
 		}
-
 		closedir ($dh);
 
 		foreach ($this->nodes as $node)
@@ -3881,9 +3899,57 @@ function CacheUpdate($agelimit=600)
 		$json = rtrim($json,", \n");
 		fputs($fd,$json);
 		fclose($fd);
+		
+		$json = "";
+		$fd = fopen($cachefolder.DIRECTORY_SEPARATOR.$cacheprefix."_tree.json","w");
+		$id = 10;	// first ID for user-supplied thing
+		
+		$json .= "{ id: 1, text: 'SCALEs'\n, children: [\n";
+		foreach ($this->colours as $scalename=>$colours)
+		{
+			$json .= "{ id: " . $id++ . ", text:" . js_escape($scalename) . " }, \n";			
+		}
+		$json = rtrim($json,", \n");
+		$json .= "]},\n";
+		
+		$json .= "{ id: 2, text: 'FONTs',\n children: [\n";
+		foreach ($this->fonts as $fontnumber => $font)
+		{
+			if ($font->type == 'truetype')
+				$json .= sprintf("{ id: %d, text: %s}, \n", $id++, "Font $fontnumber (TT)");
 
-
-
+			if ($font->type == 'gd')
+				$json .= sprintf("{ id: %d, text: %s}, \n", $id++, "Font $fontnumber (GD)");
+		}
+		$json = rtrim($json,", \n");
+		$json .= "]},\n";		
+		
+		$json .= "{ id: 3, text: 'NODEs',\n children: [\n";
+		
+		foreach ( $this->node_template_tree as $template=>$children )
+		{
+			// pass the list of subordinate nodes to the recursive tree function
+#			$json .= $this->MakeTemplateTree( $this->node_template_tree[$template] );
+		}
+		
+		$json .= "]},\n";
+		
+		$json .= "{ id: 4, text: 'LINKs',\n children: [\n";
+		$json = rtrim($json,", \n");
+		$json .= "]},\n";
+		
+		$json .= "{templates: [\n";
+		//foreach ($this->templates_seen as $template=>$count )
+		//{
+	//		$json .= js_escape($template);
+			# $json .= js_escape($this->$fld);
+	//		$json .= ",\n";
+	//	}
+	//	$json = rtrim($json,", \n");
+		$json .= "]}\n";
+		fputs($fd,"[". $json . "]");
+		fclose($fd);
+		
 		$fd = fopen($cachefolder.DIRECTORY_SEPARATOR.$cacheprefix."_nodes.json","w");
 		$json = "";
 //		$json = $this->defaultnode->asJSON(TRUE);

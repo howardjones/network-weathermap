@@ -286,6 +286,14 @@ if ($map->ReadConfig($configfile))
 		
 	if ($dumpafter == 1)
 		print_r ($map);
+		
+#	print_r ($map->node_template_tree);
+#	print_r ($map->link_template_tree);
+	
+#	$map->cachefolder="editcache";	
+#	$map->CacheUpdate(1);
+	
+		
 }
 else { die ("\n\nCould not read Weathermap config file. No output produced. Maybe try --help?\n"); }
 

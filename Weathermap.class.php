@@ -15,6 +15,7 @@ $weathermap_debugging=FALSE;
 $weathermap_map="";
 $weathermap_warncount=0;
 $weathermap_debug_suppress = array("processstring","mysprintf");
+$weathemap_lazycounter=0;
 
 // Turn on ALL error reporting for now.
 error_reporting (E_ALL);
@@ -3841,6 +3842,8 @@ function MakeHTML($imagemapname = "weathermap_imap")
 // ALWAYS deletes files in the cache folder older than $agelimit, also!
 function CacheUpdate($agelimit=600)
 {
+	global $weathermap_lazycounter; 
+	
 	$cachefolder = $this->cachefolder;
 	$configchanged = filemtime($this->configfile );
 	// make a unique, but safe, prefix for all cachefiles related to this map config
@@ -3907,7 +3910,7 @@ function CacheUpdate($agelimit=600)
 		$json .= "{ id: 1, text: 'SCALEs'\n, children: [\n";
 		foreach ($this->colours as $scalename=>$colours)
 		{
-			$json .= "{ id: " . $id++ . ", text:" . js_escape($scalename) . " }, \n";			
+			$json .= "{ id: " . $id++ . ", text:" . js_escape($scalename) . ", leaf: true }, \n";			
 		}
 		$json = rtrim($json,", \n");
 		$json .= "]},\n";
@@ -3916,37 +3919,33 @@ function CacheUpdate($agelimit=600)
 		foreach ($this->fonts as $fontnumber => $font)
 		{
 			if ($font->type == 'truetype')
-				$json .= sprintf("{ id: %d, text: %s}, \n", $id++, "Font $fontnumber (TT)");
+				$json .= sprintf("{ id: %d, text: %s, leaf: true}, \n", $id++, js_escape("Font $fontnumber (TT)"));
 
 			if ($font->type == 'gd')
-				$json .= sprintf("{ id: %d, text: %s}, \n", $id++, "Font $fontnumber (GD)");
+				$json .= sprintf("{ id: %d, text: %s, leaf: true}, \n", $id++, js_escape("Font $fontnumber (GD)"));
 		}
 		$json = rtrim($json,", \n");
 		$json .= "]},\n";		
 		
 		$json .= "{ id: 3, text: 'NODEs',\n children: [\n";
+		$json .= "{ id: ". $id++ . ", text: 'DEFAULT', children: [\n";
 		
-		foreach ( $this->node_template_tree as $template=>$children )
-		{
-			// pass the list of subordinate nodes to the recursive tree function
-#			$json .= $this->MakeTemplateTree( $this->node_template_tree[$template] );
-		}
+		$weathemap_lazycounter = $id;
+		// pass the list of subordinate nodes to the recursive tree function
+		$json .= $this->MakeTemplateTree( $this->node_template_tree );
+		$id = $weathermap_lazycounter;
 		
-		$json .= "]},\n";
+		$json = rtrim($json,", \n");		
+		$json .= "]} ]},\n";
 		
 		$json .= "{ id: 4, text: 'LINKs',\n children: [\n";
+		$json .= "{ id: ". $id++ . ", text: 'DEFAULT', children: [\n";
+		$weathemap_lazycounter = $id;
+		$json .= $this->MakeTemplateTree( $this->link_template_tree );
+		$id = $weathermap_lazycounter;
 		$json = rtrim($json,", \n");
-		$json .= "]},\n";
-		
-		$json .= "{templates: [\n";
-		//foreach ($this->templates_seen as $template=>$count )
-		//{
-	//		$json .= js_escape($template);
-			# $json .= js_escape($this->$fld);
-	//		$json .= ",\n";
-	//	}
-	//	$json = rtrim($json,", \n");
-		$json .= "]}\n";
+		$json .= "]} ]}\n";
+				
 		fputs($fd,"[". $json . "]");
 		fclose($fd);
 		
@@ -4005,6 +4004,31 @@ function CacheUpdate($agelimit=600)
 
 	}
 	else { debug("Couldn't read cache folder.\n"); }
+}
+
+function MakeTemplateTree( &$tree_list, $startpoint="DEFAULT")
+{
+	global $weathermap_lazycounter;
+	 
+	$output = "";
+	foreach ($tree_list[$startpoint] as $subnode)
+	{
+		$output .= "{ id: " . $weathermap_lazycounter++ . ", text: " . js_escape($subnode); 
+		if( isset($tree_list[$subnode]))
+		{
+			$output .= ", children: [ \n";
+			$output .= $this->MakeTemplateTree($tree_list, $subnode);
+			$output = rtrim($output,", \n");
+			$output .= "] \n";
+		}
+		else
+		{
+			$output .= ", leaf: true ";
+		}
+		$output .= "}, \n";
+	}
+	
+	return($output);
 }
 
 function DumpStats($filename="")

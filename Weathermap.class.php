@@ -714,9 +714,8 @@ function LoadPlugins( $type="data", $dir="lib/datasources" )
 	}
 }
 
-function ReadData()
+function DatasourceInit()
 {
-
 	debug("Running Init() for Data Source Plugins...\n");
 	foreach ($this->datasourceclasses as $ds_class)
 	{
@@ -735,7 +734,114 @@ function ReadData()
 			# unset($this->datasourceclasses[$ds_class]);
 		}
 	}
-	debug("Finished Initialising Plugins...\n");
+	debug("Finished Initialising Plugins...\n");	
+}
+
+function ProcessTargets()
+{
+	debug("Preprocessing targets\n");
+	
+	$allitems = array(&$this->links, &$this->nodes);
+	reset($allitems);
+	
+	debug("Preprocessing targets\n");
+	
+	while( list($kk,) = each($allitems))
+	{
+		unset($objects);
+		$objects = &$allitems[$kk];
+
+		reset($objects);
+		while (list($k,) = each($objects))
+		{
+			unset($myobj);
+			$myobj = &$objects[$k];
+			
+			$type = $myobj->my_type();
+			$name=$myobj->name;
+			
+			
+			if( ($type=='LINK' && isset($myobj->a)) || ($type=='NODE' && !is_null($myobj->x) ) )
+			{
+				if (count($myobj->targets)>0)
+				{
+					$tindex = 0;
+					foreach ($myobj->targets as $target)
+					{
+						debug ("ReadData: New Target: $target[4]\n");
+						// processstring won't use notes (only hints) for this string
+						
+						$targetstring = $this->ProcessString($target[4], $myobj, FALSE, FALSE);
+						if($target[4] != $targetstring) debug("Targetstring is now $targetstring\n");
+
+						// if the targetstring starts with a -, then we're taking this value OFF the aggregate
+						$multiply = 1;
+						if(preg_match("/^-(.*)/",$targetstring,$matches))
+						{
+							$targetstring = $matches[1];
+							$multiply = -1 * $multiply;
+						}
+						
+						// if the remaining targetstring starts with a number and a *-, then this is a scale factor
+						if(preg_match("/^(\d+\.?\d*)\*(.*)/",$targetstring,$matches))
+						{
+							$targetstring = $matches[2];
+							$multiply = $multiply * floatval($matches[1]);
+						}
+						
+						$matched = FALSE;
+						$matched_by = '';
+						foreach ($this->datasourceclasses as $ds_class)
+						{
+							if(!$matched)
+							{
+								// $recognised = call_user_func(array($ds_class, 'Recognise'), $targetstring);
+								$recognised = $this->plugins['data'][$ds_class]->Recognise($targetstring);
+
+								if( $recognised )
+								{	
+									$matched = TRUE;
+									$matched_by = $ds_class;
+																		
+									if($this->activedatasourceclasses[$ds_class])
+									{
+										$this->plugins['data'][$ds_class]->Register($targetstring, $this, $myobj);
+										if($type == 'NODE')
+										{
+											$this->nodes[$name]->targets[$tindex][1] = $multiply;
+											$this->nodes[$name]->targets[$tindex][0] = $targetstring;
+											$this->nodes[$name]->targets[$tindex][5] = $matched_by;
+										}
+										if($type == 'LINK')
+										{
+											$this->links[$name]->targets[$tindex][1] = $multiply;
+											$this->links[$name]->targets[$tindex][0] = $targetstring;
+											$this->links[$name]->targets[$tindex][5] = $matched_by;
+										}											
+									}
+									else
+									{
+										warn("ReadData: $type $name, target: $targetstring on config line $target[3] of $target[2] was recognised as a valid TARGET by a plugin that is unable to run ($ds_class) [WMWARN07]\n");
+									}
+								}
+							}
+						}
+						if(! $matched)
+						{
+							warn("ReadData: $type $name, target: $target[4] on config line $target[3] of $target[2] was not recognised as a valid TARGET [WMWARN08]\n");
+						}							
+						
+						$tindex++;
+					}
+				}
+			}
+		}
+	}
+}
+
+function ReadData()
+{
+	$this->DatasourceInit();
 
 	debug ("======================================\n");
 	debug("ReadData: Updating link data for all links and nodes\n");
@@ -743,103 +849,8 @@ function ReadData()
 	// we skip readdata completely in sizedebug mode
 	if ($this->sizedebug == 0)
 	{
-		$allitems = array(&$this->links, &$this->nodes);
-		reset($allitems);
-		# debug ("======================================\n");
-		debug("Preprocessing targets\n");
-		
-		while( list($kk,) = each($allitems))
-		{
-			unset($objects);
-			$objects = &$allitems[$kk];
-
-			reset($objects);
-			while (list($k,) = each($objects))
-			{
-				unset($myobj);
-				$myobj = &$objects[$k];
+		$this->ProcessTargets();
 				
-				$type = $myobj->my_type();
-				$name=$myobj->name;
-				
-				
-				if( ($type=='LINK' && isset($myobj->a)) || ($type=='NODE' && !is_null($myobj->x) ) )
-				{
-					if (count($myobj->targets)>0)
-					{
-						$tindex = 0;
-						foreach ($myobj->targets as $target)
-						{
-							debug ("ReadData: New Target: $target[4]\n");
-							// processstring won't use notes (only hints) for this string
-							
-							$targetstring = $this->ProcessString($target[4], $myobj, FALSE, FALSE);
-							if($target[4] != $targetstring) debug("Targetstring is now $targetstring\n");
-
-							// if the targetstring starts with a -, then we're taking this value OFF the aggregate
-							$multiply = 1;
-							if(preg_match("/^-(.*)/",$targetstring,$matches))
-							{
-								$targetstring = $matches[1];
-								$multiply = -1 * $multiply;
-							}
-							
-							// if the remaining targetstring starts with a number and a *-, then this is a scale factor
-							if(preg_match("/^(\d+\.?\d*)\*(.*)/",$targetstring,$matches))
-							{
-								$targetstring = $matches[2];
-								$multiply = $multiply * floatval($matches[1]);
-							}
-							
-							$matched = FALSE;
-							$matched_by = '';
-							foreach ($this->datasourceclasses as $ds_class)
-							{
-								if(!$matched)
-								{
-									// $recognised = call_user_func(array($ds_class, 'Recognise'), $targetstring);
-									$recognised = $this->plugins['data'][$ds_class]->Recognise($targetstring);
-
-									if( $recognised )
-									{	
-										$matched = TRUE;
-										$matched_by = $ds_class;
-																			
-										if($this->activedatasourceclasses[$ds_class])
-										{
-											$this->plugins['data'][$ds_class]->Register($targetstring, $this, $myobj);
-											if($type == 'NODE')
-											{
-												$this->nodes[$name]->targets[$tindex][1] = $multiply;
-												$this->nodes[$name]->targets[$tindex][0] = $targetstring;
-												$this->nodes[$name]->targets[$tindex][5] = $matched_by;
-											}
-											if($type == 'LINK')
-											{
-												$this->links[$name]->targets[$tindex][1] = $multiply;
-												$this->links[$name]->targets[$tindex][0] = $targetstring;
-												$this->links[$name]->targets[$tindex][5] = $matched_by;
-											}											
-										}
-										else
-										{
-											warn("ReadData: $type $name, target: $targetstring on config line $target[3] of $target[2] was recognised as a valid TARGET by a plugin that is unable to run ($ds_class) [WMWARN07]\n");
-										}
-									}
-								}
-							}
-							if(! $matched)
-							{
-								warn("ReadData: $type $name, target: $target[4] on config line $target[3] of $target[2] was not recognised as a valid TARGET [WMWARN08]\n");
-							}							
-							
-							$tindex++;
-						}
-					}
-				}
-			}
-		}
-		
 		debug ("======================================\n");
 		debug("Starting prefetch\n");
 		foreach ($this->datasourceclasses as $ds_class)
@@ -880,12 +891,12 @@ function ReadData()
 						foreach ($myobj->targets as $target)
 						{
 							debug ("ReadData: New Target: $target[4]\n");
-							debug ( var_dump($target));
+	#						debug ( var_dump($target));
 	
 							$targetstring = $target[0];
 							$multiply = $target[1];
 							
-							exit();
+	#						exit();
 							
 							$in = 0;
 							$out = 0;

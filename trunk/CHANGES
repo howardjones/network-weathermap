@@ -5,6 +5,8 @@
 	FIXED - Zero-length link check didn't include offsets (thanks Ryan Botoluzzi)
 	FIXED - Cacti-pick should get right rra path for packagers that move the rra directory (e.g. Ubuntu, Debian *again*)
 	FIXED - DS plugins that return one value and a null should work properly
+	FIXED - "Strange" characters (e.g. /) in NODE and LINK names broke the imagemap.
+	FIXED - Map Style settings in editor were broken after internal defaults changes
 	ADDED - Option of a dropdown selector to navigate between maps (in full-size view)
 	ADDED - Maps can be organised into groups in Cacti plugin. These appear
 			as tabs in the UI for viewing maps.
@@ -16,9 +18,7 @@
 	ADDED - SCALE will accept values below 0, and also above 100
 	ADDED - USESCALE has two new options: absolute and percent, which allows you to have a SCALE of absolute values
 	ADDED - New datasource plugin to support statistics from TheWitness's DSStats Cacti Plugin. This gets you daily,weekly,monthly and annual stats with no complicated rrdtool stuff.
-	CHANGE - Node and Link names must follow character restrictions for CSS IDs, since that's where they end up. 
-			Should have always been this way. Start with a letter, continue with letter, digit, dash, underscore, dot or colon.
-
+	
 0.96a	FIXED - New z-ordering code did not work correctly on PHP4. This broke (at least) the editor. (thanks toe_cutter)
 	FIXED - \n is no longer treated as a newline in TARGETs (thanks NetAdmin)
 	FIXED - KILO was broken completely between 0.95b and 0.96 (thanks Jethro Binks)

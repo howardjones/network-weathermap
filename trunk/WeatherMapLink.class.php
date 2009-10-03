@@ -9,6 +9,7 @@ require_once "HTML_ImageMap.class.php";
 class WeatherMapLink extends WeatherMapItem
 {
 	var $owner,                $name;
+	var $id;
 	var $maphtml;
 	var $a,                    $b; // the ends - references to nodes
 	var $width,                $arrowstyle, $linkstyle;
@@ -134,6 +135,7 @@ class WeatherMapLink extends WeatherMapItem
 		// to stop the editor tanking, now that colours are decided earlier in ReadData
 		$this->colours[IN] = new Colour(192,192,192);
 		$this->colours[OUT] = new Colour(192,192,192);
+		$this->id = $newowner->next_id++;
 	}
 
 	function my_type() {  return "LINK"; }
@@ -510,7 +512,7 @@ class WeatherMapLink extends WeatherMapItem
 	function WriteConfig()
 	{
 		$output='';
-		# $output .= "# first seen in ".$this->defined_in."\n";
+		# $output .= "# ID ".$this->id." - first seen in ".$this->defined_in."\n";
 
 		if($this->config_override != '')
 		{
@@ -753,6 +755,7 @@ class WeatherMapLink extends WeatherMapItem
 	{
 		$js='';
 		$js.="Links[" . js_escape($this->name) . "] = {";
+		$js .= "\"id\":" . $this->id. ", ";
 
 		if (isset($this->a))
 		{
@@ -788,14 +791,15 @@ class WeatherMapLink extends WeatherMapItem
 		$js.="overliburl:" . js_escape(join(" ",$this->overliburl[IN]));
 		
 		$js.="};\n";
+		$js .= "LinkIDs[\"L" . $this->id . "\"] = ". js_escape($this->name) . ";\n";
 		return $js;
 	}
 
 	function asJSON($complete=TRUE)
 	{
-		$js='';
-		$js.="" . js_escape($this->name) . ": {";
-
+		$js = '';
+		$js .= "" . js_escape($this->name) . ": {";
+		$js .= "\"id\":" . $this->id. ", ";
 		if (isset($this->a)) 
 		{
 			$js.="\"a\":\"" . $this->a->name . "\", ";

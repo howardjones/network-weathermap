@@ -323,22 +323,22 @@ function get_imagelist($imagedir)
 function handle_inheritance(&$map, &$inheritables)
 {
 	foreach ($inheritables as $inheritable)
-	{
+	{		
 		$fieldname = $inheritable[1];
 		$formname = $inheritable[2];
 		
 		$new = $_REQUEST[$formname];
 		
-		$old = ($inheritable[0]=='node' ? $map->defaultnode->$fieldname : $map->defaultlink->$fieldname);
+		$old = ($inheritable[0]=='node' ? $map->nodes['DEFAULT']->$fieldname : $map->links['DEFAULT']->$fieldname);	
 		
 		if($old != $new)
 		{
 			if($inheritable[0]=='node')
 			{
-				$map->defaultnode->$fieldname = $new;
+				$map->nodes['DEFAULT']->$fieldname = $new;
 				foreach ($map->nodes as $node)
 				{
-					if($node->$fieldname == $old)
+					if($node->name != ":: DEFAULT ::" && $node->$fieldname == $old)
 					{
 						$map->nodes[$node->name]->$fieldname = $new;
 					}
@@ -347,10 +347,11 @@ function handle_inheritance(&$map, &$inheritables)
 			
 			if($inheritable[0]=='link')
 			{
-				$map->defaultlink->$fieldname = $new;
+				$map->links['DEFAULT']->$fieldname = $new;
 				foreach ($map->links as $link)
 				{
-					if($link->$fieldname == $old)
+					
+					if($link->name != ":: DEFAULT ::" && $link->$fieldname == $old)
 					{
 						$map->links[$link->name]->$fieldname = $new;
 					}

@@ -395,7 +395,8 @@ class HTML_ImageMap
 	// return HTML for a subset of the map, specified by the filter string
 	// (suppose you want some partof your UI to have precedence over another part
 	//  - the imagemap is checked from top-to-bottom in the HTML)
-	function subHTML($namefilter="",$reverseorder=false)
+	// - skipnolinks -> in normal HTML output, we don't need areas for things with no href
+	function subHTML($namefilter="",$reverseorder=false, $skipnolinks=false)
 	{
 		$html = "";
 		$preg = '/'.$namefilter.'/';
@@ -405,13 +406,16 @@ class HTML_ImageMap
 			# if( ($namefilter == "") || ( preg_match($preg,$shape->name) ))
 			if( ($namefilter == "") || ( strstr($shape->name, $namefilter) !== FALSE ))
 			{
-				if($reverseorder)
+				if(!$skipnolinks || $shape->href!="")
 				{
-					$html = $shape->asHTML()."\n".$html;
-				}
-				else
-				{
-					$html .= $shape->asHTML()."\n";
+					if($reverseorder)
+					{
+						$html = $shape->asHTML()."\n".$html;
+					}
+					else
+					{
+						$html .= $shape->asHTML()."\n";
+					}
 				}
 
 			}

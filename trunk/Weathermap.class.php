@@ -162,6 +162,7 @@ class WeatherMap extends WeatherMapBase
 	var $seen_zlayers = array(0=>array(),1000=>array()); // 0 is the background, 100 is the legends, title, etc
 
 	var $config;
+	var $next_id;
 	var $min_ds_time;
 	var $max_ds_time;
 	var $background;
@@ -292,19 +293,11 @@ class WeatherMap extends WeatherMapBase
 	
 	function Reset()
 	{
+		$this->next_id = 100;
 		foreach (array_keys($this->inherit_fieldlist)as $fld) { $this->$fld=$this->inherit_fieldlist[$fld]; }
 		
 		$this->min_ds_time = NULL;
 		$this->max_ds_time = NULL;
-
-		// these two are used for default settings
-		//$this->defaultlink=new WeatherMapLink;
-		//$this->defaultlink->name="DEFAULT";
-		//$this->defaultlink->Reset($this);
-
-		//$this->defaultnode=new WeatherMapNode;
-		//$this->defaultnode->name="DEFAULT";
-		//$this->defaultnode->Reset($this);
 
 		$this->need_size_precalc=FALSE;
 
@@ -320,6 +313,7 @@ class WeatherMap extends WeatherMapBase
                 $deflink->name=":: DEFAULT ::";
                 $deflink->template=":: DEFAULT ::";
                 $deflink->Reset($this);
+               
                 $this->links[':: DEFAULT ::'] = &$deflink;
 
                 debug("Creating ':: DEFAULT ::' DEFAULT NODE\n");
@@ -327,6 +321,7 @@ class WeatherMap extends WeatherMapBase
                 $defnode->name=":: DEFAULT ::";
                 $defnode->template=":: DEFAULT ::";
                 $defnode->Reset($this);
+               
                 $this->nodes[':: DEFAULT ::'] = &$defnode;
                 
        	$this->node_template_tree = array();
@@ -988,7 +983,7 @@ function DrawLabelRotated($im, $x, $y, $angle, $text, $font, $padding, $linkname
 	$textcol=myimagecolorallocate($im, $textcolour[0], $textcolour[1], $textcolour[2]);
 	$this->myimagestring($im, $font, $points[8], $points[9], $text, $textcol,$angle);
 
-	$areaname = "LINK:".$linkname.':'.($direction+2);
+	$areaname = "LINK:L".$map->links[$linkname]->id.':'.($direction+2);
 	
 	// the rectangle is about half the size in the HTML, and easier to optimise/detect in the browser
 	if($angle==0)
@@ -1095,6 +1090,7 @@ function NewColourFromPercent($value,$scalename="DEFAULT",$name="",$is_percent=T
 {
 	$col = new Colour(0,0,0);
 	$tag = '';
+	$matchsize = NULL;
 
 	$nowarn_clipping = intval($this->get_hint("nowarn_clipping"));
 	$nowarn_scalemisses = intval($this->get_hint("nowarn_scalemisses"));
@@ -1109,11 +1105,18 @@ function NewColourFromPercent($value,$scalename="DEFAULT",$name="",$is_percent=T
 			if($nowarn_clipping==0) warn ("NewColourFromPercent: Clipped $value% to 100% for item $name\n");
 			$value = 100;
 		}
+		
+		if ($is_percent && $value < 0)
+		{
+			if($nowarn_clipping==0) warn ("NewColourFromPercent: Clipped $value% to 0% for item $name\n");
+			$value = 0;
+		}
 
 		foreach ($colours as $key => $colour)
 		{
 			if ( (!isset($colour['special']) || $colour['special'] == 0) and ($value >= $colour['bottom']) and ($value <= $colour['top']))
 			{
+				$range = $colour['top'] - $colour['bottom'];
 				if (isset($colour['red2']))
 				{
 					if($colour["bottom"] == $colour["top"])
@@ -1137,7 +1140,14 @@ function NewColourFromPercent($value,$scalename="DEFAULT",$name="",$is_percent=T
 					# $col = new Colour($r, $g, $b);
 					# $col = $colour['gdref1'];
 				}
-				$col = new Colour($r, $g, $b);
+				
+				// change in behaviour - with multiple matching ranges for a value, the smallest range wins
+				if( is_null($matchsize) || ($range < $matchsize) ) 
+				{
+					$col = new Colour($r, $g, $b);
+					$matchsize = $range;
+				}
+				
 				if(isset($colour['tag'])) $tag = $colour['tag'];
 				#### warn(">>NCFPC TAGS $tag\n");
 				debug("NCFPC $name '$tag' $key $r $g $b\n");
@@ -1471,7 +1481,8 @@ function DrawLegend_Classic($im,$scalename="DEFAULT",$use_tags=FALSE)
 
 		foreach ($colours as $colour)
 		{
-			if ($colour['bottom'] >= 0)
+			if (!isset($colour['special']) || $colour['special'] == 0)
+			// if ( 1==1 || $colour['bottom'] >= 0)
 			{
 				#  debug("$i: drawing\n");
 				if( ($hide_zero == 0) || $colour['key'] != '0_0')
@@ -1492,9 +1503,9 @@ function DrawLegend_Classic($im,$scalename="DEFAULT",$use_tags=FALSE)
 					{
 						for ($n=0; $n <= $tilewidth; $n++)
 						{
-							$percent
+							$value
 								=  $fudgefactor + $colour['bottom'] + ($n / $tilewidth) * ($colour['top'] - $colour['bottom']);
-							list($ccol,$junk) = $this->NewColourFromPercent($percent,$scalename);
+							list($ccol,$junk) = $this->NewColourFromPercent($value, $scalename, FALSE);
 							$col = $ccol->gdallocate($scale_im);
 							wimagefilledrectangle($scale_im, $x + $n, $y, $x + $n, $y + $tileheight,
 								$col);
@@ -1502,9 +1513,9 @@ function DrawLegend_Classic($im,$scalename="DEFAULT",$use_tags=FALSE)
 					}
 					else
 					{
-						// pick a percentage in the middle...
-						$percent=($colour['bottom'] + $colour['top']) / 2;
-						list($ccol,$junk) = $this->NewColourFromPercent($percent,$scalename);
+						// pick a value in the middle...
+						$value = ($colour['bottom'] + $colour['top']) / 2;
+						list($ccol,$junk) = $this->NewColourFromPercent($value, $scalename, FALSE);
 						$col = $ccol->gdallocate($scale_im);
 						wimagefilledrectangle($scale_im, $x, $y, $x + $tilewidth, $y + $tileheight,
 							$col);
@@ -2019,7 +2030,8 @@ function ReadConfig($input, $is_include=FALSE)
 			
 			$objectlinecount++;
 
-			if (preg_match("/^\s*(LINK|NODE)\s+([A-Za-z][A-Za-z0-9_\.\-\:]*)\s*$/i", $buffer, $matches))
+			#if (preg_match("/^\s*(LINK|NODE)\s+([A-Za-z][A-Za-z0-9_\.\-\:]*)\s*$/i", $buffer, $matches))
+			if (preg_match("/^\s*(LINK|NODE)\s+(\S+)\s*$/i", $buffer, $matches))
 			{
 				$objectlinecount = 0;
 				if(1==1)
@@ -2077,6 +2089,7 @@ function ReadConfig($input, $is_include=FALSE)
 						$curlink=new WeatherMapLink;
 						$curlink->name=$matches[2];
 						$curlink->Reset($this);
+										
 						$linksseen++;
 					}
 
@@ -2110,6 +2123,7 @@ function ReadConfig($input, $is_include=FALSE)
 						$curnode=new WeatherMapNode;
 						$curnode->name=$matches[2];
 						$curnode->Reset($this);
+						
 						$nodesseen++;
 					}
 
@@ -2513,7 +2527,7 @@ function ReadConfig($input, $is_include=FALSE)
 
 				// warn("Set $varname and $uvarname\n");
 
-				print ">> $stype $svar ".$matches[2]." ".$curnode->name." \n";
+				// print ">> $stype $svar ".$matches[2]." ".$curnode->name." \n";
 
 				$linematched++;
 			}
@@ -3378,7 +3392,9 @@ function DrawMap($filename = '', $thumbnailfile = '', $thumbnailmax = 250, $with
 								$ii=0;
 								foreach($this->nodes[$it->name]->boundingboxes as $bbox)
 								{
-									$this->imap->addArea("Rectangle", "NODE:" . $it->name . ':'.$ii, '', $bbox);
+									# $areaname = "NODE:" . $it->name . ':'.$ii;
+									$areaname = "NODE:N". $it->id . ":" . $ii;
+									$this->imap->addArea("Rectangle", $areaname, '', $bbox);
 									debug("Adding imagemap area");
 									$ii++;
 								}
@@ -3576,6 +3592,7 @@ function PreloadMapHTML()
 				$myobj = &$objects[$k];
 
 				$type = $myobj->my_type();
+				$prefix = substr($type,0,1);
 
 				$dirs = array();
 				//print "\n\nConsidering a $type - ".$myobj->name.".\n";
@@ -3671,7 +3688,7 @@ function PreloadMapHTML()
 							
 							foreach ($parts as $part)
 							{
-								$areaname = $type.":" . $myobj->name . ":" . $part;
+								$areaname = $type.":" . $prefix . $myobj->id. ":" . $part;
 								//print "INFOURL for $areaname - ";
 							
 								$this->imap->setProp("extrahtml", $overlibhtml, $areaname);
@@ -3685,7 +3702,8 @@ function PreloadMapHTML()
 				{
 					foreach ($parts as $part)
 					{
-						$areaname = $type.":" . $myobj->name . ":" . $part;
+						# $areaname = $type.":" . $myobj->name . ":" . $part;
+						$areaname = $type.":" . $prefix . $myobj->id. ":" . $part;
 						//print "INFOURL for $areaname - ";
 												
 						if ( ($this->htmlstyle != 'editor') && ($myobj->infourl[$dir] != '') ) {
@@ -3708,12 +3726,14 @@ function asJS()
 {
 	$js='';
 
-	$js.="var Links = new Array();\n";
+	$js .= "var Links = new Array();\n";
+	$js .= "var LinkIDs = new Array();\n";
 	# $js.=$this->defaultlink->asJS();
 
 	foreach ($this->links as $link) { $js.=$link->asJS(); }
 
-	$js.="var Nodes = new Array();\n";
+	$js .= "var Nodes = new Array();\n";
+	$js .= "var NodeIDs = new Array();\n";
 	# $js.=$this->defaultnode->asJS();
 
 	foreach ($this->nodes as $node) { $js.=$node->asJS(); }
@@ -3820,11 +3840,12 @@ function MakeHTML($imagemapname = "weathermap_imap")
 				if($it->name != 'DEFAULT' && $it->name != ":: DEFAULT ::")
 				{
 					$name = "";
-					if(strtolower(get_class($it))=='weathermaplink') $name = "LINK:";
-					if(strtolower(get_class($it))=='weathermapnode') $name = "NODE:";
-					$name .= $it->name . ":";
+					if(strtolower(get_class($it))=='weathermaplink') $name = "LINK:L";
+					if(strtolower(get_class($it))=='weathermapnode') $name = "NODE:N";
+					$name .= $it->id . ":";
 					debug("      Writing $name from imagemap\n");
-					$html .= $this->imap->subHTML($name,true);
+					// skip the linkless areas if we are in the editor - they're redundant
+					$html .= $this->imap->subHTML($name,true,($this->context != 'editor'));
 				}
 			}
 		}

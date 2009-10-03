@@ -61,7 +61,23 @@ class WeatherMapDataSource
 	//   returns an array of two values (in,out). -1,-1 if it couldn't get valid data
 	//   configline is passed in, to allow for better error messages
 	//   itemtype and itemname may be used as part of the target (e.g. for TSV source line)
-	function ReadData($targetstring, $configline, $itemtype, $itemname, $map) { return (array(-1,-1)); }
+	// function ReadData($targetstring, $configline, $itemtype, $itemname, $map) { return (array(-1,-1)); }
+	function ReadData($targetstring, &$map, &$item)
+	{
+		return(array(-1,-1));
+	}
+	
+	// pre-register a target + context, to allow a plugin to batch up queries to a slow database, or snmp for example
+	function Register($targetstring, &$map, &$item)
+	{
+	
+	}
+	
+	// called before ReadData, to allow plugins to DO the prefetch of targets known from Register
+	function Prefetch()
+	{
+		
+	}
 }
 
 // template classes for the pre- and post-processor plugins
@@ -724,16 +740,122 @@ function ReadData()
 	debug ("======================================\n");
 	debug("ReadData: Updating link data for all links and nodes\n");
 
+	// we skip readdata completely in sizedebug mode
 	if ($this->sizedebug == 0)
 	{
-
 		$allitems = array(&$this->links, &$this->nodes);
 		reset($allitems);
-
+		# debug ("======================================\n");
+		debug("Preprocessing targets\n");
+		
 		while( list($kk,) = each($allitems))
 		{
 			unset($objects);
-			# $objects = &$this->links;
+			$objects = &$allitems[$kk];
+
+			reset($objects);
+			while (list($k,) = each($objects))
+			{
+				unset($myobj);
+				$myobj = &$objects[$k];
+				
+				$type = $myobj->my_type();
+				$name=$myobj->name;
+				
+				
+				if( ($type=='LINK' && isset($myobj->a)) || ($type=='NODE' && !is_null($myobj->x) ) )
+				{
+					if (count($myobj->targets)>0)
+					{
+						$tindex = 0;
+						foreach ($myobj->targets as $target)
+						{
+							debug ("ReadData: New Target: $target[4]\n");
+							// processstring won't use notes (only hints) for this string
+							
+							$targetstring = $this->ProcessString($target[4], $myobj, FALSE, FALSE);
+							if($target[4] != $targetstring) debug("Targetstring is now $targetstring\n");
+
+							// if the targetstring starts with a -, then we're taking this value OFF the aggregate
+							$multiply = 1;
+							if(preg_match("/^-(.*)/",$targetstring,$matches))
+							{
+								$targetstring = $matches[1];
+								$multiply = -1 * $multiply;
+							}
+							
+							// if the remaining targetstring starts with a number and a *-, then this is a scale factor
+							if(preg_match("/^(\d+\.?\d*)\*(.*)/",$targetstring,$matches))
+							{
+								$targetstring = $matches[2];
+								$multiply = $multiply * floatval($matches[1]);
+							}
+							
+							$matched = FALSE;
+							$matched_by = '';
+							foreach ($this->datasourceclasses as $ds_class)
+							{
+								if(!$matched)
+								{
+									// $recognised = call_user_func(array($ds_class, 'Recognise'), $targetstring);
+									$recognised = $this->plugins['data'][$ds_class]->Recognise($targetstring);
+
+									if( $recognised )
+									{	
+										$matched = TRUE;
+										$matched_by = $ds_class;
+																			
+										if($this->activedatasourceclasses[$ds_class])
+										{
+											$this->plugins['data'][$ds_class]->Register($targetstring, $this, $myobj);
+											if($type == 'NODE')
+											{
+												$this->nodes[$name]->targets[$tindex][1] = $multiply;
+												$this->nodes[$name]->targets[$tindex][0] = $targetstring;
+												$this->nodes[$name]->targets[$tindex][5] = $matched_by;
+											}
+											if($type == 'LINK')
+											{
+												$this->links[$name]->targets[$tindex][1] = $multiply;
+												$this->links[$name]->targets[$tindex][0] = $targetstring;
+												$this->links[$name]->targets[$tindex][5] = $matched_by;
+											}											
+										}
+										else
+										{
+											warn("ReadData: $type $name, target: $targetstring on config line $target[3] of $target[2] was recognised as a valid TARGET by a plugin that is unable to run ($ds_class) [WMWARN07]\n");
+										}
+									}
+								}
+							}
+							if(! $matched)
+							{
+								warn("ReadData: $type $name, target: $target[4] on config line $target[3] of $target[2] was not recognised as a valid TARGET [WMWARN08]\n");
+							}							
+							
+							$tindex++;
+						}
+					}
+				}
+			}
+		}
+		
+		debug ("======================================\n");
+		debug("Starting prefetch\n");
+		foreach ($this->datasourceclasses as $ds_class)
+		{
+			$this->plugins['data'][$ds_class]->Prefetch();
+		}
+		
+		debug ("======================================\n");
+		debug("Starting main collection loop\n");
+		
+		$allitems = array(&$this->links, &$this->nodes);
+		reset($allitems);
+		
+		while( list($kk,) = each($allitems))
+		{
+			unset($objects);
 			$objects = &$allitems[$kk];
 
 			reset($objects);
@@ -758,7 +880,13 @@ function ReadData()
 						foreach ($myobj->targets as $target)
 						{
 							debug ("ReadData: New Target: $target[4]\n");
+							debug ( var_dump($target));
 	
+							$targetstring = $target[0];
+							$multiply = $target[1];
+							
+							exit();
+							
 							$in = 0;
 							$out = 0;
 							$datatime = 0;
@@ -767,69 +895,18 @@ function ReadData()
 								// processstring won't use notes (only hints) for this string
 								
 								$targetstring = $this->ProcessString($target[4], $myobj, FALSE, FALSE);
-								if($target[4] != $targetstring) debug("Targetstring is now $targetstring\n");
-	
-								// if the targetstring starts with a -, then we're taking this value OFF the aggregate
-								$multiply = 1;
-								if(preg_match("/^-(.*)/",$targetstring,$matches))
+								if($target[4] != $targetstring) debug("Targetstring is now $targetstring\n");							
+								if($multiply != 1) debug("Will multiply result by $multiply\n");
+																
+								if($target[5] != "")
 								{
-									$targetstring = $matches[1];
-									$multiply = -1 * $multiply;
-								}
-								
-								// if the remaining targetstring starts with a number and a *-, then this is a scale factor
-								if(preg_match("/^(\d+\.?\d*)\*(.*)/",$targetstring,$matches))
-								{
-									$targetstring = $matches[2];
-									$multiply = $multiply * floatval($matches[1]);
-								}
-	
-								if($multiply != 1)
-								{
-									debug("Will multiply result by $multiply\n");
-								}
-								
-								$matched = FALSE;
-								$matched_by = '';
-								foreach ($this->datasourceclasses as $ds_class)
-								{
-									if(!$matched)
-									{
-										// $recognised = call_user_func(array($ds_class, 'Recognise'), $targetstring);
-										$recognised = $this->plugins['data'][$ds_class]->Recognise($targetstring);
-	
-										if( $recognised )
-										{
-											if($this->activedatasourceclasses[$ds_class])
-											{
-												debug("ReadData: Matched for $ds_class. Calling ${ds_class}->ReadData()\n");
-	
-												// line number is in $target[3]
-												# list($in,$out,$datatime) =  call_user_func( array($ds_class, 'ReadData'), $targetstring, $this, $myobj );
-												// list($in,$out,$datatime) =  call_user_func_array( array($ds_class, 'ReadData'), array($targetstring, &$this, &$myobj));
-												list($in,$out,$datatime) =  $this->plugins['data'][$ds_class]->ReadData($targetstring, $this, $myobj);
-											}
-											else
-											{
-												warn("ReadData: $type $name, target: $targetstring on config line $target[3] of $target[2] was recognised as a valid TARGET by a plugin that is unable to run ($ds_class) [WMWARN07]\n");
-											}
-											$matched = TRUE;
-											$matched_by = $ds_class;
-										}
-									}
-								}
-	
-								if(! $matched)
-								{
-									// **
-									warn("ReadData: $type $name, target: $target[4] on config line $target[3] of $target[2] was not recognised as a valid TARGET [WMWARN08]\n");
+									list($in,$out,$datatime) =  $this->plugins['data'][ $target[5] ]->ReadData($targetstring, $this, $myobj);
 								}
 	
 								if (($in === NULL) && ($out === NULL))
 								{
 									$in=0;
 									$out=0;
-									// **
 									warn
 										("ReadData: $type $name, target: $targetstring on config line $target[3] of $target[2] had no valid data, according to $matched_by\n");
 								}
@@ -2373,9 +2450,15 @@ function ReadConfig($input, $is_include=FALSE)
 					foreach($args as $arg)
 					{
 						// we store the original TARGET string, and line number, along with the breakdown, to make nicer error messages later
-						// array of 5 things:
-						// - only 2,3,4 are used at the moment (more used to be before DS plugins)
-						$newtarget=array($arg,'',$filename,$linecount,$arg);
+						// array of 7 things:
+						// - only 0,1,2,3,4 are used at the moment (more used to be before DS plugins)
+						// 0 => final target string (filled in by ReadData)
+						// 1 => multiplier (filled in by ReadData)
+						// 2 => config filename where this line appears
+						// 3 => linenumber in that file
+						// 4 => the original target string
+						// 5 => the plugin to use to pull data 
+						$newtarget=array('','',$filename,$linecount,$arg,"","");
 						if ($curobj)
 						{
 							debug("  TARGET: $arg\n");

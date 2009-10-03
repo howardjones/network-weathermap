@@ -327,7 +327,7 @@ function mouse_help_handler(e)
 function click_handler(e)
     {
     var el;
-    var alt, objectname, objecttype;
+    var alt, objectname, objecttype, objectid;
 
     if (window.event && window.event.srcElement)
         {
@@ -349,6 +349,7 @@ function click_handler(e)
 
     objecttype = alt.slice(0, 4);
     objectname = alt.slice(5, alt.length);
+    objectid = objectname.slice(0,objectname.length-2);
 
     // if we're not in a mode yet...
     if (document.frmMain.action.value === '')
@@ -358,14 +359,16 @@ function click_handler(e)
         if (objecttype == 'NODE')
             {
                 // chop off the suffix
-                objectname=objectname.slice(0,objectname.length-2);
+                // objectid = objectname.slice(0,objectname.length-2);
+                objectname = NodeIDs[objectid];
                 show_node(objectname);
             }
 
         if (objecttype == 'LINK')
             {
                 // chop off the suffix
-                objectname=objectname.slice(0,objectname.length-2);
+                // objectid = objectname.slice(0,objectname.length-2);
+                objectname = LinkIDs[objectid];
                 show_link(objectname);
             }
         }
@@ -375,13 +378,13 @@ function click_handler(e)
         {
         if (objecttype == 'NODE' && document.getElementById('action').value == 'add_link')
             {
-            document.getElementById('param').value = objectname;
+            document.getElementById('param').value = NodeIDs[objectid];
             document.frmMain.submit();
             }
 
         else if (objecttype == 'NODE' && document.getElementById('action').value == 'add_link2')
             {
-            document.getElementById('param').value = objectname;
+            document.getElementById('param').value = NodeIDs[objectid];
             document.frmMain.submit();
             }
 

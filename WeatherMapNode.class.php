@@ -9,6 +9,7 @@ require_once "HTML_ImageMap.class.php";
 class WeatherMapNode extends WeatherMapItem
 {
 	var $owner;
+	var $id;
 	var $x,	$y;
 	var $original_x, $original_y,$relative_resolved;
 	var $width, $height;
@@ -726,6 +727,8 @@ class WeatherMapNode extends WeatherMapItem
 		// to stop the editor tanking, now that colours are decided earlier in ReadData
 		$this->colours[IN] = new Colour(192,192,192);
 		$this->colours[OUT] = new Colour(192,192,192);
+		
+		$this->id = $newowner->next_id++;
 	}
 
 	function CopyFrom(&$source)
@@ -742,7 +745,7 @@ class WeatherMapNode extends WeatherMapItem
 	{
 		$output='';
 				
-		# $output .= "# first seen in ".$this->defined_in."\n";
+		# $output .= "# ID ".$this->id." - first seen in ".$this->defined_in."\n";
 
 		// This allows the editor to wholesale-replace a single node's configuration
 		// at write-time - it should include the leading NODE xyz line (to allow for renaming)
@@ -930,10 +933,11 @@ class WeatherMapNode extends WeatherMapItem
 
 	function asJS()
 	{
-		$js='';
-		$js.="Nodes[" . js_escape($this->name) . "] = {";
-		$js.="x:" . (is_null($this->x)? "'null'" : $this->x) . ", ";
-		$js.="y:" . (is_null($this->y)? "'null'" : $this->y) . ", ";
+		$js = '';
+		$js .= "Nodes[" . js_escape($this->name) . "] = {";
+		$js .= "x:" . (is_null($this->x)? "'null'" : $this->x) . ", ";
+		$js .= "y:" . (is_null($this->y)? "'null'" : $this->y) . ", ";
+		$js .= "\"id\":" . $this->id. ", ";
 		// $js.="y:" . $this->y . ", ";
 		$js.="ox:" . $this->original_x . ", ";
 		$js.="oy:" . $this->original_y . ", ";
@@ -954,7 +958,8 @@ class WeatherMapNode extends WeatherMapItem
 			$js.="iconfile:" . js_escape($this->iconfile);
 		}
 		
-		$js.="};\n";
+		$js .= "};\n";
+		$js .= "NodeIDs[\"N" . $this->id . "\"] = ". js_escape($this->name) . ";\n";
 		return $js;
 	}
 
@@ -962,6 +967,7 @@ class WeatherMapNode extends WeatherMapItem
 	{
 		$js = '';
 		$js .= "" . js_escape($this->name) . ": {";
+		$js .= "\"id\":" . $this->id. ", ";
 		$js .= "\"x\":" . ($this->x - $this->centre_x). ", ";
 		$js .= "\"y\":" . ($this->y - $this->centre_y) . ", ";
 		$js .= "\"cx\":" . $this->centre_x. ", ";

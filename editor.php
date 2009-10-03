@@ -514,7 +514,7 @@ else
 		$map->ReadConfig($mapfile);
 
 		$param2 = $_REQUEST['param'];
-		$param2 = substr($param2,0,-2);
+		# $param2 = substr($param2,0,-2);
 		$newaction = 'add_link2';
               #  print $newaction;
 		$selected = 'NODE:'.$param2;
@@ -525,13 +525,14 @@ else
 		$map->ReadConfig($mapfile);
 		$a = $_REQUEST['param2'];
 		$b = $_REQUEST['param'];
-		$b = substr($b,0,-2);
+		# $b = substr($b,0,-2);
 		$log = "[$a -> $b]";
 
 		if($a != $b)
 		{
 			$newlink = new WeatherMapLink;
 			$newlink->Reset($map);
+			
 			$newlink->a = $map->nodes[$a];
 			$newlink->b = $map->nodes[$b];
 			

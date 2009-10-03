@@ -995,7 +995,7 @@ function draw_straight($image, &$curvepoints, $widths, $outlinecolour, $fillcolo
 			debug("Not drawing $linkname ($dir) fill because there is no fill colour\n");
 		}
 		
-		$areaname = "LINK:" . $linkname. ":$dir";
+		$areaname = "LINK:L" . $map->links[$linkname]->id . ":$dir";
 		$map->imap->addArea("Polygon", $areaname, '', $finalpoints);
 		debug ("Adding Poly imagemap for $areaname\n");
 	
@@ -1148,7 +1148,8 @@ function draw_curve($image, &$curvepoints, $widths, $outlinecolour, $fillcolours
 			debug("Not drawing $linkname ($dir) fill because there is no fill colour\n");
 		}
 		
-		$areaname = "LINK:" . $linkname. ":$dir";
+		# $areaname = "LINK:" . $linkname. ":$dir";
+		$areaname = "LINK:L" . $map->links[$linkname]->id . ":$dir";
 		$map->imap->addArea("Polygon", $areaname, '', $there_points);
 		debug ("Adding Poly imagemap for $areaname\n");
 

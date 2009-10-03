@@ -1152,7 +1152,7 @@ function NewColourFromPercent($value,$scalename="DEFAULT",$name="",$is_percent=T
 				
 				if(isset($colour['tag'])) $tag = $colour['tag'];
 				#### warn(">>NCFPC TAGS $tag\n");
-				debug("NCFPC $name '$tag' $key $r $g $b\n");
+				debug("NCFPC $name $scalename $value '$tag' $key $r $g $b\n");
 
 				return(array($col,$key,$tag));
 			}
@@ -1486,6 +1486,10 @@ function DrawLegend_Classic($im,$scalename="DEFAULT",$use_tags=FALSE)
 			if (!isset($colour['special']) || $colour['special'] == 0)
 			// if ( 1==1 || $colour['bottom'] >= 0)
 			{
+				// pick a value in the middle...
+				$value = ($colour['bottom'] + $colour['top']) / 2;
+				debug(sprintf("%f-%f (%f)  %d %d %d\n", $colour['bottom'], $colour['top'], $value, $colour['red1'], $colour['green1'], $colour['blue1']));
+				
 				#  debug("$i: drawing\n");
 				if( ($hide_zero == 0) || $colour['key'] != '0_0')
 				{
@@ -1501,13 +1505,14 @@ function DrawLegend_Classic($im,$scalename="DEFAULT",$use_tags=FALSE)
 						# warn("FUDGING $fudgefactor\n");
 					}
 
+					// if it's a gradient, red2 is defined, and we need to sweep the values
 					if (isset($colour['red2']))
 					{
 						for ($n=0; $n <= $tilewidth; $n++)
 						{
 							$value
 								=  $fudgefactor + $colour['bottom'] + ($n / $tilewidth) * ($colour['top'] - $colour['bottom']);
-							list($ccol,$junk) = $this->NewColourFromPercent($value, $scalename, FALSE);
+							list($ccol,$junk) = $this->NewColourFromPercent($value, $scalename, "", FALSE);
 							$col = $ccol->gdallocate($scale_im);
 							wimagefilledrectangle($scale_im, $x + $n, $y, $x + $n, $y + $tileheight,
 								$col);
@@ -1516,8 +1521,8 @@ function DrawLegend_Classic($im,$scalename="DEFAULT",$use_tags=FALSE)
 					else
 					{
 						// pick a value in the middle...
-						$value = ($colour['bottom'] + $colour['top']) / 2;
-						list($ccol,$junk) = $this->NewColourFromPercent($value, $scalename, FALSE);
+						//$value = ($colour['bottom'] + $colour['top']) / 2;
+						list($ccol,$junk) = $this->NewColourFromPercent($value, $scalename, "", FALSE);
 						$col = $ccol->gdallocate($scale_im);
 						wimagefilledrectangle($scale_im, $x, $y, $x + $tilewidth, $y + $tileheight,
 							$col);
@@ -3231,14 +3236,14 @@ function AllocateScaleColours($im,$refname='gdref1')
 	{
 		foreach ($colours as $key => $colour)
 		{
-			if (!isset($this->colours[$scalename][$key]['red2']))
+			if ( (!isset($this->colours[$scalename][$key]['red2']) ) && (!isset( $this->colours[$scalename][$key][$refname] )) )
 			{
 				$r=$colour['red1'];
 				$g=$colour['green1'];
 				$b=$colour['blue1'];
-				debug ("AllocateScaleColours: $scalename $key ($r,$g,$b)\n");
+				debug ("AllocateScaleColours: $scalename/$refname $key ($r,$g,$b)\n");
 				$this->colours[$scalename][$key][$refname]=myimagecolorallocate($im, $r, $g, $b);
-			}
+			}			
 		}
 	}
 }

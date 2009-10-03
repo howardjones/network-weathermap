@@ -35,6 +35,7 @@ a { color: black; text-decoration: underline; font-weight: normal;}
 <li><a href="#mrtg">MRTG-generated HTML files</a></li>
 <li><a href="#cactihost">Cacti host status</a></li>
 <li><a href="#cactithold">Cacti threshold/monitor status</a></li>
+<li><a href="#cactidsstats">Cacti DSStats data collection plugin</a></li>
 <li><a href="#script">MRTG-style external script</a></li>
 <li><a href="#snmp">SNMP OID</a></li>
 <li><a href="#fping">fping</a></li>
@@ -42,6 +43,13 @@ a { color: black; text-decoration: underline; font-weight: normal;}
 </p>
 
 <hr />
+
+
+
+
+
+
+
 
 <h3><a name="static"></a>Static value</h3>
 
@@ -53,6 +61,14 @@ a { color: black; text-decoration: underline; font-weight: normal;}
 <p>The values in the target string can use the same K,M,G,T suffixes as BANDWIDTH.</p>
 
 <hr />
+
+
+
+
+
+
+
+
 <h3><a name="rrd"></a>RRDtool files</h3>
 
 <div class="definition">TARGET <em>rrdfile.rrd</em>:<em>in_ds</em>:<em>out_ds</em></div>
@@ -93,7 +109,7 @@ change that assumption so that the DS plugin looks somewhere else.</p>
 <p>If the plugin detects that it is running within the Cacti poller process, it defines a couple of useful global Hint Variables for Cacti users - {map:cacti_path_rra} contains the path to the rra/ directory in your Cacti installation, with no trailing slash, and {map:cacti_url} is
 the URL to the front page of your Cacti installation, as known to the Plugin Architecture. These can be used in the TARGET, INFOURL and OVERLIBGRAPH commands in particular, to reduce a lot of duplication.</p>
 
-<h4>Cacti poller_output support (aka Boost support)</h4>
+<h4><a name="rrdpollerextras">Cacti poller_output support</a> (aka Boost support)</h4>
 
 <p>If you are using Cacti as your data collector, and running Weathermap from Cacti's poller, then there is another special feature, called poller_output. Weathermap can intercept data as it is collected by Cacti, and therefore avoid
 running lots of external rrdtool processes to collect the data it needs to display your map. This is <em>especially</em> useful if you are using TheWitness' Boost plugin, as the data isn't written to the rrd files
@@ -137,6 +153,16 @@ to allow Weathermap to work alongside Boost, then there is no workaround - the d
 <p>XXX THIS NEEDS TO BE WRITTEN!</p>
 
 <hr />
+
+
+
+
+
+
+
+
+
+
 <h3><a name="tabs"></a>Tab-separated text</h3>
 <div class="definition">TARGET <em>textfile</em></div>
 
@@ -155,6 +181,17 @@ link3    34.6K 113</pre>
 </div>
 
 <hr />
+
+
+
+
+
+
+
+
+
+
+
 <h3><a name="mrtg"></a>MRTG .html file</h3>
 <div class="definition">TARGET <em>htmlfile</em></div>
 
@@ -197,6 +234,15 @@ SCALE cactiupdown 2.5 3.5 0 255 0 </pre>
 </div>
 </p>
 <hr />
+
+
+
+
+
+
+
+
+
 <h3><a name="cactithold"></a>Cacti threshold status</h3>
 <div class="definition">TARGET cactimonitor:<em>hostid</em></div>
 <div class="definition">TARGET cactithold:<em>tholdid</em></div>
@@ -237,6 +283,52 @@ and you want to see how many of the set have exceeded their session count. You w
 defines a scale where 0 is green and 100% is red and in between is a smooth gradient. Each target will return either 0 or 1, so 100% failed thresholds gives a value of 4. Setting the MAXVALUE to 4 makes that 100% within weathermap.
 </p>
 <hr />
+
+
+
+
+
+
+
+
+
+<h3><a name="cactidsstats"></a>Cacti DSStats data collection plugin</h3>
+
+<div class="definition">TARGET dsstats:<em>dsid</em>:<em>in_ds</em>:<em>out_ds</em></div>
+<div class="definition">TARGET dsstats:<em>source</em>:<em>dsid</em>:<em>in_ds</em>:<em>out_ds</em></div>
+
+<p>The <a href="http://forums.cacti.net/about33875.html">DSStats Cacti plugin</a> stores data as the poller collects it, and also collates periodic average and maximums.
+Which are all stored in tables in the Cacti database. This makes collecting data (especially the periodic data) much more efficient.
+This DS plugin will read that data, saving a lot of external calls to <tt>rrdtool</tt>. This is similar to the 'poller_output' mode of the
+rrdtool DS, except that this way will allow you to easily make monthly or weekly summary maps. On the downside you need to supply the Cacti internal
+datasource ID for each target, rather than the rrd filename.</p>
+
+<p>The <em>dsid</em> parameter is the 'local_data_id' in Cacti - you can see this in the URLs on the datasource management page. The 'in_ds' and 'out_ds' are the names
+of the RRD DS that Cacti will update with these values (e.g. traffic_in and traffic_out for normal Interface Traffic). Either of the in_ds or out_ds can be a single hyphen (-) to
+indicate that you don't care about filling in a value for that direction. </p> 
+<p>The <em>source</em> parameter defines what data to use for this query. 'last' fetches the most-recently collected value for that dsid. The remaining possibilities all combine a 
+period and a type. The possible periods are 'hourly','daily','weekly','monthly' and 'yearly'. The types are 'average' and 'peak'. So to get the maximium value over the last week, use 'weeklypeak' as your <em>source</em>. 
+If one is not specified at all (as in the first format above), then 'last' is assumed.</p>
+<p>The DSStats datasource also sets the same additional variables described in for <a href="#rrdpollerextras">poller_output support</a> in the rrdtool plugin.</p>
+<p><strong>NOTE:</strong> One important difference between this and poller_ouput mode or regular rrdtool targets is that this plugin fetches the
+raw data from the poller. If you collecting octet counter data (like interface traffic) then you will need to multiply that data by 8 to get 
+bits per second:</p>
+<div class="example"><pre>
+	TARGET 8*dsstats:4455:traffic_in:traffic_out
+</pre>
+</div>
+
+<hr />
+
+
+
+
+
+
+
+
+
+
 <h3><a name="snmp"></a>SNMP value</h3>
 
 <div class="definition">TARGET snmp:<em>community</em>:<em>host</em>:<em>in_oid</em>:<em>out_oid</em></div>
@@ -248,6 +340,18 @@ just get the total bytes rather than a rate, for example.</p>
 <p>It also sets snmp_in_raw and snmp_out_raw to the 'raw' results from the SNMP library, before the plugin tried to force them to be numbers.</p>
 
 <hr />
+
+
+
+
+
+
+
+
+
+
+
+
 <h3><a name="script"></a>External script</h3>
 
 <div class="definition">TARGET !<em>scriptname</em></div>
@@ -259,6 +363,16 @@ just get the total bytes rather than a rate, for example.</p>
 if your script really is intended for MRTG, as the 3rd line would be the device uptime and the 4th line would be it's name.</p>
 
 <hr />
+
+
+
+
+
+
+
+
+
+
 <h3><a name="fping"></a>FPING</h3>
 
 <div class="definition">TARGET fping:<em>hostname</em></div>
@@ -268,6 +382,10 @@ if your script really is intended for MRTG, as the 3rd line would be the device 
 various statistics about it's state.</p>
 <p>You can adjust the number of pings (the default is 5), by setting the 'fping_ping_count' global variable to another number.</p>
 <p>After it has been run, the 'in' value is the average ping time in milliseconds, the 'out' value is the percentage packet loss from 5 pings (or whatever you have set), the 'fping_min' Hint Variable is the minimum  ping time in milliseconds, and 'fping_max' is the maximum.</p>
+
+
+
+
   </div>
 </body>
 </html>

@@ -154,7 +154,7 @@ class WeatherMapDataSource_dsstats extends WeatherMapDataSource {
 				{
 					foreach ( array(IN,OUT) as $dir)
 					{
-						if($dsnames[$dir] == $result['name'] && ($result['result'] != -90909090909 || $result['result'] !='U'))
+						if( ($dsnames[$dir] == $result['name']) && ($result['result'] != -90909090909) && ($result['result'] !='U') )
 						{
 							$data[$dir] = $result['result'];		
 						}

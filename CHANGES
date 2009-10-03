@@ -7,6 +7,7 @@
 	FIXED - DS plugins that return one value and a null should work properly
 	FIXED - "Strange" characters (e.g. /) in NODE and LINK names broke the imagemap.
 	FIXED - Map Style settings in editor were broken after internal defaults changes
+	FIXED - Imagemap no longer contains areas with no href defined
 	ADDED - Option of a dropdown selector to navigate between maps (in full-size view)
 	ADDED - Maps can be organised into groups in Cacti plugin. These appear
 			as tabs in the UI for viewing maps.

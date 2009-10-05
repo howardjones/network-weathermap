@@ -1408,10 +1408,17 @@ function nice_bandwidth($number, $kilo = 1000,$decimals=1,$below_one=TRUE)
 
 function nice_scalar($number, $kilo = 1000, $decimals=1)
 {
-	$suffix='';
-
+	$suffix = '';
+	$prefix = '';
+	
 	if ($number == 0)
 		return '0';
+		
+	if($number < 0)
+	{
+		$number = -$number;
+		$prefix = '-';
+	}
 
 	$mega=$kilo * $kilo;
 	$giga=$mega * $kilo;
@@ -1453,7 +1460,7 @@ function nice_scalar($number, $kilo = 1000, $decimals=1)
 		$suffix="m";
 	}
 
-	$result=format_number($number, $decimals) . $suffix;
+	$result = $prefix . format_number($number, $decimals) . $suffix;
 	return ($result);
 }
 

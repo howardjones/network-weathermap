@@ -412,8 +412,6 @@ function maplist()
 	#print_r($menu);
 	#print "</pre>";
 	
-	print "<a href='weathermap-cacti-plugin-mgmt.php?action=groupadmin'>Group Admin</a><p>";
-	
 	html_start_box("<strong>Weathermaps</strong>", "78%", $colors["header"], "3", "center", "weathermap-cacti-plugin-mgmt.php?action=addmap_picker");
 
 	html_header(array("Config File", "Title", "Group", "Active", "Settings", "Sort Order", "Accessible By",""));
@@ -555,11 +553,14 @@ function maplist()
 	{
 		print '<div align="center" class="wm_warning">'.$had_warnings.' of your maps had warnings last time '.($had_warnings>1?"they":"it").' ran. You can try to find these in your Cacti log file or by clicking on the warning sign next to that map (you might need to increase the log line count).</div>';
 	}
-		
+	
+	print "<div align='center'>";	
+	print "<a href='weathermap-cacti-plugin-mgmt.php?action=groupadmin'><img src='images/button_editgroups.png' border=0 alt='Edit Groups' /></a>";
 	if($i>0 && $i_understand_file_permissions_and_how_to_fix_them)
 	{
-		print '<div align="center"><a href="?action=rebuildnow"><img src="images/btn_recalc.png" border="0" alt="Rebuild All Maps Right Now"><br />(Experimental - You should NOT need to use this normally)</a></div>';
+		print '<br /><a href="?action=rebuildnow"><img src="images/btn_recalc.png" border="0" alt="Rebuild All Maps Right Now"><br />(Experimental - You should NOT need to use this normally)</a><br />';
 	}
+	print "</div>";
 
 }
 
@@ -1090,6 +1091,7 @@ function weathermap_group_editor()
 	global $colors, $config;
 
 	html_start_box("<strong>Edit Map Groups</strong>", "70%", $colors["header"], "2", "center", "weathermap-cacti-plugin-mgmt.php?action=group_form&id=0");
+	html_header(array("", "Group Name", "Settings", "Sort Order", ""));
 		
 	$groups = db_fetch_assoc("select * from weathermap_groups order by sortorder");
 

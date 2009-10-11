@@ -19,6 +19,7 @@
 	ADDED - SCALE will accept values below 0, and also above 100
 	ADDED - USESCALE has two new options: absolute and percent, which allows you to have a SCALE of absolute values
 	ADDED - New datasource plugin to support statistics from TheWitness's DSStats Cacti Plugin. This gets you daily,weekly,monthly and annual stats with no complicated rrdtool stuff.
+	ADDED - New converter to take a rrdtool-based map config and make it into a DSStats-based one
 	ADDED - static datasource can be used for negative values
 	
 0.96a	FIXED - New z-ordering code did not work correctly on PHP4. This broke (at least) the editor. (thanks toe_cutter)

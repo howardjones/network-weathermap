@@ -768,7 +768,7 @@ function ProcessTargets()
 					$tindex = 0;
 					foreach ($myobj->targets as $target)
 					{
-						debug ("ReadData: New Target: $target[4]\n");
+						debug ("ProcessTargets: New Target: $target[4]\n");
 						// processstring won't use notes (only hints) for this string
 						
 						$targetstring = $this->ProcessString($target[4], $myobj, FALSE, FALSE);
@@ -821,14 +821,14 @@ function ProcessTargets()
 									}
 									else
 									{
-										warn("ReadData: $type $name, target: $targetstring on config line $target[3] of $target[2] was recognised as a valid TARGET by a plugin that is unable to run ($ds_class) [WMWARN07]\n");
+										warn("ProcessTargets: $type $name, target: $targetstring on config line $target[3] of $target[2] was recognised as a valid TARGET by a plugin that is unable to run ($ds_class) [WMWARN07]\n");
 									}
 								}
 							}
 						}
 						if(! $matched)
 						{
-							warn("ReadData: $type $name, target: $target[4] on config line $target[3] of $target[2] was not recognised as a valid TARGET [WMWARN08]\n");
+							warn("ProcessTargets: $type $name, target: $target[4] on config line $target[3] of $target[2] was not recognised as a valid TARGET [WMWARN08]\n");
 						}							
 						
 						$tindex++;

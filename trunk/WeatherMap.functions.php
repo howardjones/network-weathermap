@@ -708,7 +708,7 @@ function draw_straight($image, &$curvepoints, $widths, $outlinecolour, $fillcolo
 	$q2_percent=50, $unidirectional=FALSE)
 {
 	$totaldistance = $curvepoints[count($curvepoints)-1][DISTANCE];
-	
+		
 	if($unidirectional)
 	{
 		$halfway = $totaldistance;
@@ -722,13 +722,14 @@ function draw_straight($image, &$curvepoints, $widths, $outlinecolour, $fillcolo
 	else
 	{
 	    // we'll split the spine in half here.
-	    $q2_percent = 50;
+	  #  $q2_percent = 50;
 	    $halfway = $totaldistance * ($q2_percent/100);
 	    
 	    $dirs = array(OUT,IN);
+		# $dirs = array(IN);
 	    
 	    list($halfway_x,$halfway_y,$halfwayindex) = find_distance_coords($curvepoints,$halfway);
-	    # print "Midpoint is: $halfway_x,$halfway_y\n";
+	#    print "Midpoint is: $totaldistance  $halfway  $halfwayindex   $halfway_x,$halfway_y\n";
 	    	
 	    $spine[OUT] = array();
 	    $spine[IN] = array();
@@ -736,7 +737,7 @@ function draw_straight($image, &$curvepoints, $widths, $outlinecolour, $fillcolo
 	
 	    for($i=0; $i<=$halfwayindex; $i++)
 	    {
-		$spine[OUT] []= $curvepoints[$i];
+			$spine[OUT] []= $curvepoints[$i];
 	    }
 	    // finally, add the actual midpoint
 	    $spine[OUT] []= array($halfway_x,$halfway_y, $halfway);
@@ -744,12 +745,14 @@ function draw_straight($image, &$curvepoints, $widths, $outlinecolour, $fillcolo
 	    // and then from the end to the middle for the other arrow
 	    for($i=$npoints; $i>$halfwayindex; $i--)
 	    {
-		// copy the original spine, but reversing the distance calculation
-		$spine[IN] []= array($curvepoints[$i][X], $curvepoints[$i][Y], $totaldistance - $curvepoints[$i][DISTANCE]);
+			// copy the original spine, but reversing the distance calculation
+			$spine[IN] []= array($curvepoints[$i][X], $curvepoints[$i][Y], $totaldistance - $curvepoints[$i][DISTANCE]);
 	    }
 	    // finally, add the actual midpoint
-	    $spine[IN] []= array($halfway_x,$halfway_y, $halfway);
+	    $spine[IN] []= array($halfway_x,$halfway_y, $totaldistance - $halfway);
 	}
+	
+	# wm_draw_marker_box($image,$map->selected, $halfway_x, $halfway_y );
 	
 	// now we have two seperate spines, with distances, so that the arrowhead is the end of each.
 	// (or one, if it's unidir)
@@ -758,8 +761,8 @@ function draw_straight($image, &$curvepoints, $widths, $outlinecolour, $fillcolo
 	
 	// we calculate the arrow size up here, so that we can decide on the
 	// minimum length for a link. The arrowheads are the limiting factor.
-	list($arrowsize[IN],$arrowwidth[IN]) = calc_arrowsize($widths[IN], $map, $linkname);
-	list($arrowsize[OUT],$arrowwidth[OUT]) = calc_arrowsize($widths[OUT], $map, $linkname);
+	list( $arrowsize[IN], $arrowwidth[IN] ) = calc_arrowsize( $widths[IN], $map, $linkname );
+	list( $arrowsize[OUT], $arrowwidth[OUT] ) = calc_arrowsize( $widths[OUT], $map, $linkname );
 	
 	// the 1.2 here is empirical. It ought to be 1 in theory.
 	// in practice, a link this short is useless anyway, especially with bwlabels.
@@ -767,8 +770,14 @@ function draw_straight($image, &$curvepoints, $widths, $outlinecolour, $fillcolo
 
 	foreach ($dirs as $dir)
 	{
+		# draw_spine($image, $spine[$dir],$map->selected);
+		#draw_spine_chain($image, $spine[$dir],$map->selected,3);
+		#print "=================\n$linkname/$dir\n";
+		#dump_spine($spine[$dir]);
 	    $n = count($spine[$dir]) - 1;
 	    $l = $spine[$dir][$n][DISTANCE];
+		
+		#print "L=$l N=$n\n";
 	
 	    // loop increment, start point, width, labelpos, fillcolour, outlinecolour, commentpos    
 	    $arrowsettings = array(+1, 0, $widths[$dir], 0, $fillcolours[$dir], $outlinecolour, 5);
@@ -776,237 +785,240 @@ function draw_straight($image, &$curvepoints, $widths, $outlinecolour, $fillcolo
 	    # print "Line is $n points to a distance of $l\n";
 	    if($l < $minimumlength)
 	    {
-		warn("Skipping too-short line.\n");
+			warn("Skipping too-short line.\n");
 	    }
 	    else
-	    {
-		$arrow_d = $l - $arrowsize[$dir];
-		list($pre_mid_x,$pre_mid_y,$pre_midindex) = find_distance_coords($spine[$dir], $arrow_d);
-		
-		$out = array_slice($spine[$dir], 0, $pre_midindex);
-		$out []= array($pre_mid_x, $pre_mid_y, $arrow_d);
-		
-	#	imagearc($image,$spine[$dir][$pre_midindex+1][X],$spine[$dir][$pre_midindex+1][Y],20,20,0,360,$map->selected);
-		# imagearc($image,$spine[$dir][$pre_midindex][X],$spine[$dir][$pre_midindex][Y],20,20,0,360,$map->selected);
-	#	imagearc($image,$pre_mid_x,$pre_mid_y,20,20,0,360,$map->selected);
-		
-		$spine[$dir] = $out;
-		
-		$adx=($halfway_x - $pre_mid_x);
-		$ady=($halfway_y - $pre_mid_y);
-		$ll=sqrt(($adx * $adx) + ($ady * $ady));
-	
-		$anx = $ady / $ll;
-		$any = -$adx / $ll;
-		
-		$ax1 = $pre_mid_x + $widths[$dir] * $anx;
-		$ay1 = $pre_mid_y + $widths[$dir] * $any;
-	
-		$ax2 = $pre_mid_x + $arrowwidth[$dir] * $anx;
-		$ay2 = $pre_mid_y + $arrowwidth[$dir] * $any;
-		
-		$ax3 = $halfway_x;
-		$ay3 = $halfway_y;
-		
-		$ax5 = $pre_mid_x - $widths[$dir] * $anx;
-		$ay5 = $pre_mid_y - $widths[$dir] * $any;
-	
-		$ax4 = $pre_mid_x - $arrowwidth[$dir] * $anx;
-		$ay4 = $pre_mid_y - $arrowwidth[$dir] * $any;             
-		
-		# draw_spine($image,$spine[$dir],$map->selected);
-		
-		# print "$linkname/$dir\n";
-		$simple = simplify_spine($spine[$dir]);
-		$newn = count($simple);
-		
-		
-		# draw_spine($image,$simple,$map->selected);
-		
-		# print "Simplified to $newn points\n";
-		# if($draw_skeleton) draw_spine_chain($im,$simple,$blue, 12);
-		// draw_spine_chain($im,$spine[$dir],$blue, 10);
-	
-		# draw_spine_chain($image,$simple,$map->selected, 12);
-		# draw_spine($image,$simple,$map->selected);
-		
-		// now do the actual drawing....
+		{			
+			$arrow_d = $l - $arrowsize[$dir];
+			# print "LENGTHS $l $arrow_d ".$arrowsize[$dir]."\n";
+			list($pre_mid_x,$pre_mid_y,$pre_midindex) = find_distance_coords($spine[$dir], $arrow_d);
+			# print "POS $pre_mid_x,$pre_mid_y  $pre_midindex\n";
+			$out = array_slice($spine[$dir], 0, $pre_midindex);
+			$out []= array($pre_mid_x, $pre_mid_y, $arrow_d);
 			
-		$numpoints=0;
-		$numrpoints=0;
+			# wm_draw_marker_diamond($image, $map->selected, $pre_mid_x, $pre_mid_y, 5);
+			# imagearc($image,$pre_mid_x, $pre_mid_y ,15,15,0,360,$map->selected);
+			
+			# imagearc($image,$spine[$dir][$pre_midindex+1][X],$spine[$dir][$pre_midindex+1][Y],20,20,0,360,$map->selected);
+			# imagearc($image,$spine[$dir][$pre_midindex][X],$spine[$dir][$pre_midindex][Y],20,20,0,360,$map->selected);
+			#imagearc($image,$pre_mid_x,$pre_mid_y,20,20,0,360,$map->selected);
+			#imagearc($image,$spine[$dir][$pre_midindex][X],$spine[$dir][$pre_midindex][Y],12,12,0,360,$map->selected);
+						
+			$spine[$dir] = $out;
+			
+			$adx=($halfway_x - $pre_mid_x);
+			$ady=($halfway_y - $pre_mid_y);
+			$ll=sqrt(($adx * $adx) + ($ady * $ady));
 		
-		$finalpoints = array();
-		$reversepoints = array();
+			$anx = $ady / $ll;
+			$any = -$adx / $ll;
+			
+			$ax1 = $pre_mid_x + $widths[$dir] * $anx;
+			$ay1 = $pre_mid_y + $widths[$dir] * $any;
 		
-		$finalpoints[] = $simple[0][X];
-		$finalpoints[] = $simple[0][Y];
-		$numpoints++;
+			$ax2 = $pre_mid_x + $arrowwidth[$dir] * $anx;
+			$ay2 = $pre_mid_y + $arrowwidth[$dir] * $any;
+			
+			$ax3 = $halfway_x;
+			$ay3 = $halfway_y;
+			
+			$ax5 = $pre_mid_x - $widths[$dir] * $anx;
+			$ay5 = $pre_mid_y - $widths[$dir] * $any;
 		
-		$reversepoints[] = $simple[0][X];
-		$reversepoints[] = $simple[0][Y];
-		$numrpoints++;
+			$ax4 = $pre_mid_x - $arrowwidth[$dir] * $anx;
+			$ay4 = $pre_mid_y - $arrowwidth[$dir] * $any;             
+			
+			# draw_spine($image,$spine[$dir],$map->selected);
+						
+			$simple = simplify_spine($spine[$dir]);
+			$newn = count($simple);	
+			
+			# draw_spine($image,$simple,$map->selected);
+			
+			# print "Simplified to $newn points\n";
+			# if($draw_skeleton) draw_spine_chain($im,$simple,$blue, 12);
+			# draw_spine_chain($image,$simple,$map->selected, 12);
+			 # draw_spine_chain($image,$spine[$dir],$map->selected, 10);
 		
-		// before the main loop, add in the jump out to the corners
-		// if this is the first step, then we need to go from the middle to the outside edge first
-		// ( the loop may not run, but these corners are required)
-		$i = 0;
-		$v1 = new Vector($simple[$i+1][X] - $simple[$i][X], $simple[$i+1][Y] - $simple[$i][Y]);
-		$n1 = $v1->get_normal();
-					
-		$finalpoints[] = $simple[$i][X] + $n1->dx*$widths[$dir];
-		$finalpoints[] = $simple[$i][Y] + $n1->dy*$widths[$dir];
-		$numpoints++;
-		
-		$reversepoints[] = $simple[$i][X] - $n1->dx*$widths[$dir];
-		$reversepoints[] = $simple[$i][Y] - $n1->dy*$widths[$dir];
-		$numrpoints++;
-		
-		$max_start = count($simple)-2;
-		# print "max_start is $max_start\n";
-		for ($i=0; $i <$max_start; $i++)
-		{       
-		    $v1 = new Vector($simple[$i+1][X] - $simple[$i][X], $simple[$i+1][Y] - $simple[$i][Y]);
-		    $v2 = new Vector($simple[$i+2][X] - $simple[$i+1][X], $simple[$i+2][Y] - $simple[$i+1][Y]);
-		    $n1 = $v1->get_normal();
-		    $n2 = $v2->get_normal();
-		    
-		    $capping = FALSE;
-		    // figure out the angle between the lines - for very sharp turns, we should do something special
-		    // (actually, their normals, but the angle is the same and we need the normals later)
-		    $angle = rad2deg(atan2($n2->dy,$n2->dx) - atan2($n1->dy,$n1->dx));
-		    if($angle > 180) $angle -= 360;
-		    if($angle < -180) $angle += 360;
-	    
-		    if(abs($angle)>169)
-		    {
-			$capping = TRUE;
-			# print "Would cap. ($angle)\n";
-		    }
-		    
-		    // $capping = FALSE; // override that for now           
+			# draw_spine_chain($image,$simple,$map->selected, 12);
+			# draw_spine($image,$simple,$map->selected);
+			
+			// now do the actual drawing....
 				
-		    // now figure out the geometry for where the next corners are
-		    
-		    list($xi1,$yi1) = line_crossing( $simple[$i][X] + $n1->dx * $widths[$dir], $simple[$i][Y] + $n1->dy * $widths[$dir],
-						    $simple[$i+1][X] + $n1->dx * $widths[$dir], $simple[$i+1][Y] + $n1->dy * $widths[$dir],
-						    $simple[$i+1][X] + $n2->dx * $widths[$dir], $simple[$i+1][Y] + $n2->dy * $widths[$dir],
-						    $simple[$i+2][X] + $n2->dx * $widths[$dir], $simple[$i+2][Y] + $n2->dy * $widths[$dir]
-					    );
-		
-		    list($xi2,$yi2) = line_crossing( $simple[$i][X] - $n1->dx * $widths[$dir], $simple[$i][Y] - $n1->dy * $widths[$dir],
-						$simple[$i+1][X] - $n1->dx * $widths[$dir], $simple[$i+1][Y] - $n1->dy * $widths[$dir],
-						$simple[$i+1][X] - $n2->dx * $widths[$dir], $simple[$i+1][Y] - $n2->dy * $widths[$dir],
-						$simple[$i+2][X] - $n2->dx * $widths[$dir], $simple[$i+2][Y] - $n2->dy * $widths[$dir]                                
-						);           
-		    
-		    if(!$capping)
-		    {
-			$finalpoints[] = $xi1;
-			$finalpoints[] = $yi1;
+			$numpoints=0;
+			$numrpoints=0;
+			
+			$finalpoints = array();
+			$reversepoints = array();
+			
+			$finalpoints[] = $simple[0][X];
+			$finalpoints[] = $simple[0][Y];
 			$numpoints++;
-				
-			$reversepoints[] = $xi2;
-			$reversepoints[] = $yi2;
-			$numrpoints++;                
-		    }
-		    else
-		    {
-			// in here, we need to decide which is the 'outside' of the corner,
-			// because that's what we flatten. The inside of the corner is left alone.
-			// - depending on the relative angle between the two segments, it could
-			//   be either one of these points.
 			
-			list($xi3,$yi3) = line_crossing( $simple[$i][X] + $n1->dx*$widths[$dir], $simple[$i][Y] + $n1->dy*$widths[$dir],
-					    $simple[$i+1][X] + $n1->dx*$widths[$dir], $simple[$i+1][Y] + $n1->dy*$widths[$dir],
-					    $simple[$i+1][X] - $n2->dx*$widths[$dir], $simple[$i+1][Y] - $n2->dy*$widths[$dir],
-					    $simple[$i+2][X] - $n2->dx*$widths[$dir], $simple[$i+2][Y] - $n2->dy*$widths[$dir]                                
-					    );
-	    
-			list($xi4,$yi4) = line_crossing( $simple[$i][X] - $n1->dx*$widths[$dir], $simple[$i][Y] - $n1->dy*$widths[$dir],
-						$simple[$i+1][X] - $n1->dx*$widths[$dir], $simple[$i+1][Y] - $n1->dy*$widths[$dir],
-						$simple[$i+1][X] + $n2->dx*$widths[$dir], $simple[$i+1][Y] + $n2->dy*$widths[$dir],
-						$simple[$i+2][X] + $n2->dx*$widths[$dir], $simple[$i+2][Y] + $n2->dy*$widths[$dir]                                
-						);                
-			if($angle < 0)
+			$reversepoints[] = $simple[0][X];
+			$reversepoints[] = $simple[0][Y];
+			$numrpoints++;
+			
+			// before the main loop, add in the jump out to the corners
+			// if this is the first step, then we need to go from the middle to the outside edge first
+			// ( the loop may not run, but these corners are required)
+			$i = 0;
+			$v1 = new Vector($simple[$i+1][X] - $simple[$i][X], $simple[$i+1][Y] - $simple[$i][Y]);
+			$n1 = $v1->get_normal();
+						
+			$finalpoints[] = $simple[$i][X] + $n1->dx*$widths[$dir];
+			$finalpoints[] = $simple[$i][Y] + $n1->dy*$widths[$dir];
+			$numpoints++;
+			
+			$reversepoints[] = $simple[$i][X] - $n1->dx*$widths[$dir];
+			$reversepoints[] = $simple[$i][Y] - $n1->dy*$widths[$dir];
+			$numrpoints++;
+			
+			$max_start = count($simple)-2;
+			# print "max_start is $max_start\n";
+			for ($i=0; $i <$max_start; $i++)
+			{       
+				$v1 = new Vector($simple[$i+1][X] - $simple[$i][X], $simple[$i+1][Y] - $simple[$i][Y]);
+				$v2 = new Vector($simple[$i+2][X] - $simple[$i+1][X], $simple[$i+2][Y] - $simple[$i+1][Y]);
+				$n1 = $v1->get_normal();
+				$n2 = $v2->get_normal();
+				
+				$capping = FALSE;
+				// figure out the angle between the lines - for very sharp turns, we should do something special
+				// (actually, their normals, but the angle is the same and we need the normals later)
+				$angle = rad2deg(atan2($n2->dy,$n2->dx) - atan2($n1->dy,$n1->dx));
+				if($angle > 180) $angle -= 360;
+				if($angle < -180) $angle += 360;
+			
+				if(abs($angle)>169)
+				{
+					$capping = TRUE;
+					# print "Would cap. ($angle)\n";
+				}
+				
+				// $capping = FALSE; // override that for now           
+				// now figure out the geometry for where the next corners are
+				
+				list($xi1,$yi1) = line_crossing( $simple[$i][X] + $n1->dx * $widths[$dir], $simple[$i][Y] + $n1->dy * $widths[$dir],
+								$simple[$i+1][X] + $n1->dx * $widths[$dir], $simple[$i+1][Y] + $n1->dy * $widths[$dir],
+								$simple[$i+1][X] + $n2->dx * $widths[$dir], $simple[$i+1][Y] + $n2->dy * $widths[$dir],
+								$simple[$i+2][X] + $n2->dx * $widths[$dir], $simple[$i+2][Y] + $n2->dy * $widths[$dir]
+							);
+			
+				list($xi2,$yi2) = line_crossing( $simple[$i][X] - $n1->dx * $widths[$dir], $simple[$i][Y] - $n1->dy * $widths[$dir],
+							$simple[$i+1][X] - $n1->dx * $widths[$dir], $simple[$i+1][Y] - $n1->dy * $widths[$dir],
+							$simple[$i+1][X] - $n2->dx * $widths[$dir], $simple[$i+1][Y] - $n2->dy * $widths[$dir],
+							$simple[$i+2][X] - $n2->dx * $widths[$dir], $simple[$i+2][Y] - $n2->dy * $widths[$dir]                                
+							);           
+				
+				if(!$capping)
+				{
+					$finalpoints[] = $xi1;
+					$finalpoints[] = $yi1;
+					$numpoints++;
+						
+					$reversepoints[] = $xi2;
+					$reversepoints[] = $yi2;
+					$numrpoints++;                
+				}
+				else
+				{
+				// in here, we need to decide which is the 'outside' of the corner,
+				// because that's what we flatten. The inside of the corner is left alone.
+				// - depending on the relative angle between the two segments, it could
+				//   be either one of these points.
+				
+				list($xi3,$yi3) = line_crossing( $simple[$i][X] + $n1->dx*$widths[$dir], $simple[$i][Y] + $n1->dy*$widths[$dir],
+							$simple[$i+1][X] + $n1->dx*$widths[$dir], $simple[$i+1][Y] + $n1->dy*$widths[$dir],
+							$simple[$i+1][X] - $n2->dx*$widths[$dir], $simple[$i+1][Y] - $n2->dy*$widths[$dir],
+							$simple[$i+2][X] - $n2->dx*$widths[$dir], $simple[$i+2][Y] - $n2->dy*$widths[$dir]                                
+							);
+			
+				list($xi4,$yi4) = line_crossing( $simple[$i][X] - $n1->dx*$widths[$dir], $simple[$i][Y] - $n1->dy*$widths[$dir],
+							$simple[$i+1][X] - $n1->dx*$widths[$dir], $simple[$i+1][Y] - $n1->dy*$widths[$dir],
+							$simple[$i+1][X] + $n2->dx*$widths[$dir], $simple[$i+1][Y] + $n2->dy*$widths[$dir],
+							$simple[$i+2][X] + $n2->dx*$widths[$dir], $simple[$i+2][Y] + $n2->dy*$widths[$dir]                                
+							);                
+				if($angle < 0)
+				{
+					$finalpoints[] = $xi3;
+					$finalpoints[] = $yi3;
+					$numpoints++;
+					
+					$finalpoints[] = $xi4;
+					$finalpoints[] = $yi4;
+					$numpoints++;
+					
+					$reversepoints[] = $xi2;
+					$reversepoints[] = $yi2;
+					$numrpoints++;
+				}
+				else
+				{
+					$reversepoints[] = $xi4;
+					$reversepoints[] = $yi4;
+					$numrpoints++;
+					
+					$reversepoints[] = $xi3;
+					$reversepoints[] = $yi3;
+					$numrpoints++;
+					
+					$finalpoints[] = $xi1;
+					$finalpoints[] = $yi1;
+					$numpoints++;
+				}
+				
+				}
+			}
+		  
+			// at this end, we add the arrowhead
+			
+			$finalpoints[] = $ax1;
+			$finalpoints[] = $ay1;
+			$finalpoints[] = $ax2;
+			$finalpoints[] = $ay2;
+			$finalpoints[] = $ax3;
+			$finalpoints[] = $ay3;
+			$finalpoints[] = $ax4;
+			$finalpoints[] = $ay4;
+			$finalpoints[] = $ax5;
+			$finalpoints[] = $ay5;
+			
+			$numpoints += 5;
+		
+			// combine the forwards and backwards paths, to make a complete loop
+			for($i=($numrpoints-1)*2; $i>=0; $i-=2)
 			{
-				$finalpoints[] = $xi3;
-				$finalpoints[] = $yi3;
-				$numpoints++;
+				$x = $reversepoints[$i];
+				$y = $reversepoints[$i+1];
 				
-				$finalpoints[] = $xi4;
-				$finalpoints[] = $yi4;
+				$finalpoints[] = $x;
+				$finalpoints[] = $y;
 				$numpoints++;
-				
-				$reversepoints[] = $xi2;
-				$reversepoints[] = $yi2;
-				$numrpoints++;
+			}
+			// $finalpoints[] contains a complete outline of the line at this stage
+			
+			if (!is_null($fillcolours[$dir]))
+			{
+				# wimagefilledpolygon($image, $finalpoints, count($finalpoints) / 2, $arrowsettings[4]); 
 			}
 			else
 			{
-				$reversepoints[] = $xi4;
-				$reversepoints[] = $yi4;
-				$numrpoints++;
-				
-				$reversepoints[] = $xi3;
-				$reversepoints[] = $yi3;
-				$numrpoints++;
-				
-				$finalpoints[] = $xi1;
-				$finalpoints[] = $yi1;
-				$numpoints++;
+				debug("Not drawing $linkname ($dir) fill because there is no fill colour\n");
 			}
 			
-		    }
-		}
-	  
-		// at this end, we add the arrowhead
+			$areaname = "LINK:L" . $map->links[$linkname]->id . ":$dir";
+			$map->imap->addArea("Polygon", $areaname, '', $finalpoints);
+			debug ("Adding Poly imagemap for $areaname\n");
 		
-		$finalpoints[] = $ax1;
-		$finalpoints[] = $ay1;
-		$finalpoints[] = $ax2;
-		$finalpoints[] = $ay2;
-		$finalpoints[] = $ax3;
-		$finalpoints[] = $ay3;
-		$finalpoints[] = $ax4;
-		$finalpoints[] = $ay4;
-		$finalpoints[] = $ax5;
-		$finalpoints[] = $ay5;
-		
-		$numpoints += 5;
-	
-		// combine the forwards and backwards paths, to make a complete loop
-		for($i=($numrpoints-1)*2; $i>=0; $i-=2)
-		{
-		    $x = $reversepoints[$i];
-		    $y = $reversepoints[$i+1];
-		    
-		    $finalpoints[] = $x;
-		    $finalpoints[] = $y;
-		    $numpoints++;
-		}
-		// $finalpoints[] contains a complete outline of the line at this stage
-		
-		if (!is_null($fillcolours[$dir]))
-		{
-			wimagefilledpolygon($image, $finalpoints, count($finalpoints) / 2, $arrowsettings[4]); 
-		}
-		else
-		{
-			debug("Not drawing $linkname ($dir) fill because there is no fill colour\n");
-		}
-		
-		$areaname = "LINK:L" . $map->links[$linkname]->id . ":$dir";
-		$map->imap->addArea("Polygon", $areaname, '', $finalpoints);
-		debug ("Adding Poly imagemap for $areaname\n");
-	
-		if (!is_null($outlinecolour))
-		{
-			wimagepolygon($image, $finalpoints, count($finalpoints) / 2, $arrowsettings[5]);
-		}
-		else
-		{
-			debug("Not drawing $linkname ($dir) outline because there is no outline colour\n");
-		}
+			if (!is_null($outlinecolour))
+			{
+				wimagepolygon($image, $finalpoints, count($finalpoints) / 2, $arrowsettings[5]);
+			}
+			else
+			{
+				debug("Not drawing $linkname ($dir) outline because there is no outline colour\n");
+			}
 	    }
 	}
 }
@@ -1771,14 +1783,71 @@ function wimagettftext($image, $size, $angle, $x, $y, $color, $file, $string)
 	return(imagettftext($image, $size, $angle, $x, $y, $color, $file, $string));
 }
 
+function wm_draw_marker_diamond($im, $col, $x, $y, $size=10)
+{
+	$points = array();
+	
+	$points []= $x-$size;
+	$points []= $y;
+	
+	$points []= $x;
+	$points []= $y-$size;
+	
+	$points []= $x+$size;
+	$points []= $y;
+	
+	$points []= $x;
+	$points []= $y+$size;
+		
+	$num_points = 4;
+
+	imagepolygon($im, $points, $num_points, $col);
+}
+
+function wm_draw_marker_box($im, $col, $x, $y, $size=10)
+{
+	$points = array();
+	
+	$points []= $x-$size;
+	$points []= $y-$size;
+	
+	$points []= $x+$size;
+	$points []= $y-$size;
+	
+	$points []= $x+$size;
+	$points []= $y+$size;
+	
+	$points []= $x-$size;
+	$points []= $y+$size;
+		
+	$num_points = 4;
+
+	imagepolygon($im, $points, $num_points, $col);
+}
+
+function wm_draw_marker_circle($im, $col, $x, $y, $size=10)
+{
+	imagearc($im,$x, $y ,$size,$size,0,360,$col);
+}
+
 function draw_spine_chain($im,$spine,$col, $size=10)
 {
     $newn = count($spine);
         
     for ($i=0; $i < $newn; $i++)
     {   
-        imagearc($im,$spine[$i][X],$spine[$i][Y],$size,$size,0,360,$col);
+		imagearc($im,$spine[$i][X],$spine[$i][Y],$size,$size,0,360,$col);
     }
+}
+
+function dump_spine($spine)
+{
+	print "===============\n";
+	for($i=0; $i<count($spine); $i++)
+	{
+		printf ("  %3d: %d,%d (%d)\n", $i, $spine[$i][X], $spine[$i][Y], $spine[$i][DISTANCE] );		
+	}
+	print "===============\n";
 }
 
 function draw_spine($im, $spine,$col)

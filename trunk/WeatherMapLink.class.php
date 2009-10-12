@@ -401,7 +401,7 @@ class WeatherMapLink extends WeatherMapItem
 			// then draw the "curve" itself
 			draw_straight($im, $this->curvepoints,
 				array($link_in_width,$link_out_width), $outline_colour, array($gd_in_colour, $gd_out_colour),
-				$this->name, $map, 50, ($this->linkstyle=='oneway'?TRUE:FALSE) );
+				$this->name, $map, $this->splitpos, ($this->linkstyle=='oneway'?TRUE:FALSE) );
 		}
 
 		if ( !$commentcol->is_none() )

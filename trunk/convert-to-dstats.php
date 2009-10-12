@@ -172,6 +172,8 @@
 							$path_rra = $config["rra_path"];
 							$db_rrdname = $rrdfile;
 							$db_rrdname = str_replace($path_rra,"<path_rra>",$db_rrdname);
+							# special case for relative paths
+							$db_rrdname = str_replace("../../rra","<path_rra>",$db_rrdname);
 							
 							if($db_rrdname != $rrdfile)
 							{		

@@ -1,10 +1,13 @@
+Before 0.97
+-----------
 DONE No filenames for weathermap_data
-DONE? Use weathermap_data in dsstats
+DONE Use weathermap_data in dsstats
 DONE docs for dsstats
 Test groups fully
 Add cron settings?
-Converter for rrd to dsstats
+DONE Converter for rrd to dsstats
 DONE Add snmp_cache stuff to dsstats
+DONE BUG - SPLITPOS with VIASTYLE angled breaks arrow drawing.
 
 WISHES
 -------

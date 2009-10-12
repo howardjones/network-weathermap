@@ -911,6 +911,7 @@ function ReadData()
 																
 								if($target[5] != "")
 								{
+									$matched_by = $target[5];
 									list($in,$out,$datatime) =  $this->plugins['data'][ $target[5] ]->ReadData($targetstring, $this, $myobj);
 								}
 	

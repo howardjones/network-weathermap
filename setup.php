@@ -378,6 +378,8 @@ function weathermap_setup_table () {
 			{
 				$sql[] = "alter table weathermap_data add local_data_id int(11) NOT NULL default 0 after sequence";
 				$sql[] = "alter table weathermap_data add index ( `local_data_id` )";
+				# if there is existing data without a local_data_id, ditch it
+				$sql[] = "delete from weathermap_data";
 			}
 		}
 

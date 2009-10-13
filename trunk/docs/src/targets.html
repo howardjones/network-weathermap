@@ -308,7 +308,8 @@ of the RRD DS that Cacti will update with these values (e.g. traffic_in and traf
 indicate that you don't care about filling in a value for that direction. </p> 
 <p>The <em>source</em> parameter defines what data to use for this query. 'last' fetches the most-recently collected value for that dsid. The remaining possibilities all combine a 
 period and a type. The possible periods are 'hourly','daily','weekly','monthly' and 'yearly'. The types are 'average' and 'peak'. So to get the maximium value over the last week, use 'weeklypeak' as your <em>source</em>. 
-If one is not specified at all (as in the first format above), then 'last' is assumed.</p>
+If one is not specified at all (as in the first format above), then 'last' is assumed. You can change that default by setting the global SET variable "dsstats_default_type" to the required default.</p>
+
 <p>The DSStats datasource also sets the same additional variables described in for <a href="#rrdpollerextras">poller_output support</a> in the rrdtool plugin.</p>
 <p><strong>NOTE:</strong> One important difference between this and poller_ouput mode or regular rrdtool targets is that this plugin fetches the
 raw data from the poller. If you collecting octet counter data (like interface traffic) then you will need to multiply that data by 8 to get 

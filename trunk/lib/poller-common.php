@@ -124,6 +124,7 @@ function weathermap_run_maps($mydir) {
 							if(file_exists($mapfile))
 							{
 								if($quietlogging==0) warn("Map: $mapfile -> $htmlfile & $imagefile\n",TRUE);
+								$map_start = time();
 								weathermap_memory_check("MEM starting $mapcount");
 								$wmap = new Weathermap;
 								$wmap->context = "cacti";
@@ -211,6 +212,8 @@ function weathermap_run_maps($mydir) {
 								}
 								
 								unset($wmap);
+								$map_duration = $map_start - time();
+								debug("TIME: $mapfile took $map_duration seconds.\n");
 								weathermap_memory_check("MEM after $mapcount");
 								$mapcount++;
 							}

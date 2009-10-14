@@ -905,11 +905,11 @@ function ReadData()
 							{
 								// processstring won't use notes (only hints) for this string
 								
-								$targetstring = $this->ProcessString($target[4], $myobj, FALSE, FALSE);
-								if($target[4] != $targetstring) debug("Targetstring is now $targetstring\n");							
+								$targetstring = $this->ProcessString($target[0], $myobj, FALSE, FALSE);
+								if($target[0] != $targetstring) debug("Targetstring is now $targetstring\n");							
 								if($multiply != 1) debug("Will multiply result by $multiply\n");
 																
-								if($target[5] != "")
+								if($target[0] != "")
 								{
 									$matched_by = $target[5];
 									list($in,$out,$datatime) =  $this->plugins['data'][ $target[5] ]->ReadData($targetstring, $this, $myobj);

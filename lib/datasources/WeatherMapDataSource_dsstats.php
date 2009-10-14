@@ -104,12 +104,10 @@ class WeatherMapDataSource_dsstats extends WeatherMapDataSource {
 			$datatype = "last";
 
 			if($map->get_hint("dsstats_default_type") != '') {
-					$dsnames[OUT] = $map->get_hint("dsstats_default_type");
+					$datatype = $map->get_hint("dsstats_default_type");
 					debug("Default datatype changed to ".$datatype.".\n");
 			}
-		}
-
-		if(preg_match("/^dsstats:([a-z]+):(\d+):([\-a-zA-Z0-9_]+):([\-a-zA-Z0-9_]+)$/",$targetstring,$matches))
+		}elseif(preg_match("/^dsstats:([a-z]+):(\d+):([\-a-zA-Z0-9_]+):([\-a-zA-Z0-9_]+)$/",$targetstring,$matches))
 		{
 			$dsnames[IN] = $matches[3];
 			$dsnames[OUT] = $matches[4];

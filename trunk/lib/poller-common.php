@@ -212,7 +212,7 @@ function weathermap_run_maps($mydir) {
 								}
 								
 								unset($wmap);
-								$map_duration = $map_start - time();
+								$map_duration = time() - $map_start;
 								debug("TIME: $mapfile took $map_duration seconds.\n");
 								weathermap_memory_check("MEM after $mapcount");
 								$mapcount++;

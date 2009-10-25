@@ -1000,7 +1000,7 @@ function draw_straight($image, &$curvepoints, $widths, $outlinecolour, $fillcolo
 			
 			if (!is_null($fillcolours[$dir]))
 			{
-				# wimagefilledpolygon($image, $finalpoints, count($finalpoints) / 2, $arrowsettings[4]); 
+				wimagefilledpolygon($image, $finalpoints, count($finalpoints) / 2, $arrowsettings[4]); 
 			}
 			else
 			{

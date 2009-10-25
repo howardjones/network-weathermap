@@ -12,7 +12,7 @@
 <p>You can also specify more than one url, in which case the images are 'stacked' one after another in the popup box.</p>	  
 <p>If a NOTES line is also specified for a link, then the image specified here appears with the NOTES text underneath it.</p>
 		<p>It is also possible to specify the OVERLIBGRAPH for the 'in' and 'out' halves of a link individually, using INOVERLIBGRAPH and OUTOVERLIBGRAPH.</p>
-		
+		<p>You can influence how Weathermap positions the popup box, using the OVERLIBWIDTH and OVERLIBHEIGHT keywords.</p>
 		</description>
 		<examples>
 		<example><caption>Typical use of OVERLIBGRAPH</caption><content>OVERLIBGRAPH http://www.yoursite.net/mrtg/router1-link2-daily.png</content></example>

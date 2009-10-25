@@ -340,6 +340,10 @@ bits per second:</p>
 just get the total bytes rather than a rate, for example.</p>
 <p>It also sets snmp_in_raw and snmp_out_raw to the 'raw' results from the SNMP library, before the plugin tried to force them to be numbers.</p>
 
+<p>You can adjust the behaviour of the SNMP plugin with some global SET values. 'snmp_timeout' sets the timeout for a request in <em>microseconds</em> (so the default 1000000=1 second). 'snmp_retries' changes the number of retries per request from the default (2).
+Finally, you can set 'snmp_abort_count' to an integer value - this is the number of failures for a given host before weathermap gives up on that host. The default is 0 (unlimited). This can
+improve performance if you are polling a lot of switch ports on a device that has gone down, for example.</p>
+
 <hr />
 
 

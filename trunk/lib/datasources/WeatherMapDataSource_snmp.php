@@ -49,6 +49,9 @@ class WeatherMapDataSource_snmp extends WeatherMapDataSource {
 		$retries = 2;
 		$abort_count = 0;
 		
+		$in_result = NULL;
+		$out_result = NULL;
+		
 		if($map->get_hint("snmp_timeout") != '') {
 			$timeout = intval($map->get_hint("snmp_timeout"));
 			debug("Timeout changed to ".$timeout." microseconds.\n");
@@ -72,9 +75,11 @@ class WeatherMapDataSource_snmp extends WeatherMapDataSource {
 			$out_oid = $matches[4];
 
 			if( 
-				($abort_count>0) 
-				&& (isset($this->down_cache[$host])) 
-				&& (intval($this->down_cache[$host]) > $abort_count) 
+				($abort_count == 0)
+				|| (
+					( $abort_count>0 ) 
+					&& ( !isset($this->down_cache[$host]) || intval($this->down_cache[$host]) < $abort_count ) 
+				)
 			  )
 			{			
 				if(function_exists("snmp_get_quick_print"))
@@ -96,15 +101,37 @@ class WeatherMapDataSource_snmp extends WeatherMapDataSource {
 					snmp_set_valueretrieval(SNMP_VALUE_PLAIN);
 				}
 
-				if($in_oid != '-') $in_result = snmpget($host,$community,$in_oid,$timeout,$retries);
-				if($out_oid != '-') $out_result = snmpget($host,$community,$out_oid,$timeout,$retries);
-
+				if($in_oid != '-')
+				{ 
+					$in_result = snmpget($host,$community,$in_oid,$timeout,$retries);
+					if($in_result) 
+					{ 
+						$data[IN] = floatval($in_result); 
+						$item->add_hint("snmp_in_raw",$in_result); 
+					} 
+					else
+					{
+						$this->down_cache{$host}++; 
+					}
+				}
+				if($out_oid != '-')
+				{ 
+					$out_result = snmpget($host,$community,$out_oid,$timeout,$retries);
+					if($out_result) 
+					{ 
+						// use floatval() here to force the output to be *some* kind of number
+						// just in case the stupid formatting stuff doesn't stop net-snmp returning 'down' instead of 2
+						$data[OUT] = floatval($out_result); 
+						$item->add_hint("snmp_out_raw",$out_result); 
+					} 
+					else
+					{
+						$this->down_cache{$host}++; 
+					}
+				}
+				
 				debug ("SNMP ReadData: Got $in_result and $out_result\n");
-
-				// use floatval() here to force the output to be *some* kind of number
-				// just in case the stupid formatting stuff doesn't stop net-snmp returning 'down' instead of 2
-				if($in_result) { $data[IN] = floatval($in_result); $item->add_hint("snmp_in_raw",$in_result); } else {  $this->down_cache{$host}++; }
-				if($out_result) { $data[OUT] = floatval($out_result); $item->add_hint("snmp_out_raw",$out_result);} else { $this->down_cache{$host}++; }
+				
 				$data_time = time();
 
 				if(function_exists("snmp_set_quick_print"))

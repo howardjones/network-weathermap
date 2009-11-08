@@ -247,6 +247,14 @@ default:
 	if( isset($_REQUEST['group_id']) && (is_numeric($_REQUEST['group_id']) ) )
 	{
 		$group_id = intval($_REQUEST['group_id']);
+		$_SESSION['wm_last_group'] = $group_id;
+	}
+	else
+	{
+		if(isset($_SESSION['wm_last_group']))
+		{
+			$group_id = intval($_SESSION['wm_last_group']);
+		}
 	}
 
 	$tabs = weathermap_get_valid_tabs();
@@ -736,20 +744,19 @@ function weathermap_mapselector($current_id = 0)
 {
 	global $colors;
 
-
-        $show_selector = intval(read_config_option("weathermap_map_selector"));
+    $show_selector = intval(read_config_option("weathermap_map_selector"));
 
 	if($show_selector == 0) return false;
 
 	$userid = (isset($_SESSION["sess_user_id"]) ? intval($_SESSION["sess_user_id"]) : 1);
-	$maps = db_fetch_assoc("select weathermap_maps.* from weathermap_auth,weathermap_maps where weathermap_maps.id=weathermap_auth.mapid and active='on' and (userid=".$userid." or userid=0)");
+	$maps = db_fetch_assoc("select weathermap_maps.*,weathermap_groups.name, weathermap_groups.sortorder as gsort from weathermap_groups,weathermap_auth,weathermap_maps where weathermap_maps.group_id=weathermap_groups.id and weathermap_maps.id=weathermap_auth.mapid and active='on' and (userid=".$userid." or userid=0) order by gsort, sortorder");
 
 	if(sizeof($maps)>1)
-{
+	{
 
-	/* include graph view filter selector */
-	html_graph_start_box(3, TRUE);
-	?>
+		/* include graph view filter selector */
+		html_graph_start_box(3, TRUE);
+		?>
 	<tr bgcolor="<?php print $colors["panel"];?>" class="noprint">
 			<form name="weathermap_select" method="post">
 			<input name="action" value="viewmap" type="hidden">
@@ -762,12 +769,35 @@ function weathermap_mapselector($current_id = 0)
 									<td>
 										<select name="id">
 <?php
-foreach ($maps as $map)
-{
-	print '<option ';
-	if($current_id == $map['id']) print " SELECTED ";
-	print 'value="'.$map['filehash'].'">'.$map['titlecache'].'</option>';
-}
+
+		$ngroups = 0;
+		$lastgroup = "------lasdjflkjsdlfkjlksdjflksjdflkjsldjlkjsd";
+		foreach ($maps as $map)
+		{
+			if($current_id == $map['id']) $nullhash = $map['filehash'];
+			if($map['name'] != $lastgroup)
+			{
+				$ngroups++;
+				$lastgroup = $map['name'];
+			}
+		}
+
+
+		$lastgroup = "------lasdjflkjsdlfkjlksdjflksjdflkjsldjlkjsd";
+		foreach ($maps as $map)
+		{
+			if($ngroups>1 && $map['name'] != $lastgroup)
+			{
+				print "<option style='font-weight: bold; font-style: italic' value='$nullhash'>".htmlspecialchars($map['name'])."</option>";
+				$lastgroup = $map['name'];
+			}
+			print '<option ';
+			if($current_id == $map['id']) print " SELECTED ";
+			print 'value="'.$map['filehash'].'">';
+			// if we're showing group headings, then indent the map names
+			if($ngroups>1) { print " - "; }
+			print htmlspecialchars($map['titlecache']).'</option>';
+		}
 ?>
 										</select>
 											&nbsp;<input type="image" src="../../images/button_go.gif" alt="Go" border="0" align="absmiddle">										
@@ -779,7 +809,7 @@ foreach ($maps as $map)
 	</tr>
 	<?php
 
-	html_graph_end_box(FALSE);
+		html_graph_end_box(FALSE);
 	}
 }
 

@@ -6,6 +6,8 @@
 # $cacti_base = "C:/Program Files/xampp/htdocs/cacti/";
 $cacti_base = "/var/www/html/cacti/";
 $cacti_base = "/Applications/XAMPP/htdocs/cacti/";
+$cacti_base = "/XAMPP/htdocs/cacti-0.8.7e/";
+$cacti_base = "../../";
 
 // check if the goalposts have moved
 if( is_dir($cacti_base) && file_exists($cacti_base."/include/global.php") )

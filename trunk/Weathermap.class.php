@@ -18,7 +18,7 @@ $weathermap_debug_suppress = array("processstring","mysprintf");
 $weathemap_lazycounter=0;
 
 // Turn on ALL error reporting for now.
-error_reporting (E_ALL);
+// error_reporting (E_ALL|E_STRICT);
 
 // parameterise the in/out stuff a bit
 define("IN",0);

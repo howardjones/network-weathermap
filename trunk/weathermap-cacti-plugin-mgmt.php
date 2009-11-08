@@ -114,8 +114,10 @@ case 'save':
 	$mapid = NULL;
 	$settingid = NULL;
 	$name=''; $value='';
+
 	if( isset($_REQUEST['mapid']) && is_numeric($_REQUEST['mapid']))  { $mapid = intval($_REQUEST['mapid']); }
 	if( isset($_REQUEST['id']) && is_numeric($_REQUEST['id']))  { $settingid = intval($_REQUEST['id']); }
+	
 	if( isset($_REQUEST['name']) && $_REQUEST['name'])  { $name = $_REQUEST['name']; }
 	if( isset($_REQUEST['value']) && $_REQUEST['value'])  { $value = $_REQUEST['value']; }
 	
@@ -144,7 +146,8 @@ case 'map_settings_form':
 		else
 		{
 			weathermap_map_settings_form(intval($_REQUEST['mapid']));
-		}		
+		}
+				
 		weathermap_footer_links();
 		include_once($config["base_path"]."/include/bottom_footer.php");
 	}
@@ -897,26 +900,55 @@ function weathermap_map_settings($id)
 	{
 		$title = "Additional settings for ALL maps";
 		$nonemsg = "There are no settings for all maps yet. You can add some by clicking Add up in the top-right, or choose a single map from the management screen to add settings for that map.";
+		$type = "global";
+		$settingrows = db_fetch_assoc("select * from weathermap_settings where mapid=0");
+		 
 	}
 	elseif($id<0)
 	{
-		$title = db_fetch_cell("select name from weathermap_groups where id=".intval(-$id));		
-		$title = "Edit per-map settings for Group ". intval(-$id) . ": " . $title;
+		$group_id = -intval($id);
+		$groupname = db_fetch_cell("select name from weathermap_groups where id=".$group_id);		
+		$title = "Edit per-map settings for Group ". $group_id . ": " . $groupname;
 		$nonemsg = "There are no per-group settings for this group yet. You can add some by clicking Add up in the top-right.";
+		$type="group";
+		$settingrows = db_fetch_assoc("select * from weathermap_settings where groupid=".$group_id);
 	}
 	else
 	{
 		// print "Per-map settings for map $id";
-		$title = db_fetch_cell("select titlecache from weathermap_maps where id=".intval($id));		
-		$title = "Edit per-map settings for Weathermap $id: " . $title;
+		$map = db_fetch_row("select * from weathermap_maps where id=".intval($id));
+		
+		$groupname = db_fetch_cell("select name from weathermap_groups where id=".intval($map['group_id']));	
+		$title = "Edit per-map settings for Weathermap $id: " . $map['titlecache'];
 		$nonemsg = "There are no per-map settings for this map yet. You can add some by clicking Add up in the top-right.";
+		$type = "map";
+		$settingrows = db_fetch_assoc("select * from weathermap_settings where mapid=".intval($id));
+	}
+
+	if($type == "group")
+	{
+		print "<p>All maps in this group are also affected by the following GLOBAL settings (group overrides global, map overrides group, but BOTH override SET commands within the map config file):</p>";
+		weathermap_readonly_settings(0, "Global Settings");
+		
+	}
+	
+	if($type == "map")
+	{
+		print "<p>This map is also affected by the following GLOBAL and GROUP settings (group overrides global, map overrides group, but BOTH override SET commands within the map config file):</p>";
+		
+		weathermap_readonly_settings(0, "Global Settings");
+		
+		weathermap_readonly_settings(-$map['group_id'], "Group Settings (".htmlspecialchars($groupname).")");
+		
 	}
 	
 	html_start_box("<strong>$title</strong>", "70%", $colors["header"], "2", "center", "weathermap-cacti-plugin-mgmt.php?action=map_settings_form&mapid=".intval($id));
 	html_header(array("","Name", "Value",""));
 	
 	$n=0;
-	$settingrows = db_fetch_assoc("select * from weathermap_settings where mapid=".intval($id));
+
+	
+	
 	if( is_array($settingrows) )
 	{
 		if(sizeof($settingrows)>0)
@@ -941,9 +973,52 @@ function weathermap_map_settings($id)
 	}
 	
 	html_end_box();
+	
+	print "<div align=center>";
+	if($type == "group") print "<a href='?action=groupadmin'>Back to Group Admin</a>";
+	if($type == "global") print "<a href='?action='>Back to Map Admin</a>";
+	print "</div>";
 }
 
-function weathermap_map_settings_form($mapid,$settingid=0)
+function weathermap_readonly_settings($id,$title="Settings")
+{
+	global $colors, $config;
+
+	if($id == 0) $query = "select * from weathermap_settings where mapid=0 and groupid=0";
+	if($id < 0) $query = "select * from weathermap_settings where mapid=0 and groupid=".(-intval($id));
+	if($id > 0) $query = "select * from weathermap_settings where mapid=".intval($id);
+	
+	$settings = db_fetch_assoc($query);
+		
+	html_start_box("<strong>$title</strong>", "70%", $colors["header"], "2", "center", "");
+	html_header(array("","Name", "Value",""));
+	
+	$n=0;
+	
+	if(sizeof($settings)>0)
+	{
+		foreach($settings as $setting)
+		{
+			form_alternate_row_color($colors["alternate"],$colors["light"],$n);
+			print "<td></td>";
+			print "<td>".htmlspecialchars($setting['optname'])."</td><td>".htmlspecialchars($setting['optvalue'])."</td>";
+			print "<td></td>";
+			print "</tr>";
+			$n++;
+		}
+	}
+	else
+	{
+		form_alternate_row_color($colors["alternate"],$colors["light"],$n);
+		print "<td colspan=4><em>No Settings</em></td>";
+		print "</tr>";
+	}
+		
+	html_end_box();
+	
+}
+
+function weathermap_map_settings_form($mapid=0,$settingid=0)
 {
 	global $colors, $config;
 	
@@ -958,7 +1033,9 @@ function weathermap_map_settings_form($mapid,$settingid=0)
 	
 	if($settingid != 0)
 	{
-		$result = db_fetch_assoc("select * from weathermap_settings where id=".intval($settingid)." and mapid=".intval($mapid));
+		
+		$result = db_fetch_assoc("select * from weathermap_settings where id=".intval($settingid));
+		
 		if(is_array($result) && sizeof($result)>0)
 		{
 			$name = $result[0]['optname'];
@@ -966,11 +1043,13 @@ function weathermap_map_settings_form($mapid,$settingid=0)
 		}
 	}
 	
+	# print "$mapid $settingid |$name| |$value|";
+			
 	$values_ar = array();
 	
 	$field_ar = array(
-		"mapid" => array("friendly_name" => "Style", "method" => "hidden", "value"=>$mapid ) ,
-		"id" => array("friendly_name" => "Style", "method" => "hidden", "value"=>$settingid ) ,
+		"mapid" => array("friendly_name" => "Map ID", "method" => "hidden_zero", "value" => $mapid ) ,
+		"id" => array("friendly_name" => "Setting ID", "method" => "hidden_zero", "value" => $settingid ) ,
 		"name" => array("friendly_name" => "Name", "method" => "textbox", "max_length"=>128,"description"=>"The name of the map-global SET variable", "value"=>$name),
 		"value" => array("friendly_name" => "Value", "method" => "textbox", "max_length"=>128, "description"=>"What to set it to", "value"=>$value)		
 	);
@@ -1002,11 +1081,22 @@ function weathermap_map_settings_form($mapid,$settingid=0)
 
 function weathermap_setting_save($mapid,$name,$value) 
 {
-	db_execute("insert into weathermap_settings (mapid, optname, optvalue) values ($mapid,'".mysql_real_escape_string($name)."','".mysql_real_escape_string($value)."')");
+	if($mapid >0)
+	{
+		db_execute("insert into weathermap_settings (mapid, optname, optvalue) values ($mapid,'".mysql_real_escape_string($name)."','".mysql_real_escape_string($value)."')");
+	}
+	elseif($mapid <0)
+	{
+		db_execute("insert into weathermap_settings (mapid, groupid, optname, optvalue) values (0, -$mapid,'".mysql_real_escape_string($name)."','".mysql_real_escape_string($value)."')");
+	}
+	else
+	{
+		db_execute("insert into weathermap_settings (mapid, groupid, optname, optvalue) values (0, 0,'".mysql_real_escape_string($name)."','".mysql_real_escape_string($value)."')");
+	}
 } 
 function weathermap_setting_update($mapid,$settingid,$name,$value) 
-{
-	db_execute("update weathermap_settings set optname='".mysql_real_escape_string($name)."', optvalue='".mysql_real_escape_string($value)."' where id=".intval($settingid). " and mapid=".intval($mapid));
+{	
+	db_execute("update weathermap_settings set optname='".mysql_real_escape_string($name)."', optvalue='".mysql_real_escape_string($value)."' where id=".intval($settingid));
 } 
 
 function weathermap_setting_delete($mapid,$settingid) 
@@ -1111,7 +1201,7 @@ function weathermap_group_editor()
 				print "<td>";
 			
 			print "<a href='?action=map_settings&id=-".$group['id']."'>";
-			$setting_count = db_fetch_cell("select count(*) from weathermap_settings where mapid=-".$group['id']);
+			$setting_count = db_fetch_cell("select count(*) from weathermap_settings where mapid=0 and groupid=".$group['id']);
 			if($setting_count > 0)
 			{
 				print $setting_count." special";

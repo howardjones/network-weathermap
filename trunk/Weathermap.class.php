@@ -2818,7 +2818,7 @@ function ReadConfig($input, $is_include=FALSE)
 					$linematched++;
 				}
 
-				if($val == 'none' && ($matches[1]=='LABELFONTSHADOW' || $matches[1]=='LABELBG' || $matches[1]=='LABELOUTLINE'))
+				if($val == 'none' && ($matches[1]=='LABELFONTSHADOW' || $matches[1]=='LABELBG' || $matches[1]=='LABELOUTLINE' || $matches[1]=='AICONOUTLINE'))
 				{
 					$curnode->$field=array(-1,-1,-1);
 					$linematched++;

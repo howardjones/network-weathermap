@@ -122,6 +122,7 @@ class WeatherMapDataSource_rrd extends WeatherMapDataSource {
 							// Include the local_data_id as well, to make life easier in poller_output
 							// (and to allow the cacti: DS plugin to use the same table, too)
 							$SQLins = "insert into weathermap_data (rrdfile, data_source_name, sequence, local_data_id) values ('".mysql_real_escape_string($db_rrdname)."','".mysql_real_escape_string($dsnames[$dir])."', 0,".$result['local_data_id'].")";
+							debug("RRD ReadData: poller_output - Adding new weathermap_data row for data source ID ".$result['local_data_id']."\n");
 							db_execute($SQLins);
 						}
 					}
@@ -143,15 +144,16 @@ class WeatherMapDataSource_rrd extends WeatherMapDataSource {
 						// now, we can use the local_data_id to get some other useful info
 						// first, see if the weathermap_data entry *has* a local_data_id. If not, we need to update this entry.
 						$ldi = 0;
-						if(!isset($result['local_data_id']))
+						if(!isset($result['local_data_id']) || $result['local_data_id']==0)
 						{
 							$r2 = db_fetch_row($SQLcheck);
 							if(isset($r2['local_data_id']))
 							{
-								debug("RRD ReadData: updated local_data_id\n");
+								$ldi = $r2['local_data_id'];
+								debug("RRD ReadData: updated  local_data_id for wmdata.id=" . $result['id'] . "to $ldi\n");
 								// put that in now, so that we can skip this step next time
 								db_execute("update weathermap_data set local_data_id=".$r2['local_data_id']." where id=".$result['id']);
-								$ldi = $r2['local_data_id'];
+								
 							}
 						}
 						else

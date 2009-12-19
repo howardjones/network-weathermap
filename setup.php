@@ -659,7 +659,7 @@ function weathermap_poller_output($rrd_update_array) {
 	
 	// $requiredlist = db_fetch_assoc("select distinct weathermap_data.*, data_template_data.local_data_id, data_template_rrd.data_source_type_id from weathermap_data, data_template_data, data_template_rrd where weathermap_data.rrdfile=data_template_data.data_source_path and data_template_rrd.local_data_id=data_template_data.local_data_id");
 	// new version works with *either* a local_data_id or rrdfile in the weathermap_data table, and returns BOTH
-	$requiredlist = db_fetch_assoc("select distinct weathermap_data.id, weathermap_data.last_value, weathermap_data.last_time, weathermap_data.data_source_name, data_template_data.data_source_path, data_template_data.local_data_id, data_template_rrd.data_source_type_id from weathermap_data, data_template_data, data_template_rrd where weathermap_data.local_data_id=data_template_data.local_data_id and data_template_rrd.local_data_id=data_template_data.local_data_id;");
+	$requiredlist = db_fetch_assoc("select distinct weathermap_data.id, weathermap_data.last_value, weathermap_data.last_time, weathermap_data.data_source_name, data_template_data.data_source_path, data_template_data.local_data_id, data_template_rrd.data_source_type_id from weathermap_data, data_template_data, data_template_rrd where weathermap_data.local_data_id=data_template_data.local_data_id and data_template_rrd.local_data_id=data_template_data.local_data_id and weathermap_data.local_data_id<>0;");
 	
 	$path_rra = $config["rra_path"];
 	

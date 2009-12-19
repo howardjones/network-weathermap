@@ -1,26 +1,48 @@
 <?php
 
-$mapfile = "configs/int.conf";
-$outputmapfile = "output.conf";
+$cacti_root = '/var/www/html/cacti/';
 
-# defaults. Should be overwritten by the cacti config.
-$cacti_base = '../../';
-$cacti_url = '/';
+if(!file_exists($cacti_root."/include/config.php"))
+{
+	$cacti_root = "../../..";
+	if(!file_exists($cacti_root."/include/config.php"))
+	{
+		print "Couldn't figure out where Cacti is. Edit the top line of the script.\n";
+		exit();
+	}
+}
+
+
+ini_set('include_path', ini_get('include_path') . PATH_SEPARATOR . $cacti_root . PATH_SEPARATOR . $cacti_root.'/plugins/weathermap' . PATH_SEPARATOR . $cacti_root.'/plugins/weathermap/random-bits'); 
+
+include_once 'include/global.php';
+include_once 'include/config.php'; 
+
+$cacti_base = $cacti_root;
+$cacti_url = $config['url_path']; 
 
 include_once 'editor-config.php';
 
 # set this to 1 to adjust the width of links according to speed
 $map_widths = 1;
 
+# set this to 1 to overwrite existing targets
+$overwrite_targets = 1;
+ 
+
 # adjust width of link based on bandwidth.
-# NOTE: These ARE NOT bands - the value has to be EXACTLY the one in the table.
+# NOTE: These are bands - the value has to be up to or including the value in the list to match
 $width_map = array(
-	'1000000'=>'1', # 1meg
-	'2000000'=>'1', # 2meg
+	'1000000'=>'1', # up to 1meg
+	'9999999'=>'1', # 1-10meg
 	'10000000'=>'2', # 10meg
+	'99999999'=>'2', # 10-100meg
 	'100000000'=>'4', # 100meg
+	'999999999'=>'4', # 100meg-1gig
 	'1000000000'=>'6', # 1gig
-	'10000000000'=>'8' # 10gig
+	'9999999999'=>'6', # 1gig-10gig
+	'10000000000'=>'8', # 10gig
+	'99999999999'=>'8' # 10gig-100gig
 		);
 
 // check if the goalposts have moved
@@ -44,6 +66,14 @@ else
 	exit();
 }
 
+
+# Check usage and set output file
+if (count($argv) != 3) {
+  fwrite(STDERR,"usage: " . $_SERVER['SCRIPT_NAME'] . " inputfile outputfile\n");
+  exit(1);
+}
+$mapfile = $argv[1];
+$outputmapfile = $argv[2]; 
 
 # figure out which template has interface traffic. This might be wrong for you.
 $data_template = "Interface - Traffic";
@@ -117,6 +147,7 @@ foreach ($map->nodes as $node)
 //  we want links where at least one of the nodes has a cacti_id, and where either interface_in or interface_out is set
 foreach ($map->links as $link)
 {
+	if (isset($link->a)) { 
 	$name = $link->name;
 	$a = $link->a->name;
 	$b = $link->b->name;
@@ -184,7 +215,7 @@ foreach ($map->links as $link)
 					$speed = db_fetch_cell($SQL_speed);
 					
 					$SQL_hspeed = "select field_value from host_snmp_cache where field_name='ifHighSpeed' and host_id=$tgt_host and snmp_index=$snmp_index";
-					$hspeed = db_fetch_cell($SQL_speed);
+					$hspeed = db_fetch_cell($SQL_hspeed);
 					
 					if($hspeed && intval($hspeed)>20) $total_speed += ($hspeed*1000000);
 					else if($speed) $total_speed += intval($speed);
@@ -223,10 +254,14 @@ foreach ($map->links as $link)
 			
 			if($map_widths)
 			{
-				if($width_map{$total_speed})
-				{
-					$map->links[$name]->width = $width_map{$total_speed};
-					print "    WIDTH ".$width_map{$total_speed}."\n";
+				foreach($width_map as $map_speed => $map_width)
+                                {
+					if($total_speed <= $map_speed)
+                                       {
+                                               $map->links[$name]->width = $width_map{$map_speed};
+                                               print "    WIDTH ".$width_map{$map_speed}."\n";
+                                               continue 2;
+                                       }  
 				}
 			}
 						
@@ -236,6 +271,7 @@ foreach ($map->links as $link)
 	else
 	{
 		print "Skipping link with targets\n";
+	}
 	}
 
 }

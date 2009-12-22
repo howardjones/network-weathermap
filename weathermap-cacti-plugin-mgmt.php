@@ -901,7 +901,7 @@ function weathermap_map_settings($id)
 		$title = "Additional settings for ALL maps";
 		$nonemsg = "There are no settings for all maps yet. You can add some by clicking Add up in the top-right, or choose a single map from the management screen to add settings for that map.";
 		$type = "global";
-		$settingrows = db_fetch_assoc("select * from weathermap_settings where mapid=0");
+		$settingrows = db_fetch_assoc("select * from weathermap_settings where mapid=0 and groupid=0");
 		 
 	}
 	elseif($id<0)

@@ -406,7 +406,7 @@ class HTML_ImageMap
 			# if( ($namefilter == "") || ( preg_match($preg,$shape->name) ))
 			if( ($namefilter == "") || ( strstr($shape->name, $namefilter) !== FALSE ))
 			{
-				if(!$skipnolinks || $shape->href!="")
+				if(!$skipnolinks || $shape->href != "" || $shape->extrahtml != "" )
 				{
 					if($reverseorder)
 					{

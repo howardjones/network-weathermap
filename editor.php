@@ -3,10 +3,8 @@
 require_once 'editor.inc.php';
 require_once 'Weathermap.class.php';
 
-# include "var_log.php";
-
 // so that you can't have the editor active, and not know about it.
-$ENABLED=true;
+$ENABLED=false;
 
 if(! $ENABLED)
 {
@@ -220,8 +218,8 @@ else
 		exit();
 		break;
         
-        case 'fetch_config':
-                $map->ReadConfig($mapfile);
+    case 'fetch_config':
+        $map->ReadConfig($mapfile);
 		header('Content-type: text/plain');
 		$item_name = $_REQUEST['item_name'];
                 $item_type = $_REQUEST['item_type'];
@@ -255,15 +253,15 @@ else
 		$link_name = $_REQUEST['link_name'];
 		$link_config = $_REQUEST['item_configtext'];
                 
-                $map->links[$link_name]->config_override=$link_config;
+        $map->links[$link_name]->config_override=$link_config;
                 
 		$map->WriteConfig($mapfile);
-                // now clear and reload the map object, because the in-memory one is out of sync
-                // - we don't know what changes the user made here, so we just have to reload.
-                unset($map);
-                $map = new WeatherMap;
-                $map->context = 'editor';
-                $map->ReadConfig($mapfile);
+		// now clear and reload the map object, because the in-memory one is out of sync
+		// - we don't know what changes the user made here, so we just have to reload.
+	                unset($map);
+	                $map = new WeatherMap;
+	                $map->context = 'editor';
+	                $map->ReadConfig($mapfile);
 		break;
 
 	case "set_node_config":

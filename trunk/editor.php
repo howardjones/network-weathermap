@@ -875,7 +875,7 @@ else
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<style>
+<style type="text/css">
 <?php
 		// if the cacti config was included properly, then 
 		// this will be non-empty, and we can unhide the cacti links in the Link Properties box
@@ -932,7 +932,7 @@ else
   </div>
   <form action="editor.php" method="post" name="frmMain">
 	<div align="center" id="mainarea">
-		<input type="hidden" name="plug" value="<?php echo ($fromplug==TRUE ? 1 : 0) ?>">
+		<input type="hidden" name="plug" value="<?php echo ($fromplug==TRUE ? 1 : 0) ?>" />
 	 <input style="display:none" type="image"
 	  src="<?php echo  $imageurl; ?>" id="xycapture" /><img src=
 	  "<?php echo  $imageurl; ?>" id="existingdata" alt="Weathermap" usemap="#weathermap_imap"
@@ -946,7 +946,7 @@ else
 	  <a target="configwindow" href="?<?php echo ($fromplug==TRUE ? 'plug=1&amp;':''); ?>action=show_config&amp;mapname=<?php echo  $mapname ?>">See config</a></p>
 	<pre><?php echo  $log ?></pre>
 	  </div>
-	   <map name="weathermap_imap">
+	   <map name="weathermap_imap" id="weathermap_imap">
 <?php        	
 	// we need to draw and throw away a map, to get the
 	// dimensions for the imagemap. Oh well.
@@ -1276,7 +1276,7 @@ else
 		  </tr>
 		  <tr>
 			<th>Font Samples:</th>
-			<td><div class="fontsamples" ><img src="?action=font_samples&mapname=<?php echo  $mapname?>" /></div><br />(Drawn using your PHP install)</td>
+			<td><div class="fontsamples" ><img alt="Sample of defined fonts" src="?action=font_samples&mapname=<?php echo  $mapname?>" /></div><br />(Drawn using your PHP install)</td>
 		  </tr>
 		</table>
 	  </div>

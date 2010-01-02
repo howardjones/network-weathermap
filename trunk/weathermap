@@ -11,7 +11,7 @@ require_once "Weathermap.class.php";
 
 if (!module_checks()) { die ("Quitting: Module checks failed.\n"); }
 
-//    $weathermap_debugging=TRUE; // XXX - This needs to come out again!
+//    $weathermap_debugging=TRUE; 
 
 
 

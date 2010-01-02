@@ -534,9 +534,10 @@ function weathermap_fullview($cycle=FALSE, $firstonly=FALSE, $limit_to_group = -
 				<td colspan="3">
 						<table width="100%" cellspacing="0" cellpadding="3" border="0">
 								<tr>
-										<td align="left" class="textHeaderDark"><a name="map_<?php echo $map['filehash']; ?>"></a>
-									 <?php print htmlspecialchars($maptitle); ?>
-				</td>
+									<td align="left" class="textHeaderDark">
+                                                                            <a name="map_<?php echo $map['filehash']; ?>"></a>
+                                                                            <?php print htmlspecialchars($maptitle); ?>
+                                                                        </td>
 								</tr>
 						</table>
 				</td>
@@ -758,7 +759,7 @@ function weathermap_mapselector($current_id = 0)
 		html_graph_start_box(3, TRUE);
 		?>
 	<tr bgcolor="<?php print $colors["panel"];?>" class="noprint">
-			<form name="weathermap_select" method="post">
+			<form name="weathermap_select" method="post" action="GET">
 			<input name="action" value="viewmap" type="hidden">
 			<td class="noprint">
 					<table width="100%" cellpadding="0" cellspacing="0">

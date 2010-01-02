@@ -1,6 +1,6 @@
 #mainview { background: #ccc; padding-top: 60px; }
 
-body { 		font-family: Gill Sans, Verdana, sans-serif; margin:0; }
+body { 		font-family: 'Gill Sans', Verdana, sans-serif; margin:0; }
 #toolbar { 		font-family: Verdana, sans-serif; }
 
 #toolbar { position: fixed; top:0px; left: 0px; width: 100%;

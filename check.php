@@ -83,11 +83,11 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 <head>
     <title>Weathermap Pre-Install Checker</title>
-    <style>
-    body { font-family: Lucida Grande,Arial,sans-serif; font-size: 10pt; }
+    <style type="text/css">
+    body { font-family: 'Lucida Grande',Arial,sans-serif; font-size: 10pt; }
     p {margin-bottom: 10px; margin-top: 10px;}
     table { margin: 20px;}
-    .critical { width: 400px; padding: 10px; background: #fee; border: 1px solid #f88; padding-left: 20px; background-image: left no-repeat url(images/exclamation.png); }
+    .critical { width: 400px; padding: 10px; background: #fee; border: 1px solid #f88; padding-left: 20px; background: left no-repeat url(images/exclamation.png); }
     .noncritical { width: 400px; padding: 10px; background: #ffe; border: 1px solid #fb8; }
     .ok { width: 400px; padding: 10px; background: #efe; border: 1px solid #8f8; }
     </style>

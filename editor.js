@@ -222,6 +222,8 @@ function cancel_op()
 function help_handler(e)
     {
     var el;
+    var target;
+    var help;
 
     if (window.event && window.event.srcElement)
         {
@@ -244,8 +246,8 @@ function help_handler(e)
         {
         if (helptexts[objectid])
             {
-            var help = helptexts[objectid];
-            var target = objectid.slice(0, objectid.indexOf('_')) + '_help';
+            help = helptexts[objectid];
+            target = objectid.slice(0, objectid.indexOf('_')) + '_help';
 
             document.getElementById(target).firstChild.nodeValue = help;
 
@@ -258,8 +260,8 @@ function help_handler(e)
         // alert('blurred - figure out default, and apply it.');
 
         var section = objectid.slice(0, objectid.indexOf('_'));
-        var target = section + '_help';
-        var help = helptexts[section + '_default'];
+        target = section + '_help';
+        help = helptexts[section + '_default'];
 
         if (help == 'undefined')
             {
@@ -273,6 +275,8 @@ function help_handler(e)
 function mouse_help_handler(e)
     {
     var el;
+    var target;
+    var help;
 
     //  alert('ddd');
 
@@ -297,8 +301,8 @@ function mouse_help_handler(e)
         {
         if (helptexts[objectid])
             {
-            var help = helptexts[objectid];
-            var target = objectid.slice(0, objectid.indexOf('_')) + '_help';
+            help = helptexts[objectid];
+            target = objectid.slice(0, objectid.indexOf('_')) + '_help';
 
             document.getElementById(target).firstChild.nodeValue = help;
 
@@ -311,8 +315,8 @@ function mouse_help_handler(e)
         // alert('blurred - figure out default, and apply it.');
 
         var section = objectid.slice(0, objectid.indexOf('_'));
-        var target = section + '_help';
-        var help = helptexts[section + '_default'];
+        target = section + '_help';
+        help = helptexts[section + '_default'];
 
         if (help == 'undefined')
             {

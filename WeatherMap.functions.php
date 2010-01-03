@@ -348,6 +348,96 @@ function imagecreatefromfile($filename)
 	return $bgimage;
 }
 
+// taken from here:
+// http://www.php.net/manual/en/function.imagefilter.php#62395
+// ( with some bugfixes and changes)
+// 
+// Much nicer colorization than imagefilter does, AND no special requirements.
+// Preserves white, black and transparency.
+//
+function imagecolorize($im, $r, $g, $b)
+{
+    //We will create a monochromatic palette based on
+    //the input color
+    //which will go from black to white
+    //Input color luminosity: this is equivalent to the
+    //position of the input color in the monochromatic
+    //palette
+    $lum_inp = round(255 * ($r + $g + $b) / 765); //765=255*3
+
+    //We fill the palette entry with the input color at its
+    //corresponding position
+
+    $pal[$lum_inp]['r'] = $r;
+    $pal[$lum_inp]['g'] = $g;
+    $pal[$lum_inp]['b'] = $b;
+
+    //Now we complete the palette, first we'll do it to
+    //the black,and then to the white.
+
+    //FROM input to black
+    //===================
+    //how many colors between black and input
+    $steps_to_black = $lum_inp;
+
+    //The step size for each component
+    if ($steps_to_black)
+    {
+        $step_size_red = $r / $steps_to_black;
+        $step_size_green = $g / $steps_to_black;
+        $step_size_blue = $b / $steps_to_black;
+    }
+
+    for ($i = $steps_to_black; $i >= 0; $i--)
+    {
+        $pal[$steps_to_black - $i]['r'] = $r - round($step_size_red * $i);
+        $pal[$steps_to_black - $i]['g'] = $g - round($step_size_green * $i);
+        $pal[$steps_to_black - $i]['b'] = $b - round($step_size_blue * $i);
+    }
+
+    //From input to white:
+    //===================
+    //how many colors between input and white
+    $steps_to_white = 255 - $lum_inp;
+
+    if ($steps_to_white)
+    {
+        $step_size_red = (255 - $r) / $steps_to_white;
+        $step_size_green = (255 - $g) / $steps_to_white;
+        $step_size_blue = (255 - $b) / $steps_to_white;
+    }
+    else
+        $step_size_red = $step_size_green = $step_size_blue = 0;
+
+    //The step size for each component
+    for ($i = ($lum_inp + 1); $i <= 255; $i++)
+    {
+        $pal[$i]['r'] = $r + round($step_size_red * ($i - $lum_inp));
+        $pal[$i]['g'] = $g + round($step_size_green * ($i - $lum_inp));
+        $pal[$i]['b'] = $b + round($step_size_blue * ($i - $lum_inp));
+    }
+
+    //--- End of palette creation
+
+    //Now,let's change the original palette into the one we
+    //created
+    for ($c = 0; $c < imagecolorstotal($im); $c++)
+    {
+        $col = imagecolorsforindex($im, $c);
+        $lum_src = round(255 * ($col['red'] + $col['green'] + $col['blue']) / 765);
+        $col_out = $pal[$lum_src];
+
+   #     printf("%d (%d,%d,%d) -> %d -> (%d,%d,%d)\n", $c,
+   #                $col['red'], $col['green'], $col['blue'],
+   #                $lum_src,
+   #                $col_out['r'], $col_out['g'], $col_out['b']
+   #             );
+
+        imagecolorset($im, $c, $col_out['r'], $col_out['g'], $col_out['b']);
+    }
+   
+    return($im);
+}
 
 // find the point where a line from x1,y1 through x2,y2 crosses another line through x3,y3 and x4,y4
 // (the point might not be between those points, but beyond them)

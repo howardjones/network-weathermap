@@ -10,6 +10,8 @@
 	FIXED - Imagemap no longer contains areas with no href defined
 	FIXED - SPLITPOS was ignored with VIASTYLE angled (thanks to uhtred)
 	FIXED - 'AICONOUTLINECOLOR none' is actually valid now (thanks to mgb & Leathon)
+        FIXED - readdir() loop never stops, on some systems (thanks to jerebernard)
+        ADDED - USEICONSCALE no longer has special dependencies - and the colours are nicer too.
 	ADDED - Option of a dropdown selector to navigate between maps (in full-size view)
 	ADDED - Maps can be organised into groups in Cacti plugin. These appear
 			as tabs in the UI for viewing maps.

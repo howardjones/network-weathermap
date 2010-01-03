@@ -64,7 +64,8 @@ function show_editor_startpage()
 
 		if ($dh)
 		{
-			while ($file=readdir($dh))
+                        while (false !== ($file = readdir($dh)))
+			# while ($file=readdir($dh))
 			{
 				$realfile=$mapdir . DIRECTORY_SEPARATOR . $file;
 				$note = "";

@@ -598,8 +598,20 @@ class WeatherMapDataSource_rrd extends WeatherMapDataSource {
 			}
 		}
 
-		if($data[IN] !== NULL) $data[IN] = $data[IN] * $multiplier;
-		if($data[OUT] !== NULL) $data[OUT] = $data[OUT] * $multiplier;
+                // if the Locale says that , is the decimal point, then rrdtool
+                // will honour it. However, floatval() doesn't, so let's replace
+                // any , with . (there are never thousands separators, luckily)
+                //
+		if($data[IN] !== NULL)
+                {
+                    $data[IN] = floatval(str_replace(",",".",$data[IN]));
+                    $data[IN] = $data[IN] * $multiplier;                    
+                }
+		if($data[OUT] !== NULL) 
+                {
+                    $data[OUT] = floatval(str_replace(",",".",$data[OUT]));
+                    $data[OUT] = $data[OUT] * $multiplier;
+                }
 				
 		debug ("RRD ReadData: Returning (".($data[IN]===NULL?'NULL':$data[IN]).",".($data[OUT]===NULL?'NULL':$data[OUT]).",$data_time)\n");
 		

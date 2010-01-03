@@ -439,7 +439,7 @@ function maplist()
 		print "<td>ALL MAPS</td><td>(special settings for all maps)</td><td></td><td></td>";
 		
 		print "<td><a href='?action=map_settings&id=0'>";
-		$setting_count = db_fetch_cell("select count(*) from weathermap_settings where mapid=0");
+		$setting_count = db_fetch_cell("select count(*) from weathermap_settings where mapid=0 and groupid=0");
 		if($setting_count > 0)
 		{
 			print $setting_count." special";

@@ -3,14 +3,28 @@ Before 0.97
 DONE No filenames for weathermap_data
 DONE Use weathermap_data in dsstats
 DONE docs for dsstats
-Test groups fully
+DONE Test groups fully
 Add cron settings?
 DONE Converter for rrd to dsstats
 DONE Add snmp_cache stuff to dsstats
 DONE BUG - SPLITPOS with VIASTYLE angled breaks arrow drawing.
 
+Nudge for link comments? (normal not tangent)
+
+
+PATCHES/Features
+----------------
+Browse subdirs for images in editor:
+http://forums.cacti.net/about34831.html
+
 WISHES
 -------
+
+DONE!   New ICON recolouring code
+DONE!   http://forums.cacti.net/about35242.html
+
+Text Alignment in labels
+http://forums.cacti.net/about35264.html
 
 Some kind of special warning for if ALL the maps fail in a cycle. 
 Also some sort of highlight to show that the map wasn't updated successfully last time it ran (permissions problems).
@@ -54,7 +68,7 @@ Cacti editor picker - if it's not traffic_in/traffic_out, let you pick the DSes
 
 Editor picker - plugin-supplied picker listings - allow for Zabbix,Zenoss,Cricket,Groundwork,MRTG,Orion,Smokeping,WUG etc to supply useful picker info
 
-DS Plugins - pre-load hook. ReadData runs through loop twice - once for recignise, then a pre-Read hook, then all the ReadData. Allows for pre-caching where appropriate (fping, snmp, anything that uses remote calls)
+DONE!   DS Plugins - pre-load hook. ReadData runs through loop twice - once for recignise, then a pre-Read hook, then all the ReadData. Allows for pre-caching where appropriate (fping, snmp, anything that uses remote calls)
 
 Multi-line text, plus Mactrack DS
 http://forums.cacti.net/viewtopic.php?t=26790

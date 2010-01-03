@@ -10,14 +10,17 @@
         <p>After the percentage usage is calculated (using BANDWIDTH/MAXVALUE and data from the TARGET line), 
         the colour is decided by looking up the percentage against this SCALE. If there is no USEICONSCALE
         line, then no scale is used, and the icon colour does not change.</p>
-		<p><strong>NOTE:</strong> Icon colourising uses the PHP <tt>imagefilter()</tt> function. This function
+        <p>Hint: This facility works best when you start with greyscale images.</p>     
+
+		<p><strong>NOTE:</strong> Prior to 0.97, Icon colourising used the PHP <tt>imagefilter()</tt> function. This function
 		is <em>only</em> available in the version of GD that is bundled with PHP, and not with the official GD library. Several
-		popular operating systems (e.g. Debian/Ubuntu) use the official GD library rather than the bundled PHP library. USEICONSCALE
-		<em>will not work</em> on those systems. You should get a warning when the map is produced, and check.php should also tell you 
-		this. check.php will also tell you if you are using the bundled GD library or not.</p>
+		popular operating systems (e.g. Debian/Ubuntu) use the official GD library rather than the bundled PHP library. If
+                you know that you <em>do</em> have the imagefilter function, and you prefer the 'old-style' coloring, then you can add
+                <tt>SET use_imagefilter 1</tt> in the top section of your map config file, to use <tt>imagefilter</tt> instead.</p>
         
         </description>
         <changes>
+        <change version="0.97">Removed dependency on <tt>imagefilter</tt></change>
         <change version="0.95">Added USEICONSCALE.</change>
     </changes>
 </configentry>

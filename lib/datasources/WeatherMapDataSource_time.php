@@ -1,8 +1,4 @@
 <?php
-// Sample Pluggable datasource for PHP Weathermap 0.9
-// - read a pair of values from a database, and return it
-
-// TARGET dbplug:databasename:username:pass:hostkey
 
 class WeatherMapDataSource_time extends WeatherMapDataSource {
 
@@ -50,20 +46,20 @@ class WeatherMapDataSource_time extends WeatherMapDataSource {
 					$item->add_note("time_time12",$dateTime->format("h:i"));
 					$item->add_note("time_time12ap",$dateTime->format("h:i A"));
 					$item->add_note("time_time24",$dateTime->format("H:i"));
-					$data[IN] = 0;
+					$data[IN] = $dateTime->format("H");
 					$data_time = time();
-					$data[OUT] = 0;
+					$data[OUT] = $dateTime->format("i");
 					$matches++;
 				}
 			}	
 			if($matches==0)
 			{
-				warn ("Time ReadData: Couldn't recongnize $timezone as a valid timezone name\n"); 
+				warn ("Time ReadData: Couldn't recognize $timezone as a valid timezone name\n"); 
 			}			
 		}
 		else {
 			// some error code to go in here
-			warn ("Time ReadData: Couldn't recongnize $targetstring \n"); 
+			warn ("Time ReadData: Couldn't recognize $targetstring \n"); 
 		}		
 		
 		debug ("Time ReadData: Returning (".($data[IN]===NULL?'NULL':$data[IN]).",".($data[OUT]===NULL?'NULL':$data[OUT]).",$data_time)\n");

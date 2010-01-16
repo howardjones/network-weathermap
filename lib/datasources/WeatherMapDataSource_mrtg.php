@@ -46,7 +46,7 @@ class WeatherMapDataSource_mrtg extends WeatherMapDataSource {
 			}
 			fclose($fd);
 			# don't bother with the modified time if the target is a URL
-			if(! preg_match('/^[a-z]+:\/\/',$targetstring) )
+			if(! preg_match('/^[a-z]+:\/\//',$targetstring) )
 			{
 				$data_time = filemtime($targetstring);
 			}

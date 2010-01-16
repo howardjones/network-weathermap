@@ -39,6 +39,7 @@ a { color: black; text-decoration: underline; font-weight: normal;}
 <li><a href="#script">MRTG-style external script</a></li>
 <li><a href="#snmp">SNMP OID</a></li>
 <li><a href="#fping">fping</a></li>
+<li><a href="#time">Time</a></li>
 </ul>
 </p>
 
@@ -389,6 +390,31 @@ various statistics about it's state.</p>
 <p>After it has been run, the 'in' value is the average ping time in milliseconds, the 'out' value is the percentage packet loss from 5 pings (or whatever you have set), the 'fping_min' Hint Variable is the minimum  ping time in milliseconds, and 'fping_max' is the maximum.</p>
 
 
+
+
+<h3><a name="time"></a>Current Time</h3>
+
+<div class="definition">TARGET time:<em>zonename</em></div>
+
+<p>This plugin allows you to embed the current time in any timezone in your maps.</p>
+<p>The 'in' value is the hours, the 'out' value is minutes.</p>
+<p>The format for specifying timezones is the same as most unix systems - Europe/London, US/Eastern, Japan and Etc/GMT+10 are all valid. These names are
+usually stored in /usr/share/zoneinfo on a unix-based system.</p>
+
+<p>This plugin also sets a few Hint Variables - time_time12, time_time24, time_time12ap. These are the current time in 12-hour, 24-hour and 12-hour-with-am/pm, respectively.</p>
+
+<p>A typical use is:
+    <code>
+NODE timelabel
+    LABEL {node:this:time_time12ap}
+    USESCALE none
+    TARGET time:Europe/Paris
+    </code>
+</p>
+
+<p><strong>NOTE:</strong>The timezone handling code requires at least PHP version 5.</p>
+
+<hr />
 
 
   </div>

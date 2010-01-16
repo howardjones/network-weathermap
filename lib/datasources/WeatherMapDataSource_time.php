@@ -46,6 +46,7 @@ class WeatherMapDataSource_time extends WeatherMapDataSource {
 					$item->add_note("time_time12",$dateTime->format("h:i"));
 					$item->add_note("time_time12ap",$dateTime->format("h:i A"));
 					$item->add_note("time_time24",$dateTime->format("H:i"));
+					$item->add_note("time_timezone",$tz);
 					$data[IN] = $dateTime->format("H");
 					$data_time = time();
 					$data[OUT] = $dateTime->format("i");

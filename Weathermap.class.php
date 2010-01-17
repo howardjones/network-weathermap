@@ -988,17 +988,22 @@ function ReadData()
 				}
 
 				# print $myobj->name."=>".$myobj->inpercent."%/".$myobj->outpercent."\n";
-				
+
+                                $warn_in = true;
+                                $warn_out = true;
+                                if($type=='NODE' && $myobj->scalevar =='in') $warn_out = false;
+                                if($type=='NODE' && $myobj->scalevar =='out') $warn_in = false;
+
 				if($myobj->scaletype == 'percent')
 				{
-					list($incol,$inscalekey,$inscaletag) = $this->NewColourFromPercent($myobj->inpercent,$myobj->usescale,$myobj->name);
-					list($outcol,$outscalekey, $outscaletag) = $this->NewColourFromPercent($myobj->outpercent,$myobj->usescale,$myobj->name);
+					list($incol,$inscalekey,$inscaletag) = $this->NewColourFromPercent($myobj->inpercent,$myobj->usescale,$myobj->name, TRUE, $warn_in);
+					list($outcol,$outscalekey, $outscaletag) = $this->NewColourFromPercent($myobj->outpercent,$myobj->usescale,$myobj->name, TRUE, $warn_out);
 				}
 				else
 				{
 					// use absolute values, if that's what is requested
-					list($incol,$inscalekey,$inscaletag) = $this->NewColourFromPercent($myobj->bandwidth_in,$myobj->usescale,$myobj->name, FALSE);
-					list($outcol,$outscalekey, $outscaletag) = $this->NewColourFromPercent($myobj->bandwidth_out,$myobj->usescale,$myobj->name, FALSE);	
+					list($incol,$inscalekey,$inscaletag) = $this->NewColourFromPercent($myobj->bandwidth_in,$myobj->usescale,$myobj->name, FALSE, $warn_in);
+					list($outcol,$outscalekey, $outscaletag) = $this->NewColourFromPercent($myobj->bandwidth_out,$myobj->usescale,$myobj->name, FALSE, $warn_out;
 				}
 				
 				$myobj->add_note("inscalekey",$inscalekey);
@@ -1177,15 +1182,14 @@ function ColourFromPercent($image, $percent,$scalename="DEFAULT",$name="")
 	return array($this->white,'','');
 }
 
-function NewColourFromPercent($value,$scalename="DEFAULT",$name="",$is_percent=TRUE)
+function NewColourFromPercent($value,$scalename="DEFAULT",$name="",$is_percent=TRUE, $scale_warning=TRUE)
 {
 	$col = new Colour(0,0,0);
 	$tag = '';
 	$matchsize = NULL;
 
 	$nowarn_clipping = intval($this->get_hint("nowarn_clipping"));
-	$nowarn_scalemisses = intval($this->get_hint("nowarn_scalemisses"));
-
+	$nowarn_scalemisses = (!$scale_warning) || intval($this->get_hint("nowarn_scalemisses"));
 	
 	if(isset($this->colours[$scalename]))
 	{

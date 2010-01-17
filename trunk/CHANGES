@@ -13,6 +13,7 @@
         FIXED - readdir() loop never stops, on some systems (thanks to jerebernard)
         FIXED - bad regexp in the MRTG DS plugin (thanks to Matt McMahon)
         FIXED - 0.96 had a new 'time' DS plugin - now documented!
+        FIXED - NCFPC only complains about missing scale lines on NODEs for the variable that is in use.
         ADDED - USEICONSCALE no longer has special dependencies - and the colours are nicer too.
 	ADDED - Option of a dropdown selector to navigate between maps (in full-size view)
 	ADDED - Maps can be organised into groups in Cacti plugin. These appear

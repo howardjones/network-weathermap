@@ -1003,7 +1003,7 @@ function ReadData()
 				{
 					// use absolute values, if that's what is requested
 					list($incol,$inscalekey,$inscaletag) = $this->NewColourFromPercent($myobj->bandwidth_in,$myobj->usescale,$myobj->name, FALSE, $warn_in);
-					list($outcol,$outscalekey, $outscaletag) = $this->NewColourFromPercent($myobj->bandwidth_out,$myobj->usescale,$myobj->name, FALSE, $warn_out;
+					list($outcol,$outscalekey, $outscaletag) = $this->NewColourFromPercent($myobj->bandwidth_out,$myobj->usescale,$myobj->name, FALSE, $warn_out);
 				}
 				
 				$myobj->add_note("inscalekey",$inscalekey);

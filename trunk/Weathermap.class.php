@@ -2282,6 +2282,9 @@ function ReadConfig($input, $is_include=FALSE)
 					
 					array('NODE', '/^\s*LABELOFFSET\s+([-+]?\d+)\s+([-+]?\d+)\s*$/i', array('labeloffsetx'=>1,'labeloffsety'=>2)),
 					array('NODE', '/^\s*LABELOFFSET\s+(C|NE|SE|NW|SW|N|S|E|W)\s*$/i', array('labeloffset'=>1)),
+                                        array('NODE', '/^\s*LABELOFFSET\s+((C|NE|SE|NW|SW|N|S|E|W)\d+)\s*$/i', array('labeloffset'=>1)),
+                                        array('NODE', '/^\s*LABELOFFSET\s+(-?\d+r\d+)\s*$/i', array('labeloffset'=>1)),
+                            
 					array('NODE', '/^\s*LABELFONT\s+(\d+)\s*$/i', array('labelfont'=>1)),
 					array('NODE', '/^\s*LABELANGLE\s+(0|90|180|270)\s*$/i', array('labelangle'=>1)),
 					# array('(NODE|LINK)', '/^\s*TEMPLATE\s+(\S+)\s*$/i', array('template'=>1)),						
@@ -2382,10 +2385,10 @@ function ReadConfig($input, $is_include=FALSE)
 						$nodenames[$i]=$matches[$i];
 
 						// percentage of compass - must be first
-						if (preg_match("/:(NE|SE|NW|SW|N|S|E|W|C)(\d\d)$/i", $matches[$i], $submatches))
+						if (preg_match("/:(NE|SE|NW|SW|N|S|E|W|C)(\d+)$/i", $matches[$i], $submatches))
 						{
 							$endoffset[$i]=$submatches[1].$submatches[2];
-							$nodenames[$i]=preg_replace("/:(NE|SE|NW|SW|N|S|E|W|C)\d\d$/i", '', $matches[$i]);
+							$nodenames[$i]=preg_replace("/:(NE|SE|NW|SW|N|S|E|W|C)\d+$/i", '', $matches[$i]);
 							$this->need_size_precalc=TRUE;
 						}
 						

@@ -29,6 +29,8 @@
 	ADDED - static datasource can be used for negative values
 	ADDED - SNMP datasource has configurable timeout and retry values.
 	ADDED - SNMP datasource has option to give up on a failing host
+        ADDED - LABELOFFSET supports percentage compass offsets and radial offsets, like NODES does.
+        ADDED - Percentage compass offsets (NODES and LABELOFFSET) support > 100% offsets
 	
 0.96a	FIXED - New z-ordering code did not work correctly on PHP4. This broke (at least) the editor. (thanks toe_cutter)
 	FIXED - \n is no longer treated as a newline in TARGETs (thanks NetAdmin)

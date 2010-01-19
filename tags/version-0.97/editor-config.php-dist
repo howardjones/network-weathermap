@@ -1,0 +1,39 @@
+<?php
+
+//
+// The editor tries to guess where your cacti installation is, but you
+// may need to copy this file to editor-config.php, and edit the lines below
+// if it doesn't guess correctly.
+//
+
+
+
+
+// CHANGE: Uncomment one of the lines below and change it to point to the base directory
+// of your cacti install to enable cacti support in the editor
+$cacti_base = 'C:/httpd-.2_x64/htdocs/cacti';
+// $cacti_base = "/var/www/html/cacti";
+
+
+// CHANGE: this to be the URL of the base of your Cacti install
+// it MUST end with a / character!
+$cacti_url = "http://support.company.net/cacti/";
+
+
+// where to look for config files. The directory must be readable 
+// AND writable by whatever user your webserver runs as.
+// this name is correct if you are using the Cacti plugin
+
+// NOTE: You MIGHT need to use the full path to the configs folder here,
+// (it seems to depend on the PHP or OS version)
+// $mapdir= $cacti_base.'/plugins/weathermap/configs'; 
+$mapdir='configs';
+
+
+
+// if you DON'T use Cacti, and the warning in the editor annoys you,
+// then set this to TRUE
+$ignore_cacti = FALSE;
+
+
+?>

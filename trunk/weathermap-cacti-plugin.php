@@ -759,7 +759,7 @@ function weathermap_mapselector($current_id = 0)
 		html_graph_start_box(3, TRUE);
 		?>
 	<tr bgcolor="<?php print $colors["panel"];?>" class="noprint">
-			<form name="weathermap_select" method="post" action="GET">
+			<form name="weathermap_select" method="post" action="">
 			<input name="action" value="viewmap" type="hidden">
 			<td class="noprint">
 					<table width="100%" cellpadding="0" cellspacing="0">

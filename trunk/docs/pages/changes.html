@@ -43,11 +43,54 @@ a { color: black; text-decoration: underline; font-weight: normal;}
  <h1>PHP Weathermap 
 v0.97 
 </h1> 
- <h4>Copyright &copy; 2005-2009 Howard Jones, <tt><a 
+ <h4>Copyright &copy; 2005-2010 Howard Jones, <tt><a 
 href="mailto:howie@thingy.com">howie@thingy.com</a></tt>. (<a 
 href="http://www.network-weathermap.com/">Website</a>)</h4> 
 </div> 
 
+
+ <h2><a name="changes097">Changes For This Version (0.96a to 0.97)</a></h2> 
+
+<h3>Fixes</h3> 
+<ul> 
+ <li>RRD Aggregation regexp was failing (thanks to shd) 
+ <li>Scale numerals honour locale (thanks again, shd) 
+ <li>THold plugin check failed with Thold 0.4.1 (PA 2.x, actually) 
+ <li>Uninitialized variable in ReadData when plugin is disabled 
+ <li>Zero-length link check didn't include offsets (thanks Ryan Botoluzzi) 
+ <li>Cacti-pick should get right rra path for packagers that move the rra directory (e.g. Ubuntu, Debian *again*) 
+ <li>DS plugins that return one value and a null should work properly 
+ <li>"Strange" characters (e.g. /) in <a href="config-reference.html#NODE_NODE">NODE</a> and <a href="config-reference.html#LINK_LINK">LINK</a> names broke the imagemap. 
+ <li>Map Style settings in editor were broken after internal defaults changes 
+ <li>Imagemap no longer contains areas with no href defined 
+ <li><a href="config-reference.html#LINK_SPLITPOS">SPLITPOS</a> was ignored with <a href="config-reference.html#LINK_VIASTYLE">VIASTYLE</a> angled (thanks to uhtred) 
+ <li><a href="config-reference.html#NODE_COLORS">'AICONOUTLINECOLOR</a> none' is actually valid now (thanks to mgb & Leathon) 
+ <li>readdir() loop never stops, on some systems (thanks to jerebernard) 
+ <li>bad regexp in the MRTG DS plugin (thanks to Matt McMahon) 
+ <li>0.96 had a new 'time' DS plugin - now documented! 
+ <li>NCFPC only complains about missing scale lines on <a href="config-reference.html#NODE_NODE">NODEs</a> for the variable that is in use. 
+</ul> 
+<h3>New Features</h3> 
+<ul> 
+ <li><a href="config-reference.html#NODE_USEICONSCALE">USEICONSCALE</a> no longer has special dependencies - and the colours are nicer too. 
+ <li>Option of a dropdown selector to navigate between maps (in full-size view) 
+ <li>Maps can be organised into groups in Cacti plugin. These appear 
+ as tabs in the UI for viewing maps. 
+ <li>Extra variables can be defined per-group, so all maps in a group can have similar settings (e.g. a "24hr average" tab). 
+ <li><a href="config-reference.html#GLOBAL_INCLUDE">INCLUDE</a> keyword to include a file of common definitions (based on work by BorisL) 
+ (NOTE: this can confuse the editor sometimes - see the manual page for <a href="config-reference.html#GLOBAL_INCLUDE">INCLUDE)</a> 
+ <li>Warning for maps that contain <a href="config-reference.html#LINK_OVERLIBGRAPH">OVERLIBGRAPH</a> but not <a href="config-reference.html#GLOBAL_HTMLSTYLE">'HTMLSTYLE</a> overlib' 
+ <li>Warning for use of <a href="config-reference.html#LINK_TEMPLATE">TEMPLATE</a> not as the first line of an object (overwrites settings otherwise) 
+ <li><a href="config-reference.html#GLOBAL_SCALE">SCALE</a> will accept values below 0, and also above 100 
+ <li><a href="config-reference.html#LINK_USESCALE">USESCALE</a> has two new options: absolute and percent, which allows you to have a <a href="config-reference.html#GLOBAL_SCALE">SCALE</a> of absolute values 
+ <li>New datasource plugin to support statistics from TheWitness's DSStats Cacti Plugin. This gets you daily,weekly,monthly and annual stats with no complicated rrdtool stuff. 
+ <li>New converter to take a rrdtool-based map config and make it into a DSStats-based one 
+ <li>static datasource can be used for negative values 
+ <li>SNMP datasource has configurable timeout and retry values. 
+ <li>SNMP datasource has option to give up on a failing host 
+ <li><a href="config-reference.html#NODE_LABELOFFSET">LABELOFFSET</a> supports percentage compass offsets and radial offsets, like <a href="config-reference.html#LINK_NODES">NODES</a> does. 
+ <li>Percentage compass offsets <a href="config-reference.html#LINK_NODES">(NODES</a> and <a href="config-reference.html#NODE_LABELOFFSET">LABELOFFSET)</a> support &gt; 100% offsets 
+</ul> 
 
  <h2><a name="changes096a">Changes For This Version (0.96 to 0.96a)</a></h2> 
 

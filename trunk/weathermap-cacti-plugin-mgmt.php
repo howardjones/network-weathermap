@@ -326,13 +326,20 @@ function weathermap_footer_links()
 	html_end_box(); 
 }
 
-// Repair the sort order column (for when something is deleted or inserted)
+// Repair the sort order column (for when something is deleted or inserted, or moved between groups)
+// our primary concern is to make the sort order consistent, rather than any special 'correctness'
 function map_resort()
 {
-	$list = db_fetch_assoc("select * from weathermap_maps order by sortorder;");
+	$list = db_fetch_assoc("select * from weathermap_maps order by group_id,sortorder;");
 	$i = 1;
+	$last_group = -1020.5;
 	foreach ($list as $map)
 	{
+		if($last_group != $map['group_id']) 
+		{
+			$last_group  = $map['group_id'];
+			$i=1;
+		}
 		$sql[] = "update weathermap_maps set sortorder = $i where id = ".$map['id'];
 		$i++;
 	}
@@ -364,9 +371,10 @@ function map_move($mapid,$junk,$direction)
 {
 	$source = db_fetch_assoc("select * from weathermap_maps where id=$mapid");
 	$oldorder = $source[0]['sortorder'];
+	$group = $source[0]['group_id'];
 
 	$neworder = $oldorder + $direction;
-	$target = db_fetch_assoc("select * from weathermap_maps where sortorder = $neworder");
+	$target = db_fetch_assoc("select * from weathermap_maps where group_id=$group and sortorder = $neworder");
 
 	if(!empty($target[0]['id']))
 	{
@@ -428,7 +436,7 @@ function maplist()
 	}
 
 	$i = 0;
-	$queryrows = db_fetch_assoc("select weathermap_maps.*, weathermap_groups.name as groupname from weathermap_maps, weathermap_groups where weathermap_maps.group_id=weathermap_groups.id order by sortorder");
+	$queryrows = db_fetch_assoc("select weathermap_maps.*, weathermap_groups.name as groupname from weathermap_maps, weathermap_groups where weathermap_maps.group_id=weathermap_groups.id order by weathermap_groups.sortorder,sortorder");
 	// or die (mysql_error("Could not connect to database") )
 
 	$previous_id = -2;
@@ -808,6 +816,7 @@ function weathermap_set_group($mapid,$groupid)
 	# print "UPDATING";
 	$SQL = sprintf("update weathermap_maps set group_id=%d where id=%d", $groupid, $mapid);
 	db_execute($SQL);
+	map_resort();
 }
 
 function perms_add_user($mapid,$userid)

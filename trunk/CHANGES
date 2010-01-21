@@ -1,6 +1,6 @@
 0.97a	FIXED - Incorrect action URL in 'map selector' combo box for Cacti users.
-		FIXED - cacti_graph_id set to 0 instead of ID, by rrd/poller_output and dsstats plugins (thanks sh0x)
-		CHANGE - Group sorting is a bit more logical and the presentation nicer.
+	FIXED - cacti_graph_id set to 0 instead of ID, by rrd/poller_output and dsstats plugins (thanks sh0x)
+	CHANGE - Group sorting is a bit more logical and the presentation nicer.
 
 0.97	FIXED - RRD Aggregation regexp was failing (thanks to shd)
 	FIXED - Scale numerals honour locale (thanks again, shd)
@@ -17,7 +17,7 @@
         FIXED - readdir() loop never stops, on some systems (thanks to jerebernard)
         FIXED - bad regexp in the MRTG DS plugin (thanks to Matt McMahon)
         FIXED - 0.96 had a new 'time' DS plugin - now documented!
-        FIXED - NCFPC only complains about missing scale lines on NODEs for the variable that is in use.
+        FIXED - NCFPC now only complains about missing scale lines on NODEs for the variable that is in use.
         ADDED - USEICONSCALE no longer has special dependencies - and the colours are nicer too.
 	ADDED - Option of a dropdown selector to navigate between maps (in full-size view)
 	ADDED - Maps can be organised into groups in Cacti plugin. These appear

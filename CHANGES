@@ -1,4 +1,6 @@
 0.97a	FIXED - Incorrect action URL in 'map selector' combo box for Cacti users.
+		FIXED - cacti_graph_id set to 0 instead of ID, by rrd/poller_output and dsstats plugins (thanks sh0x)
+		CHANGE - Group sorting is a bit more logical and the presentation nicer.
 
 0.97	FIXED - RRD Aggregation regexp was failing (thanks to shd)
 	FIXED - Scale numerals honour locale (thanks again, shd)

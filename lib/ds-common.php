@@ -42,7 +42,7 @@
 		
 		if(isset($vv['host_id'])) $item->add_note("cacti_host_id",intval($vv['host_id']));
 		
-		$r4 = db_fetch_row(sprintf("SELECT DISTINCT graph_templates_item.local_graph_id,title_cache FROM graph_templates_item,graph_templates_graph,data_template_rrd WHERE data_template_rrd.id=task_item_id and graph_templates_graph.local_graph_id = graph_templates_item.local_graph_id and local_data_id=%d LIMIT 1",$ldi));
+		$r4 = db_fetch_row(sprintf("SELECT DISTINCT graph_templates_item.local_graph_id,title_cache FROM graph_templates_item,graph_templates_graph,data_template_rrd WHERE data_template_rrd.id=task_item_id and graph_templates_graph.local_graph_id = graph_templates_item.local_graph_id and local_data_id=%d LIMIT 1",$local_data_id));
 		if(isset($r4['local_graph_id'])) $item->add_note("cacti_graph_id",intval($r4['local_graph_id']));
 	}
 	

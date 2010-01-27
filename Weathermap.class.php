@@ -386,12 +386,12 @@ class WeatherMap extends WeatherMapBase
 		debug ("Adding default map colour set.\n");
 		$defaults=array
 			(
-				'KEYTEXT' => array('bottom' => -2, 'top' => -1, 'red1' => 0, 'green1' => 0, 'blue1' => 0),
-				'KEYOUTLINE' => array('bottom' => -2, 'top' => -1, 'red1' => 0, 'green1' => 0, 'blue1' => 0),
-				'KEYBG' => array('bottom' => -2, 'top' => -1, 'red1' => 255, 'green1' => 255, 'blue1' => 255),
-				'BG' => array('bottom' => -2, 'top' => -1, 'red1' => 255, 'green1' => 255, 'blue1' => 255),
-				'TITLE' => array('bottom' => -2, 'top' => -1, 'red1' => 0, 'green1' => 0, 'blue1' => 0),
-				'TIME' => array('bottom' => -2, 'top' => -1, 'red1' => 0, 'green1' => 0, 'blue1' => 0)
+				'KEYTEXT' => array('bottom' => -2, 'top' => -1, 'red1' => 0, 'green1' => 0, 'blue1' => 0, 'special' => 1),
+				'KEYOUTLINE' => array('bottom' => -2, 'top' => -1, 'red1' => 0, 'green1' => 0, 'blue1' => 0, 'special' => 1),
+				'KEYBG' => array('bottom' => -2, 'top' => -1, 'red1' => 255, 'green1' => 255, 'blue1' => 255, 'special' => 1),
+				'BG' => array('bottom' => -2, 'top' => -1, 'red1' => 255, 'green1' => 255, 'blue1' => 255, 'special' => 1),
+				'TITLE' => array('bottom' => -2, 'top' => -1, 'red1' => 0, 'green1' => 0, 'blue1' => 0, 'special' => 1),
+				'TIME' => array('bottom' => -2, 'top' => -1, 'red1' => 0, 'green1' => 0, 'blue1' => 0, 'special' => 1)
 			);
 
 		foreach ($defaults as $key => $def) { $this->colours['DEFAULT'][$key]=$def; }
@@ -507,11 +507,14 @@ class WeatherMap extends WeatherMapBase
 
 	function ProcessString($input,&$context, $include_notes=TRUE,$multiline=FALSE)
 	{
-		
-
 		# debug("ProcessString: input is $input\n");
 
 		assert('is_scalar($input)');
+
+		$context_description = strtolower( $context->my_type() );
+		if($context_description != "map") $context_description .= ":" . $context->name; 
+
+		debug("Trace: ProcessString($input, $context_description)\n");
 
 		if($multiline==TRUE)
 		{
@@ -528,7 +531,7 @@ class WeatherMap extends WeatherMapBase
 			$value = "[UNKNOWN]";
 			$format = "";
 			$key = $matches[1];
-		#	debug("ProcessString: working on ".$key."\n");
+			debug("ProcessString: working on ".$key."\n");
 
 			if ( preg_match("/\{(node|map|link):([^}]+)\}/",$key,$matches) )
 			{
@@ -594,7 +597,7 @@ class WeatherMap extends WeatherMapBase
 
 				if(is_null($the_item))
 				{
-					warn("ProcessString: $key refers to unknown item [WMWARN05]\n");
+					warn("ProcessString: $key refers to unknown item (context is $context_description) [WMWARN05]\n");
 				}
 				else
 				{
@@ -3438,7 +3441,7 @@ function DrawMap($filename = '', $thumbnailfile = '', $thumbnailmax = 250, $with
 		foreach ($this->nodes as $node)
 		{
 			// don't try and draw template nodes
-			debug("Pre-rendering ".$node->name." to get bounding boxes.");
+			debug("Pre-rendering ".$node->name." to get bounding boxes.\n");
 			if(!is_null($node->x)) $this->nodes[$node->name]->pre_render($image, $this);
 		}
 		

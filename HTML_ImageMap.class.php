@@ -267,7 +267,7 @@ class HTML_ImageMap
 		} else {
 			$args = func_get_args();
 			$className = "HTML_ImageMap_Area_".$element;
-			$elementObject =& new $className($args[1],$args[2],array_slice($args, 3));
+			$elementObject = new $className($args[1],$args[2],array_slice($args, 3));
 		}
 
 		$this->shapes[] =& $elementObject;

@@ -478,7 +478,7 @@ function weathermap_fullview($cycle=FALSE, $firstonly=FALSE, $limit_to_group = -
 	if($limit_to_group >0) $maplist_SQL .= " weathermap_maps.group_id=".$limit_to_group." and ";
 	$maplist_SQL .= " (userid=".$userid." or userid=0) order by sortorder, id";
 
-	if($firstonly) { $query .= " LIMIT 1"; }
+	if($firstonly) { $maplist_SQL .= " LIMIT 1"; }
 
 	$maplist = db_fetch_assoc( $maplist_SQL );
 	html_graph_start_box(2,true);

@@ -3297,8 +3297,9 @@ function WriteConfig($filename)
 				{
 					if($node->defined_in == $this->configfile)
 					{
-						if($which=="template" && $node->x === NULL) fwrite($fd,$node->WriteConfig());
-						if($which=="normal" && $node->x !== NULL) fwrite($fd,$node->WriteConfig());
+
+						if($which=="template" && $node->x === NULL)  { debug("TEMPLATE\n"); fwrite($fd,$node->WriteConfig()); }
+						if($which=="normal" && $node->x !== NULL) { fwrite($fd,$node->WriteConfig()); }
 					}
 				}
 			}
@@ -3320,6 +3321,8 @@ function WriteConfig($filename)
 		}		
 
 		fwrite($fd, "\n\n# That's All Folks!\n");
+
+		fclose($fd);
 	}
 	else
 	{

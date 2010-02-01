@@ -6,6 +6,7 @@
 	FIXED - Editor deals with overlapping nodes on different ZORDERS properly.
 	FIXED - "property of non-object in editor.php line 466" while editing map properties (thanks to iNeo)
 	FIXED - no-data option on command-line didn't work 
+	FIXED - Clone Node was broken in 0.97 
 	CHANGE - Group sorting is a bit more logical and the presentation nicer.
 
 0.97	FIXED - RRD Aggregation regexp was failing (thanks to shd)

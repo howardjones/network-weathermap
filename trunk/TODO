@@ -1,6 +1,6 @@
 Before 0.97a
 ------------
-BUG - Editor clone doesn't work
+FIXED BUG - Editor clone doesn't work
 FIXED BUG - Show Only First Doesn't Work
 FIXED BUG - Editor imagemap has wrong sort order (lower things have priority)
 

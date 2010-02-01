@@ -830,6 +830,8 @@ else
 		$node->name = $newnodename;
 		$node->x += 30;
 		$node->y += 30;
+                $node->defined_in = $mapfile;
+
 
 		$map->nodes[$newnodename] = $node;
 		array_push($map->seen_zlayers[$node->zorder], $node);

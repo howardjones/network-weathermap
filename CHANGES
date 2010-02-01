@@ -2,6 +2,10 @@
 	FIXED - cacti_graph_id set to 0 instead of ID, by rrd/poller_output and dsstats plugins (thanks sh0x)
 	FIXED - 'classic' legend drew 'hidden' colour values for things like key background colour. (thanks jmayniac)
 	FIXED - PHP 5.3 deprecated code in HTML_Imagemap.class.php
+	FIXED - 'Show Only First' option ignored in Cacti (thanks inko_nick)
+	FIXED - Editor deals with overlapping nodes on different ZORDERS properly.
+	FIXED - "property of non-object in editor.php line 466" while editing map properties (thanks to iNeo)
+	FIXED - no-data option on command-line didn't work 
 	CHANGE - Group sorting is a bit more logical and the presentation nicer.
 
 0.97	FIXED - RRD Aggregation regexp was failing (thanks to shd)

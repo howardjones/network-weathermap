@@ -4,7 +4,7 @@ require_once 'editor.inc.php';
 require_once 'Weathermap.class.php';
 
 // so that you can't have the editor active, and not know about it.
-$ENABLED=false;
+$ENABLED=true;
 
 if(! $ENABLED)
 {
@@ -462,8 +462,8 @@ else
 		$bwin = $_REQUEST['map_linkdefaultbwin'];
 		$bwout = $_REQUEST['map_linkdefaultbwout'];
 
-		$bwin_old = $map->defaultlink->max_bandwidth_in_cfg;
-		$bwout_old = $map->defaultlink->max_bandwidth_out_cfg;
+		$bwin_old = $map->links['DEFAULT']->max_bandwidth_in_cfg;
+		$bwout_old = $map->links['DEFAULT']->max_bandwidth_out_cfg;
 
 		if( ($bwin_old != $bwin) || ($bwout_old != $bwout) )
 		{
@@ -946,7 +946,6 @@ else
 	  <a target="configwindow" href="?<?php echo ($fromplug==TRUE ? 'plug=1&amp;':''); ?>action=show_config&amp;mapname=<?php echo  $mapname ?>">See config</a></p>
 	<pre><?php echo  $log ?></pre>
 	  </div>
-	   <map name="weathermap_imap" id="weathermap_imap">
 <?php        	
 	// we need to draw and throw away a map, to get the
 	// dimensions for the imagemap. Oh well.
@@ -954,13 +953,14 @@ else
 	$map->htmlstyle='editor';
 	$map->PreloadMapHTML();
 
-	print $map->imap->subHTML("LEGEND:");
-	print $map->imap->subHTML("TIMESTAMP");
-	print $map->imap->subHTML("NODE:");
-	print $map->imap->subHTML("LINK:");
+	print $map->SortedImagemap("weathermap_imap");
+
+	#print $map->imap->subHTML("LEGEND:");
+	#print $map->imap->subHTML("TIMESTAMP");
+	#print $map->imap->subHTML("NODE:");
+	#print $map->imap->subHTML("LINK:");
                 
 ?>
-		   </map>
 	</div><!-- Node Properties -->
 
 	<div id="dlgNodeProperties" class="dlgProperties">

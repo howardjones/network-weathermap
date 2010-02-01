@@ -3931,44 +3931,50 @@ function MakeHTML($imagemapname = "weathermap_imap")
 	}
 	$html .= '</div>';
 
-	$html.='<map name="' . $imagemapname . '" id="' . $imagemapname . '">';
-
-	# $html.=$this->imap->subHTML("NODE:",true);
-	# $html.=$this->imap->subHTML("LINK:",true);
-
-	$all_layers = array_keys($this->seen_zlayers);
-	rsort($all_layers);
-
-	debug("Starting to dump imagemap in reverse Z-order...\n");
-	// this is not precisely efficient, but it'll get us going
-	// XXX - get Imagemap to store Z order, or map items to store the imagemap
-	foreach ($all_layers as $z)
-	{
-		debug("Writing HTML for layer $z\n");
-		$z_items = $this->seen_zlayers[$z];
-		if(is_array($z_items))
-		{
-			debug("   Found things for layer $z\n");
-			foreach($z_items as $it)
-			{
-				if($it->name != 'DEFAULT' && $it->name != ":: DEFAULT ::")
-				{
-					$name = "";
-					if(strtolower(get_class($it))=='weathermaplink') $name = "LINK:L";
-					if(strtolower(get_class($it))=='weathermapnode') $name = "NODE:N";
-					$name .= $it->id . ":";
-					debug("      Writing $name from imagemap\n");
-					// skip the linkless areas if we are in the editor - they're redundant
-					$html .= $this->imap->subHTML($name,true,($this->context != 'editor'));
-				}
-			}
-		}
-	}
-	
-	
-	$html.='</map>';
+	$html .= $this->SortedImagemap($imagemapname);
 
 	return ($html);
+}
+
+function SortedImagemap($imagemapname)
+{
+        $html='<map name="' . $imagemapname . '" id="' . $imagemapname . '">';
+
+        # $html.=$this->imap->subHTML("NODE:",true);
+        # $html.=$this->imap->subHTML("LINK:",true);
+
+        $all_layers = array_keys($this->seen_zlayers);
+        rsort($all_layers);
+
+        debug("Starting to dump imagemap in reverse Z-order...\n");
+        // this is not precisely efficient, but it'll get us going
+        // XXX - get Imagemap to store Z order, or map items to store the imagemap
+        foreach ($all_layers as $z)
+        {
+                debug("Writing HTML for layer $z\n");
+                $z_items = $this->seen_zlayers[$z];
+                if(is_array($z_items))
+                {
+                        debug("   Found things for layer $z\n");
+                        foreach($z_items as $it)
+                        {
+                                if($it->name != 'DEFAULT' && $it->name != ":: DEFAULT ::")
+                                {
+                                        $name = "";
+                                        if(strtolower(get_class($it))=='weathermaplink') $name = "LINK:L";
+                                        if(strtolower(get_class($it))=='weathermapnode') $name = "NODE:N";
+                                        $name .= $it->id . ":";
+                                        debug("      Writing $name from imagemap\n");
+                                        // skip the linkless areas if we are in the editor - they're redundant
+                                        $html .= $this->imap->subHTML($name,true,($this->context != 'editor'));
+                                }
+                        }
+                }
+        }
+
+        $html.='</map>';
+
+	return($html);
 }
 
 // update any editor cache files.

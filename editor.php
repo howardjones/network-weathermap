@@ -374,7 +374,7 @@ else
 		$link_name = $_REQUEST['link_name'];
 
 
-		$map->links[$link_name]->width = intval($_REQUEST['link_width']);
+		$map->links[$link_name]->width = floatval($_REQUEST['link_width']);
 		$map->links[$link_name]->infourl[IN] = $_REQUEST['link_infourl'];
 		$map->links[$link_name]->infourl[OUT] = $_REQUEST['link_infourl'];
 		$urls = preg_split('/\s+/', $_REQUEST['link_hover'], -1, PREG_SPLIT_NO_EMPTY);

@@ -28,6 +28,9 @@ $map_widths = 1;
 
 # set this to 1 to overwrite existing targets
 $overwrite_targets = 1;
+
+# set this to 1 to use DSStats targets instead of RRD file targets
+$use_dsstats = 0;
  
 
 # adjust width of link based on bandwidth.
@@ -171,7 +174,7 @@ foreach ($map->links as $link)
 			print "  We'll use the A end.\n";
 			$tgt_interface = $int_out;
 			$tgt_host = $a_id;
-			$ds_names = "";
+			$ds_names = ":traffic_in:traffic_out";
 		}
 		elseif($b_id>0  && $int_in != '')
 		{
@@ -209,7 +212,16 @@ foreach ($map->links as $link)
 					$snmp_index = $res4['snmp_index'];
 					$tgt = str_replace("<path_rra>",$config["rra_path"],$target);
 					$tgt = $tgt.$ds_names;
-					$map->links[$link->name]->targets[] = array($tgt,'','',0,$tgt);
+
+					if($use_dsstats == 0)
+					{
+						$map->links[$link->name]->targets[] = array($tgt,'','',0,$tgt);
+					}
+					else
+					{
+						$tgt = "8*dsstats:$local_data_id".$ds_names;
+						$map->links[$link->name]->targets[] = array($tgt,'','',0,$tgt);
+					}
 					
 					$SQL_speed = "select field_value from host_snmp_cache where field_name='ifSpeed' and host_id=$tgt_host and snmp_index=$snmp_index";
 					$speed = db_fetch_cell($SQL_speed);

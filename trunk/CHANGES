@@ -8,7 +8,8 @@
 	FIXED - no-data option on command-line didn't work 
 	FIXED - Clone Node was broken in 0.97 
 	CHANGE - Group sorting is a bit more logical and the presentation nicer.
-	CHANGE - LINK WIDTH accepts decimals
+	ADDED - LINK WIDTH accepts decimals
+	ADDED - cacti-integrate.php can generate DSStats TARGETs too
 
 0.97	FIXED - RRD Aggregation regexp was failing (thanks to shd)
 	FIXED - Scale numerals honour locale (thanks again, shd)

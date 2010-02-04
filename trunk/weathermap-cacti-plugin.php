@@ -750,7 +750,7 @@ function weathermap_mapselector($current_id = 0)
 	if($show_selector == 0) return false;
 
 	$userid = (isset($_SESSION["sess_user_id"]) ? intval($_SESSION["sess_user_id"]) : 1);
-	$maps = db_fetch_assoc("select weathermap_maps.*,weathermap_groups.name, weathermap_groups.sortorder as gsort from weathermap_groups,weathermap_auth,weathermap_maps where weathermap_maps.group_id=weathermap_groups.id and weathermap_maps.id=weathermap_auth.mapid and active='on' and (userid=".$userid." or userid=0) order by gsort, sortorder");
+	$maps = db_fetch_assoc("select distinct weathermap_maps.*,weathermap_groups.name, weathermap_groups.sortorder as gsort from weathermap_groups,weathermap_auth,weathermap_maps where weathermap_maps.group_id=weathermap_groups.id and weathermap_maps.id=weathermap_auth.mapid and active='on' and (userid=".$userid." or userid=0) order by gsort, sortorder");
 
 	if(sizeof($maps)>1)
 	{

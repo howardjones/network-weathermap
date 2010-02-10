@@ -579,6 +579,20 @@ else
 		$map->WriteConfig($mapfile);
 		break;
 
+		
+	case "via_link":
+		$x = intval($_REQUEST['x']);
+		$y = intval($_REQUEST['y']);
+		$link_name = $_REQUEST['link_name'];
+
+		$map->ReadConfig($mapfile);
+
+		$map->links[$link_name]->vialist = array(array(0 =>$x, 1=>$y));
+
+		$map->WriteConfig($mapfile);
+		break;
+
+		
 	case "move_node":
 		$x = snap( intval($_REQUEST['x']),  $grid_snap_value);
 		$y = snap( intval($_REQUEST['y']), $grid_snap_value);
@@ -1130,7 +1144,8 @@ else
 			  <td><a class="dlgTitlebar" id="link_delete">Delete
 			  Link</a><a class="dlgTitlebar" id="link_edit">Edit</a><a
                             class="dlgTitlebar" id="link_vert">Vert</a><a
-                            class="dlgTitlebar" id="link_horiz">Horiz</a>                          
+                            class="dlgTitlebar" id="link_horiz">Horiz</a><a 
+							class="dlgTitlebar" id="link_via">Via</a> 
                         </td>
 			</tr>
 		  </table>

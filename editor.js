@@ -198,6 +198,7 @@ function attach_click_events()
     
     addEvent(document.getElementById('link_vert'), 'click', align_link_v);
     addEvent(document.getElementById('link_horiz'), 'click', align_link_h);
+	addEvent(document.getElementById('link_via'), 'click', via_link);
     
     $('.wm_submit').click(do_submit);
     $('.wm_cancel').click(cancel_op);
@@ -564,6 +565,14 @@ function move_node()
     mapmode('xy');
     }
 
+function via_link()
+ {
+    hide_dialog('dlgLinkProperties');
+    document.getElementById('tb_help').innerText = 'Click on the map via which point you whant to redirect link.';
+    document.getElementById('action').value = "via_link";
+    mapmode('xy');
+} 
+	
 function add_link()
     {
     document.getElementById('tb_help').innerText = 'Click on the first node for one end of the link.';

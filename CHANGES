@@ -11,6 +11,7 @@
 	CHANGE - Group sorting is a bit more logical and the presentation nicer.
 	ADDED - LINK WIDTH accepts decimals
 	ADDED - cacti-integrate.php can generate DSStats TARGETs too
+	ADDED - Simple VIA editing in editor (thanks to Zdolny)
 
 0.97	FIXED - RRD Aggregation regexp was failing (thanks to shd)
 	FIXED - Scale numerals honour locale (thanks again, shd)

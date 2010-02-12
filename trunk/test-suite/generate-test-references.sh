@@ -2,6 +2,12 @@
 
 DIRECTORY="references"
 
+if [ "X$1" != "X" ]; then
+	DIRECTORY=$1
+fi
+
+echo "Processing $DIRECTORY"
+
 INDEX="index-$DIRECTORY.html"
 
 echo "<body bgcolor='#cccccc'>" > $INDEX

@@ -4,7 +4,7 @@ FIXED BUG - Editor clone doesn't work
 FIXED BUG - Show Only First Doesn't Work
 FIXED BUG - Editor imagemap has wrong sort order (lower things have priority)
 Quote escaping bug for NOTES? http://forums.cacti.net/viewtopic.php?p=181452#181452
-VIA editing code http://forums.cacti.net/viewtopic.php?t=29423&highlight=
+DONE VIA editing code http://forums.cacti.net/viewtopic.php?t=29423&highlight=
 
 
 

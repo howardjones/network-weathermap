@@ -12,6 +12,34 @@ if(!file_exists($cacti_root."/include/config.php"))
 	}
 }
 
+// initialize object
+$cg=new Console_Getopt();
+$short_opts='';
+$long_opts=array
+	(		
+		"help",
+		"input=",
+		"output=",
+		"debug",
+		"target-dsstats",
+		"target-rrdtool",
+		"error-links",
+		"error-link-size=",
+		"preserve-target",
+		"preserve-bandwidth",
+		"preserve-width",
+		"preserve-all",
+		"speed-width-map"
+	);
+
+$args=$cg->readPHPArgv();
+
+$ret=$cg->getopt($args, $short_opts, $long_opts);
+
+if (PEAR::isError($ret)) { die ("Error in command line: " . $ret->getMessage() . "\n (try --help)\n"); }
+
+$gopts=$ret[0];
+
 
 ini_set('include_path', ini_get('include_path') . PATH_SEPARATOR . $cacti_root . PATH_SEPARATOR . $cacti_root.'/plugins/weathermap' . PATH_SEPARATOR . $cacti_root.'/plugins/weathermap/random-bits'); 
 

@@ -222,27 +222,27 @@ else
         $map->ReadConfig($mapfile);
 		header('Content-type: text/plain');
 		$item_name = $_REQUEST['item_name'];
-                $item_type = $_REQUEST['item_type'];
-                $ok=FALSE;
+		$item_type = $_REQUEST['item_type'];
+		$ok=FALSE;
 
-                if($item_type == 'node')
-                {
-                        if(isset($map->nodes[$item_name]))
-                        {
-                                print $map->nodes[$item_name]->WriteConfig();
-                                $ok=TRUE;
-                        }
-                }
-                if($item_type == 'link')
-                {
-                        if(isset($map->links[$item_name]))
-                        {
-                                print $map->links[$item_name]->WriteConfig();
-                                $ok=TRUE;
-                        }
-                }
-                
-                if(! $ok) { print "# the request item didn't exist. That's probably a bug.\n"; }
+		if($item_type == 'node')
+		{
+				if(isset($map->nodes[$item_name]))
+				{
+						print $map->nodes[$item_name]->WriteConfig();
+						$ok=TRUE;
+				}
+		}
+		if($item_type == 'link')
+		{
+				if(isset($map->links[$item_name]))
+				{
+						print $map->links[$item_name]->WriteConfig();
+						$ok=TRUE;
+				}
+		}
+		
+		if(! $ok) { print "# the request item didn't exist. That's probably a bug.\n"; }
 		
 		exit();
 		break;

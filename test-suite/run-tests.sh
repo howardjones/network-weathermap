@@ -1,9 +1,16 @@
 #!/bin/sh
 
-DIRECTORY="references"
+DIRECTORY="results"
+PHP="/usr/local/bin/php"
+
+# /usr/local/php4/bin/php
 
 if [ "X$1" != "X" ]; then
-	DIRECTORY=$1
+	PHP=$1
+fi
+
+if [ "X$2" != "X" ]; then
+	DIRECTORY=$2
 fi
 
 echo "Processing $DIRECTORY"
@@ -20,7 +27,7 @@ for source in tests/*.conf; do
   echo "<hr>$source<br />" >> $INDEX
   echo "<img src='${destination}'><br />" >> $INDEX
   if [ ! -f $destination ]; then
-    php ../weathermap --config $source --output $destination
+    $PHP ../weathermap --config $source --output $destination
   else
    echo "Skipping (exists)"
   fi

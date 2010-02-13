@@ -4,18 +4,14 @@ COMPARE="compare"
 
 INDEX="index-comparisons.html"
 INDEX2="index.html"
+INDEX2TMP="indext.html"
 
 echo "<body bgcolor='#cccccc'>" > $INDEX
-echo "<body bgcolor='#cccccc'>" > $INDEX2
+
+echo "" > $INDEX2TMP
 
 
-echo "<a href='index-references.html'>Reference Images</a>" >> $INDEX2
-echo "<a href='index-results.html'>Result Images</a>" >> $INDEX2
-echo "<a href='index-comparisons.html'>Comparison Images</a>" >> $INDEX2
-echo "<hr><h1>Exceptions</h1>" >> $INDEX2
-echo "<h2>" >> $INDEX2
-date >> $INDEX2
-echo "</h2>" >> $INDEX2
+BADCOUNT=0
 
 for source in tests/*.conf; do
   base=`basename $source`
@@ -31,8 +27,9 @@ for source in tests/*.conf; do
  DIFFCOUNT=`cat $destination2`
 
 	if [ $DIFFCOUNT != "0" ]; then
-		echo "<h3>$source ($DIFFCOUNT)</h3>" >> $INDEX2
-  		echo "<img src='${destination}'><br />" >> $INDEX2
+		echo "<h3>$source ($DIFFCOUNT)</h3>" >> $INDEX2TMP
+  		echo "<img src='${destination}'><br />" >> $INDEX2TMP
+		BADCOUNT=`expr $BADCOUNT + 1`
 	fi
 
   echo "<hr>$source<br />" >> $INDEX
@@ -40,6 +37,23 @@ for source in tests/*.conf; do
 done
 
 echo "</body>" >> $INDEX
+
+
+
+echo "<body bgcolor='#cccccc'>" > $INDEX2
+echo "<a href='index-references.html'>Reference Images</a>" >> $INDEX2
+echo "<a href='index-results.html'>Result Images</a>" >> $INDEX2
+echo "<a href='index-comparisons.html'>Comparison Images</a>" >> $INDEX2
+echo "<hr><h1>Exceptions ($BADCOUNT)</h1>" >> $INDEX2
+echo "<h2>" >> $INDEX2
+date >> $INDEX2
+echo "</h2>" >> $INDEX2
+
+cat $INDEX2TMP >> $INDEX2
+rm $INDEX2TMP
+
 echo "</body>" >> $INDEX2
 
+echo
+echo "There were $BADCOUNT different tests"
 echo

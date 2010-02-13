@@ -2621,10 +2621,10 @@ function ReadConfig($input, $is_include=FALSE)
 						$uvarname = 'useiconscale';
 						$tvarname = 'iconscaletype';
 						
-						if(!function_exists("imagefilter"))
-						{
-							warn("ICON SCALEs require imagefilter, which is not present in your PHP [WMWARN040]\n");
-						}
+						// if(!function_exists("imagefilter"))
+						// {
+						// 	warn("ICON SCALEs require imagefilter, which is not present in your PHP [WMWARN040]\n");
+						// }
 						break;
 					default:
 						$varname = 'scalevar';

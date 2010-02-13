@@ -1,0 +1,13 @@
+A couple of these test files use fonts that are not in svn for copyright reasons
+
+Rebuild References (should be VERY RARE)
+ ./run-tests.sh /usr/local/bin/php references
+
+Run tests with PHP5
+ rm results/* && ./run-tests.sh
+
+Run comparison against references
+ ./compare-results.sh
+
+Run test with PHP4
+ rm results/* && ./run-tests.sh /usr/local/php4/bin/php

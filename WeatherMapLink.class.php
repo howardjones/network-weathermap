@@ -599,8 +599,7 @@ class WeatherMapLink extends WeatherMapItem
 			{
 				if ($this->notestext[$dir] != $dd->notestext[$dir]) { $output.="\t".$tdir."NOTES " . $this->notestext[$dir] . "\n"; }
 			}
-	
-			
+				
 			if($this->overliburl[IN]==$this->overliburl[OUT])
 				$dirs = array(IN=>""); // only use the IN value, since they're both the same, but don't prefix the output keyword
 			else

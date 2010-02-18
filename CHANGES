@@ -9,6 +9,7 @@
 	FIXED - Clone Node was broken in 0.97 
 	FIXED - Maps with per-user permissions show up multiple times in map selector
 	FIXED - Removed incorrect warning about imagefilter and USEICONSCALE.
+	FIXED - string escaping bug with editor and direct config changes (thanks uhtred)
 	CHANGE - Group sorting is a bit more logical and the presentation nicer.
 	ADDED - LINK WIDTH accepts decimals
 	ADDED - cacti-integrate.php can generate DSStats TARGETs too

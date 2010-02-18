@@ -665,6 +665,11 @@ function RandomData()
 function LoadPlugins( $type="data", $dir="lib/datasources" )
 {
 	debug("Beginning to load $type plugins from $dir\n");
+        
+    if ( ! file_exists($dir)) {
+        $dir = dirname(__FILE__) . DIRECTORY_SEPARATOR . $dir;
+        debug("Relative path didn't exist. Trying $dir\n");
+    }
 	# $this->datasourceclasses = array();
 	$dh=@opendir($dir);
 

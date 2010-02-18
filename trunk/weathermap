@@ -13,8 +13,6 @@ if (!module_checks()) { die ("Quitting: Module checks failed.\n"); }
 
 //    $weathermap_debugging=TRUE; 
 
-
-
 $output="html";
 $configfile="weathermap.conf";
 $htmlfile='';

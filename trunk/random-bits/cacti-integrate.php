@@ -73,6 +73,8 @@ $map_widths = false;
 // set this to true to use DSStats targets instead of RRD file targets
 $use_dsstats = false;
 
+$overwrite_targets = false;
+
 $outputmapfile = "";
 $inputmapfile = "";
 
@@ -86,6 +88,7 @@ $long_opts = array (
     "debug",
     "target-dsstats",
     "target-rrdtool",
+    "overwrite-targets",
     "speed-width-map"
 );
 
@@ -106,6 +109,10 @@ if (sizeof($gopts) > 0) {
         switch ($o[0]) {
             case '--debug':
                 $weathermap_debugging = true;
+                break;
+
+            case '--overwrite-targets':
+                $overwrite_targets = true;
                 break;
 
             case '--speed-width-map':
@@ -172,7 +179,6 @@ $fmt_cacti_graphpage = $cacti_url . "graph.php?rra_id=all&local_graph_id=%d";
 // hostname (host.description)
 // address (host.hostname) (sorry about that)
 //
-$weathermap_debugging = true;
 
 foreach ($map->nodes as $node) {
     $name = $node->name;
@@ -259,7 +265,7 @@ foreach ($map->links as $link) {
 
         print "LINK $name\n";
 
-        if (count($link->targets) == 0) {
+        if (count($link->targets) == 0 || $overwrite_targets ) {
             if ((($a_id + $b_id) > 0) && ($int_out . $int_in == '')) {
                 print "  (could do if there were interfaces)\n";
             }

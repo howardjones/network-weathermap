@@ -179,6 +179,7 @@ else
 
 		exit();        
 		break;
+
 	case 'draw':
 		header('Content-type: image/png');
 		$map->ReadConfig($mapfile);
@@ -225,24 +226,22 @@ else
 		$item_type = $_REQUEST['item_type'];
 		$ok=FALSE;
 
-		if($item_type == 'node')
-		{
-				if(isset($map->nodes[$item_name]))
-				{
-						print $map->nodes[$item_name]->WriteConfig();
-						$ok=TRUE;
-				}
+		if($item_type == 'node'){
+            if (isset($map->nodes[$item_name])) {
+                print $map->nodes[$item_name]->WriteConfig();
+                $ok=TRUE;
+            }
 		}
-		if($item_type == 'link')
-		{
-				if(isset($map->links[$item_name]))
-				{
-						print $map->links[$item_name]->WriteConfig();
-						$ok=TRUE;
-				}
+		if($item_type == 'link') {
+            if(isset($map->links[$item_name])) {
+                print $map->links[$item_name]->WriteConfig();
+                $ok=TRUE;
+            }
 		}
 		
-		if(! $ok) { print "# the request item didn't exist. That's probably a bug.\n"; }
+		if (! $ok) { 
+            print "# the request item didn't exist. That's probably a bug.\n"; 
+        }
 		
 		exit();
 		break;
@@ -251,36 +250,39 @@ else
 		$map->ReadConfig($mapfile);
 
 		$link_name = $_REQUEST['link_name'];
-		$link_config = $_REQUEST['item_configtext'];
-                
-        $map->links[$link_name]->config_override=$link_config;
+		$link_config = fix_gpc_string($_REQUEST['item_configtext']);
+		                
+        $map->links[$link_name]->config_override = $link_config;
                 
 		$map->WriteConfig($mapfile);
 		// now clear and reload the map object, because the in-memory one is out of sync
 		// - we don't know what changes the user made here, so we just have to reload.
-	                unset($map);
-	                $map = new WeatherMap;
-	                $map->context = 'editor';
-	                $map->ReadConfig($mapfile);
+		unset($map);
+		$map = new WeatherMap;
+		$map->context = 'editor';
+		$map->ReadConfig($mapfile);
 		break;
 
 	case "set_node_config":
 		$map->ReadConfig($mapfile);
 
 		$node_name = $_REQUEST['node_name'];
-		$node_config = $_REQUEST['item_configtext'];
+		$node_config = fix_gpc_string($_REQUEST['item_configtext']);
+		
+		if (true == function_exists('get_magic_quotes_gpc') && 1 == get_magic_quotes_gpc()) {
+			$link_config = stripslashes($link_config);
+		}
                 
-                $map->nodes[$node_name]->config_override=$node_config;
+        $map->nodes[$node_name]->config_override = $node_config;
                 
 		$map->WriteConfig($mapfile);
-                // now clear and reload the map object, because the in-memory one is out of sync
-                // - we don't know what changes the user made here, so we just have to reload.
-                unset($map);
-                $map = new WeatherMap;
-                $map->context = 'editor';
-                $map->ReadConfig($mapfile);
+		// now clear and reload the map object, because the in-memory one is out of sync
+		// - we don't know what changes the user made here, so we just have to reload.
+		unset($map);
+		$map = new WeatherMap;
+		$map->context = 'editor';
+		$map->ReadConfig($mapfile);
 		break;
-
 
 	case "set_node_properties":
 		$map->ReadConfig($mapfile);

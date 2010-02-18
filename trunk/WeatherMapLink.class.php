@@ -516,7 +516,7 @@ class WeatherMapLink extends WeatherMapItem
 
 		if($this->config_override != '')
 		{
-			$output  = $this->config_override."\n";
+			$output = $this->config_override."\n";
 		}
 		else
 		{
@@ -569,45 +569,52 @@ class WeatherMapLink extends WeatherMapItem
 				}
 			}		
 		
-			if($this->infourl[IN]==$this->infourl[OUT])
+			if ($this->infourl[IN] == $this->infourl[OUT]) {
 				$dirs = array(IN=>""); // only use the IN value, since they're both the same, but don't prefix the output keyword
-			else
+			} else {
 				$dirs = array( IN=>"IN", OUT=>"OUT" );// the full monty two-keyword version
+			}
 						
-			foreach ($dirs as $dir=>$tdir)
-			{
-				if ($this->infourl[$dir] != $dd->infourl[$dir]) { $output.="\t".$tdir."INFOURL " . $this->infourl[$dir] . "\n"; }
+			foreach ($dirs as $dir=>$tdir) {
+				if ($this->infourl[$dir] != $dd->infourl[$dir]) { 
+					$output .= "\t" . $tdir . "INFOURL " . $this->infourl[$dir] . "\n"; 
+				}
 			}
 			
-			if($this->overlibcaption[IN]==$this->overlibcaption[OUT])
+			if ($this->overlibcaption[IN] == $this->overlibcaption[OUT]) {
 				$dirs = array(IN=>""); // only use the IN value, since they're both the same, but don't prefix the output keyword
-			else
+			} else {
 				$dirs = array( IN=>"IN", OUT=>"OUT" );// the full monty two-keyword version
+			}
 						
-			foreach ($dirs as $dir=>$tdir)
-			{
-				if ($this->overlibcaption[$dir] != $dd->overlibcaption[$dir]) { $output.="\t".$tdir."OVERLIBCAPTION " . $this->overlibcaption[$dir] . "\n"; }
+			foreach ($dirs as $dir=>$tdir) {
+				if ($this->overlibcaption[$dir] != $dd->overlibcaption[$dir]) { 
+					$output .= "\t".$tdir."OVERLIBCAPTION " . $this->overlibcaption[$dir] . "\n"; 
+				}
+			}
+		
+			if ($this->notestext[IN] == $this->notestext[OUT]) {
+				$dirs = array(IN=>""); // only use the IN value, since they're both the same, but don't prefix the output keyword
+			} else { 
+				$dirs = array( IN=>"IN", OUT=>"OUT" );// the full monty two-keyword version
 			}
 	
-	
-			if($this->notestext[IN]==$this->notestext[OUT])
-				$dirs = array(IN=>""); // only use the IN value, since they're both the same, but don't prefix the output keyword
-			else
-				$dirs = array( IN=>"IN", OUT=>"OUT" );// the full monty two-keyword version
-	
-			foreach ($dirs as $dir=>$tdir)
-			{
-				if ($this->notestext[$dir] != $dd->notestext[$dir]) { $output.="\t".$tdir."NOTES " . $this->notestext[$dir] . "\n"; }
+			foreach ($dirs as $dir=>$tdir) {
+				if ($this->notestext[$dir] != $dd->notestext[$dir]) {
+					$output .= "\t" . $tdir . "NOTES " . $this->notestext[$dir] . "\n"; 
+				}
 			}
 				
-			if($this->overliburl[IN]==$this->overliburl[OUT])
+			if ($this->overliburl[IN]==$this->overliburl[OUT]) {
 				$dirs = array(IN=>""); // only use the IN value, since they're both the same, but don't prefix the output keyword
-			else
+			} else {
 				$dirs = array( IN=>"IN", OUT=>"OUT" );// the full monty two-keyword version
+			}
 			
-			foreach ($dirs as $dir=>$tdir)
-			{
-				if ($this->overliburl[$dir] != $dd->overliburl[$dir]) { $output.="\t".$tdir."OVERLIBGRAPH " . join(" ",$this->overliburl[$dir]) . "\n"; }
+			foreach ($dirs as $dir=>$tdir) {
+				if ($this->overliburl[$dir] != $dd->overliburl[$dir]) { 
+					$output.="\t".$tdir."OVERLIBGRAPH " . join(" ",$this->overliburl[$dir]) . "\n"; 
+				}
 			}	
 			
 			// if formats have been set, but they're just the longform of the built-in styles, set them back to the built-in styles
@@ -626,7 +633,9 @@ class WeatherMapLink extends WeatherMapItem
 
 			// if specific formats have been set, then the style will be '--'
 			// if it isn't then use the named style
-			if ( ($this->labelstyle != $dd->labelstyle) && ($this->labelstyle != '--') ) { $output.="\tBWLABEL " . $this->labelstyle . "\n"; }
+			if ( ($this->labelstyle != $dd->labelstyle) && ($this->labelstyle != '--') ) { 
+				$output .= "\tBWLABEL " . $this->labelstyle . "\n"; 
+			}
 						
 			// if either IN or OUT field changes, then both must be written because a regular BWLABEL can't do it
 			// XXX this looks wrong
@@ -635,10 +644,9 @@ class WeatherMapLink extends WeatherMapItem
 						
 			if ( ( $this->labelstyle == '--') && ( ($this->bwlabelformats[IN] != $comparison) || ($this->bwlabelformats[OUT]!= '--')) )
 			{
-				$output.="\tINBWFORMAT " . $this->bwlabelformats[IN]. "\n";
-				$output.="\tOUTBWFORMAT " . $this->bwlabelformats[OUT]. "\n";
+				$output .= "\tINBWFORMAT " . $this->bwlabelformats[IN]. "\n";
+				$output .= "\tOUTBWFORMAT " . $this->bwlabelformats[OUT]. "\n";
 			}
-
 	
 			$comparison = $dd->labeloffset_in;
 			$comparison2 = $dd->labeloffset_out;
@@ -653,63 +661,55 @@ class WeatherMapLink extends WeatherMapItem
 	
 			$comparison=$dd->targets;
 	
-			if ($this->targets != $comparison)
-			{
+			if ($this->targets != $comparison) {
 				$output.="\tTARGET";
 	
-				foreach ($this->targets as $target) 
-				{ 
-					if(strpos($target[4]," ") == FALSE) 
-					{
-						$output.=" " . $target[4]; 
+				foreach ($this->targets as $target) { 
+					if(strpos($target[4]," ") == FALSE) {
+						$output .= " " . $target[4]; 
+					} else {
+						$output .= ' "' . $target[4] . '"'; 
 					}
-					else
-					{
-						$output.=' "' . $target[4].'"'; 
-					}
-				}
-	
-				$output.="\n";
+				}	
+				$output .= "\n";
 			}
-	
-			
-	
-			foreach (array(IN,OUT) as $dir)
-			{
-				if($dir==IN) $tdir="IN";
-				if($dir==OUT) $tdir="OUT";
+				
+			foreach (array(IN,OUT) as $dir) {
+				if ($dir==IN) { 
+					$tdir="IN";
+				}
+				if ($dir==OUT) { 
+					$tdir="OUT";
+				}
 				
 				$comparison=$dd->comments[$dir];
-				if ($this->comments[$dir] != $comparison) { $output.="\t".$tdir."COMMENT " . $this->comments[$dir] . "\n"; }
+				if ($this->comments[$dir] != $comparison) { 
+					$output .= "\t" . $tdir . "COMMENT " . $this->comments[$dir] . "\n"; 
+				}
 			}
-				
+					
+			if (isset($this->a) && isset($this->b))	{
+				$output .= "\tNODES " . $this->a->name;
 	
-			if (isset($this->a) && isset($this->b))
-			{
-				$output.="\tNODES " . $this->a->name;
+				if ($this->a_offset != 'C') {
+					$output .= ":" . $this->a_offset;
+				}
 	
-				if ($this->a_offset != 'C')
-					$output.=":" . $this->a_offset;
+				$output .= " " . $this->b->name;
 	
-				$output.=" " . $this->b->name;
+				if ($this->b_offset != 'C') {
+					$output .= ":" . $this->b_offset;
+				}
 	
-				if ($this->b_offset != 'C')
-					$output.=":" . $this->b_offset;
-	
-				$output.="\n";
+				$output .= "\n";
 			}
 	
-			if (count($this->vialist) > 0)
-			{
-				foreach ($this->vialist as $via)
-				{
-					if(isset($via[2]))
-					{
-						$output.=sprintf("\tVIA %s %d %d\n", $via[2],$via[0], $via[1]);
-					}
-					else
-					{
-						$output.=sprintf("\tVIA %d %d\n", $via[0], $via[1]);
+			if (count($this->vialist) > 0) {
+				foreach ($this->vialist as $via) {
+					if( isset($via[2])) {
+						$output .= sprintf("\tVIA %s %d %d\n", $via[2],$via[0], $via[1]);
+					} else {
+						$output .= sprintf("\tVIA %d %d\n", $via[0], $via[1]);
 					}
 				}
 			}
@@ -742,8 +742,7 @@ class WeatherMapLink extends WeatherMapItem
 			      }
 			}
 	
-			if ($output != '')
-			{
+			if ($output != '') {
 				$output = "LINK " . $this->name . "\n".$output."\n";
 			}
 		}

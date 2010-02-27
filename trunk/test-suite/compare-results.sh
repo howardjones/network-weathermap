@@ -2,24 +2,29 @@
 
 COMPARE="compare"
 
-INDEX="index-comparisons.html"
-INDEX2="index.html"
+SUFFIX="php5"
+
+if [ "X$1" != "X" ]; then
+	SUFFIX=$1
+fi
+
+INDEX="index-comparisons-$SUFFIX.html"
+INDEX2="index-$SUFFIX.html"
 INDEX2TMP="indext.html"
 
 echo "<body bgcolor='#cccccc'>" > $INDEX
 
 echo "" > $INDEX2TMP
 
-
 BADCOUNT=0
 
 for source in tests/*.conf; do
   base=`basename $source`
 
-  destination="comparisons/${base}.png"
-  destination2="comparisons/${base}.txt"
+  destination="comparisons-$SUFFIX/${base}.png"
+  destination2="comparisons-$SUFFIX/${base}.txt"
   reference="references/${base}.png"
-  result="results/${base}.png"
+  result="results-$SUFFIX/${base}.png"
 
   echo "$source: $reference vs $result -> $destination"
   $COMPARE -metric AE $reference $result $destination  > $destination2 2>&1
@@ -38,12 +43,10 @@ done
 
 echo "</body>" >> $INDEX
 
-
-
 echo "<body bgcolor='#cccccc'>" > $INDEX2
 echo "<a href='index-references.html'>Reference Images</a>" >> $INDEX2
-echo "<a href='index-results.html'>Result Images</a>" >> $INDEX2
-echo "<a href='index-comparisons.html'>Comparison Images</a>" >> $INDEX2
+echo "<a href='index-results-$SUFFIX.html'>Result Images</a>" >> $INDEX2
+echo "<a href='index-comparisons-$SUFFIX.html'>Comparison Images</a>" >> $INDEX2
 echo "<hr><h1>Exceptions ($BADCOUNT)</h1>" >> $INDEX2
 echo "<h2>" >> $INDEX2
 date >> $INDEX2

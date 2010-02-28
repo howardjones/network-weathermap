@@ -766,7 +766,13 @@ class WeatherMapLink extends WeatherMapItem
 
 		$tgt='';
 
-		foreach ($this->targets as $target) { $tgt.=$target[4] . ' '; }
+		foreach ($this->targets as $target) { 
+			if(strpos($target[4]," ") == FALSE) {
+				$tgt .= $target[4] . ' ';
+			} else {
+				$tgt .= '"'.$target[4] . '" ';
+			}
+		}
 
 		$js.=js_escape(trim($tgt));
 		$js.=",";

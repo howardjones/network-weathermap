@@ -11,8 +11,11 @@
 	FIXED - Removed incorrect warning about imagefilter and USEICONSCALE.
 	FIXED - string escaping bug with editor and direct config changes (thanks uhtred)
         FIXED - --imageuri was ignored on command-line (thanks Marcus Stögbauer)
+	FIXED - links with targets containing spaces are broken by the editor (thanks Andreas Braun)
+	FIXED - deprecated jQuery function call in cacti-pick.php (thanks again Andreas Braun)
 	CHANGE - Group sorting is a bit more logical and the presentation nicer.
         CHANGE - cacti-integrate.php uses getopt to take more command-line params
+	CHANGE - Updated jQuery to latest version
 	ADDED - LINK WIDTH accepts decimals
 	ADDED - cacti-integrate.php can generate DSStats TARGETs too
 	ADDED - Simple VIA editing in editor (thanks to Zdolny)

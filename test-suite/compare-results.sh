@@ -26,7 +26,7 @@ for source in tests/*.conf; do
   reference="references/${base}.png"
   result="results-$SUFFIX/${base}.png"
 
-  echo "$source: $reference vs $result -> $destination"
+#  echo "$source: $reference vs $result -> $destination"
   $COMPARE -metric AE $reference $result $destination  > $destination2 2>&1
 
  DIFFCOUNT=`cat $destination2`
@@ -59,4 +59,5 @@ echo "</body>" >> $INDEX2
 
 echo
 echo "There were $BADCOUNT different tests"
+echo "See $INDEX2 for details."
 echo

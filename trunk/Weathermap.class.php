@@ -1,5 +1,5 @@
 <?php
-// PHP Weathermap 0.97
+// PHP Weathermap 0.97a
 // Copyright Howard Jones, 2005-2010 howie@thingy.com
 // http://www.network-weathermap.com/
 // Released under the GNU Public License
@@ -10,7 +10,7 @@ require_once "WeatherMap.functions.php";
 require_once "WeatherMapNode.class.php";
 require_once "WeatherMapLink.class.php";
 
-$WEATHERMAP_VERSION="0.97";
+$WEATHERMAP_VERSION="0.97a";
 $weathermap_debugging=FALSE;
 $weathermap_map="";
 $weathermap_warncount=0;
@@ -3920,21 +3920,25 @@ function MakeHTML($imagemapname = "weathermap_imap")
 	$html='';
 
 	$html .= '<div class="weathermapimage" style="margin-left: auto; margin-right: auto; width: '.$this->width.'px;" >';
-	if ( $this->get_hint('imageuri') != '') { $html.=sprintf(
-		'<img id="wmapimage" src="%s" width="%d" height="%d" border="0" usemap="#%s"',
-		$this->get_hint('imageuri'),
-		$this->width,
-		$this->height,
-		$imagemapname); 
+	if ( $this->get_hint('imageuri') != '') { 
+		$html.=sprintf(
+			'<img id="wmapimage" src="%s" width="%d" height="%d" border="0" usemap="#%s"',
+			$this->get_hint('imageuri'),
+			$this->width,
+			$this->height,
+			$imagemapname
+		); 
 		//$html .=  'alt="network weathermap" ';
 		$html .= '/>';
 		}
-	else { $html.=sprintf(
-		'<img id="wmapimage" src="%s" width="%d" height="%d" border="0" usemap="#%s"',
-		$this->imagefile,
-		$this->width,
-		$this->height,
-		$imagemapname); 
+	else { 
+		$html.=sprintf(
+			'<img id="wmapimage" src="%s" width="%d" height="%d" border="0" usemap="#%s"',
+			$this->imagefile,
+			$this->width,
+			$this->height,
+			$imagemapname
+		); 
 		//$html .=  'alt="network weathermap" ';
 		$html .= '/>';
 	}

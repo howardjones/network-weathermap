@@ -22,6 +22,39 @@ a { color: black; text-decoration: underline; font-weight: normal;}
 
 <!--#include file="common-top-nav.html" -->
 
+<h2><a name="changes097a">Changes For This Version (0.97 to 0.97a)</a></h2>
+
+<h3>Fixes</h3>
+<ul>
+	<li>Incorrect action URL in 'map selector' combo box for Cacti users.
+	<li>cacti_graph_id set to 0 instead of ID, by rrd/poller_output and dsstats plugins (thanks sh0x)
+	<li>'classic' legend drew 'hidden' colour values for things like key background colour. (thanks jmayniac)
+	<li>PHP 5.3 deprecated code in HTML_Imagemap.class.php
+	<li>'Show Only First' option ignored in Cacti (thanks inko_nick)
+	<li>Editor deals with overlapping nodes on different ZORDERS properly.
+	<li>"property of non-object in editor.php line 466" while editing map properties (thanks to iNeo)
+	<li>no-data option on command-line didn't work 
+	<li>Clone Node was broken in 0.97 
+	<li>Maps with per-user permissions show up multiple times in map selector
+	<li>Removed incorrect warning about imagefilter and USEICONSCALE.
+	<li>string escaping bug with editor and direct config changes (thanks uhtred)
+    <li>--imageuri was ignored on command-line (thanks Marcus Stögbauer)
+	<li>links with targets containing spaces are broken by the editor (thanks Andreas Braun)
+	<li>deprecated jQuery function call in cacti-pick.php (thanks again Andreas Braun)
+</ul>
+<h3>Changes</h3>	
+<ul>
+	<li>Group sorting is a bit more logical and the presentation nicer.
+    <li>cacti-integrate.php uses getopt to take more command-line params
+	<li>Updated jQuery to latest 
+</ul>
+<h3>New Features</h3>
+<ul>
+	<li>LINK WIDTH accepts decimals
+	<li>cacti-integrate.php can generate DSStats TARGETs too
+	<li>Simple VIA editing in editor (thanks to Zdolny)
+</ul>
+
 	<h2><a name="changes097">Changes For This Version (0.96a to 0.97)</a></h2>
 
 <h3>Fixes</h3>

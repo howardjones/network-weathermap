@@ -118,7 +118,7 @@ if(isset($_REQUEST['command']) && $_REQUEST["command"]=='link_step1')
 		if(filterstring!=previous)
 		{	
 				$('ul#dslist > li').hide();
-				$('ul#dslist > li').contains(filterstring).show();
+				$("ul#dslist > li:contains('" + filterstring + "')").show();
 		}
 	}
 

@@ -3920,10 +3920,10 @@ function MakeHTML($imagemapname = "weathermap_imap")
 	$html='';
 
 	$html .= '<div class="weathermapimage" style="margin-left: auto; margin-right: auto; width: '.$this->width.'px;" >';
-	if ( $this->get_hint('imageuri') != '') { 
+	if ( $this->imageuri != '') { 
 		$html.=sprintf(
 			'<img id="wmapimage" src="%s" width="%d" height="%d" border="0" usemap="#%s"',
-			$this->get_hint('imageuri'),
+			$this->imageuri,
 			$this->width,
 			$this->height,
 			$imagemapname

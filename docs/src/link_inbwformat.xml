@@ -17,7 +17,7 @@
     </description>
     <examples>
 	<example><caption>Providing more information in the bwlabel</caption>
-	<content>INBWFORMAT {node:this:inpercent}% of {node:this:max_bandwidth_in:%k}b/sec</content>
+	<content>INBWFORMAT {link:this:inpercent}% of {link:this:max_bandwidth_in:%k}b/sec</content>
 	</example>
     </examples>
 

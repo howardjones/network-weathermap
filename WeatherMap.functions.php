@@ -1456,49 +1456,50 @@ function nice_bandwidth($number, $kilo = 1000,$decimals=1,$below_one=TRUE)
 	if ($number == 0)
 		return '0';
 
-	$milli = 1/$kilo;
-	$micro = 1/$milli;
-	$nano = 1/$micro;
 	$mega=$kilo * $kilo;
 	$giga=$mega * $kilo;
 	$tera=$giga * $kilo;
 
-	if ($number > $tera)
+        $milli = 1/$kilo;
+	$micro = 1/$mega;
+	$nano = 1/$giga;
+
+	if ($number >= $tera)
 	{
 		$number/=$tera;
 		$suffix="T";
 	}
-	elseif ($number > $giga)
+	elseif ($number >= $giga)
 	{
 		$number/=$giga;
 		$suffix="G";
 	}
-	elseif ($number > $mega)
+	elseif ($number >= $mega)
 	{
 		$number/=$mega;
 		$suffix="M";
 	}
-	elseif ($number > $kilo)
+	elseif ($number >= $kilo)
 	{
 		$number/=$kilo;
 		$suffix="K";
 	}
-        elseif ($number > 1)
+        elseif ($number >= 1)
         {
                 $number = $number;
                 $suffix="";
         }
-	elseif (($below_one==TRUE) && ($number > $milli))
+	elseif (($below_one==TRUE) && ($number >= $milli))
 	{
 		$number/=$milli;
 		$suffix="m";
 	}
-	elseif (($below_one==TRUE) && ($number > $micro))
+	elseif (($below_one==TRUE) && ($number >= $micro))
 	{
 		$number/=$micro;
 		$suffix="u";
 	}
-	elseif (($below_one==TRUE) && ($number > $nano))
+	elseif (($below_one==TRUE) && ($number >= $nano))
 	{
 		$number/=$nano;
 		$suffix="n";

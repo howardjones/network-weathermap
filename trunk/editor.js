@@ -11,10 +11,24 @@ var helptexts = {
         'If you are using the \'overlib\' HTML style then this is the URL that will be opened when you click on the link',
     "link_hover":
         'If you are using the \'overlib\' HTML style then this is the URL of the image that will be shown when you hover over the link',
+    "link_bandwidth_in": "The bandwidth from the first node to the second node",
+    "link_bandwidth_out": "The bandwidth from the second node to the first node (if that is different)",
+    "link_commentin": "The text that will appear alongside the link",
+    "link_commentout": "The text that will appear alongside the link",
+
+    "node_infourl":
+        'If you are using the \'overlib\' HTML style then this is the URL that will be opened when you click on the node',
+    "node_hover":
+        'If you are using the \'overlib\' HTML style then this is the URL of the image that will be shown when you hover over the node',
+    "node_x": "How far from the left to position the node, in pixels",
+    "node_y": "How far from the top to position the node, in pixels",
+    "node_label": "The text that appears on the node",
+    "node_new_name": "The name used for this node when defining links",
 
     "tb_newfile": 'Change to a different file, or start creating a new one.',
     "tb_addnode": 'Add a new node to the map',
     "tb_addlink": 'Add a new link to the map, by joining two nodes together.',
+
 
     "hover_tb_newfile": 'Select a different map to edit, or start a new one.',
 

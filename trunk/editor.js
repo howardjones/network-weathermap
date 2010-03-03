@@ -2,78 +2,49 @@
 
 var newWindow;
 
-var helptexts = new Object;
-
 // seed the help text. Done in a big lump here, so we could make a foreign language version someday.
 
-helptexts.link_target
-    = 'Where should Weathermap get data for this link? This can either be an RRD file, or an HTML with special comments in it (normally from MRTG).';
-helptexts.link_width = 'How wide the link arrow will be drawn, in pixels.';
-helptexts.link_infourl
-    = 'If you are using the \'overlib\' HTML style then this is the URL that will be opened when you click on the link';
-helptexts.link_hover
-    = 'If you are using the \'overlib\' HTML style then this is the URL of the image that will be shown when you hover over the link';
+var helptexts = {
+    "link_target": 'Where should Weathermap get data for this link? This can either be an RRD file, or an HTML with special comments in it (normally from MRTG).',
+    "link_width": 'How wide the link arrow will be drawn, in pixels.',
+    "link_infourl":
+        'If you are using the \'overlib\' HTML style then this is the URL that will be opened when you click on the link',
+    "link_hover":
+        'If you are using the \'overlib\' HTML style then this is the URL of the image that will be shown when you hover over the link',
 
-helptexts.tb_newfile = 'Change to a different file, or start creating a new one.';
-helptexts.tb_addnode = 'Add a new node to the map';
-helptexts.tb_addlink = 'Add a new link to the map, by joining two nodes together.';
+    "tb_newfile": 'Change to a different file, or start creating a new one.',
+    "tb_addnode": 'Add a new node to the map',
+    "tb_addlink": 'Add a new link to the map, by joining two nodes together.',
 
-helptexts.hover_tb_newfile = 'Select a different map to edit, or start a new one.';
+    "hover_tb_newfile": 'Select a different map to edit, or start a new one.',
 
-helptexts.link_default = 'This is where help appears for links';
-helptexts.map_default = 'This is where help appears for maps';
-helptexts.node_default = 'This is where help appears for nodes';
-helptexts.tb_defaults = 'or click a Node or Link to edit it\'s properties';
+// These are the default text - what appears when nothing more interesting
+// is happening. One for each dialog/location.
+    "link_default": 'This is where help appears for links',
+    "map_default": 'This is where help appears for maps',
+    "node_default": 'This is where help appears for nodes',
+    "tb_default": 'or click a Node or Link to edit it\'s properties'
+};
 
-// addEvent(window, 'load', initJS);
-$(document).ready(initJS);
-addEvent(window, 'unload', cleanupJS);
-
-function addEvent(obj, evType, fn)
-    {
-    if (obj.addEventListener)
-        {
-        obj.addEventListener(evType, fn, false);
-        return true;
-        }
-
-    else if (obj.attachEvent)
-        {
-        var r = obj.attachEvent("on" + evType, fn);
-        return r;
-        }
-
-    else
-        {
-        return false;
-        }
-    }
+jQuery(document).ready(initJS);
+jQuery(document).unload(cleanupJS);
 
 function initJS()
     {
     // check if DOM is available, if not, we'll stop here, leaving the warning showing
     if (!document.getElementById || !document.createTextNode || !document.getElementsByTagName)
         {
+        // I'm pretty sure this is actually impossible now.
         return;
         }
 
-    // check if there is a "No JavaScript" message
-    var nojsmsg = document.getElementById('nojs');
-
-    if (nojsmsg)
-        {
-        nojsmsg.style.display = 'none';
-        }
+        // check if there is a "No JavaScript" message
+        jQuery("#nojs").hide();
 
     // so that's the warning hidden, now let's show the content
 
     // check if there is a "with JavaScript" div
-    var jsmsg = document.getElementById('withjs');
-
-    if (jsmsg)
-        {
-        jsmsg.style.display = 'block';
-        }
+    jQuery("#withjs").show();
 
     // if the xycapture element is there, then we are in the main edit screen
     if (document.getElementById('xycapture'))
@@ -81,7 +52,6 @@ function initJS()
         attach_click_events();
         attach_help_events();
         show_context_help('node_label', 'node_help');
-//	hide_all_dialogs();
 
         // set the mapmode, so we know where we stand.
         mapmode('existing');
@@ -96,261 +66,104 @@ function cleanupJS()
 
     }
 
-function attach_help_events()
-    {
-    var helps;
 
-    // add an onblur/onfocus handler to all the visible <input> items  
-    helps = document.getElementsByTagName('input');
-
-    for (i = 0; i < helps.length; ++i)
-        {
-        if (helps[i].getAttribute('type') != 'hidden')
-            {
-            addEvent(helps[i], 'focus', help_handler);
-            addEvent(helps[i], 'blur', help_handler);
-            }
-        }
-
-    if (6 == 8)
-        {
-        // add an onmousein/onmouseout handler to the toolbar buttons
-        helps = document.getElementsByTagName('li');
-
-        for (i = 0; i < helps.length; ++i)
-            {
-            // alert(helps[i].id.slice(0,3));
-            //alert(helps[i].className);
-            if (helps[i].className == 'tb_active')
-                { // alert(helps[i].id);
-                addEvent(helps[i], 'mouseover', mouse_help_handler);
-                addEvent(helps[i], 'mouseout', mouse_help_handler);
-                //   alert('Attaching to ' + helps[i].className);
-                }
-            }
-        }
-    }
 
 function attach_click_events()
-    {
-    var alt, i;
-    var areas, type;
+    {  
 
-    areas = document.getElementsByTagName('area');
-
-    for (i = 0; i < areas.length; ++i)
-    {
-        //alt = areas[i].getAttribute('id');
-        alt = areas[i].id;
-        if(alt != '')
-        {
-            type = alt.slice(0, 5);
-            if (type == 'LINK:' || type == 'NODE:')
-                {
-                // we add the href so that the browser adds a 'hand' cursor
-                areas[i].setAttribute('href', '#');
-                // and the click_handler does the actual work
-                addEvent(areas[i], 'click', click_handler);
-                }
-
-            if (type == 'TIMES')
-                {
-                areas[i].setAttribute('href', '#');
-                addEvent(areas[i], 'click', position_timestamp);
-                }
-
-            if (type == 'LEGEN')
-                {
-                areas[i].setAttribute('href', '#');
-                addEvent(areas[i], 'click', position_legend);
-                }
-        }
-    }
-
+    jQuery("area[id^=LINK:]").attr("href","#").click(click_handler);
+    jQuery("area[id^=NODE:]").attr("href","#").click(click_handler);
+    jQuery("area[id^=TIMES]").attr("href","#").click(position_timestamp);
+    jQuery("area[id^=LEGEN]").attr("href","#").click(position_legend);
+    
     if(fromplug===1)
     {
-        addEvent(document.getElementById('tb_newfile'), 'click', function() { window.location = "weathermap-cacti-plugin-mgmt.php"; });
+        jQuery("#tb_newfile").click( function() {window.location = "weathermap-cacti-plugin-mgmt.php";} )
     }
     else
     {
-        addEvent(document.getElementById('tb_newfile'), 'click', new_file);
+        jQuery("#tb_newfile").click(new_file);
     }
-    
-    addEvent(document.getElementById('tb_addnode'), 'click', add_node);
-    addEvent(document.getElementById('tb_mapprops'), 'click', map_properties);
-    addEvent(document.getElementById('tb_mapstyle'), 'click', map_style);
 
-    addEvent(document.getElementById('tb_addlink'), 'click', add_link);
-    addEvent(document.getElementById('tb_poslegend'), 'click', position_first_legend);
-    addEvent(document.getElementById('tb_postime'), 'click', position_timestamp);
-    addEvent(document.getElementById('tb_colours'), 'click', manage_colours);
-    addEvent(document.getElementById('tb_manageimages'), 'click', manage_images);
-    addEvent(document.getElementById('tb_prefs'), 'click', prefs);
+    jQuery("#tb_addnode").click(add_node);
+    jQuery("#tb_mapprops").click(map_properties);
+    jQuery("#tb_mapstyle").click(map_style);
 
+    jQuery("#tb_addlink").click(add_link);
+    jQuery("#tb_poslegend").click(position_first_legend);
+    jQuery("#tb_postime").click(position_timestamp);
+    jQuery("#tb_colours").click(manage_colours);
+
+    jQuery("#tb_manageimages").click(manage_images);
+    jQuery("#tb_prefs").click(prefs);
+
+    jQuery("#node_move").click(move_node);
+    jQuery("#node_delete").click(delete_node);
+    jQuery("#node_clone").click(clone_node);
+    jQuery("#node_edit").click(edit_node);
+
+    jQuery("#link_delete").click(delete_link);
+    jQuery("#link_edit").click(edit_link);
+
+    jQuery("#link_vert").click(align_link_v);
+    jQuery("#link_horiz").click(align_link_h);
+    jQuery("#link_via").click(via_link);
+        
+    jQuery('.wm_submit').click(do_submit);
+    jQuery('.wm_cancel').click(cancel_op);
     
-    addEvent(document.getElementById('node_move'), 'click', move_node);
-    addEvent(document.getElementById('node_delete'), 'click', delete_node);
-    addEvent(document.getElementById('node_clone'), 'click', clone_node);
-    addEvent(document.getElementById('node_edit'), 'click', edit_node);
+    jQuery('#link_cactipick').click(cactipicker).attr("href","#");
+    jQuery('#node_cactipick').click(nodecactipicker).attr("href","#");
     
-    addEvent(document.getElementById('link_delete'), 'click', delete_link);
-    addEvent(document.getElementById('link_edit'), 'click', edit_link);
-    
-    addEvent(document.getElementById('link_vert'), 'click', align_link_v);
-    addEvent(document.getElementById('link_horiz'), 'click', align_link_h);
-	addEvent(document.getElementById('link_via'), 'click', via_link);
-    
-    $('.wm_submit').click(do_submit);
-    $('.wm_cancel').click(cancel_op);
-    
-    $('#link_cactipick').click(cactipicker).attr("href","#");
-    $('#node_cactipick').click(nodecactipicker).attr("href","#");
-    
-    $('#xycapture').mouseover(function(event) {coord_capture(event);});
-    $('#xycapture').mousemove(function(event) {coord_update(event);});
-    $('#xycapture').mouseout(function(event) {coord_release(event);});
-    
-    
+    jQuery('#xycapture').mouseover(function(event) {coord_capture(event);});
+    jQuery('#xycapture').mousemove(function(event) {coord_update(event);});
+    jQuery('#xycapture').mouseout(function(event) {coord_release(event);});
+        
     }
 
 // used by the cancel button on each of the properties dialogs
 function cancel_op()
     {
     hide_all_dialogs();
-    document.frmMain.action.value = '';
+    jQuery("#action").val("");
     }
 
 function help_handler(e)
     {
-    var el;
-    var target;
-    var help;
 
-    if (window.event && window.event.srcElement)
-        {
-        el = window.event.srcElement;
-        }
+       var objectid = jQuery(this).attr('id');
+       var section = objectid.slice(0, objectid.indexOf('_'));
+       var target = section + '_help';
+       var helptext = "undefined";
 
-    if (e && e.target)
-        {
-        el = e.target;
-        }
+       if (helptexts[objectid]) {       
+            helptext = helptexts[objectid];
+       }
 
-    if (!el)
-        {
-        return;
-        }
+    if ((e.type == 'blur') || (e.type == 'mouseout')) {
+                        
+        helptext = helptexts[section + '_default'];
 
-    var objectid = el.id;
-
-    if ((e.type == 'focus') || (e.type == 'mouseover'))
-        {
-        if (helptexts[objectid])
-            {
-            help = helptexts[objectid];
-            target = objectid.slice(0, objectid.indexOf('_')) + '_help';
-
-            document.getElementById(target).firstChild.nodeValue = help;
-
-            // alert(target);
-            }
-        }
-
-    if ((e.type == 'blur') || (e.type == 'mouseout'))
-        {
-        // alert('blurred - figure out default, and apply it.');
-
-        var section = objectid.slice(0, objectid.indexOf('_'));
-        target = section + '_help';
-        help = helptexts[section + '_default'];
-
-        if (help == 'undefined')
-            {
+        if (helptext == 'undefined') {
             alert('OID is: ' + objectid + ' and target is:' + target + ' and section is: ' + section);
             }
-
-        document.getElementById(target).firstChild.nodeValue = help;
-        }
-    }
-
-function mouse_help_handler(e)
-    {
-    var el;
-    var target;
-    var help;
-
-    //  alert('ddd');
-
-    if (window.event && window.event.srcElement)
-        {
-        el = window.event.srcElement;
+            
         }
 
-    if (e && e.target)
-        {
-        el = e.target;
+        if(helptext != "undefined") {
+            jQuery("#" + target).text(helptext);
         }
 
-    if (!el)
-        {
-        return;
-        }
-
-    var objectid = el.firstChild.id;
-
-    if ((e.type == 'focus') || (e.type == 'mouseover'))
-        {
-        if (helptexts[objectid])
-            {
-            help = helptexts[objectid];
-            target = objectid.slice(0, objectid.indexOf('_')) + '_help';
-
-            document.getElementById(target).firstChild.nodeValue = help;
-
-            // alert(target);
-            }
-        }
-
-    if ((e.type == 'blur') || (e.type == 'mouseout'))
-        {
-        // alert('blurred - figure out default, and apply it.');
-
-        var section = objectid.slice(0, objectid.indexOf('_'));
-        target = section + '_help';
-        help = helptexts[section + '_default'];
-
-        if (help == 'undefined')
-            {
-            alert('OID is: ' + objectid + ' and target is:' + target + ' and section is: ' + section);
-            }
-
-        document.getElementById(target).firstChild.nodeValue = help;
-        }
     }
 
 // Any clicks in the imagemap end up here.
 function click_handler(e)
     {
-    var el;
+    
     var alt, objectname, objecttype, objectid;
-
-    if (window.event && window.event.srcElement)
-        {
-        el = window.event.srcElement;
-        }
-
-    if (e && e.target)
-        {
-        el = e.target;
-        }
-
-    if (!el)
-        {
-        return;
-        }
-
+    
     // alt = el.getAttribute('alt');
-	alt = el.id;
+	alt = jQuery(this).attr("id");
 
     objecttype = alt.slice(0, 4);
     objectname = alt.slice(5, alt.length);
@@ -677,31 +490,31 @@ function show_itemtext(itemtype,name)
     
   //  $.blockUI.defaults.elementMessage = 'Please Wait';
     
-    $('textarea#item_configtext').val('');
+    jQuery('textarea#item_configtext').val('');
     
     if(itemtype==='node')
     {           
-        $('#action').val('set_node_config');
+        jQuery('#action').val('set_node_config');
     }
     
     if(itemtype==='link')
     {           
-        $('#action').val('set_link_config');
+        jQuery('#action').val('set_link_config');
     }
     show_dialog('dlgTextEdit');
     
 //    $('#item_configtext').block();
     
-    $.ajax( { type: "GET",
+    jQuery.ajax( { type: "GET",
                 url: 'editor.php',
                 data: {action: 'fetch_config',
                         item_type: itemtype,
                         item_name: name,
                         mapname: document.frmMain.mapname.value},
                 success: function(text) {
-                        $('#item_configtext').val(text);
+                        jQuery('#item_configtext').val(text);
                         document.getElementById('item_configtext').focus();
-                      //  $('#dlgTextEdit').unblock();
+                      //  jQuery('#dlgTextEdit').unblock();
                    }
            } );
 }
@@ -793,14 +606,14 @@ function show_link(name)
         document.frmMain.link_commentposout.value = mylink.commentposout; 
 
         // if that didn't "stick", then we need to add the special value
-        if($('#link_commentposout').val() != mylink.commentposout)
+        if( jQuery('#link_commentposout').val() != mylink.commentposout)
         {
-            $('#link_commentposout').prepend("<option selected value='" + mylink.commentposout + "'>" + mylink.commentposout + "%</option>");
+            jQuery('#link_commentposout').prepend("<option selected value='" + mylink.commentposout + "'>" + mylink.commentposout + "%</option>");
         }
 
-        if($('#link_commentposin').val() != mylink.commentposin)
+        if( jQuery('#link_commentposin').val() != mylink.commentposin)
         {
-            $('#link_commentposin').prepend("<option selected value='" + mylink.commentposin + "'>" + mylink.commentposin + "%</option>");
+            jQuery('#link_commentposin').prepend("<option selected value='" + mylink.commentposin + "'>" + mylink.commentposin + "%</option>");
         }
         
         document.getElementById('link_nodename1').firstChild.nodeValue = mylink.a;
@@ -877,12 +690,12 @@ function coord_update(event)
     cursory -= p.y;
     cursory++; // fudge to make coords match results from imagemap (not sure why this is needed)
         
-    $('#tb_coords').html('Position<br />'+ cursorx + ', ' + cursory);
+    jQuery('#tb_coords').html('Position<br />'+ cursorx + ', ' + cursory);
 }
 
 function coord_release(event)
 {
-    $('#tb_coords').html('Position<br />---, ---');
+    jQuery('#tb_coords').html('Position<br />---, ---');
 }
 
 function align_link_h()
@@ -895,4 +708,11 @@ function align_link_v()
 {
     document.getElementById('action').value = "link_align_vertical";
     document.frmMain.submit();
+}
+
+function attach_help_events()
+{
+    // add an onblur/onfocus handler to all the visible <input> items
+
+    jQuery("input").focus(help_handler).blur(help_handler);
 }

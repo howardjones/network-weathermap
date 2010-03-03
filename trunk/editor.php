@@ -934,7 +934,7 @@ else
 <body id="mainview">
   <div id="toolbar">
 	<ul>
-           <li class="tb_active" id="tb_newfile">Change<br />File</li>
+          <li class="tb_active" id="tb_newfile">Change<br />File</li>
 	  <li class="tb_active" id="tb_addnode">Add<br />Node</li>
 	  <li class="tb_active" id="tb_addlink">Add<br />Link</li>
 	  <li class="tb_active" id="tb_poslegend">Position<br />Legend</li>
@@ -944,7 +944,7 @@ else
 	  <li class="tb_active" id="tb_colours">Manage<br />Colors</li>
 	  <li class="tb_active" id="tb_manageimages">Manage<br />Images</li>
 	  <li class="tb_active" id="tb_prefs">Editor<br />Settings</li>
-        <li class="tb_coords" id="tb_coords">Position<br />---, ---</li>
+          <li class="tb_coords" id="tb_coords">Position<br />---, ---</li>
 	  <li class="tb_help"><span id="tb_help">or click a Node or Link to edit it's properties</span></li>
 	</ul>
   </div>

@@ -175,7 +175,7 @@ class WeatherMap extends WeatherMapBase
 	var $links = array(); // an array of WeatherMapLinks
 	var $texts = array(); // an array containing all the extraneous text bits
 	var $used_images = array(); // an array of image filenames referred to (used by editor)
-	var $seen_zlayers = array(0=>array(),1000=>array()); // 0 is the background, 100 is the legends, title, etc
+	var $seen_zlayers = array(0=>array(),1000=>array()); // 0 is the background, 1000 is the legends, title, etc
 
 	var $config;
 	var $next_id;
@@ -3969,8 +3969,17 @@ function SortedImagemap($imagemapname)
                 if(is_array($z_items))
                 {
                         debug("   Found things for layer $z\n");
+
+                        // at z=1000, the legends and timestamps live
+                        if($z == 1000) {
+                            debug("     Builtins fit here.\n");
+                            $html .= $this->imap->subHTML("LEGEND:",true,($this->context != 'editor'));
+                            $html .= $this->imap->subHTML("TIMESTAMP",true,($this->context != 'editor'));
+                        }
+
                         foreach($z_items as $it)
                         {
+                                # print "     " . $it->name . "\n";
                                 if($it->name != 'DEFAULT' && $it->name != ":: DEFAULT ::")
                                 {
                                         $name = "";

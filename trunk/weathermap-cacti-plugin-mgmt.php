@@ -422,6 +422,23 @@ function maplist()
 	#print "<pre>";
 	#print_r($menu);
 	#print "</pre>";
+
+	$last_started = read_config_option("weathermap_last_started_file",true);
+	$last_finished = read_config_option("weathermap_last_finished_file",true);
+	$last_start_time = intval(read_config_option("weathermap_last_start_time",true));
+	$last_finish_time = intval(read_config_option("weathermap_last_finish_time",true));
+	$poller_interval = intval(read_config_option("poller_interval"));
+
+	if( ($last_finish_time - $last_start_time) > $poller_interval ) {
+
+	if( ($last_started != $last_finished) && ($last_started != "") ) {
+		print '<div align="center" class="wm_warning"><p>';
+		print "Last time it ran, Weathermap did NOT complete it's run. It failed during processing for '$last_started'. ";
+		print "This <strong>may</strong> have affected other plugins that run during the poller process. </p><p>";
+		print "You should either disable this map, or fault-find. Possible causes include memory_limit issues. The log may have more information.";
+		print '</p></div>';
+	}
+	}
 	
 	html_start_box("<strong>Weathermaps</strong>", "78%", $colors["header"], "3", "center", "weathermap-cacti-plugin-mgmt.php?action=addmap_picker");
 
@@ -559,6 +576,14 @@ function maplist()
 	}
 
 	html_end_box();
+
+        $last_stats = read_config_option("weathermap_last_stats", true);
+
+	if($last_stats != "") {
+		print "<div align='center'><strong>Last Completed Run:</strong> $last_stats</div>";
+	} else {
+		
+	}
 	
 	if($had_warnings>0)
 	{

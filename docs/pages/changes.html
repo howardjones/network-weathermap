@@ -1,14 +1,11 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"> 
-
 <html lang="en" xml:lang="en"> 
 <head> 
  <link rel="stylesheet" type="text/css" media="screen" href="weathermap.css" /> 
- <meta name="generator" content= 
- "HTML Tidy for Mac OS X (vers 12 April 2006), see www.w3.org" /> 
 
- <title>PHP Weathermap 
-v0.97 
+<title>PHP Weathermap 
+v0.97a 
  - Changes For This Version</title> 
 <style type="text/css" media="print"> 
 /*<![CDATA[*/ 
@@ -41,7 +38,7 @@ a { color: black; text-decoration: underline; font-weight: normal;}
 
 <div id="header"> 
  <h1>PHP Weathermap 
-v0.97 
+v0.97a 
 </h1> 
  <h4>Copyright &copy; 2005-2010 Howard Jones, <tt><a 
 href="mailto:howie@thingy.com">howie@thingy.com</a></tt>. (<a 
@@ -49,47 +46,81 @@ href="http://www.network-weathermap.com/">Website</a>)</h4>
 </div> 
 
 
+<h2><a name="changes097a">Changes For This Version (0.97 to 0.97a)</a></h2> 
+
+<h3>Fixes</h3> 
+<ul> 
+ <li>Incorrect action URL in 'map selector' combo box for Cacti users.</li> 
+ <li>cacti_graph_id set to 0 instead of ID, by rrd/poller_output and dsstats plugins (thanks sh0x)</li> 
+ <li>'classic' legend drew 'hidden' colour values for things like key background colour. (thanks jmayniac)</li> 
+ <li>PHP 5.3 deprecated code in HTML_Imagemap.class.php</li> 
+ <li>'Show Only First' option ignored in Cacti (thanks inko_nick)</li> 
+ <li>Editor deals with overlapping nodes on different ZORDERS properly.</li> 
+ <li>"property of non-object in editor.php line 466" while editing map properties (thanks to iNeo)</li> 
+ <li>no-data option on command-line didn't work </li> 
+ <li>Clone Node was broken in 0.97 </li> 
+ <li>Maps with per-user permissions show up multiple times in map selector</li> 
+ <li>Removed incorrect warning about imagefilter and USEICONSCALE.</li> 
+ <li>string escaping bug with editor and direct config changes (thanks uhtred)</li> 
+ <li>--imageuri was ignored on command-line (thanks Marcus Stögbauer)</li> 
+ <li>links with targets containing spaces are broken by the editor (thanks Andreas Braun)</li> 
+ <li>deprecated jQuery function call in cacti-pick.php (thanks again Andreas Braun)</li> 
+</ul> 
+<h3>Changes</h3> 
+<ul> 
+ <li>Group sorting is a bit more logical and the presentation nicer.</li> 
+ <li>cacti-integrate.php uses getopt to take more command-line params</li> 
+ <li>Updated jQuery to latest</li> 
+ <li>Number formatting will pick 1G over 1000M (and similar) (thanks cerbum)</li> 
+</ul> 
+<h3>New Features</h3> 
+<ul> 
+ <li><a href="config-reference.html#LINK_LINK">LINK</a> <a href="config-reference.html#GLOBAL_WIDTH">WIDTH</a> accepts decimals</li> 
+ <li>cacti-integrate.php can generate DSStats <a href="config-reference.html#LINK_TARGET">TARGETs</a> too</li> 
+ <li>Simple <a href="config-reference.html#LINK_VIA">VIA</a> editing in editor (thanks to Zdolny)</li> 
+</ul> 
+
  <h2><a name="changes097">Changes For This Version (0.96a to 0.97)</a></h2> 
 
 <h3>Fixes</h3> 
 <ul> 
- <li>RRD Aggregation regexp was failing (thanks to shd) 
- <li>Scale numerals honour locale (thanks again, shd) 
- <li>THold plugin check failed with Thold 0.4.1 (PA 2.x, actually) 
- <li>Uninitialized variable in ReadData when plugin is disabled 
- <li>Zero-length link check didn't include offsets (thanks Ryan Botoluzzi) 
- <li>Cacti-pick should get right rra path for packagers that move the rra directory (e.g. Ubuntu, Debian *again*) 
- <li>DS plugins that return one value and a null should work properly 
- <li>"Strange" characters (e.g. /) in <a href="config-reference.html#NODE_NODE">NODE</a> and <a href="config-reference.html#LINK_LINK">LINK</a> names broke the imagemap. 
- <li>Map Style settings in editor were broken after internal defaults changes 
- <li>Imagemap no longer contains areas with no href defined 
- <li><a href="config-reference.html#LINK_SPLITPOS">SPLITPOS</a> was ignored with <a href="config-reference.html#LINK_VIASTYLE">VIASTYLE</a> angled (thanks to uhtred) 
- <li><a href="config-reference.html#NODE_COLORS">'AICONOUTLINECOLOR</a> none' is actually valid now (thanks to mgb & Leathon) 
- <li>readdir() loop never stops, on some systems (thanks to jerebernard) 
- <li>bad regexp in the MRTG DS plugin (thanks to Matt McMahon) 
- <li>0.96 had a new 'time' DS plugin - now documented! 
- <li>NCFPC only complains about missing scale lines on <a href="config-reference.html#NODE_NODE">NODEs</a> for the variable that is in use. 
+ <li>RRD Aggregation regexp was failing (thanks to shd)</li> 
+ <li>Scale numerals honour locale (thanks again, shd)</li> 
+ <li>THold plugin check failed with Thold 0.4.1 (PA 2.x, actually)</li> 
+ <li>Uninitialized variable in ReadData when plugin is disabled</li> 
+ <li>Zero-length link check didn't include offsets (thanks Ryan Botoluzzi)</li> 
+ <li>Cacti-pick should get right rra path for packagers that move the rra directory (e.g. Ubuntu, Debian *again*)</li> 
+ <li>DS plugins that return one value and a null should work properly</li> 
+ <li>"Strange" characters (e.g. /) in <a href="config-reference.html#NODE_NODE">NODE</a> and <a href="config-reference.html#LINK_LINK">LINK</a> names broke the imagemap.</li> 
+ <li>Map Style settings in editor were broken after internal defaults changes</li> 
+ <li>Imagemap no longer contains areas with no href defined</li> 
+ <li><a href="config-reference.html#LINK_SPLITPOS">SPLITPOS</a> was ignored with <a href="config-reference.html#LINK_VIASTYLE">VIASTYLE</a> angled (thanks to uhtred)</li> 
+ <li><a href="config-reference.html#NODE_COLORS">'AICONOUTLINECOLOR</a> none' is actually valid now (thanks to mgb & Leathon)</li> 
+ <li>readdir() loop never stops, on some systems (thanks to jerebernard)</li> 
+ <li>bad regexp in the MRTG DS plugin (thanks to Matt McMahon)</li> 
+ <li>0.96 had a new 'time' DS plugin - now documented!</li> 
+ <li>NCFPC only complains about missing scale lines on <a href="config-reference.html#NODE_NODE">NODEs</a> for the variable that is in use.</li> 
 </ul> 
 <h3>New Features</h3> 
 <ul> 
- <li><a href="config-reference.html#NODE_USEICONSCALE">USEICONSCALE</a> no longer has special dependencies - and the colours are nicer too. 
- <li>Option of a dropdown selector to navigate between maps (in full-size view) 
- <li>Maps can be organised into groups in Cacti plugin. These appear 
- as tabs in the UI for viewing maps. 
- <li>Extra variables can be defined per-group, so all maps in a group can have similar settings (e.g. a "24hr average" tab). 
- <li><a href="config-reference.html#GLOBAL_INCLUDE">INCLUDE</a> keyword to include a file of common definitions (based on work by BorisL) 
- (NOTE: this can confuse the editor sometimes - see the manual page for <a href="config-reference.html#GLOBAL_INCLUDE">INCLUDE)</a> 
- <li>Warning for maps that contain <a href="config-reference.html#LINK_OVERLIBGRAPH">OVERLIBGRAPH</a> but not <a href="config-reference.html#GLOBAL_HTMLSTYLE">'HTMLSTYLE</a> overlib' 
- <li>Warning for use of <a href="config-reference.html#LINK_TEMPLATE">TEMPLATE</a> not as the first line of an object (overwrites settings otherwise) 
- <li><a href="config-reference.html#GLOBAL_SCALE">SCALE</a> will accept values below 0, and also above 100 
- <li><a href="config-reference.html#LINK_USESCALE">USESCALE</a> has two new options: absolute and percent, which allows you to have a <a href="config-reference.html#GLOBAL_SCALE">SCALE</a> of absolute values 
- <li>New datasource plugin to support statistics from TheWitness's DSStats Cacti Plugin. This gets you daily,weekly,monthly and annual stats with no complicated rrdtool stuff. 
- <li>New converter to take a rrdtool-based map config and make it into a DSStats-based one 
- <li>static datasource can be used for negative values 
- <li>SNMP datasource has configurable timeout and retry values. 
- <li>SNMP datasource has option to give up on a failing host 
- <li><a href="config-reference.html#NODE_LABELOFFSET">LABELOFFSET</a> supports percentage compass offsets and radial offsets, like <a href="config-reference.html#LINK_NODES">NODES</a> does. 
- <li>Percentage compass offsets <a href="config-reference.html#LINK_NODES">(NODES</a> and <a href="config-reference.html#NODE_LABELOFFSET">LABELOFFSET)</a> support &gt; 100% offsets 
+ <li><a href="config-reference.html#NODE_USEICONSCALE">USEICONSCALE</a> no longer has special dependencies - and the colours are nicer too.</li> 
+ <li>Option of a dropdown selector to navigate between maps (in full-size view)</li> 
+ <li>Maps can be organised into groups in Cacti plugin. These appear</li> 
+ as tabs in the UI for viewing maps.</li> 
+ <li>Extra variables can be defined per-group, so all maps in a group can have similar settings (e.g. a "24hr average" tab).</li> 
+ <li><a href="config-reference.html#GLOBAL_INCLUDE">INCLUDE</a> keyword to include a file of common definitions (based on work by BorisL)</li> 
+ (NOTE: this can confuse the editor sometimes - see the manual page for INCLUDE)</li> 
+ <li>Warning for maps that contain <a href="config-reference.html#LINK_OVERLIBGRAPH">OVERLIBGRAPH</a> but not <a href="config-reference.html#GLOBAL_HTMLSTYLE">'HTMLSTYLE</a> overlib'</li> 
+ <li>Warning for use of <a href="config-reference.html#LINK_TEMPLATE">TEMPLATE</a> not as the first line of an object (overwrites settings otherwise)</li> 
+ <li><a href="config-reference.html#GLOBAL_SCALE">SCALE</a> will accept values below 0, and also above 100</li> 
+ <li><a href="config-reference.html#LINK_USESCALE">USESCALE</a> has two new options: absolute and percent, which allows you to have a <a href="config-reference.html#GLOBAL_SCALE">SCALE</a> of absolute values</li> 
+ <li>New datasource plugin to support statistics from TheWitness's DSStats Cacti Plugin. This gets you daily,weekly,monthly and annual stats with no complicated rrdtool stuff.</li> 
+ <li>New converter to take a rrdtool-based map config and make it into a DSStats-based one</li> 
+ <li>static datasource can be used for negative values</li> 
+ <li>SNMP datasource has configurable timeout and retry values.</li> 
+ <li>SNMP datasource has option to give up on a failing host</li> 
+ <li><a href="config-reference.html#NODE_LABELOFFSET">LABELOFFSET</a> supports percentage compass offsets and radial offsets, like <a href="config-reference.html#LINK_NODES">NODES</a> does.</li> 
+ <li>Percentage compass offsets <a href="config-reference.html#LINK_NODES">(NODES</a> and <a href="config-reference.html#NODE_LABELOFFSET">LABELOFFSET)</a> support &gt; 100% offsets</li> 
 </ul> 
 
  <h2><a name="changes096a">Changes For This Version (0.96 to 0.96a)</a></h2> 

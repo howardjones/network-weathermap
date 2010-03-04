@@ -87,6 +87,8 @@ function weathermap_run_maps($mydir) {
 		$orig_cwd = getcwd();
 		chdir($mydir);
 
+		db_execute("replace into settings values('weathermap_last_start_time','".mysql_escape_string(time())."')");
+
 		// first, see if the output directory even exists
 		if(is_dir($outdir))
 		{
@@ -106,16 +108,18 @@ function weathermap_run_maps($mydir) {
 					debug("Iterating all maps.");
 
 					$imageformat = strtolower(read_config_option("weathermap_output_format"));
+					$rrdtool_path =  read_config_option("path_rrdtool");
 
 					foreach ($queryrows as $map) {
 						// reset the warning counter
 						$weathermap_warncount=0;
 						// this is what will prefix log entries for this map
 						$weathermap_map = "[Map ".$map['id']."] ".$map['configfile'];
+	
+						debug("FIRST TOUCH\n");
 						
 						if(weathermap_check_cron($weathermap_poller_start_time,$map['schedule']))
 						{
-							
 							$mapfile = $confdir.DIRECTORY_SEPARATOR.$map['configfile'];
 							$htmlfile = $outdir.DIRECTORY_SEPARATOR.$map['filehash'].".html";
 							$imagefile = $outdir.DIRECTORY_SEPARATOR.$map['filehash'].".".$imageformat;
@@ -124,13 +128,14 @@ function weathermap_run_maps($mydir) {
 							if(file_exists($mapfile))
 							{
 								if($quietlogging==0) warn("Map: $mapfile -> $htmlfile & $imagefile\n",TRUE);
+								db_execute("replace into settings values('weathermap_last_started_file','".mysql_escape_string($weathermap_map)."')");
 								$map_start = time();
 								weathermap_memory_check("MEM starting $mapcount");
 								$wmap = new Weathermap;
 								$wmap->context = "cacti";
 
 								// we can grab the rrdtool path from Cacti's config, in this case
-								$wmap->rrdtool  = read_config_option("path_rrdtool");
+								$wmap->rrdtool  = $rrdtool_path;
 
 								$wmap->ReadConfig($mapfile);							
 
@@ -215,6 +220,7 @@ function weathermap_run_maps($mydir) {
 								debug("TIME: $mapfile took $map_duration seconds.\n");
 								weathermap_memory_check("MEM after $mapcount");
 								$mapcount++;
+								db_execute("replace into settings values('weathermap_last_finished_file','".mysql_escape_string($weathermap_map)."')");
 							}
 							else
 							{
@@ -224,6 +230,10 @@ function weathermap_run_maps($mydir) {
 							$total_warnings += $weathermap_warncount;
 							$weathermap_warncount = 0;
 							$weathermap_map="";
+						}
+						else
+						{
+							debug("Skipping ".$map['id']." (".$map['configfile'].") due to schedule.\n");
 						}
 					}
 					debug("Iterated all $mapcount maps.\n");
@@ -246,7 +256,10 @@ function weathermap_run_maps($mydir) {
 		chdir($orig_cwd);
 		$duration = time() - $start_time;
 
-		if($quietlogging==0) warn("STATS: Weathermap $WEATHERMAP_VERSION run complete - $mapcount maps were run in $duration seconds with $total_warnings warnings.\n", TRUE);
+		$stats_string = date(DATE_RFC822) . ": $mapcount maps were run in $duration seconds with $total_warnings warnings.";
+		if($quietlogging==0) warn("STATS: Weathermap $WEATHERMAP_VERSION run complete - $stats_string\n", TRUE);
+		db_execute("replace into settings values('weathermap_last_stats','".mysql_escape_string($stats_string)."')");
+		db_execute("replace into settings values('weathermap_last_finish_time','".mysql_escape_string(time())."')");
 	}
 	else
 	{

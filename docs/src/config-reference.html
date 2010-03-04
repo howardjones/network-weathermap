@@ -773,7 +773,17 @@ which is then displayed. Specify the targets on one <a href="#LINK_TARGET">TARGE
 <h2><a name="LINK_WIDTH">WIDTH</a></h2>
 <div class="definition">WIDTH <em class="meta">width</em>
 </div>
-<div class="description"><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Specifies the width of this link when drawn, in pixels. </p></div>
+<div class="description">
+<p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Specifies the width of this link when drawn. The <em>width</em> value can be any positive number (including non-integers). </p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">The actual width of the final link arrow will be <em>roughly</em> 2*width+1 pixels, due to the way links are drawn, and rounding errors as 
+the internal floating-point values are finally forced onto an integer pixel-grid. </p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude"> What it actually does is calculate a centre-line (or spine), divide that up into so many segments, and then at each point along the spine, find the normal (90 degrees to the direction of the line). Then step <a href="#LINK_WIDTH">WIDTH</a> pixels along the normal in each direction to get a point to draw. This apparently-complex scheme is required to allow for <a href="#LINK_VIA">VIAs</a> - both angled and curved links have special handling, and regular straight links are treated as curved links with no <a href="#LINK_VIA">VIA</a> by default. </p> 
+</div>
+<div class="changes">
+<h3>Change History</h3>
+<dl>
+<dt>0.97a</dt>
+<dd>Added non-integer widths. Retconned explanation.</dd>
+</dl>
+</div>
 </div>
 	    	  <div class="referenceentry">
 <h2><a name="LINK_BANDWIDTH">BANDWIDTH</a></h2>
@@ -859,7 +869,7 @@ given in the <a href="#LINK_NODES">NODES</a> line. </p><p xmlns="http://www.w3.o
 <h3>Examples</h3>
 <div class="example">
 <h5>Providing more information in the bwlabel</h5>
-<pre>INBWFORMAT {node:this:inpercent}% of {node:this:max_bandwidth_in:%k}b/sec</pre>
+<pre>INBWFORMAT {link:this:inpercent}% of {link:this:max_bandwidth_in:%k}b/sec</pre>
 </div>
 </div>
 <div class="changes">

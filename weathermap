@@ -235,7 +235,7 @@ if ($map->ReadConfig($configfile))
 		$map->add_hint($key,$value);
 	}
 
-        if (! $options_output['sizedebug'] )
+        if ( (isset($options_output['sizedebug']) && ! $options_output['sizedebug']) || (!isset($options_output['sizedebug'])) )
 	{
 		if ($randomdata == 1) { $map->RandomData(); }
 		else { $map->ReadData(); }

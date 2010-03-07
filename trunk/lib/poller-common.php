@@ -140,7 +140,7 @@ function weathermap_run_maps($mydir) {
 								$wmap->ReadConfig($mapfile);							
 
 								$wmap->add_hint("mapgroup",$map['groupname']);
-								$wmap->add_hint("mapgroupextra",($map['groupid'] ==1 ? "" : $map['groupname'] ));
+								$wmap->add_hint("mapgroupextra",($map['group_id'] ==1 ? "" : $map['groupname'] ));
 							
 								# in the order of precedence - global extras, group extras, and finally map extras
 								$queries = array();

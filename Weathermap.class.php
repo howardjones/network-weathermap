@@ -2655,7 +2655,7 @@ function ReadConfig($input, $is_include=FALSE)
 			// one REGEXP to rule them all:
 //				if(preg_match("/^\s*SCALE\s+([A-Za-z][A-Za-z0-9_]*\s+)?(\d+\.?\d*)\s+(\d+\.?\d*)\s+(\d+)\s+(\d+)\s+(\d+)(?:\s+(\d+)\s+(\d+)\s+(\d+))?\s*$/i",
 //	0.95b		if(preg_match("/^\s*SCALE\s+([A-Za-z][A-Za-z0-9_]*\s+)?(\d+\.?\d*)\s+(\d+\.?\d*)\s+(\d+)\s+(\d+)\s+(\d+)(?:\s+(\d+)\s+(\d+)\s+(\d+))?\s*(.*)$/i",
-			if(preg_match("/^\s*SCALE\s+([A-Za-z][A-Za-z0-9_]*\s+)?(\-?\d+\.?\d*)\s+(\-?\d+\.?\d*)\s+(?:(\d+)\s+(\d+)\s+(\d+)(?:\s+(\d+)\s+(\d+)\s+(\d+))?|(none))\s*(.*)$/i",
+			if(preg_match("/^\s*SCALE\s+([A-Za-z][A-Za-z0-9_]*\s+)?(\-?\d+\.?\d*[munMGT]?)\s+(\-?\d+\.?\d*[munMGT]?)\s+(?:(\d+)\s+(\d+)\s+(\d+)(?:\s+(\d+)\s+(\d+)\s+(\d+))?|(none))\s*(.*)$/i",
 				$buffer, $matches))
 			{
 				// The default scale name is DEFAULT
@@ -2670,8 +2670,8 @@ function ReadConfig($input, $is_include=FALSE)
 
 				$this->colours[$matches[1]][$key]['tag']=$tag;
 
-				$this->colours[$matches[1]][$key]['bottom'] = (float)($matches[2]);
-				$this->colours[$matches[1]][$key]['top'] = (float)($matches[3]);
+				$this->colours[$matches[1]][$key]['bottom'] = unformat_number($matches[2], $this->kilo);
+				$this->colours[$matches[1]][$key]['top'] = unformat_number($matches[3], $this->kilo);
 				$this->colours[$matches[1]][$key]['special'] = 0;
 
 				if(isset($matches[10]) && $matches[10] == 'none')
@@ -3238,6 +3238,14 @@ function WriteConfig($filename)
 				{
 					$top = rtrim(rtrim(sprintf("%f",$colour['top']),"0"),$decimal_point);
 					$bottom= rtrim(rtrim(sprintf("%f",$colour['bottom']),"0"),$decimal_point);
+
+                                        if ($bottom > 1000) {
+                                            $bottom = format_bandwidth($colour['bottom'], $this->kilo);
+                                        }
+
+                                        if ($top > 1000) {
+                                            $top = format_bandwidth($colour['top'], $this->kilo);
+                                        }
 
 					$tag = (isset($colour['tag'])? $colour['tag']:'');
 

@@ -204,37 +204,37 @@ a { color: black; text-decoration: underline; font-weight: normal;}
 
 
         <dt><a name="WMWARN35">[WMWARN35]</a></dt>
-        <dd><p>"LINK ".$this->name." uses a NODE with no POSITION!"</p>
+        <dd><p>"LINK <em>linkname</em> uses a NODE with no POSITION!"</p>
         <p></p>
         </dd>
 
 
         <dt><a name="WMWARN36">[WMWARN36]</a></dt>
-        <dd><p>"Using a non-existent special font ($fontnumber) - falling back to internal GD fonts"</p>
+        <dd><p>"Using a non-existent special font (<em>number</em>) - falling back to internal GD fonts"</p>
         <p></p>
         </dd>
 
 
         <dt><a name="WMWARN37">[WMWARN37]</a></dt>
-        <dd><p>"Couldn't open PNG ICON: '" . $this->iconfile . "' - is it a PNG, JPEG or GIF?"</p>
+        <dd><p>"Couldn't open PNG ICON: '<em>filename</em>' - is it a PNG, JPEG or GIF?"</p>
         <p></p>
         </dd>
 
 
         <dt><a name="WMARN38">[WMARN38]</a></dt>
-        <dd><p>"ICON '" . $this->iconfile . "' does not exist, or is not readable. Check path and permissions."</p>
+        <dd><p>"ICON '<em>filename</em>' does not exist, or is not readable. Check path and permissions."</p>
         <p></p>
         </dd>
 
 
         <dt><a name="WMWARN39">[WMWARN39]</a></dt>
-        <dd><p>"line $linecount: TEMPLATE is not first line of object. Some data may be lost."</p>
+        <dd><p>"line <em>number</em>: TEMPLATE is not first line of object. Some data may be lost."</p>
         <p></p>
         </dd>
 
 
         <dt><a name="WMWARN40">[WMWARN40]</a></dt>
-        <dd><p>"line $linecount: $last_seen TEMPLATE '$tname' doesn't exist! (if it does exist, check it's defined first)"</p>
+        <dd><p>"line <em>number</em>: <em>NODE or LINK</em> TEMPLATE '<em>name</em>' doesn't exist! (if it does exist, check it's defined first)"</p>
         <p></p>
         </dd>
 
@@ -252,7 +252,7 @@ a { color: black; text-decoration: underline; font-weight: normal;}
 
 
         <dt><a name="WMWARN43">[WMWARN43]</a></dt>
-        <dd><p>"FindScaleExtent: non-existent SCALE $scalename"</p>
+        <dd><p>"FindScaleExtent: non-existent SCALE <em>scalename</em>"</p>
         <p></p>
         </dd>
 
@@ -264,13 +264,13 @@ a { color: black; text-decoration: underline; font-weight: normal;}
 
 
         <dt><a name="WMWARN44">[WMWARN44]</a></dt>
-        <dd><p>"ReadData: $type $name: You're using asymmetric bandwidth AND half-duplex in the same link. That makes no sense."</p>
+        <dd><p>"ReadData: <em>NODE/LINK</em> <em>name</em>: You're using asymmetric bandwidth AND half-duplex in the same link. That makes no sense."</p>
         <p></p>
         </dd>
 
 
         <dt><a name="WMWARN45">[WMWARN45]</a></dt>
-        <dd><p>"Zero-length link ".$this->name." skipped."</p>
+        <dd><p>"Zero-length link <em>name</em> skipped."</p>
         <p></p>
         </dd>
 
@@ -326,17 +326,17 @@ a { color: black; text-decoration: underline; font-weight: normal;}
 	</dd>
 
         <dt><a name="WMPOLL02">[WMPOLL02]</a></dt>
-	<dd><p>"Failed to overwrite $htmlfile - permissions of existing file are wrong? "</p>
+	<dd><p>"Failed to overwrite <em>filename</em> - permissions of existing file are wrong? "</p>
 	<p></p>
 	</dd>
 
         <dt><a name="WMPOLL03">[WMPOLL03]</a></dt>
-	<dd><p>"Failed to create $htmlfile - permissions of output directory are wrong?"</p>
+	<dd><p>"Failed to create <em>filename</em> - permissions of output directory are wrong?"</p>
 	<p></p>
 	</dd>
 
         <dt><a name="WMPOLL04">[WMPOLL04]</a></dt>
-	<dd><p>"Mapfile $mapfile is not readable or doesn't exist"</p>
+	<dd><p>"Mapfile <em>filename</em> is not readable or doesn't exist"</p>
 	<p></p>
 	</dd>
 
@@ -346,17 +346,17 @@ a { color: black; text-decoration: underline; font-weight: normal;}
 	</dd>
 
         <dt><a name="WMPOLL05">[WMPOLL06]</a></dt>
-	<dd><p>"Output directory ($outdir) isn't writable (tried to create '$testfile'). No maps created. You probably need to make it writable by the poller process (like you did with the RRA directory)"</p>
+	<dd><p>"Output directory (<em>directory</em>) isn't writable (tried to create '<em>filename</em>'). No maps created. You probably need to make it writable by the poller process (like you did with the RRA directory)"</p>
 	<p></p>
 	</dd>
 
         <dt><a name="WMPOLL07">[WMPOLL07]</a></dt>
-	<dd><p>"Output directory ($outdir) doesn't exist!. No maps created. You probably need to create that directory, and make it writable by the poller process (like you did with the RRA directory)"</p>
+	<dd><p>"Output directory (<em>directory</em>) doesn't exist!. No maps created. You probably need to create that directory, and make it writable by the poller process (like you did with the RRA directory)"</p>
 	<p></p>
 	</dd>
 
         <dt><a name="WMPOLL08">[WMPOLL08]</a></dt>
-	<dd><p>"Required modules for PHP Weathermap $WEATHERMAP_VERSION were not present. Not running."</p>
+	<dd><p>"Required modules for PHP Weathermap <em>versionnumber</em> were not present. Not running."</p>
 	<p></p>
 	</dd>
 
@@ -375,7 +375,7 @@ a { color: black; text-decoration: underline; font-weight: normal;}
 
 
         <dt><a name="WMFPING03">[WMFPING03]</a></dt>
-        <dd><p>"FPing ReadData: No lines read. Bad hostname? ($target)"</p>
+        <dd><p>"FPing ReadData: No lines read. Bad hostname? (<em>target</em>)"</p>
         <p></p>
         </dd>
 
@@ -405,13 +405,13 @@ a { color: black; text-decoration: underline; font-weight: normal;}
 	</dd>
 
         <dt><a name="WMRRD07">[WMRRD07]</a></dt>
-        <dd><p>"RRD ReadData: poller_output: ".$dsnames[$dir]." is not a valid DS name for $db_rrdname - valid names are: ".join(", ",$fields).""</p>
+        <dd><p>"RRD ReadData: poller_output: <em>dsname</em> is not a valid DS name for <em>rrdfilename</em> - valid names are: <em>dsnames</em>"</p>
         <p></p>
         </dd>
 
 
         <dt><a name="WMRRD08">[WMRRD08]</a></dt>
-        <dd><p>"RRD ReadData: poller_output: $db_rrdname is not a valid RRD filename within this Cacti install. <path_rra> is $path_rra"</p>
+        <dd><p>"RRD ReadData: poller_output: <em>filename</em> is not a valid RRD filename within this Cacti install. &lt;path_rra&gt; is <em>pathname</em>"</p>
         <p></p>
         </dd>
 
@@ -433,7 +433,7 @@ a { color: black; text-decoration: underline; font-weight: normal;}
 	</dd>
 
         <dt><a name="WMDSSTATS01">[WMDSSTATS01]</a></dt>
-	<dd><p>"DSStats ReadData: Failed to find a filename for DS id $local_data_id"</p>
+	<dd><p>"DSStats ReadData: Failed to find a filename for DS id <em>number</em>"</p>
 	<p></p>
 	</dd>
 
@@ -446,7 +446,7 @@ a { color: black; text-decoration: underline; font-weight: normal;}
 
 
         <dt><a name="WMEXT02">[WMEXT02]</a></dt>
-        <dd><p>"ExternalScript ReadData: Not enough lines read from external script ($i read, 4 expected)"</p>
+        <dd><p>"ExternalScript ReadData: Not enough lines read from external script (<em>number</em> read, 4 expected)"</p>
         <p></p>
         </dd>
 
@@ -458,7 +458,7 @@ a { color: black; text-decoration: underline; font-weight: normal;}
 
 
         <dt><a name="WMSNMP01">[WMSNMP01]</a></dt>
-        <dd><p>"SNMP for $host has reached $abort_count failures. Skipping."</p>
+        <dd><p>"SNMP for <em>hostname</em> has reached <em>number</em> failures. Skipping."</p>
         <p></p>
         </dd>
 
@@ -470,7 +470,7 @@ a { color: black; text-decoration: underline; font-weight: normal;}
 
 
         <dt><a name="WMTIME02">[WMTIME02]</a></dt>
-        <dd><p>"Time ReadData: Couldn't recognize $timezone as a valid timezone name"</p>
+        <dd><p>"Time ReadData: Couldn't recognize <em>string</em> as a valid timezone name"</p>
         <p></p>
         </dd>
 

@@ -296,10 +296,10 @@ class WeatherMapLink extends WeatherMapItem
 		$x2=$map->nodes[$this->b->name]->x;
 		$y2=$map->nodes[$this->b->name]->y;
 		
-		if(is_null($x1)) { warn("LINK ".$this->name." uses a NODE with no POSITION!\n"); return; }
-		if(is_null($y1)) { warn("LINK ".$this->name." uses a NODE with no POSITION!\n"); return; }
-		if(is_null($x2)) { warn("LINK ".$this->name." uses a NODE with no POSITION!\n"); return; }
-		if(is_null($y2)) { warn("LINK ".$this->name." uses a NODE with no POSITION!\n"); return; }
+		if(is_null($x1)) { warn("LINK ".$this->name." uses a NODE with no POSITION! [WMWARN35]\n"); return; }
+		if(is_null($y1)) { warn("LINK ".$this->name." uses a NODE with no POSITION! [WMWARN35]\n"); return; }
+		if(is_null($x2)) { warn("LINK ".$this->name." uses a NODE with no POSITION! [WMWARN35]\n"); return; }
+		if(is_null($y2)) { warn("LINK ".$this->name." uses a NODE with no POSITION! [WMWARN35]\n"); return; }
 		
 		
 		if( ($this->linkstyle=='twoway') && ($this->labeloffset_in < $this->labeloffset_out) && (intval($map->get_hint("nowarn_bwlabelpos"))==0) )
@@ -317,7 +317,7 @@ class WeatherMapLink extends WeatherMapItem
 
 		if( ($x1==$x2) && ($y1==$y2) && sizeof($this->vialist)==0)
 		{
-			warn("Zero-length link ".$this->name." skipped.");
+			warn("Zero-length link ".$this->name." skipped. [WMWARN45]");
 			return;
 		}
 

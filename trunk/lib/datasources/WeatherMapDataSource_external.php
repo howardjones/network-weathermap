@@ -46,7 +46,7 @@ class WeatherMapDataSource_external extends WeatherMapDataSource {
 			// run the command here
 			if( ($pipe = popen($command,"r")) === false)
 			{
-				warn("ExternalScript ReadData: Failed to run external script.\n");
+				warn("ExternalScript ReadData: Failed to run external script. [WMEXT01]\n");
 			}
 			else
 			{
@@ -70,7 +70,7 @@ class WeatherMapDataSource_external extends WeatherMapDataSource {
 				}
 				else
 				{
-					warn("ExternalScript ReadData: Not enough lines read from external script ($i read, 4 expected)\n");
+					warn("ExternalScript ReadData: Not enough lines read from external script ($i read, 4 expected) [WMEXT02]\n");
 				}
 			}
 		}

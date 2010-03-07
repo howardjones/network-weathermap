@@ -141,7 +141,7 @@ class WeatherMapDataSource_snmp extends WeatherMapDataSource {
 			}
 			else
 			{
-				warn("SNMP for $host has reached $abort_count failures. Skipping.");
+				warn("SNMP for $host has reached $abort_count failures. Skipping. [WMSNMP01]");
 			}
 		}
 

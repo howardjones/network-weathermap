@@ -8,7 +8,7 @@ class WeatherMapDataSource_time extends WeatherMapDataSource {
 		{
 			if(preg_match("/^[234]\./",phpversion()))
 			{
-				warn("Time DS Plugin recognised a TARGET, but needs PHP5+ to run.\n");
+				warn("Time DS Plugin recognised a TARGET, but needs PHP5+ to run. [WMTIME01]\n");
 				return FALSE;
 			}
 			return TRUE;
@@ -55,7 +55,7 @@ class WeatherMapDataSource_time extends WeatherMapDataSource {
 			}	
 			if($matches==0)
 			{
-				warn ("Time ReadData: Couldn't recognize $timezone as a valid timezone name\n"); 
+				warn ("Time ReadData: Couldn't recognize $timezone as a valid timezone name [WMTIME02]\n"); 
 			}			
 		}
 		else {

@@ -109,11 +109,11 @@ class WeatherMapDataSource_rrd extends WeatherMapDataSource {
 							}
 							if(count($fields) > 0)
 							{
-								warn("RRD ReadData: poller_output: ".$dsnames[$dir]." is not a valid DS name for $db_rrdname - valid names are: ".join(", ",$fields)."\n");
+								warn("RRD ReadData: poller_output: ".$dsnames[$dir]." is not a valid DS name for $db_rrdname - valid names are: ".join(", ",$fields)." [WMRRD07]\n");
 							}
 							else
 							{
-								warn("RRD ReadData: poller_output: $db_rrdname is not a valid RRD filename within this Cacti install. <path_rra> is $path_rra\n");
+								warn("RRD ReadData: poller_output: $db_rrdname is not a valid RRD filename within this Cacti install. <path_rra> is $path_rra [WMRRD08]\n");
 							}
 						}
 						else
@@ -306,7 +306,7 @@ class WeatherMapDataSource_rrd extends WeatherMapDataSource {
 			}
 			else
 			{
-				warn("Not enough output from RRDTool.\n");
+				warn("Not enough output from RRDTool. [WMRRD09]\n");
 			}
 		}
 		else
@@ -550,7 +550,7 @@ class WeatherMapDataSource_rrd extends WeatherMapDataSource {
 			$use_poller_output=0;
 			if($nowarn_po_agg==0)
 			{
-				warn("Can't use poller_output for rrd-aggregated data - disabling rrd_use_poller_output\n");
+				warn("Can't use poller_output for rrd-aggregated data - disabling rrd_use_poller_output [WMRRD10]\n");
 			}
 		}
 		

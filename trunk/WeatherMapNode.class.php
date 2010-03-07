@@ -481,13 +481,13 @@ class WeatherMapNode extends WeatherMapItem
 
 						}
 					}
-					else { warn ("Couldn't open PNG ICON: '" . $this->iconfile . "' - is it a PNG, JPEG or GIF?\n"); }
+					else { warn ("Couldn't open PNG ICON: '" . $this->iconfile . "' - is it a PNG, JPEG or GIF? [WMWARN37]\n"); }
 				}
 				else
 				{
 					if($this->iconfile != 'none')
 					{
-						warn ("ICON '" . $this->iconfile . "' does not exist, or is not readable. Check path and permissions.\n");
+						warn ("ICON '" . $this->iconfile . "' does not exist, or is not readable. Check path and permissions. [WMARN38]\n");
 					}
 				}
 			}
@@ -639,7 +639,7 @@ class WeatherMapNode extends WeatherMapItem
 				}
 				else
 				{
-					warn("You can't make a contrast with 'none'.\n");
+					warn("You can't make a contrast with 'none'. [WMWARN43]\n");
 					$txcol = new Colour(0,0,0);
 				}
 			}

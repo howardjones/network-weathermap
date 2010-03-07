@@ -40,7 +40,7 @@ case 'groupadmin_delete':
 	
 	if( isset($_REQUEST['id']) && is_numeric($_REQUEST['id']))  { $id = intval($_REQUEST['id']); }
 	
-	if($id>=0)
+	if($id>=1)
 	{
 		weathermap_group_delete($id);
 	}

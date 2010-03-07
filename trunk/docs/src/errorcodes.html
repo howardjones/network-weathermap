@@ -178,12 +178,118 @@ a { color: black; text-decoration: underline; font-weight: normal;}
 	<dd><p>"Failed to load GD font: <em>filename</em> (<em>errorcode</em>) at config line <em>linenumber</em> "</p>
 <p>You defined a .gdf font with FONTDEFINE, but the file doesn't exist, or can't be loaded due to permissions issues.</p>	</dd>
 
+        <dt><a name="WMWARN33">[WMWARN33]</a></dt>
+	<dd><p>"NewColourFromPercent: Clipped <em>number</em>% to 100% for item <em>itemname</em>"</p>
+        <p>You are using a regular SCALE with a value that is calculated as a
+            percentage of the MAXVALUE or BANDWIDTH. That calculated value was
+            higher than 100%. You could fix this with one of:</p>
+            <ul>
+                <li>Change BANDWIDTH or MAXVALUE to the correct value.</li>
+                <li>Use an absolute SCALE (see USESCALE)</li>
+                <li>Disable the warning by adding 'SET nowarn_clip 1' at the top of the map config file.</li>
+            </ul>
+        </dd>
+
+        <dt><a name="WMWARN33">[WMWARN34]</a></dt>
+	<dd><p>"NewColourFromPercent: Clipped <em>number</em>% to 0% for item <em>itemname</em>"</p>
+            <p>You are using a regular SCALE with a value that is calculated as a
+            percentage of the MAXVALUE or BANDWIDTH. That calculated value was
+            below 0%. You could fix this with one of:</p>
+            <ul>
+                <li>Use a '-' prefix on the TARGET to make the value positive, if it's <em>always</em> negative, like attentuation readings.</li>
+                <li>Use an absolute SCALE (see USESCALE)</li>
+                <li>Disable the warning by adding 'SET nowarn_clip 1' at the top of the map config file.</li>
+            </ul>
+        </dd>
+
+
+        <dt><a name="WMWARN35">[WMWARN35]</a></dt>
+        <dd><p>"LINK ".$this->name." uses a NODE with no POSITION!"</p>
+        <p></p>
+        </dd>
+
+
+        <dt><a name="WMWARN36">[WMWARN36]</a></dt>
+        <dd><p>"Using a non-existent special font ($fontnumber) - falling back to internal GD fonts"</p>
+        <p></p>
+        </dd>
+
+
+        <dt><a name="WMWARN37">[WMWARN37]</a></dt>
+        <dd><p>"Couldn't open PNG ICON: '" . $this->iconfile . "' - is it a PNG, JPEG or GIF?"</p>
+        <p></p>
+        </dd>
+
+
+        <dt><a name="WMARN38">[WMARN38]</a></dt>
+        <dd><p>"ICON '" . $this->iconfile . "' does not exist, or is not readable. Check path and permissions."</p>
+        <p></p>
+        </dd>
+
+
+        <dt><a name="WMWARN39">[WMWARN39]</a></dt>
+        <dd><p>"line $linecount: TEMPLATE is not first line of object. Some data may be lost."</p>
+        <p></p>
+        </dd>
+
+
+        <dt><a name="WMWARN40">[WMWARN40]</a></dt>
+        <dd><p>"line $linecount: $last_seen TEMPLATE '$tname' doesn't exist! (if it does exist, check it's defined first)"</p>
+        <p></p>
+        </dd>
+
+
+        <dt><a name="WMWARN41">[WMWARN41]</a></dt>
+        <dd><p>"OVERLIBGRAPH is used, but HTMLSTYLE is static. This is probably wrong."</p>
+        <p></p>
+        </dd>
+
+
+        <dt><a name="WMWARN42">[WMWARN42]</a></dt>
+        <dd><p>"IN/OUTOVERLIBGRAPH make no sense for a NODE!"</p>
+        <p></p>
+        </dd>
+
+
+        <dt><a name="WMWARN43">[WMWARN43]</a></dt>
+        <dd><p>"FindScaleExtent: non-existent SCALE $scalename"</p>
+        <p></p>
+        </dd>
+
+
+        <dt><a name="WMWARN43">[WMWARN43]</a></dt>
+        <dd><p>"You can't make a contrast with 'none'."</p>
+        <p></p>
+        </dd>
+
+
+        <dt><a name="WMWARN44">[WMWARN44]</a></dt>
+        <dd><p>"ReadData: $type $name: You're using asymmetric bandwidth AND half-duplex in the same link. That makes no sense."</p>
+        <p></p>
+        </dd>
+
+
+        <dt><a name="WMWARN45">[WMWARN45]</a></dt>
+        <dd><p>"Zero-length link ".$this->name." skipped."</p>
+        <p></p>
+        </dd>
+
 
       <dt><a name="WMWARN99">[WMWARN99]</a></dt>
 	<dd><p>"<em>something</em> not implemented yet"</p>
 	<p>A planned feature has been partially implemented, and you've tried to use it. Wait for the next release.</p>
 	<p>Because of the way I write Weathermap, there are sometimes parts of the code that are waiting ready for me
 	to finish writing a new feature. If it's the only thing holding back a release, I'll just disable that feature for now.</p>
+	</dd>
+
+      <dt><a name="WMEDIT01">[WMEDIT01]</a></dt>
+	<dd><p>"The map config directory is not writable by the web server user. You will not be able to edit any files until this is corrected."</p>
+	<p></   p>
+	</dd>
+
+      <dt><a name="WMEDIT02">[WMEDIT02]</a></dt>
+	<dd><p>"OLD editor config file format. The format of this file changed in version 0.92 - please check the new editor-config.php-dist and update your editor-config.php file."</p>
+	<p></p>
 	</dd>
 
 
@@ -212,6 +318,67 @@ a { color: black; text-decoration: underline; font-weight: normal;}
 	<p></p>
 	</dd>
 
+
+
+        <dt><a name="WMPOLL01">[WMPOLL01]</a></dt>
+	<dd><p>"About to write image file. If this is the last message in your log, increase memory_limit in php.ini"</p>
+	<p></p>
+	</dd>
+
+        <dt><a name="WMPOLL02">[WMPOLL02]</a></dt>
+	<dd><p>"Failed to overwrite $htmlfile - permissions of existing file are wrong? "</p>
+	<p></p>
+	</dd>
+
+        <dt><a name="WMPOLL03">[WMPOLL03]</a></dt>
+	<dd><p>"Failed to create $htmlfile - permissions of output directory are wrong?"</p>
+	<p></p>
+	</dd>
+
+        <dt><a name="WMPOLL04">[WMPOLL04]</a></dt>
+	<dd><p>"Mapfile $mapfile is not readable or doesn't exist"</p>
+	<p></p>
+	</dd>
+
+        <dt><a name="WMPOLL05">[WMPOLL05]</a></dt>
+	<dd><p>"No activated maps found. "</p>
+	<p></p>
+	</dd>
+
+        <dt><a name="WMPOLL05">[WMPOLL06]</a></dt>
+	<dd><p>"Output directory ($outdir) isn't writable (tried to create '$testfile'). No maps created. You probably need to make it writable by the poller process (like you did with the RRA directory)"</p>
+	<p></p>
+	</dd>
+
+        <dt><a name="WMPOLL07">[WMPOLL07]</a></dt>
+	<dd><p>"Output directory ($outdir) doesn't exist!. No maps created. You probably need to create that directory, and make it writable by the poller process (like you did with the RRA directory)"</p>
+	<p></p>
+	</dd>
+
+        <dt><a name="WMPOLL08">[WMPOLL08]</a></dt>
+	<dd><p>"Required modules for PHP Weathermap $WEATHERMAP_VERSION were not present. Not running."</p>
+	<p></p>
+	</dd>
+
+
+
+        <dt><a name="WMFPING01">[WMFPING01]</a></dt>
+	<dd><p>"RRD DS: RRDTool exists but is not executable? "</p>
+	<p></p>
+	</dd>
+
+
+        <dt><a name="WMFPING02">[WMFPING02]</a></dt>
+	<dd><p>"FPing ReadData: Can't find fping executable. Check path at line 19 of WeatherMapDataSource_fping.php"</p>
+	<p></p>
+	</dd>
+
+
+        <dt><a name="WMFPING03">[WMFPING03]</a></dt>
+        <dd><p>"FPing ReadData: No lines read. Bad hostname? ($target)"</p>
+        <p></p>
+        </dd>
+
 	<dt><a name="WMRRD01">[WMRRD01]</a></dt>
 	<dd><p>"RRD DS: RRDTool exists but is not executable? "</p>
 	<p>Somehow you have the right path for rrdtool, but the rrdtool binary is not executable by the user that runs weathermap (e.g. your Cacti poller user). Check permissions on your rrdtool binary.</p>
@@ -236,6 +403,80 @@ a { color: black; text-decoration: underline; font-weight: normal;}
 	<dd><p>"Target <em>rrdfile</em> doesn't exist. Is it a file? "</p>
 	<p>You have given an RRD TARGET which is a directory instead of a file, or something else unusual like that...</p>
 	</dd>
+
+        <dt><a name="WMRRD07">[WMRRD07]</a></dt>
+        <dd><p>"RRD ReadData: poller_output: ".$dsnames[$dir]." is not a valid DS name for $db_rrdname - valid names are: ".join(", ",$fields).""</p>
+        <p></p>
+        </dd>
+
+
+        <dt><a name="WMRRD08">[WMRRD08]</a></dt>
+        <dd><p>"RRD ReadData: poller_output: $db_rrdname is not a valid RRD filename within this Cacti install. <path_rra> is $path_rra"</p>
+        <p></p>
+        </dd>
+
+
+        <dt><a name="WMRRD09">[WMRRD09]</a></dt>
+        <dd><p>"Not enough output from RRDTool."</p>
+        <p></p>
+        </dd>
+
+
+        <dt><a name="WMRRD10">[WMRRD10]</a></dt>
+        <dd><p>"Can't use poller_output for rrd-aggregated data - disabling rrd_use_poller_output"</p>
+        <p></p>
+        </dd>
+
+        <dt><a name="WMRRD12">[WMRRD12]</a></dt>
+	<dd><p>"RRD ReadData: poller_output - Cacti environment is not right"</p>
+	<p></p>
+	</dd>
+
+        <dt><a name="WMDSSTATS01">[WMDSSTATS01]</a></dt>
+	<dd><p>"DSStats ReadData: Failed to find a filename for DS id $local_data_id"</p>
+	<p></p>
+	</dd>
+
+
+
+        <dt><a name="WMEXT01">[WMEXT01]</a></dt>
+        <dd><p>"ExternalScript ReadData: Failed to run external script."</p>
+        <p></p>
+        </dd>
+
+
+        <dt><a name="WMEXT02">[WMEXT02]</a></dt>
+        <dd><p>"ExternalScript ReadData: Not enough lines read from external script ($i read, 4 expected)"</p>
+        <p></p>
+        </dd>
+
+
+
+
+
+
+
+
+        <dt><a name="WMSNMP01">[WMSNMP01]</a></dt>
+        <dd><p>"SNMP for $host has reached $abort_count failures. Skipping."</p>
+        <p></p>
+        </dd>
+
+
+        <dt><a name="WMTIME01">[WMTIME01]</a></dt>
+        <dd><p>"Time DS Plugin recognised a TARGET, but needs PHP5+ to run."</p>
+        <p></p>
+        </dd>
+
+
+        <dt><a name="WMTIME02">[WMTIME02]</a></dt>
+        <dd><p>"Time ReadData: Couldn't recognize $timezone as a valid timezone name"</p>
+        <p></p>
+        </dd>
+
+
+
+
 
 
   </div>

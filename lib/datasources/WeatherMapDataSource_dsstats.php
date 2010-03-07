@@ -187,7 +187,7 @@ class WeatherMapDataSource_dsstats extends WeatherMapDataSource {
 				}
 				else
 				{
-					warn("DSStats ReadData: Failed to find a filename for DS id $local_data_id");
+					warn("DSStats ReadData: Failed to find a filename for DS id $local_data_id [WMDSTATS01]");
 				}
 			}
 		}

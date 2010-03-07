@@ -105,7 +105,7 @@ class WeatherMapDataSource_fping extends WeatherMapDataSource {
 					pclose ($pipe);
 					if($count==0)
 					{
-						warn("FPing ReadData: No lines read. Bad hostname? ($target)\n");
+						warn("FPing ReadData: No lines read. Bad hostname? ($target) [WMFPING03]\n");
 					}
 					else
 					{

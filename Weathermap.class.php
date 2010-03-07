@@ -471,7 +471,7 @@ class WeatherMap extends WeatherMapBase
 			// look up what font is defined for this slot number
 			if (!isset($this->fonts[$fontnumber]))
 			{
-				warn ("Using a non-existent special font ($fontnumber) - falling back to internal GD fonts\n");
+				warn ("Using a non-existent special font ($fontnumber) - falling back to internal GD fonts [WMWARN36]\n");
 				$fontnumber=5;
 				return array(imagefontwidth($fontnumber) * $maxlinelength, $linecount * imagefontheight($fontnumber));
 			}
@@ -986,7 +986,7 @@ function ReadData()
 					$myobj->inpercent = (($total_out + $total_in) / ($myobj->max_bandwidth_in)) * 100;
 					if($myobj->max_bandwidth_out != $myobj->max_bandwidth_in)
 					{
-						warn("ReadData: $type $name: You're using asymmetric bandwidth AND half-duplex in the same link. That makes no sense.\n");
+						warn("ReadData: $type $name: You're using asymmetric bandwidth AND half-duplex in the same link. That makes no sense. [WMWARN44]\n");
 					}
 				}
 				else
@@ -1123,7 +1123,7 @@ function ColourFromPercent($image, $percent,$scalename="DEFAULT",$name="")
 
 		if ($percent > 100)
 		{
-			if($nowarn_clipping==0) warn ("ColourFromPercent: Clipped $name $percent% to 100%\n");
+			if($nowarn_clipping==0) warn ("ColourFromPercent: Clipped $name $percent% to 100% [WMWARN33]\n");
 			$percent=100;
 		}
 
@@ -1205,13 +1205,13 @@ function NewColourFromPercent($value,$scalename="DEFAULT",$name="",$is_percent=T
 
 		if ($is_percent && $value > 100)
 		{
-			if($nowarn_clipping==0) warn ("NewColourFromPercent: Clipped $value% to 100% for item $name\n");
+			if($nowarn_clipping==0) warn ("NewColourFromPercent: Clipped $value% to 100% for item $name [WMWARN33]\n");
 			$value = 100;
 		}
 		
 		if ($is_percent && $value < 0)
 		{
-			if($nowarn_clipping==0) warn ("NewColourFromPercent: Clipped $value% to 0% for item $name\n");
+			if($nowarn_clipping==0) warn ("NewColourFromPercent: Clipped $value% to 0% for item $name [WMWARN34]\n");
 			$value = 0;
 		}
 
@@ -1317,7 +1317,7 @@ function FindScaleExtent($scalename="DEFAULT")
 	}
 	else
 	{
-		warn("FindScaleExtent: non-existent SCALE $scalename\n");
+		warn("FindScaleExtent: non-existent SCALE $scalename [WMWARN43]\n");
 	}
 	return array($min, $max);
 }
@@ -2542,7 +2542,7 @@ function ReadConfig($input, $is_include=FALSE)
 			{
 				$this->has_overlibs = TRUE;
 				if($last_seen == 'NODE' && $matches[1] != '') {
-						warn("IN/OUTOVERLIBGRAPH make no sense for a NODE!\n");
+						warn("IN/OUTOVERLIBGRAPH make no sense for a NODE! [WMWARN42]\n");
 					} else if($last_seen == 'LINK' || $last_seen=='NODE' ) {
 				
 						$urls = preg_split('/\s+/', $matches[2], -1, PREG_SPLIT_NO_EMPTY);
@@ -2569,7 +2569,7 @@ function ReadConfig($input, $is_include=FALSE)
 					$curobj->template = $matches[1];
 					debug("Resetting to template $last_seen ".$curobj->template."\n");
 					$curobj->Reset($this);
-					if( $objectlinecount > 1 ) warn("line $linecount: TEMPLATE is not first line of object. Some data may be lost.\n");
+					if( $objectlinecount > 1 ) warn("line $linecount: TEMPLATE is not first line of object. Some data may be lost. [WMWARN39]\n");
 					// build up a list of templates - this will be useful later for the tree view
 					
 					if($last_seen == 'NODE') $this->node_template_tree[ $tname ][]= $curobj->name;
@@ -2577,7 +2577,7 @@ function ReadConfig($input, $is_include=FALSE)
 				}
 				else
 				{
-					warn("line $linecount: $last_seen TEMPLATE '$tname' doesn't exist! (if it does exist, check it's defined first)\n");
+					warn("line $linecount: $last_seen TEMPLATE '$tname' doesn't exist! (if it does exist, check it's defined first) [WMWARN40]\n");
 				}
 				$linematched++;	
 				
@@ -2962,7 +2962,7 @@ function ReadConfig($input, $is_include=FALSE)
 
 	if($this->has_overlibs && $this->htmlstyle == 'static')
 	{
-		warn("OVERLIBGRAPH is used, but HTMLSTYLE is static. This is probably wrong.\n");
+		warn("OVERLIBGRAPH is used, but HTMLSTYLE is static. This is probably wrong. [WMWARN41]\n");
 	}
 	
 	debug("Building cache of z-layers and finalising bandwidth.\n");

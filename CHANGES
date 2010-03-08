@@ -17,6 +17,7 @@
         CHANGE - cacti-integrate.php uses getopt to take more command-line params
 	CHANGE - Updated jQuery to latest version
         CHANGE - Number formatting will pick 1G over 1000M (and similar) (thanks cerbum)
+        CHANGE - The editor is disabled by default - see top of editor.php (and install guide)
 	ADDED - LINK WIDTH accepts decimals
 	ADDED - cacti-integrate.php can generate DSStats TARGETs too
 	ADDED - Simple VIA editing in editor (thanks to Zdolny)

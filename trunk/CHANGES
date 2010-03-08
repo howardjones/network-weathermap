@@ -20,6 +20,7 @@
 	ADDED - LINK WIDTH accepts decimals
 	ADDED - cacti-integrate.php can generate DSStats TARGETs too
 	ADDED - Simple VIA editing in editor (thanks to Zdolny)
+        ADDED - SCALE can accept G,M,K,T,m,u,n suffixes (for absolute scales)
 
 0.97	FIXED - RRD Aggregation regexp was failing (thanks to shd)
 	FIXED - Scale numerals honour locale (thanks again, shd)

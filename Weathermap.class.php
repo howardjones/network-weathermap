@@ -3240,29 +3240,29 @@ function WriteConfig($filename)
 					$bottom= rtrim(rtrim(sprintf("%f",$colour['bottom']),"0"),$decimal_point);
 
                                         if ($bottom > 1000) {
-                                            $bottom = format_bandwidth($colour['bottom'], $this->kilo);
+                                            $bottom = nice_bandwidth($colour['bottom'], $this->kilo);
                                         }
 
                                         if ($top > 1000) {
-                                            $top = format_bandwidth($colour['top'], $this->kilo);
+                                            $top = nice_bandwidth($colour['top'], $this->kilo);
                                         }
 
 					$tag = (isset($colour['tag'])? $colour['tag']:'');
 
 					if( ($colour['red1'] == -1) && ($colour['green1'] == -1) && ($colour['blue1'] == -1))
 					{
-						$output.=sprintf("SCALE %s %s %s   none  %s\n", $scalename,
+						$output.=sprintf("SCALE %s %-4s %-4s   none   %s\n", $scalename,
 							$bottom, $top, $tag);
 					}
 					elseif (!isset($colour['red2']))
 					{
-						$output.=sprintf("SCALE %s %s %s   %d %d %d  %s\n", $scalename,
+						$output.=sprintf("SCALE %s %-4s %-4s %3d %3d %3d  %s\n", $scalename,
 							$bottom, $top,
 							$colour['red1'],            $colour['green1'], $colour['blue1'],$tag);
 					}
 					else
 					{
-						$output.=sprintf("SCALE %s %s %s   %d %d %d   %d %d %d  %s\n", $scalename,
+						$output.=sprintf("SCALE %s %-4s %-4s %3d %3d %3d   %3d %3d %3d    %s\n", $scalename,
 							$bottom, $top,
 							$colour['red1'],
 							$colour['green1'],                     $colour['blue1'],

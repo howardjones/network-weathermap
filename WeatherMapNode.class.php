@@ -481,7 +481,7 @@ class WeatherMapNode extends WeatherMapItem
 
 						}
 					}
-					else { warn ("Couldn't open PNG ICON: '" . $this->iconfile . "' - is it a PNG, JPEG or GIF? [WMWARN37]\n"); }
+					else { warn ("Couldn't open ICON: '" . $this->iconfile . "' - is it a PNG, JPEG or GIF? [WMWARN37]\n"); }
 				}
 				else
 				{

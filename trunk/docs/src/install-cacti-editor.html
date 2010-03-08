@@ -80,6 +80,22 @@ chmod u+w configs</pre>
 In a pinch, you can just <tt>chmod 777 configs</tt>, but this <em>really isn't</em> a recommended solution for a production system.</p>
 <p>On Windows, the same applies - the user that runs the webserver runs as should have permissions to write new files, and change existing files in the configs folder.</p>
 </p>
+
+
+<p>Since version 0.97, you now also need to enable the editor. The reason is so that you can't have the editor enabled without
+    knowing about it. The editor allows access to your config files without authentication, so you should consider using
+    features in your webserver to limit who can access <tt>editor.php</tt>. For example, on an Apache server, something like:
+    <pre>
+    &lt;Directory /var/www/html/cacti/plugins/weathermap&gt;
+        &lt;Files editor.php&gt;
+            Order Deny,Allow
+            Deny from all
+            Allow from 127.0.0.1
+        &lt;/FilesMatch&gt;
+    &lt;/Directory&gt;
+    </pre>
+When you are happy that the world can't edit your maps, then enable the editor. This is done by editing the top of editor.php and changing <code>$ENABLED=false;</code> to <code>$ENABLED=true;</code></p>
+
 <p>
     You should now be able to go to http://your.server/cacti/plugins/weathermap/editor.php in a browser, and get a welcome page that offers to load or create a config file. That's it. All done. Please see the <a href="editor.html">editor manual page</a> for more about <i>using</i> the editor!
 </p>

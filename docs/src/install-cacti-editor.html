@@ -83,7 +83,7 @@ In a pinch, you can just <tt>chmod 777 configs</tt>, but this <em>really isn't</
 
 
 <p>Since version 0.97, you now also need to enable the editor. The reason is so that you can't have the editor enabled without
-    knowing about it. The editor allows access to your config files without authentication, so you should consider using
+    knowing about it. The editor allows access to your config files without authentication (it doesn't use Cacti's authentication), so you should consider using
     features in your webserver to limit who can access <tt>editor.php</tt>. For example, on an Apache server, something like:
     <pre>
     &lt;Directory /var/www/html/cacti/plugins/weathermap&gt;

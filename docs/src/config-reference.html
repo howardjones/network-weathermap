@@ -265,12 +265,15 @@ which is then displayed. Specify the targets on one <a href="#NODE_TARGET">TARGE
 <div class="description">
 <p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Specify which <a href="#GLOBAL_SCALE">SCALE</a> to use to decide the colour of this node. </p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">After the percentage usage is calculated (using BANDWIDTH/MAXVALUE and data from the <a href="#NODE_TARGET">TARGET</a> line), 
  the colour is decided by looking up the percentage against this <a href="#GLOBAL_SCALE">SCALE.</a> If there is no <a href="#NODE_USESCALE">USESCALE</a> 
- line, then the default scale is used. </p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">For nodes, you can also specify a scalename of 'none'. This stops the node's colour from changing at all. This is useful if you want to 
+ line, then the default scale is used. </p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">If you also specify 'absolute', then no percentage calculation is performed. The raw values 
+ from the <a href="#NODE_TARGET">TARGET</a> line are just looked up in the named <a href="#GLOBAL_SCALE">SCALE.</a> </p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">For nodes, you can also specify a scalename of 'none'. This stops the node's colour from changing at all. This is useful if you want to 
  use the <a href="#NODE_TARGET">TARGET</a> line to fetch data that is used in the <a href="#NODE_LABEL">LABEL</a> or <a href="#NODE_ICON">ICON</a> of the node, for example, without changing the colour of the node itself. </p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">You can also change the colour of the <a href="#NODE_ICON">ICON</a> associated with a <a href="#NODE_NODE">NODE</a> according to a different <a href="#GLOBAL_SCALE">SCALE,</a> by using <a href="#NODE_USEICONSCALE">USEICONSCALE.</a> </p> 
 </div>
 <div class="changes">
 <h3>Change History</h3>
 <dl>
+<dt>0.97</dt>
+<dd>Added absolute scale support.</dd>
 <dt>0.95</dt>
 <dd>Added USEICONSCALE.</dd>
 <dt>0.9</dt>
@@ -756,14 +759,19 @@ which is then displayed. Specify the targets on one <a href="#LINK_TARGET">TARGE
 <h2><a name="LINK_USESCALE">USESCALE</a></h2>
 <div class="definition">USESCALE <em class="meta">scalename</em>
 </div>
+<div class="definition">USESCALE <em class="meta">scalename</em> percent</div>
+<div class="definition">USESCALE <em class="meta">scalename</em> absolute</div>
 <div class="description">
 <p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Specify which <a href="#GLOBAL_SCALE">SCALE</a> to use to decide the colour of this link. </p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">After the percentage usage is calculated (using <a href="#LINK_BANDWIDTH">BANDWIDTH</a> and data from the <a href="#LINK_TARGET">TARGET</a> line), 
  the colour is decided by looking up the percentage against this <a href="#GLOBAL_SCALE">SCALE.</a> If there is no <a href="#LINK_USESCALE">USESCALE</a> 
- line, then the default scale is used. </p> 
+ line, then the default scale is used. </p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">If you also specify 'absolute', then no percentage calculation is performed. The raw values 
+ from the <a href="#LINK_TARGET">TARGET</a> line are just looked up in the named <a href="#GLOBAL_SCALE">SCALE.</a> </p> 
 </div>
 <div class="changes">
 <h3>Change History</h3>
 <dl>
+<dt>0.97</dt>
+<dd>Added absolute scale support.</dd>
 <dt>0.9</dt>
 <dd>Added named scales and USESCALE.</dd>
 </dl>
@@ -1728,7 +1736,9 @@ You can set the output format in the Cacti Settings page. </p>
 <div class="description">
 <p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Defines one 'span' within the link colour-coding table. </p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude"><a href="#GLOBAL_SCALE">SCALE</a> is used to specify how <a href="#NODE_NODE">NODEs</a> and <a href="#LINK_LINK">LINKs</a> are colour-coded according to their percent usage. 
  If the percentage usage falls between min and max then the colour specified by red, green and blue is used to colour the link. 
- Colour values are between 0 and 255. Percentages are between 0 and 100, obviously. </p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">If you specify <i>two</i> colours on the line (the third and fourth forms above), then the colour chosen for the link will be calculated as 
+ Colour values are between 0 and 255. Percentages are between 0 and 100, obviously. </p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">In combination with the 'absolute' option of <a href="#LINK_USESCALE">USESCALE,</a> you can also use raw data from <a href="#LINK_TARGET">TARGET</a> lines. Just 
+ use the absolute values for min and max in <a href="#GLOBAL_SCALE">SCALE</a> lines. In this format, min and max can use the same abbreviations for mega, giga etc as 
+ <a href="#LINK_BANDWIDTH">BANDWIDTH</a> and <a href="#NODE_MAXVALUE">MAXVALUE</a> can. </p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">If you specify <i>two</i> colours on the line (the third and fourth forms above), then the colour chosen for the link will be calculated as 
  a proportion between the two colours. You can avoid specifying many <a href="#GLOBAL_SCALE">SCALE</a> lines this way. </p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">If you specify the word 'none' instead of a colour, then a transparent colour is used for that range of values. </p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Without a <i>scalename</i>, the <a href="#GLOBAL_SCALE">SCALE</a> line will add a definition to the scale named 'DEFAULT'. If you define any other named scales, you can then use the <a href="#LINK_USESCALE">USESCALE</a> directive to specify that a particular <a href="#NODE_NODE">NODE</a> or <a href="#LINK_LINK">LINK</a> use your new scale. </p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">With any of the formats, you can specify a 'tag' on the end of the line. When the colour is decided for the 'in' and 'out' parts of a <a href="#NODE_NODE">NODE</a> or <a href="#LINK_LINK">LINK,</a> 
  then a special <a href="#GLOBAL_SET">SET</a> variable is defined called {node:this:inscaletag} (or outscaletag, or link:this...) which contains the tagtext from the <a href="#GLOBAL_SCALE">SCALE</a> line that 
  matched. You can use this to do things like choose an icon, or change the label of a node or link based on a percentage. There are examples of this (and most other node-related formatting things) in the suite-1.conf map found in the random-bits/ folder of the weathermap distribution. </p><p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">If you don't add <i>any</i> <a href="#GLOBAL_SCALE">SCALE</a> lines to a configuration file, then a default set is added for you, but as soon as you add one, you'll need to make enough to cover the whole 0-100 range to get nice colours. 
@@ -1754,6 +1764,8 @@ SCALE  85  100    255     0    0</pre>
 <div class="changes">
 <h3>Change History</h3>
 <dl>
+<dt>0.97</dt>
+<dd>Added absolute scale support.</dd>
 <dt>0.96</dt>
 <dd>Added 'none' colour option.</dd>
 <dt>0.95</dt>

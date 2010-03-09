@@ -1,0 +1,210 @@
+#mainview { background: #ccc; padding-top: 60px; }
+
+body { 		font-family: 'Gill Sans', Verdana, sans-serif; margin:0; }
+#toolbar { 		font-family: Verdana, sans-serif; }
+
+#toolbar { position: fixed; top:0px; left: 0px; width: 100%;
+	color: white; border-bottom: gray solid 1px;
+	z-index: 10; opacity: 0.9;
+        background: #1958b7;
+	}
+
+#dlgEditorSettings { display: none; z-index: 7; position: absolute;top: 80px;left: 50px;}
+
+#dlgNodeProperties { display: none; z-index: 2; position: absolute;top: 100px;left: 100px;}
+#dlgTextEdit { display: none; z-index: 4; position: absolute;top: 150px;left: 150px;}
+#dlgLinkProperties { display: none; z-index: 3; position: absolute; top: 80px; left: 150px; }
+#dlgMapProperties { display: none; z-index: 1; position: absolute;top: 90px; left: 120px;}
+#dlgMapStyle { display: none; z-index: 1; position: absolute;top: 40px; left: 50px;}
+
+#dlgColours { display: none; z-index: 1; position: absolute;top: 140px; left: 90px;}
+#dlgImages { display: none; z-index: 1; position: absolute;top: 120px; left: 70px;}
+
+#dlgTextEdit textarea { padding: 3px;}
+
+/* some fudges for the Welcome screen*/
+#dlgStart { z-index: 1; position: absolute; top: 90px; left: 60px; width: 600px;}
+#dlgStart .dlgBody ul { list-style: none;  }
+#dlgStart .dlgBody ul a { text-decoration: none; color: white; font-weight: bold;}
+
+#existingdata { border: 0px; }
+
+#withjs { 
+	display: none; 
+	/* to hide the page until our Javascript is running. Otherwise the whole thing fails really. */
+}
+
+#nojs {
+/*	border: 3px dashed red;
+	background: #fee;
+	padding: 5px; 
+	/* the warning bit we'll show unless the javascript hides it */
+	font-size: 80%;
+	/* padding: 5px; */
+	margin: 25px;
+}
+
+div.dlgTitlebar ul {
+    float: right;
+    font-size: 8pt;
+    font-weight: bold;
+    font-style: italic; 
+    white-space: nowrap;
+}
+
+div.dlgTitlebar ul li {
+ display: inline;
+}
+
+a.dlgTitlebar {
+  padding:3px 3px;
+      font-size: 8pt;
+    font-weight: bold;
+    font-style: italic; 
+  background:#aaa;
+  color:#fff;
+  text-decoration:none;
+     padding: 3px;
+    border: 1px white dotted;
+    margin: 2px;
+  }
+
+div.dlgTitlebar ul li a {
+  float:right;
+  padding:3px 3px;
+  background:#aaa;
+  color:#fff;
+  text-decoration:none;
+     padding: 3px;
+    border: 1px white dotted;
+    margin: 2px;
+    cursor: pointer;
+  }
+
+a.dlgTitlebar { cursor: pointer; }  
+    
+div.dlgTitlebar ul li a:hover {
+  color:#fff;
+  background:#69c;
+  }
+
+a.dlgTitlebar:hover {
+  color:#fff;
+  background:#69c;
+  }
+
+#toolbar ul {
+  float:left;
+  width:100%;
+  margin:0;
+  padding:0;
+  font-size:11px;
+  color:#fff;
+/*  background:#ccc;*/ 
+  background: #1958b7;
+  /* margin-bottom: 10px; */
+}
+  
+#toolbar ul li.tb_help {
+    font-style: italic;
+    padding: 2px;
+}
+  
+#toolbar ul li {
+  display:inline;
+  }
+
+#toolbar ul li.tb_active {
+  float:left;
+  padding:5px 10px;
+  text-decoration:none;
+  
+  border-left: #508fc4 2px solid;
+  border-right: #1958b7 2px solid;
+  border-top: #508fc4 2px solid;
+  border-bottom: #1958b7 2px solid;
+  
+  cursor: pointer;
+  text-align: center;
+
+  background: #2175bc;
+  color:#fff;
+}
+
+#toolbar ul li.tb_coords {
+  float:left;
+  padding:7px 12px;
+  text-decoration:none;
+  width: 70px;
+    
+  text-align: center;
+
+  
+  background: #1958b7;
+  color:#fff;
+}
+
+  
+#toolbar ul li.tb_active:hover {
+  color:#fff;
+  background:#2586d7;
+  }
+
+.dlgProperties { 
+		width: 600px;
+		background: #077; 
+		margin: 5px; 
+		font-size: 8pt;
+		color: white;
+		}
+
+.dlgBody {
+	padding: 5px;
+	font-size: 12pt;
+	}
+	
+.comment { font-style: italic; font-size: 80%;}
+
+.dlgHelp {
+            font-size: 10pt;
+            line-height: 12pt;
+    		background: #099;
+            height: 48pt; 
+            padding: 5px;
+}
+
+.dlgTitlebar {
+		font-size: 12pt;
+		font-weight: bold;
+		background: #099;
+		padding-left: 5px;
+		padding-right: 4px;
+		padding-top: 2px;
+		padding-bottom: 2px;
+	}
+	
+.debug { line-height: 2.5; margin: 10px; font-size: 70%; background: yellow; border: 1px dashed black; padding: 4px;}
+.debug input { font-size: 80%; }
+.debug h1 { font-size: 8pt; border-bottom: 1px solid grey; text-align: left;}
+.debug span { position: relative; }
+.debug span label {position:absolute; top:-1.5em; left:0; font:bold 100%/1 sans-serif; }
+
+th { color: white; font-weight: bold; text-align: right; font-size: 8pt;}
+td { color: white; font-weight: normal; text-align: left; font-size: 8pt;}
+
+#xycapture { cursor: crosshair; }
+
+.alert {
+	background: #fff6bf url(images/exclamation.png) center no-repeat;
+	background-position: 15px 50%; /* x-pos y-pos */
+	text-align: left;
+	padding: 5px 20px 5px 45px;
+	border-top: 2px solid #ffd324;
+	border-bottom: 2px solid #ffd324;
+}
+
+.fontsamples { height: 64px; width: 300px; overflow: auto; }
+
+.cactilink, .cactinode { white-space: nowrap; }
+
+#item_configtext { overflow: scroll; white-space: nowrap; }

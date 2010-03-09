@@ -1,0 +1,133 @@
+GLOBAL	BACKGROUND	{existingfilename}					
+GLOBAL	BGCOLOR	{colourspec}					
+GLOBAL	FONTDEFINE	{int}	{filename}	{int}			
+GLOBAL	FONTDEFINE	{int}	{filename}				
+GLOBAL	HEIGHT	{int}					
+GLOBAL	HTMLOUTPUTFILE	{filename}					
+GLOBAL	HTMLSTYLE	static					
+GLOBAL	HTMLSTYLE	overlib					
+GLOBAL	HTMLSTYLESHEET	{string}					
+GLOBAL	IMAGEOUTPUTFILE	{filename}					
+GLOBAL	IMAGEURI	{string}					
+GLOBAL	INCLUDE	{existingfilename}					
+GLOBAL	KEYBGCOLOR	{colourspec}					
+GLOBAL	KEYFONT	{fontnumber}					
+GLOBAL	KEYOUTLINECOLOR	{colourspec}					
+GLOBAL	KEYTEXTCOLOR	{colourspec}					
+GLOBAL	MAXTIMEPOS	{int}	{int}				
+GLOBAL	MINTIMEPOS	{int}	{int}				
+GLOBAL	SET	{string}	{string}				
+GLOBAL	TIMECOLOR	{colourspec}					
+GLOBAL	TIMEFONT	{fontnumber}					
+GLOBAL	TIMEPOS	{int}	{int}				
+GLOBAL	TITLE	{string}					
+GLOBAL	TITLECOLOR	{colourspec}					
+GLOBAL	TITLEFONT	{fontnumber}					
+GLOBAL	TITLEPOS	{int}	{int}				
+GLOBAL	WIDTH	{int}					
+LINK	ARROWSTYLE	classic					
+LINK	ARROWSTYLE	{int}	{int}				
+LINK	ARROWSTYLE	compact					
+LINK	BANDWIDTH	{bwspec}	{bwspec}				
+LINK	BANDWIDTH	{bwspec}					
+LINK	BWBOXCOLOR	{colourspec}					
+LINK	BWFONT	{fontnumber}					
+LINK	BWFONTCOLOR	{colourspec}					
+LINK	BWLABEL	unformatted					
+LINK	BWLABEL	percent					
+LINK	BWLABEL	bits					
+LINK	BWLABEL	none					
+LINK	BWLABELPOS	{int}	{int}				
+LINK	BWOUTLINECOLOR	{colourspec}					
+LINK	BWSTYLE	angled					
+LINK	BWSTYLE	classic					
+LINK	COMMENTFONT	{fontnumber}					
+LINK	COMMENTFONTCOLOR	{colourspec}					
+LINK	COMMENTPOS	{int}	{int}				
+LINK	COMMENTSTYLE	center					
+LINK	COMMENTSTYLE	edge					
+LINK	DUPLEX	full					
+LINK	DUPLEX	half					
+LINK	INBWFORMAT	{string}					
+LINK	INCOMMENT	{string}					
+LINK	INFOURL	{string}					
+LINK	ININFOURL	{string}					
+LINK	INNOTES	{string}					
+LINK	INOVERLIBCAPTION	{string}					
+LINK	INOVERLIBGRAPH	{string}					
+LINK	LINKSTYLE	oneway					
+LINK	LINKSTYLE	twoway					
+LINK	MAXVALUE	{bwspec}					
+LINK	MAXVALUE	{bwspec}	{bwspec}				
+LINK	NODES	nodenameoffset	nodenameoffset				
+LINK	NODES	{nodename}	{nodename}				
+LINK	NOTES	{string}					
+LINK	OUTBWFORMAT	{string}					
+LINK	OUTCOMMENT	{string}					
+LINK	OUTINFOURL	{string}					
+LINK	OUTLINECOLOR	{colourspec}					
+LINK	OUTNOTES	{string}					
+LINK	OUTOVERLIBCAPTION	{string}					
+LINK	OUTOVERLIBGRAPH	{string}					
+LINK	OVERLIBCAPTION	{string}					
+LINK	OVERLIBGRAPH	{string}					
+LINK	OVERLIBHEIGHT	{int}					
+LINK	OVERLIBWIDTH	{int}					
+LINK	SET	{string}	{string}				
+LINK	SPLITPOS	{int}					
+LINK	TARGET	{targetspec}	…				
+LINK	TEMPLATE	linkname					
+LINK	USESCALE	{scalename}					
+LINK	VIA	{nodename}	{int}	{int}			
+LINK	VIASTYLE	angled					
+LINK	VIASTYLE	curved					
+LINK	WIDTH	{int}					
+LINK	ZORDER	{int}					
+NODE	AICONFILLCOLOR	{colourspec}					
+NODE	AICONOUTLINECOLOR	{colourspec}					
+NODE	ICON	{existingfilename}					
+NODE	INFOURL	{string}					
+NODE	LABEL	{string}					
+NODE	LABELANGLE	{int}					
+NODE	LABELFONT	{fontnumber}					
+NODE	LABELFONTCOLOR	{colourspec}					
+NODE	LABELFONTSHADOWCOLOR	{colourspec}					
+NODE	LABELOFFSET	{int}	{int}				
+NODE	LABELOFFSET	compasspoint					
+NODE	LABELOUTLINECOLOR	{colourspec}					
+NODE	MAXVALUE	{bwspec}					
+NODE	NOTES	{string}					
+NODE	OVERLIBCAPTION	{string}					
+NODE	OVERLIBGRAPH	{string}					
+NODE	OVERLIBHEIGHT	{int}					
+NODE	OVERLIBWIDTH	{int}					
+NODE	POSITION	{nodename}	{int}	{int}			
+NODE	POSITION	{int}	{int}				
+NODE	SET	{string}	{string}				
+NODE	TARGET	{targetspec}	…				
+NODE	TEMPLATE	{nodename}					
+NODE	TEMPLATE	{nodename}					
+NODE	USEICONSCALE	{scalename}	{inorout}				
+NODE	USEICONSCALE	{scalename}					
+NODE	USESCALE	{scalename}	{inorout}				
+NODE	ZORDER	{int}					
+SCALE	KEYPOS	{scalename}	{int}	{int}			
+SCALE	KEYPOS	{int}	{int}				
+SCALE	KEYSTYLE	vertical					
+SCALE	KEYSTYLE	inverted					
+SCALE	KEYSTYLE	classic					
+SCALE	KEYSTYLE	horizontal					
+SCALE	KEYSTYLE	tags					
+SCALE	KEYSTYLE	{scalename}	inverted				
+SCALE	KEYSTYLE	{scalename}	vertical				
+SCALE	KEYSTYLE	{scalename}	classic				
+SCALE	KEYSTYLE	{scalename}	tags				
+SCALE	KEYSTYLE	{scalename}	horizontal				
+SCALE	SCALE	{float}	{float}	{colourspec}	{colourspec}	{string}	
+SCALE	SCALE	{float}	{float}	{colourspec}	{string}		
+SCALE	SCALE	{float}	{float}	{colourspec}	{colourspec}		
+SCALE	SCALE	{scalename}	{float}	{float}	{colourspec}	{string}	
+SCALE	SCALE	{scalename}	{float}	{float}	{colourspec}	{colourspec}	{string}
+SCALE	SCALE	{scalename}	{float}	{float}	{colourspec}		
+SCALE	SCALE	{scalename}	{float}	{float}	{colourspec}	{colourspec}	
+SCALE	SCALE	{float}	{float}	{colourspec}			

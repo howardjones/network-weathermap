@@ -1,0 +1,70 @@
+suite-1.conf
+suite-2.conf
+============
+These are my test map config files that exercise a fair bit of the
+functionality of Weathermap, in a couple of files. The first one
+is mostly NODE stuff, and the second is mostly LINK stuff. As such,
+they make quite useful demo maps, I guess. suite-1.png and suite-2.png
+show what these maps *should* look like. They use quite a few fonts
+that I can't supply, but mostly they use Bitstream Vera, which is in
+the docs/example directory.
+
+map-split.php
+=============
+
+Reads in a map, then writes out 'submaps' of a certain size. Edit the
+top of the script to specify the source map, and the required size of
+the new maps, and it will chop up your map for you. It doesn't do 
+anything clever with things like KEYPOS or TITLEPOS, but it will do
+NODEs OK. It'll delete any links where only one end is in the final
+map, so cross-sheet links will need to be put back in. It also removes
+the BACKGROUND image if there is one, since it will (by definition) be
+the wrong size for the new maps.
+
+auto-overlib.pl
+===============
+
+A small but useful script that takes a weathermap config file with 
+references to Cacti RRD targets and automatically adds in all the 
+INFOURL and OVERLIBGRAPH lines it can, where they don't exist. 
+
+You'll need to edit the script to allow it to log in to your Cacti 
+database. Requires the Perl DBI and DBD::mysql modules. 
+
+Should work with both PHP and perl versions, but not tested with PHP 
+one. 
+
+cacti-integrate.php
+===================
+
+A script that reads in a weathermap config file, looks for special SET
+variables and uses them to populate as much as it can of TARGET, INFOURL,
+OVERLIBGRAPH, and BANDWIDTH. Requires a correct editor-config.php to access
+the Cacti database.
+
+You need SET one of 'cacti_id', 'hostname' or 'address' in each NODE so that
+it can find the Cacti Host ID for each node.
+
+You need to SET one of 'in_interface' or 'out_interface' to the interface name
+so that it can figure out which data sources are relevant. The interface name should
+match one of ifAlias, ifName or ifDescr from your router.
+
+More info here: http://forums.cacti.net/about26544.html
+
+cacti-mapper.php
+================
+
+A script that reads interface IPs from Cacti, and then uses Cacti's SNMP data
+to fetch a netmask for each interface. It then uses all this info to work out
+which interfaces are in the same address range as each other, and produces a
+map. The map positions are random, but the connections should be right. You need
+to run the results through cacti-integrate.php, to fill in the TARGET lines.
+Requires a correct editor-config.php to access the Cacti database.
+
+bristle.php
+============
+
+Generates a section of Weathermap config useful for showing traffic for all switch 
+ports in a small space. Intended to work with cacti-integrate.php
+
+More info here: http://forums.cacti.net/post-152500.html#152500

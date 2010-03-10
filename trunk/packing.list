@@ -183,6 +183,7 @@
 ./setup.php
 ./weathermap
 ./weathermap-cacti-plugin-mgmt.php
+./weathermap-cacti-plugin-editor.php
 ./weathermap-cacti-plugin.css
 ./weathermap-cacti-plugin.php
 ./weathermap-cacti-rebuild.php

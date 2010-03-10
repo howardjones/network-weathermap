@@ -1,3 +1,5 @@
+0.98    ADDED - New Cacti integration for editor. Additional 'edit maps' permission. No need for editor-config.php anymore!
+
 0.97a	FIXED - Incorrect action URL in 'map selector' combo box for Cacti users.
 	FIXED - cacti_graph_id set to 0 instead of ID, by rrd/poller_output and dsstats plugins (thanks sh0x)
 	FIXED - 'classic' legend drew 'hidden' colour values for things like key background colour. (thanks jmayniac)

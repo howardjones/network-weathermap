@@ -66,7 +66,7 @@ $param = '';
 $param2 = '';
 $log = '';
 
-if(!module_checks())
+if(!WM_module_checks())
 {
 	print "<b>Required PHP extensions are not present in your mod_php/ISAPI ";
         print "PHP module. Please check your PHP setup to ensure you have the ";

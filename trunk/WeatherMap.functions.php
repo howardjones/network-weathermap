@@ -1,12 +1,19 @@
 <?php
-// PHP Weathermap 0.97a
-// Copyright Howard Jones, 2005-2010 howie@thingy.com
-// http://www.network-weathermap.com/
-// Released under the GNU Public License
+/** PHP Weathermap 0.97a
+ * Copyright Howard Jones, 2005-2010 howie@thingy.com
+ * http://www.network-weathermap.com/
+ * Released under the GNU Public License
+ *
+ * Utility Functions
+ */
 
-// Utility functions
-// Check for GD & PNG support This is just in here so that both the editor and CLI can use it without the need for another file
-function module_checks()
+/**
+ * Check for GD & PNG support This is just in here so that both the editor
+ * and CLI can use it without the need for another file
+ *
+ * @return boolean If it's OK to run or not
+ */
+function WM_module_checks()
 {
 	if (!extension_loaded('gd'))
 	{
@@ -36,6 +43,16 @@ function module_checks()
 	}
 	return (TRUE);
 }
+
+/**
+ * central point for all debug logging, whether in the
+ * standalone or Cacti parts of the tool.
+ *
+ * @global boolean $weathermap_debugging
+ * @global string $weathermap_map
+ * @global boolean $weathermap_debug_suppress
+ * @param string $string The actual message to be logged
+  */
 
 function debug($string)
 {
@@ -81,6 +98,16 @@ function debug($string)
 	}
 }
 
+/**
+ * central point for all warnings, whether in the
+ * standalone or Cacti parts of the tool.
+ * Either dumps to stderr, or logs appropriately.
+ *
+ * @global string $weathermap_map
+ * @global integer $weathermap_warncount
+ * @param string $string
+ * @param boolean $notice_only Whether or not to prefix the string with WARNING
+ */
 function warn($string,$notice_only=FALSE)
 {
 	global $weathermap_map;
@@ -107,6 +134,14 @@ function warn($string,$notice_only=FALSE)
 	}
 }
 
+
+/**
+ * Prepare a string to be embedded in JS code or JSON
+ *
+ * @param string $str String to be escaped
+ * @param boolean $wrap Should it also wrap it in quotes?
+ * @return string
+ */
 function js_escape($str, $wrap=TRUE)
 {
 	$str=str_replace('\\', '\\\\', $str);
@@ -117,6 +152,16 @@ function js_escape($str, $wrap=TRUE)
 	return ($str);
 }
 
+/**
+ * Format a single number using a printf()-style format string.
+ * Adds extra options for KGMT-suffixes
+ *
+ * @param string $format
+ * @param int $value
+ * @param int $kilo
+ * @return string
+ *
+ */
 function mysprintf($format,$value,$kilo=1000)
 {
 	$output = "";
@@ -144,9 +189,16 @@ function mysprintf($format,$value,$kilo=1000)
 	return $output;
 }
 
-// ParseString is based on code from:
-// http://www.webscriptexpert.com/Php/Space-Separated%20Tag%20Parser/
-
+/**
+ * Simple tokenizer for strings, producing a list of 'words'
+ * taking into account quote-enclosed single-word phrases. *
+ *
+ * Based on code from:
+ * http://www.webscriptexpert.com/Php/Space-Separated%20Tag%20Parser/
+ *
+ * @param string $input
+ * @return string[]
+ */
 function ParseString($input)
 {
     $output = array();            // Array of Output
@@ -222,7 +274,15 @@ function ParseString($input)
     return $output;
 }
 
-// wrapper around imagecolorallocate to try and re-use palette slots where possible
+/**
+ * wrapper around imagecolorallocate to try and re-use palette slots where possible
+ *
+ * @param gdimageref $image
+ * @param int $red
+ * @param int $green
+ * @param int $blue
+ * @return gdcolorref
+ */
 function myimagecolorallocate($image, $red, $green, $blue)
 {
 	// it's possible that we're being called early - just return straight away, in that case
@@ -230,12 +290,21 @@ function myimagecolorallocate($image, $red, $green, $blue)
 	
 	$existing=imagecolorexact($image, $red, $green, $blue);
 
-	if ($existing > -1)
+        // XXX - check if this function is doing any good!
+	if ($existing > -1) {
 		return $existing;
+        }
 
 	return (imagecolorallocate($image, $red, $green, $blue));
 }
 
+/**
+ * Take a string and anonymise it by replacing any run of 3 or more
+ * letters with an X, and any IP address with 127.0.0.1
+ *
+ * @param string $input
+ * @return string
+ */
 function screenshotify($input)
 {
 	$tmp = $input;
@@ -246,6 +315,13 @@ function screenshotify($input)
 	return($tmp);
 }
 
+/**
+ * Turn a colour tuple into a string for a config file
+ *
+ * @param int[] $col
+ * @return string
+ *
+ */
 function render_colour($col)
 {
 	if (($col[0] == -1) && ($col[1] == -1) && ($col[1] == -1)) { return 'none'; }
@@ -254,7 +330,15 @@ function render_colour($col)
 	else { return sprintf("%d %d %d", $col[0], $col[1], $col[2]); }
 }
 
-// take the same set of points that imagepolygon does, but don't close the shape
+/**
+ * take the same set of points that imagepolygon does, but don't close the shape
+ *
+ * @param gdimageref $image
+ * @param int[] $points
+ * @param int $npoints
+ * @param gdcolorref $color
+ *
+ */
 function imagepolyline($image, $points, $npoints, $color)
 {
 	for ($i=0; $i < ($npoints - 1); $i++) 
@@ -264,7 +348,18 @@ function imagepolyline($image, $points, $npoints, $color)
 	}
 }
 
-// draw a filled round-cornered rectangle
+/**
+ * draw a filled round-cornered rectangle
+ *
+ * @param gdimageref $image
+ * @param int $x1
+ * @param int $y1
+ * @param int $x2
+ * @param int $y2
+ * @param int $radius
+ * @param gdcolorref $color
+ *
+ */
 function imagefilledroundedrectangle($image  , $x1  , $y1  , $x2  , $y2  , $radius, $color)
 {
 	imagefilledrectangle($image, $x1,$y1+$radius, $x2,$y2-$radius, $color);
@@ -280,6 +375,20 @@ function imagefilledroundedrectangle($image  , $x1  , $y1  , $x2  , $y2  , $radi
 }
 
 // draw a round-cornered rectangle
+
+/**
+ *
+ * draw a round-cornered rectangle outline
+ *
+ * @param gdimageref $image
+ * @param int $x1
+ * @param int $y1
+ * @param int $x2
+ * @param int $y2
+ * @param int $radius
+ * @param gdcolorref $color
+ *
+ */
 function imageroundedrectangle( $image  , $x1  , $y1  , $x2  , $y2  , $radius, $color )
 {
 
@@ -294,6 +403,15 @@ function imageroundedrectangle( $image  , $x1  , $y1  , $x2  , $y2  , $radius, $
 	imagearc($image, $x2-$radius, $y2-$radius, $radius*2, $radius*2, 0, 90, $color);
 }
 
+/**
+ * Load an image file, and return a gdimageref to it.
+ * Figures out for itself what format the image file is in
+ * (between JPEG, PNG, and GIF as long as you have the libraries)
+ *
+ * @param string $filename
+ * @return gdimageref
+ *
+ */
 function imagecreatefromfile($filename)
 {
 	$bgimage=NULL;
@@ -348,21 +466,27 @@ function imagecreatefromfile($filename)
 	return $bgimage;
 }
 
-// taken from here:
-// http://www.php.net/manual/en/function.imagefilter.php#62395
-// ( with some bugfixes and changes)
-// 
-// Much nicer colorization than imagefilter does, AND no special requirements.
-// Preserves white, black and transparency.
-//
+/**
+ * Much nicer colorization than imagefilter does, AND no special requirements.
+ * Preserves white, black and transparency.
+ *
+ * taken from here:
+ * http://www.php.net/manual/en/function.imagefilter.php#62395
+ * ( with some bugfixes and changes)
+ *
+ * @param gdimageref $im
+ * @param int $r
+ * @param int $g
+ * @param int $b
+ * @return gdimageref
+ */
 function imagecolorize($im, $r, $g, $b)
 {
-    //We will create a monochromatic palette based on
-    //the input color
-    //which will go from black to white
-    //Input color luminosity: this is equivalent to the
-    //position of the input color in the monochromatic
-    //palette
+    // We will create a monochromatic palette based on the input color
+    // which will go from black to white
+    // 
+    // Input color luminosity: this is equivalent to the
+    // position of the input color in the monochromatic palette
     $lum_inp = round(255 * ($r + $g + $b) / 765); //765=255*3
 
     //We fill the palette entry with the input color at its
@@ -419,19 +543,12 @@ function imagecolorize($im, $r, $g, $b)
 
     //--- End of palette creation
 
-    //Now,let's change the original palette into the one we
-    //created
+    //Now, let's change the original palette into the one we created
     for ($c = 0; $c < imagecolorstotal($im); $c++)
     {
         $col = imagecolorsforindex($im, $c);
         $lum_src = round(255 * ($col['red'] + $col['green'] + $col['blue']) / 765);
         $col_out = $pal[$lum_src];
-
-   #     printf("%d (%d,%d,%d) -> %d -> (%d,%d,%d)\n", $c,
-   #                $col['red'], $col['green'], $col['blue'],
-   #                $lum_src,
-   #                $col_out['r'], $col_out['g'], $col_out['b']
-   #             );
 
         imagecolorset($im, $c, $col_out['r'], $col_out['g'], $col_out['b']);
     }
@@ -439,10 +556,22 @@ function imagecolorize($im, $r, $g, $b)
     return($im);
 }
 
-// find the point where a line from x1,y1 through x2,y2 crosses another line through x3,y3 and x4,y4
-// (the point might not be between those points, but beyond them)
-// - doesn't handle parallel lines. In our case we will never get them.
-// - make sure we remove colinear points, or this will not be true!
+/**
+ * find the point where a line from x1,y1 through x2,y2 crosses another line through x3,y3 and x4,y4
+ * (the point might not be between those points, but beyond them)
+ * - doesn't handle parallel lines. In our case we will never get them.
+ * - make sure we remove colinear points, or this will not be true!
+ *
+ * @param float $x1
+ * @param float $y1
+ * @param float $x2
+ * @param float $y2
+ * @param float $x3
+ * @param float $y3
+ * @param float $x4
+ * @param float $y4
+ * @return float[]
+ */
 function line_crossing($x1,$y1,$x2,$y2, $x3,$y3,$x4,$y4)
 {
     
@@ -469,13 +598,21 @@ function line_crossing($x1,$y1,$x2,$y2, $x3,$y3,$x4,$y4)
     return(array($xi,$yi));
 }
 
-// rotate a list of points around cx,cy by an angle in radians, IN PLACE
+
+/**
+ * rotate a list of points around cx,cy by an angle in radians, IN PLACE
+ *
+ * @param &float[] $points
+ * @param float $cx
+ * @param float $cy
+ * @param float $angle
+ *
+ */
 function RotateAboutPoint(&$points, $cx,$cy, $angle=0)
 {
 	$npoints = count($points)/2;
 	
-	for($i=0;$i<$npoints;$i++)
-	{
+	for($i=0;$i<$npoints;$i++) {
 		$ox = $points[$i*2] - $cx;
 		$oy = $points[$i*2+1] - $cy;
 		$rx = $ox * cos($angle) - $oy*sin($angle);
@@ -545,6 +682,15 @@ function calculate_catmull_rom_span($startn, $startdistance, $numsteps, $x0, $y0
 	return array($allpoints, $distance, $n);
 }
 
+
+/**
+ * Given a spine array, find the point that is a given distance from the
+ * beginning, in pixels. Finds the known point before the distance is passed,
+ * and then interpolates to the exact distance, if necessary.
+ *
+ * @param &float[][] $pointarray
+ * @return float[]
+ */
 function find_distance_coords(&$pointarray,$distance)
 {
 	// We find the nearest lower point for each distance,
@@ -1266,7 +1412,14 @@ function draw_curve($image, &$curvepoints, $widths, $outlinecolour, $fillcolours
 	}
 }
 
-// Take a spine, and strip out all the points that are co-linear with the points either side of them
+/**
+ * Take a spine, and strip out all the points that are co-linear
+ * with the points either side of them
+ *
+ * @param &float[][] $input  the spine array to remove points from
+ * @param float $epsilon     the 'fudge factor' of how close is considered equal
+ * @return float[][]         the new reduced spine array
+ */
 function simplify_spine(&$input, $epsilon=1e-10)
 {   
     $output = array();
@@ -1312,6 +1465,13 @@ function simplify_spine(&$input, $epsilon=1e-10)
     return $output;
 }
 
+/**
+ * Take a formatted number (1.2K, 55M) and produce a regular number from it
+ *
+ * @param string $instring
+ * @param int $kilo
+ * @return float
+ */
 function unformat_number($instring, $kilo = 1000)
 {
 	$matches=0;
@@ -1334,7 +1494,17 @@ function unformat_number($instring, $kilo = 1000)
 	return ($number);
 }
 
-// given a compass-point, and a width & height, return a tuple of the x,y offsets
+/**
+ * given an offset string, and a width & height, return a tuple of the x,y offsets
+ *
+ * 'offset string' can be a compass point, an actual offset, or a couple
+ * of other polar coordinate formats.
+ *
+ * @param string $offsetstring
+ * @param float $width
+ * @param float $height
+ * @return float[]
+ */
 function calc_offset($offsetstring, $width, $height)
 {
 	if(preg_match("/^([-+]?\d+):([-+]?\d+)$/",$offsetstring,$matches))
@@ -1449,6 +1619,16 @@ function format_number($number, $precision = 2, $trailing_zeroes = 0)
 	else { return ($integer . "." . $decimal); }
 }
 
+/**
+ * Make a nice number out of a raw number.
+ * Use kilo, mega etc to make it nicer.
+ *
+ * @param float $number
+ * @param int $kilo           whether kilo is 1000, 1024 or something else
+ * @param int $decimals       how many decimal places to show?
+ * @param <type> $below_one   use the micro, nano, etc?
+ * @return string
+ */
 function nice_bandwidth($number, $kilo = 1000,$decimals=1,$below_one=TRUE)
 {
 	$suffix='';
@@ -1509,6 +1689,17 @@ function nice_bandwidth($number, $kilo = 1000,$decimals=1,$below_one=TRUE)
 	return ($result);
 }
 
+// XXX why are there two nearly-identical functions here?
+
+/**
+ * Make a nice number out of a raw number.
+ * Use kilo, mega etc to make it nicer.
+ *
+ * @param float $number  the number to format
+ * @param int $kilo      whether kilo is 1000, 1024 or something else
+ * @param int $decimals  how many decimal places to show?
+ * @return string
+ */
 function nice_scalar($number, $kilo = 1000, $decimals=1)
 {
 	$suffix = '';
@@ -1568,9 +1759,15 @@ function nice_scalar($number, $kilo = 1000, $decimals=1)
 }
 
 
-// ***********************************************
+// ****************************************************************************
 
-// we use enough points in various places to make it worth a small class to save some variable-pairs.
+/**
+ * Utility 'class' for 2D points.
+ *
+ * we use enough points in various places to make it worth a small class to
+ * save some variable-pairs.
+ *
+ */
 class Point
 {
 	var $x, $y;
@@ -1582,7 +1779,9 @@ class Point
 	}
 }
 
-// similarly for 2D vectors
+/**
+ * Utility class for 2D vectors. Mostly used in the VIA calculations
+ */
 class Vector
 {
 	var $dx, $dy;
@@ -1616,6 +1815,13 @@ class Vector
 	}
 }
 
+/**
+ * Utility class used for colour calculations in Weathermap.
+ *
+ * Allows representation of any RGB colour, plus some special
+ * pseudocolours.
+ *
+ */
 class Colour
 {
 	var $r,$g,$b, $alpha;
@@ -1754,11 +1960,22 @@ class Colour
 	}
 }
 
-// A series of wrapper functions around all the GD function calls
-// - I added these in so I could make a 'metafile' easily of all the
-//   drawing commands for a map. I have a basic Perl-Cairo script that makes
-//   anti-aliased maps from these, using Cairo instead of GD.
-
+/**
+ *
+ * A series of wrapper functions around all the GD function calls
+ * - I added these in so I could make a 'metafile' easily of all the
+ * drawing commands for a map. I have a basic Perl-Cairo script that makes
+ * anti-aliased maps from these, using Cairo instead of GD.
+ *
+ */
+  
+/**
+ * Add a line to the metadump file.
+ * Used by all the wimage* functions
+ *
+ * @param string $string String to add to file
+ * @param boolean $truncate Is this to start a new file, or continue one?
+ */
 function metadump($string, $truncate=FALSE)
 {
 	// comment this line to get a metafile for this map
@@ -1781,6 +1998,14 @@ function metacolour(&$col)
 	return ($col['red1']." ".$col['green1']." ".$col['blue1']);
 }
 
+/**
+ * Create an image structure.
+ * Log the parameters to the metafile.
+ *
+ * @param int $width
+ * @param int $height
+ * @return gdimageref
+ */
 function wimagecreate($width,$height)
 {
 	metadump("NEWIMAGE $width $height");
@@ -1853,12 +2078,9 @@ function wimagefilledpolygon($image, $points, $num_points, $color)
 
 function wimagecreatetruecolor($width, $height)
 {
-	
-
 	metadump("BLANKIMAGE $width $height");
 
 	return imagecreatetruecolor($width,$height);
-
 }
 
 function wimagettftext($image, $size, $angle, $x, $y, $color, $file, $string)
@@ -1921,16 +2143,29 @@ function wm_draw_marker_circle($im, $col, $x, $y, $size=10)
 	imagearc($im,$x, $y ,$size,$size,0,360,$col);
 }
 
+/**
+ * Draw a spine array - not used in the main code, just for debugging
+ *
+ * @param gdimageref $im
+ * @param float[][] $spine
+ * @param gdcolorref $col
+ * @param int $size
+ */
 function draw_spine_chain($im,$spine,$col, $size=10)
 {
     $newn = count($spine);
         
     for ($i=0; $i < $newn; $i++)
     {   
-		imagearc($im,$spine[$i][X],$spine[$i][Y],$size,$size,0,360,$col);
+	imagearc($im,$spine[$i][X],$spine[$i][Y],$size,$size,0,360,$col);
     }
 }
 
+/**
+ * Dump a spine array as text - not used in the main code, just for debugging
+ *
+ * @param float[][] $spine
+ */
 function dump_spine($spine)
 {
 	print "===============\n";
@@ -1941,6 +2176,14 @@ function dump_spine($spine)
 	print "===============\n";
 }
 
+
+/**
+ * Draw a spine array - not used in the main code, just for debugging
+ *
+ * @param gdimageref $im
+ * @param float[][] $spine
+ * @param gdcolorref $col
+ */
 function draw_spine($im, $spine,$col)
 {
     $max_i = count($spine)-1;

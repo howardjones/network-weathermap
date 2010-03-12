@@ -1,17 +1,20 @@
 #!/usr/bin/php
 <?php
-
-// PHP Weathermap 0.97a
-// Copyright Howard Jones, 2005-2009 howie@thingy.com
-// http://www.network-weathermap.com/
-// Released under the GNU Public License
+/** PHP Weathermap 0.97a
+ * Copyright Howard Jones, 2005-2010 howie@thingy.com
+ * http://www.network-weathermap.com/
+ * Released under the GNU Public License
+ *
+ */
 require_once 'Console/Getopt.php';
 
 require_once "Weathermap.class.php";
 
-if (!module_checks()) { die ("Quitting: Module checks failed.\n"); }
+if (!WM_module_checks()) {
+    die ("Quitting: Module checks failed.\n");
+}
 
-//    $weathermap_debugging=TRUE; 
+// $weathermap_debugging=TRUE;
 
 $output="html";
 $configfile="weathermap.conf";
@@ -56,7 +59,9 @@ $args=$cg->readPHPArgv();
 
 $ret=$cg->getopt($args, $short_opts, $long_opts);
 
-if (PEAR::isError($ret)) { die ("Error in command line: " . $ret->getMessage() . "\n (try --help)\n"); }
+if (PEAR::isError($ret)) { 
+    die ("Error in command line: " . $ret->getMessage() . "\n (try --help)\n");
+}
 
 $gopts=$ret[0];
 
@@ -81,13 +86,10 @@ if (sizeof($gopts) > 0)
 			break;
 
 		case '--image-uri':
-			// $map->imageuri=$o[1];
 			$options_output['imageuri'] = $o[1];
 			break;
 
 		case '--dumpconfig':
-			//$map->dumpconfig=$o[1];
-			// $options_output['dumpconfig'] = $o[1];
 			$dumpconfig=$o[1];
 			break;
 
@@ -198,102 +200,94 @@ $map->rrdtool = $rrdtool;
 $map->context="cli";
 
 // now stuff in all the others, that we got from getopts
-foreach ($options_output as $key=>$value)
-{
-	$map->$key = $value;
-	// $map->add_hint($key,$value);
+foreach ($options_output as $key=>$value) {
+	$map->$key = $value;	
 }
 
 $weathermap_map = $configfile;
 
-if ($map->ReadConfig($configfile))
-{
-	// allow command-lines to override the config file, but provide a default if neither are present
-	if ($imagefile == '')
-	{
-		if ($map->imageoutputfile == '') { $imagefile="weathermap.png"; }
-		else { $imagefile=$map->imageoutputfile; }
-	}
+if ($map->ReadConfig($configfile)) {
+    // allow command-lines to override the config file, but provide a default if neither are present
+    if ($imagefile == '') {
+            if ($map->imageoutputfile == '') { $imagefile="weathermap.png"; }
+            else { $imagefile=$map->imageoutputfile; }
+    }
 
-	if ($htmlfile == '')
-	{
-		if ($map->htmloutputfile != '') { $htmlfile = $map->htmloutputfile; }
-	}
+    if ($htmlfile == '') {
+            if ($map->htmloutputfile != '') {
+                $htmlfile = $map->htmloutputfile;
+            }
+    }
 
     // feed in any command-line defaults, so that they appear as if SET lines in the config
-    
+
     // XXX FIXME
-    foreach ($defines as $hintname=>$hint)
-    {
+    foreach ($defines as $hintname=>$hint) {
         $map->add_hint($hintname,$hint);
     }
-	
-	// now stuff in all the others, that we got from getopts
-	foreach ($options_output as $key=>$value)
-	{
-		// $map->$key = $value;
-		$map->add_hint($key,$value);
-	}
 
-        if ( (isset($options_output['sizedebug']) && ! $options_output['sizedebug']) || (!isset($options_output['sizedebug'])) )
-	{
-		if ($randomdata == 1) { $map->RandomData(); }
-		else { $map->ReadData(); }
-	}
+    // now stuff in all the others, that we got from getopts
+    foreach ($options_output as $key=>$value) {
+            // $map->$key = $value;
+            $map->add_hint($key,$value);
+    }
 
-	# exit();
-	
-	if ($imagefile != '')
-	{
-		$map->DrawMap($imagefile);
-		$map->imagefile=$imagefile;
-	}
+    if ( (isset($options_output['sizedebug']) && ! $options_output['sizedebug']) || (!isset($options_output['sizedebug'])) ) {
+            if ($randomdata == 1) {
+                $map->RandomData();
 
-	if ($htmlfile != '')
-	{
-		debug("Writing HTML to $htmlfile\n");
-		
-		$fd=fopen($htmlfile, 'w');
-		fwrite($fd,
-			'<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head>');
-		if($map->htmlstylesheet != '') fwrite($fd,'<link rel="stylesheet" type="text/css" href="'.$map->htmlstylesheet.'" />');
-		fwrite($fd,'<meta http-equiv="refresh" content="300" /><title>' . $map->ProcessString($map->title, $map) . '</title></head><body>');
+           } else {
+                $map->ReadData();
+          }
+    }
 
-		if ($map->htmlstyle == "overlib")
-		{
-			fwrite($fd,
-				"<div id=\"overDiv\" style=\"position:absolute; visibility:hidden; z-index:1000;\"></div>\n");
-			fwrite($fd,
-				"<script type=\"text/javascript\" src=\"overlib.js\"><!-- overLIB (c) Erik Bosrup --></script> \n");
-		}
+    if ($imagefile != '') {
+            $map->DrawMap($imagefile);
+            $map->imagefile=$imagefile;
+    }
 
-		fwrite($fd, $map->MakeHTML());
-		fwrite($fd,
-			'<hr /><span id="byline">Network Map created with <a href="http://www.network-weathermap.com/?vs='
-			. $WEATHERMAP_VERSION . '">PHP Network Weathermap v' . $WEATHERMAP_VERSION
-			. '</a></span></body></html>');
-		fclose ($fd);
-	}
+    if ($htmlfile != '') {
+            debug("Writing HTML to $htmlfile\n");
 
-	if ($dumpconfig != '')
-		$map->WriteConfig($dumpconfig);
+            $fd=fopen($htmlfile, 'w');
+            fwrite($fd,
+                    '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head>');
+            if($map->htmlstylesheet != '') fwrite($fd,'<link rel="stylesheet" type="text/css" href="'.$map->htmlstylesheet.'" />');
+            fwrite($fd,'<meta http-equiv="refresh" content="300" /><title>' . $map->ProcessString($map->title, $map) . '</title></head><body>');
 
-	if ($dumpstats != '')
-		$map->DumpStats();
-		
-	if ($dumpafter == 1)
-		print_r ($map);
-		
-#	print_r ($map->node_template_tree);
-#	print_r ($map->link_template_tree);
-	
-	# $map->cachefolder="editcache";	
-	# $map->CacheUpdate(1);
-	
-		
+            if ($map->htmlstyle == "overlib")
+            {
+                    fwrite($fd,
+                            "<div id=\"overDiv\" style=\"position:absolute; visibility:hidden; z-index:1000;\"></div>\n");
+                    fwrite($fd,
+                            "<script type=\"text/javascript\" src=\"overlib.js\"><!-- overLIB (c) Erik Bosrup --></script> \n");
+            }
+
+            fwrite($fd, $map->MakeHTML());
+            fwrite($fd,
+                    '<hr /><span id="byline">Network Map created with <a href="http://www.network-weathermap.com/?vs='
+                    . $WEATHERMAP_VERSION . '">PHP Network Weathermap v' . $WEATHERMAP_VERSION
+                    . '</a></span></body></html>');
+            fclose ($fd);
+    }
+
+    if ($dumpconfig != '') {
+            $map->WriteConfig($dumpconfig);
+    }
+
+    if ($dumpstats != '') {
+            $map->DumpStats();
+    }
+
+    if ($dumpafter == 1) {
+            print_r ($map);
+    }
+
 }
-else { die ("\n\nCould not read Weathermap config file. No output produced. Maybe try --help?\n"); }
+else { 
+    die ("\n\nCould not read Weathermap config file. No output produced. Maybe try --help?\n");
 
+}
 
 
 function my_assert_handler($file, $line, $code)
@@ -302,8 +296,8 @@ function my_assert_handler($file, $line, $code)
         File $file
         Line $line
         Code $code";
-	debug_print_backtrace();
-	exit();
+    debug_print_backtrace();
+    exit();
 }
 
 // vim:ts=4:sw=4:

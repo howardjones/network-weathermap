@@ -80,7 +80,7 @@ function weathermap_run_maps($mydir) {
 	// moved this outside the module_checks, so there should always be something in the logs!
 	if($quietlogging==0) cacti_log("Weathermap $WEATHERMAP_VERSION starting - $mode_message\n",true,"WEATHERMAP");
 
-	if(module_checks())
+	if(WM_module_checks())
 	{
 		weathermap_memory_check("MEM Initial");
 		// move to the weathermap folder so all those relatives paths don't *have* to be absolute

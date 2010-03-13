@@ -12,16 +12,16 @@ class WeatherMapDataSource_static extends WeatherMapDataSource
         if (preg_match("/^static:(\-?\d+\.?\d*[KMGT]?):(\-?\d+\.?\d*[KMGT]?)$/",
             $targetstring, $matches)
             || preg_match("/^static:(\-?\d+\.?\d*[KMGT]?)$/", $targetstring, $matches)) {
-            return TRUE;
+            return true;
         } else {
-            return FALSE;
+            return false;
         }
     }
 
     function ReadData($targetstring, &$map, &$item)
     {
-        $inbw = NULL;
-        $outbw = NULL;
+        $inbw = null;
+        $outbw = null;
         $data_time = 0;
 
         if (preg_match("/^static:(\-?\d+\.?\d*[KMGT]*):(\-?\d+\.?\d*[KMGT]*)$/",
@@ -36,7 +36,12 @@ class WeatherMapDataSource_static extends WeatherMapDataSource
             $outbw = unformat_number($matches[1]);
             $data_time = time();
         }
-        debug("Static ReadData: Returning ($inbw,$outbw,$data_time)\n");
+        
+        debug( sprintf("Static ReadData: Returning (%s, %s, %s)\n",
+		        string_or_null($data[IN]),
+		        string_or_null($data[OUT]),
+		        $data_time
+        	));
 
         return (array (
             $inbw,

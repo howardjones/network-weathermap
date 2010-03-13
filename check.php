@@ -26,7 +26,7 @@ foreach (explode("\n", $s) as $line) {
     $line = str_replace(' </td><td class="v">', ' => ', $line);
     $sep_pos = strpos($line, " => ");
 
-    if ($sep_pos !== FALSE) {
+    if ($sep_pos !== false) {
         // by here, it should be a straight "name => value"
         $name = substr($line, 0, $sep_pos);
         $value = substr($line, $sep_pos + 4);
@@ -44,15 +44,15 @@ if ($extra_ini != '') {
 }
 
 $gdversion = "";
-$gdbuiltin = FALSE;
+$gdbuiltin = false;
 $gdstring = "";
 
 if (function_exists('gd_info')) {
     $gdinfo = gd_info();
     $gdversion = $gdinfo['GD Version'];
 
-    if (strpos($gdversion, "bundled") !== FALSE) {
-        $gdbuiltin = TRUE;
+    if (strpos($gdversion, 'bundled') !== false) {
+        $gdbuiltin = true;
         $gdstring =
             "This PHP uses the 'bundled' GD library, which doesn't have alpha-blending bugs. That's good!\n";
     } else {
@@ -178,85 +178,84 @@ if (isset($argv)) {
 $critical = 0;
 $noncritical = 0;
 
-
 # critical, what-it-affects, what-it-is
 $functions = array (
     'imagepng' => array (
-        TRUE,
-        FALSE,
+        true,
+        false,
         'all of Weathermap',
         'part of the GD library and the "gd" PHP extension'
     ),
     'imagecreatetruecolor' => array (
-        TRUE,
-        FALSE,
+        true,
+        false,
         'all of Weathermap',
         'part of the GD library and the "gd" PHP extension'
     ),
     'imagealphablending' => array (
-        TRUE,
-        FALSE,
+        true,
+        false,
         'all of Weathermap',
         'part of the GD library and the "gd" PHP extension'
     ),
     'imageSaveAlpha' => array (
-        TRUE,
-        FALSE,
+        true,
+        false,
         'all of Weathermap',
         'part of the GD library and the "gd" PHP extension'
     ),
     'preg_match' => array (
-        TRUE,
-        FALSE,
+        true,
+        false,
         'configuration reading',
         'provided by the "pcre" extension'
     ),
     'imagecreatefrompng' => array (
-        TRUE,
-        FALSE,
+        true,
+        false,
         'all of Weathermap',
         'part of the GD library and the "gd" PHP extension'
     ),
     'imagecreatefromjpeg' => array (
-        FALSE,
-        FALSE,
+        false,
+        false,
         'JPEG input support for ICON and BACKGROUND',
         'an optional part of the GD library and the "gd" PHP extension'
     ),
     'imagecreatefromgif' => array (
-        FALSE,
-        FALSE,
+        false,
+        false,
         'GIF input support for ICON and BACKGROUND',
         'an optional part of the GD library and the "gd" PHP extension'
     ),
     'imagejpeg' => array (
-        FALSE,
-        FALSE,
+        false,
+        false,
         'JPEG output support',
         'an optional part of the GD library and the "gd" PHP extension'
     ),
     'imagegif' => array (
-        FALSE,
-        FALSE,
+        false,
+        false,
         'GIF output support',
         'an optional part of the GD library and the "gd" PHP extension'
     ),
-#  'imagefilter' => array(FALSE, FALSE, 'colorizing icons','a special function of the PHP-supplied GD library ONLY (not the external GD library'.($gdbuiltin?'':' that you are using').')'),
+
     'imagecopyresampled' => array (
-        FALSE,
-        FALSE,
+        false,
+        false,
         'Thumbnail creation in the Cacti plugin',
         'an optional part of the GD library and the "gd" PHP extension'
     ),
     'imagettfbbox' => array (
-        FALSE,
-        FALSE,
-        'TrueType font support',
+        false,
+        false,
+        'trueType font support',
         'an optional part of the GD library and the "gd" PHP extension'
     ),
     'memory_get_usage' => array (
-        FALSE,
-        TRUE,
+        false,
+        true,
         'memory-usage debugging',
         'not supported on all PHP versions and platforms'
     )

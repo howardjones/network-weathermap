@@ -20,17 +20,17 @@ $dom[':: DEFAULTNODE ::'] = array (
         0,
         0
     ),
-    'template' => NULL
+    'template' => null
 );
 
 $dom[':: DEFAULTLINK ::'] = array (
-    'template' => NULL,
+    'template' => null,
     'name' => '',
     'width' => 7
 );
 
-$defnode = uniqid("N");
-$deflink = uniqid("L");
+$defnode = uniqid('N');
+$deflink = uniqid('L');
 
 $dom[$defnode] = array (
     'template' => ':: DEFAULTNODE ::',
@@ -39,11 +39,11 @@ $dom[$defnode] = array (
 
 $dom[$deflink] = array ('template' => ':: DEFAULTLINK ::');
 
-ReadConfig("configs/097-test.conf");
+ReadConfig('configs/097-test.conf');
 
-function ReadConfig($input, $is_include = FALSE, $initial_context = "GLOBAL")
+function ReadConfig($input, $is_include = false, $initial_context = 'GLOBAL')
 {
-    if ((strchr($input, "\n") != FALSE) || (strchr($input, "\r") != FALSE)) {
+    if ((strchr($input, "\n") != false) || (strchr($input, "\r") != false)) {
         debug("ReadConfig Detected that this is a config fragment.\n");
         // strip out any Windows line-endings that have gotten in here
         $input = str_replace("\r", "", $input);
@@ -84,7 +84,7 @@ function ReadConfig($input, $is_include = FALSE, $initial_context = "GLOBAL")
             $cmd = strtolower(array_shift($args));
 
             if ($cmd == 'include') {
-                $this->ReadConfigNG($args[0], TRUE, $context);
+                $this->ReadConfigNG($args[0], true, $context);
             } elseif ($cmd == 'node') {
                 $context = "NODE." . $args[0];
             } elseif ($cmd == 'link') {

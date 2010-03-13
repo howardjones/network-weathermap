@@ -78,7 +78,7 @@ function weathermap_run_maps($mydir)
 
 // take our debugging cue from the poller - turn on Poller debugging to get weathermap debugging
     if (read_config_option("log_verbosity") >= POLLER_VERBOSITY_DEBUG) {
-        $weathermap_debugging = TRUE;
+        $weathermap_debugging = true;
         $mode_message = "DEBUG mode is on";
     } else {
         $mode_message
@@ -147,7 +147,7 @@ function weathermap_run_maps($mydir)
                             if (file_exists($mapfile)) {
                                 if ($quietlogging == 0)
                                     warn("Map: $mapfile -> $htmlfile & $imagefile\n",
-                                        TRUE);
+                                        true);
                                 db_execute(
                                     "replace into settings values('weathermap_last_started_file','"
                                     . mysql_escape_string($weathermap_map) . "')");
@@ -219,21 +219,23 @@ function weathermap_run_maps($mydir)
                                     'weathermap-cacti-plugin.php?action=viewimage&id='
                                     . $map['filehash'] . "&time=" . time();
 
-                                if ($quietlogging == 0)
+                                if ($quietlogging == 0) {
                                     warn(
                                         "About to write image file. If this is the last message in your log, increase memory_limit in php.ini [WMPOLL01]\n",
-                                        TRUE);
+                                        true);
+                            }
                                 weathermap_memory_check("MEM pre-render $mapcount");
 
                                 $wmap->DrawMap($imagefile, $thumbimagefile,
                                     read_config_option("weathermap_thumbsize"));
 
-                                if ($quietlogging == 0)
+                                if ($quietlogging == 0) {
                                     warn("Wrote map to $imagefile and $thumbimagefile\n",
-                                        TRUE);
+                                        true);
+                                }
                                 $fd = @fopen($htmlfile, 'w');
 
-                                if ($fd != FALSE) {
+                                if ($fd != false) {
                                     fwrite($fd,
                                         $wmap->MakeHTML('weathermap_' . $map['filehash']
                                             . '_imap'));
@@ -307,9 +309,10 @@ function weathermap_run_maps($mydir)
             date(DATE_RFC822)
                 . ": $mapcount maps were run in $duration seconds with $total_warnings warnings.";
 
-        if ($quietlogging == 0)
+        if ($quietlogging == 0) {
             warn("STATS: Weathermap $WEATHERMAP_VERSION run complete - $stats_string\n",
-                TRUE);
+                true);
+        }
         db_execute("replace into settings values('weathermap_last_stats','"
             . mysql_escape_string($stats_string) . "')");
         db_execute("replace into settings values('weathermap_last_finish_time','"

@@ -11,9 +11,9 @@ $weathermap_confdir = realpath(dirname(__FILE__) . '/configs');
 // include the weathermap class so that we can get the version
 include_once(dirname(__FILE__) . "/Weathermap.class.php");
 
-$i_understand_file_permissions_and_how_to_fix_them = FALSE;
+$i_understand_file_permissions_and_how_to_fix_them = false;
 
-$action = "";
+$action = '';
 
 if (isset($_POST['action'])) {
     $action = $_POST['action'];
@@ -24,7 +24,7 @@ if (isset($_POST['action'])) {
 switch ($action) {
     case 'group_update':
         $id = -1;
-        $newname = "";
+        $newname = '';
 
         if (isset($_REQUEST['id']) && is_numeric($_REQUEST['id'])) {
             $id = intval($_REQUEST['id']);
@@ -34,12 +34,14 @@ switch ($action) {
             $newname = $_REQUEST['gname'];
         }
 
-        if ($id >= 0 && $newname != "")
+        if ($id >= 0 && $newname != '') {
             weathermap_group_update($id, $newname);
+        }
 
-        if ($id < 0 && $newname != "")
+        if ($id < 0 && $newname != '') {
             weathermap_group_create($newname);
-        header("Location: weathermap-cacti-plugin-mgmt.php?action=groupadmin");
+        }
+        header('Location: weathermap-cacti-plugin-mgmt.php?action=groupadmin');
 
         break;
 
@@ -112,8 +114,8 @@ switch ($action) {
         break;
 
     case 'map_settings_delete':
-        $mapid = NULL;
-        $settingid = NULL;
+        $mapid = null;
+        $settingid = null;
 
         if (isset($_REQUEST['mapid']) && is_numeric($_REQUEST['mapid'])) {
             $mapid = intval($_REQUEST['mapid']);
@@ -133,8 +135,8 @@ switch ($action) {
 
     // this is the save option from the map_settings_form
     case 'save':
-        $mapid = NULL;
-        $settingid = NULL;
+        $mapid = null;
+        $settingid = null;
         $name = '';
         $value = '';
 

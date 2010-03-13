@@ -5,7 +5,7 @@ class WeatherMapDataSource_cactihost extends WeatherMapDataSource
     {
         if ($map->context == 'cacti') {
             if (function_exists('db_fetch_row')) {
-                return (TRUE);
+                return (true);
             } else {
                 debug('ReadData CactiHost: Cacti database library not found.\n');
             }
@@ -13,23 +13,23 @@ class WeatherMapDataSource_cactihost extends WeatherMapDataSource
             debug("ReadData CactiHost: Can only run from Cacti environment.\n");
         }
 
-        return (FALSE);
+        return (false);
     }
 
     function Recognise($targetstring)
     {
         if (preg_match("/^cactihost:(\d+)$/", $targetstring, $matches)) {
-            return TRUE;
+            return true;
         } else {
-            return FALSE;
+            return false;
         }
     }
 
     function ReadData($targetstring, &$map, &$item)
     {
 
-        $data[IN] = NULL;
-        $data[OUT] = NULL;
+        $data[IN] = null;
+        $data[OUT] = null;
         $data_time = 0;
 
         if (preg_match("/^cactihost:(\d+)$/", $targetstring, $matches)) {
@@ -83,9 +83,12 @@ class WeatherMapDataSource_cactihost extends WeatherMapDataSource
             }
         }
 
-        debug("CactiHost ReadData: Returning ("
-            . ($data[IN] === NULL ? 'NULL' : $data[IN]) . ","
-            . ($data[OUT] === NULL ? 'NULL' : $data[OUT]) . ",$data_time)\n");
+        debug( sprintf("CactiHost ReadData: Returning (%s, %s, %s)\n",
+		        string_or_null($data[IN]),
+		        string_or_null($data[OUT]),
+		        $data_time
+        	));
+            
 
         return (array (
             $data[IN],

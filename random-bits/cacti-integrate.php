@@ -52,12 +52,12 @@ $width_map = array (
 // check if the goalposts have moved
 if (is_dir($cacti_base) && file_exists($cacti_base . "/include/global.php")) {
     // include the cacti-config, so we know about the database
-    include_once($cacti_base . "/include/global.php");
+    include_once $cacti_base . "/include/global.php";
     $config['base_url'] = (isset($config['url_path']) ? $config['url_path'] : $cacti_url);
     $cacti_found = true;
 } elseif (is_dir($cacti_base) && file_exists($cacti_base . "/include/config.php")) {
     // include the cacti-config, so we know about the database
-    include_once($cacti_base . "/include/config.php");
+    include_once $cacti_base . "/include/config.php";
     $config['base_url'] = (isset($config['url_path']) ? $config['url_path'] : $cacti_url);
     $cacti_found = true;
 } else {

@@ -6,7 +6,7 @@ class WeatherMapPreProcessorTest extends WeatherMapPreProcessor {
 
 	function run(&$map)
 	{
-		$map->add_note("test","TEST!");
+		$map->add_note('test','TEST!');
 		debug("Test Preprocessor in the hizouse\n");
 	}
 

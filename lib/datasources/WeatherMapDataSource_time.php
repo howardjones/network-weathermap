@@ -7,19 +7,19 @@ class WeatherMapDataSource_time extends WeatherMapDataSource
             if (preg_match("/^[234]\./", phpversion())) {
                 warn(
                     "Time DS Plugin recognised a TARGET, but needs PHP5+ to run. [WMTIME01]\n");
-                return FALSE;
+                return false;
             }
-            return TRUE;
+            return true;
         } else {
-            return FALSE;
+            return false;
         }
     }
 
     // function ReadData($targetstring, $configline, $itemtype, $itemname, $map)
     function ReadData($targetstring, &$map, &$item)
     {
-        $data[IN] = NULL;
-        $data[OUT] = NULL;
+        $data[IN] = null;
+        $data[OUT] = null;
         $data_time = 0;
         $itemname = $item->name;
 
@@ -56,8 +56,11 @@ class WeatherMapDataSource_time extends WeatherMapDataSource
             warn("Time ReadData: Couldn't recognize $targetstring \n");
         }
 
-        debug("Time ReadData: Returning (" . ($data[IN] === NULL ? 'NULL' : $data[IN])
-            . "," . ($data[OUT] === NULL ? 'NULL' : $data[OUT]) . ",$data_time)\n");
+        debug( sprintf("TimeReadData: Returning (%s, %s, %s)\n",
+		        string_or_null($data[IN]),
+		        string_or_null($data[OUT]),
+		        $data_time
+        	));
 
         return (array (
             $data[IN],

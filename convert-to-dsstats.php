@@ -54,7 +54,7 @@ if (sizeof($gopts) > 0) {
     foreach ($gopts as $o) {
         switch ($o[0]) {
             case '--debug':
-                $weathermap_debugging = TRUE;
+                $weathermap_debugging = true;
                 break;
 
             case '--input':

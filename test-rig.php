@@ -123,32 +123,30 @@ function ConfigParamValidate($schema, $values)
     return $valid;
 }
 
-#$mapfile = "configs/097-test.conf";
 $mapfile = "configs/simple.conf";
 
 $map = new WeatherMap;
 
-//   $map->debugging = TRUE;
-$weathermap_debugging = TRUE;
+$weathermap_debugging = true;
 
 $map->ReadConfigNNG($mapfile);
 
 exit();
 
-list($bottom, $top) = $map->FindScaleExtent("DEFAULT");
+list($bottom, $top) = $map->FindScaleExtent('DEFAULT');
 
 print "SCALE goes from $bottom to $top\n";
 
-$r2 = $map->NewColourFromPercent(104, "DEFAULT", "test2", FALSE);
-$r3 = $map->NewColourFromPercent(-5, "DEFAULT", "test3", FALSE);
-$r4 = $map->NewColourFromPercent(5, "DEFAULT", "test4", FALSE);
-$r5 = $map->NewColourFromPercent(-35, "DEFAULT", "test5", FALSE);
+$r2 = $map->NewColourFromPercent(104, 'DEFAULT', 'test2', false);
+$r3 = $map->NewColourFromPercent(-5, 'DEFAULT', 'test3', false);
+$r4 = $map->NewColourFromPercent(5, 'DEFAULT', 'test4', false);
+$r5 = $map->NewColourFromPercent(-35, 'DEFAULT', 'test5', false);
 
 print "Did tests\n";
 
 if (1 == 0) {
-    $nodename = "Centre";
-    $newnodename = "dave";
+    $nodename = 'Centre';
+    $newnodename = 'dave';
 
     $newnode = $map->nodes[$nodename];
     $newnode->name = $newnodename;

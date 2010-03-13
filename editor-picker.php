@@ -6,7 +6,7 @@ $mapdir = 'configs';
 
 $cacti_base = '../../';
 $cacti_url = '/';
-$ignore_cacti = FALSE;
+$ignore_cacti = false;
 
 $config['base_url'] = $cacti_url;
 
@@ -18,7 +18,7 @@ if (is_dir($cacti_base) && file_exists($cacti_base . "/include/global.php")) {
     include_once($cacti_base . "/include/global.php");
     // $config['base_url'] = $cacti_url;
     $config['base_url'] = (isset($config['url_path']) ? $config['url_path'] : $cacti_url);
-    $cacti_found = TRUE;
+    $cacti_found = true;
 // print "global";
 } elseif (is_dir($cacti_base) && file_exists($cacti_base . "/include/config.php")) {
     // include the cacti-config, so we know about the database
@@ -26,10 +26,10 @@ if (is_dir($cacti_base) && file_exists($cacti_base . "/include/global.php")) {
 
     // $config['base_url'] = $cacti_url;
     $config['base_url'] = (isset($config['url_path']) ? $config['url_path'] : $cacti_url);
-    $cacti_found = TRUE;
+    $cacti_found = true;
 // print "config";
 } else {
-    $cacti_found = FALSE;
+    $cacti_found = false;
 }
 
 // print $config['base_url'];

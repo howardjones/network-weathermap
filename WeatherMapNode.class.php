@@ -720,15 +720,15 @@ class WeatherMapNode extends WeatherMapItem
         $this->owner = $newowner;
         $template = $this->template;
 
-        if ($template == '') {
-            $template = "DEFAULT";
+        if (false === isset($this->template)) {
+            $template = 'DEFAULT';
         }
 
-        debug("Resetting $this->name with $template\n");
+        debug('Resetting '.$this->name.' with '.$template."\n");
 
         // the internal default-default gets it's values from inherit_fieldlist
         // everything else comes from a node object - the template.
-        if ($this->name == ':: DEFAULT ::') {
+        if ($this->name === ':: DEFAULT ::') {
             foreach (array_keys($this->inherit_fieldlist) as $fld) {
                 $this->$fld = $this->inherit_fieldlist[$fld];
             }

@@ -22,16 +22,16 @@ class WeatherMapDataSource_external extends WeatherMapDataSource
     function Recognise($targetstring)
     {
         if (preg_match("/^!(.*)$/", $targetstring, $matches)) {
-            return TRUE;
+            return true;
         } else {
-            return FALSE;
+            return false;
         }
     }
 
     function ReadData($targetstring, &$map, &$item)
     {
-        $data[IN] = NULL;
-        $data[OUT] = NULL;
+        $data[IN] = null;
+        $data[OUT] = null;
         $data_time = 0;
 
         if (preg_match("/^!(.*)$/", $targetstring, $matches)) {
@@ -65,10 +65,12 @@ class WeatherMapDataSource_external extends WeatherMapDataSource
             }
         }
 
-        debug("ExternalScript ReadData: Returning ("
-            . ($data[IN] === NULL ? 'NULL' : $data[IN]) . ","
-            . ($data[OUT] === NULL ? 'NULL' : $data[OUT]) . ",$data_time)\n");
-
+        debug( sprintf("ExternalScript ReadData: Returning (%s, %s, %s)\n",
+		        string_or_null($data[IN]),
+		        string_or_null($data[OUT]),
+		        $data_time
+        	));
+            
         return (array (
             $data[IN],
             $data[OUT],

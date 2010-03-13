@@ -375,10 +375,10 @@ function fetch_cached_file($filename, $mapfile)
         $map->context = "editor2";
         $map->cachefolder = "editcache";
         $map->ReadConfig($mapfile);
-        $map->DrawMap('null', '', 250, FALSE);
+        $map->DrawMap('null', '', 250, false);
         $map->htmlstyle = 'editor';
 
-        $weathermap_debugging = TRUE;
+        $weathermap_debugging = true;
         $map->CacheUpdate();
         $map->CleanUp();
     }

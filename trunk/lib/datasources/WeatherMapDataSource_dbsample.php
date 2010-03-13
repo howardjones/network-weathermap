@@ -9,27 +9,27 @@ class WeatherMapDataSource_dbsample extends WeatherMapDataSource
     function Init(&$map)
     {
         if (!function_exists("mysql_real_escape_string"))
-            return FALSE;
+            return false;
 
         if (!function_exists("mysql_connect"))
-            return FALSE;
+            return false;
 
-        return (TRUE);
+        return (true);
     }
 
     function Recognise($targetstring)
     {
         if (preg_match("/^dbplug:([^:]+)$/", $targetstring, $matches)) {
-            return TRUE;
+            return true;
         } else {
-            return FALSE;
+            return false;
         }
     }
 
     function ReadData($targetstring, &$map, &$item)
     {
-        $data[IN] = NULL;
-        $data[OUT] = NULL;
+        $data[IN] = null;
+        $data[OUT] = null;
         $data_time = 0;
 
         if (preg_match("/^dbplug:([^:]+)$/", $targetstring, $matches)) {
@@ -65,8 +65,11 @@ class WeatherMapDataSource_dbsample extends WeatherMapDataSource
             $data_time = now();
         }
 
-        debug("RRD ReadData: Returning (" . ($data[IN] === NULL ? 'NULL' : $data[IN])
-            . "," . ($data[OUT] === NULL ? 'NULL' : $data[IN]) . ",$data_time)\n");
+        debug( sprintf("dbsample ReadData: Returning (%s, %s, %s)\n",
+		        string_or_null($data[IN]),
+		        string_or_null($data[OUT]),
+		        $data_time
+        	));
 
         return (array (
             $data[IN],

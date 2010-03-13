@@ -40,30 +40,35 @@ function disabled_plugin_weathermap_check_config()
 {
 // doesn't really do anything either because it's not implemented yet in PIA. Would be handy if it was.
 
-    if (!function_exists("imagecreate"))
-        return FALSE;
+    if (!function_exists("imagecreate")) {
+        return false;
+    }
 
-    if (!function_exists("preg_match"))
-        return FALSE;
+    if (!function_exists("preg_match")) {
+        return false;
+    }
 
-    if (!function_exists("imagecreatetruecolor"))
-        return FALSE;
+    if (!function_exists("imagecreatetruecolor")) {
+        return false;
+    }
 
-    if (!function_exists("imagecreatefrompng"))
-        return FALSE;
+    if (!function_exists("imagecreatefrompng")) {
+        return false;
+    }
 
-    if (!function_exists("imagepng"))
-        return FALSE;
+    if (!function_exists("imagepng")) {
+        return false;
+    }
 
-    if (!function_exists("imageSaveAlpha"))
-        return FALSE;
+    if (!function_exists("imageSaveAlpha")) {
+        return false;
+    }
 
-    if (!function_exists("imagealphablending"))
-        return FALSE;
+    if (!function_exists("imagealphablending")) {
+        return false;
+    }
 
-    //	if(!function_exists("imagecopyresampled")) return FALSE;
-
-    return TRUE;
+    return true;
 }
 
 function disabled_plugin_weathermap_install()

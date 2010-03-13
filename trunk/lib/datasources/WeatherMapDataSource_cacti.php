@@ -5,7 +5,7 @@ class WeatherMapDataSource_cacti extends WeatherMapDataSource
     {
         if ($map->context == 'cacti') {
             if (function_exists('db_fetch_row')) {
-                return (TRUE);
+                return (true);
             } else {
                 debug('ReadData cacti: Cacti database library not found.\n');
             }
@@ -13,23 +13,23 @@ class WeatherMapDataSource_cacti extends WeatherMapDataSource
             debug("ReadData cacti: Can only run from Cacti environment.\n");
         }
 
-        return (FALSE);
+        return (false);
     }
 
     function Recognise($targetstring)
     {
         if (preg_match("/^cacti:(\d+)$/", $targetstring, $matches)) {
-            return TRUE;
+            return true;
         } else {
-            return FALSE;
+            return false;
         }
     }
 
     function ReadData($targetstring, &$map, &$item)
     {
 
-        $data[IN] = NULL;
-        $data[OUT] = NULL;
+        $data[IN] = null;
+        $data[OUT] = null;
         $data_time = 0;
 
         if (preg_match("/^cacti:(\d+)$/", $targetstring, $matches)) {
@@ -39,21 +39,13 @@ class WeatherMapDataSource_cacti extends WeatherMapDataSource
 
             $result = db_fetch_row($SQL);
 
-            if (isset($result)) {
-
-// $SQL_vars = sprintf("select * from host_snmp_cache where host_id=%d and snmp_query_id=%d and snmp_index=%d");
-// $r2 = db_fetch_row($SQL_vars);
-
-// $item->add_note("cacti_hostname",$result['hostname']);
-            }
-            else {
-            // no data found, time to add a new row to weathermap_data
-            // (but let's validate the local_data_id first)
-            }
-        }
-
-        debug("cacti ReadData: Returning (" . ($data[IN] === NULL ? 'NULL' : $data[IN])
-            . "," . ($data[OUT] === NULL ? 'NULL' : $data[OUT]) . ",$data_time)\n");
+        }      
+            
+		debug( sprintf("cacti ReadData: Returning (%s, %s, %s)\n",
+		        string_or_null($data[IN]),
+		        string_or_null($data[OUT]),
+		        $data_time
+        	));
 
         return (array (
             $data[IN],

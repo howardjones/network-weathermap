@@ -6,24 +6,24 @@ require_once 'Weathermap.class.php';
 // so that you can't have the editor active, and not know about it.
 $ENABLED=false;
 
-$myname = "editor.php";
+$myname = 'editor.php';
 $fromplug = false;
-$file_button_text = "Change<br />File";
+$file_button_text = 'Change<br />File';
 
 // If $config is defined, we were called from the Cacti plugin, so auth
 // has taken place. In that situation, let them off.
-if(isset($config)) {
+if(true === isset($config)) {
     $ENABLED = true;
     $fromplug = true;
-    $myname = "weathermap-cacti-plugin-editor.php";
+    $myname = 'weathermap-cacti-plugin-editor.php';
     $cacti_found = true;
-    $file_button_text = "Back To<br />Cacti";
+    $file_button_text = 'Back To<br />Cacti';
 }
 
-if(! $ENABLED)
+if(false === $ENABLED)
 {
-    print "<p>The editor has not been enabled yet. You need to set ENABLED=true at the top of editor.php</p>";
-    print "<p>Before you do that, you should consider using &lt;Files&gt; (in Apache) or similar to limit who can access the editor.</p>";
+    print '<p>The editor has not been enabled yet. You need to set ENABLED=true at the top of editor.php</p>';
+    print '<p>Before you do that, you should consider using &lt;Files&gt; (in Apache) or similar to limit who can access the editor.</p>';
     print "<p>There is more information in the <a href='http://www.network-weathermap.com/manual/latest/pages/main.html#installation'>install guide section</a> of the manual.</p>";
 
     exit();
@@ -50,9 +50,9 @@ if( isset($_COOKIE['wmeditor']))
     if( (isset($parts[2])) && (intval($parts[2]) != 0) ) { $grid_snap_value = intval($parts[2]); }
 }
 
-if(! is_writable($mapdir))
+if(false === is_writable($mapdir))
 {
-	$configerror = "The map config directory is not writable by the web server user. You will not be able to edit any files until this is corrected. [WMEDIT01]";
+	$configerror = 'The map config directory is not writable by the web server user. You will not be able to edit any files until this is corrected. [WMEDIT01]';
 }
 
 chdir(dirname(__FILE__));
@@ -89,7 +89,7 @@ if(isset($_REQUEST['selected'])) { $selected = $_REQUEST['selected']; }
 
 $weathermap_debugging=false;
 
-if($mapname == '')
+if($mapname === '')
 {
 	// this is the file-picker/welcome page
 	show_editor_startpage();
@@ -141,15 +141,17 @@ else
 		$blackkey = imagecolorallocate($imkey,0,0,0);
 
 		$x = 3;
-		#for($i=1; $i< 6; $i++)
+
 		foreach ($map->fonts as $fontnumber => $font)
 		{
-			$string = "Abc123%";
-			$keystring = "Font $fontnumber";
+			$string = 'Abc123%';
+			$keystring = 'Font '.$fontnumber;
 			list($width,$height) = $map->myimagestringsize($fontnumber,$string);
 			list($kwidth,$kheight) = $map->myimagestringsize($keyfont,$keystring);
 
-			if($kwidth > $width) $width = $kwidth;
+			if ($kwidth > $width) { 
+				$width = $kwidth;
+			}
 
 			$y = ($sampleheight/2) + $height/2;
 			$map->myimagestring($im, $fontnumber, $x, $y, $string, $black);
@@ -187,7 +189,7 @@ else
 		}
 
 		$map->sizedebug = true;
-		//            $map->RandomData();
+
 		$map->DrawMap('','',250,true,$use_overlay,$use_relative_overlay);
 		exit();
 		break;
@@ -233,7 +235,7 @@ else
 		exit();
 		break;
 
-	case "set_link_config":
+	case 'set_link_config':
 		$map->ReadConfig($mapfile);
 
 		$link_name = $_REQUEST['link_name'];
@@ -250,7 +252,7 @@ else
 		$map->ReadConfig($mapfile);
 		break;
 
-	case "set_node_config":
+	case 'set_node_config':
 		$map->ReadConfig($mapfile);
 
 		$node_name = $_REQUEST['node_name'];
@@ -271,7 +273,7 @@ else
 		$map->ReadConfig($mapfile);
 		break;
 
-	case "set_node_properties":
+	case 'set_node_properties':
 		$map->ReadConfig($mapfile);
 
 		$node_name = $_REQUEST['node_name'];
@@ -358,7 +360,7 @@ else
 		$map->WriteConfig($mapfile);
 		break;
 
-	case "set_link_properties":
+	case 'set_link_properties':
 		$map->ReadConfig($mapfile);
 		$link_name = $_REQUEST['link_name'];
 
@@ -417,7 +419,7 @@ else
 		$map->WriteConfig($mapfile);
 		break;
 
-	case "set_map_properties":
+	case 'set_map_properties':
 		$map->ReadConfig($mapfile);
 
 		$map->title = $_REQUEST['map_title'];
@@ -497,7 +499,7 @@ else
 		$map->WriteConfig($mapfile);
 		break;
 
-	case "add_link":
+	case 'add_link':
 		$map->ReadConfig($mapfile);
 
 		$param2 = $_REQUEST['param'];
@@ -508,7 +510,7 @@ else
 
 		break;
 
-	case "add_link2":
+	case 'add_link2':
 		$map->ReadConfig($mapfile);
 		$a = $_REQUEST['param2'];
 		$b = $_REQUEST['param'];
@@ -543,7 +545,7 @@ else
 		}
 		break;
 
-	case "place_legend":
+	case 'place_legend':
 		$x = snap( intval($_REQUEST['x']) ,$grid_snap_value);
 		$y = snap( intval($_REQUEST['y']) ,$grid_snap_value);
 		$scalename = $_REQUEST['param'];
@@ -556,7 +558,7 @@ else
 		$map->WriteConfig($mapfile);
 		break;
 
-	case "place_stamp":
+	case 'place_stamp':
 		$x = snap( intval($_REQUEST['x']), $grid_snap_value);
 		$y = snap( intval($_REQUEST['y']), $grid_snap_value);
 
@@ -569,7 +571,7 @@ else
 		break;
 
 
-	case "via_link":
+	case 'via_link':
 		$x = intval($_REQUEST['x']);
 		$y = intval($_REQUEST['y']);
 		$link_name = $_REQUEST['link_name'];
@@ -582,7 +584,7 @@ else
 		break;
 
 
-	case "move_node":
+	case 'move_node':
 		$x = snap( intval($_REQUEST['x']),  $grid_snap_value);
 		$y = snap( intval($_REQUEST['y']), $grid_snap_value);
 		$node_name = $_REQUEST['node_name'];
@@ -597,20 +599,24 @@ else
 			if( (count($link->vialist)>0)  && (($link->a->name == $node_name) || ($link->b->name == $node_name)) )
 			{
 				// get the other node from us
-				if($link->a->name == $node_name) $pivot = $link->b;
-				if($link->b->name == $node_name) $pivot = $link->a;
+				if($link->a->name == $node_name) { 
+					$pivot = $link->b;
+				}
+				if($link->b->name == $node_name) { 
+					$pivot = $link->a;
+				}
 
 				if( ($link->a->name == $node_name) && ($link->b->name == $node_name) )
 				{
 					// this is a wierd special case, but it is possible
-					# $log .= "Special case for node1->node1 links\n";
+					
 					$dx = $link->a->x - $x;
 					$dy = $link->a->y - $y;
 
 					for($i=0; $i<count($link->vialist); $i++)
 					{
-						$link->vialist[$i][0] = $link->vialist[$i][0]-$dx;
-						$link->vialist[$i][1] = $link->vialist[$i][1]-$dy;
+						$link->vialist[$i][0] = $link->vialist[$i][0] - $dx;
+						$link->vialist[$i][1] = $link->vialist[$i][1] - $dy;
 					}
 				}
 				else
@@ -640,8 +646,7 @@ else
 					}
 
 					$scalefactor = $l_new/$l_old;
-					# $log .= "Scale by $scalefactor along link-line";
-
+					
 					// rotate so that link is along the axis
 					RotateAboutPoint($points,$pivx, $pivy, deg2rad($angle_old));
 					// do the scaling in here
@@ -654,16 +659,19 @@ else
 					RotateAboutPoint($points,$pivx, $pivy, deg2rad(-$angle_new));
 
 					// now put the modified points back into the vialist again
-					$v = 0; $i = 0;
+					$v = 0; 
+					$i = 0;
 					foreach($points as $p)
 					{
 						// skip a point if it positioned relative to a node. Those shouldn't be rotated (well, IMHO)
-						if(!isset($link->vialist[$v][2]))
-						{
-							$link->vialist[$v][$i]=$p;
+						if(!isset($link->vialist[$v][2])) {
+							$link->vialist[$v][$i] = $p;
 						}
 						$i++;
-						if($i==2) { $i=0; $v++;}
+						if($i===2) { 
+							$i=0; 
+							$v++;
+						}
 					}
 				}
 			}
@@ -675,7 +683,7 @@ else
 		$map->WriteConfig($mapfile);
 		break;
 
-    case "link_align_horizontal":
+    case 'link_align_horizontal':
 		$map->ReadConfig($mapfile);
 
 		$target = $_REQUEST['param'];
@@ -705,7 +713,7 @@ else
 		$map->WriteConfig($mapfile);
                 break;
 
-    case "link_align_vertical":
+    case 'link_align_vertical':
 		$map->ReadConfig($mapfile);
 
 		$target = $_REQUEST['param'];
@@ -735,7 +743,7 @@ else
 		$map->WriteConfig($mapfile);
                 break;
 
-	case "delete_link":
+	case 'delete_link':
 		$map->ReadConfig($mapfile);
 
 		$target = $_REQUEST['param'];
@@ -746,7 +754,7 @@ else
 		$map->WriteConfig($mapfile);
 		break;
 
-	case "add_node":
+	case 'add_node':
 		$x = snap(intval($_REQUEST['x']), $grid_snap_value);
 		$y = snap(intval($_REQUEST['y']), $grid_snap_value);
 
@@ -760,7 +768,7 @@ else
 
 		$node = new WeatherMapNode;
 		$node->name = $newnodename;
-		$node->template = "DEFAULT";
+		$node->template = 'DEFAULT';
 		$node->Reset($map);
 
 		$node->x = $x;
@@ -771,18 +779,18 @@ else
 
 		// only insert a label if there's no LABEL in the DEFAULT node.
 		// otherwise, respect the template.
-		if($map->nodes['DEFAULT']->label == $map->nodes[':: DEFAULT ::']->label)
+		if($map->nodes['DEFAULT']->label === $map->nodes[':: DEFAULT ::']->label)
 		{
-			$node->label = "Node";
+			$node->label = 'Node';
 		}
 
 		$map->nodes[$node->name] = $node;
-		$log = "added a node called $newnodename at $x,$y to $mapfile";
+		$log = sprintf('added a node called %s at %d,%d to %s', $newnodename, $x, $y, $mapfile);
 
 		$map->WriteConfig($mapfile);
 		break;
 
-	case "editor_settings":
+	case 'editor_settings':
             // have to do this, otherwise the editor will be unresponsive afterwards - not actually going to change anything!
             $map->ReadConfig($mapfile);
 
@@ -792,11 +800,11 @@ else
 
 	    break;
 
-	case "delete_node":
+	case 'delete_node':
 		$map->ReadConfig($mapfile);
 
 		$target = $_REQUEST['param'];
-		$log = "delete node ".$target;
+		$log = 'delete node '.$target;
 
 		foreach ($map->links as $link)
 		{
@@ -814,16 +822,16 @@ else
 		$map->WriteConfig($mapfile);
 		break;
 
-	case "clone_node":
+	case 'clone_node':
 		$map->ReadConfig($mapfile);
 
 		$target = $_REQUEST['param'];
-		$log = "clone node ".$target;
+		$log = 'clone node '.$target;
 
 		$newnodename = $target;
 		do
 		{
-			$newnodename = $newnodename."_copy";
+			$newnodename = $newnodename.'_copy';
 		} while(isset($map->nodes[$newnodename]));
 
 		$node = new WeatherMapNode;
@@ -854,7 +862,7 @@ else
 	// now we'll just draw the full editor page, with our new knowledge
 
 	$imageurl = '?mapname='.$mapname . '&amp;action=draw';
-	if($selected != '')
+	if($selected !== '')
 	{
 		$imageurl .= '&amp;selected='.$selected;
 	}
@@ -862,7 +870,9 @@ else
 	$imageurl .= '&amp;unique='.time();
 
 	// build up the editor's list of used images
-	if($map->background != '') $map->used_images[] = $map->background;
+	if($map->background !== '') { 
+		$map->used_images[] = $map->background;
+	}
 	foreach ($map->nodes as $n)
 	{
 		if($n->iconfile != '' && ! preg_match("/^(none|nink|inpie|outpie|box|rbox|gauge|round)$/",$n->iconfile))
@@ -870,11 +880,11 @@ else
 	}
 
 	// get the list from the images/ folder too
-	$imlist = get_imagelist("images");
+	$imlist = get_imagelist('images');
 
 	$fontlist = array();
 
-	setcookie("wmeditor", ($use_overlay ? "1":"0") .":". ($use_relative_overlay ? "1":"0") . ":" . intval($grid_snap_value), time()+60*60*24*30 );
+	setcookie('wmeditor', ($use_overlay ? "1":"0") .":". ($use_relative_overlay ? "1":"0") . ":" . intval($grid_snap_value), time()+60*60*24*30 );
 
 ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
@@ -1006,7 +1016,7 @@ else
 			<td><select id="node_iconfilename" name="node_iconfilename">
 
 <?php
-	if(count($imlist)==0)
+	if(count($imlist) === 0)
 	{
 		print '<option value="--NONE--">(no images are available)</option>';
 	}

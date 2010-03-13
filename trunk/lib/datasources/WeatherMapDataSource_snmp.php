@@ -21,39 +21,39 @@ class WeatherMapDataSource_snmp extends WeatherMapDataSource
         $this->down_cache = array ();
 
         if (function_exists('snmpget')) {
-            return (TRUE);
+            return (true);
         }
         debug("SNMP DS: snmpget() not found. Do you have the PHP SNMP module?\n");
 
-        return (FALSE);
+        return (false);
     }
 
     function Recognise($targetstring)
     {
         if (preg_match("/^snmp:([^:]+):([^:]+):([^:]+):([^:]+)$/", $targetstring,
             $matches)) {
-            return TRUE;
+            return true;
         } else {
-            return FALSE;
+            return false;
         }
     }
 
     function ReadData($targetstring, &$map, &$item)
     {
-        $data[IN] = NULL;
-        $data[OUT] = NULL;
+        $data[IN] = null;
+        $data[OUT] = null;
         $data_time = 0;
 
         $timeout = 1000000;
         $retries = 2;
         $abort_count = 0;
 
-        $in_result = NULL;
-        $out_result = NULL;
+        $in_result = null;
+        $out_result = null;
 
-        if ($map->get_hint("snmp_timeout") != '') {
-            $timeout = intval($map->get_hint("snmp_timeout"));
-            debug("Timeout changed to " . $timeout . " microseconds.\n");
+        if ($map->get_hint('snmp_timeout') != '') {
+            $timeout = intval($map->get_hint('snmp_timeout'));
+            debug('Timeout changed to ' . $timeout . " microseconds.\n");
         }
 
         if ($map->get_hint("snmp_abort_count") != '') {
@@ -131,8 +131,12 @@ class WeatherMapDataSource_snmp extends WeatherMapDataSource
             }
         }
 
-        debug("SNMP ReadData: Returning (" . ($data[IN] === NULL ? 'NULL' : $data[IN])
-            . "," . ($data[OUT] === NULL ? 'NULL' : $data[OUT]) . ",$data_time)\n");
+        debug( sprintf("SNMP ReadData: Returning (%s, %s, %s)\n",
+		        string_or_null($data[IN]),
+		        string_or_null($data[OUT]),
+		        $data_time
+        	));
+        
 
         return (array (
             $data[IN],

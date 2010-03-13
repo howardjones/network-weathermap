@@ -100,7 +100,7 @@ switch ($action) {
                 $map->rrdtool = read_config_option("path_rrdtool");
                 $map->ReadConfig($mapfile);
                 $map->ReadData();
-                $map->DrawMap('', '', 250, TRUE, FALSE);
+                $map->DrawMap('', '', 250, true, false);
                 dir($orig_cwd);
             }
         }
@@ -232,7 +232,7 @@ switch ($action) {
             "<div id=\"overDiv\" style=\"position:absolute; visibility:hidden; z-index:1000;\"></div>\n";
         print
             "<script type=\"text/javascript\" src=\"overlib.js\"><!-- overLIB (c) Erik Bosrup --></script> \n";
-        weathermap_fullview(TRUE);
+        weathermap_fullview(true);
         weathermap_versionbox();
 
         include_once($config["base_path"] . "/include/bottom_footer.php");
@@ -295,11 +295,11 @@ switch ($action) {
         }
 
         if (read_config_option("weathermap_pagestyle") == 1) {
-            weathermap_fullview(FALSE, FALSE, $group_id);
+            weathermap_fullview(false, false, $group_id);
         }
 
         if (read_config_option("weathermap_pagestyle") == 2) {
-            weathermap_fullview(FALSE, TRUE, $group_id);
+            weathermap_fullview(false, true, $group_id);
         }
 
         weathermap_versionbox();
@@ -433,7 +433,7 @@ function weathermap_thumbview($limit_to_group = -1)
     // if there's only one map, ignore the thumbnail setting and show it fullsize
     if (sizeof($maplist) == 1) {
         $pagetitle = "Network Weathermap";
-        weathermap_fullview(FALSE, FALSE, $limit_to_group);
+        weathermap_fullview(false, false, $limit_to_group);
     } else {
         $pagetitle = "Network Weathermaps";
 
@@ -528,7 +528,7 @@ function weathermap_thumbview($limit_to_group = -1)
     }
 }
 
-function weathermap_fullview($cycle = FALSE, $firstonly = FALSE, $limit_to_group = -1)
+function weathermap_fullview($cycle = false, $firstonly = false, $limit_to_group = -1)
 {
     global $colors;
 
@@ -539,8 +539,9 @@ function weathermap_fullview($cycle = FALSE, $firstonly = FALSE, $limit_to_group
     $maplist_SQL =
         "select distinct weathermap_maps.* from weathermap_auth,weathermap_maps where weathermap_maps.id=weathermap_auth.mapid and active='on' and ";
 
-    if ($limit_to_group > 0)
+    if ($limit_to_group > 0) {
         $maplist_SQL .= " weathermap_maps.group_id=" . $limit_to_group . " and ";
+    }
     $maplist_SQL .= " (userid=" . $userid . " or userid=0) order by sortorder, id";
 
     if ($firstonly) {
@@ -840,7 +841,7 @@ function weathermap_mapselector($current_id = 0)
     if (sizeof($maps) > 1) {
 
         /* include graph view filter selector */
-        html_graph_start_box(3, TRUE);
+        html_graph_start_box(3, true);
 ?>
 
         <tr bgcolor = "<?php print $colors["panel"];?>" class = "noprint">
@@ -908,7 +909,7 @@ function weathermap_mapselector($current_id = 0)
         </tr>
 
 <?php
-        html_graph_end_box(FALSE);
+        html_graph_end_box(false);
     }
 }
 

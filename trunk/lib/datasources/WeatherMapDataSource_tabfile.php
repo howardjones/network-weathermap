@@ -9,17 +9,17 @@ class WeatherMapDataSource_tabfile extends WeatherMapDataSource
     function Recognise($targetstring)
     {
         if (preg_match("/\.(tsv|txt)$/", $targetstring, $matches)) {
-            return TRUE;
+            return true;
         } else {
-            return FALSE;
+            return false;
         }
     }
 
     // function ReadData($targetstring, $configline, $itemtype, $itemname, $map)
     function ReadData($targetstring, &$map, &$item)
     {
-        $data[IN] = NULL;
-        $data[OUT] = NULL;
+        $data[IN] = null;
+        $data[OUT] = null;
         $data_time = 0;
         $itemname = $item->name;
 
@@ -46,8 +46,11 @@ class WeatherMapDataSource_tabfile extends WeatherMapDataSource
             debug("TabText ReadData: Couldn't open ($targetstring). \n");
         }
 
-        debug("TabText ReadData: Returning (" . ($data[IN] === NULL ? 'NULL' : $data[IN])
-            . "," . ($data[OUT] === NULL ? 'NULL' : $data[OUT]) . ",$data_time)\n");
+        debug( sprintf("TabText ReadData: Returning (%s, %s, %s)\n",
+		        string_or_null($data[IN]),
+		        string_or_null($data[OUT]),
+		        $data_time
+        	));
 
         return (array (
             $data[IN],

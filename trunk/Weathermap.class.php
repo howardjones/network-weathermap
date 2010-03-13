@@ -6,19 +6,19 @@
  *
  */
 
-require_once "HTML_ImageMap.class.php";
+require_once 'HTML_ImageMap.class.php';
 
-require_once "WeatherMap.functions.php";
-require_once "WeatherMapNode.class.php";
-require_once "WeatherMapLink.class.php";
+require_once 'WeatherMap.functions.php';
+require_once 'WeatherMapNode.class.php';
+require_once 'WeatherMapLink.class.php';
 
-$WEATHERMAP_VERSION = "0.97a";
-$weathermap_debugging = FALSE;
-$weathermap_map = "";
+$WEATHERMAP_VERSION = '0.97a';
+$weathermap_debugging = false;
+$weathermap_map = '';
 $weathermap_warncount = 0;
 $weathermap_debug_suppress = array (
-    "processstring",
-    "mysprintf"
+    'processstring',
+    'mysprintf'
 );
 
 $weathemap_lazycounter = 0;
@@ -27,25 +27,25 @@ $weathemap_lazycounter = 0;
 // error_reporting (E_ALL|E_STRICT);
 
 // parameterise the in/out stuff a bit
-define("IN", 0);
-define("OUT", 1);
-define("WMCHANNELS", 2);
+define('IN', 0);
+define('OUT', 1);
+define('WMCHANNELS', 2);
 
 define('CONFIG_TYPE_LITERAL', 0);
 define('CONFIG_TYPE_COLOR', 1);
 
 // some strings that are used in more than one place
-define('FMT_BITS_IN', "{link:this:bandwidth_in:%2k}");
-define('FMT_BITS_OUT', "{link:this:bandwidth_out:%2k}");
-define('FMT_UNFORM_IN', "{link:this:bandwidth_in}");
-define('FMT_UNFORM_OUT', "{link:this:bandwidth_out}");
-define('FMT_PERC_IN', "{link:this:inpercent:%.2f}%");
-define('FMT_PERC_OUT', "{link:this:outpercent:%.2f}%");
+define('FMT_BITS_IN', '{link:this:bandwidth_in:%2k}');
+define('FMT_BITS_OUT', '{link:this:bandwidth_out:%2k}');
+define('FMT_UNFORM_IN', '{link:this:bandwidth_in}');
+define('FMT_UNFORM_OUT', '{link:this:bandwidth_out}');
+define('FMT_PERC_IN', '{link:this:inpercent:%.2f}%');
+define('FMT_PERC_OUT', '{link:this:outpercent:%.2f}%');
 
 // the fields within a spine triple
-define("X", 0);
-define("Y", 1);
-define("DISTANCE", 2);
+define('X', 0);
+define('Y', 1);
+define('DISTANCE', 2);
 
 // ***********************************************
 
@@ -59,14 +59,14 @@ class WeatherMapDataSource
     // in a fit state to run at the moment.
     function Init(&$map)
     {
-        return TRUE;
+        return true;
     }
 
 // called with the TARGET string. Returns TRUE or FALSE, depending on whether it wants to handle this TARGET
 // called by map->ReadData()
     function Recognise($targetstring)
     {
-        return FALSE;
+        return false;
     }
 
 // the actual ReadData
@@ -87,6 +87,7 @@ class WeatherMapDataSource
 
 // called before ReadData, to allow plugins to DO the prefetch of targets known from Register
     function Prefetch() { }
+    
 }
 
 // template classes for the pre- and post-processor plugins
@@ -94,7 +95,7 @@ class WeatherMapPreProcessor
 {
     function run($map)
     {
-        return FALSE;
+        return false;
     }
 }
 
@@ -102,7 +103,7 @@ class WeatherMapPostProcessor
 {
     function run($map)
     {
-        return FALSE;
+        return false;
     }
 }
 
@@ -118,18 +119,18 @@ class WeatherMapBase
 
     function add_note($name, $value)
     {
-        debug("Adding note $name='$value' to " . $this->name . "\n");
+        debug('Adding note ' . $name . "='" . $value . "' to " . $this->name . "\n");
         $this->notes[$name] = $value;
     }
 
     function get_note($name)
     {
         if (isset($this->notes[$name])) {
-//	debug("Found note $name in ".$this->name." with value of ".$this->notes[$name].".\n");
+
             return ($this->notes[$name]);
         } else {
-            //	debug("Looked for note $name in ".$this->name." which doesn't exist.\n");
-            return (NULL);
+
+            return (null);
         }
     }
 
@@ -137,17 +138,17 @@ class WeatherMapBase
     {
         debug("Adding hint $name='$value' to " . $this->name . "\n");
         $this->hints[$name] = $value;
-    # warn("Adding hint $name to ".$this->my_type()."/".$this->name."\n");
+    
     }
 
     function get_hint($name)
     {
         if (isset($this->hints[$name])) {
-//	debug("Found hint $name in ".$this->name." with value of ".$this->hints[$name].".\n");
+
             return ($this->hints[$name]);
         } else {
-            //	debug("Looked for hint $name in ".$this->name." which doesn't exist.\n");
-            return (NULL);
+
+            return (null);
         }
     }
 }
@@ -176,7 +177,7 @@ class WeatherMapItem extends WeatherMapBase
 
     function my_type()
     {
-        return "ITEM";
+        return 'ITEM';
     }
 }
 
@@ -207,7 +208,7 @@ class WeatherMap extends WeatherMapBase
     var $kilo;
     var $sizedebug, $widthmod, $debugging;
     var $linkfont, $nodefont, $keyfont, $timefont;
-    // var $bg_r, $bg_g, $bg_b;
+
     var $timex, $timey;
     var $width, $height;
     var $keyx, $keyy, $keyimage;
@@ -255,7 +256,7 @@ class WeatherMap extends WeatherMapBase
             'postprocessclasses' => array (),
             'included_files' => array (),
             'context' => '',
-            'dumpconfig' => FALSE,
+            'dumpconfig' => false,
             'rrdtool_check' => '',
             'background' => '',
             'imageoutputfile' => '',
@@ -289,11 +290,11 @@ class WeatherMap extends WeatherMapBase
             'titley' => -1,
             'cachefolder' => 'cached',
             'mapcache' => '',
-            'sizedebug' => FALSE,
-            'debugging' => FALSE,
-            'widthmod' => FALSE,
-            'has_includes' => FALSE,
-            'has_overlibs' => FALSE,
+            'sizedebug' => false,
+            'debugging' => false,
+            'widthmod' => false,
+            'has_includes' => false,
+            'has_overlibs' => false,
             'name' => 'MAP'
         );
 
@@ -302,7 +303,7 @@ class WeatherMap extends WeatherMapBase
 
     function my_type()
     {
-        return "MAP";
+        return 'MAP';
     }
 
     function Reset()
@@ -313,10 +314,10 @@ class WeatherMap extends WeatherMapBase
             $this->$fld = $this->inherit_fieldlist[$fld];
         }
 
-        $this->min_ds_time = NULL;
-        $this->max_ds_time = NULL;
+        $this->min_ds_time = null;
+        $this->max_ds_time = null;
 
-        $this->need_size_precalc = FALSE;
+        $this->need_size_precalc = false;
 
         $this->nodes = array (); // an array of WeatherMapNodes
         $this->links = array (); // an array of WeatherMapLinks
@@ -327,16 +328,16 @@ class WeatherMap extends WeatherMapBase
         debug("Creating ':: DEFAULT ::' DEFAULT LINK\n");
         // these two are used for default settings
         $deflink = new WeatherMapLink;
-        $deflink->name = ":: DEFAULT ::";
-        $deflink->template = ":: DEFAULT ::";
+        $deflink->name = ':: DEFAULT ::';
+        $deflink->template = ':: DEFAULT ::';
         $deflink->Reset($this);
 
         $this->links[':: DEFAULT ::'] = &$deflink;
 
         debug("Creating ':: DEFAULT ::' DEFAULT NODE\n");
         $defnode = new WeatherMapNode;
-        $defnode->name = ":: DEFAULT ::";
-        $defnode->template = ":: DEFAULT ::";
+        $defnode->name = ':: DEFAULT ::';
+        $defnode->template = ':: DEFAULT ::';
         $defnode->Reset($this);
 
         $this->nodes[':: DEFAULT ::'] = &$defnode;
@@ -353,30 +354,25 @@ class WeatherMap extends WeatherMapBase
 // these can be modified by the user, but their template (and therefore comparison in WriteConfig) is ':: DEFAULT ::'
         debug("Creating actual DEFAULT NODE from :: DEFAULT ::\n");
         $defnode2 = new WeatherMapNode;
-        $defnode2->name = "DEFAULT";
-        $defnode2->template = ":: DEFAULT ::";
+        $defnode2->name = 'DEFAULT';
+        $defnode2->template = ':: DEFAULT ::';
         $defnode2->Reset($this);
 
         $this->nodes['DEFAULT'] = &$defnode2;
 
         debug("Creating actual DEFAULT LINK from :: DEFAULT ::\n");
         $deflink2 = new WeatherMapLink;
-        $deflink2->name = "DEFAULT";
-        $deflink2->template = ":: DEFAULT ::";
+        $deflink2->name = 'DEFAULT';
+        $deflink2->template = ':: DEFAULT ::';
         $deflink2->Reset($this);
 
         $this->links['DEFAULT'] = &$deflink2;
-
-        // for now, make the old defaultlink and defaultnode work too.
-        //                $this->defaultlink = $this->links['DEFAULT'];
-        //                $this->defaultnode = $this->nodes['DEFAULT'];
 
         assert('is_object($this->nodes[":: DEFAULT ::"])');
         assert('is_object($this->links[":: DEFAULT ::"])');
         assert('is_object($this->nodes["DEFAULT"])');
         assert('is_object($this->links["DEFAULT"])');
 
-        // ************************************
 
         $this->imap = new HTML_ImageMap('weathermap');
         $this->colours = array ();
@@ -445,7 +441,7 @@ class WeatherMap extends WeatherMapBase
 
         // Adding these makes the editor's job a little easier, mainly
         for ($i = 1; $i <= 5; $i++) {
-            $this->fonts[$i]->type = "GD builtin";
+            $this->fonts[$i]->type = 'GD builtin';
             $this->fonts[$i]->file = '';
             $this->fonts[$i]->size = 0;
         }
@@ -459,12 +455,13 @@ class WeatherMap extends WeatherMapBase
 
     function myimagestring($image, $fontnumber, $x, $y, $string, $colour, $angle = 0)
     {
-// if it's supposed to be a special font, and it hasn't been defined, then fall through
+        // if it's supposed to be a special font, and it hasn't been defined, then fall through
         if ($fontnumber > 5 && !isset($this->fonts[$fontnumber])) {
             warn("Using a non-existent special font ($fontnumber) - falling back to internal GD fonts [WMWARN03]\n");
 
-            if ($angle != 0)
+            if ($angle != 0) {
                 warn("Angled text doesn't work with non-FreeType fonts [WMWARN02]\n");
+            }
 
             $fontnumber = 5;
         }
@@ -473,8 +470,9 @@ class WeatherMap extends WeatherMapBase
             imagestring($image, $fontnumber, $x, $y - imagefontheight($fontnumber),
                 $string, $colour);
 
-            if ($angle != 0)
+            if ($angle != 0) {
                 warn("Angled text doesn't work with non-FreeType fonts [WMWARN02]\n");
+            }
         } else {
             // look up what font is defined for this slot number
             if ($this->fonts[$fontnumber]->type == 'truetype') {
@@ -487,8 +485,9 @@ class WeatherMap extends WeatherMapBase
                     $y - imagefontheight($this->fonts[$fontnumber]->gdnumber), $string,
                     $colour);
 
-                if ($angle != 0)
+                if ($angle != 0) {
                     warn("Angled text doesn't work with non-FreeType fonts [WMWARN04]\n");
+                }
             }
         }
     }
@@ -498,14 +497,15 @@ class WeatherMap extends WeatherMapBase
         $linecount = 1;
 
         $lines = split("\n", $string);
-        $linecount = sizeof($lines);
+        $linecount = count($lines);
         $maxlinelength = 0;
 
         foreach ($lines as $line) {
             $l = strlen($line);
 
-            if ($l > $maxlinelength)
+            if ($l > $maxlinelength) {
                 $maxlinelength = $l;
+            }
         }
 
         if (($fontnumber > 0) && ($fontnumber < 6)) {
@@ -533,15 +533,12 @@ class WeatherMap extends WeatherMapBase
                         $cx = $bounds[4] - $bounds[0];
                         $cy = $bounds[1] - $bounds[5];
 
-                        if ($cx > $xsize)
+                        if ($cx > $xsize) {
                             $xsize = $cx;
+                        }
                         $ysize += ($cy * 1.2);
-                    # warn("Adding $cy (x was $cx)\n");
+                    
                     }
-#$bounds=imagettfbbox($this->fonts[$fontnumber]->size, 0, $this->fonts[$fontnumber]->file,
-#	$string);
-# return (array($bounds[4] - $bounds[0], $bounds[1] - $bounds[5]));
-# warn("Size of $string is $xsize x $ysize over $linecount lines\n");
 
                     return (array (
                         $xsize,
@@ -560,28 +557,27 @@ class WeatherMap extends WeatherMapBase
         }
     }
 
-    function ProcessString($input, &$context, $include_notes = TRUE, $multiline = FALSE)
+    function ProcessString($input, &$context, $include_notes = true, $multiline = false)
     {
-        # debug("ProcessString: input is $input\n");
-
+        
         assert('is_scalar($input)');
 
         $context_description = strtolower($context->my_type());
 
-        if ($context_description != "map")
-            $context_description .= ":" . $context->name;
+        if ($context_description != 'map') {
+            $context_description .= ':' . $context->name;
+        }
 
         debug("Trace: ProcessString($input, $context_description)\n");
 
-        if ($multiline == TRUE) {
+        if ($multiline == true) {
             $i = $input;
-            $input = str_replace("\\n", "\n", $i);
-        # if($i != $input)  warn("$i into $input\n");
+            $input = str_replace("\\n", "\n", $i);        
         }
 
         $output = $input;
 
-        # while( preg_match("/(\{[^}]+\})/",$input,$matches) )
+        
         while (preg_match("/(\{(?:node|map|link)[^}]+\})/", $input, $matches)) {
             $value = "[UNKNOWN]";
             $format = "";
@@ -591,7 +587,7 @@ class WeatherMap extends WeatherMapBase
             if (preg_match("/\{(node|map|link):([^}]+)\}/", $key, $matches)) {
                 $type = $matches[1];
                 $args = $matches[2];
-                # debug("ProcessString: type is ".$type.", arguments are ".$args."\n");
+        
 
                 if ($type == 'map') {
                     $the_item = $this;
@@ -608,9 +604,7 @@ class WeatherMap extends WeatherMapBase
                         $args = $matches[2];
                         $format = $matches[3];
 
-#				debug("ProcessString: item is $itemname, and args are now $args\n");
-
-                        $the_item = NULL;
+                        $the_item = null;
 
                         if (($itemname == "this")
                             && ($type == strtolower($context->my_type()))) {
@@ -649,9 +643,6 @@ class WeatherMap extends WeatherMapBase
                     debug("ProcessString: Found appropriate item: " . get_class($the_item)
                         . " " . $the_item->name . "\n");
 
-# warn($the_item->name."/hints: ".var_dump($the_item->hints)."\n");
-# warn($the_item->name."/notes: ".var_dump($the_item->notes)."\n");
-
 // SET and notes have precedent over internal properties
 // this is my laziness - it saves me having a list of reserved words
 // which are currently used for internal props. You can just 'overwrite' any of them.
@@ -674,22 +665,22 @@ class WeatherMap extends WeatherMapBase
 
             // format, and sanitise the value string here, before returning it
 
-            if ($value === NULL)
+            if ($value === null) {
                 $value = 'NULL';
+            }
             debug("ProcessString: replacing " . $key . " with $value\n");
 
-            # if($format != '') $value = sprintf($format,$value);
+            
             if ($format != '') {
 
-                #		debug("Formatting with mysprintf($format,$value)\n");
                 $value = mysprintf($format, $value);
             }
 
-            #	debug("ProcessString: formatted to $value\n");
+            
             $input = str_replace($key, '', $input);
             $output = str_replace($key, $value, $output);
         }
-        #debug("ProcessString: output is $output\n");
+        
         return ($output);
     }
 
@@ -709,7 +700,7 @@ class WeatherMap extends WeatherMapBase
             $dir = dirname(__FILE__) . DIRECTORY_SEPARATOR . $dir;
             debug("Relative path didn't exist. Trying $dir\n");
         }
-        # $this->datasourceclasses = array();
+        
         $dh = @opendir($dir);
 
         if (!$dh) { // try to find it with the script, if the relative path fails
@@ -717,8 +708,9 @@ class WeatherMap extends WeatherMapBase
                 strrpos($_SERVER['argv'][0], DIRECTORY_SEPARATOR));
             $dh = opendir($srcdir . DIRECTORY_SEPARATOR . $dir);
 
-            if ($dh)
+            if ($dh) {
                 $dir = $srcdir . DIRECTORY_SEPARATOR . $dir;
+            }
         }
 
         if ($dh) {
@@ -767,7 +759,7 @@ class WeatherMap extends WeatherMapBase
             // make an instance of the class
             $dsplugins[$ds_class] = new $ds_class;
             debug("Running $ds_class" . "->Init()\n");
-            # $ret = call_user_func(array($ds_class, 'Init'), $this);
+            
             assert('isset($this->plugins["data"][$ds_class])');
 
             $ret = $this->plugins['data'][$ds_class]->Init($this);
@@ -775,7 +767,7 @@ class WeatherMap extends WeatherMapBase
             if (!$ret) {
                 debug("Removing $ds_class from Data Source list, since Init() failed\n");
                 $this->activedatasourceclasses[$ds_class] = 0;
-            # unset($this->datasourceclasses[$ds_class]);
+            
             }
         }
         debug("Finished Initialising Plugins...\n");
@@ -817,7 +809,7 @@ class WeatherMap extends WeatherMapBase
                             // processstring won't use notes (only hints) for this string
 
                             $targetstring =
-                                $this->ProcessString($target[4], $myobj, FALSE, FALSE);
+                                $this->ProcessString($target[4], $myobj, false, false);
 
                             if ($target[4] != $targetstring)
                                 debug("Targetstring is now $targetstring\n");
@@ -837,18 +829,18 @@ class WeatherMap extends WeatherMapBase
                                 $multiply = $multiply * floatval($matches[1]);
                             }
 
-                            $matched = FALSE;
+                            $matched = false;
                             $matched_by = '';
 
                             foreach ($this->datasourceclasses as $ds_class) {
                                 if (!$matched) {
-// $recognised = call_user_func(array($ds_class, 'Recognise'), $targetstring);
+
                                     $recognised =
                                         $this->plugins['data'][$ds_class]->Recognise(
                                             $targetstring);
 
                                     if ($recognised) {
-                                        $matched = TRUE;
+                                        $matched = true;
                                         $matched_by = $ds_class;
 
                                         if ($this->activedatasourceclasses[$ds_class]) {
@@ -944,12 +936,12 @@ class WeatherMap extends WeatherMapBase
 
                             foreach ($myobj->targets as $target) {
                                 debug("ReadData: New Target: $target[4]\n");
-                                #						debug ( var_dump($target));
+
 
                                 $targetstring = $target[0];
                                 $multiply = $target[1];
 
-                                #						exit();
+
 
                                 $in = 0;
                                 $out = 0;
@@ -959,14 +951,17 @@ class WeatherMap extends WeatherMapBase
 // processstring won't use notes (only hints) for this string
 
                                     $targetstring =
-                                        $this->ProcessString($target[0], $myobj, FALSE,
-                                            FALSE);
+                                        $this->ProcessString($target[0], $myobj, false,
+                                            false);
 
-                                    if ($target[0] != $targetstring)
+                                    if ($target[0] != $targetstring) {
                                         debug("Targetstring is now $targetstring\n");
+                                    }
+                                        
 
-                                    if ($multiply != 1)
+                                    if ($multiply != 1) {
                                         debug("Will multiply result by $multiply\n");
+                                    }
 
                                     if ($target[0] != "") {
                                         $matched_by = $target[5];
@@ -975,17 +970,19 @@ class WeatherMap extends WeatherMapBase
                                                 $targetstring, $this, $myobj);
                                     }
 
-                                    if (($in === NULL) && ($out === NULL)) {
+                                    if (($in === null) && ($out === null)) {
                                         $in = 0;
                                         $out = 0;
                                         warn
                                             ("ReadData: $type $name, target: $targetstring on config line $target[3] of $target[2] had no valid data, according to $matched_by\n");
                                     } else {
-                                        if ($in === NULL)
+                                        if ($in === null) {
                                             $in = 0;
+                                        }
 
-                                        if ($out === NULL)
+                                        if ($out === null) {
                                             $out = 0;
+                                        }
                                     }
 
                                     if ($multiply != 1) {
@@ -1003,13 +1000,15 @@ class WeatherMap extends WeatherMapBase
 
 # keep a track of the range of dates for data sources (mainly for MRTG/textfile based DS)
                                     if ($datatime > 0) {
-                                        if ($this->max_data_time == NULL
-                                            || $datatime > $this->max_data_time)
+                                        if ($this->max_data_time == null
+                                            || $datatime > $this->max_data_time) {
                                             $this->max_data_time = $datatime;
+                                        }
 
-                                        if ($this->min_data_time == NULL
-                                            || $datatime < $this->min_data_time)
+                                        if ($this->min_data_time == null
+                                            || $datatime < $this->min_data_time) {
                                             $this->min_data_time = $datatime;
+                                        }
 
                                         debug("DataTime MINMAX: " . $this->min_data_time
                                             . " -> " . $this->max_data_time . "\n");
@@ -1025,9 +1024,7 @@ class WeatherMap extends WeatherMapBase
                     } else {
                         debug("ReadData: Skipping $type $name that looks like a template\n.");
                     }
-
-                    # $this->links[$name]->bandwidth_in=$total_in;
-                    # $this->links[$name]->bandwidth_out=$total_out;
+                    
                     $myobj->bandwidth_in = $total_in;
                     $myobj->bandwidth_out = $total_out;
 
@@ -1054,27 +1051,29 @@ class WeatherMap extends WeatherMapBase
                     $warn_in = true;
                     $warn_out = true;
 
-                    if ($type == 'NODE' && $myobj->scalevar == 'in')
+                    if ($type == 'NODE' && $myobj->scalevar == 'in') {
                         $warn_out = false;
+                    }
 
-                    if ($type == 'NODE' && $myobj->scalevar == 'out')
+                    if ($type == 'NODE' && $myobj->scalevar == 'out') {
                         $warn_in = false;
+                    }
 
                     if ($myobj->scaletype == 'percent') {
                         list($incol, $inscalekey, $inscaletag) =
                             $this->NewColourFromPercent($myobj->inpercent,
-                                $myobj->usescale, $myobj->name, TRUE, $warn_in);
+                                $myobj->usescale, $myobj->name, true, $warn_in);
                         list($outcol, $outscalekey, $outscaletag) =
                             $this->NewColourFromPercent($myobj->outpercent,
-                                $myobj->usescale, $myobj->name, TRUE, $warn_out);
+                                $myobj->usescale, $myobj->name, true, $warn_out);
                     } else {
                         // use absolute values, if that's what is requested
                         list($incol, $inscalekey, $inscaletag) =
                             $this->NewColourFromPercent($myobj->bandwidth_in,
-                                $myobj->usescale, $myobj->name, FALSE, $warn_in);
+                                $myobj->usescale, $myobj->name, false, $warn_in);
                         list($outcol, $outscalekey, $outscaletag) =
                             $this->NewColourFromPercent($myobj->bandwidth_out,
-                                $myobj->usescale, $myobj->name, FALSE, $warn_out);
+                                $myobj->usescale, $myobj->name, false, $warn_out);
                     }
 
                     $myobj->add_note("inscalekey", $inscalekey);
@@ -1088,9 +1087,7 @@ class WeatherMap extends WeatherMapBase
 
                     $myobj->colours[IN] = $incol;
                     $myobj->colours[OUT] = $outcol;
-
-                    ### warn("TAGS (setting) |$inscaletag| |$outscaletag| \n");
-
+                    
                     debug("ReadData: Setting $total_in,$total_out\n");
                     unset($myobj);
                 }
@@ -1106,11 +1103,13 @@ class WeatherMap extends WeatherMapBase
     {
         list($strwidth, $strheight) = $this->myimagestringsize($font, $text);
 
-        if (abs($angle) > 90)
+        if (abs($angle) > 90) {
             $angle -= 180;
+        }
 
-        if ($angle < -180)
+        if ($angle < -180) {
             $angle += 360;
+        }
 
         $rangle = -deg2rad($angle);
 
@@ -1156,7 +1155,6 @@ class WeatherMap extends WeatherMapBase
         )) {
             $outlinecol = myimagecolorallocate($im, $outlinecolour[0], $outlinecolour[1],
                 $outlinecolour[2]);
-            # imagerectangle($im, $x1, $y1, $x2, $y2, $outlinecol);
             wimagepolygon($im, $points, 4, $outlinecol);
         }
 
@@ -1182,111 +1180,21 @@ class WeatherMap extends WeatherMapBase
         }
     }
 
-    function ColourFromPercent($image, $percent, $scalename = "DEFAULT", $name = "")
+    function ColourFromPercent($image, $percent, $scalename = 'DEFAULT', $name = '')
     {
-        $col = NULL;
-        $tag = '';
-
-        $nowarn_clipping = intval($this->get_hint("nowarn_clipping"));
-        $nowarn_scalemisses = intval($this->get_hint("nowarn_scalemisses"));
-
         $bt = debug_backtrace();
         $function = (isset($bt[1]['function']) ? $bt[1]['function'] : '');
         print "$function calls ColourFromPercent\n";
 
         exit();
-
-        if (isset($this->colours[$scalename])) {
-            $colours = $this->colours[$scalename];
-
-            if ($percent > 100) {
-                if ($nowarn_clipping == 0)
-                    warn("ColourFromPercent: Clipped $name $percent% to 100% [WMWARN33]\n");
-
-                $percent = 100;
-            }
-
-            foreach ($colours as $key => $colour) {
-                if (($percent >= $colour['bottom']) and ($percent <= $colour['top'])) {
-                    if (isset($colour['tag']))
-                        $tag = $colour['tag'];
-
-// we get called early now, so might not need to actually allocate a colour
-                    if (isset($image)) {
-                        if (isset($colour['red2'])) {
-                            if ($colour["bottom"] == $colour["top"]) {
-                                $ratio = 0;
-                            } else {
-                                $ratio = ($percent - $colour["bottom"])
-                                    / ($colour["top"] - $colour["bottom"]);
-                            }
-
-                            $r = $colour["red1"]
-                                + ($colour["red2"] - $colour["red1"]) * $ratio;
-                            $g = $colour["green1"]
-                                + ($colour["green2"] - $colour["green1"]) * $ratio;
-                            $b = $colour["blue1"]
-                                + ($colour["blue2"] - $colour["blue1"]) * $ratio;
-
-                            $col = myimagecolorallocate($image, $r, $g, $b);
-                        } else {
-                            $r = $colour["red1"];
-                            $g = $colour["green1"];
-                            $b = $colour["blue1"];
-
-                            $col = myimagecolorallocate($image, $r, $g, $b);
-                        # $col = $colour['gdref1'];
-                        }
-                        debug("CFPC $name $tag $key $r $g $b\n");
-                    }
-
-                    ### warn(">>TAGS CFPC $tag\n");
-
-                    return (array (
-                        $col,
-                        $key,
-                        $tag
-                    ));
-                }
-            }
-        } else {
-            if ($scalename != 'none') {
-                warn("ColourFromPercent: Attempted to use non-existent scale: $scalename for $name [WMWARN09]\n");
-            } else {
-                return array (
-                    $this->white,
-                    '',
-                    ''
-                );
-            }
-        }
-
-// you'll only get grey for a COMPLETELY quiet link if there's no 0 in the SCALE lines
-        if ($percent == 0) {
-            return array (
-                $this->grey,
-                '',
-                ''
-            );
-        }
-
-        // and you'll only get white for a link with no colour assigned
-        if ($nowarn_scalemisses == 0)
-            warn("ColourFromPercent: Scale $scalename doesn't cover $percent% for $name [WMWARN29]\n");
-
-        return array (
-            $this->white,
-            '',
-            ''
-        );
     }
 
-    function NewColourFromPercent($value, $scalename = "DEFAULT", $name = "",
-        $is_percent = TRUE, $scale_warning = TRUE)
+    function NewColourFromPercent($value, $scalename = 'DEFAULT', $name = '',
+        $is_percent = true, $scale_warning = true)
     {
         $col = new Colour(0, 0, 0);
         $tag = '';
-        $matchsize = NULL;
+        $matchsize = null;
 
         $nowarn_clipping = intval($this->get_hint("nowarn_clipping"));
         $nowarn_scalemisses = (!$scale_warning)
@@ -1333,8 +1241,7 @@ class WeatherMap extends WeatherMapBase
                         $g = $colour["green1"];
                         $b = $colour["blue1"];
 
-                    # $col = new Colour($r, $g, $b);
-                    # $col = $colour['gdref1'];
+                    
                     }
 
 // change in behaviour - with multiple matching ranges for a value, the smallest range wins
@@ -1345,7 +1252,7 @@ class WeatherMap extends WeatherMapBase
 
                     if (isset($colour['tag']))
                         $tag = $colour['tag'];
-                    #### warn(">>NCFPC TAGS $tag\n");
+                    
                     debug("NCFPC $name $scalename $value '$tag' $key $r $g $b\n");
 
                     return (array (
@@ -1446,23 +1353,20 @@ class WeatherMap extends WeatherMapBase
 
         $font = $this->keyfont;
 
-        # $x=$this->keyx[$scalename];
-        # $y=$this->keyy[$scalename];
         $x = 0;
         $y = 0;
-
-        # $width = 400;
+        
         $scalefactor = $width / 100;
 
         list($tilewidth, $tileheight) = $this->myimagestringsize($font, "100%");
         $box_left = $x;
-        # $box_left = 0;
+        
         $scale_left = $box_left + 4 + $scalefactor / 2;
         $box_right = $scale_left + $width + $tilewidth + 4 + $scalefactor / 2;
         $scale_right = $scale_left + $width;
 
         $box_top = $y;
-        # $box_top = 0;
+        
         $scale_top = $box_top + $tileheight + 6;
         $scale_bottom = $scale_top + $tileheight * 1.5;
         $box_bottom = $scale_bottom + $tileheight * 2 + 6;
@@ -1532,13 +1436,11 @@ class WeatherMap extends WeatherMapBase
         $x = $this->keyx[$scalename];
         $y = $this->keyy[$scalename];
 
-        # $height = 400;
+        
         $scalefactor = $height / 100;
 
         list($tilewidth, $tileheight) = $this->myimagestringsize($font, "100%");
 
-        # $box_left = $x;
-        # $box_top = $y;
         $box_left = 0;
         $box_top = 0;
 
@@ -1571,8 +1473,9 @@ class WeatherMap extends WeatherMapBase
 
         $updown = 1;
 
-        if ($inverted)
+        if ($inverted) {
             $updown = -1;
+        }
 
         for ($p = 0; $p <= 100; $p++) {
             if ($inverted) {
@@ -1615,14 +1518,14 @@ class WeatherMap extends WeatherMapBase
         ));
     }
 
-    function DrawLegend_Classic($im, $scalename = "DEFAULT", $use_tags = FALSE)
+    function DrawLegend_Classic($im, $scalename = 'DEFAULT', $use_tags = false)
     {
         $title = $this->keytext[$scalename];
 
         $colours = $this->colours[$scalename];
         usort($colours, array (
-            "Weathermap",
-            "coloursort"
+            'Weathermap',
+            'coloursort'
         ));
 
         $nscales = $this->numscales[$scalename];
@@ -1633,11 +1536,11 @@ class WeatherMap extends WeatherMapBase
         $hide_percent = intval($this->get_hint("key_hidepercent_" . $scalename));
 
         // did we actually hide anything?
-        $hid_zero = FALSE;
+        $hid_zero = false;
 
         if (($hide_zero == 1) && isset($colours['0_0'])) {
             $nscales--;
-            $hid_zero = TRUE;
+            $hid_zero = true;
         }
 
         $font = $this->keyfont;
@@ -1645,14 +1548,13 @@ class WeatherMap extends WeatherMapBase
         $x = $this->keyx[$scalename];
         $y = $this->keyy[$scalename];
 
-        list($tilewidth, $tileheight) = $this->myimagestringsize($font, "MMMM");
+        list($tilewidth, $tileheight) = $this->myimagestringsize($font, 'MMMM');
         $tileheight = $tileheight * 1.1;
         $tilespacing = $tileheight + 2;
 
         if (($this->keyx[$scalename] >= 0) && ($this->keyy[$scalename] >= 0)) {
 
-            # $minwidth = imagefontwidth($font) * strlen('XX 100%-100%')+10;
-            # $boxwidth = imagefontwidth($font) * strlen($title) + 10;
+            
             list($minwidth, $junk) = $this->myimagestringsize($font, 'MMMM 100%-100%');
             list($minminwidth, $junk) = $this->myimagestringsize($font, 'MMMM ');
             list($boxwidth, $junk) = $this->myimagestringsize($font, $title);
@@ -1664,17 +1566,16 @@ class WeatherMap extends WeatherMapBase
                     if (isset($colour['tag'])) {
                         list($w, $junk) = $this->myimagestringsize($font, $colour['tag']);
 
-                        # print $colour['tag']." $w \n";
-                        if ($w > $max_tag)
+                        if ($w > $max_tag) {
                             $max_tag = $w;
+                        }
                     }
                 }
 
                 // now we can tweak the widths, appropriately to allow for the tag strings
-                # print "$max_tag > $minwidth?\n";
-                if (($max_tag + $minminwidth) > $minwidth)
+                if (($max_tag + $minminwidth) > $minwidth) {
                     $minwidth = $minminwidth + $max_tag;
-            # print "minwidth is now $minwidth\n";
+                }
             }
 
             $minwidth += 10;
@@ -1715,7 +1616,7 @@ class WeatherMap extends WeatherMapBase
 
             foreach ($colours as $colour) {
                 if (!isset($colour['special']) || $colour['special'] == 0)
-                // if ( 1==1 || $colour['bottom'] >= 0)
+            
                 {
                     // pick a value in the middle...
                     $value = ($colour['bottom'] + $colour['top']) / 2;
@@ -1723,7 +1624,7 @@ class WeatherMap extends WeatherMapBase
                         $colour['top'], $value, $colour['red1'], $colour['green1'],
                         $colour['blue1']));
 
-                    #  debug("$i: drawing\n");
+            
                     if (($hide_zero == 0) || $colour['key'] != '0_0') {
                         $y = $boxy + $tilespacing * $i + 8;
                         $x = $boxx + 6;
@@ -1735,7 +1636,7 @@ class WeatherMap extends WeatherMapBase
 // gradient, but not make the scale incorrect. A quarter of a pixel should do it.
                             $fudgefactor = ($colour['top'] - $colour['bottom'])
                                 / ($tilewidth * 4);
-                        # warn("FUDGING $fudgefactor\n");
+            
                         }
 
 // if it's a gradient, red2 is defined, and we need to sweep the values
@@ -1745,18 +1646,18 @@ class WeatherMap extends WeatherMapBase
                                     + ($n / $tilewidth)
                                     * ($colour['top'] - $colour['bottom']);
                                 list($ccol, $junk) =
-                                    $this->NewColourFromPercent($value, $scalename, "",
-                                        FALSE);
+                                    $this->NewColourFromPercent($value, $scalename, '',
+                                        false);
                                 $col = $ccol->gdallocate($scale_im);
                                 wimagefilledrectangle($scale_im, $x + $n, $y, $x + $n,
                                     $y + $tileheight, $col);
                             }
                         } else {
                             // pick a value in the middle...
-                            //$value = ($colour['bottom'] + $colour['top']) / 2;
+            
                             list($ccol, $junk) =
-                                $this->NewColourFromPercent($value, $scalename, "",
-                                    FALSE);
+                                $this->NewColourFromPercent($value, $scalename, '',
+                                    false);
                             $col = $ccol->gdallocate($scale_im);
                             wimagefilledrectangle($scale_im, $x, $y, $x + $tilewidth,
                                 $y + $tileheight, $col);
@@ -1765,8 +1666,9 @@ class WeatherMap extends WeatherMapBase
                         if ($use_tags) {
                             $labelstring = "";
 
-                            if (isset($colour['tag']))
+                            if (isset($colour['tag'])) {
                                 $labelstring = $colour['tag'];
+                            }
                         } else {
                             $labelstring =
                                 sprintf("%s-%s", $colour['bottom'], $colour['top']);
@@ -1794,8 +1696,6 @@ class WeatherMap extends WeatherMapBase
                 $this->keyx[$scalename] + $boxwidth,
                 $this->keyy[$scalename] + $boxheight
             ));
-        # $this->imap->setProp("href","#","LEGEND");
-        # $this->imap->setProp("extrahtml","onclick=\"position_legend();\"","LEGEND");
 
         }
     }
@@ -1803,8 +1703,6 @@ class WeatherMap extends WeatherMapBase
     function DrawTimestamp($im, $font, $colour, $which = "")
     {
         // add a timestamp to the corner, so we can tell if it's all being updated
-        # $datestring = "Created: ".date("M d Y H:i:s",time());
-        # $this->datestamp=strftime($this->stamptext, time());
 
         switch ($which) {
             case "MIN":
@@ -1864,7 +1762,7 @@ class WeatherMap extends WeatherMapBase
 
         $this->myimagestring($im, $font, $x, $y, $string, $colour);
 
-        $this->imap->addArea("Rectangle", "TITLE", '', array (
+        $this->imap->addArea('Rectangle', 'TITLE', '', array (
             $x,
             $y,
             $x + $boxwidth,
@@ -1872,109 +1770,109 @@ class WeatherMap extends WeatherMapBase
         ));
     }
 
-    function ReadConfigNG($input, $is_include = FALSE, $initial_context = "GLOBAL")
+    function ReadConfigNG($input, $is_include = false, $initial_context = 'GLOBAL')
     {
         $valid_commands = array (
-            "GLOBAL.set",
-            "LINK.set",
-            "NODE.set",
-            "GLOBAL.#",
-            "LINK.#",
-            "NODE.#",
-            "GLOBAL.include",
-            "NODE.include",
-            "LINK.include",
-            "GLOBAL.width",
-            "GLOBAL.height",
-            "GLOBAL.background",
-            "GLOBAL.scale",
-            "GLOBAL.title",
-            "GLOBAL.titlepos",
-            "GLOBAL.fontdefine",
-            "GLOBAL.keystyle",
-            "GLOBAL.titlecolor",
-            "GLOBAL.timecolor",
-            "GLOBAL.titlefont",
-            "GLOBAL.timefont",
-            "GLOBAL.htmloutputfile",
-            "GLOBAL.htmlstyle",
-            "GLOBAL.imageoutputfile",
-            "GLOBAL.keyfont",
-            "GLOBAL.keytextcolor",
-            "GLOBAL.keyoutlinecolor",
-            "GLOBAL.keybgcolor",
-            "GLOBAL.bgcolor",
-            "SCALE.keypos",
-            "SCALE.keystyle",
-            "SCALE.scale",
-            "LINK.width",
-            "LINK.link",
-            "LINK.nodes",
-            "LINK.target",
-            "LINK.usescale",
-            "LINK.infourl",
-            "LINK.linkstyle",
-            "LINK.overlibcaption",
-            "LINK.inoverlibcaption",
-            "LINK.outoverlibcaption",
-            "LINK.inoverlibgraph",
-            "LINK.outoverlibgraph",
-            "LINK.overlibgraph",
-            "LINK.overlibwidth",
-            "LINK.overlibheight",
-            "LINK.bwlabel",
-            "LINK.via",
-            "LINK.zorder",
-            "LINK.outlinecolor",
-            "LINK.notes",
-            "LINK.innotes",
-            "LINK.outnotes",
-            "LINK.ininfourl",
-            "LINK.outinfourl",
-            "LINK.bwstyle",
-            "LINK.template",
-            "LINK.splitpos",
-            "LINK.bwlabelpos",
-            "LINK.incomment",
-            "LINK.outcomment",
-            "LINK.viastyle",
-            "LINK.bandwidth",
-            "LINK.inbwformat",
-            "LINK.outbwformat",
-            "LINK.commentstyle",
-            "LINK.commentfont",
-            "LINK.commentfontcolor",
-            "LINK.bwfont",
-            "NODE.icon",
-            "NODE.target",
-            "NODE.position",
-            "NODE.infourl",
-            "NODE.overlibgraph",
-            "NODE.zorder",
-            "NODE.label",
-            "NODE.template",
-            "NODE.labelbgcolor",
-            "NODE.maxvalue",
-            "NODE.labeloutlinecolor",
-            "NODE.aiconoutlinecolor",
-            "NODE.aiconfillcolor",
-            "NODE.usescale",
-            "NODE.labelfontcolor",
-            "NODE.labelfont",
-            "NODE.labelangle",
-            "NODE.labelfontshadowcolor",
-            "NODE.node",
-            "NODE.overlibwidth",
-            "NODE.overlibheight",
-            "NODE.labeloffset"
+            'GLOBAL.set',
+            'LINK.set',
+            'NODE.set',
+            'GLOBAL.#',
+            'LINK.#',
+            'NODE.#',
+            'GLOBAL.include',
+            'NODE.include',
+            'LINK.include',
+            'GLOBAL.width',
+            'GLOBAL.height',
+            'GLOBAL.background',
+            'GLOBAL.scale',
+            'GLOBAL.title',
+            'GLOBAL.titlepos',
+            'GLOBAL.fontdefine',
+            'GLOBAL.keystyle',
+            'GLOBAL.titlecolor',
+            'GLOBAL.timecolor',
+            'GLOBAL.titlefont',
+            'GLOBAL.timefont',
+            'GLOBAL.htmloutputfile',
+            'GLOBAL.htmlstyle',
+            'GLOBAL.imageoutputfile',
+            'GLOBAL.keyfont',
+            'GLOBAL.keytextcolor',
+            'GLOBAL.keyoutlinecolor',
+            'GLOBAL.keybgcolor',
+            'GLOBAL.bgcolor',
+            'SCALE.keypos',
+            'SCALE.keystyle',
+            'SCALE.scale',
+            'LINK.width',
+            'LINK.link',
+            'LINK.nodes',
+            'LINK.target',
+            'LINK.usescale',
+            'LINK.infourl',
+            'LINK.linkstyle',
+            'LINK.overlibcaption',
+            'LINK.inoverlibcaption',
+            'LINK.outoverlibcaption',
+            'LINK.inoverlibgraph',
+            'LINK.outoverlibgraph',
+            'LINK.overlibgraph',
+            'LINK.overlibwidth',
+            'LINK.overlibheight',
+            'LINK.bwlabel',
+            'LINK.via',
+            'LINK.zorder',
+            'LINK.outlinecolor',
+            'LINK.notes',
+            'LINK.innotes',
+            'LINK.outnotes',
+            'LINK.ininfourl',
+            'LINK.outinfourl',
+            'LINK.bwstyle',
+            'LINK.template',
+            'LINK.splitpos',
+            'LINK.bwlabelpos',
+            'LINK.incomment',
+            'LINK.outcomment',
+            'LINK.viastyle',
+            'LINK.bandwidth',
+            'LINK.inbwformat',
+            'LINK.outbwformat',
+            'LINK.commentstyle',
+            'LINK.commentfont',
+            'LINK.commentfontcolor',
+            'LINK.bwfont',
+            'NODE.icon',
+            'NODE.target',
+            'NODE.position',
+            'NODE.infourl',
+            'NODE.overlibgraph',
+            'NODE.zorder',
+            'NODE.label',
+            'NODE.template',
+            'NODE.labelbgcolor',
+            'NODE.maxvalue',
+            'NODE.labeloutlinecolor',
+            'NODE.aiconoutlinecolor',
+            'NODE.aiconfillcolor',
+            'NODE.usescale',
+            'NODE.labelfontcolor',
+            'NODE.labelfont',
+            'NODE.labelangle',
+            'NODE.labelfontshadowcolor',
+            'NODE.node',
+            'NODE.overlibwidth',
+            'NODE.overlibheight',
+            'NODE.labeloffset'
         );
 
-        if ((strchr($input, "\n") != FALSE) || (strchr($input, "\r") != FALSE)) {
+        if ((strchr($input, "\n") != false) || (strchr($input, "\r") != false)) {
             debug("ReadConfig Detected that this is a config fragment.\n");
             // strip out any Windows line-endings that have gotten in here
             $input = str_replace("\r", "", $input);
             $lines = split("/n", $input);
-            $filename = "{text insert}";
+            $filename = '{text insert}';
         } else {
             debug("ReadConfig Detected that this is a config filename.\n");
             $filename = $input;
@@ -1985,7 +1883,7 @@ class WeatherMap extends WeatherMapBase
                 while (!feof($fd)) {
                     $buffer = fgets($fd, 4096);
                     // strip out any Windows line-endings that have gotten in here
-                    $buffer = str_replace("\r", "", $buffer);
+                    $buffer = str_replace("\r", '', $buffer);
                     $lines[] = $buffer;
                 }
                 fclose($fd);
@@ -2010,7 +1908,7 @@ class WeatherMap extends WeatherMapBase
                 $cmd = strtolower(array_shift($args));
 
                 if ($cmd == 'include') {
-                    $this->ReadConfigNG($args[0], TRUE, $context);
+                    $this->ReadConfigNG($args[0], true, $context);
                 } elseif ($cmd == 'node') {
                     $context = "NODE." . $args[0];
                 } elseif ($cmd == 'link') {
@@ -2087,11 +1985,11 @@ class WeatherMap extends WeatherMapBase
         }
     }
 
-    function ReadConfigNNG($input, $is_include = FALSE, $initial_context = "GLOBAL")
+    function ReadConfigNNG($input, $is_include = false, $initial_context = 'GLOBAL')
     {
         global $valid_commands;
 
-        if ((strchr($input, "\n") != FALSE) || (strchr($input, "\r") != FALSE)) {
+        if ((strchr($input, "\n") != false) || (strchr($input, "\r") != false)) {
             debug("ReadConfig Detected that this is a config fragment.\n");
             // strip out any Windows line-endings that have gotten in here
             $input = str_replace("\r", "", $input);
@@ -2132,7 +2030,7 @@ class WeatherMap extends WeatherMapBase
                 $cmd = strtolower(array_shift($args));
 
                 if ($cmd == 'include') {
-                    $context = $this->ReadConfigNNG($args[0], TRUE, $context);
+                    $context = $this->ReadConfigNNG($args[0], true, $context);
                 } elseif ($cmd == 'node') {
                     $context = "NODE." . $args[0];
                 } elseif ($cmd == 'link') {
@@ -2221,7 +2119,7 @@ class WeatherMap extends WeatherMapBase
         fclose($fd);
     }
 
-    function ReadConfig($input, $is_include = FALSE)
+    function ReadConfig($input, $is_include = false)
     {
         $curnode = null;
         $curlink = null;
@@ -2238,7 +2136,7 @@ class WeatherMap extends WeatherMapBase
 
         $lines = array ();
 
-        if ((strchr($input, "\n") != FALSE) || (strchr($input, "\r") != FALSE)) {
+        if ((strchr($input, "\n") != false) || (strchr($input, "\r") != false)) {
             debug("ReadConfig Detected that this is a config fragment.\n");
             // strip out any Windows line-endings that have gotten in here
             $input = str_replace("\r", "", $input);
@@ -2253,10 +2151,10 @@ class WeatherMap extends WeatherMapBase
 
                 if ($is_include && in_array($filename, $this->included_files)) {
                     warn("Attempt to include '$filename' twice! Skipping it.\n");
-                    return (FALSE);
+                    return (false);
                 } else {
                     $this->included_files[] = $filename;
-                    $this->has_includes = TRUE;
+                    $this->has_includes = true;
                 }
             }
 
@@ -2288,20 +2186,22 @@ class WeatherMap extends WeatherMapBase
 
 // for any other config elements that are shared between nodes and links, they can use this
                 unset($curobj);
-                $curobj = NULL;
+                $curobj = null;
 
-                if ($last_seen == "LINK")
+                if ($last_seen == "LINK") {
                     $curobj = &$curlink;
+                }
 
-                if ($last_seen == "NODE")
+                if ($last_seen == "NODE") {
                     $curobj = &$curnode;
+                }
 
-                if ($last_seen == "GLOBAL")
+                if ($last_seen == "GLOBAL") {
                     $curobj = &$this;
+                }
 
                 $objectlinecount++;
 
-#if (preg_match("/^\s*(LINK|NODE)\s+([A-Za-z][A-Za-z0-9_\.\-\:]*)\s*$/i", $buffer, $matches))
                 if (preg_match("/^\s*(LINK|NODE)\s+(\S+)\s*$/i", $buffer, $matches)) {
                     $objectlinecount = 0;
 
@@ -2856,7 +2756,7 @@ class WeatherMap extends WeatherMapBase
                             'original_x' => 2,
                             'original_y' => 3,
                             'relative_to' => 1,
-                            'relative_resolved' => FALSE
+                            'relative_resolved' => false
                         )
                     ),
                     array (
@@ -2868,8 +2768,8 @@ class WeatherMap extends WeatherMapBase
                             'original_x' => 2,
                             'original_y' => 3,
                             'relative_to' => 1,
-                            'polar' => TRUE,
-                            'relative_resolved' => FALSE
+                            'polar' => true,
+                            'relative_resolved' => false
                         )
                     )
                 );
@@ -2889,11 +2789,11 @@ class WeatherMap extends WeatherMapBase
                             ''
                         ), $statskey);
 
-                        if (!isset($this->usage_stats[$statskey]))
+                        if (!isset($this->usage_stats[$statskey])) {
                             $this->usage_stats[$statskey] = 0;
+                        }
 
                         if (preg_match($keyword[1], $buffer, $matches)) {
-                            # print "CONFIG MATCHED: ".$keyword[1]."\n";
 
                             $this->usage_stats[$statskey]++;
 
@@ -2943,7 +2843,7 @@ class WeatherMap extends WeatherMapBase
                                 $nodenames[$i] =
                                     preg_replace("/:(NE|SE|NW|SW|N|S|E|W|C)\d+$/i", '',
                                         $matches[$i]);
-                                $this->need_size_precalc = TRUE;
+                                $this->need_size_precalc = true;
                             }
 
                             if (preg_match("/:(NE|SE|NW|SW|N|S|E|W|C)$/i", $matches[$i],
@@ -2952,7 +2852,7 @@ class WeatherMap extends WeatherMapBase
                                 $nodenames[$i] =
                                     preg_replace("/:(NE|SE|NW|SW|N|S|E|W|C)$/i", '',
                                         $matches[$i]);
-                                $this->need_size_precalc = TRUE;
+                                $this->need_size_precalc = true;
                             }
 
                             if (preg_match("/:(-?\d+r\d+)$/i", $matches[$i], $submatches))
@@ -2960,7 +2860,7 @@ class WeatherMap extends WeatherMapBase
                                 $endoffset[$i] = $submatches[1];
                                 $nodenames[$i] =
                                     preg_replace("/:(-?\d+r\d+)$/i", '', $matches[$i]);
-                                $this->need_size_precalc = TRUE;
+                                $this->need_size_precalc = true;
                             }
 
                             if (preg_match("/:([-+]?\d+):([-+]?\d+)$/i", $matches[$i],
@@ -2970,7 +2870,7 @@ class WeatherMap extends WeatherMapBase
                                 $endoffset[$i] = $xoff . ":" . $yoff;
                                 $nodenames[$i] =
                                     preg_replace("/:$xoff:$yoff$/i", '', $matches[$i]);
-                                $this->need_size_precalc = TRUE;
+                                $this->need_size_precalc = true;
                             }
 
                             if (!array_key_exists($nodenames[$i], $this->nodes)) {
@@ -2999,7 +2899,7 @@ class WeatherMap extends WeatherMapBase
                     && preg_match("/^\s*INCLUDE\s+(.*)\s*$/i", $buffer, $matches)) {
                     if (file_exists($matches[1])) {
                         debug("Including '{$matches[1]}'\n");
-                        $this->ReadConfig($matches[1], TRUE);
+                        $this->ReadConfig($matches[1], true);
                         $last_seen = "GLOBAL";
                     } else {
                         warn("INCLUDE File '{$matches[1]}' not found!\n");
@@ -3010,7 +2910,6 @@ class WeatherMap extends WeatherMapBase
                 if (($last_seen == 'NODE' || $last_seen == 'LINK')
                     && preg_match("/^\s*TARGET\s+(.*)\s*$/i", $buffer, $matches)) {
                     $linematched++;
-                    # $targets=preg_split('/\s+/', $matches[1], -1, PREG_SPLIT_NO_EMPTY);
                     $rawtargetlist = $matches[1] . " ";
 
                     if ($args[0] == 'TARGET') {
@@ -3087,7 +2986,7 @@ class WeatherMap extends WeatherMapBase
 
                 if (preg_match("/^\s*(IN|OUT)?OVERLIBGRAPH\s+(.+)$/i", $buffer, $matches))
                     {
-                    $this->has_overlibs = TRUE;
+                    $this->has_overlibs = true;
 
                     if ($last_seen == 'NODE' && $matches[1] != '') {
                         warn("IN/OUTOVERLIBGRAPH make no sense for a NODE! [WMWARN42]\n");
@@ -3095,11 +2994,13 @@ class WeatherMap extends WeatherMapBase
 
                         $urls = preg_split('/\s+/', $matches[2], -1, PREG_SPLIT_NO_EMPTY);
 
-                        if ($matches[1] == 'IN')
+                        if ($matches[1] == 'IN') {
                             $index = IN;
-
-                        if ($matches[1] == 'OUT')
+                        }
+                            
+                        if ($matches[1] == 'OUT') {
                             $index = OUT;
+                        }
 
                         if ($matches[1] == '') {
                             $curobj->overliburl[IN] = $urls;
@@ -3110,8 +3011,6 @@ class WeatherMap extends WeatherMapBase
                         $linematched++;
                     }
                 }
-
-// array('(NODE|LINK)', '/^\s*TEMPLATE\s+(\S+)\s*$/i', array('template'=>1)),
 
                 if (($last_seen == 'NODE' || $last_seen == 'LINK')
                     && preg_match("/^\s*TEMPLATE\s+(\S+)\s*$/i", $buffer, $matches)) {
@@ -3184,10 +3083,6 @@ class WeatherMap extends WeatherMapBase
                             $uvarname = 'useiconscale';
                             $tvarname = 'iconscaletype';
 
-// if(!function_exists("imagefilter"))
-// {
-// 	warn("ICON SCALEs require imagefilter, which is not present in your PHP [WMWARN040]\n");
-// }
                             break;
 
                             default:
@@ -3203,16 +3098,10 @@ class WeatherMap extends WeatherMapBase
                     $curnode->$tvarname = $stype;
                     $curnode->$uvarname = $matches[2];
 
-                    // warn("Set $varname and $uvarname\n");
-
-                    // print ">> $stype $svar ".$matches[2]." ".$curnode->name." \n";
-
                     $linematched++;
                 }
 
 // one REGEXP to rule them all:
-//				if(preg_match("/^\s*SCALE\s+([A-Za-z][A-Za-z0-9_]*\s+)?(\d+\.?\d*)\s+(\d+\.?\d*)\s+(\d+)\s+(\d+)\s+(\d+)(?:\s+(\d+)\s+(\d+)\s+(\d+))?\s*$/i",
-//	0.95b		if(preg_match("/^\s*SCALE\s+([A-Za-z][A-Za-z0-9_]*\s+)?(\d+\.?\d*)\s+(\d+\.?\d*)\s+(\d+)\s+(\d+)\s+(\d+)(?:\s+(\d+)\s+(\d+)\s+(\d+))?\s*(.*)$/i",
                 if (preg_match(
                     "/^\s*SCALE\s+([A-Za-z][A-Za-z0-9_]*\s+)?(\-?\d+\.?\d*[munMGT]?)\s+(\-?\d+\.?\d*[munMGT]?)\s+(?:(\d+)\s+(\d+)\s+(\d+)(?:\s+(\d+)\s+(\d+)\s+(\d+))?|(none))\s*(.*)$/i",
                     $buffer, $matches)) {
@@ -3353,8 +3242,6 @@ class WeatherMap extends WeatherMapBase
 
                 if (preg_match("/^\s*KILO\s+(\d+)\s*$/i", $buffer, $matches)) {
                     $this->kilo = $matches[1];
-                    # $this->defaultlink->owner->kilo=$matches[1];
-                    # $this->links['DEFAULT']=$matches[1];
                     $linematched++;
                 }
 
@@ -3362,7 +3249,7 @@ class WeatherMap extends WeatherMapBase
                     "/^\s*(TIME|TITLE|KEYBG|KEYTEXT|KEYOUTLINE|BG)COLOR\s+(\d+)\s+(\d+)\s+(\d+)\s*$/i",
                     $buffer, $matches)) {
                     $key = $matches[1];
-                    # "Found colour line for $key\n";
+
                     $this->colours['DEFAULT'][$key]['red1'] = $matches[2];
                     $this->colours['DEFAULT'][$key]['green1'] = $matches[3];
                     $this->colours['DEFAULT'][$key]['blue1'] = $matches[4];
@@ -3448,7 +3335,7 @@ class WeatherMap extends WeatherMapBase
                     if ($val == 'none'
                         && ($key == 'BWBOX' || $key == 'BWOUTLINE' || $key == 'OUTLINE'))
                         {
-                        // print "***********************************\n";
+
                         $curlink->$field = array (
                             -1,
                             -1,
@@ -3459,7 +3346,7 @@ class WeatherMap extends WeatherMapBase
                     }
 
                     if ($val == 'contrast' && $key == 'COMMENTFONT') {
-                        // print "***********************************\n";
+
                         $curlink->$field = array (
                             -3,
                             -3,
@@ -3613,8 +3500,6 @@ class WeatherMap extends WeatherMapBase
 
         debug("Building cache of z-layers and finalising bandwidth.\n");
 
-        // 	$allitems = array_merge($this->links, $this->nodes);
-
         $allitems = array ();
 
         foreach ($this->nodes as $node) {
@@ -3625,7 +3510,6 @@ class WeatherMap extends WeatherMapBase
             $allitems[] = $link;
         }
 
-        # foreach ($allitems as &$item)
         foreach ($allitems as $ky => $vl) {
             $item = &$allitems[$ky];
             $z = $item->zorder;
@@ -3634,14 +3518,14 @@ class WeatherMap extends WeatherMapBase
                 $this->seen_zlayers[$z] = array ();
             }
             array_push($this->seen_zlayers[$z], $item);
-
+                        
             // while we're looping through, let's set the real bandwidths
-            if ($item->my_type() == "LINK") {
+            if ($item->my_type() === 'LINK') {
                 $this->links[$item->name]->max_bandwidth_in =
                     unformat_number($item->max_bandwidth_in_cfg, $this->kilo);
                 $this->links[$item->name]->max_bandwidth_out =
                     unformat_number($item->max_bandwidth_out_cfg, $this->kilo);
-            } elseif ($item->my_type() == "NODE") {
+            } elseif ($item->my_type() === 'NODE') {
                 $this->nodes[$item->name]->max_bandwidth_in =
                     unformat_number($item->max_bandwidth_in_cfg, $this->kilo);
                 $this->nodes[$item->name]->max_bandwidth_out =
@@ -3649,8 +3533,6 @@ class WeatherMap extends WeatherMapBase
             } else {
                 warn("Internal bug - found an item of type: " . $item->my_type() . "\n");
             }
-// $item->max_bandwidth_in=unformat_number($item->max_bandwidth_in_cfg, $this->kilo);
-// $item->max_bandwidth_out=unformat_number($item->max_bandwidth_out_cfg, $this->kilo);
 
             debug(sprintf("   Setting bandwidth on " . $item->my_type()
                 . " $item->name (%s -> %d bps, %s -> %d bps, KILO = %d)\n",
@@ -3699,7 +3581,7 @@ class WeatherMap extends WeatherMapBase
                                 debug("->$newpos_x,$newpos_y\n");
                                 $this->nodes[$node->name]->x = $newpos_x;
                                 $this->nodes[$node->name]->y = $newpos_y;
-                                $this->nodes[$node->name]->relative_resolved = TRUE;
+                                $this->nodes[$node->name]->relative_resolved = true;
                                 $set++;
                             } else {
 
@@ -3711,7 +3593,7 @@ class WeatherMap extends WeatherMapBase
                                 debug("->$newpos_x,$newpos_y\n");
                                 $this->nodes[$node->name]->x = $newpos_x;
                                 $this->nodes[$node->name]->y = $newpos_y;
-                                $this->nodes[$node->name]->relative_resolved = TRUE;
+                                $this->nodes[$node->name]->relative_resolved = true;
                                 $set++;
                             }
                         }
@@ -3739,13 +3621,14 @@ class WeatherMap extends WeatherMapBase
         }
         debug("Finished Pre-Processing Plugins...\n");
 
-        return (TRUE);
+        return (true);
     }
 
     function ReadConfig_Commit(&$curobj)
     {
-        if (is_null($curobj))
+        if (is_null($curobj)) {
             return;
+        }
 
         $last_seen = $curobj->my_type();
 
@@ -3754,8 +3637,9 @@ class WeatherMap extends WeatherMapBase
             $this->nodes[$curobj->name] = $curobj;
             debug("Saving Node: " . $curobj->name . "\n");
 
-            if ($curobj->template == 'DEFAULT')
+            if ($curobj->template == 'DEFAULT') {
                 $this->node_template_tree["DEFAULT"][] = $curobj->name;
+            }
         }
 
         if ($last_seen == "LINK") {
@@ -3767,8 +3651,9 @@ class WeatherMap extends WeatherMapBase
                 debug("Saving Template-Only Link: " . $curobj->name . "\n");
             }
 
-            if ($curobj->template == 'DEFAULT')
+            if ($curobj->template == 'DEFAULT') {
                 $this->link_template_tree["DEFAULT"][] = $curobj->name;
+            }
         }
     }
 
@@ -3776,8 +3661,8 @@ class WeatherMap extends WeatherMapBase
     {
         global $WEATHERMAP_VERSION;
 
-        $fd = fopen($filename, "w");
-        $output = "";
+        $fd = fopen($filename, 'w');
+        $output = '';
 
         if ($fd) {
             $output
@@ -3870,11 +3755,13 @@ class WeatherMap extends WeatherMapBase
                 $keyword = $param[1];
 
                 if ($this->$field != $this->inherit_fieldlist[$field]) {
-                    if ($param[2] == CONFIG_TYPE_COLOR)
+                    if ($param[2] == CONFIG_TYPE_COLOR) {
                         $output .= "$keyword " . render_colour($this->$field) . "\n";
+                    }
 
-                    if ($param[2] == CONFIG_TYPE_LITERAL)
+                    if ($param[2] == CONFIG_TYPE_LITERAL) {
                         $output .= "$keyword " . $this->$field . "\n";
+                    }
                 }
             }
 
@@ -3995,49 +3882,49 @@ class WeatherMap extends WeatherMapBase
 
             fwrite($fd, $output);
 
-            ## fwrite($fd,$this->nodes['DEFAULT']->WriteConfig());
-            ## fwrite($fd,$this->links['DEFAULT']->WriteConfig());
-
-            # fwrite($fd, "\n\n# Node definitions:\n");
-
             foreach (array (
                 "template",
                 "normal"
             ) as $which) {
-                if ($which == "template")
+                if ($which == "template") {
                     fwrite($fd, "\n# TEMPLATE-only NODEs:\n");
+                } 
 
-                if ($which == "normal")
+                if ($which == "normal") {
                     fwrite($fd, "\n# regular NODEs:\n");
+                }
 
                 foreach ($this->nodes as $node) {
                     if (!preg_match("/^::\s/", $node->name)) {
                         if ($node->defined_in == $this->configfile) {
-                            if ($which == "template" && $node->x === NULL) {
+                            if ($which == "template" && $node->x === null) {
                                 debug("TEMPLATE\n");
                                 fwrite($fd, $node->WriteConfig());
                             }
 
-                            if ($which == "normal" && $node->x !== NULL) {
+                            if ($which == "normal" && $node->x !== null) {
                                 fwrite($fd, $node->WriteConfig());
                             }
                         }
                     }
                 }
 
-                if ($which == "template")
+                if ($which == "template") {
                     fwrite($fd, "\n# TEMPLATE-only LINKs:\n");
+                }
 
-                if ($which == "normal")
+                if ($which == "normal") {
                     fwrite($fd, "\n# regular LINKs:\n");
+                }
 
                 foreach ($this->links as $link) {
                     if (!preg_match("/^::\s/", $link->name)) {
                         if ($link->defined_in == $this->configfile) {
-                            if ($which == "template" && $link->a === NULL)
+                            if ($which == "template" && $link->a === null) {
                                 fwrite($fd, $link->WriteConfig());
+                            }
 
-                            if ($which == "normal" && $link->a !== NULL)
+                            if ($which == "normal" && $link->a !== null)
                                 fwrite($fd, $link->WriteConfig());
                         }
                     }
@@ -4049,10 +3936,10 @@ class WeatherMap extends WeatherMapBase
             fclose($fd);
         } else {
             warn("Couldn't open config file $filename for writing");
-            return (FALSE);
+            return (false);
         }
 
-        return (TRUE);
+        return (true);
     }
 
     // pre-allocate colour slots for the colours used by the arrows
@@ -4078,11 +3965,11 @@ class WeatherMap extends WeatherMapBase
     }
 
     function DrawMap($filename = '', $thumbnailfile = '', $thumbnailmax = 250,
-        $withnodes = TRUE, $use_via_overlay = FALSE, $use_rel_overlay = FALSE)
+        $withnodes = true, $use_via_overlay = false, $use_rel_overlay = false)
     {
         debug("Trace: DrawMap()\n");
         metadump("# start", true);
-        $bgimage = NULL;
+        $bgimage = null;
 
         if ($this->configfile != "") {
             $this->cachefile_version = crc32(file_get_contents($this->configfile));
@@ -4094,7 +3981,6 @@ class WeatherMap extends WeatherMapBase
 
         foreach ($this->postprocessclasses as $post_class) {
             debug("Running $post_class" . "->run()\n");
-            //call_user_func_array(array($post_class, 'run'), array(&$this));
             $this->plugins['post'][$post_class]->run($this);
         }
         debug("Finished Post-Processing Plugins...\n");
@@ -4125,13 +4011,11 @@ class WeatherMap extends WeatherMapBase
 
         $image = wimagecreatetruecolor($this->width, $this->height);
 
-        # $image = imagecreate($this->width, $this->height);
         if (!$image) {
             warn("Couldn't create output image in memory (" . $this->width . "x"
                 . $this->height . ").");
         } else {
             ImageAlphaBlending($image, true);
-            # imageantialias($image,true);
 
             // by here, we should have a valid image handle
 
@@ -4172,19 +4056,19 @@ class WeatherMap extends WeatherMapBase
 
             foreach ($all_layers as $z) {
                 $z_items = $this->seen_zlayers[$z];
-                debug("Drawing layer $z\n");
+                debug("Drawing layer ".$z."\n");
 
                 // all the map 'furniture' is fixed at z=1000
-                if ($z == 1000) {
+                if ($z === 1000) {
                     foreach ($this->colours as $scalename => $colours) {
-                        debug("Drawing KEY for $scalename if necessary.\n");
+                        debug("Drawing KEY for ".$scalename." if necessary.\n");
 
                         if ((isset($this->numscales[$scalename]))
                             && (isset($this->keyx[$scalename]))
                                 && ($this->keyx[$scalename] >= 0)
                                 && ($this->keyy[$scalename] >= 0)) {
                             if ($this->keystyle[$scalename] == 'classic')
-                                $this->DrawLegend_Classic($image, $scalename, FALSE);
+                                $this->DrawLegend_Classic($image, $scalename, false);
 
                             if ($this->keystyle[$scalename] == 'horizontal')
                                 $this->DrawLegend_Horizontal($image, $scalename,
@@ -4199,7 +4083,7 @@ class WeatherMap extends WeatherMapBase
                                     $this->keysize[$scalename], true);
 
                             if ($this->keystyle[$scalename] == 'tags')
-                                $this->DrawLegend_Classic($image, $scalename, TRUE);
+                                $this->DrawLegend_Classic($image, $scalename, true);
                         }
                     }
 
@@ -4229,25 +4113,22 @@ class WeatherMap extends WeatherMapBase
                         }
 
                         if (strtolower(get_class($it)) == 'weathermapnode') {
-                            // if(!is_null($it->x)) $it->pre_render($image, $this);
                             if ($withnodes) {
                                 // don't try and draw template nodes
                                 if (isset($this->nodes[$it->name]) && !is_null($it->x)) {
-                                    # print "::".get_class($it)."\n";
                                     debug("Drawing NODE " . $it->name . "\n");
                                     $this->nodes[$it->name]->NewDraw($image, $this);
                                     $ii = 0;
 
                                     foreach ($this->nodes[$it->
                                         name]->boundingboxes as $bbox) {
-                                        # $areaname = "NODE:" . $it->name . ':'.$ii;
                                         $areaname = "NODE:N" . $it->id . ":" . $ii;
                                         $this->imap->addArea("Rectangle", $areaname, '',
                                             $bbox);
-                                        debug("Adding imagemap area");
+                                        debug("Adding imagemap area\n");
                                         $ii++;
                                     }
-                                    debug("Added $ii bounding boxes too\n");
+                                    debug('Added '.$ii." bounding boxes too\n");
                                 }
                             }
                         }
@@ -4296,11 +4177,6 @@ class WeatherMap extends WeatherMapBase
                 }
             }
 
-            #$this->myimagestring($image, 3, 200, 100, "Test 1\nLine 2", $overlay,0);
-
-            #	$this->myimagestring($image, 30, 100, 100, "Test 1\nLine 2", $overlay,0);
-            #$this->myimagestring($image, 30, 200, 200, "Test 1\nLine 2", $overlay,45);
-
             // Ready to output the results...
 
             if ($filename == 'null') {
@@ -4310,8 +4186,8 @@ class WeatherMap extends WeatherMapBase
                 if ($filename == '') {
                     imagepng($image);
                 } else {
-                    $result = FALSE;
-                    $functions = TRUE;
+                    $result = false;
+                    $functions = true;
 
                     if (function_exists('imagejpeg') && preg_match("/\.jpg/i", $filename))
                         {
@@ -4327,10 +4203,10 @@ class WeatherMap extends WeatherMapBase
                         $result = imagepng($image, $filename);
                     } else {
                         warn("Failed to write map image. No function existed for the image format you requested. [WMWARN12]\n");
-                        $functions = FALSE;
+                        $functions = false;
                     }
 
-                    if (($result == FALSE) && ($functions == TRUE)) {
+                    if (($result == false) && ($functions == true)) {
                         if (file_exists($filename)) {
                             warn("Failed to overwrite existing image file $filename - permissions of existing file are wrong? [WMWARN13]");
                         } else {
@@ -4354,7 +4230,7 @@ class WeatherMap extends WeatherMapBase
             if (function_exists('imagecopyresampled')) {
                 // if one is specified, and we can, write a thumbnail too
                 if ($thumbnailfile != '') {
-                    $result = FALSE;
+                    $result = false;
 
                     if ($this->width > $this->height) {
                         $factor = ($thumbnailmax / $this->width);
@@ -4373,7 +4249,7 @@ class WeatherMap extends WeatherMapBase
                     $result = imagepng($imagethumb, $thumbnailfile);
                     imagedestroy($imagethumb);
 
-                    if (($result == FALSE)) {
+                    if (($result == false)) {
                         if (file_exists($filename)) {
                             warn("Failed to overwrite existing image file $filename - permissions of existing file are wrong? [WMWARN15]");
                         } else {
@@ -4392,18 +4268,16 @@ class WeatherMap extends WeatherMapBase
     {
         // destroy all the images we created, to prevent memory leaks
         foreach ($this->nodes as $node) {
-            if (isset($node->image))
+            if (isset($node->image)) {
                 imagedestroy($node->image);
+            }
         }
-    #foreach ($this->nodes as $node) { unset($node); }
-    #foreach ($this->links as $link) { unset($link); }
-
     }
 
     function PreloadMapHTML()
     {
         debug("Trace: PreloadMapHTML()\n");
-//   onmouseover="return overlib('<img src=graph.png>',DELAY,250,CAPTION,'$caption');"  onmouseout="return nd();"
+
 
 // find the middle of the map
         $center_x = $this->width / 2;
@@ -4419,7 +4293,6 @@ class WeatherMap extends WeatherMapBase
 
         while (list($kk, ) = each($allitems)) {
             unset($objects);
-            # $objects = &$this->links;
             $objects = &$allitems[$kk];
 
             reset($objects);
@@ -4433,8 +4306,7 @@ class WeatherMap extends WeatherMapBase
 
                 $dirs = array ();
 
-                //print "\n\nConsidering a $type - ".$myobj->name.".\n";
-                if ($type == 'LINK')
+                if ($type == 'LINK') {
                     $dirs = array (
                         IN => array (
                             0,
@@ -4445,26 +4317,26 @@ class WeatherMap extends WeatherMapBase
                             3
                         )
                     );
+                }
 
-                if ($type == 'NODE')
+                if ($type == 'NODE') {
                     $dirs = array (IN => array (
                         0,
                         1,
                         2,
                         3
                     ));
+                }
 
                 // check to see if any of the relevant things have a value
-                $change = "";
+                $change = '';
 
                 foreach ($dirs as $d => $parts) {
-                    //print "$d - ".join(" ",$parts)."\n";
                     $change .= join('', $myobj->overliburl[$d]);
                     $change .= $myobj->notestext[$d];
                 }
 
                 if ($this->htmlstyle == "overlib") {
-                    //print "CHANGE: $change\n";
 
                     // skip all this if it's a template node
                     if ($type == 'LINK' && !isset($myobj->a->name)) {
@@ -4500,16 +4372,18 @@ class WeatherMap extends WeatherMapBase
                             $left = "WIDTH," . $myobj->overlibwidth . ",";
                             $img_extra .= " WIDTH=$myobj->overlibwidth";
 
-                            if ($mid_x > $center_x)
+                            if ($mid_x > $center_x) {
                                 $left .= "LEFT,";
+                            }
                         }
 
                         if ($myobj->overlibheight != 0) {
                             $above = "HEIGHT," . $myobj->overlibheight . ",";
                             $img_extra .= " HEIGHT=$myobj->overlibheight";
 
-                            if ($mid_y > $center_y)
+                            if ($mid_y > $center_y) {
                                 $above .= "ABOVE,";
+                            }
                         }
 
                         foreach ($dirs as $dir => $parts) {
@@ -4522,7 +4396,6 @@ class WeatherMap extends WeatherMapBase
                             $n = 0;
 
                             if (sizeof($myobj->overliburl[$dir]) > 0) {
-                                // print "ARRAY:".is_array($link->overliburl[$dir])."\n";
                                 foreach ($myobj->overliburl[$dir] as $url) {
                                     if ($n > 0) {
                                         $overlibhtml .= '&lt;br /&gt;';
@@ -4536,8 +4409,9 @@ class WeatherMap extends WeatherMapBase
                             # print "Added $n for $dir\n";
                             if (trim($myobj->notestext[$dir]) != '') {
                                 # put in a linebreak if there was an image AND notes
-                                if ($n > 0)
+                                if ($n > 0) {
                                     $overlibhtml .= '&lt;br /&gt;';
+                                }
                                 $note =
                                     $this->ProcessString($myobj->notestext[$dir], $myobj);
                                 $note = htmlspecialchars($note, ENT_NOQUOTES);
@@ -4551,7 +4425,6 @@ class WeatherMap extends WeatherMapBase
                             foreach ($parts as $part) {
                                 $areaname =
                                     $type . ":" . $prefix . $myobj->id . ":" . $part;
-                                //print "INFOURL for $areaname - ";
 
                                 $this->imap->setProp("extrahtml", $overlibhtml,
                                     $areaname);
@@ -4563,20 +4436,17 @@ class WeatherMap extends WeatherMapBase
                 // now look at inforurls
                 foreach ($dirs as $dir => $parts) {
                     foreach ($parts as $part) {
-                        # $areaname = $type.":" . $myobj->name . ":" . $part;
+
                         $areaname = $type . ":" . $prefix . $myobj->id . ":" . $part;
-                        //print "INFOURL for $areaname - ";
+
 
                         if (($this->htmlstyle != 'editor')
                             && ($myobj->infourl[$dir] != '')) {
                             $this->imap->setProp("href",
                                 $this->ProcessString($myobj->infourl[$dir], $myobj),
                                 $areaname);
-                        //print "Setting.\n";
-                        } else {
-                        //print "NOT Setting.\n";
-                        }
-                    }
+
+                        }                     }
                 }
             }
         }
@@ -4588,7 +4458,7 @@ class WeatherMap extends WeatherMapBase
 
         $js .= "var Links = new Array();\n";
         $js .= "var LinkIDs = new Array();\n";
-        # $js.=$this->defaultlink->asJS();
+
 
         foreach ($this->links as $link) {
             $js .= $link->asJS();
@@ -4596,7 +4466,7 @@ class WeatherMap extends WeatherMapBase
 
         $js .= "var Nodes = new Array();\n";
         $js .= "var NodeIDs = new Array();\n";
-        # $js.=$this->defaultnode->asJS();
+
 
         foreach ($this->nodes as $node) {
             $js .= $node->asJS();
@@ -4640,10 +4510,10 @@ class WeatherMap extends WeatherMapBase
         $json .= "\n},\n";
 
         $json .= "'imap': [\n";
-        $json .= $this->imap->subJSON("NODE:");
+        $json .= $this->imap->subJSON('NODE:');
         // should check if there WERE nodes...
         $json .= ",\n";
-        $json .= $this->imap->subJSON("LINK:");
+        $json .= $this->imap->subJSON('LINK:');
         $json .= "\n]\n";
         $json .= "\n";
 
@@ -4668,17 +4538,17 @@ class WeatherMap extends WeatherMapBase
             .= '<div class="weathermapimage" style="margin-left: auto; margin-right: auto; width: '
             . $this->width . 'px;" >';
 
-        if ($this->imageuri != '') {
+        if ($this->imageuri !== '') {
             $html .= sprintf(
                 '<img id="wmapimage" src="%s" width="%d" height="%d" border="0" usemap="#%s"',
                 $this->imageuri, $this->width, $this->height, $imagemapname);
-            //$html .=  'alt="network weathermap" ';
+
             $html .= '/>';
         } else {
             $html .= sprintf(
                 '<img id="wmapimage" src="%s" width="%d" height="%d" border="0" usemap="#%s"',
                 $this->imagefile, $this->width, $this->height, $imagemapname);
-            //$html .=  'alt="network weathermap" ';
+
             $html .= '/>';
         }
         $html .= '</div>';
@@ -4691,9 +4561,6 @@ class WeatherMap extends WeatherMapBase
     function SortedImagemap($imagemapname)
     {
         $html = '<map name="' . $imagemapname . '" id="' . $imagemapname . '">';
-
-        # $html.=$this->imap->subHTML("NODE:",true);
-        # $html.=$this->imap->subHTML("LINK:",true);
 
         $all_layers = array_keys($this->seen_zlayers);
         rsort($all_layers);
@@ -4710,7 +4577,7 @@ class WeatherMap extends WeatherMapBase
                 debug("   Found things for layer $z\n");
 
                 // at z=1000, the legends and timestamps live
-                if ($z == 1000) {
+                if ($z === 1000) {
                     debug("     Builtins fit here.\n");
                     $html .= $this->imap->subHTML("LEGEND:", true, ($this->context
                         != 'editor'));
@@ -4719,15 +4586,17 @@ class WeatherMap extends WeatherMapBase
                 }
 
                 foreach ($z_items as $it) {
-                    # print "     " . $it->name . "\n";
-                    if ($it->name != 'DEFAULT' && $it->name != ":: DEFAULT ::") {
-                        $name = "";
 
-                        if (strtolower(get_class($it)) == 'weathermaplink')
-                            $name = "LINK:L";
+                    if ($it->name != 'DEFAULT' && $it->name != ':: DEFAULT ::') {
+                        $name = '';
 
-                        if (strtolower(get_class($it)) == 'weathermapnode')
-                            $name = "NODE:N";
+                        if (strtolower(get_class($it)) == 'weathermaplink') {
+                            $name = 'LINK:L';
+                        }
+
+                        if (strtolower(get_class($it)) == 'weathermapnode') {
+                            $name = 'NODE:N';
+                        }
                         $name .= $it->id . ":";
                         debug("      Writing $name from imagemap\n");
 // skip the linkless areas if we are in the editor - they're redundant
@@ -4753,20 +4622,24 @@ class WeatherMap extends WeatherMapBase
 
         $cachefolder = $this->cachefolder;
         $configchanged = filemtime($this->configfile);
-// make a unique, but safe, prefix for all cachefiles related to this map config
-// we use CRC32 because it makes for a shorter filename, and collisions aren't the end of the world.
+        // make a unique, but safe, prefix for all cachefiles related to this map config
+        // we use CRC32 because it makes for a shorter filename, and collisions aren't the end of the world.
         $cacheprefix = dechex(crc32($this->configfile));
 
         debug("Comparing files in $cachefolder starting with $cacheprefix, with date of $configchanged\n");
 
         $dh = opendir($cachefolder);
+        if($dh === false) {
+            debug("Couldn't read cache folder.\n");
+            return;
+        }
+        
 
-        if ($dh) {
+        
             while ($file = readdir($dh)) {
                 $realfile = $cachefolder . DIRECTORY_SEPARATOR . $file;
 
                 if (is_file($realfile) && (preg_match('/^' . $cacheprefix . '/', $file)))
-                //                                            if (is_file($realfile) )
                 {
                     debug("$realfile\n");
 
@@ -4781,7 +4654,7 @@ class WeatherMap extends WeatherMapBase
 
             foreach ($this->nodes as $node) {
                 if (isset($node->image)) {
-                    $nodefile = $cacheprefix . "_" . dechex(crc32($node->name)) . ".png";
+                    $nodefile = $cacheprefix . '_' . dechex(crc32($node->name)) . '.png';
                     $this->nodes[$node->name]->cachefile = $nodefile;
                     imagepng($node->image,
                         $cachefolder . DIRECTORY_SEPARATOR . $nodefile);
@@ -4789,7 +4662,7 @@ class WeatherMap extends WeatherMapBase
             }
 
             foreach ($this->keyimage as $key => $image) {
-                $scalefile = $cacheprefix . "_scale_" . dechex(crc32($key)) . ".png";
+                $scalefile = $cacheprefix . '_scale_' . dechex(crc32($key)) . '.png';
                 $this->keycache[$key] = $scalefile;
                 imagepng($image, $cachefolder . DIRECTORY_SEPARATOR . $scalefile);
             }
@@ -4807,9 +4680,9 @@ class WeatherMap extends WeatherMapBase
             fputs($fd, $json);
             fclose($fd);
 
-            $json = "";
+            $json = '';
             $fd = fopen($cachefolder . DIRECTORY_SEPARATOR . $cacheprefix . "_tree.json",
-                "w");
+                'w');
             $id = 10; // first ID for user-supplied thing
 
             $json .= "{ id: 1, text: 'SCALEs'\n, children: [\n";
@@ -4824,13 +4697,15 @@ class WeatherMap extends WeatherMapBase
             $json .= "{ id: 2, text: 'FONTs',\n children: [\n";
 
             foreach ($this->fonts as $fontnumber => $font) {
-                if ($font->type == 'truetype')
+                if ($font->type === 'truetype') {
                     $json .= sprintf("{ id: %d, text: %s, leaf: true}, \n", $id++,
-                        js_escape("Font $fontnumber (TT)"));
+                        js_escape('Font '.$fontnumber.' (TT)'));
+                }
 
-                if ($font->type == 'gd')
+                if ($font->type === 'gd') {
                     $json .= sprintf("{ id: %d, text: %s, leaf: true}, \n", $id++,
-                        js_escape("Font $fontnumber (GD)"));
+                        js_escape('Font '.$fontnumber.' (GD)'));
+                }
             }
             $json = rtrim($json, ", \n");
             $json .= "]},\n";
@@ -4854,89 +4729,87 @@ class WeatherMap extends WeatherMapBase
             $json = rtrim($json, ", \n");
             $json .= "]} ]}\n";
 
-            fputs($fd, "[" . $json . "]");
+            fputs($fd, '[' . $json . ']');
             fclose($fd);
 
-            $fd = fopen($cachefolder . DIRECTORY_SEPARATOR . $cacheprefix . "_nodes.json",
-                "w");
-            $json = "";
+            $fd = fopen($cachefolder . DIRECTORY_SEPARATOR . $cacheprefix . '_nodes.json',
+                'w');
+            $json = '';
 
-            //		$json = $this->defaultnode->asJSON(TRUE);
+
             foreach ($this->nodes as $node) {
-                $json .= $node->asJSON(TRUE);
+                $json .= $node->asJSON(true);
             }
             $json = rtrim($json, ", \n");
             fputs($fd, $json);
             fclose($fd);
 
             $fd = fopen($cachefolder . DIRECTORY_SEPARATOR . $cacheprefix
-                . "_nodes_lite.json", "w");
-            $json = "";
+                . '_nodes_lite.json', 'w');
+            $json = '';
 
-            //		$json = $this->defaultnode->asJSON(FALSE);
+
             foreach ($this->nodes as $node) {
-                $json .= $node->asJSON(FALSE);
+                $json .= $node->asJSON(false);
             }
             $json = rtrim($json, ", \n");
             fputs($fd, $json);
             fclose($fd);
 
-            $fd = fopen($cachefolder . DIRECTORY_SEPARATOR . $cacheprefix . "_links.json",
-                "w");
-            $json = "";
-
-            //		$json = $this->defaultlink->asJSON(TRUE);
-            foreach ($this->links as $link) {
-                $json .= $link->asJSON(TRUE);
-            }
-            $json = rtrim($json, ", \n");
-            fputs($fd, $json);
-            fclose($fd);
-
-            $fd = fopen($cachefolder . DIRECTORY_SEPARATOR . $cacheprefix
-                . "_links_lite.json", "w");
-            $json = "";
-
-            //		$json = $this->defaultlink->asJSON(FALSE);
-            foreach ($this->links as $link) {
-                $json .= $link->asJSON(FALSE);
-            }
-            $json = rtrim($json, ", \n");
-            fputs($fd, $json);
-            fclose($fd);
-
-            $fd = fopen($cachefolder . DIRECTORY_SEPARATOR . $cacheprefix
-                . "_imaphtml.json", "w");
-            $json = $this->imap->subHTML("LINK:");
-            fputs($fd, $json);
-            fclose($fd);
-
-            $fd = fopen($cachefolder . DIRECTORY_SEPARATOR . $cacheprefix . "_imap.json",
+            $fd = fopen($cachefolder . DIRECTORY_SEPARATOR . $cacheprefix . '_links.json',
                 "w");
             $json = '';
-            $nodejson = trim($this->imap->subJSON("NODE:"));
 
-            if ($nodejson != '') {
+
+            foreach ($this->links as $link) {
+                $json .= $link->asJSON(true);
+            }
+            $json = rtrim($json, ", \n");
+            fputs($fd, $json);
+            fclose($fd);
+
+            $fd = fopen($cachefolder . DIRECTORY_SEPARATOR . $cacheprefix
+                . '_links_lite.json', 'w');
+            $json = '';
+
+
+            foreach ($this->links as $link) {
+                $json .= $link->asJSON(false);
+            }
+            $json = rtrim($json, ", \n");
+            fputs($fd, $json);
+            fclose($fd);
+
+            $fd = fopen($cachefolder . DIRECTORY_SEPARATOR . $cacheprefix
+                . '_imaphtml.json', 'w');
+            $json = $this->imap->subHTML('LINK:');
+            fputs($fd, $json);
+            fclose($fd);
+
+            $fd = fopen($cachefolder . DIRECTORY_SEPARATOR . $cacheprefix . '_imap.json',
+                'w');
+            $json = '';
+            $nodejson = trim($this->imap->subJSON('NODE:'));
+
+            if ($nodejson !== '') {
                 $json .= $nodejson;
                 // should check if there WERE nodes...
                 $json .= ",\n";
             }
-            $json .= $this->imap->subJSON("LINK:");
+            $json .= $this->imap->subJSON('LINK:');
             fputs($fd, $json);
             fclose($fd);
-        } else {
-            debug("Couldn't read cache folder.\n");
-        }
+        
     }
 
-    function MakeTemplateTree(&$tree_list, $startpoint = "DEFAULT")
+    function MakeTemplateTree(&$tree_list, $startpoint = 'DEFAULT')
     {
         global $weathermap_lazycounter;
 
-        $output = "";
+        $output = '';
 
         foreach ($tree_list[$startpoint] as $subnode) {
-            $output .= "{ id: " . $weathermap_lazycounter++ . ", text: "
+            $output .= '{ id: ' . $weathermap_lazycounter++ . ', text: '
                 . js_escape($subnode);
 
             if (isset($tree_list[$subnode])) {
@@ -4945,7 +4818,7 @@ class WeatherMap extends WeatherMapBase
                 $output = rtrim($output, ", \n");
                 $output .= "] \n";
             } else {
-                $output .= ", leaf: true ";
+                $output .= ', leaf: true ';
             }
             $output .= "}, \n";
         }
@@ -4953,7 +4826,7 @@ class WeatherMap extends WeatherMapBase
         return ($output);
     }
 
-    function DumpStats($filename = "")
+    function DumpStats($filename = '')
     {
         $report = "Feature Statistics:\n\n";
 
@@ -4961,8 +4834,9 @@ class WeatherMap extends WeatherMapBase
             $report .= sprintf("%70s => %d\n", $key, $val);
         }
 
-        if ($filename == "")
+        if ($filename === '') {
             print $report;
+        }
     }
 }
 ;

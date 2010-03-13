@@ -11,20 +11,20 @@ class WeatherMapDataSource_dsstats extends WeatherMapDataSource
             if (!function_exists('db_fetch_row')) {
                 debug(
                     "ReadData DSStats: Cacti database library not found. [DSSTATS001]\n");
-                return (FALSE);
+                return (false);
             }
 
             if (function_exists("api_plugin_is_enabled")) {
                 if (!api_plugin_is_enabled('dsstats')) {
                     debug(
                         "ReadData DSStats: DSStats plugin not enabled (new-style). [DSSTATS002B]\n");
-                    return (FALSE);
+                    return (false);
                 }
             } else {
                 if (!isset($plugins) || !in_array('dsstats', $plugins)) {
                     debug(
                         "ReadData DSStats: DSStats plugin not enabled (old-style). [DSSTATS002A]\n");
-                    return (FALSE);
+                    return (false);
                 }
             }
 
@@ -41,13 +41,13 @@ class WeatherMapDataSource_dsstats extends WeatherMapDataSource
             if (!in_array('data_source_stats_hourly_last', $tables)) {
                 debug(
                     'ReadData DSStats: data_source_stats_hourly_last database table not found. [DSSTATS003]\n');
-                return (FALSE);
+                return (false);
             }
 
-            return (TRUE);
+            return (true);
         }
 
-        return (FALSE);
+        return (false);
     }
 
     # dsstats:<datatype>:<local_data_id>:<rrd_name_in>:<rrd_name_out>
@@ -56,12 +56,12 @@ class WeatherMapDataSource_dsstats extends WeatherMapDataSource
     {
         if (preg_match("/^dsstats:([a-z]+):(\d+):([\-a-zA-Z0-9_]+):([\-a-zA-Z0-9_]+)$/",
             $targetstring, $matches)) {
-            return TRUE;
+            return true;
         } elseif (preg_match("/^dsstats:(\d+):([\-a-zA-Z0-9_]+):([\-a-zA-Z0-9_]+)$/",
             $targetstring, $matches)) {
-            return TRUE;
+            return true;
         } else {
-            return FALSE;
+            return false;
         }
     }
 
@@ -74,13 +74,13 @@ class WeatherMapDataSource_dsstats extends WeatherMapDataSource
     {
         global $config;
 
-        $dsnames[IN] = "traffic_in";
-        $dsnames[OUT] = "traffic_out";
-        $data[IN] = NULL;
-        $data[OUT] = NULL;
+        $dsnames[IN] = 'traffic_in';
+        $dsnames[OUT] = 'traffic_out';
+        $data[IN] = null;
+        $data[OUT] = null;
 
-        $inbw = NULL;
-        $outbw = NULL;
+        $inbw = null;
+        $outbw = null;
         $data_time = 0;
 
         $table = "";
@@ -166,7 +166,7 @@ class WeatherMapDataSource_dsstats extends WeatherMapDataSource
                 }
             }
 
-            if ($datatype == 'wm' && ($data[IN] == NULL || $data[OUT] == NULL)) {
+            if ($datatype === 'wm' && ($data[IN] === null || $data[OUT] === null)) {
                 debug("Didn't get data for 'wm' source. Inserting new tasks.");
 // insert the required details into weathermap_data, so it will be picked up next time
                 $SQL =
@@ -183,29 +183,33 @@ class WeatherMapDataSource_dsstats extends WeatherMapDataSource
                         IN,
                         OUT
                     ) as $dir) {
-                        if ($data[$dir] === NULL) {
+                        if ($data[$dir] === null) {
                             $SQLins =
                                 "insert into weathermap_data (rrdfile, data_source_name, sequence, local_data_id) values ('"
                                 . mysql_real_escape_string($db_rrdname) . "','"
                                 . mysql_real_escape_string($dsnames[$dir]) . "', 0,"
                                 . $local_data_id . ")";
-                            // warn($SQLins);
+
                             db_execute($SQLins);
                         }
                     }
                 } else {
                     warn(
-                        "DSStats ReadData: Failed to find a filename for DS id $local_data_id [WMDSTATS01]");
+                        "DSStats ReadData: Failed to find a filename for DS id ".$local_data_id." [WMDSTATS01]");
                 }
             }
         }
 
         // fill all that other information (ifSpeed, etc)
-        if ($local_data_id > 0)
+        if ($local_data_id > 0) {
             UpdateCactiData($item, $local_data_id);
+        }
 
-        debug("DSStats ReadData: Returning (" . ($data[IN] === NULL ? 'NULL' : $data[IN])
-            . "," . ($data[OUT] === NULL ? 'NULL' : $data[OUT]) . ",$data_time)\n");
+        debug( sprintf("DSStats ReadData: Returning (%s, %s, %s)\n",
+		        string_or_null($data[IN]),
+		        string_or_null($data[OUT]),
+		        $data_time
+        	));
 
         return (array (
             $data[IN],

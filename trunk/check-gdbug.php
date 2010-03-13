@@ -36,7 +36,7 @@ $temp_width = 10;
 $temp_height = 10;
 
 $node_im = imagecreatetruecolor($temp_width, $temp_height);
-imageSaveAlpha($node_im, TRUE);
+imageSaveAlpha($node_im, true);
 $nothing = imagecolorallocatealpha($node_im, 128, 0, 0, 127);
 imagefill($node_im, 0, 0, $nothing);
 imagedestroy($node_im);

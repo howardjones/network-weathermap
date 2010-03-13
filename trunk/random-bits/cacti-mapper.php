@@ -11,25 +11,25 @@ $height = 3000;
 require_once 'editor-config.php';
 
 // check if the goalposts have moved
-if (is_dir($cacti_base) && file_exists($cacti_base . "/include/global.php")) {
+if (is_dir($cacti_base) && file_exists($cacti_base . '/include/global.php')) {
     // include the cacti-config, so we know about the database
-    include_once($cacti_base . "/include/global.php");
+    include_once $cacti_base . '/include/global.php';
     $config['base_url'] = (isset($config['url_path']) ? $config['url_path'] : $cacti_url);
-    $cacti_found = TRUE;
+    $cacti_found = true;
 } elseif (is_dir($cacti_base) && file_exists($cacti_base . "/include/config.php")) {
     // include the cacti-config, so we know about the database
-    include_once($cacti_base . "/include/config.php");
+    include_once $cacti_base . '/include/config.php';
     $config['base_url'] = (isset($config['url_path']) ? $config['url_path'] : $cacti_url);
-    $cacti_found = TRUE;
+    $cacti_found = true;
 } else {
     print "You need to fix your editor-config.php\n";
     exit();
 }
 
-include_once($cacti_base . "/lib/snmp.php");
+include_once $cacti_base . '/lib/snmp.php';
 
-if (!function_exists("cacti_snmp_get")) {
-    die("Cacti SNMP functions are not available");
+if (!function_exists('cacti_snmp_get')) {
+    die('Cacti SNMP functions are not available');
 }
 
 # figure out which template has interface traffic. This might be wrong for you.
@@ -43,7 +43,7 @@ $queryrows = db_fetch_assoc($Interfaces_SQL);
 
 if (is_array($queryrows) && sizeof($queryrows) > 0) {
     foreach ($queryrows as $line) {
-        $key = sprintf("%06d-%010d", $line['host_id'], $line['snmp_index']);
+        $key = sprintf('%06d-%010d', $line['host_id'], $line['snmp_index']);
         $hosts[$line['host_id']]['description'] = $line['description'];
         $hosts[$line['host_id']]['hostname'] = $line['hostname'];
 
@@ -61,44 +61,48 @@ if (is_array($queryrows) && sizeof($queryrows) > 0) {
         $interfaces[$key]['index'] = $line['snmp_index'];
         $interfaces[$key]['host'] = $line['host_id'];
 
-        if ($line['field_name'] == 'ifIP')
+        if ($line['field_name'] === 'ifIP') {
             $interfaces[$key]['ip'] = $line['field_value'];
+        }
 
-        if ($line['field_name'] == 'ifName')
+        if ($line['field_name'] === 'ifName') {
             $interfaces[$key]['name'] = $line['field_value'];
+        }
 
-        if ($line['field_name'] == 'ifDescr')
+        if ($line['field_name'] === 'ifDescr') {
             $interfaces[$key]['descr'] = $line['field_value'];
+        }
 
-        if ($line['field_name'] == 'ifAlias')
+        if ($line['field_name'] === 'ifAlias') {
             $interfaces[$key]['alias'] = $line['field_value'];
+        }
     }
 }
 
 $count = 0;
 
-if (file_exists("mapper-cache.txt")) {
+if (file_exists('mapper-cache.txt')) {
     print "Reading Netmask cache...\n";
-    $fd = fopen("mapper-cache.txt", "r");
+    $fd = fopen('mapper-cache.txt', 'r');
 
     while (!feof($fd)) {
         $str = fgets($fd, 4096);
-        $str = str_replace("\r", "", $str);
+        $str = str_replace('\r', '', $str);
         trim($str);
 
         list($key, $mask) = explode("\t", $str);
 
-        if (preg_match("/^(\d+\.\d+\.\d+\.\d+)$/", $mask, $m) && $mask != '0.0.0.0') {
+        if (preg_match('/^(\d+\.\d+\.\d+\.\d+)$/', $mask, $m) && $mask !== '0.0.0.0') {
             $interfaces[$key]['netmask'] = $m[1];
             $count++;
         }
     }
     fclose($fd);
 }
-print "$count netmasks in the cache.\n";
+print $count." netmasks in the cache.\n";
 
-print "Collected information on " . sizeof($interfaces) . " interfaces and "
-    . sizeof($hosts) . " hosts.\n";
+print 'Collected information on ' . count($interfaces) . ' interfaces and '
+    . count($hosts) . " hosts.\n";
 
 $cleaned = 0;
 
@@ -113,13 +117,13 @@ foreach ($interfaces as $key => $int) {
     }
 }
 
-print "Removed $cleaned interfaces from search, which have no IP address.\n";
+print "Removed ".$cleaned." interfaces from search, which have no IP address.\n";
 
 $count = 0;
 
 foreach ($interfaces as $key => $int) {
     if (!isset($int['netmask'])) {
-        $oid = ".1.3.6.1.2.1.4.20.1.3." . $int['ip'];
+        $oid = '.1.3.6.1.2.1.4.20.1.3.' . $int['ip'];
         $hostid = $int['host'];
 
         if ($count < 100) {
@@ -135,7 +139,7 @@ foreach ($interfaces as $key => $int) {
                 $hosts[$hostid]["snmp_context"], $hosts[$hostid]["snmp_port"],
                 $hosts[$hostid]["snmp_timeout"], SNMP_WEBUI);
 
-            if ($result != FALSE && preg_match("/^\d+.\d+.\d+.\d+$/", $result)) {
+            if ($result != false && preg_match("/^\d+.\d+.\d+.\d+$/", $result)) {
                 print "$result|\n";
                 $interfaces[$key]['netmask'] = $result;
             } else {
@@ -149,7 +153,7 @@ foreach ($interfaces as $key => $int) {
 
 $count = 0;
 print "Writing Netmask cache...\n";
-$fd = fopen("mapper-cache.txt", "w");
+$fd = fopen('mapper-cache.txt', 'w');
 
 foreach ($interfaces as $key => $int) {
     if (isset($int['netmask'])) {
@@ -158,7 +162,7 @@ foreach ($interfaces as $key => $int) {
     }
 }
 fclose($fd);
-print "Wrote $count cache entries.\n";
+print "Wrote ".$count." cache entries.\n";
 # SNMP netmask => .1.3.6.1.2.1.4.20.1.3.10.1.1.254
 # SNMP interface index => .1.3.6.1.2.1.4.20.1.2.10.1.1.254
 
@@ -177,10 +181,10 @@ foreach ($interfaces as $key => $int) {
         ;
     }
 }
-print "Assembled $count different network/netmask pairs\n";
+print "Assembled ".$count." different network/netmask pairs\n";
 
-$link_config = "";
-$node_config = "";
+$link_config = '';
+$node_config = '';
 $nodes_seen = array ();
 
 $count = 0;
@@ -188,19 +192,19 @@ $linkid = 0;
 $lannodeid = 0;
 
 foreach ($networks as $network => $members) {
-    if (sizeof($members) < 2) {
+    if (count($members) < 2) {
         unset($networks[$network]);
         $count++;
     }
 
-    if (sizeof($members) == 2) {
+    if (count($members) == 2) {
         print "Create LINK between\n";
 
         foreach ($members as $int) {
             $h = $interfaces[$int]['host'];
-            print "  " . $interfaces[$int]['nicename'];
-            print " on " . $hosts[$h]['description'];
-            print " (" . $hosts[$h]['hostname'] . ")\n";
+            print '  ' . $interfaces[$int]['nicename'];
+            print ' on ' . $hosts[$h]['description'];
+            print ' (' . $hosts[$h]['hostname'] . ")\n";
             $nodes_seen[$h] = 1;
         }
         $linkid++;
@@ -214,11 +218,11 @@ foreach ($networks as $network => $members) {
         $link_config .= "\n";
     }
 
-    if (sizeof($members) > 2) {
-        print "Create LAN NODE called $network and add LINKs from these NODEs to it:\n";
+    if (count($members) > 2) {
+        print "Create LAN NODE called ".$network." and add LINKs from these NODEs to it:\n";
         $x = rand(0, $width);
         $y = rand(0, $height);
-        $lan_key = preg_replace("/[.\/]/", "_", $network);
+        $lan_key = preg_replace('/[.\/]/', '_', $network);
         $node_config
             .= "NODE LAN_$lan_key\nLABELBGCOLOR 255 240 240 \n\tPOSITION $x $y\n\tLABEL $network\n\tICON 96 24 rbox\n\tLABELOFFSET C\n\tLABELOUTLINECOLOR none\nUSESCALE none in\n\n";
 
@@ -250,9 +254,9 @@ foreach ($nodes_seen as $h => $c) {
     $node_config .= "\n\n";
 }
 
-$fd = fopen("automap.cfg", "w");
+$fd = fopen('automap.cfg', 'w');
 fputs($fd,
-    "HTMLSTYLE overlib\nBGCOLOR 92 92 92\nWIDTH $width\nHEIGHT $height\nFONTDEFINE 30 GillSans 8\n");
+    "HTMLSTYLE overlib\nBGCOLOR 92 92 92\nWIDTH ".$width."\nHEIGHT ".$height."\nFONTDEFINE 30 GillSans 8\n");
 fputs($fd, "FONTDEFINE 20 GillSans 10\nFONTDEFINE 10 GillSans 9\n");
 fputs($fd,
     "SCALE DEFAULT 0 0 255 0 0\nSCALE DEFAULT 0 10   32 32 32   0 0 255\nSCALE DEFAULT 10 40   0 0 255   0 255 0\nSCALE DEFAULT 40 55   0 255 0   255 255 0\nSCALE DEFAULT 55 100   240 240 0   255 0 0\n");

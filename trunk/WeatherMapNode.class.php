@@ -106,12 +106,36 @@ class WeatherMapNode extends WeatherMapItem
                 IN => '',
                 OUT => ''
             ),
-            'labeloutlinecolour' => array (0, 0, 0),
-            'labelbgcolour' => array (255, 255, 255),
-            'labelfontcolour' => array (0, 0, 0),
-            'labelfontshadowcolour' => array (-1, -1, -1),
-            'aiconoutlinecolour' => array (0, 0, 0),
-            'aiconfillcolour' => array (-2, -2, -2), // copy from the node label
+            'labeloutlinecolour' => array (
+                0,
+                0,
+                0
+            ),
+            'labelbgcolour' => array (
+                255,
+                255,
+                255
+            ),
+            'labelfontcolour' => array (
+                0,
+                0,
+                0
+            ),
+            'labelfontshadowcolour' => array (
+                -1,
+                -1,
+                -1
+            ),
+            'aiconoutlinecolour' => array (
+                0,
+                0,
+                0
+            ),
+            'aiconfillcolour' => array (
+                -2,
+                -2,
+                -2
+            ), // copy from the node label
             'labeloffset' => '',
             'labeloffsetx' => 0,
             'labeloffsety' => 0,
@@ -171,8 +195,8 @@ class WeatherMapNode extends WeatherMapItem
 
         $col = new Colour(-1, -1, -1);
 
-        // if a target is specified, and you haven't forced no background, then the background will
-        // come from the SCALE in USESCALE
+// if a target is specified, and you haven't forced no background, then the background will
+// come from the SCALE in USESCALE
         if (!empty($this->targets) && $this->usescale != 'none') {
             $pc = 0;
 
@@ -185,7 +209,11 @@ class WeatherMapNode extends WeatherMapItem
                 $pc = $this->outpercent;
                 $col = $this->colours[OUT];
             }
-        } elseif ($this->labelbgcolour != array (-1, -1, -1)) {
+        } elseif ($this->labelbgcolour != array (
+            -1,
+            -1,
+            -1
+        )) {
             $col = new Colour($this->labelbgcolour);
         }
 
@@ -214,7 +242,8 @@ class WeatherMapNode extends WeatherMapItem
             } else {
                 // use the absolute value if we aren't doing percentage scales.
                 list($colicon, $node_iconscalekey, $icontag) =
-                    $map->NewColourFromPercent($val, $this->useiconscale, $this->name, false);
+                    $map->NewColourFromPercent($val, $this->useiconscale, $this->name,
+                        false);
             }
         }
 
@@ -225,19 +254,20 @@ class WeatherMapNode extends WeatherMapItem
 
             $this->proclabel = $map->ProcessString($this->label, $this, true, true);
 
-            // if screenshot_mode is enabled, wipe any letters to X and wipe any IP address to 127.0.0.1
-            // hopefully that will preserve enough information to show cool stuff without leaking info
+// if screenshot_mode is enabled, wipe any letters to X and wipe any IP address to 127.0.0.1
+// hopefully that will preserve enough information to show cool stuff without leaking info
             if ($map->get_hint('screenshot_mode') == 1) {
                 $this->proclabel = screenshotify($this->proclabel);
             }
 
-            list($strwidth, $strheight) 
-                = $map->myimagestringsize($this->labelfont, $this->proclabel);
+            list($strwidth, $strheight) =
+                $map->myimagestringsize($this->labelfont, $this->proclabel);
 
             if ($this->labelangle == 90 || $this->labelangle == 270) {
                 $boxwidth = ($strheight * $padfactor) + $padding;
                 $boxheight = ($strwidth * $padfactor) + $padding;
-                debug("Node->pre_render: " . $this->name . " Label Metrics are: $strwidth x $strheight -> $boxwidth x $boxheight\n");
+                debug("Node->pre_render: " . $this->name
+                    . " Label Metrics are: $strwidth x $strheight -> $boxwidth x $boxheight\n");
 
                 $label_x1 = $this->x - ($boxwidth / 2);
                 $label_y1 = $this->y - ($boxheight / 2);
@@ -278,7 +308,6 @@ class WeatherMapNode extends WeatherMapItem
             }
             $map->nodes[$this->name]->width = $boxwidth;
             $map->nodes[$this->name]->height = $boxheight;
-
         }
 
         // figure out a bounding rectangle for the icon
@@ -314,7 +343,11 @@ class WeatherMapNode extends WeatherMapItem
                     }
                 }
 
-                if ($this->aiconoutlinecolour != array (-1,-1, -1)) {
+                if ($this->aiconoutlinecolour != array (
+                    -1,
+                    -1,
+                    -1
+                )) {
                     $ink = $aiink;
                 }
 
@@ -637,7 +670,16 @@ class WeatherMapNode extends WeatherMapItem
             imageellipse($node_im, $this->centre_x, $this->centre_y, 8, 8,
                 $map->selected);
 
-            foreach (array ( "N", "S", "E", "W", "NE", "NW", "SE", "SW" ) as $corner) {
+            foreach (array (
+                "N",
+                "S",
+                "E",
+                "W",
+                "NE",
+                "NW",
+                "SE",
+                "SW"
+            ) as $corner) {
                 list($dx, $dy) = calc_offset($corner, $this->width, $this->height);
                 imageellipse($node_im, $this->centre_x + $dx, $this->centre_y + $dy, 5, 5,
                     $map->selected);
@@ -671,9 +713,7 @@ class WeatherMapNode extends WeatherMapItem
 
     // take the pre-rendered node and write it to a file so that
     // the editor can get at it.
-    function WriteToCache() 
-    {
-    }
+    function WriteToCache() { }
 
     function Reset(&$newowner)
     {
@@ -720,8 +760,8 @@ class WeatherMapNode extends WeatherMapItem
     {
         $output = '';
 
-        // This allows the editor to wholesale-replace a single node's configuration
-        // at write-time - it should include the leading NODE xyz line (to allow for renaming)
+// This allows the editor to wholesale-replace a single node's configuration
+// at write-time - it should include the leading NODE xyz line (to allow for renaming)
         if ($this->config_override != '') {
             $output = $this->config_override . "\n";
         } else {
@@ -729,7 +769,7 @@ class WeatherMapNode extends WeatherMapItem
 
             debug("Writing config for NODE $this->name against $this->template\n");
 
-            $basic_params = array (                
+            $basic_params = array (
                 array (
                     'label',
                     'LABEL',
@@ -900,9 +940,9 @@ class WeatherMapNode extends WeatherMapItem
                 }
             }
 
-            if ( ($this->max_bandwidth_in != $dd->max_bandwidth_in)
+            if (($this->max_bandwidth_in != $dd->max_bandwidth_in)
                 || ($this->max_bandwidth_out != $dd->max_bandwidth_out)
-                || ($this->name == 'DEFAULT')) {
+                    || ($this->name == 'DEFAULT')) {
                 if ($this->max_bandwidth_in == $this->max_bandwidth_out) {
                     $output .= "\tMAXVALUE " . $this->max_bandwidth_in_cfg . "\n";
                 } else {
@@ -916,7 +956,7 @@ class WeatherMapNode extends WeatherMapItem
                 // only changed ones, or unique ones, otherwise
                 if (($this->name == 'DEFAULT')
                     || (isset($dd->hints[$hintname]) && $dd->hints[$hintname] != $hint)
-                    || (!isset($dd->hints[$hintname]))) {
+                        || (!isset($dd->hints[$hintname]))) {
                     $output .= "\tSET $hintname $hint\n";
                 }
             }

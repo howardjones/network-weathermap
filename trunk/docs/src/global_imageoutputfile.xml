@@ -1,17 +1,34 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version = "1.0" encoding = "UTF-8"?>
 <configentry>
-	<keyword>IMAGEOUTPUTFILE</keyword>
-	<scope>GLOBAL</scope>
-	<anchor>GLOBAL_IMAGEOUTPUTFILE</anchor>
-    <definition>IMAGEOUTPUTFILE <meta>imagefile</meta></definition>
-    <description  xmlns="http://www.w3.org/1999/xhtml">
- <p>This specifies the name of the PNG, JPEG or GIF file that will be generated. The format chosen is based on the file-extension. </p>
-        <p>The equivalent command-line option takes precedence over this configuration line, if
- both are used. </p><p>If you are generating maps using the Cacti plugin, then this directive is ignored. 
-You can set the output format in the Cacti Settings page.</p>
+    <keyword>IMAGEOUTPUTFILE
+    </keyword>
+
+    <scope>GLOBAL
+    </scope>
+
+    <anchor>GLOBAL_IMAGEOUTPUTFILE
+    </anchor>
+
+    <definition>IMAGEOUTPUTFILE
+
+        <meta>imagefile</meta>
+    </definition>
+
+    <description xmlns = "http://www.w3.org/1999/xhtml">
+        <p>This specifies the name of the PNG, JPEG or GIF file that will be generated.
+        The format chosen is based on the file-extension. </p>
+
+        <p>The equivalent command-line option takes precedence over this configuration
+        line, if both are used. </p><p>If you are generating maps using the Cacti
+        plugin, then this directive is ignored. You can set the output format in the
+        Cacti Settings page.</p>
     </description>
-<changes>
-<change version="0.9">Added JPEG and GIF support.</change>
-<change version="0.7">Added IMAGEOUTPUTFILE.</change>
-</changes>
+
+    <changes>
+        <change version = "0.9">Added JPEG and GIF support.
+        </change>
+
+        <change version = "0.7">Added IMAGEOUTPUTFILE.
+        </change>
+    </changes>
 </configentry>

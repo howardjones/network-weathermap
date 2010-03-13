@@ -1,60 +1,65 @@
-body { font-family: 'Lucida Grande', 'Trebuchet MS',
-          Verdana, Lucida, Geneva, Helvetica,
-          Arial, sans-serif;
-	  padding:0; margin: 0;  
-          }
+body {
+    font-family: 'Lucida Grande', 'Trebuchet MS', Verdana, Lucida, Geneva, Helvetica,
+        Arial, sans-serif;
+    padding: 0;
+    margin: 0;
+}
 
-#frame { margin-left: 10px; font-size: 9pt; line-height: 150%; padding: 10pt;}
+#frame {
+    margin-left: 10px;
+    font-size: 9pt;
+    line-height: 150%;
+    padding: 10pt;
+}
 
-    .card-left, .card-right {
-       float: left;
-       clear: left;
-       width: 170px;
-       margin: 0 15px 15px 0;
-       padding: 10px 0;
-       text-align: center;
-       background: white;
-       border-right: 1px solid #ccc;
-       border-bottom: 1px solid #ccc;
-       font-size: 75%;
-       }
+.card-left, .card-right {
+    float: left;
+    clear: left;
+    width: 170px;
+    margin: 0 15px 15px 0;
+    padding: 10px 0;
+    text-align: center;
+    background: white;
+    border-right: 1px solid #ccc;
+    border-bottom: 1px solid #ccc;
+    font-size: 75%;
+}
 
-    .card-right {
-        clear: right;
-       float: right;
-       margin: 0 0 15px 15px;
-       }
+.card-right {
+    clear: right;
+    float: right;
+    margin: 0 0 15px 15px;
+}
 
-	.topnav {
-		border-top: 1px solid #999;
-		border-bottom: 1px solid #999;
-		margin-bottom: 10px;
-		background: #ddd;
-	}
-
+.topnav {
+    border-top: 1px solid #999;
+    border-bottom: 1px solid #999;
+    margin-bottom: 10px;
+    background: #ddd;
+}
 
 .license {
-        margin-left: 20pt;
-        margin-right: 20pt;
-        font-size: 8pt;
-        padding: 4pt;
-        border: black dashed 1px;
-        background-color: #eee;
+    margin-left: 20pt;
+    margin-right: 20pt;
+    font-size: 8pt;
+    padding: 4pt;
+    border: black dashed 1px;
+    background-color: #eee;
 }
 
 .notebox {
-        margin-left: 20pt;
-        margin-right: 20pt;
-        padding: 4pt;
-        border: black dashed 1px;
-        background-color: #eee;
+    margin-left: 20pt;
+    margin-right: 20pt;
+    padding: 4pt;
+    border: black dashed 1px;
+    background-color: #eee;
 }
 
 .shell {
-        background-color: #eef;
-        margin-left: 20pt;
-        padding: 4pt;
-        font-size: small;
+    background-color: #eef;
+    margin-left: 20pt;
+    padding: 4pt;
+    font-size: small;
 }
 
 .sidenote {
@@ -66,103 +71,187 @@ body { font-family: 'Lucida Grande', 'Trebuchet MS',
     background-color: #eee;
 }
 
-h2.card-title { border:0; font-size: 160%; }
+h2.card-title {
+    border: 0;
+    font-size: 160%;
+}
 
 h2 {
     margin-top: 10pt;
     padding-top: 10pt;
 }
 
-h1 {font-size: 24pt;}
-h2 {font-size: 18pt;}
-h3 {font-size: 14pt;}
-h4 { font-size: 11pt}
+h1 {
+    font-size: 24pt;
+}
 
-.faq dt { padding-top: 5pt; font-weight: bold; font-style: italic; font-size: 110% }
+h2 {
+    font-size: 18pt;
+}
+
+h3 {
+    font-size: 14pt;
+}
+
+h4 {
+    font-size: 11pt
+}
+
+.faq dt {
+    padding-top: 5pt;
+    font-weight: bold;
+    font-style: italic;
+    font-size: 110%
+}
+
 .faq dd { }
 
+h1.configsection {
+    padding-top: 1em;
+}
 
-h1.configsection { padding-top: 1em;}
-.referenceentry { clear: both;  }
-.referenceentry h2 { margin-left: 0; width: 100%; border-top: 1px solid; }
-.description { font-size: 0.9em; }
-.definition { background: #ddd; margin-left: 2em; margin-right:5em; padding: 10px; border-bottom: #aaa solid 1px;;}
-.meta { padding-left: 1em; }
+.referenceentry {
+    clear: both;
+}
 
-.example { background: #dde; margin-left: 2em; margin-right: 5em;   }
-.changes { font-size: 90%; margin-left: 2em;}
-.changes h3 { font-size: 90%; }
+.referenceentry h2 {
+    margin-left: 0;
+    width: 100%;
+    border-top: 1px solid;
+}
 
-.changes dl {width: 80%;
-margin: 0 0;
-padding: 0; 
-font-size: 90%; }
+.description {
+    font-size: 0.9em;
+} .definition
+    { background: #ddd; margin-left: 2em; margin-right:5em; padding: 10px; border-bottom: #aaa solid 1px;;
+    }
 
-.changes dt { width: 5%;
-float: left;
-clear: both;
-margin: 0 0 0 0;
-padding: .5em;
-font-weight: bold; }
+.meta {
+    padding-left: 1em;
+}
 
-.changes dd { width: 75%;
-margin: 0 0 0 0;
-padding: .5em;}
+.example {
+    background: #dde;
+    margin-left: 2em;
+    margin-right: 5em;
+}
+
+.changes {
+    font-size: 90%;
+    margin-left: 2em;
+}
+
+.changes h3 {
+    font-size: 90%;
+}
+
+.changes dl {
+    width: 80%;
+    margin: 0 0;
+    padding: 0;
+    font-size: 90%;
+}
+
+.changes dt {
+    width: 5%;
+    float: left;
+    clear: both;
+    margin: 0 0 0 0;
+    padding: .5em;
+    font-weight: bold;
+}
+
+.changes dd {
+    width: 75%;
+    margin: 0 0 0 0;
+    padding: .5em;
+}
 
 /*****/
 
-
-
-.navcontainer { border-top: solid 1px #eee; border-bottom: solid 1px #ccc; background: #ddd; }
-
-#navlist
-{
-margin: 0;
-padding: 0 0 20px 10px;
-border-bottom: 1px solid #000;
+.navcontainer {
+    border-top: solid 1px #eee;
+    border-bottom: solid 1px #ccc;
+    background: #ddd;
 }
 
-#navlist ul, #navlist li
-{
-margin: 0;
-padding: 0;
-display: inline;
-list-style-type: none;
+#navlist {
+    margin: 0;
+    padding: 0 0 20px 10px;
+    border-bottom: 1px solid #000;
 }
 
-#navlist a:link, #navlist a:visited
-{
-float: left;
-line-height: 14px;
-font-weight: bold;
-font-size: 90%;
-margin: 0 0px 4px 0px;
-border-right: 1px solid #666;
-padding-right: 4px; 
-padding-left: 4px; 
-text-decoration: none;
-color: #999;
+#navlist ul, #navlist li {
+    margin: 0;
+    padding: 0;
+    display: inline;
+    list-style-type: none;
 }
 
-#navlist a:link#current, #navlist a:visited#current, #navlist a:hover
-{
-border-bottom: 4px solid #000;
-padding-bottom: 2px;
-background: transparent;
-color: #000;
+#navlist a:link, #navlist a:visited {
+    float: left;
+    line-height: 14px;
+    font-weight: bold;
+    font-size: 90%;
+    margin: 0 0px 4px 0px;
+    border-right: 1px solid #666;
+    padding-right: 4px;
+    padding-left: 4px;
+    text-decoration: none;
+    color: #999;
 }
 
-#navlist a:hover { color: #000; }
+#navlist a:link#current, #navlist a:visited#current, #navlist a:hover {
+    border-bottom: 4px solid #000;
+    padding-bottom: 2px;
+    background: transparent;
+    color: #000;
+}
 
-table.biglist { width: 70%; margin-left: auto; margin-right: auto;}
-table.biglist th { text-align: left; padding-right: 10px;}
-table.biglist tbody tr td { border-top: solid 1px #ddd; }
+#navlist a:hover {
+    color: #000;
+}
 
+table.biglist {
+    width: 70%;
+    margin-left: auto;
+    margin-right: auto;
+}
 
-img.figure { padding: 1em; }
-img.figright { float: right; }
-img.figleft { float: left; }
+table.biglist th {
+    text-align: left;
+    padding-right: 10px;
+}
 
-.important { padding-left: 1em; padding-right: 1em; padding-top: 1em; padding-bottom: 1em; margin-top: 1em; margin-bottom: 1em; font-weight: bold; border-top: 1px solid gray; border-bottom: 1px solid gray; background: #eee; }
+table.biglist tbody tr td {
+    border-top: solid 1px #ddd;
+}
 
-.card-desc { font-size: 75%; }
+img.figure {
+    padding: 1em;
+}
+
+img.figright {
+    float: right;
+}
+
+img.figleft {
+    float: left;
+}
+
+.important {
+    padding-left: 1em;
+    padding-right: 1em;
+    padding-top: 1em;
+    padding-bottom: 1em;
+    margin-top: 1em;
+    margin-bottom: 1em;
+    font-weight: bold;
+    border-top: 1px solid gray;
+    border-bottom: 1px solid gray;
+    background: #eee;
+}
+
+.card-desc {
+    font-size: 75%;
+}

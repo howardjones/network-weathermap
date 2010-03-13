@@ -1,1382 +1,1924 @@
 <html>
-<head>
-<meta name="generator" content=
-"HTML Tidy for Mac OS X (vers 1st December 2004), see www.w3.org">
-<meta http-equiv="Content-Type" content=
-"text/html; charset=us-ascii">
-<link rel="stylesheet" type="text/css" media="screen" href=
-"weathermap.css">
-<title>PHP Weathermap v0.9 Configuration Reference</title>
-</head>
-<body>
-<div id="frame">
-<h2><a name="configref" id="configref">Configuration
-Reference</a></h2>
-<p>This page is automatically compiled, and documents all the
-configuration directives that are available in PHP Weathermap
-Version 0.9.</p>
-<h1 class="configsection">Introduction</h1>
-<div class="preamble">
-<div id="contents">
-<h4 class="configsection">Node-specific Configuration
-Directives</h4>
-<p id="context_NODE"><a href="#NODE_NODE">NODE</a> <a href=
-"#NODE_POSITION">POSITION</a> <a href="#NODE_LABEL">LABEL</a>
-<a href="#NODE_TARGET">TARGET</a> <a href=
-"#NODE_USESCALE">USESCALE</a> <a href="#NODE_MAXVALUE">MAXVALUE</a>
-<a href="#NODE_ICON">ICON</a> <a href=
-"#NODE_LABELOFFSET">LABELOFFSET</a> <a href=
-"#NODE_LABELFONT">LABELFONT</a> <a href="#NODE_COLORS">*COLOR</a>
-<a href="#NODE_INFOURL">INFOURL</a> <a href=
-"#NODE_OVERLIBGRAPH">OVERLIBGRAPH</a> <a href=
-"#NODE_OVERLIBWIDTH">OVERLIBWIDTH</a> <a href=
-"#NODE_OVERLIBHEIGHT">OVERLIBHEIGHT</a> <a href=
-"#NODE_OVERLIBCAPTION">OVERLIBCAPTION</a></p>
-<h4 class="configsection">Link-specific Configuration
-Directives</h4>
-<p id="context_LINK"><a href="#LINK_LINK">LINK</a> <a href=
-"#LINK_NODES">NODES</a> <a href="#LINK_TARGET">TARGET</a> <a href=
-"#LINK_USESCALE">USESCALE</a> <a href="#LINK_WIDTH">WIDTH</a>
-<a href="#LINK_BANDWIDTH">BANDWIDTH</a> <a href=
-"#LINK_BWLABEL">BWLABEL</a> <a href="#LINK_BWFONT">BWFONT</a>
-<a href="#LINK_INCOMMENT">INCOMMENT</a> <a href=
-"#LINK_OUTCOMMENT">OUTCOMMENT</a> <a href=
-"#LINK_COMMENTFONT">COMMMENTFONT</a> <a href=
-"#LINK_COLORS">*COLOR</a> <a href="#LINK_INFOURL">INFOURL</a>
-<a href="#LINK_OVERLIBGRAPH">OVERLIBGRAPH</a> <a href=
-"#LINK_OVERLIBWIDTH">OVERLIBWIDTH</a> <a href=
-"#LINK_OVERLIBHEIGHT">OVERLIBHEIGHT</a> <a href=
-"#LINK_OVERLIBCAPTION">OVERLIBCAPTION</a> <a href=
-"#LINK_VIA">VIA</a> <a href="#LINK_ARROWSTYLE">ARROWSTYLE</a></p>
-<h4 class="configsection">Global Configuration Directives</h4>
-<p id="context_GLOBAL"><a href="#GLOBAL_BACKGROUND">BACKGROUND</a>
-<a href="#GLOBAL_WIDTH">WIDTH</a> <a href=
-"#GLOBAL_HEIGHT">HEIGHT</a> <a href=
-"#GLOBAL_HTMLOUTPUTFILE">HTMLOUTPUTFILE</a> <a href=
-"#GLOBAL_IMAGEOUTPUTFILE">IMAGEOUTPUTFILE</a> <a href=
-"#GLOBAL_FONTDEFINE">FONTDEFINE</a> <a href=
-"#GLOBAL_FONT">*FONT</a> <a href="#GLOBAL_COLORS">*COLOR</a>
-<a href="#GLOBAL_KEYPOS">KEYPOS</a> <a href=
-"#GLOBAL_TIMEPOS">TIMEPOS</a> <a href="#GLOBAL_TITLE">TITLE</a>
-<a href="#GLOBAL_TITLEPOS">TITLEPOS</a> <a href=
-"#GLOBAL_KILO">KILO</a> <a href="#GLOBAL_HTMLSTYLE">HTMLSTYLE</a>
-<a href="#GLOBAL_SCALE">SCALE</a></p>
-</div>
-</div>
-<h1 id="s_scope_NODE" class="configsection">Node-specific
-Configuration Directives</h1>
-<div class="referenceentry">
-<h2><a name="NODE_NODE" id="NODE_NODE">NODE</a></h2>
-<div class="definition">NODE <em class="meta">nodename</em></div>
-<div class="description">
-<p>The initial definition of a NODE. This must come before any
-other configuration related to this node.</p>
-<p>The 'nodename' is used in link definitions to specify which
-nodes the link joins. The nodename is must be a single word, with
-no spaces.</p>
-<p>There is one special node name, 'DEFAULT', which allows for the
-setting of defaults. All nodes that are defined after this one in
-the configuration file will use the parameters of this node as a
-starting point. For this reason, it is best to define the DEFAULT
-node at the top of the configuration file, if you intend to use
-it.</p>
-</div>
-<div class="changes">
-<h3>Change History</h3>
-<dl>
-<dt>0.7</dt>
-<dd>Added DEFAULT node.</dd>
-</dl>
-</div>
-</div>
-<div class="referenceentry">
-<h2><a name="NODE_POSITION" id="NODE_POSITION">POSITION</a></h2>
-<div class="definition">POSITION <em class="meta">x-coord</em>
-<em class="meta">y-coord</em></div>
-<div class="definition">POSITION <em class="meta">nodename</em>
-<em class="meta">x-coord</em> <em class="meta">y-coord</em></div>
-<div class="description">
-<p>FIXME Specifies where to place the node on the map. Coordinates
-are in pixel units, with the origin at the top-left of the map.</p>
-<p>Optionally, you can also specify another node that the
-coordinates are relative to. This allows you to have 'sub-nodes'
-that follow a master node around as you alter the map.</p>
-</div>
-<div class="examples">
-<h3>Examples</h3>
-<div class="example">
-<h5>Example of a 'sub-node', that will be 20 pixels above the main
-node, wherever that gets moved to. It is used to show additional
-information about the main node.</h5>
-<pre>
-        NODE main_node
-            POSITION 200 320
-            LABEL MAIN
-            
-        NODE sub_node
-            POSITION main_node 0 -20
-            LABEL {nodes:main_node:invalue}
-        
-</pre></div>
-</div>
-<div class="changes">
-<h3>Change History</h3>
-<dl>
-<dt>0.9</dt>
-<dd>Add relative position from other nodes.</dd>
-</dl>
-</div>
-</div>
-<div class="referenceentry">
-<h2><a name="NODE_LABEL" id="NODE_LABEL">LABEL</a></h2>
-<div class="definition">LABEL <em class="meta">labeltext</em></div>
-<div class="description">
-<p>Specifies a label for the node. Everything to the end of the
-line is used.</p>
-<p>If the node has an <a href="#NODE_ICON">ICON</a> defined as
-well, then you can specify the position of the label relative to
-the node's centre-point by using <a href=
-"#NODE_LABELOFFSET">LABELOFFSET.</a></p>
-<p>The text for the label can contain <a href=
-"advanced.html#tokens">special tokens</a> to show map data.</p>
-<p>This is drawn using the font specified by <a href=
-"#NODE_LABELFONT">LABELFONT</a> in the colours specified by
-LABELFONTCOLOR, LABELFONTSHADOWCOLOR, LABELBGCOLOR and
-LABELOUTLINECOLOR.</p>
-</div>
-<div class="changes">
-<h3>Change History</h3>
-<dl>
-<dt>0.9</dt>
-<dd>Added 'special token' support.</dd>
-</dl>
-</div>
-</div>
-<div class="referenceentry">
-<h2><a name="NODE_TARGET" id="NODE_TARGET">TARGET</a></h2>
-<div class="definition">TARGET <em class=
-"meta">targetspec</em></div>
-<div class="description">
-<p>FIXME Specifies where to look for the current throughput
-information for this <a href="#LINK_LINK">LINK.</a> Currently this
-can be done in 5 ways:</p>
-<ul>
-<li>a path to a cacti-produced RRD file</li>
-<li>a path to a non-cacti-produced RRD file and the DS names within
-that RRD</li>
-<li>a path to an MRTG-produced HTML "graph holder" page.</li>
-<li>a path to a tab-delimited text file</li>
-<li>a URL to an MRTG-produced HTML "graph holder" page.</li>
-</ul>
-The last of these relies on your PHP installation having the "fopen
-URL extension" enabled. As far I know, it is enabled by default on
-a new install of current PHP version.
-<p>The default DS names for RRD files are 'traffic_in' and
-'traffic_out', which works with the majority of Cacti RRD files.
-For MRTG-produced RRD files, the names are 'DS0' and 'DS1'. You can
-also specify '-' for either DS name, which tells Weathermap to
-ignore this rrd file for the purposes of the input or output value.
-This is mainly useful in combination with the aggregation
-feature.</p>
-<p>For tab-delimited data files, the format is plain-text, with
-three tab-seperated columns. The first one is a linkname, and the
-second and third are traffic-in and traffic-out, respectively. The
-linkname should match the name in the configuration file. This
-allows you to create one text file for the entire map from some
-outside source. Traffic in &amp; out values can use the same
-"K,M,G,T" abbreviated forms as the <a href=
-"#LINK_BANDWIDTH">BANDWIDTH</a> configuration command. The file
-should have an extension of .txt or .tsv to be recognised as a
-tab-delimited file by Weathermap.</p>
-<p>You can also specify multiple targets, which will then be added
-together to make the aggregate bandwidth which is then displayed.
-Specify the targets on one TARGET line, seperated with a space.</p>
-</div>
-<div class="examples">
-<h3>Examples</h3>
-<div class="example">
-<h5>Using multiple data sources for one link</h5>
-<pre>
-TARGET link1a.rrd  link1b.rrd
-</pre></div>
-<div class="example">
-<h5>Taking the input from one file, and output from another</h5>
-<pre>
-TARGET poot.rrd:-:DS1 poot2.rrd:DS0:-
-</pre></div>
-<div class="example">
-<h5>A suitable tab-delimited data file</h5>
-<pre>
-link1    3M    4M
-link2    66K   1.8M
-link3    34.6K 113
-</pre></div>
-</div>
-<div class="changes">
-<h3>Change History</h3>
-<dl>
-<dt>0.8</dt>
-<dd>Added ability to specify multiple targets. Added tab-delimited
-data source. Added 'ignore' DS name.</dd>
-<dt>0.5</dt>
-<dd>Added ability to specify DS names.</dd>
-</dl>
-</div>
-</div>
-<div class="referenceentry">
-<h2><a name="NODE_USESCALE" id="NODE_USESCALE">USESCALE</a></h2>
-<div class="definition">USESCALE <em class=
-"meta">scalename</em></div>
-<div class="definition">USESCALE <em class="meta">scalename</em>
-<em class="meta">{in,out}</em></div>
-<div class="description">
-<p>FIXME Specifies a label for the node. Everything to the end of
-the line is used.</p>
-<p>If the node has an <a href="#NODE_ICON">ICON</a> defined as
-well, then you can specify the position of the label relative to
-the node's centre-point by using <a href=
-"#NODE_LABELOFFSET">LABELOFFSET.</a></p>
-<p>This is drawn using the font specified by <a href=
-"#NODE_LABELFONT">LABELFONT</a> in the colours specified by
-LABELFONTCOLOR, LABELFONTSHADOWCOLOR, LABELBGCOLOR and
-LABELOUTLINECOLOR.</p>
-</div>
-<div class="changes">
-<h3>Change History</h3>
-<dl>
-<dt>0.9</dt>
-<dd>Added named scales and USESCALE.</dd>
-</dl>
-</div>
-</div>
-<div class="referenceentry">
-<h2><a name="NODE_MAXVALUE" id="NODE_MAXVALUE">MAXVALUE</a></h2>
-<div class="definition">MAXVALUE <em class=
-"meta">max-value</em></div>
-<div class="definition">MAXVALUE <em class="meta">max-in-value</em>
-<em class="meta">max-out-value</em></div>
-<div class="description">
-<p>Specifies the maximum value(s) for the node, in the same way
-that <a href="#LINK_BANDWIDTH">BANDWIDTH</a> does for a <a href=
-"#LINK_LINK">LINK.</a> These are used to calculate the percentage
-usage value, which in turn is used to decide the NODE's colour, if
-it has a <a href="#NODE_TARGET">TARGET</a> defined.</p>
-<p>The default value is 100, which has the effect of not changing
-the input value ( (n/100)*100 = n ).</p>
-</div>
-<div class="changes">
-<h3>Change History</h3>
-<dl>
-<dt>0.9</dt>
-<dd>Added TARGET and MAXVALUE for nodes.</dd>
-</dl>
-</div>
-</div>
-<div class="referenceentry">
-<h2><a name="NODE_ICON" id="NODE_ICON">ICON</a></h2>
-<div class="definition">ICON <em class=
-"meta">iconimagefile</em></div>
-<div class="definition">ICON <em class="meta">maxwidth</em>
-<em class="meta">maxheight</em> <em class=
-"meta">iconimagefile</em></div>
-<div class="definition">ICON none</div>
-<div class="description">
-<p>Specifies an icon to use for the node.</p>
-<p>The filename can either be a full path to the image, or a
-relative one.</p>
-<p>The icon file must be in PNG, JPEG or GIF format.
-Alpha-transparency within the icon should be honoured by Weathermap
-for PNG icons, to create irregular shapes.</p>
-<p>If you specify the word 'none' as the icon filename, then no
-icon is used. This is useful if you have specified an ICON in the
-DEFAULT <a href="#NODE_NODE">NODE,</a> and want to override that
-for a few special cases.</p>
-<p>The second form allows you to specify a maximum width and height
-for the icon. If the PNG file that you specify is bigger or smaller
-than this size, then it is automatically scaled up (or down) in
-proportion, so that it fits into a box of the size you specify.</p>
-<p>The size of the icon image is used by <a href=
-"#NODE_LABELOFFSET">LABELOFFSET</a> to decided how far to move the
-label, if you use compass-point offsets.</p>
-<p>The text for the filename can contain <a href=
-"advanced.html#tokens">special tokens</a> to select an icon based
-on map data.</p>
-</div>
-<div class="changes">
-<h3>Change History</h3>
-<dl>
-<dt>0.9</dt>
-<dd>Added 'special token' support.</dd>
-<dt>0.9</dt>
-<dd>Added JPEG and GIF support.</dd>
-<dt>0.9</dt>
-<dd>Added special icon 'none', and automatic scaling.</dd>
-</dl>
-</div>
-</div>
-<div class="referenceentry">
-<h2><a name="NODE_LABELOFFSET" id=
-"NODE_LABELOFFSET">LABELOFFSET</a></h2>
-<div class="definition">LABELOFFSET <em class=
-"meta">compass-point</em></div>
-<div class="definition">LABELOFFSET <em class="meta">x-offset</em>
-<em class="meta">y-offset</em></div>
-<div class="description">
-<p>If you specify an <a href="#NODE_ICON">ICON,</a> and also a
-<a href="#NODE_LABEL">LABEL,</a> then you will find that the label
-is often hard to read. LABELOFFSET allows you to move the position
-of the <a href="#NODE_LABEL">LABEL,</a> so that it's not directly
-over the centre of the node anymore.</p>
-<p>You can specify a compass-point (e.g. LABELOFFSET S). The
-compass-point method takes the size of the <a href=
-"#NODE_ICON">ICON,</a> and uses that as the offset distance in the
-direction you specify. This way, you can change your icon for
-something of a different size, and not need to change all your
-offsets. You can use the main 8 points of the compass: N, E, S, W,
-NE, SE, NW, SW.</p>
-<p>For more control, you can specify an integer offset for the x
-and y positions of the label (e.g. LABELOFFSET -10 -20)
-instead.</p>
-</div>
-<div class="changes">
-<h3>Change History</h3>
-<dl>
-<dt>0.7</dt>
-<dd>Originally added LABELOFFSET</dd>
-</dl>
-</div>
-</div>
-<div class="referenceentry">
-<h2><a name="NODE_LABELFONT" id="NODE_LABELFONT">LABELFONT</a></h2>
-<div class="definition">LABELFONT <em class=
-"meta">fontnumber</em></div>
-<div class="description">
-<p>Specify the font used for drawing the LABEL.</p>
-<p>Fonts are specified by number. The GD library that Weathermap
-uses has 5 built-in fonts, 1-5. You can define new fonts based on
-TrueType or GD fonts by using the <a href=
-"#GLOBAL_FONTDEFINE">FONTDEFINE</a> directive.</p>
-</div>
-<div class="changes">
-<h3>Change History</h3>
-<dl>
-<dt>0.7</dt>
-<dd>Global NODEFONT became per-node LABELFONT.</dd>
-<dt>0.6</dt>
-<dd>Originally added NODEFONT.</dd>
-</dl>
-</div>
-</div>
-<div class="referenceentry">
-<h2><a name="NODE_COLORS" id="NODE_COLORS">*COLOR</a></h2>
-<div class="definition">LABELFONTCOLOR <em class="meta">red</em>
-<em class="meta">green</em> <em class="meta">blue</em></div>
-<div class="definition">LABELFONTSHADOWCOLOR <em class=
-"meta">red</em> <em class="meta">green</em> <em class=
-"meta">blue</em></div>
-<div class="definition">LABELBGCOLOR <em class="meta">red</em>
-<em class="meta">green</em> <em class="meta">blue</em></div>
-<div class="definition">LABELOUTLINECOLOR <em class="meta">red</em>
-<em class="meta">green</em> <em class="meta">blue</em></div>
-<div class="description">
-<p>Specify the colours used for drawing the LABEL.</p>
-<p>red, green and blue are numbers from 0 to 255.</p>
-<p>LABELFONTSHADOWCOLOR, LABELBGCOLOR and LABELOUTLINECOLOR have an
-additional option - 'none' - which stops that element of the
-<a href="#NODE_LABEL">LABEL</a> being drawn. LABELFONTSHADOWCOLOR
-defaults to 'none'.</p>
-</div>
-<div class="changes">
-<h3>Change History</h3>
-<dl>
-<dt>0.8</dt>
-<dd>Added LABELFONTCOLOR, LABELFONTSHADOWCOLOR, LABELBGCOLOR and
-LABELOUTLINECOLOR.</dd>
-</dl>
-</div>
-</div>
-<div class="referenceentry">
-<h2><a name="NODE_INFOURL" id="NODE_INFOURL">INFOURL</a></h2>
-<div class="definition">INFOURL <em class="meta">url</em></div>
-<div class="description">
-<p>Creates a hyperlink in the HTML output.</p>
-<p>If you are using the HTML output facility, then a link is added
-to the &lt;map&gt; section of the HTML so that when you click on
-the node, you are taken to the url specified here.</p>
-</div>
-</div>
-<div class="referenceentry">
-<h2><a name="NODE_OVERLIBGRAPH" id=
-"NODE_OVERLIBGRAPH">OVERLIBGRAPH</a></h2>
-<div class="definition">OVERLIBGRAPH <em class=
-"meta">url</em></div>
-<div class="description">
-<p>Creates a popup image in the HTML output.</p>
-<p>If you are using the HTML output facility, and <a href=
-"#GLOBAL_HTMLSTYLE">HTMLSTYLE</a> is set to 'overlib', then a link
-is added to the &lt;map&gt; section of the HTML so that when you
-move the mouse pointer over the the node, a box will pop up
-containing the image that you specify. Typically used to link to
-historical data in your network monitoring system.</p>
-</div>
-<div class="examples">
-<h3>Examples</h3>
-<div class="example">
-<h5>Typical use of OVERLIBGRAPH</h5>
-<pre>
-OVERLIBGRAPH http://www.yoursite.net/mrtg/router1-cpu-daily.png
-</pre></div>
-</div>
-</div>
-<div class="referenceentry">
-<h2><a name="NODE_OVERLIBWIDTH" id=
-"NODE_OVERLIBWIDTH">OVERLIBWIDTH</a></h2>
-<div class="definition">OVERLIBWIDTH <em class=
-"meta">imagewidth</em></div>
-<div class="description">
-<p>Specify the width, in pixels of the graph image referred to by
-<a href="#NODE_OVERLIBGRAPH">OVERLIBGRAPH</a> line.</p>
-<p>This is an optional extra that allows the OverLib library to
-make a better job of positioning the 'popup' image so that it
-doesn't appear off the edge of the screen. Typically, you would use
-this once, in the DEFAULT <a href="#NODE_NODE">NODE.</a> If you use
-this, you must also use <a href=
-"#NODE_OVERLIBHEIGHT">OVERLIBHEIGHT,</a> for either to have any
-effect.</p>
-</div>
-<div class="changes">
-<h3>Change History</h3>
-<dl>
-<dt>0.7</dt>
-<dd>Originally added OVERLIBWIDTH and OVERLIBHEIGHT based on code
-by Niels Baggesen.</dd>
-</dl>
-</div>
-</div>
-<div class="referenceentry">
-<h2><a name="NODE_OVERLIBHEIGHT" id=
-"NODE_OVERLIBHEIGHT">OVERLIBHEIGHT</a></h2>
-<div class="definition">OVERLIBHEIGHT <em class=
-"meta">imagewidth</em></div>
-<div class="description">
-<p>Specify the width, in pixels of the graph image referred to by
-<a href="#NODE_OVERLIBGRAPH">OVERLIBGRAPH</a> line.</p>
-<p>This is an optional extra that allows the OverLib library to
-make a better job of positioning the 'popup' image so that it
-doesn't appear off the edge of the screen. Typically, you would use
-this once, in the DEFAULT <a href="#NODE_NODE">NODE.</a> If you use
-this, you must also use <a href=
-"#NODE_OVERLIBWIDTH">OVERLIBWIDTH,</a> for either to have any
-effect.</p>
-</div>
-<div class="changes">
-<h3>Change History</h3>
-<dl>
-<dt>0.7</dt>
-<dd>Originally added OVERLIBWIDTH and OVERLIBHEIGHT based on code
-by Niels Baggesen.</dd>
-</dl>
-</div>
-</div>
-<div class="referenceentry">
-<h2><a name="NODE_OVERLIBCAPTION" id=
-"NODE_OVERLIBCAPTION">OVERLIBCAPTION</a></h2>
-<div class="definition">OVERLIBCAPTION <em class="meta">caption
-text</em></div>
-<div class="description">
-<p>Specify the caption used for the popup HTML 'window' if you have
-also specified an <a href="#NODE_OVERLIBGRAPH">OVERLIBGRAPH</a>
-line. By default, this is the name of the NODE.</p>
-<p>The text for the caption can contain <a href=
-"advanced.html#tokens">special tokens</a> to show map data.</p>
-</div>
-<div class="changes">
-<h3>Change History</h3>
-<dl>
-<dt>0.9</dt>
-<dd>Originally added OVERLIBCAPTION.</dd>
-</dl>
-</div>
-</div>
-<h1 id="s_scope_LINK" class="configsection">Link-specific
-Configuration Directives</h1>
-<div class="referenceentry">
-<h2><a name="LINK_LINK" id="LINK_LINK">LINK</a></h2>
-<div class="definition">LINK <em class="meta">linkname</em></div>
-<div class="description">
-<p>The first line of a LINK definition.</p>
-<p>The linkname must be unique within the map, and must not contain
-spaces. The only place it currently appears is in the small
-title-bar of a popup graph if you specify an <a href=
-"#LINK_OVERLIBGRAPH">OVERLIBGRAPH</a> without an <a href=
-"#LINK_OVERLIBCAPTION">OVERLIBCAPTION,</a> however.</p>
-<p>There is one special link name, 'DEFAULT', which allows for the
-setting of defaults. All links that are defined after this one in
-the configuration file will use the parameters of this link as a
-starting point. For this reason, it is best to define the DEFAULT
-link at the top of the configuration file, if you intend to use
-it.</p>
-</div>
-</div>
-<div class="referenceentry">
-<h2><a name="LINK_NODES" id="LINK_NODES">NODES</a></h2>
-<div class="definition">NODES <em class=
-"meta">nodename{:compassoffset}</em> <em class=
-"meta">nodename{:compassoffset}</em></div>
-<div class="definition">NODES <em class=
-"meta">nodename{:xoffset:yoffset}</em> <em class=
-"meta">nodename{:xoffset:yoffset}</em></div>
-<div class="description">
-<p>These are the NODEs that this link joins. There can be only two.
-They are the 'nodename's from the <a href="#NODE_NODE">NODE</a>
-line for each node.</p>
-<p>Optionally, you can add an offset after a nodename, to move the
-location of that end of the link. This can help with crowded areas
-of the map, and also in making parallel links. Valid offsets are
-named after compass-points: N,S,E,W,NE,NE,SE,SW, or they can be
-numeric values, to indicate the relative position in pixels from
-the centre of the node.</p>
-<p>The order of the nodes is significant. When reading data
-sources, the flow from the first node to the second is considered
-'out' and from second-to-first is 'in'.</p>
-</div>
-<div class="examples">
-<h3>Examples</h3>
-<div class="example">
-<h5>Two parallel links, using offsets</h5>
-<pre>
-LINK firstlink
-  NODES node1:E node2:E
+    <head>
+        <meta name = "generator" content =
+            "HTML Tidy for Mac OS X (vers 1st December 2004), see www.w3.org">
+        <meta http-equiv = "Content-Type" content = "text/html; charset=us-ascii">
+        <link rel = "stylesheet" type = "text/css" media = "screen" href =
+            "weathermap.css">
+        <title>PHP Weathermap v0.9 Configuration Reference</title>
+    </head>
 
-LINK secondlink
-  NODES node1:W node2:W
-</pre></div>
-<div class="example">
-<h5>An offset link using pixel offsets</h5>
-<pre>
-LINK firstlink
-  NODES node1:-10:10 node2:20:12
-        
-</pre></div>
-</div>
-<div class="changes">
-<h3>Change History</h3>
-<dl>
-<dt>0.9</dt>
-<dd>Added numeric pixel offsets.</dd>
-<dt>0.8</dt>
-<dd>Added ability to specify node offset.</dd>
-</dl>
-</div>
-</div>
-<div class="referenceentry">
-<h2><a name="LINK_TARGET" id="LINK_TARGET">TARGET</a></h2>
-<div class="definition">TARGET <em class=
-"meta">targetspec</em></div>
-<div class="description">
-<p>FIXME Specifies where to look for the current throughput
-information for this <a href="#LINK_LINK">LINK.</a> Currently this
-can be done in 5 ways:</p>
-<ul>
-<li>a path to a cacti-produced RRD file</li>
-<li>a path to a non-cacti-produced RRD file and the DS names within
-that RRD</li>
-<li>a path to an MRTG-produced HTML "graph holder" page.</li>
-<li>a path to a tab-delimited text file</li>
-<li>a URL to an MRTG-produced HTML "graph holder" page.</li>
-</ul>
-The last of these relies on your PHP installation having the "fopen
-URL extension" enabled. As far I know, it is enabled by default on
-a new install of current PHP version.
-<p>The default DS names for RRD files are 'traffic_in' and
-'traffic_out', which works with the majority of Cacti RRD files.
-For MRTG-produced RRD files, the names are 'DS0' and 'DS1'. You can
-also specify '-' for either DS name, which tells Weathermap to
-ignore this rrd file for the purposes of the input or output value.
-This is mainly useful in combination with the aggregation
-feature.</p>
-<p>For tab-delimited data files, the format is plain-text, with
-three tab-seperated columns. The first one is a linkname, and the
-second and third are traffic-in and traffic-out, respectively. The
-linkname should match the name in the configuration file. This
-allows you to create one text file for the entire map from some
-outside source. Traffic in &amp; out values can use the same
-"K,M,G,T" abbreviated forms as the <a href=
-"#LINK_BANDWIDTH">BANDWIDTH</a> configuration command. The file
-should have an extension of .txt or .tsv to be recognised as a
-tab-delimited file by Weathermap.</p>
-<p>You can also specify multiple targets, which will then be added
-together to make the aggregate bandwidth which is then displayed.
-Specify the targets on one TARGET line, seperated with a space.</p>
-</div>
-<div class="examples">
-<h3>Examples</h3>
-<div class="example">
-<h5>Using multiple data sources for one link</h5>
-<pre>
-TARGET link1a.rrd  link1b.rrd
-</pre></div>
-<div class="example">
-<h5>Taking the input from one file, and output from another</h5>
-<pre>
-TARGET poot.rrd:-:DS1 poot2.rrd:DS0:-
-</pre></div>
-<div class="example">
-<h5>A suitable tab-delimited data file</h5>
-<pre>
-link1    3M    4M
-link2    66K   1.8M
-link3    34.6K 113
-</pre></div>
-</div>
-<div class="changes">
-<h3>Change History</h3>
-<dl>
-<dt>0.9</dt>
-<dd>Added plugin data sources, and added new plugins.</dd>
-<dt>0.8</dt>
-<dd>Added ability to specify multiple targets. Added tab-delimited
-data source. Added 'ignore' DS name.</dd>
-<dt>0.5</dt>
-<dd>Added ability to specify DS names.</dd>
-</dl>
-</div>
-</div>
-<div class="referenceentry">
-<h2><a name="LINK_USESCALE" id="LINK_USESCALE">USESCALE</a></h2>
-<div class="definition">USESCALE <em class=
-"meta">scalename</em></div>
-<div class="description">
-<p>FIXME The first line of a <a href="#LINK_LINK">LINK</a>
-definition.</p>
-<p>The linkname must be unique within the map, and must not contain
-spaces. The only place it currently appears is in the small
-title-bar of a popup graph if you specify an <a href=
-"#LINK_OVERLIBGRAPH">OVERLIBGRAPH,</a> however.</p>
-<p>There is one special link name, 'DEFAULT', which allows for the
-setting of defaults. All links that are defined after this one in
-the configuration file will use the parameters of this link as a
-starting point. For this reason, it is best to define the DEFAULT
-link at the top of the configuration file, if you intend to use
-it.</p>
-</div>
-<div class="changes">
-<h3>Change History</h3>
-<dl>
-<dt>0.9</dt>
-<dd>Added named scales and USESCALE.</dd>
-</dl>
-</div>
-</div>
-<div class="referenceentry">
-<h2><a name="LINK_WIDTH" id="LINK_WIDTH">WIDTH</a></h2>
-<div class="definition">WIDTH <em class="meta">width</em></div>
-<div class="description">
-<p>Specifies the width of this link when drawn, in pixels.</p>
-</div>
-</div>
-<div class="referenceentry">
-<h2><a name="LINK_BANDWIDTH" id="LINK_BANDWIDTH">BANDWIDTH</a></h2>
-<div class="definition">BANDWIDTH <em class=
-"meta">max-bandwidth</em></div>
-<div class="definition">BANDWIDTH <em class=
-"meta">max-in-bandwidth</em> <em class=
-"meta">max-out-bandwidth</em></div>
-<div class="description">
-<p>Specifies the maximum throughput of this link, in bits per
-second.</p>
-<p>This is used to calculate the percentage utilisation, which in
-turn is used to make the colour for the link arrow, and optionally
-the label on the link.</p>
-<p>The second form allows you to have 'asymmetric' links, like an
-ADSL, where the first number is the maximum bandwidth from node1 to
-node2 and the second is the maximum from node2 to node1, as they
-are given in the <a href="#LINK_NODES">NODES</a> line.</p>
-<p>Bandwidths can also use K,M,G and T suffixes to specify large
-values. Also see the <a href="#GLOBAL_KILO">KILO</a> global option
-though.</p>
-</div>
-<div class="examples">
-<h3>Examples</h3>
-<div class="example">
-<h5>A typical ADSL line (as seen from the CPE)</h5>
-<pre>
-BANDWIDTH 2M 256K
-</pre></div>
-</div>
-<div class="changes">
-<h3>Change History</h3>
-<dl>
-<dt>0.5</dt>
-<dd>Added support for decimals in BANDWIDTH specifications.</dd>
-<dt>0.4</dt>
-<dd>Added support for K,M,G,T suffixes on bandwidth specs. Changed
-bandwidth from bytes to bits.</dd>
-</dl>
-</div>
-</div>
-<div class="referenceentry">
-<h2><a name="LINK_BWLABEL" id="LINK_BWLABEL">BWLABEL</a></h2>
-<div class="definition">BWLABEL <em class=
-"meta">formatname</em></div>
-<div class="description">
-<p>Specifies the type of 'bandwidth' label shown on each link.</p>
-<p>The default is 'percent', but you can also have 'none',
-'unformatted' or 'bits'. 'bits' shows the actual bandwidth,
-formatted using K,M,T,G suffixes where appropriate. 'unformatted'
-takes the value from the <a href="#LINK_TARGET">TARGET</a> and
-displays it without any formatting - this can be useful for mapping
-things other than bandwidth. 'none' hides the bandwidth label
-altogether.</p>
-</div>
-<div class="changes">
-<h3>Change History</h3>
-<dl>
-<dt>0.8</dt>
-<dd>Added unformatted format.</dd>
-<dt>0.7</dt>
-<dd>Changed from global BWLABELS to per-link BWLABEL.</dd>
-</dl>
-</div>
-</div>
-<div class="referenceentry">
-<h2><a name="LINK_BWFONT" id="LINK_BWFONT">BWFONT</a></h2>
-<div class="definition">BWFONT <em class=
-"meta">fontnumber</em></div>
-<div class="description">
-<p>Specify the font used for drawing the <a href=
-"#LINK_BWLABEL">BWLABEL</a> boxes.</p>
-<p>Fonts are specified by number. The GD library that Weathermap
-uses has 5 built-in fonts, 1-5. You can define new fonts based on
-TrueType or GD fonts by using the <a href=
-"#GLOBAL_FONTDEFINE">FONTDEFINE</a> directive.</p>
-</div>
-</div>
-<div class="referenceentry">
-<h2><a name="LINK_INCOMMENT" id="LINK_INCOMMENT">INCOMMENT</a></h2>
-<div class="definition">INCOMMENT <em class=
-"meta">string</em></div>
-<div class="description">
-<p>Specifies a comment for the input side of a LINK.</p>
-</div>
-</div>
-<div class="referenceentry">
-<h2><a name="LINK_OUTCOMMENT" id=
-"LINK_OUTCOMMENT">OUTCOMMENT</a></h2>
-<div class="definition">OUTCOMMENT <em class=
-"meta">string</em></div>
-<div class="description">
-<p>Specifies a comment for the output side of a LINK.</p>
-</div>
-</div>
-<div class="referenceentry">
-<h2><a name="LINK_COMMENTFONT" id=
-"LINK_COMMENTFONT">COMMMENTFONT</a></h2>
-<div class="definition">COMMENTFONT <em class=
-"meta">fontnumber</em></div>
-<div class="description">
-<p>FIXME Specify the font used for drawing the <a href=
-"#LINK_BWLABEL">BWLABEL</a> boxes.</p>
-<p>Fonts are specified by number. The GD library that Weathermap
-uses has 5 built-in fonts, 1-5. You can define new fonts based on
-TrueType or GD fonts by using the <a href=
-"#GLOBAL_FONTDEFINE">FONTDEFINE</a> directive.</p>
-</div>
-</div>
-<div class="referenceentry">
-<h2><a name="LINK_COLORS" id="LINK_COLORS">*COLOR</a></h2>
-<div class="definition">OUTLINECOLOR <em class="meta">red</em>
-<em class="meta">green</em> <em class="meta">blue</em></div>
-<div class="definition">BWOUTLINECOLOR <em class="meta">red</em>
-<em class="meta">green</em> <em class="meta">blue</em></div>
-<div class="definition">BWFONTCOLOR <em class="meta">red</em>
-<em class="meta">green</em> <em class="meta">blue</em></div>
-<div class="definition">BWBOXCOLOR <em class="meta">red</em>
-<em class="meta">green</em> <em class="meta">blue</em></div>
-<div class="description">
-<p>Specify the colours used for drawing the link.</p>
-<p>red, green and blue are numbers from 0 to 255.</p>
-<p>OUTLINECOLOR, BWOUTLINECOLOR and BWBOXCOLOR have an additional
-option - 'none' - which stops that element of the link being
-drawn.</p>
-</div>
-<div class="changes">
-<h3>Change History</h3>
-<dl>
-<dt>0.8</dt>
-<dd>Added OUTLINECOLOR, BWOUTLINECOLOR, BWFONTCOLOR and
-BWBOXCOLOR.</dd>
-</dl>
-</div>
-</div>
-<div class="referenceentry">
-<h2><a name="LINK_INFOURL" id="LINK_INFOURL">INFOURL</a></h2>
-<div class="definition">INFOURL <em class="meta">url</em></div>
-<div class="description">
-<p>Creates a hyperlink in the HTML output.</p>
-<p>If you are using the HTML output facility, then a link is added
-to the &lt;map&gt; section of the HTML so that when you click on
-the (weathermap) link, you are taken to the url specified here.</p>
-</div>
-</div>
-<div class="referenceentry">
-<h2><a name="LINK_OVERLIBGRAPH" id=
-"LINK_OVERLIBGRAPH">OVERLIBGRAPH</a></h2>
-<div class="definition">OVERLIBGRAPH <em class=
-"meta">url</em></div>
-<div class="description">
-<p>Creates a popup image in the HTML output.</p>
-<p>If you are using the HTML output facility, and <a href=
-"#GLOBAL_HTMLSTYLE">HTMLSTYLE</a> is set to 'overlib', then a link
-is added to the &lt;map&gt; section of the HTML so that when you
-move the mouse pointer over the the (weathermap) link, a box will
-pop up containing the image that you specify. Typically used to
-link to historical data in your network monitoring system.</p>
-</div>
-<div class="examples">
-<h3>Examples</h3>
-<div class="example">
-<h5>Typical use of OVERLIBGRAPH</h5>
-<pre>
-OVERLIBGRAPH http://www.yoursite.net/mrtg/router1-link2-daily.png
-</pre></div>
-</div>
-<div class="changes">
-<h3>Change History</h3>
-<dl>
-<dt>0.0pre</dt>
-<dd>Odd fact: This command, and the accompanying code to generate
-overlib imagemaps, were the first modification I ever made to the
-GRNET perl weathermap, and was what got me interested in writing my
-own version.</dd>
-</dl>
-</div>
-</div>
-<div class="referenceentry">
-<h2><a name="LINK_OVERLIBWIDTH" id=
-"LINK_OVERLIBWIDTH">OVERLIBWIDTH</a></h2>
-<div class="definition">OVERLIBWIDTH <em class=
-"meta">imagewidth</em></div>
-<div class="description">
-<p>Specify the width, in pixels of the graph image referred to by
-<a href="#LINK_OVERLIBGRAPH">OVERLIBGRAPH</a> line.</p>
-<p>This is an optional extra that allows the OverLib library to
-make a better job of positioning the 'popup' image so that it
-doesn't appear off the edge of the screen. Typically, you would use
-this once, in the DEFAULT link. If you use this, you must also use
-<a href="#LINK_OVERLIBHEIGHT">OVERLIBHEIGHT,</a> for either to have
-any effect.</p>
-</div>
-<div class="changes">
-<h3>Change History</h3>
-<dl>
-<dt>0.7</dt>
-<dd>Originally added OVERLIBWIDTH and OVERLIBHEIGHT based on code
-by Niels Baggesen.</dd>
-</dl>
-</div>
-</div>
-<div class="referenceentry">
-<h2><a name="LINK_OVERLIBHEIGHT" id=
-"LINK_OVERLIBHEIGHT">OVERLIBHEIGHT</a></h2>
-<div class="definition">OVERLIBHEIGHT <em class=
-"meta">imagewidth</em></div>
-<div class="description">
-<p>Specify the width, in pixels of the graph image referred to by
-<a href="#LINK_OVERLIBGRAPH">OVERLIBGRAPH</a> line.</p>
-<p>This is an optional extra that allows the OverLib library to
-make a better job of positioning the 'popup' image so that it
-doesn't appear off the edge of the screen. Typically, you would use
-this once, in the DEFAULT link. If you use this, you must also use
-<a href="#LINK_OVERLIBWIDTH">OVERLIBWIDTH,</a> for either to have
-any effect.</p>
-</div>
-<div class="changes">
-<h3>Change History</h3>
-<dl>
-<dt>0.7</dt>
-<dd>Originally added OVERLIBWIDTH and OVERLIBHEIGHT based on code
-by Niels Baggesen.</dd>
-</dl>
-</div>
-</div>
-<div class="referenceentry">
-<h2><a name="LINK_OVERLIBCAPTION" id=
-"LINK_OVERLIBCAPTION">OVERLIBCAPTION</a></h2>
-<div class="definition">OVERLIBCAPTION <em class="meta">caption
-text</em></div>
-<div class="description">
-<p>Specify the caption used for the popup HTML 'window' if you have
-also specified an <a href="#LINK_OVERLIBGRAPH">OVERLIBGRAPH</a>
-line. By default, this is the name of the LINK.</p>
-<p>The text for the caption can contain <a href=
-"advanced.html#tokens">special tokens</a> to show map data.</p>
-</div>
-<div class="changes">
-<h3>Change History</h3>
-<dl>
-<dt>0.9</dt>
-<dd>Originally added OVERLIBCAPTION.</dd>
-</dl>
-</div>
-</div>
-<div class="referenceentry">
-<h2><a name="LINK_VIA" id="LINK_VIA">VIA</a></h2>
-<div class="definition">VIA <em class="meta">x-coord</em>
-<em class="meta">y-coord</em></div>
-<div class="description">
-<p>Specify an additional point that a link must pass through.</p>
-<p>A link normally goes in a straight line between the two nodes
-listed in the <a href="#LINK_NODES">NODES</a> configuration line.
-If you need it to go around something else, or to seperate two
-parallel links so that the bandwidth labels are all visible, you
-can make the link curve.</p>
-<p>If you specify multiple VIA lines, then the link will pass
-through each in turn, in the order they are specified.</p>
-</div>
-<div class="changes">
-<h3>Change History</h3>
-<dl>
-<dt>0.8</dt>
-<dd>Originally added VIA.</dd>
-</dl>
-</div>
-</div>
-<div class="referenceentry">
-<h2><a name="LINK_ARROWSTYLE" id=
-"LINK_ARROWSTYLE">ARROWSTYLE</a></h2>
-<div class="definition">ARROWSTYLE <em class=
-"meta">stylename</em></div>
-<div class="definition">ARROWSTYLE <em class="meta">width</em>
-<em class="meta">length</em></div>
-<div class="description">
-<p>Specifies the style of arrowhead used for drawing links.</p>
-<p>The default is 'classic' which has a wide arrowhead. You can
-also choose 'compact' which gives narrower heads.</p>
-<p>Finally, you can get finer control by adjusting the size
-yourself. The width and length of the head are in units of
-link-width.</p>
-<p>Classic is equivalent to '4 2' and Compact is equivalent to '1
-1'.</p>
-</div>
-<div class="changes">
-<h3>Change History</h3>
-<dl>
-<dt>0.8</dt>
-<dd>Added custom numeric form.</dd>
-<dt>0.7</dt>
-<dd>First added.</dd>
-</dl>
-</div>
-</div>
-<h1 id="s_scope_GLOBAL" class="configsection">Global Configuration
-Directives</h1>
-<div class="referenceentry">
-<h2><a name="GLOBAL_BACKGROUND" id=
-"GLOBAL_BACKGROUND">BACKGROUND</a></h2>
-<div class="definition">BACKGROUND <em class=
-"meta">imagefile</em></div>
-<div class="description">
-<p>Specify an PNG, JPEG or GIF image file to be used as a
-background image.</p>
-<p>Any <a href="#GLOBAL_WIDTH">WIDTH</a> and <a href=
-"#GLOBAL_HEIGHT">HEIGHT</a> specifications will be ignored - the
-map will take the size of the background.</p>
-</div>
-<div class="changes">
-<h3>Change History</h3>
-<dl>
-<dt>0.9</dt>
-<dd>Added JPEG and GIF support for backgrounds.</dd>
-</dl>
-</div>
-</div>
-<div class="referenceentry">
-<h2><a name="GLOBAL_WIDTH" id="GLOBAL_WIDTH">WIDTH</a></h2>
-<div class="definition">WIDTH <em class="meta">map-width</em></div>
-<div class="description">
-<p>Specifies the width of the map image in pixels.</p>
-<p>If a <a href="#GLOBAL_BACKGROUND">BACKGROUND</a> is specified,
-and the imagefile is successfully loaded, then any WIDTH specified
-is ignored. If neither a <a href=
-"#GLOBAL_BACKGROUND">BACKGROUND</a> or WIDTH is specified, then the
-default WIDTH is 800 pixels.</p>
-</div>
-</div>
-<div class="referenceentry">
-<h2><a name="GLOBAL_HEIGHT" id="GLOBAL_HEIGHT">HEIGHT</a></h2>
-<div class="definition">WIDTH <em class=
-"meta">map-height</em></div>
-<div class="description">
-<p>Specifies the height of the map image in pixels.</p>
-<p>If a <a href="#GLOBAL_BACKGROUND">BACKGROUND</a> is specified,
-and the imagefile is successfully loaded, then any HEIGHT specified
-is ignored. If neither a <a href=
-"#GLOBAL_BACKGROUND">BACKGROUND</a> or HEIGHT is specified, then
-the default HEIGHT is 600 pixels.</p>
-</div>
-</div>
-<div class="referenceentry">
-<h2><a name="GLOBAL_HTMLOUTPUTFILE" id=
-"GLOBAL_HTMLOUTPUTFILE">HTMLOUTPUTFILE</a></h2>
-<div class="definition">HTMLOUTPUTFILE <em class=
-"meta">htmlfile</em></div>
-<div class="description">
-<p>This specifies the name of the HTML file that will be
-generated.</p>
-<p>The equivalent command-line option takes precedence over this
-configuration line, if both are used. If you are generating maps
-using the Cacti plugin, then this directive is ignored.</p>
-</div>
-<div class="changes">
-<h3>Change History</h3>
-<dl>
-<dt>0.7</dt>
-<dd>Added HTMLOUTPUTFILE.</dd>
-</dl>
-</div>
-</div>
-<div class="referenceentry">
-<h2><a name="GLOBAL_IMAGEOUTPUTFILE" id=
-"GLOBAL_IMAGEOUTPUTFILE">IMAGEOUTPUTFILE</a></h2>
-<div class="definition">IMAGEOUTPUTFILE <em class=
-"meta">imagefile</em></div>
-<div class="description">
-<p>This specifies the name of the PNG, JPEG or GIF file that will
-be generated. The format chosen is based on the file-extension.</p>
-<p>The equivalent command-line option takes precedence over this
-configuration line, if both are used.</p>
-<p>If you are generating maps using the Cacti plugin, then this
-directive is ignored. You can set the output format in the Cacti
-Settings page.</p>
-</div>
-<div class="changes">
-<h3>Change History</h3>
-<dl>
-<dt>0.9</dt>
-<dd>Added JPEG and GIF support.</dd>
-<dt>0.7</dt>
-<dd>Added IMAGEOUTPUTFILE.</dd>
-</dl>
-</div>
-</div>
-<div class="referenceentry">
-<h2><a name="GLOBAL_FONTDEFINE" id=
-"GLOBAL_FONTDEFINE">FONTDEFINE</a></h2>
-<div class="definition">FONTDEFINE <em class="meta">fontnumber</em>
-<em class="meta">gdfontfile</em></div>
-<div class="definition">FONTDEFINE <em class="meta">fontnumber</em>
-<em class="meta">ttffontfile</em> <em class=
-"meta">fontsize</em></div>
-<div class="description">
-<p>Defines a custom font to be used for text within the map.</p>
-<p>By default, the GD library used by Weathermap has 5 fonts,
-numbered 1-5. FONTDEFINE allows you to define new font numbers, and
-link them to fonts in two other formats.</p>
-<p>The first format is 'GD fonts', which are a bitmapped format
-used by GD alone. They are not scalable, and are also
-platform-specific (they use a different byte-order depending on the
-host). You should specify the full filename including any
-extensions.</p>
-<p>The second format is TrueType fonts, which are scalable,
-standard and generally a lot nicer! This time, you need to specify
-the size that the font should be rendered at. The size is in
-pixels. You can load the same font into multiple fontnumbers with
-different sizes to use in different parts of a map.</p>
-<p>The freetype library used in PHP makes a somewhat complex set of
-rules for where it will search for truetype fonts. The two easiest
-options are:</p>
-<ul>
-<li>Use the full absolute path to your .ttf file</li>
-<li>Keep your .ttf files in the Weathermap directory, and use the
-first part of the filename only, with no '.ttf' on the end.</li>
-</ul>
-The full set of rules is <a href=
-"http://www.boutell.com/gd/manual2.0.33.html#gdImageStringFT">available
-here</a>
-<p>Regardless of the format, the newly defined font can be used
-anywhere that you'd normally use a font number (for example,
-<a href="#LINK_BWFONT">BWFONT</a> or KEYFONT).</p>
-</div>
-<div class="examples">
-<h3>Examples</h3>
-<div class="example">
-<h5>Defining a new Truetype font, with the font file in the
-weathermap directory</h5>
-<pre>
-FONTDEFINE 10 VeraBd 16
-</pre></div>
-</div>
-<div class="changes">
-<h3>Change History</h3>
-<dl>
-<dt>0.8</dt>
-<dd>First added FONTDEFINE</dd>
-</dl>
-</div>
-</div>
-<div class="referenceentry">
-<h2><a name="GLOBAL_FONT" id="GLOBAL_FONT">*FONT</a></h2>
-<div class="definition">TITLEFONT <em class=
-"meta">fontnumber</em></div>
-<div class="definition">KEYFONT <em class=
-"meta">fontnumber</em></div>
-<div class="definition">TIMEFONT <em class=
-"meta">fontnumber</em></div>
-<div class="description">
-<p>Specify the fonts used for various text.</p>
-<p>Fonts are specified by number. The GD library that Weathermap
-uses has 5 built-in fonts, 1-5. You can define new fonts based on
-TrueType or GD fonts by using the <a href=
-"#GLOBAL_FONTDEFINE">FONTDEFINE</a> directive.</p>
-</div>
-<div class="changes">
-<h3>Change History</h3>
-<dl>
-<dt>0.8</dt>
-<dd>Originally added TIMEFONT.</dd>
-<dt>0.7</dt>
-<dd>Originally added TIMEFONT.</dd>
-<dt>0.6</dt>
-<dd>Originally added KEYFONT.</dd>
-</dl>
-</div>
-</div>
-<div class="referenceentry">
-<h2><a name="GLOBAL_COLORS" id="GLOBAL_COLORS">*COLOR</a></h2>
-<div class="definition">BGCOLOR <em class="meta">red</em>
-<em class="meta">green</em> <em class="meta">blue</em></div>
-<div class="definition">TIMECOLOR <em class="meta">red</em>
-<em class="meta">green</em> <em class="meta">blue</em></div>
-<div class="definition">TITLECOLOR <em class="meta">red</em>
-<em class="meta">green</em> <em class="meta">blue</em></div>
-<div class="definition">KEYTEXTCOLOR <em class="meta">red</em>
-<em class="meta">green</em> <em class="meta">blue</em></div>
-<div class="definition">KEYOUTLINECOLOR <em class="meta">red</em>
-<em class="meta">green</em> <em class="meta">blue</em></div>
-<div class="definition">KEYBGCOLOR <em class="meta">red</em>
-<em class="meta">green</em> <em class="meta">blue</em></div>
-<div class="description">
-<p>Specify the colours used for drawing the global elements of the
-map.</p>
-<p>red, green and blue are numbers from 0 to 255.</p>
-<p>LABELFONTSHADOWCOLOR, LABELBGCOLOR and LABELOUTLINECOLOR have an
-additional option - 'none' - which stops that element of the
-<a href="#NODE_LABEL">LABEL</a> being drawn. LABELFONTSHADOWCOLOR
-defaults to 'none'.</p>
-</div>
-<div class="changes">
-<h3>Change History</h3>
-<dl>
-<dt>0.8</dt>
-<dd>Added TIMECOLOR, TITLECOLOR, KEYTEXTCOLOR, KEYOUTLINECOLOR and
-KEYBGCOLOR.</dd>
-<dt>0.7</dt>
-<dd>Added BGCOLOR.</dd>
-</dl>
-</div>
-</div>
-<div class="referenceentry">
-<h2><a name="GLOBAL_KEYPOS" id="GLOBAL_KEYPOS">KEYPOS</a></h2>
-<div class="definition">KEYPOS <em class="meta">x-pos</em>
-<em class="meta">y-pos</em></div>
-<div class="definition">KEYPOS <em class="meta">x-pos</em>
-<em class="meta">y-pos</em> <em class=
-"meta">headingstring</em></div>
-<div class="description">
-<p>Specifies the position of the key, or legend, that shows what
-each colour-range means.</p>
-<p>If no KEYPOS line is given, then no legend is drawn - handy if
-you have many many colour ranges. You can optionally specify an
-additional parameter, to change the heading above the colours in
-the key. This can be used to change the language of the map, for
-example.</p>
-</div>
-<div class="changes">
-<h3>Change History</h3>
-<dl>
-<dt>0.6</dt>
-<dd>Added ability to change text.</dd>
-</dl>
-</div>
-</div>
-<div class="referenceentry">
-<h2><a name="GLOBAL_TIMEPOS" id="GLOBAL_TIMEPOS">TIMEPOS</a></h2>
-<div class="definition">TIMEPOS <em class="meta">x-pos</em>
-<em class="meta">y-pos</em></div>
-<div class="definition">TIMEPOS <em class="meta">x-pos</em>
-<em class="meta">y-pos</em> <em class=
-"meta">formatstring</em></div>
-<div class="description">
-<p>Specifies where to draw the timestamp on the map.</p>
-<p>If no TIMEPOS line is given, then the timestamp is drawn in the
-top-right corner. To hide it completely, set y to be
-<nobr>-200</nobr> or so.</p>
-<p>You can optionally specify an additional parameter to change the
-text of the timestamp. This text can contain special tokens which
-are substituted with parts of the current time. The default
-timestamp text is <nobr><tt>Created: %b %d %Y %H:%M:%S</tt></nobr>.
-The tokens used are those accepted by the PHP strftime function.
-For a full list see the <a href=
-"http://www.php.net/manual/en/function.strftime.php">PHP manual
-page</a>.</p>
-</div>
-<div class="changes">
-<h3>Change History</h3>
-<dl>
-<dt>0.6</dt>
-<dd>Added ability to change text.</dd>
-<dt>0.5</dt>
-<dd>Originally added TIMEPOS</dd>
-</dl>
-</div>
-</div>
-<div class="referenceentry">
-<h2><a name="GLOBAL_TITLE" id="GLOBAL_TITLE">TITLE</a></h2>
-<div class="definition">TITLEPOS <em class=
-"meta">titlestring</em></div>
-<div class="description">
-<p>Specifies the title text.</p>
-<p>The TITLE is shown in file-selectors for both the editor and the
-Cacti plugin. If you'd like the title to be shown on the map too,
-then add <a href="#GLOBAL_TITLEPOS">TITLEPOS</a> line also.</p>
-</div>
-<div class="changes">
-<h3>Change History</h3>
-<dl>
-<dt>0.8</dt>
-<dd>Originally added TITLEPOS.</dd>
-</dl>
-</div>
-</div>
-<div class="referenceentry">
-<h2><a name="GLOBAL_TITLEPOS" id=
-"GLOBAL_TITLEPOS">TITLEPOS</a></h2>
-<div class="definition">TITLEPOS <em class="meta">x-pos</em>
-<em class="meta">y-pos</em></div>
-<div class="definition">TITLEPOS <em class="meta">x-pos</em>
-<em class="meta">y-pos</em> <em class=
-"meta">headingstring</em></div>
-<div class="description">
-<p>Specifies the position of the title text.</p>
-<p>If no TITLEPOS line is given, then no title is drawn. You can
-optionally specify an additional parameter, to change the title.
-Any text after the second coordinate is taken as a new TITLE.</p>
-</div>
-<div class="changes">
-<h3>Change History</h3>
-<dl>
-<dt>0.8</dt>
-<dd>Originally added TITLEPOS.</dd>
-</dl>
-</div>
-</div>
-<div class="referenceentry">
-<h2><a name="GLOBAL_KILO" id="GLOBAL_KILO">KILO</a></h2>
-<div class="definition">KILO <em class="meta">number</em></div>
-<div class="description">
-<p>Specifies base value for kilo, mega and giga abbreviations.</p>
-<p>Both <a href="#LINK_BANDWIDTH">BANDWIDTH</a> and <a href=
-"#LINK_BWLABEL">BWLABEL</a> can use K,M,G,T as abbreviations for
-thousands, millions and so on. You can define what the multiple
-used is. The default is 1000.</p>
-</div>
-<div class="changes">
-<h3>Change History</h3>
-<dl>
-<dt>0.4</dt>
-<dd>Originally added KILO.</dd>
-</dl>
-</div>
-</div>
-<div class="referenceentry">
-<h2><a name="GLOBAL_HTMLSTYLE" id=
-"GLOBAL_HTMLSTYLE">HTMLSTYLE</a></h2>
-<div class="definition">HTMLSTYLE <em class=
-"meta">formatname</em></div>
-<div class="description">
-<p>Specifies the HTML output style.</p>
-<p>When HTML output is enabled, there are two variations, which you
-can choose between. 'static' is a basic HTML page with client-side
-imagemap, but no 'pop up' graphs. 'overlib' adds the use of the
-OverLib library to the page, so that pop up graphs can work, too.
-This requires Javascript, which is why 'static' is the default.</p>
-</div>
-</div>
-<div class="referenceentry">
-<h2><a name="GLOBAL_SCALE" id="GLOBAL_SCALE">SCALE</a></h2>
-<div class="definition">SCALE <em class="meta">min</em> <em class=
-"meta">max</em> <em class="meta">red</em> <em class=
-"meta">green</em> <em class="meta">blue</em></div>
-<div class="definition">SCALE <em class="meta">scalename</em>
-<em class="meta">min</em> <em class="meta">max</em> <em class=
-"meta">red</em> <em class="meta">green</em> <em class=
-"meta">blue</em></div>
-<div class="definition">SCALE <em class="meta">min</em> <em class=
-"meta">max</em> <em class="meta">red</em> <em class=
-"meta">green</em> <em class="meta">blue</em> <em class=
-"meta">red2</em> <em class="meta">green2</em> <em class=
-"meta">blue2</em></div>
-<div class="definition">SCALE <em class="meta">scalename</em>
-<em class="meta">min</em> <em class="meta">max</em> <em class=
-"meta">red</em> <em class="meta">green</em> <em class=
-"meta">blue</em> <em class="meta">red2</em> <em class=
-"meta">green2</em> <em class="meta">blue2</em></div>
-<div class="description">
-<p>Defines one 'span' within the link colour-coding table.</p>
-<p>SCALE is used to specify how LINKs are colour-coded according to
-their percent usage. If the percentage usage falls between min and
-max then the colour specified by red, green and blue is used to
-colour the link. Colour values are between 0 and 255. Percentages
-are between 0 and 100, obviously.</p>
-<p>If you specify <i>two</i> colours on the line (the third and
-fourth forms above), then the colour chosen for the link will be
-calculated as a proportion between the two colours. You can avoid
-specifying many SCALE lines this way.</p>
-<p>Without a <i>scalename</i>, the SCALE line will add a definition
-to the scale named 'DEFAULT'. If you define any other named scales,
-you can then use the <a href="#LINK_USESCALE">USESCALE</a>
-directive to specify that a particular <a href=
-"#NODE_NODE">NODE</a> or <a href="#LINK_LINK">LINK</a> use your new
-scale.</p>
-<p>If you don't add <i>any</i> SCALE lines to a configuration file,
-then a default set is added for you, but as soon as you add one,
-you'll need to make enough to cover the whole 0-100 range to get
-nice colours. Any percentage not matched by SCALE rules is rendered
-in grey.</p>
-</div>
-<div class="examples">
-<h3>Examples</h3>
-<div class="example">
-<h5>Setting up a (very simple) colour scale. Colours run smoothly
-from green to red.</h5>
-<pre>
-SCALE 0 100   0 255 0   255 0 0
-</pre></div>
-<div class="example">
-<h5>The default scale set</h5>
-<pre>
-SCALE   1   10    140     0  255
-SCALE  10   25     32    32  255
-SCALE  25   40      0   192  255
-SCALE  40   55      0   240    0
-SCALE  55   70    240   240    0
-SCALE  70   85    255   192    0
-SCALE  85  100    255     0    0
-</pre></div>
-</div>
-<div class="changes">
-<h3>Change History</h3>
-<dl>
-<dt>0.9</dt>
-<dd>Added named scales.</dd>
-<dt>0.8</dt>
-<dd>Added interpolated scale colours.</dd>
-<dt>0.5</dt>
-<dd>Changed to allow min and max to be fractional.</dd>
-</dl>
-</div>
-</div>
-</div>
-</body>
+    <body>
+        <div id = "frame">
+            <h2><a name = "configref" id = "configref">Configuration Reference</a></h2>
+
+            <p>This page is automatically compiled, and documents all the configuration
+            directives that are available in PHP Weathermap Version 0.9.</p>
+
+            <h1 class = "configsection">Introduction</h1>
+
+            <div class = "preamble">
+                <div id = "contents">
+                    <h4 class = "configsection">Node-specific Configuration
+                    Directives</h4>
+
+                    <p id = "context_NODE"><a href = "#NODE_NODE">NODE</a>
+                    <a href = "#NODE_POSITION">POSITION</a>
+                    <a href = "#NODE_LABEL">LABEL</a> <a href = "#NODE_TARGET">TARGET</a>
+                    <a href = "#NODE_USESCALE">USESCALE</a>
+                    <a href = "#NODE_MAXVALUE">MAXVALUE</a>
+                    <a href = "#NODE_ICON">ICON</a>
+                    <a href = "#NODE_LABELOFFSET">LABELOFFSET</a>
+                    <a href = "#NODE_LABELFONT">LABELFONT</a>
+                    <a href = "#NODE_COLORS">*COLOR</a>
+                    <a href = "#NODE_INFOURL">INFOURL</a>
+                    <a href = "#NODE_OVERLIBGRAPH">OVERLIBGRAPH</a>
+                    <a href = "#NODE_OVERLIBWIDTH">OVERLIBWIDTH</a>
+                    <a href = "#NODE_OVERLIBHEIGHT">OVERLIBHEIGHT</a>
+                    <a href = "#NODE_OVERLIBCAPTION">OVERLIBCAPTION</a></p>
+
+                    <h4 class = "configsection">Link-specific Configuration
+                    Directives</h4>
+
+                    <p id = "context_LINK"><a href = "#LINK_LINK">LINK</a>
+                    <a href = "#LINK_NODES">NODES</a> <a href = "#LINK_TARGET">TARGET</a>
+                    <a href = "#LINK_USESCALE">USESCALE</a>
+                    <a href = "#LINK_WIDTH">WIDTH</a>
+                    <a href = "#LINK_BANDWIDTH">BANDWIDTH</a>
+                    <a href = "#LINK_BWLABEL">BWLABEL</a>
+                    <a href = "#LINK_BWFONT">BWFONT</a>
+                    <a href = "#LINK_INCOMMENT">INCOMMENT</a>
+                    <a href = "#LINK_OUTCOMMENT">OUTCOMMENT</a>
+                    <a href = "#LINK_COMMENTFONT">COMMMENTFONT</a>
+                    <a href = "#LINK_COLORS">*COLOR</a>
+                    <a href = "#LINK_INFOURL">INFOURL</a>
+                    <a href = "#LINK_OVERLIBGRAPH">OVERLIBGRAPH</a>
+                    <a href = "#LINK_OVERLIBWIDTH">OVERLIBWIDTH</a>
+                    <a href = "#LINK_OVERLIBHEIGHT">OVERLIBHEIGHT</a>
+                    <a href = "#LINK_OVERLIBCAPTION">OVERLIBCAPTION</a>
+                    <a href = "#LINK_VIA">VIA</a>
+                    <a href = "#LINK_ARROWSTYLE">ARROWSTYLE</a></p>
+
+                    <h4 class = "configsection">Global Configuration Directives</h4>
+
+                    <p id = "context_GLOBAL"><a href = "#GLOBAL_BACKGROUND">BACKGROUND</a>
+                    <a href = "#GLOBAL_WIDTH">WIDTH</a>
+                    <a href = "#GLOBAL_HEIGHT">HEIGHT</a>
+                    <a href = "#GLOBAL_HTMLOUTPUTFILE">HTMLOUTPUTFILE</a>
+                    <a href = "#GLOBAL_IMAGEOUTPUTFILE">IMAGEOUTPUTFILE</a>
+                    <a href = "#GLOBAL_FONTDEFINE">FONTDEFINE</a>
+                    <a href = "#GLOBAL_FONT">*FONT</a>
+                    <a href = "#GLOBAL_COLORS">*COLOR</a>
+                    <a href = "#GLOBAL_KEYPOS">KEYPOS</a>
+                    <a href = "#GLOBAL_TIMEPOS">TIMEPOS</a>
+                    <a href = "#GLOBAL_TITLE">TITLE</a>
+                    <a href = "#GLOBAL_TITLEPOS">TITLEPOS</a>
+                    <a href = "#GLOBAL_KILO">KILO</a>
+                    <a href = "#GLOBAL_HTMLSTYLE">HTMLSTYLE</a>
+                    <a href = "#GLOBAL_SCALE">SCALE</a></p>
+                </div>
+            </div>
+
+            <h1 id = "s_scope_NODE" class = "configsection">Node-specific Configuration
+            Directives</h1>
+
+            <div class = "referenceentry">
+                <h2><a name = "NODE_NODE" id = "NODE_NODE">NODE</a></h2>
+
+                <div class = "definition">NODE <em class = "meta">nodename</em>
+                </div>
+
+                <div class = "description">
+                    <p>The initial definition of a NODE. This must come before any other
+                    configuration related to this node.</p>
+
+                    <p>The 'nodename' is used in link definitions to specify which nodes
+                    the link joins. The nodename is must be a single word, with no
+                    spaces.</p>
+
+                    <p>There is one special node name, 'DEFAULT', which allows for the
+                    setting of defaults. All nodes that are defined after this one in
+                    the configuration file will use the parameters of this node as a
+                    starting point. For this reason, it is best to define the DEFAULT
+                    node at the top of the configuration file, if you intend to use
+                    it.</p>
+                </div>
+
+                <div class = "changes">
+                    <h3>Change History</h3>
+
+                    <dl>
+                        <dt>0.7</dt>
+
+                        <dd>Added DEFAULT node.</dd>
+                    </dl>
+                </div>
+            </div>
+
+            <div class = "referenceentry">
+                <h2><a name = "NODE_POSITION" id = "NODE_POSITION">POSITION</a></h2>
+
+                <div class = "definition">POSITION <em class = "meta">x-coord</em>
+                <em class = "meta">y-coord</em>
+                </div>
+
+                <div class = "definition">POSITION <em class = "meta">nodename</em>
+                <em class = "meta">x-coord</em> <em class = "meta">y-coord</em>
+                </div>
+
+                <div class = "description">
+                    <p>FIXME Specifies where to place the node on the map. Coordinates
+                    are in pixel units, with the origin at the top-left of the map.</p>
+
+                    <p>Optionally, you can also specify another node that the
+                    coordinates are relative to. This allows you to have 'sub-nodes'
+                    that follow a master node around as you alter the map.</p>
+                </div>
+
+                <div class = "examples">
+                    <h3>Examples</h3>
+
+                    <div class = "example">
+                        <h5>Example of a 'sub-node', that will be 20 pixels above the
+                        main node, wherever that gets moved to. It is used to show
+                        additional information about the main node.</h5>
+
+                        <pre>
+                                                        NODE main_node
+                                                            POSITION 200 320
+                                                            LABEL MAIN
+
+                                                        NODE sub_node
+                                                            POSITION main_node 0 -20
+                                                            LABEL {nodes:main_node:invalue}
+
+</pre>
+                    </div>
+                </div>
+
+                <div class = "changes">
+                    <h3>Change History</h3>
+
+                    <dl>
+                        <dt>0.9</dt>
+
+                        <dd>Add relative position from other nodes.</dd>
+                    </dl>
+                </div>
+            </div>
+
+            <div class = "referenceentry">
+                <h2><a name = "NODE_LABEL" id = "NODE_LABEL">LABEL</a></h2>
+
+                <div class = "definition">LABEL <em class = "meta">labeltext</em>
+                </div>
+
+                <div class = "description">
+                    <p>Specifies a label for the node. Everything to the end of the line
+                    is used.</p>
+
+                    <p>If the node has an
+                    <a href = "#NODE_ICON">ICON</a> defined as well, then you can
+                    specify the position of the label relative to the node's
+                    centre-point by using
+                    <a href = "#NODE_LABELOFFSET">LABELOFFSET.</a></p>
+
+                    <p>The text for the label can contain <a href =
+                        "advanced.html#tokens">special tokens</a> to show map data.</p>
+
+                    <p>This is drawn using the font specified by
+                    <a href = "#NODE_LABELFONT">LABELFONT</a> in the colours specified
+                    by LABELFONTCOLOR, LABELFONTSHADOWCOLOR, LABELBGCOLOR and
+                    LABELOUTLINECOLOR.</p>
+                </div>
+
+                <div class = "changes">
+                    <h3>Change History</h3>
+
+                    <dl>
+                        <dt>0.9</dt>
+
+                        <dd>Added 'special token' support.</dd>
+                    </dl>
+                </div>
+            </div>
+
+            <div class = "referenceentry">
+                <h2><a name = "NODE_TARGET" id = "NODE_TARGET">TARGET</a></h2>
+
+                <div class = "definition">TARGET <em class = "meta">targetspec</em>
+                </div>
+
+                <div class = "description">
+                    <p>FIXME Specifies where to look for the current throughput
+                    information for this
+                    <a href = "#LINK_LINK">LINK.</a> Currently this can be done in 5
+                    ways:</p>
+
+                    <ul>
+                        <li>a path to a cacti-produced RRD file</li>
+
+                        <li>a path to a non-cacti-produced RRD file and the DS names
+                        within that RRD</li>
+
+                        <li>a path to an MRTG-produced HTML "graph holder" page.</li>
+
+                        <li>a path to a tab-delimited text file</li>
+
+                        <li>a URL to an MRTG-produced HTML "graph holder" page.</li>
+                    </ul>
+
+                    The last of these relies on your PHP installation having the "fopen
+                    URL extension" enabled. As far I know, it is enabled by default on a
+                    new install of current PHP version.
+
+                    <p>The default DS names for RRD files are 'traffic_in' and
+                    'traffic_out', which works with the majority of Cacti RRD files. For
+                    MRTG-produced RRD files, the names are 'DS0' and 'DS1'. You can also
+                    specify '-' for either DS name, which tells Weathermap to ignore
+                    this rrd file for the purposes of the input or output value. This is
+                    mainly useful in combination with the aggregation feature.</p>
+
+                    <p>For tab-delimited data files, the format is plain-text, with
+                    three tab-seperated columns. The first one is a linkname, and the
+                    second and third are traffic-in and traffic-out, respectively. The
+                    linkname should match the name in the configuration file. This
+                    allows you to create one text file for the entire map from some
+                    outside source. Traffic in &amp; out values can use the same
+                    "K,M,G,T" abbreviated forms as the <a href =
+                        "#LINK_BANDWIDTH">BANDWIDTH</a> configuration command. The file
+                    should have an extension of .txt or .tsv to be recognised as a
+                    tab-delimited file by Weathermap.</p>
+
+                    <p>You can also specify multiple targets, which will then be added
+                    together to make the aggregate bandwidth which is then displayed.
+                    Specify the targets on one TARGET line, seperated with a space.</p>
+                </div>
+
+                <div class = "examples">
+                    <h3>Examples</h3>
+
+                    <div class = "example">
+                        <h5>Using multiple data sources for one link</h5>
+
+                        <pre>
+                                                TARGET link1a.rrd  link1b.rrd
+</pre>
+                    </div>
+
+                    <div class = "example">
+                        <h5>Taking the input from one file, and output from another</h5>
+
+                        <pre>
+                                                TARGET poot.rrd:-:DS1 poot2.rrd:DS0:-
+</pre>
+                    </div>
+
+                    <div class = "example">
+                        <h5>A suitable tab-delimited data file</h5>
+
+                        <pre>
+                                                link1    3M    4M
+                                                link2    66K   1.8M
+                                                link3    34.6K 113
+</pre>
+                    </div>
+                </div>
+
+                <div class = "changes">
+                    <h3>Change History</h3>
+
+                    <dl>
+                        <dt>0.8</dt>
+
+                        <dd>Added ability to specify multiple targets. Added
+                        tab-delimited data source. Added 'ignore' DS name.</dd>
+
+                        <dt>0.5</dt>
+
+                        <dd>Added ability to specify DS names.</dd>
+                    </dl>
+                </div>
+            </div>
+
+            <div class = "referenceentry">
+                <h2><a name = "NODE_USESCALE" id = "NODE_USESCALE">USESCALE</a></h2>
+
+                <div class = "definition">USESCALE <em class = "meta">scalename</em>
+                </div>
+
+                <div class = "definition">USESCALE <em class = "meta">scalename</em>
+                <em class = "meta">{in,out}</em>
+                </div>
+
+                <div class = "description">
+                    <p>FIXME Specifies a label for the node. Everything to the end of
+                    the line is used.</p>
+
+                    <p>If the node has an
+                    <a href = "#NODE_ICON">ICON</a> defined as well, then you can
+                    specify the position of the label relative to the node's
+                    centre-point by using
+                    <a href = "#NODE_LABELOFFSET">LABELOFFSET.</a></p>
+
+                    <p>This is drawn using the font specified by
+                    <a href = "#NODE_LABELFONT">LABELFONT</a> in the colours specified
+                    by LABELFONTCOLOR, LABELFONTSHADOWCOLOR, LABELBGCOLOR and
+                    LABELOUTLINECOLOR.</p>
+                </div>
+
+                <div class = "changes">
+                    <h3>Change History</h3>
+
+                    <dl>
+                        <dt>0.9</dt>
+
+                        <dd>Added named scales and USESCALE.</dd>
+                    </dl>
+                </div>
+            </div>
+
+            <div class = "referenceentry">
+                <h2><a name = "NODE_MAXVALUE" id = "NODE_MAXVALUE">MAXVALUE</a></h2>
+
+                <div class = "definition">MAXVALUE <em class = "meta">max-value</em>
+                </div>
+
+                <div class = "definition">MAXVALUE <em class = "meta">max-in-value</em>
+                <em class = "meta">max-out-value</em>
+                </div>
+
+                <div class = "description">
+                    <p>Specifies the maximum value(s) for the node, in the same way that
+                    <a href = "#LINK_BANDWIDTH">BANDWIDTH</a> does for a
+                    <a href = "#LINK_LINK">LINK.</a> These are used to calculate the
+                    percentage usage value, which in turn is used to decide the NODE's
+                    colour, if it has a <a href = "#NODE_TARGET">TARGET</a> defined.</p>
+
+                    <p>The default value is 100, which has the effect of not changing
+                    the input value ( (n/100)*100 = n ).</p>
+                </div>
+
+                <div class = "changes">
+                    <h3>Change History</h3>
+
+                    <dl>
+                        <dt>0.9</dt>
+
+                        <dd>Added TARGET and MAXVALUE for nodes.</dd>
+                    </dl>
+                </div>
+            </div>
+
+            <div class = "referenceentry">
+                <h2><a name = "NODE_ICON" id = "NODE_ICON">ICON</a></h2>
+
+                <div class = "definition">ICON <em class = "meta">iconimagefile</em>
+                </div>
+
+                <div class = "definition">ICON <em class = "meta">maxwidth</em>
+                <em class = "meta">maxheight</em> <em class = "meta">iconimagefile</em>
+                </div>
+
+                <div class = "definition">ICON none
+                </div>
+
+                <div class = "description">
+                    <p>Specifies an icon to use for the node.</p>
+
+                    <p>The filename can either be a full path to the image, or a
+                    relative one.</p>
+
+                    <p>The icon file must be in PNG, JPEG or GIF format.
+                    Alpha-transparency within the icon should be honoured by Weathermap
+                    for PNG icons, to create irregular shapes.</p>
+
+                    <p>If you specify the word 'none' as the icon filename, then no icon
+                    is used. This is useful if you have specified an ICON in the DEFAULT
+                    <a href = "#NODE_NODE">NODE,</a> and want to override that for a few
+                    special cases.</p>
+
+                    <p>The second form allows you to specify a maximum width and height
+                    for the icon. If the PNG file that you specify is bigger or smaller
+                    than this size, then it is automatically scaled up (or down) in
+                    proportion, so that it fits into a box of the size you specify.</p>
+
+                    <p>The size of the icon image is used by <a href =
+                        "#NODE_LABELOFFSET">LABELOFFSET</a> to decided how far to move
+                    the label, if you use compass-point offsets.</p>
+
+                    <p>The text for the filename can contain
+                    <a href = "advanced.html#tokens">special tokens</a> to select an
+                    icon based on map data.</p>
+                </div>
+
+                <div class = "changes">
+                    <h3>Change History</h3>
+
+                    <dl>
+                        <dt>0.9</dt>
+
+                        <dd>Added 'special token' support.</dd>
+
+                        <dt>0.9</dt>
+
+                        <dd>Added JPEG and GIF support.</dd>
+
+                        <dt>0.9</dt>
+
+                        <dd>Added special icon 'none', and automatic scaling.</dd>
+                    </dl>
+                </div>
+            </div>
+
+            <div class = "referenceentry">
+                <h2><a name = "NODE_LABELOFFSET" id =
+                    "NODE_LABELOFFSET">LABELOFFSET</a></h2>
+
+                <div class = "definition">LABELOFFSET
+                <em class = "meta">compass-point</em>
+                </div>
+
+                <div class = "definition">LABELOFFSET <em class = "meta">x-offset</em>
+                <em class = "meta">y-offset</em>
+                </div>
+
+                <div class = "description">
+                    <p>If you specify an <a href = "#NODE_ICON">ICON,</a> and also a
+                    <a href = "#NODE_LABEL">LABEL,</a> then you will find that the label
+                    is often hard to read. LABELOFFSET allows you to move the position
+                    of the
+                    <a href = "#NODE_LABEL">LABEL,</a> so that it's not directly over
+                    the centre of the node anymore.</p>
+
+                    <p>You can specify a compass-point (e.g. LABELOFFSET S). The
+                    compass-point method takes the size of the <a href =
+                        "#NODE_ICON">ICON,</a> and uses that as the offset distance in
+                    the direction you specify. This way, you can change your icon for
+                    something of a different size, and not need to change all your
+                    offsets. You can use the main 8 points of the compass: N, E, S, W,
+                    NE, SE, NW, SW.</p>
+
+                    <p>For more control, you can specify an integer offset for the x and
+                    y positions of the label (e.g. LABELOFFSET -10 -20) instead.</p>
+                </div>
+
+                <div class = "changes">
+                    <h3>Change History</h3>
+
+                    <dl>
+                        <dt>0.7</dt>
+
+                        <dd>Originally added LABELOFFSET</dd>
+                    </dl>
+                </div>
+            </div>
+
+            <div class = "referenceentry">
+                <h2><a name = "NODE_LABELFONT" id = "NODE_LABELFONT">LABELFONT</a></h2>
+
+                <div class = "definition">LABELFONT <em class = "meta">fontnumber</em>
+                </div>
+
+                <div class = "description">
+                    <p>Specify the font used for drawing the LABEL.</p>
+
+                    <p>Fonts are specified by number. The GD library that Weathermap
+                    uses has 5 built-in fonts, 1-5. You can define new fonts based on
+                    TrueType or GD fonts by using the
+                    <a href = "#GLOBAL_FONTDEFINE">FONTDEFINE</a> directive.</p>
+                </div>
+
+                <div class = "changes">
+                    <h3>Change History</h3>
+
+                    <dl>
+                        <dt>0.7</dt>
+
+                        <dd>Global NODEFONT became per-node LABELFONT.</dd>
+
+                        <dt>0.6</dt>
+
+                        <dd>Originally added NODEFONT.</dd>
+                    </dl>
+                </div>
+            </div>
+
+            <div class = "referenceentry">
+                <h2><a name = "NODE_COLORS" id = "NODE_COLORS">*COLOR</a></h2>
+
+                <div class = "definition">LABELFONTCOLOR <em class = "meta">red</em>
+                <em class = "meta">green</em> <em class = "meta">blue</em>
+                </div>
+
+                <div class = "definition">LABELFONTSHADOWCOLOR <em class = "meta">red</em>
+                <em class = "meta">green</em> <em class = "meta">blue</em>
+                </div>
+
+                <div class = "definition">LABELBGCOLOR <em class = "meta">red</em>
+                <em class = "meta">green</em> <em class = "meta">blue</em>
+                </div>
+
+                <div class = "definition">LABELOUTLINECOLOR <em class = "meta">red</em>
+                <em class = "meta">green</em> <em class = "meta">blue</em>
+                </div>
+
+                <div class = "description">
+                    <p>Specify the colours used for drawing the LABEL.</p>
+
+                    <p>red, green and blue are numbers from 0 to 255.</p>
+
+                    <p>LABELFONTSHADOWCOLOR, LABELBGCOLOR and LABELOUTLINECOLOR have an
+                    additional option - 'none' - which stops that element of the
+                    <a href = "#NODE_LABEL">LABEL</a> being drawn. LABELFONTSHADOWCOLOR
+                    defaults to 'none'.</p>
+                </div>
+
+                <div class = "changes">
+                    <h3>Change History</h3>
+
+                    <dl>
+                        <dt>0.8</dt>
+
+                        <dd>Added LABELFONTCOLOR, LABELFONTSHADOWCOLOR, LABELBGCOLOR and
+                        LABELOUTLINECOLOR.</dd>
+                    </dl>
+                </div>
+            </div>
+
+            <div class = "referenceentry">
+                <h2><a name = "NODE_INFOURL" id = "NODE_INFOURL">INFOURL</a></h2>
+
+                <div class = "definition">INFOURL <em class = "meta">url</em>
+                </div>
+
+                <div class = "description">
+                    <p>Creates a hyperlink in the HTML output.</p>
+
+                    <p>If you are using the HTML output facility, then a link is added
+                    to the &lt;map&gt; section of the HTML so that when you click on the
+                    node, you are taken to the url specified here.</p>
+                </div>
+            </div>
+
+            <div class = "referenceentry">
+                <h2><a name = "NODE_OVERLIBGRAPH" id =
+                    "NODE_OVERLIBGRAPH">OVERLIBGRAPH</a></h2>
+
+                <div class = "definition">OVERLIBGRAPH <em class = "meta">url</em>
+                </div>
+
+                <div class = "description">
+                    <p>Creates a popup image in the HTML output.</p>
+
+                    <p>If you are using the HTML output facility, and <a href =
+                        "#GLOBAL_HTMLSTYLE">HTMLSTYLE</a> is set to 'overlib', then a
+                    link is added to the &lt;map&gt; section of the HTML so that when
+                    you move the mouse pointer over the the node, a box will pop up
+                    containing the image that you specify. Typically used to link to
+                    historical data in your network monitoring system.</p>
+                </div>
+
+                <div class = "examples">
+                    <h3>Examples</h3>
+
+                    <div class = "example">
+                        <h5>Typical use of OVERLIBGRAPH</h5>
+
+                        <pre>
+                                                OVERLIBGRAPH http://www.yoursite.net/mrtg/router1-cpu-daily.png
+</pre>
+                    </div>
+                </div>
+            </div>
+
+            <div class = "referenceentry">
+                <h2><a name = "NODE_OVERLIBWIDTH" id =
+                    "NODE_OVERLIBWIDTH">OVERLIBWIDTH</a></h2>
+
+                <div class = "definition">OVERLIBWIDTH <em class = "meta">imagewidth</em>
+                </div>
+
+                <div class = "description">
+                    <p>Specify the width, in pixels of the graph image referred to by
+                    <a href = "#NODE_OVERLIBGRAPH">OVERLIBGRAPH</a> line.</p>
+
+                    <p>This is an optional extra that allows the OverLib library to make
+                    a better job of positioning the 'popup' image so that it doesn't
+                    appear off the edge of the screen. Typically, you would use this
+                    once, in the DEFAULT
+                    <a href = "#NODE_NODE">NODE.</a> If you use this, you must also use
+                    <a href =
+                        "#NODE_OVERLIBHEIGHT">OVERLIBHEIGHT,</a> for either to have any
+                    effect.</p>
+                </div>
+
+                <div class = "changes">
+                    <h3>Change History</h3>
+
+                    <dl>
+                        <dt>0.7</dt>
+
+                        <dd>Originally added OVERLIBWIDTH and OVERLIBHEIGHT based on
+                        code by Niels Baggesen.</dd>
+                    </dl>
+                </div>
+            </div>
+
+            <div class = "referenceentry">
+                <h2><a name = "NODE_OVERLIBHEIGHT" id =
+                    "NODE_OVERLIBHEIGHT">OVERLIBHEIGHT</a></h2>
+
+                <div class = "definition">OVERLIBHEIGHT <em class = "meta">imagewidth</em>
+                </div>
+
+                <div class = "description">
+                    <p>Specify the width, in pixels of the graph image referred to by
+                    <a href = "#NODE_OVERLIBGRAPH">OVERLIBGRAPH</a> line.</p>
+
+                    <p>This is an optional extra that allows the OverLib library to make
+                    a better job of positioning the 'popup' image so that it doesn't
+                    appear off the edge of the screen. Typically, you would use this
+                    once, in the DEFAULT
+                    <a href = "#NODE_NODE">NODE.</a> If you use this, you must also use
+                    <a href =
+                        "#NODE_OVERLIBWIDTH">OVERLIBWIDTH,</a> for either to have any
+                    effect.</p>
+                </div>
+
+                <div class = "changes">
+                    <h3>Change History</h3>
+
+                    <dl>
+                        <dt>0.7</dt>
+
+                        <dd>Originally added OVERLIBWIDTH and OVERLIBHEIGHT based on
+                        code by Niels Baggesen.</dd>
+                    </dl>
+                </div>
+            </div>
+
+            <div class = "referenceentry">
+                <h2><a name = "NODE_OVERLIBCAPTION" id =
+                    "NODE_OVERLIBCAPTION">OVERLIBCAPTION</a></h2>
+
+                <div class = "definition">OVERLIBCAPTION
+                <em class = "meta">caption text</em>
+                </div>
+
+                <div class = "description">
+                    <p>Specify the caption used for the popup HTML 'window' if you have
+                    also specified an
+                    <a href = "#NODE_OVERLIBGRAPH">OVERLIBGRAPH</a> line. By default,
+                    this is the name of the NODE.</p>
+
+                    <p>The text for the caption can contain <a href =
+                        "advanced.html#tokens">special tokens</a> to show map data.</p>
+                </div>
+
+                <div class = "changes">
+                    <h3>Change History</h3>
+
+                    <dl>
+                        <dt>0.9</dt>
+
+                        <dd>Originally added OVERLIBCAPTION.</dd>
+                    </dl>
+                </div>
+            </div>
+
+            <h1 id = "s_scope_LINK" class = "configsection">Link-specific Configuration
+            Directives</h1>
+
+            <div class = "referenceentry">
+                <h2><a name = "LINK_LINK" id = "LINK_LINK">LINK</a></h2>
+
+                <div class = "definition">LINK <em class = "meta">linkname</em>
+                </div>
+
+                <div class = "description">
+                    <p>The first line of a LINK definition.</p>
+
+                    <p>The linkname must be unique within the map, and must not contain
+                    spaces. The only place it currently appears is in the small
+                    title-bar of a popup graph if you specify an
+                    <a href = "#LINK_OVERLIBGRAPH">OVERLIBGRAPH</a> without an
+                    <a href = "#LINK_OVERLIBCAPTION">OVERLIBCAPTION,</a> however.</p>
+
+                    <p>There is one special link name, 'DEFAULT', which allows for the
+                    setting of defaults. All links that are defined after this one in
+                    the configuration file will use the parameters of this link as a
+                    starting point. For this reason, it is best to define the DEFAULT
+                    link at the top of the configuration file, if you intend to use
+                    it.</p>
+                </div>
+            </div>
+
+            <div class = "referenceentry">
+                <h2><a name = "LINK_NODES" id = "LINK_NODES">NODES</a></h2>
+
+                <div class = "definition">NODES
+                <em class = "meta">nodename{:compassoffset}</em>
+                <em class = "meta">nodename{:compassoffset}</em>
+                </div>
+
+                <div class = "definition">NODES
+                <em class = "meta">nodename{:xoffset:yoffset}</em>
+                <em class = "meta">nodename{:xoffset:yoffset}</em>
+                </div>
+
+                <div class = "description">
+                    <p>These are the NODEs that this link joins. There can be only two.
+                    They are the 'nodename's from the
+                    <a href = "#NODE_NODE">NODE</a> line for each node.</p>
+
+                    <p>Optionally, you can add an offset after a nodename, to move the
+                    location of that end of the link. This can help with crowded areas
+                    of the map, and also in making parallel links. Valid offsets are
+                    named after compass-points: N,S,E,W,NE,NE,SE,SW, or they can be
+                    numeric values, to indicate the relative position in pixels from the
+                    centre of the node.</p>
+
+                    <p>The order of the nodes is significant. When reading data sources,
+                    the flow from the first node to the second is considered 'out' and
+                    from second-to-first is 'in'.</p>
+                </div>
+
+                <div class = "examples">
+                    <h3>Examples</h3>
+
+                    <div class = "example">
+                        <h5>Two parallel links, using offsets</h5>
+
+                        <pre>
+                                                LINK firstlink
+                                                  NODES node1:E node2:E
+
+                                                LINK secondlink
+                                                  NODES node1:W node2:W
+</pre>
+                    </div>
+
+                    <div class = "example">
+                        <h5>An offset link using pixel offsets</h5>
+
+                        <pre>
+                                                LINK firstlink
+                                                  NODES node1:-10:10 node2:20:12
+
+</pre>
+                    </div>
+                </div>
+
+                <div class = "changes">
+                    <h3>Change History</h3>
+
+                    <dl>
+                        <dt>0.9</dt>
+
+                        <dd>Added numeric pixel offsets.</dd>
+
+                        <dt>0.8</dt>
+
+                        <dd>Added ability to specify node offset.</dd>
+                    </dl>
+                </div>
+            </div>
+
+            <div class = "referenceentry">
+                <h2><a name = "LINK_TARGET" id = "LINK_TARGET">TARGET</a></h2>
+
+                <div class = "definition">TARGET <em class = "meta">targetspec</em>
+                </div>
+
+                <div class = "description">
+                    <p>FIXME Specifies where to look for the current throughput
+                    information for this
+                    <a href = "#LINK_LINK">LINK.</a> Currently this can be done in 5
+                    ways:</p>
+
+                    <ul>
+                        <li>a path to a cacti-produced RRD file</li>
+
+                        <li>a path to a non-cacti-produced RRD file and the DS names
+                        within that RRD</li>
+
+                        <li>a path to an MRTG-produced HTML "graph holder" page.</li>
+
+                        <li>a path to a tab-delimited text file</li>
+
+                        <li>a URL to an MRTG-produced HTML "graph holder" page.</li>
+                    </ul>
+
+                    The last of these relies on your PHP installation having the "fopen
+                    URL extension" enabled. As far I know, it is enabled by default on a
+                    new install of current PHP version.
+
+                    <p>The default DS names for RRD files are 'traffic_in' and
+                    'traffic_out', which works with the majority of Cacti RRD files. For
+                    MRTG-produced RRD files, the names are 'DS0' and 'DS1'. You can also
+                    specify '-' for either DS name, which tells Weathermap to ignore
+                    this rrd file for the purposes of the input or output value. This is
+                    mainly useful in combination with the aggregation feature.</p>
+
+                    <p>For tab-delimited data files, the format is plain-text, with
+                    three tab-seperated columns. The first one is a linkname, and the
+                    second and third are traffic-in and traffic-out, respectively. The
+                    linkname should match the name in the configuration file. This
+                    allows you to create one text file for the entire map from some
+                    outside source. Traffic in &amp; out values can use the same
+                    "K,M,G,T" abbreviated forms as the <a href =
+                        "#LINK_BANDWIDTH">BANDWIDTH</a> configuration command. The file
+                    should have an extension of .txt or .tsv to be recognised as a
+                    tab-delimited file by Weathermap.</p>
+
+                    <p>You can also specify multiple targets, which will then be added
+                    together to make the aggregate bandwidth which is then displayed.
+                    Specify the targets on one TARGET line, seperated with a space.</p>
+                </div>
+
+                <div class = "examples">
+                    <h3>Examples</h3>
+
+                    <div class = "example">
+                        <h5>Using multiple data sources for one link</h5>
+
+                        <pre>
+                                                TARGET link1a.rrd  link1b.rrd
+</pre>
+                    </div>
+
+                    <div class = "example">
+                        <h5>Taking the input from one file, and output from another</h5>
+
+                        <pre>
+                                                TARGET poot.rrd:-:DS1 poot2.rrd:DS0:-
+</pre>
+                    </div>
+
+                    <div class = "example">
+                        <h5>A suitable tab-delimited data file</h5>
+
+                        <pre>
+                                                link1    3M    4M
+                                                link2    66K   1.8M
+                                                link3    34.6K 113
+</pre>
+                    </div>
+                </div>
+
+                <div class = "changes">
+                    <h3>Change History</h3>
+
+                    <dl>
+                        <dt>0.9</dt>
+
+                        <dd>Added plugin data sources, and added new plugins.</dd>
+
+                        <dt>0.8</dt>
+
+                        <dd>Added ability to specify multiple targets. Added
+                        tab-delimited data source. Added 'ignore' DS name.</dd>
+
+                        <dt>0.5</dt>
+
+                        <dd>Added ability to specify DS names.</dd>
+                    </dl>
+                </div>
+            </div>
+
+            <div class = "referenceentry">
+                <h2><a name = "LINK_USESCALE" id = "LINK_USESCALE">USESCALE</a></h2>
+
+                <div class = "definition">USESCALE <em class = "meta">scalename</em>
+                </div>
+
+                <div class = "description">
+                    <p>FIXME The first line of a
+                    <a href = "#LINK_LINK">LINK</a> definition.</p>
+
+                    <p>The linkname must be unique within the map, and must not contain
+                    spaces. The only place it currently appears is in the small
+                    title-bar of a popup graph if you specify an
+                    <a href = "#LINK_OVERLIBGRAPH">OVERLIBGRAPH,</a> however.</p>
+
+                    <p>There is one special link name, 'DEFAULT', which allows for the
+                    setting of defaults. All links that are defined after this one in
+                    the configuration file will use the parameters of this link as a
+                    starting point. For this reason, it is best to define the DEFAULT
+                    link at the top of the configuration file, if you intend to use
+                    it.</p>
+                </div>
+
+                <div class = "changes">
+                    <h3>Change History</h3>
+
+                    <dl>
+                        <dt>0.9</dt>
+
+                        <dd>Added named scales and USESCALE.</dd>
+                    </dl>
+                </div>
+            </div>
+
+            <div class = "referenceentry">
+                <h2><a name = "LINK_WIDTH" id = "LINK_WIDTH">WIDTH</a></h2>
+
+                <div class = "definition">WIDTH <em class = "meta">width</em>
+                </div>
+
+                <div class = "description">
+                    <p>Specifies the width of this link when drawn, in pixels.</p>
+                </div>
+            </div>
+
+            <div class = "referenceentry">
+                <h2><a name = "LINK_BANDWIDTH" id = "LINK_BANDWIDTH">BANDWIDTH</a></h2>
+
+                <div class = "definition">BANDWIDTH <em class = "meta">max-bandwidth</em>
+                </div>
+
+                <div class = "definition">BANDWIDTH
+                <em class = "meta">max-in-bandwidth</em>
+                <em class = "meta">max-out-bandwidth</em>
+                </div>
+
+                <div class = "description">
+                    <p>Specifies the maximum throughput of this link, in bits per
+                    second.</p>
+
+                    <p>This is used to calculate the percentage utilisation, which in
+                    turn is used to make the colour for the link arrow, and optionally
+                    the label on the link.</p>
+
+                    <p>The second form allows you to have 'asymmetric' links, like an
+                    ADSL, where the first number is the maximum bandwidth from node1 to
+                    node2 and the second is the maximum from node2 to node1, as they are
+                    given in the <a href = "#LINK_NODES">NODES</a> line.</p>
+
+                    <p>Bandwidths can also use K,M,G and T suffixes to specify large
+                    values. Also see the
+                    <a href = "#GLOBAL_KILO">KILO</a> global option though.</p>
+                </div>
+
+                <div class = "examples">
+                    <h3>Examples</h3>
+
+                    <div class = "example">
+                        <h5>A typical ADSL line (as seen from the CPE)</h5>
+
+                        <pre>
+                                                BANDWIDTH 2M 256K
+</pre>
+                    </div>
+                </div>
+
+                <div class = "changes">
+                    <h3>Change History</h3>
+
+                    <dl>
+                        <dt>0.5</dt>
+
+                        <dd>Added support for decimals in BANDWIDTH specifications.</dd>
+
+                        <dt>0.4</dt>
+
+                        <dd>Added support for K,M,G,T suffixes on bandwidth specs.
+                        Changed bandwidth from bytes to bits.</dd>
+                    </dl>
+                </div>
+            </div>
+
+            <div class = "referenceentry">
+                <h2><a name = "LINK_BWLABEL" id = "LINK_BWLABEL">BWLABEL</a></h2>
+
+                <div class = "definition">BWLABEL <em class = "meta">formatname</em>
+                </div>
+
+                <div class = "description">
+                    <p>Specifies the type of 'bandwidth' label shown on each link.</p>
+
+                    <p>The default is 'percent', but you can also have 'none',
+                    'unformatted' or 'bits'. 'bits' shows the actual bandwidth,
+                    formatted using K,M,T,G suffixes where appropriate. 'unformatted'
+                    takes the value from the
+                    <a href = "#LINK_TARGET">TARGET</a> and displays it without any
+                    formatting
+                    - this can be useful for mapping things other than bandwidth. 'none'
+                    hides the bandwidth label altogether.</p>
+                </div>
+
+                <div class = "changes">
+                    <h3>Change History</h3>
+
+                    <dl>
+                        <dt>0.8</dt>
+
+                        <dd>Added unformatted format.</dd>
+
+                        <dt>0.7</dt>
+
+                        <dd>Changed from global BWLABELS to per-link BWLABEL.</dd>
+                    </dl>
+                </div>
+            </div>
+
+            <div class = "referenceentry">
+                <h2><a name = "LINK_BWFONT" id = "LINK_BWFONT">BWFONT</a></h2>
+
+                <div class = "definition">BWFONT <em class = "meta">fontnumber</em>
+                </div>
+
+                <div class = "description">
+                    <p>Specify the font used for drawing the
+                    <a href = "#LINK_BWLABEL">BWLABEL</a> boxes.</p>
+
+                    <p>Fonts are specified by number. The GD library that Weathermap
+                    uses has 5 built-in fonts, 1-5. You can define new fonts based on
+                    TrueType or GD fonts by using the
+                    <a href = "#GLOBAL_FONTDEFINE">FONTDEFINE</a> directive.</p>
+                </div>
+            </div>
+
+            <div class = "referenceentry">
+                <h2><a name = "LINK_INCOMMENT" id = "LINK_INCOMMENT">INCOMMENT</a></h2>
+
+                <div class = "definition">INCOMMENT <em class = "meta">string</em>
+                </div>
+
+                <div class = "description">
+                    <p>Specifies a comment for the input side of a LINK.</p>
+                </div>
+            </div>
+
+            <div class = "referenceentry">
+                <h2><a name = "LINK_OUTCOMMENT" id = "LINK_OUTCOMMENT">OUTCOMMENT</a></h2>
+
+                <div class = "definition">OUTCOMMENT <em class = "meta">string</em>
+                </div>
+
+                <div class = "description">
+                    <p>Specifies a comment for the output side of a LINK.</p>
+                </div>
+            </div>
+
+            <div class = "referenceentry">
+                <h2><a name = "LINK_COMMENTFONT" id =
+                    "LINK_COMMENTFONT">COMMMENTFONT</a></h2>
+
+                <div class = "definition">COMMENTFONT <em class = "meta">fontnumber</em>
+                </div>
+
+                <div class = "description">
+                    <p>FIXME Specify the font used for drawing the
+                    <a href = "#LINK_BWLABEL">BWLABEL</a> boxes.</p>
+
+                    <p>Fonts are specified by number. The GD library that Weathermap
+                    uses has 5 built-in fonts, 1-5. You can define new fonts based on
+                    TrueType or GD fonts by using the
+                    <a href = "#GLOBAL_FONTDEFINE">FONTDEFINE</a> directive.</p>
+                </div>
+            </div>
+
+            <div class = "referenceentry">
+                <h2><a name = "LINK_COLORS" id = "LINK_COLORS">*COLOR</a></h2>
+
+                <div class = "definition">OUTLINECOLOR <em class = "meta">red</em>
+                <em class = "meta">green</em> <em class = "meta">blue</em>
+                </div>
+
+                <div class = "definition">BWOUTLINECOLOR <em class = "meta">red</em>
+                <em class = "meta">green</em> <em class = "meta">blue</em>
+                </div>
+
+                <div class = "definition">BWFONTCOLOR <em class = "meta">red</em>
+                <em class = "meta">green</em> <em class = "meta">blue</em>
+                </div>
+
+                <div class = "definition">BWBOXCOLOR <em class = "meta">red</em>
+                <em class = "meta">green</em> <em class = "meta">blue</em>
+                </div>
+
+                <div class = "description">
+                    <p>Specify the colours used for drawing the link.</p>
+
+                    <p>red, green and blue are numbers from 0 to 255.</p>
+
+                    <p>OUTLINECOLOR, BWOUTLINECOLOR and BWBOXCOLOR have an additional
+                    option
+                    - 'none' - which stops that element of the link being drawn.</p>
+                </div>
+
+                <div class = "changes">
+                    <h3>Change History</h3>
+
+                    <dl>
+                        <dt>0.8</dt>
+
+                        <dd>Added OUTLINECOLOR, BWOUTLINECOLOR, BWFONTCOLOR and
+                        BWBOXCOLOR.</dd>
+                    </dl>
+                </div>
+            </div>
+
+            <div class = "referenceentry">
+                <h2><a name = "LINK_INFOURL" id = "LINK_INFOURL">INFOURL</a></h2>
+
+                <div class = "definition">INFOURL <em class = "meta">url</em>
+                </div>
+
+                <div class = "description">
+                    <p>Creates a hyperlink in the HTML output.</p>
+
+                    <p>If you are using the HTML output facility, then a link is added
+                    to the &lt;map&gt; section of the HTML so that when you click on the
+                    (weathermap) link, you are taken to the url specified here.</p>
+                </div>
+            </div>
+
+            <div class = "referenceentry">
+                <h2><a name = "LINK_OVERLIBGRAPH" id =
+                    "LINK_OVERLIBGRAPH">OVERLIBGRAPH</a></h2>
+
+                <div class = "definition">OVERLIBGRAPH <em class = "meta">url</em>
+                </div>
+
+                <div class = "description">
+                    <p>Creates a popup image in the HTML output.</p>
+
+                    <p>If you are using the HTML output facility, and <a href =
+                        "#GLOBAL_HTMLSTYLE">HTMLSTYLE</a> is set to 'overlib', then a
+                    link is added to the &lt;map&gt; section of the HTML so that when
+                    you move the mouse pointer over the the (weathermap) link, a box
+                    will pop up containing the image that you specify. Typically used to
+                    link to historical data in your network monitoring system.</p>
+                </div>
+
+                <div class = "examples">
+                    <h3>Examples</h3>
+
+                    <div class = "example">
+                        <h5>Typical use of OVERLIBGRAPH</h5>
+
+                        <pre>
+                                                OVERLIBGRAPH http://www.yoursite.net/mrtg/router1-link2-daily.png
+</pre>
+                    </div>
+                </div>
+
+                <div class = "changes">
+                    <h3>Change History</h3>
+
+                    <dl>
+                        <dt>0.0pre</dt>
+
+                        <dd>Odd fact: This command, and the accompanying code to
+                        generate overlib imagemaps, were the first modification I ever
+                        made to the GRNET perl weathermap, and was what got me
+                        interested in writing my own version.</dd>
+                    </dl>
+                </div>
+            </div>
+
+            <div class = "referenceentry">
+                <h2><a name = "LINK_OVERLIBWIDTH" id =
+                    "LINK_OVERLIBWIDTH">OVERLIBWIDTH</a></h2>
+
+                <div class = "definition">OVERLIBWIDTH <em class = "meta">imagewidth</em>
+                </div>
+
+                <div class = "description">
+                    <p>Specify the width, in pixels of the graph image referred to by
+                    <a href = "#LINK_OVERLIBGRAPH">OVERLIBGRAPH</a> line.</p>
+
+                    <p>This is an optional extra that allows the OverLib library to make
+                    a better job of positioning the 'popup' image so that it doesn't
+                    appear off the edge of the screen. Typically, you would use this
+                    once, in the DEFAULT link. If you use this, you must also use
+                    <a href = "#LINK_OVERLIBHEIGHT">OVERLIBHEIGHT,</a> for either to
+                    have any effect.</p>
+                </div>
+
+                <div class = "changes">
+                    <h3>Change History</h3>
+
+                    <dl>
+                        <dt>0.7</dt>
+
+                        <dd>Originally added OVERLIBWIDTH and OVERLIBHEIGHT based on
+                        code by Niels Baggesen.</dd>
+                    </dl>
+                </div>
+            </div>
+
+            <div class = "referenceentry">
+                <h2><a name = "LINK_OVERLIBHEIGHT" id =
+                    "LINK_OVERLIBHEIGHT">OVERLIBHEIGHT</a></h2>
+
+                <div class = "definition">OVERLIBHEIGHT <em class = "meta">imagewidth</em>
+                </div>
+
+                <div class = "description">
+                    <p>Specify the width, in pixels of the graph image referred to by
+                    <a href = "#LINK_OVERLIBGRAPH">OVERLIBGRAPH</a> line.</p>
+
+                    <p>This is an optional extra that allows the OverLib library to make
+                    a better job of positioning the 'popup' image so that it doesn't
+                    appear off the edge of the screen. Typically, you would use this
+                    once, in the DEFAULT link. If you use this, you must also use
+                    <a href = "#LINK_OVERLIBWIDTH">OVERLIBWIDTH,</a> for either to have
+                    any effect.</p>
+                </div>
+
+                <div class = "changes">
+                    <h3>Change History</h3>
+
+                    <dl>
+                        <dt>0.7</dt>
+
+                        <dd>Originally added OVERLIBWIDTH and OVERLIBHEIGHT based on
+                        code by Niels Baggesen.</dd>
+                    </dl>
+                </div>
+            </div>
+
+            <div class = "referenceentry">
+                <h2><a name = "LINK_OVERLIBCAPTION" id =
+                    "LINK_OVERLIBCAPTION">OVERLIBCAPTION</a></h2>
+
+                <div class = "definition">OVERLIBCAPTION
+                <em class = "meta">caption text</em>
+                </div>
+
+                <div class = "description">
+                    <p>Specify the caption used for the popup HTML 'window' if you have
+                    also specified an
+                    <a href = "#LINK_OVERLIBGRAPH">OVERLIBGRAPH</a> line. By default,
+                    this is the name of the LINK.</p>
+
+                    <p>The text for the caption can contain <a href =
+                        "advanced.html#tokens">special tokens</a> to show map data.</p>
+                </div>
+
+                <div class = "changes">
+                    <h3>Change History</h3>
+
+                    <dl>
+                        <dt>0.9</dt>
+
+                        <dd>Originally added OVERLIBCAPTION.</dd>
+                    </dl>
+                </div>
+            </div>
+
+            <div class = "referenceentry">
+                <h2><a name = "LINK_VIA" id = "LINK_VIA">VIA</a></h2>
+
+                <div class = "definition">VIA <em class = "meta">x-coord</em>
+                <em class = "meta">y-coord</em>
+                </div>
+
+                <div class = "description">
+                    <p>Specify an additional point that a link must pass through.</p>
+
+                    <p>A link normally goes in a straight line between the two nodes
+                    listed in the
+                    <a href = "#LINK_NODES">NODES</a> configuration line. If you need it
+                    to go around something else, or to seperate two parallel links so
+                    that the bandwidth labels are all visible, you can make the link
+                    curve.</p>
+
+                    <p>If you specify multiple VIA lines, then the link will pass
+                    through each in turn, in the order they are specified.</p>
+                </div>
+
+                <div class = "changes">
+                    <h3>Change History</h3>
+
+                    <dl>
+                        <dt>0.8</dt>
+
+                        <dd>Originally added VIA.</dd>
+                    </dl>
+                </div>
+            </div>
+
+            <div class = "referenceentry">
+                <h2><a name = "LINK_ARROWSTYLE" id = "LINK_ARROWSTYLE">ARROWSTYLE</a></h2>
+
+                <div class = "definition">ARROWSTYLE <em class = "meta">stylename</em>
+                </div>
+
+                <div class = "definition">ARROWSTYLE <em class = "meta">width</em>
+                <em class = "meta">length</em>
+                </div>
+
+                <div class = "description">
+                    <p>Specifies the style of arrowhead used for drawing links.</p>
+
+                    <p>The default is 'classic' which has a wide arrowhead. You can also
+                    choose 'compact' which gives narrower heads.</p>
+
+                    <p>Finally, you can get finer control by adjusting the size
+                    yourself. The width and length of the head are in units of
+                    link-width.</p>
+
+                    <p>Classic is equivalent to '4 2' and Compact is equivalent to '1
+                    1'.</p>
+                </div>
+
+                <div class = "changes">
+                    <h3>Change History</h3>
+
+                    <dl>
+                        <dt>0.8</dt>
+
+                        <dd>Added custom numeric form.</dd>
+
+                        <dt>0.7</dt>
+
+                        <dd>First added.</dd>
+                    </dl>
+                </div>
+            </div>
+
+            <h1 id = "s_scope_GLOBAL" class = "configsection">Global Configuration
+            Directives</h1>
+
+            <div class = "referenceentry">
+                <h2><a name = "GLOBAL_BACKGROUND" id =
+                    "GLOBAL_BACKGROUND">BACKGROUND</a></h2>
+
+                <div class = "definition">BACKGROUND <em class = "meta">imagefile</em>
+                </div>
+
+                <div class = "description">
+                    <p>Specify an PNG, JPEG or GIF image file to be used as a background
+                    image.</p>
+
+                    <p>Any <a href = "#GLOBAL_WIDTH">WIDTH</a> and
+                    <a href = "#GLOBAL_HEIGHT">HEIGHT</a> specifications will be ignored
+                    - the map will take the size of the background.</p>
+                </div>
+
+                <div class = "changes">
+                    <h3>Change History</h3>
+
+                    <dl>
+                        <dt>0.9</dt>
+
+                        <dd>Added JPEG and GIF support for backgrounds.</dd>
+                    </dl>
+                </div>
+            </div>
+
+            <div class = "referenceentry">
+                <h2><a name = "GLOBAL_WIDTH" id = "GLOBAL_WIDTH">WIDTH</a></h2>
+
+                <div class = "definition">WIDTH <em class = "meta">map-width</em>
+                </div>
+
+                <div class = "description">
+                    <p>Specifies the width of the map image in pixels.</p>
+
+                    <p>If a
+                    <a href = "#GLOBAL_BACKGROUND">BACKGROUND</a> is specified, and the
+                    imagefile is successfully loaded, then any WIDTH specified is
+                    ignored. If neither a <a href =
+                        "#GLOBAL_BACKGROUND">BACKGROUND</a> or WIDTH is specified, then
+                    the default WIDTH is 800 pixels.</p>
+                </div>
+            </div>
+
+            <div class = "referenceentry">
+                <h2><a name = "GLOBAL_HEIGHT" id = "GLOBAL_HEIGHT">HEIGHT</a></h2>
+
+                <div class = "definition">WIDTH <em class = "meta">map-height</em>
+                </div>
+
+                <div class = "description">
+                    <p>Specifies the height of the map image in pixels.</p>
+
+                    <p>If a
+                    <a href = "#GLOBAL_BACKGROUND">BACKGROUND</a> is specified, and the
+                    imagefile is successfully loaded, then any HEIGHT specified is
+                    ignored. If neither a <a href =
+                        "#GLOBAL_BACKGROUND">BACKGROUND</a> or HEIGHT is specified, then
+                    the default HEIGHT is 600 pixels.</p>
+                </div>
+            </div>
+
+            <div class = "referenceentry">
+                <h2><a name = "GLOBAL_HTMLOUTPUTFILE" id =
+                    "GLOBAL_HTMLOUTPUTFILE">HTMLOUTPUTFILE</a></h2>
+
+                <div class = "definition">HTMLOUTPUTFILE <em class = "meta">htmlfile</em>
+                </div>
+
+                <div class = "description">
+                    <p>This specifies the name of the HTML file that will be
+                    generated.</p>
+
+                    <p>The equivalent command-line option takes precedence over this
+                    configuration line, if both are used. If you are generating maps
+                    using the Cacti plugin, then this directive is ignored.</p>
+                </div>
+
+                <div class = "changes">
+                    <h3>Change History</h3>
+
+                    <dl>
+                        <dt>0.7</dt>
+
+                        <dd>Added HTMLOUTPUTFILE.</dd>
+                    </dl>
+                </div>
+            </div>
+
+            <div class = "referenceentry">
+                <h2><a name = "GLOBAL_IMAGEOUTPUTFILE" id =
+                    "GLOBAL_IMAGEOUTPUTFILE">IMAGEOUTPUTFILE</a></h2>
+
+                <div class = "definition">IMAGEOUTPUTFILE
+                <em class = "meta">imagefile</em>
+                </div>
+
+                <div class = "description">
+                    <p>This specifies the name of the PNG, JPEG or GIF file that will be
+                    generated. The format chosen is based on the file-extension.</p>
+
+                    <p>The equivalent command-line option takes precedence over this
+                    configuration line, if both are used.</p>
+
+                    <p>If you are generating maps using the Cacti plugin, then this
+                    directive is ignored. You can set the output format in the Cacti
+                    Settings page.</p>
+                </div>
+
+                <div class = "changes">
+                    <h3>Change History</h3>
+
+                    <dl>
+                        <dt>0.9</dt>
+
+                        <dd>Added JPEG and GIF support.</dd>
+
+                        <dt>0.7</dt>
+
+                        <dd>Added IMAGEOUTPUTFILE.</dd>
+                    </dl>
+                </div>
+            </div>
+
+            <div class = "referenceentry">
+                <h2><a name = "GLOBAL_FONTDEFINE" id =
+                    "GLOBAL_FONTDEFINE">FONTDEFINE</a></h2>
+
+                <div class = "definition">FONTDEFINE <em class = "meta">fontnumber</em>
+                <em class = "meta">gdfontfile</em>
+                </div>
+
+                <div class = "definition">FONTDEFINE <em class = "meta">fontnumber</em>
+                <em class = "meta">ttffontfile</em> <em class = "meta">fontsize</em>
+                </div>
+
+                <div class = "description">
+                    <p>Defines a custom font to be used for text within the map.</p>
+
+                    <p>By default, the GD library used by Weathermap has 5 fonts,
+                    numbered 1-5. FONTDEFINE allows you to define new font numbers, and
+                    link them to fonts in two other formats.</p>
+
+                    <p>The first format is 'GD fonts', which are a bitmapped format used
+                    by GD alone. They are not scalable, and are also platform-specific
+                    (they use a different byte-order depending on the host). You should
+                    specify the full filename including any extensions.</p>
+
+                    <p>The second format is TrueType fonts, which are scalable, standard
+                    and generally a lot nicer! This time, you need to specify the size
+                    that the font should be rendered at. The size is in pixels. You can
+                    load the same font into multiple fontnumbers with different sizes to
+                    use in different parts of a map.</p>
+
+                    <p>The freetype library used in PHP makes a somewhat complex set of
+                    rules for where it will search for truetype fonts. The two easiest
+                    options are:</p>
+
+                    <ul>
+                        <li>Use the full absolute path to your .ttf file</li>
+
+                        <li>Keep your .ttf files in the Weathermap directory, and use
+                        the first part of the filename only, with no '.ttf' on the
+                        end.</li>
+                    </ul>
+
+                    The full set of rules is
+                    <a href =
+                        "http://www.boutell.com/gd/manual2.0.33.html#gdImageStringFT">available
+                    here</a>
+
+                    <p>Regardless of the format, the newly defined font can be used
+                    anywhere that you'd normally use a font number (for example,
+                    <a href = "#LINK_BWFONT">BWFONT</a> or KEYFONT).</p>
+                </div>
+
+                <div class = "examples">
+                    <h3>Examples</h3>
+
+                    <div class = "example">
+                        <h5>Defining a new Truetype font, with the font file in the
+                        weathermap directory</h5>
+
+                        <pre>
+                                                FONTDEFINE 10 VeraBd 16
+</pre>
+                    </div>
+                </div>
+
+                <div class = "changes">
+                    <h3>Change History</h3>
+
+                    <dl>
+                        <dt>0.8</dt>
+
+                        <dd>First added FONTDEFINE</dd>
+                    </dl>
+                </div>
+            </div>
+
+            <div class = "referenceentry">
+                <h2><a name = "GLOBAL_FONT" id = "GLOBAL_FONT">*FONT</a></h2>
+
+                <div class = "definition">TITLEFONT <em class = "meta">fontnumber</em>
+                </div>
+
+                <div class = "definition">KEYFONT <em class = "meta">fontnumber</em>
+                </div>
+
+                <div class = "definition">TIMEFONT <em class = "meta">fontnumber</em>
+                </div>
+
+                <div class = "description">
+                    <p>Specify the fonts used for various text.</p>
+
+                    <p>Fonts are specified by number. The GD library that Weathermap
+                    uses has 5 built-in fonts, 1-5. You can define new fonts based on
+                    TrueType or GD fonts by using the
+                    <a href = "#GLOBAL_FONTDEFINE">FONTDEFINE</a> directive.</p>
+                </div>
+
+                <div class = "changes">
+                    <h3>Change History</h3>
+
+                    <dl>
+                        <dt>0.8</dt>
+
+                        <dd>Originally added TIMEFONT.</dd>
+
+                        <dt>0.7</dt>
+
+                        <dd>Originally added TIMEFONT.</dd>
+
+                        <dt>0.6</dt>
+
+                        <dd>Originally added KEYFONT.</dd>
+                    </dl>
+                </div>
+            </div>
+
+            <div class = "referenceentry">
+                <h2><a name = "GLOBAL_COLORS" id = "GLOBAL_COLORS">*COLOR</a></h2>
+
+                <div class = "definition">BGCOLOR <em class = "meta">red</em>
+                <em class = "meta">green</em> <em class = "meta">blue</em>
+                </div>
+
+                <div class = "definition">TIMECOLOR <em class = "meta">red</em>
+                <em class = "meta">green</em> <em class = "meta">blue</em>
+                </div>
+
+                <div class = "definition">TITLECOLOR <em class = "meta">red</em>
+                <em class = "meta">green</em> <em class = "meta">blue</em>
+                </div>
+
+                <div class = "definition">KEYTEXTCOLOR <em class = "meta">red</em>
+                <em class = "meta">green</em> <em class = "meta">blue</em>
+                </div>
+
+                <div class = "definition">KEYOUTLINECOLOR <em class = "meta">red</em>
+                <em class = "meta">green</em> <em class = "meta">blue</em>
+                </div>
+
+                <div class = "definition">KEYBGCOLOR <em class = "meta">red</em>
+                <em class = "meta">green</em> <em class = "meta">blue</em>
+                </div>
+
+                <div class = "description">
+                    <p>Specify the colours used for drawing the global elements of the
+                    map.</p>
+
+                    <p>red, green and blue are numbers from 0 to 255.</p>
+
+                    <p>LABELFONTSHADOWCOLOR, LABELBGCOLOR and LABELOUTLINECOLOR have an
+                    additional option - 'none' - which stops that element of the
+                    <a href = "#NODE_LABEL">LABEL</a> being drawn. LABELFONTSHADOWCOLOR
+                    defaults to 'none'.</p>
+                </div>
+
+                <div class = "changes">
+                    <h3>Change History</h3>
+
+                    <dl>
+                        <dt>0.8</dt>
+
+                        <dd>Added TIMECOLOR, TITLECOLOR, KEYTEXTCOLOR, KEYOUTLINECOLOR
+                        and KEYBGCOLOR.</dd>
+
+                        <dt>0.7</dt>
+
+                        <dd>Added BGCOLOR.</dd>
+                    </dl>
+                </div>
+            </div>
+
+            <div class = "referenceentry">
+                <h2><a name = "GLOBAL_KEYPOS" id = "GLOBAL_KEYPOS">KEYPOS</a></h2>
+
+                <div class = "definition">KEYPOS <em class = "meta">x-pos</em>
+                <em class = "meta">y-pos</em>
+                </div>
+
+                <div class = "definition">KEYPOS <em class = "meta">x-pos</em>
+                <em class = "meta">y-pos</em> <em class = "meta">headingstring</em>
+                </div>
+
+                <div class = "description">
+                    <p>Specifies the position of the key, or legend, that shows what
+                    each colour-range means.</p>
+
+                    <p>If no KEYPOS line is given, then no legend is drawn
+                    - handy if you have many many colour ranges. You can optionally
+                    specify an additional parameter, to change the heading above the
+                    colours in the key. This can be used to change the language of the
+                    map, for example.</p>
+                </div>
+
+                <div class = "changes">
+                    <h3>Change History</h3>
+
+                    <dl>
+                        <dt>0.6</dt>
+
+                        <dd>Added ability to change text.</dd>
+                    </dl>
+                </div>
+            </div>
+
+            <div class = "referenceentry">
+                <h2><a name = "GLOBAL_TIMEPOS" id = "GLOBAL_TIMEPOS">TIMEPOS</a></h2>
+
+                <div class = "definition">TIMEPOS <em class = "meta">x-pos</em>
+                <em class = "meta">y-pos</em>
+                </div>
+
+                <div class = "definition">TIMEPOS <em class = "meta">x-pos</em>
+                <em class = "meta">y-pos</em> <em class = "meta">formatstring</em>
+                </div>
+
+                <div class = "description">
+                    <p>Specifies where to draw the timestamp on the map.</p>
+
+                    <p>If no TIMEPOS line is given, then the timestamp is drawn in the
+                    top-right corner. To hide it completely, set y to be
+                    <nobr>-200</nobr> or so.</p>
+
+                    <p>You can optionally specify an additional parameter to change the
+                    text of the timestamp. This text can contain special tokens which
+                    are substituted with parts of the current time. The default
+                    timestamp text is
+                    <nobr><tt>Created: %b %d %Y %H:%M:%S</tt></nobr>. The tokens used
+                    are those accepted by the PHP strftime function. For a full list see
+                    the <a href =
+                        "http://www.php.net/manual/en/function.strftime.php">PHP manual
+                    page</a>.</p>
+                </div>
+
+                <div class = "changes">
+                    <h3>Change History</h3>
+
+                    <dl>
+                        <dt>0.6</dt>
+
+                        <dd>Added ability to change text.</dd>
+
+                        <dt>0.5</dt>
+
+                        <dd>Originally added TIMEPOS</dd>
+                    </dl>
+                </div>
+            </div>
+
+            <div class = "referenceentry">
+                <h2><a name = "GLOBAL_TITLE" id = "GLOBAL_TITLE">TITLE</a></h2>
+
+                <div class = "definition">TITLEPOS <em class = "meta">titlestring</em>
+                </div>
+
+                <div class = "description">
+                    <p>Specifies the title text.</p>
+
+                    <p>The TITLE is shown in file-selectors for both the editor and the
+                    Cacti plugin. If you'd like the title to be shown on the map too,
+                    then add <a href = "#GLOBAL_TITLEPOS">TITLEPOS</a> line also.</p>
+                </div>
+
+                <div class = "changes">
+                    <h3>Change History</h3>
+
+                    <dl>
+                        <dt>0.8</dt>
+
+                        <dd>Originally added TITLEPOS.</dd>
+                    </dl>
+                </div>
+            </div>
+
+            <div class = "referenceentry">
+                <h2><a name = "GLOBAL_TITLEPOS" id = "GLOBAL_TITLEPOS">TITLEPOS</a></h2>
+
+                <div class = "definition">TITLEPOS <em class = "meta">x-pos</em>
+                <em class = "meta">y-pos</em>
+                </div>
+
+                <div class = "definition">TITLEPOS <em class = "meta">x-pos</em>
+                <em class = "meta">y-pos</em> <em class = "meta">headingstring</em>
+                </div>
+
+                <div class = "description">
+                    <p>Specifies the position of the title text.</p>
+
+                    <p>If no TITLEPOS line is given, then no title is drawn. You can
+                    optionally specify an additional parameter, to change the title. Any
+                    text after the second coordinate is taken as a new TITLE.</p>
+                </div>
+
+                <div class = "changes">
+                    <h3>Change History</h3>
+
+                    <dl>
+                        <dt>0.8</dt>
+
+                        <dd>Originally added TITLEPOS.</dd>
+                    </dl>
+                </div>
+            </div>
+
+            <div class = "referenceentry">
+                <h2><a name = "GLOBAL_KILO" id = "GLOBAL_KILO">KILO</a></h2>
+
+                <div class = "definition">KILO <em class = "meta">number</em>
+                </div>
+
+                <div class = "description">
+                    <p>Specifies base value for kilo, mega and giga abbreviations.</p>
+
+                    <p>Both <a href = "#LINK_BANDWIDTH">BANDWIDTH</a> and <a href =
+                        "#LINK_BWLABEL">BWLABEL</a> can use K,M,G,T as abbreviations for
+                    thousands, millions and so on. You can define what the multiple used
+                    is. The default is 1000.</p>
+                </div>
+
+                <div class = "changes">
+                    <h3>Change History</h3>
+
+                    <dl>
+                        <dt>0.4</dt>
+
+                        <dd>Originally added KILO.</dd>
+                    </dl>
+                </div>
+            </div>
+
+            <div class = "referenceentry">
+                <h2><a name = "GLOBAL_HTMLSTYLE" id =
+                    "GLOBAL_HTMLSTYLE">HTMLSTYLE</a></h2>
+
+                <div class = "definition">HTMLSTYLE <em class = "meta">formatname</em>
+                </div>
+
+                <div class = "description">
+                    <p>Specifies the HTML output style.</p>
+
+                    <p>When HTML output is enabled, there are two variations, which you
+                    can choose between. 'static' is a basic HTML page with client-side
+                    imagemap, but no 'pop up' graphs. 'overlib' adds the use of the
+                    OverLib library to the page, so that pop up graphs can work, too.
+                    This requires Javascript, which is why 'static' is the default.</p>
+                </div>
+            </div>
+
+            <div class = "referenceentry">
+                <h2><a name = "GLOBAL_SCALE" id = "GLOBAL_SCALE">SCALE</a></h2>
+
+                <div class = "definition">SCALE <em class = "meta">min</em>
+                <em class = "meta">max</em> <em class = "meta">red</em>
+                <em class = "meta">green</em> <em class = "meta">blue</em>
+                </div>
+
+                <div class = "definition">SCALE <em class = "meta">scalename</em>
+                <em class = "meta">min</em> <em class = "meta">max</em>
+                <em class = "meta">red</em> <em class = "meta">green</em>
+                <em class = "meta">blue</em>
+                </div>
+
+                <div class = "definition">SCALE <em class = "meta">min</em>
+                <em class = "meta">max</em> <em class = "meta">red</em>
+                <em class = "meta">green</em> <em class = "meta">blue</em>
+                <em class = "meta">red2</em> <em class = "meta">green2</em>
+                <em class = "meta">blue2</em>
+                </div>
+
+                <div class = "definition">SCALE <em class = "meta">scalename</em>
+                <em class = "meta">min</em> <em class = "meta">max</em>
+                <em class = "meta">red</em> <em class = "meta">green</em>
+                <em class = "meta">blue</em> <em class = "meta">red2</em>
+                <em class = "meta">green2</em> <em class = "meta">blue2</em>
+                </div>
+
+                <div class = "description">
+                    <p>Defines one 'span' within the link colour-coding table.</p>
+
+                    <p>SCALE is used to specify how LINKs are colour-coded according to
+                    their percent usage. If the percentage usage falls between min and
+                    max then the colour specified by red, green and blue is used to
+                    colour the link. Colour values are between 0 and 255. Percentages
+                    are between 0 and 100, obviously.</p>
+
+                    <p>If you specify
+                    <i>two</i> colours on the line (the third and fourth forms above),
+                    then the colour chosen for the link will be calculated as a
+                    proportion between the two colours. You can avoid specifying many
+                    SCALE lines this way.</p>
+
+                    <p>Without a <i>scalename</i>,
+                    the SCALE line will add a definition to the scale named 'DEFAULT'.
+                    If you define any other named scales, you can then use the
+                    <a href = "#LINK_USESCALE">USESCALE</a> directive to specify that a
+                    particular <a href = "#NODE_NODE">NODE</a> or
+                    <a href = "#LINK_LINK">LINK</a> use your new scale.</p>
+
+                    <p>If you don't add
+                    <i>any</i> SCALE lines to a configuration file, then a default set
+                    is added for you, but as soon as you add one, you'll need to make
+                    enough to cover the whole 0-100 range to get nice colours. Any
+                    percentage not matched by SCALE rules is rendered in grey.</p>
+                </div>
+
+                <div class = "examples">
+                    <h3>Examples</h3>
+
+                    <div class = "example">
+                        <h5>Setting up a (very simple) colour scale. Colours run
+                        smoothly from green to red.</h5>
+
+                        <pre>
+                                                SCALE 0 100   0 255 0   255 0 0
+</pre>
+                    </div>
+
+                    <div class = "example">
+                        <h5>The default scale set</h5>
+
+                        <pre>
+                                                SCALE   1   10    140     0  255
+                                                SCALE  10   25     32    32  255
+                                                SCALE  25   40      0   192  255
+                                                SCALE  40   55      0   240    0
+                                                SCALE  55   70    240   240    0
+                                                SCALE  70   85    255   192    0
+                                                SCALE  85  100    255     0    0
+</pre>
+                    </div>
+                </div>
+
+                <div class = "changes">
+                    <h3>Change History</h3>
+
+                    <dl>
+                        <dt>0.9</dt>
+
+                        <dd>Added named scales.</dd>
+
+                        <dt>0.8</dt>
+
+                        <dd>Added interpolated scale colours.</dd>
+
+                        <dt>0.5</dt>
+
+                        <dd>Changed to allow min and max to be fractional.</dd>
+                    </dl>
+                </div>
+            </div>
+        </div>
+    </body>
 </html>

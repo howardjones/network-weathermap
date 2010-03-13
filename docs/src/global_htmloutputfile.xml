@@ -1,14 +1,29 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version = "1.0" encoding = "UTF-8"?>
 <configentry>
-	<keyword>HTMLOUTPUTFILE</keyword>
-	<scope>GLOBAL</scope>
-	<anchor>GLOBAL_HTMLOUTPUTFILE</anchor>
-    <definition>HTMLOUTPUTFILE <meta>htmlfile</meta></definition>
-    <description  xmlns="http://www.w3.org/1999/xhtml">
+    <keyword>HTMLOUTPUTFILE
+    </keyword>
+
+    <scope>GLOBAL
+    </scope>
+
+    <anchor>GLOBAL_HTMLOUTPUTFILE
+    </anchor>
+
+    <definition>HTMLOUTPUTFILE
+
+        <meta>htmlfile</meta>
+    </definition>
+
+    <description xmlns = "http://www.w3.org/1999/xhtml">
         <p>This specifies the name of the HTML file that will be generated. </p>
-        <p>The equivalent command-line option takes precedence over this configuration line, if both are used.  If you are generating maps using the Cacti plugin, then this directive is ignored.</p>
+
+        <p>The equivalent command-line option takes precedence over this configuration
+        line, if both are used. If you are generating maps using the Cacti plugin, then
+        this directive is ignored.</p>
     </description>
-<changes>
-<change version="0.7">Added HTMLOUTPUTFILE.</change>
-</changes>
+
+    <changes>
+        <change version = "0.7">Added HTMLOUTPUTFILE.
+        </change>
+    </changes>
 </configentry>

@@ -1,3 +1,27 @@
+Before 0.98
+-----------
+poller_output still runs with map-update-period = 0
+entries in weathermap_data are never expired
+collect usage_stats into an .xml file next to each map file
+standalone version of the cacti map browser
+track runtime per map
+improve cron string parsing
+add UI for cron
+improve usage_stats to cover non-regexp config
+improve usage_stats to cover things other than keywords
+more efficient ReadConfig - 50% of runtime!
+very simplified link drawing for classical no-via links.
+
+some things from the wishlist:
+Some kind of shorthand for 'last non-relative node'? Then the sub chunks WOULD be generic
+KEYBGCOLOR none
+KEYOUTLINECOLOR none
+{node:this_link_a:name}
+TAG + {node:tagged:name}
+Cacti editor picker - if it's not traffic_in/traffic_out, let you pick the DSes
+Editor picker - plugin-supplied picker listings - allow for Zabbix,Zenoss,Cricket,Groundwork,MRTG,Orion,Smokeping,WUG etc to supply useful picker info
+
+
 Before 0.97a
 ------------
 FIXED BUG - Editor clone doesn't work
@@ -5,8 +29,6 @@ FIXED BUG - Show Only First Doesn't Work
 FIXED BUG - Editor imagemap has wrong sort order (lower things have priority)
 FIXED Quote escaping bug for NOTES? http://forums.cacti.net/viewtopic.php?p=181452#181452
 DONE VIA editing code http://forums.cacti.net/viewtopic.php?t=29423&highlight=
-
-
 
 
 Before 0.97
@@ -43,11 +65,8 @@ Also some sort of highlight to show that the map wasn't updated successfully las
 DONE!   COMMENTSTYLE center
 
 KEYBGCOLOR none
-
 KEYOUTLINECOLOR none
-
 {node:this_link_a:name}
-
 TAG + {node:tagged:name}
 
 POSITION relative to a variable {node:tagged:name} - means evaluating relative positions a lot later
@@ -58,7 +77,6 @@ DONE!  Use OVERLIBGRAPH, OVERLIBHEIGHT in <IMG> tag. (glen walker)
 
 ProcessString for timepos string
 (+ some formatted date strings for use elsewhere?)
-
 
 Editor off by two? Nodes centered instead of aligning at UR
 http://forums.cacti.net/viewtopic.php?t=29616&start=0&postdays=0&postorder=asc&highlight=
@@ -74,10 +92,6 @@ http://forums.cacti.net/viewtopic.php?t=27516
 
 I just want to add a newline to the TIMEPOS output
 http://forums.cacti.net/viewtopic.php?t=26885
-
-Cacti editor picker - if it's not traffic_in/traffic_out, let you pick the DSes
-
-Editor picker - plugin-supplied picker listings - allow for Zabbix,Zenoss,Cricket,Groundwork,MRTG,Orion,Smokeping,WUG etc to supply useful picker info
 
 DONE!   DS Plugins - pre-load hook. ReadData runs through loop twice - once for recignise, then a pre-Read hook, then all the ReadData. Allows for pre-caching where appropriate (fping, snmp, anything that uses remote calls)
 
@@ -257,7 +271,6 @@ FIXED SET not inherited for links or nodes?
 Things below this line are not urgent
 -----------------------------------------------------------------------------------------------------
 
-Some kind of shorthand for 'last non-relative node'? Then the sub chunks WOULD be generic
 
 Move to seperate runtime vars from config vars in WeatherMapItem - makes WriteConfig and editor UI easier.
 * ReadConfig sets config vars

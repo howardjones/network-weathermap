@@ -50,14 +50,14 @@ class WeatherMapDataSource_external extends WeatherMapDataSource
                 }
                 pclose($pipe);
 
-                if ($i == 5) {
+                if ($i === 5) {
                     $data[IN] = floatval($lines[0]);
                     $data[OUT] = floatval($lines[1]);
 
-                    $item->add_hint("external_line1", $lines[0]);
-                    $item->add_hint("external_line2", $lines[1]);
-                    $item->add_hint("external_line3", $lines[2]);
-                    $item->add_hint("external_line4", $lines[3]);
+                    $item->add_hint('external_line1', $lines[0]);
+                    $item->add_hint('external_line2', $lines[1]);
+                    $item->add_hint('external_line3', $lines[2]);
+                    $item->add_hint('external_line4', $lines[3]);
                     $data_time = time();
                 } else {
                     warn("ExternalScript ReadData: Not enough lines read from external script ($i read, 4 expected) [WMEXT02]\n");

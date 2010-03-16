@@ -3,8 +3,8 @@ class WeatherMapDataSource_cacti extends WeatherMapDataSource
 {
     function Init(&$map)
     {
-        if ($map->context == 'cacti') {
-            if (function_exists('db_fetch_row')) {
+        if ($map->context === 'cacti') {
+            if (true === function_exists('db_fetch_row')) {
                 return (true);
             } else {
                 debug('ReadData cacti: Cacti database library not found.\n');
@@ -18,7 +18,7 @@ class WeatherMapDataSource_cacti extends WeatherMapDataSource
 
     function Recognise($targetstring)
     {
-        if (preg_match("/^cacti:(\d+)$/", $targetstring, $matches)) {
+        if (1 === preg_match('/^cacti:(\d+)$/', $targetstring, $matches)) {
             return true;
         } else {
             return false;
@@ -32,10 +32,10 @@ class WeatherMapDataSource_cacti extends WeatherMapDataSource
         $data[OUT] = null;
         $data_time = 0;
 
-        if (preg_match("/^cacti:(\d+)$/", $targetstring, $matches)) {
+        if (1 === preg_match('/^cacti:(\d+)$/', $targetstring, $matches)) {
             $local_data_id = intval($matches[1]);
 
-            $SQL = "select * from weathermap_data where local_data_id=$local_data_id";
+            $SQL = 'select * from weathermap_data where local_data_id='.$local_data_id;
 
             $result = db_fetch_row($SQL);
 

@@ -55,6 +55,8 @@ function WM_module_checks()
  * @global string $weathermap_map
  * @global boolean $weathermap_debug_suppress
  * @param string $string The actual message to be logged
+ * @param string... the first string is treated as a sprintf format string. 
+ *                  Following params are fed to sprintf()
   */
 
 function debug($string)
@@ -64,6 +66,12 @@ function debug($string)
     global $weathermap_debug_suppress;
 
     if (true === $weathermap_debugging) {
+
+        if(func_num_args() > 1) {
+            $args = func_get_args();
+            $string = call_user_func_array('sprintf', $args);
+        }
+                
         $calling_fn = '';
 
         if (true === function_exists('debug_backtrace')) {
@@ -74,10 +82,10 @@ function debug($string)
             $file = '';
             $line = '';
             
-            $function = (true === isset($bt[$index]['function']) ? $bt[$index]['function'] : '');
+            $function = (true === isset($bt[$index]['function'])) ? $bt[$index]['function'] : '';
             $index = 0;
-            $file = (true === isset($bt[$index]['file']) ? basename($bt[$index]['file']) : '');
-            $line = (true === isset($bt[$index]['line']) ? $bt[$index]['line'] : '');
+            $file = (true === isset($bt[$index]['file'])) ? basename($bt[$index]['file']) : '';
+            $line = (true === isset($bt[$index]['line'])) ? $bt[$index]['line'] : '';
 
             $calling_fn = sprintf(' [%s@%s:%d]', $function, $file, $line);
 
@@ -100,10 +108,10 @@ function debug($string)
             fclose($stderr);
 
             // mostly this is overkill, but it's sometimes useful (mainly in the editor)
-            if (1 == 0) {
+            if (1 === 0) {
                 $log = fopen('debug.log', 'a');
-                fwrite($log, "DEBUG:$calling_fn "
-                    . ($weathermap_map == '' ? '' : $weathermap_map . ": ") . $string);
+                fwrite($log, 'DEBUG:'.$calling_fn.' '
+                    . ($weathermap_map === '' ? '' : $weathermap_map . ': ') . $string);
                 fclose($log);
             }
         }
@@ -126,7 +134,7 @@ function warn($string, $notice_only = false)
     global $weathermap_warncount;
 
     $message = '';
-
+    
     if (false === $notice_only) {
         $weathermap_warncount++;
         $message .= 'WARNING: ';
@@ -178,7 +186,7 @@ function mysprintf($format, $value, $kilo = 1000)
 {
     $output = '';
 
-    debug("mysprintf: $format $value\n");
+    debug("mysprintf: %s %s\n", $format, $value);
 
     if (1 === preg_match('/%(\d*\.?\d*)k/', $format, $matches)) {
         $spec = $matches[1];
@@ -192,7 +200,7 @@ function mysprintf($format, $value, $kilo = 1000)
             }
         // we don't really need the justification (pre-.) part...
         }
-        debug("KMGT formatting $value with $spec.\n");
+        debug("KMGT formatting %s with %s.\n", $value, $spec);
         $result = nice_scalar($value, $kilo, $places);
         $output = preg_replace('/%' . $spec . 'k/', $format, $result);
     } else {
@@ -225,7 +233,7 @@ function ParseString($input)
     // Start the State Machine
     do {
         // Get the next token, which may be the first
-        $sToken = isset($sToken) ? strtok($sTokens) : strtok($input, $sTokens);
+        $sToken = (true === isset($sToken)) ? strtok($sTokens) : strtok($input, $sTokens);
 
         // Are there more tokens?
         if ($sToken === false) {
@@ -266,7 +274,7 @@ function ParseString($input)
         }
 
 // If, at this point, we are not within a phrase, the prepared phrase is complete and can be added to the array
-        if (($cPhraseQuote === null) && ($sPhrase != null)) {
+        if (($cPhraseQuote === null) && ($sPhrase !== null)) {
             $output[] = $sPhrase;
             $sPhrase = null;
         }
@@ -287,7 +295,7 @@ function ParseString($input)
 function myimagecolorallocate($image, $red, $green, $blue)
 {
 // it's possible that we're being called early - just return straight away, in that case
-    if (!isset($image)) {
+    if (false === isset($image)) {
         return (-1);
     }
 
@@ -312,8 +320,8 @@ function screenshotify($input)
 {
     $tmp = $input;
 
-    $tmp = preg_replace("/\b\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}\b/", "127.0.0.1", $tmp);
-    $tmp = preg_replace("/([A-Za-z]{3,})/e", "str_repeat('x',strlen('\\1'))", $tmp);
+    $tmp = preg_replace('/\b\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}\b/', '127.0.0.1', $tmp);
+    $tmp = preg_replace('/([A-Za-z]{3,})/e', "str_repeat('x',strlen('\\1'))", $tmp);
 
     return ($tmp);
 }
@@ -327,14 +335,15 @@ function screenshotify($input)
  */
 function render_colour($col)
 {
-    if (($col[0] == -1) && ($col[1] == -1) && ($col[1] == -1)) {
+    // XXX check if this is still used - WMColour has the same method
+    if (($col[0] === -1) && ($col[1] === -1) && ($col[1] === -1)) {
         return 'none';
-    } else if (($col[0] == -2) && ($col[1] == -2) && ($col[1] == -2)) {
+    } else if (($col[0] === -2) && ($col[1] === -2) && ($col[1] === -2)) {
         return 'copy';
-    } else if (($col[0] == -3) && ($col[1] == -3) && ($col[1] == -3)) {
+    } else if (($col[0] === -3) && ($col[1] === -3) && ($col[1] === -3)) {
         return 'contrast';
     } else {
-        return sprintf("%d %d %d", $col[0], $col[1], $col[2]);
+        return sprintf('%d %d %d', $col[0], $col[1], $col[2]);
     }
 }
 
@@ -381,8 +390,6 @@ function imagefilledroundedrectangle($image, $x1, $y1, $x2, $y2, $radius, $color
         $color, IMG_ARC_PIE);
     imagefilledarc($image, $x2 - $radius, $y2 - $radius, $radius * 2, $radius * 2, 0, 360,
         $color, IMG_ARC_PIE);
-
-# bool imagefilledarc  ( resource $image  , int $cx  , int $cy  , int $width  , int $height  , int $start  , int $end  , int $color  , int $style  )
 }
 
 // draw a round-cornered rectangle
@@ -495,8 +502,8 @@ function imagecolorize($im, $r, $g, $b)
     // which will go from black to white
     //
     // Input color luminosity: this is equivalent to the
-    // position of the input color in the monochromatic palette
-    $lum_inp = round(255 * ($r + $g + $b) / 765); //765=255*3
+    // position of the input color in the monochromatic palette (765=255*3)
+    $lum_inp = round(255 * ($r + $g + $b) / 765);
 
     //We fill the palette entry with the input color at its
     //corresponding position
@@ -952,8 +959,6 @@ function calc_straight(&$in_xarray, &$in_yarray, $pointsperspan = 12)
         $distance
     );
 
-    #	print_r($curvepoints);
-
     return ($curvepoints);
 }
 
@@ -1287,20 +1292,18 @@ function draw_straight($image, &$curvepoints, $widths, $outlinecolour, $fillcolo
                 wimagefilledpolygon($image, $finalpoints, count($finalpoints) / 2,
                     $arrowsettings[4]);
             } else {
-                debug(
-                    "Not drawing $linkname ($dir) fill because there is no fill colour\n");
+                debug("Not drawing %s (%s) outline because there is no fill colour\n", $linkname, $dir);
             }
 
-            $areaname = "LINK:L" . $map->links[$linkname]->id . ":$dir";
-            $map->imap->addArea("Polygon", $areaname, '', $finalpoints);
-            debug('Adding Poly imagemap for '.$areaname."\n");
+            $areaname = 'LINK:L' . $map->links[$linkname]->id . ':'.$dir;
+            $map->imap->addArea('Polygon', $areaname, '', $finalpoints);
+            debug("Adding Poly imagemap for %s\n", $areaname);
 
             if (false === is_null($outlinecolour)) {
                 wimagepolygon($image, $finalpoints, count($finalpoints) / 2,
                     $arrowsettings[5]);
             } else {
-                debug(
-                    "Not drawing $linkname ($dir) outline because there is no outline colour\n");
+                debug("Not drawing %s (%s) outline because there is no outline colour\n", $linkname, $dir);
             }
         }
     }
@@ -1367,7 +1370,7 @@ function draw_curve($image, &$curvepoints, $widths, $outlinecolour, $fillcolours
 
     if ($totaldistance <= $minimumlength) {
         warn(
-            "Skipping drawing very short link ($linkname). Impossible to draw! Try changing WIDTH or ARROWSTYLE? [WMWARN01]\n");
+            "Skipping drawing very short link (%s). Impossible to draw! Try changing WIDTH or ARROWSTYLE? [WMWARN01]\n", $linkname);
         return;
     }
 
@@ -1439,7 +1442,7 @@ function draw_curve($image, &$curvepoints, $widths, $outlinecolour, $fillcolours
         $x = array_pop($back_points);
 
         do {
-            $metapts .= " $x $y";
+            $metapts .= ' '. $x.' '.$y;
             $there_points[] = $x;
             $there_points[] = $y;
             $y = array_pop($back_points);
@@ -1456,19 +1459,18 @@ function draw_curve($image, &$curvepoints, $widths, $outlinecolour, $fillcolours
             wimagefilledpolygon($image, $there_points, count($there_points) / 2,
                 $arrowsettings[$dir][4]);
         } else {
-            debug("Not drawing $linkname ($dir) fill because there is no fill colour\n");
+            debug("Not drawing %s (%s) fill because there is no fill colour\n", $linkname, $dir);
         }
 
         $areaname = 'LINK:L' . $map->links[$linkname]->id . ':'.$dir;
         $map->imap->addArea('Polygon', $areaname, '', $there_points);
-        debug("Adding Poly imagemap for $areaname\n");
+        debug("Adding Poly imagemap for %s\n", $areaname);
 
         if (false === is_null($outlinecolour)) {
             wimagepolygon($image, $there_points, count($there_points) / 2,
                 $arrowsettings[$dir][5]);
         } else {
-            debug(
-                "Not drawing $linkname ($dir) outline because there is no outline colour\n");
+            debug("Not drawing %s (%s) fill because there is no outline colour\n", $linkname, $dir);
         }
     }
 }
@@ -1508,7 +1510,7 @@ function simplify_spine(&$input, $epsilon = 1e-10)
         }
     }
 
-    debug("Skipped $skip points of $c\n");
+    debug("Skipped %d points of %d\n", $skip, $c);
 
     $output[] = $input[$c + 1];
     return $output;
@@ -1582,9 +1584,9 @@ function calc_offset($offsetstring, $width, $height)
     } elseif (1 === preg_match('/(NE|SE|NW|SW|N|S|E|W|C)(\d+)?$/i', $offsetstring, $matches)) {
         $multiply = 1;
 
-        if (isset($matches[2])) {
+        if (true === isset($matches[2])) {
             $multiply = intval($matches[2]) / 100;
-            debug("Percentage compass offset: multiply by $multiply");
+            debug("Percentage compass offset: multiply by %f\n",$multiply);
         }
 
         $height = $height * $multiply;
@@ -1676,7 +1678,7 @@ function calc_offset($offsetstring, $width, $height)
             $y
         ));
     } else {
-        warn("Got a position offset that didn't make sense ($offsetstring).");
+        warn("Got a position offset that didn't make sense (%s).", $offsetstring);
         return (array (
             0,
             0

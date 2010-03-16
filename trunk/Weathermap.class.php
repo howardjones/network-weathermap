@@ -47,7 +47,6 @@ define('X', 0);
 define('Y', 1);
 define('DISTANCE', 2);
 
-// ***********************************************
 
 // template class for data sources. All data sources extend this class.
 // I really wish PHP4 would just die overnight
@@ -107,8 +106,6 @@ class WeatherMapPostProcessor
     }
 }
 
-// ***********************************************
-
 // Links, Nodes and the Map object inherit from this class ultimately.
 // Just to make some common code common.
 class WeatherMapBase
@@ -119,13 +116,13 @@ class WeatherMapBase
 
     function add_note($name, $value)
     {
-        debug('Adding note ' . $name . "='" . $value . "' to " . $this->name . "\n");
+        debug("Adding note %s='%s' to %s\n", $name, $value, $this->name);
         $this->notes[$name] = $value;
     }
 
     function get_note($name)
     {
-        if (isset($this->notes[$name])) {
+        if (true === isset($this->notes[$name])) {
 
             return ($this->notes[$name]);
         } else {
@@ -136,14 +133,14 @@ class WeatherMapBase
 
     function add_hint($name, $value)
     {
-        debug("Adding hint $name='$value' to " . $this->name . "\n");
+        debug("Adding hint %s='%s' to %s\n", $name, $value, $this->name);
         $this->hints[$name] = $value;
     
     }
 
     function get_hint($name)
     {
-        if (isset($this->hints[$name])) {
+        if (true === isset($this->hints[$name])) {
 
             return ($this->hints[$name]);
         } else {
@@ -456,10 +453,10 @@ class WeatherMap extends WeatherMapBase
     function myimagestring($image, $fontnumber, $x, $y, $string, $colour, $angle = 0)
     {
         // if it's supposed to be a special font, and it hasn't been defined, then fall through
-        if ($fontnumber > 5 && !isset($this->fonts[$fontnumber])) {
-            warn("Using a non-existent special font ($fontnumber) - falling back to internal GD fonts [WMWARN03]\n");
+        if ($fontnumber > 5 && (false === isset($this->fonts[$fontnumber]))) {
+            warn(sprintf("Using a non-existent special font (%d) - falling back to internal GD fonts [WMWARN03]\n", $fontnumber));
 
-            if ($angle != 0) {
+            if ($angle !== 0) {
                 warn("Angled text doesn't work with non-FreeType fonts [WMWARN02]\n");
             }
 
@@ -470,22 +467,22 @@ class WeatherMap extends WeatherMapBase
             imagestring($image, $fontnumber, $x, $y - imagefontheight($fontnumber),
                 $string, $colour);
 
-            if ($angle != 0) {
+            if ($angle !== 0) {
                 warn("Angled text doesn't work with non-FreeType fonts [WMWARN02]\n");
             }
         } else {
             // look up what font is defined for this slot number
-            if ($this->fonts[$fontnumber]->type == 'truetype') {
+            if ($this->fonts[$fontnumber]->type === 'truetype') {
                 wimagettftext($image, $this->fonts[$fontnumber]->size, $angle, $x, $y,
                     $colour, $this->fonts[$fontnumber]->file, $string);
             }
 
-            if ($this->fonts[$fontnumber]->type == 'gd') {
+            if ($this->fonts[$fontnumber]->type === 'gd') {
                 imagestring($image, $this->fonts[$fontnumber]->gdnumber, $x,
                     $y - imagefontheight($this->fonts[$fontnumber]->gdnumber), $string,
                     $colour);
 
-                if ($angle != 0) {
+                if ($angle !== 0) {
                     warn("Angled text doesn't work with non-FreeType fonts [WMWARN04]\n");
                 }
             }
@@ -515,15 +512,15 @@ class WeatherMap extends WeatherMapBase
             );
         } else {
             // look up what font is defined for this slot number
-            if (!isset($this->fonts[$fontnumber])) {
-                warn("Using a non-existent special font ($fontnumber) - falling back to internal GD fonts [WMWARN36]\n");
+            if (false === isset($this->fonts[$fontnumber])) {
+                warn(sprintf("Using a non-existent special font (%d) - falling back to internal GD fonts [WMWARN36]\n", $fontnumber));
                 $fontnumber = 5;
                 return array (
                     imagefontwidth($fontnumber) * $maxlinelength,
                     $linecount * imagefontheight($fontnumber)
                 );
             } else {
-                if ($this->fonts[$fontnumber]->type == 'truetype') {
+                if ($this->fonts[$fontnumber]->type === 'truetype') {
                     $ysize = 0;
                     $xsize = 0;
 
@@ -546,7 +543,7 @@ class WeatherMap extends WeatherMapBase
                     ));
                 }
 
-                if ($this->fonts[$fontnumber]->type == 'gd') {
+                if ($this->fonts[$fontnumber]->type === 'gd') {
                     return array (
                         imagefontwidth($this->fonts[$fontnumber]->gdnumber)
                             * $maxlinelength,
@@ -564,13 +561,13 @@ class WeatherMap extends WeatherMapBase
 
         $context_description = strtolower($context->my_type());
 
-        if ($context_description != 'map') {
+        if ($context_description !== 'map') {
             $context_description .= ':' . $context->name;
         }
 
         debug("Trace: ProcessString($input, $context_description)\n");
 
-        if ($multiline == true) {
+        if ($multiline === true) {
             $i = $input;
             $input = str_replace("\\n", "\n", $i);        
         }
@@ -578,75 +575,74 @@ class WeatherMap extends WeatherMapBase
         $output = $input;
 
         
-        while (preg_match("/(\{(?:node|map|link)[^}]+\})/", $input, $matches)) {
-            $value = "[UNKNOWN]";
-            $format = "";
+        while (preg_match('/(\{(?:node|map|link)[^}]+\})/', $input, $matches)) {
+            $value = '[UNKNOWN]';
+            $format = '';
             $key = $matches[1];
-            debug("ProcessString: working on " . $key . "\n");
+            debug("ProcessString: working on %s\n", $key);
 
-            if (preg_match("/\{(node|map|link):([^}]+)\}/", $key, $matches)) {
+            if (preg_match('/\{(node|map|link):([^}]+)\}/', $key, $matches)) {
                 $type = $matches[1];
                 $args = $matches[2];
         
 
-                if ($type == 'map') {
+                if ($type === 'map') {
                     $the_item = $this;
 
-                    if (preg_match("/map:([^:]+):*([^:]*)/", $args, $matches)) {
+                    if (preg_match('/map:([^:]+):*([^:]*)/', $args, $matches)) {
                         $args = $matches[1];
                         $format = $matches[2];
                     }
                 }
 
-                if (($type == 'link') || ($type == 'node')) {
-                    if (preg_match("/([^:]+):([^:]+):*([^:]*)/", $args, $matches)) {
+                if (($type === 'link') || ($type === 'node')) {
+                    if (preg_match('/([^:]+):([^:]+):*([^:]*)/', $args, $matches)) {
                         $itemname = $matches[1];
                         $args = $matches[2];
                         $format = $matches[3];
 
                         $the_item = null;
 
-                        if (($itemname == "this")
-                            && ($type == strtolower($context->my_type()))) {
+                        if (($itemname === 'this')
+                            && ($type === strtolower($context->my_type()))) {
                             $the_item = $context;
-                        } elseif (strtolower($context->my_type()) == "link"
-                            && $type == 'node'
-                            && ($itemname == '_linkstart_' || $itemname == '_linkend_')) {
+                        } elseif (strtolower($context->my_type()) === 'link'
+                            && $type === 'node'
+                            && ($itemname === '_linkstart_' || $itemname === '_linkend_')) {
                             // this refers to the two nodes at either end of this link
-                            if ($itemname == '_linkstart_') {
+                            if ($itemname === '_linkstart_') {
                                 $the_item = $context->a;
                             }
 
-                            if ($itemname == '_linkend_') {
+                            if ($itemname === '_linkend_') {
                                 $the_item = $context->b;
                             }
-                        } elseif (($itemname == "parent")
+                        } elseif (($itemname === 'parent')
                             && ($type == strtolower($context->my_type()))
                                 && ($type == 'node') && ($context->relative_to != '')) {
                             $the_item = $this->nodes[$context->relative_to];
                         } else {
-                            if (($type == 'link') && isset($this->links[$itemname])) {
+                            if (($type === 'link') && (true === isset($this->links[$itemname]))) {
                                 $the_item = $this->links[$itemname];
                             }
 
-                            if (($type == 'node') && isset($this->nodes[$itemname])) {
+                            if (($type === 'node') && (true === isset($this->nodes[$itemname]))) {
                                 $the_item = $this->nodes[$itemname];
                             }
                         }
                     }
                 }
 
-                if (is_null($the_item)) {
+                if (true === is_null($the_item)) {
                     warn("ProcessString: $key refers to unknown item (context is $context_description) [WMWARN05]\n");
                 } else {
-                    #	warn($the_item->name.": ".var_dump($the_item->hints)."\n");
-                    debug("ProcessString: Found appropriate item: " . get_class($the_item)
-                        . " " . $the_item->name . "\n");
+                    debug("ProcessString: Found appropriate item: %s %s\n",get_class($the_item),
+                        $the_item->name);
 
 // SET and notes have precedent over internal properties
 // this is my laziness - it saves me having a list of reserved words
 // which are currently used for internal props. You can just 'overwrite' any of them.
-                    if (isset($the_item->hints[$args])) {
+                    if (true === isset($the_item->hints[$args])) {
                         $value = $the_item->hints[$args];
                         debug("ProcessString: used hint\n");
                     }
@@ -668,14 +664,13 @@ class WeatherMap extends WeatherMapBase
             if ($value === null) {
                 $value = 'NULL';
             }
-            debug("ProcessString: replacing " . $key . " with $value\n");
+            debug("ProcessString: replacing %s with %s\n",$key, $value);
 
             
-            if ($format != '') {
+            if ($format !== '') {
 
                 $value = mysprintf($format, $value);
             }
-
             
             $input = str_replace($key, '', $input);
             $output = str_replace($key, $value, $output);
@@ -692,62 +687,64 @@ class WeatherMap extends WeatherMapBase
         }
     }
 
-    function LoadPlugins($type = "data", $dir = "lib/datasources")
+    function LoadPlugins($type = 'data', $dir = 'lib/datasources')
     {
-        debug("Beginning to load $type plugins from $dir\n");
+        debug("Beginning to load %s plugins from %s\n",$type, $dir);
 
-        if (!file_exists($dir)) {
+        if (false === file_exists($dir)) {
             $dir = dirname(__FILE__) . DIRECTORY_SEPARATOR . $dir;
-            debug("Relative path didn't exist. Trying $dir\n");
+            debug("Relative path didn't exist. Trying %s\n", $dir);
         }
         
         $dh = @opendir($dir);
 
-        if (!$dh) { // try to find it with the script, if the relative path fails
+        if (false === $dh) { // try to find it with the script, if the relative path fails
             $srcdir = substr($_SERVER['argv'][0], 0,
                 strrpos($_SERVER['argv'][0], DIRECTORY_SEPARATOR));
             $dh = opendir($srcdir . DIRECTORY_SEPARATOR . $dir);
 
-            if ($dh) {
+            if (false !== $dh) {
                 $dir = $srcdir . DIRECTORY_SEPARATOR . $dir;
             }
         }
 
-        if ($dh) {
+        if (false !== $dh) {
             while ($file = readdir($dh)) {
                 $realfile = $dir . DIRECTORY_SEPARATOR . $file;
 
                 if (is_file($realfile) && preg_match('/\.php$/', $realfile)) {
                     debug("Loading $type Plugin class from $file\n");
 
-                    include_once($realfile);
-                    $class = preg_replace("/\.php$/", "", $file);
+                    include_once $realfile;
+                    $class = preg_replace('/\.php$/', '', $file);
 
-                    if ($type == 'data') {
+                    if ($type === 'data') {
                         $this->datasourceclasses[$class] = $class;
                         $this->activedatasourceclasses[$class] = 1;
                     }
 
-                    if ($type == 'pre')
+                    if ($type === 'pre') {
                         $this->preprocessclasses[$class] = $class;
+                    }
 
-                    if ($type == 'post')
+                    if ($type === 'post') {
                         $this->postprocessclasses[$class] = $class;
+                    }
 
-                    debug("Loaded $type Plugin class $class from $file\n");
+                    debug("Loaded %s Plugin class %s from %s\n", $type, $class, $file);
                     $this->plugins[$type][$class] = new $class;
 
-                    if (!isset($this->plugins[$type][$class])) {
-                        debug("** Failed to create an object for plugin $type/$class\n");
+                    if (false === isset($this->plugins[$type][$class])) {
+                        debug("** Failed to create an object for plugin %s/%s\n", $type, $class);
                     } else {
-                        debug("Instantiated $class.\n");
+                        debug("Instantiated %s.\n", $class);
                     }
                 } else {
-                    debug("Skipping $file\n");
+                    debug("Skipping %s\n", $file);
                 }
             }
         } else {
-            warn("Couldn't open $type Plugin directory ($dir). Things will probably go wrong. [WMWARN06]\n");
+            warn("Couldn't open %s Plugin directory (%s). Things will probably go wrong. [WMWARN06]\n", $type, $dir);
         }
     }
 
@@ -758,14 +755,14 @@ class WeatherMap extends WeatherMapBase
         foreach ($this->datasourceclasses as $ds_class) {
             // make an instance of the class
             $dsplugins[$ds_class] = new $ds_class;
-            debug("Running $ds_class" . "->Init()\n");
+            debug("Running %s->Init()\n", $ds_class);
             
             assert('isset($this->plugins["data"][$ds_class])');
 
             $ret = $this->plugins['data'][$ds_class]->Init($this);
 
-            if (!$ret) {
-                debug("Removing $ds_class from Data Source list, since Init() failed\n");
+            if (false === $ret) {
+                debug("Removing %s from Data Source list, since Init() failed\n", $ds_class);
                 $this->activedatasourceclasses[$ds_class] = 0;
             
             }
@@ -891,7 +888,7 @@ class WeatherMap extends WeatherMapBase
         debug("ReadData: Updating link data for all links and nodes\n");
 
         // we skip readdata completely in sizedebug mode
-        if ($this->sizedebug == 0) {
+        if ($this->sizedebug === 0) {
             $this->ProcessTargets();
 
             debug("======================================\n");
@@ -927,7 +924,7 @@ class WeatherMap extends WeatherMapBase
                     $total_out = 0;
                     $name = $myobj->name;
                     debug("\n");
-                    debug("ReadData for $type $name: \n");
+                    debug("ReadData for %s %s: \n", $type, $name);
 
                     if (($type == 'LINK' && isset($myobj->a))
                         || ($type == 'NODE' && !is_null($myobj->x))) {
@@ -935,7 +932,7 @@ class WeatherMap extends WeatherMapBase
                             $tindex = 0;
 
                             foreach ($myobj->targets as $target) {
-                                debug("ReadData: New Target: $target[4]\n");
+                                debug("ReadData: New Target: %s\n",$target[4]);
 
 
                                 $targetstring = $target[0];
@@ -947,23 +944,23 @@ class WeatherMap extends WeatherMapBase
                                 $out = 0;
                                 $datatime = 0;
 
-                                if ($target[4] != '') {
+                                if ($target[4] !== '') {
 // processstring won't use notes (only hints) for this string
 
                                     $targetstring =
                                         $this->ProcessString($target[0], $myobj, false,
                                             false);
 
-                                    if ($target[0] != $targetstring) {
-                                        debug("Targetstring is now $targetstring\n");
+                                    if ($target[0] !== $targetstring) {
+                                        debug("Targetstring is now %s\n",$targetstring);
                                     }
                                         
 
-                                    if ($multiply != 1) {
-                                        debug("Will multiply result by $multiply\n");
+                                    if ($multiply !== 1) {
+                                        debug("Will multiply result by %f\n",$multiply);
                                     }
 
-                                    if ($target[0] != "") {
+                                    if ($target[0] !== '') {
                                         $matched_by = $target[5];
                                         list($in, $out, $datatime) =
                                             $this->plugins['data'][$target[5]]->ReadData(
@@ -1204,15 +1201,16 @@ class WeatherMap extends WeatherMapBase
             $colours = $this->colours[$scalename];
 
             if ($is_percent && $value > 100) {
-                if ($nowarn_clipping == 0)
+                if ($nowarn_clipping == 0) {
                     warn("NewColourFromPercent: Clipped $value% to 100% for item $name [WMWARN33]\n");
-
+                }
                 $value = 100;
             }
 
             if ($is_percent && $value < 0) {
-                if ($nowarn_clipping == 0)
+                if ($nowarn_clipping == 0) {
                     warn("NewColourFromPercent: Clipped $value% to 0% for item $name [WMWARN34]\n");
+                }
                 $value = 0;
             }
 
@@ -1250,8 +1248,9 @@ class WeatherMap extends WeatherMapBase
                         $matchsize = $range;
                     }
 
-                    if (isset($colour['tag']))
+                    if (isset($colour['tag'])) {
                         $tag = $colour['tag'];
+                    }
                     
                     debug("NCFPC $name $scalename $value '$tag' $key $r $g $b\n");
 
@@ -1285,10 +1284,10 @@ class WeatherMap extends WeatherMapBase
             );
         }
 
-        if ($nowarn_scalemisses == 0)
+        if ($nowarn_scalemisses == 0) {
             warn("NewColourFromPercent: Scale $scalename doesn't include a line for $value"
                 . ($is_percent ? "%" : "") . " while drawing item $name [WMWARN29]\n");
-
+        }
         // and you'll only get white for a link with no colour assigned
         return array (
             new Colour(255, 255, 255),
@@ -4570,18 +4569,18 @@ class WeatherMap extends WeatherMapBase
         // this is not precisely efficient, but it'll get us going
         // XXX - get Imagemap to store Z order, or map items to store the imagemap
         foreach ($all_layers as $z) {
-            debug("Writing HTML for layer $z\n");
+            debug("Writing HTML for layer %d\n", $z);
             $z_items = $this->seen_zlayers[$z];
 
             if (is_array($z_items)) {
-                debug("   Found things for layer $z\n");
+                debug("   Found things for layer %d\n", $z);
 
                 // at z=1000, the legends and timestamps live
                 if ($z === 1000) {
                     debug("     Builtins fit here.\n");
-                    $html .= $this->imap->subHTML("LEGEND:", true, ($this->context
+                    $html .= $this->imap->subHTML('LEGEND:', true, ($this->context
                         != 'editor'));
-                    $html .= $this->imap->subHTML("TIMESTAMP", true, ($this->context
+                    $html .= $this->imap->subHTML('TIMESTAMP', true, ($this->context
                         != 'editor'));
                 }
 
@@ -4590,16 +4589,17 @@ class WeatherMap extends WeatherMapBase
                     if ($it->name != 'DEFAULT' && $it->name != ':: DEFAULT ::') {
                         $name = '';
 
-                        if (strtolower(get_class($it)) == 'weathermaplink') {
+                        if (strtolower(get_class($it)) === 'weathermaplink') {
                             $name = 'LINK:L';
                         }
 
-                        if (strtolower(get_class($it)) == 'weathermapnode') {
+                        if (strtolower(get_class($it)) === 'weathermapnode') {
                             $name = 'NODE:N';
                         }
                         $name .= $it->id . ":";
-                        debug("      Writing $name from imagemap\n");
-// skip the linkless areas if we are in the editor - they're redundant
+                        debug("      Writing %s from imagemap\n", $name);
+                        
+                        // skip the linkless areas if we are in the editor - they're redundant
                         $html .= $this->imap->subHTML($name, true, ($this->context
                             != 'editor'));
                     }
@@ -4626,7 +4626,7 @@ class WeatherMap extends WeatherMapBase
         // we use CRC32 because it makes for a shorter filename, and collisions aren't the end of the world.
         $cacheprefix = dechex(crc32($this->configfile));
 
-        debug("Comparing files in $cachefolder starting with $cacheprefix, with date of $configchanged\n");
+        debug("Comparing files in %s starting with %s, with date of %s\n", $cachefolder, $cacheprefix, $configchanged);
 
         $dh = opendir($cachefolder);
         if($dh === false) {
@@ -4641,11 +4641,11 @@ class WeatherMap extends WeatherMapBase
 
                 if (is_file($realfile) && (preg_match('/^' . $cacheprefix . '/', $file)))
                 {
-                    debug("$realfile\n");
+                    debug("Cache: checking %s\n",$realfile);
 
                     if ((filemtime($realfile) < $configchanged)
                         || ((time() - filemtime($realfile)) > $agelimit)) {
-                        debug("Cache: deleting $realfile\n");
+                        debug("Cache: deleting %s\n",$realfile);
                         unlink($realfile);
                     }
                 }
@@ -4667,12 +4667,12 @@ class WeatherMap extends WeatherMapBase
                 imagepng($image, $cachefolder . DIRECTORY_SEPARATOR . $scalefile);
             }
 
-            $json = "";
-            $fd = fopen($cachefolder . DIRECTORY_SEPARATOR . $cacheprefix . "_map.json",
-                "w");
+            $json = '';
+            $fd = fopen($cachefolder . DIRECTORY_SEPARATOR . $cacheprefix . '_map.json',
+                'w');
 
             foreach (array_keys($this->inherit_fieldlist) as $fld) {
-                $json .= js_escape($fld) . ": ";
+                $json .= js_escape($fld) . ': ';
                 $json .= js_escape($this->$fld);
                 $json .= ",\n";
             }
@@ -4681,7 +4681,7 @@ class WeatherMap extends WeatherMapBase
             fclose($fd);
 
             $json = '';
-            $fd = fopen($cachefolder . DIRECTORY_SEPARATOR . $cacheprefix . "_tree.json",
+            $fd = fopen($cachefolder . DIRECTORY_SEPARATOR . $cacheprefix . '_tree.json',
                 'w');
             $id = 10; // first ID for user-supplied thing
 

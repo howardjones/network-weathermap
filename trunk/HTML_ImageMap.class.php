@@ -280,9 +280,8 @@ class HTML_ImageMap
             $elementObject = new $className($args[1], $args[2], array_slice($args, 3));
         }
 
-        $this->shapes[] = &$elementObject;
-        $this->nshapes++;
-    
+        $this->shapes[ $elementObject->name ] = &$elementObject;
+        $this->nshapes++;    
     }
 
     // do a hit-test based on the current map
@@ -309,23 +308,23 @@ class HTML_ImageMap
     {
         $count = 0;
 
-        for ($i = 0; $i < count($this->shapes); $i++) {
+        #for ($i = 0; $i < count($this->shapes); $i++) {
             // this USED to be a substring match, but that broke some things
             // and wasn't actually used as one anywhere.
-            if (($where === '') || ($this->shapes[$i]->name === $where)) {
+         #   if (($where === '') || ($this->shapes[$i]->name === $where)) {
                 switch ($which) {
                     case 'href':
-                        $this->shapes[$i]->href = $what;
+                        $this->shapes[$which]->href = $what;
                         break;
 
                     case 'extrahtml':
-                        $this->shapes[$i]->extrahtml = $what;
+                        $this->shapes[$which]->extrahtml = $what;
                         
                         break;
                 }
                 $count++;
-            }
-        }
+          #  }
+       # }
         return $count;
     }
 

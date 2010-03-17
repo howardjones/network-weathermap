@@ -293,7 +293,7 @@ class HTML_ImageMap
 
         foreach ($this->shapes as $shape) {
             if (true === $shape->hitTest($x, $y)) {
-                if (($namefilter === '') || (true === preg_match($preg, $shape->name))) {
+                if (($namefilter === '') || (1 === preg_match($preg, $shape->name))) {
                     return $shape->name;
                 }
             }
@@ -308,23 +308,19 @@ class HTML_ImageMap
     {
         $count = 0;
 
-        #for ($i = 0; $i < count($this->shapes); $i++) {
-            // this USED to be a substring match, but that broke some things
-            // and wasn't actually used as one anywhere.
-         #   if (($where === '') || ($this->shapes[$i]->name === $where)) {
-                switch ($which) {
-                    case 'href':
-                        $this->shapes[$which]->href = $what;
-                        break;
-
-                    case 'extrahtml':
-                        $this->shapes[$which]->extrahtml = $what;
-                        
-                        break;
-                }
+        // this USED to be a substring match, but that broke some things
+        // and wasn't actually used as one anywhere.
+        switch ($which) {
+            case 'href':
+                $this->shapes[$where]->href = $what;
                 $count++;
-          #  }
-       # }
+                break;
+
+            case 'extrahtml':
+                $this->shapes[$where]->extrahtml = $what;
+                $count++;
+                break;
+        }
         return $count;
     }
 
@@ -379,7 +375,7 @@ class HTML_ImageMap
         $preg = '/' . $namefilter . '/';
 
         foreach ($this->shapes as $shape) {
-            if (($namefilter === '') || (true === preg_match($preg, $shape->name))) {
+            if (($namefilter === '') || (1 === preg_match($preg, $shape->name))) {
                 if ($reverseorder === true) {
                     $json = $shape->asJSON() . ",\n" . $json;
                 } else {

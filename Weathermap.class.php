@@ -2670,17 +2670,15 @@ class WeatherMap extends WeatherMapBase
 
     function ReadConfig($input, $is_include = false)
     {
-		global $WM_config_keywords;
-		global $WM_config_keywords2;
-			
+        			
         $curnode = null;
         $curlink = null;
         $matches = 0;
         $nodesseen = 0;
         $linksseen = 0;
         $scalesseen = 0;
-        $last_seen = "GLOBAL";
-        $filename = "";
+        $last_seen = 'GLOBAL';
+        $filename = '';
         $objectlinecount = 0;
 
 		
@@ -2843,7 +2841,7 @@ class WeatherMap extends WeatherMapBase
                         }
 
                         $curnode->configline = $linecount;
-                        $last_seen = "NODE";
+                        $last_seen = 'NODE';
                         $linematched++;
                         $curobj = &$curnode;
                     }
@@ -2858,39 +2856,25 @@ class WeatherMap extends WeatherMapBase
                 $args = ParseString($buffer);
 
 // this loop replaces a whole pile of duplicated ifs with something with consistent handling
-                foreach ($WM_config_keywords as $keyword) {
-                    if (preg_match("/" . $keyword[0] . "/", $last_seen)) {
-                        $statskey = $last_seen . "-" . $keyword[1];
-                        $statskey = str_replace(array (
-                            '/^\s*',
-                            '\s*$/i'
-                        ), array (
-                            '',
-                            ''
-                        ), $statskey);
+                foreach ($GLOBALS['WM_config_keywords'] as $keyword) {
+                    if ( ($linematched === 0) && (1 === preg_match('/' . $keyword[0] . '/', $last_seen)) ) {
 
-                        if (!isset($this->usage_stats[$statskey])) {
-                            $this->usage_stats[$statskey] = 0;
-                        }
-
-                        if (preg_match($keyword[1], $buffer, $matches)) {
-
-                            $this->usage_stats[$statskey]++;
+                        if (1 === preg_match($keyword[1], $buffer, $matches)) {
 
                             foreach ($keyword[2] as $key => $val) {
 // so we can poke in numbers too, if the value starts with #
 // then take the # off, and treat the rest as a number literal
-                                if (preg_match("/^#(.*)/", $val, $m)) {
+                                if (1 === preg_match('/^#(.*)/', $val, $m)) {
                                     $val = $m[1];
                                 } elseif (is_numeric($val)) {
-                                    // if it's a number, then it;s a match number,
+                                    // if it's a number, then it's a match number,
                                     // otherwise it's a literal to be put into a variable
                                     $val = $matches[$val];
                                 }
 
                                 assert('is_object($curobj)');
 
-                                if (preg_match('/^(.*)\[([^\]]+)\]$/', $key, $m)) {
+                                if (1 === preg_match('/^(.*)\[([^\]]+)\]$/', $key, $m)) {
                                     $index = constant($m[2]);
                                     $key = $m[1];
                                     $curobj->{$key}[$index] = $val;
@@ -2899,7 +2883,6 @@ class WeatherMap extends WeatherMapBase
                                 }
                             }
                             $linematched++;
-                            # print "\n\n";
                             break;
                         }
                     }

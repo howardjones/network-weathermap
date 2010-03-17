@@ -270,6 +270,15 @@ class HTML_ImageMap
     }
 
 // add an element to the map - takes an array with the info, in a similar way to HTML_QuickForm
+/**
+ * 
+ * @param string OR object $element
+ * @param optional string name
+ * @param optional string href
+ * @param optional type-specific stuff
+ * @return null
+ */
+    
     function addArea($element)
     {
       if ((true === is_object($element)) && (true === is_subclass_of($element, 'html_imagemap_area'))) {
@@ -308,18 +317,20 @@ class HTML_ImageMap
     {
         $count = 0;
 
-        // this USED to be a substring match, but that broke some things
-        // and wasn't actually used as one anywhere.
-        switch ($which) {
-            case 'href':
-                $this->shapes[$where]->href = $what;
-                $count++;
-                break;
-
-            case 'extrahtml':
-                $this->shapes[$where]->extrahtml = $what;
-                $count++;
-                break;
+        if(true === isset($this->shapes[$where])) {
+            // this USED to be a substring match, but that broke some things
+            // and wasn't actually used as one anywhere.
+            switch ($which) {
+                case 'href':
+                    $this->shapes[$where]->href = $what;
+                    $count++;
+                    break;
+    
+                case 'extrahtml':
+                    $this->shapes[$where]->extrahtml = $what;
+                    $count++;
+                    break;
+            }
         }
         return $count;
     }

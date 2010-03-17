@@ -65,7 +65,10 @@ function weathermap_run_maps($mydir)
     global $weathermap_map;
     global $weathermap_warncount;
     global $weathermap_poller_start_time;
-
+    global $WM_config_keywords2;
+    global $WM_config_keywords;
+    global $weathermap_debug_suppress;
+    
     include_once $mydir.DIRECTORY_SEPARATOR.'HTML_ImageMap.class.php';
     include_once $mydir.DIRECTORY_SEPARATOR.'Weathermap.class.php';
 

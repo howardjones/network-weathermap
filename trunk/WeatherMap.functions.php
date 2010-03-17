@@ -776,12 +776,12 @@ function find_distance(&$pointarray, $distance)
     $left = 0;
     $right = count($pointarray) - 1;
 
-    if ($left === $right) {
+    if ($left == $right) {
         return ($left);
     }
 
     // if the distance is zero, there's no need to search (and it doesn't work anyway)
-    if ($distance === 0) {
+    if ($distance == 0) {
         return ($left);
     }
 
@@ -793,7 +793,7 @@ function find_distance(&$pointarray, $distance)
 
     // if somehow we have a 0-length curve, then don't try and search, just give up
     // in a somewhat predictable manner
-    if ($pointarray[$left][2] === $pointarray[$right][2]) {
+    if ($pointarray[$left][2] == $pointarray[$right][2]) {
         return ($left);
     }
 
@@ -813,6 +813,7 @@ function find_distance(&$pointarray, $distance)
     }
 
     print "FELL THROUGH\n";
+ 
     die("Howie's crappy binary search is wrong after all.\n");
 }
 

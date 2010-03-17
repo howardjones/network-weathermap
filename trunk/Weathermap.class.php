@@ -24,7 +24,7 @@ $weathermap_debug_suppress = array (
 $weathemap_lazycounter = 0;
 
 // Turn on ALL error reporting for now.
-// error_reporting (E_ALL|E_STRICT);
+error_reporting (E_ALL|E_STRICT);
 
 // parameterise the in/out stuff a bit
 define('IN', 0);
@@ -642,7 +642,7 @@ class WeatherMapDataSource
 // template classes for the pre- and post-processor plugins
 class WeatherMapPreProcessor
 {
-    function run($map)
+    function run(&$map)
     {
         return false;
     }
@@ -650,7 +650,7 @@ class WeatherMapPreProcessor
 
 class WeatherMapPostProcessor
 {
-    function run($map)
+    function run(&$map)
     {
         return false;
     }
@@ -988,6 +988,7 @@ class WeatherMap extends WeatherMapBase
 
         // Adding these makes the editor's job a little easier, mainly
         for ($i = 1; $i <= 5; $i++) {
+            $this->fonts[$i] = array();
             $this->fonts[$i]->type = 'GD builtin';
             $this->fonts[$i]->file = '';
             $this->fonts[$i]->size = 0;
@@ -1846,7 +1847,7 @@ class WeatherMap extends WeatherMapBase
         );
     }
 
-    function coloursort($a, $b)
+    static function coloursort($a, $b)
     {
         if ($a['bottom'] == $b['bottom']) {
             if ($a['top'] < $b['top']) {
@@ -3253,6 +3254,7 @@ class WeatherMap extends WeatherMapBase
                         $bounds = @imagettfbbox($matches[3], 0, $matches[2], "Ignore me");
 
                         if (isset($bounds[0])) {
+                            $this->fonts[$matches[1]] = array();
                             $this->fonts[$matches[1]]->type = "truetype";
                             $this->fonts[$matches[1]]->file = $matches[2];
                             $this->fonts[$matches[1]]->size = $matches[3];

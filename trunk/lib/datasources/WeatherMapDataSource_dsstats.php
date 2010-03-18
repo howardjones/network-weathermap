@@ -95,7 +95,7 @@ class WeatherMapDataSource_dsstats extends WeatherMapDataSource
 
             $datatype = 'last';
 
-            if ($map->get_hint('dsstats_default_type') !== '') {
+            if ($map->get_hint('dsstats_default_type') !== null) {
                 $datatype = $map->get_hint('dsstats_default_type');
                 debug("Default datatype changed to %s.\n", $datatype);
             }
@@ -158,7 +158,7 @@ class WeatherMapDataSource_dsstats extends WeatherMapDataSource
                         OUT
                     ) as $dir) {
                         if (($dsnames[$dir] === $result['name'])
-                            && ($result['result'] !== -90909090909)
+                            && ($result['result'] !== '-90909090909')
                                 && ($result['result'] !== 'U')) {
                             $data[$dir] = $result['result'];
                         }
@@ -199,9 +199,9 @@ class WeatherMapDataSource_dsstats extends WeatherMapDataSource
                 }
             }
         }
-
-        // fill all that other information (ifSpeed, etc)
-        if ($local_data_id > 0) {
+	
+		// fill all that other information (ifSpeed, etc)
+		if( ($map->get_hint("dsstats_no_cacti_extras") === null) && ($local_data_id > 0) ) {
             UpdateCactiData($item, $local_data_id);
         }
 

@@ -12,7 +12,7 @@ require_once 'WeatherMap.functions.php';
 require_once 'WeatherMapNode.class.php';
 require_once 'WeatherMapLink.class.php';
 
-$WEATHERMAP_VERSION = '0.98dev';
+$WEATHERMAP_VERSION = '0.9';
 $weathermap_debugging = false;
 $weathermap_map = '';
 $weathermap_warncount = 0;
@@ -1104,20 +1104,25 @@ class WeatherMap extends WeatherMapBase
 
     function ProcessString($input, &$context, $include_notes = true, $multiline = false)
     {
-        assert('is_scalar($input)');
+//        assert('is_scalar($input)');
 
+        if ($multiline === true) {
+            $i = $input;
+            $input = str_replace("\\n", "\n", $i);
+        }
+
+		// don't bother with all this regexp rubbish if there's nothing to match
+		if(false === strpos($input, "{")) {
+			return $input;
+		}
+		
         $context_description = strtolower($context->my_type());
 
         if ($context_description !== 'map') {
             $context_description .= ':' . $context->name;
         }
 
-        debug("Trace: ProcessString($input, $context_description)\n");
-
-        if ($multiline === true) {
-            $i = $input;
-            $input = str_replace("\\n", "\n", $i);
-        }
+//        debug("Trace: ProcessString($input, $context_description)\n");
 
         $output = $input;
 
@@ -1125,7 +1130,7 @@ class WeatherMap extends WeatherMapBase
             $value = '[UNKNOWN]';
             $format = '';
             $key = $matches[1];
-            debug("ProcessString: working on %s\n", $key);
+  //          debug("ProcessString: working on %s\n", $key);
 
             if (preg_match('/\{(node|map|link):([^}]+)\}/', $key, $matches)) {
                 $type = $matches[1];
@@ -1185,25 +1190,25 @@ class WeatherMap extends WeatherMapBase
                     warn(
                         "ProcessString: $key refers to unknown item (context is $context_description) [WMWARN05]\n");
                 } else {
-                    debug("ProcessString: Found appropriate item: %s %s\n",
-                        get_class($the_item), $the_item->name);
+    //                debug("ProcessString: Found appropriate item: %s %s\n",
+//                        get_class($the_item), $the_item->name);
 
 // SET and notes have precedent over internal properties
 // this is my laziness - it saves me having a list of reserved words
 // which are currently used for internal props. You can just 'overwrite' any of them.
                     if (true === isset($the_item->hints[$args])) {
                         $value = $the_item->hints[$args];
-                        debug("ProcessString: used hint\n");
+          //              debug("ProcessString: used hint\n");
                     }
 // for some things, we don't want to allow notes to be considered.
 // mainly - TARGET (which can define command-lines), shouldn't be
 // able to get data from uncontrolled sources (i.e. data sources rather than SET in config files).
                     elseif ($include_notes && isset($the_item->notes[$args])) {
                         $value = $the_item->notes[$args];
-                        debug("ProcessString: used note\n");
+      //                  debug("ProcessString: used note\n");
                     } elseif (isset($the_item->$args)) {
                         $value = $the_item->$args;
-                        debug("ProcessString: used internal property\n");
+        //                debug("ProcessString: used internal property\n");
                     }
                 }
             }
@@ -2854,39 +2859,40 @@ class WeatherMap extends WeatherMapBase
                 // alternative for use later where quoted strings are more useful
                 $args = ParseString($buffer);
 
-// this loop replaces a whole pile of duplicated ifs with something with consistent handling
-
+				// this loop replaces a whole pile of duplicated ifs with something with consistent handling
                 
-				// check if there is even an entry in this context for the current keyword
-				if (true === isset($WM_config_keywords2[$last_seen][$args[0]])) {
-					// if there is, then the entry is an array of arrays - iterate them to validate the config
-					foreach ($WM_config_keywords2[$last_seen][$args[0]]
-						as $keyword) {
-						if (1 === preg_match($keyword[1], $buffer, $matches)) {
-							foreach ($keyword[2] as $key => $val) {
-								// so we can poke in numbers too, if the value starts with #
-								// then take the # off, and treat the rest as a number literal
-								if (substr($val,0,1) === '#') {
-									$val = substr($val,1);
-								} elseif (is_numeric($val)) {
-									// if it's a number, then it's a match number,
-									// otherwise it's a literal to be put into a variable
-									$val = $matches[$val];
+				assert('is_object($curobj)');
+								
+				if(true === isset($args[0])) {
+					// check if there is even an entry in this context for the current keyword
+					if (true === isset($WM_config_keywords2[$last_seen][$args[0]])) {
+						// if there is, then the entry is an array of arrays - iterate them to validate the config
+						foreach ($WM_config_keywords2[$last_seen][$args[0]]
+							as $keyword) {
+							if (1 === preg_match($keyword[1], $buffer, $matches)) {
+								foreach ($keyword[2] as $key => $val) {
+									// so we can poke in numbers too, if the value starts with #
+									// then take the # off, and treat the rest as a number literal
+									if (substr($val,0,1) === '#') {
+										$val = substr($val,1);
+									} elseif (is_numeric($val)) {
+										// if it's a number, then it's a match number,
+										// otherwise it's a literal to be put into a variable
+										$val = $matches[$val];
+									}
+									
+									if (1 === preg_match('/^(.*)\[([^\]]+)\]$/', $key,
+										$m)) {									
+										$index = constant($m[2]);
+										$key = $m[1];
+										$curobj->{$key}[$index] = $val;
+									} else {
+										$curobj->$key = $val;
+									}
 								}
-
-								assert('is_object($curobj)');
-
-								if (1 === preg_match('/^(.*)\[([^\]]+)\]$/', $key,
-									$m)) {									
-									$index = constant($m[2]);
-									$key = $m[1];
-									$curobj->{$key}[$index] = $val;
-								} else {
-									$curobj->$key = $val;
-								}
+								$linematched++;
+								break;
 							}
-							$linematched++;
-							break;
 						}
 					}
 				}

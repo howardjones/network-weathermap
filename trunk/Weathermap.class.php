@@ -12,7 +12,7 @@ require_once 'WeatherMap.functions.php';
 require_once 'WeatherMapNode.class.php';
 require_once 'WeatherMapLink.class.php';
 
-$WEATHERMAP_VERSION = '0.97a';
+$WEATHERMAP_VERSION = '0.98dev';
 $weathermap_debugging = false;
 $weathermap_map = '';
 $weathermap_warncount = 0;
@@ -136,6 +136,7 @@ $WM_config_keywords2 = array (
                     'title' => 3
                 )
             ),
+		),
             'TIMEPOS' => array (
                 array (
                     'GLOBAL',
@@ -193,7 +194,7 @@ $WM_config_keywords2 = array (
                     )
                 ),
             ),
-        ),
+        
     ), // end of global
     'NODE' => array (
         'NOTES' => array (array (
@@ -344,6 +345,32 @@ $WM_config_keywords2 = array (
                 array ('label' => 1)
             ),
         ),
+		       'LABELOFFSET' => array (
+            array (
+                'NODE',
+                '/^\s*LABELOFFSET\s+([-+]?\d+)\s+([-+]?\d+)\s*$/i',
+                array (
+                    'labeloffsetx' => 1,
+                    'labeloffsety' => 2
+                )
+            ),
+            array (
+                'NODE',
+                '/^\s*LABELOFFSET\s+(C|NE|SE|NW|SW|N|S|E|W)\s*$/i',
+                array ('labeloffset' => 1)
+            ),
+            array (
+                'NODE',
+                '/^\s*LABELOFFSET\s+((C|NE|SE|NW|SW|N|S|E|W)\d+)\s*$/i',
+                array ('labeloffset' => 1)
+            ),
+            array (
+                'NODE',
+                '/^\s*LABELOFFSET\s+(-?\d+r\d+)\s*$/i',
+                array ('labeloffset' => 1)
+            ),
+        ),
+ 
     ), // end of node
     'LINK' => array (
         'NOTES' => array (array (
@@ -460,31 +487,6 @@ $WM_config_keywords2 = array (
                 )
             ),
         ),
-        'LABELOFFSET' => array (
-            array (
-                'NODE',
-                '/^\s*LABELOFFSET\s+([-+]?\d+)\s+([-+]?\d+)\s*$/i',
-                array (
-                    'labeloffsetx' => 1,
-                    'labeloffsety' => 2
-                )
-            ),
-            array (
-                'NODE',
-                '/^\s*LABELOFFSET\s+(C|NE|SE|NW|SW|N|S|E|W)\s*$/i',
-                array ('labeloffset' => 1)
-            ),
-            array (
-                'NODE',
-                '/^\s*LABELOFFSET\s+((C|NE|SE|NW|SW|N|S|E|W)\d+)\s*$/i',
-                array ('labeloffset' => 1)
-            ),
-            array (
-                'NODE',
-                '/^\s*LABELOFFSET\s+(-?\d+r\d+)\s*$/i',
-                array ('labeloffset' => 1)
-            ),
-        ),
         'BWFONT' => array (array (
             'LINK',
             '/^\s*BWFONT\s+(\d+)\s*$/i',
@@ -591,478 +593,6 @@ $WM_config_keywords2 = array (
             array ('overlibheight' => 1)
         ),),
     ) // end of link
-);
-
-$WM_config_keywords = array (
-    array (
-        'LINK',
-        '/^\s*(MAXVALUE|BANDWIDTH)\s+(\d+\.?\d*[KMGT]?)\s+(\d+\.?\d*[KMGT]?)\s*$/i',
-        array (
-            'max_bandwidth_in_cfg' => 2,
-            'max_bandwidth_out_cfg' => 3
-        )
-    ),
-    array (
-        'LINK',
-        '/^\s*(MAXVALUE|BANDWIDTH)\s+(\d+\.?\d*[KMGT]?)\s*$/i',
-        array (
-            'max_bandwidth_in_cfg' => 2,
-            'max_bandwidth_out_cfg' => 2
-        )
-    ),
-    array (
-        'NODE',
-        '/^\s*(MAXVALUE)\s+(\d+\.?\d*[KMGT]?)\s+(\d+\.?\d*[KMGT]?)\s*$/i',
-        array (
-            'max_bandwidth_in_cfg' => 2,
-            'max_bandwidth_out_cfg' => 3
-        )
-    ),
-    array (
-        'NODE',
-        '/^\s*(MAXVALUE)\s+(\d+\.?\d*[KMGT]?)\s*$/i',
-        array (
-            'max_bandwidth_in_cfg' => 2,
-            'max_bandwidth_out_cfg' => 2
-        )
-    ),
-    array (
-        'GLOBAL',
-        '/^\s*BACKGROUND\s+(.*)\s*$/i',
-        array ('background' => 1)
-    ),
-    array (
-        'GLOBAL',
-        '/^\s*HTMLOUTPUTFILE\s+(.*)\s*$/i',
-        array ('htmloutputfile' => 1)
-    ),
-    array (
-        'GLOBAL',
-        '/^\s*HTMLSTYLESHEET\s+(.*)\s*$/i',
-        array ('htmlstylesheet' => 1)
-    ),
-    array (
-        'GLOBAL',
-        '/^\s*IMAGEOUTPUTFILE\s+(.*)\s*$/i',
-        array ('imageoutputfile' => 1)
-    ),
-    array (
-        'GLOBAL',
-        '/^\s*IMAGEURI\s+(.*)\s*$/i',
-        array ('imageuri' => 1)
-    ),
-    array (
-        'GLOBAL',
-        '/^\s*TITLE\s+(.*)\s*$/i',
-        array ('title' => 1)
-    ),
-    array (
-        'GLOBAL',
-        '/^\s*HTMLSTYLE\s+(static|overlib)\s*$/i',
-        array ('htmlstyle' => 1)
-    ),
-    array (
-        'GLOBAL',
-        '/^\s*KEYFONT\s+(\d+)\s*$/i',
-        array ('keyfont' => 1)
-    ),
-    array (
-        'GLOBAL',
-        '/^\s*TITLEFONT\s+(\d+)\s*$/i',
-        array ('titlefont' => 1)
-    ),
-    array (
-        'GLOBAL',
-        '/^\s*TIMEFONT\s+(\d+)\s*$/i',
-        array ('timefont' => 1)
-    ),
-    array (
-        'GLOBAL',
-        '/^\s*TITLEPOS\s+(-?\d+)\s+(-?\d+)\s*$/i',
-        array (
-            'titlex' => 1,
-            'titley' => 2
-        )
-    ),
-    array (
-        'GLOBAL',
-        '/^\s*TITLEPOS\s+(-?\d+)\s+(-?\d+)\s+(.*)\s*$/i',
-        array (
-            'titlex' => 1,
-            'titley' => 2,
-            'title' => 3
-        )
-    ),
-    array (
-        'GLOBAL',
-        '/^\s*TIMEPOS\s+(-?\d+)\s+(-?\d+)\s*$/i',
-        array (
-            'timex' => 1,
-            'timey' => 2
-        )
-    ),
-    array (
-        'GLOBAL',
-        '/^\s*TIMEPOS\s+(-?\d+)\s+(-?\d+)\s+(.*)\s*$/i',
-        array (
-            'timex' => 1,
-            'timey' => 2,
-            'stamptext' => 3
-        )
-    ),
-    array (
-        'GLOBAL',
-        '/^\s*MINTIMEPOS\s+(-?\d+)\s+(-?\d+)\s*$/i',
-        array (
-            'mintimex' => 1,
-            'mintimey' => 2
-        )
-    ),
-    array (
-        'GLOBAL',
-        '/^\s*MINTIMEPOS\s+(-?\d+)\s+(-?\d+)\s+(.*)\s*$/i',
-        array (
-            'mintimex' => 1,
-            'mintimey' => 2,
-            'minstamptext' => 3
-        )
-    ),
-    array (
-        'GLOBAL',
-        '/^\s*MAXTIMEPOS\s+(-?\d+)\s+(-?\d+)\s*$/i',
-        array (
-            'maxtimex' => 1,
-            'maxtimey' => 2
-        )
-    ),
-    array (
-        'GLOBAL',
-        '/^\s*MAXTIMEPOS\s+(-?\d+)\s+(-?\d+)\s+(.*)\s*$/i',
-        array (
-            'maxtimex' => 1,
-            'maxtimey' => 2,
-            'maxstamptext' => 3
-        )
-    ),
-    array (
-        'NODE',
-        "/^\s*LABEL\s*$/i",
-        array ('label' => '')
-    ), # special case for blank labels
-    array (
-        'NODE',
-        "/^\s*LABEL\s+(.*)\s*$/i",
-        array ('label' => 1)
-    ),
-    array (
-        '(LINK|GLOBAL)',
-        "/^\s*WIDTH\s+(\d+)\s*$/i",
-        array ('width' => 1)
-    ),
-    array (
-        '(GLOBAL)',
-        "/^\s*HEIGHT\s+(\d+)\s*$/i",
-        array ('height' => 1)
-    ),
-    array (
-        'LINK',
-        "/^\s*WIDTH\s+(\d+\.\d+)\s*$/i",
-        array ('width' => 1)
-    ),
-    array (
-        'LINK',
-        '/^\s*ARROWSTYLE\s+(classic|compact)\s*$/i',
-        array ('arrowstyle' => 1)
-    ),
-    array (
-        'LINK',
-        '/^\s*VIASTYLE\s+(curved|angled)\s*$/i',
-        array ('viastyle' => 1)
-    ),
-    array (
-        'LINK',
-        '/^\s*INCOMMENT\s+(.*)\s*$/i',
-        array ('comments[IN]' => 1)
-    ),
-    array (
-        'LINK',
-        '/^\s*OUTCOMMENT\s+(.*)\s*$/i',
-        array ('comments[OUT]' => 1)
-    ),
-    array (
-        'LINK',
-        '/^\s*BWFONT\s+(\d+)\s*$/i',
-        array ('bwfont' => 1)
-    ),
-    array (
-        'LINK',
-        '/^\s*COMMENTFONT\s+(\d+)\s*$/i',
-        array ('commentfont' => 1)
-    ),
-    array (
-        'LINK',
-        '/^\s*COMMENTSTYLE\s+(edge|center)\s*$/i',
-        array ('commentstyle' => 1)
-    ),
-    array (
-        'LINK',
-        '/^\s*DUPLEX\s+(full|half)\s*$/i',
-        array ('duplex' => 1)
-    ),
-    array (
-        'LINK',
-        '/^\s*BWSTYLE\s+(classic|angled)\s*$/i',
-        array ('labelboxstyle' => 1)
-    ),
-    array (
-        'LINK',
-        '/^\s*LINKSTYLE\s+(twoway|oneway)\s*$/i',
-        array ('linkstyle' => 1)
-    ),
-    array (
-        'LINK',
-        '/^\s*BWLABELPOS\s+(\d+)\s(\d+)\s*$/i',
-        array (
-            'labeloffset_in' => 1,
-            'labeloffset_out' => 2
-        )
-    ),
-    array (
-        'LINK',
-        '/^\s*COMMENTPOS\s+(\d+)\s(\d+)\s*$/i',
-        array (
-            'commentoffset_in' => 1,
-            'commentoffset_out' => 2
-        )
-    ),
-    array (
-        'LINK',
-        '/^\s*USESCALE\s+([A-Za-z][A-Za-z0-9_]*)\s*$/i',
-        array ('usescale' => 1)
-    ),
-    array (
-        'LINK',
-        '/^\s*USESCALE\s+([A-Za-z][A-Za-z0-9_]*)\s+(absolute|percent)\s*$/i',
-        array (
-            'usescale' => 1,
-            'scaletype' => 2
-        )
-    ),
-    array (
-        'LINK',
-        '/^\s*SPLITPOS\s+(\d+)\s*$/i',
-        array ('splitpos' => 1)
-    ),
-    array (
-        'NODE',
-        '/^\s*LABELOFFSET\s+([-+]?\d+)\s+([-+]?\d+)\s*$/i',
-        array (
-            'labeloffsetx' => 1,
-            'labeloffsety' => 2
-        )
-    ),
-    array (
-        'NODE',
-        '/^\s*LABELOFFSET\s+(C|NE|SE|NW|SW|N|S|E|W)\s*$/i',
-        array ('labeloffset' => 1)
-    ),
-    array (
-        'NODE',
-        '/^\s*LABELOFFSET\s+((C|NE|SE|NW|SW|N|S|E|W)\d+)\s*$/i',
-        array ('labeloffset' => 1)
-    ),
-    array (
-        'NODE',
-        '/^\s*LABELOFFSET\s+(-?\d+r\d+)\s*$/i',
-        array ('labeloffset' => 1)
-    ),
-    array (
-        'NODE',
-        '/^\s*LABELFONT\s+(\d+)\s*$/i',
-        array ('labelfont' => 1)
-    ),
-    array (
-        'NODE',
-        '/^\s*LABELANGLE\s+(0|90|180|270)\s*$/i',
-        array ('labelangle' => 1)
-    ),
-    # array('(NODE|LINK)', '/^\s*TEMPLATE\s+(\S+)\s*$/i', array('template'=>1)),
-
-    array (
-        'LINK',
-        '/^\s*OUTBWFORMAT\s+(.*)\s*$/i',
-        array (
-            'bwlabelformats[OUT]' => 1,
-            'labelstyle' => '--'
-        )
-    ),
-    array (
-        'LINK',
-        '/^\s*INBWFORMAT\s+(.*)\s*$/i',
-        array (
-            'bwlabelformats[IN]' => 1,
-            'labelstyle' => '--'
-        )
-    ),
-    # array('NODE','/^\s*ICON\s+none\s*$/i',array('iconfile'=>'')),
-    array (
-        'NODE',
-        '/^\s*ICON\s+(\S+)\s*$/i',
-        array (
-            'iconfile' => 1,
-            'iconscalew' => '#0',
-            'iconscaleh' => '#0'
-        )
-    ),
-    array (
-        'NODE',
-        '/^\s*ICON\s+(\S+)\s*$/i',
-        array ('iconfile' => 1)
-    ),
-    array (
-        'NODE',
-        '/^\s*ICON\s+(\d+)\s+(\d+)\s+(inpie|outpie|box|rbox|round|gauge|nink)\s*$/i',
-        array (
-            'iconfile' => 3,
-            'iconscalew' => 1,
-            'iconscaleh' => 2
-        )
-    ),
-    array (
-        'NODE',
-        '/^\s*ICON\s+(\d+)\s+(\d+)\s+(\S+)\s*$/i',
-        array (
-            'iconfile' => 3,
-            'iconscalew' => 1,
-            'iconscaleh' => 2
-        )
-    ),
-    array (
-        'NODE',
-        '/^\s*NOTES\s+(.*)\s*$/i',
-        array (
-            'notestext[IN]' => 1,
-            'notestext[OUT]' => 1
-        )
-    ),
-    array (
-        'LINK',
-        '/^\s*NOTES\s+(.*)\s*$/i',
-        array (
-            'notestext[IN]' => 1,
-            'notestext[OUT]' => 1
-        )
-    ),
-    array (
-        'LINK',
-        '/^\s*INNOTES\s+(.*)\s*$/i',
-        array ('notestext[IN]' => 1)
-    ),
-    array (
-        'LINK',
-        '/^\s*OUTNOTES\s+(.*)\s*$/i',
-        array ('notestext[OUT]' => 1)
-    ),
-    array (
-        'NODE',
-        '/^\s*INFOURL\s+(.*)\s*$/i',
-        array (
-            'infourl[IN]' => 1,
-            'infourl[OUT]' => 1
-        )
-    ),
-    array (
-        'LINK',
-        '/^\s*INFOURL\s+(.*)\s*$/i',
-        array (
-            'infourl[IN]' => 1,
-            'infourl[OUT]' => 1
-        )
-    ),
-    array (
-        'LINK',
-        '/^\s*ININFOURL\s+(.*)\s*$/i',
-        array ('infourl[IN]' => 1)
-    ),
-    array (
-        'LINK',
-        '/^\s*OUTINFOURL\s+(.*)\s*$/i',
-        array ('infourl[OUT]' => 1)
-    ),
-    array (
-        'NODE',
-        '/^\s*OVERLIBCAPTION\s+(.*)\s*$/i',
-        array (
-            'overlibcaption[IN]' => 1,
-            'overlibcaption[OUT]' => 1
-        )
-    ),
-    array (
-        'LINK',
-        '/^\s*OVERLIBCAPTION\s+(.*)\s*$/i',
-        array (
-            'overlibcaption[IN]' => 1,
-            'overlibcaption[OUT]' => 1
-        )
-    ),
-    array (
-        'LINK',
-        '/^\s*INOVERLIBCAPTION\s+(.*)\s*$/i',
-        array ('overlibcaption[IN]' => 1)
-    ),
-    array (
-        'LINK',
-        '/^\s*OUTOVERLIBCAPTION\s+(.*)\s*$/i',
-        array ('overlibcaption[OUT]' => 1)
-    ),
-    array (
-        '(NODE|LINK)',
-        "/^\s*ZORDER\s+([-+]?\d+)\s*$/i",
-        array ('zorder' => 1)
-    ),
-    array (
-        '(NODE|LINK)',
-        "/^\s*OVERLIBWIDTH\s+(\d+)\s*$/i",
-        array ('overlibwidth' => 1)
-    ),
-    array (
-        '(NODE|LINK)',
-        "/^\s*OVERLIBHEIGHT\s+(\d+)\s*$/i",
-        array ('overlibheight' => 1)
-    ),
-    array (
-        'NODE',
-        "/^\s*POSITION\s+([-+]?\d+)\s+([-+]?\d+)\s*$/i",
-        array (
-            'x' => 1,
-            'y' => 2
-        )
-    ),
-    array (
-        'NODE',
-        "/^\s*POSITION\s+(\S+)\s+([-+]?\d+)\s+([-+]?\d+)\s*$/i",
-        array (
-            'x' => 2,
-            'y' => 3,
-            'original_x' => 2,
-            'original_y' => 3,
-            'relative_to' => 1,
-            'relative_resolved' => false
-        )
-    ),
-    array (
-        'NODE',
-        "/^\s*POSITION\s+(\S+)\s+([-+]?\d+)r(\d+)\s*$/i",
-        array (
-            'x' => 2,
-            'y' => 3,
-            'original_x' => 2,
-            'original_y' => 3,
-            'relative_to' => 1,
-            'polar' => true,
-            'relative_resolved' => false
-        )
-    )
 );
 
 
@@ -2322,7 +1852,7 @@ class WeatherMap extends WeatherMapBase
         );
     }
 
-    static function coloursort($a, $b)
+    function coloursort($a, $b)
     {
         if ($a['bottom'] == $b['bottom']) {
             if ($a['top'] < $b['top']) {
@@ -3326,71 +2856,41 @@ class WeatherMap extends WeatherMapBase
 
 // this loop replaces a whole pile of duplicated ifs with something with consistent handling
 
-                if (1 === 0) {
-                    foreach ($GLOBALS['WM_config_keywords'] as $keyword) {
-                        if (($linematched === 0)
-                            && (1 === preg_match('/' . $keyword[0] . '/', $last_seen))) {
-                            if (1 === preg_match($keyword[1], $buffer, $matches)) {
-                                foreach ($keyword[2] as $key => $val) {
-// so we can poke in numbers too, if the value starts with #
-// then take the # off, and treat the rest as a number literal
-                                    if (1 === preg_match('/^#(.*)/', $val, $m)) {
-                                        $val = $m[1];
-                                    } elseif (is_numeric($val)) {
-// if it's a number, then it's a match number,
-// otherwise it's a literal to be put into a variable
-                                        $val = $matches[$val];
-                                    }
+                
+				// check if there is even an entry in this context for the current keyword
+				if (true === isset($WM_config_keywords2[$last_seen][$args[0]])) {
+					// if there is, then the entry is an array of arrays - iterate them to validate the config
+					foreach ($WM_config_keywords2[$last_seen][$args[0]]
+						as $keyword) {
+						if (1 === preg_match($keyword[1], $buffer, $matches)) {
+							foreach ($keyword[2] as $key => $val) {
+								// so we can poke in numbers too, if the value starts with #
+								// then take the # off, and treat the rest as a number literal
+								if (substr($val,0,1) === '#') {
+									$val = substr($val,1);
+								} elseif (is_numeric($val)) {
+									// if it's a number, then it's a match number,
+									// otherwise it's a literal to be put into a variable
+									$val = $matches[$val];
+								}
 
-                                    assert('is_object($curobj)');
+								assert('is_object($curobj)');
 
-                                    if (1 === preg_match('/^(.*)\[([^\]]+)\]$/', $key,
-                                        $m)) {
-                                        $index = constant($m[2]);
-                                        $key = $m[1];
-                                        $curobj->{$key}[$index] = $val;
-                                    } else {
-                                        $curobj->$key = $val;
-                                    }
-                                }
-                                $linematched++;
-                                break;
-                            }
-                        }
-                    }
-                } else {
-                    if (true === isset($WM_config_keywords2[$last_seen][$keyword[0]])) {
-                        foreach ($WM_config_keywords2[$last_seen][$keyword[0]]
-                            as $keyword) {
-                            if (1 === preg_match($keyword[1], $buffer, $matches)) {
-                                foreach ($keyword[2] as $key => $val) {
-// so we can poke in numbers too, if the value starts with #
-// then take the # off, and treat the rest as a number literal
-                                    if (1 === preg_match('/^#(.*)/', $val, $m)) {
-                                        $val = $m[1];
-                                    } elseif (is_numeric($val)) {
-// if it's a number, then it's a match number,
-// otherwise it's a literal to be put into a variable
-                                        $val = $matches[$val];
-                                    }
-
-                                    assert('is_object($curobj)');
-
-                                    if (1 === preg_match('/^(.*)\[([^\]]+)\]$/', $key,
-                                        $m)) {
-                                        $index = constant($m[2]);
-                                        $key = $m[1];
-                                        $curobj->{$key}[$index] = $val;
-                                    } else {
-                                        $curobj->$key = $val;
-                                    }
-                                }
-                                $linematched++;
-                                break;
-                            }
-                        }
-                    }
-                }
+								if (1 === preg_match('/^(.*)\[([^\]]+)\]$/', $key,
+									$m)) {									
+									$index = constant($m[2]);
+									$key = $m[1];
+									$curobj->{$key}[$index] = $val;
+								} else {
+									$curobj->$key = $val;
+								}
+							}
+							$linematched++;
+							break;
+						}
+					}
+				}
+			
 
                 if (($linematched == 0)
                     && preg_match("/^\s*NODES\s+(\S+)\s+(\S+)\s*$/i", $buffer, $matches))

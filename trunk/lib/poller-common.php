@@ -371,6 +371,10 @@ function weathermap_run_maps($mydir)
 			db_execute("replace into settings values('weathermap_highwater_memory','"
 			. $weathermap_mem_highwater . "')");			
 		}
+		if (true === function_exists("memory_get_peak_usage")) {
+			db_execute("replace into settings values('weathermap_peak_memory','"
+			. memory_get_peak_usage() . "')");			
+		}
 }
 
 // vim:ts=4:sw=4:

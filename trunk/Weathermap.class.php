@@ -4333,18 +4333,23 @@ class WeatherMap extends WeatherMapBase
 
     function CleanUp()
     {
-        // destroy all the images we created, to prevent memory leaks
-        foreach ($this->nodes as $node) {
+        foreach ($this->links as $link) {
+		$link->owner = null;
+		$link->a = null;
+                $link->b = null;
+
+	 	unset($link);
+        }
+	 foreach ($this->nodes as $node) {
+              // destroy all the images we created, to prevent memory leaks
+
             if (isset($node->image)) {
                 imagedestroy($node->image);
             }
-		$node->owner = null;
-	 	unset($node);
+                $node->owner = null;
+                unset($node);
         }
-        foreach ($this->links as $link) {
-		$link->owner = null;
-	 	unset($link);
-        }
+
     }
 
     function PreloadMapHTML()

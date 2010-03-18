@@ -4,7 +4,13 @@
 
 function weathermap_memory_check($note = 'MEM')
 {
+	global $weathermap_mem_highwater;
+	
     if (true === function_exists('memory_get_usage')) {
+		$mem = memory_get_usage();
+		if($mem > $weathermap_mem_highwater) {
+			$weathermap_mem_highwater = $mem;
+		}
         $mem_used = nice_bandwidth(memory_get_usage());
         $mem_allowed = ini_get('memory_limit');
         debug("%s: memory_get_usage() says %sBytes used. Limit is %s\n",  $note, $mem_used,
@@ -68,11 +74,26 @@ function weathermap_run_maps($mydir)
     global $WM_config_keywords2;
     global $WM_config_keywords;
     global $weathermap_debug_suppress;
-    
+	global $weathermap_mem_highwater;
+  
+	$weathermap_mem_highwater = 0;
+  
+	if (true === function_exists('memory_get_usage')) {
+        db_execute("replace into settings values('weathermap_initial_memory','"
+			. memory_get_usage() . "')");		
+	}
+  
     include_once $mydir.DIRECTORY_SEPARATOR.'HTML_ImageMap.class.php';
     include_once $mydir.DIRECTORY_SEPARATOR.'Weathermap.class.php';
 
+	if (true === function_exists('memory_get_usage')) {			
+			  db_execute("replace into settings values('weathermap_loaded_memory','"
+			. memory_get_usage() . "')");
+			
+		}
+	
     $total_warnings = 0;
+	
 
     $start_time = time();
 
@@ -336,11 +357,20 @@ function weathermap_run_maps($mydir)
             warn('STATS: Weathermap '.$WEATHERMAP_VERSION.' run complete - '.$stats_string."\n",
                 true);
         }
+		
         db_execute("replace into settings values('weathermap_last_stats','"
             . mysql_escape_string($stats_string) . "')");
+		db_execute("replace into settings values('weathermap_last_map_count','"
+            . mysql_escape_string($mapcount) . "')");
         db_execute("replace into settings values('weathermap_last_finish_time','"
             . mysql_escape_string(time()) . "')");
   
+		if (true === function_exists('memory_get_usage')) {			
+			  db_execute("replace into settings values('weathermap_final_memory','"
+			. memory_get_usage() . "')");
+			db_execute("replace into settings values('weathermap_highwater_memory','"
+			. $weathermap_mem_highwater . "')");			
+		}
 }
 
 // vim:ts=4:sw=4:

@@ -1312,19 +1312,21 @@ function weathermap_poller_bottom()
 
     if ($renderperiod < 0) {
         // manual updates only
-        if ($quietlogging == 0)
+        if ($quietlogging == 0) {
             cacti_log("Weathermap $WEATHERMAP_VERSION - no updates ever", true,
                 "WEATHERMAP");
+				}
         return;
     } else {
         // if we're due, run the render updates
         if (($renderperiod == 0) || (($rendercounter % $renderperiod) == 0)) {
             weathermap_run_maps(dirname(__FILE__));
         } else {
-            if ($quietlogging == 0)
+            if ($quietlogging == 0) {
                 cacti_log(
                     "Weathermap $WEATHERMAP_VERSION - no update in this cycle ($rendercounter)",
                     true, "WEATHERMAP");
+					}
         }
 # cacti_log("Weathermap counter is $rendercounter. period is $renderperiod.", true, "WEATHERMAP");
 // increment the counter

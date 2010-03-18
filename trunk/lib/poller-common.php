@@ -93,7 +93,7 @@ function weathermap_run_maps($mydir)
         $mode_message
             = 'Normal logging mode. Turn on DEBUG in Cacti for more information';
     }
-    $quietlogging = read_config_option('weathermap_quiet_logging');
+    $quietlogging = intval(read_config_option('weathermap_quiet_logging'));
 
 // moved this outside the module_checks, so there should always be something in the logs!
     if ($quietlogging === 0) {

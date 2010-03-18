@@ -122,7 +122,7 @@ if (sizeof($gopts) > 0)
 		case '--sizedebug':
 		case '--no-data':
 			//$map->sizedebug=TRUE;
-			$options_output['sizedebug'] = TRUE;
+			$options_output['sizedebug'] = true;
 			break;
 
 		case '--bulge':

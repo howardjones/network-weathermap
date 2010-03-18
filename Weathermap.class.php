@@ -24,7 +24,7 @@ $weathermap_debug_suppress = array (
 $weathemap_lazycounter = 0;
 
 // Turn on ALL error reporting for now.
-error_reporting (E_ALL|E_STRICT);
+# error_reporting (E_ALL|E_STRICT);
 
 // parameterise the in/out stuff a bit
 define('IN', 0);
@@ -988,7 +988,6 @@ class WeatherMap extends WeatherMapBase
 
         // Adding these makes the editor's job a little easier, mainly
         for ($i = 1; $i <= 5; $i++) {
-            $this->fonts[$i] = array();
             $this->fonts[$i]->type = 'GD builtin';
             $this->fonts[$i]->file = '';
             $this->fonts[$i]->size = 0;
@@ -1439,7 +1438,7 @@ class WeatherMap extends WeatherMapBase
         debug("ReadData: Updating link data for all links and nodes\n");
 
         // we skip readdata completely in sizedebug mode
-        if ($this->sizedebug === 0) {
+        if ($this->sizedebug === false) {
             $this->ProcessTargets();
 
             debug("======================================\n");
@@ -1643,6 +1642,10 @@ class WeatherMap extends WeatherMapBase
             debug("ReadData Completed.\n");
             debug("------------------------------\n");
         }
+		else
+		{
+			debug("ReadData skipped due to sizedebug\n");
+		}
     }
 
     // nodename is a vestigal parameter, from the days when nodes were just big labels
@@ -3254,7 +3257,6 @@ class WeatherMap extends WeatherMapBase
                         $bounds = @imagettfbbox($matches[3], 0, $matches[2], "Ignore me");
 
                         if (isset($bounds[0])) {
-                            $this->fonts[$matches[1]] = array();
                             $this->fonts[$matches[1]]->type = "truetype";
                             $this->fonts[$matches[1]]->file = $matches[2];
                             $this->fonts[$matches[1]]->size = $matches[3];

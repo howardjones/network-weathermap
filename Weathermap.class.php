@@ -4338,6 +4338,12 @@ class WeatherMap extends WeatherMapBase
             if (isset($node->image)) {
                 imagedestroy($node->image);
             }
+		$node->owner = null;
+	 	unset($node);
+        }
+        foreach ($this->links as $link) {
+		$link->owner = null;
+	 	unset($link);
         }
     }
 

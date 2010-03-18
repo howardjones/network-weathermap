@@ -318,25 +318,17 @@ class WeatherMapLink extends WeatherMapItem
         $x2 = $map->nodes[$this->b->name]->x;
         $y2 = $map->nodes[$this->b->name]->y;
 
-        if (is_null($x1)) {
+        if (
+			is_null($x1)
+			|| is_null($y1)
+			|| is_null($x2)
+			|| is_null($y2)
+			) {
             warn("LINK " . $this->name . " uses a NODE with no POSITION! [WMWARN35]\n");
             return;
         }
+		
 
-        if (is_null($y1)) {
-            warn("LINK " . $this->name . " uses a NODE with no POSITION! [WMWARN35]\n");
-            return;
-        }
-
-        if (is_null($x2)) {
-            warn("LINK " . $this->name . " uses a NODE with no POSITION! [WMWARN35]\n");
-            return;
-        }
-
-        if (is_null($y2)) {
-            warn("LINK " . $this->name . " uses a NODE with no POSITION! [WMWARN35]\n");
-            return;
-        }
 
         if (($this->linkstyle == 'twoway')
             && ($this->labeloffset_in < $this->labeloffset_out)
@@ -355,11 +347,11 @@ class WeatherMapLink extends WeatherMapItem
         $x2 += $dx;
         $y2 += $dy;
 
-        if (($x1 == $x2) && ($y1 == $y2) && sizeof($this->vialist) == 0) {
+		if (($x1 == $x2) && ($y1 == $y2) && sizeof($this->vialist) == 0) {
             warn("Zero-length link " . $this->name . " skipped. [WMWARN45]");
             return;
         }
-
+		
         $outlinecol = new Colour($this->outlinecolour);
         $commentcol = new Colour($this->commentfontcolour);
 
@@ -408,38 +400,56 @@ class WeatherMapLink extends WeatherMapItem
                 + 1;
         }
 
-        if ($this->viastyle == 'curved') {
-            // Calculate the spine points - the actual curve
-            $this->curvepoints = calc_curve($xpoints, $ypoints);
+		if(count($this->vialist) == 0) {
+			$this->curvepoints = calc_straight($xpoints, $ypoints, 3);
+			
+			// then draw the "curve" itself
+			draw_straight($im, $this->curvepoints, array (
+				$link_in_width,
+				$link_out_width
+			), $outline_colour, array (
+				$gd_in_colour,
+				$gd_out_colour
+			), $this->name, $map, $this->splitpos, ($this->linkstyle
+				== 'oneway' ? true : false));
+		}
+		else
+		{
+		
+			if ( ($this->viastyle == 'curved')) {
+				// Calculate the spine points - the actual curve
+				$this->curvepoints = calc_curve($xpoints, $ypoints);
 
-            // then draw the curve itself
-            draw_curve($im, $this->curvepoints, array (
-                $link_in_width,
-                $link_out_width
-            ), $outline_colour, array (
-                $gd_in_colour,
-                $gd_out_colour
-            ), $this->name, $map, $this->splitpos, ($this->linkstyle
-                == 'oneway' ? true : false));
-        }
+				// then draw the curve itself
+				draw_curve($im, $this->curvepoints, array (
+					$link_in_width,
+					$link_out_width
+				), $outline_colour, array (
+					$gd_in_colour,
+					$gd_out_colour
+				), $this->name, $map, $this->splitpos, ($this->linkstyle
+					== 'oneway' ? true : false));
+			}
 
-        if ($this->viastyle == 'angled') {
-            // Calculate the spine points - the actual not a curve really, but we
-            // need to create the array, and calculate the distance bits, otherwise
-            // things like bwlabels won't know where to go.
+			if ( ($this->viastyle == 'angled')) {
+				// Calculate the spine points - the actual not a curve really, but we
+				// need to create the array, and calculate the distance bits, otherwise
+				// things like bwlabels won't know where to go.
 
-            $this->curvepoints = calc_straight($xpoints, $ypoints);
-
-            // then draw the "curve" itself
-            draw_straight($im, $this->curvepoints, array (
-                $link_in_width,
-                $link_out_width
-            ), $outline_colour, array (
-                $gd_in_colour,
-                $gd_out_colour
-            ), $this->name, $map, $this->splitpos, ($this->linkstyle
-                == 'oneway' ? true : false));
-        }
+					
+				$this->curvepoints = calc_straight($xpoints, $ypoints);
+				
+				// then draw the "curve" itself
+				draw_straight($im, $this->curvepoints, array (
+					$link_in_width,
+					$link_out_width
+				), $outline_colour, array (
+					$gd_in_colour,
+					$gd_out_colour
+				), $this->name, $map, $this->splitpos, ($this->linkstyle
+					== 'oneway' ? true : false));
+			}
+		}
 
         if (!$commentcol->is_none()) {
             if ($commentcol->is_contrast()) {

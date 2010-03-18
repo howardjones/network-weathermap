@@ -298,14 +298,16 @@ function myimagecolorallocate($image, $red, $green, $blue)
     if (false === isset($image)) {
         return (-1);
     }
-
+	
+if(1 === 0) {
     $existing = imagecolorexact($image, $red, $green, $blue);
 
     // XXX - check if this function is doing any good!
     if ($existing > -1) {
         return $existing;
     }
-
+}
+	
     return (imagecolorallocate($image, $red, $green, $blue));
 }
 

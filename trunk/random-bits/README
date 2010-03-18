@@ -68,3 +68,10 @@ Generates a section of Weathermap config useful for showing traffic for all swit
 ports in a small space. Intended to work with cacti-integrate.php
 
 More info here: http://forums.cacti.net/post-152500.html#152500
+
+query_weathermap_runtime.php
+query_weathermap_runtime.xml
+============================
+Some Cacti templates to monitor Weathermap performance - runtime, warnings, map count
+and memory usage.
+Import the XML file. Leave the php file where it is.

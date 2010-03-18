@@ -310,7 +310,7 @@ function weathermap_run_maps($mydir)
                                         . intval($wmap->thumb_height) . ' where id='
                                         . intval($map['id']));
                                 }
-
+				$wmap->CleanUp();
                                 unset($wmap);
                                 $map_duration = time() - $map_start;
                                 debug("TIME: %s took %d seconds.\n", $mapfile, $map_duration);

@@ -328,8 +328,6 @@ class WeatherMapLink extends WeatherMapItem
             return;
         }
 		
-
-
         if (($this->linkstyle == 'twoway')
             && ($this->labeloffset_in < $this->labeloffset_out)
                 && (intval($map->get_hint("nowarn_bwlabelpos")) == 0)) {
@@ -351,6 +349,8 @@ class WeatherMapLink extends WeatherMapItem
             warn("Zero-length link " . $this->name . " skipped. [WMWARN45]");
             return;
         }
+
+		$nvia = 0;
 		
         $outlinecol = new Colour($this->outlinecolour);
         $commentcol = new Colour($this->commentfontcolour);
@@ -373,6 +373,7 @@ class WeatherMapLink extends WeatherMapItem
                 $xpoints[] = $via[0];
                 $ypoints[] = $via[1];
             }
+			$nvia++;
         }
 
         $xpoints[] = $x2;
@@ -400,18 +401,20 @@ class WeatherMapLink extends WeatherMapItem
                 + 1;
         }
 
-		if(count($this->vialist) == 0) {
-			$this->curvepoints = calc_straight($xpoints, $ypoints);
-			
-			// then draw the "curve" itself
-			draw_straight($im, $this->curvepoints, array (
-				$link_in_width,
-				$link_out_width
-			), $outline_colour, array (
-				$gd_in_colour,
-				$gd_out_colour
-			), $this->name, $map, $this->splitpos, ($this->linkstyle
-				== 'oneway' ? true : false));
+		if($nvia == 0) {
+
+				$this->curvepoints = calc_straight($xpoints, $ypoints, 5);
+				
+				// then draw the "curve" itself
+				draw_straight($im, $this->curvepoints, array (
+					$link_in_width,
+					$link_out_width
+				), $outline_colour, array (
+					$gd_in_colour,
+					$gd_out_colour
+				), $this->name, $map, $this->splitpos, ($this->linkstyle
+					== 'oneway' ? true : false));
+						
 		}
 		else
 		{
@@ -471,7 +474,7 @@ class WeatherMapLink extends WeatherMapItem
                 $link_out_width * 1.1
             ));
         }
-
+		
         $curvelength = $this->curvepoints[count($this->curvepoints) - 1][2];
 // figure out where the labels should be, and what the angle of the curve is at that point
         list($q1_x, $q1_y, $junk, $q1_angle) =

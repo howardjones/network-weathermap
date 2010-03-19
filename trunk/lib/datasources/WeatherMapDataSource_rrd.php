@@ -503,12 +503,12 @@ class WeatherMapDataSource_rrd extends WeatherMapDataSource
         $SQL[OUT] = 'select null';
         $rrdfile = $targetstring;
 
-        if ($map->get_hint("rrd_default_in_ds") !== '') {
+        if ($map->get_hint("rrd_default_in_ds") !== null) {
             $dsnames[IN] = $map->get_hint('rrd_default_in_ds');
             debug("Default 'in' DS name changed to " . $dsnames[IN] . ".\n");
         }
 
-        if ($map->get_hint("rrd_default_out_ds") !== '') {
+        if ($map->get_hint("rrd_default_out_ds") !== null) {
             $dsnames[OUT] = $map->get_hint('rrd_default_out_ds');
             debug("Default 'out' DS name changed to " . $dsnames[OUT] . ".\n");
         }
@@ -520,7 +520,7 @@ class WeatherMapDataSource_rrd extends WeatherMapDataSource
         $outbw = null;
         $data_time = 0;
 
-        if (true === preg_match('/^(.*\.rrd):([\-a-zA-Z0-9_]+):([\-a-zA-Z0-9_]+)$/', $targetstring,
+        if (1 === preg_match('/^(.*\.rrd):([\-a-zA-Z0-9_]+):([\-a-zA-Z0-9_]+)$/', $targetstring,
             $matches)) {
             $rrdfile = $matches[1];
 
@@ -552,14 +552,14 @@ class WeatherMapDataSource_rrd extends WeatherMapDataSource
         if (!preg_match('/^(\/|\.)/', $rrdfile)) {
             $rrdbase = $map->get_hint('rrd_default_path');
 
-            if ($rrdbase !== '') {
+            if ($rrdbase !== null) {
                 $rrdfile = $rrdbase . '/' . $rrdfile;
             }
         }
 
-        $cfname = intval($map->get_hint('rrd_cf'));
+        $cfname = $map->get_hint('rrd_cf');
 
-        if ($cfname === '') {
+        if ($cfname === null) {
             $cfname = 'AVERAGE';
         }
 
@@ -570,7 +570,7 @@ class WeatherMapDataSource_rrd extends WeatherMapDataSource
         }
         $start = $map->get_hint('rrd_start');
 
-        if ($start === '') {
+        if ($start === null) {
             $start = 'now-'.$period;
             $end = 'now';
         } else {
@@ -581,10 +581,10 @@ class WeatherMapDataSource_rrd extends WeatherMapDataSource
         $nowarn_po_agg = intval($map->get_hint("nowarn_rrd_poller_output_aggregation"));
         $aggregatefunction = $map->get_hint('rrd_aggregate_function');
 
-        if ($aggregatefunction != '' && $use_poller_output == 1) {
+        if ($aggregatefunction !== null && $use_poller_output === 1) {
             $use_poller_output = 0;
 
-            if ($nowarn_po_agg === 0) {
+            if ($nowarn_po_agg === null) {
                 warn(
                     "Can't use poller_output for rrd-aggregated data - disabling rrd_use_poller_output [WMRRD10]\n");
             }

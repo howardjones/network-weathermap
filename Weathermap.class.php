@@ -1106,6 +1106,14 @@ class WeatherMap extends WeatherMapBase
     {
 //        assert('is_scalar($input)');
 
+	if($input === '') { return ''; }	
+
+	if(1==0 && $this->context == 'cacti') {
+	$fd = fopen("/var/www/docs/cacti/plugins/weathermap/processstring.log","a+");
+	fwrite($fd,$input."\n");
+	fclose($fd);
+	}
+
         if ($multiline === true) {
             $i = $input;
             $input = str_replace("\\n", "\n", $i);
@@ -1118,9 +1126,26 @@ class WeatherMap extends WeatherMapBase
 		
         $context_description = strtolower($context->my_type());
 
+	// next, shortcut all the regexps for very common tokens
+	if($context_description === 'node') {
+		$input = str_replace("{node:this:graph_id}", $context->get_hint("graph_id" ), $input);
+		$input = str_replace("{node:this:name}", $context->name, $input);
+	}
+
+	if($context_description === 'link') {
+		$input = str_replace("{link:this:graph_id}", $context->get_hint("graph_id" ), $input);
+	}
+
+		// don't bother with all this regexp rubbish if there's nothing to match
+		if(false === strpos($input, "{")) {
+			return $input;
+		}
+
         if ($context_description !== 'map') {
             $context_description .= ':' . $context->name;
         }
+
+	
 
 //        debug("Trace: ProcessString($input, $context_description)\n");
 

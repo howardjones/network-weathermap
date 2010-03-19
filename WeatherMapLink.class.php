@@ -401,7 +401,7 @@ class WeatherMapLink extends WeatherMapItem
         }
 
 		if(count($this->vialist) == 0) {
-			$this->curvepoints = calc_straight($xpoints, $ypoints, 3);
+			$this->curvepoints = calc_straight($xpoints, $ypoints);
 			
 			// then draw the "curve" itself
 			draw_straight($im, $this->curvepoints, array (

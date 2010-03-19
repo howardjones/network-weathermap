@@ -567,6 +567,49 @@ function imagecolorize($im, $r, $g, $b)
     return ($im);
 }
 
+
+function RotX($a,$b,$x,$y)
+{
+	return  cos( atan2($y,$x) + atan2($b,$a) ) * sqrt( $x*$x + $y*$y );
+}
+
+function RotY($a,$b,$x,$y)
+{
+	return sin( atan2($y,$x) + atan2($b,$a) ) * sqrt( $x*$x + $y*$y ) ;
+}
+
+        function CalcArrow($x1,$y1,$x2,$y2,$w)
+        {
+            $poly = array();
+
+            $poly[] = $x1 + RotX($x2-$x1, $y2-$y1, 0, $w);
+            $poly[] = $y1 + RotY($x2-$x1, $y2-$y1, 0, $w);
+
+            $poly[] = $x2 + RotX($x2-$x1, $y2-$y1, -4*$w, $w);
+            $poly[] = $y2 + RotY($x2-$x1, $y2-$y1, -4*$w, $w);
+
+            $poly[] = $x2 + RotX($x2-$x1, $y2-$y1, -4*$w, 2*$w);
+            $poly[] = $y2 + RotY($x2-$x1, $y2-$y1, -4*$w, 2*$w);
+
+            $poly[] = $x2;
+            $poly[] = $y2;
+
+            $poly[] = $x2 + RotX($x2-$x1, $y2-$y1, -4*$w, -2*$w);
+            $poly[] = $y2 + RotY($x2-$x1, $y2-$y1, -4*$w, -2*$w);
+
+            $poly[] = $x2 + RotX($x2-$x1, $y2-$y1, -4*$w, -$w);
+            $poly[] = $y2 + RotY($x2-$x1, $y2-$y1, -4*$w, -$w);
+
+            $poly[] = $x1 + RotX($x2-$x1, $y2-$y1, 0, -$w);
+            $poly[] = $y1 + RotY($x2-$x1, $y2-$y1, 0, -$w);
+        
+			return $poly;
+		}
+
+
+
+
+
 /**
  * find the point where a line from x1,y1 through x2,y2 crosses another line through x3,y3 and x4,y4
  * (the point might not be between those points, but beyond them)
@@ -719,7 +762,11 @@ function find_distance_coords(&$pointarray, $distance)
     // We find the nearest lower point for each distance,
     // then linearly interpolate to get a more accurate point
     // this saves having quite so many points-per-curve
-
+	if(count($pointarray)===0) {
+		return array(0,0,0);
+	}
+	
+	
     $index = find_distance($pointarray, $distance);
 
     $ratio = ($distance - $pointarray[$index][2])

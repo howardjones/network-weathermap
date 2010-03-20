@@ -660,6 +660,7 @@ class WeatherMapBase
     var $notes = array ();
     var $hints = array ();
     var $inherit_fieldlist;
+    var $imap_areas = array();
 
     function add_note($name, $value)
     {
@@ -1020,7 +1021,7 @@ class WeatherMap extends WeatherMapBase
         } else {
             // look up what font is defined for this slot number
             if ($this->fonts[$fontnumber]->type === 'truetype') {
-                wimagettftext($image, $this->fonts[$fontnumber]->size, $angle, $x, $y,
+                imagettftext($image, $this->fonts[$fontnumber]->size, $angle, $x, $y,
                     $colour, $this->fonts[$fontnumber]->file, $string);
             }
 
@@ -1040,7 +1041,7 @@ class WeatherMap extends WeatherMapBase
     {
         $linecount = 1;
 
-        $lines = split("\n", $string);
+        $lines = explode("\n", $string);
         $linecount = count($lines);
         $maxlinelength = 0;
 
@@ -1726,7 +1727,7 @@ class WeatherMap extends WeatherMapBase
         )) {
             $bgcol = myimagecolorallocate($im, $bgcolour[0], $bgcolour[1], $bgcolour[2]);
             # imagefilledrectangle($im, $x1, $y1, $x2, $y2, $bgcol);
-            wimagefilledpolygon($im, $points, 4, $bgcol);
+            imagefilledpolygon($im, $points, 4, $bgcol);
         }
 
         if ($outlinecolour != array (
@@ -1736,7 +1737,7 @@ class WeatherMap extends WeatherMapBase
         )) {
             $outlinecol = myimagecolorallocate($im, $outlinecolour[0], $outlinecolour[1],
                 $outlinecolour[2]);
-            wimagepolygon($im, $points, 4, $outlinecol);
+            imagepolygon($im, $points, 4, $outlinecol);
         }
 
         $textcol =
@@ -1757,8 +1758,11 @@ class WeatherMap extends WeatherMapBase
             debug("Adding Rectangle imagemap for $areaname\n");
         } else {
             $map->imap->addArea("Polygon", $areaname, '', $points);
+
             debug("Adding Poly imagemap for $areaname\n");
         }
+        $this->links[$linkname]->imap_areas[] = $areaname;
+
     }
 
     function ColourFromPercent($image, $percent, $scalename = 'DEFAULT', $name = '')
@@ -1960,9 +1964,9 @@ class WeatherMap extends WeatherMapBase
         $scale_ref = 'gdref_legend_' . $scalename;
         $this->AllocateScaleColours($scale_im, $scale_ref);
 
-        wimagefilledrectangle($scale_im, $box_left, $box_top, $box_right, $box_bottom,
+        imagefilledrectangle($scale_im, $box_left, $box_top, $box_right, $box_bottom,
             $this->colours['DEFAULT']['KEYBG'][$scale_ref]);
-        wimagerectangle($scale_im, $box_left, $box_top, $box_right, $box_bottom,
+        imagerectangle($scale_im, $box_left, $box_top, $box_right, $box_bottom,
             $this->colours['DEFAULT']['KEYOUTLINE'][$scale_ref]);
 
         $this->myimagestring($scale_im, $font, $scale_left,
@@ -1986,7 +1990,7 @@ class WeatherMap extends WeatherMapBase
 
             if ($col->is_real()) {
                 $cc = $col->gdallocate($scale_im);
-                wimagefilledrectangle($scale_im, $scale_left + $dx - $scalefactor / 2,
+                imagefilledrectangle($scale_im, $scale_left + $dx - $scalefactor / 2,
                     $scale_top, $scale_left + $dx + $scalefactor / 2, $scale_bottom, $cc);
             }
         }
@@ -1998,12 +2002,15 @@ class WeatherMap extends WeatherMapBase
         $rx = $this->keyx[$scalename];
         $ry = $this->keyy[$scalename];
 
-        $this->imap->addArea("Rectangle", "LEGEND:$scalename", '', array (
+        $areaname =  "LEGEND:".$scalename;
+        $this->imap->addArea("Rectangle", $areaname, '', array (
             $rx + $box_left,
             $ry + $box_top,
             $rx + $box_right,
             $ry + $box_bottom
         ));
+        $this->imap_areas[] = $areaname;
+
     }
 
     function DrawLegend_Vertical($im, $scalename = "DEFAULT", $height = 400,
@@ -2046,9 +2053,9 @@ class WeatherMap extends WeatherMapBase
         $scale_ref = 'gdref_legend_' . $scalename;
         $this->AllocateScaleColours($scale_im, $scale_ref);
 
-        wimagefilledrectangle($scale_im, $box_left, $box_top, $box_right, $box_bottom,
+        imagefilledrectangle($scale_im, $box_left, $box_top, $box_right, $box_bottom,
             $this->colours['DEFAULT']['KEYBG']['gdref1']);
-        wimagerectangle($scale_im, $box_left, $box_top, $box_right, $box_bottom,
+        imagerectangle($scale_im, $box_left, $box_top, $box_right, $box_bottom,
             $this->colours['DEFAULT']['KEYOUTLINE']['gdref1']);
 
         $this->myimagestring($scale_im, $font, $scale_left - $scalefactor,
@@ -2082,7 +2089,7 @@ class WeatherMap extends WeatherMapBase
 
             if ($col->is_real()) {
                 $cc = $col->gdallocate($scale_im);
-                wimagefilledrectangle($scale_im, $scale_left,
+                imagefilledrectangle($scale_im, $scale_left,
                     $scale_top + $dy - $scalefactor / 2, $scale_right,
                     $scale_top + $dy + $scalefactor / 2, $cc);
             }
@@ -2094,12 +2101,16 @@ class WeatherMap extends WeatherMapBase
 
         $rx = $this->keyx[$scalename];
         $ry = $this->keyy[$scalename];
-        $this->imap->addArea("Rectangle", "LEGEND:$scalename", '', array (
+            $areaname =  "LEGEND:".$scalename;
+
+        $this->imap->addArea("Rectangle", $areaname, '', array (
             $rx + $box_left,
             $ry + $box_top,
             $rx + $box_right,
             $ry + $box_bottom
         ));
+                $this->imap_areas[] = $areaname;
+
     }
 
     function DrawLegend_Classic($im, $scalename = 'DEFAULT', $use_tags = false)
@@ -2188,9 +2199,9 @@ class WeatherMap extends WeatherMapBase
             $scale_ref = 'gdref_legend_' . $scalename;
             $this->AllocateScaleColours($scale_im, $scale_ref);
 
-            wimagefilledrectangle($scale_im, $boxx, $boxy, $boxx + $boxwidth,
+            imagefilledrectangle($scale_im, $boxx, $boxy, $boxx + $boxwidth,
                 $boxy + $boxheight, $this->colours['DEFAULT']['KEYBG'][$scale_ref]);
-            wimagerectangle($scale_im, $boxx, $boxy, $boxx + $boxwidth,
+            imagerectangle($scale_im, $boxx, $boxy, $boxx + $boxwidth,
                 $boxy + $boxheight, $this->colours['DEFAULT']['KEYOUTLINE'][$scale_ref]);
             $this->myimagestring($scale_im, $font, $boxx + 4, $boxy + 4 + $tileheight,
                 $title, $this->colours['DEFAULT']['KEYTEXT'][$scale_ref]);
@@ -2228,7 +2239,7 @@ class WeatherMap extends WeatherMapBase
                                     $this->NewColourFromPercent($value, $scalename, '',
                                         false);
                                 $col = $ccol->gdallocate($scale_im);
-                                wimagefilledrectangle($scale_im, $x + $n, $y, $x + $n,
+                                imagefilledrectangle($scale_im, $x + $n, $y, $x + $n,
                                     $y + $tileheight, $col);
                             }
                         } else {
@@ -2238,7 +2249,7 @@ class WeatherMap extends WeatherMapBase
                                 $this->NewColourFromPercent($value, $scalename, '',
                                     false);
                             $col = $ccol->gdallocate($scale_im);
-                            wimagefilledrectangle($scale_im, $x, $y, $x + $tilewidth,
+                            imagefilledrectangle($scale_im, $x, $y, $x + $tilewidth,
                                 $y + $tileheight, $col);
                         }
 
@@ -2269,12 +2280,16 @@ class WeatherMap extends WeatherMapBase
                 }
             }
 
-            $this->imap->addArea("Rectangle", "LEGEND:$scalename", '', array (
+            $areaname =  "LEGEND:".$scalename;
+
+            $this->imap->addArea("Rectangle", $areaname, '', array (
                 $this->keyx[$scalename],
                 $this->keyy[$scalename],
                 $this->keyx[$scalename] + $boxwidth,
                 $this->keyy[$scalename] + $boxheight
             ));
+                    $this->imap_areas[] = $areaname;
+
         }
     }
 
@@ -2313,12 +2328,16 @@ class WeatherMap extends WeatherMapBase
         }
 
         $this->myimagestring($im, $font, $x, $y, $stamp, $colour);
-        $this->imap->addArea("Rectangle", $which . "TIMESTAMP", '', array (
+        $areaname =  $which . "TIMESTAMP";
+
+        $this->imap->addArea("Rectangle", $areaname, '', array (
             $x,
             $y,
             $x + $boxwidth,
             $y - $boxheight
         ));
+                $this->imap_areas[] = $areaname;
+
     }
 
     function DrawTitle($im, $font, $colour)
@@ -2346,6 +2365,8 @@ class WeatherMap extends WeatherMapBase
             $x + $boxwidth,
             $y - $boxheight
         ));
+                $this->imap_areas[] = 'TITLE';
+
     }
 
     function ReadConfigNG($input, $is_include = false, $initial_context = 'GLOBAL')
@@ -2449,7 +2470,7 @@ class WeatherMap extends WeatherMapBase
             debug("ReadConfig Detected that this is a config fragment.\n");
             // strip out any Windows line-endings that have gotten in here
             $input = str_replace("\r", "", $input);
-            $lines = split("/n", $input);
+            $lines = explode("/n", $input);
             $filename = '{text insert}';
         } else {
             debug("ReadConfig Detected that this is a config filename.\n");
@@ -2510,7 +2531,7 @@ class WeatherMap extends WeatherMapBase
                 if ($context == 'GLOBAL') {
                     $ctype = 'GLOBAL';
                 } else {
-                    list($ctype, $junk) = split("\\.", $context, 2);
+                    list($ctype, $junk) = explode("\\.", $context, 2);
                 }
 
                 $lookup = $ctype . "." . $cmd;
@@ -2571,7 +2592,7 @@ class WeatherMap extends WeatherMapBase
             debug("ReadConfig Detected that this is a config fragment.\n");
             // strip out any Windows line-endings that have gotten in here
             $input = str_replace("\r", "", $input);
-            $lines = split("/n", $input);
+            $lines = explode("/n", $input);
             $filename = "{text insert}";
         } else {
             debug("ReadConfig Detected that this is a config filename.\n");
@@ -2632,7 +2653,7 @@ class WeatherMap extends WeatherMapBase
                 if ($context == 'GLOBAL') {
                     $ctype = 'GLOBAL';
                 } else {
-                    list($ctype, $junk) = split("\\.", $context, 2);
+                    list($ctype, $junk) = explode("\\.", $context, 2);
                 }
 
                 $lookup = $ctype . "." . $cmd;
@@ -2721,7 +2742,7 @@ class WeatherMap extends WeatherMapBase
             debug("ReadConfig Detected that this is a config fragment.\n");
             // strip out any Windows line-endings that have gotten in here
             $input = str_replace("\r", "", $input);
-            $lines = split("/n", $input);
+            $lines = explode("/n", $input);
             $filename = "{text insert}";
         } else {
             debug("ReadConfig Detected that this is a config filename.\n");
@@ -4084,7 +4105,7 @@ class WeatherMap extends WeatherMapBase
         $withnodes = true, $use_via_overlay = false, $use_rel_overlay = false)
     {
         debug("Trace: DrawMap()\n");
-        metadump("# start", true);
+       // metadump("# start", true);
         $bgimage = null;
 
         if ($this->configfile != "") {
@@ -4125,7 +4146,7 @@ class WeatherMap extends WeatherMapBase
             }
         }
 
-        $image = wimagecreatetruecolor($this->width, $this->height);
+        $image = imagecreatetruecolor($this->width, $this->height);
 
         if (!$image) {
             warn("Couldn't create output image in memory (" . $this->width . "x"
@@ -4147,7 +4168,7 @@ class WeatherMap extends WeatherMapBase
             $this->AllocateScaleColours($image);
 
 // fill with background colour anyway, in case the background image failed to load
-            wimagefilledrectangle($image, 0, 0, $this->width, $this->height,
+            imagefilledrectangle($image, 0, 0, $this->width, $this->height,
                 $this->colours['DEFAULT']['BG']['gdref1']);
 
             if ($bgimage) {
@@ -4241,6 +4262,8 @@ class WeatherMap extends WeatherMapBase
                                         $areaname = "NODE:N" . $it->id . ":" . $ii;
                                         $this->imap->addArea("Rectangle", $areaname, '',
                                             $bbox);
+                                        $this->nodes[$it->name]->imap_areas[] = $areaname;
+
                                         debug("Adding imagemap area\n");
                                         $ii++;
                                     }
@@ -4730,19 +4753,27 @@ class WeatherMap extends WeatherMapBase
                     if ($it->name != 'DEFAULT' && $it->name != ':: DEFAULT ::') {
                         $name = '';
 
-                        if (strtolower(get_class($it)) === 'weathermaplink') {
-                            $name = 'LINK:L';
+                        foreach ($it->imap_areas as $areaname) {
+                        // skip the linkless areas if we are in the editor - they're redundant
+                            $html .= $this->imap->exactHTML($name, true, ($this->context
+                                != 'editor'));
                         }
 
-                        if (strtolower(get_class($it)) === 'weathermapnode') {
-                            $name = 'NODE:N';
-                        }
-                        $name .= $it->id . ":";
-                        debug("      Writing %s from imagemap\n", $name);
+                        if(1==0) {
+                            if (strtolower(get_class($it)) === 'weathermaplink') {
+                                $name = 'LINK:L';
+                            }
 
-// skip the linkless areas if we are in the editor - they're redundant
-                        $html .= $this->imap->subHTML($name, true, ($this->context
-                            != 'editor'));
+                            if (strtolower(get_class($it)) === 'weathermapnode') {
+                                $name = 'NODE:N';
+                            }
+                            $name .= $it->id . ":";
+                            debug("      Writing %s from imagemap\n", $name);
+
+                            // skip the linkless areas if we are in the editor - they're redundant
+                            $html .= $this->imap->subHTML($name, true, ($this->context
+                                != 'editor'));
+                        }
                     }
                 }
             }

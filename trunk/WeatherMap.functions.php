@@ -1339,7 +1339,7 @@ function draw_straight($image, &$curvepoints, $widths, $outlinecolour, $fillcolo
             // $finalpoints[] contains a complete outline of the line at this stage
 
             if (false === is_null($fillcolours[$dir])) {
-                wimagefilledpolygon($image, $finalpoints, count($finalpoints) / 2,
+                imagefilledpolygon($image, $finalpoints, count($finalpoints) / 2,
                     $arrowsettings[4]);
             } else {
                 debug("Not drawing %s (%s) outline because there is no fill colour\n", $linkname, $dir);
@@ -1350,7 +1350,7 @@ function draw_straight($image, &$curvepoints, $widths, $outlinecolour, $fillcolo
             debug("Adding Poly imagemap for %s\n", $areaname);
 
             if (false === is_null($outlinecolour)) {
-                wimagepolygon($image, $finalpoints, count($finalpoints) / 2,
+                imagepolygon($image, $finalpoints, count($finalpoints) / 2,
                     $arrowsettings[5]);
             } else {
                 debug("Not drawing %s (%s) outline because there is no outline colour\n", $linkname, $dir);
@@ -1506,7 +1506,7 @@ function draw_curve($image, &$curvepoints, $widths, $outlinecolour, $fillcolours
         }
 
         if (false === is_null($fillcolours[$arrayindex])) {
-            wimagefilledpolygon($image, $there_points, count($there_points) / 2,
+            imagefilledpolygon($image, $there_points, count($there_points) / 2,
                 $arrowsettings[$dir][4]);
         } else {
             debug("Not drawing %s (%s) fill because there is no fill colour\n", $linkname, $dir);
@@ -1517,7 +1517,7 @@ function draw_curve($image, &$curvepoints, $widths, $outlinecolour, $fillcolours
         debug("Adding Poly imagemap for %s\n", $areaname);
 
         if (false === is_null($outlinecolour)) {
-            wimagepolygon($image, $there_points, count($there_points) / 2,
+            imagepolygon($image, $there_points, count($there_points) / 2,
                 $arrowsettings[$dir][5]);
         } else {
             debug("Not drawing %s (%s) fill because there is no outline colour\n", $linkname, $dir);
@@ -2063,186 +2063,6 @@ class Colour
     }
 }
 
-/**
- *
- * A series of wrapper functions around all the GD function calls
- * - I added these in so I could make a 'metafile' easily of all the
- * drawing commands for a map. I have a basic Perl-Cairo script that makes
- * anti-aliased maps from these, using Cairo instead of GD.
- *
- */
-
-/**
- * Add a line to the metadump file.
- * Used by all the wimage* functions
- *
- * @param string $string String to add to file
- * @param boolean $truncate Is this to start a new file, or continue one?
- */
-function metadump($string, $truncate = false)
-{
-    // comment this line to get a metafile for this map
-    return;
-
-    if (true === $truncate) {
-        $fd = fopen('metadump.txt', 'w+');
-    } else {
-        $fd = fopen('metadump.txt', 'a');
-    }
-    fputs($fd, $string . "\n");
-    fclose($fd);
-}
-
-function metacolour(&$col)
-{
-    return ($col['red1'] . ' ' . $col['green1'] . ' ' . $col['blue1']);
-}
-
-/**
- * Create an image structure.
- * Log the parameters to the metafile.
- *
- * @param int $width
- * @param int $height
- * @return gdimageref
- */
-function wimagecreate($width, $height)
-{
-    metadump('NEWIMAGE '.$width.' '.$height);
-    return (imagecreate($width, $height));
-}
-
-function wimagefilledrectangle($image, $x1, $y1, $x2, $y2, $color)
-{
-    if ($color === null) {
-        return;
-    }
-
-    $col = imagecolorsforindex($image, $color);
-    $r = $col['red'];
-    $g = $col['green'];
-    $b = $col['blue'];
-    $a = $col['alpha'];
-    $r = $r / 255;
-    $g = $g / 255;
-    $b = $b / 255;
-    $a = (127 - $a) / 127;
-
-    metadump( sprintf('FRECT %f %f %f %f %f %f %f %f',
-        $x1, $y1, $x2, $y2, $r, $g, $b, $a));
-    
-    return (imagefilledrectangle($image, $x1, $y1, $x2, $y2, $color));
-}
-
-function wimagerectangle($image, $x1, $y1, $x2, $y2, $color)
-{
-    if ($color === null) {
-        return;
-    }
-
-    $col = imagecolorsforindex($image, $color);
-    $r = $col['red'];
-    $g = $col['green'];
-    $b = $col['blue'];
-    $a = $col['alpha'];
-    $r = $r / 255;
-    $g = $g / 255;
-    $b = $b / 255;
-    $a = (127 - $a) / 127;
-    
-    metadump( sprintf('RECT %f %f %f %f %f %f %f %f',
-        $x1, $y1, $x2, $y2, $r, $g, $b, $a));
-    
-    return (imagerectangle($image, $x1, $y1, $x2, $y2, $color));
-}
-
-function wimagepolygon($image, $points, $num_points, $color)
-{
-    if ($color === null) {
-        return;
-    }
-
-    $col = imagecolorsforindex($image, $color);
-    $r = $col['red'];
-    $g = $col['green'];
-    $b = $col['blue'];
-    $a = $col['alpha'];
-    $r = $r / 255;
-    $g = $g / 255;
-    $b = $b / 255;
-    $a = (127 - $a) / 127;
-
-    $pts = '';
-
-    for ($i = 0; $i < $num_points; $i++) {
-        $pts .= $points[$i * 2] . ' ';
-        $pts .= $points[$i * 2 + 1] . ' ';
-    }
-
-    metadump( sprintf('POLY %d %s %f %f %f %f',
-        $num_points, $pts, $r, $g, $b, $a));
-    
-    return (imagepolygon($image, $points, $num_points, $color));
-}
-
-function wimagefilledpolygon($image, $points, $num_points, $color)
-{
-    if ($color === null) {
-        return;
-    }
-
-    $col = imagecolorsforindex($image, $color);
-    $r = $col['red'];
-    $g = $col['green'];
-    $b = $col['blue'];
-    $a = $col['alpha'];
-    $r = $r / 255;
-    $g = $g / 255;
-    $b = $b / 255;
-    $a = (127 - $a) / 127;
-
-    $pts = '';
-
-    for ($i = 0; $i < $num_points; $i++) {
-        $pts .= $points[$i * 2] . ' ';
-        $pts .= $points[$i * 2 + 1] . ' ';
-    }
-    
-    metadump( sprintf('FPOLY %d %s %f %f %f %f',
-        $num_points, $pts, $r, $g, $b, $a));
-
-    return (imagefilledpolygon($image, $points, $num_points, $color));
-}
-
-function wimagecreatetruecolor($width, $height)
-{
-    metadump('BLANKIMAGE '.$width.' '.$height);
-
-    return imagecreatetruecolor($width, $height);
-}
-
-function wimagettftext($image, $size, $angle, $x, $y, $color, $file, $string)
-{
-    if ($color === null) {
-        return;
-    }        
-
-    $col = imagecolorsforindex($image, $color);
-    $r = $col['red'];
-    $g = $col['green'];
-    $b = $col['blue'];
-    $a = $col['alpha'];
-    $r = $r / 255;
-    $g = $g / 255;
-    $b = $b / 255;
-    $a = (127 - $a) / 127;
-
-    metadump( sprintf('TEXT %f %f %f %f %s %f %f %f %f %s',
-        $x, $y, $angle, $size, $file, $r, $g, $b, $a, $string
-    ));
-
-    return (imagettftext($image, $size, $angle, $x, $y, $color, $file, $string));
-}
 
 function wm_draw_marker_diamond($im, $col, $x, $y, $size = 10)
 {

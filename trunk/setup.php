@@ -339,6 +339,7 @@ function weathermap_setup_table()
 				titlecache text NOT NULL,
 				filehash varchar (40) NOT NULL default '',
 				warncount int(11) NOT NULL default 0,
+                                runtime int(11) NOT NULL default 0,
 				config text NOT NULL default '',
 				thumb_width int(11) NOT NULL default 0,
 				thumb_height int(11) NOT NULL default 0,
@@ -355,42 +356,53 @@ function weathermap_setup_table()
             $found_cf = false;
             $found_96changes = false;
             $found_96bchanges = false;
+            $found_98changes = false;
 
             while ($row = mysql_fetch_array($result, MYSQL_ASSOC)) {
-                if ($row['Field'] == 'sortorder')
+                if ($row['Field'] == 'sortorder') {
                     $found_so = true;
+                }
 
-                if ($row['Field'] == 'filehash')
+                if ($row['Field'] == 'filehash') {
                     $found_fh = true;
+                }
 
-                if ($row['Field'] == 'warncount')
+                if ($row['Field'] == 'warncount') {
                     $found_wc = true;
+                }
 
-                if ($row['Field'] == 'config')
+                if ($row['Field'] == 'config') {
                     $found_cf = true;
+                }
 
-                if ($row['Field'] == 'thumb_width')
+                if ($row['Field'] == 'thumb_width') {
                     $found_96changes = true;
+                }
 
-                if ($row['Field'] == 'group_id')
+                if ($row['Field'] == 'group_id') {
                     $found_96bchanges = true;
+                }
             }
 
-            if (!$found_so)
+            if (!$found_so) {
                 $sql[] =
                     "alter table weathermap_maps add sortorder int(11) NOT NULL default 0 after id";
+            }
 
-            if (!$found_fh)
+            if (!$found_fh) {
                 $sql[] =
                     "alter table weathermap_maps add filehash varchar(40) NOT NULL default '' after titlecache";
+            }
 
-            if (!$found_wc)
+            if (!$found_wc) {
                 $sql[] =
                     "alter table weathermap_maps add warncount int(11) NOT NULL default 0 after filehash";
+            }
 
-            if (!$found_cf)
+            if (!$found_cf) {
                 $sql[] =
                     "alter table weathermap_maps add config text NOT NULL  default '' after warncount";
+            }
 
             if (!$found_96changes) {
                 $sql[] =
@@ -409,6 +421,12 @@ function weathermap_setup_table()
                 $sql[] =
                     "ALTER TABLE `weathermap_settings` ADD `groupid` INT NOT NULL DEFAULT '0' AFTER `mapid`";
             }
+            
+            if (!$found_98changes) {
+                $sql[] = "alter table weathermap_maps add runtime int(11) NOT NULL default 0 after warncount";
+            }
+
+
         }
 
         $sql[] =
@@ -1162,8 +1180,9 @@ function weathermap_poller_output($rrd_update_array)
 
     $logging = read_config_option("log_verbosity");
 
-    if ($logging >= POLLER_VERBOSITY_DEBUG)
+    if ($logging >= POLLER_VERBOSITY_DEBUG) {
         cacti_log("WM poller_output: STARTING\n", true, "WEATHERMAP");
+    }
 
 // partially borrowed from Jimmy Conner's THold plugin.
 // (although I do things slightly differently - I go from filenames, and don't use the poller_interval)
@@ -1306,8 +1325,8 @@ function weathermap_poller_bottom()
 
     weathermap_setup_table();
 
-    $renderperiod = read_config_option("weathermap_render_period");
-    $rendercounter = read_config_option("weathermap_render_counter");
+    $renderperiod = intval(read_config_option("weathermap_render_period"));
+    $rendercounter = intval(read_config_option("weathermap_render_counter"));
     $quietlogging = read_config_option("weathermap_quiet_logging");
 
     if ($renderperiod < 0) {

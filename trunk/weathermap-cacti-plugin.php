@@ -66,166 +66,6 @@ switch ($action) {
 
         break;
 
-    case 'liveviewimage':
-        $id = -1;
-
-        if (isset($_REQUEST['id'])
-            && (!is_numeric($_REQUEST['id']) || strlen($_REQUEST['id']) == 20)) {
-            $id = weathermap_translate_id($_REQUEST['id']);
-        }
-
-        if (isset($_REQUEST['id']) && is_numeric($_REQUEST['id'])) {
-            $id = intval($_REQUEST['id']);
-        }
-
-        if ($id >= 0) {
-            $userid = (isset($_SESSION["sess_user_id"])
-                ? intval($_SESSION["sess_user_id"]) : 1);
-            $map =
-                db_fetch_assoc(
-                    "select weathermap_maps.* from weathermap_auth,weathermap_maps where weathermap_maps.id=weathermap_auth.mapid and active='on' and (userid="
-                . $userid . " or userid=0) and weathermap_maps.id=" . $id);
-
-            if (sizeof($map)) {
-
-                $mapfile = dirname(__FILE__) . '/configs/' . '/' . $map[0]['configfile'];
-                $orig_cwd = getcwd();
-                chdir(dirname(__FILE__));
-
-                header('Content-type: image/png');
-
-                $map = new WeatherMap;
-                $map->context = '';
-                // $map->context = "cacti";
-                $map->rrdtool = read_config_option("path_rrdtool");
-                $map->ReadConfig($mapfile);
-                $map->ReadData();
-                $map->DrawMap('', '', 250, true, false);
-                dir($orig_cwd);
-            }
-        }
-
-        break;
-
-    case 'liveview':
-        include_once($config["base_path"] . "/include/top_graph_header.php");
-        print
-            "<div id=\"overDiv\" style=\"position:absolute; visibility:hidden; z-index:1000;\"></div>\n";
-        print
-            "<script type=\"text/javascript\" src=\"overlib.js\"><!-- overLIB (c) Erik Bosrup --></script> \n";
-
-        $id = -1;
-
-        if (isset($_REQUEST['id'])
-            && (!is_numeric($_REQUEST['id']) || strlen($_REQUEST['id']) == 20)) {
-            $id = weathermap_translate_id($_REQUEST['id']);
-        }
-
-        if (isset($_REQUEST['id']) && is_numeric($_REQUEST['id'])) {
-            $id = intval($_REQUEST['id']);
-        }
-
-        if ($id >= 0) {
-            $userid = (isset($_SESSION["sess_user_id"])
-                ? intval($_SESSION["sess_user_id"]) : 1);
-            $map =
-                db_fetch_assoc(
-                    "select weathermap_maps.* from weathermap_auth,weathermap_maps where weathermap_maps.id=weathermap_auth.mapid and active='on' and (userid="
-                . $userid . " or userid=0) and weathermap_maps.id=" . $id);
-
-            if (sizeof($map)) {
-                $maptitle = $map[0]['titlecache'];
-
-                html_graph_start_box(1, true);
-?>
-
-            <tr bgcolor = "<?php print $colors["panel"];?>"><td>
-                    <table width = "100%" cellpadding = "0" cellspacing = "0">
-                        <tr><td class = "textHeader" nowrap><?php print $maptitle; ?></td>
-                        </tr>
-                    </table></td>
-            </tr>
-
-<?php
-                            print "<tr><td>";
-
-# print "Generating map $id here now from ".$map[0]['configfile'];
-
-                            $confdir = dirname(__FILE__) . '/configs/';
-                            // everything else in this file is inside this else
-                            $mapname = $map[0]['configfile'];
-                            $mapfile = $confdir . '/' . $mapname;
-
-                            $orig_cwd = getcwd();
-                            chdir(dirname(__FILE__));
-
-                            $map = new WeatherMap;
-                            // $map->context = "cacti";
-                            $map->rrdtool = read_config_option("path_rrdtool");
-                            print "<pre>";
-                            $map->ReadConfig($mapfile);
-                            $map->ReadData();
-                            $map->DrawMap('null');
-                            $map->PreloadMapHTML();
-                            print "</pre>";
-                            print "";
-                            print "<img src='?action=liveviewimage&id=$id' />\n";
-                            print $map->imap->subHTML("LEGEND:");
-                            print $map->imap->subHTML("TIMESTAMP");
-                            print $map->imap->subHTML("NODE:");
-                            print $map->imap->subHTML("LINK:");
-                            chdir($orig_cwd);
-
-                            print "</td></tr>";
-                            html_graph_end_box();
-            } else {
-                print "Map unavailable.";
-            }
-        } else {
-            print "No ID, or unknown map name.";
-        }
-
-        weathermap_versionbox();
-        include_once($config["base_path"] . "/include/bottom_footer.php");
-        break;
-
-    case 'mrss':
-        header('Content-type: application/rss+xml');
-        print '<?xml version="1.0" encoding="utf-8" standalone="yes"?>' . "\n";
-        print
-            '<rss xmlns:media="http://search.yahoo.com/mrss" version="2.0"><channel><title>My Network Weathermaps</title>';
-        $userid = (isset($_SESSION["sess_user_id"])
-            ? intval($_SESSION["sess_user_id"]) : 1);
-        $maplist =
-            db_fetch_assoc(
-                "select distinct weathermap_maps.* from weathermap_auth,weathermap_maps where weathermap_maps.id=weathermap_auth.mapid and active='on' and (userid="
-            . $userid . " or userid=0) order by sortorder, id");
-
-        foreach ($maplist as $map) {
-            $thumburl =
-                "weathermap-cacti-plugin.php?action=viewthumb&id=" . $map['filehash']
-                . "&time=" . time();
-            $bigurl =
-                "weathermap-cacti-plugin.php?action=viewimage&id=" . $map['filehash']
-                . "&time=" . time();
-            $linkurl =
-                'weathermap-cacti-plugin.php?action=viewmap&id=' . $map['filehash'];
-            $maptitle = $map['titlecache'];
-            $guid = $map['filehash'];
-
-            if ($maptitle == '')
-                $maptitle = "Map for config file: " . $map['configfile'];
-
-            printf(
-                '<item><title>%s</title><description>Network Weathermap named "%s"</description><link>%s</link><media:thumbnail url="%s"/><media:content url="%s"/><guid isPermaLink="false">%s%s</guid></item>',
-                $maptitle, $maptitle, $linkurl, $thumburl, $bigurl, $config['url_path'],
-                $guid);
-            print "\n";
-        }
-
-        print '</channel></rss>';
-        break;
-
     case 'viewmapcycle':
         include_once($config["base_path"] . "/include/top_graph_header.php");
         print
@@ -463,7 +303,6 @@ function weathermap_thumbview($limit_to_group = -1)
 
 <?php
         html_graph_end_box();
-        $showlivelinks = intval(read_config_option("weathermap_live_view"));
 
         weathermap_tabs($limit_to_group);
         $i = 0;
@@ -513,10 +352,6 @@ function weathermap_thumbview($limit_to_group = -1)
                     print "(thumbnail for map not created yet)";
                 }
 
-                if ($showlivelinks == 1) {
-                    print "<a href='?action=liveview&id=" . $map['filehash']
-                        . "'>(live)</a>";
-                }
                 print '</div> ';
             }
             print "</td></tr>";

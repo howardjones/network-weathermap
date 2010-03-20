@@ -628,7 +628,7 @@ class WeatherMapNode extends WeatherMapItem
                 imagerectangle($node_im, $label_x1, $label_y1, $label_x2, $label_y2,
                     $map->selected);
                 // would be nice if it was thicker, too...
-                wimagerectangle($node_im, $label_x1 + 1, $label_y1 + 1, $label_x2 - 1,
+                imagerectangle($node_im, $label_x1 + 1, $label_y1 + 1, $label_x2 - 1,
                     $label_y2 - 1, $map->selected);
             } else {
                 $olcol = new Colour($this->labeloutlinecolour);

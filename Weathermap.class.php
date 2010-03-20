@@ -2905,7 +2905,13 @@ class WeatherMap extends WeatherMapBase
                 // alternative for use later where quoted strings are more useful
                 $args = ParseString($buffer);
 
-				// this loop replaces a whole pile of duplicated ifs with something with consistent handling
+                // From here, the aim of the game is to get out of this loop as
+                // early as possible, without running more preg_match calls than
+                // necessary. In 0.97, this per-line loop accounted for 50% of
+                // the running time!
+
+
+				// this next loop replaces a whole pile of duplicated ifs with something with consistent handling
                 
 				assert('is_object($curobj)');
 								
@@ -2942,91 +2948,22 @@ class WeatherMap extends WeatherMapBase
 						}
 					}
 				}
-			
 
+                 // SETs are universal, and relatively common
                 if (($linematched == 0)
-                    && preg_match("/^\s*NODES\s+(\S+)\s+(\S+)\s*$/i", $buffer, $matches))
-                    {
-                    if ($last_seen == 'LINK') {
-                        $valid_nodes = 2;
-
-                        foreach (array (
-                            1,
-                            2
-                        ) as $i) {
-                            $endoffset[$i] = 'C';
-                            $nodenames[$i] = $matches[$i];
-
-                            // percentage of compass - must be first
-                            if (preg_match("/:(NE|SE|NW|SW|N|S|E|W|C)(\d+)$/i",
-                                $matches[$i], $submatches)) {
-                                $endoffset[$i] = $submatches[1] . $submatches[2];
-                                $nodenames[$i] =
-                                    preg_replace("/:(NE|SE|NW|SW|N|S|E|W|C)\d+$/i", '',
-                                        $matches[$i]);
-                                $this->need_size_precalc = true;
-                            }
-
-                            if (preg_match("/:(NE|SE|NW|SW|N|S|E|W|C)$/i", $matches[$i],
-                                $submatches)) {
-                                $endoffset[$i] = $submatches[1];
-                                $nodenames[$i] =
-                                    preg_replace("/:(NE|SE|NW|SW|N|S|E|W|C)$/i", '',
-                                        $matches[$i]);
-                                $this->need_size_precalc = true;
-                            }
-
-                            if (preg_match("/:(-?\d+r\d+)$/i", $matches[$i], $submatches))
-                                {
-                                $endoffset[$i] = $submatches[1];
-                                $nodenames[$i] =
-                                    preg_replace("/:(-?\d+r\d+)$/i", '', $matches[$i]);
-                                $this->need_size_precalc = true;
-                            }
-
-                            if (preg_match("/:([-+]?\d+):([-+]?\d+)$/i", $matches[$i],
-                                $submatches)) {
-                                $xoff = $submatches[1];
-                                $yoff = $submatches[2];
-                                $endoffset[$i] = $xoff . ":" . $yoff;
-                                $nodenames[$i] =
-                                    preg_replace("/:$xoff:$yoff$/i", '', $matches[$i]);
-                                $this->need_size_precalc = true;
-                            }
-
-                            if (!array_key_exists($nodenames[$i], $this->nodes)) {
-                                warn("Unknown node '" . $nodenames[$i]
-                                    . "' on line $linecount of config\n");
-                                $valid_nodes--;
-                            }
-                        }
-
-// TODO - really, this should kill the whole link, and reset for the next one
-                        if ($valid_nodes == 2) {
-                            $curlink->a = $this->nodes[$nodenames[1]];
-                            $curlink->b = $this->nodes[$nodenames[2]];
-                            $curlink->a_offset = $endoffset[1];
-                            $curlink->b_offset = $endoffset[2];
-                        } else {
-                            // this'll stop the current link being added
-                            $last_seen = "broken";
-                        }
-
-                        $linematched++;
-                    }
-                }
-
-                if (($linematched == 0) && $last_seen == 'GLOBAL'
-                    && preg_match("/^\s*INCLUDE\s+(.*)\s*$/i", $buffer, $matches)) {
-                    if (file_exists($matches[1])) {
-                        debug("Including '{$matches[1]}'\n");
-                        $this->ReadConfig($matches[1], true);
-                        $last_seen = "GLOBAL";
-                    } else {
-                        warn("INCLUDE File '{$matches[1]}' not found!\n");
-                    }
+                    && preg_match("/^\s*SET\s+(\S+)\s+(.*)\s*$/i", $buffer, $matches)) {
+                    $curobj->add_hint($matches[1], trim($matches[2]));
                     $linematched++;
                 }
+
+                // allow setting a variable to ""
+                if (($linematched == 0)
+                    && preg_match("/^\s*SET\s+(\S+)\s*$/i", $buffer, $matches)) {
+                    $curobj->add_hint($matches[1], '');
+                    $linematched++;
+                }
+
+                // same with TARGETs
 
                 if (($linematched == 0) && ($last_seen == 'NODE' || $last_seen == 'LINK')
                     && preg_match("/^\s*TARGET\s+(.*)\s*$/i", $buffer, $matches)) {
@@ -3066,6 +3003,280 @@ class WeatherMap extends WeatherMapBase
                     }
                 }
 
+                // the next blocks are for commands that only apply to one
+                // type of object, but need some more processing/validation
+                // than config_keywords[] could have done.
+                // Putting more common things at the top of these blocks
+                // should also help, if possible.
+
+                // LINK-specific stuff that couldn't be done with just a regexp
+                if($last_seen == 'LINK' && $linematched == 0 ) {
+
+                    if (($linematched == 0)
+                        && preg_match("/^\s*NODES\s+(\S+)\s+(\S+)\s*$/i", $buffer, $matches))
+                        {
+
+                            $valid_nodes = 2;
+
+                            foreach (array (
+                                1,
+                                2
+                            ) as $i) {
+                                $endoffset[$i] = 'C';
+                                $nodenames[$i] = $matches[$i];
+
+                                // percentage of compass - must be first
+                                if (preg_match("/:(NE|SE|NW|SW|N|S|E|W|C)(\d+)$/i",
+                                    $matches[$i], $submatches)) {
+                                    $endoffset[$i] = $submatches[1] . $submatches[2];
+                                    $nodenames[$i] =
+                                        preg_replace("/:(NE|SE|NW|SW|N|S|E|W|C)\d+$/i", '',
+                                            $matches[$i]);
+                                    $this->need_size_precalc = true;
+                                }
+
+                                if (preg_match("/:(NE|SE|NW|SW|N|S|E|W|C)$/i", $matches[$i],
+                                    $submatches)) {
+                                    $endoffset[$i] = $submatches[1];
+                                    $nodenames[$i] =
+                                        preg_replace("/:(NE|SE|NW|SW|N|S|E|W|C)$/i", '',
+                                            $matches[$i]);
+                                    $this->need_size_precalc = true;
+                                }
+
+                                if (preg_match("/:(-?\d+r\d+)$/i", $matches[$i], $submatches))
+                                    {
+                                    $endoffset[$i] = $submatches[1];
+                                    $nodenames[$i] =
+                                        preg_replace("/:(-?\d+r\d+)$/i", '', $matches[$i]);
+                                    $this->need_size_precalc = true;
+                                }
+
+                                if (preg_match("/:([-+]?\d+):([-+]?\d+)$/i", $matches[$i],
+                                    $submatches)) {
+                                    $xoff = $submatches[1];
+                                    $yoff = $submatches[2];
+                                    $endoffset[$i] = $xoff . ":" . $yoff;
+                                    $nodenames[$i] =
+                                        preg_replace("/:$xoff:$yoff$/i", '', $matches[$i]);
+                                    $this->need_size_precalc = true;
+                                }
+
+                                if (!array_key_exists($nodenames[$i], $this->nodes)) {
+                                    warn("Unknown node '" . $nodenames[$i]
+                                        . "' on line $linecount of config\n");
+                                    $valid_nodes--;
+                                }
+                            }
+
+    // TODO - really, this should kill the whole link, and reset for the next one
+                            if ($valid_nodes == 2) {
+                                $curlink->a = $this->nodes[$nodenames[1]];
+                                $curlink->b = $this->nodes[$nodenames[2]];
+                                $curlink->a_offset = $endoffset[1];
+                                $curlink->b_offset = $endoffset[2];
+                            } else {
+                                // this'll stop the current link being added
+                                $last_seen = "broken";
+                            }
+
+                            $linematched++;
+
+                    }
+
+
+
+                    if (($linematched == 0)
+                        && preg_match("/^\s*VIA\s+([-+]?\d+)\s+([-+]?\d+)\s*$/i", $buffer,
+                            $matches)) {
+                        $curlink->vialist[] = array (
+                            $matches[1],
+                            $matches[2]
+                        );
+
+                        $linematched++;
+                    }
+
+
+                    if (($linematched == 0) 
+                        && preg_match("/^\s*VIA\s+(\S+)\s+([-+]?\d+)\s+([-+]?\d+)\s*$/i",
+                            $buffer, $matches)) {
+                        $curlink->vialist[] = array (
+                            $matches[2],
+                            $matches[3],
+                            $matches[1]
+                        );
+
+                        $linematched++;
+                    }
+
+                    if (($linematched == 0) 
+                        && preg_match("/^\s*ARROWSTYLE\s+(\d+)\s+(\d+)\s*$/i", $buffer,
+                            $matches)) {
+                        $curlink->arrowstyle = $matches[1] . ' ' . $matches[2];
+                        $linematched++;
+                    }
+
+                    if (($linematched == 0)
+                        && (preg_match(
+                            "/^\s*(COMMENTFONT|BWBOX|BWFONT|BWOUTLINE|OUTLINE)COLOR\s+((\d+)\s+(\d+)\s+(\d+)|none|contrast|copy)\s*$/i",
+                            $buffer, $matches))) {
+                        $key = $matches[1];
+                        $field = strtolower($matches[1]) . 'colour';
+                        $val = strtolower($matches[2]);
+
+                        if (isset($matches[3])) // this is a regular colour setting thing
+                        {
+                            $curlink->$field = array (
+                                $matches[3],
+                                $matches[4],
+                                $matches[5]
+                            );
+
+                            $linematched++;
+                        }
+
+                        if ($val == 'none'
+                            && ($key == 'BWBOX' || $key == 'BWOUTLINE' || $key == 'OUTLINE'))
+                            {
+
+                            $curlink->$field = array (
+                                -1,
+                                -1,
+                                -1
+                            );
+
+                            $linematched++;
+                        }
+
+                        if ($val == 'contrast' && $key == 'COMMENTFONT') {
+
+                            $curlink->$field = array (
+                                -3,
+                                -3,
+                                -3
+                            );
+
+                            $linematched++;
+                        }
+                    }
+
+                }
+
+                // NODE-specific stuff that couldn't be done with just a regexp
+                if($last_seen == 'NODE' && $linematched == 0 ) {
+
+                }
+
+                // GLOBAL-specific stuff that couldn't be done with just a regexp
+                if($last_seen == 'GLOBAL' && $linematched == 0 ) {
+
+
+                        // truetype font definition (actually, we don't really check if it's truetype) - filename + size
+                    if (($linematched == 0)
+                        && preg_match("/^\s*FONTDEFINE\s+(\d+)\s+(\S+)\s+(\d+)\s*$/i",
+                            $buffer, $matches)) {
+                        if (function_exists("imagettfbbox")) {
+    // test if this font is valid, before adding it to the font table...
+                            $bounds = @imagettfbbox($matches[3], 0, $matches[2], "Ignore me");
+
+                            if (isset($bounds[0])) {
+                                $this->fonts[$matches[1]]->type = "truetype";
+                                $this->fonts[$matches[1]]->file = $matches[2];
+                                $this->fonts[$matches[1]]->size = $matches[3];
+                            } else {
+                                warn("Failed to load ttf font " . $matches[2]
+                                    . " - at config line $linecount\n [WMWARN30]");
+                            }
+                        } else {
+                            warn(
+                                "imagettfbbox() is not a defined function. You don't seem to have FreeType compiled into your gd module. [WMWARN31]\n");
+                        }
+
+                        $linematched++;
+                    }
+
+                    // GD font definition (no size here)
+                    if (($linematched == 0)
+                        && preg_match("/^\s*FONTDEFINE\s+(\d+)\s+(\S+)\s*$/i", $buffer,
+                            $matches)) {
+                        $newfont = imageloadfont($matches[2]);
+
+                        if ($newfont) {
+                            $this->fonts[$matches[1]]->type = "gd";
+                            $this->fonts[$matches[1]]->file = $matches[2];
+                            $this->fonts[$matches[1]]->gdnumber = $newfont;
+                        } else {
+                            warn("Failed to load GD font: " . $matches[2]
+                                . " ($newfont) at config line $linecount [WMWARN32]\n");
+                        }
+
+                        $linematched++;
+                    }
+
+
+                    if (($linematched == 0)
+                        && preg_match(
+                            "/^\s*(TIME|TITLE|KEYBG|KEYTEXT|KEYOUTLINE|BG)COLOR\s+(\d+)\s+(\d+)\s+(\d+)\s*$/i",
+                            $buffer, $matches)) {
+                        $key = $matches[1];
+
+                        $this->colours['DEFAULT'][$key]['red1'] = $matches[2];
+                        $this->colours['DEFAULT'][$key]['green1'] = $matches[3];
+                        $this->colours['DEFAULT'][$key]['blue1'] = $matches[4];
+                        $this->colours['DEFAULT'][$key]['bottom'] = -2;
+                        $this->colours['DEFAULT'][$key]['top'] = -1;
+                        $this->colours['DEFAULT'][$key]['special'] = 1;
+
+                        $linematched++;
+                    }
+
+                   if (($linematched == 0)
+                        && preg_match(
+                            "/^\s*KEYSTYLE\s+([A-Za-z][A-Za-z0-9_]+\s+)?(classic|horizontal|vertical|inverted|tags)\s?(\d+)?\s*$/i",
+                            $buffer, $matches)) {
+                        $whichkey = trim($matches[1]);
+
+                        if ($whichkey == '')
+                            $whichkey = 'DEFAULT';
+                        $this->keystyle[$whichkey] = strtolower($matches[2]);
+
+                        if (isset($matches[3]) && $matches[3] != '') {
+                            $this->keysize[$whichkey] = $matches[3];
+                        } else {
+                            $this->keysize[$whichkey] = $this->keysize['DEFAULT'];
+                        }
+
+                        $linematched++;
+                    }
+
+
+                    if (($linematched == 0)
+                        && preg_match("/^\s*KILO\s+(\d+)\s*$/i", $buffer, $matches)) {
+                        $this->kilo = $matches[1];
+                        $linematched++;
+                    }
+
+
+                }
+
+
+                // *********************************************************
+
+                if (($linematched == 0) && $last_seen == 'GLOBAL'
+                    && preg_match("/^\s*INCLUDE\s+(.*)\s*$/i", $buffer, $matches)) {
+                    if (file_exists($matches[1])) {
+                        debug("Including '{$matches[1]}'\n");
+                        $this->ReadConfig($matches[1], true);
+                        $last_seen = "GLOBAL";
+                    } else {
+                        warn("INCLUDE File '{$matches[1]}' not found!\n");
+                    }
+                    $linematched++;
+                }
+
+                
+
                 if (($linematched == 0) && $last_seen == 'LINK'
                     && preg_match("/^\s*BWLABEL\s+(bits|percent|unformatted|none)\s*$/i",
                         $buffer, $matches)) {
@@ -3094,18 +3305,7 @@ class WeatherMap extends WeatherMapBase
                     $linematched++;
                 }
 
-                if (($linematched == 0)
-                    && preg_match("/^\s*SET\s+(\S+)\s+(.*)\s*$/i", $buffer, $matches)) {
-                    $curobj->add_hint($matches[1], trim($matches[2]));
-                    $linematched++;
-                }
-
-                // allow setting a variable to ""
-                if (($linematched == 0)
-                    && preg_match("/^\s*SET\s+(\S+)\s*$/i", $buffer, $matches)) {
-                    $curobj->add_hint($matches[1], '');
-                    $linematched++;
-                }
+          
 
                 if (($linematched == 0)
                     && preg_match("/^\s*(IN|OUT)?OVERLIBGRAPH\s+(.+)$/i", $buffer,
@@ -3165,28 +3365,7 @@ class WeatherMap extends WeatherMapBase
                     $linematched++;
                 }
 
-                if (($linematched == 0) && $last_seen == 'LINK'
-                    && preg_match("/^\s*VIA\s+([-+]?\d+)\s+([-+]?\d+)\s*$/i", $buffer,
-                        $matches)) {
-                    $curlink->vialist[] = array (
-                        $matches[1],
-                        $matches[2]
-                    );
 
-                    $linematched++;
-                }
-
-                if (($linematched == 0) && $last_seen == 'LINK'
-                    && preg_match("/^\s*VIA\s+(\S+)\s+([-+]?\d+)\s+([-+]?\d+)\s*$/i",
-                        $buffer, $matches)) {
-                    $curlink->vialist[] = array (
-                        $matches[2],
-                        $matches[3],
-                        $matches[1]
-                    );
-
-                    $linematched++;
-                }
 
                 if (($linematched == 0) && ($last_seen == 'NODE')
                     && preg_match(
@@ -3310,88 +3489,10 @@ class WeatherMap extends WeatherMapBase
                 }
 
 
-// truetype font definition (actually, we don't really check if it's truetype) - filename + size
-                if (($linematched == 0)
-                    && preg_match("/^\s*FONTDEFINE\s+(\d+)\s+(\S+)\s+(\d+)\s*$/i",
-                        $buffer, $matches)) {
-                    if (function_exists("imagettfbbox")) {
-// test if this font is valid, before adding it to the font table...
-                        $bounds = @imagettfbbox($matches[3], 0, $matches[2], "Ignore me");
 
-                        if (isset($bounds[0])) {
-                            $this->fonts[$matches[1]]->type = "truetype";
-                            $this->fonts[$matches[1]]->file = $matches[2];
-                            $this->fonts[$matches[1]]->size = $matches[3];
-                        } else {
-                            warn("Failed to load ttf font " . $matches[2]
-                                . " - at config line $linecount\n [WMWARN30]");
-                        }
-                    } else {
-                        warn(
-                            "imagettfbbox() is not a defined function. You don't seem to have FreeType compiled into your gd module. [WMWARN31]\n");
-                    }
 
-                    $linematched++;
-                }
 
-                // GD font definition (no size here)
-                if (($linematched == 0)
-                    && preg_match("/^\s*FONTDEFINE\s+(\d+)\s+(\S+)\s*$/i", $buffer,
-                        $matches)) {
-                    $newfont = imageloadfont($matches[2]);
 
-                    if ($newfont) {
-                        $this->fonts[$matches[1]]->type = "gd";
-                        $this->fonts[$matches[1]]->file = $matches[2];
-                        $this->fonts[$matches[1]]->gdnumber = $newfont;
-                    } else {
-                        warn("Failed to load GD font: " . $matches[2]
-                            . " ($newfont) at config line $linecount [WMWARN32]\n");
-                    }
-
-                    $linematched++;
-                }
-
-                if (($linematched == 0)
-                    && preg_match(
-                        "/^\s*KEYSTYLE\s+([A-Za-z][A-Za-z0-9_]+\s+)?(classic|horizontal|vertical|inverted|tags)\s?(\d+)?\s*$/i",
-                        $buffer, $matches)) {
-                    $whichkey = trim($matches[1]);
-
-                    if ($whichkey == '')
-                        $whichkey = 'DEFAULT';
-                    $this->keystyle[$whichkey] = strtolower($matches[2]);
-
-                    if (isset($matches[3]) && $matches[3] != '') {
-                        $this->keysize[$whichkey] = $matches[3];
-                    } else {
-                        $this->keysize[$whichkey] = $this->keysize['DEFAULT'];
-                    }
-
-                    $linematched++;
-                }
-
-                if (($linematched == 0)
-                    && preg_match("/^\s*KILO\s+(\d+)\s*$/i", $buffer, $matches)) {
-                    $this->kilo = $matches[1];
-                    $linematched++;
-                }
-
-                if (($linematched == 0)
-                    && preg_match(
-                        "/^\s*(TIME|TITLE|KEYBG|KEYTEXT|KEYOUTLINE|BG)COLOR\s+(\d+)\s+(\d+)\s+(\d+)\s*$/i",
-                        $buffer, $matches)) {
-                    $key = $matches[1];
-
-                    $this->colours['DEFAULT'][$key]['red1'] = $matches[2];
-                    $this->colours['DEFAULT'][$key]['green1'] = $matches[3];
-                    $this->colours['DEFAULT'][$key]['blue1'] = $matches[4];
-                    $this->colours['DEFAULT'][$key]['bottom'] = -2;
-                    $this->colours['DEFAULT'][$key]['top'] = -1;
-                    $this->colours['DEFAULT'][$key]['special'] = 1;
-
-                    $linematched++;
-                }
 
                 if (($linematched == 0) && ($last_seen == 'NODE')
                     && (preg_match(
@@ -3446,57 +3547,10 @@ class WeatherMap extends WeatherMapBase
                     }
                 }
 
-                if (($linematched == 0) && ($last_seen == 'LINK')
-                    && (preg_match(
-                        "/^\s*(COMMENTFONT|BWBOX|BWFONT|BWOUTLINE|OUTLINE)COLOR\s+((\d+)\s+(\d+)\s+(\d+)|none|contrast|copy)\s*$/i",
-                        $buffer, $matches))) {
-                    $key = $matches[1];
-                    $field = strtolower($matches[1]) . 'colour';
-                    $val = strtolower($matches[2]);
 
-                    if (isset($matches[3])) // this is a regular colour setting thing
-                    {
-                        $curlink->$field = array (
-                            $matches[3],
-                            $matches[4],
-                            $matches[5]
-                        );
+                // *********************************************************
 
-                        $linematched++;
-                    }
-
-                    if ($val == 'none'
-                        && ($key == 'BWBOX' || $key == 'BWOUTLINE' || $key == 'OUTLINE'))
-                        {
-
-                        $curlink->$field = array (
-                            -1,
-                            -1,
-                            -1
-                        );
-
-                        $linematched++;
-                    }
-
-                    if ($val == 'contrast' && $key == 'COMMENTFONT') {
-
-                        $curlink->$field = array (
-                            -3,
-                            -3,
-                            -3
-                        );
-
-                        $linematched++;
-                    }
-                }
-
-                if (($linematched == 0) && $last_seen == 'LINK'
-                    && preg_match("/^\s*ARROWSTYLE\s+(\d+)\s+(\d+)\s*$/i", $buffer,
-                        $matches)) {
-                    $curlink->arrowstyle = $matches[1] . ' ' . $matches[2];
-                    $linematched++;
-                }
-
+    
                 if (($linematched == 0) && trim($buffer) != '') {
                     warn("Unrecognised config on line $linecount: $buffer\n");
                 }

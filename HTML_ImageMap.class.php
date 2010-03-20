@@ -424,12 +424,12 @@ class HTML_ImageMap
         return $html;
     }
 
-    function exactHTML($namefilter = '', $reverseorder = false, $skipnolinks = false)
+    function exactHTML($name = '', $reverseorder = false, $skipnolinks = false)
     {
         $html = '';
-
-        if(true === isset($shapes[$name])) {
-          if ( (false === $skipnolinks) || ($shape->href !== '') || ($shape->extrahtml !== '') ) {
+        $shape = $this->shapes[$name];
+        if(true === isset($shape)) {
+            if ( (false === $skipnolinks) || ($shape->href !== '') || ($shape->extrahtml !== '') ) {
                 if ($reverseorder === true) {
                     $html = $shape->asHTML() . "\n" . $html;
                 } else {

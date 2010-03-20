@@ -1761,7 +1761,7 @@ class WeatherMap extends WeatherMapBase
 
             debug("Adding Poly imagemap for $areaname\n");
         }
-        $this->links[$linkname]->imap_areas[] = $areaname;
+        $this->links[$linkname]->imap_areas []= $areaname;
 
     }
 
@@ -4724,7 +4724,7 @@ class WeatherMap extends WeatherMapBase
 
     function SortedImagemap($imagemapname)
     {
-        $html = '<map name="' . $imagemapname . '" id="' . $imagemapname . '">';
+        $html = "\n".'<map name="' . $imagemapname . '" id="' . $imagemapname . '">';
 
         $all_layers = array_keys($this->seen_zlayers);
         rsort($all_layers);
@@ -4742,11 +4742,19 @@ class WeatherMap extends WeatherMapBase
 
                 // at z=1000, the legends and timestamps live
                 if ($z === 1000) {
+
                     debug("     Builtins fit here.\n");
-                    $html .= $this->imap->subHTML('LEGEND:', true, ($this->context
-                        != 'editor'));
-                    $html .= $this->imap->subHTML('TIMESTAMP', true, ($this->context
-                        != 'editor'));
+                    if(1==0) {
+                        $html .= $this->imap->subHTML('LEGEND:', true, ($this->context
+                            != 'editor'));
+                         $html .= $this->imap->subHTML('TIMESTAMP', true, ($this->context
+                             != 'editor'));
+                    }
+                    foreach ($this->imap_areas as $areaname) {
+                        // skip the linkless areas if we are in the editor - they're redundant
+                            $html .= $this->imap->exactHTML($areaname, true, ($this->context
+                                != 'editor'));
+                        }
                 }
 
                 foreach ($z_items as $it) {
@@ -4755,7 +4763,7 @@ class WeatherMap extends WeatherMapBase
 
                         foreach ($it->imap_areas as $areaname) {
                         // skip the linkless areas if we are in the editor - they're redundant
-                            $html .= $this->imap->exactHTML($name, true, ($this->context
+                            $html .= $this->imap->exactHTML($areaname, true, ($this->context
                                 != 'editor'));
                         }
 
@@ -4779,7 +4787,7 @@ class WeatherMap extends WeatherMapBase
             }
         }
 
-        $html .= '</map>';
+        $html .= "</map>\n";
 
         return ($html);
     }

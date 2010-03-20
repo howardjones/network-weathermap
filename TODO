@@ -1,16 +1,17 @@
 Before 0.98
 -----------
-poller_output still runs with map-update-period = 0
+THIS IS CORRECT poller_output still runs with map-update-period = 0
 entries in weathermap_data are never expired
 collect usage_stats into an .xml file next to each map file
 standalone version of the cacti map browser
-track runtime per map
-improve cron string parsing
+DONE track runtime per map
+DONE improve cron string parsing
 add UI for cron
 improve usage_stats to cover non-regexp config
 improve usage_stats to cover things other than keywords
-more efficient ReadConfig - 50% of runtime!
-very simplified link drawing for classical no-via links.
+DONE more efficient ReadConfig - 50% of runtime!
+SORTOFDONE very simplified link drawing for classical no-via links.
+Move imagemap stuff so that each node and link holds it's own imagemap shapes - saves a lot of sorting and searching
 
 some things from the wishlist:
 Some kind of shorthand for 'last non-relative node'? Then the sub chunks WOULD be generic

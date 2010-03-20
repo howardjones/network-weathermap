@@ -20,20 +20,42 @@ function weathermap_memory_check($note = 'MEM')
 
 function weathermap_cron_part($value, $checkstring)
 {
-// XXX - this should really handle a few more crontab niceties like */5 or 3,5-9 but this will do for now
+    // first, shortcut the most common cases - * and a simple single number
     if ($checkstring === '*') {
         return (true);
     }
 
-    if ($checkstring === sprintf('%s', $value)) {
+    $v = stringval($value);
+
+    if ($checkstring === $v) {
         return (true);
     }
 
-    if (1 === preg_match('/\*\/(\d+)/', $checkstring, $matches)) {
-        $mod = $matches[1];
+    // Cron allows for multiple comma separated clauses, so let's break them
+    // up first, and evaluate each one.
+    $parts = explode(",", $checkstring);
 
-        if (($value % $mod) === 0) {
-            return true;
+    foreach ($parts as $part) {
+
+        // just a number
+        if ($part === $v) {
+            return (true);
+        }
+
+        // an interval - e.g. */5
+        if (1 === preg_match('/\*\/(\d+)/', $part, $matches)) {
+            $mod = $matches[1];
+
+            if (($value % $mod) === 0) {
+                return true;
+            }
+        }
+
+        // a range - e.g. 4-7
+        if(1 === preg_match('/(\d+)\-(\d+)/',$part, $matches)) {
+            if( ($value >= $matches[1]) && ($value <= $matches[2]) ) {
+                return true;
+            }
         }
     }
 
@@ -314,6 +336,7 @@ function weathermap_run_maps($mydir)
                                 unset($wmap);
                                 $map_duration = time() - $map_start;
                                 debug("TIME: %s took %d seconds.\n", $mapfile, $map_duration);
+
                                 weathermap_memory_check('MEM after '.$mapcount);
                                 $mapcount++;
                                 db_execute(
@@ -323,9 +346,7 @@ function weathermap_run_maps($mydir)
                                 warn(
                                     'Mapfile '.$mapfile." is not readable or doesn't exist [WMPOLL04]\n");
                             }
-                            db_execute('update weathermap_maps set warncount='
-                                . intval($weathermap_warncount) . ' where id='
-                                . intval($map['id']));
+                            db_execute(sprintf('update weathermap_maps set warncount=%d, runtime=%d where id=%d', $weathermap_warncount, $map_duration, $map['id'] ) );
                             $total_warnings += $weathermap_warncount;
                             $weathermap_warncount = 0;
                             $weathermap_map = '';

@@ -407,7 +407,7 @@ class HTML_ImageMap
     function subHTML($namefilter = '', $reverseorder = false, $skipnolinks = false)
     {
         $html = '';
-        $preg = '/' . $namefilter . '/';
+        $l = strlen($namefilter);
 
         foreach ($this->shapes as $shape) {
            
@@ -421,6 +421,23 @@ class HTML_ImageMap
                 }
             }
         }
+        return $html;
+    }
+
+    function exactHTML($namefilter = '', $reverseorder = false, $skipnolinks = false)
+    {
+        $html = '';
+
+        if(true === isset($shapes[$name])) {
+          if ( (false === $skipnolinks) || ($shape->href !== '') || ($shape->extrahtml !== '') ) {
+                if ($reverseorder === true) {
+                    $html = $shape->asHTML() . "\n" . $html;
+                } else {
+                    $html .= $shape->asHTML() . "\n";
+                }
+            }
+        }
+
         return $html;
     }
 }

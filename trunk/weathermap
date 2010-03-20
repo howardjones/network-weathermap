@@ -282,7 +282,6 @@ if ($map->ReadConfig($configfile)) {
     if ($dumpafter == 1) {
             print_r ($map);
     }
-
 }
 else { 
     die ("\n\nCould not read Weathermap config file. No output produced. Maybe try --help?\n");

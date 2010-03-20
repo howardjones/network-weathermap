@@ -50,11 +50,19 @@ class HTML_ImageMap_Area_Polygon extends HTML_ImageMap_Area
 
     function asHTML()
     {
+        $s1 = "";
+        $s2 = "";
+        $i = 0;
         foreach ($this->points as $point) {
-            $flatpoints[] = $point[0];
-            $flatpoints[] = $point[1];
+            if($i>0) {
+                $s1 .= ",";
+                $s2 .= ",";
+            }
+            $s1 .= $point[0];
+            $s2 .= $point[1];
+            $i++;
         }
-        $coordstring = join(',', $flatpoints);
+        $coordstring = $s1.','.$s2;
 
         return '<area' . $this->common_html() . ' shape="poly" coords="' . $coordstring
             . '" />';

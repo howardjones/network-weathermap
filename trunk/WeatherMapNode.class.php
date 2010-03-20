@@ -477,28 +477,27 @@ class WeatherMapNode extends WeatherMapItem
 
                     $icon_im = imagecreatefromfile($this->iconfile);
 
-                    if (function_exists("imagefilter") && isset($colicon)
-                        && $this->get_hint("use_imagefilter") == 1) {
-                        imagefilter($icon_im, IMG_FILTER_COLORIZE, $colicon->r,
-                            $colicon->g, $colicon->b);
-                    } else {
-                        if (isset($colicon)) {
+                    if(true === isset($colicon)) {
+                        if (function_exists("imagefilter") && $this->get_hint("use_imagefilter") == 1) {
+                            imagefilter($icon_im, IMG_FILTER_COLORIZE, $colicon->r,
+                                $colicon->g, $colicon->b);
+                        } else {
                             imagecolorize($icon_im, $colicon->r, $colicon->g,
                                 $colicon->b);
                         }
                     }
 
-                    debug(
-                        "If this is the last thing in your logs, you probably have a buggy GD library. Get > 2.0.33 or use PHP builtin.\n");
 
                     if ($icon_im) {
                         $icon_w = imagesx($icon_im);
                         $icon_h = imagesy($icon_im);
 
                         if (($this->iconscalew * $this->iconscaleh) > 0) {
-                            imagealphablending($icon_im, true);
-
                             debug("SCALING ICON here\n");
+                            debug(
+                        "If this is the last thing in your logs, you probably have a buggy GD library. Get > 2.0.33 or use PHP builtin.\n");
+
+                            imagealphablending($icon_im, true);
 
                             if ($icon_w > $icon_h) {
                                 $scalefactor = $icon_w / $this->iconscalew;
@@ -514,6 +513,7 @@ class WeatherMapNode extends WeatherMapItem
                             imagedestroy($icon_im);
                             $icon_im = $scaled;
                         }
+                        
                     } else {
                         warn("Couldn't open ICON: '" . $this->iconfile
                             . "' - is it a PNG, JPEG or GIF? [WMWARN37]\n");

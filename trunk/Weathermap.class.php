@@ -3327,7 +3327,7 @@ class WeatherMap extends WeatherMapBase
 
                             unset($matches);
 
-                            print "IN " . $last_seen . "/" . $args[0] . "\n";
+    #                        print "IN " . $last_seen . "/" . $args[0] . "\n";
 
                             if ((substr($keyword[1], 0, 1) != '/')
                                 || (1 === preg_match($keyword[1], $buffer, $matches))) {
@@ -3337,13 +3337,13 @@ class WeatherMap extends WeatherMapBase
 
                                 if (false === isset($matches)) {
                                     $matches = $args;
-                                    print " NON-REGEXP";
+   #                                 print " NON-REGEXP";
                                 }
 
-                                print " MATCH\n";
+  #                              print " MATCH\n";
 
                                 if (is_array($keyword[2])) {
-                                    print "   STRAIGHT-ASSIGN\n";
+ #                                   print "   STRAIGHT-ASSIGN\n";
 
                                     foreach ($keyword[2] as $key => $val) {
 // so we can poke in numbers too, if the value starts with #
@@ -3369,7 +3369,7 @@ class WeatherMap extends WeatherMapBase
                                 } else {
 #     function ReadConfig_Handle_TARGET($fullcommand, $args, $curobj, $filename, $linecount)
 
-                                    print " ->HANDLER\n";
+#                                    print " ->HANDLER\n";
 
 // the third arg wasn't an array, it was a function name.
 // call that function to handle this keyword
@@ -3390,7 +3390,7 @@ class WeatherMap extends WeatherMapBase
                     }
                 }
 
-                if ($linematched == 0) {
+                if (1==0 && $linematched == 0) {
                     print "READCONFIG: $last_seen/" . $args[0]
                         . " unhandled - |$buffer|\n";
                 }

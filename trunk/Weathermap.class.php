@@ -58,70 +58,110 @@ define('DISTANCE', 2);
 // there will be more lines in the array, but we'll be checking less of them
 $WM_config_keywords2 = array (
     'GLOBAL' => array (
+        'KEYOUTLINECOLOR' => array (array (
+            'GLOBAL',
+            '/^KEYOUTLINECOLOR\s+(\d+)\s+(\d+)\s+(\d+)$/',
+            'ReadConfig_Handle_GLOBALCOLOR'
+        ),),
+        'KEYTEXTCOLOR' => array (array (
+            'GLOBAL',
+            '/^KEYTEXTCOLOR\s+(\d+)\s+(\d+)\s+(\d+)$/',
+            'ReadConfig_Handle_GLOBALCOLOR'
+        ),),
+        'TITLECOLOR' => array (array (
+            'GLOBAL',
+            '/^TITLECOLOR\s+(\d+)\s+(\d+)\s+(\d+)$/',
+            'ReadConfig_Handle_GLOBALCOLOR'
+        ),),
+        'TIMECOLOR' => array (array (
+            'GLOBAL',
+            '/^TIMECOLOR\s+(\d+)\s+(\d+)\s+(\d+)$/',
+            'ReadConfig_Handle_GLOBALCOLOR'
+        ),),
+        'KEYBGCOLOR' => array (array (
+            'GLOBAL',
+            '/^KEYBGCOLOR\s+(\d+)\s+(\d+)\s+(\d+)$/',
+            'ReadConfig_Handle_GLOBALCOLOR'
+        ),),
+        'BGCOLOR' => array (array (
+            'GLOBAL',
+            '/^BGCOLOR\s+(\d+)\s+(\d+)\s+(\d+)$/',
+            'ReadConfig_Handle_GLOBALCOLOR'
+        ),),
+        'SET' => array (array (
+            'GLOBAL',
+            'SET',
+            'ReadConfig_Handle_SET'
+        ),),
         'HTMLSTYLESHEET' => array (array (
             'GLOBAL',
-            '/^\s*HTMLSTYLESHEET\s+(.*)\s*$/i',
+            '/^HTMLSTYLESHEET\s+(.*)\s*$/i',
             array ('htmlstylesheet' => 1)
         ),),
         'HTMLOUTPUTFILE' => array (array (
             'GLOBAL',
-            '/^\s*HTMLOUTPUTFILE\s+(.*)\s*$/i',
+            '/^HTMLOUTPUTFILE\s+(.*)\s*$/i',
             array ('htmloutputfile' => 1)
         ),),
         'BACKGROUND' => array (array (
             'GLOBAL',
-            '/^\s*BACKGROUND\s+(.*)\s*$/i',
+            '/^BACKGROUND\s+(.*)\s*$/i',
             array ('background' => 1)
         ),),
         'IMAGEOUTPUTFILE' => array (array (
             'GLOBAL',
-            '/^\s*IMAGEOUTPUTFILE\s+(.*)\s*$/i',
+            '/^IMAGEOUTPUTFILE\s+(.*)\s*$/i',
             array ('imageoutputfile' => 1)
         ),),
         'IMAGEURI' => array (array (
             'GLOBAL',
-            '/^\s*IMAGEURI\s+(.*)\s*$/i',
+            '/^IMAGEURI\s+(.*)\s*$/i',
             array ('imageuri' => 1)
         ),),
         'TITLE' => array (array (
             'GLOBAL',
-            '/^\s*TITLE\s+(.*)\s*$/i',
+            '/^TITLE\s+(.*)\s*$/i',
             array ('title' => 1)
         ),),
         'HTMLSTYLE' => array (array (
             'GLOBAL',
-            '/^\s*HTMLSTYLE\s+(static|overlib)\s*$/i',
+            '/^HTMLSTYLE\s+(static|overlib)\s*$/i',
             array ('htmlstyle' => 1)
+        ),),
+        'KILO' => array (array (
+            'GLOBAL',
+            '/^KILO\s+(\d+)\s*$/i',
+            array ('kilo' => 1)
         ),),
         'KEYFONT' => array (array (
             'GLOBAL',
-            '/^\s*KEYFONT\s+(\d+)\s*$/i',
+            '/^KEYFONT\s+(\d+)\s*$/i',
             array ('keyfont' => 1)
         ),),
         'TITLEFONT' => array (array (
             'GLOBAL',
-            '/^\s*TITLEFONT\s+(\d+)\s*$/i',
+            '/^TITLEFONT\s+(\d+)\s*$/i',
             array ('titlefont' => 1)
         ),),
         'TIMEFONT' => array (array (
             'GLOBAL',
-            '/^\s*TIMEFONT\s+(\d+)\s*$/i',
+            '/^TIMEFONT\s+(\d+)\s*$/i',
             array ('timefont' => 1)
         ),),
         'WIDTH' => array (array (
             'GLOBAL',
-            "/^\s*WIDTH\s+(\d+)\s*$/i",
+            "/^WIDTH\s+(\d+)\s*$/i",
             array ('width' => 1)
         ),),
         'HEIGHT' => array (array (
             '(GLOBAL)',
-            "/^\s*HEIGHT\s+(\d+)\s*$/i",
+            "/^HEIGHT\s+(\d+)\s*$/i",
             array ('height' => 1)
         ),),
         'TITLEPOS' => array (
             array (
                 'GLOBAL',
-                '/^\s*TITLEPOS\s+(-?\d+)\s+(-?\d+)\s*$/i',
+                '/^TITLEPOS\s+(-?\d+)\s+(-?\d+)\s*$/i',
                 array (
                     'titlex' => 1,
                     'titley' => 2
@@ -129,77 +169,151 @@ $WM_config_keywords2 = array (
             ),
             array (
                 'GLOBAL',
-                '/^\s*TITLEPOS\s+(-?\d+)\s+(-?\d+)\s+(.*)\s*$/i',
+                '/^TITLEPOS\s+(-?\d+)\s+(-?\d+)\s+(.*)\s*$/i',
                 array (
                     'titlex' => 1,
                     'titley' => 2,
                     'title' => 3
                 )
             ),
-		),
-            'TIMEPOS' => array (
+        ),
+        'TIMEPOS' => array (
+            array (
+                'GLOBAL',
+                '/^TIMEPOS\s+(-?\d+)\s+(-?\d+)\s*$/i',
                 array (
-                    'GLOBAL',
-                    '/^\s*TIMEPOS\s+(-?\d+)\s+(-?\d+)\s*$/i',
-                    array (
-                        'timex' => 1,
-                        'timey' => 2
-                    )
-                ),
-                array (
-                    'GLOBAL',
-                    '/^\s*TIMEPOS\s+(-?\d+)\s+(-?\d+)\s+(.*)\s*$/i',
-                    array (
-                        'timex' => 1,
-                        'timey' => 2,
-                        'stamptext' => 3
-                    )
-                ),
+                    'timex' => 1,
+                    'timey' => 2
+                )
             ),
-            'MINTIMEPOS' => array (
+            array (
+                'GLOBAL',
+                '/^TIMEPOS\s+(-?\d+)\s+(-?\d+)\s+(.*)\s*$/i',
                 array (
-                    'GLOBAL',
-                    '/^\s*MINTIMEPOS\s+(-?\d+)\s+(-?\d+)\s*$/i',
-                    array (
-                        'mintimex' => 1,
-                        'mintimey' => 2
-                    )
-                ),
-                array (
-                    'GLOBAL',
-                    '/^\s*MINTIMEPOS\s+(-?\d+)\s+(-?\d+)\s+(.*)\s*$/i',
-                    array (
-                        'mintimex' => 1,
-                        'mintimey' => 2,
-                        'minstamptext' => 3
-                    )
-                ),
+                    'timex' => 1,
+                    'timey' => 2,
+                    'stamptext' => 3
+                )
             ),
-            'MAXTIMEPOS' => array (
+        ),
+        'MINTIMEPOS' => array (
+            array (
+                'GLOBAL',
+                '/^MINTIMEPOS\s+(-?\d+)\s+(-?\d+)\s*$/i',
                 array (
-                    'GLOBAL',
-                    '/^\s*MAXTIMEPOS\s+(-?\d+)\s+(-?\d+)\s*$/i',
-                    array (
-                        'maxtimex' => 1,
-                        'maxtimey' => 2
-                    )
-                ),
-                array (
-                    'GLOBAL',
-                    '/^\s*MAXTIMEPOS\s+(-?\d+)\s+(-?\d+)\s+(.*)\s*$/i',
-                    array (
-                        'maxtimex' => 1,
-                        'maxtimey' => 2,
-                        'maxstamptext' => 3
-                    )
-                ),
+                    'mintimex' => 1,
+                    'mintimey' => 2
+                )
             ),
-        
+            array (
+                'GLOBAL',
+                '/^MINTIMEPOS\s+(-?\d+)\s+(-?\d+)\s+(.*)\s*$/i',
+                array (
+                    'mintimex' => 1,
+                    'mintimey' => 2,
+                    'minstamptext' => 3
+                )
+            ),
+        ),
+        'MAXTIMEPOS' => array (
+            array (
+                'GLOBAL',
+                '/^MAXTIMEPOS\s+(-?\d+)\s+(-?\d+)\s*$/i',
+                array (
+                    'maxtimex' => 1,
+                    'maxtimey' => 2
+                )
+            ),
+            array (
+                'GLOBAL',
+                '/^MAXTIMEPOS\s+(-?\d+)\s+(-?\d+)\s+(.*)\s*$/i',
+                array (
+                    'maxtimex' => 1,
+                    'maxtimey' => 2,
+                    'maxstamptext' => 3
+                )
+            ),
+        ),
     ), // end of global
     'NODE' => array (
+        'TARGET' => array (array (
+            'NODE',
+            'TARGET',
+            'ReadConfig_Handle_TARGET'
+        ),),
+        'SET' => array (array (
+            'NODE',
+            'SET',
+            'ReadConfig_Handle_SET'
+        ),),
+        'AICONOUTLINECOLOR' => array (
+            array (
+                'NODE',
+                '/^AICONOUTLINECOLOR\s+(\d+)\s+(\d+)\s+(\d+)$/',
+                'ReadConfig_Handle_COLOR'
+            ),
+            array (
+                'NODE',
+                '/^AICONOUTLINECOLOR\s+(none)$/',
+                'ReadConfig_Handle_COLOR'
+            ),
+        ),
+        'AICONFILLCOLOR' => array (
+            array (
+                'NODE',
+                '/^AICONFILLCOLOR\s+(\d+)\s+(\d+)\s+(\d+)$/',
+                'ReadConfig_Handle_COLOR'
+            ),
+            array (
+                'NODE',
+                '/^AICONFILLCOLOR\s+(copy)$/',
+                'ReadConfig_Handle_COLOR'
+            ),
+        ),
+        'LABELOUTLINECOLOR' => array (
+            array (
+                'NODE',
+                '/^LABELOUTLINECOLOR\s+(\d+)\s+(\d+)\s+(\d+)$/',
+                'ReadConfig_Handle_COLOR'
+            ),
+            array (
+                'NODE',
+                '/^LABELOUTLINECOLOR\s+(none)$/',
+                'ReadConfig_Handle_COLOR'
+            ),
+        ),
+        'LABELBGCOLOR' => array (
+            array (
+                'NODE',
+                '/^LABELBGCOLOR\s+(\d+)\s+(\d+)\s+(\d+)$/',
+                'ReadConfig_Handle_COLOR'
+            ),
+            array (
+                'NODE',
+                '/^LABELBGCOLOR\s+(none)$/',
+                'ReadConfig_Handle_COLOR'
+            ),
+        ),
+        'LABELFONTCOLOR' => array (
+            array (
+                'NODE',
+                '/^LABELFONTCOLOR\s+(\d+)\s+(\d+)\s+(\d+)$/',
+                'ReadConfig_Handle_COLOR'
+            ),
+            array (
+                'NODE',
+                '/^LABELFONTCOLOR\s+(contrast)$/',
+                'ReadConfig_Handle_COLOR'
+            ),
+        ),
+        'LABELFONTSHADOWCOLOR' => array (array (
+            'NODE',
+            '/^LABELFONTSHADOWCOLOR\s+(\d+)\s+(\d+)\s+(\d+)$/',
+            'ReadConfig_Handle_COLOR'
+        ),),
         'NOTES' => array (array (
             'NODE',
-            '/^\s*NOTES\s+(.*)\s*$/i',
+            '/^NOTES\s+(.*)\s*$/i',
             array (
                 'notestext[IN]' => 1,
                 'notestext[OUT]' => 1
@@ -208,7 +322,7 @@ $WM_config_keywords2 = array (
         'MAXVALUE' => array (
             array (
                 'NODE',
-                '/^\s*(MAXVALUE)\s+(\d+\.?\d*[KMGT]?)\s+(\d+\.?\d*[KMGT]?)\s*$/i',
+                '/^(MAXVALUE)\s+(\d+\.?\d*[KMGT]?)\s+(\d+\.?\d*[KMGT]?)\s*$/i',
                 array (
                     'max_bandwidth_in_cfg' => 2,
                     'max_bandwidth_out_cfg' => 3
@@ -216,7 +330,7 @@ $WM_config_keywords2 = array (
             ),
             array (
                 'NODE',
-                '/^\s*(MAXVALUE)\s+(\d+\.?\d*[KMGT]?)\s*$/i',
+                '/^(MAXVALUE)\s+(\d+\.?\d*[KMGT]?)\s*$/i',
                 array (
                     'max_bandwidth_in_cfg' => 2,
                     'max_bandwidth_out_cfg' => 2
@@ -226,7 +340,7 @@ $WM_config_keywords2 = array (
         'POSITION' => array (
             array (
                 'NODE',
-                "/^\s*POSITION\s+([-+]?\d+)\s+([-+]?\d+)\s*$/i",
+                "/^POSITION\s+([-+]?\d+)\s+([-+]?\d+)\s*$/i",
                 array (
                     'x' => 1,
                     'y' => 2
@@ -234,7 +348,7 @@ $WM_config_keywords2 = array (
             ),
             array (
                 'NODE',
-                "/^\s*POSITION\s+(\S+)\s+([-+]?\d+)\s+([-+]?\d+)\s*$/i",
+                "/^POSITION\s+(\S+)\s+([-+]?\d+)\s+([-+]?\d+)\s*$/i",
                 array (
                     'x' => 2,
                     'y' => 3,
@@ -246,7 +360,7 @@ $WM_config_keywords2 = array (
             ),
             array (
                 'NODE',
-                "/^\s*POSITION\s+(\S+)\s+([-+]?\d+)r(\d+)\s*$/i",
+                "/^POSITION\s+(\S+)\s+([-+]?\d+)r(\d+)\s*$/i",
                 array (
                     'x' => 2,
                     'y' => 3,
@@ -260,7 +374,7 @@ $WM_config_keywords2 = array (
         ),
         'INFOURL' => array (array (
             'NODE',
-            '/^\s*INFOURL\s+(.*)\s*$/i',
+            '/^INFOURL\s+(.*)\s*$/i',
             array (
                 'infourl[IN]' => 1,
                 'infourl[OUT]' => 1
@@ -268,7 +382,7 @@ $WM_config_keywords2 = array (
         ),),
         'OVERLIBCAPTION' => array (array (
             'NODE',
-            '/^\s*OVERLIBCAPTION\s+(.*)\s*$/i',
+            '/^OVERLIBCAPTION\s+(.*)\s*$/i',
             array (
                 'overlibcaption[IN]' => 1,
                 'overlibcaption[OUT]' => 1
@@ -276,33 +390,33 @@ $WM_config_keywords2 = array (
         ),),
         'ZORDER' => array (array (
             'NODE',
-            "/^\s*ZORDER\s+([-+]?\d+)\s*$/i",
+            "/^ZORDER\s+([-+]?\d+)\s*$/i",
             array ('zorder' => 1)
         ),),
         'OVERLIBHEIGHT' => array (array (
             'NODE',
-            "/^\s*OVERLIBHEIGHT\s+(\d+)\s*$/i",
+            "/^OVERLIBHEIGHT\s+(\d+)\s*$/i",
             array ('overlibheight' => 1)
         ),),
         'OVERLIBWIDTH' => array (array (
             'NODE',
-            "/^\s*OVERLIBWIDTH\s+(\d+)\s*$/i",
+            "/^OVERLIBWIDTH\s+(\d+)\s*$/i",
             array ('overlibwidth' => 1)
         ),),
         'LABELFONT' => array (array (
             'NODE',
-            '/^\s*LABELFONT\s+(\d+)\s*$/i',
+            '/^LABELFONT\s+(\d+)\s*$/i',
             array ('labelfont' => 1)
         ),),
         'LABELANGLE' => array (array (
             'NODE',
-            '/^\s*LABELANGLE\s+(0|90|180|270)\s*$/i',
+            '/^LABELANGLE\s+(0|90|180|270)\s*$/i',
             array ('labelangle' => 1)
         ),),
         'ICON' => array (
             array (
                 'NODE',
-                '/^\s*ICON\s+(\S+)\s*$/i',
+                '/^ICON\s+(\S+)\s*$/i',
                 array (
                     'iconfile' => 1,
                     'iconscalew' => '#0',
@@ -311,12 +425,12 @@ $WM_config_keywords2 = array (
             ),
             array (
                 'NODE',
-                '/^\s*ICON\s+(\S+)\s*$/i',
+                '/^ICON\s+(\S+)\s*$/i',
                 array ('iconfile' => 1)
             ),
             array (
                 'NODE',
-                '/^\s*ICON\s+(\d+)\s+(\d+)\s+(inpie|outpie|box|rbox|round|gauge|nink)\s*$/i',
+                '/^ICON\s+(\d+)\s+(\d+)\s+(inpie|outpie|box|rbox|round|gauge|nink)\s*$/i',
                 array (
                     'iconfile' => 3,
                     'iconscalew' => 1,
@@ -325,7 +439,7 @@ $WM_config_keywords2 = array (
             ),
             array (
                 'NODE',
-                '/^\s*ICON\s+(\d+)\s+(\d+)\s+(\S+)\s*$/i',
+                '/^ICON\s+(\d+)\s+(\d+)\s+(\S+)\s*$/i',
                 array (
                     'iconfile' => 3,
                     'iconscalew' => 1,
@@ -336,19 +450,19 @@ $WM_config_keywords2 = array (
         'LABEL' => array (
             array (
                 'NODE',
-                "/^\s*LABEL\s*$/i",
+                "/^LABEL\s*$/i",
                 array ('label' => '')
             ), # special case for blank labels
             array (
                 'NODE',
-                "/^\s*LABEL\s+(.*)\s*$/i",
+                "/^LABEL\s+(.*)\s*$/i",
                 array ('label' => 1)
             ),
         ),
-		       'LABELOFFSET' => array (
+        'LABELOFFSET' => array (
             array (
                 'NODE',
-                '/^\s*LABELOFFSET\s+([-+]?\d+)\s+([-+]?\d+)\s*$/i',
+                '/^LABELOFFSET\s+([-+]?\d+)\s+([-+]?\d+)\s*$/i',
                 array (
                     'labeloffsetx' => 1,
                     'labeloffsety' => 2
@@ -356,12 +470,12 @@ $WM_config_keywords2 = array (
             ),
             array (
                 'NODE',
-                '/^\s*LABELOFFSET\s+(C|NE|SE|NW|SW|N|S|E|W)\s*$/i',
+                '/^LABELOFFSET\s+(C|NE|SE|NW|SW|N|S|E|W)\s*$/i',
                 array ('labeloffset' => 1)
             ),
             array (
                 'NODE',
-                '/^\s*LABELOFFSET\s+((C|NE|SE|NW|SW|N|S|E|W)\d+)\s*$/i',
+                '/^LABELOFFSET\s+((C|NE|SE|NW|SW|N|S|E|W)\d+)\s*$/i',
                 array ('labeloffset' => 1)
             ),
             array (
@@ -370,9 +484,81 @@ $WM_config_keywords2 = array (
                 array ('labeloffset' => 1)
             ),
         ),
- 
     ), // end of node
     'LINK' => array (
+        'TARGET' => array (array (
+            'LINK',
+            'TARGET',
+            'ReadConfig_Handle_TARGET'
+        ),),
+        'SET' => array (array (
+            'LINK',
+            'SET',
+            'ReadConfig_Handle_SET'
+        ),),
+        'NODES' => array (array (
+            'LINK',
+            'NODES',
+            'ReadConfig_Handle_NODES'
+        ),),
+        'VIA' => array (array (
+            'LINK',
+            'VIA',
+            'ReadConfig_Handle_VIA'
+        ),),
+        'COMMENTFONTCOLOR' => array (
+            array (
+                'LINK',
+                '/^COMMENTFONTCOLOR\s+(\d+)\s+(\d+)\s+(\d+)$/',
+                'ReadConfig_Handle_COLOR'
+            ),
+            array (
+                'LINK',
+                '/^COMMENTFONTCOLOR\s+(contrast)$/',
+                'ReadConfig_Handle_COLOR'
+            ),
+        ),
+        'OUTLINECOLOR' => array (
+            array (
+                'LINK',
+                '/^OUTLINECOLOR\s+(\d+)\s+(\d+)\s+(\d+)$/',
+                'ReadConfig_Handle_COLOR'
+            ),
+            array (
+                'LINK',
+                '/^OUTLINECOLOR\s+(none)$/',
+                'ReadConfig_Handle_COLOR'
+            ),
+        ),
+        'BWOUTLINECOLOR' => array (
+            array (
+                'LINK',
+                '/^BWOUTLINECOLOR\s+(\d+)\s+(\d+)\s+(\d+)$/',
+                'ReadConfig_Handle_COLOR'
+            ),
+            array (
+                'LINK',
+                '/^BWOUTLINECOLOR\s+(none)$/',
+                'ReadConfig_Handle_COLOR'
+            ),
+        ),
+        'BWBOXCOLOR' => array (
+            array (
+                'LINK',
+                '/^BWBOXCOLOR\s+(\d+)\s+(\d+)\s+(\d+)$/',
+                'ReadConfig_Handle_COLOR'
+            ),
+            array (
+                'LINK',
+                '/^BWBOXCOLOR\s+(none)$/',
+                'ReadConfig_Handle_COLOR'
+            ),
+        ),
+        'BWFONTCOLOR' => array (array (
+            'LINK',
+            '/^BWFONTCOLOR\s+(\d+)\s+(\d+)\s+(\d+)$/',
+            'ReadConfig_Handle_COLOR'
+        ),),
         'NOTES' => array (array (
             'LINK',
             '/^\s*NOTES\s+(.*)\s*$/i',
@@ -660,7 +846,7 @@ class WeatherMapBase
     var $notes = array ();
     var $hints = array ();
     var $inherit_fieldlist;
-    var $imap_areas = array();
+    var $imap_areas = array ();
 
     function add_note($name, $value)
     {
@@ -1105,50 +1291,53 @@ class WeatherMap extends WeatherMapBase
 
     function ProcessString($input, &$context, $include_notes = true, $multiline = false)
     {
-//        assert('is_scalar($input)');
+        //        assert('is_scalar($input)');
 
-	if($input === '') { return ''; }	
+        if ($input === '') {
+            return '';
+        }
 
-	if(1==0 && $this->context == 'cacti') {
-	$fd = fopen("/var/www/docs/cacti/plugins/weathermap/processstring.log","a+");
-	fwrite($fd,$input."\n");
-	fclose($fd);
-	}
+        if (1 == 0 && $this->context == 'cacti') {
+            $fd = fopen("/var/www/docs/cacti/plugins/weathermap/processstring.log", "a+");
+            fwrite($fd, $input . "\n");
+            fclose($fd);
+        }
 
         if ($multiline === true) {
             $i = $input;
             $input = str_replace("\\n", "\n", $i);
         }
 
-		// don't bother with all this regexp rubbish if there's nothing to match
-		if(false === strpos($input, "{")) {
-			return $input;
-		}
-		
+        // don't bother with all this regexp rubbish if there's nothing to match
+        if (false === strpos($input, "{")) {
+            return $input;
+        }
+
         $context_description = strtolower($context->my_type());
 
-	// next, shortcut all the regexps for very common tokens
-	if($context_description === 'node') {
-		$input = str_replace("{node:this:graph_id}", $context->get_hint("graph_id" ), $input);
-		$input = str_replace("{node:this:name}", $context->name, $input);
-	}
+        // next, shortcut all the regexps for very common tokens
+        if ($context_description === 'node') {
+            $input = str_replace("{node:this:graph_id}", $context->get_hint("graph_id"),
+                $input);
+            $input = str_replace("{node:this:name}", $context->name, $input);
+        }
 
-	if($context_description === 'link') {
-		$input = str_replace("{link:this:graph_id}", $context->get_hint("graph_id" ), $input);
-	}
+        if ($context_description === 'link') {
+            $input = str_replace("{link:this:graph_id}", $context->get_hint("graph_id"),
+                $input);
+        }
 
-		// don't bother with all this regexp rubbish if there's nothing to match
-		if(false === strpos($input, "{")) {
-			return $input;
-		}
+        // don't bother with all this regexp rubbish if there's nothing to match
+        if (false === strpos($input, "{")) {
+            return $input;
+        }
 
         if ($context_description !== 'map') {
             $context_description .= ':' . $context->name;
         }
 
-	
 
-//        debug("Trace: ProcessString($input, $context_description)\n");
+        //        debug("Trace: ProcessString($input, $context_description)\n");
 
         $output = $input;
 
@@ -1156,7 +1345,7 @@ class WeatherMap extends WeatherMapBase
             $value = '[UNKNOWN]';
             $format = '';
             $key = $matches[1];
-  //          debug("ProcessString: working on %s\n", $key);
+            //          debug("ProcessString: working on %s\n", $key);
 
             if (preg_match('/\{(node|map|link):([^}]+)\}/', $key, $matches)) {
                 $type = $matches[1];
@@ -1216,7 +1405,7 @@ class WeatherMap extends WeatherMapBase
                     warn(
                         "ProcessString: $key refers to unknown item (context is $context_description) [WMWARN05]\n");
                 } else {
-    //                debug("ProcessString: Found appropriate item: %s %s\n",
+//                debug("ProcessString: Found appropriate item: %s %s\n",
 //                        get_class($the_item), $the_item->name);
 
 // SET and notes have precedent over internal properties
@@ -1224,17 +1413,17 @@ class WeatherMap extends WeatherMapBase
 // which are currently used for internal props. You can just 'overwrite' any of them.
                     if (true === isset($the_item->hints[$args])) {
                         $value = $the_item->hints[$args];
-          //              debug("ProcessString: used hint\n");
+                    //              debug("ProcessString: used hint\n");
                     }
 // for some things, we don't want to allow notes to be considered.
 // mainly - TARGET (which can define command-lines), shouldn't be
 // able to get data from uncontrolled sources (i.e. data sources rather than SET in config files).
                     elseif ($include_notes && isset($the_item->notes[$args])) {
                         $value = $the_item->notes[$args];
-      //                  debug("ProcessString: used note\n");
+                    //                  debug("ProcessString: used note\n");
                     } elseif (isset($the_item->$args)) {
                         $value = $the_item->$args;
-        //                debug("ProcessString: used internal property\n");
+                    //                debug("ProcessString: used internal property\n");
                     }
                 }
             }
@@ -1761,8 +1950,7 @@ class WeatherMap extends WeatherMapBase
 
             debug("Adding Poly imagemap for $areaname\n");
         }
-        $this->links[$linkname]->imap_areas []= $areaname;
-
+        $this->links[$linkname]->imap_areas[] = $areaname;
     }
 
     function ColourFromPercent($image, $percent, $scalename = 'DEFAULT', $name = '')
@@ -2002,15 +2190,15 @@ class WeatherMap extends WeatherMapBase
         $rx = $this->keyx[$scalename];
         $ry = $this->keyy[$scalename];
 
-        $areaname =  "LEGEND:".$scalename;
+        $areaname = "LEGEND:" . $scalename;
         $this->imap->addArea("Rectangle", $areaname, '', array (
             $rx + $box_left,
             $ry + $box_top,
             $rx + $box_right,
             $ry + $box_bottom
         ));
-        $this->imap_areas[] = $areaname;
 
+        $this->imap_areas[] = $areaname;
     }
 
     function DrawLegend_Vertical($im, $scalename = "DEFAULT", $height = 400,
@@ -2101,7 +2289,7 @@ class WeatherMap extends WeatherMapBase
 
         $rx = $this->keyx[$scalename];
         $ry = $this->keyy[$scalename];
-            $areaname =  "LEGEND:".$scalename;
+        $areaname = "LEGEND:" . $scalename;
 
         $this->imap->addArea("Rectangle", $areaname, '', array (
             $rx + $box_left,
@@ -2109,8 +2297,8 @@ class WeatherMap extends WeatherMapBase
             $rx + $box_right,
             $ry + $box_bottom
         ));
-                $this->imap_areas[] = $areaname;
 
+        $this->imap_areas[] = $areaname;
     }
 
     function DrawLegend_Classic($im, $scalename = 'DEFAULT', $use_tags = false)
@@ -2201,8 +2389,8 @@ class WeatherMap extends WeatherMapBase
 
             imagefilledrectangle($scale_im, $boxx, $boxy, $boxx + $boxwidth,
                 $boxy + $boxheight, $this->colours['DEFAULT']['KEYBG'][$scale_ref]);
-            imagerectangle($scale_im, $boxx, $boxy, $boxx + $boxwidth,
-                $boxy + $boxheight, $this->colours['DEFAULT']['KEYOUTLINE'][$scale_ref]);
+            imagerectangle($scale_im, $boxx, $boxy, $boxx + $boxwidth, $boxy + $boxheight,
+                $this->colours['DEFAULT']['KEYOUTLINE'][$scale_ref]);
             $this->myimagestring($scale_im, $font, $boxx + 4, $boxy + 4 + $tileheight,
                 $title, $this->colours['DEFAULT']['KEYTEXT'][$scale_ref]);
 
@@ -2280,7 +2468,7 @@ class WeatherMap extends WeatherMapBase
                 }
             }
 
-            $areaname =  "LEGEND:".$scalename;
+            $areaname = "LEGEND:" . $scalename;
 
             $this->imap->addArea("Rectangle", $areaname, '', array (
                 $this->keyx[$scalename],
@@ -2288,8 +2476,8 @@ class WeatherMap extends WeatherMapBase
                 $this->keyx[$scalename] + $boxwidth,
                 $this->keyy[$scalename] + $boxheight
             ));
-                    $this->imap_areas[] = $areaname;
 
+            $this->imap_areas[] = $areaname;
         }
     }
 
@@ -2328,7 +2516,7 @@ class WeatherMap extends WeatherMapBase
         }
 
         $this->myimagestring($im, $font, $x, $y, $stamp, $colour);
-        $areaname =  $which . "TIMESTAMP";
+        $areaname = $which . "TIMESTAMP";
 
         $this->imap->addArea("Rectangle", $areaname, '', array (
             $x,
@@ -2336,8 +2524,8 @@ class WeatherMap extends WeatherMapBase
             $x + $boxwidth,
             $y - $boxheight
         ));
-                $this->imap_areas[] = $areaname;
 
+        $this->imap_areas[] = $areaname;
     }
 
     function DrawTitle($im, $font, $colour)
@@ -2365,8 +2553,8 @@ class WeatherMap extends WeatherMapBase
             $x + $boxwidth,
             $y - $boxheight
         ));
-                $this->imap_areas[] = 'TITLE';
 
+        $this->imap_areas[] = 'TITLE';
     }
 
     function ReadConfigNG($input, $is_include = false, $initial_context = 'GLOBAL')
@@ -2718,6 +2906,220 @@ class WeatherMap extends WeatherMapBase
         fclose($fd);
     }
 
+    function ReadConfig_Handle_VIA($fullcommand, $args, $matches, &$curobj, $filename,
+        $linecount)
+    {
+        if (preg_match("/^\s*VIA\s+([-+]?\d+)\s+([-+]?\d+)\s*$/i", $fullcommand,
+            $matches)) {
+            $curobj->vialist[] = array (
+                $matches[1],
+                $matches[2]
+            );
+
+            return true;
+        }
+
+        if (preg_match("/^\s*VIA\s+(\S+)\s+([-+]?\d+)\s+([-+]?\d+)\s*$/i", $fullcommand,
+            $matches)) {
+            $curobj->vialist[] = array (
+                $matches[2],
+                $matches[3],
+                $matches[1]
+            );
+
+            return true;
+        }
+        return false;
+    }
+
+    function ReadConfig_Handle_NODES($fullcommand, $args, $matches, &$curobj, $filename,
+        $linecount)
+    {
+        if (preg_match("/^NODES\s+(\S+)\s+(\S+)\s*$/i", $fullcommand, $matches)) {
+
+            $valid_nodes = 2;
+
+            foreach (array (
+                1,
+                2
+            ) as $i) {
+                $endoffset[$i] = 'C';
+                $nodenames[$i] = $matches[$i];
+
+                // percentage of compass - must be first
+                if (preg_match("/:(NE|SE|NW|SW|N|S|E|W|C)(\d+)$/i", $matches[$i],
+                    $submatches)) {
+                    $endoffset[$i] = $submatches[1] . $submatches[2];
+                    $nodenames[$i] =
+                        preg_replace("/:(NE|SE|NW|SW|N|S|E|W|C)\d+$/i", '', $matches[$i]);
+                    $this->need_size_precalc = true;
+                }
+
+                if (preg_match("/:(NE|SE|NW|SW|N|S|E|W|C)$/i", $matches[$i], $submatches))
+                    {
+                    $endoffset[$i] = $submatches[1];
+                    $nodenames[$i] =
+                        preg_replace("/:(NE|SE|NW|SW|N|S|E|W|C)$/i", '', $matches[$i]);
+                    $this->need_size_precalc = true;
+                }
+
+                if (preg_match("/:(-?\d+r\d+)$/i", $matches[$i], $submatches)) {
+                    $endoffset[$i] = $submatches[1];
+                    $nodenames[$i] = preg_replace("/:(-?\d+r\d+)$/i", '', $matches[$i]);
+                    $this->need_size_precalc = true;
+                }
+
+                if (preg_match("/:([-+]?\d+):([-+]?\d+)$/i", $matches[$i], $submatches)) {
+                    $xoff = $submatches[1];
+                    $yoff = $submatches[2];
+                    $endoffset[$i] = $xoff . ":" . $yoff;
+                    $nodenames[$i] = preg_replace("/:$xoff:$yoff$/i", '', $matches[$i]);
+                    $this->need_size_precalc = true;
+                }
+
+                if (!array_key_exists($nodenames[$i], $this->nodes)) {
+                    warn("Unknown node '" . $nodenames[$i]
+                        . "' on line $linecount of config\n");
+                    $valid_nodes--;
+                }
+            }
+
+            // TODO - really, this should kill the whole link, and reset for the next one
+            // XXX this error case will not work in the handler function
+            if ($valid_nodes == 2) {
+                $curobj->a = $this->nodes[$nodenames[1]];
+                $curobj->b = $this->nodes[$nodenames[2]];
+                $curobj->a_offset = $endoffset[1];
+                $curobj->b_offset = $endoffset[2];
+            } else {
+                // this'll stop the current link being added
+                $last_seen = "broken";
+            }
+
+            return true;
+        }
+        return false;
+    }
+
+    function ReadConfig_Handle_SET($fullcommand, $args, $matches, &$curobj, $filename,
+        $linecount)
+    {
+        if (preg_match("/^SET\s+(\S+)\s+(.*)\s*$/i", $fullcommand, $matches)) {
+            $curobj->add_hint($matches[1], trim($matches[2]));
+            return true;
+        }
+
+        // allow setting a variable to ""
+        if (preg_match("/^SET\s+(\S+)\s*$/i", $fullcommand, $matches)) {
+            $curobj->add_hint($matches[1], '');
+            return true;
+        }
+
+        return false;
+    }
+
+    function ReadConfig_Handle_GLOBALCOLOR($fullcommand, $args, $matches, &$curobj,
+        $filename, $linecount)
+    {
+        $key = str_replace("COLOR", "", strtoupper($args[0]));
+
+        $this->colours['DEFAULT'][$key]['red1'] = $args[1];
+        $this->colours['DEFAULT'][$key]['green1'] = $args[2];
+        $this->colours['DEFAULT'][$key]['blue1'] = $args[3];
+        $this->colours['DEFAULT'][$key]['bottom'] = -2;
+        $this->colours['DEFAULT'][$key]['top'] = -1;
+        $this->colours['DEFAULT'][$key]['special'] = 1;
+
+        return true;
+    }
+
+    function ReadConfig_Handle_COLOR($fullcommand, $args, $matches, &$curobj, $filename,
+        $linecount)
+    {
+        $key = $args[0];
+        $field = str_replace("color", "colour", strtolower($args[0]));
+        $val = strtolower($args[1]);
+
+        if (isset($args[2])) // this is a regular colour setting thing
+        {
+            $curobj->$field = array (
+                $args[1],
+                $args[2],
+                $args[3]
+            );
+
+            return true;
+        }
+
+        if ($val == 'none') {
+            $curobj->$field = array (
+                -1,
+                -1,
+                -1
+            );
+
+            return true;
+        }
+
+        if ($val == 'contrast') {
+            $curobj->$field = array (
+                -3,
+                -3,
+                -3
+            );
+
+            return true;
+        }
+
+        if ($matches[2] == 'copy') {
+            $curobj->$field = array (
+                -2,
+                -2,
+                -2
+            );
+
+            return true;
+        }
+
+        return false;
+    }
+
+    function ReadConfig_Handle_TARGET($fullcommand, $args, $matches, &$curobj, $filename,
+        $linecount)
+    {
+// wipe any existing targets, otherwise things in the DEFAULT accumulate with the new ones
+        $curobj->targets = array ();
+        array_shift($args); // take off the actual TARGET keyword
+
+        foreach ($args as $arg) {
+// we store the original TARGET string, and line number, along with the breakdown, to make nicer error messages later
+// array of 7 things:
+// - only 0,1,2,3,4 are used at the moment (more used to be before DS plugins)
+// 0 => final target string (filled in by ReadData)
+// 1 => multiplier (filled in by ReadData)
+// 2 => config filename where this line appears
+// 3 => linenumber in that file
+// 4 => the original target string
+// 5 => the plugin to use to pull data
+            $newtarget = array (
+                '',
+                '',
+                $filename,
+                $linecount,
+                $arg,
+                "",
+                ""
+            );
+
+            if ($curobj) {
+                debug("  TARGET: $arg\n");
+                $curobj->targets[] = $newtarget;
+            }
+        }
+
+        return true;
+    }
+
     function ReadConfig($input, $is_include = false)
     {
         global $WM_config_keywords2;
@@ -2780,11 +3182,12 @@ class WeatherMap extends WeatherMapBase
             $linematched = 0;
             $linecount++;
 
-            if (preg_match("/^\s*#/", $buffer)) {
-            // this is a comment line
+            $buffer = trim($buffer);
+
+            if ($buffer == '' || substr($buffer, 0, 1) == '#') {
+            // this is a comment line, or a blank line
             }
             else {
-                $buffer = trim($buffer);
 
 // for any other config elements that are shared between nodes and links, they can use this
                 unset($curobj);
@@ -2804,7 +3207,7 @@ class WeatherMap extends WeatherMapBase
 
                 $objectlinecount++;
 
-                if (preg_match("/^\s*(LINK|NODE)\s+(\S+)\s*$/i", $buffer, $matches)) {
+                if (preg_match("/^(LINK|NODE)\s+(\S+)\s*$/i", $buffer, $matches)) {
                     $objectlinecount = 0;
 
                     if (1 == 1) {
@@ -2901,106 +3304,95 @@ class WeatherMap extends WeatherMapBase
                     $curobj->defined_in = $filename;
                 }
 
-
-                // alternative for use later where quoted strings are more useful
-                $args = ParseString($buffer);
-
-                // From here, the aim of the game is to get out of this loop as
-                // early as possible, without running more preg_match calls than
-                // necessary. In 0.97, this per-line loop accounted for 50% of
-                // the running time!
-
-
-				// this next loop replaces a whole pile of duplicated ifs with something with consistent handling
-                
-				assert('is_object($curobj)');
-								
-				if(true === isset($args[0])) {
-					// check if there is even an entry in this context for the current keyword
-					if (true === isset($WM_config_keywords2[$last_seen][$args[0]])) {
-						// if there is, then the entry is an array of arrays - iterate them to validate the config
-						foreach ($WM_config_keywords2[$last_seen][$args[0]]
-							as $keyword) {
-							if (1 === preg_match($keyword[1], $buffer, $matches)) {
-								foreach ($keyword[2] as $key => $val) {
-									// so we can poke in numbers too, if the value starts with #
-									// then take the # off, and treat the rest as a number literal
-									if (substr($val,0,1) === '#') {
-										$val = substr($val,1);
-									} elseif (is_numeric($val)) {
-										// if it's a number, then it's a match number,
-										// otherwise it's a literal to be put into a variable
-										$val = $matches[$val];
-									}
-									
-									if (1 === preg_match('/^(.*)\[([^\]]+)\]$/', $key,
-										$m)) {									
-										$index = constant($m[2]);
-										$key = $m[1];
-										$curobj->{$key}[$index] = $val;
-									} else {
-										$curobj->$key = $val;
-									}
-								}
-								$linematched++;
-								break;
-							}
-						}
-					}
-				}
-
-                 // SETs are universal, and relatively common
-                if (($linematched == 0)
-                    && preg_match("/^\s*SET\s+(\S+)\s+(.*)\s*$/i", $buffer, $matches)) {
-                    $curobj->add_hint($matches[1], trim($matches[2]));
-                    $linematched++;
+                if ($linematched == 0) {
+                    // alternative for use later where quoted strings are more useful
+                    $args = ParseString($buffer);
                 }
 
-                // allow setting a variable to ""
-                if (($linematched == 0)
-                    && preg_match("/^\s*SET\s+(\S+)\s*$/i", $buffer, $matches)) {
-                    $curobj->add_hint($matches[1], '');
-                    $linematched++;
-                }
+// From here, the aim of the game is to get out of this loop as
+// early as possible, without running more preg_match calls than
+// necessary. In 0.97, this per-line loop accounted for 50% of
+// the running time!
 
-                // same with TARGETs
 
-                if (($linematched == 0) && ($last_seen == 'NODE' || $last_seen == 'LINK')
-                    && preg_match("/^\s*TARGET\s+(.*)\s*$/i", $buffer, $matches)) {
-                    $linematched++;
-                    $rawtargetlist = $matches[1] . " ";
+// this next loop replaces a whole pile of duplicated ifs with something with consistent handling
 
-                    if ($args[0] == 'TARGET') {
-// wipe any existing targets, otherwise things in the DEFAULT accumulate with the new ones
-                        $curobj->targets = array ();
-                        array_shift($args); // take off the actual TARGET keyword
+                assert('is_object($curobj)');
 
-                        foreach ($args as $arg) {
-// we store the original TARGET string, and line number, along with the breakdown, to make nicer error messages later
-// array of 7 things:
-// - only 0,1,2,3,4 are used at the moment (more used to be before DS plugins)
-// 0 => final target string (filled in by ReadData)
-// 1 => multiplier (filled in by ReadData)
-// 2 => config filename where this line appears
-// 3 => linenumber in that file
-// 4 => the original target string
-// 5 => the plugin to use to pull data
-                            $newtarget = array (
-                                '',
-                                '',
-                                $filename,
-                                $linecount,
-                                $arg,
-                                "",
-                                ""
-                            );
+                if ($linematched == 0 && true === isset($args[0])) {
+// check if there is even an entry in this context for the current keyword
+                    if (true === isset($WM_config_keywords2[$last_seen][$args[0]])) {
+// if there is, then the entry is an array of arrays - iterate them to validate the config
+                        foreach ($WM_config_keywords2[$last_seen][$args[0]] as $keyword) {
 
-                            if ($curobj) {
-                                debug("  TARGET: $arg\n");
-                                $curobj->targets[] = $newtarget;
+                            unset($matches);
+
+                            print "IN " . $last_seen . "/" . $args[0] . "\n";
+
+                            if ((substr($keyword[1], 0, 1) != '/')
+                                || (1 === preg_match($keyword[1], $buffer, $matches))) {
+
+                                // if we came here without a regexp, then the \1 etc
+                                // refer to arg numbers, not match numbers
+
+                                if (false === isset($matches)) {
+                                    $matches = $args;
+                                    print " NON-REGEXP";
+                                }
+
+                                print " MATCH\n";
+
+                                if (is_array($keyword[2])) {
+                                    print "   STRAIGHT-ASSIGN\n";
+
+                                    foreach ($keyword[2] as $key => $val) {
+// so we can poke in numbers too, if the value starts with #
+// then take the # off, and treat the rest as a number literal
+                                        if (substr($val, 0, 1) === '#') {
+                                            $val = substr($val, 1);
+                                        } elseif (is_numeric($val)) {
+// if it's a number, then it's a match number,
+// otherwise it's a literal to be put into a variable
+                                            $val = $matches[$val];
+                                        }
+
+                                        if (1 === preg_match('/^(.*)\[([^\]]+)\]$/', $key,
+                                            $m)) {
+                                            $index = constant($m[2]);
+                                            $key = $m[1];
+                                            $curobj->{$key}[$index] = $val;
+                                        } else {
+                                            $curobj->$key = $val;
+                                        }
+                                    }
+                                    $linematched++;
+                                } else {
+#     function ReadConfig_Handle_TARGET($fullcommand, $args, $curobj, $filename, $linecount)
+
+                                    print " ->HANDLER\n";
+
+// the third arg wasn't an array, it was a function name.
+// call that function to handle this keyword
+                                    if (call_user_func(array (
+                                        $this,
+                                        $keyword[2]
+                                    ), $buffer, $args, $matches, $curobj, $filename,
+                                        $linecount)) {
+                                        $linematched++;
+                                    }
+                                }
+                            }
+
+                            if ($linematched > 0) {
+                                break;
                             }
                         }
                     }
+                }
+
+                if ($linematched == 0) {
+                    print "READCONFIG: $last_seen/" . $args[0]
+                        . " unhandled - |$buffer|\n";
                 }
 
                 // the next blocks are for commands that only apply to one
@@ -3010,175 +3402,122 @@ class WeatherMap extends WeatherMapBase
                 // should also help, if possible.
 
                 // LINK-specific stuff that couldn't be done with just a regexp
-                if($last_seen == 'LINK' && $linematched == 0 ) {
+                if ($last_seen == 'LINK' && $linematched == 0) {
+                    if (($linematched == 0) && preg_match(
+                        "/^\s*BWLABEL\s+(bits|percent|unformatted|none)\s*$/i",
+                        $buffer, $matches)) {
+                        $format_in = '';
+                        $format_out = '';
+                        $style = strtolower($matches[1]);
 
-                    if (($linematched == 0)
-                        && preg_match("/^\s*NODES\s+(\S+)\s+(\S+)\s*$/i", $buffer, $matches))
-                        {
+                        if ($style == 'percent') {
+                            $format_in = FMT_PERC_IN;
+                            $format_out = FMT_PERC_OUT;
+                        }
 
-                            $valid_nodes = 2;
+                        if ($style == 'bits') {
+                            $format_in = FMT_BITS_IN;
+                            $format_out = FMT_BITS_OUT;
+                        }
 
-                            foreach (array (
-                                1,
-                                2
-                            ) as $i) {
-                                $endoffset[$i] = 'C';
-                                $nodenames[$i] = $matches[$i];
+                        if ($style == 'unformatted') {
+                            $format_in = FMT_UNFORM_IN;
+                            $format_out = FMT_UNFORM_OUT;
+                        }
 
-                                // percentage of compass - must be first
-                                if (preg_match("/:(NE|SE|NW|SW|N|S|E|W|C)(\d+)$/i",
-                                    $matches[$i], $submatches)) {
-                                    $endoffset[$i] = $submatches[1] . $submatches[2];
-                                    $nodenames[$i] =
-                                        preg_replace("/:(NE|SE|NW|SW|N|S|E|W|C)\d+$/i", '',
-                                            $matches[$i]);
-                                    $this->need_size_precalc = true;
-                                }
-
-                                if (preg_match("/:(NE|SE|NW|SW|N|S|E|W|C)$/i", $matches[$i],
-                                    $submatches)) {
-                                    $endoffset[$i] = $submatches[1];
-                                    $nodenames[$i] =
-                                        preg_replace("/:(NE|SE|NW|SW|N|S|E|W|C)$/i", '',
-                                            $matches[$i]);
-                                    $this->need_size_precalc = true;
-                                }
-
-                                if (preg_match("/:(-?\d+r\d+)$/i", $matches[$i], $submatches))
-                                    {
-                                    $endoffset[$i] = $submatches[1];
-                                    $nodenames[$i] =
-                                        preg_replace("/:(-?\d+r\d+)$/i", '', $matches[$i]);
-                                    $this->need_size_precalc = true;
-                                }
-
-                                if (preg_match("/:([-+]?\d+):([-+]?\d+)$/i", $matches[$i],
-                                    $submatches)) {
-                                    $xoff = $submatches[1];
-                                    $yoff = $submatches[2];
-                                    $endoffset[$i] = $xoff . ":" . $yoff;
-                                    $nodenames[$i] =
-                                        preg_replace("/:$xoff:$yoff$/i", '', $matches[$i]);
-                                    $this->need_size_precalc = true;
-                                }
-
-                                if (!array_key_exists($nodenames[$i], $this->nodes)) {
-                                    warn("Unknown node '" . $nodenames[$i]
-                                        . "' on line $linecount of config\n");
-                                    $valid_nodes--;
-                                }
-                            }
-
-    // TODO - really, this should kill the whole link, and reset for the next one
-                            if ($valid_nodes == 2) {
-                                $curlink->a = $this->nodes[$nodenames[1]];
-                                $curlink->b = $this->nodes[$nodenames[2]];
-                                $curlink->a_offset = $endoffset[1];
-                                $curlink->b_offset = $endoffset[2];
-                            } else {
-                                // this'll stop the current link being added
-                                $last_seen = "broken";
-                            }
-
-                            $linematched++;
-
-                    }
-
-
-
-                    if (($linematched == 0)
-                        && preg_match("/^\s*VIA\s+([-+]?\d+)\s+([-+]?\d+)\s*$/i", $buffer,
-                            $matches)) {
-                        $curlink->vialist[] = array (
-                            $matches[1],
-                            $matches[2]
-                        );
-
+                        $curobj->labelstyle = $style;
+                        $curobj->bwlabelformats[IN] = $format_in;
+                        $curobj->bwlabelformats[OUT] = $format_out;
                         $linematched++;
                     }
 
-
-                    if (($linematched == 0) 
-                        && preg_match("/^\s*VIA\s+(\S+)\s+([-+]?\d+)\s+([-+]?\d+)\s*$/i",
-                            $buffer, $matches)) {
-                        $curlink->vialist[] = array (
-                            $matches[2],
-                            $matches[3],
-                            $matches[1]
-                        );
-
-                        $linematched++;
-                    }
-
-                    if (($linematched == 0) 
+                    if (($linematched == 0)
                         && preg_match("/^\s*ARROWSTYLE\s+(\d+)\s+(\d+)\s*$/i", $buffer,
                             $matches)) {
-                        $curlink->arrowstyle = $matches[1] . ' ' . $matches[2];
+                        $curobj->arrowstyle = $matches[1] . ' ' . $matches[2];
                         $linematched++;
                     }
-
-                    if (($linematched == 0)
-                        && (preg_match(
-                            "/^\s*(COMMENTFONT|BWBOX|BWFONT|BWOUTLINE|OUTLINE)COLOR\s+((\d+)\s+(\d+)\s+(\d+)|none|contrast|copy)\s*$/i",
-                            $buffer, $matches))) {
-                        $key = $matches[1];
-                        $field = strtolower($matches[1]) . 'colour';
-                        $val = strtolower($matches[2]);
-
-                        if (isset($matches[3])) // this is a regular colour setting thing
-                        {
-                            $curlink->$field = array (
-                                $matches[3],
-                                $matches[4],
-                                $matches[5]
-                            );
-
-                            $linematched++;
-                        }
-
-                        if ($val == 'none'
-                            && ($key == 'BWBOX' || $key == 'BWOUTLINE' || $key == 'OUTLINE'))
-                            {
-
-                            $curlink->$field = array (
-                                -1,
-                                -1,
-                                -1
-                            );
-
-                            $linematched++;
-                        }
-
-                        if ($val == 'contrast' && $key == 'COMMENTFONT') {
-
-                            $curlink->$field = array (
-                                -3,
-                                -3,
-                                -3
-                            );
-
-                            $linematched++;
-                        }
-                    }
-
                 }
 
                 // NODE-specific stuff that couldn't be done with just a regexp
-                if($last_seen == 'NODE' && $linematched == 0 ) {
+                if ($last_seen == 'NODE' && $linematched == 0) {
+                    if (($linematched == 0)
+                        && preg_match(
+                            "/^\s*USE(ICON)?SCALE\s+([A-Za-z][A-Za-z0-9_]*)(\s+(in|out))?(\s+(absolute|percent))?\s*$/i",
+                            $buffer, $matches)) {
+                        $svar = '';
+                        $stype = 'percent';
 
+                        if (isset($matches[3])) {
+                            $svar = trim($matches[3]);
+                        }
+
+                        if (isset($matches[6])) {
+                            $stype = strtolower(trim($matches[6]));
+                        }
+
+                        // opens the door for other scaley things...
+                        switch ($matches[1]) {
+                            case 'ICON':
+                                $varname = 'iconscalevar';
+                                $uvarname = 'useiconscale';
+                                $tvarname = 'iconscaletype';
+
+                                break;
+
+                                default:
+                            $varname = 'scalevar';
+                                $uvarname = 'usescale';
+                                $tvarname = 'scaletype';
+                                break;
+                        }
+
+                        if ($svar != '') {
+                            $curobj->$varname = $svar;
+                        }
+                        $curobj->$tvarname = $stype;
+                        $curobj->$uvarname = $matches[2];
+
+                        $linematched++;
+                    }
                 }
 
                 // GLOBAL-specific stuff that couldn't be done with just a regexp
-                if($last_seen == 'GLOBAL' && $linematched == 0 ) {
+                if ($last_seen == 'GLOBAL' && $linematched == 0) {
+                    if (($linematched == 0)
+                        && preg_match(
+                            "/^\s*KEYPOS\s+([A-Za-z][A-Za-z0-9_]*\s+)?(-?\d+)\s+(-?\d+)(.*)/i",
+                            $buffer, $matches)) {
+                        $whichkey = trim($matches[1]);
+
+                        if ($whichkey == '')
+                            $whichkey = 'DEFAULT';
+
+                        $this->keyx[$whichkey] = $matches[2];
+                        $this->keyy[$whichkey] = $matches[3];
+                        $extra = trim($matches[4]);
+
+                        if ($extra != '')
+                            $this->keytext[$whichkey] = $extra;
+
+                        if (!isset($this->keytext[$whichkey]))
+                            $this->keytext[$whichkey] = "DEFAULT TITLE";
+
+                        if (!isset($this->keystyle[$whichkey]))
+                            $this->keystyle[$whichkey] = "classic";
+
+                        $linematched++;
+                    }
 
 
-                        // truetype font definition (actually, we don't really check if it's truetype) - filename + size
+// truetype font definition (actually, we don't really check if it's truetype) - filename + size
                     if (($linematched == 0)
                         && preg_match("/^\s*FONTDEFINE\s+(\d+)\s+(\S+)\s+(\d+)\s*$/i",
                             $buffer, $matches)) {
                         if (function_exists("imagettfbbox")) {
-    // test if this font is valid, before adding it to the font table...
-                            $bounds = @imagettfbbox($matches[3], 0, $matches[2], "Ignore me");
+// test if this font is valid, before adding it to the font table...
+                            $bounds =
+                                @imagettfbbox($matches[3], 0, $matches[2], "Ignore me");
 
                             if (isset($bounds[0])) {
                                 $this->fonts[$matches[1]]->type = "truetype";
@@ -3214,24 +3553,7 @@ class WeatherMap extends WeatherMapBase
                         $linematched++;
                     }
 
-
                     if (($linematched == 0)
-                        && preg_match(
-                            "/^\s*(TIME|TITLE|KEYBG|KEYTEXT|KEYOUTLINE|BG)COLOR\s+(\d+)\s+(\d+)\s+(\d+)\s*$/i",
-                            $buffer, $matches)) {
-                        $key = $matches[1];
-
-                        $this->colours['DEFAULT'][$key]['red1'] = $matches[2];
-                        $this->colours['DEFAULT'][$key]['green1'] = $matches[3];
-                        $this->colours['DEFAULT'][$key]['blue1'] = $matches[4];
-                        $this->colours['DEFAULT'][$key]['bottom'] = -2;
-                        $this->colours['DEFAULT'][$key]['top'] = -1;
-                        $this->colours['DEFAULT'][$key]['special'] = 1;
-
-                        $linematched++;
-                    }
-
-                   if (($linematched == 0)
                         && preg_match(
                             "/^\s*KEYSTYLE\s+([A-Za-z][A-Za-z0-9_]+\s+)?(classic|horizontal|vertical|inverted|tags)\s?(\d+)?\s*$/i",
                             $buffer, $matches)) {
@@ -3251,61 +3573,84 @@ class WeatherMap extends WeatherMapBase
                     }
 
 
+                    // one REGEXP to rule them all:
                     if (($linematched == 0)
-                        && preg_match("/^\s*KILO\s+(\d+)\s*$/i", $buffer, $matches)) {
-                        $this->kilo = $matches[1];
+                        && preg_match(
+                            "/^\s*SCALE\s+([A-Za-z][A-Za-z0-9_]*\s+)?(\-?\d+\.?\d*[munMGT]?)\s+(\-?\d+\.?\d*[munMGT]?)\s+(?:(\d+)\s+(\d+)\s+(\d+)(?:\s+(\d+)\s+(\d+)\s+(\d+))?|(none))\s*(.*)$/i",
+                            $buffer, $matches)) {
+                        // The default scale name is DEFAULT
+                        if ($matches[1] == '')
+                            $matches[1] = 'DEFAULT';
+                        else
+                            $matches[1] = trim($matches[1]);
+
+                        $key = $matches[2] . '_' . $matches[3];
+
+                        $this->colours[$matches[1]][$key]['key'] = $key;
+
+                        $tag = $matches[11];
+
+                        $this->colours[$matches[1]][$key]['tag'] = $tag;
+
+                        $this->colours[$matches[1]][$key]['bottom'] =
+                            unformat_number($matches[2], $this->kilo);
+                        $this->colours[$matches[1]][$key]['top'] =
+                            unformat_number($matches[3], $this->kilo);
+                        $this->colours[$matches[1]][$key]['special'] = 0;
+
+                        if (isset($matches[10]) && $matches[10] == 'none') {
+                            $this->colours[$matches[1]][$key]['red1'] = -1;
+                            $this->colours[$matches[1]][$key]['green1'] = -1;
+                            $this->colours[$matches[1]][$key]['blue1'] = -1;
+                        } else {
+                            $this->colours[$matches[1]][$key]['red1'] =
+                                (int)($matches[4]);
+                            $this->colours[$matches[1]][$key]['green1'] =
+                                (int)($matches[5]);
+                            $this->colours[$matches[1]][$key]['blue1'] =
+                                (int)($matches[6]);
+                        }
+
+                        // this is the second colour, if there is one
+                        if (isset($matches[7]) && $matches[7] != '') {
+                            $this->colours[$matches[1]][$key]['red2'] =
+                                (int)($matches[7]);
+                            $this->colours[$matches[1]][$key]['green2'] =
+                                (int)($matches[8]);
+                            $this->colours[$matches[1]][$key]['blue2'] =
+                                (int)($matches[9]);
+                        }
+
+                        if (!isset($this->numscales[$matches[1]])) {
+                            $this->numscales[$matches[1]] = 1;
+                        } else {
+                            $this->numscales[$matches[1]]++;
+                        }
+
+// we count if we've seen any default scale, otherwise, we have to add
+// one at the end.
+                        if ($matches[1] == 'DEFAULT') {
+                            $scalesseen++;
+                        }
+
                         $linematched++;
                     }
 
-
+                    if (($linematched == 0)
+                        && preg_match("/^\s*INCLUDE\s+(.*)\s*$/i", $buffer, $matches)) {
+                        if (file_exists($matches[1])) {
+                            debug("Including '{$matches[1]}'\n");
+                            $this->ReadConfig($matches[1], true);
+                            $last_seen = "GLOBAL";
+                        } else {
+                            warn("INCLUDE File '{$matches[1]}' not found!\n");
+                        }
+                        $linematched++;
+                    }
                 }
 
 
                 // *********************************************************
-
-                if (($linematched == 0) && $last_seen == 'GLOBAL'
-                    && preg_match("/^\s*INCLUDE\s+(.*)\s*$/i", $buffer, $matches)) {
-                    if (file_exists($matches[1])) {
-                        debug("Including '{$matches[1]}'\n");
-                        $this->ReadConfig($matches[1], true);
-                        $last_seen = "GLOBAL";
-                    } else {
-                        warn("INCLUDE File '{$matches[1]}' not found!\n");
-                    }
-                    $linematched++;
-                }
-
-                
-
-                if (($linematched == 0) && $last_seen == 'LINK'
-                    && preg_match("/^\s*BWLABEL\s+(bits|percent|unformatted|none)\s*$/i",
-                        $buffer, $matches)) {
-                    $format_in = '';
-                    $format_out = '';
-                    $style = strtolower($matches[1]);
-
-                    if ($style == 'percent') {
-                        $format_in = FMT_PERC_IN;
-                        $format_out = FMT_PERC_OUT;
-                    }
-
-                    if ($style == 'bits') {
-                        $format_in = FMT_BITS_IN;
-                        $format_out = FMT_BITS_OUT;
-                    }
-
-                    if ($style == 'unformatted') {
-                        $format_in = FMT_UNFORM_IN;
-                        $format_out = FMT_UNFORM_OUT;
-                    }
-
-                    $curobj->labelstyle = $style;
-                    $curobj->bwlabelformats[IN] = $format_in;
-                    $curobj->bwlabelformats[OUT] = $format_out;
-                    $linematched++;
-                }
-
-          
 
                 if (($linematched == 0)
                     && preg_match("/^\s*(IN|OUT)?OVERLIBGRAPH\s+(.+)$/i", $buffer,
@@ -3366,191 +3711,8 @@ class WeatherMap extends WeatherMapBase
                 }
 
 
-
-                if (($linematched == 0) && ($last_seen == 'NODE')
-                    && preg_match(
-                        "/^\s*USE(ICON)?SCALE\s+([A-Za-z][A-Za-z0-9_]*)(\s+(in|out))?(\s+(absolute|percent))?\s*$/i",
-                        $buffer, $matches)) {
-                    $svar = '';
-                    $stype = 'percent';
-
-                    if (isset($matches[3])) {
-                        $svar = trim($matches[3]);
-                    }
-
-                    if (isset($matches[6])) {
-                        $stype = strtolower(trim($matches[6]));
-                    }
-
-                    // opens the door for other scaley things...
-                    switch ($matches[1]) {
-                        case 'ICON':
-                            $varname = 'iconscalevar';
-                            $uvarname = 'useiconscale';
-                            $tvarname = 'iconscaletype';
-
-                            break;
-
-                            default:
-                            $varname = 'scalevar';
-                            $uvarname = 'usescale';
-                            $tvarname = 'scaletype';
-                            break;
-                    }
-
-                    if ($svar != '') {
-                        $curnode->$varname = $svar;
-                    }
-                    $curnode->$tvarname = $stype;
-                    $curnode->$uvarname = $matches[2];
-
-                    $linematched++;
-                }
-
-                // one REGEXP to rule them all:
-                if (($linematched == 0)
-                    && preg_match(
-                        "/^\s*SCALE\s+([A-Za-z][A-Za-z0-9_]*\s+)?(\-?\d+\.?\d*[munMGT]?)\s+(\-?\d+\.?\d*[munMGT]?)\s+(?:(\d+)\s+(\d+)\s+(\d+)(?:\s+(\d+)\s+(\d+)\s+(\d+))?|(none))\s*(.*)$/i",
-                        $buffer, $matches)) {
-                    // The default scale name is DEFAULT
-                    if ($matches[1] == '')
-                        $matches[1] = 'DEFAULT';
-                    else
-                        $matches[1] = trim($matches[1]);
-
-                    $key = $matches[2] . '_' . $matches[3];
-
-                    $this->colours[$matches[1]][$key]['key'] = $key;
-
-                    $tag = $matches[11];
-
-                    $this->colours[$matches[1]][$key]['tag'] = $tag;
-
-                    $this->colours[$matches[1]][$key]['bottom'] =
-                        unformat_number($matches[2], $this->kilo);
-                    $this->colours[$matches[1]][$key]['top'] =
-                        unformat_number($matches[3], $this->kilo);
-                    $this->colours[$matches[1]][$key]['special'] = 0;
-
-                    if (isset($matches[10]) && $matches[10] == 'none') {
-                        $this->colours[$matches[1]][$key]['red1'] = -1;
-                        $this->colours[$matches[1]][$key]['green1'] = -1;
-                        $this->colours[$matches[1]][$key]['blue1'] = -1;
-                    } else {
-                        $this->colours[$matches[1]][$key]['red1'] = (int)($matches[4]);
-                        $this->colours[$matches[1]][$key]['green1'] = (int)($matches[5]);
-                        $this->colours[$matches[1]][$key]['blue1'] = (int)($matches[6]);
-                    }
-
-                    // this is the second colour, if there is one
-                    if (isset($matches[7]) && $matches[7] != '') {
-                        $this->colours[$matches[1]][$key]['red2'] = (int)($matches[7]);
-                        $this->colours[$matches[1]][$key]['green2'] = (int)($matches[8]);
-                        $this->colours[$matches[1]][$key]['blue2'] = (int)($matches[9]);
-                    }
-
-                    if (!isset($this->numscales[$matches[1]])) {
-                        $this->numscales[$matches[1]] = 1;
-                    } else {
-                        $this->numscales[$matches[1]]++;
-                    }
-
-                    // we count if we've seen any default scale, otherwise, we have to add
-                    // one at the end.
-                    if ($matches[1] == 'DEFAULT') {
-                        $scalesseen++;
-                    }
-
-                    $linematched++;
-                }
-
-                if (($linematched == 0) && preg_match(
-                    "/^\s*KEYPOS\s+([A-Za-z][A-Za-z0-9_]*\s+)?(-?\d+)\s+(-?\d+)(.*)/i",
-                    $buffer, $matches)) {
-                    $whichkey = trim($matches[1]);
-
-                    if ($whichkey == '')
-                        $whichkey = 'DEFAULT';
-
-                    $this->keyx[$whichkey] = $matches[2];
-                    $this->keyy[$whichkey] = $matches[3];
-                    $extra = trim($matches[4]);
-
-                    if ($extra != '')
-                        $this->keytext[$whichkey] = $extra;
-
-                    if (!isset($this->keytext[$whichkey]))
-                        $this->keytext[$whichkey] = "DEFAULT TITLE";
-
-                    if (!isset($this->keystyle[$whichkey]))
-                        $this->keystyle[$whichkey] = "classic";
-
-                    $linematched++;
-                }
-
-
-
-
-
-
-
-                if (($linematched == 0) && ($last_seen == 'NODE')
-                    && (preg_match(
-                        "/^\s*(AICONOUTLINE|AICONFILL|LABELFONT|LABELFONTSHADOW|LABELBG|LABELOUTLINE)COLOR\s+((\d+)\s+(\d+)\s+(\d+)|none|contrast|copy)\s*$/i",
-                        $buffer, $matches))) {
-                    $key = $matches[1];
-                    $field = strtolower($matches[1]) . 'colour';
-                    $val = strtolower($matches[2]);
-
-                    if (isset($matches[3])) // this is a regular colour setting thing
-                    {
-                        $curnode->$field = array (
-                            $matches[3],
-                            $matches[4],
-                            $matches[5]
-                        );
-
-                        $linematched++;
-                    }
-
-                    if ($val == 'none'
-                        && ($matches[1] == 'LABELFONTSHADOW' || $matches[1] == 'LABELBG'
-                            || $matches[1] == 'LABELOUTLINE'
-                            || $matches[1] == 'AICONOUTLINE')) {
-                        $curnode->$field = array (
-                            -1,
-                            -1,
-                            -1
-                        );
-
-                        $linematched++;
-                    }
-
-                    if ($val == 'contrast' && $matches[1] == 'LABELFONT') {
-                        $curnode->$field = array (
-                            -3,
-                            -3,
-                            -3
-                        );
-
-                        $linematched++;
-                    }
-
-                    if ($matches[2] == 'copy' && $matches[1] == 'AICONFILL') {
-                        $curnode->$field = array (
-                            -2,
-                            -2,
-                            -2
-                        );
-
-                        $linematched++;
-                    }
-                }
-
-
                 // *********************************************************
 
-    
                 if (($linematched == 0) && trim($buffer) != '') {
                     warn("Unrecognised config on line $linecount: $buffer\n");
                 }
@@ -3562,29 +3724,7 @@ class WeatherMap extends WeatherMapBase
             } // if blankline
         }     // while
 
-        if (1 == 1) {
-            $this->ReadConfig_Commit($curobj);
-        } else {
-            if ($last_seen == "NODE") {
-                $this->nodes[$curnode->name] = $curnode;
-                debug("Saving Node: " . $curnode->name . "\n");
-
-                if ($curnode->template == 'DEFAULT')
-                    $this->node_template_tree["DEFAULT"][] = $curnode->name;
-            }
-
-            if ($last_seen == "LINK") {
-                if (isset($curlink->a) && isset($curlink->b)) {
-                    $this->links[$curlink->name] = $curlink;
-                    debug("Saving Link: " . $curlink->name . "\n");
-
-                    if ($curlink->template == 'DEFAULT')
-                        $this->link_template_tree["DEFAULT"][] = $curlink->name;
-                } else {
-                    warn("Dropping LINK " . $curlink->name . " - it hasn't got 2 NODES!");
-                }
-            }
-        }
+        $this->ReadConfig_Commit($curobj);
 
         debug("ReadConfig has finished reading the config ($linecount lines)\n");
         debug("------------------------------------------\n");
@@ -4159,7 +4299,7 @@ class WeatherMap extends WeatherMapBase
         $withnodes = true, $use_via_overlay = false, $use_rel_overlay = false)
     {
         debug("Trace: DrawMap()\n");
-       // metadump("# start", true);
+        // metadump("# start", true);
         $bgimage = null;
 
         if ($this->configfile != "") {
@@ -4778,7 +4918,7 @@ class WeatherMap extends WeatherMapBase
 
     function SortedImagemap($imagemapname)
     {
-        $html = "\n".'<map name="' . $imagemapname . '" id="' . $imagemapname . '">';
+        $html = "\n" . '<map name="' . $imagemapname . '" id="' . $imagemapname . '">';
 
         $all_layers = array_keys($this->seen_zlayers);
         rsort($all_layers);
@@ -4796,19 +4936,20 @@ class WeatherMap extends WeatherMapBase
 
                 // at z=1000, the legends and timestamps live
                 if ($z === 1000) {
-
                     debug("     Builtins fit here.\n");
-                    if(1==0) {
+
+                    if (1 == 0) {
                         $html .= $this->imap->subHTML('LEGEND:', true, ($this->context
                             != 'editor'));
-                         $html .= $this->imap->subHTML('TIMESTAMP', true, ($this->context
-                             != 'editor'));
+                        $html .= $this->imap->subHTML('TIMESTAMP', true, ($this->context
+                            != 'editor'));
                     }
+
                     foreach ($this->imap_areas as $areaname) {
-                        // skip the linkless areas if we are in the editor - they're redundant
-                            $html .= $this->imap->exactHTML($areaname, true, ($this->context
-                                != 'editor'));
-                        }
+// skip the linkless areas if we are in the editor - they're redundant
+                        $html .= $this->imap->exactHTML($areaname, true, ($this->context
+                            != 'editor'));
+                    }
                 }
 
                 foreach ($z_items as $it) {
@@ -4816,12 +4957,12 @@ class WeatherMap extends WeatherMapBase
                         $name = '';
 
                         foreach ($it->imap_areas as $areaname) {
-                        // skip the linkless areas if we are in the editor - they're redundant
-                            $html .= $this->imap->exactHTML($areaname, true, ($this->context
-                                != 'editor'));
+// skip the linkless areas if we are in the editor - they're redundant
+                            $html .= $this->imap->exactHTML(
+                                $areaname, true, ($this->context != 'editor'));
                         }
 
-                        if(1==0) {
+                        if (1 == 0) {
                             if (strtolower(get_class($it)) === 'weathermaplink') {
                                 $name = 'LINK:L';
                             }
@@ -4832,7 +4973,7 @@ class WeatherMap extends WeatherMapBase
                             $name .= $it->id . ":";
                             debug("      Writing %s from imagemap\n", $name);
 
-                            // skip the linkless areas if we are in the editor - they're redundant
+// skip the linkless areas if we are in the editor - they're redundant
                             $html .= $this->imap->subHTML($name, true, ($this->context
                                 != 'editor'));
                         }

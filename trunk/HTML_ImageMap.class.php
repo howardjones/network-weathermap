@@ -25,7 +25,6 @@ class HTML_ImageMap_Area
         $h = '';
 
         if ($this->name !== '') {
-            
             $h .= ' id="' . $this->name . '" ';
         }
 
@@ -53,8 +52,9 @@ class HTML_ImageMap_Area_Polygon extends HTML_ImageMap_Area
         $s1 = "";
         $s2 = "";
         $i = 0;
+
         foreach ($this->points as $point) {
-            if($i>0) {
+            if ($i > 0) {
                 $s1 .= ",";
                 $s2 .= ",";
             }
@@ -62,7 +62,7 @@ class HTML_ImageMap_Area_Polygon extends HTML_ImageMap_Area
             $s2 .= $point[1];
             $i++;
         }
-        $coordstring = $s1.','.$s2;
+        $coordstring = $s1 . ',' . $s2;
 
         return '<area' . $this->common_html() . ' shape="poly" coords="' . $coordstring
             . '" />';
@@ -82,8 +82,9 @@ class HTML_ImageMap_Area_Polygon extends HTML_ImageMap_Area
         }
         $xlist = rtrim($xlist, ', ');
         $ylist = rtrim($ylist, ', ');
-        $json .= ' "x": [ '.$xlist.' ], "y":[ '.$ylist.' ], "minx": ' . $this->minx
-            . ', "miny": ' . $this->miny . ', "maxx":' . $this->maxx . ', "maxy":'
+        $json .= ' "x": [ ' . $xlist . ' ], "y":[ ' . $ylist . ' ], "minx": '
+            . $this->minx . ', "miny": ' . $this->miny . ', "maxx":' . $this->maxx
+            . ', "maxy":'
             . $this->maxy . '}';
 
         return ($json);
@@ -102,13 +103,11 @@ class HTML_ImageMap_Area_Polygon extends HTML_ImageMap_Area
 // Algotithm from from
 // http://www.ecse.rpi.edu/Homepages/wrf/Research/Short_Notes/pnpoly.html#The%20C%20Code
         for ($i = 0, $j = $this->npoints - 1; $i < $this->npoints; $j = $i++) {
-            
+
             $x1 = $this->points[$i][0];
             $y1 = $this->points[$i][1];
             $x2 = $this->points[$j][0];
             $y2 = $this->points[$j][1];
-
-            
 
             if (((($y1 <= $y) && ($y < $y2)) || (($y2 <= $y) && ($y < $y1)))
                 && ($x < ($x2 - $x1) * ($y - $y1) / ($y2 - $y1) + $x1)) {
@@ -148,8 +147,6 @@ class HTML_ImageMap_Area_Polygon extends HTML_ImageMap_Area
         $this->maxx = max($xlist);
         $this->miny = min($ylist);
         $this->maxy = max($ylist);
-
-    
     }
 }
 
@@ -278,18 +275,19 @@ class HTML_ImageMap
     }
 
 // add an element to the map - takes an array with the info, in a similar way to HTML_QuickForm
-/**
- * 
- * @param string OR object $element
- * @param optional string name
- * @param optional string href
- * @param optional type-specific stuff
- * @return null
- */
-    
+    /**
+     * 
+     * @param string OR object $element
+     * @param optional string name
+     * @param optional string href
+     * @param optional type-specific stuff
+     * @return null
+     */
+
     function addArea($element)
     {
-      if ((true === is_object($element)) && (true === is_subclass_of($element, 'html_imagemap_area'))) {
+        if ((true === is_object($element))
+            && (true === is_subclass_of($element, 'html_imagemap_area'))) {
             $elementObject = &$element;
         } else {
             $args = func_get_args();
@@ -297,8 +295,8 @@ class HTML_ImageMap
             $elementObject = new $className($args[1], $args[2], array_slice($args, 3));
         }
 
-        $this->shapes[ $elementObject->name ] = &$elementObject;
-        $this->nshapes++;    
+        $this->shapes[$elementObject->name] = &$elementObject;
+        $this->nshapes++;
     }
 
     // do a hit-test based on the current map
@@ -325,7 +323,7 @@ class HTML_ImageMap
     {
         $count = 0;
 
-        if(true === isset($this->shapes[$where])) {
+        if (true === isset($this->shapes[$where])) {
             // this USED to be a substring match, but that broke some things
             // and wasn't actually used as one anywhere.
             switch ($which) {
@@ -333,7 +331,7 @@ class HTML_ImageMap
                     $this->shapes[$where]->href = $what;
                     $count++;
                     break;
-    
+
                 case 'extrahtml':
                     $this->shapes[$where]->extrahtml = $what;
                     $count++;
@@ -418,9 +416,9 @@ class HTML_ImageMap
         $l = strlen($namefilter);
 
         foreach ($this->shapes as $shape) {
-           
             if (($namefilter === '') || (strstr($shape->name, $namefilter) !== false)) {
-	      if ( (false === $skipnolinks) || ($shape->href !== '') || ($shape->extrahtml !== '') ) {
+                if ((false === $skipnolinks) || ($shape->href !== '')
+                    || ($shape->extrahtml !== '')) {
                     if ($reverseorder === true) {
                         $html = $shape->asHTML() . "\n" . $html;
                     } else {
@@ -436,8 +434,10 @@ class HTML_ImageMap
     {
         $html = '';
         $shape = $this->shapes[$name];
-        if(true === isset($shape)) {
-            if ( (false === $skipnolinks) || ($shape->href !== '') || ($shape->extrahtml !== '') ) {
+
+        if (true === isset($shape)) {
+            if ((false === $skipnolinks) || ($shape->href !== '')
+                || ($shape->extrahtml !== '')) {
                 if ($reverseorder === true) {
                     $html = $shape->asHTML() . "\n" . $html;
                 } else {

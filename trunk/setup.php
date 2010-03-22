@@ -339,7 +339,7 @@ function weathermap_setup_table()
 				titlecache text NOT NULL,
 				filehash varchar (40) NOT NULL default '',
 				warncount int(11) NOT NULL default 0,
-                                runtime int(11) NOT NULL default 0,
+                                runtime double NOT NULL default 0,
 				config text NOT NULL default '',
 				thumb_width int(11) NOT NULL default 0,
 				thumb_height int(11) NOT NULL default 0,
@@ -423,7 +423,7 @@ function weathermap_setup_table()
             }
             
             if (!$found_98changes) {
-                $sql[] = "alter table weathermap_maps add runtime int(11) NOT NULL default 0 after warncount";
+                $sql[] = "alter table weathermap_maps add runtime double NOT NULL default 0 after warncount";
             }
 
 

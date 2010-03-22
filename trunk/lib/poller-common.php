@@ -117,7 +117,7 @@ function weathermap_run_maps($mydir)
     $total_warnings = 0;
 
     if (function_exists("microtime")) {
-        $start_time = microtime() / 1000000;
+        $start_time = microtime(true) / 1000000;
     } else {
         $start_time = time();
     }
@@ -134,8 +134,10 @@ function weathermap_run_maps($mydir)
 // take our debugging cue from the poller - turn on Poller debugging to get weathermap debugging
     if (read_config_option('log_verbosity') >= POLLER_VERBOSITY_DEBUG) {
         $weathermap_debugging = true;
+        $global_debug = true;
         $mode_message = 'DEBUG mode is on';
     } else {
+        $global_debug = false;
         $mode_message
             = 'Normal logging mode. Turn on DEBUG in Cacti for more information';
     }
@@ -221,8 +223,15 @@ function weathermap_run_maps($mydir)
                         "replace into settings values('weathermap_last_started_file','"
                         . mysql_escape_string($weathermap_map) . "')");
 
+                    if($global_debug === false && $map['debug']=='on') {
+                        $weathermap_debugging = true;
+                    }
+                    else {
+                        $weathermap_debugging = $global_debug;
+                    }
+
                     if (function_exists("microtime")) {
-                        $map_start = microtime() / 1000000;
+                        $map_start = microtime(true) / 1000000;
                     } else {
                         $map_start = time();
                     }
@@ -335,7 +344,7 @@ function weathermap_run_maps($mydir)
                     unset($wmap);
 
                     if (function_exists("microtime")) {
-                        $map_end = microtime() / 1000000;
+                        $map_end = microtime(true) / 1000000;
                     } else {
                         $map_end = time();
                     }
@@ -374,7 +383,7 @@ function weathermap_run_maps($mydir)
     chdir($orig_cwd);
 
     if (function_exists("microtime")) {
-        $end_time = microtime() / 1000000;
+        $end_time = microtime(true) / 1000000;
     } else {
         $end_time = time();
     }

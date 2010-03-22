@@ -117,7 +117,7 @@ function weathermap_run_maps($mydir)
     $total_warnings = 0;
 
     if (function_exists("microtime")) {
-        $start_time = microtime(true) / 1000000;
+        $start_time = microtime(true);
     } else {
         $start_time = time();
     }
@@ -161,7 +161,7 @@ function weathermap_run_maps($mydir)
     chdir($mydir);
 
     db_execute("replace into settings values('weathermap_last_start_time','"
-        . mysql_escape_string(time()) . "')");
+        . mysql_escape_string($start_time) . "')");
 
     // first, see if the output directory even exists
     if (false === is_dir($outdir)) {
@@ -204,7 +204,7 @@ function weathermap_run_maps($mydir)
 
             debug("FIRST TOUCH\n");
 
-            if (true === weathermap_check_cron($weathermap_poller_start_time,
+            if (true === weathermap_check_cron(intval($weathermap_poller_start_time),
                 $map['schedule'])) {
                 $mapfile = $confdir . DIRECTORY_SEPARATOR . $map['configfile'];
                 $htmlfile = $outdir . DIRECTORY_SEPARATOR . $map['filehash'] . '.html';
@@ -231,7 +231,7 @@ function weathermap_run_maps($mydir)
                     }
 
                     if (function_exists("microtime")) {
-                        $map_start = microtime(true) / 1000000;
+                        $map_start = microtime(true);
                     } else {
                         $map_start = time();
                     }
@@ -344,7 +344,7 @@ function weathermap_run_maps($mydir)
                     unset($wmap);
 
                     if (function_exists("microtime")) {
-                        $map_end = microtime(true) / 1000000;
+                        $map_end = microtime(true);
                     } else {
                         $map_end = time();
                     }
@@ -368,7 +368,7 @@ function weathermap_run_maps($mydir)
                     $newdebug = 'off';
                 }
                 db_execute(sprintf(
-                    "update weathermap_maps set warncount=%d, runtime=%f debug='%s' where id=%d",
+                    "update weathermap_maps set warncount=%d, runtime=%f, debug='%s' where id=%d",
                     $weathermap_warncount, $map_duration, $newdebug, $map['id']));
                 $total_warnings += $weathermap_warncount;
                 $weathermap_warncount = 0;
@@ -389,7 +389,7 @@ function weathermap_run_maps($mydir)
     chdir($orig_cwd);
 
     if (function_exists("microtime")) {
-        $end_time = microtime(true) / 1000000;
+        $end_time = microtime(true);
     } else {
         $end_time = time();
     }
@@ -410,7 +410,7 @@ function weathermap_run_maps($mydir)
     db_execute("replace into settings values('weathermap_last_map_count','"
         . mysql_escape_string($mapcount) . "')");
     db_execute("replace into settings values('weathermap_last_finish_time','"
-        . mysql_escape_string(time()) . "')");
+        . mysql_escape_string($end_time) . "')");
 
     if (true === function_exists('memory_get_usage')) {
         db_execute("replace into settings values('weathermap_final_memory','"

@@ -425,7 +425,7 @@ function weathermap_setup_table()
             
             if (!$found_98changes) {
                 $sql[] = "alter table weathermap_maps add runtime double NOT NULL default 0 after warncount";
-                $sql[] = "alter table weathermap_maps add debug set('on','off','once') NOT NULL default 0 after warncount;";
+                $sql[] = "alter table weathermap_maps add debug set('on','off','once') NOT NULL default 'off' after warncount;";
             }
         }
 

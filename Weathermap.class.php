@@ -58,6 +58,10 @@ define('DISTANCE', 2);
 // there will be more lines in the array, but we'll be checking less of them
 $WM_config_keywords2 = array (
     'GLOBAL' => array (
+        'FONTDEFINE' => array(
+            array('GLOBAL',"/^\s*FONTDEFINE\s+(\d+)\s+(\S+)\s+(\d+)\s*$/i",'ReadConfig_Handle_FONTDEFINE'),
+            array('GLOBAL',"/^\s*FONTDEFINE\s+(\d+)\s+(\S+)\s*$/i",'ReadConfig_Handle_FONTDEFINE'),
+        ),
         'KEYOUTLINECOLOR' => array (array (
             'GLOBAL',
             '/^KEYOUTLINECOLOR\s+(\d+)\s+(\d+)\s+(\d+)$/',
@@ -480,10 +484,20 @@ $WM_config_keywords2 = array (
             ),
             array (
                 'NODE',
-                '/^\s*LABELOFFSET\s+(-?\d+r\d+)\s*$/i',
+                '/^LABELOFFSET\s+(-?\d+r\d+)\s*$/i',
                 array ('labeloffset' => 1)
             ),
         ),
+        'USESCALE' => array(
+            array('NODE', "/^(USESCALE)\s+([A-Za-z][A-Za-z0-9_]*)(\s+(in|out))?(\s+(absolute|percent))?\s*$/i","ReadConfig_Handle_NODE_USESCALE"),
+        ),
+        'USEICONSCALE' => array(
+            array('NODE', "/^(USEICONSCALE)\s+([A-Za-z][A-Za-z0-9_]*)(\s+(in|out))?(\s+(absolute|percent))?\s*$/i","ReadConfig_Handle_NODE_USESCALE"),
+        ),
+        'OVERLIBGRAPH' => array(
+            array('NODE',"/^OVERLIBGRAPH\s+(.+)$/i","ReadConfig_Handle_OVERLIB")
+        ),
+
     ), // end of node
     'LINK' => array (
         'TARGET' => array (array (
@@ -561,7 +575,7 @@ $WM_config_keywords2 = array (
         ),),
         'NOTES' => array (array (
             'LINK',
-            '/^\s*NOTES\s+(.*)\s*$/i',
+            '/^NOTES\s+(.*)\s*$/i',
             array (
                 'notestext[IN]' => 1,
                 'notestext[OUT]' => 1
@@ -570,7 +584,7 @@ $WM_config_keywords2 = array (
         'MAXVALUE' => array (
             array (
                 'LINK',
-                '/^\s*(MAXVALUE)\s+(\d+\.?\d*[KMGT]?)\s+(\d+\.?\d*[KMGT]?)\s*$/i',
+                '/^(MAXVALUE)\s+(\d+\.?\d*[KMGT]?)\s+(\d+\.?\d*[KMGT]?)\s*$/i',
                 array (
                     'max_bandwidth_in_cfg' => 2,
                     'max_bandwidth_out_cfg' => 3
@@ -578,7 +592,7 @@ $WM_config_keywords2 = array (
             ),
             array (
                 'LINK',
-                '/^\s*(MAXVALUE)\s+(\d+\.?\d*[KMGT]?)\s*$/i',
+                '/^(MAXVALUE)\s+(\d+\.?\d*[KMGT]?)\s*$/i',
                 array (
                     'max_bandwidth_in_cfg' => 2,
                     'max_bandwidth_out_cfg' => 2
@@ -588,23 +602,23 @@ $WM_config_keywords2 = array (
         'WIDTH' => array (
             array (
                 'LINK',
-                "/^\s*WIDTH\s+(\d+)\s*$/i",
+                "/^WIDTH\s+(\d+)\s*$/i",
                 array ('width' => 1)
             ),
             array (
                 'LINK',
-                "/^\s*WIDTH\s+(\d+\.\d+)\s*$/i",
+                "/^WIDTH\s+(\d+\.\d+)\s*$/i",
                 array ('width' => 1)
             ),
         ),
         'SPLITPOS' => array (array (
             'LINK',
-            '/^\s*SPLITPOS\s+(\d+)\s*$/i',
+            '/^SPLITPOS\s+(\d+)\s*$/i',
             array ('splitpos' => 1)
         ),),
         'BWLABELPOS' => array (array (
             'LINK',
-            '/^\s*BWLABELPOS\s+(\d+)\s(\d+)\s*$/i',
+            '/^BWLABELPOS\s+(\d+)\s(\d+)\s*$/i',
             array (
                 'labeloffset_in' => 1,
                 'labeloffset_out' => 2
@@ -612,7 +626,7 @@ $WM_config_keywords2 = array (
         ),),
         'COMMENTPOS' => array (array (
             'LINK',
-            '/^\s*COMMENTPOS\s+(\d+)\s(\d+)\s*$/i',
+            '/^COMMENTPOS\s+(\d+)\s(\d+)\s*$/i',
             array (
                 'commentoffset_in' => 1,
                 'commentoffset_out' => 2
@@ -620,53 +634,64 @@ $WM_config_keywords2 = array (
         ),),
         'DUPLEX' => array (array (
             'LINK',
-            '/^\s*DUPLEX\s+(full|half)\s*$/i',
+            '/^DUPLEX\s+(full|half)\s*$/i',
             array ('duplex' => 1)
         ),),
         'BWSTYLE' => array (array (
             'LINK',
-            '/^\s*BWSTYLE\s+(classic|angled)\s*$/i',
+            '/^BWSTYLE\s+(classic|angled)\s*$/i',
             array ('labelboxstyle' => 1)
         ),),
         'LINKSTYLE' => array (array (
             'LINK',
-            '/^\s*LINKSTYLE\s+(twoway|oneway)\s*$/i',
+            '/^LINKSTYLE\s+(twoway|oneway)\s*$/i',
             array ('linkstyle' => 1)
         ),),
         'COMMENTSTYLE' => array (array (
             'LINK',
-            '/^\s*COMMENTSTYLE\s+(edge|center)\s*$/i',
+            '/^COMMENTSTYLE\s+(edge|center)\s*$/i',
             array ('commentstyle' => 1)
         ),),
         'ARROWSTYLE' => array (array (
             'LINK',
-            '/^\s*ARROWSTYLE\s+(classic|compact)\s*$/i',
+            '/^ARROWSTYLE\s+(classic|compact)\s*$/i',
             array ('arrowstyle' => 1)
         ),),
         'VIASTYLE' => array (array (
             'LINK',
-            '/^\s*VIASTYLE\s+(curved|angled)\s*$/i',
+            '/^VIASTYLE\s+(curved|angled)\s*$/i',
             array ('viastyle' => 1)
         ),),
         'INCOMMENT' => array (array (
             'LINK',
-            '/^\s*INCOMMENT\s+(.*)\s*$/i',
+            '/^INCOMMENT\s+(.*)\s*$/i',
             array ('comments[IN]' => 1)
         ),),
         'OUTCOMMENT' => array (array (
             'LINK',
-            '/^\s*OUTCOMMENT\s+(.*)\s*$/i',
+            '/^OUTCOMMENT\s+(.*)\s*$/i',
             array ('comments[OUT]' => 1)
         ),),
+
+        'OVERLIBGRAPH' => array(
+            array('LINK',"/^OVERLIBGRAPH\s+(.+)$/i","ReadConfig_Handle_OVERLIB")
+        ),
+        'INOVERLIBGRAPH' => array(
+            array('LINK',"/^INOVERLIBGRAPH\s+(.+)$/i","ReadConfig_Handle_OVERLIB")
+        ),
+        'OUTOVERLIBGRAPH' => array(
+            array('LINK',"/^OUTOVERLIBGRAPH\s+(.+)$/i","ReadConfig_Handle_OVERLIB")
+        ),
+
         'USESCALE' => array (
             array (
                 'LINK',
-                '/^\s*USESCALE\s+([A-Za-z][A-Za-z0-9_]*)\s*$/i',
+                '/^USESCALE\s+([A-Za-z][A-Za-z0-9_]*)\s*$/i',
                 array ('usescale' => 1)
             ),
             array (
                 'LINK',
-                '/^\s*USESCALE\s+([A-Za-z][A-Za-z0-9_]*)\s+(absolute|percent)\s*$/i',
+                '/^USESCALE\s+([A-Za-z][A-Za-z0-9_]*)\s+(absolute|percent)\s*$/i',
                 array (
                     'usescale' => 1,
                     'scaletype' => 2
@@ -675,18 +700,18 @@ $WM_config_keywords2 = array (
         ),
         'BWFONT' => array (array (
             'LINK',
-            '/^\s*BWFONT\s+(\d+)\s*$/i',
+            '/^BWFONT\s+(\d+)\s*$/i',
             array ('bwfont' => 1)
         ),),
         'COMMENTFONT' => array (array (
             'LINK',
-            '/^\s*COMMENTFONT\s+(\d+)\s*$/i',
+            '/^COMMENTFONT\s+(\d+)\s*$/i',
             array ('commentfont' => 1)
         ),),
         'BANDWIDTH' => array (
             array (
                 'LINK',
-                '/^\s*(BANDWIDTH)\s+(\d+\.?\d*[KMGT]?)\s+(\d+\.?\d*[KMGT]?)\s*$/i',
+                '/^(BANDWIDTH)\s+(\d+\.?\d*[KMGT]?)\s+(\d+\.?\d*[KMGT]?)\s*$/i',
                 array (
                     'max_bandwidth_in_cfg' => 2,
                     'max_bandwidth_out_cfg' => 3
@@ -694,7 +719,7 @@ $WM_config_keywords2 = array (
             ),
             array (
                 'LINK',
-                '/^\s*(BANDWIDTH)\s+(\d+\.?\d*[KMGT]?)\s*$/i',
+                '/^(BANDWIDTH)\s+(\d+\.?\d*[KMGT]?)\s*$/i',
                 array (
                     'max_bandwidth_in_cfg' => 2,
                     'max_bandwidth_out_cfg' => 2
@@ -703,7 +728,7 @@ $WM_config_keywords2 = array (
         ),
         'OUTBWFORMAT' => array (array (
             'LINK',
-            '/^\s*OUTBWFORMAT\s+(.*)\s*$/i',
+            '/^OUTBWFORMAT\s+(.*)\s*$/i',
             array (
                 'bwlabelformats[OUT]' => 1,
                 'labelstyle' => '--'
@@ -711,7 +736,7 @@ $WM_config_keywords2 = array (
         ),),
         'INBWFORMAT' => array (array (
             'LINK',
-            '/^\s*INBWFORMAT\s+(.*)\s*$/i',
+            '/^INBWFORMAT\s+(.*)\s*$/i',
             array (
                 'bwlabelformats[IN]' => 1,
                 'labelstyle' => '--'
@@ -719,17 +744,17 @@ $WM_config_keywords2 = array (
         ),),
         'INNOTES' => array (array (
             'LINK',
-            '/^\s*INNOTES\s+(.*)\s*$/i',
+            '/^INNOTES\s+(.*)\s*$/i',
             array ('notestext[IN]' => 1)
         ),),
         'OUTNOTES' => array (array (
             'LINK',
-            '/^\s*OUTNOTES\s+(.*)\s*$/i',
+            '/^OUTNOTES\s+(.*)\s*$/i',
             array ('notestext[OUT]' => 1)
         ),),
         'INFOURL' => array (array (
             'LINK',
-            '/^\s*INFOURL\s+(.*)\s*$/i',
+            '/^INFOURL\s+(.*)\s*$/i',
             array (
                 'infourl[IN]' => 1,
                 'infourl[OUT]' => 1
@@ -737,17 +762,17 @@ $WM_config_keywords2 = array (
         ),),
         'ININFOURL' => array (array (
             'LINK',
-            '/^\s*ININFOURL\s+(.*)\s*$/i',
+            '/^ININFOURL\s+(.*)\s*$/i',
             array ('infourl[IN]' => 1)
         ),),
         'OUTINFOURL' => array (array (
             'LINK',
-            '/^\s*OUTINFOURL\s+(.*)\s*$/i',
+            '/^OUTINFOURL\s+(.*)\s*$/i',
             array ('infourl[OUT]' => 1)
         ),),
         'OVERLIBCAPTION' => array (array (
             'LINK',
-            '/^\s*OVERLIBCAPTION\s+(.*)\s*$/i',
+            '/^OVERLIBCAPTION\s+(.*)\s*$/i',
             array (
                 'overlibcaption[IN]' => 1,
                 'overlibcaption[OUT]' => 1
@@ -755,27 +780,27 @@ $WM_config_keywords2 = array (
         ),),
         'INOVERLIBCAPTION' => array (array (
             'LINK',
-            '/^\s*INOVERLIBCAPTION\s+(.*)\s*$/i',
+            '/^INOVERLIBCAPTION\s+(.*)\s*$/i',
             array ('overlibcaption[IN]' => 1)
         ),),
         'OUTOVERLIBCAPTION' => array (array (
             'LINK',
-            '/^\s*OUTOVERLIBCAPTION\s+(.*)\s*$/i',
+            '/^OUTOVERLIBCAPTION\s+(.*)\s*$/i',
             array ('overlibcaption[OUT]' => 1)
         ),),
         'ZORDER' => array (array (
             'LINK',
-            "/^\s*ZORDER\s+([-+]?\d+)\s*$/i",
+            "/^ZORDER\s+([-+]?\d+)\s*$/i",
             array ('zorder' => 1)
         ),),
         'OVERLIBWIDTH' => array (array (
             'LINK',
-            "/^\s*OVERLIBWIDTH\s+(\d+)\s*$/i",
+            "/^OVERLIBWIDTH\s+(\d+)\s*$/i",
             array ('overlibwidth' => 1)
         ),),
         'OVERLIBHEIGHT' => array (array (
             'LINK',
-            "/^\s*OVERLIBHEIGHT\s+(\d+)\s*$/i",
+            "/^OVERLIBHEIGHT\s+(\d+)\s*$/i",
             array ('overlibheight' => 1)
         ),),
     ) // end of link
@@ -3033,6 +3058,115 @@ class WeatherMap extends WeatherMapBase
         return true;
     }
 
+    function ReadConfig_Handle_NODE_USESCALE($fullcommand, $args, $matches, &$curobj, $filename,   $linecount)
+    {
+        $svar = '';
+        $stype = 'percent';
+
+        if (isset($matches[3])) {
+            $svar = trim($matches[3]);
+        }
+
+        if (isset($matches[6])) {
+            $stype = strtolower(trim($matches[6]));
+        }
+
+        // opens the door for other scaley things...
+        switch ($args[0]) {
+            case 'ICON':
+                $varname = 'iconscalevar';
+                $uvarname = 'useiconscale';
+                $tvarname = 'iconscaletype';
+
+                break;
+
+            default:
+                $varname = 'scalevar';
+                $uvarname = 'usescale';
+                $tvarname = 'scaletype';
+                break;
+        }
+
+        if ($svar != '') {
+            $curobj->$varname = $svar;
+        }
+        $curobj->$tvarname = $stype;
+        $curobj->$uvarname = $matches[2];
+
+        return true;
+    }
+
+
+    function ReadConfig_Handle_FONTDEFINE($fullcommand, $args, $matches, &$curobj, $filename,
+        $linecount)
+    {
+
+            if(isset($args[3])) {
+                        if (function_exists("imagettfbbox")) {
+// test if this font is valid, before adding it to the font table...
+                            $bounds =
+                                @imagettfbbox($args[3], 0, $args[2], "Ignore me");
+
+                            if (isset($bounds[0])) {
+                                $this->fonts[$args[1]]->type = "truetype";
+                                $this->fonts[$args[1]]->file = $args[2];
+                                $this->fonts[$args[1]]->size = $args[3];
+                            } else {
+                                warn("Failed to load ttf font " . $args[2]
+                                    . " - at config line $linecount\n [WMWARN30]");
+                            }
+                        } else {
+                            warn(
+                                "imagettfbbox() is not a defined function. You don't seem to have FreeType compiled into your gd module. [WMWARN31]\n");
+                        }
+
+                        return true;
+            }
+            else
+            {
+                       $newfont = imageloadfont($args[2]);
+
+                        if ($newfont) {
+                            $this->fonts[$args[1]]->type = "gd";
+                            $this->fonts[$args[1]]->file = $args[2];
+                            $this->fonts[$args[1]]->gdnumber = $newfont;
+                        } else {
+                            warn("Failed to load GD font: " . $args[2]
+                                . " ($newfont) at config line $linecount [WMWARN32]\n");
+                        }
+                        return true;
+            }
+
+        
+
+        return false;
+    }
+
+    function ReadConfig_Handle_OVERLIB($fullcommand, $args, $matches, &$curobj, $filename,
+        $linecount)
+    {
+            $this->has_overlibs = true;
+
+        $urls = preg_split('/\s+/', $matches[1], -1, PREG_SPLIT_NO_EMPTY);
+
+        if ($args[0] == 'INOVERLIBGRAPH') {
+            $index = IN;
+        }
+
+        if ($args[0] == 'OUTOVERLIBGRAPH') {
+            $index = OUT;
+        }
+
+        if ($args[0] == 'OVERLIBGRAPH') {
+            $curobj->overliburl[IN] = $urls;
+            $curobj->overliburl[OUT] = $urls;
+        } else {
+            $curobj->overliburl[$index] = $urls;
+        }
+
+        return true;
+    }
+
     function ReadConfig_Handle_COLOR($fullcommand, $args, $matches, &$curobj, $filename,
         $linecount)
     {
@@ -3327,8 +3461,6 @@ class WeatherMap extends WeatherMapBase
 
                             unset($matches);
 
-    #                        print "IN " . $last_seen . "/" . $args[0] . "\n";
-
                             if ((substr($keyword[1], 0, 1) != '/')
                                 || (1 === preg_match($keyword[1], $buffer, $matches))) {
 
@@ -3337,42 +3469,39 @@ class WeatherMap extends WeatherMapBase
 
                                 if (false === isset($matches)) {
                                     $matches = $args;
-   #                                 print " NON-REGEXP";
                                 }
 
-  #                              print " MATCH\n";
-
                                 if (is_array($keyword[2])) {
- #                                   print "   STRAIGHT-ASSIGN\n";
 
                                     foreach ($keyword[2] as $key => $val) {
-// so we can poke in numbers too, if the value starts with #
-// then take the # off, and treat the rest as a number literal
+                                        // so we can poke in numbers too, if the value starts with #
+                                        // then take the # off, and treat the rest as a number literal
                                         if (substr($val, 0, 1) === '#') {
                                             $val = substr($val, 1);
                                         } elseif (is_numeric($val)) {
-// if it's a number, then it's a match number,
-// otherwise it's a literal to be put into a variable
+                                            // if it's a number, then it's a match number,
+                                            // otherwise it's a literal to be put into a variable
                                             $val = $matches[$val];
                                         }
 
+                                        // if there are [] in the string, it's an index into an array
+                                        // and the index will be one of the constants: IN or OUT
                                         if (1 === preg_match('/^(.*)\[([^\]]+)\]$/', $key,
                                             $m)) {
                                             $index = constant($m[2]);
                                             $key = $m[1];
                                             $curobj->{$key}[$index] = $val;
                                         } else {
+                                            // otherwise, it's just the name of a property on the
+                                            // appropriate object.
                                             $curobj->$key = $val;
                                         }
                                     }
                                     $linematched++;
                                 } else {
-#     function ReadConfig_Handle_TARGET($fullcommand, $args, $curobj, $filename, $linecount)
 
-#                                    print " ->HANDLER\n";
-
-// the third arg wasn't an array, it was a function name.
-// call that function to handle this keyword
+                                    // the third arg wasn't an array, it was a function name.
+                                    // call that function to handle this keyword
                                     if (call_user_func(array (
                                         $this,
                                         $keyword[2]
@@ -3383,12 +3512,17 @@ class WeatherMap extends WeatherMapBase
                                 }
                             }
 
+                            // jump out of this loop if there's been a match
                             if ($linematched > 0) {
                                 break;
                             }
                         }
                     }
                 }
+
+                // most config should be recognised by now.
+                // remaining items here require special knowledge of
+                // the parsing loop (INCLUDE) or do something else funky
 
                 if (1==0 && $linematched == 0) {
                     print "READCONFIG: $last_seen/" . $args[0]
@@ -3438,50 +3572,7 @@ class WeatherMap extends WeatherMapBase
                         $linematched++;
                     }
                 }
-
-                // NODE-specific stuff that couldn't be done with just a regexp
-                if ($last_seen == 'NODE' && $linematched == 0) {
-                    if (($linematched == 0)
-                        && preg_match(
-                            "/^\s*USE(ICON)?SCALE\s+([A-Za-z][A-Za-z0-9_]*)(\s+(in|out))?(\s+(absolute|percent))?\s*$/i",
-                            $buffer, $matches)) {
-                        $svar = '';
-                        $stype = 'percent';
-
-                        if (isset($matches[3])) {
-                            $svar = trim($matches[3]);
-                        }
-
-                        if (isset($matches[6])) {
-                            $stype = strtolower(trim($matches[6]));
-                        }
-
-                        // opens the door for other scaley things...
-                        switch ($matches[1]) {
-                            case 'ICON':
-                                $varname = 'iconscalevar';
-                                $uvarname = 'useiconscale';
-                                $tvarname = 'iconscaletype';
-
-                                break;
-
-                                default:
-                            $varname = 'scalevar';
-                                $uvarname = 'usescale';
-                                $tvarname = 'scaletype';
-                                break;
-                        }
-
-                        if ($svar != '') {
-                            $curobj->$varname = $svar;
-                        }
-                        $curobj->$tvarname = $stype;
-                        $curobj->$uvarname = $matches[2];
-
-                        $linematched++;
-                    }
-                }
-
+                
                 // GLOBAL-specific stuff that couldn't be done with just a regexp
                 if ($last_seen == 'GLOBAL' && $linematched == 0) {
                     if (($linematched == 0)
@@ -3490,68 +3581,31 @@ class WeatherMap extends WeatherMapBase
                             $buffer, $matches)) {
                         $whichkey = trim($matches[1]);
 
-                        if ($whichkey == '')
+                        if ($whichkey == '') {
                             $whichkey = 'DEFAULT';
+                        }
 
                         $this->keyx[$whichkey] = $matches[2];
                         $this->keyy[$whichkey] = $matches[3];
                         $extra = trim($matches[4]);
 
-                        if ($extra != '')
+                        if ($extra != '') {
                             $this->keytext[$whichkey] = $extra;
+                        }
 
-                        if (!isset($this->keytext[$whichkey]))
+                        // it's possible to have keypos before the scale is defined.
+                        // this is to make it at least mostly consistent internally
+                        if (!isset($this->keytext[$whichkey])) {
                             $this->keytext[$whichkey] = "DEFAULT TITLE";
+                        }
 
-                        if (!isset($this->keystyle[$whichkey]))
+                        if (!isset($this->keystyle[$whichkey])) {
                             $this->keystyle[$whichkey] = "classic";
-
-                        $linematched++;
-                    }
-
-
-// truetype font definition (actually, we don't really check if it's truetype) - filename + size
-                    if (($linematched == 0)
-                        && preg_match("/^\s*FONTDEFINE\s+(\d+)\s+(\S+)\s+(\d+)\s*$/i",
-                            $buffer, $matches)) {
-                        if (function_exists("imagettfbbox")) {
-// test if this font is valid, before adding it to the font table...
-                            $bounds =
-                                @imagettfbbox($matches[3], 0, $matches[2], "Ignore me");
-
-                            if (isset($bounds[0])) {
-                                $this->fonts[$matches[1]]->type = "truetype";
-                                $this->fonts[$matches[1]]->file = $matches[2];
-                                $this->fonts[$matches[1]]->size = $matches[3];
-                            } else {
-                                warn("Failed to load ttf font " . $matches[2]
-                                    . " - at config line $linecount\n [WMWARN30]");
-                            }
-                        } else {
-                            warn(
-                                "imagettfbbox() is not a defined function. You don't seem to have FreeType compiled into your gd module. [WMWARN31]\n");
                         }
 
                         $linematched++;
                     }
 
-                    // GD font definition (no size here)
-                    if (($linematched == 0)
-                        && preg_match("/^\s*FONTDEFINE\s+(\d+)\s+(\S+)\s*$/i", $buffer,
-                            $matches)) {
-                        $newfont = imageloadfont($matches[2]);
-
-                        if ($newfont) {
-                            $this->fonts[$matches[1]]->type = "gd";
-                            $this->fonts[$matches[1]]->file = $matches[2];
-                            $this->fonts[$matches[1]]->gdnumber = $newfont;
-                        } else {
-                            warn("Failed to load GD font: " . $matches[2]
-                                . " ($newfont) at config line $linecount [WMWARN32]\n");
-                        }
-
-                        $linematched++;
-                    }
 
                     if (($linematched == 0)
                         && preg_match(
@@ -3652,36 +3706,6 @@ class WeatherMap extends WeatherMapBase
 
                 // *********************************************************
 
-                if (($linematched == 0)
-                    && preg_match("/^\s*(IN|OUT)?OVERLIBGRAPH\s+(.+)$/i", $buffer,
-                        $matches)) {
-                    $this->has_overlibs = true;
-
-                    if (($linematched == 0) && $last_seen == 'NODE' && $matches[1] != '')
-                        {
-                        warn("IN/OUTOVERLIBGRAPH make no sense for a NODE! [WMWARN42]\n");
-                    } else if ($last_seen == 'LINK' || $last_seen == 'NODE') {
-
-                        $urls = preg_split('/\s+/', $matches[2], -1, PREG_SPLIT_NO_EMPTY);
-
-                        if ($matches[1] == 'IN') {
-                            $index = IN;
-                        }
-
-                        if ($matches[1] == 'OUT') {
-                            $index = OUT;
-                        }
-
-                        if ($matches[1] == '') {
-                            $curobj->overliburl[IN] = $urls;
-                            $curobj->overliburl[OUT] = $urls;
-                        } else {
-                            $curobj->overliburl[$index] = $urls;
-                        }
-                        $linematched++;
-                    }
-                }
-
                 if (($linematched == 0) && ($last_seen == 'NODE' || $last_seen == 'LINK')
                     && preg_match("/^\s*TEMPLATE\s+(\S+)\s*$/i", $buffer, $matches)) {
                     $tname = $matches[1];
@@ -3713,7 +3737,7 @@ class WeatherMap extends WeatherMapBase
 
                 // *********************************************************
 
-                if (($linematched == 0) && trim($buffer) != '') {
+                if (($linematched == 0) && ($buffer != '')) {
                     warn("Unrecognised config on line $linecount: $buffer\n");
                 }
 

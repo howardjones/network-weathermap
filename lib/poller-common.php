@@ -361,9 +361,15 @@ function weathermap_run_maps($mydir)
                     warn('Mapfile ' . $mapfile
                         . " is not readable or doesn't exist [WMPOLL04]\n");
                 }
+                // if the debug mode was set to once for this map, then that
+                // time has now passed, and it can be turned off again.
+                $newdebug = $map['debug'];
+                if($newdebug == 'once') {
+                    $newdebug = 'off';
+                }
                 db_execute(sprintf(
-                    'update weathermap_maps set warncount=%d, runtime=%f where id=%d',
-                    $weathermap_warncount, $map_duration, $map['id']));
+                    "update weathermap_maps set warncount=%d, runtime=%f debug='%s' where id=%d",
+                    $weathermap_warncount, $map_duration, $newdebug, $map['id']));
                 $total_warnings += $weathermap_warncount;
                 $weathermap_warncount = 0;
                 $weathermap_map = '';

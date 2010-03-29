@@ -1,5 +1,6 @@
 Before 0.98
 -----------
+USESCALE absolute not in WriteConfiG
 THIS IS CORRECT poller_output still runs with map-update-period = 0
 entries in weathermap_data are never expired
 collect usage_stats into an .xml file next to each map file

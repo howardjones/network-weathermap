@@ -50,12 +50,13 @@ if( isset($_COOKIE['wmeditor']))
     if( (isset($parts[2])) && (intval($parts[2]) != 0) ) { $grid_snap_value = intval($parts[2]); }
 }
 
+chdir(dirname(__FILE__));
+
 if(false === is_writable($mapdir))
 {
 	$configerror = 'The map config directory is not writable by the web server user. You will not be able to edit any files until this is corrected. [WMEDIT01]';
 }
 
-chdir(dirname(__FILE__));
 
 $action = '';
 $mapname = '';

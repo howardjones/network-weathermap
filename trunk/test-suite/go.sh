@@ -3,8 +3,14 @@
 #
 # A couple of these test files use fonts that are not in svn for copyright reasons
 
+# These are not final yet
+rm references/conf_*
+
 # Rebuild References (should be VERY RARE)
  ./run-tests.sh /usr/local/bin/php references
+
+if [ "X$1" = "X" ]; then
+
 
 # Run tests with default PHP (PHP5 for me)
  rm results-php5/*
@@ -22,4 +28,6 @@ echo "PHP5 Comparisons"
 # Run comparison against references
 echo "PHP4 Comparisons"
  ./compare-results.sh php4
+
+fi
 

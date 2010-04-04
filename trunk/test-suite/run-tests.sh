@@ -15,6 +15,9 @@ fi
 
 echo "Processing $DIRECTORY"
 
+touch coverage.txt
+rm coverage.txt
+
 INDEX="index-$DIRECTORY.html"
 
 echo "<body bgcolor='#cccccc'>" > $INDEX
@@ -23,13 +26,14 @@ for source in tests/*.conf; do
   destination=`basename $source`
   destination="$DIRECTORY/${destination}.png"
 
-  echo "$source -> $destination"
+  echo -n "$source -> $destination"
   echo "<hr>$source<br />" >> $INDEX
   echo "<img src='${destination}'><br />" >> $INDEX
   if [ ! -f $destination ]; then
-    $PHP ../weathermap --config $source --output $destination
+	echo
+    $PHP ../weathermap --config $source --output $destination --trackcoverage
   else
-   echo "Skipping (exists)"
+   echo " - Skipped (exists)"
   fi
 done
 

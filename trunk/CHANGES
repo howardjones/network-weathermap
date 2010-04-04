@@ -1,5 +1,11 @@
-0.98    ADDED - New Cacti integration for editor. Additional 'edit maps' permission. No need for editor-config.php anymore!
-
+0.98    FIXED - static datasource plugin honours KILO
+		FIXED - memory leak in poller code. Memory usage is MUCH lower now.
+		CHANGE - lots of performance optimisations. Roughly twice as fast as 0.97a.
+		ADDED - New Cacti integration for editor. Additional 'edit maps' permission. No need for editor-config.php anymore!
+		ADDED - per-map runtime logging
+		ADDED - per-map debugging (debug a single map in Cacti without running debug logging for the whole poller)
+		ADDED - Cacti template for monitoring Weathermap performance/mapcount/warningcount/memory.
+		
 0.97a	FIXED - Incorrect action URL in 'map selector' combo box for Cacti users.
 	FIXED - cacti_graph_id set to 0 instead of ID, by rrd/poller_output and dsstats plugins (thanks sh0x)
 	FIXED - 'classic' legend drew 'hidden' colour values for things like key background colour. (thanks jmayniac)

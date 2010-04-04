@@ -26,6 +26,8 @@ for source in tests/*.conf; do
   reference="references/${base}.png"
   result="results-$SUFFIX/${base}.png"
 
+  if [ -f $result ]; then
+
 #  echo "$source: $reference vs $result -> $destination"
   $COMPARE -metric AE $reference $result $destination  > $destination2 2>&1
 
@@ -39,6 +41,7 @@ for source in tests/*.conf; do
 
   echo "<hr>$source<br />" >> $INDEX
   echo "<img src='${destination}'><br />" >> $INDEX
+  fi
 done
 
 echo "</body>" >> $INDEX

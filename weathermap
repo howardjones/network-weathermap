@@ -23,6 +23,8 @@ $imagefile='';
 $dumpafter=0;
 $dumpstats=0;
 $randomdata=0;
+$trackcoverage=0;
+$coveragefile = "coverage.txt";
 $dumpconfig='';
 $defines=array();
 
@@ -46,6 +48,7 @@ $long_opts=array
 		"uberdebug",
 		"stats",
 		"define=",
+		"trackcoverage",
 		"no-data",
 		"randomdata",
 		"htmloutput=",
@@ -99,6 +102,10 @@ if (sizeof($gopts) > 0)
 
 		case '--stats':
 			$dumpstats=1;
+			break;
+
+		case '--trackcoverage':
+			$trackcoverage=1;
 			break;
 			
 		case '--uberdebug':
@@ -206,6 +213,13 @@ foreach ($options_output as $key=>$value) {
 
 $weathermap_map = $configfile;
 
+if( $trackcoverage===1) {
+	$map->SeedCoverage();
+	if(file_exists($coveragefile) ) {
+		$map->LoadCoverage($coveragefile);
+	}
+}
+
 if ($map->ReadConfig($configfile)) {
     // allow command-lines to override the config file, but provide a default if neither are present
     if ($imagefile == '') {
@@ -275,6 +289,10 @@ if ($map->ReadConfig($configfile)) {
             $map->WriteConfig($dumpconfig);
     }
 
+	if( $trackcoverage===1 ) {
+		$map->SaveCoverage($coveragefile);
+	}
+	
     if ($dumpstats != '') {
             $map->DumpStats();
     }

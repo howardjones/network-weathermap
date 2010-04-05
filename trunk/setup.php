@@ -598,7 +598,7 @@ function weathermap_config_arrays()
 
     $wm_menu = array (
         'plugins/weathermap/weathermap-cacti-plugin-mgmt.php' => "Weathermaps",
-        'plugins/weathermap/weathermap-cacti-plugin-mgmt-groups.php' => "Groups"
+    //    'plugins/weathermap/weathermap-cacti-plugin-mgmt-groups.php' => "Groups"
     );
 
     $menu["Management"]['plugins/weathermap/weathermap-cacti-plugin-mgmt.php'] = $wm_menu;

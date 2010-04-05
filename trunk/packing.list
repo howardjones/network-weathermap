@@ -83,7 +83,6 @@
 ./docs/pages/targets.html
 ./docs/pages/upgrading.html
 ./docs/pages/weathermap.css
-./editor-config.php-dist
 ./editor-resources/jquery-latest.min.js
 ./editor.css
 ./editor.inc.php
@@ -180,6 +179,7 @@
 ./random-bits/suite-1.png
 ./random-bits/suite-2.conf
 ./random-bits/suite-2.png
+./random-bits/query_weathermap_runtime.php
 ./setup.php
 ./weathermap
 ./weathermap-cacti-plugin-mgmt.php

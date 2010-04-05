@@ -2180,7 +2180,8 @@ class WeatherMap extends WeatherMapBase
 
         imagefilledrectangle($scale_im, $box_left, $box_top, $box_right, $box_bottom,
             $this->colours['DEFAULT']['KEYBG'][$scale_ref]);
-        imagerectangle($scale_im, $box_left, $box_top, $box_right, $box_bottom,
+     
+		imagerectangle($scale_im, $box_left, $box_top, $box_right, $box_bottom,
             $this->colours['DEFAULT']['KEYOUTLINE'][$scale_ref]);
 
         $this->myimagestring($scale_im, $font, $scale_left,
@@ -4915,7 +4916,7 @@ class WeatherMap extends WeatherMapBase
 			if($val > 0) { $i++; }
 		}
 		fclose($fd);
-		print "Loaded $i non-zero coverage stats.\n";
+#		print "Loaded $i non-zero coverage stats.\n";
 	}
 	
 	function SaveCoverage($file)
@@ -4927,7 +4928,7 @@ class WeatherMap extends WeatherMapBase
 			if($val > 0) { $i++; }
 		}
 		fclose($fd);	
-		print "Saved $i non-zero coverage stats.\n";
+#		print "Saved $i non-zero coverage stats.\n";
 	}
 }
 ;

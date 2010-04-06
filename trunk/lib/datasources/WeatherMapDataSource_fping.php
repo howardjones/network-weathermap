@@ -76,6 +76,12 @@ class WeatherMapDataSource_fping extends WeatherMapDataSource
 
                 $count = 0;
                 $hitcount = 0;
+                $loss = 0;
+                $ave = 0;
+                $total = 0;
+                $cnt = 0;
+                $min = 999999;
+                $max = 0;
 
                 if (isset($pipe)) {
                     while (!feof($pipe)) {
@@ -86,12 +92,7 @@ class WeatherMapDataSource_fping extends WeatherMapDataSource
                         if (preg_match($pattern, $line, $matches)) {
                             debug('Found output line for '.$target."\n");
                             $hitcount++;
-                            $loss = 0;
-                            $ave = 0;
-                            $total = 0;
-                            $cnt = 0;
-                            $min = 999999;
-                            $max = 0;
+                           
 
                             for ($i = 1; $i <= $ping_count; $i++) {
                                 if ($matches[$i] === '-') {

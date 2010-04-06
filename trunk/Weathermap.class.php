@@ -869,6 +869,13 @@ class WeatherMapPostProcessor
  */
 class WeatherMapScale
 {
+    var $keystyle;
+
+    function WeatherMapScale()
+    {
+        $keystyle = 'classic';
+    }
+
     function PopulateDefaults()
     {
 
@@ -876,7 +883,26 @@ class WeatherMapScale
 
     function DrawLegend()
     {
-
+        switch($this->keystyle)
+        {
+            case 'classic':
+                $this->DrawLegendClassic($image, $scalename, false);
+                break;
+            case 'horizontal':
+                $this->DrawLegendHorizontal($image, $scalename, $this->keysize[$scalename]);
+                break;
+            case 'vertical':
+                $this->DrawLegendVertical($image, $scalename,
+                        $this->keysize[$scalename]);
+                break;
+            case 'inverted':
+                $this->DrawLegendVertical($image, $scalename,
+                    $this->keysize[$scalename], true);
+                break;
+            case 'tags':
+                $this->DrawLegendClassic($image, $scalename, true);
+                break;
+        }
     }
 
     function AddSpan($lowvalue, $highvalue, $colour, $tag='')
@@ -4106,8 +4132,10 @@ class WeatherMap extends WeatherMapBase
                 // don't try and draw template nodes
                 debug("Pre-rendering " . $node->name . " to get bounding boxes.\n");
 
-                if (!is_null($node->x))
+                // don't bother drawing if there's no position - it's a template
+                if ( (!is_null($node->x) && (!is_null($node->y)))) {
                     $this->nodes[$node->name]->pre_render($image, $this);
+                }
             }
 
             $all_layers = array_keys($this->seen_zlayers);

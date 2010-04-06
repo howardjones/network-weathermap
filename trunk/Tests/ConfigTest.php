@@ -15,17 +15,13 @@ class ConfigTests extends PHPUnit_Framework_TestCase
         $previouswd = getcwd();
         chdir(dirname(__FILE__).DIRECTORY_SEPARATOR."..");
 
-        // these are more for test housekeeping than anything else
-        $this->assertTrue(file_exists($result1dir));
-        $this->assertTrue(is_dir($result1dir));
-
         $nwarns = TestOutput_RunTest($testdir.DIRECTORY_SEPARATOR.$conffile, $outputimagefile, $outputhtmlfile, '', '');
         
         $this->assertEquals(0, $nwarns, "Warnings were generated");
 
         $ref_md5 = md5_file($referenceimagefile);
         $ref_output = md5_file($outputimagefile);
-        $this->assertEquals($ref_md5, $ref_output, "Output did not match reference");
+        $this->assertEquals($ref_md5, $ref_output, "Output did not match reference for $conffile");
     
         chdir($previouswd);
     }
@@ -43,19 +39,12 @@ class ConfigTests extends PHPUnit_Framework_TestCase
 
         $outputconfigfile = $result1dir.DIRECTORY_SEPARATOR.$conffile;
 
-        // these are more for test housekeeping than anything else
-        $this->assertTrue(file_exists($result1dir));
-        $this->assertTrue(is_dir($result1dir));
-        $this->assertTrue(file_exists($result2dir));
-        $this->assertTrue(is_dir($result2dir));
-
-
         TestOutput_RunTest($testdir.DIRECTORY_SEPARATOR.$conffile, $outputimagefile, '', $outputconfigfile, '');
         TestOutput_RunTest($result1dir.DIRECTORY_SEPARATOR.$conffile, $outputimagefile2, '', '', '');
 
         $ref_output1 = md5_file($outputimagefile);
         $ref_output2 = md5_file($outputimagefile2);
-        $this->assertEquals($ref_output1, $ref_output2,"Output from WriteConfig did not match original");
+        $this->assertEquals($ref_output1, $ref_output2,"Output from WriteConfig did not match original for $conffile");
         chdir($previouswd);
 
     }

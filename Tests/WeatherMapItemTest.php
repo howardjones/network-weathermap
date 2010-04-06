@@ -28,14 +28,12 @@ class WeatherMapItemTest extends PHPUnit_Framework_TestCase {
     protected function tearDown() {
     }
 
+
     /**
      * @todo Implement testMy_type().
      */
     public function testMy_type() {
-        // Remove the following lines when you implement this test.
-        $this->markTestIncomplete(
-                'This test has not been implemented yet.'
-        );
+        $this->assertEquals($this->object->my_type(), "ITEM");
     }
 }
 ?>

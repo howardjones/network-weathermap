@@ -2239,7 +2239,10 @@ function draw_spine($im, $spine, $col)
             $map->SaveCoverage($coveragefile);
         }
         $map->CleanUp();
+        $nwarns = $map->warncount;
         unset ($map);
+
+        return intval($nwarns);
     }
 
 

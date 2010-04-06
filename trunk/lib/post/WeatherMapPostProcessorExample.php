@@ -5,7 +5,7 @@
 // To use this plugin, add the following line to your config:
 //    SET post_test_enable 1
 //
-class WeatherMapPostProcessorTest extends WeatherMapPostProcessor
+class WeatherMapPostProcessorExample extends WeatherMapPostProcessor
 {
     function run(&$map)
     {

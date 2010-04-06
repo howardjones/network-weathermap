@@ -2788,17 +2788,19 @@ class WeatherMap extends WeatherMapBase
         $svar = '';
         $stype = 'percent';
 
+        // in or out?
         if (isset($matches[3])) {
             $svar = trim($matches[3]);
         }
 
+        // percent or absolute?
         if (isset($matches[6])) {
             $stype = strtolower(trim($matches[6]));
         }
 
         // opens the door for other scaley things...
         switch ($args[0]) {
-            case 'ICON':
+            case 'USEICONSCALE':
                 $varname = 'iconscalevar';
                 $uvarname = 'useiconscale';
                 $tvarname = 'iconscaletype';

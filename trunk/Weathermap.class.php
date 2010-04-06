@@ -864,6 +864,52 @@ class WeatherMapPostProcessor
     }
 }
 
+/**
+ * Collect together everything scale-related
+ */
+class WeatherMapScale
+{
+    function PopulateDefaults()
+    {
+
+    }
+
+    function DrawLegend()
+    {
+
+    }
+
+    function AddSpan($lowvalue, $highvalue, $colour, $tag='')
+    {
+
+    }
+
+    function WriteConfig()
+    {
+        
+    }
+
+    function ColourFromValue()
+    {
+        
+    }
+
+    function DrawLegendClassic()
+    {
+
+    }
+
+    function DrawLegendVertical()
+    {
+
+    }
+
+    function DrawLegendHorizontal()
+    {
+
+    }
+}
+
 // Links, Nodes and the Map object inherit from this class ultimately.
 // Just to make some common code common.
 class WeatherMapBase
@@ -4930,6 +4976,8 @@ class WeatherMap extends WeatherMapBase
 		fclose($fd);	
 #		print "Saved $i non-zero coverage stats.\n";
 	}
+
+
 }
 ;
 // vim:ts=4:sw=4:

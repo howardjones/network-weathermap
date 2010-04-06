@@ -1,20 +1,17 @@
 <?php
     require_once "Weathermap.class.php";
 
-    chdir("test-suite");
-
     $version = explode('.', PHP_VERSION);
     $phptag = "php".$version[0];
 
-    $testdir = "tests";
-    $result1dir = "results1-$phptag";
-    $result2dir = "results2-$phptag";
+    $testdir = "test-suite/tests";
+    $result1dir = "test-suite/results1-$phptag";
+    $result2dir = "test-suite/results2-$phptag";
 
-    $coveragefile = "config-coverage.txt";
+    $coveragefile = "test-suite/config-coverage.txt";
 
     if(! file_exists($result1dir)) { mkdir($result1dir); }
     if(! file_exists($result2dir)) { mkdir($result2dir); }
-
 
     $dh = opendir($testdir);
     while ($file = readdir($dh)) {
@@ -23,7 +20,7 @@
             $imagefile = $file.".png";
             $htmlfile = $file.".html";
 
-            $reference = "references/".$file.".png";
+            $reference = "test-suite/references/".$file.".png";
 
 #            print "Running test $file to $imagefile/$htmlfile\n";
 
@@ -45,10 +42,10 @@
             // compare result1 to result2
             // for HTML and for PNG file
 
+            $ref_md5 = "fishes";
             if(file_exists($reference)) {
                 $ref_md5 = md5_file($reference);
-            } else {
-                $ref_md5 = "fishes";
+            } else {                
                 print "## $file - No reference image\n";
             }
             $gen1_md5 = md5_file($result1dir.DIRECTORY_SEPARATOR.$imagefile);
@@ -68,11 +65,8 @@
     ob_start ();
     var_dump(xdebug_get_code_coverage());
 
-    $fd = fopen("code-coverage.txt","w+");
+    $fd = fopen("test-suite/code-coverage.txt","w+");
     fwrite($fd, ob_get_contents());
     fclose($fd);
     ob_end_clean();
-
-
-
-    ?>
+?>

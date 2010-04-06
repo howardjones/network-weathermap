@@ -2799,7 +2799,7 @@ class WeatherMap extends WeatherMapBase
         }
 
         // opens the door for other scaley things...
-        switch ($args[0]) {
+        switch (strtoupper($args[0])) {
             case 'USEICONSCALE':
                 $varname = 'iconscalevar';
                 $uvarname = 'useiconscale';

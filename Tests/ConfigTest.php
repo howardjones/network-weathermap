@@ -15,7 +15,7 @@ class ConfigTests extends PHPUnit_Framework_TestCase
         $previouswd = getcwd();
         chdir(dirname(__FILE__).DIRECTORY_SEPARATOR."..");
 
-        $nwarns = TestOutput_RunTest($testdir.DIRECTORY_SEPARATOR.$conffile, $outputimagefile, $outputhtmlfile, '', '');
+        $nwarns = TestOutput_RunTest($testdir.DIRECTORY_SEPARATOR.$conffile, $outputimagefile, $outputhtmlfile, '', 'config-coverage.txt');
         
         $this->assertEquals(0, $nwarns, "Warnings were generated");
 

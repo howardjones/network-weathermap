@@ -619,11 +619,6 @@ class WeatherMapLink extends WeatherMapItem
                     CONFIG_TYPE_LITERAL
                 ),
                 array (
-                    'usescale',
-                    'USESCALE',
-                    CONFIG_TYPE_LITERAL
-                ),
-                array (
                     'bwfont',
                     'BWFONT',
                     CONFIG_TYPE_LITERAL
@@ -680,6 +675,14 @@ class WeatherMapLink extends WeatherMapItem
                         $output .= "\t$keyword " . $this->$field . "\n";
                 }
             }
+
+            $val = $this->usescale . " " . $this->scaletype;
+            $comparison = $dd->usescale . " " . $dd->scaletype;
+
+            if (($val != $comparison)) {
+                $output .= "\tUSESCALE " . $val . "\n";
+            }
+
 
             if ($this->infourl[IN] == $this->infourl[OUT]) {
                 $dirs = array (

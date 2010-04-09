@@ -349,22 +349,6 @@ function render_colour($col)
     }
 }
 
-/**
- * take the same set of points that imagepolygon does, but don't close the shape
- *
- * @param gdimageref $image
- * @param int[] $points
- * @param int $npoints
- * @param gdcolorref $color
- *
- */
-function imagepolyline($image, $points, $npoints, $color)
-{
-    for ($i = 0; $i < ($npoints - 1); $i++) {
-        imageline($image, $points[$i * 2], $points[$i * 2 + 1], $points[$i * 2 + 2],
-            $points[$i * 2 + 3], $color);
-    }
-}
 
 /**
  * draw a filled round-cornered rectangle
@@ -1945,7 +1929,7 @@ class Colour
     // Is this a transparent/none colour?
     function is_none()
     {
-        if ($this->r === -1 && $this->g === -1 && $this->b === -1) {
+        if ($this->r == -1 && $this->g == -1 && $this->b == -1) {
             return true;
         } else {
             return false;
@@ -1955,7 +1939,7 @@ class Colour
     // Is this a contrast colour?
     function is_contrast()
     {
-        if ($this->r === -3 && $this->g === -3 && $this->b === -3) {
+        if ($this->r == -3 && $this->g == -3 && $this->b == -3) {
             return true;
         } else {
             return false;
@@ -1965,7 +1949,7 @@ class Colour
     // Is this a copy colour?
     function is_copy()
     {
-        if ($this->r === -2 && $this->g === -2 && $this->b === -2) {
+        if ($this->r == -2 && $this->g == -2 && $this->b == -2) {
             return true;
         } else {
             return false;
@@ -2108,7 +2092,6 @@ function dump_spine($spine)
     }
     print "===============\n";
 }
-
 
 /**
  * Draw a spine array - not used in the main code, just for debugging

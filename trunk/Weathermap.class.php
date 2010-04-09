@@ -82,11 +82,18 @@ $WM_config_keywords2 = array (
             '/^TIMECOLOR\s+(\d+)\s+(\d+)\s+(\d+)$/',
             'ReadConfig_Handle_GLOBALCOLOR'
         ),),
-        'KEYBGCOLOR' => array (array (
+        'KEYBGCOLOR' => array (
+            array (
             'GLOBAL',
             '/^KEYBGCOLOR\s+(\d+)\s+(\d+)\s+(\d+)$/',
             'ReadConfig_Handle_GLOBALCOLOR'
-        ),),
+        ),
+            array (
+            'GLOBAL',
+            '/^KEYBGCOLOR\s+(none)$/',
+            'ReadConfig_Handle_GLOBALCOLOR'
+            ),
+            ),
         'BGCOLOR' => array (array (
             'GLOBAL',
             '/^BGCOLOR\s+(\d+)\s+(\d+)\s+(\d+)$/',
@@ -934,6 +941,27 @@ class WeatherMapScale
     {
 
     }
+
+    function FindScaleExtent()
+    {
+        $max = -999999999999999999999;
+        $min = -$max;
+        
+        $colours = $this->colours;
+
+        foreach ($colours as $key => $colour) {
+            if (!$colour['special']) {
+                $min = min($colour['bottom'], $min);
+                $max = max($colour['top'], $max);
+            }
+        }
+
+        return array (
+            $min,
+            $max
+        );
+    }
+
 }
 
 // Links, Nodes and the Map object inherit from this class ultimately.
@@ -1928,18 +1956,18 @@ class WeatherMap extends WeatherMapBase
 
                     if ($myobj->scaletype == 'percent') {
                         list($incol, $inscalekey, $inscaletag) =
-                            $this->NewColourFromPercent($myobj->inpercent,
+                            $this->ColourFromValue($myobj->inpercent,
                                 $myobj->usescale, $myobj->name, true, $warn_in);
                         list($outcol, $outscalekey, $outscaletag) =
-                            $this->NewColourFromPercent($myobj->outpercent,
+                            $this->ColourFromValue($myobj->outpercent,
                                 $myobj->usescale, $myobj->name, true, $warn_out);
                     } else {
                         // use absolute values, if that's what is requested
                         list($incol, $inscalekey, $inscaletag) =
-                            $this->NewColourFromPercent($myobj->bandwidth_in,
+                            $this->ColourFromValue($myobj->bandwidth_in,
                                 $myobj->usescale, $myobj->name, false, $warn_in);
                         list($outcol, $outscalekey, $outscaletag) =
-                            $this->NewColourFromPercent($myobj->bandwidth_out,
+                            $this->ColourFromValue($myobj->bandwidth_out,
                                 $myobj->usescale, $myobj->name, false, $warn_out);
                     }
 
@@ -2051,16 +2079,12 @@ class WeatherMap extends WeatherMapBase
         $this->links[$linkname]->imap_areas[] = $areaname;
     }
 
-    function ColourFromPercent($image, $percent, $scalename = 'DEFAULT', $name = '')
-    {
-        $bt = debug_backtrace();
-        $function = (isset($bt[1]['function']) ? $bt[1]['function'] : '');
-        print "$function calls ColourFromPercent\n";
+    // TODO: this should be in the new WeatherMapScale class
 
-        exit();
-    }
-
-    function NewColourFromPercent($value, $scalename = 'DEFAULT', $name = '',
+    /**
+     * All scale lookups are done here. 
+     */
+    function ColourFromValue($value, $scalename = 'DEFAULT', $name = '',
         $is_percent = true, $scale_warning = true)
     {
         $col = new Colour(0, 0, 0);
@@ -2077,7 +2101,7 @@ class WeatherMap extends WeatherMapBase
             if ($is_percent && $value > 100) {
                 if ($nowarn_clipping == 0) {
                     warn(
-                        "NewColourFromPercent: Clipped $value% to 100% for item $name [WMWARN33]\n");
+                        "ColourFromValue: Clipped $value% to 100% for item $name [WMWARN33]\n");
                 }
                 $value = 100;
             }
@@ -2085,7 +2109,7 @@ class WeatherMap extends WeatherMapBase
             if ($is_percent && $value < 0) {
                 if ($nowarn_clipping == 0) {
                     warn(
-                        "NewColourFromPercent: Clipped $value% to 0% for item $name [WMWARN34]\n");
+                        "ColourFromValue: Clipped $value% to 0% for item $name [WMWARN34]\n");
                 }
                 $value = 0;
             }
@@ -2126,7 +2150,7 @@ class WeatherMap extends WeatherMapBase
                         $tag = $colour['tag'];
                     }
 
-                    debug("NCFPC $name $scalename $value '$tag' $key $r $g $b\n");
+                    debug("CFV $name $scalename $value '$tag' $key $r $g $b\n");
 
                     return (array (
                         $col,
@@ -2138,7 +2162,7 @@ class WeatherMap extends WeatherMapBase
         } else {
             if ($scalename != 'none') {
                 warn(
-                    "ColourFromPercent: Attempted to use non-existent scale: $scalename for item $name [WMWARN09]\n");
+                    "ColourFromValue: Attempted to use non-existent scale: $scalename for item $name [WMWARN09]\n");
             } else {
                 return array (
                     new Colour(255, 255, 255),
@@ -2161,7 +2185,7 @@ class WeatherMap extends WeatherMapBase
 
         if ($nowarn_scalemisses == 0) {
             warn(
-                "NewColourFromPercent: Scale $scalename doesn't include a line for $value"
+                "ColourFromValue: Scale $scalename doesn't include a line for $value"
                 . ($is_percent ? "%" : "") . " while drawing item $name [WMWARN29]\n");
         }
         // and you'll only get white for a link with no colour assigned
@@ -2273,7 +2297,7 @@ class WeatherMap extends WeatherMapBase
                     $this->colours['DEFAULT']['KEYTEXT'][$scale_ref]);
             }
 
-            list($col, $junk) = $this->NewColourFromPercent($p, $scalename);
+            list($col, $junk) = $this->ColourFromValue($p, $scalename);
 
             if ($col->is_real()) {
                 $cc = $col->gdallocate($scale_im);
@@ -2372,7 +2396,7 @@ class WeatherMap extends WeatherMapBase
                     $this->colours['DEFAULT']['KEYTEXT'][$scale_ref]);
             }
 
-            list($col, $junk) = $this->NewColourFromPercent($p, $scalename);
+            list($col, $junk) = $this->ColourFromValue($p, $scalename);
 
             if ($col->is_real()) {
                 $cc = $col->gdallocate($scale_im);
@@ -2483,13 +2507,31 @@ class WeatherMap extends WeatherMapBase
             }
 
             $scale_im = imagecreatetruecolor($boxwidth + 1, $boxheight + 1);
+            imageSaveAlpha($scale_im, true);
+            $nothing = imagecolorallocatealpha($scale_im, 128, 0, 0, 127);
+            imagefill($scale_im, 0, 0, $nothing);
+
             $scale_ref = 'gdref_legend_' . $scalename;
             $this->AllocateScaleColours($scale_im, $scale_ref);
 
-            imagefilledrectangle($scale_im, $boxx, $boxy, $boxx + $boxwidth,
-                $boxy + $boxheight, $this->colours['DEFAULT']['KEYBG'][$scale_ref]);
-            imagerectangle($scale_im, $boxx, $boxy, $boxx + $boxwidth, $boxy + $boxheight,
-                $this->colours['DEFAULT']['KEYOUTLINE'][$scale_ref]);
+            $bgcol = new Colour($this->colours['DEFAULT']['KEYBG']['red1'],
+                    $this->colours['DEFAULT']['KEYBG']['green1'],
+                    $this->colours['DEFAULT']['KEYBG']['blue1']
+                    );
+            $outlinecol = new Colour($this->colours['DEFAULT']['KEYOUTLINE']['red1'],
+                    $this->colours['DEFAULT']['KEYOUTLINE']['green1'],
+                    $this->colours['DEFAULT']['KEYOUTLINE']['blue1']
+                    );
+
+            if($bgcol->is_real()) {
+                imagefilledrectangle($scale_im, $boxx, $boxy, $boxx + $boxwidth,
+                    $boxy + $boxheight, $this->colours['DEFAULT']['KEYBG'][$scale_ref]);
+            }
+            if($outlinecol->is_real()) {
+                imagerectangle($scale_im, $boxx, $boxy, $boxx + $boxwidth, $boxy + $boxheight,
+                    $this->colours['DEFAULT']['KEYOUTLINE'][$scale_ref]);
+            }
+
             $this->myimagestring($scale_im, $font, $boxx + 4, $boxy + 4 + $tileheight,
                 $title, $this->colours['DEFAULT']['KEYTEXT'][$scale_ref]);
 
@@ -2523,7 +2565,7 @@ class WeatherMap extends WeatherMapBase
                                     + ($n / $tilewidth)
                                     * ($colour['top'] - $colour['bottom']);
                                 list($ccol, $junk) =
-                                    $this->NewColourFromPercent($value, $scalename, '',
+                                    $this->ColourFromValue($value, $scalename, '',
                                         false);
                                 $col = $ccol->gdallocate($scale_im);
                                 imagefilledrectangle($scale_im, $x + $n, $y, $x + $n,
@@ -2533,7 +2575,7 @@ class WeatherMap extends WeatherMapBase
                             // pick a value in the middle...
 
                             list($ccol, $junk) =
-                                $this->NewColourFromPercent($value, $scalename, '',
+                                $this->ColourFromValue($value, $scalename, '',
                                     false);
                             $col = $ccol->gdallocate($scale_im);
                             imagefilledrectangle($scale_im, $x, $y, $x + $tilewidth,
@@ -2773,9 +2815,29 @@ class WeatherMap extends WeatherMapBase
     {
         $key = str_replace("COLOR", "", strtoupper($args[0]));
 
-        $this->colours['DEFAULT'][$key]['red1'] = $args[1];
-        $this->colours['DEFAULT'][$key]['green1'] = $args[2];
-        $this->colours['DEFAULT'][$key]['blue1'] = $args[3];
+        $r = 0;
+        $g = 0;
+        $b = 0;
+
+         if (isset($args[2])) // this is a regular colour setting thing
+        {
+
+                $r = $args[1];
+                $g = $args[2];
+                $b = $args[3];
+
+        }
+
+        if ($val == 'none') {
+            $r = -1;
+            $g = -1;
+            $b = -1;
+        }
+
+
+        $this->colours['DEFAULT'][$key]['red1'] = $r;
+        $this->colours['DEFAULT'][$key]['green1'] = $g;
+        $this->colours['DEFAULT'][$key]['blue1'] = $b;
         $this->colours['DEFAULT'][$key]['bottom'] = -2;
         $this->colours['DEFAULT'][$key]['top'] = -1;
         $this->colours['DEFAULT'][$key]['special'] = 1;

@@ -876,38 +876,67 @@ class WeatherMapPostProcessor
  */
 class WeatherMapScale
 {
+    var $colours;
+    var $name;
+    var $keypos;
+    var $keytitle;
     var $keystyle;
+    var $keysize;
+    var $keytextcolour;
+    var $keyoutlinecolour;
+    var $keybgcolour;
 
-    function WeatherMapScale()
+    function WeatherMapScale($name)
     {
-        $keystyle = 'classic';
+        $this->name = $name;
+     
+        $this->Reset();
+    }
+
+    function Reset()
+    {
+        $this->keypos = array();
+        $this->keystyle = 'classic';
+        $this->colours = array();
+        $this->keypos[X] = -1;
+        $this->keypos[Y] = -1;
+        $this->keytitle = "Traffic Load";
+        $this->keysize = 0;
+
+        $this->keybgcolour = new Colour(255,255,255);
+        $this->keytextcolour = new Colour(0,0,0);
+        $this->keyoutlinecolour = new Colour(0,0,0);
     }
 
     function PopulateDefaults()
     {
-
+     //   $this->AddSpan();
     }
 
-    function DrawLegend()
+    function DrawLegend($image)
     {
         switch($this->keystyle)
         {
             case 'classic':
-                $this->DrawLegendClassic($image, $scalename, false);
+                $this->DrawLegendClassic($image, false);
                 break;
+
             case 'horizontal':
-                $this->DrawLegendHorizontal($image, $scalename, $this->keysize[$scalename]);
+                $this->DrawLegendHorizontal($image, $this->keysize[$scalename]);
                 break;
+
             case 'vertical':
-                $this->DrawLegendVertical($image, $scalename,
+                $this->DrawLegendVertical($image, 
                         $this->keysize[$scalename]);
                 break;
+
             case 'inverted':
-                $this->DrawLegendVertical($image, $scalename,
+                $this->DrawLegendVertical($image, 
                     $this->keysize[$scalename], true);
                 break;
+
             case 'tags':
-                $this->DrawLegendClassic($image, $scalename, true);
+                $this->DrawLegendClassic($image, true);
                 break;
         }
     }
@@ -919,7 +948,38 @@ class WeatherMapScale
 
     function WriteConfig()
     {
-        
+        $output = "# All settings for scale ".$this->name."\n";
+
+        $output .= sprintf("\tKEYPOS %s %d %d %s\n",
+                $this->name,
+                $this->keypos[X], $this->keypos[Y],
+                $this->keytitle
+                );
+
+        // TODO - need to add size if non-standard
+        $output .= sprintf("\tKEYSTYLE %s %s\n",
+                    $this->name,
+                    $this->keystyle
+                );
+
+        $output .= sprintf("\tKEYBGCOLOR %s %s",
+                $this->name,
+                $this->keybgcolour->as_config()
+                );
+
+        $output .= sprintf("\tKEYFONTCOLOR %s %s",
+                $this->name,
+                $this->keyfontcolour->as_config()
+                );
+
+        $output .= sprintf("\tKEYOUTLINECOLOR %s %s",
+                $this->name,
+                $this->keyoutlinecolour->as_config()
+                );
+
+        $output .= "\n";
+
+        return $output;
     }
 
     function ColourFromValue()
@@ -2639,7 +2699,7 @@ class WeatherMap extends WeatherMapBase
                 $pos_y = $this->maxtimey;
                 break;
 
-                default:
+            default:
                 $stamp = $this->datestamp;
                 $pos_x = $this->timex;
                 $pos_y = $this->timey;
@@ -4137,7 +4197,17 @@ class WeatherMap extends WeatherMapBase
         debug("=====================================\n");
         debug("Start of Map Drawing\n");
 
-        $this->datestamp = strftime($this->stamptext, time());
+
+        // if we're running tests, we force the time to a particular value,
+        // so the output can be compared to a reference image more easily
+        $testmode = intval($this->get_hint("testmode"));
+
+        if($testmode == 1) {
+            $maptime = 1270813792;
+        } else {
+            $maptime = time();
+        }
+        $this->datestamp = strftime($this->stamptext, $maptime);
 
         // do the basic prep work
         if ($this->background != '') {

@@ -22,7 +22,8 @@ class ConfigTests extends PHPUnit_Framework_TestCase
         $ref_md5 = md5_file($referenceimagefile);
         $ref_output = md5_file($outputimagefile);
         $this->assertEquals($ref_md5, $ref_output, "Output did not match reference for $conffile");
-    
+//        $this->assertFileEquals($referenceimagefile, $outputimagefile, "Output did not match reference for $conffile");
+
         chdir($previouswd);
     }
 
@@ -45,6 +46,8 @@ class ConfigTests extends PHPUnit_Framework_TestCase
         $ref_output1 = md5_file($outputimagefile);
         $ref_output2 = md5_file($outputimagefile2);
         $this->assertEquals($ref_output1, $ref_output2,"Output from WriteConfig did not match original for $conffile");
+//        $this->assertFileEquals($outputimagefile, $outputimagefile2, "Output did not match reference for $conffile");
+
         chdir($previouswd);
 
     }

@@ -18,7 +18,7 @@ class HTML_ImageMap_Area_CircleTest extends PHPUnit_Framework_TestCase {
      * This method is called before a test is executed.
      */
     protected function setUp() {
-        $this->object = new HTML_ImageMap_Area_Circle;
+        $this->object = new HTML_ImageMap_Area_Circle("testname","testhref",array(array(100,100,150,100)));
     }
 
     /**
@@ -33,19 +33,26 @@ class HTML_ImageMap_Area_CircleTest extends PHPUnit_Framework_TestCase {
      */
     public function testAsHTML() {
         // Remove the following lines when you implement this test.
-        $this->markTestIncomplete(
-                'This test has not been implemented yet.'
-        );
+
+        $output = $this->object->asHTML();
+        $this->assertEquals($output,'<area id="testname"  href="testhref"    shape="circle" coords="100,100,150,100" />');
     }
 
     /**
      * @todo Implement testHitTest().
      */
     public function testHitTest() {
-        // Remove the following lines when you implement this test.
-        $this->markTestIncomplete(
-                'This test has not been implemented yet.'
-        );
+        $this->assertTrue( $this->object->hitTest(100,100) );
+        $this->assertTrue( $this->object->hitTest(51,100) );
+        $this->assertTrue( $this->object->hitTest(149,100) );
+        $this->assertTrue( $this->object->hitTest(100,149) );
+        $this->assertTrue( $this->object->hitTest(100,51) );
+
+        $this->assertFalse( $this->object->hitTest(49,49) );
+        $this->assertFalse( $this->object->hitTest(49,100) );
+        $this->assertFalse( $this->object->hitTest(100,151) );
+        $this->assertFalse( $this->object->hitTest(149,149) );
+
     }
 }
 ?>

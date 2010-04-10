@@ -6,6 +6,7 @@
         ADDED - per-map runtime logging
         ADDED - per-map debugging (debug a single map in Cacti without running debug logging for the whole poller)
 	ADDED - Cacti template for monitoring Weathermap performance/mapcount/warningcount/memory.
+	ADDED - KEYBGCOLOR and KEYOUTLINECOLOR both accept 'none'
 		
 0.97a	FIXED - Incorrect action URL in 'map selector' combo box for Cacti users.
 	FIXED - cacti_graph_id set to 0 instead of ID, by rrd/poller_output and dsstats plugins (thanks sh0x)

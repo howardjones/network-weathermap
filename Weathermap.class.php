@@ -62,11 +62,18 @@ $WM_config_keywords2 = array (
             array('GLOBAL',"/^\s*FONTDEFINE\s+(\d+)\s+(\S+)\s+(\d+)\s*$/i",'ReadConfig_Handle_FONTDEFINE'),
             array('GLOBAL',"/^\s*FONTDEFINE\s+(\d+)\s+(\S+)\s*$/i",'ReadConfig_Handle_FONTDEFINE'),
         ),
-        'KEYOUTLINECOLOR' => array (array (
+        'KEYOUTLINECOLOR' => array (
+            array (
             'GLOBAL',
             '/^KEYOUTLINECOLOR\s+(\d+)\s+(\d+)\s+(\d+)$/',
             'ReadConfig_Handle_GLOBALCOLOR'
-        ),),
+            ),
+            array (
+            'GLOBAL',
+            '/^KEYOUTLINECOLOR\s+(none)$/',
+            'ReadConfig_Handle_GLOBALCOLOR'
+            ),
+            ),
         'KEYTEXTCOLOR' => array (array (
             'GLOBAL',
             '/^KEYTEXTCOLOR\s+(\d+)\s+(\d+)\s+(\d+)$/',
@@ -1158,8 +1165,9 @@ class WeatherMap extends WeatherMapBase
     var $plugins = array ();
     var $included_files = array ();
     var $usage_stats = array ();
-	var $coverage = array();
-	
+    var $coverage = array();
+    var $colourtable = array();
+
     function WeatherMap()
     {
         $this->inherit_fieldlist = array (
@@ -1346,6 +1354,7 @@ class WeatherMap extends WeatherMapBase
 
         foreach ($defaults as $key => $def) {
             $this->colours['DEFAULT'][$key] = $def;
+            $this->colourtable[$key] = new Colour($def['red'], $def['green1'], $def['blue1']);
         }
 
         $this->configfile = '';
@@ -2557,15 +2566,7 @@ class WeatherMap extends WeatherMapBase
             $boxx = 0;
             $boxy = 0;
 
-            // allow for X11-style negative positioning
-            if ($boxx < 0) {
-                $boxx += $this->width;
-            }
-
-            if ($boxy < 0) {
-                $boxy += $this->height;
-            }
-
+            // create an empty transparent image of the appropriate size
             $scale_im = imagecreatetruecolor($boxwidth + 1, $boxheight + 1);
             imageSaveAlpha($scale_im, true);
             $nothing = imagecolorallocatealpha($scale_im, 128, 0, 0, 127);
@@ -2578,6 +2579,10 @@ class WeatherMap extends WeatherMapBase
                     $this->colours['DEFAULT']['KEYBG']['green1'],
                     $this->colours['DEFAULT']['KEYBG']['blue1']
                     );
+
+        #    print $bgcol->as_config();
+       #     exit();
+
             $outlinecol = new Colour($this->colours['DEFAULT']['KEYOUTLINE']['red1'],
                     $this->colours['DEFAULT']['KEYOUTLINE']['green1'],
                     $this->colours['DEFAULT']['KEYOUTLINE']['blue1']
@@ -2888,7 +2893,7 @@ class WeatherMap extends WeatherMapBase
 
         }
 
-        if ($val == 'none') {
+        if ($args[1] == 'none') {
             $r = -1;
             $g = -1;
             $b = -1;

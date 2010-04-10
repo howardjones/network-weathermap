@@ -483,7 +483,17 @@ function imagecreatefromfile($filename)
  * @return gdimageref
  */
 function imagecolorize($im, $r, $g, $b)
-{
+{    
+    // The function only accepts indexed colour images.
+    // Unfortunately, imagetruecolortopalette is pretty crappy, so you are
+    // probably better off using Paint.NET/Gimp etc to make an indexed colour
+    // version of the icon, rather than rely on this
+    if(imageistruecolor($im)) {
+        debug("imagecolorize requires paletted images - this is a truecolor image. Converting.");
+        imagetruecolortopalette($im,false,256);
+        debug("Converted image has %d colours.\n", imagecolorstotal($im));
+    }
+
     // We will create a monochromatic palette based on the input color
     // which will go from black to white
     //
@@ -1906,15 +1916,40 @@ class Colour
             $this->b = func_get_arg(2); # b        
         }
 
-        if ((func_num_args() === 1)
-            && gettype(func_get_arg(0)) === 'array') # an array of 3 colours
-        {
-            $ary = func_get_arg(0);
-            $this->r = $ary[0];
-            $this->g = $ary[1];
-            $this->b = $ary[2];
+        if (func_num_args() === 1) {
+            if(gettype(func_get_arg(0)) === 'array') # an array of 3 colours
+            {
+                $ary = func_get_arg(0);
+                $this->r = $ary[0];
+                $this->g = $ary[1];
+                $this->b = $ary[2];
+            } else {
+                $ary = func_get_arg(0);
+
+                if($ary[0] == 'none') {
+                    $this->r = -1;
+                    $this->g = -1;
+                    $this->b = -1;
+                }
+
+                if($ary[0] == 'copy') {
+                    $this->r = -2;
+                    $this->g = -2;
+                    $this->b = -2;
+                }
+
+                if($ary[0] == 'contrast') {
+                    $this->r = -3;
+                    $this->g = -3;
+                    $this->b = -3;
+                }
+            }
+
         }
-    }
+
+
+
+   }
 
     // Is this a transparent/none colour?
     function is_real()

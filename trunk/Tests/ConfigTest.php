@@ -2,7 +2,7 @@
 require_once 'PHPUnit/Framework.php';
 require_once dirname(__FILE__).'/../Weathermap.class.php';
 
-class ConfigTests extends PHPUnit_Framework_TestCase
+class ConfigTest extends PHPUnit_Framework_TestCase
 {
     /**
      * @dataProvider configlist

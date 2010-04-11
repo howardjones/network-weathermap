@@ -3517,7 +3517,7 @@ class WeatherMap extends WeatherMapBase
 
                     if (($linematched == 0)
                         && preg_match(
-                            "/^\s*KEYSTYLE\s+([A-Za-z][A-Za-z0-9_]+\s+)?(classic|horizontal|vertical|inverted|tags)\s?(\d+)?\s*$/i",
+                            "/^\s*KEYSTYLE\s+([A-Za-z][A-Za-z0-9_]+\s+)?(classic|horizontal|vertical|inverted|tags)\s*(\d+)?\s*$/i",
                             $buffer, $matches)) {
                         $whichkey = trim($matches[1]);
 

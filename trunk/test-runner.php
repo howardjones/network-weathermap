@@ -24,7 +24,9 @@
 
 #            print "Running test $file to $imagefile/$htmlfile\n";
 
-            xdebug_start_code_coverage();
+            if(function_exists("xdebug_get_code_coverage")) {
+                xdebug_start_code_coverage();
+            }
 
             TestOutput_RunTest($testdir.DIRECTORY_SEPARATOR.$file, $result1dir.DIRECTORY_SEPARATOR.$imagefile, $result1dir.DIRECTORY_SEPARATOR.$htmlfile, $result1dir.DIRECTORY_SEPARATOR.$file, $coveragefile);
 
@@ -33,8 +35,10 @@
 
             TestOutput_RunTest($result1dir.DIRECTORY_SEPARATOR.$file, $result2dir.DIRECTORY_SEPARATOR.$imagefile, $result2dir.DIRECTORY_SEPARATOR.$htmlfile, $result2dir.DIRECTORY_SEPARATOR.$file, $coveragefile);
             
-            // stop collecting coverage information, but don't delete it
-            xdebug_stop_code_coverage(FALSE);
+            if(function_exists("xdebug_get_code_coverage")) {
+                 // stop collecting coverage information, but don't delete it
+                xdebug_stop_code_coverage(FALSE);
+            }
 
 
             // TODO - add the comparison stuff in here.
@@ -62,11 +66,14 @@
     }
     closedir($dh);
 
-    ob_start ();
-    var_dump(xdebug_get_code_coverage());
+    if(function_exists("xdebug_get_code_coverage")) {
+        ob_start ();
+        var_dump(xdebug_get_code_coverage());
 
-    $fd = fopen("test-suite/code-coverage.txt","w+");
-    fwrite($fd, ob_get_contents());
-    fclose($fd);
-    ob_end_clean();
+        $fd = fopen("test-suite/code-coverage.txt","w+");
+        fwrite($fd, ob_get_contents());
+        fclose($fd);
+        ob_end_clean();
+    }
+
 ?>

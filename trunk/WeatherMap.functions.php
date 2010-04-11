@@ -2032,8 +2032,15 @@ class Colour
         return (sprintf($format, $this->r, $this->g, $this->b));
     }
 
+    /**
+     * Produce a string ready to drop into a config file by WriteConfig
+     */
     function as_config()
     {
+        if($this->is_none()) { return 'none'; }
+        if($this->is_copy()) { return 'copy'; }
+        if($this->is_contrast()) { return 'contrast'; }
+
         return $this->as_string('%d %d %d');
     }
 

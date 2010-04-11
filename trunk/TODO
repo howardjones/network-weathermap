@@ -6,7 +6,8 @@ Off-by-one in angled VIAs (only in one direction?? - test simple-link-5a.conf)
 Change non-scale colour handling to go into another colour table - no 'special'
 Winding order problem (I think) with sharp-angled vias - see conf_via3.conf
 DONE   USESCALE absolute not in WriteConfig
-
+Use the Colour class for all colours.
+KEYBG/KEYOUTLINE/KEYTEXT per-scale
 
 Move scale stuff into WeatherMapScale
 THIS IS CORRECT poller_output still runs with map-update-period = 0

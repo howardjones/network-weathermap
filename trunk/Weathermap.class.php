@@ -892,6 +892,7 @@ class WeatherMapScale
     var $keytextcolour;
     var $keyoutlinecolour;
     var $keybgcolour;
+    var $scalemisscolour;
 
     function WeatherMapScale($name)
     {
@@ -910,47 +911,54 @@ class WeatherMapScale
         $this->keytitle = "Traffic Load";
         $this->keysize = 0;
 
-        $this->keybgcolour = new Colour(255,255,255);
-        $this->keytextcolour = new Colour(0,0,0);
-        $this->keyoutlinecolour = new Colour(0,0,0);
+        $this->SetColour("KEYBG", new Colour(255,255,255));
+        $this->SetColour("KEYOUTLINE", new Colour(0,0,0));
+        $this->SetColour("KEYTEXT", new Colour(0,0,0));
+        $this->SetColour("SCALEMISS", new Colour(255,255,255));
+    }
+
+    function SpanCount()
+    {
+        return count($this->colours);
     }
 
     function PopulateDefaults()
     {
      //   $this->AddSpan();
+
     }
 
-    function DrawLegend($image)
+    function SetColour($name, $colour)
     {
-        switch($this->keystyle)
+        switch (strtoupper($name))
         {
-            case 'classic':
-                $this->DrawLegendClassic($image, false);
+            case 'KEYTEXT':
+                $this->keytextcolour = $colour;
                 break;
-
-            case 'horizontal':
-                $this->DrawLegendHorizontal($image, $this->keysize[$scalename]);
+            case 'KEYBG':
+                $this->keybgcolour = $colour;
                 break;
-
-            case 'vertical':
-                $this->DrawLegendVertical($image, 
-                        $this->keysize[$scalename]);
+            case 'KEYOUTLINE':
+                $this->keyoutlinecolour = $colour;
                 break;
-
-            case 'inverted':
-                $this->DrawLegendVertical($image, 
-                    $this->keysize[$scalename], true);
+            case 'SCALEMISS':
+                $this->scalemisscolour = $colour;
                 break;
-
-            case 'tags':
-                $this->DrawLegendClassic($image, true);
+            default:
+                warn("Unexpected colour name in WeatherMapScale->SetColour");
                 break;
         }
     }
 
-    function AddSpan($lowvalue, $highvalue, $colour, $tag='')
+    function AddSpan($lowvalue, $highvalue, $colour1, $colour2=null, $tag='')
     {
+        $key = $lowvalue . '_' . $highvalue;
 
+        $colours[$key]['c1'] = $colour1;
+        $colours[$key]['c2'] = $colour2;
+        $colours[$key]['tag'] = $tag;
+        $colours[$key]['bottom'] = $lowvalue;
+        $colours[$key]['top'] = $highvalue;
     }
 
     function WriteConfig()
@@ -984,6 +992,11 @@ class WeatherMapScale
                 $this->keyoutlinecolour->as_config()
                 );
 
+        $output .= sprintf("\tSCALEMISSCOLOR %s %s",
+                $this->name,
+                $this->scalemisscolour->as_config()
+                );
+
         $output .= "\n";
 
         return $output;
@@ -991,8 +1004,38 @@ class WeatherMapScale
 
     function ColourFromValue()
     {
-        
+
     }
+
+
+    function DrawLegend($image)
+    {
+        switch($this->keystyle)
+        {
+            case 'classic':
+                $this->DrawLegendClassic($image, false);
+                break;
+
+            case 'horizontal':
+                $this->DrawLegendHorizontal($image, $this->keysize[$scalename]);
+                break;
+
+            case 'vertical':
+                $this->DrawLegendVertical($image, 
+                        $this->keysize[$scalename]);
+                break;
+
+            case 'inverted':
+                $this->DrawLegendVertical($image, 
+                    $this->keysize[$scalename], true);
+                break;
+
+            case 'tags':
+                $this->DrawLegendClassic($image, true);
+                break;
+        }
+    }
+
 
     function DrawLegendClassic()
     {
@@ -1490,12 +1533,6 @@ class WeatherMap extends WeatherMapBase
 
         if ($input === '') {
             return '';
-        }
-
-        if (1 == 0 && $this->context == 'cacti') {
-            $fd = fopen("/var/www/docs/cacti/plugins/weathermap/processstring.log", "a+");
-            fwrite($fd, $input . "\n");
-            fclose($fd);
         }
 
         if ($multiline === true) {
@@ -2287,29 +2324,6 @@ class WeatherMap extends WeatherMapBase
         return 1;
     }
 
-    function FindScaleExtent($scalename = "DEFAULT")
-    {
-        $max = -999999999999999999999;
-        $min = -$max;
-
-        if (isset($this->colours[$scalename])) {
-            $colours = $this->colours[$scalename];
-
-            foreach ($colours as $key => $colour) {
-                if (!$colour['special']) {
-                    $min = min($colour['bottom'], $min);
-                    $max = max($colour['top'], $max);
-                }
-            }
-        } else {
-            warn("FindScaleExtent: non-existent SCALE $scalename [WMWARN43]\n");
-        }
-        return array (
-            $min,
-            $max
-        );
-    }
-
     function DrawLegend_Horizontal($im, $scalename = "DEFAULT", $width = 400)
     {
         $title = $this->keytext[$scalename];
@@ -2339,15 +2353,33 @@ class WeatherMap extends WeatherMapBase
         $scale_bottom = $scale_top + $tileheight * 1.5;
         $box_bottom = $scale_bottom + $tileheight * 2 + 6;
 
+        // create an empty transparent image of the appropriate size
         $scale_im = imagecreatetruecolor($box_right + 1, $box_bottom + 1);
+        imageSaveAlpha($scale_im, true);
+        $nothing = imagecolorallocatealpha($scale_im, 128, 0, 0, 127);
+        imagefill($scale_im, 0, 0, $nothing);
+
         $scale_ref = 'gdref_legend_' . $scalename;
         $this->AllocateScaleColours($scale_im, $scale_ref);
 
-        imagefilledrectangle($scale_im, $box_left, $box_top, $box_right, $box_bottom,
-            $this->colours['DEFAULT']['KEYBG'][$scale_ref]);
-     
-		imagerectangle($scale_im, $box_left, $box_top, $box_right, $box_bottom,
-            $this->colours['DEFAULT']['KEYOUTLINE'][$scale_ref]);
+        $bgcol = new Colour($this->colours['DEFAULT']['KEYBG']['red1'],
+                $this->colours['DEFAULT']['KEYBG']['green1'],
+                $this->colours['DEFAULT']['KEYBG']['blue1']
+                );
+
+        $outlinecol = new Colour($this->colours['DEFAULT']['KEYOUTLINE']['red1'],
+                $this->colours['DEFAULT']['KEYOUTLINE']['green1'],
+                $this->colours['DEFAULT']['KEYOUTLINE']['blue1']
+                );
+
+        if($bgcol->is_real()) {
+            imagefilledrectangle($scale_im, $box_left, $box_top, $box_right, $box_bottom,
+                $this->colours['DEFAULT']['KEYBG']['gdref1']);
+        }
+        if($outlinecol->is_real()) {
+            imagerectangle($scale_im, $box_left, $box_top, $box_right, $box_bottom,
+                $this->colours['DEFAULT']['KEYOUTLINE']['gdref1']);
+        }
 
         $this->myimagestring($scale_im, $font, $scale_left,
             $scale_bottom + $tileheight * 2 + 2, $title,
@@ -2429,14 +2461,34 @@ class WeatherMap extends WeatherMapBase
         $scale_bottom = $scale_top + $height;
         $box_bottom = $scale_bottom + $scalefactor + $tileheight / 2 + 4;
 
-        $scale_im = imagecreatetruecolor($box_right + 1, $box_bottom + 1);
-        $scale_ref = 'gdref_legend_' . $scalename;
-        $this->AllocateScaleColours($scale_im, $scale_ref);
 
-        imagefilledrectangle($scale_im, $box_left, $box_top, $box_right, $box_bottom,
-            $this->colours['DEFAULT']['KEYBG']['gdref1']);
-        imagerectangle($scale_im, $box_left, $box_top, $box_right, $box_bottom,
-            $this->colours['DEFAULT']['KEYOUTLINE']['gdref1']);
+                    // create an empty transparent image of the appropriate size
+            $scale_im = imagecreatetruecolor($box_right + 1, $box_bottom + 1);
+            imageSaveAlpha($scale_im, true);
+            $nothing = imagecolorallocatealpha($scale_im, 128, 0, 0, 127);
+            imagefill($scale_im, 0, 0, $nothing);
+
+            $scale_ref = 'gdref_legend_' . $scalename;
+            $this->AllocateScaleColours($scale_im, $scale_ref);
+
+            $bgcol = new Colour($this->colours['DEFAULT']['KEYBG']['red1'],
+                    $this->colours['DEFAULT']['KEYBG']['green1'],
+                    $this->colours['DEFAULT']['KEYBG']['blue1']
+                    );
+
+            $outlinecol = new Colour($this->colours['DEFAULT']['KEYOUTLINE']['red1'],
+                    $this->colours['DEFAULT']['KEYOUTLINE']['green1'],
+                    $this->colours['DEFAULT']['KEYOUTLINE']['blue1']
+                    );
+
+            if($bgcol->is_real()) {
+                imagefilledrectangle($scale_im, $box_left, $box_top, $box_right, $box_bottom,
+                    $this->colours['DEFAULT']['KEYBG']['gdref1']);
+            }
+            if($outlinecol->is_real()) {
+                imagerectangle($scale_im, $box_left, $box_top, $box_right, $box_bottom,
+                    $this->colours['DEFAULT']['KEYOUTLINE']['gdref1']);
+            }
 
         $this->myimagestring($scale_im, $font, $scale_left - $scalefactor,
             $scale_top - $tileheight, $title,
@@ -2579,9 +2631,6 @@ class WeatherMap extends WeatherMapBase
                     $this->colours['DEFAULT']['KEYBG']['green1'],
                     $this->colours['DEFAULT']['KEYBG']['blue1']
                     );
-
-        #    print $bgcol->as_config();
-       #     exit();
 
             $outlinecol = new Colour($this->colours['DEFAULT']['KEYOUTLINE']['red1'],
                     $this->colours['DEFAULT']['KEYOUTLINE']['green1'],
@@ -3472,8 +3521,9 @@ class WeatherMap extends WeatherMapBase
                             $buffer, $matches)) {
                         $whichkey = trim($matches[1]);
 
-                        if ($whichkey == '')
+                        if ($whichkey == '') {
                             $whichkey = 'DEFAULT';
+                        }
                         $this->keystyle[$whichkey] = strtolower($matches[2]);
 
                         if (isset($matches[3]) && $matches[3] != '') {
@@ -3515,6 +3565,8 @@ class WeatherMap extends WeatherMapBase
                             $this->colours[$matches[1]][$key]['red1'] = -1;
                             $this->colours[$matches[1]][$key]['green1'] = -1;
                             $this->colours[$matches[1]][$key]['blue1'] = -1;
+                            $this->colours[$matches[1]][$key]['c1'] = new Colour('none');
+
                         } else {
                             $this->colours[$matches[1]][$key]['red1'] =
                                 (int)($matches[4]);
@@ -3522,7 +3574,8 @@ class WeatherMap extends WeatherMapBase
                                 (int)($matches[5]);
                             $this->colours[$matches[1]][$key]['blue1'] =
                                 (int)($matches[6]);
-                        }
+                            $this->colours[$matches[1]][$key]['c1'] = new Colour((int)$matches[4], (int)$matches[5], (int)$matches[6]);
+                       }
 
                         // this is the second colour, if there is one
                         if (isset($matches[7]) && $matches[7] != '') {
@@ -3532,7 +3585,8 @@ class WeatherMap extends WeatherMapBase
                                 (int)($matches[8]);
                             $this->colours[$matches[1]][$key]['blue2'] =
                                 (int)($matches[9]);
-                        }
+                            $this->colours[$matches[1]][$key]['c2'] = new Colour((int)$matches[7], (int)$matches[8], (int)$matches[9]);
+                       }
 
                         if (!isset($this->numscales[$matches[1]])) {
                             $this->numscales[$matches[1]] = 1;
@@ -4072,8 +4126,8 @@ class WeatherMap extends WeatherMapBase
                                 $colour['green2'], $colour['blue2'], $tag);
                         }
                     } else {
-                        $output .= sprintf("%sCOLOR %d %d %d\n", $k, $colour['red1'],
-                            $colour['green1'], $colour['blue1']);
+                        $c = new Colour($colour['red1'], $colour['green1'], $colour['blue1']);
+                        $output .= sprintf("%sCOLOR %s\n", $k, $c->as_config());
                     }
                 }
                 $output .= "\n";

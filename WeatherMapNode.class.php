@@ -184,7 +184,7 @@ class WeatherMapNode extends WeatherMapItem
         $icon_w = 0;
         $icon_h = 0;
 
-        $col = new Colour(-1, -1, -1);
+        $col = new Colour('none');
 
 // if a target is specified, and you haven't forced no background, then the background will
 // come from the SCALE in USESCALE
@@ -200,11 +200,7 @@ class WeatherMapNode extends WeatherMapItem
                 $pc = $this->outpercent;
                 $col = $this->colours[OUT];
             }
-        } elseif ($this->labelbgcolour != array (
-            -1,
-            -1,
-            -1
-        )) {
+        } else {
             $col = new Colour($this->labelbgcolour);
         }
 
@@ -217,13 +213,11 @@ class WeatherMapNode extends WeatherMapItem
 
             if ($this->iconscalevar == 'in') {
                 $pc = $this->inpercent;
-                $col = $this->colours[IN];
                 $val = $this->bandwidth_in;
             }
 
             if ($this->iconscalevar == 'out') {
                 $pc = $this->outpercent;
-                $col = $this->colours[OUT];
                 $val = $this->bandwidth_out;
             }
 
@@ -326,11 +320,40 @@ class WeatherMapNode extends WeatherMapItem
                 $aifill = new Colour($this->aiconfillcolour);
                 $aiink = new Colour($this->aiconoutlinecolour);
 
-                if ($aifill->is_copy() && !$col->is_none()) {
-                    $fill = $col;
+                // if useiconscale isn't set, then use the static
+                // colour defined, or copy the colour from the label
+                if($this->useiconscale == "none") {
+                    if ($aifill->is_copy() && !$col->is_none()) {
+                        $fill = $col;
+                    } else {
+                        if ($aifill->is_real()) {
+                            $fill = $aifill;
+                        }
+                    }
                 } else {
-                    if ($aifill->is_real()) {
-                        $fill = $aifill;
+                    // if useiconscale IS defined, use that to figure out
+                    // the fill colour
+                    $pc = 0;
+                    $val = 0;
+
+                    if ($this->iconscalevar == 'in') {
+                        $pc = $this->inpercent;
+                        $val = $this->bandwidth_in;
+                    }
+
+                    if ($this->iconscalevar == 'out') {
+                        $pc = $this->outpercent;
+                        $val = $this->bandwidth_out;
+                    }
+
+                    if ($this->iconscaletype == 'percent') {
+                        list($fill, $junk, $junk) =
+                            $map->ColourFromValue($pc, $this->useiconscale, $this->name);
+                    } else {
+                        // use the absolute value if we aren't doing percentage scales.
+                        list($fill,  $junk, $junk) =
+                            $map->ColourFromValue($val, $this->useiconscale, $this->name,
+                                false);
                     }
                 }
 
@@ -537,8 +560,7 @@ class WeatherMapNode extends WeatherMapItem
                 );
             }
         }
-
-
+       
         // do any offset calculations
         $dx = 0;
         $dy = 0;
@@ -679,10 +701,6 @@ class WeatherMapNode extends WeatherMapItem
                 imagesy($this->image));
         }
     }
-
-    // take the pre-rendered node and write it to a file so that
-    // the editor can get at it.
-    function WriteToCache() { }
 
     function Reset(&$newowner)
     {

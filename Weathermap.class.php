@@ -1397,7 +1397,7 @@ class WeatherMap extends WeatherMapBase
 
         foreach ($defaults as $key => $def) {
             $this->colours['DEFAULT'][$key] = $def;
-            $this->colourtable[$key] = new Colour($def['red'], $def['green1'], $def['blue1']);
+            $this->colourtable[$key] = new Colour($def['red1'], $def['green1'], $def['blue1']);
         }
 
         $this->configfile = '';
@@ -3370,6 +3370,9 @@ class WeatherMap extends WeatherMapBase
                                 || (1 === preg_match($keyword[1], $buffer, $matches))) {
 
 								$key = sprintf("%s:%s:%s", $last_seen, $args[0] ,$keyword[1]);
+								if(!isset($this->coverage[$key])) {
+	$this->coverage[$key] = 0;
+}
 								$this->coverage[$key]++;
 								
                                 // if we came here without a regexp, then the \1 etc

@@ -20,20 +20,21 @@ class WeatherMapDataSource_static extends WeatherMapDataSource
 
     function ReadData($targetstring, &$map, &$item)
     {
-        $inbw = null;
-        $outbw = null;
+	$data[IN] = null;
+        $data[OUT] = null;
+
         $data_time = 0;
 
         if (preg_match("/^static:(\-?\d+\.?\d*[KMGT]*):(\-?\d+\.?\d*[KMGT]*)$/",
             $targetstring, $matches)) {
-            $inbw = unformat_number($matches[1], $map->kilo);
-            $outbw = unformat_number($matches[2], $map->kilo);
+            $data[IN] = unformat_number($matches[1], $map->kilo);
+            $data[OUT] = unformat_number($matches[2], $map->kilo);
             $data_time = time();
         }
 
         if (preg_match("/^static:(\-?\d+\.?\d*[KMGT]*)$/", $targetstring, $matches)) {
-            $inbw = unformat_number($matches[1], $map->kilo);
-            $outbw = $inbw;
+            $data[IN] = unformat_number($matches[1], $map->kilo);
+            $data[OUT] = $data[IN];
             $data_time = time();
         }
         
@@ -44,8 +45,8 @@ class WeatherMapDataSource_static extends WeatherMapDataSource
         	));
 
         return (array (
-            $inbw,
-            $outbw,
+            $data[IN],
+            $data[OUT],
             $data_time
         ));
     }

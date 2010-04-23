@@ -260,7 +260,7 @@ else
 		$node_config = fix_gpc_string($_REQUEST['item_configtext']);
 
 		if (true == function_exists('get_magic_quotes_gpc') && 1 == get_magic_quotes_gpc()) {
-			$link_config = stripslashes($link_config);
+			$node_config = stripslashes($node_config);
 		}
 
         $map->nodes[$node_name]->config_override = $node_config;

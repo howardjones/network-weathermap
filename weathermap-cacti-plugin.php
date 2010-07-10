@@ -757,9 +757,11 @@ function weathermap_get_valid_tabs()
             "select weathermap_maps.*, weathermap_groups.name as group_name from weathermap_auth,weathermap_maps, weathermap_groups where weathermap_groups.id=weathermap_maps.group_id and weathermap_maps.id=weathermap_auth.mapid and active='on' and (userid="
         . $userid . " or userid=0) order by weathermap_groups.sortorder");
 
+	if($maps) {
     foreach ($maps as $map) {
         $tabs[$map['group_id']] = $map['group_name'];
     }
+	}
 
     return ($tabs);
 }

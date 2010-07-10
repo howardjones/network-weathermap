@@ -367,6 +367,7 @@ function map_resort()
     $i = 1;
     $last_group = -1020.5;
 
+	if(! empty($list)) {
     foreach ($list as $map) {
         if ($last_group != $map['group_id']) {
             $last_group = $map['group_id'];
@@ -375,6 +376,7 @@ function map_resort()
         $sql[] = "update weathermap_maps set sortorder = $i where id = " . $map['id'];
         $i++;
     }
+	}
 
     if (!empty($sql)) {
         for ($a = 0; $a < count($sql); $a++) {

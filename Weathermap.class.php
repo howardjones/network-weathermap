@@ -858,7 +858,12 @@ class WeatherMapDataSource
     function Register($targetstring, &$map, &$item) { }
 
 // called before ReadData, to allow plugins to DO the prefetch of targets known from Register
-    function Prefetch() { }
+    function Prefetch(&$map) { }
+
+// Run after all data collection
+// some plugin might need to update a local cache, or other state
+    function CleanUp(&$map) { }
+
 }
 
 // template classes for the pre- and post-processor plugins
@@ -1900,7 +1905,7 @@ class WeatherMap extends WeatherMapBase
             debug("Starting prefetch\n");
 
             foreach ($this->datasourceclasses as $ds_class) {
-                $this->plugins['data'][$ds_class]->Prefetch();
+                $this->plugins['data'][$ds_class]->Prefetch($this);
             }
 
             debug("======================================\n");
@@ -2093,6 +2098,14 @@ class WeatherMap extends WeatherMapBase
                     unset($myobj);
                 }
             }
+
+            debug("======================================\n");
+            debug("Starting cleanup\n");
+
+            foreach ($this->datasourceclasses as $ds_class) {
+                $this->plugins['data'][$ds_class]->CleanUp($this);
+            }
+
             debug("ReadData Completed.\n");
             debug("------------------------------\n");
         } else {

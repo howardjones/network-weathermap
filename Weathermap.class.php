@@ -2139,7 +2139,9 @@ class WeatherMap extends WeatherMapBase
 
         $npoints = count($points) / 2;
 
-        RotateAboutPoint($points, $x, $y, $rangle);
+        if($angle != 0) {
+            RotateAboutPoint($points, $x, $y, $rangle);
+        }
 
         if ($bgcolour != array (
             -1,
@@ -4461,6 +4463,9 @@ class WeatherMap extends WeatherMapBase
                     }
                 }
             }
+
+            // debugging for editor imagemap issues
+            // $this->imap->Draw($image, $overlay);
 
             // Ready to output the results...
 

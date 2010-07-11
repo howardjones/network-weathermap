@@ -994,6 +994,100 @@ function calc_arrowsize($width, &$map, $linkname)
     ));
 }
 
+
+    function RotX($a,$b,$x,$y)
+    {
+      return  cos( atan2($y,$x) + atan2($b,$a) ) * sqrt( $x*$x + $y*$y );
+    }
+
+    function RotY($a,$b,$x,$y)
+    {
+      return sin( atan2($y,$x) + atan2($b,$a) ) * sqrt( $x*$x + $y*$y ) ;
+    }
+
+function linterp($v1, $v2, $percent)
+{
+    return($v1 + (($v2-$v1) * ($percent/100)));
+}
+
+/**
+ * Draw an 'old-style' straight link arrow.
+ *
+ * This code was brought back into 0.98 from 0.71, before there
+ * were VIAs. The theory being that for a large percentage of links on a lot
+ * of maps, the links are just straight, and theres no need for all that spine-points
+ * business. This should make for faster code, more efficient imagemaps, and
+ * smaller HTML output.
+ *
+ * @param <type> $image
+ * @param <type> $x1
+ * @param <type> $y1
+ * @param <type> $x2
+ * @param <type> $y2
+ * @param <type> $w
+ * @param <type> $outlinecolour
+ * @param <type> $fillcolour
+ * @param <type> $map
+ * @param <type> $linkname
+ * @param <type> $dir
+ */
+    function DrawArrow($image, $x1,$y1,$x2,$y2,$w, $outlinecolour, $fillcolour, &$map, $linkname, $dir)
+    {
+        $arrowheadsize = 4 * $w;
+        $arrowheadwidth = 2 * $w;
+
+#        print "$linkname   $x1, $y1 -> $x2, $y2\n";
+
+      list($arrowheadsize, $arrowheadwidth) = calc_arrowsize($w, $map, $linkname);
+
+      $d = new Vector($x2-$x1, $y2-$y1);
+      $l = $d->length();
+      $d->normalise();
+      $norm = $d->get_normal();
+      $arrow_d = $l - $arrowheadsize;
+
+      $poly = array();
+
+      $poly[] = $x1 + $norm->dx * $w;
+      $poly[] = $y1 + $norm->dy * $w;
+
+      $poly[] = $x1 + $arrow_d*$d->dx + $norm->dx * $w;
+      $poly[] = $y1 + $arrow_d*$d->dy + $norm->dy * $w;
+
+      $poly[] = $x1 + $arrow_d*$d->dx + $arrowheadwidth * $norm->dx;
+      $poly[] = $y1 + $arrow_d*$d->dy + $arrowheadwidth * $norm->dy;
+
+      $poly[] = $x2;
+      $poly[] = $y2;
+
+      $poly[] = $x1 + $arrow_d*$d->dx - $arrowheadwidth * $norm->dx;
+      $poly[] = $y1 + $arrow_d*$d->dy - $arrowheadwidth * $norm->dy;
+
+      $poly[] = $x1 + $arrow_d*$d->dx - $norm->dx * $w;
+      $poly[] = $y1 + $arrow_d*$d->dy - $norm->dy * $w;
+
+      $poly[] = $x1 - $norm->dx * $w;
+      $poly[] = $y1 - $norm->dy * $w;
+
+            if (false === is_null($fillcolour)) {
+                imagefilledpolygon($image, $poly, count($poly)/2, $fillcolour);
+            } else {
+                debug("Not drawing %s (%s) outline because there is no fill colour\n", $linkname, $dir);
+            }
+
+            $areaname = 'LINK:L' . $map->links[$linkname]->id . ':'.$dir;
+            $map->imap->addArea('Polygon', $areaname, '', $poly);
+            debug("Adding Poly imagemap for %s\n", $areaname);
+		$map->links[$linkname]->imap_areas[] = $areaname;
+
+            if (false === is_null($outlinecolour)) {
+                imagepolygon($image, $poly, count($poly)/2, $outlinecolour);
+            } else {
+                debug("Not drawing %s (%s) outline because there is no outline colour\n", $linkname, $dir);
+            }
+
+       }
+
 function draw_straight($image, &$curvepoints, $widths, $outlinecolour, $fillcolours,
     $linkname, &$map, $q2_percent = 50, $unidirectional = false)
 {
@@ -1846,6 +1940,7 @@ function nice_scalar($number, $kilo = 1000, $decimals = 1)
  * we use enough points in various places to make it worth a small class to
  * save some variable-pairs.
  *
+ * TODO: Actually USE this, where we can.
  */
 class Point
 {
@@ -1856,7 +1951,41 @@ class Point
         $this->x = $x;
         $this->y = $y;
     }
+
+    function VectorTo($p2)
+    {
+        $v = new Vector($p2->x - $this->x, $p2->y - $this->y);
+        
+        return $v;
+    }
+
+    function DistanceToLine($l)
+    {
+// TODO: Implement this
+    }
+
+    function DistanceToLineSegment($l)
+    {
+// TODO: Implement this
+    }
+
+    function DistanceTo($p2)
+    {
+        $v = $this->VectorTo($p2);
+        $d = $v->length();
+
+        return $d;
+    }
+
+    function AddVector($v, $fraction=1.0)
+    {
+        if($fraction == 0) return;
+        
+        $this->x = $this->x + $fraction * $v->dx;
+        $this->y = $this->y + $fraction * $v->dy;
+    }
 }
+
 
 /**
  * Utility class for 2D vectors. Mostly used in the VIA calculations
@@ -1871,12 +2000,28 @@ class Vector
         $this->dy = $dy;
     }
 
+    function flip()
+    {
+        $this->dx = - $this->dx;
+        $this->dy = - $this->dy;
+    }
+
+    function get_angle()
+    {
+         return rad2deg(atan2(-($this->dy), ($this->dx)));
+    }
+
     function get_normal()
     {
         $len = $this->length();
 
-        $nx1 = $this->dy / $len;
-        $ny1 = -$this->dx / $len;
+        $nx1 = 0;
+        $ny1 = 0;
+        
+        if($len > 0) {
+            $nx1 = $this->dy / $len;
+            $ny1 = -$this->dx / $len;
+        }
 
         return (new Vector($nx1, $ny1));
     }
@@ -1884,13 +2029,54 @@ class Vector
     function normalise()
     {
         $len = $this->length();
-        $this->dx = $this->dx / $len;
-        $this->dy = $this->dy / $len;
+        if($len > 0) {
+            $this->dx = $this->dx / $len;
+            $this->dy = $this->dy / $len;
+        }
+    }
+
+    function slength()
+    {
+        if( ($this->dx == 0) && ($this->dy == 0)) {
+            return 0;
+        }
+        $slen = ($this->dx) * ($this->dx) + ($this->dy) * ($this->dy);
+        
+        return $slen;
     }
 
     function length()
+    {        
+        return (sqrt($this->slength()));
+    }
+}
+
+/**
+ * A Line is simply a Vector that passes through a Point
+ */
+class Line
+{
+    var $point;
+    var $vector;
+
+    function Line($p, $v)
     {
-        return (sqrt(($this->dx) * ($this->dx)+($this->dy) * ($this->dy)));
+        $this->point = $p;
+        $this->vector = $v;
+    }
+}
+
+class LineSegment
+{
+    var $p1, $p2;
+    var $vector;
+
+    function LineSegment($p1, $p2)
+    {
+        $this->p1 = $p1;
+        $this->p2 = $p2;
+
+        $this->vector = new Vector($p2->x - $p1->x, $p2->y - $p1->y );
     }
 }
 
@@ -2074,6 +2260,14 @@ function wm_draw_marker_diamond($im, $col, $x, $y, $size = 10)
     $num_points = 4;
 
     imagepolygon($im, $points, $num_points, $col);
+}
+
+function wm_draw_marker_cross($im, $col, $x, $y, $size = 5)
+{
+    imageline($im, $x, $y, $x+$size, $y+$size, $col);
+    imageline($im, $x, $y, $x-$size, $y+$size, $col);
+    imageline($im, $x, $y, $x+$size, $y-$size, $col);
+    imageline($im, $x, $y, $x-$size, $y-$size, $col);
 }
 
 function wm_draw_marker_box($im, $col, $x, $y, $size = 10)

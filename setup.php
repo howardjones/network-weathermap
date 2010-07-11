@@ -383,7 +383,12 @@ function weathermap_setup_table()
                 if ($row['Field'] == 'group_id') {
                     $found_96bchanges = true;
                 }
-            }
+
+                if ($row['Field'] == 'debug') {
+                    $found_98changes = true;
+                }
+
+           }
 
             if (!$found_so) {
                 $sql[] =

@@ -7,9 +7,10 @@ class ConfigTest extends PHPUnit_Framework_TestCase
     /**
      * @dataProvider configlist
      */
-    public function testConfigOutput($conffile, $referenceimagefile, $testdir, $result1dir, $result2dir)
+    public function testConfigOutput($conffile, $referenceimagefile, $testdir, $result1dir, $result2dir, $diffdir, $compare)
     {
         $outputimagefile = $result1dir.DIRECTORY_SEPARATOR.$conffile.".png";
+        $comparisonimagefile = $diffdir.DIRECTORY_SEPARATOR.$conffile.".png";
         $outputhtmlfile = $result1dir.DIRECTORY_SEPARATOR.$conffile.".html";
 
         $previouswd = getcwd();
@@ -19,9 +20,31 @@ class ConfigTest extends PHPUnit_Framework_TestCase
         
         $this->assertEquals(0, $nwarns, "Warnings were generated");
 
+         # $COMPARE -metric AE $reference $result $destination  > $destination2 2>&1
+        $cmd = sprintf("%s -metric AE \"%s\" \"%s\" \"%s\"",
+                $compare,
+                $referenceimagefile,
+                $outputimagefile,
+                $comparisonimagefile
+                );
+//      print "|$cmd|\n";
+
+        if(file_exists($compare)) {
+            // system($cmd);
+            $fd = popen($cmd,"r");
+            $output = fread($fd,2000);
+            pclose($fd);
+            print "\n[$output]\n";
+            $this->AssertEquals($output, "0", "Output did not match reference for $conffile via IM");
+            
+        }
+        
         $ref_md5 = md5_file($referenceimagefile);
-        $ref_output = md5_file($outputimagefile);
-        $this->assertEquals($ref_md5, $ref_output, "Output did not match reference for $conffile");
+        $output_md5 = md5_file($outputimagefile);
+        $this->assertEquals($ref_md5, $output_md5, "Output did not match reference for $conffile via MD5");
+
+
+
 //        $this->assertFileEquals($referenceimagefile, $outputimagefile, "Output did not match reference for $conffile");
 
         chdir($previouswd);
@@ -30,7 +53,7 @@ class ConfigTest extends PHPUnit_Framework_TestCase
    /**
      * @dataProvider configlist
      */
-    public function testWriteConfigConsistency($conffile, $referenceimagefile, $testdir, $result1dir, $result2dir)
+    public function testWriteConfigConsistency($conffile, $referenceimagefile, $testdir, $result1dir, $result2dir, $diffdir, $compare)
     {
         $previouswd = getcwd();
         chdir(dirname(__FILE__).DIRECTORY_SEPARATOR."..");
@@ -57,17 +80,21 @@ class ConfigTest extends PHPUnit_Framework_TestCase
         $previouswd = getcwd();
         chdir(dirname(__FILE__).DIRECTORY_SEPARATOR."..");
 
-        $testdir = "test-suite/tests";
-        $referencedir = "test-suite/references";
+        $testdir = "test-suite".DIRECTORY_SEPARATOR."tests";
+        $referencedir = "test-suite".DIRECTORY_SEPARATOR."references";
 
         $version = explode('.', PHP_VERSION);
         $phptag = "php".$version[0];
 
-        $result1dir = "test-suite/results1-$phptag";
-        $result2dir = "test-suite/results2-$phptag";
+        $result1dir = "test-suite".DIRECTORY_SEPARATOR."results1-$phptag";
+        $result2dir = "test-suite".DIRECTORY_SEPARATOR."results2-$phptag";
+        $diffdir = "test-suite".DIRECTORY_SEPARATOR."diffs";
+
+        $compare = "test-suite".DIRECTORY_SEPARATOR."tools".DIRECTORY_SEPARATOR."compare.exe";
 
         if(! file_exists($result1dir)) { mkdir($result1dir); }
         if(! file_exists($result2dir)) { mkdir($result2dir); }
+        if(! file_exists($diffdir)) { mkdir($diffdir); }
 
         $conflist = array();
 
@@ -75,10 +102,10 @@ class ConfigTest extends PHPUnit_Framework_TestCase
         while ($file = readdir($dh)) {
             if(substr($file,-5,5) == '.conf') {
                 $imagefile = $file.".png";
-                $reference = $referencedir."/".$file.".png";
+                $reference = $referencedir.DIRECTORY_SEPARATOR.$file.".png";
 
                 if(file_exists($reference)) {
-                    $conflist[] = array($file, $reference, $testdir, $result1dir, $result2dir);
+                    $conflist[] = array($file, $reference, $testdir, $result1dir, $result2dir, $diffdir, $compare);
                 }
             }
         }

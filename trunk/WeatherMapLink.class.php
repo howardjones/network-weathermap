@@ -54,6 +54,21 @@ class WeatherMapLink extends WeatherMapItem
     var $commentoffset_in, $commentoffset_out;
     var $template;
 
+    // these are the calculated positions for various things, so that the
+    // comment and bwlabel drawing code doesn't need to know about
+    // curvepoints, and so that we don't *have* to use curvepoints
+    var $comment_x = array();
+    var $comment_y = array();
+    var $comment_angle = array();
+    var $label_x = array();
+    var $label_y = array();
+    var $label_angle = array();
+    var $mid_x, $mid_y;
+    var $commenttext = array();
+    var $commentlength = array();
+    var $commentheight = array();
+    var $calculatedwidths = array();
+
     function WeatherMapLink()
     {
         $this->inherit_fieldlist = array (
@@ -191,21 +206,8 @@ class WeatherMapLink extends WeatherMapItem
         }
     }
 
-    // image = GD image references
-    // col = array of Colour objects
-    // widths = array of link widths
-    function DrawComments($image, $col, $widths)
+    function GetDirectionList()
     {
-        $curvepoints = &$this->curvepoints;
-        $last = count($curvepoints) - 1;
-
-        $totaldistance = $curvepoints[$last][2];
-
-        $start[OUT] = 0;
-        $commentpos[OUT] = $this->commentoffset_out;
-        $commentpos[IN] = $this->commentoffset_in;
-        $start[IN] = $last;
-
         if ($this->linkstyle == "oneway") {
             $dirs = array (OUT);
         } else {
@@ -215,47 +217,108 @@ class WeatherMapLink extends WeatherMapItem
             );
         }
 
+        return ($dirs);
+    }
+
+    /**
+     * Figure out what the actual comment text will be, and how big it is.
+     */
+    function ProcessComments()
+    {
+        $dirs = $this->GetDirectionList();
+        
         foreach ($dirs as $dir) {
 
-
-            // Time to deal with Link Comments, if any
             $comment = $this->owner->ProcessString($this->comments[$dir], $this);
-
             # print "COMMENT: $comment";
 
-            if ($this->owner->get_hint('screenshot_mode') == 1)
+            if ($this->owner->get_hint('screenshot_mode') == 1) {
                 $comment = screenshotify($comment);
+            }
+            
+            $this->commenttext[$dir] = $comment;
 
-            if ($comment != '') {
+            $textheight = 0;
+            $textlength = 0;
 
+            if(strlen($comment) > 0) {
                 list($textlength, $textheight) =
                     $this->owner->myimagestringsize($this->commentfont, $comment);
+            }
+             
+             $this->commentlength[$dir] = $textlength;
+             $this->commentheight[$dir] = $textheight;
+        }
+    }
+
+    function CalculateCommentPosition($widths)
+    {
+        $dirs = $this->GetDirectionList();
+
+        // nudge pushes the comment out along the link arrow a little bit
+        // (otherwise there are more problems with text disappearing underneath links)
+
+        $nudgeout = 0;
+        $nudgealong = 0;
+
+        $nudgealong = intval($this->get_hint("comment_nudgealong"));
+        $nudgeout = intval($this->get_hint("comment_nudgeout"));
+
+        $commentpos = array();
+        $commentpos[OUT] = $this->commentoffset_out;
+        $commentpos[IN] = $this->commentoffset_in;
+        
+        // this is a much simpler process when there is no
+        // curve/vias involved. 
+        if(count($this->vialist) > 0) {
+            $curvepoints = &$this->curvepoints;
+            $last = count($curvepoints) - 1;
+
+            $totaldistance = $curvepoints[$last][2];
+
+            $start = array();
+
+            $start[OUT] = 0;
+            $start[IN] = $last;
+        }
+        else
+        {
+            // do the simpler calculation for a straight link
+            $d = new Vector($this->b->x - $this->a->x, $this->b->y - $this->a->y);
+            $totaldistance = $d->length();
+            $d->normalise();
+            $n = $d->get_normal();
+        }
+
+
+            foreach ($dirs as $dir) {                
 
                 $extra_percent = $commentpos[$dir];
-
-// nudge pushes the comment out along the link arrow a little bit
-// (otherwise there are more problems with text disappearing underneath links)
-
-                $nudgealong = intval($this->get_hint("comment_nudgealong"));
-                $nudgeout = intval($this->get_hint("comment_nudgeout"));
-
                 $extra = ($totaldistance * ($extra_percent / 100));
-                # $comment_index = find_distance($curvepoints,$extra);
 
-                list($x, $y, $comment_index, $angle) =
-                    find_distance_coords_angle($curvepoints, $extra);
+                if(count($this->vialist) > 0) {
+
+                    list($x, $y, $comment_index, $angle) =
+                        find_distance_coords_angle($curvepoints, $extra);
 
 
-                if (($comment_index != 0) && (($x != $curvepoints[$comment_index][0])
-                    || ($y != $curvepoints[$comment_index][1]))) {
-                    #	print "  -> Path 1\n";
-                    $dx = $x - $curvepoints[$comment_index][0];
-                    $dy = $y - $curvepoints[$comment_index][1];
-                } else {
-                    #	print "  -> Path 2\n";
-                    $dx = $curvepoints[$comment_index + 1][0] - $x;
-                    $dy = $curvepoints[$comment_index + 1][1] - $y;
+                    if (($comment_index != 0) && (($x != $curvepoints[$comment_index][0])
+                        || ($y != $curvepoints[$comment_index][1]))) {
+                        $d = new Vector($x - $curvepoints[$comment_index][0], $y - $curvepoints[$comment_index][1]);
+                    } else {
+                        $d = new Vector($curvepoints[$comment_index + 1][0] - $x, $curvepoints[$comment_index + 1][1] - $y);
+                    }
+                    $edge = new Point($x, $y);
                 }
+                else
+                {
+                    // this is what would have come from the spine, in a curved link
+                    $edge = new Point($this->comment_x[$dir], $this->comment_y[$dir]);
+                    $angle = $d->get_angle();
+                }                
+
+                $textheight = $this->commentheight[$dir];
+                $textlength = $this->commentlength[$dir];
 
                 $centre_distance = $widths[$dir] + 4 + $nudgeout;
 
@@ -263,49 +326,64 @@ class WeatherMapLink extends WeatherMapItem
                     $centre_distance = $nudgeout - ($textheight / 2);
                 }
 
-                // find the normal to our link, so we can get outside the arrow
-
-                $l = sqrt(($dx * $dx) + ($dy * $dy));
-
-                # print "$extra => $comment_index/$last => $x,$y => $dx,$dy => $l\n";
-
-                $dx = $dx / $l;
-                $dy = $dy / $l;
-                $nx = $dy;
-                $ny = -$dx;
+                // find the normal to our link, so we can get outside the arrow               
                 $flipped = false;
+                $d->normalise();
+                $n = $d->get_normal();
 
-// if the text will be upside-down, rotate it, flip it, and right-justify it
-// not quite as catchy as Missy's version
+                // if the text will be upside-down, rotate it, flip it, and right-justify it
+                // not quite as catchy as Missy's version
                 if (abs($angle) > 90) {
                     $angle -= 180;
 
                     if ($angle < -180) {
                         $angle += 360;
                     }
-                    $edge_x = $x + $nudgealong * $dx - $nx * $centre_distance;
-                    $edge_y = $y + $nudgealong * $dy - $ny * $centre_distance;
+
+                    $edge->AddVector($d, $nudgealong);
+                    $edge->AddVector($n, -$centre_distance);
                     $flipped = true;
                 } else {
-                    $edge_x = $x + $nudgealong * $dx + $nx * $centre_distance;
-                    $edge_y = $y + $nudgealong * $dy + $ny * $centre_distance;
+                    $edge->AddVector($d, $nudgealong);
+                    $edge->AddVector($n, $centre_distance);
                 }
 
                 if (!$flipped && ($extra + $textlength) > $totaldistance) {
-                    $edge_x -= $dx * $textlength;
-                    $edge_y -= $dy * $textlength;
+                    $edge->AddVector($d, -$textlength);
                 }
 
                 if ($flipped && ($extra - $textlength) < 0) {
-                    $edge_x += $dx * $textlength;
-                    $edge_y += $dy * $textlength;
+                    $edge->AddVector($d, $textlength);
                 }
 
-// FINALLY, draw the text!
-                $this->owner->myimagestring($image, $this->commentfont, $edge_x, $edge_y,
-                    $comment, $col[$dir], $angle);
+                $this->comment_x[$dir] = $edge->x;
+                $this->comment_y[$dir] = $edge->y;
+                $this->comment_angle[$dir] = $angle;
+            }       
+    }
 
+    /**
+     * Draw the comment text. By this stage, the actual position and angle
+     * and the final text is already calculated.
+     *
+     * @param GDImageRef $image the image ref to draw into
+     * @param GDColorRef $col[] colours for in and out text
+     */
+    function DrawComments($image, $col)
+    {
+        $dirs = $this->GetDirectionList();
+
+
+        foreach ($dirs as $dir) {
+
+            if ($this->commenttext[$dir] != '') {
+                // FINALLY, draw the text!
+                $this->owner->myimagestring($image, $this->commentfont,
+                    $this->comment_x[$dir], $this->comment_y[$dir],
+                    $this->commenttext[$dir], $col[$dir],
+                    $this->comment_angle[$dir]);
             }
+            
         }
     }
 
@@ -345,7 +423,7 @@ class WeatherMapLink extends WeatherMapItem
         $x2 += $dx;
         $y2 += $dy;
 
-		if (($x1 == $x2) && ($y1 == $y2) && sizeof($this->vialist) == 0) {
+        if (($x1 == $x2) && ($y1 == $y2) && sizeof($this->vialist) == 0) {
             warn("Zero-length link " . $this->name . " skipped. [WMWARN45]");
             return;
         }
@@ -390,6 +468,9 @@ class WeatherMapLink extends WeatherMapItem
         // these will replace the one above, ultimately.
         $link_in_width = $this->width;
         $link_out_width = $this->width;
+        // and these will replace those
+        $this->calculatedwidths[IN] = $this->width;
+        $this->calculatedwidths[OUT] = $this->width;
 
         // for bulging animations
         if (($map->widthmod) || ($map->get_hint('link_bulge') == 1)) {
@@ -399,27 +480,64 @@ class WeatherMapLink extends WeatherMapItem
             $link_in_width = (($link_in_width * $this->inpercent * 1.5 + 0.1) / 100) + 1;
             $link_out_width = (($link_out_width * $this->outpercent * 1.5 + 0.1) / 100)
                 + 1;
+            $this->calculatedwidths[IN] = (($this->calculatedwidths[IN] * $this->inpercent * 1.5 + 0.1) / 100) + 1;
+            $this->calculatedwidths[OUT] = (($this->calculatedwidths[OUT] * $this->outpercent * 1.5 + 0.1) / 100)
+                + 1;
         }
 
+        // if there are no vias, we can skip a lot of curve-related calculations
 		if($nvia == 0) {
 
-				$this->curvepoints = calc_straight($xpoints, $ypoints, 5);
-				
-				// then draw the "curve" itself
-				draw_straight($im, $this->curvepoints, array (
-					$link_in_width,
-					$link_out_width
-				), $outline_colour, array (
-					$gd_in_colour,
-					$gd_out_colour
-				), $this->name, $map, $this->splitpos, ($this->linkstyle
-					== 'oneway' ? true : false));
-						
-		}
+                    $this->curvepoints = calc_straight($xpoints, $ypoints);
+
+                    // if the link is straight, then some simple linear interpolation
+                    // will find the positions for everything
+                    $this->mid_x = linterp($x1, $x2, $this->splitpos);
+                    $this->mid_y = linterp($y1, $y2, $this->splitpos);
+
+                    $this->label_x[IN] = linterp($x1, $x2, $this->labeloffset_in);
+                    $this->label_y[IN] = linterp($y1, $y2, $this->labeloffset_in);
+
+                    $this->label_x[OUT] = linterp($x1, $x2, $this->labeloffset_out);
+                    $this->label_y[OUT] = linterp($y1, $y2, $this->labeloffset_out);
+
+                    # $angle = ($y2-$y1) / ($x2-$x1);
+                    $angle = rad2deg(atan2($y1-$y2, $x2-$x1));
+
+                    $this->label_angle[IN] = $angle;
+                    $this->label_angle[OUT] = $angle;
+                    $this->comment_angle[IN] = $angle;
+                    $this->comment_angle[OUT] = $angle;
+
+                    // these are ON the link axis, which isn't actually correct
+                    $this->comment_x[IN] = linterp($x1,$x2,$this->commentoffset_in);
+                    $this->comment_y[IN] = linterp($y1,$y2,$this->commentoffset_in);
+                    $this->comment_x[OUT] = linterp($x1,$x2,$this->commentoffset_out);
+                    $this->comment_y[OUT] = linterp($y1,$y2,$this->commentoffset_out);
+
+                    if($this->linkstyle == 'oneway') {
+                        DrawArrow($im, $x1,$y1, $x2, $y2,
+                            $link_out_width,
+                            $outline_colour, $gd_out_colour,
+                            $map, $this->name, OUT);
+
+                    } else {
+                        DrawArrow($im, $x2,$y2, $this->mid_x, $this->mid_y,
+                                $link_in_width,
+                                $outline_colour, $gd_in_colour,
+                                $map, $this->name, IN);
+                        DrawArrow($im, $x1,$y1, $this->mid_x, $this->mid_y,
+                            $link_out_width,
+                            $outline_colour, $gd_out_colour,
+                            $map, $this->name, OUT);
+                    
+                    }
+                }
 		else
 		{
-		
-			if ( ($this->viastyle == 'curved')) {
+                    // from here, we're actually drawing a link with VIAs
+                    // so there is a curvepoints array and all the rest
+                    if ( ($this->viastyle == 'curved')) {
 				// Calculate the spine points - the actual curve
 				$this->curvepoints = calc_curve($xpoints, $ypoints);
 
@@ -438,7 +556,6 @@ class WeatherMapLink extends WeatherMapItem
 				// Calculate the spine points - the actual not a curve really, but we
 				// need to create the array, and calculate the distance bits, otherwise
 				// things like bwlabels won't know where to go.
-
 					
 				$this->curvepoints = calc_straight($xpoints, $ypoints);
 				
@@ -452,9 +569,37 @@ class WeatherMapLink extends WeatherMapItem
 				), $this->name, $map, $this->splitpos, ($this->linkstyle
 					== 'oneway' ? true : false));
 			}
+
+                        // now work out where all the 'furniture' goes....
+
+                        $curvelength = $this->curvepoints[count($this->curvepoints) - 1][2];
+                        // figure out where the labels should be, and what the angle of the curve is at that point
+                        list($this->label_x[OUT], $this->label_y[OUT], $junk, $this->label_angle[OUT]) =
+                            find_distance_coords_angle($this->curvepoints, ($this->labeloffset_out / 100)
+                                * $curvelength);
+                        list( $this->label_x[IN],  $this->label_y[IN], $junk, $this->label_angle[IN]) =
+                            find_distance_coords_angle($this->curvepoints, ($this->labeloffset_in / 100)
+                                * $curvelength);
 		}
 
-        if (!$commentcol->is_none()) {
+                // at this stage, the actual link arrow(s) are drawn,
+                // and the positions/angles for bwlabels are known
+
+        // if the comment strings are both blank, or the colour is 'none', just
+        // skip the comments altogether
+        if (!$commentcol->is_none() && $this->comments[IN].$this->comments[OUT] != '') {
+
+            // Precalculate text, and text positions
+            $this->ProcessComments();
+
+            $this->CalculateCommentPosition(array (
+                $link_in_width * 1.1,
+                $link_out_width * 1.1
+            ));
+
+        //    wm_draw_marker_cross($im,$map->selected, $this->comment_x[IN], $this->comment_y[IN]);
+        //    wm_draw_marker_cross($im,$map->selected, $this->comment_x[OUT], $this->comment_y[OUT]);
+
             if ($commentcol->is_contrast()) {
                 $commentcol_in = $link_in_colour->contrast();
                 $commentcol_out = $link_out_colour->contrast();
@@ -469,41 +614,29 @@ class WeatherMapLink extends WeatherMapItem
             $this->DrawComments($im, array (
                 $comment_colour_in,
                 $comment_colour_out
-            ), array (
-                $link_in_width * 1.1,
-                $link_out_width * 1.1
             ));
         }
-		
-        $curvelength = $this->curvepoints[count($this->curvepoints) - 1][2];
-// figure out where the labels should be, and what the angle of the curve is at that point
-        list($q1_x, $q1_y, $junk, $q1_angle) =
-            find_distance_coords_angle($this->curvepoints, ($this->labeloffset_out / 100)
-                * $curvelength);
-        list($q3_x, $q3_y, $junk, $q3_angle) =
-            find_distance_coords_angle($this->curvepoints, ($this->labeloffset_in / 100)
-                * $curvelength);
-
-        if (!is_null($q1_x)) {
+        
+        if (!is_null($this->label_x[OUT])) {
             $outbound = array (
-                $q1_x,
-                $q1_y,
+                $this->label_x[OUT],
+                $this->label_y[OUT],
                 0,
                 0,
                 $this->outpercent,
                 $this->bandwidth_out,
-                $q1_angle,
+                $this->label_angle[OUT],
                 OUT
             );
 
             $inbound = array (
-                $q3_x,
-                $q3_y,
+                $this->label_x[IN],
+                $this->label_y[IN],
                 0,
                 0,
                 $this->inpercent,
                 $this->bandwidth_in,
-                $q3_angle,
+                $this->label_angle[IN],
                 IN
             );
 
@@ -533,8 +666,9 @@ class WeatherMapLink extends WeatherMapItem
 
 // if screenshot_mode is enabled, wipe any letters to X and wipe any IP address to 127.0.0.1
 // hopefully that will preserve enough information to show cool stuff without leaking info
-                    if ($map->get_hint('screenshot_mode') == 1)
+                    if ($map->get_hint('screenshot_mode') == 1) {
                         $thelabel = screenshotify($thelabel);
+                    }
 
                     if ($this->labelboxstyle == 'angled') {
                         $angle = $task[6];

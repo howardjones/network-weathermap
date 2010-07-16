@@ -173,8 +173,9 @@ class WeatherMapDataSource_rrd extends WeatherMapDataSource
                             $ldi = $result['local_data_id'];
                         }
 
-                        if ($ldi > 0)
+                        if ($ldi > 0) {
                             UpdateCactiData($item, $ldi);
+			}
                     }
                 } else {
                     debug("RRD ReadData: poller_output - DS name is '-'\n");

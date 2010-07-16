@@ -1209,6 +1209,7 @@ class WeatherMap extends WeatherMapBase
     var $has_overlibs;
     var $node_template_tree;
     var $link_template_tree;
+    var $dsinfocache=array();
 
     var $plugins = array ();
     var $included_files = array ();

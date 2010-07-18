@@ -230,8 +230,8 @@ else
 		}
 
 		if (! $ok) {
-            print "# the request item didn't exist. That's probably a bug.\n";
-        }
+                    print "# the request item didn't exist. That's probably a bug.\n";
+                }
 
 		exit();
 		break;
@@ -242,36 +242,42 @@ else
 		$link_name = $_REQUEST['link_name'];
 		$link_config = fix_gpc_string($_REQUEST['item_configtext']);
 
-        $map->links[$link_name]->config_override = $link_config;
+                if(strpos($link_name," ") === false) {
+                    $map->links[$link_name]->config_override = $link_config;
 
-		$map->WriteConfig($mapfile);
-		// now clear and reload the map object, because the in-memory one is out of sync
-		// - we don't know what changes the user made here, so we just have to reload.
-		unset($map);
-		$map = new WeatherMap;
-		$map->context = 'editor';
-		$map->ReadConfig($mapfile);
+                    $map->WriteConfig($mapfile);
+                    // now clear and reload the map object, because the in-memory one is out of sync
+                    // - we don't know what changes the user made here, so we just have to reload.
+                    unset($map);
+                    $map = new WeatherMap;
+                    $map->context = 'editor';
+                    $map->ReadConfig($mapfile);
+                }
 		break;
 
 	case 'set_node_config':
 		$map->ReadConfig($mapfile);
 
 		$node_name = $_REQUEST['node_name'];
-		$node_config = fix_gpc_string($_REQUEST['item_configtext']);
 
-		if (true == function_exists('get_magic_quotes_gpc') && 1 == get_magic_quotes_gpc()) {
-			$node_config = stripslashes($node_config);
-		}
+                if(strpos($node_name," ") === false) {
 
-        $map->nodes[$node_name]->config_override = $node_config;
+                    $node_config = fix_gpc_string($_REQUEST['item_configtext']);
 
-		$map->WriteConfig($mapfile);
-		// now clear and reload the map object, because the in-memory one is out of sync
-		// - we don't know what changes the user made here, so we just have to reload.
-		unset($map);
-		$map = new WeatherMap;
-		$map->context = 'editor';
-		$map->ReadConfig($mapfile);
+                    if (true == function_exists('get_magic_quotes_gpc') && 1 == get_magic_quotes_gpc()) {
+                            $node_config = stripslashes($node_config);
+                    }
+
+                    $map->nodes[$node_name]->config_override = $node_config;
+
+                    $map->WriteConfig($mapfile);
+                    // now clear and reload the map object, because the in-memory one is out of sync
+                    // - we don't know what changes the user made here, so we just have to reload.
+                    unset($map);
+                    $map = new WeatherMap;
+                    $map->context = 'editor';
+                    $map->ReadConfig($mapfile);
+                }
 		break;
 
 	case 'set_node_properties':
@@ -280,7 +286,7 @@ else
 		$node_name = $_REQUEST['node_name'];
 		$new_node_name = $_REQUEST['node_new_name'];
 
-		if($node_name != $new_node_name)
+		if($node_name != $new_node_name && strpos($new_node_name," ") === false)
 		{
 			if(!isset($map->nodes[$new_node_name]))
 			{
@@ -365,59 +371,60 @@ else
 		$map->ReadConfig($mapfile);
 		$link_name = $_REQUEST['link_name'];
 
+                if(strpos($link_name," ") === false) {
+                        $map->links[$link_name]->width = floatval($_REQUEST['link_width']);
+                        $map->links[$link_name]->infourl[IN] = $_REQUEST['link_infourl'];
+                        $map->links[$link_name]->infourl[OUT] = $_REQUEST['link_infourl'];
+                        $urls = preg_split('/\s+/', $_REQUEST['link_hover'], -1, PREG_SPLIT_NO_EMPTY);
+                        $map->links[$link_name]->overliburl[IN] = $urls;
+                        $map->links[$link_name]->overliburl[OUT] = $urls;
 
-		$map->links[$link_name]->width = floatval($_REQUEST['link_width']);
-		$map->links[$link_name]->infourl[IN] = $_REQUEST['link_infourl'];
-		$map->links[$link_name]->infourl[OUT] = $_REQUEST['link_infourl'];
-		$urls = preg_split('/\s+/', $_REQUEST['link_hover'], -1, PREG_SPLIT_NO_EMPTY);
-		$map->links[$link_name]->overliburl[IN] = $urls;
-		$map->links[$link_name]->overliburl[OUT] = $urls;
+                        $map->links[$link_name]->comments[IN] =  $_REQUEST['link_commentin'];
+                        $map->links[$link_name]->comments[OUT] = $_REQUEST['link_commentout'];
+                        $map->links[$link_name]->commentoffset_in =  intval($_REQUEST['link_commentposin']);
+                        $map->links[$link_name]->commentoffset_out = intval($_REQUEST['link_commentposout']);
 
-		$map->links[$link_name]->comments[IN] =  $_REQUEST['link_commentin'];
-		$map->links[$link_name]->comments[OUT] = $_REQUEST['link_commentout'];
-		$map->links[$link_name]->commentoffset_in =  intval($_REQUEST['link_commentposin']);
-		$map->links[$link_name]->commentoffset_out = intval($_REQUEST['link_commentposout']);
+                        // $map->links[$link_name]->target = $_REQUEST['link_target'];
 
-		// $map->links[$link_name]->target = $_REQUEST['link_target'];
+                        $targets = preg_split('/\s+/',$_REQUEST['link_target'],-1,PREG_SPLIT_NO_EMPTY);
+                        $new_target_list = array();
 
-		$targets = preg_split('/\s+/',$_REQUEST['link_target'],-1,PREG_SPLIT_NO_EMPTY);
-		$new_target_list = array();
+                        foreach ($targets as $target)
+                        {
+                                // we store the original TARGET string, and line number, along with the breakdown, to make nicer error messages later
+                                $newtarget = array($target,'traffic_in','traffic_out',0,$target);
 
-		foreach ($targets as $target)
-		{
-			// we store the original TARGET string, and line number, along with the breakdown, to make nicer error messages later
-			$newtarget = array($target,'traffic_in','traffic_out',0,$target);
+                                // if it's an RRD file, then allow for the user to specify the
+                                // DSs to be used. The default is traffic_in, traffic_out, which is
+                                // OK for Cacti (most of the time), but if you have other RRDs...
+                                if(preg_match("/(.*\.rrd):([\-a-zA-Z0-9_]+):([\-a-zA-Z0-9_]+)$/i",$target,$matches))
+                                {
+                                        $newtarget[0] = $matches[1];
+                                        $newtarget[1] = $matches[2];
+                                        $newtarget[2] = $matches[3];
+                                }
+                                // now we've (maybe) messed with it, we'll store the array of target specs
+                                $new_target_list[] = $newtarget;
+                        }
+                        $map->links[$link_name]->targets = $new_target_list;
 
-			// if it's an RRD file, then allow for the user to specify the
-			// DSs to be used. The default is traffic_in, traffic_out, which is
-			// OK for Cacti (most of the time), but if you have other RRDs...
-			if(preg_match("/(.*\.rrd):([\-a-zA-Z0-9_]+):([\-a-zA-Z0-9_]+)$/i",$target,$matches))
-			{
-				$newtarget[0] = $matches[1];
-				$newtarget[1] = $matches[2];
-				$newtarget[2] = $matches[3];
-			}
-			// now we've (maybe) messed with it, we'll store the array of target specs
-			$new_target_list[] = $newtarget;
-		}
-		$map->links[$link_name]->targets = $new_target_list;
+                        $bwin = $_REQUEST['link_bandwidth_in'];
+                        $bwout = $_REQUEST['link_bandwidth_out'];
 
-		$bwin = $_REQUEST['link_bandwidth_in'];
-		$bwout = $_REQUEST['link_bandwidth_out'];
+                        if(isset($_REQUEST['link_bandwidth_out_cb']) && $_REQUEST['link_bandwidth_out_cb'] == 'symmetric')
+                        {
+                                $bwout = $bwin;
+                        }
 
-		if(isset($_REQUEST['link_bandwidth_out_cb']) && $_REQUEST['link_bandwidth_out_cb'] == 'symmetric')
-		{
-			$bwout = $bwin;
-		}
-
-		// $map->links[$link_name]->SetBandwidth($bwin,$bwout);
-		$map->links[$link_name]->max_bandwidth_in_cfg = $bwin;
-		$map->links[$link_name]->max_bandwidth_out_cfg = $bwout;
-		$map->links[$link_name]->max_bandwidth_in = unformat_number($bwin, $map->kilo);
-                $map->links[$link_name]->max_bandwidth_out = unformat_number($bwout, $map->kilo);
+                        // $map->links[$link_name]->SetBandwidth($bwin,$bwout);
+                        $map->links[$link_name]->max_bandwidth_in_cfg = $bwin;
+                        $map->links[$link_name]->max_bandwidth_out_cfg = $bwout;
+                        $map->links[$link_name]->max_bandwidth_in = unformat_number($bwin, $map->kilo);
+                        $map->links[$link_name]->max_bandwidth_out = unformat_number($bwout, $map->kilo);
 
 
-		$map->WriteConfig($mapfile);
+                        $map->WriteConfig($mapfile);
+                }
 		break;
 
 	case 'set_map_properties':

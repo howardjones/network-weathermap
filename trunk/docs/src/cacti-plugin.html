@@ -177,6 +177,32 @@
             - the Cacti poller does this work for you.</strong>
             </p>
 
+            <h3>Boost support</h3>
+            <p>With TheWitness' Boost plugin installed in Cacti, the rrd files
+            are no longer updated every poller cycle. This is a problem if you are
+            using regular rrdtool TARGETs. There is support in the Weathermap plugin
+            to directly access data from the poller instead of rrd files. You can
+            find out more in the <a href="targets.html#rrd">Targets Reference</a>.
+            </p>
+
+            <h3>DSStats support</h3>
+
+            <p>Another alternative, which requires changing your TARGET lines, is
+                the DSStats plugin, also by TheWitness. This also collects data
+                into the Cacti database, and has it's own benefits if you want
+                to produce periodic summary maps. You can
+            find out more in the <a href="targets.html#dsstats">Targets Reference</a>.</p>
+
+            <h3>Accessing extra Cacti data</h3>
+            <p>Both of the above datasource plugins allow you to access some
+            additional information from the Cacti database about the data being polled (see the Targets Reference for more).            
+            </p>
+            <p>Additionally, there are some other datasource plugins that can
+                access more information from Cacti:
+                <a href="targets.html#cactithold">cactithold</a> works with cigamit's THold plugin, and
+                <a href="targets.html#cactihost">cactihost</a> accesses Cacti's host status information.
+            </p>
+
             <h3>Final Notes and Troubleshooting</h3>
 
             <p class = "important">Weathermap has quite a lot of logging. If you have a
@@ -189,7 +215,30 @@
             <a href = "http://www.network-weathermap.com/">network-weathermap.com</a>
             website for more.</p>
 
-            <p>On the Weathermap management page, there is a 'Recalculate NOW' button.
+            
+            <h3>Recalculate Now</h3>
+            
+            <p>On the Weathermap management page, there used to be a 'Recalculate NOW' button.
+                It worked by running the normal map update process immediately, but did so 
+                as the user that runs the webserver. This causes some permissions problems 
+                that you need to understand in order to use it. People would just click it 
+                and complain it didn't work, or killed their maps. I added a warning explaining
+                the problem. People still complained. I removed the button.</p>
+            <p>
+                The code is all there still, so if you really promise not to ask me why your maps
+                all stopped working after you press the button, you can re-enable it. Simply open
+                weathermap-cacti-plugin-mgmt.php in and editor and change the line that says
+                <pre>
+                    $i_understand_file_permissions_and_how_to_fix_them = false;
+                </pre>
+                to
+                <pre>
+                    $i_understand_file_permissions_and_how_to_fix_them = true;
+                </pre>
+                Now you have the button, the following explains the issues in detail.
+            </p>
+
+            <p>
             This will try to recalculate all your maps on demand. This is more
             complicated than it sounds, due to file permissions! Normally, the Cacti
             poller would create the images and HTML files in the output directory, which

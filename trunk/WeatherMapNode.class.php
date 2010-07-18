@@ -410,8 +410,8 @@ class WeatherMapNode extends WeatherMapItem
                     $size = $this->iconscalew;
                     $quarter = $size / 4;
 
-                    $col1 = $this->colours[IN];
-                    $col2 = $this->colours[OUT];
+                    $col1 = $this->colours[OUT];
+                    $col2 = $this->colours[IN];
 
                     assert('!is_null($col1)');
                     assert('!is_null($col2)');

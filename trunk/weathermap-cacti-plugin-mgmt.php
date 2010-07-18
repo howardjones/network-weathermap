@@ -761,19 +761,24 @@ function addmap_picker($show_all = false)
             while ($file = readdir($dh)) {
                 $realfile = $weathermap_confdir . '/' . $file;
 
-                $used = in_array($file, $loaded);
-                $flags[$file] = '';
+                // skip .-prefixed files like .htaccess, since it seems
+                // that otherwise people will add them as map config files.
+                if( substr($file,0,1) != '.') {
+                    $used = in_array($file, $loaded);
+                    $flags[$file] = '';
 
-                if ($used)
-                    $flags[$file] = 'USED';
+                    if ($used) {
+                        $flags[$file] = 'USED';
+                    }
 
-                if (is_file($realfile)) {
-                    if ($used && !$show_all) {
-                        $skipped++;
-                    } else {
-                        $title = wmap_get_title($realfile);
-                        $titles[$file] = $title;
-                        $i++;
+                    if (is_file($realfile)) {
+                        if ($used && !$show_all) {
+                            $skipped++;
+                        } else {
+                            $title = wmap_get_title($realfile);
+                            $titles[$file] = $title;
+                            $i++;
+                        }
                     }
                 }
             }

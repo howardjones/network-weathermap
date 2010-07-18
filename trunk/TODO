@@ -3,6 +3,10 @@ Before 0.98
 
 FIXED/DONE Imagemap seems all wrong in editor?? - write a 'draw imagemap' function
 
+per-map debugging - needs UI to enable!
+map scheduling - needs UI
+consolidated map-properties page in UI? (variable settings, plus schedule, plus debug, plus runtime info, etc)
+
 FONTDEFINE can't tell if GD font is wrong-endian?
 Off-by-one in angled VIAs (only in one direction?? - test simple-link-5a.conf)
 Change non-scale colour handling to go into another colour table - no 'special'
@@ -20,9 +24,8 @@ collect usage_stats into an .xml file next to each map file
 standalone version of the cacti map browser
 DONE   track runtime per map
 DONE   improve cron string parsing
-add UI for cron
 improve usage_stats to cover non-regexp config
-allow IMAGEOUTPUTFILE/HTMLOUTPUTFILE/IMAGEURI to make a copy of the final image in Cacti mode
+allow IMAGEOUTPUTFILE/HTMLOUTPUTFILE/IMAGEURI to make a copy of the final image in Cacti mode http://forums.cacti.net/viewtopic.php?t=36279
 improve usage_stats to cover things other than keywords
 DONE more efficient ReadConfig - 50% of runtime!
 SORTOFDONE very simplified link drawing for classical no-via links.

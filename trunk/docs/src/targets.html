@@ -45,7 +45,7 @@
             situations where there is only really one output, the 'out' value may just
             be the same as the 'in'.</p>
 
-            <p>Here are the details of the standard data source plugins:
+            <p>Here are the details of the standard data source plugins:</p>
 
             <ul>
                 <li><a href = "#static">Static value</a></li>
@@ -72,7 +72,6 @@
 
                 <li><a href = "#time">Time</a></li>
             </ul>
-            </p>
 
             <hr />
 
@@ -227,6 +226,7 @@
             the cacti_graph_id to be the local_graph_id of a graph that uses this DS in
             Cacti. You can then use those to automatically add correct OVERLIBGRAPH and
             INFOURL lines:
+            </p>
 
             <div class = "example">
                 <pre>
@@ -251,7 +251,7 @@
                 plugin.</p>
             </div>
 
-            <p>As a final feature, if you add 'SET cacti_use_ifspeed 1' to either the
+            <p>As an additional sub-feature, if you add 'SET cacti_use_ifspeed 1' to either the
             link or node, or any item it inherits settings from (e.g. DEFAULT) then
             Weathermap will take the value of ifSpeed (or ifHighSpeed for 4G+ links) and
             use it in place of the value defined in the map config file
@@ -265,6 +265,12 @@
             Weathermap to work alongside Boost, then there is no workaround
             - the data isn't in the .rrd files until Boost's own update process puts it
             there sometime later.</p>
+
+            <p><strong>Performance Note:</strong>The additional queries to fill in the
+            interface information from the Cacti database can sometimes add significantly
+            to the runtime for the map. If you know you don't need the information, you
+            can disable those queries, while still using the poller_output support. To do this,
+            add 'SET rrd_no_cacti_extras 1' to the top of the map config file.</p>
 
             <h4>RRDtool Aggregation</h4>
 
@@ -310,7 +316,7 @@
             MRTG file by Weathermap.</p>
 
             <p>Since 0.95, there are a few hint variables that will adjust the behaviour
-            of this datasaource:
+            of this datasaource:</p>
 
             <ul>
                 <li><b>SET mrtg_swap 1</b>
@@ -329,8 +335,7 @@
                 - (per-link/node) allows you to choose between average, minimum, maximum
                 and current values - use 'av','min','max','cu' - default is 'cu'</li>
             </ul>
-            </p>
-
+            
             <hr />
 
             <h3><a name = "cactihost"></a>Cacti host status</h3>
@@ -375,7 +380,7 @@
             <em>cacti_recdate</em></p>.
 
             <p>An appropriate SCALE definition to get red, green, yellow and grey labels
-            based on the state of a host would be:
+            based on the state of a host would be:</p>
 
             <div class = "example">
                 <pre>SCALE cactiupdown 0 0.5  192 192 192
@@ -383,8 +388,7 @@
                                 SCALE cactiupdown 1.5 2.5 0 0 255
                                 SCALE cactiupdown 2.5 3.5 0 255 0 </pre>
             </div>
-            </p>
-
+            
             <hr />
 
             <h3><a name = "cactithold"></a>Cacti threshold status</h3>
@@ -423,7 +427,7 @@
             cactimonitor: TARGET and multiple icons. Create a set of coloured (or
             otherwise different) icons for your node
             - they should have 'up','down','disabled','recovering' and 'tholdbreached'
-            in the names. Then:
+            in the names. Then:</p>
 
             <div class = "example">
                 <pre>
@@ -436,7 +440,7 @@
                                       USESCALE none
 </pre>
             </div>
-
+            <p>
             Will allow you to change the icon between images/server_up.png,
             images/server_down.png etc.. as the state in Cacti changes and thresholds
             are breached. The 'USESCALE none' on the end stops the label for the node
@@ -446,7 +450,7 @@
             a value that is effectively a 'percentage badness' for a set of thresholds.
             Suppose you have a set of load-balanced firewalls, and you want to see how
             many of the set have exceeded their session count. You would set up
-            thresholds on each firewall as normal, and then:
+            thresholds on each firewall as normal, and then:</p>
 
             <div class = "example">
                 <pre>
@@ -457,7 +461,7 @@
                                             USESCALE badness in
 </pre>
             </div>
-
+            <p>
             defines a scale where 0 is green and 100% is red and in between is a smooth
             gradient. Each target will return either 0 or 1, so 100% failed thresholds
             gives a value of 4. Setting the MAXVALUE to 4 makes that 100% within
@@ -520,6 +524,13 @@
                                     TARGET 8*dsstats:4455:traffic_in:traffic_out
 </pre>
             </div>
+
+            <p><strong>Performance Note:</strong>As with the rrdtool poller_output support,
+                the additional queries to fill in the
+            interface information from the Cacti database can sometimes add significantly
+            to the runtime for the map. If you know you don't need the information, you
+            can disable those queries, while still using DSStats support. To do this,
+            add 'SET dsstats_no_cacti_extras 1' to the top of the map config file.</p>
 
             <hr />
 

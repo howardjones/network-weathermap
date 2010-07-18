@@ -1,12 +1,13 @@
 <?php
 #
 # Change the uncommented line to point to your Cacti installation
+# The default is probably a good guess, but an exact path is more reliable.
 #
 # $cacti_base = "C:/Program Files/xampp/htdocs/cacti/";
-$cacti_base = '/var/www/html/cacti/';
+# $cacti_base = '/var/www/html/cacti/';
+# $cacti_base = '/Applications/XAMPP/htdocs/cacti/';
+# $cacti_base = '/XAMPP/htdocs/cacti-0.8.7e/';
 
-$cacti_base = '/Applications/XAMPP/htdocs/cacti/';
-$cacti_base = '/XAMPP/htdocs/cacti-0.8.7e/';
 $cacti_base = '../../';
 
 // check if the goalposts have moved

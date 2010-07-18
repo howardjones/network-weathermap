@@ -1,4 +1,6 @@
 <?php
+ob_start();
+
 if (isset($argv)) {
     $env = "CLI";
 } else {

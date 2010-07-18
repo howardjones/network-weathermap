@@ -633,8 +633,10 @@ function RotateAboutPoint(&$points, $cx, $cy, $angle = 0)
     $npoints = count($points) / 2;
 
     for ($i = 0; $i < $npoints; $i++) {
+
         $ox = $points[$i * 2] - $cx;
         $oy = $points[$i * 2 + 1] - $cy;
+
         $rx = $ox * cos($angle) - $oy * sin($angle);
         $ry = $oy * cos($angle) + $ox * sin($angle);
 
@@ -2009,6 +2011,18 @@ class Vector
     function get_angle()
     {
          return rad2deg(atan2(-($this->dy), ($this->dx)));
+    }
+
+    function rotate($angle)
+    {
+        $points = array();
+        $points[0] = $this->dx;
+        $points[1] = $this->dy;
+
+        RotateAboutPoint(&$points, 0, 0, $angle);
+
+        $this->dx = $points[0];
+        $this->dy = $points[1];
     }
 
     function get_normal()

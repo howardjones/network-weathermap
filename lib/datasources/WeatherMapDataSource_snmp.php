@@ -96,7 +96,7 @@ class WeatherMapDataSource_snmp extends WeatherMapDataSource
                 if ($in_oid != '-') {
                     $in_result = snmpget($host, $community, $in_oid, $timeout, $retries);
 
-                    if ($in_result) {
+                    if ($in_result !== FALSE) {
                         $data[IN] = floatval($in_result);
                         $item->add_hint("snmp_in_raw", $in_result);
                     } else {
@@ -108,7 +108,7 @@ class WeatherMapDataSource_snmp extends WeatherMapDataSource
                     $out_result =
                         snmpget($host, $community, $out_oid, $timeout, $retries);
 
-                    if ($out_result) {
+                    if ($out_result !== FALSE) {
 // use floatval() here to force the output to be *some* kind of number
 // just in case the stupid formatting stuff doesn't stop net-snmp returning 'down' instead of 2
                         $data[OUT] = floatval($out_result);

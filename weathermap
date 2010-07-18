@@ -254,7 +254,7 @@ if ($map->ReadConfig($configfile)) {
                 $map->ReadData();
           }
     }
-
+    
     if ($imagefile != '') {
             $map->DrawMap($imagefile);
             $map->imagefile=$imagefile;

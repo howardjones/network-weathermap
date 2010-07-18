@@ -2114,6 +2114,121 @@ class WeatherMap extends WeatherMapBase
         }
     }
 
+     // nodename is a vestigal parameter, from the days when nodes were just big labels
+    function DrawLabelRotatedMulti($im, $x, $y, $angle, $text, $font, $padding, $linkname,
+        $textcolour, $bgcolour, $outlinecolour, &$map, $direction)
+    {
+        if (abs($angle) > 90) {
+            $angle -= 180;
+        }
+
+        if ($angle < -180) {
+            $angle += 360;
+        }
+
+        $lines = explode("\n", $text);
+        $lengths = array();
+        $heights = array();
+
+        $maxheight = 0;
+        foreach ($lines as $line)
+        {
+            list($strwidth, $strheight) = $this->myimagestringsize($font, $line);
+            $lengths[] = $strwidth;
+            $heights[] = $strheight;
+            $maxheight += $strheight;
+        }
+
+        $maxwidth = max($lengths);
+        // $maxheight = max($heights);
+
+        $rangle = -deg2rad($angle);
+
+        $extra = 3;
+
+        $x1 = $x - ($maxwidth / 2) - $padding - $extra;
+        $x2 = $x + ($maxwidth / 2) + $padding + $extra;
+        $y1 = $y - ($maxheight / 2) - $padding - $extra;
+        $y2 = $y + ($maxheight / 2) + $padding + $extra;
+
+                // a box. the last point is the start point for the text.
+        $points = array (
+            $x1,
+            $y1,
+            $x1,
+            $y2,
+            $x2,
+            $y2,
+            $x2,
+            $y1,
+            $x - $maxwidth / 2,
+            $y + $maxheight / 2 + 1
+        );
+
+        $npoints = count($points) / 2;
+
+        //if($angle != 0) {
+            RotateAboutPoint($points, $x, $y, $rangle);
+            # RotateAboutPoint($points, $x, $y, -$rangle);
+        //}
+
+        # $rangle = 0;
+        # $angle = 0;
+
+        if ($bgcolour != array (
+            -1,
+            -1,
+            -1
+        )) {
+            // $bgcol = myimagecolorallocate($im, $bgcolour->red, $bgcolour[1], $bgcolour[2]);
+            $bgcol = $bgcolour->gdallocate($im);
+            # imagefilledrectangle($im, $x1, $y1, $x2, $y2, $bgcol);
+            imagefilledpolygon($im, $points, 4, $bgcol);
+            print "FILL\n";
+        }
+
+        if ($outlinecolour != array (
+            -1,
+            -1,
+            -1
+        )) {
+            // $outlinecol = myimagecolorallocate($im, $outlinecolour[0], $outlinecolour[1],           $outlinecolour[2]);
+            $outlinecol = $outlinecolour->gdallocate($im);
+            imagepolygon($im, $points, 4, $outlinecol);
+            print "OUTLINE\n";
+        }
+
+        // $textcol = myimagecolorallocate($im, $textcolour[0], $textcolour[1], $textcolour[2]);
+        $textcol = $textcolour->gdallocate($im);
+
+        $i = 0;
+        $h = 0;
+
+        $dir = new Vector(0,1);
+        $dir->rotate($rangle);
+        $normal = $dir->get_normal();
+
+        $centreline = new Point($x, $y);
+        $centreline->AddVector($dir, -$maxheight/2);
+
+        foreach ($lines as $line)
+        {
+            $h += $heights[$i];
+            
+            $pos = new Point($centreline->x, $centreline->y);
+
+            $pos->AddVector($dir, $h);
+            $pos->AddVector($normal, -$lengths[$i]/2);
+
+//            wm_draw_marker_box($im, $textcol, $centreline->x, $centreline->y);
+
+            $this->myimagestring($im, $font, $pos->x, $pos->y, $line, $textcol, $angle);
+            
+            $i++;
+            
+        }
+    }
+
     // nodename is a vestigal parameter, from the days when nodes were just big labels
     function DrawLabelRotated($im, $x, $y, $angle, $text, $font, $padding, $linkname,
         $textcolour, $bgcolour, $outlinecolour, &$map, $direction)
@@ -3221,7 +3336,7 @@ class WeatherMap extends WeatherMapBase
 
             if ($fd) {
                 while (!feof($fd)) {
-                    $buffer = fgets($fd, 4096);
+                    $buffer = fgets($fd, 16384);
                     // strip out any Windows line-endings that have gotten in here
                     $buffer = str_replace("\r", "", $buffer);
                     $lines[] = $buffer;
@@ -4481,6 +4596,25 @@ class WeatherMap extends WeatherMapBase
             // debugging for editor imagemap issues
             // $this->imap->Draw($image, $overlay);
 
+            $this->DrawLabelRotatedMulti($image, 400, 450, 1, "This is\nMultiline\ntext\nwith one longer line", 10, 2,"poop",
+                        new Colour(0,0,0), new Colour(255,255,255), new Colour(255,0,0), $this, IN);
+
+
+            $this->DrawLabelRotatedMulti($image, 200, 250, 45, "dc2-router\n192.168.0.1", 10, 2,"poop",
+                        new Colour(0,0,0), new Colour(255,255,255), new Colour(255,0,0), $this, IN);
+
+            $this->DrawLabelRotatedMulti($image, 200, 450, 0, "This is\nMultiline\ntext\nwith one longer line", 10, 2,"poop",
+                        new Colour(0,0,0), new Colour(255,255,255), new Colour(255,0,0), $this, IN);
+
+            $this->DrawLabelRotatedMulti($image, 200, 100, 90, "This is\nMultiline\ntext\nwith one longer line", 10, 2,"poop",
+                        new Colour(0,0,0), new Colour(255,255,255), new Colour(255,0,0), $this, IN);
+
+            $this->DrawLabelRotatedMulti($image, 400, 100, 30, "This is\nMultiline\ntext\nwith one longer line", 10, 2,"poop",
+                        new Colour(0,0,0), new Colour(255,255,255), new Colour(255,0,0), $this, IN);
+
+            $this->DrawLabelRotatedMulti($image, 400, 250, 10, "This is\nMultiline\ntext\nwith one longer line", 10, 2,"poop",
+                        new Colour(0,0,0), new Colour(255,255,255), new Colour(255,0,0), $this, IN);
+
             // Ready to output the results...
 
             if ($filename == 'null') {
@@ -4632,7 +4766,10 @@ class WeatherMap extends WeatherMapBase
             while (list($k, ) = each($objects)) {
                 unset($myobj);
                 $myobj = &$objects[$k];
-
+                #print get_class($myobj);
+                #if(get_class($myobj) =='stdClass') {
+                #    print_r($myobj);
+                #}
                 $type = $myobj->my_type();
                 $prefix = substr($type, 0, 1);
 

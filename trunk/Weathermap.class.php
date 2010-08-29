@@ -2118,12 +2118,18 @@ class WeatherMap extends WeatherMapBase
     function DrawLabelRotatedMulti($im, $x, $y, $angle, $text, $font, $padding, $linkname,
         $textcolour, $bgcolour, $outlinecolour, &$map, $direction)
     {
+
+        while($angle < 0) {
+            $angle += 360;
+        }
+
+
         if (abs($angle) > 90) {
-            $angle -= 180;
+#            $angle -= 180;
         }
 
         if ($angle < -180) {
-            $angle += 360;
+ #           $angle += 360;
         }
 
         $lines = explode("\n", $text);
@@ -2139,7 +2145,10 @@ class WeatherMap extends WeatherMapBase
             $maxheight += $strheight;
         }
 
-        $maxwidth = max($lengths);
+        // add some slop in here, because GD doesn't stick to it's own
+        // extents on angled text
+        $maxwidth = max($lengths) * 1.1;
+
         // $maxheight = max($heights);
 
         $rangle = -deg2rad($angle);
@@ -2168,9 +2177,14 @@ class WeatherMap extends WeatherMapBase
         $npoints = count($points) / 2;
 
         //if($angle != 0) {
-            RotateAboutPoint($points, $x, $y, $rangle);
-            # RotateAboutPoint($points, $x, $y, -$rangle);
-        //}
+
+        $onedegree = deg2rad(1);
+
+        for( $i=0; $i<$angle; $i++) {
+         //   RotateAboutPoint($points, $x, $y, $rangle);
+            RotateAboutPoint($points, $x, $y, -$onedegree);
+        }
+            # RotateAboutPoint($points, $x, $y, -$rangle);        //}
 
         # $rangle = 0;
         # $angle = 0;
@@ -3673,7 +3687,7 @@ class WeatherMap extends WeatherMapBase
                     // one REGEXP to rule them all:
                     if (($linematched == 0)
                         && preg_match(
-                            "/^\s*SCALE\s+([A-Za-z][A-Za-z0-9_]*\s+)?(\-?\d+\.?\d*[munMGT]?)\s+(\-?\d+\.?\d*[munMGT]?)\s+(?:(\d+)\s+(\d+)\s+(\d+)(?:\s+(\d+)\s+(\d+)\s+(\d+))?|(none))\s*(.*)$/i",
+                            "/^\s*SCALE\s+([A-Za-z][A-Za-z0-9_]*\s+)?(\-?\d+\.?\d*[munKMGT]?)\s+(\-?\d+\.?\d*[munKMGT]?)\s+(?:(\d+)\s+(\d+)\s+(\d+)(?:\s+(\d+)\s+(\d+)\s+(\d+))?|(none))\s*(.*)$/i",
                             $buffer, $matches)) {
                         // The default scale name is DEFAULT
                         if ($matches[1] == '')
@@ -4442,13 +4456,16 @@ class WeatherMap extends WeatherMapBase
 
             $this->AllocateScaleColours($image);
 
-// fill with background colour anyway, in case the background image failed to load
-            imagefilledrectangle($image, 0, 0, $this->width, $this->height,
-                $this->colours['DEFAULT']['BG']['gdref1']);
-
+            
             if ($bgimage) {
                 imagecopy($image, $bgimage, 0, 0, 0, 0, $this->width, $this->height);
                 imagedestroy($bgimage);
+            }
+            else
+            {
+                // fill with background colour anyway, since the background image failed to load
+                imagefilledrectangle($image, 0, 0, $this->width, $this->height,
+                                $this->colours['DEFAULT']['BG']['gdref1']);
             }
 
 // Now it's time to draw a map
@@ -4596,7 +4613,7 @@ class WeatherMap extends WeatherMapBase
             // debugging for editor imagemap issues
             // $this->imap->Draw($image, $overlay);
 
-            $this->DrawLabelRotatedMulti($image, 400, 450, 1, "This is\nMultiline\ntext\nwith one longer line", 10, 2,"poop",
+            $this->DrawLabelRotatedMulti($image, 400, 450, 361, "This is\nMultiline\ntext\nwith one longer line", 10, 2,"poop",
                         new Colour(0,0,0), new Colour(255,255,255), new Colour(255,0,0), $this, IN);
 
 
@@ -4612,7 +4629,7 @@ class WeatherMap extends WeatherMapBase
             $this->DrawLabelRotatedMulti($image, 400, 100, 30, "This is\nMultiline\ntext\nwith one longer line", 10, 2,"poop",
                         new Colour(0,0,0), new Colour(255,255,255), new Colour(255,0,0), $this, IN);
 
-            $this->DrawLabelRotatedMulti($image, 400, 250, 10, "This is\nMultiline\ntext\nwith one longer line", 10, 2,"poop",
+            $this->DrawLabelRotatedMulti($image, 400, 250, 1, "This is\nMultiline\ntext\nwith one longer line", 10, 2,"poop",
                         new Colour(0,0,0), new Colour(255,255,255), new Colour(255,0,0), $this, IN);
 
             // Ready to output the results...

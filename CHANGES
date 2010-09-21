@@ -4,6 +4,7 @@
         FIXED - NINK colours were exchanged (thanks Deathwing00!)
         FIXED - check-gdbug.php shouldn't complain about empty ob_flush buffers anymore
         FIXED - SNMP DS should deal better with non-numeric (and blank) return values
+        FIXED - absolute SCALE definitions didn't support K (thanks wwwdrich)
         CHANGE - lots of performance optimisations. Roughly twice as fast as 0.97a.
         CHANGE - no longer shows .-prefixed files in map config picker
         CHANGE - editor ignores attempts to rename nodes to have space in names
@@ -12,6 +13,7 @@
         ADDED - per-map debugging (debug a single map in Cacti without running debug logging for the whole poller)
 	ADDED - Cacti template for monitoring Weathermap performance/mapcount/warningcount/memory.
 	ADDED - KEYBGCOLOR and KEYOUTLINECOLOR both accept 'none'
+	ADDED - Ability to disable any warning with 'SET nowarn_WMxxx 1'
         ADDED - USEICONSCALE works to colour artificial icons
         ADDED - performance options to disable additional information checks in rrd and dstats data plugins.
 		

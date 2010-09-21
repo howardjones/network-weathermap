@@ -209,7 +209,7 @@ function weathermap_run_maps($mydir)
                 $mapfile = $confdir . DIRECTORY_SEPARATOR . $map['configfile'];
                 $htmlfile = $outdir . DIRECTORY_SEPARATOR . $map['filehash'] . '.html';
                 $statsfile = $outdir . DIRECTORY_SEPARATOR . $map['filehash'] . '.stats.xml';
-                $resultsfile = $outdir . DIRECTORY_SEPARATOR . $map['filehash'] . '.results.xml';
+                $resultsfile = $outdir . DIRECTORY_SEPARATOR . $map['filehash'] . '.results.txt';
 
                 $imagefile = $outdir . DIRECTORY_SEPARATOR . $map['filehash'] . '.'
                     . $imageformat;
@@ -331,12 +331,9 @@ function weathermap_run_maps($mydir)
                                 . " - permissions of output directory are wrong? [WMPOLL03]\n");
                         }
                     }
-
-                    $fd = @fopen($statsfile, 'w');
-					fclose($fd);
-					
-                    $fd = @fopen($resultsfile, 'w');
-					fclose($fd);
+                    
+                    $wmap->DumpStats($statsfile);
+                    $wmap->WriteDataFile($resultsfile);
 
                     $processed_title = $wmap->ProcessString($wmap->title, $wmap);
 

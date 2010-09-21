@@ -233,6 +233,9 @@ if ($map->ReadConfig($configfile)) {
             }
     }
 
+    $map->dataoutputfile = "weathermap.data.txt";
+    $map->statsoutputfile = "weathermap.stats.txt";
+
     // feed in any command-line defaults, so that they appear as if SET lines in the config
 
     // XXX FIXME
@@ -269,12 +272,16 @@ if ($map->ReadConfig($configfile)) {
             $map->WriteConfig($dumpconfig);
     }
 
-	if( $trackcoverage===1 ) {
-		$map->SaveCoverage($coveragefile);
-	}
+    if( $trackcoverage===1 ) {
+            $map->SaveCoverage($coveragefile);
+    }
 	
     if ($dumpstats != '') {
             $map->DumpStats();
+    }
+
+    if ($map->dataoutputfile != '') {
+            $map->WriteDataFile($map->dataoutputfile);
     }
 
     if ($dumpafter == 1) {

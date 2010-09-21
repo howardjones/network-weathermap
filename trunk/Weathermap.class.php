@@ -1,5 +1,5 @@
 <?php
-/** PHP Weathermap 0.97a
+/** PHP Weathermap 0.98
  * Copyright Howard Jones, 2005-2010 howie@thingy.com
  * http://www.network-weathermap.com/
  * Released under the GNU Public License
@@ -16,10 +16,15 @@ $WEATHERMAP_VERSION = '0.98dev';
 $weathermap_debugging = false;
 $weathermap_map = '';
 $weathermap_warncount = 0;
+
+// don't produce debug output for these functions
 $weathermap_debug_suppress = array (
     'processstring',
     'mysprintf'
 );
+
+// don't output warnings/errors for these codes (WMxxx)
+$weathermap_error_suppress = array();
 
 $weathemap_lazycounter = 0;
 
@@ -130,6 +135,11 @@ $WM_config_keywords2 = array (
             'GLOBAL',
             '/^IMAGEOUTPUTFILE\s+(.*)\s*$/i',
             array ('imageoutputfile' => 1)
+        ),),
+        'DATAOUTPUTFILE' => array (array (
+            'GLOBAL',
+            '/^DATAOUTPUTFILE\s+(.*)\s*$/i',
+            array ('dataoutputfile' => 1)
         ),),
         'IMAGEURI' => array (array (
             'GLOBAL',
@@ -1186,6 +1196,7 @@ class WeatherMap extends WeatherMapBase
     var $keytext, $stamptext, $datestamp;
     var $min_data_time, $max_data_time;
     var $htmloutputfile, $imageoutputfile;
+    var $dataoutputfile, $statsoutputfile;
     var $htmlstylesheet;
     var $defaultlink, $defaultnode;
     var $need_size_precalc;
@@ -1235,6 +1246,8 @@ class WeatherMap extends WeatherMapBase
             'imageoutputfile' => '',
             'imageuri' => '',
             'htmloutputfile' => '',
+            'dataoutputfile' => '',
+            'statsoutputfile' => '',
             'htmlstylesheet' => '',
             'labelstyle' => 'percent', // redundant?
             'htmlstyle' => 'static',
@@ -3055,14 +3068,26 @@ class WeatherMap extends WeatherMapBase
     function ReadConfig_Handle_SET($fullcommand, $args, $matches, &$curobj, $filename,
         $linecount)
     {
+        global $weathermap_error_suppress;
+        
         if (preg_match("/^SET\s+(\S+)\s+(.*)\s*$/i", $fullcommand, $matches)) {
             $curobj->add_hint($matches[1], trim($matches[2]));
+            
+            if($curobj->my_type() == "map" && substr($matches[1],0,7)=='nowarn_') {
+                $weathermap_error_suppress[$matches[1]] = 1;
+            }
+
             return true;
         }
 
         // allow setting a variable to ""
         if (preg_match("/^SET\s+(\S+)\s*$/i", $fullcommand, $matches)) {
             $curobj->add_hint($matches[1], '');
+
+            if($curobj->my_type() == "map" && substr($matches[1],0,7)=='nowarn_') {
+                $weathermap_error_suppress[$matches[1]] = 1;
+            }
+
             return true;
         }
 
@@ -4073,6 +4098,32 @@ class WeatherMap extends WeatherMapBase
         }
     }
 
+    function WriteDataFile($filename)
+    {
+        if($filename != "") {
+
+            $fd = fopen($filename, 'w');
+            $output = '';
+
+            if($fd) {
+
+                foreach ($this->nodes as $node) {
+                    if (!preg_match("/^::\s/", $node->name) && sizeof($node->targets)>0 )  {
+                        fputs($fd, sprintf("N_%s\t%f\t%f\r\n", $node->name, $node->bandwidth_in, $node->bandwidth_out));
+                    }
+                }
+
+                foreach ($this->links as $link) {
+                    if (!preg_match("/^::\s/", $link->name) && sizeof($link->targets)>0) {
+                        fputs($fd, sprintf("L_%s\t%f\t%f\r\n", $link->name, $link->bandwidth_in, $link->bandwidth_out));
+                    }
+                }
+                    
+                fclose($fd);
+            }
+        }
+    }
+
     function WriteConfig($filename)
     {
         global $WEATHERMAP_VERSION;
@@ -4147,6 +4198,16 @@ class WeatherMap extends WeatherMapBase
                 array (
                     'htmloutputfile',
                     'HTMLOUTPUTFILE',
+                    CONFIG_TYPE_LITERAL
+                ),
+                array (
+                    'statsoutputfile',
+                    'STATSOUTPUTFILE',
+                    CONFIG_TYPE_LITERAL
+                ),
+                array (
+                    'dataoutputfile',
+                    'DATAOUTPUTFILE',
                     CONFIG_TYPE_LITERAL
                 ),
                 array (
@@ -4612,25 +4673,6 @@ class WeatherMap extends WeatherMapBase
 
             // debugging for editor imagemap issues
             // $this->imap->Draw($image, $overlay);
-
-            $this->DrawLabelRotatedMulti($image, 400, 450, 361, "This is\nMultiline\ntext\nwith one longer line", 10, 2,"poop",
-                        new Colour(0,0,0), new Colour(255,255,255), new Colour(255,0,0), $this, IN);
-
-
-            $this->DrawLabelRotatedMulti($image, 200, 250, 45, "dc2-router\n192.168.0.1", 10, 2,"poop",
-                        new Colour(0,0,0), new Colour(255,255,255), new Colour(255,0,0), $this, IN);
-
-            $this->DrawLabelRotatedMulti($image, 200, 450, 0, "This is\nMultiline\ntext\nwith one longer line", 10, 2,"poop",
-                        new Colour(0,0,0), new Colour(255,255,255), new Colour(255,0,0), $this, IN);
-
-            $this->DrawLabelRotatedMulti($image, 200, 100, 90, "This is\nMultiline\ntext\nwith one longer line", 10, 2,"poop",
-                        new Colour(0,0,0), new Colour(255,255,255), new Colour(255,0,0), $this, IN);
-
-            $this->DrawLabelRotatedMulti($image, 400, 100, 30, "This is\nMultiline\ntext\nwith one longer line", 10, 2,"poop",
-                        new Colour(0,0,0), new Colour(255,255,255), new Colour(255,0,0), $this, IN);
-
-            $this->DrawLabelRotatedMulti($image, 400, 250, 1, "This is\nMultiline\ntext\nwith one longer line", 10, 2,"poop",
-                        new Colour(0,0,0), new Colour(255,255,255), new Colour(255,0,0), $this, IN);
 
             // Ready to output the results...
 
@@ -5330,6 +5372,10 @@ class WeatherMap extends WeatherMapBase
 
         if ($filename === '') {
             print $report;
+        } else {
+            $fd = fopen($filename);
+            fputs($fd, $report);
+            fclose($fd);
         }
     }
 	

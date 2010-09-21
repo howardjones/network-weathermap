@@ -1,5 +1,5 @@
 <?php
-/** PHP Weathermap 0.97a
+/** PHP Weathermap 0.98
  * Copyright Howard Jones, 2005-2010 howie@thingy.com
  * http://www.network-weathermap.com/
  * Released under the GNU Public License

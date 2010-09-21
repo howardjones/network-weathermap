@@ -1,5 +1,5 @@
 <?php
-/** PHP Weathermap 0.97a
+/** PHP Weathermap 0.98
  * Copyright Howard Jones, 2005-2010 howie@thingy.com
  * http://www.network-weathermap.com/
  * Released under the GNU Public License
@@ -128,13 +128,25 @@ function debug($string)
  * @param string $string
  * @param boolean $notice_only Whether or not to prefix the string with WARNING
  */
-function warn($string, $notice_only = false)
+function warn($string, $notice_only = false, $code="")
 {
     global $weathermap_map;
     global $weathermap_warncount;
+    global $weathermap_error_suppress;
 
     $message = '';
-    
+
+    if($code == "" && preg_match('/\[(WM\w+)\]/', $string, $matches)) {
+        $code = $matches[1];
+    }
+
+    if ( (true === is_array($weathermap_error_suppress))
+                && ( true === in_array(strtoupper($code), $weathermap_error_suppress))) {
+                
+                // This error code has been deliberately disabled.
+                return;
+    }
+
     if (false === $notice_only) {
         $weathermap_warncount++;
         $message .= 'WARNING: ';

@@ -104,7 +104,8 @@ function show_editor_startpage()
                 $note = "";
 
                 if ((is_file($realfile)) && (is_readable($realfile))
-                    && (!preg_match("/^\./", $file))) {
+                        && ( !preg_match("/\.php$/", $file))
+                        && (!preg_match("/^\./", $file))) {
                     if (!is_writable($realfile)) {
                         $note .= "(read-only)";
                     }

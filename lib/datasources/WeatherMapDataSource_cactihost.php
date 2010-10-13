@@ -36,16 +36,25 @@ class WeatherMapDataSource_cactihost extends WeatherMapDataSource
             $cacti_id = intval($matches[1]);
 
             $SQL = "select * from host where id=$cacti_id";
+
             // 0=disabled
             // 1=down
             // 2=recovering
             // 3=up
+            // (4 is tholdbreached in cactimonitor, so skipped here for compatibility)
+            // 5=unknown
 
             $state = -1;
             $result = db_fetch_row($SQL);
 
             if (isset($result)) {
 // create a note, which can be used in icon filenames or labels more nicely
+
+                if ($result['status'] == 5) {
+                    $state = 5;
+                    $statename = 'unknown';
+                }
+
                 if ($result['status'] == 1) {
                     $state = 1;
                     $statename = 'down';

@@ -143,6 +143,7 @@ class WeatherMapDataSource_cactithold extends WeatherMapDataSource
                 // 2=recovering
                 // 3=up
                 // 4=tholdbreached
+                // 5=unknown
 
                 $state = -1;
                 $statename = '';
@@ -168,6 +169,11 @@ class WeatherMapDataSource_cactithold extends WeatherMapDataSource
                     if ($result['disabled'] === true) {
                         $state = 0;
                         $statename = 'disabled';
+                    }
+
+                    if ($result['status'] == 5) {
+                        $state = 5;
+                        $statename = 'unknown';
                     }
 
                     $data[IN] = $state;

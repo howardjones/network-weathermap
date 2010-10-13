@@ -16,6 +16,7 @@
 	ADDED - Ability to disable any warning with 'SET nowarn_WMxxx 1'
         ADDED - USEICONSCALE works to colour artificial icons
         ADDED - performance options to disable additional information checks in rrd and dstats data plugins.
+        ADDED - cactihost and cactimonitor targets both return 5 for 'unknown' (according to Cacti) (thanks djnono17)
 		
 0.97a	FIXED - Incorrect action URL in 'map selector' combo box for Cacti users.
 	FIXED - cacti_graph_id set to 0 instead of ID, by rrd/poller_output and dsstats plugins (thanks sh0x)

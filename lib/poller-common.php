@@ -297,6 +297,7 @@ function weathermap_run_maps($mydir)
                     $wmap->ReadData();
                     weathermap_memory_check('MEM postdata ' . $mapcount);
 
+                    $configured_imageuri = $wmap->imageuri;
                     $wmap->imageuri = 'weathermap-cacti-plugin.php?action=viewimage&id='
                         . $map['filehash'] . '&time=' . time();
 
@@ -330,6 +331,36 @@ function weathermap_run_maps($mydir)
                             warn('Failed to create ' . $htmlfile
                                 . " - permissions of output directory are wrong? [WMPOLL03]\n");
                         }
+                    }
+
+                    // put back the configured imageuri
+                    $wmap->imageuri = $configured_imageuri;
+
+                    // if an htmloutputfile was configured, output the HTML there too
+                    // but using the configured imageuri and imagefilename
+                    if($wmap->htmloutputfile != "") {
+                        $htmlfile = $wmap->htmloutputfile;
+                        $fd = @fopen($htmlfile, 'w');
+
+                        if ($fd !== false) {
+                            fwrite($fd,
+                                $wmap->MakeHTML('weathermap_' . $map['filehash'] . '_imap'));
+                            fclose($fd);
+                            debug("Wrote HTML to %s\n", $htmlfile);
+                        } else {
+                            if (true === file_exists($htmlfile)) {
+                                warn('Failed to overwrite ' . $htmlfile
+                                    . " - permissions of existing file are wrong? [WMPOLL02]\n");
+                            } else {
+                                warn('Failed to create ' . $htmlfile
+                                    . " - permissions of output directory are wrong? [WMPOLL03]\n");
+                            }
+                        }
+                    }
+
+                    if($wmap->imageoutputfile != "" && $wmap->imageoutputfile != "weathermap.png") {
+                        // TODO - copy the existing file to the configured location too
+                        copy($imagefile, $wmap->imageoutputfile);
                     }
                     
                     $wmap->DumpStats($statsfile);

@@ -5373,7 +5373,7 @@ class WeatherMap extends WeatherMapBase
         if ($filename === '') {
             print $report;
         } else {
-            $fd = fopen($filename);
+            $fd = fopen($filename,"w");
             fputs($fd, $report);
             fclose($fd);
         }

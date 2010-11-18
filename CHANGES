@@ -12,11 +12,14 @@
         ADDED - per-map runtime logging
         ADDED - per-map debugging (debug a single map in Cacti without running debug logging for the whole poller)
 	ADDED - Cacti template for monitoring Weathermap performance/mapcount/warningcount/memory.
+        ADDED - when running from Cacti, HTMLOUTPUTFILE, IMAGEOUTPUTFILE and IMAGEURI can be used to create a second copy of the output.
 	ADDED - KEYBGCOLOR and KEYOUTLINECOLOR both accept 'none'
 	ADDED - Ability to disable any warning with 'SET nowarn_WMxxx 1'
         ADDED - USEICONSCALE works to colour artificial icons
         ADDED - performance options to disable additional information checks in rrd and dstats data plugins.
         ADDED - cactihost and cactimonitor targets both return 5 for 'unknown' (according to Cacti) (thanks djnono17)
+        ADDED - new DATAOUTPUTFILE allows collected data to be written to a file for later use (automatically on in Cacti)
+        ADDED - new wmdata: datasource plugin can read data from files produced by DATAOUTPUTFILE
 		
 0.97a	FIXED - Incorrect action URL in 'map selector' combo box for Cacti users.
 	FIXED - cacti_graph_id set to 0 instead of ID, by rrd/poller_output and dsstats plugins (thanks sh0x)

@@ -908,16 +908,21 @@ class WeatherMapScale
     var $keyoutlinecolour;
     var $keybgcolour;
     var $scalemisscolour;
+    var $owner;
 
-    function WeatherMapScale($name)
+    function WeatherMapScale($name, &$owner)
     {
         $this->name = $name;
-     
-        $this->Reset();
+             
+        $this->Reset($owner);
     }
 
-    function Reset()
+    function Reset(&$owner)
     {
+        $this->owner = $owner;
+
+        assert($this->owner->kilo != 0);
+        
         $this->keypos = array();
         $this->keystyle = 'classic';
         $this->colours = array();
@@ -930,6 +935,9 @@ class WeatherMapScale
         $this->SetColour("KEYOUTLINE", new Colour(0,0,0));
         $this->SetColour("KEYTEXT", new Colour(0,0,0));
         $this->SetColour("SCALEMISS", new Colour(255,255,255));
+
+        assert(isset($owner));
+
     }
 
     function SpanCount()
@@ -945,6 +953,9 @@ class WeatherMapScale
 
     function SetColour($name, $colour)
     {
+        assert(isset($this->owner));
+        assert($this->owner->kilo != 0);
+        
         switch (strtoupper($name))
         {
             case 'KEYTEXT':
@@ -967,17 +978,23 @@ class WeatherMapScale
 
     function AddSpan($lowvalue, $highvalue, $colour1, $colour2=null, $tag='')
     {
+        assert(isset($this->owner));
         $key = $lowvalue . '_' . $highvalue;
 
-        $colours[$key]['c1'] = $colour1;
-        $colours[$key]['c2'] = $colour2;
-        $colours[$key]['tag'] = $tag;
-        $colours[$key]['bottom'] = $lowvalue;
-        $colours[$key]['top'] = $highvalue;
+        $this->colours[$key]['c1'] = $colour1;
+        $this->colours[$key]['c2'] = $colour2;
+        $this->colours[$key]['tag'] = $tag;
+        $this->colours[$key]['bottom'] = $lowvalue;
+        $this->colours[$key]['top'] = $highvalue;
+
+        print $this->name." $lowvalue->$highvalue\n";
     }
 
     function WriteConfig()
     {
+        assert(isset($this->owner));
+        // TODO - These should all check against the defaults
+
         $output = "# All settings for scale ".$this->name."\n";
 
         $output .= sprintf("\tKEYPOS %s %d %d %s\n",
@@ -992,39 +1009,172 @@ class WeatherMapScale
                     $this->keystyle
                 );
 
-        $output .= sprintf("\tKEYBGCOLOR %s %s",
+        $output .= sprintf("\tKEYBGCOLOR %s %s\n",
                 $this->name,
                 $this->keybgcolour->as_config()
                 );
 
-        $output .= sprintf("\tKEYFONTCOLOR %s %s",
+        $output .= sprintf("\tKEYTEXTCOLOR %s %s\n",
                 $this->name,
-                $this->keyfontcolour->as_config()
+                $this->keytextcolour->as_config()
                 );
 
-        $output .= sprintf("\tKEYOUTLINECOLOR %s %s",
+        $output .= sprintf("\tKEYOUTLINECOLOR %s %s\n",
                 $this->name,
                 $this->keyoutlinecolour->as_config()
                 );
 
-        $output .= sprintf("\tSCALEMISSCOLOR %s %s",
+        $output .= sprintf("\tSCALEMISSCOLOR %s %s\n",
                 $this->name,
                 $this->scalemisscolour->as_config()
                 );
+
+        $locale = localeconv();
+        $decimal_point = $locale['decimal_point'];
+        
+        $output .= "\n";
+
+        foreach ($this->colours as $k => $colour) {
+            $top = rtrim(rtrim(sprintf("%f", $colour['top']), "0"),
+                $decimal_point);
+            
+            $bottom = rtrim(rtrim(sprintf("%f", $colour['bottom']), "0"),
+                $decimal_point);
+
+            if ($bottom > $owner->kilo) {
+                $bottom = nice_bandwidth($colour['bottom'], $this->owner->kilo);
+            }
+
+            if ($top > $owner->kilo) {
+                $top = nice_bandwidth($colour['top'], $this->owner->kilo);
+            }
+
+            $tag = (isset($colour['tag']) ? $colour['tag'] : '');
+
+            if($colour['c1']->equals($colour['c2'])) {
+                    $output .= sprintf("\tSCALE %s %-4s %-4s   %s   %s\n",
+                         $this->name, $bottom, $top, $colour['c1']->as_config(),$tag);
+            } else {
+                    $output .= sprintf("\tSCALE %s %-4s %-4s   %s  %s  %s\n",
+                        $this->name, $bottom, $top, $colour['c1']->as_config(),
+                            $colour['c2']->as_config(), $tag);
+            }                     
+        }
 
         $output .= "\n";
 
         return $output;
     }
 
-    function ColourFromValue()
+    function ColourFromValue($value, $name = '', $is_percent = true, $scale_warning = true)
     {
+        $col = new Colour(0, 0, 0);
+        $tag = '';
+        $matchsize = null;
 
+        $nowarn_clipping = intval($owner->get_hint("nowarn_clipping"));
+        $nowarn_scalemisses = (!$scale_warning)
+            || intval($owner->get_hint("nowarn_scalemisses"));
+
+
+        if (isset($this->colours)) {
+            $colours = $this->colours;
+
+            if ($is_percent && $value > 100) {
+                if ($nowarn_clipping == 0) {
+                    warn(
+                        "ColourFromValue: Clipped $value% to 100% for item $name [WMWARN33]\n");
+                }
+                $value = 100;
+            }
+
+            if ($is_percent && $value < 0) {
+                if ($nowarn_clipping == 0) {
+                    warn(
+                        "ColourFromValue: Clipped $value% to 0% for item $name [WMWARN34]\n");
+                }
+                $value = 0;
+            }
+
+            foreach ($colours as $key => $colour) {
+                if (($value >= $colour['bottom']) and ($value <= $colour['top'])) {
+                    $range = $colour['top'] - $colour['bottom'];
+
+                    $candidate = null;
+
+                    if($colour['c1']->equals($colour['c2'])) {
+                        $candidate = $colour['c1'];
+                    } else {
+                        if ($colour["bottom"] == $colour["top"]) {
+                            $ratio = 0;
+                        } else {
+                            $ratio = ($value - $colour["bottom"])
+                                    / ($colour["top"] - $colour["bottom"]);
+                        }
+                        $candidate = $colour['c1']->linterp($colour['c2'], $ratio);
+                    }
+
+                    // change in behaviour - with multiple matching ranges for a value, the smallest range wins
+                    if (is_null($matchsize) || ($range < $matchsize)) {
+                        $col = $candidate;
+                        $matchsize = $range;                   
+
+                        if (isset($colour['tag'])) {
+                            $tag = $colour['tag'];
+                        }
+                    }
+            
+                }
+            }
+
+            debug("CFV $name $scalename $value '$tag' $key ".$col->as_config()."\n");
+
+            return (array (
+                $col,
+                $key,
+                $tag
+            ));
+
+        } else {
+            return array (
+                    $this->scalemisscolour,
+                    '',
+                    ''
+                );
+        }
+
+        // shouldn't really get down to here if there's a complete SCALE
+
+        // you'll only get grey for a COMPLETELY quiet link if there's no 0 in the SCALE lines
+        if ($value == 0) {
+            return array (
+                new Colour(192, 192, 192),
+                '',
+                ''
+            );
+        }
+
+        if ($nowarn_scalemisses == 0) {
+            warn(
+                "ColourFromValue: Scale $scalename doesn't include a line for $value"
+                . ($is_percent ? "%" : "") . " while drawing item $name [WMWARN29]\n");
+        }
+        // and you'll only get white for a link with no colour assigned
+        return array (
+            new Colour(255, 255, 255),
+            '',
+            ''
+        );
     }
 
 
     function DrawLegend($image)
     {
+        // don't draw if the position is the default -1,-1
+        if($this->keypos[X] == -1 && $this->keypos[Y] == -1) {
+            return;
+        }
+
         switch($this->keystyle)
         {
             case 'classic':
@@ -1172,6 +1322,8 @@ class WeatherMap extends WeatherMapBase
         0 => array (),
         1000 => array ()
     ); // 0 is the background, 1000 is the legends, title, etc
+
+    var $scales = array(); // the new array of WMScale objects
 
     var $config;
     var $next_id;
@@ -1362,7 +1514,13 @@ class WeatherMap extends WeatherMapBase
         $this->imap = new HTML_ImageMap('weathermap');
         $this->colours = array ();
 
+        $this->scales = array();
+        $this->scales['DEFAULT'] = new WeatherMapScale("DEFAULT", $this);
+
         debug("Adding default map colour set.\n");
+
+        $this->colourtable = array();
+        
         $defaults = array (
             'KEYTEXT' => array (
                 'bottom' => -2,
@@ -3126,6 +3284,11 @@ class WeatherMap extends WeatherMapBase
         $this->colours['DEFAULT'][$key]['top'] = -1;
         $this->colours['DEFAULT'][$key]['special'] = 1;
 
+        # if(substr($key,0,3) != "KEY"){
+        if(1==1) {
+            $this->colourtable[$key] = new Colour($r,$g,$b);
+        }
+
         return true;
     }
 
@@ -3720,18 +3883,29 @@ class WeatherMap extends WeatherMapBase
                         else
                             $matches[1] = trim($matches[1]);
 
+                        if(isset($this->scales[$matches[1]])) {
+                            $newscale = $this->scales[$matches[1]];
+                            print "Found.\n";
+                        } else {
+                            $this->scales[$matches[1]] = new WeatherMapScale($matches[1],$this);
+                            $newscale = $this->scales[$matches[1]];
+                            print "Created.\n";
+                        }
+                        
                         $key = $matches[2] . '_' . $matches[3];
-
-                        $this->colours[$matches[1]][$key]['key'] = $key;
-
                         $tag = $matches[11];
 
-                        $this->colours[$matches[1]][$key]['tag'] = $tag;
+                        $bottom = unformat_number($matches[2], $this->kilo);
+                        $top = unformat_number($matches[3], $this->kilo);
+
+                        $this->colours[$matches[1]][$key]['key'] = $key;
+                        $this->colours[$matches[1]][$key]['tag'] = $tag;                       
 
                         $this->colours[$matches[1]][$key]['bottom'] =
                             unformat_number($matches[2], $this->kilo);
                         $this->colours[$matches[1]][$key]['top'] =
                             unformat_number($matches[3], $this->kilo);
+
                         $this->colours[$matches[1]][$key]['special'] = 0;
 
                         if (isset($matches[10]) && $matches[10] == 'none') {
@@ -3739,6 +3913,8 @@ class WeatherMap extends WeatherMapBase
                             $this->colours[$matches[1]][$key]['green1'] = -1;
                             $this->colours[$matches[1]][$key]['blue1'] = -1;
                             $this->colours[$matches[1]][$key]['c1'] = new Colour('none');
+
+                            $c1 = new Colour("none");
 
                         } else {
                             $this->colours[$matches[1]][$key]['red1'] =
@@ -3748,6 +3924,9 @@ class WeatherMap extends WeatherMapBase
                             $this->colours[$matches[1]][$key]['blue1'] =
                                 (int)($matches[6]);
                             $this->colours[$matches[1]][$key]['c1'] = new Colour((int)$matches[4], (int)$matches[5], (int)$matches[6]);
+
+                            $c1 = new Colour( (int)($matches[4]), (int)($matches[5]), (int)($matches[6]) );
+                            $c2 = $c1;
                        }
 
                         // this is the second colour, if there is one
@@ -3759,7 +3938,11 @@ class WeatherMap extends WeatherMapBase
                             $this->colours[$matches[1]][$key]['blue2'] =
                                 (int)($matches[9]);
                             $this->colours[$matches[1]][$key]['c2'] = new Colour((int)$matches[7], (int)$matches[8], (int)$matches[9]);
+
+                            $c2 = new Colour( (int)($matches[7]), (int)($matches[8]), (int)($matches[9]) );
                        }
+
+                       $newscale->AddSpan($bottom, $top, $c1, $c2, $tag);
 
                         if (!isset($this->numscales[$matches[1]])) {
                             $this->numscales[$matches[1]] = 1;
@@ -4340,7 +4523,20 @@ class WeatherMap extends WeatherMapBase
                     }
                 }
                 $output .= "\n";
+
             }
+
+            $output .= "# new colourtable stuff\n";
+            foreach ($this->colourtable as $k=>$c) {
+                $output .= sprintf("%sCOLOR %s\n", $k, $c->as_config());
+            }
+            $output .= "\n";
+
+            foreach ($this->scales as $k=>$s) {
+                $output .= $s->WriteConfig();
+            }
+
+            $output .= "\n";
 
             foreach ($this->hints as $hintname => $hint) {
                 $output .= "SET $hintname $hint\n";
@@ -4516,7 +4712,6 @@ class WeatherMap extends WeatherMapBase
                 myimagecolorallocate($image, 255, 0, 0); // for selections in the editor
 
             $this->AllocateScaleColours($image);
-
             
             if ($bgimage) {
                 imagecopy($image, $bgimage, 0, 0, 0, 0, $this->width, $this->height);
@@ -4526,7 +4721,7 @@ class WeatherMap extends WeatherMapBase
             {
                 // fill with background colour anyway, since the background image failed to load
                 imagefilledrectangle($image, 0, 0, $this->width, $this->height,
-                                $this->colours['DEFAULT']['BG']['gdref1']);
+                                $this->colourtable['BG']->gdallocate($image));
             }
 
 // Now it's time to draw a map
@@ -4580,16 +4775,16 @@ class WeatherMap extends WeatherMapBase
                     }
 
                     $this->DrawTimestamp($image, $this->timefont,
-                        $this->colours['DEFAULT']['TIME']['gdref1']);
+                        $this->colourtable['TIME']->gdallocate($image));
 
                     if (!is_null($this->min_data_time)) {
                         $this->DrawTimestamp($image, $this->timefont,
-                            $this->colours['DEFAULT']['TIME']['gdref1'], "MIN");
+                            $this->colourtable['TIME']->gdallocate($image), "MIN");
                         $this->DrawTimestamp($image, $this->timefont,
-                            $this->colours['DEFAULT']['TIME']['gdref1'], "MAX");
+                            $this->colourtable['TIME']->gdallocate($image), "MAX");
                     }
                     $this->DrawTitle($image, $this->titlefont,
-                        $this->colours['DEFAULT']['TITLE']['gdref1']);
+                        $this->colourtable['TITLE']->gdallocate($image));
                 }
 
                 if (is_array($z_items)) {

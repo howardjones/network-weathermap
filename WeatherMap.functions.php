@@ -2158,11 +2158,25 @@ class Colour
             }
 
         }
-
-
-
    }
 
+   // return true if two colours are identical
+   function equals($c2) {
+       if( $this->r == $c2->r
+              && $this->g == $c2->g
+              && $this->b == $c2->b
+              && $this->alpha == $c2->alpha
+               ) {
+           return true;
+       }
+       return false;
+   }
+
+   // take this colour, and that colour, and make a new one in the ratio given
+   function linterp_with($c2, $ratio) {
+       
+   }
+   
     // Is this a transparent/none colour?
     function is_real()
     {

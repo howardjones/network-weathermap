@@ -158,6 +158,7 @@
 ./lib/datasources/WeatherMapDataSource_static.php
 ./lib/datasources/WeatherMapDataSource_tabfile.php
 ./lib/datasources/WeatherMapDataSource_time.php
+./lib/datasources/WeatherMapDataSource_wmdata.php
 ./lib/ds-common.php
 ./lib/index.php
 ./lib/poller-common.php

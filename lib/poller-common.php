@@ -216,6 +216,9 @@ function weathermap_run_maps($mydir)
                 $thumbimagefile =
                     $outdir . DIRECTORY_SEPARATOR . $map['filehash'] . '.thumb.'
                     . $imageformat;
+                $thumb2imagefile =
+                    $outdir . DIRECTORY_SEPARATOR . $map['filehash'] . '.thumb2.'
+                    . $imageformat;
 
                 if (true === file_exists($mapfile)) {
                     if ($quietlogging === 0) {

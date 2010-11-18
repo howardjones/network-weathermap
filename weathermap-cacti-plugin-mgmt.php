@@ -183,6 +183,15 @@ switch ($action) {
         }
         break;
 
+    case 'map_properties':
+        if (isset($_REQUEST['id']) && is_numeric($_REQUEST['id'])) {
+            include_once($config["base_path"] . "/include/top_header.php");
+            weathermap_map_properties(intval($_REQUEST['id']));
+            weathermap_footer_links();
+            include_once($config["base_path"] . "/include/bottom_footer.php");
+        }
+        break;
+
     case 'map_settings':
         if (isset($_REQUEST['id']) && is_numeric($_REQUEST['id'])) {
             include_once($config["base_path"] . "/include/top_header.php");
@@ -556,6 +565,8 @@ function maplist()
             form_alternate_row_color($colors["alternate"], $colors["light"], $i);
 
             print '<td>';
+
+		print "<a href='?action=map_properties&id=".$map['id']."'>Props</a> ";
 
             if ($can_edit) {
                 print '<a title="Click to start editor with this file" ';
@@ -1058,6 +1069,43 @@ function perms_list($id)
         print "</tr>";
     }
     html_end_box();
+}
+
+function weathermap_map_properties($id)
+{
+    global $colors, $config;
+
+	print "<h3>Map Properties for map #$id</h3>";
+
+	print "<h4>Information</h4>";
+	print "<ul>";
+	print "<li>Active Now?</li>";
+	print "<li>Last Run When</li>";
+	print "<li>Last Run How Long</li>";
+	print "<li>Last Run Error Count</li>";
+	print "</ul>";
+
+	print "<h4>Permissions</h4>";
+	print "<ul>";
+	print "<li>Which users can see it?</li>";
+	print "</ul>";
+
+	print "<h4>Settings</h4>";
+	weathermap_map_settings($id);
+
+	print "<h4>Schedule</h4>";
+	print "<ul>";
+	print "<li>When can it run?</li>";
+	print "<li>Archiving?</li>";
+	print "</ul>";
+
+	print "<h4>Miscellaneous</h4>";
+	print "<ul>";
+	print "<li>One-shot debugging</li>";
+	print "<li>Enable/Disable</li>";
+	print "<li>Editor link</li>";
+	print "<li>view config</li>";
+	print "</ul>";
 }
 
 function weathermap_map_settings($id)

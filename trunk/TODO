@@ -1,6 +1,9 @@
 Before 0.98
 -----------
 
+thumb2 file - 48x48px thumb to show in map management screen.
+make a (no map yet) thumbnail
+
 FIXED/DONE Imagemap seems all wrong in editor?? - write a 'draw imagemap' function
 
 per-map debugging - needs UI to enable!

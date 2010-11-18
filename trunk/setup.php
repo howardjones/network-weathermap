@@ -844,6 +844,13 @@ function weathermap_draw_navigation_text($nav)
         "level" => "2"
     );
 
+    $nav["weathermap-cacti-plugin-mgmt.php:map_properties"] = array (
+        "title" => "Map Properties",
+        "mapping" => "index.php:,weathermap-cacti-plugin-mgmt.php:",
+        "url" => "",
+        "level" => "2"
+    );
+
     $nav["weathermap-cacti-plugin-mgmt.php:map_settings_form"] = array (
         "title" => "Map Settings",
         "mapping" => "index.php:,weathermap-cacti-plugin-mgmt.php:",

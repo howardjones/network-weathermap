@@ -208,7 +208,7 @@ function weathermap_singleview($mapid)
                             include($htmlfile);
                         } else {
                             print
-                                "<div align=\"center\" style=\"padding:20px\"><em>This map hasn't been created yet.";
+                                "<div align=\"center\" style=\"padding:20px\"><em>This map hasn't been calculated yet.";
 
                             global $config, $user_auth_realms, $user_auth_realm_filenames;
                             $realm_id2 = 0;
@@ -349,7 +349,7 @@ function weathermap_thumbview($limit_to_group = -1)
                             . '" border="0" hspace="5" vspace="5" title="' . $maptitle
                             . '"/></a>';
                 } else {
-                    print "(thumbnail for map not created yet)";
+                    print "<div class='wm_notyet'>Thumbnail for this map is not calculated yet</div>";
                 }
 
                 print '</div> ';
@@ -468,7 +468,7 @@ function weathermap_fullview($cycle = false, $firstonly = false, $limit_to_group
                         include($htmlfile);
                     } else {
                         print
-                            "<div align=\"center\" style=\"padding:20px\"><em>This map hasn't been created yet.</em></div>";
+                            "<div align=\"center\" class='wm_notyet_larger'>This map hasn't been calculated yet.</div>";
                     }
 
                     print '</td></tr>';

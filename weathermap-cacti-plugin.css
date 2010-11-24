@@ -15,3 +15,21 @@ tr.wm_disabled {
     width: 50%;
     margin: 5px auto 15px auto;
 }
+
+.wm_notyet {
+    width: 200px;
+    height: 162px;
+    background-color: #ccc;
+    padding: 10px;
+    text-align: center;
+}
+
+.wm_notyet_larger {
+    text-align: center;
+    width: 400px;
+    height: 344px;
+    background-color: #ccc;
+    padding: 20px;
+    font-style: italic;
+    font-size: 150%;
+}

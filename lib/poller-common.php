@@ -361,9 +361,33 @@ function weathermap_run_maps($mydir)
                         }
                     }
 
-                    if($wmap->imageoutputfile != "" && $wmap->imageoutputfile != "weathermap.png") {
+                    if($wmap->imageoutputfile != "" && $wmap->imageoutputfile != "weathermap.png" && file_exists($imagefile)) {
                         // TODO - copy the existing file to the configured location too
-                        copy($imagefile, $wmap->imageoutputfile);
+                        @copy($imagefile, $wmap->imageoutputfile);
+                    }
+
+                    // create a teeny icon thumbnail to use in the Cacti
+                    // management interface
+                    if (function_exists('imagecopyresampled') && file_exists($imagefile)) {
+                        $im = imagecreatefromfile($imagefile);
+
+                        $thumb2max = 64;
+
+                        if ($wmap->width > $wmap->height) {
+                            $factor = ($thumb2max / $wmap->width);
+                        } else {
+                            $factor = ($thumb2max / $wmap->height);
+                        }
+                        $thumb2_width = $wmap->width * $factor;
+                        $thumb2_height = $wmap->height * $factor;
+
+                        $imagethumb = imagecreatetruecolor($thumb2_width, $thumb2_height);
+                        imagecopyresampled($imagethumb, $im, 0, 0, 0, 0,
+                            $thumb2_width, $thumb2_height, $wmap->width,
+                            $wmap->height);
+                        $result = imagepng($imagethumb, $thumb2imagefile);
+                        imagedestroy($imagethumb);
+                        imagedestroy($im);
                     }
                     
                     $wmap->DumpStats($statsfile);

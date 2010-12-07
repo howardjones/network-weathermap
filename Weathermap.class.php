@@ -29,7 +29,8 @@ $weathermap_error_suppress = array();
 $weathemap_lazycounter = 0;
 
 // Turn on ALL error reporting for now.
-# error_reporting (E_ALL|E_STRICT);
+// error_reporting (E_ALL|E_STRICT);
+
 
 // parameterise the in/out stuff a bit
 define('IN', 0);
@@ -987,7 +988,7 @@ class WeatherMapScale
         $this->colours[$key]['bottom'] = $lowvalue;
         $this->colours[$key]['top'] = $highvalue;
 
-        debug($this->name." $lowvalue->$highvalue");
+        debug($this->name." ".$lowvalue."->".$highvalue);
     }
 
     function WriteConfig()
@@ -1041,11 +1042,11 @@ class WeatherMapScale
             $bottom = rtrim(rtrim(sprintf("%f", $colour['bottom']), "0"),
                 $decimal_point);
 
-            if ($bottom > $owner->kilo) {
+            if ($bottom > $this->owner->kilo) {
                 $bottom = nice_bandwidth($colour['bottom'], $this->owner->kilo);
             }
 
-            if ($top > $owner->kilo) {
+            if ($top > $this->owner->kilo) {
                 $top = nice_bandwidth($colour['top'], $this->owner->kilo);
             }
 
@@ -1585,6 +1586,7 @@ class WeatherMap extends WeatherMapBase
 
         // Adding these makes the editor's job a little easier, mainly
         for ($i = 1; $i <= 5; $i++) {
+            $this->fonts[$i] = new stdClass();
             $this->fonts[$i]->type = 'GD builtin';
             $this->fonts[$i]->file = '';
             $this->fonts[$i]->size = 0;

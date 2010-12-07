@@ -14,6 +14,7 @@ tr.wm_disabled {
     padding: 5px;
     width: 50%;
     margin: 5px auto 15px auto;
+    
 }
 
 .wm_notyet {
@@ -32,4 +33,11 @@ tr.wm_disabled {
     padding: 20px;
     font-style: italic;
     font-size: 150%;
+}
+
+.wm_nomaps {
+    text-align: center;
+    padding:20px;
+    line-height: 2em;
+    font-size: 200%;
 }

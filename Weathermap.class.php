@@ -987,7 +987,7 @@ class WeatherMapScale
         $this->colours[$key]['bottom'] = $lowvalue;
         $this->colours[$key]['top'] = $highvalue;
 
-        print $this->name." $lowvalue->$highvalue\n";
+        debug($this->name." $lowvalue->$highvalue");
     }
 
     function WriteConfig()
@@ -3885,11 +3885,11 @@ class WeatherMap extends WeatherMapBase
 
                         if(isset($this->scales[$matches[1]])) {
                             $newscale = $this->scales[$matches[1]];
-                            print "Found.\n";
+                            debug("Found.");
                         } else {
                             $this->scales[$matches[1]] = new WeatherMapScale($matches[1],$this);
                             $newscale = $this->scales[$matches[1]];
-                            print "Created.\n";
+                            debug("Created.");
                         }
                         
                         $key = $matches[2] . '_' . $matches[3];

@@ -43,7 +43,7 @@ $grid_snap_value = 0; // set non-zero to snap to a grid of that spacing
 
 if( isset($_COOKIE['wmeditor']))
 {
-    $parts = split(":",$_COOKIE['wmeditor']);
+    $parts = explode(":",$_COOKIE['wmeditor']);
 
     if( (isset($parts[0])) && (intval($parts[0]) == 1) ) { $use_overlay = true; }
     if( (isset($parts[1])) && (intval($parts[1]) == 1) ) { $use_relative_overlay = true; }

@@ -2,7 +2,9 @@ Before 0.98
 -----------
 
 thumb2 file - 48x48px thumb to show in map management screen.
-make a (no map yet) thumbnail
+Include note about timezone stuff in docs
+DONE make a (no map yet) thumbnail
+
 
 FIXED/DONE Imagemap seems all wrong in editor?? - write a 'draw imagemap' function
 
@@ -21,6 +23,7 @@ KEYBG/KEYOUTLINE/KEYTEXTCOLOR per-scale
 Rewrite Cacti integration and editor manual pages
 
 Move scale stuff into WeatherMapScale
+
 THIS IS CORRECT poller_output still runs with map-update-period = 0
 entries in weathermap_data are never expired
 collect usage_stats into an .xml file next to each map file
@@ -28,7 +31,7 @@ standalone version of the cacti map browser
 DONE   track runtime per map
 DONE   improve cron string parsing
 improve usage_stats to cover non-regexp config
-allow IMAGEOUTPUTFILE/HTMLOUTPUTFILE/IMAGEURI to make a copy of the final image in Cacti mode http://forums.cacti.net/viewtopic.php?t=36279
+DONE allow IMAGEOUTPUTFILE/HTMLOUTPUTFILE/IMAGEURI to make a copy of the final image in Cacti mode http://forums.cacti.net/viewtopic.php?t=36279
 improve usage_stats to cover things other than keywords
 DONE more efficient ReadConfig - 50% of runtime!
 SORTOFDONE very simplified link drawing for classical no-via links.

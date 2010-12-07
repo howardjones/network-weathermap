@@ -356,9 +356,12 @@ function weathermap_thumbview($limit_to_group = -1)
             }
             print "</td></tr>";
             html_graph_end_box();
-        } else {
-            print
-                "<div align=\"center\" style=\"padding:20px\"><em>You Have No Maps</em></div>\n";
+        } else {            
+            print "<div class='wm_nomaps'><em>You Have No Maps</em><br />";
+            if(weathermap_is_mapadmin()) {
+                print "(Visit the <a href='weathermap-cacti-plugin-mgmt.php'>Weathermap Management</a> page to get started)\n";
+            }
+            print "</div>";
         }
     }
 }
@@ -583,13 +586,9 @@ function weathermap_translate_id($idname)
     return ($map[0]['id']);
 }
 
-function weathermap_versionbox()
+function weathermap_is_mapadmin()
 {
-    global $WEATHERMAP_VERSION, $colors;
     global $config, $user_auth_realms, $user_auth_realm_filenames;
-
-    $pagefoot =
-        "Powered by <a href=\"http://www.network-weathermap.com/?v=$WEATHERMAP_VERSION\">PHP Weathermap version $WEATHERMAP_VERSION</a>";
 
     $realm_id2 = 0;
 
@@ -602,6 +601,20 @@ function weathermap_versionbox()
         "select user_auth_realm.realm_id from user_auth_realm where user_auth_realm.user_id='"
         . $userid . "' and user_auth_realm.realm_id='$realm_id2'"))
         || (empty($realm_id2))) {
+        return true;
+    }
+
+    return false;
+}
+
+function weathermap_versionbox()
+{
+    global $WEATHERMAP_VERSION, $colors;
+
+    $pagefoot =
+        "Powered by <a href=\"http://www.network-weathermap.com/?v=$WEATHERMAP_VERSION\">PHP Weathermap version $WEATHERMAP_VERSION</a>";
+
+    if(weathermap_is_mapadmin()) {
         $pagefoot
             .= " --- <a href='weathermap-cacti-plugin-mgmt.php' title='Go to the map management page'>Weathermap Management</a>";
         $pagefoot .= " | <a target=\"_blank\" href=\"docs/\">Local Documentation</a>";

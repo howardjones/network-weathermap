@@ -4535,7 +4535,7 @@ class WeatherMap extends WeatherMapBase
             $output .= "\n";
 
             foreach ($this->scales as $k=>$s) {
-                $output .= $s->WriteConfig();
+            #    $output .= $s->WriteConfig();
             }
 
             $output .= "\n";

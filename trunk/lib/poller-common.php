@@ -87,7 +87,7 @@ function weathermap_check_cron($time, $string)
     return ($matched);
 }
 
-function weathermap_run_maps($mydir)
+function weathermap_run_maps($mydir, $map_id = -1)
 {
     global $config;
     global $weathermap_debugging, $WEATHERMAP_VERSION;
@@ -186,9 +186,13 @@ function weathermap_run_maps($mydir)
     fclose($testfd);
     unlink($testfile);
 
-    $queryrows =
-        db_fetch_assoc(
-            "select m.*, g.name as groupname from weathermap_maps m,weathermap_groups g where m.group_id=g.id and active='on' order by sortorder,id");
+    $SQL = "select m.*, g.name as groupname from weathermap_maps m,weathermap_groups g where m.group_id=g.id and active='on'";
+    if( intval($map_id) >= 0) {
+        $SQL .= " and m.id=".intval($map_id)." ";
+    }
+    $SQL .= "order by sortorder,id";
+
+    $queryrows = db_fetch_assoc( $SQL );
 
     if (true === is_array($queryrows)) {
         debug("Iterating all maps.\n");

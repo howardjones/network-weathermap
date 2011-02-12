@@ -31,6 +31,7 @@ $defines=array();
 // **************************************************************************************
 // THIS IS THE ONE LINE IN HERE YOU MIGHT HAVE TO CHANGE!
 $rrdtool="/usr/bin/rrdtool";
+$rrdtool = "c:/cactid/rrdtool.exe";
 // (on Windows, use / instead of \ in pathnames - c:/rrdtool/bin/rrdtool.exe for example)
 // **************************************************************************************
 

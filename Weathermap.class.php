@@ -4528,11 +4528,11 @@ class WeatherMap extends WeatherMapBase
 
             }
 
-            $output .= "# new colourtable stuff\n";
-            foreach ($this->colourtable as $k=>$c) {
-                $output .= sprintf("%sCOLOR %s\n", $k, $c->as_config());
-            }
-            $output .= "\n";
+          #  $output .= "# new colourtable stuff\n";
+          #  foreach ($this->colourtable as $k=>$c) {
+          #      $output .= sprintf("%sCOLOR %s\n", $k, $c->as_config());
+          #  }
+          #  $output .= "\n";
 
             foreach ($this->scales as $k=>$s) {
             #    $output .= $s->WriteConfig();

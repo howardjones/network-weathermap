@@ -34,14 +34,15 @@ class ConfigTest extends PHPUnit_Framework_TestCase
             $fd = popen($cmd,"r");
             $output = fread($fd,2000);
             pclose($fd);
-            print "\n[$output]\n";
-            $this->AssertEquals($output, "0", "Output did not match reference for $conffile via IM");
+            print "\n$cmd [$output]\n";
+            
+            $this->AssertEquals($output, "0", "Image Output did not match reference for $conffile via IM");
             
         }
         
         $ref_md5 = md5_file($referenceimagefile);
         $output_md5 = md5_file($outputimagefile);
-        $this->assertEquals($ref_md5, $output_md5, "Output did not match reference for $conffile via MD5");
+        $this->assertEquals($ref_md5, $output_md5, "Image Output did not match reference for $conffile via MD5");
 
 
 
@@ -68,7 +69,7 @@ class ConfigTest extends PHPUnit_Framework_TestCase
 
         $ref_output1 = md5_file($outputimagefile);
         $ref_output2 = md5_file($outputimagefile2);
-        $this->assertEquals($ref_output1, $ref_output2,"Output from WriteConfig did not match original for $conffile");
+        $this->assertEquals($ref_output1, $ref_output2,"Config Output from WriteConfig did not match original for $conffile");
 //        $this->assertFileEquals($outputimagefile, $outputimagefile2, "Output did not match reference for $conffile");
 
         chdir($previouswd);

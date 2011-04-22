@@ -1,6 +1,8 @@
 Before 0.98
 -----------
 
+add %t option to format SNMP TimeTicks
+
 thumb2 file - 48x48px thumb to show in map management screen.
 Include note about timezone stuff in docs
 DONE make a (no map yet) thumbnail

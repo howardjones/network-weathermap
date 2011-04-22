@@ -12,16 +12,14 @@ function UpdateCactiData(&$item, $local_data_id)
 	}
 	else
 	{
-
             $to_set = array();
 
             $set_speed = intval($item->get_hint("cacti_use_ifspeed"));
 
-
             $r3 =
                 db_fetch_assoc(
                     sprintf(
-                        "select data_local.host_id, field_name,field_value from data_local,host_snmp_cache  USE INDEX (PRIMARY) where data_local.id=%d and data_local.host_id=host_snmp_cache.host_id and data_local.snmp_index=host_snmp_cache.snmp_index and data_local.snmp_query_id=host_snmp_cache.snmp_query_id",
+                        "select data_local.host_id, field_name,field_value from data_local,host_snmp_cache  USE INDEX (host_id) where data_local.id=%d and data_local.host_id=host_snmp_cache.host_id and data_local.snmp_index=host_snmp_cache.snmp_index and data_local.snmp_query_id=host_snmp_cache.snmp_query_id",
                         $local_data_id));
 
             foreach ($r3 as $vv) {

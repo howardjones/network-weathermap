@@ -5,7 +5,7 @@
         FIXED - check-gdbug.php shouldn't complain about empty ob_flush buffers anymore
         FIXED - SNMP DS should deal better with non-numeric (and blank) return values
         FIXED - absolute SCALE definitions didn't support K (thanks wwwdrich)
-        CHANGE - lots of performance optimisations. Roughly twice as fast as 0.97a.
+        CHANGE - lots of performance optimisations. Roughly twice as fast as 0.97a. (thanks ikorzha758 for starting this process, and DLNoah, jmarshall28 and llow for some input)
         CHANGE - no longer shows .-prefixed files in map config picker
         CHANGE - editor ignores attempts to rename nodes to have space in names
         ADDED - New Cacti integration for editor. Additional 'edit maps' permission. No need for editor-config.php anymore!

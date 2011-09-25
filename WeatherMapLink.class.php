@@ -428,7 +428,7 @@ class WeatherMapLink extends WeatherMapItem
             return;
         }
 
-		$nvia = 0;
+        $nvia = 0;
 		
         $outlinecol = new Colour($this->outlinecolour);
         $commentcol = new Colour($this->commentfontcolour);
@@ -451,7 +451,7 @@ class WeatherMapLink extends WeatherMapItem
                 $xpoints[] = $via[0];
                 $ypoints[] = $via[1];
             }
-			$nvia++;
+            $nvia++;
         }
 
         $xpoints[] = $x2;
@@ -486,7 +486,7 @@ class WeatherMapLink extends WeatherMapItem
         }
 
         // if there are no vias, we can skip a lot of curve-related calculations
-		if($nvia == 0) {
+		if($nvia == -1) {
 
                     $this->curvepoints = calc_straight($xpoints, $ypoints);
 

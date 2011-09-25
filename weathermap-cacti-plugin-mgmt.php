@@ -580,7 +580,8 @@ function weathermap_maplist()
 
                 print '<td>';
 
-                    print "<a href='?action=map_properties&id=".$map['id']."'>Props</a> ";
+                    print "<a href='?action=map_properties&id=".$map['id']."'><img src='images/application_form.png' alt='Properties'/></a> ";
+                    print "<a href='?action=view_map&id=".$map['id']."'><img src='images/image.png' alt='View Map'/></a> ";
 
                 if ($can_edit) {
                     print '<a title="Click to start editor with this file" ';

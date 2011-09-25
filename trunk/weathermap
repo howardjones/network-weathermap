@@ -1,7 +1,7 @@
 #!/usr/bin/php
 <?php
 /** PHP Weathermap 0.97a
- * Copyright Howard Jones, 2005-2010 howie@thingy.com
+ * Copyright Howard Jones, 2005-2011 howie@thingy.com
  * http://www.network-weathermap.com/
  * Released under the GNU Public License
  *
@@ -165,7 +165,7 @@ if (sizeof($gopts) > 0)
 
 		case '--help':
                         print 'PHP Network Weathermap v' . $WEATHERMAP_VERSION."\n";
-                        print "Copyright Howard Jones, 2005-2007 howie@thingy.com\nReleased under the GNU Public License\nhttp://www.network-weathermap.com/\n\n";
+                        print "Copyright Howard Jones, 2005-2011 howie@thingy.com\nReleased under the GNU Public License\nhttp://www.network-weathermap.com/\n\n";
 
 			print "Usage: php weathermap [options]\n\n";
                         

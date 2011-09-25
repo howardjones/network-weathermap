@@ -492,7 +492,7 @@ function weathermap_maplist()
 
     if(sizeof($queryrows)==0) {
         $blank_slate = true;
-        print "Blank Slate.";
+        print "Blank Slate. Getting Started instructions to go in here. TODO";
     }
 
     if(1==1)
@@ -580,17 +580,16 @@ function weathermap_maplist()
 
                 print '<td>';
 
-                    print "<a href='?action=map_properties&id=".$map['id']."'><img src='images/application_form.png' alt='Properties'/></a> ";
-                    print "<a href='?action=view_map&id=".$map['id']."'><img src='images/image.png' alt='View Map'/></a> ";
+                    print "<a href='?action=map_properties&id=".$map['id']."'><img width=16 height=16 src='images/application_form.png' title='Properties' alt='Properties'/></a> ";
+                    print "<a href='weathermap-cacti-plugin.php?action=viewmap&id=".$map['id']."'><img width=16 height=16 src='images/image.png' title='View Map' alt='View Map'/></a> ";
 
-                if ($can_edit) {
-                    print '<a title="Click to start editor with this file" ';
-                    print 'href="weathermap-cacti-plugin-editor.php?mapname=';
-                    print htmlspecialchars($map['configfile']) . '">';
-                }
                 print htmlspecialchars($map['configfile']);
 
                 if ($can_edit) {
+					print ' <a title="Click to start editor with this file" ';
+                    print 'href="weathermap-cacti-plugin-editor.php?mapname=';
+                    print htmlspecialchars($map['configfile']) . '">';
+					print '<img src="images/pencil.png" width=16 height=16 title="Edit this map" alt="Edit this map"/>';
                     print '</a>';
                 }
 
@@ -1093,12 +1092,20 @@ function weathermap_map_properties($id)
 
 	print "<h3>Map Properties for map #$id</h3>";
 
+    $map = db_fetch_row("select * from weathermap_maps where id=" . intval($id));
+
 	print "<h4>Information</h4>";
 	print "<ul>";
-	print "<li>Active Now?</li>";
-	print "<li>Last Run When</li>";
-	print "<li>Last Run How Long</li>";
-	print "<li>Last Run Error Count</li>";
+	print "<li>Active Now? ";
+	if($map['active'] == 'on') {
+		print "Yes, <a href=''>Disable</a>";		
+	} else {
+		print "No, <a href=''>Enable</a>";
+	}
+	print "</li>";
+	print "<li>Last Run When TODO (not stored)</li>";
+	print "<li>Last Run took ".$map['runtime']." seconds.</li>";
+	print "<li>Last Run had ".$map['warncount']." warnings.</li>";
 	print "</ul>";
 
 	print "<h4>Permissions</h4>";
@@ -1106,22 +1113,35 @@ function weathermap_map_properties($id)
 	print "<li>Which users can see it?</li>";
 	print "</ul>";
 
-	print "<h4>Settings</h4>";
-	weathermap_map_settings($id);
-
 	print "<h4>Schedule</h4>";
 	print "<ul>";
-	print "<li>When can it run?</li>";
-	print "<li>Archiving?</li>";
+	print "<li><strong>When will it be updated?</strong> ";
+	if($map['schedule'] == '*') { 
+		print "Every poller cycle."; 
+	} else { 
+		print "Something more complicated."; 
+	}
+	print "</li>";
+	print "<li><strong>Archiving is ".$map['archiving']."</strong></li>";
 	print "</ul>";
 
 	print "<h4>Miscellaneous</h4>";
 	print "<ul>";
-	print "<li>One-shot debugging</li>";
-	print "<li>Enable/Disable</li>";
+	if($map['debug'] == 'off') {
+		print "<li>Enable debugging for this map (until disabled)</li>";
+		print "<li>Enable One-shot debugging (debug for one poller cycle)</li>";
+	} else {
+		print "<li>Disable debugging for this map (including any pending one-shot)</li>";	
+	}
+	if($map['debug'] == 'once') {
+		print "<li>This map will run in debug mode for one cycle, when it is next run.</li>";
+	}
 	print "<li>Editor link</li>";
 	print "<li>view config</li>";
 	print "</ul>";
+	
+	print "<h4>Settings</h4>";
+	weathermap_map_settings($id);
 }
 
 function weathermap_map_settings($id)

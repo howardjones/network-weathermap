@@ -1380,6 +1380,8 @@ class WeatherMap extends WeatherMapBase
     var $usage_stats = array ();
     var $coverage = array();
     var $colourtable = array();
+    var $warncount = 0;
+
 
     function WeatherMap()
     {
@@ -1433,7 +1435,7 @@ class WeatherMap extends WeatherMapBase
             'debugging' => false,
             'widthmod' => false,
             'has_includes' => false,
-            'has_overlibs' => false,
+            'has_overlibs' => false,           
             'name' => 'MAP'
         );
 
@@ -5592,16 +5594,21 @@ class WeatherMap extends WeatherMapBase
 	
 	function LoadCoverage($file)
 	{
+                return 0;
 		$i=0;
 		$fd = fopen($file,"r");
-		while(! feof($fd)) {
-			$line = fgets($fd,1024);
-			$line = trim($line);
-			list($val,$key) = explode("\t",$line);
-			$this->coverage[$key] = $val;
-			if($val > 0) { $i++; }
-		}
-		fclose($fd);
+                if(is_resource($fd)) {
+                    while(! feof($fd)) {
+                            $line = fgets($fd,1024);
+                            $line = trim($line);
+                            list($val,$key) = explode("\t",$line);
+                            if($key != "") {
+                                $this->coverage[$key] = $val;
+                            }
+                            if($val > 0) { $i++; }
+                    }
+                    fclose($fd);
+                }
 #		print "Loaded $i non-zero coverage stats.\n";
 	}
 	

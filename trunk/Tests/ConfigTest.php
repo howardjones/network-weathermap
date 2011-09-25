@@ -20,24 +20,53 @@ class ConfigTest extends PHPUnit_Framework_TestCase
         
         $this->assertEquals(0, $nwarns, "Warnings were generated");
 
-         # $COMPARE -metric AE $reference $result $destination  > $destination2 2>&1
-        $cmd = sprintf("%s -metric AE \"%s\" \"%s\" \"%s\"",
-                $compare,
-                $referenceimagefile,
-                $outputimagefile,
-                $comparisonimagefile
-                );
-//      print "|$cmd|\n";
+        if(1==1) {
+             # $COMPARE -metric AE $reference $result $destination  > $destination2 2>&1
+            $cmd = sprintf("%s -metric AE \"%s\" \"%s\" \"%s\"",
+                    $compare,
+                    $referenceimagefile,
+                    $outputimagefile,
+                    $comparisonimagefile
+                    );
 
-        if(file_exists($compare)) {
-            // system($cmd);
-            $fd = popen($cmd,"r");
-            $output = fread($fd,2000);
-            pclose($fd);
-            print "\n$cmd [$output]\n";
-            
-            $this->AssertEquals($output, "0", "Image Output did not match reference for $conffile via IM");
-            
+            if(file_exists($compare)) {
+
+                $fd2 = fopen($comparisonimagefile.".txt","w");
+                fwrite($fd2,$cmd."\r\n\r\n");
+                fwrite($fd2,getcwd()."\r\n\r\n");
+
+                # $fd = popen($cmd,"r");
+                $descriptorspec = array(
+                   0 => array("pipe", "r"),  // stdin is a pipe that the child will read from
+                   1 => array("pipe", "w"),  // stdout is a pipe that the child will write to
+                   2 => array("pipe", "w")  // stderr is a pipe to write to
+                );
+                $pipes = array();
+                $process = proc_open($cmd,$descriptorspec, $pipes, getcwd(), NULL, array('bypass_shell'=>TRUE)) ;
+
+                if(is_resource($process)) {
+                    $output = fread($pipes[2],2000);
+                    fclose($pipes[0]);
+                    fclose($pipes[1]);
+                    fclose($pipes[2]);
+                    $return_value = proc_close($process);
+                    fwrite($fd2, "Returned $return_value\r\n");
+                    fwrite($fd2,"Output: |".$output."|\r\n");
+                }
+
+//                fwrite($fd2, "Handle: '$fd'; " . gettype($fd) . "\r\n");
+//
+//                $output = fread($fd,2000);
+//                fwrite($fd2,"Output: |".$output."|\r\n");
+//
+//                pclose($fd);
+                fclose($fd2);
+
+    #            print "\n$cmd [$output]\n";
+
+                $this->AssertEquals($output, "0", "Image Output did not match reference for $conffile via IM");
+
+            }
         }
         
         $ref_md5 = md5_file($referenceimagefile);

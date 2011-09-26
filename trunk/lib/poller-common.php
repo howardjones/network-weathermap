@@ -437,7 +437,7 @@ function weathermap_run_maps($mydir, $map_id = -1)
                     $newdebug = 'off';
                 }
                 db_execute(sprintf(
-                    "update weathermap_maps set warncount=%d, runtime=%f, debug='%s' where id=%d",
+                    "update weathermap_maps set warncount=%d, runtime=%f, debug='%s', lastrun=NOW() where id=%d",
                     $weathermap_warncount, $map_duration, $newdebug, $map['id']));
                 $total_warnings += $weathermap_warncount;
                 $weathermap_warncount = 0;

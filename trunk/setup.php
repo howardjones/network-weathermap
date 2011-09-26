@@ -341,13 +341,14 @@ function weathermap_setup_table()
 				warncount int(11) NOT NULL default 0,
                 debug set('on','off','once') NOT NULL default 'off',
                 runtime double NOT NULL default 0,
+				lastrun datetime,
 				config text NOT NULL default '',
 				thumb_width int(11) NOT NULL default 0,
 				thumb_height int(11) NOT NULL default 0,
 				schedule varchar(32) NOT NULL default '*',
 				archiving set('on','off') NOT NULL default 'off',
 				PRIMARY KEY  (id)
-			) TYPE=MyISAM;";
+			) ENGINE=MyISAM;";
         } else {
             $colsql = "show columns from weathermap_maps from " . $database_default;
             $result = mysql_query($colsql) or die(mysql_error());
@@ -430,6 +431,7 @@ function weathermap_setup_table()
             
             if (!$found_98changes) {
                 $sql[] = "alter table weathermap_maps add runtime double NOT NULL default 0 after warncount";
+                $sql[] = "alter table weathermap_maps add lastrun datetime after runtime";
                 $sql[] = "alter table weathermap_maps add debug set('on','off','once') NOT NULL default 'off' after warncount;";
             }
         }
@@ -442,7 +444,7 @@ function weathermap_setup_table()
                 = "CREATE TABLE weathermap_auth (
 				userid mediumint(9) NOT NULL default '0',
 				mapid int(11) NOT NULL default '0'
-			) TYPE=MyISAM;";
+			) ENGINE=MyISAM;";
         }
 
         if (!in_array('weathermap_groups', $tables)) {
@@ -452,7 +454,7 @@ function weathermap_setup_table()
 				`name` VARCHAR( 128 ) NOT NULL default '',
 				`sortorder` INT(11) NOT NULL default 0,
 				PRIMARY KEY (id)
-				) TYPE=MyISAM;";
+				) ENGINE=MyISAM;";
             $sql[] =
                 "INSERT INTO weathermap_groups (id,name,sortorder) VALUES (1,'Weathermaps',1)";
         }
@@ -466,7 +468,7 @@ function weathermap_setup_table()
 				optname varchar(128) NOT NULL default '',
 				optvalue varchar(128) NOT NULL default '',
 				PRIMARY KEY  (id)
-			) TYPE=MyISAM;";
+			) ENGINE=MyISAM;";
         }
 
         if (!in_array('weathermap_data', $tables)) {
@@ -475,7 +477,7 @@ function weathermap_setup_table()
 				rrdfile varchar(255) NOT NULL,data_source_name varchar(19) NOT NULL,
 				  last_time int(11) NOT NULL,last_value varchar(255) NOT NULL,
 				last_calc varchar(255) NOT NULL, sequence int(11) NOT NULL, local_data_id int(11) NOT NULL DEFAULT 0, PRIMARY KEY  (id), KEY rrdfile (rrdfile),
-				  KEY local_data_id (local_data_id), KEY data_source_name (data_source_name) ) TYPE=MyISAM";
+				  KEY local_data_id (local_data_id), KEY data_source_name (data_source_name) ) ENGINE=MyISAM";
         } else {
             $colsql = "show columns from weathermap_data from " . $database_default;
             $result = mysql_query($colsql) or die(mysql_error());

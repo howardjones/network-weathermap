@@ -503,7 +503,6 @@ function weathermap_maplist()
         $last_finish_time = intval(read_config_option("weathermap_last_finish_time", true));
         $poller_interval = intval(read_config_option("poller_interval"));
 
-
        if (($last_finish_time - $last_start_time) > $poller_interval) {
             if (($last_started != $last_finished) && ($last_started != "")) {
                 print '<div align="center" class="wm_warning"><p>';
@@ -1090,9 +1089,9 @@ function weathermap_map_properties($id)
 {
     global $colors, $config;
 
-	print "<h3>Map Properties for map #$id</h3>";
-
     $map = db_fetch_row("select * from weathermap_maps where id=" . intval($id));
+
+	print "<h3>Map Properties for map #$id - \"".$map['titlecache']."\"</h3>";
 
 	print "<h4>Information</h4>";
 	print "<ul>";
@@ -1103,9 +1102,19 @@ function weathermap_map_properties($id)
 		print "No, <a href=''>Enable</a>";
 	}
 	print "</li>";
-	print "<li>Last Run When TODO (not stored)</li>";
-	print "<li>Last Run took ".$map['runtime']." seconds.</li>";
-	print "<li>Last Run had ".$map['warncount']." warnings.</li>";
+	print "<li>Last Run finished at ".$map['lastrun']."</li>";
+	printf("<li>Last Run took %0.2f seconds.</li>", $map['runtime']);
+	print "<li>Last Run had ".$map['warncount']." warnings.";
+	if($map['warncount'] > 0 ) {
+	print
+        '<a href="../../utilities.php?tail_lines=500&message_type=2&action=view_logfile&filter='
+        . urlencode("[Map $id]")
+            . '" title="Check cacti.log for this map">View Cacti Log'
+        . "</a>";
+	}
+	print "</li>";
+
+
 	print "</ul>";
 
 	print "<h4>Permissions</h4>";

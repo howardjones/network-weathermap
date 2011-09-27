@@ -2031,7 +2031,7 @@ class Vector
         $points[0] = $this->dx;
         $points[1] = $this->dy;
 
-        RotateAboutPoint(&$points, 0, 0, $angle);
+        RotateAboutPoint($points, 0, 0, $angle);
 
         $this->dx = $points[0];
         $this->dy = $points[1];

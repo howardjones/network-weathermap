@@ -4996,6 +4996,13 @@ class WeatherMap extends WeatherMapBase
             $node->owner = null;
             unset($node);
         }
+
+		// Clear up the other random hashes of information
+        $this->dsinfocache = null;
+        $this->colourtable = null;
+        $this->usage_stats = null;
+        $this->scales = null;
+        $this->coverage = null;
     }
 
     function PreloadMapHTML()

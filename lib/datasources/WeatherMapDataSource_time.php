@@ -5,7 +5,7 @@ class WeatherMapDataSource_time extends WeatherMapDataSource
     {
         if (preg_match("/^time:(.*)$/", $targetstring, $matches)) {
             if (preg_match("/^[234]\./", phpversion())) {
-                warn(
+                wm_warn(
                     "Time DS Plugin recognised a TARGET, but needs PHP5+ to run. [WMTIME01]\n");
                 return false;
             }
@@ -36,7 +36,7 @@ class WeatherMapDataSource_time extends WeatherMapDataSource
 				// test that the offset is valid
 				$timestamp = strtotime($offset);
 				if (($timestamp	=== false) || ($timestamp === -1) ) {
-					warn("Time ReadData: Offset String ($offset) is bogus - ignoring [WMTIME03]\n");
+					wm_warn("Time ReadData: Offset String ($offset) is bogus - ignoring [WMTIME03]\n");
 					$offset = "now";
 				} 
 			}			
@@ -47,7 +47,7 @@ class WeatherMapDataSource_time extends WeatherMapDataSource
 
             foreach ($timezone_identifiers as $tz) {
                 if (strtolower($tz) == $timezone_l) {
-                    debug("Time ReadData: Timezone exists: $tz\n");
+                    wm_debug("Time ReadData: Timezone exists: $tz\n");
                     $dateTime = new DateTime($offset, new DateTimeZone($tz));
 
                     $item->add_note("time_time12", $dateTime->format("h:i"));
@@ -64,15 +64,15 @@ class WeatherMapDataSource_time extends WeatherMapDataSource
             }
 
             if ($matches == 0) {
-                warn(
+                wm_warn(
                     "Time ReadData: Couldn't recognize $timezone as a valid timezone name [WMTIME02]\n");
             }
         } else {
             // some error code to go in here
-            warn("Time ReadData: Couldn't recognize $targetstring \n");
+            wm_warn("Time ReadData: Couldn't recognize $targetstring \n");
         }
 
-        debug( sprintf("TimeReadData: Returning (%s, %s, %s)\n",
+        wm_debug( sprintf("TimeReadData: Returning (%s, %s, %s)\n",
 		        string_or_null($data[IN]),
 		        string_or_null($data[OUT]),
 		        $data_time

@@ -51,25 +51,25 @@ class WeatherMapDataSource_dbsample extends WeatherMapDataSource
                     $result = mysql_query($SQL);
 
                     if (false === $result) {
-                        warn('dbsample ReadData: Invalid query: ' . mysql_error() . "\n");
+                        wm_warn('dbsample ReadData: Invalid query: ' . mysql_error() . "\n");
                     } else {
                         $row = mysql_fetch_assoc($result);
                         $data[IN] = $row['in'];
                         $data[OUT] = $row['out'];
                     }
                 } else {
-                    warn('dbsample ReadData: failed to select database: ' . mysql_error()
+                    wm_warn('dbsample ReadData: failed to select database: ' . mysql_error()
                         . "\n");
                 }
             } else {
-                warn('dbsample ReadData: failed to connect to database server: '
+                wm_warn('dbsample ReadData: failed to connect to database server: '
                     . mysql_error() . "\n");
             }
 
             $data_time = now();
         }
 
-        debug( sprintf("dbsample ReadData: Returning (%s, %s, %s)\n",
+        wm_debug( sprintf("dbsample ReadData: Returning (%s, %s, %s)\n",
 		        string_or_null($data[IN]),
 		        string_or_null($data[OUT]),
 		        $data_time

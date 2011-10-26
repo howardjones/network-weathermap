@@ -37,11 +37,11 @@ class WeatherMapDataSource_external extends WeatherMapDataSource
         if (preg_match("/^!(.*)$/", $targetstring, $matches)) {
             $command = $matches[1];
 
-            debug("ExternalScript ReadData: Running $command\n");
+            wm_debug("ExternalScript ReadData: Running $command\n");
 
             // run the command here
             if (($pipe = popen($command, "r")) === false) {
-                warn("ExternalScript ReadData: Failed to run external script. [WMEXT01]\n");
+                wm_warn("ExternalScript ReadData: Failed to run external script. [WMEXT01]\n");
             } else {
                 $i = 0;
 
@@ -60,12 +60,12 @@ class WeatherMapDataSource_external extends WeatherMapDataSource
                     $item->add_hint('external_line4', $lines[3]);
                     $data_time = time();
                 } else {
-                    warn("ExternalScript ReadData: Not enough lines read from external script ($i read, 4 expected) [WMEXT02]\n");
+                    wm_warn("ExternalScript ReadData: Not enough lines read from external script ($i read, 4 expected) [WMEXT02]\n");
                 }
             }
         }
 
-        debug( sprintf("ExternalScript ReadData: Returning (%s, %s, %s)\n",
+        wm_debug( sprintf("ExternalScript ReadData: Returning (%s, %s, %s)\n",
 		        string_or_null($data[IN]),
 		        string_or_null($data[OUT]),
 		        $data_time

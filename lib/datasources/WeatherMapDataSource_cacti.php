@@ -7,10 +7,10 @@ class WeatherMapDataSource_cacti extends WeatherMapDataSource
             if (true === function_exists('db_fetch_row')) {
                 return (true);
             } else {
-                debug('ReadData cacti: Cacti database library not found.\n');
+                wm_debug('ReadData cacti: Cacti database library not found.\n');
             }
         } else {
-            debug("ReadData cacti: Can only run from Cacti environment.\n");
+            wm_debug("ReadData cacti: Can only run from Cacti environment.\n");
         }
 
         return (false);
@@ -41,7 +41,7 @@ class WeatherMapDataSource_cacti extends WeatherMapDataSource
 
         }      
             
-		debug( sprintf("cacti ReadData: Returning (%s, %s, %s)\n",
+		wm_debug( sprintf("cacti ReadData: Returning (%s, %s, %s)\n",
 		        string_or_null($data[IN]),
 		        string_or_null($data[OUT]),
 		        $data_time

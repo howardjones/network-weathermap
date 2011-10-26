@@ -1294,7 +1294,7 @@ function weathermap_poller_output($rrd_update_array)
 
                         default: // do something somewhat sensible in case something odd happens
                     $newvalue = $value;
-                        warn(
+                        wm_warn(
                             "poller_output found an unknown data_source_type_id for $file:$dsname");
                         break;
                 }

@@ -47,19 +47,19 @@ class WeatherMapDataSource_wmdata extends WeatherMapDataSource
                     $stats = stat($datafile);
                     $data_time = $stats['mtime'];
                 } else {
-                    warn("WMData ReadData: Data name ($dataname) didn't exist in ($datafile). [WMWMDATA03]\n");
+                    wm_warn("WMData ReadData: Data name ($dataname) didn't exist in ($datafile). [WMWMDATA03]\n");
                 }
                 
             } else {
-                warn("WMData ReadData: Couldn't open ($datafile). [WMWMDATA02]\n");
+                wm_warn("WMData ReadData: Couldn't open ($datafile). [WMWMDATA02]\n");
             }
 
         } else {
-            warn("WMData ReadData: $datafile doesn't exist [WMWMDATA01]");
+            wm_warn("WMData ReadData: $datafile doesn't exist [WMWMDATA01]");
         }
 
 
-        debug( sprintf("WMData ReadData: Returning (%s, %s, %s)\n",
+        wm_debug( sprintf("WMData ReadData: Returning (%s, %s, %s)\n",
 		        string_or_null($data[IN]),
 		        string_or_null($data[OUT]),
 		        $data_time

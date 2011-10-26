@@ -10,20 +10,20 @@ class WeatherMapDataSource_dsstats extends WeatherMapDataSource
 
         if ($map->context === 'cacti') {
             if (false === function_exists('db_fetch_row')) {
-                debug(
+                wm_debug(
                     "ReadData DSStats: Cacti database library not found. [DSSTATS001]\n");
                 return (false);
             }
 
             if (true === function_exists('api_plugin_is_enabled')) {
                 if (false === api_plugin_is_enabled('dsstats')) {
-                    debug(
+                    wm_debug(
                         "ReadData DSStats: DSStats plugin not enabled (new-style). [DSSTATS002B]\n");
                     return (false);
                 }
             } else {
                 if ( (false === isset($plugins)) || (false === in_array('dsstats', $plugins))) {
-                    debug(
+                    wm_debug(
                         "ReadData DSStats: DSStats plugin not enabled (old-style). [DSSTATS002A]\n");
                     return (false);
                 }
@@ -40,7 +40,7 @@ class WeatherMapDataSource_dsstats extends WeatherMapDataSource
             }
 
             if (false === in_array('data_source_stats_hourly_last', $tables)) {
-                debug(
+                wm_debug(
                     'ReadData DSStats: data_source_stats_hourly_last database table not found. [DSSTATS003]\n');
                 return (false);
             }
@@ -97,7 +97,7 @@ class WeatherMapDataSource_dsstats extends WeatherMapDataSource
 
             if ($map->get_hint('dsstats_default_type') !== null) {
                 $datatype = $map->get_hint('dsstats_default_type');
-                debug("Default datatype changed to %s.\n", $datatype);
+                wm_debug("Default datatype changed to %s.\n", $datatype);
             }
         } elseif (preg_match(
             '/^dsstats:([a-z]+):(\d+):([\-a-zA-Z0-9_]+):([\-a-zA-Z0-9_]+)$/',
@@ -167,7 +167,7 @@ class WeatherMapDataSource_dsstats extends WeatherMapDataSource
             }
 
             if ($datatype === 'wm' && ($data[IN] === null || $data[OUT] === null)) {
-                debug("Didn't get data for 'wm' source. Inserting new tasks.");
+                wm_debug("Didn't get data for 'wm' source. Inserting new tasks.");
 // insert the required details into weathermap_data, so it will be picked up next time
                 $SQL =
                     sprintf(
@@ -177,7 +177,7 @@ class WeatherMapDataSource_dsstats extends WeatherMapDataSource
 
                 if (count($result) > 0) {
                     $db_rrdname = $result['path'];
-                    debug("Filename is %s\n",$db_rrdname);
+                    wm_debug("Filename is %s\n",$db_rrdname);
 
                     foreach (array (
                         IN,
@@ -194,7 +194,7 @@ class WeatherMapDataSource_dsstats extends WeatherMapDataSource
                         }
                     }
                 } else {
-                    warn(
+                    wm_warn(
                         "DSStats ReadData: Failed to find a filename for DS id %s [WMDSTATS01]\n", $local_data_id);
                 }
             }
@@ -205,7 +205,7 @@ class WeatherMapDataSource_dsstats extends WeatherMapDataSource
             UpdateCactiData($item, $local_data_id);
         }
 
-        debug( "DSStats ReadData: Returning (%s, %s, %s)\n",
+        wm_debug( "DSStats ReadData: Returning (%s, %s, %s)\n",
 		        string_or_null($data[IN]),
 		        string_or_null($data[OUT]),
 		        $data_time

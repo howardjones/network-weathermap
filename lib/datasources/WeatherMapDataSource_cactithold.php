@@ -29,7 +29,7 @@ class WeatherMapDataSource_cactithold extends WeatherMapDataSource
 
         if ($map->context === 'cacti') {
             if (false === function_exists('db_fetch_row')) {
-                debug(
+                wm_debug(
                     "ReadData CactiTHold: Cacti database library not found. [THOLD001]\n");
                 return (false);
             }
@@ -47,7 +47,7 @@ class WeatherMapDataSource_cactithold extends WeatherMapDataSource
             }
 
             if (false === $thold_present) {
-                debug("ReadData CactiTHold: THold plugin not enabled. [THOLD002]\n");
+                wm_debug("ReadData CactiTHold: THold plugin not enabled. [THOLD002]\n");
             }
 
             $sql = 'show tables';
@@ -61,14 +61,14 @@ class WeatherMapDataSource_cactithold extends WeatherMapDataSource
             }
 
             if (false === in_array('thold_data', $tables)) {
-                debug(
+                wm_debug(
                     'ReadData CactiTHold: thold_data database table not found. [THOLD003]\n');
                 return (false);
             }
 
             return (true);
         } else {
-            debug(
+            wm_debug(
                 "ReadData CactiTHold: Can only run from Cacti environment. [THOLD004]\n");
         }
 
@@ -135,7 +135,7 @@ class WeatherMapDataSource_cactithold extends WeatherMapDataSource
             }
 
             if ($type === 'monitor') {
-                debug('CactiTHold ReadData: Getting cacti basic state for host '.$id."\n");
+                wm_debug('CactiTHold ReadData: Getting cacti basic state for host '.$id."\n");
                 $SQL = 'select * from host where id='.$id;
 
                 // 0=disabled
@@ -191,10 +191,10 @@ class WeatherMapDataSource_cactithold extends WeatherMapDataSource
                     $item->add_note('cacti_faildate', $result['status_fail_date']);
                     $item->add_note('cacti_recdate', $result['status_rec_date']);
                 }
-                debug(sprintf(
+                wm_debug(sprintf(
                     "CactiTHold ReadData: Basic state for host %d is %s/%s\n", $id, $state, $statename));
 
-                debug('CactiTHold ReadData: Checking threshold states for host '.$id."\n");
+                wm_debug('CactiTHold ReadData: Checking threshold states for host '.$id."\n");
                 $numthresh = 0;
                 $numfailing = 0;
                 $SQL2 =
@@ -209,19 +209,19 @@ class WeatherMapDataSource_cactithold extends WeatherMapDataSource
                         $numthresh++;
 
                         if (intval($th['thold_alert']) > 0) {
-                            debug(
+                            wm_debug(
                                 'CactiTHold ReadData: Seen threshold '.$desc.' failing ('.$v.')for host '.$id."\n");
                             $numfailing++;
                         } else {
-                            debug(
+                            wm_debug(
                                 'CactiTHold ReadData: Seen threshold '.$desc.' OK ('.$v.') for host '.$id."\n");
                         }
                     }
                 } else {
-                    debug('CactiTHold ReadData: Failed to get thold info for host '.$id."\n");
+                    wm_debug('CactiTHold ReadData: Failed to get thold info for host '.$id."\n");
                 }
 
-                debug(
+                wm_debug(
                     'CactiTHold ReadData: Checked '.$numthresh.' and found '.$numfailing." failing\n");
 
                 if (($numfailing > 0) && ($numthresh > 0) && ($state === 3)) {
@@ -233,16 +233,16 @@ class WeatherMapDataSource_cactithold extends WeatherMapDataSource
                         * 100);
                     $data[IN] = $state;
                     $data[OUT] = $numfailing;
-                    debug('CactiTHold ReadData: State is '.$state.'/'.$statename."\n");
+                    wm_debug('CactiTHold ReadData: State is '.$state.'/'.$statename."\n");
                 } elseif ($numthresh > 0) {
                     $item->add_note('thold_failcount', 0);
                     $item->add_note('thold_failpercent', 0);
-                    debug('CactiTHold ReadData: Leaving state as '.$state."\n");
+                    wm_debug('CactiTHold ReadData: Leaving state as '.$state."\n");
                 }
             }
         }
 
-        debug( sprintf("CactiThold ReadData: Returning (%s, %s, %s)\n",
+        wm_debug( sprintf("CactiThold ReadData: Returning (%s, %s, %s)\n",
 		        string_or_null($data[IN]),
 		        string_or_null($data[OUT]),
 		        $data_time

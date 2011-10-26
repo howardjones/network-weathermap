@@ -5,7 +5,7 @@ function UpdateCactiData(&$item, $local_data_id)
 {
 	$map = $item->owner;
 
-	debug("fetching for $local_data_id\n");
+	wm_debug("fetching for $local_data_id\n");
 
 	if( isset($map->dsinfocache[$local_data_id])) {
             $to_set = $map->dsinfocache[$local_data_id];

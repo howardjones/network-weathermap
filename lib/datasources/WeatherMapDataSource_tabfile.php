@@ -35,18 +35,18 @@ class WeatherMapDataSource_tabfile extends WeatherMapDataSource
 
                 if (preg_match("/^$itemname\t(\d+\.?\d*[KMGT]*)\t(\d+\.?\d*[KMGT]*)/",
                     $buffer, $matches)) {
-                    $data[IN] = unformat_number($matches[1]);
-                    $data[OUT] = unformat_number($matches[2]);
+                    $data[IN] = wm_unformat_number($matches[1]);
+                    $data[OUT] = wm_unformat_number($matches[2]);
                 }
             }
             $stats = stat($targetstring);
             $data_time = $stats['mtime'];
         } else {
             // TODO - some error code to go in here
-            warn("TabText ReadData: Couldn't open ($targetstring). [WMTABDATA01]");
+            wm_warn("TabText ReadData: Couldn't open ($targetstring). [WMTABDATA01]");
         }
 
-        debug( sprintf("TabText ReadData: Returning (%s, %s, %s) \n",
+        wm_debug( sprintf("TabText ReadData: Returning (%s, %s, %s) \n",
 		        string_or_null($data[IN]),
 		        string_or_null($data[OUT]),
 		        $data_time

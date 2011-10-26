@@ -121,7 +121,7 @@ while (list($kk, ) = each($allitems)) {
         $type = $myobj->my_type();
 
         $name = $myobj->name;
-        debug("ReadData for $type $name: \n");
+        wm_debug("ReadData for $type $name: \n");
 
         if (($type == 'LINK' && isset($myobj->a))
             || ($type == 'NODE' && !is_null($myobj->x))) {
@@ -130,7 +130,7 @@ while (list($kk, ) = each($allitems)) {
                 $tindex = 0;
 
                 foreach ($myobj->targets as $target) {
-                    debug("ReadData: New Target: $target[4]\n");
+                    wm_debug("ReadData: New Target: $target[4]\n");
 
                     $targetstring = $target[0];
                     $multiply = $target[1];
@@ -138,7 +138,7 @@ while (list($kk, ) = each($allitems)) {
                     if ($reverse == 0 && $target[5] == "WeatherMapDataSource_rrd") {
                         $candidates++;
 # list($in,$out,$datatime) =  $map->plugins['data'][ $target[5] ]->ReadData($targetstring, $map, $myobj);
-                        debug("ConvertDS: $targetstring is a candidate for conversion.");
+                        wm_debug("ConvertDS: $targetstring is a candidate for conversion.");
                         $rrdfile = $targetstring;
                         $multiplier = 8;
                         $dsnames[IN] = "traffic_in";
@@ -152,7 +152,7 @@ while (list($kk, ) = each($allitems)) {
                             $dsnames[IN] = $matches[2];
                             $dsnames[OUT] = $matches[3];
 
-                            debug("ConvertDS: Special DS names seen (" . $dsnames[IN]
+                            wm_debug("ConvertDS: Special DS names seen (" . $dsnames[IN]
                                 . " and " . $dsnames[OUT] . ").\n");
                         }
 
@@ -178,12 +178,12 @@ while (list($kk, ) = each($allitems)) {
                         $db_rrdname = str_replace("../../rra", "<path_rra>", $db_rrdname);
 
                         if ($db_rrdname != $rrdfile) {
-                            debug("ConvertDS: Looking for $db_rrdname in the database.");
+                            wm_debug("ConvertDS: Looking for $db_rrdname in the database.");
 
                             $SQLcheck =
                                 "select data_template_data.local_data_id from data_template_data,data_template_rrd where data_template_data.local_data_id=data_template_rrd.local_data_id and data_template_data.data_source_path='"
                                 . mysql_real_escape_string($db_rrdname) . "'";
-                            debug("ConvertDS: " . $SQLcheck);
+                            wm_debug("ConvertDS: " . $SQLcheck);
                             $results = db_fetch_assoc($SQLcheck);
 
                             if ((sizeof($results) > 0)
@@ -204,7 +204,7 @@ while (list($kk, ) = each($allitems)) {
                                     }
                                 }
 
-                                debug("ConvertDS: Converting to $new_target");
+                                wm_debug("ConvertDS: Converting to $new_target");
                                 $converted++;
 
                                 if ($type == 'NODE') {
@@ -215,10 +215,10 @@ while (list($kk, ) = each($allitems)) {
                                     $map->links[$name]->targets[$tindex][4] = $new_target;
                                 }
                             } else {
-                                warn("ConvertDS: Failed to find a match for $db_rrdname - can't convert to DSStats.");
+                                wm_warn("ConvertDS: Failed to find a match for $db_rrdname - can't convert to DSStats.");
                             }
                         } else {
-                            warn("ConvertDS: $rrdfile doesn't match with $path_rra - not bothering to look in the database.");
+                            wm_warn("ConvertDS: $rrdfile doesn't match with $path_rra - not bothering to look in the database.");
                         }
                     }
 
@@ -227,7 +227,7 @@ while (list($kk, ) = each($allitems)) {
                         && 1 == 0) {
                         $candidates++;
 # list($in,$out,$datatime) =  $map->plugins['data'][ $target[5] ]->ReadData($targetstring, $map, $myobj);
-                        debug("ConvertDS: $targetstring is a candidate for conversion.");
+                        wm_debug("ConvertDS: $targetstring is a candidate for conversion.");
 
                         $multiplier = 1;
                         $dsnames[IN] = "traffic_in";
@@ -239,12 +239,12 @@ while (list($kk, ) = each($allitems)) {
                         # special case for relative paths
                         $db_rrdname = str_replace("../../rra", "<path_rra>", $db_rrdname);
 
-                        debug("ConvertDS: Looking for $db_rrdname in the database.");
+                        wm_debug("ConvertDS: Looking for $db_rrdname in the database.");
 
                         $SQLcheck =
                             "select data_template_data.local_data_id from data_template_data,data_template_rrd where data_template_data.local_data_id=data_template_rrd.local_data_id and data_template_data.data_source_path='"
                             . mysql_real_escape_string($db_rrdname) . "'";
-                        debug("ConvertDS: " . $SQLcheck);
+                        wm_debug("ConvertDS: " . $SQLcheck);
                         $results = db_fetch_assoc($SQLcheck);
 
                         if ((sizeof($results) > 0)
@@ -265,7 +265,7 @@ while (list($kk, ) = each($allitems)) {
                                 }
                             }
 
-                            debug("ConvertDS: Converting to $new_target");
+                            wm_debug("ConvertDS: Converting to $new_target");
                             $converted++;
 
                             if ($type == 'NODE') {
@@ -276,19 +276,19 @@ while (list($kk, ) = each($allitems)) {
                                 $map->links[$name]->targets[$tindex][4] = $new_target;
                             }
                         } else {
-                            warn("ConvertDS: Failed to find a match for $db_rrdname - can't convert back to rrdfile.");
+                            wm_warn("ConvertDS: Failed to find a match for $db_rrdname - can't convert back to rrdfile.");
                         }
                     }
 
                     $tindex++;
                 }
 
-                debug("ReadData complete for $type $name\n");
+                wm_debug("ReadData complete for $type $name\n");
             } else {
-                debug("ReadData: No targets for $type $name\n");
+                wm_debug("ReadData: No targets for $type $name\n");
             }
         } else {
-            debug("ReadData: Skipping $type $name that looks like a template\n.");
+            wm_debug("ReadData: Skipping $type $name that looks like a template\n.");
         }
 
         unset($myobj);

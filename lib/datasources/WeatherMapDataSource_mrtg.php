@@ -39,7 +39,7 @@ class WeatherMapDataSource_mrtg extends WeatherMapDataSource {
 			while (!feof($fd))
 			{
 				$buffer=fgets($fd, 4096);
-				debug("MRTG ReadData: Matching on '${matchvalue}in $matchperiod' and '${matchvalue}out $matchperiod'\n");
+				wm_debug("MRTG ReadData: Matching on '${matchvalue}in $matchperiod' and '${matchvalue}out $matchperiod'\n");
 
 				if (preg_match("/<\!-- ${matchvalue}in $matchperiod ([-+]?\d+\.?\d*) -->/", $buffer, $matches)) { $data[IN] = $matches[1] * 8; }
 				if (preg_match("/<\!-- ${matchvalue}out $matchperiod ([-+]?\d+\.?\d*) -->/", $buffer, $matches)) { $data[OUT] = $matches[1] * 8; }
@@ -54,12 +54,12 @@ class WeatherMapDataSource_mrtg extends WeatherMapDataSource {
 		else
 		{
 			// some error code to go in here
-			debug ("MRTG ReadData: Couldn't open ($targetstring). \n"); 
+			wm_debug ("MRTG ReadData: Couldn't open ($targetstring). \n"); 
 		}
 		
 		if($swap==1)
 		{
-			debug("MRTG ReadData: Swapping IN and OUT\n");
+			wm_debug("MRTG ReadData: Swapping IN and OUT\n");
 			$t = $data[OUT];
 			$data[OUT] = $data[IN];
 			$data[IN] = $t;
@@ -67,12 +67,12 @@ class WeatherMapDataSource_mrtg extends WeatherMapDataSource {
 		
 		if($negate)
 		{
-			debug("MRTG ReadData: Negating values\n");
+			wm_debug("MRTG ReadData: Negating values\n");
 			$data[OUT] = -$data[OUT];
 			$data[IN] = -$data[IN];
 		}
 				
-		debug( sprintf("MRTG ReadData: Returning (%s, %s, %s)\n",
+		wm_debug( sprintf("MRTG ReadData: Returning (%s, %s, %s)\n",
 		        string_or_null($data[IN]),
 		        string_or_null($data[OUT]),
 		        $data_time

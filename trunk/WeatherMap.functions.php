@@ -13,30 +13,30 @@
  *
  * @return boolean If it's OK to run or not
  */
-function WM_module_checks()
+function wm_module_checks()
 {
     if (false === extension_loaded('gd')) {
-        warn(
+        wm_warn(
             "\n\nNo image (gd) extension is loaded. This is required by weathermap. [WMWARN20]\n\n");
-        warn("\nrun check.php to check PHP requirements.\n\n");
+        wm_warn("\nrun check.php to check PHP requirements.\n\n");
 
         return (false);
     }
 
     if (false === function_exists('imagecreatefrompng')) {
-        warn("Your GD php module doesn't support PNG format. [WMWARN21]\n");
-        warn("\nrun check.php to check PHP requirements.\n\n");
+        wm_warn("Your GD php module doesn't support PNG format. [WMWARN21]\n");
+        wm_warn("\nrun check.php to check PHP requirements.\n\n");
         return (false);
     }
 
     if (false === function_exists('imagecreatetruecolor')) {
-        warn("Your GD php module doesn't support truecolor. [WMWARN22]\n");
-        warn("\nrun check.php to check PHP requirements.\n\n");
+        wm_warn("Your GD php module doesn't support truecolor. [WMWARN22]\n");
+        wm_warn("\nrun check.php to check PHP requirements.\n\n");
         return (false);
     }
 
     if (false === function_exists('imagecopyresampled')) {
-        warn(
+        wm_warn(
             "Your GD php module doesn't support thumbnail creation (imagecopyresampled). [WMWARN23]\n");
     }
     return (true);
@@ -59,7 +59,7 @@ function WM_module_checks()
  *                  Following params are fed to sprintf()
   */
 
-function debug($string)
+function wm_debug($string)
 {
     global $weathermap_debugging;
     global $weathermap_map;
@@ -128,7 +128,7 @@ function debug($string)
  * @param string $string
  * @param boolean $notice_only Whether or not to prefix the string with WARNING
  */
-function warn($string, $notice_only = false, $code="")
+function wm_warn($string, $notice_only = false, $code="")
 {
     global $weathermap_map;
     global $weathermap_warncount;
@@ -198,7 +198,7 @@ function mysprintf($format, $value, $kilo = 1000)
 {
     $output = '';
 
-    debug("mysprintf: %s %s\n", $format, $value);
+    wm_debug("mysprintf: %s %s\n", $format, $value);
 
     if (1 === preg_match('/%(\d*\.?\d*)k/', $format, $matches)) {
         $spec = $matches[1];
@@ -212,11 +212,11 @@ function mysprintf($format, $value, $kilo = 1000)
             }
         // we don't really need the justification (pre-.) part...
         }
-        debug("KMGT formatting %s with %s.\n", $value, $spec);
+        wm_debug("KMGT formatting %s with %s.\n", $value, $spec);
         $result = nice_scalar($value, $kilo, $places);
         $output = preg_replace('/%' . $spec . 'k/', $format, $result);
     } else {
-        debug("Falling through to standard sprintf\n");
+        wm_debug("Falling through to standard sprintf\n");
         $output = sprintf($format, $value);
     }
     return $output;
@@ -232,7 +232,7 @@ function mysprintf($format, $value, $kilo = 1000)
  * @param string $input
  * @return string[]
  */
-function ParseString($input)
+function wm_parse_string($input)
 {
     $output = array ();   // Array of Output
     $cPhraseQuote = null; // Record of the quote that opened the current phrase
@@ -330,7 +330,7 @@ if(1 === 0) {
  * @param string $input
  * @return string
  */
-function screenshotify($input)
+function wm_screenshotify($input)
 {
     $tmp = $input;
 
@@ -438,7 +438,7 @@ function imagecreatefromfile($filename)
     $formats = imagetypes();
 
     if (false === is_readable($filename)) {
-        warn('Image file '.$filename." is unreadable. Check permissions. [WMIMG05]\n");
+        wm_warn('Image file '.$filename." is unreadable. Check permissions. [WMIMG05]\n");
         return null;
     }
     
@@ -449,7 +449,7 @@ function imagecreatefromfile($filename)
                 if ((imagetypes() & IMG_GIF) === IMG_GIF) {
                     $bgimage = imagecreatefromgif($filename);
                 } else {
-                    warn(
+                    wm_warn(
                         'Image file '.$filename." is GIF, but GIF is not supported by your GD library. [WMIMG01]\n");
                 }
                 break;
@@ -458,7 +458,7 @@ function imagecreatefromfile($filename)
                 if ((imagetypes() & IMG_JPEG) === IMG_JPEG) {
                     $bgimage = imagecreatefromjpeg($filename);
                 } else {
-                    warn(
+                    wm_warn(
                         'Image file '.$filename." is JPEG, but JPEG is not supported by your GD library. [WMIMG02]\n");
                 }
                 break;
@@ -467,13 +467,13 @@ function imagecreatefromfile($filename)
                 if ((imagetypes() & IMG_PNG) === IMG_PNG) {
                     $bgimage = imagecreatefrompng($filename);
                 } else {
-                    warn(
+                    wm_warn(
                         'Image file '.$filename." is PNG, but PNG is not supported by your GD library. [WMIMG03]\n");
                 }
                 break;
 
             default:
-                warn('Image file '.$filename." wasn't recognised (type=".$type."). Check format is supported by your GD library. [WMIMG04]\n");
+                wm_warn('Image file '.$filename." wasn't recognised (type=".$type."). Check format is supported by your GD library. [WMIMG04]\n");
                 break;
         }
         
@@ -501,9 +501,9 @@ function imagecolorize($im, $r, $g, $b)
     // probably better off using Paint.NET/Gimp etc to make an indexed colour
     // version of the icon, rather than rely on this
     if(imageistruecolor($im)) {
-        debug("imagecolorize requires paletted images - this is a truecolor image. Converting.");
+        wm_debug("imagecolorize requires paletted images - this is a truecolor image. Converting.");
         imagetruecolortopalette($im,false,256);
-        debug("Converted image has %d colours.\n", imagecolorstotal($im));
+        wm_debug("Converted image has %d colours.\n", imagecolorstotal($im));
     }
 
     // We will create a monochromatic palette based on the input color
@@ -602,14 +602,14 @@ function line_crossing($x1, $y1, $x2, $y2, $x3, $y3, $x4, $y4)
         $slope1 = ($y2 - $y1) / ($x2 - $x1);
     } else {
         $slope1 = 1e10;
-        debug("Slope1 is infinite.\n");
+        wm_debug("Slope1 is infinite.\n");
     }
 
     if ($x3 !== $x4) {
         $slope2 = ($y4 - $y3) / ($x4 - $x3);
     } else {
         $slope2 = 1e10;
-        debug("Slope2 is infinite.\n");
+        wm_debug("Slope2 is infinite.\n");
     }
 
     $a1 = $slope1;
@@ -848,7 +848,7 @@ function calc_curve(&$in_xarray, &$in_yarray, $pointsperspan = 32)
 
     for ($i = 0; $i < count($in_xarray); $i++) {
         if (($in_xarray[$i] === $last_x) && ($in_yarray[$i] === $last_y)) {
-            debug("Dumping useless duplicate point on curve\n");
+            wm_debug("Dumping useless duplicate point on curve\n");
         } else {
             $xarray[] = $in_xarray[$i];
             $yarray[] = $in_yarray[$i];
@@ -860,7 +860,7 @@ function calc_curve(&$in_xarray, &$in_yarray, $pointsperspan = 32)
 
     // only proceed if we still have at least two points!
     if (count($xarray) <= 1) {
-        warn("Arrow not drawn, as it's 1-dimensional.\n");
+        wm_warn("Arrow not drawn, as it's 1-dimensional.\n");
         return (array (
             null,
             null,
@@ -920,7 +920,7 @@ function calc_straight(&$in_xarray, &$in_yarray, $pointsperspan = 12)
 
     for ($i = 0; $i < count($in_xarray); $i++) {
         if (($in_xarray[$i] === $last_x) && ($in_yarray[$i] === $last_y)) {
-            debug("Dumping useless duplicate point on curve\n");
+            wm_debug("Dumping useless duplicate point on curve\n");
         } else {
             $xarray[] = $in_xarray[$i];
             $yarray[] = $in_yarray[$i];
@@ -932,7 +932,7 @@ function calc_straight(&$in_xarray, &$in_yarray, $pointsperspan = 12)
 
     // only proceed if we still have at least two points!
     if (count($xarray) <= 1) {
-        warn("Arrow not drawn, as it's 1-dimensional.\n");
+        wm_warn("Arrow not drawn, as it's 1-dimensional.\n");
         return (array (
             null,
             null,
@@ -1054,7 +1054,7 @@ function linterp($v1, $v2, $percent)
 
       list($arrowheadsize, $arrowheadwidth) = calc_arrowsize($w, $map, $linkname);
 
-      $d = new Vector($x2-$x1, $y2-$y1);
+      $d = new WMVector($x2-$x1, $y2-$y1);
       $l = $d->length();
       $d->normalise();
       $norm = $d->get_normal();
@@ -1086,18 +1086,18 @@ function linterp($v1, $v2, $percent)
             if (false === is_null($fillcolour)) {
                 imagefilledpolygon($image, $poly, count($poly)/2, $fillcolour);
             } else {
-                debug("Not drawing %s (%s) outline because there is no fill colour\n", $linkname, $dir);
+                wm_debug("Not drawing %s (%s) outline because there is no fill colour\n", $linkname, $dir);
             }
 
             $areaname = 'LINK:L' . $map->links[$linkname]->id . ':'.$dir;
             $map->imap->addArea('Polygon', $areaname, '', $poly);
-            debug("Adding Poly imagemap for %s\n", $areaname);
+            wm_debug("Adding Poly imagemap for %s\n", $areaname);
 		$map->links[$linkname]->imap_areas[] = $areaname;
 
             if (false === is_null($outlinecolour)) {
                 imagepolygon($image, $poly, count($poly)/2, $outlinecolour);
             } else {
-                debug("Not drawing %s (%s) outline because there is no outline colour\n", $linkname, $dir);
+                wm_debug("Not drawing %s (%s) outline because there is no outline colour\n", $linkname, $dir);
             }
 
        }
@@ -1192,7 +1192,7 @@ function draw_straight($image, &$curvepoints, $widths, $outlinecolour, $fillcolo
         );
 
         if ($l < $minimumlength) {
-            warn("Skipping too-short line.\n");
+            wm_warn("Skipping too-short line.\n");
         } else {
             $arrow_d = $l - $arrowsize[$dir];
 
@@ -1253,7 +1253,7 @@ function draw_straight($image, &$curvepoints, $widths, $outlinecolour, $fillcolo
 // if this is the first step, then we need to go from the middle to the outside edge first
 // ( the loop may not run, but these corners are required)
             $i = 0;
-            $v1 = new Vector($simple[$i + 1][X] - $simple[$i][X],
+            $v1 = new WMVector($simple[$i + 1][X] - $simple[$i][X],
                 $simple[$i + 1][Y] - $simple[$i][Y]);
             $n1 = $v1->get_normal();
 
@@ -1269,9 +1269,9 @@ function draw_straight($image, &$curvepoints, $widths, $outlinecolour, $fillcolo
 
 
             for ($i = 0; $i < $max_start; $i++) {
-                $v1 = new Vector($simple[$i + 1][X] - $simple[$i][X],
+                $v1 = new WMVector($simple[$i + 1][X] - $simple[$i][X],
                     $simple[$i + 1][Y] - $simple[$i][Y]);
-                $v2 = new Vector($simple[$i + 2][X] - $simple[$i + 1][X],
+                $v2 = new WMVector($simple[$i + 2][X] - $simple[$i + 1][X],
                     $simple[$i + 2][Y] - $simple[$i + 1][Y]);
                 $n1 = $v1->get_normal();
                 $n2 = $v2->get_normal();
@@ -1405,12 +1405,12 @@ function draw_straight($image, &$curvepoints, $widths, $outlinecolour, $fillcolo
                 imagefilledpolygon($image, $finalpoints, count($finalpoints) / 2,
                     $arrowsettings[4]);
             } else {
-                debug("Not drawing %s (%s) outline because there is no fill colour\n", $linkname, $dir);
+                wm_debug("Not drawing %s (%s) outline because there is no fill colour\n", $linkname, $dir);
             }
 
             $areaname = 'LINK:L' . $map->links[$linkname]->id . ':'.$dir;
             $map->imap->addArea('Polygon', $areaname, '', $finalpoints);
-            debug("Adding Poly imagemap for %s\n", $areaname);
+            wm_debug("Adding Poly imagemap for %s\n", $areaname);
 		$map->links[$linkname]->imap_areas[] = $areaname;
 
 
@@ -1418,7 +1418,7 @@ function draw_straight($image, &$curvepoints, $widths, $outlinecolour, $fillcolo
                 imagepolygon($image, $finalpoints, count($finalpoints) / 2,
                     $arrowsettings[5]);
             } else {
-                debug("Not drawing %s (%s) outline because there is no outline colour\n", $linkname, $dir);
+                wm_debug("Not drawing %s (%s) outline because there is no outline colour\n", $linkname, $dir);
             }
         }
     }
@@ -1484,7 +1484,7 @@ function draw_curve($image, &$curvepoints, $widths, $outlinecolour, $fillcolours
     $minimumlength = 1.2 * ($arrowsize[IN] + $arrowsize[OUT]);
 
     if ($totaldistance <= $minimumlength) {
-        warn(
+        wm_warn(
             "Skipping drawing very short link (%s). Impossible to draw! Try changing WIDTH or ARROWSTYLE? [WMWARN01]\n", $linkname);
         return;
     }
@@ -1574,20 +1574,20 @@ function draw_curve($image, &$curvepoints, $widths, $outlinecolour, $fillcolours
             imagefilledpolygon($image, $there_points, count($there_points) / 2,
                 $arrowsettings[$dir][4]);
         } else {
-            debug("Not drawing %s (%s) fill because there is no fill colour\n", $linkname, $dir);
+            wm_debug("Not drawing %s (%s) fill because there is no fill colour\n", $linkname, $dir);
         }
 
         $areaname = 'LINK:L' . $map->links[$linkname]->id . ':'.$dir;
         $map->imap->addArea('Polygon', $areaname, '', $there_points);
         $map->links[$linkname]->imap_areas[] = $areaname;
 
-        debug("Adding Poly imagemap for %s\n", $areaname);
+        wm_debug("Adding Poly imagemap for %s\n", $areaname);
 
         if (false === is_null($outlinecolour)) {
             imagepolygon($image, $there_points, count($there_points) / 2,
                 $arrowsettings[$dir][5]);
         } else {
-            debug("Not drawing %s (%s) fill because there is no outline colour\n", $linkname, $dir);
+            wm_debug("Not drawing %s (%s) fill because there is no outline colour\n", $linkname, $dir);
         }
     }
 }
@@ -1627,7 +1627,7 @@ function simplify_spine(&$input, $epsilon = 1e-10)
         }
     }
 
-    debug("Skipped %d points of %d\n", $skip, $c);
+    wm_debug("Skipped %d points of %d\n", $skip, $c);
 
     $output[] = $input[$c + 1];
     return $output;
@@ -1640,7 +1640,7 @@ function simplify_spine(&$input, $epsilon = 1e-10)
  * @param int $kilo
  * @return float
  */
-function unformat_number($instring, $kilo = 1000)
+function wm_unformat_number($instring, $kilo = 1000)
 {
     $matches = 0;
     $number = 0;
@@ -1693,7 +1693,7 @@ function unformat_number($instring, $kilo = 1000)
 function calc_offset($offsetstring, $width, $height)
 {
     if (1 === preg_match('/^([-+]?\d+):([-+]?\d+)$/', $offsetstring, $matches)) {
-        debug("Numeric Offset found\n");
+        wm_debug("Numeric Offset found\n");
         return (array (
             $matches[1],
             $matches[2]
@@ -1703,7 +1703,7 @@ function calc_offset($offsetstring, $width, $height)
 
         if (true === isset($matches[2])) {
             $multiply = intval($matches[2]) / 100;
-            debug("Percentage compass offset: multiply by %f\n",$multiply);
+            wm_debug("Percentage compass offset: multiply by %f\n",$multiply);
         }
 
         $height = $height * $multiply;
@@ -1795,7 +1795,7 @@ function calc_offset($offsetstring, $width, $height)
             $y
         ));
     } else {
-        warn("Got a position offset that didn't make sense (%s).", $offsetstring);
+        wm_warn("Got a position offset that didn't make sense (%s).", $offsetstring);
         return (array (
             0,
             0
@@ -1806,7 +1806,7 @@ function calc_offset($offsetstring, $width, $height)
 // These next two are based on perl's Number::Format module
 // by William R. Ward, chopped down to just what I needed
 
-function format_number($number, $precision = 2, $trailing_zeroes = 0)
+function wm_format_number($number, $precision = 2, $trailing_zeroes = 0)
 {
     $sign = 1;
 
@@ -1845,7 +1845,7 @@ function format_number($number, $precision = 2, $trailing_zeroes = 0)
  * @param <type> $below_one   use the micro, nano, etc?
  * @return string
  */
-function nice_bandwidth($number, $kilo = 1000, $decimals = 1, $below_one = true)
+function wm_nice_bandwidth($number, $kilo = 1000, $decimals = 1, $below_one = true)
 {
     $suffix = '';
 
@@ -1887,7 +1887,7 @@ function nice_bandwidth($number, $kilo = 1000, $decimals = 1, $below_one = true)
         $suffix = 'n';
     }
 
-    $result = format_number($number, $decimals) . $suffix;
+    $result = wm_format_number($number, $decimals) . $suffix;
     return ($result);
 }
 
@@ -1943,7 +1943,7 @@ function nice_scalar($number, $kilo = 1000, $decimals = 1)
         $suffix = 'm';
     }
 
-    $result = $prefix . format_number($number, $decimals) . $suffix;
+    $result = $prefix . wm_format_number($number, $decimals) . $suffix;
     return ($result);
 }
 
@@ -1956,11 +1956,11 @@ function nice_scalar($number, $kilo = 1000, $decimals = 1)
  *
  * TODO: Actually USE this, where we can.
  */
-class Point
+class WMPoint
 {
     var $x, $y;
 
-    function Point($x = 0, $y = 0)
+    function WMPoint($x = 0, $y = 0)
     {
         $this->x = $x;
         $this->y = $y;
@@ -1968,7 +1968,7 @@ class Point
 
     function VectorTo($p2)
     {
-        $v = new Vector($p2->x - $this->x, $p2->y - $this->y);
+        $v = new WMVector($p2->x - $this->x, $p2->y - $this->y);
         
         return $v;
     }
@@ -2004,11 +2004,11 @@ class Point
 /**
  * Utility class for 2D vectors. Mostly used in the VIA calculations
  */
-class Vector
+class WMVector
 {
     var $dx, $dy;
 
-    function Vector($dx = 0, $dy = 0)
+    function WMVector($dx = 0, $dy = 0)
     {
         $this->dx = $dx;
         $this->dy = $dy;
@@ -2049,7 +2049,7 @@ class Vector
             $ny1 = -$this->dx / $len;
         }
 
-        return (new Vector($nx1, $ny1));
+        return (new WMVector($nx1, $ny1));
     }
 
     function normalise()
@@ -2080,29 +2080,29 @@ class Vector
 /**
  * A Line is simply a Vector that passes through a Point
  */
-class Line
+class WMLine
 {
     var $point;
     var $vector;
 
-    function Line($p, $v)
+    function WMLine($p, $v)
     {
         $this->point = $p;
         $this->vector = $v;
     }
 }
 
-class LineSegment
+class WMLineSegment
 {
     var $p1, $p2;
     var $vector;
 
-    function LineSegment($p1, $p2)
+    function WMLineSegment($p1, $p2)
     {
         $this->p1 = $p1;
         $this->p2 = $p2;
 
-        $this->vector = new Vector($p2->x - $p1->x, $p2->y - $p1->y );
+        $this->vector = new WMVector($p2->x - $p1->x, $p2->y - $p1->y );
     }
 }
 
@@ -2113,13 +2113,13 @@ class LineSegment
  * pseudocolours.
  *
  */
-class Colour
+class WMColour
 {
     var $r, $g, $b, $alpha;
 
 
     // take in an existing value and create a Colour object for it
-    function Colour()
+    function WMColour()
     {
         if (func_num_args() === 3)       # a set of 3 colours
         {
@@ -2248,7 +2248,7 @@ class Colour
 
     function contrast()
     {
-        return (new Colour($this->contrast_ary()));
+        return (new WMColour($this->contrast_ary()));
     }
 
 // make a printable version, for debugging
@@ -2280,6 +2280,22 @@ class Colour
     }
 }
 
+
+/**
+ * Additional 'missing' GD functions
+ * 
+ */
+class WMGraphics {
+    
+}
+
+/**
+ * Various static functions to do with Catmull-Rom curve generation
+ * 
+ */
+class WMCurve {
+    
+}
 
 function wm_draw_marker_diamond($im, $col, $x, $y, $size = 10)
 {

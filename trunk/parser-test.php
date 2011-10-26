@@ -44,13 +44,13 @@ ReadConfig('configs/097-test.conf');
 function ReadConfig($input, $is_include = false, $initial_context = 'GLOBAL')
 {
     if ((strchr($input, "\n") != false) || (strchr($input, "\r") != false)) {
-        debug("ReadConfig Detected that this is a config fragment.\n");
+        wm_debug("ReadConfig Detected that this is a config fragment.\n");
         // strip out any Windows line-endings that have gotten in here
         $input = str_replace("\r", "", $input);
         $lines = split("/n", $input);
         $filename = "{text insert}";
     } else {
-        debug("ReadConfig Detected that this is a config filename.\n");
+        wm_debug("ReadConfig Detected that this is a config filename.\n");
         $filename = $input;
 
         $fd = fopen($filename, "r");
@@ -77,7 +77,7 @@ function ReadConfig($input, $is_include = false, $initial_context = 'GLOBAL')
 
         $buffer = trim($buffer);
         // alternative for use later where quoted strings are more useful
-        $args = ParseString($buffer);
+        $args = wm_parse_string($buffer);
 
         if (sizeof($args) > 0) {
             $linematched++;
@@ -148,7 +148,7 @@ function ReadConfig($input, $is_include = false, $initial_context = 'GLOBAL')
         }
 
         if ($linematched == 0 && trim($buffer) != '') {
-            warn("Unrecognised config on line $linecount: $buffer\n");
+            wm_warn("Unrecognised config on line $linecount: $buffer\n");
         }
     }
 

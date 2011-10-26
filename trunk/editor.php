@@ -67,7 +67,7 @@ $param = '';
 $param2 = '';
 $log = '';
 
-if(!WM_module_checks())
+if(!wm_module_checks())
 {
 	print "<b>Required PHP extensions are not present in your mod_php/ISAPI ";
         print "PHP module. Please check your PHP setup to ensure you have the ";
@@ -100,9 +100,9 @@ else
 	// everything else in this file is inside this else
 	$mapfile = $mapdir.'/'.$mapname;
 
-	debug("==========================================================================================================\n");
-	debug("Starting Edit Run: action is $action on $mapname\n");
-	debug("==========================================================================================================\n");
+	wm_debug("==========================================================================================================\n");
+	wm_debug("Starting Edit Run: action is $action on $mapname\n");
+	wm_debug("==========================================================================================================\n");
 
 	# editor_log("\n\n-----------------------------------------------------------------------------\nNEW REQUEST:\n\n");
 	# editor_log(var_log($_REQUEST));
@@ -419,8 +419,8 @@ else
                         // $map->links[$link_name]->SetBandwidth($bwin,$bwout);
                         $map->links[$link_name]->max_bandwidth_in_cfg = $bwin;
                         $map->links[$link_name]->max_bandwidth_out_cfg = $bwout;
-                        $map->links[$link_name]->max_bandwidth_in = unformat_number($bwin, $map->kilo);
-                        $map->links[$link_name]->max_bandwidth_out = unformat_number($bwout, $map->kilo);
+                        $map->links[$link_name]->max_bandwidth_in = wm_unformat_number($bwin, $map->kilo);
+                        $map->links[$link_name]->max_bandwidth_out = wm_unformat_number($bwout, $map->kilo);
 
 
                         $map->WriteConfig($mapfile);
@@ -468,8 +468,8 @@ else
 		{
 			$map->links['DEFAULT']->max_bandwidth_in_cfg = $bwin;
 			$map->links['DEFAULT']->max_bandwidth_out_cfg = $bwout;
-			$map->links['DEFAULT']->max_bandwidth_in = unformat_number($bwin, $map->kilo);
-                        $map->links['DEFAULT']->max_bandwidth_out = unformat_number($bwout, $map->kilo);
+			$map->links['DEFAULT']->max_bandwidth_in = wm_unformat_number($bwin, $map->kilo);
+                        $map->links['DEFAULT']->max_bandwidth_out = wm_unformat_number($bwout, $map->kilo);
 
 			// $map->defaultlink->SetBandwidth($bwin,$bwout);
 			foreach ($map->links as $link)
@@ -480,8 +480,8 @@ else
 					$link_name = $link->name;
 					$map->links[$link_name]->max_bandwidth_in_cfg = $bwin;
 					$map->links[$link_name]->max_bandwidth_out_cfg = $bwout;
-					$map->links[$link_name]->max_bandwidth_in = unformat_number($bwin, $map->kilo);
-			        $map->links[$link_name]->max_bandwidth_out = unformat_number($bwout, $map->kilo);
+					$map->links[$link_name]->max_bandwidth_in = wm_unformat_number($bwin, $map->kilo);
+			        $map->links[$link_name]->max_bandwidth_out = wm_unformat_number($bwout, $map->kilo);
 				}
 			}
 		}
@@ -865,7 +865,7 @@ else
 	}
 
 	//by here, there should be a valid $map - either a blank one, the existing one, or the existing one with requested changes
-	debug("Finished modifying\n");
+	wm_debug("Finished modifying\n");
 
 	// now we'll just draw the full editor page, with our new knowledge
 

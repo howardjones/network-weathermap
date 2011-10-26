@@ -10,7 +10,7 @@ require_once 'Console/Getopt.php';
 
 require_once "Weathermap.class.php";
 
-if (!WM_module_checks()) {
+if (!wm_module_checks()) {
     die ("Quitting: Module checks failed.\n");
 }
 
@@ -148,7 +148,7 @@ if (sizeof($gopts) > 0)
 			{
 	            $varname = $matches[1];
 	            $value = $matches[2];
-				debug(">> $varname = '$value'\n");
+				wm_debug(">> $varname = '$value'\n");
 	            // save this for later, so that when the map object exists, it can be defined
 	            $defines[$varname]=$value;
 			}
@@ -198,9 +198,9 @@ if (sizeof($gopts) > 0)
 if(isset($options_output['debugging']) && $options_output['debugging']) 
 {
 	$weathermap_debugging=TRUE;
-	debug("------------------------------------\n");
-	debug("Starting PHP-Weathermap run, with config: $configfile\n");
-	debug("------------------------------------\n");
+	wm_debug("------------------------------------\n");
+	wm_debug("Starting PHP-Weathermap run, with config: $configfile\n");
+	wm_debug("------------------------------------\n");
 }
 
 $map=new Weathermap;
@@ -265,7 +265,7 @@ if ($map->ReadConfig($configfile)) {
     }
 
     if ($htmlfile != '') {
-            debug("Writing HTML to $htmlfile\n");
+            wm_debug("Writing HTML to $htmlfile\n");
             TestOutput_HTML($htmlfile, $map);    
     }
 

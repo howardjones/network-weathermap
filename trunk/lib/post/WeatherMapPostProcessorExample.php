@@ -12,7 +12,7 @@ class WeatherMapPostProcessorExample extends WeatherMapPostProcessor
         $enable = $map->get_hint("post_test_enable");
 
         if ($enable) {
-            debug(__CLASS__ . " is here\n");
+            wm_debug(__CLASS__ . " is here\n");
 
             // do your work in here...
 
@@ -20,7 +20,7 @@ class WeatherMapPostProcessorExample extends WeatherMapPostProcessor
             $map->add_note("test", $orig . " TESTYTEST");
         // -------------------------
         } else {
-            debug(__CLASS__ . " Not Enabled\n");
+            wm_debug(__CLASS__ . " Not Enabled\n");
         }
     }
 }

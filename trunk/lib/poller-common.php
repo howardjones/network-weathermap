@@ -12,9 +12,9 @@ function weathermap_memory_check($note = 'MEM')
         if ($mem > $weathermap_mem_highwater) {
             $weathermap_mem_highwater = $mem;
         }
-        $mem_used = nice_bandwidth(memory_get_usage());
+        $mem_used = wm_nice_bandwidth(memory_get_usage());
         $mem_allowed = ini_get('memory_limit');
-        debug("%s: memory_get_usage() says %sBytes used. Limit is %s\n", $note, $mem_used,
+        wm_debug("%s: memory_get_usage() says %sBytes used. Limit is %s\n", $note, $mem_used,
             $mem_allowed);
     }
 }
@@ -149,8 +149,8 @@ function weathermap_run_maps($mydir, $map_id = -1)
             . "\n", true, 'WEATHERMAP');
     }
 
-    if (false === WM_module_checks()) {
-        warn('Required modules for PHP Weathermap ' . $WEATHERMAP_VERSION
+    if (false === wm_module_checks()) {
+        wm_warn('Required modules for PHP Weathermap ' . $WEATHERMAP_VERSION
             . " were not present. Not running. [WMPOLL08]\n");
         return;
     }
@@ -165,7 +165,7 @@ function weathermap_run_maps($mydir, $map_id = -1)
 
     // first, see if the output directory even exists
     if (false === is_dir($outdir)) {
-        warn('Output directory (' . $outdir
+        wm_warn('Output directory (' . $outdir
             . ") doesn't exist!. No maps created. You probably need to create that directory, and make it writable by the poller process (like you did with the RRA directory) [WMPOLL07]\n");
         return;
     }
@@ -176,7 +176,7 @@ function weathermap_run_maps($mydir, $map_id = -1)
     $testfd = fopen($testfile, 'w');
 
     if (false === $testfd) {
-        warn('Output directory (' . $outdir . ") isn't writable (tried to create '"
+        wm_warn('Output directory (' . $outdir . ") isn't writable (tried to create '"
             . $testfile
             . "'). No maps created. You probably need to make it writable by the poller process (like you did with the RRA directory) [WMPOLL06]\n");
 
@@ -195,7 +195,7 @@ function weathermap_run_maps($mydir, $map_id = -1)
     $queryrows = db_fetch_assoc( $SQL );
 
     if (true === is_array($queryrows)) {
-        debug("Iterating all maps.\n");
+        wm_debug("Iterating all maps.\n");
 
         $imageformat = strtolower(read_config_option('weathermap_output_format'));
         $rrdtool_path = read_config_option('path_rrdtool');
@@ -206,7 +206,7 @@ function weathermap_run_maps($mydir, $map_id = -1)
             // this is what will prefix log entries for this map
             $weathermap_map = '[Map ' . $map['id'] . '] ' . $map['configfile'];
 
-            debug("FIRST TOUCH\n");
+            wm_debug("FIRST TOUCH\n");
 
             if (true === weathermap_check_cron(intval($weathermap_poller_start_time),
                 $map['schedule'])) {
@@ -226,7 +226,7 @@ function weathermap_run_maps($mydir, $map_id = -1)
 
                 if (true === file_exists($mapfile)) {
                     if ($quietlogging === 0) {
-                        warn('Map: ' . $mapfile . ' -> ' . $htmlfile . ' & ' . $imagefile
+                        wm_warn('Map: ' . $mapfile . ' -> ' . $htmlfile . ' & ' . $imagefile
                             . "\n", true);
                     }
                     db_execute(
@@ -277,20 +277,20 @@ function weathermap_run_maps($mydir, $map_id = -1)
                             foreach ($settingrows as $setting) {
                                 if ($setting['mapid'] === 0 && $setting['groupid'] === 0)
                                     {
-                                    debug('Setting additional (all maps) option: '
+                                    wm_debug('Setting additional (all maps) option: '
                                         . $setting['optname'] . " to '"
                                         . $setting['optvalue'] . "'\n");
                                     $wmap->add_hint($setting['optname'],
                                         $setting['optvalue']);
                                 } elseif ($setting['groupid'] != 0) {
-                                    debug(
+                                    wm_debug(
                                         'Setting additional (all maps in group) option: '
                                         . $setting['optname'] . " to '"
                                         . $setting['optvalue'] . "'\n");
                                     $wmap->add_hint($setting['optname'],
                                         $setting['optvalue']);
                                 } else {
-                                    debug('Setting additional map-global option: '
+                                    wm_debug('Setting additional map-global option: '
                                         . $setting['optname'] . " to '"
                                         . $setting['optvalue'] . "'\n");
                                     $wmap->add_hint($setting['optname'],
@@ -309,7 +309,7 @@ function weathermap_run_maps($mydir, $map_id = -1)
                         . $map['filehash'] . '&time=' . time();
 
                     if ($quietlogging === 0) {
-                        warn(
+                        wm_warn(
                             "About to write image file. If this is the last message in your log, increase memory_limit in php.ini [WMPOLL01]\n",
                             true);
                     }
@@ -319,7 +319,7 @@ function weathermap_run_maps($mydir, $map_id = -1)
                         read_config_option('weathermap_thumbsize'));
 
                     if ($quietlogging === 0) {
-                        warn('Wrote map to ' . $imagefile . ' and ' . $thumbimagefile
+                        wm_warn('Wrote map to ' . $imagefile . ' and ' . $thumbimagefile
                             . "\n", true);
                     }
 
@@ -329,13 +329,13 @@ function weathermap_run_maps($mydir, $map_id = -1)
                         fwrite($fd,
                             $wmap->MakeHTML('weathermap_' . $map['filehash'] . '_imap'));
                         fclose($fd);
-                        debug("Wrote HTML to %s\n", $htmlfile);
+                        wm_debug("Wrote HTML to %s\n", $htmlfile);
                     } else {
                         if (true === file_exists($htmlfile)) {
-                            warn('Failed to overwrite ' . $htmlfile
+                            wm_warn('Failed to overwrite ' . $htmlfile
                                 . " - permissions of existing file are wrong? [WMPOLL02]\n");
                         } else {
-                            warn('Failed to create ' . $htmlfile
+                            wm_warn('Failed to create ' . $htmlfile
                                 . " - permissions of output directory are wrong? [WMPOLL03]\n");
                         }
                     }
@@ -353,13 +353,13 @@ function weathermap_run_maps($mydir, $map_id = -1)
                             fwrite($fd,
                                 $wmap->MakeHTML('weathermap_' . $map['filehash'] . '_imap'));
                             fclose($fd);
-                            debug("Wrote HTML to %s\n", $htmlfile);
+                            wm_debug("Wrote HTML to %s\n", $htmlfile);
                         } else {
                             if (true === file_exists($htmlfile)) {
-                                warn('Failed to overwrite ' . $htmlfile
+                                wm_warn('Failed to overwrite ' . $htmlfile
                                     . " - permissions of existing file are wrong? [WMPOLL02]\n");
                             } else {
-                                warn('Failed to create ' . $htmlfile
+                                wm_warn('Failed to create ' . $htmlfile
                                     . " - permissions of output directory are wrong? [WMPOLL03]\n");
                             }
                         }
@@ -419,7 +419,7 @@ function weathermap_run_maps($mydir, $map_id = -1)
                     }
 
                     $map_duration = $map_end - $map_start;
-                    debug("TIME: %s took %f seconds.\n", $mapfile, $map_duration);
+                    wm_debug("TIME: %s took %f seconds.\n", $mapfile, $map_duration);
 
                     weathermap_memory_check('MEM after ' . $mapcount);
                     $mapcount++;
@@ -427,7 +427,7 @@ function weathermap_run_maps($mydir, $map_id = -1)
                         "replace into settings values('weathermap_last_finished_file','"
                         . mysql_escape_string($weathermap_map) . "')");
                 } else {
-                    warn('Mapfile ' . $mapfile
+                    wm_warn('Mapfile ' . $mapfile
                         . " is not readable or doesn't exist [WMPOLL04]\n");
                 }
                 // if the debug mode was set to once for this map, then that
@@ -443,14 +443,14 @@ function weathermap_run_maps($mydir, $map_id = -1)
                 $weathermap_warncount = 0;
                 $weathermap_map = '';
             } else {
-                debug('Skipping ' . $map['id'] . ' (' . $map['configfile']
+                wm_debug('Skipping ' . $map['id'] . ' (' . $map['configfile']
                     . ") due to schedule.\n");
             }
         }
-        debug("Iterated all %d maps.\n", $mapcount);
+        wm_debug("Iterated all %d maps.\n", $mapcount);
     } else {
         if ($quietlogging === 0) {
-            warn("No activated maps found. [WMPOLL05]\n");
+            wm_warn("No activated maps found. [WMPOLL05]\n");
         }
     }
 
@@ -470,7 +470,7 @@ function weathermap_run_maps($mydir, $map_id = -1)
             $mapcount, $duration, $total_warnings);
 
     if ($quietlogging === 0) {
-        warn('STATS: Weathermap ' . $WEATHERMAP_VERSION . ' run complete - '
+        wm_warn('STATS: Weathermap ' . $WEATHERMAP_VERSION . ' run complete - '
             . $stats_string . "\n", true);
     }
 

@@ -23,7 +23,7 @@ class WeatherMapDataSource_snmp extends WeatherMapDataSource
         if (function_exists('snmpget')) {
             return (true);
         }
-        debug("SNMP DS: snmpget() not found. Do you have the PHP SNMP module?\n");
+        wm_debug("SNMP DS: snmpget() not found. Do you have the PHP SNMP module?\n");
 
         return (false);
     }
@@ -53,17 +53,17 @@ class WeatherMapDataSource_snmp extends WeatherMapDataSource
 
         if ($map->get_hint('snmp_timeout') != '') {
             $timeout = intval($map->get_hint('snmp_timeout'));
-            debug('Timeout changed to ' . $timeout . " microseconds.\n");
+            wm_debug('Timeout changed to ' . $timeout . " microseconds.\n");
         }
 
         if ($map->get_hint("snmp_abort_count") != '') {
             $abort_count = intval($map->get_hint("snmp_abort_count"));
-            debug("Will abort after $abort_count failures for a given host.\n");
+            wm_debug("Will abort after $abort_count failures for a given host.\n");
         }
 
         if ($map->get_hint("snmp_retries") != '') {
             $retries = intval($map->get_hint("snmp_retries"));
-            debug("Number of retries changed to " . $retries . ".\n");
+            wm_debug("Number of retries changed to " . $retries . ".\n");
         }
 
         if (preg_match("/^snmp:([^:]+):([^:]+):([^:]+):([^:]+)$/", $targetstring,
@@ -118,7 +118,7 @@ class WeatherMapDataSource_snmp extends WeatherMapDataSource
                     }
                 }
 
-                debug("SNMP ReadData: Got $in_result and $out_result\n");
+                wm_debug("SNMP ReadData: Got $in_result and $out_result\n");
 
                 $data_time = time();
 
@@ -126,12 +126,12 @@ class WeatherMapDataSource_snmp extends WeatherMapDataSource
                     snmp_set_quick_print($was);
                 }
             } else {
-                warn(
+                wm_warn(
                     "SNMP for $host has reached $abort_count failures. Skipping. [WMSNMP01]");
             }
         }
 
-        debug( sprintf("SNMP ReadData: Returning (%s, %s, %s)\n",
+        wm_debug( sprintf("SNMP ReadData: Returning (%s, %s, %s)\n",
 		        string_or_null($data[IN]),
 		        string_or_null($data[OUT]),
 		        $data_time

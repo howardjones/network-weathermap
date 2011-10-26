@@ -50,13 +50,13 @@ class WeatherMapDataSource_fping extends WeatherMapDataSource
         }
 
     	if (false === is_executable($this->fping_cmd)) {
-          	warn("FPing ReadData: Can't find fping executable. Check path at line 19 of WeatherMapDataSource_fping.php [WMFPING01]\n");
+          	wm_warn("FPing ReadData: Can't find fping executable. Check path at line 19 of WeatherMapDataSource_fping.php [WMFPING01]\n");
          	
            	return (array(null, null, 0));            	
     	}
 
     	if (false === preg_match('/^fping:(\S+)$/', $targetstring, $matches)) {
-    		warn("FPing ReadData: Somehow, fping DS got called for a non-fping TARGET\n");
+    		wm_warn("FPing ReadData: Somehow, fping DS got called for a non-fping TARGET\n");
            	return (array(null, null, 0));
     	}
             
@@ -71,7 +71,7 @@ class WeatherMapDataSource_fping extends WeatherMapDataSource
             
                 $command = $this->fping_cmd
                     . ' -t100 -r1 -p20 -u -C '.$ping_count.' -i10 -q '.$target.' 2>&1';
-                debug('Running '.$command."\n");
+                wm_debug('Running '.$command."\n");
                 $pipe = popen($command, 'r');
 
                 $count = 0;
@@ -87,10 +87,10 @@ class WeatherMapDataSource_fping extends WeatherMapDataSource
                     while (!feof($pipe)) {
                         $line = fgets($pipe, 4096);
                         $count++;
-                        debug('Output: '.$line);
+                        wm_debug('Output: '.$line);
 
                         if (preg_match($pattern, $line, $matches)) {
-                            debug('Found output line for '.$target."\n");
+                            wm_debug('Found output line for '.$target."\n");
                             $hitcount++;
                            
 
@@ -109,18 +109,18 @@ class WeatherMapDataSource_fping extends WeatherMapDataSource
                                 $ave = $total / $cnt;
                             }
 
-                            debug( sprintf("Result: %d %f -> %f %f %f\n", 
+                            wm_debug( sprintf("Result: %d %f -> %f %f %f\n", 
                             		$cnt, $min, $max, $ave, $loss));                            
                         }
                     }
                     pclose($pipe);
 
                     if ($count === 0) {
-                        warn(
+                        wm_warn(
                             'FPing ReadData: No lines read. Bad hostname? ('.$target.") [WMFPING03]\n");
                     } else {
                         if ($hitcount === 0) {
-                            warn(
+                            wm_warn(
                                 'FPing ReadData: '.$count.' lines read. But nothing returned for target??? ('.$target.") Try running with DEBUG to see output.  [WMFPING02]\n");
                         } else {
                             $data[IN] = $ave;
@@ -131,7 +131,7 @@ class WeatherMapDataSource_fping extends WeatherMapDataSource
                     }
                 }             
 
-        debug( sprintf("FPing ReadData: Returning (%s, %s, %s)\n",
+        wm_debug( sprintf("FPing ReadData: Returning (%s, %s, %s)\n",
 		        string_or_null($data[IN]),
 		        string_or_null($data[OUT]),
 		        $data_time

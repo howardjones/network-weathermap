@@ -170,7 +170,7 @@ class WeatherMapLink extends WeatherMapItem
             $template = 'DEFAULT';
         }
         
-        debug("Resetting $this->name with $template\n");
+        wm_debug("Resetting $this->name with $template\n");
 
         // the internal default-default gets it's values from inherit_fieldlist
         // everything else comes from a link object - the template.
@@ -184,8 +184,8 @@ class WeatherMapLink extends WeatherMapItem
         $this->template = $template;
 
         // to stop the editor tanking, now that colours are decided earlier in ReadData
-        $this->colours[IN] = new Colour(192, 192, 192);
-        $this->colours[OUT] = new Colour(192, 192, 192);
+        $this->colours[IN] = new WMColour(192, 192, 192);
+        $this->colours[OUT] = new WMColour(192, 192, 192);
         $this->id = $newowner->next_id++;
     }
 
@@ -196,7 +196,7 @@ class WeatherMapLink extends WeatherMapItem
 
     function CopyFrom(&$source)
     {
-        debug("Initialising LINK ".$this->name." from ".$source->name."\n");
+        wm_debug("Initialising LINK ".$this->name." from ".$source->name."\n");
         assert('is_object($source)');
 
         foreach (array_keys($this->inherit_fieldlist) as $fld) {
@@ -233,7 +233,7 @@ class WeatherMapLink extends WeatherMapItem
             # print "COMMENT: $comment";
 
             if ($this->owner->get_hint('screenshot_mode') == 1) {
-                $comment = screenshotify($comment);
+                $comment = wm_screenshotify($comment);
             }
             
             $this->commenttext[$dir] = $comment;
@@ -284,7 +284,7 @@ class WeatherMapLink extends WeatherMapItem
         else
         {
             // do the simpler calculation for a straight link
-            $d = new Vector($this->b->x - $this->a->x, $this->b->y - $this->a->y);
+            $d = new WMVector($this->b->x - $this->a->x, $this->b->y - $this->a->y);
             $totaldistance = $d->length();
             $d->normalise();
             $n = $d->get_normal();
@@ -304,16 +304,16 @@ class WeatherMapLink extends WeatherMapItem
 
                     if (($comment_index != 0) && (($x != $curvepoints[$comment_index][0])
                         || ($y != $curvepoints[$comment_index][1]))) {
-                        $d = new Vector($x - $curvepoints[$comment_index][0], $y - $curvepoints[$comment_index][1]);
+                        $d = new WMVector($x - $curvepoints[$comment_index][0], $y - $curvepoints[$comment_index][1]);
                     } else {
-                        $d = new Vector($curvepoints[$comment_index + 1][0] - $x, $curvepoints[$comment_index + 1][1] - $y);
+                        $d = new WMVector($curvepoints[$comment_index + 1][0] - $x, $curvepoints[$comment_index + 1][1] - $y);
                     }
-                    $edge = new Point($x, $y);
+                    $edge = new WMPoint($x, $y);
                 }
                 else
                 {
                     // this is what would have come from the spine, in a curved link
-                    $edge = new Point($this->comment_x[$dir], $this->comment_y[$dir]);
+                    $edge = new WMPoint($this->comment_x[$dir], $this->comment_y[$dir]);
                     $angle = $d->get_angle();
                 }                
 
@@ -402,14 +402,14 @@ class WeatherMapLink extends WeatherMapItem
 			|| is_null($x2)
 			|| is_null($y2)
 			) {
-            warn("LINK " . $this->name . " uses a NODE with no POSITION! [WMWARN35]\n");
+            wm_warn("LINK " . $this->name . " uses a NODE with no POSITION! [WMWARN35]\n");
             return;
         }
 		
         if (($this->linkstyle == 'twoway')
             && ($this->labeloffset_in < $this->labeloffset_out)
                 && (intval($map->get_hint("nowarn_bwlabelpos")) == 0)) {
-            warn("LINK " . $this->name
+            wm_warn("LINK " . $this->name
                 . " probably has it's BWLABELPOSs the wrong way around [WMWARN50]\n");
         }
 
@@ -424,14 +424,14 @@ class WeatherMapLink extends WeatherMapItem
         $y2 += $dy;
 
         if (($x1 == $x2) && ($y1 == $y2) && sizeof($this->vialist) == 0) {
-            warn("Zero-length link " . $this->name . " skipped. [WMWARN45]");
+            wm_warn("Zero-length link " . $this->name . " skipped. [WMWARN45]");
             return;
         }
 
         $nvia = 0;
 		
-        $outlinecol = new Colour($this->outlinecolour);
-        $commentcol = new Colour($this->commentfontcolour);
+        $outlinecol = new WMColour($this->outlinecolour);
+        $commentcol = new WMColour($this->commentfontcolour);
 
         $outline_colour = $outlinecol->gdallocate($im);
 
@@ -660,14 +660,14 @@ class WeatherMapLink extends WeatherMapItem
                 $thelabel = $map->ProcessString($this->bwlabelformats[$task[7]], $this);
 
                 if ($thelabel != '') {
-                    debug("Bandwidth for label is " . $task[5] . "\n");
+                    wm_debug("Bandwidth for label is " . $task[5] . "\n");
 
                     $padding = intval($this->get_hint('bwlabel_padding'));
 
 // if screenshot_mode is enabled, wipe any letters to X and wipe any IP address to 127.0.0.1
 // hopefully that will preserve enough information to show cool stuff without leaking info
                     if ($map->get_hint('screenshot_mode') == 1) {
-                        $thelabel = screenshotify($thelabel);
+                        $thelabel = wm_screenshotify($thelabel);
                     }
 
                     if ($this->labelboxstyle == 'angled') {
@@ -694,7 +694,7 @@ class WeatherMapLink extends WeatherMapItem
         } else {
             $dd = $this->owner->links[$this->template];
 
-            debug("Writing config for LINK $this->name against $this->template\n");
+            wm_debug("Writing config for LINK $this->name against $this->template\n");
 
             $basic_params = array (
                 array (

@@ -116,26 +116,31 @@ class WeatherMapLink extends WeatherMapItem
             'linkstyle' => 'twoway',
             'overlibwidth' => 0,
             'overlibheight' => 0,
+            // TODO - Should be WMColour
             'outlinecolour' => array (
                 0,
                 0,
                 0
             ),
+            // TODO - Should be WMColour
             'bwoutlinecolour' => array (
                 0,
                 0,
                 0
             ),
+            // TODO - Should be WMColour
             'bwfontcolour' => array (
                 0,
                 0,
                 0
             ),
+            // TODO - Should be WMColour
             'bwboxcolour' => array (
                 255,
                 255,
                 255
             ),
+            // TODO - Should be WMColour
             'commentfontcolour' => array (
                 192,
                 192,
@@ -413,12 +418,12 @@ class WeatherMapLink extends WeatherMapItem
                 . " probably has it's BWLABELPOSs the wrong way around [WMWARN50]\n");
         }
 
-        list($dx, $dy) = calc_offset($this->a_offset, $map->nodes[$this->a->name]->width,
+        list($dx, $dy) = wm_calc_offset($this->a_offset, $map->nodes[$this->a->name]->width,
             $map->nodes[$this->a->name]->height);
         $x1 += $dx;
         $y1 += $dy;
 
-        list($dx, $dy) = calc_offset($this->b_offset, $map->nodes[$this->b->name]->width,
+        list($dx, $dy) = wm_calc_offset($this->b_offset, $map->nodes[$this->b->name]->width,
             $map->nodes[$this->b->name]->height);
         $x2 += $dx;
         $y2 += $dy;
@@ -488,18 +493,18 @@ class WeatherMapLink extends WeatherMapItem
         // if there are no vias, we can skip a lot of curve-related calculations
 		if($nvia == -1) {
 
-                    $this->curvepoints = calc_straight($xpoints, $ypoints);
+                    $this->curvepoints = WMCurve::calc_straight($xpoints, $ypoints);
 
                     // if the link is straight, then some simple linear interpolation
                     // will find the positions for everything
-                    $this->mid_x = linterp($x1, $x2, $this->splitpos);
-                    $this->mid_y = linterp($y1, $y2, $this->splitpos);
+                    $this->mid_x = wm_interpolate($x1, $x2, $this->splitpos);
+                    $this->mid_y = wm_interpolate($y1, $y2, $this->splitpos);
 
-                    $this->label_x[IN] = linterp($x1, $x2, $this->labeloffset_in);
-                    $this->label_y[IN] = linterp($y1, $y2, $this->labeloffset_in);
+                    $this->label_x[IN] = wm_interpolate($x1, $x2, $this->labeloffset_in);
+                    $this->label_y[IN] = wm_interpolate($y1, $y2, $this->labeloffset_in);
 
-                    $this->label_x[OUT] = linterp($x1, $x2, $this->labeloffset_out);
-                    $this->label_y[OUT] = linterp($y1, $y2, $this->labeloffset_out);
+                    $this->label_x[OUT] = wm_interpolate($x1, $x2, $this->labeloffset_out);
+                    $this->label_y[OUT] = wm_interpolate($y1, $y2, $this->labeloffset_out);
 
                     # $angle = ($y2-$y1) / ($x2-$x1);
                     $angle = rad2deg(atan2($y1-$y2, $x2-$x1));
@@ -510,10 +515,10 @@ class WeatherMapLink extends WeatherMapItem
                     $this->comment_angle[OUT] = $angle;
 
                     // these are ON the link axis, which isn't actually correct
-                    $this->comment_x[IN] = linterp($x1,$x2,$this->commentoffset_in);
-                    $this->comment_y[IN] = linterp($y1,$y2,$this->commentoffset_in);
-                    $this->comment_x[OUT] = linterp($x1,$x2,$this->commentoffset_out);
-                    $this->comment_y[OUT] = linterp($y1,$y2,$this->commentoffset_out);
+                    $this->comment_x[IN] = wm_interpolate($x1,$x2,$this->commentoffset_in);
+                    $this->comment_y[IN] = wm_interpolate($y1,$y2,$this->commentoffset_in);
+                    $this->comment_x[OUT] = wm_interpolate($x1,$x2,$this->commentoffset_out);
+                    $this->comment_y[OUT] = wm_interpolate($y1,$y2,$this->commentoffset_out);
 
                     if($this->linkstyle == 'oneway') {
                         DrawArrow($im, $x1,$y1, $x2, $y2,
@@ -539,10 +544,10 @@ class WeatherMapLink extends WeatherMapItem
                     // so there is a curvepoints array and all the rest
                     if ( ($this->viastyle == 'curved')) {
 				// Calculate the spine points - the actual curve
-				$this->curvepoints = calc_curve($xpoints, $ypoints);
+				$this->curvepoints = WMCurve::calc_curve($xpoints, $ypoints);
 
 				// then draw the curve itself
-				draw_curve($im, $this->curvepoints, array (
+				draw_curved_link($im, $this->curvepoints, array (
 					$link_in_width,
 					$link_out_width
 				), $outline_colour, array (
@@ -560,7 +565,7 @@ class WeatherMapLink extends WeatherMapItem
 				$this->curvepoints = calc_straight($xpoints, $ypoints);
 				
 				// then draw the "curve" itself
-				draw_straight($im, $this->curvepoints, array (
+				draw_angled_link($im, $this->curvepoints, array (
 					$link_in_width,
 					$link_out_width
 				), $outline_colour, array (

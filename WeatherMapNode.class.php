@@ -106,31 +106,37 @@ class WeatherMapNode extends WeatherMapItem
                 IN => '',
                 OUT => ''
             ),
+            // TODO - Should be WMColour
             'labeloutlinecolour' => array (
                 0,
                 0,
                 0
             ),
+            // TODO - Should be WMColour
             'labelbgcolour' => array (
                 255,
                 255,
                 255
             ),
+            // TODO - Should be WMColour
             'labelfontcolour' => array (
                 0,
                 0,
                 0
             ),
+            // TODO - Should be WMColour
             'labelfontshadowcolour' => array (
                 -1,
                 -1,
                 -1
             ),
+            // TODO - Should be WMColour
             'aiconoutlinecolour' => array (
                 0,
                 0,
                 0
             ),
+            // TODO - Should be WMColour
             'aiconfillcolour' => array (
                 -2,
                 -2,
@@ -379,12 +385,12 @@ class WeatherMapNode extends WeatherMapItem
 
                 if ($this->iconfile == 'rbox') {
                     if ($fill !== null && !$fill->is_none()) {
-                        imagefilledroundedrectangle($icon_im, 0, 0, $this->iconscalew - 1,
+                        WMGraphics::imagefilledroundedrectangle($icon_im, 0, 0, $this->iconscalew - 1,
                             $this->iconscaleh - 1, 4, $fill->gdallocate($icon_im));
                     }
 
                     if ($ink !== null && !$ink->is_none()) {
-                        imageroundedrectangle($icon_im, 0, 0, $this->iconscalew - 1,
+                        WMGraphics::imageroundedrectangle($icon_im, 0, 0, $this->iconscalew - 1,
                             $this->iconscaleh - 1, 4, $ink->gdallocate($icon_im));
                     }
                 }
@@ -569,7 +575,7 @@ class WeatherMapNode extends WeatherMapItem
             $this->labeloffsetx = 0;
             $this->labeloffsety = 0;
 
-            list($dx, $dy) = calc_offset($this->labeloffset, ($icon_w + $boxwidth - 1),
+            list($dx, $dy) = wm_calc_offset($this->labeloffset, ($icon_w + $boxwidth - 1),
                 ($icon_h + $boxheight));
         }
 

@@ -419,155 +419,10 @@ function imagecreatefromfile($filename)
     return $bgimage;
 }
 
-/**
- * Much nicer colorization than imagefilter does, AND no special requirements.
- * Preserves white, black and transparency.
- *
- * taken from here:
- * http://www.php.net/manual/en/function.imagefilter.php#62395
- * ( with some bugfixes and changes)
- *
- * @param gdimageref $im
- * @param int $r
- * @param int $g
- * @param int $b
- * @return gdimageref
- */
-function imagecolorize($im, $r, $g, $b)
-{    
-    // The function only accepts indexed colour images.
-    // Unfortunately, imagetruecolortopalette is pretty crappy, so you are
-    // probably better off using Paint.NET/Gimp etc to make an indexed colour
-    // version of the icon, rather than rely on this
-    if(imageistruecolor($im)) {
-        wm_debug("imagecolorize requires paletted images - this is a truecolor image. Converting.");
-        imagetruecolortopalette($im,false,256);
-        wm_debug("Converted image has %d colours.\n", imagecolorstotal($im));
-    }
-
-    // We will create a monochromatic palette based on the input color
-    // which will go from black to white
-    //
-    // Input color luminosity: this is equivalent to the
-    // position of the input color in the monochromatic palette (765=255*3)
-    $lum_inp = round(255 * ($r + $g + $b) / 765);
-
-    //We fill the palette entry with the input color at its
-    //corresponding position
-
-    $pal[$lum_inp]['r'] = $r;
-    $pal[$lum_inp]['g'] = $g;
-    $pal[$lum_inp]['b'] = $b;
-
-    //Now we complete the palette, first we'll do it to
-    //the black,and then to the white.
-
-    //FROM input to black
-    //how many colors between black and input
-    $steps_to_black = $lum_inp;
-
-    //The step size for each component
-    if ($steps_to_black > 0) {
-        $step_size_red = $r / $steps_to_black;
-        $step_size_green = $g / $steps_to_black;
-        $step_size_blue = $b / $steps_to_black;
-    }
-
-    for ($i = $steps_to_black; $i >= 0; $i--) {
-        $pal[$steps_to_black - $i]['r'] = $r - round($step_size_red * $i);
-        $pal[$steps_to_black - $i]['g'] = $g - round($step_size_green * $i);
-        $pal[$steps_to_black - $i]['b'] = $b - round($step_size_blue * $i);
-    }
-
-    //From input to white:
-    //how many colors between input and white
-    $steps_to_white = 255 - $lum_inp;
-
-    if ($steps_to_white > 0) {
-        $step_size_red = (255 - $r) / $steps_to_white;
-        $step_size_green = (255 - $g) / $steps_to_white;
-        $step_size_blue = (255 - $b) / $steps_to_white;
-    } else {
-        $step_size_red = $step_size_green = $step_size_blue = 0;
-    }
-
-    //The step size for each component
-    for ($i = ($lum_inp + 1); $i <= 255; $i++) {
-        $pal[$i]['r'] = $r + round($step_size_red * ($i - $lum_inp));
-        $pal[$i]['g'] = $g + round($step_size_green * ($i - $lum_inp));
-        $pal[$i]['b'] = $b + round($step_size_blue * ($i - $lum_inp));
-    }
-
-    //--- End of palette creation
-
-    //Now, let's change the original palette into the one we created
-    for ($c = 0; $c < imagecolorstotal($im); $c++) {
-        $col = imagecolorsforindex($im, $c);
-        $lum_src = round(255 * ($col['red'] + $col['green'] + $col['blue']) / 765);
-        $col_out = $pal[$lum_src];
-
-        imagecolorset($im, $c, $col_out['r'], $col_out['g'], $col_out['b']);
-    }
-
-    return ($im);
-}
 
 
 
 
-
-/**
- * find the point where a line from x1,y1 through x2,y2 crosses another line through x3,y3 and x4,y4
- * (the point might not be between those points, but beyond them)
- * - doesn't handle parallel lines. In our case we will never get them.
- * - make sure we remove colinear points, or this will not be true!
- *
- * @param float $x1
- * @param float $y1
- * @param float $x2
- * @param float $y2
- * @param float $x3
- * @param float $y3
- * @param float $x4
- * @param float $y4
- * @return float[]
- */
-function line_crossing($x1, $y1, $x2, $y2, $x3, $y3, $x4, $y4)
-{
-
-    // First, check that the slope isn't infinite.
-    // if it is, tweak it to be merely huge
-    if ($x1 !== $x2) {
-        $slope1 = ($y2 - $y1) / ($x2 - $x1);
-    } else {
-        $slope1 = 1e10;
-        wm_debug("Slope1 is infinite.\n");
-    }
-
-    if ($x3 !== $x4) {
-        $slope2 = ($y4 - $y3) / ($x4 - $x3);
-    } else {
-        $slope2 = 1e10;
-        wm_debug("Slope2 is infinite.\n");
-    }
-
-    $a1 = $slope1;
-    $a2 = $slope2;
-    $b1 = -1;
-    $b2 = -1;
-    $c1 = ($y1 - $slope1 * $x1);
-    $c2 = ($y3 - $slope2 * $x3);
-
-    $det_inv = 1 / ($a1 * $b2 - $a2 * $b1);
-
-    $xi = (($b1 * $c2 - $b2 * $c1) * $det_inv);
-    $yi = (($a2 * $c1 - $a1 * $c2) * $det_inv);
-
-    return (array (
-        $xi,
-        $yi
-    ));
-}
 
 
 /**
@@ -782,10 +637,10 @@ function wm_interpolate($v1, $v2, $percent)
  * @param <type> $linkname
  * @param <type> $dir
  */
-    function DrawArrow($image, $x1,$y1,$x2,$y2,$w, $outlinecolour, $fillcolour, &$map, $linkname, $dir)
-    {
-        $arrowheadsize = 4 * $w;
-        $arrowheadwidth = 2 * $w;
+function DrawArrow($image, $x1,$y1,$x2,$y2,$w, $outlinecolour, $fillcolour, &$map, $linkname, $dir)
+{
+    $arrowheadsize = 4 * $w;
+    $arrowheadwidth = 2 * $w;
 
 #        print "$linkname   $x1, $y1 -> $x2, $y2\n";
 
@@ -820,26 +675,26 @@ function wm_interpolate($v1, $v2, $percent)
       $poly[] = $x1 - $norm->dx * $w;
       $poly[] = $y1 - $norm->dy * $w;
 
-            if (false === is_null($fillcolour)) {
-                imagefilledpolygon($image, $poly, count($poly)/2, $fillcolour);
-            } else {
-                wm_debug("Not drawing %s (%s) outline because there is no fill colour\n", $linkname, $dir);
-            }
+        if (false === is_null($fillcolour)) {
+            imagefilledpolygon($image, $poly, count($poly)/2, $fillcolour);
+        } else {
+            wm_debug("Not drawing %s (%s) outline because there is no fill colour\n", $linkname, $dir);
+        }
 
-            $areaname = 'LINK:L' . $map->links[$linkname]->id . ':'.$dir;
-            $map->imap->addArea('Polygon', $areaname, '', $poly);
-            wm_debug("Adding Poly imagemap for %s\n", $areaname);
-		$map->links[$linkname]->imap_areas[] = $areaname;
+        $areaname = 'LINK:L' . $map->links[$linkname]->id . ':'.$dir;
+        $map->imap->addArea('Polygon', $areaname, '', $poly);
+        wm_debug("Adding Poly imagemap for %s\n", $areaname);
+            $map->links[$linkname]->imap_areas[] = $areaname;
 
-            if (false === is_null($outlinecolour)) {
-                imagepolygon($image, $poly, count($poly)/2, $outlinecolour);
-            } else {
-                wm_debug("Not drawing %s (%s) outline because there is no outline colour\n", $linkname, $dir);
-            }
+        if (false === is_null($outlinecolour)) {
+            imagepolygon($image, $poly, count($poly)/2, $outlinecolour);
+        } else {
+            wm_debug("Not drawing %s (%s) outline because there is no outline colour\n", $linkname, $dir);
+        }
 
-       }
+   }
 
-function draw_angled_link($image, &$curvepoints, $widths, $outlinecolour, $fillcolours,
+function wm_draw_angled_link($image, &$curvepoints, $widths, $outlinecolour, $fillcolours,
     $linkname, &$map, $q2_percent = 50, $unidirectional = false)
 {
     $totaldistance = $curvepoints[count($curvepoints) - 1][DISTANCE];
@@ -986,9 +841,9 @@ function draw_angled_link($image, &$curvepoints, $widths, $outlinecolour, $fillc
             $reversepoints[] = $simple[0][Y];
             $numrpoints++;
 
-// before the main loop, add in the jump out to the corners
-// if this is the first step, then we need to go from the middle to the outside edge first
-// ( the loop may not run, but these corners are required)
+            // before the main loop, add in the jump out to the corners
+            // if this is the first step, then we need to go from the middle to the outside edge first
+            // ( the loop may not run, but these corners are required)
             $i = 0;
             $v1 = new WMVector($simple[$i + 1][X] - $simple[$i][X],
                 $simple[$i + 1][Y] - $simple[$i][Y]);
@@ -1032,7 +887,7 @@ function draw_angled_link($image, &$curvepoints, $widths, $outlinecolour, $fillc
 
                 // now figure out the geometry for where the next corners are
 
-                list($xi1, $yi1) = line_crossing($simple[$i][X] + $n1->dx * $widths[$dir],
+                list($xi1, $yi1) = WMCurve::line_crossing($simple[$i][X] + $n1->dx * $widths[$dir],
                     $simple[$i][Y] + $n1->dy * $widths[$dir],
                     $simple[$i + 1][X] + $n1->dx * $widths[$dir],
                     $simple[$i + 1][Y] + $n1->dy * $widths[$dir],
@@ -1041,7 +896,7 @@ function draw_angled_link($image, &$curvepoints, $widths, $outlinecolour, $fillc
                     $simple[$i + 2][X] + $n2->dx * $widths[$dir],
                     $simple[$i + 2][Y] + $n2->dy * $widths[$dir]);
 
-                list($xi2, $yi2) = line_crossing($simple[$i][X] - $n1->dx * $widths[$dir],
+                list($xi2, $yi2) = WMCurve::line_crossing($simple[$i][X] - $n1->dx * $widths[$dir],
                     $simple[$i][Y] - $n1->dy * $widths[$dir],
                     $simple[$i + 1][X] - $n1->dx * $widths[$dir],
                     $simple[$i + 1][Y] - $n1->dy * $widths[$dir],
@@ -1065,7 +920,7 @@ function draw_angled_link($image, &$curvepoints, $widths, $outlinecolour, $fillc
 //   be either one of these points.
 
                     list($xi3, $yi3) =
-                        line_crossing($simple[$i][X] + $n1->dx * $widths[$dir],
+                        WMCurve::line_crossing($simple[$i][X] + $n1->dx * $widths[$dir],
                             $simple[$i][Y] + $n1->dy * $widths[$dir],
                             $simple[$i + 1][X] + $n1->dx * $widths[$dir],
                             $simple[$i + 1][Y] + $n1->dy * $widths[$dir],
@@ -1075,7 +930,7 @@ function draw_angled_link($image, &$curvepoints, $widths, $outlinecolour, $fillc
                             $simple[$i + 2][Y] - $n2->dy * $widths[$dir]);
 
                     list($xi4, $yi4) =
-                        line_crossing($simple[$i][X] - $n1->dx * $widths[$dir],
+                        WMCurve::line_crossing($simple[$i][X] - $n1->dx * $widths[$dir],
                             $simple[$i][Y] - $n1->dy * $widths[$dir],
                             $simple[$i + 1][X] - $n1->dx * $widths[$dir],
                             $simple[$i + 1][Y] - $n1->dy * $widths[$dir],
@@ -1167,7 +1022,7 @@ function draw_angled_link($image, &$curvepoints, $widths, $outlinecolour, $fillc
 //    width is the link width (the actual width is twice this)
 //    outlinecolour is a GD colour reference
 //    fillcolours is an array of two more colour references, one for the out, and one for the in spans
-function draw_curved_link($image, &$curvepoints, $widths, $outlinecolour, $fillcolours,
+function wm_draw_curved_link($image, &$curvepoints, $widths, $outlinecolour, $fillcolours,
     $linkname, &$map, $q2_percent = 50, $unidirectional = false)
 {
 // now we have a 'spine' - all the central points for this curve.
@@ -1872,26 +1727,27 @@ class WMColour
                 $this->r = $ary[0];
                 $this->g = $ary[1];
                 $this->b = $ary[2];
-            } else {
-                $ary = func_get_arg(0);
+            } else {          
+                // a single scalar argument - should be a 'special' colour
+                $arg = func_get_arg(0);
 
-                if($ary[0] == 'none') {
+                if($arg == 'none') {
                     $this->r = -1;
                     $this->g = -1;
                     $this->b = -1;
                 }
 
-                if($ary[0] == 'copy') {
+                if($arg == 'copy') {
                     $this->r = -2;
                     $this->g = -2;
                     $this->b = -2;
                 }
 
-                if($ary[0] == 'contrast') {
+                if($arg == 'contrast') {
                     $this->r = -3;
                     $this->g = -3;
                     $this->b = -3;
-                }
+                }                
             }
 
         }
@@ -2085,6 +1941,99 @@ class WMGraphics {
             $color);
     }
 
+    /**
+     * Much nicer colorization than imagefilter does, AND no special requirements.
+     * Preserves white, black and transparency.
+     *
+     * taken from here:
+     * http://www.php.net/manual/en/function.imagefilter.php#62395
+     * ( with some bugfixes and changes)
+     *
+     * @param gdimageref $im
+     * @param int $r
+     * @param int $g
+     * @param int $b
+     * @return gdimageref
+     */
+    function imagecolorize($im, $r, $g, $b)
+    {    
+        // The function only accepts indexed colour images.
+        // Unfortunately, imagetruecolortopalette is pretty crappy, so you are
+        // probably better off using Paint.NET/Gimp etc to make an indexed colour
+        // version of the icon, rather than rely on this
+        if(imageistruecolor($im)) {
+            wm_debug("imagecolorize requires paletted images - this is a truecolor image. Converting.");
+            imagetruecolortopalette($im,false,256);
+            wm_debug("Converted image has %d colours.\n", imagecolorstotal($im));
+        }
+
+        // We will create a monochromatic palette based on the input color
+        // which will go from black to white
+        //
+        // Input color luminosity: this is equivalent to the
+        // position of the input color in the monochromatic palette (765=255*3)
+        $lum_inp = round(255 * ($r + $g + $b) / 765);
+
+        //We fill the palette entry with the input color at its
+        //corresponding position
+
+        $pal[$lum_inp]['r'] = $r;
+        $pal[$lum_inp]['g'] = $g;
+        $pal[$lum_inp]['b'] = $b;
+
+        //Now we complete the palette, first we'll do it to
+        //the black,and then to the white.
+
+        //FROM input to black
+        //how many colors between black and input
+        $steps_to_black = $lum_inp;
+
+        //The step size for each component
+        if ($steps_to_black > 0) {
+            $step_size_red = $r / $steps_to_black;
+            $step_size_green = $g / $steps_to_black;
+            $step_size_blue = $b / $steps_to_black;
+        }
+
+        for ($i = $steps_to_black; $i >= 0; $i--) {
+            $pal[$steps_to_black - $i]['r'] = $r - round($step_size_red * $i);
+            $pal[$steps_to_black - $i]['g'] = $g - round($step_size_green * $i);
+            $pal[$steps_to_black - $i]['b'] = $b - round($step_size_blue * $i);
+        }
+
+        //From input to white:
+        //how many colors between input and white
+        $steps_to_white = 255 - $lum_inp;
+
+        if ($steps_to_white > 0) {
+            $step_size_red = (255 - $r) / $steps_to_white;
+            $step_size_green = (255 - $g) / $steps_to_white;
+            $step_size_blue = (255 - $b) / $steps_to_white;
+        } else {
+            $step_size_red = $step_size_green = $step_size_blue = 0;
+        }
+
+        //The step size for each component
+        for ($i = ($lum_inp + 1); $i <= 255; $i++) {
+            $pal[$i]['r'] = $r + round($step_size_red * ($i - $lum_inp));
+            $pal[$i]['g'] = $g + round($step_size_green * ($i - $lum_inp));
+            $pal[$i]['b'] = $b + round($step_size_blue * ($i - $lum_inp));
+        }
+
+        //--- End of palette creation
+
+        //Now, let's change the original palette into the one we created
+        for ($c = 0; $c < imagecolorstotal($im); $c++) {
+            $col = imagecolorsforindex($im, $c);
+            $lum_src = round(255 * ($col['red'] + $col['green'] + $col['blue']) / 765);
+            $col_out = $pal[$lum_src];
+
+            imagecolorset($im, $c, $col_out['r'], $col_out['g'], $col_out['b']);
+        }
+
+        return ($im);
+    }
+
     
     function draw_marker_diamond($im, $col, $x, $y, $size = 10)
     {
@@ -2147,8 +2096,202 @@ class WMGraphics {
  * The link-drawing stuff (especially curves) uses a 'spine' of points,
  * each with x,y coordinates and a distance along the spine. This is used
  * to position the various elements like arrowheads, labels etc.
+ * 
  */
 class WMSpine {
+    
+    // The actual spine array - 3 elements per step (x, y, distance)
+    var $spine = array(); 
+    
+    /**
+     * Given a spine array, find the point that is a given distance from the
+     * beginning, in pixels. Finds the known point before the distance is passed,
+     * and then interpolates to the exact distance, if necessary.
+     *
+     * @return float[]
+     */
+    function find_distance_coords($distance)
+    {
+        // We find the nearest lower point for each distance,
+        // then linearly interpolate to get a more accurate point
+        // this saves having quite so many points-per-curve
+            if(count($this->spine)===0) {
+                    return array(0,0,0);
+            }
+
+
+        $index = find_distance($this->spine, $distance);
+
+        $ratio = ($distance - $this->spine[$index][2])
+            / ($this->spine[$index + 1][2] - $this->spine[$index][2]);
+        $x = $this->spine[$index][0]
+            + $ratio * ($this->spine[$index + 1][0] - $this->spine[$index][0]);
+        $y = $this->spine[$index][1]
+            + $ratio * ($this->spine[$index + 1][1] - $this->spine[$index][1]);
+
+        return (array (
+            $x,
+            $y,
+            $index
+        ));
+    }
+
+    function find_distance_coords_angle($distance)
+    {
+        // This is the point we need
+        list($x, $y, $index) = find_distance_coords($this->spine, $distance);
+
+        // now to find one either side of it, to get a line to find the angle of
+        $left = $index;
+        $right = $left + 1;
+        $max = count($this->spine) - 1;
+
+        // if we're right up against the last point, then step backwards one
+        if ($right >= $max) {
+            $left--;
+            $right--;
+        }
+
+        $x1 = $this->spine[$left][0];
+        $y1 = $this->spine[$left][1];
+
+        $x2 = $this->spine[$right][0];
+        $y2 = $this->spine[$right][1];
+
+        $dx = $x2 - $x1;
+        $dy = $y2 - $y1;
+
+        $angle = rad2deg(atan2(-$dy, $dx));
+
+        return (array (
+            $x,
+            $y,
+            $index,
+            $angle
+        ));
+    }
+
+    // return the index of the point either at (unlikely) or just before the target distance
+    // we will linearly interpolate afterwards to get a true point - pointarray is an array of 3-tuples produced by the function above
+    function find_distance($distance)
+    {
+        $left = 0;
+        $right = count($this->spine) - 1;
+
+        if ($left == $right) {
+            return ($left);
+        }
+
+        // if the distance is zero, there's no need to search (and it doesn't work anyway)
+        if ($distance == 0) {
+            return ($left);
+        }
+
+        // if it's a point past the end of the line, then just return the end of the line
+        // Weathermap should *never* ask for this, anyway
+        if ($this->spine[$right][2] < $distance) {
+            return ($right);
+        }
+
+        // if somehow we have a 0-length curve, then don't try and search, just give up
+        // in a somewhat predictable manner
+        if ($this->spine[$left][2] == $this->spine[$right][2]) {
+            return ($left);
+        }
+
+        while ($left <= $right) {
+            $mid = floor(($left + $right) / 2);
+
+            if (($this->spine[$mid][2] < $distance) && ($this->spine[$mid + 1][2] >= $distance))
+                {
+                return $mid;
+            }
+
+            if ($distance <= $this->spine[$mid][2]) {
+                $right = $mid - 1;
+            } else {
+                $left = $mid + 1;
+            }
+        }
+
+        print "FELL THROUGH\n";
+
+        die("Howie's crappy binary search is wrong after all.\n");
+    }
+
+
+    
+    
+    /**
+     * Take a spine, and strip out all the points that are co-linear
+     * with the points either side of them
+     *
+     * @param float $epsilon     the 'fudge factor' of how close is considered equal
+     * @return float[][]         the new reduced spine array
+     */
+    function simplify($epsilon = 1e-10)
+    {
+        $output = array ();
+
+        $output[] = $this->spine[0];
+        $n = 1;
+        $c = count($this->spine) - 2;
+        $skip = 0;
+
+        for ($n = 1; $n <= $c; $n++) {
+            $x = $this->spine[$n][X];
+            $y = $this->spine[$n][Y];
+
+            // figure out the area of the triangle formed by this point, and the one before and after
+            $a = abs($this->spine[$n - 1][X] * ($this->spine[$n][Y] - $this->spine[$n + 1][Y])
+                + $this->spine[$n][X] * ($this->spine[$n + 1][Y] - $this->spine[$n - 1][Y])
+                + $this->spine[$n + 1][X] * ($this->spine[$n - 1][Y] - $this->spine[$n][Y]));
+
+            if ($a > $epsilon)
+            {
+                $output[] = $this->spine[$n];
+            } else {
+                // ignore n
+                $skip++;
+            }
+        }
+
+        wm_debug("Skipped %d points of %d\n", $skip, $c);
+
+        $output[] = $this->spine[$c + 1];
+        return $output;
+    }
+    
+    /**
+     * Draw a spine array - not used in the main code, just for debugging
+     *
+     * @param gdimageref $im
+     * @param gdcolorref $col
+     */
+    function draw($im, $col)
+    {
+        $max_i = count($this->spine) - 1;
+
+        for ($i = 0; $i < $max_i; $i++) {
+            imageline($im, $this->spine[$i][X], $this->spine[$i][Y], $this->spine[$i + 1][X], $this->spine[$i + 1][Y],
+                $col);
+        }
+    }
+    
+    /**
+     * Dump a spine array as text - not used in the main code, just for debugging
+     *
+     */
+    function dump()
+    {
+        print "===============\n";
+
+        for ($i = 0; $i < count($this->spine); $i++) {
+            printf("  %3d: %d,%d (%d)\n", $i, $this->spine[$i][X], $this->spine[$i][Y],
+                $this->spine[$i][DISTANCE]);
+        }
+        print "===============\n";
+    }
     
 }
 
@@ -2306,6 +2449,61 @@ class WMCurve {
         return ($curvepoints);
     }
 
+    /**
+     * find the point where a line from x1,y1 through x2,y2 crosses another line through x3,y3 and x4,y4
+     * (the point might not be between those points, but beyond them)
+     * - doesn't handle parallel lines. In our case we will never get them.
+     * - make sure we remove colinear points, or this will not be true!
+     *
+     * @param float $x1
+     * @param float $y1
+     * @param float $x2
+     * @param float $y2
+     * @param float $x3
+     * @param float $y3
+     * @param float $x4
+     * @param float $y4
+     * @return float[]
+     */
+    function line_crossing($x1, $y1, $x2, $y2, $x3, $y3, $x4, $y4)
+    {
+
+        // First, check that the slope isn't infinite.
+        // if it is, tweak it to be merely huge
+        if ($x1 !== $x2) {
+            $slope1 = ($y2 - $y1) / ($x2 - $x1);
+        } else {
+            $slope1 = 1e10;
+            wm_debug("Slope1 is infinite.\n");
+        }
+
+        if ($x3 !== $x4) {
+            $slope2 = ($y4 - $y3) / ($x4 - $x3);
+        } else {
+            $slope2 = 1e10;
+            wm_debug("Slope2 is infinite.\n");
+        }
+
+        $a1 = $slope1;
+        $a2 = $slope2;
+        $b1 = -1;
+        $b2 = -1;
+        $c1 = ($y1 - $slope1 * $x1);
+        $c2 = ($y3 - $slope2 * $x3);
+
+        $det_inv = 1 / ($a1 * $b2 - $a2 * $b1);
+
+        $xi = (($b1 * $c2 - $b2 * $c1) * $det_inv);
+        $yi = (($a2 * $c1 - $a1 * $c2) * $det_inv);
+
+        return (array (
+            $xi,
+            $yi
+        ));
+    }
+
+
+    
     // calculate the points for a span of the curve. We pass in the distance so far, and the array index, so that
     // the chunk of array generated by this function can be array_merged with existing points from before.
     // Considering how many array functions there are, PHP has horrible list support
@@ -2470,6 +2668,8 @@ function draw_spine($im, $spine, $col)
 
     function TestOutput_RunTest($conffile, $imagefile, $htmlfile, $newconffile, $coveragefile)
     {
+        global $weathermap_map;
+        
         $map = new WeatherMap();
         if($coveragefile != '') {
             $map->SeedCoverage();
@@ -2477,7 +2677,7 @@ function draw_spine($im, $spine, $col)
                 $map->LoadCoverage($coveragefile);
             }
         }
-
+        $weathermap_map = $conffile;
         $map->ReadConfig($conffile);
         $map->ReadData();
         $map->DrawMap($imagefile);

@@ -57,8 +57,8 @@ class WeatherMapLink extends WeatherMapItem
     // these are the calculated positions for various things, so that the
     // comment and bwlabel drawing code doesn't need to know about
     // curvepoints, and so that we don't *have* to use curvepoints
-    var $comment_x = array();
-    var $comment_y = array();
+    var $comment_x = array(0,0);
+    var $comment_y = array(0,0);
     var $comment_angle = array();
     var $label_x = array();
     var $label_y = array();
@@ -117,31 +117,31 @@ class WeatherMapLink extends WeatherMapItem
             'overlibwidth' => 0,
             'overlibheight' => 0,
             // TODO - Should be WMColour
-            'outlinecolour' => array (
+            'outlinecolour' => new WMColour (
                 0,
                 0,
                 0
             ),
             // TODO - Should be WMColour
-            'bwoutlinecolour' => array (
+            'bwoutlinecolour' => new WMColour (
                 0,
                 0,
                 0
             ),
             // TODO - Should be WMColour
-            'bwfontcolour' => array (
+            'bwfontcolour' => new WMColour (
                 0,
                 0,
                 0
             ),
             // TODO - Should be WMColour
-            'bwboxcolour' => array (
+            'bwboxcolour' => new WMColour (
                 255,
                 255,
                 255
             ),
             // TODO - Should be WMColour
-            'commentfontcolour' => array (
+            'commentfontcolour' => new WMColour (
                 192,
                 192,
                 192
@@ -317,6 +317,7 @@ class WeatherMapLink extends WeatherMapItem
                 }
                 else
                 {
+                    // TODO comment_x/y aren't always set?
                     // this is what would have come from the spine, in a curved link
                     $edge = new WMPoint($this->comment_x[$dir], $this->comment_y[$dir]);
                     $angle = $d->get_angle();
@@ -435,8 +436,8 @@ class WeatherMapLink extends WeatherMapItem
 
         $nvia = 0;
 		
-        $outlinecol = new WMColour($this->outlinecolour);
-        $commentcol = new WMColour($this->commentfontcolour);
+        $outlinecol = $this->outlinecolour;
+        $commentcol = $this->commentfontcolour;
 
         $outline_colour = $outlinecol->gdallocate($im);
 
@@ -547,7 +548,7 @@ class WeatherMapLink extends WeatherMapItem
 				$this->curvepoints = WMCurve::calc_curve($xpoints, $ypoints);
 
 				// then draw the curve itself
-				draw_curved_link($im, $this->curvepoints, array (
+				wm_draw_curved_link($im, $this->curvepoints, array (
 					$link_in_width,
 					$link_out_width
 				), $outline_colour, array (
@@ -562,10 +563,10 @@ class WeatherMapLink extends WeatherMapItem
 				// need to create the array, and calculate the distance bits, otherwise
 				// things like bwlabels won't know where to go.
 					
-				$this->curvepoints = calc_straight($xpoints, $ypoints);
+				$this->curvepoints = WMCurve::calc_straight($xpoints, $ypoints);
 				
 				// then draw the "curve" itself
-				draw_angled_link($im, $this->curvepoints, array (
+				wm_draw_angled_link($im, $this->curvepoints, array (
 					$link_in_width,
 					$link_out_width
 				), $outline_colour, array (
@@ -808,7 +809,7 @@ class WeatherMapLink extends WeatherMapItem
                 #if (1==1)
                 {
                     if ($param[2] == CONFIG_TYPE_COLOR)
-                        $output .= "\t$keyword " . render_colour($this->$field) . "\n";
+                        $output .= "\t$keyword " . $this->$field->as_config() . "\n";
 
                     if ($param[2] == CONFIG_TYPE_LITERAL)
                         $output .= "\t$keyword " . $this->$field . "\n";

@@ -107,41 +107,34 @@ class WeatherMapNode extends WeatherMapItem
                 OUT => ''
             ),
             // TODO - Should be WMColour
-            'labeloutlinecolour' => array (
+            'labeloutlinecolour' => new WMColour (
                 0,
                 0,
                 0
             ),
             // TODO - Should be WMColour
-            'labelbgcolour' => array (
+            'labelbgcolour' => new WMColour (
                 255,
                 255,
                 255
             ),
             // TODO - Should be WMColour
-            'labelfontcolour' => array (
+            'labelfontcolour' => new WMColour (
                 0,
                 0,
                 0
             ),
             // TODO - Should be WMColour
-            'labelfontshadowcolour' => array (
-                -1,
-                -1,
-                -1
-            ),
+            'labelfontshadowcolour' => new WMColour ( 'none' ),
             // TODO - Should be WMColour
-            'aiconoutlinecolour' => array (
+            'aiconoutlinecolour' => new WMColour (
                 0,
                 0,
                 0
             ),
             // TODO - Should be WMColour
-            'aiconfillcolour' => array (
-                -2,
-                -2,
-                -2
-            ), // copy from the node label
+            'aiconfillcolour' => new WMColour ( 'copy' ), // copy from the node label
+            
             'labeloffset' => '',
             'labeloffsetx' => 0,
             'labeloffsety' => 0,
@@ -207,7 +200,7 @@ class WeatherMapNode extends WeatherMapItem
                 $col = $this->colours[OUT];
             }
         } else {
-            $col = new WMColour($this->labelbgcolour);
+            $col = $this->labelbgcolour;
         }
 
         $colicon = null;
@@ -323,8 +316,8 @@ class WeatherMapNode extends WeatherMapItem
                 $fill = null;
                 $ink = null;
 
-                $aifill = new WMColour($this->aiconfillcolour);
-                $aiink = new WMColour($this->aiconoutlinecolour);
+                $aifill = $this->aiconfillcolour;
+                $aiink = $this->aiconoutlinecolour;
 
                 // if useiconscale isn't set, then use the static
                 // colour defined, or copy the colour from the label
@@ -363,11 +356,7 @@ class WeatherMapNode extends WeatherMapItem
                     }
                 }
 
-                if ($this->aiconoutlinecolour != array (
-                    -1,
-                    -1,
-                    -1
-                )) {
+                if ($this->aiconoutlinecolour->is_real()) {
                     $ink = $aiink;
                 }
 
@@ -502,7 +491,8 @@ class WeatherMapNode extends WeatherMapItem
                             imagefilter($icon_im, IMG_FILTER_COLORIZE, $colicon->r,
                                 $colicon->g, $colicon->b);
                         } else {
-                            imagecolorize($icon_im, $colicon->r, $colicon->g,
+                            wm_warn("ICONCOL: ".$colicon->as_config());
+                            WMGraphics::imagecolorize($icon_im, $colicon->r, $colicon->g,
                                 $colicon->b);
                         }
                     }
@@ -645,12 +635,12 @@ class WeatherMapNode extends WeatherMapItem
 
             if ($this->selected) {
                 imagerectangle($node_im, $label_x1, $label_y1, $label_x2, $label_y2,
-                    $map->selected);
+                    $map->selectedcolour);
                 // would be nice if it was thicker, too...
                 imagerectangle($node_im, $label_x1 + 1, $label_y1 + 1, $label_x2 - 1,
-                    $label_y2 - 1, $map->selected);
+                    $label_y2 - 1, $map->selectedcolour);
             } else {
-                $olcol = new WMColour($this->labeloutlinecolour);
+                $olcol = $this->labeloutlinecolour;
 
                 if ($olcol->is_real()) {
                     imagerectangle($node_im, $label_x1, $label_y1, $label_x2, $label_y2,
@@ -659,16 +649,15 @@ class WeatherMapNode extends WeatherMapItem
             }
             #}
 
-            $shcol = new WMColour($this->labelfontshadowcolour);
+            $shcol = $this->labelfontshadowcolour;
 
             if ($shcol->is_real()) {
                 $map->myimagestring($node_im, $this->labelfont, $txt_x + 1, $txt_y + 1,
                     $this->proclabel, $shcol->gdallocate($node_im), $this->labelangle);
             }
 
-            $txcol = new WMColour($this->labelfontcolour[0], $this->labelfontcolour[1],
-                $this->labelfontcolour[2]);
-
+            $txcol = $this->labelfontcolour;
+            
             if ($txcol->is_contrast()) {
                 if ($col->is_real()) {
                     $txcol = $col->contrast();
@@ -728,6 +717,7 @@ class WeatherMapNode extends WeatherMapItem
         } else {
             $this->CopyFrom($this->owner->nodes[$template]);
         }
+        
         $this->template = $template;
 
         // to stop the editor tanking, now that colours are decided earlier in ReadData
@@ -841,7 +831,7 @@ class WeatherMapNode extends WeatherMapItem
 
                 if ($this->$field != $dd->$field) {
                     if ($param[2] == CONFIG_TYPE_COLOR) {
-                        $output .= "\t$keyword " . render_colour($this->$field) . "\n";
+                        $output .= "\t$keyword " . $this->$field->as_config() . "\n";
                     }
 
                     if ($param[2] == CONFIG_TYPE_LITERAL) {

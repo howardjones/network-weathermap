@@ -1,5 +1,5 @@
 <?php
-require_once 'PHPUnit/Framework.php';
+// require_once 'PHPUnit/Framework.php';
 require_once dirname(__FILE__).'/../Weathermap.class.php';
 
 class ConfigTest extends PHPUnit_Framework_TestCase
@@ -64,7 +64,7 @@ class ConfigTest extends PHPUnit_Framework_TestCase
 
     #            print "\n$cmd [$output]\n";
 
-                $this->AssertEquals($output, "0", "Image Output did not match reference for $conffile via IM");
+                $this->AssertEquals($output, "0\n", "Image Output did not match reference for $conffile via IM");
 
             }
         }
@@ -120,12 +120,17 @@ class ConfigTest extends PHPUnit_Framework_TestCase
         $result2dir = "test-suite".DIRECTORY_SEPARATOR."results2-$phptag";
         $diffdir = "test-suite".DIRECTORY_SEPARATOR."diffs";
 
+        // XXX This changes
         $compare = "test-suite".DIRECTORY_SEPARATOR."tools".DIRECTORY_SEPARATOR."compare.exe";
-
+        $compare = "/usr/local/bin/compare";
+        
         if(! file_exists($result1dir)) { mkdir($result1dir); }
         if(! file_exists($result2dir)) { mkdir($result2dir); }
         if(! file_exists($diffdir)) { mkdir($diffdir); }
 
+        $fd = fopen("test-suite/summary.html","w");
+        fputs($fd,"<html><head><title>Test summary</title></head><style>img {border: 1px solid black; }</style><body><h3>Test Summary</h3>\n");
+        
         $conflist = array();
 
         $dh = opendir($testdir);
@@ -136,12 +141,18 @@ class ConfigTest extends PHPUnit_Framework_TestCase
 
                 if(file_exists($reference)) {
                     $conflist[] = array($file, $reference, $testdir, $result1dir, $result2dir, $diffdir, $compare);
+                
+                    fputs($fd,"<h4>$file</h4><p><nobr><img src='results1-$phptag/$file.png'> <img src='references/$file.png'> <img src='diffs/$file.png'></nobr></p>");
+                    
                 }
             }
         }
         closedir($dh);
         chdir($previouswd);
 
+        fclose($fd);
+ 
+        
         return $conflist;
     }
 }

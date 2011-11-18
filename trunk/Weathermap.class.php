@@ -51,7 +51,7 @@ define('FMT_PERC_OUT', '{link:this:outpercent:%.2f}%');
 // the fields within a spine triple
 define('X', 0);
 define('Y', 1);
-define('DISTANCE', 2);
+define('DISTANCE', 2); 
 
 
 // most of the config keywords just copy stuff into object properties.
@@ -1362,7 +1362,7 @@ class WeatherMap extends WeatherMapBase
     var $context;
     var $cachefolder, $mapcache, $cachefile_version;
     var $name;
-    var $black, $white, $grey, $selected;
+    var $black, $white, $grey, $selectedcolour;
 
     var $datasourceclasses;
     var $preprocessclasses;
@@ -2469,28 +2469,24 @@ class WeatherMap extends WeatherMapBase
             RotateAboutPoint($points, $x, $y, $rangle);
         }
 
-        if ($bgcolour != array (
-            -1,
-            -1,
-            -1
-        )) {
-            $bgcol = myimagecolorallocate($im, $bgcolour[0], $bgcolour[1], $bgcolour[2]);
+        if ($bgcolour->is_real()) {
+            $bgcol = $bgcolour->gdallocate($im);
+            
+            # $bgcol = myimagecolorallocate($im, $bgcolour[0], $bgcolour[1], $bgcolour[2]);
             # imagefilledrectangle($im, $x1, $y1, $x2, $y2, $bgcol);
             imagefilledpolygon($im, $points, 4, $bgcol);
         }
 
-        if ($outlinecolour != array (
-            -1,
-            -1,
-            -1
-        )) {
-            $outlinecol = myimagecolorallocate($im, $outlinecolour[0], $outlinecolour[1],
-                $outlinecolour[2]);
+        if ($outlinecolour->is_real() ) {
+            $outlinecol = $outlinecolour->gdallocate($im);
+            #$outlinecol = myimagecolorallocate($im, $outlinecolour[0], $outlinecolour[1],
+            #    $outlinecolour[2]);
             imagepolygon($im, $points, 4, $outlinecol);
         }
 
-        $textcol =
-            myimagecolorallocate($im, $textcolour[0], $textcolour[1], $textcolour[2]);
+         $textcol = $textcolour->gdallocate($im);
+#        $textcol =
+ #           myimagecolorallocate($im, $textcolour[0], $textcolour[1], $textcolour[2]);
         $this->myimagestring($im, $font, $points[8], $points[9], $text, $textcol, $angle);
 
         $areaname = "LINK:L" . $map->links[$linkname]->id . ':' . ($direction + 2);
@@ -3268,11 +3264,24 @@ class WeatherMap extends WeatherMapBase
         $filename, $linecount)
     {
         $key = str_replace("COLOR", "", strtoupper($args[0]));
-
+        $val = strtolower($args[1]);
+        
         $r = 0;
         $g = 0;
         $b = 0;
 
+        if (isset($args[2])) // this is a regular colour setting thing
+        {
+            $wmc = new WMColour($args[1],$args[2],$args[3]);
+        }
+        else
+        {
+            $wmc = new WMColour($val);
+        }        
+        $this->colourtable[$key] = $wmc;
+
+        // wm_warn("$key ($val) = ".$wmc->as_config());
+        
          if (isset($args[2])) // this is a regular colour setting thing
         {
 
@@ -3296,11 +3305,7 @@ class WeatherMap extends WeatherMapBase
         $this->colours['DEFAULT'][$key]['top'] = -1;
         $this->colours['DEFAULT'][$key]['special'] = 1;
 
-        # if(substr($key,0,3) != "KEY"){
-        if(1==1) {
-            $this->colourtable[$key] = new WMColour($r,$g,$b);
-        }
-
+       
         return true;
     }
 
@@ -3424,6 +3429,20 @@ class WeatherMap extends WeatherMapBase
         $field = str_replace("color", "colour", strtolower($args[0]));
         $val = strtolower($args[1]);
 
+        if (isset($args[2])) // this is a regular colour setting thing
+        {
+            $wmc = new WMColour($args[1],$args[2],$args[3]);
+        }
+        else
+        {
+            $wmc = new WMColour($val);
+        }        
+       //  wm_warn("$key ($val) = ".$wmc->as_config());
+        
+        $curobj->$field = $wmc;
+        
+        return true;
+        
         if (isset($args[2])) // this is a regular colour setting thing
         {
             $curobj->$field = array (
@@ -4720,7 +4739,7 @@ class WeatherMap extends WeatherMapBase
             $this->white = myimagecolorallocate($image, 255, 255, 255);
             $this->black = myimagecolorallocate($image, 0, 0, 0);
             $this->grey = myimagecolorallocate($image, 192, 192, 192);
-            $this->selected =
+            $this->selectedcolour =
                 myimagecolorallocate($image, 255, 0, 0); // for selections in the editor
 
             $this->AllocateScaleColours($image);

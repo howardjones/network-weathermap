@@ -72,7 +72,13 @@ switch ($action) {
             "<div id=\"overDiv\" style=\"position:absolute; visibility:hidden; z-index:1000;\"></div>\n";
         print
             "<script type=\"text/javascript\" src=\"overlib.js\"><!-- overLIB (c) Erik Bosrup --></script> \n";
-        weathermap_fullview(true);
+        
+        $groupid = -1;
+        if ( (isset($_REQUEST['group']) && is_numeric($_REQUEST['group'] ) )) {
+            $groupid = intval($_REQUEST['group']);
+        }
+        
+        weathermap_fullview(true,false,$groupid);
         weathermap_versionbox();
 
         include_once($config["base_path"] . "/include/bottom_footer.php");
@@ -287,8 +293,12 @@ function weathermap_thumbview($limit_to_group = -1)
                         <td class = "textHeader" nowrap><?php print $pagetitle; ?></td>
 
                         <td align = "right">
-                            <a href = "?action=viewmapcycle">automatically cycle</a>
-                            between full-size maps)
+                            automatically cycle between full-size maps (<?php
+                                if ($limit_to_group > 0) {
+                                    print '<a href = "?action=viewmapcycle&group='.intval($limit_to_group).'">within this group</a>, or ';
+                                } 
+                                print ' <a href = "?action=viewmapcycle">all maps</a>';                                
+                            ?>)
                         </td>
                     </tr>
                 </table>
@@ -394,8 +404,9 @@ function weathermap_fullview($cycle = false, $firstonly = false, $limit_to_group
     } else {
         $pagetitle = "Network Weathermaps";
     }
+    
+    $extra = "";
 ?>
-
     <tr bgcolor = "<?php print $colors["panel"];?>">
         <td>
             <table width = "100%" cellpadding = "0" cellspacing = "0">
@@ -405,16 +416,22 @@ function weathermap_fullview($cycle = false, $firstonly = false, $limit_to_group
 
                     <td align = "right">
                         <?php if (!$cycle) { ?>
-
-                            <a href = "?action=viewmapcycle">automatically cycle</a>
-                            between full-size maps)
+                        (automatically cycle between full-size maps (<?php
+                                
+                                if ($limit_to_group > 0) {
+                                    
+                                    print '<a href = "?action=viewmapcycle&group='.intval($limit_to_group).'">within this group</a>, or ';
+                                } 
+                                print ' <a href = "?action=viewmapcycle">all maps</a>';                                
+                            ?>)                        
 
                         <?php
                         } else {
+                            if($limit_to_group > 0) {
+                                $extra = " in this group";
+                            }
                         ?>
-
-                            Cycling all available maps. <a href = "?action=">Stop.</a>
-
+                            Cycling all available maps<?php echo $extra; ?>. <a href = "?action=">Stop.</a>
                         <?php
                         }
                         ?>

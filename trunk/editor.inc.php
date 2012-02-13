@@ -193,8 +193,9 @@ function snap($coord, $gridsnap = 0)
 {
     if ($gridsnap == 0) {
         return ($coord);
-    } else {
-        return ($coord - ($coord % $gridsnap));
+    } else {        
+        $rest = $coord % $gridsnap;
+        return ($coord - $rest + round($rest/$gridsnap) * $gridsnap );
     }
 }
 

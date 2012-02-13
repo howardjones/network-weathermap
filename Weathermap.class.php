@@ -366,6 +366,12 @@ $WM_config_keywords2 = array (
                 )
             ),
         ),
+        'ORIGIN' => array(
+            array('NODE', 
+                "/^ORIGIN\s+(C|NE|SE|NW|SW|N|S|E|W)/i",
+                array("position_origin" => 1)                
+            )
+        ),
         'POSITION' => array (
             array (
                 'NODE',
@@ -4669,7 +4675,7 @@ class WeatherMap extends WeatherMapBase
     }
 
     function DrawMap($filename = '', $thumbnailfile = '', $thumbnailmax = 250,
-        $withnodes = true, $use_via_overlay = false, $use_rel_overlay = false)
+        $withnodes = true, $use_via_overlay = false, $use_rel_overlay = false, $use_grid_overlay = 0)
     {
         wm_debug("Trace: DrawMap()\n");
         // metadump("# start", true);
@@ -4757,6 +4763,23 @@ class WeatherMap extends WeatherMapBase
 
 // Now it's time to draw a map
 
+            // draw a grid over the background (but under any objects) if it is
+            // requested by the editor
+            if($use_grid_overlay != 0) {
+                for($x = 0; $x < $this->width; $x += $use_grid_overlay) {
+                    for($y = 0; $y < $this->height; $y += $use_grid_overlay) {                        
+                        imagesetpixel($image, $x, $y, $this->selectedcolour);
+                        if($use_grid_overlay > 15) {
+                            // for wider grids, make the points more obvious
+                            imagesetpixel($image, $x+1, $y, $this->selectedcolour);
+                            imagesetpixel($image, $x-1, $y, $this->selectedcolour);
+                            imagesetpixel($image, $x, $y+1, $this->selectedcolour);
+                            imagesetpixel($image, $x, $y-1, $this->selectedcolour);
+                        }
+                    }
+                }
+            }
+            
 // do the node rendering stuff first, regardless of where they are actually drawn.
 // this is so we can get the size of the nodes, which links will need if they use offsets
             foreach ($this->nodes as $node) {

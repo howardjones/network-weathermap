@@ -49,6 +49,7 @@ class WeatherMapNode extends WeatherMapItem
     var $scalevar, $iconscalevar;
     var $notestext = array ();
     var $image;
+    var $position_origin;
     var $centre_x, $centre_y;
     var $relative_to;
     var $zorder;
@@ -79,6 +80,7 @@ class WeatherMapNode extends WeatherMapItem
             'outscalekey' => '',
             'original_x' => 0,
             'original_y' => 0,
+            'position_origin' => 'C',
             'inpercent' => 0,
             'outpercent' => 0,
             'labelangle' => 0,
@@ -766,6 +768,11 @@ class WeatherMapNode extends WeatherMapItem
                 array (
                     'labeloffset',
                     'LABELOFFSET',
+                    CONFIG_TYPE_LITERAL
+                ),
+                array (
+                    'position_origin',
+                    'ORIGIN',
                     CONFIG_TYPE_LITERAL
                 ),
                 array (

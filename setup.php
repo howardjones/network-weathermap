@@ -1192,6 +1192,12 @@ function weathermap_poller_output($rrd_update_array)
     global $config;
     // global $weathermap_debugging;
 
+    // if we somehow get called with no data, just give up...
+    // (http://forums.cacti.net/viewtopic.php?p=225214#p225214)
+    if(!isset($rrd_update_array)) {
+        return $rrd_update_array;
+    }
+    
     $logging = read_config_option("log_verbosity");
 
     if ($logging >= POLLER_VERBOSITY_DEBUG) {

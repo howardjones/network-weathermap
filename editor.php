@@ -39,7 +39,9 @@ $configerror = '';
 // these are all set via the Editor Settings dialog, in the editor, now.
 $use_overlay = false; // set to true to enable experimental overlay showing VIAs
 $use_relative_overlay = false; // set to true to enable experimental overlay showing relative-positioning
+
 $grid_snap_value = 0; // set non-zero to snap to a grid of that spacing
+$use_grid_overlay = false; // set to true to enable experimental overlay showing snap grid
 
 if( isset($_COOKIE['wmeditor']))
 {
@@ -48,6 +50,8 @@ if( isset($_COOKIE['wmeditor']))
     if( (isset($parts[0])) && (intval($parts[0]) == 1) ) { $use_overlay = true; }
     if( (isset($parts[1])) && (intval($parts[1]) == 1) ) { $use_relative_overlay = true; }
     if( (isset($parts[2])) && (intval($parts[2]) != 0) ) { $grid_snap_value = intval($parts[2]); }
+
+    if( (isset($parts[3])) && (intval($parts[3]) == 1) ) { $use_grid_overlay = true; }
 }
 
 chdir(dirname(__FILE__));
@@ -191,7 +195,7 @@ else
 
 		$map->sizedebug = true;
 
-		$map->DrawMap('','',250,true,$use_overlay,$use_relative_overlay);
+		$map->DrawMap('','',250,true,$use_overlay,$use_relative_overlay, ($use_grid_overlay ? $grid_snap_value : 0) ) ;
 		exit();
 		break;
 
@@ -803,6 +807,7 @@ else
             $map->ReadConfig($mapfile);
 
 	    $use_overlay = (isset($_REQUEST['editorsettings_showvias']) ? intval($_REQUEST['editorsettings_showvias']) : false);
+	    $use_grid_overlay = (isset($_REQUEST['editorsettings_showgrid']) ? intval($_REQUEST['editorsettings_showgrid']) : false);
 	    $use_relative_overlay = (isset($_REQUEST['editorsettings_showrelative']) ? intval($_REQUEST['editorsettings_showrelative']) : false);
 	    $grid_snap_value = (isset($_REQUEST['editorsettings_gridsnap']) ? intval($_REQUEST['editorsettings_gridsnap']) : 0);
 
@@ -892,7 +897,7 @@ else
 
 	$fontlist = array();
 
-	setcookie('wmeditor', ($use_overlay ? "1":"0") .":". ($use_relative_overlay ? "1":"0") . ":" . intval($grid_snap_value), time()+60*60*24*30 );
+	setcookie('wmeditor', ($use_overlay ? "1":"0") .":". ($use_relative_overlay ? "1":"0") . ":" . intval($grid_snap_value) . ":" . ($use_grid_overlay ? "1":"0"), time()+60*60*24*30 );
 
 ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
@@ -1428,6 +1433,7 @@ else
 			    </select>
 			</td>
 		    </tr>
+                                        
 		    <tr>
 			<th>Snap To Grid</th>
 			<td><select id="editorsettings_gridsnap" name="editorsettings_gridsnap">
@@ -1438,6 +1444,15 @@ else
 			    <option <?php echo ($grid_snap_value==20 ? 'selected' : '') ?> value="20">20 pixels</option>
 			    <option <?php echo ($grid_snap_value==50 ? 'selected' : '') ?> value="50">50 pixels</option>
 			    <option <?php echo ($grid_snap_value==100 ? 'selected' : '') ?> value="100">100 pixels</option>
+			    </select>
+			</td>
+		    </tr>
+                    
+                    <tr>
+			<th>Show Grid overlay</th>
+			<td><select id="editorsettings_showgrid" name="editorsettings_showgrid">
+			  <option <?php echo ($use_grid_overlay ? 'selected' : '') ?> value="1">Yes</option>
+			  <option <?php echo ($use_grid_overlay ? '' : 'selected') ?> value="0">No</option>
 			    </select>
 			</td>
 		    </tr>

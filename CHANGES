@@ -5,16 +5,21 @@
         FIXED - check-gdbug.php shouldn't complain about empty ob_flush buffers anymore
         FIXED - SNMP DS should deal better with non-numeric (and blank) return values
         FIXED - absolute SCALE definitions didn't support K (thanks wwwdrich)
+        FIXED - updated mysql schema commands to use modern ENGINE instead of TYPE;
+        FIXED - fixed some function-name clashes with other plugins
         CHANGE - lots of performance optimisations. Roughly twice as fast as 0.97a. (thanks ikorzha758 for starting this process, and DLNoah, jmarshall28 and llow for some input)
         CHANGE - no longer shows .-prefixed files in map config picker
         CHANGE - editor ignores attempts to rename nodes to have space in names
+        CHANGE - editor snap function improved (snap to *nearest* point) (thanks Andreas Braun)
+        ADDED - editor has option to show the snap grid
+        ADDED - Cycle Maps can cycle all maps, or just the ones in a particular group (good for NOC displays)
         ADDED - New Cacti integration for editor. Additional 'edit maps' permission. No need for editor-config.php anymore!
         ADDED - per-map runtime logging
         ADDED - per-map debugging (debug a single map in Cacti without running debug logging for the whole poller)
-		ADDED - Cacti template for monitoring Weathermap performance/mapcount/warningcount/memory.
+	ADDED - Cacti template for monitoring Weathermap performance/mapcount/warningcount/memory.
         ADDED - when running from Cacti, HTMLOUTPUTFILE, IMAGEOUTPUTFILE and IMAGEURI can be used to create a second copy of the output.
-		ADDED - KEYBGCOLOR and KEYOUTLINECOLOR both accept 'none'
-		ADDED - Ability to disable any warning with 'SET nowarn_WMxxx 1'
+	ADDED - KEYBGCOLOR and KEYOUTLINECOLOR both accept 'none'
+	ADDED - Ability to disable any warning with 'SET nowarn_WMxxx 1'
         ADDED - USEICONSCALE works to colour artificial icons
         ADDED - performance options to disable additional information checks in rrd and dsstats data plugins.
         ADDED - cactihost and cactimonitor targets both return 5 for 'unknown' (according to Cacti) (thanks djnono17)

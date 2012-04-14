@@ -3553,7 +3553,7 @@ class WeatherMap extends WeatherMapBase
             wm_debug("ReadConfig Detected that this is a config fragment.\n");
             // strip out any Windows line-endings that have gotten in here
             $input = str_replace("\r", "", $input);
-            $lines = explode("/n", $input);
+            $lines = explode("\n", $input);
             $filename = "{text insert}";
         } else {
             wm_debug("ReadConfig Detected that this is a config filename.\n");

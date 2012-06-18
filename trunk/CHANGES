@@ -13,6 +13,7 @@
         CHANGE - editor snap function improved (snap to *nearest* point) (thanks Andreas Braun)
         ADDED - editor has option to show the snap grid
         ADDED - Cycle Maps can cycle all maps, or just the ones in a particular group (good for NOC displays)
+        ADDED - Cycle Maps handles different poller intervals, and has new in-cycle controls.
         ADDED - New Cacti integration for editor. Additional 'edit maps' permission. No need for editor-config.php anymore!
         ADDED - per-map runtime logging
         ADDED - per-map debugging (debug a single map in Cacti without running debug logging for the whole poller)

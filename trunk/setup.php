@@ -339,7 +339,7 @@ function weathermap_setup_table()
 				titlecache text NOT NULL,
 				filehash varchar (40) NOT NULL default '',
 				warncount int(11) NOT NULL default 0,
-                debug set('on','off','once') NOT NULL default 'off',
+                                debug set('on','off','once') NOT NULL default 'off',
                 runtime double NOT NULL default 0,
 				lastrun datetime,
 				config text NOT NULL default '',

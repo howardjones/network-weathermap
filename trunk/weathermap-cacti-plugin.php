@@ -67,7 +67,9 @@ switch ($action) {
         break;
 
     case 'viewmapcycle':
+        
         include_once($config["base_path"] . "/include/top_graph_header.php");
+        
         print
             "<div id=\"overDiv\" style=\"position:absolute; visibility:hidden; z-index:1000;\"></div>\n";
         print
@@ -306,9 +308,7 @@ function weathermap_thumbview($limit_to_group = -1)
         </tr>
 
         <tr>
-            <td><i>Click on thumbnails for a full view (or you can
-            <a href = "?action=viewmapcycle">automatically cycle</a> between full-size
-            maps)</i></td>
+            <td><i>Click on thumbnails for a full view</i></td>
         </tr>
 
 <?php
@@ -431,7 +431,12 @@ function weathermap_fullview($cycle = false, $firstonly = false, $limit_to_group
                                 $extra = " in this group";
                             }
                         ?>
-                            Cycling all available maps<?php echo $extra; ?>. <a href = "?action=">Stop.</a>
+                            Cycling all available maps<?php echo $extra; ?>. Next map in <span id="wm_countdown">0</span> seconds. 
+                            
+                            <a href="?action="><img src="images/control_stop_blue.png" width="16" height="16" /></a>
+                            <a href="#"><img src="images/control_rewind_blue.png" width="16" height="16" /></a>
+                            <a href="#"><img src="images/control_pause_blue.png" width="16" height="16" /></a>
+                            <a href="#"><img src="images/control_fastforward_blue.png" width="16" height="16" /></a>
                         <?php
                         }
                         ?>
@@ -444,7 +449,9 @@ function weathermap_fullview($cycle = false, $firstonly = false, $limit_to_group
     <?php
     html_graph_end_box();
 
-    weathermap_tabs($limit_to_group);
+    if(! $cycle) {
+        weathermap_tabs($limit_to_group);
+    }
 
     $i = 0;
 
@@ -498,6 +505,8 @@ function weathermap_fullview($cycle = false, $firstonly = false, $limit_to_group
 
         if ($cycle) {
             $refreshtime = read_config_option("weathermap_cycle_refresh");
+            $poller_cycle = read_config_option("poller_interval");
+            
 // OK, so the Cycle plugin does all this with a <META> tag at the bottom of the body
 // that overrides the one at the top (that Cacti puts there). Unfortunately, that
 // isn't valid HTML! So here's a Javascript driven way to do it
@@ -527,6 +536,19 @@ function weathermap_fullview($cycle = false, $firstonly = false, $limit_to_group
 
             wm_maps = new Array;
             wm_current = 0;
+            wm_countdown = 0;
+            wm_period = 0;
+            wm_poller_cycle = <?php echo $poller_cycle; ?> * 1000;
+            
+            wm_timer_counter = null;
+            wm_timer_flipper = null;
+            wm_timer_reloader = null;
+
+            function wm_counter() 
+            {
+                document.getElementById("wm_countdown").textContent = wm_countdown;
+                wm_countdown--;
+            }
 
             function wm_tick()
             {
@@ -535,7 +557,8 @@ function weathermap_fullview($cycle = false, $firstonly = false, $limit_to_group
 
                 if (wm_current >= wm_maps.length)
                     wm_current = 0;
-                document.getElementById(wm_maps[wm_current]).style.display = 'block';
+                document.getElementById(wm_maps[wm_current]).style.display = 'block';                               
+                wm_countdown = wm_period/1000;
             }
 
             function wm_reload() {
@@ -569,16 +592,19 @@ function weathermap_fullview($cycle = false, $firstonly = false, $limit_to_group
                     // figure out how long the refresh is, so that we get
                     // through all the maps in exactly 5 minutes
 
-                    var period = <?php echo $refreshtime ?> * 1000;
+                    wm_period = <?php echo $refreshtime ?> * 1000;
 
-                    if (period == 0) {
-                        var period = 300000 / j;
+                    if (wm_period == 0) {
+                        wm_period = wm_poller_cycle / j;
                     }
+                    wm_countdown = wm_period/1000;
 
+                    // a countdown timer in the top corner
+                    wm_timer_counter = setInterval(wm_counter, 1000);
                     // our map-switching clock
-                    setInterval(wm_tick, period);
+                    wm_timer_flipper = setInterval(wm_tick, wm_period);
                     // when to reload the whole page (with new map data)
-                    setTimeout(wm_reload, 300000);
+                    wm_timer_reloader = setTimeout(wm_reload, wm_poller_cycle);
                 }
             }
 

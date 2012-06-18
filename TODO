@@ -1,6 +1,9 @@
 Before 0.98
 -----------
 
+Comments aren't drawn along a link!
+
+
 add %t option to format SNMP TimeTicks
 
 thumb2 file - 48x48px thumb to show in map management screen.

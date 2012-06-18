@@ -204,7 +204,7 @@ switch ($action) {
     case 'perms_add_user':
         if (isset($_REQUEST['mapid']) && is_numeric($_REQUEST['mapid'])
             && isset($_REQUEST['userid']) && is_numeric($_REQUEST['userid'])) {
-            perms_add_user(intval($_REQUEST['mapid']), intval($_REQUEST['userid']));
+            weathermap_perms_add_user(intval($_REQUEST['mapid']), intval($_REQUEST['userid']));
             header("Location: weathermap-cacti-plugin-mgmt.php?action=perms_edit&id="
                 . intval($_REQUEST['mapid']));
         }
@@ -213,7 +213,7 @@ switch ($action) {
     case 'perms_delete_user':
         if (isset($_REQUEST['mapid']) && is_numeric($_REQUEST['mapid'])
             && isset($_REQUEST['userid']) && is_numeric($_REQUEST['userid'])) {
-            perms_delete_user($_REQUEST['mapid'], $_REQUEST['userid']);
+            weathermap_perms_delete_user($_REQUEST['mapid'], $_REQUEST['userid']);
             header("Location: weathermap-cacti-plugin-mgmt.php?action=perms_edit&id="
                 . $_REQUEST['mapid']);
         }
@@ -222,7 +222,7 @@ switch ($action) {
     case 'perms_edit':
         if (isset($_REQUEST['id']) && is_numeric($_REQUEST['id'])) {
             include_once($config["base_path"] . "/include/top_header.php");
-            perms_list($_REQUEST['id']);
+            weathermap_perms_list($_REQUEST['id']);
             include_once($config["base_path"] . "/include/bottom_footer.php");
         } else {
             print "Something got lost back there.";
@@ -231,33 +231,33 @@ switch ($action) {
 
     case 'delete_map':
         if (isset($_REQUEST['id']) && is_numeric($_REQUEST['id']))
-            map_delete($_REQUEST['id']);
+            weathermap_map_delete($_REQUEST['id']);
         header("Location: weathermap-cacti-plugin-mgmt.php");
         break;
 
     case 'deactivate_map':
         if (isset($_REQUEST['id']) && is_numeric($_REQUEST['id']))
-            map_deactivate($_REQUEST['id']);
+            weathermap_map_deactivate($_REQUEST['id']);
         header("Location: weathermap-cacti-plugin-mgmt.php");
         break;
 
     case 'activate_map':
         if (isset($_REQUEST['id']) && is_numeric($_REQUEST['id']))
-            map_activate($_REQUEST['id']);
+            weathermap_map_activate($_REQUEST['id']);
         header("Location: weathermap-cacti-plugin-mgmt.php");
         break;
 
     case 'move_map_up':
         if (isset($_REQUEST['id']) && is_numeric($_REQUEST['id'])
             && isset($_REQUEST['order']) && is_numeric($_REQUEST['order']))
-            map_move($_REQUEST['id'], $_REQUEST['order'], -1);
+            weathermap_map_move($_REQUEST['id'], $_REQUEST['order'], -1);
         header("Location: weathermap-cacti-plugin-mgmt.php");
         break;
 
     case 'move_map_down':
         if (isset($_REQUEST['id']) && is_numeric($_REQUEST['id'])
             && isset($_REQUEST['order']) && is_numeric($_REQUEST['order']))
-            map_move($_REQUEST['id'], $_REQUEST['order'], +1);
+            weathermap_map_move($_REQUEST['id'], $_REQUEST['order'], +1);
         header("Location: weathermap-cacti-plugin-mgmt.php");
         break;
 
@@ -292,16 +292,16 @@ switch ($action) {
         include_once($config["base_path"] . "/include/top_header.php");
 
         if (isset($_REQUEST['show']) && $_REQUEST['show'] == 'all') {
-            addmap_picker(true);
+            weathermap_addmap_picker(true);
         } else {
-            addmap_picker(false);
+            weathermap_addmap_picker(false);
         }
         include_once($config["base_path"] . "/include/bottom_footer.php");
         break;
 
     case 'addmap':
         if (isset($_REQUEST['file'])) {
-            add_config($_REQUEST['file']);
+            weathermap_add_config($_REQUEST['file']);
             header("Location: weathermap-cacti-plugin-mgmt.php");
         } else {
             print "No such file.";
@@ -347,7 +347,7 @@ switch ($action) {
     // by default, just list the map setup
     default:
         include_once($config["base_path"] . "/include/top_header.php");
-        weathermap_maplist();
+        weathermap_map_list();
         weathermap_footer_links();
         include_once($config["base_path"] . "/include/bottom_footer.php");
         break;
@@ -370,7 +370,7 @@ function weathermap_footer_links()
 
 // Repair the sort order column (for when something is deleted or inserted, or moved between groups)
 // our primary concern is to make the sort order consistent, rather than any special 'correctness'
-function map_resort()
+function weathermap_map_resort()
 {
     $list = db_fetch_assoc("select * from weathermap_maps order by group_id,sortorder;");
     $i = 1;
@@ -412,7 +412,7 @@ function weathermap_group_resort()
     }
 }
 
-function map_move($mapid, $junk, $direction)
+function weathermap_map_move($mapid, $junk, $direction)
 {
     $source = db_fetch_assoc("select * from weathermap_maps where id=$mapid");
     $oldorder = $source[0]['sortorder'];
@@ -461,7 +461,7 @@ function weathermap_group_move($id, $junk, $direction)
     }
 }
 
-function weathermap_maplist()
+function weathermap_map_list()
 {
     global $colors, $menu;
     global $i_understand_file_permissions_and_how_to_fix_them;
@@ -484,6 +484,13 @@ function weathermap_maplist()
         $can_edit = true;
     }
 
+    // since it's apparently becoming a more common issue, just check that the tables
+    // actually exist in the database!
+    $queryrows =
+        db_fetch_assoc("show table status like 'weathermap%'");
+    if(sizeof($queryrows)==0) {
+        print "<div class='wm_warning'>Something bad has happened - none of the weathermap tables exist. This is probably a bug in setup.php - please look for a solution in the forums.</div>";
+    }        
  
     $i = 0;
     $queryrows =
@@ -610,14 +617,23 @@ function weathermap_maplist()
                 print '<td><a title="Click to change group" href="?action=chgroup&id='
                     . $map['id'] . '">' . htmlspecialchars($map['groupname']) . '</a></td>';
 
+                $debugextra = "";
+                if($map['debug'] == 'on') {
+                    $debugextra="<img src='images/bug.png' />";
+                }
+                
+                if($map['debug'] == 'once') {
+                    $debugextra="<img src='images/bug.png' />x1";
+                }
+                
                 if ($map['active'] == 'on') {
                     print
                         '<td class="wm_enabled"><a title="Click to Deactivate" href="?action=deactivate_map&id='
-                        . $map['id'] . '"><font color="green">Yes</font></a>';
+                        . $map['id'] . '"><font color="green">Yes</font>'.$debugextra.'</a>';
                 } else {
                     print
                         '<td class="wm_disabled"><a title="Click to Activate" href="?action=activate_map&id='
-                        . $map['id'] . '"><font color="red">No</font></a>';
+                        . $map['id'] . '"><font color="red">No</font>'.$debugextra.'</a>';
                 }
                 print "<td>";
 
@@ -724,7 +740,7 @@ function weathermap_maplist()
     }
 }
 
-function addmap_picker($show_all = false)
+function weathermap_addmap_picker($show_all = false)
 {
     global $weathermap_confdir;
     global $colors;
@@ -900,7 +916,7 @@ function weathermap_preview_config($file)
     }
 }
 
-function add_config($file)
+function weathermap_add_config($file)
 {
     global $weathermap_confdir;
     global $colors;
@@ -934,7 +950,7 @@ function add_config($file)
 
         db_execute("update weathermap_maps set filehash=LEFT(MD5(concat(id,configfile,rand())),20) where id=$last_id");
 
-        map_resort();
+        weathermap_map_resort();
     }
 }
 
@@ -962,19 +978,19 @@ function weathermap_get_title($filename)
     return ($title);
 }
 
-function map_deactivate($id)
+function weathermap_map_deactivate($id)
 {
     $SQL = "update weathermap_maps set active='off' where id=" . $id;
     db_execute($SQL);
 }
 
-function map_activate($id)
+function weathermap_map_activate($id)
 {
     $SQL = "update weathermap_maps set active='on' where id=" . $id;
     db_execute($SQL);
 }
 
-function map_delete($id)
+function weathermap_map_delete($id)
 {
     $SQL = "delete from weathermap_maps where id=" . $id;
     db_execute($SQL);
@@ -985,7 +1001,7 @@ function map_delete($id)
     $SQL = "delete from weathermap_settings where mapid=" . $id;
     db_execute($SQL);
 
-    map_resort();
+    weathermap_map_resort();
 }
 
 function weathermap_set_group($mapid, $groupid)
@@ -994,22 +1010,22 @@ function weathermap_set_group($mapid, $groupid)
     $SQL =
         sprintf("update weathermap_maps set group_id=%d where id=%d", $groupid, $mapid);
     db_execute($SQL);
-    map_resort();
+    weathermap_map_resort();
 }
 
-function perms_add_user($mapid, $userid)
+function weathermap_perms_add_user($mapid, $userid)
 {
     $SQL = "insert into weathermap_auth (mapid,userid) values($mapid,$userid)";
     db_execute($SQL);
 }
 
-function perms_delete_user($mapid, $userid)
+function weathermap_perms_delete_user($mapid, $userid)
 {
     $SQL = "delete from weathermap_auth where mapid=$mapid and userid=$userid";
     db_execute($SQL);
 }
 
-function perms_list($id)
+function weathermap_perms_list($id)
 {
     global $colors;
 

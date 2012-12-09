@@ -15,7 +15,8 @@ due course.
     CHANGE - editor snap function improved (snap to *nearest* point) (thanks Andreas Braun)
     CHANGE - no longer shows .-prefixed files in map config picker
     CHANGE - editor ignores attempts to rename nodes to have space in names
-
+	ADDED - Caching for cacti data fetched by dsstats and rrdtool/poller_output DS plugins
+	
 
 0.97a	FIXED - Incorrect action URL in 'map selector' combo box for Cacti users.
 	FIXED - cacti_graph_id set to 0 instead of ID, by rrd/poller_output and dsstats plugins (thanks sh0x)

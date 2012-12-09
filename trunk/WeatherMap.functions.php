@@ -88,8 +88,9 @@ function wm_warn($string,$notice_only=FALSE)
     global $weathermap_error_suppress;
 	
 	$message = "";
+	$code = "";
 	
-	if($code == "" && preg_match('/\[(WM\w+)\]/', $string, $matches)) {
+	if(preg_match('/\[(WM\w+)\]/', $string, $matches)) {
         $code = $matches[1];
     }
 

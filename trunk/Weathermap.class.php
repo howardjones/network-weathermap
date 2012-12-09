@@ -249,7 +249,8 @@ class WeatherMap extends WeatherMapBase
 	var $has_overlibs;
 	var $node_template_tree;
 	var $link_template_tree;
-
+    var $dsinfocache=array();
+	
 	var $plugins = array();
 	var $included_files = array();
 	var $usage_stats = array();
@@ -464,7 +465,7 @@ class WeatherMap extends WeatherMapBase
 	{
 		$linecount = 1;
 		
-		$lines = split("\n",$string);
+		$lines = explode("\n",$string);
 		$linecount = sizeof($lines);
 		$maxlinelength=0;
 		foreach($lines as $line)

@@ -4,60 +4,57 @@
 
 // TARGET dbplug:databasename:username:pass:hostkey
 
-class WeatherMapDataSource_tabfile extends WeatherMapDataSource
-{
-    function Recognise($targetstring)
-    {
-        if (preg_match("/\.(tsv|txt)$/", $targetstring, $matches)) {
-            return true;
-        } else {
-            return false;
-        }
-    }
+class WeatherMapDataSource_tabfile extends WeatherMapDataSource {
 
-    // function ReadData($targetstring, $configline, $itemtype, $itemname, $map)
-    function ReadData($targetstring, &$map, &$item)
-    {
-        $data[IN] = null;
-        $data[OUT] = null;
-        $data_time = 0;
-        $itemname = $item->name;
+	function Recognise($targetstring)
+	{
+		if(preg_match("/\.(tsv|txt)$/",$targetstring,$matches))
+		{
+			return TRUE;
+		}
+		else
+		{
+			return FALSE;
+		}
+	}
 
-        $matches = 0;
+	// function ReadData($targetstring, $configline, $itemtype, $itemname, $map)
+	function ReadData($targetstring, &$map, &$item)
+	{
+		$data[IN] = NULL;
+		$data[OUT] = NULL;
+		$data_time=0;
+		$itemname = $item->name;
 
-        $fd = fopen($targetstring, "r");
+		$matches=0;
 
-        if ($fd) {
-            while (!feof($fd)) {
-                $buffer = fgets($fd, 4096);
-                # strip out any Windows line-endings that have gotten in here
-                $buffer = str_replace("\r", "", $buffer);
+		$fd=fopen($targetstring, "r");
 
-                if (preg_match("/^$itemname\t(\d+\.?\d*[KMGT]*)\t(\d+\.?\d*[KMGT]*)/",
-                    $buffer, $matches)) {
-                    $data[IN] = wm_unformat_number($matches[1]);
-                    $data[OUT] = wm_unformat_number($matches[2]);
-                }
-            }
-            $stats = stat($targetstring);
-            $data_time = $stats['mtime'];
-        } else {
-            // TODO - some error code to go in here
-            wm_warn("TabText ReadData: Couldn't open ($targetstring). [WMTABDATA01]");
-        }
+		if ($fd)
+		{
+			while (!feof($fd))
+			{
+				$buffer=fgets($fd, 4096);
+				# strip out any Windows line-endings that have gotten in here
+				$buffer=str_replace("\r", "", $buffer);
 
-        wm_debug( sprintf("TabText ReadData: Returning (%s, %s, %s) \n",
-		        string_or_null($data[IN]),
-		        string_or_null($data[OUT]),
-		        $data_time
-        	));
-
-        return (array (
-            $data[IN],
-            $data[OUT],
-            $data_time
-        ));
-    }
+				if (preg_match("/^$itemname\t(\d+\.?\d*[KMGT]*)\t(\d+\.?\d*[KMGT]*)/", $buffer, $matches))
+				{
+					$data[IN]=unformat_number($matches[1]);
+					$data[OUT]=unformat_number($matches[2]);
+				}
+			}
+			$stats = stat($targetstring);
+			$data_time = $stats['mtime'];
+		}
+		else {
+			// some error code to go in here
+			wm_debug ("TabText ReadData: Couldn't open ($targetstring). \n"); }
+		
+			wm_debug ("TabText ReadData: Returning (".($data[IN]===NULL?'NULL':$data[IN]).",".($data[OUT]===NULL?'NULL':$data[OUT]).",$data_time)\n");
+		
+			return( array($data[IN], $data[OUT], $data_time) );
+	}
 }
 
 // vim:ts=4:sw=4:

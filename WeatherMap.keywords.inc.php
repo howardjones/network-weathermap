@@ -1,9 +1,3 @@
-<?php
-
-// most of the config keywords just copy stuff into object properties.
-// these are all dealt with from this one array. The special-cases
-// follow on from that
-
 
 // new version of config_keywords
 // array of contexts, contains an array of keywords, contains a (short) list of regexps as now

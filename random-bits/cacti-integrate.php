@@ -19,8 +19,7 @@ if (!file_exists($cacti_root . "/include/config.php")) {
 }
 
 ini_set('include_path',
-    ini_get('include_path') . PATH_SEPARATOR . $cacti_root . PATH_SEPARATOR . $cacti_root
-        . '/plugins/weathermap'
+    ini_get('include_path') . PATH_SEPARATOR . $cacti_root . PATH_SEPARATOR . $cacti_root . '/plugins/weathermap'
     . PATH_SEPARATOR . $cacti_root . '/plugins/weathermap/random-bits');
 
 require_once 'Weathermap.class.php';
@@ -52,12 +51,12 @@ $width_map = array (
 // check if the goalposts have moved
 if (is_dir($cacti_base) && file_exists($cacti_base . "/include/global.php")) {
     // include the cacti-config, so we know about the database
-    include_once $cacti_base . "/include/global.php";
+    include_once($cacti_base . "/include/global.php");
     $config['base_url'] = (isset($config['url_path']) ? $config['url_path'] : $cacti_url);
     $cacti_found = true;
 } elseif (is_dir($cacti_base) && file_exists($cacti_base . "/include/config.php")) {
     // include the cacti-config, so we know about the database
-    include_once $cacti_base . "/include/config.php";
+    include_once($cacti_base . "/include/config.php");
     $config['base_url'] = (isset($config['url_path']) ? $config['url_path'] : $cacti_url);
     $cacti_found = true;
 } else {
@@ -163,16 +162,15 @@ if ($inputmapfile == '' || $outputmapfile == '') {
 
 // figure out which template has interface traffic. This might be wrong for you.
 $data_template = "Interface - Traffic";
-$data_template_id = db_fetch_cell("select id from data_template where name='"
-    . mysql_real_escape_string($data_template) . "'");
+$data_template_id =
+    db_fetch_cell("select id from data_template where name='" . mysql_real_escape_string($data_template) . "'");
 
 $map = new WeatherMap;
 
 $map->ReadConfig($inputmapfile);
 
 $fmt_cacti_graph =
-    $cacti_url
-        . "graph_image.php?local_graph_id=%d&rra_id=0&graph_nolegend=true&graph_height=100&graph_width=300";
+    $cacti_url . "graph_image.php?local_graph_id=%d&rra_id=0&graph_nolegend=true&graph_height=100&graph_width=300";
 $fmt_cacti_graphpage = $cacti_url . "graph.php?rra_id=all&local_graph_id=%d";
 
 //
@@ -190,8 +188,7 @@ foreach ($map->nodes as $node) {
     $address = $node->get_hint("address");
 
     if ($host_id != '') {
-        $res1 = db_fetch_row("select hostname,description from host where id="
-            . intval($host_id));
+        $res1 = db_fetch_row("select hostname,description from host where id=" . intval($host_id));
 
         if ($res1) {
             if ($hostname == '') {
@@ -208,8 +205,8 @@ foreach ($map->nodes as $node) {
 // by now, if there was a host_id, all 3 are populated. If not, then we should try one of the others to get a host_id
     else {
         if ($address != '') {
-            $res2 = db_fetch_row("select id,description from host where hostname='"
-                . mysql_real_escape_string($address) . "'");
+            $res2 = db_fetch_row("select id,description from host where hostname='" . mysql_real_escape_string($address)
+                . "'");
 
             if ($res2) {
                 $host_id = $res2['id'];
@@ -221,8 +218,9 @@ foreach ($map->nodes as $node) {
                 }
             }
         } elseif ($hostname != '') {
-            $res3 = db_fetch_row("select id,hostname from host where description='"
-                . mysql_real_escape_string($hostname) . "'");
+            $res3 =
+                db_fetch_row("select id,hostname from host where description='" . mysql_real_escape_string($hostname)
+                    . "'");
 
             if ($res3) {
                 $host_id = $res3['id'];
@@ -267,7 +265,7 @@ foreach ($map->links as $link) {
 
         print "LINK $name\n";
 
-        if (count($link->targets) == 0 || $overwrite_targets) {
+        if (count($link->targets) == 0 || $overwrite_targets ) {
             if ((($a_id + $b_id) > 0) && ($int_out . $int_in == '')) {
                 print "  (could do if there were interfaces)\n";
             }
@@ -290,8 +288,7 @@ foreach ($map->links as $link) {
                 $tgt_host = $b_id;
                 $ds_names = ":traffic_out:traffic_in";
             } else {
-                print
-                    "  No useful ends on this link - fill in more detail (host id, IP) on either NODE $a or $b\n";
+                print "  No useful ends on this link - fill in more detail (host id, IP) on either NODE $a or $b\n";
             }
 
             if ($tgt_host != "") {
@@ -310,8 +307,7 @@ foreach ($map->links as $link) {
                         $SQL =
                             sprintf(
                                 "select data_local.id, data_source_path, host_snmp_cache.snmp_index from data_template_data, data_local,snmp_query, host_snmp_cache where data_template_data.local_data_id=data_local.id and host_snmp_cache.snmp_query_id = snmp_query.id and data_local.host_id=host_snmp_cache.host_id and data_local.snmp_query_id=host_snmp_cache.snmp_query_id  and data_local.snmp_index=host_snmp_cache.snmp_index and host_snmp_cache.host_id=%d and host_snmp_cache.field_name='%s' and host_snmp_cache.field_value='%s' and data_local.data_template_id=%d order by data_template_data.id desc limit 1;",
-                                $tgt_host, $field, mysql_real_escape_string($interface),
-                                $data_template_id);
+                                $tgt_host, $field, mysql_real_escape_string($interface), $data_template_id);
                         $res4 = db_fetch_row($SQL);
 
                         if ($res4)
@@ -383,8 +379,8 @@ foreach ($map->links as $link) {
                 print "    SPEED $total_speed\n";
                 $map->links[$name]->max_bandwidth_in = $total_speed;
                 $map->links[$name]->max_bandwidth_out = $total_speed;
-                $map->links[$name]->max_bandwidth_in_cfg = wm_nice_bandwidth($total_speed);
-                $map->links[$name]->max_bandwidth_out_cfg = wm_nice_bandwidth($total_speed);
+                $map->links[$name]->max_bandwidth_in_cfg = nice_bandwidth($total_speed);
+                $map->links[$name]->max_bandwidth_out_cfg = nice_bandwidth($total_speed);
 
                 if ($map_widths) {
                     foreach ($width_map as $map_speed => $map_width) {

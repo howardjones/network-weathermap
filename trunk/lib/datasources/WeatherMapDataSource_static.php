@@ -5,51 +5,44 @@
 // TARGET static:10M
 // TARGET static:2M:256K
 
-class WeatherMapDataSource_static extends WeatherMapDataSource
-{
-    function Recognise($targetstring)
-    {
-        if (preg_match("/^static:(\-?\d+\.?\d*[KMGT]?):(\-?\d+\.?\d*[KMGT]?)$/",
-            $targetstring, $matches)
-            || preg_match("/^static:(\-?\d+\.?\d*[KMGT]?)$/", $targetstring, $matches)) {
-            return true;
-        } else {
-            return false;
-        }
-    }
+class WeatherMapDataSource_static extends WeatherMapDataSource {
 
-    function ReadData($targetstring, &$map, &$item)
-    {
-	$data[IN] = null;
-        $data[OUT] = null;
+	function Recognise($targetstring)
+	{
+		if( preg_match("/^static:(\-?\d+\.?\d*[KMGT]?):(\-?\d+\.?\d*[KMGT]?)$/",$targetstring,$matches) || 
+			preg_match("/^static:(\-?\d+\.?\d*[KMGT]?)$/",$targetstring,$matches) )
+		{
+			return TRUE;
+		}
+		else
+		{
+			return FALSE;
+		}
+	}
 
-        $data_time = 0;
+	function ReadData($targetstring, &$map, &$item)
+	{
+		$inbw = NULL;
+		$outbw = NULL;
+		$data_time=0;
 
-        if (preg_match("/^static:(\-?\d+\.?\d*[KMGT]*):(\-?\d+\.?\d*[KMGT]*)$/",
-            $targetstring, $matches)) {
-            $data[IN] = wm_unformat_number($matches[1], $map->kilo);
-            $data[OUT] = wm_unformat_number($matches[2], $map->kilo);
-            $data_time = time();
-        }
+		if(preg_match("/^static:(\-?\d+\.?\d*[KMGT]*):(\-?\d+\.?\d*[KMGT]*)$/",$targetstring,$matches))
+		{
+			$inbw = unformat_number($matches[1], $map->kilo);
+			$outbw = unformat_number($matches[2], $map->kilo);
+			$data_time = time();
+		}
 
-        if (preg_match("/^static:(\-?\d+\.?\d*[KMGT]*)$/", $targetstring, $matches)) {
-            $data[IN] = wm_unformat_number($matches[1], $map->kilo);
-            $data[OUT] = $data[IN];
-            $data_time = time();
-        }
-        
-        wm_debug( sprintf("Static ReadData: Returning (%s, %s, %s)\n",
-		        string_or_null($data[IN]),
-		        string_or_null($data[OUT]),
-		        $data_time
-        	));
+		if(preg_match("/^static:(\-?\d+\.?\d*[KMGT]*)$/",$targetstring,$matches))
+		{
+			$inbw = unformat_number($matches[1], $map->kilo);
+			$outbw = $inbw;
+			$data_time = time();
+		}
+		wm_debug ("Static ReadData: Returning ($inbw,$outbw,$data_time)\n");
 
-        return (array (
-            $data[IN],
-            $data[OUT],
-            $data_time
-        ));
-    }
+		return ( array($inbw,$outbw,$data_time) );
+	}
 }
 
 // vim:ts=4:sw=4:

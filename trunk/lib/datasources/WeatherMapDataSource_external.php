@@ -10,73 +10,75 @@
 // we ignore the last two
 
 // NOTE: Obviously, if you allow anyone to create maps, you are
-//       allowing them to run ANY COMMAND as the user that runs
-//       weathermap, by using this plugin. This might not be a
+//       allowing them to run ANY COMMAND as the user that runs 
+//       weathermap, by using this plugin. This might not be a 
 //       good thing.
 
 //       If you want to allow only one command, consider making
 //       your own datasource plugin which only runs that one command.
 
-class WeatherMapDataSource_external extends WeatherMapDataSource
-{
-    function Recognise($targetstring)
-    {
-        if (preg_match("/^!(.*)$/", $targetstring, $matches)) {
-            return true;
-        } else {
-            return false;
-        }
-    }
 
-    function ReadData($targetstring, &$map, &$item)
-    {
-        $data[IN] = null;
-        $data[OUT] = null;
-        $data_time = 0;
+class WeatherMapDataSource_external extends WeatherMapDataSource {
 
-        if (preg_match("/^!(.*)$/", $targetstring, $matches)) {
-            $command = $matches[1];
+	function Recognise($targetstring)
+	{
+		if(preg_match("/^!(.*)$/",$targetstring,$matches))
+		{
+			return TRUE;
+		}
+		else
+		{
+			return FALSE;
+		}
+	}
 
-            wm_debug("ExternalScript ReadData: Running $command\n");
+	function ReadData($targetstring, &$map, &$item)
+	{
+		$data[IN] = NULL;
+		$data[OUT] = NULL;
+		$data_time = 0;
 
-            // run the command here
-            if (($pipe = popen($command, "r")) === false) {
-                wm_warn("ExternalScript ReadData: Failed to run external script. [WMEXT01]\n");
-            } else {
-                $i = 0;
+		if(preg_match("/^!(.*)$/",$targetstring,$matches))
+		{
+			$command = $matches[1];
 
-                while (($i < 5) && !feof($pipe)) {
-                    $lines[$i++] = fgets($pipe, 1024);
-                }
-                pclose($pipe);
+			wm_debug("ExternalScript ReadData: Running $command\n");
+			// run the command here
+			if( ($pipe = popen($command,"r")) === false)
+			{
+				wm_warn("ExternalScript ReadData: Failed to run external script. [WMEXT01]\n");
+			}
+			else
+			{
+				$i=0;
+				while( ($i <5) && ! feof($pipe) )
+				{
+					$lines[$i++] = fgets($pipe,1024);
+				}
+				pclose($pipe);
 
-                if ($i === 5) {
-                    $data[IN] = floatval($lines[0]);
-                    $data[OUT] = floatval($lines[1]);
+				if($i==5)
+				{
+					$data[IN] = floatval($lines[0]);
+					$data[OUT] = floatval($lines[1]);
+					
+					$item->add_hint("external_line1",$lines[0]);
+					$item->add_hint("external_line2",$lines[1]);
+					$item->add_hint("external_line3",$lines[2]);
+					$item->add_hint("external_line4",$lines[3]);
+					$data_time = time();
+				}
+				else
+				{
+					wm_warn("ExternalScript ReadData: Not enough lines read from external script ($i read, 4 expected) [WMEXT02]\n");
+				}
+			}
+		}
 
-                    $item->add_hint('external_line1', $lines[0]);
-                    $item->add_hint('external_line2', $lines[1]);
-                    $item->add_hint('external_line3', $lines[2]);
-                    $item->add_hint('external_line4', $lines[3]);
-                    $data_time = time();
-                } else {
-                    wm_warn("ExternalScript ReadData: Not enough lines read from external script ($i read, 4 expected) [WMEXT02]\n");
-                }
-            }
-        }
-
-        wm_debug( sprintf("ExternalScript ReadData: Returning (%s, %s, %s)\n",
-		        string_or_null($data[IN]),
-		        string_or_null($data[OUT]),
-		        $data_time
-        	));
-            
-        return (array (
-            $data[IN],
-            $data[OUT],
-            $data_time
-        ));
-    }
+		wm_debug ("ExternalScript ReadData: Returning (".($data[IN]===NULL?'NULL':$data[IN]).",".($data[OUT]===NULL?'NULL':$data[OUT]).",$data_time)\n");
+		
+		return( array($data[IN], $data[OUT], $data_time) );
+	}
 }
 
 // vim:ts=4:sw=4:

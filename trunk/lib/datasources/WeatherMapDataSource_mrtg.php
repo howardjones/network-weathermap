@@ -10,18 +10,18 @@ class WeatherMapDataSource_mrtg extends WeatherMapDataSource {
 	{
 		if(preg_match("/\.(htm|html)$/",$targetstring,$matches))
 		{
-			return true;
+			return TRUE;
 		}
 		else
 		{
-			return false;
+			return FALSE;
 		}
 	}
 
 	function ReadData($targetstring, &$map, &$item)
 	{
-		$data[IN] = null;
-		$data[OUT] = null;
+		$data[IN] = NULL;
+		$data[OUT] = NULL;
 		$data_time = 0;
 		
 		$matchvalue= $item->get_hint('mrtg_value');
@@ -29,10 +29,10 @@ class WeatherMapDataSource_mrtg extends WeatherMapDataSource {
 		$swap = intval($item->get_hint('mrtg_swap'));
 		$negate = intval($item->get_hint('mrtg_negate'));
 				
-		if($matchvalue =='') { $matchvalue = 'cu'; }
-		if($matchperiod =='') { $matchperiod = 'd';	}
+		if($matchvalue =='') $matchvalue = "cu";
+		if($matchperiod =='') $matchperiod = "d";	
 				
-		$fd=fopen($targetstring, 'r');
+		$fd=fopen($targetstring, "r");
 
 		if ($fd)
 		{
@@ -71,13 +71,9 @@ class WeatherMapDataSource_mrtg extends WeatherMapDataSource {
 			$data[OUT] = -$data[OUT];
 			$data[IN] = -$data[IN];
 		}
-				
-		wm_debug( sprintf("MRTG ReadData: Returning (%s, %s, %s)\n",
-		        string_or_null($data[IN]),
-		        string_or_null($data[OUT]),
-		        $data_time
-        	));
 		
+		wm_debug ("MRTG ReadData: Returning (".($data[IN]===NULL?'NULL':$data[IN]).",".($data[OUT]===NULL?'NULL':$data[OUT]).",$data_time)\n");
+
 		return( array($data[IN], $data[OUT], $data_time) );
 	}
 }

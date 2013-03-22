@@ -1,18 +1,10 @@
 <?xml version = "1.0" encoding = "UTF-8"?>
 <configentry>
-    <keyword>BACKGROUND
-    </keyword>
+    <keyword>BACKGROUND</keyword>
+    <scope>GLOBAL</scope>
+    <anchor>GLOBAL_BACKGROUND</anchor>
 
-    <scope>GLOBAL
-    </scope>
-
-    <anchor>GLOBAL_BACKGROUND
-    </anchor>
-
-    <definition>BACKGROUND
-
-        <meta>imagefile</meta>
-    </definition>
+    <definition>BACKGROUND <meta>imagefile</meta></definition>
 
     <description xmlns = "http://www.w3.org/1999/xhtml">
         <p>Specify an PNG, JPEG or GIF image file to be used as a background image.</p>

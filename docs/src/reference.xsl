@@ -3,28 +3,15 @@
     <xsl:output omit-xml-declaration = "yes" indent = "yes" />
 
     <xsl:template match = "references">
-        <html>
-            <head>
-                <link rel = "stylesheet" type = "text/css" media = "screen"
-                    href = "weathermap.css" />
-
-                <title>PHP Weathermap v%VERSION% Configuration Reference</title>
-            </head>
-
-            <body>
-                <div id = "frame">
-                    %NAV IN HERE%
-
+	<xsl:processing-instruction name="php">include 'vars.php'; $PAGE_TITLE='Configuration Reference'; include 'common-page-head.html'; </xsl:processing-instruction>
                     <h2><a name = "configref">Configuration Reference</a></h2>
 
                     <p>This page is automatically compiled, and documents all the
                     configuration directives that are available in PHP Weathermap
-                    %VERSION%. </p>
+                    <xsl:processing-instruction name="php">echo $WEATHERMAP_VERSION; </xsl:processing-instruction>. </p>
 
                     <xsl:apply-templates />
-                </div>
-            </body>
-        </html>
+	<xsl:processing-instruction name="php">include 'common-page-foot.html'; </xsl:processing-instruction>
     </xsl:template>
 
     <xsl:template match = "section">

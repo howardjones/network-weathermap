@@ -13,20 +13,22 @@ contents.xml: contents.xsl index.xml $(GLOBALS) $(LINKS) $(NODES)
 
 config-reference.html: reference.xsl index.xml contents.xml $(GLOBALS) $(LINKS) $(NODES)
 	xsltproc --xinclude reference.xsl index.xml | ./relink-reference.pl > config-reference.html
-	./process.pl $(VERSION)  < config-reference.html > ../pages/config-reference.html
-	./process.pl $(VERSION)   < main.html > ../pages/main.html
-	./process.pl $(VERSION)   < errorcodes.html | ./relink-reference.pl ALL > ../pages/errorcodes.html
-	./process.pl $(VERSION)   < index.html > ../index.html
-	./process.pl $(VERSION)  < cli-reference.html > ../pages/cli-reference.html
-	./process.pl $(VERSION)   < cacti-plugin.html > ../pages/cacti-plugin.html
-	./process.pl $(VERSION)   < editor.html | ./relink-reference.pl ALL > ../pages/editor.html
-	./process.pl $(VERSION)   < advanced.html | ./relink-reference.pl ALL > ../pages/advanced.html
-	./process.pl $(VERSION)   < faq.html | ./relink-reference.pl ALL > ../pages/faq.html
-	./process.pl $(VERSION)   < changes.html | ./relink-reference.pl ALL > ../pages/changes.html
-	./process.pl $(VERSION)   < targets.html | ./relink-reference.pl ALL > ../pages/targets.html
-	./process.pl $(VERSION)   < install-cacti.html > ../pages/install-cacti.html
-	./process.pl $(VERSION)   < install-cacti-editor.html > ../pages/install-cacti-editor.html
-	./process.pl $(VERSION)   < install-cli.html > ../pages/install-cli.html
-	./process.pl $(VERSION)   < install-cli-editor.html > ../pages/install-cli-editor.html
-	./process.pl $(VERSION)   < upgrading.html > ../pages/upgrading.html
-	
+	# I will probably have to do some kind of pennance for this mess
+	echo "<?php \$$WEATHERMAP_VERSION='v$(VERSION)'; ?>" > vars.php
+	php config-reference.html > ../pages/config-reference.html
+	php main.html > ../pages/main.html
+	php errorcodes.html | ./relink-reference.pl ALL > ../pages/errorcodes.html
+	php index.html > ../index.html
+	php cli-reference.html > ../pages/cli-reference.html
+	php cacti-plugin.html > ../pages/cacti-plugin.html
+	php install-cacti.html > ../pages/install-cacti.html
+	php install-cacti-editor.html > ../pages/install-cacti-editor.html
+	php install-cli.html > ../pages/install-cli.html
+	php install-cli-editor.html > ../pages/install-cli-editor.html
+	php upgrading.html > ../pages/upgrading.html
+	php editor.html | ./relink-reference.pl ALL > ../pages/editor.html
+	php advanced.html | ./relink-reference.pl ALL > ../pages/advanced.html
+	php faq.html | ./relink-reference.pl ALL > ../pages/faq.html
+	php changes.html | ./relink-reference.pl ALL > ../pages/changes.html
+	php targets.html | ./relink-reference.pl ALL > ../pages/targets.html
+

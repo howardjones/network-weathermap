@@ -1,22 +1,12 @@
 <?xml version = "1.0" encoding = "UTF-8"?>
 <configentry>
-    <keyword>*COLOR
-    </keyword>
+    <keyword>*COLOR</keyword>
 
-    <scope>GLOBAL
-    </scope>
+    <scope>GLOBAL</scope>
 
-    <anchor>GLOBAL_COLORS
-    </anchor>
+    <anchor>GLOBAL_COLORS</anchor>
 
-    <definition>BGCOLOR
-
-        <meta>red</meta>
-
-        <meta>green</meta>
-
-        <meta>blue</meta>
-    </definition>
+    <definition>BGCOLOR <meta>red</meta> <meta>green</meta> <meta>blue</meta></definition>
 
     <definition>TIMECOLOR
 

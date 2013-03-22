@@ -1,34 +1,9 @@
-<!doctype html public "-//w3c//dtd xhtml 1.0 strict//en"
-    "http://www.w3.org/tr/xhtml1/dtd/xhtml1-strict.dtd">
-<html lang = "en" xml:lang = "en" xmlns = "http://www.w3.org/1999/xhtml">
-    <head>
-        <link rel = "stylesheet" type = "text/css" media = "screen" href =
-            "weathermap.css" />
-
-        <meta name = "generator" content =
-            "HTML Tidy for Mac OS X (vers 1st December 2004), see www.w3.org" />
-
-        <title>PHP Weathermap<!--#echo var="WM_VERSION"-->-FAQ</title>
-
-        <style type = "text/css" media = "print">
-            /*<![CDATA[*/
-            body {
-                font-size: 12pt;
-            }
-
-            a {
-                color: black;
-                text-decoration: underline;
-                font-weight: normal;
-            }
-            /*]]>*/
-        </style>
-    </head>
-
-    <body>
-        <div id = "frame">
-            <!--#include file="common-top-nav.html" -->
-
+<?php
+	include "vars.php";
+	$PAGE_TITLE="FAQ &amp; Useful Tips";
+	$PATH_EXTRA="../";
+	include "common-page-head.html";
+?>
             <h2><a name = "faq" id = "faq">FAQ &amp; Useful Tips</a></h2>
 
             <h3>FAQs</h3>
@@ -319,6 +294,6 @@
                 users</a> anyway
                 - it's nice to know that people do use this thing.</p></dd>
             </dl>
-        </div>
-    </body>
-</html>
+<?php
+	include "common-page-foot.html";
+?>

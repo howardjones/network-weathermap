@@ -16,11 +16,13 @@
         <h4 class = "configsection"><xsl:value-of select = "@name" /></h4>
 
         <p id = "context_{@scope}">
-        <xsl:apply-templates select = "configentry" /></p>
+        <xsl:apply-templates select = "configentry">
+		<xsl:sort select="anchor" />
+	</xsl:apply-templates></p>
     </xsl:template>
 
     <xsl:template match = "configentry">
-        <a href = "#{./anchor}">
+        <a class="" href = "#{./anchor}">
 
         <xsl:value-of select = "./keyword" /></a>
     </xsl:template>

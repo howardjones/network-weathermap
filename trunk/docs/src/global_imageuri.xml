@@ -1,16 +1,12 @@
 <?xml version = "1.0" encoding = "UTF-8"?>
 <configentry>
-    <keyword>IMAGEURI
-    </keyword>
+    <keyword>IMAGEURI</keyword>
 
-    <scope>GLOBAL
-    </scope>
+    <scope>GLOBAL</scope>
 
-    <anchor>GLOBAL_IMAGEURI
-    </anchor>
+    <anchor>GLOBAL_IMAGEURI</anchor>
 
-    <definition>IMAGEURI
-
+    <definition>IMAGEURI 
         <meta>image-uri</meta>
     </definition>
 

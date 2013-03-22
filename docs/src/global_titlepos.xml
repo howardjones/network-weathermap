@@ -1,13 +1,10 @@
-<?xml version = "1.0" encoding = "UTF-8"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <configentry>
-    <keyword>TITLEPOS
-    </keyword>
+    <keyword>TITLEPOS</keyword>
 
-    <scope>GLOBAL
-    </scope>
+    <scope>GLOBAL</scope>
 
-    <anchor>GLOBAL_TITLEPOS
-    </anchor>
+    <anchor>GLOBAL_TITLEPOS</anchor>
 
     <definition>TITLEPOS
 
@@ -25,7 +22,7 @@
         <meta>headingstring</meta>
     </definition>
 
-    <description xmlns = "http://www.w3.org/1999/xhtml">
+    <description xmlns="http://www.w3.org/1999/xhtml">
         <p>Specifies the position of the title text. </p>
 
         <p>If no TITLEPOS line is given, then no title is drawn. You can optionally
@@ -37,7 +34,7 @@
     </description>
 
     <changes>
-        <change version = "0.8">Originally added TITLEPOS.
+        <change version="0.8">Originally added TITLEPOS.
         </change>
     </changes>
 </configentry>

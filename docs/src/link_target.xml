@@ -1,13 +1,10 @@
-<?xml version = "1.0" encoding = "UTF-8"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <configentry>
-    <keyword>TARGET
-    </keyword>
+    <keyword>TARGET</keyword>
 
-    <scope>LINK
-    </scope>
+    <scope>LINK</scope>
 
-    <anchor>LINK_TARGET
-    </anchor>
+    <anchor>LINK_TARGET</anchor>
 
     <definition>TARGET
 
@@ -44,7 +41,7 @@
         <meta>targetspec</meta>"
     </definition>
 
-    <description xmlns = "http://www.w3.org/1999/xhtml">
+    <description xmlns="http://www.w3.org/1999/xhtml">
         <p>Specifies where to look for the current throughput information for this LINK.
         You can also specify multiple targets, which will then be added together to make
         the aggregate bandwidth which is then displayed. Specify the targets on one
@@ -62,7 +59,7 @@
 
         <p>The actual contents of the
         <em>targetspec</em> depend on the data source plugins that are available.
-        <a href = "targets.html">The standard plugins are documented here</a>.</p>
+        <a href="targets.html">The standard plugins are documented here</a>.</p>
 
         <p>To help with filenames that can contain spaces, or for the external script
         data source, you can enclose the entire targetspec in double-quotes (") to show
@@ -72,24 +69,24 @@
     </description>
 
     <changes>
-        <change version = "0.96">Added quotes option for targets with spaces.
+        <change version="0.96">Added quotes option for targets with spaces.
         </change>
 
-        <change version = "0.96">Added scale factors for all datasources.
+        <change version="0.96">Added scale factors for all datasources.
         </change>
 
-        <change version = "0.91">Added 'negative' datasources.
+        <change version="0.91">Added 'negative' datasources.
         </change>
 
-        <change version = "0.9">Added plugin data sources, node targets, and added new
+        <change version="0.9">Added plugin data sources, node targets, and added new
         plugins.
         </change>
 
-        <change version = "0.8">Added ability to specify multiple targets. Added
+        <change version="0.8">Added ability to specify multiple targets. Added
         tab-delimited data source. Added 'ignore' DS name.
         </change>
 
-        <change version = "0.5">Added ability to specify DS names.
+        <change version="0.5">Added ability to specify DS names.
         </change>
     </changes>
 

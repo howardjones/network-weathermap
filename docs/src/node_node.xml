@@ -1,20 +1,17 @@
-<?xml version = "1.0" encoding = "UTF-8"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <configentry>
-    <keyword>NODE
-    </keyword>
+    <keyword>NODE</keyword>
 
-    <scope>NODE
-    </scope>
+    <scope>NODE</scope>
 
-    <anchor>NODE_NODE
-    </anchor>
+    <anchor>NODE_NODE</anchor>
 
     <definition>NODE
 
         <meta>nodename</meta>
     </definition>
 
-    <description xmlns = "http://www.w3.org/1999/xhtml">
+    <description xmlns="http://www.w3.org/1999/xhtml">
         <p>The initial definition of a NODE. This must come before any other
         configuration related to this node.</p>
 
@@ -29,7 +26,7 @@
     </description>
 
     <changes>
-        <change version = "0.7">Added DEFAULT node.
+        <change version="0.7">Added DEFAULT node.
         </change>
     </changes>
 </configentry>

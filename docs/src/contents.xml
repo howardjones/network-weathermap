@@ -3,177 +3,96 @@
     <div id="contents">
       <h4 xmlns="" class="configsection">Node-specific Configuration Directives</h4>
       <p xmlns="" id="context_NODE">
-        <a class="" href="#NODE_COLORS&#10;    ">*COLOR
-    </a>
-        <a class="" href="#NODE_ICON&#10;    ">ICON
-    </a>
-        <a class="" href="#NODE_INFOURL&#10;    ">INFOURL
-    </a>
-        <a class="" href="#NODE_LABEL&#10;    ">LABEL
-    </a>
-        <a class="" href="#NODE_LABELANGLE&#10;    ">LABELANGLE
-    </a>
-        <a class="" href="#NODE_LABELFONT&#10;    ">LABELFONT
-    </a>
-        <a class="" href="#NODE_LABELOFFSET&#10;    ">LABELOFFSET
-    </a>
-        <a class="" href="#NODE_MAXVALUE&#10;    ">MAXVALUE
-    </a>
-        <a class="" href="#NODE_NODE&#10;    ">NODE
-    </a>
-        <a class="" href="#NODE_NOTES&#10;    ">NOTES
-    </a>
-        <a class="" href="#NODE_OVERLIBCAPTION&#10;    ">OVERLIBCAPTION
-    </a>
-        <a class="" href="#NODE_OVERLIBGRAPH&#10;    ">OVERLIBGRAPH
-    </a>
-        <a class="" href="#NODE_OVERLIBHEIGHT&#10;    ">OVERLIBHEIGHT
-    </a>
-        <a class="" href="#NODE_OVERLIBWIDTH&#10;    ">OVERLIBWIDTH
-    </a>
-        <a class="" href="#NODE_POSITION&#10;    ">POSITION
-    </a>
-        <a class="" href="#NODE_SET&#10;    ">SET
-    </a>
-        <a class="" href="#NODE_TARGET&#10;    ">TARGET
-    </a>
-        <a class="" href="#NODE_TEMPLATE&#10;    ">TEMPLATE
-    </a>
-        <a class="" href="#NODE_USEICONSCALE&#10;    ">USEICONSCALE
-    </a>
-        <a class="" href="#NODE_USESCALE&#10;    ">USESCALE
-    </a>
-        <a class="" href="#NODE_ZORDER&#10;    ">ZORDER
-    </a>
+        <a class="" href="#NODE_COLORS">*COLOR</a>
+        <a class="" href="#NODE_ICON">ICON</a>
+        <a class="" href="#NODE_INFOURL">INFOURL</a>
+        <a class="" href="#NODE_LABEL">LABEL</a>
+        <a class="" href="#NODE_LABELANGLE">LABELANGLE</a>
+        <a class="" href="#NODE_LABELFONT">LABELFONT</a>
+        <a class="" href="#NODE_LABELOFFSET">LABELOFFSET</a>
+        <a class="" href="#NODE_MAXVALUE">MAXVALUE</a>
+        <a class="" href="#NODE_NODE">NODE</a>
+        <a class="" href="#NODE_NOTES">NOTES</a>
+        <a class="" href="#NODE_OVERLIBCAPTION">OVERLIBCAPTION</a>
+        <a class="" href="#NODE_OVERLIBGRAPH">OVERLIBGRAPH</a>
+        <a class="" href="#NODE_OVERLIBHEIGHT">OVERLIBHEIGHT</a>
+        <a class="" href="#NODE_OVERLIBWIDTH">OVERLIBWIDTH</a>
+        <a class="" href="#NODE_POSITION">POSITION</a>
+        <a class="" href="#NODE_SET">SET</a>
+        <a class="" href="#NODE_TARGET">TARGET</a>
+        <a class="" href="#NODE_TEMPLATE">TEMPLATE</a>
+        <a class="" href="#NODE_USEICONSCALE">USEICONSCALE</a>
+        <a class="" href="#NODE_USESCALE">USESCALE</a>
+        <a class="" href="#NODE_ZORDER">ZORDER</a>
       </p>
       <h4 xmlns="" class="configsection">Link-specific Configuration Directives</h4>
       <p xmlns="" id="context_LINK">
-        <a class="" href="#LINK_ARROWSTYLE&#10;    ">ARROWSTYLE
-    </a>
-        <a class="" href="#LINK_BANDWIDTH&#10;    ">BANDWIDTH
-    </a>
-        <a class="" href="#LINK_BWFONT&#10;    ">BWFONT
-    </a>
-        <a class="" href="#LINK_BWLABEL&#10;    ">BWLABEL
-    </a>
-        <a class="" href="#LINK_BWLABELPOS&#10;    ">BWLABELPOS
-    </a>
-        <a class="" href="#LINK_BWSTYLE&#10;    ">BWSTYLE
-    </a>
-        <a class="" href="#LINK_COLORS&#10;    ">*COLOR
-    </a>
-        <a class="" href="#LINK_COMMENTFONT&#10;    ">COMMENTFONT
-    </a>
-        <a class="" href="#LINK_COMMENTPOS&#10;    ">COMMENTPOS
-    </a>
-        <a class="" href="#LINK_COMMENTSTYLE&#10;    ">COMMENTSTYLE
-    </a>
-        <a class="" href="#LINK_DUPLEX&#10;    ">DUPLEX
-    </a>
-        <a class="" href="#LINK_INBWFORMAT&#10;    ">INBWFORMAT
-    </a>
-        <a class="" href="#LINK_INCOMMENT&#10;    ">INCOMMENT
-    </a>
-        <a class="" href="#LINK_INFOURL&#10;    ">INFOURL
-    </a>
-        <a class="" href="#LINK_ININFOURL&#10;    ">ININFOURL
-    </a>
-        <a class="" href="#LINK_INNOTES&#10;    ">INNOTES
-    </a>
-        <a class="" href="#LINK_INOVERLIBCAPTION&#10;    ">INOVERLIBCAPTION
-    </a>
-        <a class="" href="#LINK_INOVERLIBGRAPH&#10;    ">INOVERLIBGRAPH
-    </a>
-        <a class="" href="#LINK_LINK&#10;    ">LINK
-    </a>
-        <a class="" href="#LINK_LINKSTYLE&#10;    ">LINKSTYLE
-    </a>
-        <a class="" href="#LINK_NODES&#10;    ">NODES
-    </a>
-        <a class="" href="#LINK_NOTES&#10;    ">NOTES
-    </a>
-        <a class="" href="#LINK_OUTBWFORMAT&#10;    ">OUTBWFORMAT
-    </a>
-        <a class="" href="#LINK_OUTCOMMENT&#10;    ">OUTCOMMENT
-    </a>
-        <a class="" href="#LINK_OUTINFOURL&#10;    ">OUTINFOURL
-    </a>
-        <a class="" href="#LINK_OUTNOTES&#10;    ">OUTNOTES
-    </a>
-        <a class="" href="#LINK_OUTOVERLIBCAPTION&#10;    ">OUTOVERLIBCAPTION
-    </a>
-        <a class="" href="#LINK_OUTOVERLIBGRAPH&#10;    ">OUTOVERLIBGRAPH
-    </a>
-        <a class="" href="#LINK_OVERLIBCAPTION&#10;    ">OVERLIBCAPTION
-    </a>
-        <a class="" href="#LINK_OVERLIBGRAPH&#10;    ">OVERLIBGRAPH
-    </a>
-        <a class="" href="#LINK_OVERLIBHEIGHT&#10;    ">OVERLIBHEIGHT
-    </a>
-        <a class="" href="#LINK_OVERLIBWIDTH&#10;    ">OVERLIBWIDTH
-    </a>
-        <a class="" href="#LINK_SET&#10;    ">SET
-    </a>
-        <a class="" href="#LINK_SPLITPOS&#10;    ">SPLITPOS
-    </a>
-        <a class="" href="#LINK_TARGET&#10;    ">TARGET
-    </a>
-        <a class="" href="#LINK_TEMPLATE&#10;    ">TEMPLATE
-    </a>
-        <a class="" href="#LINK_USESCALE&#10;    ">USESCALE
-    </a>
-        <a class="" href="#LINK_VIA&#10;    ">VIA
-    </a>
-        <a class="" href="#LINK_VIASTYLE&#10;    ">VIASTYLE
-    </a>
-        <a class="" href="#LINK_WIDTH&#10;    ">WIDTH
-    </a>
-        <a class="" href="#LINK_ZORDER&#10;    ">ZORDER
-    </a>
+        <a class="" href="#LINK_ARROWSTYLE">ARROWSTYLE</a>
+        <a class="" href="#LINK_BANDWIDTH">BANDWIDTH</a>
+        <a class="" href="#LINK_BWFONT">BWFONT</a>
+        <a class="" href="#LINK_BWLABEL">BWLABEL</a>
+        <a class="" href="#LINK_BWLABELPOS">BWLABELPOS</a>
+        <a class="" href="#LINK_BWSTYLE">BWSTYLE</a>
+        <a class="" href="#LINK_COLORS">*COLOR</a>
+        <a class="" href="#LINK_COMMENTFONT">COMMENTFONT</a>
+        <a class="" href="#LINK_COMMENTPOS">COMMENTPOS</a>
+        <a class="" href="#LINK_COMMENTSTYLE">COMMENTSTYLE</a>
+        <a class="" href="#LINK_DUPLEX">DUPLEX</a>
+        <a class="" href="#LINK_INBWFORMAT">INBWFORMAT</a>
+        <a class="" href="#LINK_INCOMMENT">INCOMMENT</a>
+        <a class="" href="#LINK_INFOURL">INFOURL</a>
+        <a class="" href="#LINK_ININFOURL">ININFOURL</a>
+        <a class="" href="#LINK_INNOTES">INNOTES</a>
+        <a class="" href="#LINK_INOVERLIBCAPTION">INOVERLIBCAPTION</a>
+        <a class="" href="#LINK_INOVERLIBGRAPH">INOVERLIBGRAPH</a>
+        <a class="" href="#LINK_LINK">LINK</a>
+        <a class="" href="#LINK_LINKSTYLE">LINKSTYLE</a>
+        <a class="" href="#LINK_NODES">NODES</a>
+        <a class="" href="#LINK_NOTES">NOTES</a>
+        <a class="" href="#LINK_OUTBWFORMAT">OUTBWFORMAT</a>
+        <a class="" href="#LINK_OUTCOMMENT">OUTCOMMENT</a>
+        <a class="" href="#LINK_OUTINFOURL">OUTINFOURL</a>
+        <a class="" href="#LINK_OUTNOTES">OUTNOTES</a>
+        <a class="" href="#LINK_OUTOVERLIBCAPTION">OUTOVERLIBCAPTION</a>
+        <a class="" href="#LINK_OUTOVERLIBGRAPH">OUTOVERLIBGRAPH</a>
+        <a class="" href="#LINK_OVERLIBCAPTION">OVERLIBCAPTION</a>
+        <a class="" href="#LINK_OVERLIBGRAPH">OVERLIBGRAPH</a>
+        <a class="" href="#LINK_OVERLIBHEIGHT">OVERLIBHEIGHT</a>
+        <a class="" href="#LINK_OVERLIBWIDTH">OVERLIBWIDTH</a>
+        <a class="" href="#LINK_SET">SET</a>
+        <a class="" href="#LINK_SPLITPOS">SPLITPOS</a>
+        <a class="" href="#LINK_TARGET">TARGET</a>
+        <a class="" href="#LINK_TEMPLATE">TEMPLATE</a>
+        <a class="" href="#LINK_USESCALE">USESCALE</a>
+        <a class="" href="#LINK_VIA">VIA</a>
+        <a class="" href="#LINK_VIASTYLE">VIASTYLE</a>
+        <a class="" href="#LINK_WIDTH">WIDTH</a>
+        <a class="" href="#LINK_ZORDER">ZORDER</a>
       </p>
       <h4 xmlns="" class="configsection">Global Configuration Directives</h4>
       <p xmlns="" id="context_GLOBAL">
         <a class="" href="#GLOBAL_BACKGROUND">BACKGROUND</a>
         <a class="" href="#GLOBAL_COLORS">*COLOR</a>
-        <a class="" href="#GLOBAL_FONT&#10;    ">*FONT
-    </a>
-        <a class="" href="#GLOBAL_FONTDEFINE&#10;    ">FONTDEFINE
-    </a>
-        <a class="" href="#GLOBAL_HEIGHT&#10;    ">HEIGHT
-    </a>
-        <a class="" href="#GLOBAL_HTMLOUTPUTFILE&#10;    ">HTMLOUTPUTFILE
-    </a>
-        <a class="" href="#GLOBAL_HTMLSTYLE&#10;    ">HTMLSTYLE
-    </a>
-        <a class="" href="#GLOBAL_HTMLSTYLESHEET&#10;    ">HTMLSTYLESHEET
-    </a>
-        <a class="" href="#GLOBAL_IMAGEOUTPUTFILE&#10;    ">IMAGEOUTPUTFILE
-    </a>
+        <a class="" href="#GLOBAL_FONT">*FONT</a>
+        <a class="" href="#GLOBAL_FONTDEFINE">FONTDEFINE</a>
+        <a class="" href="#GLOBAL_HEIGHT">HEIGHT</a>
+        <a class="" href="#GLOBAL_HTMLOUTPUTFILE">HTMLOUTPUTFILE</a>
+        <a class="" href="#GLOBAL_HTMLSTYLE">HTMLSTYLE</a>
+        <a class="" href="#GLOBAL_HTMLSTYLESHEET">HTMLSTYLESHEET</a>
+        <a class="" href="#GLOBAL_IMAGEOUTPUTFILE">IMAGEOUTPUTFILE</a>
         <a class="" href="#GLOBAL_IMAGEURI">IMAGEURI</a>
-        <a class="" href="#GLOBAL_INCLUDE&#10;    ">INCLUDE
-    </a>
-        <a class="" href="#GLOBAL_KEYPOS&#10;    ">KEYPOS
-    </a>
-        <a class="" href="#GLOBAL_KEYSTYLE&#10;    ">KEYSTYLE
-    </a>
-        <a class="" href="#GLOBAL_KILO&#10;    ">KILO
-    </a>
-        <a class="" href="#GLOBAL_MAXTIMEPOS&#10;    ">MAXTIMEPOS
-    </a>
-        <a class="" href="#GLOBAL_MINTIMEPOS&#10;    ">MINTIMEPOS
-    </a>
-        <a class="" href="#GLOBAL_SCALE&#10;    ">SCALE
-    </a>
-        <a class="" href="#GLOBAL_SET&#10;    ">SET
-    </a>
-        <a class="" href="#GLOBAL_TIMEPOS&#10;    ">TIMEPOS
-    </a>
-        <a class="" href="#GLOBAL_TITLE&#10;    ">TITLE
-    </a>
-        <a class="" href="#GLOBAL_TITLEPOS&#10;    ">TITLEPOS
-    </a>
-        <a class="" href="#GLOBAL_WIDTH&#10;    ">WIDTH
-    </a>
+        <a class="" href="#GLOBAL_INCLUDE">INCLUDE</a>
+        <a class="" href="#GLOBAL_KEYPOS">KEYPOS</a>
+        <a class="" href="#GLOBAL_KEYSTYLE">KEYSTYLE</a>
+        <a class="" href="#GLOBAL_KILO">KILO</a>
+        <a class="" href="#GLOBAL_MAXTIMEPOS">MAXTIMEPOS</a>
+        <a class="" href="#GLOBAL_MINTIMEPOS">MINTIMEPOS</a>
+        <a class="" href="#GLOBAL_SCALE">SCALE</a>
+        <a class="" href="#GLOBAL_SET">SET</a>
+        <a class="" href="#GLOBAL_TIMEPOS">TIMEPOS</a>
+        <a class="" href="#GLOBAL_TITLE">TITLE</a>
+        <a class="" href="#GLOBAL_TITLEPOS">TITLEPOS</a>
+        <a class="" href="#GLOBAL_WIDTH">WIDTH</a>
       </p>
     </div>
   </description>

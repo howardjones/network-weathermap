@@ -1,13 +1,10 @@
-<?xml version = "1.0" encoding = "UTF-8"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <configentry>
-    <keyword>COMMENTPOS
-    </keyword>
+    <keyword>COMMENTPOS</keyword>
 
-    <scope>LINK
-    </scope>
+    <scope>LINK</scope>
 
-    <anchor>LINK_COMMENTPOS
-    </anchor>
+    <anchor>LINK_COMMENTPOS</anchor>
 
     <definition>COMMENTPOS
 
@@ -16,7 +13,7 @@
         <meta>outposition</meta>
     </definition>
 
-    <description xmlns = "http://www.w3.org/1999/xhtml">
+    <description xmlns="http://www.w3.org/1999/xhtml">
         <p>Specify the position along the link used for drawing the INCOMMENT and
         OUTCOMMENT text.</p>
 
@@ -26,7 +23,7 @@
     </description>
 
     <changes>
-        <change version = "0.92">Added COMMENTPOS
+        <change version="0.92">Added COMMENTPOS
         </change>
     </changes>
 </configentry>

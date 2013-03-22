@@ -1,20 +1,17 @@
-<?xml version = "1.0" encoding = "UTF-8"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <configentry>
-    <keyword>IMAGEOUTPUTFILE
-    </keyword>
+    <keyword>IMAGEOUTPUTFILE</keyword>
 
-    <scope>GLOBAL
-    </scope>
+    <scope>GLOBAL</scope>
 
-    <anchor>GLOBAL_IMAGEOUTPUTFILE
-    </anchor>
+    <anchor>GLOBAL_IMAGEOUTPUTFILE</anchor>
 
     <definition>IMAGEOUTPUTFILE
 
         <meta>imagefile</meta>
     </definition>
 
-    <description xmlns = "http://www.w3.org/1999/xhtml">
+    <description xmlns="http://www.w3.org/1999/xhtml">
         <p>This specifies the name of the PNG, JPEG or GIF file that will be generated.
         The format chosen is based on the file-extension. </p>
 
@@ -25,10 +22,10 @@
     </description>
 
     <changes>
-        <change version = "0.9">Added JPEG and GIF support.
+        <change version="0.9">Added JPEG and GIF support.
         </change>
 
-        <change version = "0.7">Added IMAGEOUTPUTFILE.
+        <change version="0.7">Added IMAGEOUTPUTFILE.
         </change>
     </changes>
 </configentry>

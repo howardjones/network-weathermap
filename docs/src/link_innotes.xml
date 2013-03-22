@@ -1,13 +1,10 @@
-<?xml version = "1.0" encoding = "UTF-8"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <configentry>
-    <keyword>INNOTES
-    </keyword>
+    <keyword>INNOTES</keyword>
 
-    <scope>LINK
-    </scope>
+    <scope>LINK</scope>
 
-    <anchor>LINK_INNOTES
-    </anchor>
+    <anchor>LINK_INNOTES</anchor>
 
     <definition>INNOTES
 
@@ -19,12 +16,12 @@
         <meta>notes text</meta>
     </definition>
 
-    <description xmlns = "http://www.w3.org/1999/xhtml">
+    <description xmlns="http://www.w3.org/1999/xhtml">
         <p>Same as NOTES, but specifies a text box for only the 'in' side of a link.</p>
     </description>
 
     <changes>
-        <change version = "0.95">Added IN/OUT support
+        <change version="0.95">Added IN/OUT support
         </change>
     </changes>
 </configentry>

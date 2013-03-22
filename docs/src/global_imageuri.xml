@@ -1,4 +1,4 @@
-<?xml version = "1.0" encoding = "UTF-8"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <configentry>
     <keyword>IMAGEURI</keyword>
 
@@ -10,7 +10,7 @@
         <meta>image-uri</meta>
     </definition>
 
-    <description xmlns = "http://www.w3.org/1999/xhtml">
+    <description xmlns="http://www.w3.org/1999/xhtml">
         <p>If you are generating output files using HTMLOUTPUTFILE and IMAGEOUTPUTFILE
         that are in a different directory to the weathermap installation, then the HTML
         will probably contain an incorrect IMG tag. This keyword allows you to replace
@@ -24,7 +24,7 @@
     </description>
 
     <changes>
-        <change version = "0.96">Added IMAGEURI.
+        <change version="0.96">Added IMAGEURI.
         </change>
     </changes>
 </configentry>

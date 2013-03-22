@@ -1,20 +1,17 @@
-<?xml version = "1.0" encoding = "UTF-8"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <configentry>
-    <keyword>BWFONT
-    </keyword>
+    <keyword>BWFONT</keyword>
 
-    <scope>LINK
-    </scope>
+    <scope>LINK</scope>
 
-    <anchor>LINK_BWFONT
-    </anchor>
+    <anchor>LINK_BWFONT</anchor>
 
     <definition>BWFONT
 
         <meta>fontnumber</meta>
     </definition>
 
-    <description xmlns = "http://www.w3.org/1999/xhtml">
+    <description xmlns="http://www.w3.org/1999/xhtml">
         <p>Specify the font used for drawing the BWLABEL boxes.</p>
 
         <p>Fonts are specified by number. The GD library that Weathermap uses has 5
@@ -22,6 +19,6 @@
         using the FONTDEFINE directive.</p>
 
         <p>
-        <img src = "../images/font-sizes.png" />The built-in GD fonts.</p>
+        <img src="../images/font-sizes.png"/>The built-in GD fonts.</p>
     </description>
 </configentry>

@@ -1,13 +1,10 @@
-<?xml version = "1.0" encoding = "UTF-8"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <configentry>
-    <keyword>KEYSTYLE
-    </keyword>
+    <keyword>KEYSTYLE</keyword>
 
-    <scope>GLOBAL
-    </scope>
+    <scope>GLOBAL</scope>
 
-    <anchor>GLOBAL_KEYSTYLE
-    </anchor>
+    <anchor>GLOBAL_KEYSTYLE</anchor>
 
     <definition>KEYSTYLE
 
@@ -37,7 +34,7 @@
         <meta>size</meta>
     </definition>
 
-    <description xmlns = "http://www.w3.org/1999/xhtml">
+    <description xmlns="http://www.w3.org/1999/xhtml">
         <p>Specifies the style of the key, or legend, that shows what each colour-range
         means. If a scalename is not given, then "DEFAULT" is assumed. Valid stylenames
         are: 'classic', 'horizontal', 'vertical', 'inverted' and 'tags'.</p>
@@ -58,19 +55,19 @@
         </p>
 
         <p>
-        <img src = "../images/keystyle-classic.png" />Classic Style</p>
+        <img src="../images/keystyle-classic.png"/>Classic Style</p>
 
         <p>
-        <img src = "../images/keystyle-horizontal.png" />Horizontal Style</p>
+        <img src="../images/keystyle-horizontal.png"/>Horizontal Style</p>
 
         <p>
-        <img src = "../images/keystyle-vertical.png" />Vertical Style</p>
+        <img src="../images/keystyle-vertical.png"/>Vertical Style</p>
 
         <p>
-        <img src = "../images/keystyle-inverted.png" />Inverted Style</p>
+        <img src="../images/keystyle-inverted.png"/>Inverted Style</p>
 
         <p>
-        <img src = "../images/keystyle-tags.png" />Tags Style</p>
+        <img src="../images/keystyle-tags.png"/>Tags Style</p>
 
         <p>You can hide the percentage signs in the key, by setting
         key_hidepercent_<em>scalename</em> to 1</p>
@@ -89,13 +86,13 @@
     </examples>
 
     <changes>
-        <change version = "0.96">Added tags and inverted styles.
+        <change version="0.96">Added tags and inverted styles.
         </change>
 
-        <change version = "0.92">Added hidepercent and hidezero SET variables.
+        <change version="0.92">Added hidepercent and hidezero SET variables.
         </change>
 
-        <change version = "0.9">Added support for multiple key styles (classic,
+        <change version="0.9">Added support for multiple key styles (classic,
         horizontal, vertical).
         </change>
     </changes>

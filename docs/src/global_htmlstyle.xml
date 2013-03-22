@@ -1,20 +1,17 @@
-<?xml version = "1.0" encoding = "UTF-8"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <configentry>
-    <keyword>HTMLSTYLE
-    </keyword>
+    <keyword>HTMLSTYLE</keyword>
 
-    <scope>GLOBAL
-    </scope>
+    <scope>GLOBAL</scope>
 
-    <anchor>GLOBAL_HTMLSTYLE
-    </anchor>
+    <anchor>GLOBAL_HTMLSTYLE</anchor>
 
     <definition>HTMLSTYLE
 
         <meta>formatname</meta>
     </definition>
 
-    <description xmlns = "http://www.w3.org/1999/xhtml">
+    <description xmlns="http://www.w3.org/1999/xhtml">
         <p>Specifies the HTML output style. </p>
 
         <p>When HTML output is enabled, there are two variations, which you can choose

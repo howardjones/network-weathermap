@@ -1,13 +1,10 @@
-<?xml version = "1.0" encoding = "UTF-8"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <configentry>
-    <keyword>BWLABELPOS
-    </keyword>
+    <keyword>BWLABELPOS</keyword>
 
-    <scope>LINK
-    </scope>
+    <scope>LINK</scope>
 
-    <anchor>LINK_BWLABELPOS
-    </anchor>
+    <anchor>LINK_BWLABELPOS</anchor>
 
     <definition>BWLABELPOS
 
@@ -16,7 +13,7 @@
         <meta>outposition</meta>
     </definition>
 
-    <description xmlns = "http://www.w3.org/1999/xhtml">
+    <description xmlns="http://www.w3.org/1999/xhtml">
         <p>Specifies the position of the 'bandwidth' labels shown on each link.</p>
 
         <p>The two position values are percentages along the link arrow, from the first
@@ -29,10 +26,10 @@
     </description>
 
     <changes>
-        <change version = "0.96">Added warning for proably-wrong positions
+        <change version="0.96">Added warning for proably-wrong positions
         </change>
 
-        <change version = "0.9">Added BWLABELPOS
+        <change version="0.9">Added BWLABELPOS
         </change>
     </changes>
 </configentry>

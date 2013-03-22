@@ -1,13 +1,10 @@
-<?xml version = "1.0" encoding = "UTF-8"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <configentry>
-    <keyword>SCALE
-    </keyword>
+    <keyword>SCALE</keyword>
 
-    <scope>GLOBAL
-    </scope>
+    <scope>GLOBAL</scope>
 
-    <anchor>GLOBAL_SCALE
-    </anchor>
+    <anchor>GLOBAL_SCALE</anchor>
 
     <definition>SCALE
 
@@ -162,7 +159,7 @@
         none
     </definition>
 
-    <description xmlns = "http://www.w3.org/1999/xhtml">
+    <description xmlns="http://www.w3.org/1999/xhtml">
         <p>Defines one 'span' within the link colour-coding table.</p>
 
         <p>SCALE is used to specify how NODEs and LINKs are colour-coded according to
@@ -233,28 +230,28 @@
     </examples>
 
     <changes>
-        <change version = "0.97">Added absolute scale support.
+        <change version="0.97">Added absolute scale support.
         </change>
 
-        <change version = "0.96">Added 'none' colour option.
+        <change version="0.96">Added 'none' colour option.
         </change>
 
-        <change version = "0.95">Added USEICONSCALE.
+        <change version="0.95">Added USEICONSCALE.
         </change>
 
-        <change version = "0.95">Added scale tags.
+        <change version="0.95">Added scale tags.
         </change>
 
-        <change version = "0.9">Added named scales.
+        <change version="0.9">Added named scales.
         </change>
 
-        <change version = "0.9">Added considtently sorted scales.
+        <change version="0.9">Added considtently sorted scales.
         </change>
 
-        <change version = "0.8">Added interpolated scale colours.
+        <change version="0.8">Added interpolated scale colours.
         </change>
 
-        <change version = "0.5">Changed to allow min and max to be fractional.
+        <change version="0.5">Changed to allow min and max to be fractional.
         </change>
     </changes>
 </configentry>

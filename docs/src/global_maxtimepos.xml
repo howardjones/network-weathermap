@@ -1,13 +1,10 @@
-<?xml version = "1.0" encoding = "UTF-8"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <configentry>
-    <keyword>MAXTIMEPOS
-    </keyword>
+    <keyword>MAXTIMEPOS</keyword>
 
-    <scope>GLOBAL
-    </scope>
+    <scope>GLOBAL</scope>
 
-    <anchor>GLOBAL_MAXTIMEPOS
-    </anchor>
+    <anchor>GLOBAL_MAXTIMEPOS</anchor>
 
     <definition>MAXTIMEPOS
 
@@ -25,7 +22,7 @@
         <meta>formatstring</meta>
     </definition>
 
-    <description xmlns = "http://www.w3.org/1999/xhtml">
+    <description xmlns="http://www.w3.org/1999/xhtml">
         <p>Specifies where to draw the 'newest data' timestamp on the map.</p>
 
         <p>The data collection part of weathermap collects a timestamp for each piece of
@@ -42,7 +39,7 @@
         of the current time. The default timestamp text is
         <nobr><tt>Newest Data: %b %d %Y %H:%M:%S</tt></nobr>. The tokens used are those
         accepted by the PHP strftime function. For a full list see the
-        <a href = "http://www.php.net/manual/en/function.strftime.php">PHP manual
+        <a href="http://www.php.net/manual/en/function.strftime.php">PHP manual
         page</a>.</p>
 
         <p>You can control the font used to draw the timestamp with TIMEFONT, and the
@@ -50,7 +47,7 @@
     </description>
 
     <changes>
-        <change version = "0.96">Originally added MAXTIMEPOS
+        <change version="0.96">Originally added MAXTIMEPOS
         </change>
     </changes>
 </configentry>

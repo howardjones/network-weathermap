@@ -1,20 +1,17 @@
-<?xml version = "1.0" encoding = "UTF-8"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <configentry>
-    <keyword>NOTES
-    </keyword>
+    <keyword>NOTES</keyword>
 
-    <scope>NODE
-    </scope>
+    <scope>NODE</scope>
 
-    <anchor>NODE_NOTES
-    </anchor>
+    <anchor>NODE_NOTES</anchor>
 
     <definition>NOTES
 
         <meta>notes text</meta>
     </definition>
 
-    <description xmlns = "http://www.w3.org/1999/xhtml">
+    <description xmlns="http://www.w3.org/1999/xhtml">
         <p>Specifies the text or HTML notes for a node. </p>
 
         <p>The
@@ -27,7 +24,7 @@
     </description>
 
     <changes>
-        <change version = "0.9">Originally added NOTES.
+        <change version="0.9">Originally added NOTES.
         </change>
     </changes>
 </configentry>

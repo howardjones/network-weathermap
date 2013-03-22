@@ -1,20 +1,17 @@
-<?xml version = "1.0" encoding = "UTF-8"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <configentry>
-    <keyword>ZORDER
-    </keyword>
+    <keyword>ZORDER</keyword>
 
-    <scope>NODE
-    </scope>
+    <scope>NODE</scope>
 
-    <anchor>NODE_ZORDER
-    </anchor>
+    <anchor>NODE_ZORDER</anchor>
 
     <definition>ZORDER
 
         <meta>z-coord</meta>
     </definition>
 
-    <description xmlns = "http://www.w3.org/1999/xhtml">
+    <description xmlns="http://www.w3.org/1999/xhtml">
         <p>Specifies the order in which to draw this item on the map.</p>
 
         <p>By default, all nodes are drawn above all links. There are some situations
@@ -30,7 +27,7 @@
     </description>
 
     <changes>
-        <change version = "0.96">Added Z-ordering support.
+        <change version="0.96">Added Z-ordering support.
         </change>
     </changes>
 </configentry>

@@ -6,6 +6,10 @@ VERSION ?= 0.97a
 
 all: config-reference.html
 
+#
+# We process index.xml twice - once to generate the ToC, and then again to generate
+# the actual reference guide
+#
 contents.xml: contents.xsl index.xml $(GLOBALS) $(LINKS) $(NODES)
 	echo '<pop></pop>' > contents.xml
 	xsltproc --xinclude contents.xsl index.xml > contents-t.xml

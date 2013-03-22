@@ -1,13 +1,10 @@
-<?xml version = "1.0" encoding = "UTF-8"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <configentry>
-    <keyword>*COLOR
-    </keyword>
+    <keyword>*COLOR</keyword>
 
-    <scope>LINK
-    </scope>
+    <scope>LINK</scope>
 
-    <anchor>LINK_COLORS
-    </anchor>
+    <anchor>LINK_COLORS</anchor>
 
     <definition>OUTLINECOLOR
 
@@ -54,7 +51,7 @@
         <meta>blue</meta>
     </definition>
 
-    <description xmlns = "http://www.w3.org/1999/xhtml">
+    <description xmlns="http://www.w3.org/1999/xhtml">
         <p>Specify the colours used for drawing the link.</p>
 
         <p>red, green and blue are numbers from 0 to 255.</p>
@@ -83,22 +80,22 @@
         </ul>
 
         <p>
-        <img src = "../images/contrast.png" /> <tt>COMMENTFONTCOLOR contrast</tt> with
+        <img src="../images/contrast.png"/> <tt>COMMENTFONTCOLOR contrast</tt> with
         <tt>COMMENTSTYLE center</tt></p>
     </description>
 
     <changes>
-        <change version = "0.96">Added COMMENTFONTCOLOR contrast.
+        <change version="0.96">Added COMMENTFONTCOLOR contrast.
         </change>
 
-        <change version = "0.93">Added correction
+        <change version="0.93">Added correction
         - COMMENTCOLOR was shown instead of COMMENTFONTCOLOR.
         </change>
 
-        <change version = "0.9">Added COMMENTCOLOR.
+        <change version="0.9">Added COMMENTCOLOR.
         </change>
 
-        <change version = "0.8">Added OUTLINECOLOR, BWOUTLINECOLOR, BWFONTCOLOR and
+        <change version="0.8">Added OUTLINECOLOR, BWOUTLINECOLOR, BWFONTCOLOR and
         BWBOXCOLOR.
         </change>
     </changes>

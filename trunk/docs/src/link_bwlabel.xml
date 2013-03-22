@@ -1,20 +1,17 @@
-<?xml version = "1.0" encoding = "UTF-8"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <configentry>
-    <keyword>BWLABEL
-    </keyword>
+    <keyword>BWLABEL</keyword>
 
-    <scope>LINK
-    </scope>
+    <scope>LINK</scope>
 
-    <anchor>LINK_BWLABEL
-    </anchor>
+    <anchor>LINK_BWLABEL</anchor>
 
     <definition>BWLABEL
 
         <meta>formatname</meta>
     </definition>
 
-    <description xmlns = "http://www.w3.org/1999/xhtml">
+    <description xmlns="http://www.w3.org/1999/xhtml">
         <p>Specifies the type of 'bandwidth' label shown on each link.</p>
 
         <p>The default is 'percent', but you can also have 'none', 'unformatted' or
@@ -28,10 +25,10 @@
     </description>
 
     <changes>
-        <change version = "0.8">Added unformatted format.
+        <change version="0.8">Added unformatted format.
         </change>
 
-        <change version = "0.7">Changed from global BWLABELS to per-link BWLABEL.
+        <change version="0.7">Changed from global BWLABELS to per-link BWLABEL.
         </change>
     </changes>
 </configentry>

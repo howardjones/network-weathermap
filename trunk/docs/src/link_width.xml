@@ -1,20 +1,17 @@
-<?xml version = "1.0" encoding = "UTF-8"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <configentry>
-    <keyword>WIDTH
-    </keyword>
+    <keyword>WIDTH</keyword>
 
-    <scope>LINK
-    </scope>
+    <scope>LINK</scope>
 
-    <anchor>LINK_WIDTH
-    </anchor>
+    <anchor>LINK_WIDTH</anchor>
 
     <definition>WIDTH
 
         <meta>width</meta>
     </definition>
 
-    <description xmlns = "http://www.w3.org/1999/xhtml">
+    <description xmlns="http://www.w3.org/1999/xhtml">
         <p>Specifies the width of this link when drawn. The
         <em>width</em> value can be any positive number (including non-integers).</p>
 
@@ -34,7 +31,7 @@
     </description>
 
     <changes>
-        <change version = "0.97a">Added non-integer widths. Retconned explanation.
+        <change version="0.97a">Added non-integer widths. Retconned explanation.
         </change>
     </changes>
 </configentry>

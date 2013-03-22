@@ -1,20 +1,17 @@
-<?xml version = "1.0" encoding = "UTF-8"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <configentry>
-    <keyword>HTMLSTYLESHEET
-    </keyword>
+    <keyword>HTMLSTYLESHEET</keyword>
 
-    <scope>GLOBAL
-    </scope>
+    <scope>GLOBAL</scope>
 
-    <anchor>GLOBAL_HTMLSTYLESHEET
-    </anchor>
+    <anchor>GLOBAL_HTMLSTYLESHEET</anchor>
 
     <definition>HTMLSTYLESHEET
 
         <meta>URL</meta>
     </definition>
 
-    <description xmlns = "http://www.w3.org/1999/xhtml">
+    <description xmlns="http://www.w3.org/1999/xhtml">
         <p>Specifies a CSS stylesheet to reference, when generating HTML. </p>
 
         <p>When HTML output is enabled, this allows you to include your own CSS
@@ -25,7 +22,7 @@
         ignored.</p>
 
         <changes>
-            <change version = "0.96">Added HTMLSTYLESHEET.
+            <change version="0.96">Added HTMLSTYLESHEET.
             </change>
         </changes>
     </description>

@@ -1,20 +1,17 @@
-<?xml version = "1.0" encoding = "UTF-8"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <configentry>
-    <keyword>TEMPLATE
-    </keyword>
+    <keyword>TEMPLATE</keyword>
 
-    <scope>NODE
-    </scope>
+    <scope>NODE</scope>
 
-    <anchor>NODE_TEMPLATE
-    </anchor>
+    <anchor>NODE_TEMPLATE</anchor>
 
     <definition>TEMPLATE
 
         <meta>nodename</meta>
     </definition>
 
-    <description xmlns = "http://www.w3.org/1999/xhtml">
+    <description xmlns="http://www.w3.org/1999/xhtml">
         <p>By default, each new node starts with the same set of properties. You can
         change the default properties by defining a node called DEFAULT.</p>
 
@@ -40,7 +37,7 @@
     </examples>
 
     <changes>
-        <change version = "0.96">Added template support
+        <change version="0.96">Added template support
         </change>
     </changes>
 </configentry>

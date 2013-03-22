@@ -1,13 +1,10 @@
-<?xml version = "1.0" encoding = "UTF-8"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <configentry>
-    <keyword>KEYPOS
-    </keyword>
+    <keyword>KEYPOS</keyword>
 
-    <scope>GLOBAL
-    </scope>
+    <scope>GLOBAL</scope>
 
-    <anchor>GLOBAL_KEYPOS
-    </anchor>
+    <anchor>GLOBAL_KEYPOS</anchor>
 
     <definition>KEYPOS
 
@@ -45,7 +42,7 @@
         <meta>headingstring</meta>
     </definition>
 
-    <description xmlns = "http://www.w3.org/1999/xhtml">
+    <description xmlns="http://www.w3.org/1999/xhtml">
         <p>Specifies the position of the key, or legend, that shows what each
         colour-range in a scale means. If a scalename is not given, then "DEFAULT" is
         assumed. If no KEYPOS line is given for a scale, then no legend is drawn
@@ -63,10 +60,10 @@
     </description>
 
     <changes>
-        <change version = "0.9">Added support for multiple SCALEs.
+        <change version="0.9">Added support for multiple SCALEs.
         </change>
 
-        <change version = "0.6">Added ability to change text.
+        <change version="0.6">Added ability to change text.
         </change>
     </changes>
 </configentry>

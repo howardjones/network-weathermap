@@ -1,20 +1,17 @@
-<?xml version = "1.0" encoding = "UTF-8"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <configentry>
-    <keyword>HTMLOUTPUTFILE
-    </keyword>
+    <keyword>HTMLOUTPUTFILE</keyword>
 
-    <scope>GLOBAL
-    </scope>
+    <scope>GLOBAL</scope>
 
-    <anchor>GLOBAL_HTMLOUTPUTFILE
-    </anchor>
+    <anchor>GLOBAL_HTMLOUTPUTFILE</anchor>
 
     <definition>HTMLOUTPUTFILE
 
         <meta>htmlfile</meta>
     </definition>
 
-    <description xmlns = "http://www.w3.org/1999/xhtml">
+    <description xmlns="http://www.w3.org/1999/xhtml">
         <p>This specifies the name of the HTML file that will be generated. </p>
 
         <p>The equivalent command-line option takes precedence over this configuration
@@ -23,7 +20,7 @@
     </description>
 
     <changes>
-        <change version = "0.7">Added HTMLOUTPUTFILE.
+        <change version="0.7">Added HTMLOUTPUTFILE.
         </change>
     </changes>
 </configentry>

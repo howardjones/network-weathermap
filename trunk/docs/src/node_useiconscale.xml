@@ -1,13 +1,10 @@
-<?xml version = "1.0" encoding = "UTF-8"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <configentry>
-    <keyword>USEICONSCALE
-    </keyword>
+    <keyword>USEICONSCALE</keyword>
 
-    <scope>NODE
-    </scope>
+    <scope>NODE</scope>
 
-    <anchor>NODE_USEICONSCALE
-    </anchor>
+    <anchor>NODE_USEICONSCALE</anchor>
 
     <definition>USEICONSCALE
 
@@ -21,7 +18,7 @@
         <meta>{in,out}</meta>
     </definition>
 
-    <description xmlns = "http://www.w3.org/1999/xhtml">
+    <description xmlns="http://www.w3.org/1999/xhtml">
         <p>Specify which SCALE to use to decide the colour of the icon for this node.</p>
 
         <p>After the percentage usage is calculated (using BANDWIDTH/MAXVALUE and data
@@ -44,10 +41,10 @@
     </description>
 
     <changes>
-        <change version = "0.97">Removed dependency on <tt>imagefilter</tt>
+        <change version="0.97">Removed dependency on <tt>imagefilter</tt>
         </change>
 
-        <change version = "0.95">Added USEICONSCALE.
+        <change version="0.95">Added USEICONSCALE.
         </change>
     </changes>
 </configentry>

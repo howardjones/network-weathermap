@@ -1,20 +1,17 @@
-<?xml version = "1.0" encoding = "UTF-8"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <configentry>
-    <keyword>BWSTYLE
-    </keyword>
+    <keyword>BWSTYLE</keyword>
 
-    <scope>LINK
-    </scope>
+    <scope>LINK</scope>
 
-    <anchor>LINK_BWSTYLE
-    </anchor>
+    <anchor>LINK_BWSTYLE</anchor>
 
     <definition>BWSTYLE
 
         <meta>formatname</meta>
     </definition>
 
-    <description xmlns = "http://www.w3.org/1999/xhtml">
+    <description xmlns="http://www.w3.org/1999/xhtml">
         <p>Specifies the style used to draw the box around the 'bandwidth' label shown
         on each link.</p>
 
@@ -29,14 +26,14 @@
         <p>To change the contents of the label, use BWLABEL or INBWFORMAT/OUTBWFORMAT.</p>
 
         <p>
-        <img src = "../images/bwstyle-classic.png" /> Classic label style</p>
+        <img src="../images/bwstyle-classic.png"/> Classic label style</p>
 
         <p>
-        <img src = "../images/bwstyle-angled.png" /> Angled label style</p>
+        <img src="../images/bwstyle-angled.png"/> Angled label style</p>
     </description>
 
     <changes>
-        <change version = "0.92">Added BWSTYLE.
+        <change version="0.92">Added BWSTYLE.
         </change>
     </changes>
 </configentry>

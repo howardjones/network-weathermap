@@ -1,13 +1,10 @@
-<?xml version = "1.0" encoding = "UTF-8"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <configentry>
-    <keyword>FONTDEFINE
-    </keyword>
+    <keyword>FONTDEFINE</keyword>
 
-    <scope>GLOBAL
-    </scope>
+    <scope>GLOBAL</scope>
 
-    <anchor>GLOBAL_FONTDEFINE
-    </anchor>
+    <anchor>GLOBAL_FONTDEFINE</anchor>
 
     <definition>FONTDEFINE
 
@@ -25,7 +22,7 @@
         <meta>fontsize</meta>
     </definition>
 
-    <description xmlns = "http://www.w3.org/1999/xhtml">
+    <description xmlns="http://www.w3.org/1999/xhtml">
         <p>Defines a custom font to be used for text within the map.</p>
 
         <p>By default, the GD library used by Weathermap has 5 fonts, numbered 1-5.
@@ -52,7 +49,7 @@
         </ul>
 
         The full set of rules is
-        <a href = "http://www.boutell.com/gd/manual2.0.33.html#gdImageStringFT">available
+        <a href="http://www.boutell.com/gd/manual2.0.33.html#gdImageStringFT">available
         here</a></p>
 
         <p>Regardless of the format, the newly defined font can be used anywhere that
@@ -70,7 +67,7 @@
     </examples>
 
     <changes>
-        <change version = "0.8">First added FONTDEFINE
+        <change version="0.8">First added FONTDEFINE
         </change>
     </changes>
 </configentry>

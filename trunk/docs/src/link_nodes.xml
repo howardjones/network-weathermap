@@ -1,13 +1,10 @@
-<?xml version = "1.0" encoding = "UTF-8"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <configentry>
-    <keyword>NODES
-    </keyword>
+    <keyword>NODES</keyword>
 
-    <scope>LINK
-    </scope>
+    <scope>LINK</scope>
 
-    <anchor>LINK_NODES
-    </anchor>
+    <anchor>LINK_NODES</anchor>
 
     <definition>NODES
 
@@ -37,7 +34,7 @@
         <meta>nodename{:angle}r{radius}</meta>
     </definition>
 
-    <description xmlns = "http://www.w3.org/1999/xhtml">
+    <description xmlns="http://www.w3.org/1999/xhtml">
         <p>These are the NODEs that this link joins. There can be only two. They are the
         'nodename's from the NODE line for each node.</p>
 
@@ -58,50 +55,50 @@
         is 'in'.</p>
 
         <p>
-        <img src = "../images/compass-points.png" />
+        <img src="../images/compass-points.png"/>
 
-        <br />The compass points, relative to the node's bounding-box..</p>
-
-        <p>
-        <img src = "../images/linkoffset-defaults.png" />
-
-        <br />The default - node centre to node centre.</p>
+        <br/>The compass points, relative to the node's bounding-box..</p>
 
         <p>
-        <img src = "../images/linkoffset-eastwest.png" />
+        <img src="../images/linkoffset-defaults.png"/>
 
-        <br />Using compass points - <tt>NODES node1:E node2:W</tt></p>
+        <br/>The default - node centre to node centre.</p>
 
         <p>
-        <img src = "../images/linkoffset-east50west50.png" />
+        <img src="../images/linkoffset-eastwest.png"/>
 
-        <br />Using compass points with percentages -
+        <br/>Using compass points - <tt>NODES node1:E node2:W</tt></p>
+
+        <p>
+        <img src="../images/linkoffset-east50west50.png"/>
+
+        <br/>Using compass points with percentages -
         <tt>NODES node1:E50 node2:W50</tt></p>
 
         <p>
-        <img src = "../images/linkoffset-radial.png" />
+        <img src="../images/linkoffset-radial.png"/>
 
-        <br />Using polar offsets - <tt>NODES node1:45r20 node2:225r20</tt></p>
+        <br/>Using polar offsets - <tt>NODES node1:45r20 node2:225r20</tt></p>
 
         <p>
-        <img src = "../images/linkoffset-parallel.png" />
+        <img src="../images/linkoffset-parallel.png"/>
 
-        <br />Using offsets to make parallel links-
+        <br/>Using offsets to make parallel links-
         <tt>NODES node1:NE50 node2:NW50</tt> for one link and
         <tt>NODES node1:SE50 node2:SW50</tt> for the other.</p>
     </description>
 
     <changes>
-        <change version = "0.96">Added polar offsets.
+        <change version="0.96">Added polar offsets.
         </change>
 
-        <change version = "0.96">Added fractional compass offsets.
+        <change version="0.96">Added fractional compass offsets.
         </change>
 
-        <change version = "0.9">Added numeric pixel offsets.
+        <change version="0.9">Added numeric pixel offsets.
         </change>
 
-        <change version = "0.8">Added ability to specify node offset.
+        <change version="0.8">Added ability to specify node offset.
         </change>
     </changes>
 

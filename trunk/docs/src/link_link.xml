@@ -1,20 +1,17 @@
-<?xml version = "1.0" encoding = "UTF-8"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <configentry>
-    <keyword>LINK
-    </keyword>
+    <keyword>LINK</keyword>
 
-    <scope>LINK
-    </scope>
+    <scope>LINK</scope>
 
-    <anchor>LINK_LINK
-    </anchor>
+    <anchor>LINK_LINK</anchor>
 
     <definition>LINK
 
         <meta>linkname</meta>
     </definition>
 
-    <description xmlns = "http://www.w3.org/1999/xhtml">
+    <description xmlns="http://www.w3.org/1999/xhtml">
         <p>The first line of a LINK definition.</p>
 
         <p>The linkname must be unique within the map, and must not contain spaces. The

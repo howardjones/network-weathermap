@@ -1,13 +1,10 @@
-<?xml version = "1.0" encoding = "UTF-8"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <configentry>
-    <keyword>POSITION
-    </keyword>
+    <keyword>POSITION</keyword>
 
-    <scope>NODE
-    </scope>
+    <scope>NODE</scope>
 
-    <anchor>NODE_POSITION
-    </anchor>
+    <anchor>NODE_POSITION</anchor>
 
     <definition>POSITION
 
@@ -25,7 +22,7 @@
         <meta>y-coord</meta>
     </definition>
 
-    <description xmlns = "http://www.w3.org/1999/xhtml">
+    <description xmlns="http://www.w3.org/1999/xhtml">
         <p>Specifies where to place the node on the map. Coordinates are in pixel units,
         with the origin at the top-left of the map.</p>
 
@@ -50,7 +47,7 @@
     </examples>
 
     <changes>
-        <change version = "0.9">Add relative position from other nodes.
+        <change version="0.9">Add relative position from other nodes.
         </change>
     </changes>
 </configentry>

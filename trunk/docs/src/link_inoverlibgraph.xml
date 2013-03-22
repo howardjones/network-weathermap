@@ -1,13 +1,10 @@
-<?xml version = "1.0" encoding = "UTF-8"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <configentry>
-    <keyword>INOVERLIBGRAPH
-    </keyword>
+    <keyword>INOVERLIBGRAPH</keyword>
 
-    <scope>LINK
-    </scope>
+    <scope>LINK</scope>
 
-    <anchor>LINK_INOVERLIBGRAPH
-    </anchor>
+    <anchor>LINK_INOVERLIBGRAPH</anchor>
 
     <definition>INOVERLIBGRAPH
 
@@ -21,16 +18,16 @@
         <meta>url</meta>...
     </definition>
 
-    <description xmlns = "http://www.w3.org/1999/xhtml">
+    <description xmlns="http://www.w3.org/1999/xhtml">
         <p>Same as OVERLIBGRAPH, but specifies a pop-up graph for only the 'in' side of
         a link.</p>
     </description>
 
     <changes>
-        <change version = "0.95">Added multiple URL support
+        <change version="0.95">Added multiple URL support
         </change>
 
-        <change version = "0.95">Added IN/OUT support
+        <change version="0.95">Added IN/OUT support
         </change>
     </changes>
 </configentry>

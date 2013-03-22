@@ -1,24 +1,21 @@
-<?xml version = "1.0" encoding = "UTF-8"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <configentry>
-    <keyword>OVERLIBGRAPH
-    </keyword>
+    <keyword>OVERLIBGRAPH</keyword>
 
-    <scope>LINK
-    </scope>
+    <scope>LINK</scope>
 
-    <anchor>LINK_OVERLIBGRAPH
-    </anchor>
+    <anchor>LINK_OVERLIBGRAPH</anchor>
 
     <definition>OVERLIBGRAPH
 
         <meta>url</meta>
     </definition>
 
-    <description xmlns = "http://www.w3.org/1999/xhtml">
+    <description xmlns="http://www.w3.org/1999/xhtml">
         <p>Creates a popup image in the HTML output.</p>
 
         <p>If you are using the HTML output facility, and HTMLSTYLE is set to 'overlib',
-        then a link is added to the &lt;map&gt; section of the HTML so that when you
+        then a link is added to the &lt;map> section of the HTML so that when you
         move the mouse pointer over the the (weathermap) link, a box will pop up
         containing the image that you specify. Typically used to link to historical data
         in your network monitoring system.</p>
@@ -45,13 +42,13 @@
     </examples>
 
     <changes>
-        <change version = "0.95">Added multiple URL support
+        <change version="0.95">Added multiple URL support
         </change>
 
-        <change version = "0.95">Added IN/OUT support
+        <change version="0.95">Added IN/OUT support
         </change>
 
-        <change version = "0.0pre">Odd fact: This command, and the accompanying code to
+        <change version="0.0pre">Odd fact: This command, and the accompanying code to
         generate overlib imagemaps, were the first modification I ever made to the GRNET
         perl weathermap, and was what got me interested in writing my own version.
         </change>

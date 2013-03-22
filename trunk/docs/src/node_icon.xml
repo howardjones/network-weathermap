@@ -1,13 +1,10 @@
-<?xml version = "1.0" encoding = "UTF-8"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <configentry>
-    <keyword>ICON
-    </keyword>
+    <keyword>ICON</keyword>
 
-    <scope>NODE
-    </scope>
+    <scope>NODE</scope>
 
-    <anchor>NODE_ICON
-    </anchor>
+    <anchor>NODE_ICON</anchor>
 
     <definition>ICON
 
@@ -26,7 +23,7 @@
     <definition>ICON none
     </definition>
 
-    <description xmlns = "http://www.w3.org/1999/xhtml">
+    <description xmlns="http://www.w3.org/1999/xhtml">
         <p>Specifies an icon to use for the node.</p>
 
         <p>The filename can either be a full path to the image, or a relative one. </p>
@@ -70,7 +67,7 @@
         the label, if you use compass-point offsets.</p>
 
         <p>The text for the filename can contain
-        <a href = "advanced.html#tokens">special tokens</a> to select an icon based on
+        <a href="advanced.html#tokens">special tokens</a> to select an icon based on
         map data.</p>
 
         <p>You can adjust the colour of the icon according to a SCALE, by using
@@ -79,22 +76,22 @@
     </description>
 
     <changes>
-        <change version = "0.96">Added inpie, outpie and nink.
+        <change version="0.96">Added inpie, outpie and nink.
         </change>
 
-        <change version = "0.95">Added Artificial Icon support - round, rbox and box.
+        <change version="0.95">Added Artificial Icon support - round, rbox and box.
         </change>
 
-        <change version = "0.95">Added Icon colourising support.
+        <change version="0.95">Added Icon colourising support.
         </change>
 
-        <change version = "0.9">Added 'special token' support.
+        <change version="0.9">Added 'special token' support.
         </change>
 
-        <change version = "0.9">Added JPEG and GIF support.
+        <change version="0.9">Added JPEG and GIF support.
         </change>
 
-        <change version = "0.9">Added special icon 'none', and automatic scaling.
+        <change version="0.9">Added special icon 'none', and automatic scaling.
         </change>
     </changes>
 </configentry>

@@ -2,7 +2,7 @@ GLOBALS = global_*.xml intro_*.xml
 LINKS = link_*.xml
 NODES = node_*.xml
 
-VERSION ?= 0.97a
+VERSION ?= 0.97b
 
 all: config-reference.html
 

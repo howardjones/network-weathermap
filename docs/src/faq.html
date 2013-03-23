@@ -4,7 +4,7 @@
 	$PATH_EXTRA="../";
 	include "common-page-head.html";
 ?>
-            <h2><a name = "faq" id = "faq">FAQ &amp; Useful Tips</a></h2>
+            <h2 id = "faq">FAQ &amp; Useful Tips</h2>
 
             <h3>FAQs</h3>
 
@@ -20,7 +20,7 @@
             forget to turn the Log Level back down again!</p>
 
             <dl class = "faq">
-                <dt><a name = "module_not_found"></a>I get some error about 'module not
+                <dt id = "module_not_found">I get some error about 'module not
                 found', or similar...can you help?</dt>
 
                 <dd><p>The answer is probably no, or at least not directly. In most
@@ -50,7 +50,7 @@
 
                 </dd>
 
-                <dt><a name = "see_nothing"></a>I don't see ANYTHING in the logs when
+                <dt id = "see_nothing">I don't see ANYTHING in the logs when
                 using the Cacti plugin.</dt>
 
                 <dd><p>Check if this is still the case when Weathermap is the only
@@ -61,7 +61,7 @@
 
                 </dd>
 
-                <dt><a name = "nofunction"></a>I get an error message about
+                <dt id = "nofunction">I get an error message about
                 function_exists()</dt>
 
                 <dd><p>This is PHP telling you that a function that Weathermap requires
@@ -85,14 +85,14 @@
 
                 </dd>
 
-                <dt><a name = "nothumb"></a>My maps don't get created/updated (or "This
+                <dt id = "nothumb">My maps don't get created/updated (or "This
                 map hasn't been created yet")</dt>
 
                 <dd><p>This is almost always a permissions problem. Look in your
                 cacti.log for lines starting WEATHERMAP to see what is going
                 wrong. </p></dd>
 
-                <dt><a name = "no_overlib"></a>I've defined some OVERLIBGRAPH lines, but
+                <dt id = "no_overlib">I've defined some OVERLIBGRAPH lines, but
                 nothing appears in the map HTML when I use the command-line tool.</dt>
 
                 <dd><p>For historical reasons, the default format for HTMLSTYLE is
@@ -100,7 +100,7 @@
                 you need to have 'HTMLSTYLE overlib' near the top of your map
                 configuration file.</p></dd>
 
-                <dt><a name = "overliboffscreen"></a>When I use OVERLIBGRAPH and the
+                <dt id= "overliboffscreen">When I use OVERLIBGRAPH and the
                 pointer is near the right side of the screen, the floating graph
                 disappears off the side of the screen...</dt>
 
@@ -115,7 +115,7 @@
 
                 </dd>
 
-                <dt><a name = "gauges"></a>The value from my RRD data is much too
+                <dt id = "gauges">The value from my RRD data is much too
                 big!</dt>
 
                 <dd><p>Is it about 8 times too big, by any chance? Historically,
@@ -131,13 +131,13 @@
                 value, or multiply by 1024 to get a kilobytes values from a megabytes
                 one.</p></dd>
 
-                <dt><a name = "timezone"></a>The timestamp on my map is all wrong!</dt>
+                <dt id= "timezone">The timestamp on my map is all wrong!</dt>
 
                 <dd><p>I have not seen this one myself, but a Chinese user has, and it
                 seems that PHP doesn't always use your system timezone correctly. The
                 fix is to edit php.ini to change date.timezone </p></dd>
 
-                <dt><a name = "gdbug"></a>Weathermap just dies without warning on my
+                <dt id = "gdbug">Weathermap just dies without warning on my
                 Debian/Ubuntu system
 
                 <br />OR... I get a blank screen in the editor when I add a node
@@ -170,7 +170,7 @@
 
                 </dd>
 
-                <dt><a name = "icons"></a>Where can I find some icons to use with
+                <dt id = "icons">Where can I find some icons to use with
                 Weathermap? Why don't you have any supplied with it?</dt>
 
                 <dd><p>
@@ -196,7 +196,7 @@
 
                 </dd>
 
-                <dt><a name = "logo"></a>How can I embed an image (like my company's
+                <dt id = "logo">How can I embed an image (like my company's
                 logo) in my maps? I don't want to have to create a special
                 background...</dt>
 
@@ -205,7 +205,7 @@
                 somewhere else - even dynamically produced ones
                 - how about MRTG graphs or RRD stripgraphs embedded in your map?</p></dd>
 
-                <dt><a name = "curves"></a>I need to have a link that isn't just a
+                <dt id = "curves">I need to have a link that isn't just a
                 straight line...how can I do this?</dt>
 
                 <dd><p>
@@ -214,17 +214,16 @@
                 around corners.:
 
                 <div class = "shell">
-                    <pre>
-                                        LINK bendylink
-                                            NODES node1 node2
-                                            VIA 200 300
-                                            VIA 360 240
+                    <pre>LINK bendylink
+	NODES node1 node2
+	VIA 200 300
+	VIA 360 240
 </pre>
                 </div></p>
 
                 </dd>
 
-                <dt><a name = "parallel"></a>I need to have more than one link from node
+                <dt id= "parallel">I need to have more than one link from node
                 A to node B, but they just overlap...how can I do this?</dt>
 
                 <dd><p>See
@@ -233,7 +232,7 @@
 
                 </dd>
 
-                <dt><a name = "aggregate"></a>I still have two links, but I use MLPPP,
+                <dt id = "aggregate">I still have two links, but I use MLPPP,
                 and I want to see a single link on the map for both physical lines.</dt>
 
                 <dd> <p>See
@@ -242,7 +241,7 @@
 
                 </dd>
 
-                <dt><a name = "editor_requests"></a>When will you make the editor work
+                <dt id = "editor_requests">When will you make the editor work
                 like <em>XYZ</em>?</dt>
 
                 <dd><p>Adding the editor in 0.7 has made adding a new core weathermap
@@ -258,7 +257,7 @@
                 was written for
                 - it was written before I added new 0.7 features. D'oh!).</p></dd>
 
-                <dt><a name = "feature_requests"></a>Will you extend weathermap to do
+                <dt id= "feature_requests">Will you extend weathermap to do
                 <em>XYZ</em>?</dt>
 
                 <dd><p>It depends. I have an internal idea of what I want weathermap to
@@ -283,7 +282,7 @@
 
                 </dd>
 
-                <dt><a name = "repayme"></a>How can I possibly repay you for making my
+                <dt id= "repayme">How can I possibly repay you for making my
                 life and work so much easier?</dt>
 
                 <dd><p>Actually, this one isn't very frequent. If you do find yourself

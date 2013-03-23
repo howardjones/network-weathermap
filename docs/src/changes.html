@@ -3,8 +3,35 @@
         $PAGE_TITLE="Changes for this version";
         include "common-page-head.html";
 ?>
-
-            <h2><a name = "changes097a">Changes For This Version (0.97 to 0.97a)</a></h2>
+			<h2 id="changes097b">Changes For This Version (0.97a to 0.97b)</h2>
+			<p>0.97b is a special release starting from 0.97a and backporting all the quick bugfixes from the 0.98 code.
+There are larger structural changes in 0.98 and new features, but these bugfixes were useful enough to
+warrant a new 0.97 release (especially the mysql schema change). A real 0.98 release will follow in
+due course.</p>
+			<h3>Fixes</h3>
+<ul>
+<li>absolute SCALE definitions didn't support K (thanks wwwdrich)</li>
+<li>memory leak in poller code. Memory usage is MUCH lower now.</li>
+<li>updated mysql schema commands to use modern ENGINE instead of TYPE</li>
+<li>static datasource plugin honours KILO</li>
+<li>check-gdbug.php shouldn't complain about empty ob_flush buffers anymore</li>
+<li>SNMP DS should deal better with non-numeric (and blank) return values</li>
+<li>NINK colours were exchanged (thanks Deathwing00!)</li>
+<li>WriteConfig (i.e. editor) won't 'lose' absolute keyword from</li>
+<li>fixed some function-name clashes with other plugins</li>
+</ul>
+			<h3>Changes</h3>
+			<ul>
+<li>no longer shows .-prefixed files in map config picker</li>
+<li>editor ignores attempts to rename nodes to have space in names</li>
+			<li>Manual updates for changes in Cacti, and improvements in styling.</li>
+			</ul>
+			<h3>New Features</h3>
+			<ul>
+<li>Caching for cacti data fetched by dsstats and rrdtool/poller_output DS plugins</li>			
+			</ul>
+			
+            <h2 id="changes097a">Changes For This Version (0.97 to 0.97a)</h2>
 
             <p>Lots of bugs appeared the day after 0.97 was released! There are a few
             small features added, but mainly this is bugfixes.</p>
@@ -79,7 +106,7 @@
                 <li>SCALE can accept G,M,K,T,m,u,n suffixes (for absolute scales)</li>
             </ul>
 
-            <h2><a name = "changes097">Changes For This Version (0.96a to 0.97)</a></h2>
+            <h2 id="changes097">Changes For This Version (0.96a to 0.97)</h2>
 
             <h3>Fixes</h3>
 
@@ -181,7 +208,7 @@
                 offsets</li>
             </ul>
 
-            <h2><a name = "changes096a">Changes For This Version (0.96 to 0.96a)</a></h2>
+            <h2 id="changes096a">Changes For This Version (0.96 to 0.96a)</h2>
 
             <p>Just the usual post-release bug reports...</p>
 
@@ -206,7 +233,7 @@
                 <li> Managed to make LABELOFFSET case-sensitive.</li>
             </ul>
 
-            <h2><a name = "changes096">Changes For This Version (0.95b to 0.96)</a></h2>
+            <h2 id="changes096">Changes For This Version (0.95b to 0.96)</h2>
 
             <h3>Fixes</h3>
 
@@ -376,7 +403,7 @@
                 <li>MINTIMEPOS and MAXTIMEPOS to track data source times</li>
             </ul>
 
-            <h2><a name = "changes095">Changes For This Version (0.941 to 0.95)</a></h2>
+            <h2 id="changes095">Changes For This Version (0.941 to 0.95)</h2>
 
             <p>This release has a lot of changes
             - most of them are small 'polishing' tweaks, but there are a few interesting
@@ -508,7 +535,7 @@
                 targets.html</li>
             </ul>
 
-            <h2><a name = "changes0941">Changes For This Version (0.94 to 0.941)</a></h2>
+            <h2 id="changes0941">Changes For This Version (0.94 to 0.941)</h2>
 
             <h3>Fixes</h3>
 
@@ -520,7 +547,7 @@
                 <li>Removed some extra chatty debugging code from poller_output</li>
             </ul>
 
-            <h2><a name = "changes094">Changes For This Version (0.93 to 0.94)</a></h2>
+            <h2 id="changes094">Changes For This Version (0.93 to 0.94)</h2>
 
             <p>0.94 was released early, to fix the one small issue caused by files
             moving around in the recent Cacti 0.8.7 release. However, there are some
@@ -570,7 +597,7 @@
                 <li>Changes for compatibility with Cacti 0.8.7's moved config file.</li>
             </ul>
 
-            <h2><a name = "changes093">Changes For This Version (0.92 to 0.93)</a></h2>
+            <h2 id="changes093">Changes For This Version (0.92 to 0.93)</h2>
 
             <h3>Changes</h3>
 
@@ -670,7 +697,7 @@
                 classic scale too.</li>
             </ul>
 
-            <h2><a name = "changes092">Changes For This Version (0.91 to 0.92)</a></h2>
+            <h2 id="changes092">Changes For This Version (0.91 to 0.92)</h2>
 
             <h3>New Features</h3>
 
@@ -722,7 +749,7 @@
                 be mainly Windows)</li>
             </ul>
 
-            <h2><a name = "changes091">Changes For This Version (0.9 to 0.91)</a></h2>
+            <h2 id="changes091">Changes For This Version (0.9 to 0.91)</h2>
 
             <p>After all the big changes (below for 0.9), there are a whole bunch of
             bugs that no-one spotted in the testing, so this release is mostly a
@@ -780,7 +807,7 @@
                 - it would swap them over</li>
             </ul>
 
-            <h2><a name = "changes09">Changes For This Version (0.82 to 0.9)</a></h2>
+            <h2 id="changes09">Changes For This Version (0.82 to 0.9)</h2>
 
             <p>I've divided the changes up into chunks. Most of the serious work was
             done in the
@@ -789,7 +816,7 @@
             - see the Config Reference for the full detail. I've mentioned the
             appropriate configuration keywords if there are any.</p>
 
-            <h3><a name = "graphical">Graphical Changes</a></h3>
+            <h3 id="graphical">Graphical Changes</h3>
 
             <p>These tend to be smaller things, but together they make a lot of useful
             additions.</p>
@@ -825,6 +852,9 @@
             per-node/link. You can
             <em>also</em> have HTML-formatted text in that window, with or without the
             graph. See NOTES and OVERLIBCAPTION.</p>
+			
+			<p>Use it with String Tokens to make captions for your nodes, with
+            additional information.</p>
 
             <h4>New Legend Styles</h4>
 
@@ -838,10 +868,9 @@
             maintaining big rows of nodes, where only one needs to be fixed in position
             now.</p>
 
-            <p>Use it with String Tokens to make captions for your nodes, with
-            additional information.</p>
+            
 
-            <h3><a name = "structural">Structural Changes</a></h3>
+            <h3 id="structural">Structural Changes</h3>
 
             <p>The internal structure of Weathermap has changed quite a lot in this
             version. It started as a few small changes, but each one showed that another
@@ -909,7 +938,7 @@
             or for the whole map. These can be used to give fine-tuning parameters to
             the data source plugins, and also as additional data in String Tokens.</p>
 
-            <h3><a name = "cacti">Cacti Plugin</a></h3>
+            <h3 id="cacti">Cacti Plugin</h3>
 
             <p>Most of the Cacti Plugin changes are bugfixes or for more advanced
             users.</p>
@@ -934,7 +963,7 @@
             redraw of all maps from within the Cacti UI, instead of waiting for a poller
             cycle.</p>
 
-            <h3><a name = "editor">Editor</a></h3>
+            <h3 id="editor">Editor</h3>
 
             <p>There are no new features in the Editor for 0.9, although a few annoying
             bugs have been squashed. I have big plans for the editor, but they are a
@@ -942,7 +971,7 @@
             never have appeared :-) Now this version is released, the Editor is one the
             main focus areas for the next release. </p>
 
-            <h3><a name = "bugs">Bugfixes</a></h3>
+            <h3 id="bugs">Bugfixes</h3>
 
             <p>There were a lot of bugs fixed along the way. Most were new ones, but a
             few are things that existed in 0.82 too:</p>

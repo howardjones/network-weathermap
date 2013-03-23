@@ -35,9 +35,7 @@
         <meta>targetspec</meta>
     </definition>
 
-    <definition>TARGET "
-
-        <meta>targetspec</meta>"
+    <definition>TARGET "<meta>targetspec</meta>"
     </definition>
 
     <description xmlns="http://www.w3.org/1999/xhtml">

@@ -3,111 +3,109 @@
 </h2><p>This page is automatically compiled, and documents all the
                     configuration directives that are available in PHP Weathermap
                     <?php echo $WEATHERMAP_VERSION; ?>.  </p>
-    <h1 class="configsection">Introduction</h1>
+    <h2 class="configsection">Introduction</h2>
         <div class="preamble">
   <div xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude" id="contents">
       <h4 xmlns="" class="configsection">Node-specific Configuration Directives</h4>
       <p xmlns="" id="context_NODE">
-        <a class="" href="#NODE_COLORS">*COLOR</a>
-        <a class="" href="#NODE_ICON">ICON</a>
-        <a class="" href="#NODE_INFOURL">INFOURL</a>
-        <a class="" href="#NODE_LABEL">LABEL</a>
-        <a class="" href="#NODE_LABELANGLE">LABELANGLE</a>
-        <a class="" href="#NODE_LABELFONT">LABELFONT</a>
-        <a class="" href="#NODE_LABELOFFSET">LABELOFFSET</a>
-        <a class="" href="#NODE_MAXVALUE">MAXVALUE</a>
-        <a class="" href="#NODE_NODE">NODE</a>
-        <a class="" href="#NODE_NOTES">NOTES</a>
-        <a class="" href="#NODE_OVERLIBCAPTION">OVERLIBCAPTION</a>
-        <a class="" href="#NODE_OVERLIBGRAPH">OVERLIBGRAPH</a>
-        <a class="" href="#NODE_OVERLIBHEIGHT">OVERLIBHEIGHT</a>
-        <a class="" href="#NODE_OVERLIBWIDTH">OVERLIBWIDTH</a>
-        <a class="" href="#NODE_POSITION">POSITION</a>
-        <a class="" href="#NODE_SET">SET</a>
-        <a class="" href="#NODE_TARGET">TARGET</a>
-        <a class="" href="#NODE_TEMPLATE">TEMPLATE</a>
-        <a class="" href="#NODE_USEICONSCALE">USEICONSCALE</a>
-        <a class="" href="#NODE_USESCALE">USESCALE</a>
-        <a class="" href="#NODE_ZORDER">ZORDER</a>
+        <a class="tocentry" href="#NODE_COLORS">*COLOR</a>
+        <a class="tocentry" href="#NODE_ICON">ICON</a>
+        <a class="tocentry" href="#NODE_INFOURL">INFOURL</a>
+        <a class="tocentry" href="#NODE_LABEL">LABEL</a>
+        <a class="tocentry" href="#NODE_LABELANGLE">LABELANGLE</a>
+        <a class="tocentry" href="#NODE_LABELFONT">LABELFONT</a>
+        <a class="tocentry" href="#NODE_LABELOFFSET">LABELOFFSET</a>
+        <a class="tocentry" href="#NODE_MAXVALUE">MAXVALUE</a>
+        <a class="tocentry" href="#NODE_NODE">NODE</a>
+        <a class="tocentry" href="#NODE_NOTES">NOTES</a>
+        <a class="tocentry" href="#NODE_OVERLIBCAPTION">OVERLIBCAPTION</a>
+        <a class="tocentry" href="#NODE_OVERLIBGRAPH">OVERLIBGRAPH</a>
+        <a class="tocentry" href="#NODE_OVERLIBHEIGHT">OVERLIBHEIGHT</a>
+        <a class="tocentry" href="#NODE_OVERLIBWIDTH">OVERLIBWIDTH</a>
+        <a class="tocentry" href="#NODE_POSITION">POSITION</a>
+        <a class="tocentry" href="#NODE_SET">SET</a>
+        <a class="tocentry" href="#NODE_TARGET">TARGET</a>
+        <a class="tocentry" href="#NODE_TEMPLATE">TEMPLATE</a>
+        <a class="tocentry" href="#NODE_USEICONSCALE">USEICONSCALE</a>
+        <a class="tocentry" href="#NODE_USESCALE">USESCALE</a>
+        <a class="tocentry" href="#NODE_ZORDER">ZORDER</a>
        </p>
       <h4 xmlns="" class="configsection">Link-specific Configuration Directives</h4>
       <p xmlns="" id="context_LINK">
-        <a class="" href="#LINK_ARROWSTYLE">ARROWSTYLE</a>
-        <a class="" href="#LINK_BANDWIDTH">BANDWIDTH</a>
-        <a class="" href="#LINK_BWFONT">BWFONT</a>
-        <a class="" href="#LINK_BWLABEL">BWLABEL</a>
-        <a class="" href="#LINK_BWLABELPOS">BWLABELPOS</a>
-        <a class="" href="#LINK_BWSTYLE">BWSTYLE</a>
-        <a class="" href="#LINK_COLORS">*COLOR</a>
-        <a class="" href="#LINK_COMMENTFONT">COMMENTFONT</a>
-        <a class="" href="#LINK_COMMENTPOS">COMMENTPOS</a>
-        <a class="" href="#LINK_COMMENTSTYLE">COMMENTSTYLE</a>
-        <a class="" href="#LINK_DUPLEX">DUPLEX</a>
-        <a class="" href="#LINK_INBWFORMAT">INBWFORMAT</a>
-        <a class="" href="#LINK_INCOMMENT">INCOMMENT</a>
-        <a class="" href="#LINK_INFOURL">INFOURL</a>
-        <a class="" href="#LINK_ININFOURL">ININFOURL</a>
-        <a class="" href="#LINK_INNOTES">INNOTES</a>
-        <a class="" href="#LINK_INOVERLIBCAPTION">INOVERLIBCAPTION</a>
-        <a class="" href="#LINK_INOVERLIBGRAPH">INOVERLIBGRAPH</a>
-        <a class="" href="#LINK_LINK">LINK</a>
-        <a class="" href="#LINK_LINKSTYLE">LINKSTYLE</a>
-        <a class="" href="#LINK_NODES">NODES</a>
-        <a class="" href="#LINK_NOTES">NOTES</a>
-        <a class="" href="#LINK_OUTBWFORMAT">OUTBWFORMAT</a>
-        <a class="" href="#LINK_OUTCOMMENT">OUTCOMMENT</a>
-        <a class="" href="#LINK_OUTINFOURL">OUTINFOURL</a>
-        <a class="" href="#LINK_OUTNOTES">OUTNOTES</a>
-        <a class="" href="#LINK_OUTOVERLIBCAPTION">OUTOVERLIBCAPTION</a>
-        <a class="" href="#LINK_OUTOVERLIBGRAPH">OUTOVERLIBGRAPH</a>
-        <a class="" href="#LINK_OVERLIBCAPTION">OVERLIBCAPTION</a>
-        <a class="" href="#LINK_OVERLIBGRAPH">OVERLIBGRAPH</a>
-        <a class="" href="#LINK_OVERLIBHEIGHT">OVERLIBHEIGHT</a>
-        <a class="" href="#LINK_OVERLIBWIDTH">OVERLIBWIDTH</a>
-        <a class="" href="#LINK_SET">SET</a>
-        <a class="" href="#LINK_SPLITPOS">SPLITPOS</a>
-        <a class="" href="#LINK_TARGET">TARGET</a>
-        <a class="" href="#LINK_TEMPLATE">TEMPLATE</a>
-        <a class="" href="#LINK_USESCALE">USESCALE</a>
-        <a class="" href="#LINK_VIA">VIA</a>
-        <a class="" href="#LINK_VIASTYLE">VIASTYLE</a>
-        <a class="" href="#LINK_WIDTH">WIDTH</a>
-        <a class="" href="#LINK_ZORDER">ZORDER</a>
+        <a class="tocentry" href="#LINK_ARROWSTYLE">ARROWSTYLE</a>
+        <a class="tocentry" href="#LINK_BANDWIDTH">BANDWIDTH</a>
+        <a class="tocentry" href="#LINK_BWFONT">BWFONT</a>
+        <a class="tocentry" href="#LINK_BWLABEL">BWLABEL</a>
+        <a class="tocentry" href="#LINK_BWLABELPOS">BWLABELPOS</a>
+        <a class="tocentry" href="#LINK_BWSTYLE">BWSTYLE</a>
+        <a class="tocentry" href="#LINK_COLORS">*COLOR</a>
+        <a class="tocentry" href="#LINK_COMMENTFONT">COMMENTFONT</a>
+        <a class="tocentry" href="#LINK_COMMENTPOS">COMMENTPOS</a>
+        <a class="tocentry" href="#LINK_COMMENTSTYLE">COMMENTSTYLE</a>
+        <a class="tocentry" href="#LINK_DUPLEX">DUPLEX</a>
+        <a class="tocentry" href="#LINK_INBWFORMAT">INBWFORMAT</a>
+        <a class="tocentry" href="#LINK_INCOMMENT">INCOMMENT</a>
+        <a class="tocentry" href="#LINK_INFOURL">INFOURL</a>
+        <a class="tocentry" href="#LINK_ININFOURL">ININFOURL</a>
+        <a class="tocentry" href="#LINK_INNOTES">INNOTES</a>
+        <a class="tocentry" href="#LINK_INOVERLIBCAPTION">INOVERLIBCAPTION</a>
+        <a class="tocentry" href="#LINK_INOVERLIBGRAPH">INOVERLIBGRAPH</a>
+        <a class="tocentry" href="#LINK_LINK">LINK</a>
+        <a class="tocentry" href="#LINK_LINKSTYLE">LINKSTYLE</a>
+        <a class="tocentry" href="#LINK_NODES">NODES</a>
+        <a class="tocentry" href="#LINK_NOTES">NOTES</a>
+        <a class="tocentry" href="#LINK_OUTBWFORMAT">OUTBWFORMAT</a>
+        <a class="tocentry" href="#LINK_OUTCOMMENT">OUTCOMMENT</a>
+        <a class="tocentry" href="#LINK_OUTINFOURL">OUTINFOURL</a>
+        <a class="tocentry" href="#LINK_OUTNOTES">OUTNOTES</a>
+        <a class="tocentry" href="#LINK_OUTOVERLIBCAPTION">OUTOVERLIBCAPTION</a>
+        <a class="tocentry" href="#LINK_OUTOVERLIBGRAPH">OUTOVERLIBGRAPH</a>
+        <a class="tocentry" href="#LINK_OVERLIBCAPTION">OVERLIBCAPTION</a>
+        <a class="tocentry" href="#LINK_OVERLIBGRAPH">OVERLIBGRAPH</a>
+        <a class="tocentry" href="#LINK_OVERLIBHEIGHT">OVERLIBHEIGHT</a>
+        <a class="tocentry" href="#LINK_OVERLIBWIDTH">OVERLIBWIDTH</a>
+        <a class="tocentry" href="#LINK_SET">SET</a>
+        <a class="tocentry" href="#LINK_SPLITPOS">SPLITPOS</a>
+        <a class="tocentry" href="#LINK_TARGET">TARGET</a>
+        <a class="tocentry" href="#LINK_TEMPLATE">TEMPLATE</a>
+        <a class="tocentry" href="#LINK_USESCALE">USESCALE</a>
+        <a class="tocentry" href="#LINK_VIA">VIA</a>
+        <a class="tocentry" href="#LINK_VIASTYLE">VIASTYLE</a>
+        <a class="tocentry" href="#LINK_WIDTH">WIDTH</a>
+        <a class="tocentry" href="#LINK_ZORDER">ZORDER</a>
        </p>
       <h4 xmlns="" class="configsection">Global Configuration Directives</h4>
       <p xmlns="" id="context_GLOBAL">
-        <a class="" href="#GLOBAL_BACKGROUND">BACKGROUND</a>
-        <a class="" href="#GLOBAL_COLORS">*COLOR</a>
-        <a class="" href="#GLOBAL_FONT">*FONT</a>
-        <a class="" href="#GLOBAL_FONTDEFINE">FONTDEFINE</a>
-        <a class="" href="#GLOBAL_HEIGHT">HEIGHT</a>
-        <a class="" href="#GLOBAL_HTMLOUTPUTFILE">HTMLOUTPUTFILE</a>
-        <a class="" href="#GLOBAL_HTMLSTYLE">HTMLSTYLE</a>
-        <a class="" href="#GLOBAL_HTMLSTYLESHEET">HTMLSTYLESHEET</a>
-        <a class="" href="#GLOBAL_IMAGEOUTPUTFILE">IMAGEOUTPUTFILE</a>
-        <a class="" href="#GLOBAL_IMAGEURI">IMAGEURI</a>
-        <a class="" href="#GLOBAL_INCLUDE">INCLUDE</a>
-        <a class="" href="#GLOBAL_KEYPOS">KEYPOS</a>
-        <a class="" href="#GLOBAL_KEYSTYLE">KEYSTYLE</a>
-        <a class="" href="#GLOBAL_KILO">KILO</a>
-        <a class="" href="#GLOBAL_MAXTIMEPOS">MAXTIMEPOS</a>
-        <a class="" href="#GLOBAL_MINTIMEPOS">MINTIMEPOS</a>
-        <a class="" href="#GLOBAL_SCALE">SCALE</a>
-        <a class="" href="#GLOBAL_SET">SET</a>
-        <a class="" href="#GLOBAL_TIMEPOS">TIMEPOS</a>
-        <a class="" href="#GLOBAL_TITLE">TITLE</a>
-        <a class="" href="#GLOBAL_TITLEPOS">TITLEPOS</a>
-        <a class="" href="#GLOBAL_WIDTH">WIDTH</a>
+        <a class="tocentry" href="#GLOBAL_BACKGROUND">BACKGROUND</a>
+        <a class="tocentry" href="#GLOBAL_COLORS">*COLOR</a>
+        <a class="tocentry" href="#GLOBAL_FONT">*FONT</a>
+        <a class="tocentry" href="#GLOBAL_FONTDEFINE">FONTDEFINE</a>
+        <a class="tocentry" href="#GLOBAL_HEIGHT">HEIGHT</a>
+        <a class="tocentry" href="#GLOBAL_HTMLOUTPUTFILE">HTMLOUTPUTFILE</a>
+        <a class="tocentry" href="#GLOBAL_HTMLSTYLE">HTMLSTYLE</a>
+        <a class="tocentry" href="#GLOBAL_HTMLSTYLESHEET">HTMLSTYLESHEET</a>
+        <a class="tocentry" href="#GLOBAL_IMAGEOUTPUTFILE">IMAGEOUTPUTFILE</a>
+        <a class="tocentry" href="#GLOBAL_IMAGEURI">IMAGEURI</a>
+        <a class="tocentry" href="#GLOBAL_INCLUDE">INCLUDE</a>
+        <a class="tocentry" href="#GLOBAL_KEYPOS">KEYPOS</a>
+        <a class="tocentry" href="#GLOBAL_KEYSTYLE">KEYSTYLE</a>
+        <a class="tocentry" href="#GLOBAL_KILO">KILO</a>
+        <a class="tocentry" href="#GLOBAL_MAXTIMEPOS">MAXTIMEPOS</a>
+        <a class="tocentry" href="#GLOBAL_MINTIMEPOS">MINTIMEPOS</a>
+        <a class="tocentry" href="#GLOBAL_SCALE">SCALE</a>
+        <a class="tocentry" href="#GLOBAL_SET">SET</a>
+        <a class="tocentry" href="#GLOBAL_TIMEPOS">TIMEPOS</a>
+        <a class="tocentry" href="#GLOBAL_TITLE">TITLE</a>
+        <a class="tocentry" href="#GLOBAL_TITLEPOS">TITLEPOS</a>
+        <a class="tocentry" href="#GLOBAL_WIDTH">WIDTH</a>
        </p>
     </div>
 </div>
     
 
-    <h1 id="s_scope_NODE" class="configsection">Node-specific Configuration Directives</h1>
+    <h2 id="s_scope_NODE" class="configsection">Node-specific Configuration Directives</h2>
         <div class="referenceentry">
-  <h2>
-    <a name="NODE_NODE">NODE</a>
-  </h2>
+  <h3 id="NODE_NODE">NODE</h3>
   <div class="definition">NODE
 
         <em class="meta">nodename</em>
@@ -124,8 +122,8 @@
  intend to use it. </p> 
   </div>
   <div class="changes">
-    <h3>Change History</h3>
-    <dl>
+    <h4>Change History</h4>
+    <dl class="small">
       <dt>0.7</dt>
       <dd>Added DEFAULT node.
         </dd>
@@ -134,9 +132,7 @@
 </div>
 
         <div class="referenceentry">
-  <h2>
-    <a name="NODE_TEMPLATE">TEMPLATE</a>
-  </h2>
+  <h3 id="NODE_TEMPLATE">TEMPLATE</h3>
   <div class="definition">TEMPLATE
 
         <em class="meta">nodename</em>
@@ -155,16 +151,16 @@
  have already defined for that <a href="#NODE_NODE">NODE.</a> </p> 
   </div>
   <div class="examples">
-    <h3>Examples</h3>
-    <div class="example">
-      <h5>NODE Templates in use - with template-only nodes</h5>
+    <h4>Examples</h4>
+    <blockquote class="example">
+      <cite>NODE Templates in use - with template-only nodes</cite>
       <pre>NODE server
             </pre>
-    </div>
+    </blockquote>
   </div>
   <div class="changes">
-    <h3>Change History</h3>
-    <dl>
+    <h4>Change History</h4>
+    <dl class="small">
       <dt>0.96</dt>
       <dd>Added template support
         </dd>
@@ -173,9 +169,7 @@
 </div>
 
         <div class="referenceentry">
-  <h2>
-    <a name="NODE_POSITION">POSITION</a>
-  </h2>
+  <h3 id="NODE_POSITION">POSITION</h3>
   <div class="definition">POSITION
 
         <em class="meta">x-coord</em>
@@ -200,21 +194,21 @@
  positioned! </p> 
   </div>
   <div class="examples">
-    <h3>Examples</h3>
-    <div class="example">
-      <h5>Example of a 'sub-node', that will be 20 pixels above the main
+    <h4>Examples</h4>
+    <blockquote class="example">
+      <cite>Example of a 'sub-node', that will be 20 pixels above the main
         node, wherever that gets moved to. It is used to show additional information
-        about the main node.</h5>
+        about the main node.</cite>
       <pre>
                 NODE main_node POSITION 200 320 LABEL MAIN
 
                 NODE sub_node POSITION main_node 0 -20 LABEL {nodes:main_node:invalue}
             </pre>
-    </div>
+    </blockquote>
   </div>
   <div class="changes">
-    <h3>Change History</h3>
-    <dl>
+    <h4>Change History</h4>
+    <dl class="small">
       <dt>0.9</dt>
       <dd>Add relative position from other nodes.
         </dd>
@@ -223,9 +217,7 @@
 </div>
 
         <div class="referenceentry">
-  <h2>
-    <a name="NODE_LABEL">LABEL</a>
-  </h2>
+  <h3 id="NODE_LABEL">LABEL</h3>
   <div class="definition">LABEL
 
         <em class="meta">labeltext</em>
@@ -240,8 +232,8 @@
  by <a href="#NODE_COLORS">LABELFONTCOLOR,</a> <a href="#NODE_COLORS">LABELFONTSHADOWCOLOR,</a> <a href="#NODE_COLORS">LABELBGCOLOR</a> and <a href="#NODE_COLORS">LABELOUTLINECOLOR.</a> </p> 
   </div>
   <div class="changes">
-    <h3>Change History</h3>
-    <dl>
+    <h4>Change History</h4>
+    <dl class="small">
       <dt>0.9</dt>
       <dd>Added 'special token' support.
         </dd>
@@ -250,9 +242,7 @@
 </div>
 
         <div class="referenceentry">
-  <h2>
-    <a name="NODE_TARGET">TARGET</a>
-  </h2>
+  <h3 id="NODE_TARGET">TARGET</h3>
   <div class="definition">TARGET
 
         <em class="meta">targetspec</em>
@@ -279,9 +269,7 @@
 
         <em class="meta">targetspec</em>
     </div>
-  <div class="definition">TARGET "
-
-        <em class="meta">targetspec</em>"
+  <div class="definition">TARGET "<em class="meta">targetspec</em>"
     </div>
   <div class="description">
  <p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Specifies where to look for the current "throughput" information for this 
@@ -309,22 +297,22 @@
  prefixes.</em> </p> 
   </div>
   <div class="examples">
-    <h3>Examples</h3>
-    <div class="example">
-      <h5>Using multiple data sources for one link</h5>
+    <h4>Examples</h4>
+    <blockquote class="example">
+      <cite>Using multiple data sources for one link</cite>
       <pre>TARGET link1a.rrd link1b.rrd
             </pre>
-    </div>
-    <div class="example">
-      <h5>Taking the input from one file, and output from
-        another</h5>
+    </blockquote>
+    <blockquote class="example">
+      <cite>Taking the input from one file, and output from
+        another</cite>
       <pre>TARGET poot.rrd:-:DS1 poot2.rrd:DS0:-
             </pre>
-    </div>
+    </blockquote>
   </div>
   <div class="changes">
-    <h3>Change History</h3>
-    <dl>
+    <h4>Change History</h4>
+    <dl class="small">
       <dt>0.96</dt>
       <dd>Added quotes option for targets with spaces.
         </dd>
@@ -350,9 +338,7 @@
 </div>
 
         <div class="referenceentry">
-  <h2>
-    <a name="NODE_USESCALE">USESCALE</a>
-  </h2>
+  <h3 id="NODE_USESCALE">USESCALE</h3>
   <div class="definition">USESCALE
 
         <em class="meta">scalename</em>
@@ -379,8 +365,8 @@
  to a different <a href="#GLOBAL_SCALE">SCALE,</a> by using <a href="#NODE_USEICONSCALE">USEICONSCALE.</a> </p> 
   </div>
   <div class="changes">
-    <h3>Change History</h3>
-    <dl>
+    <h4>Change History</h4>
+    <dl class="small">
       <dt>0.97</dt>
       <dd>Added absolute scale support.
         </dd>
@@ -395,9 +381,7 @@
 </div>
 
         <div class="referenceentry">
-  <h2>
-    <a name="NODE_MAXVALUE">MAXVALUE</a>
-  </h2>
+  <h3 id="NODE_MAXVALUE">MAXVALUE</h3>
   <div class="definition">MAXVALUE
 
         <em class="meta">max-value</em>
@@ -416,8 +400,8 @@
  value ( (n/100)*100 = n ). </p> 
   </div>
   <div class="changes">
-    <h3>Change History</h3>
-    <dl>
+    <h4>Change History</h4>
+    <dl class="small">
       <dt>0.9</dt>
       <dd>Added TARGET and MAXVALUE for nodes.
         </dd>
@@ -426,9 +410,7 @@
 </div>
 
         <div class="referenceentry">
-  <h2>
-    <a name="NODE_ICON">ICON</a>
-  </h2>
+  <h3 id="NODE_ICON">ICON</h3>
   <div class="definition">ICON
 
         <em class="meta">iconimagefile</em>
@@ -487,8 +469,8 @@
  present in the main GD library). </p> 
   </div>
   <div class="changes">
-    <h3>Change History</h3>
-    <dl>
+    <h4>Change History</h4>
+    <dl class="small">
       <dt>0.96</dt>
       <dd>Added inpie, outpie and nink.
         </dd>
@@ -512,9 +494,7 @@
 </div>
 
         <div class="referenceentry">
-  <h2>
-    <a name="NODE_USEICONSCALE">USEICONSCALE</a>
-  </h2>
+  <h3 id="NODE_USEICONSCALE">USEICONSCALE</h3>
   <div class="definition">USEICONSCALE
 
         <em class="meta">scalename</em>
@@ -544,8 +524,8 @@
  <tt>imagefilter</tt> instead. </p> 
   </div>
   <div class="changes">
-    <h3>Change History</h3>
-    <dl>
+    <h4>Change History</h4>
+    <dl class="small">
       <dt>0.97</dt>
       <dd>Removed dependency on imagefilter
         </dd>
@@ -557,9 +537,7 @@
 </div>
 
         <div class="referenceentry">
-  <h2>
-    <a name="NODE_LABELOFFSET">LABELOFFSET</a>
-  </h2>
+  <h3 id="NODE_LABELOFFSET">LABELOFFSET</h3>
   <div class="definition">LABELOFFSET
 
         <em class="meta">compass-point</em>
@@ -587,8 +565,8 @@
  of the label (e.g. <a href="#NODE_LABELOFFSET">LABELOFFSET</a> -10 -20) instead. </p> 
   </div>
   <div class="changes">
-    <h3>Change History</h3>
-    <dl>
+    <h4>Change History</h4>
+    <dl class="small">
       <dt>0.7</dt>
       <dd>Originally added LABELOFFSET
         </dd>
@@ -597,9 +575,7 @@
 </div>
 
         <div class="referenceentry">
-  <h2>
-    <a name="NODE_LABELANGLE">LABELANGLE</a>
-  </h2>
+  <h3 id="NODE_LABELANGLE">LABELANGLE</h3>
   <div class="definition">LABELANGLE
 
         <em class="meta">angle</em>
@@ -611,14 +587,15 @@
  <p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">The <a href="#NODE_LABELFONT">LABELFONT</a> 
  <em>must be a TrueType font</em> for angles other than 0 (the default) as these 
  are the only font type to support rotating text. </p> 
- <p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude"> 
+ <figure xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude"> 
  <img src="../images/labelangle+labeloffset.png"/> 
 
- <br/>Rotated label, using <tt><a href="#NODE_LABELANGLE">LABELANGLE</a> 90</tt> and <tt><a href="#NODE_LABELOFFSET">LABELOFFSET</a> E</tt> </p> 
+ <figcaption>Rotated label, using <tt><a href="#NODE_LABELANGLE">LABELANGLE</a> 90</tt> and <tt><a href="#NODE_LABELOFFSET">LABELOFFSET</a> E</tt></figcaption> 
+ </figure> 
   </div>
   <div class="changes">
-    <h3>Change History</h3>
-    <dl>
+    <h4>Change History</h4>
+    <dl class="small">
       <dt>0.95</dt>
       <dd>Added LABELANGLE.
         </dd>
@@ -627,9 +604,7 @@
 </div>
 
         <div class="referenceentry">
-  <h2>
-    <a name="NODE_LABELFONT">LABELFONT</a>
-  </h2>
+  <h3 id="NODE_LABELFONT">LABELFONT</h3>
   <div class="definition">LABELFONT
 
         <em class="meta">fontnumber</em>
@@ -643,8 +618,8 @@
  <img src="../images/font-sizes.png"/>The built-in GD fonts. </p> 
   </div>
   <div class="changes">
-    <h3>Change History</h3>
-    <dl>
+    <h4>Change History</h4>
+    <dl class="small">
       <dt>0.7</dt>
       <dd>Global NODEFONT became per-node LABELFONT.
         </dd>
@@ -656,9 +631,7 @@
 </div>
 
         <div class="referenceentry">
-  <h2>
-    <a name="NODE_COLORS">*COLOR</a>
-  </h2>
+  <h3 id="NODE_COLORS">*COLOR</h3>
   <div class="definition">LABELFONTCOLOR
 
         <em class="meta">red</em>
@@ -724,8 +697,8 @@
  about artificial icons. </p> 
   </div>
   <div class="changes">
-    <h3>Change History</h3>
-    <dl>
+    <h4>Change History</h4>
+    <dl class="small">
       <dt>0.95</dt>
       <dd>Added 'contrast' and 'copy' options.
         </dd>
@@ -741,9 +714,7 @@
 </div>
 
         <div class="referenceentry">
-  <h2>
-    <a name="NODE_INFOURL">INFOURL</a>
-  </h2>
+  <h3 id="NODE_INFOURL">INFOURL</h3>
   <div class="definition">INFOURL
 
         <em class="meta">url</em>
@@ -757,9 +728,7 @@
 </div>
 
         <div class="referenceentry">
-  <h2>
-    <a name="NODE_OVERLIBGRAPH">OVERLIBGRAPH</a>
-  </h2>
+  <h3 id="NODE_OVERLIBGRAPH">OVERLIBGRAPH</h3>
   <div class="definition">OVERLIBGRAPH
 
         <em class="meta">url</em>
@@ -785,16 +754,16 @@
  <a href="#NODE_OVERLIBWIDTH">OVERLIBWIDTH</a> and <a href="#NODE_OVERLIBHEIGHT">OVERLIBHEIGHT</a> keywords. </p> 
   </div>
   <div class="examples">
-    <h3>Examples</h3>
-    <div class="example">
-      <h5>Typical use of OVERLIBGRAPH</h5>
+    <h4>Examples</h4>
+    <blockquote class="example">
+      <cite>Typical use of OVERLIBGRAPH</cite>
       <pre>OVERLIBGRAPH http://www.yoursite.net/mrtg/router1-cpu-daily.png
             </pre>
-    </div>
+    </blockquote>
   </div>
   <div class="changes">
-    <h3>Change History</h3>
-    <dl>
+    <h4>Change History</h4>
+    <dl class="small">
       <dt>0.95</dt>
       <dd>Added multiple URL support
         </dd>
@@ -803,9 +772,7 @@
 </div>
 
         <div class="referenceentry">
-  <h2>
-    <a name="NODE_OVERLIBWIDTH">OVERLIBWIDTH</a>
-  </h2>
+  <h3 id="NODE_OVERLIBWIDTH">OVERLIBWIDTH</h3>
   <div class="definition">OVERLIBWIDTH
 
         <em class="meta">imagewidth</em>
@@ -819,8 +786,8 @@
  this, you must also use <a href="#NODE_OVERLIBHEIGHT">OVERLIBHEIGHT,</a> for either to have any effect. </p> 
   </div>
   <div class="changes">
-    <h3>Change History</h3>
-    <dl>
+    <h4>Change History</h4>
+    <dl class="small">
       <dt>0.7</dt>
       <dd>Originally added OVERLIBWIDTH and OVERLIBHEIGHT based on
         code by Niels Baggesen.
@@ -830,9 +797,7 @@
 </div>
 
         <div class="referenceentry">
-  <h2>
-    <a name="NODE_OVERLIBHEIGHT">OVERLIBHEIGHT</a>
-  </h2>
+  <h3 id="NODE_OVERLIBHEIGHT">OVERLIBHEIGHT</h3>
   <div class="definition">OVERLIBHEIGHT
 
         <em class="meta">imagewidth</em>
@@ -846,8 +811,8 @@
  this, you must also use <a href="#NODE_OVERLIBWIDTH">OVERLIBWIDTH,</a> for either to have any effect. </p> 
   </div>
   <div class="changes">
-    <h3>Change History</h3>
-    <dl>
+    <h4>Change History</h4>
+    <dl class="small">
       <dt>0.7</dt>
       <dd>Originally added OVERLIBWIDTH and OVERLIBHEIGHT based on
         code by Niels Baggesen.
@@ -857,9 +822,7 @@
 </div>
 
         <div class="referenceentry">
-  <h2>
-    <a name="NODE_OVERLIBCAPTION">OVERLIBCAPTION</a>
-  </h2>
+  <h3 id="NODE_OVERLIBCAPTION">OVERLIBCAPTION</h3>
   <div class="definition">OVERLIBCAPTION
 
         <em class="meta">caption text</em>
@@ -871,8 +834,8 @@
  <a href="advanced.html#tokens">special tokens</a> to show map data. </p> 
   </div>
   <div class="changes">
-    <h3>Change History</h3>
-    <dl>
+    <h4>Change History</h4>
+    <dl class="small">
       <dt>0.9</dt>
       <dd>Originally added OVERLIBCAPTION.
         </dd>
@@ -881,9 +844,7 @@
 </div>
 
         <div class="referenceentry">
-  <h2>
-    <a name="NODE_NOTES">NOTES</a>
-  </h2>
+  <h3 id="NODE_NOTES">NOTES</h3>
   <div class="definition">NOTES
 
         <em class="meta">notes text</em>
@@ -898,8 +859,8 @@
  functionality. </p> 
   </div>
   <div class="changes">
-    <h3>Change History</h3>
-    <dl>
+    <h4>Change History</h4>
+    <dl class="small">
       <dt>0.9</dt>
       <dd>Originally added NOTES.
         </dd>
@@ -908,9 +869,7 @@
 </div>
 
         <div class="referenceentry">
-  <h2>
-    <a name="NODE_SET">SET</a>
-  </h2>
+  <h3 id="NODE_SET">SET</h3>
   <div class="definition">SET
 
         <em class="meta">hintname</em>
@@ -929,8 +888,8 @@
  <a href="advanced.html">Advanced Topics</a> section. </p> 
   </div>
   <div class="changes">
-    <h3>Change History</h3>
-    <dl>
+    <h4>Change History</h4>
+    <dl class="small">
       <dt>0.9</dt>
       <dd>Originally added SET.
         </dd>
@@ -939,9 +898,7 @@
 </div>
 
         <div class="referenceentry">
-  <h2>
-    <a name="NODE_ZORDER">ZORDER</a>
-  </h2>
+  <h3 id="NODE_ZORDER">ZORDER</h3>
   <div class="definition">ZORDER
 
         <em class="meta">z-coord</em>
@@ -959,8 +916,8 @@
  </p> 
   </div>
   <div class="changes">
-    <h3>Change History</h3>
-    <dl>
+    <h4>Change History</h4>
+    <dl class="small">
       <dt>0.96</dt>
       <dd>Added Z-ordering support.
         </dd>
@@ -969,11 +926,9 @@
 </div>
     
 
-    <h1 id="s_scope_LINK" class="configsection">Link-specific Configuration Directives</h1>
+    <h2 id="s_scope_LINK" class="configsection">Link-specific Configuration Directives</h2>
         <div class="referenceentry">
-  <h2>
-    <a name="LINK_LINK">LINK</a>
-  </h2>
+  <h3 id="LINK_LINK">LINK</h3>
   <div class="definition">LINK
 
         <em class="meta">linkname</em>
@@ -992,9 +947,7 @@
 </div>
 
         <div class="referenceentry">
-  <h2>
-    <a name="LINK_TEMPLATE">TEMPLATE</a>
-  </h2>
+  <h3 id="LINK_TEMPLATE">TEMPLATE</h3>
   <div class="definition">TEMPLATE
 
         <em class="meta">linkname</em>
@@ -1013,9 +966,9 @@
  have already defined for that <a href="#LINK_LINK">LINK.</a> </p> 
   </div>
   <div class="examples">
-    <h3>Examples</h3>
-    <div class="example">
-      <h5>LINK Templates in use - with template-only links</h5>
+    <h4>Examples</h4>
+    <blockquote class="example">
+      <cite>LINK Templates in use - with template-only links</cite>
       <pre>LINK bigpipe WIDTH 8 ARROWSTYLE classic
 
                 LINK smallpipe WIDTH 3 ARROWSTYLE compact
@@ -1023,11 +976,11 @@
                 # this link uses the bigpipe template, so it doesn't need any
             formatting/styling commands LINK a_real_link TEMPLATE bigpipe NODES rtr1 rtr2
             </pre>
-    </div>
+    </blockquote>
   </div>
   <div class="changes">
-    <h3>Change History</h3>
-    <dl>
+    <h4>Change History</h4>
+    <dl class="small">
       <dt>0.96</dt>
       <dd>Added template support
         </dd>
@@ -1036,9 +989,7 @@
 </div>
 
         <div class="referenceentry">
-  <h2>
-    <a name="LINK_NODES">NODES</a>
-  </h2>
+  <h3 id="LINK_NODES">NODES</h3>
   <div class="definition">NODES
 
         <em class="meta">nodename{:compassoffset}</em>
@@ -1109,41 +1060,41 @@
  <tt><a href="#LINK_NODES">NODES</a> node1:SE50 node2:SW50</tt> for the other. </p> 
   </div>
   <div class="examples">
-    <h3>Examples</h3>
-    <div class="example">
-      <h5>Defining a simple link</h5>
+    <h4>Examples</h4>
+    <blockquote class="example">
+      <cite>Defining a simple link</cite>
       <pre>LINK mylink NODES node1 node2
             </pre>
-    </div>
-    <div class="example">
-      <h5>Two parallel links, using offsets</h5>
+    </blockquote>
+    <blockquote class="example">
+      <cite>Two parallel links, using offsets</cite>
       <pre>LINK firstlink NODES node1:E node2:E
 
                 LINK secondlink NODES node1:W node2:W
             </pre>
-    </div>
-    <div class="example">
-      <h5>Two parallel links, using percentage compass offsets to bring
-        the links closer together</h5>
+    </blockquote>
+    <blockquote class="example">
+      <cite>Two parallel links, using percentage compass offsets to bring
+        the links closer together</cite>
       <pre>LINK firstlink NODES node1:E50 node2:E50
 
                 LINK secondlink NODES node1:W50 node2:W50
             </pre>
-    </div>
-    <div class="example">
-      <h5>An offset link using pixel offsets</h5>
+    </blockquote>
+    <blockquote class="example">
+      <cite>An offset link using pixel offsets</cite>
       <pre>LINK firstlink NODES node1:-10:10 node2:20:12
             </pre>
-    </div>
-    <div class="example">
-      <h5>An offset link using polar coordinates</h5>
+    </blockquote>
+    <blockquote class="example">
+      <cite>An offset link using polar coordinates</cite>
       <pre>LINK firstlink NODES node1:45r20 node2:225r20
             </pre>
-    </div>
+    </blockquote>
   </div>
   <div class="changes">
-    <h3>Change History</h3>
-    <dl>
+    <h4>Change History</h4>
+    <dl class="small">
       <dt>0.96</dt>
       <dd>Added polar offsets.
         </dd>
@@ -1161,9 +1112,7 @@
 </div>
 
         <div class="referenceentry">
-  <h2>
-    <a name="LINK_TARGET">TARGET</a>
-  </h2>
+  <h3 id="LINK_TARGET">TARGET</h3>
   <div class="definition">TARGET
 
         <em class="meta">targetspec</em>
@@ -1190,9 +1139,7 @@
 
         <em class="meta">targetspec</em>
     </div>
-  <div class="definition">TARGET "
-
-        <em class="meta">targetspec</em>"
+  <div class="definition">TARGET "<em class="meta">targetspec</em>"
     </div>
   <div class="description">
  <p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Specifies where to look for the current throughput information for this <a href="#LINK_LINK">LINK.</a> 
@@ -1217,22 +1164,22 @@
  prefixes.</em> </p> 
   </div>
   <div class="examples">
-    <h3>Examples</h3>
-    <div class="example">
-      <h5>Using multiple data sources for one link</h5>
+    <h4>Examples</h4>
+    <blockquote class="example">
+      <cite>Using multiple data sources for one link</cite>
       <pre>TARGET link1a.rrd link1b.rrd
             </pre>
-    </div>
-    <div class="example">
-      <h5>Taking the input from one file, and output from
-        another</h5>
+    </blockquote>
+    <blockquote class="example">
+      <cite>Taking the input from one file, and output from
+        another</cite>
       <pre>TARGET poot.rrd:-:DS1 poot2.rrd:DS0:-
             </pre>
-    </div>
+    </blockquote>
   </div>
   <div class="changes">
-    <h3>Change History</h3>
-    <dl>
+    <h4>Change History</h4>
+    <dl class="small">
       <dt>0.96</dt>
       <dd>Added quotes option for targets with spaces.
         </dd>
@@ -1258,9 +1205,7 @@
 </div>
 
         <div class="referenceentry">
-  <h2>
-    <a name="LINK_USESCALE">USESCALE</a>
-  </h2>
+  <h3 id="LINK_USESCALE">USESCALE</h3>
   <div class="definition">USESCALE
 
         <em class="meta">scalename</em>
@@ -1286,8 +1231,8 @@
  The raw values from the <a href="#LINK_TARGET">TARGET</a> line are just looked up in the named <a href="#GLOBAL_SCALE">SCALE.</a> </p> 
   </div>
   <div class="changes">
-    <h3>Change History</h3>
-    <dl>
+    <h4>Change History</h4>
+    <dl class="small">
       <dt>0.97</dt>
       <dd>Added absolute scale support.
         </dd>
@@ -1299,9 +1244,7 @@
 </div>
 
         <div class="referenceentry">
-  <h2>
-    <a name="LINK_WIDTH">WIDTH</a>
-  </h2>
+  <h3 id="LINK_WIDTH">WIDTH</h3>
   <div class="definition">WIDTH
 
         <em class="meta">width</em>
@@ -1323,8 +1266,8 @@
  are treated as curved links with no <a href="#LINK_VIA">VIA</a> by default. </p> 
   </div>
   <div class="changes">
-    <h3>Change History</h3>
-    <dl>
+    <h4>Change History</h4>
+    <dl class="small">
       <dt>0.97a</dt>
       <dd>Added non-integer widths. Retconned explanation.
         </dd>
@@ -1333,9 +1276,7 @@
 </div>
 
         <div class="referenceentry">
-  <h2>
-    <a name="LINK_BANDWIDTH">BANDWIDTH</a>
-  </h2>
+  <h3 id="LINK_BANDWIDTH">BANDWIDTH</h3>
   <div class="definition">BANDWIDTH
 
         <em class="meta">max-bandwidth</em>
@@ -1357,16 +1298,16 @@
  see the <a href="#GLOBAL_KILO">KILO</a> global option though. </p> 
   </div>
   <div class="examples">
-    <h3>Examples</h3>
-    <div class="example">
-      <h5>A typical ADSL line (as seen from the CPE)</h5>
+    <h4>Examples</h4>
+    <blockquote class="example">
+      <cite>A typical ADSL line (as seen from the CPE)</cite>
       <pre>BANDWIDTH 2M 256K
             </pre>
-    </div>
+    </blockquote>
   </div>
   <div class="changes">
-    <h3>Change History</h3>
-    <dl>
+    <h4>Change History</h4>
+    <dl class="small">
       <dt>0.9</dt>
       <dd>Added MAXVALUE as a synonym to match NODE MAXVALUE. No
         change in functionality.
@@ -1383,9 +1324,7 @@
 </div>
 
         <div class="referenceentry">
-  <h2>
-    <a name="LINK_DUPLEX">DUPLEX</a>
-  </h2>
+  <h3 id="LINK_DUPLEX">DUPLEX</h3>
   <div class="definition">DUPLEX
 
         <em class="meta">full</em>
@@ -1401,8 +1340,8 @@
  instead of (in/max) and (out/max) separately. </p> 
   </div>
   <div class="changes">
-    <h3>Change History</h3>
-    <dl>
+    <h4>Change History</h4>
+    <dl class="small">
       <dt>0.95</dt>
       <dd>Added DUPLEX.
         </dd>
@@ -1411,9 +1350,7 @@
 </div>
 
         <div class="referenceentry">
-  <h2>
-    <a name="LINK_BWLABEL">BWLABEL</a>
-  </h2>
+  <h3 id="LINK_BWLABEL">BWLABEL</h3>
   <div class="definition">BWLABEL
 
         <em class="meta">formatname</em>
@@ -1430,8 +1367,8 @@
  </p> 
   </div>
   <div class="changes">
-    <h3>Change History</h3>
-    <dl>
+    <h4>Change History</h4>
+    <dl class="small">
       <dt>0.8</dt>
       <dd>Added unformatted format.
         </dd>
@@ -1443,9 +1380,7 @@
 </div>
 
         <div class="referenceentry">
-  <h2>
-    <a name="LINK_INBWFORMAT">INBWFORMAT</a>
-  </h2>
+  <h3 id="LINK_INBWFORMAT">INBWFORMAT</h3>
   <div class="definition">INBWFORMAT
 
         <em class="meta">string</em>
@@ -1464,17 +1399,17 @@
  outbound bandwidth label. </p> 
   </div>
   <div class="examples">
-    <h3>Examples</h3>
-    <div class="example">
-      <h5>Providing more information in the bwlabel</h5>
+    <h4>Examples</h4>
+    <blockquote class="example">
+      <cite>Providing more information in the bwlabel</cite>
       <pre>INBWFORMAT {link:this:inpercent}% of
             {link:this:max_bandwidth_in:%k}b/sec
             </pre>
-    </div>
+    </blockquote>
   </div>
   <div class="changes">
-    <h3>Change History</h3>
-    <dl>
+    <h4>Change History</h4>
+    <dl class="small">
       <dt>0.94</dt>
       <dd>Added INBWFORMAT.
         </dd>
@@ -1483,9 +1418,7 @@
 </div>
 
         <div class="referenceentry">
-  <h2>
-    <a name="LINK_OUTBWFORMAT">OUTBWFORMAT</a>
-  </h2>
+  <h3 id="LINK_OUTBWFORMAT">OUTBWFORMAT</h3>
   <div class="definition">OUTBWFORMAT
 
         <em class="meta">string</em>
@@ -1496,8 +1429,8 @@
  <p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">See the <a href="#LINK_INBWFORMAT">INBWFORMAT</a> entry for more information. </p> 
   </div>
   <div class="changes">
-    <h3>Change History</h3>
-    <dl>
+    <h4>Change History</h4>
+    <dl class="small">
       <dt>0.94</dt>
       <dd>Added OUTBWFORMAT.
         </dd>
@@ -1506,9 +1439,7 @@
 </div>
 
         <div class="referenceentry">
-  <h2>
-    <a name="LINK_BWSTYLE">BWSTYLE</a>
-  </h2>
+  <h3 id="LINK_BWSTYLE">BWSTYLE</h3>
   <div class="definition">BWSTYLE
 
         <em class="meta">formatname</em>
@@ -1529,8 +1460,8 @@
  <img src="../images/bwstyle-angled.png"/> Angled label style </p> 
   </div>
   <div class="changes">
-    <h3>Change History</h3>
-    <dl>
+    <h4>Change History</h4>
+    <dl class="small">
       <dt>0.92</dt>
       <dd>Added BWSTYLE.
         </dd>
@@ -1539,9 +1470,7 @@
 </div>
 
         <div class="referenceentry">
-  <h2>
-    <a name="LINK_BWLABELPOS">BWLABELPOS</a>
-  </h2>
+  <h3 id="LINK_BWLABELPOS">BWLABELPOS</h3>
   <div class="definition">BWLABELPOS
 
         <em class="meta">inposition</em>
@@ -1558,8 +1487,8 @@
  nowarn_bwlabelpos 1' in the top section of you map config file. </p> 
   </div>
   <div class="changes">
-    <h3>Change History</h3>
-    <dl>
+    <h4>Change History</h4>
+    <dl class="small">
       <dt>0.96</dt>
       <dd>Added warning for proably-wrong positions
         </dd>
@@ -1571,9 +1500,7 @@
 </div>
 
         <div class="referenceentry">
-  <h2>
-    <a name="LINK_BWFONT">BWFONT</a>
-  </h2>
+  <h3 id="LINK_BWFONT">BWFONT</h3>
   <div class="definition">BWFONT
 
         <em class="meta">fontnumber</em>
@@ -1589,9 +1516,7 @@
 </div>
 
         <div class="referenceentry">
-  <h2>
-    <a name="LINK_INCOMMENT">INCOMMENT</a>
-  </h2>
+  <h3 id="LINK_INCOMMENT">INCOMMENT</h3>
   <div class="definition">INCOMMENT
 
         <em class="meta">string</em>
@@ -1607,8 +1532,8 @@
  rotating text. </p> 
   </div>
   <div class="changes">
-    <h3>Change History</h3>
-    <dl>
+    <h4>Change History</h4>
+    <dl class="small">
       <dt>0.9</dt>
       <dd>Added link comments
         </dd>
@@ -1617,9 +1542,7 @@
 </div>
 
         <div class="referenceentry">
-  <h2>
-    <a name="LINK_OUTCOMMENT">OUTCOMMENT</a>
-  </h2>
+  <h3 id="LINK_OUTCOMMENT">OUTCOMMENT</h3>
   <div class="definition">OUTCOMMENT
 
         <em class="meta">string</em>
@@ -1635,8 +1558,8 @@
  rotating text. </p> 
   </div>
   <div class="changes">
-    <h3>Change History</h3>
-    <dl>
+    <h4>Change History</h4>
+    <dl class="small">
       <dt>0.9</dt>
       <dd>Added link comments
         </dd>
@@ -1645,9 +1568,7 @@
 </div>
 
         <div class="referenceentry">
-  <h2>
-    <a name="LINK_COMMENTFONT">COMMENTFONT</a>
-  </h2>
+  <h3 id="LINK_COMMENTFONT">COMMENTFONT</h3>
   <div class="definition">COMMENTFONT
 
         <em class="meta">fontnumber</em>
@@ -1663,8 +1584,8 @@
  to render the font with <a href="#LINK_COLORS">COMMENTFONTCOLOR</a> </p> 
   </div>
   <div class="changes">
-    <h3>Change History</h3>
-    <dl>
+    <h4>Change History</h4>
+    <dl class="small">
       <dt>0.9</dt>
       <dd>Added link comments
         </dd>
@@ -1673,9 +1594,7 @@
 </div>
 
         <div class="referenceentry">
-  <h2>
-    <a name="LINK_COMMENTPOS">COMMENTPOS</a>
-  </h2>
+  <h3 id="LINK_COMMENTPOS">COMMENTPOS</h3>
   <div class="definition">COMMENTPOS
 
         <em class="meta">inposition</em>
@@ -1690,8 +1609,8 @@
  <strong><a href="#LINK_COMMENTPOS">COMMENTPOS</a> 95 5</strong>. </p> 
   </div>
   <div class="changes">
-    <h3>Change History</h3>
-    <dl>
+    <h4>Change History</h4>
+    <dl class="small">
       <dt>0.92</dt>
       <dd>Added COMMENTPOS
         </dd>
@@ -1700,9 +1619,7 @@
 </div>
 
         <div class="referenceentry">
-  <h2>
-    <a name="LINK_COMMENTSTYLE">COMMENTSTYLE</a>
-  </h2>
+  <h3 id="LINK_COMMENTSTYLE">COMMENTSTYLE</h3>
   <div class="definition">COMMENTSTYLE edge
     </div>
   <div class="definition">COMMENTSTYLE center
@@ -1716,8 +1633,8 @@
  <img src="../images/commentstyle-center.png"/> 'center' comment style </p> 
   </div>
   <div class="changes">
-    <h3>Change History</h3>
-    <dl>
+    <h4>Change History</h4>
+    <dl class="small">
       <dt>0.96</dt>
       <dd>Added COMMENTSTYLE
         </dd>
@@ -1726,9 +1643,7 @@
 </div>
 
         <div class="referenceentry">
-  <h2>
-    <a name="LINK_SPLITPOS">SPLITPOS</a>
-  </h2>
+  <h3 id="LINK_SPLITPOS">SPLITPOS</h3>
   <div class="definition">SPLITPOS
 
         <em class="meta">position</em>
@@ -1738,8 +1653,8 @@
  <em>position</em> is a percentage, and defaults to 50. </p> 
   </div>
   <div class="changes">
-    <h3>Change History</h3>
-    <dl>
+    <h4>Change History</h4>
+    <dl class="small">
       <dt>0.95</dt>
       <dd>Added SPLITPOS
         </dd>
@@ -1748,9 +1663,7 @@
 </div>
 
         <div class="referenceentry">
-  <h2>
-    <a name="LINK_COLORS">*COLOR</a>
-  </h2>
+  <h3 id="LINK_COLORS">*COLOR</h3>
   <div class="definition">OUTLINECOLOR
 
         <em class="meta">red</em>
@@ -1818,8 +1731,8 @@
  <tt><a href="#LINK_COMMENTSTYLE">COMMENTSTYLE</a> center</tt> </p> 
   </div>
   <div class="changes">
-    <h3>Change History</h3>
-    <dl>
+    <h4>Change History</h4>
+    <dl class="small">
       <dt>0.96</dt>
       <dd>Added COMMENTFONTCOLOR contrast.
         </dd>
@@ -1839,9 +1752,7 @@
 </div>
 
         <div class="referenceentry">
-  <h2>
-    <a name="LINK_INFOURL">INFOURL</a>
-  </h2>
+  <h3 id="LINK_INFOURL">INFOURL</h3>
   <div class="definition">INFOURL
 
         <em class="meta">url</em>
@@ -1855,8 +1766,8 @@
  link individually, using <a href="#LINK_ININFOURL">ININFOURLand</a> <a href="#LINK_OUTINFOURL">OUTINFOURL.</a> </p> 
   </div>
   <div class="changes">
-    <h3>Change History</h3>
-    <dl>
+    <h4>Change History</h4>
+    <dl class="small">
       <dt>0.95</dt>
       <dd>Added IN/OUT support
         </dd>
@@ -1865,9 +1776,7 @@
 </div>
 
         <div class="referenceentry">
-  <h2>
-    <a name="LINK_ININFOURL">ININFOURL</a>
-  </h2>
+  <h3 id="LINK_ININFOURL">ININFOURL</h3>
   <div class="definition">ININFOURL
 
         <em class="meta">url</em>
@@ -1881,8 +1790,8 @@
  link. </p> 
   </div>
   <div class="changes">
-    <h3>Change History</h3>
-    <dl>
+    <h4>Change History</h4>
+    <dl class="small">
       <dt>0.95</dt>
       <dd>Added IN/OUT support
         </dd>
@@ -1891,9 +1800,7 @@
 </div>
 
         <div class="referenceentry">
-  <h2>
-    <a name="LINK_OUTINFOURL">OUTINFOURL</a>
-  </h2>
+  <h3 id="LINK_OUTINFOURL">OUTINFOURL</h3>
   <div class="definition">OUTINFOURL
 
         <em class="meta">url</em>
@@ -1907,8 +1814,8 @@
  link. </p> 
   </div>
   <div class="changes">
-    <h3>Change History</h3>
-    <dl>
+    <h4>Change History</h4>
+    <dl class="small">
       <dt>0.95</dt>
       <dd>Added IN/OUT support
         </dd>
@@ -1917,9 +1824,7 @@
 </div>
 
         <div class="referenceentry">
-  <h2>
-    <a name="LINK_OVERLIBGRAPH">OVERLIBGRAPH</a>
-  </h2>
+  <h3 id="LINK_OVERLIBGRAPH">OVERLIBGRAPH</h3>
   <div class="definition">OVERLIBGRAPH
 
         <em class="meta">url</em>
@@ -1941,16 +1846,16 @@
  <a href="#LINK_OVERLIBWIDTH">OVERLIBWIDTH</a> and <a href="#LINK_OVERLIBHEIGHT">OVERLIBHEIGHT</a> keywords. </p> 
   </div>
   <div class="examples">
-    <h3>Examples</h3>
-    <div class="example">
-      <h5>Typical use of OVERLIBGRAPH</h5>
+    <h4>Examples</h4>
+    <blockquote class="example">
+      <cite>Typical use of OVERLIBGRAPH</cite>
       <pre>OVERLIBGRAPH http://www.yoursite.net/mrtg/router1-link2-daily.png
             </pre>
-    </div>
+    </blockquote>
   </div>
   <div class="changes">
-    <h3>Change History</h3>
-    <dl>
+    <h4>Change History</h4>
+    <dl class="small">
       <dt>0.95</dt>
       <dd>Added multiple URL support
         </dd>
@@ -1967,9 +1872,7 @@
 </div>
 
         <div class="referenceentry">
-  <h2>
-    <a name="LINK_INOVERLIBGRAPH">INOVERLIBGRAPH</a>
-  </h2>
+  <h3 id="LINK_INOVERLIBGRAPH">INOVERLIBGRAPH</h3>
   <div class="definition">INOVERLIBGRAPH
 
         <em class="meta">url</em>
@@ -1985,8 +1888,8 @@
  a link. </p> 
   </div>
   <div class="changes">
-    <h3>Change History</h3>
-    <dl>
+    <h4>Change History</h4>
+    <dl class="small">
       <dt>0.95</dt>
       <dd>Added multiple URL support
         </dd>
@@ -1998,9 +1901,7 @@
 </div>
 
         <div class="referenceentry">
-  <h2>
-    <a name="LINK_OUTOVERLIBGRAPH">OUTOVERLIBGRAPH</a>
-  </h2>
+  <h3 id="LINK_OUTOVERLIBGRAPH">OUTOVERLIBGRAPH</h3>
   <div class="definition">OUTOVERLIBGRAPH
 
         <em class="meta">url</em>
@@ -2016,8 +1917,8 @@
  a link. </p> 
   </div>
   <div class="changes">
-    <h3>Change History</h3>
-    <dl>
+    <h4>Change History</h4>
+    <dl class="small">
       <dt>0.95</dt>
       <dd>Added multiple URL support
         </dd>
@@ -2029,9 +1930,7 @@
 </div>
 
         <div class="referenceentry">
-  <h2>
-    <a name="LINK_OVERLIBWIDTH">OVERLIBWIDTH</a>
-  </h2>
+  <h3 id="LINK_OVERLIBWIDTH">OVERLIBWIDTH</h3>
   <div class="definition">OVERLIBWIDTH
 
         <em class="meta">imagewidth</em>
@@ -2045,8 +1944,8 @@
  this, you must also use <a href="#LINK_OVERLIBHEIGHT">OVERLIBHEIGHT,</a> for either to have any effect. </p> 
   </div>
   <div class="changes">
-    <h3>Change History</h3>
-    <dl>
+    <h4>Change History</h4>
+    <dl class="small">
       <dt>0.7</dt>
       <dd>Originally added OVERLIBWIDTH and OVERLIBHEIGHT based on
         code by Niels Baggesen.
@@ -2056,9 +1955,7 @@
 </div>
 
         <div class="referenceentry">
-  <h2>
-    <a name="LINK_OVERLIBHEIGHT">OVERLIBHEIGHT</a>
-  </h2>
+  <h3 id="LINK_OVERLIBHEIGHT">OVERLIBHEIGHT</h3>
   <div class="definition">OVERLIBHEIGHT
 
         <em class="meta">imagewidth</em>
@@ -2072,8 +1969,8 @@
  this, you must also use <a href="#LINK_OVERLIBWIDTH">OVERLIBWIDTH,</a> for either to have any effect. </p> 
   </div>
   <div class="changes">
-    <h3>Change History</h3>
-    <dl>
+    <h4>Change History</h4>
+    <dl class="small">
       <dt>0.7</dt>
       <dd>Originally added OVERLIBWIDTH and OVERLIBHEIGHT based on
         code by Niels Baggesen.
@@ -2083,9 +1980,7 @@
 </div>
 
         <div class="referenceentry">
-  <h2>
-    <a name="LINK_OVERLIBCAPTION">OVERLIBCAPTION</a>
-  </h2>
+  <h3 id="LINK_OVERLIBCAPTION">OVERLIBCAPTION</h3>
   <div class="definition">OVERLIBCAPTION
 
         <em class="meta">caption text</em>
@@ -2097,8 +1992,8 @@
  <a href="advanced.html#tokens">special tokens</a> to show map data. </p> 
   </div>
   <div class="changes">
-    <h3>Change History</h3>
-    <dl>
+    <h4>Change History</h4>
+    <dl class="small">
       <dt>0.9</dt>
       <dd>Originally added OVERLIBCAPTION.
         </dd>
@@ -2107,9 +2002,7 @@
 </div>
 
         <div class="referenceentry">
-  <h2>
-    <a name="LINK_INOVERLIBCAPTION">INOVERLIBCAPTION</a>
-  </h2>
+  <h3 id="LINK_INOVERLIBCAPTION">INOVERLIBCAPTION</h3>
   <div class="definition">INOVERLIBCAPTION
 
         <em class="meta">caption text</em>
@@ -2119,8 +2012,8 @@
  'in' side of a link. </p> 
   </div>
   <div class="changes">
-    <h3>Change History</h3>
-    <dl>
+    <h4>Change History</h4>
+    <dl class="small">
       <dt>0.95</dt>
       <dd>Added multiple URL support
         </dd>
@@ -2132,9 +2025,7 @@
 </div>
 
         <div class="referenceentry">
-  <h2>
-    <a name="LINK_OUTOVERLIBCAPTION">OUTOVERLIBCAPTION</a>
-  </h2>
+  <h3 id="LINK_OUTOVERLIBCAPTION">OUTOVERLIBCAPTION</h3>
   <div class="definition">OUTOVERLIBCAPTION
 
         <em class="meta">caption text</em>
@@ -2144,8 +2035,8 @@
  'out' side of a link. </p> 
   </div>
   <div class="changes">
-    <h3>Change History</h3>
-    <dl>
+    <h4>Change History</h4>
+    <dl class="small">
       <dt>0.95</dt>
       <dd>Added multiple URL support
         </dd>
@@ -2157,9 +2048,7 @@
 </div>
 
         <div class="referenceentry">
-  <h2>
-    <a name="LINK_NOTES">NOTES</a>
-  </h2>
+  <h3 id="LINK_NOTES">NOTES</h3>
   <div class="definition">NOTES
 
         <em class="meta">notes text</em>
@@ -2176,8 +2065,8 @@
  link individually, using <a href="#LINK_INNOTES">INNOTES</a> and <a href="#LINK_OUTNOTES">OUTNOTES.</a> </p> 
   </div>
   <div class="changes">
-    <h3>Change History</h3>
-    <dl>
+    <h4>Change History</h4>
+    <dl class="small">
       <dt>0.95</dt>
       <dd>Added IN/OUT support
         </dd>
@@ -2189,9 +2078,7 @@
 </div>
 
         <div class="referenceentry">
-  <h2>
-    <a name="LINK_INNOTES">INNOTES</a>
-  </h2>
+  <h3 id="LINK_INNOTES">INNOTES</h3>
   <div class="definition">INNOTES
 
         <em class="meta">url</em>
@@ -2204,8 +2091,8 @@
  <p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Same as <a href="#LINK_NOTES">NOTES,</a> but specifies a text box for only the 'in' side of a link. </p> 
   </div>
   <div class="changes">
-    <h3>Change History</h3>
-    <dl>
+    <h4>Change History</h4>
+    <dl class="small">
       <dt>0.95</dt>
       <dd>Added IN/OUT support
         </dd>
@@ -2214,9 +2101,7 @@
 </div>
 
         <div class="referenceentry">
-  <h2>
-    <a name="LINK_OUTNOTES">OUTNOTES</a>
-  </h2>
+  <h3 id="LINK_OUTNOTES">OUTNOTES</h3>
   <div class="definition">OUTNOTES
 
         <em class="meta">url</em>
@@ -2230,8 +2115,8 @@
  link. </p> 
   </div>
   <div class="changes">
-    <h3>Change History</h3>
-    <dl>
+    <h4>Change History</h4>
+    <dl class="small">
       <dt>0.95</dt>
       <dd>Added IN/OUT support
         </dd>
@@ -2240,9 +2125,7 @@
 </div>
 
         <div class="referenceentry">
-  <h2>
-    <a name="LINK_VIA">VIA</a>
-  </h2>
+  <h3 id="LINK_VIA">VIA</h3>
   <div class="definition">VIA
 
         <em class="meta">x-coord</em>
@@ -2270,8 +2153,8 @@
  easier to have curves keep the intended shape as you re-organise a map. </p> 
   </div>
   <div class="changes">
-    <h3>Change History</h3>
-    <dl>
+    <h4>Change History</h4>
+    <dl class="small">
       <dt>0.96</dt>
       <dd>Added angled VIAs.
         </dd>
@@ -2286,9 +2169,7 @@
 </div>
 
         <div class="referenceentry">
-  <h2>
-    <a name="LINK_VIASTYLE">VIASTYLE</a>
-  </h2>
+  <h3 id="LINK_VIASTYLE">VIASTYLE</h3>
   <div class="definition">VIASTYLE curved
     </div>
   <div class="definition">VIASTYLE angled
@@ -2303,8 +2184,8 @@
  <img src="../images/viastyle-angled.png"/>Angled <a href="#LINK_VIA">VIA</a> </p> 
   </div>
   <div class="changes">
-    <h3>Change History</h3>
-    <dl>
+    <h4>Change History</h4>
+    <dl class="small">
       <dt>0.96</dt>
       <dd>Added 'angled' style, and VIASTYLE.
         </dd>
@@ -2313,9 +2194,7 @@
 </div>
 
         <div class="referenceentry">
-  <h2>
-    <a name="LINK_LINKSTYLE">LINKSTYLE</a>
-  </h2>
+  <h3 id="LINK_LINKSTYLE">LINKSTYLE</h3>
   <div class="definition">LINKSTYLE oneway
     </div>
   <div class="definition">LINKSTYLE twoway
@@ -2332,8 +2211,8 @@
  <em>two</em> positions in the <a href="#LINK_BWLABELPOS">BWLABELPOS</a> line, however). </p> 
   </div>
   <div class="changes">
-    <h3>Change History</h3>
-    <dl>
+    <h4>Change History</h4>
+    <dl class="small">
       <dt>0.94</dt>
       <dd>Added LINKSTYLE.
         </dd>
@@ -2342,9 +2221,7 @@
 </div>
 
         <div class="referenceentry">
-  <h2>
-    <a name="LINK_ARROWSTYLE">ARROWSTYLE</a>
-  </h2>
+  <h3 id="LINK_ARROWSTYLE">ARROWSTYLE</h3>
   <div class="definition">ARROWSTYLE
 
         <em class="meta">stylename</em>
@@ -2368,8 +2245,8 @@
  <img src="../images/arrowstyle-compact.png"/> Compact arrow style </p> 
   </div>
   <div class="changes">
-    <h3>Change History</h3>
-    <dl>
+    <h4>Change History</h4>
+    <dl class="small">
       <dt>0.8</dt>
       <dd>Added custom numeric form.
         </dd>
@@ -2381,9 +2258,7 @@
 </div>
 
         <div class="referenceentry">
-  <h2>
-    <a name="LINK_SET">SET</a>
-  </h2>
+  <h3 id="LINK_SET">SET</h3>
   <div class="definition">SET
 
         <em class="meta">hintname</em>
@@ -2402,8 +2277,8 @@
  <a href="advanced.html">Advanced Topics</a> section. </p> 
   </div>
   <div class="changes">
-    <h3>Change History</h3>
-    <dl>
+    <h4>Change History</h4>
+    <dl class="small">
       <dt>0.9</dt>
       <dd>Originally added SET.
         </dd>
@@ -2412,9 +2287,7 @@
 </div>
 
         <div class="referenceentry">
-  <h2>
-    <a name="LINK_ZORDER">ZORDER</a>
-  </h2>
+  <h3 id="LINK_ZORDER">ZORDER</h3>
   <div class="definition">ZORDER
 
         <em class="meta">z-coord</em>
@@ -2432,8 +2305,8 @@
  </p> 
   </div>
   <div class="changes">
-    <h3>Change History</h3>
-    <dl>
+    <h4>Change History</h4>
+    <dl class="small">
       <dt>0.96</dt>
       <dd>Added Z-ordering support.
         </dd>
@@ -2442,11 +2315,9 @@
 </div>
     
 
-    <h1 id="s_scope_GLOBAL" class="configsection">Global Configuration Directives</h1>
+    <h2 id="s_scope_GLOBAL" class="configsection">Global Configuration Directives</h2>
         <div class="referenceentry">
-  <h2>
-    <a name="GLOBAL_BACKGROUND">BACKGROUND</a>
-  </h2>
+  <h3 id="GLOBAL_BACKGROUND">BACKGROUND</h3>
   <div class="definition">BACKGROUND <em class="meta">imagefile</em></div>
   <div class="description">
  <p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Specify an PNG, JPEG or GIF image file to be used as a background image. </p> 
@@ -2454,8 +2325,8 @@
  - the map will take the size of the background. </p> 
   </div>
   <div class="changes">
-    <h3>Change History</h3>
-    <dl>
+    <h4>Change History</h4>
+    <dl class="small">
       <dt>0.9</dt>
       <dd>Added JPEG and GIF support for backgrounds.
         </dd>
@@ -2464,9 +2335,7 @@
 </div>
 
         <div class="referenceentry">
-  <h2>
-    <a name="GLOBAL_WIDTH">WIDTH</a>
-  </h2>
+  <h3 id="GLOBAL_WIDTH">WIDTH</h3>
   <div class="definition">WIDTH
 
         <em class="meta">map-width</em>
@@ -2480,9 +2349,7 @@
 </div>
 
         <div class="referenceentry">
-  <h2>
-    <a name="GLOBAL_HEIGHT">HEIGHT</a>
-  </h2>
+  <h3 id="GLOBAL_HEIGHT">HEIGHT</h3>
   <div class="definition">HEIGHT
 
         <em class="meta">map-height</em>
@@ -2496,9 +2363,7 @@
 </div>
 
         <div class="referenceentry">
-  <h2>
-    <a name="GLOBAL_HTMLOUTPUTFILE">HTMLOUTPUTFILE</a>
-  </h2>
+  <h3 id="GLOBAL_HTMLOUTPUTFILE">HTMLOUTPUTFILE</h3>
   <div class="definition">HTMLOUTPUTFILE
 
         <em class="meta">htmlfile</em>
@@ -2510,8 +2375,8 @@
  this directive is ignored. </p> 
   </div>
   <div class="changes">
-    <h3>Change History</h3>
-    <dl>
+    <h4>Change History</h4>
+    <dl class="small">
       <dt>0.7</dt>
       <dd>Added HTMLOUTPUTFILE.
         </dd>
@@ -2520,9 +2385,7 @@
 </div>
 
         <div class="referenceentry">
-  <h2>
-    <a name="GLOBAL_HTMLSTYLESHEET">HTMLSTYLESHEET</a>
-  </h2>
+  <h3 id="GLOBAL_HTMLSTYLESHEET">HTMLSTYLESHEET</h3>
   <div class="definition">HTMLSTYLESHEET
 
         <em class="meta">URL</em>
@@ -2542,9 +2405,7 @@
 </div>
 
         <div class="referenceentry">
-  <h2>
-    <a name="GLOBAL_IMAGEOUTPUTFILE">IMAGEOUTPUTFILE</a>
-  </h2>
+  <h3 id="GLOBAL_IMAGEOUTPUTFILE">IMAGEOUTPUTFILE</h3>
   <div class="definition">IMAGEOUTPUTFILE
 
         <em class="meta">imagefile</em>
@@ -2559,8 +2420,8 @@
  Cacti Settings page. </p> 
   </div>
   <div class="changes">
-    <h3>Change History</h3>
-    <dl>
+    <h4>Change History</h4>
+    <dl class="small">
       <dt>0.9</dt>
       <dd>Added JPEG and GIF support.
         </dd>
@@ -2572,9 +2433,7 @@
 </div>
 
         <div class="referenceentry">
-  <h2>
-    <a name="GLOBAL_IMAGEURI">IMAGEURI</a>
-  </h2>
+  <h3 id="GLOBAL_IMAGEURI">IMAGEURI</h3>
   <div class="definition">IMAGEURI 
         <em class="meta">image-uri</em>
     </div>
@@ -2589,8 +2448,8 @@
  ignored, as the filename and uri are calculated instead. </p> 
   </div>
   <div class="changes">
-    <h3>Change History</h3>
-    <dl>
+    <h4>Change History</h4>
+    <dl class="small">
       <dt>0.96</dt>
       <dd>Added IMAGEURI.
         </dd>
@@ -2599,9 +2458,7 @@
 </div>
 
         <div class="referenceentry">
-  <h2>
-    <a name="GLOBAL_FONTDEFINE">FONTDEFINE</a>
-  </h2>
+  <h3 id="GLOBAL_FONTDEFINE">FONTDEFINE</h3>
   <div class="definition">FONTDEFINE
 
         <em class="meta">fontnumber</em>
@@ -2646,17 +2503,17 @@
  </p> 
   </div>
   <div class="examples">
-    <h3>Examples</h3>
-    <div class="example">
-      <h5>Defining a new Truetype font, with the font file in the
-        weathermap directory</h5>
+    <h4>Examples</h4>
+    <blockquote class="example">
+      <cite>Defining a new Truetype font, with the font file in the
+        weathermap directory</cite>
       <pre>FONTDEFINE 10 VeraBd 16
             </pre>
-    </div>
+    </blockquote>
   </div>
   <div class="changes">
-    <h3>Change History</h3>
-    <dl>
+    <h4>Change History</h4>
+    <dl class="small">
       <dt>0.8</dt>
       <dd>First added FONTDEFINE
         </dd>
@@ -2665,9 +2522,7 @@
 </div>
 
         <div class="referenceentry">
-  <h2>
-    <a name="GLOBAL_FONT">*FONT</a>
-  </h2>
+  <h3 id="GLOBAL_FONT">*FONT</h3>
   <div class="definition">TITLEFONT
 
         <em class="meta">fontnumber</em>
@@ -2689,8 +2544,8 @@
  <img src="../images/font-sizes.png"/>The built-in GD fonts. </p> 
   </div>
   <div class="changes">
-    <h3>Change History</h3>
-    <dl>
+    <h4>Change History</h4>
+    <dl class="small">
       <dt>0.8</dt>
       <dd>Originally added TITLEFONT.
         </dd>
@@ -2705,9 +2560,7 @@
 </div>
 
         <div class="referenceentry">
-  <h2>
-    <a name="GLOBAL_COLORS">*COLOR</a>
-  </h2>
+  <h3 id="GLOBAL_COLORS">*COLOR</h3>
   <div class="definition">BGCOLOR <em class="meta">red</em> <em class="meta">green</em> <em class="meta">blue</em></div>
   <div class="definition">TIMECOLOR
 
@@ -2754,8 +2607,8 @@
  <p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">red, green and blue are numbers from 0 to 255. </p> 
   </div>
   <div class="changes">
-    <h3>Change History</h3>
-    <dl>
+    <h4>Change History</h4>
+    <dl class="small">
       <dt>0.8</dt>
       <dd>Added TIMECOLOR, TITLECOLOR, KEYTEXTCOLOR,
         KEYOUTLINECOLOR and KEYBGCOLOR.
@@ -2768,9 +2621,7 @@
 </div>
 
         <div class="referenceentry">
-  <h2>
-    <a name="GLOBAL_TIMEPOS">TIMEPOS</a>
-  </h2>
+  <h3 id="GLOBAL_TIMEPOS">TIMEPOS</h3>
   <div class="definition">TIMEPOS
 
         <em class="meta">x-pos</em>
@@ -2800,8 +2651,8 @@
  colour that it is drawn in, using <a href="#GLOBAL_COLORS">TIMECOLOR.</a> </p> 
   </div>
   <div class="changes">
-    <h3>Change History</h3>
-    <dl>
+    <h4>Change History</h4>
+    <dl class="small">
       <dt>0.6</dt>
       <dd>Added ability to change text.
         </dd>
@@ -2813,9 +2664,7 @@
 </div>
 
         <div class="referenceentry">
-  <h2>
-    <a name="GLOBAL_MINTIMEPOS">MINTIMEPOS</a>
-  </h2>
+  <h3 id="GLOBAL_MINTIMEPOS">MINTIMEPOS</h3>
   <div class="definition">MINTIMEPOS
 
         <em class="meta">x-pos</em>
@@ -2850,8 +2699,8 @@
  colour that it is drawn in, using <a href="#GLOBAL_COLORS">TIMECOLOR.</a> </p> 
   </div>
   <div class="changes">
-    <h3>Change History</h3>
-    <dl>
+    <h4>Change History</h4>
+    <dl class="small">
       <dt>0.96</dt>
       <dd>Originally added MINTIMEPOS
         </dd>
@@ -2860,9 +2709,7 @@
 </div>
 
         <div class="referenceentry">
-  <h2>
-    <a name="GLOBAL_MAXTIMEPOS">MAXTIMEPOS</a>
-  </h2>
+  <h3 id="GLOBAL_MAXTIMEPOS">MAXTIMEPOS</h3>
   <div class="definition">MAXTIMEPOS
 
         <em class="meta">x-pos</em>
@@ -2897,8 +2744,8 @@
  colour that it is drawn in, using <a href="#GLOBAL_COLORS">TIMECOLOR.</a> </p> 
   </div>
   <div class="changes">
-    <h3>Change History</h3>
-    <dl>
+    <h4>Change History</h4>
+    <dl class="small">
       <dt>0.96</dt>
       <dd>Originally added MAXTIMEPOS
         </dd>
@@ -2907,9 +2754,7 @@
 </div>
 
         <div class="referenceentry">
-  <h2>
-    <a name="GLOBAL_TITLE">TITLE</a>
-  </h2>
+  <h3 id="GLOBAL_TITLE">TITLE</h3>
   <div class="definition">TITLE
 
         <em class="meta">titlestring</em>
@@ -2923,9 +2768,7 @@
 </div>
 
         <div class="referenceentry">
-  <h2>
-    <a name="GLOBAL_TITLEPOS">TITLEPOS</a>
-  </h2>
+  <h3 id="GLOBAL_TITLEPOS">TITLEPOS</h3>
   <div class="definition">TITLEPOS
 
         <em class="meta">x-pos</em>
@@ -2949,8 +2792,8 @@
  colour that it is drawn in, using <a href="#GLOBAL_COLORS">TITLECOLOR.</a> </p> 
   </div>
   <div class="changes">
-    <h3>Change History</h3>
-    <dl>
+    <h4>Change History</h4>
+    <dl class="small">
       <dt>0.8</dt>
       <dd>Originally added TITLEPOS.
         </dd>
@@ -2959,9 +2802,7 @@
 </div>
 
         <div class="referenceentry">
-  <h2>
-    <a name="GLOBAL_KILO">KILO</a>
-  </h2>
+  <h3 id="GLOBAL_KILO">KILO</h3>
   <div class="definition">KILO
 
         <em class="meta">number</em>
@@ -2973,8 +2814,8 @@
  1000. </p> 
   </div>
   <div class="changes">
-    <h3>Change History</h3>
-    <dl>
+    <h4>Change History</h4>
+    <dl class="small">
       <dt>0.4</dt>
       <dd>Originally added KILO.
         </dd>
@@ -2983,9 +2824,7 @@
 </div>
 
         <div class="referenceentry">
-  <h2>
-    <a name="GLOBAL_HTMLSTYLE">HTMLSTYLE</a>
-  </h2>
+  <h3 id="GLOBAL_HTMLSTYLE">HTMLSTYLE</h3>
   <div class="definition">HTMLSTYLE
 
         <em class="meta">formatname</em>
@@ -3001,9 +2840,7 @@
 </div>
 
         <div class="referenceentry">
-  <h2>
-    <a name="GLOBAL_SCALE">SCALE</a>
-  </h2>
+  <h3 id="GLOBAL_SCALE">SCALE</h3>
   <div class="definition">SCALE
 
         <em class="meta">min</em>
@@ -3191,24 +3028,24 @@
  <a href="#NODE_USEICONSCALE">USEICONSCALE.</a> </p> 
   </div>
   <div class="examples">
-    <h3>Examples</h3>
-    <div class="example">
-      <h5>Setting up a (very simple) colour scale. Colours run smoothly
-        from green to red.</h5>
+    <h4>Examples</h4>
+    <blockquote class="example">
+      <cite>Setting up a (very simple) colour scale. Colours run smoothly
+        from green to red.</cite>
       <pre>SCALE 0 100 0 255 0 255 0 0
             </pre>
-    </div>
-    <div class="example">
-      <h5>The default scale set</h5>
+    </blockquote>
+    <blockquote class="example">
+      <cite>The default scale set</cite>
       <pre>SCALE 1 10 140 0 255 SCALE 10 25 32 32 255 SCALE 25 40 0 192 255
             SCALE 40 55 0 240 0 SCALE 55 70 240 240 0 SCALE 70 85 255 192 0 SCALE 85 100
             255 0 0
             </pre>
-    </div>
+    </blockquote>
   </div>
   <div class="changes">
-    <h3>Change History</h3>
-    <dl>
+    <h4>Change History</h4>
+    <dl class="small">
       <dt>0.97</dt>
       <dd>Added absolute scale support.
         </dd>
@@ -3238,9 +3075,7 @@
 </div>
 
         <div class="referenceentry">
-  <h2>
-    <a name="GLOBAL_KEYPOS">KEYPOS</a>
-  </h2>
+  <h3 id="GLOBAL_KEYPOS">KEYPOS</h3>
   <div class="definition">KEYPOS
 
         <em class="meta">x-pos</em>
@@ -3288,8 +3123,8 @@
  that it is drawn in, using <a href="#GLOBAL_COLORS">KEYTEXTCOLOR,</a> <a href="#GLOBAL_COLORS">KEYBGCOLOR</a> and <a href="#GLOBAL_COLORS">KEYOUTLINECOLOR.</a> </p> 
   </div>
   <div class="changes">
-    <h3>Change History</h3>
-    <dl>
+    <h4>Change History</h4>
+    <dl class="small">
       <dt>0.9</dt>
       <dd>Added support for multiple SCALEs.
         </dd>
@@ -3301,9 +3136,7 @@
 </div>
 
         <div class="referenceentry">
-  <h2>
-    <a name="GLOBAL_KEYSTYLE">KEYSTYLE</a>
-  </h2>
+  <h3 id="GLOBAL_KEYSTYLE">KEYSTYLE</h3>
   <div class="definition">KEYSTYLE
 
         <em class="meta">stylename</em>
@@ -3361,17 +3194,17 @@
  setting key_hidezero_<em>scalename</em> to 1 </p> 
   </div>
   <div class="examples">
-    <h3>Examples</h3>
-    <div class="example">
-      <h5>Hiding percentage signs, and the 'absolute zero' SCALE entry
-        in a key.</h5>
+    <h4>Examples</h4>
+    <blockquote class="example">
+      <cite>Hiding percentage signs, and the 'absolute zero' SCALE entry
+        in a key.</cite>
       <pre>SET key_hidezero_DEFAULT 1 SET key_hidepercent_DEFAULT 1
             </pre>
-    </div>
+    </blockquote>
   </div>
   <div class="changes">
-    <h3>Change History</h3>
-    <dl>
+    <h4>Change History</h4>
+    <dl class="small">
       <dt>0.96</dt>
       <dd>Added tags and inverted styles.
         </dd>
@@ -3387,9 +3220,7 @@
 </div>
 
         <div class="referenceentry">
-  <h2>
-    <a name="GLOBAL_SET">SET</a>
-  </h2>
+  <h3 id="GLOBAL_SET">SET</h3>
   <div class="definition">SET
 
         <em class="meta">hintname</em>
@@ -3408,23 +3239,23 @@
  <a href="advanced.html">Advanced Topics</a> section. </p> 
   </div>
   <div class="examples">
-    <h3>Examples</h3>
-    <div class="example">
-      <h5>Enabling 'bulging link mode' in the link-rendering
-        code.</h5>
+    <h4>Examples</h4>
+    <blockquote class="example">
+      <cite>Enabling 'bulging link mode' in the link-rendering
+        code.</cite>
       <pre>SET link_bulge 1
             </pre>
-    </div>
-    <div class="example">
-      <h5>Enabling 'screenshot mode' to anonymise a map in 0.95 or
-        newer.</h5>
+    </blockquote>
+    <blockquote class="example">
+      <cite>Enabling 'screenshot mode' to anonymise a map in 0.95 or
+        newer.</cite>
       <pre>SET screenshot_mode 1
             </pre>
-    </div>
+    </blockquote>
   </div>
   <div class="changes">
-    <h3>Change History</h3>
-    <dl>
+    <h4>Change History</h4>
+    <dl class="small">
       <dt>0.9</dt>
       <dd>Originally added SET.
         </dd>
@@ -3433,9 +3264,7 @@
 </div>
 
         <div class="referenceentry">
-  <h2>
-    <a name="GLOBAL_INCLUDE">INCLUDE</a>
-  </h2>
+  <h3 id="GLOBAL_INCLUDE">INCLUDE</h3>
   <div class="definition">INCLUDE
 
         <em class="meta">filename</em>
@@ -3467,8 +3296,8 @@
  </p> 
   </div>
   <div class="changes">
-    <h3>Change History</h3>
-    <dl>
+    <h4>Change History</h4>
+    <dl class="small">
       <dt>0.96b</dt>
       <dd>Originally added INCLUDE.
         </dd>

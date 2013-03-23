@@ -1,9 +1,0 @@
-#!/usr/bin/perl
-
-$some_dir = ".";
-
-opendir(DIR, $some_dir) || die "can't opendir $some_dir: $!";
-                   @bits = grep { /^(node|global|link)_/ && /\.xml$/ && -f "$some_dir/$_" } readdir(DIR);
-		                      closedir DIR;
-
-				      print join(" ",@bits);

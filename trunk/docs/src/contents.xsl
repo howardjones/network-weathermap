@@ -22,7 +22,7 @@
     </xsl:template>
 
     <xsl:template match = "configentry">
-        <a class="" href = "#{./anchor}">
+        <a class="tocentry" href = "#{./anchor}">
 
         <xsl:value-of select = "./keyword" /></a>
     </xsl:template>

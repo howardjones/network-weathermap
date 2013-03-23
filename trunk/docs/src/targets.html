@@ -3,7 +3,7 @@
         $PAGE_TITLE="Specifying TARGET lines";
         include "common-page-head.html";
 ?>
-            <h2><a name = "targets">Specifying TARGET lines</a></h2>
+            <h2 id="targets">Specifying TARGET lines</h2>
 
             <p>The actual data-reading part of Weathermap is handled by Data Source
             Plugins since version 0.9. These allow users or third-parties to easily add
@@ -17,7 +17,7 @@
             <a href = "advanced.html#tokens">Special Tokens</a> in strings. For
             situations where there is only really one output, the 'out' value may just
             be the same as the 'in'.</p>
-
+						
             <p>Here are the details of the standard data source plugins:</p>
 
             <ul>
@@ -46,8 +46,9 @@
                 <li><a href = "#time">Time</a></li>
             </ul>
 
-            <hr />
-
+			<hr />
+			
+			
             <h3><a name = "static"></a>Static value</h3>
 
             <div class = "definition">TARGET static:<em>invalue</em>:<em>outvalue</em>
@@ -268,9 +269,9 @@
             <div class = "example">
                 <h5>A suitable tab-delimited data file</h5>
 
-                <pre>link1    3M    4M
-                                link2    66K   1.8M
-                                link3    34.6K 113</pre>
+<pre>link1    3M    4M
+link2    66K   1.8M
+link3    34.6K 113</pre>
             </div>
 
             <hr />
@@ -324,7 +325,7 @@
             for example
             - possible values are 'up','down','disabled', and 'recovering'.</p>
 
-            <table>
+            <table class="bordered striped small">
                 <thead>
                     <tr><th>Code</th><th><tt>state</tt> value</th>
                     </tr>
@@ -361,11 +362,11 @@
             based on the state of a host would be:</p>
 
             <div class = "example">
-                <pre>SCALE cactiupdown 0 0.5  192 192 192
-                                SCALE cactiupdown 0.5 1.5 255 0 0
-                                SCALE cactiupdown 1.5 2.5 0 0 255
-                                SCALE cactiupdown 2.5 3.5 0 255 0
-                                SCALE cactiupdown 4.5 5.5 128 128 128 </pre>
+<pre>SCALE cactiupdown 0 0.5  192 192 192
+SCALE cactiupdown 0.5 1.5 255 0 0
+SCALE cactiupdown 1.5 2.5 0 0 255
+SCALE cactiupdown 2.5 3.5 0 255 0
+SCALE cactiupdown 4.5 5.5 128 128 128 </pre>
             </div>
             
             <hr />
@@ -409,14 +410,13 @@
             in the names. Then:</p>
 
             <div class = "example">
-                <pre>
-                                      NODE myserver
-                                      LABEL Server 1
-                                      POSITION 100 100
-                                      TARGET cactimonitor:77
-                                      ICON images/server_{node:this:state}.png
-                                      LABELOFFSET S
-                                      USESCALE none
+                <pre>NODE myserver
+LABEL Server 1
+POSITION 100 100
+TARGET cactimonitor:77
+ICON images/server_{node:this:state}.png
+LABELOFFSET S
+USESCALE none
 </pre>
             </div>
             <p>
@@ -432,12 +432,12 @@
             thresholds on each firewall as normal, and then:</p>
 
             <div class = "example">
-                <pre>
-                                      SCALE badness 0 100  0 255 0   255 0 0
-                                      NODE firewall_status
-                                            TARGET cactithold:334:22 cactithold:34:255 cactithold:337:235 cactithold:33:254
-                                            MAXVALUE 4
-                                            USESCALE badness in
+                <pre>SCALE badness 0 100  0 255 0   255 0 0
+				
+NODE firewall_status
+	TARGET cactithold:334:22 cactithold:34:255 cactithold:337:235 cactithold:33:254
+	MAXVALUE 4
+	USESCALE badness in
 </pre>
             </div>
             <p>
@@ -499,9 +499,7 @@
             per second:</p>
 
             <div class = "example">
-                <pre>
-                                    TARGET 8*dsstats:4455:traffic_in:traffic_out
-</pre>
+                <pre>TARGET 8*dsstats:4455:traffic_in:traffic_out</pre>
             </div>
 
             <p><strong>Performance Note:</strong>As with the rrdtool poller_output support,

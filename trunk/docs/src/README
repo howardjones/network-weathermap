@@ -17,3 +17,9 @@ So:
 Sorry about that! :-)
 
 HJ March 2013
+
+
+--
+
+check-docs.pl -> Verify that all the config reference sections are actually included
+relink-reference.pl -> Look for mentions of the config keywords, and linkify them

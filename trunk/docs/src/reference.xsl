@@ -15,14 +15,14 @@
     </xsl:template>
 
     <xsl:template match = "section">
-        <h1 id = "s_scope_{@scope}" class = "configsection">
-        <xsl:value-of select = "@name" /></h1>
+        <h2 id = "s_scope_{@scope}" class = "configsection">
+        <xsl:value-of select = "@name" /></h2>
 
         <xsl:apply-templates />
     </xsl:template>
 
     <xsl:template match = "textsection">
-        <h1 class = "configsection"><xsl:value-of select = "@name" /></h1>
+        <h2 class = "configsection"><xsl:value-of select = "@name" /></h2>
 
         <xsl:apply-templates />
     </xsl:template>
@@ -36,9 +36,9 @@
 
     <xsl:template match = "configentry">
         <div class = "referenceentry">
-            <h2><a name = "{./anchor}">
+            <h3 id="{./anchor}">
 
-            <xsl:value-of select = "./keyword" /></a></h2>
+            <xsl:value-of select = "./keyword" /></h3>
 
             <xsl:apply-templates select = "definition" />
 
@@ -55,28 +55,27 @@
 
     <xsl:template match = "examples">
         <div class = "examples">
-            <h3>Examples</h3>
+            <h4>Examples</h4>
 
             <xsl:for-each select = "./example">
-                <div class = "example">
-                    <h5><xsl:value-of select = "./caption" /></h5>
+                <blockquote class = "example">
+                    <cite><xsl:value-of select = "./caption" /></cite>
 
                     <pre>
-                                                    <xsl:value-of select="./content"/>
-            </pre>
-                </div>
+<xsl:value-of select="./content"/>
+					</pre>
+                </blockquote>
             </xsl:for-each>
         </div>
     </xsl:template>
 
     <xsl:template match = "changes">
         <div class = "changes">
-            <h3>Change History</h3>
+            <h4>Change History</h4>
 
-            <dl>
+            <dl class="small">
                 <xsl:for-each select = "./change">
                     <dt><xsl:value-of select = "@version" /></dt>
-
                     <dd><xsl:value-of select = "." /></dd>
                 </xsl:for-each>
             </dl>

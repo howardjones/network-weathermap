@@ -20,10 +20,12 @@
         <em>must be a TrueType font</em> for angles other than 0 (the default) as these
         are the only font type to support rotating text.</p>
 
-        <p>
+
+	<figure>
         <img src="../images/labelangle+labeloffset.png"/>
 
-        <br/>Rotated label, using <tt>LABELANGLE 90</tt> and <tt>LABELOFFSET E</tt></p>
+        <figcaption>Rotated label, using <tt>LABELANGLE 90</tt> and <tt>LABELOFFSET E</tt></figcaption>
+	</figure>
     </description>
 
     <changes>

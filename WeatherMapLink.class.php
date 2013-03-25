@@ -321,6 +321,7 @@ class WeatherMapLink extends WeatherMapItem
 			return;
 		}
 
+		
 		$outlinecol = new Colour($this->outlinecolour);
 		$commentcol = new Colour($this->commentfontcolour);
 		
@@ -378,20 +379,8 @@ class WeatherMapLink extends WeatherMapItem
 			$link_out_width = (($link_out_width * $this->outpercent * 1.5 + 0.1) / 100) + 1;
 		}
 
-
-		if($this->viastyle=='curved')
-		{
-			// Calculate the spine points - the actual curve	
-			$this->curvepoints = calc_curve($xpoints, $ypoints);
-										
-			// then draw the curve itself
-			draw_curve($im, $this->curvepoints,
-				array($link_in_width,$link_out_width), $outline_colour, array($gd_in_colour, $gd_out_colour),
-				$this->name, $map, $this->splitpos, ($this->linkstyle=='oneway'?TRUE:FALSE) );
-		}
-		
-		if($this->viastyle=='angled')
-		{
+		// If there are no vias, treat this as a 2-point angled link, not curved
+		if( sizeof($this->vialist)==0 || $this->viastyle=='angled') {
 			// Calculate the spine points - the actual not a curve really, but we
 			// need to create the array, and calculate the distance bits, otherwise
 			// things like bwlabels won't know where to go.
@@ -403,7 +392,18 @@ class WeatherMapLink extends WeatherMapItem
 				array($link_in_width,$link_out_width), $outline_colour, array($gd_in_colour, $gd_out_colour),
 				$this->name, $map, $this->splitpos, ($this->linkstyle=='oneway'?TRUE:FALSE) );
 		}
+		elseif($this->viastyle=='curved')
+		{
+			// Calculate the spine points - the actual curve	
+			$this->curvepoints = calc_curve($xpoints, $ypoints);
+										
+			// then draw the curve itself
+			draw_curve($im, $this->curvepoints,
+				array($link_in_width,$link_out_width), $outline_colour, array($gd_in_colour, $gd_out_colour),
+				$this->name, $map, $this->splitpos, ($this->linkstyle=='oneway'?TRUE:FALSE) );
+		}
 
+		
 		if ( !$commentcol->is_none() )
 		{			
 			if($commentcol->is_contrast())

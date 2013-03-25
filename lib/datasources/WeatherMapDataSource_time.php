@@ -39,7 +39,7 @@ class WeatherMapDataSource_time extends WeatherMapDataSource {
 			foreach ($timezone_identifiers as $tz)
 			{
 				if(strtolower($tz) == $timezone_l)
-				{
+				{				
 					wm_debug ("Time ReadData: Timezone exists: $tz\n");
 					$dateTime = new DateTime("now", new DateTimeZone($tz));
 					

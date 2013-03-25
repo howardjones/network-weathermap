@@ -1,9 +1,0 @@
-This is a fresh import of the 0.92 release code, plus the supporting files
-- the Makefiles and source for the manual (it's done with XML and XSLT)
-- the Makefile for the release itself
-- the various little bits and pieces
-
-Depending on what is happening, there is a good chance that this version
-won't run completely. That's what you get for downloading from SVN instead
-of waiting for a release.
-

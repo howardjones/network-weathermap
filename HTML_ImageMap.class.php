@@ -26,16 +26,16 @@ class HTML_ImageMap_Area
 		if($this->name != "")
 		{
 			// $h .= " alt=\"".$this->name."\" ";
-			$h .= " id=\"".$this->name."\" ";
+			$h .= "id=\"".$this->name."\" ";
 		}
 		if($this->href != "")
 		{
-			$h .= " href=\"".$this->href."\" ";
+			$h .= "href=\"".$this->href."\" ";
 		}
-		else { $h .= " nohref "; }
+		else { $h .= "nohref "; }
 		if($this->extrahtml != "")
 		{
-			$h .= " ".$this->extrahtml." ";
+			$h .= $this->extrahtml." ";
 		}
 		return $h;
 	}
@@ -57,7 +57,7 @@ class HTML_ImageMap_Area_Polygon extends HTML_ImageMap_Area
 		}
 		$coordstring = join(",",$flatpoints);
 
-		return '<area'.$this->common_html().' shape="poly" coords="'.$coordstring.'" />';
+		return '<area '.$this->common_html().'shape="poly" coords="'.$coordstring.'" />';
 	}
 
 	function asJSON()
@@ -191,7 +191,7 @@ class HTML_ImageMap_Area_Rectangle extends HTML_ImageMap_Area
 	function asHTML()
 	{
 		$coordstring = join(",",array($this->x1,$this->y1,$this->x2,$this->y2));
-		return '<area'.$this->common_html().' shape="rect" coords="'.$coordstring.'" />';
+		return '<area '.$this->common_html().'shape="rect" coords="'.$coordstring.'" />';
 
 	}
 
@@ -213,7 +213,7 @@ class HTML_ImageMap_Area_Circle extends HTML_ImageMap_Area
 	function asHTML()
 	{
 		$coordstring = join(",",array($this->centx,$this->centy,$this->edgex,$this->edgey) );
-		return '<area'.$this->common_html().' shape="circle" coords="'.$coordstring.'" />';
+		return '<area '.$this->common_html().'shape="circle" coords="'.$coordstring.'" />';
 	}
 
 	function hitTest($x,$y)

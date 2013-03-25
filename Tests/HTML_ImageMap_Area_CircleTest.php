@@ -35,23 +35,30 @@ class HTML_ImageMap_Area_CircleTest extends PHPUnit_Framework_TestCase {
         // Remove the following lines when you implement this test.
 
         $output = $this->object->asHTML();
-        $this->assertEquals($output,'<area id="testname"  href="testhref"    shape="circle" coords="100,100,150,100" />');
+        $this->assertEquals('<area id="testname" href="testhref" shape="circle" coords="100,100,150,100" />', $output);
     }
 
     /**
      * @todo Implement testHitTest().
      */
     public function testHitTest() {
-        $this->assertTrue( $this->object->hitTest(100,100) );
-        $this->assertTrue( $this->object->hitTest(51,100) );
-        $this->assertTrue( $this->object->hitTest(149,100) );
-        $this->assertTrue( $this->object->hitTest(100,149) );
-        $this->assertTrue( $this->object->hitTest(100,51) );
 
-        $this->assertFalse( $this->object->hitTest(49,49) );
-        $this->assertFalse( $this->object->hitTest(49,100) );
-        $this->assertFalse( $this->object->hitTest(100,151) );
-        $this->assertFalse( $this->object->hitTest(149,149) );
+	$points = array(
+		array(100,100,True),
+		array(51,100,True),
+		array(149,100,True),
+		array(100,149,True),
+		array(100,51,True),
+		array(49,49,False),
+		array(49,100,False),
+		array(100,151,False),
+		array(149,149,False)
+	);
+
+	foreach ($points as $point) {
+		$desc = sprintf("Hit %d,%d", $point[0], $point[1]);
+		$this->assertEquals($point[2],  $this->object->hitTest($point[0], $point[1]), $desc);
+	}
 
     }
 }

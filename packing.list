@@ -12,7 +12,7 @@
 ./configs/.htaccess
 ./configs/index.php
 ./configs/simple.conf
-./convert-to-dsstats.php
+./random-bits/convert-to-dsstats.php
 ./docs/example/Gradient_BK_800.png
 ./docs/example/Vera.ttf
 ./docs/example/VeraBI.ttf
@@ -66,6 +66,7 @@
 ./docs/images/viastyle-curved.png
 ./docs/images/weathermap-example.png
 ./docs/images/weathermap-mini.png
+./docs/kube101/css/kube.min.css
 ./docs/index.html
 ./docs/pages/advanced.html
 ./docs/pages/cacti-plugin.html
@@ -82,8 +83,11 @@
 ./docs/pages/main.html
 ./docs/pages/targets.html
 ./docs/pages/upgrading.html
-./docs/pages/weathermap.css
-./docs/pages/manual.css
+./docs/manual.css
+./docs/fonts/PTS55F.ttf
+./docs/fonts/PTS56F.ttf
+./docs/fonts/PTS75F.ttf
+./docs/fonts/PTS76F.ttf
 ./editor-resources/jquery-latest.min.js
 ./editor.css
 ./editor.inc.php

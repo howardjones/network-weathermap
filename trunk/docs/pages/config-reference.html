@@ -34,9 +34,7 @@
 </div>
 
 
-<h2>
-  <a name="configref">Configuration Reference</a>
-</h2><p>This page is automatically compiled, and documents all the
+<h2 id="configref">Configuration Reference</h2><p>This page is automatically compiled, and documents all the
                     configuration directives that are available in PHP Weathermap
                     v0.97b.  </p>
     <h2 class="configsection">Introduction</h2>
@@ -2526,10 +2524,12 @@
  where it will search for truetype fonts. The two easiest options are: 
 
  <ul><li>Use the full absolute path to your .ttf file</li> 
-
  <li>Keep your .ttf files in the Weathermap directory, and use the first part 
  of the filename only, with no '.ttf' on the end.</li> 
  </ul> 
+
+ <p><em>If you have a font in the Weathermap directory as above and it's not loading, also 
+ try: ./FontName.ttf</em> </p> 
 
  The full set of rules is 
  <a href="http://www.boutell.com/gd/manual2.0.33.html#gdImageStringFT">available 
@@ -3286,6 +3286,11 @@
       <cite>Enabling 'screenshot mode' to anonymise a map in 0.95 or
         newer.</cite>
       <pre>SET screenshot_mode 1
+            </pre>
+    </blockquote>
+    <blockquote class="example">
+      <cite>Disabling 'WMWARN50' messages from appearing</cite>
+      <pre>SET nowarn_WMWARN50 1
             </pre>
     </blockquote>
   </div>

@@ -43,10 +43,12 @@
         where it will search for truetype fonts. The two easiest options are:
 
         <ul><li>Use the full absolute path to your .ttf file</li>
-
             <li>Keep your .ttf files in the Weathermap directory, and use the first part
-            of the filename only, with no '.ttf' on the end.</li>
+            of the filename only, with no '.ttf' on the end.</li>						
         </ul>
+		
+		<p><em>If you have a font in the Weathermap directory as above and it's not loading, also
+		try: ./FontName.ttf</em></p>
 
         The full set of rules is
         <a href="http://www.boutell.com/gd/manual2.0.33.html#gdImageStringFT">available

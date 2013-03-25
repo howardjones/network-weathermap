@@ -4,13 +4,23 @@
         include "common-page-head.html";
 ?>
 
-            <h2><a name = "editor" id = "editor">Advanced Topics</a></h2>
+            <h2 id = "advtopics" id = "advtopics">Advanced Topics</h2>
 
             <p>This page contains information for the more advanced corners of
             Weathermap usage. I assume that you are more familiar with the basics of map
             design here - there is less explanation of the simple stuff.</p>
 
-            <h2><a name = "tokens">Special String Processing Tokens</a></h2>
+			<ul>
+			<li><a href="#tokens">Special String Processing Tokens</a></li>
+			<li><a href="#formatting">Formatting in Special Tokens</a>			</li>
+			<li><a href="#tweaks">SETting Hint Variables to tweak maps</a>			</li>
+			<li><a href="#plugins">Writing Plugins</a></li>
+			<li><a href="#dataplugins">Datasource Plugins</a></li>
+			<li><a href="#prepostplugins">Pre- &amp; Post-Processing Plugins</a></li>
+			
+			</ul>
+			
+            <h3 id= "tokens">Special String Processing Tokens</h3>
 
             <p>Most places where you can specify a string in Weathermap config files,
             you can now include data from within the Weathermap data model. Useful
@@ -243,7 +253,7 @@
             anything in your weathermap.
             </p>
 
-            <h3><a name = "formatting">Formatting in Special Tokens</a></h3>
+            <h3 id = "formatting">Formatting in Special Tokens</h3>
 
             <p>To allow you to control better how the values of special tokens are used,
             you can add a final part inside the token that specifies the format.</p>
@@ -273,7 +283,7 @@
                 </tr>
             </table>
 
-            <h2><a name = "tweaks">SETting Hint Variables to tweak maps</a></h2>
+            <h2 id = "tweaks">SETting Hint Variables to tweak maps</h2>
 
             <p>
             In addition to any variables that you define using SET, and the ones that
@@ -304,7 +314,7 @@
             <a href = "targets.html#rrd">RRDtool datasource plugin</a> to select what
             data is extracted.</p>
 
-            <h2><a name = "plugins">Writing Plugins</a></h2>
+            <h2 id = "plugins">Writing Plugins</h2>
 
             <p>Version 0.9 of Weathermap introduces a plugin system for extending it's
             capabilities. This makes it possible for third parties to add new possible
@@ -322,7 +332,7 @@
             <a href = "#tokens">special string tokens</a> in NODE labels, for
             example. </p>
 
-            <h3><a name = "dataplugins">Datasource Plugins</a></h3>
+            <h3 id = "dataplugins">Datasource Plugins</h3>
 
             <p>
             Datasource plugins are the main plugin type in Weathermap. They allow the
@@ -386,7 +396,7 @@
             hostnames for the remote system that data is being read from, so that they
             don't have to be hardcoded, or appear in <em>every</em> TARGET string.</p>
 
-            <h3><a name = "prepostplugins">Pre- &amp; Post-Processing Plugins</a></h3>
+            <h3 id= "prepostplugins">Pre- &amp; Post-Processing Plugins</h3>
 
             <p>Post-processing plugins can be used to calculate additional global
             statistics for a map, which can then be used in elements on the map. For

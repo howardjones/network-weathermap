@@ -16,6 +16,7 @@ $weathermap_map="";
 $weathermap_warncount=0;
 $weathemap_lazycounter=0;
 
+// Dummy array for some future code
 $WM_config_keywords2 = array ();
 
 // don't produce debug output for these functions

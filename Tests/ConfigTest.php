@@ -126,7 +126,7 @@ class ConfigTest extends PHPUnit_Framework_TestCase
         if(! file_exists($diffdir)) { mkdir($diffdir); }
 
         $fd = fopen("test-suite/summary.html","w");
-        fputs($fd,"<html><head><title>Test summary</title></head><style>img {border: 1px solid black; }</style><body><h3>Test Summary</h3>\n");
+        fputs($fd,"<html><head><title>Test summary</title></head><style>img {border: 1px solid black; }</style><body><h3>Test Summary</h3>(result - reference - diff)<br/>\n");
         
         $conflist = array();
 
@@ -139,7 +139,7 @@ class ConfigTest extends PHPUnit_Framework_TestCase
                 if(file_exists($reference)) {
                     $conflist[] = array($file, $reference, $testdir, $result1dir, $result2dir, $diffdir, $compare);
                 
-                    fputs($fd,"<h4>$file</h4><p><nobr><img src='results1-$phptag/$file.png'> <img src='references/$file.png'> <img src='diffs/$file.png'></nobr></p>\n");
+                    fputs($fd,"<h4>$file <a href=\"tests/$file\">[conf]</a></h4><p><nobr><img src='results1-$phptag/$file.png'> <img src='references/$file.png'> <img src='diffs/$file.png'></nobr></p>\n");
                     
                 }
             }
@@ -147,6 +147,7 @@ class ConfigTest extends PHPUnit_Framework_TestCase
         closedir($dh);
         chdir($previouswd);
 
+	fputs($fd,"</body></html>");
         fclose($fd);
  
         return $conflist;

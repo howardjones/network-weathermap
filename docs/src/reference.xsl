@@ -4,7 +4,7 @@
 
     <xsl:template match = "references">
 	<xsl:processing-instruction name="php">include 'vars.php'; $PAGE_TITLE='Configuration Reference'; include 'common-page-head.html'; </xsl:processing-instruction>
-                    <h2><a name = "configref">Configuration Reference</a></h2>
+                    <h2 id= "configref">Configuration Reference</h2>
 
                     <p>This page is automatically compiled, and documents all the
                     configuration directives that are available in PHP Weathermap

@@ -5,19 +5,19 @@ due course.
 
 0.97b	FIXED - absolute SCALE definitions didn't support K (thanks wwwdrich)
     FIXED - memory leak in poller code. Memory usage is MUCH lower now.
-	FIXED - updated mysql schema commands to use modern ENGINE instead of TYPE;
-	FIXED - static datasource plugin honours KILO
+    FIXED - updated mysql schema commands to use modern ENGINE instead of TYPE;
+    FIXED - static datasource plugin honours KILO
     FIXED - check-gdbug.php shouldn't complain about empty ob_flush buffers anymore
     FIXED - SNMP DS should deal better with non-numeric (and blank) return values
     FIXED - NINK colours were exchanged (thanks Deathwing00!)
     FIXED - WriteConfig (i.e. editor) won't 'lose' absolute keyword from 
     FIXED - fixed some function-name clashes with other plugins
-	FIXED - PHP 5.3/5.4/strict related errors ("Creating default object from empty value")
+    FIXED - PHP 5.3/5.4/strict related errors ("Creating default object from empty value")
     CHANGE - editor snap function improved (snap to *nearest* point) (thanks Andreas Braun)
     CHANGE - no longer shows .-prefixed files in map config picker
     CHANGE - editor ignores attempts to rename nodes to have space in names
-	ADDED - Caching for cacti data fetched by dsstats and rrdtool/poller_output DS plugins
-	
+    ADDED - Caching for cacti data fetched by dsstats and rrdtool/poller_output DS plugins
+    ADDED - Ability to disable any warning with 'SET nowarn_WMxxx 1'
 
 0.97a	FIXED - Incorrect action URL in 'map selector' combo box for Cacti users.
 	FIXED - cacti_graph_id set to 0 instead of ID, by rrd/poller_output and dsstats plugins (thanks sh0x)

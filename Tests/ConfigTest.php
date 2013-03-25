@@ -16,7 +16,16 @@ class ConfigTest extends PHPUnit_Framework_TestCase
         $previouswd = getcwd();
         chdir(dirname(__FILE__).DIRECTORY_SEPARATOR."..");
 
+		$compare_output = $comparisonimagefile.".txt";
+		unlink($compare_output);
+		
         $nwarns = TestOutput_RunTest($testdir.DIRECTORY_SEPARATOR.$conffile, $outputimagefile, $outputhtmlfile, '', 'config-coverage.txt');
+
+	if($nwarns < 0) {
+		$this->markTestIncomplete( 'This test is for a future feature');
+        	chdir($previouswd);
+		return;
+	}
         
         $this->assertEquals(0, $nwarns, "Warnings were generated");
 
@@ -69,8 +78,6 @@ class ConfigTest extends PHPUnit_Framework_TestCase
         $ref_md5 = md5_file($referenceimagefile);
         $output_md5 = md5_file($outputimagefile);
         $this->assertEquals($ref_md5, $output_md5, "Image Output did not match reference for $conffile via MD5");
-
-
 
 //        $this->assertFileEquals($referenceimagefile, $outputimagefile, "Output did not match reference for $conffile");
 

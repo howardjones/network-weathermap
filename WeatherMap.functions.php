@@ -2029,6 +2029,7 @@ function draw_spine($im, $spine,$col)
     function TestOutput_RunTest($conffile, $imagefile, $htmlfile, $newconffile, $coveragefile)
     {
         global $weathermap_map;
+	global $WEATHERMAP_VERSION;
 
         $map = new WeatherMap();
         if($coveragefile != '') {
@@ -2039,20 +2040,44 @@ function draw_spine($im, $spine,$col)
         }
         $weathermap_map = $conffile;
         $map->ReadConfig($conffile);
-        $map->ReadData();
-        $map->DrawMap($imagefile);
-        $map->imagefile=$imagefile;
-        if($htmlfile != '') {
-            TestOutput_HTML($htmlfile, $map);
-        }
-        if($newconffile != '') {
-            $map->WriteConfig($newconffile);
-        }
-        if($coveragefile != '') {
-            $map->SaveCoverage($coveragefile);
-        }
+	$skip = 0;
+	$nwarns = 0;
+
+	if( ! strstr($WEATHERMAP_VERSION, "dev" )) {
+		# Allow tests to be from the future. Global SET in test file can excempt test from running
+		# SET REQUIRES_VERSION 0.98
+		# but don't check if the current version is a dev version
+		$required_version = $map->get_hint("REQUIRES_VERSION");
+
+		if($required_version != "") {	
+			// doesan't need to be complete, just in the right order
+			$known_versions = array("0.97","0.97a","0.97b","0.98");
+			$my_version = array_search($WEATHERMAP_VERSION,$known_versions);	
+			$req_version = array_search($required_version,$known_versions);	
+			if($req_version > $my_version) {
+				$skip = 1;
+				$nwarns = -1;
+			}
+		}
+	}
+
+	if( $skip == 0) {
+       		$map->ReadData();
+       		$map->DrawMap($imagefile);
+        	$map->imagefile=$imagefile;
+        	if($htmlfile != '') {
+        	    TestOutput_HTML($htmlfile, $map);
+        	}
+        	if($newconffile != '') {
+        	    $map->WriteConfig($newconffile);
+        	}
+        	if($coveragefile != '') {
+        	    $map->SaveCoverage($coveragefile);
+        	}
+        	$nwarns = $map->warncount;
+	}
+	
         $map->CleanUp();
-        $nwarns = $map->warncount;
         unset ($map);
 
         return intval($nwarns);

@@ -47,5 +47,11 @@
             <content>SET screenshot_mode 1
             </content>
         </example>
+		
+		<example><caption>Disabling 'WMWARN50' messages from appearing</caption>
+
+            <content>SET nowarn_WMWARN50 1
+            </content>
+        </example>
     </examples>
 </configentry>

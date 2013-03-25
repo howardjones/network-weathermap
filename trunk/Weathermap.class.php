@@ -2472,8 +2472,7 @@ function ReadConfig($input, $is_include=FALSE)
 				$linematched++;
 			}
 
-			if(preg_match("/^\s*KEYSTYLE\s+([A-Za-z][A-Za-z0-9_]+\s+)?(classic|horizontal|vertical|inverted|tags)\s?(\d+)?\s*$/i",$buffer, $matches))
-			{
+			if(preg_match("/^\s*KEYSTYLE\s+([A-Za-z][A-Za-z0-9_]+\s+)?(classic|horizontal|vertical|inverted|tags)\s?(\d+)?\s*$/i",$buffer, $matches)) {
 				$whichkey = trim($matches[1]);
 				if($whichkey == '') $whichkey = 'DEFAULT';
 				$this->keystyle[$whichkey] = strtolower($matches[2]);

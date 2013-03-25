@@ -20,7 +20,7 @@ manual:	docs/index.html
 clean:
 	rm random-bits/suite-1.png random-bits/suite-2.png docs/src/contents.xml
 
-release: 
+release: test
 	echo Building release $(RELNAME)
 	# mv $(RELDIR) $(RELDIR).$$
 	mkdir -p $(RELDIR)
@@ -30,14 +30,19 @@ release:
 	cd $(RELBASE); mv $(RELDIR) $(RELNAME)
 
 test:	
-	echo "Creating test data"
-	./mk-test-rrd.pl
-	echo "Running test data set..."
-	./tester.sh
+	phpunit Tests/
+	grep  Output test-suite/diffs/*.txt | grep -v '|0|' | awk -F: '{ print $1;}' | sed -r 's/.png.txt//' > test-suite/failing-images.txt
+	test-suites/make-failing-summary.pl test-suite/failing-images.txt test-suite/summary.html > test-suite/failing-summary.html
+
+testcoverage:	
+	phpunit --coverage-html test-suite/code-coverage/ Tests/
 
 sql:
 	mysqldump -n --add-drop-table --no-data -uroot -p cacti weathermap_maps > weathermap.sql
 	mysqldump -n --add-drop-table --no-data -uroot -p cacti weathermap_auth >> weathermap.sql
+	mysqldump -n --add-drop-table --no-data -uroot -p cacti weathermap_groups >> weathermap.sql
+	mysqldump -n --add-drop-table --no-data -uroot -p cacti weathermap_settings >> weathermap.sql
+	mysqldump -n --add-drop-table --no-data -uroot -p cacti weathermap_data >> weathermap.sql
 
 tag:
 	svn copy http://www.network-weathermap.com/svn/repos/trunk http://www.network-weathermap.com/svn/repos/tags/version-$(VERSION) -m "Tagging $(VERSION) for release"

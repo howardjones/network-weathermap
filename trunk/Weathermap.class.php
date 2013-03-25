@@ -14,8 +14,9 @@ $WEATHERMAP_VERSION="0.97b";
 $weathermap_debugging=FALSE;
 $weathermap_map="";
 $weathermap_warncount=0;
-$weathermap_debug_suppress = array("processstring","mysprintf");
 $weathemap_lazycounter=0;
+
+$WM_config_keywords2 = array ();
 
 // don't produce debug output for these functions
 $weathermap_debug_suppress = array (
@@ -28,6 +29,7 @@ $weathermap_error_suppress = array();
 
 // Turn on ALL error reporting for now.
 // error_reporting (E_ALL|E_STRICT);
+error_reporting (E_ALL);
 
 // parameterise the in/out stuff a bit
 define("IN",0);
@@ -92,12 +94,12 @@ class WeatherMapDataSource
 // template classes for the pre- and post-processor plugins
 class WeatherMapPreProcessor
 {
-	function run($map) { return FALSE; }
+	function run(&$map) { return FALSE; }
 }
 
 class WeatherMapPostProcessor
 {
-	function run($map) { return FALSE; }
+	function run(&$map) { return FALSE; }
 }
 
 // ***********************************************
@@ -254,6 +256,10 @@ class WeatherMap extends WeatherMapBase
 	var $plugins = array();
 	var $included_files = array();
 	var $usage_stats = array();
+	var $coverage = array();
+    var $colourtable = array();
+    var $warncount = 0;
+
 
 	function WeatherMap()
 	{
@@ -415,6 +421,7 @@ class WeatherMap extends WeatherMapBase
 		// Adding these makes the editor's job a little easier, mainly
 		for($i=1; $i<=5; $i++)
 		{
+			$this->fonts[$i] = new WMFont();
 			$this->fonts[$i]->type="GD builtin";
 			$this->fonts[$i]->file='';
 			$this->fonts[$i]->size=0;
@@ -1730,341 +1737,6 @@ function DrawTitle($im, $font, $colour)
 	$this->imap->addArea("Rectangle", "TITLE", '', array($x, $y, $x + $boxwidth, $y - $boxheight));
 }
 
-function ReadConfigNG($input, $is_include=FALSE, $initial_context="GLOBAL")
-{
-	$valid_commands = array(
-			"GLOBAL.set", "LINK.set", "NODE.set",
-			"GLOBAL.#","LINK.#","NODE.#",
-			"GLOBAL.include", "NODE.include", "LINK.include",
-			
-			"GLOBAL.width", "GLOBAL.height", "GLOBAL.background",
-			"GLOBAL.scale", "GLOBAL.title", "GLOBAL.titlepos",
-			"GLOBAL.fontdefine",
-			"GLOBAL.keystyle", "GLOBAL.titlecolor", "GLOBAL.timecolor",
-			"GLOBAL.titlefont", "GLOBAL.timefont", "GLOBAL.htmloutputfile",
-			"GLOBAL.htmlstyle", "GLOBAL.imageoutputfile", "GLOBAL.keyfont",
-			"GLOBAL.keytextcolor", "GLOBAL.keyoutlinecolor", "GLOBAL.keybgcolor",
-			"GLOBAL.bgcolor",
-			
-			"SCALE.keypos", "SCALE.keystyle", "SCALE.scale",
-			
-			"LINK.width", "LINK.link", "LINK.nodes",
-			"LINK.target", "LINK.usescale", "LINK.infourl",
-			"LINK.linkstyle", "LINK.overlibcaption", "LINK.inoverlibcaption", "LINK.outoverlibcaption", 
-			"LINK.inoverlibgraph", "LINK.outoverlibgraph",
-			"LINK.overlibgraph", "LINK.overlibwidth", "LINK.overlibheight",
-			"LINK.bwlabel", "LINK.via", "LINK.zorder", "LINK.outlinecolor",
-			"LINK.notes", "LINK.innotes", "LINK.outnotes","LINK.ininfourl", "LINK.outinfourl",
-			"LINK.bwstyle", "LINK.template", "LINK.splitpos", "LINK.bwlabelpos", "LINK.incomment", "LINK.outcomment",
-			"LINK.viastyle", "LINK.bandwidth", "LINK.inbwformat", "LINK.outbwformat",
-			"LINK.commentstyle", "LINK.commentfont", "LINK.commentfontcolor", "LINK.bwfont",
-		
-			"NODE.icon", "NODE.target", "NODE.position", "NODE.infourl", "NODE.overlibgraph",
-			"NODE.zorder", "NODE.label", "NODE.template", "NODE.labelbgcolor",
-			"NODE.maxvalue",
-			"NODE.labeloutlinecolor", "NODE.aiconoutlinecolor", "NODE.aiconfillcolor", "NODE.usescale",
-			"NODE.labelfontcolor", "NODE.labelfont", "NODE.labelangle", "NODE.labelfontshadowcolor",
-			"NODE.node", "NODE.overlibwidth", "NODE.overlibheight", "NODE.labeloffset"
-		);
-	
-	
-	if( (strchr($input,"\n")!=FALSE) || (strchr($input,"\r")!=FALSE ) )
-	{
-		 wm_debug("ReadConfig Detected that this is a config fragment.\n");
-			 // strip out any Windows line-endings that have gotten in here
-			 $input=str_replace("\r", "", $input);
-			 $lines = split("/n",$input);
-			 $filename = "{text insert}";
-	}
-	else
-	{
-		wm_debug("ReadConfig Detected that this is a config filename.\n");
-		 $filename = $input;
-		
-		$fd=fopen($filename, "r");
-		 
-		if ($fd)
-		{
-				while (!feof($fd))
-				{
-					$buffer=fgets($fd, 4096);
-					// strip out any Windows line-endings that have gotten in here
-					$buffer=str_replace("\r", "", $buffer);
-					$lines[] = $buffer;
-				}
-				fclose($fd);
-		}
-	}
-		
-	$linecount = 0;
-	$context = $initial_context;
-
-	foreach($lines as $buffer)
-	{
-		$linematched=0;
-		$linecount++;
-		$nextcontext = "";
-		$key = "";
-	
-		$buffer = trim($buffer);
-		// alternative for use later where quoted strings are more useful
-		$args = wm_parse_string($buffer);
-		
-		if(sizeof($args) > 0)
-		{		
-			$linematched++;		
-			$cmd = strtolower(array_shift($args));
-						
-			if($cmd == 'include')
-			{
-				$this->ReadConfigNG($args[0],TRUE, $context);
-			}
-			elseif($cmd == 'node')
-			{
-				$context = "NODE.".$args[0];
-			}
-			elseif($cmd == 'link')
-			{
-				$context = "LINK.".$args[0];
-				$vcount = 0;	# reset the via-number counter, it's a new link
-			}
-			elseif($cmd == 'scale' || $cmd == 'keystyle' || $cmd == 'keypos')
-			{
-				if( preg_match("/^[0-9\-]+/i",$args[0]) )
-				{
-					$scalename = "DEFAULT";
-				}
-				else
-				{
-					$scalename = array_shift($args);
-				}
-				if($cmd=="scale") $key = $args[0]."_".$args[1];
-				$nextcontext = $context;
-				$context = "SCALE.".$scalename;
-			}
-			
-			array_unshift($args,$cmd);
-			
-			if($context == 'GLOBAL')
-	 		{ 
-				$ctype='GLOBAL'; 
-			}
-			else
-			{
-				list($ctype,$junk) = split("\\.", $context, 2);
-			}
-			
-			$lookup = $ctype.".".$cmd;
-			
-			// Some things (scales, mainly) might define special keys
-			// the key should be unique for that object
-			// most (all?) things for a link or node are one-offs. 
-			if($key == "") $key = $cmd; 
-			if($cmd == 'set' || $cmd == 'fontdefine') $key .= "_".$args[1];
-			if($cmd == 'via')
-			{
-				$key .= "_".$vcount;
-				$vcount++;
-			}
-			
-			# everything else
-			if( substr($cmd, 0, 1) != '#')
-			{
-				if(! in_array($lookup, $valid_commands))
-				{
-					print "INVALID COMMAND: $lookup\n";
-				}
-				
-				if(isset($config[$context][$key]))
-				{
-					print "REDEFINED $key in $context\n";
-				}
-				else
-				{
-					array_unshift($args,$linecount);
-					array_unshift($args,$filename);
-					$this->config[$context][$key] = $args;
-				}
-			}
-			print "$context\\$key  $filename:$linecount ".join("|",$args)."\n";
-			
-			if($nextcontext != "") $context = $nextcontext;
-		}
-		
-		if ($linematched == 0 && trim($buffer) != '') { wm_warn ("Unrecognised config on line $linecount: $buffer\n"); }
-		
-	}
-	
-	if(! $is_include)
-	{
-		print_r($this->config);
-	
-		foreach ($this->config as $context=>$values)
-		{
-			print "> $context\n";
-		}
-	}
-	
-	
-}
-
-function ReadConfigNNG($input, $is_include=FALSE, $initial_context="GLOBAL")
-{
-	global $valid_commands;
-		
-	if( (strchr($input,"\n")!=FALSE) || (strchr($input,"\r")!=FALSE ) )
-	{
-		 wm_debug("ReadConfig Detected that this is a config fragment.\n");
-			 // strip out any Windows line-endings that have gotten in here
-			 $input=str_replace("\r", "", $input);
-			 $lines = split("/n",$input);
-			 $filename = "{text insert}";
-	}
-	else
-	{
-		wm_debug("ReadConfig Detected that this is a config filename.\n");
-		 $filename = $input;
-		
-		$fd=fopen($filename, "r");
-		 
-		if ($fd)
-		{
-			while (!feof($fd))
-			{
-				$buffer=fgets($fd, 4096);
-				// strip out any Windows line-endings that have gotten in here
-				$buffer=str_replace("\r", "", $buffer);
-				$lines[] = $buffer;
-			}
-			fclose($fd);
-		}
-	}
-		
-	$linecount = 0;
-	$context = $initial_context;
-
-	foreach($lines as $buffer)
-	{
-		$linematched=0;
-		$linecount++;
-		$nextcontext = "";
-		$key = "";
-	
-		$buffer = trim($buffer);
-		// alternative for use later where quoted strings are more useful
-		$args = wm_parse_string($buffer);
-		
-		if(sizeof($args) > 0)
-		{		
-			$linematched++;		
-			$cmd = strtolower(array_shift($args));
-						
-			if($cmd == 'include')
-			{
-				$context = $this->ReadConfigNNG($args[0],TRUE, $context);
-			}
-			elseif($cmd == 'node')
-			{
-				$context = "NODE.".$args[0];
-			}
-			elseif($cmd == 'link')
-			{
-				$context = "LINK.".$args[0];
-				$vcount = 0;	# reset the via-number counter, it's a new link
-			}
-			elseif($cmd == 'scale' || $cmd == 'keystyle' || $cmd == 'keypos')
-			{
-				if( preg_match("/^[0-9\-]+/i",$args[0]) )
-				{
-					$scalename = "DEFAULT";
-				}
-				else
-				{
-					$scalename = array_shift($args);
-				}
-				if($cmd=="scale") $key = $args[0]."_".$args[1];
-				$nextcontext = $context;
-				$context = "SCALE.".$scalename;
-			}
-			
-			array_unshift($args,$cmd);
-			
-			if($context == 'GLOBAL')
-	 		{ 
-				$ctype='GLOBAL'; 
-			}
-			else
-			{
-				list($ctype,$junk) = split("\\.", $context, 2);
-			}
-			
-			$lookup = $ctype.".".$cmd;
-			
-			// Some things (scales, mainly) might define special keys
-			// the key should be unique for that object
-			// most (all?) things for a link or node are one-offs. 
-			if($key == "") $key = $cmd; 
-			if($cmd == 'set' || $cmd == 'fontdefine') $key .= "_".$args[1];
-			if($cmd == 'via')
-			{
-				$key .= "_".$vcount;
-				$vcount++;
-			}
-			
-			# everything else
-			if( substr($cmd, 0, 1) != '#')
-			{
-				if(! array_key_exists($lookup, $valid_commands))
-				{
-					print "INVALID COMMAND: $lookup\n";
-				}
-				
-				if(isset($config[$context][$key]))
-				{
-					print "REDEFINED $key in $context\n";
-				}
-				else
-				{
-					array_unshift($args,$linecount);
-					array_unshift($args,$filename);
-					$this->config[$context][$key] = $args;
-				}
-			}
-			print "$context\\$key  $filename:$linecount ".join("|",$args)."\n";
-			
-			if($nextcontext != "") $context = $nextcontext;
-		}
-		
-		if ($linematched == 0 && trim($buffer) != '') { wm_warn ("Unrecognised config on line $linecount: $buffer\n"); }
-		
-	}
-	
-	if(! $is_include)
-	{
-		
-		# print_r($this->config);
-	
-		foreach ($this->config as $context=>$values)
-		{
-		#	print "> $context\n";
-		}
-	}
-	
-	return($context);
-}
-
-
-function WriteConfigNG($filename)
-{
-	global $WEATHERMAP_VERSION;
-	
-	$fd = fopen($filename);
-	
-	
-	
-	fclose($fd);
-}
-
 function ReadConfig($input, $is_include=FALSE)
 {
 	global $weathermap_error_suppress;
@@ -2766,12 +2438,14 @@ function ReadConfig($input, $is_include=FALSE)
 
 					if (isset($bounds[0]))
 					{
+						$this->fonts[$matches[1]] = new WMFont();
 						$this->fonts[$matches[1]]->type="truetype";
 						$this->fonts[$matches[1]]->file=$matches[2];
 						$this->fonts[$matches[1]]->size=$matches[3];
 					}
 					else { wm_warn
-						("Failed to load ttf font " . $matches[2] . " - at config line $linecount\n [WMWARN30]"); }
+						("Failed to load ttf font " . $matches[2] . " - at config line $linecount [WMWARN30]");
+					}
 				}
 				else { wm_warn
 					("imagettfbbox() is not a defined function. You don't seem to have FreeType compiled into your gd module. [WMWARN31]\n");
@@ -2787,6 +2461,7 @@ function ReadConfig($input, $is_include=FALSE)
 
 				if ($newfont)
 				{
+					$this->fonts[$matches[1]] = new WMFont();
 					$this->fonts[$matches[1]]->type="gd";
 					$this->fonts[$matches[1]]->file=$matches[2];
 					$this->fonts[$matches[1]]->gdnumber=$newfont;
@@ -4259,6 +3934,54 @@ function DumpStats($filename="")
 	
 	if($filename == "") print $report;
 }
+
+ function SeedCoverage()
+        {
+                global $WM_config_keywords2;
+
+                foreach ( array_keys($WM_config_keywords2) as $context) {
+                        foreach ( array_keys($WM_config_keywords2[$context]) as $keyword) {
+                                foreach ( $WM_config_keywords2[$context][$keyword] as $patternarray) {
+                                        $key = sprintf("%s:%s:%s",$context, $keyword ,$patternarray[1]);
+                                        $this->coverage[$key] = 0;
+                                }
+                        }
+                }
+        }
+
+        function LoadCoverage($file)
+        {
+                return 0;
+                $i=0;
+                $fd = fopen($file,"r");
+                if(is_resource($fd)) {
+                    while(! feof($fd)) {
+                            $line = fgets($fd,1024);
+                            $line = trim($line);
+                            list($val,$key) = explode("\t",$line);
+                            if($key != "") {
+                                $this->coverage[$key] = $val;
+                            }
+                            if($val > 0) { $i++; }
+                    }
+                    fclose($fd);
+                }
+#               print "Loaded $i non-zero coverage stats.\n";
+        }
+
+        function SaveCoverage($file)
+        {
+                $i=0;
+                $fd = fopen($file,"w+");
+                foreach ($this->coverage as $key=>$val) {
+                        fputs($fd, "$val\t$key\n");
+                        if($val > 0) { $i++; }
+                }
+                fclose($fd);
+#               print "Saved $i non-zero coverage stats.\n";
+        }
+
+
 
 };
 // vim:ts=4:sw=4:

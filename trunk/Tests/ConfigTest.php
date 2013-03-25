@@ -43,6 +43,7 @@ class ConfigTest extends PHPUnit_Framework_TestCase
                 );
                 $pipes = array();
                 $process = proc_open($cmd,$descriptorspec, $pipes, getcwd(), NULL, array('bypass_shell'=>TRUE)) ;
+		$output = "";
 
                 if(is_resource($process)) {
                     $output = fread($pipes[2],2000);
@@ -54,17 +55,13 @@ class ConfigTest extends PHPUnit_Framework_TestCase
                     fwrite($fd2,"Output: |".$output."|\r\n");
                 }
 
-//                fwrite($fd2, "Handle: '$fd'; " . gettype($fd) . "\r\n");
-//
-//                $output = fread($fd,2000);
-//                fwrite($fd2,"Output: |".$output."|\r\n");
-//
-//                pclose($fd);
                 fclose($fd2);
 
-    #            print "\n$cmd [$output]\n";
+		// it turns out that some versions of compare output two lines, and some don't, so trim.
+		$lines = explode("\n",$output);
+		$output = $lines[0];
 
-                $this->AssertEquals($output, "0\n", "Image Output did not match reference for $conffile via IM");
+                $this->AssertEquals("0", $output, "Image Output did not match reference for $conffile via IM");
 
             }
         }
@@ -122,7 +119,7 @@ class ConfigTest extends PHPUnit_Framework_TestCase
 
         // XXX This changes
         $compare = "test-suite".DIRECTORY_SEPARATOR."tools".DIRECTORY_SEPARATOR."compare.exe";
-        $compare = "/usr/local/bin/compare";
+        $compare = "/usr/bin/compare";
         
         if(! file_exists($result1dir)) { mkdir($result1dir); }
         if(! file_exists($result2dir)) { mkdir($result2dir); }
@@ -142,7 +139,7 @@ class ConfigTest extends PHPUnit_Framework_TestCase
                 if(file_exists($reference)) {
                     $conflist[] = array($file, $reference, $testdir, $result1dir, $result2dir, $diffdir, $compare);
                 
-                    fputs($fd,"<h4>$file</h4><p><nobr><img src='results1-$phptag/$file.png'> <img src='references/$file.png'> <img src='diffs/$file.png'></nobr></p>");
+                    fputs($fd,"<h4>$file</h4><p><nobr><img src='results1-$phptag/$file.png'> <img src='references/$file.png'> <img src='diffs/$file.png'></nobr></p>\n");
                     
                 }
             }
@@ -152,7 +149,6 @@ class ConfigTest extends PHPUnit_Framework_TestCase
 
         fclose($fd);
  
-        
         return $conflist;
     }
 }

@@ -12,6 +12,7 @@ due course.
     FIXED - NINK colours were exchanged (thanks Deathwing00!)
     FIXED - WriteConfig (i.e. editor) won't 'lose' absolute keyword from 
     FIXED - fixed some function-name clashes with other plugins
+	FIXED - PHP 5.3/5.4/strict related errors ("Creating default object from empty value")
     CHANGE - editor snap function improved (snap to *nearest* point) (thanks Andreas Braun)
     CHANGE - no longer shows .-prefixed files in map config picker
     CHANGE - editor ignores attempts to rename nodes to have space in names

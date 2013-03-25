@@ -83,6 +83,7 @@
 ./docs/pages/targets.html
 ./docs/pages/upgrading.html
 ./docs/pages/weathermap.css
+./docs/pages/manual.css
 ./editor-resources/jquery-latest.min.js
 ./editor.css
 ./editor.inc.php

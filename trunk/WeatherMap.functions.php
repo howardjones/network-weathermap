@@ -1583,6 +1583,15 @@ function nice_scalar($number, $kilo = 1000, $decimals=1)
 
 // ***********************************************
 
+// Skeleton class just to keep strict mode quiet. 
+class WMFont
+{
+	var $type;
+	var $file;
+	var $gdnumber;
+	var $size;
+}
+
 // we use enough points in various places to make it worth a small class to save some variable-pairs.
 class Point
 {
@@ -1967,6 +1976,89 @@ function draw_spine($im, $spine,$col)
                     );
     }
 }
+
+/**
+ * A duplicate of the HTML output code in the weathermap CLI utility,
+ * for use by the test-output stuff.
+ *
+ * @global string $WEATHERMAP_VERSION
+ * @param string $htmlfile
+ * @param WeatherMap $map
+ */
+    function TestOutput_HTML($htmlfile, &$map)
+    {
+        global $WEATHERMAP_VERSION;
+
+        $fd=fopen($htmlfile, 'w');
+        fwrite($fd,
+                '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head>');
+        if($map->htmlstylesheet != '') fwrite($fd,'<link rel="stylesheet" type="text/css" href="'.$map->htmlstylesheet.'" />');
+        fwrite($fd,'<meta http-equiv="refresh" content="300" /><title>' . $map->ProcessString($map->title, $map) . '</title></head><body>');
+
+        if ($map->htmlstyle == "overlib")
+        {
+                fwrite($fd,
+                        "<div id=\"overDiv\" style=\"position:absolute; visibility:hidden; z-index:1000;\"></div>\n");
+                fwrite($fd,
+                        "<script type=\"text/javascript\" src=\"overlib.js\"><!-- overLIB (c) Erik Bosrup --></script> \n");
+        }
+
+        fwrite($fd, $map->MakeHTML());
+        fwrite($fd,
+                '<hr /><span id="byline">Network Map created with <a href="http://www.network-weathermap.com/?vs='
+                . $WEATHERMAP_VERSION . '">PHP Network Weathermap v' . $WEATHERMAP_VERSION
+                . '</a></span></body></html>');
+        fclose ($fd);
+    }
+
+	    /**
+     * Run a config-based test.
+     * Read in config from $conffile, and produce an image and HTML output
+     * Optionally Produce a new config file in $newconffile (for testing WriteConfig)
+     * Optionally collect config-keyword-coverage stats about this config file
+     *
+     *
+     *
+     * @param string $conffile
+     * @param string $imagefile
+     * @param string $htmlfile
+     * @param string $newconffile
+     * @param string $coveragefile
+     */
+
+    function TestOutput_RunTest($conffile, $imagefile, $htmlfile, $newconffile, $coveragefile)
+    {
+        global $weathermap_map;
+
+        $map = new WeatherMap();
+        if($coveragefile != '') {
+            $map->SeedCoverage();
+            if(file_exists($coveragefile) ) {
+                $map->LoadCoverage($coveragefile);
+            }
+        }
+        $weathermap_map = $conffile;
+        $map->ReadConfig($conffile);
+        $map->ReadData();
+        $map->DrawMap($imagefile);
+        $map->imagefile=$imagefile;
+        if($htmlfile != '') {
+            TestOutput_HTML($htmlfile, $map);
+        }
+        if($newconffile != '') {
+            $map->WriteConfig($newconffile);
+        }
+        if($coveragefile != '') {
+            $map->SaveCoverage($coveragefile);
+        }
+        $map->CleanUp();
+        $nwarns = $map->warncount;
+        unset ($map);
+
+        return intval($nwarns);
+    }
+
+	
 
 // vim:ts=4:sw=4:
 ?>

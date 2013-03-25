@@ -20,6 +20,9 @@ See http://www.bosrup.com/web/overlib/?License
 The Bitstream Vera Open Source fonts (Vera*.ttf) are copyright Bitstream, Inc.
 See http://www.bitstream.com/font_rendering/products/dev_fonts/vera.html
 
+The manual uses the Kube CSS Framework - http://imperavi.com/kube/
+and ParaType's PT Sans font: http://www.fontsquirrel.com/fonts/PT-Sans
+
 jquery-latest.min.js is the jQuery javascript library - written by John Resig and collaborators.
 http://docs.jquery.com/Licensing
 

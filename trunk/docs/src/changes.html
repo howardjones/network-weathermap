@@ -9,26 +9,27 @@ There are larger structural changes in 0.98 and new features, but these bugfixes
 warrant a new 0.97 release (especially the mysql schema change). A real 0.98 release will follow in
 due course.</p>
 			<h3>Fixes</h3>
-<ul>
-<li>absolute SCALE definitions didn't support K (thanks wwwdrich)</li>
-<li>memory leak in poller code. Memory usage is MUCH lower now.</li>
-<li>updated mysql schema commands to use modern ENGINE instead of TYPE</li>
-<li>static datasource plugin honours KILO</li>
-<li>check-gdbug.php shouldn't complain about empty ob_flush buffers anymore</li>
-<li>SNMP DS should deal better with non-numeric (and blank) return values</li>
-<li>NINK colours were exchanged (thanks Deathwing00!)</li>
-<li>WriteConfig (i.e. editor) won't 'lose' absolute keyword from</li>
-<li>fixed some function-name clashes with other plugins</li>
-</ul>
+			<ul>
+				<li>absolute SCALE definitions didn't support K (thanks wwwdrich)</li>
+				<li>memory leak in poller code. Memory usage is MUCH lower now.</li>
+				<li>updated mysql schema commands to use modern ENGINE instead of TYPE</li>
+				<li>static datasource plugin honours KILO</li>
+				<li>check-gdbug.php shouldn't complain about empty ob_flush buffers anymore</li>
+				<li>SNMP DS should deal better with non-numeric (and blank) return values</li>
+				<li>NINK colours were exchanged (thanks Deathwing00!)</li>
+				<li>WriteConfig (i.e. editor) won't 'lose' absolute keyword from</li>
+				<li>fixed some function-name clashes with other plugins</li>
+				<li>PHP 5.3/5.4/strict related errors ("Creating default object from empty value")</li>
+			</ul>
 			<h3>Changes</h3>
 			<ul>
-<li>no longer shows .-prefixed files in map config picker</li>
-<li>editor ignores attempts to rename nodes to have space in names</li>
-			<li>Manual updates for changes in Cacti, and improvements in styling.</li>
+				<li>no longer shows .-prefixed files in map config picker</li>
+				<li>editor ignores attempts to rename nodes to have space in names</li>
+				<li>Manual updates for changes in Cacti, and improvements in styling.</li>
 			</ul>
 			<h3>New Features</h3>
 			<ul>
-<li>Caching for cacti data fetched by dsstats and rrdtool/poller_output DS plugins</li>			
+				<li>Caching for cacti data fetched by dsstats and rrdtool/poller_output DS plugins</li>			
 			</ul>
 			
             <h2 id="changes097a">Changes For This Version (0.97 to 0.97a)</h2>

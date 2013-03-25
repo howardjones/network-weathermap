@@ -33,7 +33,7 @@ class WeatherMapItemTest extends PHPUnit_Framework_TestCase {
      * @todo Implement testMy_type().
      */
     public function testMy_type() {
-        $this->assertEquals($this->object->my_type(), "ITEM");
+        $this->assertEquals("ITEM", $this->object->my_type());
     }
 }
 ?>

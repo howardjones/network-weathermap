@@ -1,4 +1,4 @@
-VERSION=0.98dev
+VERSION=0.97b
 RELBASE=../releases
 RELNAME=php-weathermap-$(VERSION)
 RELDIR=$(RELBASE)/weathermap
@@ -20,7 +20,7 @@ manual:	docs/index.html
 clean:
 	rm random-bits/suite-1.png random-bits/suite-2.png docs/src/contents.xml
 
-release: test
+release: 
 	echo Building release $(RELNAME)
 	# mv $(RELDIR) $(RELDIR).$$
 	mkdir -p $(RELDIR)

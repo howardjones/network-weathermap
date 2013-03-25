@@ -2504,6 +2504,7 @@ function ReadConfig($input, $is_include=FALSE)
 				$matches))
 			{
 				$key=$matches[1];
+								
 				# "Found colour line for $key\n";
 				$this->colours['DEFAULT'][$key]['red1']=$matches[2];
 				$this->colours['DEFAULT'][$key]['green1']=$matches[3];

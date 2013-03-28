@@ -12,3 +12,8 @@ Remove View permission, and CHECK Weathermap tab disappears (console menu remain
 Add View permission, remove Manage, and CHECK Weathermap tab reappears and console menu disappears
 CHECK mysqlshow shows 5 tables - weathermap_data weathermap_auth weathermap_maps weathermap_settings, weathermap_groups
 Go to Manage Weathermaps - wait 5 minutes and CHECK "last completed" is updating
+Click Add and CHECK that simple.conf ONLY is listed. 
+Click View to see the contents of simple.conf in a new window/tab
+Click Add and CHECK that simple.conf is listed in the main management page
+Click Add again, CHECK the list is empty
+Click 'show these files' and CHECK that only simple.conf is listed (no php or .htaccess files!)

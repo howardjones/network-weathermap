@@ -28,6 +28,7 @@ release:
 	cd $(RELBASE); zip -r $(RELNAME).zip weathermap/*
 	cd $(RELBASE); tar cvfz $(RELNAME).tgz weathermap
 	cd $(RELBASE); mv $(RELDIR) $(RELNAME)
+	echo $(RENAME) built in $(RELBASE)
 
 test:	
 	phpunit Tests/

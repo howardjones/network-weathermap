@@ -15,6 +15,7 @@ due course.
     FIXED - PHP 5.3/5.4/strict related errors ("Creating default object from empty value")
     CHANGE - editor snap function improved (snap to *nearest* point) (thanks Andreas Braun)
     CHANGE - no longer shows .-prefixed files in map config picker
+	CHANGE - the Cacti UI will warn you about fundamental file permissions problems
     CHANGE - editor ignores attempts to rename nodes to have space in names
     ADDED - Caching for cacti data fetched by dsstats and rrdtool/poller_output DS plugins
     ADDED - Ability to disable any warning with 'SET nowarn_WMxxx 1'

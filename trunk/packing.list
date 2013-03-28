@@ -167,8 +167,8 @@
 ./lib/ds-common.php
 ./lib/index.php
 ./lib/poller-common.php
-./lib/post/WeatherMapPostProcessorTest.php
-./lib/pre/WeatherMapPreProcessorTest.php
+./lib/post/WeatherMapPostProcessorExample.php
+./lib/pre/WeatherMapPreProcessorExample.php
 ./logout.php
 ./net-data.txt
 ./output/.htaccess

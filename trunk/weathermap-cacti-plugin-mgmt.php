@@ -618,7 +618,7 @@ function addmap_picker($show_all=false)
 			
 		}
 	}
-	$loaded[]='index.php';
+	# $loaded[]='index.php';
 
 	html_start_box("<strong>Available Weathermap Configuration Files</strong>", "78%", $colors["header"], "1", "center", "");
 
@@ -637,7 +637,8 @@ function addmap_picker($show_all=false)
 				
 				// skip .-prefixed files like .htaccess, since it seems
                 // that otherwise people will add them as map config files.
-                if( substr($file,0,1) != '.') {
+				// and the index.php too - for the same reason
+                if( substr($file,0,1) != '.' && $file != "index.php") {
 					$used = in_array($file,$loaded);
 					$flags[$file] = '';
 					if($used) $flags[$file] = 'USED';

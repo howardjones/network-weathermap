@@ -57,6 +57,7 @@ function weathermap_run_maps($mydir) {
 	include_once($mydir.DIRECTORY_SEPARATOR."Weathermap.class.php");
 
 	$total_warnings = 0;
+	$warning_notes = "";
 
 	$start_time = time();
 	if($weathermap_poller_start_time==0) $weathermap_poller_start_time = $start_time;
@@ -248,17 +249,21 @@ function weathermap_run_maps($mydir) {
 			else
 			{
 				wm_warn("Output directory ($outdir) isn't writable (tried to create '$testfile'). No maps created. You probably need to make it writable by the poller process (like you did with the RRA directory) [WMPOLL06]\n");
+				$total_warnings++;
+				$warning_notes .= " (Permissions problem prevents any maps running WMPOLL06)";
 			}
 		}
 		else
 		{
 			wm_warn("Output directory ($outdir) doesn't exist!. No maps created. You probably need to create that directory, and make it writable by the poller process (like you did with the RRA directory) [WMPOLL07]\n");
+			$total_warnings++;
+			$warning_notes .= " (Output directory problem prevents any maps running WMPOLL07)";
 		}
 		weathermap_memory_check("MEM Final");
 		chdir($orig_cwd);
 		$duration = time() - $start_time;
 		
-		$stats_string = date(DATE_RFC822) . ": $mapcount maps were run in $duration seconds with $total_warnings warnings.";
+		$stats_string = date(DATE_RFC822) . ": $mapcount maps were run in $duration seconds with $total_warnings warnings." . $warning_notes;
 		if($quietlogging==0) wm_warn("STATS: Weathermap $WEATHERMAP_VERSION run complete - $stats_string\n", TRUE);
 		db_execute("replace into settings values('weathermap_last_stats','".mysql_escape_string($stats_string)."')");
 		db_execute("replace into settings values('weathermap_last_finish_time','".mysql_escape_string(time())."')");

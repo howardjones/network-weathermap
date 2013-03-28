@@ -17,3 +17,7 @@ Click View to see the contents of simple.conf in a new window/tab
 Click Add and CHECK that simple.conf is listed in the main management page
 Click Add again, CHECK the list is empty
 Click 'show these files' and CHECK that only simple.conf is listed (no php or .htaccess files!)
+Click Add one more time, and CHECK there are two simple.conf entries listed
+Wait 5 minutes and CHECK that a warning message appears on the Management page (we didn't set permissions on output/)
+chown cacti weathermap/output and wait another 5 minutes
+CHECK thumbnail does appear for both simple.conf in the Weathermap tab

@@ -3,6 +3,12 @@ There are larger structural changes in 0.98 and new features, but these bugfixes
 warrant a new 0.97 release (especially the mysql schema change). A real 0.98 release will follow in
 due course.
 
+Also late addition to 0.97b - a couple of security analysts have pointed out flaws in the editor.
+First, the ability to remotely create .php files and then cross-site-scripting vulnerabilities. Both
+are really facets of the same thing - lack of input validation. 0.97b improves this a great deal.
+
+Thanks to Gerry Eisenhaur and Daniel Ricardo dos Santos respectively for their security bug reports.
+
 0.97b	FIXED - absolute SCALE definitions didn't support K (thanks wwwdrich)
     FIXED - memory leak in poller code. Memory usage is MUCH lower now.
     FIXED - updated mysql schema commands to use modern ENGINE instead of TYPE;
@@ -20,6 +26,7 @@ due course.
     CHANGE - Editor won't deal with config files that don't have a .conf extension
     ADDED - Caching for cacti data fetched by dsstats and rrdtool/poller_output DS plugins
     ADDED - Ability to disable any warning with 'SET nowarn_WMxxx 1'
+    ADDED - .htaccess files added for directories that don't need to be web-accessible - needs "AllowOverride Limit" or "AllowOverride All" in your Apache config.
 
 0.97a	FIXED - Incorrect action URL in 'map selector' combo box for Cacti users.
 	FIXED - cacti_graph_id set to 0 instead of ID, by rrd/poller_output and dsstats plugins (thanks sh0x)

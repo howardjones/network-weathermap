@@ -1,10 +1,10 @@
 <?php
 	
-require_once 'editor.inc.php';
-require_once 'Weathermap.class.php';
+require_once 'lib/editor.inc.php';
+require_once 'lib/Weathermap.class.php';
 
 // so that you can't have the editor active, and not know about it.
-$ENABLED=false;
+$ENABLED=true;
 
 if(! $ENABLED)
 {
@@ -94,8 +94,8 @@ if(!wm_module_checks())
 }
 
 if(isset($_REQUEST['action'])) { $action = $_REQUEST['action']; }
-if(isset($_REQUEST['mapname'])) { $mapname = $_REQUEST['mapname'];  $mapname = str_replace('/','',$mapname); }
-if(isset($_REQUEST['selected'])) { $selected = $_REQUEST['selected']; }
+if(isset($_REQUEST['mapname'])) { $mapname = $_REQUEST['mapname'];  $mapname = wm_editor_sanitize_conffile($mapname); }
+if(isset($_REQUEST['selected'])) { $selected = wm_editor_sanitize_selected($_REQUEST['selected']); }
 
 $weathermap_debugging=FALSE;
 
@@ -129,10 +129,17 @@ else
 		break;
 
 	case 'newmapcopy':
-		if(isset($_REQUEST['sourcemap'])) { $sourcemapname = $_REQUEST['sourcemap']; }		
-		$sourcemap = $mapdir.'/'.$sourcemapname;
-		$map->ReadConfig($sourcemap);
-		$map->WriteConfig($mapfile);
+		if(isset($_REQUEST['sourcemap'])) { $sourcemapname = $_REQUEST['sourcemap']; }
+		
+		$sourcemapname = wm_editor_sanitize_conffile($sourcemapname);
+		
+		if($$sourcemapname != "") {
+		    $sourcemap = $mapdir.'/'.$sourcemapname;
+		    if( file_exists($sourcemap) && is_readable($sourcemap) ) {
+			$map->ReadConfig($sourcemap);
+			$map->WriteConfig($mapfile);
+		    }
+		}
 		break;
 
 	case 'font_samples':
@@ -199,8 +206,7 @@ else
 			}
 		}
 
-		$map->sizedebug = TRUE;
-		//            $map->RandomData();
+		$map->sizedebug = TRUE;		
 		$map->DrawMap('','',250,TRUE,$use_overlay,$use_relative_overlay);
 		exit();
 		break;
@@ -220,47 +226,50 @@ else
 		break;
         
     case 'fetch_config':
-        $map->ReadConfig($mapfile);
-		header('Content-type: text/plain');
-		$item_name = $_REQUEST['item_name'];
-		$item_type = $_REQUEST['item_type'];
-		$ok=FALSE;
+	    $map->ReadConfig($mapfile);
+	    header('Content-type: text/plain');
+	    $item_name = $_REQUEST['item_name'];
+	    $item_type = $_REQUEST['item_type'];
+	    
+	    $ok=FALSE;
 
-		if($item_type == 'node'){
-            if (isset($map->nodes[$item_name])) {
-                print $map->nodes[$item_name]->WriteConfig();
-                $ok=TRUE;
-            }
+	    if($item_type == 'node'){
+		if (isset($map->nodes[$item_name])) {
+		    print $map->nodes[$item_name]->WriteConfig();
+		    $ok = TRUE;
 		}
-		if($item_type == 'link') {
-            if(isset($map->links[$item_name])) {
-                print $map->links[$item_name]->WriteConfig();
-                $ok=TRUE;
-            }
+	    }
+	    if($item_type == 'link') {
+		if(isset($map->links[$item_name])) {
+		    print $map->links[$item_name]->WriteConfig();
+		    $ok = TRUE;
 		}
+	    }
 		
-		if (! $ok) { 
-            print "# the request item didn't exist. That's probably a bug.\n"; 
-        }
+	    if (! $ok) { 
+	        print "# the request item didn't exist. That's probably a bug.\n"; 
+	    }
 		
-		exit();
-		break;
+	    exit();
+	    break;
 
 	case "set_link_config":
 		$map->ReadConfig($mapfile);
 
 		$link_name = $_REQUEST['link_name'];
 		$link_config = fix_gpc_string($_REQUEST['item_configtext']);
-		                
-        $map->links[$link_name]->config_override = $link_config;
-                
-		$map->WriteConfig($mapfile);
-		// now clear and reload the map object, because the in-memory one is out of sync
-		// - we don't know what changes the user made here, so we just have to reload.
-		unset($map);
-		$map = new WeatherMap;
-		$map->context = 'editor';
-		$map->ReadConfig($mapfile);
+
+		if(isset($map->links[$link_name])) {		                
+		    $map->links[$link_name]->config_override = $link_config;
+		    
+		    $map->WriteConfig($mapfile);
+		    // now clear and reload the map object, because the in-memory one is out of sync
+		    // - we don't know what changes the user made here, so we just have to reload.
+		    unset($map);
+		    $map = new WeatherMap;
+		    $map->context = 'editor';
+		    $map->ReadConfig($mapfile);
+		}
 		break;
 
 	case "set_node_config":
@@ -269,19 +278,17 @@ else
 		$node_name = $_REQUEST['node_name'];
 		$node_config = fix_gpc_string($_REQUEST['item_configtext']);
 		
-		if (true == function_exists('get_magic_quotes_gpc') && 1 == get_magic_quotes_gpc()) {
-			$link_config = stripslashes($link_config);
+		if(isset($map->nodes[$node_name])) {		                
+		    $map->nodes[$node_name]->config_override = $node_config;
+		    
+		    $map->WriteConfig($mapfile);
+		    // now clear and reload the map object, because the in-memory one is out of sync
+		    // - we don't know what changes the user made here, so we just have to reload.
+		    unset($map);
+		    $map = new WeatherMap;
+		    $map->context = 'editor';
+		    $map->ReadConfig($mapfile);
 		}
-                
-        $map->nodes[$node_name]->config_override = $node_config;
-                
-		$map->WriteConfig($mapfile);
-		// now clear and reload the map object, because the in-memory one is out of sync
-		// - we don't know what changes the user made here, so we just have to reload.
-		unset($map);
-		$map = new WeatherMap;
-		$map->context = 'editor';
-		$map->ReadConfig($mapfile);
 		break;
 
 	case "set_node_properties":
@@ -290,66 +297,68 @@ else
 		$node_name = $_REQUEST['node_name'];
 		$new_node_name = $_REQUEST['node_new_name'];
 
-        if($node_name != $new_node_name && strpos($new_node_name," ") === false)
+		// first check if there's a rename...
+		if($node_name != $new_node_name && strpos($new_node_name," ") === false)
 		{
-			if(!isset($map->nodes[$new_node_name]))
-			{
-				// we need to rename the node first.					
-				$newnode = $map->nodes[$node_name];
-				$newnode->name = $new_node_name;
-				$map->nodes[$new_node_name] = $newnode;
-				unset($map->nodes[$node_name]);
+		    if(!isset($map->nodes[$new_node_name]))
+		    {
+			    // we need to rename the node first.					
+			    $newnode = $map->nodes[$node_name];
+			    $newnode->name = $new_node_name;
+			    $map->nodes[$new_node_name] = $newnode;
+			    unset($map->nodes[$node_name]);
 
-				// find the references elsewhere to the old node name.
-				// First, relatively-positioned NODEs	
-				foreach ($map->nodes as $node)
-				{
-					if($node->relative_to == $node_name)
-					{
-						$map->nodes[$node->name]->relative_to = $new_node_name;
-					}
-				}
-				// Next, LINKs that use this NODE as an end.	
-				foreach ($map->links as $link)
-				{
-				    if(isset($link->a))
+			    // find the references elsewhere to the old node name.
+			    // First, relatively-positioned NODEs	
+			    foreach ($map->nodes as $node)
+			    {
+				    if($node->relative_to == $node_name)
 				    {
-					if($link->a->name == $node_name)
+					    $map->nodes[$node->name]->relative_to = $new_node_name;
+				    }
+			    }
+			    // Next, LINKs that use this NODE as an end.	
+			    foreach ($map->links as $link)
+			    {
+				if(isset($link->a))
+				{
+				    if($link->a->name == $node_name)
+				    {
+					    $map->links[$link->name]->a = $newnode;
+				    }
+				    if($link->b->name == $node_name)
+				    {
+					    $map->links[$link->name]->b = $newnode;
+				    }
+				    // while we're here, VIAs can also be relative to a NODE,
+				    // so check if any of those need to change
+				    if( (count($link->vialist)>0) )
+				    {
+					$vv=0;
+					foreach($link->vialist as $v)
 					{
-						$map->links[$link->name]->a = $newnode;
-					}
-					if($link->b->name == $node_name)
-					{
-						$map->links[$link->name]->b = $newnode;
-					}
-					// while we're here, VIAs can also be relative to a NODE,
-					// so check if any of those need to change
-					if( (count($link->vialist)>0) )
-                        		{
-                                            $vv=0;
-					    foreach($link->vialist as $v)
-                                            {
-                                                if(isset($v[2]) && $v[2] == $node_name)
-                                                {
-                                                    // die PHP4, die!
-                                                    $map->links[$link->name]->vialist[$vv][2] = $new_node_name;
-                                                }
-                                                $vv++;
-                                            }                                            
-					}
+					    if(isset($v[2]) && $v[2] == $node_name)
+					    {
+						// die PHP4, die!
+						$map->links[$link->name]->vialist[$vv][2] = $new_node_name;
+					    }
+					    $vv++;
+					}                                            
 				    }
 				}
-			}
-			else
-			{
-				// silently ignore attempts to rename a node to an existing name
-				$new_node_name = $node_name;
-			}
+			    }
+		    }
+		    else
+		    {
+			// silently ignore attempts to rename a node to an existing name
+			$new_node_name = $node_name;
+		    }
 		}
 
 		// by this point, and renaming has been done, and new_node_name will always be the right name
-		$map->nodes[$new_node_name]->label = $_REQUEST['node_label'];
-		$map->nodes[$new_node_name]->infourl[IN] = $_REQUEST['node_infourl'];
+		$map->nodes[$new_node_name]->label = wm_editor_sanitize_string($_REQUEST['node_label']);
+		$map->nodes[$new_node_name]->infourl[IN] = wm_editor_sanitize_string($_REQUEST['node_infourl']);
+		
 		$urls = preg_split('/\s+/', $_REQUEST['node_hover'], -1, PREG_SPLIT_NO_EMPTY);
 		$map->nodes[$new_node_name]->overliburl[IN] = $urls;
 		$map->nodes[$new_node_name]->overliburl[OUT] = $urls;
@@ -359,13 +368,15 @@ else
 
 		if($_REQUEST['node_iconfilename'] == '--NONE--')
 		{
-			$map->nodes[$new_node_name]->iconfile='';    
+		    $map->nodes[$new_node_name]->iconfile='';   
 		}
 		else
 		{
-			// AICONs mess this up, because they're not fully supported by the editor, but it can still break them
-			if($_REQUEST['node_iconfilename'] != '--AICON--')
-				$map->nodes[$new_node_name]->iconfile = stripslashes($_REQUEST['node_iconfilename']);
+		    // AICONs mess this up, because they're not fully supported by the editor, but it can still break them
+		    if($_REQUEST['node_iconfilename'] != '--AICON--') {
+			    $iconfile = stripslashes($_REQUEST['node_iconfilename']);			    
+			    $map->nodes[$new_node_name]->iconfile = $iconfile;
+		    }
 		}
 
 		$map->WriteConfig($mapfile);
@@ -375,72 +386,75 @@ else
 		$map->ReadConfig($mapfile);
 		$link_name = $_REQUEST['link_name'];
 
-        if(strpos($link_name," ") === false) {
+		if(strpos($link_name," ") === false) {
+		    $map->links[$link_name]->width = floatval($_REQUEST['link_width']);
+		    $map->links[$link_name]->infourl[IN] = wm_editor_sanitize_string($_REQUEST['link_infourl']);
+		    $map->links[$link_name]->infourl[OUT] = wm_editor_sanitize_string($_REQUEST['link_infourl']);
+		    $urls = preg_split('/\s+/', $_REQUEST['link_hover'], -1, PREG_SPLIT_NO_EMPTY);
+		    $map->links[$link_name]->overliburl[IN] = $urls;
+		    $map->links[$link_name]->overliburl[OUT] = $urls;
+		    
+		    $map->links[$link_name]->comments[IN] =  wm_editor_sanitize_string($_REQUEST['link_commentin']);
+		    $map->links[$link_name]->comments[OUT] = wm_editor_sanitize_string($_REQUEST['link_commentout']);
+		    $map->links[$link_name]->commentoffset_in =  intval($_REQUEST['link_commentposin']);
+		    $map->links[$link_name]->commentoffset_out = intval($_REQUEST['link_commentposout']); 
 
-			$map->links[$link_name]->width = floatval($_REQUEST['link_width']);
-			$map->links[$link_name]->infourl[IN] = $_REQUEST['link_infourl'];
-			$map->links[$link_name]->infourl[OUT] = $_REQUEST['link_infourl'];
-			$urls = preg_split('/\s+/', $_REQUEST['link_hover'], -1, PREG_SPLIT_NO_EMPTY);
-			$map->links[$link_name]->overliburl[IN] = $urls;
-			$map->links[$link_name]->overliburl[OUT] = $urls;
-			
-			$map->links[$link_name]->comments[IN] =  $_REQUEST['link_commentin'];
-			$map->links[$link_name]->comments[OUT] = $_REQUEST['link_commentout'];
-			$map->links[$link_name]->commentoffset_in =  intval($_REQUEST['link_commentposin']);
-			$map->links[$link_name]->commentoffset_out = intval($_REQUEST['link_commentposout']); 
+		    // $map->links[$link_name]->target = $_REQUEST['link_target'];
 
-			// $map->links[$link_name]->target = $_REQUEST['link_target'];
+		    $targets = preg_split('/\s+/',$_REQUEST['link_target'],-1,PREG_SPLIT_NO_EMPTY); 
+		    $new_target_list = array();
 
-			$targets = preg_split('/\s+/',$_REQUEST['link_target'],-1,PREG_SPLIT_NO_EMPTY); 
-			$new_target_list = array();
+		    foreach ($targets as $target)
+		    {
+			// we store the original TARGET string, and line number, along with the breakdown, to make nicer error messages later
+			$newtarget = array($target,'traffic_in','traffic_out',0,$target);
 
-			foreach ($targets as $target)
+			// if it's an RRD file, then allow for the user to specify the
+			// DSs to be used. The default is traffic_in, traffic_out, which is
+			// OK for Cacti (most of the time), but if you have other RRDs...
+			if(preg_match("/(.*\.rrd):([\-a-zA-Z0-9_]+):([\-a-zA-Z0-9_]+)$/i",$target,$matches))
 			{
-				// we store the original TARGET string, and line number, along with the breakdown, to make nicer error messages later
-				$newtarget = array($target,'traffic_in','traffic_out',0,$target);
-
-				// if it's an RRD file, then allow for the user to specify the
-				// DSs to be used. The default is traffic_in, traffic_out, which is
-				// OK for Cacti (most of the time), but if you have other RRDs...
-				if(preg_match("/(.*\.rrd):([\-a-zA-Z0-9_]+):([\-a-zA-Z0-9_]+)$/i",$target,$matches))
-				{
-					$newtarget[0] = $matches[1];
-					$newtarget[1] = $matches[2];
-					$newtarget[2] = $matches[3];
-				}
-				// now we've (maybe) messed with it, we'll store the array of target specs
-				$new_target_list[] = $newtarget;
+				$newtarget[0] = $matches[1];
+				$newtarget[1] = $matches[2];
+				$newtarget[2] = $matches[3];
 			}
-			$map->links[$link_name]->targets = $new_target_list;
+			// now we've (maybe) messed with it, we'll store the array of target specs
+			$new_target_list[] = $newtarget;
+		    }
+		    $map->links[$link_name]->targets = $new_target_list;
 
-			$bwin = $_REQUEST['link_bandwidth_in'];
-			$bwout = $_REQUEST['link_bandwidth_out'];
+		    $bwin = $_REQUEST['link_bandwidth_in'];
+		    $bwout = $_REQUEST['link_bandwidth_out'];
 
-			if(isset($_REQUEST['link_bandwidth_out_cb']) && $_REQUEST['link_bandwidth_out_cb'] == 'symmetric')
-			{
-				$bwout = $bwin;
-			}
+		    if(isset($_REQUEST['link_bandwidth_out_cb']) && $_REQUEST['link_bandwidth_out_cb'] == 'symmetric')
+		    {
+			    $bwout = $bwin;
+		    }
 
-			// $map->links[$link_name]->SetBandwidth($bwin,$bwout);
+		    if(wm_editor_validate_bandwidth($bwin)) {
 			$map->links[$link_name]->max_bandwidth_in_cfg = $bwin;
-			$map->links[$link_name]->max_bandwidth_out_cfg = $bwout;
 			$map->links[$link_name]->max_bandwidth_in = unformat_number($bwin, $map->kilo);
-	                $map->links[$link_name]->max_bandwidth_out = unformat_number($bwout, $map->kilo);
-
-
-			$map->WriteConfig($mapfile);
+		    
+		    }
+		    if(wm_editor_validate_bandwidth($bwout)) {
+			$map->links[$link_name]->max_bandwidth_out_cfg = $bwout;		    
+			$map->links[$link_name]->max_bandwidth_out = unformat_number($bwout, $map->kilo);
+		    }
+		    // $map->links[$link_name]->SetBandwidth($bwin,$bwout);
+		    
+		    $map->WriteConfig($mapfile);
 		}
 		break;
 
 	case "set_map_properties":
 		$map->ReadConfig($mapfile);
 
-		$map->title = $_REQUEST['map_title'];
-		$map->keytext['DEFAULT'] = $_REQUEST['map_legend'];
-		$map->stamptext = $_REQUEST['map_stamp'];
+		$map->title = wm_editor_sanitize_string($_REQUEST['map_title']);
+		$map->keytext['DEFAULT'] = wm_editor_sanitize_string($_REQUEST['map_legend']);
+		$map->stamptext = wm_editor_sanitize_string($_REQUEST['map_stamp']);
 
-		$map->htmloutputfile = $_REQUEST['map_htmlfile'];
-		$map->imageoutputfile = $_REQUEST['map_pngfile'];
+		$map->htmloutputfile = wm_editor_sanitize_file($_REQUEST['map_htmlfile'],array("html") );
+		$map->imageoutputfile = wm_editor_sanitize_file($_REQUEST['map_pngfile'],array("png","jpg","gif","jpeg"));
 
 		$map->width = intval($_REQUEST['map_width']);
 		$map->height = intval($_REQUEST['map_height']);
@@ -448,15 +462,15 @@ else
 		// XXX sanitise this a bit
 		if($_REQUEST['map_bgfile'] == '--NONE--')
 		{
-			$map->background='';    
+		    $map->background='';    
 		}
 		else
-		{
-			$map->background = stripslashes($_REQUEST['map_bgfile']);
+		{		    
+		    $map->background = wm_editor_sanitize_file(stripslashes($_REQUEST['map_bgfile']),array("png","jpg","gif","jpeg") );
 		}
 
 		$inheritables = array(
-			array('link','width','map_linkdefaultwidth'),
+			array('link','width','map_linkdefaultwidth',"float"),
 		);
 
 		handle_inheritance($map, $inheritables);	
@@ -465,9 +479,17 @@ else
                 
 		$bwin = $_REQUEST['map_linkdefaultbwin'];
 		$bwout = $_REQUEST['map_linkdefaultbwout'];
-
+		
 		$bwin_old = $map->links['DEFAULT']->max_bandwidth_in_cfg;
 		$bwout_old = $map->links['DEFAULT']->max_bandwidth_out_cfg;
+		
+		if(! wm_editor_validate_bandwidth($bwin)) {
+		    $bwin = $bwin_old;
+		}
+
+		if(! wm_editor_validate_bandwidth($bwout)) {
+		    $bwout = $bwout_old;
+		}		
 
 		if( ($bwin_old != $bwin) || ($bwout_old != $bwout) )
 		{
@@ -479,15 +501,15 @@ else
 			// $map->defaultlink->SetBandwidth($bwin,$bwout);
 			foreach ($map->links as $link)
 			{
-				if( ($link->max_bandwidth_in_cfg == $bwin_old) || ($link->max_bandwidth_out_cfg == $bwout_old) )
-				{
-		//			$link->SetBandwidth($bwin,$bwout);
-					$link_name = $link->name;
-					$map->links[$link_name]->max_bandwidth_in_cfg = $bwin;
-					$map->links[$link_name]->max_bandwidth_out_cfg = $bwout;
-					$map->links[$link_name]->max_bandwidth_in = unformat_number($bwin, $map->kilo);
-			        $map->links[$link_name]->max_bandwidth_out = unformat_number($bwout, $map->kilo);
-				}
+			    if( ($link->max_bandwidth_in_cfg == $bwin_old) || ($link->max_bandwidth_out_cfg == $bwout_old) )
+			    {
+	    //			$link->SetBandwidth($bwin,$bwout);
+				    $link_name = $link->name;
+				    $map->links[$link_name]->max_bandwidth_in_cfg = $bwin;
+				    $map->links[$link_name]->max_bandwidth_out_cfg = $bwout;
+				    $map->links[$link_name]->max_bandwidth_in = unformat_number($bwin, $map->kilo);
+				    $map->links[$link_name]->max_bandwidth_out = unformat_number($bwout, $map->kilo);
+			    }
 			}
 		}
 
@@ -497,14 +519,17 @@ else
 	case 'set_map_style':
 		$map->ReadConfig($mapfile);
 
-		$map->htmlstyle = $_REQUEST['mapstyle_htmlstyle'];
+		if(wm_editor_validate_one_of($_REQUEST['mapstyle_htmlstyle'],array('static','overlib'),false)) {
+		    $map->htmlstyle = strtolower($_REQUEST['mapstyle_htmlstyle']); 		    
+		}
+
 		$map->keyfont = intval($_REQUEST['mapstyle_legendfont']);
 
 		$inheritables = array(
-			array('link','labelstyle','mapstyle_linklabels'),
-			array('link','bwfont','mapstyle_linkfont'),
-			array('link','arrowstyle','mapstyle_arrowstyle'),
-			array('node','labelfont','mapstyle_nodefont')
+			array('link','labelstyle','mapstyle_linklabels',""),
+			array('link','bwfont','mapstyle_linkfont',"int"),
+			array('link','arrowstyle','mapstyle_arrowstyle',""),
+			array('node','labelfont','mapstyle_nodefont',"int")
 			);
 
 		handle_inheritance($map, $inheritables);
@@ -530,7 +555,7 @@ else
 		# $b = substr($b,0,-2);
 		$log = "[$a -> $b]";
 
-		if($a != $b)
+		if($a != $b && isset($map->nodes[$a]) && isset($map->nodes[$b]) )
 		{
 			$newlink = new WeatherMapLink;
 			$newlink->Reset($map);
@@ -561,7 +586,7 @@ else
 	case "place_legend":
 		$x = snap( intval($_REQUEST['x']) ,$grid_snap_value);
 		$y = snap( intval($_REQUEST['y']) ,$grid_snap_value);
-		$scalename = $_REQUEST['param'];
+		$scalename = wm_editor_sanitize_name($_REQUEST['param']);
 
 		$map->ReadConfig($mapfile);
 
@@ -587,178 +612,190 @@ else
 	case "via_link":
 		$x = intval($_REQUEST['x']);
 		$y = intval($_REQUEST['y']);
-		$link_name = $_REQUEST['link_name'];
+		$link_name = wm_editor_sanitize_name($_REQUEST['link_name']);
 
 		$map->ReadConfig($mapfile);
 
-		$map->links[$link_name]->vialist = array(array(0 =>$x, 1=>$y));
-
-		$map->WriteConfig($mapfile);
+		if(isset($map->links[$link_name])) {
+		    $map->links[$link_name]->vialist = array(array(0 =>$x, 1=>$y));
+		    $map->WriteConfig($mapfile);
+		}
+		
 		break;
 
 		
 	case "move_node":
 		$x = snap( intval($_REQUEST['x']),  $grid_snap_value);
 		$y = snap( intval($_REQUEST['y']), $grid_snap_value);
-		$node_name = $_REQUEST['node_name'];
+		$node_name = wm_editor_sanitize_name($_REQUEST['node_name']);
 
 		$map->ReadConfig($mapfile);
 
-		// This is a complicated bit. Find out if this node is involved in any
-		// links that have VIAs. If it is, we want to rotate those VIA points
-		// about the *other* node in the link
-		foreach ($map->links as $link)
-		{
-			if( (count($link->vialist)>0)  && (($link->a->name == $node_name) || ($link->b->name == $node_name)) )
-			{	
-				// get the other node from us
-				if($link->a->name == $node_name) $pivot = $link->b;
-				if($link->b->name == $node_name) $pivot = $link->a; 
-				
-				if( ($link->a->name == $node_name) && ($link->b->name == $node_name) )
-				{
-					// this is a wierd special case, but it is possible
-					# $log .= "Special case for node1->node1 links\n";
-					$dx = $link->a->x - $x;
-					$dy = $link->a->y - $y;
-					
-					for($i=0; $i<count($link->vialist); $i++)
-					{
-						$link->vialist[$i][0] = $link->vialist[$i][0]-$dx;
-						$link->vialist[$i][1] = $link->vialist[$i][1]-$dy;
-					}
-				}
-				else
-				{
-					$pivx = $pivot->x;
-					$pivy = $pivot->y;
-					
-					$dx_old = $pivx - $map->nodes[$node_name]->x;
-					$dy_old = $pivy - $map->nodes[$node_name]->y;
-					$dx_new = $pivx - $x;
-					$dy_new = $pivy - $y;
-					$l_old = sqrt($dx_old*$dx_old + $dy_old*$dy_old);
-					$l_new = sqrt($dx_new*$dx_new + $dy_new*$dy_new);
-					
-					$angle_old = rad2deg(atan2(-$dy_old,$dx_old));
-					$angle_new = rad2deg(atan2(-$dy_new,$dx_new));
-										
-					# $log .= "$pivx,$pivy\n$dx_old $dy_old $l_old => $angle_old\n";
-					# $log .= "$dx_new $dy_new $l_new => $angle_new\n";
-				
-					// the geometry stuff uses a different point format, helpfully
-					$points = array();
-					foreach($link->vialist as $via)
-					{
-						$points[] = $via[0];
-						$points[] = $via[1];
-					}
-					
-					$scalefactor = $l_new/$l_old;
-					# $log .= "Scale by $scalefactor along link-line";
-					
-					// rotate so that link is along the axis
-					RotateAboutPoint($points,$pivx, $pivy, deg2rad($angle_old));
-					// do the scaling in here
-					for($i=0; $i<(count($points)/2); $i++)
-					{
-						$basex = ($points[$i*2] - $pivx) * $scalefactor + $pivx;
-						$points[$i*2] = $basex;
-					}
-					// rotate back so that link is along the new direction
-					RotateAboutPoint($points,$pivx, $pivy, deg2rad(-$angle_new));
-					
-					// now put the modified points back into the vialist again
-					$v = 0; $i = 0;
-					foreach($points as $p)
-					{
-						// skip a point if it positioned relative to a node. Those shouldn't be rotated (well, IMHO)
-						if(!isset($link->vialist[$v][2]))
-						{
-							$link->vialist[$v][$i]=$p;
-						}
-						$i++;
-						if($i==2) { $i=0; $v++;}					
-					}
-				}
-			}
+		if(isset($map->nodes[$node_name])) {
+		    // This is a complicated bit. Find out if this node is involved in any
+		    // links that have VIAs. If it is, we want to rotate those VIA points
+		    // about the *other* node in the link
+		    foreach ($map->links as $link)
+		    {
+			    if( (count($link->vialist)>0)  && (($link->a->name == $node_name) || ($link->b->name == $node_name)) )
+			    {	
+				    // get the other node from us
+				    if($link->a->name == $node_name) $pivot = $link->b;
+				    if($link->b->name == $node_name) $pivot = $link->a; 
+				    
+				    if( ($link->a->name == $node_name) && ($link->b->name == $node_name) )
+				    {
+					    // this is a wierd special case, but it is possible
+					    # $log .= "Special case for node1->node1 links\n";
+					    $dx = $link->a->x - $x;
+					    $dy = $link->a->y - $y;
+					    
+					    for($i=0; $i<count($link->vialist); $i++)
+					    {
+						    $link->vialist[$i][0] = $link->vialist[$i][0]-$dx;
+						    $link->vialist[$i][1] = $link->vialist[$i][1]-$dy;
+					    }
+				    }
+				    else
+				    {
+					    $pivx = $pivot->x;
+					    $pivy = $pivot->y;
+					    
+					    $dx_old = $pivx - $map->nodes[$node_name]->x;
+					    $dy_old = $pivy - $map->nodes[$node_name]->y;
+					    $dx_new = $pivx - $x;
+					    $dy_new = $pivy - $y;
+					    $l_old = sqrt($dx_old*$dx_old + $dy_old*$dy_old);
+					    $l_new = sqrt($dx_new*$dx_new + $dy_new*$dy_new);
+					    
+					    $angle_old = rad2deg(atan2(-$dy_old,$dx_old));
+					    $angle_new = rad2deg(atan2(-$dy_new,$dx_new));
+										    
+					    # $log .= "$pivx,$pivy\n$dx_old $dy_old $l_old => $angle_old\n";
+					    # $log .= "$dx_new $dy_new $l_new => $angle_new\n";
+				    
+					    // the geometry stuff uses a different point format, helpfully
+					    $points = array();
+					    foreach($link->vialist as $via)
+					    {
+						    $points[] = $via[0];
+						    $points[] = $via[1];
+					    }
+					    
+					    $scalefactor = $l_new/$l_old;
+					    # $log .= "Scale by $scalefactor along link-line";
+					    
+					    // rotate so that link is along the axis
+					    RotateAboutPoint($points,$pivx, $pivy, deg2rad($angle_old));
+					    // do the scaling in here
+					    for($i=0; $i<(count($points)/2); $i++)
+					    {
+						    $basex = ($points[$i*2] - $pivx) * $scalefactor + $pivx;
+						    $points[$i*2] = $basex;
+					    }
+					    // rotate back so that link is along the new direction
+					    RotateAboutPoint($points,$pivx, $pivy, deg2rad(-$angle_new));
+					    
+					    // now put the modified points back into the vialist again
+					    $v = 0; $i = 0;
+					    foreach($points as $p)
+					    {
+						    // skip a point if it positioned relative to a node. Those shouldn't be rotated (well, IMHO)
+						    if(!isset($link->vialist[$v][2]))
+						    {
+							    $link->vialist[$v][$i]=$p;
+						    }
+						    $i++;
+						    if($i==2) { $i=0; $v++;}					
+					    }
+				    }
+			    }
+		    }
+		    
+		    $map->nodes[$node_name]->x = $x;
+		    $map->nodes[$node_name]->y = $y;
+    
+		    $map->WriteConfig($mapfile);
 		}
-		
-		$map->nodes[$node_name]->x = $x;
-		$map->nodes[$node_name]->y = $y;
-
-		$map->WriteConfig($mapfile);
 		break;
 
     case "link_align_horizontal":
 		$map->ReadConfig($mapfile);
 
-		$target = $_REQUEST['param'];
-		$log = "align link ".$target;
-
-		$a_y = $map->links[$target]->a->y;
-                $b_y = $map->links[$target]->b->y;
-                
-                $diff = $b_y - $a_y;
-                $newoffset = "0:$diff";
-                
-                // if we've already done this once, try the other way around...
-                if($map->links[$target]->a_offset == $newoffset)
-                {
-                    $diff = $a_y - $b_y;
-                    $newoffset = "0:$diff";
-                    $map->links[$target]->b_offset = $newoffset;
-                    $map->links[$target]->a_offset = "C";
-                }
-                else
-                {
-                    // the standard thing
-                    $map->links[$target]->a_offset = $newoffset;
-                    $map->links[$target]->b_offset = "C";
-                }     
-
-		$map->WriteConfig($mapfile);
+		$target = wm_editor_sanitize_name($_REQUEST['param']);
+		
+		if(isset($map->links[target])) {
+		    $log = "align link ".$target;	
+		    
+		    $a_y = $map->links[$target]->a->y;
+		    $b_y = $map->links[$target]->b->y;
+		    
+		    $diff = $b_y - $a_y;
+		    $newoffset = "0:$diff";
+		    
+		    // if we've already done this once, try the other way around...
+		    if($map->links[$target]->a_offset == $newoffset)
+		    {
+			$diff = $a_y - $b_y;
+			$newoffset = "0:$diff";
+			$map->links[$target]->b_offset = $newoffset;
+			$map->links[$target]->a_offset = "C";
+		    }
+		    else
+		    {
+			// the standard thing
+			$map->links[$target]->a_offset = $newoffset;
+			$map->links[$target]->b_offset = "C";
+		    }     
+    
+		    $map->WriteConfig($mapfile);
+		}
                 break;
 
     case "link_align_vertical":
 		$map->ReadConfig($mapfile);
 
-		$target = $_REQUEST['param'];
-		$log = "align link ".$target;
-
-		$a_x = $map->links[$target]->a->x;
-                $b_x = $map->links[$target]->b->x;
-                
-                $diff = $b_x - $a_x;
-                $newoffset = "$diff:0";
-                
-                // if we've already done this once, try the other way around...
-                if($map->links[$target]->a_offset == $newoffset)
-                {
-                    $diff = $a_x - $b_x;
-                    $newoffset = "$diff:0";
-                    $map->links[$target]->b_offset = $newoffset;
-                    $map->links[$target]->a_offset = "C";
-                }
-                else
-                {
-                    // the standard thing
-                    $map->links[$target]->a_offset = $newoffset;
-                    $map->links[$target]->b_offset = "C";
-                }     
-
-		$map->WriteConfig($mapfile);
+		$target = wm_editor_sanitize_name($_REQUEST['param']);
+		
+		if(isset($map->links[target])) {		    
+		    $log = "align link ".$target;
+    
+		    $a_x = $map->links[$target]->a->x;
+		    $b_x = $map->links[$target]->b->x;
+		    
+		    $diff = $b_x - $a_x;
+		    $newoffset = "$diff:0";
+		    
+		    // if we've already done this once, try the other way around...
+		    if($map->links[$target]->a_offset == $newoffset)
+		    {
+			$diff = $a_x - $b_x;
+			$newoffset = "$diff:0";
+			$map->links[$target]->b_offset = $newoffset;
+			$map->links[$target]->a_offset = "C";
+		    }
+		    else
+		    {
+			// the standard thing
+			$map->links[$target]->a_offset = $newoffset;
+			$map->links[$target]->b_offset = "C";
+		    }     
+    
+		    $map->WriteConfig($mapfile);
+		}
                 break;
 
 	case "delete_link":
 		$map->ReadConfig($mapfile);
 
-		$target = $_REQUEST['param'];
+		$target = wm_editor_sanitize_name($_REQUEST['param']);
 		$log = "delete link ".$target;
 
-		unset($map->links[$target]);
-		
-		$map->WriteConfig($mapfile);
+		if(isset($map->links[target])) {
+		    unset($map->links[$target]);
+		    
+		    $map->WriteConfig($mapfile);
+		}
 		break;
 
 	case "add_node":
@@ -810,51 +847,55 @@ else
 	case "delete_node":
 		$map->ReadConfig($mapfile);
 
-		$target = $_REQUEST['param'];
-		$log = "delete node ".$target;
-
-		foreach ($map->links as $link)
-		{
-			if( isset($link->a) )
-			{
-				if( ($target == $link->a->name) || ($target == $link->b->name) )
-				{
-					unset($map->links[$link->name]);
-				}
-			}
-		}           
-
-		unset($map->nodes[$target]);
-
-		$map->WriteConfig($mapfile);
+		$target = wm_editor_sanitize_name($_REQUEST['param']);
+		if(isset($map->nodes[$target])) {
+		    $log = "delete node ".$target;
+    
+		    foreach ($map->links as $link)
+		    {
+			    if( isset($link->a) )
+			    {
+				    if( ($target == $link->a->name) || ($target == $link->b->name) )
+				    {
+					    unset($map->links[$link->name]);
+				    }
+			    }
+		    }           
+    
+		    unset($map->nodes[$target]);
+    
+		    $map->WriteConfig($mapfile);
+		}
 		break;
 
 	case "clone_node":
 		$map->ReadConfig($mapfile);
 
-		$target = $_REQUEST['param'];
-		$log = "clone node ".$target;
-
-		$newnodename = $target;
-		do
-		{
-			$newnodename = $newnodename."_copy";
-		} while(isset($map->nodes[$newnodename]));
-		
-		$node = new WeatherMapNode;
-		$node->Reset($map);
-		$node->CopyFrom($map->nodes[$target]);
-
-		$node->name = $newnodename;
-		$node->x += 30;
-		$node->y += 30;
-                $node->defined_in = $mapfile;
-
-
-		$map->nodes[$newnodename] = $node;
-		array_push($map->seen_zlayers[$node->zorder], $node);
-
-		$map->WriteConfig($mapfile);
+		$target = wm_editor_sanitize_name($_REQUEST['param']);
+		if(isset($map->nodes[$target])) {
+		    $log = "clone node ".$target;
+    
+		    $newnodename = $target;
+		    do
+		    {
+			    $newnodename = $newnodename."_copy";
+		    } while(isset($map->nodes[$newnodename]));
+		    
+		    $node = new WeatherMapNode;
+		    $node->Reset($map);
+		    $node->CopyFrom($map->nodes[$target]);
+    
+		    $node->name = $newnodename;
+		    $node->x += 30;
+		    $node->y += 30;
+		    $node->defined_in = $mapfile;
+    
+    
+		    $map->nodes[$newnodename] = $node;
+		    array_push($map->seen_zlayers[$node->zorder], $node);
+    
+		    $map->WriteConfig($mapfile);
+		}
 		break;
 
 		// no action was defined - starting a new map?
@@ -868,10 +909,10 @@ else
 
 	// now we'll just draw the full editor page, with our new knowledge
 
-	$imageurl = '?mapname='.$mapname . '&amp;action=draw';
+	$imageurl = '?mapname='.urlencode($mapname) . '&amp;action=draw';
 	if($selected != '')
 	{
-		$imageurl .= '&amp;selected='.$selected;
+		$imageurl .= '&amp;selected='.urlencode(wm_editor_sanitize_selected($selected));
 	}
 
 	$imageurl .= '&amp;unique='.time();
@@ -954,17 +995,17 @@ else
 	<div align="center" id="mainarea">
 		<input type="hidden" name="plug" value="<?php echo ($fromplug==TRUE ? 1 : 0) ?>" />
 	 <input style="display:none" type="image"
-	  src="<?php echo  $imageurl; ?>" id="xycapture" /><img src=
-	  "<?php echo  $imageurl; ?>" id="existingdata" alt="Weathermap" usemap="#weathermap_imap"
+	  src="<?php echo $imageurl; ?>" id="xycapture" /><img src=
+	  "<?php echo $imageurl; ?>" id="existingdata" alt="Weathermap" usemap="#weathermap_imap"
 	   />
-	   <div class="debug"><p><strong>Debug:</strong> <a href="?<?php echo ($fromplug==TRUE ? 'plug=1&amp;' : ''); ?>action=nothing&amp;mapname=<?php echo  $mapname ?>">Do Nothing</a> 
-	   <span><label for="mapname">mapfile</label><input type="text" name="mapname" value="<?php echo  $mapname; ?>" /></span>
-	   <span><label for="action">action</label><input type="text" id="action" name="action" value="<?php echo $newaction; ?>" /></span>
+	   <div class="debug"><p><strong>Debug:</strong> <a href="?<?php echo ($fromplug==TRUE ? 'plug=1&amp;' : ''); ?>action=nothing&amp;mapname=<?php echo  htmlspecialchars($mapname) ?>">Do Nothing</a> 
+	   <span><label for="mapname">mapfile</label><input type="text" name="mapname" value="<?php echo htmlspecialchars($mapname); ?>" /></span>
+	   <span><label for="action">action</label><input type="text" id="action" name="action" value="<?php echo htmlspecialchars($newaction); ?>" /></span>
 	  <span><label for="param">param</label><input type="text" name="param" id="param" value="" /></span>
-            <span><label for="param2">param2</label><input type="text" name="param2" id="param2" value="<?php echo $param2; ?>" /></span> 
+            <span><label for="param2">param2</label><input type="text" name="param2" id="param2" value="<?php echo htmlspecialchars($param2); ?>" /></span> 
 	  <span><label for="debug">debug</label><input id="debug" value="" name="debug" /></span> 
-	  <a target="configwindow" href="?<?php echo ($fromplug==TRUE ? 'plug=1&amp;':''); ?>action=show_config&amp;mapname=<?php echo  $mapname ?>">See config</a></p>
-	<pre><?php echo  $log ?></pre>
+	  <a target="configwindow" href="?<?php echo ($fromplug==TRUE ? 'plug=1&amp;':''); ?>action=show_config&amp;mapname=<?php echo  urlencode($mapname) ?>">See config</a></p>
+	<pre><?php echo  htmlspecialchars($log) ?></pre>
 	  </div>
 <?php        	
 	// we need to draw and throw away a map, to get the
@@ -1032,7 +1073,7 @@ else
 		foreach ($imlist as $im)
 		{
 			print "<option ";
-			print "value=\"$im\">$im</option>\n";
+			print "value=\"".htmlspecialchars($im)."\">".htmlspecialchars($im)."</option>\n";
 		}
 	}
 ?>
@@ -1178,41 +1219,41 @@ else
 		<table>
 		  <tr>
 			<th>Map Title</th>
-			<td><input id="map_title" name="map_title" size="25" type="text" value="<?php echo  $map->title ?>"/></td>
+			<td><input id="map_title" name="map_title" size="25" type="text" value="<?php echo  htmlspecialchars($map->title) ?>"/></td>
 		  </tr>
 		<tr>
 			<th>Legend Text</th>
-			<td><input name="map_legend" size="25" type="text" value="<?php echo  $map->keytext['DEFAULT'] ?>" /></td>
+			<td><input name="map_legend" size="25" type="text" value="<?php echo  htmlspecialchars($map->keytext['DEFAULT']) ?>" /></td>
 		  </tr>
 		<tr>
 			<th>Timestamp Text</th>
-			<td><input name="map_stamp" size="25" type="text" value="<?php echo  $map->stamptext ?>" /></td>
+			<td><input name="map_stamp" size="25" type="text" value="<?php echo  htmlspecialchars($map->stamptext) ?>" /></td>
 		  </tr>
 
 		<tr>
 			<th>Default Link Width</th>
-			<td><input name="map_linkdefaultwidth" size="6" type="text" value="<?php echo  $map->links['DEFAULT']->width ?>" /> pixels</td>
+			<td><input name="map_linkdefaultwidth" size="6" type="text" value="<?php echo  htmlspecialchars($map->links['DEFAULT']->width) ?>" /> pixels</td>
 		  </tr>
 
 		<tr>
 			<th>Default Link Bandwidth</th>
-			<td><input name="map_linkdefaultbwin" size="6" type="text" value="<?php echo  $map->links['DEFAULT']->max_bandwidth_in_cfg ?>" /> bit/sec in, <input name="map_linkdefaultbwout" size="6" type="text" value="<?php echo  $map->links['DEFAULT']->max_bandwidth_out_cfg ?>" /> bit/sec out</td>
+			<td><input name="map_linkdefaultbwin" size="6" type="text" value="<?php echo  htmlspecialchars($map->links['DEFAULT']->max_bandwidth_in_cfg) ?>" /> bit/sec in, <input name="map_linkdefaultbwout" size="6" type="text" value="<?php echo  htmlspecialchars($map->links['DEFAULT']->max_bandwidth_out_cfg) ?>" /> bit/sec out</td>
 		  </tr>
 
 
 		  <tr>
 			<th>Map Size</th>
 			<td><input name="map_width" size="5" type=
-			"text"  value="<?php echo  $map->width ?>" /> x <input name="map_height" size="5" type=
-			"text"  value="<?php echo  $map->height ?>" /> pixels</td>
+			"text"  value="<?php echo  htmlspecialchars($map->width) ?>" /> x <input name="map_height" size="5" type=
+			"text"  value="<?php echo  htmlspecialchars($map->height) ?>" /> pixels</td>
 		  </tr>
 		   <tr>
 			<th>Output Image Filename</th>
-			<td><input name="map_pngfile" type="text"  value="<?php echo  $map->imageoutputfile ?>" /></td>
+			<td><input name="map_pngfile" type="text"  value="<?php echo  htmlspecialchars($map->imageoutputfile) ?>" /></td>
 		  </tr>
 		  <tr>
 			<th>Output HTML Filename</th>
-			<td><input name="map_htmlfile" type="text" value="<?php echo  $map->htmloutputfile ?>" /></td>
+			<td><input name="map_htmlfile" type="text" value="<?php echo  htmlspecialchars($map->htmloutputfile) ?>" /></td>
 		  </tr>
 		  <tr>
 			<th>Background Image Filename</th>
@@ -1228,10 +1269,9 @@ else
 		print '<option value="--NONE--">--NONE--</option>';
 		foreach ($imlist as $im)
 		{
-			print "<option ";
-			if($map->background == $im) print " selected ";
-			print "value=\"$im\">$im</option>\n";
-
+			print "<option ";		
+    			if($map->background == $im) print " selected ";
+			print "value=\"".htmlspecialchars($im)."\">".htmlspecialchars($im)."</option>\n";
 		}
 	}
 ?>

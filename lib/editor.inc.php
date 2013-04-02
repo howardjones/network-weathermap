@@ -23,14 +23,94 @@ function fix_gpc_string($input)
     return ($input);
 }
 
+/**
+ * Clean up URI (function taken from Cacti) to protect against XSS
+ */
+function wm_editor_sanitize_uri($str) {
+        static $drop_char_match =   array(' ','^', '$', '<', '>', '`', '\'', '"', '|', '+', '[', ']', '{', '}', ';', '!', '%');
+        static $drop_char_replace = array('', '', '',  '',  '',  '',  '',   '',  '',  '',  '',  '',  '',  '',  '',  '', '');
+
+        return str_replace($drop_char_match, $drop_char_replace, urldecode($str));
+}
+
+// much looser sanitise for general strings that shouldn't have HTML in them
+function wm_editor_sanitize_string($str) {
+        static $drop_char_match =   array('<', '>' );
+        static $drop_char_replace = array('', '');
+
+        return str_replace($drop_char_match, $drop_char_replace, urldecode($str));
+}
+
+function wm_editor_validate_bandwidth($bw) {
+  
+    if(preg_match( "/^(\d+\.?\d*[KMGT]?)$/", $bw) ) {
+	return true;
+    }
+    return false;
+}
+
+function wm_editor_validate_one_of($input,$valid=array(),$case_sensitive=false) {
+    if(! $case_sensitive ) $input = strtolower($input);
+    
+    foreach ($valid as $v) {
+	if(! $case_sensitive ) $v = strtolower($v);
+	if($v == $input) return true;
+    }
+    
+    return false;
+}
+
+// Labels for Nodes, Links and Scales shouldn't have spaces in
+function wm_editor_sanitize_name($str) {
+    return str_replace( array(" "), "", $str);
+}
+
+function wm_editor_sanitize_selected($str) {        
+	$res = urldecode($str);
+	
+	if( ! preg_match("/^(LINK|NODE):/",$res)) {
+	    return "";
+	}
+	return wm_editor_sanitize_name($res);
+}
+
+function wm_editor_sanitize_file($filename,$allowed_exts=array()) {
+    
+    $filename = wm_editor_sanitize_uri($filename);
+    
+    if ($filename == "") return "";
+        
+    $ok = false;
+    foreach ($allowed_exts as $ext) {
+	$match = ".".$ext;
+	
+	if( substr($filename, -strlen($match),strlen($match)) == $match) {
+	    $ok = true;
+	}
+    }    
+    if(! $ok ) return "";
+    return $filename;
+}
+
+function wm_editor_sanitize_conffile($filename) {
+    
+    $filename = wm_editor_sanitize_uri($filename);
+    
+    # If we've been fed something other than a .conf filename, just pretend it didn't happen
+    if ( substr($filename,-5,5) != ".conf" ) {
+	$filename = ""; 
+     }
+    return $filename;
+}
+
 function show_editor_startpage()
 {
 	global $mapdir, $WEATHERMAP_VERSION, $config_loaded, $cacti_found, $ignore_cacti,$configerror;
 
 	$fromplug = false;
-    if (isset($_REQUEST['plug']) && (intval($_REQUEST['plug'])==1) ) { 
-        $fromplug = true; 
-    }
+	if (isset($_REQUEST['plug']) && (intval($_REQUEST['plug'])==1) ) { 
+	    $fromplug = true; 
+	}
 
 	$matches=0;
 
@@ -56,7 +136,7 @@ function show_editor_startpage()
 	}
 	
 	if ($errormessage != '') {
-		print '<div class="alert" id="nocacti">'.$errormessage.'</div>';
+		print '<div class="alert" id="nocacti">'.htmlspecialchars($errormessage).'</div>';
 	}
 
 	print '<div id="withjs">';
@@ -86,34 +166,35 @@ function show_editor_startpage()
 		$dh=opendir($mapdir);
 
 		if ($dh) {
-            while (false !== ($file = readdir($dh))) {
-				$realfile=$mapdir . DIRECTORY_SEPARATOR . $file;
-				$note = "";
-
-				if ( (is_file($realfile)) && (is_readable($realfile)) && (!preg_match("/^\./",$file) ) ) {
-					if (!is_writable($realfile)) {
-						$note .= "(read-only)";
-					}
-					$title='(no title)';
-					$fd=fopen($realfile, "r");
-					if ($fd) {
-						while (!feof($fd)) {
-							$buffer=fgets($fd, 4096);
+		    while (false !== ($file = readdir($dh))) {
+			$realfile=$mapdir . DIRECTORY_SEPARATOR . $file;
+			$note = "";
 	
-							if (preg_match("/^\s*TITLE\s+(.*)/i", $buffer, $matches)) { 
-                                $title=$matches[1]; 
-                            }
+			// skip directories, unreadable files, .files and anything that doesn't come through the sanitiser unchanged
+			if ( (is_file($realfile)) && (is_readable($realfile)) && (!preg_match("/^\./",$file) )  && ( wm_editor_sanitize_conffile($file) == $file ) ) {
+				if (!is_writable($realfile)) {
+					$note .= "(read-only)";
+				}
+				$title='(no title)';
+				$fd=fopen($realfile, "r");
+				if ($fd) {
+					while (!feof($fd)) {
+						$buffer=fgets($fd, 4096);
+	
+						if (preg_match("/^\s*TITLE\s+(.*)/i", $buffer, $matches)) { 
+						    $title= wm_editor_sanitize_string($matches[1]); 
 						}
-	
-						fclose ($fd);
-						$titles[$file] = $title;
-						$notes[$file] = $note;
-						$n++;
 					}
+	
+					fclose ($fd);
+					$titles[$file] = $title;
+					$notes[$file] = $note;
+					$n++;
 				}
 			}
+		    }
 
-			closedir ($dh);
+		    closedir ($dh);
 		} else { 
             $errorstring = "Can't open mapdir to read."; 
         }
@@ -121,12 +202,11 @@ function show_editor_startpage()
 		ksort($titles);
 		
 		if ($n == 0) { 
-            $errorstring = "No files in mapdir"; 
-        }
+		    $errorstring = "No files in mapdir"; 
+		}
 	} else { 
-        $errorstring = "NO DIRECTORY named $mapdir"; 
-    }
-
+	    $errorstring = "NO DIRECTORY named $mapdir"; 
+	}
 
 	print 'OR<br />Create A New Map as a copy of an existing map:<br>';
 	print '<form method="GET">';
@@ -142,31 +222,32 @@ function show_editor_startpage()
 			print "<option value=\"$nicefile\">$nicefile</option>\n";
 		}
 	} else {
-		print '<option value="">'.$errorstring.'</option>';
+		print '<option value="">'.htmlspecialchars($errorstring).'</option>';
 	}
 	
 	print '</select>';
 	print '<input type="submit" value="Create Copy">';
 	print '</form>';
 	print 'OR<br />';
-	print 'Open An Existing Map (looking in ' . $mapdir . '):<ul class="filelist">';
+	print 'Open An Existing Map (looking in ' . htmlspecialchars($mapdir) . '):<ul class="filelist">';
 
 	if ($errorstring == '') {
-		foreach ($titles as $file=>$title) {
-			$title = $titles[$file];
+		foreach ($titles as $file=>$title) {			
+			# $title = $titles[$file];
 			$note = $notes[$file];
 			$nicefile = htmlspecialchars($file);
-			print "<li>$note<a href=\"?mapname=$nicefile&plug=$fromplug\">$nicefile</a> - <span class=\"comment\">$title</span></li>\n";
+			$nicetitle = htmlspecialchars($title);
+			print "<li>$note<a href=\"?mapname=$nicefile&plug=$fromplug\">$nicefile</a> - <span class=\"comment\">$nicetitle</span></li>\n";
 		}
 	} else {
-		print '<li>'.$errorstring.'</li>';
+		print '<li>'.htmlspecialchars($errorstring).'</li>';
 	}
 
 	print "</ul>";
 
 	print "</div>"; // dlgbody
 	print '<div class="dlgHelp" id="start_help">PHP Weathermap ' . $WEATHERMAP_VERSION
-		. ' Copyright &copy; 2005-2012 Howard Jones - howie@thingy.com<br />The current version should always be <a href="http://www.network-weathermap.com/">available here</a>, along with other related software. PHP Weathermap is licensed under the GNU Public License, version 2. See COPYING for details. This distribution also includes the Overlib library by Erik Bosrup.</div>';
+		. ' Copyright &copy; 2005-2013 Howard Jones - howie@thingy.com<br />The current version should always be <a href="http://www.network-weathermap.com/">available here</a>, along with other related software. PHP Weathermap is licensed under the GNU Public License, version 2. See COPYING for details. This distribution also includes the Overlib library by Erik Bosrup.</div>';
 
 	print "</div>"; // dlgStart
 	print "</div>"; // withjs
@@ -183,24 +264,11 @@ function snap($coord, $gridsnap = 0)
     }
 }
 
-// Following function is based on code taken from here:
-// http://uk2.php.net/manual/en/security.globals.php
-//
-// It extracts a set of named variables into the global namespace,
-// validating them as they go. Returns true or false depending on if
-// validation fails. If it does fail, then nothing is added to the
-// global namespace.
-//
-function extract_with_validation($array, $paramarray, $prefix = "", $debug = false)
+
+function extract_with_validation($array, $paramarray)
 {
 	$all_present=true;
 	$candidates=array( );
-
-	if ($debug) {
-		print '<pre>';
-    	print_r ($paramarray);
-		print_r ($array);
-    }
 
 	foreach ($paramarray as $var) {
 		$varname=$var[0];
@@ -208,15 +276,11 @@ function extract_with_validation($array, $paramarray, $prefix = "", $debug = fal
 		$varreqd=$var[2];
 
 		if ($varreqd == 'req' && !array_key_exists($varname, $array)) { 
-            $all_present=false; 
-        }
+	            $all_present=false; 
+	        }
 
 		if (array_key_exists($varname, $array)) {
 			$varvalue=$array[$varname];
-
-			if ($debug) {
-				print "Checking $varname...";
-            }
 
 			$waspresent=$all_present;
 
@@ -279,7 +343,6 @@ function extract_with_validation($array, $paramarray, $prefix = "", $debug = fal
 				if (!preg_match('/^\d+\.?\d*[KMGT]*$/i', $varvalue)) { 
                     $all_present=false; 
                 }
-
 				break;
 
 			default:
@@ -288,40 +351,20 @@ function extract_with_validation($array, $paramarray, $prefix = "", $debug = fal
 
 				break;
 			}
-
-			if ($debug && $waspresent != $all_present) { 
-                print "Failed on $varname."; 
-            }
-
+			
 			if ($all_present) {
 				$candidates["{$prefix}{$varname}"]=$varvalue;
-				$candidates["{$prefix}{$varname}_slashes"]=addslashes($varvalue);
-				$candidates["{$prefix}{$varname}_url"]=urlencode($varvalue);
-				$candidates["{$prefix}{$varname}_html"]=htmlspecialchars($varvalue);
-				$candidates["{$prefix}{$varname}_url_html"]=htmlspecialchars(urlencode($varvalue));
 			}
-		} else {
-			if ($debug) {
-				print "Skipping $varname\n";
-            }
 		}
 	}
 
-	if ($debug) {
-		print_r ($candidates);
-    }
-
 	if ($all_present) {
-		foreach ($candidates as $key => $value) { 
-            $GLOBALS[$key]=$value; 
-        }
+	    foreach ($candidates as $key => $value) { 
+		$GLOBALS[$key]=$value; 
+	    }
 	}
 
-	if ($debug) {
-		print '</pre>';
-    }
-
-	return ($all_present);
+	return array($all_present,$candidates);
 }
 
 function get_imagelist($imagedir)
@@ -335,9 +378,9 @@ function get_imagelist($imagedir)
 		if ($dh) {
 			while ($file=readdir($dh)) {
 				$realfile=$imagedir . DIRECTORY_SEPARATOR . $file;
-                $uri = $imagedir . "/" . $file;
+				$uri = $imagedir . "/" . $file;
 
-				if (is_file($realfile) && ( preg_match('/\.(gif|jpg|png)$/i',$file) )) {
+				if (is_readable($realfile) && ( preg_match('/\.(gif|jpg|png)$/i',$file) )) {
 					$imagelist[] = $uri;
 					$n++;
 				}
@@ -354,8 +397,19 @@ function handle_inheritance(&$map, &$inheritables)
 	foreach ($inheritables as $inheritable) {		
 		$fieldname = $inheritable[1];
 		$formname = $inheritable[2];
+		$validation = $inheritable[3];
 		
 		$new = $_REQUEST[$formname];
+		if($validation != "") {
+		    switch($validation) {
+			case "int":
+			    $new = intval($new);
+			    break;
+			case "float":
+			    $new = floatval($new);
+			    break;
+		    }
+		}
 		
 		$old = ($inheritable[0]=='node' ? $map->nodes['DEFAULT']->$fieldname : $map->links['DEFAULT']->$fieldname);	
 		

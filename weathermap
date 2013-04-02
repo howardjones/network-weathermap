@@ -7,7 +7,7 @@
 // Released under the GNU Public License
 require_once 'Console/Getopt.php';
 
-require_once "Weathermap.class.php";
+require_once "lib/Weathermap.class.php";
 
 if (!wm_module_checks()) { die ("Quitting: Module checks failed.\n"); }
 

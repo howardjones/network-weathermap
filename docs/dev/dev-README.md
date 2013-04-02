@@ -11,13 +11,20 @@ final testing. A lot of the subversion repo doesn't end up in the final zip, so
 it's quite easy to accidentally miss a file out of the packing.list and have a 
 broken version. Two totally separate Cacti installs in one box would also work.
 Both VMs are built using a script to get the appropriate packages installed 
-in a consistent manner.
+in a consistent manner. The script is here: <a href="install-notes.txt">install-notes.txt</a>.
+
+## Basic Philosophy ##
+
+Any time someone has to ask a question about how something in Weathermap works, I 
+treat it as a failure - either the feature is too complicated, or the manual doesn't 
+explain it well enough. Possibly, the user has totally misunderstood what should
+happen, in which case I let myself off the hook, but that's not the default position.
 
 ## Testing ##
 
-### Unit Tests (automated) ###
+### Functional & Tests (automated) ###
 
-The subversion repo includes unit tests for phpunit. You can run them all in one go
+The subversion repo includes tests for phpunit. You can run them all in one go
 by running ./test.sh in the weathermap folder. This runs phpunit, and then compiles
 a report of the failing tests. There are some traditional unit tests, but a lot of
 the testing works as follows:
@@ -26,14 +33,14 @@ the testing works as follows:
 * run it
 * save config (as the editor would)
 * load *that* config
-* save a second copy
-* compare the two generated config files
-* compare the generated image to a reference image
+* run it
+* compare the two generated image files (to see if the config is "losing" bits - WriteConfig bugs)
+* compare the generated image to a reference image (to see if the config works as expected)
   
 Tests/ConfigTest.php does this for every .conf file that it finds in the test-suite/tests
 directory. There are around 150 tests so far. Each one tests a particular feature or
 combination. Every time I find a new problem, I add new tests. Every time I add a new
-feature, I add new tests.
+feature, I add new tests. This covers a lot of the core weathermap features by now.
 
 Each test can have a global SET variable to indicate which version of Weathermap is needed
 to run it. This is useful for excluding new features from testing. This looks like:
@@ -53,9 +60,15 @@ here and there. There's also an 'approve' link in that report, so you can update
 image to use the current output, if you think that the current output is actually correct (or
 isn't a bug, just library differences).
 
-### UI Tests (manual) ###
+### UI Functional Tests (manual) ###
 
 This is the boring part.
+
+There's a manual check-list in <a href="pre-release-tests.md">pre-release-tests.md</a> that exercises all the clickable things. It
+has proven useful so far though, and caught a few issues that I wouldn't have otherwise noticed
+until someone else told me about them.
+
+I should probably look at something like Selenium for this stuff.
 
 ## Building Documentation ##
 
@@ -89,3 +102,10 @@ final docs. You may need to 'touch index.xml' just to force a rebuild.
 
 ## Creating the final zip ##
 
+Just make sure that the version number is correct at the top of the main Makefile, then run 'make release'. The zip
+(and a tgz file I don't currently use) will appear in a directory alongside the weathermap one called ../releases
+
+Unless you already have files there. Then it all breaks a bit.
+
+If you *do* end up making your own zips, I'd appreciate it if you either don't distribute them widely, or clearly label
+where they came from, and that you will be supporting them, just to avoid confusion.

@@ -1,6 +1,6 @@
 <?php
 // require_once 'PHPUnit/Framework.php';
-require_once dirname(__FILE__).'/../Weathermap.class.php';
+require_once dirname(__FILE__).'/../lib/Weathermap.class.php';
 
 class ConfigTest extends PHPUnit_Framework_TestCase
 {
@@ -21,50 +21,51 @@ class ConfigTest extends PHPUnit_Framework_TestCase
 		
         $nwarns = TestOutput_RunTest($testdir.DIRECTORY_SEPARATOR.$conffile, $outputimagefile, $outputhtmlfile, '', 'config-coverage.txt');
 
-	if($nwarns < 0) {
-		$this->markTestIncomplete( 'This test is for a future feature');
-        	chdir($previouswd);
-		return;
-	}
-        
+		// if REQUIRES_VERSION was set, and set to a newer version, then this test is known to fail
+		if($nwarns < 0) {
+			$this->markTestIncomplete( 'This test is for a future feature');
+				chdir($previouswd);
+			return;
+		}
+			
         $this->assertEquals(0, $nwarns, "Warnings were generated");
 
-        if(1==1) {
-             # $COMPARE -metric AE $reference $result $destination  > $destination2 2>&1
-            $cmd = sprintf("%s -metric AE \"%s\" \"%s\" \"%s\"",
-                    $compare,
-                    $referenceimagefile,
-                    $outputimagefile,
-                    $comparisonimagefile
-                    );
+        
+		 # $COMPARE -metric AE $reference $result $destination  > $destination2 2>&1
+		$cmd = sprintf("%s -metric AE \"%s\" \"%s\" \"%s\"",
+				$compare,
+				$referenceimagefile,
+				$outputimagefile,
+				$comparisonimagefile
+				);
 
-            if(file_exists($compare)) {
+		if(file_exists($compare)) {
 
-                $fd2 = fopen($comparisonimagefile.".txt","w");
-                fwrite($fd2,$cmd."\r\n\r\n");
-                fwrite($fd2,getcwd()."\r\n\r\n");
+			$fd2 = fopen($comparisonimagefile.".txt","w");
+			fwrite($fd2,$cmd."\r\n\r\n");
+			fwrite($fd2,getcwd()."\r\n\r\n");
 
-                # $fd = popen($cmd,"r");
-                $descriptorspec = array(
-                   0 => array("pipe", "r"),  // stdin is a pipe that the child will read from
-                   1 => array("pipe", "w"),  // stdout is a pipe that the child will write to
-                   2 => array("pipe", "w")  // stderr is a pipe to write to
-                );
-                $pipes = array();
-                $process = proc_open($cmd,$descriptorspec, $pipes, getcwd(), NULL, array('bypass_shell'=>TRUE)) ;
-		$output = "";
+			# $fd = popen($cmd,"r");
+			$descriptorspec = array(
+			   0 => array("pipe", "r"),  // stdin is a pipe that the child will read from
+			   1 => array("pipe", "w"),  // stdout is a pipe that the child will write to
+			   2 => array("pipe", "w")  // stderr is a pipe to write to
+			);
+			$pipes = array();
+			$process = proc_open($cmd,$descriptorspec, $pipes, getcwd(), NULL, array('bypass_shell'=>TRUE)) ;
+	$output = "";
 
-                if(is_resource($process)) {
-                    $output = fread($pipes[2],2000);
-                    fclose($pipes[0]);
-                    fclose($pipes[1]);
-                    fclose($pipes[2]);
-                    $return_value = proc_close($process);
-                    fwrite($fd2, "Returned $return_value\r\n");
-                    fwrite($fd2,"Output: |".$output."|\r\n");
-                }
+			if(is_resource($process)) {
+				$output = fread($pipes[2],2000);
+				fclose($pipes[0]);
+				fclose($pipes[1]);
+				fclose($pipes[2]);
+				$return_value = proc_close($process);
+				fwrite($fd2, "Returned $return_value\r\n");
+				fwrite($fd2,"Output: |".$output."|\r\n");
+			}
 
-                fclose($fd2);
+			fclose($fd2);
 
 		// it turns out that some versions of compare output two lines, and some don't, so trim.
 		$lines = explode("\n",$output);
@@ -73,7 +74,7 @@ class ConfigTest extends PHPUnit_Framework_TestCase
                 $this->AssertEquals("0", $output, "Image Output did not match reference for $conffile via IM");
 
             }
-        }
+        
         
         $ref_md5 = md5_file($referenceimagefile);
         $output_md5 = md5_file($outputimagefile);

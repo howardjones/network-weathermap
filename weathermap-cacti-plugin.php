@@ -7,7 +7,7 @@ include_once("./include/auth.php");
 // include_once("./include/config.php");
 
 // include the weathermap class so that we can get the version
-include_once(dirname(__FILE__)."/Weathermap.class.php");
+include_once(dirname(__FILE__)."/lib/Weathermap.class.php");
 
 $action = "";
 if (isset($_POST['action'])) {

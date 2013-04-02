@@ -1,9 +1,25 @@
 #!/bin/sh
 
-# Prepare Cacti/Weathermap dev environment for Ubuntu Server 12.04
+# Prepare Cacti/Weathermap dev/test environment for Ubuntu Server 12.04
 #
-# Assumed: Selected LAMP option during install.
+# Assumed: 
+#   * Selected LAMP option during install.
+#   * System WON'T be internet accessible or otherwise vulnerable!
 #
+
+#######################################################################
+# 
+# Configuration
+
+CACTI_VERSION="0.8.8a"
+SPINE_VERSION="0.8.8a"
+
+WEATHERMAP_VERSION="svn" # version number or svn or 'none'
+
+MYSQL_ROOT_PWD="mypassword"
+
+#
+#######################################################################
 
 # Cacti stuff
 apt-get -y install git subversion php5 php5-gd snmp rrdtool
@@ -17,8 +33,8 @@ apt-get -y install libmysqlclient-dev libsnmp-dev
 # Weathermap - the manual uses XSLT and Weathermap uses PEAR
 apt-get -y install xsltproc php-pear
 
-# Weathermap - fping datasource, phpunit & ImageMagick for unit tests
-apt-get -y install fping imagemagick phpunit phpunit-docs php5-xdebug
+# Weathermap - fping datasource, xdebug & ImageMagick for unit tests
+apt-get -y install fping imagemagick php5-xdebug
 
 # Generally useful for testing
 apt-get -y install snmpd zip unzip
@@ -51,7 +67,7 @@ svn checkout http://www.network-weathermap.com/svn/repos/trunk  weathermap
 cd ../
 
 # Fix some perms, ready for the poller
-useradd -d /var/www/cacti cacti
+useradd -d /var/www/cacti-0.8.8a cacti
 chown -R cacti /var/www/cacti-0.8.8a/log
 chown -R cacti /var/www/cacti-0.8.8a/rra
 
@@ -60,6 +76,11 @@ echo "*/5 * * * * cacti /usr/bin/php /var/www/cacti-0.8.8a/poller.php > /var/www
 touch /var/www/cacti-0.8.8a/last-poller-output.txt
 chown cacti /var/www/cacti-0.8.8a/last-poller-output.txt
 
+# Some extra PEAR stuff we use - PHPUnit and Markdown
+pear channel-discover pear.michelf.com
+pear install michelf/MarkdownExtra
+pear config-set auto_discover 1
+pear install pear.phpunit.de/PHPUnit
 
 # You still need to edit cacti-0.8.8a/include/config.php at this point - The URL base and the database parameters need to be changed, at least.
 #

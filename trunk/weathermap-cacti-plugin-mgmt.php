@@ -9,7 +9,7 @@ include_once($config["library_path"] . "/database.php");
 $weathermap_confdir = realpath(dirname(__FILE__).'/configs');
 
 // include the weathermap class so that we can get the version
-include_once(dirname(__FILE__)."/Weathermap.class.php");
+include_once(dirname(__FILE__)."/lib/Weathermap.class.php");
 
 $i_understand_file_permissions_and_how_to_fix_them = FALSE;
 

@@ -2,10 +2,6 @@
 ./COPYING
 ./HTML_ImageMap.class.php
 ./README
-./WeatherMap.functions.php
-./WeatherMapLink.class.php
-./WeatherMapNode.class.php
-./Weathermap.class.php
 ./cacti-pick.php
 ./check-gdbug.php
 ./check.php
@@ -13,6 +9,7 @@
 ./configs/index.php
 ./configs/simple.conf
 ./random-bits/convert-to-dsstats.php
+./random-bits/index.php
 ./docs/example/Gradient_BK_800.png
 ./docs/example/Vera.ttf
 ./docs/example/VeraBI.ttf
@@ -89,8 +86,8 @@
 ./docs/fonts/PTS75F.ttf
 ./docs/fonts/PTS76F.ttf
 ./editor-resources/jquery-latest.min.js
+./editor-resources/index.php
 ./editor.css
-./editor.inc.php
 ./editor.js
 ./editor.php
 ./images/Cloud-Filled.png
@@ -194,3 +191,11 @@
 ./weathermap-cacti-plugin.php
 ./weathermap-cacti-rebuild.php
 ./weathermap.conf
+./lib/editor.inc.php
+./lib/HTML_ImageMap.class.php
+./lib/Weathermap.class.php
+./lib/WeatherMap.functions.php
+./lib/WeatherMap.keywords.inc.php
+./lib/WeatherMapLink.class.php
+./lib/WeatherMapNode.class.php
+

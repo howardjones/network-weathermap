@@ -114,7 +114,7 @@ function show_editor_startpage()
 
 	$matches=0;
 
-	print '<html xmlns="http://www.w3.org/1999/xhtml"><head><link rel="stylesheet" type="text/css" media="screen" href="editor.css" /><script type="text/javascript" src="editor-resources/jquery-latest.min.js"></script><script src="editor.js" type="text/javascript"></script><title>PHP Weathermap Editor ' . $WEATHERMAP_VERSION
+	print '<html xmlns="http://www.w3.org/1999/xhtml"><head><link rel="stylesheet" type="text/css" media="screen" href="editor-resources/oldeditor.css" /><script type="text/javascript" src="editor-resources/jquery-latest.min.js"></script><script src="editor-resources/editor.js" type="text/javascript"></script><title>PHP Weathermap Editor ' . $WEATHERMAP_VERSION
 		. '</title></head><body>';
 
 	print '<div id="nojs" class="alert"><b>WARNING</b> - ';

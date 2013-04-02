@@ -1,7 +1,7 @@
 <?php
 // require_once 'PHPUnit/Framework.php';
 
-require_once dirname(__FILE__).'/../Weathermap.class.php';
+require_once dirname(__FILE__).'/../lib/Weathermap.class.php';
 
 /**
  * Test class for WeatherMapBase.

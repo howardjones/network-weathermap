@@ -24,6 +24,9 @@ Thanks to Gerry Eisenhaur and Daniel Ricardo dos Santos respectively for their s
     CHANGE - editor ignores attempts to rename nodes to have space in names
     CHANGE - Moved all PHP that doesn't need to be web-accessible into lib
     CHANGE - Editor won't deal with config files that don't have a .conf extension
+    CHANGE - Manual updates for changes in Cacti, and improvements in styling. Security section added.
+    CHANGE - General improvements in input validation and output escaping in editor
+    CHANGE - 'External Script' datasource plugin is disabled by default in new installs (NOT upgrades though!)
     ADDED - Caching for cacti data fetched by dsstats and rrdtool/poller_output DS plugins
     ADDED - Ability to disable any warning with 'SET nowarn_WMxxx 1'
     ADDED - .htaccess files added for directories that don't need to be web-accessible - needs "AllowOverride Limit" or "AllowOverride All" in your Apache config.

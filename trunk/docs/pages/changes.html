@@ -39,6 +39,10 @@
 There are larger structural changes in 0.98 and new features, but these bugfixes were useful enough to 
 warrant a new 0.97 release (especially the mysql schema change). A real 0.98 release will follow in 
 due course. </p> 
+ <p>Also late addition to 0.97b - a couple of security analysts have pointed out flaws in the editor. 
+First, the ability to remotely create .php files and then cross-site-scripting vulnerabilities. Both 
+are really facets of the same thing - lack of input validation. 0.97b improves this a great deal. </p> 
+ <p>Thanks to Gerry Eisenhaur and Daniel Ricardo dos Santos respectively for their security bug reports. </p> 
  <h3>Fixes</h3> 
  <ul> 
  <li>absolute <a href="config-reference.html#GLOBAL_SCALE">SCALE</a> definitions didn't support K (thanks wwwdrich)</li> 
@@ -57,6 +61,12 @@ due course. </p>
  <li>no longer shows .-prefixed files in map config picker</li> 
  <li>editor ignores attempts to rename nodes to have space in names</li> 
  <li>Manual updates for changes in Cacti, and improvements in styling.</li> 
+
+ <li>The Cacti UI will warn you about fundamental file permissions problems</li> 
+ <li>Moved all PHP that doesn't need to be web-accessible into lib. See <a href="main.html#security">Security notes</a>.</li> 
+ <li>Editor won't deal with config files that don't have a .conf extension</li> 
+ <li>General improvements in input validation and output escaping in editor</li> 
+ <li>'External Script' datasource plugin is disabled by default in new installs (NOT upgrades though!)</li> 
  </ul> 
  <h3>New Features</h3> 
  <ul> 

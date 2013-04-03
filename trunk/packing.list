@@ -26,10 +26,12 @@
 ./docs/example/VeraSeBd.ttf
 ./docs/example/VeraSe.ttf
 ./docs/example/Vera.ttf
-./docs/fonts/PTS55F.ttf
-./docs/fonts/PTS56F.ttf
-./docs/fonts/PTS75F.ttf
-./docs/fonts/PTS76F.ttf
+./docs/fonts/PTN77F-webfont.ttf
+./docs/fonts/PTS75F-webfont.ttf
+./docs/fonts/PTS55F-webfont.ttf
+./docs/fonts/PTC75F-webfont.ttf
+./docs/fonts/PTC55F-webfont.ttf
+./docs/fonts/PTN57F-webfont.ttf
 ./docs/howto.pdf
 ./docs/howto.png
 ./docs/images/arrowstyle-classic.png
@@ -147,7 +149,7 @@
 ./lib/datasources/WeatherMapDataSource_cactithold.php
 ./lib/datasources/WeatherMapDataSource_dbsample.php
 ./lib/datasources/WeatherMapDataSource_dsstats.php
-./lib/datasources/WeatherMapDataSource_external.php
+./lib/datasources/WeatherMapDataSource_external.php.disabled
 ./lib/datasources/WeatherMapDataSource_fping.php
 ./lib/datasources/WeatherMapDataSource_mrtg.php
 ./lib/datasources/WeatherMapDataSource_rrd.php

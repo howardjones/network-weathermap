@@ -582,7 +582,15 @@ link3 34.6K 113</pre>
  <div class = "definition"><a href="config-reference.html#LINK_TARGET">TARGET</a> !<em>scriptname</em> 
  </div> 
 
- <p>This plugin is fairly experimental and not thoroughly tested. </p> 
+ <p>This plugin is fairly experimental and not thoroughly tested. Due to the 
+ risks involved with using it (it allows someone who can create configs to 
+ run arbitrary commands as the user who updates your maps - e.g. the Cacti 
+ poller user), it is disabled by default in new installs of version 0.97b and 
+ above. To enable it, rename WeatherMapDataSource_external.php.disabled to 
+ WeatherMapDataSource_external.php in the lib/datasources directory. Please see 
+ the <a href="main.html#security">Security notes</a> elsewhere in this manual before 
+ doing that. 
+ </p> 
 
  <p>This plugin allows you to write small external scripts, and pass the 
  value from the script into Weathermap. The output format of the script is 

@@ -128,7 +128,23 @@
                     <li><a href = "install-cli.html">As a standalone command-line
                     tool</a></li>
                 </ul>
-                </p>
+		
+		<h3 id="#security">Security</h3>
+		<p>Weathermap has several features that can potentially give users more access than you intended to. This section describes
+		the risks, and possible ways to mitigate them.</p>
+		<p>First of all, there are quite a few folders in the weathermap distribution that don't need to be web-accessible. If you aren't' using the
+		Cacti plugin, then practically all of it can be blocked or moved elsewhere. If you are using Weathermap with Cacti, then you can still
+		deny ALL access from web users for the configs, output, lib and random-bits directories. The distribution comes with .htaccess files that
+		will do this for you if you have Apache, and you have enabled "AllowOverride All" for the Weathermap directory (it may be on by default -
+		you can test by trying to access http://yourserver/cacti/plugins/weathermap/lib/ - you should get a 403 Forbidden error.</p>
+		<p>Secondly, you should use additional access control (by IP or authentication) to limit who can access the editor.php and cacti-pick.php pages. The second of those
+		will allow someone accessing the page to see a list of all the datasources in your Cacti installation. The first one allows
+		anyone who can access it to edit your maps (logically enough). <em>However</em>, Weathermap includes a datasource plugin that
+		allow someone who can change the TARGET lines in a map to potentially run any command as the Cacti poller user. As of version 0.97b, this plugin
+		(<a href="targets.html#script">external</a>) is disabled by default.</p>
+		
+                <p>Any user with access to the editor can also see all your maps. In a shared or service provider environment, this may be
+		a Bad Thing.</p>
 
                 <h2 id = "running">Running Weathermap</h2>
 

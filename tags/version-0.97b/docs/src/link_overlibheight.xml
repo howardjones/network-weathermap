@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configentry>
+    <keyword>OVERLIBHEIGHT</keyword>
+
+    <scope>LINK</scope>
+
+    <anchor>LINK_OVERLIBHEIGHT</anchor>
+
+    <definition>OVERLIBHEIGHT
+
+        <meta>imagewidth</meta>
+    </definition>
+
+    <description xmlns="http://www.w3.org/1999/xhtml">
+        <p>Specify the width, in pixels of the graph image referred to by OVERLIBGRAPH
+        line.</p>
+
+        <p>This is an optional extra that allows the OverLib library to make a better
+        job of positioning the 'popup' image so that it doesn't appear off the edge of
+        the screen. Typically, you would use this once, in the DEFAULT link. If you use
+        this, you must also use OVERLIBWIDTH, for either to have any effect.</p>
+    </description>
+
+    <changes>
+        <change version="0.7">Originally added OVERLIBWIDTH and OVERLIBHEIGHT based on
+        code by Niels Baggesen.
+        </change>
+    </changes>
+</configentry>

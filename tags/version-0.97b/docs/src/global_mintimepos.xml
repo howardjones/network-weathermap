@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configentry>
+    <keyword>MINTIMEPOS</keyword>
+
+    <scope>GLOBAL</scope>
+
+    <anchor>GLOBAL_MINTIMEPOS</anchor>
+
+    <definition>MINTIMEPOS
+
+        <meta>x-pos</meta>
+
+        <meta>y-pos</meta>
+    </definition>
+
+    <definition>MINTIMEPOS
+
+        <meta>x-pos</meta>
+
+        <meta>y-pos</meta>
+
+        <meta>formatstring</meta>
+    </definition>
+
+    <description xmlns="http://www.w3.org/1999/xhtml">
+        <p>Specifies where to draw the 'oldest data' timestamp on the map.</p>
+
+        <p>The data collection part of weathermap collects a timestamp for each piece of
+        data, alongside the actual data. This is intended to signify the time that the
+        data was actually valid
+        - it would be the file modification date if it was a text file, or the current
+        time if it was a live SNMP query. The minimum and maximum of these times are
+        collated, and can be shown on the map with MINTIMEPOS and MAXTIMEPOS.</p>
+
+        <p>If no MINTIMEPOS line is given, then the timestamp is not drawn. </p>
+
+        <p>You can optionally specify an additional parameter to change the text of the
+        timestamp. This text can contain special tokens which are substituted with parts
+        of the current time. The default timestamp text is
+        <nobr><tt>Oldest Data: %b %d %Y %H:%M:%S</tt></nobr>. The tokens used are those
+        accepted by the PHP strftime function. For a full list see the
+        <a href="http://www.php.net/manual/en/function.strftime.php">PHP manual
+        page</a>.</p>
+
+        <p>You can control the font used to draw the timestamp with TIMEFONT, and the
+        colour that it is drawn in, using TIMECOLOR.</p>
+    </description>
+
+    <changes>
+        <change version="0.96">Originally added MINTIMEPOS
+        </change>
+    </changes>
+</configentry>

@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configentry>
+    <keyword>BACKGROUND</keyword>
+    <scope>GLOBAL</scope>
+    <anchor>GLOBAL_BACKGROUND</anchor>
+
+    <definition>BACKGROUND <meta>imagefile</meta></definition>
+
+    <description xmlns="http://www.w3.org/1999/xhtml">
+        <p>Specify an PNG, JPEG or GIF image file to be used as a background image.</p>
+
+        <p>Any WIDTH and HEIGHT specifications will be ignored
+        - the map will take the size of the background.</p>
+    </description>
+
+    <changes>
+        <change version="0.9">Added JPEG and GIF support for backgrounds.
+        </change>
+    </changes>
+</configentry>

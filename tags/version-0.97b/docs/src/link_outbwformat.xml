@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configentry>
+    <keyword>OUTBWFORMAT</keyword>
+
+    <scope>LINK</scope>
+
+    <anchor>LINK_OUTBWFORMAT</anchor>
+
+    <definition>OUTBWFORMAT
+
+        <meta>string</meta>
+    </definition>
+
+    <description xmlns="http://www.w3.org/1999/xhtml">
+        <p>Specifies a custom string to use for the outbound data BWLABEL bandwidth
+        labels.</p>
+
+        <p>See the INBWFORMAT entry for more information.</p>
+    </description>
+
+    <changes>
+        <change version="0.94">Added OUTBWFORMAT.
+        </change>
+    </changes>
+</configentry>

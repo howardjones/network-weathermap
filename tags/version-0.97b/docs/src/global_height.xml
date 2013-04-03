@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configentry>
+    <keyword>HEIGHT</keyword>
+
+    <scope>GLOBAL</scope>
+
+    <anchor>GLOBAL_HEIGHT</anchor>
+
+    <definition>HEIGHT
+
+        <meta>map-height</meta>
+    </definition>
+
+    <description xmlns="http://www.w3.org/1999/xhtml">
+        <p>Specifies the height of the map image in pixels.</p>
+
+        <p>If a BACKGROUND is specified, and the imagefile is successfully loaded, then
+        any HEIGHT specified is ignored. If neither a BACKGROUND or HEIGHT is specified,
+        then the default HEIGHT is 600 pixels.</p>
+    </description>
+</configentry>

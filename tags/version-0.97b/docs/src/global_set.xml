@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configentry>
+    <keyword>SET</keyword>
+
+    <scope>GLOBAL</scope>
+
+    <anchor>GLOBAL_SET</anchor>
+
+    <definition>SET
+
+        <meta>hintname</meta>
+
+        <meta>hintvalue</meta>
+    </definition>
+
+    <description xmlns="http://www.w3.org/1999/xhtml">
+        <p>Specifies a value for a <em>hint variable</em>.</p>
+
+        <p>Hint Variables allow the user to pass settings to the internals of Weathermap
+        that wouldn't normally need to be changed, or that aren't part of the core
+        Weathermap application. Examples are: small rendering changes, parameters for
+        datasources plugins and similar.</p>
+
+        <p>Hint Variables are either Global for the map, or assigned to a specific link
+        or node.</p>
+
+        <p>There is more about Hint Variables in the
+        <a href="advanced.html">Advanced Topics</a> section.</p>
+    </description>
+
+    <changes>
+        <change version="0.9">Originally added SET.
+        </change>
+    </changes>
+
+    <examples>
+        <example><caption>Enabling 'bulging link mode' in the link-rendering
+        code.</caption>
+
+            <content>SET link_bulge 1
+            </content>
+        </example>
+
+        <example><caption>Enabling 'screenshot mode' to anonymise a map in 0.95 or
+        newer.</caption>
+
+            <content>SET screenshot_mode 1
+            </content>
+        </example>
+		
+		<example><caption>Disabling 'WMWARN50' messages from appearing</caption>
+
+            <content>SET nowarn_WMWARN50 1
+            </content>
+        </example>
+    </examples>
+</configentry>

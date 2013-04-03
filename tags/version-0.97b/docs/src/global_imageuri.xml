@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configentry>
+    <keyword>IMAGEURI</keyword>
+
+    <scope>GLOBAL</scope>
+
+    <anchor>GLOBAL_IMAGEURI</anchor>
+
+    <definition>IMAGEURI 
+        <meta>image-uri</meta>
+    </definition>
+
+    <description xmlns="http://www.w3.org/1999/xhtml">
+        <p>If you are generating output files using HTMLOUTPUTFILE and IMAGEOUTPUTFILE
+        that are in a different directory to the weathermap installation, then the HTML
+        will probably contain an incorrect IMG tag. This keyword allows you to replace
+        the IMG SRC attribute in the HTML output with a corrected one.</p>
+
+        <p>The equivalent command-line option (--image-uri) takes precedence over this
+        configuration line, if both are used. </p>
+
+        <p>If you are generating maps using the Cacti plugin, then this directive is
+        ignored, as the filename and uri are calculated instead. </p>
+    </description>
+
+    <changes>
+        <change version="0.96">Added IMAGEURI.
+        </change>
+    </changes>
+</configentry>

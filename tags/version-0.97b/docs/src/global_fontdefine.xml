@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configentry>
+    <keyword>FONTDEFINE</keyword>
+
+    <scope>GLOBAL</scope>
+
+    <anchor>GLOBAL_FONTDEFINE</anchor>
+
+    <definition>FONTDEFINE
+
+        <meta>fontnumber</meta>
+
+        <meta>gdfontfile</meta>
+    </definition>
+
+    <definition>FONTDEFINE
+
+        <meta>fontnumber</meta>
+
+        <meta>ttffontfile</meta>
+
+        <meta>fontsize</meta>
+    </definition>
+
+    <description xmlns="http://www.w3.org/1999/xhtml">
+        <p>Defines a custom font to be used for text within the map.</p>
+
+        <p>By default, the GD library used by Weathermap has 5 fonts, numbered 1-5.
+        FONTDEFINE allows you to define new font numbers, and link them to fonts in two
+        other formats.</p>
+
+        <p>The first format is 'GD fonts', which are a bitmapped format used by GD
+        alone. They are not scalable, and are also platform-specific (they use a
+        different byte-order depending on the host). You should specify the full
+        filename including any extensions.</p>
+
+        <p>The second format is TrueType fonts, which are scalable, standard and
+        generally a lot nicer! This time, you need to specify the size that the font
+        should be rendered at. The size is in pixels. You can load the same font into
+        multiple fontnumbers with different sizes to use in different parts of a map.</p>
+
+        <p>The freetype library used in PHP makes a somewhat complex set of rules for
+        where it will search for truetype fonts. The two easiest options are:
+
+        <ul><li>Use the full absolute path to your .ttf file</li>
+            <li>Keep your .ttf files in the Weathermap directory, and use the first part
+            of the filename only, with no '.ttf' on the end.</li>						
+        </ul>
+		
+		<p><em>If you have a font in the Weathermap directory as above and it's not loading, also
+		try: ./FontName.ttf</em></p>
+
+        The full set of rules is
+        <a href="http://www.boutell.com/gd/manual2.0.33.html#gdImageStringFT">available
+        here</a></p>
+
+        <p>Regardless of the format, the newly defined font can be used anywhere that
+        you'd normally use a font number (for example, BWFONT or KEYFONT).
+        </p>
+    </description>
+
+    <examples>
+        <example><caption>Defining a new Truetype font, with the font file in the
+        weathermap directory</caption>
+
+            <content>FONTDEFINE 10 VeraBd 16
+            </content>
+        </example>
+    </examples>
+
+    <changes>
+        <change version="0.8">First added FONTDEFINE
+        </change>
+    </changes>
+</configentry>

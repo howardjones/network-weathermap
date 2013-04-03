@@ -1,0 +1,146 @@
+<?xml version = "1.0" encoding = "UTF-8"?>
+<!doctype html public "-//w3c//dtd xhtml 1.0 strict//en"
+    "http://www.w3.org/tr/xhtml1/dtd/xhtml1-strict.dtd">
+<html xmlns = "http://www.w3.org/1999/xhtml" xml:lang = "en" lang = "en">
+    <head>
+        <link rel = "stylesheet" type = "text/css" media = "screen"
+            href = "editor-resources/editor.css" />
+
+        <title>PHP Network Weathermap FrontEnd</title>
+
+        <script src = "editor-resources/jquery-latest.min.js" type = "text/javascript">
+        </script>
+
+        <script src = "editor-resources//jquery.event.drag-1.0.js"
+            type = "text/javascript">
+        </script>
+
+        <script ssrc = "lib/javascript/interface.js" type = "text/javascript">
+        </script>
+
+        <script src = "editor-resources/newedit08.js" type = "text/javascript">
+        </script>
+
+        <script src = "firebug/firebug.js" type = "text/javascript">
+        </script>
+
+        <script type = "text/javascript">
+        </script>
+    </head>
+
+    <body>
+        <div id = "toolbar">
+            <span id = "filenameholder">Editing
+            <strong id = "filename">blah.conf</strong></span>
+            <span id = "version">PHP Network Weathermap version 0.95</span>
+
+            <ul id = "tblist">
+                <li><a id = "btn_selectfile" class = "tb_button" href = "#">Change
+                File</a></li>
+
+                <li><a id = "btn_refresh" class = "tb_button" href = "#">Refresh
+                Map</a></li>
+
+                <li><a id = "btn_addnode" class = "tb_button" href = "#">Add Node</a></li>
+
+                <li><a id = "btn_addlink" class = "tb_button" href = "#">Add Link</a></li>
+
+                <li class = "tb_help">click on a node to change it's properties</li>
+            </ul>
+
+            <img width = "16" height = "16" src = "editor-resources/indicator.gif"
+                title = "Application Is Busy" alt = "Application Is Busy" id = "busy" />
+        </div>
+
+        <div id = "mainpage">
+            <div id = "welcome">
+                <h2>PHP Network Weathermap v0.95</h2>
+
+                <h3>Interactive Map Editor</h3>
+
+                <p>Welcome to the new PHP Weathermap Editor. Just like the old editor,
+                "<em>This editor is not finished! There are many features of Weathermap
+                that you will be missing out on if you choose to use the editor
+                only</em>". </p>
+
+                <p>Obviously the whole point of rewriting the editor is that there are
+                <em>less</em> of these features, but there will still be some. If you
+                need fine-control over some aspects of the map then you should consider
+                reading the config reference, and breaking out Notepad/vi. It's not so
+                scary.</p>
+
+                <p>For the best experience of the editor, you might want to maximise
+                your browser window. The editor is most-tested in FireFox 2.0, but
+                should work in most modern browsers.</p>
+
+                <p class = "emph">Click anywhere on the text to get started!</p>
+
+                <div class = "license">
+                    <p>Copyright &copy; 2005-2007 Howard Jones - howie@thingy.com</p>
+
+                    <p>The current version should always be
+                    <a href = "http://wotsit.thingy.com/haj/cacti/">available here</a>,
+                    along with other related software. PHP Weathermap is licensed under
+                    the GNU Public License, version 2. See COPYING for
+                    details.</p><p>This distribution also includes software and data
+                    from other authors:
+
+                    <ul>
+                        <li>overlib.js is part of Overlib 4.21, copyright Erik Bosrup
+                        1998-2004. All rights reserved. See
+                        http://www.bosrup.com/web/overlib/?License</li>
+
+                        <li>The jQuery 1.1.1 library is copyright &copy; 2007 by John
+                        Resig and the jQuery team. Released under the GPL.</li>
+
+                        <li>The jQuery Interface Elements library is by Stefan Petre and
+                        Paul Bakaus. Released under the GPL.</li>
+
+                        <li>Some of the bundled icons are part of the Cisco icon
+                        collection, used with permission.</li>
+
+                        <li>The Bitstream Vera Open Source fonts (Vera*.ttf) are
+                        copyright Bitstream, Inc. See
+                        http://www.bitstream.com/font_rendering/products/dev_fonts/vera.html</li>
+                    </ul>
+
+                    Thanks to all of these people and organisations for making their
+                    work available.</p>
+                </div>
+            </div>
+
+            <div id = "filepicker">
+                <h2>Which file to work on?</h2>
+
+                <p>You can edit an existing map by selecting it from the list below, or
+                create a new one, named
+
+                <input name = "newname" id = "newname" />
+
+                <input value = "Create" type = "button" /></p>
+
+                <ul id = "filelist">
+                    <li><a href = "">
+
+                    <img src = "editor-resources/lock.png" alt = "Read-Only file"
+                        title = "Read-Only file" /><span>filename</span>
+                    <em>map title</em></a></li>
+
+                    <li><a href = ""><span>filename</span> <em>map title</em></a></li>
+
+                    <li><a href = ""><span>filename</span> <em>map title</em></a></li>
+
+                    <li><a href = ""><span>filename</span> <em>map title</em></a></li>
+                </ul>
+            </div>
+
+            <div id = "themap">
+                <div id = "nodecontainer"></div>
+
+                <img src = "weathermap.png" id = "existingdata" alt = "Weathermap"
+                    usemap = "#weathermap_imap" />
+            </div>
+        <map id = "weathermap_imap" name = "weathermap_imap"></map>
+        </div>
+    </body>
+</html>

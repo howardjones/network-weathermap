@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configentry>
+    <keyword>ZORDER</keyword>
+
+    <scope>LINK</scope>
+
+    <anchor>LINK_ZORDER</anchor>
+
+    <definition>ZORDER
+
+        <meta>z-coord</meta>
+    </definition>
+
+    <description xmlns="http://www.w3.org/1999/xhtml">
+        <p>Specifies the order in which to draw this item on the map.</p>
+
+        <p>By default, all nodes are drawn above all links. There are some situations
+        where you might like to change this, for example if you use a NODE as a
+        background image, and you want links to show in front of that image.</p>
+
+        <p>By default, all nodes have a Z coordinate of 600, and all links have 300. The
+        map legend is at 1000, which cannot be changed (you can move everything else
+        above it, if you like, of course). Items are drawn from lowest Z up to highest
+        Z, so if you want a particular node to appear underneath the default links, you
+        can use 'ZORDER 250' to do that.
+        </p>
+    </description>
+
+    <changes>
+        <change version="0.96">Added Z-ordering support.
+        </change>
+    </changes>
+</configentry>

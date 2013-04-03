@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configentry>
+    <keyword>COMMENTFONT</keyword>
+
+    <scope>LINK</scope>
+
+    <anchor>LINK_COMMENTFONT</anchor>
+
+    <definition>COMMENTFONT
+
+        <meta>fontnumber</meta>
+    </definition>
+
+    <description xmlns="http://www.w3.org/1999/xhtml">
+        <p>Specify the font used for drawing the INCOMMENT and OUTCOMMENT text.</p>
+
+        <p>Fonts are specified by number. The GD library that Weathermap uses has 5
+        built-in fonts, 1-5. You can define new fonts based on TrueType or GD fonts by
+        using the FONTDEFINE directive.</p>
+
+        <p>For Link Comments, you
+        <em>must</em> define a TrueType font. These are the only font that can rotate
+        text through any angle, as required by comments. You can change the colour used
+        to render the font with COMMENTFONTCOLOR</p>
+    </description>
+
+    <changes>
+        <change version="0.9">Added link comments
+        </change>
+    </changes>
+</configentry>

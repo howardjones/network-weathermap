@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configentry>
+    <keyword>LABEL</keyword>
+
+    <scope>NODE</scope>
+
+    <anchor>NODE_LABEL</anchor>
+
+    <definition>LABEL
+
+        <meta>labeltext</meta>
+    </definition>
+
+    <description xmlns="http://www.w3.org/1999/xhtml">
+        <p>Specifies a label for the node. Everything to the end of the line is used.</p>
+
+        <p>If the node has an ICON defined as well, then you can specify the position of
+        the label relative to the node's centre-point by using LABELOFFSET. </p>
+
+        <p>The text for the label can contain
+        <a href="advanced.html#tokens">special tokens</a> to show map data.</p>
+
+        <p>This is drawn using the font specified by LABELFONT in the colours specified
+        by LABELFONTCOLOR, LABELFONTSHADOWCOLOR, LABELBGCOLOR and LABELOUTLINECOLOR.</p>
+    </description>
+
+    <changes>
+        <change version="0.9">Added 'special token' support.
+        </change>
+    </changes>
+</configentry>

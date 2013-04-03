@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configentry>
+    <keyword>HTMLSTYLESHEET</keyword>
+
+    <scope>GLOBAL</scope>
+
+    <anchor>GLOBAL_HTMLSTYLESHEET</anchor>
+
+    <definition>HTMLSTYLESHEET
+
+        <meta>URL</meta>
+    </definition>
+
+    <description xmlns="http://www.w3.org/1999/xhtml">
+        <p>Specifies a CSS stylesheet to reference, when generating HTML. </p>
+
+        <p>When HTML output is enabled, this allows you to include your own CSS
+        stylesheet in the result, allowing for customisation of the output without
+        needing to use awk/perl/etc to modify the HTML.</p>
+
+        <p>If you are generating maps using the Cacti plugin, then this directive is
+        ignored.</p>
+
+        <changes>
+            <change version="0.96">Added HTMLSTYLESHEET.
+            </change>
+        </changes>
+    </description>
+</configentry>

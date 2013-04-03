@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configentry>
+    <keyword>LABELOFFSET</keyword>
+
+    <scope>NODE</scope>
+
+    <anchor>NODE_LABELOFFSET</anchor>
+
+    <definition>LABELOFFSET
+
+        <meta>compass-point</meta>
+    </definition>
+
+    <definition>LABELOFFSET
+
+        <meta>x-offset</meta>
+
+        <meta>y-offset</meta>
+    </definition>
+
+    <description xmlns="http://www.w3.org/1999/xhtml">
+        <p>If you specify an ICON, and also a LABEL, then you will find that the label
+        is often hard to read. LABELOFFSET allows you to move the position of the LABEL,
+        so that it's not directly over the centre of the node anymore. </p>
+
+        <p>You can specify a compass-point (e.g. LABELOFFSET S). The compass-point
+        method takes the size of the ICON, and uses that as the offset distance in the
+        direction you specify. This way, you can change your icon for something of a
+        different size, and not need to change all your offsets. You can use the main 8
+        points of the compass: N, E, S, W, NE, SE, NW, SW.</p>
+
+        <p>
+        <img src="../images/compass-points.png"/>
+
+        <br/>The compass points, relative to the node's bounding-box..</p>
+
+        <p>For more control, you can specify an integer offset for the x and y positions
+        of the label (e.g. LABELOFFSET -10 -20) instead.</p>
+    </description>
+
+    <changes>
+        <change version="0.7">Originally added LABELOFFSET
+        </change>
+    </changes>
+</configentry>

@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configentry>
+    <keyword>DUPLEX</keyword>
+
+    <scope>LINK</scope>
+
+    <anchor>LINK_DUPLEX</anchor>
+
+    <definition>DUPLEX
+
+        <meta>full</meta>
+    </definition>
+
+    <definition>DUPLEX
+
+        <meta>half</meta>
+    </definition>
+
+    <description xmlns="http://www.w3.org/1999/xhtml">
+        <p>'half' indicates that the bandwidth specified by the BANDWIDTH keyword is
+        half-duplex rather than the default full.</p>
+
+        <p>This means that the percentages calculated are calculated as (in+out)/max
+        instead of (in/max) and (out/max) separately.</p>
+    </description>
+
+    <changes>
+        <change version="0.95">Added DUPLEX.
+        </change>
+    </changes>
+</configentry>

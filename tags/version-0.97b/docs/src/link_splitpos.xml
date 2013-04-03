@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configentry>
+    <keyword>SPLITPOS</keyword>
+
+    <scope>LINK</scope>
+
+    <anchor>LINK_SPLITPOS</anchor>
+
+    <definition>SPLITPOS
+
+        <meta>position</meta>
+    </definition>
+
+    <description xmlns="http://www.w3.org/1999/xhtml">
+        <p>Specify the position of the 'split' between the in and out arrows in a link.
+        <em>position</em> is a percentage, and defaults to 50.</p>
+    </description>
+
+    <changes>
+        <change version="0.95">Added SPLITPOS
+        </change>
+    </changes>
+</configentry>

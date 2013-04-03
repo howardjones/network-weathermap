@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configentry>
+    <keyword>ININFOURL</keyword>
+
+    <scope>LINK</scope>
+
+    <anchor>LINK_ININFOURL</anchor>
+
+    <definition>ININFOURL
+
+        <meta>url</meta>
+    </definition>
+
+    <definition>ININFOURL
+
+        <meta>url</meta>
+    </definition>
+
+    <description xmlns="http://www.w3.org/1999/xhtml">
+        <p>Same as INFOURL, but specifies a hyperlink for only the 'in' side of a
+        link.</p>
+    </description>
+
+    <changes>
+        <change version="0.95">Added IN/OUT support
+        </change>
+    </changes>
+</configentry>

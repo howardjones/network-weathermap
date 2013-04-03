@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configentry>
+    <keyword>VIA</keyword>
+
+    <scope>LINK</scope>
+
+    <anchor>LINK_VIA</anchor>
+    <definition>VIA
+
+        <meta>x-coord</meta>
+
+        <meta>y-coord</meta>
+    </definition>
+
+    <definition>VIA
+
+        <meta>nodename</meta>
+
+        <meta>x-offset</meta>
+
+        <meta>y-offset</meta>
+    </definition>
+
+    <description xmlns="http://www.w3.org/1999/xhtml">
+        <p>Specify an additional point that a link must pass through.</p>
+
+        <p>A link normally goes in a straight line between the two nodes listed in the
+        NODES configuration line. If you need it to go around something else, or to
+        seperate two parallel links so that the bandwidth labels are all visible, you
+        can make the link curve.</p>
+
+        <p>If you specify multiple VIA lines, then the link will pass through each in
+        turn, in the order they are specified.</p>
+
+        <p>You can choose between curved or angled links with VIASTYLE.</p>
+
+        <p>Any VIA can also be specified relative to a NODE on the map. This makes it
+        easier to have curves keep the intended shape as you re-organise a map.</p>
+    </description>
+
+    <changes>
+        <change version="0.96">Added angled VIAs.
+        </change>
+
+        <change version="0.95">Added relative-positioned VIA.
+        </change>
+
+        <change version="0.8">Originally added VIA.
+        </change>
+    </changes>
+</configentry>

@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configentry>
+    <keyword>OUTCOMMENT</keyword>
+
+    <scope>LINK</scope>
+
+    <anchor>LINK_OUTCOMMENT</anchor>
+
+    <definition>OUTCOMMENT
+
+        <meta>string</meta>
+    </definition>
+
+    <description xmlns="http://www.w3.org/1999/xhtml">
+        <p>Specifies a comment for the output side of a LINK.</p>
+
+        <p>The link comment appears as text running alongside the link arrow. The font
+        used is governed by COMMENTFONT and the colour by COMMENTFONTCOLOR.</p>
+
+        <p>The text for the comment can contain
+        <a href="advanced.html#tokens">special tokens</a> to show map data.</p>
+
+        <p>The COMMENTFONT
+        <em>must be a TrueType font</em> as these are the only font type to support
+        rotating text.</p>
+    </description>
+
+    <changes>
+        <change version="0.9">Added link comments
+        </change>
+    </changes>
+</configentry>

@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configentry>
+    <keyword>LABELFONT</keyword>
+
+    <scope>NODE</scope>
+
+    <anchor>NODE_LABELFONT</anchor>
+
+    <definition>LABELFONT
+
+        <meta>fontnumber</meta>
+    </definition>
+
+    <description xmlns="http://www.w3.org/1999/xhtml">
+        <p>Specify the font used for drawing the LABEL.</p>
+
+        <p>Fonts are specified by number. The GD library that Weathermap uses has 5
+        built-in fonts, 1-5. You can define new fonts based on TrueType or GD fonts by
+        using the FONTDEFINE directive.</p>
+
+        <p>
+        <img src="../images/font-sizes.png"/>The built-in GD fonts.</p>
+    </description>
+
+    <changes>
+        <change version="0.7">Global NODEFONT became per-node LABELFONT.
+        </change>
+
+        <change version="0.6">Originally added NODEFONT.
+        </change>
+    </changes>
+</configentry>

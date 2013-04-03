@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configentry>
+    <keyword>OVERLIBGRAPH</keyword>
+
+    <scope>NODE</scope>
+
+    <anchor>NODE_OVERLIBGRAPH</anchor>
+
+    <definition>OVERLIBGRAPH
+
+        <meta>url</meta>
+    </definition>
+
+    <definition>OVERLIBGRAPH
+
+        <meta>url</meta>
+
+        <meta>url</meta>...
+    </definition>
+
+    <description xmlns="http://www.w3.org/1999/xhtml">
+        <p>Creates a popup image in the HTML output.</p>
+
+        <p>If you are using the HTML output facility, and HTMLSTYLE is set to 'overlib',
+        then a link is added to the &lt;map> section of the HTML so that when you
+        move the mouse pointer over the the node, a box will pop up containing the image
+        that you specify. Typically used to link to historical data in your network
+        monitoring system.</p>
+
+        <p>You can also specify more than one url, in which case the images are
+        'stacked' one after another in the popup box.</p>
+
+        <p>If a NOTES line is also specified for a node, then the image(s) specified
+        here appears with the NOTES text underneath it.</p>
+
+        <p>You can influence how Weathermap positions the popup box, using the
+        OVERLIBWIDTH and OVERLIBHEIGHT keywords.</p>
+    </description>
+
+    <examples>
+        <example><caption>Typical use of OVERLIBGRAPH</caption>
+
+            <content>OVERLIBGRAPH http://www.yoursite.net/mrtg/router1-cpu-daily.png
+            </content>
+        </example>
+    </examples>
+
+    <changes>
+        <change version="0.95">Added multiple URL support
+        </change>
+    </changes>
+</configentry>

@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configentry>
+    <keyword>KEYPOS</keyword>
+
+    <scope>GLOBAL</scope>
+
+    <anchor>GLOBAL_KEYPOS</anchor>
+
+    <definition>KEYPOS
+
+        <meta>x-pos</meta>
+
+        <meta>y-pos</meta>
+    </definition>
+
+    <definition>KEYPOS
+
+        <meta>x-pos</meta>
+
+        <meta>y-pos</meta>
+
+        <meta>headingstring</meta>
+    </definition>
+
+    <definition>KEYPOS
+
+        <meta>scalename</meta>
+
+        <meta>x-pos</meta>
+
+        <meta>y-pos</meta>
+    </definition>
+
+    <definition>KEYPOS
+
+        <meta>scalename</meta>
+
+        <meta>x-pos</meta>
+
+        <meta>y-pos</meta>
+
+        <meta>headingstring</meta>
+    </definition>
+
+    <description xmlns="http://www.w3.org/1999/xhtml">
+        <p>Specifies the position of the key, or legend, that shows what each
+        colour-range in a scale means. If a scalename is not given, then "DEFAULT" is
+        assumed. If no KEYPOS line is given for a scale, then no legend is drawn
+        - handy if you have many many colour ranges. You can also hide any legend by
+        giving it a position with negative coordinates.</p>
+
+        <p>You can optionally specify an additional parameter, to change the heading
+        above the colours in the key. This can be used to change the language of the
+        map, for example. If a scalename is given, then you
+        <em>must also specify a title</em>
+        - there is no useful default title for non-DEFAULT scales.</p>
+
+        <p>You can control the font used to draw the key with KEYFONT, and the colours
+        that it is drawn in, using KEYTEXTCOLOR, KEYBGCOLOR and KEYOUTLINECOLOR.</p>
+    </description>
+
+    <changes>
+        <change version="0.9">Added support for multiple SCALEs.
+        </change>
+
+        <change version="0.6">Added ability to change text.
+        </change>
+    </changes>
+</configentry>

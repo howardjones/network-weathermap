@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configentry>
+    <keyword>LINK</keyword>
+
+    <scope>LINK</scope>
+
+    <anchor>LINK_LINK</anchor>
+
+    <definition>LINK
+
+        <meta>linkname</meta>
+    </definition>
+
+    <description xmlns="http://www.w3.org/1999/xhtml">
+        <p>The first line of a LINK definition.</p>
+
+        <p>The linkname must be unique within the map, and must not contain spaces. The
+        only place it currently appears is in the small title-bar of a popup graph if
+        you specify an OVERLIBGRAPH without an OVERLIBCAPTION, however.</p>
+
+        <p>There is one special link name, 'DEFAULT', which allows for the setting of
+        defaults. All links that are defined after this one in the configuration file
+        will use the parameters of this link as a starting point. For this reason, it is
+        best to define the DEFAULT link at the top of the configuration file, if you
+        intend to use it.</p>
+    </description>
+</configentry>

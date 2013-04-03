@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configentry>
+    <keyword>OVERLIBGRAPH</keyword>
+
+    <scope>LINK</scope>
+
+    <anchor>LINK_OVERLIBGRAPH</anchor>
+
+    <definition>OVERLIBGRAPH
+
+        <meta>url</meta>
+    </definition>
+
+    <description xmlns="http://www.w3.org/1999/xhtml">
+        <p>Creates a popup image in the HTML output.</p>
+
+        <p>If you are using the HTML output facility, and HTMLSTYLE is set to 'overlib',
+        then a link is added to the &lt;map> section of the HTML so that when you
+        move the mouse pointer over the the (weathermap) link, a box will pop up
+        containing the image that you specify. Typically used to link to historical data
+        in your network monitoring system.</p>
+
+        <p>You can also specify more than one url, in which case the images are
+        'stacked' one after another in the popup box.</p>
+
+        <p>If a NOTES line is also specified for a link, then the image specified here
+        appears with the NOTES text underneath it.</p>
+
+        <p>It is also possible to specify the OVERLIBGRAPH for the 'in' and 'out' halves
+        of a link individually, using INOVERLIBGRAPH and OUTOVERLIBGRAPH.</p>
+
+        <p>You can influence how Weathermap positions the popup box, using the
+        OVERLIBWIDTH and OVERLIBHEIGHT keywords.</p>
+    </description>
+
+    <examples>
+        <example><caption>Typical use of OVERLIBGRAPH</caption>
+
+            <content>OVERLIBGRAPH http://www.yoursite.net/mrtg/router1-link2-daily.png
+            </content>
+        </example>
+    </examples>
+
+    <changes>
+        <change version="0.95">Added multiple URL support
+        </change>
+
+        <change version="0.95">Added IN/OUT support
+        </change>
+
+        <change version="0.0pre">Odd fact: This command, and the accompanying code to
+        generate overlib imagemaps, were the first modification I ever made to the GRNET
+        perl weathermap, and was what got me interested in writing my own version.
+        </change>
+    </changes>
+</configentry>

@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configentry>
+    <keyword>NODE</keyword>
+
+    <scope>NODE</scope>
+
+    <anchor>NODE_NODE</anchor>
+
+    <definition>NODE
+
+        <meta>nodename</meta>
+    </definition>
+
+    <description xmlns="http://www.w3.org/1999/xhtml">
+        <p>The initial definition of a NODE. This must come before any other
+        configuration related to this node.</p>
+
+        <p>The 'nodename' is used in link definitions to specify which nodes the link
+        joins. The nodename is must be a single word, with no spaces.</p>
+
+        <p>There is one special node name, 'DEFAULT', which allows for the setting of
+        defaults. All nodes that are defined after this one in the configuration file
+        will use the parameters of this node as a starting point. For this reason, it is
+        best to define the DEFAULT node at the top of the configuration file, if you
+        intend to use it.</p>
+    </description>
+
+    <changes>
+        <change version="0.7">Added DEFAULT node.
+        </change>
+    </changes>
+</configentry>

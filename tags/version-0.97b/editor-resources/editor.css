@@ -1,0 +1,198 @@
+/* http://colorblender.com/?preloadblend=BC00008A513EFFF2DE5E5550857C73FCFCFC */
+
+body {
+    font-family: 'Lucida Grande', Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background: #5D5E5E;
+}
+
+#mainpage {
+    padding-top: 58px;
+}
+
+/****************************************/
+
+#welcome {
+    width: 550px;
+    margin-left: auto;
+    margin-right: auto;
+    cursor: pointer;
+    background: white;
+    color: black;
+    border: 1px black solid;
+    padding: 10px;
+}
+
+.license {
+    font-size: 70%;
+}
+
+.emph {
+    font-size: 150%;
+    font-weight: bold;
+    text-align: center;
+}
+
+/****************************************/
+
+#toolbar {
+    position: fixed;
+    top: 0px;
+    left: 0px;
+    height: 32px;
+    width: 100%;
+    color: white;
+    border-bottom: gray solid 1px;
+    z-index: 1000;
+    opacity: 0.9;
+    display: none;
+    background: #2D3E70;
+}
+
+#version {
+    font-size: 70%;
+    padding-left: 10px;
+    padding-right: 10px;
+    float: right;
+}
+
+#filenameholder {
+    font-size: 70%;
+    padding-left: 10px;
+    padding-right: 10px;
+    float: left;
+}
+
+#busy {
+    display: none;
+}
+
+.viamarker {
+    z-index: 500;
+    position: absolute;
+}
+
+/****************************************/
+
+/* #themap { margin-left: auto; margin-right: auto; padding: 0; width: 800px; padding-top: 10px; display: none; } */
+#existingdata {
+    border: none;
+    position: absolute;
+    left: 10px;
+    top: 58px;
+}
+
+/****************************************/
+
+#filepicker {
+    width: 500px;
+    margin-left: auto;
+    margin-right: auto;
+    display: none;
+    padding: 10px;
+    background: white;
+    color: black;
+    border: 1px black solid;
+}
+
+#filelist {
+    list-style: none;
+    margin: 0;
+    border: 0;
+    padding: 0;
+    width: 400px;
+    background: #ddd;
+    border: 1px solid gray;
+    border-right: 2px solid gray;
+    border-bottom: 2px solid gray;
+    font-size: 110%;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+#filelist li {
+    border-bottom: 1px solid gray;
+    font-weight: bold;
+}
+
+#filelist li a em {
+    font-size: 90%;
+    font-weight: normal;
+    font-family: serif;
+}
+
+#filelist li a {
+    padding: 4px;
+    text-decoration: none;
+    color: black;
+    width: 99%;
+    display: block;
+}
+
+#filelist li a:hover {
+    color: white;
+    background: #2D3E70;
+}
+
+#filelist li a img {
+    border: none;
+    padding: 2px;
+}
+
+#filelist li#status em {
+    font-size: 90%;
+    font-weight: normal;
+    font-family: serif;
+}
+
+
+/****************************************/
+
+.draggablenode {
+    cursor: move;
+}
+
+.tb_info {
+    color: #ccc;
+    font-style: italic;
+}
+
+.tb_help {
+    color: black;
+    border-left: white;
+}
+
+ul#tblist {
+    list-style-type: none;
+    background-color: whitesmoke;
+    width: 100%;
+    height: 24px;
+    padding: 0;
+}
+
+ul#tblist li {
+    float: left;
+    display: block;
+    text-align: center;
+    font: normal small-caps normal 12px "Lucida Grande", Lucida, Verdana, sans-serif;
+    margin: 1px;
+    background-color: #efefef;
+    padding: 3px 2px 3px 5px;
+}
+
+a.tb_button {
+    padding-left: 18px;
+    background: url(add.png) no-repeat left top;
+    text-decoration: none;
+    color: black;
+}
+
+/* Individual icons for the toolbar*/
+a#btn_changefile {
+    background: url(bullet_disk.png) no-repeat left top;
+}
+
+a#btn_refresh {
+    background: url(arrow_refresh.png) no-repeat left top;
+}

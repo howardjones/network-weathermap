@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configentry>
+    <keyword>HTMLSTYLE</keyword>
+
+    <scope>GLOBAL</scope>
+
+    <anchor>GLOBAL_HTMLSTYLE</anchor>
+
+    <definition>HTMLSTYLE
+
+        <meta>formatname</meta>
+    </definition>
+
+    <description xmlns="http://www.w3.org/1999/xhtml">
+        <p>Specifies the HTML output style. </p>
+
+        <p>When HTML output is enabled, there are two variations, which you can choose
+        between. 'static' is a basic HTML page with client-side imagemap, but no 'pop
+        up' graphs. 'overlib' adds the use of the OverLib library to the page, so that
+        pop up graphs can work, too. This requires Javascript, which is why 'static' is
+        the default.</p>
+    </description>
+</configentry>

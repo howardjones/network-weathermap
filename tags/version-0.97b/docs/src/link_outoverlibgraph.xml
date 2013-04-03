@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configentry>
+    <keyword>OUTOVERLIBGRAPH</keyword>
+
+    <scope>LINK</scope>
+
+    <anchor>LINK_OUTOVERLIBGRAPH</anchor>
+
+    <definition>OUTOVERLIBGRAPH
+
+        <meta>url</meta>
+    </definition>
+
+    <definition>OUTOVERLIBGRAPH
+
+        <meta>url</meta>
+
+        <meta>url</meta>...
+    </definition>
+
+    <description xmlns="http://www.w3.org/1999/xhtml">
+        <p>Same as OVERLIBGRAPH, but specifies a pop-up graph for only the 'out' side of
+        a link.</p>
+    </description>
+
+    <changes>
+        <change version="0.95">Added multiple URL support
+        </change>
+
+        <change version="0.95">Added IN/OUT support
+        </change>
+    </changes>
+</configentry>

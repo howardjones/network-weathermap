@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configentry>
+    <keyword>INFOURL</keyword>
+
+    <scope>NODE</scope>
+
+    <anchor>NODE_INFOURL</anchor>
+
+    <definition>INFOURL
+
+        <meta>url</meta>
+    </definition>
+
+    <description xmlns="http://www.w3.org/1999/xhtml">
+        <p>Creates a hyperlink in the HTML output.</p>
+
+        <p>If you are using the HTML output facility, then a link is added to the
+        &lt;map> section of the HTML so that when you click on the node, you are
+        taken to the url specified here.</p>
+    </description>
+</configentry>

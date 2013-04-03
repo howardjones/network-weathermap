@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configentry>
+    <keyword>BWFONT</keyword>
+
+    <scope>LINK</scope>
+
+    <anchor>LINK_BWFONT</anchor>
+
+    <definition>BWFONT
+
+        <meta>fontnumber</meta>
+    </definition>
+
+    <description xmlns="http://www.w3.org/1999/xhtml">
+        <p>Specify the font used for drawing the BWLABEL boxes.</p>
+
+        <p>Fonts are specified by number. The GD library that Weathermap uses has 5
+        built-in fonts, 1-5. You can define new fonts based on TrueType or GD fonts by
+        using the FONTDEFINE directive.</p>
+
+        <p>
+        <img src="../images/font-sizes.png"/>The built-in GD fonts.</p>
+    </description>
+</configentry>

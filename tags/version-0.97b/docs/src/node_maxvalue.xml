@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configentry>
+    <keyword>MAXVALUE</keyword>
+
+    <scope>NODE</scope>
+
+    <anchor>NODE_MAXVALUE</anchor>
+
+    <definition>MAXVALUE
+
+        <meta>max-value</meta>
+    </definition>
+
+    <definition>MAXVALUE
+
+        <meta>max-in-value</meta>
+
+        <meta>max-out-value</meta>
+    </definition>
+
+    <description xmlns="http://www.w3.org/1999/xhtml">
+        <p>Specifies the maximum value(s) for the node, in the same way that BANDWIDTH
+        does for a LINK. These are used to calculate the percentage usage value, which
+        in turn is used to decide the NODE's colour, if it has a TARGET defined.</p>
+
+        <p>The default value is 100, which has the effect of not changing the input
+        value ( (n/100)*100 = n ).</p>
+    </description>
+
+    <changes>
+        <change version="0.9">Added TARGET and MAXVALUE for nodes.
+        </change>
+    </changes>
+</configentry>

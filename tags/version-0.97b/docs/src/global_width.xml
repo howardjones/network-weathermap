@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configentry>
+    <keyword>WIDTH</keyword>
+
+    <scope>GLOBAL</scope>
+
+    <anchor>GLOBAL_WIDTH</anchor>
+
+    <definition>WIDTH
+
+        <meta>map-width</meta>
+    </definition>
+
+    <description xmlns="http://www.w3.org/1999/xhtml">
+        <p>Specifies the width of the map image in pixels.</p>
+
+        <p>If a BACKGROUND is specified, and the imagefile is successfully loaded, then
+        any WIDTH specified is ignored. If neither a BACKGROUND or WIDTH is specified,
+        then the default WIDTH is 800 pixels.</p>
+    </description>
+</configentry>

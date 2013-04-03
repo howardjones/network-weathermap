@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configentry>
+    <keyword>USESCALE</keyword>
+
+    <scope>NODE</scope>
+
+    <anchor>NODE_USESCALE</anchor>
+
+    <definition>USESCALE
+
+        <meta>scalename</meta>
+    </definition>
+
+    <definition>USESCALE
+
+        <meta>scalename</meta>
+
+        <meta>{in,out}</meta>
+    </definition>
+
+    <description xmlns="http://www.w3.org/1999/xhtml">
+        <p>Specify which SCALE to use to decide the colour of this node.</p>
+
+        <p>After the percentage usage is calculated (using BANDWIDTH/MAXVALUE and data
+        from the TARGET line), the colour is decided by looking up the percentage
+        against this SCALE. If there is no USESCALE line, then the default scale is
+        used.</p>
+
+        <p>If you also specify 'absolute', then no percentage calculation is performed.
+        The raw values from the TARGET line are just looked up in the named SCALE.</p>
+
+        <p>For nodes, you can also specify a scalename of 'none'. This stops the node's
+        colour from changing at all. This is useful if you want to use the TARGET line
+        to fetch data that is used in the LABEL or ICON of the node, for example,
+        without changing the colour of the node itself.</p>
+
+        <p>You can also change the colour of the ICON associated with a NODE according
+        to a different SCALE, by using USEICONSCALE.</p>
+    </description>
+
+    <changes>
+        <change version="0.97">Added absolute scale support.
+        </change>
+
+        <change version="0.95">Added USEICONSCALE.
+        </change>
+
+        <change version="0.9">Added named scales and USESCALE.
+        </change>
+    </changes>
+</configentry>

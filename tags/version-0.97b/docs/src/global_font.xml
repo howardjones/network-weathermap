@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configentry>
+    <keyword>*FONT</keyword>
+
+    <scope>GLOBAL</scope>
+
+    <anchor>GLOBAL_FONT</anchor>
+
+    <definition>TITLEFONT
+
+        <meta>fontnumber</meta>
+    </definition>
+
+    <definition>KEYFONT
+
+        <meta>fontnumber</meta>
+    </definition>
+
+    <definition>TIMEFONT
+
+        <meta>fontnumber</meta>
+    </definition>
+
+    <description xmlns="http://www.w3.org/1999/xhtml">
+        <p>Specify the fonts used for various text. </p>
+
+        <p>Fonts are specified by number. The GD library that Weathermap uses has 5
+        built-in fonts, 1-5. You can define new fonts based on TrueType or GD fonts by
+        using the FONTDEFINE directive.</p>
+
+        <p>
+        <img src="../images/font-sizes.png"/>The built-in GD fonts.</p>
+    </description>
+
+    <changes>
+        <change version="0.8">Originally added TITLEFONT.
+        </change>
+
+        <change version="0.7">Originally added TIMEFONT.
+        </change>
+
+        <change version="0.6">Originally added KEYFONT.
+        </change>
+    </changes>
+</configentry>

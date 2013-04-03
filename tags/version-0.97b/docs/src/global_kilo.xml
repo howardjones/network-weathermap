@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configentry>
+    <keyword>KILO</keyword>
+
+    <scope>GLOBAL</scope>
+
+    <anchor>GLOBAL_KILO</anchor>
+
+    <definition>KILO
+
+        <meta>number</meta>
+    </definition>
+
+    <description xmlns="http://www.w3.org/1999/xhtml">
+        <p>Specifies base value for kilo, mega and giga abbreviations. </p>
+
+        <p>Both BANDWIDTH and BWLABEL can use K,M,G,T as abbreviations for thousands,
+        millions and so on. You can define what the multiple used is. The default is
+        1000.</p>
+    </description>
+
+    <changes>
+        <change version="0.4">Originally added KILO.
+        </change>
+    </changes>
+</configentry>

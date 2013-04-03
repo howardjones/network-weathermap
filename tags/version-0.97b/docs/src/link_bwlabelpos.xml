@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configentry>
+    <keyword>BWLABELPOS</keyword>
+
+    <scope>LINK</scope>
+
+    <anchor>LINK_BWLABELPOS</anchor>
+
+    <definition>BWLABELPOS
+
+        <meta>inposition</meta>
+
+        <meta>outposition</meta>
+    </definition>
+
+    <description xmlns="http://www.w3.org/1999/xhtml">
+        <p>Specifies the position of the 'bandwidth' labels shown on each link.</p>
+
+        <p>The two position values are percentages along the link arrow, from the first
+        to the second node. Therefore <tt>BWLABELPOS 75 25</tt> is the default.</p>
+
+        <p>Weathermap will produce a warning if the outpostion is greater than the
+        inposition. In most cases, you have probably made a mistake, but if you have a
+        good reason to do this, then you can disable that warning using 'SET
+        nowarn_bwlabelpos 1' in the top section of you map config file.</p>
+    </description>
+
+    <changes>
+        <change version="0.96">Added warning for proably-wrong positions
+        </change>
+
+        <change version="0.9">Added BWLABELPOS
+        </change>
+    </changes>
+</configentry>

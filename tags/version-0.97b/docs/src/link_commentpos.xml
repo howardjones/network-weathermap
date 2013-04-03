@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configentry>
+    <keyword>COMMENTPOS</keyword>
+
+    <scope>LINK</scope>
+
+    <anchor>LINK_COMMENTPOS</anchor>
+
+    <definition>COMMENTPOS
+
+        <meta>inposition</meta>
+
+        <meta>outposition</meta>
+    </definition>
+
+    <description xmlns="http://www.w3.org/1999/xhtml">
+        <p>Specify the position along the link used for drawing the INCOMMENT and
+        OUTCOMMENT text.</p>
+
+        <p>The positions are specified as a percentage position along the link, like
+        BWLABELPOS. The default positions are equivalent to
+        <strong>COMMENTPOS 95 5</strong>.</p>
+    </description>
+
+    <changes>
+        <change version="0.92">Added COMMENTPOS
+        </change>
+    </changes>
+</configentry>

@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configentry>
+    <keyword>VIASTYLE</keyword>
+
+    <scope>LINK</scope>
+
+    <anchor>LINK_VIASTYLE</anchor>
+
+    <definition>VIASTYLE curved
+    </definition>
+
+    <definition>VIASTYLE angled
+    </definition>
+
+    <description xmlns="http://www.w3.org/1999/xhtml">
+        <p>When using VIA to define a non-straight LINK, you can choose to have a curved
+        link, where the curve passes through each VIA point, or an angled link where
+        each VIA point is a 'corner'. The default is for a curved link.</p>
+
+        <p>
+        <img src="../images/viastyle-curved.png"/>Curved VIA</p>
+
+        <p>
+        <img src="../images/viastyle-angled.png"/>Angled VIA</p>
+    </description>
+
+    <changes>
+        <change version="0.96">Added 'angled' style, and VIASTYLE.
+        </change>
+    </changes>
+</configentry>

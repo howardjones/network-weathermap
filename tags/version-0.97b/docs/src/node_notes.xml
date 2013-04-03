@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configentry>
+    <keyword>NOTES</keyword>
+
+    <scope>NODE</scope>
+
+    <anchor>NODE_NOTES</anchor>
+
+    <definition>NOTES
+
+        <meta>notes text</meta>
+    </definition>
+
+    <description xmlns="http://www.w3.org/1999/xhtml">
+        <p>Specifies the text or HTML notes for a node. </p>
+
+        <p>The
+        <em>notes text</em> appears in a popup box when the user hovers their mouse over
+        the node. If an OVERLIBGRAPH is specified too, then the text appears below the
+        graph.</p>
+
+        <p>The map HTMLSTYLE must be set to 'overlib' to enable any of the mouse-hover
+        functionality.</p>
+    </description>
+
+    <changes>
+        <change version="0.9">Originally added NOTES.
+        </change>
+    </changes>
+</configentry>

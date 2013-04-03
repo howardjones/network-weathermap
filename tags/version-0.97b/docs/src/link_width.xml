@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configentry>
+    <keyword>WIDTH</keyword>
+
+    <scope>LINK</scope>
+
+    <anchor>LINK_WIDTH</anchor>
+
+    <definition>WIDTH
+
+        <meta>width</meta>
+    </definition>
+
+    <description xmlns="http://www.w3.org/1999/xhtml">
+        <p>Specifies the width of this link when drawn. The
+        <em>width</em> value can be any positive number (including non-integers).</p>
+
+        <p>The actual width of the final link arrow will be
+        <em>roughly</em> 2*width+1 pixels, due to the way links are drawn, and rounding
+        errors as the internal floating-point values are finally forced onto an integer
+        pixel-grid.</p>
+
+        <p>
+        What it actually does is calculate a centre-line (or spine), divide that up into
+        so many segments, and then at each point along the spine, find the normal (90
+        degrees to the direction of the line). Then step WIDTH pixels along the normal
+        in each direction to get a point to draw. This apparently-complex scheme is
+        required to allow for VIAs
+        - both angled and curved links have special handling, and regular straight links
+        are treated as curved links with no VIA by default.</p>
+    </description>
+
+    <changes>
+        <change version="0.97a">Added non-integer widths. Retconned explanation.
+        </change>
+    </changes>
+</configentry>

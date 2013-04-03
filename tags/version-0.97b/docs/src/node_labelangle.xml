@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configentry>
+    <keyword>LABELANGLE</keyword>
+
+    <scope>NODE</scope>
+
+    <anchor>NODE_LABELANGLE</anchor>
+
+    <definition>LABELANGLE
+
+        <meta>angle</meta>
+    </definition>
+
+    <description xmlns="http://www.w3.org/1999/xhtml">
+        <p>Specifies a rotation angle of the label for a node. Allowed angles are 0, 90,
+        180 and 270 degrees. The rotation is around the centre of the label, after any
+        LABELOFFSET has been applied.</p>
+
+        <p>The LABELFONT
+        <em>must be a TrueType font</em> for angles other than 0 (the default) as these
+        are the only font type to support rotating text.</p>
+
+
+	<figure>
+        <img src="../images/labelangle+labeloffset.png"/>
+
+        <figcaption>Rotated label, using <tt>LABELANGLE 90</tt> and <tt>LABELOFFSET E</tt></figcaption>
+	</figure>
+    </description>
+
+    <changes>
+        <change version="0.95">Added LABELANGLE.
+        </change>
+    </changes>
+</configentry>

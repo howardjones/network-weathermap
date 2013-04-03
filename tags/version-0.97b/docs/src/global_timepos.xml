@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configentry>
+    <keyword>TIMEPOS</keyword>
+
+    <scope>GLOBAL</scope>
+
+    <anchor>GLOBAL_TIMEPOS</anchor>
+
+    <definition>TIMEPOS
+
+        <meta>x-pos</meta>
+
+        <meta>y-pos</meta>
+    </definition>
+
+    <definition>TIMEPOS
+
+        <meta>x-pos</meta>
+
+        <meta>y-pos</meta>
+
+        <meta>formatstring</meta>
+    </definition>
+
+    <description xmlns="http://www.w3.org/1999/xhtml">
+        <p>Specifies where to draw the timestamp on the map.</p>
+
+        <p>If no TIMEPOS line is given, then the timestamp is drawn in the top-right
+        corner. To hide it completely, set y to be <nobr>-200</nobr> or so.</p>
+
+        <p>You can optionally specify an additional parameter to change the text of the
+        timestamp. This text can contain special tokens which are substituted with parts
+        of the current time. The default timestamp text is
+        <nobr><tt>Created: %b %d %Y %H:%M:%S</tt></nobr>. The tokens used are those
+        accepted by the PHP strftime function. For a full list see the
+        <a href="http://www.php.net/manual/en/function.strftime.php">PHP manual
+        page</a>.</p>
+
+        <p>You can control the font used to draw the timestamp with TIMEFONT, and the
+        colour that it is drawn in, using TIMECOLOR.</p>
+    </description>
+
+    <changes>
+        <change version="0.6">Added ability to change text.
+        </change>
+
+        <change version="0.5">Originally added TIMEPOS
+        </change>
+    </changes>
+</configentry>

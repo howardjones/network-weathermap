@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configentry>
+    <keyword>LINKSTYLE</keyword>
+
+    <scope>LINK</scope>
+
+    <anchor>LINK_LINKSTYLE</anchor>
+
+    <definition>LINKSTYLE oneway
+    </definition>
+
+    <definition>LINKSTYLE twoway
+    </definition>
+
+    <description xmlns="http://www.w3.org/1999/xhtml">
+        <p>Specifies the whether the link should be drawn with one or two arrows.</p>
+
+        <p>A 'standard' (twoway) link has two arrows
+        - one for inbound data and one for outbound data. In some situations (e.g.
+        round-trip latency), you might only want an arrow in one direction.</p>
+
+        <p>One-way arrows only show the outbound BWLABEL, but they show it in the
+        standard position
+        - 25% of the way along. Change the position of the label with BWLABELPOS as
+        usual (you still need to specify
+        <em>two</em> positions in the BWLABELPOS line, however).</p>
+    </description>
+
+    <changes>
+        <change version="0.94">Added LINKSTYLE.
+        </change>
+    </changes>
+</configentry>

@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configentry>
+    <keyword>TITLE</keyword>
+
+    <scope>GLOBAL</scope>
+
+    <anchor>GLOBAL_TITLE</anchor>
+
+    <definition>TITLE
+
+        <meta>titlestring</meta>
+    </definition>
+
+    <description xmlns="http://www.w3.org/1999/xhtml">
+        <p>Specifies the title text. </p>
+
+        <p>The TITLE is shown in file-selectors for both the editor and the Cacti
+        plugin. If you'd like the title to be shown on the map too, then add TITLEPOS
+        line also.</p>
+    </description>
+</configentry>

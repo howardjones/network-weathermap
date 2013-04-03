@@ -1,0 +1,528 @@
+Before 0.98
+-----------
+
+Comments aren't drawn along a link!
+
+
+add %t option to format SNMP TimeTicks
+
+thumb2 file - 48x48px thumb to show in map management screen.
+Include note about timezone stuff in docs
+DONE make a (no map yet) thumbnail
+
+
+FIXED/DONE Imagemap seems all wrong in editor?? - write a 'draw imagemap' function
+
+per-map debugging - needs UI to enable!
+map scheduling - needs UI
+consolidated map-properties page in UI? (variable settings, plus schedule, plus debug, plus runtime info, etc)
+
+FONTDEFINE can't tell if GD font is wrong-endian?
+Off-by-one in angled VIAs (only in one direction?? - test simple-link-5a.conf)
+Change non-scale colour handling to go into another colour table - no 'special'
+Winding order problem (I think) with sharp-angled vias - see conf_via3.conf
+DONE   USESCALE absolute not in WriteConfig
+Use the Colour class for all colours.
+KEYBG/KEYOUTLINE/KEYTEXTCOLOR per-scale
+
+Rewrite Cacti integration and editor manual pages
+
+Move scale stuff into WeatherMapScale
+
+THIS IS CORRECT poller_output still runs with map-update-period = 0
+entries in weathermap_data are never expired
+collect usage_stats into an .xml file next to each map file
+standalone version of the cacti map browser
+DONE   track runtime per map
+DONE   improve cron string parsing
+improve usage_stats to cover non-regexp config
+DONE allow IMAGEOUTPUTFILE/HTMLOUTPUTFILE/IMAGEURI to make a copy of the final image in Cacti mode http://forums.cacti.net/viewtopic.php?t=36279
+improve usage_stats to cover things other than keywords
+DONE more efficient ReadConfig - 50% of runtime!
+SORTOFDONE very simplified link drawing for classical no-via links.
+DONE Move imagemap stuff so that each node and link holds it's own imagemap shapes - saves a lot of sorting and searching
+
+some things from the wishlist:
+Some kind of shorthand for 'last non-relative node'? Then the sub chunks WOULD be generic
+DONE   KEYBGCOLOR none
+DONE   KEYOUTLINECOLOR none
+{node:this_link_a:name}
+TAG + {node:tagged:name}
+Cacti editor picker - if it's not traffic_in/traffic_out, let you pick the DSes
+Editor picker - plugin-supplied picker listings - allow for Zabbix,Zenoss,Cricket,Groundwork,MRTG,Orion,Smokeping,WUG etc to supply useful picker info
+
+
+Before 0.97a
+------------
+FIXED BUG - Editor clone doesn't work
+FIXED BUG - Show Only First Doesn't Work
+FIXED BUG - Editor imagemap has wrong sort order (lower things have priority)
+FIXED Quote escaping bug for NOTES? http://forums.cacti.net/viewtopic.php?p=181452#181452
+DONE VIA editing code http://forums.cacti.net/viewtopic.php?t=29423&highlight=
+
+
+Before 0.97
+-----------
+DONE No filenames for weathermap_data
+DONE Use weathermap_data in dsstats
+DONE docs for dsstats
+DONE Test groups fully
+Add cron settings?
+DONE Converter for rrd to dsstats
+DONE Add snmp_cache stuff to dsstats
+DONE BUG - SPLITPOS with VIASTYLE angled breaks arrow drawing.
+
+Nudge for link comments? (normal not tangent)
+
+
+PATCHES/Features
+----------------
+Browse subdirs for images in editor:
+http://forums.cacti.net/about34831.html
+
+WISHES
+-------
+
+DONE!   New ICON recolouring code
+DONE!   http://forums.cacti.net/about35242.html
+
+Text Alignment in labels
+http://forums.cacti.net/about35264.html
+
+Some kind of special warning for if ALL the maps fail in a cycle. 
+Also some sort of highlight to show that the map wasn't updated successfully last time it ran (permissions problems).
+
+DONE!   COMMENTSTYLE center
+
+KEYBGCOLOR none
+KEYOUTLINECOLOR none
+{node:this_link_a:name}
+TAG + {node:tagged:name}
+
+POSITION relative to a variable {node:tagged:name} - means evaluating relative positions a lot later
+
+DONE!  define inscalecolor_html as well
+
+DONE!  Use OVERLIBGRAPH, OVERLIBHEIGHT in <IMG> tag. (glen walker)
+
+ProcessString for timepos string
+(+ some formatted date strings for use elsewhere?)
+
+Editor off by two? Nodes centered instead of aligning at UR
+http://forums.cacti.net/viewtopic.php?t=29616&start=0&postdays=0&postorder=asc&highlight=
+
+Hide Maps in Cacti Tab?
+http://forums.cacti.net/viewtopic.php?p=117591
+
+Processing Token - 95th percentile
+http://forums.cacti.net/viewtopic.php?p=135555
+
+weathermap / smokeping (editor picker)
+http://forums.cacti.net/viewtopic.php?t=27516
+
+I just want to add a newline to the TIMEPOS output
+http://forums.cacti.net/viewtopic.php?t=26885
+
+DONE!   DS Plugins - pre-load hook. ReadData runs through loop twice - once for recignise, then a pre-Read hook, then all the ReadData. Allows for pre-caching where appropriate (fping, snmp, anything that uses remote calls)
+
+Multi-line text, plus Mactrack DS
+http://forums.cacti.net/viewtopic.php?t=26790
+
+Non-percentage scales
+http://forums.cacti.net/viewtopic.php?t=16372
+
+Node Position as percentage along link? (fake labels etc)
+
+Cron-style control per-map (to allow for a monthly average map, run once a month)
+http://www.freebsd.org/cgi/cvsweb.cgi/src/usr.sbin/cron/lib/entry.c?rev=1.20
+
+Image archiving - for animation, previous months monthly reports, etc.
+
+New Link styles - dotted, dashed, split
+
+---------------------------------------
+
+
+Before 0.96
+-----------
+
+Refresh before viewing graphs? (glenp)
+http://forums.cacti.net/viewtopic.php?p=145866#145866
+
+Editor placeholder for dynamic icon? (glenp)
+http://forums.cacti.net/viewtopic.php?p=145749#145749
+
+editor.php security
+
+rrdtool cdefs
+
+spaces in filenames/targets where appropriate - quotes, and escaped quotes "([^\"\\]*(?:\\.[^\"\\]*)*)" | (\S+)\s | \s
+
+more AICONs - NINK, PIE, GAUGE
+
+(multiline (bw)labels? - interpret \n)
+
+DONE!  ZORDER messes up imagemaps
+DONE!  external script params - needs spaces in targets
+DONE!  rrdtool averaging   rrdtool graph /dev/null -f "" -s now-30d -e now DEF:in=../rra/atm-sl_traffic_in_5498.rrd:traffic_in:AVERAGE DEF:out=../rra/atm-sl_traffic_in_5498.rrd:traffic_out:AVERAGE VDEF:avg_in=in,AVERAGE VDEF:avg_out=out,AVERAGE PRINT:avg_in:%lf PRINT:avg_out:%lf
+DONE!   Angled VIAs
+DONE!  'none' for SCALE (not gradient)
+DONE!  COMMENTSTYLE (edge|center)
+DONE!  contrast for commentcolor (when using 'COMMENTSTYLE center')
+
+Coverage/Usage stats
+WUG DS
+Nagios DS
+Solarwinds Orion DS
+Nabbix DS
+RRD xport DS (use rrdtool graph and PRINT in fact)
+
+FIXED  Fix a few docs bugs with unclosed tags - actually this is some kind of processing bug to do with <div>s
+
+FIXED  BUG imagemap floats
+DONE!  BUG: ReadData should not be run for links with no nodes (templates) or nodes with no position.
+DONE!  Documentation for printf tokens!
+DONE!  multiple instances of same map in Cacti
+DONE!  -> per-instance SET params in Cacti UI. e.g. a monthly average version
+DONE!  store the dimensions of the thumbnail (better presentation in Cacti)
+DONE!  warning for BWLABELPOS when in<out
+DONE!  add SET nowarn_xxxxx for some of the more common warnings
+DONE!  Check for NULL coords in link code
+DONE!  Z-order - layers for drawing
+DONE!  Get rid of defaultlink and defaultnode - use __DEFAULT in main array instead.
+DONE!  (Multilayered inheritance) -> Parent property. Default parent is __DEFAULT
+DONE!  Per-map warning count in DB
+DONE!  Some SETs to suppress warnings?
+
+
+Before 0.95
+-----------
+DONE! SCALE tags
+DONE! Artificial ICONs
+DONE! IN/OUT infourl/notes/overlibgraph stuff - OVERLIBCAPTION missed - check others with editor?
+DONE! Negative DS values
+DONE! Half-duplex links
+DONE! (Reworking of DS plugins to use Null instead of -1)
+
+Before 0.94
+-----------------
+MOSTLYDONE!   Boost/poller_output support
+DONE!   THold DS
+DONE!   INBWFORMAT/OUTBWFORMAT
+DONE!   Unidirectional links
+DONE! Fixes for Cacti 0.8.7 changes
+BUG: RRD line with one NaN and one good value should still be a good line. -> Actual bug is that -1 is a magic value. Switch to NULL for 'no value'!
+FIXED BUG: poller_output should degrade when no new updates arrive, somehow.
+FIXED BUG: cacti-picker.php needs to include global.php if there is one, in preference to config.php (0.8.7 compat)
+
+------------------------------------------------------------
+(php-rrdtool support?)
+(Editor NG) -> IE6 styling and imagemap updating is totally wrong
+Extra DS for WUG, Nagios
+USESCALE can use any variable - USESCALE scalename {node:this:cactihost_latency}
+Finish Artificial Icons
+Editor shows absolute coordinates for relative-positioned nodes...
+DONE Colours do wierd things with artificial icons - needs extra colour defs. How to make fit with USESCALE?
+RRD CF selection (0.92 patch from Ghozlane Toumi - needs rewrite now)
+
+-----------------
+
+Before 0.93
+-----------------
+
+DONE Editor testing, layout cleanup.
+DONE Verify rrdtool DS is OK
+
+-----------------
+
+Background image links: http://art.gnome.org/backgrounds/abstract/
+Background image generator: http://splintax.blogspot.com/2006/01/starfish-automatically-generated.html
+
+FIXED BUG: USESCALE none produces an error - if no scale called 'none' is defined, it is not an error.
+FIXED BUG: COMMENTPOS 0 breaks things. LABELPOS 0 probably does too (binary search problem)
+FIXED BUG: WriteConfig KEYPOS *STILL* produces invalid config?
+
+DONE RRD DS should look for lines with valid data *in the named DS*, not ALL valid.
+
+DONE WriteConfig should optionally just return a string (so the editor can fetch a config chunk)
+DONE WriteConfig should optionally write the contents of a variable in place of the normal config (so the editor can update a chunk)
+
+DONE Work out NODE-drawing code so that the bg colour is known earlier, so artificial icons can use it.
+
+DONE Finish scale-drawing changes so that the cached image is stored somewhere.
+
+Editor - make the link offset radio buttons work (what about numeric offsets?)
+
+Refactor scale/colour picking stuff, so we can get inscalekey/outscalekey early
+
+Cacti poller_output support (Boost) - lots of reworking
+
+Editor QuickWin(tm): Upload images
+Editor QuickWin(tm): Grid Snap
+Editor QuickWin(tm): Node Targets picker
+
+Error Codes - error code linked to explanatory page on website. Getting tired of explaining the english errors again and again!
+
+Memory Leaks?
+
+RRDserv-compatible target?  rrdfile.rrd@hostname:portnumber   rrdremote:host:port:file.rrd (need to learn PHP sockets)
+
+php-rrdtool support in rrd DS plugin
+
+Cacti THold DS plugin
+Cacti Manage DS plugin (if I can get Manage to work)
+Cacti Report DS plugin?
+WhatsUp Gold 8 & 11 DS plugins
+Nagios DS plugin
+
+BWLABELS nonzero   to hide bwlabel boxes for (exactly) zero values. (grangenet weathermap)
+
+Node width/height adjustment? Maybe some special ICONs? :-
+    ICON 300 400 box  # use existing size thingy. 'box' just draws a bigger box
+	ICON 48 48 nink # draw a nink
+
+INBWFORMAT/OUTBWFORMAT - ProcessString strings for the bwlabels
+- Some way to format BWLABELs? I want milliseconds, someone else wanted  "x% of yMb"
+- should be something like BWLABELIN and BWLABELOUT. Each one needs different vars.
+- This is starting to get ugly.
+
+DONE Refactor draw_curve/draw_label - store the spine in the link?
+DONE  - allow for tangential labels, moving comments, etc, without making draw_curve even bigger
+
+DONE INCOMMENTPOS/OUTCOMMENTPOS
+DONE Tangential Labels
+DONE Use PHP_CompatInfo to get definitive requirements
+DONE "subtractive aggregation" prefix a - to a target
+
+DONE Editor QuickWin(tm): Pick any defined font? (like the current image picker)
+DONE Editor QuickWin(tm): Moving a node rotates VIAs - needed in AJAX editor anyway.
+FIXED SET not inherited for links or nodes?
+
+Things below this line are not urgent
+-----------------------------------------------------------------------------------------------------
+
+
+Move to seperate runtime vars from config vars in WeatherMapItem - makes WriteConfig and editor UI easier.
+* ReadConfig sets config vars
+* some kind of GetConfig is used by anything that needs to read these
+* the runtime state is NOT the config vars
+* WriteConfig writes the config vars
+- should a pre/post plugin be allowed to alter the config vars? (e.g. snap to grid)
+
+DEAD Decide which internal properties are visible through ProcessString, and limit/rename them.
+
+DEAD Move to using RRD xml output, to avoid some text-parsing problems
+
+Nagios target
+
+Cacti data target (use data_id instead of rrd path - helps with Boost?)
+
+Editor: wierd redraw bug switching to xy sometimes. Some kind of preloader?
+
+#################################
+
+FIXED  WriteConfig fails to write KEYSTYLEs properly for multiple SCALEs
+
+FIXED COMMENTFONTCOLOR is ignored!
+
+DONE  --help for weathermap CLI
+DONE  --no-data option for CLI
+
+DONE Config for plugins - some kind of #pragma?
+DONE Allow specification of RRD command line (via #pragma-like thing) (Andrei)
+DONE - this is the incomplete SET command
+
+FIXED   BUG: Two nodes close together will really freak out the curve code
+
+DONE?   RRD plugin - headers different in rrdtool 1.x
+
+DONE    Additional ProcessString format option to get KMGT version of value
+
+DONE  MAXVALUE as synonym for BANDWIDTH on LINKS
+
+DONE  Figure out at least an appropriate straight-line angle to draw link comments
+
+FIRST CUT DONE Label number formatting options in ProcessString - %2f
+
+FIXED    INCOMMENT and OUTCOMMENT don't do anything
+
+FIXED    COMMENTFONT and COMMENTFONTCOLOR don't do anything either
+
+DONE ProcessString - node:parent:xxxx
+   this would allow you to cut&paste chunks of subordinate nodes without rewriting
+   parent refers to the node that this one is positioned relative to, if any
+
+SIDESTEPPED RRD needs bytes/bits/absolute options
+
+FIXED $map->rrdtool_check is no longer checked!
+
+FIXED WriteConfig doesn't write ICON scaling
+
+FIXED? RRD plugin doesn't set data_time (do ANY?)
+
+FIXED Editor doesn't edit horiz/vertical keystyles - no AREA?
+
+FIXED? ShortOpenTags Editor bug?
+
+
+FIXED WriteConfig doesn't understand ICON none?
+DONE WriteConfig doesn't do MAXVALUE
+DONE WriteConfig doesn't do imageoutputfile and htmloutputfile??
+
+DONE UI to allow disabling of poller map generation (while retaining thumbs browsing) (Andrei)
+DONE UI to 'render now' for debugging
+DONE CLI script to 'render now' to do async maps (Andrei)
+
+FIXED   LABELOFFSET needs 'C'
+FIXED   ICON needs 'none'
+
+FIXED OVERLIBGRAPH flicker on near-centre verticals
+
+FIXED  BUG: New node-image stuff doesn't work on PHP4? FIXED with $map->nodes[$this->name]->labeloffsetx = 0;
+                    
+FIXED BUG: Flashing overlib graphs
+
+FIXED   Node positioning relative to another node
+
+DONE positioning bw labels as a percentage from each end... 
+DONE    BWLABEL 25 75 bits
+DONE    BWLABEL 45 55 bits
+
+DONE Use ProcessString for icon filenames (may allow some up/down icons?)
+
+
+DONE Named SCALEs  * DONE for LINKs
+
+DONE Format strings - decide how these work!
+
+DONE  ICON maxwidth maxheight filename 
+DONE  rescaling icons without doing any work
+
+DONE   NODES node1:N node2:10:10
+DONE   Allow numerical offsets for node offsets
+
+LINK sdfsdf
+   INCOMMENT fe0/0.1
+   OUTCOMMENT fe1/0.1
+   COMMENTFONT 33
+Allow extra 'annotation' text per-link-direction
+
+DONE Unrecognised config on line 7: KEYSTYLE horizontal
+
+DONE Take classic, horizontal and vertical. H&V are both a continuous
+DONE strip from 0 to 100%, marked up in 20%s. (maybe 'notches' for the bands?)
+
+
+#####################################################################
+
+
+DONE Unrecognised config on line 39: KEYBGCOLOR 192 192 192
+DONE Unrecognised config on line 40: KEYTEXTCOLOR 0 0 0
+DONE Unrecognised config on line 41: TIMECOLOR 255 255 255
+DONE Unrecognised config on line 42: TITLEPOS 30 30
+DONE Unrecognised config on line 43: TITLECOLOR 255 255 255
+DONE Unrecognised config on line 44: TITLEFONT 120
+DONE More colours, and also a drawable title
+
+
+DONE Unrecognised config on line 57:         BWOUTLINECOLOR 255 255 255
+DONE Unrecognised config on line 58:         BWFONTCOLOR 255 255 255
+DONE Unrecognised config on line 59:         BWBOXCOLOR 0 0 0
+DONE Unrecognised config on line 60:         ARROWSTYLE 3 2
+DONE Unrecognised config on line 67:         OUTLINECOLOR 255 0 0
+DONE for LINKS
+
+
+DONE Unrecognised config on line 68:         FONTCOLOR 0 0 255
+DONE Unrecognised config on line 69:         FONTSHADOWCOLOR none
+DONE for NODES
+
+DONE Extras:
+  DONE Finish curves 
+	DONE (
+		DONE all links are curves
+		DONE imagemap is generated correctly
+	DONE )
+
+	DONE WriteConfig doesn't do half these things!
+	
+  Always calc nodesizes early. simplify the box/margin calcs
+  
+  GD capability checking. 
+  
+  Option to use indexed colour, for the plebs.
+  
+  Cacti-pick -> MRTG-pick -> NRG-pick
+  
+  DONE Cacti plugin -> at least view/manage. Get weathermap logs into cacti log?
+
+Editor: cacti-pick style thing for MRTG folder-of-rrds (and NRG, etc etc)
+Editor: i18n - all text from a seperate file...
+
+DONE Cacti Plugin - display
+DONE Cacti Plugin - poller
+DONE Cacti Plugin - manage
+DONE Cacti Plugin - edit
+
+FIXED Editor: Node renaming doesn't work
+Editor: Draggable dialogs?
+Editor: Draggable NODEs?
+Editor: Update to use new defaults model
+
+DONE Aggregate TARGETS: TARGET xy.rrd + yz.rrd + rr.rrd  [can't be asymmetric in this style] 
+
+DONE Some way to change Icon/Label colour based on a data source (e.g. up/down info)
+
+Some way to have one-directional arrows (e.g. latency)
+Some way to have non-bits/sec data (e.g. latency in seconds, no *8)
+
+Niels Baggesen: BWLABELS BOTH (!)
+Ueli: Use rrdtool extension if possible
+DONE: TFC: multipoint links, or curved, or parallel?
+
+DONE Alex Soares de Moura: arrow outlines on/off/colour
+
+DONE Me: overhaul arrow drawing generally, so I understand it properly! :-)
+
+Editor: Scale editor
+DONE Editor: font selection
+Editor:  other colours (background, link outline)
+DONE Editor: Cacti source picker
+Editor: Image management (backgrounds, icons)
+
+NOT DONE RIGHT Editor: Help text - onfocus & onblur handlers for all form elements.
+
+NOT NEEDED ANYMORE Editor: 'reverse' option on cacti-picker
+
+DONE? Editor: wierd redraw bug switching to xy sometimes. Some kind of preloader?
+
+NON-BUG sizedebug doesn't work in editor?? did before... maybe only in PHP4 (of course)
+
+Recalc Now should check permissions
+
+FIXED Editor: ' & " stripslashes issue - MORE stripslashes crap in editor.php - it breaks ' and " in nodenames.
+
+FIXED Editor: images on windows \ vs / - http://forums.cacti.net/viewtopic.php?p=93556#93556
+
+DONE Some memory-usage monitoring would make debugging configs easier.
+
+FIXED Map Cycle mode broken in IE?
+
+DONE Cacti Host Status target
+
+DONE length for horizonal/vertical scales:  KEYSTYLE horizontal 300   (the width is auto, based on font, isn't it?)
+
+DONE  Make a note available with the percentage bandwidth, so it can appear in comments/labels
+DONE --> calculate percentage bandwidth BEFORE drawing anything (before the post-process?), so it's universally available.
+
+DONE ProcessString for TARGET, based on hints but not notes.
+
+DONE --define x=y option for CLI
+
+DONE ProcessString for INFOURL, OVERLIBGRAPH?
+- Not TARGET? (any plugin could put strings into a command line for '!' plugin) 
+
+NON-BUG weathermap-cacti-rebuild.php has cacti-path hardcoded!
+
+
+

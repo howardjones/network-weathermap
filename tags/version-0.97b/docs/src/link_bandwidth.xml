@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configentry>
+    <keyword>BANDWIDTH</keyword>
+
+    <scope>LINK</scope>
+
+    <anchor>LINK_BANDWIDTH</anchor>
+
+    <definition>BANDWIDTH
+
+        <meta>max-bandwidth</meta>
+    </definition>
+
+    <definition>BANDWIDTH
+
+        <meta>max-in-bandwidth</meta>
+
+        <meta>max-out-bandwidth</meta>
+    </definition>
+
+    <description xmlns="http://www.w3.org/1999/xhtml">
+        <p>Specifies the maximum throughput of this link, in bits per second.</p>
+
+        <p>This is used to calculate the percentage utilisation, which in turn is used
+        to make the colour for the link arrow, and optionally the label on the link.</p>
+
+        <p>The second form allows you to have 'asymmetric' links, like an ADSL, where
+        the first number is the maximum bandwidth from node1 to node2 and the second is
+        the maximum from node2 to node1, as they are given in the NODES line.</p>
+
+        <p>Bandwidths can also use K,M,G and T suffixes to specify large values. Also
+        see the KILO global option though.</p>
+    </description>
+
+    <changes>
+        <change version="0.9">Added MAXVALUE as a synonym to match NODE MAXVALUE. No
+        change in functionality.
+        </change>
+
+        <change version="0.5">Added support for decimals in BANDWIDTH specifications.
+        </change>
+
+        <change version="0.4">Added support for K,M,G,T suffixes on bandwidth specs.
+        Changed bandwidth from bytes to bits.
+        </change>
+    </changes>
+
+    <examples>
+        <example><caption>A typical ADSL line (as seen from the CPE)</caption>
+
+            <content>BANDWIDTH 2M 256K
+            </content>
+        </example>
+    </examples>
+</configentry>

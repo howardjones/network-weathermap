@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configentry>
+    <keyword>USEICONSCALE</keyword>
+
+    <scope>NODE</scope>
+
+    <anchor>NODE_USEICONSCALE</anchor>
+
+    <definition>USEICONSCALE
+
+        <meta>scalename</meta>
+    </definition>
+
+    <definition>USEICONSCALE
+
+        <meta>scalename</meta>
+
+        <meta>{in,out}</meta>
+    </definition>
+
+    <description xmlns="http://www.w3.org/1999/xhtml">
+        <p>Specify which SCALE to use to decide the colour of the icon for this node.</p>
+
+        <p>After the percentage usage is calculated (using BANDWIDTH/MAXVALUE and data
+        from the TARGET line), the colour is decided by looking up the percentage
+        against this SCALE. If there is no USEICONSCALE line, then no scale is used, and
+        the icon colour does not change.</p>
+
+        <p>Hint: This facility works best when you start with greyscale images.</p>
+
+        <p><strong>NOTE:</strong> Prior to 0.97, Icon colourising used the PHP
+        <tt>imagefilter()</tt> function. This function is
+        <em>only</em> available in the version of GD that is bundled with PHP, and not
+        with the official GD library. Several popular operating systems (e.g.
+        Debian/Ubuntu) use the official GD library rather than the bundled PHP library.
+        If you know that you
+        <em>do</em> have the imagefilter function, and you prefer the 'old-style'
+        coloring, then you can add
+        <tt>SET use_imagefilter 1</tt> in the top section of your map config file, to use
+        <tt>imagefilter</tt> instead.</p>
+    </description>
+
+    <changes>
+        <change version="0.97">Removed dependency on <tt>imagefilter</tt>
+        </change>
+
+        <change version="0.95">Added USEICONSCALE.
+        </change>
+    </changes>
+</configentry>

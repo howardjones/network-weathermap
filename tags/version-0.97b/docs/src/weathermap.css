@@ -1,0 +1,167 @@
+body {
+    font-family: 'Lucida Grande', 'Trebuchet MS', Verdana, Lucida, Geneva, Helvetica,
+        Arial, sans-serif;
+}
+
+#frame {
+    font-size: 9pt;
+    line-height: 150%;
+    padding: 16pt
+}
+
+.card-left, .card-right {
+    float: left;
+    clear: left;
+    width: 170px;
+    margin: 0 15px 15px 0;
+    padding: 10px 0;
+    text-align: center;
+    background: white;
+    border-right: 1px solid #ccc;
+    border-bottom: 1px solid #ccc;
+    font-size: 75%;
+}
+
+.card-right {
+    clear: right;
+    float: right;
+    margin: 0 0 15px 15px;
+}
+
+.topnav {
+    border-top: 1px solid #999;
+    border-bottom: 1px solid #999;
+    margin-bottom: 10px;
+    background: #ddd;
+}
+
+.license {
+    margin-left: 20pt;
+    margin-right: 20pt;
+    font-size: 8pt;
+    padding: 4pt;
+    border: black dashed 1px;
+    background-color: #eee;
+}
+
+.notebox {
+    margin-left: 20pt;
+    margin-right: 20pt;
+    padding: 4pt;
+    border: black dashed 1px;
+    background-color: #eee;
+}
+
+.shell {
+    background-color: #eef;
+    margin-left: 20pt;
+    padding: 4pt;
+    font-size: small;
+}
+
+.sidenote {
+    float: right;
+    width: 250px;
+    border: 1px dashed #aaa;
+    padding: 4pt;
+    margin: 4pt;
+    background-color: #eee;
+}
+
+h2.card-title {
+    border: 0;
+    font-size: 160%;
+}
+
+h2 {
+    margin-top: 10pt;
+    padding-top: 10pt;
+    border-top: 1px dashed black;
+}
+
+h1 {
+    font-size: 24pt;
+}
+
+h2 {
+    font-size: 18pt;
+}
+
+h3 {
+    font-size: 14pt;
+}
+
+h4 {
+    font-size: 11pt
+}
+
+.faq dt {
+    padding-top: 5pt;
+    font-weight: bold;
+    font-style: italic;
+    font-size: 110%
+}
+
+.faq dd { }
+
+h1.configsection {
+    padding-top: 1em;
+}
+
+.referenceentry {
+    clear: both;
+}
+
+.referenceentry h2 {
+    width: 100%;
+    border-top: 1px solid;
+}
+
+.description {
+    font-size: 0.9em;
+} .definition
+    { background: #ddd; margin-left: 2em; margin-right:5em; padding: 10px; border-bottom: #aaa solid 1px;;
+    }
+
+.meta {
+    padding-left: 1em;
+}
+
+.example {
+    background: #dde;
+    margin-left: 2em;
+    margin-right: 5em;
+}
+
+.changes {
+    font-size: 90%;
+    margin-left: 2em;
+}
+
+.changes h3 {
+    font-size: 90%;
+}
+
+.changes dl {
+    width: 80%;
+    margin: 0 0;
+    padding: 0;
+    font-size: 90%;
+}
+
+.changes dt {
+    width: 5%;
+    float: left;
+    clear: both;
+    margin: 0 0 0 0;
+    padding: .5em;
+    font-weight: bold;
+}
+
+.changes dd {
+    width: 75%;
+    margin: 0 0 0 0;
+    padding: .5em;
+}
+
+/*****/

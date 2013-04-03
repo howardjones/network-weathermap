@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configentry>
+    <keyword>INCLUDE</keyword>
+
+    <scope>GLOBAL</scope>
+
+    <anchor>GLOBAL_INCLUDE</anchor>
+
+    <definition>INCLUDE
+
+        <meta>filename</meta>
+    </definition>
+
+    <description xmlns="http://www.w3.org/1999/xhtml">
+        <p>Include the contents of an additional file within the current map
+        configuration file.</p>
+
+        <p>Allows you to use a common set of definition across several map files. There
+        are several restrictions:
+
+        <ul>
+            <li>INCLUDE can
+            <em>only</em> be used in the 'global' section of the the map configuration
+            file - that is, before the first NODE or LINK.</li>
+
+            <li>INCULDEd files must contain complete NODE or LINK definitions.</li>
+
+            <li>If you intend to use the web-based editor, then you can't currently use
+            any commands other than NODE or LINK definitions
+            - that is, no SCALEs or FONTDEFINEs etc.</li>
+        </ul>
+
+        The INCLUDE file can still be useful to define a set of standard templates that
+        can then be used across maps. Some of the other restrictions will hopefully be
+        lifted in a future version. The reason for the restrictions is that the way
+        config files are read and written doesn't keep track of where a particular
+        setting came from, apart from at the NODE/LINK level. This is also the reason
+        why comments are 'lost' by the editor.
+        </p>
+    </description>
+
+    <changes>
+        <change version="0.96b">Originally added INCLUDE.
+        </change>
+    </changes>
+</configentry>

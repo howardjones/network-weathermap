@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configentry>
+    <keyword>OUTOVERLIBCAPTION</keyword>
+
+    <scope>LINK</scope>
+
+    <anchor>LINK_OUTOVERLIBCAPTION</anchor>
+
+    <definition>OUTOVERLIBCAPTION
+
+        <meta>caption text</meta>
+    </definition>
+
+    <description xmlns="http://www.w3.org/1999/xhtml">
+        <p>Same as OVERLIBCAPTION, but specifies a pop-up graph caption for only the
+        'out' side of a link.</p>
+    </description>
+
+    <changes>
+        <change version="0.95">Added multiple URL support
+        </change>
+
+        <change version="0.9">Originally added OVERLIBCAPTION.
+        </change>
+    </changes>
+</configentry>

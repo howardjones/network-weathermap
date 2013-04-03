@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configentry>
+    <keyword>OVERLIBCAPTION</keyword>
+
+    <scope>NODE</scope>
+
+    <anchor>NODE_OVERLIBCAPTION</anchor>
+
+    <definition>OVERLIBCAPTION
+
+        <meta>caption text</meta>
+    </definition>
+
+    <description xmlns="http://www.w3.org/1999/xhtml">
+        <p>Specify the caption used for the popup HTML 'window' if you have also
+        specified an OVERLIBGRAPH line. By default, this is the name of the NODE.</p>
+
+        <p>The text for the caption can contain
+        <a href="advanced.html#tokens">special tokens</a> to show map data.</p>
+    </description>
+
+    <changes>
+        <change version="0.9">Originally added OVERLIBCAPTION.
+        </change>
+    </changes>
+</configentry>

@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configentry>
+    <keyword>TEMPLATE</keyword>
+
+    <scope>NODE</scope>
+
+    <anchor>NODE_TEMPLATE</anchor>
+
+    <definition>TEMPLATE
+
+        <meta>nodename</meta>
+    </definition>
+
+    <description xmlns="http://www.w3.org/1999/xhtml">
+        <p>By default, each new node starts with the same set of properties. You can
+        change the default properties by defining a node called DEFAULT.</p>
+
+        <p>You can also use the TEMPLATE keyword to make a node inherit it's settings from
+        <em>any</em> other node. The node you use must be defined earlier in the config
+        file than where you use it.</p>
+
+        <p>You can make template-only nodes that are not visible in the map, by not
+        including a NODES line in the node. Template nodes can also use templates, to
+        build up a hierarchy of 'types'.</p>
+
+        <p><strong>NOTE:</strong> The TEMPLATE line should be the first line in the NODE
+        definition, as it will copy the configuration over the top of anything else you
+        have already defined for that NODE.</p>
+    </description>
+
+    <examples>
+        <example><caption>NODE Templates in use - with template-only nodes</caption>
+
+            <content>NODE server
+            </content>
+        </example>
+    </examples>
+
+    <changes>
+        <change version="0.96">Added template support
+        </change>
+    </changes>
+</configentry>

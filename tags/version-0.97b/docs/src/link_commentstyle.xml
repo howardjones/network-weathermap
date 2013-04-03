@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configentry>
+    <keyword>COMMENTSTYLE</keyword>
+
+    <scope>LINK</scope>
+
+    <anchor>LINK_COMMENTSTYLE</anchor>
+
+    <definition>COMMENTSTYLE edge
+    </definition>
+
+    <definition>COMMENTSTYLE center
+    </definition>
+
+    <description xmlns="http://www.w3.org/1999/xhtml">
+        <p>Specify whether link comments run along the outside edge of the link, or down
+        the centre of the link arrow.</p>
+
+        <p>
+        <img src="../images/commentstyle-edge.png"/> 'edge' comment style</p>
+
+        <p>
+        <img src="../images/commentstyle-center.png"/> 'center' comment style</p>
+    </description>
+
+    <changes>
+        <change version="0.96">Added COMMENTSTYLE
+        </change>
+    </changes>
+</configentry>

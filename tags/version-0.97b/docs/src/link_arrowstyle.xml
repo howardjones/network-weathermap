@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configentry>
+    <keyword>ARROWSTYLE</keyword>
+
+    <scope>LINK</scope>
+
+    <anchor>LINK_ARROWSTYLE</anchor>
+
+    <definition>ARROWSTYLE
+
+        <meta>stylename</meta>
+    </definition>
+
+    <definition>ARROWSTYLE
+
+        <meta>width</meta>
+
+        <meta>length</meta>
+    </definition>
+
+    <description xmlns="http://www.w3.org/1999/xhtml">
+        <p>Specifies the style of arrowhead used for drawing links.</p>
+
+        <p>The default is 'classic' which has a wide arrowhead. You can also choose
+        'compact' which gives narrower heads.</p>
+
+        <p>Finally, you can get finer control by adjusting the size yourself. The width
+        and length of the head are in units of link-width.</p>
+
+        <p>Classic is equivalent to '4 2' and Compact is equivalent to '1 1'.</p>
+
+        <p>
+        <img src="../images/arrowstyle-classic.png"/> Classic arrow style</p>
+
+        <p>
+        <img src="../images/arrowstyle-compact.png"/> Compact arrow style</p>
+    </description>
+
+    <changes>
+        <change version="0.8">Added custom numeric form.
+        </change>
+
+        <change version="0.7">First added.
+        </change>
+    </changes>
+</configentry>

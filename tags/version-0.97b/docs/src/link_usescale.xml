@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configentry>
+    <keyword>USESCALE</keyword>
+
+    <scope>LINK</scope>
+
+    <anchor>LINK_USESCALE</anchor>
+
+    <definition>USESCALE
+
+        <meta>scalename</meta>
+    </definition>
+
+    <definition>USESCALE
+
+        <meta>scalename</meta>
+
+        percent
+    </definition>
+
+    <definition>USESCALE
+
+        <meta>scalename</meta>
+
+        absolute
+    </definition>
+
+    <description xmlns="http://www.w3.org/1999/xhtml">
+        <p>Specify which SCALE to use to decide the colour of this link.</p>
+
+        <p>After the percentage usage is calculated (using BANDWIDTH and data from the
+        TARGET line), the colour is decided by looking up the percentage against this
+        SCALE. If there is no USESCALE line, then the default scale is used.</p>
+
+        <p>If you also specify 'absolute', then no percentage calculation is performed.
+        The raw values from the TARGET line are just looked up in the named SCALE.</p>
+    </description>
+
+    <changes>
+        <change version="0.97">Added absolute scale support.
+        </change>
+
+        <change version="0.9">Added named scales and USESCALE.
+        </change>
+    </changes>
+</configentry>

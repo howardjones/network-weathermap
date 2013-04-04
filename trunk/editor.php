@@ -947,7 +947,7 @@ else
 		}
 ?>
 	</style>
-  <link rel="stylesheet" type="text/css" media="screen" href="editor.css" />
+  <link rel="stylesheet" type="text/css" media="screen" href="editor-resources/oldeditor.css" />
 <script src="editor-resources/jquery-latest.min.js" type="text/javascript"></script>
 <script src="editor.js" type="text/javascript"></script>
 	<script type="text/javascript">

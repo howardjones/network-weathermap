@@ -86,6 +86,7 @@
 ./docs/pages/upgrading.html
 ./editor.php
 ./editor-resources/editor.css
+./editor-resources/oldeditor.css
 ./editor-resources/editor.js
 ./editor-resources/index.php
 ./editor-resources/jquery-latest.min.js

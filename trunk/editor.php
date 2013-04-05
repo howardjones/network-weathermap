@@ -4,7 +4,7 @@ require_once 'lib/editor.inc.php';
 require_once 'lib/Weathermap.class.php';
 
 // so that you can't have the editor active, and not know about it.
-$ENABLED=true;
+$ENABLED=false;
 
 if(! $ENABLED)
 {

@@ -18,7 +18,7 @@ function disabled_plugin_weathermap_version()
 
 function weathermap_version () {
 	return array( 	'name'    	=> 'weathermap',
-		'version'       => '0.97b',
+		'version'       => '0.97d',
 		'longname'      => 'PHP Network Weathermap',
 		'author'        => 'Howard Jones',
 		'homepage'      => 'http://www.network-weathermap.com/',
@@ -581,7 +581,7 @@ function weathermap_show_tab () {
 			$prefix="";
 		}
 
-		print '<a href="' . $config['url_path'] . 'plugins/weathermap/weathermap-cacti-plugin.php"><img src="' . $config['url_path'] . 'plugins/weathermap/images/'.$prefix.'tab_weathermap';
+		print '<a href="' . $config['url_path'] . 'plugins/weathermap/weathermap-cacti-plugin.php"><img src="' . $config['url_path'] . 'plugins/weathermap/plugin-images/'.$prefix.'tab_weathermap';
 		// if we're ON a weathermap page, print '_red'
 		if(preg_match('/plugins\/weathermap\/weathermap-cacti-plugin.php/',$_SERVER['REQUEST_URI'] ,$matches))
 		{
@@ -751,22 +751,7 @@ function weathermap_poller_output($rrd_update_array) {
 			}
 			db_execute("UPDATE weathermap_data SET last_time=$newtime, last_calc='$newvalue', last_value='$newlastvalue',sequence=sequence+1  where id = " . $required['id']);
 	        	if($logging >= POLLER_VERBOSITY_DEBUG) cacti_log("WM poller_output: Final value is $newvalue (was $lastval, period was $period)\n",true,"WEATHERMAP");
-		}
-		else
-		{
-			if(1==0 && $logging >= POLLER_VERBOSITY_DEBUG)
-			{
-			#	cacti_log("WM poller_output: ENDING\n",true,"WEATHERMAP");
-				cacti_log("WM poller_output: Didn't find it.\n",true,"WEATHERMAP");
-				cacti_log("WM poller_output: DID find these:\n",true,"WEATHERMAP");
-				
-				foreach (array_keys($rrd_update_array) as $key)
-				{
-					$local_data_id = $rrd_update_array[$key]["local_data_id"];
-					cacti_log("WM poller_output:    $key ($local_data_id)\n",true,"WEATHERMAP");
-				}			
-			}
-		}
+		}		
 	}
 
 	if($logging >= POLLER_VERBOSITY_DEBUG) cacti_log("WM poller_output: ENDING\n",true,"WEATHERMAP");

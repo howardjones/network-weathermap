@@ -1,4 +1,6 @@
 <?php
+	# This file is from Weathermap version 0.97d
+
     /**
      * A shim for the standalone editor so that it benefits from 
      * Cacti authentication. 

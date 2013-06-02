@@ -1,12 +1,15 @@
 <?php
 
+# This file is from Weathermap version 0.97d
+
 #
 # Change the uncommented line to point to your Cacti installation
 #
 # $cacti_base = "C:/Program Files/xampp/htdocs/cacti/";
-$cacti_base = "/var/www/html/cacti/";
-$cacti_base = "/Applications/XAMPP/htdocs/cacti/";
-$cacti_base = "/XAMPP/htdocs/cacti-0.8.7e/";
+# $cacti_base = "/var/www/html/cacti/";
+# $cacti_base = "/Applications/XAMPP/htdocs/cacti/";
+# $cacti_base = "/XAMPP/htdocs/cacti-0.8.7e/";
+# (the following usually works)
 $cacti_base = "../../";
 
 // check if the goalposts have moved

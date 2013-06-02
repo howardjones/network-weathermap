@@ -1,10 +1,12 @@
 <?php
 	
+# This file is from Weathermap version 0.97d	
+	
 require_once 'lib/editor.inc.php';
 require_once 'lib/Weathermap.class.php';
 
 // so that you can't have the editor active, and not know about it.
-$ENABLED=false;
+$ENABLED=true;
 
 if(! $ENABLED)
 {
@@ -29,7 +31,7 @@ $grid_snap_value = 0; // set non-zero to snap to a grid of that spacing
 
 if( isset($_COOKIE['wmeditor']))
 {
-    $parts = split(":",$_COOKIE['wmeditor']);
+    $parts = explode(":",$_COOKIE['wmeditor']);
     
     if( (isset($parts[0])) && (intval($parts[0]) == 1) ) { $use_overlay = TRUE; }
     if( (isset($parts[1])) && (intval($parts[1]) == 1) ) { $use_relative_overlay = TRUE; }
@@ -133,7 +135,7 @@ else
 		
 		$sourcemapname = wm_editor_sanitize_conffile($sourcemapname);
 		
-		if($$sourcemapname != "") {
+		if($sourcemapname != "") {
 		    $sourcemap = $mapdir.'/'.$sourcemapname;
 		    if( file_exists($sourcemap) && is_readable($sourcemap) ) {
 			$map->ReadConfig($sourcemap);

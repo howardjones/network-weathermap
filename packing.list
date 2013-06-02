@@ -89,6 +89,7 @@
 ./editor-resources/oldeditor.css
 ./editor-resources/editor.js
 ./editor-resources/index.php
+./editor-resources/exclamation.png
 ./editor-resources/jquery-latest.min.js
 ./images/application.png
 ./images/application_side_list.png

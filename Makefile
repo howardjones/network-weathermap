@@ -1,4 +1,4 @@
-VERSION=0.97b
+VERSION=0.98
 RELBASE=../releases
 RELNAME=php-weathermap-$(VERSION)
 RELDIR=$(RELBASE)/weathermap
@@ -14,6 +14,7 @@ random-bits/suite-2.png:  random-bits/suite-2.conf
 ready: random-bits/suite-1.png random-bits/suite-2.png
 
 manual:	docs/index.html
+	touch docs/src/index.xml
 	$(MAKE) -C docs/src VERSION=$(VERSION)
 	cd docs/example && ./bodge-example.sh
 	
@@ -22,6 +23,7 @@ clean:
 
 release: 
 	echo Building release $(RELNAME)
+	grep -q ENABLED=true editor.php
 	# mv $(RELDIR) $(RELDIR).$$
 	mkdir -p $(RELDIR)
 	tar cTf packing.list - | (cd $(RELDIR); tar xvf -)

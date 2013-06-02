@@ -1,15 +1,17 @@
 <?php
 
-chdir('../../');
-include_once("./include/auth.php");
-include_once("./include/config.php");
+# This file is from Weathermap version 0.97d
 
-include_once($config["library_path"] . "/database.php");
+chdir('../../');
+include_once "./include/auth.php";
+include_once "./include/config.php";
+
+include_once $config["library_path"] . "/database.php";
 
 $weathermap_confdir = realpath(dirname(__FILE__).'/configs');
 
 // include the weathermap class so that we can get the version
-include_once(dirname(__FILE__)."/lib/Weathermap.class.php");
+include_once dirname(__FILE__)."/lib/Weathermap.class.php";
 
 $i_understand_file_permissions_and_how_to_fix_them = FALSE;
 
@@ -492,7 +494,7 @@ function maplist()
 			{
 				$had_warnings++;
 				
-				print '<a href="../../utilities.php?tail_lines=500&message_type=2&action=view_logfile&filter='.urlencode($map['configfile']).'" title="Check cacti.log for this map"><img border=0 src="images/exclamation.png" title="'.$map['warncount'].' warnings last time this map was run. Check your logs.">'.$map['warncount']."</a>";
+				print '<a href="../../utilities.php?tail_lines=500&message_type=2&action=view_logfile&filter='.urlencode($map['configfile']).'" title="Check cacti.log for this map"><img border=0 src="plugin-images/exclamation.png" title="'.$map['warncount'].' warnings last time this map was run. Check your logs.">'.$map['warncount']."</a>";
 			}
 			print "</td>";
 			
@@ -591,11 +593,11 @@ function maplist()
 	}
 	
 	print "<div align='center'>";	
-	print "<a href='weathermap-cacti-plugin-mgmt.php?action=groupadmin'><img src='images/button_editgroups.png' border=0 alt='Edit Groups' /></a>";
-	print "&nbsp;<a href='../../settings.php?tab=misc'><img src='images/button_settings.gif' border=0 alt='Settings' /></a>";
+	print "<a href='weathermap-cacti-plugin-mgmt.php?action=groupadmin'><img src='plugin-images/button_editgroups.png' border=0 alt='Edit Groups' /></a>";
+	print "&nbsp;<a href='../../settings.php?tab=misc'><img src='plugin-images/button_settings.gif' border=0 alt='Settings' /></a>";
 	if($i>0 && $i_understand_file_permissions_and_how_to_fix_them)
 	{
-		print '<br /><a href="?action=rebuildnow"><img src="images/btn_recalc.png" border="0" alt="Rebuild All Maps Right Now"><br />(Experimental - You should NOT need to use this normally)</a><br />';
+		print '<br /><a href="?action=rebuildnow"><img src="plugin-images/btn_recalc.png" border="0" alt="Rebuild All Maps Right Now"><br />(Experimental - You should NOT need to use this normally)</a><br />';
 	}
 	print "</div>";
 

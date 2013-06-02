@@ -10,7 +10,7 @@ require_once "WeatherMap.functions.php";
 require_once "WeatherMapNode.class.php";
 require_once "WeatherMapLink.class.php";
 
-$WEATHERMAP_VERSION="0.97b";
+$WEATHERMAP_VERSION="0.98";
 $weathermap_debugging=FALSE;
 $weathermap_map="";
 $weathermap_warncount=0;
@@ -225,6 +225,7 @@ class WeatherMap extends WeatherMapBase
 	var $min_data_time, $max_data_time;
 	var $htmloutputfile,
 		$imageoutputfile;
+	var $dataoutputfile;
 	var $htmlstylesheet;
 	var $defaultlink,
 		$defaultnode;
@@ -279,6 +280,7 @@ class WeatherMap extends WeatherMapBase
 				'rrdtool_check' => '',
 				'background' => '',
 				'imageoutputfile' => '',
+				'dataoutputfile' => '',
 				'imageuri' => '',
 				'htmloutputfile' => '',
 				'htmlstylesheet' => '',
@@ -1602,8 +1604,7 @@ function DrawLegend_Classic($im,$scalename="DEFAULT",$use_tags=FALSE)
 
 		foreach ($colours as $colour)
 		{
-			if (!isset($colour['special']) || $colour['special'] == 0)
-			// if ( 1==1 || $colour['bottom'] >= 0)
+			if (!isset($colour['special']) || $colour['special'] == 0)			
 			{
 				// pick a value in the middle...
 				$value = ($colour['bottom'] + $colour['top']) / 2;
@@ -1761,8 +1762,8 @@ function ReadConfig($input, $is_include=FALSE)
 	{
 		 wm_debug("ReadConfig Detected that this is a config fragment.\n");
 			 // strip out any Windows line-endings that have gotten in here
-			 $input=str_replace("\r", "", $input);
-			 $lines = split("/n",$input);
+			 $input = str_replace("\r", "", $input);
+			 $lines = explode("/n",$input);
 			 $filename = "{text insert}";
 	}
 	else
@@ -1827,37 +1828,9 @@ function ReadConfig($input, $is_include=FALSE)
 			if (preg_match("/^\s*(LINK|NODE)\s+(\S+)\s*$/i", $buffer, $matches))
 			{
 				$objectlinecount = 0;
-				if(1==1)
-				{
-					$this->ReadConfig_Commit($curobj);
-				}
-				else
-				{
-					// first, save the previous item, before starting work on the new one
-					if ($last_seen == "NODE")
-					{
-						$this->nodes[$curnode->name]=$curnode;
-						if($curnode->template == 'DEFAULT') $this->node_template_tree[ "DEFAULT" ][]= $curnode->name;
-					
-						wm_debug ("Saving Node: " . $curnode->name . "\n");
-					}
-
-					if ($last_seen == "LINK")
-					{
-						if (isset($curlink->a) && isset($curlink->b))
-						{
-							$this->links[$curlink->name]=$curlink;
-							wm_debug ("Saving Link: " . $curlink->name . "\n");
-						}
-						else
-						{
-							$this->links[$curlink->name]=$curlink;
-							wm_debug ("Saving Template-Only Link: " . $curlink->name . "\n");
-						}
-						if($curlink->template == 'DEFAULT') $this->link_template_tree[ "DEFAULT" ][]= $curlink->name;				
-					}
-				}
-
+				
+				$this->ReadConfig_Commit($curobj);
+				
 				if ($matches[1] == 'LINK')
 				{
 					if ($matches[2] == 'DEFAULT')
@@ -1940,6 +1913,7 @@ function ReadConfig($input, $is_include=FALSE)
 					array('NODE','/^\s*(MAXVALUE)\s+(\d+\.?\d*[KMGT]?)\s*$/i',array('max_bandwidth_in_cfg'=>2,'max_bandwidth_out_cfg'=>2)),
 					array('GLOBAL','/^\s*BACKGROUND\s+(.*)\s*$/i',array('background'=>1)),
 					array('GLOBAL','/^\s*HTMLOUTPUTFILE\s+(.*)\s*$/i',array('htmloutputfile'=>1)),
+					array('GLOBAL','/^\s*DATAOUTPUTFILE\s+(.*)\s*$/i',array('dataoutputfile'=>1)),
 					array('GLOBAL','/^\s*HTMLSTYLESHEET\s+(.*)\s*$/i',array('htmlstylesheet'=>1)),
 					array('GLOBAL','/^\s*IMAGEOUTPUTFILE\s+(.*)\s*$/i',array('imageoutputfile'=>1)),
 					array('GLOBAL','/^\s*IMAGEURI\s+(.*)\s*$/i',array('imageuri'=>1)),
@@ -2597,32 +2571,8 @@ function ReadConfig($input, $is_include=FALSE)
 			}
 		} // if blankline
 	}     // while
-
-	if(1==1)
-	{
-		$this->ReadConfig_Commit($curobj);
-	}
-	else
-	{
-	if ($last_seen == "NODE")
-	{
-		$this->nodes[$curnode->name]=$curnode;
-		wm_debug ("Saving Node: " . $curnode->name . "\n");
-		if($curnode->template == 'DEFAULT') $this->node_template_tree[ "DEFAULT" ][]= $curnode->name;	
-	}
-
-	if ($last_seen == "LINK")
-	{
-		if (isset($curlink->a) && isset($curlink->b))
-		{
-			$this->links[$curlink->name]=$curlink;
-			wm_debug ("Saving Link: " . $curlink->name . "\n");
-			if($curlink->template == 'DEFAULT') $this->link_template_tree[ "DEFAULT" ][]= $curlink->name;				
-		}
-		else { wm_warn ("Dropping LINK " . $curlink->name . " - it hasn't got 2 NODES!"); }
-	}
-	}
 	
+	$this->ReadConfig_Commit($curobj);	
 		
 	wm_debug("ReadConfig has finished reading the config ($linecount lines)\n");
 	wm_debug("------------------------------------------\n");
@@ -2829,6 +2779,32 @@ function ReadConfig_Commit(&$curobj)
 	}
 }
 
+function WriteDataFile($filename)
+{
+    if($filename != "") {
+
+	$fd = fopen($filename, 'w');
+	$output = '';
+
+	if($fd) {
+
+	    foreach ($this->nodes as $node) {
+		if (!preg_match("/^::\s/", $node->name) && sizeof($node->targets)>0 )  {
+		    fputs($fd, sprintf("N_%s\t%f\t%f\r\n", $node->name, $node->bandwidth_in, $node->bandwidth_out));
+		}
+	    }
+
+	    foreach ($this->links as $link) {
+		if (!preg_match("/^::\s/", $link->name) && sizeof($link->targets)>0) {
+		    fputs($fd, sprintf("L_%s\t%f\t%f\r\n", $link->name, $link->bandwidth_in, $link->bandwidth_out));
+		}
+	    }
+		
+	    fclose($fd);
+	}
+    }
+}
+
 function WriteConfig($filename)
 {
 	global $WEATHERMAP_VERSION;
@@ -2865,6 +2841,7 @@ function WriteConfig($filename)
 				array('titlefont','TITLEFONT',CONFIG_TYPE_LITERAL),
 				array('title','TITLE',CONFIG_TYPE_LITERAL),
 				array('htmloutputfile','HTMLOUTPUTFILE',CONFIG_TYPE_LITERAL),
+				array('dataoutputfile','DATAOUTPUTFILE',CONFIG_TYPE_LITERAL),
 				array('htmlstylesheet','HTMLSTYLESHEET',CONFIG_TYPE_LITERAL),
 				array('imageuri','IMAGEURI',CONFIG_TYPE_LITERAL),
 				array('imageoutputfile','IMAGEOUTPUTFILE',CONFIG_TYPE_LITERAL)
@@ -3412,7 +3389,7 @@ function CleanUp()
         unset($node);
     }
 
-            // Clear up the other random hashes of information
+    // Clear up the other random hashes of information
     $this->dsinfocache = null;
     $this->colourtable = null;
     $this->usage_stats = null;
@@ -3933,7 +3910,19 @@ function DumpStats($filename="")
 		$report .= sprintf("%70s => %d\n",$key,$val);
 	}
 	
-	if($filename == "") print $report;
+	if($filename == "") {
+		print $report;
+	} else {
+		$fd = @fopen($filename, 'w');
+		if($fd != FALSE)
+		{
+			fputs($fd,$report);
+			fclose($fd);
+		}
+		else {
+			wmwarn("Unable to open stats file for writing [WMSTATS01]");
+		}
+	}	
 }
 
  function SeedCoverage()

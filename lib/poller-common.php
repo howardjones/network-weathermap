@@ -52,9 +52,9 @@ function weathermap_run_maps($mydir) {
 	global $weathermap_map;
 	global $weathermap_warncount;
 	global $weathermap_poller_start_time;
-
-	include_once($mydir.DIRECTORY_SEPARATOR."lib".DIRECTORY_SEPARATOR."HTML_ImageMap.class.php");
-	include_once($mydir.DIRECTORY_SEPARATOR."lib".DIRECTORY_SEPARATOR."Weathermap.class.php");
+		
+	require_once($mydir.DIRECTORY_SEPARATOR."lib".DIRECTORY_SEPARATOR."HTML_ImageMap.class.php");
+	require_once($mydir.DIRECTORY_SEPARATOR."lib".DIRECTORY_SEPARATOR."Weathermap.class.php");
 
 	$total_warnings = 0;
 	$warning_notes = "";
@@ -121,10 +121,12 @@ function weathermap_run_maps($mydir) {
 						
 						if(weathermap_check_cron($weathermap_poller_start_time,$map['schedule']))
 						{
-							$mapfile = $confdir.DIRECTORY_SEPARATOR.$map['configfile'];
-							$htmlfile = $outdir.DIRECTORY_SEPARATOR.$map['filehash'].".html";
-							$imagefile = $outdir.DIRECTORY_SEPARATOR.$map['filehash'].".".$imageformat;
-							$thumbimagefile = $outdir.DIRECTORY_SEPARATOR.$map['filehash'].".thumb.".$imageformat;
+							$mapfile = $confdir . DIRECTORY_SEPARATOR . $map['configfile'];
+							$htmlfile = $outdir . DIRECTORY_SEPARATOR . $map['filehash'].".html";
+							$imagefile = $outdir . DIRECTORY_SEPARATOR . $map['filehash'].".".$imageformat;
+							$thumbimagefile = $outdir . DIRECTORY_SEPARATOR . $map['filehash'].".thumb.".$imageformat;
+							$statsfile = $outdir . DIRECTORY_SEPARATOR . $map['filehash'] . '.stats.xml';
+							$resultsfile = $outdir . DIRECTORY_SEPARATOR . $map['filehash'] . '.results.txt';
 
 							if(file_exists($mapfile))
 							{
@@ -208,6 +210,14 @@ function weathermap_run_maps($mydir) {
 									}
 								}
 
+								$wmap->DumpStats($statsfile);
+								$wmap->WriteDataFile($resultsfile);
+								
+								// if the user explicitly defined a data file, write it there too
+								if($wmap->dataoutputfile) {
+									$map->WriteDataFile($map->dataoutputfile);
+								}
+								
 								$processed_title = $wmap->ProcessString($wmap->title,$wmap);
 								
 								db_execute("update weathermap_maps set titlecache='".mysql_real_escape_string($processed_title)."' where id=".intval($map['id']));

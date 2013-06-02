@@ -38,7 +38,7 @@ while (<>) {
         $vias = $3;
         $rest = $4;
 
-        @bits = split(/\s+/, $rest);
+        @bits = explode(/\s+/, $rest);
 
         print "LINK $n1$n2$i\n\tWIDTH 3\n\tNODES $n1 $n2\n";
 

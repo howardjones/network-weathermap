@@ -10,7 +10,7 @@ $ignore_cacti = false;
 
 $config['base_url'] = $cacti_url;
 
-@include_once ('editor-config.php');
+@include_once 'editor-config.php';
 
 // check if the goalposts have moved
 if (is_dir($cacti_base) && file_exists($cacti_base . "/include/global.php")) {

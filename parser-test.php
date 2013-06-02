@@ -5,7 +5,7 @@ $f = fopen("config-schema.tsv", "r");
 
 while (!feof($f)) {
     $line = fgets($f);
-    $parts = split("\t", $line);
+    $parts = explode("\t", $line);
     $context = array_shift($parts);
     $command = array_shift($parts);
 
@@ -47,7 +47,7 @@ function ReadConfig($input, $is_include = false, $initial_context = 'GLOBAL')
         wm_debug("ReadConfig Detected that this is a config fragment.\n");
         // strip out any Windows line-endings that have gotten in here
         $input = str_replace("\r", "", $input);
-        $lines = split("/n", $input);
+        $lines = explode("/n", $input);
         $filename = "{text insert}";
     } else {
         wm_debug("ReadConfig Detected that this is a config filename.\n");
@@ -108,7 +108,7 @@ function ReadConfig($input, $is_include = false, $initial_context = 'GLOBAL')
             if ($context == 'GLOBAL') {
                 $ctype = 'GLOBAL';
             } else {
-                list($ctype, $junk) = split("\\.", $context, 2);
+                list($ctype, $junk) = explode("\\.", $context, 2);
             }
 
             $lookup = $ctype . "." . $cmd;

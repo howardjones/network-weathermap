@@ -1,13 +1,15 @@
 <?php
 
+# This file is from Weathermap version 0.97d
+
 $guest_account = true;
 
 chdir('../../');
-include_once("./include/auth.php");
+include_once "./include/auth.php";
 // include_once("./include/config.php");
 
 // include the weathermap class so that we can get the version
-include_once(dirname(__FILE__)."/lib/Weathermap.class.php");
+include_once dirname(__FILE__)."/lib/Weathermap.class.php";
 
 $action = "";
 if (isset($_POST['action'])) {
@@ -63,153 +65,40 @@ case 'viewimage':
 	
 	break;
 
-case 'liveviewimage':
-	$id = -1;
-
-	if( isset($_REQUEST['id']) && (!is_numeric($_REQUEST['id']) || strlen($_REQUEST['id'])==20) )
-	{
-		$id = weathermap_translate_id($_REQUEST['id']);
-	}
-
-	if( isset($_REQUEST['id']) && is_numeric($_REQUEST['id']) )
-	{
-		$id = intval($_REQUEST['id']);
-	}
-	
-	if($id >=0)
-	{
-		$userid = (isset($_SESSION["sess_user_id"]) ? intval($_SESSION["sess_user_id"]) : 1);
-		$map = db_fetch_assoc("select weathermap_maps.* from weathermap_auth,weathermap_maps where weathermap_maps.id=weathermap_auth.mapid and active='on' and (userid=".$userid." or userid=0) and weathermap_maps.id=".$id);
-		
-		if(sizeof($map))
-		{
-		
-		$mapfile = dirname(__FILE__).'/configs/'.'/'.$map[0]['configfile'];
-		$orig_cwd = getcwd();
-		chdir(dirname(__FILE__));
-
-		header('Content-type: image/png');
-
-		$map = new WeatherMap;
-		$map->context = '';
-			// $map->context = "cacti";
-			$map->rrdtool  = read_config_option("path_rrdtool");
-		$map->ReadConfig($mapfile);
-		$map->ReadData();
-		$map->DrawMap('','',250,TRUE,FALSE);
-		dir($orig_cwd);	
-		}
-
-	}
-	
-	break;
-case 'liveview':
-	include_once($config["base_path"]."/include/top_graph_header.php");
-	print "<div id=\"overDiv\" style=\"position:absolute; visibility:hidden; z-index:1000;\"></div>\n";
-	print "<script type=\"text/javascript\" src=\"overlib.js\"><!-- overLIB (c) Erik Bosrup --></script> \n";
-	
-	$id = -1;
-
-	if( isset($_REQUEST['id']) && (!is_numeric($_REQUEST['id']) || strlen($_REQUEST['id'])==20) )
-	{
-		$id = weathermap_translate_id($_REQUEST['id']);
-	}
-
-	if( isset($_REQUEST['id']) && is_numeric($_REQUEST['id']) )
-	{
-		$id = intval($_REQUEST['id']);
-	}
-	
-	if($id >=0)
-	{
-		$userid = (isset($_SESSION["sess_user_id"]) ? intval($_SESSION["sess_user_id"]) : 1);
-		$map = db_fetch_assoc("select weathermap_maps.* from weathermap_auth,weathermap_maps where weathermap_maps.id=weathermap_auth.mapid and active='on' and (userid=".$userid." or userid=0) and weathermap_maps.id=".$id);
-
-		if(sizeof($map))
-		{		
-			$maptitle = $map[0]['titlecache'];
-			
-			html_graph_start_box(1,true);
-	?>
-<tr bgcolor="<?php print $colors["panel"];?>"><td><table width="100%" cellpadding="0" cellspacing="0"><tr><td class="textHeader" nowrap><?php print $maptitle; ?></td></tr></table></td></tr>
-<?php
-			print "<tr><td>";		
-					
-			# print "Generating map $id here now from ".$map[0]['configfile'];
-			
-			$confdir = dirname(__FILE__).'/configs/';
-			// everything else in this file is inside this else
-			$mapname = $map[0]['configfile'];
-			$mapfile = $confdir.'/'.$mapname;        
-	
-			$orig_cwd = getcwd();
-			chdir(dirname(__FILE__));	
-	
-			$map = new WeatherMap;
-			// $map->context = "cacti";
-			$map->rrdtool  = read_config_option("path_rrdtool");
-			print "<pre>";
-			$map->ReadConfig($mapfile);
-			$map->ReadData();
-			$map->DrawMap('null');		
-			$map->PreloadMapHTML();
-			print "</pre>";
-			print "";
-			print "<img src='?action=liveviewimage&id=$id' />\n";
-			print $map->imap->subHTML("LEGEND:");
-			print $map->imap->subHTML("TIMESTAMP");
-			print $map->imap->subHTML("NODE:");
-			print $map->imap->subHTML("LINK:");
-			chdir($orig_cwd);
-			
-			print "</td></tr>";
-			html_graph_end_box();
-		}
-		else
-		{
-			print "Map unavailable.";
-		}
-	}
-	else
-	{
-		print "No ID, or unknown map name.";
-	}
-
-	
-	weathermap_versionbox();
-	include_once($config["base_path"]."/include/bottom_footer.php");
-	break;
-
-case 'mrss':
-	header('Content-type: application/rss+xml');
-	print '<?xml version="1.0" encoding="utf-8" standalone="yes"?>'."\n";
-	print '<rss xmlns:media="http://search.yahoo.com/mrss" version="2.0"><channel><title>My Network Weathermaps</title>';
-	$userid = (isset($_SESSION["sess_user_id"]) ? intval($_SESSION["sess_user_id"]) : 1);
-	$maplist = db_fetch_assoc( "select distinct weathermap_maps.* from weathermap_auth,weathermap_maps where weathermap_maps.id=weathermap_auth.mapid and active='on' and (userid=".$userid." or userid=0) order by sortorder, id");	
-	foreach ($maplist as $map) {
-		$thumburl = "weathermap-cacti-plugin.php?action=viewthumb&id=".$map['filehash']."&time=".time();
-		$bigurl = "weathermap-cacti-plugin.php?action=viewimage&id=".$map['filehash']."&time=".time();
-		$linkurl = 'weathermap-cacti-plugin.php?action=viewmap&id='.$map['filehash'];
-		$maptitle = $map['titlecache'];
-		$guid = $map['filehash'];
-		if($maptitle == '') $maptitle= "Map for config file: ".$map['configfile'];
-		
-		printf('<item><title>%s</title><description>Network Weathermap named "%s"</description><link>%s</link><media:thumbnail url="%s"/><media:content url="%s"/><guid isPermaLink="false">%s%s</guid></item>',
-			$maptitle, $maptitle, $linkurl,$thumburl,$bigurl,$config['url_path'],$guid);
-		print "\n";
-	}
-	
-	print '</channel></rss>';
-	break;
 
 case 'viewmapcycle':
-	include_once($config["base_path"]."/include/top_graph_header.php");
+
+	$fullscreen = 0;
+	if ( (isset($_REQUEST['fullscreen']) && is_numeric($_REQUEST['fullscreen'] ) )) {
+            $fullscreen = intval($_REQUEST['fullscreen']);
+        }
+		
+	if($fullscreen==1) {
+		print "<html><head>";
+		print '<LINK rel="stylesheet" type="text/css" media="screen" href="weathermap-cacti-plugin.css">';		
+		print "</head><body id='wm_fullscreen'>";
+	} else {
+		include_once($config["base_path"]."/include/top_graph_header.php");
+	}	
+	
 	print "<div id=\"overDiv\" style=\"position:absolute; visibility:hidden; z-index:1000;\"></div>\n";
 	print "<script type=\"text/javascript\" src=\"overlib.js\"><!-- overLIB (c) Erik Bosrup --></script> \n";
-	weathermap_fullview(TRUE);
-	weathermap_versionbox();
+	
+	$groupid = -1;
+        if ( (isset($_REQUEST['group']) && is_numeric($_REQUEST['group'] ) )) {
+            $groupid = intval($_REQUEST['group']);
+        }
+	
+	weathermap_fullview(true,false,$groupid, $fullscreen);
+	if($fullscreen == 0) {
+		weathermap_versionbox();
+	}
 
-	include_once($config["base_path"]."/include/bottom_footer.php");
+	if($fullscreen==1) {
+		print "</body></html>";
+	} else {
+		include_once($config["base_path"]."/include/bottom_footer.php");
+	}
 	break;
 
 case 'viewmap':
@@ -229,7 +118,7 @@ case 'viewmap':
 		$id = intval($_REQUEST['id']);
 	}
 	
-	if($id>=0)
+	if($id >= 0)
 	{	
 		weathermap_singleview($id);
 	}	
@@ -404,7 +293,13 @@ function weathermap_thumbview($limit_to_group = -1)
 						<table width="100%" cellpadding="0" cellspacing="0">
 								<tr>
 								   <td class="textHeader" nowrap> <?php print $pagetitle; ?></td>
-				<td align="right"> <a href="?action=viewmapcycle">automatically cycle</a> between full-size maps) </td>
+				<td align="right">
+				automatically cycle between full-size maps (<?php
+                                if ($limit_to_group > 0) {
+                                    print '<a href = "?action=viewmapcycle&group='.intval($limit_to_group).'">within this group</a>, or ';
+                                } 
+                                print ' <a href = "?action=viewmapcycle">all maps</a>';  ?>)
+				</td>
 				</tr>
 			</table>
 		</td>
@@ -466,22 +361,21 @@ function weathermap_thumbview($limit_to_group = -1)
 	}
 }
 
-function weathermap_fullview($cycle=FALSE, $firstonly=FALSE, $limit_to_group = -1)
+function weathermap_fullview($cycle=FALSE, $firstonly=FALSE, $limit_to_group = -1, $fullscreen = 0)
 {
 	global $colors;
 
 	$_SESSION['custom']=false;
 
 	$userid = (isset($_SESSION["sess_user_id"]) ? intval($_SESSION["sess_user_id"]) : 1);
-	# $query = "select distinct weathermap_maps.* from weathermap_auth,weathermap_maps where weathermap_maps.id=weathermap_auth.mapid and active='on' and (userid=".$userid." or userid=0) order by sortorder, id";
+	
 	$maplist_SQL = "select distinct weathermap_maps.* from weathermap_auth,weathermap_maps where weathermap_maps.id=weathermap_auth.mapid and active='on' and ";
+	
 	if($limit_to_group >0) $maplist_SQL .= " weathermap_maps.group_id=".$limit_to_group." and ";
+	
 	$maplist_SQL .= " (userid=".$userid." or userid=0) order by sortorder, id";
 
 	if($firstonly) { $maplist_SQL .= " LIMIT 1"; }
-
-	$maplist = db_fetch_assoc( $maplist_SQL );
-	html_graph_start_box(2,true);
 
 	if(sizeof($maplist) == 1)
 	{
@@ -492,32 +386,74 @@ function weathermap_fullview($cycle=FALSE, $firstonly=FALSE, $limit_to_group = -
 		$pagetitle = "Network Weathermaps";
 	}
 
+	
+	$maplist = db_fetch_assoc( $maplist_SQL );
+
+	$class = "inplace";
+	if($fullscreen) $class = "fullscreen";
+	
+if($cycle) {
+	
+	print "<script src='editor-resources/jquery-latest.min.js'></script>";
+	$extra = "";
+	if($limit_to_group > 0) $extra = " in this group";
+	?>
+		<div id="wmcyclecontrolbox" class="<?php print $class ?>">
+			<div id="wm_progress"></div>
+			<div id="wm_cyclecontrols">
+			<a id="cycle_stop" href="?action="><img src="plugin-images/control_stop_blue.png" width="16" height="16" /></a>
+			<a id="cycle_prev" href="#"><img src="plugin-images/control_rewind_blue.png" width="16" height="16" /></a>
+			<a id="cycle_pause" href="#"><img src="plugin-images/control_pause_blue.png" width="16" height="16" /></a>
+			<a id="cycle_next" href="#"><img src="plugin-images/control_fastforward_blue.png" width="16" height="16" /></a>
+			<a id="cycle_fullscreen" href="?action=viewmapcycle&fullscreen=1"><img src="plugin-images/arrow_out.png" width="16" height="16" /></a>
+			Showing <span id="wm_current_map">1</span> of <span id="wm_total_map">1</span>. 
+			Cycling all available maps<?php echo $extra; ?>.
+			</div>
+		</div>
+	<?php
+	}
+	
+		
+	// only draw the whole screen if we're not cycling, or we're cycling without fullscreen mode
+	if($cycle == false || $fullscreen==0) {
+		html_graph_start_box(2,true);
 ?>
-<tr bgcolor="<?php print $colors["panel"];?>">
+			<tr bgcolor="<?php print $colors["panel"];?>">
 				<td>
 						<table width="100%" cellpadding="0" cellspacing="0">
 								<tr>
 								   <td class="textHeader" nowrap> <?php print $pagetitle; ?> </td>
-				<td align="right">
-				<?php if(! $cycle) { ?>
-				<a href="?action=viewmapcycle">automatically cycle</a> between full-size maps)
-				<?php } else { ?>
-				Cycling all available maps. <a href="?action=">Stop.</a>
-				<?php }?>
-				</td>
+				<td align = "right">
+                        <?php if (!$cycle) { ?>
+                        (automatically cycle between full-size maps (<?php
+                                
+                                if ($limit_to_group > 0) {
+                                    
+                                    print '<a href = "?action=viewmapcycle&group='.intval($limit_to_group).'">within this group</a>, or ';
+                                } 
+                                print ' <a href = "?action=viewmapcycle">all maps</a>';                                
+                            ?>)                        
+
+                        <?php
+                        }
+			
+                        ?>
+                    </td>
 				</tr>
 			</table>
 		</td>
 </tr>
 <?php
-	html_graph_end_box();
-
-	weathermap_tabs($limit_to_group);
+		html_graph_end_box();
+	
+		weathermap_tabs($limit_to_group);	
+	}
 	
 	$i = 0;
 	if (sizeof($maplist) > 0)
 	{
-
+		print "<div class='all_map_holder $class'>";
+		
 		$outdir = dirname(__FILE__).'/output/';
 		$confdir = dirname(__FILE__).'/configs/';
 		foreach ($maplist as $map)
@@ -526,10 +462,11 @@ function weathermap_fullview($cycle=FALSE, $firstonly=FALSE, $limit_to_group = -
 			$htmlfile = $outdir.$map['filehash'].".html";
 			$maptitle = $map['titlecache'];
 			if($maptitle == '') $maptitle= "Map for config file: ".$map['configfile'];
-			
+						
 			print '<div class="weathermapholder" id="mapholder_'.$map['filehash'].'">';
-			html_graph_start_box(1,true);
-			print '<tr bgcolor="#' . $colors["header_panel"] . '">'; 
+			if($cycle == false || $fullscreen==0) {
+				html_graph_start_box(1,true);
+				print '<tr bgcolor="#' . $colors["header_panel"] . '">'; 
 ?>
 				<td colspan="3">
 						<table width="100%" cellspacing="0" cellpadding="3" border="0">
@@ -545,7 +482,7 @@ function weathermap_fullview($cycle=FALSE, $firstonly=FALSE, $limit_to_group = -
 		<tr>
 			<td>
 <?php
-
+			}
 			if(file_exists($htmlfile))
 			{
 				include($htmlfile);
@@ -554,16 +491,20 @@ function weathermap_fullview($cycle=FALSE, $firstonly=FALSE, $limit_to_group = -
 			{
 				print "<div align=\"center\" style=\"padding:20px\"><em>This map hasn't been created yet.</em></div>";
 			}
-
-			print '</td></tr>';
-			html_graph_end_box();
+			
+			if($cycle == false || $fullscreen==0) {
+				print '</td></tr>';
+				html_graph_end_box();
+			}
 			print '</div>';
 		}
-
-
+		print "</div>";
+		
 		if($cycle)
 		{
 			$refreshtime = read_config_option("weathermap_cycle_refresh");
+			$poller_cycle = read_config_option("poller_interval");
+			
 			// OK, so the Cycle plugin does all this with a <META> tag at the bottom of the body
 			// that overrides the one at the top (that Cacti puts there). Unfortunately, that
 			// isn't valid HTML! So here's a Javascript driven way to do it
@@ -572,93 +513,179 @@ function weathermap_fullview($cycle=FALSE, $firstonly=FALSE, $limit_to_group = -
 			// We also do a nice thing of taking the poller-period (5 mins), and the
 			// available maps, and making sure each one gets equal time in the 5 minute period.
 ?>
-			<script type="text/javascript">
+        <script type = "text/javascript">           
+            
+	    jQuery.fn.center = function () {
+		this.css("position","fixed");
+		this.css("top", Math.max(0, (($(window).height() - $(this).outerHeight()) / 2) + 
+							    $(window).scrollTop()) + "px");
+		this.css("left", Math.max(0, (($(window).width() - $(this).outerWidth()) / 2) + 
+							    $(window).scrollLeft()) + "px");
+		return this;
+	    }
+	    
+	    wm_fullscreen = <?php echo ($fullscreen ? "1" : "0"); ?>;
+            wm_current = 0;
+            wm_countdown = 0;
+            wm_period = 0;
+	    wm_nmaps = 0;
+            wm_poller_cycle = <?php echo $poller_cycle; ?> * 1000;
+	    wm_paused = false;
+	                
+            wm_timer_counter = null;
+            wm_timer_reloader = null;
 
-			function addEvent(obj, evType, fn)
-			{
-				if (obj.addEventListener)
-				{
-					obj.addEventListener(evType, fn, false);
-					return true;
-				}
-
-				else if (obj.attachEvent)
-				{
-					var r = obj.attachEvent("on" + evType, fn);
-					return r;
-				}
-
-				else
-				{
-					return false;
-				}
+	    function wm_update_progess() {
+		// update the countdown bar - 450 is the max width in pixels
+		var progress = wm_countdown / (wm_period/200) * 450;
+		$("#wm_progress").css("width",progress);		
+	    }
+	    
+	    // update the countdown, unless paused. Then just flash the progress bar.
+            function wm_counter() 
+            {
+		if (wm_paused) {
+			$("#wm_progress").toggleClass("paused");
+		} else {			
+			wm_update_progess();
+	                wm_countdown--;
+			
+			if (wm_countdown < 0) {
+				wm_switchmap(1);
 			}
+		}				
+            }
 
-			wm_maps = new Array;
-			wm_current = 0;
+	    // change to the next (or previous) map, reset the countdown, update the bar
+            function wm_switchmap(direction)
+            {
+		var wm_new = wm_current + direction;
+		
+		if (wm_new < 0) wm_new += wm_nmaps;
+		wm_new = wm_new % wm_nmaps;
+		
+		var now = $(".weathermapholder").eq(wm_current);
+		var next = $(".weathermapholder").eq(wm_new);
+		
+		if (wm_fullscreen) {
+			// in fullscreen, we centre everything, layer it with z-index and cross-fade
+			next.center();	
+			now.css("z-index", 2);
+			next.css("z-index", 3);
+			
+			now.fadeOut(1200, function () {
+				// now that we're done with it, force a reload on the image just passed
+				var d = new Date();
+				var newurl = $(this).find('img').attr("src");
+				newurl = newurl.replace(/time=\d+/, "time=" + d.getTime());				
 
-			function wm_tick()
-			{
-				document.getElementById(wm_maps[wm_current]).style.display='none';
-				wm_current++;
-				if(wm_current >= wm_maps.length) wm_current = 0;
-				document.getElementById(wm_maps[wm_current]).style.display='block';
+				$(this).find('img').attr( "src", newurl);
+			} );
+			next.fadeIn(1200);
+		} else {
+			// in non-fullscreen mode, the fades just make things look strange. Snap-changes
+			now.hide(1, function () {
+				// now that we're done with it, force a reload on the image just passed
+				var d = new Date();
+				var newurl = $(this).find('img').attr("src");
+				newurl = newurl.replace(/time=\d+/, "time=" + d.getTime());				
 
+				$(this).find('img').attr( "src", newurl);
+			} );
+			next.show(1);
+		}
+		
+		wm_countdown = wm_period/200;
+		wm_current = wm_new;
+		
+		$("#wm_current_map").text(wm_current + 1);		
+		wm_update_progess();
+            }
+
+            function wm_reload() {
+                // window.location.reload();
+            }
+	    
+	    function wm_pause() {
+		wm_paused = ! wm_paused;
+		// remove the paused class on the progress bar, if we're mid-flash and no longer paused
+		if (! wm_paused) {
+			$("#wm_progress").removeClass("paused");
+		}
+	    }
+
+	    function wm_next() {
+		wm_switchmap(1);
+	    }
+	    
+	    function wm_prev() {
+		wm_switchmap(-1);
+	    }
+	    
+            function wm_initJS()
+            {        	
+		wm_nmaps = $(".weathermapholder").length;
+
+		$("#wm_total_map").text(wm_nmaps);
+		
+		$("#cycle_pause").click(wm_pause);
+		$("#cycle_next").click(wm_next);
+		$("#cycle_prev").click(wm_prev);
+		
+		$(document).keyup( function (event) {
+			if (event.keyCode == 27) {
+				$("a#cycle_stop").click();
 			}
-
-			function wm_reload()
-			{
-				window.location.reload();
+			if (event.keyCode == 32) {
+				wm_pause();
+				event.preventDefault();
 			}
-
-			function wm_initJS()
-			{
-				var i,j;
-				var possible_maps = document.getElementsByTagName('div');
-
-				j = 0;
-
-				for (i = 0; i < possible_maps.length; ++i)
-				{
-					if (possible_maps[i].className == 'weathermapholder')
-					{
-						wm_maps[j] = possible_maps[i].id;
-						j++;
-					}
-				}
-				// stop here if there were no maps
-				if(j>0)
-				{
-					wm_current = 0;
-					// hide all but the first one
-					if(j>1)
-					{
-						for(i=1;i<j;i++)
-						{
-							document.getElementById(wm_maps[i]).style.display='none';
-						}
-					}
-					// figure out how long the refresh is, so that we get
-					// through all the maps in exactly 5 minutes
-
-					var period = <?php echo $refreshtime ?> * 1000;
-
-					if(period == 0)
-					{
-						var period = 300000/j;
-					}           
-
-					// our map-switching clock
-					setInterval(wm_tick, period);
-					// when to reload the whole page (with new map data)
-					setTimeout( wm_reload ,300000);
-				}
+			if (event.keyCode == 37) {
+				wm_prev();
+				event.preventDefault();
 			}
+			if (event.keyCode == 39) {
+				wm_prev();
+				event.preventDefault();
+			}
+		});
+		
+                // stop here if there were no maps
+                if (wm_nmaps > 0) {
+                    wm_current = 0;
+                    
+		    wm_switchmap(0);
+		    		    		    
+                    // figure out how long the refresh is, so that we get
+                    // through all the maps in exactly 5 minutes
 
+                    wm_period = <?php echo $refreshtime ?> * 1000;
 
-			addEvent(window, 'load', wm_initJS);
+                    if (wm_period == 0) {
+                        wm_period = wm_poller_cycle / wm_nmaps;
+                    }
+                    wm_countdown = wm_period/200;
 
-			</script>
+                    // a countdown timer in the top corner
+                    wm_timer_counter = setInterval(wm_counter, 200);
+		    
+                    // when to reload the whole page (with new map data)
+                    wm_timer_reloader = setTimeout(wm_reload, wm_poller_cycle);
+                }
+		
+		// aim to get a video-player style OSD for fullscreen mode:
+		// if the pointer is off the controls for more than 5 seconds, fade the controls away
+		// if the pointer moves after that, bring the controls back
+		// if the pointer is over the controls, don't fade
+		if (wm_fullscreen) {
+			// $("#wmcyclecontrolbox").delay(5000).fadeOut(500);
+			// $("body").mousemove( function () {$("#wmcyclecontrolbox").fadeIn(100); }  );
+			// $("#wmcyclecontrolbox").mouseleave( function () { $("#wmcyclecontrolbox").delay(2000).fadeOut(500); });
+		}
+            }
+            
+	    $(document).ready(wm_initJS);
+        </script>
 <?php
 		}
 	}

@@ -1,10 +1,11 @@
 #!/usr/bin/php
 <?php
 
-// PHP Weathermap 0.97b
-// Copyright Howard Jones, 2005-2012 howie@thingy.com
+// PHP Weathermap 0.97d
+// Copyright Howard Jones, 2005-2013 howie@thingy.com
 // http://www.network-weathermap.com/
 // Released under the GNU Public License
+
 require_once 'Console/Getopt.php';
 
 require_once "lib/Weathermap.class.php";
@@ -44,6 +45,7 @@ $long_opts=array
 		"stats",
 		"define=",
 		"no-data",
+		"no-warn=",
 		"randomdata",
 		"htmloutput=",
 		"dumpafter",
@@ -98,6 +100,14 @@ if (sizeof($gopts) > 0)
 		case '--stats':
 			$dumpstats=1;
 			break;
+		
+		case '--no-warn':
+			// allow disabling of warnings from the command-line, too (mainly for the rrdtool warning)
+			$suppress_warnings = explode(",",$o[1]);
+			foreach ($suppress_warnings as $s) {				
+				$weathermap_error_suppress[] = $s;
+			}
+			break;		
 			
 		case '--uberdebug':
 			// allow ALL trace messages (normally we block some of the chatty ones)
@@ -166,15 +176,16 @@ if (sizeof($gopts) > 0)
                         print " --image-uri {uri}        -  URI to prefix <img> tags in HTML.\n";
                         print " --bulge                  -  Enable link-bulging mode. See manual.\n\n";
 						
-						print " --define name=value      -  Define internal variables\n";
-						print "                             (equivalent to global SET in config file)\n\n";
-                        
+			print " --define name=value      -  Define internal variables\n";
+			print "                             (equivalent to global SET in config file)\n\n";
+
                         print " --no-data                -  skip the data-reading process (just a 'grey' map)\n";
                         print " --randomdata            -  as above, but use random data\n";
                         print " --debug                  -  produce (LOTS) of debugging information during run\n";
+			print " --no-warn={errorcode}[,{errorcode}] - suppress warnings with listed errorcodes\n";
                         print " --dump-after             -  dump all internal PHP structures (HUGE)\n";
                         print " --dumpconfig {filename}  -  filename to write a new config to (for testing)\n\n";
-                        
+			                        
                         print " --help                   -  show this help\n";
                         print " --version                -  show version number\n\n";
                         print "More info at http://www.network-weathermap.com/\n";
@@ -280,7 +291,11 @@ if ($map->ReadConfig($configfile))
 
 	if ($dumpstats != '')
 		$map->DumpStats();
-		
+	
+	if ($map->dataoutputfile != '') {
+		$map->WriteDataFile($map->dataoutputfile);
+	}
+	    
 	if ($dumpafter == 1)
 		print_r ($map);
 		

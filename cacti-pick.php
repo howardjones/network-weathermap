@@ -1,5 +1,7 @@
 <?php
 
+# This file is from Weathermap version 0.97d
+
 // ******************************************
 // sensible defaults
 $mapdir='configs';

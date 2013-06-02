@@ -398,11 +398,10 @@ function syncmap()
             var myname = jQuery(this).attr('id');
             myname = myname.replace('mapnode_', '');
 
-            // alert(myname);
+            
             if (map.nodes[myname])
-            //if(1==0)
             {
-            // it still exists, keep it around
+            
             }
             else {
                 jQuery(this).remove();

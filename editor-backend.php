@@ -1,7 +1,7 @@
 <?php
 error_reporting(E_ALL);
 
-require_once("Weathermap.class.php");
+require_once("lib/Weathermap.class.php");
 
 $mapdir = "configs";
 

@@ -1,4 +1,6 @@
 <?php
+	# This file is from Weathermap version 0.97d
+
 	ob_start();
 	
 	if(isset($argv))

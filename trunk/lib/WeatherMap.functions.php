@@ -63,7 +63,9 @@ function wm_debug($string)
 
 		// use Cacti's debug log, if we are running from the poller
 		if (function_exists('debug_log_insert') && (!function_exists('show_editor_startpage')))
-		{ cacti_log("DEBUG:$calling_fn " . ($weathermap_map==''?'':$weathermap_map.": ") . rtrim($string), true, "WEATHERMAP"); }
+		{
+			cacti_log("DEBUG:$calling_fn " . ($weathermap_map==''?'':$weathermap_map.": ") . rtrim($string), true, "WEATHERMAP");
+		}
 		else
 		{
 			$stderr=fopen('php://stderr', 'w');
@@ -85,7 +87,7 @@ function wm_warn($string,$notice_only=FALSE)
 {
 	global $weathermap_map;
 	global $weathermap_warncount;
-    global $weathermap_error_suppress;
+	global $weathermap_error_suppress;
 	
 	$message = "";
 	$code = "";
@@ -1299,22 +1301,15 @@ function simplify_spine(&$input, $epsilon=1e-10)
 		+ $input[$n][X] * ( $input[$n+1][Y] - $input[$n-1][Y] )
 		+ $input[$n+1][X] * ( $input[$n-1][Y] - $input[$n][Y] ) );
 	
-	# print "$n  $x,$y    $a";
-	
-        if ( $a > $epsilon)
-	// if(1==1)
+        if ( $a > $epsilon)	
         {
-            $output []= $input[$n];
-	#    print "  KEEP";
+            $output []= $input[$n];	
         }
         else
         {
             // ignore n
             $skip++;
-	#    print "  SKIP";
-            
         }
-	# print "\n";
     }
         
     wm_debug("Skipped $skip points of $c\n");

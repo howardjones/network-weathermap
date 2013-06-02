@@ -1,4 +1,6 @@
 <?php
+	# This file is from Weathermap version 0.97d
+
       // get some basics...
       $php_version = phpversion();
       $mem_allowed = ini_get("memory_limit");
@@ -192,7 +194,7 @@
 		else
 		{
 		    $wnotes = wordwrap($notes,50);
-			$lines = split("\n",$wnotes);
+			$lines = explode("\n",$wnotes);
 			$i=0;
 			foreach ($lines as $noteline)
 			{

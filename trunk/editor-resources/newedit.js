@@ -129,27 +129,22 @@ function syncmap()
 
     // first, clear out the NODES that have disappeared...
 
-    if (1 === 0) {
-        // this doesn't flicker as much as you might expect
-        $('img.mapnode').remove();
-    } else {
-        // this just seems to die for some reason.
-        $('img.mapnode').each(function(i)
+    
+    // this just seems to die for some reason.
+    $('img.mapnode').each(function(i)
+    {
+        var myname = $(this).attr('id');
+        myname = myname.replace('mapnode_', '');
+        
+        if (map.nodes[myname])            
         {
-            var myname = $(this).attr('id');
-            myname = myname.replace('mapnode_', '');
-
-            // alert(myname);
-            if (map.nodes[myname])
-            //if(1==0)
-            {
             // it still exists, keep it around
-            }
-            else {
-                $(this).remove();
-            }
-        });
-    }
+        }
+        else {
+            $(this).remove();
+        }
+    });
+    
 
     var origin_x = parseInt($('#existingdata').css('left'), 10);
     var origin_y = parseInt($('#existingdata').css('top'), 10);

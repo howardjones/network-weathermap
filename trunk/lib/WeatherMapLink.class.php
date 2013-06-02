@@ -559,10 +559,8 @@ class WeatherMapLink extends WeatherMapItem
 			{
 				$field = $param[0];
 				$keyword = $param[1];
-						
-				# $output .= "# For $keyword: ".$this->$field." vs ".$dd->$field."\n";
-				if ($this->$field != $dd->$field) 
-				#if (1==1)
+									
+				if ($this->$field != $dd->$field) 				
 				{ 
 					if($param[2] == CONFIG_TYPE_COLOR) $output.="\t$keyword " . render_colour($this->$field) . "\n"; 
 					if($param[2] == CONFIG_TYPE_LITERAL) $output.="\t$keyword " . $this->$field . "\n"; 

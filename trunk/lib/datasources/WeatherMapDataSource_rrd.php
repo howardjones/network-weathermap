@@ -179,30 +179,6 @@ class WeatherMapDataSource_rrd extends WeatherMapDataSource {
 		wm_debug("RRD ReadData: poller_output - ended\n");
 	}
 	
-	function wmrrd_read_from_php_rrd($rrdfile,$cf,$start,$end,$dsnames, &$data ,&$map, &$data_time,&$item)
-	{
-		// not yet implemented - use php-rrdtool to read rrd data. Should be quicker
-		if ((1==0) && extension_loaded('RRDTool')) // fetch the values via the RRDtool Extension
-		{
-			// for the php-rrdtool module, we use an array instead...
-			$rrdparams = array("AVERAGE","--start",$start,"--end",$end);
-			$rrdreturn = rrd_fetch ($rrdfile,$rrdparams,count($rrdparams));
-			print_r($rrdreturn);
-			// XXX - figure out what to do with the results here
-			$now = $rrdreturn['start'];
-			$n=0;
-			do {
-				$now += $rrdreturn['step'];
-				print "$now - ";
-				for($i=0;$i<$rrdreturn['ds_cnt'];$i++)
-				{
-					print $rrdreturn['ds_namv'][$i] . ' = '.$rrdreturn['data'][$n++]." ";
-				}
-				print "\n";
-			} while($now <= $rrdreturn['end']);
-		}
-	}
-	
 	# rrdtool graph /dev/null -f "" -s now-30d -e now DEF:in=../rra/atm-sl_traffic_in_5498.rrd:traffic_in:AVERAGE DEF:out=../rra/atm-sl_traffic_in_5498.rrd:traffic_out:AVERAGE VDEF:avg_in=in,AVERAGE VDEF:avg_out=out,AVERAGE PRINT:avg_in:%lf PRINT:avg_out:%lf
 
 	function wmrrd_read_from_real_rrdtool_aggregate($rrdfile,$cf,$aggregatefn,$start,$end,$dsnames, &$data, &$map, &$data_time,&$item)
@@ -574,23 +550,17 @@ class WeatherMapDataSource_rrd extends WeatherMapDataSource {
 				wm_debug ("RRD ReadData: Target DS names are ".$dsnames[IN]." and ".$dsnames[OUT]."\n");
 		
 				$values=array();
-	
-				if ((1==0) && extension_loaded('RRDTool')) // fetch the values via the RRDtool Extension
+					
+				if($aggregatefunction != '')
 				{
-					WeatherMapDataSource_rrd::wmrrd_read_from_php_rrd($rrdfile,$cfname,$start,$end, $dsnames, $data,$map, $data_time,$item);
+					WeatherMapDataSource_rrd::wmrrd_read_from_real_rrdtool_aggregate($rrdfile,$cfname,$aggregatefunction, $start,$end, $dsnames, $data,$map, $data_time,$item);	
 				}
 				else
 				{
-					if($aggregatefunction != '')
-					{
-						WeatherMapDataSource_rrd::wmrrd_read_from_real_rrdtool_aggregate($rrdfile,$cfname,$aggregatefunction, $start,$end, $dsnames, $data,$map, $data_time,$item);	
-					}
-					else
-					{
-						// do this the tried and trusted old-fashioned way
-						WeatherMapDataSource_rrd::wmrrd_read_from_real_rrdtool($rrdfile,$cfname,$start,$end, $dsnames, $data,$map, $data_time,$item);
-					}
+					// do this the tried and trusted old-fashioned way
+					WeatherMapDataSource_rrd::wmrrd_read_from_real_rrdtool($rrdfile,$cfname,$start,$end, $dsnames, $data,$map, $data_time,$item);
 				}
+			
 			}
 			else
 			{

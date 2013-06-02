@@ -1,3 +1,7 @@
+0.97c has no additional changes - it's just 0.97b with some silly errors fixed, and  all
+the CSS files included with the correct paths. There were also reports of problems with the
+actual zip file.
+
 0.97b is a special release starting from 0.97a and backporting all the quick bugfixes from the 0.98 code. 
 There are larger structural changes in 0.98 and new features, but these bugfixes were useful enough to
 warrant a new 0.97 release (especially the mysql schema change). A real 0.98 release will follow in
@@ -9,7 +13,14 @@ are really facets of the same thing - lack of input validation. 0.97b improves t
 
 Thanks to Gerry Eisenhaur and Daniel Ricardo dos Santos respectively for their security bug reports.
 
-0.97b	FIXED - absolute SCALE definitions didn't support K (thanks wwwdrich)
+0.98	FIXED - More PHP 5.3/5.4/strict related errors (split -> explode)
+    CHANGE - command-line weathermap has new --no-warn option to disable warnings
+    ADDED - new DATAOUTPUTFILE allows collected data to be written to a file for later use (automatically on in Cacti)
+    ADDED - new wmdata: datasource plugin can read data from files produced by DATAOUTPUTFILE    
+
+0.97c - No code changes apart from path fixes, and ZIP file fixes.
+
+0.97b   FIXED - absolute SCALE definitions didn't support K (thanks wwwdrich)
     FIXED - memory leak in poller code. Memory usage is MUCH lower now.
     FIXED - updated mysql schema commands to use modern ENGINE instead of TYPE;
     FIXED - static datasource plugin honours KILO
@@ -467,4 +478,3 @@ Thanks to Gerry Eisenhaur and Daniel Ricardo dos Santos respectively for their s
       Code tidyup for weathermap.php
 
 0.1 - Initial pre-release version
-

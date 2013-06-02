@@ -647,23 +647,8 @@ class WeatherMapNode extends WeatherMapItem
 			//$map->myimagestring($node_im, $this->labelfont, $txt_x, $txt_y, $this->proclabel, $txcol->gdallocate($node_im),90);
 		}
 
-		# imagerectangle($node_im,$label_x1,$label_y1,$label_x2,$label_y2,$map->black);
-		# imagerectangle($node_im,$icon_x1,$icon_y1,$icon_x2,$icon_y2,$map->black);
-
 		$map->nodes[$this->name]->centre_x = $this->x - $bbox_x1;
 		$map->nodes[$this->name]->centre_y = $this->y - $bbox_y1;
-
-		if(1==0)
-		{
-
-			imageellipse($node_im, $this->centre_x, $this->centre_y, 8, 8, $map->selected);
-
-			foreach (array("N","S","E","W","NE","NW","SE","SW") as $corner)
-			{
-				list($dx, $dy)=calc_offset($corner, $this->width, $this->height);
-				imageellipse($node_im, $this->centre_x + $dx, $this->centre_y + $dy, 5, 5, $map->selected);
-			}
-		}
 
 		# $this->image = $node_im;
 		$map->nodes[$this->name]->image = $node_im;

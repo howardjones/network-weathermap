@@ -3,7 +3,6 @@ Before 0.98
 
 Comments aren't drawn along a link!
 
-
 add %t option to format SNMP TimeTicks
 
 thumb2 file - 48x48px thumb to show in map management screen.
@@ -56,7 +55,7 @@ Before 0.97d
 Version headers for ALL 'entry point' files - rebuild, editor, etc
 DSStats special ds problems? http://forums.cacti.net/viewtopic.php?f=16&t=50086
 browniebraun's grid patch
-new cycling code (+ fullscreen)
+new cycling code (+ fullscreen) - Escape to stop, and fwd/back aren't correct
 btn_recalc is missing?
 
 Before 0.97a

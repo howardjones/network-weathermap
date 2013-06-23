@@ -610,7 +610,7 @@ class WeatherMapNode extends WeatherMapItem
 			{
 				imagerectangle($node_im, $label_x1, $label_y1, $label_x2, $label_y2, $map->selected);
 				// would be nice if it was thicker, too...
-				wimagerectangle($node_im, $label_x1 + 1, $label_y1 + 1, $label_x2 - 1, $label_y2 - 1, $map->selected);
+				imagerectangle($node_im, $label_x1 + 1, $label_y1 + 1, $label_x2 - 1, $label_y2 - 1, $map->selected);
 			}
 			else
 			{
@@ -620,8 +620,7 @@ class WeatherMapNode extends WeatherMapItem
 					imagerectangle($node_im, $label_x1, $label_y1, $label_x2, $label_y2, $olcol->gdallocate($node_im));
 				}
 			}
-			#}
-
+			
 			$shcol = new Colour($this->labelfontshadowcolour);
 			if ($shcol->is_real())
 			{
@@ -629,8 +628,7 @@ class WeatherMapNode extends WeatherMapItem
 			}
 
 			$txcol = new Colour($this->labelfontcolour[0],$this->labelfontcolour[1],$this->labelfontcolour[2]);
-			#$col=myimagecolorallocate($node_im, $this->labelfontcolour[0], $this->labelfontcolour[1],
-			#	$this->labelfontcolour[2]);
+			
 			if($txcol->is_contrast())
 			{
 				if($col->is_real())
@@ -643,8 +641,7 @@ class WeatherMapNode extends WeatherMapItem
 					$txcol = new Colour(0,0,0);
 				}
 			}
-			$map->myimagestring($node_im, $this->labelfont, $txt_x, $txt_y, $this->proclabel, $txcol->gdallocate($node_im),$this->labelangle);
-			//$map->myimagestring($node_im, $this->labelfont, $txt_x, $txt_y, $this->proclabel, $txcol->gdallocate($node_im),90);
+			$map->myimagestring($node_im, $this->labelfont, $txt_x, $txt_y, $this->proclabel, $txcol->gdallocate($node_im),$this->labelangle);			
 		}
 
 		$map->nodes[$this->name]->centre_x = $this->x - $bbox_x1;

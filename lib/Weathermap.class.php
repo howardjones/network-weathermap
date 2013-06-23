@@ -12,6 +12,7 @@ require_once "WeatherMapLink.class.php";
 
 $WEATHERMAP_VERSION="0.98";
 $weathermap_debugging=FALSE;
+$weathermap_debugging_readdata=FALSE;
 $weathermap_map="";
 $weathermap_warncount=0;
 $weathemap_lazycounter=0;
@@ -457,7 +458,7 @@ class WeatherMap extends WeatherMapBase
 			// look up what font is defined for this slot number
 			if ($this->fonts[$fontnumber]->type == 'truetype')
 			{
-				wimagettftext($image, $this->fonts[$fontnumber]->size, $angle, $x, $y,
+				imagettftext($image, $this->fonts[$fontnumber]->size, $angle, $x, $y,
 					$colour, $this->fonts[$fontnumber]->file, $string);
 			}
 
@@ -1089,7 +1090,7 @@ function DrawLabelRotated($im, $x, $y, $angle, $text, $font, $padding, $linkname
 	{
 		$bgcol=myimagecolorallocate($im, $bgcolour[0], $bgcolour[1], $bgcolour[2]);
 		# imagefilledrectangle($im, $x1, $y1, $x2, $y2, $bgcol);
-		wimagefilledpolygon($im,$points,4,$bgcol);
+		imagefilledpolygon($im,$points,4,$bgcol);
 	}
 
 	if ($outlinecolour != array
@@ -1101,7 +1102,7 @@ function DrawLabelRotated($im, $x, $y, $angle, $text, $font, $padding, $linkname
 	{
 		$outlinecol=myimagecolorallocate($im, $outlinecolour[0], $outlinecolour[1], $outlinecolour[2]);
 		# imagerectangle($im, $x1, $y1, $x2, $y2, $outlinecol);
-		wimagepolygon($im,$points,4,$outlinecol);
+		imagepolygon($im,$points,4,$outlinecol);
 	}
 
 	$textcol=myimagecolorallocate($im, $textcolour[0], $textcolour[1], $textcolour[2]);
@@ -1378,9 +1379,9 @@ function DrawLegend_Horizontal($im,$scalename="DEFAULT",$width=400)
 	$scale_ref = 'gdref_legend_'.$scalename;
 	$this->AllocateScaleColours($scale_im,$scale_ref);
 
-	wimagefilledrectangle($scale_im, $box_left, $box_top, $box_right, $box_bottom,
+	imagefilledrectangle($scale_im, $box_left, $box_top, $box_right, $box_bottom,
 		$this->colours['DEFAULT']['KEYBG'][$scale_ref]);
-	wimagerectangle($scale_im, $box_left, $box_top, $box_right, $box_bottom,
+	imagerectangle($scale_im, $box_left, $box_top, $box_right, $box_bottom,
 		$this->colours['DEFAULT']['KEYOUTLINE'][$scale_ref]);
 
 	$this->myimagestring($scale_im, $font, $scale_left, $scale_bottom + $tileheight * 2 + 2 , $title,
@@ -1404,7 +1405,7 @@ function DrawLegend_Horizontal($im,$scalename="DEFAULT",$width=400)
 		if($col->is_real())
 		{
 			$cc = $col->gdallocate($scale_im);
-			wimagefilledrectangle($scale_im, $scale_left + $dx - $scalefactor/2, $scale_top,
+			imagefilledrectangle($scale_im, $scale_left + $dx - $scalefactor/2, $scale_top,
 				$scale_left + $dx + $scalefactor/2, $scale_bottom,
 				$cc);
 		}
@@ -1462,9 +1463,9 @@ function DrawLegend_Vertical($im,$scalename="DEFAULT",$height=400,$inverted=fals
 	$scale_ref = 'gdref_legend_'.$scalename;
 	$this->AllocateScaleColours($scale_im,$scale_ref);
 
-	wimagefilledrectangle($scale_im, $box_left, $box_top, $box_right, $box_bottom,
+	imagefilledrectangle($scale_im, $box_left, $box_top, $box_right, $box_bottom,
 		$this->colours['DEFAULT']['KEYBG']['gdref1']);
-	wimagerectangle($scale_im, $box_left, $box_top, $box_right, $box_bottom,
+	imagerectangle($scale_im, $box_left, $box_top, $box_right, $box_bottom,
 		$this->colours['DEFAULT']['KEYOUTLINE']['gdref1']);
 
 	$this->myimagestring($scale_im, $font, $scale_left-$scalefactor, $scale_top - $tileheight , $title,
@@ -1499,7 +1500,7 @@ function DrawLegend_Vertical($im,$scalename="DEFAULT",$height=400,$inverted=fals
 		if( $col->is_real())
 		{
 			$cc = $col->gdallocate($scale_im);
-			wimagefilledrectangle($scale_im, $scale_left, $scale_top + $dy - $scalefactor/2,
+			imagefilledrectangle($scale_im, $scale_left, $scale_top + $dy - $scalefactor/2,
 				$scale_right, $scale_top + $dy + $scalefactor/2,
 				$cc);
 		}
@@ -1593,9 +1594,9 @@ function DrawLegend_Classic($im,$scalename="DEFAULT",$use_tags=FALSE)
 		$scale_ref = 'gdref_legend_'.$scalename;
 		$this->AllocateScaleColours($scale_im,$scale_ref);
 
-		wimagefilledrectangle($scale_im, $boxx, $boxy, $boxx + $boxwidth, $boxy + $boxheight,
+		imagefilledrectangle($scale_im, $boxx, $boxy, $boxx + $boxwidth, $boxy + $boxheight,
 			$this->colours['DEFAULT']['KEYBG'][$scale_ref]);
-		wimagerectangle($scale_im, $boxx, $boxy, $boxx + $boxwidth, $boxy + $boxheight,
+		imagerectangle($scale_im, $boxx, $boxy, $boxx + $boxwidth, $boxy + $boxheight,
 			$this->colours['DEFAULT']['KEYOUTLINE'][$scale_ref]);
 		$this->myimagestring($scale_im, $font, $boxx + 4, $boxy + 4 + $tileheight, $title,
 			$this->colours['DEFAULT']['KEYTEXT'][$scale_ref]);
@@ -1634,7 +1635,7 @@ function DrawLegend_Classic($im,$scalename="DEFAULT",$use_tags=FALSE)
 								=  $fudgefactor + $colour['bottom'] + ($n / $tilewidth) * ($colour['top'] - $colour['bottom']);
 							list($ccol,$junk) = $this->NewColourFromPercent($value, $scalename, "", FALSE);
 							$col = $ccol->gdallocate($scale_im);
-							wimagefilledrectangle($scale_im, $x + $n, $y, $x + $n, $y + $tileheight,
+							imagefilledrectangle($scale_im, $x + $n, $y, $x + $n, $y + $tileheight,
 								$col);
 						}
 					}
@@ -1644,7 +1645,7 @@ function DrawLegend_Classic($im,$scalename="DEFAULT",$use_tags=FALSE)
 						//$value = ($colour['bottom'] + $colour['top']) / 2;
 						list($ccol,$junk) = $this->NewColourFromPercent($value, $scalename, "", FALSE);
 						$col = $ccol->gdallocate($scale_im);
-						wimagefilledrectangle($scale_im, $x, $y, $x + $tilewidth, $y + $tileheight,
+						imagefilledrectangle($scale_im, $x, $y, $x + $tilewidth, $y + $tileheight,
 							$col);
 					}
 
@@ -3048,7 +3049,7 @@ function AllocateScaleColours($im,$refname='gdref1')
 function DrawMap($filename = '', $thumbnailfile = '', $thumbnailmax = 250, $withnodes = TRUE, $use_via_overlay = FALSE, $use_rel_overlay=FALSE)
 {
 	wm_debug("Trace: DrawMap()\n");
-	metadump("# start",true);
+	
 	$bgimage=NULL;
 	if($this->configfile != "")
 	{
@@ -3095,7 +3096,7 @@ function DrawMap($filename = '', $thumbnailfile = '', $thumbnailmax = 250, $with
 			. $this->background . "\n"); }
 	}
 
-	$image=wimagecreatetruecolor($this->width, $this->height);
+	$image=imagecreatetruecolor($this->width, $this->height);
 
 	# $image = imagecreate($this->width, $this->height);
 	if (!$image) { wm_warn
@@ -3118,7 +3119,7 @@ function DrawMap($filename = '', $thumbnailfile = '', $thumbnailmax = 250, $with
 		$this->AllocateScaleColours($image);
 
 		// fill with background colour anyway, in case the background image failed to load
-		wimagefilledrectangle($image, 0, 0, $this->width, $this->height, $this->colours['DEFAULT']['BG']['gdref1']);
+		imagefilledrectangle($image, 0, 0, $this->width, $this->height, $this->colours['DEFAULT']['BG']['gdref1']);
 
 		if ($bgimage)
 		{
@@ -3449,7 +3450,7 @@ function PreloadMapHTML()
 
 					if($change != '')
 					{
-						//print "Something to be done.\n";
+						
 						if($type=='NODE')
 						{
 							$mid_x = $myobj->x;

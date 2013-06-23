@@ -863,9 +863,7 @@ function draw_straight($image, &$curvepoints, $widths, $outlinecolour, $fillcolo
 	    // finally, add the actual midpoint
 	    $spine[IN] []= array($halfway_x,$halfway_y, $totaldistance - $halfway);
 	}
-	
-	# wm_draw_marker_box($image,$map->selected, $halfway_x, $halfway_y );
-	
+
 	// now we have two seperate spines, with distances, so that the arrowhead is the end of each.
 	// (or one, if it's unidir)
 	
@@ -882,19 +880,12 @@ function draw_straight($image, &$curvepoints, $widths, $outlinecolour, $fillcolo
 
 	foreach ($dirs as $dir)
 	{
-		# draw_spine($image, $spine[$dir],$map->selected);
-		#draw_spine_chain($image, $spine[$dir],$map->selected,3);
-		#print "=================\n$linkname/$dir\n";
-		#dump_spine($spine[$dir]);
 	    $n = count($spine[$dir]) - 1;
 	    $l = $spine[$dir][$n][DISTANCE];
 		
-		#print "L=$l N=$n\n";
-	
 	    // loop increment, start point, width, labelpos, fillcolour, outlinecolour, commentpos    
 	    $arrowsettings = array(+1, 0, $widths[$dir], 0, $fillcolours[$dir], $outlinecolour, 5);
 	    
-	    # print "Line is $n points to a distance of $l\n";
 	    if($l < $minimumlength)
 	    {
 			wm_warn("Skipping too-short line.\n");
@@ -902,20 +893,10 @@ function draw_straight($image, &$curvepoints, $widths, $outlinecolour, $fillcolo
 	    else
 		{			
 			$arrow_d = $l - $arrowsize[$dir];
-			# print "LENGTHS $l $arrow_d ".$arrowsize[$dir]."\n";
 			list($pre_mid_x,$pre_mid_y,$pre_midindex) = find_distance_coords($spine[$dir], $arrow_d);
-			# print "POS $pre_mid_x,$pre_mid_y  $pre_midindex\n";
 			$out = array_slice($spine[$dir], 0, $pre_midindex);
 			$out []= array($pre_mid_x, $pre_mid_y, $arrow_d);
 			
-			# wm_draw_marker_diamond($image, $map->selected, $pre_mid_x, $pre_mid_y, 5);
-			# imagearc($image,$pre_mid_x, $pre_mid_y ,15,15,0,360,$map->selected);
-			
-			# imagearc($image,$spine[$dir][$pre_midindex+1][X],$spine[$dir][$pre_midindex+1][Y],20,20,0,360,$map->selected);
-			# imagearc($image,$spine[$dir][$pre_midindex][X],$spine[$dir][$pre_midindex][Y],20,20,0,360,$map->selected);
-			#imagearc($image,$pre_mid_x,$pre_mid_y,20,20,0,360,$map->selected);
-			#imagearc($image,$spine[$dir][$pre_midindex][X],$spine[$dir][$pre_midindex][Y],12,12,0,360,$map->selected);
-						
 			$spine[$dir] = $out;
 			
 			$adx=($halfway_x - $pre_mid_x);
@@ -940,20 +921,8 @@ function draw_straight($image, &$curvepoints, $widths, $outlinecolour, $fillcolo
 			$ax4 = $pre_mid_x - $arrowwidth[$dir] * $anx;
 			$ay4 = $pre_mid_y - $arrowwidth[$dir] * $any;             
 			
-			# draw_spine($image,$spine[$dir],$map->selected);
-						
 			$simple = simplify_spine($spine[$dir]);
 			$newn = count($simple);	
-			
-			# draw_spine($image,$simple,$map->selected);
-			
-			# print "Simplified to $newn points\n";
-			# if($draw_skeleton) draw_spine_chain($im,$simple,$blue, 12);
-			# draw_spine_chain($image,$simple,$map->selected, 12);
-			 # draw_spine_chain($image,$spine[$dir],$map->selected, 10);
-		
-			# draw_spine_chain($image,$simple,$map->selected, 12);
-			# draw_spine($image,$simple,$map->selected);
 			
 			// now do the actual drawing....
 				
@@ -987,7 +956,6 @@ function draw_straight($image, &$curvepoints, $widths, $outlinecolour, $fillcolo
 			$numrpoints++;
 			
 			$max_start = count($simple)-2;
-			# print "max_start is $max_start\n";
 			for ($i=0; $i <$max_start; $i++)
 			{       
 				$v1 = new Vector($simple[$i+1][X] - $simple[$i][X], $simple[$i+1][Y] - $simple[$i][Y]);
@@ -1005,10 +973,8 @@ function draw_straight($image, &$curvepoints, $widths, $outlinecolour, $fillcolo
 				if(abs($angle)>169)
 				{
 					$capping = TRUE;
-					# print "Would cap. ($angle)\n";
 				}
 				
-				// $capping = FALSE; // override that for now           
 				// now figure out the geometry for where the next corners are
 				
 				list($xi1,$yi1) = line_crossing( $simple[$i][X] + $n1->dx * $widths[$dir], $simple[$i][Y] + $n1->dy * $widths[$dir],
@@ -1123,12 +1089,9 @@ function draw_straight($image, &$curvepoints, $widths, $outlinecolour, $fillcolo
 			$map->imap->addArea("Polygon", $areaname, '', $finalpoints);
 			wm_debug ("Adding Poly imagemap for $areaname\n");
 		
-			if (!is_null($outlinecolour))
-			{
+			if (!is_null($outlinecolour)) {
 				imagepolygon($image, $finalpoints, count($finalpoints) / 2, $arrowsettings[5]);
-			}
-			else
-			{
+			} else {
 				wm_debug("Not drawing $linkname ($dir) outline because there is no outline colour\n");
 			}
 	    }
@@ -1174,7 +1137,6 @@ function draw_curve($image, &$curvepoints, $widths, $outlinecolour, $fillcolours
 	// in practice, a link this short is useless anyway, especially with bwlabels.
 	$minimumlength = 1.2*($arrowsize[IN]+$arrowsize[OUT]);
 
-	# warn("$linkname: Total: $totaldistance $arrowsize $arrowwidth $minimumlength\n");
 	if($totaldistance <= $minimumlength)
 	{
 		wm_warn("Skipping drawing very short link ($linkname). Impossible to draw! Try changing WIDTH or ARROWSTYLE? [WMWARN01]\n");
@@ -1191,7 +1153,6 @@ function draw_curve($image, &$curvepoints, $widths, $outlinecolour, $fillcolours
 	foreach ($dirs as $dir)
 	{
 		$direction = $arrowsettings[$dir][0];
-		// $width = $widths[$dir];
 		// this is the last index before the arrowhead starts
 		list($pre_mid_x,$pre_mid_y,$pre_midindex) = find_distance_coords($curvepoints,$halfway - $direction * $arrowsize[$dir]);
 		
@@ -1199,8 +1160,6 @@ function draw_curve($image, &$curvepoints, $widths, $outlinecolour, $fillcolours
 		$back_points=array();
 		$arrowpoints=array();
 
-		# if ($direction < 0) { $start=count($curvepoints) - 1; }
-		# else { $start=0; }
 		$start = $arrowsettings[$dir][1];
 
 		for ($i=$start; $i != $pre_midindex; $i+=$direction)
@@ -1272,17 +1231,13 @@ function draw_curve($image, &$curvepoints, $widths, $outlinecolour, $fillcolours
 			wm_debug("Not drawing $linkname ($dir) fill because there is no fill colour\n");
 		}
 		
-		# $areaname = "LINK:" . $linkname. ":$dir";
 		$areaname = "LINK:L" . $map->links[$linkname]->id . ":$dir";
 		$map->imap->addArea("Polygon", $areaname, '', $there_points);
 		wm_debug ("Adding Poly imagemap for $areaname\n");
 
-		if (!is_null($outlinecolour))
-		{
+		if (!is_null($outlinecolour)) {
 			imagepolygon($image, $there_points, count($there_points) / 2, $arrowsettings[$dir][5]);
-		}
-		else
-		{
+		} else {
 			wm_debug("Not drawing $linkname ($dir) outline because there is no outline colour\n");
 		}
 	}
@@ -1321,8 +1276,6 @@ function simplify_spine(&$input, $epsilon=1e-10)
         
     wm_debug("Skipped $skip points of $c\n");
     
-#    print "------------------------\n";
-    
     $output []= $input[$c+1];
     return $output;
 }
@@ -1352,16 +1305,13 @@ function unformat_number($instring, $kilo = 1000)
 // given a compass-point, and a width & height, return a tuple of the x,y offsets
 function calc_offset($offsetstring, $width, $height)
 {
-	if(preg_match("/^([-+]?\d+):([-+]?\d+)$/",$offsetstring,$matches))
-	{
+	if (preg_match("/^([-+]?\d+):([-+]?\d+)$/",$offsetstring,$matches)) {
 		wm_debug("Numeric Offset found\n");
 		return(array($matches[1],$matches[2]));
 	}
-	elseif(preg_match("/(NE|SE|NW|SW|N|S|E|W|C)(\d+)?$/i",$offsetstring,$matches))
-	{
+	elseif (preg_match("/(NE|SE|NW|SW|N|S|E|W|C)(\d+)?$/i",$offsetstring,$matches)) {
 		$multiply = 1;
-		if( isset($matches[2] ) )
-		{
+		if (isset($matches[2])) {
 			$multiply = intval($matches[2])/100;
 			wm_debug("Percentage compass offset: multiply by $multiply");
 		}
@@ -1374,52 +1324,32 @@ function calc_offset($offsetstring, $width, $height)
 		case 'N':
 			return (array(0, -$height / 2));
 
-			break;
-
 		case 'S':
 			return (array(0, $height / 2));
-
-			break;
 
 		case 'E':
 			return (array(+$width / 2, 0));
 
-			break;
-
 		case 'W':
 			return (array(-$width / 2, 0));
-
-			break;
 
 		case 'NW':
 			return (array(-$width / 2, -$height / 2));
 
-			break;
-
 		case 'NE':
 			return (array($width / 2, -$height / 2));
-
-			break;
 
 		case 'SW':
 			return (array(-$width / 2, $height / 2));
 
-			break;
-
 		case 'SE':
 			return (array($width / 2, $height / 2));
 
-			break;
-
-		case 'C':
+		case 'C':	// FALL THROUGH
 		default:
 			return (array(0, 0));
-
-			break;
 		}
-	}
-	elseif( preg_match("/(-?\d+)r(\d+)$/i",$offsetstring,$matches) )
-	{
+	} elseif (preg_match("/(-?\d+)r(\d+)$/i",$offsetstring,$matches)) {
 		$angle = intval($matches[1]);
 		$distance = intval($matches[2]);
 		
@@ -1428,9 +1358,7 @@ function calc_offset($offsetstring, $width, $height)
 				
 		return (array($x,$y));
 		
-	}
-	else
-	{
+	} else {
 		wm_warn("Got a position offset that didn't make sense ($offsetstring).");
 		return (array(0, 0));
 	}
@@ -1445,8 +1373,7 @@ function format_number($number, $precision = 2, $trailing_zeroes = 0)
 {
 	$sign=1;
 
-	if ($number < 0)
-	{
+	if ($number < 0) {
 		$number=abs($number);
 		$sign=-1;
 	}
@@ -1454,14 +1381,21 @@ function format_number($number, $precision = 2, $trailing_zeroes = 0)
 	$number=round($number, $precision);
 	$integer=intval($number);
 
-	if (strlen($integer) < strlen($number)) { $decimal=substr($number, strlen($integer) + 1); }
+	if (strlen($integer) < strlen($number)) {
+		$decimal=substr($number, strlen($integer) + 1);
+	}
 
-	if (!isset($decimal)) { $decimal=''; }
+	if (!isset($decimal)) {
+		$decimal='';
+	}
 
 	$integer=$sign * $integer;
 
-	if ($decimal == '') { return ($integer); }
-	else { return ($integer . "." . $decimal); }
+	if ($decimal == '') {
+		return ($integer);
+	} else {
+		return ($integer . "." . $decimal);
+	}
 }
 
 function nice_bandwidth($number, $kilo = 1000,$decimals=1,$below_one=TRUE)
@@ -1479,48 +1413,33 @@ function nice_bandwidth($number, $kilo = 1000,$decimals=1,$below_one=TRUE)
 	$micro = 1/$mega;
 	$nano = 1/$giga;
 
-	if ($number >= $tera)
-	{
+	if ($number >= $tera) {
 		$number/=$tera;
 		$suffix="T";
-	}
-	elseif ($number >= $giga)
-	{
+	} elseif ($number >= $giga) {
 		$number/=$giga;
 		$suffix="G";
-	}
-	elseif ($number >= $mega)
-	{
+	} elseif ($number >= $mega) {
 		$number/=$mega;
 		$suffix="M";
-	}
-	elseif ($number >= $kilo)
-	{
+	} elseif ($number >= $kilo) {
 		$number/=$kilo;
 		$suffix="K";
-	}
-        elseif ($number >= 1)
-        {
+	} elseif ($number >= 1) {
                 $number = $number;
                 $suffix="";
-        }
-	elseif (($below_one==TRUE) && ($number >= $milli))
-	{
+        } elseif (($below_one==TRUE) && ($number >= $milli)) {
 		$number/=$milli;
 		$suffix="m";
-	}
-	elseif (($below_one==TRUE) && ($number >= $micro))
-	{
+	} elseif (($below_one==TRUE) && ($number >= $micro)) {
 		$number/=$micro;
 		$suffix="u";
-	}
-	elseif (($below_one==TRUE) && ($number >= $nano))
-	{
+	} elseif (($below_one==TRUE) && ($number >= $nano)) {
 		$number/=$nano;
 		$suffix="n";
 	}
 
-	$result=format_number($number, $decimals) . $suffix;
+	$result = format_number($number, $decimals) . $suffix;
 	return ($result);
 }
 
@@ -1532,8 +1451,7 @@ function nice_scalar($number, $kilo = 1000, $decimals=1)
 	if ($number == 0)
 		return '0';
 		
-	if($number < 0)
-	{
+	if($number < 0) {
 		$number = -$number;
 		$prefix = '-';
 	}
@@ -1542,44 +1460,31 @@ function nice_scalar($number, $kilo = 1000, $decimals=1)
 	$giga=$mega * $kilo;
 	$tera=$giga * $kilo;
 
-	if ($number > $tera)
-	{
+	if ($number > $tera) {
 		$number/=$tera;
 		$suffix="T";
-	}
-	elseif ($number > $giga)
-	{
+	} elseif ($number > $giga) {
 		$number/=$giga;
 		$suffix="G";
-	}
-	elseif ($number > $mega)
-	{
+	} elseif ($number > $mega) {
 		$number/=$mega;
 		$suffix="M";
-	}
-	elseif ($number > $kilo)
-	{
+	} elseif ($number > $kilo) {
 		$number/=$kilo;
 		$suffix="K";
-	}
-        elseif ($number > 1)
-        {
+	} elseif ($number > 1) {
                 $number = $number;
                 $suffix="";
-        }
-	elseif ($number < (1 / ($kilo)))
-	{
+        } elseif ($number < (1 / ($kilo))) {
 		$number=$number * $mega;
 		$suffix="u";
-	}
-	elseif ($number < 1)
-	{
+	} elseif ($number < 1) {
 		$number=$number * $kilo;
 		$suffix="m";
 	}
 
 	$result = $prefix . format_number($number, $decimals) . $suffix;
-	return ($result);
+	return $result;
 }
 
 
@@ -1624,7 +1529,7 @@ class Vector
 		$nx1 = $this->dy / $len;
 		$ny1 = -$this->dx / $len;
 		
-		return( new Vector($nx1, $ny1));
+		return new Vector($nx1, $ny1);
 	}
 	
 	function normalise()
@@ -1653,8 +1558,6 @@ class Colour
 			$this->r = func_get_arg(0); # r
 			$this->g = func_get_arg(1); # g
 			$this->b = func_get_arg(2); # b
-			#print "3 args";
-			#print $this->as_string()."--";
 		}
 		
 		if( (func_num_args() == 1) && gettype(func_get_arg(0))=='array' ) # an array of 3 colours
@@ -1947,13 +1850,14 @@ function draw_spine($im, $spine,$col)
        		$map->ReadData();
        		$map->DrawMap($imagefile);
         	$map->imagefile=$imagefile;
-        	if($htmlfile != '') {
+		
+        	if ($htmlfile != '') {
         	    TestOutput_HTML($htmlfile, $map);
         	}
-        	if($newconffile != '') {
+        	if ($newconffile != '') {
         	    $map->WriteConfig($newconffile);
         	}
-        	if($coveragefile != '') {
+        	if ($coveragefile != '') {
         	    $map->SaveCoverage($coveragefile);
         	}
         	$nwarns = $map->warncount;
@@ -1965,7 +1869,4 @@ function draw_spine($im, $spine,$col)
         return intval($nwarns);
     }
 
-	
-
 // vim:ts=4:sw=4:
-?>

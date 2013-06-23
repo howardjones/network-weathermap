@@ -8,7 +8,9 @@
       
       $mem_warning = "";
       $mem_allowed_int = return_bytes($mem_allowed);
-      if(($mem_allowed_int>0) && ($mem_allowed_int < 32000000)) { $mem_warning='You should increase this value to at least 32M. '; }
+      if (($mem_allowed_int>0) && ($mem_allowed_int < 32000000)) {
+	    $mem_warning='You should increase this value to at least 32M. ';
+      }
       
       // capture the PHP "General Info" table
       ob_start();
@@ -18,14 +20,13 @@
 
       // <tr><td class="e">System </td><td class="v">Windows NT BLINKYZERO 6.0 build 6000 </td></tr>
       // since preg_* are potentially missing, we'll have to do this without regexps.
-      foreach (explode("\n",$s) as $line)
-      {
+      foreach (explode("\n",$s) as $line) {
             $line = str_replace('<tr><td class="e">','',$line);
             $line = str_replace('</td></tr>','',$line);
             $line = str_replace(' </td><td class="v">',' => ',$line);
             $sep_pos = strpos($line," => ");
-            if($sep_pos!==FALSE)
-            {
+	    
+            if ($sep_pos!==FALSE) {
                   // by here, it should be a straight "name => value"
                   $name = substr($line,0,$sep_pos);
                   $value = substr($line,$sep_pos+4);
@@ -35,47 +36,42 @@
       
       $ini_file = $php_general['Loaded Configuration File'];
       $extra_ini = php_ini_scanned_files();
-      if($extra_ini != '')
-      {     $extra_ini = "The following additional ini files were read: $extra_ini"; }
-      else { $extra_ini = "There were no additional ini files, according to PHP."; }
+      if($extra_ini != '') {
+	    $extra_ini = "The following additional ini files were read: $extra_ini";
+      } else {
+	    $extra_ini = "There were no additional ini files, according to PHP.";
+      }
 
       $gdversion = "";
       $gdbuiltin=FALSE;
       $gdstring = "";
-      if(function_exists('gd_info'))
-      {
+      if (function_exists('gd_info')) {
             $gdinfo = gd_info();
             $gdversion=$gdinfo['GD Version'];
-            if(strpos($gdversion,"bundled") !== FALSE)
-            {
+            if (strpos($gdversion,"bundled") !== FALSE) {
                   $gdbuiltin=TRUE;
                   $gdstring="This PHP uses the 'bundled' GD library, which doesn't have alpha-blending bugs. That's good!\n";
-            }
-            else
-            {
+            } else {
                   $gdstring="This PHP uses the system GD library, which MIGHT have alpha-blending bugs. Check that you have at least GD 2.0.34 installed, if you see problems with weathermap segfaulting.\n";
 		  $gdstring .= "You can test for this specific fault by running check-gdbug.php\n";
             }
-      }
-      else
-      {
+      } else {
 	      $gdstring = "The gdinfo() function is not available, which means that either the GD extension is not available, not enabled, or not installed.\n";
-	      }
+      }
 
-  if(isset($argv))
-  {
+  if (isset($argv)) {
 	$environment = "CLI";
-    print "\n----------------------------------------------------\nWeathermap Pre-Install Checker\n\n";     
-	print "This script checks for some common problems with your PHP and server\nenvironment that may stop Weathermap or the Editor from working.\n\n";
-	print "NOTE: You should run this script as both a web page AND from the\ncommand-line, as the environment can be different in each.\n";
-        print "\nThis is the PHP version that is responsible for \n* creating maps from the Cacti poller\n* the command-line weathermap tool\n\n";
-        print "PHP Basics\n----------\n";
-        print wordwrap("This is PHP Version $php_version running on \"$php_os\" with a memory_limit of '$mem_allowed'. $mem_warning\n");
-        print "\nThe php.ini file was $ini_file\n$extra_ini\n\n";
-        print "";
-	print "PHP Functions\n-------------\n";
-        print "Some parts of Weathermap need special support in your PHP\ninstallation to work.\n\n";
-	print wordwrap($gdstring)."\n";
+      echo "\n----------------------------------------------------\nWeathermap Pre-Install Checker\n\n";     
+	echo "This script checks for some common problems with your PHP and server\nenvironment that may stop Weathermap or the Editor from working.\n\n";
+	echo "NOTE: You should run this script as both a web page AND from the\ncommand-line, as the environment can be different in each.\n";
+        echo "\nThis is the PHP version that is responsible for \n* creating maps from the Cacti poller\n* the command-line weathermap tool\n\n";
+        echo "PHP Basics\n----------\n";
+        echo wordwrap("This is PHP Version $php_version running on \"$php_os\" with a memory_limit of '$mem_allowed'. $mem_warning\n");
+        echo "\nThe php.ini file was $ini_file\n$extra_ini\n\n";
+        echo "";
+	echo "PHP Functions\n-------------\n";
+        echo "Some parts of Weathermap need special support in your PHP\ninstallation to work.\n\n";
+	echo wordwrap($gdstring)."\n";
   }
   else
   {
@@ -145,11 +141,11 @@
             if($included != 1)
             {
                   $noncritical++;
-                  print wordwrap("The Console_Getopt PEAR module is not available. The CLI weathermap tool will not run without it (that may not be a problem, if you only intend to use Cacti).\n\n");
+                  echo wordwrap("The Console_Getopt PEAR module is not available. The CLI weathermap tool will not run without it (that may not be a problem, if you only intend to use Cacti).\n\n");
             }
             else
             {
-                  print wordwrap("The Console_Getopt PEAR module is available. That's good!\n\n");
+                  echo wordwrap("The Console_Getopt PEAR module is available. That's good!\n\n");
             }
             
       }
@@ -157,12 +153,12 @@
    foreach ($functions as $function=>$details)
     {
 		$exists = ""; $notes="";
-	    if($environment=='web') print "<tr><td align=right>$function()</td>";
+	    if($environment=='web') echo "<tr><td align=right>$function()</td>";
 	
         if(function_exists($function))
         {
 			$exists = "YES";
-            if($environment=='web') print "<td><img alt=\"YES\" src=\"images/tick.png\" /></td>";
+            if($environment=='web') echo "<td><img alt=\"YES\" src=\"images/tick.png\" /></td>";
         }
         else
         {            
@@ -170,27 +166,27 @@
             if($details[0])
             {
 			    $notes .= "CRITICAL.   ";
-                if($environment=='web') print "<td><img alt=\"NO\" src=\"images/exclamation.png\" /><b>CRITICAL</b> ";
+                if($environment=='web') echo "<td><img alt=\"NO\" src=\"images/exclamation.png\" /><b>CRITICAL</b> ";
                 $critical++;
             } else {
                 if(!$details[1])
                 {
 				   $notes .= "Non-Critical.   ";
-                    if($environment=='web') print "<td><img  alt=\"NO\" src=\"images/cross.png\" /><i>non-critical</i>  ";
+                    if($environment=='web') echo "<td><img  alt=\"NO\" src=\"images/cross.png\" /><i>non-critical</i>  ";
                     $noncritical++;
                 }
                 else
                 {
 					$notes .= "Minor.   ";
-                    if($environment=='web') print "<td><img alt=\"NO\" src=\"images/cross.png\" /><i>minor</i>  ";
+                    if($environment=='web') echo "<td><img alt=\"NO\" src=\"images/cross.png\" /><i>minor</i>  ";
                 }
             }
 			$explanation = "This is required for ".$details[2].". It is ".$details[3].".";
 			$notes .= $explanation;
             
-            if($environment=='web') print "$explanation</td>";
+            if($environment=='web') echo "$explanation</td>";
         }
-        if($environment=='web') print "</tr>\n";
+        if($environment=='web') echo "</tr>\n";
 		else
 		{
 		    $wnotes = wordwrap($notes,50);
@@ -200,61 +196,61 @@
 			{
 				if($i==0)
 				{
-					print sprintf("%20s %5s %-52s\n",$function,$exists,$noteline);
+					echo sprintf("%20s %5s %-52s\n",$function,$exists,$noteline);
 					$i++;
 				}
 				else
 				{
-					print sprintf("%20s %5s %-52s\n","","",$noteline);
+					echo sprintf("%20s %5s %-52s\n","","",$noteline);
 					$i++;
 				}
 			}
 		}		
     }
         
-    if($environment=='web') print "</table>";
+    if($environment=='web') echo "</table>";
     
     if( ($critical + $noncritical) > 0)
     {
 	    if($environment=='web') 
 		{
-        print "<p>If these functions are not found, you may need to <ul><li>check that the 'extension=' line for that extension is uncommented in your php.ini file (then restart your webserver), or<li>install the extension, if it isn't installed already</ul>";
+        echo "<p>If these functions are not found, you may need to <ul><li>check that the 'extension=' line for that extension is uncommented in your php.ini file (then restart your webserver), or<li>install the extension, if it isn't installed already</ul>";
 		}
 		else
 		{
-			print "\nIf these functions are not found, you may need to\n * check that the 'extension=' line for that extension is uncommented in\n   your php.ini file (then restart your webserver), or\n * install the extension, if it isn't installed already\n\n";
+			echo "\nIf these functions are not found, you may need to\n * check that the 'extension=' line for that extension is uncommented in\n   your php.ini file (then restart your webserver), or\n * install the extension, if it isn't installed already\n\n";
 		}
 		
-        print wordwrap("The details of how this is done will depend on your operating system, and on where you installed (or compiled) your PHP from originally. Usually, you would install an RPM, or other package on Linux systems, a port on *BSD, or a DLL on Windows. If you build PHP from source, you need to add extra options to the './configure' line. Consult your PHP documention for more information.\n");
-		if($environment=='web') print "</p>";
+        echo wordwrap("The details of how this is done will depend on your operating system, and on where you installed (or compiled) your PHP from originally. Usually, you would install an RPM, or other package on Linux systems, a port on *BSD, or a DLL on Windows. If you build PHP from source, you need to add extra options to the './configure' line. Consult your PHP documention for more information.\n");
+		if($environment=='web') echo "</p>";
     }
 
-	if($environment=="CLI") print "\n---------------------------------------------------------------------\n";
+	if($environment=="CLI") echo "\n---------------------------------------------------------------------\n";
 			
     if($critical>0)
     {
-        if($environment=='web') print "<div class=\"critical\">";
-		print wordwrap("There are problems with your PHP or server environment that will stop Weathermap from working. You need to correct these issues if you wish to use Weathermap.\n");
-		if($environment=='web') print "</div>";
+        if($environment=='web') echo "<div class=\"critical\">";
+		echo wordwrap("There are problems with your PHP or server environment that will stop Weathermap from working. You need to correct these issues if you wish to use Weathermap.\n");
+		if($environment=='web') echo "</div>";
     }
     else
     {
         if($noncritical>0)
         {
-            if($environment=='web') print "<div class=\"noncritical\">";
-            print wordwrap("Some features of Weathermap will not be available to you, due to lack of support in your PHP installation. You can still proceed with Weathermap though.\n");
-            if($environment=='web') print "</div>";
+            if($environment=='web') echo "<div class=\"noncritical\">";
+            echo wordwrap("Some features of Weathermap will not be available to you, due to lack of support in your PHP installation. You can still proceed with Weathermap though.\n");
+            if($environment=='web') echo "</div>";
 
         }
         else
         {
-            if($environment=='web') print "<div class=\"ok\">";
-            print wordwrap("OK! Your PHP and server environment *seems* to have support for ALL of the Weathermap features. Make sure you have run this script BOTH as a web page and from the CLI to be sure, however.\n");
-            if($environment=='web') print "</div>";
+            if($environment=='web') echo "<div class=\"ok\">";
+            echo wordwrap("OK! Your PHP and server environment *seems* to have support for ALL of the Weathermap features. Make sure you have run this script BOTH as a web page and from the CLI to be sure, however.\n");
+            if($environment=='web') echo "</div>";
 
         }
     }
-      if($environment=='web') print "</body></html>";
+      if($environment=='web') echo "</body></html>";
       
       function return_bytes($val) {
       $val = trim($val);

@@ -67,7 +67,7 @@ function disabled_plugin_weathermap_install ()
 	api_plugin_register_hook('weathermap', 'page_title', 'weathermap_page_title',             'setup.php');
 	api_plugin_register_hook('weathermap', 'page_head', 'weathermap_page_head',             'setup.php');
 
-	weathermap_setup_table ();
+	weathermap_setup_table();
 }
 
 
@@ -105,32 +105,25 @@ function weathermap_page_head()
 {
 	global $config;
 		
-	if (preg_match('/plugins\/weathermap\//',$_SERVER['REQUEST_URI'] ,$matches))
-	{
+	if (preg_match('/plugins\/weathermap\//',$_SERVER['REQUEST_URI'] ,$matches)) {
 		print '<LINK rel="stylesheet" type="text/css" media="screen" href="weathermap-cacti-plugin.css">';
 	}
 }
 
 function weathermap_page_title( $t )
 {
-        if (preg_match('/plugins\/weathermap\//',$_SERVER['REQUEST_URI'] ,$matches))
-        {
+        if (preg_match('/plugins\/weathermap\//',$_SERVER['REQUEST_URI'] ,$matches)) {
                 $t .= " - Weathermap";
 
-		if (preg_match('/plugins\/weathermap\/weathermap-cacti-plugin.php\?action=viewmap&id=([^&]+)/',$_SERVER['REQUEST_URI'],$matches))
-                {
+		if (preg_match('/plugins\/weathermap\/weathermap-cacti-plugin.php\?action=viewmap&id=([^&]+)/',$_SERVER['REQUEST_URI'],$matches)) {
                         $mapid = $matches[1];
-						if (preg_match("/^\d+$/",$mapid))
-						{
-							$title = db_fetch_cell("SELECT titlecache from weathermap_maps where ID=".intval($mapid));
-						}
-						else
-						{
-							$title = db_fetch_cell("SELECT titlecache from weathermap_maps where filehash='".mysql_real_escape_string($mapid)."'");
-						}
+			if (preg_match("/^\d+$/",$mapid)) {
+				$title = db_fetch_cell("SELECT titlecache from weathermap_maps where ID=".intval($mapid));
+			} else {
+				$title = db_fetch_cell("SELECT titlecache from weathermap_maps where filehash='".mysql_real_escape_string($mapid)."'");
+			}
                         if (isset($title)) $t .= " - $title";
                 }
-
         }
         return($t);
 }
@@ -143,8 +136,7 @@ function weathermap_top_graph_refresh($refresh)
 		return $refresh;
 
 	// if we're cycling maps, then we want to handle reloads ourselves, thanks
-	if (isset($_REQUEST["action"]) && $_REQUEST["action"] == 'viewmapcycle')
-	{
+	if (isset($_REQUEST["action"]) && $_REQUEST["action"] == 'viewmapcycle') {
 		return(86400);
 	}
 	return ($refresh);
@@ -239,10 +231,11 @@ function weathermap_config_settings ()
 		)
 	);
 	
-	if (isset($settings["misc"]))
+	if (isset($settings["misc"])) {
 		$settings["misc"] = array_merge($settings["misc"], $temp);
-	else
+	} else {
 		$settings["misc"]=$temp;
+	}
 }
 
 
@@ -250,7 +243,7 @@ function weathermap_setup_table ()
 {
 	global $config, $database_default;
 	global $WEATHERMAP_VERSION;
-	include_once($config["library_path"] . DIRECTORY_SEPARATOR . "database.php");
+	include_once $config["library_path"] . DIRECTORY_SEPARATOR . "database.php";
 
 	$dbversion = read_config_option("weathermap_db_version");
 
@@ -259,16 +252,14 @@ function weathermap_setup_table ()
 	
 	// only bother with all this if it's a new install, a new version, or we're in a development version
 	// - saves a handful of db hits per request!
-	if (($dbversion=="") || (preg_match("/dev$/",$myversion)) || ($dbversion != $myversion))
-	{
-		# cacti_log("Doing setup_table() \n",true,"WEATHERMAP");
+	if (($dbversion=="") || (preg_match("/dev$/",$myversion)) || ($dbversion != $myversion)) {		
 		$sql = "show tables";
 		$result = db_fetch_assoc($sql) or die (mysql_error());
 
 		$tables = array();
 		$sql = array();
 
-		foreach($result as $index => $arr) {
+		foreach ($result as $index => $arr) {
 			foreach ($arr as $t) {
 				$tables[] = $t;
 			}
@@ -298,46 +289,45 @@ function weathermap_setup_table ()
 				archiving set('on','off') NOT NULL default 'off',
 				PRIMARY KEY  (id)
 			) ENGINE=MyISAM;";
-		} else 	{
+		} else {
 			$colsql = "show columns from weathermap_maps from " . $database_default;
 			$result = mysql_query($colsql) or die (mysql_error());
-			$found_so = false;	$found_fh = false;
-			$found_wc = false;	$found_cf = false;
-			$found_96changes = false;
-			$found_96bchanges = false;
-			$found_98changes = false;
+			$found_so = FALSE;
+			$found_fh = FALSE;
+			$found_wc = FALSE;
+			$found_cf = FALSE;
+			$found_96changes = FALSE;
+			$found_96bchanges = FALSE;
+			$found_98changes = FALSE;
 			
 			while ($row = mysql_fetch_array($result, MYSQL_ASSOC)) {
-				if ($row['Field'] == 'sortorder') $found_so = true;
-				if ($row['Field'] == 'filehash') $found_fh = true;
-				if ($row['Field'] == 'warncount') $found_wc = true;
-				if ($row['Field'] == 'config') $found_cf = true;
+				if ($row['Field'] == 'sortorder') $found_so = TRUE;
+				if ($row['Field'] == 'filehash') $found_fh = TRUE;
+				if ($row['Field'] == 'warncount') $found_wc = TRUE;
+				if ($row['Field'] == 'config') $found_cf = TRUE;
 				
-				if ($row['Field'] == 'thumb_width') $found_96changes = true;
-				if ($row['Field'] == 'group_id') $found_96bchanges = true;
+				if ($row['Field'] == 'thumb_width') $found_96changes = TRUE;
+				if ($row['Field'] == 'group_id') $found_96bchanges = TRUE;
 				if ($row['Field'] == 'debug') {
-					$found_98changes = true;
+					$found_98changes = TRUE;
 				}
 			}
 			if (!$found_so) $sql[] = "alter table weathermap_maps add sortorder int(11) NOT NULL default 0 after id";
 			if (!$found_fh) $sql[] = "alter table weathermap_maps add filehash varchar(40) NOT NULL default '' after titlecache";		
 			if (!$found_wc) $sql[] = "alter table weathermap_maps add warncount int(11) NOT NULL default 0 after filehash";		
 			if (!$found_cf) $sql[] = "alter table weathermap_maps add config text NOT NULL  default '' after warncount";
-			if (!$found_96changes)
-			{
+			if (!$found_96changes) {
 				$sql[] = "alter table weathermap_maps add thumb_width int(11) NOT NULL default 0 after config";
 				$sql[] = "alter table weathermap_maps add thumb_height int(11) NOT NULL default 0 after thumb_width";
 				$sql[] = "alter table weathermap_maps add schedule varchar(32) NOT NULL default '*' after thumb_height";
 				$sql[] = "alter table weathermap_maps add archiving set('on','off') NOT NULL default 'off' after schedule";
 			}
-			if (!$found_96bchanges)
-			{
+			if (!$found_96bchanges) {
 				$sql[] = "alter table weathermap_maps add group_id int(11) NOT NULL default 1 after sortorder";
 				$sql[] = "ALTER TABLE `weathermap_settings` ADD `groupid` INT NOT NULL DEFAULT '0' AFTER `mapid`";
 			}
 			
-			if (!$found_98changes)
-			{				
+			if (!$found_98changes) {				
 				$sql[] = "alter table weathermap_maps add runtime double NOT NULL default 0 after warncount";
 				$sql[] = "alter table weathermap_maps add lastrun datetime after runtime";
 				$sql[] = "alter table weathermap_maps add debug set('on','off','once') NOT NULL default 'off' after warncount;";
@@ -381,15 +371,13 @@ function weathermap_setup_table ()
 				  last_time int(11) NOT NULL,last_value varchar(255) NOT NULL,
 				last_calc varchar(255) NOT NULL, sequence int(11) NOT NULL, local_data_id int(11) NOT NULL DEFAULT 0, PRIMARY KEY  (id), KEY rrdfile (rrdfile),
 				  KEY local_data_id (local_data_id), KEY data_source_name (data_source_name) ) ENGINE=MyISAM";
-		}
-		else
-		{
+		} else {
 			$colsql = "show columns from weathermap_data from " . $database_default;
 			$result = mysql_query($colsql) or die (mysql_error());
-			$found_ldi = false;
+			$found_ldi = FALSE;
 			
 			while ($row = mysql_fetch_array($result, MYSQL_ASSOC)) {
-				if ($row['Field'] == 'local_data_id') $found_ldi = true;
+				if ($row['Field'] == 'local_data_id') $found_ldi = TRUE;
 			}
 			
 			if (!$found_ldi) {
@@ -459,8 +447,7 @@ function weathermap_setup_table ()
 		$sql[] = "update weathermap_maps set sortorder=id where sortorder is null or sortorder=0;";
 
 		if (!empty($sql)) {
-			for ($a = 0; $a < count($sql); $a++) {
-				# cacti_log("Executing SQL: ".$sql[$a]."\n",true,"WEATHERMAP");
+			for ($a = 0; $a < count($sql); $a++) {				
 				$result = db_execute($sql[$a]);
 			}
 		}
@@ -510,14 +497,13 @@ function weathermap_show_tab ()
 			$prefix="";
 		}
 
-		print '<a href="' . $config['url_path'] . 'plugins/weathermap/weathermap-cacti-plugin.php"><img src="' . $config['url_path'] . 'plugins/weathermap/plugin-images/'.$prefix.'tab_weathermap';
+		echo '<a href="' . $config['url_path'] . 'plugins/weathermap/weathermap-cacti-plugin.php"><img src="' . $config['url_path'] . 'plugins/weathermap/plugin-images/'.$prefix.'tab_weathermap';
 		
 		// if we're ON a weathermap page, print '_red'		
-		if (preg_match('/plugins\/weathermap\/weathermap-cacti-plugin.php/',$_SERVER['REQUEST_URI'] ,$matches))	{
-			print "_red";
+		if (preg_match('/plugins\/weathermap\/weathermap-cacti-plugin.php/',$_SERVER['REQUEST_URI'] ,$matches)) {
+			echo "_red";
 		}
-		print '.gif" alt="weathermap" align="absmiddle" border="0"></a>';
-
+		echo '.gif" alt="weathermap" align="absmiddle" border="0"></a>';
 	}
 
 	weathermap_setup_table();
@@ -532,13 +518,11 @@ function weathermap_draw_navigation_text ($nav)
 	$nav["weathermap-cacti-plugin.php:viewthumb"] = array("title" => "Weathermap", "mapping" => "index.php:", "url" => "weathermap-cacti-plugin.php", "level" => "1");
 
 	$nav["weathermap-cacti-plugin-mgmt.php:"] = array("title" => "Weathermap Management", "mapping" => "index.php:", "url" => "weathermap-cacti-plugin-mgmt.php", "level" => "1");
-	//   $nav["weathermap-cacti-plugin-mgmt.php:addmap_picker"] = array("title" => "Weathermap Management", "mapping" => "index.php:", "url" => "weathermap-cacti-plugin-mgmt.php", "level" => "1");
+	
 	$nav["weathermap-cacti-plugin-mgmt.php:viewconfig"] = array("title" => "Weathermap Management", "mapping" => "index.php:", "url" => "weathermap-cacti-plugin-mgmt.php", "level" => "1");
 	$nav["weathermap-cacti-plugin-mgmt.php:addmap"] = array("title" => "Weathermap Management", "mapping" => "index.php:", "url" => "weathermap-cacti-plugin-mgmt.php", "level" => "1");
 	$nav["weathermap-cacti-plugin-mgmt.php:editmap"] = array("title" => "Weathermap Management", "mapping" => "index.php:", "url" => "weathermap-cacti-plugin-mgmt.php", "level" => "1");
 	$nav["weathermap-cacti-plugin-mgmt.php:editor"] = array("title" => "Weathermap Management", "mapping" => "index.php:", "url" => "weathermap-cacti-plugin-mgmt.php", "level" => "1");
-
-	//  "graphs.php:graph_edit" => array("title" => "(Edit)", "mapping" => "index.php:,graphs.php:", "url" => "", "level" => "2"),
 
 	$nav["weathermap-cacti-plugin-mgmt.php:perms_edit"] = array("title" => "Edit Permissions", "mapping" => "index.php:,weathermap-cacti-plugin-mgmt.php:", "url" => "", "level" => "2");
 	$nav["weathermap-cacti-plugin-mgmt.php:addmap_picker"] = array("title" => "Add Map", "mapping" => "index.php:,weathermap-cacti-plugin-mgmt.php:", "url" => "", "level" => "2");
@@ -548,8 +532,6 @@ function weathermap_draw_navigation_text ($nav)
 	$nav["weathermap-cacti-plugin-mgmt.php:map_settings_update"] = array("title" => "Map Settings", "mapping" => "index.php:,weathermap-cacti-plugin-mgmt.php:", "url" => "", "level" => "2");
 	$nav["weathermap-cacti-plugin-mgmt.php:map_settings_add"] = array("title" => "Map Settings", "mapping" => "index.php:,weathermap-cacti-plugin-mgmt.php:", "url" => "", "level" => "2");
 
-
-	// $nav["weathermap-cacti-plugin-mgmt.php:perms_edit"] = array("title" => "Weathermap Management", "mapping" => "index.php:", "url" => "weathermap-cacti-plugin-mgmt.php", "level" => "1");
 	$nav["weathermap-cacti-plugin-mgmt.php:perms_add_user"] = array("title" => "Weathermap Management", "mapping" => "index.php:", "url" => "weathermap-cacti-plugin-mgmt.php", "level" => "1");
 	$nav["weathermap-cacti-plugin-mgmt.php:perms_delete_user"] = array("title" => "Weathermap Management", "mapping" => "index.php:", "url" => "weathermap-cacti-plugin-mgmt.php", "level" => "1");
 	$nav["weathermap-cacti-plugin-mgmt.php:delete_map"] = array("title" => "Weathermap Management", "mapping" => "index.php:", "url" => "weathermap-cacti-plugin-mgmt.php", "level" => "1");
@@ -575,17 +557,14 @@ function weathermap_draw_navigation_text ($nav)
 function weathermap_poller_output($rrd_update_array)
 {
 	global $config;
-	// global $weathermap_debugging;
 
 	$logging = read_config_option("log_verbosity");
 
-	if ($logging >= POLLER_VERBOSITY_DEBUG) cacti_log("WM poller_output: STARTING\n",true,"WEATHERMAP");
+	if ($logging >= POLLER_VERBOSITY_DEBUG) cacti_log("WM poller_output: STARTING\n",TRUE,"WEATHERMAP");
 
 	// partially borrowed from Jimmy Conner's THold plugin.
 	// (although I do things slightly differently - I go from filenames, and don't use the poller_interval)
 
-	
-	// $requiredlist = db_fetch_assoc("select distinct weathermap_data.*, data_template_data.local_data_id, data_template_rrd.data_source_type_id from weathermap_data, data_template_data, data_template_rrd where weathermap_data.rrdfile=data_template_data.data_source_path and data_template_rrd.local_data_id=data_template_data.local_data_id");
 	// new version works with *either* a local_data_id or rrdfile in the weathermap_data table, and returns BOTH
 	$requiredlist = db_fetch_assoc("select distinct weathermap_data.id, weathermap_data.last_value, weathermap_data.last_time, weathermap_data.data_source_name, data_template_data.data_source_path, data_template_data.local_data_id, data_template_rrd.data_source_type_id from weathermap_data, data_template_data, data_template_rrd where weathermap_data.local_data_id=data_template_data.local_data_id and data_template_rrd.local_data_id=data_template_data.local_data_id and weathermap_data.local_data_id<>0;");
 	
@@ -594,16 +573,14 @@ function weathermap_poller_output($rrd_update_array)
 	# especially on Windows, it seems that filenames are not reliable (sometimes \ and sometimes / even though path_rra is always /) .
 	# let's make an index from local_data_id to filename, and then use local_data_id as the key...
 	
-	foreach (array_keys($rrd_update_array) as $key)
-	{
+	foreach (array_keys($rrd_update_array) as $key) {
 		if (isset( $rrd_update_array[$key]['times']) && is_array($rrd_update_array[$key]['times'])) {			
 			$knownfiles[ $rrd_update_array[$key]["local_data_id"] ] = $key;
 			
 		}
 	}
 	
-	foreach ($requiredlist as $required)
-	{
+	foreach ($requiredlist as $required) {
 		$file = str_replace("<path_rra>", $path_rra, $required['data_source_path']);
 		$dsname = $required['data_source_name'];
 		$local_data_id = $required['local_data_id'];
@@ -613,14 +590,15 @@ function weathermap_poller_output($rrd_update_array)
 			if ($file2 != '') $file = $file2;
 		}
 				
-	    if ($logging >= POLLER_VERBOSITY_DEBUG) cacti_log("WM poller_output: Looking for $file ($local_data_id) (".$required['data_source_path'].")\n",true,"WEATHERMAP");
+		if ($logging >= POLLER_VERBOSITY_DEBUG) {
+		    cacti_log("WM poller_output: Looking for $file ($local_data_id) (".$required['data_source_path'].")\n",TRUE,"WEATHERMAP");
+		}
 		
-		if (isset($rrd_update_array[$file]) && is_array($rrd_update_array[$file]) && isset($rrd_update_array[$file]['times']) && is_array($rrd_update_array[$file]['times']) && isset( $rrd_update_array{$file}['times'][key($rrd_update_array[$file]['times'])]{$dsname}))
-		{
+		if (isset($rrd_update_array[$file]) && is_array($rrd_update_array[$file]) && isset($rrd_update_array[$file]['times']) && is_array($rrd_update_array[$file]['times']) && isset( $rrd_update_array{$file}['times'][key($rrd_update_array[$file]['times'])]{$dsname})) {
 			$value = $rrd_update_array{$file}['times'][key($rrd_update_array[$file]['times'])]{$dsname};
 			$time = key($rrd_update_array[$file]['times']);
 			if (read_config_option("log_verbosity") >= POLLER_VERBOSITY_MEDIUM) 
-				cacti_log("WM poller_output: Got one! $file:$dsname -> $time $value\n",true,"WEATHERMAP");
+				cacti_log("WM poller_output: Got one! $file:$dsname -> $time $value\n",TRUE,"WEATHERMAP");
 			
 			$period = $time - $required['last_time'];
 			$lastval = $required['last_value'];
@@ -672,11 +650,11 @@ function weathermap_poller_output($rrd_update_array)
 				}
 			}
 			db_execute("UPDATE weathermap_data SET last_time=$newtime, last_calc='$newvalue', last_value='$newlastvalue',sequence=sequence+1  where id = " . $required['id']);
-	        	if ($logging >= POLLER_VERBOSITY_DEBUG) cacti_log("WM poller_output: Final value is $newvalue (was $lastval, period was $period)\n",true,"WEATHERMAP");
+	        	if ($logging >= POLLER_VERBOSITY_DEBUG) cacti_log("WM poller_output: Final value is $newvalue (was $lastval, period was $period)\n",TRUE,"WEATHERMAP");
 		}		
 	}
 
-	if ($logging >= POLLER_VERBOSITY_DEBUG) cacti_log("WM poller_output: ENDING\n",true,"WEATHERMAP");
+	if ($logging >= POLLER_VERBOSITY_DEBUG) cacti_log("WM poller_output: ENDING\n",TRUE,"WEATHERMAP");
 	
 	return $rrd_update_array;
 }
@@ -686,8 +664,8 @@ function weathermap_poller_bottom()
 	global $config;
 	global $weathermap_debugging, $WEATHERMAP_VERSION;
 
-	include_once($config["library_path"] . DIRECTORY_SEPARATOR."database.php");
-	include_once(dirname(__FILE__).DIRECTORY_SEPARATOR."lib".DIRECTORY_SEPARATOR."poller-common.php");
+	include_once $config["library_path"] . DIRECTORY_SEPARATOR."database.php";
+	include_once dirname(__FILE__).DIRECTORY_SEPARATOR."lib".DIRECTORY_SEPARATOR."poller-common.php";
 
 	weathermap_setup_table();
 
@@ -697,14 +675,14 @@ function weathermap_poller_bottom()
 
 	if ($renderperiod<0) {
 		// manual updates only
-		if ($quietlogging==0) cacti_log("Weathermap $WEATHERMAP_VERSION - no updates ever",true,"WEATHERMAP");
+		if ($quietlogging==0) cacti_log("Weathermap $WEATHERMAP_VERSION - no updates ever",TRUE,"WEATHERMAP");
 		return;
 	} else {
 		// if we're due, run the render updates
 		if (( $renderperiod == 0) || ( ($rendercounter % $renderperiod) == 0)) {
-			weathermap_run_maps(dirname(__FILE__) );
+			weathermap_run_maps(dirname(__FILE__));
 		} else {
-			if ($quietlogging==0) cacti_log("Weathermap $WEATHERMAP_VERSION - no update in this cycle ($rendercounter)",true,"WEATHERMAP");
+			if ($quietlogging==0) cacti_log("Weathermap $WEATHERMAP_VERSION - no update in this cycle ($rendercounter)",TRUE,"WEATHERMAP");
 		}
 		
 		// increment the counter

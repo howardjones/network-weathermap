@@ -176,19 +176,13 @@ class WeatherMapLink extends WeatherMapItem
 		
 		foreach ($dirs as $dir)
 		{
-			
-		
 			// Time to deal with Link Comments, if any
 			$comment = $this->owner->ProcessString($this->comments[$dir], $this);
-			
-			# print "COMMENT: $comment";
 			
 			if($this->owner->get_hint('screenshot_mode')==1)  $comment=screenshotify($comment);
 	
 			if($comment != '')
 			{
-				# print "\n\n----------------------------------------------------------------\nComment $dir for ".$this->name."\n";;
-			
 				list($textlength, $textheight) = $this->owner->myimagestringsize($this->commentfont, $comment);
 				
 				$extra_percent = $commentpos[$dir];
@@ -196,34 +190,20 @@ class WeatherMapLink extends WeatherMapItem
 				// $font = $this->commentfont;
 				// nudge pushes the comment out along the link arrow a little bit
 				// (otherwise there are more problems with text disappearing underneath links)
-				# $nudgealong = 0; $nudgeout=0;
 				$nudgealong = intval($this->get_hint("comment_nudgealong"));
 				$nudgeout = intval($this->get_hint("comment_nudgeout"));		
 	
 				$extra = ($totaldistance * ($extra_percent/100));
-				# $comment_index = find_distance($curvepoints,$extra);
 				
 				list($x,$y,$comment_index,$angle) = find_distance_coords_angle($curvepoints,$extra);
 							
-				#  print "$extra_percent => $extra ($totaldistance)\n";
-				#printf("  Point A is %f,%f\n",$curvepoints[$comment_index][0], $curvepoints[$comment_index][1]);
-				#printf("  Point B is %f,%f\n",$curvepoints[$comment_index+1][0], $curvepoints[$comment_index+1][1]);
-				#printf("  Point X is %f,%f\n",$x, $y);
-							
-				# if( ($comment_index != 0)) print "I ";
-				# if (($x != $curvepoints[$comment_index][0]) ) print "X ";
-				# if (($y != $curvepoints[$comment_index][1]) ) print "Y ";
-				# print "\n";
-							
 				if( ($comment_index != 0) && (($x != $curvepoints[$comment_index][0]) || ($y != $curvepoints[$comment_index][1])) )
 				{
-				#	print "  -> Path 1\n";
 					$dx = $x - $curvepoints[$comment_index][0];
 					$dy = $y - $curvepoints[$comment_index][1];
 				}
 				else
 				{			
-				#	print "  -> Path 2\n";
 					$dx = $curvepoints[$comment_index+1][0] - $x;
 					$dy = $curvepoints[$comment_index+1][1] - $y;
 				}
@@ -238,8 +218,6 @@ class WeatherMapLink extends WeatherMapItem
 				
 				$l=sqrt(($dx * $dx) + ($dy * $dy));
 				
-				# print "$extra => $comment_index/$last => $x,$y => $dx,$dy => $l\n";
-				
 				$dx = $dx/$l; 	$dy = $dy/$l;
 				$nx = $dy;  $ny = -$dx;
 				$flipped=FALSE;
@@ -248,12 +226,10 @@ class WeatherMapLink extends WeatherMapItem
 				// not quite as catchy as Missy's version
 				if(abs($angle)>90)
 				{
-					# $col = $map->selected;
 					$angle -= 180;
 					if($angle < -180) $angle +=360;
 					$edge_x = $x + $nudgealong*$dx - $nx * $centre_distance;
 					$edge_y = $y + $nudgealong*$dy - $ny * $centre_distance;
-					# $comment .= "@";
 					$flipped = TRUE;
 				}
 				else
@@ -262,27 +238,20 @@ class WeatherMapLink extends WeatherMapItem
 					$edge_y = $y + $nudgealong*$dy + $ny * $centre_distance;
 				}
 				
-				
-				
 				if( !$flipped && ($extra + $textlength) > $totaldistance)
 				{					
 					$edge_x -= $dx * $textlength;
 					$edge_y -= $dy * $textlength;
-					# $comment .= "#";
 				}
 				
 				if( $flipped && ($extra - $textlength) < 0)
 				{					
 					$edge_x += $dx * $textlength;
 					$edge_y += $dy * $textlength;
-					# $comment .= "%";
 				}
 				
 				// FINALLY, draw the text!
-				# imagefttext($image, $fontsize, $angle, $edge_x, $edge_y, $col, $font,$comment);
 				$this->owner->myimagestring($image, $this->commentfont, $edge_x, $edge_y, $comment, $col[$dir], $angle);
-				#imagearc($image,$x,$y,10,10,0, 360,$this->owner->selected);
-				#imagearc($image,$edge_x,$edge_y,10,10,0, 360,$this->owner->selected);
 			}
 		}
 	}
@@ -333,10 +302,8 @@ class WeatherMapLink extends WeatherMapItem
 		$xpoints[]=$x1;
 		$ypoints[]=$y1;
 
-		# warn("There are VIAs.\n");
 		foreach ($this->vialist as $via)
 		{
-			# imagearc($im, $via[0],$via[1],20,20,0,360,$map->selected);
 			if(isset($via[2]))
 			{
 				$xpoints[]=$map->nodes[$via[2]]->x + $via[0];
@@ -352,17 +319,11 @@ class WeatherMapLink extends WeatherMapItem
 		$xpoints[]=$x2;
 		$ypoints[]=$y2;
 
-		# list($link_in_colour,$link_in_scalekey, $link_in_scaletag) = $map->NewColourFromPercent($this->inpercent,$this->usescale,$this->name);
-		# list($link_out_colour,$link_out_scalekey, $link_out_scaletag) = $map->NewColourFromPercent($this->outpercent,$this->usescale,$this->name);
-		
 		$link_in_colour = $this->colours[IN];
 		$link_out_colour = $this->colours[OUT];
 		
 		$gd_in_colour = $link_in_colour->gdallocate($im);
 		$gd_out_colour = $link_out_colour->gdallocate($im);
-		
-	//	$map->links[$this->name]->inscalekey = $link_in_scalekey;
-	//	$map->links[$this->name]->outscalekey = $link_out_scalekey;
 		
 		$link_width=$this->width;
 		// these will replace the one above, ultimately.
@@ -427,11 +388,6 @@ class WeatherMapLink extends WeatherMapItem
 		// figure out where the labels should be, and what the angle of the curve is at that point
 		list($q1_x,$q1_y,$junk,$q1_angle) = find_distance_coords_angle($this->curvepoints,($this->labeloffset_out/100)*$curvelength);
 		list($q3_x,$q3_y,$junk,$q3_angle) = find_distance_coords_angle($this->curvepoints,($this->labeloffset_in/100)*$curvelength);
-
-		# imageline($im, $q1_x+20*cos(deg2rad($q1_angle)),$q1_y-20*sin(deg2rad($q1_angle)), $q1_x-20*cos(deg2rad($q1_angle)), $q1_y+20*sin(deg2rad($q1_angle)), $this->owner->selected );
-		# imageline($im, $q3_x+20*cos(deg2rad($q3_angle)),$q3_y-20*sin(deg2rad($q3_angle)), $q3_x-20*cos(deg2rad($q3_angle)), $q3_y+20*sin(deg2rad($q3_angle)), $this->owner->selected );
-
-		# warn("$q1_angle $q3_angle\n");
 
 		if (!is_null($q1_x))
 		{
@@ -502,8 +458,6 @@ class WeatherMapLink extends WeatherMapItem
 					
 					$map->DrawLabelRotated($im, $task[0],            $task[1],$angle,           $thelabel, $this->bwfont, $padding,
 							$this->name,  $this->bwfontcolour, $this->bwboxcolour, $this->bwoutlinecolour,$map, $task[7]);
-					
-					// imagearc($im, $task[0], $task[1], 10,10,0,360,$map->selected);
 				}
 			}
 		}
@@ -512,7 +466,6 @@ class WeatherMapLink extends WeatherMapItem
 	function WriteConfig()
 	{
 		$output='';
-		# $output .= "# ID ".$this->id." - first seen in ".$this->defined_in."\n";
 
 		if($this->config_override != '')
 		{
@@ -520,7 +473,6 @@ class WeatherMapLink extends WeatherMapItem
 		}
 		else
 		{
-			# $defdef = $this->owner->defaultlink;
 			$dd = $this->owner->links[$this->template];
 			
 			wm_debug("Writing config for LINK $this->name against $this->template\n");
@@ -537,7 +489,6 @@ class WeatherMapLink extends WeatherMapItem
 					array('duplex','DUPLEX',CONFIG_TYPE_LITERAL),
 					array('commentstyle','COMMENTSTYLE',CONFIG_TYPE_LITERAL),
 					array('labelboxstyle','BWSTYLE',CONFIG_TYPE_LITERAL),
-			//		array('usescale','USESCALE',CONFIG_TYPE_LITERAL),
 					
 					array('bwfont','BWFONT',CONFIG_TYPE_LITERAL),
 					array('commentfont','COMMENTFONT',CONFIG_TYPE_LITERAL),
@@ -849,4 +800,3 @@ class WeatherMapLink extends WeatherMapItem
 };
 
 // vim:ts=4:sw=4:
-?>

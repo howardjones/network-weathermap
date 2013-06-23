@@ -509,12 +509,7 @@ class WeatherMap extends WeatherMapBase
 						$cy = $bounds[1] - $bounds[5];
 						if($cx > $xsize) $xsize = $cx;
 						$ysize += ($cy*1.2);
-						# warn("Adding $cy (x was $cx)\n");
 					}
-					#$bounds=imagettfbbox($this->fonts[$fontnumber]->size, 0, $this->fonts[$fontnumber]->file,
-					#	$string);
-					# return (array($bounds[4] - $bounds[0], $bounds[1] - $bounds[5]));
-					# warn("Size of $string is $xsize x $ysize over $linecount lines\n");
 					
 					return(array($xsize,$ysize));
 				}
@@ -528,8 +523,6 @@ class WeatherMap extends WeatherMapBase
 
 	function ProcessString($input,&$context, $include_notes=TRUE,$multiline=FALSE)
 	{
-		# debug("ProcessString: input is $input\n");
-
 		assert('is_scalar($input)');
 
 		$context_description = strtolower( $context->my_type() );
@@ -541,12 +534,10 @@ class WeatherMap extends WeatherMapBase
 		{
 			$i = $input;
 			$input = str_replace("\\n","\n",$i);
-			# if($i != $input)  warn("$i into $input\n");
 		}
 
 		$output = $input;
 		
-		# while( preg_match("/(\{[^}]+\})/",$input,$matches) )
 		while( preg_match("/(\{(?:node|map|link)[^}]+\})/",$input,$matches) )
 		{
 			$value = "[UNKNOWN]";
@@ -558,7 +549,6 @@ class WeatherMap extends WeatherMapBase
 			{
 				$type = $matches[1];
 				$args = $matches[2];
-				# debug("ProcessString: type is ".$type.", arguments are ".$args."\n");
 
 				if($type == 'map')
 				{
@@ -577,8 +567,6 @@ class WeatherMap extends WeatherMapBase
 						$itemname = $matches[1];
 						$args = $matches[2];
 						$format = $matches[3];
-
-		#				debug("ProcessString: item is $itemname, and args are now $args\n");
 
 						$the_item = NULL;
 						if( ($itemname == "this") && ($type == strtolower($context->my_type())) )
@@ -622,11 +610,7 @@ class WeatherMap extends WeatherMapBase
 				}
 				else
 				{
-				#	warn($the_item->name.": ".var_dump($the_item->hints)."\n");
 					wm_debug("ProcessString: Found appropriate item: ".get_class($the_item)." ".$the_item->name."\n");
-
-					# warn($the_item->name."/hints: ".var_dump($the_item->hints)."\n");
-					# warn($the_item->name."/notes: ".var_dump($the_item->notes)."\n");
 
 					// SET and notes have precedent over internal properties
 					// this is my laziness - it saves me having a list of reserved words
@@ -658,19 +642,14 @@ class WeatherMap extends WeatherMapBase
 			if($value===NULL) $value='NULL';
 			wm_debug("ProcessString: replacing ".$key." with $value\n");
 
-			# if($format != '') $value = sprintf($format,$value);
 			if($format != '')
 			{
-
-		#		debug("Formatting with mysprintf($format,$value)\n");
 				$value = mysprintf($format,$value);
 			}
 
-		#	debug("ProcessString: formatted to $value\n");
 			$input = str_replace($key,'',$input);
 			$output = str_replace($key,$value,$output);
 		}
-		#debug("ProcessString: output is $output\n");
 		return ($output);
 }
 

@@ -11,30 +11,24 @@ $ignore_cacti=FALSE;
 
 $config['base_url'] = $cacti_url;
 
-@include_once('editor-config.php');
+@include_once 'editor-config.php';
 
 // check if the goalposts have moved
-if( is_dir($cacti_base) && file_exists($cacti_base."/include/global.php") )
-{
+if (is_dir($cacti_base) && file_exists($cacti_base."/include/global.php")) {
 	// include the cacti-config, so we know about the database
 	include_once($cacti_base."/include/global.php");
 	// $config['base_url'] = $cacti_url;
 	$config['base_url'] = (isset($config['url_path'])? $config['url_path'] : $cacti_url);
 	$cacti_found = TRUE;
-	// print "global";
 }
-elseif( is_dir($cacti_base) && file_exists($cacti_base."/include/config.php") )
-{
+elseif(is_dir($cacti_base) && file_exists($cacti_base."/include/config.php")) {
 	// include the cacti-config, so we know about the database
 	include_once($cacti_base."/include/config.php");
 
 	// $config['base_url'] = $cacti_url;
 	$config['base_url'] = (isset($config['url_path'])? $config['url_path'] : $cacti_url);
 	$cacti_found = TRUE;
-	// print "config";
-}
-else
-{
+} else {
 	$cacti_found = FALSE;
 }
 
@@ -50,8 +44,7 @@ function js_escape($str)
 	return($str);
 }
 
-if(isset($_REQUEST['command']) && $_REQUEST["command"]=='link_step2')
-{
+if(isset($_REQUEST['command']) && $_REQUEST["command"]=='link_step2') {
 	$dataid = intval($_REQUEST['dataid']);
 
 	$SQL_graphid = sprintf("select graph_templates_item.local_graph_id, title_cache FROM graph_templates_item,graph_templates_graph,data_template_rrd where graph_templates_graph.local_graph_id = graph_templates_item.local_graph_id  and task_item_id=data_template_rrd.id and local_data_id=%d LIMIT 1;",$dataid);
@@ -203,12 +196,11 @@ if(isset($_REQUEST['command']) && $_REQUEST["command"]=='link_step1')
 	$overlib = true;
 	$aggregate = false;
 	
-	if(isset($_REQUEST['aggregate'])) $aggregate = ( $_REQUEST['aggregate']==0 ? false : true);
-	if(isset($_REQUEST['overlib'])) $overlib= ( $_REQUEST['overlib']==0 ? false : true);
+	if (isset($_REQUEST['aggregate'])) $aggregate = ( $_REQUEST['aggregate']==0 ? false : true);
+	if (isset($_REQUEST['overlib'])) $overlib= ( $_REQUEST['overlib']==0 ? false : true);
 	
 	
-	if(isset($_REQUEST['host_id']))
-	{
+	if (isset($_REQUEST['host_id'])) {
 		$host_id = intval($_REQUEST['host_id']);
 		if($host_id>=0) $SQL_picklist .= " and data_local.host_id=$host_id ";
 	}
@@ -223,32 +215,31 @@ if(isset($_REQUEST['command']) && $_REQUEST["command"]=='link_step1')
 <form name="mini">
 <?php 
 if(sizeof($hosts) > 0) {
-	print 'Host: <select name="host_id"  onChange="applyDSFilterChange(document.mini)">';
+	echo 'Host: <select name="host_id"  onChange="applyDSFilterChange(document.mini)">';
 
-	print '<option '.($host_id==-1 ? 'SELECTED' : '' ).' value="-1">Any</option>';
-	print '<option '.($host_id==0 ? 'SELECTED' : '' ).' value="0">None</option>';
+	echo '<option '.($host_id==-1 ? 'SELECTED' : '' ).' value="-1">Any</option>';
+	echo '<option '.($host_id==0 ? 'SELECTED' : '' ).' value="0">None</option>';
 	foreach ($hosts as $host)
 	{
-		print '<option ';
-		if($host_id==$host['id']) print " SELECTED ";
-		print 'value="'.$host['id'].'">'.$host['name'].'</option>';
+		echo '<option ';
+		if($host_id==$host['id']) echo " SELECTED ";
+		echo 'value="'.$host['id'].'">'.$host['name'].'</option>';
 	}
-	print '</select><br />';
+	echo'</select><br />';
 }
 
-	print '<span class="filter" style="display: none;">Filter: <input id="filterstring" name="filterstring" size="20"> (case-sensitive)<br /></span>';
-	print '<input id="overlib" name="overlib" type="checkbox" value="yes" '.($overlib ? 'CHECKED' : '' ).'> <label for="overlib">Also set OVERLIBGRAPH and INFOURL.</label><br />';
-	print '<input id="aggregate" name="aggregate" type="checkbox" value="yes" '.($aggregate ? 'CHECKED' : '' ).'> <label for="aggregate">Append TARGET to existing one (Aggregate)</label>';
+	echo '<span class="filter" style="display: none;">Filter: <input id="filterstring" name="filterstring" size="20"> (case-sensitive)<br /></span>';
+	echo '<input id="overlib" name="overlib" type="checkbox" value="yes" '.($overlib ? 'CHECKED' : '' ).'> <label for="overlib">Also set OVERLIBGRAPH and INFOURL.</label><br />';
+	echo '<input id="aggregate" name="aggregate" type="checkbox" value="yes" '.($aggregate ? 'CHECKED' : '' ).'> <label for="aggregate">Append TARGET to existing one (Aggregate)</label>';
 
-	print '</form><div class="listcontainer"><ul id="dslist">';
+	echo '</form><div class="listcontainer"><ul id="dslist">';
 
 	$queryrows = db_fetch_assoc($SQL_picklist);
 
-	// print $SQL_picklist;
+	// echo $SQL_picklist;
 
 	$i=0;
-	if( is_array($queryrows)  && sizeof($queryrows) > 0 )
-	{
+	if(is_array($queryrows)  && sizeof($queryrows) > 0) {
 		foreach ($queryrows as $line) {
 			//while ($line = mysql_fetch_array($result, MYSQL_ASSOC)) {
 			echo "<li class=\"row".($i%2)."\">";
@@ -258,18 +249,9 @@ if(sizeof($hosts) > 0) {
 			
 			$i++;
 		}
+	} else {
+		echo "<li>No results...</li>";
 	}
-	else
-	{
-		print "<li>No results...</li>";
-	}
-
-	// Free resultset
-	//mysql_free_result($result);
-
-	// Closing connection
-	//mysql_close($link);
-
 ?>
 </ul>
 </div>
@@ -332,23 +314,23 @@ if(isset($_REQUEST['command']) && $_REQUEST["command"]=='node_step1')
 	function applyDSFilterChange(objForm) {
                 strURL = '?host_id=' + objForm.host_id.value;
                 strURL = strURL + '&command=node_step1';
-				if( objForm.overlib.checked)
-				{
-					strURL = strURL + "&overlib=1";
-				}
-				else
-				{
-					strURL = strURL + "&overlib=0";
-				}
-				
-				//if( objForm.aggregate.checked)
-				//{
-				//	strURL = strURL + "&aggregate=1";
-				//}
-				//else
-				//{
-				//	strURL = strURL + "&aggregate=0";
-				//}
+		if( objForm.overlib.checked)
+		{
+			strURL = strURL + "&overlib=1";
+		}
+		else
+		{
+			strURL = strURL + "&overlib=0";
+		}
+		
+		//if( objForm.aggregate.checked)
+		//{
+		//	strURL = strURL + "&aggregate=1";
+		//}
+		//else
+		//{
+		//	strURL = strURL + "&aggregate=0";
+		//}
                 document.location = strURL;
         }
 	
@@ -394,29 +376,27 @@ if(isset($_REQUEST['command']) && $_REQUEST["command"]=='node_step1')
 <form name="mini">
 <?php 
 if(sizeof($hosts) > 0) {
-	print 'Host: <select name="host_id"  onChange="applyDSFilterChange(document.mini)">';
+	echo 'Host: <select name="host_id"  onChange="applyDSFilterChange(document.mini)">';
 
-	print '<option '.($host_id==-1 ? 'SELECTED' : '' ).' value="-1">Any</option>';
-	print '<option '.($host_id==0 ? 'SELECTED' : '' ).' value="0">None</option>';
-	foreach ($hosts as $host)
-	{
-		print '<option ';
-		if($host_id==$host['id']) print " SELECTED ";
-		print 'value="'.$host['id'].'">'.$host['name'].'</option>';
+	echo '<option '.($host_id==-1 ? 'SELECTED' : '' ).' value="-1">Any</option>';
+	echo '<option '.($host_id==0 ? 'SELECTED' : '' ).' value="0">None</option>';
+	foreach ($hosts as $host) {
+		echo '<option ';
+		if($host_id==$host['id']) echo " SELECTED ";
+		echo 'value="'.$host['id'].'">'.$host['name'].'</option>';
 	}
-	print '</select><br />';
+	echo '</select><br />';
 }
 
-	print '<span class="filter" style="display: none;">Filter: <input id="filterstring" name="filterstring" size="20"> (case-sensitive)<br /></span>';
-	print '<input id="overlib" name="overlib" type="checkbox" value="yes" '.($overlib ? 'CHECKED' : '' ).'> <label for="overlib">Set both OVERLIBGRAPH and INFOURL.</label><br />';
+	echo '<span class="filter" style="display: none;">Filter: <input id="filterstring" name="filterstring" size="20"> (case-sensitive)<br /></span>';
+	echo '<input id="overlib" name="overlib" type="checkbox" value="yes" '.($overlib ? 'CHECKED' : '' ).'> <label for="overlib">Set both OVERLIBGRAPH and INFOURL.</label><br />';
 
-	print '</form><div class="listcontainer"><ul id="dslist">';
+	echo '</form><div class="listcontainer"><ul id="dslist">';
 
 	$queryrows = db_fetch_assoc($SQL_picklist);
 
 	$i=0;
-	if( is_array($queryrows) && sizeof($queryrows) > 0)
-	{
+	if (is_array($queryrows) && sizeof($queryrows) > 0) {
 		foreach ($queryrows as $line) {
 			echo "<li class=\"row".($i%2)."\">";
 			$key = $line['local_graph_id'];
@@ -424,10 +404,8 @@ if(sizeof($hosts) > 0) {
 			echo "</li>\n";
 			$i++;
 		}
-	}
-	else
-	{
-		print "No results...";
+	} else {
+		echo "No results...";
 	}
 
 ?>
@@ -438,4 +416,3 @@ if(sizeof($hosts) > 0) {
 } // end of node step 1
 
 // vim:ts=4:sw=4:
-?>

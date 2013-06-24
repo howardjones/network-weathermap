@@ -16,8 +16,10 @@ class ConfigTest extends PHPUnit_Framework_TestCase
         $previouswd = getcwd();
         chdir(dirname(__FILE__).DIRECTORY_SEPARATOR."..");
 
-		$compare_output = $comparisonimagefile.".txt";
-		unlink($compare_output);
+	$compare_output = $comparisonimagefile.".txt";
+	if(file_exists($compare_output)) {
+	    unlink($compare_output);
+	}
 		
         $nwarns = TestOutput_RunTest($testdir.DIRECTORY_SEPARATOR.$conffile, $outputimagefile, $outputhtmlfile, '', 'config-coverage.txt');
 
@@ -53,7 +55,7 @@ class ConfigTest extends PHPUnit_Framework_TestCase
 			);
 			$pipes = array();
 			$process = proc_open($cmd,$descriptorspec, $pipes, getcwd(), NULL, array('bypass_shell'=>TRUE)) ;
-	$output = "";
+			$output = "";
 
 			if(is_resource($process)) {
 				$output = fread($pipes[2],2000);

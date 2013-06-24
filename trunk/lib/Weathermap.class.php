@@ -124,12 +124,10 @@ class WeatherMapBase
 	{
 		if(isset($this->notes[$name]))
 		{
-		//	debug("Found note $name in ".$this->name." with value of ".$this->notes[$name].".\n");
 			return($this->notes[$name]);
 		}
 		else
 		{
-		//	debug("Looked for note $name in ".$this->name." which doesn't exist.\n");
 			return(NULL);
 		}
 	}
@@ -138,7 +136,6 @@ class WeatherMapBase
 	{
 		wm_debug("Adding hint $name='$value' to ".$this->name."\n");
 		$this->hints[$name] = $value;
-		# warn("Adding hint $name to ".$this->my_type()."/".$this->name."\n");
 	}
 
 
@@ -146,12 +143,10 @@ class WeatherMapBase
 	{
 		if(isset($this->hints[$name]))
 		{
-		//	debug("Found hint $name in ".$this->name." with value of ".$this->hints[$name].".\n");
 			return($this->hints[$name]);
 		}
 		else
 		{
-		//	debug("Looked for hint $name in ".$this->name." which doesn't exist.\n");
 			return(NULL);
 		}
 	}
@@ -212,7 +207,6 @@ class WeatherMap extends WeatherMapBase
 		$nodefont,
 		$keyfont,
 		$timefont;
-	// var $bg_r, $bg_g, $bg_b;
 	var $timex,
 		$timey;
 	var $width,
@@ -360,8 +354,8 @@ class WeatherMap extends WeatherMapBase
                
                 $this->nodes[':: DEFAULT ::'] = &$defnode;
                 
-       	$this->node_template_tree = array();
-       	$this->link_template_tree = array();
+	       	$this->node_template_tree = array();
+	       	$this->link_template_tree = array();
        	
 		$this->node_template_tree['DEFAULT'] = array();
 		$this->link_template_tree['DEFAULT'] = array();
@@ -392,7 +386,7 @@ class WeatherMap extends WeatherMapBase
 
                 assert('is_object($this->nodes[":: DEFAULT ::"])');
                 assert('is_object($this->links[":: DEFAULT ::"])');
-				assert('is_object($this->nodes["DEFAULT"])');
+		assert('is_object($this->nodes["DEFAULT"])');
                 assert('is_object($this->links["DEFAULT"])');
 
 // ************************************
@@ -670,7 +664,6 @@ function LoadPlugins( $type="data", $dir="lib/datasources" )
         $dir = dirname(__FILE__) . DIRECTORY_SEPARATOR . $dir;
         wm_debug("Relative path didn't exist. Trying $dir\n");
     }
-	# $this->datasourceclasses = array();
 	$dh=@opendir($dir);
 
 	if(!$dh) {	// try to find it with the script, if the relative path fails
@@ -730,7 +723,6 @@ function DatasourceInit()
 		// make an instance of the class
 		$dsplugins[$ds_class] = new $ds_class;
 		wm_debug("Running $ds_class"."->Init()\n");
-		# $ret = call_user_func(array($ds_class, 'Init'), $this);
 		assert('isset($this->plugins["data"][$ds_class])');
 
 		$ret = $this->plugins['data'][$ds_class]->Init($this);
@@ -739,7 +731,6 @@ function DatasourceInit()
 		{
 			wm_debug("Removing $ds_class from Data Source list, since Init() failed\n");
 			$this->activedatasourceclasses[$ds_class]=0;
-			# unset($this->datasourceclasses[$ds_class]);
 		}
 	}
 	wm_debug("Finished Initialising Plugins...\n");	
@@ -803,7 +794,6 @@ function ProcessTargets()
 						{
 							if(!$matched)
 							{
-								// $recognised = call_user_func(array($ds_class, 'Recognise'), $targetstring);
 								$recognised = $this->plugins['data'][$ds_class]->Recognise($targetstring);
 
 								if( $recognised )
@@ -899,7 +889,6 @@ function ReadData()
 						foreach ($myobj->targets as $target)
 						{
 							wm_debug ("ReadData: New Target: $target[4]\n");
-	#						debug ( var_dump($target));
 	
 							$targetstring = $target[0];
 							$multiply = $target[1];
@@ -973,8 +962,6 @@ function ReadData()
 					wm_debug("ReadData: Skipping $type $name that looks like a template\n.");
 				}
 
-				# $this->links[$name]->bandwidth_in=$total_in;
-				# $this->links[$name]->bandwidth_out=$total_out;
 				$myobj->bandwidth_in = $total_in;
 				$myobj->bandwidth_out = $total_out;
 
@@ -994,8 +981,6 @@ function ReadData()
 					$myobj->outpercent = (($total_out) / ($myobj->max_bandwidth_out)) * 100;
 					$myobj->inpercent = (($total_in) / ($myobj->max_bandwidth_in)) * 100;
 				}
-
-				# print $myobj->name."=>".$myobj->inpercent."%/".$myobj->outpercent."\n";
 
                                 $warn_in = true;
                                 $warn_out = true;
@@ -1068,7 +1053,6 @@ function DrawLabelRotated($im, $x, $y, $angle, $text, $font, $padding, $linkname
 		))
 	{
 		$bgcol=myimagecolorallocate($im, $bgcolour[0], $bgcolour[1], $bgcolour[2]);
-		# imagefilledrectangle($im, $x1, $y1, $x2, $y2, $bgcol);
 		imagefilledpolygon($im,$points,4,$bgcol);
 	}
 
@@ -1080,7 +1064,6 @@ function DrawLabelRotated($im, $x, $y, $angle, $text, $font, $padding, $linkname
 		))
 	{
 		$outlinecol=myimagecolorallocate($im, $outlinecolour[0], $outlinecolour[1], $outlinecolour[2]);
-		# imagerectangle($im, $x1, $y1, $x2, $y2, $outlinecol);
 		imagepolygon($im,$points,4,$outlinecol);
 	}
 
@@ -1101,93 +1084,6 @@ function DrawLabelRotated($im, $x, $y, $angle, $text, $font, $padding, $linkname
 		wm_debug ("Adding Poly imagemap for $areaname\n");
 	}
 
-}
-
-function ColourFromPercent($image, $percent,$scalename="DEFAULT",$name="")
-{
-	$col = NULL;
-	$tag = '';
-	
-	$nowarn_clipping = intval($this->get_hint("nowarn_clipping"));
-	$nowarn_scalemisses = intval($this->get_hint("nowarn_scalemisses"));
-
-	$bt = debug_backtrace();
-	$function = (isset($bt[1]['function']) ? $bt[1]['function'] : '');
-	print "$function calls ColourFromPercent\n";
-
-	exit();
-
-	if(isset($this->colours[$scalename]))
-	{
-		$colours=$this->colours[$scalename];
-
-		if ($percent > 100)
-		{
-			if($nowarn_clipping==0) wm_warn ("ColourFromPercent: Clipped $name $percent% to 100% [WMWARN33]\n");
-			$percent=100;
-		}
-
-		foreach ($colours as $key => $colour)
-		{
-			if (($percent >= $colour['bottom']) and ($percent <= $colour['top']))
-			{
-				if(isset($colour['tag'])) $tag = $colour['tag'];
-
-				// we get called early now, so might not need to actually allocate a colour
-				if(isset($image))
-				{
-					if (isset($colour['red2']))
-					{
-						if($colour["bottom"] == $colour["top"])
-						{
-							$ratio = 0;
-						}
-						else
-						{
-							$ratio=($percent - $colour["bottom"]) / ($colour["top"] - $colour["bottom"]);
-						}
-
-						$r=$colour["red1"] + ($colour["red2"] - $colour["red1"]) * $ratio;
-						$g=$colour["green1"] + ($colour["green2"] - $colour["green1"]) * $ratio;
-						$b=$colour["blue1"] + ($colour["blue2"] - $colour["blue1"]) * $ratio;
-
-						$col = myimagecolorallocate($image, $r, $g, $b);
-					}
-					else {
-						$r=$colour["red1"];
-						$g=$colour["green1"];
-						$b=$colour["blue1"];
-
-						$col = myimagecolorallocate($image, $r, $g, $b);
-						# $col = $colour['gdref1'];
-					}
-					wm_debug("CFPC $name $tag $key $r $g $b\n");
-				}
-
-				### warn(">>TAGS CFPC $tag\n");
-
-				return(array($col,$key,$tag));
-			}
-		}
-	}
-	else
-	{
-		if($scalename != 'none')
-		{
-			wm_warn("ColourFromPercent: Attempted to use non-existent scale: $scalename for $name [WMWARN09]\n");
-		}
-		else
-		{
-			return array($this->white,'','');
-		}
-	}
-
-	// you'll only get grey for a COMPLETELY quiet link if there's no 0 in the SCALE lines
-	if ($percent == 0) { return array($this->grey,'',''); }
-
-	// and you'll only get white for a link with no colour assigned
-	if($nowarn_scalemisses==0) wm_warn("ColourFromPercent: Scale $scalename doesn't cover $percent% for $name [WMWARN29]\n");
-	return array($this->white,'','');
 }
 
 function NewColourFromPercent($value,$scalename="DEFAULT",$name="",$is_percent=TRUE, $scale_warning=TRUE)
@@ -1239,9 +1135,6 @@ function NewColourFromPercent($value,$scalename="DEFAULT",$name="",$is_percent=T
 					$r=$colour["red1"];
 					$g=$colour["green1"];
 					$b=$colour["blue1"];
-
-					# $col = new Colour($r, $g, $b);
-					# $col = $colour['gdref1'];
 				}
 				
 				// change in behaviour - with multiple matching ranges for a value, the smallest range wins
@@ -1333,23 +1226,18 @@ function DrawLegend_Horizontal($im,$scalename="DEFAULT",$width=400)
 
 	$font=$this->keyfont;
 
-	# $x=$this->keyx[$scalename];
-	# $y=$this->keyy[$scalename];
 	$x = 0;
 	$y = 0;
 
-	# $width = 400;
 	$scalefactor = $width/100;
 
 	list($tilewidth, $tileheight)=$this->myimagestringsize($font, "100%");
 	$box_left = $x;
-	# $box_left = 0;
 	$scale_left = $box_left + 4 + $scalefactor/2;
 	$box_right = $scale_left + $width + $tilewidth + 4 + $scalefactor/2;
 	$scale_right = $scale_left + $width;
 
 	$box_top = $y;
-	# $box_top = 0;
 	$scale_top = $box_top + $tileheight + 6;
 	$scale_bottom = $scale_top + $tileheight * 1.5;
 	$box_bottom = $scale_bottom + $tileheight * 2 + 6;
@@ -1414,13 +1302,10 @@ function DrawLegend_Vertical($im,$scalename="DEFAULT",$height=400,$inverted=fals
 	$x=$this->keyx[$scalename];
 	$y=$this->keyy[$scalename];
 
-	# $height = 400;
 	$scalefactor = $height/100;
 
 	list($tilewidth, $tileheight)=$this->myimagestringsize($font, "100%");
 
-	# $box_left = $x;
-	# $box_top = $y;
 	$box_left = 0;
 	$box_top = 0;
 
@@ -1527,9 +1412,6 @@ function DrawLegend_Classic($im,$scalename="DEFAULT",$use_tags=FALSE)
 
 	if (($this->keyx[$scalename] >= 0) && ($this->keyy[$scalename] >= 0))
 	{
-
-		# $minwidth = imagefontwidth($font) * strlen('XX 100%-100%')+10;
-		# $boxwidth = imagefontwidth($font) * strlen($title) + 10;
 		list($minwidth, $junk)=$this->myimagestringsize($font, 'MMMM 100%-100%');
 		list($minminwidth, $junk)=$this->myimagestringsize($font, 'MMMM ');
 		list($boxwidth, $junk)=$this->myimagestringsize($font, $title);
@@ -1542,15 +1424,12 @@ function DrawLegend_Classic($im,$scalename="DEFAULT",$use_tags=FALSE)
 				if ( isset($colour['tag']) )
 				{
 					list($w, $junk)=$this->myimagestringsize($font, $colour['tag']);
-					# print $colour['tag']." $w \n";
 					if($w > $max_tag) $max_tag = $w;
 				}
 			}
 			
 			// now we can tweak the widths, appropriately to allow for the tag strings
-			# print "$max_tag > $minwidth?\n";
 			if( ($max_tag + $minminwidth) > $minwidth) $minwidth = $minminwidth + $max_tag;
-			# print "minwidth is now $minwidth\n";
 		}
 
 		$minwidth+=10;
@@ -1602,7 +1481,6 @@ function DrawLegend_Classic($im,$scalename="DEFAULT",$use_tags=FALSE)
 						// calculate a small offset that can be added, which will hide the zero-value in a
 						// gradient, but not make the scale incorrect. A quarter of a pixel should do it.
 						$fudgefactor = ($colour['top'] - $colour['bottom'])/($tilewidth*4);
-						# warn("FUDGING $fudgefactor\n");
 					}
 
 					// if it's a gradient, red2 is defined, and we need to sweep the values
@@ -1621,7 +1499,6 @@ function DrawLegend_Classic($im,$scalename="DEFAULT",$use_tags=FALSE)
 					else
 					{
 						// pick a value in the middle...
-						//$value = ($colour['bottom'] + $colour['top']) / 2;
 						list($ccol,$junk) = $this->NewColourFromPercent($value, $scalename, "", FALSE);
 						$col = $ccol->gdallocate($scale_im);
 						imagefilledrectangle($scale_im, $x, $y, $x + $tilewidth, $y + $tileheight,
@@ -1651,9 +1528,6 @@ function DrawLegend_Classic($im,$scalename="DEFAULT",$use_tags=FALSE)
 
 		$this->imap->addArea("Rectangle", "LEGEND:$scalename", '',
 			array($this->keyx[$scalename], $this->keyy[$scalename], $this->keyx[$scalename] + $boxwidth, $this->keyy[$scalename] + $boxheight));
-		# $this->imap->setProp("href","#","LEGEND");
-		# $this->imap->setProp("extrahtml","onclick=\"position_legend();\"","LEGEND");
-
 	}
 }
 
@@ -1804,7 +1678,6 @@ function ReadConfig($input, $is_include=FALSE)
 			
 			$objectlinecount++;
 
-			#if (preg_match("/^\s*(LINK|NODE)\s+([A-Za-z][A-Za-z0-9_\.\-\:]*)\s*$/i", $buffer, $matches))
 			if (preg_match("/^\s*(LINK|NODE)\s+(\S+)\s*$/i", $buffer, $matches))
 			{
 				$objectlinecount = 0;
@@ -1986,8 +1859,6 @@ function ReadConfig($input, $is_include=FALSE)
 					
 					if(preg_match($keyword[1],$buffer,$matches))
 					{
-						# print "CONFIG MATCHED: ".$keyword[1]."\n";
-						
 						$this->usage_stats[$statskey]++;
 						
 						foreach ($keyword[2] as $key=>$val)
@@ -2019,7 +1890,6 @@ function ReadConfig($input, $is_include=FALSE)
 							}
 						}
 						$linematched++;
-						# print "\n\n";
 						break;
 					}
 				}
@@ -2105,7 +1975,6 @@ function ReadConfig($input, $is_include=FALSE)
 			if ( ( $last_seen=='NODE' || $last_seen=='LINK' ) && preg_match("/^\s*TARGET\s+(.*)\s*$/i", $buffer, $matches))
 			{
 				$linematched++;
-				# $targets=preg_split('/\s+/', $matches[1], -1, PREG_SPLIT_NO_EMPTY);
 				$rawtargetlist = $matches[1]." ";
 							
 				if($args[0]=='TARGET')
@@ -2302,8 +2171,6 @@ function ReadConfig($input, $is_include=FALSE)
 			}
 
 			// one REGEXP to rule them all:
-//				if(preg_match("/^\s*SCALE\s+([A-Za-z][A-Za-z0-9_]*\s+)?(\d+\.?\d*)\s+(\d+\.?\d*)\s+(\d+)\s+(\d+)\s+(\d+)(?:\s+(\d+)\s+(\d+)\s+(\d+))?\s*$/i",
-//	0.95b		if(preg_match("/^\s*SCALE\s+([A-Za-z][A-Za-z0-9_]*\s+)?(\d+\.?\d*)\s+(\d+\.?\d*)\s+(\d+)\s+(\d+)\s+(\d+)(?:\s+(\d+)\s+(\d+)\s+(\d+))?\s*(.*)$/i",
 			if(preg_match("/^\s*SCALE\s+([A-Za-z][A-Za-z0-9_]*\s+)?(\-?\d+\.?\d*[munKMGT]?)\s+(\-?\d+\.?\d*[munKMGT]?)\s+(?:(\d+)\s+(\d+)\s+(\d+)(?:\s+(\d+)\s+(\d+)\s+(\d+))?|(none))\s*(.*)$/i",
 				$buffer, $matches))
 			{
@@ -2595,8 +2462,6 @@ function ReadConfig($input, $is_include=FALSE)
 	
 	wm_debug("Building cache of z-layers and finalising bandwidth.\n");
 
-// 	$allitems = array_merge($this->links, $this->nodes);
-
 	$allitems = array();
 	foreach ($this->nodes as $node)
 	{
@@ -2633,8 +2498,6 @@ function ReadConfig($input, $is_include=FALSE)
 		{
 			wm_warn("Internal bug - found an item of type: ".$item->my_type()."\n");
 		}
-		// $item->max_bandwidth_in=unformat_number($item->max_bandwidth_in_cfg, $this->kilo);
-		// $item->max_bandwidth_out=unformat_number($item->max_bandwidth_out_cfg, $this->kilo);
 		
 		wm_debug (sprintf("   Setting bandwidth on ".$item->my_type()." $item->name (%s -> %d bps, %s -> %d bps, KILO = %d)\n", $item->max_bandwidth_in_cfg, $item->max_bandwidth_in, $item->max_bandwidth_out_cfg, $item->max_bandwidth_out, $this->kilo));		
 	}
@@ -2950,11 +2813,6 @@ function WriteConfig($filename)
 
 		fwrite($fd, $output);
 
-		## fwrite($fd,$this->nodes['DEFAULT']->WriteConfig());
-		## fwrite($fd,$this->links['DEFAULT']->WriteConfig());
-
-		# fwrite($fd, "\n\n# Node definitions:\n");
-
 		foreach (array("template","normal") as $which)
 		{
 			if($which == "template") fwrite($fd,"\n# TEMPLATE-only NODEs:\n");
@@ -3077,13 +2935,11 @@ function DrawMap($filename = '', $thumbnailfile = '', $thumbnailmax = 250, $with
 
 	$image=imagecreatetruecolor($this->width, $this->height);
 
-	# $image = imagecreate($this->width, $this->height);
 	if (!$image) { wm_warn
 		("Couldn't create output image in memory (" . $this->width . "x" . $this->height . ")."); }
 	else
 	{
 		ImageAlphaBlending($image, true);
-		# imageantialias($image,true);
 
 		// by here, we should have a valid image handle
 
@@ -3199,8 +3055,6 @@ function DrawMap($filename = '', $thumbnailfile = '', $thumbnailmax = 250, $with
         {
 		if($use_rel_overlay)
 		{
-		#		$overlay = myimagecolorallocate($image, 200, 0, 0);
-		
 			// first, we can show relatively positioned NODEs
 			foreach ($this->nodes as $node) {
 					if($node->relative_to != '')
@@ -3241,11 +3095,6 @@ function DrawMap($filename = '', $thumbnailfile = '', $thumbnailmax = 250, $with
 			}
 		}
         }
-
-		#$this->myimagestring($image, 3, 200, 100, "Test 1\nLine 2", $overlay,0);
-		
-#	$this->myimagestring($image, 30, 100, 100, "Test 1\nLine 2", $overlay,0);
-		#$this->myimagestring($image, 30, 200, 200, "Test 1\nLine 2", $overlay,45);
 
 		// Ready to output the results...
 
@@ -3346,190 +3195,177 @@ function DrawMap($filename = '', $thumbnailfile = '', $thumbnailmax = 250, $with
 function CleanUp()
 {
 	$all_layers = array_keys($this->seen_zlayers);
-
-    foreach ($all_layers as $z) {
-        $this->seen_zlayers[$z] = null;
-    }
-
-    foreach ($this->links as $link) {
-        $link->owner = null;
-        $link->a = null;
-        $link->b = null;
-
-        unset($link);
-    }
-
-    foreach ($this->nodes as $node) {
-        // destroy all the images we created, to prevent memory leaks
-
-        if (isset($node->image)) {
-            imagedestroy($node->image);
-        }
-        $node->owner = null;
-        unset($node);
-    }
-
-    // Clear up the other random hashes of information
-    $this->dsinfocache = null;
-    $this->colourtable = null;
-    $this->usage_stats = null;
-    $this->scales = null;
+	
+	foreach ($all_layers as $z) {
+	    $this->seen_zlayers[$z] = null;
+	}
+	
+	foreach ($this->links as $link) {
+	    $link->owner = null;
+	    $link->a = null;
+	    $link->b = null;
+	
+	    unset($link);
+	}
+	
+	foreach ($this->nodes as $node) {
+	    // destroy all the images we created, to prevent memory leaks
+	
+	    if (isset($node->image)) {
+		imagedestroy($node->image);
+	    }
+	    $node->owner = null;
+	    unset($node);
+	}
+	
+	// Clear up the other random hashes of information
+	$this->dsinfocache = null;
+	$this->colourtable = null;
+	$this->usage_stats = null;
+	$this->scales = null;
 
 }
 
 function PreloadMapHTML()
 {
 	wm_debug("Trace: PreloadMapHTML()\n");
-		//   onmouseover="return overlib('<img src=graph.png>',DELAY,250,CAPTION,'$caption');"  onmouseout="return nd();"
 
-		// find the middle of the map
-		$center_x=$this->width / 2;
-		$center_y=$this->height / 2;
+	// find the middle of the map
+	$center_x=$this->width / 2;
+	$center_y=$this->height / 2;
 
-		// loop through everything. Figure out along the way if it's a node or a link
-		$allitems = array(&$this->nodes, &$this->links);
-		reset($allitems);
+	// loop through everything. Figure out along the way if it's a node or a link
+	$allitems = array(&$this->nodes, &$this->links);
+	reset($allitems);
 
-		while( list($kk,) = each($allitems))
+	while( list($kk,) = each($allitems))
+	{
+		unset($objects);
+		# $objects = &$this->links;
+		$objects = &$allitems[$kk];
+
+		reset($objects);
+		while (list($k,) = each($objects))
 		{
-			unset($objects);
-			# $objects = &$this->links;
-			$objects = &$allitems[$kk];
+			unset($myobj);
+			$myobj = &$objects[$k];
 
-			reset($objects);
-			while (list($k,) = each($objects))
+			$type = $myobj->my_type();
+			$prefix = substr($type,0,1);
+
+			$dirs = array();
+			if($type == 'LINK') $dirs = array(IN=>array(0,2), OUT=>array(1,3));
+			if($type == 'NODE') $dirs = array(IN=>array(0,1,2,3));
+			
+			// check to see if any of the relevant things have a value
+			$change = "";
+			foreach ($dirs as $d=>$parts)
 			{
-				unset($myobj);
-				$myobj = &$objects[$k];
+				$change .= join('',$myobj->overliburl[$d]);
+				$change .= $myobj->notestext[$d];
+			}
+			
+			if ($this->htmlstyle == "overlib")
+			{
+				// skip all this if it's a template node
+				if($type=='LINK' && ! isset($myobj->a->name)) { $change = ''; }
+				if($type=='NODE' && ! isset($myobj->x)) { $change = ''; }
 
-				$type = $myobj->my_type();
-				$prefix = substr($type,0,1);
-
-				$dirs = array();
-				//print "\n\nConsidering a $type - ".$myobj->name.".\n";
-				if($type == 'LINK') $dirs = array(IN=>array(0,2), OUT=>array(1,3));
-				if($type == 'NODE') $dirs = array(IN=>array(0,1,2,3));
-				
-				// check to see if any of the relevant things have a value
-				$change = "";
-				foreach ($dirs as $d=>$parts)
+				if($change != '')
 				{
-					//print "$d - ".join(" ",$parts)."\n";
-					$change .= join('',$myobj->overliburl[$d]);
-					$change .= $myobj->notestext[$d];
-				}
-				
-				if ($this->htmlstyle == "overlib")
-				{
-					//print "CHANGE: $change\n";
-
-					// skip all this if it's a template node
-					if($type=='LINK' && ! isset($myobj->a->name)) { $change = ''; }
-					if($type=='NODE' && ! isset($myobj->x)) { $change = ''; }
-
-					if($change != '')
-					{
-						
-						if($type=='NODE')
-						{
-							$mid_x = $myobj->x;
-							$mid_y = $myobj->y;
-						}
-						if($type=='LINK')
-						{
-							$a_x = $this->nodes[$myobj->a->name]->x;
-							$a_y = $this->nodes[$myobj->a->name]->y;
-
-							$b_x = $this->nodes[$myobj->b->name]->x;
-							$b_y = $this->nodes[$myobj->b->name]->y;
-
-							$mid_x=($a_x + $b_x) / 2;
-							$mid_y=($a_y + $b_y) / 2;
-						}
-						$left=""; $above="";
-						$img_extra = "";
 					
-						if ($myobj->overlibwidth != 0)
-						{
-							$left="WIDTH," . $myobj->overlibwidth . ",";
-							$img_extra .= " WIDTH=$myobj->overlibwidth";
-
-							if ($mid_x > $center_x) $left.="LEFT,";
-						}
-						
-						if ($myobj->overlibheight != 0)
-						{
-							$above="HEIGHT," . $myobj->overlibheight . ",";
-							$img_extra .= " HEIGHT=$myobj->overlibheight";
-
-							if ($mid_y > $center_y) $above.="ABOVE,";
-						}
-						
-						foreach ($dirs as $dir=>$parts)
-						{
-							$caption = ($myobj->overlibcaption[$dir] != '' ? $myobj->overlibcaption[$dir] : $myobj->name);
-							$caption = $this->ProcessString($caption,$myobj);
-
-							$overlibhtml = "onmouseover=\"return overlib('";
-
-							$n = 0;
-							if(sizeof($myobj->overliburl[$dir]) > 0)
-							{
-								// print "ARRAY:".is_array($link->overliburl[$dir])."\n";
-								foreach ($myobj->overliburl[$dir] as $url)
-								{
-									if($n>0) { $overlibhtml .= '&lt;br /&gt;'; }
-									$overlibhtml .= "&lt;img $img_extra src=" . $this->ProcessString($url,$myobj) . "&gt;";
-									$n++;
-								}
-							}
-							# print "Added $n for $dir\n";
-							if(trim($myobj->notestext[$dir]) != '')
-							{
-								# put in a linebreak if there was an image AND notes
-								if($n>0) $overlibhtml .= '&lt;br /&gt;';
-								$note = $this->ProcessString($myobj->notestext[$dir],$myobj);
-								$note = htmlspecialchars($note, ENT_NOQUOTES);
-								$note=str_replace("'", "\\&apos;", $note);
-								$note=str_replace('"', "&quot;", $note);
-								$overlibhtml .= $note;
-							}
-							$overlibhtml .= "',DELAY,250,${left}${above}CAPTION,'" . $caption
-							. "');\"  onmouseout=\"return nd();\"";
-							
-							foreach ($parts as $part)
-							{
-								$areaname = $type.":" . $prefix . $myobj->id. ":" . $part;
-								//print "INFOURL for $areaname - ";
-							
-								$this->imap->setProp("extrahtml", $overlibhtml, $areaname);
-							}
-						}			
-					} // if change
-				} // overlib?
-				
-				// now look at inforurls
-				foreach ($dirs as $dir=>$parts)
-				{
-					foreach ($parts as $part)
+					if($type=='NODE')
 					{
-						# $areaname = $type.":" . $myobj->name . ":" . $part;
-						$areaname = $type.":" . $prefix . $myobj->id. ":" . $part;
-						//print "INFOURL for $areaname - ";
-												
-						if ( ($this->htmlstyle != 'editor') && ($myobj->infourl[$dir] != '') ) {
-							$this->imap->setProp("href", $this->ProcessString($myobj->infourl[$dir],$myobj), $areaname);
-							//print "Setting.\n";
-						}
-						else
+						$mid_x = $myobj->x;
+						$mid_y = $myobj->y;
+					}
+					if($type=='LINK')
+					{
+						$a_x = $this->nodes[$myobj->a->name]->x;
+						$a_y = $this->nodes[$myobj->a->name]->y;
+
+						$b_x = $this->nodes[$myobj->b->name]->x;
+						$b_y = $this->nodes[$myobj->b->name]->y;
+
+						$mid_x=($a_x + $b_x) / 2;
+						$mid_y=($a_y + $b_y) / 2;
+					}
+					$left=""; $above="";
+					$img_extra = "";
+				
+					if ($myobj->overlibwidth != 0)
+					{
+						$left="WIDTH," . $myobj->overlibwidth . ",";
+						$img_extra .= " WIDTH=$myobj->overlibwidth";
+
+						if ($mid_x > $center_x) $left.="LEFT,";
+					}
+					
+					if ($myobj->overlibheight != 0)
+					{
+						$above="HEIGHT," . $myobj->overlibheight . ",";
+						$img_extra .= " HEIGHT=$myobj->overlibheight";
+
+						if ($mid_y > $center_y) $above.="ABOVE,";
+					}
+					
+					foreach ($dirs as $dir=>$parts)
+					{
+						$caption = ($myobj->overlibcaption[$dir] != '' ? $myobj->overlibcaption[$dir] : $myobj->name);
+						$caption = $this->ProcessString($caption,$myobj);
+
+						$overlibhtml = "onmouseover=\"return overlib('";
+
+						$n = 0;
+						if(sizeof($myobj->overliburl[$dir]) > 0)
 						{
-							//print "NOT Setting.\n";
+							// print "ARRAY:".is_array($link->overliburl[$dir])."\n";
+							foreach ($myobj->overliburl[$dir] as $url)
+							{
+								if($n>0) { $overlibhtml .= '&lt;br /&gt;'; }
+								$overlibhtml .= "&lt;img $img_extra src=" . $this->ProcessString($url,$myobj) . "&gt;";
+								$n++;
+							}
 						}
+
+						if(trim($myobj->notestext[$dir]) != '')
+						{
+							# put in a linebreak if there was an image AND notes
+							if($n>0) $overlibhtml .= '&lt;br /&gt;';
+							$note = $this->ProcessString($myobj->notestext[$dir],$myobj);
+							$note = htmlspecialchars($note, ENT_NOQUOTES);
+							$note=str_replace("'", "\\&apos;", $note);
+							$note=str_replace('"', "&quot;", $note);
+							$overlibhtml .= $note;
+						}
+						$overlibhtml .= "',DELAY,250,${left}${above}CAPTION,'" . $caption
+						. "');\"  onmouseout=\"return nd();\"";
+						
+						foreach ($parts as $part)
+						{
+							$areaname = $type.":" . $prefix . $myobj->id. ":" . $part;
+						
+							$this->imap->setProp("extrahtml", $overlibhtml, $areaname);
+						}
+					}			
+				} // if change
+			} // overlib?
+			
+			// now look at inforurls
+			foreach ($dirs as $dir=>$parts)
+			{
+				foreach ($parts as $part)
+				{
+					$areaname = $type.":" . $prefix . $myobj->id. ":" . $part;
+											
+					if ( ($this->htmlstyle != 'editor') && ($myobj->infourl[$dir] != '') ) {
+						$this->imap->setProp("href", $this->ProcessString($myobj->infourl[$dir],$myobj), $areaname);
 					}
 				}
-			
 			}
+		
 		}
+	}
 	
 }
 
@@ -3539,13 +3375,11 @@ function asJS()
 
 	$js .= "var Links = new Array();\n";
 	$js .= "var LinkIDs = new Array();\n";
-	# $js.=$this->defaultlink->asJS();
 
 	foreach ($this->links as $link) { $js.=$link->asJS(); }
 
 	$js .= "var Nodes = new Array();\n";
 	$js .= "var NodeIDs = new Array();\n";
-	# $js.=$this->defaultnode->asJS();
 
 	foreach ($this->nodes as $node) { $js.=$node->asJS(); }
 
@@ -3665,14 +3499,12 @@ function SortedImagemap($imagemapname)
                             $html .= $this->imap->subHTML("TIMESTAMP",true,($this->context != 'editor'));
                         }
 
-                        foreach($z_items as $it)
-                        {
-                                # print "     " . $it->name . "\n";
+                        foreach($z_items as $it) {
                                 if($it->name != 'DEFAULT' && $it->name != ":: DEFAULT ::")
                                 {
                                         $name = "";
-                                        if(strtolower(get_class($it))=='weathermaplink') $name = "LINK:L";
-                                        if(strtolower(get_class($it))=='weathermapnode') $name = "NODE:N";
+                                        if (strtolower(get_class($it))=='weathermaplink') $name = "LINK:L";
+                                        if (strtolower(get_class($it))=='weathermapnode') $name = "NODE:N";
                                         $name .= $it->id . ":";
                                         wm_debug("      Writing $name from imagemap\n");
                                         // skip the linkless areas if we are in the editor - they're redundant
@@ -3802,7 +3634,6 @@ function CacheUpdate($agelimit=600)
 		
 		$fd = fopen($cachefolder.DIRECTORY_SEPARATOR.$cacheprefix."_nodes.json","w");
 		$json = "";
-//		$json = $this->defaultnode->asJSON(TRUE);
 		foreach ($this->nodes as $node) { $json .= $node->asJSON(TRUE); }
 		$json = rtrim($json,", \n");
 		fputs($fd,$json);
@@ -3810,7 +3641,6 @@ function CacheUpdate($agelimit=600)
 
 		$fd = fopen($cachefolder.DIRECTORY_SEPARATOR.$cacheprefix."_nodes_lite.json","w");
 		$json = "";
-//		$json = $this->defaultnode->asJSON(FALSE);
 		foreach ($this->nodes as $node) { $json .= $node->asJSON(FALSE); }
 		$json = rtrim($json,", \n");
 		fputs($fd,$json);
@@ -3820,7 +3650,6 @@ function CacheUpdate($agelimit=600)
 
 		$fd = fopen($cachefolder.DIRECTORY_SEPARATOR.$cacheprefix."_links.json","w");
 		$json = "";
-//		$json = $this->defaultlink->asJSON(TRUE);
 		foreach ($this->links as $link) { $json .= $link->asJSON(TRUE); }
 		$json = rtrim($json,", \n");
 		fputs($fd,$json);
@@ -3828,7 +3657,6 @@ function CacheUpdate($agelimit=600)
 
 		$fd = fopen($cachefolder.DIRECTORY_SEPARATOR.$cacheprefix."_links_lite.json","w");
 		$json = "";
-//		$json = $this->defaultlink->asJSON(FALSE);
 		foreach ($this->links as $link) { $json .= $link->asJSON(FALSE); }
 		$json = rtrim($json,", \n");
 		fputs($fd,$json);
@@ -3936,7 +3764,6 @@ function DumpStats($filename="")
                     }
                     fclose($fd);
                 }
-#               print "Loaded $i non-zero coverage stats.\n";
         }
 
         function SaveCoverage($file)
@@ -3948,7 +3775,6 @@ function DumpStats($filename="")
                         if($val > 0) { $i++; }
                 }
                 fclose($fd);
-#               print "Saved $i non-zero coverage stats.\n";
         }
 
 

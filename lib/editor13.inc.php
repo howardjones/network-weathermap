@@ -19,7 +19,7 @@
   */
 function fix_gpc_string($input) 
 {
-    if (true == function_exists('get_magic_quotes_gpc') && 1 == get_magic_quotes_gpc()) {
+    if (TRUE == function_exists('get_magic_quotes_gpc') && 1 == get_magic_quotes_gpc()) {
         $input = stripslashes($input);
     }
     return ($input);
@@ -46,20 +46,20 @@ function wm_editor_sanitize_string($str) {
 function wm_editor_validate_bandwidth($bw) {
   
     if(preg_match( "/^(\d+\.?\d*[KMGT]?)$/", $bw) ) {
-	return true;
+	return TRUE;
     }
-    return false;
+    return FALSE;
 }
 
-function wm_editor_validate_one_of($input,$valid=array(),$case_sensitive=false) {
+function wm_editor_validate_one_of($input,$valid=array(),$case_sensitive=FALSE) {
     if(! $case_sensitive ) $input = strtolower($input);
     
     foreach ($valid as $v) {
 	if(! $case_sensitive ) $v = strtolower($v);
-	if($v == $input) return true;
+	if($v == $input) return TRUE;
     }
     
-    return false;
+    return FALSE;
 }
 
 // Labels for Nodes, Links and Scales shouldn't have spaces in
@@ -82,12 +82,12 @@ function wm_editor_sanitize_file($filename,$allowed_exts=array()) {
     
     if ($filename == "") return "";
         
-    $ok = false;
+    $ok = FALSE;
     foreach ($allowed_exts as $ext) {
 	$match = ".".$ext;
 	
 	if( substr($filename, -strlen($match),strlen($match)) == $match) {
-	    $ok = true;
+	    $ok = TRUE;
 	}
     }    
     if(! $ok ) return "";
@@ -119,7 +119,7 @@ function snap($coord, $gridsnap = 0)
 
 function extract_with_validation($array, $paramarray)
 {
-	$all_present=true;
+	$all_present=TRUE;
 	$candidates=array( );
 
 	foreach ($paramarray as $var) {
@@ -128,7 +128,7 @@ function extract_with_validation($array, $paramarray)
 		$varreqd=$var[2];
 
 		if ($varreqd == 'req' && !array_key_exists($varname, $array)) { 
-	            $all_present=false; 
+	            $all_present=FALSE; 
 	        }
 
 		if (array_key_exists($varname, $array)) {
@@ -140,28 +140,28 @@ function extract_with_validation($array, $paramarray)
 			{
 			case 'int':
 				if (!preg_match('/^\-*\d+$/', $varvalue)) { 
-                    $all_present=false; 
+                    $all_present=FALSE; 
                 }
 
 				break;
 
 			case 'float':
 				if (!preg_match('/^\d+\.\d+$/', $varvalue)) { 
-                    $all_present=false; 
+                    $all_present=FALSE; 
                 }
 
 				break;
 
 			case 'yesno':
 				if (!preg_match('/^(y|n|yes|no)$/i', $varvalue)) { 
-                    $all_present=false; 
+                    $all_present=FALSE; 
                 }
 
 				break;
 
 			case 'sqldate':
 				if (!preg_match('/^\d\d\d\d\-\d\d\-\d\d$/i', $varvalue)) { 
-                    $all_present=false; 
+                    $all_present=FALSE; 
                 }
 
 				break;
@@ -172,34 +172,34 @@ function extract_with_validation($array, $paramarray)
 
 			case 'ip':
 				if (!preg_match( '/^((\d|[1-9]\d|2[0-4]\d|25[0-5]|1\d\d)(?:\.(\d|[1-9]\d|2[0-4]\d|25[0-5]|1\d\d)){3})$/', $varvalue)) { 
-                    $all_present=false; 
+                    $all_present=FALSE; 
                 }
 
 				break;
 
 			case 'alpha':
 				if (!preg_match('/^[A-Za-z]+$/', $varvalue)) { 
-                    $all_present=false; 
+                    $all_present=FALSE; 
                 }
 
 				break;
 
 			case 'alphanum':
 				if (!preg_match('/^[A-Za-z0-9]+$/', $varvalue)) { 
-                    $all_present=false; 
+                    $all_present=FALSE; 
                 }
 
 				break;
 
 			case 'bandwidth':
 				if (!preg_match('/^\d+\.?\d*[KMGT]*$/i', $varvalue)) { 
-                    $all_present=false; 
+                    $all_present=FALSE; 
                 }
 				break;
 
 			default:
 				// an unknown type counts as an error, really
-				$all_present=false;
+				$all_present=FALSE;
 
 				break;
 			}
@@ -318,9 +318,9 @@ function show_editor_startpage()
 {
 	global $mapdir, $WEATHERMAP_VERSION, $config_loaded, $cacti_found, $ignore_cacti,$configerror;
 
-	$fromplug = false;
+	$fromplug = FALSE;
 	if (isset($_REQUEST['plug']) && (intval($_REQUEST['plug'])==1) ) { 
-	    $fromplug = true; 
+	    $fromplug = TRUE; 
 	}
 
 	$matches=0;
@@ -362,12 +362,6 @@ function show_editor_startpage()
 	print 'Welcome to the Weathermap '.$WEATHERMAP_VERSION.' editor</h3>';
 	print '</div><div class="modal-body">';
 	
-	# print '<div style="border: 3px dashed red; background: #055; padding: 5px; font-size: 90%;"><b>NOTE:</b> This editor is not finished! There are many features of ';
-	# print 'Weathermap that you will be missing out on if you choose to use the editor only.';
-	# print 'These include: curves, node offsets, font definitions, colour changing, per-node/per-link settings and image uploading. You CAN use the editor without damaging these features if you added them by hand, however.</div><p>';
-	
-	# print 'Do you want to:<p>';
-	
 	print '<form method="GET" class="form-inline">';
 	print '<label><strong>Create A New Map</strong>, named</label> ';	
 	print '<div class="input-append"><input type="text" name="mapname" size="20"><span class="add-on">.conf</span></div>';
@@ -387,7 +381,7 @@ function show_editor_startpage()
 		$dh=opendir($mapdir);
 
 		if ($dh) {
-		    while (false !== ($file = readdir($dh))) {
+		    while (FALSE !== ($file = readdir($dh))) {
 			$realfile=$mapdir . DIRECTORY_SEPARATOR . $file;
 			$note = "";
 	
@@ -429,7 +423,6 @@ function show_editor_startpage()
 	    $errorstring = "NO DIRECTORY named $mapdir"; 
 	}
 
-	# print 'OR<br />';
 	print "<hr>";
 	
 	print '<form method="GET"  class="form-inline">';
@@ -456,7 +449,6 @@ function show_editor_startpage()
 	
 	print "<hr>";
 	
-	# print 'OR<br />';
 	print 'or <strong>Open An Existing Map</strong>:';
 	print '<div id="existinglist"><ul class="filelist">';
 

@@ -489,7 +489,12 @@ if($cycle) {
 			// available maps, and making sure each one gets equal time in the 5 minute period.
 ?>
         <script type = "text/javascript">           
-            
+        
+        var KEYCODE_ESCAPE = 27;
+        var KEYCODE_LEFT = 37;
+        var KEYCODE_RIGHT = 39
+        var KEYCODE_SPACE = 32;
+        
 	    jQuery.fn.center = function () {
 		this.css("position","fixed");
 		this.css("top", Math.max(0, (($(window).height() - $(this).outerHeight()) / 2) + 
@@ -597,8 +602,8 @@ if($cycle) {
 		wm_switchmap(-1);
 	    }
 	    
-            function wm_initJS()
-            {        	
+        function wm_initJS()
+        {        	
 		wm_nmaps = $(".weathermapholder").length;
 
 		$("#wm_total_map").text(wm_nmaps);
@@ -608,19 +613,23 @@ if($cycle) {
 		$("#cycle_prev").click(wm_prev);
 		
 		$(document).keyup( function (event) {
-			if (event.keyCode == 27) {
-				$("a#cycle_stop").click();
+            if (event.keyCode == KEYCODE_ESCAPE) {
+				window.location.href = $('#cycle_stop').attr('href');
+                event.preventDefault();
 			}
-			if (event.keyCode == 32) {
+            
+			if (event.keyCode == KEYCODE_SPACE) {
 				wm_pause();
 				event.preventDefault();
 			}
-			if (event.keyCode == 37) {
+            // left
+			if (event.keyCode == KEYCODE_LEFT) {
 				wm_prev();
 				event.preventDefault();
 			}
-			if (event.keyCode == 39) {
-				wm_prev();
+            // right
+			if (event.keyCode == KEYCODE_RIGHT) {
+				wm_next();
 				event.preventDefault();
 			}
 		});

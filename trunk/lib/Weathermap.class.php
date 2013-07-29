@@ -3750,17 +3750,19 @@ function DumpStats($filename="")
         function LoadCoverage($file)
         {
                 return 0;
-                $i=0;
+                $i = 0;
                 $fd = fopen($file,"r");
-                if(is_resource($fd)) {
-                    while(! feof($fd)) {
-                            $line = fgets($fd,1024);
-                            $line = trim($line);
-                            list($val,$key) = explode("\t",$line);
-                            if($key != "") {
-                                $this->coverage[$key] = $val;
-                            }
-                            if($val > 0) { $i++; }
+                if (is_resource($fd)) {
+                    while (! feof($fd)) {
+			$line = fgets($fd,1024);
+			$line = trim($line);
+			list($val,$key) = explode("\t",$line);
+			if ($key != "") {
+			    $this->coverage[$key] = $val;
+			}
+                        if ($val > 0) {
+				$i++;
+			}
                     }
                     fclose($fd);
                 }
@@ -3768,11 +3770,13 @@ function DumpStats($filename="")
 
         function SaveCoverage($file)
         {
-                $i=0;
+                $i = 0;
                 $fd = fopen($file,"w+");
                 foreach ($this->coverage as $key=>$val) {
                         fputs($fd, "$val\t$key\n");
-                        if($val > 0) { $i++; }
+                        if ($val > 0) {
+				$i++;
+			}
                 }
                 fclose($fd);
         }
@@ -3780,5 +3784,5 @@ function DumpStats($filename="")
 
 
 };
+
 // vim:ts=4:sw=4:
-?>

@@ -2,8 +2,8 @@
 	
 # This file is from Weathermap version 0.97d	
 	
-require_once 'lib/editor.inc.php';
-require_once 'lib/Weathermap.class.php';
+require_once dirname(__FILE__).'/lib/editor.inc.php';
+require_once dirname(__FILE__).'/lib/Weathermap.class.php';
 
 // so that you can't have the editor active, and not know about it.
 $ENABLED=true;

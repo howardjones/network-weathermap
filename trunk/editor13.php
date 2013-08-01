@@ -2,8 +2,8 @@
 	
 # This file is from Weathermap version 0.97d	
 	
-require_once 'lib/editor13.inc.php';
-require_once 'lib/Weathermap.class.php';
+// require_once 'lib/editor13.inc.php';
+require_once 'lib/WeatherMapEditorUI.class.php';
 
 // so that you can't have the editor active, and not know about it.
 $ENABLED=true;
@@ -15,62 +15,21 @@ if(! $ENABLED)
     exit();
 }
 
-// sensible defaults
-$mapdir='configs';
-$cacti_base = '../../';
-$cacti_url = '/';
-$ignore_cacti=FALSE;
-$configerror = '';
+// $config_loaded = @include_once 'editor-config.php';
 
-$config_loaded = @include_once 'editor-config.php';
+// if (isset($config)) {
+//    $configerror = 'OLD editor config file format. The format of this file changed in version 0.92 - please check the new editor-config.php-dist and update your editor-config.php file. [WMEDIT02]';
+// }
 
-// these are all set via the Editor Settings dialog, in the editor, now.
-$use_overlay = FALSE; // set to TRUE to enable experimental overlay showing VIAs
-$use_relative_overlay = FALSE; // set to TRUE to enable experimental overlay showing relative-positioning
-$grid_snap_value = 0; // set non-zero to snap to a grid of that spacing
+$ui = new WeatherMapEditorUI();
+$ui->moduleChecks();
+$cacti_found = $ui->loadCacti($cacti_base);
 
-if( isset($_COOKIE['wmeditor']))
-{
-    $parts = explode(":",$_COOKIE['wmeditor']);
-    
-    if( (isset($parts[0])) && (intval($parts[0]) == 1) ) { $use_overlay = TRUE; }
-    if( (isset($parts[1])) && (intval($parts[1]) == 1) ) { $use_relative_overlay = TRUE; }
-    if( (isset($parts[2])) && (intval($parts[2]) != 0) ) { $grid_snap_value = intval($parts[2]); }   
-}
-
-if( isset($config) )
-{
-    $configerror = 'OLD editor config file format. The format of this file changed in version 0.92 - please check the new editor-config.php-dist and update your editor-config.php file. [WMEDIT02]';
-}
-
-// check if the goalposts have moved
-if( is_dir($cacti_base) && file_exists($cacti_base."/include/global.php") )
-{
-	// include the cacti-config, so we know about the database
-	include_once($cacti_base."/include/global.php");
-	$config['base_url'] = $cacti_url;
-	$cacti_found = TRUE;
-}
-elseif( is_dir($cacti_base) && file_exists($cacti_base."/include/config.php") )
-{
-	// include the cacti-config, so we know about the database
-	include_once($cacti_base."/include/config.php");
-
-	$config['base_url'] = $cacti_url;
-	$cacti_found = TRUE;
-}
-else
-{
-	$cacti_found = FALSE;
-}
-
-if($cacti_found && isset($plugins))
-{
+if ($cacti_found && isset($plugins)) {
 	# here, we know we're part of a plugin - do auth stuff
 }
 
-if(! is_writable($mapdir))
-{
+if (!is_writable($mapdir)) {
 	$configerror = "The map config directory is not writable by the web server user. You will not be able to edit any files until this is corrected. [WMEDIT01]";
 }
 
@@ -85,26 +44,16 @@ $param = '';
 $param2 = '';
 $log = '';
 
-if(!wm_module_checks())
-{
-	print "<b>Required PHP extensions are not present in your mod_php/ISAPI PHP module. Please check your PHP setup to ensure you have the GD extension installed and enabled.</b><p>";
-	print "If you find that the weathermap tool itself is working, from the command-line or Cacti poller, then it is possible that you have two different PHP installations. The Editor uses the same PHP that webpages on your server use, but the main weathermap tool uses the command-line PHP interpreter.<p>";
-	print "<p>You should also run <a href=\"check.php\">check.php</a> to help make sure that there are no problems.</p><hr/>";
-	print "Here is a copy of the phpinfo() from your PHP web module, to help debugging this...<hr>";
-	phpinfo();
-	exit();
-}
+$ui->main();
 
-if(isset($_REQUEST['action'])) { $action = $_REQUEST['action']; }
-if(isset($_REQUEST['mapname'])) { $mapname = $_REQUEST['mapname'];  $mapname = wm_editor_sanitize_conffile($mapname); }
-if(isset($_REQUEST['selected'])) { $selected = wm_editor_sanitize_selected($_REQUEST['selected']); }
+// if (isset($_REQUEST['selected'])) { $selected = wm_editor_sanitize_selected($_REQUEST['selected']); }
 
 $weathermap_debugging=FALSE;
 
 if($mapname == '')
 {
-	// this is the file-picker/welcome page
-	show_editor_startpage();
+    // this is the file-picker/welcome page
+    show_editor_startpage();
 }
 else
 {  

@@ -4,11 +4,11 @@
 // http://www.network-weathermap.com/
 // Released under the GNU Public License
 
-require_once "HTML_ImageMap.class.php";
+require_once dirname(__FILE__).'/HTML_ImageMap.class.php';
 
-require_once "WeatherMap.functions.php";
-require_once "WeatherMapNode.class.php";
-require_once "WeatherMapLink.class.php";
+require_once dirname(__FILE__).'/WeatherMap.functions.php';
+require_once dirname(__FILE__).'/WeatherMapNode.class.php';
+require_once dirname(__FILE__).'/WeatherMapLink.class.php';
 
 $WEATHERMAP_VERSION="0.98";
 $weathermap_debugging=FALSE;
@@ -425,9 +425,9 @@ class WeatherMap extends WeatherMapBase
 			$this->fonts[$i]->size=0;
 		}
 
-		$this->LoadPlugins('data', 'lib' . DIRECTORY_SEPARATOR . 'datasources');
-		$this->LoadPlugins('pre', 'lib' . DIRECTORY_SEPARATOR . 'pre');
-		$this->LoadPlugins('post', 'lib' . DIRECTORY_SEPARATOR . 'post');
+		$this->LoadPlugins('data', dirname(__FILE__) . DIRECTORY_SEPARATOR . 'datasources');
+		$this->LoadPlugins('pre', dirname(__FILE__) . DIRECTORY_SEPARATOR . 'pre');
+		$this->LoadPlugins('post', dirname(__FILE__) . DIRECTORY_SEPARATOR . 'post');
 
 		wm_debug("WeatherMap class Reset() complete\n");
 	}

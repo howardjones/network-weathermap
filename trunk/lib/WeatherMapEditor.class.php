@@ -4,7 +4,7 @@
 // http://www.network-weathermap.com/
 // Released under the GNU Public License
 
-require_once "Weathermap.class.php";
+require_once dirname(__FILE__).'/Weathermap.class.php';
 
 /** Wrapper API around WeatherMap to provide the relevant operations to manipulate
  *  the map contents that an editor will need, without it needing to see inside the map object.

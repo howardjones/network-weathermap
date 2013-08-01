@@ -4,7 +4,7 @@
 // http://www.network-weathermap.com/
 // Released under the GNU Public License
 
-require_once "HTML_ImageMap.class.php";
+require_once dirname(__FILE__).'/HTML_ImageMap.class.php';
 
 class WeatherMapLink extends WeatherMapItem
 {

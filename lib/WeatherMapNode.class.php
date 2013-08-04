@@ -54,12 +54,14 @@ class WeatherMapNode extends WeatherMapItem
 	var $template;
 	var $polar;
 	var $boundingboxes=array();
+	var $named_offsets=array();
 
 	function WeatherMapNode()
 	{
 		$this->inherit_fieldlist=array
 			(
 				'boundingboxes'=>array(),
+				'named_offsets'=>array(),
 				'my_default' => NULL,
 				'label' => '',
 				'proclabel' => '',
@@ -501,6 +503,7 @@ class WeatherMapNode extends WeatherMapItem
 				$map->nodes[$this->name]->height = imagesy($icon_im);
 
 				$map->nodes[$this->name]->boundingboxes[] = array($icon_x1, $icon_y1, $icon_x2, $icon_y2);
+				
 			}
 
 		}
@@ -838,6 +841,21 @@ class WeatherMapNode extends WeatherMapItem
 				.="\tMAXVALUE " . $this->max_bandwidth_in_cfg . " " . $this->max_bandwidth_out_cfg . "\n"; }
 			}
 
+			foreach ($this->named_offsets as $off_name=>$off_pos)
+			{
+				// if the offset exists with different values, or
+				// doesn't exist at all in the template, we need to write
+				// some config for it
+				if (  (isset($dd->named_offsets[$off_name]) &&
+				     ($dd->named_offsets[$off_name][0] != $off_pos[0])
+				     || ($dd->named_offsets[$off_name][1] != $off_pos[1]))
+				    || (!isset($dd->named_offsets[$off_name]))
+				    ) {
+
+				    $output .= sprintf("DEFINEOFFSET %s %d %d\n", $off_name, $off_pos[0], $off_pos[1]);					
+				}
+			}
+			
 			foreach ($this->hints as $hintname=>$hint)
 			{
 			  // all hints for DEFAULT node are for writing

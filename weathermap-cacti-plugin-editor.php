@@ -17,5 +17,5 @@
 
     require_once $config['library_path'] . '/database.php';
 
-    require_once 'editor.php';
+    require_once dirname(__FILE__).'/editor.php';
 ?>

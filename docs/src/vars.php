@@ -1,1 +1,1 @@
-<?php $WEATHERMAP_VERSION='v0.97c'; ?>
+<?php $WEATHERMAP_VERSION='v0.97d'; ?>

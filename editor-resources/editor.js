@@ -118,9 +118,8 @@ function attach_click_events()
 
     jQuery("#link_delete").click(delete_link);
     jQuery("#link_edit").click(edit_link);
-
-    jQuery("#link_vert").click(align_link_v);
-    jQuery("#link_horiz").click(align_link_h);
+    
+    jQuery("#link_tidy").click(tidy_link);
     jQuery("#link_via").click(via_link);
         
     jQuery('.wm_submit').click(do_submit);
@@ -712,17 +711,12 @@ function coord_release(event)
     jQuery('#tb_coords').html('Position<br />---, ---');
 }
 
-function align_link_h()
+function tidy_link()
 {
-    document.getElementById('action').value = "link_align_horizontal";
+    document.getElementById('action').value = "link_tidy";
     document.frmMain.submit();
 }
 
-function align_link_v()
-{
-    document.getElementById('action').value = "link_align_vertical";
-    document.frmMain.submit();
-}
 
 function attach_help_events()
 {

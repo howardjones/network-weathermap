@@ -26,7 +26,7 @@
     </description>
 
     <changes>
-        <change version="0.96">Added warning for proably-wrong positions
+        <change version="0.96">Added warning for probably-wrong positions
         </change>
 
         <change version="0.9">Added BWLABELPOS

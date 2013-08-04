@@ -1843,7 +1843,8 @@ function ReadConfig($input, $is_include=FALSE)
 					array('(NODE|LINK)', "/^\s*OVERLIBHEIGHT\s+(\d+)\s*$/i", array('overlibheight'=>1)),
 					array('NODE', "/^\s*POSITION\s+([-+]?\d+)\s+([-+]?\d+)\s*$/i", array('x'=>1,'y'=>2)),
 					array('NODE', "/^\s*POSITION\s+(\S+)\s+([-+]?\d+)\s+([-+]?\d+)\s*$/i", array('x'=>2,'y'=>3,'original_x'=>2,'original_y'=>3,'relative_to'=>1,'relative_resolved'=>FALSE)),
-					array('NODE', "/^\s*POSITION\s+(\S+)\s+([-+]?\d+)r(\d+)\s*$/i", array('x'=>2,'y'=>3,'original_x'=>2,'original_y'=>3,'relative_to'=>1,'polar'=>TRUE,'relative_resolved'=>FALSE))
+					array('NODE', "/^\s*POSITION\s+(\S+)\s+([-+]?\d+)r(\d+)\s*$/i", array('x'=>2,'y'=>3,'original_x'=>2,'original_y'=>3,'relative_to'=>1,'polar'=>TRUE,'relative_resolved'=>FALSE)),
+					array('NODE', "/^\s*POSITION\s+([A-Za-z][A-Za-z0-9\-_]*):([A-Za-z][A-Za-z0-9_]*)\s*$/i", array('relative_to'=>1,'relative_name'=>2,'pos_named'=>TRUE, 'polar'=>FALSE,'relative_resolved'=>FALSE))
 					);
 
 			// alternative for use later where quoted strings are more useful
@@ -1906,6 +1907,8 @@ function ReadConfig($input, $is_include=FALSE)
 					{
 						$endoffset[$i]='C';
 						$nodenames[$i]=$matches[$i];
+						$offset_dx[$i] = 0;
+						$offset_dy[$i] = 0;
 
 						// percentage of compass - must be first
 						if (preg_match("/:(NE|SE|NW|SW|N|S|E|W|C)(\d+)$/i", $matches[$i], $submatches))
@@ -1926,7 +1929,7 @@ function ReadConfig($input, $is_include=FALSE)
 						{
 							$endoffset[$i]=$submatches[1];
 							$nodenames[$i]=preg_replace("/:(-?\d+r\d+)$/i", '', $matches[$i]);
-							$this->need_size_precalc=TRUE;
+							$this->need_size_precalc=TRUE;							
 						}
 
 						if (preg_match("/:([-+]?\d+):([-+]?\d+)$/i", $matches[$i], $submatches))
@@ -1936,6 +1939,18 @@ function ReadConfig($input, $is_include=FALSE)
 							$endoffset[$i]=$xoff.":".$yoff;
 							$nodenames[$i]=preg_replace("/:$xoff:$yoff$/i", '', $matches[$i]);
 							$this->need_size_precalc=TRUE;
+						}
+						
+						if (preg_match("/^([^:]+):([A-Za-z][A-Za-z0-9\-_]*)$/i", $matches[$i], $submatches)) {
+							$other_node = $submatches[1];
+							if (array_key_exists($submatches[2], $this->nodes[$other_node]->named_offsets)) {
+								$named_offset = $submatches[2];
+								$nodenames[$i] = preg_replace("/:$named_offset$/i", '', $matches[$i]);
+								
+								$endoffset[$i] = $named_offset;
+								$offset_dx[$i] = $this->nodes[$other_node]->named_offsets[$named_offset][0];
+								$offset_dy[$i] = $this->nodes[$other_node]->named_offsets[$named_offset][1];
+							}
 						}
 
 						if (!array_key_exists($nodenames[$i], $this->nodes))
@@ -1952,6 +1967,22 @@ function ReadConfig($input, $is_include=FALSE)
 						$curlink->b=$this->nodes[$nodenames[2]];
 						$curlink->a_offset=$endoffset[1];
 						$curlink->b_offset=$endoffset[2];
+						
+						// lash-up to avoid having to pass loads of context to calc_offset
+						// - named offsets require access to the internals of the node, when they are
+						//   resolved. Luckily we can resolve them here, and skip that.
+						if($offset_dx[1]!=0 || $offset_dy[1]!=0) {
+							$curlink->a_offset_dx = $offset_dx[1];
+							$curlink->a_offset_dy = $offset_dy[1];
+							$curlink->a_offset_resolved = TRUE;
+						}
+						
+						if($offset_dx[2]!=0 || $offset_dy[2]!=0) {
+							$curlink->b_offset_dx = $offset_dx[2];
+							$curlink->b_offset_dy = $offset_dy[2];
+							$curlink->b_offset_resolved = TRUE;
+						}
+						
 					}
 					else {
 						// this'll stop the current link being added
@@ -2038,6 +2069,7 @@ function ReadConfig($input, $is_include=FALSE)
 			if ($last_seen == "NODE" && preg_match("/^\s*DEFINEOFFSET\s+([A-Za-z][A-Za-z0-9_]*)\s+([-+]?\d+)\s+([-+]?\d+)$/i", $buffer, $matches))
 			{
 				$curobj->named_offsets[$matches[1]] = array(intval($matches[2]), intval($matches[3]));
+				$linematched++;
 			}
 			
 			if (preg_match("/^\s*SET\s+(\S+)\s+(.*)\s*$/i", $buffer, $matches))
@@ -2526,8 +2558,7 @@ function ReadConfig($input, $is_include=FALSE)
 			{
 				wm_debug("Resolving relative position for NODE ".$node->name." to ".$node->relative_to."\n");
 				if(array_key_exists($node->relative_to,$this->nodes))
-				{
-					
+				{					
 					// check if we are relative to another node which is in turn relative to something
 					// we need to resolve that one before we can resolve this one!
 					if(  ($this->nodes[$node->relative_to]->relative_to != '') && (!$this->nodes[$node->relative_to]->relative_resolved) )
@@ -2554,9 +2585,17 @@ function ReadConfig($input, $is_include=FALSE)
 							$this->nodes[$node->name]->relative_resolved=TRUE;
 							$set++;
 						}
+						elseif ($node->pos_named) {
+							$off_name = $node->relative_name;
+							if(isset($this->nodes[$node->relative_to]->named_offsets[$off_name])) {
+								$this->nodes[$node->name]->x = $rx + $this->nodes[$node->relative_to]->named_offsets[$off_name][0];
+								$this->nodes[$node->name]->y = $ry + $this->nodes[$node->relative_to]->named_offsets[$off_name][1];
+							} else {
+								$skipped++;
+							}
+						}
 						else
-						{
-							
+						{							
 							// save the relative coords, so that WriteConfig can work
 							// resolve the relative stuff
 	
@@ -2572,7 +2611,7 @@ function ReadConfig($input, $is_include=FALSE)
 				}
 				else
 				{
-					wm_warn("NODE ".$node->name." has a relative position to an unknown node! [WMWARN10]\n");
+					wm_warn("NODE ".$node->name." has a relative position to an unknown node (".$node->relative_to.")! [WMWARN10]\n");
 				}
 			}
 		}
@@ -3064,18 +3103,18 @@ function DrawMap($filename = '', $thumbnailfile = '', $thumbnailmax = 250, $with
 		{
 			// first, we can show relatively positioned NODEs
 			foreach ($this->nodes as $node) {
-					if($node->relative_to != '')
-					{
-							$rel_x = $this->nodes[$node->relative_to]->x;
-							$rel_y = $this->nodes[$node->relative_to]->y;
-							imagearc($image,$node->x, $node->y,
-									15,15,0,360,$overlay);
-							imagearc($image,$node->x, $node->y,
-									16,16,0,360,$overlay);
-		
-							imageline($image,$node->x, $node->y,
-									$rel_x, $rel_y, $overlay);
-					}
+				if($node->relative_to != '')
+				{
+					$rel_x = $this->nodes[$node->relative_to]->x;
+					$rel_y = $this->nodes[$node->relative_to]->y;
+					imagearc($image,$node->x, $node->y,
+							15,15,0,360,$overlay);
+					imagearc($image,$node->x, $node->y,
+							16,16,0,360,$overlay);
+
+					imageline($image,$node->x, $node->y,
+							$rel_x, $rel_y, $overlay);
+				}
 			}
 		}
 		
@@ -3098,6 +3137,18 @@ function DrawMap($filename = '', $thumbnailfile = '', $thumbnailmax = 250, $with
 					}
 					imagearc($image, $x,$y, 10,10,0,360,$overlay);
 					imagearc($image, $x,$y, 12,12,0,360,$overlay);
+				}
+			}
+			
+			// also (temporarily) draw all named offsets for each node
+			foreach($this->nodes as $node)
+			{
+				if( !is_null($node->x )) {
+					foreach ($node->named_offsets as $name=>$offsets) {
+						$x = $node->x + $offsets[0];
+						$y = $node->y + $offsets[1];
+						imagearc($image, $x, $y, 4,4, 0,360, $overlay);
+					}
 				}
 			}
 		}

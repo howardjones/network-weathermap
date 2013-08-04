@@ -65,7 +65,7 @@
 
         <p>red, green and blue are numbers from 0 to 255.</p>
 
-        <p>LABELFONTSHADOWCOLOR, LABELBGCOLOR and LABELOUTLINECOLOR have an additional
+        <p>LABELFONTSHADOWCOLOR, LABELBGCOLOR, LABELOUTLINECOLOR and AICONFILLCOLOR have an additional
         option - 'none'
         - which stops that element of the LABEL being drawn. LABELFONTSHADOWCOLOR
         defaults to 'none'.</p>
@@ -82,6 +82,8 @@
     </description>
 
     <changes>
+        <change version="0.98">Added 'none' option for AICONFILLCOLOR.
+        </change>
         <change version="0.95">Added 'contrast' and 'copy' options.
         </change>
 

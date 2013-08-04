@@ -183,7 +183,7 @@ if (sizeof($gopts) > 0)
                         print " --randomdata            -  as above, but use random data\n";
                         print " --debug                  -  produce (LOTS) of debugging information during run\n";
 			print " --no-warn={errorcode}[,{errorcode}] - suppress warnings with listed errorcodes\n";
-                        print " --dump-after             -  dump all internal PHP structures (HUGE)\n";
+                        print " --dumpafter             -  dump all internal PHP structures (HUGE)\n";
                         print " --dumpconfig {filename}  -  filename to write a new config to (for testing)\n\n";
 			                        
                         print " --help                   -  show this help\n";

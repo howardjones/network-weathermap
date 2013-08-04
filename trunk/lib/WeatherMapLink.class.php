@@ -25,6 +25,9 @@ class WeatherMapLink extends WeatherMapItem
 	var $max_bandwidth_in_cfg, $max_bandwidth_out_cfg;
 	var $targets = array();
 	var $a_offset,             $b_offset;
+	var $a_offset_dx, 	$b_offset_dx;
+	var $a_offset_dy, 	$b_offset_dy;
+	var $a_offset_resolved, $b_offset_resolved;
 	var $in_ds,                $out_ds;
 	var $colours = array();
 	var $selected;
@@ -95,6 +98,12 @@ class WeatherMapLink extends WeatherMapItem
 			# 'incolour'=>-1,'outcolour'=>-1,
 			'a_offset' => 'C',
 			'b_offset' => 'C',
+			'a_offset_dx' => 0,
+			'a_offset_dy' => 0,
+			'b_offset_dx' => 0,
+			'b_offset_dy' => 0,
+			'a_offset_resolved' => FALSE,
+			'b_offset_resolved' => FALSE,
 			#'incomment' => '',
 			#'outcomment' => '',
 			'zorder' => 300,
@@ -269,20 +278,30 @@ class WeatherMapLink extends WeatherMapItem
 		if(is_null($y1)) { wm_warn("LINK ".$this->name." uses a NODE with no POSITION! [WMWARN35]\n"); return; }
 		if(is_null($x2)) { wm_warn("LINK ".$this->name." uses a NODE with no POSITION! [WMWARN35]\n"); return; }
 		if(is_null($y2)) { wm_warn("LINK ".$this->name." uses a NODE with no POSITION! [WMWARN35]\n"); return; }
-		
-		
+				
 		if( ($this->linkstyle=='twoway') && ($this->labeloffset_in < $this->labeloffset_out) && (intval($map->get_hint("nowarn_bwlabelpos"))==0) )
 		{
 			wm_warn("LINK ".$this->name." probably has it's BWLABELPOSs the wrong way around [WMWARN50]\n");
 		}
 		
-		list($dx, $dy)=calc_offset($this->a_offset, $map->nodes[$this->a->name]->width, $map->nodes[$this->a->name]->height);
-		$x1+=$dx;
-		$y1+=$dy;
-
-		list($dx, $dy)=calc_offset($this->b_offset, $map->nodes[$this->b->name]->width, $map->nodes[$this->b->name]->height);
-		$x2+=$dx;
-		$y2+=$dy;
+		// Adjust the link endpoints, if any offset was specified
+		if (!$this->a_offset_resolved) {
+			list($dx, $dy) = calc_offset($this->a_offset, $map->nodes[$this->a->name]->width, $map->nodes[$this->a->name]->height);
+			$x1 += $dx;
+			$y1 += $dy;
+		} else {
+			$x1 += $this->a_offset_dx;
+			$y1 += $this->a_offset_dy;
+		}
+		
+		if (!$this->b_offset_resolved) {
+			list($dx, $dy) = calc_offset($this->b_offset, $map->nodes[$this->b->name]->width, $map->nodes[$this->b->name]->height);
+			$x2 += $dx;
+			$y2 += $dy;
+		} else {
+			$x2 += $this->b_offset_dx;
+			$y2 += $this->b_offset_dy;
+		}
 
 		if( ($x1==$x2) && ($y1==$y2) && sizeof($this->vialist)==0)
 		{

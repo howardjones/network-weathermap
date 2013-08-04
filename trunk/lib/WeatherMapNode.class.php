@@ -74,6 +74,7 @@ class WeatherMapNode extends WeatherMapItem
 				'iconscalevar' => 'in',
 				'labelfont' => 3,
 				'relative_to' => '',
+				'relative_name' => '',
 				'relative_resolved' => FALSE,
 				'x' => NULL,
 				'y' => NULL,
@@ -117,6 +118,7 @@ class WeatherMapNode extends WeatherMapItem
 		$this->centre_x = 0;
 		$this->centre_y = 0;
 		$this->polar = FALSE;
+		$this->pos_named = FALSE;
 		$this->image = NULL;
 	}
 
@@ -712,14 +714,12 @@ class WeatherMapNode extends WeatherMapItem
 		}
 		else
 		{
-			# $defdef = $this->owner->defaultnode;
+			// this is our template. Anything we do different should be written
 			$dd = $this->owner->nodes[$this->template];
 			
 			wm_debug("Writing config for NODE $this->name against $this->template\n");
 			
-			# $field = 'zorder'; $keyword = 'ZORDER';
-			$basic_params = array(
-					# array('template','TEMPLATE',CONFIG_TYPE_LITERAL),
+			$basic_params = array(					
 					array('label','LABEL',CONFIG_TYPE_LITERAL),
 					array('zorder','ZORDER',CONFIG_TYPE_LITERAL),
 					array('labeloffset','LABELOFFSET',CONFIG_TYPE_LITERAL),
@@ -747,7 +747,6 @@ class WeatherMapNode extends WeatherMapItem
 				$field = $param[0];
 				$keyword = $param[1];
 
-			#	$comparison=($this->name == 'DEFAULT' ? $this->inherit_fieldlist[$field] : $defdef->$field);
 				if ($this->$field != $dd->$field)
 				{
 					if($param[2] == CONFIG_TYPE_COLOR) $output.="\t$keyword " . render_colour($this->$field) . "\n";
@@ -824,6 +823,10 @@ class WeatherMapNode extends WeatherMapItem
 					{
 						$output .= "\tPOSITION ".$this->relative_to . " " .  $this->original_x . "r" . $this->original_y . "\n";
 					}
+					elseif($this->pos_named)
+					{
+						$output .= "\tPOSITION ".$this->relative_to.":".$this->relative_name."\n";
+					}
 					else
 					{
 						$output.="\tPOSITION " . $this->relative_to . " " .  $this->original_x . " " . $this->original_y . "\n";
@@ -845,14 +848,16 @@ class WeatherMapNode extends WeatherMapItem
 			{
 				// if the offset exists with different values, or
 				// doesn't exist at all in the template, we need to write
-				// some config for it
-				if (  (isset($dd->named_offsets[$off_name]) &&
-				     ($dd->named_offsets[$off_name][0] != $off_pos[0])
-				     || ($dd->named_offsets[$off_name][1] != $off_pos[1]))
-				    || (!isset($dd->named_offsets[$off_name]))
-				    ) {
-
-				    $output .= sprintf("DEFINEOFFSET %s %d %d\n", $off_name, $off_pos[0], $off_pos[1]);					
+				// some config for it				
+				if (  ( array_key_exists($off_name, $dd->named_offsets) ) ) {
+					$ox = $dd->named_offsets[$off_name][0];
+					$oy = $dd->named_offsets[$off_name][1];
+					
+					if( $ox != $off_pos[0] || $oy != $off_pos[1]) {
+						$output .= sprintf("\tDEFINEOFFSET %s %d %d\n", $off_name, $off_pos[0], $off_pos[1]);					
+					}
+				} else {
+					$output .= sprintf("\tDEFINEOFFSET %s %d %d\n", $off_name, $off_pos[0], $off_pos[1]);					
 				}
 			}
 			

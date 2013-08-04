@@ -15,14 +15,14 @@ $weathermap_debugging=FALSE;
 $weathermap_debugging_readdata=FALSE;
 $weathermap_map="";
 $weathermap_warncount=0;
-$weathemap_lazycounter=0;
+$weathermap_lazycounter=0;
 
 // Dummy array for some future code
 $WM_config_keywords2 = array ();
 
 // don't produce debug output for these functions
 $weathermap_debug_suppress = array (
-    'processstring',
+#    'processstring',
     'mysprintf'
 );
 
@@ -637,8 +637,9 @@ class WeatherMap extends WeatherMapBase
 			wm_debug("ProcessString: replacing ".$key." with $value\n");
 
 			if($format != '')
-			{
-				$value = mysprintf($format,$value);
+			{				
+				$value = mysprintf($format,$value, $this->kilo);
+				wm_debug("ProcessString: formatted $format to $value\n");
 			}
 
 			$input = str_replace($key,'',$input);
@@ -2033,6 +2034,12 @@ function ReadConfig($input, $is_include=FALSE)
 				$linematched++;
 			}			
 			
+			// offset names must start with a letter, and can only contain letters, digits and _
+			if ($last_seen == "NODE" && preg_match("/^\s*DEFINEOFFSET\s+([A-Za-z][A-Za-z0-9_]*)\s+([-+]?\d+)\s+([-+]?\d+)$/i", $buffer, $matches))
+			{
+				$curobj->named_offsets[$matches[1]] = array(intval($matches[2]), intval($matches[3]));
+			}
+			
 			if (preg_match("/^\s*SET\s+(\S+)\s+(.*)\s*$/i", $buffer, $matches))
 			{
 					$curobj->add_hint($matches[1],trim($matches[2]));
@@ -2353,7 +2360,7 @@ function ReadConfig($input, $is_include=FALSE)
 					$linematched++;
 				}
 
-				if($val == 'none' && ($matches[1]=='LABELFONTSHADOW' || $matches[1]=='LABELBG' || $matches[1]=='LABELOUTLINE' || $matches[1]=='AICONOUTLINE'))
+				if($val == 'none' && ($matches[1]=='LABELFONTSHADOW' || $matches[1]=='LABELBG' || $matches[1]=='LABELOUTLINE' || $matches[1]=='AICONOUTLINE' || $matches[1]=='AICONFILL'))
 				{
 					$curnode->$field=array(-1,-1,-1);
 					$linematched++;
@@ -3613,7 +3620,7 @@ function CacheUpdate($agelimit=600)
 		$json .= "{ id: 3, text: 'NODEs',\n children: [\n";
 		$json .= "{ id: ". $id++ . ", text: 'DEFAULT', children: [\n";
 		
-		$weathemap_lazycounter = $id;
+		$weathermap_lazycounter = $id;
 		// pass the list of subordinate nodes to the recursive tree function
 		$json .= $this->MakeTemplateTree( $this->node_template_tree );
 		$id = $weathermap_lazycounter;
@@ -3623,7 +3630,7 @@ function CacheUpdate($agelimit=600)
 		
 		$json .= "{ id: 4, text: 'LINKs',\n children: [\n";
 		$json .= "{ id: ". $id++ . ", text: 'DEFAULT', children: [\n";
-		$weathemap_lazycounter = $id;
+		$weathermap_lazycounter = $id;
 		$json .= $this->MakeTemplateTree( $this->link_template_tree );
 		$id = $weathermap_lazycounter;
 		$json = rtrim($json,", \n");

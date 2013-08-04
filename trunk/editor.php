@@ -726,7 +726,7 @@ else
 
 		$target = wm_editor_sanitize_name($_REQUEST['param']);
 		
-		if(isset($map->links[target])) {
+		if(isset($map->links[$target])) {
 		    $log = "align link ".$target;	
 		    
 		    $a_y = $map->links[$target]->a->y;
@@ -759,7 +759,7 @@ else
 
 		$target = wm_editor_sanitize_name($_REQUEST['param']);
 		
-		if(isset($map->links[target])) {		    
+		if(isset($map->links[$target])) {		    
 		    $log = "align link ".$target;
     
 		    $a_x = $map->links[$target]->a->x;
@@ -786,6 +786,21 @@ else
 		    $map->WriteConfig($mapfile);
 		}
                 break;
+	    
+	case "link_tidy":
+	    $map->ReadConfig($mapfile);
+	    
+	    $target = wm_editor_sanitize_name($_REQUEST['param']);
+		
+	    if(isset($map->links[$target])) {
+		// draw a map and throw it away, to calculate all the bounding boxes
+		$map->DrawMap('null');
+		
+		tidy_link($map,$target);
+		
+		$map->WriteConfig($mapfile);
+	    }
+	    break;
 
 	case "delete_link":
 		$map->ReadConfig($mapfile);
@@ -1190,8 +1205,7 @@ else
 			  <th></th>
 			  <td><a class="dlgTitlebar" id="link_delete">Delete
 			  Link</a><a class="dlgTitlebar" id="link_edit">Edit</a><a
-                            class="dlgTitlebar" id="link_vert">Vert</a><a
-                            class="dlgTitlebar" id="link_horiz">Horiz</a><a 
+                            class="dlgTitlebar" id="link_tidy">Tidy</a><a 
 							class="dlgTitlebar" id="link_via">Via</a> 
                         </td>
 			</tr>

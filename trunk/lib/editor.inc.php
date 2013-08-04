@@ -238,9 +238,10 @@ function show_editor_startpage()
 		foreach ($titles as $file=>$title) {			
 			# $title = $titles[$file];
 			$note = $notes[$file];
-			$nicefile = htmlspecialchars($file);
+			$nicefileurl = urlencode($file);
+			$nicefile  = htmlspecialchars($file);
 			$nicetitle = htmlspecialchars($title);
-			print "<li>$note<a href=\"?mapname=$nicefile&plug=$fromplug\">$nicefile</a> - <span class=\"comment\">$nicetitle</span></li>\n";
+			print "<li>$note<a href=\"?mapname=$nicefileurl&plug=$fromplug\">$nicefile</a> - <span class=\"comment\">$nicetitle</span></li>\n";
 		}
 	} else {
 		print '<li>'.htmlspecialchars($errorstring).'</li>';
@@ -456,6 +457,165 @@ function get_fontlist(&$map,$name,$current)
     $output .= "</select>";
 
     return($output);
+}
+
+function range_overlaps ($a_min,$a_max, $b_min, $b_max)
+{
+    if($a_min > $b_max) {
+	return false;
+    }
+    if($b_min > $a_max) {
+	return false;
+    }
+            
+    return true;
+}
+
+/* distance - find the distance between two points
+ *
+ */
+function distance ($ax,$ay, $bx,$by)
+{
+    $dx = $bx - $ax;
+    $dy = $by - $ay;
+    return sqrt( $dx*$dx + $dy*$dy );
+}
+
+/**
+ * tidy_link - change link offsets so that link is horizonal or vertical, if possible.
+ *             if not possible, change offsets to the closest facing compass points
+ */
+function tidy_link($map,$target)
+{
+    // print "\n-----------------------------------\nTidying $target...\n";
+    if(isset($map->links[$target]) and isset($map->links[$target]->a) ) {
+                        
+        $node_a = $map->links[$target]->a;
+        $node_b = $map->links[$target]->b;
+        
+        $new_a_offset = "0:0";
+        $new_b_offset = "0:0";
+        
+	// Update TODO: if the nodes are already directly left/right or up/down, then use compass-points, not pixel offsets
+	// (e.g. N90) so if the label changes, they won't need to be re-tidied
+	
+        // First bounding box in the node's boundingbox array is the icon, if there is one, or the label if not.
+        $bb_a = $node_a->boundingboxes[0];
+        $bb_b = $node_b->boundingboxes[0];	
+        
+        // figure out if they share any x or y coordinates
+        $x_overlap = range_overlaps($bb_a[0], $bb_a[2], $bb_b[0], $bb_b[2]);
+        $y_overlap = range_overlaps($bb_a[1], $bb_a[3], $bb_b[1], $bb_b[3]);
+        
+        $a_x_offset = 0; $a_y_offset = 0;
+        $b_x_offset = 0; $b_y_offset = 0;
+            
+        // if they are side by side, and there's some common y coords, make link horizontal
+        if ( !$x_overlap && $y_overlap ) {
+            // print "SIDE BY SIDE\n";
+            
+            // snap the X coord to the appropriate edge of the node
+            if ($bb_a[2] < $bb_b[0]) {
+                $a_x_offset = $bb_a[2] - $node_a->x;
+                $b_x_offset = $bb_b[0] - $node_b->x;
+            }
+            if ($bb_b[2] < $bb_a[0]) {
+                $a_x_offset = $bb_a[0] - $node_a->x;
+                $b_x_offset = $bb_b[2] - $node_b->x;
+            }
+            
+            // this should be true whichever way around they are
+            $min_overlap = max($bb_a[1], $bb_b[1]);
+            $max_overlap = min($bb_a[3], $bb_b[3]);
+            $overlap = $max_overlap - $min_overlap;
+            $n = $overlap/2;
+            
+            $a_y_offset = $min_overlap + $n - $node_a->y;
+            $b_y_offset = $min_overlap + $n - $node_b->y;
+            
+            // print "New offsets are $a_y_offset, $b_y_offset\n";                    
+            // print "N is $n (overlap was $overlap)\n";
+            
+            $new_a_offset = sprintf("%d:%d", $a_x_offset,$a_y_offset);
+            $new_b_offset = sprintf("%d:%d", $b_x_offset,$b_y_offset);
+        }			
+        
+        // if they are above and below, and there's some common x coords, make link vertical
+        if ( !$y_overlap && $x_overlap ) {
+            // print "ABOVE/BELOW\n";
+            
+            // snap the Y coord to the appropriate edge of the node
+            if ($bb_a[3] < $bb_b[1]) {
+                $a_y_offset = $bb_a[3] - $node_a->y;
+                $b_y_offset = $bb_b[1] - $node_b->y;
+            }
+            if ($bb_b[3] < $bb_a[1]) {
+                $a_y_offset = $bb_a[1] - $node_a->y;
+                $b_y_offset = $bb_b[3] - $node_b->y;
+            }
+            
+            $min_overlap = max($bb_a[0], $bb_b[0]);
+            $max_overlap = min($bb_a[2], $bb_b[2]);
+            $overlap = $max_overlap - $min_overlap;
+            $n = $overlap/2;
+            
+            // move the X coord to the centre of the overlapping area
+            $a_x_offset = $min_overlap + $n - $node_a->x;
+            $b_x_offset = $min_overlap + $n - $node_b->x;
+                
+            // print "N is $n (overlap was $overlap)\n";                    
+            // print "New offsets are $a_y_offset, $b_y_offset\n";
+                                
+            $new_a_offset = sprintf("%d:%d", $a_x_offset,$a_y_offset);
+            $new_b_offset = sprintf("%d:%d", $b_x_offset,$b_y_offset);
+        }			
+        
+        // if no common coordinates, figure out the best diagonal...
+        // currently - brute force search the compass points for the shortest distance
+        // potentially - intersect link line with rectangles to get exact crossing point
+        if ( !$y_overlap && !$x_overlap ) {
+            // print "DIAGONAL\n";
+            
+            $corners = array("NE","E","SE","S","SW","W","NW","N");
+            
+            // start with what we have now
+            $best_distance = distance( $node_a->x, $node_a->y, $node_b->x, $node_b->y );
+            $best_offset_a = "C";
+            $best_offset_b = "C";
+            
+            foreach ($corners as $corner1) {
+                list ($ax,$ay) = calc_offset($corner1, $bb_a[2] - $bb_a[0], $bb_a[3] - $bb_a[1]);
+                
+                $axx = $node_a->x + $ax;
+                $ayy = $node_a->y + $ay;
+                    
+                foreach ($corners as $corner2) {
+                    list($bx,$by) = calc_offset($corner2, $bb_b[2] - $bb_b[0], $bb_b[3] - $bb_b[1]);
+                    
+                    $bxx = $node_b->x + $bx;
+                    $byy = $node_b->y + $by;
+                                                
+                    $d = distance($axx,$ayy, $bxx, $byy);
+                    if($d < $best_distance) {
+                        // print "from $corner1 ($axx, $ayy) to $corner2 ($bxx, $byy): ";
+                        // print "NEW BEST $d\n";                                
+                        $best_distance = $d;
+                        $best_offset_a = $corner1;
+                        $best_offset_b = $corner2;
+                    }                            
+                }
+            }
+            // Step back a bit from the edge, to hide the corners of the link
+            $new_a_offset = $best_offset_a."85";
+            $new_b_offset = $best_offset_b."85";
+        }
+        
+        // unwritten/implied - if both overlap, you're doing something wierd and you're on your own
+
+        // finally, update the offsets
+        $map->links[$target]->a_offset = $new_a_offset;
+        $map->links[$target]->b_offset = $new_b_offset;
+    }
 }
 
 function editor_log($str)

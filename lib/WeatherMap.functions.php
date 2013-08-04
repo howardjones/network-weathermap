@@ -1357,13 +1357,10 @@ function calc_offset($offsetstring, $width, $height)
 		$y = - $distance * cos(deg2rad($angle));
 				
 		return (array($x,$y));
-		
 	} else {
 		wm_warn("Got a position offset that didn't make sense ($offsetstring).");
 		return (array(0, 0));
-	}
-	
-	
+	}	
 }
 
 // These next two are based on perl's Number::Format module

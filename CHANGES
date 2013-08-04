@@ -7,6 +7,7 @@
     ADDED - new wmdata: datasource plugin can read data from files produced by DATAOUTPUTFILE
     ADDED - AICONFILLCOLOR accepts 'none'
     ADDED - Editor 'tidy link' function replaces Vert & Horiz, and does much nicer job
+    ADDED - Named offsets. You can define a position relative to a node, give it a name, and use that name for POSITION and NODES. Think switch ports.
 
 0.97c - No code changes apart from path fixes, and ZIP file fixes.
 

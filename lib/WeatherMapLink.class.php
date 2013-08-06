@@ -88,11 +88,11 @@ class WeatherMapLink extends WeatherMapItem
 			'linkstyle' => 'twoway',
 			'overlibwidth' => 0,
 			'overlibheight' => 0,
-			'outlinecolour' => array(0, 0, 0),
-			'bwoutlinecolour' => array(0, 0, 0),
-			'bwfontcolour' => array(0, 0, 0),
-			'bwboxcolour' => array(255, 255, 255),
-			'commentfontcolour' => array(192,192,192),
+			'outlinecolour' => new WMColour(0, 0, 0),
+			'bwoutlinecolour' => new WMColour(0, 0, 0),
+			'bwfontcolour' => new WMColour(0, 0, 0),
+			'bwboxcolour' => new WMColour(255, 255, 255),
+			'commentfontcolour' => new WMColour(192,192,192),
 			'inpercent'=>0, 'outpercent'=>0,
 			'inscalekey'=>'', 'outscalekey'=>'',
 			# 'incolour'=>-1,'outcolour'=>-1,
@@ -142,8 +142,8 @@ class WeatherMapLink extends WeatherMapItem
 		$this->template = $template;
 		
 		// to stop the editor tanking, now that colours are decided earlier in ReadData
-		$this->colours[IN] = new Colour(192,192,192);
-		$this->colours[OUT] = new Colour(192,192,192);
+		$this->colours[IN] = new WMColour(192,192,192);
+		$this->colours[OUT] = new WMColour(192,192,192);
 		$this->id = $newowner->next_id++;
 	}
 
@@ -310,8 +310,8 @@ class WeatherMapLink extends WeatherMapItem
 		}
 
 		
-		$outlinecol = new Colour($this->outlinecolour);
-		$commentcol = new Colour($this->commentfontcolour);
+		$outlinecol = new WMColour($this->outlinecolour);
+		$commentcol = new WMColour($this->commentfontcolour);
 		
 		$outline_colour = $outlinecol->gdallocate($im);
 				
@@ -476,7 +476,7 @@ class WeatherMapLink extends WeatherMapItem
 					}
 					
 					$map->DrawLabelRotated($im, $task[0],            $task[1],$angle,           $thelabel, $this->bwfont, $padding,
-							$this->name,  $this->bwfontcolour, $this->bwboxcolour, $this->bwoutlinecolour,$map, $task[7]);
+						$this->name,  $this->bwfontcolour, $this->bwboxcolour, $this->bwoutlinecolour,$map, $task[7]);
 				}
 			}
 		}
@@ -532,7 +532,7 @@ class WeatherMapLink extends WeatherMapItem
 									
 				if ($this->$field != $dd->$field) 				
 				{ 
-					if($param[2] == CONFIG_TYPE_COLOR) $output.="\t$keyword " . render_colour($this->$field) . "\n"; 
+					if($param[2] == CONFIG_TYPE_COLOR) $output.="\t$keyword " . $this->$field->as_config() . "\n"; 
 					if($param[2] == CONFIG_TYPE_LITERAL) $output.="\t$keyword " . $this->$field . "\n"; 
 				}
 			}		

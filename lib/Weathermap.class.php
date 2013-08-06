@@ -1341,14 +1341,14 @@ function ReadData()
 
 				if($myobj->scaletype == 'percent')
 				{
-					list($incol,$inscalekey,$inscaletag) = $this->NewColourFromPercent($myobj->inpercent,$myobj->usescale,$myobj->name, TRUE, $warn_in);
-					list($outcol,$outscalekey, $outscaletag) = $this->NewColourFromPercent($myobj->outpercent,$myobj->usescale,$myobj->name, TRUE, $warn_out);
+					list($incol,$inscalekey,$inscaletag) = $this->ColourFromValue($myobj->inpercent,$myobj->usescale,$myobj->name, TRUE, $warn_in);
+					list($outcol,$outscalekey, $outscaletag) = $this->ColourFromValue($myobj->outpercent,$myobj->usescale,$myobj->name, TRUE, $warn_out);
 				}
 				else
 				{
 					// use absolute values, if that's what is requested
-					list($incol,$inscalekey,$inscaletag) = $this->NewColourFromPercent($myobj->bandwidth_in,$myobj->usescale,$myobj->name, FALSE, $warn_in);
-					list($outcol,$outscalekey, $outscaletag) = $this->NewColourFromPercent($myobj->bandwidth_out,$myobj->usescale,$myobj->name, FALSE, $warn_out);
+					list($incol,$inscalekey,$inscaletag) = $this->ColourFromValue($myobj->bandwidth_in,$myobj->usescale,$myobj->name, FALSE, $warn_in);
+					list($outcol,$outscalekey, $outscaletag) = $this->ColourFromValue($myobj->bandwidth_out,$myobj->usescale,$myobj->name, FALSE, $warn_out);
 				}
 				
 				$myobj->add_note("inscalekey",$inscalekey);
@@ -1397,29 +1397,22 @@ function DrawLabelRotated($im, $x, $y, $angle, $text, $font, $padding, $linkname
 
 	RotateAboutPoint($points, $x,$y, $rangle);
 
-	if ($bgcolour != array
-		(
-			-1,
-			-1,
-			-1
-		))
+	if ($bgcolour->is_real())
 	{
-		$bgcol=myimagecolorallocate($im, $bgcolour[0], $bgcolour[1], $bgcolour[2]);
+		#X  $bgcol=myimagecolorallocate($im, $bgcolour[0], $bgcolour[1], $bgcolour[2]);
+		$bgcol = $bgcolour->gdallocate($im);
 		imagefilledpolygon($im,$points,4,$bgcol);
 	}
 
-	if ($outlinecolour != array
-		(
-			-1,
-			-1,
-			-1
-		))
+	if ($outlinecolour->is_real())
 	{
-		$outlinecol=myimagecolorallocate($im, $outlinecolour[0], $outlinecolour[1], $outlinecolour[2]);
+		#X $outlinecol=myimagecolorallocate($im, $outlinecolour[0], $outlinecolour[1], $outlinecolour[2]);
+		$outlinecol = $outlinecolour->gdallocate($im);
 		imagepolygon($im,$points,4,$outlinecol);
 	}
 
-	$textcol=myimagecolorallocate($im, $textcolour[0], $textcolour[1], $textcolour[2]);
+	#X $textcol=myimagecolorallocate($im, $textcolour[0], $textcolour[1], $textcolour[2]);
+	$textcol = $textcolour->gdallocate($im);
 	$this->myimagestring($im, $font, $points[8], $points[9], $text, $textcol,$angle);
 
 	$areaname = "LINK:L".$map->links[$linkname]->id.':'.($direction+2);
@@ -1427,6 +1420,7 @@ function DrawLabelRotated($im, $x, $y, $angle, $text, $font, $padding, $linkname
 	// the rectangle is about half the size in the HTML, and easier to optimise/detect in the browser
 	if($angle==0)
 	{
+		// TODO: We can also optimise for 90, 180, 270 degrees
 		$map->imap->addArea("Rectangle", $areaname, '', array($x1, $y1, $x2, $y2));
 		wm_debug ("Adding Rectangle imagemap for $areaname\n");
 	}
@@ -1438,9 +1432,10 @@ function DrawLabelRotated($im, $x, $y, $angle, $text, $font, $padding, $linkname
 
 }
 
-function NewColourFromPercent($value,$scalename="DEFAULT",$name="",$is_percent=TRUE, $scale_warning=TRUE)
+// This should be in WeatherMapScale - All scale lookups are done here
+function ColourFromValue($value,$scalename="DEFAULT",$name="",$is_percent=TRUE, $scale_warning=TRUE)
 {
-	$col = new Colour(0,0,0);
+	$col = new WMColour(0,0,0);
 	$tag = '';
 	$matchsize = NULL;
 
@@ -1453,13 +1448,13 @@ function NewColourFromPercent($value,$scalename="DEFAULT",$name="",$is_percent=T
 
 		if ($is_percent && $value > 100)
 		{
-			if($nowarn_clipping==0) wm_warn ("NewColourFromPercent: Clipped $value% to 100% for item $name [WMWARN33]\n");
+			if($nowarn_clipping==0) wm_warn ("ColourFromValue: Clipped $value% to 100% for item $name [WMWARN33]\n");
 			$value = 100;
 		}
 		
 		if ($is_percent && $value < 0)
 		{
-			if($nowarn_clipping==0) wm_warn ("NewColourFromPercent: Clipped $value% to 0% for item $name [WMWARN34]\n");
+			if($nowarn_clipping==0) wm_warn ("ColourFromValue: Clipped $value% to 0% for item $name [WMWARN34]\n");
 			$value = 0;
 		}
 
@@ -1492,13 +1487,13 @@ function NewColourFromPercent($value,$scalename="DEFAULT",$name="",$is_percent=T
 				// change in behaviour - with multiple matching ranges for a value, the smallest range wins
 				if( is_null($matchsize) || ($range < $matchsize) ) 
 				{
-					$col = new Colour($r, $g, $b);
+					$col = new WMColour($r, $g, $b);
 					$matchsize = $range;
 				}
 				
 				if(isset($colour['tag'])) $tag = $colour['tag'];
 				#### warn(">>NCFPC TAGS $tag\n");
-				wm_debug("NCFPC $name $scalename $value '$tag' $key $r $g $b\n");
+				wm_debug("CFV $name $scalename $value '$tag' $key $r $g $b\n");
 
 				return(array($col,$key,$tag));
 			}
@@ -1508,23 +1503,23 @@ function NewColourFromPercent($value,$scalename="DEFAULT",$name="",$is_percent=T
 	{
 		if($scalename != 'none')
 		{
-			wm_warn("ColourFromPercent: Attempted to use non-existent scale: $scalename for item $name [WMWARN09]\n");
+			wm_warn("ColourFromValue: Attempted to use non-existent scale: $scalename for item $name [WMWARN09]\n");
 		}
 		else
 		{
-			return array(new Colour(255,255,255),'','');
+			return array(new WMColour(255,255,255),'','');
 		}
 	}
 
 	// shouldn't really get down to here if there's a complete SCALE
 
 	// you'll only get grey for a COMPLETELY quiet link if there's no 0 in the SCALE lines
-	if ($value == 0) { return array(new Colour(192,192,192),'',''); }
+	if ($value == 0) { return array(new WMColour(192,192,192),'',''); }
 
-	if($nowarn_scalemisses==0) wm_warn("NewColourFromPercent: Scale $scalename doesn't include a line for $value".($is_percent ? "%" : "")." while drawing item $name [WMWARN29]\n");
+	if($nowarn_scalemisses==0) wm_warn("ColourFromValue: Scale $scalename doesn't include a line for $value".($is_percent ? "%" : "")." while drawing item $name [WMWARN29]\n");
 
 	// and you'll only get white for a link with no colour assigned
-	return array(new Colour(255,255,255),'','');
+	return array(new WMColour(255,255,255),'','');
 }
 
 
@@ -1620,7 +1615,7 @@ function DrawLegend_Horizontal($im,$scalename="DEFAULT",$width=400)
 				$this->colours['DEFAULT']['KEYTEXT'][$scale_ref]);
 		}
 
-		list($col,$junk) = $this->NewColourFromPercent($p,$scalename);
+		list($col,$junk) = $this->ColourFromValue($p,$scalename);
 		if($col->is_real())
 		{
 			$cc = $col->gdallocate($scale_im);
@@ -1712,7 +1707,7 @@ function DrawLegend_Vertical($im,$scalename="DEFAULT",$height=400,$inverted=fals
 				$labelstring,  $this->colours['DEFAULT']['KEYTEXT'][$scale_ref]);
 		}
 
-		list($col,$junk) = $this->NewColourFromPercent($p,$scalename);
+		list($col,$junk) = $this->ColourFromValue($p,$scalename);
 		if( $col->is_real())
 		{
 			$cc = $col->gdallocate($scale_im);
@@ -1842,7 +1837,7 @@ function DrawLegend_Classic($im,$scalename="DEFAULT",$use_tags=FALSE)
 						{
 							$value
 								=  $fudgefactor + $colour['bottom'] + ($n / $tilewidth) * ($colour['top'] - $colour['bottom']);
-							list($ccol,$junk) = $this->NewColourFromPercent($value, $scalename, "", FALSE);
+							list($ccol,$junk) = $this->ColourFromValue($value, $scalename, "", FALSE);
 							$col = $ccol->gdallocate($scale_im);
 							imagefilledrectangle($scale_im, $x + $n, $y, $x + $n, $y + $tileheight,
 								$col);
@@ -1851,7 +1846,7 @@ function DrawLegend_Classic($im,$scalename="DEFAULT",$use_tags=FALSE)
 					else
 					{
 						// pick a value in the middle...
-						list($ccol,$junk) = $this->NewColourFromPercent($value, $scalename, "", FALSE);
+						list($ccol,$junk) = $this->ColourFromValue($value, $scalename, "", FALSE);
 						$col = $ccol->gdallocate($scale_im);
 						imagefilledrectangle($scale_im, $x, $y, $x + $tilewidth, $y + $tileheight,
 							$col);
@@ -1948,6 +1943,14 @@ function DrawTitle($im, $font, $colour)
 // *************************************
 // New ReadConfig special-case handlers
 
+function ReadConfig_Handle_DEFINEOFFSET($fullcommand, $args, $matches, &$curobj, $filename,
+        $linecount)
+{
+	$curobj->named_offsets[$matches[1]] = array(intval($matches[2]), intval($matches[3]));
+	
+	return true;
+}
+
 function ReadConfig_Handle_VIA($fullcommand, $args, $matches, &$curobj, $filename,
         $linecount)
     {
@@ -1987,6 +1990,8 @@ function ReadConfig_Handle_VIA($fullcommand, $args, $matches, &$curobj, $filenam
             ) as $i) {
                 $endoffset[$i] = 'C';
                 $nodenames[$i] = $matches[$i];
+		$offset_dx[$i] = 0;
+		$offset_dy[$i] = 0;
 
                 // percentage of compass - must be first
                 if (preg_match("/:(NE|SE|NW|SW|N|S|E|W|C)(\d+)$/i", $matches[$i],
@@ -2018,7 +2023,19 @@ function ReadConfig_Handle_VIA($fullcommand, $args, $matches, &$curobj, $filenam
                     $nodenames[$i] = preg_replace("/:$xoff:$yoff$/i", '', $matches[$i]);
                     $this->need_size_precalc = true;
                 }
-
+		
+		if (preg_match("/^([^:]+):([A-Za-z][A-Za-z0-9\-_]*)$/i", $matches[$i], $submatches)) {
+			$other_node = $submatches[1];
+			if (array_key_exists($submatches[2], $this->nodes[$other_node]->named_offsets)) {
+				$named_offset = $submatches[2];
+				$nodenames[$i] = preg_replace("/:$named_offset$/i", '', $matches[$i]);
+				
+				$endoffset[$i] = $named_offset;
+				$offset_dx[$i] = $this->nodes[$other_node]->named_offsets[$named_offset][0];
+				$offset_dy[$i] = $this->nodes[$other_node]->named_offsets[$named_offset][1];
+			}
+		}
+		
                 if (!array_key_exists($nodenames[$i], $this->nodes)) {
                     wm_warn("Unknown node '" . $nodenames[$i]
                         . "' on line $linecount of config\n");
@@ -2033,6 +2050,21 @@ function ReadConfig_Handle_VIA($fullcommand, $args, $matches, &$curobj, $filenam
                 $curobj->b = $this->nodes[$nodenames[2]];
                 $curobj->a_offset = $endoffset[1];
                 $curobj->b_offset = $endoffset[2];
+				
+		// lash-up to avoid having to pass loads of context to calc_offset
+		// - named offsets require access to the internals of the node, when they are
+		//   resolved. Luckily we can resolve them here, and skip that.
+		if($offset_dx[1]!=0 || $offset_dy[1]!=0) {
+			$curobj->a_offset_dx = $offset_dx[1];
+			$curobj->a_offset_dy = $offset_dy[1];
+			$curobj->a_offset_resolved = TRUE;
+		}
+		
+		if($offset_dx[2]!=0 || $offset_dy[2]!=0) {
+			$curobj->b_offset_dx = $offset_dx[2];
+			$curobj->b_offset_dy = $offset_dy[2];
+			$curobj->b_offset_resolved = TRUE;
+		}
             } else {
                 // this'll stop the current link being added
                 $last_seen = "broken";
@@ -2868,7 +2900,25 @@ function ReadConfig13($input, $is_include=FALSE)
         wm_debug("ReadConfig has finished reading the config ($linecount lines)\n");
         wm_debug("------------------------------------------\n");
 
+        return (true);
+}
+
+// *************************************
+
+function ReadConfig($input, $is_include=FALSE)
+{
+	global $weathermap_error_suppress;
+
+	// Do the actual config-reading (new version now)
+	$result = $this->ReadConfig13($input, $is_include);
+
+	// Do the other things that have always been in ReadConfig, but only if this isn't an included file
 	if(! $is_include) {
+		// XXX This is a bodge
+		$scalesseen = 0;
+		// XXX so is this
+		$filename = $input;
+		
 		// load some default colouring, otherwise it all goes wrong
 		if ($scalesseen == 0) {
 		    wm_debug("Adding default SCALE colour set (no SCALE lines seen).\n");
@@ -2970,12 +3020,12 @@ function ReadConfig13($input, $is_include=FALSE)
 		$this->ResolveRelativePositions();
 		$this->RunPreprocessors();
 	}
-        return (true);
+	
+	return $result;
 }
 
-// *************************************
 
-function ReadConfig($input, $is_include=FALSE)
+function OldReadConfig($input, $is_include=FALSE)
 {
 	global $weathermap_error_suppress;
 
@@ -3007,7 +3057,7 @@ function ReadConfig($input, $is_include=FALSE)
 	else
 	{
 		wm_debug("ReadConfig Detected that this is a config filename.\n");
-		 $filename = $input;
+		$filename = $input;
 		 
 		if($is_include){ 
 			wm_debug("ReadConfig Detected that this is an INCLUDED config filename.\n");

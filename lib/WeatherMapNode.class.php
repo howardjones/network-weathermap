@@ -97,12 +97,12 @@ class WeatherMapNode extends WeatherMapItem
 				'overlibwidth' => 0,
 				'overlibheight' => 0,
 				'overlibcaption' => array(IN=>'',OUT=>''),
-				'labeloutlinecolour' => array(0, 0, 0),
-				'labelbgcolour' => array(255, 255, 255),
-				'labelfontcolour' => array(0, 0, 0),
-				'labelfontshadowcolour' => array(-1, -1, -1),
-				'aiconoutlinecolour' => array(0,0,0),
-				'aiconfillcolour' => array(-2,-2,-2), // copy from the node label
+				'labeloutlinecolour' => new WMColour(0, 0, 0),
+				'labelbgcolour' => new WMColour(255, 255, 255),
+				'labelfontcolour' => new WMColour(0, 0, 0),
+				'labelfontshadowcolour' => new WMColour('none'),
+				'aiconoutlinecolour' => new WMColour(0,0,0),
+				'aiconfillcolour' => new WMColour('copy'), // copy from the node label
 				'labeloffset' => '',
 				'labeloffsetx' => 0,
 				'labeloffsety' => 0,
@@ -146,7 +146,7 @@ class WeatherMapNode extends WeatherMapItem
 		$icon_w = 0;
 		$icon_h = 0;
 
-		$col = new Colour(-1,-1,-1);
+		$col = new WMColour('none');
 		# print $col->as_string();
 
 		// if a target is specified, and you haven't forced no background, then the background will
@@ -169,10 +169,10 @@ class WeatherMapNode extends WeatherMapItem
 
 			}
 		}
-		elseif($this->labelbgcolour != array(-1,-1,-1))
+		else
 		{
 			// $col=myimagecolorallocate($node_im, $this->labelbgcolour[0], $this->labelbgcolour[1], $this->labelbgcolour[2]);
-			$col = new Colour($this->labelbgcolour);
+			$col = $this->labelbgcolour;
 		}
 
 		$colicon = null;
@@ -198,13 +198,13 @@ class WeatherMapNode extends WeatherMapItem
 			if($this->iconscaletype=='percent')
 			{
 				list($colicon,$node_iconscalekey,$icontag) = 
-					$map->NewColourFromPercent($pc, $this->useiconscale,$this->name );	
+					$map->ColourFromValue($pc, $this->useiconscale,$this->name );	
 			}
 			else
 			{
 				// use the absolute value if we aren't doing percentage scales.
 				list($colicon,$node_iconscalekey,$icontag) = 
-					$map->NewColourFromPercent($val, $this->useiconscale,$this->name, FALSE );
+					$map->ColourFromValue($val, $this->useiconscale,$this->name, FALSE );
 			}
 		}
 
@@ -297,8 +297,8 @@ class WeatherMapNode extends WeatherMapItem
 				$fill = NULL;
 				$ink = NULL;
 
-				$aifill = new Colour($this->aiconfillcolour);
-				$aiink = new Colour($this->aiconoutlinecolour);
+				$aifill = new WMColour($this->aiconfillcolour);
+				$aiink = new WMColour($this->aiconoutlinecolour);
 
 				if ( $aifill->is_copy() && !$col->is_none() )
 				{
@@ -596,20 +596,20 @@ class WeatherMapNode extends WeatherMapItem
 			}
 			else
 			{
-				$olcol = new Colour($this->labeloutlinecolour);
-				if ($olcol->is_real())
+				$olcol = $this->labeloutlinecolour;
+				if ($this->labeloutlinecolour->is_real())
 				{
 					imagerectangle($node_im, $label_x1, $label_y1, $label_x2, $label_y2, $olcol->gdallocate($node_im));
 				}
 			}
 			
-			$shcol = new Colour($this->labelfontshadowcolour);
+			$shcol = $this->labelfontshadowcolour;
 			if ($shcol->is_real())
 			{
 				$map->myimagestring($node_im, $this->labelfont, $txt_x + 1, $txt_y + 1, $this->proclabel, $shcol->gdallocate($node_im),$this->labelangle);
 			}
 
-			$txcol = new Colour($this->labelfontcolour[0],$this->labelfontcolour[1],$this->labelfontcolour[2]);
+			$txcol = $this->labelfontcolour;
 			
 			if($txcol->is_contrast())
 			{
@@ -620,7 +620,7 @@ class WeatherMapNode extends WeatherMapItem
 				else
 				{
 					wm_warn("You can't make a contrast with 'none'. [WMWARN43]\n");
-					$txcol = new Colour(0,0,0);
+					$txcol = new WMColour(0,0,0);
 				}
 			}
 			$map->myimagestring($node_im, $this->labelfont, $txt_x, $txt_y, $this->proclabel, $txcol->gdallocate($node_im),$this->labelangle);			
@@ -684,8 +684,8 @@ class WeatherMapNode extends WeatherMapItem
 		$this->template = $template;
 		
 		// to stop the editor tanking, now that colours are decided earlier in ReadData
-		$this->colours[IN] = new Colour(192,192,192);
-		$this->colours[OUT] = new Colour(192,192,192);
+		$this->colours[IN] = new WMColour(192,192,192);
+		$this->colours[OUT] = new WMColour(192,192,192);
 		
 		$this->id = $newowner->next_id++;
 	}
@@ -749,7 +749,7 @@ class WeatherMapNode extends WeatherMapItem
 
 				if ($this->$field != $dd->$field)
 				{
-					if($param[2] == CONFIG_TYPE_COLOR) $output.="\t$keyword " . render_colour($this->$field) . "\n";
+					if($param[2] == CONFIG_TYPE_COLOR) $output.="\t$keyword " . $this->$field->as_config() . "\n";
 					if($param[2] == CONFIG_TYPE_LITERAL) $output.="\t$keyword " . $this->$field . "\n";
 				}
 			}

@@ -2336,6 +2336,7 @@ function ReadConfig_Handle_VIA($fullcommand, $args, $matches, &$curobj, $filenam
     }
 
 // Temporary new ReadConfig, using the new table of keywords
+// However, this also expects a bunch of other internal change (WMColour, WMScale etc)
     
 function ReadConfig13($input, $is_include=FALSE)
 {	
@@ -2406,7 +2407,7 @@ function ReadConfig13($input, $is_include=FALSE)
             }
             else {
 
-// for any other config elements that are shared between nodes and links, they can use this
+		// for any other config elements that are shared between nodes and links, they can use this
                 unset($curobj);
                 $curobj = null;
 
@@ -2430,7 +2431,7 @@ function ReadConfig13($input, $is_include=FALSE)
                     if (1 == 1) {
                         $this->ReadConfig_Commit($curobj);
                     } else {
-// first, save the previous item, before starting work on the new one
+			// first, save the previous item, before starting work on the new one
                         if ($last_seen == "NODE") {
                             $this->nodes[$curnode->name] = $curnode;
 
@@ -2525,19 +2526,16 @@ function ReadConfig13($input, $is_include=FALSE)
                     // alternative for use later where quoted strings are more useful
                     $args = wm_parse_string($buffer);
                 }
-
-// From here, the aim of the game is to get out of this loop as
-// early as possible, without running more preg_match calls than
-// necessary. In 0.97, this per-line loop accounted for 50% of
-// the running time!
-
-
-// this next loop replaces a whole pile of duplicated ifs with something with consistent handling
+		
+		// From here, the aim of the game is to get out of this loop as
+		// early as possible, without running more preg_match calls than
+		// necessary. In 0.97, this per-line loop accounted for 50% of
+		// the running time!
+		
+		
+		// this next loop replaces a whole pile of duplicated ifs with something with consistent handling
 
                 assert('is_object($curobj)');
-
-		# wm_debug("ARGS[0] is $args[0]\n");
-		
 		
                 if ($linematched == 0 && true === isset($args[0])) {
 // check if there is even an entry in this context for the current keyword
@@ -2550,11 +2548,11 @@ function ReadConfig13($input, $is_include=FALSE)
                             if ((substr($keyword[1], 0, 1) != '/')
                                 || (1 === preg_match($keyword[1], $buffer, $matches))) {
 
-								$key = sprintf("%s:%s:%s", $last_seen, $args[0] ,$keyword[1]);
-								if(!isset($this->coverage[$key])) {
-	$this->coverage[$key] = 0;
-}
-								$this->coverage[$key]++;
+				$key = sprintf("%s:%s:%s", $last_seen, $args[0] ,$keyword[1]);
+				if(!isset($this->coverage[$key])) {
+					$this->coverage[$key] = 0;
+				}
+				$this->coverage[$key]++;
 								
                                 // if we came here without a regexp, then the \1 etc
                                 // refer to arg numbers, not match numbers
@@ -2870,229 +2868,108 @@ function ReadConfig13($input, $is_include=FALSE)
         wm_debug("ReadConfig has finished reading the config ($linecount lines)\n");
         wm_debug("------------------------------------------\n");
 
-        // load some default colouring, otherwise it all goes wrong
-        if ($scalesseen == 0) {
-            wm_debug("Adding default SCALE colour set (no SCALE lines seen).\n");
-            $defaults = array (
-                '0_0' => array (
-                    'bottom' => 0,
-                    'top' => 0,
-                    'red1' => 192,
-                    'green1' => 192,
-                    'blue1' => 192,
-                    'special' => 0
-                ),
-                '0_1' => array (
-                    'bottom' => 0,
-                    'top' => 1,
-                    'red1' => 255,
-                    'green1' => 255,
-                    'blue1' => 255,
-                    'special' => 0
-                ),
-                '1_10' => array (
-                    'bottom' => 1,
-                    'top' => 10,
-                    'red1' => 140,
-                    'green1' => 0,
-                    'blue1' => 255,
-                    'special' => 0
-                ),
-                '10_25' => array (
-                    'bottom' => 10,
-                    'top' => 25,
-                    'red1' => 32,
-                    'green1' => 32,
-                    'blue1' => 255,
-                    'special' => 0
-                ),
-                '25_40' => array (
-                    'bottom' => 25,
-                    'top' => 40,
-                    'red1' => 0,
-                    'green1' => 192,
-                    'blue1' => 255,
-                    'special' => 0
-                ),
-                '40_55' => array (
-                    'bottom' => 40,
-                    'top' => 55,
-                    'red1' => 0,
-                    'green1' => 240,
-                    'blue1' => 0,
-                    'special' => 0
-                ),
-                '55_70' => array (
-                    'bottom' => 55,
-                    'top' => 70,
-                    'red1' => 240,
-                    'green1' => 240,
-                    'blue1' => 0,
-                    'special' => 0
-                ),
-                '70_85' => array (
-                    'bottom' => 70,
-                    'top' => 85,
-                    'red1' => 255,
-                    'green1' => 192,
-                    'blue1' => 0,
-                    'special' => 0
-                ),
-                '85_100' => array (
-                    'bottom' => 85,
-                    'top' => 100,
-                    'red1' => 255,
-                    'green1' => 0,
-                    'blue1' => 0,
-                    'special' => 0
-                )
-            );
-
-            foreach ($defaults as $key => $def) {
-                $this->colours['DEFAULT'][$key] = $def;
-                $this->colours['DEFAULT'][$key]['key'] = $key;
-                $scalesseen++;
-            }
-            // we have a 0-0 line now, so we need to hide that.
-            $this->add_hint("key_hidezero_DEFAULT", 1);
-        } else {
-            wm_debug("Already have $scalesseen scales, no defaults added.\n");
-        }
-
-        $this->numscales['DEFAULT'] = $scalesseen;
-        $this->configfile = "$filename";
-
-        if ($this->has_overlibs && $this->htmlstyle == 'static') {
-            wm_warn(
-                "OVERLIBGRAPH is used, but HTMLSTYLE is static. This is probably wrong. [WMWARN41]\n");
-        }
-
-        wm_debug("Building cache of z-layers and finalising bandwidth.\n");
-
-        $allitems = array ();
-
-        foreach ($this->nodes as $node) {
-            $allitems[] = $node;
-        }
-
-        foreach ($this->links as $link) {
-            $allitems[] = $link;
-        }
-
-        foreach ($allitems as $ky => $vl) {
-            $item = &$allitems[$ky];
-            $z = $item->zorder;
-
-            if (!isset($this->seen_zlayers[$z]) || !is_array($this->seen_zlayers[$z])) {
-                $this->seen_zlayers[$z] = array ();
-            }
-            array_push($this->seen_zlayers[$z], $item);
-
-            // while we're looping through, let's set the real bandwidths
-            if ($item->my_type() === 'LINK') {
-                $this->links[$item->name]->max_bandwidth_in =
-                    wm_unformat_number($item->max_bandwidth_in_cfg, $this->kilo);
-                $this->links[$item->name]->max_bandwidth_out =
-                    wm_unformat_number($item->max_bandwidth_out_cfg, $this->kilo);
-            } elseif ($item->my_type() === 'NODE') {
-                $this->nodes[$item->name]->max_bandwidth_in =
-                    wm_unformat_number($item->max_bandwidth_in_cfg, $this->kilo);
-                $this->nodes[$item->name]->max_bandwidth_out =
-                    wm_unformat_number($item->max_bandwidth_out_cfg, $this->kilo);
-            } else {
-                wm_warn("Internal bug - found an item of type: " . $item->my_type() . "\n");
-            }
-
-            wm_debug(sprintf("   Setting bandwidth on " . $item->my_type()
-                . " $item->name (%s -> %d bps, %s -> %d bps, KILO = %d)\n",
-                $item->max_bandwidth_in_cfg, $item->max_bandwidth_in,
-                $item->max_bandwidth_out_cfg, $item->max_bandwidth_out, $this->kilo));
-        }
-
-        wm_debug("Found " . sizeof($this->seen_zlayers)
-            . " z-layers including builtins (0,100).\n");
-
-        // calculate any relative positions here - that way, nothing else
-        // really needs to know about them
-
-        wm_debug("Resolving relative positions for NODEs...\n");
-        // safety net for cyclic dependencies
-        $i = 100;
-
-        do {
-            $skipped = 0;
-            $set = 0;
-
-            foreach ($this->nodes as $node) {
-                if (($node->relative_to != '') && (!$node->relative_resolved)) {
-                    wm_debug("Resolving relative position for NODE " . $node->name . " to "
-                        . $node->relative_to . "\n");
-
-                    if (array_key_exists($node->relative_to, $this->nodes)) {
-
-// check if we are relative to another node which is in turn relative to something
-// we need to resolve that one before we can resolve this one!
-                        if (($this->nodes[$node->relative_to]->relative_to != '')
-                            && (!$this->nodes[$node->relative_to]->relative_resolved)) {
-                            wm_debug(
-                                "Skipping unresolved relative_to. Let's hope it's not a circular one\n");
-                            $skipped++;
-                        } else {
-                            $rx = $this->nodes[$node->relative_to]->x;
-                            $ry = $this->nodes[$node->relative_to]->y;
-
-                            if ($node->polar) {
-                                // treat this one as a POLAR relative coordinate.
-                                // - draw rings around a node!
-                                $angle = $node->x;
-                                $distance = $node->y;
-                                $newpos_x = $rx + $distance * sin(deg2rad($angle));
-                                $newpos_y = $ry - $distance * cos(deg2rad($angle));
-                                wm_debug("->$newpos_x,$newpos_y\n");
-                                $this->nodes[$node->name]->x = $newpos_x;
-                                $this->nodes[$node->name]->y = $newpos_y;
-                                $this->nodes[$node->name]->relative_resolved = true;
-                                $set++;
-                            } else {
-
-                                // save the relative coords, so that WriteConfig can work
-                                // resolve the relative stuff
-
-                                $newpos_x = $rx + $this->nodes[$node->name]->x;
-                                $newpos_y = $ry + $this->nodes[$node->name]->y;
-                                wm_debug("->$newpos_x,$newpos_y\n");
-                                $this->nodes[$node->name]->x = $newpos_x;
-                                $this->nodes[$node->name]->y = $newpos_y;
-                                $this->nodes[$node->name]->relative_resolved = true;
-                                $set++;
-                            }
-                        }
-                    } else {
-                        wm_warn("NODE " . $node->name
-                            . " has a relative position to an unknown node! [WMWARN10]\n");
-                    }
-                }
-            }
-            wm_debug(
-                "Relative Positions Cycle $i - set $set and Skipped $skipped for unresolved dependencies\n");
-            $i--;
-        } while (($set > 0) && ($i != 0));
-
-        if ($skipped > 0) {
-            wm_warn(
-                "There are Circular dependencies in relative POSITION lines for $skipped nodes. [WMWARN11]\n");
-        }
-
-        wm_debug("-----------------------------------\n");
-
-        wm_debug("Running Pre-Processing Plugins...\n");
-
-        foreach ($this->preprocessclasses as $pre_class) {
-            wm_debug("Running $pre_class" . "->run()\n");
-            $this->plugins['pre'][$pre_class]->run($this);
-        }
-        wm_debug("Finished Pre-Processing Plugins...\n");
-
+	if(! $is_include) {
+		// load some default colouring, otherwise it all goes wrong
+		if ($scalesseen == 0) {
+		    wm_debug("Adding default SCALE colour set (no SCALE lines seen).\n");
+		    $defaults = array (
+			'0_0' => array (
+			    'bottom' => 0,
+			    'top' => 0,
+			    'red1' => 192,
+			    'green1' => 192,
+			    'blue1' => 192,
+			    'special' => 0
+			),
+			'0_1' => array (
+			    'bottom' => 0,
+			    'top' => 1,
+			    'red1' => 255,
+			    'green1' => 255,
+			    'blue1' => 255,
+			    'special' => 0
+			),
+			'1_10' => array (
+			    'bottom' => 1,
+			    'top' => 10,
+			    'red1' => 140,
+			    'green1' => 0,
+			    'blue1' => 255,
+			    'special' => 0
+			),
+			'10_25' => array (
+			    'bottom' => 10,
+			    'top' => 25,
+			    'red1' => 32,
+			    'green1' => 32,
+			    'blue1' => 255,
+			    'special' => 0
+			),
+			'25_40' => array (
+			    'bottom' => 25,
+			    'top' => 40,
+			    'red1' => 0,
+			    'green1' => 192,
+			    'blue1' => 255,
+			    'special' => 0
+			),
+			'40_55' => array (
+			    'bottom' => 40,
+			    'top' => 55,
+			    'red1' => 0,
+			    'green1' => 240,
+			    'blue1' => 0,
+			    'special' => 0
+			),
+			'55_70' => array (
+			    'bottom' => 55,
+			    'top' => 70,
+			    'red1' => 240,
+			    'green1' => 240,
+			    'blue1' => 0,
+			    'special' => 0
+			),
+			'70_85' => array (
+			    'bottom' => 70,
+			    'top' => 85,
+			    'red1' => 255,
+			    'green1' => 192,
+			    'blue1' => 0,
+			    'special' => 0
+			),
+			'85_100' => array (
+			    'bottom' => 85,
+			    'top' => 100,
+			    'red1' => 255,
+			    'green1' => 0,
+			    'blue1' => 0,
+			    'special' => 0
+			)
+		    );
+	
+		    foreach ($defaults as $key => $def) {
+			$this->colours['DEFAULT'][$key] = $def;
+			$this->colours['DEFAULT'][$key]['key'] = $key;
+			$scalesseen++;
+		    }
+		    // we have a 0-0 line now, so we need to hide that.
+		    $this->add_hint("key_hidezero_DEFAULT", 1);
+		} else {
+		    wm_debug("Already have $scalesseen scales, no defaults added.\n");
+		}
+	
+		$this->numscales['DEFAULT'] = $scalesseen;
+		$this->configfile = "$filename";
+	
+		if ($this->has_overlibs && $this->htmlstyle == 'static') {
+		    wm_warn(
+			"OVERLIBGRAPH is used, but HTMLSTYLE is static. This is probably wrong. [WMWARN41]\n");
+		}
+	
+		$this->BuildZLayers();
+		$this->ResolveRelativePositions();
+		$this->RunPreprocessors();
+	}
         return (true);
 }
 
@@ -3987,41 +3864,53 @@ function ReadConfig($input, $is_include=FALSE)
 	wm_debug("ReadConfig has finished reading the config ($linecount lines)\n");
 	wm_debug("------------------------------------------\n");
 
-	// load some default colouring, otherwise it all goes wrong
-	if ($scalesseen == 0)
-	{
-		wm_debug ("Adding default SCALE colour set (no SCALE lines seen).\n");
-		$defaults=array
-			(
-				'0_0' => array('bottom' => 0, 'top' => 0, 'red1' => 192, 'green1' => 192, 'blue1' => 192, 'special'=>0),
-				'0_1' => array('bottom' => 0, 'top' => 1, 'red1' => 255, 'green1' => 255, 'blue1' => 255, 'special'=>0),
-				'1_10' => array('bottom' => 1, 'top' => 10, 'red1' => 140, 'green1' => 0, 'blue1' => 255, 'special'=>0),
-				'10_25' => array('bottom' => 10, 'top' => 25, 'red1' => 32, 'green1' => 32, 'blue1' => 255, 'special'=>0),
-				'25_40' => array('bottom' => 25, 'top' => 40, 'red1' => 0, 'green1' => 192, 'blue1' => 255, 'special'=>0),
-				'40_55' => array('bottom' => 40, 'top' => 55, 'red1' => 0, 'green1' => 240, 'blue1' => 0, 'special'=>0),
-				'55_70' => array('bottom' => 55, 'top' => 70, 'red1' => 240, 'green1' => 240, 'blue1' => 0, 'special'=>0),
-				'70_85' => array('bottom' => 70, 'top' => 85, 'red1' => 255, 'green1' => 192, 'blue1' => 0, 'special'=>0),
-				'85_100' => array('bottom' => 85, 'top' => 100, 'red1' => 255, 'green1' => 0, 'blue1' => 0, 'special'=>0)
-			);
-
-		foreach ($defaults as $key => $def)
+	// If this is the root file, we're done, and can do some cleanup
+	if( !$is_include) {
+		// load some default colouring, otherwise it all goes wrong
+		if ($scalesseen == 0)
 		{
-			$this->colours['DEFAULT'][$key]=$def;
-			$this->colours['DEFAULT'][$key]['key']=$key;
-			$scalesseen++;
-		}
-		// we have a 0-0 line now, so we need to hide that.
-		$this->add_hint("key_hidezero_DEFAULT",1);
-	}
-	else { wm_debug ("Already have $scalesseen scales, no defaults added.\n"); }
+			wm_debug ("Adding default SCALE colour set (no SCALE lines seen).\n");
+			$defaults = array
+				(
+					'0_0' => array('bottom' => 0, 'top' => 0, 'red1' => 192, 'green1' => 192, 'blue1' => 192, 'special'=>0),
+					'0_1' => array('bottom' => 0, 'top' => 1, 'red1' => 255, 'green1' => 255, 'blue1' => 255, 'special'=>0),
+					'1_10' => array('bottom' => 1, 'top' => 10, 'red1' => 140, 'green1' => 0, 'blue1' => 255, 'special'=>0),
+					'10_25' => array('bottom' => 10, 'top' => 25, 'red1' => 32, 'green1' => 32, 'blue1' => 255, 'special'=>0),
+					'25_40' => array('bottom' => 25, 'top' => 40, 'red1' => 0, 'green1' => 192, 'blue1' => 255, 'special'=>0),
+					'40_55' => array('bottom' => 40, 'top' => 55, 'red1' => 0, 'green1' => 240, 'blue1' => 0, 'special'=>0),
+					'55_70' => array('bottom' => 55, 'top' => 70, 'red1' => 240, 'green1' => 240, 'blue1' => 0, 'special'=>0),
+					'70_85' => array('bottom' => 70, 'top' => 85, 'red1' => 255, 'green1' => 192, 'blue1' => 0, 'special'=>0),
+					'85_100' => array('bottom' => 85, 'top' => 100, 'red1' => 255, 'green1' => 0, 'blue1' => 0, 'special'=>0)
+				);
 	
-	$this->numscales['DEFAULT']=$scalesseen;
-	$this->configfile="$filename";
-
-	if($this->has_overlibs && $this->htmlstyle == 'static')
-	{
-		wm_warn("OVERLIBGRAPH is used, but HTMLSTYLE is static. This is probably wrong. [WMWARN41]\n");
+			foreach ($defaults as $key => $def)
+			{
+				$this->colours['DEFAULT'][$key]=$def;
+				$this->colours['DEFAULT'][$key]['key']=$key;
+				$scalesseen++;
+			}
+			// we have a 0-0 line now, so we need to hide that.
+			$this->add_hint("key_hidezero_DEFAULT",1);
+		}
+		else { wm_debug ("Already have $scalesseen scales, no defaults added.\n"); }
+		
+		$this->numscales['DEFAULT']=$scalesseen;
+		$this->configfile="$filename";
+	
+		if($this->has_overlibs && $this->htmlstyle == 'static')
+		{
+			wm_warn("OVERLIBGRAPH is used, but HTMLSTYLE is static. This is probably wrong. [WMWARN41]\n");
+		}
+		
+		$this->BuildZLayers();
+		$this->ResolveRelativePositions();
+		$this->RunPreprocessors();
 	}
+	return (TRUE);
+}
+
+function BuildZLayers()
+{
 	
 	wm_debug("Building cache of z-layers and finalising bandwidth.\n");
 
@@ -4066,10 +3955,24 @@ function ReadConfig($input, $is_include=FALSE)
 	}
 
 	wm_debug("Found ".sizeof($this->seen_zlayers)." z-layers including builtins (0,100).\n");
+}
 
+function RunPreprocessors()
+{
+	wm_debug("Running Pre-Processing Plugins...\n");
+	foreach ($this->preprocessclasses as $pre_class)
+	{
+		wm_debug("Running $pre_class"."->run()\n");
+		$this->plugins['pre'][$pre_class]->run($this);
+	}
+	wm_debug("Finished Pre-Processing Plugins...\n");	
+}
+
+function ResolveRelativePositions()
+{
 	// calculate any relative positions here - that way, nothing else
 	// really needs to know about them
-
+	
 	wm_debug("Resolving relative positions for NODEs...\n");
 	// safety net for cyclic dependencies
 	$i=100;
@@ -4142,24 +4045,14 @@ function ReadConfig($input, $is_include=FALSE)
 		wm_debug("Relative Positions Cycle $i - set $set and Skipped $skipped for unresolved dependencies\n");
 		$i--;
 	} while( ($set>0) && ($i!=0)  );
-
+	
 	if($skipped>0)
 	{
 		wm_warn("There are Circular dependencies in relative POSITION lines for $skipped nodes. [WMWARN11]\n");
 	}
-
+	
 	wm_debug("-----------------------------------\n");
 
-
-	wm_debug("Running Pre-Processing Plugins...\n");
-	foreach ($this->preprocessclasses as $pre_class)
-	{
-		wm_debug("Running $pre_class"."->run()\n");
-		$this->plugins['pre'][$pre_class]->run($this);
-	}
-	wm_debug("Finished Pre-Processing Plugins...\n");
-
-	return (TRUE);
 }
 
 function ReadConfig_Commit(&$curobj)

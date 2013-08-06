@@ -2,9 +2,17 @@
 // Sample Pluggable datasource for PHP Weathermap 0.9
 // - read a pair of values from a database, and return it
 
-// TARGET dbplug:databasename:username:pass:hostkey
+// TARGET dbplug:key
 
-class WeatherMapDataSource_dbsample extends WeatherMapDataSource {
+// Expects to find SET variables for the database access details
+//     dbplug_dbuser - mysql username
+//     dbplug_dbpass - mysql password
+//     dbplug_dbname - mysql database name
+//     dbplug_dbhost - mysql host
+
+// Intended as a demo, but should be useful for something, too
+
+class WeatherMapDataSource_dbplug extends WeatherMapDataSource {
 
 	function Init(&$map)
 	{
@@ -41,7 +49,9 @@ class WeatherMapDataSource_dbsample extends WeatherMapDataSource {
 						
 			$key = mysql_real_escape_string($matches[1]);
 
+			// This is the one line you will certainly need to change
 			$SQL = "select in,out from table where host=$key LIMIT 1";
+			
 			if(mysql_connect($database_host,$database_user,$database_pass))
 			{
 				if(mysql_select_db($database_name))
@@ -49,7 +59,7 @@ class WeatherMapDataSource_dbsample extends WeatherMapDataSource {
 					$result = mysql_query($SQL);
 					if (!$result)
 					{
-					    wm_warn("dbsample ReadData: Invalid query: " . mysql_error()."\n");
+					    wm_warn("dbplug ReadData: Invalid query: " . mysql_error()."\n");
 					}
 					else
 					{
@@ -60,19 +70,19 @@ class WeatherMapDataSource_dbsample extends WeatherMapDataSource {
 				}
 				else
 				{
-					wm_warn("dbsample ReadData: failed to select database: ".mysql_error()."\n");
+					wm_warn("dbplug ReadData: failed to select database: ".mysql_error()."\n");
 				}
 			}
 			else
 			{
-				wm_warn("dbsample ReadData: failed to connect to database server: ".mysql_error()."\n");
+				wm_warn("dbplug ReadData: failed to connect to database server: ".mysql_error()."\n");
 			}
 			
 			$data_time = now();
 		}
 		
 		
-		wm_debug ("RRD ReadData: Returning (".($data[IN]===NULL?'NULL':$data[IN]).",".($data[OUT]===NULL?'NULL':$data[IN]).",$data_time)\n");
+		wm_debug ("RRD ReadData dbplug: Returning (".($data[IN]===NULL?'NULL':$data[IN]).",".($data[OUT]===NULL?'NULL':$data[IN]).",$data_time)\n");
 		
 		return( array($data[IN], $data[OUT], $data_time) );
 	}

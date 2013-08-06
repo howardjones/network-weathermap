@@ -1,4 +1,4 @@
-
+<?php
 // new version of config_keywords
 // array of contexts, contains an array of keywords, contains a (short) list of regexps as now
 // this way, we don't scan the whole table, and we call preg_match a WHOLE lot less
@@ -777,4 +777,3 @@ $WM_config_keywords2 = array (
         ),),
     ) // end of link
 );
-

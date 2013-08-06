@@ -236,7 +236,7 @@ $WM_config_keywords2 = array (
             ),
             array (
                 'NODE',
-                '/^AICONFILLCOLOR\s+(copy)$/',
+                '/^AICONFILLCOLOR\s+(copy|none)$/',
                 'ReadConfig_Handle_COLOR'
             ),
         ),
@@ -347,6 +347,24 @@ $WM_config_keywords2 = array (
                     'relative_resolved' => false
                 )
             ),
+            array ( # named offset
+                'NODE',
+                "/^POSITION\s+([A-Za-z][A-Za-z0-9\-_]*):([A-Za-z][A-Za-z0-9_]*)$/i",
+                array (                    
+                    'relative_to' => 1,
+                    'relative_name' => 2,
+                    'pos_named' => true,
+                    'polar' => false,
+                    'relative_resolved' => false
+                )
+            ),
+        ),
+        'DEFINEOFFSET' => array(
+                            array(
+                                'NODE',
+                                '/^DEFINEOFFSET\s+([A-Za-z][A-Za-z0-9_]*)\s+([-+]?\d+)\s+([-+]?\d+)/i',
+                                "ReadConfig_Handle_DEFINEOFFSET"
+                ),
         ),
         'INFOURL' => array (array (
             'NODE',

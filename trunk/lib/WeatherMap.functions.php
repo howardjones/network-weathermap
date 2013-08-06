@@ -270,6 +270,8 @@ function screenshotify($input)
 
 function render_colour($col)
 {
+	die("render_colour() called");
+	
 	if (($col[0] == -1) && ($col[1] == -1) && ($col[1] == -1)) { return 'none'; }
 	else if (($col[0] == -2) && ($col[1] == -2) && ($col[1] == -2)) { return 'copy'; }
 	else if (($col[0] == -3) && ($col[1] == -3) && ($col[1] == -3)) { return 'contrast'; }
@@ -944,7 +946,7 @@ function draw_straight($image, &$curvepoints, $widths, $outlinecolour, $fillcolo
 			// if this is the first step, then we need to go from the middle to the outside edge first
 			// ( the loop may not run, but these corners are required)
 			$i = 0;
-			$v1 = new Vector($simple[$i+1][X] - $simple[$i][X], $simple[$i+1][Y] - $simple[$i][Y]);
+			$v1 = new WMVector($simple[$i+1][X] - $simple[$i][X], $simple[$i+1][Y] - $simple[$i][Y]);
 			$n1 = $v1->get_normal();
 						
 			$finalpoints[] = $simple[$i][X] + $n1->dx*$widths[$dir];
@@ -958,8 +960,8 @@ function draw_straight($image, &$curvepoints, $widths, $outlinecolour, $fillcolo
 			$max_start = count($simple)-2;
 			for ($i=0; $i <$max_start; $i++)
 			{       
-				$v1 = new Vector($simple[$i+1][X] - $simple[$i][X], $simple[$i+1][Y] - $simple[$i][Y]);
-				$v2 = new Vector($simple[$i+2][X] - $simple[$i+1][X], $simple[$i+2][Y] - $simple[$i+1][Y]);
+				$v1 = new WMVector($simple[$i+1][X] - $simple[$i][X], $simple[$i+1][Y] - $simple[$i][Y]);
+				$v2 = new WMVector($simple[$i+2][X] - $simple[$i+1][X], $simple[$i+2][Y] - $simple[$i+1][Y]);
 				$n1 = $v1->get_normal();
 				$n2 = $v2->get_normal();
 				
@@ -1508,6 +1510,7 @@ class Point
 	
 	function Point($x=0,$y=0)
 	{
+		die("old Point class used File: " . __FILE__ . " on line: " . __LINE__); 
 		$this->x = $x;
 		$this->y = $y;
 	}
@@ -1520,6 +1523,7 @@ class Vector
 	
 	function Vector($dx=0,$dy=0)
 	{
+		die("old Vector class used File: " . __FILE__ . " on line: " . __LINE__); 
 		$this->dx = $dx;
 		$this->dy = $dy;
 	}
@@ -1554,6 +1558,8 @@ class Colour
 	// take in an existing value and create a Colour object for it
 	function Colour()
 	{
+		die("Old Colour class used\n");
+		
 		if(func_num_args() == 3) # a set of 3 colours
 		{
 			$this->r = func_get_arg(0); # r

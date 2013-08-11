@@ -149,7 +149,7 @@ class ConfigTest extends PHPUnit_Framework_TestCase
                 if(file_exists($reference)) {
                     $conflist[] = array($file, $reference, $testdir, $result1dir, $result2dir, $diffdir, $compare);
                 
-                    fputs($fd,"<h4>$file <a href=\"tests/$file\">[conf]</a></h4><p><nobr><img src='results1-$phptag/$file.png'> <img src='references/$file.png'> <img src='diffs/$file.png'></nobr></p>\n");                    
+                    fputs($fd,"<h4>$file <a href=\"tests/$file\">[conf]</a></h4><p><nobr>Out:<img align=middle src='results1-$phptag/$file.png'> Ref:<img src='references/$file.png' align=middle> Diff:<img align=middle src='diffs/$file.png'></nobr></p>\n");                    
                 }
             }
         }

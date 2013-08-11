@@ -147,8 +147,7 @@ class WeatherMapNode extends WeatherMapItem
 		$icon_h = 0;
 
 		$col = new WMColour('none');
-		# print $col->as_string();
-
+		
 		// if a target is specified, and you haven't forced no background, then the background will
 		// come from the SCALE in USESCALE
 		if( !empty($this->targets) && $this->usescale != 'none' )
@@ -159,14 +158,12 @@ class WeatherMapNode extends WeatherMapItem
 			{
 				$pc = $this->inpercent;
 				$col = $this->colours[IN];
-
 			}
 			
 			if($this->scalevar == 'out')
 			{
 				$pc = $this->outpercent;
 				$col = $this->colours[OUT];
-
 			}
 		}
 		else
@@ -175,6 +172,9 @@ class WeatherMapNode extends WeatherMapItem
 			$col = $this->labelbgcolour;
 		}
 
+        # print "-----\n";
+        # print_r($col);
+        
 		$colicon = null;
 		if ( !empty($this->targets) && $this->useiconscale != 'none' )
 		{
@@ -185,13 +185,14 @@ class WeatherMapNode extends WeatherMapItem
 			if($this->iconscalevar == 'in')
 			{
 				$pc = $this->inpercent;
-				$col = $this->colours[IN];
+			//x	$col = $this->colours[IN];
 				$val = $this->bandwidth_in;
 			}
+            
 			if($this->iconscalevar == 'out')
 			{
 				$pc = $this->outpercent;
-				$col = $this->colours[OUT];
+			//x            $col = $this->colours[OUT];
 				$val = $this->bandwidth_out;
 			}
 
@@ -208,6 +209,8 @@ class WeatherMapNode extends WeatherMapItem
 			}
 		}
 
+        // print_r($col);
+        
 		// figure out a bounding rectangle for the label
 		if ($this->label != '')
 		{
@@ -283,8 +286,11 @@ class WeatherMapNode extends WeatherMapItem
 			$icon_w = 0;
 			$icon_h = 0;
 
-			if($this->iconfile == 'rbox' || $this->iconfile == 'box' || $this->iconfile == 'round' || $this->iconfile == 'inpie' || $this->iconfile == 'outpie' || $this->iconfile == 'gauge' || $this->iconfile == 'nink')
-			{
+            $aicon_types = array('rbox','box','round','inpie','outpie','nink','gauge');
+            
+			// if($this->iconfile == 'rbox' || $this->iconfile == 'box' || $this->iconfile == 'round' || $this->iconfile == 'inpie' || $this->iconfile == 'outpie' || $this->iconfile == 'gauge' || $this->iconfile == 'nink')
+			if(in_array($this->iconfile, $aicon_types))
+            {
 				wm_debug("Artificial Icon type " .$this->iconfile. " for $this->name\n");
 				// this is an artificial icon - we don't load a file for it
 
@@ -297,24 +303,55 @@ class WeatherMapNode extends WeatherMapItem
 				$fill = NULL;
 				$ink = NULL;
 
-				$aifill = new WMColour($this->aiconfillcolour);
-				$aiink = new WMColour($this->aiconoutlinecolour);
+				$aifill = $this->aiconfillcolour;
+				$aiink = $this->aiconoutlinecolour;
 
-				if ( $aifill->is_copy() && !$col->is_none() )
-				{
-					$fill = $col;
-				}
-				else
-				{
-					if($aifill->is_real())
-					{
-						$fill = $aifill;
-					}
-				}
+                // if useiconscale isn't set, then use the static
+                // colour defined, or copy the colour from the label
+                if($this->useiconscale == "none") {
+                    if ( $aifill->is_copy() && !$col->is_none() )
+                    {
+                        $fill = $col;
+                    }
+                    elseif( $aifill->is_real() || $aifill->is_none() )
+                    {
+                        $fill = $aifill;
+                    }
+                    else {
+                        wm_warn("AICONFILLCOLOR is copy, but LABELBGCOLOR is none.\n");
+                    }
+                } else {
+                    // if useiconscale IS defined, use that to figure out
+                    // the fill colour
 
-				if ($this->aiconoutlinecolour != array(-1,-1,-1))
+                    $pc = 0;
+                    $val = 0;
+
+                    if ($this->iconscalevar == 'in') {
+                        $pc = $this->inpercent;
+                        $val = $this->bandwidth_in;
+                    }
+
+                    if ($this->iconscalevar == 'out') {
+                        $pc = $this->outpercent;
+                        $val = $this->bandwidth_out;
+                    }
+
+                    if ($this->iconscaletype == 'percent') {
+                        list($fill, $junk, $junk) =
+                            $map->ColourFromValue($pc, $this->useiconscale, $this->name);
+                    } else {
+                        // use the absolute value if we aren't doing percentage scales.
+                        list($fill,  $junk, $junk) =
+                            $map->ColourFromValue($val, $this->useiconscale, $this->name,
+                                false);
+                    }
+          
+                }
+                                
+				if ($this->aiconoutlinecolour->is_real())
 				{
-					$ink=$aiink;
+					$ink = $aiink;
 				}
 
 				if($this->iconfile=='box')
@@ -504,10 +541,8 @@ class WeatherMapNode extends WeatherMapItem
 				$map->nodes[$this->name]->width = imagesx($icon_im);
 				$map->nodes[$this->name]->height = imagesy($icon_im);
 
-				$map->nodes[$this->name]->boundingboxes[] = array($icon_x1, $icon_y1, $icon_x2, $icon_y2);
-				
+				$map->nodes[$this->name]->boundingboxes[] = array($icon_x1, $icon_y1, $icon_x2, $icon_y2);	
 			}
-
 		}
 
 		// do any offset calculations
@@ -543,7 +578,6 @@ class WeatherMapNode extends WeatherMapItem
 
 		// create TWO imagemap entries - one for the label and one for the icon
 		// (so we can have close-spaced icons better)
-
 
 		$temp_width = $bbox_x2-$bbox_x1;
 		$temp_height = $bbox_y2-$bbox_y1;
@@ -582,7 +616,10 @@ class WeatherMapNode extends WeatherMapItem
 			$txt_y += ($this->labeloffsety + $dy);
 
 			// if there's an icon, then you can choose to have no background
+            assert('is_object($col)');
 
+            // print_r($col);
+            
 			if(! $col->is_none() )
 			{
 			    imagefilledrectangle($node_im, $label_x1, $label_y1, $label_x2, $label_y2, $col->gdallocate($node_im));

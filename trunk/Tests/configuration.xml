@@ -19,4 +19,9 @@ and open the template in the editor.
       <directory>Tests</directory>
     </testsuite>
   </testsuites>
+
+<logging>
+  <log type="json" target="logfile.json"/>
+</logging>
+
 </phpunit>

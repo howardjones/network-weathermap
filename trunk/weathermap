@@ -22,6 +22,7 @@ $dumpafter=0;
 $dumpstats=0;
 $randomdata=0;
 $dumpconfig='';
+$readconfigonly=0;
 $defines=array();
 
 // **************************************************************************************
@@ -41,6 +42,7 @@ $long_opts=array
 		"config=",
 		"output=",
 		"debug",
+		"read-config-only",
 		"uberdebug",
 		"stats",
 		"define=",
@@ -95,6 +97,10 @@ if (sizeof($gopts) > 0)
 
 		case '--randomdata':
 			$randomdata=1;
+			break;
+
+		case '--read-config-only':
+			$readconfigonly=1;
 			break;
 
 		case '--stats':
@@ -219,6 +225,7 @@ $weathermap_map = $configfile;
 
 if ($map->ReadConfig($configfile))
 {
+	if (!$readconfigonly) {
 	// allow command-lines to override the config file, but provide a default if neither are present
 	if ($imagefile == '')
 	{
@@ -305,7 +312,7 @@ if ($map->ReadConfig($configfile))
 	# $map->cachefolder="editcache";	
 	# $map->CacheUpdate(1);
 	
-		
+}		
 }
 else { die ("\n\nCould not read Weathermap config file. No output produced. Maybe try --help?\n"); }
 

@@ -308,10 +308,9 @@ class WeatherMapLink extends WeatherMapItem
 			wm_warn("Zero-length link ".$this->name." skipped. [WMWARN45]");
 			return;
 		}
-
 		
-		$outlinecol = new WMColour($this->outlinecolour);
-		$commentcol = new WMColour($this->commentfontcolour);
+		$outlinecol = $this->outlinecolour;
+		$commentcol = $this->commentfontcolour;
 		
 		$outline_colour = $outlinecol->gdallocate($im);
 				

@@ -57,7 +57,7 @@ function weathermap_run_maps($mydir)
 	global $weathermap_warncount;
 	global $weathermap_poller_start_time;
 		
-	require_once $mydir.DIRECTORY_SEPARATOR."lib".DIRECTORY_SEPARATOR."HTML_ImageMap.class.php";
+	// require_once $mydir.DIRECTORY_SEPARATOR."lib".DIRECTORY_SEPARATOR."HTML_ImageMap.class.php";
 	require_once $mydir.DIRECTORY_SEPARATOR."lib".DIRECTORY_SEPARATOR."Weathermap.class.php";
 
 	$total_warnings = 0;
@@ -137,7 +137,7 @@ function weathermap_run_maps($mydir)
 								// we can grab the rrdtool path from Cacti's config, in this case
 								$wmap->rrdtool  = $rrdtool_path;
 
-								$wmap->ReadConfig($mapfile);							
+								$wmap->ReadConfig($mapfile);
 
 								$wmap->add_hint("mapgroup",$map['groupname']);
 								$wmap->add_hint("mapgroupextra",($map['group_id'] ==1 ? "" : $map['groupname'] ));

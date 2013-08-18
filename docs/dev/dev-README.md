@@ -2,7 +2,7 @@
 
 ## Introduction ##
 
-So you can play along at home, here are some notes on how Weathermap prepared
+So you can play along at home, here are some notes on how Weathermap is prepared
 for release, how to create a dev environment, and how to complete the pre-release
 testing. 
 
@@ -38,7 +38,8 @@ the testing works as follows:
 * compare the generated image to a reference image (to see if the config works as expected)
   
 Tests/ConfigTest.php does this for every .conf file that it finds in the test-suite/tests
-directory. There are around 150 tests so far. Each one tests a particular feature or
+directory that also has a corresponding image in the references/ directory. There are 
+around 150 tests so far. Each one tests a particular feature or
 combination. Every time I find a new problem, I add new tests. Every time I add a new
 feature, I add new tests. This covers a lot of the core weathermap features by now.
 
@@ -50,6 +51,13 @@ to run it. This is useful for excluding new features from testing. This looks li
 The test runner looks for that, and will skip tests when runn with a lower version. The only
 exception is if the current version includes 'dev' in the name - then it will always run all
 tests.
+
+There is also a special test-related setting to ensure that maps with a timestamp in them always
+show the same time:
+
+    SET testmode 1
+	
+to avoid getting failures comparing to a reference image that was generated at another time.
 
 After the tests have run, you can look at test-suite/index.html to get summary reports of all
 image-comparison tests, or just the failing ones. ImageMagick is used to compare images, so 

@@ -3,7 +3,10 @@
 // array of contexts, contains an array of keywords, contains a (short) list of regexps as now
 // this way, we don't scan the whole table, and we call preg_match a WHOLE lot less
 // there will be more lines in the array, but we'll be checking less of them
-$WM_config_keywords2 = array (
+
+# global $WM_config_keywords2;
+
+$this->config_keywords = array (
     'GLOBAL' => array (
         'FONTDEFINE' => array(
             array('GLOBAL',"/^\s*FONTDEFINE\s+(\d+)\s+(\S+)\s+(\d+)\s*$/i",'ReadConfig_Handle_FONTDEFINE'),

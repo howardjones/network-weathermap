@@ -1,7 +1,7 @@
 <?php
         include "vars.php";
         $PAGE_TITLE="Upgrading";
-        include "common-page-head.html";
+        include "common-page-head.php";
 ?>
 
             <h2>Upgrading From Previous Versions</h2>
@@ -28,5 +28,5 @@
             automatically.</p>
 
 <?php
-        include "common-page-foot.html";
+        include "common-page-foot.php";
 ?>

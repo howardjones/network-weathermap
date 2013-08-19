@@ -1,7 +1,7 @@
 <?php
         include "vars.php";
         $PAGE_TITLE="Changes for this version";
-        include "common-page-head.html";
+        include "common-page-head.php";
 ?>
 			<h2 id="changes097b">Changes For This Version (0.97a to 0.97b)</h2>
 			<p>0.97b is a special release starting from 0.97a and backporting all the quick bugfixes from the 0.98 code.
@@ -171,21 +171,16 @@ are really facets of the same thing - lack of input validation. 0.97b improves t
                 <li>Option of a dropdown selector to navigate between maps (in full-size
                 view)</li>
 
-                <li>Maps can be organised into groups in Cacti plugin. These appear</li>
-
-                as tabs in the UI for viewing maps.
-
-                </li>
+                <li>Maps can be organised into groups in Cacti plugin. These appear
+                as tabs in the UI for viewing maps.</li>
 
                 <li>Extra variables can be defined per-group, so all maps in a group can
                 have similar settings (e.g. a "24hr average" tab).</li>
 
                 <li>INCLUDE keyword to include a file of common definitions (based on
-                work by BorisL)</li>
-
+                work by BorisL)
                 (NOTE: this can confuse the editor sometimes
                 - see the manual page for INCLUDE)
-
                 </li>
 
                 <li>Warning for maps that contain OVERLIBGRAPH but not 'HTMLSTYLE
@@ -1013,5 +1008,5 @@ are really facets of the same thing - lack of input validation. 0.97b improves t
                 <li>Close-together nodes don't crash the curve-drawing anymore</li>
             </ul>
 <?php
-        include "common-page-foot.html";
+        include "common-page-foot.php";
 ?>

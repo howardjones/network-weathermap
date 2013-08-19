@@ -33,6 +33,7 @@ $weathermap_error_suppress = array();
 // Turn on ALL error reporting for now.
 // error_reporting (E_ALL|E_STRICT);
 error_reporting (E_ALL);
+error_reporting(E_ALL & ~E_STRICT);
 
 // parameterise the in/out stuff a bit
 define("IN",0);
@@ -607,6 +608,7 @@ class WeatherMap extends WeatherMapBase
 	var $usage_stats = array();
 	var $coverage = array();
     var $colourtable = array();
+    var $fonts = array();
     var $warncount = 0;
 
 
@@ -646,6 +648,7 @@ class WeatherMap extends WeatherMapBase
 				'timefont' => 2,
 				'timex' => 0,
 				'timey' => 0,
+                                'fonts' => array(),
 				
 				'mintimex' => -10000,
 				'mintimey' => -10000,
@@ -2226,8 +2229,8 @@ function ReadConfig_Handle_VIA($fullcommand, $args, $matches, &$curobj, $filenam
             }
             else
        		 {
-				wm_debug("New GD font in slot %d\n",$args[1]);
-				$newfont = imageloadfont($args[2]);
+                        wm_debug("New GD font in slot %d\n",$args[1]);
+                        $newfont = imageloadfont($args[2]);
 
                         if ($newfont) {
                             $this->fonts[$args[1]]->type = "gd";
@@ -5097,7 +5100,7 @@ function MakeHTML($imagemapname = "weathermap_imap")
 	$html .= '<div class="weathermapimage" style="margin-left: auto; margin-right: auto; width: '.$this->width.'px;" >';
 	if ( $this->imageuri != '') { 
 		$html.=sprintf(
-			'<img id="wmapimage" src="%s" width="%d" height="%d" border="0" usemap="#%s"',
+			'<img id="wmapimage" src="%s" width="%d" height="%d" style="border: 0;" usemap="#%s"',
 			$this->imageuri,
 			$this->width,
 			$this->height,

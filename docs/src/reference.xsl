@@ -3,7 +3,7 @@
     <xsl:output omit-xml-declaration = "yes" indent = "yes" />
 
     <xsl:template match = "references">
-	<xsl:processing-instruction name="php">include 'vars.php'; $PAGE_TITLE='Configuration Reference'; include 'common-page-head.html'; </xsl:processing-instruction>
+	<xsl:processing-instruction name="php">include 'vars.php'; $PAGE_TITLE='Configuration Reference'; include 'common-page-head.php'; </xsl:processing-instruction>
                     <h2 id= "configref">Configuration Reference</h2>
 
                     <p>This page is automatically compiled, and documents all the
@@ -11,7 +11,7 @@
                     <xsl:processing-instruction name="php">echo $WEATHERMAP_VERSION; </xsl:processing-instruction>. </p>
 
                     <xsl:apply-templates />
-	<xsl:processing-instruction name="php">include 'common-page-foot.html'; </xsl:processing-instruction>
+	<xsl:processing-instruction name="php">include 'common-page-foot.php'; </xsl:processing-instruction>
     </xsl:template>
 
     <xsl:template match = "section">

@@ -1,10 +1,10 @@
 <?php
         include "vars.php";
         $PAGE_TITLE="Advanced Topics";
-        include "common-page-head.html";
+        include "common-page-head.php";
 ?>
 
-            <h2 id = "advtopics" id = "advtopics">Advanced Topics</h2>
+            <h2 id = "advtopics">Advanced Topics</h2>
 
             <p>This page contains information for the more advanced corners of
             Weathermap usage. I assume that you are more familiar with the basics of map
@@ -404,5 +404,5 @@
             network, or a total network uptime based on the uptimes of all nodes.
             Currently, there aren't any of these plugins, but the hooks are available.</p>
 <?php
-        include "common-page-foot.html";
+        include "common-page-foot.php";
 ?>

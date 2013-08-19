@@ -2,9 +2,9 @@
         include "vars.php";
         $PAGE_TITLE="The Map Editor";
         $PATH_EXTRA="../";
-        include "common-page-head.html";
+        include "common-page-head.php";
 ?>
-            <h2 id = "editor" id = "editor">The Map Editor</h2>
+            <h2 id = "editor">The Map Editor</h2>
 
             <p class = "notebox"><b>Note:</b> This section is basically unaltered from
             the v0.7 manual. The editor hasn't really changed since then, except to fix
@@ -92,5 +92,5 @@
             </p>
 
 <?php
-        include "common-page-foot.html";
+        include "common-page-foot.php";
 ?>

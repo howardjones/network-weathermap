@@ -2,7 +2,7 @@
         include "vars.php";
         $PAGE_TITLE="Error Code Reference";
         $PATH_EXTRA="../";
-        include "common-page-head.html";
+        include "common-page-head.php";
 ?>
 
             <h3>Error Code Reference</h3>
@@ -42,7 +42,7 @@
                 </dd>
 
                 <dt id="WMWARN02">[WMWARN02],
-                <span id = "WMWARN04">[WMWARN04]</a></dt>
+                <span id = "WMWARN04">[WMWARN04]</span></dt>
 
                 <dd><p>"Angled text doesn't work with non-FreeType fonts "</p>
 
@@ -70,9 +70,7 @@
 
                 </dd>
 
-                <dt id="WMWARN03">[WMWARN03]</a>
-
-                </dt>
+                <dt id="WMWARN03">[WMWARN03]</dt>
 
                 <dd><p>"Using a non-existent special font (<em>fontnumber</em>)
                 - falling back to internal GD fonts "</p>
@@ -410,7 +408,7 @@
 
                 </dd>
 
-                <dt id="WMWARN33">[WMWARN34]</dt>
+                <dt id="WMWARN34">[WMWARN34]</dt>
 
                 <dd><p>"NewColourFromPercent: Clipped <em>number</em>% to 0% for item
                 <em>itemname</em>"</p>
@@ -702,7 +700,7 @@
 
                 </dd>
 
-                <dt id="WMPOLL05">[WMPOLL06]</dt>
+                <dt id="WMPOLL06">[WMPOLL06]</dt>
 
                 <dd><p>"Output directory (<em>directory</em>) isn't writable (tried to
                 create '<em>filename</em>'). No maps created. You probably need to make
@@ -922,5 +920,5 @@
                 </dd>
 	</dl>
 <?php
-        include "common-page-foot.html";
+        include "common-page-foot.php";
 ?>

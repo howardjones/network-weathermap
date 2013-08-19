@@ -2,7 +2,7 @@
 	include "vars.php";
 	$PAGE_TITLE="FAQ &amp; Useful Tips";
 	$PATH_EXTRA="../";
-	include "common-page-head.html";
+	include "common-page-head.php";
 ?>
             <h2 id = "faq">FAQ &amp; Useful Tips</h2>
 
@@ -294,5 +294,5 @@
                 - it's nice to know that people do use this thing.</p></dd>
             </dl>
 <?php
-	include "common-page-foot.html";
+	include "common-page-foot.php";
 ?>

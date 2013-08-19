@@ -1,7 +1,7 @@
 <?php
         include "vars.php";
         $PAGE_TITLE="Specifying TARGET lines";
-        include "common-page-head.html";
+        include "common-page-head.php";
 ?>
             <h2 id="targets">Specifying TARGET lines</h2>
 
@@ -49,7 +49,7 @@
 			<hr />
 			
 			
-            <h3><a name = "static"></a>Static value</h3>
+            <h3><a id = "static"></a>Static value</h3>
 
             <div class = "definition">TARGET static:<em>invalue</em>:<em>outvalue</em>
             </div>
@@ -67,7 +67,7 @@
 
             <hr />
 
-            <h3><a name = "rrd"></a>RRDtool files</h3>
+            <h3><a id = "rrd"></a>RRDtool files</h3>
 
             <div class = "definition">TARGET
             <em>rrdfile.rrd</em>:<em>in_ds</em>:<em>out_ds</em>
@@ -164,7 +164,7 @@
             These can be used in the TARGET, INFOURL and OVERLIBGRAPH commands in
             particular, to reduce a lot of duplication.</p>
 
-            <h4><a name = "rrdpollerextras">Cacti poller_output support</a> (aka Boost
+            <h4><a id = "rrdpollerextras">Cacti poller_output support</a> (aka Boost
             support)</h4>
 
             <p>If you are using Cacti as your data collector, and running Weathermap
@@ -252,7 +252,7 @@
 
             <hr />
 
-            <h3><a name = "tabs"></a>Tab-separated text</h3>
+            <h3><a id = "tabs"></a>Tab-separated text</h3>
 
             <div class = "definition">TARGET <em>textfile</em>
             </div>
@@ -276,7 +276,7 @@ link3    34.6K 113</pre>
 
             <hr />
 
-            <h3><a name = "mrtg"></a>MRTG .html file</h3>
+            <h3><a id = "mrtg"></a>MRTG .html file</h3>
 
             <div class = "definition">TARGET <em>htmlfile</em>
             </div>
@@ -312,7 +312,7 @@ link3    34.6K 113</pre>
             
             <hr />
 
-            <h3><a name = "cactihost"></a>Cacti host status</h3>
+            <h3><a id = "cactihost"></a>Cacti host status</h3>
 
             <div class = "definition">TARGET cactihost:<em>hostid</em>
             </div>
@@ -371,7 +371,7 @@ SCALE cactiupdown 4.5 5.5 128 128 128 </pre>
             
             <hr />
 
-            <h3><a name = "cactithold"></a>Cacti threshold status</h3>
+            <h3><a id = "cactithold"></a>Cacti threshold status</h3>
 
             <div class = "definition">TARGET cactimonitor:<em>hostid</em>
             </div>
@@ -449,7 +449,7 @@ NODE firewall_status
 
             <hr />
 
-            <h3><a name = "cactidsstats"></a>Cacti DSStats data collection plugin</h3>
+            <h3><a id = "cactidsstats"></a>Cacti DSStats data collection plugin</h3>
 
             <div class = "definition">TARGET
             dsstats:<em>dsid</em>:<em>in_ds</em>:<em>out_ds</em>
@@ -511,7 +511,7 @@ NODE firewall_status
 
             <hr />
 
-            <h3><a name = "snmp"></a>SNMP value</h3>
+            <h3><a id = "snmp"></a>SNMP value</h3>
 
             <div class = "definition">TARGET
             snmp:<em>community</em>:<em>host</em>:<em>in_oid</em>:<em>out_oid</em>
@@ -546,7 +546,7 @@ NODE firewall_status
 
             <hr />
 
-            <h3><a name = "script"></a>External script</h3>
+            <h3><a id = "script"></a>External script</h3>
 
             <div class = "definition">TARGET !<em>scriptname</em>
             </div>
@@ -581,7 +581,7 @@ NODE firewall_status
 
             <hr />
 
-            <h3><a name = "fping"></a>FPING</h3>
+            <h3><a id = "fping"></a>FPING</h3>
 
             <div class = "definition">TARGET fping:<em>hostname</em>
             </div>
@@ -603,7 +603,7 @@ NODE firewall_status
             whatever you have set), the 'fping_min' Hint Variable is the minimum ping
             time in milliseconds, and 'fping_max' is the maximum.</p>
 
-            <h3><a name = "time"></a>Current Time</h3>
+            <h3><a id = "time"></a>Current Time</h3>
 
             <div class = "definition">TARGET time:<em>zonename</em>
             </div>
@@ -630,5 +630,5 @@ NODE firewall_status
             version 5.</p>
 
 <?php
-        include "common-page-foot.html";
+        include "common-page-foot.php";
 ?>

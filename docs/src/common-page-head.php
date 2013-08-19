@@ -1,6 +1,6 @@
 <?php
 	if(! isset($PATH_EXTRA)) { $PATH_EXTRA = "../"; }
-?><!doctype html>
+?><!DOCTYPE html>
 <html lang = "en" xml:lang = "en" xmlns = "http://www.w3.org/1999/xhtml">
     <head>
         <link rel = "stylesheet" type = "text/css" media = "screen" href = "<?php echo $PATH_EXTRA; ?>kube101/css/kube.min.css" />
@@ -9,7 +9,7 @@
     </head>
 
     <body class="kubepage">
-            <?php if(! isset($FRONT_PAGE)) include "common-top-nav.html" ?>
+            <?php if(! isset($FRONT_PAGE)) include "common-top-nav.php" ?>
 	<div id="content">
 	<div id="content2" class="wrapper">
 

@@ -1,7 +1,7 @@
 <?php
         include "vars.php";
         $PAGE_TITLE="Cacti Plugin";
-        include "common-page-head.html";
+        include "common-page-head.php";
 ?>
             <h2 id = "cactiplugin">Cacti Plugin</h2>
 
@@ -229,5 +229,5 @@
             <strong>This is why the button is labelled 'experimental'.</strong></p>
 
 <?php
-        include "common-page-foot.html";
+        include "common-page-foot.php";
 ?>

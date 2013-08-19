@@ -1,7 +1,7 @@
 <?php
         include "vars.php";
         $PAGE_TITLE="Installation - Command-Line Tool Only";
-        include "common-page-head.html";
+        include "common-page-head.php";
 ?>
             <h2>Installation</h2>
 
@@ -79,5 +79,5 @@
             <i>should</i> get some kind of error to help you figure out why.</p>
 
 <?php
-        include "common-page-foot.html";
+        include "common-page-foot.php";
 ?>

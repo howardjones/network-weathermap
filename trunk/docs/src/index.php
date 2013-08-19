@@ -3,7 +3,7 @@
         $PAGE_TITLE="Start Here";
 	$PATH_EXTRA="";
 	$FRONT_PAGE = 1;
-        include "common-page-head.html";
+        include "common-page-head.php";
 ?>
 
             <p style = "text-align:center; font-weight: bold; font-size: 130%; margin-bottom: 3em; margin-top: 3em;"><a href = "pages/main.html">New
@@ -82,5 +82,5 @@
             <br clear = "both" />
 
 <?php
-        include "common-page-foot.html";
+        include "common-page-foot.php";
 ?>

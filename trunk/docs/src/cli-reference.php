@@ -1,7 +1,7 @@
 <?php
         include "vars.php";
         $PAGE_TITLE="Command-line option Reference";
-        include "common-page-head.html";
+        include "common-page-head.php";
 ?>
 
             <div id = "enclose">
@@ -68,5 +68,5 @@
                 the src attribute, if you know better.</p>
             </div>
 <?php
-        include "common-page-foot.html";
+        include "common-page-foot.php";
 ?>

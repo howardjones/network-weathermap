@@ -1,7 +1,7 @@
 <?php
         include "vars.php";
         $PAGE_TITLE="Installation - Command-Line Tool and Editor";
-        include "common-page-head.html";
+        include "common-page-head.php";
 ?>
             <h2>Installation</h2>
 
@@ -168,5 +168,5 @@
             </p>
 
 <?php
-        include "common-page-foot.html";
+        include "common-page-foot.php";
 ?>

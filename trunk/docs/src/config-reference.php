@@ -1,4 +1,4 @@
-<?php include 'vars.php'; $PAGE_TITLE='Configuration Reference'; include 'common-page-head.html'; ?><h2 id="configref">Configuration Reference</h2><p>This page is automatically compiled, and documents all the
+<?php include 'vars.php'; $PAGE_TITLE='Configuration Reference'; include 'common-page-head.php'; ?><h2 id="configref">Configuration Reference</h2><p>This page is automatically compiled, and documents all the
                     configuration directives that are available in PHP Weathermap
                     <?php echo $WEATHERMAP_VERSION; ?>.  </p>
     <h2 class="configsection">Introduction</h2>
@@ -681,7 +681,7 @@
   <div class="description">
  <p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Specify the colours used for drawing the <a href="#NODE_LABEL">LABEL.</a> </p> 
  <p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">red, green and blue are numbers from 0 to 255. </p> 
- <p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude"><a href="#NODE_COLORS">LABELFONTSHADOWCOLOR,</a> <a href="#NODE_COLORS">LABELBGCOLOR</a> and <a href="#NODE_COLORS">LABELOUTLINECOLOR</a> have an additional 
+ <p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude"><a href="#NODE_COLORS">LABELFONTSHADOWCOLOR,</a> <a href="#NODE_COLORS">LABELBGCOLOR,</a> <a href="#NODE_COLORS">LABELOUTLINECOLOR</a> and <a href="#NODE_COLORS">AICONFILLCOLOR</a> have an additional 
  option - 'none' 
  - which stops that element of the <a href="#NODE_LABEL">LABEL</a> being drawn. <a href="#NODE_COLORS">LABELFONTSHADOWCOLOR</a> 
  defaults to 'none'. </p> 
@@ -697,6 +697,9 @@
   <div class="changes">
     <h4>Change History</h4>
     <dl class="small">
+      <dt>0.98</dt>
+      <dd>Added 'none' option for AICONFILLCOLOR.
+        </dd>
       <dt>0.95</dt>
       <dd>Added 'contrast' and 'copy' options.
         </dd>
@@ -1488,7 +1491,7 @@
     <h4>Change History</h4>
     <dl class="small">
       <dt>0.96</dt>
-      <dd>Added warning for proably-wrong positions
+      <dd>Added warning for probably-wrong positions
         </dd>
       <dt>0.9</dt>
       <dd>Added BWLABELPOS
@@ -3310,4 +3313,4 @@
   </div>
 </div>
     
-<?php include 'common-page-foot.html'; ?>
+<?php include 'common-page-foot.php'; ?>

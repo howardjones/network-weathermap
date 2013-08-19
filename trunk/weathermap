@@ -10,7 +10,9 @@ require_once 'Console/Getopt.php';
 
 require_once dirname(__FILE__).'/lib/Weathermap.class.php';
 
-if (!wm_module_checks()) { die ("Quitting: Module checks failed.\n"); }
+if (!wm_module_checks()) { 
+    die ("Quitting: Module checks failed.\n");     
+}
 
 //    $weathermap_debugging=TRUE; 
 
@@ -60,16 +62,16 @@ $args=$cg->readPHPArgv();
 
 $ret=$cg->getopt($args, $short_opts, $long_opts);
 
-if (PEAR::isError($ret)) { die ("Error in command line: " . $ret->getMessage() . "\n (try --help)\n"); }
+if (PEAR::isError($ret)) { 
+    die ("Error in command line: " . $ret->getMessage() . "\n (try --help)\n");     
+}
 
 $gopts=$ret[0];
 
 $options_output = array();
 
-if (sizeof($gopts) > 0)
-{
-	foreach ($gopts as $o)
-	{
+if (sizeof($gopts) > 0) {
+	foreach ($gopts as $o) {
 		switch ($o[0])
 		{
 		case '--config':
@@ -202,8 +204,7 @@ if (sizeof($gopts) > 0)
 }
 
 // set this BEFORE we create the map object, so we get the debug output from Reset(), as well
-if(isset($options_output['debugging']) && $options_output['debugging']) 
-{
+if(isset($options_output['debugging']) && $options_output['debugging']) {
 	$weathermap_debugging=TRUE;
 	wm_debug("------------------------------------\n");
 	wm_debug("Starting PHP-Weathermap run, with config: $configfile\n");
@@ -223,9 +224,8 @@ foreach ($options_output as $key=>$value)
 
 $weathermap_map = $configfile;
 
-if ($map->ReadConfig($configfile))
-{
-	if (!$readconfigonly) {
+if ($map->ReadConfig($configfile)) {
+    if (!$readconfigonly) {
 	// allow command-lines to override the config file, but provide a default if neither are present
 	if ($imagefile == '')
 	{
@@ -238,18 +238,17 @@ if ($map->ReadConfig($configfile))
 		if ($map->htmloutputfile != '') { $htmlfile = $map->htmloutputfile; }
 	}
 
-    // feed in any command-line defaults, so that they appear as if SET lines in the config
-    
-    // XXX FIXME
-    foreach ($defines as $hintname=>$hint)
-    {
-        $map->add_hint($hintname,$hint);
-    }
+        // feed in any command-line defaults, so that they appear as if SET lines in the config
+
+        // XXX FIXME
+        foreach ($defines as $hintname=>$hint)
+        {
+            $map->add_hint($hintname,$hint);
+        }
 	
 	// now stuff in all the others, that we got from getopts
 	foreach ($options_output as $key=>$value)
-	{
-		// $map->$key = $value;
+	{		
 		$map->add_hint($key,$value);
 	}
 
@@ -258,8 +257,6 @@ if ($map->ReadConfig($configfile))
 		if ($randomdata == 1) { $map->RandomData(); }
 		else { $map->ReadData(); }
 	}
-
-	# exit();
 	
 	if ($imagefile != '')
 	{
@@ -273,7 +270,7 @@ if ($map->ReadConfig($configfile))
 		
 		$fd=fopen($htmlfile, 'w');
 		fwrite($fd,
-			'<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head>');
+			'<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">'."\n".'<html xmlns="http://www.w3.org/1999/xhtml"><head>');
 		if($map->htmlstylesheet != '') fwrite($fd,'<link rel="stylesheet" type="text/css" href="'.$map->htmlstylesheet.'" />');
 		fwrite($fd,'<meta http-equiv="refresh" content="300" /><title>' . $map->ProcessString($map->title, $map) . '</title></head><body>');
 
@@ -306,17 +303,11 @@ if ($map->ReadConfig($configfile))
 	if ($dumpafter == 1)
 		print_r ($map);
 		
-#	print_r ($map->node_template_tree);
-#	print_r ($map->link_template_tree);
-	
-	# $map->cachefolder="editcache";	
-	# $map->CacheUpdate(1);
-	
-}		
+    }		
 }
-else { die ("\n\nCould not read Weathermap config file. No output produced. Maybe try --help?\n"); }
-
-
+else { 
+    die ("\n\nCould not read Weathermap config file. No output produced. Maybe try --help?\n");     
+}
 
 function my_assert_handler($file, $line, $code)
 {

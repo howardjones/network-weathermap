@@ -359,14 +359,13 @@ function weathermap_fullview($cycle=FALSE, $firstonly=FALSE, $limit_to_group = -
 
 	if($firstonly) { $maplist_SQL .= " LIMIT 1"; }
 
+        $maplist = db_fetch_assoc( $maplist_SQL );
+        
 	if(sizeof($maplist) == 1) {
 		$pagetitle = "Network Weathermap";
 	} else {
 		$pagetitle = "Network Weathermaps";
 	}
-
-	
-	$maplist = db_fetch_assoc( $maplist_SQL );
 
 	$class = "inplace";
 	if($fullscreen) $class = "fullscreen";

@@ -2,7 +2,7 @@
         include "vars.php";
         $PAGE_TITLE="Introduction";
         $PATH_EXTRA="../";
-        include "common-page-head.html";
+        include "common-page-head.php";
 ?>
             <div class = "license"><p>PHP Weathermap is free software; you can
             redistribute it and/or modify it under the terms of the GNU General Public
@@ -501,5 +501,5 @@ LINK infra-core
             </div>
 
 <?php
-        include "common-page-foot.html";
+        include "common-page-foot.php";
 ?>

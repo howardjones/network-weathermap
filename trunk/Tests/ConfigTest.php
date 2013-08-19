@@ -126,17 +126,21 @@ class ConfigTest extends PHPUnit_Framework_TestCase
         $result1dir = "test-suite".DIRECTORY_SEPARATOR."results1-$phptag";
         $result2dir = "test-suite".DIRECTORY_SEPARATOR."results2-$phptag";
         $diffdir = "test-suite".DIRECTORY_SEPARATOR."diffs";
-
-        // XXX This changes
+      
+        // NOTE: This path will change between systems...
         $compare = "test-suite".DIRECTORY_SEPARATOR."tools".DIRECTORY_SEPARATOR."compare.exe";
         $compare = "/usr/bin/compare";
+        
+        if( ! file_exists($compare)) {
+            die("Compare path doesn't exist.");
+        }
         
         if(! file_exists($result1dir)) { mkdir($result1dir); }
         if(! file_exists($result2dir)) { mkdir($result2dir); }
         if(! file_exists($diffdir)) { mkdir($diffdir); }
-
+        
         $fd = fopen("test-suite/summary.html","w");
-        fputs($fd,"<html><head><title>Test summary</title></head><style>img {border: 1px solid black; }</style><body><h3>Test Summary</h3>(result - reference - diff)<br/>\n");
+        fputs($fd,"<html><head><title>Test summary</title><style>img {border: 1px solid black; }</style></head><body><h3>Test Summary</h3>(result - reference - diff)<br/>\n");
         
         $conflist = array();
 

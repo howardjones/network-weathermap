@@ -90,7 +90,7 @@ function weathermap_run_maps($mydir)
 		$orig_cwd = getcwd();
 		chdir($mydir);
 
-		db_execute("replace into settings values('weathermap_last_start_time','".mysql_escape_string(time())."')");
+		db_execute("replace into settings values('weathermap_last_start_time','".mysql_real_escape_string(time())."')");
 
 		// first, see if the output directory even exists
 		if (is_dir($outdir)) {
@@ -128,7 +128,7 @@ function weathermap_run_maps($mydir)
 
 							if (file_exists($mapfile)) {
 								if ($quietlogging==0) wm_warn("Map: $mapfile -> $htmlfile & $imagefile\n",TRUE);
-								db_execute("replace into settings values('weathermap_last_started_file','".mysql_escape_string($weathermap_map)."')");
+								db_execute("replace into settings values('weathermap_last_started_file','".mysql_real_escape_string($weathermap_map)."')");
 								$map_start = time();
 								weathermap_memory_check("MEM starting $mapcount");
 								$wmap = new Weathermap;
@@ -213,7 +213,7 @@ function weathermap_run_maps($mydir)
 								wm_debug("TIME: $mapfile took $map_duration seconds.\n");
 								weathermap_memory_check("MEM after $mapcount");
 								$mapcount++;
-								db_execute("replace into settings values('weathermap_last_finished_file','".mysql_escape_string($weathermap_map)."')");
+								db_execute("replace into settings values('weathermap_last_finished_file','".mysql_real_escape_string($weathermap_map)."')");
 							} else {
 								wm_warn("Mapfile $mapfile is not readable or doesn't exist [WMPOLL04]\n");
 							}
@@ -245,8 +245,8 @@ function weathermap_run_maps($mydir)
 		
 		$stats_string = date(DATE_RFC822) . ": $mapcount maps were run in $duration seconds with $total_warnings warnings." . $warning_notes;
 		if ($quietlogging==0) wm_warn("STATS: Weathermap $WEATHERMAP_VERSION run complete - $stats_string\n", TRUE);
-		db_execute("replace into settings values('weathermap_last_stats','".mysql_escape_string($stats_string)."')");
-		db_execute("replace into settings values('weathermap_last_finish_time','".mysql_escape_string(time())."')");
+		db_execute("replace into settings values('weathermap_last_stats','".mysql_real_escape_string($stats_string)."')");
+		db_execute("replace into settings values('weathermap_last_finish_time','".mysql_real_escape_string(time())."')");
 	} else {
 		wm_warn("Required modules for PHP Weathermap $WEATHERMAP_VERSION were not present. Not running. [WMPOLL08]\n");
 	}

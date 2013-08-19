@@ -6,7 +6,7 @@
 
 # global $WM_config_keywords2;
 
-$this->config_keywords = array (
+var $config_keywords = array (
     'GLOBAL' => array (
         'FONTDEFINE' => array(
             array('GLOBAL',"/^\s*FONTDEFINE\s+(\d+)\s+(\S+)\s+(\d+)\s*$/i",'ReadConfig_Handle_FONTDEFINE'),

@@ -502,6 +502,7 @@ class WeatherMapBase
 	}
 }
 
+// XXX - unused
 class WeatherMapConfigItem
 {
 	var $defined_in;
@@ -2244,15 +2245,17 @@ function DrawLabelRotated($im, $x, $y, $angle, $text, $font, $padding, $linkname
 // This should be in WeatherMapScale - All scale lookups are done here
 function ColourFromValue($value,$scalename="DEFAULT",$name="",$is_percent=TRUE, $scale_warning=TRUE)
 {
-	$col = new WMColour(0,0,0);
+	
 	$tag = '';
 	$matchsize = NULL;
+        $matchkey = NULL;
 
 	$nowarn_clipping = intval($this->get_hint("nowarn_clipping"));
 	$nowarn_scalemisses = (!$scale_warning) || intval($this->get_hint("nowarn_scalemisses"));
 	
-	if(isset($this->colours[$scalename]))
-	{
+	if(isset($this->colours[$scalename])) {
+            // $col = new WMColour(0,0,0);
+            
 		$colours=$this->colours[$scalename];
 
 		if ($is_percent && $value > 100)
@@ -2267,55 +2270,62 @@ function ColourFromValue($value,$scalename="DEFAULT",$name="",$is_percent=TRUE, 
 			$value = 0;
 		}
 
-		foreach ($colours as $key => $colour)
-		{
-			if ( (!isset($colour['special']) || $colour['special'] == 0) and ($value >= $colour['bottom']) and ($value <= $colour['top']))
-			{
-				$range = $colour['top'] - $colour['bottom'];
-				if (isset($colour['red2']))
-				{
-					if($colour["bottom"] == $colour["top"])
-					{
-						$ratio = 0;
-					}
-					else
-					{
-						$ratio=($value - $colour["bottom"]) / ($colour["top"] - $colour["bottom"]);
-					}
+		foreach ($colours as $key => $colour) {
+			if ( (!isset($colour['special']) || $colour['special'] == 0) 
+                            and ($value >= $colour['bottom']) 
+                            and ($value <= $colour['top'])) {
 
-					$r=$colour["red1"] + ($colour["red2"] - $colour["red1"]) * $ratio;
-					$g=$colour["green1"] + ($colour["green2"] - $colour["green1"]) * $ratio;
-					$b=$colour["blue1"] + ($colour["blue2"] - $colour["blue1"]) * $ratio;
-				}
-				else {
-					$r=$colour["red1"];
-					$g=$colour["green1"];
-					$b=$colour["blue1"];
-				}
-				
+				$range = $colour['top'] - $colour['bottom'];
+								
 				// change in behaviour - with multiple matching ranges for a value, the smallest range wins
 				if( is_null($matchsize) || ($range < $matchsize) ) 
-				{
-					$col = new WMColour($r, $g, $b);
+				{					
 					$matchsize = $range;
-				}
-				
-				if(isset($colour['tag'])) $tag = $colour['tag'];
-				#### warn(">>NCFPC TAGS $tag\n");
-				wm_debug("CFV $name $scalename $value '$tag' $key $r $g $b\n");
-
-				return(array($col,$key,$tag));
+                                        $matchkey = $key;
+                                        
+                                        # wm_debug("CFV $name $scalename $value '$tag' $key $r $g $b\n");
+				}											
 			}
 		}
-	}
-	else
-	{
-		if($scalename != 'none')
-		{
+                
+                // if we have a match, figure out the actual
+                // colour (for gradients) and return it
+                if(!is_null($matchsize)) {
+                    
+                    $colour = $colours[$matchkey];
+                    
+                    if (isset($colour['red2']))
+                    {
+                            if($colour["bottom"] == $colour["top"])
+                            {
+                                    $ratio = 0;
+                            }
+                            else
+                            {
+                                    $ratio=($value - $colour["bottom"]) / ($colour["top"] - $colour["bottom"]);
+                            }
+
+                            $r=$colour["red1"] + ($colour["red2"] - $colour["red1"]) * $ratio;
+                            $g=$colour["green1"] + ($colour["green2"] - $colour["green1"]) * $ratio;
+                            $b=$colour["blue1"] + ($colour["blue2"] - $colour["blue1"]) * $ratio;
+                    }
+                    else {
+                            $r=$colour["red1"];
+                            $g=$colour["green1"];
+                            $b=$colour["blue1"];
+                    }
+                    
+                    if(isset($colour['tag'])) {
+                        $tag = $colour['tag'];
+                    }
+                    $col = new WMColour($r, $g, $b);
+                    return(array($col,$matchkey,$tag));
+                }
+                
+	} else 	{
+		if($scalename != 'none') {
 			wm_warn("ColourFromValue: Attempted to use non-existent scale: $scalename for item $name [WMWARN09]\n");
-		}
-		else
-		{
+		} else {
 			return array(new WMColour(255,255,255),'','');
 		}
 	}
@@ -2323,9 +2333,13 @@ function ColourFromValue($value,$scalename="DEFAULT",$name="",$is_percent=TRUE, 
 	// shouldn't really get down to here if there's a complete SCALE
 
 	// you'll only get grey for a COMPLETELY quiet link if there's no 0 in the SCALE lines
-	if ($value == 0) { return array(new WMColour(192,192,192),'',''); }
+	if ($value == 0) { 
+            return array(new WMColour(192,192,192),'','');             
+        }
 
-	if($nowarn_scalemisses==0) wm_warn("ColourFromValue: Scale $scalename doesn't include a line for $value".($is_percent ? "%" : "")." while drawing item $name [WMWARN29]\n");
+	if($nowarn_scalemisses==0) {
+            wm_warn("ColourFromValue: Scale $scalename doesn't include a line for $value".($is_percent ? "%" : "")." while drawing item $name [WMWARN29]\n");
+        }
 
 	// and you'll only get white for a link with no colour assigned
 	return array(new WMColour(255,255,255),'','');
@@ -3198,16 +3212,7 @@ function ReadConfig($input, $is_include=FALSE)
         // if it isn't, it's the filename
 
         $lines = array ();
-
-        assert('is_array($this->config_keywords)');
-        wm_debug("We know about " . count($this->config_keywords) . " config keywords.\n");
-                
-        $xx = 0;
-        foreach ($this->config_keywords as $keyword=>$value) {
-            $xx++;
-        }
-        wm_debug("Counting by hand, that's $xx\n");
-        
+       
         if ((strchr($input, "\n") != false) || (strchr($input, "\r") != false)) {
             wm_debug("ReadConfig Detected that this is a config fragment.\n");
             // strip out any Windows line-endings that have gotten in here
@@ -3385,7 +3390,7 @@ function ReadConfig($input, $is_include=FALSE)
 		
 		// this next loop replaces a whole pile of duplicated ifs with something with consistent handling
 
-                assert('is_object($curobj)');
+#                assert('is_object($curobj)');
 		
                 if ($linematched == 0 && true === isset($args[0])) {
 // check if there is even an entry in this context for the current keyword
@@ -4239,7 +4244,7 @@ function OldReadConfig($input, $is_include=FALSE)
 								$val = $matches[$val];
 							}
 							
-							assert('is_object($curobj)');
+							# assert('is_object($curobj)');
 							
 							if(preg_match('/^(.*)\[([^\]]+)\]$/',$key,$m))
 							{
@@ -4902,7 +4907,6 @@ function BuildZLayers()
 		$allitems[] = $link;
 	}
 	
-	# foreach ($allitems as &$item)
 	foreach ($allitems as $ky=>$vl)
 	{
 		$item =& $allitems[$ky];

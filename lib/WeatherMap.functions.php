@@ -42,16 +42,15 @@ function wm_debug($string)
 	global $weathermap_debugging;
 	global $weathermap_debugging_readdata;
 	global $weathermap_map;
-	global $weathermap_debug_suppress;
-
-	$is_readdata = FALSE;
-	
-	if(preg_match("/ReadData/",$string) ) {
-		$is_readdata = TRUE;
-	}
-	
+	global $weathermap_debug_suppress;	
+		
 	if ($weathermap_debugging || ( $weathermap_debugging_readdata && $is_readdata) )
 	{
+                $is_readdata = FALSE;
+            	if (FALSE !== strpos("ReadData",$string) ) {
+                        $is_readdata = TRUE;
+                }
+
 		$calling_fn = "";
 		if(function_exists("debug_backtrace"))
 		{
@@ -1296,13 +1295,21 @@ function unformat_number($instring, $kilo = 1000)
 	{
 		$number=floatval($matches[1]);
 
-		if ($matches[2] == 'K') { $number=$number * $kilo; }
-		if ($matches[2] == 'M') { $number=$number * $kilo * $kilo; }
-		if ($matches[2] == 'G') { $number=$number * $kilo * $kilo * $kilo; }
-		if ($matches[2] == 'T') { $number=$number * $kilo * $kilo * $kilo * $kilo; }
-		// new, for absolute datastyle. Think seconds.
-		if ($matches[2] == 'm') { $number=$number / $kilo; }
-		if ($matches[2] == 'u') { $number=$number / ($kilo * $kilo); }
+                switch($matches[2]) {
+                    case 'K':
+                        return $number * $kilo;
+                    case 'M':
+                        return $number * $kilo * $kilo;
+                    case 'G':
+                        return $number * $kilo * $kilo * $kilo;
+                    case 'T':
+                        return $number * $kilo * $kilo * $kilo * $kilo;
+                    case 'm':
+                        return $number / $kilo;
+                    case 'u':
+                        return $number / ($kilo * $kilo);
+                }              
+	
 	}
 	else { $number=floatval($instring); }
 

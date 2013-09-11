@@ -6,6 +6,44 @@
 
 require_once dirname(__FILE__).'/WeatherMapEditor.class.php';
 
+// Grabbed from here: http://www.massassi.com/php/articles/template_engines/
+
+class SimpleTemplate {
+    var $vars; /// Holds all the template variables
+
+    /**
+     * Constructor
+     *
+     * @param $file string the file name you want to load
+     */
+    function Template($file = null) {
+        $this->file = $file;
+    }
+
+    /**
+     * Set a template variable.
+     */
+    function set($name, $value) {
+        $this->vars[$name] = is_object($value) ? $value->fetch() : $value;
+    }
+
+    /**
+     * Open, parse, and return the template file.
+     *
+     * @param $file string the template file name
+     */
+    function fetch($file = null) {
+        if(!$file) $file = $this->file;
+
+        extract($this->vars);          // Extract the vars to local namespace
+        ob_start();                    // Start output buffering
+        include($file);                // Include the file
+        $contents = ob_get_contents(); // Get the contents of the buffer
+        ob_end_clean();                // End buffering and discard
+        return $contents;              // Return the contents
+    }
+}
+
 /** The various functions concerned with the actual presentation of the supplied editor, and
  *  validation of input etc. Mostly class methods.
  */
@@ -167,6 +205,7 @@ class WeatherMapEditorUI {
         "set_link_properties" => array(),
         "set_map_properties" => array(),
         "set_map_style" => array(),
+        "nothing" => array(args=>array())
     );
 
     
@@ -180,12 +219,10 @@ class WeatherMapEditorUI {
      */
     function validateRequest($request)
     {
-        if (!isset($request['action'])) {
-            return FALSE;
-        } else {
-            $action = strtolower(trim($request['action']));
-        }
-        if (!array_key_exists($this->commands,$action)) {
+       $action = strtolower(trim($request['action']));
+        
+        if( array_key_exists())
+        if (!array_key_exists($action, $this->commands)) {            
             return FALSE;
         }
         
@@ -247,6 +284,9 @@ class WeatherMapEditorUI {
      */ 
     function dispatchRequest($request)
     {
+        $action = strtolower(trim($request['action']));
+        
+        
         return FALSE;
     }
     
@@ -325,11 +365,113 @@ class WeatherMapEditorUI {
     {
         $this->unpackCookie();
         $this->editor = new WeatherMapEditor();
+                
+    }
+        
+    function getExistingConfigs($mapdir)
+    {
+        $titles = array();
+        $notes = array();
+        
+        $errorstring="";
+                       
+        if (is_dir($mapdir)) {
+            $n=0;
+            $dh=opendir($mapdir);
+        
+            if ($dh) {
+                while (FALSE !== ($file = readdir($dh))) {
+                    $realfile=$mapdir . DIRECTORY_SEPARATOR . $file;
+                    $note = "";
+        
+                    // skip directories, unreadable files, .files and anything that doesn't come through the sanitiser unchanged
+                    if ( (is_file($realfile)) && (is_readable($realfile)) && (!preg_match("/^\./",$file) )  
+                    //    && ( wm_editor_sanitize_conffile($file) == $file )
+                     ) {
+                        if (!is_writable($realfile)) {
+                            $note .= "(read-only)";
+                        }
+                        $title='(no title)';
+                        $fd=fopen($realfile, "r");
+                        if ($fd) {
+                            while (!feof($fd)) {
+                                $buffer=fgets($fd, 4096);
+        
+                                if (preg_match("/^\s*TITLE\s+(.*)/i", $buffer, $matches)) {
+                                    // $title= wm_editor_sanitize_string($matches[1]);
+                                    $title = $matches[1];
+                                }
+                            }
+        
+                            fclose ($fd);
+                            $titles[$file] = $title;
+                            $notes[$file] = $note;
+                            $n++;
+                        }
+                    }
+                }
+        
+                closedir ($dh);
+            } else {
+                $errorstring = "Can't open mapdir to read.";
+            }
+        
+            ksort($titles);
+        
+            if ($n == 0) {
+                $errorstring = "No files in mapdir";
+            }
+        } else {
+            $errorstring = "NO DIRECTORY named $mapdir";
+        }
+        
+        return array($titles, $notes, $errorstring);
     }
     
     function showStartPage()
     {
-        print "START";
+        global $WEATHERMAP_VERSION;
+
+        $tpl = new SimpleTemplate();
+        
+        $tpl->set("WEATHERMAP_VERSION", $WEATHERMAP_VERSION);
+        $tpl->set("fromplug", 1);        
+        
+        list($titles, $notes, $errorstring) = $this->getExistingConfigs($this->mapDirectory);
+        
+        foreach ($titles as $file=>$title) {
+            $nicenote = htmlspecialchars($notes[$file]);
+            $nicefile = htmlspecialchars($file);
+            $nicetitle = htmlspecialchars($title);
+            
+            $nicetitles[$nicefile] = $nicetitle;
+            $nicenotes[$nicefile] = $nicenote; 
+        }
+        
+        $tpl->set("errorstring", $errorstring);
+        $tpl->set("titles", $nicetitles);
+        $tpl->set("notes", $nicenotes);
+        
+        echo $tpl->fetch("editor-resources/templates/front.php");
+    }
+    
+    function showMainPage()
+    {
+        global $WEATHERMAP_VERSION;
+        
+        $tpl = new SimpleTemplate();
+        $tpl->set("WEATHERMAP_VERSION", $WEATHERMAP_VERSION);
+        $tpl->set("fromplug", 1);
+
+        $tpl->set("imageurl", htmlspecialchars("?action=draw&map=" . $this->mapfile));
+        $tpl->set("mapname", htmlspecialchars($this->mapfile));
+        $tpl->set("newaction", htmlspecialchars($this->mapfile));
+        $tpl->set("param2", htmlspecialchars($this->mapfile));
+        
+        $tpl->set("map_width",300);
+        $tpl->set("map_height",300);
+        
+        echo $tpl->fetch("editor-resources/templates/main.php");
     }
     
     function main()
@@ -337,15 +479,22 @@ class WeatherMapEditorUI {
         $mapname = "";
         $action = "";
         
-        if (isset($_REQUEST['action'])) { $action = $_REQUEST['action']; }
-        if (isset($_REQUEST['mapname'])) { $mapname = $_REQUEST['mapname']; $mapname = wm_editor_sanitize_conffile($mapname); }
+        if (isset($_REQUEST['action'])) { 
+            $action = $_REQUEST['action']; 
+        }
+        if (isset($_REQUEST['mapname'])) { 
+            $mapname = $_REQUEST['mapname']; 
+            $this->mapfile = $mapname;
+            //$mapname = wm_editor_sanitize_conffile($mapname); 
+        }
         
         if($mapname == '') {
             $this->showStartPage();
         } else {
-            if($this->validateRequest($_REQUEST)) {
+            if($this->validateRequest($_REQUEST)) {                
+                print "DO ACTION";
                 $this->dispatchRequest($_REQUEST);
-                print "ACTION";
+                $this->showMainPage();
             } else {
                 print "FAIL";                
             }

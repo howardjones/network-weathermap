@@ -3724,6 +3724,8 @@ function ReadConfig($input, $is_include=FALSE)
         wm_debug("------------------------------------------\n");
 
         if (!$is_include) {
+        	$this->configfile = "$filename";
+        	 
             $this->PostReadConfig();
         }
         
@@ -5097,6 +5099,8 @@ function WriteConfig($filename)
 {
 	global $WEATHERMAP_VERSION;
 
+	wm_debug("Writing config to $filename (read from $this->configfile)\n");
+	
 	$fd=fopen($filename, "w");
 	$output="";
 
@@ -5274,9 +5278,9 @@ function WriteConfig($filename)
 			{
 				if(!preg_match("/^::\s/",$node->name))
 				{
+					wm_debug("WriteConfig: Considering Node $node->name defined in $node->defined_in\n");
 					if($node->defined_in == $this->configfile)
 					{
-
 						if($which=="template" && $node->x === NULL)  { wm_debug("TEMPLATE\n"); fwrite($fd,$node->WriteConfig()); }
 						if($which=="normal" && $node->x !== NULL) { fwrite($fd,$node->WriteConfig()); }
 					}
@@ -5290,6 +5294,7 @@ function WriteConfig($filename)
 			{
 				if(!preg_match("/^::\s/",$link->name))
 				{
+					wm_debug("WriteConfig: Considering Link $link->name\n");
 					if($link->defined_in == $this->configfile)
 					{
 						if($which=="template" && $link->a === NULL) fwrite($fd,$link->WriteConfig());

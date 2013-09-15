@@ -14,6 +14,7 @@
     ADDED - Some developer documentation - both code documentation and dev/release process docs.
     ADDED - New improved Cycle Maps mode for Cacti plugin, including "cycle only one group" and true fullscreen with crossfading for NOC displays.
     ADDED - Weathermap will use anti-aliasing if your GD supports it (php-bundled GD doesn't) (thanks shd)
+    ADDED - Special token formatting can handle timeticks and time_t formatting (%T and %t respectively)
 
 0.97c - No code changes apart from path fixes, and ZIP file fixes.
 

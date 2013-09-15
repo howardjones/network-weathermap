@@ -281,6 +281,12 @@
                 <tr><th>{link:this:bandwidth_in:%0.2k}</th><td>as above, but limit the
                 floating-point part to 2 decimal places (Weathermap special)</td>
                 </tr>
+                
+                <tr><th>{link:this:bandwidth_in:%t}</th><td>Format a duration in seconds in human-readable form (Weathermap special)</td>
+                <tr><th>{link:this:bandwidth_in:%T}</th><td>Format a duration in hundredths-of-seconds (aka SNMP TimeTicks) in human-readable form (Weathermap special)</td>
+                <tr><th>{link:this:bandwidth_in:%2T} {link:this:bandwidth_in:%2t}</th><td>Format a duration in human-readable form show only the 2 most significant parts. e.g. 1y34d13m3s becomes 1y34d (Weathermap special)</td>
+                
+                </tr>
             </table>
 
             <h2 id = "tweaks">SETting Hint Variables to tweak maps</h2>

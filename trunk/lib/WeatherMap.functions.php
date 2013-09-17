@@ -289,13 +289,14 @@ function wm_parse_string($input)
 function myimagecolorallocate($image, $red, $green, $blue)
 {
 	// it's possible that we're being called early - just return straight away, in that case
-	if(!isset($image)) return(-1);
+	if (!isset($image)) return(-1);
+
+	if (1==0) {
+		$existing=imagecolorexact($image, $red, $green, $blue);
 	
-	$existing=imagecolorexact($image, $red, $green, $blue);
-
-	if ($existing > -1)
-		return $existing;
-
+		if ($existing > -1)
+			return $existing;
+	}
 	return (imagecolorallocate($image, $red, $green, $blue));
 }
 

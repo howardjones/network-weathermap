@@ -103,7 +103,7 @@ class WeatherMapDataSource_dsstats extends WeatherMapDataSource {
 
 			$datatype = "last";
 
-			if($map->get_hint("dsstats_default_type") != '') {
+			if($map->get_hint("dsstats_default_type") !== null) {
 					$datatype = $map->get_hint("dsstats_default_type");
 					wm_debug("Default datatype changed to ".$datatype.".\n");
 			}
@@ -152,7 +152,7 @@ class WeatherMapDataSource_dsstats extends WeatherMapDataSource {
 				{
 					foreach ( array(IN,OUT) as $dir)
 					{
-						if( ($dsnames[$dir] == $result['name']) && ($result['result'] != -90909090909) && ($result['result'] !='U') )
+						if( ($dsnames[$dir] == $result['name']) && ($result['result'] !== '-90909090909') && ($result['result'] !='U') )
 						{
 							$data[$dir] = $result['result'];		
 						}
@@ -193,7 +193,8 @@ class WeatherMapDataSource_dsstats extends WeatherMapDataSource {
 		}
 
 		// fill all that other information (ifSpeed, etc)
-		if($local_data_id>0) UpdateCactiData($item, $local_data_id);
+		// (but only if it's not switched off!)
+		if(($map->get_hint("dsstats_no_cacti_extras") === null) && $local_data_id>0) UpdateCactiData($item, $local_data_id);
 		
 		wm_debug ("DSStats ReadData: Returning (".($data[IN]===NULL?'NULL':$data[IN]).",".($data[OUT]===NULL?'NULL':$data[OUT]).",$data_time)\n");
 		

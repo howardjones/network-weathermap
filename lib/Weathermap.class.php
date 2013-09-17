@@ -1678,19 +1678,14 @@ var $config_keywords = array (
 
 	function ProcessString($input,&$context, $include_notes=TRUE,$multiline=FALSE)
 	{
-		assert('is_scalar($input)');
-
-		$context_description = strtolower( $context->my_type() );
-		if($context_description != "map") $context_description .= ":" . $context->name; 
-
-		wm_debug("Trace: ProcessString($input, $context_description)\n");
-
-		if($multiline==TRUE)
-		{
-			$i = $input;
-			$input = str_replace("\\n","\n",$i);
+		// don't bother with all this regexp rubbish if there's nothing to match
+		if(false === strpos($input, "{")) {
+			return $input;
 		}
-
+		
+		$context_description = strtolower( $context->my_type() );
+		if($context_description != "map") $context_description .= ":" . $context->name;
+		
 		$output = $input;
 		
 		while( preg_match("/(\{(?:node|map|link)[^}]+\})/",$input,$matches) )
@@ -1698,7 +1693,7 @@ var $config_keywords = array (
 			$value = "[UNKNOWN]";
 			$format = "";
 			$key = $matches[1];
-			wm_debug("ProcessString: working on ".$key."\n");
+		//	wm_debug("ProcessString: working on ".$key."\n");
 
 			if ( preg_match("/\{(node|map|link):([^}]+)\}/",$key,$matches) )
 			{
@@ -1765,7 +1760,7 @@ var $config_keywords = array (
 				}
 				else
 				{
-					wm_debug("ProcessString: Found appropriate item: ".get_class($the_item)." ".$the_item->name."\n");
+				//	wm_debug("ProcessString: Found appropriate item: ".get_class($the_item)." ".$the_item->name."\n");
 
 					// SET and notes have precedent over internal properties
 					// this is my laziness - it saves me having a list of reserved words
@@ -1781,13 +1776,13 @@ var $config_keywords = array (
 					elseif($include_notes && isset($the_item->notes[$args]))
 					{
 						$value = $the_item->notes[$args];
-						wm_debug("ProcessString: used note\n");
+					//	wm_debug("ProcessString: used note\n");
 
 					}
 					elseif(isset($the_item->$args))
 					{
 						$value = $the_item->$args;
-						wm_debug("ProcessString: used internal property\n");
+					//	wm_debug("ProcessString: used internal property\n");
 					}
 				}
 			}
@@ -1795,12 +1790,13 @@ var $config_keywords = array (
 			// format, and sanitise the value string here, before returning it
 
 			if($value===NULL) $value='NULL';
-			wm_debug("ProcessString: replacing ".$key." with $value\n");
+			
+			wm_debug("ProcessString: replacing %s with %s \n",$key,$value);
 
 			if($format != '')
 			{				
 				$value = mysprintf($format,$value, $this->kilo);
-				wm_debug("ProcessString: formatted $format to $value\n");
+			//	wm_debug("ProcessString: formatted $format to $value\n");
 			}
 
 			$input = str_replace($key,'',$input);
@@ -5682,6 +5678,11 @@ function DrawMap($filename = '', $thumbnailfile = '', $thumbnailmax = 250, $with
 	}
 }
 
+/**
+ * So that memory is deallocated correctly, go through and remove all the
+ * references to other objects. The PHP GC doesn't deal with circular
+ * references, so this stops the memory usage from ballooning up.
+ */
 function CleanUp()
 {
 	$all_layers = array_keys($this->seen_zlayers);
@@ -5702,7 +5703,7 @@ function CleanUp()
 	    // destroy all the images we created, to prevent memory leaks
 	
 	    if (isset($node->image)) {
-		imagedestroy($node->image);
+			imagedestroy($node->image);
 	    }
 	    $node->owner = null;
 	    unset($node);

@@ -1678,6 +1678,8 @@ var $config_keywords = array (
 
 	function ProcessString($input,&$context, $include_notes=TRUE,$multiline=FALSE)
 	{
+		if($input === '') { return ''; }
+	
 		// don't bother with all this regexp rubbish if there's nothing to match
 		if(false === strpos($input, "{")) {
 			return $input;
@@ -1685,6 +1687,21 @@ var $config_keywords = array (
 		
 		$context_description = strtolower( $context->my_type() );
 		if($context_description != "map") $context_description .= ":" . $context->name;
+		
+		// next, shortcut all the regexps for very common tokens
+		if($context_description === 'node') {
+			$input = str_replace("{node:this:graph_id}", $context->get_hint("graph_id" ), $input);
+			$input = str_replace("{node:this:name}", $context->name, $input);
+		}
+		
+		if($context_description === 'link') {
+			$input = str_replace("{link:this:graph_id}", $context->get_hint("graph_id" ), $input);
+		}
+		
+		// check if we can now quit early before the regexp stuff
+		if(false === strpos($input, "{")) {
+			return $input;
+		}
 		
 		$output = $input;
 		

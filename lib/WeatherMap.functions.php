@@ -177,7 +177,7 @@ function mysprintf($format,$value,$kilo=1000)
 	}
 	elseif (preg_match("/%(-*)(\d*)([Tt])/",$format,$matches)) {
 		$spec = $matches[3];
-		$precision = ($matches[2] ==''? 10 : intval($matches[1]));
+		$precision = ($matches[2] =='' ? 10 : intval($matches[2]));
 		$joinchar = " ";
 		if($matches[1] == "-") {
 			$joinchar = " ";

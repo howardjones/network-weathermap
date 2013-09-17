@@ -260,6 +260,14 @@ class HTML_ImageMap
 	}
 
 	// add an element to the map - takes an array with the info, in a similar way to HTML_QuickForm
+	/**
+	 *
+	 * @param string OR object $element
+	 * @param optional string name
+	 * @param optional string href
+	 * @param optional type-specific stuff
+	 * @return null
+	 */
 	function addArea($element)
 	{
 		if (is_object($element) && is_subclass_of($element, 'html_imagemap_area')) {
@@ -270,7 +278,7 @@ class HTML_ImageMap
 			$elementObject = new $className($args[1],$args[2],array_slice($args, 3));
 		}
 
-		$this->shapes[] =& $elementObject;
+		$this->shapes[ $elementObject->name ] = &$elementObject;
 		$this->nshapes++;
 		//      print $this->nshapes." shapes\n";
 	}
@@ -300,25 +308,20 @@ class HTML_ImageMap
 	function setProp($which, $what, $where)
 	{
 		$count = 0;
-		for($i=0; $i<count($this->shapes); $i++)
-		{
-			// this USED to be a substring match, but that broke some things
-			// and wasn't actually used as one anywhere.
-			if( ($where == "") || ( $this->shapes[$i]->name==$where) )
-			{
-				switch($which)
-				{
-				case 'href':
-					$this->shapes[$i]->href= $what;
-					break;
-				case 'extrahtml':
-					$this->shapes[$i]->extrahtml= $what;
-					#print "IMAGEMAP: Found $where and adding $which\n";
-					break;
-				}
-				$count++;
-			}
-		}
+		 if(true === isset($this->shapes[$where])) {
+            switch ($which) {
+                case 'href':
+                    $this->shapes[$where]->href = $what;
+                    $count++;
+                    break;
+    
+                case 'extrahtml':
+                    $this->shapes[$where]->extrahtml = $what;
+                    $count++;
+                    break;
+            }
+        }
+		
 		return $count;
 	}
 

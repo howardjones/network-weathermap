@@ -4,10 +4,16 @@
 
 function weathermap_memory_check($note="MEM")
 {
-	if (function_exists("memory_get_usage")) {
-		$mem_used = nice_bandwidth(memory_get_usage());
+	global $weathermap_mem_highwater;
+	
+	if (true === function_exists("memory_get_usage")) {
+		$mem = memory_get_usage();
+		if($mem > $weathermap_mem_highwater) {
+			$weathermap_mem_highwater = $mem;
+		}
+		$mem_used = nice_bandwidth($mem);
 		$mem_allowed = ini_get("memory_limit");
-		wm_debug("$note: memory_get_usage() says ".$mem_used."Bytes used. Limit is ".$mem_allowed."\n");
+		wm_debug("%s: memory_get_usage() says %sBytes used. Limit is %s\n",  $note, $mem_used, $mem_allowed);
 	}
 }
 
@@ -56,10 +62,25 @@ function weathermap_run_maps($mydir)
 	global $weathermap_map;
 	global $weathermap_warncount;
 	global $weathermap_poller_start_time;
-		
+	
+	global $weathermap_mem_highwater;
+	
+	$weathermap_mem_highwater = 0;
+	
+	if (true === function_exists('memory_get_usage')) {
+		db_execute("replace into settings values('weathermap_initial_memory','"
+				. memory_get_usage() . "')");
+	}
+
 	// require_once $mydir.DIRECTORY_SEPARATOR."lib".DIRECTORY_SEPARATOR."HTML_ImageMap.class.php";
 	require_once $mydir.DIRECTORY_SEPARATOR."lib".DIRECTORY_SEPARATOR."Weathermap.class.php";
 
+	if (true === function_exists('memory_get_usage')) {
+		db_execute("replace into settings values('weathermap_loaded_memory','"
+				. memory_get_usage() . "')");
+			
+	}
+	
 	$total_warnings = 0;
 	$warning_notes = "";
 
@@ -80,7 +101,7 @@ function weathermap_run_maps($mydir)
 	} else {
 		$mode_message = "Normal logging mode. Turn on DEBUG in Cacti for more information";
 	}
-	$quietlogging = read_config_option("weathermap_quiet_logging");  
+	$quietlogging = intval(read_config_option("weathermap_quiet_logging"));  
 	// moved this outside the module_checks, so there should always be something in the logs!
 	if ($quietlogging==0) cacti_log("Weathermap $WEATHERMAP_VERSION starting - $mode_message\n",TRUE,"WEATHERMAP");
 
@@ -247,6 +268,16 @@ function weathermap_run_maps($mydir)
 		if ($quietlogging==0) wm_warn("STATS: Weathermap $WEATHERMAP_VERSION run complete - $stats_string\n", TRUE);
 		db_execute("replace into settings values('weathermap_last_stats','".mysql_real_escape_string($stats_string)."')");
 		db_execute("replace into settings values('weathermap_last_finish_time','".mysql_real_escape_string(time())."')");
+		db_execute("replace into settings values('weathermap_last_map_count','". mysql_escape_string($mapcount) . "')");
+
+		if (true === function_exists('memory_get_usage')) {
+			db_execute("replace into settings values('weathermap_final_memory','"
+					. memory_get_usage() . "')");
+					db_execute("replace into settings values('weathermap_highwater_memory','"
+							. $weathermap_mem_highwater . "')");
+		}
+		
+		
 	} else {
 		wm_warn("Required modules for PHP Weathermap $WEATHERMAP_VERSION were not present. Not running. [WMPOLL08]\n");
 	}

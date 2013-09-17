@@ -5408,11 +5408,13 @@ function DrawMap($filename = '', $thumbnailfile = '', $thumbnailmax = 250, $with
 	{
 		ImageAlphaBlending($image, true);
                 
-                // Turn on anti-aliasing if it exists
+		if($this->get_hint("antialias") == 1) {
+		        // Turn on anti-aliasing if it exists and it was requested
                 if(function_exists("imageantialias")) {
                     imageantialias($image,true);
                 }
-
+		}
+		
 		// by here, we should have a valid image handle
 
 		// save this away, now
@@ -5425,14 +5427,18 @@ function DrawMap($filename = '', $thumbnailfile = '', $thumbnailmax = 250, $with
 
 		$this->AllocateScaleColours($image);
 
-		// fill with background colour anyway, in case the background image failed to load
-		imagefilledrectangle($image, 0, 0, $this->width, $this->height, $this->colours['DEFAULT']['BG']['gdref1']);
-
 		if ($bgimage)
 		{
 			imagecopy($image, $bgimage, 0, 0, 0, 0, $this->width, $this->height);
 			imagedestroy ($bgimage);
 		}
+		else
+		{
+			// fill with background colour anyway, since the background image failed to load
+			imagefilledrectangle($image, 0, 0, $this->width, $this->height,
+				$this->colours['DEFAULT']['BG']['gdref1']);
+		}
+		
 
 		// Now it's time to draw a map
 

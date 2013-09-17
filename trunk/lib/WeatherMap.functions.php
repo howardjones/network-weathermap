@@ -37,6 +37,18 @@ function wm_module_checks()
 	return (TRUE);
 }
 
+/**
+ * central point for all debug logging, whether in the
+ * standalone or Cacti parts of the tool.
+ *
+ * @global boolean $weathermap_debugging
+ * @global string $weathermap_map
+ * @global boolean $weathermap_debug_suppress
+ * @param string $string The actual message to be logged
+ * @param string... the first string is treated as a sprintf format string.
+ *                  Following params are fed to sprintf()
+ */
+
 function wm_debug($string)
 {
 	global $weathermap_debugging;
@@ -44,24 +56,32 @@ function wm_debug($string)
 	global $weathermap_map;
 	global $weathermap_debug_suppress;	
 		
+	if ($weathermap_debugging_readdata) {
+		$is_readdata = FALSE;
+		
+		if (FALSE !== strpos("ReadData",$string) ) {
+			$is_readdata = TRUE;
+		}
+	}
+	
 	if ($weathermap_debugging || ( $weathermap_debugging_readdata && $is_readdata) )
-	{
-                $is_readdata = FALSE;
-            	if (FALSE !== strpos("ReadData",$string) ) {
-                        $is_readdata = TRUE;
-                }
-
+	{         
+		if(func_num_args() > 1) {
+			$args = func_get_args();
+			$string = call_user_func_array('sprintf', $args);
+		}
+		
 		$calling_fn = "";
 		if(function_exists("debug_backtrace"))
 		{
 			$bt = debug_backtrace();
 			$index = 1;
-		# 	$class = (isset($bt[$index]['class']) ? $bt[$index]['class'] : '');
-        		$function = (isset($bt[$index]['function']) ? $bt[$index]['function'] : '');
-			$index = 0;
-			$file = (isset($bt[$index]['file']) ? basename($bt[$index]['file']) : '');
-        		$line = (isset($bt[$index]['line']) ? $bt[$index]['line'] : '');
-
+		
+        	$function = (true === isset($bt[$index]['function'])) ? $bt[$index]['function'] : '';
+        	$index = 0;
+        	$file = (true === isset($bt[$index]['file'])) ? basename($bt[$index]['file']) : '';
+        	$line = (true === isset($bt[$index]['line'])) ? $bt[$index]['line'] : '';
+        		
 			$calling_fn = " [$function@$file:$line]";
 
 			if(is_array($weathermap_debug_suppress) && in_array(strtolower($function),$weathermap_debug_suppress)) return;
@@ -142,7 +162,6 @@ function mysprintf($format,$value,$kilo=1000)
 {
 	$output = "";
 
-	wm_debug("mysprintf: $format $value\n");
 	if (preg_match("/%(\d*\.?\d*)k/",$format,$matches))
 	{
 		$spec = $matches[1];
@@ -153,13 +172,17 @@ function mysprintf($format,$value,$kilo=1000)
 			if($matches[2] != '') $places=$matches[2];
 			// we don't really need the justification (pre-.) part...
 		}	
-		wm_debug("KMGT formatting $value with $spec.\n");
 		$result = nice_scalar($value, $kilo, $places);
 		$output = preg_replace("/%".$spec."k/",$format,$result);
 	}
-	elseif (preg_match("/%(\d*)([Tt])/",$format,$matches)) {
-		$spec = $matches[2];
-		$precision = ($matches[1] ==''? 10 : intval($matches[1]));
+	elseif (preg_match("/%(-*)(\d*)([Tt])/",$format,$matches)) {
+		$spec = $matches[3];
+		$precision = ($matches[2] ==''? 10 : intval($matches[1]));
+		$joinchar = " ";
+		if($matches[1] == "-") {
+			$joinchar = " ";
+		}
+		
 		# special formatting for time_t (t) and SNMP TimeTicks (T)
 		if($spec == "T") $value = $value/100;
 		
@@ -176,10 +199,9 @@ function mysprintf($format,$value,$kilo=1000)
 		if(sizeof($results)==0) {
 			$results[]="0s";
 		}		
-		$output = implode("", array_slice($results,0,$precision));
+		$output = implode($joinchar, array_slice($results,0,$precision));
 		
 	} else {
-		wm_debug("Falling through to standard sprintf\n");
 		$output = sprintf($format,$value);
 	}
 	return $output;
@@ -318,8 +340,6 @@ function imagefilledroundedrectangle($image  , $x1  , $y1  , $x2  , $y2  , $radi
 	
 	imagefilledarc($image, $x1+$radius, $y2-$radius, $radius*2, $radius*2, 0, 360, $color, IMG_ARC_PIE);
 	imagefilledarc($image, $x2-$radius, $y2-$radius, $radius*2, $radius*2, 0, 360, $color, IMG_ARC_PIE);
-	
-	# bool imagefilledarc  ( resource $image  , int $cx  , int $cy  , int $width  , int $height  , int $start  , int $end  , int $color  , int $style  )
 }
 
 // draw a round-cornered rectangle
@@ -400,16 +420,15 @@ function imagecreatefromfile($filename)
 //
 function imagecolorize($im, $r, $g, $b)
 {
-    //We will create a monochromatic palette based on
-    //the input color
-    //which will go from black to white
-    //Input color luminosity: this is equivalent to the
-    //position of the input color in the monochromatic
-    //palette
-    $lum_inp = round(255 * ($r + $g + $b) / 765); //765=255*3
+    // We will create a monochromatic palette based on the input color
+    // which will go from black to white
+    
+    // Input color luminosity: this is equivalent to the
+    // position of the input color in the monochromatic palette 765=255*3
+    $lum_inp = round(255 * ($r + $g + $b) / 765); 
 
-    //We fill the palette entry with the input color at its
-    //corresponding position
+    // We fill the palette entry with the input color at its
+    // corresponding position
 
     $pal[$lum_inp]['r'] = $r;
     $pal[$lum_inp]['g'] = $g;
@@ -1103,17 +1122,17 @@ function draw_straight($image, &$curvepoints, $widths, $outlinecolour, $fillcolo
 			}
 			else
 			{
-				wm_debug("Not drawing $linkname ($dir) fill because there is no fill colour\n");
-			}
+				wm_debug("Not drawing %s (%s) outline because there is no fill colour\n", $linkname, $dir);
+			}	
 			
 			$areaname = "LINK:L" . $map->links[$linkname]->id . ":$dir";
 			$map->imap->addArea("Polygon", $areaname, '', $finalpoints);
-			wm_debug ("Adding Poly imagemap for $areaname\n");
-		
+            wm_debug("Adding Poly imagemap for %s\n", $areaname);
+					
 			if (!is_null($outlinecolour)) {
 				imagepolygon($image, $finalpoints, count($finalpoints) / 2, $arrowsettings[5]);
 			} else {
-				wm_debug("Not drawing $linkname ($dir) outline because there is no outline colour\n");
+                wm_debug("Not drawing %s (%s) outline because there is no outline colour\n", $linkname, $dir);
 			}
 	    }
 	}

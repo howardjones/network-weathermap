@@ -669,8 +669,8 @@ function weathermap_poller_bottom()
 
 	weathermap_setup_table();
 
-	$renderperiod = read_config_option("weathermap_render_period");  
-	$rendercounter = read_config_option("weathermap_render_counter");  
+	$renderperiod = intval(read_config_option("weathermap_render_period"));  
+	$rendercounter = intval(read_config_option("weathermap_render_counter"));  
 	$quietlogging = read_config_option("weathermap_quiet_logging");  
 
 	if ($renderperiod<0) {

@@ -402,6 +402,7 @@ class HTML_ImageMap
 	function subHTML($namefilter="",$reverseorder=false, $skipnolinks=false)
 	{
 		$html = "";
+		$l = strlen($namefilter);
 		$preg = '/'.$namefilter.'/';
 		
 		foreach ($this->shapes as $shape)
@@ -426,6 +427,26 @@ class HTML_ImageMap
 		return $html;
 	}
 
+	function exactHTML($name = '', $reverseorder = false, $skipnolinks = false)
+	{
+		$html = '';
+	
+		$shape = $this->shapes[$name];
+		
+		if(true === isset($shape)) {
+			if ( (false === $skipnolinks) || ($shape->href !== '') || ($shape->extrahtml !== '') ) {
+				if ($reverseorder === true) {
+					$html = $shape->asHTML() . "\n" . $html;
+				} else {
+					$html .= $shape->asHTML() . "\n";
+				}
+			}
+		}
+	
+		return $html;
+	}
+	
+	
 }
 // vim:ts=4:sw=4:
 ?>

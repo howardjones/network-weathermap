@@ -20,12 +20,43 @@ function weathermap_memory_check($note="MEM")
 function weathermap_cron_part($value,$checkstring)
 {
 	// XXX - this should really handle a few more crontab niceties like */5 or 3,5-9 but this will do for now
-	if ($checkstring == '*') return TRUE;
-	if ($checkstring == sprintf("%s",$value) ) return TRUE;
 	
-	if (preg_match("/\*\/(\d+)/",$checkstring, $matches)) {
-		$mod = $matches[1];
-		if (($value % $mod ) == 0) return TRUE;
+	// first, shortcut the most common cases - * and a simple single number
+	if ($checkstring == '*') return TRUE;
+	
+	$v = stringval($value);
+	
+	if ($checkstring === $v) {
+		return (true);
+	}
+	
+	// Cron allows for multiple comma separated clauses, so let's break them
+	// up first, and evaluate each one.
+	$parts = explode(",", $checkstring);
+	
+
+	foreach ($parts as $part) {
+		// just a number
+		if ($part === $v) {
+			return (true);
+		}
+		
+		// an interval - e.g. */5
+		if (1 === preg_match('/\*\/(\d+)/', $part, $matches)) {
+			$mod = $matches[1];
+		
+			if (($value % $mod) === 0) {
+				return true;
+			}
+		}
+		
+		// a range - e.g. 4-7
+		if(1 === preg_match('/(\d+)\-(\d+)/',$part, $matches)) {
+			if( ($value >= $matches[1]) && ($value <= $matches[2]) ) {
+				return true;
+			}
+		}
+		
 	}
 	
 	return FALSE;

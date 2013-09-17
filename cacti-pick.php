@@ -44,6 +44,33 @@ function js_escape($str)
 	return($str);
 }
 
+/* usort_natural_hosts - sorts two values naturally (ie. ab1, ab2, ab7, ab10, ab20)
+   @arg $a - the first string to compare
+   @arg $b - the second string to compare
+   @returns - '1' if $a is greater than $b, '-1' if $a is less than $b, or '0' if
+     $b is equal to $b */
+function usort_natural_hosts($a, $b) {
+	return strnatcmp($a['name'], $b['name']);
+}
+	
+/* usort_natural_titles - sorts two values naturally (ie. ab1, ab2, ab7, ab10, ab20)
+   @arg $a - the first string to compare
+   @arg $b - the second string to compare
+   @returns - '1' if $a is greater than $b, '-1' if $a is less than $b, or '0' if
+   $b is equal to $b */
+function usort_natural_titles($a, $b) {
+	return strnatcasecmp($a['title_cache'], $b['title_cache']);
+}
+		
+/* usort_natural_names - sorts two values naturally (ie. ab1, ab2, ab7, ab10, ab20)
+   @arg $a - the first string to compare
+   @arg $b - the second string to compare
+   @returns - '1' if $a is greater than $b, '-1' if $a is less than $b, or '0' if
+   $b is equal to $b */
+function usort_natural_names($a, $b) {
+	return strnatcasecmp($a['name_cache'], $b['name_cache']);
+}
+
 if(isset($_REQUEST['command']) && $_REQUEST["command"]=='link_step2') {
 	$dataid = intval($_REQUEST['dataid']);
 
@@ -219,6 +246,9 @@ if(sizeof($hosts) > 0) {
 
 	echo '<option '.($host_id==-1 ? 'SELECTED' : '' ).' value="-1">Any</option>';
 	echo '<option '.($host_id==0 ? 'SELECTED' : '' ).' value="0">None</option>';
+	
+	uasort($hosts, "usort_natural_hosts");
+	
 	foreach ($hosts as $host)
 	{
 		echo '<option ';
@@ -240,6 +270,8 @@ if(sizeof($hosts) > 0) {
 
 	$i=0;
 	if(is_array($queryrows)  && sizeof($queryrows) > 0) {
+		uasort($queryrows, "usort_natural_names");
+
 		foreach ($queryrows as $line) {
 			//while ($line = mysql_fetch_array($result, MYSQL_ASSOC)) {
 			echo "<li class=\"row".($i%2)."\">";
@@ -380,6 +412,8 @@ if(sizeof($hosts) > 0) {
 
 	echo '<option '.($host_id==-1 ? 'SELECTED' : '' ).' value="-1">Any</option>';
 	echo '<option '.($host_id==0 ? 'SELECTED' : '' ).' value="0">None</option>';
+	uasort($hosts, "usort_natural_hosts");
+	
 	foreach ($hosts as $host) {
 		echo '<option ';
 		if($host_id==$host['id']) echo " SELECTED ";
@@ -397,6 +431,8 @@ if(sizeof($hosts) > 0) {
 
 	$i=0;
 	if (is_array($queryrows) && sizeof($queryrows) > 0) {
+		uasort($queryrows, "usort_natural_titles");
+
 		foreach ($queryrows as $line) {
 			echo "<li class=\"row".($i%2)."\">";
 			$key = $line['local_graph_id'];

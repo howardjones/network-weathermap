@@ -2430,12 +2430,32 @@ function DrawLegend_Horizontal($im,$scalename="DEFAULT",$width=400)
 
 	$scale_im = imagecreatetruecolor($box_right+1, $box_bottom+1);
 	$scale_ref = 'gdref_legend_'.$scalename;
+	
+	// Start with a transparent box, in case the fill or outline colour is 'none'
+	imageSaveAlpha($scale_im, true);
+	$nothing = imagecolorallocatealpha($scale_im, 128, 0, 0, 127);
+	imagefill($scale_im, 0, 0, $nothing);
+	
 	$this->AllocateScaleColours($scale_im,$scale_ref);
 
-	imagefilledrectangle($scale_im, $box_left, $box_top, $box_right, $box_bottom,
-		$this->colours['DEFAULT']['KEYBG'][$scale_ref]);
-	imagerectangle($scale_im, $box_left, $box_top, $box_right, $box_bottom,
-		$this->colours['DEFAULT']['KEYOUTLINE'][$scale_ref]);
+	$bgcol = new WMColour($this->colours['DEFAULT']['KEYBG']['red1'],
+			$this->colours['DEFAULT']['KEYBG']['green1'],
+			$this->colours['DEFAULT']['KEYBG']['blue1']
+	);
+	$outlinecol = new WMColour($this->colours['DEFAULT']['KEYOUTLINE']['red1'],
+			$this->colours['DEFAULT']['KEYOUTLINE']['green1'],
+			$this->colours['DEFAULT']['KEYOUTLINE']['blue1']
+	);
+	
+		if($bgcol->is_real()) {
+                imagefilledrectangle($scale_im, $boxx, $boxy, $boxx + $boxwidth,
+                    $boxy + $boxheight, $this->colours['DEFAULT']['KEYBG'][$scale_ref]);
+        }
+        
+        if($outlinecol->is_real()) {
+                imagerectangle($scale_im, $boxx, $boxy, $boxx + $boxwidth, $boxy + $boxheight,
+                    $this->colours['DEFAULT']['KEYOUTLINE'][$scale_ref]);
+        }
 
 	$this->myimagestring($scale_im, $font, $scale_left, $scale_bottom + $tileheight * 2 + 2 , $title,
 		$this->colours['DEFAULT']['KEYTEXT'][$scale_ref]);
@@ -2514,12 +2534,32 @@ function DrawLegend_Vertical($im,$scalename="DEFAULT",$height=400,$inverted=fals
 
 	$scale_im = imagecreatetruecolor($box_right+1, $box_bottom+1);
 	$scale_ref = 'gdref_legend_'.$scalename;
+	
+	// Start with a transparent box, in case the fill or outline colour is 'none'
+	imageSaveAlpha($scale_im, true);
+	$nothing = imagecolorallocatealpha($scale_im, 128, 0, 0, 127);
+	imagefill($scale_im, 0, 0, $nothing);
+	
 	$this->AllocateScaleColours($scale_im,$scale_ref);
 
-	imagefilledrectangle($scale_im, $box_left, $box_top, $box_right, $box_bottom,
-		$this->colours['DEFAULT']['KEYBG']['gdref1']);
-	imagerectangle($scale_im, $box_left, $box_top, $box_right, $box_bottom,
-		$this->colours['DEFAULT']['KEYOUTLINE']['gdref1']);
+	$bgcol = new WMColour($this->colours['DEFAULT']['KEYBG']['red1'],
+			$this->colours['DEFAULT']['KEYBG']['green1'],
+			$this->colours['DEFAULT']['KEYBG']['blue1']
+	);
+	$outlinecol = new WMColour($this->colours['DEFAULT']['KEYOUTLINE']['red1'],
+			$this->colours['DEFAULT']['KEYOUTLINE']['green1'],
+			$this->colours['DEFAULT']['KEYOUTLINE']['blue1']
+	);
+	
+		if($bgcol->is_real()) {
+                imagefilledrectangle($scale_im, $boxx, $boxy, $boxx + $boxwidth,
+                    $boxy + $boxheight, $this->colours['DEFAULT']['KEYBG'][$scale_ref]);
+        }
+        
+        if($outlinecol->is_real()) {
+                imagerectangle($scale_im, $boxx, $boxy, $boxx + $boxwidth, $boxy + $boxheight,
+                    $this->colours['DEFAULT']['KEYOUTLINE'][$scale_ref]);
+        }
 
 	$this->myimagestring($scale_im, $font, $scale_left-$scalefactor, $scale_top - $tileheight , $title,
 		$this->colours['DEFAULT']['KEYTEXT']['gdref1']);
@@ -2578,7 +2618,7 @@ function DrawLegend_Classic($im,$scalename="DEFAULT",$use_tags=FALSE)
 	$colours=$this->colours[$scalename];
 	usort($colours, array("Weathermap", "coloursort"));
 	
-	$nscales=$this->numscales[$scalename];
+	$nscales = $this->numscales[$scalename];
 
 	wm_debug("Drawing $nscales colours into SCALE\n");
 
@@ -2640,6 +2680,8 @@ function DrawLegend_Classic($im,$scalename="DEFAULT",$use_tags=FALSE)
 
 		if ($boxy < 0) { $boxy+=$this->height; }
 
+		wm_debug("Scale Box is %dx%d\n", $boxwidth+1, $boxheight+1);
+		
 		$scale_im = imagecreatetruecolor($boxwidth+1, $boxheight+1);
 		
 		// Start with a transparent box, in case the fill or outline colour is 'none'
@@ -3883,6 +3925,7 @@ function DefaultScales()
             $this->colours['DEFAULT'][$key] = $def;
             $this->colours['DEFAULT'][$key]['key'] = $key;
             $this->scalesseen++;
+            $this->numscales['DEFAULT']++;
         }
         // we have a 0-0 line now, so we need to hide that.
         $this->add_hint("key_hidezero_DEFAULT", 1);

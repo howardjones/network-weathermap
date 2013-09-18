@@ -115,7 +115,12 @@ function weathermap_run_maps($mydir)
 	$total_warnings = 0;
 	$warning_notes = "";
 
-	$start_time = time();
+	if (function_exists("microtime")) {
+		$start_time = microtime(true) / 1000000;
+	} else {
+		$start_time = time();
+	}
+	
 	if ($weathermap_poller_start_time==0) {
 		$weathermap_poller_start_time = $start_time;
 	}
@@ -129,8 +134,10 @@ function weathermap_run_maps($mydir)
 	if (read_config_option("log_verbosity") >= POLLER_VERBOSITY_DEBUG) {
 		$weathermap_debugging = TRUE;
 		$mode_message = "DEBUG mode is on";
+		$global_debug = true;
 	} else {
 		$mode_message = "Normal logging mode. Turn on DEBUG in Cacti for more information";
+		$global_debug = false;
 	}
 	$quietlogging = intval(read_config_option("weathermap_quiet_logging"));  
 	// moved this outside the module_checks, so there should always be something in the logs!
@@ -181,7 +188,20 @@ function weathermap_run_maps($mydir)
 							if (file_exists($mapfile)) {
 								if ($quietlogging==0) wm_warn("Map: $mapfile -> $htmlfile & $imagefile\n",TRUE);
 								db_execute("replace into settings values('weathermap_last_started_file','".mysql_real_escape_string($weathermap_map)."')");
-								$map_start = time();
+								
+								if($global_debug === false && $map['debug']=='on') {
+									$weathermap_debugging = true;
+								}
+								else {
+									$weathermap_debugging = $global_debug;
+								}
+								
+								if (function_exists("microtime")) {
+									$map_start = microtime(true) / 1000000;
+								} else {
+									$map_start = time();
+								}
+								
 								weathermap_memory_check("MEM starting $mapcount");
 								$wmap = new Weathermap;
 								$wmap->context = "cacti";
@@ -261,8 +281,14 @@ function weathermap_run_maps($mydir)
 								$wmap->CleanUp();
 								unset($wmap);
 								
-								$map_duration = time() - $map_start;
-								wm_debug("TIME: $mapfile took $map_duration seconds.\n");
+								if (function_exists("microtime")) {
+									$map_end = microtime(true) / 1000000;
+								} else {
+									$map_end = time();
+								}
+								
+								$map_duration = $map_end - $map_start;
+								wm_debug("TIME: $mapfile took %f seconds.\n", $map_duration);
 								weathermap_memory_check("MEM after $mapcount");
 								$mapcount++;
 								db_execute("replace into settings values('weathermap_last_finished_file','".mysql_real_escape_string($weathermap_map)."')");
@@ -293,9 +319,17 @@ function weathermap_run_maps($mydir)
 		}
 		weathermap_memory_check("MEM Final");
 		chdir($orig_cwd);
-		$duration = time() - $start_time;
 		
-		$stats_string = date(DATE_RFC822) . ": $mapcount maps were run in $duration seconds with $total_warnings warnings." . $warning_notes;
+		if (function_exists("microtime")) {
+			$end_time = microtime(true) / 1000000;
+		} else {
+			$end_time = time();
+		}
+		
+		$duration = $end_time - $start_time;
+		
+		$stats_string = sprintf('%s: %d maps were run in %f seconds with %d warnings', date(DATE_RFC822),
+				$mapcount, $duration, $total_warnings);
 		if ($quietlogging==0) wm_warn("STATS: Weathermap $WEATHERMAP_VERSION run complete - $stats_string\n", TRUE);
 		db_execute("replace into settings values('weathermap_last_stats','".mysql_real_escape_string($stats_string)."')");
 		db_execute("replace into settings values('weathermap_last_finish_time','".mysql_real_escape_string(time())."')");

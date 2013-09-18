@@ -2641,13 +2641,35 @@ function DrawLegend_Classic($im,$scalename="DEFAULT",$use_tags=FALSE)
 		if ($boxy < 0) { $boxy+=$this->height; }
 
 		$scale_im = imagecreatetruecolor($boxwidth+1, $boxheight+1);
+		
+		// Start with a transparent box, in case the fill or outline colour is 'none'
+		imageSaveAlpha($scale_im, true);
+		$nothing = imagecolorallocatealpha($scale_im, 128, 0, 0, 127);
+		imagefill($scale_im, 0, 0, $nothing);
+		
 		$scale_ref = 'gdref_legend_'.$scalename;
 		$this->AllocateScaleColours($scale_im,$scale_ref);
 
-		imagefilledrectangle($scale_im, $boxx, $boxy, $boxx + $boxwidth, $boxy + $boxheight,
-			$this->colours['DEFAULT']['KEYBG'][$scale_ref]);
-		imagerectangle($scale_im, $boxx, $boxy, $boxx + $boxwidth, $boxy + $boxheight,
-			$this->colours['DEFAULT']['KEYOUTLINE'][$scale_ref]);
+		$bgcol = new Colour($this->colours['DEFAULT']['KEYBG']['red1'],
+				$this->colours['DEFAULT']['KEYBG']['green1'],
+				$this->colours['DEFAULT']['KEYBG']['blue1']
+		);
+		$outlinecol = new Colour($this->colours['DEFAULT']['KEYOUTLINE']['red1'],
+				$this->colours['DEFAULT']['KEYOUTLINE']['green1'],
+				$this->colours['DEFAULT']['KEYOUTLINE']['blue1']
+		);
+		
+		
+		if($bgcol->is_real()) {
+                imagefilledrectangle($scale_im, $boxx, $boxy, $boxx + $boxwidth,
+                    $boxy + $boxheight, $this->colours['DEFAULT']['KEYBG'][$scale_ref]);
+        }
+        
+        if($outlinecol->is_real()) {
+                imagerectangle($scale_im, $boxx, $boxy, $boxx + $boxwidth, $boxy + $boxheight,
+                    $this->colours['DEFAULT']['KEYOUTLINE'][$scale_ref]);
+        }
+		
 		$this->myimagestring($scale_im, $font, $boxx + 4, $boxy + 4 + $tileheight, $title,
 			$this->colours['DEFAULT']['KEYTEXT'][$scale_ref]);
 

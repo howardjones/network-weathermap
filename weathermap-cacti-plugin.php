@@ -373,7 +373,25 @@ function weathermap_fullview($cycle=FALSE, $firstonly=FALSE, $limit_to_group = -
 	if($cycle) $class = "inplace";
 	if($fullscreen) $class = "fullscreen";
 	
-
+	if($cycle) {
+		print "<script src='editor-resources/jquery-latest.min.js'></script>";
+		$extra = "";
+		if($limit_to_group > 0) $extra = " in this group";
+		?>
+					<div id="wmcyclecontrolbox" class="<?php print $class ?>">
+						<div id="wm_progress"></div>
+						<div id="wm_cyclecontrols">
+						<a id="cycle_stop" href="?action="><img src="plugin-images/control_stop_blue.png" width="16" height="16" /></a>
+						<a id="cycle_prev" href="#"><img src="plugin-images/control_rewind_blue.png" width="16" height="16" /></a>
+						<a id="cycle_pause" href="#"><img src="plugin-images/control_pause_blue.png" width="16" height="16" /></a>
+						<a id="cycle_next" href="#"><img src="plugin-images/control_fastforward_blue.png" width="16" height="16" /></a>
+						<a id="cycle_fullscreen" href="?action=viewmapcycle&fullscreen=1"><img src="plugin-images/arrow_out.png" width="16" height="16" /></a>
+						Showing <span id="wm_current_map">1</span> of <span id="wm_total_map">1</span>. 
+						Cycling all available maps<?php echo $extra; ?>.
+						</div>
+					</div>
+				<?php
+			}
 	
 		
 	// only draw the whole screen if we're not cycling, or we're cycling without fullscreen mode
@@ -412,8 +430,6 @@ function weathermap_fullview($cycle=FALSE, $firstonly=FALSE, $limit_to_group = -
 	
 		weathermap_tabs($limit_to_group);	
 	}
-	
-	print "\n\n\n\n\n\n\n\n";
 	
 	$i = 0;
 	if (sizeof($maplist) > 0) {
@@ -470,26 +486,6 @@ print '<div class="weathermapholder" id="mapholder_'.$map['filehash'].'">';
 		}
 		print "</div>";
 		
-		if($cycle) {		
-			print "<script src='editor-resources/jquery-latest.min.js'></script>";
-			$extra = "";
-			if($limit_to_group > 0) $extra = " in this group";
-			?>
-				<div id="wmcyclecontrolbox" class="<?php print $class ?>">
-					<div id="wm_progress"></div>
-					<div id="wm_cyclecontrols">
-					<a id="cycle_stop" href="?action="><img src="plugin-images/control_stop_blue.png" width="16" height="16" /></a>
-					<a id="cycle_prev" href="#"><img src="plugin-images/control_rewind_blue.png" width="16" height="16" /></a>
-					<a id="cycle_pause" href="#"><img src="plugin-images/control_pause_blue.png" width="16" height="16" /></a>
-					<a id="cycle_next" href="#"><img src="plugin-images/control_fastforward_blue.png" width="16" height="16" /></a>
-					<a id="cycle_fullscreen" href="?action=viewmapcycle&fullscreen=1"><img src="plugin-images/arrow_out.png" width="16" height="16" /></a>
-					Showing <span id="wm_current_map">1</span> of <span id="wm_total_map">1</span>. 
-					Cycling all available maps<?php echo $extra; ?>.
-					</div>
-				</div>
-			<?php
-		}
-		
 		if ($cycle) {
 			$refreshtime = read_config_option("weathermap_cycle_refresh");
 			$poller_cycle = read_config_option("poller_interval");			
@@ -497,6 +493,7 @@ print '<div class="weathermapholder" id="mapholder_'.$map['filehash'].'">';
         <script type = "text/javascript">           
 			wm_fullscreen = <?php echo ($fullscreen ? "1" : "0"); ?>;
 			wm_poller_cycle = <?php echo $poller_cycle; ?> * 1000;
+			wm_period = <?php echo $refreshtime ?> * 1000;
 		</script>
 		<script type="text/javascript" src="cacti-resources/map-cycle.js"></script>
 <?php
@@ -508,11 +505,6 @@ print '<div class="weathermapholder" id="mapholder_'.$map['filehash'].'">';
 	}
 
 
-	
-	
-	
-	print "\n\n\n\n\n\n\n\n";
-	
 }
 
 function weathermap_translate_id($idname)

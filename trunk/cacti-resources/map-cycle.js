@@ -151,7 +151,7 @@ jQuery.fn.center = function () {
                 // figure out how long the refresh is, so that we get
                 // through all the maps in exactly 5 minutes
 
-                wm_period = <?php echo $refreshtime ?> * 1000;
+               // wm_period = <?php echo $refreshtime ?> * 1000;
 
                 if (wm_period == 0) {
                     wm_period = wm_poller_cycle / wm_nmaps;

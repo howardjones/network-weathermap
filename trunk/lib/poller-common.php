@@ -299,7 +299,7 @@ function weathermap_run_maps($mydir)
 		if ($quietlogging==0) wm_warn("STATS: Weathermap $WEATHERMAP_VERSION run complete - $stats_string\n", TRUE);
 		db_execute("replace into settings values('weathermap_last_stats','".mysql_real_escape_string($stats_string)."')");
 		db_execute("replace into settings values('weathermap_last_finish_time','".mysql_real_escape_string(time())."')");
-		db_execute("replace into settings values('weathermap_last_map_count','". mysql_escape_string($mapcount) . "')");
+		db_execute("replace into settings values('weathermap_last_map_count','". mysql_real_escape_string($mapcount) . "')");
 
 		if (true === function_exists('memory_get_usage')) {
 			db_execute("replace into settings values('weathermap_final_memory','"

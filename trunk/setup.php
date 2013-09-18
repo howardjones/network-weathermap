@@ -106,7 +106,7 @@ function weathermap_page_head()
 	global $config;
 		
 	if (preg_match('/plugins\/weathermap\//',$_SERVER['REQUEST_URI'] ,$matches)) {
-		print '<LINK rel="stylesheet" type="text/css" media="screen" href="weathermap-cacti-plugin.css">';
+		print '<LINK rel="stylesheet" type="text/css" media="screen" href="cacti-resources/weathermap.css">';
 	}
 }
 

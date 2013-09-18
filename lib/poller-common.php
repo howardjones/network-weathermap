@@ -116,7 +116,7 @@ function weathermap_run_maps($mydir)
 	$warning_notes = "";
 
 	if (function_exists("microtime")) {
-		$start_time = microtime(true) / 1000000;
+		$start_time = microtime(true);
 	} else {
 		$start_time = time();
 	}
@@ -197,7 +197,7 @@ function weathermap_run_maps($mydir)
 								}
 								
 								if (function_exists("microtime")) {
-									$map_start = microtime(true) / 1000000;
+									$map_start = microtime(true);
 								} else {
 									$map_start = time();
 								}
@@ -282,7 +282,7 @@ function weathermap_run_maps($mydir)
 								unset($wmap);
 								
 								if (function_exists("microtime")) {
-									$map_end = microtime(true) / 1000000;
+									$map_end = microtime(true);
 								} else {
 									$map_end = time();
 								}
@@ -295,7 +295,10 @@ function weathermap_run_maps($mydir)
 							} else {
 								wm_warn("Mapfile $mapfile is not readable or doesn't exist [WMPOLL04]\n");
 							}
-							db_execute("update weathermap_maps set warncount=".intval($weathermap_warncount)." where id=".intval($map['id']));
+							db_execute(sprintf(
+									'update weathermap_maps set warncount=%d, runtime=%f where id=%d',
+									$weathermap_warncount, $map_duration, $map['id']));
+								
 							$total_warnings += $weathermap_warncount;
 							$weathermap_warncount = 0;
 							$weathermap_map="";
@@ -321,7 +324,7 @@ function weathermap_run_maps($mydir)
 		chdir($orig_cwd);
 		
 		if (function_exists("microtime")) {
-			$end_time = microtime(true) / 1000000;
+			$end_time = microtime(true);
 		} else {
 			$end_time = time();
 		}
@@ -330,6 +333,7 @@ function weathermap_run_maps($mydir)
 		
 		$stats_string = sprintf('%s: %d maps were run in %f seconds with %d warnings', date(DATE_RFC822),
 				$mapcount, $duration, $total_warnings);
+		
 		if ($quietlogging==0) wm_warn("STATS: Weathermap $WEATHERMAP_VERSION run complete - $stats_string\n", TRUE);
 		db_execute("replace into settings values('weathermap_last_stats','".mysql_real_escape_string($stats_string)."')");
 		db_execute("replace into settings values('weathermap_last_finish_time','".mysql_real_escape_string(time())."')");

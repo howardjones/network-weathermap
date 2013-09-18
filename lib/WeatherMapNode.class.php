@@ -129,8 +129,13 @@ class WeatherMapNode extends WeatherMapItem
 	function pre_render($im, &$map)
 	{
 		// don't bother drawing if there's no position - it's a template
-		if( is_null($this->x) ) return;
-		if( is_null($this->y) ) return;
+		if (is_null($this->x)) {
+			return;
+		}
+		
+		if (is_null($this->y)) {
+			return;
+		}
 		
 		// apparently, some versions of the gd extension will crash
 		// if we continue...

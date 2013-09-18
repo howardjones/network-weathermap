@@ -2650,11 +2650,11 @@ function DrawLegend_Classic($im,$scalename="DEFAULT",$use_tags=FALSE)
 		$scale_ref = 'gdref_legend_'.$scalename;
 		$this->AllocateScaleColours($scale_im,$scale_ref);
 
-		$bgcol = new Colour($this->colours['DEFAULT']['KEYBG']['red1'],
+		$bgcol = new WMColour($this->colours['DEFAULT']['KEYBG']['red1'],
 				$this->colours['DEFAULT']['KEYBG']['green1'],
 				$this->colours['DEFAULT']['KEYBG']['blue1']
 		);
-		$outlinecol = new Colour($this->colours['DEFAULT']['KEYOUTLINE']['red1'],
+		$outlinecol = new WMColour($this->colours['DEFAULT']['KEYOUTLINE']['red1'],
 				$this->colours['DEFAULT']['KEYOUTLINE']['green1'],
 				$this->colours['DEFAULT']['KEYOUTLINE']['blue1']
 		);

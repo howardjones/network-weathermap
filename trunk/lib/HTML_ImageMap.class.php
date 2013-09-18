@@ -119,7 +119,7 @@ class HTML_ImageMap_Area_Polygon extends HTML_ImageMap_Area
 
 		if( intval($this->npoints) != ($this->npoints))
 		{
-			die("Odd number of points!");
+            die('Odd number of points in HTML_ImageMap_Area_Polygon!');
 		}
 
 		for ($i=0; $i<count($c); $i+=2)
@@ -221,8 +221,8 @@ class HTML_ImageMap_Area_Circle extends HTML_ImageMap_Area
 		$radius1 = ($this->edgey - $this->centy) * ($this->edgey - $this->centy)
 			+ ($this->edgex - $this->centx) * ($this->edgex - $this->centx);
 
-		$radius2 = ($this->edgey - $y) * ($this->edgey - $y)
-			+ ($this->edgex - $x) * ($this->edgex - $x);
+		$radius2 = ($this->centy - $y) * ($this->centy - $y)
+			+ ($this->centx - $x) * ($this->centx - $x);
 
 		return ($radius2 <= $radius1);
 	}

@@ -149,7 +149,7 @@ function weathermap_run_maps($mydir)
 		$orig_cwd = getcwd();
 		chdir($mydir);
 
-		db_execute("replace into settings values('weathermap_last_start_time','".mysql_real_escape_string(time())."')");
+		db_execute("replace into settings values('weathermap_last_start_time','".mysql_real_escape_string($start_time)."')");
 
 		// first, see if the output directory even exists
 		if (is_dir($outdir)) {
@@ -177,7 +177,7 @@ function weathermap_run_maps($mydir)
 	
 						wm_debug("FIRST TOUCH\n");
 						
-						if (weathermap_check_cron($weathermap_poller_start_time,$map['schedule'])) {
+						if (weathermap_check_cron( intval($weathermap_poller_start_time), $map['schedule'])) {
 							$mapfile = $confdir . DIRECTORY_SEPARATOR . $map['configfile'];
 							$htmlfile = $outdir . DIRECTORY_SEPARATOR . $map['filehash'].".html";
 							$imagefile = $outdir . DIRECTORY_SEPARATOR . $map['filehash'].".".$imageformat;
@@ -189,7 +189,7 @@ function weathermap_run_maps($mydir)
 								if ($quietlogging==0) wm_warn("Map: $mapfile -> $htmlfile & $imagefile\n",TRUE);
 								db_execute("replace into settings values('weathermap_last_started_file','".mysql_real_escape_string($weathermap_map)."')");
 								
-								if($global_debug === false && $map['debug']=='on') {
+								if($global_debug === false && ($map['debug']=='on' || $map['debug']=='once') {
 									$weathermap_debugging = true;
 								}
 								else {
@@ -295,9 +295,17 @@ function weathermap_run_maps($mydir)
 							} else {
 								wm_warn("Mapfile $mapfile is not readable or doesn't exist [WMPOLL04]\n");
 							}
+							
+							// if the debug mode was set to once for this map, then that
+							// time has now passed, and it can be turned off again.
+							$newdebug = $map['debug'];
+							if($newdebug == 'once') {
+								$newdebug = 'off';
+							}
+							
 							db_execute(sprintf(
-									'update weathermap_maps set warncount=%d, runtime=%f where id=%d',
-									$weathermap_warncount, $map_duration, $map['id']));
+									"update weathermap_maps set warncount=%d, runtime=%f,debug='%s' where id=%d",
+									$weathermap_warncount, $map_duration, $newdebug, $map['id']));
 								
 							$total_warnings += $weathermap_warncount;
 							$weathermap_warncount = 0;
@@ -336,7 +344,7 @@ function weathermap_run_maps($mydir)
 		
 		if ($quietlogging==0) wm_warn("STATS: Weathermap $WEATHERMAP_VERSION run complete - $stats_string\n", TRUE);
 		db_execute("replace into settings values('weathermap_last_stats','".mysql_real_escape_string($stats_string)."')");
-		db_execute("replace into settings values('weathermap_last_finish_time','".mysql_real_escape_string(time())."')");
+		db_execute("replace into settings values('weathermap_last_finish_time','".mysql_real_escape_string($end_time)."')");
 		db_execute("replace into settings values('weathermap_last_map_count','". mysql_real_escape_string($mapcount) . "')");
 
 		if (true === function_exists('memory_get_usage')) {

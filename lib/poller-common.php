@@ -189,7 +189,7 @@ function weathermap_run_maps($mydir)
 								if ($quietlogging==0) wm_warn("Map: $mapfile -> $htmlfile & $imagefile\n",TRUE);
 								db_execute("replace into settings values('weathermap_last_started_file','".mysql_real_escape_string($weathermap_map)."')");
 								
-								if($global_debug === false && ($map['debug']=='on' || $map['debug']=='once') {
+								if($global_debug === false && ($map['debug']=='on' || $map['debug']=='once')) {
 									$weathermap_debugging = true;
 								}
 								else {

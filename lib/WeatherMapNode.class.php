@@ -439,19 +439,17 @@ class WeatherMapNode extends WeatherMapItem
 
 					$icon_im = imagecreatefromfile($this->iconfile);
 					# $icon_im = imagecreatefrompng($this->iconfile);
-					if(function_exists("imagefilter") && isset($colicon) && $this->get_hint("use_imagefilter")==1)
-					{						
-						imagefilter($icon_im, IMG_FILTER_COLORIZE, $colicon->r, $colicon->g, $colicon->b);						
-					}
-					else
-					{
-                                            if(isset($colicon))
-                                            {
-                                                imagecolorize($icon_im, $colicon->r, $colicon->g, $colicon->b);
-                                            }
+					
+					if(true === isset($colicon)) {
+						if (function_exists("imagefilter") && $this->get_hint("use_imagefilter") == 1) {
+							imagefilter($icon_im, IMG_FILTER_COLORIZE, $colicon->r,
+							$colicon->g, $colicon->b);
+						} else {
+							imagecolorize($icon_im, $colicon->r, $colicon->g,
+							$colicon->b);
+						}
 					}
 
-					wm_debug("If this is the last thing in your logs, you probably have a buggy GD library. Get > 2.0.33 or use PHP builtin.\n");
 					if ($icon_im)
 					{
 						$icon_w = imagesx($icon_im);
@@ -459,6 +457,8 @@ class WeatherMapNode extends WeatherMapItem
 
 						if(($this->iconscalew * $this->iconscaleh) > 0)
 						{
+							wm_debug("If this is the last thing in your logs, you probably have a buggy GD library. Get > 2.0.33 or use PHP builtin.\n");
+								
 							imagealphablending($icon_im, true);
 
 							wm_debug("SCALING ICON here\n");

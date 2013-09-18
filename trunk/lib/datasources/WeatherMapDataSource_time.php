@@ -32,6 +32,21 @@ class WeatherMapDataSource_time extends WeatherMapDataSource {
 		if(preg_match("/^time:(.*)$/",$targetstring,$matches))
 		{
 			$timezone = $matches[1];
+			
+			$offset = "now";
+				
+			if( preg_match("/^([^:]+):(.*)$/",$timezone, $matches2)) {
+				$timezone = $matches2[1];
+				$offset = $matches2[2];
+			
+				// test that the offset is valid
+				$timestamp = strtotime($offset);
+				if (($timestamp	=== false) || ($timestamp === -1) ) {
+					warn("Time ReadData: Offset String ($offset) is bogus - ignoring [WMTIME03]\n");
+					$offset = "now";
+				}
+			}
+				
 			$timezone_l = strtolower($timezone);
 			
 			$timezone_identifiers = DateTimeZone::listIdentifiers();
@@ -41,11 +56,13 @@ class WeatherMapDataSource_time extends WeatherMapDataSource {
 				if(strtolower($tz) == $timezone_l)
 				{				
 					wm_debug ("Time ReadData: Timezone exists: $tz\n");
-					$dateTime = new DateTime("now", new DateTimeZone($tz));
+					$dateTime = new DateTime($offset, new DateTimeZone($tz));
 					
 					$item->add_note("time_time12",$dateTime->format("h:i"));
 					$item->add_note("time_time12ap",$dateTime->format("h:i A"));
 					$item->add_note("time_time24",$dateTime->format("H:i"));
+					$item->add_note("time_timet", $dateTime->format("U"));
+						
 					$item->add_note("time_timezone",$tz);
 					$data[IN] = $dateTime->format("H");
 					$data_time = time();

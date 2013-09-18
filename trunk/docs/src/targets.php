@@ -621,6 +621,8 @@ NODE firewall_status
             - time_time12, time_time24, time_time12ap. These are the current time in
             12-hour, 24-hour and 12-hour-with-am/pm, respectively.</p>
 
+            <p>XXX Add in new offset and time_t related options. Mention %t</p>
+            
             <p>A typical use is:
             <code> NODE timelabel LABEL {node:this:time_time12ap} USESCALE none TARGET
             time:Europe/Paris </code>

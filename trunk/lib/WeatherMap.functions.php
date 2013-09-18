@@ -1171,7 +1171,9 @@ function draw_straight($image, &$curvepoints, $widths, $outlinecolour, $fillcolo
 			$areaname = "LINK:L" . $map->links[$linkname]->id . ":$dir";
 			$map->imap->addArea("Polygon", $areaname, '', $finalpoints);
             wm_debug("Adding Poly imagemap for %s\n", $areaname);
-					
+            
+            $map->links[$linkname]->imap_areas[] = $areaname;
+            
 			if (!is_null($outlinecolour)) {
 				imagepolygon($image, $finalpoints, count($finalpoints) / 2, $arrowsettings[5]);
 			} else {

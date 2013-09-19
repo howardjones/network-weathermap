@@ -385,7 +385,7 @@ function weathermap_fullview($cycle=FALSE, $firstonly=FALSE, $limit_to_group = -
 						<a id="cycle_prev" href="#"><img src="plugin-images/control_rewind_blue.png" width="16" height="16" /></a>
 						<a id="cycle_pause" href="#"><img src="plugin-images/control_pause_blue.png" width="16" height="16" /></a>
 						<a id="cycle_next" href="#"><img src="plugin-images/control_fastforward_blue.png" width="16" height="16" /></a>
-						<a id="cycle_fullscreen" href="?action=viewmapcycle&fullscreen=1"><img src="plugin-images/arrow_out.png" width="16" height="16" /></a>
+						<a id="cycle_fullscreen" href="?action=viewmapcycle&fullscreen=1&group=<?php echo $limit_to_group; ?>"><img src="plugin-images/arrow_out.png" width="16" height="16" /></a>
 						Showing <span id="wm_current_map">1</span> of <span id="wm_total_map">1</span>. 
 						Cycling all available maps<?php echo $extra; ?>.
 						</div>
@@ -396,9 +396,7 @@ function weathermap_fullview($cycle=FALSE, $firstonly=FALSE, $limit_to_group = -
 		
 	// only draw the whole screen if we're not cycling, or we're cycling without fullscreen mode
 	if ($cycle == false || $fullscreen==0) {
-		print "<!-- -->\n";
 		html_graph_start_box(2,true);
-		print "<!-- -->\n";
 ?>
 			<tr bgcolor="<?php print $colors["panel"];?>">
 				<td>
@@ -444,11 +442,9 @@ function weathermap_fullview($cycle=FALSE, $firstonly=FALSE, $limit_to_group = -
 			$maptitle = $map['titlecache'];
 			if($maptitle == '') $maptitle= "Map for config file: ".$map['configfile'];
 						
-print '<div class="weathermapholder" id="mapholder_'.$map['filehash'].'">';
+			print '<div class="weathermapholder" id="mapholder_'.$map['filehash'].'">';
 			if($cycle == false || $fullscreen==0) {
-				print "<!-- -->\n";
 				html_graph_start_box(1,true);
-				print "<!-- -->\n";
 				
 ?>
 		<tr bgcolor="#<?php echo $colors["header_panel"] ?>">
@@ -477,10 +473,7 @@ print '<div class="weathermapholder" id="mapholder_'.$map['filehash'].'">';
 			
 			if ($cycle == false || $fullscreen==0) {
 				print '</td></tr>';
-				print "<!-- -->\n";
-				html_graph_end_box();
-				print "<!-- -->\n";
-				
+				html_graph_end_box();				
 			}
 			print '</div>';
 		}

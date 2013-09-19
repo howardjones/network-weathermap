@@ -2448,13 +2448,13 @@ function DrawLegend_Horizontal($im,$scalename="DEFAULT",$width=400)
 	);
 	
 		if($bgcol->is_real()) {
-                imagefilledrectangle($scale_im, $boxx, $boxy, $boxx + $boxwidth,
-                    $boxy + $boxheight, $this->colours['DEFAULT']['KEYBG'][$scale_ref]);
-        }
+			imagefilledrectangle($scale_im, $box_left, $box_top, $box_right, $box_bottom,
+				$this->colours['DEFAULT']['KEYBG'][$scale_ref]);
+			}
         
         if($outlinecol->is_real()) {
-                imagerectangle($scale_im, $boxx, $boxy, $boxx + $boxwidth, $boxy + $boxheight,
-                    $this->colours['DEFAULT']['KEYOUTLINE'][$scale_ref]);
+        	imagerectangle($scale_im, $box_left, $box_top, $box_right, $box_bottom,
+				$this->colours['DEFAULT']['KEYOUTLINE'][$scale_ref]);
         }
 
 	$this->myimagestring($scale_im, $font, $scale_left, $scale_bottom + $tileheight * 2 + 2 , $title,
@@ -2552,13 +2552,13 @@ function DrawLegend_Vertical($im,$scalename="DEFAULT",$height=400,$inverted=fals
 	);
 	
 		if($bgcol->is_real()) {
-                imagefilledrectangle($scale_im, $boxx, $boxy, $boxx + $boxwidth,
-                    $boxy + $boxheight, $this->colours['DEFAULT']['KEYBG'][$scale_ref]);
-        }
+			imagefilledrectangle($scale_im, $box_left, $box_top, $box_right, $box_bottom,
+				$this->colours['DEFAULT']['KEYBG'][$scale_ref]);
+			}
         
         if($outlinecol->is_real()) {
-                imagerectangle($scale_im, $boxx, $boxy, $boxx + $boxwidth, $boxy + $boxheight,
-                    $this->colours['DEFAULT']['KEYOUTLINE'][$scale_ref]);
+        	imagerectangle($scale_im, $box_left, $box_top, $box_right, $box_bottom,
+				$this->colours['DEFAULT']['KEYOUTLINE'][$scale_ref]);
         }
 
 	$this->myimagestring($scale_im, $font, $scale_left-$scalefactor, $scale_top - $tileheight , $title,

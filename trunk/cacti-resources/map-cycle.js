@@ -15,7 +15,7 @@ jQuery.fn.center = function () {
    // wm_fullscreen = <?php echo ($fullscreen ? "1" : "0"); ?>;
         wm_current = 0;
         wm_countdown = 0;
-        wm_period = 0;
+       // wm_period = 0;
     wm_nmaps = 0;
        // wm_poller_cycle = <?php echo $poller_cycle; ?> * 1000;
     wm_paused = false;
@@ -149,7 +149,7 @@ jQuery.fn.center = function () {
 	    wm_switchmap(0);
 	    		    		    
                 // figure out how long the refresh is, so that we get
-                // through all the maps in exactly 5 minutes
+                // through all the maps in exactly one poller cycle
 
                // wm_period = <?php echo $refreshtime ?> * 1000;
 

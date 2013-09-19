@@ -166,7 +166,7 @@ function weathermap_config_settings ()
 		),
 		"weathermap_cycle_refresh" => array(
 			"friendly_name" => "Refresh Time",
-			"description" => "How often to refresh the page in Cycle mode. Automatic makes all available maps fit into 5 minutes.",
+			"description" => "How often to refresh the page in Cycle mode. Automatic makes all available maps fit into one poller cycle (normally 5 minutes).",
 			"method" => "drop_array",
 			"array" => array(0 => "Automatic", 5 => "5 Seconds",
 			15 => '15 Seconds',

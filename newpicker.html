@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="ISO-8859-1">
+<title>Data Source Picker Test</title>
+
+
+<script type="text/javascript"
+	src="editor-resources/jquery-1.10.1.min.js"></script>
+<script type="text/javascript"
+	src="editor-resources/bootstrap/js/bootstrap.min.js"></script>
+
+<link rel="stylesheet" type="text/css"
+	href="editor-resources/bootstrap/css/bootstrap.min.css" />
+
+<style>
+#currentlist {
+	height: 200px;
+	overflow-x: hidden;
+	overflow-y: auto;
+	border-top: 1px solid gray;
+	border-bottom: 1px solid gray;
+}
+
+#currentlist li:hover { background: #def; }
+
+</style>
+
+</head>
+<body>
+
+
+
+    <div class="container">
+    	<h1>Testing new picker</h1>
+
+		<form class="form-horizontal col-md-4" role="form">
+			<label for="target">Target</label>
+			<div class="input-group">				
+					<input type="text" id="target" name="target" class="form-control">
+				      <span class="input-group-btn">
+			        <button class="btn btn-primary" id="target_picker" type="button">Pick</button>
+			      </span>				
+			</div>
+		</form>
+	</div>
+
+	<div class="modal fade" id="pickermodal">
+		<div class="modal-dialog">
+			<div class="modal-content">
+
+				<div class="modal-header">
+					<h2 id="datatitle" class="modal-title"></h2>
+				</div>
+				<div class="modal-body">
+
+					<ol id="levelslist" class="breadcrumb">
+					</ol>
+
+					<ul id="pickedlist" class="list-group">
+					</ul>
+
+					<ul id="currentlist" class="list-group compact">
+					<li>poop</li>
+					</ul>
+
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+					<button type="button" class="btn btn-primary">Apply</button>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<script type="text/javascript">
+	
+		function prepare_pick_source() {
+			$('#levelslist').hide();
+			$('#pickedlist').hide();
+						
+			$.getJSON("newpickerserver.php", { "act": "metameta" }, function(data) {
+				$('#datatitle').text("Select Data Source");
+							
+				$.each(data.sources, function(key, val) {
+					$('#currentlist').append("<li class='wm-ds list-group-item'><large>" + val[0] + "</large></li>");
+				});
+				$(".wm-ds").click(wm_populate_breadcrumbs);
+			});
+
+		}
+
+		function wm_populate_breadcrumbs () {
+
+			$('#levelslist').show();
+			$('#pickedlist').show();
+			
+			$.getJSON("newpickerserver.php",  { "act": "meta", "source":"cacti_rrddata" }, function(data) {
+				$('#currentlist li').remove();
+				$('#datatitle').text(data.name);
+				$.each(data.headings, function(key, val) {
+					$('#levelslist').append("<li>" + val + "</li>");
+				});
+
+			});
+
+			$.getJSON("newpickerserver.php", { "act": "list", "source":"cacti_rrddata","keys":[22,33]}, wm_populate_picklist);
+		}
+		
+		function wm_populate_picklist(data) {
+			$.each(data, function(key, val) {
+				
+				$('#currentlist').append(
+						"<li class='list-group-item'>" + val[1]
+								+ " <small><em>" + val[2]
+								+ "</em></small></li>");
+			});
+		}
+
+		function wm_initJS() {
+			$('#target_picker').click( function () {
+				$('#currentlist li').remove();
+				$('#pickermodal').modal( );
+				prepare_pick_source();			
+			});
+		}
+
+		
+		$(document).ready(wm_initJS);
+	</script>
+
+</body>
+</html>

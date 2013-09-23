@@ -3,8 +3,8 @@
 <body id="mainview">
 <div id="wrap">
     
-  <div class="navbar navbar-fixed-top" id="topmenu">    
-	<div class="navbar-inner">
+  <div class="navbar navbar-default navbar-fixed-top" id="topmenu">    
+	<div class="navbar-header">
 	    <div class="container">
 	    <a class="brand" href="#">WMEditor</a>
 	    <ul class="nav">
@@ -47,6 +47,7 @@
 	   
 	       <?php echo $imagemap ?>
 	   </div>
+	   </form>	 
   </div>
   
   

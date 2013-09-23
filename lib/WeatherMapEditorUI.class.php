@@ -71,14 +71,14 @@ class WeatherMapEditorUI {
     // All the valid commands, and their expected parameters, so we can centralise the validation
     var $commands = array(
         "add_node" => array(
-                        args=>array(
+                        "args"=>array(
                             array("mapname","mapfile"),
                             array("x","int"),
                             array("y","int")
                         )
                     ),
         "move_node" => array(
-                        args=>array(
+                        "args"=>array(
                             array("mapname","mapfile"),
                             array("x","int"),
                             array("y","int"),
@@ -86,68 +86,68 @@ class WeatherMapEditorUI {
                         )
                     ),
         "newmap" => array(
-                    args=>array(
+                    "args"=>array(
                             array("mapname","mapfile"),
                         )
                     ),
         "newmap_copy" => array(
-                    args=>array(
+                    "args"=>array(
                             array("mapname","mapfile"),
                             array("sourcemap","mapfile"),
                         )
                     ),
         "font_samples" => array(
-                    args=>array(
+                    "args"=>array(
                             array("mapname","mapfile"),
                         )
                     ),
         "draw" => array(
-                    args=>array(
+                    "args"=>array(
                             array("mapname","mapfile"),
                             array("selected","jsname",TRUE), // optional
                         )
                     ),
         "show_config" => array(
-                    args=>array(
+                    "args"=>array(
                             array("mapname","mapfile"),
                         )
                     ),
         "fetch_config" => array(
-                    args=>array(
+                    "args"=>array(
                             array("mapname","mapfile"),
                             array("item_type",array("node","link")),
                             array("item_name","name"),
                         )
                     ),
         "set_link_config" => array(
-                    args=>array(
+                    "args"=>array(
                             array("mapname","mapfile"),
                             array("item_configtext","text"),
                             array("link_name","name"),
                         )
                     ),
         "set_node_config" => array(
-                    args=>array(
+                    "args"=>array(
                             array("mapname","mapfile"),
                             array("item_configtext","text"),
                             array("node_name","name"),
                         )
                     ),
         "add_link" => array(
-                    args=>array(
+                    "args"=>array(
                             array("mapname","mapfile"),
                             array("param","name"),
                         )
                     ),
         "add_link2" => array(
-                    args=>array(
+                    "args"=>array(
                             array("mapname","mapfile"),
                             array("param","name"),
                             array("param2","name"),
                         )
                     ),
         "place_legend" => array(
-                    args=>array(
+                    "args"=>array(
                             array("mapname","mapfile"),
                             array("param","name"),
                             array("x","int"),
@@ -155,14 +155,14 @@ class WeatherMapEditorUI {
                         )
                     ),
         "place_stamp" => array(
-                    args=>array(
+                    "args"=>array(
                             array("mapname","mapfile"),
                             array("x","int"),
                             array("y","int"),
                         )
                     ),
         "via_link" => array(
-                    args=>array(
+                    "args"=>array(
                             array("mapname","mapfile"),
                             array("link_name","name"),
                             array("x","int"),
@@ -170,31 +170,31 @@ class WeatherMapEditorUI {
                         )
                     ),
         "delete_link" => array(
-                    args=>array(
+                    "args"=>array(
                             array("mapname","mapfile"),
                             array("param","name"),
                         )
                     ),
         "delete_node" => array(
-                    args=>array(
+                    "args"=>array(
                             array("mapname","mapfile"),
                             array("param","name"),
                         )
                     ),
         "clone_node" => array(
-                    args=>array(
+                    "args"=>array(
                             array("mapname","mapfile"),
                             array("param","name"),
                         )
                     ),
         "link_align_horizontal" => array(
-                    args=>array(
+                    "args"=>array(
                             array("mapname","mapfile"),
                             array("param","name"),
                         )
                     ),
         "link_align_vertical" => array(
-                    args=>array(
+                    "args"=>array(
                             array("mapname","mapfile"),
                             array("param","name"),
                         )
@@ -205,7 +205,7 @@ class WeatherMapEditorUI {
         "set_link_properties" => array(),
         "set_map_properties" => array(),
         "set_map_style" => array(),
-        "nothing" => array(args=>array())
+        "nothing" => array("args"=>array())
     );
 
     
@@ -228,7 +228,7 @@ class WeatherMapEditorUI {
         
         // Now check all the required arguments exist, and are appropriate types
         $validation = $this->commands[$action];
-        foreach ($action['args'] as $arg) {
+        foreach ($validation['args'] as $arg) {
             $required = TRUE;
             // some args are optional (not many)
             if(isset($arg[2]) && $arg[2]===TRUE) {

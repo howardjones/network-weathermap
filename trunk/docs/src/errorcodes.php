@@ -559,6 +559,14 @@
                 isn't possible to draw.</p>
 
                 </dd>
+                
+                <dt id="WMWARN50">[WMWARN50]</dt>
+                <dd>
+                <p>"Skipping too-short line"</p>
+                <p>To draw a link correctly with arrows, requires a certain distance between nodes. If your nodes are too close together, Weathermap will just skip drawing the link. This distance depends on the width of
+                the link (because the arrows are in proportion to the width). Try reducing the WIDTH of the link, changing to ARROWSTYLE compact, or moving the nodes further apart.</p>
+                </dd>
+               
 
                 <dt id="WMWARN99">[WMWARN99]</dt>
 
@@ -644,7 +652,7 @@
                 your server. Depending on the version of PHP, this can be quite low (8M
                 in older versions). Weathermap uses a lot (relatively) of memory to
                 produce the large image files. If it hits the PHP memory limit, then PHP
-                just kills the script with no warning. Because it log that it is dead
+                just kills the script with no warning. Because it can't log that it is dead
                 (because it is dead), it logs just before the 'risk' happens.
                 <em>If this log message is
                 <strong>not</strong> the last message in your log file, then

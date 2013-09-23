@@ -933,7 +933,7 @@ function draw_straight($image, &$curvepoints, $widths, $outlinecolour, $fillcolo
 	    
 	    if($l < $minimumlength)
 	    {
-			wm_warn("Skipping too-short line.\n");
+			wm_warn("Skipping too-short line [WMWARN50]\n");
 	    }
 	    else
 		{			

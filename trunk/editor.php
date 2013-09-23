@@ -808,7 +808,7 @@ else
 		$target = wm_editor_sanitize_name($_REQUEST['param']);
 		$log = "delete link ".$target;
 
-		if(isset($map->links[target])) {
+		if(isset($map->links[$target])) {
 		    unset($map->links[$target]);
 		    
 		    $map->WriteConfig($mapfile);
@@ -1055,7 +1055,7 @@ else
 		<table>
 		<tr>
 			<th>Position</th>
-			<td><input id="node_x" name="node_x" size=4 type="text" />,<input id="node_y" name="node_y" size=4 type="text" /></td>
+			<td><input id="node_x" name="node_x" size=4 type="text" />,<input id="node_y" name="node_y" size=4 type="text" /><span id="node_locktext"></span></td>
 		</tr>
 		  <tr>
 			<th>Internal Name</th>

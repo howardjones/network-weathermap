@@ -14,6 +14,8 @@
 
 <div id="withjs">
     <div id="dlgStart" class="modal" >
+       <div class="modal-dialog">
+      <div class="modal-content">
         <div class="dlgTitlebar modal-header"><h3>
             Welcome to the Weathermap <?php echo $WEATHERMAP_VERSION ?> editor</h3>
         </div>
@@ -49,7 +51,7 @@
             <ul class="filelist">
            <?php foreach ($titles as $file=>$title) : ?>                               
                 <li>
-                <?php echo $note ?>
+                <?php echo $notes[$file] ?>
                 <a href="?mapname=<?php echo $file ?>&action=nothing&plug=<?php echo $fromplug ?>"><?php echo $file ?></a>
                  - <span class="comment"><?php echo $title ?></span>
                  </li>
@@ -67,7 +69,7 @@
             COPYING for details. This distribution also includes other open source software listed in the README file.</small>
         </div>            
     </div>
-        
+        </div></div>
 </div>
 
 </div>

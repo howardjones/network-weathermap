@@ -242,6 +242,7 @@ function weathermap_run_maps($mydir)
 								$wmap->ReadData();
 								weathermap_memory_check("MEM postdata $mapcount");
 
+								$configured_imageuri = $wmap->imageuri;
 								$wmap->imageuri = 'weathermap-cacti-plugin.php?action=viewimage&id='.$map['filehash']."&time=".time();
 	
 								if ($quietlogging==0) wm_warn("About to write image file. If this is the last message in your log, increase memory_limit in php.ini [WMPOLL01]\n",TRUE);
@@ -265,6 +266,40 @@ function weathermap_run_maps($mydir)
 
 								$wmap->DumpStats($statsfile);
 								$wmap->WriteDataFile($resultsfile);
+								
+								// put back the configured imageuri
+								$wmap->imageuri = $configured_imageuri;
+								
+								// if an htmloutputfile was configured, output the HTML there too
+                    // but using the configured imageuri and imagefilename
+                    if($wmap->htmloutputfile != "") {
+                        $htmlfile = $wmap->htmloutputfile;
+                        $fd = @fopen($htmlfile, 'w');
+
+                        if ($fd !== false) {
+                            fwrite($fd,
+                                $wmap->MakeHTML('weathermap_' . $map['filehash'] . '_imap'));
+                            fclose($fd);
+                            wm_debug("Wrote HTML to %s\n", $htmlfile);
+                        } else {
+                            if (true === file_exists($htmlfile)) {
+                                wm_warn('Failed to overwrite ' . $htmlfile
+                                    . " - permissions of existing file are wrong? [WMPOLL02]\n");
+                            } else {
+                                wm_warn('Failed to create ' . $htmlfile
+                                    . " - permissions of output directory are wrong? [WMPOLL03]\n");
+                            }
+                        }
+                    }
+
+                    if($wmap->imageoutputfile != "" && $wmap->imageoutputfile != "weathermap.png" && file_exists($imagefile)) {
+                        // TODO - copy the existing file to the configured location too
+                        @copy($imagefile, $wmap->imageoutputfile);
+                    }
+								
+                    
+                    
+								
 								
 								// if the user explicitly defined a data file, write it there too
 								if ($wmap->dataoutputfile) {

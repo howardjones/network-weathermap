@@ -453,7 +453,7 @@ function weathermap_fullview($cycle=FALSE, $firstonly=FALSE, $limit_to_group = -
 								<tr>
 									<td align="left" class="textHeaderDark">
                                     	<a name="map_<?php echo $map['filehash']; ?>">
-                                        <?php print htmlspecialchars($maptitle); ?></a>
+                                        </a><?php print htmlspecialchars($maptitle); ?>
                                     </td>
 								</tr>
 						</table>

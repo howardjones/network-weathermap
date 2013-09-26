@@ -2094,7 +2094,7 @@ function ReadData()
 									$in=0;
 									$out=0;
 									wm_warn
-										("ReadData: $type $name, target: $targetstring on config line $target[3] of $target[2] had no valid data, according to $matched_by\n");
+										("ReadData: $type $name, target: $targetstring on config line $target[3] of $target[2] had no valid data, according to $matched_by [WMWARN70]\n");
 								}
 								else
 								{

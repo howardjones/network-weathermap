@@ -114,21 +114,21 @@ function wm_warn($string,$notice_only=FALSE)
 	global $weathermap_map;
 	global $weathermap_warncount;
 	global $weathermap_error_suppress;
-	
+		
 	$message = "";
 	$code = "";
 	
 	if(preg_match('/\[(WM\w+)\]/', $string, $matches)) {
         $code = $matches[1];
     }
-
+    
     if ( (true === is_array($weathermap_error_suppress))
                 && ( true === in_array(strtoupper($code), $weathermap_error_suppress))) {
-                
+    	
                 // This error code has been deliberately disabled.
                 return;
     }
-	
+	    
 	if(!$notice_only)
 	{
 		$weathermap_warncount++;

@@ -567,7 +567,18 @@
                 the link (because the arrows are in proportion to the width). Try reducing the WIDTH of the link, changing to ARROWSTYLE compact, or moving the nodes further apart.</p>
                 </dd>
                
-
+				<dt id="WMWARN70">[WMWARN70]</dt>
+                <dd>
+                <p>"ReadData: {map item} target: {target} on config line {line} of {file} had no valid data, according to {plugin}"</p>
+                <p>
+                This tells you that for a given <em>map item</em> defined on that line of that config file, there is no data. Weathermap
+                has figured out which datasource plugin should be used, but that plugin was unable to get data for this target. It could
+                be a NaN in an rrd file, a non-existent file for several data sources, or a network timeout for some others. Usually the
+                plugin will also log some detail just before this, but you might need to turn on DEBUG loggging to see that. 
+                </p>
+                </dd>
+                
+                
                 <dt id="WMWARN99">[WMWARN99]</dt>
 
                 <dd><p>"<em>something</em> not implemented yet"</p>

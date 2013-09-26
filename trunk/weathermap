@@ -29,7 +29,7 @@ $defines=array();
 
 // **************************************************************************************
 // THIS IS THE ONE LINE IN HERE YOU MIGHT HAVE TO CHANGE!
-$rrdtool="/usr/bin/rrdtool";
+$rrdtool="/opt/local/bin/rrdtool";
 // (on Windows, use / instead of \ in pathnames - c:/rrdtool/bin/rrdtool.exe for example)
 // **************************************************************************************
 
@@ -113,7 +113,7 @@ if (sizeof($gopts) > 0) {
 			// allow disabling of warnings from the command-line, too (mainly for the rrdtool warning)
 			$suppress_warnings = explode(",",$o[1]);
 			foreach ($suppress_warnings as $s) {				
-				$weathermap_error_suppress[] = $s;
+				$weathermap_error_suppress[] = strtoupper($s);
 			}
 			break;		
 			

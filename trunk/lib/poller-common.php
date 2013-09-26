@@ -93,6 +93,7 @@ function weathermap_run_maps($mydir)
 	global $weathermap_map;
 	global $weathermap_warncount;
 	global $weathermap_poller_start_time;
+	global $weathermap_error_suppress;
 	
 	global $weathermap_mem_highwater;
 	
@@ -224,19 +225,29 @@ function weathermap_run_maps($mydir)
 									$settingrows = db_fetch_assoc($sql);
 									if (is_array($settingrows) && count($settingrows) > 0) { 
 										foreach ($settingrows as $setting) {
+											$set_it = false;
 											if ($setting['mapid']==0 && $setting['groupid']==0) {
 												wm_debug("Setting additional (all maps) option: ".$setting['optname']." to '".$setting['optvalue']."'\n");
-												$wmap->add_hint($setting['optname'],$setting['optvalue']);
+												$set_it = true;
 											} elseif ($setting['groupid']!=0) {
 												wm_debug("Setting additional (all maps in group) option: ".$setting['optname']." to '".$setting['optvalue']."'\n");
-												$wmap->add_hint($setting['optname'],$setting['optvalue']);
+												$set_it = true;
 											} else {
 												wm_debug("Setting additional map-global option: ".$setting['optname']." to '".$setting['optvalue']."'\n");
+												$set_it = true;
+											}
+											if($set_it) {
 												$wmap->add_hint($setting['optname'],$setting['optvalue']);
+												
+												if(substr($setting['optname'],0,7)=='nowarn_') {
+													$code = strtoupper(substr($setting['optname'],7) );
+													$weathermap_error_suppress[] = $code;
+												}
 											}
 										}
 									}
 								}																
+								
 								
 								weathermap_memory_check("MEM postread $mapcount");
 								$wmap->ReadData();

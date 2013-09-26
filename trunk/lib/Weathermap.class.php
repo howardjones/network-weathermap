@@ -2995,12 +2995,12 @@ function ReadConfig_Handle_VIA($fullcommand, $args, $matches, &$curobj, $filenam
         $linecount)
     {
         global $weathermap_error_suppress;
-        
+    
         if (preg_match("/^SET\s+(\S+)\s+(.*)\s*$/i", $fullcommand, $matches)) {
             $curobj->add_hint($matches[1], trim($matches[2]));
             
-            if($curobj->my_type() == "map" && substr($matches[1],0,7)=='nowarn_') {
-                $weathermap_error_suppress[$matches[1]] = 1;
+            if($curobj->my_type() == "MAP" && substr($matches[1],0,7)=='nowarn_') {
+                $weathermap_error_suppress[] = strtoupper( substr($matches[1],7) );
             }
 
             return true;
@@ -3010,8 +3010,8 @@ function ReadConfig_Handle_VIA($fullcommand, $args, $matches, &$curobj, $filenam
         if (preg_match("/^SET\s+(\S+)\s*$/i", $fullcommand, $matches)) {
             $curobj->add_hint($matches[1], '');
 
-            if($curobj->my_type() == "map" && substr($matches[1],0,7)=='nowarn_') {
-                $weathermap_error_suppress[$matches[1]] = 1;
+            if($curobj->my_type() == "MAP" && substr($matches[1],0,7)=='nowarn_') {
+                $weathermap_error_suppress[] = strtoupper( substr($matches[1],7) );
             }
 
             return true;
@@ -3679,11 +3679,11 @@ function ReadConfig($input, $is_include=FALSE)
 
                         if(isset($this->scales[$matches[1]])) {
                             $newscale = $this->scales[$matches[1]];
-                            wm_debug("Found.");
+                           // wm_debug("Found.");
                         } else {
                             $this->scales[$matches[1]] = new WeatherMapScale($matches[1],$this);
                             $newscale = $this->scales[$matches[1]];
-                            wm_debug("Created.");
+                          //  wm_debug("Created.");
                         }
                         
                         $key = $matches[2] . '_' . $matches[3];
@@ -4539,7 +4539,7 @@ function OldReadConfig($input, $is_include=FALSE)
 					$curobj->add_hint($matches[1],trim($matches[2]));
 					
 					if($curobj->my_type() == "map" && substr($matches[1],0,7)=='nowarn_') {
-						$weathermap_error_suppress[$matches[1]] = 1;
+						$weathermap_error_suppress[] = strtoupper(substr($matches[1],7));
 					}
 					
 					$linematched++;
@@ -4551,7 +4551,7 @@ function OldReadConfig($input, $is_include=FALSE)
 					$curobj->add_hint($matches[1],'');
 					
 					if($curobj->my_type() == "map" && substr($matches[1],0,7)=='nowarn_') {
-						$weathermap_error_suppress[$matches[1]] = 1;
+						$weathermap_error_suppress[] = strtoupper(substr($matches[1],7));						
 					}
 					
 					$linematched++;

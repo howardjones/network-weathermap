@@ -13,6 +13,8 @@ broken version. Two totally separate Cacti installs in one box would also work.
 Both VMs are built using a script to get the appropriate packages installed 
 in a consistent manner. The script is here: <a href="install-notes.txt">install-notes.txt</a>.
 
+TODO: Add some notes here about the Vagrantfile and Puppet manifests.
+
 ## Basic Philosophy ##
 
 Any time someone has to ask a question about how something in Weathermap works, I 

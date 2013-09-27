@@ -927,7 +927,9 @@ function draw_straight($image, &$curvepoints, $widths, $outlinecolour, $fillcolo
 	{
 	    $n = count($spine[$dir]) - 1;
 	    $l = $spine[$dir][$n][DISTANCE];
-		
+
+	    // draw_spine($image, $spine[$dir], $map->selected);
+	    
 	    // loop increment, start point, width, labelpos, fillcolour, outlinecolour, commentpos    
 	    $arrowsettings = array(+1, 0, $widths[$dir], 0, $fillcolours[$dir], $outlinecolour, 5);
 	    
@@ -1120,10 +1122,17 @@ function draw_straight($image, &$curvepoints, $widths, $outlinecolour, $fillcolo
 				$numpoints++;
 			}
 			// $finalpoints[] contains a complete outline of the line at this stage
+
+			// Turns out GD always rounds down, which puts a kink in some straight lines.
+			// We'll manually round to the *nearest* integer, which makes this consistent.
+			$np = count($finalpoints);
+			for ($i=0; $i<$np; $i++) {
+				$finalpoints[$i] = round($finalpoints[$i]);
+			}
 			
 			if (!is_null($fillcolours[$dir]))
 			{
-				imagefilledpolygon($image, $finalpoints, count($finalpoints) / 2, $arrowsettings[4]); 
+				imagefilledpolygon($image, $finalpoints, $np / 2, $arrowsettings[4]); 
 			}
 			else
 			{
@@ -1133,11 +1142,11 @@ function draw_straight($image, &$curvepoints, $widths, $outlinecolour, $fillcolo
 			$areaname = "LINK:L" . $map->links[$linkname]->id . ":$dir";
 			$map->imap->addArea("Polygon", $areaname, '', $finalpoints);
             wm_debug("Adding Poly imagemap for %s\n", $areaname);
-            
+    
             $map->links[$linkname]->imap_areas[] = $areaname;
             
 			if (!is_null($outlinecolour)) {
-				imagepolygon($image, $finalpoints, count($finalpoints) / 2, $arrowsettings[5]);
+				imagepolygon($image, $finalpoints, $np / 2, $arrowsettings[5]);
 			} else {
                 wm_debug("Not drawing %s (%s) outline because there is no outline colour\n", $linkname, $dir);
 			}

@@ -7,7 +7,9 @@
 
 	if(! is_writable($reference)) {
 		print "Unable to write to $reference - check permissions.";
-		exit();
+
+        print "<p> or manually: <code>cp $last_result $reference</code></p>";
+        exit();
 	}
 
 	if( file_exists($last_result) ) {

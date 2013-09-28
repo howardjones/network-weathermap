@@ -1,7 +1,9 @@
 r512 - last performance-related commit
 r443 - 0.97a
 
-DONE Up to r495 (inclusive)
+DONE Up to r506 (inclusive)
+
+r500 - move link drawing code to use Point and Vector (skipped for now)
 
 Finish moving to WMColour
 Finish moving to WMScale

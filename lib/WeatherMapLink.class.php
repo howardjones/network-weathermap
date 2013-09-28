@@ -158,6 +158,17 @@ class WeatherMapLink extends WeatherMapItem
 			 if($fld != 'template') $this->$fld = $source->$fld;
 		}
 	}
+	
+	function GetDirectionList()
+	{
+		if ($this->linkstyle == "oneway") {
+			$dirs = array (OUT);
+		} else {
+			$dirs = array (OUT,IN);
+		}
+	
+		return ($dirs);
+	}
 
 // image = GD image references
 // col = array of Colour objects
@@ -174,14 +185,7 @@ class WeatherMapLink extends WeatherMapItem
 		$commentpos[IN] = $this->commentoffset_in;
 		$start[IN] = $last;
 		
-		if($this->linkstyle=="oneway")
-		{
-			$dirs = array(OUT);
-		}
-		else
-		{
-			$dirs = array(OUT,IN);
-		}
+		$dirs = $this->GetDirectionList();
 		
 		foreach ($dirs as $dir)
 		{

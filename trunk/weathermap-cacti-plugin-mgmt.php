@@ -474,14 +474,23 @@ function maplist()
 		print "</tr>";
 		$i++;
 		
+		$rowcols = array($colors["light"],$colors["alternate"]);
+		$last_group = "----asdadasdasdasd";
+		
 		foreach ($queryrows as $map)
 		{
-			form_alternate_row_color($colors["alternate"],$colors["light"],$i);
-
-			print sprintf("<td><a href='weathermap-cacti-plugin.php?action=viewmap&id=%s'><img src='weathermap-cacti-plugin.php?action=viewthumb48&id=%s' width=48 height=48 border=0/></a>", $map['filehash'], $map['filehash']);
+			$first_in_group = false;
+			if($map['groupname'] != $last_group) {
+				$first_in_group = true;
+				$last_group = $map['groupname'];
 			
-			print '<a title="Click to start editor with this file" href="editor.php?plug=1&mapname='.htmlspecialchars($map['configfile']).'">'.htmlspecialchars($map['configfile']).'</a>';
+				printf("<tr><td colspan=9 class='groupheader'>Group: '%s'</td></tr>", $map['groupname']);
+			}
 			
+			printf("<tr bgcolor='#%s' class='%s'>", $rowcols[$i%2], ($first_in_group ? "fig" : ""));
+			
+			printf("<td><a href='weathermap-cacti-plugin.php?action=viewmap&id=%s'><img src='weathermap-cacti-plugin.php?action=viewthumb48&id=%s' width=48 height=48 border=0/></a>", $map['filehash'], $map['filehash']);
+			print '<a title="Click to start editor with this file" href="editor.php?plug=1&mapname='.htmlspecialchars($map['configfile']).'">'.htmlspecialchars($map['configfile']).'</a>';		
 			print "</td>";
 			
 			#		print '<a href="?action=editor&plug=1&mapname='.htmlspecialchars($map['configfile']).'">[edit]</a></td>';
@@ -499,14 +508,14 @@ function maplist()
 			
 			if($map['active'] == 'on')
 			{
-				print '<td class="wm_enabled"><a title="Click to Deactivate" href="?action=deactivate_map&id='.$map['id'].'"><font color="green">Yes</font></a>';
+				print '<td class="wm_enabled"><a title="Click to Deactivate" href="?action=deactivate_map&id='.$map['id'].'"><font color="green">Yes</font></a></td>';
 			}
 			else
 			{
-				print '<td class="wm_disabled"><a title="Click to Activate" href="?action=activate_map&id='.$map['id'].'"><font color="red">No</font></a>';
+				print '<td class="wm_disabled"><a title="Click to Activate" href="?action=activate_map&id='.$map['id'].'"><font color="red">No</font></a></td>';
 			}			
-			print "<td>";
 			
+			print "<td>";
 			print "<a href='?action=map_settings&id=".$map['id']."'>";
 			$setting_count = db_fetch_cell("select count(*) from weathermap_settings where mapid=".$map['id']);
 			if($setting_count > 0)
@@ -518,12 +527,10 @@ function maplist()
 			{
 				print "standard";
 			}
-			print "</a>";
-			
+			print "</a>";			
 			print "</td>";
 			
-			print '</td>';
-
+			
 			print '<td>';
 
 			print '<a href="?action=move_map_up&order='.$map['sortorder'].'&id='.$map['id'].'"><img src="../../images/move_up.gif" width="14" height="10" border="0" alt="Move Map Up" title="Move Map Up"></a>';

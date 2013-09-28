@@ -33,3 +33,9 @@ body#wm_fullscreen { font-family: sans-serif; margin: 0; border: 0; padding: 0; 
 .inplace .weathermapholder { display: none; }
 
 /* .all_map_holder { margin-left: auto; margin-right: auto;  } */
+
+tr.fig, tr.fig td { border-top: 1px solid gray; }
+
+td.groupheader { background-color: #009; color: white; font-weight: bold; }
+
+

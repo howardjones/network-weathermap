@@ -89,10 +89,12 @@ class WeatherMapDataSource
 	}
 	
 	// called before ReadData, to allow plugins to DO the prefetch of targets known from Register
-	function Prefetch()
-	{
-		
-	}
+	function Prefetch(&$map) { }
+	
+	// Run after all data collection
+	// some plugin might need to update a local cache, or other state
+	function CleanUp(&$map) { }
+	
 }
 
 // template classes for the pre- and post-processor plugins
@@ -2033,7 +2035,7 @@ function ReadData()
 		wm_debug("Starting prefetch\n");
 		foreach ($this->datasourceclasses as $ds_class)
 		{
-			$this->plugins['data'][$ds_class]->Prefetch();
+			$this->plugins['data'][$ds_class]->Prefetch($this);
 		}
 		
 		wm_debug ("======================================\n");
@@ -2197,6 +2199,15 @@ function ReadData()
 				unset($myobj);
 			}
 		}
+		
+		wm_debug("======================================\n");
+		wm_debug("Starting cleanup\n");
+		
+		foreach ($this->datasourceclasses as $ds_class) {
+			$this->plugins['data'][$ds_class]->CleanUp($this);
+		}
+		
+		
 		wm_debug ("ReadData Completed.\n");
 		wm_debug("------------------------------\n");
 	}
@@ -2223,8 +2234,10 @@ function DrawLabelRotated($im, $x, $y, $angle, $text, $font, $padding, $linkname
 	$points = array($x1,$y1, $x1,$y2, $x2,$y2, $x2,$y1,   $x-$strwidth/2, $y+$strheight/2 + 1);
 	$npoints = count($points)/2;
 
-	RotateAboutPoint($points, $x,$y, $rangle);
-
+	if($rangle != 0) {
+		RotateAboutPoint($points, $x,$y, $rangle);
+	}
+	
 	if ($bgcolour->is_real())
 	{
 		#X  $bgcol=myimagecolorallocate($im, $bgcolour[0], $bgcolour[1], $bgcolour[2]);
@@ -4222,95 +4235,6 @@ function OldReadConfig($input, $is_include=FALSE)
 				$curobj->defined_in = $filename;
 			}
 
-			// most of the config keywords just copy stuff into object properties.
-			// these are all dealt with from this one array. The special-cases
-			// follow on from that
-			$config_keywords = array(
-					array('LINK','/^\s*(MAXVALUE|BANDWIDTH)\s+(\d+\.?\d*[KMGT]?)\s+(\d+\.?\d*[KMGT]?)\s*$/i',array('max_bandwidth_in_cfg'=>2,'max_bandwidth_out_cfg'=>3)),
-					array('LINK','/^\s*(MAXVALUE|BANDWIDTH)\s+(\d+\.?\d*[KMGT]?)\s*$/i',array('max_bandwidth_in_cfg'=>2,'max_bandwidth_out_cfg'=>2)),
-					array('NODE','/^\s*(MAXVALUE)\s+(\d+\.?\d*[KMGT]?)\s+(\d+\.?\d*[KMGT]?)\s*$/i',array('max_bandwidth_in_cfg'=>2,'max_bandwidth_out_cfg'=>3)),
-					array('NODE','/^\s*(MAXVALUE)\s+(\d+\.?\d*[KMGT]?)\s*$/i',array('max_bandwidth_in_cfg'=>2,'max_bandwidth_out_cfg'=>2)),
-					array('GLOBAL','/^\s*BACKGROUND\s+(.*)\s*$/i',array('background'=>1)),
-					array('GLOBAL','/^\s*HTMLOUTPUTFILE\s+(.*)\s*$/i',array('htmloutputfile'=>1)),
-					array('GLOBAL','/^\s*DATAOUTPUTFILE\s+(.*)\s*$/i',array('dataoutputfile'=>1)),
-					array('GLOBAL','/^\s*HTMLSTYLESHEET\s+(.*)\s*$/i',array('htmlstylesheet'=>1)),
-					array('GLOBAL','/^\s*IMAGEOUTPUTFILE\s+(.*)\s*$/i',array('imageoutputfile'=>1)),
-					array('GLOBAL','/^\s*IMAGEURI\s+(.*)\s*$/i',array('imageuri'=>1)),
-					array('GLOBAL','/^\s*TITLE\s+(.*)\s*$/i',array('title'=>1)),
-					array('GLOBAL','/^\s*HTMLSTYLE\s+(static|overlib)\s*$/i',array('htmlstyle'=>1)),
-					array('GLOBAL','/^\s*KEYFONT\s+(\d+)\s*$/i',array('keyfont'=>1)),
-					array('GLOBAL','/^\s*TITLEFONT\s+(\d+)\s*$/i',array('titlefont'=>1)),
-					array('GLOBAL','/^\s*TIMEFONT\s+(\d+)\s*$/i',array('timefont'=>1)),
-					array('GLOBAL','/^\s*TITLEPOS\s+(-?\d+)\s+(-?\d+)\s*$/i',array('titlex'=>1, 'titley'=>2)),
-					array('GLOBAL','/^\s*TITLEPOS\s+(-?\d+)\s+(-?\d+)\s+(.*)\s*$/i',array('titlex'=>1, 'titley'=>2, 'title'=>3)),
-					array('GLOBAL','/^\s*TIMEPOS\s+(-?\d+)\s+(-?\d+)\s*$/i',array('timex'=>1, 'timey'=>2)),
-					array('GLOBAL','/^\s*TIMEPOS\s+(-?\d+)\s+(-?\d+)\s+(.*)\s*$/i',array('timex'=>1, 'timey'=>2, 'stamptext'=>3)),
-					array('GLOBAL','/^\s*MINTIMEPOS\s+(-?\d+)\s+(-?\d+)\s*$/i',array('mintimex'=>1, 'mintimey'=>2)),
-					array('GLOBAL','/^\s*MINTIMEPOS\s+(-?\d+)\s+(-?\d+)\s+(.*)\s*$/i',array('mintimex'=>1, 'mintimey'=>2, 'minstamptext'=>3)),
-					array('GLOBAL','/^\s*MAXTIMEPOS\s+(-?\d+)\s+(-?\d+)\s*$/i',array('maxtimex'=>1, 'maxtimey'=>2)),
-					array('GLOBAL','/^\s*MAXTIMEPOS\s+(-?\d+)\s+(-?\d+)\s+(.*)\s*$/i',array('maxtimex'=>1, 'maxtimey'=>2, 'maxstamptext'=>3)),
-					array('NODE', "/^\s*LABEL\s*$/i", array('label'=>'')),	# special case for blank labels
-					array('NODE', "/^\s*LABEL\s+(.*)\s*$/i", array('label'=>1)),
-					array('(LINK|GLOBAL)', "/^\s*WIDTH\s+(\d+)\s*$/i", array('width'=>1)),
-					array('(LINK|GLOBAL)', "/^\s*HEIGHT\s+(\d+)\s*$/i", array('height'=>1)),
-					array('LINK', "/^\s*WIDTH\s+(\d+\.\d+)\s*$/i", array('width'=>1)),
-					array('LINK', '/^\s*ARROWSTYLE\s+(classic|compact)\s*$/i', array('arrowstyle'=>1)),
-					array('LINK', '/^\s*VIASTYLE\s+(curved|angled)\s*$/i', array('viastyle'=>1)),
-					array('LINK', '/^\s*INCOMMENT\s+(.*)\s*$/i', array('comments[IN]'=>1)),
-					array('LINK', '/^\s*OUTCOMMENT\s+(.*)\s*$/i', array('comments[OUT]'=>1)),
-					array('LINK', '/^\s*BWFONT\s+(\d+)\s*$/i', array('bwfont'=>1)),
-					array('LINK', '/^\s*COMMENTFONT\s+(\d+)\s*$/i', array('commentfont'=>1)),
-					array('LINK', '/^\s*COMMENTSTYLE\s+(edge|center)\s*$/i', array('commentstyle'=>1)),
-					array('LINK', '/^\s*DUPLEX\s+(full|half)\s*$/i', array('duplex'=>1)),
-					array('LINK', '/^\s*BWSTYLE\s+(classic|angled)\s*$/i', array('labelboxstyle'=>1)),
-					array('LINK', '/^\s*LINKSTYLE\s+(twoway|oneway)\s*$/i', array('linkstyle'=>1)),
-					array('LINK', '/^\s*BWLABELPOS\s+(\d+)\s(\d+)\s*$/i', array('labeloffset_in'=>1,'labeloffset_out'=>2)),
-					array('LINK', '/^\s*COMMENTPOS\s+(\d+)\s(\d+)\s*$/i', array('commentoffset_in'=>1, 'commentoffset_out'=>2)),
-					array('LINK', '/^\s*USESCALE\s+([A-Za-z][A-Za-z0-9_]*)\s*$/i', array('usescale'=>1)),
-					array('LINK', '/^\s*USESCALE\s+([A-Za-z][A-Za-z0-9_]*)\s+(absolute|percent)\s*$/i', array('usescale'=>1,'scaletype'=>2)),
-
-					array('LINK', '/^\s*SPLITPOS\s+(\d+)\s*$/i', array('splitpos'=>1)),
-					
-					array('NODE', '/^\s*LABELOFFSET\s+([-+]?\d+)\s+([-+]?\d+)\s*$/i', array('labeloffsetx'=>1,'labeloffsety'=>2)),
-					array('NODE', '/^\s*LABELOFFSET\s+(C|NE|SE|NW|SW|N|S|E|W)\s*$/i', array('labeloffset'=>1)),
-                                        array('NODE', '/^\s*LABELOFFSET\s+((C|NE|SE|NW|SW|N|S|E|W)\d+)\s*$/i', array('labeloffset'=>1)),
-                                        array('NODE', '/^\s*LABELOFFSET\s+(-?\d+r\d+)\s*$/i', array('labeloffset'=>1)),
-                            
-					array('NODE', '/^\s*LABELFONT\s+(\d+)\s*$/i', array('labelfont'=>1)),
-					array('NODE', '/^\s*LABELANGLE\s+(0|90|180|270)\s*$/i', array('labelangle'=>1)),
-					# array('(NODE|LINK)', '/^\s*TEMPLATE\s+(\S+)\s*$/i', array('template'=>1)),						
-					
-					array('LINK', '/^\s*OUTBWFORMAT\s+(.*)\s*$/i', array('bwlabelformats[OUT]'=>1,'labelstyle'=>'--')),
-					array('LINK', '/^\s*INBWFORMAT\s+(.*)\s*$/i', array('bwlabelformats[IN]'=>1,'labelstyle'=>'--')),
-					# array('NODE','/^\s*ICON\s+none\s*$/i',array('iconfile'=>'')),
-					array('NODE','/^\s*ICON\s+(\S+)\s*$/i',array('iconfile'=>1, 'iconscalew'=>'#0', 'iconscaleh'=>'#0')),
-					array('NODE','/^\s*ICON\s+(\S+)\s*$/i',array('iconfile'=>1)),
-					array('NODE','/^\s*ICON\s+(\d+)\s+(\d+)\s+(inpie|outpie|box|rbox|round|gauge|nink)\s*$/i',array('iconfile'=>3, 'iconscalew'=>1, 'iconscaleh'=>2)),
-					array('NODE','/^\s*ICON\s+(\d+)\s+(\d+)\s+(\S+)\s*$/i',array('iconfile'=>3, 'iconscalew'=>1, 'iconscaleh'=>2)),
-					
-					array('NODE','/^\s*NOTES\s+(.*)\s*$/i',array('notestext[IN]'=>1,'notestext[OUT]'=>1)),
-					array('LINK','/^\s*NOTES\s+(.*)\s*$/i',array('notestext[IN]'=>1,'notestext[OUT]'=>1)),
-					array('LINK','/^\s*INNOTES\s+(.*)\s*$/i',array('notestext[IN]'=>1)),
-					array('LINK','/^\s*OUTNOTES\s+(.*)\s*$/i',array('notestext[OUT]'=>1)),
-					
-					array('NODE','/^\s*INFOURL\s+(.*)\s*$/i',array('infourl[IN]'=>1,'infourl[OUT]'=>1)),
-					array('LINK','/^\s*INFOURL\s+(.*)\s*$/i',array('infourl[IN]'=>1,'infourl[OUT]'=>1)),
-					array('LINK','/^\s*ININFOURL\s+(.*)\s*$/i',array('infourl[IN]'=>1)),
-					array('LINK','/^\s*OUTINFOURL\s+(.*)\s*$/i',array('infourl[OUT]'=>1)),
-					
-					array('NODE','/^\s*OVERLIBCAPTION\s+(.*)\s*$/i',array('overlibcaption[IN]'=>1,'overlibcaption[OUT]'=>1)),
-					array('LINK','/^\s*OVERLIBCAPTION\s+(.*)\s*$/i',array('overlibcaption[IN]'=>1,'overlibcaption[OUT]'=>1)),
-					array('LINK','/^\s*INOVERLIBCAPTION\s+(.*)\s*$/i',array('overlibcaption[IN]'=>1)),
-					array('LINK','/^\s*OUTOVERLIBCAPTION\s+(.*)\s*$/i',array('overlibcaption[OUT]'=>1)),
-											
-					array('(NODE|LINK)', "/^\s*ZORDER\s+([-+]?\d+)\s*$/i", array('zorder'=>1)),
-					array('(NODE|LINK)', "/^\s*OVERLIBWIDTH\s+(\d+)\s*$/i", array('overlibwidth'=>1)),
-					array('(NODE|LINK)', "/^\s*OVERLIBHEIGHT\s+(\d+)\s*$/i", array('overlibheight'=>1)),
-					array('NODE', "/^\s*POSITION\s+([-+]?\d+)\s+([-+]?\d+)\s*$/i", array('x'=>1,'y'=>2)),
-					array('NODE', "/^\s*POSITION\s+(\S+)\s+([-+]?\d+)\s+([-+]?\d+)\s*$/i", array('x'=>2,'y'=>3,'original_x'=>2,'original_y'=>3,'relative_to'=>1,'relative_resolved'=>FALSE)),
-					array('NODE', "/^\s*POSITION\s+(\S+)\s+([-+]?\d+)r(\d+)\s*$/i", array('x'=>2,'y'=>3,'original_x'=>2,'original_y'=>3,'relative_to'=>1,'polar'=>TRUE,'relative_resolved'=>FALSE)),
-					array('NODE', "/^\s*POSITION\s+([A-Za-z][A-Za-z0-9\-_]*):([A-Za-z][A-Za-z0-9_]*)\s*$/i", array('relative_to'=>1,'relative_name'=>2,'pos_named'=>TRUE, 'polar'=>FALSE,'relative_resolved'=>FALSE))
-					);
 
 			// alternative for use later where quoted strings are more useful
 			$args = wm_parse_string($buffer);

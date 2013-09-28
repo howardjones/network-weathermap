@@ -185,7 +185,7 @@ function weathermap_run_maps($mydir)
 							$thumbimagefile = $outdir . DIRECTORY_SEPARATOR . $map['filehash'].".thumb.".$imageformat;
 							$thumbimagefile2 = $outdir . DIRECTORY_SEPARATOR . $map['filehash'].".thumb48.".$imageformat;
 								
-							$statsfile = $outdir . DIRECTORY_SEPARATOR . $map['filehash'] . '.stats.xml';
+							$statsfile = $outdir . DIRECTORY_SEPARATOR . $map['filehash'] . '.stats.txt';
 							$resultsfile = $outdir . DIRECTORY_SEPARATOR . $map['filehash'] . '.results.txt';
 							// used to write files before moving them into place
 							$tempfile = $outdir . DIRECTORY_SEPARATOR . $map['filehash'] . '.tmp.png';

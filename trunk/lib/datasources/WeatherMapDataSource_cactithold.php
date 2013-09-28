@@ -147,6 +147,7 @@ $thold_present = false;
 				// 2=recovering
 				// 3=up
 				// 4=tholdbreached
+				// 5=unknown
 	
 				$state = -1;
 				$statename = '';
@@ -159,6 +160,11 @@ $thold_present = false;
 					if($result['status'] == 3) { $state = 3; $statename = 'up'; }
 					if($result['disabled'])  { $state = 0; $statename = 'disabled'; }
 	
+					if ($result['status'] == 5) {
+						$state = 5;
+						$statename = 'unknown';
+					}
+					
 					$data[IN] = $state;
 					$data[OUT] = 0;
 					$item->add_note("state",$statename);

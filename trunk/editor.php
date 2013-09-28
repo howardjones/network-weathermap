@@ -261,16 +261,19 @@ else
 		$link_name = $_REQUEST['link_name'];
 		$link_config = fix_gpc_string($_REQUEST['item_configtext']);
 
-		if(isset($map->links[$link_name])) {		                
-		    $map->links[$link_name]->config_override = $link_config;
-		    
-		    $map->WriteConfig($mapfile);
-		    // now clear and reload the map object, because the in-memory one is out of sync
-		    // - we don't know what changes the user made here, so we just have to reload.
-		    unset($map);
-		    $map = new WeatherMap;
-		    $map->context = 'editor';
-		    $map->ReadConfig($mapfile);
+		// no link names with spaces
+		if(strpos($link_name," ") === false) {
+			if(isset($map->links[$link_name])) {		                
+			    $map->links[$link_name]->config_override = $link_config;
+			    
+			    $map->WriteConfig($mapfile);
+			    // now clear and reload the map object, because the in-memory one is out of sync
+			    // - we don't know what changes the user made here, so we just have to reload.
+			    unset($map);
+			    $map = new WeatherMap;
+			    $map->context = 'editor';
+			    $map->ReadConfig($mapfile);
+			}
 		}
 		break;
 
@@ -280,16 +283,19 @@ else
 		$node_name = $_REQUEST['node_name'];
 		$node_config = fix_gpc_string($_REQUEST['item_configtext']);
 		
-		if(isset($map->nodes[$node_name])) {		                
-		    $map->nodes[$node_name]->config_override = $node_config;
-		    
-		    $map->WriteConfig($mapfile);
-		    // now clear and reload the map object, because the in-memory one is out of sync
-		    // - we don't know what changes the user made here, so we just have to reload.
-		    unset($map);
-		    $map = new WeatherMap;
-		    $map->context = 'editor';
-		    $map->ReadConfig($mapfile);
+		// no node names with spaces
+		if(strpos($node_name," ") === false) {
+			if(isset($map->nodes[$node_name])) {		                
+			    $map->nodes[$node_name]->config_override = $node_config;
+			    
+			    $map->WriteConfig($mapfile);
+			    // now clear and reload the map object, because the in-memory one is out of sync
+			    // - we don't know what changes the user made here, so we just have to reload.
+			    unset($map);
+			    $map = new WeatherMap;
+			    $map->context = 'editor';
+			    $map->ReadConfig($mapfile);
+			}
 		}
 		break;
 

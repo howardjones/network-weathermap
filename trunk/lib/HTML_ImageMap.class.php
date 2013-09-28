@@ -109,6 +109,16 @@ class HTML_ImageMap_Area_Polygon extends HTML_ImageMap_Area
 		return ($c);
 	}
 
+	function Draw($im, $col)
+	{
+		$pts = array();
+		foreach ($this->points as $point) {
+			$pts[] = $point[0];
+			$pts[] = $point[1];
+		}
+		imagepolygon($im, $pts, count($pts)/2, $col);
+	}
+	
 	function HTML_ImageMap_Area_Polygon ( $name="", $href="",$coords)
 	{
 		$c = $coords[0];
@@ -203,6 +213,14 @@ class HTML_ImageMap_Area_Rectangle extends HTML_ImageMap_Area
 
 		return($json);
 	}
+	
+
+	function Draw($im, $col)
+	{
+		imagerectangle($im, $this->x1, $this->y1, $this->x2, $this->y2, $col);
+	}
+	
+	
 
 }
 
@@ -227,6 +245,16 @@ class HTML_ImageMap_Area_Circle extends HTML_ImageMap_Area
 		return ($radius2 <= $radius1);
 	}
 
+
+	function Draw($im, $col)
+	{
+		$radius = abs($this->centx - $this->edgex);
+		imageellipse($image, $this->centx, $this->centy, $radius, $radius, $col);
+		imagerectangle($im, $this->x1, $this->y1, $this->x2, $this->y2, $col);
+	}
+	
+	
+	
 	function HTML_ImageMap_Area_Circle($name="", $href="",$coords)
 	{
 		$c = $coords[0];
@@ -259,6 +287,20 @@ class HTML_ImageMap
 		$this->name = "";
 	}
 
+
+	/**
+	 * Draw the outlines for the imagemap - for debugging
+	 *
+	 * @param GDImageRef $im
+	 * @param GDColorRef $col
+	 */
+	function Draw($im, $col)
+	{
+		foreach ($this->shapes as $shape) {
+			$shape->Draw($im, $col);
+		}
+	}
+	
 	// add an element to the map - takes an array with the info, in a similar way to HTML_QuickForm
 	/**
 	 *

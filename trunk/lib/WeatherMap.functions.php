@@ -1475,7 +1475,7 @@ function format_number($number, $precision = 2, $trailing_zeroes = 0)
 	}
 }
 
-function nice_bandwidth($number, $kilo = 1000,$decimals=1,$below_one=TRUE)
+function wm_nice_bandwidth($number, $kilo = 1000,$decimals=1,$below_one=TRUE)
 {
 	$suffix='';
 

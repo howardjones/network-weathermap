@@ -49,7 +49,7 @@ class WeatherMapDataSource_tabfile extends WeatherMapDataSource {
 		}
 		else {
 			// some error code to go in here
-			wm_debug ("TabText ReadData: Couldn't open ($targetstring). \n"); }
+			wm_debug ("TabText ReadData: Couldn't open ($targetstring). [WMTABDATA01]\n"); }
 		
 			wm_debug ("TabText ReadData: Returning (".($data[IN]===NULL?'NULL':$data[IN]).",".($data[OUT]===NULL?'NULL':$data[OUT]).",$data_time)\n");
 		

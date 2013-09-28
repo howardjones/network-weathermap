@@ -11,7 +11,7 @@ function weathermap_memory_check($note="MEM")
 		if($mem > $weathermap_mem_highwater) {
 			$weathermap_mem_highwater = $mem;
 		}
-		$mem_used = nice_bandwidth($mem);
+		$mem_used = wm_nice_bandwidth($mem);
 		$mem_allowed = ini_get("memory_limit");
 		wm_debug("%s: memory_get_usage() says %sBytes used. Limit is %s\n",  $note, $mem_used, $mem_allowed);
 	}
@@ -86,7 +86,7 @@ function weathermap_check_cron($time,$string)
 	return($matched);
 }
 
-function weathermap_run_maps($mydir)
+function weathermap_run_maps($mydir, $map_id = -1)
 {
 	global $config;
 	global $weathermap_debugging, $WEATHERMAP_VERSION;
@@ -162,8 +162,15 @@ function weathermap_run_maps($mydir)
 				fclose($testfd); 
 				unlink($testfile);
 
-				$queryrows = db_fetch_assoc("select m.*, g.name as groupname from weathermap_maps m,weathermap_groups g where m.group_id=g.id and active='on' order by sortorder,id");
 
+				$SQL = "select m.*, g.name as groupname from weathermap_maps m,weathermap_groups g where m.group_id=g.id and active='on'";
+				if( intval($map_id) >= 0) {
+					$SQL .= " and m.id=".intval($map_id)." ";
+				}
+				$SQL .= "order by sortorder,id";
+				
+				$queryrows = db_fetch_assoc( $SQL );
+				
 				if (is_array($queryrows)) {
 					wm_debug("Iterating all maps.");
 
@@ -416,8 +423,7 @@ function weathermap_run_maps($mydir)
 			$peak_memory = memory_get_peak_usage();
 			db_execute("replace into settings values('weathermap_peak_memory','"
 					. $peak_memory . "')");
-			$peak_memory = $peak_memory/(1024*1024);
-			$stats_string .= sprintf(" using %.1fMbytes peak memory", $peak_memory);
+			$stats_string .= sprintf(" using %sbytes peak memory", wm_nice_bandwidth($peak_memory));
 		}
 		
 		

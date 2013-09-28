@@ -154,7 +154,15 @@ class ConfigTest extends PHPUnit_Framework_TestCase
                 if(file_exists($reference)) {
                     $conflist[] = array($file, $reference, $testdir, $result1dir, $result2dir, $diffdir, $compare);
                 
-                    fputs($fd,"<h4>$file <a href=\"tests/$file\">[conf]</a></h4><p><nobr>Out:<img align=middle src='results1-$phptag/$file.png'> Ref:<img src='references/$file.png' align=middle> Diff:<img align=middle src='diffs/$file.png'></nobr></p>\n");                    
+                    $title = get_map_title($testdir.DIRECTORY_SEPARATOR.$file);
+                    
+                    fputs($fd,sprintf("<h4>%s <a href=\"tests/%s\">[conf]</a> <em>%s</em></h4><p><nobr>Out:<img align=middle src='results1-%s/%s.png'> Ref:<img src='references/%s.png' align=middle> Diff:<img align=middle src='diffs/%s.png'></nobr></p>\n",
+                    		$file, $file, htmlspecialchars($title),
+                    		$phptag, $file,
+                    		$file,
+                    		$file
+                    ));                    
+                	
                 }
             }
         }
@@ -166,5 +174,23 @@ class ConfigTest extends PHPUnit_Framework_TestCase
  
         return $conflist;
     }
+}
+
+function get_map_title($realfile) {
+	$title = "";
+	$fd=fopen($realfile, "r");
+	if ($fd) {
+		while (!feof($fd)) {
+			$buffer=fgets($fd, 1024);
+	
+			if (preg_match("/^\s*TITLE\s+(.*)/i", $buffer, $matches)) {
+				$title= $matches[1];
+				break;
+			}
+		}
+	
+		fclose ($fd);
+	}
+	return $title;
 }
 ?>

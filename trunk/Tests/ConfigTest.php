@@ -130,7 +130,7 @@ class ConfigTest extends PHPUnit_Framework_TestCase
         // NOTE: This path will change between systems...
         $compare = "test-suite".DIRECTORY_SEPARATOR."tools".DIRECTORY_SEPARATOR."compare.exe";
         $compare = "/usr/bin/compare";
-        $compare = "/usr/local/bin/compare";
+        # $compare = "/usr/local/bin/compare";
         
         if( ! file_exists($compare)) {
             die("Compare path doesn't exist.");

@@ -20,6 +20,7 @@ if (isset($_POST['action'])) {
 switch($action)
 {
 case 'viewthumb': // FALL THROUGH
+case 'viewthumb48': // FALL THROUGH	
 case 'viewimage':
 	$id = -1;
 
@@ -41,6 +42,7 @@ case 'viewimage':
 		{
 			$imagefile = dirname(__FILE__).'/output/'.'/'.$map[0]['filehash'].".".$imageformat;
 			if($action == 'viewthumb') $imagefile = dirname(__FILE__).'/output/'.$map[0]['filehash'].".thumb.".$imageformat;
+			if($action == 'viewthumb48') $imagefile = dirname(__FILE__).'/output/'.$map[0]['filehash'].".thumb48.".$imageformat;
 			
 			$orig_cwd = getcwd();
 			chdir(dirname(__FILE__));

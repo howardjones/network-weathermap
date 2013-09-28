@@ -185,6 +185,8 @@ function weathermap_run_maps($mydir)
 							$thumbimagefile = $outdir . DIRECTORY_SEPARATOR . $map['filehash'].".thumb.".$imageformat;
 							$statsfile = $outdir . DIRECTORY_SEPARATOR . $map['filehash'] . '.stats.xml';
 							$resultsfile = $outdir . DIRECTORY_SEPARATOR . $map['filehash'] . '.results.txt';
+							// used to write files before moving them into place
+							$tempfile = $outdir . DIRECTORY_SEPARATOR . $map['filehash'] . '.tmp';
 
 							if (file_exists($mapfile)) {
 								if ($quietlogging==0) wm_warn("Map: $mapfile -> $htmlfile & $imagefile\n",TRUE);
@@ -259,8 +261,19 @@ function weathermap_run_maps($mydir)
 								if ($quietlogging==0) wm_warn("About to write image file. If this is the last message in your log, increase memory_limit in php.ini [WMPOLL01]\n",TRUE);
 								weathermap_memory_check("MEM pre-render $mapcount");
 								
-								$wmap->DrawMap($imagefile,$thumbimagefile,read_config_option("weathermap_thumbsize"));
+								// Write the image to a temporary file first - it turns out that libpng is not that fast
+								// and this way we avoid showing half a map
+								$wmap->DrawMap($tempfile,$thumbimagefile,read_config_option("weathermap_thumbsize"));
 								
+								// Firstly, don't move or delete anything if the image saving failed
+								if(file_exists($tempfile)){
+									// Don't try and delete a non-existent file (first run)
+									if(file_exists($imagefile)) {
+										unlink($imagefile);
+									}
+									rename($tempfile,$imagefile);
+								}
+												
 								if ($quietlogging==0) wm_warn("Wrote map to $imagefile and $thumbimagefile\n",TRUE);
 								$fd = @fopen($htmlfile, 'w');
 								if ($fd != FALSE) {

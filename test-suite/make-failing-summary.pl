@@ -32,13 +32,6 @@ while(<SUMMARY>) {
 				}				
 			}
 			close(DIFF);
-			open(CONF, "test-suite/tests/${conf}") || die($!);
-			while(<CONF>) {
-				if( m/^\s*TITLE (.*)/ ) {
-					print "<em>$1</em><br>\n";	
-				}				
-			}
-			close(CONF);
 
 			print "$differences differences.<br>";
 			print "<a href='approve.php?cf=".$conf."'>Approve left image as new reference</a>";

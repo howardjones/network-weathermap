@@ -412,6 +412,16 @@ function weathermap_run_maps($mydir)
 		$stats_string = sprintf('%s: %d maps were run in %f seconds with %d warnings', date(DATE_RFC822),
 				$mapcount, $duration, $total_warnings);
 		
+		if (true === function_exists("memory_get_peak_usage")) {
+			$peak_memory = memory_get_peak_usage();
+			db_execute("replace into settings values('weathermap_peak_memory','"
+					. $peak_memory . "')");
+			$peak_memory = $peak_memory/(1024*1024);
+			$stats_string .= sprintf(" using %.1fMbytes peak memory", $peak_memory);
+		}
+		
+		
+		
 		if ($quietlogging==0) wm_warn("STATS: Weathermap $WEATHERMAP_VERSION run complete - $stats_string\n", TRUE);
 		db_execute("replace into settings values('weathermap_last_stats','".mysql_real_escape_string($stats_string)."')");
 		db_execute("replace into settings values('weathermap_last_finish_time','".mysql_real_escape_string($end_time)."')");

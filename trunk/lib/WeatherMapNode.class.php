@@ -176,7 +176,7 @@ class WeatherMapNode extends WeatherMapItem
 		}
 		else
 		{
-			// $col=myimagecolorallocate($node_im, $this->labelbgcolour[0], $this->labelbgcolour[1], $this->labelbgcolour[2]);
+		//	$col=myimagecolorallocate($node_im, $this->labelbgcolour[0], $this->labelbgcolour[1], $this->labelbgcolour[2]);
 			$col = $this->labelbgcolour;
 		}
 
@@ -190,13 +190,13 @@ class WeatherMapNode extends WeatherMapItem
 			if($this->iconscalevar == 'in')
 			{
 				$pc = $this->inpercent;
-				$col = $this->colours[IN];
+				// $col = $this->colours[IN];
 				$val = $this->bandwidth_in;
 			}
 			if($this->iconscalevar == 'out')
 			{
 				$pc = $this->outpercent;
-				$col = $this->colours[OUT];
+			// 	$col = $this->colours[OUT];
 				$val = $this->bandwidth_out;
 			}
 
@@ -305,17 +305,48 @@ class WeatherMapNode extends WeatherMapItem
 				$aifill = $this->aiconfillcolour;
 				$aiink = $this->aiconoutlinecolour;
 
-				if ( $aifill->is_copy() && !$col->is_none() )
-				{
-					$fill = $col;
-				}
-				else
-				{
-					if($aifill->is_real())
+				// if useiconscale isn't set, then use the static
+				// colour defined, or copy the colour from the label
+				if($this->useiconscale == "none") {
+				
+					if ( $aifill->is_copy() && !$col->is_none() )
 					{
-						$fill = $aifill;
+						$fill = $col;
+					}
+					else
+					{
+						if($aifill->is_real())
+						{
+							$fill = $aifill;
+						}
+					}
+				} else {
+					// if useiconscale IS defined, use that to figure out
+					// the fill colour
+					$pc = 0;
+					$val = 0;
+				
+					if ($this->iconscalevar == 'in') {
+						$pc = $this->inpercent;
+						$val = $this->bandwidth_in;
+					}
+				
+					if ($this->iconscalevar == 'out') {
+						$pc = $this->outpercent;
+						$val = $this->bandwidth_out;
+					}
+				
+					if ($this->iconscaletype == 'percent') {
+						list($fill, $junk, $junk) =
+						$map->ColourFromValue($pc, $this->useiconscale, $this->name);
+					} else {
+						// use the absolute value if we aren't doing percentage scales.
+						list($fill,  $junk, $junk) =
+						$map->ColourFromValue($val, $this->useiconscale, $this->name,
+								false);
 					}
 				}
+						
 
 				if ( !$this->aiconoutlinecolour->is_none() )
 				{
@@ -658,12 +689,6 @@ class WeatherMapNode extends WeatherMapItem
 			imagecopy ( $im, $this->image, $this->x - $this->centre_x, $this->y - $this->centre_y, 0, 0, imagesx($this->image), imagesy($this->image) );
 		}
 
-	}
-
-	// take the pre-rendered node and write it to a file so that
-	// the editor can get at it.
-	function WriteToCache()
-	{
 	}
 
 	function Reset(&$newowner)

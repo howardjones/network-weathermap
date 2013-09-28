@@ -1571,7 +1571,10 @@ var $config_keywords = array (
 				'TIME' => array('bottom' => -2, 'top' => -1, 'red1' => 0, 'green1' => 0, 'blue1' => 0, 'special' => 1)
 			);
 
-		foreach ($defaults as $key => $def) { $this->colours['DEFAULT'][$key]=$def; }
+		foreach ($defaults as $key => $def) { 
+			$this->colours['DEFAULT'][$key]=$def; 
+			$this->colourtable[$key] = new WMColour($def['red1'], $def['green1'], $def['blue1']);
+		}
 
 		$this->configfile='';
 		$this->imagefile='';
@@ -3647,7 +3650,7 @@ function ReadConfig($input, $is_include=FALSE)
 
                     if (($linematched == 0)
                         && preg_match(
-                            "/^\s*KEYSTYLE\s+([A-Za-z][A-Za-z0-9_]+\s+)?(classic|horizontal|vertical|inverted|tags)\s*(\d+)?\s*$/i",
+                            "/^\s*KEYSTYLE\s+([A-Za-z][A-Za-z0-9_]+\s+)?(classic|horizontal|vertical|inverted|tags)\s?(\d+)?\s*$/i",
                             $buffer, $matches)) {
                         $whichkey = trim($matches[1]);
 
@@ -5332,13 +5335,8 @@ function WriteConfig($filename)
 					}
 				}
 				else {
-					if ($colour['red1']==-1 && $colour['green1']==-1 && $colour['blue1']==-1)
-					{
-						$output.=sprintf("%sCOLOR none\n", $k);
-					} else {
-						$output.=sprintf("%sCOLOR %d %d %d\n", $k, $colour['red1'], $colour['green1'],
-					$colour['blue1']);
-					}
+					$c = new WMColour($colour['red1'], $colour['green1'], $colour['blue1']);
+					$output .= sprintf("%sCOLOR %s\n", $k, $c->as_config());
 				}
 			}
 			$output .= "\n";

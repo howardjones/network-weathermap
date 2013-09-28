@@ -421,6 +421,16 @@ function imagecreatefromfile($filename)
 //
 function imagecolorize($im, $r, $g, $b)
 {
+	// The function only accepts indexed colour images.
+	// Unfortunately, imagetruecolortopalette is pretty crappy, so you are
+	// probably better off using Paint.NET/Gimp etc to make an indexed colour
+	// version of the icon, rather than rely on this
+	if(imageistruecolor($im)) {
+		wm_debug("imagecolorize requires paletted images - this is a truecolor image. Converting.");
+		imagetruecolortopalette($im,false,256);
+		wm_debug("Converted image has %d colours.\n", imagecolorstotal($im));
+	}
+
     // We will create a monochromatic palette based on the input color
     // which will go from black to white
     

@@ -3,12 +3,17 @@ r443 - 0.97a
 
 DONE Up to r490 (inclusive)
 
+Finish moving to WMColour
+Finish moving to WMScale
+Show runtimes in map list
+
+
 Before 0.98
 -----------
 
 Comments aren't drawn along a link!
 
-add %t option to format SNMP TimeTicks
+DONE add %t option to format SNMP TimeTicks
 
 thumb2 file - 48x48px thumb to show in map management screen.
 Include note about timezone stuff in docs
@@ -22,7 +27,7 @@ map scheduling - needs UI
 consolidated map-properties page in UI? (variable settings, plus schedule, plus debug, plus runtime info, etc)
 
 FONTDEFINE can't tell if GD font is wrong-endian?
-Off-by-one in angled VIAs (only in one direction?? - test simple-link-5a.conf)
+FIXED Off-by-one in angled VIAs (only in one direction?? - test simple-link-5a.conf)
 Change non-scale colour handling to go into another colour table - no 'special'
 Winding order problem (I think) with sharp-angled vias - see conf_via3.conf
 DONE   USESCALE absolute not in WriteConfig

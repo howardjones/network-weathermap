@@ -183,10 +183,12 @@ function weathermap_run_maps($mydir)
 							$htmlfile = $outdir . DIRECTORY_SEPARATOR . $map['filehash'].".html";
 							$imagefile = $outdir . DIRECTORY_SEPARATOR . $map['filehash'].".".$imageformat;
 							$thumbimagefile = $outdir . DIRECTORY_SEPARATOR . $map['filehash'].".thumb.".$imageformat;
+							$thumbimagefile2 = $outdir . DIRECTORY_SEPARATOR . $map['filehash'].".thumb48.".$imageformat;
+								
 							$statsfile = $outdir . DIRECTORY_SEPARATOR . $map['filehash'] . '.stats.xml';
 							$resultsfile = $outdir . DIRECTORY_SEPARATOR . $map['filehash'] . '.results.txt';
 							// used to write files before moving them into place
-							$tempfile = $outdir . DIRECTORY_SEPARATOR . $map['filehash'] . '.tmp';
+							$tempfile = $outdir . DIRECTORY_SEPARATOR . $map['filehash'] . '.tmp.png';
 
 							if (file_exists($mapfile)) {
 								if ($quietlogging==0) wm_warn("Map: $mapfile -> $htmlfile & $imagefile\n",TRUE);
@@ -273,6 +275,15 @@ function weathermap_run_maps($mydir)
 									}
 									rename($tempfile,$imagefile);
 								}
+								
+
+								$im = imagecreatefrompng($thumbimagefile);
+								$im48 = imagecreatetruecolor(48,48);
+								imagecopyresampled($im48, $im, 0, 0, 0, 0, 48, 48, imagesx($im), imagesy($im));
+								imagepng($im48,$thumbimagefile2);
+								imagedestroy($im48);
+								imagedestroy($im);
+								
 												
 								if ($quietlogging==0) wm_warn("Wrote map to $imagefile and $thumbimagefile\n",TRUE);
 								$fd = @fopen($htmlfile, 'w');

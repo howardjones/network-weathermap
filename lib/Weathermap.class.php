@@ -5710,7 +5710,7 @@ function DrawMap($filename = '', $thumbnailfile = '', $thumbnailmax = 250, $with
 				}
 				else
 				{
-					wm_warn("Failed to write map image. No function existed for the image format you requested. [WMWARN12]\n");
+					wm_warn("Failed to write map image. No function existed for the image format you requested ($filename). [WMWARN12]\n");
 					$functions = FALSE;
 				}
 

@@ -432,7 +432,7 @@ function maplist()
 	
 	html_start_box("<strong>Weathermaps</strong>", "78%", $colors["header"], "3", "center", "weathermap-cacti-plugin-mgmt.php?action=addmap_picker");
 
-	html_header(array("Config File", "Title", "Group", "Active", "Settings", "Sort Order", "Accessible By",""));
+	html_header(array("Config File", "Title", "Group", "Last Run", "Active", "Settings", "Sort Order", "Accessible By",""));
 
 	$query = db_fetch_assoc("select id,username from user_auth");
 	$users[0] = 'Anyone';
@@ -452,6 +452,7 @@ function maplist()
 	{
 		form_alternate_row_color($colors["alternate"],$colors["light"],$i);
 		print "<td>ALL MAPS</td><td>(special settings for all maps)</td><td></td><td></td>";
+		print "<td></td>";
 		
 		print "<td><a href='?action=map_settings&id=0'>";
 		$setting_count = db_fetch_cell("select count(*) from weathermap_settings where mapid=0 and groupid=0");
@@ -477,19 +478,25 @@ function maplist()
 		{
 			form_alternate_row_color($colors["alternate"],$colors["light"],$i);
 
-			print '<td><a title="Click to start editor with this file" href="editor.php?plug=1&mapname='.htmlspecialchars($map['configfile']).'">'.htmlspecialchars($map['configfile']).'</a>';
-			if($map['warncount']>0)
-			{
-				$had_warnings++;
-				
-				print '<a href="../../utilities.php?tail_lines=500&message_type=2&action=view_logfile&filter='.urlencode($map['configfile']).'" title="Check cacti.log for this map"><img border=0 src="plugin-images/exclamation.png" title="'.$map['warncount'].' warnings last time this map was run. Check your logs.">'.$map['warncount']."</a>";
-			}
+			print sprintf("<td><a href='weathermap-cacti-plugin.php?action=viewmap&id=%s'><img src='weathermap-cacti-plugin.php?action=viewthumb48&id=%s' width=48 height=48 border=0/></a>", $map['filehash'], $map['filehash']);
+			
+			print '<a title="Click to start editor with this file" href="editor.php?plug=1&mapname='.htmlspecialchars($map['configfile']).'">'.htmlspecialchars($map['configfile']).'</a>';
+			
 			print "</td>";
 			
 			#		print '<a href="?action=editor&plug=1&mapname='.htmlspecialchars($map['configfile']).'">[edit]</a></td>';
 			print '<td>'.htmlspecialchars($map['titlecache']).'</td>';
 			print '<td><a title="Click to change group" href="?action=chgroup&id='.$map['id'].'">'.htmlspecialchars($map['groupname']).'</a></td>';
-						
+
+			print "<td>";
+			print sprintf("%.2gs", $map['runtime']);
+			if($map['warncount']>0)
+			{
+				$had_warnings++;
+				print '<br><a href="../../utilities.php?tail_lines=500&message_type=2&action=view_logfile&filter='.urlencode($map['configfile']).'" title="Check cacti.log for this map"><img border=0 src="plugin-images/exclamation.png" title="'.$map['warncount'].' warnings last time this map was run. Check your logs.">'.$map['warncount']."</a>";
+			}
+			print "</td>";
+			
 			if($map['active'] == 'on')
 			{
 				print '<td class="wm_enabled"><a title="Click to Deactivate" href="?action=deactivate_map&id='.$map['id'].'"><font color="green">Yes</font></a>';

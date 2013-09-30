@@ -128,12 +128,21 @@ class ConfigTest extends PHPUnit_Framework_TestCase
         $diffdir = "test-suite".DIRECTORY_SEPARATOR."diffs";
       
         // NOTE: This path will change between systems...
-        $compare = "test-suite".DIRECTORY_SEPARATOR."tools".DIRECTORY_SEPARATOR."compare.exe";
-        $compare = "/usr/bin/compare";
-        # $compare = "/usr/local/bin/compare";
+        $compares = array(
+	        "/usr/bin/compare",
+        	"/usr/local/bin/compare",
+	       	 "test-suite".DIRECTORY_SEPARATOR."tools".DIRECTORY_SEPARATOR."compare.exe"    	
+        );
+        
+		foreach ($compares as $c) {
+			if(file_exists($c) and is_executable($c)) {
+				$compare = $c;
+				break;
+			}
+		}
         
         if( ! file_exists($compare)) {
-            die("Compare path doesn't exist.");
+            die("Compare path doesn't exist - do you have Imagemagick? \n");
         }
         
         if(! file_exists($result1dir)) { mkdir($result1dir); }

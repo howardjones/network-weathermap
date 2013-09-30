@@ -165,7 +165,7 @@ case 'perms_add_user':
 	if (isset($_REQUEST['mapid']) && is_numeric($_REQUEST['mapid'])
 		&& isset($_REQUEST['userid']) && is_numeric($_REQUEST['userid'])
 		) {
-		perms_add_user(intval($_REQUEST['mapid']),intval($_REQUEST['userid']));
+		weathermap_perms_add_user(intval($_REQUEST['mapid']),intval($_REQUEST['userid']));
 		header("Location: weathermap-cacti-plugin-mgmt.php?action=perms_edit&id=".intval($_REQUEST['mapid']));
 	}
 	break;
@@ -174,7 +174,7 @@ case 'perms_delete_user':
 	if (isset($_REQUEST['mapid']) && is_numeric($_REQUEST['mapid'])
 		&& isset($_REQUEST['userid']) && is_numeric($_REQUEST['userid'])
 		) {
-		perms_delete_user($_REQUEST['mapid'],$_REQUEST['userid']);
+		weathermap_perms_delete_user($_REQUEST['mapid'],$_REQUEST['userid']);
 		header("Location: weathermap-cacti-plugin-mgmt.php?action=perms_edit&id=".$_REQUEST['mapid']);
 	}
 	break;
@@ -182,7 +182,7 @@ case 'perms_delete_user':
 case 'perms_edit':
 	if (isset($_REQUEST['id']) && is_numeric($_REQUEST['id'])) {
 		require_once($config["base_path"]."/include/top_header.php");
-		perms_list($_REQUEST['id']);
+		weathermap_perms_list($_REQUEST['id']);
 		require_once($config["base_path"]."/include/bottom_footer.php");
 	} else {
 		print "Something got lost back there.";
@@ -192,31 +192,31 @@ case 'perms_edit':
 
 
 case 'delete_map':
-	if (isset($_REQUEST['id']) && is_numeric($_REQUEST['id'])) map_delete($_REQUEST['id']);
+	if (isset($_REQUEST['id']) && is_numeric($_REQUEST['id'])) weathermap_map_delete($_REQUEST['id']);
 	header("Location: weathermap-cacti-plugin-mgmt.php");
 	break;
 
 case 'deactivate_map':
-	if (isset($_REQUEST['id']) && is_numeric($_REQUEST['id'])) map_deactivate($_REQUEST['id']);
+	if (isset($_REQUEST['id']) && is_numeric($_REQUEST['id'])) weathermap_map_deactivate($_REQUEST['id']);
 	header("Location: weathermap-cacti-plugin-mgmt.php");
 	break;
 
 case 'activate_map':
-	if( isset($_REQUEST['id']) && is_numeric($_REQUEST['id'])) map_activate($_REQUEST['id']);
+	if( isset($_REQUEST['id']) && is_numeric($_REQUEST['id'])) weathermap_map_activate($_REQUEST['id']);
 	header("Location: weathermap-cacti-plugin-mgmt.php");
 	break;
 
 case 'move_map_up':
 	if (isset($_REQUEST['id']) && is_numeric($_REQUEST['id']) &&
 		isset($_REQUEST['order']) && is_numeric($_REQUEST['order'])) {
-		map_move($_REQUEST['id'],$_REQUEST['order'],-1);
+		weathermap_map_move($_REQUEST['id'],$_REQUEST['order'],-1);
 	}
 	header("Location: weathermap-cacti-plugin-mgmt.php");
 	break;
 case 'move_map_down':
 	if (isset($_REQUEST['id']) && is_numeric($_REQUEST['id']) &&
 		isset($_REQUEST['order']) && is_numeric($_REQUEST['order'])) {
-		map_move($_REQUEST['id'],$_REQUEST['order'],+1);
+		weathermap_map_move($_REQUEST['id'],$_REQUEST['order'],+1);
 	}
 	header("Location: weathermap-cacti-plugin-mgmt.php");
 	break;
@@ -240,7 +240,7 @@ case 'viewconfig':
 	require_once $config["base_path"]."/include/top_graph_header.php";
 	
 	if (isset($_REQUEST['file'])) {
-		preview_config($_REQUEST['file']);
+		weathermap_preview_config($_REQUEST['file']);
 	} else {
 		print "No such file.";
 	}
@@ -252,16 +252,16 @@ case 'addmap_picker':
 	require_once $config["base_path"]."/include/top_header.php";
 	
 	if (isset($_REQUEST['show']) && $_REQUEST['show']=='all') {
-		addmap_picker(TRUE);
+		weathermap_addmap_picker(TRUE);
 	} else {
-		addmap_picker(FALSE);
+		weathermap_addmap_picker(FALSE);
 	}
 	require_once $config["base_path"]."/include/bottom_footer.php";
 	break;
 
 case 'addmap':
 	if (isset($_REQUEST['file'])) {
-		add_config($_REQUEST['file']);
+		weathermap_add_config($_REQUEST['file']);
 		header("Location: weathermap-cacti-plugin-mgmt.php");
 	} else {
 		print "No such file.";
@@ -301,7 +301,9 @@ case 'rebuildnow2':
 	// by default, just list the map setup
 default:
 	require_once $config["base_path"]."/include/top_header.php";
-	maplist();
+	weathermap_maplist();
+	weathermap_maplist3();
+	
 	weathermap_footer_links();	
 	require_once $config["base_path"]."/include/bottom_footer.php";
 	break;
@@ -321,7 +323,7 @@ function weathermap_footer_links()
 
 // Repair the sort order column (for when something is deleted or inserted, or moved between groups)
 // our primary concern is to make the sort order consistent, rather than any special 'correctness'
-function map_resort()
+function weathermap_map_resort()
 {
 	$list = db_fetch_assoc("select * from weathermap_maps order by group_id,sortorder;");
 	$i = 1;
@@ -358,7 +360,7 @@ function weathermap_group_resort()
 	}
 }
 
-function map_move($mapid,$junk,$direction)
+function weathermap_map_move($mapid,$junk,$direction)
 {
 	$source = db_fetch_assoc("select * from weathermap_maps where id=$mapid");
 	$oldorder = $source[0]['sortorder'];
@@ -403,16 +405,465 @@ function weathermap_group_move($id,$junk,$direction)
 		}
 	}
 }
+function weathermap_maplist3()
+{
+	$had_warnings = 0;
+	
+		$users = weathermap_cacti_userlist();
+		$groups = weathermap_group_list();
+		
+		print "Experimental replacement for existing map list... <ul>";
+		print "<li>Get rid of Group admin screen. Remove lots of junk from map table (sort arrows, group name)";
+		print "<li>Drag maps to re-order (basic test done)";
+		print "<li>Drag Groups to re-order (todo)";
+		print "<li>Click triangle icon to reveal more settings (todo):<ul>";
+		
+		print "<li>Scheduling (implemented but no UI)";
+		print "<li>Per-map debug enable and one-shot debug enable (implemented but no UI)";
+		print "<li>Archiving (db field, no implementation)";
+		print "<li>Settings? (currently a separate screen)";
+		
+		print "</ul>";
+		print "</ul>";
+		print "<div class='wm_maplist'>";
+		print "<h2 class='wm_allmaps'>All Maps <span class='wm_controls'>[Settings][Add Group]</span></h2>";
+		
+		
+		foreach ($groups as $group_id=>$groupname)
+		{
+			print "<div class='wm_mapgroup'>";
+			printf ("<h3 class=wm_group>%s <span class='wm_controls'>[Add Map][Settings][Rename][Delete]</span></h3>\n", $groupname);
+				
+			$i = 0;
+			$g = 0;
+			$queryrows = db_fetch_assoc(sprintf("select weathermap_maps.* from weathermap_maps where weathermap_maps.group_id=%d order by sortorder",$group_id));
+			
+			if( is_array($queryrows) && count($queryrows) > 0 )
+			{
+				print "<table class='mapsortable'><tbody>";
+			
+				foreach ($queryrows as $map)
+				{
+					$classes = "maplist-entry";
+					if($i %2 == 0) $classes .= " alt-row";
+					if($map['active'] == 'off') $classes .= " wm_map_disabled";
+						
+					printf("<tr class='%s' id='map_%d'>",$classes, $map['id']);
+					
+					// drag handle and thumbnail
+					print "<td class='maptable_thumb'>";
+					printf("<img class='draghandle' src='cacti-resources/drag-handle.png' id='draghandle_%d'> ", $map['id']);
+					printf("<a href='weathermap-cacti-plugin.php?action=viewmap&id=%s'><img src='weathermap-cacti-plugin.php?action=viewthumb48&id=%s' width=48 height=48 class='thumb48' /></a>", $map['filehash'], $map['filehash']);
+					print "</td>";
+					
+					// map title and config filename + disclosure for more map info
+					print "<td class='maptable_disc'>";
+					print '<span class="ui-icon map-disclosure ui-icon-triangle-1-e"></span>';
+					print "</td>";
+						
+					print "<td class='wm_maptitle maptable_names'>";
+					print '<span class="wm_maptitle">'.htmlspecialchars($map['titlecache'])."</span><br />";
+					print '<a title="Click to start editor with this file" href="editor.php?plug=1&mapname='.htmlspecialchars($map['configfile']).'">'.htmlspecialchars($map['configfile']).'</a>';
+					print "</td>";
+						
+						
+					// Last run status - time + warning count
+					print "<td class='maptable_status'>";
+					print sprintf("%.2gs", $map['runtime']);
+					if($map['warncount']>0)
+					{
+						$had_warnings++;
+						print '<br><br><a class="wm_warningcount" href="../../utilities.php?tail_lines=500&message_type=2&action=view_logfile&filter='.urlencode($map['configfile']).'" title="Check cacti.log for this map">'.$map['warncount'].' warnings</a>';
+					}
+					print "</td>";
+					
+						
+					// Active/Disabled + debug status for per-map debugging
+					$debugextra = "";
+					if($map['debug'] == 'on') {
+						$debugextra="<img src='images/bug.png' />";
+					}
+					
+					if($map['debug'] == 'once') {
+						$debugextra="<img src='images/bug.png' />x1";
+					}
+						
+					if($map['active'] == 'on')
+					{
+						$class = "wm_enabled";
+						$action = "deactivate_map";
+						$label = "Deactivate";
+						$label2 = "Yes";
+					} else {
+						$class = "wm_disabled";
+						$action = "activate_map";
+						$label = "Activate";
+						$label2 = "No";
+					}
+					
+					printf('<td class="%s maptable_active"><a title="Click to %s" href="?action=%s&id=%s">%s</a>%s</td>',
+					$class,$label,$action, $map['id'], $label2,
+					$debugextra
+					);
+					
+						
+					// SETtings
+					print "<td class='maptable_settings'>";
+					print "<a href='?action=map_settings&id=".$map['id']."'>";
+					$setting_count = db_fetch_cell("select count(*) from weathermap_settings where mapid=".$map['id']);
+					if($setting_count > 0)
+					{
+						print $setting_count." special";
+						if($setting_count>1) print "s";
+					}
+					else
+					{
+						print "standard";
+					}
+					print "</a>";
+					print "</td>";
+					
+					
+					
+					// Permissions
+					print '<td class="maptable_perms">';
+					$UserSQL = 'select * from weathermap_auth where mapid='.$map['id'].' order by userid';
+					$userlist = db_fetch_assoc($UserSQL);
+					
+					$mapusers = array();
+					foreach ($userlist as $user)
+					{
+						if(array_key_exists($user['userid'],$users))
+						{
+							$mapusers[] = $users[$user['userid']];
+						}
+					}
+					
+					print '<a title="Click to edit permissions" href="?action=perms_edit&id='.$map['id'].'">';
+					
+					if(count($mapusers) == 0)
+					{
+						print "(no users)";
+					}
+					else
+					{
+						print join(", ",$mapusers);
+					}
+					print '</a>';
+					print '</td>';
+						
+						
+					// Delete
+					print '<td class="maptable_delete">';
+					print '<a href="?action=delete_map&id='.$map['id'].'"><img src="cacti-resources/delete_icon.png" width="10" height="10" border="0" alt="Delete Map" title="Delete Map"></a>';
+					print '</td>';
+					
+						
+						
+					print '</tr>';
+					print "\n";
+				} 
+				
+				print "</tbody></table>";
+				
+			} else {
+				print "<table class='mapsortable'><tbody>";
+				print "<tr><td colspan=8>No maps in this group.</td></tr>";		
+				print "</tbody></table>";
+			}
+			
+			print "</div>";
+		}
+		
+		print "</div>";
+		
+		?>
+			
+		<script type="text/javascript">
+		
+	
+		$(function() {
 
-function maplist()
+			$(".mapsortable tbody").sortable(
+					{
+						connectWith: ".mapsortable tbody",
+						handle: '.draghandle',
+						forcePlaceholderSize: true,
+						forceHelperSize: true,
+						axis: 'y',
+						opacity: 0.5,
+						placeholder: "sortable-placeholder"
+					//	helper: function() { return "<div class='ghost'></div>"; },
+					//	start: resizeGhost,
+					//	revert: 'invalid',
+					//	handle: '.draghandle'
+					});
+					 
+					function resizeGhost(event, ui) {
+						var helper = ui.helper;
+						var element = $(event.target);
+						helper.width(element.width());
+						helper.height(element.height());
+					}
+			 
+		  });
+		</script>
+			<?php 
+			
+}
+
+function weathermap_maplist2()
+{
+	global $i_understand_file_permissions_and_how_to_fix_them;
+		
+	$query = db_fetch_assoc("select id,username from user_auth");
+	$users[0] = 'Anyone';
+	
+	foreach ($query as $user)
+	{
+		$users[$user['id']] = $user['username'];
+	}
+	
+	$gquery = db_fetch_assoc("select * from weathermap_groups order by weathermap_groups.sortorder");
+	
+	foreach ($gquery as $g) {
+		$known_groups[$g['id']] = $g['name'];
+		$seen_groups[$g['id']] = 0;
+	}
+	
+	print "<div class='wm_maplist'>";	
+	
+	print "<h2>All Maps <span class='wm_controls'>[Settings][Add Group]</span></h2>";
+	
+	$i = 0;
+	$g = 0;
+	$queryrows = db_fetch_assoc("select weathermap_maps.*, weathermap_groups.name as groupname from weathermap_maps, weathermap_groups where weathermap_maps.group_id=weathermap_groups.id order by weathermap_groups.sortorder,sortorder");
+	// or die (mysql_error("Could not connect to database") )
+	
+	$headers = array("","","Config File", "Last Run", "Active", "Settings", "Accessible By","");
+	$nheads = sizeof($headers);
+	
+	$previous_id = -2;
+	$had_warnings = 0;
+	if( is_array($queryrows) )
+	{	
+		$last_group = "----asdadasdasdasd";
+	
+		foreach ($queryrows as $map)
+		{
+			$first_in_group = false;
+			if($map['groupname'] != $last_group) {
+				
+				if($last_group != "----asdadasdasdasd") {
+					print "</tbody></table>";
+				}
+				
+				$first_in_group = true;
+				$last_group = $map['groupname'];
+				$seen_groups[$map['group_id']] = 1;
+				# printf("<tr><td></td><td colspan=$nheads class='groupheader2'>Group: '%s'</td></tr>", $map['groupname']);
+				
+				
+				printf ("<h3>%s <span class='wm_controls'>[Add Map][Settings][Rename][Delete]</span></h3>\n", $map['groupname']);
+				print "<table width=700>";
+				print "<thead>";				
+				print "<tr>";
+				foreach ($headers as $h) {
+					$w = 60;
+					$h1 = $h;
+					if($h1 == 'Config File') $w = 200;
+						
+					printf("\t<th width=%d>%s</th>\n", $w, htmlspecialchars($h1));
+				}
+				print "</tr>";
+				print "</thead><tbody>\n";
+
+			}
+				
+			$classes = "maplist-entry";
+			if($i %2 == 0) $classes .= " alt-row";
+			if($map['active'] == 'off') $classes .= " wm_map_disabled";
+			
+			printf("<tr class='%s' id='map_%d'>",$classes, $map['id']);
+				
+			// drag handle and thumbnail
+			print "<td>";
+			printf("<img src='cacti-resources/drag-handle.png' id='draghandle_%d'> ", $map['id']);
+			printf("<a href='weathermap-cacti-plugin.php?action=viewmap&id=%s'><img src='weathermap-cacti-plugin.php?action=viewthumb48&id=%s' width=48 height=48 border=0/></a>", $map['filehash'], $map['filehash']);
+			print "</td>";
+				
+			// map title and config filename + disclosure for more map info
+			print "<td>";
+			print '<span class="ui-icon map-disclosure ui-icon-triangle-1-e"></span>';
+			print "</td>";
+			
+			print "<td class='wm_maptitle'>";				
+			print '<span class="wm_maptitle">'.htmlspecialchars($map['titlecache'])."</span><br />";
+			print '<a title="Click to start editor with this file" href="editor.php?plug=1&mapname='.htmlspecialchars($map['configfile']).'">'.htmlspecialchars($map['configfile']).'</a>';
+			print "</td>";
+			
+			
+			// Last run status - time + warning count				
+			print "<td>";
+			print sprintf("%.2gs", $map['runtime']);
+			if($map['warncount']>0)
+			{
+				$had_warnings++;
+				print '<br><a href="../../utilities.php?tail_lines=500&message_type=2&action=view_logfile&filter='.urlencode($map['configfile']).'" title="Check cacti.log for this map">'.$map['warncount'].'<img border=0 src="plugin-images/exclamation.png" title="'.$map['warncount'].' warnings last time this map was run. Check your logs."></a>';
+			}
+			print "</td>";
+				
+			
+			// Active/Disabled + debug status for per-map debugging
+			$debugextra = "";
+			if($map['debug'] == 'on') {
+				$debugextra="<img src='images/bug.png' />";
+			}
+				
+			if($map['debug'] == 'once') {
+				$debugextra="<img src='images/bug.png' />x1";
+			}
+			
+			if($map['active'] == 'on')
+			{
+				$class = "wm_enabled";
+				$action = "deactivate_map";
+				$label = "Deactivate";
+				$label2 = "Yes";
+			} else {
+				$class = "wm_disabled";
+				$action = "activate_map";
+				$label = "Activate";
+				$label2 = "No";
+			}
+
+			printf('<td class="%s"><a title="Click to %s" href="?action=%s&id=%s">%s</a>%s</td>',
+				$class,$label,$action, $map['id'], $label2,
+				$debugextra
+				);
+				
+			
+			// SETtings
+			print "<td>";
+			print "<a href='?action=map_settings&id=".$map['id']."'>";
+			$setting_count = db_fetch_cell("select count(*) from weathermap_settings where mapid=".$map['id']);
+			if($setting_count > 0)
+			{
+				print $setting_count." special";
+				if($setting_count>1) print "s";
+			}
+			else
+			{
+				print "standard";
+			}
+			print "</a>";
+			print "</td>";
+				
+		
+				
+			// Permissions
+			print '<td>';
+			$UserSQL = 'select * from weathermap_auth where mapid='.$map['id'].' order by userid';
+			$userlist = db_fetch_assoc($UserSQL);
+	
+			$mapusers = array();
+			foreach ($userlist as $user)
+			{
+				if(array_key_exists($user['userid'],$users))
+				{
+					$mapusers[] = $users[$user['userid']];
+				}
+			}
+	
+			print '<a title="Click to edit permissions" href="?action=perms_edit&id='.$map['id'].'">';
+			if(count($mapusers) == 0)
+			{
+				print "(no users)";
+			}
+			else
+			{
+				print join(", ",$mapusers);
+			}
+			print '</a>';
+			print '</td>';
+			
+			
+			// Delete			
+			print '<td>';
+			print '<a href="?action=delete_map&id='.$map['id'].'"><img src="cacti-resources/delete_icon.png" width="10" height="10" border="0" alt="Delete Map" title="Delete Map"></a>';
+			print '</td>';
+	
+			
+			
+			print '</tr>';
+			print "\n";
+				
+			printf("<tr class='wm_map_extra' id='extra_%s'>", $map['id']);
+			print "<td></td>";
+			print "<td></td>";
+				
+			print "<td>";
+			print "Extra information goes in here: <ul>";
+			print "<li>Debugging";
+			print "<li>Schedule";
+			print "<li>Settings";
+			print "<li>Archiving";
+			print "</ul>";
+			print "</td>";
+				
+
+			print '</tr>';
+				
+			print "\n";
+			$i++;
+		}
+	}
+	
+	// Show empty groups
+	
+	print "</tbody></table>";
+	
+
+	foreach ($known_groups as $k=>$v ) {
+		if($seen_groups[$k]==0)
+		{
+			printf ("<h3>%s <span class='wm_controls'>[Add Map][Settings][Rename][Delete]</span></h3>\n", $v);
+			print "<p>No maps in this group.</p>";
+		}
+	}
+	
+	print "</div>";
+	?>
+	
+<script type="text/javascript">
+
+function show_disclosure() {
+	$(this).removeClass('ui-icon-triangle-1-e').addClass('ui-icon-triangle-1-s');
+	$(this).parents("tr.maplist-entry").next().show("slow");
+	$('.map-disclosure').click(hide_disclosure);
+}
+
+function hide_disclosure() {
+	$("tr.wm_map_extra").hide('slow');
+	$(this).removeClass('ui-icon-triangle-1-s').addClass('ui-icon-triangle-1-e');
+	$('.map-disclosure').click(show_disclosure);
+}
+
+$(function() {
+
+	$('.map-disclosure').click( show_disclosure );
+	 
+  });
+</script>
+	<?php 
+	
+}
+
+function weathermap_maplist()
 {
 	global $colors, $menu;
 	global $i_understand_file_permissions_and_how_to_fix_them;
-
-	#print "<pre>";
-	#print_r($menu);
-	#print "</pre>";
-
+	
 	$last_started = read_config_option("weathermap_last_started_file",true);
 	$last_finished = read_config_option("weathermap_last_finished_file",true);
 	$last_start_time = intval(read_config_option("weathermap_last_start_time",true));
@@ -432,7 +883,10 @@ function maplist()
 	
 	html_start_box("<strong>Weathermaps</strong>", "78%", $colors["header"], "3", "center", "weathermap-cacti-plugin-mgmt.php?action=addmap_picker");
 
-	html_header(array("Config File", "Title", "Group", "Last Run", "Active", "Settings", "Sort Order", "Accessible By",""));
+	$headers = array("","Config File", "Title", "Group", "Last Run", "Active", "Settings", "Sort Order", "Accessible By","");
+	$nheads = sizeof($headers);
+	
+	html_header($headers);
 
 	$query = db_fetch_assoc("select id,username from user_auth");
 	$users[0] = 'Anyone';
@@ -442,6 +896,14 @@ function maplist()
 		$users[$user['id']] = $user['username'];
 	}
 
+	// since it's apparently becoming a more common issue, just check that the tables
+	// actually exist in the database!
+	$queryrows =
+	db_fetch_assoc("show table status like 'weathermap%'");
+	if(sizeof($queryrows)==0) {
+		print "<div class='wm_warning'>Something bad has happened - none of the weathermap tables exist. This is probably a bug in setup.php - please look for a solution in the forums.</div>";
+	}
+	
 	$i = 0;
 	$queryrows = db_fetch_assoc("select weathermap_maps.*, weathermap_groups.name as groupname from weathermap_maps, weathermap_groups where weathermap_maps.group_id=weathermap_groups.id order by weathermap_groups.sortorder,sortorder");
 	// or die (mysql_error("Could not connect to database") )
@@ -451,6 +913,7 @@ function maplist()
 	if( is_array($queryrows) )
 	{
 		form_alternate_row_color($colors["alternate"],$colors["light"],$i);
+		print "<td></td>";
 		print "<td>ALL MAPS</td><td>(special settings for all maps)</td><td></td><td></td>";
 		print "<td></td>";
 		
@@ -475,28 +938,24 @@ function maplist()
 		$i++;
 		
 		$rowcols = array($colors["light"],$colors["alternate"]);
-		$last_group = "----asdadasdasdasd";
-		
+				
 		foreach ($queryrows as $map)
 		{
-			$first_in_group = false;
-			if($map['groupname'] != $last_group) {
-				$first_in_group = true;
-				$last_group = $map['groupname'];
+			printf("<tr bgcolor='#%s'>", $rowcols[$i%2]);
 			
-				printf("<tr><td colspan=9 class='groupheader'>Group: '%s'</td></tr>", $map['groupname']);
-			}
+			print "<td>";
 			
-			printf("<tr bgcolor='#%s' class='%s'>", $rowcols[$i%2], ($first_in_group ? "fig" : ""));
-			
-			printf("<td><a href='weathermap-cacti-plugin.php?action=viewmap&id=%s'><img src='weathermap-cacti-plugin.php?action=viewthumb48&id=%s' width=48 height=48 border=0/></a>", $map['filehash'], $map['filehash']);
-			print '<a title="Click to start editor with this file" href="editor.php?plug=1&mapname='.htmlspecialchars($map['configfile']).'">'.htmlspecialchars($map['configfile']).'</a>';		
+			printf("<a href='weathermap-cacti-plugin.php?action=viewmap&id=%s'><img src='weathermap-cacti-plugin.php?action=viewthumb48&id=%s' width=48 height=48 border=0/></a></td>", $map['filehash'], $map['filehash']);
+
+			print '<td><a title="Click to start editor with this file" href="editor.php?plug=1&mapname='.htmlspecialchars($map['configfile']).'">'.htmlspecialchars($map['configfile']).'</a>';		
 			print "</td>";
 			
 			#		print '<a href="?action=editor&plug=1&mapname='.htmlspecialchars($map['configfile']).'">[edit]</a></td>';
 			print '<td>'.htmlspecialchars($map['titlecache']).'</td>';
+			
 			print '<td><a title="Click to change group" href="?action=chgroup&id='.$map['id'].'">'.htmlspecialchars($map['groupname']).'</a></td>';
-
+			
+			
 			print "<td>";
 			print sprintf("%.2gs", $map['runtime']);
 			if($map['warncount']>0)
@@ -506,13 +965,30 @@ function maplist()
 			}
 			print "</td>";
 			
+			
+			$debugextra = "";
+			if($map['debug'] == 'on') {
+				$debugextra="<img src='images/bug.png' />";
+			}
+			
+			if($map['debug'] == 'once') {
+				$debugextra="<img src='images/bug.png' />x1";
+			}
+				
 			if($map['active'] == 'on')
 			{
-				print '<td class="wm_enabled"><a title="Click to Deactivate" href="?action=deactivate_map&id='.$map['id'].'"><font color="green">Yes</font></a></td>';
+				printf('<td class="%s"><a title="Click to %s" href="?action=%s&id=%s"><font color="green">Yes</font></a>%s</td>',
+						'wm_enabled','Deactivate',"deactivate_map", $map['id'],
+						$debugextra
+						);
 			}
 			else
 			{
-				print '<td class="wm_disabled"><a title="Click to Activate" href="?action=activate_map&id='.$map['id'].'"><font color="red">No</font></a></td>';
+				printf('<td class="%s"><a title="Click to %s" href="?action=%s&id=%s"><font color="red">No</font></a>%s</td>',
+							'wm_disabled','Activate',"activate_map", $map['id'],
+							$debugextra
+				);
+			//	print '<td class="wm_disabled"><a title="Click to Activate" href="?action=activate_map&id='.$map['id'].'"><font color="red">No</font></a>$debugextra</td>';
 			}			
 			
 			print "<td>";
@@ -530,16 +1006,11 @@ function maplist()
 			print "</a>";			
 			print "</td>";
 			
+				print '<td>';
+				print '<a href="?action=move_map_up&order='.$map['sortorder'].'&id='.$map['id'].'"><img src="../../images/move_up.gif" width="14" height="10" border="0" alt="Move Map Up" title="Move Map Up"></a>';
+				print '<a href="?action=move_map_down&order='.$map['sortorder'].'&id='.$map['id'].'"><img src="../../images/move_down.gif" width="14" height="10" border="0" alt="Move Map Down" title="Move Map Down"></a>';	
+				print "</td>";
 			
-			print '<td>';
-
-			print '<a href="?action=move_map_up&order='.$map['sortorder'].'&id='.$map['id'].'"><img src="../../images/move_up.gif" width="14" height="10" border="0" alt="Move Map Up" title="Move Map Up"></a>';
-			print '<a href="?action=move_map_down&order='.$map['sortorder'].'&id='.$map['id'].'"><img src="../../images/move_down.gif" width="14" height="10" border="0" alt="Move Map Down" title="Move Map Down"></a>';
-
-// print $map['sortorder'];
-
-			print "</td>";
-
 			print '<td>';
 			$UserSQL = 'select * from weathermap_auth where mapid='.$map['id'].' order by userid';
 			$userlist = db_fetch_assoc($UserSQL);
@@ -574,12 +1045,17 @@ function maplist()
 			$i++;
 		}
 	}
-
+	
+	
+	
 	if($i==0)
 	{
 		print "<tr><td><em>No Weathermaps Configured</em></td></tr>\n";
 	}
 
+	print "</tbody>";
+	
+	
 	html_end_box();
 
         $last_stats = read_config_option("weathermap_last_stats", true);
@@ -606,7 +1082,7 @@ function maplist()
 
 }
 
-function addmap_picker($show_all=false)
+function weathermap_addmap_picker($show_all=false)
 {
 	global $weathermap_confdir;
 	global $colors;
@@ -656,7 +1132,7 @@ function addmap_picker($show_all=false)
 						}
 						else
 						{
-							$title = wmap_get_title($realfile);
+							$title = weathermap_get_title($realfile);
 							$titles[$file] = $title;
 							$i++;
 						}
@@ -718,7 +1194,7 @@ function addmap_picker($show_all=false)
 	
 }
 
-function preview_config($file)
+function weathermap_preview_config($file)
 {
 	global $weathermap_confdir;
 	global $colors;
@@ -757,7 +1233,7 @@ function preview_config($file)
 	}
 }
 
-function add_config($file)
+function weathermap_add_config($file)
 {
 	global $weathermap_confdir;
 	global $colors;
@@ -776,7 +1252,7 @@ function add_config($file)
 	else
 	{
 		$realfile = $weathermap_confdir.DIRECTORY_SEPARATOR.$file;
-		$title = wmap_get_title($realfile);
+		$title = weathermap_get_title($realfile);
 
 		$file = mysql_real_escape_string($file);
 		$title = mysql_real_escape_string($title);
@@ -792,11 +1268,11 @@ function add_config($file)
 		
 		db_execute("update weathermap_maps set filehash=LEFT(MD5(concat(id,configfile,rand())),20) where id=$last_id");
 
-		map_resort();
+		weathermap_map_resort();
 	}
 }
 
-function wmap_get_title($filename)
+function weathermap_get_title($filename)
 {
 	$title = "(no title)";
 	$fd = fopen($filename,"r");
@@ -806,11 +1282,13 @@ function wmap_get_title($filename)
 		if(preg_match("/^\s*TITLE\s+(.*)/i",$buffer, $matches))
 		{
 			$title = $matches[1];
+			break;
 		}
 		// this regexp is tweaked from the ReadConfig version, to only match TITLEPOS lines *with* a title appended
 		if(preg_match("/^\s*TITLEPOS\s+\d+\s+\d+\s+(.+)/i",$buffer, $matches))
 		{
 			$title = $matches[1];
+			break;
 		}
 		// strip out any DOS line endings that got through
 		$title=str_replace("\r", "", $title);
@@ -820,19 +1298,19 @@ function wmap_get_title($filename)
 	return($title);
 }
 
-function map_deactivate($id)
+function weathermap_map_deactivate($id)
 {
 	$SQL = "update weathermap_maps set active='off' where id=".$id;
 	db_execute($SQL);
 }
 
-function map_activate($id)
+function weathermap_map_activate($id)
 {
 	$SQL = "update weathermap_maps set active='on' where id=".$id;
 	db_execute($SQL);
 }
 
-function map_delete($id)
+function weathermap_map_delete($id)
 {
 	$SQL = "delete from weathermap_maps where id=".$id;
 	db_execute($SQL);
@@ -843,7 +1321,7 @@ function map_delete($id)
 	$SQL = "delete from weathermap_settings where mapid=".$id;
 	db_execute($SQL);
 	
-	map_resort();
+	weathermap_map_resort();
 }
 
 function weathermap_set_group($mapid,$groupid)
@@ -851,22 +1329,22 @@ function weathermap_set_group($mapid,$groupid)
 	# print "UPDATING";
 	$SQL = sprintf("update weathermap_maps set group_id=%d where id=%d", $groupid, $mapid);
 	db_execute($SQL);
-	map_resort();
+	weathermap_map_resort();
 }
 
-function perms_add_user($mapid,$userid)
+function weathermap_perms_add_user($mapid,$userid)
 {
 	$SQL = "insert into weathermap_auth (mapid,userid) values($mapid,$userid)";
 	db_execute($SQL);
 }
 
-function perms_delete_user($mapid,$userid)
+function weathermap_perms_delete_user($mapid,$userid)
 {
 	$SQL = "delete from weathermap_auth where mapid=$mapid and userid=$userid";
 	db_execute($SQL);
 }
 
-function perms_list($id)
+function weathermap_perms_list($id)
 {
 	global $colors;
 
@@ -1292,6 +1770,10 @@ function weathermap_group_editor()
 
 function weathermap_group_create($newname)
 {
+	if ($newname == "") {
+		return;
+	}
+	
 	$sortorder = db_fetch_cell("select max(sortorder)+1 from weathermap_groups");
 	$SQL = sprintf("insert into weathermap_groups (name, sortorder) values ('%s',%d)", mysql_escape_string($newname), $sortorder);
 #	print $SQL;
@@ -1300,6 +1782,10 @@ function weathermap_group_create($newname)
 
 function weathermap_group_update($id, $newname)
 {
+
+	if ($newname == "") {
+		return;	
+	}
 	
 	$SQL = sprintf("update weathermap_groups set name='%s' where id=%d", mysql_escape_string($newname), $id);
 #	print $SQL;
@@ -1316,6 +1802,29 @@ function weathermap_group_delete($id)
 	$SQL3 = "DELETE from weathermap_groups where id=".$id;
 	db_execute($SQL2);
 	db_execute($SQL3);
+}
+
+function weathermap_cacti_userlist()
+{
+	$query = db_fetch_assoc("select id,username from user_auth");
+	$users[0] = 'Anyone';
+	
+	foreach ($query as $user)
+	{
+		$users[$user['id']] = $user['username'];
+	}
+	return $users;
+}
+
+function weathermap_group_list() 
+{
+	$gquery = db_fetch_assoc("select * from weathermap_groups order by weathermap_groups.sortorder");
+	
+	foreach ($gquery as $g) {
+		$groups[$g['id']] = $g['name'];
+	}
+	
+	return $groups;
 }
 
 // vim:ts=4:sw=4:

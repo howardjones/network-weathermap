@@ -1906,7 +1906,7 @@ class WMColour
     function as_html()
     {
         if (true === $this->is_real()) {
-            return $this->as_string('#%02x%02x%02x');;
+            return $this->as_string('#%02x%02x%02x');
         } else {
             return '';
         }

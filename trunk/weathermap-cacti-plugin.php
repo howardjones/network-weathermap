@@ -32,13 +32,13 @@ case 'viewimage':
 		$id = intval($_REQUEST['id']);
 	}
 	
-	if ($id >=0) {
+	if ($id >= 0) {
 		$imageformat = strtolower(read_config_option("weathermap_output_format"));
 		
 		$userid = (isset($_SESSION["sess_user_id"]) ? intval($_SESSION["sess_user_id"]) : 1);
-		$map = db_fetch_assoc("select weathermap_maps.* from weathermap_auth,weathermap_maps where weathermap_maps.id=weathermap_auth.mapid and active='on' and (userid=".$userid." or userid=0) and weathermap_maps.id=".$id);
+		$map = db_fetch_assoc("select weathermap_maps.* from weathermap_auth,weathermap_maps where weathermap_maps.id=weathermap_auth.mapid and (userid=".$userid." or userid=0) and  active='on' and weathermap_maps.id=".$id);
 		
-		if(sizeof($map))
+		if(sizeof($map)==1)
 		{
 			$imagefile = dirname(__FILE__).'/output/'.'/'.$map[0]['filehash'].".".$imageformat;
 			if($action == 'viewthumb') $imagefile = dirname(__FILE__).'/output/'.$map[0]['filehash'].".thumb.".$imageformat;
@@ -49,9 +49,17 @@ case 'viewimage':
 
 			header('Content-type: image/png');
 			
-			readfile($imagefile);
-					
+			if( file_exists($imagefile)) {		
+				readfile($imagefile);
+			} else {
+				weathermap_grey_image(48,48);
+			}
+							
 			dir($orig_cwd);	
+		} elseif ($action == "viewthumb48") {
+			// in the management view, a disabled map will fail the query above, so generate *something*
+			header('Content-type: image/png');
+			weathermap_grey_image(48,48);
 		}
 	}
 	
@@ -687,6 +695,15 @@ function weathermap_tabs($current_tab)
 	} else {
 		return(false);
 	}			
+}
+
+function weathermap_grey_image($w, $h) {
+
+	$im = imagecreate($w,$h);
+	$shade = 240;
+	$grey = imagecolorallocate($im, $shade, $shade, $shade);
+	imagepng($im);
+
 }
 
 // vim:ts=4:sw=4:

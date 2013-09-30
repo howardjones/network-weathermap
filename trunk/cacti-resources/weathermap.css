@@ -1,6 +1,38 @@
 @CHARSET "ISO-8859-1";
 
-tr.wm_disabled { color: #ccc; }
+
+.sortable-placeholder { border: 3px dashed gray; height: 48px; }
+.draghandle { cursor:  }
+
+tr.wm_map_disabled { color: #ccc; }
+
+td.wm_maptitle { padding-right: 20px; }
+span.wm_maptitle { font-size: 150%; }
+.wm_controls { font-size: 70%; color: lightgray;}
+.wm_maplist { padding-left: 100px; padding-bottom: 50px; }
+
+.wm_mapgroup { padding-left: 30px; }
+
+img.thumb48 { border: 1px solid #eee; }
+td.maptable_thumb { width: 66px; }
+td.maptable_disc { width: 12px; }
+td.maptable_delete { width: 20px; }
+td.maptable_perms {width: 150px; }
+td.maptable_names { width: 400px; }
+td.maptable_status { width: 100px; }
+td.maptable_settings { width: 80px; }
+td.maptable_active { width: 50px; }
+ 
+div.wm_mapgroup table { border-top: 1px solid #eee; }
+.wm_warningcount { border: 2px red solid; padding: 2px; }
+ 
+.wm_maplist tr td { border-bottom: 1px solid #eee; }
+
+.wm_maplist tr th { color: gray; font-weight: normal; }
+
+x.wm_maplist tr.alt-row { background-color: #eef; }
+
+.wm_map_extra { display: none; }
 
 .wm_warning { padding:5px; width: 50%; border: 2px red solid; margin: 5px auto 15px auto; background-color: #fee; }
 

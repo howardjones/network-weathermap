@@ -2,10 +2,11 @@ r512 - last performance-related commit
 r529 - last commit before 0.98 rollback
 r443 - 0.97a
 
-DONE Up to r516 (inclusive)
+DONE Up to r522 (inclusive)
 
 r500 - move link drawing code to use Point and Vector (skipped for now)
 
+Rename plugin functions into a weathermap_ namespace
 Finish moving to WMColour
 Finish moving to WMScale
 DONE Show runtimes in map list

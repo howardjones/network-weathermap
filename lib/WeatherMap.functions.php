@@ -137,131 +137,6 @@ function wm_warn($string, $notice_only = FALSE, $code = "")
     }
 }
 
-function js_escape($str, $wrap = TRUE)
-{
-    $str = str_replace ( '\\', '\\\\', $str );
-    $str = str_replace ( '"', '\\"', $str );
-    
-    if ($wrap)
-        $str = '"' . $str . '"';
-    
-    return ($str);
-}
-
-function mysprintf($format, $value, $kilo = 1000)
-{
-    $output = "";
-    
-    if (preg_match ( "/%(\d*\.?\d*)k/", $format, $matches )) {
-        $spec = $matches [1];
-        $places = 2;
-        if ($spec != '') {
-            preg_match ( "/(\d*)\.?(\d*)/", $spec, $matches );
-            if ($matches [2] != '')
-                $places = $matches [2];
-            // we don't really need the justification (pre-.) part...
-        }
-        $result = nice_scalar ( $value, $kilo, $places );
-        $output = preg_replace ( "/%" . $spec . "k/", $format, $result );
-    } elseif (preg_match ( "/%(-*)(\d*)([Tt])/", $format, $matches )) {
-        $spec = $matches [3];
-        $precision = ($matches [2] == '' ? 10 : intval ( $matches [2] ));
-        $joinchar = " ";
-        if ($matches [1] == "-") {
-            $joinchar = " ";
-        }
-        
-        // special formatting for time_t (t) and SNMP TimeTicks (T)
-        if ($spec == "T")
-            $value = $value / 100;
-        
-        $results = array ();
-        $periods = array (
-                "y" => 24 * 60 * 60 * 365,
-                "d" => 24 * 60 * 60,
-                "h" => 60 * 60,
-                "m" => 60,
-                "s" => 1 
-        );
-        foreach ( $periods as $periodsuffix => $timeperiod ) {
-            $slot = floor ( $value / $timeperiod );
-            $value = $value - $slot * $timeperiod;
-            
-            if ($slot > 0) {
-                $results [] = sprintf ( "%d%s", $slot, $periodsuffix );
-            }
-        }
-        if (sizeof ( $results ) == 0) {
-            $results [] = "0s";
-        }
-        $output = implode ( $joinchar, array_slice ( $results, 0, $precision ) );
-    } else {
-        $output = sprintf ( $format, $value );
-    }
-    return $output;
-}
-
-// ParseString is based on code from:
-// http://www.webscriptexpert.com/Php/Space-Separated%20Tag%20Parser/
-function wm_parse_string($input)
-{
-    $output = array (); // Array of Output
-    $cPhraseQuote = null; // Record of the quote that opened the current phrase
-    $sPhrase = null; // Temp storage for the current phrase we are building
-                     
-    // Define some constants
-    $sTokens = " \t"; // Space, Tab
-    $sQuotes = "'\""; // Single and Double Quotes
-                      
-    // Start the State Machine
-    do {
-        // Get the next token, which may be the first
-        $sToken = isset ( $sToken ) ? strtok ( $sTokens ) : strtok ( $input, $sTokens );
-        
-        // Are there more tokens?
-        if ($sToken === false) {
-            // Ensure that the last phrase is marked as ended
-            $cPhraseQuote = null;
-        } else {
-            // Are we within a phrase or not?
-            if ($cPhraseQuote !== null) {
-                // Will the current token end the phrase?
-                if (substr ( $sToken, - 1, 1 ) === $cPhraseQuote) {
-                    // Trim the last character and add to the current phrase, with a single leading space if necessary
-                    if (strlen ( $sToken ) > 1)
-                        $sPhrase .= ((strlen ( $sPhrase ) > 0) ? ' ' : null) . substr ( $sToken, 0, - 1 );
-                    $cPhraseQuote = null;
-                } else {
-                    // If not, add the token to the phrase, with a single leading space if necessary
-                    $sPhrase .= ((strlen ( $sPhrase ) > 0) ? ' ' : null) . $sToken;
-                }
-            } else {
-                // Will the current token start a phrase?
-                if (strpos ( $sQuotes, $sToken [0] ) !== false) {
-                    // Will the current token end the phrase?
-                    if ((strlen ( $sToken ) > 1) && ($sToken [0] === substr ( $sToken, - 1, 1 ))) {
-                        // The current token begins AND ends the phrase, trim the quotes
-                        $sPhrase = substr ( $sToken, 1, - 1 );
-                    } else {
-                        // Remove the leading quote
-                        $sPhrase = substr ( $sToken, 1 );
-                        $cPhraseQuote = $sToken [0];
-                    }
-                } else
-                    $sPhrase = $sToken;
-            }
-        }
-        
-        // If, at this point, we are not within a phrase, the prepared phrase is complete and can be added to the array
-        if (($cPhraseQuote === null) && ($sPhrase != null)) {
-            $output [] = $sPhrase;
-            $sPhrase = null;
-        }
-    } while ( $sToken !== false ); // Stop when we receive FALSE from strtok()
-    
-    return $output;
-}
-
 // wrapper around imagecolorallocate to try and re-use palette slots where possible
 function myimagecolorallocate($image, $red, $green, $blue)
 {
@@ -276,31 +151,6 @@ function myimagecolorallocate($image, $red, $green, $blue)
             return $existing;
     }
     return (imagecolorallocate ( $image, $red, $green, $blue ));
-}
-
-function screenshotify($input)
-{
-    $tmp = $input;
-    
-    $tmp = preg_replace ( "/\b\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}\b/", "127.0.0.1", $tmp );
-    $tmp = preg_replace ( "/([A-Za-z]{3,})/e", "str_repeat('x',strlen('\\1'))", $tmp );
-    
-    return ($tmp);
-}
-
-function render_colour($col)
-{
-    die ( "render_colour() called" );
-    
-    if (($col [0] == - 1) && ($col [1] == - 1) && ($col [1] == - 1)) {
-        return 'none';
-    } else if (($col [0] == - 2) && ($col [1] == - 2) && ($col [1] == - 2)) {
-        return 'copy';
-    } else if (($col [0] == - 3) && ($col [1] == - 3) && ($col [1] == - 3)) {
-        return 'contrast';
-    } else {
-        return sprintf ( "%d %d %d", $col [0], $col [1], $col [2] );
-    }
 }
 
 // take the same set of points that imagepolygon does, but don't close the shape
@@ -514,21 +364,6 @@ function line_crossing($x1, $y1, $x2, $y2, $x3, $y3, $x4, $y4)
     ));
 }
 
-// rotate a list of points around cx,cy by an angle in radians, IN PLACE
-function RotateAboutPoint(&$points, $cx, $cy, $angle = 0)
-{
-    $npoints = count ( $points ) / 2;
-    
-    for($i = 0; $i < $npoints; $i ++) {
-        $ox = $points [$i * 2] - $cx;
-        $oy = $points [$i * 2 + 1] - $cy;
-        $rx = $ox * cos ( $angle ) - $oy * sin ( $angle );
-        $ry = $oy * cos ( $angle ) + $ox * sin ( $angle );
-        
-        $points [$i * 2] = $rx + $cx;
-        $points [$i * 2 + 1] = $ry + $cy;
-    }
-}
 
 // calculate the points for a span of the curve. We pass in the distance so far, and the array index, so that
 // the chunk of array generated by this function can be array_merged with existing points from before.
@@ -1307,7 +1142,7 @@ function draw_curve($image, &$curvepoints, $widths, $outlinecolour, $fillcolours
 
 // Take a spine, and strip out all the points that are co-linear with the points either side of them
 function simplify_spine(&$input, $epsilon = 1e-10)
-{
+{   
     $output = array ();
     
     $output [] = $input [0];
@@ -1336,12 +1171,155 @@ function simplify_spine(&$input, $epsilon = 1e-10)
     return $output;
 }
 
-function wm_unformat_number($instring, $kilo = 1000)
+/** Die, leaving a stack-trace. Mostly used along with the unit tests to figure out if
+ *  a piece of old-looking code is really redundant.
+ *  
+ * @param string $message
+ */
+function wm_die_with_trace($message="Dying here") 
 {
-    return unformat_number ( $instring, $kilo );
+    debug_print_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS);
+    die($message);
 }
 
-function unformat_number($instring, $kilo = 1000)
+function js_escape($str, $wrap = TRUE)
+{
+    $str = str_replace ( '\\', '\\\\', $str );
+    $str = str_replace ( '"', '\\"', $str );
+
+    if ($wrap)
+        $str = '"' . $str . '"';
+
+    return ($str);
+}
+
+function mysprintf($format, $value, $kilo = 1000)
+{
+    $output = "";
+
+    if (preg_match ( "/%(\d*\.?\d*)k/", $format, $matches )) {
+        $spec = $matches [1];
+        $places = 2;
+        if ($spec != '') {
+            preg_match ( "/(\d*)\.?(\d*)/", $spec, $matches );
+            if ($matches [2] != '')
+                $places = $matches [2];
+            // we don't really need the justification (pre-.) part...
+        }
+        $result = nice_scalar ( $value, $kilo, $places );
+        $output = preg_replace ( "/%" . $spec . "k/", $format, $result );
+    } elseif (preg_match ( "/%(-*)(\d*)([Tt])/", $format, $matches )) {
+        $spec = $matches [3];
+        $precision = ($matches [2] == '' ? 10 : intval ( $matches [2] ));
+        $joinchar = " ";
+        if ($matches [1] == "-") {
+            $joinchar = " ";
+        }
+
+        // special formatting for time_t (t) and SNMP TimeTicks (T)
+        if ($spec == "T")
+            $value = $value / 100;
+
+        $results = array ();
+        $periods = array (
+                "y" => 24 * 60 * 60 * 365,
+                "d" => 24 * 60 * 60,
+                "h" => 60 * 60,
+                "m" => 60,
+                "s" => 1
+        );
+        foreach ( $periods as $periodsuffix => $timeperiod ) {
+            $slot = floor ( $value / $timeperiod );
+            $value = $value - $slot * $timeperiod;
+
+            if ($slot > 0) {
+                $results [] = sprintf ( "%d%s", $slot, $periodsuffix );
+            }
+        }
+        if (sizeof ( $results ) == 0) {
+            $results [] = "0s";
+        }
+        $output = implode ( $joinchar, array_slice ( $results, 0, $precision ) );
+    } else {
+        $output = sprintf ( $format, $value );
+    }
+    return $output;
+}
+
+// ParseString is based on code from:
+// http://www.webscriptexpert.com/Php/Space-Separated%20Tag%20Parser/
+function wm_parse_string($input)
+{
+    $output = array (); // Array of Output
+    $cPhraseQuote = null; // Record of the quote that opened the current phrase
+    $sPhrase = null; // Temp storage for the current phrase we are building
+     
+    // Define some constants
+    $sTokens = " \t"; // Space, Tab
+    $sQuotes = "'\""; // Single and Double Quotes
+
+    // Start the State Machine
+    do {
+        // Get the next token, which may be the first
+        $sToken = isset ( $sToken ) ? strtok ( $sTokens ) : strtok ( $input, $sTokens );
+
+        // Are there more tokens?
+        if ($sToken === false) {
+            // Ensure that the last phrase is marked as ended
+            $cPhraseQuote = null;
+        } else {
+            // Are we within a phrase or not?
+            if ($cPhraseQuote !== null) {
+                // Will the current token end the phrase?
+                if (substr ( $sToken, - 1, 1 ) === $cPhraseQuote) {
+                    // Trim the last character and add to the current phrase, with a single leading space if necessary
+                    if (strlen ( $sToken ) > 1)
+                        $sPhrase .= ((strlen ( $sPhrase ) > 0) ? ' ' : null) . substr ( $sToken, 0, - 1 );
+                    $cPhraseQuote = null;
+                } else {
+                    // If not, add the token to the phrase, with a single leading space if necessary
+                    $sPhrase .= ((strlen ( $sPhrase ) > 0) ? ' ' : null) . $sToken;
+                }
+            } else {
+                // Will the current token start a phrase?
+                if (strpos ( $sQuotes, $sToken [0] ) !== false) {
+                    // Will the current token end the phrase?
+                    if ((strlen ( $sToken ) > 1) && ($sToken [0] === substr ( $sToken, - 1, 1 ))) {
+                        // The current token begins AND ends the phrase, trim the quotes
+                        $sPhrase = substr ( $sToken, 1, - 1 );
+                    } else {
+                        // Remove the leading quote
+                        $sPhrase = substr ( $sToken, 1 );
+                        $cPhraseQuote = $sToken [0];
+                    }
+                } else
+                    $sPhrase = $sToken;
+            }
+        }
+
+        // If, at this point, we are not within a phrase, the prepared phrase is complete and can be added to the array
+        if (($cPhraseQuote === null) && ($sPhrase != null)) {
+            $output [] = $sPhrase;
+            $sPhrase = null;
+        }
+    } while ( $sToken !== false ); // Stop when we receive FALSE from strtok()
+
+    return $output;
+}
+
+
+function screenshotify($input)
+{
+    $tmp = $input;
+
+    $tmp = preg_replace ( "/\b\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}\b/", "127.0.0.1", $tmp );
+    $tmp = preg_replace ( "/([A-Za-z]{3,})/e", "str_repeat('x',strlen('\\1'))", $tmp );
+
+    return ($tmp);
+}
+
+
+function wm_unformat_number($instring, $kilo = 1000)
 {
     $matches = 0;
     $number = 0;
@@ -1583,6 +1561,23 @@ function nice_scalar($number, $kilo = 1000, $decimals = 1)
     
     $result = $prefix . format_number ( $number, $decimals ) . $suffix;
     return $result;
+}
+
+
+// rotate a list of points around cx,cy by an angle in radians, IN PLACE
+function RotateAboutPoint(&$points, $cx, $cy, $angle = 0)
+{
+    $npoints = count ( $points ) / 2;
+
+    for($i = 0; $i < $npoints; $i ++) {
+        $ox = $points [$i * 2] - $cx;
+        $oy = $points [$i * 2 + 1] - $cy;
+        $rx = $ox * cos ( $angle ) - $oy * sin ( $angle );
+        $ry = $oy * cos ( $angle ) + $ox * sin ( $angle );
+
+        $points [$i * 2] = $rx + $cx;
+        $points [$i * 2 + 1] = $ry + $cy;
+    }
 }
 
 // ***********************************************
@@ -1986,7 +1981,7 @@ function wm_draw_marker_circle($im, $col, $x, $y, $size = 10)
     imagearc ( $im, $x, $y, $size, $size, 0, 360, $col );
 }
 
-function draw_spine_chain($im, $spine, $col, $size = 10)
+function wm_draw_spine_chain($im, $spine, $col, $size = 10)
 {
     $newn = count ( $spine );
     
@@ -1995,7 +1990,7 @@ function draw_spine_chain($im, $spine, $col, $size = 10)
     }
 }
 
-function dump_spine($spine)
+function wm_dump_spine($spine)
 {
     print "===============\n";
     for($i = 0; $i < count ( $spine ); $i ++) {
@@ -2004,7 +1999,7 @@ function dump_spine($spine)
     print "===============\n";
 }
 
-function draw_spine($im, $spine, $col)
+function wm_draw_spine($im, $spine, $col)
 {
     $max_i = count ( $spine ) - 1;
     
@@ -2047,8 +2042,6 @@ function TestOutput_HTML($htmlfile, &$map)
  * Optionally Produce a new config file in $newconffile (for testing WriteConfig)
  * Optionally collect config-keyword-coverage stats about this config file
  *
- *
- *
  * @param string $conffile            
  * @param string $imagefile            
  * @param string $htmlfile            
@@ -2057,7 +2050,7 @@ function TestOutput_HTML($htmlfile, &$map)
  */
 function TestOutput_RunTest($conffile, $imagefile, $htmlfile, $newconffile, $coveragefile)
 {
-    global $weathermap_map;
+//    global $weathermap_map;
     global $WEATHERMAP_VERSION;
     
     $map = new WeatherMap ();

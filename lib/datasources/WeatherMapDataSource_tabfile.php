@@ -40,8 +40,8 @@ class WeatherMapDataSource_tabfile extends WeatherMapDataSource {
 
 				if (preg_match("/^$itemname\t(\d+\.?\d*[KMGT]*)\t(\d+\.?\d*[KMGT]*)/", $buffer, $matches))
 				{
-					$data[IN]=unformat_number($matches[1]);
-					$data[OUT]=unformat_number($matches[2]);
+					$data[IN]=wm_unformat_number($matches[1]);
+					$data[OUT]=wm_unformat_number($matches[2]);
 				}
 			}
 			$stats = stat($targetstring);

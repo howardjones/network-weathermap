@@ -593,10 +593,6 @@ function weathermap_maplist3()
 						axis: 'y',
 						opacity: 0.5,
 						placeholder: "sortable-placeholder"
-					//	helper: function() { return "<div class='ghost'></div>"; },
-					//	start: resizeGhost,
-					//	revert: 'invalid',
-					//	handle: '.draghandle'
 					});
 					 
 					function resizeGhost(event, ui) {
@@ -607,6 +603,12 @@ function weathermap_maplist3()
 					}
 			 
 		  });
+
+			$(".wm_group").sortable({
+					connectWith: ".wm_group",
+					axis: 'y'
+			});
+		  
 		</script>
 			<?php 
 			

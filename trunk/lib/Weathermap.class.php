@@ -3988,13 +3988,13 @@ function BuildZLayers()
 		// while we're looping through, let's set the real bandwidths
 		if($item->my_type() == "LINK")
 		{
-			$this->links[$item->name]->max_bandwidth_in = unformat_number($item->max_bandwidth_in_cfg, $this->kilo);
-			$this->links[$item->name]->max_bandwidth_out = unformat_number($item->max_bandwidth_out_cfg, $this->kilo);
+			$this->links[$item->name]->max_bandwidth_in = wm_unformat_number($item->max_bandwidth_in_cfg, $this->kilo);
+			$this->links[$item->name]->max_bandwidth_out = wm_unformat_number($item->max_bandwidth_out_cfg, $this->kilo);
 		}
 		elseif($item->my_type() == "NODE")
 		{
-			$this->nodes[$item->name]->max_bandwidth_in = unformat_number($item->max_bandwidth_in_cfg, $this->kilo);
-			$this->nodes[$item->name]->max_bandwidth_out = unformat_number($item->max_bandwidth_out_cfg, $this->kilo);
+			$this->nodes[$item->name]->max_bandwidth_in = wm_unformat_number($item->max_bandwidth_in_cfg, $this->kilo);
+			$this->nodes[$item->name]->max_bandwidth_out = wm_unformat_number($item->max_bandwidth_out_cfg, $this->kilo);
 		}
 		else
 		{

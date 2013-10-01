@@ -25,9 +25,8 @@ td.maptable_active { width: 50px; }
  
 div.wm_mapgroup table { border-top: 1px solid #eee; }
 .wm_warningcount { border: 2px red solid; padding: 2px; }
- 
-.wm_maplist tr td { border-bottom: 1px solid #eee; }
 
+.wm_maplist tr td { border-bottom: 1px solid #eee; }
 .wm_maplist tr th { color: gray; font-weight: normal; }
 
 x.wm_maplist tr.alt-row { background-color: #eef; }

@@ -40,7 +40,7 @@ figure {   margin-bottom: 1.5em;
    
 .changes dl { padding-left: 1.5em; }
 
-.definition { 
+.olddefinition { 
 	padding-left: 1.5em;
 	overflow: hidden;
 	margin-bottom: 1em;
@@ -56,82 +56,9 @@ figure {   margin-bottom: 1.5em;
 	box-shadow: 0 1px 2px rgba(0, 0, 0, .5);
  }
  
-.examples blockquote { border: none;}
-blockquote.example { border: none;}
+.oldexamples blockquote { border: none;}
+blockquote.oldexample { border: none;}
 
 tt.clioption { font-weight: bold; font-size: 105%; white-space: nowrap; }
 #content { margin-top: 1em; }
 
-#nav {
-		width:100%;
-		overflow:hidden;
-		/* (en|de) Bugfix:IE - collapsing horizontal margins */
-		position:relative;
-		line-height:1em;
-		background: #222;
-
-}
-
-	#nav ul {
-		margin:0;
-		padding: 0.5em 1.5em;
-		/* (en|de) Bugfix:IE - Doubled Float Margin Bug */
-		display:inline;
-		float:left; /* LTR */
-	}
-
-#nav ul li {
-		/* (en|de) Bugfix:IE - Doubled Float Margin Bug */
-		display:inline;
-		float:left; /* LTR */
-		font-size:1.0em;
-		line-height:1em;
-		list-style-type:none;
-		margin: 0 .25em 0 0;
-		padding:0;
-}
-
-#nav ul li a,
-	#nav ul li strong {
-		background:transparent;
-		color:#aaa;
-		display:block;
-		font-size:1em;
-		line-height: 2em;
-		padding: 0 0.5em;
-		font-weight:normal;
-		text-decoration:none;
-		text-shadow: 0 1px 1px rgba(0,0,0,.5);
-		width:auto;
-	}
-
-	#nav ul li a:focus,
-	#nav ul li a:hover,
-	#nav ul li a:active  {
-		color: #ccc;
-		background:#666;
-		background: rgba(255,255,255,.25);
-		-webkit-border-radius: 0.2em;
-		-moz-border-radius: 0.2em;
-		border-radius: 0.2em;
-		text-decoration:none;
-		outline: 0 none;
-	}
-	
-		#nav ul li.active {
-		background:#666;
-		background: rgba(255,255,255,.3);
-		-webkit-border-radius: 0.2em;
-		-moz-border-radius: 0.2em;
-		border-radius: 0.2em;
-		color: #fff;
-	}
-
-	#nav ul li.active strong,
-	#nav ul li.active a:focus,
-	#nav ul li.active a:hover,
-	#nav ul li.active a:active {
-		background:transparent;
-		color:#fff;
-		text-decoration:none;
-	}

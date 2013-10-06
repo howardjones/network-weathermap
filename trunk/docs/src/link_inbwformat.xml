@@ -6,9 +6,7 @@
 
     <anchor>LINK_INBWFORMAT</anchor>
 
-    <definition>INBWFORMAT
-
-        <meta>string</meta>
+    <definition>INBWFORMAT <meta>string</meta>
     </definition>
 
     <description xmlns="http://www.w3.org/1999/xhtml">
@@ -30,10 +28,7 @@
 
     <examples>
         <example><caption>Providing more information in the bwlabel</caption>
-
-            <content>INBWFORMAT {link:this:inpercent}% of
-            {link:this:max_bandwidth_in:%k}b/sec
-            </content>
+            <content>INBWFORMAT {link:this:inpercent}% of {link:this:max_bandwidth_in:%k}b/sec</content>
         </example>
     </examples>
 

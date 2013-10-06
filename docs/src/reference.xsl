@@ -59,7 +59,7 @@
 
             <xsl:for-each select = "./example">
                 <blockquote class = "example">
-                    <cite><xsl:value-of select = "./caption" /></cite>
+                    <small><cite><xsl:value-of select = "./caption" /></cite></small>
 
                     <pre>
 <xsl:value-of select="./content"/>
@@ -84,7 +84,9 @@
 
     <xsl:template match = "definition">
         <div class = "definition">
+        	<pre>
             <xsl:apply-templates />
+        	</pre>
         </div>
     </xsl:template>
 

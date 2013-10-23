@@ -358,8 +358,8 @@ function show_editor_startpage()
 	}
 
 	print '<div id="withjs">';
-	print '<div id="dlgStart" class="modal" ><div class="dlgTitlebar modal-header"><h3>';	
-	print 'Welcome to the Weathermap '.$WEATHERMAP_VERSION.' editor</h3>';
+	print '<div id="dlgStart" class="modal" ><div class="dlgTitlebar modal-header"><h2>';	
+	print 'Welcome to the Weathermap '.$WEATHERMAP_VERSION.' editor</h2>';
 	print '</div><div class="modal-body">';
 	
 	print '<form method="GET" class="form-inline">';
@@ -425,7 +425,7 @@ function show_editor_startpage()
 
 	print "<hr>";
 	
-	print '<form method="GET"  class="form-inline">';
+	print '<form method="GET"  class="form-inline" role="form">';
 	print '<input name="action" type="hidden" value="newmapcopy">';
 	print '<input name="plug" type="hidden" value="'.$fromplug.'">';
 	print '<div class="control-group"><label>or <strong>Create A New Map as a copy</strong> of an existing map, named:</label>';

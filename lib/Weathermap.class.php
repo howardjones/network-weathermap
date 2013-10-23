@@ -617,6 +617,7 @@ class WeatherMap extends WeatherMapBase
     var $colourtable = array();
     var $fonts = array();
     var $warncount = 0;
+    var $jsincludes = array();
 
         
     // new version of config_keywords
@@ -683,6 +684,11 @@ var $config_keywords = array (
             'GLOBAL',
             '/^HTMLSTYLESHEET\s+(.*)\s*$/i',
             array ('htmlstylesheet' => 1)
+        ),),
+        'HTMLJSINCLUDE' => array (array (
+                'GLOBAL',
+                '/^HTMLJSINCLUDE\s+(.*)\s*$/i',
+                array ('jsincludes+' => 1)
         ),),
         'HTMLOUTPUTFILE' => array (array (
             'GLOBAL',
@@ -3554,6 +3560,10 @@ function ReadConfig($input, $is_include=FALSE)
                                             $index = constant($m[2]);
                                             $key = $m[1];
                                             $curobj->{$key}[$index] = $val;
+                                        } elseif (substr($key,-1,1) == "+") {
+                                            // if the key ends in a plus, it's an array we should append to
+                                            $key = substr($key,0,-1);
+                                            array_push($curobj->$key, $val);
                                         } else {
                                             // otherwise, it's just the name of a property on the
                                             // appropriate object.
@@ -5042,7 +5052,7 @@ function MakeHTML($imagemapname = "weathermap_imap")
 	$html .= '</div>';
 
 	$html .= $this->SortedImagemap($imagemapname);
-
+	
 	return ($html);
 }
 

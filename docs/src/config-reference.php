@@ -1549,7 +1549,7 @@
       <small>
         <cite>Providing more information in the bwlabel</cite>
       </small>
-      <pre>INBWFORMAT {link:this:inpercent}% of{link:this:max_bandwidth_in:%k}b/sec</pre>
+      <pre>INBWFORMAT {link:this:inpercent}% of {link:this:max_bandwidth_in:%k}b/sec</pre>
     </blockquote>
   </div>
   <div class="changes">

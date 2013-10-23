@@ -1812,9 +1812,14 @@ class WMColour
         return false;
     }
     
-    // TODO - take this colour, and that colour, and make a new one in the ratio given
+    // take this colour, and that colour, and make a new one in the ratio given
     function linterp_with($c2, $ratio)
     {
+        $r = $this->r + ($c2->r - $this->r) * $ratio;
+        $g = $this->g + ($c2->g - $this->g) * $ratio;
+        $b = $this->b + ($c2->b - $this->b) * $ratio;
+    
+        return new WMColour($r,$g,$b);
     }
     
     // Is this a transparent/none colour?

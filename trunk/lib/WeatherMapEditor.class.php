@@ -110,7 +110,7 @@ class WeatherMapEditor {
     	$affected_nodes = array();
     	$affected_links = array();
     	
-    	
+    	// TODO - lots of work in this, to move VIAs etc.
     	
     	return array($n_nodes, $n_links, $affected_nodes, $affected_links);
     }

@@ -460,8 +460,8 @@ class WeatherMapDataSource_rrd extends WeatherMapDataSource {
 
 		$multiplier = 8; // default bytes-to-bits
 
-		$inbw = NULL;
-		$outbw = NULL;
+		# $inbw = NULL;
+		# $outbw = NULL;
 		$data_time = 0;
 
 		if(1 === preg_match("/^(.*\.rrd):([\-a-zA-Z0-9_]+):([\-a-zA-Z0-9_]+)$/",$targetstring,$matches))

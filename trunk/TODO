@@ -1,3 +1,6 @@
+Editor: Cloning a node loses the template
+Editor: re-tidy should know that a-b is the same as b-a
+
 r512 - last performance-related commit
 r529 - last commit before 0.98 rollback
 r443 - 0.97a

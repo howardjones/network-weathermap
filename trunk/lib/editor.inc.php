@@ -459,16 +459,24 @@ function get_fontlist(&$map,$name,$current)
     return($output);
 }
 
-function range_overlaps ($a_min,$a_max, $b_min, $b_max)
+function range_overlaps($a_min, $a_max, $b_min, $b_max)
 {
-    if($a_min > $b_max) {
-	return false;
+    if ($a_min > $b_max) {
+        return false;
     }
-    if($b_min > $a_max) {
-	return false;
+    if ($b_min > $a_max) {
+        return false;
     }
-            
+    
     return true;
+}
+
+function common_range ($a_min,$a_max, $b_min, $b_max)
+{
+    $min_overlap = max($a_min, $b_min);
+    $max_overlap = min($a_max, $b_max);
+    
+    return array($min_overlap,$max_overlap);
 }
 
 /* distance - find the distance between two points
@@ -481,18 +489,31 @@ function distance ($ax,$ay, $bx,$by)
     return sqrt( $dx*$dx + $dy*$dy );
 }
 
+function tidy_links($map,$targets)
+{
+    // not very efficient, but it saves looking for special cases (a->b & b->a together)
+    $ntargets = count($targets);
+
+    $i = 1;
+    foreach ($targets as $target) {
+        tidy_link($map, $target, $i, $ntargets);
+        $i++;
+    }    
+}
+
+
 /**
  * tidy_link - change link offsets so that link is horizonal or vertical, if possible.
  *             if not possible, change offsets to the closest facing compass points
  */
-function tidy_link($map,$target)
+function tidy_link($map,$target, $linknumber=1, $linktotal=1)
 {
     // print "\n-----------------------------------\nTidying $target...\n";
     if(isset($map->links[$target]) and isset($map->links[$target]->a) ) {
                         
         $node_a = $map->links[$target]->a;
         $node_b = $map->links[$target]->b;
-        
+               
         $new_a_offset = "0:0";
         $new_b_offset = "0:0";
         
@@ -525,17 +546,13 @@ function tidy_link($map,$target)
             }
             
             // this should be true whichever way around they are
-            $min_overlap = max($bb_a[1], $bb_b[1]);
-            $max_overlap = min($bb_a[3], $bb_b[3]);
+            list($min_overlap,$max_overlap) = common_range($bb_a[1],$bb_a[3],$bb_b[1],$bb_b[3]);
             $overlap = $max_overlap - $min_overlap;
-            $n = $overlap/2;
+            $n = $overlap/($linktotal+1);
             
-            $a_y_offset = $min_overlap + $n - $node_a->y;
-            $b_y_offset = $min_overlap + $n - $node_b->y;
-            
-            // print "New offsets are $a_y_offset, $b_y_offset\n";                    
-            // print "N is $n (overlap was $overlap)\n";
-            
+            $a_y_offset = $min_overlap + ($linknumber*$n) - $node_a->y;
+            $b_y_offset = $min_overlap + ($linknumber*$n) - $node_b->y;
+         
             $new_a_offset = sprintf("%d:%d", $a_x_offset,$a_y_offset);
             $new_b_offset = sprintf("%d:%d", $b_x_offset,$b_y_offset);
         }			
@@ -554,26 +571,53 @@ function tidy_link($map,$target)
                 $b_y_offset = $bb_b[3] - $node_b->y;
             }
             
-            $min_overlap = max($bb_a[0], $bb_b[0]);
-            $max_overlap = min($bb_a[2], $bb_b[2]);
+            list($min_overlap,$max_overlap) = common_range($bb_a[0],$bb_a[2],$bb_b[0],$bb_b[2]);
             $overlap = $max_overlap - $min_overlap;
-            $n = $overlap/2;
+            $n = $overlap/($linktotal+1);
             
             // move the X coord to the centre of the overlapping area
-            $a_x_offset = $min_overlap + $n - $node_a->x;
-            $b_x_offset = $min_overlap + $n - $node_b->x;
+            $a_x_offset = $min_overlap + ($linknumber*$n) - $node_a->x;
+            $b_x_offset = $min_overlap + ($linknumber*$n) - $node_b->x;
                 
-            // print "N is $n (overlap was $overlap)\n";                    
-            // print "New offsets are $a_y_offset, $b_y_offset\n";
-                                
             $new_a_offset = sprintf("%d:%d", $a_x_offset,$a_y_offset);
             $new_b_offset = sprintf("%d:%d", $b_x_offset,$b_y_offset);
+            
+            
         }			
+        
+        // if no common coordinates, figure out the best diagonal...
+        if ( !$y_overlap && !$x_overlap ) {
+            
+            $pt_a = new WMPoint($node_a->x, $node_a->y);
+            $pt_b = new WMPoint($node_b->x, $node_b->y);
+           
+            
+            $line = new WMLineSegment($pt_a, $pt_b);
+            
+            $tangent = $line->vector;
+            $tangent->normalise();
+            
+            $normal = $tangent->get_normal();
+            
+            $pt_a->AddVector( $normal, 15 * ($linknumber-1) );
+            $pt_b->AddVector( $normal, 15 * ($linknumber-1) );
+            
+            $a_x_offset = $pt_a->x - $node_a->x;
+            $a_y_offset = $pt_a->y - $node_a->y;
+            
+            $b_x_offset = $pt_b->x - $node_b->x;
+            $b_y_offset = $pt_b->y - $node_b->y;
+            
+            $new_a_offset = sprintf("%d:%d", $a_x_offset,$a_y_offset);
+            $new_b_offset = sprintf("%d:%d", $b_x_offset,$b_y_offset);
+                        
+            
+        }
         
         // if no common coordinates, figure out the best diagonal...
         // currently - brute force search the compass points for the shortest distance
         // potentially - intersect link line with rectangles to get exact crossing point
-        if ( !$y_overlap && !$x_overlap ) {
+        if ( 1==0 && !$y_overlap && !$x_overlap ) {
             // print "DIAGONAL\n";
             
             $corners = array("NE","E","SE","S","SW","W","NW","N");
@@ -615,6 +659,45 @@ function tidy_link($map,$target)
         // finally, update the offsets
         $map->links[$target]->a_offset = $new_a_offset;
         $map->links[$target]->b_offset = $new_b_offset;
+        // and also add a note that this link was tidied, and is eligible for automatic tidying
+        $map->links[$target]->add_hint("_tidied",1);
+    }
+}
+
+
+function retidy_links($map)
+{
+    $routes = array();
+    $done = array();
+
+    foreach ($map->links as $link)
+    {
+        $route = $link->a->name . " " . $link->b->name;
+        if(strcmp( $link->a->name, $link->b->name) > 0) {
+            $route = $link->b->name . " " . $link->a->name;
+        }
+        $routes[$route][] = $link->name;
+    }
+    
+    foreach ($map->links as $link)
+    {
+        $route = $link->a->name . " " . $link->b->name;
+        if(strcmp( $link->a->name, $link->b->name) > 0) {
+            $route = $link->b->name . " " . $link->a->name;
+        }
+        
+        if($link->get_hint("_tidied")==1 && $done[$route]==0) {
+        
+            if(sizeof($routes[$route]) == 1) {
+                    tidy_link($map,$link->name);
+                    $done[$route] = 1;
+            } else {
+                # handle multi-links specially... 
+                tidy_links($map,$routes[$route]);
+                // mark it so we don't do it again when the other links come by
+                $done[$route] = 1;                
+            }
+        }
     }
 }
 

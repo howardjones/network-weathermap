@@ -191,9 +191,9 @@ function imageroundedrectangle($image, $x1, $y1, $x2, $y2, $radius, $color)
 function imagecreatefromfile($filename)
 {
     $bgimage = NULL;
-    $formats = imagetypes ();
+
     if (is_readable ( $filename )) {
-        list ( $width, $height, $type, $attr ) = getimagesize ( $filename );
+        list ( , , $type, ) = getimagesize ( $filename );
         switch ($type) {
             case IMAGETYPE_GIF :
                 if (imagetypes () & IMG_GIF) {
@@ -825,7 +825,7 @@ function draw_straight($image, &$curvepoints, $widths, $outlinecolour, $fillcolo
             $ay4 = $pre_mid_y - $arrowwidth [$dir] * $any;
             
             $simple = simplify_spine ( $spine [$dir] );
-            $newn = count ( $simple );
+            # $newn = count ( $simple );
             
             // now do the actual drawing....
             
@@ -1151,8 +1151,8 @@ function simplify_spine(&$input, $epsilon = 1e-10)
     $skip = 0;
     
     for($n = 1; $n <= $c; $n ++) {
-        $x = $input [$n] [X];
-        $y = $input [$n] [Y];
+        # $x = $input [$n] [X];
+        # $y = $input [$n] [Y];
         
         // figure out the area of the triangle formed by this point, and the one before and after
         $a = abs ( $input [$n - 1] [X] * ($input [$n] [Y] - $input [$n + 1] [Y]) + $input [$n] [X] * ($input [$n + 1] [Y] - $input [$n - 1] [Y]) + $input [$n + 1] [X] * ($input [$n - 1] [Y] - $input [$n] [Y]) );
@@ -1618,6 +1618,14 @@ class WMPoint
         return $v;
     }
 
+    function LineTo($p2)
+    {
+        $l = new WMLine ( $this->x, $this->y, $p2->x, $p2->y );
+        
+        return $l;
+    }
+
+    
     function DistanceToLine($l)
     {
         // TODO: Implement this
@@ -1643,6 +1651,11 @@ class WMPoint
         
         $this->x = $this->x + $fraction * $v->dx;
         $this->y = $this->y + $fraction * $v->dy;
+    }
+    
+    function as_string()
+    {
+        return sprintf("(%f,%f)", $this->x, $this->y);
     }
 }
 
@@ -1720,6 +1733,45 @@ class WMVector
     function length()
     {
         return (sqrt ( $this->slength () ));
+    }
+    
+    function as_string()
+    {
+        return sprintf("[%f,%f]", $this->dx, $this->dy);
+    }
+}
+
+class WMRectangle
+{
+    var $topleft;
+    var $bottomright;
+
+    function WMRectangle($x1,$y1, $x2, $y2)
+    {
+        if($x2<$x1) {
+            $tmp = $x1;
+            $x1 = $x2;
+            $x2 = $tmp;
+        }
+        
+        if($y2<$y1) {
+            $tmp = $y1;
+            $y1 = $y2;
+            $y2 = $tmp;
+        }
+        
+        $topleft = new WMPoint($x1,$y1);
+        $bottomright = new WMPoint($x2,$y2);
+    }
+    
+    function width() 
+    {
+        return ($this->bottomright->x - $this->topleft->x);
+    }
+    
+    function height() 
+    {
+        return ($this->bottomright->y - $this->topleft->y);
     }
 }
 
@@ -2065,7 +2117,7 @@ function TestOutput_RunTest($conffile, $imagefile, $htmlfile, $newconffile, $cov
             $map->LoadCoverage ( $coveragefile );
         }
     }
-    $weathermap_map = $conffile;
+    # $weathermap_map = $conffile;
     $map->ReadConfig ( $conffile );
     $skip = 0;
     $nwarns = 0;

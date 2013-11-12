@@ -13,6 +13,7 @@
     ADDED - new wmdata: datasource plugin can read data from files produced by DATAOUTPUTFILE
     ADDED - AICONFILLCOLOR accepts 'none' for drawing giant transparent shapes.
     ADDED - Editor 'tidy link' function replaces Vert & Horiz, and does much nicer job
+	ADDED - 'retidy' option in editor to recalculate all links previously positioned with 'tidy'.
     ADDED - Named offsets. You can define a position relative to a node, give it a name, and use that name for POSITION and NODES. Think switch ports.
     ADDED - KEYBGCOLOR and KEYOUTLINECOLOR both accept 'none'
     ADDED - Some developer documentation - both code documentation and dev/release process docs.

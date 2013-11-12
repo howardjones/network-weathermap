@@ -465,6 +465,7 @@ class WeatherMapBase
 	var $notes = array();
 	var $hints = array();
 	var $imap_areas = array();
+	var $config = array();
 
 	var $inherit_fieldlist;
 
@@ -4322,20 +4323,20 @@ function WriteConfig($filename)
 		}
 
 		
-		
-		// TODO - These should replace the stuff above
-		$output .= "# new colourtable stuff (duplicated above right now TODO)\n";
-		foreach ($this->colourtable as $k=>$c) {
-		#	$output .= sprintf("%sCOLOR %s\n", $k, $c->as_config());
-		}
-		$output .= "\n";
-		
-		foreach ($this->scales as $k=>$s) {
-		#	$output .= $s->WriteConfig();
-		}
-		
-		$output .= "\n";
-
+		if(1==0) {
+            // TODO - These should replace the stuff above
+            $output .= "# new colourtable stuff (duplicated above right now TODO)\n";
+            foreach ($this->colourtable as $k=>$c) {
+            #	$output .= sprintf("%sCOLOR %s\n", $k, $c->as_config());
+            }
+            $output .= "\n";
+            
+            foreach ($this->scales as $k=>$s) {
+            #	$output .= $s->WriteConfig();
+            }
+            
+            $output .= "\n";
+        }
 		
 		
 		
@@ -4462,6 +4463,7 @@ function DrawMap($filename = '', $thumbnailfile = '', $thumbnailmax = 250, $with
 
         if($testmode == 1) {
             $maptime = 1270813792;
+	    date_default_timezone_set('UTC');
         } else {
             $maptime = time();
         }

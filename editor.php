@@ -808,6 +808,17 @@ else
 	    }
 	    break;
 
+	case "retidy":
+	    $map->ReadConfig($mapfile);
+	    
+	    // draw a map and throw it away, to calculate all the bounding boxes
+	    $map->DrawMap('null');
+	    retidy_links($map);
+	    
+	    $map->WriteConfig($mapfile);
+	     
+	    break;
+	    
 	case "delete_link":
 		$map->ReadConfig($mapfile);
 
@@ -1021,7 +1032,11 @@ else
 	  src="<?php echo $imageurl; ?>" id="xycapture" /><img src=
 	  "<?php echo $imageurl; ?>" id="existingdata" alt="Weathermap" usemap="#weathermap_imap"
 	   />
-	   <div class="debug"><p><strong>Debug:</strong> <a href="?<?php echo ($fromplug==TRUE ? 'plug=1&amp;' : ''); ?>action=nothing&amp;mapname=<?php echo  htmlspecialchars($mapname) ?>">Do Nothing</a> 
+	   <div class="debug"><p><strong>Debug:</strong>
+	   
+	   <a href="?<?php echo ($fromplug==TRUE ? 'plug=1&amp;' : ''); ?>action=retidy&amp;mapname=<?php echo  htmlspecialchars($mapname) ?>">Re-tidy</a> 
+	   
+	    <a href="?<?php echo ($fromplug==TRUE ? 'plug=1&amp;' : ''); ?>action=nothing&amp;mapname=<?php echo  htmlspecialchars($mapname) ?>">Do Nothing</a> 
 	   <span><label for="mapname">mapfile</label><input type="text" name="mapname" value="<?php echo htmlspecialchars($mapname); ?>" /></span>
 	   <span><label for="action">action</label><input type="text" id="action" name="action" value="<?php echo htmlspecialchars($newaction); ?>" /></span>
 	  <span><label for="param">param</label><input type="text" name="param" id="param" value="" /></span>
@@ -1029,6 +1044,7 @@ else
 	  <span><label for="debug">debug</label><input id="debug" value="" name="debug" /></span> 
 	  <a target="configwindow" href="?<?php echo ($fromplug==TRUE ? 'plug=1&amp;':''); ?>action=show_config&amp;mapname=<?php echo  urlencode($mapname) ?>">See config</a></p>
 	<pre><?php echo  htmlspecialchars($log) ?></pre>
+	
 	  </div>
 <?php        	
 	// we need to draw and throw away a map, to get the

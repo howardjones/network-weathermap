@@ -629,8 +629,8 @@ class WeatherMap extends WeatherMapBase
 var $config_keywords = array (
     'GLOBAL' => array (
         'FONTDEFINE' => array(
-            array('GLOBAL',"/^\s*FONTDEFINE\s+(\d+)\s+(\S+)\s+(\d+)\s*$/i",'ReadConfig_Handle_FONTDEFINE'),
-            array('GLOBAL',"/^\s*FONTDEFINE\s+(\d+)\s+(\S+)\s*$/i",'ReadConfig_Handle_FONTDEFINE'),
+            array('GLOBAL','/^\s*FONTDEFINE\s+(\d+)\s+(\S+)\s+(\d+)\s*$/i','ReadConfig_Handle_FONTDEFINE'),
+            array('GLOBAL','/^\s*FONTDEFINE\s+(\d+)\s+(\S+)\s*$/i','ReadConfig_Handle_FONTDEFINE'),
         ),
         'KEYOUTLINECOLOR' => array (
             array (
@@ -748,12 +748,12 @@ var $config_keywords = array (
         ),),
         'WIDTH' => array (array (
             'GLOBAL',
-            "/^WIDTH\s+(\d+)\s*$/i",
+            '/^WIDTH\s+(\d+)\s*$/i',
             array ('width' => 1)
         ),),
         'HEIGHT' => array (array (
             '(GLOBAL)',
-            "/^HEIGHT\s+(\d+)\s*$/i",
+            '/^HEIGHT\s+(\d+)\s*$/i',
             array ('height' => 1)
         ),),
         'TITLEPOS' => array (
@@ -937,14 +937,14 @@ var $config_keywords = array (
         ),
         'ORIGIN' => array(
             array('NODE', 
-                "/^ORIGIN\s+(C|NE|SE|NW|SW|N|S|E|W)/i",
+                '/^ORIGIN\s+(C|NE|SE|NW|SW|N|S|E|W)/i',
                 array("position_origin" => 1)                
             )
         ),
         'POSITION' => array (
             array (
                 'NODE',
-                "/^POSITION\s+([-+]?\d+)\s+([-+]?\d+)\s*$/i",
+                '/^POSITION\s+([-+]?\d+)\s+([-+]?\d+)\s*$/i',
                 array (
                     'x' => 1,
                     'y' => 2
@@ -952,7 +952,7 @@ var $config_keywords = array (
             ),
             array (
                 'NODE',
-                "/^POSITION\s+(\S+)\s+([-+]?\d+)\s+([-+]?\d+)\s*$/i",
+                '/^POSITION\s+(\S+)\s+([-+]?\d+)\s+([-+]?\d+)\s*$/i',
                 array (
                     'x' => 2,
                     'y' => 3,
@@ -964,7 +964,7 @@ var $config_keywords = array (
             ),
             array (
                 'NODE',
-                "/^POSITION\s+(\S+)\s+([-+]?\d+)r(\d+)\s*$/i",
+                '/^POSITION\s+(\S+)\s+([-+]?\d+)r(\d+)\s*$/i',
                 array (
                     'x' => 2,
                     'y' => 3,
@@ -977,7 +977,7 @@ var $config_keywords = array (
             ),
             array ( # named offset
                 'NODE',
-                "/^POSITION\s+([A-Za-z][A-Za-z0-9\-_]*):([A-Za-z][A-Za-z0-9_]*)$/i",
+                '/^POSITION\s+([A-Za-z][A-Za-z0-9\-_]*):([A-Za-z][A-Za-z0-9_]*)$/i',
                 array (                    
                     'relative_to' => 1,
                     'relative_name' => 2,
@@ -1012,17 +1012,17 @@ var $config_keywords = array (
         ),),
         'ZORDER' => array (array (
             'NODE',
-            "/^ZORDER\s+([-+]?\d+)\s*$/i",
+            '/^ZORDER\s+([-+]?\d+)\s*$/i',
             array ('zorder' => 1)
         ),),
         'OVERLIBHEIGHT' => array (array (
             'NODE',
-            "/^OVERLIBHEIGHT\s+(\d+)\s*$/i",
+            '/^OVERLIBHEIGHT\s+(\d+)\s*$/i',
             array ('overlibheight' => 1)
         ),),
         'OVERLIBWIDTH' => array (array (
             'NODE',
-            "/^OVERLIBWIDTH\s+(\d+)\s*$/i",
+            '/^OVERLIBWIDTH\s+(\d+)\s*$/i',
             array ('overlibwidth' => 1)
         ),),
         'LABELFONT' => array (array (
@@ -1072,12 +1072,12 @@ var $config_keywords = array (
         'LABEL' => array (
             array (
                 'NODE',
-                "/^LABEL\s*$/i",
+                '/^LABEL\s*$/i',
                 array ('label' => '')
             ), # special case for blank labels
             array (
                 'NODE',
-                "/^LABEL\s+(.*)\s*$/i",
+                '/^LABEL\s+(.*)\s*$/i',
                 array ('label' => 1)
             ),
         ),
@@ -1107,13 +1107,13 @@ var $config_keywords = array (
             ),
         ),
         'USESCALE' => array(
-            array('NODE', "/^(USESCALE)\s+([A-Za-z][A-Za-z0-9_]*)(\s+(in|out))?(\s+(absolute|percent))?\s*$/i","ReadConfig_Handle_NODE_USESCALE"),
+            array('NODE', '/^(USESCALE)\s+([A-Za-z][A-Za-z0-9_]*)(\s+(in|out))?(\s+(absolute|percent))?\s*$/i',"ReadConfig_Handle_NODE_USESCALE"),
         ),
         'USEICONSCALE' => array(
-            array('NODE', "/^(USEICONSCALE)\s+([A-Za-z][A-Za-z0-9_]*)(\s+(in|out))?(\s+(absolute|percent))?\s*$/i","ReadConfig_Handle_NODE_USESCALE"),
+            array('NODE', '/^(USEICONSCALE)\s+([A-Za-z][A-Za-z0-9_]*)(\s+(in|out))?(\s+(absolute|percent))?\s*$/i',"ReadConfig_Handle_NODE_USESCALE"),
         ),
         'OVERLIBGRAPH' => array(
-            array('NODE',"/^OVERLIBGRAPH\s+(.+)$/i","ReadConfig_Handle_OVERLIB")
+            array('NODE','/^OVERLIBGRAPH\s+(.+)$/i',"ReadConfig_Handle_OVERLIB")
         ),
 
     ), // end of node
@@ -1220,12 +1220,12 @@ var $config_keywords = array (
         'WIDTH' => array (
             array (
                 'LINK',
-                "/^WIDTH\s+(\d+)\s*$/i",
+                '/^WIDTH\s+(\d+)\s*$/i',
                 array ('width' => 1)
             ),
             array (
                 'LINK',
-                "/^WIDTH\s+(\d+\.\d+)\s*$/i",
+                '/^WIDTH\s+(\d+\.\d+)\s*$/i',
                 array ('width' => 1)
             ),
         ),
@@ -1292,13 +1292,13 @@ var $config_keywords = array (
         ),),
 
         'OVERLIBGRAPH' => array(
-            array('LINK',"/^OVERLIBGRAPH\s+(.+)$/i","ReadConfig_Handle_OVERLIB")
+            array('LINK','/^OVERLIBGRAPH\s+(.+)$/i',"ReadConfig_Handle_OVERLIB")
         ),
         'INOVERLIBGRAPH' => array(
-            array('LINK',"/^INOVERLIBGRAPH\s+(.+)$/i","ReadConfig_Handle_OVERLIB")
+            array('LINK','/^INOVERLIBGRAPH\s+(.+)$/i',"ReadConfig_Handle_OVERLIB")
         ),
         'OUTOVERLIBGRAPH' => array(
-            array('LINK',"/^OUTOVERLIBGRAPH\s+(.+)$/i","ReadConfig_Handle_OVERLIB")
+            array('LINK','/^OUTOVERLIBGRAPH\s+(.+)$/i',"ReadConfig_Handle_OVERLIB")
         ),
 
         'USESCALE' => array (
@@ -1408,17 +1408,17 @@ var $config_keywords = array (
         ),),
         'ZORDER' => array (array (
             'LINK',
-            "/^ZORDER\s+([-+]?\d+)\s*$/i",
+            '/^ZORDER\s+([-+]?\d+)\s*$/i',
             array ('zorder' => 1)
         ),),
         'OVERLIBWIDTH' => array (array (
             'LINK',
-            "/^OVERLIBWIDTH\s+(\d+)\s*$/i",
+            '/^OVERLIBWIDTH\s+(\d+)\s*$/i',
             array ('overlibwidth' => 1)
         ),),
         'OVERLIBHEIGHT' => array (array (
             'LINK',
-            "/^OVERLIBHEIGHT\s+(\d+)\s*$/i",
+            '/^OVERLIBHEIGHT\s+(\d+)\s*$/i',
             array ('overlibheight' => 1)
         ),),
     ) // end of link
@@ -1727,14 +1727,14 @@ var $config_keywords = array (
 		
 		$output = $input;
 		
-		while( preg_match("/(\{(?:node|map|link)[^}]+\})/",$input,$matches) )
+		while( preg_match('/(\{(?:node|map|link)[^}]+\})/',$input,$matches) )
 		{
 			$value = "[UNKNOWN]";
 			$format = "";
 			$key = $matches[1];
 		//	wm_debug("ProcessString: working on ".$key."\n");
 
-			if ( preg_match("/\{(node|map|link):([^}]+)\}/",$key,$matches) )
+			if ( preg_match('/\{(node|map|link):([^}]+)\}/',$key,$matches) )
 			{
 				$type = $matches[1];
 				$args = $matches[2];
@@ -1742,7 +1742,7 @@ var $config_keywords = array (
 				if($type == 'map')
 				{
 					$the_item = $this;
-					if(preg_match("/map:([^:]+):*([^:]*)/",$args,$matches))
+					if(preg_match('/map:([^:]+):*([^:]*)/',$args,$matches))
 					{
 						$args = $matches[1];
 						$format = $matches[2];

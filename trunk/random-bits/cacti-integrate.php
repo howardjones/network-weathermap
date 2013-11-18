@@ -7,7 +7,7 @@
  * See http://forums.cacti.net/about26544.html for more info
  *
  */
-$cacti_root = '/var/www/html/cacti/';
+$cacti_root = '/var/www/html';
 
 if (!file_exists($cacti_root . "/include/config.php")) {
     $cacti_root = "../../..";
@@ -22,7 +22,7 @@ ini_set('include_path',
     ini_get('include_path') . PATH_SEPARATOR . $cacti_root . PATH_SEPARATOR . $cacti_root . '/plugins/weathermap'
     . PATH_SEPARATOR . $cacti_root . '/plugins/weathermap/random-bits');
 
-require_once 'Weathermap.class.php';
+require_once 'lib/Weathermap.class.php';
 require_once 'Console/Getopt.php';
 
 include_once 'include/global.php';
@@ -31,7 +31,7 @@ include_once 'include/config.php';
 $cacti_base = $cacti_root;
 $cacti_url = $config['url_path'];
 
-include_once 'editor-config.php';
+# include_once 'editor-config.php';
 
 // adjust width of link based on bandwidth.
 // NOTE: These are bands - the value has to be up to or including the value in the list to match
@@ -42,9 +42,11 @@ $width_map = array (
     '99999999' => '2',    // 10-100meg
     '100000000' => '4',   // 100meg
     '999999999' => '4',   // 100meg-1gig
-    '1000000000' => '6',  // 1gig
-    '9999999999' => '6',  // 1gig-10gig
-    '10000000000' => '8', // 10gig
+    '1000000000' => '5',  // 1gig
+    '3999999999' => '5',  // 1gig-4gig
+    '4000000000' => '6',  // 4gig
+    '9999999999' => '7',  // 4gig-10gig
+    '10000000000' => '7', // 10gig
     '99999999999' => '8'  // 10gig-100gig
 );
 
@@ -72,11 +74,14 @@ $map_widths = false;
 
 // set this to true to use DSStats targets instead of RRD file targets
 $use_dsstats = false;
+$use_host_target = true;
+$use_fc_hack = false;
 
 $overwrite_targets = false;
 
 $outputmapfile = "";
 $inputmapfile = "";
+$mappingsfile = "";
 
 // initialize object
 $cg = new Console_Getopt();
@@ -85,10 +90,13 @@ $long_opts = array (
     "help",
     "input=",
     "output=",
+    "manual-mappings=",
+    "fc-hack",
     "debug",
     "target-dsstats",
     "target-rrdtool",
     "overwrite-targets",
+    "no-host-target",
     "speed-width-map"
 );
 
@@ -123,6 +131,10 @@ if (sizeof($gopts) > 0) {
                 $use_dsstats = true;
                 break;
 
+            case '--fc-hack':
+                $use_fc_hack = true;
+                break;
+
             case '--target-rrdtool':
                 $use_dsstats = false;
                 break;
@@ -135,10 +147,18 @@ if (sizeof($gopts) > 0) {
                 $inputmapfile = $o[1];
                 break;
 
+            case '--manual-mappings':
+                $mappingsfile = $o[1];
+                break;
+                
+            case '--no-host-target':
+                $use_host_target = false;
+                break;
+
             case '--help':
                 print "cacti-integrate.php\n";
                 print
-                    "Copyright Howard Jones, 2008-2010 howie@thingy.com\nReleased under the GNU Public License\nhttp://www.network-weathermap.com/\n\n";
+                    "Copyright Howard Jones, 2008-2013 howie@thingy.com\nReleased under the GNU Public License\nhttp://www.network-weathermap.com/\n\n";
 
                 print "Usage: php cacti-integrate.php [options]\n\n";
 
@@ -146,6 +166,10 @@ if (sizeof($gopts) > 0) {
                 print " --output {filename}     -  write new config to this file\n";
                 print " --target-rrdtool        -  generate rrd file targets (default)\n";
                 print " --target-dsstats        -  generate DSStats targets\n";
+                print " --no-host-target        - don't generate cactimonitor: targets for hosts\n";
+                print " --speed-width-map       - modify link WIDTH based on ifSpeed\n";
+                print " --fc-hack               - enable special treatment for FibreChannel\n";
+                print " --manual-mappings {filename}\n                         - add extra datasource hints.\n";
                 print " --debug                 -  enable debugging\n";
                 print " --help                  -  show this help\n";
 
@@ -158,6 +182,27 @@ if (sizeof($gopts) > 0) {
 if ($inputmapfile == '' || $outputmapfile == '') {
     print "You MUST specify an input and output file. See --help\n";
     exit();
+}
+
+//
+// Read a file of additional mappings. Useful if you are using some strange
+// data template, and especially if the device doesn't report port names usefully. *cough* Brocade
+//
+$manual_ds = array();
+$manual_rrd = array();
+
+if ($mappingsfile != "") {
+
+    $fd = fopen($mappingsfile,"ra");
+    while(!feof($fd)) {
+        $line = fgets($fd,2000);
+        $parts = explode("\t",$line);
+    
+        $manual_ds[$parts[0]][$parts[1]] = $parts[2];
+        $manual_rrd[$parts[0]][$parts[1]] = $parts[3];
+    
+    }
+    fclose($fd);
 }
 
 // figure out which template has interface traffic. This might be wrong for you.
@@ -234,7 +279,7 @@ foreach ($map->nodes as $node) {
         }
     }
 
-    if ($host_id != '') {
+    if ( $use_host_target && $host_id != '') {
         $info = $config['base_url'] . "host.php?id=" . $host_id;
         $tgt = "cactimonitor:$host_id";
         $map->nodes[$node->name]->targets = array (array (
@@ -281,7 +326,8 @@ foreach ($map->links as $link) {
                 print "  We'll use the A end.\n";
                 $tgt_interface = $int_out;
                 $tgt_host = $a_id;
-                $ds_names = ":traffic_in:traffic_out";
+               # $ds_names = ":traffic_in:traffic_out";
+                $ds_names = "";
             } elseif ($b_id > 0 && $int_in != '') {
                 print "  We'll use the B end and reverse it.\n";
                 $tgt_interface = $int_in;
@@ -297,6 +343,9 @@ foreach ($map->links as $link) {
                 $total_target = array ();
 
                 foreach ($int_list as $interface) {
+                    $tgt = "";
+                    $snmp_index = "";
+                    
                     print "  Interface: $interface\n";
 
                     foreach (array (
@@ -321,8 +370,29 @@ foreach ($map->links as $link) {
                         $snmp_index = $res4['snmp_index'];
                         $tgt = str_replace("<path_rra>", $config["rra_path"], $target);
                         $tgt = $tgt . $ds_names;
+                    } else {
+                        
+                        if( isset($manual_ds[$tgt_host][$interface])) {
+                            
+                            $tgt = $manual_rrd[$tgt_host][$interface];
+                            $local_data_id = $manual_ds[$tgt_host][$interface];
+                        }
+                    }
+                    
+                    if($tgt != "") {
 
-                        if ($use_dsstats) {
+                        $map->links[$name]->add_hint("ds_id", $local_data_id);
+                                                
+                        if($use_fc_hack) {
+                            // Special case - if the host has _is_brocade SET to 1, assume this is a
+                            // Brocade FibreChannel fabric switch. Those count 32-bit words instead of bytes, and have a funny
+                            // DS name
+                            if ( $map->nodes[$a]->get_hint("_is_brocade") == 1) {
+                                $tgt = "4*".$tgt.":swFCPortRxWords:swFCPortTxWords";
+                            }
+                        }
+                        
+                        if (!$use_dsstats) {
                             $map->links[$link->name]->targets[] = array (
                                 $tgt,
                                 '',
@@ -341,19 +411,21 @@ foreach ($map->links as $link) {
                             );
                         }
 
-                        $SQL_speed =
-                            "select field_value from host_snmp_cache where field_name='ifSpeed' and host_id=$tgt_host and snmp_index=$snmp_index";
-                        $speed = db_fetch_cell($SQL_speed);
-
-                        $SQL_hspeed =
-                            "select field_value from host_snmp_cache where field_name='ifHighSpeed' and host_id=$tgt_host and snmp_index=$snmp_index";
-                        $hspeed = db_fetch_cell($SQL_hspeed);
-
-                        if ($hspeed && intval($hspeed) > 20)
-                            $total_speed += ($hspeed * 1000000);
-                        else if ($speed)
-                            $total_speed += intval($speed);
-
+                        if($snmp_index != "") {
+                            $SQL_speed =
+                                "select field_value from host_snmp_cache where field_name='ifSpeed' and host_id=$tgt_host and snmp_index=$snmp_index";
+                            $speed = db_fetch_cell($SQL_speed);
+    
+                            $SQL_hspeed =
+                                "select field_value from host_snmp_cache where field_name='ifHighSpeed' and host_id=$tgt_host and snmp_index=$snmp_index";
+                            $hspeed = db_fetch_cell($SQL_hspeed);
+    
+                            if ($hspeed && intval($hspeed) > 20)
+                                $total_speed += ($hspeed * 1000000);
+                            else if ($speed)
+                                $total_speed += intval($speed);
+                        }
+                        
                         $SQL_graphid =
                             "select graph_templates_item.local_graph_id FROM graph_templates_item,graph_templates_graph,data_template_rrd where graph_templates_graph.local_graph_id = graph_templates_item.local_graph_id  and task_item_id=data_template_rrd.id and local_data_id=$local_data_id LIMIT 1;";
                         $graph_id = db_fetch_cell($SQL_graphid);
@@ -362,6 +434,8 @@ foreach ($map->links as $link) {
                             $overlib = sprintf($fmt_cacti_graph, $graph_id);
                             $infourl = sprintf($fmt_cacti_graphpage, $graph_id);
 
+                            $map->links[$name]->add_hint("graph_id", $graph_id);
+                            
                             print "    INFO $infourl\n";
                             print "    OVER $overlib\n";
                             $map->links[$name]->overliburl[IN][] = $overlib;
@@ -377,17 +451,19 @@ foreach ($map->links as $link) {
                 }
 
                 print "    SPEED $total_speed\n";
-                $map->links[$name]->max_bandwidth_in = $total_speed;
-                $map->links[$name]->max_bandwidth_out = $total_speed;
-                $map->links[$name]->max_bandwidth_in_cfg = nice_bandwidth($total_speed);
-                $map->links[$name]->max_bandwidth_out_cfg = nice_bandwidth($total_speed);
-
-                if ($map_widths) {
-                    foreach ($width_map as $map_speed => $map_width) {
-                        if ($total_speed <= $map_speed) {
-                            $map->links[$name]->width = $width_map{$map_speed};
-                            print "    WIDTH " . $width_map{$map_speed}. "\n";
-                            continue 2;
+                if($total_speed > 0) {
+                    $map->links[$name]->max_bandwidth_in = $total_speed;
+                    $map->links[$name]->max_bandwidth_out = $total_speed;
+                    $map->links[$name]->max_bandwidth_in_cfg = wm_nice_bandwidth($total_speed);
+                    $map->links[$name]->max_bandwidth_out_cfg = wm_nice_bandwidth($total_speed);
+                                
+                    if ($map_widths) {
+                        foreach ($width_map as $map_speed => $map_width) {
+                            if ($total_speed <= $map_speed) {
+                                $map->links[$name]->width = $width_map{$map_speed};
+                                print "    WIDTH " . $width_map{$map_speed}. "\n";
+                                continue 2;
+                            }
                         }
                     }
                 }

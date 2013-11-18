@@ -5090,8 +5090,10 @@ function SortedImagemap($imagemapname)
                             			!= 'editor'));
                             }
                         }
-
-                        foreach($z_items as $it) {
+                        
+                        // we reverse the array for each zlayer so that the imagemap order
+                        // will match up with the draw order (last drawn should be first hit)
+                        foreach( array_reverse($z_items) as $it) {
                                 if($it->name != 'DEFAULT' && $it->name != ":: DEFAULT ::")
                                 {
                                         $name = "";

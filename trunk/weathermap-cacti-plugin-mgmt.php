@@ -302,7 +302,7 @@ case 'rebuildnow2':
 default:
 	require_once $config["base_path"]."/include/top_header.php";
 	weathermap_maplist();
-	// weathermap_maplist3();
+	# weathermap_maplist3();
 	
 	weathermap_footer_links();	
 	require_once $config["base_path"]."/include/bottom_footer.php";

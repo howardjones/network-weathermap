@@ -489,14 +489,14 @@ function distance ($ax,$ay, $bx,$by)
     return sqrt( $dx*$dx + $dy*$dy );
 }
 
-function tidy_links($map,$targets)
+function tidy_links($map,$targets, $ignore_tidied=FALSE)
 {
     // not very efficient, but it saves looking for special cases (a->b & b->a together)
     $ntargets = count($targets);
 
     $i = 1;
     foreach ($targets as $target) {
-        tidy_link($map, $target, $i, $ntargets);
+        tidy_link($map, $target, $i, $ntargets, $ignore_tidied);
         $i++;
     }    
 }
@@ -506,7 +506,7 @@ function tidy_links($map,$targets)
  * tidy_link - change link offsets so that link is horizonal or vertical, if possible.
  *             if not possible, change offsets to the closest facing compass points
  */
-function tidy_link($map,$target, $linknumber=1, $linktotal=1)
+function tidy_link($map,$target, $linknumber=1, $linktotal=1, $ignore_tidied=FALSE)
 {
     // print "\n-----------------------------------\nTidying $target...\n";
     if(isset($map->links[$target]) and isset($map->links[$target]->a) ) {
@@ -664,8 +664,16 @@ function tidy_link($map,$target, $linknumber=1, $linktotal=1)
     }
 }
 
+function untidy_links($map)
+{
+    foreach ($map->links as $link)
+    {
+        $link->a_offset = "C";
+        $link->b_offset = "C";
+    }
+}
 
-function retidy_links($map)
+function retidy_links($map, $ignore_tidied=FALSE)
 {
     $routes = array();
     $done = array();
@@ -686,7 +694,7 @@ function retidy_links($map)
             $route = $link->b->name . " " . $link->a->name;
         }
         
-        if($link->get_hint("_tidied")==1 && $done[$route]==0) {
+        if( ($ignore_tidied || $link->get_hint("_tidied")==1) && $done[$route]==0) {
         
             if(sizeof($routes[$route]) == 1) {
                     tidy_link($map,$link->name);

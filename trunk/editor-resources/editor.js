@@ -572,6 +572,12 @@ function show_node(name)
         {
             document.frmMain.node_iconfilename.value = '--NONE--';
         }  
+		
+		if(mynode.relative_to != '') {
+			document.frmMain.node_lock_to.value = mynode.relative_to;
+		} else {
+			document.frmMain.node_lock_to.value = "-- NONE --";
+		}
 
         // save this here, just in case they choose delete_node or move_node
         document.getElementById('param').value = mynode.name;

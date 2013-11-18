@@ -370,9 +370,24 @@ else
 		$urls = preg_split('/\s+/', $_REQUEST['node_hover'], -1, PREG_SPLIT_NO_EMPTY);
 		$map->nodes[$new_node_name]->overliburl[IN] = $urls;
 		$map->nodes[$new_node_name]->overliburl[OUT] = $urls;
-		
-		$map->nodes[$new_node_name]->x = intval($_REQUEST['node_x']);
+
+        $map->nodes[$new_node_name]->x = intval($_REQUEST['node_x']);
 		$map->nodes[$new_node_name]->y = intval($_REQUEST['node_y']);
+        
+        if($_REQUEST['node_lock_to'] == "-- NONE --") {
+            // handle case where we're moving from relative to not-relative
+            $map->nodes[$new_node_name]->relative_to = "";
+        } else {
+            $anchor = $_REQUEST['node_lock_to'];
+            $map->nodes[$new_node_name]->relative_to = $anchor;
+            
+            $dx = $map->nodes[$new_node_name]->x - $map->nodes[$anchor]->x;
+            $dy = $map->nodes[$new_node_name]->y - $map->nodes[$anchor]->y;
+            
+            $map->nodes[$new_node_name]->original_x = $dx;
+            $map->nodes[$new_node_name]->original_y = $dy;
+        }
+		
 
 		if($_REQUEST['node_iconfilename'] == '--NONE--')
 		{
@@ -818,7 +833,29 @@ else
 	    $map->WriteConfig($mapfile);
 	     
 	    break;
+	
+    case "retidy_all":
+	    $map->ReadConfig($mapfile);
 	    
+	    // draw a map and throw it away, to calculate all the bounding boxes
+	    $map->DrawMap('null');
+	    retidy_links($map,TRUE);
+	    
+	    $map->WriteConfig($mapfile);
+	     
+	    break;
+    
+    case "untidy":
+	    $map->ReadConfig($mapfile);
+	    
+	    // draw a map and throw it away, to calculate all the bounding boxes
+	    $map->DrawMap('null');
+	    untidy_links($map);
+	    
+	    $map->WriteConfig($mapfile);
+	     
+	    break;
+    
 	case "delete_link":
 		$map->ReadConfig($mapfile);
 
@@ -918,6 +955,10 @@ else
 		    $node = new WeatherMapNode;
 		    $node->Reset($map);
 		    $node->CopyFrom($map->nodes[$target]);
+		    
+		    # CopyFrom skips this one, because it's also the function used by template inheritance
+		    # - but for Clone, we DO want to copy the template too
+		    $node->template = $map->nodes[$target]->template;
     
 		    $node->name = $newnodename;
 		    $node->x += 30;
@@ -1033,8 +1074,9 @@ else
 	  "<?php echo $imageurl; ?>" id="existingdata" alt="Weathermap" usemap="#weathermap_imap"
 	   />
 	   <div class="debug"><p><strong>Debug:</strong>
-	   
+	   <a href="?<?php echo ($fromplug==TRUE ? 'plug=1&amp;' : ''); ?>action=retidy_all&amp;mapname=<?php echo  htmlspecialchars($mapname) ?>">Re-tidy ALL</a> 
 	   <a href="?<?php echo ($fromplug==TRUE ? 'plug=1&amp;' : ''); ?>action=retidy&amp;mapname=<?php echo  htmlspecialchars($mapname) ?>">Re-tidy</a> 
+       <a href="?<?php echo ($fromplug==TRUE ? 'plug=1&amp;' : ''); ?>action=untidy&amp;mapname=<?php echo  htmlspecialchars($mapname) ?>">Un-tidy</a> 
 	   
 	    <a href="?<?php echo ($fromplug==TRUE ? 'plug=1&amp;' : ''); ?>action=nothing&amp;mapname=<?php echo  htmlspecialchars($mapname) ?>">Do Nothing</a> 
 	   <span><label for="mapname">mapfile</label><input type="text" name="mapname" value="<?php echo htmlspecialchars($mapname); ?>" /></span>
@@ -1077,7 +1119,23 @@ else
 		<table>
 		<tr>
 			<th>Position</th>
-			<td><input id="node_x" name="node_x" size=4 type="text" />,<input id="node_y" name="node_y" size=4 type="text" /><span id="node_locktext"></span></td>
+			<td><input id="node_x" name="node_x" size=4 type="text" />,<input id="node_y" name="node_y" size=4 type="text" /><span id="node_locktext">          
+            <br />Lock to: <select name="node_lock_to" id="node_lock_to"><option>-- NONE --</option> <?php
+
+        $nodelist = array();
+
+        foreach ($map->nodes as $node) {
+                if($node->x >= 0) {
+                        $nodelist[] = $node->name;
+                }
+        }
+        sort($nodelist);
+        foreach ($nodelist as $node) {
+                print "<option>".htmlspecialchars($node)."</option>\n";
+        }
+?>
+</select>
+            </span></td>
 		</tr>
 		  <tr>
 			<th>Internal Name</th>

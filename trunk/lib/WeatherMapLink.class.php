@@ -369,6 +369,8 @@ class WeatherMapLink extends WeatherMapItem
 			$link_out_width = (($link_out_width * $this->outpercent * 1.5 + 0.1) / 100) + 1;
 		}
 
+        // XXX - there is no addArea here!!
+        
 		// If there are no vias, treat this as a 2-point angled link, not curved
 		if( $nvia==0 || $this->viastyle=='angled') {
 			// Calculate the spine points - the actual not a curve really, but we
@@ -775,7 +777,23 @@ class WeatherMapLink extends WeatherMapItem
 		$js.="commentposout:" . intval($this->commentoffset_out) . ", ";
 
 		$js.="infourl:" . js_escape($this->infourl[IN]) . ", ";
-		$js.="overliburl:" . js_escape(join(" ",$this->overliburl[IN]));
+		$js.="overliburl:" . js_escape(join(" ",$this->overliburl[IN])). ", ";
+        
+        $js .= "via: [";
+        $ii = 0;
+        foreach ($this->vialist as $via) {
+            if($ii>0) { $js .= ", "; }
+            $js .= sprintf("[%d,%d", $via[0],$via[1]);
+            if(isset($via[2])) {
+                $js .= ",".js_escape($via[2]);
+            }
+            $js .= "]";
+            
+            $ii++;
+        }
+        
+        $js .= "]";
+        
 		
 		$js.="};\n";
 		$js .= "LinkIDs[\"L" . $this->id . "\"] = ". js_escape($this->name) . ";\n";

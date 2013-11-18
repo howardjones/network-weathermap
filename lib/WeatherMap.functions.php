@@ -1131,6 +1131,7 @@ function draw_curve($image, &$curvepoints, $widths, $outlinecolour, $fillcolours
         $areaname = "LINK:L" . $map->links [$linkname]->id . ":$dir";
         $map->imap->addArea ( "Polygon", $areaname, '', $there_points );
         wm_debug ( "Adding Poly imagemap for $areaname\n" );
+        $map->links [$linkname]->imap_areas [] = $areaname;
         
         if (! is_null ( $outlinecolour )) {
             imagepolygon ( $image, $there_points, count ( $there_points ) / 2, $arrowsettings [$dir] [5] );

@@ -5,6 +5,8 @@
     FIXED - fixed up comments in dbplug datasource plugin to match reality
     FIXED - nowarn_WMxxxx actually works!
     FIXED - rounding error 'kinks' in angled VIA links
+    FIXED - Cloning a templated node in editor retains the template in the clone
+	FIXED - Imagemap sortorder problem in editor. If you can see it, you can click it.
     CHANGE - command-line weathermap has new --no-warn option to disable warnings
     CHANGE - new config parser is much faster than the previous one
     CHANGE - other performance improvements - possibly twice as quick as 0.97c (thanks to ikorzha758 for lots of feedback)
@@ -21,6 +23,8 @@
     ADDED - Weathermap will use anti-aliasing if your GD supports it (php-bundled GD doesn't) (thanks shd)
     ADDED - Special token formatting can handle timeticks and time_t formatting (%T and %t respectively)
     ADDED - Memory tracking and Cacti templates to track it
+    ADDED - Added some more options to cacti-integrate.php and updated for new file layout
+	ADDED - Facility to edit relative positioning in editor - this effectively gives a 'group' function
 
 0.97c - No code changes apart from path fixes, and ZIP file fixes.
 

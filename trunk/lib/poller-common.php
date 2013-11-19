@@ -416,7 +416,7 @@ function weathermap_run_maps($mydir, $map_id = -1)
 		
 		$duration = $end_time - $start_time;
 		
-		$stats_string = sprintf('%s: %d maps were run in %f seconds with %d warnings', date(DATE_RFC822),
+		$stats_string = sprintf('%s: %d maps were run in %.2f seconds with %d warnings', date(DATE_RFC822),
 				$mapcount, $duration, $total_warnings);
 		
 		if (true === function_exists("memory_get_peak_usage")) {

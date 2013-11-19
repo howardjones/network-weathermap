@@ -70,3 +70,4 @@ tr.fig, tr.fig td { border-top: 1px solid gray; }
 td.groupheader { background-color: #009; color: white; font-weight: bold; }
 
 
+.wm_expanded { height: 200px; border-left: 1px solid gray; border-bottom: 1px solid gray; border-right: 1px solid gray; } 

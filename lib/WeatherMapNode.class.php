@@ -171,7 +171,6 @@ class WeatherMapNode extends WeatherMapItem
 			{
 				$pc = $this->outpercent;
 				$col = $this->colours[OUT];
-
 			}
 		}
 		else
@@ -580,7 +579,6 @@ class WeatherMapNode extends WeatherMapItem
 		// create TWO imagemap entries - one for the label and one for the icon
 		// (so we can have close-spaced icons better)
 
-
 		$temp_width = $bbox_x2-$bbox_x1;
 		$temp_height = $bbox_y2-$bbox_y1;
 		// create an image of that size and draw into it
@@ -618,9 +616,9 @@ class WeatherMapNode extends WeatherMapItem
 			$txt_y += ($this->labeloffsety + $dy);
 
 			// if there's an icon, then you can choose to have no background
-
-			if(! $col->is_none() )
-			{
+			
+			if (! $this->labelbgcolour->is_none() ) {
+			// if(! $col->is_none() ) {			
 			    imagefilledrectangle($node_im, $label_x1, $label_y1, $label_x2, $label_y2, $col->gdallocate($node_im));
 			}
 

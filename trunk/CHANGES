@@ -7,6 +7,7 @@
     FIXED - rounding error 'kinks' in angled VIA links
     FIXED - Cloning a templated node in editor retains the template in the clone
 	FIXED - Imagemap sortorder problem in editor. If you can see it, you can click it.
+	FIXED - cacti_use_ifspeed incorrect when interfaces > 20M and ifhighspeed available
     CHANGE - command-line weathermap has new --no-warn option to disable warnings
     CHANGE - new config parser is much faster than the previous one
     CHANGE - other performance improvements - possibly twice as quick as 0.97c (thanks to ikorzha758 for lots of feedback)

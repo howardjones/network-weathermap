@@ -56,6 +56,7 @@ class WeatherMapLink extends WeatherMapItem
 	var $labeloffset_in, $labeloffset_out;
 	var $commentoffset_in, $commentoffset_out;
 	var $template;
+	var $config;
 
 	function WeatherMapLink() { $this->inherit_fieldlist=array
 		(
@@ -80,6 +81,7 @@ class WeatherMapLink extends WeatherMapItem
 			'notes' => array(),
 			'hints' => array(),
 			'comments' => array('',''),
+			'config' => array(),
 			'bwlabelformats' => array(FMT_PERC_IN,FMT_PERC_OUT),
 			'overliburl' => array(array(),array()),
 			'notestext' => array(IN=>'',OUT=>''),

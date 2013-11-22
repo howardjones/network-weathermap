@@ -24,6 +24,7 @@ $dumpafter=0;
 $dumpstats=0;
 $randomdata=0;
 $dumpconfig='';
+$dumpjsonconfig='';
 $readconfigonly=0;
 $defines=array();
 
@@ -55,7 +56,8 @@ $long_opts=array
 		"dumpafter",
 		"bulge",
 		"sizedebug",
-		"dumpconfig="
+		"dumpconfig=",
+		"dumpjsonconfig="
 	);
 
 $args=$cg->readPHPArgv();
@@ -87,14 +89,15 @@ if (sizeof($gopts) > 0) {
 			break;
 
 		case '--image-uri':
-			// $map->imageuri=$o[1];
 			$options_output['imageuri'] = $o[1];
 			break;
 
 		case '--dumpconfig':
-			//$map->dumpconfig=$o[1];
-			// $options_output['dumpconfig'] = $o[1];
 			$dumpconfig=$o[1];
+			break;
+			
+		case '--dumpjsonconfig':		
+			$dumpjsonconfig=$o[1];
 			break;
 
 		case '--randomdata':
@@ -225,18 +228,20 @@ foreach ($options_output as $key=>$value)
 $weathermap_map = $configfile;
 
 if ($map->ReadConfig($configfile)) {
-    if (!$readconfigonly) {
-	// allow command-lines to override the config file, but provide a default if neither are present
-	if ($imagefile == '')
-	{
-		if ($map->imageoutputfile == '') { $imagefile="weathermap.png"; }
-		else { $imagefile=$map->imageoutputfile; }
-	}
 
-	if ($htmlfile == '')
-	{
-		if ($map->htmloutputfile != '') { $htmlfile = $map->htmloutputfile; }
-	}
+    if (!$readconfigonly) {
+    
+		// allow command-lines to override the config file, but provide a default if neither are present
+		if ($imagefile == '')
+		{
+			if ($map->imageoutputfile == '') { $imagefile="weathermap.png"; }
+			else { $imagefile=$map->imageoutputfile; }
+		}
+	
+		if ($htmlfile == '')
+		{
+			if ($map->htmloutputfile != '') { $htmlfile = $map->htmloutputfile; }
+		}
 
         // feed in any command-line defaults, so that they appear as if SET lines in the config
 
@@ -246,45 +251,72 @@ if ($map->ReadConfig($configfile)) {
             $map->add_hint($hintname,$hint);
         }
 	
-	// now stuff in all the others, that we got from getopts
-	foreach ($options_output as $key=>$value)
-	{		
-		$map->add_hint($key,$value);
-	}
-
-        if ( (isset($options_output['sizedebug']) && ! $options_output['sizedebug']) || (!isset($options_output['sizedebug'])) )
-	{
-		if ($randomdata == 1) { $map->RandomData(); }
-		else { $map->ReadData(); }
-	}
+		// now stuff in all the others, that we got from getopts
+		foreach ($options_output as $key=>$value)
+		{		
+			$map->add_hint($key,$value);
+		}
 	
-	if ($imagefile != '')
-	{
-		$map->DrawMap($imagefile);
-		$map->imagefile=$imagefile;
-	}
-
-	if ($htmlfile != '')
-	{
-		wm_debug("Writing HTML to $htmlfile\n");
+	        if ( (isset($options_output['sizedebug']) && ! $options_output['sizedebug']) || (!isset($options_output['sizedebug'])) )
+		{
+			if ($randomdata == 1) { $map->RandomData(); }
+			else { $map->ReadData(); }
+		}
 		
-		TestOutput_HTML($htmlfile, $map);    
-	}
-
-	if ($dumpconfig != '')
-		$map->WriteConfig($dumpconfig);
-
-	if ($dumpstats != '')
-		$map->DumpStats();
+		if ($imagefile != '') {
+			$map->DrawMap($imagefile);
+			$map->imagefile=$imagefile;
+		}
 	
-	if ($map->dataoutputfile != '') {
-		$map->WriteDataFile($map->dataoutputfile);
-	}
+		if ($htmlfile != '') {
+			wm_debug("Writing HTML to $htmlfile\n");
+			
+			TestOutput_HTML($htmlfile, $map);    
+		}
+	
+		if ($dumpconfig != '') {
+			$map->WriteConfig($dumpconfig);
+		}
+	
+		if ($dumpstats != '') {
+			$map->DumpStats();
+		}
+		
+		if ($map->dataoutputfile != '') {
+			$map->WriteDataFile($map->dataoutputfile);
+		}
+		    
+		if ($dumpafter == 1) {
+			print_r ($map);		
+	    }		
 	    
-	if ($dumpafter == 1)
-		print_r ($map);
-		
-    }		
+	}
+	
+    if ($dumpjsonconfig != "") {
+		print "{";
+		print "\n\"map\": \n";
+		print json_encode($map->config, JSON_PRETTY_PRINT);
+		print ",\n";		
+		print "\"nodes\": {\n";
+		$i = 0;
+		foreach ($map->nodes as $item) {							
+			if($i > 0) print ",\n";
+			print js_escape($item->name).":";
+			print json_encode($item->config, JSON_PRETTY_PRINT);
+			$i++;
+		}
+		print ",\n\"links\": {\n";
+		$i = 0;		
+		foreach ($map->links as $item) {
+			if($i > 0) print ",\n";
+			print js_escape($item->name).":";
+			print json_encode($item->config, JSON_PRETTY_PRINT);
+			$i++;			
+		}	
+		print "}\n";
+ 		print "}\n";
+ 		print "}\n";
+    }
 }
 else { 
     die ("\n\nCould not read Weathermap config file. No output produced. Maybe try --help?\n");     

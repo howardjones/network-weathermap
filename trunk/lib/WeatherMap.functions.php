@@ -1308,13 +1308,18 @@ function wm_parse_string($input)
     return $output;
 }
 
+// PHP < 5.3 doesn't support anonymous functions, so here's a little function for screenshotify
+function screenshotify_xxx($matches)
+{
+    return str_repeat('x',strlen($matches[1]));
+}
 
 function screenshotify($input)
 {
     $tmp = $input;
 
     $tmp = preg_replace ( "/\b\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}\b/", "127.0.0.1", $tmp );    
-    $tmp = preg_replace_callback ( "/([A-Za-z]{3,})/", function ($matches) { return str_repeat('x',strlen($matches[1])); }, $tmp );
+    $tmp = preg_replace_callback ( "/([A-Za-z]{3,})/", "screenshotify_xxx", $tmp );
 
     return ($tmp);
 }
@@ -2080,8 +2085,9 @@ function TestOutput_HTML($htmlfile, &$map)
     
     $fd = fopen ( $htmlfile, 'w' );
     fwrite ( $fd, '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head>' );
-    if ($map->htmlstylesheet != '')
+    if ($map->htmlstylesheet != '') {
         fwrite ( $fd, '<link rel="stylesheet" type="text/css" href="' . $map->htmlstylesheet . '" />' );
+    }
     fwrite ( $fd, '<meta http-equiv="refresh" content="300" /><title>' . $map->ProcessString ( $map->title, $map ) . '</title></head><body>' );
     
     if ($map->htmlstyle == "overlib") {

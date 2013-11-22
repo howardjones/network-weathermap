@@ -3528,11 +3528,12 @@ function ReadConfig($input, $is_include=FALSE)
                             if ((substr($keyword[1], 0, 1) != '/')
                                 || (1 === preg_match($keyword[1], $buffer, $matches))) {
 
-				$key = sprintf("%s:%s:%s", $last_seen, $args[0] ,$keyword[1]);
-				if(!isset($this->coverage[$key])) {
-					$this->coverage[$key] = 0;
-				}
-				$this->coverage[$key]++;
+                                // keep a running total of how often each keyword is used
+                				$key = sprintf("%s:%s:%s", $last_seen, $args[0] ,$keyword[1]);
+                				if(!isset($this->coverage[$key])) {
+                					$this->coverage[$key] = 0;
+                				}
+                				$this->coverage[$key]++;
 								
                                 // if we came here without a regexp, then the \1 etc
                                 // refer to arg numbers, not match numbers
@@ -3561,14 +3562,18 @@ function ReadConfig($input, $is_include=FALSE)
                                             $index = constant($m[2]);
                                             $key = $m[1];
                                             $curobj->{$key}[$index] = $val;
+                                            $curobj->config[$key.".".$index] = $val;
                                         } elseif (substr($key,-1,1) == "+") {
                                             // if the key ends in a plus, it's an array we should append to
                                             $key = substr($key,0,-1);
                                             array_push($curobj->$key, $val);
+                                            array_push($curobj->config[$key], $val);
+                                            
                                         } else {
                                             // otherwise, it's just the name of a property on the
                                             // appropriate object.
                                             $curobj->$key = $val;
+                                            $curobj->config[$key] = $val;
                                         }
                                     }
                                     $linematched++;

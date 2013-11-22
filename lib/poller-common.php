@@ -283,15 +283,13 @@ function weathermap_run_maps($mydir, $map_id = -1)
 									rename($tempfile,$imagefile);
 								}
 								
-
 								$im = imagecreatefrompng($thumbimagefile);
 								$im48 = imagecreatetruecolor(48,48);
 								imagecopyresampled($im48, $im, 0, 0, 0, 0, 48, 48, imagesx($im), imagesy($im));
 								imagepng($im48,$thumbimagefile2);
 								imagedestroy($im48);
 								imagedestroy($im);
-								
-												
+																				
 								if ($quietlogging==0) wm_warn("Wrote map to $imagefile and $thumbimagefile\n",TRUE);
 								$fd = @fopen($htmlfile, 'w');
 								if ($fd != FALSE) {

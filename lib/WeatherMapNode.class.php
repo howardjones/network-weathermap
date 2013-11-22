@@ -55,6 +55,7 @@ class WeatherMapNode extends WeatherMapItem
 	var $polar;
 	var $boundingboxes=array();
 	var $named_offsets=array();
+	var $config = array();
 
 	function WeatherMapNode()
 	{
@@ -93,6 +94,7 @@ class WeatherMapNode extends WeatherMapItem
 				'notestext' => array(IN=>'',OUT=>''),
 				'notes' => array(),
 				'hints' => array(),
+				'config' => array(),			    
 				'overliburl' => array(IN=>array(),OUT=>array()),
 				'overlibwidth' => 0,
 				'overlibheight' => 0,

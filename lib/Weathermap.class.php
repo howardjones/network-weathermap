@@ -4378,6 +4378,8 @@ function WriteConfig($filename)
 					{
 						if($which=="template" && $node->x === NULL)  { wm_debug("TEMPLATE\n"); fwrite($fd,$node->WriteConfig()); }
 						if($which=="normal" && $node->x !== NULL) { fwrite($fd,$node->WriteConfig()); }
+					} else {
+    					wm_debug("Not writing Node $node->name - defined in another file");
 					}
 				}
 			}

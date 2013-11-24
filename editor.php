@@ -1125,7 +1125,8 @@ else
         $nodelist = array();
 
         foreach ($map->nodes as $node) {
-                if($node->x >= 0) {
+				// only show non-template nodes
+                if( $node->x  !== NULL) {
                         $nodelist[] = $node->name;
                 }
         }

@@ -589,7 +589,6 @@ function show_node(name)
 
 function show_link(name)
     {
-    var found = -1;
     mapmode('existing');
 
     hide_all_dialogs();
@@ -652,28 +651,20 @@ function show_link(name)
 
 function show_dialog(dlg)
     {
-    document.getElementById(dlg).style.display = 'block';
+		jQuery( document.getElementById(dlg) ).show();
     }
 
 function hide_dialog(dlg)
     {
-    document.getElementById(dlg).style.display = 'none';
+	jQuery( document.getElementById(dlg) ).hide();
     // reset the action. The use pressed Cancel, if this function was called
     // (that, or they're about to open a new Properties dialog, so the value is irrelevant)
     document.frmMain.action.value = '';
-    //	alert('ACTION=' + document.frmMain.action.value);
     }
 
 function hide_all_dialogs()
-    {
-    hide_dialog('dlgMapProperties');
-    hide_dialog('dlgMapStyle');
-    hide_dialog('dlgLinkProperties');
-    hide_dialog('dlgTextEdit');
-    hide_dialog('dlgNodeProperties');
-    hide_dialog('dlgColours');
-    hide_dialog('dlgImages');
-    hide_dialog('dlgEditorSettings');
+    {	
+		jQuery(".dlgProperties").hide();	
     }
 
 function ElementPosition(param){

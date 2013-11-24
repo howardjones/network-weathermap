@@ -401,8 +401,7 @@ function weathermap_fullview($cycle=FALSE, $firstonly=FALSE, $limit_to_group = -
 						</div>
 					</div>
 				<?php
-			}
-	
+			}	
 		
 	// only draw the whole screen if we're not cycling, or we're cycling without fullscreen mode
 	if ($cycle == false || $fullscreen==0) {
@@ -492,13 +491,15 @@ function weathermap_fullview($cycle=FALSE, $firstonly=FALSE, $limit_to_group = -
 		if ($cycle) {
 			$refreshtime = read_config_option("weathermap_cycle_refresh");
 			$poller_cycle = read_config_option("poller_interval");			
-?>
-        <script type = "text/javascript">           
-			wm_fullscreen = <?php echo ($fullscreen ? "1" : "0"); ?>;
-			wm_poller_cycle = <?php echo $poller_cycle; ?> * 1000;
-			wm_period = <?php echo $refreshtime ?> * 1000;
-		</script>
+?>        
 		<script type="text/javascript" src="cacti-resources/map-cycle.js"></script>
+		<script type = "text/javascript">        
+			$(document).ready( function() {
+				WMcycler.start({ fullscreen: <?php echo ($fullscreen ? "1" : "0"); ?>, 
+				    poller_cycle: <?php echo $poller_cycle * 1000; ?>, 
+				    period: <?php echo $refreshtime  * 1000; ?>});
+			});
+		</script>
 <?php
 		}
 	}

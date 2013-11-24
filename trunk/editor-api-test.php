@@ -30,10 +30,23 @@ print "  $log\n";
 $editor->saveConfig("test-output-3.conf");
 
 print "Add a via\n";
-$editor->addLinkVia($newname, 120, 170);
+$editor->setLinkVia($newname, 120, 170);
 $editor->saveConfig("test-output-4.conf");
 
 print "Move a node\n";
 $editor->moveNode("n1", 150, 150);
 $editor->saveConfig("test-output-5.conf");
+
+
+print "Clone two nodes\n";
+
+list($success,$newname,$log) = $editor->cloneNode("n1");
+if($success !== TRUE ) die( "Clone failed.");
+print "  $log\n";
+
+list($success,$newname,$log) = $editor->cloneNode("n2","mr_clone");
+if($success !== TRUE ) die( "Clone failed.");
+print "  $log\n";
+
+$editor->saveConfig("test-output-6.conf");
 

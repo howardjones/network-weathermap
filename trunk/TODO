@@ -1,3 +1,5 @@
+Editor - setting defaults for link font, and bwstyle do nothing?
+Collect all the external javascript, PHP and CSS into a vendor folder: Bootstrap, jQuery/UI, overlib
 FIXED Editor: Cloning a node loses the template
 Editor: re-tidy should know that a-b is the same as b-a
 

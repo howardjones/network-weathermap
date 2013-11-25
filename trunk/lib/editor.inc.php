@@ -25,6 +25,57 @@ function fix_gpc_string($input)
     return ($input);
 }
 
+if(!function_exists("json_encode")) {
+    /**
+     * json_encode2()
+     *
+     * @access public
+     * @param bool $a
+     * @return string
+     */
+    function json_encode($a=false) {
+        if (is_null($a)) return 'null';
+        if ($a === false) return 'false';
+        if ($a === true) return 'true';
+        if (is_scalar($a))
+        {
+            if (is_float($a))
+            {
+                // Always use "." for floats.
+                return floatval(str_replace(",", ".", strval($a)));
+            }
+    
+            if (is_string($a))
+            {
+                static $jsonReplaces = array(array("\\", "/", "\n", "\t", "\r", "\b", "\f", '"'), array('\\\\', '\\/', '\\n', '\\t', '\\r', '\\b', '\\f', '\"'));
+                return '"' . str_replace($jsonReplaces[0], $jsonReplaces[1], $a) . '"';
+            }
+            else
+                return $a;
+        }
+        $isList = true;
+        for ($i = 0, reset($a); $i < count($a); $i++, next($a))
+        {
+            if (key($a) !== $i)
+            {
+                $isList = false;
+                break;
+            }
+        }
+        $result = array();
+        if ($isList)
+        {
+            foreach ($a as $v) $result[] = $this->json_encode2($v);
+            return '[' . join(',', $result) . ']';
+        }
+        else
+        {
+            foreach ($a as $k => $v) $result[] = $this->json_encode2($k).':'.$this->json_encode2($v);
+            return '{' . join(',', $result) . '}';
+        }
+    }
+}
+
 /**
  * Clean up URI (function taken from Cacti) to protect against XSS
  */
@@ -117,7 +168,7 @@ function show_editor_startpage()
 	$matches=0;
 
 	print '<!DOCTYPE html>
-            <html><head><link rel="stylesheet" type="text/css" media="screen" href="editor-resources/oldeditor.css" /><script type="text/javascript" src="editor-resources/jquery-latest.min.js"></script><script src="editor-resources/editor.js" type="text/javascript"></script><title>PHP Weathermap Editor ' . $WEATHERMAP_VERSION
+            <html><head><link rel="stylesheet" type="text/css" media="screen" href="editor-resources/oldeditor.css" /><script type="text/javascript" src="vendor/jquery-1.10.2.min.js"></script><script src="editor-resources/editor.js" type="text/javascript"></script><title>PHP Weathermap Editor ' . $WEATHERMAP_VERSION
 		. '</title></head><body>';
 
 	print '<div id="nojs" class="alert"><b>WARNING</b> - ';

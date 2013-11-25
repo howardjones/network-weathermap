@@ -485,11 +485,11 @@ function weathermap_maplist4()
                 // Active/Disabled + debug status for per-map debugging
                 $debugextra = "";
                 if($map['debug'] == 'on') {
-                    $debugextra="<br><img src='images/bug.png' />";
+                    $debugextra="<br><img src='cacti-resources/img/bug.png' />";
                 }
                 	
                 if($map['debug'] == 'once') {
-                    $debugextra="<br><img src='images/bug.png' />x1";
+                    $debugextra="<br><img src='cacti-resources/img/bug.png' />x1";
                 }
 
                 if($map['active'] == 'on')
@@ -561,7 +561,7 @@ function weathermap_maplist4()
 
                 // Delete
                 print '<td class="maptable_delete">';
-                print '<a href="?action=delete_map&id='.$map['id'].'"><img src="cacti-resources/delete_icon.png" width="10" height="10" border="0" alt="Delete Map" title="Delete Map"></a>';
+                print '<a href="?action=delete_map&id='.$map['id'].'"><img src="cacti-resources/img/delete_icon.png" width="10" height="10" border="0" alt="Delete Map" title="Delete Map"></a>';
                 print '</td>';
                 	
 
@@ -647,7 +647,7 @@ function weathermap_maplist3()
 					
 					// drag handle and thumbnail
 					print "<td class='maptable_thumb'>";
-					printf("<img class='draghandle' src='cacti-resources/drag-handle.png' id='draghandle_%d'> ", $map['id']);
+					printf("<img class='draghandle' src='cacti-resources/img/drag-handle.png' id='draghandle_%d'> ", $map['id']);
 					printf("<a href='weathermap-cacti-plugin.php?action=viewmap&id=%s'><img src='weathermap-cacti-plugin.php?action=viewthumb48&id=%s' width=48 height=48 class='thumb48' /></a>", $map['filehash'], $map['filehash']);
 					print "</td>";
 					
@@ -676,11 +676,11 @@ function weathermap_maplist3()
 					// Active/Disabled + debug status for per-map debugging
 					$debugextra = "";
 					if($map['debug'] == 'on') {
-						$debugextra="<img src='images/bug.png' />";
+						$debugextra="<img src='cacti-resources/img/bug.png' />";
 					}
 					
 					if($map['debug'] == 'once') {
-						$debugextra="<img src='images/bug.png' />x1";
+						$debugextra="<img src='cacti-resources/img/bug.png' />x1";
 					}
 						
 					if($map['active'] == 'on')
@@ -750,7 +750,7 @@ function weathermap_maplist3()
 						
 					// Delete
 					print '<td class="maptable_delete">';
-					print '<a href="?action=delete_map&id='.$map['id'].'"><img src="cacti-resources/delete_icon.png" width="10" height="10" border="0" alt="Delete Map" title="Delete Map"></a>';
+					print '<a href="?action=delete_map&id='.$map['id'].'"><img src="cacti-resources/img/delete_icon.png" width="10" height="10" border="0" alt="Delete Map" title="Delete Map"></a>';
 					print '</td>';
 					
 						
@@ -885,7 +885,7 @@ function weathermap_maplist2()
 				
 			// drag handle and thumbnail
 			print "<td>";
-			printf("<img src='cacti-resources/drag-handle.png' id='draghandle_%d'> ", $map['id']);
+			printf("<img src='cacti-resources/img/drag-handle.png' id='draghandle_%d'> ", $map['id']);
 			printf("<a href='weathermap-cacti-plugin.php?action=viewmap&id=%s'><img src='weathermap-cacti-plugin.php?action=viewthumb48&id=%s' width=48 height=48 border=0/></a>", $map['filehash'], $map['filehash']);
 			print "</td>";
 				
@@ -906,7 +906,7 @@ function weathermap_maplist2()
 			if($map['warncount']>0)
 			{
 				$had_warnings++;
-				print '<br><a href="../../utilities.php?tail_lines=500&message_type=2&action=view_logfile&filter='.urlencode($map['configfile']).'" title="Check cacti.log for this map">'.$map['warncount'].'<img border=0 src="plugin-images/exclamation.png" title="'.$map['warncount'].' warnings last time this map was run. Check your logs."></a>';
+				print '<br><a href="../../utilities.php?tail_lines=500&message_type=2&action=view_logfile&filter='.urlencode($map['configfile']).'" title="Check cacti.log for this map">'.$map['warncount'].'<img border=0 src="cacti-resources/img/exclamation.png" title="'.$map['warncount'].' warnings last time this map was run. Check your logs."></a>';
 			}
 			print "</td>";
 				
@@ -914,11 +914,11 @@ function weathermap_maplist2()
 			// Active/Disabled + debug status for per-map debugging
 			$debugextra = "";
 			if($map['debug'] == 'on') {
-				$debugextra="<img src='images/bug.png' />";
+				$debugextra="<img src='cacti-resources/img/bug.png' />";
 			}
 				
 			if($map['debug'] == 'once') {
-				$debugextra="<img src='images/bug.png' />x1";
+				$debugextra="<img src='cacti-resources/img/bug.png' />x1";
 			}
 			
 			if($map['active'] == 'on')
@@ -987,7 +987,7 @@ function weathermap_maplist2()
 			
 			// Delete			
 			print '<td>';
-			print '<a href="?action=delete_map&id='.$map['id'].'"><img src="cacti-resources/delete_icon.png" width="10" height="10" border="0" alt="Delete Map" title="Delete Map"></a>';
+			print '<a href="?action=delete_map&id='.$map['id'].'"><img src="cacti-resources/img/delete_icon.png" width="10" height="10" border="0" alt="Delete Map" title="Delete Map"></a>';
 			print '</td>';
 	
 			
@@ -1158,18 +1158,18 @@ function weathermap_maplist()
 			if($map['warncount']>0)
 			{
 				$had_warnings++;
-				print '<br><a href="../../utilities.php?tail_lines=500&message_type=2&action=view_logfile&filter='.urlencode($map['configfile']).'" title="Check cacti.log for this map"><img border=0 src="plugin-images/exclamation.png" title="'.$map['warncount'].' warnings last time this map was run. Check your logs.">'.$map['warncount']."</a>";
+				print '<br><a href="../../utilities.php?tail_lines=500&message_type=2&action=view_logfile&filter='.urlencode($map['configfile']).'" title="Check cacti.log for this map"><img border=0 src="cacti-resources/img/exclamation.png" title="'.$map['warncount'].' warnings last time this map was run. Check your logs.">'.$map['warncount']."</a>";
 			}
 			print "</td>";
 			
 			
 			$debugextra = "";
 			if($map['debug'] == 'on') {
-				$debugextra="<img src='images/bug.png' />";
+				$debugextra="<img src='cacti-resources/img/bug.png' />";
 			}
 			
 			if($map['debug'] == 'once') {
-				$debugextra="<img src='images/bug.png' />x1";
+				$debugextra="<img src='cacti-resources/img/bug.png' />x1";
 			}
 				
 			if($map['active'] == 'on')
@@ -1269,11 +1269,11 @@ function weathermap_maplist()
 	}
 	
 	print "<div align='center'>";	
-	print "<a href='weathermap-cacti-plugin-mgmt.php?action=groupadmin'><img src='plugin-images/button_editgroups.png' border=0 alt='Edit Groups' /></a>";
-	print "&nbsp;<a href='../../settings.php?tab=misc'><img src='plugin-images/button_settings.gif' border=0 alt='Settings' /></a>";
+	print "<a href='weathermap-cacti-plugin-mgmt.php?action=groupadmin'><img src='cacti-resources/img/button_editgroups.png' border=0 alt='Edit Groups' /></a>";
+	print "&nbsp;<a href='../../settings.php?tab=misc'><img src='cacti-resources/img/button_settings.gif' border=0 alt='Settings' /></a>";
 	if($i>0 && $i_understand_file_permissions_and_how_to_fix_them)
 	{
-		print '<br /><a href="?action=rebuildnow"><img src="plugin-images/btn_recalc.png" border="0" alt="Rebuild All Maps Right Now"><br />(Experimental - You should NOT need to use this normally)</a><br />';
+		print '<br /><a href="?action=rebuildnow"><img src="cacti-resources/img/btn_recalc.png" border="0" alt="Rebuild All Maps Right Now"><br />(Experimental - You should NOT need to use this normally)</a><br />';
 	}
 	print "</div>";
 

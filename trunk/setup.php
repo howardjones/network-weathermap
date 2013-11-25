@@ -108,9 +108,9 @@ function weathermap_page_head()
 	if (preg_match('/plugins\/weathermap\//',$_SERVER['REQUEST_URI'] ,$matches)) {
 		?>
 		<link rel="stylesheet" type="text/css" media="screen" href="cacti-resources/weathermap.css" />
-		<link rel="stylesheet" href="cacti-resources/jquery-ui/css/ui-lightness/jquery-ui-1.10.3.custom.css" />
-		<script src="editor-resources/jquery-1.10.1.min.js"></script>
-		<script src="cacti-resources/jquery-ui/js/jquery-ui-1.10.3.custom.min.js"></script>
+		<link rel="stylesheet" href="vendor/jquery-ui/css/ui-lightness/jquery-ui-1.10.3.custom.css" />
+		<script src="vendor/jquery-1.10.2.min.js"></script>
+		<script src="vendor/jquery-ui/js/jquery-ui-1.10.3.custom.min.js"></script>
 		<?php
 	}
 }
@@ -502,7 +502,7 @@ function weathermap_show_tab ()
 			$prefix="";
 		}
 
-		echo '<a href="' . $config['url_path'] . 'plugins/weathermap/weathermap-cacti-plugin.php"><img src="' . $config['url_path'] . 'plugins/weathermap/plugin-images/'.$prefix.'tab_weathermap';
+		echo '<a href="' . $config['url_path'] . 'plugins/weathermap/weathermap-cacti-plugin.php"><img src="' . $config['url_path'] . 'plugins/weathermap/cacti-resources/img/'.$prefix.'tab_weathermap';
 		
 		// if we're ON a weathermap page, print '_red'		
 		if (preg_match('/plugins\/weathermap\/weathermap-cacti-plugin.php/',$_SERVER['REQUEST_URI'] ,$matches)) {

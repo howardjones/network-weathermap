@@ -2092,7 +2092,7 @@ function TestOutput_HTML($htmlfile, &$map)
     
     if ($map->htmlstyle == "overlib") {
         fwrite ( $fd, "<div id=\"overDiv\" style=\"position:absolute; visibility:hidden; z-index:1000;\"></div>\n" );
-        fwrite ( $fd, "<script type=\"text/javascript\" src=\"overlib.js\"><!-- overLIB (c) Erik Bosrup --></script> \n" );
+        fwrite ( $fd, "<script type=\"text/javascript\" src=\"vendor/overlib.js\"><!-- overLIB (c) Erik Bosrup --></script> \n" );
     }
     
     fwrite ( $fd, $map->MakeHTML () );

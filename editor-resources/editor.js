@@ -85,10 +85,10 @@ function cleanupJS()
 function attach_click_events()
     {  
 
-    jQuery("area[id^=LINK:]").attr("href","#").click(click_handler);
-    jQuery("area[id^=NODE:]").attr("href","#").click(click_handler);
-    jQuery("area[id^=TIMES]").attr("href","#").click(position_timestamp);
-    jQuery("area[id^=LEGEN]").attr("href","#").click(position_legend);
+    jQuery('area[id^="LINK:"]').attr("href","#").click(click_handler);
+    jQuery('area[id^="NODE:"]').attr("href","#").click(click_handler);
+    jQuery('area[id^="TIMES"]').attr("href","#").click(position_timestamp);
+    jQuery('area[id^="LEGEN"]').attr("href","#").click(position_legend);
     
     if(fromplug===1)
     {
@@ -373,14 +373,13 @@ function edit_node()
 {
         document.getElementById('action').value = "edit_node";
         show_itemtext('node',document.frmMain.node_name.value);
-        // document.frmMain.submit();
-   }
+
+}
 
 function edit_link()
 {
         document.getElementById('action').value = "edit_link";
         show_itemtext('link',document.frmMain.link_name.value);
-        // document.frmMain.submit();
 }
 
 function move_node()
@@ -470,18 +469,12 @@ function position_legend(e)
             }
         
         // we need to figure out WHICH legend, nowadays
-        //alt = el.getAttribute('alt');
 		alt = el.id;
 
     // objecttype = alt.slice(0, 5);
     objectname = alt.slice(7, alt.length);
       
-    real_position_legend(objectname);
-            
-    //document.getElementById('tb_help').innerText = 'Click on the map where you would like to put the legend.';
-    //document.getElementById('action').value = "place_legend";
-    //document.getElementById('param').value = objectname;
-    //mapmode('xy');
+    real_position_legend(objectname);           
     }
     
 function real_position_legend(scalename)
@@ -498,10 +491,6 @@ function show_itemtext(itemtype,name)
     mapmode('existing');
 
     hide_all_dialogs();
-
-    // $('#dlgNodeProperties').block();
-    
-  //  $.blockUI.defaults.elementMessage = 'Please Wait';
     
     jQuery('textarea#item_configtext').val('');
     
@@ -515,9 +504,7 @@ function show_itemtext(itemtype,name)
         jQuery('#action').val('set_link_config');
     }
     show_dialog('dlgTextEdit');
-    
-//    $('#item_configtext').block();
-    
+       
     jQuery.ajax( { type: "GET",
                 url: 'editor.php',
                 data: {action: 'fetch_config',
@@ -527,7 +514,6 @@ function show_itemtext(itemtype,name)
                 success: function(text) {
                         jQuery('#item_configtext').val(text);
                         document.getElementById('item_configtext').focus();
-                      //  jQuery('#dlgTextEdit').unblock();
                    }
            } );
 }
@@ -558,7 +544,6 @@ function show_node(name)
         
         if(mynode.iconfile != '')
         {
-			// console.log(mynode.iconfile.substring(0,2));
 			if(mynode.iconfile.substring(0,2)=='::')
 			{
 				document.frmMain.node_iconfilename.value = '--AICON--';
@@ -686,7 +671,7 @@ function ElementPosition(param){
 
 function coord_capture(event)
 {
-    // $('#tb_coords').html('+++');
+
 }
 
 function coord_update(event)

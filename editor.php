@@ -1022,9 +1022,9 @@ else
 		}
 ?>
 	</style>
-  <link rel="stylesheet" type="text/css" media="screen" href="editor-resources/oldeditor.css" />
-<script src="editor-resources/jquery-latest.min.js" type="text/javascript"></script>
-<script src="editor-resources/editor.js" type="text/javascript"></script>
+    <link rel="stylesheet" type="text/css" media="screen" href="editor-resources/oldeditor.css" />
+    <script src="vendor/jquery-1.10.2.min.js" type="text/javascript"></script>
+    <script src="editor-resources/editor.js" type="text/javascript"></script>
 	<script type="text/javascript">
 	
 	var fromplug=<?php echo ($fromplug==TRUE ? 1:0); ?>;
@@ -1044,6 +1044,10 @@ else
 	}
 
 	sort($imlist);
+
+	print "var wmapdata = {";
+	
+	print "};";
 ?>
 	</script>
   <title>PHP Weathermap Editor <?php echo $WEATHERMAP_VERSION; ?></title>
@@ -1052,17 +1056,15 @@ else
 <body id="mainview">
   <div id="toolbar">
 	<ul>
-          <li class="tb_active" id="tb_newfile">Change<br />File</li>
+      <li class="tb_active" id="tb_newfile">Change<br />File</li>
 	  <li class="tb_active" id="tb_addnode">Add<br />Node</li>
 	  <li class="tb_active" id="tb_addlink">Add<br />Link</li>
 	  <li class="tb_active" id="tb_poslegend">Position<br />Legend</li>
 	  <li class="tb_active" id="tb_postime">Position<br />Timestamp</li>
 	  <li class="tb_active" id="tb_mapprops">Map<br />Properties</li>
 	  <li class="tb_active" id="tb_mapstyle">Map<br />Style</li>
-	  <li class="tb_active" id="tb_colours">Manage<br />Colors</li>
-	  <li class="tb_active" id="tb_manageimages">Manage<br />Images</li>
 	  <li class="tb_active" id="tb_prefs">Editor<br />Settings</li>
-          <li class="tb_coords" id="tb_coords">Position<br />---, ---</li>
+      <li class="tb_coords" id="tb_coords">Position<br />---, ---</li>
 	  <li class="tb_help"><span id="tb_help">or click a Node or Link to edit it's properties</span></li>
 	</ul>
   </div>

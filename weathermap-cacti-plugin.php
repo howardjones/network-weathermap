@@ -84,7 +84,7 @@ case 'viewmapcycle':
 	}	
 	
 	print "<div id=\"overDiv\" style=\"position:absolute; visibility:hidden; z-index:1000;\"></div>\n";
-	print "<script type=\"text/javascript\" src=\"overlib.js\"><!-- overLIB (c) Erik Bosrup --></script> \n";
+	print "<script type=\"text/javascript\" src=\"vendor/overlib.js\"><!-- overLIB (c) Erik Bosrup --></script> \n";
 	
 	$groupid = -1;
         if ( (isset($_REQUEST['group']) && is_numeric($_REQUEST['group'] ) )) {
@@ -391,11 +391,11 @@ function weathermap_fullview($cycle=FALSE, $firstonly=FALSE, $limit_to_group = -
 					<div id="wmcyclecontrolbox" class="<?php print $class ?>">
 						<div id="wm_progress"></div>
 						<div id="wm_cyclecontrols">
-						<a id="cycle_stop" href="?action="><img src="plugin-images/control_stop_blue.png" width="16" height="16" /></a>
-						<a id="cycle_prev" href="#"><img src="plugin-images/control_rewind_blue.png" width="16" height="16" /></a>
-						<a id="cycle_pause" href="#"><img src="plugin-images/control_pause_blue.png" width="16" height="16" /></a>
-						<a id="cycle_next" href="#"><img src="plugin-images/control_fastforward_blue.png" width="16" height="16" /></a>
-						<a id="cycle_fullscreen" href="?action=viewmapcycle&fullscreen=1&group=<?php echo $limit_to_group; ?>"><img src="plugin-images/arrow_out.png" width="16" height="16" /></a>
+						<a id="cycle_stop" href="?action="><img src="cacti-resources/img/control_stop_blue.png" width="16" height="16" /></a>
+						<a id="cycle_prev" href="#"><img src="cacti-resources/img/control_rewind_blue.png" width="16" height="16" /></a>
+						<a id="cycle_pause" href="#"><img src="cacti-resources/img/control_pause_blue.png" width="16" height="16" /></a>
+						<a id="cycle_next" href="#"><img src="cacti-resources/img/control_fastforward_blue.png" width="16" height="16" /></a>
+						<a id="cycle_fullscreen" href="?action=viewmapcycle&fullscreen=1&group=<?php echo $limit_to_group; ?>"><img src="cacti-resources/img/arrow_out.png" width="16" height="16" /></a>
 						Showing <span id="wm_current_map">1</span> of <span id="wm_total_map">1</span>. 
 						Cycling all available maps<?php echo $extra; ?>.
 						</div>

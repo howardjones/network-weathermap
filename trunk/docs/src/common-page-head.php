@@ -3,8 +3,7 @@
 ?><!DOCTYPE html>
 <html lang = "en" xml:lang = "en" xmlns = "http://www.w3.org/1999/xhtml">
     <head>
-        <link rel = "stylesheet" type = "text/css" media = "screen" href = "<?php echo $PATH_EXTRA; ?>../editor-resources/bootstrap/css/bootstrap.min.css" />
-        <slink rel = "stylesheet" type = "text/css" media = "screen" href = "<?php echo $PATH_EXTRA; ?>kube101/css/kube.min.css" />
+        <link rel = "stylesheet" type = "text/css" media = "screen" href = "<?php echo $PATH_EXTRA; ?>../vendor/bootstrap/css/bootstrap.min.css" />        
         <link rel = "stylesheet" type = "text/css" href = "<?php echo $PATH_EXTRA; ?>manual.css" />
         <title>PHP Weathermap <?php echo $WEATHERMAP_VERSION; ?> - <?php echo $PAGE_TITLE; ?></title>
     </head>

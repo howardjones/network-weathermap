@@ -227,7 +227,7 @@ function show_editor_startpage()
 			// skip directories, unreadable files, .files and anything that doesn't come through the sanitiser unchanged
 			if ( (is_file($realfile)) && (is_readable($realfile)) && (!preg_match("/^\./",$file) )  && ( wm_editor_sanitize_conffile($file) == $file ) ) {
 				if (!is_writable($realfile)) {
-					$note .= "(read-only)";
+					$note .= "(read-only) ";
 				}
 				$title='(no title)';
 				$fd=fopen($realfile, "r");

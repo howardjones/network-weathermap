@@ -745,9 +745,9 @@ function retidy_links($map, $ignore_tidied=FALSE)
             $route = $link->b->name . " " . $link->a->name;
         }
         
-        if( ($ignore_tidied || $link->get_hint("_tidied")==1) && $done[$route]==0) {
+        if( ($ignore_tidied || $link->get_hint("_tidied")==1) && !isset($done[$route]) && isset( $routes[$route] ) ) {
         
-            if(sizeof($routes[$route]) == 1) {
+            if( sizeof($routes[$route]) == 1) {
                     tidy_link($map,$link->name);
                     $done[$route] = 1;
             } else {

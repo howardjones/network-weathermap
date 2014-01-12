@@ -1197,7 +1197,13 @@ function js_escape($str, $wrap = TRUE)
 function mysprintf($format, $value, $kilo = 1000)
 {
     $output = "";
-
+    
+    // if we get a NULL, it probably means no-data from the datasource plugin
+    // don't coerce that into a zero
+    if($value === NULL) {
+        return "?";
+    }
+    
     if (preg_match ( "/%(\d*\.?\d*)k/", $format, $matches )) {
         $spec = $matches [1];
         $places = 2;

@@ -4151,6 +4151,59 @@ function ReadConfig_Commit(&$curobj)
 	}
 }
 
+function WriteJSONFile($filename)
+{
+
+    if($filename != "") {
+    
+        $fd = fopen($filename, 'w');
+        $output = '';
+    
+        if($fd) {
+
+            $data = array();
+            $data['nodes'] = array();
+            $data['links'] = array();
+            $data['scales'] = array();
+            
+            foreach ($this->scales as $scale) {
+                $data['scales'][$scale->name] = array();
+            }
+
+            foreach ($this->nodes as $node) {
+                $data['nodes'][$node->name] = array();
+
+                $data['nodes'][$node->name]["x"] = $node->x;
+                $data['nodes'][$node->name]["y"] = $node->y;
+                
+                $data['nodes'][$node->name]["bounding_boxes"] = array();
+                foreach ($node->boundingboxes as $bb) {
+                    $data['nodes'][$node->name]["bounding_boxes"][] = array($bb[0], $bb[1], $bb[2],$bb[3]);
+                }
+                
+                $data['nodes'][$node->name]["template"] = false;
+                if($node->x === null) {
+                    $data['nodes'][$node->name]["template"] = true;                	
+                }
+            }
+            
+            foreach ($this->links as $link) {
+                $data['links'][$link->name] = array();
+                $data['links'][$link->name]["width"] = $link->width;
+                $data['links'][$link->name]["nodes"] = array($link->a->name, $link->b->name);
+               
+                $data['links'][$link->name]["template"] = false;
+                if($link->a === null) {
+                    $data['links'][$link->name]["template"] = true;
+                }
+            }
+            
+            fputs($fd, json_encode($data, JSON_PRETTY_PRINT));
+            
+        }
+    }
+}
+
 function WriteDataFile($filename)
 {
     if($filename != "") {

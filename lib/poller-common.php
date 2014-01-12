@@ -192,6 +192,8 @@ function weathermap_run_maps($mydir, $map_id = -1)
 							$thumbimagefile = $outdir . DIRECTORY_SEPARATOR . $map['filehash'].".thumb.".$imageformat;
 							$thumbimagefile2 = $outdir . DIRECTORY_SEPARATOR . $map['filehash'].".thumb48.".$imageformat;
 								
+							$jsonfile  = $outdir . DIRECTORY_SEPARATOR . $map['filehash'].".json";
+							
 							$statsfile = $outdir . DIRECTORY_SEPARATOR . $map['filehash'] . '.stats.txt';
 							$resultsfile = $outdir . DIRECTORY_SEPARATOR . $map['filehash'] . '.results.txt';
 							// used to write files before moving them into place
@@ -306,6 +308,7 @@ function weathermap_run_maps($mydir, $map_id = -1)
 
 								$wmap->DumpStats($statsfile);
 								$wmap->WriteDataFile($resultsfile);
+								$wmap->WriteJSONFile($jsonfile);
 								
 								// put back the configured imageuri
 								$wmap->imageuri = $configured_imageuri;
@@ -440,8 +443,7 @@ function weathermap_run_maps($mydir, $map_id = -1)
 		if (true === function_exists("memory_get_peak_usage")) {
 			db_execute("replace into settings values('weathermap_peak_memory','"
 					. memory_get_peak_usage() . "')");
-		}
-		
+		}	
 		
 		
 	} else {

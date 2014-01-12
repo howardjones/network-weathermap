@@ -38,11 +38,19 @@ class WeatherMapDataSource_tabfile extends WeatherMapDataSource {
 				# strip out any Windows line-endings that have gotten in here
 				$buffer=str_replace("\r", "", $buffer);
 
-				if (preg_match("/^$itemname\t(\d+\.?\d*[KMGT]*)\t(\d+\.?\d*[KMGT]*)/", $buffer, $matches))
-				{
-					$data[IN]=wm_unformat_number($matches[1]);
-					$data[OUT]=wm_unformat_number($matches[2]);
+				$parts = explode("\t",$buffer);
+				
+				if($parts[0] == $itemname) {
+				    $data[IN] = ($parts[1]=="-" ? NULL : wm_unformat_number($parts[1]) );
+				    $data[OUT] = ($parts[2]=="-" ? NULL : wm_unformat_number($parts[2]) );
 				}
+				
+				// if (preg_match("/^$itemname\t(\d+\.?\d*[KMGT]*)\t(\d+\.?\d*[KMGT]*)/", $buffer, $matches))
+				// {
+				// 	$data[IN]=wm_unformat_number($matches[1]);
+				// 	$data[OUT]=wm_unformat_number($matches[2]);
+				// }
+				
 			}
 			$stats = stat($targetstring);
 			$data_time = $stats['mtime'];

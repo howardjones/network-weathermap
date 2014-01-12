@@ -1,6 +1,6 @@
 Editor - moving a dependent item in a "locked" set should update the relative coords (optionally?)
 Editor - setting defaults for link font, and bwstyle do nothing?
-Collect all the external javascript, PHP and CSS into a vendor folder: Bootstrap, jQuery/UI, overlib
+DONE Collect all the external javascript, PHP and CSS into a vendor folder: Bootstrap, jQuery/UI, overlib
 FIXED Editor: Cloning a node loses the template
 Editor: re-tidy should know that a-b is the same as b-a
 Fullscreen cycle: controls should be moveable (and fade away?)

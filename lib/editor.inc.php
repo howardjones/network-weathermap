@@ -540,7 +540,7 @@ function distance ($ax,$ay, $bx,$by)
     return sqrt( $dx*$dx + $dy*$dy );
 }
 
-function tidy_links($map,$targets, $ignore_tidied=FALSE)
+function tidy_links(&$map,$targets, $ignore_tidied=FALSE)
 {
     // not very efficient, but it saves looking for special cases (a->b & b->a together)
     $ntargets = count($targets);
@@ -557,7 +557,7 @@ function tidy_links($map,$targets, $ignore_tidied=FALSE)
  * tidy_link - change link offsets so that link is horizonal or vertical, if possible.
  *             if not possible, change offsets to the closest facing compass points
  */
-function tidy_link($map,$target, $linknumber=1, $linktotal=1, $ignore_tidied=FALSE)
+function tidy_link(&$map,$target, $linknumber=1, $linktotal=1, $ignore_tidied=FALSE)
 {
     // print "\n-----------------------------------\nTidying $target...\n";
     if(isset($map->links[$target]) and isset($map->links[$target]->a) ) {
@@ -715,7 +715,7 @@ function tidy_link($map,$target, $linknumber=1, $linktotal=1, $ignore_tidied=FAL
     }
 }
 
-function untidy_links($map)
+function untidy_links(&$map)
 {
     foreach ($map->links as $link)
     {
@@ -724,37 +724,41 @@ function untidy_links($map)
     }
 }
 
-function retidy_links($map, $ignore_tidied=FALSE)
+function retidy_links(&$map, $ignore_tidied=FALSE)
 {
     $routes = array();
     $done = array();
 
     foreach ($map->links as $link)
     {
-        $route = $link->a->name . " " . $link->b->name;
-        if(strcmp( $link->a->name, $link->b->name) > 0) {
-            $route = $link->b->name . " " . $link->a->name;
+        if(isset($link->a)) {
+            $route = $link->a->name . " " . $link->b->name;
+            if(strcmp( $link->a->name, $link->b->name) > 0) {
+                $route = $link->b->name . " " . $link->a->name;
+            }
+            $routes[$route][] = $link->name;
         }
-        $routes[$route][] = $link->name;
     }
     
     foreach ($map->links as $link)
     {
-        $route = $link->a->name . " " . $link->b->name;
-        if(strcmp( $link->a->name, $link->b->name) > 0) {
-            $route = $link->b->name . " " . $link->a->name;
-        }
-        
-        if( ($ignore_tidied || $link->get_hint("_tidied")==1) && !isset($done[$route]) && isset( $routes[$route] ) ) {
-        
-            if( sizeof($routes[$route]) == 1) {
-                    tidy_link($map,$link->name);
-                    $done[$route] = 1;
-            } else {
-                # handle multi-links specially... 
-                tidy_links($map,$routes[$route]);
-                // mark it so we don't do it again when the other links come by
-                $done[$route] = 1;                
+        if(isset($link->a)) {
+            $route = $link->a->name . " " . $link->b->name;
+            if(strcmp( $link->a->name, $link->b->name) > 0) {
+                $route = $link->b->name . " " . $link->a->name;
+            }
+            
+            if( ($ignore_tidied || $link->get_hint("_tidied")==1) && !isset($done[$route]) && isset( $routes[$route] ) ) {
+            
+                if( sizeof($routes[$route]) == 1) {
+                        tidy_link($map,$link->name);
+                        $done[$route] = 1;
+                } else {
+                    # handle multi-links specially... 
+                    tidy_links($map,$routes[$route]);
+                    // mark it so we don't do it again when the other links come by
+                    $done[$route] = 1;                
+                }
             }
         }
     }

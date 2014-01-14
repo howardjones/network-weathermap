@@ -106,7 +106,7 @@ case 'viewmapcycle':
 case 'viewmap':
 	require_once($config["base_path"]."/include/top_graph_header.php");
 	print "<div id=\"overDiv\" style=\"position:absolute; visibility:hidden; z-index:1000;\"></div>\n";
-	print "<script type=\"text/javascript\" src=\"overlib.js\"><!-- overLIB (c) Erik Bosrup --></script> \n";
+	print "<script type=\"text/javascript\" src=\"vendor/overlib.js\"><!-- overLIB (c) Erik Bosrup --></script> \n";
 
 	$id = -1;
 
@@ -130,7 +130,7 @@ case 'viewmap':
 default:
 	require_once($config["base_path"]."/include/top_graph_header.php");
 	print "<div id=\"overDiv\" style=\"position:absolute; visibility:hidden; z-index:1000;\"></div>\n";
-	print "<script type=\"text/javascript\" src=\"overlib.js\"><!-- overLIB (c) Erik Bosrup --></script> \n";
+	print "<script type=\"text/javascript\" src=\"vendor/overlib.js\"><!-- overLIB (c) Erik Bosrup --></script> \n";
 
 	$group_id = -1;
 	if( isset($_REQUEST['group_id']) && (is_numeric($_REQUEST['group_id']) ) )

@@ -22,7 +22,7 @@ MYSQL_ROOT_PWD="mypassword"
 #######################################################################
 
 # Cacti stuff
-apt-get -y install git subversion php5 php5-gd snmp rrdtool
+apt-get -y install git subversion php5 php5-gd snmp rrdtool mysql-server php5-mysql
 
 # General C stuff (to build spine)
 apt-get -y install autoconf build-essential linux-headers-`uname -r`
@@ -70,6 +70,9 @@ cd ../
 useradd -d /var/www/cacti-0.8.8a cacti
 chown -R cacti /var/www/cacti-0.8.8a/log
 chown -R cacti /var/www/cacti-0.8.8a/rra
+
+
+chown -R cacti /var/www/cacti-0.8.8a/plugins/weathermap/output
 
 # create the cron job, ready to be symlinked to /etc/cron.d
 echo "*/5 * * * * cacti /usr/bin/php /var/www/cacti-0.8.8a/poller.php > /var/www/cacti-0.8.8a/last-poller-output.txt 2>&1" > cacti.cron 

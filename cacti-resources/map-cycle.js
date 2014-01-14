@@ -1,178 +1,197 @@
-
 // http://stackoverflow.com/a/210733/2397542 - jQuery center function from Tony L.
 jQuery.fn.center = function () {
-	this.css("position","fixed");
-	this.css("top", Math.max(0, (($(window).height() - $(this).outerHeight()) / 2) + 
-			$(window).scrollTop()) + "px");
-	this.css("left", Math.max(0, (($(window).width() - $(this).outerWidth()) / 2) + 
-			$(window).scrollLeft()) + "px");
-	return this;
-}
+    
+    this.css("position", "fixed");
+    this.css("top",  Math.max(0, (($(window).height() - this.outerHeight()) / 2) + $(window).scrollTop()) + "px");
+    this.css("left", Math.max(0, (($(window).width() - this.outerWidth()) / 2) + $(window).scrollLeft()) + "px");
+    
+    return this;
+};
 
 WMcycler = {
 
-	KEYCODE_ESCAPE: 27,
-	KEYCODE_LEFT: 37,
-	KEYCODE_RIGHT: 39,
-	KEYCODE_SPACE: 32,
-	
-	period: 0,
-	fullscreen: 0,
-	poller_cycle: 0,
-	current: 0,
-	countdown: 0,
-	nmaps: 0,
-	paused: false,
-	timer_counter: null,
-	timer_reloader: null,
+    KEYCODE_ESCAPE : 27,
+    KEYCODE_LEFT : 37,
+    KEYCODE_RIGHT : 39,
+    KEYCODE_SPACE : 32,
 
-	updateProgress: function () {
-		// update the countdown bar - 450 is the max width in pixels
-		var progress = this.countdown / (this.period/200) * 450;
-		$("#wm_progress").css("width",progress);		
-	},
-	
-	counterHandler: function() {
-		if (this.paused) {
-			$("#wm_progress").toggleClass("paused");
-		} else {			
-			this.updateProgress();
-			this.countdown--;
+    period : 0,
+    fullscreen : 0,
+    poller_cycle : 0,
+    current : 0,
+    countdown : 0,
+    nmaps : 0,
+    paused : false,
+    timer_counter : null,
+    timer_reloader : null,
 
-			if (this.countdown < 0) {
-				this.switchMap(1);
-			}
-		}				
-	},
+    updateProgress : function () {
+        // update the countdown bar - 450 is the max width in pixels
+        var progress = this.countdown / (this.period / 200) * 450;
+        $("#wm_progress").css("width", progress);
+    },
 
-	// change to the next (or previous) map, reset the countdown, update the bar	
-	switchMap: function(direction) {
-		var wm_new = this.current + direction;
+    counterHandler : function () {
+        if (this.paused) {
+            $("#wm_progress").toggleClass("paused");
+        } else {
+            this.updateProgress();
+            this.countdown--;
 
-		if (wm_new < 0) wm_new += this.nmaps;
-		wm_new = wm_new % this.nmaps;
+            if (this.countdown < 0) {
+                this.switchMap(1);
+            }
+        }
+    },
 
-		var now = $(".weathermapholder").eq(this.current);
-		var next = $(".weathermapholder").eq(wm_new);
+    // change to the next (or previous) map, reset the countdown, update the bar
+    switchMap : function (direction) {
+        var wm_new = this.current + direction;
 
-		if (this.fullscreen) {
-			// in fullscreen, we centre everything, layer it with z-index and cross-fade
-			next.center();	
-			now.css("z-index", 2);
-			next.css("z-index", 3);
+        if (wm_new < 0) {
+            wm_new += this.nmaps;
+        }
+        wm_new = wm_new % this.nmaps;
 
-			now.fadeOut(1200, function () {
-				// now that we're done with it, force a reload on the image just passed
-				var d = new Date();
-				var newurl = $(this).find('img').attr("src");
-				newurl = newurl.replace(/time=\d+/, "time=" + d.getTime());				
+        var now = $(".weathermapholder").eq(this.current);
+        var next = $(".weathermapholder").eq(wm_new);
 
-				$(this).find('img').attr( "src", newurl);
-			} );
-			next.fadeIn(1200);
-		} else {
-			// in non-fullscreen mode, the fades just make things look strange. Snap-changes
-			now.hide(1, function () {
-				// now that we're done with it, force a reload on the image just passed
-				var d = new Date();
-				var newurl = $(this).find('img').attr("src");
-				newurl = newurl.replace(/time=\d+/, "time=" + d.getTime());				
+        if (this.fullscreen) {
+            // in fullscreen, we centre everything, layer it with z-index and
+            // cross-fade
+            next.center();
+            now.css("z-index", 2);
+            next.css("z-index", 3);
 
-				$(this).find('img').attr( "src", newurl);
-			} );
-			next.show(1);
-		}
+            now.fadeOut(1200, function () {
+                // now that we're done with it, force a reload on the image just
+                // passed
+                var d = new Date();
+                var newurl = $(this).find('img').attr("src");
+                newurl = newurl.replace(/time=\d+/, "time=" + d.getTime());
 
-		this.countdown = this.period/200;
-		this.current = wm_new;
+                $(this).find('img').attr("src", newurl);
+            });
+            next.fadeIn(1200);
+        } else {
+            // in non-fullscreen mode, the fades just make things look strange.
+            // Snap-changes
+            now.hide(1, function () {
+                // now that we're done with it, force a reload on the image just
+                // passed
+                var d = new Date();
+                var newurl = $(this).find('img').attr("src");
+                newurl = newurl.replace(/time=\d+/, "time=" + d.getTime());
 
-		$("#wm_current_map").text(this.current + 1);		
-		this.updateProgress();
-	},
-	
-	start: function (initialData) {        	
-		
-		this.period = initialData.period;
-		this.poller_cycle = initialData.poller_cycle;
-		this.fullscreen = initialData.fullscreen;
-	
-		this.nmaps = $(".weathermapholder").length;
+                $(this).find('img').attr("src", newurl);
+            });
+            next.show(1);
+        }
 
-		// copy of this that we can pass into callbacks
-		var that = this;
-		
-		$("#wm_total_map").text( this.nmaps);
+        this.countdown = this.period / 200;
+        this.current = wm_new;
 
-		$("#cycle_pause").click( function() { that.pauseAction(); } );
-		$("#cycle_next").click( function() { that.nextAction(); } );
-		$("#cycle_prev").click( function() { that.previousAction(); } );
+        $("#wm_current_map").text(this.current + 1);
+        this.updateProgress();
+    },
 
-		$(document).keyup( function (event) {
-			if (event.keyCode == that.KEYCODE_ESCAPE) {
-				window.location.href = $('#cycle_stop').attr('href');
-				event.preventDefault();
-			}
+    start : function (initialData) {
 
-			if (event.keyCode == that.KEYCODE_SPACE) {
-				that.pauseAction();
-				event.preventDefault();
-			}
-			// left
-			if (event.keyCode == that.KEYCODE_LEFT) {
-				that.previousAction();
-				event.preventDefault();
-			}
-			// right
-			if (event.keyCode == that.KEYCODE_RIGHT) {
-				that.nextAction();
-				event.preventDefault();
-			}
-		});
+        this.period = initialData.period;
+        this.poller_cycle = initialData.poller_cycle;
+        this.fullscreen = initialData.fullscreen;
 
-		// stop here if there were no maps
-		if (this.nmaps > 0) {
-			this.current = 0;
+        this.nmaps = $(".weathermapholder").length;
 
-			this.switchMap(0);
+        // copy of this that we can pass into callbacks
+        var that = this;
 
-			// figure out how long the refresh is, so that we get
-			// through all the maps in exactly one poller cycle
-			if (this.period == 0) {
-				this.period = this.poller_cycle / this.nmaps;
-			}
-			this.countdown = this.period/200;
+        $("#wm_total_map").text(this.nmaps);
 
-			// a countdown timer in the top corner			
-			this.timer_counter = setInterval( function() { that.counterHandler(); }, 200);
+        $("#cycle_pause").click(function () {
+            that.pauseAction();
+        });
+        $("#cycle_next").click(function () {
+            that.nextAction();
+        });
+        $("#cycle_prev").click(function () {
+            that.previousAction();
+        });
 
-			// when to reload the whole page (with new map data)
-			this.timer_reloader = setTimeout( function() { that.reload(); }, this.poller_cycle);
-		}
+        $(document).keyup(function (event) {
+            if (event.keyCode === that.KEYCODE_ESCAPE) {
+                window.location.href = $('#cycle_stop').attr('href');
+                event.preventDefault();
+            }
 
-		// aim to get a video-player style OSD for fullscreen mode:
-		// if the pointer is off the controls for more than 5 seconds, fade the controls away
-		// if the pointer moves after that, bring the controls back
-		// if the pointer is over the controls, don't fade
-		if (this.fullscreen) {
-			// $("#wmcyclecontrolbox").delay(5000).fadeOut(500);
-			// $(document).mousemove( function () {$("#wmcyclecontrolbox").fadeIn(100); }  );
-			// $("#wmcyclecontrolbox").mouseleave( function () { $("#wmcyclecontrolbox").delay(2000).fadeOut(500); });
-		}
-	},
-	
-	reloadAction: function() {},
-	nextAction: function() {
-		this.switchMap(1);
-	},
-	previousAction: function() {
-		this.switchMap(-1);
-	},
-	pauseAction: function() {
-		this.paused = ! this.paused;
-		// remove the paused class on the progress bar, if we're mid-flash and no longer paused
-		if (! this.paused) {
-			$("#wm_progress").removeClass("paused");
-		}
-	},
+            if (event.keyCode === that.KEYCODE_SPACE) {
+                that.pauseAction();
+                event.preventDefault();
+            }
+            // left
+            if (event.keyCode === that.KEYCODE_LEFT) {
+                that.previousAction();
+                event.preventDefault();
+            }
+            // right
+            if (event.keyCode === that.KEYCODE_RIGHT) {
+                that.nextAction();
+                event.preventDefault();
+            }
+        });
 
+        // stop here if there were no maps
+        if (this.nmaps > 0) {
+            this.current = 0;
+
+            this.switchMap(0);
+
+            // figure out how long the refresh is, so that we get
+            // through all the maps in exactly one poller cycle
+            if (this.period === 0) {
+                this.period = this.poller_cycle / this.nmaps;
+            }
+            this.countdown = this.period / 200;
+
+            // a countdown timer in the top corner
+            this.timer_counter = setInterval(function () {
+                that.counterHandler();
+            }, 200);
+
+            // when to reload the whole page (with new map data)
+            this.timer_reloader = setTimeout(function () {
+                that.reload();
+            }, this.poller_cycle);
+        }
+
+        // aim to get a video-player style OSD for fullscreen mode:
+        // if the pointer is off the controls for more than 5 seconds, fade the
+        // controls away
+        // if the pointer moves after that, bring the controls back
+        // if the pointer is over the controls, don't fade
+        if (this.fullscreen) {
+            // $("#wmcyclecontrolbox").delay(5000).fadeOut(500);
+            // $(document).mousemove( function ()
+            // {$("#wmcyclecontrolbox").fadeIn(100); } );
+            // $("#wmcyclecontrolbox").mouseleave( function () {
+            // $("#wmcyclecontrolbox").delay(2000).fadeOut(500); });
+        }
+    },
+
+    reloadAction : function () {
+    },
+    nextAction : function () {
+        this.switchMap(1);
+    },
+    previousAction : function () {
+        this.switchMap(-1);
+    },
+    pauseAction : function () {
+        this.paused = !this.paused;
+        // remove the paused class on the progress bar, if we're mid-flash and
+        // no longer paused
+        if (!this.paused) {
+            $("#wm_progress").removeClass("paused");
+        }
+    }
 };

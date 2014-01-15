@@ -1718,6 +1718,8 @@ var $config_keywords = array (
 		
 		if($context_description === 'link') {
 			$input = str_replace("{link:this:graph_id}", $context->get_hint("graph_id" ), $input);
+			
+			// TODO - shortcuts for standard bwlabel formats
 		}
 		
 		// check if we can now quit early before the regexp stuff

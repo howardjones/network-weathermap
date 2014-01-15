@@ -814,12 +814,12 @@ else
 	    $target = wm_editor_sanitize_name($_REQUEST['param']);
 		
 	    if(isset($map->links[$target])) {
-		// draw a map and throw it away, to calculate all the bounding boxes
-		$map->DrawMap('null');
-		
-		tidy_link($map,$target);
-		
-		$map->WriteConfig($mapfile);
+    		// draw a map and throw it away, to calculate all the bounding boxes
+    		$map->DrawMap('null');
+    		
+    		tidy_link($map,$target);
+    		
+    		$map->WriteConfig($mapfile);
 	    }
 	    break;
 

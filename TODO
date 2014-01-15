@@ -1,3 +1,6 @@
+BUG - $(window).height() returns 0 in firefox => Center() doesn't centre vertically in FF.
+BUG - Node icon filenames are run through processstring() in the editor during a Tidy operation? 
+
 Editor - moving a dependent item in a "locked" set should update the relative coords (optionally?)
 Editor - setting defaults for link font, and bwstyle do nothing?
 DONE Collect all the external javascript, PHP and CSS into a vendor folder: Bootstrap, jQuery/UI, overlib

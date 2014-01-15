@@ -55,10 +55,12 @@ class WeatherMapNode extends WeatherMapItem
 	var $polar;
 	var $boundingboxes=array();
 	var $named_offsets=array();
+	
 	var $config = array();
-
+	var $runtime = array();
+			
 	function WeatherMapNode()
-	{
+	{	    
 		$this->inherit_fieldlist=array
 			(
 				'boundingboxes'=>array(),
@@ -94,7 +96,7 @@ class WeatherMapNode extends WeatherMapItem
 				'notestext' => array(IN=>'',OUT=>''),
 				'notes' => array(),
 				'hints' => array(),
-				'config' => array(),			    
+				'config' => array(),			    			   
 				'overliburl' => array(IN=>array(),OUT=>array()),
 				'overlibwidth' => 0,
 				'overlibheight' => 0,
@@ -468,13 +470,15 @@ class WeatherMapNode extends WeatherMapItem
 			}
 			else
 			{
-				$this->iconfile = $map->ProcessString($this->iconfile ,$this);
-				if (is_readable($this->iconfile))
+				// $this->iconfile = $map->ProcessString($this->iconfile ,$this);
+				$realiconfile = $map->ProcessString($this->iconfile ,$this);
+				
+				if (is_readable($realiconfile))
 				{
 					imagealphablending($im, true);
 					// draw the supplied icon, instead of the labelled box
 
-					$icon_im = imagecreatefromfile($this->iconfile);
+					$icon_im = imagecreatefromfile($realiconfile);
 					# $icon_im = imagecreatefrompng($this->iconfile);
 					
 					if(true === isset($colicon)) {
@@ -517,13 +521,13 @@ class WeatherMapNode extends WeatherMapItem
 
 						}
 					}
-					else { wm_warn ("Couldn't open ICON: '" . $this->iconfile . "' - is it a PNG, JPEG or GIF? [WMWARN37]\n"); }
+					else { wm_warn ("Couldn't open ICON: '" . $realiconfile . "' - is it a PNG, JPEG or GIF? [WMWARN37]\n"); }
 				}
 				else
 				{
-					if($this->iconfile != 'none')
+					if($realiconfile != 'none')
 					{
-						wm_warn ("ICON '" . $this->iconfile . "' does not exist, or is not readable. Check path and permissions. [WMARN38]\n");
+						wm_warn ("ICON '" . $realiconfile . "' does not exist, or is not readable. Check path and permissions. [WMARN38]\n");
 					}
 				}
 			}
@@ -544,7 +548,6 @@ class WeatherMapNode extends WeatherMapItem
 				$map->nodes[$this->name]->boundingboxes[] = array($icon_x1, $icon_y1, $icon_x2, $icon_y2);
 				
 			}
-
 		}
 
 		// do any offset calculations

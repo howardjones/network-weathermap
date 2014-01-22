@@ -1,5 +1,7 @@
 BUG - $(window).height() returns 0 in firefox => Center() doesn't centre vertically in FF.
-BUG - Node icon filenames are run through processstring() in the editor during a Tidy operation? 
+FIXED BUG - Node icon filenames are run through processstring() in the editor during a Tidy operation?
+ => design issue. Running DrawMap() to get bounding boxes requires loading the images, which requires valid filenames
+ => tidy can't work on a link where either node has a dynamic icon filename. 
 
 Editor - moving a dependent item in a "locked" set should update the relative coords (optionally?)
 Editor - setting defaults for link font, and bwstyle do nothing?

@@ -76,6 +76,7 @@ case 'viewmapcycle':
         }
 		
 	if ($fullscreen==1) {
+	    print "<!DOCTYPE html>\n";
 		print "<html><head>";
 		print '<LINK rel="stylesheet" type="text/css" media="screen" href="cacti-resources/weathermap.css">';		
 		print "</head><body id='wm_fullscreen'>";

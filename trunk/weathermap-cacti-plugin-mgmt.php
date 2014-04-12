@@ -11,7 +11,7 @@ require_once $config["library_path"] . "/database.php";
 $weathermap_confdir = realpath(dirname(__FILE__).'/configs');
 
 // include the weathermap class so that we can get the version
-require_once dirname(__FILE__)."/lib/Weathermap.class.php";
+require_once dirname(__FILE__)."/lib/globals.php";
 
 $i_understand_file_permissions_and_how_to_fix_them = FALSE;
 
@@ -286,7 +286,7 @@ case 'rebuildnow':
 	break;
 
 case 'rebuildnow2':
-	require_once dirname(__FILE__).DIRECTORY_SEPARATOR."Weathermap.class.php";
+	require_once dirname(__FILE__).DIRECTORY_SEPARATOR."all.php";
 	require_once dirname(__FILE__).DIRECTORY_SEPARATOR."lib".DIRECTORY_SEPARATOR."poller-common.php";
 
 	require_once $config["base_path"]."/include/top_header.php";

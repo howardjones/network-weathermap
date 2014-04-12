@@ -35,33 +35,29 @@ class WeatherMapDataSource_tabfile extends WeatherMapDataSource {
 			while (!feof($fd))
 			{
 				$buffer=fgets($fd, 4096);
-				# strip out any Windows line-endings that have gotten in here
+				# strip out any line-endings that have gotten in here
 				$buffer=str_replace("\r", "", $buffer);
+				$buffer=str_replace("\n", "", $buffer);				
 
 				$parts = explode("\t",$buffer);
 				
-				if($parts[0] == $itemname) {
+				if($parts[0] == $itemname) {			   
+				    
 				    $data[IN] = ($parts[1]=="-" ? NULL : wm_unformat_number($parts[1]) );
 				    $data[OUT] = ($parts[2]=="-" ? NULL : wm_unformat_number($parts[2]) );
+				    				   
 				}
-				
-				// if (preg_match("/^$itemname\t(\d+\.?\d*[KMGT]*)\t(\d+\.?\d*[KMGT]*)/", $buffer, $matches))
-				// {
-				// 	$data[IN]=wm_unformat_number($matches[1]);
-				// 	$data[OUT]=wm_unformat_number($matches[2]);
-				// }
-				
 			}
 			$stats = stat($targetstring);
 			$data_time = $stats['mtime'];
+		} else {
+		    // some error code to go in here
+		    wm_debug ("TabText ReadData: Couldn't open ($targetstring). [WMTABDATA01]\n");
 		}
-		else {
-			// some error code to go in here
-			wm_debug ("TabText ReadData: Couldn't open ($targetstring). [WMTABDATA01]\n"); }
-		
-			wm_debug ("TabText ReadData: Returning (".($data[IN]===NULL?'NULL':$data[IN]).",".($data[OUT]===NULL?'NULL':$data[OUT]).",$data_time)\n");
-		
-			return( array($data[IN], $data[OUT], $data_time) );
+				
+		wm_debug ("TabText ReadData: Returning (".($data[IN]===NULL ? 'NULL' : $data[IN]) . "," . ($data[OUT]===NULL ? 'NULL' : $data[OUT]).",$data_time)\n");
+	 
+		return( array($data[IN], $data[OUT], $data_time) );
 	}
 }
 

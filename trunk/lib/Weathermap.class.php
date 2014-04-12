@@ -1,537 +1,10 @@
 <?php
-// PHP Weathermap 0.97b
-// Copyright Howard Jones, 2005-2012 howie@thingy.com
+// PHP Weathermap 0.98
+// Copyright Howard Jones, 2005-2014 howie@thingy.com
 // http://www.network-weathermap.com/
 // Released under the GNU Public License
 
-require_once dirname(__FILE__).'/HTML_ImageMap.class.php';
-
-require_once dirname(__FILE__).'/WeatherMap.functions.php';
-require_once dirname(__FILE__).'/WeatherMapNode.class.php';
-require_once dirname(__FILE__).'/WeatherMapLink.class.php';
-
-$WEATHERMAP_VERSION="0.98";
-$weathermap_debugging=FALSE;
-$weathermap_debugging_readdata=FALSE;
-$weathermap_map="";
-$weathermap_warncount=0;
-$weathermap_lazycounter=0;
-
-// Dummy array for some future code
-// $WM_config_keywords2 = array ();
-
-
-// don't produce debug output for these functions
-$weathermap_debug_suppress = array (
-#    'processstring',
-    'mysprintf'
-);
-
-// don't output warnings/errors for these codes (WMxxx)
-$weathermap_error_suppress = array();
-
-// Turn on ALL error reporting for now.
-// error_reporting (E_ALL|E_STRICT);
-error_reporting (E_ALL);
-error_reporting(E_ALL & ~E_STRICT);
-
-// parameterise the in/out stuff a bit
-define("IN",0);
-define("OUT",1);
-define("WMCHANNELS",2);
-
-define('CONFIG_TYPE_LITERAL',0);
-define('CONFIG_TYPE_COLOR',1);
-
-// some strings that are used in more than one place
-define('FMT_BITS_IN',"{link:this:bandwidth_in:%2k}");
-define('FMT_BITS_OUT',"{link:this:bandwidth_out:%2k}");
-define('FMT_UNFORM_IN',"{link:this:bandwidth_in}");
-define('FMT_UNFORM_OUT',"{link:this:bandwidth_out}");
-define('FMT_PERC_IN',"{link:this:inpercent:%.2f}%");
-define('FMT_PERC_OUT',"{link:this:outpercent:%.2f}%");
-
-// the fields within a spine triple
-define("X",0);
-define("Y",1);
-define("DISTANCE",2);
-
 // ***********************************************
-
-// template class for data sources. All data sources extend this class.
-// I really wish PHP4 would just die overnight
-class WeatherMapDataSource
-{
-	// Initialize - called after config has been read (so SETs are processed)
-	// but just before ReadData. Used to allow plugins to verify their dependencies
-	// (if any) and bow out gracefully. Return FALSE to signal that the plugin is not
-	// in a fit state to run at the moment.
-	function Init(&$map) { return TRUE; }
-
-	// called with the TARGET string. Returns TRUE or FALSE, depending on whether it wants to handle this TARGET
-	// called by map->ReadData()
-	function Recognise( $targetstring ) { return FALSE; }
-
-	// the actual ReadData
-	//   returns an array of two values (in,out). -1,-1 if it couldn't get valid data
-	//   configline is passed in, to allow for better error messages
-	//   itemtype and itemname may be used as part of the target (e.g. for TSV source line)
-	// function ReadData($targetstring, $configline, $itemtype, $itemname, $map) { return (array(-1,-1)); }
-	function ReadData($targetstring, &$map, &$item)
-	{
-		return(array(-1,-1));
-	}
-	
-	// pre-register a target + context, to allow a plugin to batch up queries to a slow database, or snmp for example
-	function Register($targetstring, &$map, &$item)
-	{
-	
-	}
-	
-	// called before ReadData, to allow plugins to DO the prefetch of targets known from Register
-	function Prefetch(&$map) { }
-	
-	// Run after all data collection
-	// some plugin might need to update a local cache, or other state
-	function CleanUp(&$map) { }
-	
-}
-
-// template classes for the pre- and post-processor plugins
-class WeatherMapPreProcessor
-{
-	function run(&$map) { return FALSE; }
-}
-
-class WeatherMapPostProcessor
-{
-	function run(&$map) { return FALSE; }
-}
-
-
-/**
- * Collect together everything scale-related
- */
-class WeatherMapScale
-{
-    var $colours;
-    var $name;
-    var $keypos;
-    var $keytitle;
-    var $keystyle;
-    var $keysize;
-    var $keytextcolour;
-    var $keyoutlinecolour;
-    var $keybgcolour;
-    var $scalemisscolour;
-    var $owner;
-
-    function WeatherMapScale($name, &$owner)
-    {
-        $this->name = $name;
-             
-        $this->Reset($owner);
-    }
-
-    function Reset(&$owner)
-    {
-        $this->owner = $owner;
-
-        assert($this->owner->kilo != 0);
-        
-        $this->keypos = array();
-        $this->keystyle = 'classic';
-        $this->colours = array();
-        $this->keypos[X] = -1;
-        $this->keypos[Y] = -1;
-        $this->keytitle = "Traffic Load";
-        $this->keysize = 0;
-
-        $this->SetColour("KEYBG", new WMColour(255,255,255));
-        $this->SetColour("KEYOUTLINE", new WMColour(0,0,0));
-        $this->SetColour("KEYTEXT", new WMColour(0,0,0));
-        $this->SetColour("SCALEMISS", new WMColour(255,255,255));
-
-        assert(isset($owner));
-
-    }
-
-    function SpanCount()
-    {
-        return count($this->colours);
-    }
-
-    function PopulateDefaults()
-    {
-     //   $this->AddSpan();
-
-    }
-
-    function SetColour($name, $colour)
-    {
-        assert(isset($this->owner));
-        assert($this->owner->kilo != 0);
-        
-        switch (strtoupper($name))
-        {
-            case 'KEYTEXT':
-                $this->keytextcolour = $colour;
-                break;
-            case 'KEYBG':
-                $this->keybgcolour = $colour;
-                break;
-            case 'KEYOUTLINE':
-                $this->keyoutlinecolour = $colour;
-                break;
-            case 'SCALEMISS':
-                $this->scalemisscolour = $colour;
-                break;
-            default:
-                wm_warn("Unexpected colour name in WeatherMapScale->SetColour");
-                break;
-        }
-    }
-
-    function AddSpan($lowvalue, $highvalue, $colour1, $colour2=null, $tag='')
-    {
-        assert(isset($this->owner));
-        $key = $lowvalue . '_' . $highvalue;
-
-        $this->colours[$key]['c1'] = $colour1;
-        $this->colours[$key]['c2'] = $colour2;
-        $this->colours[$key]['tag'] = $tag;
-        $this->colours[$key]['bottom'] = $lowvalue;
-        $this->colours[$key]['top'] = $highvalue;
-
-        wm_debug("%s %s->%s", $this->name, $lowvalue, $highvalue);
-    }
-
-    function WriteConfig()
-    {
-        assert(isset($this->owner));
-        // TODO - These should all check against the defaults
-
-        $output = "# All settings for scale ".$this->name."\n";
-
-        $output .= sprintf("\tKEYPOS %s %d %d %s\n",
-                $this->name,
-                $this->keypos[X], $this->keypos[Y],
-                $this->keytitle
-                );
-
-        // TODO - need to add size if non-standard
-        $output .= sprintf("\tKEYSTYLE %s %s\n",
-                    $this->name,
-                    $this->keystyle
-                );
-
-        $output .= sprintf("\tKEYBGCOLOR %s %s\n",
-                $this->name,
-                $this->keybgcolour->as_config()
-                );
-
-        $output .= sprintf("\tKEYTEXTCOLOR %s %s\n",
-                $this->name,
-                $this->keytextcolour->as_config()
-                );
-
-        $output .= sprintf("\tKEYOUTLINECOLOR %s %s\n",
-                $this->name,
-                $this->keyoutlinecolour->as_config()
-                );
-
-        $output .= sprintf("\tSCALEMISSCOLOR %s %s\n",
-                $this->name,
-                $this->scalemisscolour->as_config()
-                );
-
-        $locale = localeconv();
-        $decimal_point = $locale['decimal_point'];
-        
-        $output .= "\n";
-
-        foreach ($this->colours as $k => $colour) {
-            $top = rtrim(rtrim(sprintf("%f", $colour['top']), "0"),
-                $decimal_point);
-            
-            $bottom = rtrim(rtrim(sprintf("%f", $colour['bottom']), "0"),
-                $decimal_point);
-
-            if ($bottom > $this->owner->kilo) {
-                $bottom = wm_nice_bandwidth($colour['bottom'], $this->owner->kilo);
-            }
-
-            if ($top > $this->owner->kilo) {
-                $top = wm_nice_bandwidth($colour['top'], $this->owner->kilo);
-            }
-
-            $tag = (isset($colour['tag']) ? $colour['tag'] : '');
-
-            if($colour['c1']->equals($colour['c2'])) {
-                    $output .= sprintf("\tSCALE %s %-4s %-4s   %s   %s\n",
-                         $this->name, $bottom, $top, $colour['c1']->as_config(),$tag);
-            } else {
-                    $output .= sprintf("\tSCALE %s %-4s %-4s   %s  %s  %s\n",
-                        $this->name, $bottom, $top, $colour['c1']->as_config(),
-                            $colour['c2']->as_config(), $tag);
-            }                     
-        }
-
-        $output .= "\n";
-
-        return $output;
-    }
-
-    function ColourFromValue($value, $name = '', $is_percent = true, $scale_warning = true)
-    {
-        $col = new WMColour(0, 0, 0);
-        $tag = '';
-        $matchsize = null;
-
-        $nowarn_clipping = intval($owner->get_hint("nowarn_clipping"));
-        $nowarn_scalemisses = (!$scale_warning)
-            || intval($owner->get_hint("nowarn_scalemisses"));
-
-
-        if (isset($this->colours)) {
-            $colours = $this->colours;
-
-            if ($is_percent && $value > 100) {
-                if ($nowarn_clipping == 0) {
-                    wm_warn(
-                        "ColourFromValue: Clipped $value% to 100% for item $name [WMWARN33]\n");
-                }
-                $value = 100;
-            }
-
-            if ($is_percent && $value < 0) {
-                if ($nowarn_clipping == 0) {
-                    wm_warn(
-                        "ColourFromValue: Clipped $value% to 0% for item $name [WMWARN34]\n");
-                }
-                $value = 0;
-            }
-
-            foreach ($colours as $key => $colour) {
-                if (($value >= $colour['bottom']) and ($value <= $colour['top'])) {
-                    $range = $colour['top'] - $colour['bottom'];
-
-                    $candidate = null;
-
-                    if($colour['c1']->equals($colour['c2'])) {
-                        $candidate = $colour['c1'];
-                    } else {
-                        if ($colour["bottom"] == $colour["top"]) {
-                            $ratio = 0;
-                        } else {
-                            $ratio = ($value - $colour["bottom"])
-                                    / ($colour["top"] - $colour["bottom"]);
-                        }
-                        $candidate = $colour['c1']->linterp($colour['c2'], $ratio);
-                    }
-
-                    // change in behaviour - with multiple matching ranges for a value, the smallest range wins
-                    if (is_null($matchsize) || ($range < $matchsize)) {
-                        $col = $candidate;
-                        $matchsize = $range;                   
-
-                        if (isset($colour['tag'])) {
-                            $tag = $colour['tag'];
-                        }
-                    }
-            
-                }
-            }
-
-            wm_debug("CFV $name $scalename $value '$tag' $key ".$col->as_config()."\n");
-
-            return (array (
-                $col,
-                $key,
-                $tag
-            ));
-
-        } else {
-            return array (
-                    $this->scalemisscolour,
-                    '',
-                    ''
-                );
-        }
-
-        // shouldn't really get down to here if there's a complete SCALE
-
-        // you'll only get grey for a COMPLETELY quiet link if there's no 0 in the SCALE lines
-        if ($value == 0) {
-            return array (
-                new WMColour(192, 192, 192),
-                '',
-                ''
-            );
-        }
-
-        if ($nowarn_scalemisses == 0) {
-            wm_warn(
-                "ColourFromValue: Scale $scalename doesn't include a line for $value"
-                . ($is_percent ? "%" : "") . " while drawing item $name [WMWARN29]\n");
-        }
-        // and you'll only get white for a link with no colour assigned
-        return array (
-            new WMColour(255, 255, 255),
-            '',
-            ''
-        );
-    }
-
-
-    function DrawLegend($image)
-    {
-        // don't draw if the position is the default -1,-1
-        if($this->keypos[X] == -1 && $this->keypos[Y] == -1) {
-            return;
-        }
-
-        switch($this->keystyle)
-        {
-            case 'classic':
-                $this->DrawLegendClassic($image, false);
-                break;
-
-            case 'horizontal':
-                $this->DrawLegendHorizontal($image, $this->keysize[$scalename]);
-                break;
-
-            case 'vertical':
-                $this->DrawLegendVertical($image, 
-                        $this->keysize[$scalename]);
-                break;
-
-            case 'inverted':
-                $this->DrawLegendVertical($image, 
-                    $this->keysize[$scalename], true);
-                break;
-
-            case 'tags':
-                $this->DrawLegendClassic($image, true);
-                break;
-        }
-    }
-
-
-    function DrawLegendClassic()
-    {
-
-    }
-
-    function DrawLegendVertical()
-    {
-
-    }
-
-    function DrawLegendHorizontal()
-    {
-
-    }
-
-    function FindScaleExtent()
-    {
-        $max = -999999999999999999999;
-        $min = -$max;
-        
-        $colours = $this->colours;
-
-        foreach ($colours as $key => $colour) {
-            if (!$colour['special']) {
-                $min = min($colour['bottom'], $min);
-                $max = max($colour['top'], $max);
-            }
-        }
-
-        return array (
-            $min,
-            $max
-        );
-    }
-
-}
-
-
-// ***********************************************
-
-// Links, Nodes and the Map object inherit from this class ultimately.
-// Just to make some common code common.
-class WeatherMapBase
-{
-	var $notes = array();
-	var $hints = array();
-	var $imap_areas = array();
-	var $config = array();
-
-	var $inherit_fieldlist;
-
-	function add_note($name,$value)
-	{
-		wm_debug("Adding note $name='$value' to ".$this->name."\n");
-		$this->notes[$name] = $value;
-	}
-
-	function get_note($name)
-	{
-		if(isset($this->notes[$name]))
-		{
-			return($this->notes[$name]);
-		}
-		else
-		{
-			return(NULL);
-		}
-	}
-
-	function add_hint($name,$value)
-	{
-		wm_debug("Adding hint $name='$value' to ".$this->name."\n");
-		$this->hints[$name] = $value;
-	}
-
-
-	function get_hint($name)
-	{
-		if(isset($this->hints[$name]))
-		{
-			return($this->hints[$name]);
-		}
-		else
-		{
-			return(NULL);
-		}
-	}
-}
-
-// XXX - unused
-class WeatherMapConfigItem
-{
-	var $defined_in;
-	var $name;
-	var $value;
-	var $type;
-}
-
-// The 'things on the map' class. More common code (mainly variables, actually)
-class WeatherMapItem extends WeatherMapBase
-{
-	var $owner;
-
-	var $configline;
-	var $infourl;
-	var $overliburl;
-	var $overlibwidth, $overlibheight;
-	var $overlibcaption;
-	var $my_default;
-	var $defined_in;
-	var $config_override;	# used by the editor to allow text-editing
-
-	function my_type() {  return "ITEM"; }
-}
 
 class WeatherMap extends WeatherMapBase
 {
@@ -1707,19 +1180,39 @@ var $config_keywords = array (
 			return $input;
 		}
 		
-		$context_description = strtolower( $context->my_type() );
-		if($context_description != "map") $context_description .= ":" . $context->name;
+		$context_type = strtolower( $context->my_type() );
+		
+		if($context_type != "map") { 
+		    $context_description = $context_type . ":" . $context->name;
+		} else {
+		    $context_description = $context_type;
+		}
 		
 		// next, shortcut all the regexps for very common tokens
-		if($context_description === 'node') {
+		if($context_type === 'node') {
 			$input = str_replace("{node:this:graph_id}", $context->get_hint("graph_id" ), $input);
 			$input = str_replace("{node:this:name}", $context->name, $input);
 		}
 		
-		if($context_description === 'link') {
+		if($context_type === 'link') {
 			$input = str_replace("{link:this:graph_id}", $context->get_hint("graph_id" ), $input);
+			$input = str_replace("{link:this:name}", $context->name, $input);
 			
-			// TODO - shortcuts for standard bwlabel formats
+			if(false !== strpos($input, "{")) {
+			    // TODO - shortcuts for standard bwlabel formats, if there is still a token
+			    
+			    //if (strpos($input,"{link:this:bandwidth_in:%2k}") !== false) {
+			    //    $temp = mysprintf("%2k",$context->hints['bandwidth_in']);			        
+			    //    $input = str_replace("{link:this:bandwidth_in:%2k}", $temp, $input);
+			    //}
+			    
+			    // define('FMT_BITS_IN',"{link:this:bandwidth_in:%2k}");
+			    // define('FMT_BITS_OUT',"{link:this:bandwidth_out:%2k}");
+			    // define('FMT_UNFORM_IN',"{link:this:bandwidth_in}");
+			    // define('FMT_UNFORM_OUT',"{link:this:bandwidth_out}");
+			    // define('FMT_PERC_IN',"{link:this:inpercent:%.2f}%");
+			    // define('FMT_PERC_OUT',"{link:this:outpercent:%.2f}%");
+			}
 		}
 		
 		// check if we can now quit early before the regexp stuff
@@ -1795,53 +1288,57 @@ var $config_keywords = array (
 					}
 				}
 
-				if(is_null($the_item))
+				if (is_null($the_item))
 				{
 					wm_warn("ProcessString: $key refers to unknown item (context is $context_description) [WMWARN05]\n");
 				}
 				else
 				{
-				//	wm_debug("ProcessString: Found appropriate item: ".get_class($the_item)." ".$the_item->name."\n");
+					wm_debug("ProcessString: Found appropriate item: ".get_class($the_item)." ".$the_item->name."\n");
 
 					// SET and notes have precedent over internal properties
 					// this is my laziness - it saves me having a list of reserved words
 					// which are currently used for internal props. You can just 'overwrite' any of them.
-					if(isset($the_item->hints[$args]))
+					if ( array_key_exists($args, $the_item->hints) )
 					{
 						$value = $the_item->hints[$args];
-						wm_debug("ProcessString: used hint\n");
+						 wm_debug("ProcessString: used hint\n");
 					}
 					// for some things, we don't want to allow notes to be considered.
 					// mainly - TARGET (which can define command-lines), shouldn't be
 					// able to get data from uncontrolled sources (i.e. data sources rather than SET in config files).
-					elseif($include_notes && isset($the_item->notes[$args]))
+					elseif ($include_notes && array_key_exists($args, $the_item->notes))
 					{
 						$value = $the_item->notes[$args];
-					//	wm_debug("ProcessString: used note\n");
+						wm_debug("ProcessString: used note\n");
 
 					}
-					elseif(isset($the_item->$args))
+					
+					// REQUIRES PHP 5.1.0+ or PHP_Compat
+					elseif ( property_exists($the_item, $args))
 					{
 						$value = $the_item->$args;
-					//	wm_debug("ProcessString: used internal property\n");
+						wm_debug("ProcessString: used internal property\n");
+					} else {
+					    wm_debug("ProcessString: fell off the bottom.\n");
 					}
 				}
 			}
 
 			// format, and sanitise the value string here, before returning it
 
-			if($value===NULL) $value='NULL';
+			// if($value===NULL) $value='NULL';
 			
 			wm_debug("ProcessString: replacing %s with %s \n",$key,$value);
 
 			if($format != '')
 			{				
 				$value = mysprintf($format,$value, $this->kilo);
-			//	wm_debug("ProcessString: formatted $format to $value\n");
+                wm_debug("ProcessString: formatted $format to $value\n");
 			}
 
 			$input = str_replace($key,'',$input);
-			$output = str_replace($key,$value,$output);
+			$output = str_replace($key, $value, $output);
 		}
 		return ($output);
 }
@@ -2082,7 +1579,9 @@ function ReadData()
 
 				if( ($type=='LINK' && isset($myobj->a)) || ($type=='NODE' && !is_null($myobj->x) ) )
 				{
-					if (count($myobj->targets)>0)
+				    $ntargets = count($myobj->targets);
+				    
+					if ($ntargets>0)
 					{
 						$tindex = 0;
 						foreach ($myobj->targets as $target)
@@ -2111,31 +1610,46 @@ function ReadData()
 									list($in,$out,$datatime) =  $this->plugins['data'][ $target[5] ]->ReadData($targetstring, $this, $myobj);
 								}
 	
+								// TODO - untangle this mess!
+								
 								if (($in === NULL) && ($out === NULL))
 								{
 									$in=0;
 									$out=0;
 									wm_warn
 										("ReadData: $type $name, target: $targetstring on config line $target[3] of $target[2] had no valid data, according to $matched_by [WMWARN70]\n");
+
+									// this is to allow NULL to be passed through from DS plugins in the case of a single target
+									// we've never defined what x + NULL is, so we'll treat that as a 0
+									if ($ntargets == 1) {
+									   $total_in = NULL;
+									   $total_out = NULL;
+									}
 								}
 								else
 								{
-									if($in === NULL) $in = 0;
-									if($out === NULL) $out = 0;
-								}
+								    // force NULL to 0, for the purpose of totals
+									// if($in === NULL) $in = 0;
+									// if($out === NULL) $out = 0;								
 	
-								if($multiply != 1) {  
-									wm_debug("Pre-multiply: $in $out\n"); 
-								
-									$in = $multiply*$in;
-									$out = $multiply*$out;
-								
-									wm_debug("Post-multiply: $in $out\n"); 
+    								if($multiply != 1) {  
+    									wm_debug("Pre-multiply: $in $out\n"); 
+    								
+    									$in = $multiply*$in;
+    									$out = $multiply*$out;
+    								
+    									wm_debug("Post-multiply: $in $out\n"); 
+    								}
+
+    								if($ntargets > 1) {    								    
+            							$total_in = $total_in + $in;
+            							$total_out = $total_out + $out;
+    								} else {
+    								    $total_in = $in;
+    								    $total_out = $out;
+    								}    								
 								}
-								
-								$total_in=$total_in + $in;
-								$total_out=$total_out + $out;
-								wm_debug("Aggregate so far: $total_in $total_out\n");
+								wm_debug( sprintf("Aggregate so far: %s,%s\n", wm_value_or_null($total_in), wm_value_or_null($total_out)));
 								# keep a track of the range of dates for data sources (mainly for MRTG/textfile based DS)
 								if($datatime > 0)
 								{
@@ -2143,8 +1657,7 @@ function ReadData()
 									if($this->min_data_time==NULL || $datatime < $this->min_data_time) $this->min_data_time = $datatime;
 									
 									wm_debug("DataTime MINMAX: ".$this->min_data_time." -> ".$this->max_data_time."\n");
-								}
-								
+								}								
 							}
 							$tindex++;
 						}
@@ -2212,7 +1725,7 @@ function ReadData()
 
 				### warn("TAGS (setting) |$inscaletag| |$outscaletag| \n");
 
-				wm_debug ("ReadData: Setting $total_in,$total_out\n");
+				wm_debug ( sprintf("ReadData: Setting %s,%s for %s\n", wm_value_or_null($total_in), wm_value_or_null($total_out), $name) );
 				unset($myobj);
 			}
 		}

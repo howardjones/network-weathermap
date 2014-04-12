@@ -270,6 +270,14 @@ class WeatherMapLink extends WeatherMapItem
 			}
 		}
 	}
+	
+	/***
+	 * Precalculate the colours necessary for this link.
+	 */
+	function precalculate(&$map)
+	{
+	    
+	}
 
 	function Draw($im, &$map)
 	{
@@ -472,7 +480,7 @@ class WeatherMapLink extends WeatherMapItem
 	
 				if ($thelabel != '')
 				{
-					wm_debug("Bandwidth for label is ".$task[5]."\n");
+					wm_debug("Bandwidth for label is ".wm_value_or_null($task[5])." (label is '$thelabel')\n");
 					
 					$padding = intval($this->get_hint('bwlabel_padding'));		
 					

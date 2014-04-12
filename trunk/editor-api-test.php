@@ -2,7 +2,7 @@
 
 require_once 'Console/Getopt.php';
 
-require_once dirname(__FILE__).'/lib/Weathermap.class.php';
+require_once dirname(__FILE__).'/lib/all.php';
 require_once dirname(__FILE__).'/lib/WeatherMapEditor.class.php';
 
 if (!wm_module_checks()) {

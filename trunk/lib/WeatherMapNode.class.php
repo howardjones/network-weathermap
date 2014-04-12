@@ -128,6 +128,35 @@ class WeatherMapNode extends WeatherMapItem
 
 	function my_type() {  return "NODE"; }
 
+	/***
+	 * precalculate the colours to be used, and the bounding boxes for labels and icons (if they exist)
+	 * 
+	 * This is the only stuff that needs to be done if we're doing an editing pass. No actual drawing is necessary.
+	 */
+	function precalculate(&$map)
+	{
+	    // don't bother doing anything if there's no position - it's a template
+	    if (is_null($this->x)) {
+	        return;
+	    }
+	    
+	    if (is_null($this->y)) {
+	        return;
+	    }
+	    
+	    // apparently, some versions of the gd extension will crash
+	    // if we continue...
+	    if($this->label == '' && $this->iconfile=='') return;
+	    
+        // First, figure out the icon
+        
+	    // Next, figure out the label
+	    
+	    // Finally, the colours
+	      	   
+	}
+		
+	
 	// make a mini-image, containing this node and nothing else
 	// figure out where the real NODE centre is, relative to the top-left corner.
 	function pre_render($im, &$map)

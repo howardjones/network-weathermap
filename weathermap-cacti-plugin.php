@@ -8,7 +8,7 @@ chdir('../../');
 require_once "./include/auth.php";
 
 // include the weathermap class so that we can get the version
-require_once dirname(__FILE__)."/lib/Weathermap.class.php";
+require_once dirname(__FILE__)."/lib/globals.php";
 
 $action = "";
 if (isset($_POST['action'])) {

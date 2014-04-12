@@ -86,6 +86,72 @@ function weathermap_check_cron($time,$string)
 	return($matched);
 }
 
+
+/**
+ * Handle the expiry of old archived images when archiving is enabled
+ *
+ * Older than 6 hours, only every 30 minutes is kept  (mod 1800)
+ * Older than 24 hours only every hour is kept   (mod 3600)
+ * Older than 2 days only every 2 hours is kept  (mod 7200)
+ * Older than 5 days only every 6 hours is kept  (mod 21600)
+ * Older than 7 days only every 24 hours is kept  (mod 86400)
+ * Older than 30 days nothing is kept
+ *
+ * => leads to (with 5 minute polling):
+ *      72 images of last 6 hours
+ *      36 images of the next 18 hours
+ *      24 images of the next day
+ *      36 images of the next 3 days
+ *      4 images of the next 2 days
+ *      23 images of the next 23 days
+ *      = 195 images max (+1 for current image)
+ *
+ * @param $prefix
+ * @param $directory
+ */
+function weathermap_manage_archiving($prefix, $directory)
+{
+    $l = strlen($prefix);
+    $files = array();
+
+    // What modulo to use after what age, when deciding what to keep
+    $breaks = array(
+        21600 => 1800,
+        86400 => 3600,
+        172800 => 7200,
+        432000 => 21600,
+        604800 => 86400,
+        2592000 => 0
+    );
+
+
+    if (is_dir($directory)) {
+        if ($dh = opendir($directory)) {
+            while (($file = readdir($dh)) !== false) {
+                if( substr($file,0,$l) == $prefix) {
+                    $files[] = $directory.PATH_SEPARATOR.$file;
+                }
+            }
+            closedir($dh);
+
+            foreach ($files as $file) {
+                $ctime = 0;
+                $parts = explode("-", $file);
+
+                $ctime = mktime($parts[-2],$parts[-1],0,$parts[-4],$parts[-3],$parts[-5]);
+                $age = $ctime - time();
+
+                foreach ($breaks as $break=>$bmod) {
+                    if($age > $break) {
+                        $mod = $bmod;
+                    }
+                }
+
+            }
+        }
+    }
+}
+
 function weathermap_run_maps($mydir, $map_id = -1)
 {
 	global $config;
@@ -105,12 +171,11 @@ function weathermap_run_maps($mydir, $map_id = -1)
 	}
 
 	// require_once $mydir.DIRECTORY_SEPARATOR."lib".DIRECTORY_SEPARATOR."HTML_ImageMap.class.php";
-	require_once $mydir.DIRECTORY_SEPARATOR."lib".DIRECTORY_SEPARATOR."Weathermap.class.php";
+	require_once $mydir.DIRECTORY_SEPARATOR."lib".DIRECTORY_SEPARATOR."all.php";
 
 	if (true === function_exists('memory_get_usage')) {
 		db_execute("replace into settings values('weathermap_loaded_memory','"
-				. memory_get_usage() . "')");
-			
+				. memory_get_usage() . "')");			
 	}
 	
 	$total_warnings = 0;
@@ -126,7 +191,7 @@ function weathermap_run_maps($mydir, $map_id = -1)
 		$weathermap_poller_start_time = $start_time;
 	}
 
-	$outdir = $mydir.DIRECTORY_SEPARATOR.'output';
+	$output_directory = $mydir.DIRECTORY_SEPARATOR.'output';
 	$confdir = $mydir.DIRECTORY_SEPARATOR.'configs';
 
 	$mapcount = 0;
@@ -140,6 +205,7 @@ function weathermap_run_maps($mydir, $map_id = -1)
 		$mode_message = "Normal logging mode. Turn on DEBUG in Cacti for more information";
 		$global_debug = false;
 	}
+	
 	$quietlogging = intval(read_config_option("weathermap_quiet_logging"));  
 	// moved this outside the module_checks, so there should always be something in the logs!
 	if ($quietlogging==0) cacti_log("Weathermap $WEATHERMAP_VERSION starting - $mode_message\n",TRUE,"WEATHERMAP");
@@ -153,10 +219,10 @@ function weathermap_run_maps($mydir, $map_id = -1)
 		db_execute("replace into settings values('weathermap_last_start_time','".mysql_real_escape_string($start_time)."')");
 
 		// first, see if the output directory even exists
-		if (is_dir($outdir)) {
+		if (is_dir($output_directory)) {
 			// next, make sure that we stand a chance of writing files
 			//// $testfile = realpath($outdir."weathermap.permissions.test");
-			$testfile = $outdir.DIRECTORY_SEPARATOR."weathermap.permissions.test";
+			$testfile = $output_directory.DIRECTORY_SEPARATOR."weathermap.permissions.test";
 			$testfd = fopen($testfile, 'w');
 			if ($testfd) { 
 				fclose($testfd); 
@@ -187,17 +253,17 @@ function weathermap_run_maps($mydir, $map_id = -1)
 						
 						if (weathermap_check_cron( intval($weathermap_poller_start_time), $map['schedule'])) {
 							$mapfile = $confdir . DIRECTORY_SEPARATOR . $map['configfile'];
-							$htmlfile = $outdir . DIRECTORY_SEPARATOR . $map['filehash'].".html";
-							$imagefile = $outdir . DIRECTORY_SEPARATOR . $map['filehash'].".".$imageformat;
-							$thumbimagefile = $outdir . DIRECTORY_SEPARATOR . $map['filehash'].".thumb.".$imageformat;
-							$thumbimagefile2 = $outdir . DIRECTORY_SEPARATOR . $map['filehash'].".thumb48.".$imageformat;
+							$htmlfile = $output_directory . DIRECTORY_SEPARATOR . $map['filehash'].".html";
+							$imagefile = $output_directory . DIRECTORY_SEPARATOR . $map['filehash'].".".$imageformat;
+							$thumbimagefile = $output_directory . DIRECTORY_SEPARATOR . $map['filehash'].".thumb.".$imageformat;
+							$thumbimagefile2 = $output_directory . DIRECTORY_SEPARATOR . $map['filehash'].".thumb48.".$imageformat;
 								
-							$jsonfile  = $outdir . DIRECTORY_SEPARATOR . $map['filehash'].".json";
+							$jsonfile  = $output_directory . DIRECTORY_SEPARATOR . $map['filehash'].".json";
 							
-							$statsfile = $outdir . DIRECTORY_SEPARATOR . $map['filehash'] . '.stats.txt';
-							$resultsfile = $outdir . DIRECTORY_SEPARATOR . $map['filehash'] . '.results.txt';
+							$statsfile = $output_directory . DIRECTORY_SEPARATOR . $map['filehash'] . '.stats.txt';
+							$resultsfile = $output_directory . DIRECTORY_SEPARATOR . $map['filehash'] . '.results.txt';
 							// used to write files before moving them into place
-							$tempfile = $outdir . DIRECTORY_SEPARATOR . $map['filehash'] . '.tmp.png';
+							$tempfile = $output_directory . DIRECTORY_SEPARATOR . $map['filehash'] . '.tmp.png';
 
 							if (file_exists($mapfile)) {
 								if ($quietlogging==0) wm_warn("Map: $mapfile -> $htmlfile & $imagefile\n",TRUE);
@@ -314,36 +380,42 @@ function weathermap_run_maps($mydir, $map_id = -1)
 								$wmap->imageuri = $configured_imageuri;
 								
 								// if an htmloutputfile was configured, output the HTML there too
-                    // but using the configured imageuri and imagefilename
-                    if($wmap->htmloutputfile != "") {
-                        $htmlfile = $wmap->htmloutputfile;
-                        $fd = @fopen($htmlfile, 'w');
+                                // but using the configured imageuri and imagefilename
+                                if($wmap->htmloutputfile != "") {
+                                    $htmlfile = $wmap->htmloutputfile;
+                                    $fd = @fopen($htmlfile, 'w');
+            
+                                    if ($fd !== false) {
+                                        fwrite($fd,
+                                            $wmap->MakeHTML('weathermap_' . $map['filehash'] . '_imap'));
+                                        fclose($fd);
+                                        wm_debug("Wrote HTML to %s\n", $htmlfile);
+                                    } else {
+                                        if (true === file_exists($htmlfile)) {
+                                            wm_warn('Failed to overwrite ' . $htmlfile
+                                                . " - permissions of existing file are wrong? [WMPOLL02]\n");
+                                        } else {
+                                            wm_warn('Failed to create ' . $htmlfile
+                                                . " - permissions of output directory are wrong? [WMPOLL03]\n");
+                                        }
+                                    }
+                                }                              
+            
+                                if($wmap->imageoutputfile != "" && $wmap->imageoutputfile != "weathermap.png" && file_exists($imagefile)) {
+                                    // TODO - copy the existing file to the configured location too
+                                    @copy($imagefile, $wmap->imageoutputfile);
+                                }
+                                
+                                // If archiving is enabled for this map, then save copies with datestamps, for animation etc
+                                if ($map['archiving'] == 'on') {
+                                    // TODO - additionally save a copy with a datestamp file format
+                                    $datestamp = strftime("%Y-%m-%d-%H-%M",$weathermap_poller_start_time);
+                                    $archive_filename = $output_directory . DIRECTORY_SEPARATOR . sprintf("%s-archive-%s.%s",$map['filehash'], $datestamp, $imageformat);
+                                    @copy($imagefile, $archive_filename);
 
-                        if ($fd !== false) {
-                            fwrite($fd,
-                                $wmap->MakeHTML('weathermap_' . $map['filehash'] . '_imap'));
-                            fclose($fd);
-                            wm_debug("Wrote HTML to %s\n", $htmlfile);
-                        } else {
-                            if (true === file_exists($htmlfile)) {
-                                wm_warn('Failed to overwrite ' . $htmlfile
-                                    . " - permissions of existing file are wrong? [WMPOLL02]\n");
-                            } else {
-                                wm_warn('Failed to create ' . $htmlfile
-                                    . " - permissions of output directory are wrong? [WMPOLL03]\n");
-                            }
-                        }
-                    }
-
-                    if($wmap->imageoutputfile != "" && $wmap->imageoutputfile != "weathermap.png" && file_exists($imagefile)) {
-                        // TODO - copy the existing file to the configured location too
-                        @copy($imagefile, $wmap->imageoutputfile);
-                    }
-								
-                    
-                    
-								
-								
+                                    weathermap_manage_archiving($map['filehash'] . "-archive-", $output_directory);
+                                }
+            													
 								// if the user explicitly defined a data file, write it there too
 								if ($wmap->dataoutputfile) {
 									$map->WriteDataFile($map->dataoutputfile);
@@ -397,12 +469,12 @@ function weathermap_run_maps($mydir, $map_id = -1)
 					if ($quietlogging==0) wm_warn("No activated maps found. [WMPOLL05]\n");
 				}
 			} else {
-				wm_warn("Output directory ($outdir) isn't writable (tried to create '$testfile'). No maps created. You probably need to make it writable by the poller process (like you did with the RRA directory) [WMPOLL06]\n");
+				wm_warn("Output directory ($output_directory) isn't writable (tried to create '$testfile'). No maps created. You probably need to make it writable by the poller process (like you did with the RRA directory) [WMPOLL06]\n");
 				$total_warnings++;
 				$warning_notes .= " (Permissions problem prevents any maps running WMPOLL06)";
 			}
 		} else {
-			wm_warn("Output directory ($outdir) doesn't exist!. No maps created. You probably need to create that directory, and make it writable by the poller process (like you did with the RRA directory) [WMPOLL07]\n");
+			wm_warn("Output directory ($output_directory) doesn't exist!. No maps created. You probably need to create that directory, and make it writable by the poller process (like you did with the RRA directory) [WMPOLL07]\n");
 			$total_warnings++;
 			$warning_notes .= " (Output directory problem prevents any maps running WMPOLL07)";
 		}
@@ -426,9 +498,7 @@ function weathermap_run_maps($mydir, $map_id = -1)
 					. $peak_memory . "')");
 			$stats_string .= sprintf(" using %sbytes peak memory", wm_nice_bandwidth($peak_memory));
 		}
-		
-		
-		
+
 		if ($quietlogging==0) wm_warn("STATS: Weathermap $WEATHERMAP_VERSION run complete - $stats_string\n", TRUE);
 		db_execute("replace into settings values('weathermap_last_stats','".mysql_real_escape_string($stats_string)."')");
 		db_execute("replace into settings values('weathermap_last_finish_time','".mysql_real_escape_string($end_time)."')");
@@ -443,8 +513,7 @@ function weathermap_run_maps($mydir, $map_id = -1)
 		if (true === function_exists("memory_get_peak_usage")) {
 			db_execute("replace into settings values('weathermap_peak_memory','"
 					. memory_get_peak_usage() . "')");
-		}	
-		
+		}
 		
 	} else {
 		wm_warn("Required modules for PHP Weathermap $WEATHERMAP_VERSION were not present. Not running. [WMPOLL08]\n");

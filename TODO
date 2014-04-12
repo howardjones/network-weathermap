@@ -1,7 +1,11 @@
-BUG - $(window).height() returns 0 in firefox => Center() doesn't centre vertically in FF.
+Basic implementation for archiving
+
+FIXED BUG - $(window).height() returns 0 in firefox => Center() doesn't centre vertically in FF.
 FIXED BUG - Node icon filenames are run through processstring() in the editor during a Tidy operation?
  => design issue. Running DrawMap() to get bounding boxes requires loading the images, which requires valid filenames
  => tidy can't work on a link where either node has a dynamic icon filename. 
+Add tests for 'no-data' in text DS and also in ProcessString
+Add more shortcuts to ProcessString (at least for standard bwlabels)
 
 Editor - moving a dependent item in a "locked" set should update the relative coords (optionally?)
 Editor - setting defaults for link font, and bwstyle do nothing?

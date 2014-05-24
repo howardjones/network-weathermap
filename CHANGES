@@ -12,6 +12,7 @@
     CHANGE - new config parser is much faster than the previous one
     CHANGE - other performance improvements - possibly twice as quick as 0.97c (thanks to ikorzha758 for lots of feedback)
     CHANGE - (Cacti plugin only) images are written to a temporary file first, to avoid displaying half-written images
+	CHANGE - The internals of Weathermap have been broken out into more files. Hopefully will help with sharing development.
     ADDED - new DATAOUTPUTFILE allows collected data to be written to a file for later use (automatically enabled in Cacti)
     ADDED - new wmdata: datasource plugin can read data from files produced by DATAOUTPUTFILE
     ADDED - AICONFILLCOLOR accepts 'none' for drawing giant transparent shapes.
@@ -26,6 +27,7 @@
     ADDED - Memory tracking and Cacti templates to track it
     ADDED - Added some more options to cacti-integrate.php and updated for new file layout
 	ADDED - Facility to edit relative positioning in editor - this effectively gives a 'group' function
+	ADDED - Added --map-list option to weathermap-cacti-rebuild.php to help find map IDs
 
 0.97c - No code changes apart from path fixes, and ZIP file fixes.
 

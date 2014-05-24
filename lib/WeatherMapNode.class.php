@@ -132,6 +132,8 @@ class WeatherMapNode extends WeatherMapItem
 	 * precalculate the colours to be used, and the bounding boxes for labels and icons (if they exist)
 	 * 
 	 * This is the only stuff that needs to be done if we're doing an editing pass. No actual drawing is necessary.
+     *
+     * TODO: write this.
 	 */
 	function precalculate(&$map)
 	{
@@ -512,11 +514,9 @@ class WeatherMapNode extends WeatherMapItem
 					
 					if(true === isset($colicon)) {
 						if (function_exists("imagefilter") && $this->get_hint("use_imagefilter") == 1) {
-							imagefilter($icon_im, IMG_FILTER_COLORIZE, $colicon->r,
-							$colicon->g, $colicon->b);
+							imagefilter($icon_im, IMG_FILTER_COLORIZE, $colicon->red, $colicon->green, $colicon->blue);
 						} else {
-							imagecolorize($icon_im, $colicon->r, $colicon->g,
-							$colicon->b);
+							imagecolorize($icon_im, $colicon->red, $colicon->green, $colicon->blue);
 						}
 					}
 
@@ -709,10 +709,9 @@ class WeatherMapNode extends WeatherMapItem
 	}
 
 	// draw the node, using the pre_render() output
-	function NewDraw($im, &$map)
+	function Draw($im, &$map)
 	{
-		// take the offset we figured out earlier, and just blit
-		// the image on. Who says "blit" anymore?
+		// take the offset we figured out earlier, and just blit the image on. Who says "blit" anymore?
 
 		// it's possible that there is no image, so better check.
 		if(isset($this->image))

@@ -28,10 +28,8 @@
     		{
     			return($this->notes[$name]);
     		}
-    		else
-    		{
-    			return(NULL);
-    		}
+
+            return(NULL);
     	}
     
     	function add_hint($name,$value)
@@ -47,10 +45,8 @@
     		{
     			return($this->hints[$name]);
     		}
-    		else
-    		{
-    			return(NULL);
-    		}
+
+    		return(NULL);
     	}
     }
     

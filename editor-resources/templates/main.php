@@ -29,11 +29,11 @@
   <div class="container" id="wmmaincontainer">
     <form action="" method="post" name="frmMain" >
 	   <div align="center" id="mainarea">
-	   	<input type="hidden" name="plug" value="<?php echo ($fromplug==TRUE ? 1 : 0) ?>" />
+	   	<input type="hidden" name="plug" value="<?php echo ($fromplug==true ? 1 : 0) ?>" />
 	    <input style="display:none" type="image"  width="<?php echo $map_width?>" height="<?php echo $map_height?>" 
 	       src="<?php echo $imageurl; ?>" id="xycapture" /><img src=
-	       "<?php echo $imageurl; ?>" width="<?php echo $map_width?>" height="<?php echo $map_height?>" id="existingdata" alt="Weathermap"
-	       usemap="#weathermap_imap" />
+	       "<?php echo $imageurl; ?>" width="<?php echo $map_width?>" height="<?php echo $map_height?>"
+           id="existingdata" alt="Weathermap" usemap="#weathermap_imap" />
 	   
 	       <div class="debug control-group">
         	   <input type="text" class="input-mini" name="mapname" value="<?php echo $mapname ?>" />
@@ -41,8 +41,10 @@
         	   <input type="text" class="input-mini" name="param" id="param" value="" />
                <input type="text" class="input-mini" name="param2" id="param2" value="<?php echo $param2 ?>" />
         	   <input type="text" class="input-mini" id="debug" value="" name="debug" />    	  
-        	   <a class="btn btn-success" href="?<?php echo ($fromplug==TRUE ? 'plug=1&amp;' : ''); ?>action=nothing&amp;mapname=<?php echo  htmlspecialchars($mapname) ?>">Do Nothing</a> 
-        	   <a class="btn btn-info" target="configwindow" href="?<?php echo ($fromplug==TRUE ? 'plug=1&amp;':''); ?>action=show_config&amp;mapname=<?php echo  urlencode($mapname) ?>">See config</a>
+        	   <a class="btn btn-success" href="?<?php echo ($fromplug==true ? 'plug=1&amp;' : '');
+               ?>action=nothing&amp;mapname=<?php echo  htmlspecialchars($mapname) ?>">Do Nothing</a>
+        	   <a class="btn btn-info" target="configwindow" href="?<?php echo ($fromplug==true ? 'plug=1&amp;':'');
+               ?>action=show_config&amp;mapname=<?php echo  urlencode($mapname) ?>">See config</a>
     	   </div>  
 	   
 	       <?php echo $imagemap ?>

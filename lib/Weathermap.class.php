@@ -1171,7 +1171,7 @@ var $config_keywords = array (
 		}
 	}
 
-	function ProcessString($input,&$context, $include_notes=TRUE,$multiline=FALSE)
+	function ProcessString($input,&$context, $include_notes=TRUE, $multiline=FALSE)
 	{
 		if($input === '') { return ''; }
 	
@@ -1417,8 +1417,9 @@ function DatasourceInit()
 	foreach ($this->datasourceclasses as $ds_class)
 	{
 		// make an instance of the class
-		$dsplugins[$ds_class] = new $ds_class;
-		wm_debug("Running $ds_class"."->Init()\n");
+		# $dsplugins[$ds_class] = new $ds_class;
+        $this->plugins['data'][$ds_class] = new $ds_class;
+        wm_debug("Running $ds_class"."->Init()\n");
 		assert('isset($this->plugins["data"][$ds_class])');
 
 		$ret = $this->plugins['data'][$ds_class]->Init($this);
@@ -1455,7 +1456,7 @@ function ProcessTargets()
 			$type = $myobj->my_type();
 			$name=$myobj->name;
 			
-			
+			// TODO - refactor to an is_template() test in the object
 			if( ($type=='LINK' && isset($myobj->a)) || ($type=='NODE' && !is_null($myobj->x) ) )
 			{
 				if (count($myobj->targets)>0)
@@ -1762,7 +1763,7 @@ function DrawLabelRotated($im, $x, $y, $angle, $text, $font, $padding, $linkname
 
 	// a box. the last point is the start point for the text.
 	$points = array($x1,$y1, $x1,$y2, $x2,$y2, $x2,$y1,   $x-$strwidth/2, $y+$strheight/2 + 1);
-	$npoints = count($points)/2;
+	# $npoints = count($points)/2;
 
 	if($rangle != 0) {
 		RotateAboutPoint($points, $x,$y, $rangle);
@@ -1810,7 +1811,7 @@ function ColourFromValue($value,$scalename="DEFAULT",$name="",$is_percent=TRUE, 
 	
 	$tag = '';
 	$matchsize = NULL;
-        $matchkey = NULL;
+    $matchkey = NULL;
 
 	$nowarn_clipping = intval($this->get_hint("nowarn_clipping"));
 	$nowarn_scalemisses = (!$scale_warning) || intval($this->get_hint("nowarn_scalemisses"));
@@ -1840,7 +1841,7 @@ function ColourFromValue($value,$scalename="DEFAULT",$name="",$is_percent=TRUE, 
 				$range = $colour['top'] - $colour['bottom'];
 								
 				// change in behaviour - with multiple matching ranges for a value, the smallest range wins
-				if( is_null($matchsize) || ($range < $matchsize) ) 
+				if ( is_null($matchsize) || ($range < $matchsize) )
 				{					
 					$matchsize = $range;
                                         $matchkey = $key;
@@ -1852,7 +1853,7 @@ function ColourFromValue($value,$scalename="DEFAULT",$name="",$is_percent=TRUE, 
                 
                 // if we have a match, figure out the actual
                 // colour (for gradients) and return it
-                if(!is_null($matchsize)) {
+                if (!is_null($matchsize)) {
                     
                     $colour = $colours[$matchkey];
                     
@@ -1867,21 +1868,21 @@ function ColourFromValue($value,$scalename="DEFAULT",$name="",$is_percent=TRUE, 
                                     $ratio=($value - $colour["bottom"]) / ($colour["top"] - $colour["bottom"]);
                             }
 
-                            $r=$colour["red1"] + ($colour["red2"] - $colour["red1"]) * $ratio;
-                            $g=$colour["green1"] + ($colour["green2"] - $colour["green1"]) * $ratio;
-                            $b=$colour["blue1"] + ($colour["blue2"] - $colour["blue1"]) * $ratio;
+                            $red = $colour["red1"] + ($colour["red2"] - $colour["red1"]) * $ratio;
+                            $green = $colour["green1"] + ($colour["green2"] - $colour["green1"]) * $ratio;
+                            $blue = $colour["blue1"] + ($colour["blue2"] - $colour["blue1"]) * $ratio;
                     }
                     else {
-                            $r=$colour["red1"];
-                            $g=$colour["green1"];
-                            $b=$colour["blue1"];
+                            $red = $colour["red1"];
+                            $green = $colour["green1"];
+                            $blue = $colour["blue1"];
                     }
                     
                     if(isset($colour['tag'])) {
                         $tag = $colour['tag'];
                     }
-                    $col = new WMColour($r, $g, $b);
-                    return(array($col,$matchkey,$tag));
+                    $col = new WMColour($red, $green, $blue);
+                    return(array($col, $matchkey, $tag));
                 }
                 
 	} else 	{
@@ -1931,7 +1932,7 @@ function FindScaleExtent($scalename="DEFAULT")
 	{
 		$colours=$this->colours[$scalename];
 
-		foreach ($colours as $key => $colour)
+		foreach ($colours as $colour)
 		{
 			if(! $colour['special'])
 			{
@@ -1951,8 +1952,8 @@ function DrawLegend_Horizontal($im,$scalename="DEFAULT",$width=400)
 {
 	$title=$this->keytext[$scalename];
 
-	$colours=$this->colours[$scalename];
-	$nscales=$this->numscales[$scalename];
+	# $colours=$this->colours[$scalename];
+	$nscales = $this->numscales[$scalename];
 
 	wm_debug("Drawing $nscales colours into SCALE\n");
 
@@ -1967,7 +1968,7 @@ function DrawLegend_Horizontal($im,$scalename="DEFAULT",$width=400)
 	$box_left = $x;
 	$scale_left = $box_left + 4 + $scalefactor/2;
 	$box_right = $scale_left + $width + $tilewidth + 4 + $scalefactor/2;
-	$scale_right = $scale_left + $width;
+	# $scale_right = $scale_left + $width;
 
 	$box_top = $y;
 	$scale_top = $box_top + $tileheight + 6;
@@ -1993,15 +1994,15 @@ function DrawLegend_Horizontal($im,$scalename="DEFAULT",$width=400)
 			$this->colours['DEFAULT']['KEYOUTLINE']['blue1']
 	);
 	
-		if($bgcol->is_real()) {
-			imagefilledrectangle($scale_im, $box_left, $box_top, $box_right, $box_bottom,
-				$this->colours['DEFAULT']['KEYBG'][$scale_ref]);
-			}
-        
-        if($outlinecol->is_real()) {
-        	imagerectangle($scale_im, $box_left, $box_top, $box_right, $box_bottom,
-				$this->colours['DEFAULT']['KEYOUTLINE'][$scale_ref]);
+    if($bgcol->is_real()) {
+        imagefilledrectangle($scale_im, $box_left, $box_top, $box_right, $box_bottom,
+            $this->colours['DEFAULT']['KEYBG'][$scale_ref]);
         }
+
+    if($outlinecol->is_real()) {
+        imagerectangle($scale_im, $box_left, $box_top, $box_right, $box_bottom,
+            $this->colours['DEFAULT']['KEYOUTLINE'][$scale_ref]);
+    }
 
 	$this->myimagestring($scale_im, $font, $scale_left, $scale_bottom + $tileheight * 2 + 2 , $title,
 		$this->colours['DEFAULT']['KEYTEXT'][$scale_ref]);
@@ -2020,7 +2021,7 @@ function DrawLegend_Horizontal($im,$scalename="DEFAULT",$width=400)
 				$this->colours['DEFAULT']['KEYTEXT'][$scale_ref]);
 		}
 
-		list($col,$junk) = $this->ColourFromValue($p,$scalename);
+		list($col,) = $this->ColourFromValue($p,$scalename);
 		if($col->is_real())
 		{
 			$cc = $col->gdallocate($scale_im);
@@ -2047,15 +2048,15 @@ function DrawLegend_Vertical($im,$scalename="DEFAULT",$height=400,$inverted=fals
 {
 	$title=$this->keytext[$scalename];
 
-	$colours=$this->colours[$scalename];
+	# $colours=$this->colours[$scalename];
 	$nscales=$this->numscales[$scalename];
 
 	wm_debug("Drawing $nscales colours into SCALE\n");
 
 	$font=$this->keyfont;
 
-	$x=$this->keyx[$scalename];
-	$y=$this->keyy[$scalename];
+	# $x = $this->keyx[$scalename];
+	# $y = $this->keyy[$scalename];
 
 	$scalefactor = $height/100;
 
@@ -2068,7 +2069,7 @@ function DrawLegend_Vertical($im,$scalename="DEFAULT",$height=400,$inverted=fals
 	$scale_right = $scale_left + $tileheight*2;
 	$box_right = $scale_right + $tilewidth + $scalefactor*2 + 4;
 
-	list($titlewidth,$titleheight) = $this->myimagestringsize($font,$title);
+	list($titlewidth,) = $this->myimagestringsize($font,$title);
 	if( ($box_left + $titlewidth + $scalefactor*3) > $box_right)
 	{
 		$box_right = $box_left + $scalefactor*4 + $titlewidth;
@@ -2118,42 +2119,42 @@ function DrawLegend_Vertical($im,$scalename="DEFAULT",$height=400,$inverted=fals
 	{
 		if($inverted)
 		{
-			$dy = (100-$p) * $scalefactor;
+			$delta_y = (100-$p) * $scalefactor;
 		}
 		else
 		{
-			$dy = $p*$scalefactor;
+			$delta_y = $p*$scalefactor;
 		}
 	
 		if( ($p % 25) == 0)
 		{
-			imageline($scale_im, $scale_left - $scalefactor, $scale_top + $dy,
-				$scale_right + $scalefactor, $scale_top + $dy,
+			imageline($scale_im, $scale_left - $scalefactor, $scale_top + $delta_y,
+				$scale_right + $scalefactor, $scale_top + $delta_y,
 				$this->colours['DEFAULT']['KEYTEXT'][$scale_ref]);
 			$labelstring=sprintf("%d%%", $p);
-			$this->myimagestring($scale_im, $font, $scale_right + $scalefactor*2 , $scale_top + $dy + $tileheight/2,
+			$this->myimagestring($scale_im, $font, $scale_right + $scalefactor*2 , $scale_top + $delta_y + $tileheight/2,
 				$labelstring,  $this->colours['DEFAULT']['KEYTEXT'][$scale_ref]);
 		}
 
-		list($col,$junk) = $this->ColourFromValue($p,$scalename);
+		list($col,) = $this->ColourFromValue($p,$scalename);
 		if( $col->is_real())
 		{
-			$cc = $col->gdallocate($scale_im);
-			imagefilledrectangle($scale_im, $scale_left, $scale_top + $dy - $scalefactor/2,
-				$scale_right, $scale_top + $dy + $scalefactor/2,
-				$cc);
+			# $cc = $col->gdallocate($scale_im);
+			imagefilledrectangle($scale_im, $scale_left, $scale_top + $delta_y - $scalefactor/2,
+				$scale_right, $scale_top + $delta_y + $scalefactor/2,
+                $col->gdallocate($scale_im));
 		}
 	}
 
 	imagecopy($im,$scale_im,$this->keyx[$scalename],$this->keyy[$scalename],0,0,imagesx($scale_im),imagesy($scale_im));
 	$this->keyimage[$scalename] = $scale_im;
 
-	$rx = $this->keyx[$scalename];
-	$ry = $this->keyy[$scalename];
+	$origin_x = $this->keyx[$scalename];
+	$origin_y = $this->keyy[$scalename];
 	
 	$areaname = "LEGEND:$scalename";
 	$this->imap->addArea("Rectangle", $areaname, '',
-		array($rx+$box_left, $ry+$box_top, $rx+$box_right, $ry+$box_bottom));
+		array($origin_x+$box_left, $origin_y+$box_top, $origin_x+$box_right, $origin_y+$box_bottom));
 	$this->imap_areas[] = $areaname;
 }
 
@@ -2340,8 +2341,6 @@ function DrawLegend_Classic($im,$scalename="DEFAULT",$use_tags=FALSE)
 function DrawTimestamp($im, $font, $colour, $which="")
 {
 	// add a timestamp to the corner, so we can tell if it's all being updated
-	# $datestring = "Created: ".date("M d Y H:i:s",time());
-	# $this->datestamp=strftime($this->stamptext, time());
 
 	switch($which)
 	{
@@ -2379,7 +2378,7 @@ function DrawTimestamp($im, $font, $colour, $which="")
 	$this->imap_areas[] = $areaname;
 }
 
-function DrawTitle($im, $font, $colour)
+function DrawTitle($gdimage, $font, $colour)
 {
 	$string = $this->ProcessString($this->title,$this);
 	
@@ -2396,7 +2395,7 @@ function DrawTitle($im, $font, $colour)
 		$y=$this->titley;
 	}
 
-	$this->myimagestring($im, $font, $x, $y, $string, $colour);
+	$this->myimagestring($gdimage, $font, $x, $y, $string, $colour);
 
 	$this->imap->addArea("Rectangle", "TITLE", '', array($x, $y, $x + $boxwidth, $y - $boxheight));
 	$this->imap_areas[] = 'TITLE';
@@ -3505,9 +3504,10 @@ function BuildZLayers()
 	{
 		$allitems[] = $link;
 	}
-	
-	foreach ($allitems as $ky=>$vl)
-	{
+
+    while (list($ky,) = each ($allitems)) {
+	# foreach ($allitems as $ky=>$vl)
+	# {
 		$item =& $allitems[$ky];
 		$z = $item->zorder;
 		if(!isset($this->seen_zlayers[$z]) || !is_array($this->seen_zlayers[$z]))
@@ -3672,7 +3672,7 @@ function WriteJSONFile($filename)
     if($filename != "") {
     
         $fd = fopen($filename, 'w');
-        $output = '';
+        # $output = '';
     
         if($fd) {
 
@@ -3724,7 +3724,7 @@ function WriteDataFile($filename)
     if($filename != "") {
 
 	$fd = fopen($filename, 'w');
-	$output = '';
+	# $output = '';
 
 	if($fd) {
 
@@ -3900,12 +3900,12 @@ function WriteConfig($filename)
             // TODO - These should replace the stuff above
             $output .= "# new colourtable stuff (duplicated above right now TODO)\n";
             foreach ($this->colourtable as $k=>$c) {
-            #	$output .= sprintf("%sCOLOR %s\n", $k, $c->as_config());
+            	$output .= sprintf("%sCOLOR %s\n", $k, $c->as_config());
             }
             $output .= "\n";
             
-            foreach ($this->scales as $k=>$s) {
-            #	$output .= $s->WriteConfig();
+            foreach ($this->scales as $s) {
+            	$output .= $s->WriteConfig();
             }
             
             $output .= "\n";
@@ -4127,6 +4127,7 @@ function DrawMap($filename = '', $thumbnailfile = '', $thumbnailmax = 250, $with
 			// all the map 'furniture' is fixed at z=1000
 			if($z==1000)
 			{
+
 				foreach ($this->colours as $scalename=>$colours)
 				{
 					wm_debug("Drawing KEY for $scalename if necessary.\n");
@@ -4174,7 +4175,7 @@ function DrawMap($filename = '', $thumbnailfile = '', $thumbnailmax = 250, $with
 							{
 								# print "::".get_class($it)."\n";
 								wm_debug("Drawing NODE ".$it->name."\n");
-								$this->nodes[$it->name]->NewDraw($image, $this);
+								$this->nodes[$it->name]->Draw($image, $this);
 								$ii=0;
 								foreach($this->nodes[$it->name]->boundingboxes as $bbox)
 								{
@@ -4243,7 +4244,7 @@ function DrawMap($filename = '', $thumbnailfile = '', $thumbnailmax = 250, $with
 				foreach($this->nodes as $node)
 				{
 					if( !is_null($node->x )) {
-						foreach ($node->named_offsets as $name=>$offsets) {
+						foreach ($node->named_offsets as $offsets) {
 							$x = $node->x + $offsets[0];
 							$y = $node->y + $offsets[1];
 							imagearc($image, $x, $y, 4,4, 0,360, $overlay);
@@ -4769,8 +4770,9 @@ function CacheUpdate($agelimit=600)
 		$id = 10;	// first ID for user-supplied thing
 		
 		$json .= "{ id: 1, text: 'SCALEs'\n, children: [\n";
-		foreach ($this->colours as $scalename=>$colours)
-		{
+        while ( list($scalename,) = each($this->colours)) {
+		#foreach ($this->colours as $scalename=>$colours)
+		#{
 			$json .= "{ id: " . $id++ . ", text:" . js_escape($scalename) . ", leaf: true }, \n";			
 		}
 		$json = rtrim($json,", \n");
@@ -4906,7 +4908,7 @@ function DumpStats($filename="")
 			fclose($fd);
 		}
 		else {
-			wmwarn("Unable to open stats file for writing [WMSTATS01]");
+			wm_warn("Unable to open stats file for writing [WMSTATS01]");
 		}
 	}	
 }

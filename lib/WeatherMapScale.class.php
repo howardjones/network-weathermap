@@ -141,7 +141,7 @@
     
             $output .= "\n";
     
-            foreach ($this->colours as $k => $colour) {
+            foreach ($this->colours as $colour) {
                 $top = rtrim(rtrim(sprintf("%f", $colour['top']), "0"),
                     $decimal_point);
     
@@ -274,7 +274,6 @@
             );
         }
     
-    
         function DrawLegend($image)
         {
             // don't draw if the position is the default -1,-1
@@ -331,7 +330,7 @@
     
             $colours = $this->colours;
     
-            foreach ($colours as $key => $colour) {
+            foreach ($colours as $colour) {
                 if (!$colour['special']) {
                     $min = min($colour['bottom'], $min);
                     $max = max($colour['top'], $max);

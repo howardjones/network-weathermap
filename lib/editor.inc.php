@@ -568,8 +568,8 @@ function tidy_link(&$map,$target, $linknumber=1, $linktotal=1, $ignore_tidied=FA
         $new_a_offset = "0:0";
         $new_b_offset = "0:0";
         
-	// Update TODO: if the nodes are already directly left/right or up/down, then use compass-points, not pixel offsets
-	// (e.g. N90) so if the label changes, they won't need to be re-tidied
+        // Update TODO: if the nodes are already directly left/right or up/down, then use compass-points, not pixel offsets
+        // (e.g. N90) so if the label changes, they won't need to be re-tidied
 	
         // First bounding box in the node's boundingbox array is the icon, if there is one, or the label if not.
         $bb_a = $node_a->boundingboxes[0];
@@ -632,8 +632,6 @@ function tidy_link(&$map,$target, $linknumber=1, $linktotal=1, $ignore_tidied=FA
                 
             $new_a_offset = sprintf("%d:%d", $a_x_offset,$a_y_offset);
             $new_b_offset = sprintf("%d:%d", $b_x_offset,$b_y_offset);
-            
-            
         }			
         
         // if no common coordinates, figure out the best diagonal...
@@ -705,7 +703,7 @@ function tidy_link(&$map,$target, $linknumber=1, $linktotal=1, $ignore_tidied=FA
             $new_b_offset = $best_offset_b."85";
         }
         
-        // unwritten/implied - if both overlap, you're doing something wierd and you're on your own
+        // unwritten/implied - if both overlap, you're doing something weird and you're on your own
 
         // finally, update the offsets
         $map->links[$target]->a_offset = $new_a_offset;

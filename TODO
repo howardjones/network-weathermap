@@ -1,19 +1,43 @@
-Basic implementation for archiving
+DONEish Basic implementation for archiving
+
+Cacti mgmt - rework map list.
+
+Get code into PSR-2 shape?
+
+Finish moving to WMColour
+
+Finish moving to WMScale
+
+Finish move to use geometry classes - should simplify link-drawing a lot
+
+New-style plugin!!
+
+Editor - tidy doesn't deal with diagonal (no common coordinates) nodes
+
+Editor - tidy should use NESW etc if it can
+
+Editor - moving a dependent item in a "locked" set should update the relative coords (optionally?)
+
+Editor - setting defaults for link font, and bwstyle do nothing?
+
+Add support for rrdtool pipe mode - DS plugins know all their targets in advance now, so it can pre-fetch all the results from a single rrdtool process, instead of spawning hundreds.
+
+Add tests for 'no-data' in text DS and also in ProcessString
+
+Add more shortcuts to ProcessString (at least for standard bwlabels)
+
+Editor: re-tidy should know that a-b is the same as b-a
+
+--
 
 FIXED BUG - $(window).height() returns 0 in firefox => Center() doesn't centre vertically in FF.
 FIXED BUG - Node icon filenames are run through processstring() in the editor during a Tidy operation?
  => design issue. Running DrawMap() to get bounding boxes requires loading the images, which requires valid filenames
- => tidy can't work on a link where either node has a dynamic icon filename. 
-Add tests for 'no-data' in text DS and also in ProcessString
-Add more shortcuts to ProcessString (at least for standard bwlabels)
+ => tidy can't work on a link where either node has a dynamic icon filename.
 
-Editor - moving a dependent item in a "locked" set should update the relative coords (optionally?)
-Editor - setting defaults for link font, and bwstyle do nothing?
 DONE Collect all the external javascript, PHP and CSS into a vendor folder: Bootstrap, jQuery/UI, overlib
 FIXED Editor: Cloning a node loses the template
-Editor: re-tidy should know that a-b is the same as b-a
-Fullscreen cycle: controls should be moveable (and fade away?)
-Cacti mgmt - rework map list.
+DONE Fullscreen cycle: controls should be moveable (and fade away?)
 
 r512 - last performance-related commit
 r529 - last commit before 0.98 rollback
@@ -24,10 +48,8 @@ DONE Up to r522 (inclusive)
 r500 - move link drawing code to use Point and Vector (skipped for now)
 
 Rename plugin functions into a weathermap_ namespace
-Finish moving to WMColour
-Finish moving to WMScale
+
 DONE Show runtimes in map list
-New-style plugin!!
 
 
 Before 0.98

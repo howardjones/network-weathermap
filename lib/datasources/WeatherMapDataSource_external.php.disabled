@@ -22,7 +22,7 @@ class WeatherMapDataSource_external extends WeatherMapDataSource {
 
 	function Recognise($targetstring)
 	{
-		if(preg_match("/^!(.*)$/",$targetstring,$matches))
+		if(preg_match("/^!(.*)$/",$targetstring))
 		{
 			return TRUE;
 		}

@@ -6,7 +6,7 @@ class WeatherMapDataSource_dsstats extends WeatherMapDataSource {
 
 	function Init(&$map)
 	{
-		global $config;
+		# global $config;
 		if($map->context=='cacti')
 		{
 			if( !function_exists('db_fetch_row') )
@@ -35,7 +35,7 @@ class WeatherMapDataSource_dsstats extends WeatherMapDataSource {
 			$result = db_fetch_assoc($sql) or die (mysql_error());
 			$tables = array();
 			
-			foreach($result as $index => $arr) {
+			foreach($result as $arr) {
 				foreach ($arr as $t) {
 					$tables[] = $t;
 				}
@@ -57,18 +57,16 @@ class WeatherMapDataSource_dsstats extends WeatherMapDataSource {
 
 	function Recognise($targetstring)
 	{
-		if(preg_match("/^dsstats:([a-z]+):(\d+):([\-a-zA-Z0-9_]+):([\-a-zA-Z0-9_]+)$/",$targetstring,$matches))
-		{
+		if(preg_match("/^dsstats:([a-z]+):(\d+):([\-a-zA-Z0-9_]+):([\-a-zA-Z0-9_]+)$/",$targetstring)) {
 			return TRUE;
 		}
-		elseif(preg_match("/^dsstats:(\d+):([\-a-zA-Z0-9_]+):([\-a-zA-Z0-9_]+)$/",$targetstring,$matches))
-		{
+
+        if(preg_match("/^dsstats:(\d+):([\-a-zA-Z0-9_]+):([\-a-zA-Z0-9_]+)$/",$targetstring)) {
 			return TRUE;
 		}
-		else
-		{
-			return FALSE;
-		}
+
+		return FALSE;
+
 	}
 
 	
@@ -79,15 +77,15 @@ class WeatherMapDataSource_dsstats extends WeatherMapDataSource {
 	// data_time is intended to allow more informed graphing in the future
 	function ReadData($targetstring, &$map, &$item)
 	{
-		global $config;
+		# global $config;
 		
 		$dsnames[IN] = "traffic_in";
 		$dsnames[OUT] = "traffic_out";
 		$data[IN] = NULL;
 		$data[OUT] = NULL;
 
-		$inbw = NULL;
-		$outbw = NULL;
+		# $inbw = NULL;
+		# $outbw = NULL;
 		$data_time = 0;
 
 		$table = "";

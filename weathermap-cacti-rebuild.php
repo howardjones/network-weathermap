@@ -14,12 +14,13 @@ $cacti_base = "../../";
 
 
 require_once dirname(__FILE__).DIRECTORY_SEPARATOR."setup.php";
+require_once dirname(__FILE__).DIRECTORY_SEPARATOR."lib".DIRECTORY_SEPARATOR."all.php";
 require_once dirname(__FILE__).DIRECTORY_SEPARATOR."lib".DIRECTORY_SEPARATOR."poller-common.php";
-
 
 require_once 'Console/Getopt.php';
 
 $map_id = -1;
+$list_ids = false;
 
 // initialize object
 $cg=new Console_Getopt();
@@ -29,7 +30,8 @@ $long_opts=array
 		"version",
 		"help",
 		"cacti-base=",
-		"map-id="
+		"map-id=",
+		"map-list"
 );
 
 $args=$cg->readPHPArgv();
@@ -56,6 +58,12 @@ if (sizeof($gopts) > 0)
 
 			case '--help':
 				print 'PHP Network Weathermap v' . $WEATHERMAP_VERSION."\n";
+                print "Usage:\n weathermap-cacti-rebuild.php [--cacti-base={PATH}] [--map-id={int}] [--map-list] [--help]\n";
+                print "  Rebuilds all maps registered with Cacti, using Cacti poller-like environment (so poller_output works).\n";
+                print "  --map-id={map-id}   builds one map and exits\n";
+                print "  --map-list          shows a list of registered maps with their ids and exits\n";
+                print "  --cacti-base={PATH} manually set the path to the Cacti base directory, if we have trouble finding it.\n";
+                print "  --help              this page\n";
 				exit();
 				break;
 
@@ -72,11 +80,13 @@ if (sizeof($gopts) > 0)
 			case '--map-id':
 				$map_id = intval($o[1]);
 				break;
+
+            case '--map-list':
+                $list_ids = true;
+                break;
 		}
 	}
 }
-
-
 
 // check if the goalposts have moved
 if (is_dir($cacti_base) && file_exists($cacti_base."/include/global.php")) {
@@ -87,6 +97,31 @@ if (is_dir($cacti_base) && file_exists($cacti_base."/include/global.php")) {
         include_once $cacti_base."/include/config.php";
 } else {
 	echo "Couldn't find a usable Cacti config";
+}
+
+if($list_ids) {
+    print 'PHP Network Weathermap v' . $WEATHERMAP_VERSION."\n";
+    print "Available map ids:\n";
+
+    $SQL = "select m.*, g.name as groupname from weathermap_maps m,weathermap_groups g where m.group_id=g.id ";
+    $SQL .= "order by id";
+
+    $queryrows = db_fetch_assoc( $SQL );
+
+    // build a list of the maps that we're actually going to run
+    if (is_array($queryrows)) {
+        foreach ($queryrows as $map) {
+
+            printf("%4d - %8s - %-30s %s\n",
+                $map['id'],
+                $map['active']=='on'? 'enabled':'disabled',
+                $map['configfile'],
+                $map['filehash']
+            );
+        }
+    }
+
+    exit();
 }
 
 weathermap_setup_table();

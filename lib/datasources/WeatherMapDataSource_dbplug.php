@@ -24,7 +24,7 @@ class WeatherMapDataSource_dbplug extends WeatherMapDataSource {
 	
 	function Recognise($targetstring)
 	{
-		if(preg_match("/^dbplug:([^:]+)$/",$targetstring,$matches))
+		if(preg_match("/^dbplug:([^:]+)$/",$targetstring))
 		{
 			return TRUE;
 		}

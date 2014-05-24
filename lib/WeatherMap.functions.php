@@ -294,12 +294,12 @@ function screenshotify_xxx($matches)
 
 function screenshotify($input)
 {
-    $tmp = $input;
+    $output = $input;
 
-    $tmp = preg_replace ( "/\b\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}\b/", "127.0.0.1", $tmp );    
-    $tmp = preg_replace_callback ( "/([A-Za-z]{3,})/", "screenshotify_xxx", $tmp );
+    $output = preg_replace ( "/\b\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}\b/", "127.0.0.1", $output );
+    $output = preg_replace_callback ( "/([A-Za-z]{3,})/", "screenshotify_xxx", $output );
 
-    return ($tmp);
+    return ($output);
 }
 
 
@@ -549,18 +549,18 @@ function nice_scalar($number, $kilo = 1000, $decimals = 1)
 
 
 // rotate a list of points around cx,cy by an angle in radians, IN PLACE
-function RotateAboutPoint(&$points, $cx, $cy, $angle = 0)
+function RotateAboutPoint(&$points, $centre_x, $centre_y, $angle = 0)
 {
     $npoints = count ( $points ) / 2;
 
     for($i = 0; $i < $npoints; $i ++) {
-        $ox = $points [$i * 2] - $cx;
-        $oy = $points [$i * 2 + 1] - $cy;
-        $rx = $ox * cos ( $angle ) - $oy * sin ( $angle );
-        $ry = $oy * cos ( $angle ) + $ox * sin ( $angle );
+        $delta_x = $points [$i * 2] - $centre_x;
+        $delta_y = $points [$i * 2 + 1] - $centre_y;
+        $rotated_x = $delta_x * cos ( $angle ) - $delta_y * sin ( $angle );
+        $rotated_y = $delta_y * cos ( $angle ) + $delta_x * sin ( $angle );
 
-        $points [$i * 2] = $rx + $cx;
-        $points [$i * 2 + 1] = $ry + $cy;
+        $points [$i * 2] = $rotated_x + $centre_x;
+        $points [$i * 2 + 1] = $rotated_y + $centre_y;
     }
 }
 
@@ -579,15 +579,15 @@ class WMFont
 
 
 
-function wm_draw_marker_cross($im, $col, $x, $y, $size = 5)
+function wm_draw_marker_cross($gdimage, $colour, $x, $y, $size = 5)
 {
-    imageline ( $im, $x, $y, $x + $size, $y + $size, $col );
-    imageline ( $im, $x, $y, $x - $size, $y + $size, $col );
-    imageline ( $im, $x, $y, $x + $size, $y - $size, $col );
-    imageline ( $im, $x, $y, $x - $size, $y - $size, $col );
+    imageline ( $gdimage, $x, $y, $x + $size, $y + $size, $colour );
+    imageline ( $gdimage, $x, $y, $x - $size, $y + $size, $colour );
+    imageline ( $gdimage, $x, $y, $x + $size, $y - $size, $colour );
+    imageline ( $gdimage, $x, $y, $x - $size, $y - $size, $colour );
 }
 
-function wm_draw_marker_diamond($im, $col, $x, $y, $size = 10)
+function wm_draw_marker_diamond($gdimage, $colour, $x, $y, $size = 10)
 {
     $points = array ();
     
@@ -605,10 +605,10 @@ function wm_draw_marker_diamond($im, $col, $x, $y, $size = 10)
     
     $num_points = 4;
     
-    imagepolygon ( $im, $points, $num_points, $col );
+    imagepolygon ( $gdimage, $points, $num_points, $colour );
 }
 
-function wm_draw_marker_box($im, $col, $x, $y, $size = 10)
+function wm_draw_marker_box($gdimage, $colour, $x, $y, $size = 10)
 {
     $points = array ();
     
@@ -626,20 +626,20 @@ function wm_draw_marker_box($im, $col, $x, $y, $size = 10)
     
     $num_points = 4;
     
-    imagepolygon ( $im, $points, $num_points, $col );
+    imagepolygon ( $gdimage, $points, $num_points, $colour );
 }
 
-function wm_draw_marker_circle($im, $col, $x, $y, $size = 10)
+function wm_draw_marker_circle($gdimage, $colour, $x, $y, $size = 10)
 {
-    imagearc ( $im, $x, $y, $size, $size, 0, 360, $col );
+    imagearc ( $gdimage, $x, $y, $size, $size, 0, 360, $colour );
 }
 
-function wm_draw_spine_chain($im, $spine, $col, $size = 10)
+function wm_draw_spine_chain($gdimage, $spine, $colour, $size = 10)
 {
     $newn = count ( $spine );
     
     for($i = 0; $i < $newn; $i ++) {
-        imagearc ( $im, $spine [$i] [X], $spine [$i] [Y], $size, $size, 0, 360, $col );
+        imagearc ( $gdimage, $spine [$i] [X], $spine [$i] [Y], $size, $size, 0, 360, $colour );
     }
 }
 
@@ -652,12 +652,12 @@ function wm_dump_spine($spine)
     print "===============\n";
 }
 
-function wm_draw_spine($im, $spine, $col)
+function wm_draw_spine($gdimage, $spine, $colour)
 {
     $max_i = count ( $spine ) - 1;
     
     for($i = 0; $i < $max_i; $i ++) {
-        imageline ( $im, $spine [$i] [X], $spine [$i] [Y], $spine [$i + 1] [X], $spine [$i + 1] [Y], $col );
+        imageline ( $gdimage, $spine [$i] [X], $spine [$i] [Y], $spine [$i + 1] [X], $spine [$i + 1] [Y], $colour );
     }
 }
 

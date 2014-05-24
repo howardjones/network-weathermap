@@ -26,9 +26,7 @@
     
         function LineTo($p2)
         {
-            $l = new WMLine ( $this->x, $this->y, $p2->x, $p2->y );
-    
-            return $l;
+            return new WMLine ( $this->x, $this->y, $p2->x, $p2->y );
         }
     
     
@@ -154,20 +152,20 @@
     
         function WMRectangle($x1,$y1, $x2, $y2)
         {
-            if($x2<$x1) {
+            if ($x2<$x1) {
                 $tmp = $x1;
                 $x1 = $x2;
                 $x2 = $tmp;
             }
     
-            if($y2<$y1) {
+            if ($y2<$y1) {
                 $tmp = $y1;
                 $y1 = $y2;
                 $y2 = $tmp;
             }
     
-            $topleft = new WMPoint($x1,$y1);
-            $bottomright = new WMPoint($x2,$y2);
+            $this->topleft = new WMPoint($x1,$y1);
+            $this->bottomright = new WMPoint($x2,$y2);
         }
     
         function width()
@@ -178,6 +176,19 @@
         function height()
         {
             return ($this->bottomright->y - $this->topleft->y);
+        }
+
+        function contains($p)
+        {
+            if ( $this->topleft->x <= $p->x
+                && $this->bottomright->x >= $p->x
+                && $this->topleft->y <= $p->y
+                && $this->bottomright->y >= $p->y) {
+
+                return TRUE;
+            }
+
+            return FALSE;
         }
     }
     

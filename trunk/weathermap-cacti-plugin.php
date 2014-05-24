@@ -385,9 +385,10 @@ function weathermap_fullview($cycle=FALSE, $firstonly=FALSE, $limit_to_group = -
 	if($fullscreen) $class = "fullscreen";
 	
 	if($cycle) {
-		print "<script src='vendor/jquery-1.10.2.min.js'></script>";
-		$extra = "";
-		if($limit_to_group > 0) $extra = " in this group";
+        print "<script src='vendor/jquery-1.10.2.min.js'></script>";
+        print "<script src='vendor/jquery.idletimer.min.js'></script>";
+        $extra = "";
+        if($limit_to_group > 0) $extra = " in this group";
 		?>
 					<div id="wmcyclecontrolbox" class="<?php print $class ?>">
 						<div id="wm_progress"></div>

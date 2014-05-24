@@ -28,3 +28,5 @@
     
     require_once dirname(__FILE__).'/WeatherMapNode.class.php';
     require_once dirname(__FILE__).'/WeatherMapLink.class.php';
+    
+    require_once dirname(__FILE__).'/WeatherMapRunner.class.php';

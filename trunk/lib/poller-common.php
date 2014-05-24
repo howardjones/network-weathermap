@@ -4,40 +4,43 @@
 
 function weathermap_memory_check($note="MEM")
 {
-	global $weathermap_mem_highwater;
-	
-	if (true === function_exists("memory_get_usage")) {
-		$mem = memory_get_usage();
-		if($mem > $weathermap_mem_highwater) {
-			$weathermap_mem_highwater = $mem;
-		}
-		$mem_used = wm_nice_bandwidth($mem);
-		$mem_allowed = ini_get("memory_limit");
-		wm_debug("%s: memory_get_usage() says %sBytes used. Limit is %s\n",  $note, $mem_used, $mem_allowed);
-	}
+    global $weathermap_mem_highwater;
+
+    if (true === function_exists("memory_get_usage")) {
+            $mem = memory_get_usage();
+            if($mem > $weathermap_mem_highwater) {
+                    $weathermap_mem_highwater = $mem;
+            }
+            $mem_used = wm_nice_bandwidth($mem);
+            $mem_allowed = ini_get("memory_limit");
+            wm_debug("%s: memory_get_usage() says %sBytes used. Limit is %s\n",  $note, $mem_used, $mem_allowed);
+            
+            return $mem_used;
+    }
+    return 0;
 }
 
-function weathermap_cron_part($value,$checkstring)
+function weathermap_cron_part($value, $checkstring)
 {
-	// XXX - this should really handle a few more crontab niceties like */5 or 3,5-9 but this will do for now
-	
+	// Possible commonents: * (any)
+    //       4 (or any digit) - exact match
+    //       */5 - every five
+    //       5-7  - between 5 and 7 inclusive
+
 	// first, shortcut the most common cases - * and a simple single number
 	if ($checkstring == '*') return TRUE;
-	
-	$v = stringval($value);
-	
-	if ($checkstring === $v) {
+
+	if ($checkstring == $value) {
 		return (true);
 	}
 	
 	// Cron allows for multiple comma separated clauses, so let's break them
 	// up first, and evaluate each one.
 	$parts = explode(",", $checkstring);
-	
 
 	foreach ($parts as $part) {
 		// just a number
-		if ($part === $v) {
+		if ($part === $value) {
 			return (true);
 		}
 		
@@ -62,30 +65,58 @@ function weathermap_cron_part($value,$checkstring)
 	return FALSE;
 }
 
-function weathermap_check_cron($time,$string)
+function weathermap_check_cron($time, $string)
 {
-	if($string == '') return TRUE;
-	if($string == '*') return TRUE;
+	if ($string == '') return TRUE;
+	if ($string == '*') return TRUE;
 	
 	$lt = localtime($time, TRUE);
-	list($minute,$hour,$wday,$day,$month) = preg_split('/\s+/',$string);
-	
-	$matched = TRUE;
+    list($minute,$hour,$weekday,$day,$month) = preg_split('/\s+/',$string);
 
 	if (weathermap_cron_part($lt['tm_min'],$minute)
 		&& weathermap_cron_part($lt['tm_hour'],$hour)
-		&& weathermap_cron_part($lt['tm_wday'],$wday)
+		&& weathermap_cron_part($lt['tm_wday'],$weekday)
 		&& weathermap_cron_part($lt['tm_mday'],$day)
 		&& weathermap_cron_part($lt['tm_mon']+1,$month)
 	   ) {
 		return TRUE;
-	} else {
-		return FALSE;
 	}
-	
-	return($matched);
+
+    return FALSE;
 }
 
+function weathermap_archive_keep($filename, $breaks)
+{
+    $parts_by_dot = explode(".",$filename);
+    array_pop($parts_by_dot);
+    $filename_without_ext = join(".",$parts_by_dot);
+    $rev_parts_by_dash = array_reverse(explode("-", $filename_without_ext));
+
+    $ctime = mktime(
+        $rev_parts_by_dash[1],
+        $rev_parts_by_dash[0],
+        0,
+        $rev_parts_by_dash[3],
+        $rev_parts_by_dash[2],
+        $rev_parts_by_dash[4]);
+
+    $age = time() - $ctime;
+    $modulo = null;
+
+    foreach ($breaks as $breakstart => $breakmodulo) {
+        if($age > $breakstart) {
+            $modulo = $breakmodulo;
+        }
+    }
+
+    if( ! is_null($modulo) ) {
+        if (($modulo == 0) || ($ctime % $modulo) != 0) {
+            return false;
+        }
+    }
+
+    return true;
+}
 
 /**
  * Handle the expiry of old archived images when archiving is enabled
@@ -124,37 +155,77 @@ function weathermap_manage_archiving($prefix, $directory)
         2592000 => 0
     );
 
-
     if (is_dir($directory)) {
         if ($dh = opendir($directory)) {
             while (($file = readdir($dh)) !== false) {
                 if( substr($file,0,$l) == $prefix) {
-                    $files[] = $directory.PATH_SEPARATOR.$file;
+                    $files[] = $directory.DIRECTORY_SEPARATOR.$file;
                 }
             }
             closedir($dh);
 
             foreach ($files as $file) {
-                $ctime = 0;
-                $parts = explode("-", $file);
-
-                $ctime = mktime($parts[-2],$parts[-1],0,$parts[-4],$parts[-3],$parts[-5]);
-                $age = $ctime - time();
-
-                foreach ($breaks as $break=>$bmod) {
-                    if($age > $break) {
-                        $mod = $bmod;
-                    }
+                if ( !weathermap_archive_keep($file, $breaks) ) {
+                        wm_warn("$file will be expired.");
+                        unlink($file);
                 }
-
             }
         }
     }
 }
 
+function weathermap_directory_writeable($directory_path)
+{
+    if (! is_dir($directory_path)) {
+        wm_warn("Output directory ($directory_path) doesn't exist!. No maps created. You probably need to create that directory, and make it writable by the poller process (like you did with the RRA directory) [WMPOLL07]\n");
+        return FALSE;
+    }
+    
+    $testfile = $directory_path.DIRECTORY_SEPARATOR."weathermap.permissions.test";
+    
+    $testfd = fopen($testfile, 'w');
+    if ($testfd) { 
+        fclose($testfd); 
+        unlink($testfile);
+        return TRUE;
+    }
+    wm_warn("Output directory ($directory_path) isn't writable (tried to create '$testfile'). No maps created. You probably need to make it writable by the poller process (like you did with the RRA directory) [WMPOLL06]\n");
+    return FALSE;
+}
+
+function weathermap_get_runlist($map_id = -1, $quietlogging)
+{
+    global $weathermap_poller_start_time;
+    
+    $SQL = "select m.*, g.name as groupname from weathermap_maps m,weathermap_groups g where m.group_id=g.id and active='on'";
+    if( intval($map_id) >= 0) {
+            $SQL .= " and m.id=".intval($map_id)." ";
+    }
+    $SQL .= "order by sortorder,id";
+
+    $queryrows = db_fetch_assoc( $SQL );
+
+    $maplist = array();
+    
+    // build a list of the maps that we're actually going to run
+    if (is_array($queryrows)) {
+        foreach ($queryrows as $map) {
+            if (weathermap_check_cron( intval($weathermap_poller_start_time), $map['schedule'])) {
+                $maplist[] = $map;
+            }
+        }
+    }
+    
+    if (sizeof($maplist)==0) {
+        if ($quietlogging==0) wm_warn("No activated maps found. [WMPOLL05]\n");
+    }
+    
+    return $maplist;
+}
+
 function weathermap_run_maps($mydir, $map_id = -1)
 {
-	global $config;
+	# global $config;
 	global $weathermap_debugging, $WEATHERMAP_VERSION;
 	global $weathermap_map;
 	global $weathermap_warncount;
@@ -180,12 +251,8 @@ function weathermap_run_maps($mydir, $map_id = -1)
 	
 	$total_warnings = 0;
 	$warning_notes = "";
-
-	if (function_exists("microtime")) {
-		$start_time = microtime(true);
-	} else {
-		$start_time = time();
-	}
+	
+        $start_time = microtime(true);
 	
 	if ($weathermap_poller_start_time==0) {
 		$weathermap_poller_start_time = $start_time;
@@ -218,53 +285,41 @@ function weathermap_run_maps($mydir, $map_id = -1)
 
 		db_execute("replace into settings values('weathermap_last_start_time','".mysql_real_escape_string($start_time)."')");
 
-		// first, see if the output directory even exists
-		if (is_dir($output_directory)) {
-			// next, make sure that we stand a chance of writing files
-			//// $testfile = realpath($outdir."weathermap.permissions.test");
-			$testfile = $output_directory.DIRECTORY_SEPARATOR."weathermap.permissions.test";
-			$testfd = fopen($testfile, 'w');
-			if ($testfd) { 
-				fclose($testfd); 
-				unlink($testfile);
-
-
-				$SQL = "select m.*, g.name as groupname from weathermap_maps m,weathermap_groups g where m.group_id=g.id and active='on'";
-				if( intval($map_id) >= 0) {
-					$SQL .= " and m.id=".intval($map_id)." ";
-				}
-				$SQL .= "order by sortorder,id";
-				
-				$queryrows = db_fetch_assoc( $SQL );
-				
-				if (is_array($queryrows)) {
-					wm_debug("Iterating all maps.");
-
-					$imageformat = strtolower(read_config_option("weathermap_output_format"));
-					$rrdtool_path =  read_config_option("path_rrdtool");
-
-					foreach ($queryrows as $map) {
-						// reset the warning counter
-						$weathermap_warncount=0;
-						// this is what will prefix log entries for this map
-						$weathermap_map = "[Map ".$map['id']."] ".$map['configfile'];
-	
-						wm_debug("FIRST TOUCH\n");
-						
-						if (weathermap_check_cron( intval($weathermap_poller_start_time), $map['schedule'])) {
-							$mapfile = $confdir . DIRECTORY_SEPARATOR . $map['configfile'];
-							$htmlfile = $output_directory . DIRECTORY_SEPARATOR . $map['filehash'].".html";
-							$imagefile = $output_directory . DIRECTORY_SEPARATOR . $map['filehash'].".".$imageformat;
-							$thumbimagefile = $output_directory . DIRECTORY_SEPARATOR . $map['filehash'].".thumb.".$imageformat;
-							$thumbimagefile2 = $output_directory . DIRECTORY_SEPARATOR . $map['filehash'].".thumb48.".$imageformat;
+		// first, see if the output directory exists and is writable
+		if (weathermap_directory_writeable($output_directory)) {
+			
+                    $maplist = weathermap_get_runlist($map_id, $quietlogging);
 								
-							$jsonfile  = $output_directory . DIRECTORY_SEPARATOR . $map['filehash'].".json";
-							
-							$statsfile = $output_directory . DIRECTORY_SEPARATOR . $map['filehash'] . '.stats.txt';
-							$resultsfile = $output_directory . DIRECTORY_SEPARATOR . $map['filehash'] . '.results.txt';
-							// used to write files before moving them into place
-							$tempfile = $output_directory . DIRECTORY_SEPARATOR . $map['filehash'] . '.tmp.png';
+                    wm_debug("Iterating all maps.");
 
+                    $imageformat = strtolower(read_config_option("weathermap_output_format"));
+                    $rrdtool_path =  read_config_option("path_rrdtool");
+
+                    foreach ($maplist as $map) {
+                            // reset the warning counter
+                            $weathermap_warncount=0;
+                            // this is what will prefix log entries for this map
+                            $weathermap_map = "[Map ".$map['id']."] ".$map['configfile'];
+
+                            wm_debug("FIRST TOUCH\n");
+                                                    
+                            $runner = new WeatherMapRunner($confdir, $output_directory, $map['configfile'], $map['filehash'], $imageformat);
+                            
+                            $mapfile = $confdir . DIRECTORY_SEPARATOR . $map['configfile'];
+                            $htmlfile = $output_directory . DIRECTORY_SEPARATOR . $map['filehash'].".html";
+                            $imagefile = $output_directory . DIRECTORY_SEPARATOR . $map['filehash'].".".$imageformat;
+                            $thumbimagefile = $output_directory . DIRECTORY_SEPARATOR . $map['filehash'].".thumb.".$imageformat;
+                            $thumbimagefile2 = $output_directory . DIRECTORY_SEPARATOR . $map['filehash'].".thumb48.".$imageformat;
+
+                            $jsonfile  = $output_directory . DIRECTORY_SEPARATOR . $map['filehash'].".json";
+
+                            $statsfile = $output_directory . DIRECTORY_SEPARATOR . $map['filehash'] . '.stats.txt';
+                            $resultsfile = $output_directory . DIRECTORY_SEPARATOR . $map['filehash'] . '.results.txt';
+                            // used to write files before moving them into place
+                            $tempfile = $output_directory . DIRECTORY_SEPARATOR . $map['filehash'] . '.tmp.png';
+
+                            $runner->LoadMap();
+                            
 							if (file_exists($mapfile)) {
 								if ($quietlogging==0) wm_warn("Map: $mapfile -> $htmlfile & $imagefile\n",TRUE);
 								db_execute("replace into settings values('weathermap_last_started_file','".mysql_real_escape_string($weathermap_map)."')");
@@ -276,11 +331,9 @@ function weathermap_run_maps($mydir, $map_id = -1)
 									$weathermap_debugging = $global_debug;
 								}
 								
-								if (function_exists("microtime")) {
-									$map_start = microtime(true);
-								} else {
-									$map_start = time();
-								}
+								
+                                                                $map_start = microtime(true);
+								
 								
 								weathermap_memory_check("MEM starting $mapcount");
 								$wmap = new Weathermap;
@@ -374,7 +427,7 @@ function weathermap_run_maps($mydir, $map_id = -1)
 
 								$wmap->DumpStats($statsfile);
 								$wmap->WriteDataFile($resultsfile);
-								$wmap->WriteJSONFile($jsonfile);
+								// $wmap->WriteJSONFile($jsonfile);
 								
 								// put back the configured imageuri
 								$wmap->imageuri = $configured_imageuri;
@@ -402,7 +455,7 @@ function weathermap_run_maps($mydir, $map_id = -1)
                                 }                              
             
                                 if($wmap->imageoutputfile != "" && $wmap->imageoutputfile != "weathermap.png" && file_exists($imagefile)) {
-                                    // TODO - copy the existing file to the configured location too
+                                    // copy the existing file to the configured location too
                                     @copy($imagefile, $wmap->imageoutputfile);
                                 }
                                 
@@ -428,14 +481,13 @@ function weathermap_run_maps($mydir, $map_id = -1)
 									db_execute("update weathermap_maps set thumb_width=".intval($wmap->thumb_width).", thumb_height=".intval($wmap->thumb_height)." where id=".intval($map['id']));
 								}
 								
+                                                                $runner->CleanUp();
+                                                                unset($runner);
+                                                                
 								$wmap->CleanUp();
 								unset($wmap);
 								
-								if (function_exists("microtime")) {
-									$map_end = microtime(true);
-								} else {
-									$map_end = time();
-								}
+                                                                $map_end = microtime(true);
 								
 								$map_duration = $map_end - $map_start;
 								wm_debug("TIME: $mapfile took %f seconds.\n", $map_duration);
@@ -460,32 +512,21 @@ function weathermap_run_maps($mydir, $map_id = -1)
 							$total_warnings += $weathermap_warncount;
 							$weathermap_warncount = 0;
 							$weathermap_map="";
-						} else {
-							wm_debug("Skipping ".$map['id']." (".$map['configfile'].") due to schedule.\n");
-						}
+						
 					}
 					wm_debug("Iterated all $mapcount maps.\n");
-				} else {
-					if ($quietlogging==0) wm_warn("No activated maps found. [WMPOLL05]\n");
-				}
-			} else {
-				wm_warn("Output directory ($output_directory) isn't writable (tried to create '$testfile'). No maps created. You probably need to make it writable by the poller process (like you did with the RRA directory) [WMPOLL06]\n");
-				$total_warnings++;
-				$warning_notes .= " (Permissions problem prevents any maps running WMPOLL06)";
-			}
+				 
+			
 		} else {
 			wm_warn("Output directory ($output_directory) doesn't exist!. No maps created. You probably need to create that directory, and make it writable by the poller process (like you did with the RRA directory) [WMPOLL07]\n");
 			$total_warnings++;
 			$warning_notes .= " (Output directory problem prevents any maps running WMPOLL07)";
 		}
+                
 		weathermap_memory_check("MEM Final");
 		chdir($orig_cwd);
 		
-		if (function_exists("microtime")) {
-			$end_time = microtime(true);
-		} else {
-			$end_time = time();
-		}
+        	$end_time = microtime(true);
 		
 		$duration = $end_time - $start_time;
 		

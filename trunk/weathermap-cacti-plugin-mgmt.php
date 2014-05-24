@@ -484,6 +484,7 @@ function weathermap_maplist4()
 
                 // Active/Disabled + debug status for per-map debugging
                 $debugextra = "";
+
                 if($map['debug'] == 'on') {
                     $debugextra="<br><img src='cacti-resources/img/bug.png' />";
                 }
@@ -504,7 +505,16 @@ function weathermap_maplist4()
                     $label = "Activate";
                     $label2 = "Disabled";
                 }
-                	
+
+                if($map['archiving'] == 'on') {
+                    $debugextra .= ' <img src="cacti-resources/img/database.png" alt="Archiving" >';
+                }
+
+                if($map['schedule'] != '*') {
+                    $debugextra .= ' <img src="cacti-resources/img/clock.png" alt="Scheduled" >';
+                }
+
+
                 printf('<td class="%s maptable_active"><a title="Click to %s" href="?action=%s&id=%s">%s</a>%s</td>',
                 $class,$label,$action, $map['id'], $label2,
                 $debugextra

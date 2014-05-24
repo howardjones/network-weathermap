@@ -22,22 +22,24 @@ class HTML_ImageMap_Area
 
 	function common_html()
 	{
-		$h = "";
+		$html = "";
 		if($this->name != "")
 		{
 			// $h .= " alt=\"".$this->name."\" ";
-			$h .= "id=\"".$this->name."\" ";
+			$html .= "id=\"".$this->name."\" ";
 		}
-		if($this->href != "")
+
+        if($this->href != "")
 		{
-			$h .= "href=\"".$this->href."\" ";
+			$html .= "href=\"".$this->href."\" ";
 		}
-		else { $h .= "nohref "; }
+		else { $html .= "nohref "; }
+
 		if($this->extrahtml != "")
 		{
-			$h .= $this->extrahtml." ";
+			$html .= $this->extrahtml." ";
 		}
-		return $h;
+		return $html;
 	}
 
 }
@@ -109,14 +111,14 @@ class HTML_ImageMap_Area_Polygon extends HTML_ImageMap_Area
 		return ($c);
 	}
 
-	function Draw($im, $col)
+	function Draw($gdimage, $colour)
 	{
 		$pts = array();
 		foreach ($this->points as $point) {
 			$pts[] = $point[0];
 			$pts[] = $point[1];
 		}
-		imagepolygon($im, $pts, count($pts)/2, $col);
+		imagepolygon($gdimage, $pts, count($pts)/2, $colour);
 	}
 	
 	function HTML_ImageMap_Area_Polygon ( $name="", $href="",$coords)
@@ -215,9 +217,9 @@ class HTML_ImageMap_Area_Rectangle extends HTML_ImageMap_Area
 	}
 	
 
-	function Draw($im, $col)
+	function Draw($gdimage, $colour)
 	{
-		imagerectangle($im, $this->x1, $this->y1, $this->x2, $this->y2, $col);
+		imagerectangle($gdimage, $this->x1, $this->y1, $this->x2, $this->y2, $colour);
 	}
 	
 	
@@ -226,31 +228,31 @@ class HTML_ImageMap_Area_Rectangle extends HTML_ImageMap_Area
 
 class HTML_ImageMap_Area_Circle extends HTML_ImageMap_Area
 {
-	var $centx,$centy, $edgex, $edgey;
+	var $centre_x,$centre_y, $edge_x, $edge_y;
 
 	function asHTML()
 	{
-		$coordstring = join(",",array($this->centx,$this->centy,$this->edgex,$this->edgey) );
+		$coordstring = join(",",array($this->centre_x,$this->centre_y,$this->edge_x,$this->edge_y) );
 		return '<area '.$this->common_html().'shape="circle" coords="'.$coordstring.'" />';
 	}
 
 	function hitTest($x,$y)
 	{
-		$radius1 = ($this->edgey - $this->centy) * ($this->edgey - $this->centy)
-			+ ($this->edgex - $this->centx) * ($this->edgex - $this->centx);
+		$radius1 = ($this->edge_y - $this->centre_y) * ($this->edge_y - $this->centre_y)
+			+ ($this->edge_x - $this->centre_x) * ($this->edge_x - $this->centre_x);
 
-		$radius2 = ($this->centy - $y) * ($this->centy - $y)
-			+ ($this->centx - $x) * ($this->centx - $x);
+		$radius2 = ($this->centre_y - $y) * ($this->centre_y - $y)
+			+ ($this->centre_x - $x) * ($this->centre_x - $x);
 
 		return ($radius2 <= $radius1);
 	}
 
 
-	function Draw($im, $col)
+	function Draw($gdimage, $colour)
 	{
-		$radius = abs($this->centx - $this->edgex);
-		imageellipse($image, $this->centx, $this->centy, $radius, $radius, $col);
-		imagerectangle($im, $this->x1, $this->y1, $this->x2, $this->y2, $col);
+		$radius = abs($this->centre_x - $this->edge_x);
+		imageellipse($gdimage, $this->centre_x, $this->centre_y, $radius, $radius, $colour);
+		imagerectangle($gdimage, $this->x1, $this->y1, $this->x2, $this->y2, $colour);
 	}
 	
 	
@@ -261,10 +263,10 @@ class HTML_ImageMap_Area_Circle extends HTML_ImageMap_Area
 
 		$this->name = $name;
 		$this->href = $href;
-		$this->centx = round($c[0]);
-		$this->centy = round($c[1]);
-		$this->edgex = round($c[2]);
-		$this->edgey = round($c[3]);
+		$this->centre_x = round($c[0]);
+		$this->centre_y = round($c[1]);
+		$this->edge_x = round($c[2]);
+		$this->edge_y = round($c[3]);
 	}
 }
 
@@ -291,13 +293,13 @@ class HTML_ImageMap
 	/**
 	 * Draw the outlines for the imagemap - for debugging
 	 *
-	 * @param GDImageRef $im
-	 * @param GDColorRef $col
+	 * @param GDImageRef $gdimage
+	 * @param GDColorRef $colour
 	 */
-	function Draw($im, $col)
+	function Draw($gdimage, $colour)
 	{
 		foreach ($this->shapes as $shape) {
-			$shape->Draw($im, $col);
+			$shape->Draw($gdimage, $colour);
 		}
 	}
 	
@@ -322,7 +324,6 @@ class HTML_ImageMap
 
 		$this->shapes[ $elementObject->name ] = &$elementObject;
 		$this->nshapes++;
-		//      print $this->nshapes." shapes\n";
 	}
 
 	// do a hit-test based on the current map
@@ -444,8 +445,8 @@ class HTML_ImageMap
 	function subHTML($namefilter="",$reverseorder=false, $skipnolinks=false)
 	{
 		$html = "";
-		$l = strlen($namefilter);
-		$preg = '/'.$namefilter.'/';
+		# $l = strlen($namefilter);
+		# $preg = '/'.$namefilter.'/';
 		
 		foreach ($this->shapes as $shape)
 		{

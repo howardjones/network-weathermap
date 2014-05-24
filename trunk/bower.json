@@ -1,0 +1,17 @@
+{
+  "name": "weathermap",
+  "version": "0.98.0",
+  "description": "Network Weathermap",
+  "license": "GPLv2",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "bootstrap": "~3.1.1"
+  }
+}

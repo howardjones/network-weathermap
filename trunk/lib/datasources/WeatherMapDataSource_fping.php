@@ -30,7 +30,7 @@ class WeatherMapDataSource_fping extends WeatherMapDataSource {
 		{
 			// save the address. This way, we can do ONE fping call for all the pings in the map.
 			// fping does it all in parallel, so 10 hosts takes the same time as 1
-			$this->addresscache[]=$matches[1];
+			$this->addresscache[] = $matches[1];
 			return TRUE;
 		}
 		else

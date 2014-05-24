@@ -8,7 +8,7 @@ class WeatherMapDataSource_mrtg extends WeatherMapDataSource {
 
 	function Recognise($targetstring)
 	{
-		if(preg_match("/\.(htm|html)$/",$targetstring,$matches))
+		if(preg_match("/\.(htm|html)$/",$targetstring))
 		{
 			return TRUE;
 		}

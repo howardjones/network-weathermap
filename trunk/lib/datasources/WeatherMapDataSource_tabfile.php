@@ -8,7 +8,7 @@ class WeatherMapDataSource_tabfile extends WeatherMapDataSource {
 
 	function Recognise($targetstring)
 	{
-		if(preg_match("/\.(tsv|txt)$/",$targetstring,$matches))
+		if(preg_match("/\.(tsv|txt)$/",$targetstring))
 		{
 			return TRUE;
 		}
@@ -26,7 +26,7 @@ class WeatherMapDataSource_tabfile extends WeatherMapDataSource {
 		$data_time=0;
 		$itemname = $item->name;
 
-		$matches=0;
+		# $matches=0;
 
 		$fd=fopen($targetstring, "r");
 

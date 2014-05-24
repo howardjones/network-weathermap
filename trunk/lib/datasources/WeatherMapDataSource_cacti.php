@@ -1,4 +1,7 @@
 <?php
+
+# TODO - this doesn't do anything!
+
 class WeatherMapDataSource_cacti extends WeatherMapDataSource
 {
     function Init(&$map)
@@ -18,7 +21,7 @@ class WeatherMapDataSource_cacti extends WeatherMapDataSource
 
     function Recognise($targetstring)
     {
-        if (1 === preg_match('/^cacti:(\d+)$/', $targetstring, $matches)) {
+        if (1 === preg_match('/^cacti:(\d+)$/', $targetstring)) {
             return true;
         } else {
             return false;

@@ -3,7 +3,7 @@ jQuery.fn.center = function () {
     
     this.css("position", "fixed");
     
-    console.log( "(" + $(window).height() + " - " +  this.outerHeight() + ") / 2 + " +  $(window).scrollTop() );
+  //  console.log( "(" + $(window).height() + " - " +  this.outerHeight() + ") / 2 + " +  $(window).scrollTop() );
     
     this.css("top",  Math.max(0, (($(window).height() - this.outerHeight()) / 2) + $(window).scrollTop()) + "px");
     this.css("left", Math.max(0, (($(window).width() - this.outerWidth()) / 2) + $(window).scrollLeft()) + "px");
@@ -98,6 +98,14 @@ WMcycler = {
         this.updateProgress();
     },
 
+    hideControls: function() {
+        $("#wmcyclecontrolbox").fadeOut(500);
+    },
+
+    showControls: function() {
+        $("#wmcyclecontrolbox").fadeIn(100);
+    },
+
     start : function (initialData) {
 
         this.period = initialData.period;
@@ -173,6 +181,19 @@ WMcycler = {
         // if the pointer moves after that, bring the controls back
         // if the pointer is over the controls, don't fade
         if (this.fullscreen) {
+
+            $(document).idleTimer( {
+                timeout: 5000
+            } );
+
+            $(document).on("idle.idleTimer", function(event, elem, obj){
+                that.hideControls();
+            });
+            $(document).on("active.idleTimer", function(event, elem, obj){
+                that.showControls();
+            });
+
+            // this.hideControls();
             // $("#wmcyclecontrolbox").delay(5000).fadeOut(500);
             // $(document).mousemove( function ()
             // {$("#wmcyclecontrolbox").fadeIn(100); } );

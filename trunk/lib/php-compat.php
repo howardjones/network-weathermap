@@ -73,3 +73,14 @@ if (!function_exists('property_exists')) {
         return php_compat_property_exists($class, $property);
     }
 }
+
+if (!function_exists('microtime')) {
+    function microtime($as_float)
+    {
+        if($as_float) {
+            return time();
+        } else {
+            return sprtinf("%d 0", time());
+        }
+    }
+}

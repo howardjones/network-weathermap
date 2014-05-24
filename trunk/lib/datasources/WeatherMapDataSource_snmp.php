@@ -29,7 +29,7 @@ class WeatherMapDataSource_snmp extends WeatherMapDataSource {
 
 	function Recognise($targetstring)
 	{
-		if(preg_match("/^snmp:([^:]+):([^:]+):([^:]+):([^:]+)$/",$targetstring,$matches))
+		if(preg_match("/^snmp:([^:]+):([^:]+):([^:]+):([^:]+)$/",$targetstring))
 		{
 			return TRUE;
 		}
@@ -134,10 +134,13 @@ class WeatherMapDataSource_snmp extends WeatherMapDataSource {
 				
 				$data_time = time();
 
-				if(function_exists("snmp_set_quick_print"))
-				{
+                // Restore the SNMP settings as before
+				if(function_exists("snmp_set_quick_print")) {
 					snmp_set_quick_print($was);
 				}
+                if(function_exists("snmp_set_valueretrieval")) {
+                    snmp_get_valueretrieval($was2);
+                }
 			}
 			else
 			{

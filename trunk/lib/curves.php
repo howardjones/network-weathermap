@@ -570,7 +570,6 @@ function draw_straight($image, &$curvepoints, $widths, $outlinecolour, $fillcolo
                 // now figure out the geometry for where the next corners are
 
                 list ( $xi1, $yi1 ) = line_crossing ( $simple [$i] [X] + $n1->dx * $widths [$dir], $simple [$i] [Y] + $n1->dy * $widths [$dir], $simple [$i + 1] [X] + $n1->dx * $widths [$dir], $simple [$i + 1] [Y] + $n1->dy * $widths [$dir], $simple [$i + 1] [X] + $n2->dx * $widths [$dir], $simple [$i + 1] [Y] + $n2->dy * $widths [$dir], $simple [$i + 2] [X] + $n2->dx * $widths [$dir], $simple [$i + 2] [Y] + $n2->dy * $widths [$dir] );
-
                 list ( $xi2, $yi2 ) = line_crossing ( $simple [$i] [X] - $n1->dx * $widths [$dir], $simple [$i] [Y] - $n1->dy * $widths [$dir], $simple [$i + 1] [X] - $n1->dx * $widths [$dir], $simple [$i + 1] [Y] - $n1->dy * $widths [$dir], $simple [$i + 1] [X] - $n2->dx * $widths [$dir], $simple [$i + 1] [Y] - $n2->dy * $widths [$dir], $simple [$i + 2] [X] - $n2->dx * $widths [$dir], $simple [$i + 2] [Y] - $n2->dy * $widths [$dir] );
 
                 if (! $capping) {
@@ -586,6 +585,8 @@ function draw_straight($image, &$curvepoints, $widths, $outlinecolour, $fillcolo
                     // because that's what we flatten. The inside of the corner is left alone.
                     // - depending on the relative angle between the two segments, it could
                     // be either one of these points.
+
+                    // TODO - this is wrong. See test conf_via3.conf
 
                     list ( $xi3, $yi3 ) = line_crossing ( $simple [$i] [X] + $n1->dx * $widths [$dir], $simple [$i] [Y] + $n1->dy * $widths [$dir], $simple [$i + 1] [X] + $n1->dx * $widths [$dir], $simple [$i + 1] [Y] + $n1->dy * $widths [$dir], $simple [$i + 1] [X] - $n2->dx * $widths [$dir], $simple [$i + 1] [Y] - $n2->dy * $widths [$dir], $simple [$i + 2] [X] - $n2->dx * $widths [$dir], $simple [$i + 2] [Y] - $n2->dy * $widths [$dir] );
 
@@ -748,7 +749,7 @@ function draw_curve($image, &$curvepoints, $widths, $outlinecolour, $fillcolours
 
         $there_points = array ();
         $back_points = array ();
-        $arrowpoints = array ();
+        # $arrowpoints = array ();
 
         $start = $arrowsettings [$dir] [1];
 

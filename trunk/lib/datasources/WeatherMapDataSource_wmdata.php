@@ -4,7 +4,7 @@ class WeatherMapDataSource_wmdata extends WeatherMapDataSource
 {
     function Recognise($targetstring)
     {
-        if (preg_match("/^wmdata:.*$/", $targetstring, $matches)) {
+        if (preg_match("/^wmdata:.*$/", $targetstring)) {
             return true;
         } else {
             return false;
@@ -17,7 +17,7 @@ class WeatherMapDataSource_wmdata extends WeatherMapDataSource
         $data[IN] = null;
         $data[OUT] = null;
         $data_time = 0;
-        $itemname = $item->name;
+        # $itemname = $item->name;
 
         $matches = 0;
 

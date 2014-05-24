@@ -35,27 +35,27 @@ class WeatherMapDataSource_cactithold extends WeatherMapDataSource {
 				return(FALSE);
 			}
 
-$thold_present = false;
+            $thold_present = false;
 
-                        if (function_exists("api_plugin_is_enabled")) {
-                                if (api_plugin_is_enabled('thold')) {
-                                        $thold_present = true;
-                                }
-                        }
+            if (function_exists("api_plugin_is_enabled")) {
+                    if (api_plugin_is_enabled('thold')) {
+                            $thold_present = true;
+                    }
+            }
 
-                        if ( isset($plugins) && in_array('thold',$plugins)) {
-                                $thold_present = true;
-                        }
+            if ( isset($plugins) && in_array('thold',$plugins)) {
+                    $thold_present = true;
+            }
 
-                        if ( !$thold_present) {
-                                wm_debug("ReadData CactiTHold: THold plugin not enabled. [THOLD002]\n");
-                        }
+            if ( !$thold_present) {
+                    wm_debug("ReadData CactiTHold: THold plugin not enabled. [THOLD002]\n");
+            }
 
 			$sql = "show tables";
 			$result = db_fetch_assoc($sql) or die (mysql_error());
 			$tables = array();
 			
-			foreach($result as $index => $arr) {
+			foreach($result as $arr) {
 				foreach ($arr as $t) {
 					$tables[] = $t;
 				}
@@ -79,11 +79,11 @@ $thold_present = false;
 
 	function Recognise($targetstring)
 	{
-		if(preg_match("/^cacti(thold|monitor):(\d+)$/",$targetstring,$matches))
+		if(preg_match("/^cacti(thold|monitor):(\d+)$/",$targetstring))
 		{
 			return TRUE;
 		}
-		elseif(preg_match("/^cactithold:(\d+):(\d+)$/",$targetstring,$matches))
+		elseif(preg_match("/^cactithold:(\d+):(\d+)$/",$targetstring))
 		{
 			return TRUE;
 		}

@@ -246,7 +246,7 @@ class WeatherMapDataSource_rrd extends WeatherMapDataSource {
 		$pipe=popen($command, "r");
 		
 		$lines=array ();
-		$count = 0;
+		# $count = 0;
 		$linecount = 0;
 
 		if (isset($pipe))
@@ -295,7 +295,7 @@ class WeatherMapDataSource_rrd extends WeatherMapDataSource {
 
 	}
 
-	function wmrrd_read_from_real_rrdtool($rrdfile,$cf,$start,$end,$dsnames, &$data, &$map, &$data_time,&$item)
+	function wmrrd_read_from_real_rrdtool($rrdfile, $cf, $start, $end, $dsnames, &$data, &$map, &$data_time,&$item)
 	{
 		wm_debug("RRD ReadData: traditional style\n");
 
@@ -341,7 +341,7 @@ class WeatherMapDataSource_rrd extends WeatherMapDataSource {
 		$pipe=popen($command, "r");
 		
 		$lines=array ();
-		$count = 0;
+		# $count = 0;
 		$linecount = 0;
 
 		if (isset($pipe))
@@ -439,7 +439,7 @@ class WeatherMapDataSource_rrd extends WeatherMapDataSource {
 	// data_time is intended to allow more informed graphing in the future
 	function ReadData($targetstring, &$map, &$item)
 	{
-		global $config;
+		# global $config;
 		
 		$dsnames[IN] = "traffic_in";
 		$dsnames[OUT] = "traffic_out";
@@ -551,18 +551,17 @@ class WeatherMapDataSource_rrd extends WeatherMapDataSource {
 			{
 				wm_debug ("RRD ReadData: Target DS names are ".$dsnames[IN]." and ".$dsnames[OUT]."\n");
 		
-				$values=array();
+				# $values=array();
 					
 				if($aggregatefunction != '')
 				{
-					WeatherMapDataSource_rrd::wmrrd_read_from_real_rrdtool_aggregate($rrdfile,$cfname,$aggregatefunction, $start,$end, $dsnames, $data,$map, $data_time,$item);	
+					WeatherMapDataSource_rrd::wmrrd_read_from_real_rrdtool_aggregate($rrdfile, $cfname, $aggregatefunction, $start,$end, $dsnames, $data,$map, $data_time,$item);
 				}
 				else
 				{
 					// do this the tried and trusted old-fashioned way
-					WeatherMapDataSource_rrd::wmrrd_read_from_real_rrdtool($rrdfile,$cfname,$start,$end, $dsnames, $data,$map, $data_time,$item);
+					WeatherMapDataSource_rrd::wmrrd_read_from_real_rrdtool($rrdfile, $cfname, $start, $end, $dsnames, $data,$map, $data_time,$item);
 				}
-			
 			}
 			else
 			{
@@ -570,20 +569,18 @@ class WeatherMapDataSource_rrd extends WeatherMapDataSource {
 			}
 		}
 
-                // if the Locale says that , is the decimal point, then rrdtool
-                // will honour it. However, floatval() doesn't, so let's replace
-                // any , with . (there are never thousands separators, luckily)
-                //
-		if($data[IN] !== NULL)
-                {
-                    $data[IN] = floatval(str_replace(",",".",$data[IN]));
-                    $data[IN] = $data[IN] * $multiplier;                    
-                }
-		if($data[OUT] !== NULL) 
-                {
-                    $data[OUT] = floatval(str_replace(",",".",$data[OUT]));
-                    $data[OUT] = $data[OUT] * $multiplier;
-                }
+        // if the Locale says that , is the decimal point, then rrdtool
+        // will honour it. However, floatval() doesn't, so let's replace
+        // any , with . (there are never thousands separators, luckily)
+        //
+		if($data[IN] !== NULL) {
+            $data[IN] = floatval(str_replace(",",".",$data[IN]));
+            $data[IN] = $data[IN] * $multiplier;
+        }
+		if($data[OUT] !== NULL) {
+            $data[OUT] = floatval(str_replace(",",".",$data[OUT]));
+            $data[OUT] = $data[OUT] * $multiplier;
+        }
 				
 		wm_debug ("RRD ReadData: Returning (".($data[IN]===NULL?'NULL':$data[IN]).",".($data[OUT]===NULL?'NULL':$data[OUT]).",$data_time)\n");
 		

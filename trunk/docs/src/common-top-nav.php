@@ -2,7 +2,8 @@
 <div class="navbar navbar-inverse navbar-fixed-top">
 	<div class="container">
 		<div class="navbar-header" id="nav">
-			<a class="navbar-brand" href="http://www.network-weathermap.com/">Weathermap <?php echo $WEATHERMAP_VERSION ?></a>
+			<a class="navbar-brand" href="http://www.network-weathermap.com/">Weathermap
+                <?php echo $WEATHERMAP_VERSION ?></a>
 			<ul class="nav navbar-nav">
 				<li><a href="main.html">Contents</a></li>
 				<li><a href="main.html#installation">Installation</a></li>

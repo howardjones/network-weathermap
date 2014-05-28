@@ -31,7 +31,10 @@ if [ $fflag -eq 1 ]; then
 	phpmd lib/ html codesize,design,naming,cleancode > test-suite/md-rest.html
 
     # phpcs -p -v --tab-width=4 -s --extensions=php --standard=PEAR --report-full=test-suite/phpcs-report-PEAR.txt  .
-    phpcs -p -v --tab-width=4 -s --extensions=php --sniffs=Generic.PHP.DisallowShortOpenTag,Squiz.PHP.CommentedOutCode --report-full=test-suite/phpcs-report-smelly.txt  .
-    phpcs -p -v --tab-width=4 -s --extensions=php --standard=PSR1,PSR2 --report-full=test-suite/phpcs-report-PSR-1-2.txt  .
+    # phpcs -p -v --tab-width=4 -s --extensions=php --sniffs=Generic.PHP.DisallowShortOpenTag,Squiz.PHP.CommentedOutCode --report-full=test-suite/phpcs-report-smelly.txt  .
+    # phpcs -p -v --tab-width=4 -s --extensions=php --standard=PSR2 --report-full=test-suite/phpcs-report-PSR-1-2.txt  .
+    phpcs -p -v --tab-width=4 -s --extensions=php --standard=PSR2ish --report-full=test-suite/phpcs-report-PSR-1-2.txt lib 
+
+    phpcpd lib/  > test-suite/cut-paste.txt
 
 fi

@@ -633,4 +633,3 @@ NODE firewall_status
 
 <?php
         include "common-page-foot.php";
-?>

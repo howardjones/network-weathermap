@@ -7,10 +7,6 @@
  * 
  */
 
-
-
-
-
 /**
  * Replace property_exists()
  *
@@ -27,8 +23,11 @@
 function php_compat_property_exists($class, $property)
 {
     if (!is_string($property)) {
-        user_error('property_exists() expects parameter 2 to be a string, ' .
-            gettype($property) . ' given', E_USER_WARNING);
+        user_error(
+            'property_exists() expects parameter 2 to be a string, ' .
+            gettype($property) . ' given',
+            E_USER_WARNING
+        );
         return false;
     }
 
@@ -44,13 +43,13 @@ function php_compat_property_exists($class, $property)
         }
 
         // Bail out early if get_class_vars or get_object_vars didnt work
-        // or returned an empty array           
+        // or returned an empty array
         if (!is_array($vars) || count($vars) <= 0) {
             return false;
         }
 
         $property = strtolower($property);
-        foreach (array_keys($vars) AS $varname) {
+        foreach (array_keys($vars) as $varname) {
             if (strtolower($varname) == $property) {
                 return true;
             }
@@ -59,10 +58,12 @@ function php_compat_property_exists($class, $property)
         return false;
     }
 
-    user_error('property_exists() expects parameter 1 to be a string or ' .
-        'an object, ' . gettype($class) . ' given', E_USER_WARNING);
+    user_error(
+        'property_exists() expects parameter 1 to be a string or ' .
+        'an object, ' . gettype($class) . ' given',
+        E_USER_WARNING
+    );
     return false;
-
 }
 
 
@@ -77,10 +78,10 @@ if (!function_exists('property_exists')) {
 if (!function_exists('microtime')) {
     function microtime($as_float)
     {
-        if($as_float) {
+        if ($as_float) {
             return time();
         } else {
-            return sprtinf("%d 0", time());
+            return sprintf("%d 0", time());
         }
     }
 }

@@ -100,8 +100,8 @@
 	
 	$map->ReadConfig($inputfile);
 
-	$map->DatasourceInit();
-	$map->ProcessTargets();
+	$map->initialiseDatasourcePlugins();
+	$map->preProcessTargets();
 	
 	$allitems = array(&$map->links, &$map->nodes);
 	reset($allitems);
@@ -306,7 +306,7 @@
 		}
 	}
 	
-	$map->WriteConfig($outputfile);
+	$map->writeConfig($outputfile);
 
 	print "Wrote new config to $outputfile\n";
 	

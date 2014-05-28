@@ -8,7 +8,7 @@ class WeatherMapDataSource_tabfile extends WeatherMapDataSource {
 
 	function Recognise($targetstring)
 	{
-		if(preg_match("/\.(tsv|txt)$/",$targetstring))
+		if (preg_match("/\.(tsv|txt)$/",$targetstring))
 		{
 			return TRUE;
 		}
@@ -41,10 +41,10 @@ class WeatherMapDataSource_tabfile extends WeatherMapDataSource {
 
 				$parts = explode("\t",$buffer);
 				
-				if($parts[0] == $itemname) {			   
+				if ($parts[0] == $itemname) {			   
 				    
-				    $data[IN] = ($parts[1]=="-" ? NULL : wm_unformat_number($parts[1]) );
-				    $data[OUT] = ($parts[2]=="-" ? NULL : wm_unformat_number($parts[2]) );
+				    $data[IN] = ($parts[1]=="-" ? NULL : wmInterpretNumberWithMetricPrefix($parts[1]) );
+				    $data[OUT] = ($parts[2]=="-" ? NULL : wmInterpretNumberWithMetricPrefix($parts[2]) );
 				    				   
 				}
 			}

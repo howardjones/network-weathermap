@@ -8,7 +8,7 @@ class WeatherMapDataSource_mrtg extends WeatherMapDataSource {
 
 	function Recognise($targetstring)
 	{
-		if(preg_match("/\.(htm|html)$/",$targetstring))
+		if (preg_match("/\.(htm|html)$/",$targetstring))
 		{
 			return TRUE;
 		}
@@ -29,8 +29,8 @@ class WeatherMapDataSource_mrtg extends WeatherMapDataSource {
 		$swap = intval($item->get_hint('mrtg_swap'));
 		$negate = intval($item->get_hint('mrtg_negate'));
 				
-		if($matchvalue =='') $matchvalue = "cu";
-		if($matchperiod =='') $matchperiod = "d";	
+		if ($matchvalue =='') $matchvalue = "cu";
+		if ($matchperiod =='') $matchperiod = "d";	
 				
 		$fd=fopen($targetstring, "r");
 
@@ -46,7 +46,7 @@ class WeatherMapDataSource_mrtg extends WeatherMapDataSource {
 			}
 			fclose($fd);
 			# don't bother with the modified time if the target is a URL
-			if(! preg_match('/^[a-z]+:\/\//',$targetstring) )
+			if (! preg_match('/^[a-z]+:\/\//',$targetstring) )
 			{
 				$data_time = filemtime($targetstring);
 			}
@@ -57,7 +57,7 @@ class WeatherMapDataSource_mrtg extends WeatherMapDataSource {
 			wm_debug ("MRTG ReadData: Couldn't open ($targetstring). \n"); 
 		}
 		
-		if($swap==1)
+		if ($swap==1)
 		{
 			wm_debug("MRTG ReadData: Swapping IN and OUT\n");
 			$t = $data[OUT];
@@ -65,7 +65,7 @@ class WeatherMapDataSource_mrtg extends WeatherMapDataSource {
 			$data[IN] = $t;
 		}
 		
-		if($negate)
+		if ($negate)
 		{
 			wm_debug("MRTG ReadData: Negating values\n");
 			$data[OUT] = -$data[OUT];

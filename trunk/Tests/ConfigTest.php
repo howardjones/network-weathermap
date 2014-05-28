@@ -16,12 +16,12 @@ class ConfigTest extends PHPUnit_Framework_TestCase
         $previouswd = getcwd();
         chdir(dirname(__FILE__).DIRECTORY_SEPARATOR."..");
 
-	$compare_output = $comparisonimagefile.".txt";
-	if(file_exists($compare_output)) {
-	    unlink($compare_output);
-	}
+        $compare_output = $comparisonimagefile.".txt";
+        if(file_exists($compare_output)) {
+            unlink($compare_output);
+        }
 		
-        $nwarns = TestOutput_RunTest($testdir.DIRECTORY_SEPARATOR.$conffile, $outputimagefile, $outputhtmlfile, '', 'config-coverage.txt');
+        $nwarns = TestOutput_RunTest($testdir.DIRECTORY_SEPARATOR.$conffile, $outputimagefile, $outputhtmlfile, '', '');
 
 		// if REQUIRES_VERSION was set, and set to a newer version, then this test is known to fail
 		if($nwarns < 0) {
@@ -32,7 +32,6 @@ class ConfigTest extends PHPUnit_Framework_TestCase
 			
         $this->assertEquals(0, $nwarns, "Warnings were generated");
 
-        
 		 # $COMPARE -metric AE $reference $result $destination  > $destination2 2>&1
 		$cmd = sprintf("%s -metric AE \"%s\" \"%s\" \"%s\"",
 				$compare,

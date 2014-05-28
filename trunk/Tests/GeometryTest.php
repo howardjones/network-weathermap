@@ -34,17 +34,17 @@ class GeometryTest  extends PHPUnit_Framework_TestCase {
         $r1 = new WMRectangle(10,10,20,40);
         $r2 = new WMRectangle(20,40,10,10);
 
-        $this->assertTrue($r1->contains(new WMPoint(15,15)));
-        $this->assertTrue($r2->contains(new WMPoint(15,15)));
+        $this->assertTrue($r1->containsPoint(new WMPoint(15,15)));
+        $this->assertTrue($r2->containsPoint(new WMPoint(15,15)));
 
-        $this->assertTrue($r1->contains(new WMPoint(10,10)));
-        $this->assertTrue($r2->contains(new WMPoint(10,10)));
+        $this->assertTrue($r1->containsPoint(new WMPoint(10,10)));
+        $this->assertTrue($r2->containsPoint(new WMPoint(10,10)));
 
-        $this->assertTrue($r1->contains(new WMPoint(20,40)));
-        $this->assertTrue($r2->contains(new WMPoint(20,40)));
+        $this->assertTrue($r1->containsPoint(new WMPoint(20,40)));
+        $this->assertTrue($r2->containsPoint(new WMPoint(20,40)));
 
-        $this->assertFalse($r1->contains(new WMPoint(2,40)));
-        $this->assertFalse($r2->contains(new WMPoint(2,40)));
+        $this->assertFalse($r1->containsPoint(new WMPoint(2,40)));
+        $this->assertFalse($r2->containsPoint(new WMPoint(2,40)));
 
         $this->assertEquals($r1->width(), 10);
         $this->assertEquals($r2->width(), 10);

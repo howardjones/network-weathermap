@@ -71,7 +71,7 @@ class WeatherMapEditor {
 	    	$node->name = $newnodename;
 	    	$node->template = $template;
 	    	
-	    	$node->Reset($this->map);
+	    	$node->reset($this->map);
 	    	
 	    	$node->x = $x;
 	    	$node->y = $y;
@@ -179,7 +179,7 @@ class WeatherMapEditor {
             	        $scalefactor = $l_new/$l_old;
             	        	
             	        // rotate so that link is along the axis
-            	        RotateAboutPoint($points,$pivx, $pivy, deg2rad($angle_old));
+            	        rotateAboutPoint($points,$pivx, $pivy, deg2rad($angle_old));
             	        // do the scaling in here
             	        for($i=0; $i<(count($points)/2); $i++)
             	        {
@@ -187,7 +187,7 @@ class WeatherMapEditor {
                 	        $points[$i*2] = $basex;
             	        }
             	        // rotate back so that link is along the new direction
-            	        RotateAboutPoint($points,$pivx, $pivy, deg2rad(-$angle_new));
+            	        rotateAboutPoint($points,$pivx, $pivy, deg2rad(-$angle_new));
     	        	
             	        // now put the modified points back into the vialist again
             	        $v = 0; $i = 0;
@@ -286,8 +286,8 @@ class WeatherMapEditor {
     	    $log .= " into $newnodename";
     	    
     	    $node = new WeatherMapNode;
-    	    $node->Reset($this->map);
-    	    $node->CopyFrom($this->map->nodes[$sourcename]);
+    	    $node->reset($this->map);
+    	    $node->copyFrom($this->map->nodes[$sourcename]);
     	
     	    # CopyFrom skips this one, because it's also the function used by template inheritance
     	    # - but for Clone, we DO want to copy the template too
@@ -318,7 +318,7 @@ class WeatherMapEditor {
     	if($node1 != $node2 && isset($this->map->nodes[$node1]) && isset($this->map->nodes[$node2]) )
     	{
     		$newlink = new WeatherMapLink;
-    		$newlink->Reset($this->map);
+    		$newlink->reset($this->map);
     			
     		$newlink->a = $this->map->nodes[$node1];
     		$newlink->b = $this->map->nodes[$node2];
@@ -564,10 +564,10 @@ class WeatherMapEditor {
                 $tangent = $line->vector;
                 $tangent->normalise();
         
-                $normal = $tangent->get_normal();
+                $normal = $tangent->getNormal();
         
-                $pt_a->AddVector( $normal, 15 * ($linknumber-1) );
-                $pt_b->AddVector( $normal, 15 * ($linknumber-1) );
+                $pt_a->addVector( $normal, 15 * ($linknumber-1) );
+                $pt_b->addVector( $normal, 15 * ($linknumber-1) );
         
                 $a_x_offset = $pt_a->x - $node_a->x;
                 $a_y_offset = $pt_a->y - $node_a->y;
@@ -595,13 +595,13 @@ class WeatherMapEditor {
                 $best_offset_b = "C";
         
                 foreach ($corners as $corner1) {
-                    list ($ax,$ay) = calc_offset($corner1, $bb_a[2] - $bb_a[0], $bb_a[3] - $bb_a[1]);
+                    list ($ax,$ay) = wmCalculateOffset($corner1, $bb_a[2] - $bb_a[0], $bb_a[3] - $bb_a[1]);
         
                     $axx = $node_a->x + $ax;
                     $ayy = $node_a->y + $ay;
         
                     foreach ($corners as $corner2) {
-                        list($bx,$by) = calc_offset($corner2, $bb_b[2] - $bb_b[0], $bb_b[3] - $bb_b[1]);
+                        list($bx,$by) = wmCalculateOffset($corner2, $bb_b[2] - $bb_b[0], $bb_b[3] - $bb_b[1]);
         
                         $bxx = $node_b->x + $bx;
                         $byy = $node_b->y + $by;

@@ -83,4 +83,3 @@
 
 <?php
         include "common-page-foot.php";
-?>

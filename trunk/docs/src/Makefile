@@ -18,7 +18,7 @@ contents.xml: contents.xsl index.xml $(GLOBALS) $(LINKS) $(NODES)
 config-reference.php: reference.xsl index.xml contents.xml $(GLOBALS) $(LINKS) $(NODES)
 	xsltproc --xinclude reference.xsl index.xml | ./relink-reference.pl > config-reference.php
 	# I will probably have to do some kind of pennance for this mess
-	echo "<?php \$$WEATHERMAP_VERSION='v$(VERSION)'; ?>" > vars.php
+	echo "<?php \$$WEATHERMAP_VERSION='v$(VERSION)';" > vars.php
 	php config-reference.php > ../pages/config-reference.html
 	php main.php > ../pages/main.html
 	php errorcodes.php | ./relink-reference.pl ALL > ../pages/errorcodes.html

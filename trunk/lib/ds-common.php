@@ -9,9 +9,7 @@ function UpdateCactiData(&$item, $local_data_id)
 
 	if( isset($map->dsinfocache[$local_data_id])) {
             $to_set = $map->dsinfocache[$local_data_id];
-	}
-	else
-	{
+	} else {
 		$to_set = array();
 
 		$set_speed = intval($item->get_hint("cacti_use_ifspeed"));
@@ -76,8 +74,7 @@ function UpdateCactiData(&$item, $local_data_id)
 	}
 
 	# By now, we have the values, one way or another.
-	foreach ($to_set as $k=>$v)
-	{
+	foreach ($to_set as $k => $v) {
 		$item->add_note($k, $v);
 	}
 

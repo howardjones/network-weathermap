@@ -1,10 +1,23 @@
-<?php 
+<?php
 
+/**
+ * @param $x1
+ * @param $y1
+ * @param $x2
+ * @param $y2
+ * @param $x3
+ * @param $y3
+ * @param $x4
+ * @param $y4
+ * @return array
 
-// find the point where a line from x1,y1 through x2,y2 crosses another line through x3,y3 and x4,y4
-// (the point might not be between those points, but beyond them)
-// - doesn't handle parallel lines. In our case we will never get them.
-// - make sure we remove colinear points, or this will not be true!
+ find the point where a line from x1,y1 through x2,y2 crosses another line through x3,y3 and x4,y4
+ (the point might not be between those points, but beyond them)
+ - doesn't handle parallel lines. In our case we will never get them.
+ - make sure we remove colinear points, or this will not be true!
+ */
+
+// TODO - reimplement in WMLine
 function line_crossing($x1, $y1, $x2, $y2, $x3, $y3, $x4, $y4)
 {
 
@@ -45,22 +58,22 @@ function line_crossing($x1, $y1, $x2, $y2, $x3, $y3, $x4, $y4)
 // Given 4 ordinates and a parameter from 0 to 1, calculate a point on the Catmull Rom spline through them.
 class CatmullRom1D
 {
-	function CatmullRom1D($p0, $p1, $p2, $p3)
-	{
-		$this->Ap = - $p0 + 3 * $p1 - 3 * $p2 + $p3;
-		$this->Bp = 2 * $p0 - 5 * $p1 + 4 * $p2 - $p3;
-		$this->Cp = - $p0 + $p2;
-		$this->Dp = 2 * $p1;
-	}
-	
-	function calculate($t)
-	{
-		$t2 = $t * $t;
-		$t3 = $t2 * $t;
-		$d = 2;
-		
-		return (($this->Ap * $t3) + ($this->Bp * $t2) + ($this->Cp * $t) + $this->Dp) / $d;
-	}
+    function CatmullRom1D($p0, $p1, $p2, $p3)
+    {
+        $this->Ap = - $p0 + 3 * $p1 - 3 * $p2 + $p3;
+        $this->Bp = 2 * $p0 - 5 * $p1 + 4 * $p2 - $p3;
+        $this->Cp = - $p0 + $p2;
+        $this->Dp = 2 * $p1;
+    }
+
+    function calculate($t)
+    {
+        $t2 = $t * $t;
+        $t3 = $t2 * $t;
+        $d = 2;
+
+        return (($this->Ap * $t3) + ($this->Bp * $t2) + ($this->Cp * $t) + $this->Dp) / $d;
+    }
 }
 
 // calculate the points for a span of the curve. We pass in the distance so far, and the array index, so that
@@ -81,14 +94,14 @@ function calculate_catmull_rom_span($startn, $startdistance, $numsteps, $x0, $y0
         $distance
     );
 
-	$cr_x = new CatmullRom1D($x0,$x1,$x2,$x3);
-	$cr_y = new CatmullRom1D($y0,$y1,$y2,$y3);
-	
+    $cr_x = new CatmullRom1D($x0, $x1, $x2, $x3);
+    $cr_y = new CatmullRom1D($y0, $y1, $y2, $y3);
+
     for($i = 0; $i <= $numsteps; $i ++) {
         $t = $i / $numsteps;
  
-		$x = $cr_x->calculate($t);
-		$y = $cr_y->calculate($t);
+        $x = $cr_x->calculate($t);
+        $y = $cr_y->calculate($t);
 
         if ($i > 0) {
             $step = sqrt ( (($x - $lx) * ($x - $lx)) + (($y - $ly) * ($y - $ly)) );
@@ -118,7 +131,7 @@ function find_distance_coords(&$pointarray, $distance)
     // We find the nearest lower point for each distance,
     // then linearly interpolate to get a more accurate point
     // this saves having quite so many points-per-curve
-    if (count ( $pointarray ) === 0) {
+    if (count($pointarray) === 0) {
         return array (
             0,
             0,
@@ -126,11 +139,13 @@ function find_distance_coords(&$pointarray, $distance)
         );
     }
 
-    $index = find_distance ( $pointarray, $distance );
+    $index = find_distance ($pointarray, $distance);
 
-    $ratio = ($distance - $pointarray [$index] [2]) / ($pointarray [$index + 1] [2] - $pointarray [$index] [2]);
-    $x = $pointarray [$index] [0] + $ratio * ($pointarray [$index + 1] [0] - $pointarray [$index] [0]);
-    $y = $pointarray [$index] [1] + $ratio * ($pointarray [$index + 1] [1] - $pointarray [$index] [1]);
+    // Figure out how far the target distance is between the found point and the next one
+    $ratio = ($distance - $pointarray[$index][2]) / ($pointarray[$index + 1][2] - $pointarray[$index][2]);
+    // linearly interpolate x and y to get to the actual required distance
+    $x = $pointarray[$index][0] + $ratio * ($pointarray[$index + 1][0] - $pointarray[$index][0]);
+    $y = $pointarray[$index][1] + $ratio * ($pointarray[$index + 1][1] - $pointarray[$index][1]);
 
     return (array (
         $x,
@@ -153,18 +168,17 @@ function find_distance_coords_angle(&$pointarray, $distance)
         $left --;
         $right --;
     }
-    // if($left<=0) { $left = 0; }
 
-    $x1 = $pointarray [$left] [0];
-    $y1 = $pointarray [$left] [1];
+    $x1 = $pointarray[$left][0];
+    $y1 = $pointarray[$left][1];
 
-    $x2 = $pointarray [$right] [0];
-    $y2 = $pointarray [$right] [1];
+    $x2 = $pointarray[$right][0];
+    $y2 = $pointarray[$right][1];
 
     $dx = $x2 - $x1;
     $dy = $y2 - $y1;
 
-    $angle = rad2deg ( atan2 ( - $dy, $dx ) );
+    $angle = rad2deg(atan2 ( - $dy, $dx ));
 
     return (array (
         $x,
@@ -179,14 +193,16 @@ function find_distance_coords_angle(&$pointarray, $distance)
 function find_distance(&$pointarray, $distance)
 {
     $left = 0;
-    $right = count ( $pointarray ) - 1;
+    $right = count($pointarray) - 1;
 
-    if ($left == $right)
+    if ($left == $right) {
         return ($left);
+    }
 
     // if the distance is zero, there's no need to search (and it doesn't work anyway)
-    if ($distance == 0)
+    if ($distance == 0) {
         return ($left);
+    }
 
     // if it's a point past the end of the line, then just return the end of the line
     // Weathermap should *never* ask for this, anyway
@@ -225,10 +241,10 @@ function calc_curve(&$in_xarray, &$in_yarray, $pointsperspan = 32)
     // search through the point list, for consecutive duplicate points
     // (most common case will be a straight link with both NODEs at the same place, I think)
     // strip those out, because they'll break the binary search/centre-point stuff
-    $last_x = NULL;
-    $last_y = NULL;
+    $last_x = null;
+    $last_y = null;
 
-    for($i = 0; $i < count ( $in_xarray ); $i ++) {
+    for ($i = 0; $i < count ( $in_xarray ); $i ++) {
         if (($in_xarray [$i] == $last_x) && ($in_yarray [$i] == $last_y)) {
             wm_debug ( "Dumping useless duplicate point on curve\n" );
         } else {
@@ -241,13 +257,13 @@ function calc_curve(&$in_xarray, &$in_yarray, $pointsperspan = 32)
     }
 
     // only proceed if we still have at least two points!
-    if (count ( $xarray ) <= 1) {
+    if (count($xarray) <= 1) {
         wm_warn ( "Arrow not drawn, as it's 1-dimensional.\n" );
         return (array (
-            NULL,
-            NULL,
-            NULL,
-            NULL
+            null,
+            null,
+            null,
+            null
         ));
     }
 
@@ -294,8 +310,8 @@ function calc_straight(&$in_xarray, &$in_yarray, $pointsperspan = 12)
     // search through the point list, for consecutive duplicate points
     // (most common case will be a straight link with both NODEs at the same place, I think)
     // strip those out, because they'll break the binary search/centre-point stuff
-    $last_x = NULL;
-    $last_y = NULL;
+    $last_x = null;
+    $last_y = null;
 
     for($i = 0; $i < count ( $in_xarray ); $i ++) {
         if (($in_xarray [$i] == $last_x) && ($in_yarray [$i] == $last_y)) {
@@ -313,10 +329,10 @@ function calc_straight(&$in_xarray, &$in_yarray, $pointsperspan = 12)
     if (count ( $xarray ) <= 1) {
         wm_warn ( "Arrow not drawn, as it's 1-dimensional.\n" );
         return (array (
-            NULL,
-            NULL,
-            NULL,
-            NULL
+            null,
+            null,
+            null,
+            null
         ));
     }
 
@@ -362,11 +378,12 @@ function calc_straight(&$in_xarray, &$in_yarray, $pointsperspan = 12)
 
 function calc_arrowsize($width, &$map, $linkname)
 {
+    // This is the default 'classic' size
     $arrowlengthfactor = 4;
     $arrowwidthfactor = 2;
 
     // this is so I can use it in some test code - sorry!
-    if ($map !== NULL) {
+    if ($map !== null) {
         if ($map->links [$linkname]->arrowstyle == 'compact') {
             $arrowlengthfactor = 1;
             $arrowwidthfactor = 1;
@@ -378,16 +395,16 @@ function calc_arrowsize($width, &$map, $linkname)
         }
     }
 
-    $arrowsize = $width * $arrowlengthfactor;
+    $arrowlength = $width * $arrowlengthfactor;
     $arrowwidth = $width * $arrowwidthfactor;
 
     return (array (
-        $arrowsize,
+        $arrowlength,
         $arrowwidth
     ));
 }
 
-function draw_straight($image, &$curvepoints, $widths, $outlinecolour, $fillcolours, $linkname, &$map, $q2_percent = 50, $unidirectional = FALSE)
+function draw_straight($image, &$curvepoints, $widths, $outlinecolour, $fillcolours, $linkname, &$map, $q2_percent = 50, $unidirectional = false)
 {
     $totaldistance = $curvepoints [count ( $curvepoints ) - 1] [DISTANCE];
 
@@ -403,17 +420,14 @@ function draw_straight($image, &$curvepoints, $widths, $outlinecolour, $fillcolo
         $spine [OUT] = $curvepoints;
     } else {
         // we'll split the spine in half here.
-        // $q2_percent = 50;
         $halfway = $totaldistance * ($q2_percent / 100);
 
         $dirs = array (
             OUT,
             IN
         );
-        // $dirs = array(IN);
 
         list ( $halfway_x, $halfway_y, $halfwayindex ) = find_distance_coords ( $curvepoints, $halfway );
-        // print "Midpoint is: $totaldistance $halfway $halfwayindex $halfway_x,$halfway_y\n";
 
         $spine [OUT] = array ();
         $spine [IN] = array ();
@@ -430,7 +444,7 @@ function draw_straight($image, &$curvepoints, $widths, $outlinecolour, $fillcolo
         );
 
         // and then from the end to the middle for the other arrow
-        for($i = $npoints; $i > $halfwayindex; $i --) {
+        for ($i = $npoints; $i > $halfwayindex; $i --) {
             // copy the original spine, but reversing the distance calculation
             $spine [IN] [] = array (
                 $curvepoints [$i] [X],
@@ -464,8 +478,6 @@ function draw_straight($image, &$curvepoints, $widths, $outlinecolour, $fillcolo
         $n = count ( $spine [$dir] ) - 1;
         $l = $spine [$dir] [$n] [DISTANCE];
 
-        // draw_spine($image, $spine[$dir], $map->selected);
-
         // loop increment, start point, width, labelpos, fillcolour, outlinecolour, commentpos
         $arrowsettings = array (
             + 1,
@@ -491,6 +503,8 @@ function draw_straight($image, &$curvepoints, $widths, $outlinecolour, $fillcolo
 
             $spine [$dir] = $out;
 
+            // Arrow.
+            // TODO - refactor this.
             $adx = ($halfway_x - $pre_mid_x);
             $ady = ($halfway_y - $pre_mid_y);
             $ll = sqrt ( ($adx * $adx) + ($ady * $ady) );
@@ -514,7 +528,6 @@ function draw_straight($image, &$curvepoints, $widths, $outlinecolour, $fillcolo
             $ay4 = $pre_mid_y - $arrowwidth [$dir] * $any;
 
             $simple = simplify_spine ( $spine [$dir] );
-            # $newn = count ( $simple );
 
             // now do the actual drawing....
 
@@ -524,12 +537,12 @@ function draw_straight($image, &$curvepoints, $widths, $outlinecolour, $fillcolo
             $finalpoints = array ();
             $reversepoints = array ();
 
-            $finalpoints [] = $simple [0] [X];
-            $finalpoints [] = $simple [0] [Y];
+            $finalpoints [] = $simple[0][X];
+            $finalpoints [] = $simple[0][Y];
             $numpoints ++;
 
-            $reversepoints [] = $simple [0] [X];
-            $reversepoints [] = $simple [0] [Y];
+            $reversepoints [] = $simple[0][X];
+            $reversepoints [] = $simple[0][Y];
             $numrpoints ++;
 
             // before the main loop, add in the jump out to the corners
@@ -537,7 +550,7 @@ function draw_straight($image, &$curvepoints, $widths, $outlinecolour, $fillcolo
             // ( the loop may not run, but these corners are required)
             $i = 0;
             $v1 = new WMVector ( $simple [$i + 1] [X] - $simple [$i] [X], $simple [$i + 1] [Y] - $simple [$i] [Y] );
-            $n1 = $v1->get_normal ();
+            $n1 = $v1->getNormal ();
 
             $finalpoints [] = $simple [$i] [X] + $n1->dx * $widths [$dir];
             $finalpoints [] = $simple [$i] [Y] + $n1->dy * $widths [$dir];
@@ -551,20 +564,22 @@ function draw_straight($image, &$curvepoints, $widths, $outlinecolour, $fillcolo
             for($i = 0; $i < $max_start; $i ++) {
                 $v1 = new WMVector ( $simple [$i + 1] [X] - $simple [$i] [X], $simple [$i + 1] [Y] - $simple [$i] [Y] );
                 $v2 = new WMVector ( $simple [$i + 2] [X] - $simple [$i + 1] [X], $simple [$i + 2] [Y] - $simple [$i + 1] [Y] );
-                $n1 = $v1->get_normal ();
-                $n2 = $v2->get_normal ();
+                $n1 = $v1->getNormal ();
+                $n2 = $v2->getNormal ();
 
-                $capping = FALSE;
+                $capping = false;
                 // figure out the angle between the lines - for very sharp turns, we should do something special
                 // (actually, their normals, but the angle is the same and we need the normals later)
                 $angle = rad2deg ( atan2 ( $n2->dy, $n2->dx ) - atan2 ( $n1->dy, $n1->dx ) );
-                if ($angle > 180)
+                if ($angle > 180) {
                     $angle -= 360;
-                if ($angle < - 180)
+                }
+                if ($angle < - 180) {
                     $angle += 360;
+                }
 
                 if (abs ( $angle ) > 169) {
-                    $capping = TRUE;
+                    $capping = true;
                 }
 
                 // now figure out the geometry for where the next corners are
@@ -643,7 +658,7 @@ function draw_straight($image, &$curvepoints, $widths, $outlinecolour, $fillcolo
                 $finalpoints [] = $y;
                 $numpoints ++;
             }
-            // $finalpoints[] contains a complete outline of the line at this stage
+            // $finalpoints[] contains a complete outline of the link at this stage
 
             // Turns out GD always rounds down, which puts a kink in some straight lines.
             // We'll manually round to the *nearest* integer, which makes this consistent.
@@ -679,7 +694,7 @@ function draw_straight($image, &$curvepoints, $widths, $outlinecolour, $fillcolo
 // width is the link width (the actual width is twice this)
 // outlinecolour is a GD colour reference
 // fillcolours is an array of two more colour references, one for the out, and one for the in spans
-function draw_curve($image, &$curvepoints, $widths, $outlinecolour, $fillcolours, $linkname, &$map, $q2_percent = 50, $unidirectional = FALSE)
+function draw_curve($image, &$curvepoints, $widths, $outlinecolour, $fillcolours, $linkname, &$map, $q2_percent = 50, $unidirectional = false)
 {
     // now we have a 'spine' - all the central points for this curve.
     // time to flesh it out to the right width, and figure out where to draw arrows and bandwidth boxes...
@@ -703,7 +718,7 @@ function draw_curve($image, &$curvepoints, $widths, $outlinecolour, $fillcolours
     }
 
     // loop increment, start point, width, labelpos, fillcolour, outlinecolour, commentpos
-    $arrowsettings [OUT] = array (
+    $arrowsettings[OUT] = array (
         + 1,
         0,
         $widths [OUT],
@@ -712,7 +727,8 @@ function draw_curve($image, &$curvepoints, $widths, $outlinecolour, $fillcolours
         $outlinecolour,
         5
     );
-    $arrowsettings [IN] = array (
+
+    $arrowsettings[IN] = array (
         - 1,
         count ( $curvepoints ) - 1,
         $widths [IN],
@@ -724,32 +740,31 @@ function draw_curve($image, &$curvepoints, $widths, $outlinecolour, $fillcolours
 
     // we calculate the arrow size up here, so that we can decide on the
     // minimum length for a link. The arrowheads are the limiting factor.
-    list ( $arrowsize [IN], $arrowwidth [IN] ) = calc_arrowsize ( $widths [IN], $map, $linkname );
-    list ( $arrowsize [OUT], $arrowwidth [OUT] ) = calc_arrowsize ( $widths [OUT], $map, $linkname );
+    list ( $arrowsize[IN], $arrowwidth[IN] ) = calc_arrowsize($widths [IN], $map, $linkname);
+    list ( $arrowsize[OUT], $arrowwidth[OUT] ) = calc_arrowsize($widths [OUT], $map, $linkname);
 
     // the 1.2 here is empirical. It ought to be 1 in theory.
     // in practice, a link this short is useless anyway, especially with bwlabels.
-    $minimumlength = 1.2 * ($arrowsize [IN] + $arrowsize [OUT]);
+    $minimumlength = 1.2 * ($arrowsize[IN] + $arrowsize[OUT]);
 
     if ($totaldistance <= $minimumlength) {
         wm_warn ( "Skipping drawing very short link ($linkname). Impossible to draw! Try changing WIDTH or ARROWSTYLE? [WMWARN01]\n" );
         return;
     }
 
-    list ( $halfway_x, $halfway_y, $halfwayindex ) = find_distance_coords ( $curvepoints, $halfway );
+    list ($halfway_x, $halfway_y, $halfwayindex) = find_distance_coords($curvepoints, $halfway);
 
     // loop over direction here
     // direction is 1.0 for the first half (forwards through the pointlist), and -1.0 for the second half (backwards from the end)
     // - used as a multiplier on anything that looks forwards or backwards through the list
 
-    foreach ( $dirs as $dir ) {
-        $direction = $arrowsettings [$dir] [0];
+    foreach ($dirs as $dir) {
+        $direction = $arrowsettings[$dir][0];
         // this is the last index before the arrowhead starts
         list ( $pre_mid_x, $pre_mid_y, $pre_midindex ) = find_distance_coords ( $curvepoints, $halfway - $direction * $arrowsize [$dir] );
 
         $there_points = array ();
         $back_points = array ();
-        # $arrowpoints = array ();
 
         $start = $arrowsettings [$dir] [1];
 
@@ -837,13 +852,10 @@ function simplify_spine(&$input, $epsilon = 1e-10)
     $output = array ();
 
     $output [] = $input [0];
-    $n = 1;
     $c = count ( $input ) - 2;
     $skip = 0;
 
     for($n = 1; $n <= $c; $n ++) {
-        # $x = $input [$n] [X];
-        # $y = $input [$n] [Y];
 
         // figure out the area of the triangle formed by this point, and the one before and after
         $a = abs ( $input [$n - 1] [X] * ($input [$n] [Y] - $input [$n + 1] [Y]) + $input [$n] [X] * ($input [$n + 1] [Y] - $input [$n - 1] [Y]) + $input [$n + 1] [X] * ($input [$n - 1] [Y] - $input [$n] [Y]) );
@@ -860,4 +872,87 @@ function simplify_spine(&$input, $epsilon = 1e-10)
 
     $output [] = $input [$c + 1];
     return $output;
+}
+
+/**
+ * Given a start point on the spine, calculate the points for an arrowhead.
+ *
+ * @param WMPoint $start_point - a point back from the end of the spine
+ * @param WMPoint $end_point - the actual end of the spine (the point of the arrow)
+ * @param int $direction - whether we're going backwards or forwards along the line
+ * @param int $link_width - the width of the link
+ * @param int $arrow_width - the width of the arrowhead widest point
+ *
+ * @return WMPoint[]
+ */
+function generateArrowhead($start_point, $end_point, $direction, $link_width, $arrow_width)
+{
+    $points = array();
+
+    // Calculate a tanget
+    $arrow_direction = WMVector($halfway_x - $pre_mid_x, $halfway_y - $pre_mid_y);
+    $arrow_direction.normalise();
+    // and from that, a normal
+    $arrow_normal = $arrow_direction->getNormal();
+
+    $points []= $start_point.addVector($arrow_normal, $direction * $link_width);
+    $points []= $start_point.addVector($arrow_normal, $direction * $arrow_width);
+    $points []= $end_point;
+    $points []= $start_point.addVector($arrow_normal, $direction * -$arrow_width);
+    $points []= $start_point.addVector($arrow_normal, $direction * -$link_width);
+
+    return $points;
+}
+
+// TODO - extract spine-related stuff into WMSpine
+class WMSpine
+{
+    var $points;
+
+    function simplify()
+    {
+
+    }
+
+    function findIndexNearDistance($target_distance)
+    {
+
+    }
+
+    function findPointAtDistance($target_distance)
+    {
+
+    }
+
+    function findPointAndAngleAtDistance($target_distance)
+    {
+
+    }
+
+    function dump($spine)
+    {
+        print "===============\n";
+        for($i = 0; $i < count ( $spine ); $i ++) {
+            printf ( "  %3d: %d,%d (%d)\n", $i, $spine [$i] [X], $spine [$i] [Y], $spine [$i] [DISTANCE] );
+        }
+        print "===============\n";
+    }
+
+    function drawSpine($gdimage, $spine, $colour)
+    {
+        $max_i = count ( $spine ) - 1;
+
+        for($i = 0; $i < $max_i; $i ++) {
+            imageline ( $gdimage, $spine [$i] [X], $spine [$i] [Y], $spine [$i + 1] [X], $spine [$i + 1] [Y], $colour );
+        }
+    }
+
+    function drawChain($gdimage, $spine, $colour, $size = 10)
+    {
+        $newn = count($spine);
+
+        for ($i = 0; $i < $newn; $i ++) {
+            imagearc($gdimage, $spine[$i][X], $spine[$i][Y], $size, $size, 0, 360, $colour);
+        }
+    }
 }

@@ -94,13 +94,13 @@ $map->ReadConfig($inputfile);
 
 // 'Draw' the map, so that we get dimensions for all the nodes
 // and offsets for links are calculated.
-$map->DrawMap(null);
+$map->drawMapImage(null);
 
 // loop through all links
 // adjust node offsets so that links come from correct side of nodes, and ideally still
 // from underneath them (e.g. NE80 not NE)
 
-$map->WriteConfig($outputfile);
+$map->writeConfig($outputfile);
 
 print 'Wrote new config to '.$outputfile."\n";
 ?>

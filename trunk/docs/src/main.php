@@ -502,4 +502,3 @@ LINK infra-core
 
 <?php
         include "common-page-foot.php";
-?>

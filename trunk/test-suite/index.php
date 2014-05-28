@@ -15,14 +15,19 @@
 <h1>Test Results</h1>
 
 <ul>
-<li><?php file_link("summary.html","Summary of all image-comparison test results") ?>(updated by 'make test')</li>
-<li><?php file_link("summary-failing.html","Summary of FAILING image-comparison test results") ?>(updated by 'make test')</li>
-<li><?php file_link("code-coverage/index.html","Code coverage report for unit tests") ?>(updated by 'make testcoverage')</li>
+<li><?php file_link("summary.html","Summary of all image-comparison test results") ?>(updated by 'test.sh')</li>
+<li><?php file_link("summary-failing.html","Summary of FAILING image-comparison test results") ?>(updated by 'test.sh')</li>
+<li><?php file_link("code-coverage/index.html","Code coverage report for unit tests") ?>(updated by 'test.sh -f')</li>
 </ul>
 <ul>
-<li><?php file_link("md-unused.html","PHPMD unused code report") ?>(updated by 'update-summaries.sh')</li>
-<li><?php file_link("md-rest.html","PHPMD everything-else code report") ?>(updated by 'update-summaries.sh')</li>
+<li><?php file_link("md-unused.html","PHPMD unused code report") ?>(updated by 'test.sh -f')</li>
+<li><?php file_link("md-rest.html","PHPMD everything-else code report") ?>(updated by 'test.sh -f')</li>
 </ul>
+<ul>
+    <li><?php file_link("phpcs-report-smelly.txt","PHPCS specific Sniffs report") ?>(updated by 'test.sh -f')</li>
+    <li><?php file_link("phpcs-report-PSR-1-2.txt","PHPCS PSR-2 report") ?>(updated by 'test.sh -f')</li>
+</ul>
+
         </div>
         </div>
 </body>
@@ -47,4 +52,3 @@ function file_age($filename)
 	return sprintf("%.1f days ago",$age/86400);
 }
 
-?>

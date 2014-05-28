@@ -42,13 +42,16 @@ class WeatherMapDataSource_cacti extends WeatherMapDataSource
 
             $result = db_fetch_row($SQL);
 
-        }      
+        }
             
-		wm_debug( sprintf("cacti ReadData: Returning (%s, %s, %s)\n",
-		        string_or_null($data[IN]),
-		        string_or_null($data[OUT]),
-		        $data_time
-        	));
+		wm_debug(
+            sprintf(
+                "cacti ReadData: Returning (%s, %s, %s)\n",
+                string_or_null($data[IN]),
+                string_or_null($data[OUT]),
+                $data_time
+        	)
+        );
 
         return (array (
             $data[IN],
@@ -58,6 +61,4 @@ class WeatherMapDataSource_cacti extends WeatherMapDataSource
     }
 }
 
-
 // vim:ts=4:sw=4:
-?>

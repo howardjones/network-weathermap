@@ -4,9 +4,9 @@ class WeatherMapDataSource_cactihost extends WeatherMapDataSource {
 
 	function Init(&$map)
 	{
-		if($map->context == 'cacti')
+		if ($map->context == 'cacti')
 		{   
-			if( function_exists('db_fetch_row') )
+			if ( function_exists('db_fetch_row') )
 			{
 				return(TRUE);
 			}
@@ -25,7 +25,7 @@ class WeatherMapDataSource_cactihost extends WeatherMapDataSource {
 
 	function Recognise($targetstring)
 	{
-		if(preg_match("/^cactihost:(\d+)$/",$targetstring))
+		if (preg_match("/^cactihost:(\d+)$/",$targetstring))
 		{
 			return TRUE;
 		}
@@ -42,7 +42,7 @@ class WeatherMapDataSource_cactihost extends WeatherMapDataSource {
 		$data[OUT] = NULL;
 		$data_time = 0;
 
-		if(preg_match("/^cactihost:(\d+)$/",$targetstring,$matches))
+		if (preg_match("/^cactihost:(\d+)$/",$targetstring,$matches))
 		{
 			$cacti_id = intval($matches[1]);
 
@@ -56,7 +56,7 @@ class WeatherMapDataSource_cactihost extends WeatherMapDataSource {
 
 			$state = -1;
 			$result = db_fetch_row($SQL);
-			if(isset($result))
+			if (isset($result))
 			{
 				// create a note, which can be used in icon filenames or labels more nicely
 				
@@ -65,10 +65,10 @@ class WeatherMapDataSource_cactihost extends WeatherMapDataSource {
 					$statename = 'unknown';
 				}
 				
-				if($result['status'] == 1) { $state = 1; $statename = 'down'; }
-				if($result['status'] == 2) { $state = 2; $statename = 'recovering'; }
-				if($result['status'] == 3) { $state = 3; $statename = 'up'; }
-				if($result['disabled'])  { $state = 0; $statename = 'disabled'; }
+				if ($result['status'] == 1) { $state = 1; $statename = 'down'; }
+				if ($result['status'] == 2) { $state = 2; $statename = 'recovering'; }
+				if ($result['status'] == 3) { $state = 3; $statename = 'up'; }
+				if ($result['disabled'])  { $state = 0; $statename = 'disabled'; }
 
 				$data[IN] = $state;
 				$data[OUT] = $state;

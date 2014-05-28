@@ -16,7 +16,7 @@
     
     	var $inherit_fieldlist;
     
-    	function add_note($name,$value)
+    	function add_note($name, $value)
     	{
     		wm_debug("Adding note $name='$value' to ".$this->name."\n");
     		$this->notes[$name] = $value;
@@ -24,15 +24,14 @@
     
     	function get_note($name)
     	{
-    		if(isset($this->notes[$name]))
-    		{
-    			return($this->notes[$name]);
+    		if(isset($this->notes[$name])) {
+                return($this->notes[$name]);
     		}
 
             return(NULL);
     	}
     
-    	function add_hint($name,$value)
+    	function add_hint($name, $value)
     	{
     		wm_debug("Adding hint $name='$value' to ".$this->name."\n");
     		$this->hints[$name] = $value;
@@ -49,16 +48,7 @@
     		return(NULL);
     	}
     }
-    
-    // XXX - unused
-    class WeatherMapConfigItem
-    {
-    	var $defined_in;
-    	var $name;
-    	var $value;
-    	var $type;
-    }
-    
+
     // The 'things on the map' class. More common code (mainly variables, actually)
     class WeatherMapItem extends WeatherMapBase
     {
@@ -73,5 +63,8 @@
     	var $defined_in;
     	var $config_override;	# used by the editor to allow text-editing
     
-    	function my_type() {  return "ITEM"; }
+    	function my_type()
+        {
+            return "ITEM";
+        }
     }

@@ -92,7 +92,7 @@ print "Reading config from $inputfile\n";
 
 $map->ReadConfig($inputfile);
 
-$map->WriteConfig($outputfile);
+$map->writeConfig($outputfile);
 
 print "Wrote new config to $outputfile\n";
 ?>

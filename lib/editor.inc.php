@@ -25,7 +25,7 @@ function fix_gpc_string($input)
     return ($input);
 }
 
-if(!function_exists("json_encode")) {
+if (!function_exists("json_encode")) {
     /**
      * json_encode2()
      *
@@ -33,44 +33,46 @@ if(!function_exists("json_encode")) {
      * @param bool $a
      * @return string
      */
-    function json_encode($a=false) {
-        if (is_null($a)) return 'null';
-        if ($a === false) return 'false';
-        if ($a === true) return 'true';
-        if (is_scalar($a))
-        {
-            if (is_float($a))
-            {
+    function json_encode($a = false) {
+        if (is_null($a)) {
+            return 'null';
+        }
+        if ($a === false) {
+            return 'false';
+        }
+        if ($a === true) {
+            return 'true';
+        }
+        if (is_scalar($a)) {
+            if (is_float($a)) {
                 // Always use "." for floats.
                 return floatval(str_replace(",", ".", strval($a)));
             }
     
-            if (is_string($a))
-            {
+            if (is_string($a)) {
                 static $jsonReplaces = array(array("\\", "/", "\n", "\t", "\r", "\b", "\f", '"'), array('\\\\', '\\/', '\\n', '\\t', '\\r', '\\b', '\\f', '\"'));
                 return '"' . str_replace($jsonReplaces[0], $jsonReplaces[1], $a) . '"';
-            }
-            else
+            } else {
                 return $a;
+            }
         }
         $isList = true;
-        for ($i = 0, reset($a); $i < count($a); $i++, next($a))
-        {
-            if (key($a) !== $i)
-            {
+        for ($i = 0, reset($a); $i < count($a); $i++, next($a)) {
+            if (key($a) !== $i) {
                 $isList = false;
                 break;
             }
         }
         $result = array();
-        if ($isList)
-        {
-            foreach ($a as $v) $result[] = $this->json_encode2($v);
+        if ($isList) {
+            foreach ($a as $v) {
+                $result[] = $this->json_encode2($v);
+            }
             return '[' . join(',', $result) . ']';
-        }
-        else
-        {
-            foreach ($a as $k => $v) $result[] = $this->json_encode2($k).':'.$this->json_encode2($v);
+        } else {
+            foreach ($a as $k => $v) {
+                $result[] = $this->json_encode2($k).':'.$this->json_encode2($v);
+            }
             return '{' . join(',', $result) . '}';
         }
     }
@@ -79,7 +81,8 @@ if(!function_exists("json_encode")) {
 /**
  * Clean up URI (function taken from Cacti) to protect against XSS
  */
-function wm_editor_sanitize_uri($str) {
+function wm_editor_sanitize_uri($str)
+{
         static $drop_char_match =   array(' ','^', '$', '<', '>', '`', '\'', '"', '|', '+', '[', ']', '{', '}', ';', '!', '%');
         static $drop_char_replace = array('', '', '',  '',  '',  '',  '',   '',  '',  '',  '',  '',  '',  '',  '',  '', '');
 
@@ -87,72 +90,87 @@ function wm_editor_sanitize_uri($str) {
 }
 
 // much looser sanitise for general strings that shouldn't have HTML in them
-function wm_editor_sanitize_string($str) {
+function wm_editor_sanitize_string($str)
+{
         static $drop_char_match =   array('<', '>' );
         static $drop_char_replace = array('', '');
 
         return str_replace($drop_char_match, $drop_char_replace, urldecode($str));
 }
 
-function wm_editor_validate_bandwidth($bw) {
-  
-    if(preg_match( "/^(\d+\.?\d*[KMGT]?)$/", $bw) ) {
-	return true;
+function wm_editor_validate_bandwidth($bw)
+{
+    if (preg_match("/^(\d+\.?\d*[KMGT]?)$/", $bw)) {
+	    return true;
     }
     return false;
 }
 
-function wm_editor_validate_one_of($input,$valid=array(),$case_sensitive=false) {
-    if(! $case_sensitive ) $input = strtolower($input);
+function wm_editor_validate_one_of($input, $valid = array(), $case_sensitive = false)
+{
+    if (! $case_sensitive) {
+        $input = strtolower($input);
+    }
     
     foreach ($valid as $v) {
-	if(! $case_sensitive ) $v = strtolower($v);
-	if($v == $input) return true;
+        if (! $case_sensitive ) {
+            $v = strtolower($v);
+        }
+	    if ($v == $input) {
+            return true;
+        }
     }
     
     return false;
 }
 
 // Labels for Nodes, Links and Scales shouldn't have spaces in
-function wm_editor_sanitize_name($str) {
-    return str_replace( array(" "), "", $str);
+function wm_editor_sanitize_name($str)
+{
+    return str_replace(array(" "), "", $str);
 }
 
-function wm_editor_sanitize_selected($str) {        
+function wm_editor_sanitize_selected($str)
+{
 	$res = urldecode($str);
 	
-	if( ! preg_match("/^(LINK|NODE):/",$res)) {
+	if (! preg_match("/^(LINK|NODE):/",$res)) {
 	    return "";
 	}
 	return wm_editor_sanitize_name($res);
 }
 
-function wm_editor_sanitize_file($filename,$allowed_exts=array()) {
-    
+function wm_editor_sanitize_file($filename, $allowed_exts = array())
+{
     $filename = wm_editor_sanitize_uri($filename);
     
-    if ($filename == "") return "";
+    if ($filename == "") {
+        return "";
+    }
         
     $ok = false;
     foreach ($allowed_exts as $ext) {
-	$match = ".".$ext;
-	
-	if( substr($filename, -strlen($match),strlen($match)) == $match) {
-	    $ok = true;
-	}
+        $match = ".".$ext;
+
+        if (substr($filename, -strlen($match), strlen($match)) == $match) {
+            $ok = true;
+        }
     }    
-    if(! $ok ) return "";
+    if (! $ok) {
+        return "";
+    }
     return $filename;
 }
 
-function wm_editor_sanitize_conffile($filename) {
+function wm_editor_sanitize_conffile($filename)
+{
     
     $filename = wm_editor_sanitize_uri($filename);
     
     # If we've been fed something other than a .conf filename, just pretend it didn't happen
-    if ( substr($filename,-5,5) != ".conf" ) {
-	$filename = ""; 
-     }
+    if (substr($filename, -5, 5) != ".conf" ) {
+        $filename = "";
+    }
     return $filename;
 }
 
@@ -161,8 +179,8 @@ function show_editor_startpage()
 	global $mapdir, $WEATHERMAP_VERSION, $config_loaded, $cacti_found, $ignore_cacti,$configerror;
 
 	$fromplug = false;
-	if (isset($_REQUEST['plug']) && (intval($_REQUEST['plug'])==1) ) { 
-	    $fromplug = true; 
+	if (isset($_REQUEST['plug']) && (intval($_REQUEST['plug'])==1)) {
+	    $fromplug = true;
 	}
 
 	$matches=0;
@@ -184,8 +202,8 @@ function show_editor_startpage()
 		
 	if (! $cacti_found && !$ignore_cacti) {
 		$errormessage .= '$cacti_base is not set correctly. Cacti integration will be disabled in the editor.';
-		if ($config_loaded != 1) { 
-            $errormessage .= " You might need to copy editor-config.php-dist to editor-config.php and edit it."; 
+		if ($config_loaded != 1) {
+            $errormessage .= " You might need to copy editor-config.php-dist to editor-config.php and edit it.";
         }
 	}
 	
@@ -221,45 +239,44 @@ function show_editor_startpage()
 
 		if ($dh) {
 		    while (false !== ($file = readdir($dh))) {
-			$realfile=$mapdir . DIRECTORY_SEPARATOR . $file;
-			$note = "";
-	
-			// skip directories, unreadable files, .files and anything that doesn't come through the sanitiser unchanged
-			if ( (is_file($realfile)) && (is_readable($realfile)) && (!preg_match("/^\./",$file) )  && ( wm_editor_sanitize_conffile($file) == $file ) ) {
-				if (!is_writable($realfile)) {
-					$note .= "(read-only) ";
-				}
-				$title='(no title)';
-				$fd=fopen($realfile, "r");
-				if ($fd) {
-					while (!feof($fd)) {
-						$buffer=fgets($fd, 4096);
-	
-						if (preg_match("/^\s*TITLE\s+(.*)/i", $buffer, $matches)) { 
-						    $title= wm_editor_sanitize_string($matches[1]); 
-						}
-					}
-	
-					fclose ($fd);
-					$titles[$file] = $title;
-					$notes[$file] = $note;
-					$n++;
-				}
-			}
-		    }
+                $realfile=$mapdir . DIRECTORY_SEPARATOR . $file;
+                $note = "";
 
-		    closedir ($dh);
+                // skip directories, unreadable files, .files and anything that doesn't come through the sanitiser unchanged
+                if ((is_file($realfile)) && (is_readable($realfile)) && (!preg_match("/^\./", $file) )  && ( wm_editor_sanitize_conffile($file) == $file)) {
+                    if (!is_writable($realfile)) {
+                        $note .= "(read-only) ";
+                    }
+                    $title='(no title)';
+                    $fd=fopen($realfile, "r");
+                    if ($fd) {
+                        while (!feof($fd)) {
+                            $buffer=fgets($fd, 4096);
+
+                            if (preg_match("/^\s*TITLE\s+(.*)/i", $buffer, $matches)) {
+                                $title= wm_editor_sanitize_string($matches[1]);
+                            }
+                        }
+
+                        fclose($fd);
+                        $titles[$file] = $title;
+                        $notes[$file] = $note;
+                        $n++;
+                    }
+                }
+		    }
+		    closedir($dh);
 		} else { 
-            $errorstring = "Can't open mapdir to read."; 
+            $errorstring = "Can't open mapdir to read.";
         }
 		
 		ksort($titles);
 		
-		if ($n == 0) { 
-		    $errorstring = "No files in mapdir"; 
+		if ($n == 0) {
+		    $errorstring = "No files in mapdir";
 		}
-	} else { 
-	    $errorstring = "NO DIRECTORY named $mapdir"; 
+	} else {
+	    $errorstring = "NO DIRECTORY named $mapdir";
 	}
 
 	print 'OR<br />Create A New Map as a copy of an existing map:<br>';
@@ -271,7 +288,7 @@ function show_editor_startpage()
 	print '<select name="sourcemap">';
 	
 	if ($errorstring == '') {
-		foreach ($titles as $file=>$title) {
+		foreach ($titles as $file => $title) {
 			$nicefile = htmlspecialchars($file);
 			print "<option value=\"$nicefile\">$nicefile</option>\n";
 		}
@@ -286,7 +303,7 @@ function show_editor_startpage()
 	print 'Open An Existing Map (looking in ' . htmlspecialchars($mapdir) . '):<ul class="filelist">';
 
 	if ($errorstring == '') {
-		foreach ($titles as $file=>$title) {			
+		foreach ($titles as $file => $title) {
 			# $title = $titles[$file];
 			$note = $notes[$file];
 			$nicefileurl = urlencode($file);
@@ -315,10 +332,9 @@ function snap($coord, $gridsnap = 0)
         return ($coord);
     } else {        
         $rest = $coord % $gridsnap;
-        return ($coord - $rest + round($rest/$gridsnap) * $gridsnap );
+        return ($coord - $rest + round($rest/$gridsnap) * $gridsnap);
     }
 }
-
 
 function extract_with_validation($array, $paramarray)
 {
@@ -332,7 +348,7 @@ function extract_with_validation($array, $paramarray)
 
 		if ($varreqd == 'req' && !array_key_exists($varname, $array)) { 
 	            $all_present=false; 
-	        }
+	    }
 
 		if (array_key_exists($varname, $array)) {
 			$varvalue=$array[$varname];
@@ -341,70 +357,53 @@ function extract_with_validation($array, $paramarray)
 
 			switch ($vartype)
 			{
-			case 'int':
-				if (!preg_match('/^\-*\d+$/', $varvalue)) { 
-                    $all_present=false; 
-                }
-
-				break;
-
-			case 'float':
-				if (!preg_match('/^\d+\.\d+$/', $varvalue)) { 
-                    $all_present=false; 
-                }
-
-				break;
-
-			case 'yesno':
-				if (!preg_match('/^(y|n|yes|no)$/i', $varvalue)) { 
-                    $all_present=false; 
-                }
-
-				break;
-
-			case 'sqldate':
-				if (!preg_match('/^\d\d\d\d\-\d\d\-\d\d$/i', $varvalue)) { 
-                    $all_present=false; 
-                }
-
-				break;
-
-			case 'any':
-				// we don't care at all
-				break;
-
-			case 'ip':
-				if (!preg_match( '/^((\d|[1-9]\d|2[0-4]\d|25[0-5]|1\d\d)(?:\.(\d|[1-9]\d|2[0-4]\d|25[0-5]|1\d\d)){3})$/', $varvalue)) { 
-                    $all_present=false; 
-                }
-
-				break;
-
-			case 'alpha':
-				if (!preg_match('/^[A-Za-z]+$/', $varvalue)) { 
-                    $all_present=false; 
-                }
-
-				break;
-
-			case 'alphanum':
-				if (!preg_match('/^[A-Za-z0-9]+$/', $varvalue)) { 
-                    $all_present=false; 
-                }
-
-				break;
-
-			case 'bandwidth':
-				if (!preg_match('/^\d+\.?\d*[KMGT]*$/i', $varvalue)) { 
-                    $all_present=false; 
-                }
-				break;
-
-			default:
-				// an unknown type counts as an error, really
-				$all_present=false;
-
-				break;
+                case 'int':
+                    if (!preg_match('/^\-*\d+$/', $varvalue)) {
+                        $all_present=false;
+                    }
+                    break;
+                case 'float':
+                    if (!preg_match('/^\d+\.\d+$/', $varvalue)) {
+                        $all_present=false;
+                    }
+                    break;
+                case 'yesno':
+                    if (!preg_match('/^(y|n|yes|no)$/i', $varvalue)) {
+                        $all_present=false;
+                    }
+                    break;
+                case 'sqldate':
+                    if (!preg_match('/^\d\d\d\d\-\d\d\-\d\d$/i', $varvalue)) {
+                        $all_present=false;
+                    }
+                    break;
+                case 'any':
+                    // we don't care at all
+                    break;
+                case 'ip':
+                    if (!preg_match( '/^((\d|[1-9]\d|2[0-4]\d|25[0-5]|1\d\d)(?:\.(\d|[1-9]\d|2[0-4]\d|25[0-5]|1\d\d)){3})$/', $varvalue)) {
+                        $all_present=false;
+                    }
+                    break;
+                case 'alpha':
+                    if (!preg_match('/^[A-Za-z]+$/', $varvalue)) {
+                        $all_present=false;
+                    }
+                    break;
+                case 'alphanum':
+                    if (!preg_match('/^[A-Za-z0-9]+$/', $varvalue)) {
+                        $all_present=false;
+                    }
+                    break;
+                case 'bandwidth':
+                    if (!preg_match('/^\d+\.?\d*[KMGT]*$/i', $varvalue)) {
+                        $all_present=false;
+                    }
+                    break;
+                default:
+                    // an unknown type counts as an error, really
+                    $all_present=false;
+                    break;
 			}
 			
 			if ($all_present) {
@@ -415,11 +414,11 @@ function extract_with_validation($array, $paramarray)
 
 	if ($all_present) {
 	    foreach ($candidates as $key => $value) { 
-		$GLOBALS[$key]=$value; 
+    		$GLOBALS[$key]=$value;
 	    }
 	}
 
-	return array($all_present,$candidates);
+	return array($all_present, $candidates);
 }
 
 function get_imagelist($imagedir)
@@ -455,14 +454,14 @@ function handle_inheritance(&$map, &$inheritables)
 		$validation = $inheritable[3];
 		
 		$new = $_REQUEST[$formname];
-		if($validation != "") {
+		if ($validation != "") {
 		    switch($validation) {
-			case "int":
-			    $new = intval($new);
-			    break;
-			case "float":
-			    $new = floatval($new);
-			    break;
+                case "int":
+                    $new = intval($new);
+                    break;
+                case "float":
+                    $new = floatval($new);
+                    break;
 		    }
 		}
 		
@@ -481,7 +480,6 @@ function handle_inheritance(&$map, &$inheritables)
 			if ($inheritable[0]=='link') {
 				$map->links['DEFAULT']->$fieldname = $new;
 				foreach ($map->links as $link) {
-					
 					if ($link->name != ":: DEFAULT ::" && $link->$fieldname == $old) {
 						$map->links[$link->name]->$fieldname = $new;
 					}
@@ -522,7 +520,7 @@ function range_overlaps($a_min, $a_max, $b_min, $b_max)
     return true;
 }
 
-function common_range ($a_min,$a_max, $b_min, $b_max)
+function common_range($a_min, $a_max, $b_min, $b_max)
 {
     $min_overlap = max($a_min, $b_min);
     $max_overlap = min($a_max, $b_max);
@@ -533,14 +531,14 @@ function common_range ($a_min,$a_max, $b_min, $b_max)
 /* distance - find the distance between two points
  *
  */
-function distance ($ax,$ay, $bx,$by)
+function distance ($ax, $ay, $bx, $by)
 {
     $dx = $bx - $ax;
     $dy = $by - $ay;
     return sqrt( $dx*$dx + $dy*$dy );
 }
 
-function tidy_links(&$map,$targets, $ignore_tidied=FALSE)
+function tidy_links(&$map, $targets, $ignore_tidied = false)
 {
     // not very efficient, but it saves looking for special cases (a->b & b->a together)
     $ntargets = count($targets);
@@ -557,10 +555,10 @@ function tidy_links(&$map,$targets, $ignore_tidied=FALSE)
  * tidy_link - change link offsets so that link is horizonal or vertical, if possible.
  *             if not possible, change offsets to the closest facing compass points
  */
-function tidy_link(&$map,$target, $linknumber=1, $linktotal=1, $ignore_tidied=FALSE)
+function tidy_link(&$map, $target, $linknumber = 1, $linktotal = 1, $ignore_tidied = false)
 {
     // print "\n-----------------------------------\nTidying $target...\n";
-    if(isset($map->links[$target]) and isset($map->links[$target]->a) ) {
+    if (isset($map->links[$target]) and isset($map->links[$target]->a)) {
                         
         $node_a = $map->links[$target]->a;
         $node_b = $map->links[$target]->b;
@@ -579,11 +577,13 @@ function tidy_link(&$map,$target, $linknumber=1, $linktotal=1, $ignore_tidied=FA
         $x_overlap = range_overlaps($bb_a[0], $bb_a[2], $bb_b[0], $bb_b[2]);
         $y_overlap = range_overlaps($bb_a[1], $bb_a[3], $bb_b[1], $bb_b[3]);
         
-        $a_x_offset = 0; $a_y_offset = 0;
-        $b_x_offset = 0; $b_y_offset = 0;
+        $a_x_offset = 0;
+        $a_y_offset = 0;
+        $b_x_offset = 0;
+        $b_y_offset = 0;
             
         // if they are side by side, and there's some common y coords, make link horizontal
-        if ( !$x_overlap && $y_overlap ) {
+        if (!$x_overlap && $y_overlap) {
             // print "SIDE BY SIDE\n";
             
             // snap the X coord to the appropriate edge of the node
@@ -597,15 +597,15 @@ function tidy_link(&$map,$target, $linknumber=1, $linktotal=1, $ignore_tidied=FA
             }
             
             // this should be true whichever way around they are
-            list($min_overlap,$max_overlap) = common_range($bb_a[1],$bb_a[3],$bb_b[1],$bb_b[3]);
+            list($min_overlap,$max_overlap) = common_range($bb_a[1], $bb_a[3], $bb_b[1], $bb_b[3]);
             $overlap = $max_overlap - $min_overlap;
             $n = $overlap/($linktotal+1);
             
             $a_y_offset = $min_overlap + ($linknumber*$n) - $node_a->y;
             $b_y_offset = $min_overlap + ($linknumber*$n) - $node_b->y;
          
-            $new_a_offset = sprintf("%d:%d", $a_x_offset,$a_y_offset);
-            $new_b_offset = sprintf("%d:%d", $b_x_offset,$b_y_offset);
+            $new_a_offset = sprintf("%d:%d", $a_x_offset, $a_y_offset);
+            $new_b_offset = sprintf("%d:%d", $b_x_offset, $b_y_offset);
         }			
         
         // if they are above and below, and there's some common x coords, make link vertical
@@ -622,7 +622,7 @@ function tidy_link(&$map,$target, $linknumber=1, $linktotal=1, $ignore_tidied=FA
                 $b_y_offset = $bb_b[3] - $node_b->y;
             }
             
-            list($min_overlap,$max_overlap) = common_range($bb_a[0],$bb_a[2],$bb_b[0],$bb_b[2]);
+            list($min_overlap,$max_overlap) = common_range($bb_a[0], $bb_a[2], $bb_b[0], $bb_b[2]);
             $overlap = $max_overlap - $min_overlap;
             $n = $overlap/($linktotal+1);
             
@@ -630,8 +630,8 @@ function tidy_link(&$map,$target, $linknumber=1, $linktotal=1, $ignore_tidied=FA
             $a_x_offset = $min_overlap + ($linknumber*$n) - $node_a->x;
             $b_x_offset = $min_overlap + ($linknumber*$n) - $node_b->x;
                 
-            $new_a_offset = sprintf("%d:%d", $a_x_offset,$a_y_offset);
-            $new_b_offset = sprintf("%d:%d", $b_x_offset,$b_y_offset);
+            $new_a_offset = sprintf("%d:%d", $a_x_offset, $a_y_offset);
+            $new_b_offset = sprintf("%d:%d", $b_x_offset, $b_y_offset);
         }			
         
         // if no common coordinates, figure out the best diagonal...
@@ -646,10 +646,10 @@ function tidy_link(&$map,$target, $linknumber=1, $linktotal=1, $ignore_tidied=FA
             $tangent = $line->vector;
             $tangent->normalise();
             
-            $normal = $tangent->get_normal();
+            $normal = $tangent->getNormal();
             
-            $pt_a->AddVector( $normal, 15 * ($linknumber-1) );
-            $pt_b->AddVector( $normal, 15 * ($linknumber-1) );
+            $pt_a->addVector( $normal, 15 * ($linknumber-1) );
+            $pt_b->addVector( $normal, 15 * ($linknumber-1) );
             
             $a_x_offset = $pt_a->x - $node_a->x;
             $a_y_offset = $pt_a->y - $node_a->y;
@@ -657,10 +657,8 @@ function tidy_link(&$map,$target, $linknumber=1, $linktotal=1, $ignore_tidied=FA
             $b_x_offset = $pt_b->x - $node_b->x;
             $b_y_offset = $pt_b->y - $node_b->y;
             
-            $new_a_offset = sprintf("%d:%d", $a_x_offset,$a_y_offset);
-            $new_b_offset = sprintf("%d:%d", $b_x_offset,$b_y_offset);
-                        
-            
+            $new_a_offset = sprintf("%d:%d", $a_x_offset, $a_y_offset);
+            $new_b_offset = sprintf("%d:%d", $b_x_offset, $b_y_offset);
         }
         
         // if no common coordinates, figure out the best diagonal...
@@ -677,19 +675,19 @@ function tidy_link(&$map,$target, $linknumber=1, $linktotal=1, $ignore_tidied=FA
             $best_offset_b = "C";
             
             foreach ($corners as $corner1) {
-                list ($ax,$ay) = calc_offset($corner1, $bb_a[2] - $bb_a[0], $bb_a[3] - $bb_a[1]);
+                list ($ax,$ay) = wmCalculateOffset($corner1, $bb_a[2] - $bb_a[0], $bb_a[3] - $bb_a[1]);
                 
                 $axx = $node_a->x + $ax;
                 $ayy = $node_a->y + $ay;
                     
                 foreach ($corners as $corner2) {
-                    list($bx,$by) = calc_offset($corner2, $bb_b[2] - $bb_b[0], $bb_b[3] - $bb_b[1]);
+                    list($bx,$by) = wmCalculateOffset($corner2, $bb_b[2] - $bb_b[0], $bb_b[3] - $bb_b[1]);
                     
                     $bxx = $node_b->x + $bx;
                     $byy = $node_b->y + $by;
                                                 
                     $d = distance($axx,$ayy, $bxx, $byy);
-                    if($d < $best_distance) {
+                    if ($d < $best_distance) {
                         // print "from $corner1 ($axx, $ayy) to $corner2 ($bxx, $byy): ";
                         // print "NEW BEST $d\n";                                
                         $best_distance = $d;
@@ -715,45 +713,42 @@ function tidy_link(&$map,$target, $linknumber=1, $linktotal=1, $ignore_tidied=FA
 
 function untidy_links(&$map)
 {
-    foreach ($map->links as $link)
-    {
+    foreach ($map->links as $link) {
         $link->a_offset = "C";
         $link->b_offset = "C";
     }
 }
 
-function retidy_links(&$map, $ignore_tidied=FALSE)
+function retidy_links(&$map, $ignore_tidied = false)
 {
     $routes = array();
     $done = array();
 
-    foreach ($map->links as $link)
-    {
-        if(isset($link->a)) {
+    foreach ($map->links as $link) {
+        if (isset($link->a)) {
             $route = $link->a->name . " " . $link->b->name;
-            if(strcmp( $link->a->name, $link->b->name) > 0) {
+            if (strcmp( $link->a->name, $link->b->name) > 0) {
                 $route = $link->b->name . " " . $link->a->name;
             }
             $routes[$route][] = $link->name;
         }
     }
     
-    foreach ($map->links as $link)
-    {
-        if(isset($link->a)) {
+    foreach ($map->links as $link) {
+        if (isset($link->a)) {
             $route = $link->a->name . " " . $link->b->name;
-            if(strcmp( $link->a->name, $link->b->name) > 0) {
+            if (strcmp( $link->a->name, $link->b->name) > 0) {
                 $route = $link->b->name . " " . $link->a->name;
             }
             
-            if( ($ignore_tidied || $link->get_hint("_tidied")==1) && !isset($done[$route]) && isset( $routes[$route] ) ) {
+            if (($ignore_tidied || $link->get_hint("_tidied")==1) && !isset($done[$route]) && isset($routes[$route])) {
             
-                if( sizeof($routes[$route]) == 1) {
-                        tidy_link($map,$link->name);
+                if ( sizeof($routes[$route]) == 1) {
+                        tidy_link($map, $link->name);
                         $done[$route] = 1;
                 } else {
                     # handle multi-links specially... 
-                    tidy_links($map,$routes[$route]);
+                    tidy_links($map, $routes[$route]);
                     // mark it so we don't do it again when the other links come by
                     $done[$route] = 1;                
                 }
@@ -770,4 +765,3 @@ function editor_log($str)
 }
 
 // vim:ts=4:sw=4:
-?>

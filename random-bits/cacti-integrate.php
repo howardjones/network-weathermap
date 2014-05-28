@@ -454,8 +454,8 @@ foreach ($map->links as $link) {
                 if($total_speed > 0) {
                     $map->links[$name]->max_bandwidth_in = $total_speed;
                     $map->links[$name]->max_bandwidth_out = $total_speed;
-                    $map->links[$name]->max_bandwidth_in_cfg = wm_nice_bandwidth($total_speed);
-                    $map->links[$name]->max_bandwidth_out_cfg = wm_nice_bandwidth($total_speed);
+                    $map->links[$name]->max_bandwidth_in_cfg = wmFormatNumberWithMetricPrefix($total_speed);
+                    $map->links[$name]->max_bandwidth_out_cfg = wmFormatNumberWithMetricPrefix($total_speed);
                                 
                     if ($map_widths) {
                         foreach ($width_map as $map_speed => $map_width) {
@@ -474,7 +474,7 @@ foreach ($map->links as $link) {
     }
 }
 
-$map->WriteConfig($outputmapfile);
+$map->writeConfig($outputmapfile);
 
 print "Wrote config to $outputmapfile\n";
 ?>

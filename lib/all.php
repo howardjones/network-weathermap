@@ -6,7 +6,6 @@
 
     // one file to include all the others...
 
-
     require_once dirname(__FILE__).'/globals.php';
 
     require_once dirname(__FILE__).'/php-compat.php';

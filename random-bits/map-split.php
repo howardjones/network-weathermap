@@ -75,7 +75,7 @@
 				$map->width = $desired_width;
 				$map->height = $desired_height;
 				$map->background="";
-				$map->WriteConfig($output_mapfile);
+				$map->writeConfig($output_mapfile);
 			}
 		}
 		

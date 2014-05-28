@@ -22,43 +22,34 @@ class WeatherMapDataSource_external extends WeatherMapDataSource {
 
 	function Recognise($targetstring)
 	{
-		if(preg_match("/^!(.*)$/",$targetstring))
-		{
-			return TRUE;
-		}
-		else
-		{
-			return FALSE;
+		if (preg_match("/^!(.*)$/",$targetstring)) {
+			return true;
+		} else {
+			return false;
 		}
 	}
 
 	function ReadData($targetstring, &$map, &$item)
 	{
-		$data[IN] = NULL;
-		$data[OUT] = NULL;
+		$data[IN] = null;
+		$data[OUT] = null;
 		$data_time = 0;
 
-		if(preg_match("/^!(.*)$/",$targetstring,$matches))
-		{
+		if (preg_match("/^!(.*)$/", $targetstring, $matches)) {
 			$command = $matches[1];
 
 			wm_debug("ExternalScript ReadData: Running $command\n");
 			// run the command here
-			if( ($pipe = popen($command,"r")) === false)
-			{
+			if ( ($pipe = popen($command,"r")) === false) {
 				wm_warn("ExternalScript ReadData: Failed to run external script. [WMEXT01]\n");
-			}
-			else
-			{
+			} else {
 				$i=0;
-				while( ($i <5) && ! feof($pipe) )
-				{
+				while( ($i <5) && ! feof($pipe) ) {
 					$lines[$i++] = fgets($pipe,1024);
 				}
 				pclose($pipe);
 
-				if($i==5)
-				{
+				if ($i==5) {
 					$data[IN] = floatval($lines[0]);
 					$data[OUT] = floatval($lines[1]);
 					
@@ -67,20 +58,16 @@ class WeatherMapDataSource_external extends WeatherMapDataSource {
 					$item->add_hint("external_line3",$lines[2]);
 					$item->add_hint("external_line4",$lines[3]);
 					$data_time = time();
-				}
-				else
-				{
+				} else {
 					wm_warn("ExternalScript ReadData: Not enough lines read from external script ($i read, 4 expected) [WMEXT02]\n");
 				}
 			}
 		}
 
-		wm_debug ("ExternalScript ReadData: Returning (".($data[IN]===NULL?'NULL':$data[IN]).",".($data[OUT]===NULL?'NULL':$data[OUT]).",$data_time)\n");
+		wm_debug ("ExternalScript ReadData: Returning (".($data[IN]===null?'null':$data[IN]).",".($data[OUT]===null?'null':$data[OUT]).", $data_time)\n");
 		
 		return( array($data[IN], $data[OUT], $data_time) );
 	}
 }
 
 // vim:ts=4:sw=4:
-
-?>

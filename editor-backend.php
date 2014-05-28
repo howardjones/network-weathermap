@@ -77,7 +77,7 @@ function process_editor_command($cmd)
             $map->ReadConfig($mapfile);
             $map->links[$lname]->vialist[$vnum][0] = $x;
             $map->links[$lname]->vialist[$vnum][1] = $y;
-            $map->WriteConfig($mapfile);
+            $map->writeConfig($mapfile);
 
             print "{ status: 'OK' }";
             break;
@@ -100,7 +100,7 @@ function process_editor_command($cmd)
                 $y
             );
 
-            $map->WriteConfig($mapfile);
+            $map->writeConfig($mapfile);
 
             print "{ status: 'OK' }";
             break;
@@ -110,8 +110,8 @@ function process_editor_command($cmd)
             $json = "{ \"status\": 'OK', \"files\": [";
 
             foreach ($files as $file) {
-                $json .= "{\"file\": " . js_escape($file[0]) . ", \"title\":"
-                    . js_escape($file[1]) . ", \"locked\":" . $file[2] . " },\n";
+                $json .= "{\"file\": " . jsEscape($file[0]) . ", \"title\":"
+                    . jsEscape($file[1]) . ", \"locked\":" . $file[2] . " },\n";
             }
             $json = rtrim($json, ", \n");
             $json .= "] }";
@@ -289,7 +289,7 @@ function act_move_node($node_name, $x, $y)
                 # $log .= "Scale by $scalefactor along link-line";
 
                 // rotate so that link is along the axis
-                RotateAboutPoint($points, $pivx, $pivy, deg2rad($angle_old));
+                rotateAboutPoint($points, $pivx, $pivy, deg2rad($angle_old));
 
                 // do the scaling in here
                 for ($i = 0; $i < (count($points) / 2); $i++) {
@@ -297,7 +297,7 @@ function act_move_node($node_name, $x, $y)
                     $points[$i * 2] = $basex;
                 }
                 // rotate back so that link is along the new direction
-                RotateAboutPoint($points, $pivx, $pivy, deg2rad(-$angle_new));
+                rotateAboutPoint($points, $pivx, $pivy, deg2rad(-$angle_new));
 
                 // now put the modified points back into the vialist again
                 $v = 0;
@@ -319,7 +319,7 @@ function act_move_node($node_name, $x, $y)
     $map->nodes[$node_name]->x = $x;
     $map->nodes[$node_name]->y = $y;
 
-    $map->WriteConfig($mapfile);
+    $map->writeConfig($mapfile);
 }
 
 function logentry($line)
@@ -375,12 +375,12 @@ function fetch_cached_file($filename, $mapfile)
         $map->context = "editor2";
         $map->cachefolder = "editcache";
         $map->ReadConfig($mapfile);
-        $map->DrawMap('null', '', 250, false);
+        $map->drawMapImage('null', '', 250, false);
         $map->htmlstyle = 'editor';
 
         $weathermap_debugging = true;
-        $map->CacheUpdate();
-        $map->CleanUp();
+        $map->updateEditorCache();
+        $map->cleanUp();
     }
 
     if ((!file_exists($cachetestfile))

@@ -1,5 +1,7 @@
 <?php
-	if(! isset($PATH_EXTRA)) { $PATH_EXTRA = "../"; }
+    if(! isset($PATH_EXTRA)) {
+        $PATH_EXTRA = "../";
+    }
 ?><!DOCTYPE html>
 <html lang = "en" xml:lang = "en" xmlns = "http://www.w3.org/1999/xhtml">
     <head>
@@ -9,13 +11,15 @@
     </head>
 
     <body>
-            <?php if(! isset($FRONT_PAGE)) include "common-top-nav.php" ?>
-	<sdiv id="content">
-	<sdiv id="content2" class="wrapper">
+            <?php if(! isset($FRONT_PAGE)) {
+                include "common-top-nav.php";
+} ?>
+    <sdiv id="content">
+    <sdiv id="content2" class="wrapper">
 
 
 <div class="container">
-	
+
 <div id = "header">
     <h1>PHP Weathermap <?php echo $WEATHERMAP_VERSION; ?> </h1>
 
@@ -23,4 +27,3 @@
     <tt><a href = "mailto:howie@thingy.com">howie@thingy.com</a></tt>. (<a
         href = "http://www.network-weathermap.com/">Website</a>)</h4>
 </div>
-

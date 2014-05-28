@@ -127,7 +127,7 @@ else
 	switch($action)
 	{
 	case 'newmap':
-		$map->WriteConfig($mapfile);
+		$map->writeConfig($mapfile);
 		break;
 
 	case 'newmapcopy':
@@ -139,7 +139,7 @@ else
 		    $sourcemap = $mapdir.'/'.$sourcemapname;
 		    if( file_exists($sourcemap) && is_readable($sourcemap) ) {
 			$map->ReadConfig($sourcemap);
-			$map->WriteConfig($mapfile);
+			$map->writeConfig($mapfile);
 		    }
 		}
 		break;
@@ -209,7 +209,7 @@ else
 		}
 
 		$map->sizedebug = TRUE;		
-		$map->DrawMap('','',250,TRUE,$use_overlay,$use_relative_overlay);
+		$map->drawMapImage('','',250,TRUE,$use_overlay,$use_relative_overlay);
 		exit();
 		break;
 
@@ -266,7 +266,7 @@ else
 			if(isset($map->links[$link_name])) {		                
 			    $map->links[$link_name]->config_override = $link_config;
 			    
-			    $map->WriteConfig($mapfile);
+			    $map->writeConfig($mapfile);
 			    // now clear and reload the map object, because the in-memory one is out of sync
 			    // - we don't know what changes the user made here, so we just have to reload.
 			    unset($map);
@@ -288,7 +288,7 @@ else
 			if(isset($map->nodes[$node_name])) {		                
 			    $map->nodes[$node_name]->config_override = $node_config;
 			    
-			    $map->WriteConfig($mapfile);
+			    $map->writeConfig($mapfile);
 			    // now clear and reload the map object, because the in-memory one is out of sync
 			    // - we don't know what changes the user made here, so we just have to reload.
 			    unset($map);
@@ -402,7 +402,7 @@ else
 		    }
 		}
 
-		$map->WriteConfig($mapfile);
+		$map->writeConfig($mapfile);
 		break;
 
 	case "set_link_properties":
@@ -456,16 +456,16 @@ else
 
 		    if(wm_editor_validate_bandwidth($bwin)) {
 			$map->links[$link_name]->max_bandwidth_in_cfg = $bwin;
-			$map->links[$link_name]->max_bandwidth_in = wm_unformat_number($bwin, $map->kilo);
+			$map->links[$link_name]->max_bandwidth_in = wmInterpretNumberWithMetricPrefix($bwin, $map->kilo);
 		    
 		    }
 		    if(wm_editor_validate_bandwidth($bwout)) {
 			$map->links[$link_name]->max_bandwidth_out_cfg = $bwout;		    
-			$map->links[$link_name]->max_bandwidth_out = wm_unformat_number($bwout, $map->kilo);
+			$map->links[$link_name]->max_bandwidth_out = wmInterpretNumberWithMetricPrefix($bwout, $map->kilo);
 		    }
 		    // $map->links[$link_name]->SetBandwidth($bwin,$bwout);
 		    
-		    $map->WriteConfig($mapfile);
+		    $map->writeConfig($mapfile);
 		}
 		break;
 
@@ -518,8 +518,8 @@ else
 		{
 			$map->links['DEFAULT']->max_bandwidth_in_cfg = $bwin;
 			$map->links['DEFAULT']->max_bandwidth_out_cfg = $bwout;
-			$map->links['DEFAULT']->max_bandwidth_in = wm_unformat_number($bwin, $map->kilo);
-                        $map->links['DEFAULT']->max_bandwidth_out = wm_unformat_number($bwout, $map->kilo);
+			$map->links['DEFAULT']->max_bandwidth_in = wmInterpretNumberWithMetricPrefix($bwin, $map->kilo);
+                        $map->links['DEFAULT']->max_bandwidth_out = wmInterpretNumberWithMetricPrefix($bwout, $map->kilo);
 			
 			// $map->defaultlink->SetBandwidth($bwin,$bwout);
 			foreach ($map->links as $link)
@@ -530,13 +530,13 @@ else
 				    $link_name = $link->name;
 				    $map->links[$link_name]->max_bandwidth_in_cfg = $bwin;
 				    $map->links[$link_name]->max_bandwidth_out_cfg = $bwout;
-				    $map->links[$link_name]->max_bandwidth_in = wm_unformat_number($bwin, $map->kilo);
-				    $map->links[$link_name]->max_bandwidth_out = wm_unformat_number($bwout, $map->kilo);
+				    $map->links[$link_name]->max_bandwidth_in = wmInterpretNumberWithMetricPrefix($bwin, $map->kilo);
+				    $map->links[$link_name]->max_bandwidth_out = wmInterpretNumberWithMetricPrefix($bwout, $map->kilo);
 			    }
 			}
 		}
 
-		$map->WriteConfig($mapfile);
+		$map->writeConfig($mapfile);
 		break; 
 
 	case 'set_map_style':
@@ -557,7 +557,7 @@ else
 
 		handle_inheritance($map, $inheritables);
 		
-		$map->WriteConfig($mapfile);
+		$map->writeConfig($mapfile);
 		break;
 
 	case "add_link":
@@ -581,7 +581,7 @@ else
 		if($a != $b && isset($map->nodes[$a]) && isset($map->nodes[$b]) )
 		{
 			$newlink = new WeatherMapLink;
-			$newlink->Reset($map);
+			$newlink->reset($map);
 			
 			$newlink->a = $map->nodes[$a];
 			$newlink->b = $map->nodes[$b];
@@ -602,7 +602,7 @@ else
 			$map->links[$newlinkname] = $newlink;
 			array_push($map->seen_zlayers[$newlink->zorder], $newlink);
 
-			$map->WriteConfig($mapfile);
+			$map->writeConfig($mapfile);
 		}          
 		break;
 
@@ -616,7 +616,7 @@ else
 		$map->keyx[$scalename] = $x;
 		$map->keyy[$scalename] = $y;
 
-		$map->WriteConfig($mapfile);
+		$map->writeConfig($mapfile);
 		break;
 
 	case "place_stamp":
@@ -628,7 +628,7 @@ else
 		$map->timex = $x;
 		$map->timey = $y;
 
-		$map->WriteConfig($mapfile);
+		$map->writeConfig($mapfile);
 		break;
 
 		
@@ -641,7 +641,7 @@ else
 
 		if(isset($map->links[$link_name])) {
 		    $map->links[$link_name]->vialist = array(array(0 =>$x, 1=>$y));
-		    $map->WriteConfig($mapfile);
+		    $map->writeConfig($mapfile);
 		}
 		
 		break;
@@ -709,7 +709,7 @@ else
 					    # $log .= "Scale by $scalefactor along link-line";
 					    
 					    // rotate so that link is along the axis
-					    RotateAboutPoint($points,$pivx, $pivy, deg2rad($angle_old));
+					    rotateAboutPoint($points,$pivx, $pivy, deg2rad($angle_old));
 					    // do the scaling in here
 					    for($i=0; $i<(count($points)/2); $i++)
 					    {
@@ -717,7 +717,7 @@ else
 						    $points[$i*2] = $basex;
 					    }
 					    // rotate back so that link is along the new direction
-					    RotateAboutPoint($points,$pivx, $pivy, deg2rad(-$angle_new));
+					    rotateAboutPoint($points,$pivx, $pivy, deg2rad(-$angle_new));
 					    
 					    // now put the modified points back into the vialist again
 					    $v = 0; $i = 0;
@@ -738,7 +738,7 @@ else
 		    $map->nodes[$node_name]->x = $x;
 		    $map->nodes[$node_name]->y = $y;
     
-		    $map->WriteConfig($mapfile);
+		    $map->writeConfig($mapfile);
 		}
 		break;
 
@@ -771,7 +771,7 @@ else
 			$map->links[$target]->b_offset = "C";
 		    }     
     
-		    $map->WriteConfig($mapfile);
+		    $map->writeConfig($mapfile);
 		}
                 break;
 
@@ -804,7 +804,7 @@ else
 			$map->links[$target]->b_offset = "C";
 		    }     
     
-		    $map->WriteConfig($mapfile);
+		    $map->writeConfig($mapfile);
 		}
                 break;
 	    
@@ -815,11 +815,11 @@ else
 		
 	    if(isset($map->links[$target])) {
     		// draw a map and throw it away, to calculate all the bounding boxes
-    		$map->DrawMap('null');
+    		$map->drawMapImage('null');
     		
     		tidy_link($map,$target);
     		
-    		$map->WriteConfig($mapfile);
+    		$map->writeConfig($mapfile);
 	    }
 	    break;
 
@@ -827,10 +827,10 @@ else
 	    $map->ReadConfig($mapfile);
 	    
 	    // draw a map and throw it away, to calculate all the bounding boxes
-	    $map->DrawMap('null');
+	    $map->drawMapImage('null');
 	    retidy_links($map);
 	    
-	    $map->WriteConfig($mapfile);
+	    $map->writeConfig($mapfile);
 	     
 	    break;
 	
@@ -838,10 +838,10 @@ else
 	    $map->ReadConfig($mapfile);
 	    
 	    // draw a map and throw it away, to calculate all the bounding boxes
-	    $map->DrawMap('null');
+	    $map->drawMapImage('null');
 	    retidy_links($map,TRUE);
 	    
-	    $map->WriteConfig($mapfile);
+	    $map->writeConfig($mapfile);
 	     
 	    break;
     
@@ -849,10 +849,10 @@ else
 	    $map->ReadConfig($mapfile);
 	    
 	    // draw a map and throw it away, to calculate all the bounding boxes
-	    $map->DrawMap('null');
+	    $map->drawMapImage('null');
 	    untidy_links($map);
 	    
-	    $map->WriteConfig($mapfile);
+	    $map->writeConfig($mapfile);
 	     
 	    break;
     
@@ -865,7 +865,7 @@ else
 		if(isset($map->links[$target])) {
 		    unset($map->links[$target]);
 		    
-		    $map->WriteConfig($mapfile);
+		    $map->writeConfig($mapfile);
 		}
 		break;
 
@@ -884,7 +884,7 @@ else
 		$node = new WeatherMapNode;
 		$node->name = $newnodename;
 		$node->template = "DEFAULT";
-		$node->Reset($map);
+		$node->reset($map);
 				
 		$node->x = $x;
 		$node->y = $y;
@@ -902,7 +902,7 @@ else
 		$map->nodes[$node->name] = $node;
 		$log = "added a node called $newnodename at $x,$y to $mapfile";
 						
-		$map->WriteConfig($mapfile);
+		$map->writeConfig($mapfile);
 		break;
 
 	case "editor_settings":
@@ -935,7 +935,7 @@ else
     
 		    unset($map->nodes[$target]);
     
-		    $map->WriteConfig($mapfile);
+		    $map->writeConfig($mapfile);
 		}
 		break;
 
@@ -953,8 +953,8 @@ else
 		    } while(isset($map->nodes[$newnodename]));
 		    
 		    $node = new WeatherMapNode;
-		    $node->Reset($map);
-		    $node->CopyFrom($map->nodes[$target]);
+		    $node->reset($map);
+		    $node->copyFrom($map->nodes[$target]);
 		    
 		    # CopyFrom skips this one, because it's also the function used by template inheritance
 		    # - but for Clone, we DO want to copy the template too
@@ -969,7 +969,7 @@ else
 		    $map->nodes[$newnodename] = $node;
 		    array_push($map->seen_zlayers[$node->zorder], $node);
     
-		    $map->WriteConfig($mapfile);
+		    $map->writeConfig($mapfile);
 		}
 		break;
 
@@ -1093,11 +1093,11 @@ else
 <?php        	
 	// we need to draw and throw away a map, to get the
 	// dimensions for the imagemap. Oh well.
-	$map->DrawMap('null');
+	$map->drawMapImage('null');
 	$map->htmlstyle='editor';
-	$map->PreloadMapHTML();
+	$map->calculateImageMap();
 
-	print $map->SortedImagemap("weathermap_imap");
+	print $map->generateSortedImagemap("weathermap_imap");
 
 	#print $map->imap->subHTML("LEGEND:");
 	#print $map->imap->subHTML("TIMESTAMP");

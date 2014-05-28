@@ -1009,4 +1009,3 @@ are really facets of the same thing - lack of input validation. 0.97b improves t
             </ul>
 <?php
         include "common-page-foot.php";
-?>

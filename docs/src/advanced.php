@@ -411,4 +411,3 @@
             Currently, there aren't any of these plugins, but the hooks are available.</p>
 <?php
         include "common-page-foot.php";
-?>

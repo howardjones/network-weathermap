@@ -18,7 +18,6 @@ class WeatherMapPostProcessorExample extends WeatherMapPostProcessor
 
             $orig = $map->get_note("test");
             $map->add_note("test", $orig . " TESTYTEST");
-        // -------------------------
         } else {
             wm_debug(__CLASS__ . " Not Enabled\n");
         }
@@ -26,4 +25,3 @@ class WeatherMapPostProcessorExample extends WeatherMapPostProcessor
 }
 
 // vim:ts=4:sw=4:
-?>

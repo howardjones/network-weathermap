@@ -4,8 +4,6 @@
 // http://www.network-weathermap.com/
 // Released under the GNU Public License
 
-require_once dirname(__FILE__).'/HTML_ImageMap.class.php';
-
 class WeatherMapLink extends WeatherMapItem
 {
     var $owner;
@@ -58,7 +56,7 @@ class WeatherMapLink extends WeatherMapItem
     var $config;
 
     function WeatherMapLink()
-    { 
+    {
         $this->inherit_fieldlist=array(
             'my_default' => null,
             'width' => 7,
@@ -121,7 +119,9 @@ class WeatherMapLink extends WeatherMapItem
         $this->owner=$newowner;
 
         $template = $this->template;
-                if($template == '') $template = "DEFAULT";
+        if ($template == '') {
+            $template = "DEFAULT";
+        }
 
         wm_debug("Resetting $this->name with $template\n");
 
@@ -158,16 +158,18 @@ class WeatherMapLink extends WeatherMapItem
         assert('is_object($source)');
 
         foreach (array_keys($this->inherit_fieldlist) as $fld) {
-             if($fld != 'template') $this->$fld = $source->$fld;
+            if ($fld != 'template') {
+                $this->$fld = $source->$fld;
+            }
         }
     }
 
     function getDirectionList()
     {
         if ($this->linkstyle == "oneway") {
-            $dirs = array (OUT);
+            $dirs = array(OUT);
         } else {
-            $dirs = array (OUT,IN);
+            $dirs = array(OUT,IN);
         }
 
         return ($dirs);

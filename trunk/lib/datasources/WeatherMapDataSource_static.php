@@ -29,15 +29,14 @@ class WeatherMapDataSource_static extends WeatherMapDataSource {
 			$data_time = time();
 		}
 
-		if (preg_match("/^static:(\-?\d+\.?\d*[KMGT]*)$/", $targetstring, $matches))
-		{
+		if (preg_match("/^static:(\-?\d+\.?\d*[KMGT]*)$/", $targetstring, $matches)) {
 			$inbw = wmInterpretNumberWithMetricPrefix($matches[1], $map->kilo);
 			$outbw = $inbw;
 			$data_time = time();
 		}
-		wm_debug ("Static ReadData: Returning ($inbw, $outbw, $data_time)\n");
+		wm_debug("Static ReadData: Returning ($inbw, $outbw, $data_time)\n");
 
-		return ( array($inbw, $outbw, $data_time) );
+		return (array($inbw, $outbw, $data_time));
 	}
 }
 

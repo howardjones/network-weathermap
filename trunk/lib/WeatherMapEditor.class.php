@@ -4,8 +4,6 @@
 // http://www.network-weathermap.com/
 // Released under the GNU Public License
 
-require_once dirname(__FILE__).'/all.php';
-
 /** Wrapper API around WeatherMap to provide the relevant operations to manipulate
  *  the map contents that an editor will need, without it needing to see inside the map object.
  *  (a second class, WeatherMapEditorUI, is concerned with the actual presentation of the supplied editor)
@@ -18,87 +16,105 @@ class WeatherMapEditor {
     
     function WeatherMapEditor()
     {
-    	$this->map = NULL;
+        $this->map = null;
     }
     
     function isLoaded() {
-    	return !is_null($this->map);
+        return !is_null($this->map);
     }
     
     function newConfig() 
     {
-    	$this->map = new WeatherMap();
-    	$this->map->context = "editor";
-    	$this->mapfile = "untitled";
+        $this->map = new WeatherMap();
+        $this->map->context = "editor";
+        $this->mapfile = "untitled";
     }
     
     function loadConfig($filename)
     {
         $this->map = new WeatherMap();
-       	$this->map->context = 'editor';
+        $this->map->context = 'editor';
         $this->map->ReadConfig($filename);
-		$this->mapfile = $filename;
+        $this->mapfile = $filename;
     }
-    
-    function saveConfig($filename)
-    {   
-        $this->mapfile = $filename;        
-    	$this->map->WriteConfig($filename);    	
-    }
-    
-    function addNode($x, $y, $nodename="", $template="DEFAULT")
-    {    
-    	if (! $this->isLoaded() ) die("Map must be loaded before editing API called.");
-    	
-    	$success = false;
-    	$log = "";
-    	$newnodename = null;
-    	
-    	// Generate a node name for ourselves  
-    	if($nodename == "") {
-	    	$newnodename = sprintf("node%05d",time()%10000);
-	    	while(array_key_exists($newnodename,$this->map->nodes))
-	    	{
-	    		$newnodename .= "a";
-	    	}
-    	} else {
-    		$newnodename = $nodename;
-    	}
 
-    	// Check again - if they are specifying a name, it's possible for it to exist
-    	if (!array_key_exists($newnodename, $this->map->nodes)) {
-	    	$node = new WeatherMapNode;
-	    	$node->name = $newnodename;
-	    	$node->template = $template;
-	    	
-	    	$node->reset($this->map);
-	    	
-	    	$node->x = $x;
-	    	$node->y = $y;
-	    	$node->defined_in = $this->map->configfile;
-	    	
-	    	// needs to know if zlayer exists.
-	    	if( !array_key_exists($node->zorder, $this->map->seen_zlayers)) {
-	    		$this->map->seen_zlayers[$node->zorder] = array();
-	    	}
-	    	array_push($this->map->seen_zlayers[$node->zorder], $node);
-	    	
-	    	// only insert a label if there's no LABEL in the DEFAULT node.
-	    	// otherwise, respect the template.
-	    	if($this->map->nodes['DEFAULT']->label == $this->map->nodes[':: DEFAULT ::']->label)
-	    	{
-	    		$node->label = "Node";
-	    	}
-	    	
-	    	$this->map->nodes[$node->name] = $node;
-	    	$log = "added a node called $newnodename at $x,$y to $this->mapfile";
-    		$success = true;
-    	} else {
-    		$log = "Requested node name already exists";
-    		$success = false;
-    	}
-    	
-    	return array($newnodename, $success, $log);
+    /**
+     * Save the map config file.
+     *
+     * Optionally, save to a different file from the one loaded.
+     *
+     * @param string $filename
+     */
+    function saveConfig($filename="")
+    {
+        if ($filename != "") {
+            $this->mapfile = $filename;
+        }
+        $this->map->writeConfig($this->mapfile);
+    }
+
+    /**
+     * Return the config that would have been saved. Mainly for tests.
+     *
+     */
+    function getConfig()
+    {
+        return $this->map->getConfig();
+    }
+    
+    function addNode($x, $y, $nodename = "", $template = "DEFAULT")
+    {    
+        if (! $this->isLoaded() ) {
+            die("Map must be loaded before editing API called.");
+        }
+
+        $success = false;
+        $log = "";
+        $newnodename = null;
+
+        // Generate a node name for ourselves if one wasn't supplied
+        if ($nodename == "") {
+            $newnodename = sprintf("node%05d",time()%10000);
+            while (array_key_exists($newnodename,$this->map->nodes)) {
+                $newnodename .= "a";
+            }
+        } else {
+            $newnodename = $nodename;
+        }
+
+        // Check again - if they are specifying a name, it's possible for it to exist
+        if (!array_key_exists($newnodename, $this->map->nodes)) {
+            $node = new WeatherMapNode;
+            $node->name = $newnodename;
+            $node->template = $template;
+
+            $node->reset($this->map);
+
+            $node->x = $x;
+            $node->y = $y;
+            $node->defined_in = $this->map->configfile;
+
+            // needs to know if zlayer exists.
+            if ( !array_key_exists($node->zorder, $this->map->seen_zlayers)) {
+                $this->map->seen_zlayers[$node->zorder] = array();
+            }
+            array_push($this->map->seen_zlayers[$node->zorder], $node);
+
+            // only insert a label if there's no LABEL in the DEFAULT node.
+            // otherwise, respect the template.
+            if ($this->map->nodes['DEFAULT']->label == $this->map->nodes[':: DEFAULT ::']->label) {
+                $node->label = "Node";
+            }
+
+            $this->map->nodes[$node->name] = $node;
+            $log = "added a node called $newnodename at $x,$y to $this->mapfile";
+            $success = true;
+        } else {
+            $log = "Requested node name already exists";
+            $success = false;
+        }
+
+        return array($newnodename, $success, $log);
     }
     
     /**
@@ -108,250 +124,251 @@ class WeatherMapEditor {
      * @param string $node_name
      * @param number $x
      * @param number $y
+     *
+     * @return array (number of affected nodes, number of affected links, list of affected nodes, list of affected links)
      */
     function moveNode($node_name, $x, $y)
     {
-    	if (! $this->isLoaded() ) die("Map must be loaded before editing API called.");
-    	 
-    	$n_links = 0;
-    	$n_nodes = 0;
-    	$affected_nodes = array();
-    	$affected_links = array();
-    	
-    	if(isset($this->map->nodes[$node_name])) {
-    	    // This is a complicated bit. Find out if this node is involved in any
-    	    // links that have VIAs. If it is, we want to rotate those VIA points
-    	    // about the *other* node in the link
-    	    foreach ($this->map->links as $link)
-    	    {
-    	        if( (count($link->vialist)>0)  && (($link->a->name == $node_name) || ($link->b->name == $node_name)) )
-    	        {
-    	            
-    	            $affected_links[] = $link->name;
-    	            
-    	            // get the other node from us
-    	            if($link->a->name == $node_name) {
-    	                $pivot = $link->b;
-    	            }
-    	            
-    	            if($link->b->name == $node_name) { 
-    	                $pivot = $link->a;
-    	            }
+        if (! $this->isLoaded()) {
+            die("Map must be loaded before editing API called.");
+        }
 
-    	            // this is a wierd special case, but it is possible, with link offsets
-    	            if ( ($link->a->name == $node_name) && ($link->b->name == $node_name) )
-    	            {    	             
-    	                $dx = $link->a->x - $x;
-    	                $dy = $link->a->y - $y;
-    	                	
-    	                for($i=0; $i<count($link->vialist); $i++)
-    	                {
-    	                    $link->vialist[$i][0] = $link->vialist[$i][0]-$dx;
-    	                    $link->vialist[$i][1] = $link->vialist[$i][1]-$dy;
-    	                }
-        	        }
-        	        else
-        	        {
-            	        $pivx = $pivot->x;
-            	        $pivy = $pivot->y;
-            	        	
-            	        $dx_old = $pivx - $this->map->nodes[$node_name]->x;
-            	        $dy_old = $pivy - $this->map->nodes[$node_name]->y;
-            	        $dx_new = $pivx - $x;
-            	        $dy_new = $pivy - $y;
-            	        $l_old = sqrt($dx_old*$dx_old + $dy_old*$dy_old);
-            	        $l_new = sqrt($dx_new*$dx_new + $dy_new*$dy_new);
-            	        	
-            	        $angle_old = rad2deg(atan2(-$dy_old,$dx_old));
-            	        $angle_new = rad2deg(atan2(-$dy_new,$dx_new));
-            	
-            	        # $log .= "$pivx,$pivy\n$dx_old $dy_old $l_old => $angle_old\n";
-            	        # $log .= "$dx_new $dy_new $l_new => $angle_new\n";
-            	
-            	        // the geometry stuff uses a different point format, helpfully
-            	        $points = array();
-            	        foreach($link->vialist as $via)
-            	        {
-            	            $points[] = $via[0];
-            	            $points[] = $via[1];
-            	        }
-    	        	
-            	        $scalefactor = $l_new/$l_old;
-            	        	
-            	        // rotate so that link is along the axis
-            	        rotateAboutPoint($points,$pivx, $pivy, deg2rad($angle_old));
-            	        // do the scaling in here
-            	        for($i=0; $i<(count($points)/2); $i++)
-            	        {
-                	        $basex = ($points[$i*2] - $pivx) * $scalefactor + $pivx;
-                	        $points[$i*2] = $basex;
-            	        }
-            	        // rotate back so that link is along the new direction
-            	        rotateAboutPoint($points,$pivx, $pivy, deg2rad(-$angle_new));
-    	        	
-            	        // now put the modified points back into the vialist again
-            	        $v = 0; $i = 0;
-            	        foreach($points as $p)
-            	        {
-                	        // skip a point if it positioned relative to a node. Those shouldn't be rotated (well, IMHO)
-            	            if(!isset($link->vialist[$v][2]))
-            	            {
-                	            $link->vialist[$v][$i]=$p;
-            	            }
-            	            $i++;
-            	            if($i==2) { 
-            	                $i=0; $v++;
-            	            }            	        
-           	            }
-    	           }
-    	       }
+        $n_links = 0;
+        $n_nodes = 0;
+        $affected_nodes = array();
+        $affected_links = array();
+
+        if (isset($this->map->nodes[$node_name])) {
+            // This is a complicated bit. Find out if this node is involved in any
+            // links that have VIAs. If it is, we want to rotate those VIA points
+            // about the *other* node in the link
+            foreach ($this->map->links as $link) {
+                if ( (count($link->vialist)>0)  && (($link->a->name == $node_name) || ($link->b->name == $node_name)) ) {
+
+                    $affected_links[] = $link->name;
+
+                    // get the other node from us
+                    if ($link->a->name == $node_name) {
+                        $pivot = $link->b;
+                    }
+
+                    if ($link->b->name == $node_name) {
+                        $pivot = $link->a;
+                    }
+
+                    // this is a wierd special case, but it is possible, with link offsets
+                    if ( ($link->a->name == $node_name) && ($link->b->name == $node_name) ) {
+                        $dx = $link->a->x - $x;
+                        $dy = $link->a->y - $y;
+
+                        for ($i=0; $i<count($link->vialist); $i++) {
+                            $link->vialist[$i][0] = $link->vialist[$i][0]-$dx;
+                            $link->vialist[$i][1] = $link->vialist[$i][1]-$dy;
+                        }
+                    } else {
+                        $pivx = $pivot->x;
+                        $pivy = $pivot->y;
+
+                        $dx_old = $pivx - $this->map->nodes[$node_name]->x;
+                        $dy_old = $pivy - $this->map->nodes[$node_name]->y;
+                        $dx_new = $pivx - $x;
+                        $dy_new = $pivy - $y;
+                        $l_old = sqrt($dx_old*$dx_old + $dy_old*$dy_old);
+                        $l_new = sqrt($dx_new*$dx_new + $dy_new*$dy_new);
+
+                        $angle_old = rad2deg(atan2(-$dy_old,$dx_old));
+                        $angle_new = rad2deg(atan2(-$dy_new,$dx_new));
+
+                        # $log .= "$pivx,$pivy\n$dx_old $dy_old $l_old => $angle_old\n";
+                        # $log .= "$dx_new $dy_new $l_new => $angle_new\n";
+
+                        // the geometry stuff uses a different point format, helpfully
+                        $points = array();
+                        foreach ($link->vialist as $via) {
+                            $points[] = $via[0];
+                            $points[] = $via[1];
+                        }
+
+                        $scalefactor = $l_new/$l_old;
+
+                        // rotate so that link is along the axis
+                        rotateAboutPoint($points,$pivx, $pivy, deg2rad($angle_old));
+                        // do the scaling in here
+                        for ($i=0; $i<(count($points)/2); $i++) {
+                            $basex = ($points[$i*2] - $pivx) * $scalefactor + $pivx;
+                            $points[$i*2] = $basex;
+                        }
+                        // rotate back so that link is along the new direction
+                        rotateAboutPoint($points,$pivx, $pivy, deg2rad(-$angle_new));
+
+                        // now put the modified points back into the vialist again
+                        $v = 0;
+                        $i = 0;
+                        foreach ($points as $p) {
+                            // skip a point if it positioned relative to a node. Those shouldn't be rotated (well, IMHO)
+                            if (!isset($link->vialist[$v][2])) {
+                                $link->vialist[$v][$i]=$p;
+                            }
+                            $i++;
+                            if ($i==2) {
+                                $i=0;
+                                $v++;
+                            }
+                        }
+                   }
+               }
             }
-    	
+
             $this->map->nodes[$node_name]->x = $x;
-        	$this->map->nodes[$node_name]->y = $y;
+            $this->map->nodes[$node_name]->y = $y;
         }  
-    	
+
         $n_links = count($affected_links);
         $n_nodes = count($affected_nodes);
         
-    	return array($n_nodes, $n_links, $affected_nodes, $affected_links);
+        return array($n_nodes, $n_links, $affected_nodes, $affected_links);
     }
         
     function updateNode($nodename)
     {
-    	if (! $this->isLoaded() ) die("Map must be loaded before editing API called.");
-    	 
-    	die("unimplemented");
+        if (! $this->isLoaded()) {
+            die("Map must be loaded before editing API called.");
+        }
+
+        die("unimplemented");
     }
     
     function deleteNode($nodename)
-    {    
-    	if (! $this->isLoaded() ) die("Map must be loaded before editing API called.");
-    	 
-    	$n_links = 0;
-    	$n_nodes = 0;
-    	$affected_nodes = array();
-    	$affected_links = array();
-    	    
-    	if(isset($this->map->nodes[$nodename])) {
-    	    
-    	    $affected_nodes[] = $nodename;
-    	    
-    		$log = "delete node ".$nodename;
-    	
-    		foreach ($this->map->links as $link)
-    		{
-    			if( isset($link->a) )
-    			{
-    				if( ($nodename == $link->a->name) || ($nodename == $link->b->name) )
-    				{
-    				    $affected_links[] = $link->name;
-    					unset($this->map->links[$link->name]);
-    				}
-    			}
-    		}
-    	
-    		unset($this->map->nodes[$target]);
-    		$n_nodes++;
-    	}
-    	// TODO - look for relative positioned nodes, and un-relative them
-    	
-    	$n_nodes = count($affected_nodes);
-    	$n_links = count($affected_links);
-    	return array($n_nodes, $n_links, $affected_nodes, $affected_links ,$log);
+    {
+        if (! $this->isLoaded()) {
+            die("Map must be loaded before editing API called.");
+        }
+
+        $log = "";
+        $n_links = 0;
+        $n_nodes = 0;
+        $affected_nodes = array();
+        $affected_links = array();
+
+        if (isset($this->map->nodes[$nodename])) {
+
+            $affected_nodes[] = $nodename;
+
+            $log = "delete node ".$nodename;
+
+            foreach ($this->map->links as $link) {
+                if ( isset($link->a) ) {
+                    if ( ($nodename == $link->a->name) || ($nodename == $link->b->name) ) {
+                        $affected_links[] = $link->name;
+                        unset($this->map->links[$link->name]);
+                    }
+                }
+            }
+
+            unset($this->map->nodes[$nodename]);
+            $n_nodes++;
+        }
+        // TODO - look for relative positioned nodes, and un-relative them
+
+        $n_nodes = count($affected_nodes);
+        $n_links = count($affected_links);
+        return array($n_nodes, $n_links, $affected_nodes, $affected_links ,$log);
     }
 
-    function cloneNode($sourcename, $targetname="", $or_fail = FALSE)
+    function cloneNode($sourcename, $targetname="", $or_fail = false)
     {
-    	if (! $this->isLoaded() ) die("Map must be loaded before editing API called.");
+        if (! $this->isLoaded()) {
+            die("Map must be loaded before editing API called.");
+        }
 
-    	if(isset($this->map->nodes[$sourcename])) {
-    	    $log = "cloned node ".$sourcename;
-    	
-    	    // Try to use the requested name, if possible, and if specified
-    	    $newnodename = ($targetname != "" ? $targetname : $sourcename);
-    	    
-    	    if($targetname != "" && $or_fail && isset($this->map->nodes[$newnodename]) ) {
-    	        return array(FALSE, NULL, "Requested name already exists");
-    	    }
-    	    
-    	    if( isset($this->map->nodes[$newnodename]) ) {
-    	        $newnodename = $sourcename;
-    	        do
-        	    {
-        	        $newnodename = $newnodename."_copy";
-        	    } while(isset($this->map->nodes[$newnodename]));
-    	    }
-    	
-    	    $log .= " into $newnodename";
-    	    
-    	    $node = new WeatherMapNode;
-    	    $node->reset($this->map);
-    	    $node->copyFrom($this->map->nodes[$sourcename]);
-    	
-    	    # CopyFrom skips this one, because it's also the function used by template inheritance
-    	    # - but for Clone, we DO want to copy the template too
-    	    $node->template = $this->map->nodes[$sourcename]->template;
-    	
-    	    $node->name = $newnodename;
-    	    $node->x += 30;
-    	    $node->y += 30;
-    	    $node->defined_in = $this->map->configfile;
-    	    	
-    	    $this->map->nodes[$newnodename] = $node;
-    	    array_push($this->map->seen_zlayers[$node->zorder], $node);
-    	    
-    	    return array(TRUE, $newnodename, $log);
-    	}
-    	
-    	return array(FALSE, NULL,"Request source does not exist");    	
+        if (isset($this->map->nodes[$sourcename])) {
+            $log = "cloned node ".$sourcename;
+
+            // Try to use the requested name, if possible, and if specified
+            $newnodename = ($targetname != "" ? $targetname : $sourcename);
+
+            if ($targetname != "" && $or_fail && isset($this->map->nodes[$newnodename]) ) {
+                return array(false, null, "Requested name already exists");
+            }
+
+            if ( isset($this->map->nodes[$newnodename]) ) {
+                $newnodename = $sourcename;
+                do {
+                    $newnodename = $newnodename."_copy";
+                } while (isset($this->map->nodes[$newnodename]));
+            }
+
+            $log .= " into $newnodename";
+
+            $node = new WeatherMapNode;
+            $node->reset($this->map);
+            $node->copyFrom($this->map->nodes[$sourcename]);
+
+            # CopyFrom skips this one, because it's also the function used by template inheritance
+            # - but for Clone, we DO want to copy the template too
+            $node->template = $this->map->nodes[$sourcename]->template;
+
+            $node->name = $newnodename;
+            $node->x += 30;
+            $node->y += 30;
+            $node->defined_in = $this->map->configfile;
+
+            $this->map->nodes[$newnodename] = $node;
+            array_push($this->map->seen_zlayers[$node->zorder], $node);
+
+            return array(true, $newnodename, $log);
+        }
+
+        return array(false, null,"Request source does not exist");
     }
         
-    function addLink($node1, $node2, $linkname="",$template="DEFAULT")
+    function addLink($node1, $node2, $linkname = "",$template = "DEFAULT")
     {    
-    	if (! $this->isLoaded() ) die("Map must be loaded before editing API called.");
-    	
-    	$success = false;
-    	$log = "";
-    	$newlinkname = null;
-    	
-    	if($node1 != $node2 && isset($this->map->nodes[$node1]) && isset($this->map->nodes[$node2]) )
-    	{
-    		$newlink = new WeatherMapLink;
-    		$newlink->reset($this->map);
-    			
-    		$newlink->a = $this->map->nodes[$node1];
-    		$newlink->b = $this->map->nodes[$node2];
-    			
-    		// make sure the link name is unique. We can have multiple links between
-    		// the same nodes, these days
-    		$newlinkname = "$node1-$node2";
-    		while(array_key_exists($newlinkname,$this->map->links))
-    		{
-    			$newlinkname .= "a";
-    		}
-    		$newlink->name = $newlinkname;
-    		$newlink->defined_in = $this->map->configfile;
-    		$this->map->links[$newlinkname] = $newlink;
+        if (! $this->isLoaded()) {
+            die("Map must be loaded before editing API called.");
+        }
 
-    		// needs to know if zlayer exists.
-    		if( !array_key_exists($newlink->zorder, $this->map->seen_zlayers)) {
-    			$this->map->seen_zlayers[$newlink->zorder] = array();
-    		}
-    		array_push($this->map->seen_zlayers[$newlink->zorder], $newlink);
-       		$success = true;
-       		$log = "created link $newlinkname between $node1 and $node2";
-    	} 	 
-       	
-       	return array($newlinkname, $success, $log);
-       	
+        $success = false;
+        $log = "";
+        $newlinkname = null;
+
+        if ($node1 != $node2 && isset($this->map->nodes[$node1]) && isset($this->map->nodes[$node2]) ) {
+            $newlink = new WeatherMapLink;
+            $newlink->reset($this->map);
+
+            $newlink->a = $this->map->nodes[$node1];
+            $newlink->b = $this->map->nodes[$node2];
+
+            // make sure the link name is unique. We can have multiple links between
+            // the same nodes, these days
+            $newlinkname = "$node1-$node2";
+            while (array_key_exists($newlinkname,$this->map->links)) {
+                $newlinkname .= "a";
+            }
+            $newlink->name = $newlinkname;
+            $newlink->defined_in = $this->map->configfile;
+            $this->map->links[$newlinkname] = $newlink;
+
+            // needs to know if zlayer exists.
+            if ( !array_key_exists($newlink->zorder, $this->map->seen_zlayers)) {
+                $this->map->seen_zlayers[$newlink->zorder] = array();
+            }
+            array_push($this->map->seen_zlayers[$newlink->zorder], $newlink);
+            $success = true;
+            $log = "created link $newlinkname between $node1 and $node2";
+        }
+
+        return array($newlinkname, $success, $log);
+
     }
     
     function updateLink()
-    {    
-    	if (! $this->isLoaded() ) die("Map must be loaded before editing API called.");
-    	
-    	die("unimplemented");
+    {
+        if (! $this->isLoaded()) {
+            die("Map must be loaded before editing API called.");
+        }
+
+        die("unimplemented");
     }
     
     /**
@@ -363,7 +380,9 @@ class WeatherMapEditor {
      */
     function cloneLink($sourcename, $targetname="")
     {
-        if (! $this->isLoaded() ) die("Map must be loaded before editing API called.");
+        if (! $this->isLoaded()) {
+            die("Map must be loaded before editing API called.");
+        }
         
         die("unimplemented");
     }
@@ -378,39 +397,47 @@ class WeatherMapEditor {
      * @return boolean - successful or not
      */
     function setLinkVia($linkname, $x,$y)
-    {    
-    	if (! $this->isLoaded() ) die("Map must be loaded before editing API called.");
+    {
+        if (! $this->isLoaded()) {
+            die("Map must be loaded before editing API called.");
+        }
 
-    	if(isset($this->map->links[$linkname])) {
-    	    $this->map->links[$linkname]->vialist = array(array(0 =>$x, 1=>$y));
-    	    
-    	    return TRUE;
-    	}
-    	return FALSE;
+        if (isset($this->map->links[$linkname])) {
+            $this->map->links[$linkname]->vialist = array(array(0 =>$x, 1=>$y));
+
+            return true;
+        }
+        return false;
     }
     
     function tidyLink($linkname) 
     {
-    	if (! $this->isLoaded() ) die("Map must be loaded before editing API called.");
+        if (! $this->isLoaded()) {
+            die("Map must be loaded before editing API called.");
+        }
 
-    	// draw a map and throw it away, to calculate all the bounding boxes
-    	$this->map->DrawMap('null');    	
-    	$this->_tidy_link($linkname);
-    	
+        // draw a map and throw it away, to calculate all the bounding boxes
+        $this->map->DrawMap('null');
+        $this->_tidy_link($linkname);
+
     }
 
     function retidyAllLinks($linkname)
     {
-        if (! $this->isLoaded() ) die("Map must be loaded before editing API called.");
+        if (! $this->isLoaded()) {
+            die("Map must be loaded before editing API called.");
+        }
         
         // draw a map and throw it away, to calculate all the bounding boxes
         $this->map->DrawMap('null');
-        $this->_retidy_links(TRUE);
+        $this->_retidy_links(true);
     }
     
     function retidyLinks($linkname)
     {
-        if (! $this->isLoaded() ) die("Map must be loaded before editing API called.");
+        if (! $this->isLoaded()) {
+            die("Map must be loaded before editing API called.");
+        }
         
         // draw a map and throw it away, to calculate all the bounding boxes
         $this->map->DrawMap('null');                
@@ -423,9 +450,11 @@ class WeatherMapEditor {
      *  
      * @param boolean $ignore_tidied
      */
-    function _retidyLinks($ignore_tidied=FALSE)
+    function _retidyLinks($ignore_tidied=false)
     {
-        if (! $this->isLoaded() ) die("Map must be loaded before editing API called.");
+        if (! $this->isLoaded()) {
+            die("Map must be loaded before editing API called.");
+        }
     
         // draw a map and throw it away, to calculate all the bounding boxes
         $this->map->DrawMap('null');
@@ -433,25 +462,23 @@ class WeatherMapEditor {
         $routes = array();
         $done = array();
         
-        foreach ($this->map->links as $link)
-        {
+        foreach ($this->map->links as $link) {
             $route = $link->a->name . " " . $link->b->name;
-            if(strcmp( $link->a->name, $link->b->name) > 0) {
+            if (strcmp( $link->a->name, $link->b->name) > 0) {
                 $route = $link->b->name . " " . $link->a->name;
             }
             $routes[$route][] = $link->name;
         }
         
-        foreach ($this->map->links as $link)
-        {
+        foreach ($this->map->links as $link) {
             $route = $link->a->name . " " . $link->b->name;
-            if(strcmp( $link->a->name, $link->b->name) > 0) {
+            if (strcmp( $link->a->name, $link->b->name) > 0) {
                 $route = $link->b->name . " " . $link->a->name;
             }
         
-            if( ($ignore_tidied || $link->get_hint("_tidied")==1) && $done[$route]==0) {
+            if ( ($ignore_tidied || $link->get_hint("_tidied")==1) && $done[$route]==0) {
         
-                if(sizeof($routes[$route]) == 1) {
+                if (sizeof($routes[$route]) == 1) {
                     $this->_tidy_link($link->name);
                     $done[$route] = 1;
                 } else {
@@ -469,14 +496,14 @@ class WeatherMapEditor {
      *  if not possible, change offsets to the closest facing compass points
      *  
      * @param string $target - the link name to tidy
-     * @param number $linknumber - if this is part of a group, which number in the group
-     * @param number $linktotal - if this is part of a group, how many total in the group
+     * @param int $linknumber - if this is part of a group, which number in the group
+     * @param int $linktotal - if this is part of a group, how many total in the group
      * @param bool $ignore_tidied - whether to take notice of the "_tidied" hint
      */
-    function _tidy_link($target, $linknumber=1, $linktotal=1, $ignore_tidied=FALSE) 
+    function _tidy_link($target, $linknumber = 1, $linktotal = 1, $ignore_tidied = false)
     {
         // print "\n-----------------------------------\nTidying $target...\n";
-        if(isset($this->map->links[$target]) and isset($this->map->links[$target]->a) ) {
+        if (isset($this->map->links[$target]) and isset($this->map->links[$target]->a) ) {
         
             $node_a = $this->map->links[$target]->a;
             $node_b = $this->map->links[$target]->b;
@@ -607,7 +634,7 @@ class WeatherMapEditor {
                         $byy = $node_b->y + $by;
         
                         $d = distance($axx,$ayy, $bxx, $byy);
-                        if($d < $best_distance) {
+                        if ($d < $best_distance) {
                             // print "from $corner1 ($axx, $ayy) to $corner2 ($bxx, $byy): ";
                             // print "NEW BEST $d\n";
                             $best_distance = $d;
@@ -639,7 +666,7 @@ class WeatherMapEditor {
      * @param bool $ignore_tidied - whether to take notice of the "_tidied" hint
      * 
      */
-    function _tidy_links($links,  $ignore_tidied=FALSE) 
+    function _tidy_links($links,  $ignore_tidied=false) 
     {
         // not very efficient, but it saves looking for special cases (a->b & b->a together)
         $ntargets = count($targets);
@@ -657,26 +684,31 @@ class WeatherMapEditor {
      */
     function untidyLinks()
     {
-        if (! $this->isLoaded() ) die("Map must be loaded before editing API called.");
+        if (! $this->isLoaded()) {
+            die("Map must be loaded before editing API called.");
+        }
         
-        foreach ($this->map->links as $link)
-        {
+        foreach ($this->map->links as $link) {
             $link->a_offset = "C";
             $link->b_offset = "C";
         }    
     }
     
-    function placeLegend($x, $y, $scalename="DEFAULT") 
+    function placeLegend($x, $y, $scalename = "DEFAULT")
     {
-        if (! $this->isLoaded() ) die("Map must be loaded before editing API called.");
+        if (! $this->isLoaded()) {
+            die("Map must be loaded before editing API called.");
+        }
         
         $this->map->keyx[$scalename] = $x;
         $this->map->keyy[$scalename] = $y;
     }
     
     function placeTitle($x, $y) 
-    {        
-        if (! $this->isLoaded() ) die("Map must be loaded before editing API called.");
+    {
+        if (! $this->isLoaded()) {
+            die("Map must be loaded before editing API called.");
+        }
         
         $this->map->timex = $x;
         $this->map->timey = $y;
@@ -684,16 +716,20 @@ class WeatherMapEditor {
     
     function placeTimestamp($x, $y)
     {
-        if (! $this->isLoaded() ) die("Map must be loaded before editing API called.");
+        if (! $this->isLoaded()) {
+            die("Map must be loaded before editing API called.");
+        }
         
         $this->map->timex = $x;
         $this->map->timey = $y;
     }
     
     function asJS()
-    {    
-    	if (! $this->isLoaded() ) die("Map must be loaded before editing API called.");
-    	 
+    {
+        if (! $this->isLoaded()) {
+            die("Map must be loaded before editing API called.");
+        }
+
     }
     
     
@@ -727,23 +763,21 @@ class WeatherMapEditor {
      * @param number $b_max
      * @return number list($min,$max)
      */
-    function common_range ($a_min,$a_max, $b_min, $b_max)
+    function common_range ($a_min, $a_max, $b_min, $b_max)
     {
         $min_overlap = max($a_min, $b_min);
         $max_overlap = min($a_max, $b_max);
     
-        return array($min_overlap,$max_overlap);
+        return array($min_overlap, $max_overlap);
     }
     
     /* distance - find the distance between two points
      *
     */
-    function distance ($ax,$ay, $bx,$by)
+    function distance ($ax, $ay, $bx, $by)
     {
         $dx = $bx - $ax;
         $dy = $by - $ay;
         return sqrt( $dx*$dx + $dy*$dy );
     }
-    
-    
 }

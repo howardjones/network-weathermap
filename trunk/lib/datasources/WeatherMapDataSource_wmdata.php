@@ -21,12 +21,12 @@ class WeatherMapDataSource_wmdata extends WeatherMapDataSource
 
         $matches = 0;
 
-        if( preg_match("/^wmdata:([^:]*):(.*)", $targetstring, $matches)) {
+        if (preg_match("/^wmdata:([^:]*):(.*)", $targetstring, $matches)) {
             $datafile = $matches[1];
             $dataname = $matches[2];
         }
 
-        if( file_exists($datafile)) {
+        if (file_exists($datafile)) {
             $fd = fopen($targetstring, "r");
             if ($fd) {
                 $found = false;
@@ -35,15 +35,15 @@ class WeatherMapDataSource_wmdata extends WeatherMapDataSource
                     # strip out any Windows line-endings that have gotten in here
                     $buffer = str_replace("\r", "", $buffer);
 
-                    $fields = explode("\t",$buffer);
-                    if($fields[0] == $dataname) {
+                    $fields = explode("\t", $buffer);
+                    if ($fields[0] == $dataname) {
                         $data[IN] = $fields[1];
                         $data[OUT] = $fields[2];
                         $found = true;
                     }
                 }
 
-                if($found===true) {
+                if ($found===true) {
                     $stats = stat($datafile);
                     $data_time = $stats['mtime'];
                 } else {
@@ -59,11 +59,14 @@ class WeatherMapDataSource_wmdata extends WeatherMapDataSource
         }
 
 
-        wm_debug( sprintf("WMData ReadData: Returning (%s, %s, %s)\n",
+        wm_debug(
+            sprintf(
+                "WMData ReadData: Returning (%s, %s, %s)\n",
 		        string_or_null($data[IN]),
 		        string_or_null($data[OUT]),
 		        $data_time
-        	));
+        	)
+        );
 
         return (array (
             $data[IN],
@@ -74,4 +77,3 @@ class WeatherMapDataSource_wmdata extends WeatherMapDataSource
 }
 
 // vim:ts=4:sw=4:
-?>

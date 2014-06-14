@@ -326,11 +326,11 @@ function show_editor_startpage()
 	$matches=0;
 
 	print '<!DOCTYPE html>
-            <html><head>
+        <html><head>
 	    <link rel="stylesheet" type="text/css" href="editor-resources/editor13.css" />
-	    <link rel="stylesheet" type="text/css" href="editor-resources/bootstrap/css/bootstrap.min.css" />
-	    <script type="text/javascript" src="editor-resources/jquery-1.10.1.min.js">
-	    <script type="text/javascript" src="editor-resources/bootstrap/js/bootstrap.min.js">
+	    <link rel="stylesheet" type="text/css" href="vendor/bootstrap/dist/css/bootstrap.min.css" />
+	    <script type="text/javascript" src="vendor/jquery/jquery-1.10.1.min.js">
+	    <script type="text/javascript" src="vendor/bootstrap/dist/js/bootstrap.min.js">
 	    </script><script src="editor-resources/editor13.js" type="text/javascript"></script>
 	    <title>PHP Weathermap Editor ' . $WEATHERMAP_VERSION
 		. '</title></head><body><div class="container">';

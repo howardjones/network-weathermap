@@ -30,7 +30,6 @@ class WeatherMapDataSource_cacti extends WeatherMapDataSource
 
     function ReadData($targetstring, &$map, &$item)
     {
-
         $data[IN] = null;
         $data[OUT] = null;
         $data_time = 0;
@@ -41,16 +40,15 @@ class WeatherMapDataSource_cacti extends WeatherMapDataSource
             $SQL = 'select * from weathermap_data where local_data_id='.$local_data_id;
 
             $result = db_fetch_row($SQL);
-
         }
             
-		wm_debug(
+        wm_debug(
             sprintf(
                 "cacti ReadData: Returning (%s, %s, %s)\n",
                 string_or_null($data[IN]),
                 string_or_null($data[OUT]),
                 $data_time
-        	)
+            )
         );
 
         return (array (

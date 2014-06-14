@@ -1,5 +1,5 @@
 <?php include "header.php"; ?>
-<body>
+<body id="startview">
 <div class="container">
 
     <div id="nojs" class="alert"><b>WARNING</b> -
@@ -18,65 +18,64 @@
 
     <div id="withjs">
         <div id="dlgStart" class="modal">
-            <div class="modal-dialog">
+            <div class="modal-dialog modal-lg">
                 <div class="modal-content">
                     <div class="dlgTitlebar modal-header"><h3>
                             Welcome to the Weathermap <?php echo $WEATHERMAP_VERSION ?> editor</h3>
                     </div>
                     <div class="modal-body">
 
-                        <form method="GET" class="form-inline">
-                            <label><strong>Create A New Map</strong>, named</label>
+                        <h2>Create A New Map</h2>
 
-                            <div class="input-append"><input type="text" name="mapname" size="20"><span
-                                    class="add-on">.conf</span>
+                        <form method="GET" class="form-inline">
+                            <div class="row">
+
+                                <div class="col-xs-5">
+                                    <label>named</label>
+                                    <span class="input-group"><input type="text" class="form-control"
+                                                                     placeholder="filename" name="mapname"
+                                                                     size="20"><span
+                                            class="input-group-addon"> .conf</span>
+                                    </span>
+                                </div>
+
+                                <input type="submit" class="btn btn-success" value="Create">
+                                <input name="action" type="hidden" value="newmap">
+                                <input name="plug" type="hidden" value="<?php echo $fromplug ?>">
+
+                                <div class="col-xs-4">
+                                    <input type="checkbox" name="template" value="copy"> <label>copied from</label> <select
+                                        name="sourcemap">
+                                        <?php foreach ($titles as $file => $title): ?>
+                                            <option value="<?php echo $file ?>"><?php echo $file ?></option>
+                                        <?php endforeach ?>
+                                    </select>
+                                </div>
+
                             </div>
-                            <input name="action" type="hidden" value="newmap">
-                            <input name="plug" type="hidden" value="<?php echo $fromplug ?>">
-                            <input type="submit" class="btn btn-success" value="Create">
                         </form>
 
                         <hr/>
 
-                        <form method="GET" class="form-inline">
-                            <input name="action" type="hidden" value="newmapcopy">
-                            <input name="plug" type="hidden" value="'.$fromplug.'">
+                        <h2>or Open an existing map</h2>
 
-                            <div class="control-group"><label>or <strong>Create A New Map as a copy</strong> of an
-                                    existing map, named:</label>
-
-                                <div class="input-append"><input type="text" name="mapname" size="20"><span
-                                        class="add-on">.conf</span></div>
-                            </div>
-                            <div class="control-group"><label>based on</label><select name="sourcemap">
-                                    <?php foreach ($titles as $file => $title): ?>
-                                        <option value="<?php echo $file ?>"><?php echo $file ?></option>
-                                    <?php endforeach ?>
-                                </select>
-                                <input type="submit" class="btn btn-success" value="Create Copy"></div>
-                        </form>
-
-                        <hr/>
-
-                        or <strong>Open An Existing Map</strong>:
                         <div id="existinglist">
-                            <ul class="filelist">
+                            <table class="table table-striped table-bordered filelist">
                                 <?php foreach ($titles as $file => $title) : ?>
-                                    <li>
-                                        <?php echo $notes[$file] ?>
-                                        <a href="?mapname=<?php echo $file ?>&action=nothing&plug=<?php
-                                        echo $fromplug ?>"><?php echo $file ?></a>
-                                        - <span class="comment"><?php echo $title ?></span>
-                                    </li>
+                                    <tr>
+                                        <td><?php echo $notes[$file] ?></td>
+                                        <td><a href="?mapname=<?php echo $file ?>&action=nothing&plug=<?php
+                                        echo $fromplug ?>"><?php echo $file ?></a></td>
+                                        <td><span class="comment"><?php echo $title ?></span></td>
+                                    </tr>
                                 <?php endforeach ?>
-
-                            </ul>
+                            </table>
                         </div>
                     </div>
 
                     <div class="modal-footer">
                         <small>PHP Weathermap <?php echo $WEATHERMAP_VERSION ?>
-                            Copyright &copy; 2005-2013 Howard Jones - howie@thingy.com
+                            Copyright &copy; 2005-2014 Howard Jones - howie@thingy.com
                             <br/>The current version should always be
                             <a href="http://www.network-weathermap.com/">available here</a>,
                             along with other related software. PHP Weathermap is licensed under the GNU Public License,

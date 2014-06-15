@@ -78,103 +78,7 @@ if (!function_exists("json_encode")) {
     }
 }
 
-/**
- * Clean up URI (function taken from Cacti) to protect against XSS
- */
-function wm_editor_sanitize_uri($str)
-{
-        static $drop_char_match =   array(' ','^', '$', '<', '>', '`', '\'', '"', '|', '+', '[', ']', '{', '}', ';', '!', '%');
-        static $drop_char_replace = array('', '', '',  '',  '',  '',  '',   '',  '',  '',  '',  '',  '',  '',  '',  '', '');
-
-        return str_replace($drop_char_match, $drop_char_replace, urldecode($str));
-}
-
-// much looser sanitise for general strings that shouldn't have HTML in them
-function wm_editor_sanitize_string($str)
-{
-        static $drop_char_match =   array('<', '>' );
-        static $drop_char_replace = array('', '');
-
-        return str_replace($drop_char_match, $drop_char_replace, urldecode($str));
-}
-
-function wm_editor_validate_bandwidth($bw)
-{
-    if (preg_match("/^(\d+\.?\d*[KMGT]?)$/", $bw)) {
-	    return true;
-    }
-    return false;
-}
-
-function wm_editor_validate_one_of($input, $valid = array(), $case_sensitive = false)
-{
-    if (! $case_sensitive) {
-        $input = strtolower($input);
-    }
-    
-    foreach ($valid as $v) {
-        if (! $case_sensitive ) {
-            $v = strtolower($v);
-        }
-	    if ($v == $input) {
-            return true;
-        }
-    }
-    
-    return false;
-}
-
-// Labels for Nodes, Links and Scales shouldn't have spaces in
-function wm_editor_sanitize_name($str)
-{
-    return str_replace(array(" "), "", $str);
-}
-
-function wm_editor_sanitize_selected($str)
-{
-	$res = urldecode($str);
-	
-	if (! preg_match("/^(LINK|NODE):/",$res)) {
-	    return "";
-	}
-	return wm_editor_sanitize_name($res);
-}
-
-function wm_editor_sanitize_file($filename, $allowed_exts = array())
-{
-    $filename = wm_editor_sanitize_uri($filename);
-    
-    if ($filename == "") {
-        return "";
-    }
-        
-    $ok = false;
-    foreach ($allowed_exts as $ext) {
-        $match = ".".$ext;
-
-        if (substr($filename, -strlen($match), strlen($match)) == $match) {
-            $ok = true;
-        }
-    }    
-    if (! $ok) {
-        return "";
-    }
-    return $filename;
-}
-
-function wm_editor_sanitize_conffile($filename)
-{
-    
-    $filename = wm_editor_sanitize_uri($filename);
-    
-    # If we've been fed something other than a .conf filename, just pretend it didn't happen
-    if (substr($filename, -5, 5) != ".conf" ) {
-        $filename = "";
-    }
-    return $filename;
-}
-
-function show_editor_startpage()
+function wmeShowStartPage()
 {
 	global $mapdir, $WEATHERMAP_VERSION, $config_loaded, $cacti_found, $ignore_cacti,$configerror;
 
@@ -243,7 +147,7 @@ function show_editor_startpage()
                 $note = "";
 
                 // skip directories, unreadable files, .files and anything that doesn't come through the sanitiser unchanged
-                if ((is_file($realfile)) && (is_readable($realfile)) && (!preg_match("/^\./", $file) )  && ( wm_editor_sanitize_conffile($file) == $file)) {
+                if ((is_file($realfile)) && (is_readable($realfile)) && (!preg_match("/^\./", $file) )  && ( wmeSanitizeConfigFile($file) == $file)) {
                     if (!is_writable($realfile)) {
                         $note .= "(read-only) ";
                     }
@@ -254,7 +158,7 @@ function show_editor_startpage()
                             $buffer=fgets($fd, 4096);
 
                             if (preg_match("/^\s*TITLE\s+(.*)/i", $buffer, $matches)) {
-                                $title= wm_editor_sanitize_string($matches[1]);
+                                $title= wmeSanitizeString($matches[1]);
                             }
                         }
 
@@ -326,7 +230,7 @@ function show_editor_startpage()
 	print "</body></html>";
 }
 
-function snap($coord, $gridsnap = 0)
+function wmeGridSnap($coord, $gridsnap = 0)
 {
     if ($gridsnap == 0) {
         return ($coord);
@@ -421,7 +325,7 @@ function extract_with_validation($array, $paramarray)
 	return array($all_present, $candidates);
 }
 
-function get_imagelist($imagedir)
+function wmeGetImageList($imagedir)
 {
 	$imagelist = array();
 
@@ -446,7 +350,7 @@ function get_imagelist($imagedir)
 	return ($imagelist);
 }
 
-function handle_inheritance(&$map, &$inheritables)
+function wmeHandleInheritance(&$map, &$inheritables)
 {
 	foreach ($inheritables as $inheritable) {		
 		$fieldname = $inheritable[1];
@@ -489,7 +393,7 @@ function handle_inheritance(&$map, &$inheritables)
 	}
 }
 
-function get_fontlist(&$map,$name,$current)
+function wmeGetFontList(&$map,$name,$current)
 {
     $output = '<select class="fontcombo" name="'.$name.'">';
         
@@ -757,11 +661,102 @@ function retidy_links(&$map, $ignore_tidied = false)
     }
 }
 
-function editor_log($str)
+/**
+ * Clean up URI (function taken from Cacti) to protect against XSS
+ */
+function wmeSanitizeURI($str)
 {
-    // $f = fopen("editor.log","a");
-    // fputs($f, $str);
-    // fclose($f);
+    static $drop_char_match =   array(' ','^', '$', '<', '>', '`', '\'', '"', '|', '+', '[', ']', '{', '}', ';', '!', '%');
+    static $drop_char_replace = array('', '', '',  '',  '',  '',  '',   '',  '',  '',  '',  '',  '',  '',  '',  '', '');
+
+    return str_replace($drop_char_match, $drop_char_replace, urldecode($str));
 }
+
+// much looser sanitise for general strings that shouldn't have HTML in them
+function wmeSanitizeString($str)
+{
+    static $drop_char_match =   array('<', '>' );
+    static $drop_char_replace = array('', '');
+
+    return str_replace($drop_char_match, $drop_char_replace, urldecode($str));
+}
+
+function wmeValidateBandwidth($bw)
+{
+    if (preg_match("/^(\d+\.?\d*[KMGT]?)$/", $bw)) {
+        return true;
+    }
+    return false;
+}
+
+function wmeValidateOneOf($input, $valid = array(), $case_sensitive = false)
+{
+    if (! $case_sensitive) {
+        $input = strtolower($input);
+    }
+
+    foreach ($valid as $v) {
+        if (! $case_sensitive ) {
+            $v = strtolower($v);
+        }
+        if ($v == $input) {
+            return true;
+        }
+    }
+
+    return false;
+}
+
+// Labels for Nodes, Links and Scales shouldn't have spaces in
+function wmeSanitizeName($str)
+{
+    return str_replace(array(" "), "", $str);
+}
+
+function wmeSanitizeSelected($str)
+{
+    $res = urldecode($str);
+
+    if (! preg_match("/^(LINK|NODE):/",$res)) {
+        return "";
+    }
+    return wmeSanitizeName($res);
+}
+
+function wmeSanitizeFile($filename, $allowed_exts = array())
+{
+    $filename = wmeSanitizeURI($filename);
+
+    if ($filename == "") {
+        return "";
+    }
+
+    $ok = false;
+    foreach ($allowed_exts as $ext) {
+        $match = ".".$ext;
+
+        if (substr($filename, -strlen($match), strlen($match)) == $match) {
+            $ok = true;
+        }
+    }
+    if (! $ok) {
+        return "";
+    }
+    return $filename;
+}
+
+function wmeSanitizeConfigFile($filename)
+{
+    # If we've been fed something other than a .conf filename, just pretend it didn't happen
+    $filename = wmeSanitizeURI($filename,array("conf"));
+
+    # on top of the url stuff, we don't ever need to see a / in a config filename
+    # (CVE-2013-3739)
+    if (strstr($filename,"/") !== false ) {
+        $filename = "";
+    }
+    return $filename;
+}
+
 
 // vim:ts=4:sw=4:

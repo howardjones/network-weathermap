@@ -34,7 +34,8 @@ class SimpleTemplate {
      *
      * @param $file string the template file name
      */
-    function fetch($file = null) {
+    function fetch($file = null)
+    {
         if (!$file) {
             $file = $this->file;
         }
@@ -56,7 +57,7 @@ class WeatherMapEditorUI {
 
     var $editor;
 
-    var $selected;
+    var $selected = "";
     var $mapfile;
     var $mapname;
 
@@ -66,6 +67,9 @@ class WeatherMapEditorUI {
     var $cactiURL = "/";
     var $ignoreCacti = false;
     var $configError = "";
+    var $next_action = "";
+    var $log_message = "";
+    var $param2 = "";
     var $mapDirectory = "configs";
     
     var $useOverlay = false;
@@ -88,7 +92,7 @@ class WeatherMapEditorUI {
                 array("mapname", "mapfile"),
                 array("x", "int"),
                 array("y", "int"),
-                array("node_name", "name")
+                array("param", "name")
             ),
             "handler" => "cmdMoveNode"
         ),
@@ -109,20 +113,25 @@ class WeatherMapEditorUI {
             "args" => array(
                 array("mapname", "mapfile"),
             ),
-            "handler" => "cmdDrawFontSamples"
+            "handler" => "cmdDrawFontSamples",
+            "late_load" => true,
+            "no_save" => true
         ),
         "draw" => array(
             "args" => array(
                 array("mapname", "mapfile"),
                 array("selected", "jsname", true), // optional
             ),
-            "handler" => "cmdDrawMap"
+            "handler" => "cmdDrawMap",
+            "late_load" => true,
+            "no_save" => true
         ),
         "show_config" => array(
             "args" => array(
                 array("mapname", "mapfile"),
             ),
-            "handler" => "cmdShowConfig"
+            "handler" => "cmdShowConfig",
+            "no_save" => true
         ),
         "fetch_config" => array(
             "args" => array(
@@ -130,7 +139,8 @@ class WeatherMapEditorUI {
                 array("item_type", array("node", "link")),
                 array("item_name", "name"),
             ),
-            "handler" => "cmdGetItemConfig"
+            "handler" => "cmdGetItemConfig",
+            "no_save" => true
         ),
         "set_link_config" => array(
             "args" => array(
@@ -217,13 +227,30 @@ class WeatherMapEditorUI {
             ),
             "handler" => "cmdTidyLink"
         ),
+        "edit_link" => array(
+            "args" => array(
+                array("mapname", "mapfile"),
+                array("param", "name"),
+                array("link_name", "name"),
+                array("link_bandwidth_in", "string"),
+                array("link_bandwidth_out", "string"),
+                array("link_target", "string"),
+                array("link_hover", "string"),
+                array("link_infourl", "string"),
+                array("link_commentin", "string"),
+                array("link_commentout", "string"),
+                array("link_commentposout", "string"),
+                array("link_commentposin", "string")
+            ),
+            "handler" => "cmdEditLink"
+        ),
 
         "editor_settings" => array(),
         "set_node_properties" => array(),
         "set_link_properties" => array(),
         "set_map_properties" => array(),
         "set_map_style" => array(),
-        "nothing" => array("args" => array(), "handler"=>"cmdDoNothing")
+        "nothing" => array("args" => array(), "handler"=>"cmdDoNothing", "no_save" => true)
     );
 
     
@@ -280,7 +307,8 @@ class WeatherMapEditorUI {
      *
      * @returns bool
      */
-    function validateArgument($type, $value) {
+    function validateArgument($type, $value)
+    {
         switch ($type) {
             case "int":
                 if (is_int($value)) {
@@ -291,11 +319,20 @@ class WeatherMapEditorUI {
                 }
                 break;
             case "name":
-                return true;
+                if ($value == wmeSanitizeName($value)) {
+                    return true;
+                }
+                return false;
             case "jsname":
-                return true;
+                if ($value == wmeSanitizeName($value)) {
+                    return true;
+                }
+                return false;
             case "mapfile":
-                return true;
+                if ($value == wmeSanitizeConfigFile($value)) {
+                    return true;
+                }
+                return false;
             case "string":
                 return true;
             default:
@@ -314,7 +351,7 @@ class WeatherMapEditorUI {
      * @param string[] $request
      *
      * @returns bool
-     */ 
+     */
     function dispatchRequest($action, $request, $editor)
     {
         if (!array_key_exists($action, $this->commands)) {
@@ -340,6 +377,26 @@ class WeatherMapEditorUI {
         return false;
     }
 
+    function setLogMessage($message)
+    {
+        $this->log_message = $message;
+    }
+
+    function setNextAction($action)
+    {
+        $this->next_action = $action;
+    }
+
+    function setParam2($value)
+    {
+        $this->param2 = $value;
+    }
+
+    function setSelected($item)
+    {
+        $this->selected = $item;
+    }
+
     // cmd* methods below here translate form inputs into Editor API calls, which do the real work
 
     /**
@@ -358,9 +415,30 @@ class WeatherMapEditorUI {
     function cmdDrawMap($params, $editor)
     {
         header("Content-type: image/png");
+        $etag = md5_file($this->mapfile);
+        header("Etag: $etag");
+
+        if (isset($_SERVER['HTTP_IF_NONE_MATCH']) && trim($_SERVER['HTTP_IF_NONE_MATCH']) == $etag) {
+            header("HTTP/1.1 304 Not Modified");
+            exit();
+        }
+        /*
+         * NOW load the config, if it's needed. This means a simple refresh skips all the config parsing with
+         * a browser that understands ETag headers. We also never save after a DrawMap, so that saves time too.
+         * (300ms -> 10ms on a simple test map)
+         * Downside - technically the MD5 of the config file is not the perfect hash - any changes to external
+         * image files or font files are not reflected. To counteract that, the URL used by the editor has a
+         * random addition so that it only matches between multiple URLs on the same page.
+         */
+        $editor->loadConfig($this->mapfile);
 
         // TODO - add in checks for overlays
-        // TODO - add in checks for SELECTED node
+
+        if (isset($params['selected']) && substr($params['selected'], 0, 5) == 'NODE:') {
+            $nodename = substr($params['selected'], 5);
+            $editor->map->nodes[$nodename]->selected=1;
+        }
+
         $editor->map->drawMapImage('', '', 250, true, false, false);
 
         exit();
@@ -382,6 +460,46 @@ class WeatherMapEditorUI {
      * @param string[] $params
      * @param WeatherMapEditor $editor
      */
+    function cmdCloneNode($params, $editor)
+    {
+        $editor->cloneNode($params['param']);
+    }
+
+    function cmdAddLinkInitial($params, $editor)
+    {
+        $selected = 'NODE:'.$params['param'];
+        // mark the node so that it will be drawn in red next time
+        $this->setSelected($selected);
+        // pre-set an action, so we start in node-picking mode
+        $this->setNextAction("add_link2");
+        // store the first choice, so that on the next pick, both are available
+        $this->setParam2($params['param']);
+        $this->setLogMessage("Waiting for second node");
+    }
+
+    function cmdAddLinkFinal($params, $editor)
+    {
+        $editor->addLink($params['param'], $params['param2']);
+    }
+
+    function cmdEditLink($params, $editor)
+    {
+
+    }
+
+    /**
+     * @param string[] $params
+     * @param WeatherMapEditor $editor
+     */
+    function cmdDeleteLink($params, $editor)
+    {
+        $editor->deleteLink($params['param']);
+    }
+
+    /**
+     * @param string[] $params
+     * @param WeatherMapEditor $editor
+     */
     function cmdDeleteNode($params, $editor)
     {
         $editor->deleteNode($params['param']);
@@ -396,7 +514,16 @@ class WeatherMapEditorUI {
         $x = $this->snap($params['x']);
         $y = $this->snap($params['y']);
 
-        $editor->moveNode($params['node_name'], $x, $y);
+        $editor->moveNode($params['param'], $x, $y);
+    }
+
+    /**
+     * @param string[] $params
+     * @param WeatherMapEditor $editor
+     */
+    function cmdTidyLink($params, $editor)
+    {
+        $editor->tidyLink($params['param']);
     }
 
     /**
@@ -423,7 +550,7 @@ class WeatherMapEditorUI {
     {
         if ($this->gridSnapValue == 0) {
             return ($coord);
-        } else {        
+        } else {
             $rest = $coord % $this->gridSnapValue;
             return ($coord - $rest + round($rest/$this->gridSnapValue) * $this->gridSnapValue );
         }
@@ -432,8 +559,8 @@ class WeatherMapEditorUI {
     // Labels for Nodes, Links and Scales shouldn't have spaces in
     function sanitizeName($str)
     {
-        return str_replace( array(" "), "", $str);
-    }    
+        return str_replace(array(" "), "", $str);
+    }
  
     function moduleChecks()
     {
@@ -474,10 +601,10 @@ class WeatherMapEditorUI {
         return $this->foundCacti;
     }
     
-    function unpackCookie($cookiename="wmeditor")
-    {       
+    function unpackCookie($cookiename = "wmeditor")
+    {
         if ( isset($_COOKIE[$cookiename])) {
-            $parts = explode(":",$_COOKIE[$cookiename]);
+            $parts = explode(":", $_COOKIE[$cookiename]);
 
             if ((isset($parts[0])) && (intval($parts[0]) == 1)) {
                 $this->useOverlay = true;
@@ -497,13 +624,31 @@ class WeatherMapEditorUI {
         $this->editor = new WeatherMapEditor();
                 
     }
-        
+
+    function getTitleFromConfig($filename)
+    {
+        $title = "";
+
+        $fd=fopen($filename, "r");
+        if ($fd) {
+            while (!feof($fd)) {
+                $buffer = fgets($fd, 4096);
+
+                if (preg_match("/^\s*TITLE\s+(.*)/i", $buffer, $matches)) {
+                    $title = $matches[1];
+                }
+            }
+            fclose($fd);
+        }
+        return $title;
+    }
+
     function getExistingConfigs($mapdir)
     {
         $titles = array();
         $notes = array();
         
-        $errorstring="";
+        $errorstring = "";
                        
         if (is_dir($mapdir)) {
             $n=0;
@@ -511,37 +656,25 @@ class WeatherMapEditorUI {
         
             if ($dh) {
                 while (false !== ($file = readdir($dh))) {
-                    $realfile=$mapdir . DIRECTORY_SEPARATOR . $file;
+                    $realfile = $mapdir . DIRECTORY_SEPARATOR . $file;
                     $note = "";
         
                     // skip directories, unreadable files, .files and anything that doesn't come through the sanitiser unchanged
-                    if ( (is_file($realfile)) && (is_readable($realfile)) && (!preg_match("/^\./",$file) )  
-                    //    && ( wm_editor_sanitize_conffile($file) == $file )
-                     ) {
+                    if ( (is_file($realfile)) && (is_readable($realfile)) && (!preg_match("/^\./", $file)) && (wmeSanitizeConfigFile($file) == $file )) {
                         if (!is_writable($realfile)) {
                             $note .= "(read-only)";
                         }
-                        $title='(no title)';
-                        $fd=fopen($realfile, "r");
-                        if ($fd) {
-                            while (!feof($fd)) {
-                                $buffer=fgets($fd, 4096);
-        
-                                if (preg_match("/^\s*TITLE\s+(.*)/i", $buffer, $matches)) {
-                                    // $title= wm_editor_sanitize_string($matches[1]);
-                                    $title = $matches[1];
-                                }
-                            }
-        
-                            fclose ($fd);
-                            $titles[$file] = $title;
-                            $notes[$file] = $note;
-                            $n++;
+
+                        $title = $this->getTitleFromConfig($realfile);
+                        if ($title=="") {
+                            $title='(no title)';
                         }
+
+                        $titles[$file] = $title;
+                        $notes[$file] = $note;
                     }
                 }
-        
-                closedir ($dh);
+                closedir($dh);
             } else {
                 $errorstring = "Can't open mapdir to read.";
             }
@@ -565,17 +698,17 @@ class WeatherMapEditorUI {
         $tpl = new SimpleTemplate();
         
         $tpl->set("WEATHERMAP_VERSION", $WEATHERMAP_VERSION);
-        $tpl->set("fromplug", 1);        
+        $tpl->set("fromplug", 1);
         
         list($titles, $notes, $errorstring) = $this->getExistingConfigs($this->mapDirectory);
         
-        foreach ($titles as $file=>$title) {
+        foreach ($titles as $file => $title) {
             $nicenote = htmlspecialchars($notes[$file]);
             $nicefile = htmlspecialchars($file);
             $nicetitle = htmlspecialchars($title);
             
             $nicetitles[$nicefile] = $nicetitle;
-            $nicenotes[$nicefile] = $nicenote; 
+            $nicenotes[$nicefile] = $nicenote;
         }
         
         $tpl->set("errorstring", $errorstring);
@@ -588,18 +721,23 @@ class WeatherMapEditorUI {
     function showMainPage($editor)
     {
         global $WEATHERMAP_VERSION;
-        
+
+        /* add a random bit onto the URL so that the next request won't get the same URL/ETag combo
+           even if the config file contents don't change, but the two requests for the same editor page WILL */
+
+        $map_url = "?action=draw&mapname=" . $this->mapname . "&rand=" . rand(0,100000);
+
         $tpl = new SimpleTemplate();
         $tpl->set("WEATHERMAP_VERSION", $WEATHERMAP_VERSION);
         $tpl->set("fromplug", 1);
 
-        $tpl->set("map_json", "");
-        $tpl->set("images_json", "");
-
-        $tpl->set("imageurl", htmlspecialchars("?action=draw&mapname=" . $this->mapname));
+        $tpl->set("imageurl", htmlspecialchars($map_url));
+        if($this->selected != "") {
+            $tpl->set("imageurl", htmlspecialchars($map_url . "&selected=" . urlencode($this->selected)));
+        }
         $tpl->set("mapname", htmlspecialchars($this->mapname));
-        $tpl->set("newaction", htmlspecialchars($this->mapname));
-        $tpl->set("param2", htmlspecialchars($this->mapname));
+        $tpl->set("newaction", htmlspecialchars($this->next_action));
+        $tpl->set("param2", htmlspecialchars($this->param2));
 
         $editor->map->drawMapImage('null');
         $editor->map->htmlstyle='editor';
@@ -611,24 +749,29 @@ class WeatherMapEditorUI {
 
         $tpl->set("map_width", $editor->map->width);
         $tpl->set("map_height", $editor->map->height);
-        $tpl->set("log", "last log message");
+        $tpl->set("log", $this->log_message);
 
         echo $tpl->fetch("editor-resources/templates/main.php");
     }
     
-    function main()
+    function main($request)
     {
         $mapname = "";
         $action = "";
         
-        if (isset($_REQUEST['action'])) {
-            $action = strtolower(trim($_REQUEST['action']));
+        if (isset($request['action'])) {
+            $action = strtolower(trim($request['action']));
         }
-        if (isset($_REQUEST['mapname'])) { 
-            $mapname = $_REQUEST['mapname'];
+        if (isset($request['mapname'])) {
+            $mapname = $request['mapname'];
 
-            if($action=="newmap" || $action=="newmap_copy") {
+            if ($action=="newmap" || $action=="newmap_copy") {
                 $mapname .= ".conf";
+            }
+
+            // If there's something funny with the config filename, just stop.
+            if ($mapname != wmeSanitizeConfigFile($mapname)) {
+                exit();
             }
 
             $this->mapfile = $this->mapDirectory."/".$mapname;
@@ -638,17 +781,125 @@ class WeatherMapEditorUI {
         if ($mapname == '') {
             $this->showStartPage();
         } else {
-            if ($this->validateRequest($action, $_REQUEST)) {
-                # print "DO ACTION";
+            if ($this->validateRequest($action, $request)) {
                 $editor = new WeatherMapEditor();
-                $editor->loadConfig($this->mapfile);
-                $result = $this->dispatchRequest($action, $_REQUEST, $editor);
-                $editor->saveConfig();
+                if ( !isset($this->commands[$action]['late_load'])) {
+                    $editor->loadConfig($this->mapfile);
+                }
+                $result = $this->dispatchRequest($action, $request, $editor);
+                if ( !isset($this->commands[$action]['no_save'])) {
+                    $editor->saveConfig();
+                }
                 $this->showMainPage($editor);
             } else {
-                print "FAIL";                
+                print "FAIL";
             }
         }
         exit();
     }
+}
+
+
+
+/**
+ * Clean up URI (function taken from Cacti) to protect against XSS
+ */
+function wmeSanitizeURI($str)
+{
+    static $drop_char_match =   array(' ','^', '$', '<', '>', '`', '\'', '"', '|', '+', '[', ']', '{', '}', ';', '!', '%');
+    static $drop_char_replace = array('', '', '',  '',  '',  '',  '',   '',  '',  '',  '',  '',  '',  '',  '',  '', '');
+
+    return str_replace($drop_char_match, $drop_char_replace, urldecode($str));
+}
+
+// much looser sanitise for general strings that shouldn't have HTML in them
+function wmeSanitizeString($str)
+{
+    static $drop_char_match =   array('<', '>' );
+    static $drop_char_replace = array('', '');
+
+    return str_replace($drop_char_match, $drop_char_replace, urldecode($str));
+}
+
+function wmeValidateBandwidth($bw)
+{
+    if (preg_match("/^(\d+\.?\d*[KMGT]?)$/", $bw)) {
+        return true;
+    }
+    return false;
+}
+
+function wmeValidateOneOf($input, $valid = array(), $case_sensitive = false)
+{
+    if (! $case_sensitive) {
+        $input = strtolower($input);
+    }
+
+    foreach ($valid as $v) {
+        if (! $case_sensitive ) {
+            $v = strtolower($v);
+        }
+        if ($v == $input) {
+            return true;
+        }
+    }
+
+    return false;
+}
+
+// Labels for Nodes, Links and Scales shouldn't have spaces in
+function wmeSanitizeName($str)
+{
+    return str_replace(array(" "), "", $str);
+}
+
+function wmeSanitizeSelected($str)
+{
+    $res = urldecode($str);
+
+    if (! preg_match("/^(LINK|NODE):/", $res)) {
+        return "";
+    }
+    return wmeSanitizeName($res);
+}
+
+function wmeSanitizeFile($filename, $allowed_exts = array())
+{
+    $filename = wmeSanitizeURI($filename);
+
+    if ($filename == "") {
+        return "";
+    }
+
+    $ok = false;
+    foreach ($allowed_exts as $ext) {
+        $match = ".".$ext;
+
+        if (substr($filename, -strlen($match), strlen($match)) == $match) {
+            $ok = true;
+        }
+    }
+    if (! $ok) {
+        return "";
+    }
+    return $filename;
+}
+
+function wmeSanitizeConfigFile($filename)
+{
+    # If we've been fed something other than a .conf filename, just pretend it didn't happen
+    $filename = wmeSanitizeFile($filename, array("conf"));
+
+    # on top of the url stuff, we don't ever need to see a / in a config filename
+    # (CVE-2013-3739)
+    if (strstr($filename, "/") !== false ) {
+        $filename = "";
+    }
+    if (strstr($filename, "?") !== false ) {
+        $filename = "";
+    }
+    if (strstr($filename, "*") !== false ) {
+        $filename = "";
+    }
+    return $filename;
 }

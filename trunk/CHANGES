@@ -6,6 +6,7 @@ Lots of reorganisation in 0.98 for multiple goals:
 - make it clear where 3rd-party libraries are used (vendor directory) and make updates to those easy with Bower
 
 0.98	FIXED - More PHP 5.3/5.4/strict related errors (split -> explode)
+    FIXED - Config file path validation issue in editor (CVE-2013-3739)
     FIXED - internal relative paths break in several situations (e.g. running from cron)
     FIXED - KILO was ignored when processing %k in special tokens
     FIXED - fixed up comments in dbplug datasource plugin to match reality
@@ -14,6 +15,7 @@ Lots of reorganisation in 0.98 for multiple goals:
     FIXED - Cloning a templated node in editor retains the template in the clone
 	FIXED - Imagemap sortorder problem in editor. If you can see it, you can click it.
 	FIXED - cacti_use_ifspeed incorrect when interfaces > 20M and ifhighspeed available
+	FIXED - if permissions in Cacti said Anyone *and* you, then no images are shown
     CHANGE - command-line weathermap has new --no-warn option to disable warnings
     CHANGE - new config parser is much faster than the previous one
     CHANGE - other performance improvements - possibly twice as quick as 0.97c (thanks to ikorzha758 for lots of feedback)

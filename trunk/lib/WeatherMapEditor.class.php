@@ -370,7 +370,20 @@ class WeatherMapEditor {
 
         die("unimplemented");
     }
-    
+
+    function deleteLink($linkname)
+    {
+        if (! $this->isLoaded()) {
+            die("Map must be loaded before editing API called.");
+        }
+
+        if (isset($this->map->links[$linkname])) {
+            unset($this->map->links[$linkname]);
+            return true;
+        }
+        return false;
+    }
+
     /**
      * cloneLink - create a copy of an existing link
      * Not as useful as cloneNode, but still sometimes handy.
@@ -417,9 +430,8 @@ class WeatherMapEditor {
         }
 
         // draw a map and throw it away, to calculate all the bounding boxes
-        $this->map->DrawMap('null');
+        $this->map->drawMapImage('null');
         $this->_tidy_link($linkname);
-
     }
 
     function retidyAllLinks($linkname)

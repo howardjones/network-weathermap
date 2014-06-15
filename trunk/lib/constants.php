@@ -30,4 +30,9 @@ define("X", 0);
 define("Y", 1);
 define("DISTANCE", 2);
 
+// the source information for config fetching
+define("CONF_NOT_FOUND",0);
+define("CONF_FOUND_DIRECT",1);
+define("CONF_FOUND_INHERITED",2);
+
 // ***********************************************

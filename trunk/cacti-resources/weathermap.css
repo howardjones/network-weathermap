@@ -1,8 +1,7 @@
 @CHARSET "ISO-8859-1";
 
-
 .sortable-placeholder { border: 3px dashed gray; height: 48px; }
-.draghandle { cursor:  }
+.draghandle { cursor: move }
 
 tr.wm_map_disabled { color: #ccc; }
 
@@ -29,7 +28,7 @@ div.wm_mapgroup table { border-top: 1px solid #eee; }
 .wm_maplist tr td { border-bottom: 1px solid #cccccc; }
 .wm_maplist tr th { color: gray; font-weight: normal; }
 
-x.wm_maplist tr.alt-row { background-color: #eef; }
+.xwm_maplist tr.alt-row { background-color: #eef; }
 
 .wm_map_extra { display: none; }
 

@@ -49,11 +49,12 @@ class WeatherMapLink extends WeatherMapItem
     var $bwfontcolour;
     var $comments = array();
     var $bwlabelformats = array();
-    var $curvepoints;
+    var $spinepoints;
     var $labeloffset_in, $labeloffset_out;
     var $commentoffset_in, $commentoffset_out;
     var $template;
     var $config;
+    var $descendents;
 
     function WeatherMapLink()
     {
@@ -79,7 +80,6 @@ class WeatherMapLink extends WeatherMapItem
             'notes' => array(),
             'hints' => array(),
             'comments' => array('',''),
-            'config' => array(),
             'bwlabelformats' => array(FMT_PERC_IN,FMT_PERC_OUT),
             'overliburl' => array(array(),array()),
             'notestext' => array(IN=>'',OUT=>''),
@@ -112,6 +112,8 @@ class WeatherMapLink extends WeatherMapItem
             'max_bandwidth_in_cfg' => '100M',
             'max_bandwidth_out_cfg' => '100M'
         );
+        $this->config = array();
+        $this->descendents = array();
     }
 
     function reset(&$newowner)
@@ -131,8 +133,11 @@ class WeatherMapLink extends WeatherMapItem
             foreach (array_keys($this->inherit_fieldlist) as $fld) {
                 $this->$fld=$this->inherit_fieldlist[$fld];
             }
+            $this->parent = null;
         } else {
             $this->copyFrom($this->owner->links[$template]);
+            $this->parent = $this->owner->links[$template];
+            $this->parent->descendents []= $this;       // TODO - should fix up the descendents list of the previous parent
         }
         $this->template = $template;
 
@@ -180,7 +185,7 @@ class WeatherMapLink extends WeatherMapItem
     // widths = array of link widths
     function drawComments($image, $col, $widths)
     {
-        $curvepoints =& $this->curvepoints;
+        $curvepoints =& $this->spinepoints;
         $last = count($curvepoints)-1;
 
         $totaldistance = $curvepoints[$last][2];
@@ -270,8 +275,13 @@ class WeatherMapLink extends WeatherMapItem
     /***
      * Precalculate the colours necessary for this link.
      */
-    function preCalculate(&$map)
+    function preCalculate()
     {
+        // don't bother doing anything if it's a template
+        if ($this->isTemplate()) {
+            return;
+        }
+
 
     }
 
@@ -295,7 +305,7 @@ class WeatherMapLink extends WeatherMapItem
         }
 
         if (($this->linkstyle=='twoway') && ($this->labeloffset_in < $this->labeloffset_out) && (intval($map->get_hint("nowarn_bwlabelpos"))==0)) {
-            wm_warn("LINK ".$this->name." probably has it's BWLABELPOSs the wrong way around [WMWARN50]\n");
+            wm_warn("LINK ".$this->name." probably has it's BWLABELPOS values the wrong way around [WMWARN50]\n");
         }
 
         // Adjust the link endpoints, if any offset was specified
@@ -366,20 +376,18 @@ class WeatherMapLink extends WeatherMapItem
             $link_out_width = (($link_out_width * $this->outpercent * 1.5 + 0.1) / 100) + 1;
         }
 
-        // XXX - there is no addArea here!!
-        
         // If there are no vias, treat this as a 2-point angled link, not curved
         if ($via_count==0 || $this->viastyle=='angled') {
             // Calculate the spine points - the actual not a curve really, but we
             // need to create the array, and calculate the distance bits, otherwise
             // things like bwlabels won't know where to go.
 
-            $this->curvepoints = calc_straight($xpoints, $ypoints);
+            $this->spinepoints = calc_straight($xpoints, $ypoints);
 
             // then draw the "curve" itself
             draw_straight(
                 $im,
-                $this->curvepoints,
+                $this->spinepoints,
                 array($link_in_width, $link_out_width),
                 $gd_outline_colour,
                 array($gd_in_colour, $gd_out_colour),
@@ -390,12 +398,12 @@ class WeatherMapLink extends WeatherMapItem
             );
         } elseif ($this->viastyle=='curved') {
             // Calculate the spine points - the actual curve
-            $this->curvepoints = calc_curve($xpoints, $ypoints);
+            $this->spinepoints = calc_curve($xpoints, $ypoints);
 
             // then draw the curve itself
             draw_curve(
                 $im,
-                $this->curvepoints,
+                $this->spinepoints,
                 array($link_in_width, $link_out_width),
                 $gd_outline_colour,
                 array($gd_in_colour, $gd_out_colour),
@@ -426,10 +434,10 @@ class WeatherMapLink extends WeatherMapItem
             );
         }
 
-        $curvelength = $this->curvepoints[count($this->curvepoints)-1][2];
+        $curvelength = $this->spinepoints[count($this->spinepoints)-1][2];
         // figure out where the labels should be, and what the angle of the curve is at that point
-        list($q1_x, $q1_y, , $q1_angle) = find_distance_coords_angle($this->curvepoints, ($this->labeloffset_out/100)*$curvelength);
-        list($q3_x, $q3_y, , $q3_angle) = find_distance_coords_angle($this->curvepoints, ($this->labeloffset_in/100)*$curvelength);
+        list($q1_x, $q1_y, , $q1_angle) = find_distance_coords_angle($this->spinepoints, ($this->labeloffset_out/100)*$curvelength);
+        list($q3_x, $q3_y, , $q3_angle) = find_distance_coords_angle($this->spinepoints, ($this->labeloffset_in/100)*$curvelength);
 
         if (!is_null($q1_x)) {
             $inbound_params = array(

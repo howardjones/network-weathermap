@@ -20,5 +20,4 @@ $ui->moduleChecks();
 
 chdir(dirname(__FILE__));
 
-$ui->main();
-
+$ui->main($_REQUEST);

@@ -333,19 +333,18 @@ function weathermap_run_maps($mydir, $map_id = -1)
                 $runner->LoadMap();
 
                 if (file_exists($mapfile)) {
-                    if ($quietlogging==0) wm_warn("Map: $mapfile -> $htmlfile & $imagefile\n",true);
+                    if ($quietlogging==0) {
+                        wm_warn("Map: $mapfile -> $htmlfile & $imagefile\n",true);
+                    }
                     db_execute("replace into settings values('weathermap_last_started_file','".mysql_real_escape_string($weathermap_map)."')");
 
                     if ($global_debug === false && ($map['debug']=='on' || $map['debug']=='once')) {
                         $weathermap_debugging = true;
-                    }
-                    else {
+                        wm_debug("Per-map debugging enabled for this map.\n");
+                    } else {
                         $weathermap_debugging = $global_debug;
                     }
-
-
                     $map_start = microtime(true);
-
 
                     weathermap_memory_check("MEM starting $mapcount");
                     $wmap = new Weathermap;
@@ -441,9 +440,8 @@ function weathermap_run_maps($mydir, $map_id = -1)
                         }
                     }
 
-                    $wmap->dumpUsageStatistics($statsfile);
+
                     $wmap->writeDataFile($resultsfile);
-                    // $wmap->WriteJSONFile($jsonfile);
 
                     // put back the configured imageuri
                     $wmap->imageuri = $configured_imageuri;
@@ -522,7 +520,7 @@ function weathermap_run_maps($mydir, $map_id = -1)
                 }
 
                 db_execute(sprintf(
-                    "update weathermap_maps set warncount=%d, runtime=%f,debug='%s',lastrun=NOW() where id=%d",
+                    "update weathermap_maps set warncount=%d, runtime=%f, debug='%s',lastrun=NOW() where id=%d",
                     $weathermap_warncount,
                     $map_duration,
                     $newdebug,

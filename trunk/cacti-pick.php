@@ -36,8 +36,6 @@ if (is_dir($cacti_base) && file_exists($cacti_base."/include/global.php")) {
     $cacti_found = false;
 }
 
-// ******************************************
-
 function jsEscape($str)
 {
     $str = str_replace('\\', '\\\\', $str);
@@ -48,7 +46,7 @@ function jsEscape($str)
     return($str);
 }
 
-/* usort_natural_hosts - sorts two values naturally (ie. ab1, ab2, ab7, ab10, ab20)
+/** usort_natural_hosts - sorts two values naturally (ie. ab1, ab2, ab7, ab10, ab20)
    @arg $a - the first string to compare
    @arg $b - the second string to compare
    @returns - '1' if $a is greater than $b, '-1' if $a is less than $b, or '0' if
@@ -58,7 +56,7 @@ function usortNaturalHosts($a, $b)
     return strnatcmp($a['name'], $b['name']);
 }
 
-/* usort_natural_titles - sorts two values naturally (ie. ab1, ab2, ab7, ab10, ab20)
+/** usort_natural_titles - sorts two values naturally (ie. ab1, ab2, ab7, ab10, ab20)
    @arg $a - the first string to compare
    @arg $b - the second string to compare
    @returns - '1' if $a is greater than $b, '-1' if $a is less than $b, or '0' if
@@ -68,7 +66,7 @@ function usortNaturalTitles($a, $b)
     return strnatcasecmp($a['title_cache'], $b['title_cache']);
 }
 
-/* usort_natural_names - sorts two values naturally (ie. ab1, ab2, ab7, ab10, ab20)
+/** usort_natural_names - sorts two values naturally (ie. ab1, ab2, ab7, ab10, ab20)
    @arg $a - the first string to compare
    @arg $b - the second string to compare
    @returns - '1' if $a is greater than $b, '-1' if $a is less than $b, or '0' if

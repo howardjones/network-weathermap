@@ -14,7 +14,6 @@ class WeatherMap extends WeatherMapBase
 
     var $scales = array(); // the new array of WMScale objects
 
-    var $config;
     var $next_id;
     var $min_ds_time;
     var $max_ds_time;
@@ -76,18 +75,19 @@ class WeatherMap extends WeatherMapBase
     var $thumb_width, $thumb_height;
     var $has_includes;
     var $has_overlibs;
-    var $node_template_tree;
-    var $link_template_tree;
     var $dsinfocache = array();
 
     var $plugins = array();
     var $included_files = array();
     var $usage_stats = array();
-    var $coverage = array();
     var $colourtable = array();
     var $fonts = array();
     var $warncount = 0;
     var $jsincludes = array();
+    var $parent = null;
+
+    var $config = array();
+    var $runtime = array();
 
     // new version of config_keywords
     // array of contexts, contains an array of keywords, contains a (short) list of regexps as now
@@ -702,6 +702,44 @@ class WeatherMap extends WeatherMapBase
                 '/^SPLITPOS\s+(\d+)\s*$/i',
                 array('splitpos' => 1)
             ),),
+            'BWLABEL' => array(
+                array(
+                    'LINK',
+                    '/^BWLABEL\s+bits\s*$/i',
+                    array(
+                        'labelstyle' => 'bits',
+                        'bwlabelformats[IN]' => FMT_BITS_IN,
+                        'bwlabelformats[OUT]' => FMT_BITS_OUT,
+                    )
+                ),
+                array(
+                    'LINK',
+                    '/^BWLABEL\s+percent\s*$/i',
+                    array(
+                        'labelstyle' => 'percent',
+                        'bwlabelformats[IN]' => FMT_PERC_IN,
+                        'bwlabelformats[OUT]' => FMT_PERC_OUT,
+                    )
+                ),
+                array(
+                    'LINK',
+                    '/^BWLABEL\s+unformatted\s*$/i',
+                    array(
+                        'labelstyle' => 'unformatted',
+                        'bwlabelformats[IN]' => FMT_UNFORM_IN,
+                        'bwlabelformats[OUT]' => FMT_UNFORM_OUT,
+                    )
+                ),
+                array(
+                    'LINK',
+                    '/^BWLABEL\s+none\s*$/i',
+                    array(
+                        'labelstyle' => 'none',
+                        'bwlabelformats[IN]' => '',
+                        'bwlabelformats[OUT]' => '',
+                    )
+                ),
+            ),
             'BWLABELPOS' => array(array(
                 'LINK',
                 '/^BWLABELPOS\s+(\d+)\s(\d+)\s*$/i',
@@ -999,16 +1037,10 @@ class WeatherMap extends WeatherMapBase
 
         $this->nodes[':: DEFAULT ::'] = & $defnode;
 
-        $this->node_template_tree = array();
-        $this->link_template_tree = array();
-
         $this->scales = array();
         $this->scales['DEFAULT'] = new WeatherMapScale("DEFAULT", $this);
 
         $this->colourtable = array();
-
-        $this->node_template_tree['DEFAULT'] = array();
-        $this->link_template_tree['DEFAULT'] = array();
 
         // ************************************
         // now create the DEFAULT link and node, based on those.
@@ -2718,26 +2750,12 @@ class WeatherMap extends WeatherMapBase
                         // first, save the previous item, before starting work on the new one
                         if ($last_seen == "NODE") {
                             $this->nodes[$curnode->name] = $curnode;
-
-                            if ($curnode->template == 'DEFAULT') {
-                                $this->node_template_tree["DEFAULT"][] = $curnode->name;
-                            }
-
                             wm_debug("Saving Node: " . $curnode->name . "\n");
                         }
 
                         if ($last_seen == "LINK") {
-                            if (isset($curlink->a) && isset($curlink->b)) {
-                                $this->links[$curlink->name] = $curlink;
-                                wm_debug("Saving Link: " . $curlink->name . "\n");
-                            } else {
-                                $this->links[$curlink->name] = $curlink;
-                                wm_debug("Saving Template-Only Link: " . $curlink->name . "\n");
-                            }
-
-                            if ($curlink->template == 'DEFAULT') {
-                                $this->link_template_tree["DEFAULT"][] = $curlink->name;
-                            }
+                            $this->links[$curlink->name] = $curlink;
+                            wm_debug("Saving Link: " . $curlink->name . "\n");
                         }
                     }
 
@@ -2825,13 +2843,6 @@ class WeatherMap extends WeatherMapBase
 
                             if ((substr($keyword[1], 0, 1) != '/') || (1 === preg_match($keyword[1], $buffer, $matches))) {
 
-                                // keep a running total of how often each keyword is used
-                                $key = sprintf("%s:%s:%s", $last_seen, $args[0], $keyword[1]);
-                                if (!isset($this->coverage[$key])) {
-                                    $this->coverage[$key] = 0;
-                                }
-                                $this->coverage[$key]++;
-
                                 // if we came here without a regexp, then the \1 etc
                                 // refer to arg numbers, not match numbers
 
@@ -2858,18 +2869,19 @@ class WeatherMap extends WeatherMapBase
                                             $index = constant($m[2]);
                                             $key = $m[1];
                                             $curobj->{$key}[$index] = $val;
-                                            $curobj->config[$key . "." . $index] = $val;
+                                            $curobj->setConfig($key . "." . $index, $val);
                                         } elseif (substr($key, -1, 1) == "+") {
                                             // if the key ends in a plus, it's an array we should append to
                                             $key = substr($key, 0, -1);
                                             array_push($curobj->$key, $val);
                                             array_push($curobj->config[$key], $val);
+                                            $curobj->addConfig($key, $val);
 
                                         } else {
                                             // otherwise, it's just the name of a property on the
                                             // appropriate object.
                                             $curobj->$key = $val;
-                                            $curobj->config[$key] = $val;
+                                            $curobj->setConfig($key, $val);
                                         }
                                     }
                                     $linematched++;
@@ -2906,32 +2918,6 @@ class WeatherMap extends WeatherMapBase
 
                 // LINK-specific stuff that couldn't be done with just a regexp
                 if ($last_seen == 'LINK' && $linematched == 0) {
-                    if (($linematched == 0) && preg_match("/^\s*BWLABEL\s+(bits|percent|unformatted|none)\s*$/i", $buffer, $matches)) {
-                        $format_in = '';
-                        $format_out = '';
-                        $style = strtolower($matches[1]);
-
-                        if ($style == 'percent') {
-                            $format_in = FMT_PERC_IN;
-                            $format_out = FMT_PERC_OUT;
-                        }
-
-                        if ($style == 'bits') {
-                            $format_in = FMT_BITS_IN;
-                            $format_out = FMT_BITS_OUT;
-                        }
-
-                        if ($style == 'unformatted') {
-                            $format_in = FMT_UNFORM_IN;
-                            $format_out = FMT_UNFORM_OUT;
-                        }
-
-                        $curobj->labelstyle = $style;
-                        $curobj->bwlabelformats[IN] = $format_in;
-                        $curobj->bwlabelformats[OUT] = $format_out;
-                        $linematched++;
-                    }
-
                     if (($linematched == 0) && preg_match("/^\s*ARROWSTYLE\s+(\d+)\s+(\d+)\s*$/i", $buffer, $matches)) {
                         $curobj->arrowstyle = $matches[1] . ' ' . $matches[2];
                         $linematched++;
@@ -3088,21 +3074,10 @@ class WeatherMap extends WeatherMapBase
                     if (($last_seen == 'NODE' && isset($this->nodes[$tname]))
                         || ($last_seen == 'LINK' && isset($this->links[$tname]))
                     ) {
-                        $curobj->template = $matches[1];
-                        wm_debug("Resetting to template $last_seen " . $curobj->template . "\n");
-                        $curobj->Reset($this);
+                        $curobj->setTemplate($matches[1], $this);
 
                         if ($objectlinecount > 1) {
                             wm_warn("line $linecount: TEMPLATE is not first line of object. Some data may be lost. [WMWARN39]\n");
-                        }
-                        // build up a list of templates - this will be useful later for the tree view
-
-                        if ($last_seen == 'NODE') {
-                            $this->node_template_tree[$tname][] = $curobj->name;
-                        }
-
-                        if ($last_seen == 'LINK') {
-                            $this->link_template_tree[$tname][] = $curobj->name;
                         }
                     } else {
                         wm_warn("line $linecount: $last_seen TEMPLATE '$tname' doesn't exist! (if it does exist, check it's defined first) [WMWARN40]\n");
@@ -3378,22 +3353,11 @@ class WeatherMap extends WeatherMapBase
         if ($last_seen == "NODE") {
             $this->nodes[$curobj->name] = $curobj;
             wm_debug("Saving Node: " . $curobj->name . "\n");
-            if ($curobj->template == 'DEFAULT') {
-                $this->node_template_tree["DEFAULT"][] = $curobj->name;
-            }
         }
 
         if ($last_seen == "LINK") {
-            if (isset($curobj->a) && isset($curobj->b)) {
-                $this->links[$curobj->name] = $curobj;
-                wm_debug("Saving Link: " . $curobj->name . "\n");
-            } else {
-                $this->links[$curobj->name] = $curobj;
-                wm_debug("Saving Template-Only Link: " . $curobj->name . "\n");
-            }
-            if ($curobj->template == 'DEFAULT') {
-                $this->link_template_tree["DEFAULT"][] = $curobj->name;
-            }
+            $this->links[$curobj->name] = $curobj;
+            wm_debug("Saving Link: " . $curobj->name . "\n");
         }
     }
 
@@ -4055,6 +4019,8 @@ class WeatherMap extends WeatherMapBase
             $link->owner = null;
             $link->a = null;
             $link->b = null;
+            $link->parent = null;
+            $link->descendents = null;
 
             unset($link);
         }
@@ -4066,6 +4032,8 @@ class WeatherMap extends WeatherMapBase
                 imagedestroy($node->image);
             }
             $node->owner = null;
+            $node->parent = null;
+            $node->descendents = null;
             unset($node);
         }
 
@@ -4235,6 +4203,15 @@ class WeatherMap extends WeatherMapBase
             $js.=$node->asJS();
         }
 
+
+        $mapname = array_pop(explode("/", $this->configfile));
+        $js .= "var Map = {\n";
+        $js .= sprintf('  "file": %s,', jsEscape($mapname));
+        $js .= sprintf('  "width": %s,', jsEscape($this->width));
+        $js .= sprintf('  "height": %s,', jsEscape($this->height));
+        $js .= sprintf('  "title": %s,', jsEscape($this->title));
+        $js .= "\n};\n";
+
         return $js;
     }
 
@@ -4368,209 +4345,6 @@ class WeatherMap extends WeatherMapBase
         $html .= "</map>\n";
 
         return($html);
-    }
-
-    // update any editor cache files.
-    // if the config file is newer than the cache files, or $agelimit seconds have passed,
-    // then write new stuff, otherwise just return.
-    // ALWAYS deletes files in the cache folder older than $agelimit, also!
-    function updateEditorCache($agelimit = 600)
-    {
-        global $weathermap_lazycounter;
-
-        $cachefolder = $this->cachefolder;
-        $configchanged = filemtime($this->configfile);
-        // make a unique, but safe, prefix for all cachefiles related to this map config
-        // we use CRC32 because it makes for a shorter filename, and collisions aren't the end of the world.
-        $cacheprefix = dechex(crc32($this->configfile));
-
-        wm_debug("Comparing files in $cachefolder starting with $cacheprefix, with date of $configchanged\n");
-
-        $dh=opendir($cachefolder);
-
-        if ($dh) {
-            while ($file=readdir($dh)) {
-                $realfile = $cachefolder . DIRECTORY_SEPARATOR . $file;
-
-                if (is_file($realfile) && (preg_match('/^'.$cacheprefix.'/', $file))) {
-                    wm_debug("$realfile\n");
-                    if ((filemtime($realfile) < $configchanged) || ((time() - filemtime($realfile)) > $agelimit)) {
-                        wm_debug("Cache: deleting $realfile\n");
-                        unlink($realfile);
-                    }
-                }
-            }
-            closedir($dh);
-
-            foreach ($this->nodes as $node) {
-                if (isset($node->image)) {
-                    $nodefile = $cacheprefix."_".dechex(crc32($node->name)).".png";
-                    $this->nodes[$node->name]->cachefile = $nodefile;
-                    imagepng($node->image, $cachefolder.DIRECTORY_SEPARATOR.$nodefile);
-                }
-            }
-
-            foreach ($this->keyimage as $key => $image) {
-                $scalefile = $cacheprefix."_scale_".dechex(crc32($key)).".png";
-                    $this->keycache[$key] = $scalefile;
-                    imagepng($image, $cachefolder.DIRECTORY_SEPARATOR.$scalefile);
-            }
-
-            $json = "";
-            $fd = fopen($cachefolder.DIRECTORY_SEPARATOR.$cacheprefix."_map.json", "w");
-            foreach (array_keys($this->inherit_fieldlist) as $fld) {
-                $json .= jsEscape($fld).": ";
-                $json .= jsEscape($this->$fld);
-                $json .= ",\n";
-            }
-            $json = rtrim($json, ", \n");
-            fputs($fd, $json);
-            fclose($fd);
-
-            $json = "";
-            $fd = fopen($cachefolder.DIRECTORY_SEPARATOR.$cacheprefix."_tree.json", "w");
-            $id = 10;	// first ID for user-supplied thing
-
-            $json .= "{ id: 1, text: 'SCALEs'\n, children: [\n";
-            while (list($scalename,) = each($this->colours)) {
-                #foreach ($this->colours as $scalename=>$colours)
-                #{
-                $json .= "{ id: " . $id++ . ", text:" . jsEscape($scalename) . ", leaf: true }, \n";
-            }
-            $json = rtrim($json, ", \n");
-            $json .= "]},\n";
-
-            $json .= "{ id: 2, text: 'FONTs',\n children: [\n";
-            foreach ($this->fonts as $fontnumber => $font) {
-                if ($font->type == 'truetype') {
-                    $json .= sprintf("{ id: %d, text: %s, leaf: true}, \n", $id++, jsEscape("Font $fontnumber (TT)"));
-                }
-
-                if ($font->type == 'gd') {
-                    $json .= sprintf("{ id: %d, text: %s, leaf: true}, \n", $id++, jsEscape("Font $fontnumber (GD)"));
-                }
-            }
-            $json = rtrim($json, ", \n");
-            $json .= "]},\n";
-
-            $json .= "{ id: 3, text: 'NODEs',\n children: [\n";
-            $json .= "{ id: ". $id++ . ", text: 'DEFAULT', children: [\n";
-
-            $weathermap_lazycounter = $id;
-            // pass the list of subordinate nodes to the recursive tree function
-            $json .= $this->makeTemplateTree($this->node_template_tree);
-            $id = $weathermap_lazycounter;
-
-            $json = rtrim($json, ", \n");
-            $json .= "]} ]},\n";
-
-            $json .= "{ id: 4, text: 'LINKs',\n children: [\n";
-            $json .= "{ id: ". $id++ . ", text: 'DEFAULT', children: [\n";
-            $weathermap_lazycounter = $id;
-            $json .= $this->makeTemplateTree($this->link_template_tree);
-            $id = $weathermap_lazycounter;
-            $json = rtrim($json, ", \n");
-            $json .= "]} ]}\n";
-
-            fputs($fd, "[". $json . "]");
-            fclose($fd);
-
-            $fd = fopen($cachefolder.DIRECTORY_SEPARATOR.$cacheprefix."_nodes.json", "w");
-            $json = "";
-            foreach ($this->nodes as $node) {
-                $json .= $node->asJSON(true);
-            }
-            $json = rtrim($json, ", \n");
-            fputs($fd, $json);
-            fclose($fd);
-
-            $fd = fopen($cachefolder.DIRECTORY_SEPARATOR.$cacheprefix."_nodes_lite.json", "w");
-            $json = "";
-            foreach ($this->nodes as $node) {
-                $json .= $node->asJSON(false);
-            }
-            $json = rtrim($json, ", \n");
-            fputs($fd, $json);
-            fclose($fd);
-
-            $fd = fopen($cachefolder.DIRECTORY_SEPARATOR.$cacheprefix."_links.json", "w");
-            $json = "";
-            foreach ($this->links as $link) {
-                $json .= $link->asJSON(true);
-            }
-            $json = rtrim($json, ", \n");
-            fputs($fd, $json);
-            fclose($fd);
-
-            $fd = fopen($cachefolder.DIRECTORY_SEPARATOR.$cacheprefix."_links_lite.json", "w");
-            $json = "";
-            foreach ($this->links as $link) {
-                $json .= $link->asJSON(false);
-            }
-            $json = rtrim($json, ", \n");
-            fputs($fd, $json);
-            fclose($fd);
-
-            $fd = fopen($cachefolder.DIRECTORY_SEPARATOR.$cacheprefix."_imaphtml.json", "w");
-            $json = $this->imap->subHTML("LINK:");
-            fputs($fd, $json);
-            fclose($fd);
-
-            $fd = fopen($cachefolder.DIRECTORY_SEPARATOR.$cacheprefix."_imap.json", "w");
-            $json = '';
-            $nodejson = trim($this->imap->subJSON("NODE:"));
-            if ($nodejson != '') {
-                $json .= $nodejson;
-                // should check if there WERE nodes...
-                $json .= ",\n";
-            }
-            $json .= $this->imap->subJSON("LINK:");
-            fputs($fd, $json);
-            fclose($fd);
-        } else {
-            wm_debug("Couldn't read cache folder.\n");
-        }
-    }
-
-    function makeTemplateTree(&$tree_list, $startpoint = "DEFAULT")
-    {
-        global $weathermap_lazycounter;
-
-        $output = "";
-        foreach ($tree_list[$startpoint] as $subnode) {
-            $output .= "{ id: " . $weathermap_lazycounter++ . ", text: " . jsEscape($subnode);
-            if (isset($tree_list[$subnode])) {
-                $output .= ", children: [ \n";
-                $output .= $this->makeTemplateTree($tree_list, $subnode);
-                $output = rtrim($output, ", \n");
-                $output .= "] \n";
-            } else {
-                $output .= ", leaf: true ";
-            }
-            $output .= "}, \n";
-        }
-
-        return($output);
-    }
-
-    function dumpUsageStatistics($filename = "")
-    {
-        $report = "Feature Statistics:\n\n";
-        foreach ($this->usage_stats as $key => $val) {
-            $report .= sprintf("%70s => %d\n", $key, $val);
-        }
-
-        if ($filename == "") {
-            print $report;
-        } else {
-            $fd = @fopen($filename, 'w');
-            if ($fd != false) {
-                fputs($fd, $report);
-                fclose($fd);
-            } else {
-                wm_warn("Unable to open stats file for writing [WMSTATS01]");
-            }
-        }
     }
 }
 

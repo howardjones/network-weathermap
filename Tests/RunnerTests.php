@@ -1,10 +1,4 @@
 <?php
-/**
- * Created by IntelliJ IDEA.
- * User: Howard Jones
- * Date: 18/05/2014
- * Time: 18:59
- */
 
 require_once dirname(__FILE__).'/../lib/poller-common.php';
 

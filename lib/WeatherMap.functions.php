@@ -85,7 +85,7 @@ function wm_debug($string)
         }
         
         // use Cacti's debug log, if we are running from the poller
-        if (function_exists('debug_log_insert') && (! function_exists('show_editor_startpage'))) {
+        if (function_exists('debug_log_insert') && (! function_exists('wmeShowStartPage'))) {
             cacti_log("DEBUG:$calling_fn " . ($weathermap_map == '' ? '' : $weathermap_map . ": ") . rtrim($string), true, "WEATHERMAP");
         } else {
             $stderr = fopen('php://stderr', 'w');
@@ -127,7 +127,7 @@ function wm_warn($string, $notice_only = false, $code = "")
     $message .= ($weathermap_map == '' ? '' : $weathermap_map . ": ") . rtrim($string);
     
     // use Cacti's debug log, if we are running from the poller
-    if (function_exists('cacti_log') && (! function_exists('show_editor_startpage'))) {
+    if (function_exists('cacti_log') && (! function_exists('wmeShowStartPage'))) {
         cacti_log($message, true, "WEATHERMAP");
     } else {
         $stderr = fopen('php://stderr', 'w');

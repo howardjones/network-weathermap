@@ -22,19 +22,18 @@ function wmuiUserPluginDispatcher($action, $request)
                 $imageformat = strtolower(read_config_option("weathermap_output_format"));
 
                 $userid = (isset($_SESSION["sess_user_id"]) ? intval($_SESSION["sess_user_id"]) : 1);
-                $map = db_fetch_assoc("select weathermap_maps.* from weathermap_auth,weathermap_maps where weathermap_maps.id=weathermap_auth.mapid and (userid=" . $userid . " or userid=0) and  active='on' and weathermap_maps.id=" . $id);
+
+                $map = db_fetch_assoc("select weathermap_maps.* from weathermap_auth,weathermap_maps where weathermap_maps.id=weathermap_auth.mapid and (userid=" . $userid . " or userid=0) and  active='on' and weathermap_maps.id=" . $id . " LIMIT 1");
 
                 if (sizeof($map) == 1) {
-                    $imagefile = dirname(__FILE__) . '/../output/' . '/' . $map[0]['filehash'] . "." . $imageformat;
+
+                    $imagefile = dirname(__FILE__) . '/../output/' . $map[0]['filehash'] . "." . $imageformat;
                     if ($action == 'viewthumb') {
                         $imagefile = dirname(__FILE__) . '/../output/' . $map[0]['filehash'] . ".thumb." . $imageformat;
                     }
                     if ($action == 'viewthumb48') {
                         $imagefile = dirname(__FILE__) . '/../output/' . $map[0]['filehash'] . ".thumb48." . $imageformat;
                     }
-
-                    $orig_cwd = getcwd();
-                    chdir(dirname(__FILE__));
 
                     header('Content-type: image/png');
 
@@ -43,8 +42,6 @@ function wmuiUserPluginDispatcher($action, $request)
                     } else {
                         wmGenerateGreyImage(48, 48);
                     }
-
-                    dir($orig_cwd);
                 } elseif ($action == "viewthumb48") {
                     // in the management view, a disabled map will fail the query above, so generate *something*
                     header('Content-type: image/png');
@@ -534,27 +531,6 @@ function wmStreamBinaryFile($filename)
     return $status;
 }
 
-function wmGenerateFooterLinks()
-{
-    global $colors;
-    global $WEATHERMAP_VERSION;
-
-    print '<br />';
-    html_start_box(
-        "<center><a target=\"_blank\" class=\"linkOverDark\" href=\"docs/\">Local Documentation</a> -- "
-        . "<a target=\"_blank\" class=\"linkOverDark\" href=\"http://www.network-weathermap.com/\">Weathermap"
-        . " Website</a> -- <a target=\"_target\" class=\"linkOverDark\" "
-        . "href=\"weathermap-cacti-plugin-editor.php?plug=1\">Weathermap Editor</a> -- "
-        . "This is version $WEATHERMAP_VERSION</center>",
-        "78%",
-        $colors["header"],
-        "2",
-        "center",
-        ""
-    );
-    html_end_box();
-}
-
 function wmGenerateMapSelectorBox($current_id = 0)
 {
     global $colors;
@@ -679,6 +655,7 @@ function wmGenerateGreyImage($w, $h)
 {
     $im = imagecreate($w, $h);
     $shade = 240;
+    // The first colour allocated becomes the background colour of the image. No need to fill
     $grey = imagecolorallocate($im, $shade, $shade, $shade);
     imagepng($im);
 

@@ -13,6 +13,7 @@ $weathermap_confdir = realpath(dirname(__FILE__).'/configs');
 // include the weathermap class so that we can get the version
 require_once dirname(__FILE__)."/lib/globals.php";
 require_once dirname(__FILE__)."/lib/cacti-plugin-mgmt.php";
+require_once dirname(__FILE__)."/lib/cacti-plugin-common.php";
 
 $i_understand_file_permissions_and_how_to_fix_them = false;
 

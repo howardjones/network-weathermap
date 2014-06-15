@@ -3,6 +3,8 @@
 <body id="mainview">
 <script type="text/javascript">
     <?php echo $map_json; ?>
+    <?php echo $images_json; ?>
+    var fromplug = <?php echo $fromplug ?>;
 </script>
 <div id="wrap">
     <div class="navbar navbar-default navbar-fixed-top" id="topmenu">
@@ -22,8 +24,7 @@
                 <li ><a href="#" id="tb_manageimages">Manage Images</a></li> -->
                 <li><a href="#" id="tb_prefs">Editor<br/> Settings</a></li>
                 <li class="divider-vertical"></li>
-                <li><a id="tb_coords">Position<br/><span id="coords_x">---</span>, <span id="coords_y">---</span></a>
-                </li>
+                <li><a id="tb_coords">Position<br/><span id="coords_x">---</span>, <span id="coords_y">---</span></a></li>
                 <!-- <li class="tb_help"><span id="tb_help">or click a Node or Link to edit it's properties</span></li> -->
             </ul>
         </div>
@@ -34,15 +35,16 @@
         <form action="" method="post" name="frmMain" class="form-inline">
             <div align="center" id="mainarea">
                 <input type="hidden" name="plug" value="<?php echo($fromplug == true ? 1 : 0) ?>"/>
+                <div id="imagecontainer">
                 <input style="display:none" type="image" width="<?php echo $map_width ?>"
+                       src="<?php echo $imageurl; ?>"
                        height="<?php echo $map_height ?>"
-                       src="<?php echo $imageurl; ?>" id="xycapture"/><img src=
-                                                                           "<?php echo $imageurl; ?>"
-                                                                           width="<?php echo $map_width ?>"
-                                                                           height="<?php echo $map_height ?>"
-                                                                           id="existingdata" alt="Weathermap"
-                                                                           usemap="#weathermap_imap"/>
-
+                       src="" id="xycapture"/><img src="<?php echo $imageurl; ?>"
+                                                   width="<?php echo $map_width ?>"
+                                                   height="<?php echo $map_height ?>"
+                                                   id="existingdata" alt="Weathermap"
+                                                   usemap="#weathermap_imap"/>
+                </div>
                 <div class="debug well well-sm">
                     Editing: <?php echo $mapname; ?>
                     <a class="btn btn-success btn-xs" href="?<?php echo($fromplug == true ? 'plug=1&amp;' : '');
@@ -54,13 +56,13 @@
                     <a class="btn btn-success btn-xs" href="?<?php echo($fromplug == true ? 'plug=1&amp;' : '');
                     ?>action=tidy_all&amp;mapname=<?php echo htmlspecialchars($mapname) ?>">Tidy All</a>
 
-                    <input type="hidden" class="form-control input-sm" name="mapname" value="<?php echo $mapname ?>"/>
-                    <input type="hidden" class="form-control input-sm" id="action" name="action"
+                    <input type="ahidden" class="form-control input-sm" name="mapname" value="<?php echo $mapname ?>"/>
+                    <input type="ahidden" class="form-control input-sm" id="action" name="action"
                            value="<?php echo $newaction ?>"/>
-                    <input type="hidden" class="form-control input-sm" name="param" id="param" value=""/>
-                    <input type="hidden" class="form-control input-sm" name="param2" id="param2"
+                    <input type="ahidden" class="form-control input-sm" name="param" id="param" value=""/>
+                    <input type="ahidden" class="form-control input-sm" name="param2" id="param2"
                            value="<?php echo $param2 ?>"/>
-                    <input type="hidden" class="form-control input-sm" id="debug" value="" name="debug"/>
+                    <input type="ahidden" class="form-control input-sm" id="debug" value="" name="debug"/>
 
                     <a class="btn btn-success btn-warning btn-xs"
                        href="?<?php echo($fromplug == true ? 'plug=1&amp;' : '');
@@ -77,29 +79,47 @@
     </div>
 </div>
 <script type="text/template" id="tpl-dialog-node-properties">
+    <div id="dlgNodeProperties" class="dlgProperties">
+        <h3>Node Properties <small>Node '<span id="node_nodename1"><%-rc.name %></span>'</small></h3>
+        <div class="dlgTitlebar">
+            <button id="tb_node_submit" class="wm_submit btn btn-success">Save</button>
+            <button id="tb_node_cancel" class="wm_cancel btn btn-danger">Cancel</button>
+            <a href="#" class="btn btn-default" id="node_move">Move</a>
+            <a href=""  class="btn btn-default" id="node_clone">Clone</a>
+
+            <a href="" class="btn btn-default" id="node_edit">Edit</a>
+            <a href="" class="btn btn-danger" id="node_delete">Delete</a>
+        </div>
+
+        <div class="dlgBody">
+            Node properties go in here
+        </div>
+    </div><!-- Node Properties -->
 </script>
+
 <script type="text/template" id="tpl-dialog-link-properties">
     <div id="dlgLinkProperties" class="dlgProperties">
-        <h3>Link Properties <small>Link from '<span id="link_nodename1"><%-rc.a %></span>' to '<span id="link_nodename2"><%-rc.b %></span>'</small></h3>
+        <h3>Link Properties <small>Link from '<span id="link_nodename1"><%-rc.data.a %></span>' to '<span id="link_nodename2"><%-rc.data.b %></span>'</small></h3>
         <div class="dlgTitlebar">
             <button id="tb_link_submit" class="wm_submit btn btn-success">Save</button>
             <button id="tb_link_cancel" class="wm_cancel btn btn-danger">Cancel</button>
-            <button class="btn" id="link_delete">Delete Link</button>
+
             <button class="btn" id="link_edit">Edit</button>
             <button class="btn" id="link_tidy">Tidy</button>
             <button class="btn" id="link_via">Add Via</button>
+            <button class="btn" id="link_delete">Delete</button>
         </div>
 
         <div class="dlgBody">
 
-            <input size="6" name="link_name" type="hidden"/>
+            <input size="6" name="link_name" type="hidden" value="<%- rc.name %>"/>
 
             <table width="100%" class="table">
                 <tr>
                     <th>Maximum Bandwidth<br/>
-                        Into '<span id="link_nodename1a"><%-rc.a %></span>'
+                        Into '<span id="link_nodename1a"><%-rc.data.a %></span>'
                     </th>
-                    <td><input size="8" id="link_bandwidth_in" name="link_bandwidth_in" value="<%-rc.bw_in %>" type=
+                    <td><input size="8" id="link_bandwidth_in" name="link_bandwidth_in" value="<%-rc.data.bw_in %>" type=
                         "text"/> bits/sec
                     </td>
                 </tr>
@@ -164,7 +184,23 @@
 
     </div><!-- Link Properties -->
 </script>
-<script type="text/template" id="dialog-map-properties">
+<script type="text/template" id="tpl-dialog-map-properties">
+    <div id="dlgMapProperties" class="dlgProperties">
+        <h3>Map Properties <small>Map '<span id="map_mapname1"><%-rc.file %></span>'</small></h3>
+        <div class="dlgTitlebar">
+            <button id="tb_map_submit" class="wm_submit btn btn-success">Save</button>
+            <button id="tb_map_cancel" class="wm_cancel btn btn-danger">Cancel</button>
+        </div>
+
+        <div class="dlgBody">
+            Map properties go in here.
+
+            <%- rc.title %>
+            <%- rc.file %>
+            <%- rc.width %> x <%- rc.height %>
+
+        </div>
+    </div><!-- Map Properties -->
 </script>
 </body>
 </html>

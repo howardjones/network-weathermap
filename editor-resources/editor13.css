@@ -57,7 +57,7 @@ html, body {
     }
 }
 
-#xycapture, #existingdata {
+#imagecontainer {
     border: 1px solid gray;
 }
 
@@ -72,10 +72,11 @@ body {
 
 #xycapture {
     cursor: crosshair;
+    z-index: 200;
 }
 
 #wmmaincontainer {
-    margin-top: 70px;
+    margin-top: 80px;
 }
 
 #datapickerlist {
@@ -83,8 +84,12 @@ body {
     overflow-y: scroll;
 }
 
+.debug {
+    margin-top: 10px;
+}
 
 .dlgProperties { background-color: white; border: 2px solid gray; position: absolute; left: 20px; top:100px; padding:0; margin: 0;}
 .dlgProperties .dlgBody { padding: 8px; }
-.dlgProperties h3 { background-color: gray; color: white; margin:0; padding:8px; }
+.dlgProperties h3 { background-color: gray; color: white; margin:0; padding:8px; cursor: move;}
 .dlgProperties .dlgTitlebar { padding: 4px; }
+

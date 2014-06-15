@@ -10,6 +10,7 @@ require_once "./include/auth.php";
 // include the weathermap class so that we can get the version
 require_once dirname(__FILE__)."/lib/globals.php";
 require_once dirname(__FILE__)."/lib/cacti-plugin-user.php";
+require_once dirname(__FILE__)."/lib/cacti-plugin-common.php";
 
 $action = "";
 if (isset($_POST['action'])) {

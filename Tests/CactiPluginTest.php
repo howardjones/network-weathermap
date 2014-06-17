@@ -9,6 +9,7 @@
 require_once dirname(__FILE__).'/../lib/cacti-plugin-mgmt.php';
 require_once dirname(__FILE__).'/../lib/cacti-plugin-user.php';
 require_once dirname(__FILE__).'/../lib/cacti-plugin-common.php';
+require_once dirname(__FILE__).'/../lib/cacti-plugin-hooks.php';
 
 class CactiPluginTest extends PHPUnit_Framework_TestCase {
     public function testRun() {

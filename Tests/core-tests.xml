@@ -1,0 +1,21 @@
+<phpunit>
+  <testsuites>
+    <testsuite name="Weathermap_Core">
+        <file>Tests/ConfigTest.php</file>
+        <file>Tests/GeometryTest.php</file>
+        <file>Tests/HTML_ImageMap_Area_CircleTest.php</file>
+        <file>Tests/HTML_ImageMap_Area_PolygonTest.php</file>
+        <file>Tests/HTML_ImageMap_Area_RectangleTest.php</file>
+        <file>Tests/HTML_ImageMap_AreaTest.php</file>
+        <file>Tests/HTML_ImageMapTest.php</file>
+        <file>Tests/RunnerTests.php</file>
+        <file>Tests/WeatherMapBaseTest.php</file>
+        <file>Tests/WeatherMapDataSourceTest.php</file>
+        <file>Tests/WeatherMapItemTest.php</file>
+        <file>Tests/WeatherMapPostProcessorTest.php</file>
+        <file>Tests/WeatherMapPreProcessorTest.php</file>
+        <file>Tests/WeatherMapScaleTest.php</file>
+        <file>Tests/WeatherMapTest.php</file>
+    </testsuite>
+  </testsuites>
+</phpunit>

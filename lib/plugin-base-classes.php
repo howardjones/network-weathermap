@@ -65,3 +65,8 @@ class WeatherMapPostProcessor
         return false;
     }
 }
+
+class WeatherMapDataPicker
+{
+
+}

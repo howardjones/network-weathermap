@@ -1,0 +1,9 @@
+<phpunit>
+  <testsuites>
+    <testsuite name="Weathermap_Editor">
+        <file>Tests/WeatherMapEditorTest.php</file>
+        <file>Tests/WeatherMapEditorUITest.php</file>
+    </testsuite>
+  </testsuites>
+</phpunit>
+

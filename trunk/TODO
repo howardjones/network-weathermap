@@ -1,3 +1,7 @@
+Fix the packing.list to reflect all the changes in locations
+
+Make 2 releases from the makefile - a distro, and a distro+test-suite for testing the distro on a virgin system
+
 DONEish Basic implementation for archiving
 
 Cacti mgmt - rework map list.

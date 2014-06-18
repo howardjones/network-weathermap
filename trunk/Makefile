@@ -1,5 +1,5 @@
 VERSION=0.98pre
-RELBASE=../releases
+RELBASE=releases
 RELNAME=php-weathermap-$(VERSION)
 RELDIR=$(RELBASE)/weathermap
 
@@ -19,17 +19,24 @@ manual:	docs/index.html
 	cd docs/example && ./bodge-example.sh
 	
 clean:
-	rm random-bits/suite-1.png random-bits/suite-2.png docs/src/contents.xml
+	rm docs/src/contents.xml test-suite/results1-php5/* test-suite/results2-php5/* test-suite/diffs/* ./test-suite/code-coverage/*
 
 release: 
 	echo Building release $(RELNAME)
 	grep -q ENABLED=true editor.php
 	# mv $(RELDIR) $(RELDIR).$$
 	mkdir -p $(RELDIR)
+	rm -rf $(RELDIR)
+	mkdir -p $(RELDIR)
 	tar cTf packing.list - | (cd $(RELDIR); tar xvf -)
 	cd $(RELBASE); zip -r $(RELNAME).zip weathermap/*
 	cd $(RELBASE); tar cvfz $(RELNAME).tgz weathermap
-	cd $(RELBASE); mv $(RELDIR) $(RELNAME)
+	rm -rf $(RELDIR)
+	mkdir -p $(RELDIR)
+	tar cTf packing.list-tests - | (cd $(RELDIR); tar xvf -)
+	cd $(RELBASE); zip -r $(RELNAME)-tests.zip weathermap/*
+	cd $(RELBASE); tar cvfz $(RELNAME)-tests.tgz weathermap
+	rm -rf $(RELDIR)
 	echo $(RENAME) built in $(RELBASE)
 
 test:	

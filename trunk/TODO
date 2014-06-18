@@ -14,7 +14,7 @@ Finish moving to WMScale
 
 Finish move to use geometry classes - should simplify link-drawing a lot
 
-New-style plugin!!
+DONE New-style plugin!!
 
 Editor - tidy doesn't deal with diagonal (no common coordinates) nodes
 

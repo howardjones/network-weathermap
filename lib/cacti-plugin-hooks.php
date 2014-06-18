@@ -144,16 +144,15 @@ function weathermap_config_settings()
 function weathermap_setup_table()
 {
     global $config, $database_default;
-    include_once $config["library_path"] . DIRECTORY_SEPARATOR . "database.php";
-
-//    $dbversion = read_config_option("weathermap_db_version");
+    // include_once $config["library_path"] . DIRECTORY_SEPARATOR . "database.php";
+    $dbversion = read_config_option("weathermap_db_version");
 
     $myversioninfo = plugin_weathermap_version();
     $myversion = $myversioninfo['version'];
 
     // only bother with all this if it's a new install, a new version, or we're in a development version
     // - saves a handful of db hits per request!
-   // if (($dbversion=="") || (preg_match("/dev$/", $myversion)) || ($dbversion != $myversion)) {
+   if (($dbversion=="") || (preg_match("/dev$/", $myversion)) || ($dbversion != $myversion)) {
         $sql = "show tables";
         $result = db_fetch_assoc($sql) or die (mysql_error());
 
@@ -216,9 +215,11 @@ function weathermap_setup_table()
                 )
             );
 
+            $maps_field_fields = array_keys($maps_field_changes);
+
             while ($row = mysql_fetch_array($result, MYSQL_ASSOC)) {
                 // if the table already has the field, remove that entry from the potential changes list
-                if (in_array($row['Field'], $maps_field_changes)) {
+                if (in_array($row['Field'], $maps_field_fields)) {
                     unset($maps_field_changes[$row['Field']]);
                 }
             }
@@ -343,11 +344,11 @@ function weathermap_setup_table()
         $sql[] = "update weathermap_maps set sortorder=id where sortorder is null or sortorder=0;";
 
         if (!empty($sql)) {
-            for ($a = 0; $a < count($sql); $a++) {
-                $result = db_execute($sql[$a]);
+            foreach ($sql as $s) {
+                $result = db_execute($s);
             }
         }
-   // }
+   }
 }
 
 function weathermap_config_arrays()
@@ -585,7 +586,7 @@ function weathermap_poller_bottom()
     } else {
         // if we're due, run the render updates
         if (( $renderperiod == 0) || ( ($rendercounter % $renderperiod) == 0)) {
-            weathermap_run_maps(dirname(__FILE__));
+            weathermap_run_maps(dirname(__FILE__)."/..");
         } else {
             if ($quietlogging==0) {
                 cacti_log("Weathermap $WEATHERMAP_VERSION - no update in this cycle ($rendercounter)", true, "WEATHERMAP");

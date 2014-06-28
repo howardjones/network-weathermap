@@ -13,13 +13,13 @@ do
 done
 
 if [ $fflag -eq 1 ]; then
-	make testcoverage
+	phpunit --coverage-html test-suite/code-coverage/ Tests/
 else
-	make test
+	phpunit Tests/	
 fi
 
-  grep  Output test-suite/diffs/*.txt | grep -v '|0|' | awk -F: '{ print $1;}' | sed -e 's/.png.txt//' -e 's/test-suite\/diffs\///' > test-suite/failing-images.txt
-        test-suite/make-failing-summary.pl test-suite/failing-images.txt test-suite/summary.html > test-suite/summary-failing.html
+grep  Output test-suite/diffs/*.txt | grep -v '|0|' | awk -F: '{ print $1;}' | sed -e 's/.png.txt//' -e 's/test-suite\/diffs\///' > test-suite/failing-images.txt
+test-suite/make-failing-summary.pl test-suite/failing-images.txt test-suite/summary.html > test-suite/summary-failing.html
 
 echo
 echo "NOTE: 3 tests have a timestamp in them, and will always fail"

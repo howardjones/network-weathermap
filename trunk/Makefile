@@ -38,6 +38,8 @@ release:
 	cd $(RELBASE); tar cvfz $(RELNAME)-tests.tgz weathermap
 	rm -rf $(RELDIR)
 	echo $(RENAME) built in $(RELBASE)
+	# copy the results into the Vagrant shared directory, ready for test installations
+	cp -f $(RELBASE)/$(RELNAME)-tests.zip  $(RELBASE)/$(RELNAME).zip docs/dev/data
 
 test:	
 	phpunit Tests/

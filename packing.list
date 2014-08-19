@@ -1,4 +1,4 @@
-./README
+./README.md
 ./CHANGES
 ./vendor/overlib.js
 ./vendor/underscore/underscore.js

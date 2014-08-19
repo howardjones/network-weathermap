@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<phpunit colors="true">
+    <php>
+      
+    </php>
+
+    <testsuites>
+        <testsuite name="Weathermap Test Suite">
+            <directory>./Tests/</directory>
+        </testsuite>
+    </testsuites>
+
+    <filter>
+        <whitelist>
+            <directory>./</directory>
+            <exclude>
+                <directory>./Tests</directory>
+            </exclude>
+        </whitelist>
+    </filter>
+</phpunit>

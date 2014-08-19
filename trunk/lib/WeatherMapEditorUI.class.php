@@ -193,11 +193,18 @@ class WeatherMapEditorUI {
         "via_link" => array(
             "args" => array(
                 array("mapname", "mapfile"),
-                array("link_name", "name"),
+                array("param", "name"),
                 array("x", "int"),
                 array("y", "int"),
             ),
             "handler" => "cmdAddLinkVia"
+        ),
+        "straight_link" => array(
+            "args" => array(
+                array("mapname", "mapfile"),
+                array("param", "name")
+            ),
+            "handler" => "cmdLinkStraighten"
         ),
         "delete_link" => array(
             "args" => array(
@@ -227,6 +234,24 @@ class WeatherMapEditorUI {
             ),
             "handler" => "cmdTidyLink"
         ),
+        "tidy_all" => array(
+            "args" => array(
+                array("mapname", "mapfile")
+            ),
+            "handler" => "cmdTidyAllLinks"
+        ),
+        "retidy" => array(
+            "args" => array(
+                array("mapname", "mapfile")
+            ),
+            "handler" => "cmdReTidyAllLinks"
+        ),
+        "untidy_all" => array(
+            "args" => array(
+                array("mapname", "mapfile")
+            ),
+            "handler" => "cmdUnTidyAllLinks"
+        ),
         "edit_link" => array(
             "args" => array(
                 array("mapname", "mapfile"),
@@ -250,7 +275,7 @@ class WeatherMapEditorUI {
         "set_link_properties" => array(),
         "set_map_properties" => array(),
         "set_map_style" => array(),
-        "nothing" => array("args" => array(), "handler"=>"cmdDoNothing", "no_save" => true)
+        "nothing" => array("args" => array(array("mapname","mapfile")), "handler"=>"cmdDoNothing", "no_save" => true)
     );
 
     
@@ -397,6 +422,16 @@ class WeatherMapEditorUI {
         $this->selected = $item;
     }
 
+    function setEmbedded($state)
+    {
+        $this->fromPlugin = $state;
+    }
+
+    function isEmbedded()
+    {
+        return($this->fromPlugin);
+    }
+
     // cmd* methods below here translate form inputs into Editor API calls, which do the real work
 
     /**
@@ -406,6 +441,15 @@ class WeatherMapEditorUI {
     function cmdDoNothing($params, $editor)
     {
         return true;
+    }
+
+    function cmdShowConfig($params, $editor)
+    {
+        header("Content-type: text/plain");
+
+        print $editor->getConfig();
+
+        exit();
     }
 
     /**
@@ -453,7 +497,8 @@ class WeatherMapEditorUI {
         $x = $this->snap($params['x']);
         $y = $this->snap($params['y']);
 
-        $editor->addNode($x, $y);
+        list($newname, $success, $log) = $editor->addNode($x, $y);
+        $this->setLogMessage($log);
     }
 
     /**
@@ -462,7 +507,10 @@ class WeatherMapEditorUI {
      */
     function cmdCloneNode($params, $editor)
     {
-        $editor->cloneNode($params['param']);
+        list($result, $affected, $log) = $editor->cloneNode($params['param']);
+        $this->setLogMessage($log);
+
+        return $result;
     }
 
     function cmdAddLinkInitial($params, $editor)
@@ -480,6 +528,16 @@ class WeatherMapEditorUI {
     function cmdAddLinkFinal($params, $editor)
     {
         $editor->addLink($params['param'], $params['param2']);
+    }
+
+    function cmdAddLinkVia($params, $editor)
+    {
+        $editor->setLinkVia($params['param'], $params['x'], $params['y']);
+    }
+
+    function cmdLinkStraighten($params, $editor)
+    {
+        $editor->clearLinkVias($params['param']);
     }
 
     function cmdEditLink($params, $editor)
@@ -524,6 +582,33 @@ class WeatherMapEditorUI {
     function cmdTidyLink($params, $editor)
     {
         $editor->tidyLink($params['param']);
+    }
+
+    /**
+     * @param string[] $params
+     * @param WeatherMapEditor $editor
+     */
+    function cmdTidyAllLinks($params, $editor)
+    {
+        $editor->tidyAllLinks();
+    }
+
+    /**
+     * @param string[] $params
+     * @param WeatherMapEditor $editor
+     */
+    function cmdReTidyAllLinks($params, $editor)
+    {
+        $editor->retidyAllLinks();
+    }
+
+    /**
+     * @param string[] $params
+     * @param WeatherMapEditor $editor
+     */
+    function cmdUnTidyAllLinks($params, $editor)
+    {
+        $editor->untidyLinks();
     }
 
     /**
@@ -729,7 +814,7 @@ class WeatherMapEditorUI {
 
         $tpl = new SimpleTemplate();
         $tpl->set("WEATHERMAP_VERSION", $WEATHERMAP_VERSION);
-        $tpl->set("fromplug", 1);
+        $tpl->set("fromplug", ($this->isEmbedded() ? 1 : 0));
 
         $tpl->set("imageurl", htmlspecialchars($map_url));
         if($this->selected != "") {
@@ -739,6 +824,7 @@ class WeatherMapEditorUI {
         $tpl->set("newaction", htmlspecialchars($this->next_action));
         $tpl->set("param2", htmlspecialchars($this->param2));
 
+        // draw a map to throw away, just to get the imagemap updated
         $editor->map->drawMapImage('null');
         $editor->map->htmlstyle='editor';
         $editor->map->calculateImageMap();
@@ -754,7 +840,7 @@ class WeatherMapEditorUI {
         echo $tpl->fetch("editor-resources/templates/main.php");
     }
     
-    function main($request)
+    function main($request, $from_plugin=false)
     {
         $mapname = "";
         $action = "";
@@ -783,6 +869,7 @@ class WeatherMapEditorUI {
         } else {
             if ($this->validateRequest($action, $request)) {
                 $editor = new WeatherMapEditor();
+                $this->setEmbedded($from_plugin);
                 if ( !isset($this->commands[$action]['late_load'])) {
                     $editor->loadConfig($this->mapfile);
                 }

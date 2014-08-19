@@ -39,7 +39,7 @@ release:
 	rm -rf $(RELDIR)
 	echo $(RENAME) built in $(RELBASE)
 	# copy the results into the Vagrant shared directory, ready for test installations
-	cp -f $(RELBASE)/$(RELNAME)-tests.zip  $(RELBASE)/$(RELNAME).zip docs/dev/data
+	cp -f $(RELBASE)/$(RELNAME)-tests.zip  $(RELBASE)/$(RELNAME).zip docs/dev/vagrant-testers
 
 test:	
 	phpunit Tests/

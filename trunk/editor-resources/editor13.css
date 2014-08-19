@@ -68,6 +68,7 @@ body {
 #existinglist {
     height: 150px;
     overflow-y: scroll;
+    border: 1px solid gray;
 }
 
 #xycapture {
@@ -88,8 +89,12 @@ body {
     margin-top: 10px;
 }
 
-.dlgProperties { background-color: white; border: 2px solid gray; position: absolute; left: 20px; top:100px; padding:0; margin: 0;}
+.dlgUnderlay { z-index: 4950; width: 100%; height: 100%; position: absolute; left:0; top:0; background-color: black; opacity: 0.4; }
+
+.dlgProperties { background-color: white; border: 2px solid gray; position: absolute; left: 20px; top:100px; padding:0; margin: 0; z-index: 5000; opacity: 1.0;}
 .dlgProperties .dlgBody { padding: 8px; }
 .dlgProperties h3 { background-color: gray; color: white; margin:0; padding:8px; cursor: move;}
 .dlgProperties .dlgTitlebar { padding: 4px; }
+
+#canvas_node_drag { cursor: move; border: 4px solid red; z-index: 6000; }
 

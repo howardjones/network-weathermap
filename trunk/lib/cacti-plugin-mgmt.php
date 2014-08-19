@@ -454,7 +454,7 @@ function wmMapManagementList4()
 
                 print "<td class='wm_maptitle maptable_names'>";
                 print '<span class="wm_maptitle">'.htmlspecialchars($map['titlecache'])."</span><br />";
-                print '<a title="Click to start editor with this file" href="editor.php?plug=1&mapname='.htmlspecialchars($map['configfile']).'">'.htmlspecialchars($map['configfile']).'</a>';
+                print '<a title="Click to start editor with this file" href="weathermap-cacti-plugin-editor.php?action=nothing&mapname='.htmlspecialchars($map['configfile']).'">'.htmlspecialchars($map['configfile']).'</a>';
                 print "</td>";
 
 

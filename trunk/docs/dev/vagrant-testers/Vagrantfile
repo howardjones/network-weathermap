@@ -1,0 +1,52 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+# Vagrantfile API/syntax version. Don't touch unless you know what you're doing!
+VAGRANTFILE_API_VERSION = "2"
+
+Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
+  
+  # Every Vagrant virtual environment requires a box to build off of.  
+  config.vm.network "forwarded_port", guest: 80, host: 8080
+  config.vm.synced_folder "../data", "/vagrant_data"
+  
+  # just the specialisations for each OS-specific box
+  
+  config.vm.define :u1404 do |u1404|
+        u1404.vm.provision :shell, :path => "vagrant-cacti-u1404.sh"
+		u1404.vm.box = "ubuntu/trusty64"
+  end
+  
+  config.vm.define :u1204 do |u1204|
+        u1204.vm.provision :shell, :path => "vagrant-cacti-u1204.sh"
+		u1204.vm.box = "ubuntu/precise64"
+  end
+  
+  config.vm.define :deb74 do |deb74|
+        deb74.vm.provision :shell, :path => "vagrant-cacti-deb74.sh"
+		deb74.vm.box = "chef/debian-7.4"
+  end
+  
+  config.vm.define :centos6 do |centos6|
+        centos6.vm.provision :shell, :path => "vagrant-cacti-centos6.sh"
+		centos6.vm.box = "chef/centos-6.5"
+  end
+  
+  config.vm.define :centos5 do |centos5|
+        centos5.vm.provision :shell, :path => "vagrant-cacti-centos5.sh"
+		centos5.vm.box = "chef/centos-5.10"
+  end
+  
+  config.vm.define :freebsd9 do |freebsd9|
+        freebsd9.vm.provision :shell, :path => "vagrant-cacti-freebsd9.sh"
+		freebsd9.vm.box = "chef/freebsd-9.2"
+  end
+  
+  config.vm.define :win2008 do |win2008|
+        # win2008.vm.provision :shell, :path => "vagrant-cacti-win2008.ps1"
+		win2008.vm.box = "windows-server-2008-r2-eval"
+		win2008.vm.communicator = "winrm"
+		config.vm.network "forwarded_port", guest: 3389, host: 13389
+  end
+  
+end

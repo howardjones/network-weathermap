@@ -1,6 +1,6 @@
-Fix the packing.list to reflect all the changes in locations
+DONE? Fix the packing.list to reflect all the changes in locations
 
-Make 2 releases from the makefile - a distro, and a distro+test-suite for testing the distro on a virgin system
+DONE Make 2 releases from the makefile - a distro, and a distro+test-suite for testing the distro on a virgin system
 
 DONEish Basic implementation for archiving
 
@@ -18,7 +18,7 @@ DONE New-style plugin!!
 
 Editor - tidy doesn't deal with diagonal (no common coordinates) nodes
 
-Editor - tidy should use NESW etc if it can
+DONE Editor - tidy should use NESW etc if it can
 
 Editor - moving a dependent item in a "locked" set should update the relative coords (optionally?)
 
@@ -31,6 +31,8 @@ Add tests for 'no-data' in text DS and also in ProcessString
 Add more shortcuts to ProcessString (at least for standard bwlabels)
 
 Editor: re-tidy should know that a-b is the same as b-a
+
+DONE Editor: re-add the Cacti authentication integration
 
 --
 

@@ -902,21 +902,27 @@ class WeatherMapNode extends WeatherMapItem
         $js .= "x:" . (is_null($this->x)? "'null'" : $this->x) . ", ";
         $js .= "y:" . (is_null($this->y)? "'null'" : $this->y) . ", ";
         $js .= "\"id\":" . $this->id. ", ";
-        // $js.="y:" . $this->y . ", ";
-        $js.="ox:" . $this->original_x . ", ";
-        $js.="oy:" . $this->original_y . ", ";
-        $js.="relative_to:" . jsEscape($this->relative_to) . ", ";
-        $js.="label:" . jsEscape($this->label) . ", ";
-        $js.="name:" . jsEscape($this->name) . ", ";
-        $js.="infourl:" . jsEscape($this->infourl[IN]) . ", ";
-        $js.="overlibcaption:" . jsEscape($this->overlibcaption[IN]) . ", ";
-        $js.="overliburl:" . jsEscape(join(" ", $this->overliburl[IN])) . ", ";
-        $js.="overlibwidth:" . $this->overlibheight . ", ";
-        $js.="overlibheight:" . $this->overlibwidth . ", ";
-        if (preg_match("/^(none|nink|inpie|outpie|box|rbox|gauge|round)$/", $this->iconfile)) {
-            $js.="iconfile:" . jsEscape("::".$this->iconfile);
+        //  $js.="y:" . $this->y . ", ";
+        $js .= "ox:" . $this->original_x . ", ";
+        $js .= "oy:" . $this->original_y . ", ";
+        $js .= "relative_to:" . jsEscape($this->relative_to) . ", ";
+        $js .= "label:" . jsEscape($this->label) . ", ";
+        $js .= "name:" . jsEscape($this->name) . ", ";
+        $js .= "infourl:" . jsEscape($this->infourl[IN]) . ", ";
+        $js .= "overlibcaption:" . jsEscape($this->overlibcaption[IN]) . ", ";
+        $js .= "overliburl:" . jsEscape(join(" ", $this->overliburl[IN])) . ", ";
+        $js .= "overlibwidth:" . $this->overlibheight . ", ";
+        $js .= "overlibheight:" . $this->overlibwidth . ", ";
+        if  (sizeof($this->boundingboxes) > 0) {
+            $js .= sprintf("bbox:[%d,%d, %d,%d], ", $this->boundingboxes[0][0],$this->boundingboxes[0][1],$this->boundingboxes[0][2],$this->boundingboxes[0][3]);
         } else {
-            $js.="iconfile:" . jsEscape($this->iconfile);
+            $js .= "bbox: [], ";
+        }
+
+        if (preg_match("/^(none|nink|inpie|outpie|box|rbox|gauge|round)$/", $this->iconfile)) {
+            $js .= "iconfile:" . jsEscape("::".$this->iconfile);
+        } else {
+            $js .= "iconfile:" . jsEscape($this->iconfile);
         }
 
         $js .= "};\n";

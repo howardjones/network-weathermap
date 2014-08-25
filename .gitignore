@@ -1,0 +1,9 @@
+output
+test-suite/diffs/
+test-suite/results1-php5/
+test-suite/results2-php5/
+test-suite/summary.html
+weathermap.iml
+weathermap.ipr
+weathermap.iws
+

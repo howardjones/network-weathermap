@@ -4,6 +4,7 @@ Lots of reorganisation in 0.98 for multiple goals:
 - move towards PSR-2 guidelines where it makes sense - mostly code formatting and function naming, but also separating
   out function definitions from code with side-effects.
 - make it clear where 3rd-party libraries are used (vendor directory) and make updates to those easy with Bower
+- get ready for github and Travis-CI
 
 0.98	FIXED - More PHP 5.3/5.4/strict related errors (split -> explode)
         FIXED - Config file path validation issue in editor (CVE-2013-3739)

@@ -12,6 +12,13 @@
     "tests"
   ],
   "dependencies": {
-    "bootstrap": "~3.1.1"
+    "bootstrap": "~3.1.1",
+    "jquery-ui": "~1.11.1",
+    "jquery": "~2.1.1",
+    "underscore": "~1.6.0",
+    "json2": "*",
+    "marionette": "~2.1.0",
+    "jquery-idletimer": "~1.0.1",
+    "jquery.colorpicker": "~1.0.9"
   }
 }

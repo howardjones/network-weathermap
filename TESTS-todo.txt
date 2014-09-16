@@ -1,0 +1,43 @@
+
+Tests to add:
+
+   Template not first line [WARNING]
+   DONE rel pos of a rel pos
+   rel pos of a non-existent node [WARNING]
+   rel pos of a rel pos of the first rel pos [WARNING] - i.e. loop
+
+	MINTIMEPOS
+	MAXTIMEPOS
+	
+	Testing for editor overlays in map drawing - force weathermap into editor mode
+	
+	Writing a JPEG or GIF
+	
+	HTMLSTYLE overlib, and related (OVERLIBGRAPH)
+
+	asJS
+	asJSON
+	writeJSONFile
+	writeDataFile
+	
+	NOTES
+	
+	INFOURL
+	
+	overiding namedoffsets inherited from templates
+
+None of the new cacti plugin functions
+
+imagecreatefromfile - load from gif, load from jpeg, failed load
+
+imagepolyline - not used?
+myimagecolorallocate - doesn't do anything??
+	
+no testing for poller-common.php or ds-common.php (ds-common needs refactoring)
+
+DS plugins need data sources to feed them
+	
+how to test if warnings appear?
+	A lot of error-cases are not tested
+
+is JSON.php even used?

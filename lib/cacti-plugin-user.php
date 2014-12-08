@@ -10,12 +10,12 @@ function wmuiUserPluginDispatcher($action, $request)
         case 'viewimage':
             $id = -1;
 
-            if (isset($_REQUEST['id']) && (!is_numeric($_REQUEST['id']) || strlen($_REQUEST['id']) == 20)) {
-                $id = wmTranslateHashToID($_REQUEST['id']);
+            if (isset($_GET['id']) && (!is_numeric($_GET['id']) || strlen($_GET['id']) == 20)) {
+                $id = wmTranslateHashToID($_GET['id']);
             }
 
-            if (isset($_REQUEST['id']) && is_numeric($_REQUEST['id'])) {
-                $id = intval($_REQUEST['id']);
+            if (isset($_GET['id']) && is_numeric($_GET['id'])) {
+                $id = intval($_GET['id']);
             }
 
             if ($id >= 0) {
@@ -52,8 +52,8 @@ function wmuiUserPluginDispatcher($action, $request)
             break;
         case 'viewmapcycle':
             $fullscreen = 0;
-            if ((isset($_REQUEST['fullscreen']) && is_numeric($_REQUEST['fullscreen']))) {
-                $fullscreen = intval($_REQUEST['fullscreen']);
+            if ((isset($_GET['fullscreen']) && is_numeric($_GET['fullscreen']))) {
+                $fullscreen = intval($_GET['fullscreen']);
             }
 
             if ($fullscreen == 1) {
@@ -69,8 +69,8 @@ function wmuiUserPluginDispatcher($action, $request)
             print "<script type=\"text/javascript\" src=\"vendor/overlib.js\"><!-- overLIB (c) Erik Bosrup --></script> \n";
 
             $groupid = -1;
-            if ((isset($_REQUEST['group']) && is_numeric($_REQUEST['group']))) {
-                $groupid = intval($_REQUEST['group']);
+            if ((isset($_GET['group']) && is_numeric($_GET['group']))) {
+                $groupid = intval($_GET['group']);
             }
 
             wmuiFullMapView(true, false, $groupid, $fullscreen);
@@ -89,12 +89,12 @@ function wmuiUserPluginDispatcher($action, $request)
 
             $id = -1;
 
-            if (isset($_REQUEST['id']) && (!is_numeric($_REQUEST['id']) || strlen($_REQUEST['id']) == 20)) {
-                $id = wmTranslateHashToID($_REQUEST['id']);
+            if (isset($_GET['id']) && (!is_numeric($_GET['id']) || strlen($_GET['id']) == 20)) {
+                $id = wmTranslateHashToID($_GET['id']);
             }
 
-            if (isset($_REQUEST['id']) && is_numeric($_REQUEST['id'])) {
-                $id = intval($_REQUEST['id']);
+            if (isset($_GET['id']) && is_numeric($_GET['id'])) {
+                $id = intval($_GET['id']);
             }
 
             if ($id >= 0) {
@@ -111,8 +111,8 @@ function wmuiUserPluginDispatcher($action, $request)
             print "<script type=\"text/javascript\" src=\"vendor/overlib.js\"><!-- overLIB (c) Erik Bosrup --></script> \n";
 
             $group_id = -1;
-            if (isset($_REQUEST['group_id']) && (is_numeric($_REQUEST['group_id']))) {
-                $group_id = intval($_REQUEST['group_id']);
+            if (isset($_GET['group_id']) && (is_numeric($_GET['group_id']))) {
+                $group_id = intval($_GET['group_id']);
                 $_SESSION['wm_last_group'] = $group_id;
             } else {
                 if (isset($_SESSION['wm_last_group'])) {

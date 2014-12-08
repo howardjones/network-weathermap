@@ -15,12 +15,12 @@
       // capture the PHP "General Info" table
       ob_start();
       phpinfo(INFO_GENERAL);
-      $s = ob_get_contents();
+      $php_info_output = ob_get_contents();
       ob_end_clean();
 
       // <tr><td class="e">System </td><td class="v">Windows NT BLINKYZERO 6.0 build 6000 </td></tr>
       // since preg_* are potentially missing, we'll have to do this without regexps.
-      foreach (explode("\n",$s) as $line) {
+      foreach (explode("\n",$php_info_output) as $line) {
             $line = str_replace('<tr><td class="e">','',$line);
             $line = str_replace('</td></tr>','',$line);
             $line = str_replace(' </td><td class="v">',' => ',$line);
@@ -153,12 +153,16 @@
    foreach ($functions as $function=>$details)
     {
 		$exists = ""; $notes="";
-	    if($environment=='web') echo "<tr><td align=right>$function()</td>";
+	    if($environment=='web') {
+            echo "<tr><td align=right>$function()</td>";
+        }
 	
         if(function_exists($function))
         {
 			$exists = "YES";
-            if($environment=='web') echo "<td><img alt=\"YES\" src=\"images/tick.png\" /></td>";
+            if($environment=='web') {
+                echo "<td><img alt=\"YES\" src=\"images/tick.png\" /></td>";
+            }
         }
         else
         {            
@@ -166,43 +170,53 @@
             if($details[0])
             {
 			    $notes .= "CRITICAL.   ";
-                if($environment=='web') echo "<td><img alt=\"NO\" src=\"images/exclamation.png\" /><b>CRITICAL</b> ";
+                if($environment=='web') {
+                    echo "<td><img alt=\"NO\" src=\"images/exclamation.png\" /><b>CRITICAL</b> ";
+                }
                 $critical++;
             } else {
                 if(!$details[1])
                 {
 				   $notes .= "Non-Critical.   ";
-                    if($environment=='web') echo "<td><img  alt=\"NO\" src=\"images/cross.png\" /><i>non-critical</i>  ";
+                    if($environment=='web') {
+                        echo "<td><img  alt=\"NO\" src=\"images/cross.png\" /><i>non-critical</i>  ";
+                    }
                     $noncritical++;
                 }
                 else
                 {
 					$notes .= "Minor.   ";
-                    if($environment=='web') echo "<td><img alt=\"NO\" src=\"images/cross.png\" /><i>minor</i>  ";
+                    if($environment=='web') {
+                        echo "<td><img alt=\"NO\" src=\"images/cross.png\" /><i>minor</i>  ";
+                    }
                 }
             }
 			$explanation = "This is required for ".$details[2].". It is ".$details[3].".";
 			$notes .= $explanation;
             
-            if($environment=='web') echo "$explanation</td>";
+            if($environment=='web') {
+                echo "$explanation</td>";
+            }
         }
-        if($environment=='web') echo "</tr>\n";
+        if($environment=='web') {
+            echo "</tr>\n";
+        }
 		else
 		{
 		    $wnotes = wordwrap($notes,50);
 			$lines = explode("\n",$wnotes);
-			$i=0;
+			$line_counter=0;
 			foreach ($lines as $noteline)
 			{
-				if($i==0)
+				if($line_counter==0)
 				{
 					echo sprintf("%20s %5s %-52s\n",$function,$exists,$noteline);
-					$i++;
+					$line_counter++;
 				}
 				else
 				{
 					echo sprintf("%20s %5s %-52s\n","","",$noteline);
-					$i++;
+					$line_counter++;
 				}
 			}
 		}		
@@ -214,7 +228,7 @@
     {
 	    if($environment=='web') 
 		{
-        echo "<p>If these functions are not found, you may need to <ul><li>check that the 'extension=' line for that extension is uncommented in your php.ini file (then restart your webserver), or<li>install the extension, if it isn't installed already</ul>";
+            echo "<p>If these functions are not found, you may need to <ul><li>check that the 'extension=' line for that extension is uncommented in your php.ini file (then restart your webserver), or<li>install the extension, if it isn't installed already</ul>";
 		}
 		else
 		{
@@ -229,28 +243,42 @@
 			
     if($critical>0)
     {
-        if($environment=='web') echo "<div class=\"critical\">";
+        if($environment=='web') {
+            echo "<div class=\"critical\">";
+        }
 		echo wordwrap("There are problems with your PHP or server environment that will stop Weathermap from working. You need to correct these issues if you wish to use Weathermap.\n");
-		if($environment=='web') echo "</div>";
+		if($environment=='web') {
+            echo "</div>";
+        }
     }
     else
     {
         if($noncritical>0)
         {
-            if($environment=='web') echo "<div class=\"noncritical\">";
+            if($environment=='web') {
+                echo "<div class=\"noncritical\">";
+            }
             echo wordwrap("Some features of Weathermap will not be available to you, due to lack of support in your PHP installation. You can still proceed with Weathermap though.\n");
-            if($environment=='web') echo "</div>";
+            if($environment=='web') {
+                echo "</div>";
+            }
 
         }
         else
         {
-            if($environment=='web') echo "<div class=\"ok\">";
+            if($environment=='web') {
+                echo "<div class=\"ok\">";
+            }
             echo wordwrap("OK! Your PHP and server environment *seems* to have support for ALL of the Weathermap features. Make sure you have run this script BOTH as a web page and from the CLI to be sure, however.\n");
-            if($environment=='web') echo "</div>";
+            if($environment=='web') {
+                echo "</div>";
+            }
 
         }
     }
-      if($environment=='web') echo "</body></html>";
+      if($environment=='web') {
+          echo "</body></html>";
+      }
       
       function return_bytes($val) {
       $val = trim($val);

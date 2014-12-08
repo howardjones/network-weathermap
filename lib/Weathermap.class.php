@@ -1874,25 +1874,6 @@ class WeatherMap extends WeatherMapBase
         return 1;
     }
 
-    function findScaleExtent($scalename = "DEFAULT")
-    {
-        $max = -999999999999999999999;
-        $min = -$max;
-
-        if (isset($this->colours[$scalename])) {
-            $colours = $this->colours[$scalename];
-
-            foreach ($colours as $colour) {
-                if (!$colour['special']) {
-                    $min = min($colour['bottom'], $min);
-                    $max = max($colour['top'], $max);
-                }
-            }
-        } else {
-            wm_warn("FindScaleExtent: non-existent SCALE $scalename [WMWARN43]\n");
-        }
-        return array($min, $max);
-    }
 
     function drawLegendHorizontal($im, $scalename = "DEFAULT", $width = 400)
     {
@@ -2127,19 +2108,8 @@ class WeatherMap extends WeatherMapBase
 
             $boxheight = $tilespacing * ($nscales + 1) + 10;
 
-            $boxx = $x;
-            $boxy = $y;
             $boxx = 0;
             $boxy = 0;
-
-            // allow for X11-style negative positioning
-            if ($boxx < 0) {
-                $boxx += $this->width;
-            }
-
-            if ($boxy < 0) {
-                $boxy += $this->height;
-            }
 
             wm_debug("Scale Box is %dx%d\n", $boxwidth + 1, $boxheight + 1);
 
@@ -2217,11 +2187,11 @@ class WeatherMap extends WeatherMapBase
                         $this->myimagestring($scale_im, $font, $x + 4 + $tilewidth, $y + $tileheight, $labelstring, $this->colours['DEFAULT']['KEYTEXT'][$scale_ref]);
                         $i++;
                     }
-                    imagecopy($im, $scale_im, $this->keyx[$scalename], $this->keyy[$scalename], 0, 0, imagesx($scale_im), imagesy($scale_im));
-                    $this->keyimage[$scalename] = $scale_im;
-
                 }
             }
+
+            imagecopy($im, $scale_im, $this->keyx[$scalename], $this->keyy[$scalename], 0, 0, imagesx($scale_im), imagesy($scale_im));
+            $this->keyimage[$scalename] = $scale_im;
 
             $areaname = "LEGEND:$scalename";
 
@@ -2744,20 +2714,7 @@ class WeatherMap extends WeatherMapBase
                 if (preg_match("/^(LINK|NODE)\s+(\S+)\s*$/i", $buffer, $matches)) {
                     $objectlinecount = 0;
 
-                    if (1 == 1) {
-                        $this->ReadConfig_Commit($curobj);
-                    } else {
-                        // first, save the previous item, before starting work on the new one
-                        if ($last_seen == "NODE") {
-                            $this->nodes[$curnode->name] = $curnode;
-                            wm_debug("Saving Node: " . $curnode->name . "\n");
-                        }
-
-                        if ($last_seen == "LINK") {
-                            $this->links[$curlink->name] = $curlink;
-                            wm_debug("Saving Link: " . $curlink->name . "\n");
-                        }
-                    }
+                    $this->ReadConfig_Commit($curobj);
 
                     if ($matches[1] == 'LINK') {
                         if ($matches[2] == 'DEFAULT') {

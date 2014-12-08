@@ -340,7 +340,7 @@ function wmuiFullMapView($cycle = false, $firstonly = false, $limit_to_group = -
 
     if ($cycle) {
         print "<script src='vendor/jquery/dist/jquery.min.js'></script>";
-        print "<script src='vendor/jquery.idletimer.min.js'></script>";
+        print "<script src='vendor/jquery-idletimer/dist/idle-timer.min.js'></script>";
         $extra = "";
         if ($limit_to_group > 0) {
             $extra = " in this group";

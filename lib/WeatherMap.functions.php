@@ -191,7 +191,7 @@ function wmSprintf($format, $value, $kilo = 1000)
         $precision = ($matches[2] == '' ? 10 : intval($matches[2]));
         $joinchar = " ";
         if ($matches[1] == "-") {
-            $joinchar = " ";
+            $joinchar = "";
         }
 
         // special formatting for time_t (t) and SNMP TimeTicks (T)
@@ -593,19 +593,12 @@ function OutputHTML($htmlfile, &$map)
  * @param string $newconffile            
  * @param string $coveragefile            
  */
-function TestOutput_RunTest($conffile, $imagefile, $htmlfile, $newconffile, $coveragefile)
+function TestOutput_RunTest($conffile, $imagefile, $htmlfile, $newconffile)
 {
-//    global $weathermap_map;
     global $WEATHERMAP_VERSION;
     
     $map = new WeatherMap();
-    if ($coveragefile != '') {
-        $map->SeedCoverage();
-        if (file_exists($coveragefile)) {
-            $map->LoadCoverage($coveragefile);
-        }
-    }
-    # $weathermap_map = $conffile;
+
     $map->ReadConfig($conffile);
     $skip = 0;
     $nwarns = 0;
@@ -643,9 +636,6 @@ function TestOutput_RunTest($conffile, $imagefile, $htmlfile, $newconffile, $cov
         }
         if ($newconffile != '') {
             $map->writeConfig($newconffile);
-        }
-        if ($coveragefile != '') {
-            $map->SaveCoverage($coveragefile);
         }
         $nwarns = $map->warncount;
     }

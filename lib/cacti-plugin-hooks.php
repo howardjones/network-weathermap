@@ -7,9 +7,9 @@ function weathermap_page_head()
     if (preg_match('/plugins\/weathermap\//', $_SERVER['REQUEST_URI'], $matches)) {
         ?>
         <link rel="stylesheet" type="text/css" media="screen" href="cacti-resources/weathermap.css" />
-        <link rel="stylesheet" href="vendor/jquery-ui/css/ui-lightness/jquery-ui-1.10.3.custom.css" />
-        <script src="vendor/jquery-1.10.2.min.js"></script>
-        <script src="vendor/jquery-ui/js/jquery-ui-1.10.3.custom.min.js"></script>
+        <link rel="stylesheet" href="vendor/jquery-ui/themes/ui-lightness/jquery-ui.min.css" />
+        <script src="vendor/jquery/dist/jquery.min.js"></script>
+        <script src="vendor/jquery-ui/js/jquery-ui.min.js"></script>
     <?php
     }
 }

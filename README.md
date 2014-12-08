@@ -1,4 +1,4 @@
-# Network Weathermap # 
+# Network Weathermap
 
 *TEST RELEASE* for 0.98
 
@@ -11,7 +11,7 @@ See CHANGES for the most recent updates, listed by version.
 See COPYING for the license under which Weathermap is released.
 
 There is much more information, tutorials and updates available at:
-    [http://www.network-weathermap.com/]
+    http://www.network-weathermap.com/
 
 
 ## Other Software ##

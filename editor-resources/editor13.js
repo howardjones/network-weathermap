@@ -1,3 +1,12 @@
+"use strict";
+/*global jQuery:false */
+/*global _:false */
+/*global Nodes:false */
+/*global NodeIDs:false */
+/*global Links:false */
+/*global LinkIDs:false */
+/*jslint vars: true, plusplus: true, devel: true, nomen: true, indent: 4, maxerr: 50 */ /*global define */
+
 _.templateSettings.variable = "rc";
 
 var wmEditor = {
@@ -6,7 +15,7 @@ var wmEditor = {
     KEYCODE_N : 78,
     KEYCODE_DEL : 46,
 
-    start: function() {
+    start: function () {
         // check if there is a "No JavaScript" message
         jQuery("#nojs").hide();
 
@@ -19,7 +28,7 @@ var wmEditor = {
         wmEditor.startClickListeners();
     },
 
-    startClickListeners: function() {
+    startClickListeners: function () {
         jQuery('area[id^="LINK:"]').attr("href", "#").click(wmEditor.handleMapClick);
         jQuery('area[id^="NODE:"]').attr("href", "#").click(wmEditor.handleMapClick);
 
@@ -53,16 +62,16 @@ var wmEditor = {
         // jQuery('area[id^="LEGEN"]').attr("href", "#").click(position_legend);
     },
 
-    handleKey: function(event) {
+    handleKey: function (event) {
         if (event.keyCode == wmEditor.KEYCODE_ESCAPE) {
             wmEditor.handleUnderlayClick();
         }
 
-        if (event.which == wmEditor.KEYCODE_N) {
+        if (event.which === wmEditor.KEYCODE_N) {
             wmEditor.handleAddNode();
         }
 
-        if (event.which == wmEditor.KEYCODE_L) {
+        if (event.which === wmEditor.KEYCODE_L) {
             wmEditor.handleAddLink();
         }
     },
@@ -70,7 +79,7 @@ var wmEditor = {
     // Translate a click event into a nodeClicked or linkClicked event
     // special handlers for those events do the real work. This will allow us to have multiple methods
     // of selecting nodes/links, like a pick-list.
-    handleMapClick: function(e) {
+    handleMapClick: function (e) {
         var element_id, objectname, objecttype, objectid;
 
         console.log("Click handler!");
@@ -82,29 +91,30 @@ var wmEditor = {
         objectname = element_id.slice(5, element_id.length);
         objectid = objectname.slice(0, objectname.length - 2);
 
-        if (objecttype == 'NODE') {
+        if (objecttype === 'NODE') {
             objectname = NodeIDs[objectid];
             console.log("custom nodeClicked event for " + objectname);
             jQuery(this).trigger("nodeClicked", [objecttype, objectname]);
         }
 
-        if (objecttype == 'LINK') {
+        if (objecttype === 'LINK') {
             objectname = LinkIDs[objectid];
             console.log("custom linkClicked event for " + objectname);
             jQuery(this).trigger("linkClicked", [objecttype, objectname]);
         }
     },
 
-    handleLinkClick: function(e, type, name) {
+    handleLinkClick: function (e, type, name) {
         console.log("Showing link properties for " + name);
         wmEditor.showLinkProperties(name);
     },
 
-    handleNodeClick: function(e, type, name) {
+    handleNodeClick: function (e, type, name) {
         // TODO - check if we're in the middle of adding a node
         // don't show the properties then.
 
-        var element_id, objectname, objecttype, objectid;
+        var element_id, objectname, objecttype, objectid,
+            action = jQuery("#action").val();
 
         // alt = el.getAttribute('alt');
         element_id = jQuery(this).attr("id");
@@ -112,10 +122,10 @@ var wmEditor = {
         objectname = element_id.slice(5, element_id.length);
         objectid = objectname.slice(0, objectname.length - 2);
 
-        if (jQuery("#action").val() == 'add_link') {
+        if (action === 'add_link') {
             jQuery("#param").val(NodeIDs[objectid]);
             document.frmMain.submit();
-        } else if (jQuery("#action").val() == 'add_link2') {
+        } else if (action === 'add_link2') {
             jQuery("#param").val(NodeIDs[objectid]);
             document.frmMain.submit();
         } else {
@@ -142,18 +152,18 @@ var wmEditor = {
     },
 
     // They clicked away from the dialog. Cancel the interaction
-    handleUnderlayClick: function(e, type, name) {
+    handleUnderlayClick: function (e, type, name) {
         wmEditor.hideAllDialogs();
         jQuery('#action').val('');
         jQuery('#param').val('');
     },
 
-    showLinkProperties: function(name) {
+    showLinkProperties: function (name) {
         jQuery("#action").val("edit_link");
         wmEditor.setMapMode('existing');
         wmEditor.hideAllDialogs();
 
-        var template = _.template($("script#tpl-dialog-link-properties" ).html());
+        var template = _.template(jQuery("script#tpl-dialog-link-properties" ).html());
 
         var input = {name: name, data: Links[name], via_label: "Add Via", show_straighten: false};
 
@@ -169,12 +179,12 @@ var wmEditor = {
         jQuery("#link_bandwidth_in").focus();
     },
 
-    showNodeProperties: function(name) {
+    showNodeProperties: function (name) {
         jQuery("#action").val("edit_node");
         wmEditor.setMapMode('existing');
         wmEditor.hideAllDialogs();
 
-        var template = _.template($("script#tpl-dialog-node-properties" ).html());
+        var template = _.template(jQuery("script#tpl-dialog-node-properties" ).html());
 
         jQuery("#mainarea").after(template(Nodes[name]));
         jQuery("#param").val(name);
@@ -183,26 +193,26 @@ var wmEditor = {
         jQuery("#node_new_name").focus();
     },
 
-    showMapProperties: function() {
+    showMapProperties: function () {
         wmEditor.hideAllDialogs();
 
-        var template = _.template($("script#tpl-dialog-map-properties" ).html());
+        var template = _.template(jQuery("script#tpl-dialog-map-properties" ).html());
         jQuery("#mainarea").after(template(Map));
         jQuery("#dlgMapProperties").show();
         jQuery("#dlgMapProperties").draggable({handle:"h3"});
     },
 
-    hideAllDialogs: function() {
+    hideAllDialogs: function () {
         jQuery(".dlgProperties").remove();
         jQuery('.dlgUnderlay').remove();
     },
 
-    setMapMode: function(new_mode) {
-        if (new_mode == 'xy') {
+    setMapMode: function (new_mode) {
+        if (new_mode === 'xy') {
             jQuery("#debug").val("xy");
             jQuery("#xycapture").show();
             jQuery("#existingdata").hide();
-        } else if (new_mode == 'existing') {
+        } else if (new_mode === 'existing') {
             jQuery("#debug").val("existing");
             jQuery("#existingdata").show();
             jQuery("#xycapture").hide();
@@ -210,65 +220,52 @@ var wmEditor = {
             alert('invalid mode');
         }
     },
-    handleAddNode:   function(event, type, name) {
+    handleAddNode:   function (event, type, name) {
         console.log("in handleAddNode");
         wmEditor.setMapMode('xy');
         jQuery("#action").val("add_node");
     },
-    handleAddLink:   function(event, type, name) {
+    handleAddLink:   function (event, type, name) {
         console.log("in handleAddLink");
         jQuery("#action").val("add_link");
         wmEditor.setMapMode('existing');
     },
-    handleDeleteNode: function(event, type, name) {
+    handleDeleteNode: function (event, type, name) {
         jQuery('#action').val('delete_node');
         document.frmMain.submit();
     },
-    handleDeleteLink: function(event, type, name) {
+    handleDeleteLink: function (event, type, name) {
         jQuery('#action').val('delete_link');
         document.frmMain.submit();
     },
-    handleStraighten: function(event, type, name) {
+    handleStraighten: function (event, type, name) {
         jQuery('#action').val('straight_link');
         document.frmMain.submit();
     },
-    handleAddVia: function(event, type, name) {
+    handleAddVia: function (event, type, name) {
         console.log("in handleAddVia - setting xy mode");
         jQuery('#action').val('via_link');
         wmEditor.hideAllDialogs();
         wmEditor.setMapMode('xy');
     },
-    handleTidyLink: function(event, type, name) {
+    handleTidyLink: function (event, type, name) {
         jQuery('#action').val('link_tidy');
         document.frmMain.submit();
     },
-    handleCloneNode: function(event, type, name) {
+    handleCloneNode: function (event, type, name) {
         jQuery('#action').val('clone_node');
         document.frmMain.submit();
     },
-    handleMoveNode: function(event, type, name) {
+    handleMoveNode: function (event, type, name) {
         console.log("move node - setting xy mode");
         jQuery('#action').val('move_node');
         wmEditor.hideAllDialogs();
         wmEditor.setMapMode("xy");
     },
-    handleMapProperties: function(event, type, name) {
+    handleMapProperties: function (event, type, name) {
 
         console.log("in handleMapProperties");
         wmEditor.showMapProperties();
-    },
-    setMapMode: function(mode) {
-        if (mode == 'xy') {
-            jQuery('#debug').value='xy';
-            jQuery('#existingdata').hide();
-            jQuery('#xycapture').show();
-        } else if (mode == 'existing') {
-            jQuery('#debug').value='existing';
-            jQuery('#xycapture').hide();
-            jQuery('#existingdata').show();
-        } else {
-            alert('invalid mode');
-        }
     }
 };
 

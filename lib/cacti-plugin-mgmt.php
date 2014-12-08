@@ -424,7 +424,7 @@ function wmMapManagementList4()
         printf("<h3 class=wm_group>%s <span class='wm_controls'>[Add Map][Settings][Rename][Delete][Move Up][Move Down]</span></h3>\n", $groupname);
 
         $i = 0;
-        $g = 0;
+
         $queryrows = db_fetch_assoc(sprintf("select weathermap_maps.* from weathermap_maps where weathermap_maps.group_id=%d order by sortorder", $group_id));
 
         if (is_array($queryrows) && count($queryrows) > 0) {
@@ -819,16 +819,16 @@ function wmuiMapFilePicker($show_all = false)
     }
 
     html_start_box("<strong>Available Weathermap Configuration Files</strong>", "78%", $colors["header"], "1", "center", "");
+    $nFiles=0;
 
     if (is_dir($weathermap_confdir)) {
-        $n=0;
-        $dh = opendir($weathermap_confdir);
-        if ($dh) {
-            $i = 0;
-            $skipped = 0;
+
+        $dirhandle = opendir($weathermap_confdir);
+        if ($dirhandle) {
+            $nSkipped = 0;
             html_header(array("", "", "Config File", "Title", ""), 2);
 
-            while ($file = readdir($dh)) {
+            while ($file = readdir($dirhandle)) {
                 $realfile = $weathermap_confdir.'/'.$file;
 
                 // skip .-prefixed files like .htaccess, since it seems
@@ -843,24 +843,24 @@ function wmuiMapFilePicker($show_all = false)
 
                     if (is_file($realfile)) {
                         if ($used && !$show_all) {
-                            $skipped++;
+                            $nSkipped++;
                         } else {
                             $title = wmMapGetTitleFromFile($realfile);
                             $titles[$file] = $title;
-                            $i++;
+                            $nFiles++;
                         }
                     }
                 }
             }
-            closedir($dh);
+            closedir($dirhandle);
 
-            if ($i>0) {
+            if ($nFiles>0) {
                 ksort($titles);
 
-                $i=0;
+                $nFiles=0;
                 foreach ($titles as $file => $title) {
                     $title = $titles[$file];
-                    form_alternate_row_color($colors["alternate"], $colors["light"], $i);
+                    form_alternate_row_color($colors["alternate"], $colors["light"], $nFiles);
                     print '<td><a href="?action=addmap&amp;file='.$file.'" title="Add the configuration file">Add</a></td>';
                     print '<td><a href="?action=viewconfig&amp;file='.$file.'" title="View the configuration file in a new window" target="_blank">View</a></td>';
                     print '<td>'.htmlspecialchars($file);
@@ -870,16 +870,16 @@ function wmuiMapFilePicker($show_all = false)
                     print '</td>';
                     print '<td><em>'.htmlspecialchars($title).'</em></td>';
                     print '</tr>';
-                    $i++;
+                    $nFiles++;
                 }
             }
 
-            if (($i + $skipped) == 0) {
+            if (($nFiles + $nSkipped) == 0) {
                 print "<tr><td>No files were found in the configs directory.</td></tr>";
             }
 
-            if (($i == 0) && $skipped>0) {
-                print "<tr><td>($skipped files weren't shown because they are already in the database</td></tr>";
+            if (($nFiles == 0) && $nSkipped>0) {
+                print "<tr><td>($nSkipped files weren't shown because they are already in the database</td></tr>";
             }
         } else {
             print "<tr><td>Can't open $weathermap_confdir to read - you should set it to be readable by the webserver.</td></tr>";
@@ -890,7 +890,7 @@ function wmuiMapFilePicker($show_all = false)
 
     html_end_box();
 
-    if ($skipped>0) {
+    if ($nSkipped>0) {
         print "<p align=center>Some files are not shown because they have already been added. You can <a href='?action=addmap_picker&show=all'>show these files too</a>, if you need to.</p>";
     }
     if ($show_all) {
@@ -919,12 +919,12 @@ function wmuiPreviewConfig($file)
         print '<pre>';
         $realfile = $weathermap_confdir.'/'.$file;
         if (is_file($realfile)) {
-            $fd = fopen($realfile, "r");
-            while (!feof($fd)) {
-                $buffer = fgets($fd, 4096);
+            $filehandle = fopen($realfile, "r");
+            while (!feof($filehandle)) {
+                $buffer = fgets($filehandle, 4096);
                 print $buffer;
             }
-            fclose($fd);
+            fclose($filehandle);
         }
         print '</pre>';
         print '</td></tr>';
@@ -970,9 +970,9 @@ function wmMapAdd($file)
 function wmMapGetTitleFromFile($filename)
 {
     $title = "(no title)";
-    $fd = fopen($filename, "r");
-    while (!feof($fd)) {
-        $buffer = fgets($fd, 4096);
+    $filehandle = fopen($filename, "r");
+    while (!feof($filehandle)) {
+        $buffer = fgets($filehandle, 4096);
         if (preg_match("/^\s*TITLE\s+(.*)/i", $buffer, $matches)) {
             $title = $matches[1];
             break;
@@ -985,7 +985,7 @@ function wmMapGetTitleFromFile($filename)
         // strip out any DOS line endings that got through
         $title=str_replace("\r", "", $title);
     }
-    fclose($fd);
+    fclose($filehandle);
 
     return($title);
 }
@@ -1069,16 +1069,16 @@ function wmuiMapPermissionsPage($id)
     html_start_box("<strong>Edit permissions for Weathermap $id: $title</strong>", "70%", $colors["header"], "2", "center", "");
     html_header(array("Username", ""));
 
-    $n = 0;
+    $row = 0;
     foreach ($mapuserids as $user) {
-        form_alternate_row_color($colors["alternate"], $colors["light"], $n);
+        form_alternate_row_color($colors["alternate"], $colors["light"], $row);
         print "<td>".$users[$user]."</td>";
         print '<td><a href="?action=perms_delete_user&mapid='.$id.'&userid='.$user.'"><img src="../../images/delete_icon.gif" width="10" height="10" border="0" alt="Remove permissions for this user to see this map"></a></td>';
 
         print "</tr>";
-        $n++;
+        $row++;
     }
-    if ($n==0) {
+    if ($row==0) {
         print "<tr><td><em><strong>nobody</strong> can see this map</em></td></tr>";
     }
     html_end_box();
@@ -1141,18 +1141,18 @@ function wmuiMapSettingsPage($id)
     html_start_box("<strong>$title</strong>", "70%", $colors["header"], "2", "center", "weathermap-cacti-plugin-mgmt.php?action=map_settings_form&mapid=".intval($id));
     html_header(array("", "Name", "Value", ""));
 
-    $n=0;
+    $row=0;
 
     if (is_array($settingrows)) {
         if (sizeof($settingrows)>0) {
             foreach ($settingrows as $setting) {
-                form_alternate_row_color($colors["alternate"], $colors["light"], $n);
+                form_alternate_row_color($colors["alternate"], $colors["light"], $row);
                 print '<td><a href="?action=map_settings_form&mapid='.$id.'&id='.intval($setting['id']).'"><img src="../../images/graph_properties.gif" width="16" height="16" border="0" alt="Edit this definition">Edit</a></td>';
                 print "<td>".htmlspecialchars($setting['optname'])."</td>";
                 print "<td>".htmlspecialchars($setting['optvalue'])."</td>";
                 print '<td><a href="?action=map_settings_delete&mapid='.$id.'&id='.intval($setting['id']).'"><img src="../../images/delete_icon_large.gif" width="12" height="12" border="0" alt="Remove this definition from this map"></a></td>';
                 print "</tr>";
-                $n++;
+                $row++;
             }
         } else {
             print "<tr>";
@@ -1192,20 +1192,20 @@ function wmuiMapSettingsReadOnly($id, $title = "Settings")
     html_start_box("<strong>$title</strong>", "70%", $colors["header"], "2", "center", "");
     html_header(array("", "Name", "Value", ""));
 
-    $n=0;
+    $row=0;
 
     if (sizeof($settings)>0) {
         foreach ($settings as $setting) {
-            form_alternate_row_color($colors["alternate"], $colors["light"], $n);
+            form_alternate_row_color($colors["alternate"], $colors["light"], $row);
             print "<td></td>";
             print "<td>".htmlspecialchars($setting['optname'])."</td>";
             print "<td>".htmlspecialchars($setting['optvalue'])."</td>";
             print "<td></td>";
             print "</tr>";
-            $n++;
+            $row++;
         }
     } else {
-        form_alternate_row_color($colors["alternate"], $colors["light"], $n);
+        form_alternate_row_color($colors["alternate"], $colors["light"], $row);
         print "<td colspan=4><em>No Settings</em></td>";
         print "</tr>";
     }
@@ -1364,12 +1364,12 @@ function wmuiGroupList()
 
     $groups = db_fetch_assoc("select * from weathermap_groups order by sortorder");
 
-    $n = 0;
+    $row = 0;
 
     if (is_array($groups)) {
         if (sizeof($groups)>0) {
             foreach ($groups as $group) {
-                form_alternate_row_color($colors["alternate"], $colors["light"], $n);
+                form_alternate_row_color($colors["alternate"], $colors["light"], $row);
                 print '<td><a href="weathermap-cacti-plugin-mgmt.php?action=group_form&id='.intval($group['id']).'"><img src="../../images/graph_properties.gif" width="16" height="16" border="0" alt="Rename This Group" title="Rename This Group">Rename</a></td>';
                 print "<td>".htmlspecialchars($group['name'])."</td>";
 
@@ -1404,7 +1404,7 @@ function wmuiGroupList()
                 print '</td>';
 
                 print "</tr>";
-                $n++;
+                $row++;
             }
         } else {
             print "<tr>";

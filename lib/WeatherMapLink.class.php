@@ -515,7 +515,7 @@ class WeatherMapLink extends WeatherMapItem
         if ($this->config_override != '') {
             $output = $this->config_override."\n";
         } else {
-            $dd = $this->owner->links[$this->template];
+            $default_default = $this->owner->links[$this->template];
 
             wm_debug("Writing config for LINK $this->name against $this->template\n");
 
@@ -551,7 +551,7 @@ class WeatherMapLink extends WeatherMapItem
                 $field = $param[0];
                 $keyword = $param[1];
 
-                if ($this->$field != $dd->$field) {
+                if ($this->$field != $default_default->$field) {
                     if ($param[2] == CONFIG_TYPE_COLOR) {
                         $output .= "\t$keyword " . $this->$field->asConfig() . "\n";
                     }
@@ -562,7 +562,7 @@ class WeatherMapLink extends WeatherMapItem
             }
 
             $val = $this->usescale . " " . $this->scaletype;
-            $comparison = $dd->usescale . " " . $dd->scaletype;
+            $comparison = $default_default->usescale . " " . $default_default->scaletype;
 
             if (($val != $comparison)) {
                 $output.="\tUSESCALE " . $val . "\n";
@@ -575,7 +575,7 @@ class WeatherMapLink extends WeatherMapItem
             }
 
             foreach ($dirs as $dir => $tdir) {
-                if ($this->infourl[$dir] != $dd->infourl[$dir]) {
+                if ($this->infourl[$dir] != $default_default->infourl[$dir]) {
                     $output .= "\t" . $tdir . "INFOURL " . $this->infourl[$dir] . "\n";
                 }
             }
@@ -587,7 +587,7 @@ class WeatherMapLink extends WeatherMapItem
             }
 
             foreach ($dirs as $dir => $tdir) {
-                if ($this->overlibcaption[$dir] != $dd->overlibcaption[$dir]) {
+                if ($this->overlibcaption[$dir] != $default_default->overlibcaption[$dir]) {
                     $output .= "\t".$tdir."OVERLIBCAPTION " . $this->overlibcaption[$dir] . "\n";
                 }
             }
@@ -599,7 +599,7 @@ class WeatherMapLink extends WeatherMapItem
             }
 
             foreach ($dirs as $dir => $tdir) {
-                if ($this->notestext[$dir] != $dd->notestext[$dir]) {
+                if ($this->notestext[$dir] != $default_default->notestext[$dir]) {
                     $output .= "\t" . $tdir . "NOTES " . $this->notestext[$dir] . "\n";
                 }
             }
@@ -611,7 +611,7 @@ class WeatherMapLink extends WeatherMapItem
             }
 
             foreach ($dirs as $dir => $tdir) {
-                if ($this->overliburl[$dir] != $dd->overliburl[$dir]) {
+                if ($this->overliburl[$dir] != $default_default->overliburl[$dir]) {
                     $output.="\t".$tdir."OVERLIBGRAPH " . join(" ", $this->overliburl[$dir]) . "\n";
                 }
             }
@@ -629,41 +629,41 @@ class WeatherMapLink extends WeatherMapItem
 
             // if specific formats have been set, then the style will be '--'
             // if it isn't then use the named style
-            if (($this->labelstyle != $dd->labelstyle) && ($this->labelstyle != '--')) {
+            if (($this->labelstyle != $default_default->labelstyle) && ($this->labelstyle != '--')) {
                 $output .= "\tBWLABEL " . $this->labelstyle . "\n";
             }
 
             // if either IN or OUT field changes, then both must be written because a regular BWLABEL can't do it
             // XXX this looks wrong
-            $comparison = $dd->bwlabelformats[IN];
-            $comparison2 = $dd->bwlabelformats[OUT];
+            $comparison = $default_default->bwlabelformats[IN];
+            $comparison2 = $default_default->bwlabelformats[OUT];
 
             if (($this->labelstyle == '--') && ( ($this->bwlabelformats[IN] != $comparison) || ($this->bwlabelformats[OUT]!= '--'))) {
                 $output .= "\tINBWFORMAT " . $this->bwlabelformats[IN]. "\n";
                 $output .= "\tOUTBWFORMAT " . $this->bwlabelformats[OUT]. "\n";
             }
 
-            $comparison = $dd->labeloffset_in;
-            $comparison2 = $dd->labeloffset_out;
+            $comparison = $default_default->labeloffset_in;
+            $comparison2 = $default_default->labeloffset_out;
 
             if (($this->labeloffset_in != $comparison) || ($this->labeloffset_out != $comparison2)) {
                 $output .="\tBWLABELPOS " . $this->labeloffset_in . " " . $this->labeloffset_out . "\n";
             }
 
-            $comparison=$dd->commentoffset_in.":".$dd->commentoffset_out;
+            $comparison=$default_default->commentoffset_in.":".$default_default->commentoffset_out;
             $mine = $this->commentoffset_in.":".$this->commentoffset_out;
             if ($mine != $comparison) {
                 $output.="\tCOMMENTPOS " . $this->commentoffset_in." ".$this->commentoffset_out. "\n";
             }
 
 
-            $comparison=$dd->targets;
+            $comparison=$default_default->targets;
 
             if ($this->targets != $comparison) {
                 $output .= "\tTARGET";
 
                 foreach ($this->targets as $target) {
-                    if (strpos($target[4], " ") == false) {
+                    if (strpos($target[4], " ") === false) {
                         $output .= " " . $target[4];
                     } else {
                         $output .= ' "' . $target[4] . '"';
@@ -680,7 +680,7 @@ class WeatherMapLink extends WeatherMapItem
                     $tdir="OUT";
                 }
 
-                $comparison=$dd->comments[$dir];
+                $comparison=$default_default->comments[$dir];
                 if ($this->comments[$dir] != $comparison) {
                     $output .= "\t" . $tdir . "COMMENT " . $this->comments[$dir] . "\n";
                 }
@@ -712,8 +712,8 @@ class WeatherMapLink extends WeatherMapItem
                 }
             }
 
-            if (($this->max_bandwidth_in != $dd->max_bandwidth_in)
-            || ($this->max_bandwidth_out != $dd->max_bandwidth_out)
+            if (($this->max_bandwidth_in != $default_default->max_bandwidth_in)
+            || ($this->max_bandwidth_out != $default_default->max_bandwidth_out)
             || ($this->name == 'DEFAULT')
             ) {
                 if ($this->max_bandwidth_in == $this->max_bandwidth_out) {
@@ -727,9 +727,9 @@ class WeatherMapLink extends WeatherMapItem
                 // all hints for DEFAULT node are for writing
                 // only changed ones, or unique ones, otherwise
                 if (($this->name == 'DEFAULT')
-                || (isset($dd->hints[$hintname])
-                && $dd->hints[$hintname] != $hint)
-                || (!isset($dd->hints[$hintname]))
+                || (isset($default_default->hints[$hintname])
+                && $default_default->hints[$hintname] != $hint)
+                || (!isset($default_default->hints[$hintname]))
                 ) {
                     $output .= "\tSET $hintname $hint\n";
                 }
@@ -744,86 +744,86 @@ class WeatherMapLink extends WeatherMapItem
 
     function asJS()
     {
-        $js='';
-        $js.="Links[" . jsEscape($this->name) . "] = {";
-        $js .= "\"id\":" . $this->id. ", ";
+        $output='';
+        $output.="Links[" . jsEscape($this->name) . "] = {";
+        $output .= "\"id\":" . $this->id. ", ";
 
         if (isset($this->a)) {
-            $js.="a:'" . $this->a->name . "', ";
-            $js.="b:'" . $this->b->name . "', ";
+            $output.="a:'" . $this->a->name . "', ";
+            $output.="b:'" . $this->b->name . "', ";
         }
 
-        $js.="width:'" . $this->width . "', ";
-        $js.="target:";
+        $output.="width:'" . $this->width . "', ";
+        $output.="target:";
 
         $tgt='';
 
         foreach ($this->targets as $target) {
-            if (strpos($target[4], " ") == false) {
+            if (strpos($target[4], " ") === false) {
                 $tgt .= $target[4] . ' ';
             } else {
                 $tgt .= '"'.$target[4] . '" ';
             }
         }
 
-        $js.=jsEscape(trim($tgt));
-        $js.=",";
+        $output.=jsEscape(trim($tgt));
+        $output.=",";
 
-        $js.="bw_in:" . jsEscape($this->max_bandwidth_in_cfg) . ", ";
-        $js.="bw_out:" . jsEscape($this->max_bandwidth_out_cfg) . ", ";
+        $output.="bw_in:" . jsEscape($this->max_bandwidth_in_cfg) . ", ";
+        $output.="bw_out:" . jsEscape($this->max_bandwidth_out_cfg) . ", ";
 
-        $js.="name:" . jsEscape($this->name) . ", ";
-        $js.="overlibwidth:'" . $this->overlibheight . "', ";
-        $js.="overlibheight:'" . $this->overlibwidth . "', ";
-        $js.="overlibcaption:" . jsEscape($this->overlibcaption[IN]) . ", ";
+        $output.="name:" . jsEscape($this->name) . ", ";
+        $output.="overlibwidth:'" . $this->overlibheight . "', ";
+        $output.="overlibheight:'" . $this->overlibwidth . "', ";
+        $output.="overlibcaption:" . jsEscape($this->overlibcaption[IN]) . ", ";
 
-        $js.="commentin:" . jsEscape($this->comments[IN]) . ", ";
-        $js.="commentposin:" . intval($this->commentoffset_in) . ", ";
+        $output.="commentin:" . jsEscape($this->comments[IN]) . ", ";
+        $output.="commentposin:" . intval($this->commentoffset_in) . ", ";
 
-        $js.="commentout:" . jsEscape($this->comments[OUT]) . ", ";
-        $js.="commentposout:" . intval($this->commentoffset_out) . ", ";
+        $output.="commentout:" . jsEscape($this->comments[OUT]) . ", ";
+        $output.="commentposout:" . intval($this->commentoffset_out) . ", ";
 
-        $js.="infourl:" . jsEscape($this->infourl[IN]) . ", ";
-        $js.="overliburl:" . jsEscape(join(" ", $this->overliburl[IN])). ", ";
+        $output.="infourl:" . jsEscape($this->infourl[IN]) . ", ";
+        $output.="overliburl:" . jsEscape(join(" ", $this->overliburl[IN])). ", ";
         
-        $js .= "via: [";
-        $ii = 0;
+        $output .= "via: [";
+        $nItem = 0;
         foreach ($this->vialist as $via) {
-            if ($ii > 0) {
-                $js .= ", ";
+            if ($nItem > 0) {
+                $output .= ", ";
             }
-            $js .= sprintf("[%d,%d", $via[0], $via[1]);
+            $output .= sprintf("[%d,%d", $via[0], $via[1]);
             if (isset($via[2])) {
-                $js .= ",".jsEscape($via[2]);
+                $output .= ",".jsEscape($via[2]);
             }
-            $js .= "]";
+            $output .= "]";
             
-            $ii++;
+            $nItem++;
         }
         
-        $js .= "]";
+        $output .= "]";
         
 
-        $js.="};\n";
-        $js .= "LinkIDs[\"L" . $this->id . "\"] = ". jsEscape($this->name) . ";\n";
-        return $js;
+        $output.="};\n";
+        $output .= "LinkIDs[\"L" . $this->id . "\"] = ". jsEscape($this->name) . ";\n";
+        return $output;
     }
 
     function asJSON($complete = true)
     {
-        $js = '';
-        $js .= "" . jsEscape($this->name) . ": {";
-        $js .= "\"id\":" . $this->id. ", ";
+        $output = '';
+        $output .= "" . jsEscape($this->name) . ": {";
+        $output .= "\"id\":" . $this->id. ", ";
         if (isset($this->a)) {
-            $js.="\"a\":\"" . $this->a->name . "\", ";
-            $js.="\"b\":\"" . $this->b->name . "\", ";
+            $output.="\"a\":\"" . $this->a->name . "\", ";
+            $output.="\"b\":\"" . $this->b->name . "\", ";
         }
 
         if ($complete) {
-            $js.="\"infourl\":" . jsEscape($this->infourl) . ", ";
-            $js.="\"overliburl\":" . jsEscape($this->overliburl). ", ";
-            $js.="\"width\":\"" . $this->width . "\", ";
-            $js.="\"target\":";
+            $output.="\"infourl\":" . jsEscape($this->infourl) . ", ";
+            $output.="\"overliburl\":" . jsEscape($this->overliburl). ", ";
+            $output.="\"width\":\"" . $this->width . "\", ";
+            $output.="\"target\":";
 
             $tgt="";
 
@@ -831,16 +831,16 @@ class WeatherMapLink extends WeatherMapItem
                 $tgt.=$target[4] . " ";
             }
 
-            $js.=jsEscape(trim($tgt));
-            $js.=",";
+            $output.=jsEscape(trim($tgt));
+            $output.=",";
 
-            $js.="\"bw_in\":" . jsEscape($this->max_bandwidth_in_cfg) . ", ";
-            $js.="\"bw_out\":" . jsEscape($this->max_bandwidth_out_cfg) . ", ";
+            $output.="\"bw_in\":" . jsEscape($this->max_bandwidth_in_cfg) . ", ";
+            $output.="\"bw_out\":" . jsEscape($this->max_bandwidth_out_cfg) . ", ";
 
-            $js.="\"name\":" . jsEscape($this->name) . ", ";
-            $js.="\"overlibwidth\":\"" . $this->overlibheight . "\", ";
-            $js.="\"overlibheight\":\"" . $this->overlibwidth . "\", ";
-            $js.="\"overlibcaption\":" . jsEscape($this->overlibcaption) . ", ";
+            $output.="\"name\":" . jsEscape($this->name) . ", ";
+            $output.="\"overlibwidth\":\"" . $this->overlibheight . "\", ";
+            $output.="\"overlibheight\":\"" . $this->overlibwidth . "\", ";
+            $output.="\"overlibcaption\":" . jsEscape($this->overlibcaption) . ", ";
         }
         $vias = "\"via\": [";
         foreach ($this->vialist as $via) {
@@ -849,10 +849,10 @@ class WeatherMapLink extends WeatherMapItem
         $vias .= "],";
         $vias = str_replace("],],", "]]", $vias);
         $vias = str_replace("[],", "[]", $vias);
-        $js .= $vias;
+        $output .= $vias;
 
-        $js.="},\n";
-        return $js;
+        $output.="},\n";
+        return $output;
     }
 }
 

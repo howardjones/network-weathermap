@@ -726,7 +726,7 @@ class WeatherMapNode extends WeatherMapItem
             $output  = $this->config_override."\n";
         } else {
             // this is our template. Anything we do different should be written
-            $dd = $this->owner->nodes[$this->template];
+            $default_default = $this->owner->nodes[$this->template];
 
             wm_debug("Writing config for NODE $this->name against $this->template\n");
 
@@ -756,7 +756,7 @@ class WeatherMapNode extends WeatherMapItem
                 $field = $param[0];
                 $keyword = $param[1];
 
-                if ($this->$field != $dd->$field) {
+                if ($this->$field != $default_default->$field) {
                     if ($param[2] == CONFIG_TYPE_COLOR) {
                         $output.="\t$keyword " . $this->$field->asConfig() . "\n";
                     }
@@ -767,26 +767,26 @@ class WeatherMapNode extends WeatherMapItem
             }
 
             // IN/OUT are the same, so we can use the simpler form here
-            if ($this->infourl[IN] != $dd->infourl[IN]) {
+            if ($this->infourl[IN] != $default_default->infourl[IN]) {
                 $output.="\tINFOURL " . $this->infourl[IN] . "\n";
             }
 
-            if ($this->overlibcaption[IN] != $dd->overlibcaption[IN]) {
+            if ($this->overlibcaption[IN] != $default_default->overlibcaption[IN]) {
                 $output.="\tOVERLIBCAPTION " . $this->overlibcaption[IN] . "\n";
             }
 
             // IN/OUT are the same, so we can use the simpler form here
-            if ($this->notestext[IN] != $dd->notestext[IN]) {
+            if ($this->notestext[IN] != $default_default->notestext[IN]) {
                 $output.="\tNOTES " . $this->notestext[IN] . "\n";
             }
 
-            if ($this->overliburl[IN] != $dd->overliburl[IN]) {
+            if ($this->overliburl[IN] != $default_default->overliburl[IN]) {
                 $output.="\tOVERLIBGRAPH " . join(" ", $this->overliburl[IN]) . "\n";
             }
 
             $val = $this->iconscalew. " " . $this->iconscaleh. " " .$this->iconfile;
 
-            $comparison = $dd->iconscalew. " " . $dd->iconscaleh . " " . $dd->iconfile;
+            $comparison = $default_default->iconscalew. " " . $default_default->iconscaleh . " " . $default_default->iconfile;
 
             if ($val != $comparison) {
                 $output .= "\tICON ";
@@ -796,11 +796,11 @@ class WeatherMapNode extends WeatherMapItem
                 $output .= ($this->iconfile=='' ?  'none' : $this->iconfile) . "\n";
             }
 
-            if ($this->targets != $dd->targets) {
+            if ($this->targets != $default_default->targets) {
                 $output.="\tTARGET";
 
                 foreach ($this->targets as $target) {
-                    if (strpos($target[4], " ") == false) {
+                    if (strpos($target[4], " ") === false) {
                         $output.=" " . $target[4];
                     } else {
                         $output.=' "' . $target[4].'"';
@@ -810,28 +810,28 @@ class WeatherMapNode extends WeatherMapItem
             }
 
             $val = $this->usescale . " " . $this->scalevar . " " . $this->scaletype;
-            $comparison = $dd->usescale . " " . $dd->scalevar . " " . $dd->scaletype;
+            $comparison = $default_default->usescale . " " . $default_default->scalevar . " " . $default_default->scaletype;
 
             if (($val != $comparison)) {
                 $output.="\tUSESCALE " . $val . "\n";
             }
 
             $val = $this->useiconscale . " " . $this->iconscalevar;
-            $comparison= $dd->useiconscale . " " . $dd->iconscalevar;
+            $comparison= $default_default->useiconscale . " " . $default_default->iconscalevar;
 
             if ($val != $comparison) {
                 $output.="\tUSEICONSCALE " .$val . "\n";
             }
 
             $val = $this->labeloffsetx . " " . $this->labeloffsety;
-            $comparison = $dd->labeloffsetx . " " . $dd->labeloffsety;
+            $comparison = $default_default->labeloffsetx . " " . $default_default->labeloffsety;
 
             if ($comparison != $val) {
                 $output.="\tLABELOFFSET " . $val . "\n";
             }
 
             $val = $this->x . " " . $this->y;
-            $comparison = $dd->x . " " . $dd->y;
+            $comparison = $default_default->x . " " . $default_default->y;
 
             if ($val != $comparison) {
                 if ($this->relative_to == '') {
@@ -847,8 +847,8 @@ class WeatherMapNode extends WeatherMapItem
                 }
             }
 
-            if (($this->max_bandwidth_in != $dd->max_bandwidth_in)
-                || ($this->max_bandwidth_out != $dd->max_bandwidth_out)
+            if (($this->max_bandwidth_in != $default_default->max_bandwidth_in)
+                || ($this->max_bandwidth_out != $default_default->max_bandwidth_out)
                     || ($this->name == 'DEFAULT')
             ) {
                 if ($this->max_bandwidth_in == $this->max_bandwidth_out) {
@@ -862,9 +862,9 @@ class WeatherMapNode extends WeatherMapItem
                 // if the offset exists with different values, or
                 // doesn't exist at all in the template, we need to write
                 // some config for it
-                if ((array_key_exists($off_name, $dd->named_offsets))) {
-                    $ox = $dd->named_offsets[$off_name][0];
-                    $oy = $dd->named_offsets[$off_name][1];
+                if ((array_key_exists($off_name, $default_default->named_offsets))) {
+                    $ox = $default_default->named_offsets[$off_name][0];
+                    $oy = $default_default->named_offsets[$off_name][1];
 
                     if ($ox != $off_pos[0] || $oy != $off_pos[1]) {
                         $output .= sprintf("\tDEFINEOFFSET %s %d %d\n", $off_name, $off_pos[0], $off_pos[1]);
@@ -879,11 +879,11 @@ class WeatherMapNode extends WeatherMapItem
                 // only changed ones, or unique ones, otherwise
                 if (($this->name == 'DEFAULT')
                     ||
-                    (isset($dd->hints[$hintname])
+                    (isset($default_default->hints[$hintname])
                         &&
-                        $dd->hints[$hintname] != $hint)
+                        $default_default->hints[$hintname] != $hint)
                     ||
-                    (!isset($dd->hints[$hintname]))
+                    (!isset($default_default->hints[$hintname]))
                 ) {
                     $output .= "\tSET $hintname $hint\n";
                 }

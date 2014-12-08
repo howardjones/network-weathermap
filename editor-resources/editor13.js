@@ -5,7 +5,8 @@
 /*global NodeIDs:false */
 /*global Links:false */
 /*global LinkIDs:false */
-/*jslint vars: true, plusplus: true, devel: true, nomen: true, indent: 4, maxerr: 50 */ /*global define */
+/*global document:false */
+/*jslint vars: true, plusplus: true, devel: true, nomen: true, indent: 4, maxerr: 50 */
 
 _.templateSettings.variable = "rc";
 
@@ -53,7 +54,7 @@ var wmEditor = {
         };
 
         jQuery.each(click_listeners, function (selector, handler) {
-            jQuery(document).on("click",selector, handler);
+            jQuery(document).on("click", selector, handler);
         });
         // keyboard shortcuts
         jQuery(document).on('keyup', wmEditor.handleKey);
@@ -63,7 +64,7 @@ var wmEditor = {
     },
 
     handleKey: function (event) {
-        if (event.keyCode == wmEditor.KEYCODE_ESCAPE) {
+        if (event.keyCode === wmEditor.KEYCODE_ESCAPE) {
             wmEditor.handleUnderlayClick();
         }
 
@@ -79,7 +80,7 @@ var wmEditor = {
     // Translate a click event into a nodeClicked or linkClicked event
     // special handlers for those events do the real work. This will allow us to have multiple methods
     // of selecting nodes/links, like a pick-list.
-    handleMapClick: function (e) {
+    handleMapClick: function () {
         var element_id, objectname, objecttype, objectid;
 
         console.log("Click handler!");
@@ -105,15 +106,18 @@ var wmEditor = {
     },
 
     handleLinkClick: function (e, type, name) {
+        undefined(e, type);
         console.log("Showing link properties for " + name);
         wmEditor.showLinkProperties(name);
     },
 
     handleNodeClick: function (e, type, name) {
+        undefined(e, type);
+
         // TODO - check if we're in the middle of adding a node
         // don't show the properties then.
 
-        var element_id, objectname, objecttype, objectid,
+        var element_id, objectname, objectid,
             action = jQuery("#action").val();
 
         // alt = el.getAttribute('alt');
@@ -152,7 +156,7 @@ var wmEditor = {
     },
 
     // They clicked away from the dialog. Cancel the interaction
-    handleUnderlayClick: function (e, type, name) {
+    handleUnderlayClick: function () {
         wmEditor.hideAllDialogs();
         jQuery('#action').val('');
         jQuery('#param').val('');
@@ -163,7 +167,7 @@ var wmEditor = {
         wmEditor.setMapMode('existing');
         wmEditor.hideAllDialogs();
 
-        var template = _.template(jQuery("script#tpl-dialog-link-properties" ).html());
+        var template = _.template(jQuery("script#tpl-dialog-link-properties").html());
 
         var input = {name: name, data: Links[name], via_label: "Add Via", show_straighten: false};
 
@@ -172,10 +176,10 @@ var wmEditor = {
             input.show_straighten = true;
         }
 
-        jQuery("#mainarea").after(template( input ));
+        jQuery("#mainarea").after(template(input));
         jQuery("#param").val(name);
         jQuery("#dlgLinkProperties").show();
-        jQuery("#dlgLinkProperties").draggable({handle:"h3"});
+        jQuery("#dlgLinkProperties").draggable({handle: "h3"});
         jQuery("#link_bandwidth_in").focus();
     },
 
@@ -184,22 +188,22 @@ var wmEditor = {
         wmEditor.setMapMode('existing');
         wmEditor.hideAllDialogs();
 
-        var template = _.template(jQuery("script#tpl-dialog-node-properties" ).html());
+        var template = _.template(jQuery("script#tpl-dialog-node-properties").html());
 
         jQuery("#mainarea").after(template(Nodes[name]));
         jQuery("#param").val(name);
         jQuery("#dlgNodeProperties").show();
-        jQuery("#dlgNodeProperties").draggable({handle:"h3"});
+        jQuery("#dlgNodeProperties").draggable({handle: "h3"});
         jQuery("#node_new_name").focus();
     },
 
     showMapProperties: function () {
         wmEditor.hideAllDialogs();
 
-        var template = _.template(jQuery("script#tpl-dialog-map-properties" ).html());
+        var template = _.template(jQuery("script#tpl-dialog-map-properties").html());
         jQuery("#mainarea").after(template(Map));
         jQuery("#dlgMapProperties").show();
-        jQuery("#dlgMapProperties").draggable({handle:"h3"});
+        jQuery("#dlgMapProperties").draggable({handle: "h3"});
     },
 
     hideAllDialogs: function () {
@@ -220,49 +224,49 @@ var wmEditor = {
             alert('invalid mode');
         }
     },
-    handleAddNode:   function (event, type, name) {
+    handleAddNode:   function () {
         console.log("in handleAddNode");
         wmEditor.setMapMode('xy');
         jQuery("#action").val("add_node");
     },
-    handleAddLink:   function (event, type, name) {
+    handleAddLink:   function () {
         console.log("in handleAddLink");
         jQuery("#action").val("add_link");
         wmEditor.setMapMode('existing');
     },
-    handleDeleteNode: function (event, type, name) {
+    handleDeleteNode: function () {
         jQuery('#action').val('delete_node');
         document.frmMain.submit();
     },
-    handleDeleteLink: function (event, type, name) {
+    handleDeleteLink: function () {
         jQuery('#action').val('delete_link');
         document.frmMain.submit();
     },
-    handleStraighten: function (event, type, name) {
+    handleStraighten: function () {
         jQuery('#action').val('straight_link');
         document.frmMain.submit();
     },
-    handleAddVia: function (event, type, name) {
+    handleAddVia: function () {
         console.log("in handleAddVia - setting xy mode");
         jQuery('#action').val('via_link');
         wmEditor.hideAllDialogs();
         wmEditor.setMapMode('xy');
     },
-    handleTidyLink: function (event, type, name) {
+    handleTidyLink: function () {
         jQuery('#action').val('link_tidy');
         document.frmMain.submit();
     },
-    handleCloneNode: function (event, type, name) {
+    handleCloneNode: function () {
         jQuery('#action').val('clone_node');
         document.frmMain.submit();
     },
-    handleMoveNode: function (event, type, name) {
+    handleMoveNode: function () {
         console.log("move node - setting xy mode");
         jQuery('#action').val('move_node');
         wmEditor.hideAllDialogs();
         wmEditor.setMapMode("xy");
     },
-    handleMapProperties: function (event, type, name) {
+    handleMapProperties: function () {
 
         console.log("in handleMapProperties");
         wmEditor.showMapProperties();

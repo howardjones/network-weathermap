@@ -200,34 +200,42 @@ function show_node(name) {
 }
 
 function show_link(name) {
+    var fields, index, mylink;
+
     mapmode('existing');
 
     hide_all_dialogs();
 
-    var mylink = Links[name];
+    mylink = Links[name];
 
     if (mylink) {
-        document.frmMain.link_name.value = mylink.name;
-        document.frmMain.link_target.value = mylink.target;
-        document.frmMain.link_width.value = mylink.width;
+        fields = [
+            ['#link_target', mylink.target],
+            ['#link_width', mylink.width],
+            ['#link_name', mylink.name],
+            ['#link_bandwidth_in', mylink.bw_in],
+            ['#link_bandwidth_out', mylink.bw_out],
+            ['#link_infourl', mylink.infourl],
+            ['#link_hover', mylink.overliburl],
+            ['#link_commentin', mylink.commentin],
+            ['#link_commentout', mylink.commentout],
+            ['#link_commentinpos', mylink.commentposin],
+            ['#link_commentoutpos', mylink.commentposout],
 
-        document.frmMain.link_bandwidth_in.value = mylink.bw_in;
+            ['#param', mylink.name],
+            ['#action', "set_link_properties"]
+        ];
+
+        for (index = 0; index < fields.length; ++index) {
+            jQuery(fields[index][0]).val(fields[index][1]);
+        }
 
         if (mylink.bw_in === mylink.bw_out) {
             document.frmMain.link_bandwidth_out.value = '';
             document.frmMain.link_bandwidth_out_cb.checked = 1;
         } else {
             document.frmMain.link_bandwidth_out_cb.checked = 0;
-            document.frmMain.link_bandwidth_out.value = mylink.bw_out;
         }
-
-        document.frmMain.link_infourl.value = mylink.infourl;
-        document.frmMain.link_hover.value = mylink.overliburl;
-
-        document.frmMain.link_commentin.value = mylink.commentin;
-        document.frmMain.link_commentout.value = mylink.commentout;
-        document.frmMain.link_commentposin.value = mylink.commentposin;
-        document.frmMain.link_commentposout.value = mylink.commentposout;
 
         // if that didn't "stick", then we need to add the special value
         if (jQuery('#link_commentposout').val() !== mylink.commentposout) {
@@ -241,15 +249,10 @@ function show_link(name) {
         document.getElementById('link_nodename1').firstChild.nodeValue = mylink.a;
         document.getElementById('link_nodename1a').firstChild.nodeValue = mylink.a;
         document.getElementById('link_nodename1b').firstChild.nodeValue = mylink.a;
-
         document.getElementById('link_nodename2').firstChild.nodeValue = mylink.b;
 
-        document.getElementById('param').value = mylink.name;
-
-        document.frmMain.action.value = "set_link_properties";
-
         show_dialog('dlgLinkProperties');
-        document.getElementById('link_bandwidth_in').focus();
+        jQuery('#link_bandwidth_in').focus();
     }
 }
 
@@ -520,10 +523,20 @@ function attach_help_events() {
     jQuery("input").focus(help_handler).blur(help_handler);
 }
 
+function handleNewMap() {
+    if (fromplug !== 1) {
+        new_file();
+    } else {
+        window.location = "weathermap-cacti-plugin-mgmt.php";
+    }
+}
+
 function attach_click_events() {
 
     var index,
         clicks = [
+            ["#tb_newfile", handleNewMap],
+
             ["#tb_addnode", add_node],
             ["#tb_mapprops", map_properties],
             ["#tb_mapstyle", map_style],
@@ -548,36 +561,34 @@ function attach_click_events() {
             ["#link_via", via_link],
 
             ['.wm_submit', do_submit],
-            ['.wm_cancel', cancel_op]
+            ['.wm_cancel', cancel_op],
+            ['#link_cactipick', openCactiPicker],
+            ['#node_cactipick', openNodeCactiPicker],
+            ['area[id^="LINK:"]', click_handler],
+            ['area[id^="NODE:"]', click_handler],
+            ['area[id^="TIMES"]', click_handler],
+            ['area[id^="LEGEN"]', click_handler]
+        ],
+        fakelinks = [
+            '#link_cactipick',
+            '#node_cactipick',
+            'area[id^="LINK:"]',
+            'area[id^="NODE:"]',
+            'area[id^="TIMES"]',
+            'area[id^="LEGEN"]'
         ];
 
-    for (index = 0; index < a.length; ++index) {
+    for (index = 0; index < clicks.length; ++index) {
         jQuery(clicks[index][0]).click(clicks[index][1]);
     }
 
-        jQuery('area[id^="LINK:"]').attr("href", "#").click(click_handler);
-    jQuery('area[id^="NODE:"]').attr("href", "#").click(click_handler);
-    jQuery('area[id^="TIMES"]').attr("href", "#").click(position_timestamp);
-    jQuery('area[id^="LEGEN"]').attr("href", "#").click(position_legend);
-
-    if (fromplug !== 1) {
-        jQuery("#tb_newfile").click(new_file);
-    } else {
-        jQuery("#tb_newfile").click(function () {
-            window.location = "weathermap-cacti-plugin-mgmt.php";
-        });
+    for (index = 0; index < fakelinks.length; ++index) {
+        jQuery(fakelinks[index][0]).attr('href', '#');
     }
-
-    jQuery('#link_cactipick').click(openCactiPicker).attr("href", "#");
-    jQuery('#node_cactipick').click(openNodeCactiPicker).attr("href", "#");
 
     jQuery('#xycapture').mousemove(function (event) {coord_update(event); })
                         .mouseout(function (event) {coord_release(event); });
-
 }
-
-
-
 
 function initJS() {
     // check if DOM is available, if not, we'll stop here, leaving the warning showing

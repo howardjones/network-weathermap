@@ -155,31 +155,36 @@ function show_itemtext(itemtype, name) {
 }
 
 function show_node(name) {
+    var fields, index, mynode;
     mapmode('existing');
 
     hide_all_dialogs();
 
-    var mynode = Nodes[name];
+    mynode = Nodes[name];
 
     if (mynode) {
-        document.frmMain.action.value = "set_node_properties";
-        document.frmMain.node_name.value = name;
-        document.frmMain.node_new_name.value = name;
+        fields = [
+            ['#node_target', mynode.target],
+            ['#node_name', mynode.name],
+            ['#node_newname', mynode.name],
+            ['#node_label', mynode.label],
+            ['#node_bandwidth_out', mynode.bw_out],
+            ['#node_infourl', mynode.infourl],
+            ['#node_hover', mynode.overliburl],
+            ['#node_nodex', mynode.x],
+            ['#node_nodey', mynode.y],
+            ['#node_iconfilename', mynode.iconfile],
 
-        document.frmMain.node_x.value = mynode.x;
-        document.frmMain.node_y.value = mynode.y;
+            ['#param', mynode.name],
+            ['#action', "set_node_properties"]
+        ];
 
-        document.frmMain.node_name.value = mynode.name;
-        document.frmMain.node_new_name.value = mynode.name;
-        document.frmMain.node_label.value = mynode.label;
-        document.frmMain.node_infourl.value = mynode.infourl;
-        document.frmMain.node_hover.value = mynode.overliburl;
-
+        for (index = 0; index < fields.length; ++index) {
+            jQuery(fields[index][0]).val(fields[index][1]);
+        }
         if (mynode.iconfile !== '') {
             if (mynode.iconfile.substring(0, 2) === '::') {
                 document.frmMain.node_iconfilename.value = '--AICON--';
-            } else {
-                document.frmMain.node_iconfilename.value = mynode.iconfile;
             }
         } else {
             document.frmMain.node_iconfilename.value = '--NONE--';
@@ -190,9 +195,6 @@ function show_node(name) {
         } else {
             document.frmMain.node_lock_to.value = "-- NONE --";
         }
-
-        // save this here, just in case they choose delete_node or move_node
-        document.getElementById('param').value = mynode.name;
 
         show_dialog('dlgNodeProperties');
         document.getElementById('node_new_name').focus();
@@ -277,11 +279,6 @@ function prefs() {
     document.getElementById('action').value = "editor_settings";
     show_dialog('dlgEditorSettings');
 }
-
-function new_file() {
-    window.location = "?action=newfile";
-}
-
 
 
 function add_node() {
@@ -479,7 +476,6 @@ function click_handler(e) {
 
     var alt, objectname, objecttype, objectid;
 
-    // alt = el.getAttribute('alt');
     alt = jQuery(this).attr("id");
 
     objecttype = alt.slice(0, 4);
@@ -525,7 +521,7 @@ function attach_help_events() {
 
 function handleNewMap() {
     if (fromplug !== 1) {
-        new_file();
+        window.location = "?action=newfile";
     } else {
         window.location = "weathermap-cacti-plugin-mgmt.php";
     }

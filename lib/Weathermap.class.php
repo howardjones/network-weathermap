@@ -1697,7 +1697,7 @@ class WeatherMap extends WeatherMapBase
     }
 
     // nodename is a vestigal parameter, from the days when nodes were just big labels
-    function drawLabelRotated($im, $x, $y, $angle, $text, $font, $padding, $linkname, $textcolour, $bgcolour, $outlinecolour, &$map, $direction)
+    function drawLabelRotated($im, $centre_x, $centre_y, $angle, $text, $font, $padding, $linkname, $textcolour, $bgcolour, $outlinecolour, &$map, $direction)
     {
         list($strwidth, $strheight) = $this->myimagestringsize($font, $text);
 
@@ -1712,17 +1712,17 @@ class WeatherMap extends WeatherMapBase
 
         $extra = 3;
 
-        $x1 = $x - ($strwidth / 2) - $padding - $extra;
-        $x2 = $x + ($strwidth / 2) + $padding + $extra;
-        $y1 = $y - ($strheight / 2) - $padding - $extra;
-        $y2 = $y + ($strheight / 2) + $padding + $extra;
+        $topleft_x = $centre_x - ($strwidth / 2) - $padding - $extra;
+        $topleft_y = $centre_y - ($strheight / 2) - $padding - $extra;
+
+        $botright_x = $centre_x + ($strwidth / 2) + $padding + $extra;
+        $botright_y = $centre_y + ($strheight / 2) + $padding + $extra;
 
         // a box. the last point is the start point for the text.
-        $points = array($x1, $y1, $x1, $y2, $x2, $y2, $x2, $y1, $x - $strwidth / 2, $y + $strheight / 2 + 1);
-        # $npoints = count($points)/2;
+        $points = array($topleft_x, $topleft_y, $topleft_x, $botright_y, $botright_x, $botright_y, $botright_x, $topleft_y, $centre_x - $strwidth / 2, $centre_y + $strheight / 2 + 1);
 
         if ($rangle != 0) {
-            rotateAboutPoint($points, $x, $y, $rangle);
+            rotateAboutPoint($points, $centre_x, $centre_y, $rangle);
         }
 
         if ($bgcolour->isRealColour()) {
@@ -1746,7 +1746,7 @@ class WeatherMap extends WeatherMapBase
         // the rectangle is about half the size in the HTML, and easier to optimise/detect in the browser
         if ($angle == 0) {
             // TODO: We can also optimise for 90, 180, 270 degrees
-            $map->imap->addArea("Rectangle", $areaname, '', array($x1, $y1, $x2, $y2));
+            $map->imap->addArea("Rectangle", $areaname, '', array($topleft_x, $topleft_y, $botright_x, $botright_y));
             wm_debug("Adding Rectangle imagemap for $areaname\n");
         } else {
             $map->imap->addArea("Polygon", $areaname, '', $points);
@@ -1879,7 +1879,6 @@ class WeatherMap extends WeatherMapBase
     {
         $title = $this->keytext[$scalename];
 
-        # $colours=$this->colours[$scalename];
         $nscales = $this->numscales[$scalename];
 
         wm_debug("Drawing $nscales colours into SCALE\n");
@@ -1895,7 +1894,6 @@ class WeatherMap extends WeatherMapBase
         $box_left = $x;
         $scale_left = $box_left + 4 + $scalefactor / 2;
         $box_right = $scale_left + $width + $tilewidth + 4 + $scalefactor / 2;
-        # $scale_right = $scale_left + $width;
 
         $box_top = $y;
         $scale_top = $box_top + $tileheight + 6;
@@ -1963,9 +1961,6 @@ class WeatherMap extends WeatherMapBase
         wm_debug("Drawing $nscales colours into SCALE\n");
 
         $font = $this->keyfont;
-
-        # $x = $this->keyx[$scalename];
-        # $y = $this->keyy[$scalename];
 
         $scalefactor = $height / 100;
 
@@ -3907,7 +3902,7 @@ class WeatherMap extends WeatherMapBase
                         $functions = false;
                     }
 
-                    if (($result==false) && ($functions==true)) {
+                    if (($result===false) && ($functions===true)) {
                         if (file_exists($filename)) {
                             wm_warn("Failed to overwrite existing image file $filename - permissions of existing file are wrong? [WMWARN13]");
                         } else {
@@ -3944,7 +3939,7 @@ class WeatherMap extends WeatherMapBase
 
 
 
-                    if (($result==false)) {
+                    if (($result===false)) {
                         if (file_exists($filename)) {
                             wm_warn("Failed to overwrite existing image file $filename - permissions of existing file are wrong? [WMWARN15]");
                         } else {

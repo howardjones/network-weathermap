@@ -520,10 +520,42 @@ function attach_help_events() {
     jQuery("input").focus(help_handler).blur(help_handler);
 }
 
-
 function attach_click_events() {
 
-    jQuery('area[id^="LINK:"]').attr("href", "#").click(click_handler);
+    var index,
+        clicks = [
+            ["#tb_addnode", add_node],
+            ["#tb_mapprops", map_properties],
+            ["#tb_mapstyle", map_style],
+
+            ["#tb_addlink", add_link],
+            ["#tb_poslegend", position_first_legend],
+            ["#tb_postime", position_timestamp],
+            ["#tb_colours", manage_colours],
+
+            ["#tb_manageimages", manage_images],
+            ["#tb_prefs", prefs],
+
+            ["#node_move", move_node],
+            ["#node_delete", delete_node],
+            ["#node_clone", clone_node],
+            ["#node_edit", edit_node],
+
+            ["#link_delete", delete_link],
+            ["#link_edit", edit_link],
+
+            ["#link_tidy", tidy_link],
+            ["#link_via", via_link],
+
+            ['.wm_submit', do_submit],
+            ['.wm_cancel', cancel_op]
+        ];
+
+    for (index = 0; index < a.length; ++index) {
+        jQuery(clicks[index][0]).click(clicks[index][1]);
+    }
+
+        jQuery('area[id^="LINK:"]').attr("href", "#").click(click_handler);
     jQuery('area[id^="NODE:"]').attr("href", "#").click(click_handler);
     jQuery('area[id^="TIMES"]').attr("href", "#").click(position_timestamp);
     jQuery('area[id^="LEGEN"]').attr("href", "#").click(position_legend);
@@ -535,32 +567,6 @@ function attach_click_events() {
             window.location = "weathermap-cacti-plugin-mgmt.php";
         });
     }
-
-    jQuery("#tb_addnode").click(add_node);
-    jQuery("#tb_mapprops").click(map_properties);
-    jQuery("#tb_mapstyle").click(map_style);
-
-    jQuery("#tb_addlink").click(add_link);
-    jQuery("#tb_poslegend").click(position_first_legend);
-    jQuery("#tb_postime").click(position_timestamp);
-    jQuery("#tb_colours").click(manage_colours);
-
-    jQuery("#tb_manageimages").click(manage_images);
-    jQuery("#tb_prefs").click(prefs);
-
-    jQuery("#node_move").click(move_node);
-    jQuery("#node_delete").click(delete_node);
-    jQuery("#node_clone").click(clone_node);
-    jQuery("#node_edit").click(edit_node);
-
-    jQuery("#link_delete").click(delete_link);
-    jQuery("#link_edit").click(edit_link);
-
-    jQuery("#link_tidy").click(tidy_link);
-    jQuery("#link_via").click(via_link);
-
-    jQuery('.wm_submit').click(do_submit);
-    jQuery('.wm_cancel').click(cancel_op);
 
     jQuery('#link_cactipick').click(openCactiPicker).attr("href", "#");
     jQuery('#node_cactipick').click(openNodeCactiPicker).attr("href", "#");

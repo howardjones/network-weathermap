@@ -8,8 +8,7 @@
 /*global document:false */
 /*jslint vars: true, plusplus: true, devel: true, nomen: true, indent: 4, maxerr: 50 */
 
-// global variable for subwindow reference
-
+// global variable for sub-window reference
 var newWindow;
 
 // seed the help text. Done in a big lump here, so we could make a foreign language version someday.
@@ -51,113 +50,36 @@ var helptexts = {
 
 
 
-
-
-
-
-function help_handler(e) {
-
-    var objectid = jQuery(this).attr('id');
-    var section = objectid.slice(0, objectid.indexOf('_'));
-    var target = section + '_help';
-    var helptext = "undefined";
-
-    if (helptexts[objectid]) {
-        helptext = helptexts[objectid];
-    }
-
-    if ((e.type === 'blur') || (e.type === 'mouseout')) {
-
-        helptext = helptexts[section + '_default'];
-
-        if (helptext === 'undefined') {
-            alert('OID is: ' + objectid + ' and target is:' + target + ' and section is: ' + section);
-        }
-
-    }
-
-    if (helptext !== "undefined") {
-        jQuery("#" + target).text(helptext);
-    }
-
+function hide_all_dialogs() {
+    jQuery(".dlgProperties").hide();
 }
 
-// Any clicks in the imagemap end up here.
-function click_handler(e) {
 
-    var alt, objectname, objecttype, objectid;
-
-    // alt = el.getAttribute('alt');
-    alt = jQuery(this).attr("id");
-
-    objecttype = alt.slice(0, 4);
-    objectname = alt.slice(5, alt.length);
-    objectid = objectname.slice(0,objectname.length-2);
-
-    // if we're not in a mode yet...
-    if (document.frmMain.action.value === '') {
-        // if we're waiting for a node specifically (e.g. "make link") then ignore links here
-        if (objecttype === 'NODE') {
-            // chop off the suffix
-            // objectid = objectname.slice(0,objectname.length-2);
-            objectname = NodeIDs[objectid];
-            show_node(objectname);
-        }
-
-        if (objecttype === 'LINK') {
-            // chop off the suffix
-            // objectid = objectname.slice(0,objectname.length-2);
-            objectname = LinkIDs[objectid];
-            show_link(objectname);
-        }
-    } else {
-        // we've got a command queued, so do the appropriate thing
-        if (objecttype === 'NODE' && document.getElementById('action').value === 'add_link') {
-            document.getElementById('param').value = NodeIDs[objectid];
-            document.frmMain.submit();
-        } else if (objecttype === 'NODE' && document.getElementById('action').value === 'add_link2') {
-            document.getElementById('param').value = NodeIDs[objectid];
-            document.frmMain.submit();
-        } else {
-            // Halfway through one operation, the user has done something unexpected.
-            // reset back to standard state, and see if we can oblige them
-            document.frmMain.action.value = '';
-            hide_all_dialogs();
-            click_handler(e);
-        }
-    }
-}
 
 // used by the Submit button on each of the properties dialogs
 function do_submit() {
     document.frmMain.submit();
 }
 
-
-function cactipicker() {
+function openPickerWindow(url) {
     // make sure it isn't already opened
     if (!newWindow || newWindow.closed) {
-        newWindow = window.open("", "cactipicker", "scrollbars=1,status=1,height=400,width=400,resizable=1");
+        newWindow = window.open("", "openCactiPicker", "scrollbars=1,status=1,height=400,width=400,resizable=1");
     } else if (newWindow.focus) {
         // window is already open and focusable, so bring it to the front
         newWindow.focus();
     }
 
-    // newWindow.location = "cacti-pick.php?command=link_step1";
-    newWindow.location = "cacti-pick.php?command=link_step1";
+    newWindow.location = url;
+}
+
+function openCactiPicker() {
+    openPickerWindow("cacti-pick.php?command=link_step1");
 }
 
 
-function nodecactipicker() {
-    // make sure it isn't already opened
-    if (!newWindow || newWindow.closed) {
-        newWindow = window.open("", "cactipicker", "scrollbars=1,status=1,height=400,width=400,resizable=1");
-    } else if (newWindow.focus) {
-        // window is already open and focusable, so bring it to the front
-        newWindow.focus();
-    }
-
-    newWindow.location = "cacti-pick.php?command=node_step1";
+function openNodeCactiPicker() {
+    openPickerWindow("cacti-pick.php?command=node_step1");
 }
 
 function show_context_help(itemid, targetid) {
@@ -183,9 +105,7 @@ function mapmode(m) {
     }
 }
 
-function hide_all_dialogs() {
-    jQuery(".dlgProperties").hide();
-}
+
 
 // used by the cancel button on each of the properties dialogs
 function cancel_op() {
@@ -201,9 +121,38 @@ function hide_dialog(dlg) {
 }
 
 function show_dialog(dlg) {
-    jQuery( document.getElementById(dlg) ).show();
+    jQuery(document.getElementById(dlg)).show();
 }
 
+
+function show_itemtext(itemtype, name) {
+    mapmode('existing');
+
+    hide_all_dialogs();
+
+    jQuery('textarea#item_configtext').val('');
+
+    if (itemtype === 'node') {
+        jQuery('#action').val('set_node_config');
+    }
+
+    if (itemtype === 'link') {
+        jQuery('#action').val('set_link_config');
+    }
+    show_dialog('dlgTextEdit');
+
+    jQuery.ajax({ type: "GET",
+        url: 'editor.php',
+        data: {action: 'fetch_config',
+            item_type: itemtype,
+            item_name: name,
+            mapname: document.frmMain.mapname.value},
+        success: function (text) {
+            jQuery('#item_configtext').val(text);
+            document.getElementById('item_configtext').focus();
+        }
+        });
+}
 
 function show_node(name) {
     mapmode('existing');
@@ -227,7 +176,7 @@ function show_node(name) {
         document.frmMain.node_hover.value = mynode.overliburl;
 
         if (mynode.iconfile !== '') {
-            if (mynode.iconfile.substring(0,2) === '::') {
+            if (mynode.iconfile.substring(0, 2) === '::') {
                 document.frmMain.node_iconfilename.value = '--AICON--';
             } else {
                 document.frmMain.node_iconfilename.value = mynode.iconfile;
@@ -411,6 +360,13 @@ function position_timestamp() {
     mapmode('xy');
 }
 
+function real_position_legend(scalename) {
+    document.getElementById('tb_help').innerText = 'Click on the map where you would like to put the legend.';
+    document.getElementById('action').value = "place_legend";
+    document.getElementById('param').value = scalename;
+    mapmode('xy');
+}
+
 // called from clicking the toolbar
 function position_first_legend() {
     real_position_legend('DEFAULT');
@@ -441,41 +397,7 @@ function position_legend(e) {
     real_position_legend(objectname);
 }
 
-function real_position_legend(scalename) {
-    document.getElementById('tb_help').innerText = 'Click on the map where you would like to put the legend.';
-    document.getElementById('action').value = "place_legend";
-    document.getElementById('param').value = scalename;
-    mapmode('xy');
-}
 
-function show_itemtext(itemtype,name) {
-    mapmode('existing');
-
-    hide_all_dialogs();
-
-    jQuery('textarea#item_configtext').val('');
-
-    if (itemtype === 'node') {
-        jQuery('#action').val('set_node_config');
-    }
-
-    if (itemtype === 'link') {
-        jQuery('#action').val('set_link_config');
-    }
-    show_dialog('dlgTextEdit');
-
-    jQuery.ajax({ type: "GET",
-        url: 'editor.php',
-        data: {action: 'fetch_config',
-            item_type: itemtype,
-            item_name: name,
-            mapname: document.frmMain.mapname.value},
-        success: function (text) {
-            jQuery('#item_configtext').val(text);
-            document.getElementById('item_configtext').focus();
-        }
-        });
-}
 
 
 
@@ -488,7 +410,7 @@ function ElementPosition(param) {
         x = obj.offsetLeft;
         y = obj.offsetTop;
         var body = document.getElementsByTagName('body')[0];
-        while (obj.offsetParent && obj!=body){
+        while (obj.offsetParent && obj !== body) {
             x += obj.offsetParent.offsetLeft;
             y += obj.offsetParent.offsetTop;
             obj = obj.offsetParent;
@@ -496,10 +418,6 @@ function ElementPosition(param) {
     }
     this.x = x;
     this.y = y;
-}
-
-function coord_capture() {
-
 }
 
 function coord_update(event) {
@@ -512,7 +430,7 @@ function coord_update(event) {
     cursory -= p.y;
     cursory++; // fudge to make coords match results from imagemap (not sure why this is needed)
 
-    jQuery('#tb_coords').html('Position<br />'+ cursorx + ', ' + cursory);
+    jQuery('#tb_coords').html('Position<br />' + cursorx + ', ' + cursory);
 }
 
 function coord_release() {
@@ -522,6 +440,77 @@ function coord_release() {
 function tidy_link() {
     document.getElementById('action').value = "link_tidy";
     document.frmMain.submit();
+}
+
+
+
+function help_handler(e) {
+
+    var objectid = jQuery(this).attr('id');
+    var section = objectid.slice(0, objectid.indexOf('_'));
+    var target = section + '_help';
+    var helptext = "undefined";
+
+    if (helptexts[objectid]) {
+        helptext = helptexts[objectid];
+    }
+
+    if ((e.type === 'blur') || (e.type === 'mouseout')) {
+
+        helptext = helptexts[section + '_default'];
+
+        if (helptext === 'undefined') {
+            alert('OID is: ' + objectid + ' and target is:' + target + ' and section is: ' + section);
+        }
+    }
+
+    if (helptext !== "undefined") {
+        jQuery("#" + target).text(helptext);
+    }
+
+}
+
+
+// Any clicks in the imagemap end up here.
+function click_handler(e) {
+
+    var alt, objectname, objecttype, objectid;
+
+    // alt = el.getAttribute('alt');
+    alt = jQuery(this).attr("id");
+
+    objecttype = alt.slice(0, 4);
+    objectname = alt.slice(5, alt.length);
+    objectid = objectname.slice(0, objectname.length - 2);
+
+    // if we're not in a mode yet...
+    if (document.frmMain.action.value === '') {
+        // if we're waiting for a node specifically (e.g. "make link") then ignore links here
+        if (objecttype === 'NODE') {
+            objectname = NodeIDs[objectid];
+            show_node(objectname);
+        }
+
+        if (objecttype === 'LINK') {
+            objectname = LinkIDs[objectid];
+            show_link(objectname);
+        }
+    } else {
+        // we've got a command queued, so do the appropriate thing
+        if (objecttype === 'NODE' && document.getElementById('action').value === 'add_link') {
+            document.getElementById('param').value = NodeIDs[objectid];
+            document.frmMain.submit();
+        } else if (objecttype === 'NODE' && document.getElementById('action').value === 'add_link2') {
+            document.getElementById('param').value = NodeIDs[objectid];
+            document.frmMain.submit();
+        } else {
+            // Halfway through one operation, the user has done something unexpected.
+            // reset back to standard state, and see if we can oblige them
+            document.frmMain.action.value = '';
+            hide_all_dialogs();
+            click_handler(e);
+        }
+    }
 }
 
 
@@ -573,11 +562,10 @@ function attach_click_events() {
     jQuery('.wm_submit').click(do_submit);
     jQuery('.wm_cancel').click(cancel_op);
 
-    jQuery('#link_cactipick').click(cactipicker).attr("href","#");
-    jQuery('#node_cactipick').click(nodecactipicker).attr("href","#");
+    jQuery('#link_cactipick').click(openCactiPicker).attr("href", "#");
+    jQuery('#node_cactipick').click(openNodeCactiPicker).attr("href", "#");
 
-    jQuery('#xycapture').mouseover(function (event) {coord_capture(event); })
-                        .mousemove(function (event) {coord_update(event); })
+    jQuery('#xycapture').mousemove(function (event) {coord_update(event); })
                         .mouseout(function (event) {coord_release(event); });
 
 }
@@ -611,12 +599,4 @@ function initJS() {
     }
 }
 
-function cleanupJS() {
-
-    // This should be cleaning up all the handlers we added in initJS, to avoid killing
-    // IE/Win and Safari (at least) over a period of time with memory leaks.
-
-}
-
 jQuery(document).ready(initJS);
-jQuery(document).unload(cleanupJS);

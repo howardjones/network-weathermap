@@ -90,7 +90,7 @@ function wmeShowStartPage()
 	$matches=0;
 
 	print '<!DOCTYPE html>
-            <html><head><link rel="stylesheet" type="text/css" media="screen" href="editor-resources/oldeditor.css" /><script type="text/javascript" src="vendor/jquery-1.10.2.min.js"></script><script src="editor-resources/editor.js" type="text/javascript"></script><title>PHP Weathermap Editor ' . $WEATHERMAP_VERSION
+            <html><head><link rel="stylesheet" type="text/css" media="screen" href="editor-resources/oldeditor.css" /><script type="text/javascript" src="vendor/jquery/dist/jquery.min.js"></script><script src="editor-resources/editor.js" type="text/javascript"></script><title>PHP Weathermap Editor ' . $WEATHERMAP_VERSION
 		. '</title></head><body>';
 
 	print '<div id="nojs" class="alert"><b>WARNING</b> - ';

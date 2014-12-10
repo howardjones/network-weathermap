@@ -18,7 +18,7 @@
     
     require_once dirname(__FILE__).'/WeatherMapScale.class.php';
     require_once dirname(__FILE__).'/Weathermap.class.php';
-    
+
     require_once dirname(__FILE__).'/WeatherMap.functions.php';
     
     require_once dirname(__FILE__).'/image-functions.php';
@@ -28,5 +28,6 @@
     
     require_once dirname(__FILE__).'/WeatherMapNode.class.php';
     require_once dirname(__FILE__).'/WeatherMapLink.class.php';
-    
+    require_once dirname(__FILE__).'/WeatherMapConfig.php';
+
     require_once dirname(__FILE__).'/WeatherMapRunner.class.php';

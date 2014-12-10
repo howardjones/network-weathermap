@@ -225,6 +225,8 @@ function wmSprintf($format, $value, $kilo = 1000)
     return $output;
 }
 
+// TODO - kill this after ConfigReader is completed
+
 // ParseString is based on code from:
 // http://www.webscriptexpert.com/Php/Space-Separated%20Tag%20Parser/
 function wmParseString($input)

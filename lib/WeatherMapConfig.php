@@ -942,6 +942,8 @@ class WeatherMapConfigReader
 
     function readConfig($inputLines)
     {
+        $matches = null;
+
         foreach ($inputLines as $buffer) {
             $lineMatched = false;
             $this->lineCount++;
@@ -954,8 +956,72 @@ class WeatherMapConfigReader
                 // break out the line into words (quoted strings are one word)
                 $args = parseString($buffer);
 
+                if ( !$lineMatched && true === isset($args[0])) {
+                    // check if there is even an entry in this context for the current keyword
+                    if (true === isset($this->config_keywords[$this->currentType][$args[0]])) {
+                        // if there is, then the entry is an array of arrays - iterate them to validate the config
+                        foreach ($this->config_keywords[$this->currentType][$args[0]] as $keyword) {
+                            unset($matches);
 
+                            if ((substr($keyword[1], 0, 1) != '/') || (1 === preg_match($keyword[1], $buffer, $matches))) {
+                                // if we came here without a regexp, then the \1 etc
+                                // refer to arg numbers, not match numbers
 
+                                if (false === isset($matches)) {
+                                    $matches = $args;
+                                }
+
+                                if (is_array($keyword[2])) {
+
+                                    foreach ($keyword[2] as $key => $val) {
+                                        // so we can poke in numbers too, if the value starts with #
+                                        // then take the # off, and treat the rest as a number literal
+                                        if (substr($val, 0, 1) === '#') {
+                                            $val = substr($val, 1);
+                                        } elseif (is_numeric($val)) {
+                                            // if it's a number, then it's a match number,
+                                            // otherwise it's a literal to be put into a variable
+                                            $val = $matches[$val];
+                                        }
+
+                                        // if there are [] in the string, it's an index into an array
+                                        // and the index will be one of the constants: IN or OUT
+                                        if (1 === preg_match('/^(.*)\[([^\]]+)\]$/', $key, $m)) {
+                                            $index = constant($m[2]);
+                                            $key = $m[1];
+                                            $this->currentObject->{$key}[$index] = $val;
+                                            $this->currentObject->setConfig($key . "." . $index, $val);
+                                        } elseif (substr($key, -1, 1) == "+") {
+                                            // if the key ends in a plus, it's an array we should append to
+                                            $key = substr($key, 0, -1);
+                                            array_push($this->currentObject->$key, $val);
+                                            array_push($this->currentObject->config[$key], $val);
+                                            $this->currentObject->addConfig($key, $val);
+
+                                        } else {
+                                            // otherwise, it's just the name of a property on the
+                                            // appropriate object.
+                                            $this->currentObject->$key = $val;
+                                            $this->currentObject->setConfig($key, $val);
+                                        }
+                                    }
+                                    $lineMatched = true;
+                                } else {
+                                    // the third arg wasn't an array, it was a function name.
+                                    // call that function to handle this keyword
+                                    if (call_user_func(array($this, $keyword[2]), $buffer, $args, $matches)) {
+                                        $lineMatched = true;
+                                    }
+                                }
+                            }
+
+                            // jump out of this loop if there's been a match
+                            if ($lineMatched) {
+                                break;
+                            }
+                        }
+                    }
+                }
             }
         }
         return $this->lineCount;

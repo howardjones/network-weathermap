@@ -26,6 +26,25 @@ class WeatherMapConfigReader
 
     private $configKeywords = array(
         'GLOBAL' => array(
+            'INCLUDE' => array(
+                array('GLOBAL', "/^\s*INCLUDE\s+(.*)\s*$/i", 'handleINCLUDE'),
+            ),
+
+            'SCALE' => array(
+                array('GLOBAL', "/^\s*SCALE\s+([A-Za-z][A-Za-z0-9_]*\s+)?(\-?\d+\.?\d*[munKMGT]?)\s+(\-?\d+\.?\d*[munKMGT]?)\s+(?:(\d+)\s+(\d+)\s+(\d+)(?:\s+(\d+)\s+(\d+)\s+(\d+))?|(none))\s*(.*)$/i", 'handleSCALE'),
+            ),
+            'KEYSTYLE' => array(
+                array('GLOBAL', '/^\s*KEYSTYLE\s+([A-Za-z][A-Za-z0-9_]+\s+)?(classic|horizontal|vertical|inverted|tags)\s?(\d+)?\s*$/i', 'handleKEYSTYLE'),
+            ),
+            'KEYPOS' => array(
+                array('GLOBAL', '/^\s*KEYPOS\s+([A-Za-z][A-Za-z0-9_]*\s+)?(-?\d+)\s+(-?\d+)(.*)/i', 'handleKEYPOS'),
+            ),
+            'NODE' => array(
+                array('GLOBAL', '/^\s*NODE\s+(\S+)\s*$/i', 'handleNODE'),
+            ),
+            'LINK' => array(
+                array('GLOBAL', '/^\s*LINK\s+(\S+)\s*$/i', 'handleLINK'),
+            ),
             'FONTDEFINE' => array(
                 array('GLOBAL', '/^\s*FONTDEFINE\s+(\d+)\s+(\S+)\s+(\d+)\s*$/i', 'handleFONTDEFINE'),
                 array('GLOBAL', '/^\s*FONTDEFINE\s+(\d+)\s+(\S+)\s*$/i', 'handleFONTDEFINE'),
@@ -232,6 +251,19 @@ class WeatherMapConfigReader
             ),
         ), // end of global
         'NODE' => array(
+            'INCLUDE' => array(
+                array('NODE', "/^\s*INCLUDE\s+(.*)\s*$/i", 'handleINCLUDE'),
+            ),
+
+            'TEMPLATE' => array(
+                array('NODE', "/^\s*TEMPLATE\s+(\S+)\s*$/i", 'handleTEMPLATE')
+            ),
+            'NODE' => array(
+                array('NODE', '/^\s*NODE\s+(\S+)\s*$/i', 'handleNODE'),
+            ),
+            'LINK' => array(
+                array('NODE', '/^\s*LINK\s+(\S+)\s*$/i', 'handleLINK'),
+            ),
             'TARGET' => array(array(
                 'NODE',
                 'TARGET',
@@ -516,6 +548,19 @@ class WeatherMapConfigReader
 
         ), // end of node
         'LINK' => array(
+            'INCLUDE' => array(
+                array('LINK', "/^\s*INCLUDE\s+(.*)\s*$/i", 'handleINCLUDE'),
+            ),
+
+            'TEMPLATE' => array(
+                array('LINK', "/^\s*TEMPLATE\s+(\S+)\s*$/i", 'handleTEMPLATE')
+            ),
+            'NODE' => array(
+                array('LINK', '/^\s*NODE\s+(\S+)\s*$/i', 'handleNODE'),
+            ),
+            'LINK' => array(
+                array('LINK', '/^\s*LINK\s+(\S+)\s*$/i', 'handleLINK'),
+            ),
             'TARGET' => array(array(
                 'LINK',
                 'TARGET',
@@ -710,7 +755,10 @@ class WeatherMapConfigReader
                 'LINK',
                 '/^ARROWSTYLE\s+(classic|compact)\s*$/i',
                 array('arrowstyle' => 1)
-            ),),
+            ),
+                array('LINK', '/^\s*ARROWSTYLE\s+(\d+)\s+(\d+)\s*$/i', 'handleARROWSTYLE'),
+
+                ),
             'VIASTYLE' => array(array(
                 'LINK',
                 '/^VIASTYLE\s+(curved|angled)\s*$/i',
@@ -871,6 +919,7 @@ class WeatherMapConfigReader
         }
     }
 
+
     // parseString is based on code from:
     // http://www.webscriptexpert.com/Php/Space-Separated%20Tag%20Parser/
     function parseString($input)
@@ -935,6 +984,247 @@ class WeatherMapConfigReader
     }
 
 
+    function handleINCLUDE($fullcommand, $args, $matches)
+    {
+        $filename = $matches[1];
+
+        if (file_exists($filename)) {
+            wm_debug("Including '{$filename}'\n");
+
+            if (in_array($filename, $this->mapObject->included_files)) {
+                wm_warn("Attempt to include '$filename' twice! Skipping it.\n");
+                return (false);
+            } else {
+                $this->mapObject->included_files[] = $filename;
+                $this->mapObject->has_includes = true;
+            }
+
+            $reader = new WeatherMapConfigReader();
+            $reader->Init($this->mapObject);
+            $reader->readConfigFile($matches[1]);
+
+            $this->currentType = "GLOBAL";
+            $this->currentObject = $this->mapObject;
+
+            return true;
+        } else {
+            wm_warn("INCLUDE File '{$matches[1]}' not found!\n");
+            return false;
+        }
+    }
+
+    function handleTEMPLATE($fullcommand, $args, $matches)
+    {
+        $templateName = $matches[1];
+
+        if (($this->currentType == 'NODE' && isset($this->mapObject->nodes[$templateName]))
+            || ($this->currentType == 'LINK' && isset($this->mapObject->links[$templateName]))
+        ) {
+            $this->currentObject->setTemplate($matches[1], $this->mapObject);
+
+            if ($this->objectLineCount > 1) {
+                wm_warn("line $this->lineCount: TEMPLATE is not first line of object. Some data may be lost. [WMWARN39]\n");
+            }
+        } else {
+            wm_warn("line $this->lineCount: $last_seen TEMPLATE '$templateName' doesn't exist! (if it does exist, check it's defined first) [WMWARN40]\n");
+        }
+
+        return true;
+    }
+
+    function handleSCALE($fullcommand, $args, $matches)
+    {
+        // The default scale name is DEFAULT
+        if ($matches[1] == '') {
+            $matches[1] = 'DEFAULT';
+        } else {
+            $matches[1] = trim($matches[1]);
+        }
+
+        if (isset($this->mapObject->scales[$matches[1]])) {
+            $newscale = $this->mapObject->scales[$matches[1]];
+            // wm_debug("Found.");
+        } else {
+            $this->mapObject->scales[$matches[1]] = new WeatherMapScale($matches[1], $this->mapObject);
+            $newscale = $this->mapObject->scales[$matches[1]];
+            //  wm_debug("Created.");
+        }
+
+        $key = $matches[2] . '_' . $matches[3];
+        $tag = $matches[11];
+        $c1 = null;
+        $c2 = null;
+
+        $bottom = wmInterpretNumberWithMetricPrefix($matches[2], $this->mapObject->kilo);
+        $top = wmInterpretNumberWithMetricPrefix($matches[3], $this->mapObject->kilo);
+
+        $this->mapObject->colours[$matches[1]][$key]['key'] = $key;
+        $this->mapObject->colours[$matches[1]][$key]['tag'] = $tag;
+
+        $this->mapObject->colours[$matches[1]][$key]['bottom'] = wmInterpretNumberWithMetricPrefix($matches[2], $this->mapObject->kilo);
+        $this->mapObject->colours[$matches[1]][$key]['top'] = wmInterpretNumberWithMetricPrefix($matches[3], $this->mapObject->kilo);
+
+        $this->mapObject->colours[$matches[1]][$key]['special'] = 0;
+
+        if (isset($matches[10]) && $matches[10] == 'none') {
+            $this->mapObject->colours[$matches[1]][$key]['red1'] = -1;
+            $this->mapObject->colours[$matches[1]][$key]['green1'] = -1;
+            $this->mapObject->colours[$matches[1]][$key]['blue1'] = -1;
+            $this->mapObject->colours[$matches[1]][$key]['c1'] = new WMColour('none');
+
+            $c1 = new WMColour("none");
+
+        } else {
+            $this->mapObject->colours[$matches[1]][$key]['red1'] = (int)($matches[4]);
+            $this->mapObject->colours[$matches[1]][$key]['green1'] = (int)($matches[5]);
+            $this->mapObject->colours[$matches[1]][$key]['blue1'] = (int)($matches[6]);
+            $this->mapObject->colours[$matches[1]][$key]['c1'] = new WMColour((int)$matches[4], (int)$matches[5], (int)$matches[6]);
+
+            $c1 = new WMColour((int)($matches[4]), (int)($matches[5]), (int)($matches[6]));
+            $c2 = $c1;
+        }
+
+        // this is the second colour, if there is one
+        if (isset($matches[7]) && $matches[7] != '') {
+            $this->mapObject->colours[$matches[1]][$key]['red2'] = (int)($matches[7]);
+            $this->mapObject->colours[$matches[1]][$key]['green2'] = (int)($matches[8]);
+            $this->mapObject->colours[$matches[1]][$key]['blue2'] = (int)($matches[9]);
+            $this->mapObject->colours[$matches[1]][$key]['c2'] = new WMColour((int)$matches[7], (int)$matches[8], (int)$matches[9]);
+
+            $c2 = new WMColour((int)($matches[7]), (int)($matches[8]), (int)($matches[9]));
+        }
+
+        $newscale->AddSpan($bottom, $top, $c1, $c2, $tag);
+
+        if (!isset($this->mapObject->numscales[$matches[1]])) {
+            $this->mapObject->numscales[$matches[1]] = 1;
+        } else {
+            $this->mapObject->numscales[$matches[1]]++;
+        }
+
+        // we count if we've seen any default scale, otherwise, we have to add
+        // one at the end.
+        if ($matches[1] == 'DEFAULT') {
+            $this->mapObject->scalesseen++;
+        }
+
+        return true;
+    }
+
+    function handleKEYSTYLE($fullcommand, $args, $matches)
+    {
+        $whichKey = trim($matches[1]);
+
+        if ($whichKey == '') {
+            $whichKey = 'DEFAULT';
+        }
+        $this->mapObject->keystyle[$whichKey] = strtolower($matches[2]);
+
+        if (isset($matches[3]) && $matches[3] != '') {
+            $this->mapObject->keysize[$whichKey] = $matches[3];
+        } else {
+            $this->mapObject->keysize[$whichKey] = $this->mapObject->keysize['DEFAULT'];
+        }
+
+        return true;
+    }
+
+    function handleKEYPOS($fullcommand, $args, $matches)
+    {
+        $whichKey = trim($matches[1]);
+
+        if ($whichKey == '') {
+            $whichKey = 'DEFAULT';
+        }
+
+        $this->mapObject->keyx[$whichKey] = $matches[2];
+        $this->mapObject->keyy[$whichKey] = $matches[3];
+        $extra = trim($matches[4]);
+
+        if ($extra != '') {
+            $this->mapObject->keytext[$whichKey] = $extra;
+        }
+
+        // it's possible to have keypos before the scale is defined.
+        // this is to make it at least mostly consistent internally
+        if (!isset($this->mapObject->keytext[$whichKey])) {
+            $this->mapObject->keytext[$whichKey] = "DEFAULT TITLE";
+        }
+
+        if (!isset($this->mapObject->keystyle[$whichKey])) {
+            $this->mapObject->keystyle[$whichKey] = "classic";
+        }
+
+        return true;
+    }
+
+    function handleARROWSTYLE($fullcommand, $args, $matches)
+    {
+
+        $this->currentObject->arrowstyle = $matches[1] . ' ' . $matches[2];
+        return true;
+    }
+
+    function handleNODE($fullcommand, $args, $matches) {
+
+        $this->commitItem();
+        unset($this->currentObject);
+
+        if ($args[1] == 'DEFAULT') {
+            $this->currentObject = $this->mapObject->nodes['DEFAULT'];
+            wm_debug("Loaded default NODE\n");
+
+            if(sizeof($this->mapObject->nodes) > 2) {
+                wm_warn("NODE DEFAULT is not the first NODE. Defaults will not apply to earlier NODEs. [WMWARN27]\n");
+            }
+
+        } else {
+            if (isset($this->mapObject->nodes[$matches[1]])) {
+                wm_warn("Duplicate node name " . $matches[1] . " at line $this->lineCount - only the last one defined is used. [WMWARN24]\n");
+            }
+
+            $this->currentObject = new WeatherMapNode();
+            $this->currentObject->name = $matches[1];
+            $this->currentObject->reset($this->mapObject);
+            wm_debug("Created new NODE\n");
+        }
+        $this->objectLineCount = 0;
+        $this->currentType = "NODE";
+        $this->currentObject->configline = $this->lineCount;
+        $this->currentObject->defined_in = $this->currentSource;
+
+        return true;
+
+    }
+
+    function handleLINK($fullcommand, $args, $matches) {
+        $this->commitItem();
+        unset($this->currentObject);
+
+        if ($args[1] == 'DEFAULT') {
+            $this->currentObject = $this->mapObject->links['DEFAULT'];
+            wm_debug("Loaded default LINK\n");
+
+            if(sizeof($this->mapObject->nodes) > 2) {
+                wm_warn("LINK DEFAULT is not the first LINK. Defaults will not apply to earlier LINKs. [WMWARN26]\n");
+            }
+
+        } else {
+            if (isset($this->mapObject->links[$matches[1]])) {
+                wm_warn("Duplicate link name " . $matches[1] . " at line $this->lineCount - only the last one defined is used. [WMWARN25]\n");
+            }
+            $this->currentObject = new WeatherMapLink();
+            $this->currentObject->name = $matches[1];
+            $this->currentObject->reset($this->mapObject);
+            wm_debug("Created new LINK\n");
+        }
+        $this->currentType = "LINK";
+        $this->objectLineCount = 0;
+        $this->currentObject->configline = $this->lineCount;
+        $this->currentObject->defined_in = $this->currentSource;
+
+        return true;
+    }
 
     // *************************************
     // New ReadConfig special-case handlers
@@ -1311,33 +1601,65 @@ class WeatherMapConfigReader
 
     function commitItem()
     {
+        if (is_null($this->currentObject)) {
+            return;
+        }
 
+        wm_debug("-> Committing a $this->currentType\n");
+
+        if($this->currentType == 'NODE') {
+            $this->mapObject->nodes[$this->currentObject->name] = $this->currentObject;
+        }
+
+        if($this->currentType == 'LINK') {
+            $this->mapObject->links[$this->currentObject->name] = $this->currentObject;
+        }
     }
 
-    function readConfig($inputLines)
+    function readConfigLines($inputLines)
     {
         $matches = null;
 
+        wm_debug("in readConfig\n");
+
         foreach ($inputLines as $buffer) {
+
+            wm_debug("Processing: $buffer\n");
             $lineMatched = false;
             $this->lineCount++;
+
             $buffer = trim($buffer);
 
             if ($buffer == '' || substr($buffer, 0, 1) == '#') {
                 // this is a comment line, or a blank line
+                $lineMatched = true;
             } else {
                 $this->objectLineCount++;
                 // break out the line into words (quoted strings are one word)
-                $args = parseString($buffer);
+                $args = $this::parseString($buffer);
+                wm_debug("  First: $args[0] in $this->currentType\n");
+
+
+                // From here, the aim of the game is to get out of this loop as
+                // early as possible, without running more preg_match calls than
+                // necessary. In 0.97, this per-line loop accounted for 50% of
+                // the running time!
+
+                // this next loop replaces a whole pile of duplicated ifs with something with consistent handling
+
 
                 if ( !$lineMatched && true === isset($args[0])) {
                     // check if there is even an entry in this context for the current keyword
-                    if (true === isset($this->config_keywords[$this->currentType][$args[0]])) {
+                    if (true === isset($this->configKeywords[$this->currentType][$args[0]])) {
                         // if there is, then the entry is an array of arrays - iterate them to validate the config
-                        foreach ($this->config_keywords[$this->currentType][$args[0]] as $keyword) {
+                        wm_debug("    Possible!\n");
+                        foreach ($this->configKeywords[$this->currentType][$args[0]] as $keyword) {
                             unset($matches);
-
+                            wm_debug("      Trying $keyword[1]\n");
                             if ((substr($keyword[1], 0, 1) != '/') || (1 === preg_match($keyword[1], $buffer, $matches))) {
+
+                                wm_debug("Might be $args[0]\n");
+
                                 // if we came here without a regexp, then the \1 etc
                                 // refer to arg numbers, not match numbers
 
@@ -1375,6 +1697,7 @@ class WeatherMapConfigReader
                                         } else {
                                             // otherwise, it's just the name of a property on the
                                             // appropriate object.
+                                            wm_debug("      DONE! ($key, $val)\n");
                                             $this->currentObject->$key = $val;
                                             $this->currentObject->setConfig($key, $val);
                                         }
@@ -1397,7 +1720,18 @@ class WeatherMapConfigReader
                     }
                 }
             }
+
+            if ((!$lineMatched) && ($buffer != '')) {
+                wm_warn("Unrecognised config on line $this->lineCount: $buffer\n");
+            }
         }
+
+        // Commit the last item
+        $this->commitItem();
+
+        wm_debug("ReadConfig has finished reading the config ($this->lineCount lines)\n");
+        wm_debug("------------------------------------------\n");
+
         return $this->lineCount;
     }
 
@@ -1413,12 +1747,17 @@ class WeatherMapConfigReader
                 $lines[] = $buffer;
             }
             fclose($fileHandle);
+
+            $this->currentSource = $filename;
+            $result = $this->readConfigLines($lines);
+
+            return $result;
+        } else {
+            return false;
         }
 
-        $this->currentSource = $filename;
-        $result = $this->readConfig($lines);
 
-        return $result;
+
     }
 
 }

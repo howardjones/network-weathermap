@@ -13,9 +13,9 @@ do
 done
 
 if [ $fflag -eq 1 ]; then
-	phpunit --coverage-html test-suite/code-coverage/ Tests/
+	vendor/bin/phpunit --coverage-html test-suite/code-coverage/ Tests/
 else
-	phpunit Tests/	
+	vendor/bin/phpunit Tests/	
 fi
 
 grep  Output test-suite/diffs/*.txt | grep -v '|0|' | awk -F: '{ print $1;}' | sed -e 's/.png.txt//' -e 's/test-suite\/diffs\///' > test-suite/failing-images.txt
@@ -27,14 +27,14 @@ echo "NOTE: 3 tests have a timestamp in them, and will always fail"
 if [ $fflag -eq 1 ]; then
 
 	echo "Running code quality and test coverage reports."
-	phpmd lib/ html unusedcode > test-suite/md-unused.html
-	phpmd lib/ html codesize,design,naming,cleancode > test-suite/md-rest.html
+	vendor/bin/phpmd lib/ html unusedcode > test-suite/md-unused.html
+	vendor/bin/phpmd lib/ html codesize,design,naming,cleancode > test-suite/md-rest.html
 
     # phpcs -p -v --tab-width=4 -s --extensions=php --standard=PEAR --report-full=test-suite/phpcs-report-PEAR.txt  .
     # phpcs -p -v --tab-width=4 -s --extensions=php --sniffs=Generic.PHP.DisallowShortOpenTag,Squiz.PHP.CommentedOutCode --report-full=test-suite/phpcs-report-smelly.txt  .
     # phpcs -p -v --tab-width=4 -s --extensions=php --standard=PSR2 --report-full=test-suite/phpcs-report-PSR-1-2.txt  .
-    phpcs -p -v --tab-width=4 -s --extensions=php --standard=PSR2ish --report-full=test-suite/phpcs-report-PSR-1-2.txt lib 
+    vendor/bin/phpcs -p -v --tab-width=4 -s --extensions=php --standard=PSR2ish --report-full=test-suite/phpcs-report-PSR-1-2.txt lib 
 
-    phpcpd lib/  > test-suite/cut-paste.txt
+    vendor/bin/phpcpd lib/  > test-suite/cut-paste.txt
 
 fi

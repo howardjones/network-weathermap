@@ -430,6 +430,43 @@ class WMFont
     var $file;
     var $gdnumber;
     var $size;
+
+    function InitTTF($file, $size)
+    {
+
+
+        if (function_exists("imagettfbbox")) {
+            // test if this font is valid, before adding it to the font table...
+            $bounds = @imagettfbbox($args[3], 0, $args[2], "Ignore me");
+            if (isset($bounds[0])) {
+
+                $this->file = $file;
+                $this->size = $size;
+                $this->type = "truetype";
+
+                return true;
+            } else {
+                return false;
+            }
+        } else {
+            return false;
+        }
+    }
+
+    function InitGD($file, $gdnumber)
+    {
+        $gd = imageloadfont($file);
+
+        if ($gd) {
+            $this->gdnumber = $gd;
+            $this->file = $file;
+            $this->type = "gd";
+
+            return true;
+        } else {
+            return false;
+        }
+    }
 }
 
 // ///////////////////////////////////////////////////////////////////////////////////////

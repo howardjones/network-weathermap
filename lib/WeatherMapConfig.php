@@ -922,7 +922,7 @@ class WeatherMapConfigReader
 
     // parseString is based on code from:
     // http://www.webscriptexpert.com/Php/Space-Separated%20Tag%20Parser/
-    function parseString($input)
+    private function parseString($input)
     {
         $output = array (); // Array of Output
         $cPhraseQuote = null; // Record of the quote that opened the current phrase
@@ -984,7 +984,7 @@ class WeatherMapConfigReader
     }
 
 
-    function handleINCLUDE($fullcommand, $args, $matches)
+    private function handleINCLUDE($fullcommand, $args, $matches)
     {
         $filename = $matches[1];
 
@@ -1013,7 +1013,7 @@ class WeatherMapConfigReader
         }
     }
 
-    function handleTEMPLATE($fullcommand, $args, $matches)
+    private function handleTEMPLATE($fullcommand, $args, $matches)
     {
         $templateName = $matches[1];
 
@@ -1032,7 +1032,8 @@ class WeatherMapConfigReader
         return true;
     }
 
-    function handleSCALE($fullcommand, $args, $matches)
+    // TODO: refactor this - it doesn't need to be one big handler anymore (multiple regexps for different styles?)
+    private function handleSCALE($fullcommand, $args, $matches)
     {
         // The default scale name is DEFAULT
         if ($matches[1] == '') {
@@ -1052,8 +1053,9 @@ class WeatherMapConfigReader
 
         $key = $matches[2] . '_' . $matches[3];
         $tag = $matches[11];
-        $c1 = null;
-        $c2 = null;
+
+        $colour1 = null;
+        $colour2 = null;
 
         $bottom = wmInterpretNumberWithMetricPrefix($matches[2], $this->mapObject->kilo);
         $top = wmInterpretNumberWithMetricPrefix($matches[3], $this->mapObject->kilo);
@@ -1072,7 +1074,7 @@ class WeatherMapConfigReader
             $this->mapObject->colours[$matches[1]][$key]['blue1'] = -1;
             $this->mapObject->colours[$matches[1]][$key]['c1'] = new WMColour('none');
 
-            $c1 = new WMColour("none");
+            $colour1 = new WMColour("none");
 
         } else {
             $this->mapObject->colours[$matches[1]][$key]['red1'] = (int)($matches[4]);
@@ -1080,8 +1082,8 @@ class WeatherMapConfigReader
             $this->mapObject->colours[$matches[1]][$key]['blue1'] = (int)($matches[6]);
             $this->mapObject->colours[$matches[1]][$key]['c1'] = new WMColour((int)$matches[4], (int)$matches[5], (int)$matches[6]);
 
-            $c1 = new WMColour((int)($matches[4]), (int)($matches[5]), (int)($matches[6]));
-            $c2 = $c1;
+            $colour1 = new WMColour((int)($matches[4]), (int)($matches[5]), (int)($matches[6]));
+            $colour2 = $colour1;
         }
 
         // this is the second colour, if there is one
@@ -1091,10 +1093,10 @@ class WeatherMapConfigReader
             $this->mapObject->colours[$matches[1]][$key]['blue2'] = (int)($matches[9]);
             $this->mapObject->colours[$matches[1]][$key]['c2'] = new WMColour((int)$matches[7], (int)$matches[8], (int)$matches[9]);
 
-            $c2 = new WMColour((int)($matches[7]), (int)($matches[8]), (int)($matches[9]));
+            $colour2 = new WMColour((int)($matches[7]), (int)($matches[8]), (int)($matches[9]));
         }
 
-        $newscale->AddSpan($bottom, $top, $c1, $c2, $tag);
+        $newscale->AddSpan($bottom, $top, $colour1, $colour2, $tag);
 
         if (!isset($this->mapObject->numscales[$matches[1]])) {
             $this->mapObject->numscales[$matches[1]] = 1;
@@ -1111,7 +1113,7 @@ class WeatherMapConfigReader
         return true;
     }
 
-    function handleKEYSTYLE($fullcommand, $args, $matches)
+    private function handleKEYSTYLE($fullcommand, $args, $matches)
     {
         $whichKey = trim($matches[1]);
 
@@ -1129,7 +1131,7 @@ class WeatherMapConfigReader
         return true;
     }
 
-    function handleKEYPOS($fullcommand, $args, $matches)
+    private function handleKEYPOS($fullcommand, $args, $matches)
     {
         $whichKey = trim($matches[1]);
 
@@ -1158,14 +1160,14 @@ class WeatherMapConfigReader
         return true;
     }
 
-    function handleARROWSTYLE($fullcommand, $args, $matches)
+    private function handleARROWSTYLE($fullcommand, $args, $matches)
     {
 
         $this->currentObject->arrowstyle = $matches[1] . ' ' . $matches[2];
         return true;
     }
 
-    function handleNODE($fullcommand, $args, $matches) {
+    private function handleNODE($fullcommand, $args, $matches) {
 
         $this->commitItem();
         unset($this->currentObject);
@@ -1197,7 +1199,7 @@ class WeatherMapConfigReader
 
     }
 
-    function handleLINK($fullcommand, $args, $matches) {
+    private function handleLINK($fullcommand, $args, $matches) {
         $this->commitItem();
         unset($this->currentObject);
 
@@ -1229,14 +1231,14 @@ class WeatherMapConfigReader
     // *************************************
     // New ReadConfig special-case handlers
 
-    function handleDEFINEOFFSET($fullcommand, $args, $matches)
+    private function handleDEFINEOFFSET($fullcommand, $args, $matches)
     {
         $this->currentObject->named_offsets[$matches[1]] = array(intval($matches[2]), intval($matches[3]));
 
         return true;
     }
 
-    function handleVIA($fullcommand, $args, $matches)
+    private function handleVIA($fullcommand, $args, $matches)
     {
         if (preg_match("/^\s*VIA\s+([-+]?\d+)\s+([-+]?\d+)\s*$/i", $fullcommand, $matches)) {
             $this->currentObject->vialist[] = array($matches[1], $matches[2]);
@@ -1249,10 +1251,12 @@ class WeatherMapConfigReader
 
             return true;
         }
+
         return false;
     }
 
-    function handleNODES($fullcommand, $args, $matches)
+    // TODO refactor this?
+    private function handleNODES($fullcommand, $args, $matches)
     {
         $offset_dx = array();
         $offset_dy = array();
@@ -1346,7 +1350,7 @@ class WeatherMapConfigReader
         return false;
     }
 
-    function handleSET($fullcommand, $args, $matches)
+    private function handleSET($fullcommand, $args, $matches)
     {
         global $weathermap_error_suppress;
 
@@ -1374,14 +1378,14 @@ class WeatherMapConfigReader
         return false;
     }
 
-    function handleGLOBALCOLOR($fullcommand, $args, $matches)
+    private function handleGLOBALCOLOR($fullcommand, $args, $matches)
     {
         $key = str_replace("COLOR", "", strtoupper($args[0]));
         $val = strtolower($args[1]);
 
-        $r = 0;
-        $g = 0;
-        $b = 0;
+        $red = 0;
+        $green = 0;
+        $blue = 0;
 
         // this is a regular colour setting thing
 
@@ -1394,30 +1398,30 @@ class WeatherMapConfigReader
 
         // this is a regular colour setting thing
         if (isset($args[2])) {
-            $r = $args[1];
-            $g = $args[2];
-            $b = $args[3];
+            $red = $args[1];
+            $green = $args[2];
+            $blue = $args[3];
         }
 
         if ($args[1] == 'none') {
-            $r = -1;
-            $g = -1;
-            $b = -1;
+            $red = -1;
+            $green = -1;
+            $blue = -1;
         }
 
-        $this->mapObject->colours['DEFAULT'][$key]['red1'] = $r;
-        $this->mapObject->colours['DEFAULT'][$key]['green1'] = $g;
-        $this->mapObject->colours['DEFAULT'][$key]['blue1'] = $b;
+        $this->mapObject->colours['DEFAULT'][$key]['red1'] = $red;
+        $this->mapObject->colours['DEFAULT'][$key]['green1'] = $green;
+        $this->mapObject->colours['DEFAULT'][$key]['blue1'] = $blue;
         $this->mapObject->colours['DEFAULT'][$key]['bottom'] = -2;
         $this->mapObject->colours['DEFAULT'][$key]['top'] = -1;
         $this->mapObject->colours['DEFAULT'][$key]['special'] = 1;
 
-        $this->mapObject->colourtable[$key] = new WMColour($r, $g, $b);
+        $this->mapObject->colourtable[$key] = new WMColour($red, $green, $blue);
 
         return true;
     }
 
-    function handleNODE_USESCALE($fullcommand, $args, $matches)
+    private function handleNODE_USESCALE($fullcommand, $args, $matches)
     {
         $svar = '';
         $stype = 'percent';
@@ -1456,46 +1460,39 @@ class WeatherMapConfigReader
     }
 
 
-    function handleFONTDEFINE($fullcommand, $args, $matches)
+    private function handleFONTDEFINE($fullcommand, $args, $matches)
     {
         if (isset($args[3])) {
             wm_debug("New TrueType font in slot %d\n", $args[1]);
-            if (function_exists("imagettfbbox")) {
-                // test if this font is valid, before adding it to the font table...
-                $bounds = @imagettfbbox($args[3], 0, $args[2], "Ignore me");
 
-                if (isset($bounds[0])) {
-                    $this->mapObject->fonts[$args[1]] = new WMFont();
-                    $this->mapObject->fonts[$args[1]]->type = "truetype";
-                    $this->mapObject->fonts[$args[1]]->file = $args[2];
-                    $this->mapObject->fonts[$args[1]]->size = $args[3];
-                } else {
-                    wm_warn("Failed to load ttf font " . $args[2] . " - at config line $this->lineCount\n [WMWARN30]");
-                }
-            } else {
-                wm_warn("imagettfbbox() is not a defined function. You don't seem to have FreeType compiled into your gd module. [WMWARN31]\n");
+            $newFontObject = new WMFont();
+            $fontOK = $newFontObject->InitTTF($args[2], $args[3]);
+
+            if (! $fontOK) {
+                wm_warn("Failed to load ttf font " . $args[2] . " - at config line $this->lineCount\n [WMWARN30]");
             }
 
-            return true;
         } else {
             wm_debug("New GD font in slot %d\n", $args[1]);
-            $newfont = imageloadfont($args[2]);
 
-            if ($newfont) {
-                $this->mapObject->fonts[$args[1]] = new WMFont();
-                $this->mapObject->fonts[$args[1]]->type = "gd";
-                $this->mapObject->fonts[$args[1]]->file = $args[2];
-                $this->mapObject->fonts[$args[1]]->gdnumber = $newfont;
-            } else {
+            $newFontObject = new WMFont();
+            $fontOK = $newFontObject->InitGD($args[2]);
+
+            if (!$fontOK) {
                 wm_warn("Failed to load GD font: " . $args[2] . " ($newfont) at config line $this->lineCount [WMWARN32]\n");
+                $newFontObject = null;
             }
+        }
+
+        if (! is_null($newFontObject)) {
+            $this->mapObject->fonts[$args[1]] = $newFontObject;
             return true;
         }
 
         return false;
     }
 
-    function handleOVERLIB($fullcommand, $args, $matches)
+    private function handleOVERLIB($fullcommand, $args, $matches)
     {
         $this->mapObject->has_overlibs = true;
 
@@ -1519,7 +1516,7 @@ class WeatherMapConfigReader
         return true;
     }
 
-    function handleCOLOR($fullcommand, $args, $matches)
+    private function handleCOLOR($fullcommand, $args, $matches)
     {
         $key = $args[0];
         $field = str_replace("color", "colour", strtolower($args[0]));
@@ -1564,7 +1561,7 @@ class WeatherMapConfigReader
         return false;
     }
 
-    function handleTARGET($fullcommand, $args, $matches)
+    private function handleTARGET($fullcommand, $args, $matches)
     {
         // wipe any existing targets, otherwise things in the DEFAULT accumulate with the new ones
         $this->currentObject->targets = array();
@@ -1599,7 +1596,7 @@ class WeatherMapConfigReader
         return true;
     }
 
-    function commitItem()
+    private function commitItem()
     {
         if (is_null($this->currentObject)) {
             return;

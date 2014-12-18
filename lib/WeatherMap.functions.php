@@ -423,7 +423,6 @@ function rotateAboutPoint(&$points, $centre_x, $centre_y, $angle = 0)
 
 // ***********************************************
 
-// Skeleton class just to keep strict mode quiet.
 class WMFont
 {
     var $type;
@@ -431,13 +430,11 @@ class WMFont
     var $gdnumber;
     var $size;
 
-    function InitTTF($file, $size)
+    function initTTF($file, $size)
     {
-
-
         if (function_exists("imagettfbbox")) {
             // test if this font is valid, before adding it to the font table...
-            $bounds = @imagettfbbox($args[3], 0, $args[2], "Ignore me");
+            $bounds = @imagettfbbox($size, 0, $file, "Ignore me");
             if (isset($bounds[0])) {
 
                 $this->file = $file;
@@ -445,15 +442,33 @@ class WMFont
                 $this->type = "truetype";
 
                 return true;
-            } else {
-                return false;
             }
-        } else {
+
             return false;
+        }
+
+        return false;
+    }
+
+    function isTrueType()
+    {
+        if ($this->type == 'truetype') {
+            return true;
         }
     }
 
-    function InitGD($file, $gdnumber)
+    function isGD()
+    {
+        if ($this->type == 'gd') {
+            return true;
+        }
+        if ($this->type == 'GD builtin') {
+            return true;
+        }
+        return false;
+    }
+
+    function initGD($file)
     {
         $gd = imageloadfont($file);
 
@@ -466,6 +481,132 @@ class WMFont
         } else {
             return false;
         }
+    }
+
+    function initGDBuiltin($gdNumber)
+    {
+        $this->gdnumber = $gdNumber;
+        $this->type = "GD builtin";
+
+        return true;
+    }
+
+    function drawImageString($image, $x, $y, $string, $colour, $angle = 0)
+    {
+        if ($this->isGD()) {
+            imagestring($image, $this->gdnumber, $x, $y - imagefontheight($this->gdnumber), $string, $colour);
+            if ($angle != 0) {
+                wm_warn("Angled text doesn't work with non-FreeType fonts [WMWARN02]\n");
+            }
+        }
+
+        if ($this->isTrueType()) {
+            imagettftext($image, $this->size, $angle, $x, $y, $colour, $this->file, $string);
+        }
+    }
+
+    function calculateImageStringSize($string)
+    {
+        $linecount = 1;
+
+        $lines = explode("\n", $string);
+        $linecount = sizeof($lines);
+        $maxlinelength = 0;
+
+        foreach ($lines as $line) {
+            $l = strlen($line);
+            if ($l > $maxlinelength) {
+                $maxlinelength = $l;
+            }
+        }
+
+        if ($this->isGD()) {
+            return array(imagefontwidth($this->gdnumber) * $maxlinelength, $linecount * imagefontheight($this->gdnumber));
+        }
+
+        if ($this->isTrueType()) {
+            $ysize = 0;
+            $xsize = 0;
+            foreach ($lines as $line) {
+                $bounds = imagettfbbox($this->size, 0, $this->file, $line);
+                $cx = $bounds[4] - $bounds[0];
+                $cy = $bounds[1] - $bounds[5];
+                if ($cx > $xsize) {
+                    $xsize = $cx;
+                }
+                $ysize += ($cy * 1.2);
+            }
+
+            return (array($xsize, $ysize));
+        }
+
+        return (array(0,0));
+    }
+}
+
+class WMFontTable
+{
+    private $table = array();
+
+    public function init()
+    {
+        for ($i = 1; $i < 6; $i++) {
+            $this->table[$i] = new WMFont();
+            $this->table[$i]->initGDBuiltin($i);
+        }
+    }
+
+    public function addFont($number, $font)
+    {
+        $this->table[$number] = $font;
+    }
+
+    /**
+     * isValid - verify if a font number is valid in the current font table
+     *
+     * @param $number int Number of font in table
+     * @return bool true if font number is for a valid font
+     */
+    public function isValid($number)
+    {
+        if (! isset($this->table[$number])) {
+            return false;
+        }
+        if ($this->table[$number]->type="") {
+            return false;
+        }
+
+        return true;
+    }
+
+    public function getFont($number)
+    {
+        if (! $this->isValid($number)) {
+            wm_warn("Using a non-existent special font ($number) - falling back to internal GD fonts [WMWARN36]\n");
+            return $this->getFont(5);
+        }
+
+        return $this->table[$number];
+    }
+
+    public function getConfig()
+    {
+        $output = "";
+        if (count($this->table) > 0) {
+            foreach ($this->table as $fontnumber => $font) {
+                if ($font->type == 'truetype') {
+                    $output .= sprintf("FONTDEFINE %d %s %d\n", $fontnumber, $font->file, $font->size);
+                }
+
+                if ($font->type == 'gd') {
+                    $output .= sprintf("FONTDEFINE %d %s\n", $fontnumber, $font->file);
+                }
+            }
+
+            $output .= "\n";
+        }
+
+        return $output;
     }
 }
 

@@ -59,7 +59,10 @@ class WeatherMapRunner {
         weathermap_memory_check("MEM postread $this->config_file");
         $this->wmap->ReadData();
         weathermap_memory_check("MEM postdata $this->config_file");
+
+        $this->wmap->runProcessorPlugins("post");
         weathermap_memory_check("MEM pre-render $mapcount");
+
         $this->wmap->DrawMap($this->tempfile, $this->thumbimagefile, read_config_option("weathermap_thumbsize"));
     }
     

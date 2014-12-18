@@ -1466,7 +1466,7 @@ class WeatherMapConfigReader
             wm_debug("New TrueType font in slot %d\n", $args[1]);
 
             $newFontObject = new WMFont();
-            $fontOK = $newFontObject->InitTTF($args[2], $args[3]);
+            $fontOK = $newFontObject->initTTF($args[2], $args[3]);
 
             if (! $fontOK) {
                 wm_warn("Failed to load ttf font " . $args[2] . " - at config line $this->lineCount\n [WMWARN30]");
@@ -1476,7 +1476,7 @@ class WeatherMapConfigReader
             wm_debug("New GD font in slot %d\n", $args[1]);
 
             $newFontObject = new WMFont();
-            $fontOK = $newFontObject->InitGD($args[2]);
+            $fontOK = $newFontObject->initGD($args[2]);
 
             if (!$fontOK) {
                 wm_warn("Failed to load GD font: " . $args[2] . " ($newfont) at config line $this->lineCount [WMWARN32]\n");
@@ -1485,7 +1485,8 @@ class WeatherMapConfigReader
         }
 
         if (! is_null($newFontObject)) {
-            $this->mapObject->fonts[$args[1]] = $newFontObject;
+            // $this->mapObject->fonts[$args[1]] = $newFontObject;
+            $this->mapObject->fonts->addFont($args[1], $newFontObject);
             return true;
         }
 

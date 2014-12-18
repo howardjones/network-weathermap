@@ -1162,6 +1162,8 @@ class WeatherMap extends WeatherMapBase
         $tileheight = $tileheight * 1.1;
         $tilespacing = $tileheight + 2;
 
+
+
         if (($this->keyx[$scalename] >= 0) && ($this->keyy[$scalename] >= 0)) {
             list($minwidth,) = $this->myimagestringsize($font, 'MMMM 100%-100%');
             list($minminwidth,) = $this->myimagestringsize($font, 'MMMM ');

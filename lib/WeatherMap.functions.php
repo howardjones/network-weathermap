@@ -491,53 +491,51 @@ class WMFont
         return true;
     }
 
-    function drawImageString($image, $x, $y, $string, $colour, $angle = 0)
+    function drawImageString($gdImage, $x, $y, $string, $colour, $angle = 0)
     {
         if ($this->isGD()) {
-            imagestring($image, $this->gdnumber, $x, $y - imagefontheight($this->gdnumber), $string, $colour);
+            imagestring($gdImage, $this->gdnumber, $x, $y - imagefontheight($this->gdnumber), $string, $colour);
             if ($angle != 0) {
                 wm_warn("Angled text doesn't work with non-FreeType fonts [WMWARN02]\n");
             }
         }
 
         if ($this->isTrueType()) {
-            imagettftext($image, $this->size, $angle, $x, $y, $colour, $this->file, $string);
+            imagettftext($gdImage, $this->size, $angle, $x, $y, $colour, $this->file, $string);
         }
     }
 
     function calculateImageStringSize($string)
     {
-        $linecount = 1;
-
         $lines = explode("\n", $string);
-        $linecount = sizeof($lines);
-        $maxlinelength = 0;
+        $lineCount = sizeof($lines);
+        $maxLineLength = 0;
 
         foreach ($lines as $line) {
             $l = strlen($line);
-            if ($l > $maxlinelength) {
-                $maxlinelength = $l;
+            if ($l > $maxLineLength) {
+                $maxLineLength = $l;
             }
         }
 
         if ($this->isGD()) {
-            return array(imagefontwidth($this->gdnumber) * $maxlinelength, $linecount * imagefontheight($this->gdnumber));
+            return array(imagefontwidth($this->gdnumber) * $maxLineLength, $lineCount * imagefontheight($this->gdnumber));
         }
 
         if ($this->isTrueType()) {
-            $ysize = 0;
-            $xsize = 0;
+            $height = 0;
+            $width = 0;
             foreach ($lines as $line) {
                 $bounds = imagettfbbox($this->size, 0, $this->file, $line);
-                $cx = $bounds[4] - $bounds[0];
-                $cy = $bounds[1] - $bounds[5];
-                if ($cx > $xsize) {
-                    $xsize = $cx;
+                $charWidth = $bounds[4] - $bounds[0];
+                $charHeight = $bounds[1] - $bounds[5];
+                if ($charWidth > $width) {
+                    $width = $charWidth;
                 }
-                $ysize += ($cy * 1.2);
+                $height += ($charHeight * 1.2);
             }
 
-            return (array($xsize, $ysize));
+            return (array($width, $height));
         }
 
         return (array(0,0));
@@ -551,55 +549,57 @@ class WMFontTable
     public function init()
     {
         for ($i = 1; $i < 6; $i++) {
-            $this->table[$i] = new WMFont();
-            $this->table[$i]->initGDBuiltin($i);
+            $newFont = new WMFont();
+            $newFont->initGDBuiltin($i);
+
+            $this->addFont($i, $newFont);
         }
     }
 
-    public function addFont($number, $font)
+    public function addFont($fontNumber, $font)
     {
-        $this->table[$number] = $font;
+        $this->table[$fontNumber] = $font;
     }
 
     /**
      * isValid - verify if a font number is valid in the current font table
      *
-     * @param $number int Number of font in table
+     * @param $fontNumber int Number of font in table
      * @return bool true if font number is for a valid font
      */
-    public function isValid($number)
+    public function isValid($fontNumber)
     {
-        if (! isset($this->table[$number])) {
+        if (! isset($this->table[$fontNumber])) {
             return false;
         }
-        if ($this->table[$number]->type="") {
+        if ($this->table[$fontNumber]->type=="") {
             return false;
         }
 
         return true;
     }
 
-    public function getFont($number)
+    public function getFont($fontNumber)
     {
-        if (! $this->isValid($number)) {
-            wm_warn("Using a non-existent special font ($number) - falling back to internal GD fonts [WMWARN36]\n");
+        if (! $this->isValid($fontNumber)) {
+            wm_warn("Using a non-existent special font ($fontNumber) - falling back to internal GD fonts [WMWARN36]\n");
             return $this->getFont(5);
         }
 
-        return $this->table[$number];
+        return $this->table[$fontNumber];
     }
 
     public function getConfig()
     {
         $output = "";
         if (count($this->table) > 0) {
-            foreach ($this->table as $fontnumber => $font) {
-                if ($font->type == 'truetype') {
-                    $output .= sprintf("FONTDEFINE %d %s %d\n", $fontnumber, $font->file, $font->size);
+            foreach ($this->table as $fontNumber => $fontObject) {
+                if ($fontObject->type == 'truetype') {
+                    $output .= sprintf("FONTDEFINE %d %s %d\n", $fontNumber, $fontObject->file, $fontObject->size);
                 }
 
-                if ($font->type == 'gd') {
-                    $output .= sprintf("FONTDEFINE %d %s\n", $fontnumber, $font->file);
+                if ($fontObject->type == 'gd') {
+                    $output .= sprintf("FONTDEFINE %d %s\n", $fontNumber, $fontObject->file);
                 }
             }
 
@@ -614,15 +614,15 @@ class WMFontTable
 
 
 
-function wmDrawMarkerCross($gdimage, $colour, $x, $y, $size = 5)
+function wmDrawMarkerCross($gdImage, $colour, $x, $y, $size = 5)
 {
-    imageline($gdimage, $x, $y, $x + $size, $y + $size, $colour);
-    imageline($gdimage, $x, $y, $x - $size, $y + $size, $colour);
-    imageline($gdimage, $x, $y, $x + $size, $y - $size, $colour);
-    imageline($gdimage, $x, $y, $x - $size, $y - $size, $colour);
+    imageline($gdImage, $x, $y, $x + $size, $y + $size, $colour);
+    imageline($gdImage, $x, $y, $x - $size, $y + $size, $colour);
+    imageline($gdImage, $x, $y, $x + $size, $y - $size, $colour);
+    imageline($gdImage, $x, $y, $x - $size, $y - $size, $colour);
 }
 
-function wmDrawMarkerDiamond($gdimage, $colour, $x, $y, $size = 10)
+function wmDrawMarkerDiamond($gdImage, $colour, $x, $y, $size = 10)
 {
     $points = array ();
     
@@ -640,10 +640,10 @@ function wmDrawMarkerDiamond($gdimage, $colour, $x, $y, $size = 10)
     
     $num_points = 4;
     
-    imagepolygon($gdimage, $points, $num_points, $colour);
+    imagepolygon($gdImage, $points, $num_points, $colour);
 }
 
-function wmDrawMarkerBox($gdimage, $colour, $x, $y, $size = 10)
+function wmDrawMarkerBox($gdImage, $colour, $x, $y, $size = 10)
 {
     $points = array ();
     
@@ -661,12 +661,12 @@ function wmDrawMarkerBox($gdimage, $colour, $x, $y, $size = 10)
     
     $num_points = 4;
     
-    imagepolygon($gdimage, $points, $num_points, $colour);
+    imagepolygon($gdImage, $points, $num_points, $colour);
 }
 
-function wmDrawMarkerCircle($gdimage, $colour, $x, $y, $size = 10)
+function wmDrawMarkerCircle($gdImage, $colour, $x, $y, $size = 10)
 {
-    imagearc($gdimage, $x, $y, $size, $size, 0, 360, $colour);
+    imagearc($gdImage, $x, $y, $size, $size, 0, 360, $colour);
 }
 
 /**

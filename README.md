@@ -1,6 +1,15 @@
 # Network Weathermap
 
+[![Build Status](https://travis-ci.org/howardjones/network-weathermap.svg?branch=master)](https://travis-ci.org/howardjones/network-weathermap)
+[![Test Coverage](https://codeclimate.com/github/howardjones/network-weathermap/badges/coverage.svg)](https://codeclimate.com/github/howardjones/network-weathermap)
+[![Code Climate](https://codeclimate.com/github/howardjones/network-weathermap/badges/gpa.svg)](https://codeclimate.com/github/howardjones/network-weathermap)
+
 *TEST RELEASE* for 0.98
+
+Note - this is undergoing pretty dramatic refactoring and reorganisation at the moment. I'd wait
+a little while before forking for any work - HJ Dec 20th 2014
+
+---
 
 This is PHP Network Weathermap, version 0.98 by Howard Jones (howie@thingy.com)
 

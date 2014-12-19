@@ -65,7 +65,7 @@ class WeatherMapEditor {
     function addNode($x, $y, $nodename = "", $template = "DEFAULT")
     {    
         if (! $this->isLoaded() ) {
-            die("Map must be loaded before editing API called.");
+            throw new Exception("Map must be loaded before editing API called.");
         }
 
         $success = false;
@@ -130,7 +130,7 @@ class WeatherMapEditor {
     function moveNode($node_name, $x, $y)
     {
         if (! $this->isLoaded()) {
-            die("Map must be loaded before editing API called.");
+            throw new Exception("Map must be loaded before editing API called.");
         }
 
         $n_links = 0;
@@ -161,9 +161,9 @@ class WeatherMapEditor {
                         $dx = $link->a->x - $x;
                         $dy = $link->a->y - $y;
 
-                        for ($i=0; $i<count($link->vialist); $i++) {
-                            $link->vialist[$i][0] = $link->vialist[$i][0]-$dx;
-                            $link->vialist[$i][1] = $link->vialist[$i][1]-$dy;
+                        for ($count=0; $count<count($link->vialist); $count++) {
+                            $link->vialist[$count][0] = $link->vialist[$count][0]-$dx;
+                            $link->vialist[$count][1] = $link->vialist[$count][1]-$dy;
                         }
                     } else {
                         $pivx = $pivot->x;
@@ -194,25 +194,25 @@ class WeatherMapEditor {
                         // rotate so that link is along the axis
                         rotateAboutPoint($points,$pivx, $pivy, deg2rad($angle_old));
                         // do the scaling in here
-                        for ($i=0; $i<(count($points)/2); $i++) {
-                            $basex = ($points[$i*2] - $pivx) * $scalefactor + $pivx;
-                            $points[$i*2] = $basex;
+                        for ($count=0; $count<(count($points)/2); $count++) {
+                            $basex = ($points[$count*2] - $pivx) * $scalefactor + $pivx;
+                            $points[$count*2] = $basex;
                         }
                         // rotate back so that link is along the new direction
                         rotateAboutPoint($points,$pivx, $pivy, deg2rad(-$angle_new));
 
                         // now put the modified points back into the vialist again
-                        $v = 0;
-                        $i = 0;
+                        $viaCount = 0;
+                        $count = 0;
                         foreach ($points as $p) {
                             // skip a point if it positioned relative to a node. Those shouldn't be rotated (well, IMHO)
-                            if (!isset($link->vialist[$v][2])) {
-                                $link->vialist[$v][$i]=$p;
+                            if (!isset($link->vialist[$viaCount][2])) {
+                                $link->vialist[$viaCount][$count]=$p;
                             }
-                            $i++;
-                            if ($i==2) {
-                                $i=0;
-                                $v++;
+                            $count++;
+                            if ($count==2) {
+                                $count=0;
+                                $viaCount++;
                             }
                         }
                    }
@@ -232,16 +232,16 @@ class WeatherMapEditor {
     function updateNode($nodename)
     {
         if (! $this->isLoaded()) {
-            die("Map must be loaded before editing API called.");
+            throw new Exception("Map must be loaded before editing API called.");
         }
 
-        die("unimplemented");
+        throw new Exception("unimplemented");
     }
     
     function deleteNode($nodename)
     {
         if (! $this->isLoaded()) {
-            die("Map must be loaded before editing API called.");
+            throw new Exception("Map must be loaded before editing API called.");
         }
 
         $log = "";
@@ -278,7 +278,7 @@ class WeatherMapEditor {
     function cloneNode($sourcename, $targetname = "", $or_fail = false)
     {
         if (! $this->isLoaded()) {
-            die("Map must be loaded before editing API called.");
+            throw new Exception("Map must be loaded before editing API called.");
         }
 
         if (isset($this->map->nodes[$sourcename])) {
@@ -325,7 +325,7 @@ class WeatherMapEditor {
     function addLink($node1, $node2, $linkname = "",$template = "DEFAULT")
     {    
         if (! $this->isLoaded()) {
-            die("Map must be loaded before editing API called.");
+            throw new Exception("Map must be loaded before editing API called.");
         }
 
         $success = false;
@@ -365,16 +365,16 @@ class WeatherMapEditor {
     function updateLink()
     {
         if (! $this->isLoaded()) {
-            die("Map must be loaded before editing API called.");
+            throw new Exception("Map must be loaded before editing API called.");
         }
 
-        die("unimplemented");
+        throw new Exception("unimplemented");
     }
 
     function deleteLink($linkname)
     {
         if (! $this->isLoaded()) {
-            die("Map must be loaded before editing API called.");
+            throw new Exception("Map must be loaded before editing API called.");
         }
 
         if (isset($this->map->links[$linkname])) {
@@ -394,10 +394,10 @@ class WeatherMapEditor {
     function cloneLink($sourcename, $targetname="")
     {
         if (! $this->isLoaded()) {
-            die("Map must be loaded before editing API called.");
+            throw new Exception("Map must be loaded before editing API called.");
         }
-        
-        die("unimplemented");
+
+        throw new Exception("unimplemented");
     }
     
     /**
@@ -412,7 +412,7 @@ class WeatherMapEditor {
     function setLinkVia($linkname, $x, $y)
     {
         if (! $this->isLoaded()) {
-            die("Map must be loaded before editing API called.");
+            throw new Exception("Map must be loaded before editing API called.");
         }
 
         if (isset($this->map->links[$linkname])) {
@@ -426,7 +426,7 @@ class WeatherMapEditor {
     function clearLinkVias($linkname)
     {
         if (! $this->isLoaded()) {
-            die("Map must be loaded before editing API called.");
+            throw new Exception("Map must be loaded before editing API called.");
         }
 
         if (isset($this->map->links[$linkname])) {
@@ -440,7 +440,7 @@ class WeatherMapEditor {
     function tidyLink($linkname) 
     {
         if (! $this->isLoaded()) {
-            die("Map must be loaded before editing API called.");
+            throw new Exception("Map must be loaded before editing API called.");
         }
 
         // draw a map and throw it away, to calculate all the bounding boxes
@@ -451,7 +451,7 @@ class WeatherMapEditor {
     function tidyAllLinks()
     {
         if (! $this->isLoaded()) {
-            die("Map must be loaded before editing API called.");
+            throw new Exception("Map must be loaded before editing API called.");
         }
 
         // draw a map and throw it away, to calculate all the bounding boxes
@@ -462,7 +462,7 @@ class WeatherMapEditor {
     function retidyAllLinks()
     {
         if (! $this->isLoaded()) {
-            die("Map must be loaded before editing API called.");
+            throw new Exception("Map must be loaded before editing API called.");
         }
         
         // draw a map and throw it away, to calculate all the bounding boxes
@@ -473,7 +473,7 @@ class WeatherMapEditor {
     function retidyLinks()
     {
         if (! $this->isLoaded()) {
-            die("Map must be loaded before editing API called.");
+            throw new Exception("Map must be loaded before editing API called.");
         }
         
         // draw a map and throw it away, to calculate all the bounding boxes
@@ -490,7 +490,7 @@ class WeatherMapEditor {
     function _retidyLinks($ignore_tidied=false)
     {
         if (! $this->isLoaded()) {
-            die("Map must be loaded before editing API called.");
+            throw new Exception("Map must be loaded before editing API called.");
         }
     
         // draw a map and throw it away, to calculate all the bounding boxes
@@ -676,11 +676,11 @@ class WeatherMapEditor {
                         $bxx = $node_b->x + $bx;
                         $byy = $node_b->y + $by;
         
-                        $d = distance($axx,$ayy, $bxx, $byy);
-                        if ($d < $best_distance) {
+                        $distance = distance($axx,$ayy, $bxx, $byy);
+                        if ($distance < $best_distance) {
                             // print "from $corner1 ($axx, $ayy) to $corner2 ($bxx, $byy): ";
                             // print "NEW BEST $d\n";
-                            $best_distance = $d;
+                            $best_distance = $distance;
                             $best_offset_a = $corner1;
                             $best_offset_b = $corner2;
                         }
@@ -728,7 +728,7 @@ class WeatherMapEditor {
     function untidyLinks()
     {
         if (! $this->isLoaded()) {
-            die("Map must be loaded before editing API called.");
+            throw new Exception("Map must be loaded before editing API called.");
         }
         
         foreach ($this->map->links as $link) {
@@ -740,7 +740,7 @@ class WeatherMapEditor {
     function placeLegend($x, $y, $scalename = "DEFAULT")
     {
         if (! $this->isLoaded()) {
-            die("Map must be loaded before editing API called.");
+            throw new Exception("Map must be loaded before editing API called.");
         }
         
         $this->map->keyx[$scalename] = $x;
@@ -750,7 +750,7 @@ class WeatherMapEditor {
     function placeTitle($x, $y) 
     {
         if (! $this->isLoaded()) {
-            die("Map must be loaded before editing API called.");
+            throw new Exception("Map must be loaded before editing API called.");
         }
         
         $this->map->timex = $x;
@@ -760,7 +760,7 @@ class WeatherMapEditor {
     function placeTimestamp($x, $y)
     {
         if (! $this->isLoaded()) {
-            die("Map must be loaded before editing API called.");
+            throw new Exception("Map must be loaded before editing API called.");
         }
         
         $this->map->timex = $x;
@@ -770,7 +770,7 @@ class WeatherMapEditor {
     function asJS()
     {
         if (! $this->isLoaded()) {
-            die("Map must be loaded before editing API called.");
+            throw new Exception("Map must be loaded before editing API called.");
         }
 
     }

@@ -61,7 +61,6 @@ class WeatherMapScale
     function SetColour($name, $colour)
     {
         assert(isset($this->owner));
-        assert($this->owner->kilo != 0);
 
         switch (strtoupper($name))
         {
@@ -83,21 +82,21 @@ class WeatherMapScale
         }
     }
 
-    function AddSpan($lowvalue, $highvalue, $colour1, $colour2 = null, $tag = '')
+    function AddSpan($lowValue, $highValue, $lowColour, $highColour = null, $tag = '')
     {
         assert(isset($this->owner));
-        $key = $lowvalue . '_' . $highvalue;
+        $key = $lowValue . '_' . $highValue;
 
-        $this->colours[$key]['c1'] = $colour1;
-        $this->colours[$key]['c2'] = $colour2;
+        $this->colours[$key]['c1'] = $lowColour;
+        $this->colours[$key]['c2'] = $highColour;
         $this->colours[$key]['tag'] = $tag;
-        $this->colours[$key]['bottom'] = $lowvalue;
-        $this->colours[$key]['top'] = $highvalue;
+        $this->colours[$key]['bottom'] = $lowValue;
+        $this->colours[$key]['top'] = $highValue;
 
-        wm_debug("%s %s->%s", $this->name, $lowvalue, $highvalue);
+        wm_debug("%s %s->%s", $this->name, $lowValue, $highValue);
     }
 
-    function WriteConfig()
+    function getConfig()
     {
         assert(isset($this->owner));
         // TODO - These should all check against the defaults
@@ -252,24 +251,14 @@ class WeatherMapScale
             return (array ($col, $key, $tag));
 
         } else {
+            if ($nowarn_scalemisses == 0) {
+                wm_warn(
+                    "ColourFromValue: Scale $scalename doesn't include a line for $value"
+                    . ($is_percent ? "%" : "") . " while drawing item $name [WMWARN29]\n"
+                );
+            }
             return array ($this->scalemisscolour, '', '');
         }
-
-        // shouldn't really get down to here if there's a complete SCALE
-
-        // you'll only get grey for a COMPLETELY quiet link if there's no 0 in the SCALE lines
-        if ($value == 0) {
-            return array (new WMColour(192, 192, 192), '', '');
-        }
-
-        if ($nowarn_scalemisses == 0) {
-            wm_warn(
-                "ColourFromValue: Scale $scalename doesn't include a line for $value"
-                . ($is_percent ? "%" : "") . " while drawing item $name [WMWARN29]\n"
-            );
-        }
-        // and you'll only get white for a link with no colour assigned
-        return array (new WMColour(255, 255, 255), '', '');
     }
 
     function DrawLegend($image)

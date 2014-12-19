@@ -713,7 +713,7 @@ class WeatherMapNode extends WeatherMapItem
         }
     }
 
-    function writeConfig()
+    function getConfig()
     {
         $output='';
 

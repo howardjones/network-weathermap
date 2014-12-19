@@ -180,15 +180,12 @@ class WeatherMapLink extends WeatherMapItem
         return ($dirs);
     }
 
-    // image = GD image references
-    // col = array of Colour objects
-    // widths = array of link widths
-    function drawComments($image, $col, $widths)
+    function drawComments($gdImage, $colourList, $widthList)
     {
         $curvepoints =& $this->spinepoints;
         $last = count($curvepoints)-1;
 
-        $totaldistance = $curvepoints[$last][2];
+        $totalDistance = $curvepoints[$last][2];
 
         $start[OUT] = 0;
         $commentpos[OUT] = $this->commentoffset_out;
@@ -196,6 +193,7 @@ class WeatherMapLink extends WeatherMapItem
         $start[IN] = $last;
 
         $dirs = $this->getDirectionList();
+        $fontObject = $this->owner->fonts->getFont($this->commentfont);
 
         foreach ($dirs as $dir) {
             // Time to deal with Link Comments, if any
@@ -212,10 +210,10 @@ class WeatherMapLink extends WeatherMapItem
 
                 // nudge pushes the comment out along the link arrow a little bit
                 // (otherwise there are more problems with text disappearing underneath links)
-                $nudgealong = intval($this->get_hint("comment_nudgealong"));
-                $nudgeout = intval($this->get_hint("comment_nudgeout"));
+                $nudgeAlong = intval($this->get_hint("comment_nudgealong"));
+                $nudgeOut = intval($this->get_hint("comment_nudgeout"));
 
-                $extra = ($totaldistance * ($extra_percent/100));
+                $extra = ($totalDistance * ($extra_percent/100));
 
                 list($x, $y, $comment_index, $angle) = find_distance_coords_angle($curvepoints, $extra);
 
@@ -227,9 +225,9 @@ class WeatherMapLink extends WeatherMapItem
                     $dy = $curvepoints[$comment_index+1][1] - $y;
                 }
 
-                $centre_distance = $widths[$dir] + 4 + $nudgeout;
+                $centre_distance = $widthList[$dir] + 4 + $nudgeOut;
                 if ($this->commentstyle == 'center') {
-                    $centre_distance = $nudgeout - ($textheight/2);
+                    $centre_distance = $nudgeOut - ($textheight/2);
                 }
 
                 // find the normal to our link, so we can get outside the arrow
@@ -239,7 +237,7 @@ class WeatherMapLink extends WeatherMapItem
                 $dy = $dy/$l;
                 $nx = $dy;
                 $ny = -$dx;
-                $flipped=false;
+                $flipped = false;
 
                 // if the text will be upside-down, rotate it, flip it, and right-justify it
                 // not quite as catchy as Missy's version
@@ -248,15 +246,15 @@ class WeatherMapLink extends WeatherMapItem
                     if ($angle < -180) {
                         $angle +=360;
                     }
-                    $edge_x = $x + $nudgealong*$dx - $nx * $centre_distance;
-                    $edge_y = $y + $nudgealong*$dy - $ny * $centre_distance;
+                    $edge_x = $x + $nudgeAlong*$dx - $nx * $centre_distance;
+                    $edge_y = $y + $nudgeAlong*$dy - $ny * $centre_distance;
                     $flipped = true;
                 } else {
-                    $edge_x = $x + $nudgealong*$dx + $nx * $centre_distance;
-                    $edge_y = $y + $nudgealong*$dy + $ny * $centre_distance;
+                    $edge_x = $x + $nudgeAlong*$dx + $nx * $centre_distance;
+                    $edge_y = $y + $nudgeAlong*$dy + $ny * $centre_distance;
                 }
 
-                if (!$flipped && ($extra + $textlength) > $totaldistance) {
+                if (!$flipped && ($extra + $textlength) > $totalDistance) {
                     $edge_x -= $dx * $textlength;
                     $edge_y -= $dy * $textlength;
                 }
@@ -267,7 +265,9 @@ class WeatherMapLink extends WeatherMapItem
                 }
 
                 // FINALLY, draw the text!
-                $this->owner->myimagestring($image, $this->commentfont, $edge_x, $edge_y, $comment, $col[$dir], $angle);
+
+                $fontObject->drawImageString($gdImage, $edge_x, $edge_y, $comment, $colourList[$dir], $angle);
+              //  $this->owner->myimagestring($gdImage, $this->commentfont, $edge_x, $edge_y, $comment, $colourList[$dir], $angle);
             }
         }
     }
@@ -281,8 +281,6 @@ class WeatherMapLink extends WeatherMapItem
         if ($this->isTemplate()) {
             return;
         }
-
-
     }
 
     function draw($im, &$map)
@@ -508,7 +506,7 @@ class WeatherMapLink extends WeatherMapItem
         }
     }
 
-    function writeConfig()
+    function getConfig()
     {
         $output='';
 

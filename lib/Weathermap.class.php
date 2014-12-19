@@ -1382,6 +1382,7 @@ class WeatherMap extends WeatherMapBase
         } else {
             wm_debug("ReadConfig Detected that this is a config filename.\n");
             $reader->readConfigFile($input);
+            $this->configfile = $input;
         }
 
         $this->postReadConfigTasks();
@@ -1625,26 +1626,6 @@ class WeatherMap extends WeatherMapBase
 
     }
 
-    function ReadConfig_Commit(&$curobj)
-    {
-        if (is_null($curobj)) {
-            return;
-        }
-
-        $last_seen = $curobj->my_type();
-
-        // first, save the previous item, before starting work on the new one
-        if ($last_seen == "NODE") {
-            $this->nodes[$curobj->name] = $curobj;
-            wm_debug("Saving Node: " . $curobj->name . "\n");
-        }
-
-        if ($last_seen == "LINK") {
-            $this->links[$curobj->name] = $curobj;
-            wm_debug("Saving Link: " . $curobj->name . "\n");
-        }
-    }
-
     function writeJSONFile($filename)
     {
 
@@ -1872,7 +1853,7 @@ class WeatherMap extends WeatherMapBase
             $output .= "\n";
 
             foreach ($this->scales as $s) {
-                $output .= $s->WriteConfig();
+                $output .= $s->getConfig();
             }
 
             $output .= "\n";
@@ -1906,13 +1887,13 @@ class WeatherMap extends WeatherMapBase
                     if ($node->defined_in == $this->configfile) {
                         if ($which=="template" && $node->x === null) {
                             wm_debug("TEMPLATE\n");
-                            $output .= $node->WriteConfig();
+                            $output .= $node->getConfig();
                         }
                         if ($which=="normal" && $node->x !== null) {
-                            $output .= $node->WriteConfig();
+                            $output .= $node->getConfig();
                         }
                     } else {
-                        wm_debug("Not writing Node $node->name - defined in another file");
+                        wm_debug("Not writing Node $node->name - defined in another file\n");
                     }
                 }
             }
@@ -1929,10 +1910,10 @@ class WeatherMap extends WeatherMapBase
                     wm_debug("WriteConfig: Considering Link $link->name\n");
                     if ($link->defined_in == $this->configfile) {
                         if ($which=="template" && $link->a === null) {
-                            $output .= $link->WriteConfig();
+                            $output .= $link->getConfig();
                         }
                         if ($which=="normal" && $link->a !== null) {
-                            $output .= $link->WriteConfig();
+                            $output .= $link->getConfig();
                         }
                     }
                 }

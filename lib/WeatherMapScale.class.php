@@ -17,9 +17,12 @@ class WeatherMapScale
     var $scalemisscolour;
     var $owner;
 
+    var $scaleType;
+
     function WeatherMapScale($name, &$owner)
     {
         $this->name = $name;
+        $this->scaleType = "percent";
 
         $this->Reset($owner);
     }
@@ -47,15 +50,32 @@ class WeatherMapScale
 
     }
 
-    function SpanCount()
+    function spanCount()
     {
         return count($this->colours);
     }
 
-    function PopulateDefaults()
+    function populateDefaults()
     {
-        //   $this->AddSpan();
+        if ($this->spanCount() == 0) {
+            wm_debug("Adding default SCALE colour set (no SCALE lines seen).\n");
 
+            $this->AddSpan(0, 0, new WMColour(192, 192, 192));
+            $this->AddSpan(0, 1, new WMColour(255, 255, 255));
+            $this->AddSpan(1, 10, new WMColour(140, 0, 255));
+            $this->AddSpan(10, 25, new WMColour(32, 32, 255));
+            $this->AddSpan(25, 40, new WMColour(0, 192, 255));
+            $this->AddSpan(40, 55, new WMColour(0, 240, 0));
+            $this->AddSpan(55, 70, new WMColour(240, 240, 0));
+            $this->AddSpan(70, 85, new WMColour(255, 192, 0));
+            $this->AddSpan(85, 100, new WMColour(255, 0, 0));
+
+            // we have a 0-0 line now, so we need to hide that.
+            $this->add_hint("key_hidezero_" . $this->name, 1);
+
+        } else {
+            wm_debug("Already have $this->scalesseen scales, no defaults added.\n");
+        }
     }
 
     function SetColour($name, $colour)
@@ -261,7 +281,7 @@ class WeatherMapScale
         }
     }
 
-    function DrawLegend($image)
+    function DrawLegend($gdImage)
     {
         // don't draw if the position is the default -1,-1
         if ($this->keypos[X] == -1 && $this->keypos[Y] == -1) {
@@ -271,35 +291,35 @@ class WeatherMapScale
         switch($this->keystyle)
         {
             case 'classic':
-                $this->DrawLegendClassic($image, false);
+                $this->DrawLegendClassic($gdImage, false);
                 break;
             case 'horizontal':
-                $this->DrawLegendHorizontal($image, $this->keysize[$scalename]);
+                $this->DrawLegendHorizontal($gdImage, $this->keysize);
                 break;
             case 'vertical':
-                $this->DrawLegendVertical($image, $this->keysize[$scalename]);
+                $this->DrawLegendVertical($gdImage, $this->keysize);
                 break;
             case 'inverted':
-                $this->DrawLegendVertical($image, $this->keysize[$scalename], true);
+                $this->DrawLegendVertical($gdImage, $this->keysize, true);
                 break;
             case 'tags':
-                $this->DrawLegendClassic($image, true);
+                $this->DrawLegendClassic($gdImage, true);
                 break;
         }
     }
 
 
-    function DrawLegendClassic()
+    function DrawLegendClassic($gdImage, $useTags = false)
     {
 
     }
 
-    function DrawLegendVertical()
+    function DrawLegendVertical($gdImage, $height = 400, $inverted = true)
     {
 
     }
 
-    function DrawLegendHorizontal()
+    function DrawLegendHorizontal($gdImage, $width = 400)
     {
 
     }

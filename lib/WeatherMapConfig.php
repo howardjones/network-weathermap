@@ -1396,6 +1396,8 @@ class WeatherMapConfigReader
         }
         $this->mapObject->colourtable[$key] = $wmc;
 
+        // below here is the old way
+
         // this is a regular colour setting thing
         if (isset($args[2])) {
             $red = $args[1];
@@ -1415,8 +1417,6 @@ class WeatherMapConfigReader
         $this->mapObject->colours['DEFAULT'][$key]['bottom'] = -2;
         $this->mapObject->colours['DEFAULT'][$key]['top'] = -1;
         $this->mapObject->colours['DEFAULT'][$key]['special'] = 1;
-
-        $this->mapObject->colourtable[$key] = new WMColour($red, $green, $blue);
 
         return true;
     }

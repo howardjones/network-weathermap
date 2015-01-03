@@ -1,0 +1,8 @@
+./Tests
+./test-suite/tests
+./test-suite/references
+./test-suite/tools
+./test-suite/data
+./test.sh
+./composer.json
+./test-suite/make-failing-summary.pl

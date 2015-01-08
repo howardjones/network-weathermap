@@ -1,5 +1,5 @@
 VERSION=0.98pre
-RELBASE=releases
+RELBASE=dist
 RELNAME=php-weathermap-$(VERSION)
 RELDIR=$(RELBASE)/weathermap
 
@@ -23,20 +23,19 @@ clean:
 
 release: 
 	echo Building release $(RELNAME)
-	grep -q ENABLED=true editor.php
-	# mv $(RELDIR) $(RELDIR).$$
-	mkdir -p $(RELDIR)
+
 	rm -rf $(RELDIR)
-	mkdir -p $(RELDIR)
+	mkdir $(RELDIR)
+	mkdir -p $(RELDIR)/random-bits $(RELDIR)/lib/datasources $(RELDIR)/lib/port $(RELDIR)/lib/pre $(RELDIR)/vendor $(RELDIR)/images $(RELDIR)/editor-resources $(RELDIR)/output $(RELDIR)/configs $(RELDIR)/cacti-resources $(RELDIR)/plugin-images $(RELDIR)/docs
+	grep -q ENABLED=true editor.php
 	tar cTf packing.list - | (cd $(RELDIR); tar xvf -)
 	cd $(RELBASE); zip -r $(RELNAME).zip weathermap/*
 	cd $(RELBASE); tar cvfz $(RELNAME).tgz weathermap
-	rm -rf $(RELDIR)
-	mkdir -p $(RELDIR)
+	# Add in test code, and repackage
 	tar cTf packing.list-tests - | (cd $(RELDIR); tar xvf -)
 	cd $(RELBASE); zip -r $(RELNAME)-tests.zip weathermap/*
 	cd $(RELBASE); tar cvfz $(RELNAME)-tests.tgz weathermap
-	rm -rf $(RELDIR)
+	# rm -rf $(RELDIR)
 	echo $(RENAME) built in $(RELBASE)
 	# copy the results into the Vagrant shared directory, ready for test installations
 	cp -f $(RELBASE)/$(RELNAME)-tests.zip  $(RELBASE)/$(RELNAME).zip docs/dev/vagrant-testers

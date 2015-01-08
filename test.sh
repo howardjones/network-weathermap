@@ -22,7 +22,7 @@ grep  Output test-suite/diffs/*.txt | grep -v '|0|' | awk -F: '{ print $1;}' | s
 test-suite/make-failing-summary.pl test-suite/failing-images.txt test-suite/summary.html > test-suite/summary-failing.html
 
 echo
-echo "NOTE: 3 tests have a timestamp in them, and will always fail"
+# echo "NOTE: 3 tests have a timestamp in them, and will always fail"
 
 if [ $fflag -eq 1 ]; then
 

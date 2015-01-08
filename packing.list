@@ -170,6 +170,7 @@
 ./lib/datasources/WeatherMapDataSource_static.php
 ./lib/editor.inc.php
 ./lib/WeatherMapScale.class.php
+./lib/fonts.php
 ./lib/geometry.php
 ./lib/globals.php
 ./lib/editor-pickers/WeatherMapDataPicker_cactidsstats.php

@@ -449,7 +449,7 @@ class WeatherMapEditorUI {
 
         print $editor->getConfig();
 
-        exit();
+        return false;
     }
 
     /**
@@ -464,7 +464,7 @@ class WeatherMapEditorUI {
 
         if (isset($_SERVER['HTTP_IF_NONE_MATCH']) && trim($_SERVER['HTTP_IF_NONE_MATCH']) == $etag) {
             header("HTTP/1.1 304 Not Modified");
-            exit();
+            return false;
         }
         /*
          * NOW load the config, if it's needed. This means a simple refresh skips all the config parsing with
@@ -485,7 +485,7 @@ class WeatherMapEditorUI {
 
         $editor->map->drawMapImage('', '', 250, true, false, false);
 
-        exit();
+        return false;
     }
 
     /**
@@ -713,34 +713,34 @@ class WeatherMapEditorUI {
     {
         $title = "";
 
-        $fd=fopen($filename, "r");
-        if ($fd) {
-            while (!feof($fd)) {
-                $buffer = fgets($fd, 4096);
+        $fileHandle=fopen($filename, "r");
+        if ($fileHandle) {
+            while (!feof($fileHandle)) {
+                $buffer = fgets($fileHandle, 4096);
 
                 if (preg_match("/^\s*TITLE\s+(.*)/i", $buffer, $matches)) {
                     $title = $matches[1];
                 }
             }
-            fclose($fd);
+            fclose($fileHandle);
         }
         return $title;
     }
 
-    function getExistingConfigs($mapdir)
+    function getExistingConfigs($mapDirectory)
     {
         $titles = array();
         $notes = array();
         
-        $errorstring = "";
+        $errorString = "";
                        
-        if (is_dir($mapdir)) {
-            $n=0;
-            $dh=opendir($mapdir);
+        if (is_dir($mapDirectory)) {
+            $n = 0; // TODO - nothing seems to increment this!
+            $directoryHandle = opendir($mapDirectory);
         
-            if ($dh) {
-                while (false !== ($file = readdir($dh))) {
-                    $realfile = $mapdir . DIRECTORY_SEPARATOR . $file;
+            if ($directoryHandle) {
+                while (false !== ($file = readdir($directoryHandle))) {
+                    $realfile = $mapDirectory . DIRECTORY_SEPARATOR . $file;
                     $note = "";
         
                     // skip directories, unreadable files, .files and anything that doesn't come through the sanitiser unchanged
@@ -758,21 +758,21 @@ class WeatherMapEditorUI {
                         $notes[$file] = $note;
                     }
                 }
-                closedir($dh);
+                closedir($directoryHandle);
             } else {
-                $errorstring = "Can't open mapdir to read.";
+                $errorString = "Can't open mapdir to read.";
             }
         
             ksort($titles);
         
             if ($n == 0) {
-                $errorstring = "No files in mapdir";
+                $errorString = "No files in mapdir";
             }
         } else {
-            $errorstring = "NO DIRECTORY named $mapdir";
+            $errorString = "NO DIRECTORY named $mapDirectory";
         }
         
-        return array($titles, $notes, $errorstring);
+        return array($titles, $notes, $errorString);
     }
     
     function showStartPage()
@@ -876,12 +876,13 @@ class WeatherMapEditorUI {
                 if ( !isset($this->commands[$action]['no_save'])) {
                     $editor->saveConfig();
                 }
-                $this->showMainPage($editor);
+                if ($result !== false) {
+                    $this->showMainPage($editor);
+                }
             } else {
                 print "FAIL";
             }
         }
-        exit();
     }
 }
 
@@ -957,15 +958,15 @@ function wmeSanitizeFile($filename, $allowed_exts = array())
         return "";
     }
 
-    $ok = false;
+    $clean = false;
     foreach ($allowed_exts as $ext) {
         $match = ".".$ext;
 
         if (substr($filename, -strlen($match), strlen($match)) == $match) {
-            $ok = true;
+            $clean = true;
         }
     }
-    if (! $ok) {
+    if (! $clean) {
         return "";
     }
     return $filename;

@@ -58,9 +58,9 @@ class WeatherMapEditorUITest extends PHPUnit_Framework_TestCase {
         $this->assertEquals( "", wmeSanitizeConfigFile("../../etc/passwd"));
         $this->assertEquals( "", wmeSanitizeConfigFile("file*.conf"));
 
-        $this->assertEquals( "fish.ext1", wmeSanitizeFile("fish.ext1",array("ext1","ext2")));
-        $this->assertEquals( "", wmeSanitizeFile("fish.ext1",array("ext2","ext3")));
-        $this->assertEquals( "", wmeSanitizeFile("fish",array("ext2","ext3")));
+        $this->assertEquals( "fish.ext1", wmeSanitizeFile("fish.ext1", array("ext1","ext2")));
+        $this->assertEquals( "", wmeSanitizeFile("fish.ext1", array("ext2","ext3")));
+        $this->assertEquals( "", wmeSanitizeFile("fish", array("ext2","ext3")));
     }
 
     function testUIInternals()

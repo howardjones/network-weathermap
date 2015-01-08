@@ -15,6 +15,7 @@ class WeatherMapScale
     var $keyoutlinecolour;
     var $keybgcolour;
     var $scalemisscolour;
+    var $keyfont;
     var $owner;
 
     var $scaleType;
@@ -281,7 +282,7 @@ class WeatherMapScale
         }
     }
 
-    function DrawLegend($gdImage)
+    function DrawLegend($gdTargetImage)
     {
         // don't draw if the position is the default -1,-1
         if ($this->keypos[X] == -1 && $this->keypos[Y] == -1) {
@@ -291,35 +292,49 @@ class WeatherMapScale
         switch($this->keystyle)
         {
             case 'classic':
-                $this->DrawLegendClassic($gdImage, false);
+                $gdScaleImage = $this->DrawLegendClassic(false);
                 break;
             case 'horizontal':
-                $this->DrawLegendHorizontal($gdImage, $this->keysize);
+                $gdScaleImage = $this->DrawLegendHorizontal($this->keysize);
                 break;
             case 'vertical':
-                $this->DrawLegendVertical($gdImage, $this->keysize);
+                $gdScaleImage = $this->DrawLegendVertical($this->keysize);
                 break;
             case 'inverted':
-                $this->DrawLegendVertical($gdImage, $this->keysize, true);
+                $gdScaleImage = $this->DrawLegendVertical($this->keysize, true);
                 break;
             case 'tags':
-                $this->DrawLegendClassic($gdImage, true);
+                $gdScaleImage = $this->DrawLegendClassic(true);
                 break;
         }
+
+        $xTarget = $this->keypos[X];
+        $yTarget = $this->keypos[Y];
+        $width = imagesx($gdScaleImage);
+        $height = imagesy($gdScaleImage);
+
+        imagecopy($gdTargetImage, $gdScaleImage, $xTarget, $yTarget, 0, 0, $width, $height);
+
+        $areaName = "LEGEND:" . $this->name;
+
+        $this->imap->addArea("Rectangle", $areaName, '', array($xTarget, $yTarget, $xTarget + $width, $yTarget + $height));
+        // TODO: stop tracking z-order seperately. addArea() should take the z layer
+        $this->imap_areas[] = $areaName;
+
     }
 
 
-    function DrawLegendClassic($gdImage, $useTags = false)
+    function DrawLegendClassic($useTags = false)
     {
 
     }
 
-    function DrawLegendVertical($gdImage, $height = 400, $inverted = true)
+    function DrawLegendVertical($height = 400, $inverted = true)
     {
 
     }
 
-    function DrawLegendHorizontal($gdImage, $width = 400)
+    function DrawLegendHorizontal($width = 400)
     {
 
     }

@@ -1603,6 +1603,11 @@ class WeatherMapConfigReader
             return;
         }
 
+        if (get_class($this->currentObject) == 'stdClass') {
+            wm_warn("INTERNAL - avoided a stdClass");
+            return;
+        }
+
         wm_debug("-> Committing a $this->currentType\n");
 
         if($this->currentType == 'NODE') {
@@ -1749,12 +1754,11 @@ class WeatherMapConfigReader
             $this->currentSource = $filename;
             $result = $this->readConfigLines($lines);
 
+
             return $result;
         } else {
             return false;
         }
-
-
 
     }
 

@@ -68,10 +68,10 @@ class WeatherMap extends WeatherMapBase
         $selected;
     var $scalesseen;
 
-    var $datasourceclasses;
+    var $dataSourceClasses;
     var $preprocessclasses;
     var $postprocessclasses;
-    var $activedatasourceclasses;
+    var $activeDataSourceClasses;
     var $thumb_width, $thumb_height;
     var $has_includes;
     var $has_overlibs;
@@ -436,18 +436,18 @@ class WeatherMap extends WeatherMapBase
             $dir = dirname(__FILE__) . DIRECTORY_SEPARATOR . $dir;
             wm_debug("Relative path didn't exist. Trying $dir\n");
         }
-        $dh = @opendir($dir);
+        $directoryHandle = @opendir($dir);
 
-        if (!$dh) { // try to find it with the script, if the relative path fails
+        if (!$directoryHandle) { // try to find it with the script, if the relative path fails
             $srcdir = substr($_SERVER['argv'][0], 0, strrpos($_SERVER['argv'][0], DIRECTORY_SEPARATOR));
-            $dh = opendir($srcdir . DIRECTORY_SEPARATOR . $dir);
-            if ($dh) {
+            $directoryHandle = opendir($srcdir . DIRECTORY_SEPARATOR . $dir);
+            if ($directoryHandle) {
                 $dir = $srcdir . DIRECTORY_SEPARATOR . $dir;
             }
         }
 
-        if ($dh) {
-            while ($file = readdir($dh)) {
+        if ($directoryHandle) {
+            while ($file = readdir($directoryHandle)) {
                 $realfile = $dir . DIRECTORY_SEPARATOR . $file;
 
                 if (is_file($realfile) && preg_match('/\.php$/', $realfile)) {
@@ -456,8 +456,8 @@ class WeatherMap extends WeatherMapBase
                     include_once($realfile);
                     $class = preg_replace("/\.php$/", "", $file);
                     if ($type == 'data') {
-                        $this->datasourceclasses [$class] = $class;
-                        $this->activedatasourceclasses[$class] = 1;
+                        $this->dataSourceClasses [$class] = $class;
+                        $this->activeDataSourceClasses[$class] = true;
                     }
                     if ($type == 'pre') {
                         $this->preprocessclasses [$class] = $class;
@@ -485,7 +485,7 @@ class WeatherMap extends WeatherMapBase
     function initialiseDatasourcePlugins()
     {
         wm_debug("Running Init() for Data Source Plugins...\n");
-        foreach ($this->datasourceclasses as $ds_class) {
+        foreach ($this->dataSourceClasses as $ds_class) {
             // make an instance of the class
             # $dsplugins[$ds_class] = new $ds_class;
             $this->plugins['data'][$ds_class] = new $ds_class;
@@ -496,7 +496,7 @@ class WeatherMap extends WeatherMapBase
 
             if (!$ret) {
                 wm_debug("Removing $ds_class from Data Source list, since Init() failed\n");
-                $this->activedatasourceclasses[$ds_class] = 0;
+                $this->activeDataSourceClasses[$ds_class] = false;
             }
         }
         wm_debug("Finished Initialising Plugins...\n");
@@ -506,72 +506,68 @@ class WeatherMap extends WeatherMapBase
     {
         wm_debug("Preprocessing targets\n");
 
-        $allitems = array(&$this->links, &$this->nodes);
-        reset($allitems);
+        $listOfItemLists = array(&$this->links, &$this->nodes);
+        reset($listOfItemLists);
 
         wm_debug("Preprocessing targets\n");
 
-        while (list($kk,) = each($allitems)) {
-            unset($objects);
-            $objects = & $allitems[$kk];
+        while (list($outerListCount,) = each($listOfItemLists)) {
+            unset($itemList);
+            $itemList = & $listOfItemLists[$outerListCount];
 
-            reset($objects);
-            while (list($k,) = each($objects)) {
-                unset($myobj);
-                $myobj = & $objects[$k];
+            reset($itemList);
+            while (list($innerListCount,) = each($itemList)) {
+                unset($oneMapItem);
+                $oneMapItem = & $itemList[$innerListCount];
 
-                $type = $myobj->my_type();
-                $name = $myobj->name;
+                $type = $oneMapItem->my_type();
+                $name = $oneMapItem->name;
 
-                if (!$myobj->isTemplate()) {
-                    if (count($myobj->targets) > 0) {
-                        $tindex = 0;
-                        foreach ($myobj->targets as $target) {
+                if (!$oneMapItem->isTemplate()) {
+                    if (count($oneMapItem->targets) > 0) {
+                        $targetIndex = 0;
+                        foreach ($oneMapItem->targets as $target) {
                             wm_debug("ProcessTargets: New Target: $target[4]\n");
                             // processstring won't use notes (only hints) for this string
 
-                            $targetstring = $this->processString($target[4], $myobj, false, false);
-                            if ($target[4] != $targetstring) {
-                                wm_debug("Targetstring is now $targetstring\n");
+                            $targetString = $this->processString($target[4], $oneMapItem, false, false);
+                            if ($target[4] != $targetString) {
+                                wm_debug("Targetstring is now $targetString\n");
                             }
 
                             // if the targetstring starts with a -, then we're taking this value OFF the aggregate
                             $multiply = 1;
-                            if (preg_match("/^-(.*)/", $targetstring, $matches)) {
-                                $targetstring = $matches[1];
+
+                            if (preg_match("/^-(.*)/", $targetString, $matches)) {
+                                $targetString = $matches[1];
                                 $multiply = -1 * $multiply;
                             }
 
                             // if the remaining targetstring starts with a number and a *-, then this is a scale factor
-                            if (preg_match("/^(\d+\.?\d*)\*(.*)/", $targetstring, $matches)) {
-                                $targetstring = $matches[2];
+                            if (preg_match("/^(\d+\.?\d*)\*(.*)/", $targetString, $matches)) {
+                                $targetString = $matches[2];
                                 $multiply = $multiply * floatval($matches[1]);
                             }
 
                             $matched = false;
-                            $matched_by = '';
-                            foreach ($this->datasourceclasses as $ds_class) {
+                            $matchedBy = '';
+
+                            foreach ($this->dataSourceClasses as $ds_class) {
                                 if (!$matched) {
-                                    $recognised = $this->plugins['data'][$ds_class]->Recognise($targetstring);
+                                    $recognised = $this->plugins['data'][$ds_class]->Recognise($targetString);
 
                                     if ($recognised) {
                                         $matched = true;
-                                        $matched_by = $ds_class;
+                                        $matchedBy = $ds_class;
 
-                                        if ($this->activedatasourceclasses[$ds_class]) {
-                                            $this->plugins['data'][$ds_class]->Register($targetstring, $this, $myobj);
-                                            if ($type == 'NODE') {
-                                                $this->nodes[$name]->targets[$tindex][1] = $multiply;
-                                                $this->nodes[$name]->targets[$tindex][0] = $targetstring;
-                                                $this->nodes[$name]->targets[$tindex][5] = $matched_by;
-                                            }
-                                            if ($type == 'LINK') {
-                                                $this->links[$name]->targets[$tindex][1] = $multiply;
-                                                $this->links[$name]->targets[$tindex][0] = $targetstring;
-                                                $this->links[$name]->targets[$tindex][5] = $matched_by;
-                                            }
+                                        if ($this->activeDataSourceClasses[$ds_class]) {
+                                            $this->plugins['data'][$ds_class]->Register($targetString, $this, $oneMapItem);
+
+                                            $oneMapItem->targets[$targetIndex][1] = $multiply;
+                                            $oneMapItem->targets[$targetIndex][0] = $targetString;
+                                            $oneMapItem->targets[$targetIndex][5] = $matchedBy;
                                         } else {
-                                            wm_warn("ProcessTargets: $type $name, target: $targetstring on config line $target[3] of $target[2] was recognised as a valid TARGET by a plugin that is unable to run ($ds_class) [WMWARN07]\n");
+                                            wm_warn("ProcessTargets: $type $name, target: $targetString on config line $target[3] of $target[2] was recognised as a valid TARGET by a plugin that is unable to run ($ds_class) [WMWARN07]\n");
                                         }
                                     }
                                 }
@@ -580,7 +576,7 @@ class WeatherMap extends WeatherMapBase
                                 wm_warn("ProcessTargets: $type $name, target: $target[4] on config line $target[3] of $target[2] was not recognised as a valid TARGET [WMWARN08]\n");
                             }
 
-                            $tindex++;
+                            $targetIndex++;
                         }
                     }
                 }
@@ -601,39 +597,39 @@ class WeatherMap extends WeatherMapBase
 
             wm_debug("======================================\n");
             wm_debug("Starting prefetch\n");
-            foreach ($this->datasourceclasses as $ds_class) {
+            foreach ($this->dataSourceClasses as $ds_class) {
                 $this->plugins['data'][$ds_class]->Prefetch($this);
             }
 
             wm_debug("======================================\n");
             wm_debug("Starting main collection loop\n");
 
-            $allitems = array(&$this->links, &$this->nodes);
-            reset($allitems);
+            $listOfItemLists = array(&$this->links, &$this->nodes);
+            reset($listOfItemLists);
 
-            while (list($kk,) = each($allitems)) {
-                unset($objects);
-                $objects = & $allitems[$kk];
+            while (list($outerListCount,) = each($listOfItemLists)) {
+                unset($itemList);
+                $itemList = & $listOfItemLists[$outerListCount];
 
-                reset($objects);
-                while (list($k,) = each($objects)) {
-                    unset($myobj);
-                    $myobj = & $objects[$k];
+                reset($itemList);
+                while (list($innerListCount,) = each($itemList)) {
+                    unset($oneMapItem);
+                    $oneMapItem = & $itemList[$innerListCount];
 
-                    $type = $myobj->my_type();
+                    $type = $oneMapItem->my_type();
 
                     $total_in = 0;
                     $total_out = 0;
-                    $name = $myobj->name;
+                    $name = $oneMapItem->name;
                     wm_debug("\n");
                     wm_debug("ReadData for $type $name: \n");
 
-                    if (($type == 'LINK' && isset($myobj->a)) || ($type == 'NODE' && !is_null($myobj->x))) {
-                        $ntargets = count($myobj->targets);
+                    if (! $oneMapItem->isTemplate()) {
+                        $nTargets = count($oneMapItem->targets);
 
-                        if ($ntargets > 0) {
-                            $tindex = 0;
-                            foreach ($myobj->targets as $target) {
+                        if ($nTargets > 0) {
+                            $targetIndex = 0;
+                            foreach ($oneMapItem->targets as $target) {
                                 wm_debug("ReadData: New Target: $target[4]\n");
 
                                 $targetstring = $target[0];
@@ -645,7 +641,7 @@ class WeatherMap extends WeatherMapBase
                                 if ($target[4] != '') {
                                     // processstring won't use notes (only hints) for this string
 
-                                    $targetstring = $this->processString($target[0], $myobj, false, false);
+                                    $targetstring = $this->processString($target[0], $oneMapItem, false, false);
                                     if ($target[0] != $targetstring) {
                                         wm_debug("Targetstring is now $targetstring\n");
                                     }
@@ -655,7 +651,7 @@ class WeatherMap extends WeatherMapBase
 
                                     if ($target[0] != "") {
                                         $matched_by = $target[5];
-                                        list($in, $out, $datatime) = $this->plugins['data'][$target[5]]->ReadData($targetstring, $this, $myobj);
+                                        list($in, $out, $datatime) = $this->plugins['data'][$target[5]]->ReadData($targetstring, $this, $oneMapItem);
                                     }
 
                                     // TODO - untangle this mess!
@@ -667,7 +663,7 @@ class WeatherMap extends WeatherMapBase
 
                                         // this is to allow null to be passed through from DS plugins in the case of a single target
                                         // we've never defined what x + null is, so we'll treat that as a 0
-                                        if ($ntargets == 1) {
+                                        if ($nTargets == 1) {
                                             $total_in = null;
                                             $total_out = null;
                                         }
@@ -685,7 +681,7 @@ class WeatherMap extends WeatherMapBase
                                             wm_debug("Post-multiply: $in $out\n");
                                         }
 
-                                        if ($ntargets > 1) {
+                                        if ($nTargets > 1) {
                                             $total_in = $total_in + $in;
                                             $total_out = $total_out + $out;
                                         } else {
@@ -706,7 +702,7 @@ class WeatherMap extends WeatherMapBase
                                         wm_debug("DataTime MINMAX: " . $this->min_data_time . " -> " . $this->max_data_time . "\n");
                                     }
                                 }
-                                $tindex++;
+                                $targetIndex++;
                             }
 
                             wm_debug("ReadData complete for $type $name: $total_in $total_out\n");
@@ -717,63 +713,63 @@ class WeatherMap extends WeatherMapBase
                         wm_debug("ReadData: Skipping $type $name that looks like a template\n.");
                     }
 
-                    $myobj->bandwidth_in = $total_in;
-                    $myobj->bandwidth_out = $total_out;
+                    $oneMapItem->bandwidth_in = $total_in;
+                    $oneMapItem->bandwidth_out = $total_out;
 
-                    if ($type == 'LINK' && $myobj->duplex == 'half') {
+                    if ($type == 'LINK' && $oneMapItem->duplex == 'half') {
                         // in a half duplex link, in and out share a common bandwidth pool, so percentages need to include both
                         wm_debug("Calculating percentage using half-duplex\n");
-                        $myobj->outpercent = (($total_in + $total_out) / ($myobj->max_bandwidth_out)) * 100;
-                        $myobj->inpercent = (($total_out + $total_in) / ($myobj->max_bandwidth_in)) * 100;
-                        if ($myobj->max_bandwidth_out != $myobj->max_bandwidth_in) {
+                        $oneMapItem->outpercent = (($total_in + $total_out) / ($oneMapItem->max_bandwidth_out)) * 100;
+                        $oneMapItem->inpercent = (($total_out + $total_in) / ($oneMapItem->max_bandwidth_in)) * 100;
+                        if ($oneMapItem->max_bandwidth_out != $oneMapItem->max_bandwidth_in) {
                             wm_warn("ReadData: $type $name: You're using asymmetric bandwidth AND half-duplex in the same link. That makes no sense. [WMWARN44]\n");
                         }
                     } else {
-                        $myobj->outpercent = (($total_out) / ($myobj->max_bandwidth_out)) * 100;
-                        $myobj->inpercent = (($total_in) / ($myobj->max_bandwidth_in)) * 100;
+                        $oneMapItem->outpercent = (($total_out) / ($oneMapItem->max_bandwidth_out)) * 100;
+                        $oneMapItem->inpercent = (($total_in) / ($oneMapItem->max_bandwidth_in)) * 100;
                     }
 
                     $warn_in = true;
                     $warn_out = true;
-                    if ($type == 'NODE' && $myobj->scalevar == 'in') {
+                    if ($type == 'NODE' && $oneMapItem->scalevar == 'in') {
                         $warn_out = false;
                     }
-                    if ($type == 'NODE' && $myobj->scalevar == 'out') {
+                    if ($type == 'NODE' && $oneMapItem->scalevar == 'out') {
                         $warn_in = false;
                     }
 
-                    if ($myobj->scaletype == 'percent') {
-                        list($incol, $inscalekey, $inscaletag) = $this->colourFromValue($myobj->inpercent, $myobj->usescale, $myobj->name, true, $warn_in);
-                        list($outcol, $outscalekey, $outscaletag) = $this->colourFromValue($myobj->outpercent, $myobj->usescale, $myobj->name, true, $warn_out);
+                    if ($oneMapItem->scaletype == 'percent') {
+                        list($incol, $inscalekey, $inscaletag) = $this->colourFromValue($oneMapItem->inpercent, $oneMapItem->usescale, $oneMapItem->name, true, $warn_in);
+                        list($outcol, $outscalekey, $outscaletag) = $this->colourFromValue($oneMapItem->outpercent, $oneMapItem->usescale, $oneMapItem->name, true, $warn_out);
                     } else {
                         // use absolute values, if that's what is requested
-                        list($incol, $inscalekey, $inscaletag) = $this->colourFromValue($myobj->bandwidth_in, $myobj->usescale, $myobj->name, false, $warn_in);
-                        list($outcol, $outscalekey, $outscaletag) = $this->colourFromValue($myobj->bandwidth_out, $myobj->usescale, $myobj->name, false, $warn_out);
+                        list($incol, $inscalekey, $inscaletag) = $this->colourFromValue($oneMapItem->bandwidth_in, $oneMapItem->usescale, $oneMapItem->name, false, $warn_in);
+                        list($outcol, $outscalekey, $outscaletag) = $this->colourFromValue($oneMapItem->bandwidth_out, $oneMapItem->usescale, $oneMapItem->name, false, $warn_out);
                     }
 
-                    $myobj->add_note("inscalekey", $inscalekey);
-                    $myobj->add_note("outscalekey", $outscalekey);
+                    $oneMapItem->add_note("inscalekey", $inscalekey);
+                    $oneMapItem->add_note("outscalekey", $outscalekey);
 
-                    $myobj->add_note("inscaletag", $inscaletag);
-                    $myobj->add_note("outscaletag", $outscaletag);
+                    $oneMapItem->add_note("inscaletag", $inscaletag);
+                    $oneMapItem->add_note("outscaletag", $outscaletag);
 
-                    $myobj->add_note("inscalecolor", $incol->asHTML());
-                    $myobj->add_note("outscalecolor", $outcol->asHTML());
+                    $oneMapItem->add_note("inscalecolor", $incol->asHTML());
+                    $oneMapItem->add_note("outscalecolor", $outcol->asHTML());
 
-                    $myobj->colours[IN] = $incol;
-                    $myobj->colours[OUT] = $outcol;
+                    $oneMapItem->colours[IN] = $incol;
+                    $oneMapItem->colours[OUT] = $outcol;
 
                     ### warn("TAGS (setting) |$inscaletag| |$outscaletag| \n");
 
                     wm_debug(sprintf("ReadData: Setting %s,%s for %s\n", wm_value_or_null($total_in), wm_value_or_null($total_out), $name));
-                    unset($myobj);
+                    unset($oneMapItem);
                 }
             }
 
             wm_debug("======================================\n");
             wm_debug("Starting cleanup\n");
 
-            foreach ($this->datasourceclasses as $ds_class) {
+            foreach ($this->dataSourceClasses as $ds_class) {
                 $this->plugins['data'][$ds_class]->CleanUp($this);
             }
 
@@ -965,79 +961,87 @@ class WeatherMap extends WeatherMapBase
     }
 
 
-    function drawLegendHorizontal($im, $scalename = "DEFAULT", $width = 400)
+    function drawLegendHorizontal($gdTargetImage, $scaleName = "DEFAULT", $keyWidth = 400)
     {
-        $title = $this->keytext[$scalename];
+        $title = $this->keytext[$scaleName];
 
-        $nscales = $this->numscales[$scalename];
+        $nScales = $this->numscales[$scaleName];
 
-        wm_debug("Drawing $nscales colours into SCALE\n");
+        wm_debug("Drawing $nScales colours into SCALE\n");
 
-        $font = $this->keyfont;
+        # $font = $this->keyfont;
+        $fontObject = $this->fonts->getFont($this->keyfont);
 
         $x = 0;
         $y = 0;
 
-        $scalefactor = $width / 100;
+        $scaleFactor = $keyWidth / 100;
 
-        list($tilewidth, $tileheight) = $this->myimagestringsize($font, "100%");
-        $box_left = $x;
-        $scale_left = $box_left + 4 + $scalefactor / 2;
-        $box_right = $scale_left + $width + $tilewidth + 4 + $scalefactor / 2;
+        list($tileWidth, $tileHeight) = $fontObject->calculateImageStringSize("100%");
 
-        $box_top = $y;
-        $scale_top = $box_top + $tileheight + 6;
-        $scale_bottom = $scale_top + $tileheight * 1.5;
-        $box_bottom = $scale_bottom + $tileheight * 2 + 6;
+        $boxLeft = $x;
+        $scaleLeft = $boxLeft + 4 + $scaleFactor / 2;
+        $boxRight = $scaleLeft + $keyWidth + $tileWidth + 4 + $scaleFactor / 2;
 
-        $scale_im = imagecreatetruecolor($box_right + 1, $box_bottom + 1);
-        $scale_ref = 'gdref_legend_' . $scalename;
+        $boxTop = $y;
+        $scaleTop = $boxTop + $tileHeight + 6;
+        $scaleBottom = $scaleTop + $tileHeight * 1.5;
+        $boxBottom = $scaleBottom + $tileHeight * 2 + 6;
+
+        $gdScaleImage = imagecreatetruecolor($boxRight + 1, $boxBottom + 1);
+        $scaleReference = 'gdref_legend_' . $scaleName;
 
         // Start with a transparent box, in case the fill or outline colour is 'none'
-        imageSaveAlpha($scale_im, true);
-        $nothing = imagecolorallocatealpha($scale_im, 128, 0, 0, 127);
-        imagefill($scale_im, 0, 0, $nothing);
+        imageSaveAlpha($gdScaleImage, true);
+        $transparentColour = imagecolorallocatealpha($gdScaleImage, 128, 0, 0, 127);
+        imagefill($gdScaleImage, 0, 0, $transparentColour);
 
-        $this->preAllocateScaleColours($scale_im, $scale_ref);
+        $this->preAllocateScaleColours($gdScaleImage, $scaleReference);
 
-        $bgcol = new WMColour($this->colours['DEFAULT']['KEYBG']['red1'], $this->colours['DEFAULT']['KEYBG']['green1'], $this->colours['DEFAULT']['KEYBG']['blue1']);
-        $outlinecol = new WMColour($this->colours['DEFAULT']['KEYOUTLINE']['red1'], $this->colours['DEFAULT']['KEYOUTLINE']['green1'], $this->colours['DEFAULT']['KEYOUTLINE']['blue1']);
+        $bgColour = new WMColour($this->colours['DEFAULT']['KEYBG']['red1'], $this->colours['DEFAULT']['KEYBG']['green1'], $this->colours['DEFAULT']['KEYBG']['blue1']);
+        $outlineColour = new WMColour($this->colours['DEFAULT']['KEYOUTLINE']['red1'], $this->colours['DEFAULT']['KEYOUTLINE']['green1'], $this->colours['DEFAULT']['KEYOUTLINE']['blue1']);
 
-        if ($bgcol->isRealColour()) {
-            imagefilledrectangle($scale_im, $box_left, $box_top, $box_right, $box_bottom, $this->colours['DEFAULT']['KEYBG'][$scale_ref]);
+        if ($bgColour->isRealColour()) {
+            imagefilledrectangle($gdScaleImage, $boxLeft, $boxTop, $boxRight, $boxBottom, $this->colours['DEFAULT']['KEYBG'][$scaleReference]);
         }
 
-        if ($outlinecol->isRealColour()) {
-            imagerectangle($scale_im, $box_left, $box_top, $box_right, $box_bottom, $this->colours['DEFAULT']['KEYOUTLINE'][$scale_ref]);
+        if ($outlineColour->isRealColour()) {
+            imagerectangle($gdScaleImage, $boxLeft, $boxTop, $boxRight, $boxBottom, $this->colours['DEFAULT']['KEYOUTLINE'][$scaleReference]);
         }
 
-        $this->myimagestring($scale_im, $font, $scale_left, $scale_bottom + $tileheight * 2 + 2, $title, $this->colours['DEFAULT']['KEYTEXT'][$scale_ref]);
+        # $this->myimagestring($gdScaleImage, $font, $scaleLeft, $scaleBottom + $tileHeight * 2 + 2, $title, $this->colours['DEFAULT']['KEYTEXT'][$scaleReference]);
+        $fontObject->drawImageString($gdScaleImage, $scaleLeft, $scaleBottom + $tileHeight * 2 + 2, $title, $this->colours['DEFAULT']['KEYTEXT'][$scaleReference]);
 
-        for ($p = 0; $p <= 100; $p++) {
-            $dx = $p * $scalefactor;
+        for ($percentage = 0; $percentage <= 100; $percentage++) {
+            $xOffset = $percentage * $scaleFactor;
 
-            if (($p % 25) == 0) {
-                imageline($scale_im, $scale_left + $dx, $scale_top - $tileheight, $scale_left + $dx, $scale_bottom + $tileheight, $this->colours['DEFAULT']['KEYTEXT'][$scale_ref]);
-                $labelstring = sprintf("%d%%", $p);
-                $this->myimagestring($scale_im, $font, $scale_left + $dx + 2, $scale_top - 2, $labelstring, $this->colours['DEFAULT']['KEYTEXT'][$scale_ref]);
+            if (($percentage % 25) == 0) {
+                imageline($gdScaleImage, $scaleLeft + $xOffset, $scaleTop - $tileHeight, $scaleLeft + $xOffset, $scaleBottom + $tileHeight, $this->colours['DEFAULT']['KEYTEXT'][$scaleReference]);
+                $labelString = sprintf("%d%%", $percentage);
+                # $this->myimagestring($gdScaleImage, $font, $scaleLeft + $xOffset + 2, $scaleTop - 2, $labelString, $this->colours['DEFAULT']['KEYTEXT'][$scaleReference]);
+                $fontObject->drawImageString($gdScaleImage, $scaleLeft + $xOffset + 2, $scaleTop - 2, $labelString, $this->colours['DEFAULT']['KEYTEXT'][$scaleReference]);
             }
 
-            list($col,) = $this->colourFromValue($p, $scalename);
+            list($col,) = $this->colourFromValue($percentage, $scaleName);
             if ($col->isRealColour()) {
-                $cc = $col->gdAllocate($scale_im);
-                imagefilledrectangle($scale_im, $scale_left + $dx - $scalefactor / 2, $scale_top, $scale_left + $dx + $scalefactor / 2, $scale_bottom, $cc);
+                $cc = $col->gdAllocate($gdScaleImage);
+                imagefilledrectangle($gdScaleImage, $scaleLeft + $xOffset - $scaleFactor / 2, $scaleTop, $scaleLeft + $xOffset + $scaleFactor / 2, $scaleBottom, $cc);
             }
         }
 
-        imagecopy($im, $scale_im, $this->keyx[$scalename], $this->keyy[$scalename], 0, 0, imagesx($scale_im), imagesy($scale_im));
-        $this->keyimage[$scalename] = $scale_im;
 
-        $rx = $this->keyx[$scalename];
-        $ry = $this->keyy[$scalename];
+        // TODO: this should be in a different method - all drawLegendXXX should return a gdImage instead,
+        //   and ONE place handles the drawing and imagemap
+        imagecopy($gdTargetImage, $gdScaleImage, $this->keyx[$scaleName], $this->keyy[$scaleName], 0, 0, imagesx($gdScaleImage), imagesy($gdScaleImage));
+        $this->keyimage[$scaleName] = $gdScaleImage;
 
-        $areaname = "LEGEND:" . $scalename;
-        $this->imap->addArea("Rectangle", $areaname, '', array($rx + $box_left, $ry + $box_top, $rx + $box_right, $ry + $box_bottom));
-        $this->imap_areas[] = $areaname;
+        $xTarget = $this->keyx[$scaleName];
+        $yTarget = $this->keyy[$scaleName];
+
+        $areaName = "LEGEND:" . $scaleName;
+        $this->imap->addArea("Rectangle", $areaName, '', array($xTarget + $boxLeft, $yTarget + $boxTop, $xTarget + $boxRight, $yTarget + $boxBottom));
+        // TODO: stop tracking z-order seperately. addArea() should take the z layer
+        $this->imap_areas[] = $areaName;
 
     }
 

@@ -249,6 +249,7 @@ class HTML_ImageMap
     var $shapes;
     var $nshapes;
     var $name;
+    var $zLayers;
 
     function HTML_ImageMap($name = "")
     {
@@ -259,6 +260,7 @@ class HTML_ImageMap
     function Reset()
     {
         $this->shapes = array();
+        $this->zLayers = array();
         $this->nshapes = 0;
         $this->name = "";
     }

@@ -57,6 +57,8 @@ function line_crossing($x1, $y1, $x2, $y2, $x3, $y3, $x4, $y4)
 // Given 4 ordinates and a parameter from 0 to 1, calculate a point on the Catmull Rom spline through them.
 class CatmullRom1D
 {
+    private $Ap, $Bp, $Cp, $Dp;
+
     function CatmullRom1D($p0, $p1, $p2, $p3)
     {
         $this->Ap = - $p0 + 3 * $p1 - 3 * $p2 + $p3;
@@ -230,7 +232,7 @@ function find_distance(&$pointarray, $distance)
     }
 
     print "FELL THROUGH\n";
-    die("Howie's crappy binary search is wrong after all.\n");
+    throw new Exception("Howie's crappy binary search is wrong after all.\n");
 }
 
 // Give a list of key points, calculate a curve through them
@@ -375,31 +377,28 @@ function calc_straight(&$in_xarray, &$in_yarray, $pointsperspan = 12)
     return ($curvepoints);
 }
 
-function calc_arrowsize($width, &$map, $linkname)
+function calc_arrowsize($linkWidth, $arrowStyle)
 {
     // This is the default 'classic' size
-    $arrowlengthfactor = 4;
-    $arrowwidthfactor = 2;
+    $arrowLengthFactor = 4;
+    $arrowWidthFactor = 2;
 
-    // this is so I can use it in some test code - sorry!
-    if ($map !== null) {
-        if ($map->links[$linkname]->arrowstyle == 'compact') {
-            $arrowlengthfactor = 1;
-            $arrowwidthfactor = 1;
-        }
-
-        if (preg_match('/(\d+) (\d+)/', $map->links[$linkname]->arrowstyle, $matches )) {
-            $arrowlengthfactor = $matches[1];
-            $arrowwidthfactor = $matches[2];
-        }
+    if ($arrowStyle == 'compact') {
+        $arrowLengthFactor = 1;
+        $arrowWidthFactor = 1;
     }
 
-    $arrowlength = $width * $arrowlengthfactor;
-    $arrowwidth = $width * $arrowwidthfactor;
+    if (preg_match('/(\d+) (\d+)/', $arrowStyle, $matches )) {
+        $arrowLengthFactor = $matches[1];
+        $arrowWidthFactor = $matches[2];
+    }
+
+    $arrowLength = $linkWidth * $arrowLengthFactor;
+    $arrowWidth = $linkWidth * $arrowWidthFactor;
 
     return (array(
-        $arrowlength,
-        $arrowwidth
+        $arrowLength,
+        $arrowWidth
     ));
 }
 
@@ -466,8 +465,8 @@ function draw_straight($image, &$curvepoints, $widths, $outlinecolour, $fillcolo
 
     // we calculate the arrow size up here, so that we can decide on the
     // minimum length for a link. The arrowheads are the limiting factor.
-    list($arrowsize[IN], $arrowwidth[IN] ) = calc_arrowsize($widths[IN], $map, $linkname );
-    list($arrowsize[OUT], $arrowwidth[OUT] ) = calc_arrowsize($widths[OUT], $map, $linkname );
+    list($arrowsize[IN], $arrowwidth[IN] ) = calc_arrowsize($widths[IN], $map->links[$linkname]->arrowstyle );
+    list($arrowsize[OUT], $arrowwidth[OUT] ) = calc_arrowsize($widths[OUT], $map->links[$linkname]->arrowstyle );
 
     // the 1.2 here is empirical. It ought to be 1 in theory.
     // in practice, a link this short is useless anyway, especially with bwlabels.
@@ -739,8 +738,8 @@ function draw_curve($image, &$curvepoints, $widths, $outlinecolour, $fillcolours
 
     // we calculate the arrow size up here, so that we can decide on the
     // minimum length for a link. The arrowheads are the limiting factor.
-    list($arrowsize[IN], $arrowwidth[IN] ) = calc_arrowsize($widths[IN], $map, $linkname);
-    list($arrowsize[OUT], $arrowwidth[OUT] ) = calc_arrowsize($widths[OUT], $map, $linkname);
+    list($arrowsize[IN], $arrowwidth[IN] ) = calc_arrowsize($widths[IN], $map->links[$linkname]->arrowstyle);
+    list($arrowsize[OUT], $arrowwidth[OUT] ) = calc_arrowsize($widths[OUT], $map->links[$linkname]->arrowstyle);
 
     // the 1.2 here is empirical. It ought to be 1 in theory.
     // in practice, a link this short is useless anyway, especially with bwlabels.
@@ -903,10 +902,31 @@ function generateArrowhead($start_point, $end_point, $direction, $link_width, $a
     return $points;
 }
 
+class WMLinkGeometry
+{
+    private $arrowWidths;
+    private $fillColours;
+    private $outlineColour;
+    private $curvePoints;
+    private $directions;
+    private $owner;
+    private $controlPoints;
+
+    function Init(&$link)
+    {
+        $this->owner = $link;
+        $this->directions = array(IN, OUT);
+        if (1==0) {
+            $this->directions = array(OUT);
+        }
+    }
+}
+
 // TODO - extract spine-related stuff into WMSpine
 class WMSpine
 {
     var $points;
+    var $totalDistance;
 
     function simplify()
     {
@@ -931,27 +951,28 @@ class WMSpine
     function dump($spine)
     {
         print "===============\n";
-        for ($i = 0; $i < count($spine ); $i ++) {
+        $nPoints = count($spine);
+        for ($i = 0; $i < $nPoints; $i ++) {
             printf("  %3d: %d,%d (%d)\n", $i, $spine[$i][X], $spine[$i][Y], $spine[$i][DISTANCE] );
         }
         print "===============\n";
     }
 
-    function drawSpine($gdimage, $spine, $colour)
+    function drawSpine($gdImage, $spine, $colour)
     {
-        $max_i = count($spine ) - 1;
+        $nPoints = count($spine ) - 1;
 
-        for ($i = 0; $i < $max_i; $i ++) {
-            imageline($gdimage, $spine[$i][X], $spine[$i][Y], $spine[$i + 1][X], $spine[$i + 1][Y], $colour );
+        for ($i = 0; $i < $nPoints; $i ++) {
+            imageline($gdImage, $spine[$i][X], $spine[$i][Y], $spine[$i + 1][X], $spine[$i + 1][Y], $colour );
         }
     }
 
-    function drawChain($gdimage, $spine, $colour, $size = 10)
+    function drawChain($gdImage, $spine, $colour, $size = 10)
     {
-        $newn = count($spine);
+        $nPoints = count($spine);
 
-        for ($i = 0; $i < $newn; $i ++) {
-            imagearc($gdimage, $spine[$i][X], $spine[$i][Y], $size, $size, 0, 360, $colour);
+        for ($i = 0; $i < $nPoints; $i ++) {
+            imagearc($gdImage, $spine[$i][X], $spine[$i][Y], $size, $size, 0, 360, $colour);
         }
     }
 }

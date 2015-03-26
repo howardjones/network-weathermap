@@ -430,7 +430,7 @@ class WeatherMapDataSource_rrd extends WeatherMapDataSource {
             }
         }
 
-        $cfname = intval($map->get_hint('rrd_cf'));
+        $cfname = $map->get_hint('rrd_cf');
         if ($cfname===null) {
             $cfname='AVERAGE';
         }

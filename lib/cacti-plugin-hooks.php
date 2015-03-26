@@ -182,7 +182,7 @@ function weathermap_setup_table()
                 debug set('on','off','once') NOT NULL default 'off',
                 runtime double NOT NULL default 0,
                 lastrun datetime,
-                config text NOT NULL default '',
+                config text NOT NULL,
                 thumb_width int(11) NOT NULL default 0,
                 thumb_height int(11) NOT NULL default 0,
                 schedule varchar(32) NOT NULL default '*',
@@ -197,7 +197,7 @@ function weathermap_setup_table()
                 'sortorder' => array("alter table weathermap_maps add sortorder int(11) NOT NULL default 0 after id"),
                 'filehash' => array("alter table weathermap_maps add filehash varchar(40) NOT NULL default '' after titlecache"),
                 'warncount' => array("alter table weathermap_maps add warncount int(11) NOT NULL default 0 after filehash"),
-                'config' => array("alter table weathermap_maps add config text NOT NULL  default '' after warncount"),
+                'config' => array("alter table weathermap_maps add config text NOT NULL after warncount"),
                 'thumb_width' => array(
                     "alter table weathermap_maps add thumb_width int(11) NOT NULL default 0 after config",
                     "alter table weathermap_maps add thumb_height int(11) NOT NULL default 0 after thumb_width",

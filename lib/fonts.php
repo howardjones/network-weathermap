@@ -167,6 +167,17 @@ class WMFontTable
         return $this->table[$fontNumber];
     }
 
+    public function getList()
+    {
+        $list = array();
+
+        foreach ($this->table as $fontNumber => $fontObject) {
+            $list[$fontNumber] = array("type" => $fontObject->type);
+        }
+
+        return $list;
+    }
+
     public function getConfig()
     {
         $output = "";

@@ -194,6 +194,7 @@
 ./plugin-images/s_tab_weathermap_red.gif
 ./plugin-images/s_tab_weathermap.gif
 ./editor.php
+./editor13.php
 ./COPYING
 ./cacti-resources/map-cycle.js
 ./cacti-resources/drag-handle-active.png

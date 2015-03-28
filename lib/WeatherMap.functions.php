@@ -489,7 +489,7 @@ function wmDrawMarkerCircle($gdImage, $colour, $x, $y, $size = 10)
  * @param string $htmlfile            
  * @param WeatherMap $map            
  */
-function OutputHTML($htmlfile, &$map)
+function OutputHTML($htmlfile, &$map, $refresh=300)
 {
     global $WEATHERMAP_VERSION;
     
@@ -498,7 +498,7 @@ function OutputHTML($htmlfile, &$map)
     if ($map->htmlstylesheet != '') {
         fwrite($fd, '<link rel="stylesheet" type="text/css" href="' . $map->htmlstylesheet . '" />');
     }
-    fwrite($fd, '<meta http-equiv="refresh" content="300" /><title>' . $map->processString($map->title, $map) . '</title></head><body>');
+    fwrite($fd, '<meta http-equiv="refresh" content="' . intval($refresh) . '" /><title>' . $map->processString($map->title, $map) . '</title></head><body>');
     
     if ($map->htmlstyle == "overlib") {
         fwrite($fd, "<div id=\"overDiv\" style=\"position:absolute; visibility:hidden; z-index:1000;\"></div>\n");

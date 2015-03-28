@@ -393,11 +393,11 @@ function wmeHandleInheritance(&$map, &$inheritables)
 	}
 }
 
-function wmeGetFontList(&$map,$name,$current)
+function wmeGetFontList(&$map, $name, $current)
 {
     $output = '<select class="fontcombo" name="'.$name.'">';
         
-    ksort($map->fonts);
+    ksort($map->fonts->getList());
 
     foreach ($map->fonts as $fontnumber => $font) {		
         $output .= '<option ';

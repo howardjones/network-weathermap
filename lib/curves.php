@@ -59,21 +59,20 @@ class CatmullRom1D
 {
     private $Ap, $Bp, $Cp, $Dp;
 
-    function CatmullRom1D($p0, $p1, $p2, $p3)
+    function CatmullRom1D($point0, $point1, $point2, $point4)
     {
-        $this->Ap = - $p0 + 3 * $p1 - 3 * $p2 + $p3;
-        $this->Bp = 2 * $p0 - 5 * $p1 + 4 * $p2 - $p3;
-        $this->Cp = - $p0 + $p2;
-        $this->Dp = 2 * $p1;
+        $this->Ap = - $point0 + 3 * $point1 - 3 * $point2 + $point4;
+        $this->Bp = 2 * $point0 - 5 * $point1 + 4 * $point2 - $point4;
+        $this->Cp = - $point0 + $point2;
+        $this->Dp = 2 * $point1;
     }
 
-    function calculate($t)
+    function calculate($parameter)
     {
-        $t2 = $t * $t;
-        $t3 = $t2 * $t;
-        $d = 2;
+        $parameterSquared = $parameter * $parameter;
+        $parameterCubed = $parameterSquared * $parameter;
 
-        return (($this->Ap * $t3) + ($this->Bp * $t2) + ($this->Cp * $t) + $this->Dp) / $d;
+        return (($this->Ap * $parameterCubed) + ($this->Bp * $parameterSquared) + ($this->Cp * $parameter) + $this->Dp) / 2;
     }
 }
 
@@ -887,21 +886,27 @@ function generateArrowhead($start_point, $end_point, $direction, $link_width, $a
 {
     $points = array();
 
-    // Calculate a tanget
+    // Calculate a tangent
     $arrow_direction = WMVector($halfway_x - $pre_mid_x, $halfway_y - $pre_mid_y);
-    $arrow_direction.normalise();
+    $arrow_direction->normalise();
     // and from that, a normal
     $arrow_normal = $arrow_direction->getNormal();
 
-    $points[]= $start_point.addVector($arrow_normal, $direction * $link_width);
-    $points[]= $start_point.addVector($arrow_normal, $direction * $arrow_width);
+    $points[]= $start_point->addVector($arrow_normal, $direction * $link_width);
+    $points[]= $start_point->addVector($arrow_normal, $direction * $arrow_width);
     $points[]= $end_point;
-    $points[]= $start_point.addVector($arrow_normal, $direction * -$arrow_width);
-    $points[]= $start_point.addVector($arrow_normal, $direction * -$link_width);
+    $points[]= $start_point->addVector($arrow_normal, $direction * -$arrow_width);
+    $points[]= $start_point->addVector($arrow_normal, $direction * -$link_width);
 
     return $points;
 }
 
+/***
+ * Class WMLinkGeometry - everything needed to draw a link
+ *
+ * Actually collect all the link-drawing code into an object!
+ *
+ */
 class WMLinkGeometry
 {
     private $arrowWidths;
@@ -912,13 +917,42 @@ class WMLinkGeometry
     private $owner;
     private $controlPoints;
 
-    function Init(&$link)
+    function Init(&$link, $controlPoints, $widths, $directions = 2)
     {
         $this->owner = $link;
         $this->directions = array(IN, OUT);
-        if (1==0) {
+        if ($directions == 1) {
             $this->directions = array(OUT);
         }
+
+        $this->controlPoints = $controlPoints;
+
+        foreach ($this->directions as $direction) {
+            $this->arrowWidths[$direction] = $widths[$direction];
+        }
+
+        $this->processControlPoints();
+        $this->curvePoints = new WMSpine();
+    }
+
+    /***
+     * processControlPoints - remove duplicate points, and co-linear points from control point list
+     */
+    function processControlPoints()
+    {
+
+    }
+
+    function setFillColours($colours)
+    {
+        foreach ($this->directions as $direction) {
+            $this->fillColours[$direction] = $colours[$direction];
+        }
+    }
+
+    function setOutlineColour($colour)
+    {
+        $this->outlineColour = $colour;
     }
 }
 

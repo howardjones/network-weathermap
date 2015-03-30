@@ -15,6 +15,14 @@ class WMLinkGeometry
     private $owner;
     private $controlPoints;
 
+    /***
+     * Get things started for link geometry
+     *
+     * @param WeatherMapLink $link
+     * @param WMPoint[] $controlPoints
+     * @param int[] $widths
+     * @param int $directions
+     */
     function Init(&$link, $controlPoints, $widths, $directions = 2)
     {
         $this->owner = $link;
@@ -38,7 +46,15 @@ class WMLinkGeometry
      */
     function processControlPoints()
     {
+        $lastPoint = new WMPoint(-101.111, -2345234.333);
 
+        foreach ($this->controlPoints as $cp)
+        {
+            if ( $cp.identical($lastPoint)) {
+                wm_debug("Dumping useless duplicate point on curve");
+
+            }
+        }
     }
 
     function setFillColours($colours)

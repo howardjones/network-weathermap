@@ -477,4 +477,3 @@ foreach ($map->links as $link) {
 $map->writeConfig($outputmapfile);
 
 print "Wrote config to $outputmapfile\n";
-?>

@@ -37,12 +37,15 @@ if (!function_exists("json_encode")) {
         if (is_null($a)) {
             return 'null';
         }
+
         if ($a === false) {
             return 'false';
         }
+
         if ($a === true) {
             return 'true';
         }
+
         if (is_scalar($a)) {
             if (is_float($a)) {
                 // Always use "." for floats.
@@ -56,6 +59,7 @@ if (!function_exists("json_encode")) {
                 return $a;
             }
         }
+
         $isList = true;
         for ($i = 0, reset($a); $i < count($a); $i++, next($a)) {
             if (key($a) !== $i) {
@@ -63,6 +67,7 @@ if (!function_exists("json_encode")) {
                 break;
             }
         }
+
         $result = array();
         if ($isList) {
             foreach ($a as $v) {
@@ -748,7 +753,7 @@ function wmeSanitizeFile($filename, $allowed_exts = array())
 function wmeSanitizeConfigFile($filename)
 {
     # If we've been fed something other than a .conf filename, just pretend it didn't happen
-    $filename = wmeSanitizeURI($filename,array("conf"));
+    $filename = wmeSanitizeFile($filename, array("conf"));
 
     # on top of the url stuff, we don't ever need to see a / in a config filename
     # (CVE-2013-3739)

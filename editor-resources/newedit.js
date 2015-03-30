@@ -80,8 +80,7 @@ function showpicker()
     $('#themap').hide();
     $('#busy').show();
 
-    $('#filelist').empty();
-    $('#filelist').append(
+    $('#filelist').empty().append(
         '<li id="status"><em><img src="editor-resources/activity-indicator.gif">Fetching File List...</em></li>');
 
     $.getJSON("editor-backend.php", {
@@ -282,9 +281,7 @@ function reapplyLinkEvents()
     // unbind, then re-apply all events for links.
     // is this actually necessary?
 
-    $('area[@id^=LINK:]').unbind();
-
-    $('area[@id^=LINK:]').mousedown(function(ev)
+    $('area[@id^=LINK:]').unbind().mousedown(function(ev)
     {
         console.log('LINK mousedown');
         linkmdown = true;
@@ -294,19 +291,14 @@ function reapplyLinkEvents()
         dragstart.y = pos.y;
         dragitem = $(this).attr('id');
         return(false);
-    });
-
-    $('area[@id^=LINK:]').mousemove(function()
+    }).mousemove(function()
     {
         if (linkmdown) {
             return(false);
         }
         return(true);
-    });
-
-    $('area[@id^=LINK:]').mouseup(function(ev)
+    }).mouseup(function(ev)
     {
-
         // verify if we've moved much since the down - if we did, it's not a click
         var pos = getMousePosition(ev);
         dragstop.x = pos.x;
@@ -345,9 +337,7 @@ function reapplyDraggableEvents()
 {
     var origin_x, origin_y;
 
-    $('.draggable').unbind();
-
-    $('.draggable').mousedown(function(ev)
+    $('.draggable').unbind().mousedown(function(ev)
     {
         dragmdown = true;
         console.log('mousedown');
@@ -364,9 +354,7 @@ function reapplyDraggableEvents()
         dragoffset.y = -(h / 2);
 
         return(false);
-    });
-    $('.draggable').mousemove(function(ev) { });
-    $('.draggable').mouseup(function(ev)
+    }).mousemove(function(ev) { }).mouseup(function(ev)
     {
         console.log('mouseup');
         dragmdown = false;

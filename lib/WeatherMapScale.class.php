@@ -289,6 +289,8 @@ class WeatherMapScale
             return;
         }
 
+        $gdScaleImage = null;
+
         switch($this->keystyle)
         {
             case 'classic':
@@ -326,17 +328,26 @@ class WeatherMapScale
 
     function DrawLegendClassic($useTags = false)
     {
+        // TODO - This doesn't draw anything!
+        $gdImage = imagecreate(100,100);
 
+        return $gdImage;
     }
 
     function DrawLegendVertical($height = 400, $inverted = true)
     {
+        // TODO - This doesn't draw anything!
+        $gdImage = imagecreate(100,100);
 
+        return $gdImage;
     }
 
     function DrawLegendHorizontal($width = 400)
     {
+        // TODO - This doesn't draw anything!
+        $gdImage = imagecreate(100,100);
 
+        return $gdImage;
     }
 
     function FindScaleExtent()

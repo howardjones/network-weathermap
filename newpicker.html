@@ -96,7 +96,7 @@
 			$('#pickedlist').show();
 			
 			$.getJSON("newpickerserver.php",  { "act": "meta", "source":"cacti_rrddata" }, function(data) {
-				$('#currentlist li').remove();
+				$('#currentlist').find('li').remove();
 				$('#datatitle').text(data.name);
 				$.each(data.headings, function(key, val) {
 					$('#levelslist').append("<li>" + val + "</li>");
@@ -119,7 +119,7 @@
 
 		function wm_initJS() {
 			$('#target_picker').click( function () {
-				$('#currentlist li').remove();
+				// $('#cur').find('li'list li').remove();
 				$('#pickermodal').modal( );
 				prepare_pick_source();			
 			});

@@ -313,4 +313,4 @@
 	print "$totaltargets targets, $candidates rrd-based targets, $converted were actually converted.\n";
 
 	// vim:ts=4:sw=4:
-?>
+

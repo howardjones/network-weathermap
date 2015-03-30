@@ -30,11 +30,8 @@ var wmEditor = {
     },
 
     startClickListeners: function () {
-        jQuery('area[id^="LINK:"]').attr("href", "#").click(wmEditor.handleMapClick);
-        jQuery('area[id^="NODE:"]').attr("href", "#").click(wmEditor.handleMapClick);
-
-        jQuery('area[id^="LINK:"]').attr("href", "#").on("linkClicked", wmEditor.handleLinkClick);
-        jQuery('area[id^="NODE:"]').attr("href", "#").on("nodeClicked", wmEditor.handleNodeClick);
+        jQuery('area[id^="LINK:"]').attr("href", "#").click(wmEditor.handleMapClick).on("linkClicked", wmEditor.handleLinkClick);
+        jQuery('area[id^="NODE:"]').attr("href", "#").click(wmEditor.handleMapClick).on("nodeClicked", wmEditor.handleNodeClick);
 
         var click_listeners = {
             "#tb_mapprops": wmEditor.handleMapProperties,
@@ -106,13 +103,13 @@ var wmEditor = {
     },
 
     handleLinkClick: function (e, type, name) {
-        undefined(e, type);
+        //undefined(e, type);
         console.log("Showing link properties for " + name);
         wmEditor.showLinkProperties(name);
     },
 
     handleNodeClick: function (e, type, name) {
-        undefined(e, type);
+        //undefined(e, type);
 
         // TODO - check if we're in the middle of adding a node
         // don't show the properties then.
@@ -178,8 +175,7 @@ var wmEditor = {
 
         jQuery("#mainarea").after(template(input));
         jQuery("#param").val(name);
-        jQuery("#dlgLinkProperties").show();
-        jQuery("#dlgLinkProperties").draggable({handle: "h3"});
+        jQuery("#dlgLinkProperties").show().draggable({handle: "h3"});
         jQuery("#link_bandwidth_in").focus();
     },
 
@@ -192,8 +188,7 @@ var wmEditor = {
 
         jQuery("#mainarea").after(template(Nodes[name]));
         jQuery("#param").val(name);
-        jQuery("#dlgNodeProperties").show();
-        jQuery("#dlgNodeProperties").draggable({handle: "h3"});
+        jQuery("#dlgNodeProperties").show().draggable({handle: "h3"});
         jQuery("#node_new_name").focus();
     },
 
@@ -202,8 +197,7 @@ var wmEditor = {
 
         var template = _.template(jQuery("script#tpl-dialog-map-properties").html());
         jQuery("#mainarea").after(template(Map));
-        jQuery("#dlgMapProperties").show();
-        jQuery("#dlgMapProperties").draggable({handle: "h3"});
+        jQuery("#dlgMapProperties").show().draggable({handle: "h3"});
     },
 
     hideAllDialogs: function () {

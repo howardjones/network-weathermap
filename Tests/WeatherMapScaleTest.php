@@ -109,4 +109,4 @@ class WeatherMapScaleTest extends PHPUnit_Framework_TestCase {
         );
     }
 }
-?>
+

@@ -94,7 +94,7 @@ if (isset($_REQUEST['command']) && $_REQUEST["command"]=='link_step2') {
         <script type="text/javascript">
         function update_source_step2(graphid)
         {
-            var graph_url, hover_url;
+            var graph_url, info_url;
 
             var base_url = '<?php echo isset($config['base_url'])?$config['base_url']:''; ?>';
 
@@ -175,7 +175,7 @@ if (isset($_REQUEST['command']) && $_REQUEST["command"]=='link_step1') {
         }
 
         function applyDSFilterChange(objForm) {
-            strURL = '?host_id=' + objForm.host_id.value;
+            var strURL = '?host_id=' + objForm.host_id.value;
             strURL = strURL + '&command=link_step1';
             if( objForm.overlib.checked) {
                 strURL = strURL + "&overlib=1";
@@ -326,8 +326,7 @@ if (isset($_REQUEST['command']) && $_REQUEST["command"]=='node_step1') {
 
             if(filterstring!=previous)
             {
-                    $('ul#dslist > li').hide();
-                    $('ul#dslist > li').contains(filterstring).show();
+                    $('ul#dslist > li').hide().contains(filterstring).show();
             }
         }
 
@@ -339,14 +338,12 @@ if (isset($_REQUEST['command']) && $_REQUEST["command"]=='node_step1') {
         });
 
         function applyDSFilterChange(objForm) {
-                    strURL = '?host_id=' + objForm.host_id.value;
-                    strURL = strURL + '&command=node_step1';
-            if( objForm.overlib.checked)
-            {
+            var strURL = '?host_id=' + objForm.host_id.value;
+            strURL = strURL + '&command=node_step1';
+            if (objForm.overlib.checked) {
                 strURL = strURL + "&overlib=1";
             }
-            else
-            {
+            else {
                 strURL = strURL + "&overlib=0";
             }
 
@@ -355,7 +352,7 @@ if (isset($_REQUEST['command']) && $_REQUEST["command"]=='node_step1') {
 
         function update_source_step1(graphid)
         {
-            var graph_url, hover_url;
+            var graph_url, info_url;
 
             var base_url = '<?php echo isset($config['base_url'])?$config['base_url']:''; ?>';
 

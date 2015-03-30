@@ -85,7 +85,10 @@
     body { font-family: 'Lucida Grande',Arial,sans-serif; font-size: 10pt; }
     p {margin-bottom: 10px; margin-top: 10px;}
     table { margin: 20px;}
-    .critical { width: 400px; padding: 10px; background: #fee; border: 1px solid #f88; padding-left: 20px; background: left no-repeat url(images/exclamation.png); }
+    .critical { width: 400px;
+        background: #fee; border: 1px solid #f88;
+        padding: 10px 10px 10px 20px;
+        background: left no-repeat url(images/exclamation.png); }
     .noncritical { width: 400px; padding: 10px; background: #ffe; border: 1px solid #fb8; }
     .ok { width: 400px; padding: 10px; background: #efe; border: 1px solid #8f8; }
     </style>
@@ -279,26 +282,24 @@
       if($environment=='web') {
           echo "</body></html>";
       }
-      
-      function return_bytes($val) {
-      $val = trim($val);
-      if($val != '')
-      {
-      $last = strtolower($val{strlen($val)-1});
-      switch($last) {
-          // The 'G' modifier is available since PHP 5.1.0
-          case 'g':
-              $val *= 1024;
-          case 'm':
-              $val *= 1024;
-          case 'k':
-              $val *= 1024;
+
+function return_bytes($val)
+{
+    $val = trim($val);
+    if ($val != '') {
+        $last = strtolower($val{strlen($val) - 1});
+        switch ($last) {
+            // The 'G' modifier is available since PHP 5.1.0
+            case 'g':
+                $val *= 1024;
+            case 'm':
+                $val *= 1024;
+            case 'k':
+                $val *= 1024;
+        }
+    } else {
+        $val = 0;
     }
-    	}
-	else
-	{
-		$val = 0;
-	}
 
     return $val;
 }

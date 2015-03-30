@@ -604,6 +604,8 @@ function wmGenerateMapSelectorBox($current_id = 0)
         <?php
         html_graph_end_box(false);
     }
+
+    return true;
 }
 
 function wmGetValidTabs()

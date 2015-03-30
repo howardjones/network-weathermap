@@ -5,7 +5,7 @@ exports.client = require('webdriverjs').remote({
 		// //
 		// http://code.google.com/p/selenium/wiki/DesiredCapabilities
 		browserName : 'phantomjs'
-	},
+	}
 // // webdriverjs has a lot of output which
 // is generally useless
 // // However, if anything goes wrong,

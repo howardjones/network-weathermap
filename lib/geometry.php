@@ -19,6 +19,14 @@ class WMPoint
         $this->y = $y;
     }
 
+    function identical($point2)
+    {
+        if (($this->x == $point2->x) && ($this->y == $point2->y)) {
+            return TRUE;
+        }
+        return FALSE;
+    }
+
     function vectorToPoint($p2)
     {
         $v = new WMVector($p2->x - $this->x, $p2->y - $this->y);
@@ -59,11 +67,13 @@ class WMPoint
     function addVector($v, $fraction = 1.0)
     {
         if ($fraction == 0) {
-            return;
+            return $this;
         }
 
         $this->x = $this->x + $fraction * $v->dx;
         $this->y = $this->y + $fraction * $v->dy;
+
+        return $this;
     }
 
     /**

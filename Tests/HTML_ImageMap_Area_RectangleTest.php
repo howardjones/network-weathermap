@@ -74,4 +74,4 @@ class HTML_ImageMap_Area_RectangleTest extends PHPUnit_Framework_TestCase {
         );
     }
 }
-?>
+

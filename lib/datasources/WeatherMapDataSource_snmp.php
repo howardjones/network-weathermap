@@ -124,7 +124,7 @@ class WeatherMapDataSource_snmp extends WeatherMapDataSource {
                     snmp_set_quick_print($was);
                 }
                 if (function_exists("snmp_set_valueretrieval")) {
-                    snmp_get_valueretrieval($was2);
+                    snmp_set_valueretrieval($was2);
                 }
             } else {
                 wm_warn("SNMP for $host has reached $abort_count failures. Skipping. [WMSNMP01]");

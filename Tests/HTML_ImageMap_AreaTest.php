@@ -38,4 +38,4 @@ class HTML_ImageMap_AreaTest extends PHPUnit_Framework_TestCase {
         );
     }
 }
-?>
+

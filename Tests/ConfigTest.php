@@ -229,5 +229,3 @@ function get_map_title($realfile) {
 	return $title;
 }
 
-
-?>

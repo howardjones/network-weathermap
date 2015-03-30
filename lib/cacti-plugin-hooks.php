@@ -2,8 +2,6 @@
 
 function weathermap_page_head()
 {
-    global $config;
-
     if (preg_match('/plugins\/weathermap\//', $_SERVER['REQUEST_URI'], $matches)) {
         ?>
         <link rel="stylesheet" type="text/css" media="screen" href="cacti-resources/weathermap.css" />
@@ -143,7 +141,7 @@ function weathermap_config_settings()
 
 function weathermap_setup_table()
 {
-    global $config, $database_default;
+    global $database_default;
     // include_once $config["library_path"] . DIRECTORY_SEPARATOR . "database.php";
     $dbversion = read_config_option("weathermap_db_version");
 
@@ -368,7 +366,7 @@ function weathermap_config_arrays()
 
 function weathermap_show_tab()
 {
-    global $config, $user_auth_realms, $user_auth_realm_filenames;
+    global $config, $user_auth_realm_filenames;
     $realm_id2 = 0;
 
     if (isset($user_auth_realm_filenames[basename('weathermap-cacti-plugin.php')])) {
@@ -567,7 +565,7 @@ function weathermap_poller_output($rrd_update_array)
 function weathermap_poller_bottom()
 {
     global $config;
-    global $weathermap_debugging, $WEATHERMAP_VERSION;
+    global $WEATHERMAP_VERSION;
 
     include_once $config["library_path"] . DIRECTORY_SEPARATOR."database.php";
     include_once "poller-common.php";

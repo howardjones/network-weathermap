@@ -33,6 +33,7 @@ class WMFont
         if ($this->type == 'truetype') {
             return true;
         }
+        return false;
     }
 
     function isGD()

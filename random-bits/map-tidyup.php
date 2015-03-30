@@ -103,4 +103,3 @@ $map->drawMapImage(null);
 $map->writeConfig($outputfile);
 
 print 'Wrote new config to '.$outputfile."\n";
-?>

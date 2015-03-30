@@ -65,4 +65,3 @@ for($n=1; $n<=$nports; $n++)
 }
 print "# Now run this output through cacti-integrate.php to add all the INFOURL and TARGET lines";
 
-?>

@@ -595,7 +595,7 @@ function wmMapManagementList4()
 
 function wmMapManagementList()
 {
-    global $colors, $menu;
+    global $colors;
     global $i_understand_file_permissions_and_how_to_fix_them;
 
     $last_started = read_config_option("weathermap_last_started_file", true);
@@ -618,7 +618,6 @@ function wmMapManagementList()
     html_start_box("<strong>Weathermaps</strong>", "78%", $colors["header"], "3", "center", "weathermap-cacti-plugin-mgmt.php?action=addmap_picker");
 
     $headers = array("", "Config File", "Title", "Group", "Last Run", "Active", "Settings", "Sort Order", "Accessible By", "");
-    $nheads = sizeof($headers);
 
     html_header($headers);
 
@@ -641,7 +640,6 @@ function wmMapManagementList()
     $queryrows = db_fetch_assoc("select weathermap_maps.*, weathermap_groups.name as groupname from weathermap_maps, weathermap_groups where weathermap_maps.group_id=weathermap_groups.id order by weathermap_groups.sortorder,sortorder");
     // or die (mysql_error("Could not connect to database") )
 
-    $previous_id = -2;
     $had_warnings = 0;
     if (is_array($queryrows)) {
         form_alternate_row_color($colors["alternate"], $colors["light"], $i);
@@ -935,7 +933,6 @@ function wmuiPreviewConfig($file)
 function wmMapAdd($file)
 {
     global $weathermap_confdir;
-    global $colors;
 
     chdir($weathermap_confdir);
 
@@ -1098,7 +1095,7 @@ function wmuiMapPermissionsPage($id)
 
 function wmuiMapSettingsPage($id)
 {
-    global $colors, $config;
+    global $colors;
 
     if ($id==0) {
         $title = "Additional settings for ALL maps";
@@ -1216,7 +1213,7 @@ function wmuiMapSettingsReadOnly($id, $title = "Settings")
 
 function wmuiMapSettingsForm($mapid = 0, $settingid = 0)
 {
-    global $colors, $config;
+    global $colors;
 
     // print "Per-map settings for map $id";
 
@@ -1298,8 +1295,6 @@ function wmuiMapGroupChangePage($id)
 
     $title = db_fetch_cell("select titlecache from weathermap_maps where id=".intval($id));
     $curgroup = db_fetch_cell("select group_id from weathermap_maps where id=".intval($id));
-
-    $n=0;
 
     print "<form>";
     print "<input type=hidden name='map_id' value='".$id."'>";

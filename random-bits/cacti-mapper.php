@@ -345,5 +345,3 @@ function get_cidr($mask)
 
 }
 
-
-?>

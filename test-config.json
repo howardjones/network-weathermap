@@ -1,4 +1,4 @@
-var cf = {
+{
 	global_settings: {
 		'link_bulge': 1
 	},

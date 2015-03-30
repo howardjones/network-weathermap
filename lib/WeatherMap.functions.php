@@ -388,7 +388,7 @@ function wmFormatNumberWithMetricPrefix($number, $kilo = 1000, $decimals = 1, $b
         $number /= $kilo;
         $suffix = "K";
     } elseif ($number >= 1) {
-        $number = $number;
+        // $number = $number;
         $suffix = "";
     } elseif (($below_one === true) && ($number >= $milli)) {
         $number /= $milli;

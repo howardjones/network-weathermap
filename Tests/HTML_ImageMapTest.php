@@ -118,4 +118,4 @@ class HTML_ImageMapTest extends PHPUnit_Framework_TestCase {
         );
     }
 }
-?>
+

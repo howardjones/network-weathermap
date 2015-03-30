@@ -95,4 +95,3 @@ $map->ReadConfig($inputfile);
 $map->writeConfig($outputfile);
 
 print "Wrote new config to $outputfile\n";
-?>

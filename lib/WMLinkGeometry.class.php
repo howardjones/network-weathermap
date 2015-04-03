@@ -68,4 +68,29 @@ class WMLinkGeometry
     {
         $this->outlineColour = $colour;
     }
+
+    function calculateArrowSize($linkWidth, $arrowStyle)
+    {
+        // This is the default 'classic' size
+        $arrowLengthFactor = 4;
+        $arrowWidthFactor = 2;
+
+        if ($arrowStyle == 'compact') {
+            $arrowLengthFactor = 1;
+            $arrowWidthFactor = 1;
+        }
+
+        if (preg_match('/(\d+) (\d+)/', $arrowStyle, $matches)) {
+            $arrowLengthFactor = $matches[1];
+            $arrowWidthFactor = $matches[2];
+        }
+
+        $arrowLength = $linkWidth * $arrowLengthFactor;
+        $arrowWidth = $linkWidth * $arrowWidthFactor;
+
+        return (array(
+            $arrowLength,
+            $arrowWidth
+        ));
+    }
 }

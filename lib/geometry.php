@@ -37,6 +37,21 @@ class WMPoint
         return FALSE;
     }
 
+    /**
+     * Compare two points to within a few decimal places - good enough for graphics! (and unit tests)
+     *
+     * @param $point2
+     * @return bool
+     */
+    function closeEnough($point2)
+    {
+        if ((round($this->x,2) == round($point2->x,2)) && (round($this->y,2) == round($point2->y,2))) {
+            return TRUE;
+        }
+        return FALSE;
+    }
+
+
     function vectorToPoint($p2)
     {
         $v = new WMVector($p2->x - $this->x, $p2->y - $this->y);
@@ -46,7 +61,7 @@ class WMPoint
 
     function lineToPoint($p2)
     {
-        return new WMLine($this->x, $this->y, $p2->x, $p2->y);
+        return new WMLine($this->x, $this->y, $p2->x - $this->x, $p2->y - $this->y);
     }
 
 
@@ -136,6 +151,16 @@ class WMVector
     function getAngle()
     {
         return rad2deg(atan2(($this->dy), ($this->dx)));
+    }
+
+    function getSlope()
+    {
+        if($this->dx == 0) {
+            // special case - if slope is infinite, fudge it to be REALLY BIG instead
+            wm_debug("Slope is infinite.\n");
+            return 1e10;
+        }
+        return ($this->dy / $this->dx);
     }
 
     /**
@@ -277,15 +302,45 @@ class WMLine
         $this->vector = $v;
     }
 
+    function getSlope()
+    {
+        return $this->vector->getSlope();
+    }
+
+    function getYIntercept()
+    {
+        $slope = $this->getSlope();
+        $intercept = $this->point->y - $this->point->x * $slope;
+
+        return $intercept;
+    }
+
+
     /**
      * Find the point where this line and another one cross
      *
      * @param $line2 the other line
      * @return WMPoint the crossing point
+     * @throws Exception
      */
     function findCrossingPoint($line2)
     {
+        $slope1 = $this->vector->getSlope();
+        $slope2 = $line2->vector->getSlope();
 
+        if ($slope1 == $slope2) {
+            // for a general case, this should probably be handled better
+            // but for our use, there should never be parallel lines
+            throw new Exception("ParallelLinesNeverCross");
+        }
+
+        $b1 = $this->getYIntercept();
+        $b2 = $line2->getYIntercept();
+
+        $xi = ($b2 - $b1) / ($slope1 - $slope2);
+        $yi = $b1 + $slope1*$xi;
+
+        return new WMPoint($xi, $yi);
     }
 }
 class WMLineSegment

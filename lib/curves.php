@@ -18,6 +18,19 @@
  */
 
 // TODO - reimplement in WMLine
+/**
+ * Given two lines (4 points), find the point where they cross
+ *
+ * @param $x1
+ * @param $y1
+ * @param $x2
+ * @param $y2
+ * @param $x3
+ * @param $y3
+ * @param $x4
+ * @param $y4
+ * @return array
+ */
 function line_crossing($x1, $y1, $x2, $y2, $x3, $y3, $x4, $y4)
 {
     // First, check that the slope isn't infinite.
@@ -460,7 +473,7 @@ function draw_straight($image, &$curvepoints, $widths, $outlinecolour, $fillcolo
     // now we have two seperate spines, with distances, so that the arrowhead is the end of each.
     // (or one, if it's unidir)
 
-    // so we can loop along the spine for each one as a seperate entity
+    // so we can loop along the spine for each one as a separate entity
 
     // we calculate the arrow size up here, so that we can decide on the
     // minimum length for a link. The arrowheads are the limiting factor.

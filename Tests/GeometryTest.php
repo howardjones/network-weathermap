@@ -24,9 +24,36 @@ class GeometryTest  extends PHPUnit_Framework_TestCase {
 
     }
 
+    public function testLineException()
+    {
+        $line1 = new WMLine(new WMPoint(50,50), new WMVector(1,0) );
+        $line3 = new WMLine(new WMPoint(70,0), new WMVector(1,0) );
+
+     //   $this->setExpectedException("ParallelLinesNeverCross");
+     //   $point = $line1->findCrossingPoint($line3);
+    }
+
     public function testLine()
     {
+        $line1 = new WMLine(new WMPoint(50,50), new WMVector(1,0) );
+        $line2 = new WMLine(new WMPoint(100,0), new WMVector(0,1) );
+        $line3 = new WMLine(new WMPoint(30,0), new WMVector(3,1) );
+        $line4 = new WMLine(new WMPoint(0,0), new WMVector(1,1) );
 
+        $this->assertEquals(0, $line1->getSlope());
+        $this->assertEquals(1e10, $line2->getSlope()); // this is our "INFINITE" value
+
+        $point = $line1->findCrossingPoint($line2);
+        $this->assertTrue($point->closeEnough(new WMPoint(100,50)));
+
+        $point = $line1->findCrossingPoint($line4);
+        $this->assertTrue($point->closeEnough(new WMPoint(50,50)));
+
+        $point = $line2->findCrossingPoint($line4);
+        $this->assertTrue($point->closeEnough(new WMPoint(100,100)));
+
+        $point = $line3->findCrossingPoint($line4);
+        $this->assertTrue($point->closeEnough(new WMPoint(-15,-15)));
     }
 
     public function testRectangle()

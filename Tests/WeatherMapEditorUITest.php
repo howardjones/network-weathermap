@@ -41,8 +41,10 @@ class WeatherMapEditorUITest extends PHPUnit_Framework_TestCase {
         $ui = new WeatherMapEditorUI();
 
         foreach ($ui->commands as $action => $command) {
+
             $this->assertTrue(isset($command['handler']), "Action $action has a handler");
-            $this->assertTrue(method_exists($ui, $command['handler']), "Action $action has a handler that exists");
+            $handler = $command['handler'];
+            $this->assertTrue(method_exists($ui, $command['handler']), "Action $action has a handler that exists called $handler");
         }
     }
 

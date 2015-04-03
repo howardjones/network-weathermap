@@ -39,6 +39,9 @@ class WMLinkGeometry
 
         $this->processControlPoints();
         $this->curvePoints = new WMSpine();
+
+        $this->calculateSpine();
+
     }
 
     /***
@@ -46,14 +49,15 @@ class WMLinkGeometry
      */
     function processControlPoints()
     {
-        $lastPoint = new WMPoint(-101.111, -2345234.333);
+        $previousPoint = new WMPoint(-101.111, -2345234.333);
 
-        foreach ($this->controlPoints as $cp)
+        foreach ($this->controlPoints as $key=>$cp)
         {
-            if ( $cp.identical($lastPoint)) {
+            if ( $cp.closeEnough($previousPoint)) {
                 wm_debug("Dumping useless duplicate point on curve");
-
+                unset($this->controlPoints[$key]);
             }
+            $previousPoint = $cp;
         }
     }
 
@@ -92,5 +96,33 @@ class WMLinkGeometry
             $arrowLength,
             $arrowWidth
         ));
+    }
+
+
+}
+
+class WMCurvedLinkGeometry extends WMLinkGeometry
+{
+    function calculateSpine()
+    {
+
+    }
+
+    function draw($gdImage)
+    {
+
+    }
+}
+
+class WMAngledLinkGeometry extends WMLinkGeometry
+{
+    function calculateSpine()
+    {
+
+    }
+
+    function draw($gdImage)
+    {
+
     }
 }

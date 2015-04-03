@@ -270,11 +270,11 @@ class WeatherMapEditorUI {
             "handler" => "cmdEditLink"
         ),
 
-        "editor_settings" => array(),
-        "set_node_properties" => array(),
-        "set_link_properties" => array(),
-        "set_map_properties" => array(),
-        "set_map_style" => array(),
+//        "editor_settings" => array(),
+//        "set_node_properties" => array(),
+//        "set_link_properties" => array(),
+//        "set_map_properties" => array(),
+//        "set_map_style" => array(),
         "nothing" => array("args" => array(array("mapname","mapfile")), "handler"=>"cmdDoNothing", "no_save" => true)
     );
 
@@ -629,6 +629,36 @@ class WeatherMapEditorUI {
     {
         $editor->loadConfig($this->mapDirectory."/".$params['sourcemap']);
         $editor->saveConfig($this->mapfile);
+    }
+
+    function cmdDrawFontSamples($params, $editor)
+    {
+
+    }
+
+    function cmdGetItemConfig($params, $editor)
+    {
+
+    }
+
+    function cmdReplaceNodeConfig($params, $editor)
+    {
+
+    }
+
+    function cmdReplaceLinkConfig($params, $editor)
+    {
+
+    }
+
+    function cmdMoveLegend($params, $editor)
+    {
+
+    }
+
+    function cmdMoveTimestamp($params, $editor)
+    {
+
     }
 
     function snap($coord)

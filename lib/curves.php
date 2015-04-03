@@ -882,6 +882,7 @@ function simplify_spine(&$input, $epsilon = 1e-10)
  *
  * @return WMPoint[]
  */
+// NOT-YET-USED
 function generateArrowhead($start_point, $end_point, $direction, $link_width, $arrow_width)
 {
     $points = array();

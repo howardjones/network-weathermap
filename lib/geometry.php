@@ -1,4 +1,14 @@
-<?php 
+<?php
+
+function getTriangleArea($point1, $point2, $point3)
+{
+    $a = abs($point1->x * ($point2->y - $point3->y)
+        + $point2->x * ($point3->y - $point1->y)
+        + $point3->x * ($point1->y - $point2->y));
+
+    return $a;
+}
+    
 /**
  * Utility 'class' for 2D points.
  *
@@ -77,6 +87,23 @@ class WMPoint
     }
 
     /**
+     * Linear Interpolate between two points
+     *
+     * @param $point2 - other point we're interpolating to
+     * @param $ratio - how far (0-1) between the two
+     * @return WMPoint - a new WMPoint
+     */
+    function LERPWith($point2, $ratio)
+    {
+        $x = $this->x + $ratio * ($point2->x - $this->x);
+        $y = $this->y + $ratio * ($point2->y - $this->y);
+
+        $newPoint = new WMPoint($x, $y);
+
+        return $newPoint;
+    }
+
+    /**
      * @return string
      */
     function asString()
@@ -108,7 +135,7 @@ class WMVector
 
     function getAngle()
     {
-        return rad2deg(atan2(-($this->dy), ($this->dx)));
+        return rad2deg(atan2(($this->dy), ($this->dx)));
     }
 
     /**

@@ -187,21 +187,33 @@ class WMSpine
         print "===============\n";
     }
 
-    function drawSpine($gdImage, $spine, $colour)
+    function drawSpine($gdImage, $colour)
     {
-        $nPoints = count($spine ) - 1;
+        $nPoints = count($this->points ) - 1;
 
         for ($i = 0; $i < $nPoints; $i ++) {
-            imageline($gdImage, $spine[$i][X], $spine[$i][Y], $spine[$i + 1][X], $spine[$i + 1][Y], $colour );
+            $point1 = $this->points[$i][0];
+            $point2 = $this->points[$i+1][0];
+            imageline($gdImage,
+                $point1->x,
+                $point1->y,
+                $point2->x,
+                $point2->y,
+                $colour );
         }
     }
 
-    function drawChain($gdImage, $spine, $colour, $size = 10)
+    function drawChain($gdImage, $colour, $size = 10)
     {
-        $nPoints = count($spine);
+        $nPoints = count($this->points);
 
         for ($i = 0; $i < $nPoints; $i ++) {
-            imagearc($gdImage, $spine[$i][X], $spine[$i][Y], $size, $size, 0, 360, $colour);
+            imagearc($gdImage,
+                $this->points[$i][0]->x,
+                $this->points[$i][0]->y,
+                $size, $size,
+                0, 360,
+                $colour);
         }
     }
 }

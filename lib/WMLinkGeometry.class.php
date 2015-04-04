@@ -145,7 +145,13 @@ class WMCurvedLinkGeometry extends WMLinkGeometry
 
     function draw($gdImage)
     {
+        if (is_null($this->curvePoints)) {
+            throw new Exception("DrawingEmptySpline");
+        }
 
+        $colour = imagecolorallocate($gdImage, 255, 0, 0);
+        $this->curvePoints->drawSpine($gdImage, $colour);
+        $this->curvePoints->drawChain($gdImage, $colour);
     }
 }
 
@@ -153,12 +159,37 @@ class WMAngledLinkGeometry extends WMLinkGeometry
 {
     function calculateSpine($pointsPerSpan=5)
     {
+        $nPoints = count($this->controlPoints);
 
+        $np = 0;
+        $distance = 0;
+
+        for ($i = 0; $i < ($nPoints - 1); $i ++) {
+            // still subdivide the straight line, because other stuff makes assumptions about
+            // how often there is a point - at least find_distance_coords_angle breaks
+            $dx = ($this->controlPoints[$i + 1]->x - $this->controlPoints[$i]->x) / $pointsPerSpan;
+            $dy = ($this->controlPoints[$i + 1]->y - $this->controlPoints[$i]->y) / $pointsPerSpan;
+
+            for ($j = 0; $j < $pointsPerSpan; $j ++) {
+                $x = $this->controlPoints[$i]->x + $j * $dx;
+                $y = $this->controlPoints[$i]->y + $j * $dy;
+
+                $newPoint = new WMPoint($x, $y);
+                $this->curvePoints->addPoint($newPoint);
+            }
+        }
+
+        $this->curvePoints->addPoint($this->controlPoints[$nPoints-1]);
     }
 
     function draw($gdImage)
     {
-
+        if (is_null($this->curvePoints)) {
+            throw new Exception("DrawingEmptySpline");
+        }
+        $colour = imagecolorallocate($gdImage, 255, 0, 0);
+        $this->curvePoints->drawSpine($gdImage, $colour);
+        $this->curvePoints->drawChain($gdImage, $colour);
     }
 }
 

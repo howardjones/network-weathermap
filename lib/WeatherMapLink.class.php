@@ -300,7 +300,7 @@ class WeatherMapLink extends WeatherMapItem
     /***
      * Precalculate the colours necessary for this link.
      */
-    function preCalculate()
+    function preCalculate(&$map)
     {
         // don't bother doing anything if it's a template
         if ($this->isTemplate()) {
@@ -330,68 +330,33 @@ class WeatherMapLink extends WeatherMapItem
             return;
         }
 
-        $this->geometry = WMLinkGeometryFactory::create($this->viastyle);
-        $this->geometry->Init($this, $points, array($this->width, $this->width), ($this->linkstyle=='oneway'?1:2), $this->splitpos);
+        $widths = array($this->width, $this->width);
+
+        // for bulging animations, modulate the width with the percentage value
+        if (($map->widthmod) || ($map->get_hint('link_bulge') == 1)) {
+            // a few 0.1s and +1s to fix div-by-zero, and invisible links
+            $widths[0] = (($widths[0] * $this->inpercent * 1.5 + 0.1) / 100) + 1;
+            $widths[1] = (($widths[1] * $this->outpercent * 1.5 + 0.1) / 100) + 1;
+        }
+
+        $style = $this->viastyle;
+
+        // don't bother with any curve stuff if there aren't any Vias defined, even if the style is 'curved'
+        if (count($this->vialist)==0) {
+        //    $style = "angled";
+        }
+
+        $this->geometry = WMLinkGeometryFactory::create($style);
+        $this->geometry->Init($this, $points, $widths, ($this->linkstyle=='oneway'?1:2), $this->splitpos);
     }
+
 
     function draw($im, &$map)
     {
-        // Get the positions of the end-points
-        $x1 = $map->nodes[$this->a->name]->x;
-        $y1 = $map->nodes[$this->a->name]->y;
-
-        $x2 = $map->nodes[$this->b->name]->x;
-        $y2 = $map->nodes[$this->b->name]->y;
-
-        // Adjust the link endpoints, if any offset was specified
-        if (!$this->a_offset_resolved) {
-            list($dx, $dy) = wmCalculateOffset($this->a_offset, $map->nodes[$this->a->name]->width, $map->nodes[$this->a->name]->height);
-            $x1 += $dx;
-            $y1 += $dy;
-        } else {
-            $x1 += $this->a_offset_dx;
-            $y1 += $this->a_offset_dy;
-        }
-
-        if (!$this->b_offset_resolved) {
-            list($dx, $dy) = wmCalculateOffset($this->b_offset, $map->nodes[$this->b->name]->width, $map->nodes[$this->b->name]->height);
-            $x2 += $dx;
-            $y2 += $dy;
-        } else {
-            $x2 += $this->b_offset_dx;
-            $y2 += $this->b_offset_dy;
-        }
-
-        if (($x1==$x2) && ($y1==$y2) && sizeof($this->vialist)==0) {
-            wm_warn("Zero-length link ".$this->name." skipped. [WMWARN45]");
-            return;
-        }
-
         $link_outline_colour = $this->outlinecolour;
         $comment_colour = $this->commentfontcolour;
 
         $gd_outline_colour = $link_outline_colour->gdallocate($im);
-
-        $xpoints = array ();
-        $ypoints = array ();
-
-        $xpoints[]=$x1;
-        $ypoints[]=$y1;
-
-        $via_count = 0;
-        foreach ($this->vialist as $via) {
-            if (isset($via[2])) {
-                $xpoints[]=$map->nodes[$via[2]]->x + $via[0];
-                $ypoints[]=$map->nodes[$via[2]]->y + $via[1];
-            } else {
-                $xpoints[]=$via[0];
-                $ypoints[]=$via[1];
-            }
-            $via_count++;
-        }
-
-        $xpoints[]=$x2;
-        $ypoints[]=$y2;
 
         $link_in_colour = $this->colours[IN];
         $link_out_colour = $this->colours[OUT];
@@ -399,145 +364,211 @@ class WeatherMapLink extends WeatherMapItem
         $gd_in_colour = $link_in_colour->gdallocate($im);
         $gd_out_colour = $link_out_colour->gdallocate($im);
 
-        $link_width=$this->width;
-        // these will replace the one above, ultimately.
-        $link_in_width=$this->width;
-        $link_out_width=$this->width;
+        if (1 == 0) {
+            // Get the positions of the end-points
+            $x1 = $map->nodes[$this->a->name]->x;
+            $y1 = $map->nodes[$this->a->name]->y;
 
-        // for bulging animations
-        if (($map->widthmod) || ($map->get_hint('link_bulge') == 1)) {
-            // a few 0.1s and +1s to fix div-by-zero, and invisible links
-            $link_in_width = (($link_in_width * $this->inpercent * 1.5 + 0.1) / 100) + 1;
-            $link_out_width = (($link_out_width * $this->outpercent * 1.5 + 0.1) / 100) + 1;
-        }
+            $x2 = $map->nodes[$this->b->name]->x;
+            $y2 = $map->nodes[$this->b->name]->y;
 
-        // If there are no vias, treat this as a 2-point angled link, not curved
-        if ($via_count==0 || $this->viastyle=='angled') {
-            // Calculate the spine points - the actual not a curve really, but we
-            // need to create the array, and calculate the distance bits, otherwise
-            // things like bwlabels won't know where to go.
-
-            $this->spinepoints = calc_straight($xpoints, $ypoints);
-
-            // then draw the "curve" itself
-            draw_straight(
-                $im,
-                $this->spinepoints,
-                array($link_in_width, $link_out_width),
-                $gd_outline_colour,
-                array($gd_in_colour, $gd_out_colour),
-                $this->name,
-                $map,
-                $this->splitpos,
-                ($this->linkstyle=='oneway'?true:false)
-            );
-        } elseif ($this->viastyle=='curved') {
-            // Calculate the spine points - the actual curve
-            $this->spinepoints = calc_curve($xpoints, $ypoints);
-
-            // then draw the curve itself
-            draw_curve(
-                $im,
-                $this->spinepoints,
-                array($link_in_width, $link_out_width),
-                $gd_outline_colour,
-                array($gd_in_colour, $gd_out_colour),
-                $this->name,
-                $map,
-                $this->splitpos,
-                ($this->linkstyle=='oneway'?true:false)
-            );
-        }
-
-
-        if (!$comment_colour->isNone()) {
-            if ($comment_colour->isContrast()) {
-                $comment_colour_in = $link_in_colour->getContrastingColour();
-                $comment_colour_out = $link_out_colour->getContrastingColour();
+            // Adjust the link endpoints, if any offset was specified
+            if (!$this->a_offset_resolved) {
+                list($dx, $dy) = wmCalculateOffset($this->a_offset, $map->nodes[$this->a->name]->width, $map->nodes[$this->a->name]->height);
+                $x1 += $dx;
+                $y1 += $dy;
             } else {
-                $comment_colour_in = $comment_colour;
-                $comment_colour_out = $comment_colour;
+                $x1 += $this->a_offset_dx;
+                $y1 += $this->a_offset_dy;
             }
 
-            $gd_comment_colour_in = $comment_colour_in->gdAllocate($im);
-            $gd_comment_colour_out = $comment_colour_out->gdAllocate($im);
+            if (!$this->b_offset_resolved) {
+                list($dx, $dy) = wmCalculateOffset($this->b_offset, $map->nodes[$this->b->name]->width, $map->nodes[$this->b->name]->height);
+                $x2 += $dx;
+                $y2 += $dy;
+            } else {
+                $x2 += $this->b_offset_dx;
+                $y2 += $this->b_offset_dy;
+            }
 
-            $this->drawComments(
-                $im,
-                array($gd_comment_colour_in, $gd_comment_colour_out),
-                array($link_in_width*1.1, $link_out_width*1.1)
-            );
+            if (($x1 == $x2) && ($y1 == $y2) && sizeof($this->vialist) == 0) {
+                wm_warn("Zero-length link " . $this->name . " skipped. [WMWARN45]");
+                return;
+            }
+
+            $xpoints = array();
+            $ypoints = array();
+
+            $xpoints[] = $x1;
+            $ypoints[] = $y1;
+
+            $via_count = 0;
+            foreach ($this->vialist as $via) {
+                if (isset($via[2])) {
+                    $xpoints[] = $map->nodes[$via[2]]->x + $via[0];
+                    $ypoints[] = $map->nodes[$via[2]]->y + $via[1];
+                } else {
+                    $xpoints[] = $via[0];
+                    $ypoints[] = $via[1];
+                }
+                $via_count++;
+            }
+
+            $xpoints[] = $x2;
+            $ypoints[] = $y2;
+
+            $link_in_width = $this->width;
+            $link_out_width = $this->width;
+
+            // for bulging animations
+            if (($map->widthmod) || ($map->get_hint('link_bulge') == 1)) {
+                // a few 0.1s and +1s to fix div-by-zero, and invisible links
+                $link_in_width = (($link_in_width * $this->inpercent * 1.5 + 0.1) / 100) + 1;
+                $link_out_width = (($link_out_width * $this->outpercent * 1.5 + 0.1) / 100) + 1;
+            }
+
+            // If there are no vias, treat this as a 2-point angled link, not curved
+            if ($via_count == 0 || $this->viastyle == 'angled') {
+                // Calculate the spine points - the actual not a curve really, but we
+                // need to create the array, and calculate the distance bits, otherwise
+                // things like bwlabels won't know where to go.
+
+                $this->spinepoints = calc_straight($xpoints, $ypoints);
+
+                // then draw the "curve" itself
+                draw_straight(
+                    $im,
+                    $this->spinepoints,
+                    array($link_in_width, $link_out_width),
+                    $gd_outline_colour,
+                    array($gd_in_colour, $gd_out_colour),
+                    $this->name,
+                    $map,
+                    $this->splitpos,
+                    ($this->linkstyle == 'oneway' ? true : false)
+                );
+            } elseif ($this->viastyle == 'curved') {
+                // Calculate the spine points - the actual curve
+                $this->spinepoints = calc_curve($xpoints, $ypoints);
+
+                // then draw the curve itself
+                draw_curve(
+                    $im,
+                    $this->spinepoints,
+                    array($link_in_width, $link_out_width),
+                    $gd_outline_colour,
+                    array($gd_in_colour, $gd_out_colour),
+                    $this->name,
+                    $map,
+                    $this->splitpos,
+                    ($this->linkstyle == 'oneway' ? true : false)
+                );
+            }
         }
 
-        $curvelength = $this->spinepoints[count($this->spinepoints)-1][2];
-        // figure out where the labels should be, and what the angle of the curve is at that point
-        list($q1_x, $q1_y, , $q1_angle) = find_distance_coords_angle($this->spinepoints, ($this->labeloffset_out/100)*$curvelength);
-        list($q3_x, $q3_y, , $q3_angle) = find_distance_coords_angle($this->spinepoints, ($this->labeloffset_in/100)*$curvelength);
+        // If there is geometry to draw, draw it
+        if (!is_null($this->geometry)) {
 
-        if (!is_null($q1_x)) {
-            $inbound_params = array(
-                'x'=>$q3_x,
-                'y'=>$q3_y,
-                'angle'=>$q3_angle,
-                'percentage'=>$this->inpercent,
-                'bandwidth'=>$this->bandwidth_in,
-                'direction'=>IN
-            );
-            $outbound_params = array(
-                'x'=>$q1_x,
-                'y'=>$q1_y,
-                'angle'=>$q1_angle,
-                'percentage'=>$this->outpercent,
-                'bandwidth'=>$this->bandwidth_out,
-                'direction'=>OUT
-            );
+            $this->geometry->setOutlineColour($this->outlinecolour);
+            $this->geometry->setFillColours(array($this->colours[IN], $this->colours[OUT]));
 
-            if ($map->sizedebug) {
-                $outbound_params['bandwidth'] = $this->max_bandwidth_out;
-                $inbound_params['bandwidth'] = $this->max_bandwidth_in;
+            $this->geometry->draw($im);
+        }
+
+        // TODO: Refactor into drawComments
+        if (1==0) {
+            if (!$comment_colour->isNone()) {
+                if ($comment_colour->isContrast()) {
+                    $comment_colour_in = $link_in_colour->getContrastingColour();
+                    $comment_colour_out = $link_out_colour->getContrastingColour();
+                } else {
+                    $comment_colour_in = $comment_colour;
+                    $comment_colour_out = $comment_colour;
+                }
+
+                $gd_comment_colour_in = $comment_colour_in->gdAllocate($im);
+                $gd_comment_colour_out = $comment_colour_out->gdAllocate($im);
+
+                $this->drawComments(
+                    $im,
+                    array($gd_comment_colour_in, $gd_comment_colour_out),
+                    array($link_in_width * 1.1, $link_out_width * 1.1)
+                );
             }
+        }
 
-            if ($this->linkstyle == 'oneway') {
-                $tasks = array($outbound_params);
-            } else {
-                $tasks = array($inbound_params, $outbound_params);
-            }
+        // TODO: Refactor into drawBWLabels
+        if (1==0) {
+            $curvelength = $this->spinepoints[count($this->spinepoints) - 1][2];
+            // figure out where the labels should be, and what the angle of the curve is at that point
+            list($q1_x, $q1_y, , $q1_angle) = find_distance_coords_angle($this->spinepoints, ($this->labeloffset_out / 100) * $curvelength);
+            list($q3_x, $q3_y, , $q3_angle) = find_distance_coords_angle($this->spinepoints, ($this->labeloffset_in / 100) * $curvelength);
 
-            foreach ($tasks as $task) {
-                $label_text = $map->ProcessString($this->bwlabelformats[$task['direction']], $this);
+            if (!is_null($q1_x)) {
+                $inbound_params = array(
+                    'x' => $q3_x,
+                    'y' => $q3_y,
+                    'angle' => $q3_angle,
+                    'percentage' => $this->inpercent,
+                    'bandwidth' => $this->bandwidth_in,
+                    'direction' => IN
+                );
+                $outbound_params = array(
+                    'x' => $q1_x,
+                    'y' => $q1_y,
+                    'angle' => $q1_angle,
+                    'percentage' => $this->outpercent,
+                    'bandwidth' => $this->bandwidth_out,
+                    'direction' => OUT
+                );
 
-                if ($label_text != '') {
-                    wm_debug("Bandwidth for label is ".wm_value_or_null($task['bandwidth'])." (label is '$label_text')\n");
+                if ($map->sizedebug) {
+                    $outbound_params['bandwidth'] = $this->max_bandwidth_out;
+                    $inbound_params['bandwidth'] = $this->max_bandwidth_in;
+                }
 
-                    $padding = intval($this->get_hint('bwlabel_padding'));
+                if ($this->linkstyle == 'oneway') {
+                    $tasks = array($outbound_params);
+                } else {
+                    $tasks = array($inbound_params, $outbound_params);
+                }
 
-                    // if screenshot_mode is enabled, wipe any letters to X and wipe any IP address to 127.0.0.1
-                    // hopefully that will preserve enough information to show cool stuff without leaking info
-                    if ($map->get_hint('screenshot_mode')==1) {
-                        $label_text = wmStringAnonymise($label_text);
+                foreach ($tasks as $task) {
+                    $label_text = $map->ProcessString($this->bwlabelformats[$task['direction']], $this);
+
+                    if ($label_text != '') {
+                        wm_debug("Bandwidth for label is " . wm_value_or_null($task['bandwidth']) . " (label is '$label_text')\n");
+
+                        $padding = intval($this->get_hint('bwlabel_padding'));
+
+                        // if screenshot_mode is enabled, wipe any letters to X and wipe any IP address to 127.0.0.1
+                        // hopefully that will preserve enough information to show cool stuff without leaking info
+                        if ($map->get_hint('screenshot_mode') == 1) {
+                            $label_text = wmStringAnonymise($label_text);
+                        }
+
+                        if ($this->labelboxstyle == 'angled') {
+                            $angle = $task['angle'];
+                        } else {
+                            $angle = 0;
+                        }
+
+                        $map->DrawLabelRotated(
+                            $im,
+                            $task['x'],
+                            $task['y'],
+                            $angle,
+                            $label_text,
+                            $this->bwfont,
+                            $padding,
+                            $this->name,
+                            $this->bwfontcolour,
+                            $this->bwboxcolour,
+                            $this->bwoutlinecolour,
+                            $map,
+                            $task['direction']
+                        );
                     }
-
-                    if ($this->labelboxstyle == 'angled') {
-                        $angle = $task['angle'];
-                    } else {
-                        $angle = 0;
-                    }
-
-                    $map->DrawLabelRotated(
-                        $im,
-                        $task['x'],
-                        $task['y'],
-                        $angle,
-                        $label_text,
-                        $this->bwfont,
-                        $padding,
-                        $this->name,
-                        $this->bwfontcolour,
-                        $this->bwboxcolour,
-                        $this->bwoutlinecolour,
-                        $map,
-                        $task['direction']
-                    );
                 }
             }
         }

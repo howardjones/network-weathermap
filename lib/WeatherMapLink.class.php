@@ -55,6 +55,7 @@ class WeatherMapLink extends WeatherMapItem
     var $template;
     var $config;
     var $descendents;
+    var $geometry;
 
     function WeatherMapLink()
     {
@@ -272,25 +273,14 @@ class WeatherMapLink extends WeatherMapItem
         }
     }
 
-    /***
-     * Precalculate the colours necessary for this link.
-     */
-    function preCalculate()
-    {
-        // don't bother doing anything if it's a template
-        if ($this->isTemplate()) {
-            return;
-        }
-    }
-
-    function draw($im, &$map)
+    function preChecks(&$map)
     {
         // Get the positions of the end-points
-        $x1 = $map->nodes[$this->a->name]->x;
-        $y1 = $map->nodes[$this->a->name]->y;
+        $x1 = $this->a->x;
+        $y1 = $this->a->y;
 
-        $x2 = $map->nodes[$this->b->name]->x;
-        $y2 = $map->nodes[$this->b->name]->y;
+        $x2 = $this->b->x;
+        $y2 = $this->b->y;
 
         if (is_null($x1) || is_null($y1)) {
             wm_warn("LINK " . $this->name . " uses a NODE (" . $this->a->name . ") with no POSITION! [WMWARN35]\n");
@@ -305,6 +295,53 @@ class WeatherMapLink extends WeatherMapItem
         if (($this->linkstyle=='twoway') && ($this->labeloffset_in < $this->labeloffset_out) && (intval($map->get_hint("nowarn_bwlabelpos"))==0)) {
             wm_warn("LINK ".$this->name." probably has it's BWLABELPOS values the wrong way around [WMWARN50]\n");
         }
+    }
+
+    /***
+     * Precalculate the colours necessary for this link.
+     */
+    function preCalculate()
+    {
+        // don't bother doing anything if it's a template
+        if ($this->isTemplate()) {
+            return;
+        }
+
+        $points = array();
+
+        list($dx, $dy) = wmCalculateOffset($this->a_offset, $this->a->width, $this->a->height);
+        $points[] = new WMPoint($this->a->x + $dx, $this->a->y + $dy);
+
+        foreach ($this->vialist as $v) {
+            // if the via has a third element, the first two are relative to that node
+            if (isset($via[2])) {
+                $points[] = new WMPoint($map->nodes[$via[2]]->x + $v[0], $map->nodes[$via[2]]->y + $v[1]);
+            } else {
+                $points[] = new WMPoint($v[0], $v[1]);
+            }
+        }
+
+        list($dx, $dy) = wmCalculateOffset($this->b_offset, $this->b->width, $this->b->height);
+        $points[] = new WMPoint($this->b->x + $dx, $this->b->y + $dy);
+
+        if ( $points[0]->closeEnough($points[1]) && sizeof($this->vialist)==0) {
+            wm_warn("Zero-length link ".$this->name." skipped. [WMWARN45]");
+            $this->geometry = null;
+            return;
+        }
+
+        $this->geometry = WMLinkGeometryFactory::create($this->viastyle);
+        $this->geometry->Init($this, $points, array($this->width, $this->width), ($this->linkstyle=='oneway'?1:2), $this->splitpos);
+    }
+
+    function draw($im, &$map)
+    {
+        // Get the positions of the end-points
+        $x1 = $map->nodes[$this->a->name]->x;
+        $y1 = $map->nodes[$this->a->name]->y;
+
+        $x2 = $map->nodes[$this->b->name]->x;
+        $y2 = $map->nodes[$this->b->name]->y;
 
         // Adjust the link endpoints, if any offset was specified
         if (!$this->a_offset_resolved) {

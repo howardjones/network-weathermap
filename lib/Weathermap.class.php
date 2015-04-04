@@ -2108,7 +2108,9 @@ class WeatherMap extends WeatherMapBase
                             // (also, check if the link still exists - if this is in the editor, it may have been deleted by now)
                             if (isset($this->links[$it->name]) && isset($it->a) && isset($it->b)) {
                                 wm_debug("Drawing LINK ".$it->name."\n");
-                                $this->links[$it->name]->Draw($image, $this);
+                                $this->links[$it->name]->preChecks($this);
+                                $this->links[$it->name]->preCalculate($this);
+                                $this->links[$it->name]->draw($image, $this);
                             }
                         }
                         if (strtolower(get_class($it))=='weathermapnode') {

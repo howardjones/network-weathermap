@@ -269,7 +269,6 @@ class WeatherMapEditorUI {
             ),
             "handler" => "cmdEditLink"
         ),
-
 //        "editor_settings" => array(),
 //        "set_node_properties" => array(),
 //        "set_link_properties" => array(),
@@ -278,9 +277,6 @@ class WeatherMapEditorUI {
         "nothing" => array("args" => array(array("mapname","mapfile")), "handler"=>"cmdDoNothing", "no_save" => true)
     );
 
-    
-    
-      
     /**
      * Given an array of request variables (usually $_REQUEST), check that the
      * request is a valid one. Does the action exist? Do the arguments match the action?
@@ -437,6 +433,8 @@ class WeatherMapEditorUI {
     /**
      * @param string[] $params
      * @param WeatherMapEditor $editor
+     *
+     * @return bool
      */
     function cmdDoNothing($params, $editor)
     {
@@ -455,6 +453,7 @@ class WeatherMapEditorUI {
     /**
      * @param string[] $params
      * @param WeatherMapEditor $editor
+     * @return bool
      */
     function cmdDrawMap($params, $editor)
     {

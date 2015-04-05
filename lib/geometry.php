@@ -85,6 +85,11 @@ class WMPoint
         return $d;
     }
 
+    function copy()
+    {
+        return new WMPoint($this->x, $this->y);
+    }
+
     /**
      * @param WMVector $v
      * @param float $fraction

@@ -343,11 +343,11 @@ class WeatherMapLink extends WeatherMapItem
 
         // don't bother with any curve stuff if there aren't any Vias defined, even if the style is 'curved'
         if (count($this->vialist)==0) {
-        //    $style = "angled";
+            $style = "angled";
         }
 
         $this->geometry = WMLinkGeometryFactory::create($style);
-        $this->geometry->Init($this, $points, $widths, ($this->linkstyle=='oneway'?1:2), $this->splitpos);
+        $this->geometry->Init($this, $points, $widths, ($this->linkstyle=='oneway'?1:2), $this->splitpos, $this->arrowstyle);
     }
 
 
@@ -355,14 +355,13 @@ class WeatherMapLink extends WeatherMapItem
     {
         $link_outline_colour = $this->outlinecolour;
         $comment_colour = $this->commentfontcolour;
-
-        $gd_outline_colour = $link_outline_colour->gdallocate($im);
-
         $link_in_colour = $this->colours[IN];
         $link_out_colour = $this->colours[OUT];
 
+        // don't really need these
         $gd_in_colour = $link_in_colour->gdallocate($im);
         $gd_out_colour = $link_out_colour->gdallocate($im);
+        $gd_outline_colour = $link_outline_colour->gdallocate($im);
 
         if (1 == 0) {
             // Get the positions of the end-points

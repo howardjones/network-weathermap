@@ -8,6 +8,16 @@ class WMSpine
      */
     var $points;
 
+    /**
+     * Add a raw spine entry, assuming it's correct - used for copying spines around
+     *
+     * @param $newEntry
+     */
+    function addRawEntry($newEntry)
+    {
+        $this->points[] = $newEntry;
+    }
+
     function addPoint($newPoint)
     {
         if (is_null($this->points)) {
@@ -78,6 +88,8 @@ class WMSpine
 
         // Figure out how far the target distance is between the found point and the next one
         $ratio = ($targetDistance - $this->points[$foundIndex][1]) / ($this->points[$foundIndex + 1][1] - $this->points[$foundIndex][1]);
+
+        print "\n\n$targetDistance   $ratio  $foundIndex\n\n";
 
         // linearly interpolate x and y to get to the actual required distance
         $newPoint = $this->points[$foundIndex][0]->LERPWith($this->points[$foundIndex+1][0], $ratio);
@@ -176,6 +188,43 @@ class WMSpine
         throw new Exception("Howie's crappy binary search is wrong after all.\n");
     }
 
+    /** split - split the Spine into two new spines, with splitIndex in the first one
+     *  used by the link-drawing code to make one curve into two arrows
+     *
+     */
+    function split($splitIndex)
+    {
+        $spine1 = new WMSpine();
+        $spine2 = new WMSpine();
+
+        $endCursor = $this->pointCount()-1;
+        $totalDistance = $this->totalDistance();
+
+        for($i = 0; $i <= $splitIndex; $i++) {
+            $spine1->addRawEntry($this->points[$i]);
+        }
+
+        for($i = $endCursor; $i > $splitIndex; $i--) {
+            $newEntry = $this->points[$i];
+            $newEntry[1] = $totalDistance - $newEntry[1];
+            $spine2->addRawEntry($newEntry);
+        }
+
+        return array($spine1, $spine2);
+    }
+
+    function splitAtDistance($splitDistance)
+    {
+        list($halfwayPoint, $halfwayIndex) = $this->findPointAtDistance($splitDistance);
+
+        list($spine1, $spine2) = $this->split($halfwayIndex);
+
+        // Add the actual midpoint back to the end of both spines
+        $spine1->addRawEntry(array($halfwayPoint, $splitDistance));
+        $spine2->addRawEntry(array($halfwayPoint, $splitDistance));
+
+        return array($spine1, $spine2);
+    }
 
     function dump($spine)
     {

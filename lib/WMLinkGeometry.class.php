@@ -236,22 +236,10 @@ class WMCurvedLinkGeometry extends WMLinkGeometry
         $colour2 = imagecolorallocate($gdImage, 0, 255, 0);
         $colour3 = imagecolorallocate($gdImage, 0, 0, 255);
 
-        $this->curvePoints->drawSpine($gdImage, $colour);
-      //  $this->curvePoints->drawChain($gdImage, $colour);
+        // $this->curvePoints->drawSpine($gdImage, $colour);
 
         $this->preDraw();
 
-        if(1==0) {
-            $splitDistance = $this->curvePoints->totalDistance() * ($this->splitPosition / 100);
-            list($halfwayPoint, $halfwayIndex) = $this->curvePoints->findPointAtDistance($splitDistance);
-            wmDrawMarkerDiamond($gdImage, $colour3, $halfwayPoint->x, $halfwayPoint->y);
-
-            $this->splitCurves[OUT]->drawSpine($gdImage, $colour2);
-            $this->splitCurves[IN]->drawSpine($gdImage, $colour3);
-
-            wmDrawMarkerDiamond($gdImage, $colour3, $this->arrowPoints[IN]->x, $this->arrowPoints[IN]->y, 5);
-            wmDrawMarkerDiamond($gdImage, $colour3, $this->arrowPoints[OUT]->x, $this->arrowPoints[OUT]->y, 5);
-        }
 
         foreach ($this->directions as $direction) {
             $there = array();
@@ -274,7 +262,6 @@ class WMCurvedLinkGeometry extends WMLinkGeometry
             for ($i=0; $i<count($outline)-1; $i++) {
                 $p = $outline[$i];
                 $p2 = $outline[$i+1];
-                // wmDrawMarkerBox($gdImage, $colour2, $p->x, $p->y, 3);
                 imageline($gdImage, $p->x, $p->y, $p2->x, $p2->y, $colour2);
             }
         }

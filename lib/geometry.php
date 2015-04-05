@@ -37,6 +37,12 @@ class WMPoint
         return FALSE;
     }
 
+    function round()
+    {
+        $this->x = round($this->x);
+        $this->y = round($this->y);
+    }
+
     /**
      * Compare two points to within a few decimal places - good enough for graphics! (and unit tests)
      *
@@ -45,7 +51,7 @@ class WMPoint
      */
     function closeEnough($point2)
     {
-        if ((round($this->x,2) == round($point2->x,2)) && (round($this->y,2) == round($point2->y,2))) {
+        if ((round($this->x,2) == round($point2->x, 2)) && (round($this->y, 2) == round($point2->y, 2))) {
             return TRUE;
         }
         return FALSE;

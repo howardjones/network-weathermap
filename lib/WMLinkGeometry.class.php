@@ -200,6 +200,10 @@ class WMCurvedLinkGeometry extends WMLinkGeometry
         // do this once only. (two original points, plus our two duplicates).
         $nPoints = count($this->controlPoints);
 
+        // Add the very first point manually. The CRSpan function counts from 1 to avoid
+        // duplication of points later in the curve
+        $this->curvePoints->addPoint($this->controlPoints[0]);
+
         for ($i = 0; $i < ($nPoints - 3); $i ++) {
             $this->calculateCRSpan($i, $pointsPerSpan);
         }
@@ -210,7 +214,7 @@ class WMCurvedLinkGeometry extends WMLinkGeometry
         $cr_x = new CatmullRom1D($this->controlPoints[$startIndex]->x, $this->controlPoints[$startIndex+1]->x, $this->controlPoints[$startIndex+2]->x, $this->controlPoints[$startIndex+3]->x);
         $cr_y = new CatmullRom1D($this->controlPoints[$startIndex]->y, $this->controlPoints[$startIndex+1]->y, $this->controlPoints[$startIndex+2]->y, $this->controlPoints[$startIndex+3]->y);
 
-        for ($i = 0; $i <= $pointsPerSpan; $i++) {
+        for ($i = 1; $i <= $pointsPerSpan; $i++) {
             $t = $i / $pointsPerSpan;
 
             $x = $cr_x->calculate($t);

@@ -16,6 +16,13 @@
             <directory>./</directory>
             <exclude>
                 <directory>./Tests</directory>
+                <directory>./vendor</directory>
+                <directory>./docs</directory>
+                <directory>./dist</directory>
+                <directory>./output</directory>
+                <directory>./edit-cache</directory>
+                <directory>./build</directory>
+                <directory>./test-suite</directory>
             </exclude>
         </whitelist>
     </filter>

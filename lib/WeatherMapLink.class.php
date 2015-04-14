@@ -173,72 +173,69 @@ class WeatherMapLink extends WeatherMapItem
     function getDirectionList()
     {
         if ($this->linkstyle == "oneway") {
-            $dirs = array(OUT);
-        } else {
-            $dirs = array(OUT,IN);
+            return array(OUT);
         }
 
-        return ($dirs);
+        return array(OUT,IN);
     }
 
-    function drawComments($gdImage, $colourList, $widthList)
+    function drawComments($gdImage)
     {
-        $curvepoints =& $this->spinepoints;
-        $last = count($curvepoints)-1;
+        wm_debug("Link ".$this->name.": Drawing comments.\n");
 
-        $totalDistance = $curvepoints[$last][2];
+        $directions = $this->getDirectionList();
+        $commentPositions = array();
 
-        $start[OUT] = 0;
-        $commentpos[OUT] = $this->commentoffset_out;
-        $commentpos[IN] = $this->commentoffset_in;
-        $start[IN] = $last;
+        $commentColours = array();
+        $gdCommentColours = array();
 
-        $dirs = $this->getDirectionList();
+        $commentPositions[OUT] = $this->commentoffset_out;
+        $commentPositions[IN] = $this->commentoffset_in;
+
+        $widthList = $this->geometry->getWidths();
+
         $fontObject = $this->owner->fonts->getFont($this->commentfont);
 
-        foreach ($dirs as $dir) {
+        foreach ($directions as $direction) {
             // Time to deal with Link Comments, if any
-            $comment = $this->owner->ProcessString($this->comments[$dir], $this);
+            $comment = $this->owner->ProcessString($this->comments[$direction], $this);
 
             if ($this->owner->get_hint('screenshot_mode')==1) {
                 $comment=wmStringAnonymise($comment);
             }
 
             if ($comment != '') {
-                list($textlength, $textheight) = $this->owner->myimagestringsize($this->commentfont, $comment);
+                if ($this->commentfontcolour->isContrast()) {
+                    $commentColours[$direction] = $this->colours[$direction]->getContrastingColour();
+                } else {
+                    $commentColours[$direction] = $this->commentfontcolour;
+                }
 
-                $extra_percent = $commentpos[$dir];
+                $gdCommentColours[$direction] = $commentColours[$direction]->gdAllocate($gdImage);
+
+                list($textWidth, $textHeight) = $this->owner->myimagestringsize($this->commentfont, $comment);
 
                 // nudge pushes the comment out along the link arrow a little bit
                 // (otherwise there are more problems with text disappearing underneath links)
                 $nudgeAlong = intval($this->get_hint("comment_nudgealong"));
                 $nudgeOut = intval($this->get_hint("comment_nudgeout"));
 
-                $extra = ($totalDistance * ($extra_percent/100));
+                list ($position, $comment_index, $angle, $distance) = $this->geometry->findPointAndAngleAtPercentageDistance($commentPositions[$direction]);
 
-                list($x, $y, $comment_index, $angle) = find_distance_coords_angle($curvepoints, $extra);
+                $tangent = $this->geometry->findTangentAtIndex($comment_index, $direction);
 
-                if (($comment_index != 0) && (($x != $curvepoints[$comment_index][0]) || ($y != $curvepoints[$comment_index][1]))) {
-                    $dx = $x - $curvepoints[$comment_index][0];
-                    $dy = $y - $curvepoints[$comment_index][1];
-                } else {
-                    $dx = $curvepoints[$comment_index+1][0] - $x;
-                    $dy = $curvepoints[$comment_index+1][1] - $y;
-                }
+                $centreDistance = $widthList[$direction] + 4 + $nudgeOut;
 
-                $centre_distance = $widthList[$dir] + 4 + $nudgeOut;
                 if ($this->commentstyle == 'center') {
-                    $centre_distance = $nudgeOut - ($textheight/2);
+                    $centreDistance = $nudgeOut - ($textHeight/2);
                 }
 
                 // find the normal to our link, so we can get outside the arrow
-                $l = sqrt(($dx * $dx) + ($dy * $dy));
+                $normal = $tangent->getNormal();
 
-                $dx = $dx/$l;
-                $dy = $dy/$l;
-                $nx = $dy;
-                $ny = -$dx;
                 $flipped = false;
+
+                $edge = $position;
 
                 // if the text will be upside-down, rotate it, flip it, and right-justify it
                 // not quite as catchy as Missy's version
@@ -247,34 +244,31 @@ class WeatherMapLink extends WeatherMapItem
                     if ($angle < -180) {
                         $angle +=360;
                     }
-                    $edge_x = $x + $nudgeAlong*$dx - $nx * $centre_distance;
-                    $edge_y = $y + $nudgeAlong*$dy - $ny * $centre_distance;
+                    $edge->addVector($tangent, $nudgeAlong);
+                    $edge->addVector($normal, -$centreDistance);
                     $flipped = true;
                 } else {
-                    $edge_x = $x + $nudgeAlong*$dx + $nx * $centre_distance;
-                    $edge_y = $y + $nudgeAlong*$dy + $ny * $centre_distance;
+                    $edge->addVector($tangent, $nudgeAlong);
+                    $edge->addVector($normal, $centreDistance);
                 }
 
-                if (!$flipped && ($extra + $textlength) > $totalDistance) {
-                    $edge_x -= $dx * $textlength;
-                    $edge_y -= $dy * $textlength;
+                if (!$flipped && ($distance + $textWidth) > $this->geometry->totalDistance()) {
+                    $edge->addVector($tangent, -$textWidth);
                 }
 
-                if ($flipped && ($extra - $textlength) < 0) {
-                    $edge_x += $dx * $textlength;
-                    $edge_y += $dy * $textlength;
+                if ($flipped && ($distance - $textWidth) < 0) {
+                    $edge->addVector($tangent, $textWidth);
                 }
 
                 // FINALLY, draw the text!
-
-                $fontObject->drawImageString($gdImage, $edge_x, $edge_y, $comment, $colourList[$dir], $angle);
-              //  $this->owner->myimagestring($gdImage, $this->commentfont, $edge_x, $edge_y, $comment, $colourList[$dir], $angle);
+                $fontObject->drawImageString($gdImage, $edge->x, $edge->y, $comment, $gdCommentColours[$direction], $angle);
             }
         }
     }
 
     function preChecks(&$map)
     {
+        wm_debug("Link ".$this->name.": pre-checks.\n");
         // Get the positions of the end-points
         $x1 = $this->a->x;
         $y1 = $this->a->y;
@@ -302,6 +296,8 @@ class WeatherMapLink extends WeatherMapItem
      */
     function preCalculate(&$map)
     {
+        wm_debug("Link ".$this->name.": Calculating geometry.\n");
+
         // don't bother doing anything if it's a template
         if ($this->isTemplate()) {
             return;
@@ -343,7 +339,7 @@ class WeatherMapLink extends WeatherMapItem
 
         // don't bother with any curve stuff if there aren't any Vias defined, even if the style is 'curved'
         if (count($this->vialist)==0) {
-            $style = "angled";
+        ##   $style = "angled";
         }
 
         $this->geometry = WMLinkGeometryFactory::create($style);
@@ -353,118 +349,7 @@ class WeatherMapLink extends WeatherMapItem
 
     function draw($im, &$map)
     {
-        $link_outline_colour = $this->outlinecolour;
-        $comment_colour = $this->commentfontcolour;
-        $link_in_colour = $this->colours[IN];
-        $link_out_colour = $this->colours[OUT];
-
-        // don't really need these
-        $gd_in_colour = $link_in_colour->gdallocate($im);
-        $gd_out_colour = $link_out_colour->gdallocate($im);
-        $gd_outline_colour = $link_outline_colour->gdallocate($im);
-
-        if (1 == 0) {
-            // Get the positions of the end-points
-            $x1 = $map->nodes[$this->a->name]->x;
-            $y1 = $map->nodes[$this->a->name]->y;
-
-            $x2 = $map->nodes[$this->b->name]->x;
-            $y2 = $map->nodes[$this->b->name]->y;
-
-            // Adjust the link endpoints, if any offset was specified
-            if (!$this->a_offset_resolved) {
-                list($dx, $dy) = wmCalculateOffset($this->a_offset, $map->nodes[$this->a->name]->width, $map->nodes[$this->a->name]->height);
-                $x1 += $dx;
-                $y1 += $dy;
-            } else {
-                $x1 += $this->a_offset_dx;
-                $y1 += $this->a_offset_dy;
-            }
-
-            if (!$this->b_offset_resolved) {
-                list($dx, $dy) = wmCalculateOffset($this->b_offset, $map->nodes[$this->b->name]->width, $map->nodes[$this->b->name]->height);
-                $x2 += $dx;
-                $y2 += $dy;
-            } else {
-                $x2 += $this->b_offset_dx;
-                $y2 += $this->b_offset_dy;
-            }
-
-            if (($x1 == $x2) && ($y1 == $y2) && sizeof($this->vialist) == 0) {
-                wm_warn("Zero-length link " . $this->name . " skipped. [WMWARN45]");
-                return;
-            }
-
-            $xpoints = array();
-            $ypoints = array();
-
-            $xpoints[] = $x1;
-            $ypoints[] = $y1;
-
-            $via_count = 0;
-            foreach ($this->vialist as $via) {
-                if (isset($via[2])) {
-                    $xpoints[] = $map->nodes[$via[2]]->x + $via[0];
-                    $ypoints[] = $map->nodes[$via[2]]->y + $via[1];
-                } else {
-                    $xpoints[] = $via[0];
-                    $ypoints[] = $via[1];
-                }
-                $via_count++;
-            }
-
-            $xpoints[] = $x2;
-            $ypoints[] = $y2;
-
-            $link_in_width = $this->width;
-            $link_out_width = $this->width;
-
-            // for bulging animations
-            if (($map->widthmod) || ($map->get_hint('link_bulge') == 1)) {
-                // a few 0.1s and +1s to fix div-by-zero, and invisible links
-                $link_in_width = (($link_in_width * $this->inpercent * 1.5 + 0.1) / 100) + 1;
-                $link_out_width = (($link_out_width * $this->outpercent * 1.5 + 0.1) / 100) + 1;
-            }
-
-            // If there are no vias, treat this as a 2-point angled link, not curved
-            if ($via_count == 0 || $this->viastyle == 'angled') {
-                // Calculate the spine points - the actual not a curve really, but we
-                // need to create the array, and calculate the distance bits, otherwise
-                // things like bwlabels won't know where to go.
-
-                $this->spinepoints = calc_straight($xpoints, $ypoints);
-
-                // then draw the "curve" itself
-                draw_straight(
-                    $im,
-                    $this->spinepoints,
-                    array($link_in_width, $link_out_width),
-                    $gd_outline_colour,
-                    array($gd_in_colour, $gd_out_colour),
-                    $this->name,
-                    $map,
-                    $this->splitpos,
-                    ($this->linkstyle == 'oneway' ? true : false)
-                );
-            } elseif ($this->viastyle == 'curved') {
-                // Calculate the spine points - the actual curve
-                $this->spinepoints = calc_curve($xpoints, $ypoints);
-
-                // then draw the curve itself
-                draw_curve(
-                    $im,
-                    $this->spinepoints,
-                    array($link_in_width, $link_out_width),
-                    $gd_outline_colour,
-                    array($gd_in_colour, $gd_out_colour),
-                    $this->name,
-                    $map,
-                    $this->splitpos,
-                    ($this->linkstyle == 'oneway' ? true : false)
-                );
-            }
-        }
-
+        wm_debug("Link ".$this->name.": Drawing.\n");
         // If there is geometry to draw, draw it
         if (!is_null($this->geometry)) {
 
@@ -474,26 +359,9 @@ class WeatherMapLink extends WeatherMapItem
             $this->geometry->draw($im);
         }
 
-        // TODO: Refactor into drawComments
-        if (1==0) {
-            if (!$comment_colour->isNone()) {
-                if ($comment_colour->isContrast()) {
-                    $comment_colour_in = $link_in_colour->getContrastingColour();
-                    $comment_colour_out = $link_out_colour->getContrastingColour();
-                } else {
-                    $comment_colour_in = $comment_colour;
-                    $comment_colour_out = $comment_colour;
-                }
+        if (!$this->commentfontcolour->isNone()) {
 
-                $gd_comment_colour_in = $comment_colour_in->gdAllocate($im);
-                $gd_comment_colour_out = $comment_colour_out->gdAllocate($im);
-
-                $this->drawComments(
-                    $im,
-                    array($gd_comment_colour_in, $gd_comment_colour_out),
-                    array($link_in_width * 1.1, $link_out_width * 1.1)
-                );
-            }
+            $this->drawComments($im);
         }
 
         // TODO: Refactor into drawBWLabels
@@ -807,12 +675,11 @@ class WeatherMapLink extends WeatherMapItem
         return($output);
     }
 
-    function asJS()
+    function asJSCore()
     {
-        $output='';
-        $output.="Links[" . jsEscape($this->name) . "] = {";
-        $output .= "\"id\":" . $this->id. ", ";
+        $output = "";
 
+        $output .= "\"id\":" . $this->id. ", ";
         if (isset($this->a)) {
             $output.="a:'" . $this->a->name . "', ";
             $output.="b:'" . $this->b->name . "', ";
@@ -850,7 +717,7 @@ class WeatherMapLink extends WeatherMapItem
 
         $output.="infourl:" . jsEscape($this->infourl[IN]) . ", ";
         $output.="overliburl:" . jsEscape(join(" ", $this->overliburl[IN])). ", ";
-        
+
         $output .= "via: [";
         $nItem = 0;
         foreach ($this->vialist as $via) {
@@ -862,12 +729,21 @@ class WeatherMapLink extends WeatherMapItem
                 $output .= ",".jsEscape($via[2]);
             }
             $output .= "]";
-            
+
             $nItem++;
         }
-        
+
         $output .= "]";
-        
+
+        return $output;
+    }
+
+    function asJS()
+    {
+        $output='';
+        $output.="Links[" . jsEscape($this->name) . "] = {";
+
+        $output .= $this->asJSCore();
 
         $output.="};\n";
         $output .= "LinkIDs[\"L" . $this->id . "\"] = ". jsEscape($this->name) . ";\n";
@@ -878,43 +754,8 @@ class WeatherMapLink extends WeatherMapItem
     {
         $output = '';
         $output .= "" . jsEscape($this->name) . ": {";
-        $output .= "\"id\":" . $this->id. ", ";
-        if (isset($this->a)) {
-            $output.="\"a\":\"" . $this->a->name . "\", ";
-            $output.="\"b\":\"" . $this->b->name . "\", ";
-        }
 
-        if ($complete) {
-            $output.="\"infourl\":" . jsEscape($this->infourl) . ", ";
-            $output.="\"overliburl\":" . jsEscape($this->overliburl). ", ";
-            $output.="\"width\":\"" . $this->width . "\", ";
-            $output.="\"target\":";
-
-            $tgt="";
-
-            foreach ($this->targets as $target) {
-                $tgt.=$target[4] . " ";
-            }
-
-            $output.=jsEscape(trim($tgt));
-            $output.=",";
-
-            $output.="\"bw_in\":" . jsEscape($this->max_bandwidth_in_cfg) . ", ";
-            $output.="\"bw_out\":" . jsEscape($this->max_bandwidth_out_cfg) . ", ";
-
-            $output.="\"name\":" . jsEscape($this->name) . ", ";
-            $output.="\"overlibwidth\":\"" . $this->overlibheight . "\", ";
-            $output.="\"overlibheight\":\"" . $this->overlibwidth . "\", ";
-            $output.="\"overlibcaption\":" . jsEscape($this->overlibcaption) . ", ";
-        }
-        $vias = "\"via\": [";
-        foreach ($this->vialist as $via) {
-            $vias .= sprintf("[%d,%d,'%s'],", $via[0], $via[1], $via[2]);
-        }
-        $vias .= "],";
-        $vias = str_replace("],],", "]]", $vias);
-        $vias = str_replace("[],", "[]", $vias);
-        $output .= $vias;
+        $output .= $this->asJSCore();
 
         $output.="},\n";
         return $output;

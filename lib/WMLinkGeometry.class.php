@@ -10,12 +10,14 @@ class WMLinkGeometry
     protected $linkWidths;
     protected $fillColours;
     protected $outlineColour;
-    protected $curvePoints;
     protected $directions;
     protected $splitPosition;
     protected $owner;
-    protected $controlPoints;
     protected $arrowStyle;
+    protected $name;
+
+    protected $controlPoints; // the points defined by the user for this link
+    protected $curvePoints; // the calculated spine for the whole link, used for distance calculations
 
     protected $splitCurves; // The spines for each direction of the link
     protected $drawnCurves; // The actual list of WMPoints that will be drawn
@@ -38,6 +40,7 @@ class WMLinkGeometry
     function Init(&$link, $controlPoints, $widths, $directions = 2, $splitPosition=50, $arrowStyle="classic")
     {
         $this->owner = $link;
+        $this->name = $link->name;
         $this->drawnCurves = array();
 
         if ($directions == 1) {
@@ -84,6 +87,11 @@ class WMLinkGeometry
             }
             $previousPoint = $cp;
         }
+    }
+
+    function getWidths()
+    {
+        return $this->linkWidths;
     }
 
     function setFillColours($colours)
@@ -154,6 +162,28 @@ class WMLinkGeometry
         return $points;
     }
 
+    function totalDistance()
+    {
+        return $this->curvePoints->totalDistance();
+    }
+
+    function findTangentAtIndex($index, $direction = OUT)
+    {
+        $step = -1 + $direction * 2;
+
+        return $this->curvePoints->findTangentAtIndex($index, $step);
+    }
+
+    function findPointAndAngleAtPercentageDistance($targetPercentage)
+    {
+        return $this->curvePoints->findPointAndAngleAtPercentageDistance($targetPercentage);
+    }
+
+    function findPointAndAngleAtDistance($targetDistance)
+    {
+        return $this->curvePoints->findPointAndAngleAtDistance($targetDistance);
+    }
+
     function preDraw()
     {
         $halfwayDistance = $this->curvePoints->totalDistance() * ($this->splitPosition / 100);
@@ -161,7 +191,7 @@ class WMLinkGeometry
         // For a one-directional link, there's no split point, and one arrow
         // just copy the whole spine
         if (count($this->directions) == 1) {
-            $this->splitCurves[OUT] = array($this->curvePoints);
+            $this->splitCurves[OUT] = $this->curvePoints;
         } else {
             // for a 'normal' link, we want to split the spine into two
             // then reverse one of them, so that we can just draw two
@@ -169,8 +199,7 @@ class WMLinkGeometry
             list($this->splitCurves[OUT], $this->splitCurves[IN]) = $this->curvePoints->splitAtDistance($halfwayDistance);
         }
 
-        $this->midPoint = $this->splitCurves[OUT]->points[ $this->splitCurves[OUT]->pointCount()-1][0];
-
+        $this->midPoint = $this->splitCurves[OUT]->lastPoint();
 
         foreach ($this->directions as $direction) {
             $nPoints = count($this->splitCurves[$direction]) - 1;
@@ -179,11 +208,56 @@ class WMLinkGeometry
             list($arrowSize, $this->arrowWidths[$direction]) = $this->calculateArrowSize($this->linkWidths[$direction], $this->arrowStyle);
 
             $arrowDistance = $totalDistance - $arrowSize;
-           // print "$totalDistance - $arrowSize = $arrowDistance\n";
             list($this->arrowPoints[$direction], $this->arrowIndexes[$direction]) = $this->splitCurves[$direction]->findPointAtDistance($arrowDistance);
         }
     }
 
+    function draw($gdImage)
+    {
+        if (is_null($this->curvePoints)) {
+            throw new Exception("DrawingEmptySpline");
+        }
+
+        if ( ($this->arrowWidths[IN] + $this->arrowWidths[OUT] * 1.2) > $this->curvePoints->totalDistance()) {
+            wm_warn("Skipping too-short link [WMWARN50]");
+
+            return;
+        }
+
+        $this->preDraw();
+        $this->generateOutlines();
+
+        $colour = imagecolorallocate($gdImage, 255, 0, 0);
+
+        $linkName = $this->name;
+
+        foreach ($this->directions as $direction)
+        {
+            $curve = $this->drawnCurves[$direction];
+            $polyline = array();
+
+            foreach ($curve as $point)
+            {
+                $polyline[] = round($point->x);
+                $polyline[] = round($point->y);
+            }
+
+            if (! $this->fillColours[$direction]->isNone() ) {
+                imagefilledpolygon($gdImage, $polyline, count($polyline ) / 2, $this->fillColours[$direction]->gdAllocate($gdImage) );
+            } else {
+                wm_debug("Not drawing $linkName ($direction) fill because there is no fill colour\n" );
+            }
+
+            if (! $this->outlineColour->isNone() ) {
+                imagepolygon($gdImage, $polyline, count($polyline ) / 2, $this->outlineColour->gdAllocate($gdImage) );
+            } else {
+                wm_debug("Not drawing $linkName ($direction) outline because there is no outline colour\n" );
+            }
+
+        }
+
+        # $this->curvePoints->drawSpine($gdImage, $colour);
+    }
 }
 
 class WMCurvedLinkGeometry extends WMLinkGeometry
@@ -224,27 +298,8 @@ class WMCurvedLinkGeometry extends WMLinkGeometry
         }
     }
 
-    function draw($gdImage)
+    function generateOutlines()
     {
-        if (is_null($this->curvePoints)) {
-            throw new Exception("DrawingEmptySpline");
-        }
-
-        if ( ($this->arrowWidths[IN] + $this->arrowWidths[OUT] * 1.2) > $this->curvePoints->totalDistance()) {
-            wm_warn("Skipping too-short link [WMWARN50]");
-
-            return;
-        }
-
-        $colour = imagecolorallocate($gdImage, 255, 0, 0);
-        $colour2 = imagecolorallocate($gdImage, 0, 255, 0);
-        $colour3 = imagecolorallocate($gdImage, 0, 0, 255);
-
-        // $this->curvePoints->drawSpine($gdImage, $colour);
-
-        $this->preDraw();
-
-
         foreach ($this->directions as $direction) {
             $there = array();
             $back = array();
@@ -263,19 +318,14 @@ class WMCurvedLinkGeometry extends WMLinkGeometry
             $arrow = $this->generateArrowhead($this->arrowPoints[$direction], $this->midPoint, 1, $this->linkWidths[$direction], $this->arrowWidths[$direction]);
             $outline = array_merge($there, $arrow, $back);
 
-            for ($i=0; $i<count($outline)-1; $i++) {
-                $p = $outline[$i];
-                $p2 = $outline[$i+1];
-                imageline($gdImage, $p->x, $p->y, $p2->x, $p2->y, $colour2);
-            }
+            $this->drawnCurves[$direction] = $outline;
         }
     }
 }
 
 class WMAngledLinkGeometry extends WMLinkGeometry
 {
-    
-    
+
     function calculateSpine($pointsPerSpan=5)
     {
         $nPoints = count($this->controlPoints);
@@ -298,8 +348,24 @@ class WMAngledLinkGeometry extends WMLinkGeometry
         $this->curvePoints->addPoint($this->controlPoints[$nPoints-1]);
     }
 
+    function generateOutlines()
+    {
+        foreach ($this->directions as $direction) {
+            $there = array();
+            $back = array();
+            $width = $this->linkWidths[$direction];
 
-    function draw($gdImage)
+            // temporary - just a line between A and B
+            $outline = array();
+            $outline[] = $this->splitCurves[$direction]->points[0][0];
+            $outline[] = $this->splitCurves[$direction]->points[count($this->splitCurves[$direction])-1][0];
+            $outline[] = $this->splitCurves[$direction]->points[0][0];
+
+            $this->drawnCurves[$direction] = $outline;
+        }
+    }
+
+    function olddraw($gdImage)
     {
         if (is_null($this->curvePoints)) {
             throw new Exception("DrawingEmptySpline");
@@ -309,7 +375,6 @@ class WMAngledLinkGeometry extends WMLinkGeometry
         $colour3 = imagecolorallocate($gdImage, 0, 0, 255);
 
         $this->curvePoints->drawSpine($gdImage, $colour);
-        // $this->curvePoints->drawChain($gdImage, $colour);
 
         $this->preDraw();
 
@@ -317,14 +382,11 @@ class WMAngledLinkGeometry extends WMLinkGeometry
         list($halfwayPoint, $halfwayIndex) = $this->curvePoints->findPointAtDistance($splitDistance);
         wmDrawMarkerDiamond($gdImage, $colour3, $halfwayPoint->x, $halfwayPoint->y);
 
-
         $this->splitCurves[OUT]->drawSpine($gdImage, $colour2);
         $this->splitCurves[IN]->drawSpine($gdImage, $colour3);
 
         wmDrawMarkerDiamond($gdImage, $colour3, $this->arrowPoints[IN]->x, $this->arrowPoints[IN]->y, 5);
         wmDrawMarkerDiamond($gdImage, $colour3, $this->arrowPoints[OUT]->x, $this->arrowPoints[OUT]->y, 5);
-
-
     }
 }
 

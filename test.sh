@@ -30,11 +30,11 @@ if [ $fflag -eq 1 ]; then
 	vendor/bin/phpmd lib/ html unusedcode > test-suite/md-unused.html
 	vendor/bin/phpmd lib/ html codesize,design,naming,cleancode > test-suite/md-rest.html
 
+    vendor/bin/phpcpd lib/  > test-suite/cut-paste.txt
+
     # phpcs -p -v --tab-width=4 -s --extensions=php --standard=PEAR --report-full=test-suite/phpcs-report-PEAR.txt  .
     # phpcs -p -v --tab-width=4 -s --extensions=php --sniffs=Generic.PHP.DisallowShortOpenTag,Squiz.PHP.CommentedOutCode --report-full=test-suite/phpcs-report-smelly.txt  .
     # phpcs -p -v --tab-width=4 -s --extensions=php --standard=PSR2 --report-full=test-suite/phpcs-report-PSR-1-2.txt  .
-    vendor/bin/phpcs -p -v --tab-width=4 -s --extensions=php --standard=PSR2ish --report-full=test-suite/phpcs-report-PSR-1-2.txt lib 
-
-    vendor/bin/phpcpd lib/  > test-suite/cut-paste.txt
+    vendor/bin/phpcs -p -v --tab-width=4 -s --extensions=php --standard=PSR2 --report-full=test-suite/phpcs-report-PSR-1-2.txt lib
 
 fi

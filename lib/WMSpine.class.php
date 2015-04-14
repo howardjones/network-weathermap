@@ -75,6 +75,41 @@ class WMSpine
         return $output;
     }
 
+    function firstPoint()
+    {
+        return $this->points[0][0];
+    }
+
+    function lastPoint()
+    {
+        return $this->points[ $this->pointCount() -1 ][0];
+    }
+
+    // find the tangent of the spine at a given index (used by DrawComments)
+    function findTangentAtIndex($index, $step)
+    {
+        if ($index > 0) {
+            $maxIndex = $this->pointCount() - 1;
+            if($index < $maxIndex) {
+                $p1 = $this->points[$index][0];
+                $p2 = $this->points[$index + $step][0];
+            } else {
+                // if we're at the end, always use the last two points
+                $p1 = $this->points[$maxIndex-1][0];
+                $p2 = $this->points[$maxIndex][0];
+            }
+        } else {
+            // if we're at the start, always use the first two points
+            $p1 = $this->points[0][0];
+            $p2 = $this->points[1][0];
+        }
+
+        $tangent = $p1->vectorToPoint($p2);
+        $tangent->normalise();
+
+        return $tangent;
+    }
+
     function findPointAtDistance($targetDistance)
     {
         // We find the nearest lower point for each distance,
@@ -89,7 +124,7 @@ class WMSpine
         // Figure out how far the target distance is between the found point and the next one
         $ratio = ($targetDistance - $this->points[$foundIndex][1]) / ($this->points[$foundIndex + 1][1] - $this->points[$foundIndex][1]);
 
-        print "\n\n$targetDistance   $ratio  $foundIndex\n\n";
+        # print "\n\n$targetDistance   $ratio  $foundIndex\n\n";
 
         // linearly interpolate x and y to get to the actual required distance
         $newPoint = $this->points[$foundIndex][0]->LERPWith($this->points[$foundIndex+1][0], $ratio);
@@ -98,6 +133,21 @@ class WMSpine
             $newPoint,
             $foundIndex
         ));
+    }
+
+    function findPointAndAngleAtPercentageDistance($targetPercentage)
+    {
+        $targetDistance = $this->totalDistance() * ($targetPercentage/100);
+
+        // find the point and angle
+        $result = $this->findPointAndAngleAtDistance($targetDistance);
+        // append the distance we calculated, in case it's needed by the caller
+        // (e.g. arrowhead calcs are part percentage (splitpos) and part absolute (arrrowsize))
+        $result[] = $targetDistance;
+
+
+
+        return $result;
     }
 
     function findPointAndAngleAtDistance($targetDistance)

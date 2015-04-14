@@ -24,7 +24,7 @@
     
     require_once dirname(__FILE__).'/image-functions.php';
     require_once dirname(__FILE__).'/geometry.php';
-    require_once dirname(__FILE__).'/curves.php';
+   // require_once dirname(__FILE__).'/curves.php';
     require_once dirname(__FILE__).'/WMSpine.class.php';
     require_once dirname(__FILE__).'/WMLinkGeometry.class.php';
 

@@ -70,7 +70,6 @@ class WMPoint
         return new WMLine($this->x, $this->y, $p2->x - $this->x, $p2->y - $this->y);
     }
 
-
     function distanceToLine($l)
     {
         // TODO: Implement this
@@ -99,6 +98,8 @@ class WMPoint
     /**
      * @param WMVector $v
      * @param float $fraction
+     *
+     * @return $this - to allow for chaining of operations
      */
     function addVector($v, $fraction = 1.0)
     {
@@ -395,5 +396,28 @@ class WMBoundingBox
     function getBoundingRectangle()
     {
         return new WMRectangle($this->minimum_x, $this->minimum_y, $this->maximum_x, $this->maximum_y);
+    }
+}
+
+
+// Given 4 ordinates and a parameter from 0 to 1, calculate a point on the Catmull Rom spline through them.
+class CatmullRom1D
+{
+    private $Ap, $Bp, $Cp, $Dp;
+
+    function CatmullRom1D($point0, $point1, $point2, $point4)
+    {
+        $this->Ap = - $point0 + 3 * $point1 - 3 * $point2 + $point4;
+        $this->Bp = 2 * $point0 - 5 * $point1 + 4 * $point2 - $point4;
+        $this->Cp = - $point0 + $point2;
+        $this->Dp = 2 * $point1;
+    }
+
+    function calculate($parameter)
+    {
+        $parameterSquared = $parameter * $parameter;
+        $parameterCubed = $parameterSquared * $parameter;
+
+        return (($this->Ap * $parameterCubed) + ($this->Bp * $parameterSquared) + ($this->Cp * $parameter) + $this->Dp) / 2;
     }
 }

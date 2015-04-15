@@ -1,7 +1,7 @@
 <?php
 
-require_once dirname(__FILE__).'/../lib/all.php';
-require_once dirname(__FILE__).'/../lib/WeatherMapEditor.class.php';
+require_once dirname(__FILE__) . '/../../lib/all.php';
+require_once dirname(__FILE__) . '/../../lib/WeatherMapEditor.class.php';
 
 class WeatherMapEditorTest extends PHPUnit_Framework_TestCase {
 
@@ -50,7 +50,7 @@ class WeatherMapEditorTest extends PHPUnit_Framework_TestCase {
     function setUp()
     {
         self::$previouswd = getcwd();
-        chdir(dirname(__FILE__).DIRECTORY_SEPARATOR."..");
+        chdir(dirname(__FILE__).DIRECTORY_SEPARATOR."../..");
 
         $version = explode('.', PHP_VERSION);
         $phptag = "php".$version[0];

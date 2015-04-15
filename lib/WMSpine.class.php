@@ -88,21 +88,42 @@ class WMSpine
     // find the tangent of the spine at a given index (used by DrawComments)
     function findTangentAtIndex($index, $step)
     {
+        wm_debug("fTAI $index $step\n");
+        $maxIndex = $this->pointCount() - 1;
+
         if ($index > 0) {
-            $maxIndex = $this->pointCount() - 1;
             if($index < $maxIndex) {
                 $p1 = $this->points[$index][0];
                 $p2 = $this->points[$index + $step][0];
+                wm_debug("STD\n");
             } else {
                 // if we're at the end, always use the last two points
-                $p1 = $this->points[$maxIndex-1][0];
-                $p2 = $this->points[$maxIndex][0];
+
+                if ($step < 0) {
+                    $p2 = $this->points[$maxIndex-1][0];
+                    $p1 = $this->points[$maxIndex][0];
+                    wm_debug("END REVERSE\n");
+                } else {
+                    $p1 = $this->points[$maxIndex-1][0];
+                    $p2 = $this->points[$maxIndex][0];
+                    wm_debug("END FORWARD\n");
+                }
             }
         } else {
             // if we're at the start, always use the first two points
-            $p1 = $this->points[0][0];
-            $p2 = $this->points[1][0];
+            if ($step < 0) {
+                $p2 = $this->points[0][0];
+                $p1 = $this->points[1][0];
+                wm_debug("START REVERSE\n");
+            } else {
+                $p1 = $this->points[0][0];
+                $p2 = $this->points[1][0];
+                wm_debug("START FORWARD\n");
+            }
         }
+
+        wm_debug("p1 is " . $p1->asString() . "\n");
+        wm_debug("p2 is " . $p2->asString() . "\n");
 
         $tangent = $p1->vectorToPoint($p2);
         $tangent->normalise();
@@ -144,8 +165,6 @@ class WMSpine
         // append the distance we calculated, in case it's needed by the caller
         // (e.g. arrowhead calcs are part percentage (splitpos) and part absolute (arrrowsize))
         $result[] = $targetDistance;
-
-
 
         return $result;
     }

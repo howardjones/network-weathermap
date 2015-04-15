@@ -219,10 +219,6 @@ class WeatherMap extends WeatherMapBase
 
         $this->links['DEFAULT'] = & $deflink2;
 
-        // for now, make the old defaultlink and defaultnode work too.
-        //                $this->defaultlink = $this->links['DEFAULT'];
-        //                $this->defaultnode = $this->nodes['DEFAULT'];
-
         assert('is_object($this->nodes[":: DEFAULT ::"])');
         assert('is_object($this->links[":: DEFAULT ::"])');
         assert('is_object($this->nodes["DEFAULT"])');
@@ -420,6 +416,10 @@ class WeatherMap extends WeatherMapBase
         return ($output);
     }
 
+    /**
+     * Fill in the links with random bandwidth data. Basically for a "demo mode" for
+     * the command-line tool.
+     */
     function populateRandomData()
     {
         foreach ($this->links as $link) {
@@ -428,6 +428,13 @@ class WeatherMap extends WeatherMapBase
         }
     }
 
+    /**
+     * Search a directory for plugin class files, and load them. Each one is then
+     * instantiated once, and saved into the map object.
+     *
+     * @param string $type - Which kind of plugin are we loading?
+     * @param string $dir - Where to load from?
+     */
     function loadPlugins($type = "data", $dir = "lib/datasources")
     {
         wm_debug("Beginning to load $type plugins from $dir\n");
@@ -482,12 +489,15 @@ class WeatherMap extends WeatherMapBase
         }
     }
 
+    /**
+     * Loop through the datasource plugins, allowing them to initialise any internals.
+     * The plugins can also refuse to run, if resources they need aren't available.
+     */
     function initialiseDatasourcePlugins()
     {
         wm_debug("Running Init() for Data Source Plugins...\n");
         foreach ($this->dataSourceClasses as $ds_class) {
             // make an instance of the class
-            # $dsplugins[$ds_class] = new $ds_class;
             $this->plugins['data'][$ds_class] = new $ds_class;
             wm_debug("Running $ds_class" . "->Init()\n");
             assert('isset($this->plugins["data"][$ds_class])');

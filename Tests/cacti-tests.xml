@@ -1,8 +1,0 @@
-<phpunit>
-  <testsuites>
-    <testsuite name="Weathermap_Cacti">
-        <file>Tests/CactiPluginTest.php</file>
-    </testsuite>
-  </testsuites>
-</phpunit>
-

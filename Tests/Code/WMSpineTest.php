@@ -6,7 +6,7 @@
  * Time: 07:35
  */
 
-require_once dirname(__FILE__).'/../lib/all.php';
+require_once dirname(__FILE__) . '/../../lib/all.php';
 
 class WMSpineTest extends PHPUnit_Framework_TestCase {
 
@@ -42,24 +42,51 @@ class WMSpineTest extends PHPUnit_Framework_TestCase {
 
         $testSpine->addPoint(new WMPoint(100,100));
 
+        /*
+      \
+      |\
+      | \
+      |  \
+      |   \
+      |    E
+      |     \
+      |      \
+      |       v
+      |
+      |               ------B--A
+      |                        |
+      |                        C
+      |                        |
+      |                        |
+      |                        |
+      |                        |
+      |                        |
+      |-------------D----------'
+
+ **/
+        // A
         $result = $testSpine->findPointAndAngleAtDistance(100);
         $this->assertTrue( $result[0]->identical(new WMPoint(150,50)) );
 
+        // B
         $result = $testSpine->findPointAndAngleAtDistance(90);
         $this->assertTrue( $result[0]->identical(new WMPoint(140,50)) );
         $this->assertEquals(0, $result[2]);
 
+        //C
         $result = $testSpine->findPointAndAngleAtDistance(110);
         $this->assertTrue( $result[0]->identical(new WMPoint(150,60)) );
-        $this->assertEquals(90, $result[2]);
+        $this->assertEquals(-90, $result[2]);
 
+        // D
         $result = $testSpine->findPointAndAngleAtDistance(300);
 
         $this->assertTrue( $result[0]->identical(new WMPoint(50,150)) );
         $this->assertEquals(180, $result[2]);
 
+        // E
         $result = $testSpine->findPointAndAngleAtDistance(550);
-        $this->assertEquals(45, $result[2]);
+        $this->assertEquals(-45, $result[2]);
     }
 
     function testPointSearch()
@@ -71,6 +98,8 @@ class WMSpineTest extends PHPUnit_Framework_TestCase {
         $testSpine->addPoint(new WMPoint(150,150));
         $testSpine->addPoint(new WMPoint(0,150));
         $testSpine->addPoint(new WMPoint(0,0));
+
+
 
         $result = $testSpine->findPointAtDistance(0);
         $this->assertTrue( $result[0]->identical(new WMPoint(50,50)) );

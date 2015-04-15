@@ -1,6 +1,6 @@
 <?php
 // require_once 'PHPUnit/Framework.php';
-require_once dirname(__FILE__).'/../lib/all.php';
+require_once dirname(__FILE__).'/../../lib/all.php';
 
 class ConfigTest extends PHPUnit_Framework_TestCase
 {
@@ -160,7 +160,7 @@ class ConfigTest extends PHPUnit_Framework_TestCase
     protected function setUp()
     {
         self::$previouswd = getcwd();
-        chdir(dirname(__FILE__) . DIRECTORY_SEPARATOR . "..");
+        chdir(dirname(__FILE__) . DIRECTORY_SEPARATOR . "../..");
     }
 
     // this has to happen before the dataprovider runs, but
@@ -204,7 +204,7 @@ class ConfigTest extends PHPUnit_Framework_TestCase
         }
 
         if( ! file_exists(self::$compare)) {
-            die("Compare path doesn't exist - do you have Imagemagick? \n");
+            die("Compare path doesn't exist (or isn't executable) - do you have Imagemagick? \n");
         }
     }
 

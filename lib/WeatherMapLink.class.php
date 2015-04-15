@@ -176,7 +176,7 @@ class WeatherMapLink extends WeatherMapItem
             return array(OUT);
         }
 
-        return array(OUT,IN);
+        return array(IN, OUT);
     }
 
     function drawComments($gdImage)
@@ -197,6 +197,10 @@ class WeatherMapLink extends WeatherMapItem
         $fontObject = $this->owner->fonts->getFont($this->commentfont);
 
         foreach ($directions as $direction) {
+            wm_debug("Link ".$this->name.": Drawing comments for direction $direction\n");
+
+            $widthList[$direction] *= 1.1;
+
             // Time to deal with Link Comments, if any
             $comment = $this->owner->ProcessString($this->comments[$direction], $this);
 
@@ -230,6 +234,10 @@ class WeatherMapLink extends WeatherMapItem
                     $centreDistance = $nudgeOut - ($textHeight/2);
                 }
 
+                wm_debug("Tangent angle is ".$tangent->getAngle()."\n");
+
+                wm_debug("Link ".$this->name." angle is $angle and  commentwidth is $textWidth and centreDistance is $centreDistance for direction $direction\n");
+
                 // find the normal to our link, so we can get outside the arrow
                 $normal = $tangent->getNormal();
 
@@ -237,9 +245,12 @@ class WeatherMapLink extends WeatherMapItem
 
                 $edge = $position;
 
+                wm_debug("Link ".$this->name." Edge is ".$edge->asString()." for direction $direction\n");
+
                 // if the text will be upside-down, rotate it, flip it, and right-justify it
                 // not quite as catchy as Missy's version
-                if (abs($angle)>90) {
+                if (abs($angle) > 90) {
+                    wm_debug("flipped\n");
                     $angle -= 180;
                     if ($angle < -180) {
                         $angle +=360;
@@ -248,20 +259,30 @@ class WeatherMapLink extends WeatherMapItem
                     $edge->addVector($normal, -$centreDistance);
                     $flipped = true;
                 } else {
+                    wm_debug("not flipped\n");
                     $edge->addVector($tangent, $nudgeAlong);
                     $edge->addVector($normal, $centreDistance);
                 }
+                wm_debug("Link ".$this->name." Edge is ".$edge->asString()." for direction $direction\n");
 
-                if (!$flipped && ($distance + $textWidth) > $this->geometry->totalDistance()) {
-                    $edge->addVector($tangent, -$textWidth);
-                }
+                $maxLength = $this->geometry->totalDistance();
 
-                if ($flipped && ($distance - $textWidth) < 0) {
+                if (!$flipped && ($distance + $textWidth) > $maxLength) {
+                    wm_debug("off end [$distance $textWidth $maxLength]\n");
                     $edge->addVector($tangent, $textWidth);
                 }
 
+                if ($flipped && ($distance - $textWidth) < 0) {
+                    wm_debug("off beginning\n");
+                    $edge->addVector($tangent, $textWidth);
+                }
+
+                wm_debug("Link ".$this->name." writing $comment at ".$edge->asString()." for direction $direction\n");
+
                 // FINALLY, draw the text!
                 $fontObject->drawImageString($gdImage, $edge->x, $edge->y, $comment, $gdCommentColours[$direction], $angle);
+            } else {
+                wm_debug("Link ".$this->name." no text for direction $direction\n");
             }
         }
     }
@@ -357,88 +378,83 @@ class WeatherMapLink extends WeatherMapItem
             $this->geometry->setFillColours(array($this->colours[IN], $this->colours[OUT]));
 
             $this->geometry->draw($im);
+
+            if (!$this->commentfontcolour->isNone()) {
+
+                $this->drawComments($im);
+            }
+
+            $this->drawBandwidthLabels($im);
+        } else {
+            wm_debug("Skipping link with no geometry attached\n");
         }
+    }
 
-        if (!$this->commentfontcolour->isNone()) {
+    function drawBandwidthLabels($gdImage)
+    {
+        wm_debug("Link ".$this->name.": Drawing bwlabels.\n");
 
-            $this->drawComments($im);
-        }
+        $directions = $this->getDirectionList();
+        $labelPositions = array();
+        $labelOffsets = array();
+        $percentages = array();
+        $bandwidths = array();
+        $max_bandwidths = array();
 
-        // TODO: Refactor into drawBWLabels
-        if (1==0) {
-            $curvelength = $this->spinepoints[count($this->spinepoints) - 1][2];
-            // figure out where the labels should be, and what the angle of the curve is at that point
-            list($q1_x, $q1_y, , $q1_angle) = find_distance_coords_angle($this->spinepoints, ($this->labeloffset_out / 100) * $curvelength);
-            list($q3_x, $q3_y, , $q3_angle) = find_distance_coords_angle($this->spinepoints, ($this->labeloffset_in / 100) * $curvelength);
+        // TODO - this stuff should all be in arrays already!
+        $labelOffsets[IN] = $this->labeloffset_in;
+        $labelOffsets[OUT] = $this->labeloffset_out;
+        $percentages[IN] = $this->inpercent;
+        $percentages[OUT] = $this->outpercent;
+        $bandwidths[IN] = $this->bandwidth_in;
+        $bandwidths[OUT] = $this->bandwidth_out;
+        $max_bandwidths[IN] = $this->max_bandwidth_in;
+        $max_bandwidths[OUT] = $this->max_bandwidth_out;
 
-            if (!is_null($q1_x)) {
-                $inbound_params = array(
-                    'x' => $q3_x,
-                    'y' => $q3_y,
-                    'angle' => $q3_angle,
-                    'percentage' => $this->inpercent,
-                    'bandwidth' => $this->bandwidth_in,
-                    'direction' => IN
+        foreach ($directions as $direction) {
+            list ($position, $index, $angle, $distance) = $this->geometry->findPointAndAngleAtPercentageDistance($labelOffsets[$direction]);
+
+            $percentage = $percentages[$direction
+            ];
+            $bandwidth = $bandwidths[$direction];
+
+            if ($this->owner->sizedebug) {
+                $bandwidth = $max_bandwidths[$direction];
+            }
+
+            $label_text = $this->owner->ProcessString($this->bwlabelformats[$direction], $this);
+            if ($label_text != '') {
+                wm_debug("Bandwidth for label is " . wm_value_or_null($bandwidth) . " (label is '$label_text')\n");
+                $padding = intval($this->get_hint('bwlabel_padding'));
+
+                // if screenshot_mode is enabled, wipe any letters to X and wipe any IP address to 127.0.0.1
+                // hopefully that will preserve enough information to show cool stuff without leaking info
+                if ($this->owner->get_hint('screenshot_mode') == 1) {
+                    $label_text = wmStringAnonymise($label_text);
+                }
+
+                if ($this->labelboxstyle != 'angled') {
+                    $angle = 0;
+                }
+
+                $this->owner->drawLabelRotated(
+                    $gdImage,
+                    $position->x,
+                    $position->y,
+                    $angle,
+                    $label_text,
+                    $this->bwfont,
+                    $padding,
+                    $this->name,
+                    $this->bwfontcolour,
+                    $this->bwboxcolour,
+                    $this->bwoutlinecolour,
+                    $this->owner,    // XXX - why is this passed?
+                    $direction
                 );
-                $outbound_params = array(
-                    'x' => $q1_x,
-                    'y' => $q1_y,
-                    'angle' => $q1_angle,
-                    'percentage' => $this->outpercent,
-                    'bandwidth' => $this->bandwidth_out,
-                    'direction' => OUT
-                );
-
-                if ($map->sizedebug) {
-                    $outbound_params['bandwidth'] = $this->max_bandwidth_out;
-                    $inbound_params['bandwidth'] = $this->max_bandwidth_in;
-                }
-
-                if ($this->linkstyle == 'oneway') {
-                    $tasks = array($outbound_params);
-                } else {
-                    $tasks = array($inbound_params, $outbound_params);
-                }
-
-                foreach ($tasks as $task) {
-                    $label_text = $map->ProcessString($this->bwlabelformats[$task['direction']], $this);
-
-                    if ($label_text != '') {
-                        wm_debug("Bandwidth for label is " . wm_value_or_null($task['bandwidth']) . " (label is '$label_text')\n");
-
-                        $padding = intval($this->get_hint('bwlabel_padding'));
-
-                        // if screenshot_mode is enabled, wipe any letters to X and wipe any IP address to 127.0.0.1
-                        // hopefully that will preserve enough information to show cool stuff without leaking info
-                        if ($map->get_hint('screenshot_mode') == 1) {
-                            $label_text = wmStringAnonymise($label_text);
-                        }
-
-                        if ($this->labelboxstyle == 'angled') {
-                            $angle = $task['angle'];
-                        } else {
-                            $angle = 0;
-                        }
-
-                        $map->DrawLabelRotated(
-                            $im,
-                            $task['x'],
-                            $task['y'],
-                            $angle,
-                            $label_text,
-                            $this->bwfont,
-                            $padding,
-                            $this->name,
-                            $this->bwfontcolour,
-                            $this->bwboxcolour,
-                            $this->bwoutlinecolour,
-                            $map,
-                            $task['direction']
-                        );
-                    }
-                }
             }
         }
+
     }
 
     function getConfig()

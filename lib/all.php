@@ -24,9 +24,11 @@
     
     require_once dirname(__FILE__).'/image-functions.php';
     require_once dirname(__FILE__).'/geometry.php';
-   // require_once dirname(__FILE__).'/curves.php';
     require_once dirname(__FILE__).'/WMSpine.class.php';
     require_once dirname(__FILE__).'/WMLinkGeometry.class.php';
+    require_once dirname(__FILE__).'/WMAngledLinkGeometry.class.php';
+    require_once dirname(__FILE__).'/WMCurvedLinkGeometry.class.php';
+    require_once dirname(__FILE__).'/WMLinkGeometryFactory.class.php';
 
     require_once dirname(__FILE__).'/WMColour.class.php';
     

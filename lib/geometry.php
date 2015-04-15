@@ -37,6 +37,9 @@ class WMPoint
         return FALSE;
     }
 
+    /**
+     * round() - round the coordinates to their nearest integers, in place.
+     */
     function round()
     {
         $this->x = round($this->x);
@@ -67,7 +70,8 @@ class WMPoint
 
     function lineToPoint($p2)
     {
-        return new WMLine($this->x, $this->y, $p2->x - $this->x, $p2->y - $this->y);
+        $vec = $this->vectorToPoint($p2);
+        return new WMLine ($this, $vec);
     }
 
     function distanceToLine($l)
@@ -135,6 +139,11 @@ class WMPoint
      */
     function asString()
     {
+        return $this->__toString();
+    }
+
+    function __toString()
+    {
         return sprintf("(%f,%f)", $this->x, $this->y);
     }
 }
@@ -162,7 +171,7 @@ class WMVector
 
     function getAngle()
     {
-        return rad2deg(atan2(($this->dy), ($this->dx)));
+        return rad2deg(atan2((-$this->dy), ($this->dx)));
     }
 
     function getSlope()
@@ -244,10 +253,15 @@ class WMVector
         return (sqrt($this->squaredLength()));
     }
 
+    function asString()
+    {
+        return $this->__toString();
+    }
+
     /**
      * @return string
      */
-    function asString()
+    function __toString()
     {
         return sprintf("[%f,%f]", $this->dx, $this->dy);
     }
@@ -298,6 +312,11 @@ class WMRectangle
 
         return false;
     }
+
+    function __toString()
+    {
+        return sprintf("[%sx%s]", $this->topleft, $this->bottomright);
+    }
 }
 
 /**
@@ -327,6 +346,10 @@ class WMLine
         return $intercept;
     }
 
+    function __toString()
+    {
+        return sprintf("/%s-%s/", $this->point, $this->vector);
+    }
 
     /**
      * Find the point where this line and another one cross
@@ -354,6 +377,7 @@ class WMLine
 
         return new WMPoint($xi, $yi);
     }
+    
 }
 class WMLineSegment
 {
@@ -366,7 +390,12 @@ class WMLineSegment
         $this->point1 = $p1;
         $this->point2 = $p2;
 
-        $this->vector = new WMVector($this->point2->x - $this->point1->x, $this->point2->y - $this->point1->y);
+        $this->vector = $p1->vectorToPoint($p2);
+    }
+
+    function __toString()
+    {
+        return sprintf("{%s--%s}", $this->point1, $this->point2);
     }
 }
 
@@ -379,23 +408,29 @@ class WMBoundingBox
 
     function addPoint($x, $y)
     {
-        if (is_null($this->minumum_x) || $x < $this->$minimum_x) {
-            $this->minumum_x = $x;
+        if (is_null($this->minimum_x) || $x < $this->minimum_x) {
+            $this->minimum_x = $x;
         }
-        if (is_null($this->maxumum_x) || $x > $this->$maximum_x) {
-            $this->maxumum_x = $x;
+        if (is_null($this->maximum_x) || $x > $this->maximum_x) {
+            $this->maximum_x = $x;
         }
-        if (is_null($this->minumum_y) || $y < $this->$minimum_y) {
-            $this->minumum_y = $y;
+        if (is_null($this->minimum_y) || $y < $this->minimum_y) {
+            $this->minimum_y = $y;
         }
-        if (is_null($this->maxumum_y) || $y > $this->$maximum_y) {
-            $this->maxumum_y = $y;
+        if (is_null($this->maximum_y) || $y > $this->maximum_y) {
+            $this->maximum_y = $y;
         }
     }
 
     function getBoundingRectangle()
     {
         return new WMRectangle($this->minimum_x, $this->minimum_y, $this->maximum_x, $this->maximum_y);
+    }
+
+    function __toString()
+    {
+        $r = $this->getBoundingRectangle();
+        return "$r";
     }
 }
 

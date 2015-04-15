@@ -68,5 +68,6 @@ function plugin_weathermap_upgrade()
 }
 
 require "lib/cacti-plugin-hooks.php";
+require "lib/cacti-plugin-poller.php";
 
 // vim:ts=4:sw=4:

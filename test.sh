@@ -13,7 +13,7 @@ do
 done
 
 if [ $fflag -eq 1 ]; then
-	vendor/bin/phpunit --coverage-html test-suite/code-coverage/ Tests/
+	vendor/bin/phpunit --coverage-html test-suite/code-coverage/ --coverage-clover build/logs/clover.xml Tests/
 else
 	vendor/bin/phpunit Tests/	
 fi

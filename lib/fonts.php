@@ -21,8 +21,9 @@ class WMFont
 
                 return true;
             }
-
-            return false;
+            throw new Exception("FontLoadFailed");
+        } else {
+            throw new Exception("TrueTypeModuleUnavailable");
         }
 
         return false;

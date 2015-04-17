@@ -17,6 +17,6 @@
         "phpmd/phpmd": "~2.1",
         "sebastian/phpcpd": "~2.0",
         "squizlabs/php_codesniffer": "~2.0",
-        "phpunit/phpunit-selenium": "dev-master"
+        "phpunit/phpunit-selenium": ">=1.2"
     }
 }

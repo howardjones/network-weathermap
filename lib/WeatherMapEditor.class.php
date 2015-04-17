@@ -65,7 +65,7 @@ class WeatherMapEditor {
     function addNode($x, $y, $nodename = "", $template = "DEFAULT")
     {    
         if (! $this->isLoaded() ) {
-            throw new Exception("Map must be loaded before editing API called.");
+            throw new WMException("Map must be loaded before editing API called.");
         }
 
         $success = false;
@@ -130,7 +130,7 @@ class WeatherMapEditor {
     function moveNode($node_name, $x, $y)
     {
         if (! $this->isLoaded()) {
-            throw new Exception("Map must be loaded before editing API called.");
+            throw new WMException("Map must be loaded before editing API called.");
         }
 
         $n_links = 0;
@@ -232,16 +232,16 @@ class WeatherMapEditor {
     function updateNode($nodename)
     {
         if (! $this->isLoaded()) {
-            throw new Exception("Map must be loaded before editing API called.");
+            throw new WMException("Map must be loaded before editing API called.");
         }
 
-        throw new Exception("unimplemented");
+        throw new WMException("unimplemented");
     }
     
     function deleteNode($nodename)
     {
         if (! $this->isLoaded()) {
-            throw new Exception("Map must be loaded before editing API called.");
+            throw new WMException("Map must be loaded before editing API called.");
         }
 
         $log = "";
@@ -278,7 +278,7 @@ class WeatherMapEditor {
     function cloneNode($sourcename, $targetname = "", $or_fail = false)
     {
         if (! $this->isLoaded()) {
-            throw new Exception("Map must be loaded before editing API called.");
+            throw new WMException("Map must be loaded before editing API called.");
         }
 
         if (isset($this->map->nodes[$sourcename])) {
@@ -325,7 +325,7 @@ class WeatherMapEditor {
     function addLink($node1, $node2, $linkname = "",$template = "DEFAULT")
     {    
         if (! $this->isLoaded()) {
-            throw new Exception("Map must be loaded before editing API called.");
+            throw new WMException("Map must be loaded before editing API called.");
         }
 
         $success = false;
@@ -365,16 +365,16 @@ class WeatherMapEditor {
     function updateLink()
     {
         if (! $this->isLoaded()) {
-            throw new Exception("Map must be loaded before editing API called.");
+            throw new WMException("Map must be loaded before editing API called.");
         }
 
-        throw new Exception("unimplemented");
+        throw new WMException("unimplemented");
     }
 
     function deleteLink($linkname)
     {
         if (! $this->isLoaded()) {
-            throw new Exception("Map must be loaded before editing API called.");
+            throw new WMException("Map must be loaded before editing API called.");
         }
 
         if (isset($this->map->links[$linkname])) {
@@ -394,10 +394,10 @@ class WeatherMapEditor {
     function cloneLink($sourcename, $targetname="")
     {
         if (! $this->isLoaded()) {
-            throw new Exception("Map must be loaded before editing API called.");
+            throw new WMException("Map must be loaded before editing API called.");
         }
 
-        throw new Exception("unimplemented");
+        throw new WMException("unimplemented");
     }
     
     /**
@@ -412,7 +412,7 @@ class WeatherMapEditor {
     function setLinkVia($linkname, $x, $y)
     {
         if (! $this->isLoaded()) {
-            throw new Exception("Map must be loaded before editing API called.");
+            throw new WMException("Map must be loaded before editing API called.");
         }
 
         if (isset($this->map->links[$linkname])) {
@@ -426,7 +426,7 @@ class WeatherMapEditor {
     function clearLinkVias($linkname)
     {
         if (! $this->isLoaded()) {
-            throw new Exception("Map must be loaded before editing API called.");
+            throw new WMException("Map must be loaded before editing API called.");
         }
 
         if (isset($this->map->links[$linkname])) {
@@ -440,7 +440,7 @@ class WeatherMapEditor {
     function tidyLink($linkname) 
     {
         if (! $this->isLoaded()) {
-            throw new Exception("Map must be loaded before editing API called.");
+            throw new WMException("Map must be loaded before editing API called.");
         }
 
         // draw a map and throw it away, to calculate all the bounding boxes
@@ -451,7 +451,7 @@ class WeatherMapEditor {
     function tidyAllLinks()
     {
         if (! $this->isLoaded()) {
-            throw new Exception("Map must be loaded before editing API called.");
+            throw new WMException("Map must be loaded before editing API called.");
         }
 
         // draw a map and throw it away, to calculate all the bounding boxes
@@ -462,7 +462,7 @@ class WeatherMapEditor {
     function retidyAllLinks()
     {
         if (! $this->isLoaded()) {
-            throw new Exception("Map must be loaded before editing API called.");
+            throw new WMException("Map must be loaded before editing API called.");
         }
         
         // draw a map and throw it away, to calculate all the bounding boxes
@@ -473,7 +473,7 @@ class WeatherMapEditor {
     function retidyLinks()
     {
         if (! $this->isLoaded()) {
-            throw new Exception("Map must be loaded before editing API called.");
+            throw new WMException("Map must be loaded before editing API called.");
         }
         
         // draw a map and throw it away, to calculate all the bounding boxes
@@ -490,7 +490,7 @@ class WeatherMapEditor {
     function _retidyLinks($ignore_tidied=false)
     {
         if (! $this->isLoaded()) {
-            throw new Exception("Map must be loaded before editing API called.");
+            throw new WMException("Map must be loaded before editing API called.");
         }
     
         // draw a map and throw it away, to calculate all the bounding boxes
@@ -728,7 +728,7 @@ class WeatherMapEditor {
     function untidyLinks()
     {
         if (! $this->isLoaded()) {
-            throw new Exception("Map must be loaded before editing API called.");
+            throw new WMException("Map must be loaded before editing API called.");
         }
         
         foreach ($this->map->links as $link) {
@@ -740,7 +740,7 @@ class WeatherMapEditor {
     function placeLegend($x, $y, $scalename = "DEFAULT")
     {
         if (! $this->isLoaded()) {
-            throw new Exception("Map must be loaded before editing API called.");
+            throw new WMException("Map must be loaded before editing API called.");
         }
         
         $this->map->keyx[$scalename] = $x;
@@ -750,7 +750,7 @@ class WeatherMapEditor {
     function placeTitle($x, $y) 
     {
         if (! $this->isLoaded()) {
-            throw new Exception("Map must be loaded before editing API called.");
+            throw new WMException("Map must be loaded before editing API called.");
         }
         
         $this->map->timex = $x;
@@ -760,7 +760,7 @@ class WeatherMapEditor {
     function placeTimestamp($x, $y)
     {
         if (! $this->isLoaded()) {
-            throw new Exception("Map must be loaded before editing API called.");
+            throw new WMException("Map must be loaded before editing API called.");
         }
         
         $this->map->timex = $x;
@@ -770,7 +770,7 @@ class WeatherMapEditor {
     function asJS()
     {
         if (! $this->isLoaded()) {
-            throw new Exception("Map must be loaded before editing API called.");
+            throw new WMException("Map must be loaded before editing API called.");
         }
 
     }

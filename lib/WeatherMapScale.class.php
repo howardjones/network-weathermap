@@ -72,10 +72,10 @@ class WeatherMapScale
             $this->AddSpan(85, 100, new WMColour(255, 0, 0));
 
             // we have a 0-0 line now, so we need to hide that.
-            $this->add_hint("key_hidezero_" . $this->name, 1);
+            $this->owner->add_hint("key_hidezero_" . $this->name, 1);
 
         } else {
-            wm_debug("Already have $this->scalesseen scales, no defaults added.\n");
+            wm_debug("Already have ". $this->spanCount(). " scales, no defaults added.\n");
         }
     }
 
@@ -214,10 +214,12 @@ class WeatherMapScale
     {
         $col = new WMColour(0, 0, 0);
         $tag = '';
-        $matchsize = null;
+        $matchSize = null;
 
-        $nowarn_clipping = intval($owner->get_hint("nowarn_clipping"));
-        $nowarn_scalemisses = (!$scale_warning) || intval($owner->get_hint("nowarn_scalemisses"));
+        $scalename = $this->name;
+
+        $nowarn_clipping = intval($this->owner->get_hint("nowarn_clipping"));
+        $nowarn_scalemisses = (!$scale_warning) || intval($this->owner->get_hint("nowarn_scalemisses"));
 
         if (isset($this->colours)) {
             $colours = $this->colours;
@@ -242,7 +244,7 @@ class WeatherMapScale
 
                     $candidate = null;
 
-                    if ($colour['c1']->equals($colour['c2'])) {
+                    if (is_null($colour['c2']) or $colour['c1']->equals($colour['c2'])) {
                         $candidate = $colour['c1'];
                     } else {
                         if ($colour["bottom"] == $colour["top"]) {
@@ -255,9 +257,9 @@ class WeatherMapScale
                     }
 
                     // change in behaviour - with multiple matching ranges for a value, the smallest range wins
-                    if (is_null($matchsize) || ($range < $matchsize)) {
+                    if (is_null($matchSize) || ($range < $matchSize)) {
                         $col = $candidate;
-                        $matchsize = $range;
+                        $matchSize = $range;
 
                         if (isset($colour['tag'])) {
                             $tag = $colour['tag'];
@@ -358,10 +360,10 @@ class WeatherMapScale
         $colours = $this->colours;
 
         foreach ($colours as $colour) {
-            if (!$colour['special']) {
+            // if (!$colour['special']) {
                 $min = min($colour['bottom'], $min);
                 $max = max($colour['top'], $max);
-            }
+           // }
         }
 
         return array($min, $max);

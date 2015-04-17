@@ -282,6 +282,7 @@ class WeatherMap extends WeatherMapBase
             return $input;
         }
 
+        $the_item = null;
         $context_type = strtolower($context->my_type());
 
         if ($context_type != "map") {

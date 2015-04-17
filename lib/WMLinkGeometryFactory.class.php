@@ -11,7 +11,7 @@ class WMLinkGeometryFactory
             return new WMCurvedLinkGeometry();
         }
 
-        throw new Exception("UnexpectedViaStyle");
+        throw new WMException("UnexpectedViaStyle");
     }
 
 }

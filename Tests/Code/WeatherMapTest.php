@@ -1,5 +1,4 @@
 <?php
-// require_once 'PHPUnit/Framework.php';
 
 require_once dirname(__FILE__) . '/../../lib/all.php';
 
@@ -27,13 +26,74 @@ class WeatherMapTest extends PHPUnit_Framework_TestCase {
      * This method is called after a test is executed.
      */
     protected function tearDown() {
+        $this->object->cleanUp();
     }
 
-    public function testRun() {
-        // Remove the following lines when you implement this test.
-        $this->markTestIncomplete(
-            'This test has not been implemented yet.'
-        );
+    public function testSimple() {
+        $this->assertInstanceOf("WeatherMap", $this->object);
+    }
+
+    /**
+     * @covers WeatherMap::processString
+     */
+    public function testProcessString() {
+
+        global $weathermap_debugging;
+
+        $this->assertEquals("", $this->object->processString("", $this->object, true, false));
+        $this->assertEquals("dog", $this->object->processString("dog", $this->object, true, false));
+
+        $this->assertEquals("[UNKNOWN]", $this->object->processString("{map:randomstring}", $this->object, true, false));
+        $this->assertEquals("[UNKNOWN]", $this->object->processString("{node:randomstring}", $this->object, true, false));
+        $this->assertEquals("[UNKNOWN]", $this->object->processString("{link:randomstring}", $this->object, true, false));
+
+        // load a config file, so there are map objects to talk about
+        $this->object->ReadConfig(dirname(__FILE__).'/../../test-suite/tests/simple-link-1.conf');
+        // initialise the data, otherwise we'll get "" instead of 0 for bandwidth, etc
+        $this->object->readData();
+
+        $n1 = $this->object->nodes['n1'];
+        $l1 = $this->object->links['l1'];
+
+        $this->assertInstanceOf("WeatherMapNode", $n1);
+        $this->assertInstanceOf("WeatherMapLink", $l1);
+
+        // $weathermap_debugging = TRUE;
+
+        $n1->add_note("note1","Data from another plugin");
+        $n1->add_hint("note2","User input");
+
+        // testing notes-inclusion/exclusion
+        $this->assertEquals("[UNKNOWN]", $this->object->processString("{node:this:note1}", $n1, false, false));
+        $this->assertEquals("Data from another plugin", $this->object->processString("{node:this:note1}", $n1, true, false));
+        // vs hints, which always work
+        $this->assertEquals("User input", $this->object->processString("{node:this:note2}", $n1, false, false));
+        $this->assertEquals("User input", $this->object->processString("{node:this:note2}", $n1, true, false));
+
+        $this->assertEquals("Some Simple Links and Nodes", $this->object->processString("{map:title}", $n1, true, false));
+        $this->assertEquals("Some Simple Links and Nodes", $this->object->processString("{map:title}", $this->object, true, false));
+        $this->assertEquals("Some Simple Links and Nodes", $this->object->processString("{map:title}", $l1, true, false));
+
+        // hints "overwrite" internal variables
+        $this->object->add_hint("title", "fish");
+        $this->assertEquals("fish", $this->object->processString("{map:title}", $n1, true, false));
+
+        // and notes might "overwrite" internal variables depending on where we are (not in TARGETs for example)
+        $this->object->delete_hint("title");
+        $this->object->add_note("title", "cat");
+        $this->assertEquals("cat", $this->object->processString("{map:title}", $n1, true, false));
+        $this->assertEquals("Some Simple Links and Nodes", $this->object->processString("{map:title}", $n1, false, false));
+
+
+        $this->assertEquals("n1", $this->object->processString("{node:this:name}", $n1, true, false));
+        $this->assertEquals("l1", $this->object->processString("{link:this:name}", $l1, true, false));
+
+        $this->assertEquals("0", $this->object->processString("{node:this:bandwidth_in}", $n1, true, false));
+        $this->assertEquals("0", $this->object->processString("{link:this:bandwidth_in}", $l1, true, false));
+
+        $this->assertEquals("0", $this->object->processString("{node:n1:bandwidth_in}", $this->object, true, false));
+        $this->assertEquals("0", $this->object->processString("{link:l1:bandwidth_in}", $this->object, true, false));
+
     }
 }
 

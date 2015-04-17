@@ -20,5 +20,8 @@
     "marionette": "~2.1.0",
     "jquery-idletimer": "~1.0.1",
     "jquery.colorpicker": "~1.0.9"
+  },
+  "resolutions": {
+    "jquery": ">= 1.9.0"
   }
 }

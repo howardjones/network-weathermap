@@ -19,6 +19,7 @@ class MiscFunctionsTest extends PHPUnit_Framework_TestCase {
 
         $this->assertEquals( 'xxx xxx is 127.0.0.1 xxxxx', wmStringAnonymise("the DNS is 8.8.8.8 right") );
         $this->assertEquals( 'xxx xxx is 127.0.0.1', wmStringAnonymise("the DNS is 8.8.8.8") );
+        $this->assertEquals( '127.0.0.1 is xxx xxx xxx 127.0.0.1', wmStringAnonymise("8.8.8.8 is the DNS not 8.8.4.4") );
         $this->assertEquals( '127.0.0.1', wmStringAnonymise("8.8.8.8") );
 
         $this->assertEquals( 'a bb xxx xxxx xxxxx', wmStringAnonymise("a bb ccc dddd eeeee") );
@@ -56,6 +57,8 @@ class MiscFunctionsTest extends PHPUnit_Framework_TestCase {
         $this->assertEquals( "1T", wmSprintf("%k", 1000*1000*1000*1000) );
         $this->assertEquals( "1T", wmSprintf("%k", 1024*1024*1024*1024, 1024) );
 
+        $this->assertEquals( "2.4T", wmSprintf("%k", 2.4*1024*1024*1024*1024, 1024) );
+
     }
 
     function testNumberFormatting()
@@ -81,7 +84,6 @@ class MiscFunctionsTest extends PHPUnit_Framework_TestCase {
         // base-2 vs base-10
         $this->assertEquals( "2K", wmFormatNumberWithMetricPrefix(2048,1024,2) );
         $this->assertEquals( "2.05K", wmFormatNumberWithMetricPrefix(2048,1000,2) );
-
 
         // fractional formatting...
         $this->assertEquals( "0.00", wmFormatNumberWithMetricPrefix(0.001,1000,2,false) );
@@ -128,6 +130,7 @@ class MiscFunctionsTest extends PHPUnit_Framework_TestCase {
         $this->assertEquals( array(0, 0), wmCalculateOffset("", 10, 20) );
         $this->assertEquals( array(0, 0), wmCalculateOffset("C", 10, 20) );
 
+        // +Y is down (i.e. South)
         $this->assertEquals( array(0, -10), wmCalculateOffset("N", 10, 20) );
         $this->assertEquals( array(0, 10), wmCalculateOffset("S", 10, 20) );
 

@@ -4,6 +4,9 @@
 // http://www.network-weathermap.com/
 // Released under the GNU Public License
 
+
+class WMException extends Exception { }
+
 // Links, Nodes and the Map object inherit from this class ultimately.
 // Just to make some common code common.
     
@@ -20,6 +23,16 @@ class WeatherMapBase
     function my_type()
     {
         return "MAP";
+    }
+
+    function delete_hint($name)
+    {
+        unset($this->hints[$name]);
+    }
+
+    function delete_note($name)
+    {
+        unset($this->notes[$name]);
     }
 
     function add_note($name, $value)

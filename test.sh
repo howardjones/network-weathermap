@@ -14,6 +14,7 @@ done
 
 if [ $fflag -eq 1 ]; then
 	vendor/bin/phpunit --coverage-html test-suite/code-coverage/ --coverage-clover build/logs/clover.xml Tests/
+	vendor/bin/phpunit --coverage-html test-suite/code-coverage-codeonly/ Tests/Code
 else
 	vendor/bin/phpunit Tests/	
 fi

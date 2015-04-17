@@ -165,39 +165,36 @@ class WeatherMapNode extends WeatherMapItem
         // Finally, the colours
     }
 
-
-
     // make a mini-image, containing this node and nothing else
     // figure out where the real NODE centre is, relative to the top-left corner.
     function preRender($im, &$map)
     {
-        // don't bother drawing if there's no position - it's a template
-        if (is_null($this->x)) {
+        // don't bother drawing if it's a template
+        if ($this->isTemplate()) {
             return;
         }
 
-        if (is_null($this->y)) {
-            return;
-        }
-
-        // apparently, some versions of the gd extension will crash
-        // if we continue...
+        // apparently, some versions of the gd extension will crash if we continue...
         if ($this->label == '' && $this->iconfile=='') {
             return;
         }
 
         // start these off with sensible values, so that bbox
         // calculations are easier.
+
         $icon_x1 = $this->x;
         $icon_x2 = $this->x;
         $icon_y1 = $this->y;
         $icon_y2 = $this->y;
+
         $label_x1 = $this->x;
         $label_x2 = $this->x;
         $label_y1 = $this->y;
         $label_y2 = $this->y;
-        $boxwidth = 0;
-        $boxheight = 0;
+
+        $boxWidth = 0;
+        $boxHeight = 0;
+
         $icon_w = 0;
         $icon_h = 0;
 
@@ -260,15 +257,15 @@ class WeatherMapNode extends WeatherMapItem
             list($strwidth, $strheight) = $map->myimagestringsize($this->labelfont, $this->proclabel);
 
             if ($this->labelangle==90 || $this->labelangle==270) {
-                $boxwidth = ($strheight * $padfactor) + $padding;
-                $boxheight = ($strwidth * $padfactor) + $padding;
-                wm_debug("Node->pre_render: ".$this->name." Label Metrics are: $strwidth x $strheight -> $boxwidth x $boxheight\n");
+                $boxWidth = ($strheight * $padfactor) + $padding;
+                $boxHeight = ($strwidth * $padfactor) + $padding;
+                wm_debug("Node->pre_render: ".$this->name." Label Metrics are: $strwidth x $strheight -> $boxWidth x $boxHeight\n");
 
-                $label_x1 = $this->x - ($boxwidth / 2);
-                $label_y1 = $this->y - ($boxheight / 2);
+                $label_x1 = $this->x - ($boxWidth / 2);
+                $label_y1 = $this->y - ($boxHeight / 2);
 
-                $label_x2 = $this->x + ($boxwidth / 2);
-                $label_y2 = $this->y + ($boxheight / 2);
+                $label_x2 = $this->x + ($boxWidth / 2);
+                $label_y2 = $this->y + ($boxHeight / 2);
 
                 if ($this->labelangle==90) {
                     $txt_x = $this->x + ($strheight / 2);
@@ -281,15 +278,15 @@ class WeatherMapNode extends WeatherMapItem
             }
 
             if ($this->labelangle==0 || $this->labelangle==180) {
-                $boxwidth = ($strwidth * $padfactor) + $padding;
-                $boxheight = ($strheight * $padfactor) + $padding;
-                wm_debug("Node->pre_render: ".$this->name." Label Metrics are: $strwidth x $strheight -> $boxwidth x $boxheight\n");
+                $boxWidth = ($strwidth * $padfactor) + $padding;
+                $boxHeight = ($strheight * $padfactor) + $padding;
+                wm_debug("Node->pre_render: ".$this->name." Label Metrics are: $strwidth x $strheight -> $boxWidth x $boxHeight\n");
 
-                $label_x1 = $this->x - ($boxwidth / 2);
-                $label_y1 = $this->y - ($boxheight / 2);
+                $label_x1 = $this->x - ($boxWidth / 2);
+                $label_y1 = $this->y - ($boxHeight / 2);
 
-                $label_x2 = $this->x + ($boxwidth / 2);
-                $label_y2 = $this->y + ($boxheight / 2);
+                $label_x2 = $this->x + ($boxWidth / 2);
+                $label_y2 = $this->y + ($boxHeight / 2);
 
                 $txt_x = $this->x - ($strwidth / 2);
                 $txt_y = $this->y + ($strheight / 2);
@@ -299,8 +296,8 @@ class WeatherMapNode extends WeatherMapItem
                     $txt_y = $this->y - ($strheight / 2);
                 }
             }
-            $map->nodes[$this->name]->width = $boxwidth;
-            $map->nodes[$this->name]->height = $boxheight;
+            $map->nodes[$this->name]->width = $boxWidth;
+            $map->nodes[$this->name]->height = $boxHeight;
         }
 
         // figure out a bounding rectangle for the icon
@@ -529,16 +526,16 @@ class WeatherMapNode extends WeatherMapItem
         }
 
         // do any offset calculations
-        $dx=0;
-        $dy=0;
+        $dx = 0;
+        $dy = 0;
         if (($this->labeloffset != '') && (($this->iconfile != ''))) {
             $this->labeloffsetx = 0;
             $this->labeloffsety = 0;
 
             list($dx, $dy) = wmCalculateOffset(
                 $this->labeloffset,
-                ($icon_w + $boxwidth -1),
-                ($icon_h + $boxheight)
+                ($icon_w + $boxWidth -1),
+                ($icon_h + $boxHeight)
             );
         }
 
@@ -564,11 +561,11 @@ class WeatherMapNode extends WeatherMapItem
         $temp_width = $bbox_x2 - $bbox_x1;
         $temp_height = $bbox_y2 - $bbox_y1;
         // create an image of that size and draw into it
-        $node_im=imagecreatetruecolor($temp_width, $temp_height);
+        $node_im = imagecreatetruecolor($temp_width, $temp_height);
         // ImageAlphaBlending($node_im, false);
         imageSaveAlpha($node_im, true);
 
-        $nothing=imagecolorallocatealpha($node_im, 128, 0, 0, 127);
+        $nothing = imagecolorallocatealpha($node_im, 128, 0, 0, 127);
         imagefill($node_im, 0, 0, $nothing);
 
         $label_x1 -= $bbox_x1;
@@ -648,13 +645,6 @@ class WeatherMapNode extends WeatherMapItem
         $map->nodes[$this->name]->centre_y = $this->y - $bbox_y1;
 
         $map->nodes[$this->name]->image = $node_im;
-    }
-
-    function updateEditorCache($cachedir, $mapname)
-    {
-        $cachename = $cachedir."/node_".md5($mapname."/".$this->name).".png";
-        // save this image to a cache, for the editor
-        imagepng($this->image, $cachename);
     }
 
     // draw the node, using the pre_render() output

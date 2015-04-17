@@ -329,12 +329,12 @@ class WeatherMapLink extends WeatherMapItem
         list($dx, $dy) = wmCalculateOffset($this->a_offset, $this->a->width, $this->a->height);
         $points[] = new WMPoint($this->a->x + $dx, $this->a->y + $dy);
 
-        foreach ($this->vialist as $v) {
+        foreach ($this->vialist as $via) {
             // if the via has a third element, the first two are relative to that node
             if (isset($via[2])) {
-                $points[] = new WMPoint($map->nodes[$via[2]]->x + $v[0], $map->nodes[$via[2]]->y + $v[1]);
+                $points[] = new WMPoint($map->nodes[$via[2]]->x + $via[0], $map->nodes[$via[2]]->y + $via[1]);
             } else {
-                $points[] = new WMPoint($v[0], $v[1]);
+                $points[] = new WMPoint($via[0], $via[1]);
             }
         }
 

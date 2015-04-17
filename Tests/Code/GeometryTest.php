@@ -20,8 +20,24 @@ class GeometryTest  extends PHPUnit_Framework_TestCase {
         $p2 = new WMPoint(10,0);
         $p3 = new WMPoint(0,10);
 
-        $a = getTriangleArea($p1, $p2, $p3);
-        $this->assertEquals(50, $a);
+        $this->assertEquals(50, getTriangleArea($p1, $p2, $p3));
+
+        $p1 = new WMPoint(6,35);
+        $p2 = new WMPoint(15,10);
+        $p3 = new WMPoint(50,29);
+
+        $this->assertEquals(523, getTriangleArea($p1, $p2, $p3));
+    }
+
+    public function testCatmullRom()
+    {
+
+        // simple straight line case (both ends have duplicated control points)
+        $c = new CatmullRom1D(0,0,10,10);
+
+        $this->assertEquals(0,$c->calculate(0));
+        $this->assertEquals(5,$c->calculate(0.5));
+        $this->assertEquals(10,$c->calculate(1));
     }
 
     public function testPoint()
@@ -161,8 +177,8 @@ class GeometryTest  extends PHPUnit_Framework_TestCase {
         $line1 = new WMLine(new WMPoint(50,50), new WMVector(1,0) );
         $line3 = new WMLine(new WMPoint(70,0), new WMVector(1,0) );
 
-     //   $this->setExpectedException("ParallelLinesNeverCross");
-     //   $point = $line1->findCrossingPoint($line3);
+        $this->setExpectedException("WMException");
+        $point = $line1->findCrossingPoint($line3);
     }
 
     public function testLineSegment()

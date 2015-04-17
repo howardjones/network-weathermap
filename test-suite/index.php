@@ -18,6 +18,7 @@
 <li><?php file_link("summary.html","Summary of all image-comparison test results") ?>(updated by 'test.sh')</li>
 <li><?php file_link("summary-failing.html","Summary of FAILING image-comparison test results") ?>(updated by 'test.sh')</li>
 <li><?php file_link("code-coverage/index.html","Code coverage report for unit tests") ?>(updated by 'test.sh -f')</li>
+<li><?php file_link("code-coverage-codeonly/index.html","Code coverage report for unit tests, excluding config-based tests") ?>(updated by 'test.sh -f')</li>
 </ul>
 <ul>
 <li><?php file_link("md-unused.html","PHPMD unused code report") ?>(updated by 'test.sh -f')</li>

@@ -137,7 +137,7 @@ class WMSpine
         // then linearly interpolate to get a more accurate point
         // this saves having quite so many points-per-curve
         if (count($this->points) === 0) {
-            Throw new Exception("Called findPointAtDistance with an empty WMSpline");
+            Throw new WMException("Called findPointAtDistance with an empty WMSpline");
         }
 
         $foundIndex = $this->findIndexNearDistance($targetDistance);
@@ -205,7 +205,7 @@ class WMSpine
      *
      * @param $targetDistance
      * @return int - index of the point found
-     * @throws Exception
+     * @throws WMException
      */
     function findIndexNearDistance($targetDistance)
     {
@@ -254,7 +254,7 @@ class WMSpine
         }
 
         print "FELL THROUGH\n";
-        throw new Exception("Howie's crappy binary search is wrong after all.\n");
+        throw new WMException("Howie's crappy binary search is wrong after all.\n");
     }
 
     /** split - split the Spine into two new spines, with splitIndex in the first one

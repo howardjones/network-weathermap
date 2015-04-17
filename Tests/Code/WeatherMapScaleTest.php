@@ -18,8 +18,8 @@ class WeatherMapScaleTest extends PHPUnit_Framework_TestCase {
      * This method is called before a test is executed.
      */
     protected function setUp() {
-        // $this->wmap = new Weathermap();
-        // $this->object = new WeatherMapScale("testscale", Null);
+        $this->wmap = new Weathermap();
+        $this->object = new WeatherMapScale("testscale", $this->wmap);
     }
 
     /**
@@ -29,84 +29,41 @@ class WeatherMapScaleTest extends PHPUnit_Framework_TestCase {
     protected function tearDown() {
     }
 
-    /**
-     * @todo Implement testPopulateDefaults().
-     */
-    public function testPopulateDefaults() {
-        // Remove the following lines when you implement this test.
-        $this->markTestIncomplete(
-                'This test has not been implemented yet.'
-        );
+
+    public function testConstruction()
+    {
+        $this->assertInstanceOf("WeatherMapScale", $this->object);
+
+        $this->assertEquals(0, $this->object->spanCount());
     }
 
-    /**
-     * @todo Implement testDrawLegend().
-     */
-    public function testDrawLegend() {
-        // Remove the following lines when you implement this test.
-        $this->markTestIncomplete(
-                'This test has not been implemented yet.'
-        );
+    public function testScaleManagement()
+    {
+        $this->object->populateDefaults();
+        $this->assertEquals(9, $this->object->spanCount());
+
+        list($min, $max) = $this->object->FindScaleExtent();
+
+        $this->assertEquals(0,$min);
+        $this->assertEquals(100,$max);
+
+        list($c, $key, $tag) = $this->object->ColourFromValue(0);
+        $this->assertInstanceOf("WMColour", $c);
+        $this->assertTrue( $c->equals(new WMColour(192,192,192)));
+
+        list($c, $key, $tag) = $this->object->ColourFromValue(0.1);
+        $this->assertInstanceOf("WMColour", $c);
+        $this->assertTrue( $c->equals(new WMColour(255,255,255)));
+
+        list($c, $key, $tag) = $this->object->ColourFromValue(2);
+        $this->assertInstanceOf("WMColour", $c);
+        $this->assertTrue( $c->equals(new WMColour(140,0,255)));
+
+        list($c, $key, $tag) = $this->object->ColourFromValue(200);
+        $this->assertInstanceOf("WMColour", $c);
+        $this->assertTrue( $c->equals(new WMColour(255,0,0)));
+
     }
 
-    /**
-     * @todo Implement testAddSpan().
-     */
-    public function testAddSpan() {
-        // Remove the following lines when you implement this test.
-        $this->markTestIncomplete(
-                'This test has not been implemented yet.'
-        );
-    }
-
-    /**
-     * @todo Implement testWriteConfig().
-     */
-    public function testWriteConfig() {
-        // Remove the following lines when you implement this test.
-        $this->markTestIncomplete(
-                'This test has not been implemented yet.'
-        );
-    }
-
-    /**
-     * @todo Implement testColourFromValue().
-     */
-    public function testColourFromValue() {
-        // Remove the following lines when you implement this test.
-        $this->markTestIncomplete(
-                'This test has not been implemented yet.'
-        );
-    }
-
-    /**
-     * @todo Implement testDrawLegendClassic().
-     */
-    public function testDrawLegendClassic() {
-        // Remove the following lines when you implement this test.
-        $this->markTestIncomplete(
-                'This test has not been implemented yet.'
-        );
-    }
-
-    /**
-     * @todo Implement testDrawLegendVertical().
-     */
-    public function testDrawLegendVertical() {
-        // Remove the following lines when you implement this test.
-        $this->markTestIncomplete(
-                'This test has not been implemented yet.'
-        );
-    }
-
-    /**
-     * @todo Implement testDrawLegendHorizontal().
-     */
-    public function testDrawLegendHorizontal() {
-        // Remove the following lines when you implement this test.
-        $this->markTestIncomplete(
-                'This test has not been implemented yet.'
-        );
-    }
 }
 

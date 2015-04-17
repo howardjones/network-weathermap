@@ -4,7 +4,7 @@ function getTriangleArea($point1, $point2, $point3)
 {
     $a = abs($point1->x * ($point2->y - $point3->y)
         + $point2->x * ($point3->y - $point1->y)
-        + $point3->x * ($point1->y - $point2->y));
+        + $point3->x * ($point1->y - $point2->y)) / 2.0;
 
     return $a;
 }
@@ -356,7 +356,7 @@ class WMLine
      *
      * @param $line2 the other line
      * @return WMPoint the crossing point
-     * @throws Exception
+     * @throws WMException
      */
     function findCrossingPoint($line2)
     {
@@ -366,7 +366,7 @@ class WMLine
         if ($slope1 == $slope2) {
             // for a general case, this should probably be handled better
             // but for our use, there should never be parallel lines
-            throw new Exception("ParallelLinesNeverCross");
+            throw new WMException("ParallelLinesNeverCross");
         }
 
         $b1 = $this->getYIntercept();

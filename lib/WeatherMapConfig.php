@@ -1240,18 +1240,17 @@ class WeatherMapConfigReader
 
     private function handleVIA($fullcommand, $args, $matches)
     {
-        if (preg_match("/^\s*VIA\s+([-+]?\d+)\s+([-+]?\d+)\s*$/i", $fullcommand, $matches)) {
-            $this->currentObject->vialist[] = array($matches[1], $matches[2]);
-
-            return true;
-        }
-
         if (preg_match("/^\s*VIA\s+(\S+)\s+([-+]?\d+)\s+([-+]?\d+)\s*$/i", $fullcommand, $matches)) {
             $this->currentObject->vialist[] = array($matches[2], $matches[3], $matches[1]);
 
             return true;
         }
 
+        if (preg_match("/^\s*VIA\s+([-+]?\d+)\s+([-+]?\d+)\s*$/i", $fullcommand, $matches)) {
+            $this->currentObject->vialist[] = array($matches[1], $matches[2]);
+
+            return true;
+        }
         return false;
     }
 

@@ -190,6 +190,8 @@ class WMLinkGeometry
     {
         $halfwayDistance = $this->curvePoints->totalDistance() * ($this->splitPosition / 100);
 
+        wm_debug("SPLIT at %d%% over %d to get %d\n", $this->splitPosition, $this->curvePoints->totalDistance(), $halfwayDistance);
+
         // For a one-directional link, there's no split point, and one arrow
         // just copy the whole spine
         if (count($this->directions) == 1) {
@@ -199,18 +201,26 @@ class WMLinkGeometry
             // then reverse one of them, so that we can just draw two
             // arrows with exactly the same method
             list($this->splitCurves[OUT], $this->splitCurves[IN]) = $this->curvePoints->splitAtDistance($halfwayDistance);
+
+            wm_debug("After split: %d/%d\n", $this->splitCurves[IN]->totalDistance(), $this->splitCurves[OUT]->totalDistance());
         }
 
         $this->midPoint = $this->splitCurves[OUT]->lastPoint();
 
         foreach ($this->directions as $direction) {
-            $nPoints = count($this->splitCurves[$direction]) - 1;
+            $nPoints = $this->splitCurves[$direction]->pointCount() - 1;
             $totalDistance = $this->splitCurves[$direction]->totalDistance();
 
             list($arrowSize, $this->arrowWidths[$direction]) = $this->calculateArrowSize($this->linkWidths[$direction], $this->arrowStyle);
 
             $arrowDistance = $totalDistance - $arrowSize;
+
+            wm_debug("SPLIT/$direction: $totalDistance->$arrowDistance ($arrowSize)\n");
+
             list($this->arrowPoints[$direction], $this->arrowIndexes[$direction]) = $this->splitCurves[$direction]->findPointAtDistance($arrowDistance);
+
+            wm_debug("ARROW for $direction: %s->%s (index %d)\n", $this->midPoint, $this->arrowPoints[$direction], $this->arrowIndexes[$direction]);
+
         }
     }
 
@@ -240,8 +250,10 @@ class WMLinkGeometry
 
             foreach ($curve as $point)
             {
-                $polyline[] = round($point->x);
-                $polyline[] = round($point->y);
+               $polyline[] = round($point->x);
+               $polyline[] = round($point->y);
+               // $polyline[] = $point->x;
+               // $polyline[] = $point->y;
             }
 
             if (! $this->fillColours[$direction]->isNone() ) {

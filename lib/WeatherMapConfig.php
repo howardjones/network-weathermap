@@ -1233,6 +1233,7 @@ class WeatherMapConfigReader
 
     private function handleDEFINEOFFSET($fullcommand, $args, $matches)
     {
+        wm_debug("Defining a named offset: ". $matches[1]."\n");
         $this->currentObject->named_offsets[$matches[1]] = array(intval($matches[2]), intval($matches[3]));
 
         return true;

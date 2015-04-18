@@ -6,7 +6,7 @@ class WMSpine
     /**
      * @var points - array of WMPoint + distance for points in a spine
      */
-    var $points;
+    private $points;
 
     /**
      * Add a raw spine entry, assuming it's correct - used for copying spines around
@@ -38,6 +38,11 @@ class WMSpine
     function pointCount()
     {
         return count($this->points);
+    }
+
+    function getPoint($index)
+    {
+        return $this->points[$index][0];
     }
 
     function totalDistance()
@@ -269,13 +274,17 @@ class WMSpine
         $endCursor = $this->pointCount()-1;
         $totalDistance = $this->totalDistance();
 
-        for($i = 0; $i <= $splitIndex; $i++) {
+        for($i = 0; $i < $splitIndex; $i++) {
             $spine1->addRawEntry($this->points[$i]);
         }
 
+        // work backwards from the end, finishing with the same point
+        // Recalculate the distance (element 1) from the other end as we go
         for($i = $endCursor; $i > $splitIndex; $i--) {
             $newEntry = $this->points[$i];
-            $newEntry[1] = $totalDistance - $newEntry[1];
+            $newDistance = $totalDistance - $newEntry[1];
+                wm_debug("  $totalDistance => $newDistance  \n");
+            $newEntry[1] = $newDistance;
             $spine2->addRawEntry($newEntry);
         }
 
@@ -286,11 +295,13 @@ class WMSpine
     {
         list($halfwayPoint, $halfwayIndex) = $this->findPointAtDistance($splitDistance);
 
+        wm_debug("Halfway split (%d) is at index %d %s\n", $splitDistance, $halfwayIndex, $halfwayPoint);
+
         list($spine1, $spine2) = $this->split($halfwayIndex);
 
-        // Add the actual midpoint back to the end of both spines
+        // Add the actual midpoint back to the end of both spines (on the reverse one, reverse the distance)
         $spine1->addRawEntry(array($halfwayPoint, $splitDistance));
-        $spine2->addRawEntry(array($halfwayPoint, $splitDistance));
+        $spine2->addRawEntry(array($halfwayPoint, $this->totalDistance() - $splitDistance));
 
         return array($spine1, $spine2);
     }

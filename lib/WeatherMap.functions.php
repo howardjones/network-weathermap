@@ -317,6 +317,7 @@ function wmCalculateOffset($offsetstring, $width, $height)
         
         return (array($x, $y));
     } else {
+        // TODO - where is the named offset handling!!
         wm_warn("Got a position offset that didn't make sense ($offsetstring).");
         return (array (0, 0));
     }

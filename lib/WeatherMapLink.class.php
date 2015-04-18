@@ -360,7 +360,7 @@ class WeatherMapLink extends WeatherMapItem
 
         // don't bother with any curve stuff if there aren't any Vias defined, even if the style is 'curved'
         if (count($this->vialist)==0) {
-        ##   $style = "angled";
+            $style = "angled";
         }
 
         $this->geometry = WMLinkGeometryFactory::create($style);

@@ -8,15 +8,15 @@ class WMCurvedLinkGeometry extends WMLinkGeometry
         array_unshift($this->controlPoints, $this->controlPoints[0]);
         array_push($this->controlPoints, $this->controlPoints[count($this->controlPoints)-1]);
 
-        // Loop through (nearly) all the points. C-R consumes 3 points after the one we specify, so
-        // don't go all the way to the end of the list. Note that for a straight line, that means we
-        // do this once only. (two original points, plus our two duplicates).
         $nPoints = count($this->controlPoints);
 
         // Add the very first point manually. The CRSpan function counts from 1 to avoid
         // duplication of points later in the curve
         $this->curvePoints->addPoint($this->controlPoints[0]);
 
+        // Loop through (nearly) all the points. C-R consumes 3 points after the one we specify, so
+        // don't go all the way to the end of the list. Note that for a straight line, that means we
+        // do this once only. (two original points, plus our two duplicates).
         for ($i = 0; $i < ($nPoints - 3); $i ++) {
             $this->calculateCRSpan($i, $pointsPerSpan);
         }
@@ -45,8 +45,8 @@ class WMCurvedLinkGeometry extends WMLinkGeometry
             $width = $this->linkWidths[$direction];
 
             for($i=0; $i <= $this->arrowIndexes[$direction]; $i++) {
-                $here = $this->splitCurves[$direction]->points[$i][0];
-                $tangent = $here->vectorToPoint($this->splitCurves[$direction]->points[$i+1][0]);
+                $here = $this->splitCurves[$direction]->getPoint($i);
+                $tangent = $here->vectorToPoint($this->splitCurves[$direction]->getPoint($i+1));
                 $tangent->normalise();
                 $normal = $tangent->getNormal();
 

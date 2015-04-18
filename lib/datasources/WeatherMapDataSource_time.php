@@ -1,6 +1,7 @@
 <?php
 
-class WeatherMapDataSource_time extends WeatherMapDataSource {
+class WeatherMapDataSource_time extends WeatherMapDataSource
+{
 
     function Recognise($targetstring)
     {
@@ -35,7 +36,7 @@ class WeatherMapDataSource_time extends WeatherMapDataSource {
 
                 // test that the offset is valid
                 $timestamp = strtotime($offset);
-                if (($timestamp	=== false) || ($timestamp === -1) ) {
+                if (($timestamp     === false) || ($timestamp === -1)) {
                     warn("Time ReadData: Offset String ($offset) is bogus - ignoring [WMTIME03]\n");
                     $offset = "now";
                 }

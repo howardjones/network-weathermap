@@ -4,7 +4,8 @@
 
 // TARGET dbplug:databasename:username:pass:hostkey
 
-class WeatherMapDataSource_tabfile extends WeatherMapDataSource {
+class WeatherMapDataSource_tabfile extends WeatherMapDataSource
+{
 
     function Recognise($targetstring)
     {
@@ -55,4 +56,3 @@ class WeatherMapDataSource_tabfile extends WeatherMapDataSource {
 }
 
 // vim:ts=4:sw=4:
-

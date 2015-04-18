@@ -1,4 +1,4 @@
-<?php 
+<?php
 // template class for data sources. All data sources extend this class.
 // I really wish PHP4 would just die overnight
 class WeatherMapDataSource
@@ -14,7 +14,7 @@ class WeatherMapDataSource
 
     // called with the TARGET string. Returns true or false, depending on whether it wants to handle this TARGET
     // called by map->ReadData()
-    function Recognise( $targetstring )
+    function Recognise($targetstring)
     {
         return false;
     }

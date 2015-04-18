@@ -28,6 +28,9 @@
     <li><?php file_link("phpcs-report-smelly.txt","PHPCS specific Sniffs report") ?>(updated by 'test.sh -f')</li>
     <li><?php file_link("phpcs-report-PSR-1-2.txt","PHPCS PSR-2 report") ?>(updated by 'test.sh -f')</li>
 </ul>
+<ul>
+	<li><a href="https://codeclimate.com/github/howardjones/network-weathermap">Code Climate</a></li>
+</ul>
 
         </div>
         </div>

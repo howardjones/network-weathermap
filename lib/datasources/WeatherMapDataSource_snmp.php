@@ -13,7 +13,8 @@
 // TARGET snmp:public:hostname:1.3.6.1.4.1.3711.1.1:1.3.6.1.4.1.3711.1.2
 // (that is, TARGET snmp:community:host:in_oid:out_oid
 
-class WeatherMapDataSource_snmp extends WeatherMapDataSource {
+class WeatherMapDataSource_snmp extends WeatherMapDataSource
+{
 
     function Init(&$map)
     {
@@ -72,8 +73,7 @@ class WeatherMapDataSource_snmp extends WeatherMapDataSource {
             $in_oid = $matches[3];
             $out_oid = $matches[4];
 
-            if (
-                ($abort_count == 0)
+            if (($abort_count == 0)
                 || (
                     ( $abort_count>0 )
                     && ( !isset($this->down_cache[$host]) || intval($this->down_cache[$host]) < $abort_count )

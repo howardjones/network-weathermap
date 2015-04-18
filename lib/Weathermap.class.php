@@ -1898,8 +1898,8 @@ class WeatherMap extends WeatherMapBase
 
             foreach ($this->nodes as $node) {
                 if (!preg_match("/^::\s/", $node->name)) {
-                    wm_debug("WriteConfig: Considering Node $node->name defined in $node->defined_in\n");
-                    if ($node->defined_in == $this->configfile) {
+                    wm_debug("WriteConfig: Considering Node %s defined in %s\n", $node->name, $node->getDefined());
+                    if ($node->getDefined() == $this->configfile) {
                         if ($which=="template" && $node->x === null) {
                             wm_debug("TEMPLATE\n");
                             $output .= $node->getConfig();
@@ -1922,8 +1922,8 @@ class WeatherMap extends WeatherMapBase
 
             foreach ($this->links as $link) {
                 if (!preg_match("/^::\s/", $link->name)) {
-                    wm_debug("WriteConfig: Considering Link $link->name\n");
-                    if ($link->defined_in == $this->configfile) {
+                    wm_debug("WriteConfig: Considering Link %s defined in %s\n", $link->name, $link->getDefined());
+                    if ($link->getDefined() == $this->configfile) {
                         if ($which=="template" && $link->a === null) {
                             $output .= $link->getConfig();
                         }
@@ -2134,7 +2134,6 @@ class WeatherMap extends WeatherMapBase
                                     $this->nodes[$it->name]->Draw($image, $this);
                                     $ii=0;
                                     foreach ($this->nodes[$it->name]->boundingboxes as $bbox) {
-                                        # $areaname = "NODE:" . $it->name . ':'.$ii;
                                         $areaname = "NODE:N". $it->id . ":" . $ii;
                                         $this->imap->addArea("Rectangle", $areaname, '', $bbox);
                                         wm_debug("Adding imagemap area");
@@ -2286,24 +2285,13 @@ class WeatherMap extends WeatherMapBase
         }
 
         foreach ($this->links as $link) {
-            $link->owner = null;
-            $link->a = null;
-            $link->b = null;
-            $link->parent = null;
-            $link->descendents = null;
-
+            $link->cleanUp();
             unset($link);
         }
 
         foreach ($this->nodes as $node) {
             // destroy all the images we created, to prevent memory leaks
-
-            if (isset($node->image)) {
-                imagedestroy($node->image);
-            }
-            $node->owner = null;
-            $node->parent = null;
-            $node->descendents = null;
+            $node->cleanUp();
             unset($node);
         }
 

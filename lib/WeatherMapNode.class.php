@@ -138,6 +138,27 @@ class WeatherMapNode extends WeatherMapItem
         return "NODE";
     }
 
+    public function getPosition()
+    {
+        return array($this->x, $this->y);
+    }
+
+    public function setPosition($x, $y)
+    {
+        $this->x = $x;
+        $this->y = $y;
+    }
+
+    public function cleanUp()
+    {
+        if (isset($this->image)) {
+            imagedestroy($this->image);
+        }
+        $this->owner = null;
+        $this->parent = null;
+        $this->descendents = null;
+    }
+
     /***
      * precalculate the colours to be used, and the bounding boxes for labels and icons (if they exist)
      *

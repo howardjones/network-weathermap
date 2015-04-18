@@ -21,7 +21,8 @@
 // Original development for this plugin was paid for by
 //    Stellar Consulting
 
-class WeatherMapDataSource_cactithold extends WeatherMapDataSource {
+class WeatherMapDataSource_cactithold extends WeatherMapDataSource
+{
 
     function Init(&$map)
     {

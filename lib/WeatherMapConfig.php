@@ -908,7 +908,7 @@ class WeatherMapConfigReader
         ) // end of link
     );
 
-    public function Init(&$map, $type="GLOBAL", $object=null)
+    public function Init(&$map, $type = "GLOBAL", $object = null)
     {
         $this->mapObject = $map;
         $this->currentType = $type;
@@ -1167,7 +1167,8 @@ class WeatherMapConfigReader
         return true;
     }
 
-    private function handleNODE($fullcommand, $args, $matches) {
+    private function handleNODE($fullcommand, $args, $matches)
+    {
 
         $this->commitItem();
         unset($this->currentObject);
@@ -1176,7 +1177,7 @@ class WeatherMapConfigReader
             $this->currentObject = $this->mapObject->nodes['DEFAULT'];
             wm_debug("Loaded default NODE\n");
 
-            if(sizeof($this->mapObject->nodes) > 2) {
+            if (sizeof($this->mapObject->nodes) > 2) {
                 wm_warn("NODE DEFAULT is not the first NODE. Defaults will not apply to earlier NODEs. [WMWARN27]\n");
             }
 
@@ -1199,7 +1200,8 @@ class WeatherMapConfigReader
 
     }
 
-    private function handleLINK($fullcommand, $args, $matches) {
+    private function handleLINK($fullcommand, $args, $matches)
+    {
         $this->commitItem();
         unset($this->currentObject);
 
@@ -1207,7 +1209,7 @@ class WeatherMapConfigReader
             $this->currentObject = $this->mapObject->links['DEFAULT'];
             wm_debug("Loaded default LINK\n");
 
-            if(sizeof($this->mapObject->nodes) > 2) {
+            if (sizeof($this->mapObject->nodes) > 2) {
                 wm_warn("LINK DEFAULT is not the first LINK. Defaults will not apply to earlier LINKs. [WMWARN26]\n");
             }
 
@@ -1264,7 +1266,6 @@ class WeatherMapConfigReader
         $endoffset = array();
 
         if (preg_match("/^NODES\s+(\S+)\s+(\S+)\s*$/i", $fullcommand, $matches)) {
-
             $valid_nodes = 2;
 
             foreach (array(1, 2) as $i) {
@@ -1610,11 +1611,11 @@ class WeatherMapConfigReader
 
         wm_debug("-> Committing a $this->currentType\n");
 
-        if($this->currentType == 'NODE') {
+        if ($this->currentType == 'NODE') {
             $this->mapObject->nodes[$this->currentObject->name] = $this->currentObject;
         }
 
-        if($this->currentType == 'LINK') {
+        if ($this->currentType == 'LINK') {
             $this->mapObject->links[$this->currentObject->name] = $this->currentObject;
         }
     }
@@ -1626,7 +1627,6 @@ class WeatherMapConfigReader
         wm_debug("in readConfig\n");
 
         foreach ($inputLines as $buffer) {
-
             wm_debug("Processing: $buffer\n");
             $lineMatched = false;
             $this->lineCount++;
@@ -1651,7 +1651,7 @@ class WeatherMapConfigReader
                 // this next loop replaces a whole pile of duplicated ifs with something with consistent handling
 
 
-                if ( !$lineMatched && true === isset($args[0])) {
+                if (!$lineMatched && true === isset($args[0])) {
                     // check if there is even an entry in this context for the current keyword
                     if (true === isset($this->configKeywords[$this->currentType][$args[0]])) {
                         // if there is, then the entry is an array of arrays - iterate them to validate the config
@@ -1660,7 +1660,6 @@ class WeatherMapConfigReader
                             unset($matches);
                             wm_debug("      Trying $keyword[1]\n");
                             if ((substr($keyword[1], 0, 1) != '/') || (1 === preg_match($keyword[1], $buffer, $matches))) {
-
                                 wm_debug("Might be $args[0]\n");
 
                                 // if we came here without a regexp, then the \1 etc
@@ -1671,7 +1670,6 @@ class WeatherMapConfigReader
                                 }
 
                                 if (is_array($keyword[2])) {
-
                                     foreach ($keyword[2] as $key => $val) {
                                         // so we can poke in numbers too, if the value starts with #
                                         // then take the # off, and treat the rest as a number literal
@@ -1761,5 +1759,4 @@ class WeatherMapConfigReader
         }
 
     }
-
 }

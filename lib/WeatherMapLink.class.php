@@ -289,6 +289,15 @@ class WeatherMapLink extends WeatherMapItem
             }
         }
     }
+    
+    public function cleanUp()
+    {
+        $this->owner = null;
+        $this->a = null;
+        $this->b = null;
+        $this->parent = null;
+        $this->descendents = null;
+    }
 
     function preChecks(&$map)
     {

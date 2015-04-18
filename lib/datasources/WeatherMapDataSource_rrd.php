@@ -7,7 +7,8 @@
 
 include_once(dirname(__FILE__)."/../ds-common.php");
 
-class WeatherMapDataSource_rrd extends WeatherMapDataSource {
+class WeatherMapDataSource_rrd extends WeatherMapDataSource
+{
 
     function Init(&$map)
     {
@@ -101,7 +102,7 @@ class WeatherMapDataSource_rrd extends WeatherMapDataSource {
                     } else { // the data table line already exists
                         wm_debug("RRD ReadData: poller_output - found weathermap_data row\n");
                         // if the result is valid, then use it
-                        if ( ($result['sequence'] > 2) && ( $result['last_time'] > $worst_time) ) {
+                        if (($result['sequence'] > 2) && ( $result['last_time'] > $worst_time)) {
                             $data[$dir] = $result['last_calc'];
                             $data_time = $result['last_time'];
                             wm_debug("RRD ReadData: poller_output - data looks valid\n");
@@ -125,7 +126,7 @@ class WeatherMapDataSource_rrd extends WeatherMapDataSource {
                             $ldi = $result['local_data_id'];
                         }
 
-                        if ( ($map->get_hint("rrd_no_cacti_extras") === null) && ($ldi > 0) ) {
+                        if (($map->get_hint("rrd_no_cacti_extras") === null) && ($ldi > 0)) {
                             UpdateCactiData($item, $ldi);
                         }
                     }
@@ -383,7 +384,7 @@ class WeatherMapDataSource_rrd extends WeatherMapDataSource {
         $SQL[OUT] = 'select null';
         $rrdfile = $targetstring;
 
-        if ($map->get_hint("rrd_default_in_ds") !== null ) {
+        if ($map->get_hint("rrd_default_in_ds") !== null) {
             $dsnames[IN] = $map->get_hint("rrd_default_in_ds");
             wm_debug("Default 'in' DS name changed to ".$dsnames[IN].".\n");
         }

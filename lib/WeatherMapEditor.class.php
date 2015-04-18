@@ -90,9 +90,8 @@ class WeatherMapEditor {
 
             $node->reset($this->map);
 
-            $node->x = $x;
-            $node->y = $y;
-            $node->defined_in = $this->map->configfile;
+            $node->setPosition($x, $y);
+            $node->setDefined($this->map->configfile);
 
             // needs to know if zlayer exists.
             if ( !array_key_exists($node->zorder, $this->map->seen_zlayers)) {
@@ -309,9 +308,9 @@ class WeatherMapEditor {
             $node->template = $this->map->nodes[$sourcename]->template;
 
             $node->name = $newnodename;
-            $node->x += 30;
-            $node->y += 30;
-            $node->defined_in = $this->map->configfile;
+            list($x, $y) = $node->getPosition();
+            $node->setPosition($x + 30, $y + 30);
+            $node->setDefined($this->map->configfile);
 
             $this->map->nodes[$newnodename] = $node;
             array_push($this->map->seen_zlayers[$node->zorder], $node);

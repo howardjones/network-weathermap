@@ -1,6 +1,7 @@
 <?php
 
-class WeatherMapDataSource_cactihost extends WeatherMapDataSource {
+class WeatherMapDataSource_cactihost extends WeatherMapDataSource
+{
 
     function Init(&$map)
     {

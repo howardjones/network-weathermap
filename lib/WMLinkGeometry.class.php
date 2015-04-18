@@ -37,7 +37,7 @@ class WMLinkGeometry
      * @param int $splitPosition
      * @throws WMException
      */
-    function Init(&$link, $controlPoints, $widths, $directions = 2, $splitPosition=50, $arrowStyle="classic")
+    function Init(&$link, $controlPoints, $widths, $directions = 2, $splitPosition = 50, $arrowStyle = "classic")
     {
         $this->owner = $link;
         $this->name = $link->name;
@@ -79,9 +79,8 @@ class WMLinkGeometry
     {
         $previousPoint = new WMPoint(-101.111, -2345234.333);
 
-        foreach ($this->controlPoints as $key=>$cp)
-        {
-            if ( $cp->closeEnough($previousPoint)) {
+        foreach ($this->controlPoints as $key => $cp) {
+            if ($cp->closeEnough($previousPoint)) {
                 wm_debug("Dumping useless duplicate point on curve");
                 unset($this->controlPoints[$key]);
             }
@@ -230,7 +229,7 @@ class WMLinkGeometry
             throw new WMException("DrawingEmptySpline");
         }
 
-        if ( ($this->arrowWidths[IN] + $this->arrowWidths[OUT] * 1.2) > $this->curvePoints->totalDistance()) {
+        if (($this->arrowWidths[IN] + $this->arrowWidths[OUT] * 1.2) > $this->curvePoints->totalDistance()) {
             wm_warn("Skipping too-short link [WMWARN50]");
 
             return;
@@ -243,29 +242,27 @@ class WMLinkGeometry
 
         $linkName = $this->name;
 
-        foreach ($this->directions as $direction)
-        {
+        foreach ($this->directions as $direction) {
             $curve = $this->drawnCurves[$direction];
             $polyline = array();
 
-            foreach ($curve as $point)
-            {
-               $polyline[] = round($point->x);
-               $polyline[] = round($point->y);
+            foreach ($curve as $point) {
+                $polyline[] = round($point->x);
+                $polyline[] = round($point->y);
                // $polyline[] = $point->x;
                // $polyline[] = $point->y;
             }
 
-            if (! $this->fillColours[$direction]->isNone() ) {
-                imagefilledpolygon($gdImage, $polyline, count($polyline ) / 2, $this->fillColours[$direction]->gdAllocate($gdImage) );
+            if (! $this->fillColours[$direction]->isNone()) {
+                imagefilledpolygon($gdImage, $polyline, count($polyline) / 2, $this->fillColours[$direction]->gdAllocate($gdImage));
             } else {
-                wm_debug("Not drawing $linkName ($direction) fill because there is no fill colour\n" );
+                wm_debug("Not drawing $linkName ($direction) fill because there is no fill colour\n");
             }
 
-            if (! $this->outlineColour->isNone() ) {
-                imagepolygon($gdImage, $polyline, count($polyline ) / 2, $this->outlineColour->gdAllocate($gdImage) );
+            if (! $this->outlineColour->isNone()) {
+                imagepolygon($gdImage, $polyline, count($polyline) / 2, $this->outlineColour->gdAllocate($gdImage));
             } else {
-                wm_debug("Not drawing $linkName ($direction) outline because there is no outline colour\n" );
+                wm_debug("Not drawing $linkName ($direction) outline because there is no outline colour\n");
             }
 
         }
@@ -273,5 +270,3 @@ class WMLinkGeometry
         # $this->curvePoints->drawSpine($gdImage, $colour);
     }
 }
-
-

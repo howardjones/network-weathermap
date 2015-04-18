@@ -1,47 +1,56 @@
-<?php 
+<?php
 // PHP Weathermap 0.98
 // Copyright Howard Jones, 2005-2014 howie@thingy.com
 // http://www.network-weathermap.com/
 // Released under the GNU Public License
 
 
-class WMException extends Exception { }
+class WMException extends Exception
+{
+
+}
 
 // Links, Nodes and the Map object inherit from this class ultimately.
 // Just to make some common code common.
     
 class WeatherMapBase
 {
-    var $notes = array();
-    var $hints = array();
-    var $imap_areas = array();
-    var $config = array();
-    var $descendents = array();
+    protected $notes = array();
+    protected $hints = array();
+    protected $imap_areas = array();
+    protected $config = array();
+    protected $descendents = array();
 
-    var $inherit_fieldlist;
+    protected $inherit_fieldlist;
 
-    function my_type()
+    public function my_type()
     {
         return "MAP";
     }
 
-    function delete_hint($name)
+    /**
+     * Anything calling this should be doing it a better way!
+     */
+    public function getInternalMember($thing)
     {
-        unset($this->hints[$name]);
+        return $this->$thing;
     }
 
-    function delete_note($name)
+    /**
+     * Anything calling this should be doing it a better way!
+     */
+    public function setInternalMember($thing, $value)
     {
-        unset($this->notes[$name]);
+        $this->$thing = $value;
     }
 
-    function add_note($name, $value)
+    public function add_note($name, $value)
     {
         wm_debug("Adding note $name='$value' to ".$this->name."\n");
         $this->notes[$name] = $value;
     }
 
-    function get_note($name)
+    public function get_note($name)
     {
         if (isset($this->notes[$name])) {
             return($this->notes[$name]);
@@ -50,20 +59,29 @@ class WeatherMapBase
         return(null);
     }
 
-    function add_hint($name, $value)
+    public function delete_note($name)
+    {
+        unset($this->notes[$name]);
+    }
+
+    public function add_hint($name, $value)
     {
         wm_debug("Adding hint $name='$value' to ".$this->name."\n");
         $this->hints[$name] = $value;
     }
 
-
-    function get_hint($name)
+    public function get_hint($name)
     {
         if (isset($this->hints[$name])) {
             return($this->hints[$name]);
         }
 
         return(null);
+    }
+
+    public function delete_hint($name)
+    {
+        unset($this->hints[$name]);
     }
 
     /**
@@ -74,14 +92,14 @@ class WeatherMapBase
      * @param $keyname
      * @return array
      */
-    function getConfig($keyname)
+    public function getConfig($keyname)
     {
         if (isset($this->config[$keyname])) {
             return array($this->config[$keyname], CONF_FOUND_DIRECT);
         } else {
             if (!is_null($this->parent)) {
                 list($value, $direct) = $this->parent->getConfig($keyname);
-                if($direct != CONF_NOT_FOUND) {
+                if ($direct != CONF_NOT_FOUND) {
                     $direct = CONF_FOUND_INHERITED;
                 }
             } else {
@@ -97,7 +115,7 @@ class WeatherMapBase
         }
     }
 
-    function getConfigWithoutInheritance($keyname)
+    public function getConfigWithoutInheritance($keyname)
     {
         if (isset($this->config[$keyname])) {
             return $this->config[$keyname];
@@ -111,7 +129,7 @@ class WeatherMapBase
      *
      * return an array of the objects that were notified
      */
-    function setConfig($keyname, $value, $recalculate=false)
+    public function setConfig($keyname, $value, $recalculate = false)
     {
         wm_debug("Settings config %s = %s\n", $keyname, $value);
         if (is_null($value)) {
@@ -127,7 +145,7 @@ class WeatherMapBase
         return array($this->name);
     }
 
-    function addConfig($keyname, $value, $recalculate=false)
+    public function addConfig($keyname, $value, $recalculate = false)
     {
         wm_debug("Appending config %s = %s\n", $keyname, $value);
         if (is_null($this->config[$keyname])) {
@@ -155,7 +173,7 @@ class WeatherMapBase
      * do theirs, too. Recursively build up a list of the affected objects so we could
      * tell the editor to do selective updates
      */
-    function recalculate()
+    public function recalculate()
     {
         $notified = array();
         $notified []= $this->name;
@@ -172,7 +190,7 @@ class WeatherMapBase
         return $notified;
     }
 
-    function setTemplate($template_name, $owner)
+    public function setTemplate($template_name, $owner)
     {
         $this->template = $template_name;
         wm_debug("Resetting to template %s %s\n", $this->my_type(), $template_name);
@@ -183,24 +201,34 @@ class WeatherMapBase
 // The 'things on the map' class. More common code (mainly variables, actually)
 class WeatherMapItem extends WeatherMapBase
 {
-    var $owner;
+    // TODO - we should be able to make most of these protected
+    public $owner;
 
-    var $configline;
-    var $infourl;
-    var $overliburl;
-    var $overlibwidth;
-    var $overlibheight;
-    var $overlibcaption;
-    var $descendents; # if I change, who could inherit that change?
-    var $config;  # config set on this node specifically
-    var $parent;
-    var $my_default;
-    var $defined_in;
-    var $config_override;	# used by the editor to allow text-editing
+    public $configline;
+    public $infourl;
+    public $overliburl;
+    public $overlibwidth;
+    public $overlibheight;
+    public $overlibcaption;
+    public $descendents; # if I change, who could inherit that change?
+    public $config;  # config set on this node specifically
+    public $parent;
+    public $my_default;
+    public $defined_in;
+    public $config_override;   # used by the editor to allow text-editing
 
-    function my_type()
+    public function my_type()
     {
         return "ITEM";
     }
 
+    public function setDefined($source)
+    {
+        $this->defined_in = $source;
+    }
+
+    public function getDefined()
+    {
+        return $this->defined_in;
+    }
 }

@@ -12,15 +12,16 @@
 
 // Intended as a demo, but should be useful for something, too
 
-class WeatherMapDataSource_dbplug extends WeatherMapDataSource {
+class WeatherMapDataSource_dbplug extends WeatherMapDataSource
+{
 
     function Init(&$map)
     {
-        if (! function_exists("mysql_real_escape_string") ) {
+        if (! function_exists("mysql_real_escape_string")) {
             return false;
         }
 
-        if (! function_exists("mysql_connect") ) {
+        if (! function_exists("mysql_connect")) {
             return false;
         }
 

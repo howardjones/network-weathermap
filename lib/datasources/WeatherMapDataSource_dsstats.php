@@ -2,7 +2,8 @@
 
 include_once(dirname(__FILE__)."/../ds-common.php");
 
-class WeatherMapDataSource_dsstats extends WeatherMapDataSource {
+class WeatherMapDataSource_dsstats extends WeatherMapDataSource
+{
 
     function Init(&$map)
     {
@@ -16,7 +17,7 @@ class WeatherMapDataSource_dsstats extends WeatherMapDataSource {
                 if (! api_plugin_is_enabled('dsstats')) {
                     wm_debug("ReadData DSStats: DSStats plugin not enabled (new-style). [DSSTATS002B]\n");
                     return(false);
-                 }
+                }
             } else {
                 if (!isset($plugins) || !in_array('dsstats', $plugins)) {
                     wm_debug("ReadData DSStats: DSStats plugin not enabled (old-style). [DSSTATS002A]\n");
@@ -96,31 +97,31 @@ class WeatherMapDataSource_dsstats extends WeatherMapDataSource {
             $local_data_id = $matches[2];
         }
 
-        if ( substr($datatype, 0, 5) == "daily") {
+        if (substr($datatype, 0, 5) == "daily") {
             $table = "data_source_stats_daily";
         }
 
-        if ( substr($datatype, 0, 6) == "weekly") {
+        if (substr($datatype, 0, 6) == "weekly") {
             $table = "data_source_stats_weekly";
         }
 
-        if ( substr($datatype, 0, 7) == "monthly") {
+        if (substr($datatype, 0, 7) == "monthly") {
             $table = "data_source_stats_monthly";
         }
 
-        if ( substr($datatype, 0, 6) == "hourly") {
+        if (substr($datatype, 0, 6) == "hourly") {
             $table = "data_source_stats_hourly";
         }
 
-        if ( substr($datatype, 0, 6) == "yearly") {
+        if (substr($datatype, 0, 6) == "yearly") {
             $table = "data_source_stats_yearly";
         }
 
-        if ( substr($datatype, -7) == "average" ) {
+        if (substr($datatype, -7) == "average") {
             $field = "average";
         }
 
-        if ( substr($datatype, -4) == "peak" ) {
+        if (substr($datatype, -4) == "peak") {
             $field = "peak";
         }
 

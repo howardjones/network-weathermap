@@ -145,7 +145,7 @@ function wm_value_or_null($value)
 
 /** Die, leaving a stack-trace. Mostly used along with the unit tests to figure out if
  *  a piece of old-looking code is really redundant.
- *  
+ *
  * @param string $message
  */
 function wm_die_with_trace($message = "Dying here")
@@ -487,10 +487,10 @@ function wmDrawMarkerCircle($gdImage, $colour, $x, $y, $size = 10)
  * Produce the HTML output for both the unit-tests and the CLI utility
  *
  * @global string $WEATHERMAP_VERSION
- * @param string $htmlfile            
- * @param WeatherMap $map            
+ * @param string $htmlfile
+ * @param WeatherMap $map
  */
-function OutputHTML($htmlfile, &$map, $refresh=300)
+function OutputHTML($htmlfile, &$map, $refresh = 300)
 {
     global $WEATHERMAP_VERSION;
     
@@ -517,11 +517,11 @@ function OutputHTML($htmlfile, &$map, $refresh=300)
  * Optionally Produce a new config file in $newconffile (for testing WriteConfig)
  * Optionally collect config-keyword-coverage stats about this config file
  *
- * @param string $conffile            
- * @param string $imagefile            
- * @param string $htmlfile            
- * @param string $newconffile            
- * @param string $coveragefile            
+ * @param string $conffile
+ * @param string $imagefile
+ * @param string $htmlfile
+ * @param string $newconffile
+ * @param string $coveragefile
  */
 function TestOutput_RunTest($conffile, $imagefile, $htmlfile, $newconffile)
 {

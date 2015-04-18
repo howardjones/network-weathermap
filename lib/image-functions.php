@@ -1,4 +1,4 @@
-<?php 
+<?php
 
 // wrapper around imagecolorallocate to try and re-use palette slots where possible
 function myimagecolorallocate($image, $red, $green, $blue)

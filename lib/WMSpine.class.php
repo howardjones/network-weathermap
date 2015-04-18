@@ -58,11 +58,10 @@ class WMSpine
         $output = new WMSpine();
 
         $output->addPoint($this->points[0][0]);
-        $c = count($this->points ) - 2;
+        $c = count($this->points) - 2;
         $skip = 0;
 
         for ($n = 1; $n <= $c; $n ++) {
-
             // figure out the area of the triangle formed by this point, and the one before and after
             $a = getTriangleArea($this->points[$n-1][0], $this->points[$n][0], $this->points[$n+1][0]);
 
@@ -74,7 +73,7 @@ class WMSpine
             }
         }
 
-        wm_debug("Skipped $skip points of $c\n" );
+        wm_debug("Skipped $skip points of $c\n");
 
         $output->addPoint($this->points[$c+1][0]);
         return $output;
@@ -97,7 +96,7 @@ class WMSpine
         $maxIndex = $this->pointCount() - 1;
 
         if ($index > 0) {
-            if($index < $maxIndex) {
+            if ($index < $maxIndex) {
                 $p1 = $this->points[$index][0];
                 $p2 = $this->points[$index + $step][0];
                 wm_debug("STD\n");
@@ -142,7 +141,7 @@ class WMSpine
         // then linearly interpolate to get a more accurate point
         // this saves having quite so many points-per-curve
         if (count($this->points) === 0) {
-            Throw new WMException("Called findPointAtDistance with an empty WMSpline");
+            throw new WMException("Called findPointAtDistance with an empty WMSpline");
         }
 
         $foundIndex = $this->findIndexNearDistance($targetDistance);
@@ -244,7 +243,7 @@ class WMSpine
             return ($left);
         }
 
-        while ($left <= $right ) {
+        while ($left <= $right) {
             $mid = floor(($left + $right) / 2);
 
             if (($this->points[$mid][1] <= $targetDistance) && ($this->points[$mid + 1][1] > $targetDistance)) {
@@ -274,13 +273,13 @@ class WMSpine
         $endCursor = $this->pointCount()-1;
         $totalDistance = $this->totalDistance();
 
-        for($i = 0; $i < $splitIndex; $i++) {
+        for ($i = 0; $i < $splitIndex; $i++) {
             $spine1->addRawEntry($this->points[$i]);
         }
 
         // work backwards from the end, finishing with the same point
         // Recalculate the distance (element 1) from the other end as we go
-        for($i = $endCursor; $i > $splitIndex; $i--) {
+        for ($i = $endCursor; $i > $splitIndex; $i--) {
             $newEntry = $this->points[$i];
             $newDistance = $totalDistance - $newEntry[1];
                 wm_debug("  $totalDistance => $newDistance  \n");
@@ -311,24 +310,26 @@ class WMSpine
         print "===============\n";
         $nPoints = count($spine);
         for ($i = 0; $i < $nPoints; $i ++) {
-            printf("  %3d: %d,%d (%d)\n", $i, $spine[$i][X], $spine[$i][Y], $spine[$i][DISTANCE] );
+            printf("  %3d: %d,%d (%d)\n", $i, $spine[$i][X], $spine[$i][Y], $spine[$i][DISTANCE]);
         }
         print "===============\n";
     }
 
     function drawSpine($gdImage, $colour)
     {
-        $nPoints = count($this->points ) - 1;
+        $nPoints = count($this->points) - 1;
 
         for ($i = 0; $i < $nPoints; $i ++) {
             $point1 = $this->points[$i][0];
             $point2 = $this->points[$i+1][0];
-            imageline($gdImage,
+            imageline(
+                $gdImage,
                 $point1->x,
                 $point1->y,
                 $point2->x,
                 $point2->y,
-                $colour );
+                $colour
+            );
         }
     }
 
@@ -337,12 +338,16 @@ class WMSpine
         $nPoints = count($this->points);
 
         for ($i = 0; $i < $nPoints; $i ++) {
-            imagearc($gdImage,
+            imagearc(
+                $gdImage,
                 $this->points[$i][0]->x,
                 $this->points[$i][0]->y,
-                $size, $size,
-                0, 360,
-                $colour);
+                $size,
+                $size,
+                0,
+                360,
+                $colour
+            );
         }
     }
 }

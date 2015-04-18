@@ -3,7 +3,7 @@
 class WMAngledLinkGeometry extends WMLinkGeometry
 {
 
-    function calculateSpine($pointsPerSpan=5)
+    function calculateSpine($pointsPerSpan = 5)
     {
         $nPoints = count($this->controlPoints);
 
@@ -28,7 +28,6 @@ class WMAngledLinkGeometry extends WMLinkGeometry
     function generateOutlines()
     {
         foreach ($this->directions as $direction) {
-
             // we build up two sets of points here. One is "above" the central spine, and the other below.
             // These are built up in one pass through the spine, with the "there" list growing upwards,
             // and the "back" list growing backwards (using unshift).
@@ -56,7 +55,6 @@ class WMAngledLinkGeometry extends WMLinkGeometry
             wm_debug("We'll loop through %d steps.", $maxStartIndex + 1);
 
             for ($i = 0; $i < $maxStartIndex; $i ++) {
-
                 $point = $simple->getPoint($i);
                 $nextPoint = $simple->getPoint($i+1);
                 $nextNextPoint = $simple->getPoint($i+2);
@@ -81,7 +79,7 @@ class WMAngledLinkGeometry extends WMLinkGeometry
                     $angle += 360;
                 }
 
-                if (abs($angle ) > 169) {
+                if (abs($angle) > 169) {
                     $capping = true;
                 }
 
@@ -158,5 +156,4 @@ class WMAngledLinkGeometry extends WMLinkGeometry
             $this->drawnCurves[$direction] = $outline;
         }
     }
-
 }

@@ -150,7 +150,7 @@ class WMAngledLinkGeometry extends WMLinkGeometry
                 wm_debug("Next step...\n");
             }
 
-            $arrow = $this->generateArrowhead($this->arrowPoints[$direction], $this->midPoint, 1, $this->linkWidths[$direction], $this->arrowWidths[$direction]);
+            $arrow = $this->generateArrowhead($this->arrowPoints[$direction], $this->midPoint, $this->linkWidths[$direction], $this->arrowWidths[$direction]);
 
             $outline = array_merge($there, $arrow, $back);
             $this->drawnCurves[$direction] = $outline;

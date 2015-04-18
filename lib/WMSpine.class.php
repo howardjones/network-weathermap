@@ -24,9 +24,7 @@ class WMSpine
             $this->points = array();
             $distance = 0;
         } else {
-          //  print_r($this->points);
             $lastPoint = end($this->points);
-         //   print_r($lastPoint);
 
             reset($this->points);
             $distance = $lastPoint[1] + $lastPoint[0]->distanceToPoint($newPoint);
@@ -58,14 +56,14 @@ class WMSpine
         $output = new WMSpine();
 
         $output->addPoint($this->points[0][0]);
-        $c = count($this->points) - 2;
+        $maxStartIndex = count($this->points) - 2;
         $skip = 0;
 
-        for ($n = 1; $n <= $c; $n ++) {
+        for ($n = 1; $n <= $maxStartIndex; $n ++) {
             // figure out the area of the triangle formed by this point, and the one before and after
-            $a = getTriangleArea($this->points[$n-1][0], $this->points[$n][0], $this->points[$n+1][0]);
+            $area = getTriangleArea($this->points[$n-1][0], $this->points[$n][0], $this->points[$n+1][0]);
 
-            if ($a > $epsilon) {
+            if ($area > $epsilon) {
                 $output->addPoint($this->points[$n][0]);
             } else {
                 // ignore n
@@ -73,9 +71,9 @@ class WMSpine
             }
         }
 
-        wm_debug("Skipped $skip points of $c\n");
+        wm_debug("Skipped $skip points of $maxStartIndex\n");
 
-        $output->addPoint($this->points[$c+1][0]);
+        $output->addPoint($this->points[$maxStartIndex+1][0]);
         return $output;
     }
 
@@ -90,46 +88,27 @@ class WMSpine
     }
 
     // find the tangent of the spine at a given index (used by DrawComments)
-    function findTangentAtIndex($index, $step)
+    function findTangentAtIndex($index)
     {
-        wm_debug("fTAI $index $step\n");
         $maxIndex = $this->pointCount() - 1;
 
         if ($index > 0) {
             if ($index < $maxIndex) {
-                $p1 = $this->points[$index][0];
-                $p2 = $this->points[$index + $step][0];
-                wm_debug("STD\n");
+                $point1 = $this->points[$index][0];
+                $point2 = $this->points[$index + 1][0];
             } else {
                 // if we're at the end, always use the last two points
 
-                if ($step < 0) {
-                    $p2 = $this->points[$maxIndex-1][0];
-                    $p1 = $this->points[$maxIndex][0];
-                    wm_debug("END REVERSE\n");
-                } else {
-                    $p1 = $this->points[$maxIndex-1][0];
-                    $p2 = $this->points[$maxIndex][0];
-                    wm_debug("END FORWARD\n");
-                }
+                $point1 = $this->points[$maxIndex-1][0];
+                $point2 = $this->points[$maxIndex][0];
             }
         } else {
             // if we're at the start, always use the first two points
-            if ($step < 0) {
-                $p2 = $this->points[0][0];
-                $p1 = $this->points[1][0];
-                wm_debug("START REVERSE\n");
-            } else {
-                $p1 = $this->points[0][0];
-                $p2 = $this->points[1][0];
-                wm_debug("START FORWARD\n");
-            }
+            $point1 = $this->points[0][0];
+            $point2 = $this->points[1][0];
         }
 
-        wm_debug("p1 is $p1\n");
-        wm_debug("p2 is $p2\n");
-
-        $tangent = $p1->vectorToPoint($p2);
+        $tangent = $point1->vectorToPoint($point2);
         $tangent->normalise();
 
         return $tangent;

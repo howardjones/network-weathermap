@@ -54,7 +54,7 @@ class WMCurvedLinkGeometry extends WMLinkGeometry
                 array_unshift($back, $here->copy()->addVector($normal, -$width));
             }
 
-            $arrow = $this->generateArrowhead($this->arrowPoints[$direction], $this->midPoint, 1, $this->linkWidths[$direction], $this->arrowWidths[$direction]);
+            $arrow = $this->generateArrowhead($this->arrowPoints[$direction], $this->midPoint, $this->linkWidths[$direction], $this->arrowWidths[$direction]);
             $outline = array_merge($there, $arrow, $back);
 
             $this->drawnCurves[$direction] = $outline;

@@ -226,7 +226,7 @@ class WeatherMapLink extends WeatherMapItem
 
                 list ($position, $comment_index, $angle, $distance) = $this->geometry->findPointAndAngleAtPercentageDistance($commentPositions[$direction]);
 
-                $tangent = $this->geometry->findTangentAtIndex($comment_index,1);
+                $tangent = $this->geometry->findTangentAtIndex($comment_index);
                 $tangent->normalise();
 
                 $centreDistance = $widthList[$direction] + 4 + $nudgeOut;

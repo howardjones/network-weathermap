@@ -136,13 +136,12 @@ class WMLinkGeometry
      *
      * @param WMPoint $startPoint - a point back from the end of the spine
      * @param WMPoint $endPoint - the actual end of the spine (the point of the arrow)
-     * @param int $direction - whether we're going backwards or forwards along the line
      * @param int $linkWidth - the width of the link
      * @param int $arrowWidth - the width of the arrowhead widest point
      *
      * @return WMPoint[]
      */
-    function generateArrowhead($startPoint, $endPoint, $direction, $linkWidth, $arrowWidth)
+    function generateArrowhead($startPoint, $endPoint, $linkWidth, $arrowWidth)
     {
         $points = array();
 
@@ -152,11 +151,11 @@ class WMLinkGeometry
         // and from that, a normal
         $arrowNormal = $arrowDirection->getNormal();
 
-        $points[]= $startPoint->copy()->addVector($arrowNormal, $direction * $linkWidth);
-        $points[]= $startPoint->copy()->addVector($arrowNormal, $direction * $arrowWidth);
+        $points[]= $startPoint->copy()->addVector($arrowNormal, $linkWidth);
+        $points[]= $startPoint->copy()->addVector($arrowNormal, $arrowWidth);
         $points[]= $endPoint;
-        $points[]= $startPoint->copy()->addVector($arrowNormal, $direction * -$arrowWidth);
-        $points[]= $startPoint->copy()->addVector($arrowNormal, $direction * -$linkWidth);
+        $points[]= $startPoint->copy()->addVector($arrowNormal, -$arrowWidth);
+        $points[]= $startPoint->copy()->addVector($arrowNormal, -$linkWidth);
 
         return $points;
     }
@@ -166,13 +165,9 @@ class WMLinkGeometry
         return $this->curvePoints->totalDistance();
     }
 
-    function findTangentAtIndex($index, $direction = OUT)
+    function findTangentAtIndex($index)
     {
-        $step = -1 + $direction * 2;
-
-        wm_debug("$direction / $step\n");
-
-        return $this->curvePoints->findTangentAtIndex($index, $step);
+        return $this->curvePoints->findTangentAtIndex($index);
     }
 
     function findPointAndAngleAtPercentageDistance($targetPercentage)
@@ -185,11 +180,9 @@ class WMLinkGeometry
         return $this->curvePoints->findPointAndAngleAtDistance($targetDistance);
     }
 
-    function preDraw()
+    protected function splitSpine()
     {
         $halfwayDistance = $this->curvePoints->totalDistance() * ($this->splitPosition / 100);
-
-        wm_debug("SPLIT at %d%% over %d to get %d\n", $this->splitPosition, $this->curvePoints->totalDistance(), $halfwayDistance);
 
         // For a one-directional link, there's no split point, and one arrow
         // just copy the whole spine
@@ -200,27 +193,28 @@ class WMLinkGeometry
             // then reverse one of them, so that we can just draw two
             // arrows with exactly the same method
             list($this->splitCurves[OUT], $this->splitCurves[IN]) = $this->curvePoints->splitAtDistance($halfwayDistance);
-
-            wm_debug("After split: %d/%d\n", $this->splitCurves[IN]->totalDistance(), $this->splitCurves[OUT]->totalDistance());
         }
 
         $this->midPoint = $this->splitCurves[OUT]->lastPoint();
+    }
 
+    protected function findArrowPoints()
+    {
         foreach ($this->directions as $direction) {
-            $nPoints = $this->splitCurves[$direction]->pointCount() - 1;
             $totalDistance = $this->splitCurves[$direction]->totalDistance();
 
             list($arrowSize, $this->arrowWidths[$direction]) = $this->calculateArrowSize($this->linkWidths[$direction], $this->arrowStyle);
 
             $arrowDistance = $totalDistance - $arrowSize;
 
-            wm_debug("SPLIT/$direction: $totalDistance->$arrowDistance ($arrowSize)\n");
-
             list($this->arrowPoints[$direction], $this->arrowIndexes[$direction]) = $this->splitCurves[$direction]->findPointAtDistance($arrowDistance);
-
-            wm_debug("ARROW for $direction: %s->%s (index %d)\n", $this->midPoint, $this->arrowPoints[$direction], $this->arrowIndexes[$direction]);
-
         }
+    }
+
+    function preDraw()
+    {
+        $this->splitSpine();
+        $this->findArrowPoints();
     }
 
     function draw($gdImage)
@@ -237,8 +231,6 @@ class WMLinkGeometry
 
         $this->preDraw();
         $this->generateOutlines();
-
-        $colour = imagecolorallocate($gdImage, 255, 0, 0);
 
         $linkName = $this->name;
 
@@ -266,7 +258,5 @@ class WMLinkGeometry
             }
 
         }
-
-        # $this->curvePoints->drawSpine($gdImage, $colour);
     }
 }

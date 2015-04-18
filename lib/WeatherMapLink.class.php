@@ -226,7 +226,8 @@ class WeatherMapLink extends WeatherMapItem
 
                 list ($position, $comment_index, $angle, $distance) = $this->geometry->findPointAndAngleAtPercentageDistance($commentPositions[$direction]);
 
-                $tangent = $this->geometry->findTangentAtIndex($comment_index, $direction);
+                $tangent = $this->geometry->findTangentAtIndex($comment_index,1);
+                $tangent->normalise();
 
                 $centreDistance = $widthList[$direction] + 4 + $nudgeOut;
 
@@ -234,23 +235,25 @@ class WeatherMapLink extends WeatherMapItem
                     $centreDistance = $nudgeOut - ($textHeight/2);
                 }
 
-                wm_debug("Tangent angle is ".$tangent->getAngle()."\n");
+                wm_debug("Tangent angle is ".$tangent->getAngle()." (on $tangent)\n");
+                wm_debug("Starting position is $position\n");
 
-                wm_debug("Link ".$this->name." angle is $angle and  commentwidth is $textWidth and centreDistance is $centreDistance for direction $direction\n");
+                wm_debug("Link ".$this->name." angle is $angle and commentwidth is $textWidth and centreDistance is $centreDistance for direction $direction\n");
 
                 // find the normal to our link, so we can get outside the arrow
                 $normal = $tangent->getNormal();
+                wm_debug("Normal is $normal\n");
 
                 $flipped = false;
 
                 $edge = $position;
 
-                wm_debug("Link ".$this->name." Edge is ".$edge->asString()." for direction $direction\n");
+                wm_debug("Link ".$this->name." Edge is $edge for direction $direction\n");
 
                 // if the text will be upside-down, rotate it, flip it, and right-justify it
                 // not quite as catchy as Missy's version
                 if (abs($angle) > 90) {
-                    wm_debug("flipped\n");
+                    wm_debug("flipped ($angle)\n");
                     $angle -= 180;
                     if ($angle < -180) {
                         $angle +=360;
@@ -269,7 +272,7 @@ class WeatherMapLink extends WeatherMapItem
 
                 if (!$flipped && ($distance + $textWidth) > $maxLength) {
                     wm_debug("off end [$distance $textWidth $maxLength]\n");
-                    $edge->addVector($tangent, $textWidth);
+                    $edge->addVector($tangent, -$textWidth);
                 }
 
                 if ($flipped && ($distance - $textWidth) < 0) {
@@ -277,7 +280,7 @@ class WeatherMapLink extends WeatherMapItem
                     $edge->addVector($tangent, $textWidth);
                 }
 
-                wm_debug("Link ".$this->name." writing $comment at ".$edge->asString()." for direction $direction\n");
+                wm_debug("Link ".$this->name." writing $comment at $edge and angle $angle for direction $direction\n");
 
                 // FINALLY, draw the text!
                 $fontObject->drawImageString($gdImage, $edge->x, $edge->y, $comment, $gdCommentColours[$direction], $angle);

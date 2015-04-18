@@ -127,8 +127,8 @@ class WMSpine
             }
         }
 
-        wm_debug("p1 is " . $p1->asString() . "\n");
-        wm_debug("p2 is " . $p2->asString() . "\n");
+        wm_debug("p1 is $p1\n");
+        wm_debug("p2 is $p2\n");
 
         $tangent = $p1->vectorToPoint($p2);
         $tangent->normalise();

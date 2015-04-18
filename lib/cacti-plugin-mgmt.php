@@ -406,7 +406,6 @@ function wmMapManagementList4()
     if ($last_stats != "") {
         print "<div align='center'><strong>Last Completed Run:</strong> $last_stats</div>";
     } else {
-
     }
 
     if ($had_warnings>0) {
@@ -605,7 +604,6 @@ function wmMapManagementList()
     $poller_interval = intval(read_config_option("poller_interval"));
 
     if (($last_finish_time - $last_start_time) > $poller_interval) {
-
         if (($last_started != $last_finished) && ($last_started != "")) {
             print '<div align="center" class="wm_warning"><p>';
             print "Last time it ran, Weathermap did NOT complete it's run. It failed during processing for '$last_started'. ";
@@ -820,7 +818,6 @@ function wmuiMapFilePicker($show_all = false)
     $nFiles=0;
 
     if (is_dir($weathermap_confdir)) {
-
         $dirhandle = opendir($weathermap_confdir);
         if ($dirhandle) {
             $nSkipped = 0;
@@ -1228,7 +1225,6 @@ function wmuiMapSettingsForm($mapid = 0, $settingid = 0)
     $value = "";
 
     if ($settingid != 0) {
-
         $result = db_fetch_assoc("select * from weathermap_settings where id=".intval($settingid));
 
         if (is_array($result) && sizeof($result)>0) {

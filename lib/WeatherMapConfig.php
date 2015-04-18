@@ -994,10 +994,10 @@ class WeatherMapConfigReader
             if (in_array($filename, $this->mapObject->included_files)) {
                 wm_warn("Attempt to include '$filename' twice! Skipping it.\n");
                 return (false);
-            } else {
-                $this->mapObject->included_files[] = $filename;
-                $this->mapObject->has_includes = true;
             }
+
+            $this->mapObject->included_files[] = $filename;
+            $this->mapObject->has_includes = true;
 
             $reader = new WeatherMapConfigReader();
             $reader->Init($this->mapObject);
@@ -1007,10 +1007,10 @@ class WeatherMapConfigReader
             $this->currentObject = $this->mapObject;
 
             return true;
-        } else {
-            wm_warn("INCLUDE File '{$matches[1]}' not found!\n");
-            return false;
         }
+
+        wm_warn("INCLUDE File '{$matches[1]}' not found!\n");
+        return false;
     }
 
     private function handleTEMPLATE($fullcommand, $args, $matches)
@@ -1025,11 +1025,12 @@ class WeatherMapConfigReader
             if ($this->objectLineCount > 1) {
                 wm_warn("line $this->lineCount: TEMPLATE is not first line of object. Some data may be lost. [WMWARN39]\n");
             }
-        } else {
-            wm_warn("line $this->lineCount: $last_seen TEMPLATE '$templateName' doesn't exist! (if it does exist, check it's defined first) [WMWARN40]\n");
+            return true;
         }
 
-        return true;
+        wm_warn("line $this->lineCount: $last_seen TEMPLATE '$templateName' doesn't exist! (if it does exist, check it's defined first) [WMWARN40]\n");
+
+        return false;
     }
 
     // TODO: refactor this - it doesn't need to be one big handler anymore (multiple regexps for different styles?)
@@ -1044,11 +1045,9 @@ class WeatherMapConfigReader
 
         if (isset($this->mapObject->scales[$matches[1]])) {
             $newscale = $this->mapObject->scales[$matches[1]];
-            // wm_debug("Found.");
         } else {
             $this->mapObject->scales[$matches[1]] = new WeatherMapScale($matches[1], $this->mapObject);
             $newscale = $this->mapObject->scales[$matches[1]];
-            //  wm_debug("Created.");
         }
 
         $key = $matches[2] . '_' . $matches[3];
@@ -1069,31 +1068,31 @@ class WeatherMapConfigReader
         $this->mapObject->colours[$matches[1]][$key]['special'] = 0;
 
         if (isset($matches[10]) && $matches[10] == 'none') {
-            $this->mapObject->colours[$matches[1]][$key]['red1'] = -1;
-            $this->mapObject->colours[$matches[1]][$key]['green1'] = -1;
-            $this->mapObject->colours[$matches[1]][$key]['blue1'] = -1;
+//            $this->mapObject->colours[$matches[1]][$key]['red1'] = -1;
+//            $this->mapObject->colours[$matches[1]][$key]['green1'] = -1;
+//            $this->mapObject->colours[$matches[1]][$key]['blue1'] = -1;
             $this->mapObject->colours[$matches[1]][$key]['c1'] = new WMColour('none');
 
             $colour1 = new WMColour("none");
 
         } else {
-            $this->mapObject->colours[$matches[1]][$key]['red1'] = (int)($matches[4]);
-            $this->mapObject->colours[$matches[1]][$key]['green1'] = (int)($matches[5]);
-            $this->mapObject->colours[$matches[1]][$key]['blue1'] = (int)($matches[6]);
-            $this->mapObject->colours[$matches[1]][$key]['c1'] = new WMColour((int)$matches[4], (int)$matches[5], (int)$matches[6]);
-
             $colour1 = new WMColour((int)($matches[4]), (int)($matches[5]), (int)($matches[6]));
             $colour2 = $colour1;
+
+//            $this->mapObject->colours[$matches[1]][$key]['red1'] = (int)($matches[4]);
+//            $this->mapObject->colours[$matches[1]][$key]['green1'] = (int)($matches[5]);
+//            $this->mapObject->colours[$matches[1]][$key]['blue1'] = (int)($matches[6]);
+            $this->mapObject->colours[$matches[1]][$key]['c1'] = $colour1;
         }
 
         // this is the second colour, if there is one
         if (isset($matches[7]) && $matches[7] != '') {
-            $this->mapObject->colours[$matches[1]][$key]['red2'] = (int)($matches[7]);
-            $this->mapObject->colours[$matches[1]][$key]['green2'] = (int)($matches[8]);
-            $this->mapObject->colours[$matches[1]][$key]['blue2'] = (int)($matches[9]);
-            $this->mapObject->colours[$matches[1]][$key]['c2'] = new WMColour((int)$matches[7], (int)$matches[8], (int)$matches[9]);
-
             $colour2 = new WMColour((int)($matches[7]), (int)($matches[8]), (int)($matches[9]));
+
+//            $this->mapObject->colours[$matches[1]][$key]['red2'] = (int)($matches[7]);
+//            $this->mapObject->colours[$matches[1]][$key]['green2'] = (int)($matches[8]);
+//            $this->mapObject->colours[$matches[1]][$key]['blue2'] = (int)($matches[9]);
+            $this->mapObject->colours[$matches[1]][$key]['c2'] = $colour2;
         }
 
         $newscale->AddSpan($bottom, $top, $colour1, $colour2, $tag);
@@ -1257,6 +1256,56 @@ class WeatherMapConfigReader
         return false;
     }
 
+    private function interpretNodeSpec($input)
+    {
+        $endoffset = 'C';
+        $nodename = $input;
+        $offset_dx = 0;
+        $offset_dy = 0;
+        $need_size_precalc = false;
+
+        // percentage of compass - must be first
+        if (preg_match('/:(NE|SE|NW|SW|N|S|E|W|C)(\d+)$/i', $input, $submatches)) {
+            $endoffset = $submatches[1] . $submatches[2];
+            $nodename = preg_replace('/:(NE|SE|NW|SW|N|S|E|W|C)\d+$/i', '', $input);
+            $need_size_precalc = true;
+        }
+
+        if (preg_match("/:(NE|SE|NW|SW|N|S|E|W|C)$/i", $input, $submatches)) {
+            $endoffset = $submatches[1];
+            $nodename = preg_replace('/:(NE|SE|NW|SW|N|S|E|W|C)$/i', '', $input);
+            $need_size_precalc = true;
+        }
+
+        if (preg_match('/:(-?\d+r\d+)$/i', $input, $submatches)) {
+            $endoffset = $submatches[1];
+            $nodename = preg_replace('/:(-?\d+r\d+)$/i', '', $input);
+            $need_size_precalc = true;
+        }
+
+        if (preg_match('/:([-+]?\d+):([-+]?\d+)$/i', $input, $submatches)) {
+            $xoff = $submatches[1];
+            $yoff = $submatches[2];
+            $endoffset = $xoff . ":" . $yoff;
+            $nodename = preg_replace("/:$xoff:$yoff$/i", '', $input);
+            $need_size_precalc = true;
+        }
+
+        if (preg_match('/^([^:]+):([A-Za-z][A-Za-z0-9\-_]*)$/i', $input, $submatches)) {
+            $other_node = $submatches[1];
+            if (array_key_exists($submatches[2], $this->mapObject->nodes[$other_node]->named_offsets)) {
+                $named_offset = $submatches[2];
+                $nodename = preg_replace("/:$named_offset$/i", '', $input);
+
+                $endoffset = $named_offset;
+                $offset_dx = $this->mapObject->nodes[$other_node]->named_offsets[$named_offset][0];
+                $offset_dy = $this->mapObject->nodes[$other_node]->named_offsets[$named_offset][1];
+            }
+        }
+
+        return array($offset_dx, $offset_dy, $nodename, $endoffset, $need_size_precalc);
+    }
+    
     // TODO refactor this?
     private function handleNODES($fullcommand, $args, $matches)
     {
@@ -1274,43 +1323,10 @@ class WeatherMapConfigReader
                 $offset_dx[$i] = 0;
                 $offset_dy[$i] = 0;
 
-                // percentage of compass - must be first
-                if (preg_match("/:(NE|SE|NW|SW|N|S|E|W|C)(\d+)$/i", $matches[$i], $submatches)) {
-                    $endoffset[$i] = $submatches[1] . $submatches[2];
-                    $nodenames[$i] = preg_replace("/:(NE|SE|NW|SW|N|S|E|W|C)\d+$/i", '', $matches[$i]);
+                list($offset_dx[$i], $offset_dy[$i], $nodenames[$i], $endoffset[$i], $need_size_precalc) = $this->interpretNodeSpec($matches[$i]);
+
+                if ($need_size_precalc && ! $this->mapObject->need_size_precalc) {
                     $this->mapObject->need_size_precalc = true;
-                }
-
-                if (preg_match("/:(NE|SE|NW|SW|N|S|E|W|C)$/i", $matches[$i], $submatches)) {
-                    $endoffset[$i] = $submatches[1];
-                    $nodenames[$i] = preg_replace("/:(NE|SE|NW|SW|N|S|E|W|C)$/i", '', $matches[$i]);
-                    $this->mapObject->need_size_precalc = true;
-                }
-
-                if (preg_match("/:(-?\d+r\d+)$/i", $matches[$i], $submatches)) {
-                    $endoffset[$i] = $submatches[1];
-                    $nodenames[$i] = preg_replace("/:(-?\d+r\d+)$/i", '', $matches[$i]);
-                    $this->mapObject->need_size_precalc = true;
-                }
-
-                if (preg_match("/:([-+]?\d+):([-+]?\d+)$/i", $matches[$i], $submatches)) {
-                    $xoff = $submatches[1];
-                    $yoff = $submatches[2];
-                    $endoffset[$i] = $xoff . ":" . $yoff;
-                    $nodenames[$i] = preg_replace("/:$xoff:$yoff$/i", '', $matches[$i]);
-                    $this->mapObject->need_size_precalc = true;
-                }
-
-                if (preg_match("/^([^:]+):([A-Za-z][A-Za-z0-9\-_]*)$/i", $matches[$i], $submatches)) {
-                    $other_node = $submatches[1];
-                    if (array_key_exists($submatches[2], $this->mapObject->nodes[$other_node]->named_offsets)) {
-                        $named_offset = $submatches[2];
-                        $nodenames[$i] = preg_replace("/:$named_offset$/i", '', $matches[$i]);
-
-                        $endoffset[$i] = $named_offset;
-                        $offset_dx[$i] = $this->mapObject->nodes[$other_node]->named_offsets[$named_offset][0];
-                        $offset_dy[$i] = $this->mapObject->nodes[$other_node]->named_offsets[$named_offset][1];
-                    }
                 }
 
                 if (!array_key_exists($nodenames[$i], $this->mapObject->nodes)) {
@@ -1415,6 +1431,7 @@ class WeatherMapConfigReader
         $this->mapObject->colours['DEFAULT'][$key]['red1'] = $red;
         $this->mapObject->colours['DEFAULT'][$key]['green1'] = $green;
         $this->mapObject->colours['DEFAULT'][$key]['blue1'] = $blue;
+        $this->mapObject->colours['DEFAULT'][$key]['c1'] = $wmc;
         $this->mapObject->colours['DEFAULT'][$key]['bottom'] = -2;
         $this->mapObject->colours['DEFAULT'][$key]['top'] = -1;
         $this->mapObject->colours['DEFAULT'][$key]['special'] = 1;

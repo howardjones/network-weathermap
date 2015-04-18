@@ -155,6 +155,11 @@ class WMColour
         return (sprintf($format, $this->red, $this->green, $this->blue));
     }
 
+    function __toString()
+    {
+        return $this->asString();
+    }
+
     /**
      * Produce a string ready to drop into a config file by WriteConfig
      */

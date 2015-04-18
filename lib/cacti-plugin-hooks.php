@@ -150,7 +150,7 @@ function weathermap_setup_table()
 
     // only bother with all this if it's a new install, a new version, or we're in a development version
     // - saves a handful of db hits per request!
-   if (($dbversion=="") || (preg_match("/dev$/", $myversion)) || ($dbversion != $myversion)) {
+    if (($dbversion=="") || (preg_match("/dev$/", $myversion)) || ($dbversion != $myversion)) {
         $sql = "show tables";
         $result = db_fetch_assoc($sql) or die (mysql_error());
 
@@ -161,7 +161,7 @@ function weathermap_setup_table()
             foreach ($arr as $t) {
                 $tables[] = $t;
             }
-        }
+         }
 
         $sql[] = "update weathermap_maps set sortorder=id where sortorder is null;";
 
@@ -187,7 +187,7 @@ function weathermap_setup_table()
                 archiving set('on','off') NOT NULL default 'off',
                 PRIMARY KEY  (id)
             ) ENGINE=MyISAM;";
-        } else {
+         } else {
             $colsql = "show columns from weathermap_maps from " . $database_default;
             $result = mysql_query($colsql) or die (mysql_error());
 
@@ -220,35 +220,35 @@ function weathermap_setup_table()
                 if (in_array($row['Field'], $maps_field_fields)) {
                     unset($maps_field_changes[$row['Field']]);
                 }
-            }
+             }
             foreach ($maps_field_changes as $change_list) {
                 foreach ($change_list as $change) {
                     $sql []= $change;
                 }
+             }
             }
-        }
 
-        $sql[] = "update weathermap_maps set filehash=LEFT(MD5(concat(id,configfile,rand())),20) where filehash = '';";
+            $sql[] = "update weathermap_maps set filehash=LEFT(MD5(concat(id,configfile,rand())),20) where filehash = '';";
 
-        if (!in_array('weathermap_auth', $tables)) {
-            $sql[] = "CREATE TABLE weathermap_auth (
+            if (!in_array('weathermap_auth', $tables)) {
+                $sql[] = "CREATE TABLE weathermap_auth (
                 userid mediumint(9) NOT NULL default '0',
                 mapid int(11) NOT NULL default '0'
             ) ENGINE=MyISAM;";
-        }
+            }
 
-        if (!in_array('weathermap_groups', $tables)) {
-            $sql[] = "CREATE TABLE  weathermap_groups (
+            if (!in_array('weathermap_groups', $tables)) {
+                $sql[] = "CREATE TABLE  weathermap_groups (
                 `id` INT(11) NOT NULL auto_increment,
                 `name` VARCHAR( 128 ) NOT NULL default '',
                 `sortorder` INT(11) NOT NULL default 0,
                 PRIMARY KEY (id)
                 ) ENGINE=MyISAM;";
-            $sql[] = "INSERT INTO weathermap_groups (id,name,sortorder) VALUES (1,'Weathermaps',1)";
-        }
+                $sql[] = "INSERT INTO weathermap_groups (id,name,sortorder) VALUES (1,'Weathermaps',1)";
+            }
 
-        if (!in_array('weathermap_settings', $tables)) {
-            $sql[] = "CREATE TABLE weathermap_settings (
+            if (!in_array('weathermap_settings', $tables)) {
+                $sql[] = "CREATE TABLE weathermap_settings (
                 id int(11) NOT NULL auto_increment,
                 mapid int(11) NOT NULL default '0',
                 groupid int(11) NOT NULL default '0',
@@ -256,97 +256,97 @@ function weathermap_setup_table()
                 optvalue varchar(128) NOT NULL default '',
                 PRIMARY KEY  (id)
             ) ENGINE=MyISAM;";
-        }
+            }
 
-        if (!in_array('weathermap_data', $tables)) {
-            $sql[] = "CREATE TABLE IF NOT EXISTS weathermap_data (id int(11) NOT NULL auto_increment,
+            if (!in_array('weathermap_data', $tables)) {
+                $sql[] = "CREATE TABLE IF NOT EXISTS weathermap_data (id int(11) NOT NULL auto_increment,
                 rrdfile varchar(255) NOT NULL,data_source_name varchar(19) NOT NULL,
                   last_time int(11) NOT NULL,last_value varchar(255) NOT NULL,
                 last_calc varchar(255) NOT NULL, sequence int(11) NOT NULL, local_data_id int(11) NOT NULL DEFAULT 0, PRIMARY KEY  (id), KEY rrdfile (rrdfile),
                   KEY local_data_id (local_data_id), KEY data_source_name (data_source_name) ) ENGINE=MyISAM;";
-        } else {
-            $colsql = "show columns from weathermap_data from " . $database_default;
-            $result = mysql_query($colsql) or die (mysql_error());
-            $found_ldi = false;
+            } else {
+                $colsql = "show columns from weathermap_data from " . $database_default;
+                $result = mysql_query($colsql) or die (mysql_error());
+                $found_ldi = false;
 
-            while ($row = mysql_fetch_array($result, MYSQL_ASSOC)) {
-                if ($row['Field'] == 'local_data_id') {
-                    $found_ldi = true;
+                while ($row = mysql_fetch_array($result, MYSQL_ASSOC)) {
+                    if ($row['Field'] == 'local_data_id') {
+                        $found_ldi = true;
+                    }
+                }
+
+                if (!$found_ldi) {
+                    $sql[] = "alter table weathermap_data add local_data_id int(11) NOT NULL default 0 after sequence";
+                    $sql[] = "alter table weathermap_data add index ( `local_data_id` )";
+                    # if there is existing data without a local_data_id, ditch it
+                    $sql[] = "delete from weathermap_data";
                 }
             }
 
-            if (!$found_ldi) {
-                $sql[] = "alter table weathermap_data add local_data_id int(11) NOT NULL default 0 after sequence";
-                $sql[] = "alter table weathermap_data add index ( `local_data_id` )";
-                # if there is existing data without a local_data_id, ditch it
-                $sql[] = "delete from weathermap_data";
+         // create the settings entries, if necessary
+
+            $pagestyle = read_config_option("weathermap_pagestyle");
+            if ($pagestyle == '' or $pagestyle < 0 or $pagestyle >2) {
+                $sql[] = "replace into settings values('weathermap_pagestyle',0)";
             }
-        }
 
-        // create the settings entries, if necessary
-
-        $pagestyle = read_config_option("weathermap_pagestyle");
-        if ($pagestyle == '' or $pagestyle < 0 or $pagestyle >2) {
-            $sql[] = "replace into settings values('weathermap_pagestyle',0)";
-        }
-
-        $cycledelay = read_config_option("weathermap_cycle_refresh");
-        if ($cycledelay == '' or intval($cycledelay < 0) ) {
-            $sql[] = "replace into settings values('weathermap_cycle_refresh',0)";
-        }
-
-        $renderperiod = read_config_option("weathermap_render_period");
-        if ($renderperiod == '' or intval($renderperiod < -1) ) {
-            $sql[] = "replace into settings values('weathermap_render_period',0)";
-        }
-
-        $quietlogging = read_config_option("weathermap_quiet_logging");
-        if ($quietlogging == '' or intval($quietlogging < -1) ) {
-            $sql[] = "replace into settings values('weathermap_quiet_logging',0)";
-        }
-
-        $rendercounter = read_config_option("weathermap_render_counter");
-        if ($rendercounter == '' or intval($rendercounter < 0) ) {
-            $sql[] = "replace into settings values('weathermap_render_counter',0)";
-        }
-
-        $outputformat = read_config_option("weathermap_output_format");
-        if ($outputformat == '' ) {
-            $sql[] = "replace into settings values('weathermap_output_format','png')";
-        }
-
-        $tsize = read_config_option("weathermap_thumbsize");
-        if ($tsize == '' or $tsize < 1) {
-            $sql[] = "replace into settings values('weathermap_thumbsize',250)";
-        }
-
-        $ms = read_config_option("weathermap_map_selector");
-        if ($ms == '' or intval($ms) < 0 or intval($ms) > 1) {
-            $sql[] = "replace into settings values('weathermap_map_selector',1)";
-        }
-
-        $at = read_config_option("weathermap_all_tab");
-        if ($at == '' or intval($at) < 0 or intval($at) > 1) {
-            $sql[] = "replace into settings values('weathermap_all_tab',0)";
-        }
-
-        $ddo = read_config_option("weathermap_debug_data_only");
-        if ($ddo == '' or intval($ddo) < 0 or intval($ddo) > 1) {
-            $sql[] = "replace into settings values('weathermap_debug_data_only',1)";
-        }
-
-        // update the version, so we can skip this next time
-        $sql[] = "replace into settings values('weathermap_db_version','$myversion')";
-
-        // patch up the sortorder for any maps that don't have one.
-        $sql[] = "update weathermap_maps set sortorder=id where sortorder is null or sortorder=0;";
-
-        if (!empty($sql)) {
-            foreach ($sql as $s) {
-                $result = db_execute($s);
+            $cycledelay = read_config_option("weathermap_cycle_refresh");
+            if ($cycledelay == '' or intval($cycledelay < 0)) {
+                $sql[] = "replace into settings values('weathermap_cycle_refresh',0)";
             }
-        }
-   }
+
+            $renderperiod = read_config_option("weathermap_render_period");
+            if ($renderperiod == '' or intval($renderperiod < -1)) {
+                $sql[] = "replace into settings values('weathermap_render_period',0)";
+            }
+
+            $quietlogging = read_config_option("weathermap_quiet_logging");
+            if ($quietlogging == '' or intval($quietlogging < -1)) {
+                $sql[] = "replace into settings values('weathermap_quiet_logging',0)";
+            }
+
+            $rendercounter = read_config_option("weathermap_render_counter");
+            if ($rendercounter == '' or intval($rendercounter < 0)) {
+                $sql[] = "replace into settings values('weathermap_render_counter',0)";
+            }
+
+            $outputformat = read_config_option("weathermap_output_format");
+            if ($outputformat == '') {
+                $sql[] = "replace into settings values('weathermap_output_format','png')";
+            }
+
+            $tsize = read_config_option("weathermap_thumbsize");
+            if ($tsize == '' or $tsize < 1) {
+                $sql[] = "replace into settings values('weathermap_thumbsize',250)";
+            }
+
+            $ms = read_config_option("weathermap_map_selector");
+            if ($ms == '' or intval($ms) < 0 or intval($ms) > 1) {
+                $sql[] = "replace into settings values('weathermap_map_selector',1)";
+            }
+
+            $at = read_config_option("weathermap_all_tab");
+            if ($at == '' or intval($at) < 0 or intval($at) > 1) {
+                $sql[] = "replace into settings values('weathermap_all_tab',0)";
+            }
+
+            $ddo = read_config_option("weathermap_debug_data_only");
+            if ($ddo == '' or intval($ddo) < 0 or intval($ddo) > 1) {
+                $sql[] = "replace into settings values('weathermap_debug_data_only',1)";
+            }
+
+         // update the version, so we can skip this next time
+            $sql[] = "replace into settings values('weathermap_db_version','$myversion')";
+
+         // patch up the sortorder for any maps that don't have one.
+            $sql[] = "update weathermap_maps set sortorder=id where sortorder is null or sortorder=0;";
+
+            if (!empty($sql)) {
+                foreach ($sql as $s) {
+                    $result = db_execute($s);
+                }
+            }
+    }
 }
 
 function weathermap_config_arrays()
@@ -377,7 +377,6 @@ function weathermap_show_tab()
     $userid = (isset($_SESSION["sess_user_id"]) ? intval($_SESSION["sess_user_id"]) : 1);
 
     if ((db_fetch_assoc("select user_auth_realm.realm_id from user_auth_realm where user_auth_realm.user_id='" . $userid . "' and user_auth_realm.realm_id='$realm_id2'")) || (empty($realm_id2))) {
-
         if ($tabstyle>0) {
             $prefix="s_";
         } else {

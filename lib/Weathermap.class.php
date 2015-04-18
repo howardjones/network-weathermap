@@ -240,8 +240,10 @@ class WeatherMap extends WeatherMapBase
         );
 
         foreach ($defaults as $key => $def) {
-            $this->colours['DEFAULT'][$key] = $def;
             $this->colourtable[$key] = new WMColour($def['red1'], $def['green1'], $def['blue1']);
+
+            $def['c1'] = $this->colourtable[$key];
+            $this->colours['DEFAULT'][$key] = $def;
         }
 
         $this->configfile = '';
@@ -864,7 +866,7 @@ class WeatherMap extends WeatherMapBase
         $nowarn_scalemisses = (!$scale_warning) || intval($this->get_hint("nowarn_scalemisses"));
 
         if (isset($this->colours[$scalename])) {
-            // $col = new WMColour(0,0,0);
+
             $colours = $this->colours[$scalename];
 
             if ($is_percent && $value > 100) {
@@ -881,13 +883,13 @@ class WeatherMap extends WeatherMapBase
                 $value = 0;
             }
 
-            foreach ($colours as $key => $colour) {
-                if ((!isset($colour['special']) || $colour['special'] == 0)
-                    and ($value >= $colour['bottom'])
-                    and ($value <= $colour['top'])
+            foreach ($colours as $key => $scaleEntry) {
+                if ((!isset($scaleEntry['special']) || $scaleEntry['special'] == 0)
+                    and ($value >= $scaleEntry['bottom'])
+                    and ($value <= $scaleEntry['top'])
                 ) {
 
-                    $range = $colour['top'] - $colour['bottom'];
+                    $range = $scaleEntry['top'] - $scaleEntry['bottom'];
 
                     // change in behaviour - with multiple matching ranges for a value, the smallest range wins
                     if (is_null($matchsize) || ($range < $matchsize)) {
@@ -899,32 +901,29 @@ class WeatherMap extends WeatherMapBase
                 }
             }
 
+            // TODO: this should use the 'c1' property, not the individual RGB properties
+
             // if we have a match, figure out the actual
             // colour (for gradients) and return it
             if (!is_null($matchsize)) {
 
-                $colour = $colours[$matchkey];
+                $scaleEntry = $colours[$matchkey];
 
-                if (isset($colour['red2'])) {
-                    if ($colour["bottom"] == $colour["top"]) {
+                if (isset($scaleEntry['c2'])) {
+                    if ($scaleEntry["bottom"] == $scaleEntry["top"]) {
                         $ratio = 0;
                     } else {
-                        $ratio = ($value - $colour["bottom"]) / ($colour["top"] - $colour["bottom"]);
+                        $ratio = ($value - $scaleEntry["bottom"]) / ($scaleEntry["top"] - $scaleEntry["bottom"]);
                     }
 
-                    $red = $colour["red1"] + ($colour["red2"] - $colour["red1"]) * $ratio;
-                    $green = $colour["green1"] + ($colour["green2"] - $colour["green1"]) * $ratio;
-                    $blue = $colour["blue1"] + ($colour["blue2"] - $colour["blue1"]) * $ratio;
+                    $col = $scaleEntry['c1']->blendWith($scaleEntry['c2'], $ratio);
                 } else {
-                    $red = $colour["red1"];
-                    $green = $colour["green1"];
-                    $blue = $colour["blue1"];
+                    $col = $scaleEntry['c1'];
                 }
 
-                if (isset($colour['tag'])) {
-                    $tag = $colour['tag'];
+                if (isset($scaleEntry['tag'])) {
+                    $tag = $scaleEntry['tag'];
                 }
-                $col = new WMColour($red, $green, $blue);
                 return (array($col, $matchkey, $tag));
             }
 
@@ -952,7 +951,7 @@ class WeatherMap extends WeatherMapBase
     }
 
 
-    function colourSort($a, $b)
+    function scaleEntrySort($a, $b)
     {
         if ($a['bottom'] == $b['bottom']) {
             if ($a['top'] < $b['top']) {
@@ -1009,8 +1008,8 @@ class WeatherMap extends WeatherMapBase
 
         $this->preAllocateScaleColours($gdScaleImage, $scaleReference);
 
-        $bgColour = new WMColour($this->colours['DEFAULT']['KEYBG']['red1'], $this->colours['DEFAULT']['KEYBG']['green1'], $this->colours['DEFAULT']['KEYBG']['blue1']);
-        $outlineColour = new WMColour($this->colours['DEFAULT']['KEYOUTLINE']['red1'], $this->colours['DEFAULT']['KEYOUTLINE']['green1'], $this->colours['DEFAULT']['KEYOUTLINE']['blue1']);
+        $bgColour = $this->colours['DEFAULT']['KEYBG']['c1'];
+        $outlineColour = $this->colours['DEFAULT']['KEYOUTLINE']['c1'];
 
         if ($bgColour->isRealColour()) {
             imagefilledrectangle($gdScaleImage, $boxLeft, $boxTop, $boxRight, $boxBottom, $this->colours['DEFAULT']['KEYBG'][$scaleReference]);
@@ -1152,7 +1151,7 @@ class WeatherMap extends WeatherMapBase
         $title = $this->keytext[$scalename];
 
         $colours = $this->colours[$scalename];
-        usort($colours, array("Weathermap", "colourSort"));
+        usort($colours, array("Weathermap", "scaleEntrySort"));
 
         $nscales = $this->numscales[$scalename];
 
@@ -1245,7 +1244,7 @@ class WeatherMap extends WeatherMapBase
                 if (!isset($colour['special']) || $colour['special'] == 0) {
                     // pick a value in the middle...
                     $value = ($colour['bottom'] + $colour['top']) / 2;
-                    wm_debug(sprintf("%f-%f (%f)  %d %d %d\n", $colour['bottom'], $colour['top'], $value, $colour['red1'], $colour['green1'], $colour['blue1']));
+                    wm_debug(sprintf("%f-%f (%f)  %s\n", $colour['bottom'], $colour['top'], $value, $colour['c1']));
 
                     #  debug("$i: drawing\n");
                     if (($hide_zero == 0) || $colour['key'] != '0_0') {
@@ -1260,7 +1259,7 @@ class WeatherMap extends WeatherMapBase
                         }
 
                         // if it's a gradient, red2 is defined, and we need to sweep the values
-                        if (isset($colour['red2'])) {
+                        if (isset($colour['c2'])) {
                             for ($n = 0; $n <= $tilewidth; $n++) {
                                 $value = $fudgefactor + $colour['bottom'] + ($n / $tilewidth) * ($colour['top'] - $colour['bottom']);
                                 list($ccol,) = $this->colourFromValue($value, $scalename, "", false);
@@ -1502,6 +1501,8 @@ class WeatherMap extends WeatherMapBase
             foreach ($defaults as $key => $def) {
                 $this->colours['DEFAULT'][$key] = $def;
                 $this->colours['DEFAULT'][$key]['key'] = $key;
+                $this->colours['DEFAULT'][$key]['c1'] = new WMColour($def['red1'], $def['green1'], $def['blue1']);
+                $this->colours['DEFAULT'][$key]['c2'] = null;
                 $this->scalesseen++;
                 $this->numscales['DEFAULT']++;
             }
@@ -1822,37 +1823,30 @@ class WeatherMap extends WeatherMapBase
 
                     $tag = (isset($colour['tag'])? $colour['tag']:'');
 
-                    if (($colour['red1'] == -1) && ($colour['green1'] == -1) && ($colour['blue1'] == -1)) {
+                    if (($colour['c1']->isNone())) {
                         $output.=sprintf("SCALE %s %-4s %-4s   none   %s\n", $scalename, $bottom, $top, $tag);
-                    } elseif (!isset($colour['red2'])) {
+                    } elseif (!isset($colour['c2'])) {
                         $output.=sprintf(
-                            "SCALE %s %-4s %-4s %3d %3d %3d  %s\n",
+                            "SCALE %s %-4s %-4s %s  %s\n",
                             $scalename,
                             $bottom,
                             $top,
-                            $colour['red1'],
-                            $colour['green1'],
-                            $colour['blue1'],
+                            $colour['c1']->asConfig(),
                             $tag
                         );
                     } else {
                         $output.=sprintf(
-                            "SCALE %s %-4s %-4s %3d %3d %3d   %3d %3d %3d    %s\n",
+                            "SCALE %s %-4s %-4s %s   %s    %s\n",
                             $scalename,
                             $bottom,
                             $top,
-                            $colour['red1'],
-                            $colour['green1'],
-                            $colour['blue1'],
-                            $colour['red2'],
-                            $colour['green2'],
-                            $colour['blue2'],
+                            $colour['c1']->asConfig(),
+                            $colour['c2']->asConfig(),
                             $tag
                         );
                     }
                 } else {
-                    $c = new WMColour($colour['red1'], $colour['green1'], $colour['blue1']);
-                    $output .= sprintf("%sCOLOR %s\n", $k, $c->asConfig());
+                    $output .= sprintf("%sCOLOR %s\n", $k, $colour['c1']->asConfig());
                 }
             }
             $output .= "\n";
@@ -1863,7 +1857,7 @@ class WeatherMap extends WeatherMapBase
             // TODO - These should replace the stuff above
             $output .= "# new colourtable stuff (duplicated above right now TODO)\n";
             foreach ($this->colourtable as $k => $c) {
-                $output .= sprintf("%sCOLOR %s\n", $k, $c->as_config());
+                $output .= sprintf("%sCOLOR %s\n", $k, $c->asConfig());
             }
             $output .= "\n";
 
@@ -1966,12 +1960,9 @@ class WeatherMap extends WeatherMapBase
     {
         foreach ($this->colours as $scalename => $colours) {
             foreach ($colours as $key => $colour) {
-                if ((!isset($this->colours[$scalename][$key]['red2'])) && (!isset($this->colours[$scalename][$key][$refname]))) {
-                    $r=$colour['red1'];
-                    $g=$colour['green1'];
-                    $b=$colour['blue1'];
-                    wm_debug("AllocateScaleColours: $scalename/$refname $key ($r,$g,$b)\n");
-                    $this->colours[$scalename][$key][$refname]=myimagecolorallocate($im, $r, $g, $b);
+                if ((!isset($this->colours[$scalename][$key]['c2'])) && (!isset($this->colours[$scalename][$key][$refname]))) {
+                    $this->colours[$scalename][$key][$refname] = $this->colours[$scalename][$key]['c1']->gdAllocate($im);
+                    wm_debug("AllocateScaleColours: %s/%s %s %s\n", $scalename, $refname, $key, $this->colours[$scalename][$key]['c1']);
                 }
             }
         }

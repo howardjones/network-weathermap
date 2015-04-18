@@ -26,7 +26,6 @@ function wmuiUserPluginDispatcher($action, $request)
                 $map = db_fetch_assoc("select weathermap_maps.* from weathermap_auth,weathermap_maps where weathermap_maps.id=weathermap_auth.mapid and (userid=" . $userid . " or userid=0) and  active='on' and weathermap_maps.id=" . $id . " LIMIT 1");
 
                 if (sizeof($map) == 1) {
-
                     $imagefile = dirname(__FILE__) . '/../output/' . $map[0]['filehash'] . "." . $imageformat;
                     if ($action == 'viewthumb') {
                         $imagefile = dirname(__FILE__) . '/../output/' . $map[0]['filehash'] . ".thumb." . $imageformat;
@@ -174,13 +173,13 @@ function wmuiSingleMapView($mapid)
                                                                  cellspacing="0"><tr><td class="textHeader"
                                                                                          nowrap><?php print $maptitle;
 
-        if ($is_wm_admin) {
-            print "<span style='font-size: 80%'>";
-            print "[ <a href='weathermap-cacti-plugin-mgmt.php?action=map_settings&id=".$mapid."'>Map Settings</a> |";
-            print "<a href='weathermap-cacti-plugin-mgmt.php?action=perms_edit&id=".$mapid."'>Map Permissions</a> |";
-            print "<a href=''>Edit Map</a> ]";
-            print "</span>";
-        }
+                                                                                            if ($is_wm_admin) {
+                                                                                                print "<span style='font-size: 80%'>";
+                                                                                                print "[ <a href='weathermap-cacti-plugin-mgmt.php?action=map_settings&id=".$mapid."'>Map Settings</a> |";
+                                                                                                print "<a href='weathermap-cacti-plugin-mgmt.php?action=perms_edit&id=".$mapid."'>Map Permissions</a> |";
+                                                                                                print "<a href=''>Edit Map</a> ]";
+                                                                                                print "</span>";
+                                                                                            }
 
                             ?></td></tr></table></td></tr>
         <tr><td>
@@ -243,9 +242,9 @@ function wmuiThumbnailView($limit_to_group = -1)
                         <td class="textHeader" nowrap> <?php print $pagetitle; ?></td>
                         <td align="right">
                             automatically cycle between full-size maps (<?php
-        if ($limit_to_group > 0) {
-            print '<a href = "?action=viewmapcycle&group='.intval($limit_to_group).'">within this group</a>, or ';
-        }
+                            if ($limit_to_group > 0) {
+                                print '<a href = "?action=viewmapcycle&group='.intval($limit_to_group).'">within this group</a>, or ';
+                            }
                             print ' <a href = "?action=viewmapcycle">all maps</a>';  ?>)
                         </td>
                     </tr>
@@ -262,7 +261,6 @@ function wmuiThumbnailView($limit_to_group = -1)
         wmGenerateGroupTabs($limit_to_group);
         $i = 0;
         if (sizeof($maplist) > 0) {
-
             $outdir = dirname(__FILE__).'/../output/';
 
             $imageformat = strtolower(read_config_option("weathermap_output_format"));
@@ -372,18 +370,19 @@ function wmuiFullMapView($cycle = false, $firstonly = false, $limit_to_group = -
                         <td class="textHeader" nowrap> <?php print $pagetitle; ?> </td>
                         <td align = "right">
                             <?php
-        if (!$cycle) { ?>
+                            if (!$cycle) {
+?>
                                 (automatically cycle between full-size maps (<?php
 
-            if ($limit_to_group > 0) {
-                print '<a href = "?action=viewmapcycle&group='.intval($limit_to_group)
-                    . '">within this group</a>, or ';
-            }
-            print ' <a href = "?action=viewmapcycle">all maps</a>';
-            ?>)
+                                if ($limit_to_group > 0) {
+                                    print '<a href = "?action=viewmapcycle&group='.intval($limit_to_group)
+                                        . '">within this group</a>, or ';
+                                }
+                                print ' <a href = "?action=viewmapcycle">all maps</a>';
+                                ?>)
 
-        <?php
-        }
+                            <?php
+                            }
         ?>
                         </td>
                     </tr>
@@ -545,7 +544,6 @@ function wmGenerateMapSelectorBox($current_id = 0)
     $maps = db_fetch_assoc("select distinct weathermap_maps.*,weathermap_groups.name, weathermap_groups.sortorder as gsort from weathermap_groups,weathermap_auth,weathermap_maps where weathermap_maps.group_id=weathermap_groups.id and weathermap_maps.id=weathermap_auth.mapid and active='on' and (userid=".$userid." or userid=0) order by gsort, sortorder");
 
     if (sizeof($maps)>1) {
-
         /* include graph view filter selector */
         html_graph_start_box(3, true);
         ?>
@@ -562,35 +560,35 @@ function wmGenerateMapSelectorBox($current_id = 0)
                                 <select name="id">
                                     <?php
 
-        $ngroups = 0;
-        $lastgroup = "------lasdjflkjsdlfkjlksdjflksjdflkjsldjlkjsd";
-        foreach ($maps as $map) {
-            if ($current_id == $map['id']) {
-                $nullhash = $map['filehash'];
-            }
-            if ($map['name'] != $lastgroup) {
-                $ngroups++;
-                $lastgroup = $map['name'];
-            }
-        }
+                                    $ngroups = 0;
+                                    $lastgroup = "------lasdjflkjsdlfkjlksdjflksjdflkjsldjlkjsd";
+                                    foreach ($maps as $map) {
+                                        if ($current_id == $map['id']) {
+                                            $nullhash = $map['filehash'];
+                                        }
+                                        if ($map['name'] != $lastgroup) {
+                                            $ngroups++;
+                                            $lastgroup = $map['name'];
+                                        }
+                                    }
 
-        $lastgroup = "------lasdjflkjsdlfkjlksdjflksjdflkjsldjlkjsd";
-        foreach ($maps as $map) {
-            if ($ngroups>1 && $map['name'] != $lastgroup) {
-                print "<option style='font-weight: bold; font-style: italic' value='$nullhash'>".htmlspecialchars($map['name'])."</option>";
-                $lastgroup = $map['name'];
-            }
-            print '<option ';
-            if ($current_id == $map['id']) {
-                print " SELECTED ";
-            }
-            print 'value="'.$map['filehash'].'">';
-            // if we're showing group headings, then indent the map names
-            if ($ngroups>1) {
-                print " - ";
-            }
-            print htmlspecialchars($map['titlecache']) . '</option>';
-        }
+                                    $lastgroup = "------lasdjflkjsdlfkjlksdjflksjdflkjsldjlkjsd";
+                                    foreach ($maps as $map) {
+                                        if ($ngroups>1 && $map['name'] != $lastgroup) {
+                                            print "<option style='font-weight: bold; font-style: italic' value='$nullhash'>".htmlspecialchars($map['name'])."</option>";
+                                            $lastgroup = $map['name'];
+                                        }
+                                        print '<option ';
+                                        if ($current_id == $map['id']) {
+                                            print " SELECTED ";
+                                        }
+                                        print 'value="'.$map['filehash'].'">';
+                                        // if we're showing group headings, then indent the map names
+                                        if ($ngroups>1) {
+                                            print " - ";
+                                        }
+                                        print htmlspecialchars($map['titlecache']) . '</option>';
+                                    }
                                     ?>
                                 </select>
                                 &nbsp;<input type="image" src="../../images/button_go.gif" alt="Go"

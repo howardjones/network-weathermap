@@ -228,22 +228,20 @@ class WeatherMap extends WeatherMapBase
 
         $this->imap = new HTML_ImageMap('weathermap');
         $this->colours = array();
+        $this->colourtable = array();
 
         wm_debug("Adding default map colour set.\n");
         $defaults = array(
-            'KEYTEXT' => array('bottom' => -2, 'top' => -1, 'red1' => 0, 'green1' => 0, 'blue1' => 0, 'special' => 1),
-            'KEYOUTLINE' => array('bottom' => -2, 'top' => -1, 'red1' => 0, 'green1' => 0, 'blue1' => 0, 'special' => 1),
-            'KEYBG' => array('bottom' => -2, 'top' => -1, 'red1' => 255, 'green1' => 255, 'blue1' => 255, 'special' => 1),
-            'BG' => array('bottom' => -2, 'top' => -1, 'red1' => 255, 'green1' => 255, 'blue1' => 255, 'special' => 1),
-            'TITLE' => array('bottom' => -2, 'top' => -1, 'red1' => 0, 'green1' => 0, 'blue1' => 0, 'special' => 1),
-            'TIME' => array('bottom' => -2, 'top' => -1, 'red1' => 0, 'green1' => 0, 'blue1' => 0, 'special' => 1)
+            'KEYTEXT' => array('bottom' => -2, 'top' => -1, 'red' => 0, 'green' => 0, 'blue' => 0),
+            'KEYOUTLINE' => array('bottom' => -2, 'top' => -1, 'red' => 0, 'green' => 0, 'blue' => 0),
+            'KEYBG' => array('bottom' => -2, 'top' => -1, 'red' => 255, 'green' => 255, 'blue' => 255),
+            'BG' => array('bottom' => -2, 'top' => -1, 'red' => 255, 'green' => 255, 'blue' => 255),
+            'TITLE' => array('bottom' => -2, 'top' => -1, 'red' => 0, 'green' => 0, 'blue' => 0),
+            'TIME' => array('bottom' => -2, 'top' => -1, 'red' => 0, 'green' => 0, 'blue' => 0)
         );
 
         foreach ($defaults as $key => $def) {
-            $this->colourtable[$key] = new WMColour($def['red1'], $def['green1'], $def['blue1']);
-
-            $def['c1'] = $this->colourtable[$key];
-            $this->colours['DEFAULT'][$key] = $def;
+            $this->colourtable[$key] = new WMColour($def['red'], $def['green'], $def['blue']);
         }
 
         $this->configfile = '';
@@ -262,6 +260,7 @@ class WeatherMap extends WeatherMapBase
 
     function myimagestring($image, $fontnumber, $x, $y, $string, $colour, $angle = 0)
     {
+        // throw new WMException("Still using myimagestring");
         $fontObject = $this->fonts->getFont($fontnumber);
         return $fontObject->drawImageString($image, $x, $y, $string, $colour, $angle);
 
@@ -822,23 +821,19 @@ class WeatherMap extends WeatherMapBase
         }
 
         if ($bgcolour->isRealColour()) {
-            #X  $bgcol=myimagecolorallocate($im, $bgcolour[0], $bgcolour[1], $bgcolour[2]);
             $bgcol = $bgcolour->gdAllocate($im);
             imagefilledpolygon($im, $points, 4, $bgcol);
         }
 
         if ($outlinecolour->isRealColour()) {
-            #X $outlinecol=myimagecolorallocate($im, $outlinecolour[0], $outlinecolour[1], $outlinecolour[2]);
             $outlinecol = $outlinecolour->gdAllocate($im);
             imagepolygon($im, $points, 4, $outlinecol);
         }
 
-        #X $textcol=myimagecolorallocate($im, $textcolour[0], $textcolour[1], $textcolour[2]);
         $textcol = $textcolour->gdallocate($im);
 
 
         $fontObject->drawImageString($im, $points[8], $points[9], $text, $textcol, $angle);
-        // $this->myimagestring($im, $font, $points[8], $points[9], $text, $textcol, $angle);
 
         $areaname = "LINK:L" . $map->links[$linkname]->id . ':' . ($direction + 2);
 
@@ -1008,28 +1003,28 @@ class WeatherMap extends WeatherMapBase
 
         $this->preAllocateScaleColours($gdScaleImage, $scaleReference);
 
-        $bgColour = $this->colours['DEFAULT']['KEYBG']['c1'];
-        $outlineColour = $this->colours['DEFAULT']['KEYOUTLINE']['c1'];
+        $bgColour = $this->colourtable['KEYBG'];
+        $outlineColour = $this->colourtable['KEYOUTLINE'];
+
+        wm_debug("BG is $bgColour, Outline is $outlineColour\n");
 
         if ($bgColour->isRealColour()) {
-            imagefilledrectangle($gdScaleImage, $boxLeft, $boxTop, $boxRight, $boxBottom, $this->colours['DEFAULT']['KEYBG'][$scaleReference]);
+            imagefilledrectangle($gdScaleImage, $boxLeft, $boxTop, $boxRight, $boxBottom, $bgColour->gdAllocate($gdScaleImage));
         }
 
         if ($outlineColour->isRealColour()) {
-            imagerectangle($gdScaleImage, $boxLeft, $boxTop, $boxRight, $boxBottom, $this->colours['DEFAULT']['KEYOUTLINE'][$scaleReference]);
+            imagerectangle($gdScaleImage, $boxLeft, $boxTop, $boxRight, $boxBottom, $outlineColour->gdAllocate($gdScaleImage));
         }
 
-        # $this->myimagestring($gdScaleImage, $font, $scaleLeft, $scaleBottom + $tileHeight * 2 + 2, $title, $this->colours['DEFAULT']['KEYTEXT'][$scaleReference]);
-        $fontObject->drawImageString($gdScaleImage, $scaleLeft, $scaleBottom + $tileHeight * 2 + 2, $title, $this->colours['DEFAULT']['KEYTEXT'][$scaleReference]);
+        $fontObject->drawImageString($gdScaleImage, $scaleLeft, $scaleBottom + $tileHeight * 2 + 2, $title, $this->colourtable['KEYTEXT']->gdAllocate($gdScaleImage));
 
         for ($percentage = 0; $percentage <= 100; $percentage++) {
             $xOffset = $percentage * $scaleFactor;
 
             if (($percentage % 25) == 0) {
-                imageline($gdScaleImage, $scaleLeft + $xOffset, $scaleTop - $tileHeight, $scaleLeft + $xOffset, $scaleBottom + $tileHeight, $this->colours['DEFAULT']['KEYTEXT'][$scaleReference]);
+                imageline($gdScaleImage, $scaleLeft + $xOffset, $scaleTop - $tileHeight, $scaleLeft + $xOffset, $scaleBottom + $tileHeight, $this->colourtable['KEYTEXT']->gdAllocate($gdScaleImage));
                 $labelString = sprintf("%d%%", $percentage);
-                # $this->myimagestring($gdScaleImage, $font, $scaleLeft + $xOffset + 2, $scaleTop - 2, $labelString, $this->colours['DEFAULT']['KEYTEXT'][$scaleReference]);
-                $fontObject->drawImageString($gdScaleImage, $scaleLeft + $xOffset + 2, $scaleTop - 2, $labelString, $this->colours['DEFAULT']['KEYTEXT'][$scaleReference]);
+                $fontObject->drawImageString($gdScaleImage, $scaleLeft + $xOffset + 2, $scaleTop - 2, $labelString, $this->colourtable['KEYTEXT']->gdAllocate($gdScaleImage));
             }
 
             list($col,) = $this->colourFromValue($percentage, $scaleName);
@@ -1086,34 +1081,30 @@ class WeatherMap extends WeatherMapBase
         $scale_bottom = $scale_top + $height;
         $box_bottom = $scale_bottom + $scalefactor + $tileheight / 2 + 4;
 
-        $scale_im = imagecreatetruecolor($box_right + 1, $box_bottom + 1);
+        $gdScaleImage = imagecreatetruecolor($box_right + 1, $box_bottom + 1);
         $scale_ref = 'gdref_legend_' . $scalename;
 
         // Start with a transparent box, in case the fill or outline colour is 'none'
-        imageSaveAlpha($scale_im, true);
-        $nothing = imagecolorallocatealpha($scale_im, 128, 0, 0, 127);
-        imagefill($scale_im, 0, 0, $nothing);
+        imageSaveAlpha($gdScaleImage, true);
+        $nothing = imagecolorallocatealpha($gdScaleImage, 128, 0, 0, 127);
+        imagefill($gdScaleImage, 0, 0, $nothing);
 
-        $this->preAllocateScaleColours($scale_im, $scale_ref);
+        $this->preAllocateScaleColours($gdScaleImage, $scale_ref);
 
-        $bgcol = new WMColour($this->colours['DEFAULT']['KEYBG']['red1'], $this->colours['DEFAULT']['KEYBG']['green1'], $this->colours['DEFAULT']['KEYBG']['blue1']);
-        $outlinecol = new WMColour($this->colours['DEFAULT']['KEYOUTLINE']['red1'], $this->colours['DEFAULT']['KEYOUTLINE']['green1'], $this->colours['DEFAULT']['KEYOUTLINE']['blue1']);
+        $bgColour = $this->colourtable['KEYBG'];
+        $outlineColour = $this->colourtable['KEYOUTLINE'];
 
-        if ($bgcol->isRealColour()) {
-            imagefilledrectangle($scale_im, $box_left, $box_top, $box_right, $box_bottom, $this->colours['DEFAULT']['KEYBG'][$scale_ref]);
+        wm_debug("BG is $bgColour, Outline is $outlineColour\n");
+
+        if ($bgColour->isRealColour()) {
+            imagefilledrectangle($gdScaleImage, $box_left, $box_top, $box_right, $box_bottom, $bgColour->gdAllocate($gdScaleImage));
         }
 
-        if ($outlinecol->isRealColour()) {
-            imagerectangle($scale_im, $box_left, $box_top, $box_right, $box_bottom, $this->colours['DEFAULT']['KEYOUTLINE'][$scale_ref]);
+        if ($outlineColour->isRealColour()) {
+            imagerectangle($gdScaleImage, $box_left, $box_top, $box_right, $box_bottom, $outlineColour->gdAllocate($gdScaleImage));
         }
 
-        $this->myimagestring($scale_im, $font, $scale_left - $scalefactor, $scale_top - $tileheight, $title, $this->colours['DEFAULT']['KEYTEXT']['gdref1']);
-
-        $updown = 1;
-        if ($inverted) {
-            $updown = -1;
-        }
-
+        $this->myimagestring($gdScaleImage, $font, $scale_left - $scalefactor, $scale_top - $tileheight, $title, $this->colourtable['KEYTEXT']->gdAllocate($gdScaleImage));
 
         for ($p = 0; $p <= 100; $p++) {
             if ($inverted) {
@@ -1123,20 +1114,19 @@ class WeatherMap extends WeatherMapBase
             }
 
             if (($p % 25) == 0) {
-                imageline($scale_im, $scale_left - $scalefactor, $scale_top + $delta_y, $scale_right + $scalefactor, $scale_top + $delta_y, $this->colours['DEFAULT']['KEYTEXT'][$scale_ref]);
+                imageline($gdScaleImage, $scale_left - $scalefactor, $scale_top + $delta_y, $scale_right + $scalefactor, $scale_top + $delta_y, $this->colourtable['KEYTEXT']->gdAllocate($gdScaleImage));
                 $labelstring = sprintf("%d%%", $p);
-                $this->myimagestring($scale_im, $font, $scale_right + $scalefactor * 2, $scale_top + $delta_y + $tileheight / 2, $labelstring, $this->colours['DEFAULT']['KEYTEXT'][$scale_ref]);
+                $this->myimagestring($gdScaleImage, $font, $scale_right + $scalefactor * 2, $scale_top + $delta_y + $tileheight / 2, $labelstring, $this->colourtable['KEYTEXT']->gdAllocate($gdScaleImage));
             }
 
             list($col,) = $this->colourFromValue($p, $scalename);
             if ($col->isRealColour()) {
-                # $cc = $col->gdallocate($scale_im);
-                imagefilledrectangle($scale_im, $scale_left, $scale_top + $delta_y - $scalefactor / 2, $scale_right, $scale_top + $delta_y + $scalefactor / 2, $col->gdAllocate($scale_im));
+                imagefilledrectangle($gdScaleImage, $scale_left, $scale_top + $delta_y - $scalefactor / 2, $scale_right, $scale_top + $delta_y + $scalefactor / 2, $col->gdAllocate($gdScaleImage));
             }
         }
 
-        imagecopy($im, $scale_im, $this->keyx[$scalename], $this->keyy[$scalename], 0, 0, imagesx($scale_im), imagesy($scale_im));
-        $this->keyimage[$scalename] = $scale_im;
+        imagecopy($im, $gdScaleImage, $this->keyx[$scalename], $this->keyy[$scalename], 0, 0, imagesx($gdScaleImage), imagesy($gdScaleImage));
+        $this->keyimage[$scalename] = $gdScaleImage;
 
         $origin_x = $this->keyx[$scalename];
         $origin_y = $this->keyy[$scalename];
@@ -1146,19 +1136,19 @@ class WeatherMap extends WeatherMapBase
         $this->imap_areas[] = $areaname;
     }
 
-    function drawLegendClassic($im, $scalename = "DEFAULT", $use_tags = false)
+    function drawLegendClassic($im, $scaleName = "DEFAULT", $useTags = false)
     {
-        $title = $this->keytext[$scalename];
+        $title = $this->keytext[$scaleName];
 
-        $colours = $this->colours[$scalename];
+        $colours = $this->colours[$scaleName];
         usort($colours, array("Weathermap", "scaleEntrySort"));
 
-        $nscales = $this->numscales[$scalename];
+        $nscales = $this->numscales[$scaleName];
 
         wm_debug("Drawing $nscales colours into SCALE\n");
 
-        $hide_zero = intval($this->get_hint("key_hidezero_" . $scalename));
-        $hide_percent = intval($this->get_hint("key_hidepercent_" . $scalename));
+        $hide_zero = intval($this->get_hint("key_hidezero_" . $scaleName));
+        $hide_percent = intval($this->get_hint("key_hidepercent_" . $scaleName));
 
         // did we actually hide anything?
         $hid_zero = false;
@@ -1169,21 +1159,19 @@ class WeatherMap extends WeatherMapBase
 
         $font = $this->keyfont;
 
-        $x = $this->keyx[$scalename];
-        $y = $this->keyy[$scalename];
+        $x = $this->keyx[$scaleName];
+        $y = $this->keyy[$scaleName];
 
-        list($tilewidth, $tileheight) = $this->myimagestringsize($font, "MMMM");
-        $tileheight = $tileheight * 1.1;
-        $tilespacing = $tileheight + 2;
+        list($tileWidth, $tileHeight) = $this->myimagestringsize($font, "MMMM");
+        $tileHeight = $tileHeight * 1.1;
+        $tileSpacing = $tileHeight + 2;
 
-
-
-        if (($this->keyx[$scalename] >= 0) && ($this->keyy[$scalename] >= 0)) {
+        if (($this->keyx[$scaleName] >= 0) && ($this->keyy[$scaleName] >= 0)) {
             list($minwidth,) = $this->myimagestringsize($font, 'MMMM 100%-100%');
             list($minminwidth,) = $this->myimagestringsize($font, 'MMMM ');
             list($boxwidth,) = $this->myimagestringsize($font, $title);
 
-            if ($use_tags) {
+            if ($useTags) {
                 $max_tag = 0;
                 foreach ($colours as $colour) {
                     if (isset($colour['tag'])) {
@@ -1207,36 +1195,35 @@ class WeatherMap extends WeatherMapBase
                 $boxwidth = $minwidth;
             }
 
-            $boxheight = $tilespacing * ($nscales + 1) + 10;
+            $boxheight = $tileSpacing * ($nscales + 1) + 10;
 
             $boxx = 0;
             $boxy = 0;
 
             wm_debug("Scale Box is %dx%d\n", $boxwidth + 1, $boxheight + 1);
 
-            $scale_im = imagecreatetruecolor($boxwidth + 1, $boxheight + 1);
+            $gdScaleImage = imagecreatetruecolor($boxwidth + 1, $boxheight + 1);
 
             // Start with a transparent box, in case the fill or outline colour is 'none'
-            imageSaveAlpha($scale_im, true);
-            $nothing = imagecolorallocatealpha($scale_im, 128, 0, 0, 127);
-            imagefill($scale_im, 0, 0, $nothing);
+            imageSaveAlpha($gdScaleImage, true);
+            $nothing = imagecolorallocatealpha($gdScaleImage, 128, 0, 0, 127);
+            imagefill($gdScaleImage, 0, 0, $nothing);
 
-            $scale_ref = 'gdref_legend_' . $scalename;
-            $this->preAllocateScaleColours($scale_im, $scale_ref);
+            $scale_ref = 'gdref_legend_' . $scaleName;
+            $this->preAllocateScaleColours($gdScaleImage, $scale_ref);
 
-            $bgcol = new WMColour($this->colours['DEFAULT']['KEYBG']['red1'], $this->colours['DEFAULT']['KEYBG']['green1'], $this->colours['DEFAULT']['KEYBG']['blue1']);
-            $outlinecol = new WMColour($this->colours['DEFAULT']['KEYOUTLINE']['red1'], $this->colours['DEFAULT']['KEYOUTLINE']['green1'], $this->colours['DEFAULT']['KEYOUTLINE']['blue1']);
+            $bgColour = $this->colourtable['KEYBG'];
+            $outlineColour = $this->colourtable['KEYOUTLINE'];
 
-
-            if ($bgcol->isRealColour()) {
-                imagefilledrectangle($scale_im, $boxx, $boxy, $boxx + $boxwidth, $boxy + $boxheight, $this->colours['DEFAULT']['KEYBG'][$scale_ref]);
+            if ($bgColour->isRealColour()) {
+                imagefilledrectangle($gdScaleImage, $boxx, $boxy, $boxx + $boxwidth, $boxy + $boxheight, $bgColour->gdAllocate($gdScaleImage));
             }
 
-            if ($outlinecol->isRealColour()) {
-                imagerectangle($scale_im, $boxx, $boxy, $boxx + $boxwidth, $boxy + $boxheight, $this->colours['DEFAULT']['KEYOUTLINE'][$scale_ref]);
+            if ($outlineColour->isRealColour()) {
+                imagerectangle($gdScaleImage, $boxx, $boxy, $boxx + $boxwidth, $boxy + $boxheight, $outlineColour->gdAllocate($gdScaleImage));
             }
 
-            $this->myimagestring($scale_im, $font, $boxx + 4, $boxy + 4 + $tileheight, $title, $this->colours['DEFAULT']['KEYTEXT'][$scale_ref]);
+            $this->myimagestring($gdScaleImage, $font, $boxx + 4, $boxy + 4 + $tileHeight, $title, $this->colourtable['KEYTEXT']->gdAllocate($gdScaleImage));
 
             $i = 1;
 
@@ -1248,32 +1235,32 @@ class WeatherMap extends WeatherMapBase
 
                     #  debug("$i: drawing\n");
                     if (($hide_zero == 0) || $colour['key'] != '0_0') {
-                        $y = $boxy + $tilespacing * $i + 8;
+                        $y = $boxy + $tileSpacing * $i + 8;
                         $x = $boxx + 6;
 
                         $fudgefactor = 0;
                         if ($hid_zero && $colour['bottom'] == 0) {
                             // calculate a small offset that can be added, which will hide the zero-value in a
                             // gradient, but not make the scale incorrect. A quarter of a pixel should do it.
-                            $fudgefactor = ($colour['top'] - $colour['bottom']) / ($tilewidth * 4);
+                            $fudgefactor = ($colour['top'] - $colour['bottom']) / ($tileWidth * 4);
                         }
 
                         // if it's a gradient, red2 is defined, and we need to sweep the values
                         if (isset($colour['c2'])) {
-                            for ($n = 0; $n <= $tilewidth; $n++) {
-                                $value = $fudgefactor + $colour['bottom'] + ($n / $tilewidth) * ($colour['top'] - $colour['bottom']);
-                                list($ccol,) = $this->colourFromValue($value, $scalename, "", false);
-                                $col = $ccol->gdallocate($scale_im);
-                                imagefilledrectangle($scale_im, $x + $n, $y, $x + $n, $y + $tileheight, $col);
+                            for ($n = 0; $n <= $tileWidth; $n++) {
+                                $value = $fudgefactor + $colour['bottom'] + ($n / $tileWidth) * ($colour['top'] - $colour['bottom']);
+                                list($ccol,) = $this->colourFromValue($value, $scaleName, "", false);
+                                $col = $ccol->gdallocate($gdScaleImage);
+                                imagefilledrectangle($gdScaleImage, $x + $n, $y, $x + $n, $y + $tileHeight, $col);
                             }
                         } else {
                             // pick a value in the middle...
-                            list($ccol,) = $this->colourFromValue($value, $scalename, "", false);
-                            $col = $ccol->gdallocate($scale_im);
-                            imagefilledrectangle($scale_im, $x, $y, $x + $tilewidth, $y + $tileheight, $col);
+                            list($ccol,) = $this->colourFromValue($value, $scaleName, "", false);
+                            $col = $ccol->gdallocate($gdScaleImage);
+                            imagefilledrectangle($gdScaleImage, $x, $y, $x + $tileWidth, $y + $tileHeight, $col);
                         }
 
-                        if ($use_tags) {
+                        if ($useTags) {
                             $labelstring = "";
                             if (isset($colour['tag'])) {
                                 $labelstring = $colour['tag'];
@@ -1285,18 +1272,18 @@ class WeatherMap extends WeatherMapBase
                             }
                         }
 
-                        $this->myimagestring($scale_im, $font, $x + 4 + $tilewidth, $y + $tileheight, $labelstring, $this->colours['DEFAULT']['KEYTEXT'][$scale_ref]);
+                        $this->myimagestring($gdScaleImage, $font, $x + 4 + $tileWidth, $y + $tileHeight, $labelstring, $this->colourtable['KEYTEXT']->gdAllocate($gdScaleImage));
                         $i++;
                     }
                 }
             }
 
-            imagecopy($im, $scale_im, $this->keyx[$scalename], $this->keyy[$scalename], 0, 0, imagesx($scale_im), imagesy($scale_im));
-            $this->keyimage[$scalename] = $scale_im;
+            imagecopy($im, $gdScaleImage, $this->keyx[$scaleName], $this->keyy[$scaleName], 0, 0, imagesx($gdScaleImage), imagesy($gdScaleImage));
+            $this->keyimage[$scaleName] = $gdScaleImage;
 
-            $areaname = "LEGEND:$scalename";
+            $areaname = "LEGEND:$scaleName";
 
-            $this->imap->addArea("Rectangle", $areaname, '', array($this->keyx[$scalename], $this->keyy[$scalename], $this->keyx[$scalename] + $boxwidth, $this->keyy[$scalename] + $boxheight));
+            $this->imap->addArea("Rectangle", $areaname, '', array($this->keyx[$scaleName], $this->keyy[$scaleName], $this->keyx[$scaleName] + $boxwidth, $this->keyy[$scaleName] + $boxheight));
             $this->imap_areas[] = $areaname;
         }
     }

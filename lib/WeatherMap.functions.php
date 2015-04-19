@@ -376,7 +376,15 @@ function wmFormatNumber($number, $precision = 2, $trailing_zeroes = 0)
     return ($integer . "." . $decimal);
 }
 
-function wmFormatNumberWithMetricPrefix($number, $kilo = 1000, $decimals = 1, $below_one = true)
+/**
+ * Format a number using the most-appropriate SI suffix
+ *
+ * @param float $number The number to format
+ * @param int $kilo What value to use for a K (1000 or 1024 usually)
+ * @param int $decimals how many decimal places to display
+ * @return string the resulting formatted number
+ */
+function wmFormatNumberWithMetricPrefix($number, $kilo = 1000, $decimals = 1)
 {
     $lookup = array(
         "T" => $kilo * $kilo * $kilo * $kilo,
@@ -401,10 +409,6 @@ function wmFormatNumberWithMetricPrefix($number, $kilo = 1000, $decimals = 1, $b
     }
 
     foreach ($lookup as $suffix=>$unit) {
-        if ((false===$below_one) && $unit < 1) {
-            break;
-        }
-
         if ($number >= $unit) {
             return $prefix . wmFormatNumber($number/$unit, $decimals) . $suffix;
         }

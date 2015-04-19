@@ -82,10 +82,9 @@ class MiscFunctionsTest extends PHPUnit_Framework_TestCase {
         $this->assertEquals( "2.05K", wmFormatNumberWithMetricPrefix(2048,1000,2) );
 
         // fractional formatting...
-        $this->assertEquals( "0.00", wmFormatNumberWithMetricPrefix(0.001,1000,2,false) );
-        $this->assertEquals( "1m", wmFormatNumberWithMetricPrefix(0.001,1000,2,true) );
-        $this->assertEquals( "1u", wmFormatNumberWithMetricPrefix(0.000001,1000,2,true) );
-        $this->assertEquals( "1n", wmFormatNumberWithMetricPrefix(0.000000001,1000,2,true) );
+        $this->assertEquals( "1m", wmFormatNumberWithMetricPrefix(0.001,1000,2) );
+        $this->assertEquals( "1u", wmFormatNumberWithMetricPrefix(0.000001,1000,2) );
+        $this->assertEquals( "1n", wmFormatNumberWithMetricPrefix(0.000000001,1000,2) );
 
         // negatives
         $this->assertEquals( "-2K", wmFormatNumberWithMetricPrefix(-2048,1024,2) );

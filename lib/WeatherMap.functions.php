@@ -69,13 +69,13 @@ function wm_debug($string)
         
         $calling_fn = "";
         if (function_exists("debug_backtrace")) {
-            $bt = debug_backtrace();
+            $backtrace = debug_backtrace();
             $index = 1;
             
-            $function = (true === isset($bt[$index]['function'])) ? $bt[$index]['function'] : '';
+            $function = (true === isset($backtrace[$index]['function'])) ? $backtrace[$index]['function'] : '';
             $index = 0;
-            $file = (true === isset($bt[$index]['file'])) ? basename($bt[$index]['file']) : '';
-            $line = (true === isset($bt[$index]['line'])) ? $bt[$index]['line'] : '';
+            $file = (true === isset($backtrace[$index]['file'])) ? basename($backtrace[$index]['file']) : '';
+            $line = (true === isset($backtrace[$index]['line'])) ? $backtrace[$index]['line'] : '';
             
             $calling_fn = " [$function@$file:$line]";
             
@@ -141,31 +141,75 @@ function wm_value_or_null($value)
     return ($value === null ? '{null}' : $value);
 }
 
-
-
 /** Die, leaving a stack-trace. Mostly used along with the unit tests to figure out if
  *  a piece of old-looking code is really redundant.
  *
- * @param string $message
+ * @param string $message message to be show in exception
+ * @throws WMException that's ALL it does
  */
 function wm_die_with_trace($message = "Dying here")
 {
     debug_print_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS);
-    die($message);
+    throw new WMException($message);
 }
 
-function jsEscape($str, $wrap = true)
+function jsEscape($str)
 {
     $str = str_replace('\\', '\\\\', $str);
     $str = str_replace('"', '\\"', $str);
 
-    if ($wrap) {
-        $str = '"' . $str . '"';
-    }
+    $str = '"' . $str . '"';
 
     return ($str);
 }
 
+function wmFormatTimeTicks($value, $prefix, $tokenCharacter, $precision)
+{
+    $joinCharacter = " ";
+    if ($prefix == "-") {
+        $joinCharacter = "";
+    }
+
+    // special formatting for time_t (t) and SNMP TimeTicks (T)
+    if ($tokenCharacter == "T") {
+        $value = $value / 100;
+    }
+
+    $results = array();
+    $periods = array(
+        "y" => 24 * 60 * 60 * 365,
+        "d" => 24 * 60 * 60,
+        "h" => 60 * 60,
+        "m" => 60,
+        "s" => 1
+    );
+    foreach ($periods as $periodSuffix => $timePeriod) {
+        $slot = floor($value / $timePeriod);
+        $value = $value - $slot * $timePeriod;
+
+        if ($slot > 0) {
+            $results [] = sprintf("%d%s", $slot, $periodSuffix);
+        }
+    }
+    if (sizeof($results) == 0) {
+        $results [] = "0s";
+    }
+    return implode($joinCharacter, array_slice($results, 0, $precision));
+}
+
+/**
+ * Extend the real sprintf() with some weathermap-specific additional tokens.
+ * %k for kilo-based suffixes (KGMT)
+ * %T and %t for SNMP timeticks
+ *
+ * Assumptions - this is called from ProcessString, so there will only ever be one token in
+ * the format string, and nothing else.
+ *
+ * @param $format a format string
+ * @param $value a value to be formatted
+ * @param int $kilo the base value for kilo,mega,giga calculations (1000 or 1024 usually)
+ * @return string the resulting string
+ */
 function wmSprintf($format, $value, $kilo = 1000)
 {
     // if we get a null, it probably means no-data from the datasource plugin
@@ -173,65 +217,41 @@ function wmSprintf($format, $value, $kilo = 1000)
     if ($value === null) {
         return "?";
     }
-    
-    if (preg_match("/%(\d*\.?\d*)k/", $format, $matches)) {
-        $spec = $matches[1];
+
+    if (preg_match("/%(\d*)\.?(\d*)k/", $format, $matches)) {
         $places = 2;
-        if ($spec != '') {
-            preg_match("/(\d*)\.?(\d*)/", $spec, $matches);
-            if ($matches [2] != '') {
-                $places = $matches[2];
-            }
-            // we don't really need the justification (pre-.) part...
+        // we don't really need the justification (pre-.) part...
+        if ($matches[2] != "") {
+            $places = intval($matches[2]);
         }
-        $result = wmFormatNumberWithMetricPrefix($value, $kilo, $places);
-        $output = preg_replace("/%" . $spec . "k/", $format, $result);
-    } elseif (preg_match("/%(-*)(\d*)([Tt])/", $format, $matches)) {
-        $spec = $matches[3];
+        return wmFormatNumberWithMetricPrefix($value, $kilo, $places);
+
+    } elseif (preg_match('/%(-*)(\d*)([Tt])/', $format, $matches)) {
         $precision = ($matches[2] == '' ? 10 : intval($matches[2]));
-        $joinchar = " ";
-        if ($matches[1] == "-") {
-            $joinchar = "";
-        }
 
-        // special formatting for time_t (t) and SNMP TimeTicks (T)
-        if ($spec == "T") {
-            $value = $value / 100;
-        }
-
-        $results = array();
-        $periods = array(
-                "y" => 24 * 60 * 60 * 365,
-                "d" => 24 * 60 * 60,
-                "h" => 60 * 60,
-                "m" => 60,
-                "s" => 1
-        );
-        foreach ($periods as $periodsuffix => $timeperiod) {
-            $slot = floor($value / $timeperiod);
-            $value = $value - $slot * $timeperiod;
-
-            if ($slot > 0) {
-                $results [] = sprintf("%d%s", $slot, $periodsuffix);
-            }
-        }
-        if (sizeof($results) == 0) {
-            $results [] = "0s";
-        }
-        $output = implode($joinchar, array_slice($results, 0, $precision));
-    } else {
-        $output = sprintf($format, $value);
+        return wmFormatTimeTicks($value, $matches[1], $matches[3], $precision);
     }
-    return $output;
+
+    return sprintf($format, $value);
 }
 
 
-// PHP < 5.3 doesn't support anonymous functions, so here's a little function for screenshotify
+// PHP < 5.3 doesn't support anonymous functions, so here's a little function for wmStringAnonymise (screenshotify)
 function wmStringAnonymiseReplacer($matches)
 {
     return str_repeat('x', strlen($matches[1]));
 }
 
+/**
+ * Aka 'screenshotify' - takes a string and masks out any word longer than 2 characters
+ * Also turns any IP address to 127.0.0.1
+ *
+ * Intended to allow a quick global setting to remove all private (text) information from
+ * a map for sharing.
+ *
+ * @param string $input The string to clean
+ * @return string the cleaned result
+ */
 function wmStringAnonymise($input)
 {
     $output = $input;
@@ -243,84 +263,86 @@ function wmStringAnonymise($input)
 }
 
 
-function wmInterpretNumberWithMetricPrefix($instring, $kilo = 1000)
+function wmInterpretNumberWithMetricPrefix($inputString, $kilo = 1000)
 {
     $matches = 0;
 
-    if (preg_match("/([0-9\.]+)(M|G|K|T|m|u)/", $instring, $matches)) {
+    $lookup = array(
+        "K" => $kilo,
+        "M" => $kilo * $kilo,
+        "G" => $kilo * $kilo * $kilo,
+        "T" => $kilo * $kilo * $kilo * $kilo,
+        "m" => 1/$kilo,
+        "u" => 1/($kilo*$kilo)
+    );
+
+    if (preg_match('/([0-9\.]+)(M|G|K|T|m|u)/', $inputString, $matches)) {
         $number = floatval($matches[1]);
-        
-        switch ($matches [2]) {
-            case 'K':
-                return $number * $kilo;
-            case 'M':
-                return $number * $kilo * $kilo;
-            case 'G':
-                return $number * $kilo * $kilo * $kilo;
-            case 'T':
-                return $number * $kilo * $kilo * $kilo * $kilo;
-            case 'm':
-                return $number / $kilo;
-            case 'u':
-                return $number / ($kilo * $kilo);
+
+        if (isset($lookup[$matches[2]])) {
+            return $number * $lookup[$matches[2]];
         }
-    } else {
-        $number = floatval($instring);
     }
-    
-    return ($number);
+    return floatval($inputString);
+}
+
+function wmCalculateCompassOffset($compassPoint, $factor, $width, $height)
+{
+    $compassPoints = array(
+        "N" => array(0, -1),
+        "S" => array(0, 1),
+        "E" => array(1, 0),
+        "W" => array(-1, 0),
+        "NE" => array(1, -1),
+        "NW" => array(-1, -1),
+        "SE" => array(1, 1),
+        "SW" => array(-1, 1),
+        "C" => array(0, 0)
+    );
+    $multiply = 1;
+    if (null !== $factor) {
+        $multiply = intval($factor) / 100;
+        wm_debug("Percentage compass offset: multiply by $multiply");
+    }
+
+    // divide by 2, since the actual offset will only ever be half of the
+    // width and height
+    $height = ($height * $multiply) / 2;
+    $width = ($width * $multiply) / 2;
+
+    $offsets = $compassPoints[strtoupper($compassPoint)];
+    $offsets[0] *= $width;
+    $offsets[1] *= $height;
+
+    return $offsets;
 }
 
 // given a compass-point, and a width & height, return a tuple of the x,y offsets
 function wmCalculateOffset($offsetstring, $width, $height)
 {
-    if (preg_match("/^([-+]?\d+):([-+]?\d+)$/", $offsetstring, $matches)) {
+
+    if (preg_match('/^([-+]?\d+):([-+]?\d+)$/', $offsetstring, $matches)) {
         wm_debug("Numeric Offset found\n");
         return (array($matches[1], $matches[2]));
-    } elseif (preg_match("/(NE|SE|NW|SW|N|S|E|W|C)(\d+)?$/i", $offsetstring, $matches)) {
-        $multiply = 1;
-        if (isset($matches[2])) {
-            $multiply = intval($matches[2]) / 100;
-            wm_debug("Percentage compass offset: multiply by $multiply");
-        }
-        
-        $height = $height * $multiply;
-        $width = $width * $multiply;
-        
-        switch (strtoupper($matches[1])) {
-            case 'N':
-                return (array (0, -$height / 2));
-            case 'S':
-                return (array (0, $height / 2));
-            case 'E':
-                return (array (+$width / 2, 0));
-            case 'W':
-                return (array (-$width / 2, 0));
-            case 'NW':
-                return (array (-$width / 2, -$height / 2));
-            case 'NE':
-                return (array ($width / 2, -$height / 2));
-            case 'SW':
-                return (array (-$width / 2, $height / 2));
-            case 'SE':
-                return (array ($width / 2, $height / 2));
-            case 'C': // FALL THROUGH
-            default:
-                return (array (0, 0));
-        }
-    } elseif (preg_match("/(-?\d+)r(\d+)$/i", $offsetstring, $matches)) {
+    }
+
+    if (preg_match('/(NE|SE|NW|SW|N|S|E|W|C)(\d+)?$/i', $offsetstring, $matches)) {
+        return wmCalculateCompassOffset($matches[1], (isset($matches[2]) ? $matches[2] : null), $width, $height);
+    }
+
+    if (preg_match('/(-?\d+)r(\d+)$/i', $offsetstring, $matches)) {
         $angle = intval($matches[1]);
         $distance = intval($matches[2]);
+        $rangle = deg2rad($angle);
+
+        $offsets = array($distance * sin($rangle), -$distance * cos($rangle));
         
-        $x = $distance * sin(deg2rad($angle));
-        $y = - $distance * cos(deg2rad($angle));
-        
-        return (array($x, $y));
-    } else {
-        // TODO - where is the named offset handling!!
-        wm_warn("Got a position offset that didn't make sense ($offsetstring).");
-        return (array (0, 0));
+        return $offsets;
     }
+
+    // TODO - where is the named offset handling!!
+    wm_warn("Got a position offset that didn't make sense ($offsetstring).");
+    return (array (0, 0));
 }
 
 // These next two are based on perl's Number::Format module
@@ -349,14 +371,24 @@ function wmFormatNumber($number, $precision = 2, $trailing_zeroes = 0)
     
     if ($decimal == '') {
         return ($integer);
-    } else {
-        return ($integer . "." . $decimal);
     }
+
+    return ($integer . "." . $decimal);
 }
 
 function wmFormatNumberWithMetricPrefix($number, $kilo = 1000, $decimals = 1, $below_one = true)
 {
-    $suffix = '';
+    $lookup = array(
+        "T" => $kilo * $kilo * $kilo * $kilo,
+        "G" => $kilo * $kilo * $kilo,
+        "M" => $kilo * $kilo,
+        "K" => $kilo,
+        "" => 1,
+        "m" => 1/$kilo,
+        "u" => 1/($kilo*$kilo),
+        "n" => 1/($kilo*$kilo*$kilo)
+    );
+
     $prefix = '';
 
     if ($number == 0) {
@@ -367,51 +399,35 @@ function wmFormatNumberWithMetricPrefix($number, $kilo = 1000, $decimals = 1, $b
         $number = -$number;
         $prefix = '-';
     }
-    
-    $mega = $kilo * $kilo;
-    $giga = $mega * $kilo;
-    $tera = $giga * $kilo;
-    
-    $milli = 1 / $kilo;
-    $micro = 1 / $mega;
-    $nano = 1 / $giga;
-    
-    if ($number >= $tera) {
-        $number /= $tera;
-        $suffix = "T";
-    } elseif ($number >= $giga) {
-        $number /= $giga;
-        $suffix = "G";
-    } elseif ($number >= $mega) {
-        $number /= $mega;
-        $suffix = "M";
-    } elseif ($number >= $kilo) {
-        $number /= $kilo;
-        $suffix = "K";
-    } elseif ($number >= 1) {
-        // $number = $number;
-        $suffix = "";
-    } elseif (($below_one === true) && ($number >= $milli)) {
-        $number /= $milli;
-        $suffix = "m";
-    } elseif (($below_one === true) && ($number >= $micro)) {
-        $number /= $micro;
-        $suffix = "u";
-    } elseif (($below_one === true) && ($number >= $nano)) {
-        $number /= $nano;
-        $suffix = "n";
+
+    foreach ($lookup as $suffix=>$unit) {
+        if ((false===$below_one) && $unit < 1) {
+            break;
+        }
+
+        if ($number >= $unit) {
+            return $prefix . wmFormatNumber($number/$unit, $decimals) . $suffix;
+        }
     }
-    
-    $result = $prefix . wmFormatNumber($number, $decimals) . $suffix;
-    return ($result);
+
+    return $prefix . wmFormatNumber($number, $decimals);
 }
 
-// rotate a list of points around cx,cy by an angle in radians, IN PLACE
+/**
+ * rotate a list of points around cx,cy by an angle in radians, IN PLACE
+ *
+ * TODO: This should be using WMPoints! (And should be a method of WMPoint)
+ *
+ * @param $points array of ordinates (x,y,x,y,x,y...)
+ * @param $centre_x centre of rotation, X coordinate
+ * @param $centre_y centre of rotation, Y coordinate
+ * @param int $angle angle in radians
+ */
 function rotateAboutPoint(&$points, $centre_x, $centre_y, $angle = 0)
 {
-    $npoints = count($points) / 2;
+    $nPoints = count($points) / 2;
 
-    for ($i = 0; $i < $npoints; $i ++) {
+    for ($i = 0; $i < $nPoints; $i ++) {
         $delta_x = $points[$i * 2] - $centre_x;
         $delta_y = $points[$i * 2 + 1] - $centre_y;
         $rotated_x = $delta_x * cos($angle) - $delta_y * sin($angle);
@@ -428,16 +444,22 @@ function rotateAboutPoint(&$points, $centre_x, $centre_y, $angle = 0)
 
 
 
-function wmDrawMarkerCross($gdImage, $colour, $x, $y, $size = 5)
+function wmDrawMarkerCross($gdImage, $colour, $point, $size = 5)
 {
+    $x = $point->x;
+    $y = $point->y;
+
     imageline($gdImage, $x, $y, $x + $size, $y + $size, $colour);
     imageline($gdImage, $x, $y, $x - $size, $y + $size, $colour);
     imageline($gdImage, $x, $y, $x + $size, $y - $size, $colour);
     imageline($gdImage, $x, $y, $x - $size, $y - $size, $colour);
 }
 
-function wmDrawMarkerDiamond($gdImage, $colour, $x, $y, $size = 10)
+function wmDrawMarkerDiamond($gdImage, $colour, $point, $size = 10)
 {
+    $x = $point->x;
+    $y = $point->y;
+
     $points = array ();
     
     $points[] = $x - $size;
@@ -457,8 +479,11 @@ function wmDrawMarkerDiamond($gdImage, $colour, $x, $y, $size = 10)
     imagepolygon($gdImage, $points, $num_points, $colour);
 }
 
-function wmDrawMarkerBox($gdImage, $colour, $x, $y, $size = 10)
+function wmDrawMarkerBox($gdImage, $colour, $point, $size = 10)
 {
+    $x = $point->x;
+    $y = $point->y;
+
     $points = array ();
     
     $points[] = $x - $size;
@@ -478,8 +503,11 @@ function wmDrawMarkerBox($gdImage, $colour, $x, $y, $size = 10)
     imagepolygon($gdImage, $points, $num_points, $colour);
 }
 
-function wmDrawMarkerCircle($gdImage, $colour, $x, $y, $size = 10)
+function wmDrawMarkerCircle($gdImage, $colour, $point, $size = 10)
 {
+    $x = $point->x;
+    $y = $point->y;
+
     imagearc($gdImage, $x, $y, $size, $size, 0, 360, $colour);
 }
 
@@ -494,21 +522,21 @@ function OutputHTML($htmlfile, &$map, $refresh = 300)
 {
     global $WEATHERMAP_VERSION;
     
-    $fd = fopen($htmlfile, 'w');
-    fwrite($fd, '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head>');
+    $filehandle = fopen($htmlfile, 'w');
+    fwrite($filehandle, '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head>');
     if ($map->htmlstylesheet != '') {
-        fwrite($fd, '<link rel="stylesheet" type="text/css" href="' . $map->htmlstylesheet . '" />');
+        fwrite($filehandle, '<link rel="stylesheet" type="text/css" href="' . $map->htmlstylesheet . '" />');
     }
-    fwrite($fd, '<meta http-equiv="refresh" content="' . intval($refresh) . '" /><title>' . $map->processString($map->title, $map) . '</title></head><body>');
+    fwrite($filehandle, '<meta http-equiv="refresh" content="' . intval($refresh) . '" /><title>' . $map->processString($map->title, $map) . '</title></head><body>');
     
     if ($map->htmlstyle == "overlib") {
-        fwrite($fd, "<div id=\"overDiv\" style=\"position:absolute; visibility:hidden; z-index:1000;\"></div>\n");
-        fwrite($fd, "<script type=\"text/javascript\" src=\"vendor/overlib.js\"><!-- overLIB (c) Erik Bosrup --></script> \n");
+        fwrite($filehandle, "<div id=\"overDiv\" style=\"position:absolute; visibility:hidden; z-index:1000;\"></div>\n");
+        fwrite($filehandle, "<script type=\"text/javascript\" src=\"vendor/overlib.js\"><!-- overLIB (c) Erik Bosrup --></script> \n");
     }
     
-    fwrite($fd, $map->makeHTML());
-    fwrite($fd, '<hr /><span id="byline">Network Map created with <a href="http://www.network-weathermap.com/?vs=' . $WEATHERMAP_VERSION . '">PHP Network Weathermap v' . $WEATHERMAP_VERSION . '</a></span></body></html>');
-    fclose($fd);
+    fwrite($filehandle, $map->makeHTML());
+    fwrite($filehandle, '<hr /><span id="byline">Network Map created with <a href="http://www.network-weathermap.com/?vs=' . $WEATHERMAP_VERSION . '">PHP Network Weathermap v' . $WEATHERMAP_VERSION . '</a></span></body></html>');
+    fclose($filehandle);
 }
 
 /**

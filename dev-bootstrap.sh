@@ -1,7 +1,13 @@
 #!/bin/sh
 
-# First, we'll need Bower for web packages, and composer for PHP packages
+# the config-based tests require imagemagick's compare command
+sudo apt-get install imagemagick
+# phpdoc needs the XSL extension
+sudo apt-get install php5-xsl graphviz
+# the documentation compilation process needs xsltproc
+sudo apt-get install xsltproc
 
+# First, we'll need Bower for web packages, and composer for PHP packages
 sudo apt-get install nodejs
 sudo npm install -g bower
 
@@ -11,7 +17,7 @@ chmod +x composer.phar
 bower install
 ./composer.phar install
 
-# the config-based tests require imagemagick's compare command
-sudo apt-get install imagemagick
+# create a few empty directories if necessary 
+mkdir docs/dev/generated dist build build/logs
 
 echo "Should be ready to go! Try a ./test.sh"

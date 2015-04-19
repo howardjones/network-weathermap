@@ -20,7 +20,7 @@ class WeatherMapScale
 
     var $scaleType;
 
-    function WeatherMapScale($name, &$owner)
+    function __construct($name, &$owner)
     {
         $this->name = $name;
         $this->scaleType = "percent";
@@ -28,7 +28,7 @@ class WeatherMapScale
         $this->Reset($owner);
     }
 
-    function Reset(&$owner)
+    public function Reset(&$owner)
     {
         $this->owner = $owner;
 
@@ -51,12 +51,12 @@ class WeatherMapScale
 
     }
 
-    function spanCount()
+    public function spanCount()
     {
         return count($this->colours);
     }
 
-    function populateDefaults()
+    public function populateDefaults()
     {
         if ($this->spanCount() == 0) {
             wm_debug("Adding default SCALE colour set (no SCALE lines seen).\n");
@@ -79,7 +79,7 @@ class WeatherMapScale
         }
     }
 
-    function SetColour($name, $colour)
+    public function SetColour($name, $colour)
     {
         assert(isset($this->owner));
 
@@ -103,7 +103,7 @@ class WeatherMapScale
         }
     }
 
-    function AddSpan($lowValue, $highValue, $lowColour, $highColour = null, $tag = '')
+    public function AddSpan($lowValue, $highValue, $lowColour, $highColour = null, $tag = '')
     {
         assert(isset($this->owner));
         $key = $lowValue . '_' . $highValue;
@@ -117,7 +117,7 @@ class WeatherMapScale
         wm_debug("%s %s->%s", $this->name, $lowValue, $highValue);
     }
 
-    function getConfig()
+    public function getConfig()
     {
         assert(isset($this->owner));
         // TODO - These should all check against the defaults
@@ -210,7 +210,7 @@ class WeatherMapScale
         return $output;
     }
 
-    function ColourFromValue($value, $name = '', $is_percent = true, $scale_warning = true)
+    public function ColourFromValue($value, $name = '', $is_percent = true, $scale_warning = true)
     {
         $col = new WMColour(0, 0, 0);
         $tag = '';
@@ -324,9 +324,7 @@ class WeatherMapScale
         $this->imap->addArea("Rectangle", $areaName, '', array($xTarget, $yTarget, $xTarget + $width, $yTarget + $height));
         // TODO: stop tracking z-order seperately. addArea() should take the z layer
         $this->imap_areas[] = $areaName;
-
     }
-
 
     function DrawLegendClassic($useTags = false)
     {
@@ -360,10 +358,8 @@ class WeatherMapScale
         $colours = $this->colours;
 
         foreach ($colours as $colour) {
-            // if (!$colour['special']) {
-                $min = min($colour['bottom'], $min);
-                $max = max($colour['top'], $max);
-           // }
+            $min = min($colour['bottom'], $min);
+            $max = max($colour['top'], $max);
         }
 
         return array($min, $max);

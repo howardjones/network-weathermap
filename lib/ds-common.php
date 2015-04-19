@@ -17,7 +17,12 @@ function UpdateCactiData(&$item, $local_data_id)
         $r3 =
             db_fetch_assoc(
                 sprintf(
-                    "select data_local.host_id, field_name,field_value from data_local,host_snmp_cache  USE INDEX (host_id) where data_local.id=%d and data_local.host_id=host_snmp_cache.host_id and data_local.snmp_index=host_snmp_cache.snmp_index and data_local.snmp_query_id=host_snmp_cache.snmp_query_id",
+                    "select data_local.host_id, field_name,field_value
+                     from data_local,host_snmp_cache  USE INDEX (host_id)
+                     where data_local.id=%d
+                       and data_local.host_id=host_snmp_cache.host_id
+                       and data_local.snmp_index=host_snmp_cache.snmp_index
+                       and data_local.snmp_query_id=host_snmp_cache.snmp_query_id",
                     $local_data_id
                 )
             );
@@ -63,7 +68,12 @@ function UpdateCactiData(&$item, $local_data_id)
         $r4 =
             db_fetch_row(
                 sprintf(
-                    "SELECT DISTINCT graph_templates_item.local_graph_id,title_cache FROM graph_templates_item,graph_templates_graph,data_template_rrd WHERE data_template_rrd.id=task_item_id and graph_templates_graph.local_graph_id = graph_templates_item.local_graph_id and local_data_id=%d LIMIT 1",
+                    "SELECT DISTINCT graph_templates_item.local_graph_id,title_cache
+                      FROM graph_templates_item,graph_templates_graph,data_template_rrd
+                      WHERE data_template_rrd.id=task_item_id
+                        and graph_templates_graph.local_graph_id = graph_templates_item.local_graph_id
+                        and local_data_id=%d
+                      LIMIT 1",
                     $local_data_id
                 )
             );

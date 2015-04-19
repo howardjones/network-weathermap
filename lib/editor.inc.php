@@ -54,7 +54,10 @@ if (!function_exists("json_encode")) {
             }
     
             if (is_string($a)) {
-                static $jsonReplaces = array(array("\\", "/", "\n", "\t", "\r", "\b", "\f", '"'), array('\\\\', '\\/', '\\n', '\\t', '\\r', '\\b', '\\f', '\"'));
+                static $jsonReplaces = array(
+                    array("\\", "/", "\n", "\t", "\r", "\b", "\f", '"'),
+                    array('\\\\', '\\/', '\\n', '\\t', '\\r', '\\b', '\\f', '\"')
+                );
                 return '"' . str_replace($jsonReplaces[0], $jsonReplaces[1], $a) . '"';
             } else {
                 return $a;

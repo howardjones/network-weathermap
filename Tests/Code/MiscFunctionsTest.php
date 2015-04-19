@@ -1,20 +1,16 @@
 <?php
-/**
- * Created by IntelliJ IDEA.
- * User: Howard Jones
- * Date: 28/08/2014
- * Time: 18:10
- */
+
+require_once dirname(__FILE__).'/../../lib/all.php';
 
 class MiscFunctionsTest extends PHPUnit_Framework_TestCase {
 
     function testStringHandling()
     {
-        $this->assertEquals( "1", jsEscape("1", false) );
-        $this->assertEquals( '"1"', jsEscape("1", true) );
+        $this->assertEquals( '"1"', jsEscape("1") );
 
-        $this->assertEquals( "2\\\\2", jsEscape("2\\2", false) );
-        $this->assertEquals( '\"a quote\"', jsEscape('"a quote"', false) );
+        $this->assertEquals( '"2\\\\2"', jsEscape("2\\2") );
+
+        $this->assertEquals( '"\"a quote\""', jsEscape('"a quote"') );
 
 
         $this->assertEquals( 'xxx xxx is 127.0.0.1 xxxxx', wmStringAnonymise("the DNS is 8.8.8.8 right") );

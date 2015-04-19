@@ -258,6 +258,19 @@ class WeatherMap extends WeatherMapBase
         wm_debug("WeatherMap class Reset() complete\n");
     }
 
+    /**
+     * The old way to render strings in a particular font.
+     * @deprecated use WMFont instead
+     *
+     * @param $image
+     * @param $fontnumber
+     * @param $x
+     * @param $y
+     * @param $string
+     * @param $colour
+     * @param int $angle
+     * @return mixed
+     */
     function myimagestring($image, $fontnumber, $x, $y, $string, $colour, $angle = 0)
     {
         // throw new WMException("Still using myimagestring");
@@ -266,6 +279,14 @@ class WeatherMap extends WeatherMapBase
 
     }
 
+    /**
+     * The old way to get font metrics.
+     * @deprecated use WMFont instead
+     *
+     * @param $fontNumber
+     * @param $string
+     * @return mixed
+     */
     function myimagestringsize($fontNumber, $string)
     {
         $fontObject = $this->fonts->getFont($fontNumber);

@@ -9,7 +9,9 @@
             "email": "howie@thingy.com"
         }
     ],
-    "require": {},
+    "require": {
+        "phpdocumentor/phpdocumentor": "2.*"
+    },
     "require-dev": {
 	"jelix/fakeserverconf": "dev-master",
         "codeclimate/php-test-reporter": "0.1.*",

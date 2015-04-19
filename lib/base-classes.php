@@ -231,4 +231,17 @@ class WeatherMapItem extends WeatherMapBase
     {
         return $this->defined_in;
     }
+
+
+    /**
+     * Accessor for the variables that should be visible to ProcessString {} tokens.
+     * Side-effect - none of the others are available anymore, and ALL are decoupled from the
+     * actual implementation names, so we can refactor/rename more easily.
+     *
+     * @param $name#
+     */
+    public function getValue($name)
+    {
+
+    }
 }

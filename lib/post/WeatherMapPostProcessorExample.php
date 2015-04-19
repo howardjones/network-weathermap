@@ -7,7 +7,7 @@
 //
 class WeatherMapPostProcessorExample extends WeatherMapPostProcessor
 {
-    function run(&$map)
+    public function run(&$map)
     {
         $enable = $map->get_hint("post_test_enable");
 

@@ -61,7 +61,7 @@ class WeatherMapNode extends WeatherMapItem
     var $runtime = array();
     var $descendents = array();
 
-    function WeatherMapNode()
+    function __construct()
     {
         $this->inherit_fieldlist=array
             (

@@ -15,8 +15,7 @@ class WeatherMap extends WeatherMapBase
     var $scales = array(); // the new array of WMScale objects
 
     var $next_id;
-    var $min_ds_time;
-    var $max_ds_time;
+
     var $background;
     var $htmlstyle;
     var $imap;
@@ -25,42 +24,48 @@ class WeatherMap extends WeatherMapBase
     var $imagefile,
         $imageuri;
     var $rrdtool;
-    var $title,
-        $titlefont;
+
     var $kilo;
     var $sizedebug,
         $widthmod,
         $debugging;
-    var $linkfont,
-        $nodefont,
-        $keyfont,
+    var $keyfont,
         $timefont;
-    var $timex,
-        $timey;
-    var $width,
-        $height;
-    var $keyx,
-        $keyy, $keyimage;
+
+    var $width, $height;
+
+    var $keyx, $keyy, $keyimage, $keytext; // arrays
+
     var $titlex,
         $titley;
-    var $keytext,
-        $stamptext, $datestamp;
-    var $min_data_time, $max_data_time;
+    var $title,
+        $titlefont;
+
     var $htmloutputfile,
         $imageoutputfile;
     var $dataoutputfile;
+
     var $htmlstylesheet;
+
     var $defaultlink,
         $defaultnode;
+
     var $need_size_precalc;
     var $keystyle, $keysize;
     var $rrdtool_check;
     var $inherit_fieldlist;
+
+
+    var $min_ds_time;
+    var $max_ds_time;
+    var $min_data_time, $max_data_time;
+    var $timex, $timey;
+    var  $stamptext, $datestamp;
     var $mintimex, $maxtimex;
     var $mintimey, $maxtimey;
     var $minstamptext, $maxstamptext;
+
     var $context;
-    var $cachefolder, $mapcache, $cachefile_version;
     var $name;
     var $black,
         $white,
@@ -68,9 +73,6 @@ class WeatherMap extends WeatherMapBase
         $selected;
     var $scalesseen;
 
-    var $dataSourceClasses;
-    var $preprocessclasses;
-    var $postprocessclasses;
     var $activeDataSourceClasses;
     var $thumb_width, $thumb_height;
     var $has_includes;
@@ -168,8 +170,6 @@ class WeatherMap extends WeatherMapBase
 
         $this->min_ds_time = null;
         $this->max_ds_time = null;
-
-        $this->need_size_precalc = false;
 
         $this->nodes = array(); // an array of WeatherMapNodes
         $this->links = array(); // an array of WeatherMapLinks
@@ -400,25 +400,7 @@ class WeatherMap extends WeatherMapBase
                 } else {
                     wm_debug("ProcessString: Found appropriate item: " . get_class($the_item) . " " . $the_item->name . "\n");
 
-                    // SET and notes have precedent over internal properties
-                    // this is my laziness - it saves me having a list of reserved words
-                    // which are currently used for internal props. You can just 'overwrite' any of them.
-                    if (array_key_exists($args, $the_item->hints)) {
-                        $value = $the_item->hints[$args];
-                        wm_debug("ProcessString: used hint\n");
-                    } elseif ($include_notes && array_key_exists($args, $the_item->notes)) {
-                        // for some things, we don't want to allow notes to be considered.
-                        // mainly - TARGET (which can define command-lines), shouldn't be
-                        // able to get data from uncontrolled sources (i.e. data sources rather than SET in config files).
-                        $value = $the_item->notes[$args];
-                        wm_debug("ProcessString: used note\n");
-                    } elseif (property_exists($the_item, $args)) {
-                        // REQUIRES PHP 5.1.0+ or PHP_Compat
-                        $value = $the_item->$args;
-                        wm_debug("ProcessString: used internal property\n");
-                    } else {
-                        wm_debug("ProcessString: fell off the bottom.\n");
-                    }
+                    $value = $this->findItemValue($the_item, $args, $value, $include_notes);
                 }
             }
 
@@ -437,6 +419,36 @@ class WeatherMap extends WeatherMapBase
             $output = str_replace($key, $value, $output);
         }
         return ($output);
+    }
+
+    function findItemValue(&$mapItem, $variableName, $currentValue, $includeNotes = true)
+    {
+        // SET and notes have precedent over internal properties
+        // this is my laziness - it saves me having a list of reserved words
+        // which are currently used for internal props. You can just 'overwrite' any of them.
+        if (array_key_exists($variableName, $mapItem->hints)) {
+            wm_debug("ProcessString: used hint\n");
+            return $mapItem->hints[$variableName];
+        }
+
+        if ($includeNotes && array_key_exists($variableName, $mapItem->notes)) {
+            // for some things, we don't want to allow notes to be considered.
+            // mainly - TARGET (which can define command-lines), shouldn't be
+            // able to get data from uncontrolled sources (i.e. data sources rather than SET in config files).
+            wm_debug("ProcessString: used note\n");
+            return $mapItem->notes[$variableName];
+        }
+
+        // Previously this was directly accessing properties of map items
+        try {
+            $value = $mapItem->getValue($variableName);
+        } catch(WMException $e) {
+            // give up, and pass back the current value
+            return $currentValue;
+        }
+
+        wm_debug("ProcessString: used internal property\n");
+        return $value;
     }
 
     /**
@@ -485,15 +497,9 @@ class WeatherMap extends WeatherMapBase
 
                     include_once($realfile);
                     $class = preg_replace("/\.php$/", "", $file);
+
                     if ($type == 'data') {
-                        $this->dataSourceClasses [$class] = $class;
                         $this->activeDataSourceClasses[$class] = true;
-                    }
-                    if ($type == 'pre') {
-                        $this->preprocessclasses [$class] = $class;
-                    }
-                    if ($type == 'post') {
-                        $this->postprocessclasses [$class] = $class;
                     }
 
                     wm_debug("Loaded $type Plugin class $class from $file\n");
@@ -519,17 +525,16 @@ class WeatherMap extends WeatherMapBase
     function initialiseDatasourcePlugins()
     {
         wm_debug("Running Init() for Data Source Plugins...\n");
-        foreach ($this->dataSourceClasses as $ds_class) {
-            // make an instance of the class
-            $this->plugins['data'][$ds_class] = new $ds_class;
-            wm_debug("Running $ds_class" . "->Init()\n");
-            assert('isset($this->plugins["data"][$ds_class])');
 
-            $ret = $this->plugins['data'][$ds_class]->Init($this);
+        foreach ($this->plugins['data'] as $name=>$pluginInstance) {
+            // make an instance of the class
+            wm_debug("Running $name" . "->Init()\n");
+
+            $ret = $pluginInstance->Init($this);
 
             if (!$ret) {
-                wm_debug("Removing $ds_class from Data Source list, since Init() failed\n");
-                $this->activeDataSourceClasses[$ds_class] = false;
+                wm_debug("Removing $name from Data Source list, since Init() failed\n");
+                $this->activeDataSourceClasses[$name] = false;
             }
         }
         wm_debug("Finished Initialising Plugins...\n");
@@ -585,22 +590,22 @@ class WeatherMap extends WeatherMapBase
                             $matched = false;
                             $matchedBy = '';
 
-                            foreach ($this->dataSourceClasses as $ds_class) {
+                            foreach ($this->plugins['data'] as $name=>$pluginObject) {
                                 if (!$matched) {
-                                    $recognised = $this->plugins['data'][$ds_class]->Recognise($targetString);
+                                    $recognised = $pluginObject->Recognise($targetString);
 
                                     if ($recognised) {
                                         $matched = true;
-                                        $matchedBy = $ds_class;
+                                        $matchedBy = $name;
 
-                                        if ($this->activeDataSourceClasses[$ds_class]) {
-                                            $this->plugins['data'][$ds_class]->Register($targetString, $this, $oneMapItem);
+                                        if ($this->activeDataSourceClasses[$name]) {
+                                            $pluginObject->Register($targetString, $this, $oneMapItem);
 
                                             $oneMapItem->targets[$targetIndex][1] = $multiply;
                                             $oneMapItem->targets[$targetIndex][0] = $targetString;
                                             $oneMapItem->targets[$targetIndex][5] = $matchedBy;
                                         } else {
-                                            wm_warn("ProcessTargets: $type $name, target: $targetString on config line $target[3] of $target[2] was recognised as a valid TARGET by a plugin that is unable to run ($ds_class) [WMWARN07]\n");
+                                            wm_warn("ProcessTargets: $type $name, target: $targetString on config line $target[3] of $target[2] was recognised as a valid TARGET by a plugin that is unable to run ($pluginObject) [WMWARN07]\n");
                                         }
                                     }
                                 }
@@ -630,8 +635,8 @@ class WeatherMap extends WeatherMapBase
 
             wm_debug("======================================\n");
             wm_debug("Starting prefetch\n");
-            foreach ($this->dataSourceClasses as $ds_class) {
-                $this->plugins['data'][$ds_class]->Prefetch($this);
+            foreach ($this->plugins['data'] as $name=>$pluginObject) {
+                $pluginObject->Prefetch($this);
             }
 
             wm_debug("======================================\n");
@@ -802,8 +807,8 @@ class WeatherMap extends WeatherMapBase
             wm_debug("======================================\n");
             wm_debug("Starting cleanup\n");
 
-            foreach ($this->dataSourceClasses as $ds_class) {
-                $this->plugins['data'][$ds_class]->CleanUp($this);
+            foreach ($this->plugins['data'] as $name=>$pluginObject) {
+                $pluginObject->CleanUp($this);
             }
 
             wm_debug("ReadData Completed.\n");
@@ -1561,17 +1566,10 @@ class WeatherMap extends WeatherMapBase
 
     function runProcessorPlugins($stage="pre")
     {
-        $classes =array();
-        if ($stage == 'pre') {
-            $classes = $this->preprocessclasses;
-        }
-        if ($stage == 'post') {
-            $classes = $this->postprocessclasses;
-        }
         wm_debug("Running $stage-processing plugins...\n");
-        foreach ($classes as $plugin_class) {
-            wm_debug("Running $plugin_class" . "->run()\n");
-            $this->plugins[$stage][$plugin_class]->run($this);
+        foreach ($this->plugins[$stage] as $name=>$pluginObject) {
+            wm_debug("Running %s->run()\n", $name);
+            $pluginObject->run($this);
         }
         wm_debug("Finished $stage-processing plugins...\n");
     }
@@ -1981,17 +1979,11 @@ class WeatherMap extends WeatherMapBase
         wm_debug("Trace: DrawMap()\n");
 
         $bgimage=null;
-        if ($this->configfile != "") {
-            $this->cachefile_version = crc32(file_get_contents($this->configfile));
-        } else {
-            $this->cachefile_version = crc32("........");
-        }
 
         wm_debug("Running Post-Processing Plugins...\n");
-        foreach ($this->postprocessclasses as $post_class) {
-            wm_debug("Running $post_class"."->run()\n");
-            //call_user_func_array(array($post_class, 'run'), array(&$this));
-            $this->plugins['post'][$post_class]->run($this);
+        foreach ($this->plugins['post'] as $pluginName=>$pluginObject) {
+            wm_debug("Running $pluginName"."->run()\n");
+            $pluginObject->run($this);
         }
         wm_debug("Finished Post-Processing Plugins...\n");
 
@@ -2226,13 +2218,6 @@ class WeatherMap extends WeatherMapBase
                         }
                     }
                 }
-            }
-
-            if ($this->context == 'editor2') {
-                $cachefile = $this->cachefolder.DIRECTORY_SEPARATOR.dechex(crc32($this->configfile))."_bg.".$this->cachefile_version.".png";
-                imagepng($image, $cachefile);
-                $cacheuri = $this->cachefolder.'/'.dechex(crc32($this->configfile))."_bg.".$this->cachefile_version.".png";
-                $this->mapcache = $cacheuri;
             }
 
             if (function_exists('imagecopyresampled')) {
@@ -2472,51 +2457,6 @@ class WeatherMap extends WeatherMapBase
         return $js;
     }
 
-    function asJSON()
-    {
-        $json = '';
-
-        $json .= "{ \n";
-
-        $json .= "\"map\": {  \n";
-        foreach (array_keys($this->inherit_fieldlist) as $fld) {
-            $json .= jsEscape($fld).": ";
-            $json .= jsEscape($this->$fld);
-            $json .= ",\n";
-        }
-        $json = rtrim($json, ", \n");
-        $json .= "\n},\n";
-
-        $json .= "\"nodes\": {\n";
-        $json .= $this->defaultnode->asJSON();
-        foreach ($this->nodes as $node) {
-            $json .= $node->asJSON();
-        }
-        $json = rtrim($json, ", \n");
-        $json .= "\n},\n";
-
-        $json .= "\"links\": {\n";
-        $json .= $this->defaultlink->asJSON();
-
-        foreach ($this->links as $link) {
-            $json .= $link->asJSON();
-        }
-        $json = rtrim($json, ", \n");
-        $json .= "\n},\n";
-
-        $json .= "'imap': [\n";
-        $json .= $this->imap->subJSON("NODE:");
-        // should check if there WERE nodes...
-        $json .= ",\n";
-        $json .= $this->imap->subJSON("LINK:");
-        $json .= "\n]\n";
-        $json .= "\n";
-
-        $json .= ", 'valid': 1}\n";
-
-        return($json);
-    }
-
     // This method MUST run *after* DrawMap. It relies on DrawMap to call the map-drawing bits
     // which will populate the ImageMap with regions.
     //
@@ -2602,6 +2542,15 @@ class WeatherMap extends WeatherMapBase
         $html .= "</map>\n";
 
         return($html);
+    }
+
+    public function getValue($name)
+    {
+        wm_debug("Fetching %s\n", $name);
+        if (property_exists($this, $name)) {
+            return $this->$name;
+        }
+        throw new WMException("NoSuchProperty");
     }
 }
 

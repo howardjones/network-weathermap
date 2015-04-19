@@ -14,7 +14,7 @@ class WMColour
     var $alpha;
     
     // take in an existing value and create a Colour object for it
-    function WMColour()
+    function __construct()
     {
         // a set of 3 colours
         if (func_num_args() === 3) {

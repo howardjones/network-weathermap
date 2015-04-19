@@ -1325,10 +1325,6 @@ class WeatherMapConfigReader
 
                 list($offset_dx[$i], $offset_dy[$i], $nodenames[$i], $endoffset[$i], $need_size_precalc) = $this->interpretNodeSpec($matches[$i]);
 
-                if ($need_size_precalc && ! $this->mapObject->need_size_precalc) {
-                    $this->mapObject->need_size_precalc = true;
-                }
-
                 if (!array_key_exists($nodenames[$i], $this->mapObject->nodes)) {
                     wm_warn("Unknown node '" . $nodenames[$i] . "' on line $this->lineCount of config\n");
                     $valid_nodes--;

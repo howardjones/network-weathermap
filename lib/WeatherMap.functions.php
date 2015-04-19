@@ -608,4 +608,5 @@ function TestOutput_RunTest($conffile, $imagefile, $htmlfile, $newconffile)
     return intval($nwarns);
 }
 
+
 // vim:ts=4:sw=4:

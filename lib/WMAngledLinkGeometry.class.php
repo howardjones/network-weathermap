@@ -10,14 +10,11 @@ class WMAngledLinkGeometry extends WMLinkGeometry
         for ($i = 0; $i < ($nPoints - 1); $i ++) {
             // still subdivide the straight line, because other stuff makes assumptions about
             // how often there is a point - at least find_distance_coords_angle breaks
-            $dx = ($this->controlPoints[$i + 1]->x - $this->controlPoints[$i]->x) / $pointsPerSpan;
-            $dy = ($this->controlPoints[$i + 1]->y - $this->controlPoints[$i]->y) / $pointsPerSpan;
+
+            $tangent = $this->controlPoints[$i]->vectorToPoint($this->controlPoints[$i+1]);
 
             for ($j = 0; $j < $pointsPerSpan; $j ++) {
-                $x = $this->controlPoints[$i]->x + $j * $dx;
-                $y = $this->controlPoints[$i]->y + $j * $dy;
-
-                $newPoint = new WMPoint($x, $y);
+                $newPoint = $this->controlPoints[$i]->copy()->addVector($tangent, $j/$pointsPerSpan);
                 $this->curvePoints->addPoint($newPoint);
             }
         }

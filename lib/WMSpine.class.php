@@ -92,20 +92,22 @@ class WMSpine
     {
         $maxIndex = $this->pointCount() - 1;
 
-        if ($index > 0) {
-            if ($index < $maxIndex) {
-                $point1 = $this->points[$index][0];
-                $point2 = $this->points[$index + 1][0];
-            } else {
-                // if we're at the end, always use the last two points
-
-                $point1 = $this->points[$maxIndex-1][0];
-                $point2 = $this->points[$maxIndex][0];
-            }
-        } else {
+        if ($index <= 0) {
             // if we're at the start, always use the first two points
             $point1 = $this->points[0][0];
             $point2 = $this->points[1][0];
+        }
+
+        if ($index >= $maxIndex) {
+            // if we're at the end, always use the last two points
+            $point1 = $this->points[$maxIndex-1][0];
+            $point2 = $this->points[$maxIndex][0];
+        }
+
+        if ($index > 0 && $index < $maxIndex) {
+            // just a regular point on the spine
+            $point1 = $this->points[$index][0];
+            $point2 = $this->points[$index + 1][0];
         }
 
         $tangent = $point1->vectorToPoint($point2);
@@ -284,14 +286,15 @@ class WMSpine
         return array($spine1, $spine2);
     }
 
-    function dump($spine)
+    function __toString()
     {
-        print "===============\n";
-        $nPoints = count($spine);
-        for ($i = 0; $i < $nPoints; $i ++) {
-            printf("  %3d: %d,%d (%d)\n", $i, $spine[$i][X], $spine[$i][Y], $spine[$i][DISTANCE]);
+        $output = "SPINE:[";
+        for ($i = 0; $i < $this->pointCount(); $i ++) {
+            $output .= sprintf("%s[%s]--", $this->points[$i][0], $this->points[$i][1]);
         }
-        print "===============\n";
+        $output .= "]";
+
+        return $output;
     }
 
     function drawSpine($gdImage, $colour)

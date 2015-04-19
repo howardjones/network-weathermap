@@ -9,7 +9,6 @@ class WeatherMapLink extends WeatherMapItem
     var $owner;
     var $name;
     var $id;
-    var $maphtml;
     var $a,                    $b; // the ends - references to nodes
     var $width,                $arrowstyle, $linkstyle;
     var $bwfont,               $labelstyle, $labelboxstyle;
@@ -29,7 +28,6 @@ class WeatherMapLink extends WeatherMapItem
     var $a_offset_resolved, $b_offset_resolved;
     var $in_ds,                $out_ds;
     var $colours = array();
-    var $selected;
     var $inpercent,            $outpercent;
     var $inherit_fieldlist;
     var $vialist = array();
@@ -49,13 +47,12 @@ class WeatherMapLink extends WeatherMapItem
     var $bwfontcolour;
     var $comments = array();
     var $bwlabelformats = array();
-    var $spinepoints;
     var $labeloffset_in, $labeloffset_out;
     var $commentoffset_in, $commentoffset_out;
     var $template;
     var $config;
     var $descendents;
-    var $geometry;
+    var $geometry;  // contains all the spine-related data (WMLinkGeometry)
 
     function WeatherMapLink()
     {
@@ -208,85 +205,72 @@ class WeatherMapLink extends WeatherMapItem
                 $comment=wmStringAnonymise($comment);
             }
 
-            if ($comment != '') {
-                if ($this->commentfontcolour->isContrast()) {
-                    $commentColours[$direction] = $this->colours[$direction]->getContrastingColour();
-                } else {
-                    $commentColours[$direction] = $this->commentfontcolour;
-                }
-
-                $gdCommentColours[$direction] = $commentColours[$direction]->gdAllocate($gdImage);
-
-                list($textWidth, $textHeight) = $this->owner->myimagestringsize($this->commentfont, $comment);
-
-                // nudge pushes the comment out along the link arrow a little bit
-                // (otherwise there are more problems with text disappearing underneath links)
-                $nudgeAlong = intval($this->get_hint("comment_nudgealong"));
-                $nudgeOut = intval($this->get_hint("comment_nudgeout"));
-
-                list ($position, $comment_index, $angle, $distance) = $this->geometry->findPointAndAngleAtPercentageDistance($commentPositions[$direction]);
-
-                $tangent = $this->geometry->findTangentAtIndex($comment_index);
-                $tangent->normalise();
-
-                $centreDistance = $widthList[$direction] + 4 + $nudgeOut;
-
-                if ($this->commentstyle == 'center') {
-                    $centreDistance = $nudgeOut - ($textHeight/2);
-                }
-
-                wm_debug("Tangent angle is ".$tangent->getAngle()." (on $tangent)\n");
-                wm_debug("Starting position is $position\n");
-
-                wm_debug("Link ".$this->name." angle is $angle and commentwidth is $textWidth and centreDistance is $centreDistance for direction $direction\n");
-
-                // find the normal to our link, so we can get outside the arrow
-                $normal = $tangent->getNormal();
-                wm_debug("Normal is $normal\n");
-
-                $flipped = false;
-
-                $edge = $position;
-
-                wm_debug("Link ".$this->name." Edge is $edge for direction $direction\n");
-
-                // if the text will be upside-down, rotate it, flip it, and right-justify it
-                // not quite as catchy as Missy's version
-                if (abs($angle) > 90) {
-                    wm_debug("flipped ($angle)\n");
-                    $angle -= 180;
-                    if ($angle < -180) {
-                        $angle +=360;
-                    }
-                    $edge->addVector($tangent, $nudgeAlong);
-                    $edge->addVector($normal, -$centreDistance);
-                    $flipped = true;
-                } else {
-                    wm_debug("not flipped\n");
-                    $edge->addVector($tangent, $nudgeAlong);
-                    $edge->addVector($normal, $centreDistance);
-                }
-                wm_debug("Link ".$this->name." Edge is ".$edge->asString()." for direction $direction\n");
-
-                $maxLength = $this->geometry->totalDistance();
-
-                if (!$flipped && ($distance + $textWidth) > $maxLength) {
-                    wm_debug("off end [$distance $textWidth $maxLength]\n");
-                    $edge->addVector($tangent, -$textWidth);
-                }
-
-                if ($flipped && ($distance - $textWidth) < 0) {
-                    wm_debug("off beginning\n");
-                    $edge->addVector($tangent, $textWidth);
-                }
-
-                wm_debug("Link ".$this->name." writing $comment at $edge and angle $angle for direction $direction\n");
-
-                // FINALLY, draw the text!
-                $fontObject->drawImageString($gdImage, $edge->x, $edge->y, $comment, $gdCommentColours[$direction], $angle);
-            } else {
+            if ($comment == '') {
                 wm_debug("Link ".$this->name." no text for direction $direction\n");
+                break;
             }
+
+            $commentColours[$direction] = $this->commentfontcolour;
+
+            if ($this->commentfontcolour->isContrast()) {
+                $commentColours[$direction] = $this->colours[$direction]->getContrastingColour();
+            }
+
+            $gdCommentColours[$direction] = $commentColours[$direction]->gdAllocate($gdImage);
+
+            list($textWidth, $textHeight) = $this->owner->myimagestringsize($this->commentfont, $comment);
+
+            // nudge pushes the comment out along the link arrow a little bit
+            // (otherwise there are more problems with text disappearing underneath links)
+            $nudgeAlong = intval($this->get_hint("comment_nudgealong"));
+            $nudgeOut = intval($this->get_hint("comment_nudgeout"));
+
+            list ($position, $comment_index, $angle, $distance) = $this->geometry->findPointAndAngleAtPercentageDistance($commentPositions[$direction]);
+
+            $tangent = $this->geometry->findTangentAtIndex($comment_index);
+            $tangent->normalise();
+
+            $centreDistance = $widthList[$direction] + 4 + $nudgeOut;
+
+            if ($this->commentstyle == 'center') {
+                $centreDistance = $nudgeOut - ($textHeight/2);
+            }
+            // find the normal to our link, so we can get outside the arrow
+            $normal = $tangent->getNormal();
+
+            $flipped = false;
+
+            $edge = $position;
+
+            // if the text will be upside-down, rotate it, flip it, and right-justify it
+            // not quite as catchy as Missy's version
+            if (abs($angle) > 90) {
+                $angle -= 180;
+                if ($angle < -180) {
+                    $angle +=360;
+                }
+                $edge->addVector($tangent, $nudgeAlong);
+                $edge->addVector($normal, -$centreDistance);
+                $flipped = true;
+            } else {
+                $edge->addVector($tangent, $nudgeAlong);
+                $edge->addVector($normal, $centreDistance);
+            }
+
+            $maxLength = $this->geometry->totalDistance();
+
+            if (!$flipped && ($distance + $textWidth) > $maxLength) {
+                $edge->addVector($tangent, -$textWidth);
+            }
+
+            if ($flipped && ($distance - $textWidth) < 0) {
+                $edge->addVector($tangent, $textWidth);
+            }
+
+            wm_debug("Link ".$this->name." writing $comment at $edge and angle $angle for direction $direction\n");
+
+            // FINALLY, draw the text!
+            $fontObject->drawImageString($gdImage, $edge->x, $edge->y, $comment, $gdCommentColours[$direction], $angle);
         }
     }
     
@@ -778,15 +762,13 @@ class WeatherMapLink extends WeatherMapItem
         return $output;
     }
 
-    function asJSON($complete = true)
+    public function getValue($name)
     {
-        $output = '';
-        $output .= "" . jsEscape($this->name) . ": {";
-
-        $output .= $this->asJSCore();
-
-        $output.="},\n";
-        return $output;
+        wm_debug("Fetching %s\n", $name);
+        if (property_exists($this, $name)) {
+            return $this->$name;
+        }
+        throw new WMException("NoSuchProperty");
     }
 }
 

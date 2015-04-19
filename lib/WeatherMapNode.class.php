@@ -227,7 +227,6 @@ class WeatherMapNode extends WeatherMapItem
         // if a target is specified, and you haven't forced no background, then the background will
         // come from the SCALE in USESCALE
         if (!empty($this->targets) && $this->usescale != 'none') {
-
             if ($this->scalevar == 'in') {
                 $label_fill_colour = $this->colours[IN];
 
@@ -961,6 +960,5 @@ class WeatherMapNode extends WeatherMapItem
         }
         throw new WMException("NoSuchProperty");
     }
-
 }
 // vim:ts=4:sw=4:

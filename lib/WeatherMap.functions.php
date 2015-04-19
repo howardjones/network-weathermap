@@ -408,7 +408,7 @@ function wmFormatNumberWithMetricPrefix($number, $kilo = 1000, $decimals = 1)
         $prefix = '-';
     }
 
-    foreach ($lookup as $suffix=>$unit) {
+    foreach ($lookup as $suffix => $unit) {
         if ($number >= $unit) {
             return $prefix . wmFormatNumber($number/$unit, $decimals) . $suffix;
         }

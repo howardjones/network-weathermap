@@ -442,7 +442,7 @@ class WeatherMap extends WeatherMapBase
         // Previously this was directly accessing properties of map items
         try {
             $value = $mapItem->getValue($variableName);
-        } catch(WMException $e) {
+        } catch (WMException $e) {
             // give up, and pass back the current value
             return $currentValue;
         }
@@ -526,7 +526,7 @@ class WeatherMap extends WeatherMapBase
     {
         wm_debug("Running Init() for Data Source Plugins...\n");
 
-        foreach ($this->plugins['data'] as $name=>$pluginInstance) {
+        foreach ($this->plugins['data'] as $name => $pluginInstance) {
             // make an instance of the class
             wm_debug("Running $name" . "->Init()\n");
 
@@ -590,7 +590,7 @@ class WeatherMap extends WeatherMapBase
                             $matched = false;
                             $matchedBy = '';
 
-                            foreach ($this->plugins['data'] as $name=>$pluginObject) {
+                            foreach ($this->plugins['data'] as $name => $pluginObject) {
                                 if (!$matched) {
                                     $recognised = $pluginObject->Recognise($targetString);
 
@@ -635,7 +635,7 @@ class WeatherMap extends WeatherMapBase
 
             wm_debug("======================================\n");
             wm_debug("Starting prefetch\n");
-            foreach ($this->plugins['data'] as $name=>$pluginObject) {
+            foreach ($this->plugins['data'] as $name => $pluginObject) {
                 $pluginObject->Prefetch($this);
             }
 
@@ -807,7 +807,7 @@ class WeatherMap extends WeatherMapBase
             wm_debug("======================================\n");
             wm_debug("Starting cleanup\n");
 
-            foreach ($this->plugins['data'] as $name=>$pluginObject) {
+            foreach ($this->plugins['data'] as $name => $pluginObject) {
                 $pluginObject->CleanUp($this);
             }
 
@@ -887,7 +887,6 @@ class WeatherMap extends WeatherMapBase
         $nowarn_scalemisses = (!$scale_warning) || intval($this->get_hint("nowarn_scalemisses"));
 
         if (isset($this->colours[$scalename])) {
-
             $colours = $this->colours[$scalename];
 
             if ($is_percent && $value > 100) {
@@ -909,7 +908,6 @@ class WeatherMap extends WeatherMapBase
                     and ($value >= $scaleEntry['bottom'])
                     and ($value <= $scaleEntry['top'])
                 ) {
-
                     $range = $scaleEntry['top'] - $scaleEntry['bottom'];
 
                     // change in behaviour - with multiple matching ranges for a value, the smallest range wins
@@ -927,7 +925,6 @@ class WeatherMap extends WeatherMapBase
             // if we have a match, figure out the actual
             // colour (for gradients) and return it
             if (!is_null($matchsize)) {
-
                 $scaleEntry = $colours[$matchkey];
 
                 if (isset($scaleEntry['c2'])) {
@@ -1564,10 +1561,10 @@ class WeatherMap extends WeatherMapBase
         wm_debug("Found " . sizeof($this->seen_zlayers) . " z-layers including builtins (0,100).\n");
     }
 
-    function runProcessorPlugins($stage="pre")
+    function runProcessorPlugins($stage = "pre")
     {
         wm_debug("Running $stage-processing plugins...\n");
-        foreach ($this->plugins[$stage] as $name=>$pluginObject) {
+        foreach ($this->plugins[$stage] as $name => $pluginObject) {
             wm_debug("Running %s->run()\n", $name);
             $pluginObject->run($this);
         }
@@ -1652,12 +1649,10 @@ class WeatherMap extends WeatherMapBase
     {
 
         if ($filename != "") {
-
             $fd = fopen($filename, 'w');
             # $output = '';
 
             if ($fd) {
-
                 $data = array();
                 $data['nodes'] = array();
                 $data['links'] = array();
@@ -1981,7 +1976,7 @@ class WeatherMap extends WeatherMapBase
         $bgimage=null;
 
         wm_debug("Running Post-Processing Plugins...\n");
-        foreach ($this->plugins['post'] as $pluginName=>$pluginObject) {
+        foreach ($this->plugins['post'] as $pluginName => $pluginObject) {
             wm_debug("Running $pluginName"."->run()\n");
             $pluginObject->run($this);
         }
@@ -2028,9 +2023,9 @@ class WeatherMap extends WeatherMapBase
 
             if ($this->get_hint("antialias") == 1) {
                     // Turn on anti-aliasing if it exists and it was requested
-                    if (function_exists("imageantialias")) {
-                        imageantialias($image, true);
-                    }
+                if (function_exists("imageantialias")) {
+                    imageantialias($image, true);
+                }
             }
 
             // by here, we should have a valid image handle

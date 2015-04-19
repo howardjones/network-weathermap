@@ -238,7 +238,6 @@ class WMSpine
             }
         }
 
-        print "FELL THROUGH\n";
         throw new WMException("Howie's crappy binary search is wrong after all.\n");
     }
 

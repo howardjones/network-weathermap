@@ -352,10 +352,10 @@ class HTML_ImageMap
                 {
                     case 'href':
                             $this->shapes[$i]->href= $what;
-                            break;
+                        break;
                     case 'extrahtml':
                             $this->shapes[$i]->extrahtml= $what;
-                            break;
+                        break;
                 }
                 $count++;
             }
@@ -412,8 +412,8 @@ class HTML_ImageMap
 
         foreach ($this->shapes as $shape) {
             # if ( ($namefilter == "") || ( preg_match($preg,$shape->name) ))
-            if ( ($namefilter == "") || ( strstr($shape->name, $namefilter) !== false )) {
-                if (!$skipnolinks || $shape->href != "" || $shape->extrahtml != "" ) {
+            if (($namefilter == "") || ( strstr($shape->name, $namefilter) !== false )) {
+                if (!$skipnolinks || $shape->href != "" || $shape->extrahtml != "") {
                     if ($reverseorder) {
                         $html = $shape->asHTML()."\n".$html;
                     } else {

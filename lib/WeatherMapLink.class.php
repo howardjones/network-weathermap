@@ -23,8 +23,8 @@ class WeatherMapLink extends WeatherMapItem
     var $max_bandwidth_in_cfg, $max_bandwidth_out_cfg;
     var $targets = array();
     var $a_offset,             $b_offset;
-    var $a_offset_dx, 	$b_offset_dx;
-    var $a_offset_dy, 	$b_offset_dy;
+    var $a_offset_dx,   $b_offset_dx;
+    var $a_offset_dy,   $b_offset_dy;
     var $a_offset_resolved, $b_offset_resolved;
     var $in_ds,                $out_ds;
     var $colours = array();
@@ -337,7 +337,7 @@ class WeatherMapLink extends WeatherMapItem
         list($dx, $dy) = wmCalculateOffset($this->b_offset, $this->b->width, $this->b->height);
         $points[] = new WMPoint($this->b->x + $dx, $this->b->y + $dy);
 
-        if ( $points[0]->closeEnough($points[1]) && sizeof($this->vialist)==0) {
+        if ($points[0]->closeEnough($points[1]) && sizeof($this->vialist)==0) {
             wm_warn("Zero-length link ".$this->name." skipped. [WMWARN45]");
             $this->geometry = null;
             return;
@@ -369,14 +369,12 @@ class WeatherMapLink extends WeatherMapItem
         wm_debug("Link ".$this->name.": Drawing.\n");
         // If there is geometry to draw, draw it
         if (!is_null($this->geometry)) {
-
             $this->geometry->setOutlineColour($this->outlinecolour);
             $this->geometry->setFillColours(array($this->colours[IN], $this->colours[OUT]));
 
             $this->geometry->draw($im);
 
             if (!$this->commentfontcolour->isNone()) {
-
                 $this->drawComments($im);
             }
 
@@ -445,7 +443,7 @@ class WeatherMapLink extends WeatherMapItem
                     $this->bwfontcolour,
                     $this->bwboxcolour,
                     $this->bwoutlinecolour,
-                    $this->owner,    // XXX - why is this passed?
+                    $this->owner, // XXX - why is this passed?
                     $direction
                 );
             }
@@ -631,7 +629,7 @@ class WeatherMapLink extends WeatherMapItem
                 }
             }
 
-            if (isset($this->a) && isset($this->b))	{
+            if (isset($this->a) && isset($this->b)) {
                 $output .= "\tNODES " . $this->a->name;
 
                 if ($this->a_offset != 'C') {

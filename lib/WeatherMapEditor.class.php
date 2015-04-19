@@ -9,7 +9,8 @@
  *  (a second class, WeatherMapEditorUI, is concerned with the actual presentation of the supplied editor)
  */
 
-class WeatherMapEditor {
+class WeatherMapEditor
+{
     
     var $map;
     var $mapfile;
@@ -19,11 +20,12 @@ class WeatherMapEditor {
         $this->map = null;
     }
     
-    function isLoaded() {
+    function isLoaded()
+    {
         return !is_null($this->map);
     }
     
-    function newConfig() 
+    function newConfig()
     {
         $this->map = new WeatherMap();
         $this->map->context = "editor";
@@ -45,7 +47,7 @@ class WeatherMapEditor {
      *
      * @param string $filename
      */
-    function saveConfig($filename="")
+    function saveConfig($filename = "")
     {
         if ($filename != "") {
             $this->mapfile = $filename;
@@ -63,8 +65,8 @@ class WeatherMapEditor {
     }
     
     function addNode($x, $y, $nodename = "", $template = "DEFAULT")
-    {    
-        if (! $this->isLoaded() ) {
+    {
+        if (! $this->isLoaded()) {
             throw new WMException("Map must be loaded before editing API called.");
         }
 
@@ -74,8 +76,8 @@ class WeatherMapEditor {
 
         // Generate a node name for ourselves if one wasn't supplied
         if ($nodename == "") {
-            $newnodename = sprintf("node%05d",time()%10000);
-            while (array_key_exists($newnodename,$this->map->nodes)) {
+            $newnodename = sprintf("node%05d", time()%10000);
+            while (array_key_exists($newnodename, $this->map->nodes)) {
                 $newnodename .= "a";
             }
         } else {
@@ -94,7 +96,7 @@ class WeatherMapEditor {
             $node->setDefined($this->map->configfile);
 
             // needs to know if zlayer exists.
-            if ( !array_key_exists($node->zorder, $this->map->seen_zlayers)) {
+            if (!array_key_exists($node->zorder, $this->map->seen_zlayers)) {
                 $this->map->seen_zlayers[$node->zorder] = array();
             }
             array_push($this->map->seen_zlayers[$node->zorder], $node);
@@ -119,7 +121,7 @@ class WeatherMapEditor {
     /**
      * moveNode - move a node, taking into account any relative nodes, and any links that
      * join to it, dealing with VIAs in an attractive way.
-     * 
+     *
      * @param string $node_name
      * @param number $x
      * @param number $y
@@ -142,8 +144,7 @@ class WeatherMapEditor {
             // links that have VIAs. If it is, we want to rotate those VIA points
             // about the *other* node in the link
             foreach ($this->map->links as $link) {
-                if ( (count($link->vialist)>0)  && (($link->a->name == $node_name) || ($link->b->name == $node_name)) ) {
-
+                if ((count($link->vialist)>0)  && (($link->a->name == $node_name) || ($link->b->name == $node_name))) {
                     $affected_links[] = $link->name;
 
                     // get the other node from us
@@ -156,7 +157,7 @@ class WeatherMapEditor {
                     }
 
                     // this is a wierd special case, but it is possible, with link offsets
-                    if ( ($link->a->name == $node_name) && ($link->b->name == $node_name) ) {
+                    if (($link->a->name == $node_name) && ($link->b->name == $node_name)) {
                         $dx = $link->a->x - $x;
                         $dy = $link->a->y - $y;
 
@@ -175,8 +176,8 @@ class WeatherMapEditor {
                         $l_old = sqrt($dx_old*$dx_old + $dy_old*$dy_old);
                         $l_new = sqrt($dx_new*$dx_new + $dy_new*$dy_new);
 
-                        $angle_old = rad2deg(atan2(-$dy_old,$dx_old));
-                        $angle_new = rad2deg(atan2(-$dy_new,$dx_new));
+                        $angle_old = rad2deg(atan2(-$dy_old, $dx_old));
+                        $angle_new = rad2deg(atan2(-$dy_new, $dx_new));
 
                         # $log .= "$pivx,$pivy\n$dx_old $dy_old $l_old => $angle_old\n";
                         # $log .= "$dx_new $dy_new $l_new => $angle_new\n";
@@ -191,14 +192,14 @@ class WeatherMapEditor {
                         $scalefactor = $l_new/$l_old;
 
                         // rotate so that link is along the axis
-                        rotateAboutPoint($points,$pivx, $pivy, deg2rad($angle_old));
+                        rotateAboutPoint($points, $pivx, $pivy, deg2rad($angle_old));
                         // do the scaling in here
                         for ($count=0; $count<(count($points)/2); $count++) {
                             $basex = ($points[$count*2] - $pivx) * $scalefactor + $pivx;
                             $points[$count*2] = $basex;
                         }
                         // rotate back so that link is along the new direction
-                        rotateAboutPoint($points,$pivx, $pivy, deg2rad(-$angle_new));
+                        rotateAboutPoint($points, $pivx, $pivy, deg2rad(-$angle_new));
 
                         // now put the modified points back into the vialist again
                         $viaCount = 0;
@@ -214,13 +215,13 @@ class WeatherMapEditor {
                                 $viaCount++;
                             }
                         }
-                   }
-               }
+                    }
+                }
             }
 
             $this->map->nodes[$node_name]->x = $x;
             $this->map->nodes[$node_name]->y = $y;
-        }  
+        }
 
         $n_links = count($affected_links);
         $n_nodes = count($affected_nodes);
@@ -250,14 +251,13 @@ class WeatherMapEditor {
         $affected_links = array();
 
         if (isset($this->map->nodes[$nodename])) {
-
             $affected_nodes[] = $nodename;
 
             $log = "delete node ".$nodename;
 
             foreach ($this->map->links as $link) {
-                if ( isset($link->a) ) {
-                    if ( ($nodename == $link->a->name) || ($nodename == $link->b->name) ) {
+                if (isset($link->a)) {
+                    if (($nodename == $link->a->name) || ($nodename == $link->b->name)) {
                         $affected_links[] = $link->name;
                         unset($this->map->links[$link->name]);
                     }
@@ -286,11 +286,11 @@ class WeatherMapEditor {
             // Try to use the requested name, if possible, and if specified
             $newnodename = ($targetname != "" ? $targetname : $sourcename);
 
-            if ($targetname != "" && $or_fail && isset($this->map->nodes[$newnodename]) ) {
+            if ($targetname != "" && $or_fail && isset($this->map->nodes[$newnodename])) {
                 return array(false, null, "Requested name already exists");
             }
 
-            if ( isset($this->map->nodes[$newnodename]) ) {
+            if (isset($this->map->nodes[$newnodename])) {
                 $newnodename = $sourcename;
                 do {
                     $newnodename = $newnodename."_copy";
@@ -321,8 +321,8 @@ class WeatherMapEditor {
         return array(false, null, "Request source does not exist");
     }
         
-    function addLink($node1, $node2, $linkname = "",$template = "DEFAULT")
-    {    
+    function addLink($node1, $node2, $linkname = "", $template = "DEFAULT")
+    {
         if (! $this->isLoaded()) {
             throw new WMException("Map must be loaded before editing API called.");
         }
@@ -331,7 +331,7 @@ class WeatherMapEditor {
         $log = "";
         $newlinkname = null;
 
-        if ($node1 != $node2 && isset($this->map->nodes[$node1]) && isset($this->map->nodes[$node2]) ) {
+        if ($node1 != $node2 && isset($this->map->nodes[$node1]) && isset($this->map->nodes[$node2])) {
             $newlink = new WeatherMapLink;
             $newlink->reset($this->map);
 
@@ -341,7 +341,7 @@ class WeatherMapEditor {
             // make sure the link name is unique. We can have multiple links between
             // the same nodes, these days
             $newlinkname = "$node1-$node2";
-            while (array_key_exists($newlinkname,$this->map->links)) {
+            while (array_key_exists($newlinkname, $this->map->links)) {
                 $newlinkname .= "a";
             }
             $newlink->name = $newlinkname;
@@ -349,7 +349,7 @@ class WeatherMapEditor {
             $this->map->links[$newlinkname] = $newlink;
 
             // needs to know if zlayer exists.
-            if ( !array_key_exists($newlink->zorder, $this->map->seen_zlayers)) {
+            if (!array_key_exists($newlink->zorder, $this->map->seen_zlayers)) {
                 $this->map->seen_zlayers[$newlink->zorder] = array();
             }
             array_push($this->map->seen_zlayers[$newlink->zorder], $newlink);
@@ -386,11 +386,11 @@ class WeatherMapEditor {
     /**
      * cloneLink - create a copy of an existing link
      * Not as useful as cloneNode, but still sometimes handy.
-     * 
+     *
      * @param string $sourcename
      * @param string $targetname
      */
-    function cloneLink($sourcename, $targetname="")
+    function cloneLink($sourcename, $targetname = "")
     {
         if (! $this->isLoaded()) {
             throw new WMException("Map must be loaded before editing API called.");
@@ -402,7 +402,7 @@ class WeatherMapEditor {
     /**
      * setLinkVia - simple-minded add/replacement of a single VIA for a link.
      * Should be replaced by addLinkVia with intelligent handling of multiple VIAs
-     * 
+     *
      * @param string $linkname
      * @param number $x
      * @param number $y
@@ -436,7 +436,7 @@ class WeatherMapEditor {
         return false;
     }
     
-    function tidyLink($linkname) 
+    function tidyLink($linkname)
     {
         if (! $this->isLoaded()) {
             throw new WMException("Map must be loaded before editing API called.");
@@ -483,10 +483,10 @@ class WeatherMapEditor {
     /**
      * _retidy_links - find all links that have previously been tidied (_tidied hint) and tidy them again
      * UNLESS $ignore_tidied is set, then do every single link (for editor testing)
-     *  
+     *
      * @param boolean $ignore_tidied
      */
-    function _retidyLinks($ignore_tidied=false)
+    function _retidyLinks($ignore_tidied = false)
     {
         if (! $this->isLoaded()) {
             throw new WMException("Map must be loaded before editing API called.");
@@ -509,9 +509,7 @@ class WeatherMapEditor {
         }
         
         foreach ($this->map->links as $link) {
-
             if (isset($link->a) && isset($link->b)) {
-
                 $route = $link->a->name . " " . $link->b->name;
 
                 if (strcmp($link->a->name, $link->b->name) > 0) {
@@ -519,7 +517,6 @@ class WeatherMapEditor {
                 }
 
                 if (($ignore_tidied || $link->get_hint("_tidied") == 1) && !isset($done[$route])) {
-
                     if (sizeof($routes[$route]) == 1) {
                         $this->_tidy_link($link->name);
                         $done[$route] = 1;
@@ -537,7 +534,7 @@ class WeatherMapEditor {
     /**
      * _tidy_link - change link offsets so that link is horizonal or vertical, if possible.
      *  if not possible, change offsets to the closest facing compass points
-     *  
+     *
      * @param string $target - the link name to tidy
      * @param int $linknumber - if this is part of a group, which number in the group
      * @param int $linktotal - if this is part of a group, how many total in the group
@@ -547,7 +544,6 @@ class WeatherMapEditor {
     {
         // print "\n-----------------------------------\nTidying $target...\n";
         if (isset($this->map->links[$target]) and isset($this->map->links[$target]->a)) {
-        
             $node_a = $this->map->links[$target]->a;
             $node_b = $this->map->links[$target]->b;
              
@@ -586,7 +582,7 @@ class WeatherMapEditor {
                 }
         
                 // this should be true whichever way around they are
-                list($min_overlap,$max_overlap) = $this->common_range($bb_a[1],$bb_a[3],$bb_b[1],$bb_b[3]);
+                list($min_overlap,$max_overlap) = $this->common_range($bb_a[1], $bb_a[3], $bb_b[1], $bb_b[3]);
                 $overlap = $max_overlap - $min_overlap;
                 $n = $overlap/($linktotal+1);
         
@@ -598,7 +594,7 @@ class WeatherMapEditor {
             }
         
             // if they are above and below, and there's some common x coords, make link vertical
-            if ( !$y_overlap && $x_overlap ) {
+            if (!$y_overlap && $x_overlap) {
                 // print "ABOVE/BELOW\n";
         
                 // snap the Y coord to the appropriate edge of the node
@@ -611,7 +607,7 @@ class WeatherMapEditor {
                     $b_y_offset = $bb_b[3] - $node_b->y;
                 }
         
-                list($min_overlap,$max_overlap) = $this->common_range($bb_a[0],$bb_a[2],$bb_b[0],$bb_b[2]);
+                list($min_overlap,$max_overlap) = $this->common_range($bb_a[0], $bb_a[2], $bb_b[0], $bb_b[2]);
                 $overlap = $max_overlap - $min_overlap;
                 $n = $overlap/($linktotal+1);
         
@@ -624,8 +620,7 @@ class WeatherMapEditor {
             }
         
             // if no common coordinates, figure out the best diagonal...
-            if ( (1==0) && !$y_overlap && !$x_overlap ) {
-        
+            if ((1==0) && !$y_overlap && !$x_overlap) {
                 $pt_a = new WMPoint($node_a->x, $node_a->y);
                 $pt_b = new WMPoint($node_b->x, $node_b->y);
                  
@@ -637,8 +632,8 @@ class WeatherMapEditor {
         
                 $normal = $tangent->getNormal();
         
-                $pt_a->addVector( $normal, 15 * ($linknumber-1) );
-                $pt_b->addVector( $normal, 15 * ($linknumber-1) );
+                $pt_a->addVector($normal, 15 * ($linknumber-1));
+                $pt_b->addVector($normal, 15 * ($linknumber-1));
         
                 $a_x_offset = $pt_a->x - $node_a->x;
                 $a_y_offset = $pt_a->y - $node_a->y;
@@ -653,13 +648,13 @@ class WeatherMapEditor {
             // if no common coordinates, figure out the best diagonal...
             // currently - brute force search the compass points for the shortest distance
             // potentially - intersect link line with rectangles to get exact crossing point
-            if ( 1==0 && !$y_overlap && !$x_overlap ) {
+            if (1==0 && !$y_overlap && !$x_overlap) {
                 // print "DIAGONAL\n";
         
                 $corners = array("NE","E","SE","S","SW","W","NW","N");
         
                 // start with what we have now
-                $best_distance = distance( $node_a->x, $node_a->y, $node_b->x, $node_b->y );
+                $best_distance = distance($node_a->x, $node_a->y, $node_b->x, $node_b->y);
                 $best_offset_a = "C";
                 $best_offset_b = "C";
         
@@ -675,7 +670,7 @@ class WeatherMapEditor {
                         $bxx = $node_b->x + $bx;
                         $byy = $node_b->y + $by;
         
-                        $distance = distance($axx,$ayy, $bxx, $byy);
+                        $distance = distance($axx, $ayy, $bxx, $byy);
                         if ($distance < $best_distance) {
                             // print "from $corner1 ($axx, $ayy) to $corner2 ($bxx, $byy): ";
                             // print "NEW BEST $d\n";
@@ -696,19 +691,19 @@ class WeatherMapEditor {
             $this->map->links[$target]->a_offset = $new_a_offset;
             $this->map->links[$target]->b_offset = $new_b_offset;
             // and also add a note that this link was tidied, and is eligible for automatic tidying
-            $this->map->links[$target]->add_hint("_tidied",1);
+            $this->map->links[$target]->add_hint("_tidied", 1);
         }
     }
     
     /**
      * _tidy_links - for a group of links between the same two nodes, distribute them
      * nicely.
-     * 
+     *
      * @param string[] $links - the link names to treat as a group
      * @param bool $ignore_tidied - whether to take notice of the "_tidied" hint
-     * 
+     *
      */
-    function _tidy_links($links,  $ignore_tidied=false) 
+    function _tidy_links($links, $ignore_tidied = false)
     {
         // not very efficient, but it saves looking for special cases (a->b & b->a together)
         $ntargets = count($targets);
@@ -722,7 +717,7 @@ class WeatherMapEditor {
 
     /**
      * untidyLinks - remove all link offsets from the map. Used mainly for testing.
-     * 
+     *
      */
     function untidyLinks()
     {
@@ -733,7 +728,7 @@ class WeatherMapEditor {
         foreach ($this->map->links as $link) {
             $link->a_offset = "C";
             $link->b_offset = "C";
-        }    
+        }
     }
     
     function placeLegend($x, $y, $scalename = "DEFAULT")
@@ -746,7 +741,7 @@ class WeatherMapEditor {
         $this->map->keyy[$scalename] = $y;
     }
     
-    function placeTitle($x, $y) 
+    function placeTitle($x, $y)
     {
         if (! $this->isLoaded()) {
             throw new WMException("Map must be loaded before editing API called.");
@@ -777,7 +772,7 @@ class WeatherMapEditor {
     
     /**
      * range_overlaps - check if two ranges have anything in common. Used for tidy()
-     * 
+     *
      * @param unknown $a_min
      * @param unknown $a_max
      * @param unknown $b_min
@@ -798,14 +793,14 @@ class WeatherMapEditor {
     
     /**
      * common_range - find the range of numbers where two ranges overlap. Used for tidy()
-     * 
+     *
      * @param number $a_min
      * @param number $a_max
      * @param number $b_min
      * @param number $b_max
      * @return number list($min,$max)
      */
-    function common_range ($a_min, $a_max, $b_min, $b_max)
+    function common_range($a_min, $a_max, $b_min, $b_max)
     {
         $min_overlap = max($a_min, $b_min);
         $max_overlap = min($a_max, $b_max);
@@ -816,11 +811,11 @@ class WeatherMapEditor {
     /* distance - find the distance between two points
      *
     */
-    function distance ($ax, $ay, $bx, $by)
+    function distance($ax, $ay, $bx, $by)
     {
         $dx = $bx - $ax;
         $dy = $by - $ay;
-        return sqrt( $dx*$dx + $dy*$dy );
+        return sqrt($dx*$dx + $dy*$dy);
     }
 
     /**
@@ -831,13 +826,13 @@ class WeatherMapEditor {
      * @param int $y_offset
      * @return string
      */
-    function simplifyOffset ($x_offset, $y_offset)
+    function simplifyOffset($x_offset, $y_offset)
     {
         if ($x_offset== 0 && $y_offset==0) {
             return "";
         }
 
-        if($x_offset==0) {
+        if ($x_offset==0) {
             if ($y_offset<0) {
                 return "N95";
             } else {
@@ -845,7 +840,7 @@ class WeatherMapEditor {
             }
         }
 
-        if($y_offset==0) {
+        if ($y_offset==0) {
             if ($x_offset <0) {
                 return "W95";
             } else {

@@ -7,7 +7,7 @@
  * Time: 13:59
  */
 
-define("WEATHERMAP_VERSION","0.98");
+define("WEATHERMAP_VERSION", "0.98");
 
 // parameterise the in/out stuff a bit
 define("IN", 0);
@@ -31,8 +31,8 @@ define("Y", 1);
 define("DISTANCE", 2);
 
 // the source information for config fetching
-define("CONF_NOT_FOUND",0);
-define("CONF_FOUND_DIRECT",1);
-define("CONF_FOUND_INHERITED",2);
+define("CONF_NOT_FOUND", 0);
+define("CONF_FOUND_DIRECT", 1);
+define("CONF_FOUND_INHERITED", 2);
 
 // ***********************************************

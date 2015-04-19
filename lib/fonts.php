@@ -14,7 +14,6 @@ class WMFont
             // test if this font is valid, before adding it to the font table...
             $bounds = @imagettfbbox($size, 0, $filename, "Ignore me");
             if (isset($bounds[0])) {
-
                 $this->file = $filename;
                 $this->size = $size;
                 $this->type = "truetype";

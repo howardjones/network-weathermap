@@ -2,7 +2,7 @@
 
 class WMLinkGeometryFactory
 {
-    function create($style)
+    public function create($style)
     {
         if ($style=='angled') {
             return new WMAngledLinkGeometry();
@@ -13,5 +13,4 @@ class WMLinkGeometryFactory
 
         throw new WMException("UnexpectedViaStyle");
     }
-
 }

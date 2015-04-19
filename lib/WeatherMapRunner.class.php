@@ -3,7 +3,8 @@
  * Encapsulate all the random junk required to produce a map. Extracted from poller-common.php
  *
  */
-class WeatherMapRunner {
+class WeatherMapRunner
+{
     
     private $map;
     
@@ -21,7 +22,7 @@ class WeatherMapRunner {
     private $workingImageFileName;
     
     function __construct($config_directory, $output_directory, $config_file, $filehash, $imageformat)
-    {    
+    {
         $this->mapConfigFileName = $config_directory . DIRECTORY_SEPARATOR . $config_file;
         $this->htmlOutputFileName = $output_directory . DIRECTORY_SEPARATOR . $filehash.".html";
         $this->imageOutputFileName = $output_directory . DIRECTORY_SEPARATOR . $filehash.".".$imageformat;

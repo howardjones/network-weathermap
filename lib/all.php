@@ -1,10 +1,11 @@
 <?php
-    // PHP Weathermap 0.98
-    // Copyright Howard Jones, 2005-2014 howie@thingy.com
-    // http://www.network-weathermap.com/
-    // Released under the GNU Public License
+/*   PHP Weathermap 0.98
+     Copyright Howard Jones, 2005-2014 howie@thingy.com
+     http://www.network-weathermap.com/
+     Released under the GNU Public License
 
-    // one file to include all the others...
+    one file to include all the others...
+*/
 
     require_once dirname(__FILE__).'/globals.php';
     require_once dirname(__FILE__).'/constants.php';

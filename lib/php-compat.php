@@ -2,9 +2,9 @@
 
 /**
  * Parts of the PEAR PHP_Compat library, to avoid another dependency for a handful of functions.
- * 
+ *
  * http://pear.php.net/package/PHP_Compat/
- * 
+ *
  */
 
 /**

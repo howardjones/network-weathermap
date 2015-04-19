@@ -1,4 +1,4 @@
-<?php 
+<?php
 
 /**
  * Utility class used for colour calculations in Weathermap.

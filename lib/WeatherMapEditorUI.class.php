@@ -8,7 +8,8 @@
 
 // Grabbed from here: http://www.massassi.com/php/articles/template_engines/
 
-class SimpleTemplate {
+class SimpleTemplate
+{
     var $vars; /// Holds all the template variables
 
     /**
@@ -53,7 +54,8 @@ class SimpleTemplate {
  *  validation of input etc. Mostly class methods.
  */
 
-class WeatherMapEditorUI {
+class WeatherMapEditorUI
+{
 
     var $editor;
 
@@ -695,12 +697,12 @@ class WeatherMapEditorUI {
     {
         $this->foundCacti = false;
         // check if the goalposts have moved
-        if ( is_dir($cacti_base) && file_exists($cacti_base."/include/global.php") ) {
+        if (is_dir($cacti_base) && file_exists($cacti_base."/include/global.php")) {
             // include the cacti-config, so we know about the database
                 include_once($cacti_base."/include/global.php");
                 $config['base_url'] = $cacti_url;
                 $cacti_found = true;
-        } elseif ( is_dir($cacti_base) && file_exists($cacti_base."/include/config.php") ) {
+        } elseif (is_dir($cacti_base) && file_exists($cacti_base."/include/config.php")) {
             // include the cacti-config, so we know about the database
                 include_once($cacti_base."/include/config.php");
         
@@ -716,7 +718,7 @@ class WeatherMapEditorUI {
     
     function unpackCookie($cookiename = "wmeditor")
     {
-        if ( isset($_COOKIE[$cookiename])) {
+        if (isset($_COOKIE[$cookiename])) {
             $parts = explode(":", $_COOKIE[$cookiename]);
 
             if ((isset($parts[0])) && (intval($parts[0]) == 1)) {
@@ -773,7 +775,7 @@ class WeatherMapEditorUI {
                     $note = "";
         
                     // skip directories, unreadable files, .files and anything that doesn't come through the sanitiser unchanged
-                    if ( (is_file($realfile)) && (is_readable($realfile)) && (!preg_match("/^\./", $file)) && (wmeSanitizeConfigFile($file) == $file )) {
+                    if ((is_file($realfile)) && (is_readable($realfile)) && (!preg_match("/^\./", $file)) && (wmeSanitizeConfigFile($file) == $file )) {
                         if (!is_writable($realfile)) {
                             $note .= "(read-only)";
                         }
@@ -838,14 +840,14 @@ class WeatherMapEditorUI {
         /* add a random bit onto the URL so that the next request won't get the same URL/ETag combo
            even if the config file contents don't change, but the two requests for the same editor page WILL */
 
-        $map_url = "?action=draw&mapname=" . $this->mapname . "&rand=" . rand(0,100000);
+        $map_url = "?action=draw&mapname=" . $this->mapname . "&rand=" . rand(0, 100000);
 
         $tpl = new SimpleTemplate();
         $tpl->set("WEATHERMAP_VERSION", $WEATHERMAP_VERSION);
         $tpl->set("fromplug", ($this->isEmbedded() ? 1 : 0));
 
         $tpl->set("imageurl", htmlspecialchars($map_url));
-        if($this->selected != "") {
+        if ($this->selected != "") {
             $tpl->set("imageurl", htmlspecialchars($map_url . "&selected=" . urlencode($this->selected)));
         }
         $tpl->set("mapname", htmlspecialchars($this->mapname));
@@ -868,7 +870,7 @@ class WeatherMapEditorUI {
         echo $tpl->fetch("editor-resources/templates/main.php");
     }
     
-    function main($request, $from_plugin=false)
+    function main($request, $from_plugin = false)
     {
         $mapname = "";
         $action = "";
@@ -898,11 +900,11 @@ class WeatherMapEditorUI {
             if ($this->validateRequest($action, $request)) {
                 $editor = new WeatherMapEditor();
                 $this->setEmbedded($from_plugin);
-                if ( !isset($this->commands[$action]['late_load'])) {
+                if (!isset($this->commands[$action]['late_load'])) {
                     $editor->loadConfig($this->mapfile);
                 }
                 $result = $this->dispatchRequest($action, $request, $editor);
-                if ( !isset($this->commands[$action]['no_save'])) {
+                if (!isset($this->commands[$action]['no_save'])) {
                     $editor->saveConfig();
                 }
                 if ($result !== false) {
@@ -952,7 +954,7 @@ function wmeValidateOneOf($input, $valid = array(), $case_sensitive = false)
     }
 
     foreach ($valid as $v) {
-        if (! $case_sensitive ) {
+        if (! $case_sensitive) {
             $v = strtolower($v);
         }
         if ($v == $input) {
@@ -1008,13 +1010,13 @@ function wmeSanitizeConfigFile($filename)
 
     # on top of the url stuff, we don't ever need to see a / in a config filename
     # (CVE-2013-3739)
-    if (strstr($filename, "/") !== false ) {
+    if (strstr($filename, "/") !== false) {
         $filename = "";
     }
-    if (strstr($filename, "?") !== false ) {
+    if (strstr($filename, "?") !== false) {
         $filename = "";
     }
-    if (strstr($filename, "*") !== false ) {
+    if (strstr($filename, "*") !== false) {
         $filename = "";
     }
     return $filename;

@@ -32,9 +32,9 @@ class WMPoint
     function identical($point2)
     {
         if (($this->x == $point2->x) && ($this->y == $point2->y)) {
-            return TRUE;
+            return true;
         }
-        return FALSE;
+        return false;
     }
 
     /**
@@ -54,10 +54,10 @@ class WMPoint
      */
     function closeEnough($point2)
     {
-        if ((round($this->x,2) == round($point2->x, 2)) && (round($this->y, 2) == round($point2->y, 2))) {
-            return TRUE;
+        if ((round($this->x, 2) == round($point2->x, 2)) && (round($this->y, 2) == round($point2->y, 2))) {
+            return true;
         }
-        return FALSE;
+        return false;
     }
 
 
@@ -71,7 +71,7 @@ class WMPoint
     function lineToPoint($p2)
     {
         $vec = $this->vectorToPoint($p2);
-        return new WMLine ($this, $vec);
+        return new WMLine($this, $vec);
     }
 
     function distanceToLine($l)
@@ -176,7 +176,7 @@ class WMVector
 
     function getSlope()
     {
-        if($this->dx == 0) {
+        if ($this->dx == 0) {
             // special case - if slope is infinite, fudge it to be REALLY BIG instead
             wm_debug("Slope is infinite.\n");
             return 1e10;
@@ -306,7 +306,6 @@ class WMRectangle
             && $this->bottomright->x >= $p->x
             && $this->topleft->y <= $p->y
             && $this->bottomright->y >= $p->y) {
-
             return true;
         }
 
@@ -377,7 +376,6 @@ class WMLine
 
         return new WMPoint($xi, $yi);
     }
-    
 }
 class WMLineSegment
 {

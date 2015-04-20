@@ -608,5 +608,30 @@ function TestOutput_RunTest($conffile, $imagefile, $htmlfile, $newconffile)
     return intval($nwarns);
 }
 
+function wmDirectionToString($input)
+{
+    if($input==IN) {
+        return 'IN';
+    }
+    if($input==OUT) {
+        return 'OUT';
+    }
+
+    return 'INVALID';
+}
+
+function wmStringToDirection($input)
+{
+    if($input == 'IN'){
+        return IN;
+    }
+
+    if($input == 'OUT'){
+        return OUT;
+    }
+
+    // return something that'll break any array indexing straight away (hopefully)
+    return -1.63;
+}
 
 // vim:ts=4:sw=4:

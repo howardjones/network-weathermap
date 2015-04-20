@@ -488,33 +488,34 @@ class WeatherMap extends WeatherMapBase
             }
         }
 
-        if ($directoryHandle) {
-            while ($file = readdir($directoryHandle)) {
-                $realfile = $dir . DIRECTORY_SEPARATOR . $file;
-
-                if (is_file($realfile) && preg_match('/\.php$/', $realfile)) {
-                    wm_debug("Loading $type Plugin class from $file\n");
-
-                    include_once($realfile);
-                    $class = preg_replace("/\.php$/", "", $file);
-
-                    if ($type == 'data') {
-                        $this->activeDataSourceClasses[$class] = true;
-                    }
-
-                    wm_debug("Loaded $type Plugin class $class from $file\n");
-                    $this->plugins[$type][$class] = new $class;
-                    if (!isset($this->plugins[$type][$class])) {
-                        wm_debug("** Failed to create an object for plugin $type/$class\n");
-                    } else {
-                        wm_debug("Instantiated $class.\n");
-                    }
-                } else {
-                    wm_debug("Skipping $file\n");
-                }
-            }
-        } else {
+        if (!$directoryHandle) {
             wm_warn("Couldn't open $type Plugin directory ($dir). Things will probably go wrong. [WMWARN06]\n");
+            return;
+        }
+
+        while ($file = readdir($directoryHandle)) {
+            $realfile = $dir . DIRECTORY_SEPARATOR . $file;
+
+            if (is_file($realfile) && preg_match('/\.php$/', $realfile)) {
+                wm_debug("Loading $type Plugin class from $file\n");
+
+                include_once($realfile);
+                $class = preg_replace("/\.php$/", "", $file);
+
+                wm_debug("Loaded $type Plugin class $class from $file\n");
+
+                $this->plugins[$type][$class]['object'] = new $class;
+                $this->plugins[$type][$class]['active'] = true;
+
+                if (!isset($this->plugins[$type][$class])) {
+                    wm_debug("** Failed to create an object for plugin $type/$class\n");
+                    $this->plugins[$type][$class]['active'] = false;
+                } else {
+                    wm_debug("Instantiated $class.\n");
+                }
+            } else {
+                wm_debug("Skipping $file\n");
+            }
         }
     }
 
@@ -522,19 +523,22 @@ class WeatherMap extends WeatherMapBase
      * Loop through the datasource plugins, allowing them to initialise any internals.
      * The plugins can also refuse to run, if resources they need aren't available.
      */
-    function initialiseDatasourcePlugins()
+    function initialiseAllPlugins()
     {
         wm_debug("Running Init() for Data Source Plugins...\n");
 
-        foreach ($this->plugins['data'] as $name => $pluginInstance) {
-            // make an instance of the class
-            wm_debug("Running $name" . "->Init()\n");
+        foreach (array('data','pre','post') as $type) {
+            wm_debug("Initialising $type Plugins...\n");
 
-            $ret = $pluginInstance->Init($this);
+            foreach ($this->plugins[$type] as $name => $pluginEntry) {
+                wm_debug("Running $name" . "->Init()\n");
 
-            if (!$ret) {
-                wm_debug("Removing $name from Data Source list, since Init() failed\n");
-                $this->activeDataSourceClasses[$name] = false;
+                $ret = $pluginEntry['object']->Init($this);
+
+                if (!$ret) {
+                    wm_debug("Marking $name plugin as inactive, since Init() failed\n");
+                    $pluginEntry['active'] = false;
+                }
             }
         }
         wm_debug("Finished Initialising Plugins...\n");
@@ -580,67 +584,44 @@ class WeatherMap extends WeatherMapBase
 
         foreach ($itemList as $oneMapItem) {
 
-            $type = $oneMapItem->my_type();
-            $name = $oneMapItem->name;
+            if($oneMapItem->isTemplate()) {
+                continue;
+            }
 
-            if (!$oneMapItem->isTemplate()) {
-                if (count($oneMapItem->targets) > 0) {
-                    foreach ($oneMapItem->targets as $target) {
-                        wm_debug("ProcessTargets: New Target: $target\n");
+            foreach ($oneMapItem->targets as $target) {
+                wm_debug("ProcessTargets: New Target: $target\n");
 
-                        $target->preProcess($oneMapItem, $this);
-                        $matchedBy = $target->findHandlingPlugin($this->plugins['data']);
+                $target->preProcess($oneMapItem, $this);
+                $matchedBy = $target->findHandlingPlugin($this->plugins['data']);
 
-                        if ($matchedBy != "") {
-                            if ($this->activeDataSourceClasses[$matchedBy]) {
-                                $target->registerWithPlugin($this->plugins['data'], $this, $oneMapItem);
-                            } else {
-                                wm_warn("ProcessTargets: $type $name, target: $target was recognised as a valid TARGET by a plugin that is unable to run ($matchedBy) [WMWARN07]\n");
-                            }
-                        }
-
-                        if ($matchedBy == "") {
-                            wm_warn("ProcessTargets: $type $name, target: $target was not recognised as a valid TARGET [WMWARN08]\n");
-                        }
+                if ($matchedBy != "") {
+                    if ($this->plugins['data'][$matchedBy]['active']) {
+                        $target->registerWithPlugin($this, $oneMapItem);
+                    } else {
+                        wm_warn(sprintf("ProcessTargets: %s %s, target: %s was recognised as a valid TARGET by a plugin that is unable to run (%s) [WMWARN07]\n",
+                            $oneMapItem->my_type(), $oneMapItem->name, $target, $matchedBy));
                     }
+                }
+
+                if ($matchedBy == "") {
+                    wm_warn(sprintf("ProcessTargets: %s, %s, target: %s was not recognised as a valid TARGET [WMWARN08]\n",
+                        $oneMapItem->my_type(), $oneMapItem->name, $target));
                 }
             }
         }
     }
 
-    function readData()
+    function readDataFromTargets($itemList)
     {
-        // we skip readdata completely in sizedebug mode
-        if ($this->sizedebug != 0) {
-            wm_debug("Size Debugging is on. Skipping readData.\n");
-            return;
-        }
-
-        $allMapItems = $this->buildAllItemsList();
-
-        $this->initialiseDatasourcePlugins();
-
-        wm_debug("======================================\n");
-        wm_debug("ReadData: Updating link data for all links and nodes\n");
-
-        // process all the targets and find a plugin for them
-        $this->preProcessTargets($allMapItems);
-
-        // give all the plugins a chance to prefetch their results
-        wm_debug("======================================\n");
-        wm_debug("Starting prefetch\n");
-        foreach ($this->plugins['data'] as $name => $pluginObject) {
-            $pluginObject->Prefetch($this);
-        }
-
         wm_debug("======================================\n");
         wm_debug("Starting main collection loop\n");
 
         $channels = array(IN,OUT);
 
-        foreach ($allMapItems as $oneMapItem) {
+        foreach ($itemList as $mapItem) {
 
-            $type = $oneMapItem->my_type();
+            $type = $mapItem->my_type();
+            $name = $mapItem->name;
 
             $totals = array();
             foreach ($channels as $channel) {
@@ -648,25 +629,19 @@ class WeatherMap extends WeatherMapBase
             }
             $datatime = 0;
 
-            $name = $oneMapItem->name;
             wm_debug("-------------------------------------------------------------\n");
             wm_debug("ReadData for $type $name: \n");
 
-            if ( $oneMapItem->isTemplate()) {
+            if ( $mapItem->isTemplate()) {
                 wm_debug("ReadData: Skipping $type $name that looks like a template\n.");
                 continue;
             }
 
-            $nTargets = count($oneMapItem->targets);
+            $nTargets = count($mapItem->targets);
 
-            if ($nTargets == 0) {
-                wm_debug("ReadData: No targets for $type $name\n");
-                continue;
-            }
-
-            foreach ($oneMapItem->targets as $target) {
+            foreach ($mapItem->targets as $target) {
                 wm_debug("ReadData: New Target: $target\n");
-                $target->readData($this->plugins['data'], $this, $oneMapItem);
+                $target->readData($this, $mapItem);
 
                 if ($target->hasValidData()) {
                     $results = $target->getData();
@@ -681,6 +656,7 @@ class WeatherMap extends WeatherMapBase
                     wm_debug("Invalid data?\n");
                 }
 
+                // This was the only target, and it's failed
                 if (!$target->hasValidData() && $nTargets == 1 ) {
                     // this is to allow null to be passed through from DS plugins in the case of a single target
                     // we've never defined what x + null is, so we'll treat that as a 0
@@ -705,86 +681,123 @@ class WeatherMap extends WeatherMapBase
 
             wm_debug("ReadData complete for %s %s: %s\n", $type, $name, join(" ", $totals));
 
-            // bodge for now: TODO these should be set in Reset() and readConfig()
-            $oneMapItem->maxValues[IN] = $oneMapItem->max_bandwidth_in;
-            $oneMapItem->maxValues[OUT] = $oneMapItem->max_bandwidth_out;
+            // NOTE - this part still happens even if there were no targets
 
-            $oneMapItem->bandwidth_in = $totals[IN];
-            $oneMapItem->bandwidth_out = $totals[OUT];
+            // bodge for now: TODO these should be set in Reset() and readConfig()
+            $mapItem->maxValues[IN] = $mapItem->max_bandwidth_in;
+            $mapItem->maxValues[OUT] = $mapItem->max_bandwidth_out;
+
+            $mapItem->bandwidth_in = $totals[IN];
+            $mapItem->bandwidth_out = $totals[OUT];
             // TODO this should replace the above 2 lines
             foreach ($channels as $channel) {
-                $oneMapItem->absoluteUsages[$channel] = $totals[$channel];
-                $oneMapItem->percentUsages[$channel] = ($totals[$channel] / $oneMapItem->maxValues[$channel]) * 100;
+                $mapItem->absoluteUsages[$channel] = $totals[$channel];
+                $mapItem->percentUsages[$channel] = ($totals[$channel] / $mapItem->maxValues[$channel]) * 100;
             }
-            $oneMapItem->outpercent = (($totals[OUT]) / ($oneMapItem->max_bandwidth_out)) * 100;
-            $oneMapItem->inpercent = (($totals[IN]) / ($oneMapItem->max_bandwidth_in)) * 100;
+            $mapItem->outpercent = (($totals[OUT]) / ($mapItem->max_bandwidth_out)) * 100;
+            $mapItem->inpercent = (($totals[IN]) / ($mapItem->max_bandwidth_in)) * 100;
 
-            if ($type == 'LINK' && $oneMapItem->duplex == 'half') {
+            if ($type == 'LINK' && $mapItem->duplex == 'half') {
                 // in a half duplex link, in and out share a common bandwidth pool, so percentages need to include both
                 wm_debug("Calculating percentage using half-duplex\n");
-                $oneMapItem->outpercent = (($totals[IN] + $totals[OUT]) / ($oneMapItem->max_bandwidth_out)) * 100;
-                $oneMapItem->inpercent = (($totals[IN] + $totals[OUT]) / ($oneMapItem->max_bandwidth_in)) * 100;
+                $mapItem->outpercent = (($totals[IN] + $totals[OUT]) / ($mapItem->max_bandwidth_out)) * 100;
+                $mapItem->inpercent = (($totals[IN] + $totals[OUT]) / ($mapItem->max_bandwidth_in)) * 100;
 
-                if ($oneMapItem->max_bandwidth_out != $oneMapItem->max_bandwidth_in) {
+                if ($mapItem->max_bandwidth_out != $mapItem->max_bandwidth_in) {
                     wm_warn("ReadData: $type $name: You're using asymmetric bandwidth AND half-duplex in the same link. That makes no sense. [WMWARN44]\n");
                 }
             }
 
             $warn_in = true;
             $warn_out = true;
-            if ($type == 'NODE' && $oneMapItem->scalevar == 'in') {
+            if ($type == 'NODE' && $mapItem->scalevar == 'in') {
                 $warn_out = false;
             }
-            if ($type == 'NODE' && $oneMapItem->scalevar == 'out') {
+            if ($type == 'NODE' && $mapItem->scalevar == 'out') {
                 $warn_in = false;
             }
 
-            if ($oneMapItem->scaletype == 'percent') {
-                list($incol, $inscalekey, $inscaletag) = $this->colourFromValue($oneMapItem->inpercent, $oneMapItem->usescale, $oneMapItem->name, true, $warn_in);
-                list($outcol, $outscalekey, $outscaletag) = $this->colourFromValue($oneMapItem->outpercent, $oneMapItem->usescale, $oneMapItem->name, true, $warn_out);
+            if ($mapItem->scaletype == 'percent') {
+                list($incol, $inscalekey, $inscaletag) = $this->colourFromValue($mapItem->inpercent, $mapItem->usescale, $mapItem->name, true, $warn_in);
+                list($outcol, $outscalekey, $outscaletag) = $this->colourFromValue($mapItem->outpercent, $mapItem->usescale, $mapItem->name, true, $warn_out);
 
                 foreach ($channels as $channel) {
-                    list($col, $scalekey, $scaletag) = $this->colourFromValue($oneMapItem->percentUsages[$channel], $oneMapItem->usescale, $oneMapItem->name, true, $warn_out);
-                    $oneMapItem->channelScaleColours[$channel] = $col;
-                    $oneMapItem->colours[$channel] = $col;
+                    list($col, $scalekey, $scaletag) = $this->colourFromValue($mapItem->percentUsages[$channel], $mapItem->usescale, $mapItem->name, true, $warn_out);
+                    $mapItem->channelScaleColours[$channel] = $col;
+                    $mapItem->colours[$channel] = $col;
                 }
             } else {
                 // use absolute values, if that's what is requested
-                list($incol, $inscalekey, $inscaletag) = $this->colourFromValue($oneMapItem->bandwidth_in, $oneMapItem->usescale, $oneMapItem->name, false, $warn_in);
-                list($outcol, $outscalekey, $outscaletag) = $this->colourFromValue($oneMapItem->bandwidth_out, $oneMapItem->usescale, $oneMapItem->name, false, $warn_out);
+                list($incol, $inscalekey, $inscaletag) = $this->colourFromValue($mapItem->bandwidth_in, $mapItem->usescale, $mapItem->name, false, $warn_in);
+                list($outcol, $outscalekey, $outscaletag) = $this->colourFromValue($mapItem->bandwidth_out, $mapItem->usescale, $mapItem->name, false, $warn_out);
 
                 foreach ($channels as $channel) {
-                    list($col, $scalekey, $scaletag) = $this->colourFromValue($oneMapItem->absoluteUsages[$channel], $oneMapItem->usescale, $oneMapItem->name, false, $warn_out);
-                    $oneMapItem->channelScaleColours[$channel] = $col;
-                    $oneMapItem->colours[$channel] = $col;
+                    list($col, $scalekey, $scaletag) = $this->colourFromValue($mapItem->absoluteUsages[$channel], $mapItem->usescale, $mapItem->name, false, $warn_out);
+                    $mapItem->channelScaleColours[$channel] = $col;
+                    $mapItem->colours[$channel] = $col;
                 }
             }
 
-            $oneMapItem->add_note("inscalekey", $inscalekey);
-            $oneMapItem->add_note("outscalekey", $outscalekey);
+            $mapItem->add_note("inscalekey", $inscalekey);
+            $mapItem->add_note("outscalekey", $outscalekey);
 
-            $oneMapItem->add_note("inscaletag", $inscaletag);
-            $oneMapItem->add_note("outscaletag", $outscaletag);
+            $mapItem->add_note("inscaletag", $inscaletag);
+            $mapItem->add_note("outscaletag", $outscaletag);
 
-            $oneMapItem->add_note("inscalecolor", $incol->asHTML());
-            $oneMapItem->add_note("outscalecolor", $outcol->asHTML());
+            $mapItem->add_note("inscalecolor", $incol->asHTML());
+            $mapItem->add_note("outscalecolor", $outcol->asHTML());
 
-//            $oneMapItem->colours[IN] = $incol;
-//            $oneMapItem->colours[OUT] = $outcol;
-
-            ### warn("TAGS (setting) |$inscaletag| |$outscaletag| \n");
+            $mapItem->colours[IN] = $incol;
+            $mapItem->colours[OUT] = $outcol;
 
             wm_debug(sprintf("ReadData: Setting %s,%s for %s\n", wm_value_or_null($totals[IN]), wm_value_or_null($totals[OUT]), $name));
-            unset($oneMapItem);
+            unset($mapItem);
         }
+    }
 
+    function prefetchPlugins()
+    {
+        // give all the plugins a chance to prefetch their results
+        wm_debug("======================================\n");
+        wm_debug("Starting prefetch\n");
+        foreach ($this->plugins['data'] as $name => $pluginEntry) {
+            $pluginEntry['object']->Prefetch($this);
+        }
+    }
 
+    function cleanupPlugins($type)
+    {
         wm_debug("======================================\n");
         wm_debug("Starting cleanup\n");
 
-        foreach ($this->plugins['data'] as $name => $pluginObject) {
-            $pluginObject->CleanUp($this);
+        foreach ($this->plugins[$type] as $name => $pluginEntry) {
+            $pluginEntry['object']->CleanUp($this);
         }
+    }
+
+    function readData()
+    {
+        // we skip readdata completely in sizedebug mode
+        if ($this->sizedebug != 0) {
+            wm_debug("Size Debugging is on. Skipping readData.\n");
+            return;
+        }
+
+        wm_debug("======================================\n");
+        wm_debug("ReadData: Updating link data for all links and nodes\n");
+
+        $allMapItems = $this->buildAllItemsList();
+
+        $this->initialiseAllPlugins();
+
+        // process all the targets and find a plugin for them
+        $this->preProcessTargets($allMapItems);
+
+        $this->prefetchPlugins();
+
+        $this->readDataFromTargets($allMapItems);
+
+        $this->cleanupPlugins('data');
 
         wm_debug("ReadData Completed.\n");
         wm_debug("------------------------------\n");
@@ -1502,18 +1515,9 @@ class WeatherMap extends WeatherMapBase
     {
         wm_debug("Building cache of z-layers and finalising bandwidth.\n");
 
-        $allitems = array();
-        foreach ($this->nodes as $node) {
-            $allitems[] = $node;
-        }
-        foreach ($this->links as $link) {
-            $allitems[] = $link;
-        }
+        $allItems = $this->buildAllItemsList();
 
-        while (list($ky,) = each($allitems)) {
-            # foreach ($allitems as $ky=>$vl)
-            # {
-            $item =& $allitems[$ky];
+        foreach ($allItems as $item) {
             $z = $item->zorder;
             if (!isset($this->seen_zlayers[$z]) || !is_array($this->seen_zlayers[$z])) {
                 $this->seen_zlayers[$z] = array();
@@ -1521,6 +1525,10 @@ class WeatherMap extends WeatherMapBase
             array_push($this->seen_zlayers[$z], $item);
 
             // while we're looping through, let's set the real bandwidths
+            $item->maxValues[IN] = wmInterpretNumberWithMetricPrefix($item->max_bandwidth_in_cfg, $this->kilo);
+            $item->maxValues[OUT] = wmInterpretNumberWithMetricPrefix($item->max_bandwidth_out_cfg, $this->kilo);
+
+            // TODO - remove PHP4ism
             if ($item->my_type() == "LINK") {
                 $this->links[$item->name]->max_bandwidth_in = wmInterpretNumberWithMetricPrefix($item->max_bandwidth_in_cfg, $this->kilo);
                 $this->links[$item->name]->max_bandwidth_out = wmInterpretNumberWithMetricPrefix($item->max_bandwidth_out_cfg, $this->kilo);
@@ -1539,9 +1547,9 @@ class WeatherMap extends WeatherMapBase
     function runProcessorPlugins($stage = "pre")
     {
         wm_debug("Running $stage-processing plugins...\n");
-        foreach ($this->plugins[$stage] as $name => $pluginObject) {
+        foreach ($this->plugins[$stage] as $name => $pluginEntry) {
             wm_debug("Running %s->run()\n", $name);
-            $pluginObject->run($this);
+            $pluginEntry['object']->run($this);
         }
         wm_debug("Finished $stage-processing plugins...\n");
     }
@@ -1951,9 +1959,9 @@ class WeatherMap extends WeatherMapBase
         $bgimage=null;
 
         wm_debug("Running Post-Processing Plugins...\n");
-        foreach ($this->plugins['post'] as $pluginName => $pluginObject) {
+        foreach ($this->plugins['post'] as $pluginName => $pluginEntry) {
             wm_debug("Running $pluginName"."->run()\n");
-            $pluginObject->run($this);
+            $pluginEntry['object']->run($this);
         }
         wm_debug("Finished Post-Processing Plugins...\n");
 
@@ -2256,175 +2264,170 @@ class WeatherMap extends WeatherMapBase
         $this->scales = null;
     }
 
-    function calculateImageMap()
+    function processOverlib($mapItem, $dirs)
     {
-        wm_debug("Trace: PreloadMapHTML()\n");
+        // skip all this if it's a template node
+        if ($mapItem->isTemplate()) {
+            return;
+        }
+
+        $type = $mapItem->my_type();
 
         // find the middle of the map
-        $center_x = $this->width / 2;
-        $center_y = $this->height / 2;
+        $centre_x = $this->width / 2;
+        $centre_y = $this->height / 2;
 
-        // loop through everything. Figure out along the way if it's a node or a link
-        $allitems = array(&$this->nodes, &$this->links);
-        reset($allitems);
+        if ($type=='NODE') {
+            $mid_x = $mapItem->x;
+            $mid_y = $mapItem->y;
+        }
 
-        while (list($kk,) = each($allitems)) {
-            unset($objects);
-            # $objects = &$this->links;
-            $objects = &$allitems[$kk];
+        if ($type=='LINK') {
+            $a_x = $this->nodes[$mapItem->a->name]->x;
+            $a_y = $this->nodes[$mapItem->a->name]->y;
 
-            reset($objects);
-            while (list($k,) = each($objects)) {
-                unset($myobj);
-                $myobj = &$objects[$k];
+            $b_x = $this->nodes[$mapItem->b->name]->x;
+            $b_y = $this->nodes[$mapItem->b->name]->y;
 
-                $type = $myobj->my_type();
-                $prefix = substr($type, 0, 1);
+            $mid_x=($a_x + $b_x) / 2;
+            $mid_y=($a_y + $b_y) / 2;
+        }
+        $left="";
+        $above="";
+        $img_extra = "";
 
-                $dirs = array();
-                if ($type == 'LINK') {
-                    $dirs = array(IN=>array(0, 2), OUT=>array(1, 3));
-                }
-                if ($type == 'NODE') {
-                    $dirs = array(IN=>array(0, 1, 2, 3));
-                }
+        if ($mapItem->overlibwidth != 0) {
+            $left="WIDTH," . $mapItem->overlibwidth . ",";
+            $img_extra .= " WIDTH=$mapItem->overlibwidth";
 
-                // check to see if any of the relevant things have a value
-                $change = "";
-                foreach ($dirs as $d => $parts) {
-                    $change .= join('', $myobj->overliburl[$d]);
-                    $change .= $myobj->notestext[$d];
-                }
+            if ($mid_x > $centre_x) {
+                $left.="LEFT,";
+            }
+        }
 
-                if ($this->htmlstyle == "overlib") {
-                    // skip all this if it's a template node
-                    if ($type=='LINK' && ! isset($myobj->a->name)) {
-                        $change = '';
+        if ($mapItem->overlibheight != 0) {
+            $above="HEIGHT," . $mapItem->overlibheight . ",";
+            $img_extra .= " HEIGHT=$mapItem->overlibheight";
+
+            if ($mid_y > $centre_y) {
+                $above.="ABOVE,";
+            }
+        }
+
+        foreach ($dirs as $dir => $parts) {
+            $caption = ($mapItem->overlibcaption[$dir] != '' ? $mapItem->overlibcaption[$dir] : $mapItem->name);
+            $caption = $this->processString($caption, $mapItem);
+
+            $overlibhtml = "onmouseover=\"return overlib('";
+
+            $n = 0;
+            if (sizeof($mapItem->overliburl[$dir]) > 0) {
+                // print "ARRAY:".is_array($link->overliburl[$dir])."\n";
+                foreach ($mapItem->overliburl[$dir] as $url) {
+                    if ($n>0) {
+                        $overlibhtml .= '&lt;br /&gt;';
                     }
-                    if ($type=='NODE' && ! isset($myobj->x)) {
-                        $change = '';
-                    }
-
-                    if ($change != '') {
-                        if ($type=='NODE') {
-                            $mid_x = $myobj->x;
-                            $mid_y = $myobj->y;
-                        }
-
-                        if ($type=='LINK') {
-                            $a_x = $this->nodes[$myobj->a->name]->x;
-                            $a_y = $this->nodes[$myobj->a->name]->y;
-
-                            $b_x = $this->nodes[$myobj->b->name]->x;
-                            $b_y = $this->nodes[$myobj->b->name]->y;
-
-                            $mid_x=($a_x + $b_x) / 2;
-                            $mid_y=($a_y + $b_y) / 2;
-                        }
-                        $left="";
-                        $above="";
-                        $img_extra = "";
-
-                        if ($myobj->overlibwidth != 0) {
-                            $left="WIDTH," . $myobj->overlibwidth . ",";
-                            $img_extra .= " WIDTH=$myobj->overlibwidth";
-
-                            if ($mid_x > $center_x) {
-                                $left.="LEFT,";
-                            }
-                        }
-
-                        if ($myobj->overlibheight != 0) {
-                            $above="HEIGHT," . $myobj->overlibheight . ",";
-                            $img_extra .= " HEIGHT=$myobj->overlibheight";
-
-                            if ($mid_y > $center_y) {
-                                $above.="ABOVE,";
-                            }
-                        }
-
-                        foreach ($dirs as $dir => $parts) {
-                            $caption = ($myobj->overlibcaption[$dir] != '' ? $myobj->overlibcaption[$dir] : $myobj->name);
-                            $caption = $this->processString($caption, $myobj);
-
-                            $overlibhtml = "onmouseover=\"return overlib('";
-
-                            $n = 0;
-                            if (sizeof($myobj->overliburl[$dir]) > 0) {
-                                // print "ARRAY:".is_array($link->overliburl[$dir])."\n";
-                                foreach ($myobj->overliburl[$dir] as $url) {
-                                    if ($n>0) {
-                                        $overlibhtml .= '&lt;br /&gt;';
-                                    }
-                                    $overlibhtml .= "&lt;img $img_extra src=" . $this->processString($url, $myobj) . "&gt;";
-                                    $n++;
-                                }
-                            }
-
-                            if (trim($myobj->notestext[$dir]) != '') {
-                                # put in a linebreak if there was an image AND notes
-                                if ($n>0) {
-                                    $overlibhtml .= '&lt;br /&gt;';
-                                }
-                                $note = $this->processString($myobj->notestext[$dir], $myobj);
-                                $note = htmlspecialchars($note, ENT_NOQUOTES);
-                                $note=str_replace("'", "\\&apos;", $note);
-                                $note=str_replace('"', "&quot;", $note);
-                                $overlibhtml .= $note;
-                            }
-                            $overlibhtml .= "',DELAY,250,${left}${above}CAPTION,'" . $caption . "');\"  onmouseout=\"return nd();\"";
-
-                            foreach ($parts as $part) {
-                                $areaname = $type.":" . $prefix . $myobj->id. ":" . $part;
-
-                                $this->imap->setProp("extrahtml", $overlibhtml, $areaname);
-                            }
-                        }
-                    } // if change
-                } // overlib?
-
-                // now look at infourls
-                foreach ($dirs as $dir => $parts) {
-                    foreach ($parts as $part) {
-                        $areaname = $type.":" . $prefix . $myobj->id. ":" . $part;
-
-                        if (($this->htmlstyle != 'editor') && ($myobj->infourl[$dir] != '')) {
-                            $this->imap->setProp("href", $this->processString($myobj->infourl[$dir], $myobj), $areaname);
-                        }
-                    }
+                    $overlibhtml .= "&lt;img $img_extra src=" . $this->processString($url, $mapItem) . "&gt;";
+                    $n++;
                 }
+            }
+
+            if (trim($mapItem->notestext[$dir]) != '') {
+                # put in a linebreak if there was an image AND notes
+                if ($n>0) {
+                    $overlibhtml .= '&lt;br /&gt;';
+                }
+                $note = $this->processString($mapItem->notestext[$dir], $mapItem);
+                $note = htmlspecialchars($note, ENT_NOQUOTES);
+                $note=str_replace("'", "\\&apos;", $note);
+                $note=str_replace('"', "&quot;", $note);
+                $overlibhtml .= $note;
+            }
+            $overlibhtml .= "',DELAY,250,${left}${above}CAPTION,'" . $caption . "');\"  onmouseout=\"return nd();\"";
+
+            foreach ($parts as $part) {
+                $areaname = $type.":" . $prefix . $mapItem->id. ":" . $part;
+
+                $this->imap->setProp("extrahtml", $overlibhtml, $areaname);
             }
         }
     }
 
+    function calculateImageMap()
+    {
+        wm_debug("Trace: PreloadMapHTML()\n");
+
+        $allItems = $this->buildAllItemsList();
+
+        // loop through everything. Figure out along the way if it's a node or a link
+
+        foreach ($allItems as $mapItem) {
+
+            $type = $mapItem->my_type();
+            $prefix = substr($type, 0, 1);
+
+            $dirs = array();
+            if ($type == 'LINK') {
+                $dirs = array(IN=>array(0, 2), OUT=>array(1, 3));
+            }
+            if ($type == 'NODE') {
+                $dirs = array(IN=>array(0, 1, 2, 3));
+            }
+
+            // check to see if any of the relevant things have a value
+            $change = "";
+            foreach ($dirs as $d => $parts) {
+                $change .= join('', $mapItem->overliburl[$d]);
+                $change .= $mapItem->notestext[$d];
+            }
+
+            if ($this->htmlstyle == "overlib") {
+                $this->processOverlib($mapItem, $dirs);
+            }
+
+            // now look at infourls
+            foreach ($dirs as $dir => $parts) {
+                foreach ($parts as $part) {
+                    $areaname = $type.":" . $prefix . $mapItem->id. ":" . $part;
+
+                    if (($this->htmlstyle != 'editor') && ($mapItem->infourl[$dir] != '')) {
+                        $this->imap->setProp("href", $this->processString($mapItem->infourl[$dir], $mapItem), $areaname);
+                    }
+                }
+            }
+        }
+
+    }
+
     function asJS()
     {
-        $js='';
+        $javascript = '';
 
-        $js .= "var Links = new Array();\n";
-        $js .= "var LinkIDs = new Array();\n";
+        $javascript .= "var Links = new Array();\n";
+        $javascript .= "var LinkIDs = new Array();\n";
 
         foreach ($this->links as $link) {
-            $js.=$link->asJS();
+            $javascript.=$link->asJS();
         }
 
-        $js .= "var Nodes = new Array();\n";
-        $js .= "var NodeIDs = new Array();\n";
+        $javascript .= "var Nodes = new Array();\n";
+        $javascript .= "var NodeIDs = new Array();\n";
 
         foreach ($this->nodes as $node) {
-            $js.=$node->asJS();
+            $javascript.=$node->asJS();
         }
 
 
-        $mapname = array_pop(explode("/", $this->configfile));
-        $js .= "var Map = {\n";
-        $js .= sprintf('  "file": %s,', jsEscape($mapname));
-        $js .= sprintf('  "width": %s,', jsEscape($this->width));
-        $js .= sprintf('  "height": %s,', jsEscape($this->height));
-        $js .= sprintf('  "title": %s,', jsEscape($this->title));
-        $js .= "\n};\n";
+        $mapName = array_pop(explode("/", $this->configfile));
 
-        return $js;
+        $javascript .= "var Map = {\n";
+        $javascript .= sprintf('  "file": %s,', jsEscape($mapName));
+        $javascript .= sprintf('  "width": %s,', jsEscape($this->width));
+        $javascript .= sprintf('  "height": %s,', jsEscape($this->height));
+        $javascript .= sprintf('  "title": %s,', jsEscape($this->title));
+        $javascript .= "\n};\n";
+
+        return $javascript;
     }
 
     // This method MUST run *after* DrawMap. It relies on DrawMap to call the map-drawing bits

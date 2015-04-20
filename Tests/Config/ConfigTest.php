@@ -100,7 +100,6 @@ class ConfigTest extends PHPUnit_Framework_TestCase
      * byte-identical this time)
      *
      * @dataProvider configlist
-     * @after testConfigOutput
      */
     public function testWriteConfigConsistency($conffile, $referenceimagefile)
     {

@@ -12,7 +12,8 @@ class WMTarget {
     public $originalTargetString;
 
     public $pluginName;
-    public $scaleFactor = 1.0;
+    protected $pluginObject;
+    protected $scaleFactor = 1.0;
     public $pluginRunnable = true;
 
     public $configLineNumber;
@@ -29,6 +30,7 @@ class WMTarget {
         $this->configFileName = $configFile;
         $this->configLineNumber = $lineNumber;
         $this->pluginRunnable = false;
+        $this->pluginObject = null;
 
         $this->values[IN] = null;
         $this->values[OUT] = null;
@@ -70,12 +72,14 @@ class WMTarget {
     public function findHandlingPlugin($pluginList)
     {
         wm_debug("Finding handler for '%s'\n", $this->finalTargetString);
-        foreach ($pluginList as $name => $pluginObject) {
-            $isRecognised = $pluginObject->Recognise($this->finalTargetString);
+        foreach ($pluginList as $name => $pluginEntry) {
+            $isRecognised = $pluginEntry['object']->Recognise($this->finalTargetString);
 
             if ($isRecognised) {
                 wm_debug("plugin %s says it can handle it\n", $name);
                 $this->pluginName = $name;
+                $this->pluginObject = $pluginEntry['object'];
+                $this->pluginRunnable = $pluginEntry['active'];
                 return $name;
             }
         }
@@ -83,13 +87,12 @@ class WMTarget {
         return false;
     }
 
-    public function registerWithPlugin($pluginList, &$map, &$mapItem)
+    public function registerWithPlugin(&$map, &$mapItem)
     {
-        $pluginList[$this->pluginName]->Register($this->finalTargetString, $map, $mapItem);
-        $this->pluginRunnable = true;
+        $this->pluginObject->Register($this->finalTargetString, $map, $mapItem);
     }
 
-    public function readData($pluginList, &$map, &$mapItem)
+    public function readData(&$map, &$mapItem)
     {
         if( ! $this->pluginRunnable) {
             wm_debug("Plugin %s isn't runnable\n", $this->pluginName);
@@ -100,7 +103,7 @@ class WMTarget {
             wm_debug("Will multiply result by %f\n", $this->scaleFactor);
         }
 
-        list($in, $out, $datatime) = $pluginList[$this->pluginName]->ReadData($this->finalTargetString, $map, $mapItem);
+        list($in, $out, $datatime) = $this->pluginObject->ReadData($this->finalTargetString, $map, $mapItem);
 
         if ($in === null && $out === null) {
             wm_warn(sprintf("ReadData: %s %s, target: %s had no valid data, according to %s [WMWARN70]\n", $mapItem->my_type(), $mapItem->name, $this->finalTargetString, $this->pluginName));

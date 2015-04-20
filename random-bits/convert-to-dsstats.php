@@ -100,7 +100,7 @@
 	
 	$map->ReadConfig($inputfile);
 
-	$map->initialiseDatasourcePlugins();
+	$map->initialiseAllPlugins();
 	$map->preProcessTargets();
 	
 	$allitems = array(&$map->links, &$map->nodes);

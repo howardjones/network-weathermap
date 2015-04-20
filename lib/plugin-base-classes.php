@@ -7,6 +7,8 @@
  */
 class WeatherMapDataSource
 {
+    var $owner;
+
     /**
      * Initialize - called after config has been read (so SETs are processed)
      * but just before ReadData. Used to allow plugins to verify their dependencies
@@ -18,6 +20,8 @@ class WeatherMapDataSource
      */
     public function Init(&$map)
     {
+        $this->owner = $map;
+
         return true;
     }
 
@@ -86,13 +90,22 @@ class WeatherMapDataSource
  */
 class WeatherMapPreProcessor
 {
+    private $owner;
+
+    public function Init(&$map)
+    {
+        $this->owner = $map;
+
+        return true;
+    }
+
     /**
      * The only API for a PreProcessor - do whatever it is that you are supposed to do.
      *
      * @param $map the WeatherMap main object
      * @return bool Success/Failure? Not currently interpreted.
      */
-    public function run(&$map)
+    public function run()
     {
         return false;
     }
@@ -105,13 +118,22 @@ class WeatherMapPreProcessor
  */
 class WeatherMapPostProcessor
 {
+    private $owner;
+
+    public function Init(&$map)
+    {
+        $this->owner = $map;
+
+        return true;
+    }
+
     /**
      * The only API for a PostProcessor - do whatever it is that you are supposed to do.
      *
      * @param $map the WeatherMap main object
      * @return bool Success/Failure? Not currently interpreted.
      */
-    public function run(&$map)
+    public function run()
     {
         return false;
     }
@@ -127,4 +149,13 @@ class WeatherMapPostProcessor
 class WeatherMapDataPicker
 {
     // TBD
+
+    private $owner;
+
+    public function Init(&$map)
+    {
+        $this->owner = $map;
+
+        return true;
+    }
 }

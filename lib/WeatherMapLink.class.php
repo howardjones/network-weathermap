@@ -116,6 +116,8 @@ class WeatherMapLink extends WeatherMapItem
             'overlibcaption' => array('', ''),
             'max_bandwidth_in' => 100000000,
             'max_bandwidth_out' => 100000000,
+            'bandwidth_in' => 0,
+            'bandwidth_out' => 0,
             'max_bandwidth_in_cfg' => '100M',
             'max_bandwidth_out_cfg' => '100M'
         );

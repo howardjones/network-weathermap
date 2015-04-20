@@ -18,23 +18,23 @@ class WeatherMapDataSource_cactihost extends WeatherMapDataSource
         return(false);
     }
 
-    function Recognise($targetstring)
+    function Recognise($targetString)
     {
-        if (preg_match("/^cactihost:(\d+)$/", $targetstring)) {
+        if (preg_match("/^cactihost:(\d+)$/", $targetString)) {
             return true;
         } else {
             return false;
         }
     }
 
-    function ReadData($targetstring, &$map, &$item)
+    function ReadData($targetString, &$map, &$mapItem)
     {
 
         $data[IN] = null;
         $data[OUT] = null;
         $data_time = 0;
 
-        if (preg_match("/^cactihost:(\d+)$/", $targetstring, $matches)) {
+        if (preg_match("/^cactihost:(\d+)$/", $targetString, $matches)) {
             $cacti_id = intval($matches[1]);
 
             $SQL = "select * from host where id=$cacti_id";
@@ -73,18 +73,18 @@ class WeatherMapDataSource_cactihost extends WeatherMapDataSource
 
                 $data[IN] = $state;
                 $data[OUT] = $state;
-                $item->add_note("state", $statename);
-                $item->add_note("cacti_description", $result['description']);
+                $mapItem->add_note("state", $statename);
+                $mapItem->add_note("cacti_description", $result['description']);
 
-                $item->add_note("cacti_hostname", $result['hostname']);
-                $item->add_note("cacti_curtime", $result['cur_time']);
-                $item->add_note("cacti_avgtime", $result['avg_time']);
-                $item->add_note("cacti_mintime", $result['min_time']);
-                $item->add_note("cacti_maxtime", $result['max_time']);
-                $item->add_note("cacti_availability", $result['availability']);
+                $mapItem->add_note("cacti_hostname", $result['hostname']);
+                $mapItem->add_note("cacti_curtime", $result['cur_time']);
+                $mapItem->add_note("cacti_avgtime", $result['avg_time']);
+                $mapItem->add_note("cacti_mintime", $result['min_time']);
+                $mapItem->add_note("cacti_maxtime", $result['max_time']);
+                $mapItem->add_note("cacti_availability", $result['availability']);
 
-                $item->add_note("cacti_faildate", $result['status_fail_date']);
-                $item->add_note("cacti_recdate", $result['status_rec_date']);
+                $mapItem->add_note("cacti_faildate", $result['status_fail_date']);
+                $mapItem->add_note("cacti_recdate", $result['status_rec_date']);
             }
         }
 

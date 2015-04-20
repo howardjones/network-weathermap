@@ -130,8 +130,6 @@ class WMSpine
         // Figure out how far the target distance is between the found point and the next one
         $ratio = ($targetDistance - $this->points[$foundIndex][1]) / ($this->points[$foundIndex + 1][1] - $this->points[$foundIndex][1]);
 
-        # print "\n\n$targetDistance   $ratio  $foundIndex\n\n";
-
         // linearly interpolate x and y to get to the actual required distance
         $newPoint = $this->points[$foundIndex][0]->LERPWith($this->points[$foundIndex+1][0], $ratio);
 
@@ -285,7 +283,7 @@ class WMSpine
         return array($spine1, $spine2);
     }
 
-    function __toString()
+    public function __toString()
     {
         $output = "SPINE:[";
         for ($i = 0; $i < $this->pointCount(); $i ++) {
@@ -296,7 +294,7 @@ class WMSpine
         return $output;
     }
 
-    function drawSpine($gdImage, $colour)
+    public function drawSpine($gdImage, $colour)
     {
         $nPoints = count($this->points) - 1;
 
@@ -314,7 +312,7 @@ class WMSpine
         }
     }
 
-    function drawChain($gdImage, $colour, $size = 10)
+    public function drawChain($gdImage, $colour, $size = 10)
     {
         $nPoints = count($this->points);
 

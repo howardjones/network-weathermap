@@ -20,16 +20,16 @@ function getTriangleArea($point1, $point2, $point3)
 
 class WMPoint
 {
-    var $x;
-    var $y;
+    public $x;
+    public $y;
 
-    function WMPoint($x = 0, $y = 0)
+    public function WMPoint($x = 0, $y = 0)
     {
         $this->x = $x;
         $this->y = $y;
     }
 
-    function identical($point2)
+    public function identical($point2)
     {
         if (($this->x == $point2->x) && ($this->y == $point2->y)) {
             return true;
@@ -40,7 +40,7 @@ class WMPoint
     /**
      * round() - round the coordinates to their nearest integers, in place.
      */
-    function round()
+    public function round()
     {
         $this->x = round($this->x);
         $this->y = round($this->y);
@@ -52,7 +52,7 @@ class WMPoint
      * @param $point2
      * @return bool
      */
-    function closeEnough($point2)
+    public function closeEnough($point2)
     {
         if ((round($this->x, 2) == round($point2->x, 2)) && (round($this->y, 2) == round($point2->y, 2))) {
             return true;
@@ -61,20 +61,20 @@ class WMPoint
     }
 
 
-    function vectorToPoint($p2)
+    public function vectorToPoint($p2)
     {
         $v = new WMVector($p2->x - $this->x, $p2->y - $this->y);
 
         return $v;
     }
 
-    function lineToPoint($p2)
+    public function lineToPoint($p2)
     {
         $vec = $this->vectorToPoint($p2);
         return new WMLine($this, $vec);
     }
 
-    function distanceToLine($l)
+    public function distanceToLine($l)
     {
         // TODO: Implement this
     }
@@ -86,7 +86,7 @@ class WMPoint
         // Distance to point1, distance to point2, distance to line
     }
 
-    function distanceToPoint($p2)
+    public function distanceToPoint($p2)
     {
         $v = $this->vectorToPoint($p2);
         $d = $v->length();
@@ -94,7 +94,7 @@ class WMPoint
         return $d;
     }
 
-    function copy()
+    public function copy()
     {
         return new WMPoint($this->x, $this->y);
     }
@@ -105,7 +105,7 @@ class WMPoint
      *
      * @return $this - to allow for chaining of operations
      */
-    function addVector($v, $fraction = 1.0)
+    public function addVector($v, $fraction = 1.0)
     {
         if ($fraction == 0) {
             return $this;
@@ -124,7 +124,7 @@ class WMPoint
      * @param $ratio - how far (0-1) between the two
      * @return WMPoint - a new WMPoint
      */
-    function LERPWith($point2, $ratio)
+    public function LERPWith($point2, $ratio)
     {
         $x = $this->x + $ratio * ($point2->x - $this->x);
         $y = $this->y + $ratio * ($point2->y - $this->y);
@@ -137,12 +137,12 @@ class WMPoint
     /**
      * @return string
      */
-    function asString()
+    public function asString()
     {
         return $this->__toString();
     }
 
-    function __toString()
+    public function __toString()
     {
         return sprintf("(%f,%f)", $this->x, $this->y);
     }
@@ -154,27 +154,27 @@ class WMPoint
  */
 class WMVector
 {
-    var $dx;
-    var $dy;
+    public $dx;
+    public $dy;
 
-    function WMVector($dx = 0, $dy = 0)
+    public function __construct($dx = 0, $dy = 0)
     {
         $this->dx = $dx;
         $this->dy = $dy;
     }
 
-    function flip()
+    public function flip()
     {
         $this->dx = - $this->dx;
         $this->dy = - $this->dy;
     }
 
-    function getAngle()
+    public function getAngle()
     {
         return rad2deg(atan2((-$this->dy), ($this->dx)));
     }
 
-    function getSlope()
+    public function getSlope()
     {
         if ($this->dx == 0) {
             // special case - if slope is infinite, fudge it to be REALLY BIG instead
@@ -187,7 +187,7 @@ class WMVector
     /**
      * @param float $angle
      */
-    function rotate($angle)
+    public function rotate($angle)
     {
         $points = array();
         $points[0] = $this->dx;
@@ -202,7 +202,7 @@ class WMVector
     /**
      * @return WMVector
      */
-    function getNormal()
+    public function getNormal()
     {
         $len = $this->length();
 
@@ -220,7 +220,7 @@ class WMVector
     /**
      * Turn vector into unit-vector
      */
-    function normalise()
+    public function normalise()
     {
         $len = $this->length();
         if ($len > 0 && $len != 1) {
@@ -235,7 +235,7 @@ class WMVector
      *
      * @return float
      */
-    function squaredLength()
+    public function squaredLength()
     {
         if (($this->dx == 0) && ($this->dy == 0)) {
             return 0;
@@ -248,12 +248,12 @@ class WMVector
     /**
      * @return float
      */
-    function length()
+    public function length()
     {
         return (sqrt($this->squaredLength()));
     }
 
-    function asString()
+    public function asString()
     {
         return $this->__toString();
     }
@@ -261,7 +261,7 @@ class WMVector
     /**
      * @return string
      */
-    function __toString()
+    public function __toString()
     {
         return sprintf("[%f,%f]", $this->dx, $this->dy);
     }
@@ -269,11 +269,12 @@ class WMVector
 
 class WMRectangle
 {
-    var $topleft;
-    var $bottomright;
+    private $topLeft;
+    private $bottomRight;
 
-    function WMRectangle($x1, $y1, $x2, $y2)
+    public function __construct($x1, $y1, $x2, $y2)
     {
+        // swap points around so that topLeft is actually top-left
         if ($x2<$x1) {
             $tmp = $x1;
             $x1 = $x2;
@@ -286,35 +287,35 @@ class WMRectangle
             $y2 = $tmp;
         }
 
-        $this->topleft = new WMPoint($x1, $y1);
-        $this->bottomright = new WMPoint($x2, $y2);
+        $this->topLeft = new WMPoint($x1, $y1);
+        $this->bottomRight = new WMPoint($x2, $y2);
     }
 
-    function width()
+    public function width()
     {
-        return ($this->bottomright->x - $this->topleft->x);
+        return ($this->bottomRight->x - $this->topLeft->x);
     }
 
-    function height()
+    public function height()
     {
-        return ($this->bottomright->y - $this->topleft->y);
+        return ($this->bottomRight->y - $this->topLeft->y);
     }
 
-    function containsPoint($p)
+    public function containsPoint($p)
     {
-        if ($this->topleft->x <= $p->x
-            && $this->bottomright->x >= $p->x
-            && $this->topleft->y <= $p->y
-            && $this->bottomright->y >= $p->y) {
+        if ($this->topLeft->x <= $p->x
+            && $this->bottomRight->x >= $p->x
+            && $this->topLeft->y <= $p->y
+            && $this->bottomRight->y >= $p->y) {
             return true;
         }
 
         return false;
     }
 
-    function __toString()
+    public function __toString()
     {
-        return sprintf("[%sx%s]", $this->topleft, $this->bottomright);
+        return sprintf("[%sx%s]", $this->topLeft, $this->bottomRight);
     }
 }
 
@@ -323,21 +324,21 @@ class WMRectangle
  */
 class WMLine
 {
-    var $point;
-    var $vector;
+    private $point;
+    private $vector;
 
-    function WMLine($p, $v)
+    public function __construct($p, $v)
     {
         $this->point = $p;
         $this->vector = $v;
     }
 
-    function getSlope()
+    public function getSlope()
     {
         return $this->vector->getSlope();
     }
 
-    function getYIntercept()
+    public function getYIntercept()
     {
         $slope = $this->getSlope();
         $intercept = $this->point->y - $this->point->x * $slope;
@@ -345,7 +346,7 @@ class WMLine
         return $intercept;
     }
 
-    function __toString()
+    public function __toString()
     {
         return sprintf("/%s-%s/", $this->point, $this->vector);
     }
@@ -357,7 +358,7 @@ class WMLine
      * @return WMPoint the crossing point
      * @throws WMException
      */
-    function findCrossingPoint($line2)
+    public function findCrossingPoint($line2)
     {
         $slope1 = $this->vector->getSlope();
         $slope2 = $line2->vector->getSlope();
@@ -379,11 +380,11 @@ class WMLine
 }
 class WMLineSegment
 {
-    var $point1;
-    var $point2;
-    var $vector;
+    private $point1;
+    private $point2;
+    private $vector;
 
-    function WMLineSegment($p1, $p2)
+    public function __construct($p1, $p2)
     {
         $this->point1 = $p1;
         $this->point2 = $p2;
@@ -391,7 +392,7 @@ class WMLineSegment
         $this->vector = $p1->vectorToPoint($p2);
     }
 
-    function __toString()
+    public function __toString()
     {
         return sprintf("{%s--%s}", $this->point1, $this->point2);
     }
@@ -399,12 +400,20 @@ class WMLineSegment
 
 class WMBoundingBox
 {
-    var $minimum_x = null;
-    var $maximum_x = null;
-    var $maximum_y = null;
-    var $minimum_y = null;
+    private $minimum_x;
+    private $maximum_x;
+    private $maximum_y;
+    private $minimum_y;
 
-    function addPoint($x, $y)
+    public function __construct()
+    {
+        $minimum_x = null;
+        $maximum_x = null;
+        $maximum_y = null;
+        $minimum_y = null;
+    }
+
+    public function addPoint($x, $y)
     {
         if (is_null($this->minimum_x) || $x < $this->minimum_x) {
             $this->minimum_x = $x;
@@ -420,12 +429,12 @@ class WMBoundingBox
         }
     }
 
-    function getBoundingRectangle()
+    public function getBoundingRectangle()
     {
         return new WMRectangle($this->minimum_x, $this->minimum_y, $this->maximum_x, $this->maximum_y);
     }
 
-    function __toString()
+    public function __toString()
     {
         $r = $this->getBoundingRectangle();
         return "$r";
@@ -436,9 +445,12 @@ class WMBoundingBox
 // Given 4 ordinates and a parameter from 0 to 1, calculate a point on the Catmull Rom spline through them.
 class CatmullRom1D
 {
-    private $Ap, $Bp, $Cp, $Dp;
+    private $Ap;
+    private $Bp;
+    private $Cp;
+    private $Dp;
 
-    function CatmullRom1D($point0, $point1, $point2, $point4)
+    public function __construct($point0, $point1, $point2, $point4)
     {
         $this->Ap = - $point0 + 3 * $point1 - 3 * $point2 + $point4;
         $this->Bp = 2 * $point0 - 5 * $point1 + 4 * $point2 - $point4;
@@ -446,11 +458,16 @@ class CatmullRom1D
         $this->Dp = 2 * $point1;
     }
 
-    function calculate($parameter)
+    public function calculate($parameter)
     {
         $parameterSquared = $parameter * $parameter;
         $parameterCubed = $parameterSquared * $parameter;
 
-        return (($this->Ap * $parameterCubed) + ($this->Bp * $parameterSquared) + ($this->Cp * $parameter) + $this->Dp) / 2;
+        return ((
+                ($this->Ap * $parameterCubed)
+                + ($this->Bp * $parameterSquared)
+                + ($this->Cp * $parameter)
+                + $this->Dp
+                ) / 2);
     }
 }

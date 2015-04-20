@@ -25,9 +25,9 @@ class WeatherMapDataSource_fping extends WeatherMapDataSource
     // this function will get called for every datasource, even if we replied false to Init.
     // (so that we can warn the user that it *would* have worked, if only the plugin could run)
     // SO... don't do anything in here that relies on the things that Init looked for, because they might not exist!
-    function Recognise($targetstring)
+    function Recognise($targetString)
     {
-        if (preg_match("/^fping:(\S+)$/", $targetstring, $matches)) {
+        if (preg_match("/^fping:(\S+)$/", $targetString, $matches)) {
             // save the address. This way, we can do ONE fping call for all the pings in the map.
             // fping does it all in parallel, so 10 hosts takes the same time as 1
             $this->addresscache[] = $matches[1];
@@ -37,7 +37,7 @@ class WeatherMapDataSource_fping extends WeatherMapDataSource
         }
     }
 
-    function ReadData($targetstring, &$map, &$item)
+    function ReadData($targetString, &$map, &$mapItem)
     {
         $data[IN] = null;
         $data[OUT] = null;
@@ -48,7 +48,7 @@ class WeatherMapDataSource_fping extends WeatherMapDataSource
             $ping_count = 5;
         }
 
-        if (preg_match("/^fping:(\S+)$/", $targetstring, $matches)) {
+        if (preg_match("/^fping:(\S+)$/", $targetString, $matches)) {
             $target = $matches[1];
 
             $pattern = "/^$target\s:";
@@ -107,8 +107,8 @@ class WeatherMapDataSource_fping extends WeatherMapDataSource
                         } else {
                             $data[IN] = $ave;
                             $data[OUT] = $loss;
-                            $item->add_note("fping_min", $min);
-                            $item->add_note("fping_max", $max);
+                            $mapItem->add_note("fping_min", $min);
+                            $mapItem->add_note("fping_max", $max);
                         }
                     }
                 }

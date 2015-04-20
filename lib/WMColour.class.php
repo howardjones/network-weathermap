@@ -8,10 +8,10 @@
  */
 class WMColour
 {
-    var $red;
-    var $green;
-    var $blue;
-    var $alpha;
+    private $red;
+    private $green;
+    private $blue;
+    private $alpha;
     
     // take in an existing value and create a Colour object for it
     function __construct()
@@ -54,7 +54,12 @@ class WMColour
             }
         }
     }
-    
+
+    public function getComponents()
+    {
+        return array($this->red, $this->green, $this->blue);
+    }
+
     // return true if two colours are identical
     function equals($colour2)
     {

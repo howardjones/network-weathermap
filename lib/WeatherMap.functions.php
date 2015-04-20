@@ -610,10 +610,10 @@ function TestOutput_RunTest($conffile, $imagefile, $htmlfile, $newconffile)
 
 function wmDirectionToString($input)
 {
-    if($input==IN) {
+    if ($input==IN) {
         return 'IN';
     }
-    if($input==OUT) {
+    if ($input==OUT) {
         return 'OUT';
     }
 
@@ -622,11 +622,11 @@ function wmDirectionToString($input)
 
 function wmStringToDirection($input)
 {
-    if($input == 'IN'){
+    if ($input == 'IN') {
         return IN;
     }
 
-    if($input == 'OUT'){
+    if ($input == 'OUT') {
         return OUT;
     }
 

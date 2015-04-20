@@ -7,21 +7,22 @@
  * This is to replace an ugly array that gets passed around with mysterious fields.
  *
  */
-class WMTarget {
-    public $finalTargetString;
-    public $originalTargetString;
+class WMTarget
+{
+    private $finalTargetString;
+    private $originalTargetString;
 
-    public $pluginName;
-    protected $pluginObject;
-    protected $scaleFactor = 1.0;
-    public $pluginRunnable = true;
+    private $pluginName;
+    private $pluginObject;
+    private $scaleFactor = 1.0;
+    private $pluginRunnable = true;
 
-    public $configLineNumber;
-    public $configFileName;
+    private $configLineNumber;
+    private $configFileName;
 
-    public $values = array();
-    public $timestamp;
-    public $dataValid = false;
+    private $values = array();
+    private $timestamp;
+    private $dataValid = false;
 
     public function __construct($targetString, $configFile, $lineNumber)
     {
@@ -94,7 +95,7 @@ class WMTarget {
 
     public function readData(&$map, &$mapItem)
     {
-        if( ! $this->pluginRunnable) {
+        if (! $this->pluginRunnable) {
             wm_debug("Plugin %s isn't runnable\n", $this->pluginName);
             return;
         }
@@ -141,5 +142,4 @@ class WMTarget {
 
         return $result;
     }
-
 }

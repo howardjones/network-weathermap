@@ -2,9 +2,9 @@
 
 class WeatherMapDataSource_wmdata extends WeatherMapDataSource
 {
-    function Recognise($targetstring)
+    function Recognise($targetString)
     {
-        if (preg_match("/^wmdata:.*$/", $targetstring)) {
+        if (preg_match("/^wmdata:.*$/", $targetString)) {
             return true;
         } else {
             return false;
@@ -12,7 +12,7 @@ class WeatherMapDataSource_wmdata extends WeatherMapDataSource
     }
 
     // function ReadData($targetstring, $configline, $itemtype, $itemname, $map)
-    function ReadData($targetstring, &$map, &$item)
+    function ReadData($targetString, &$map, &$mapItem)
     {
         $data[IN] = null;
         $data[OUT] = null;
@@ -21,13 +21,13 @@ class WeatherMapDataSource_wmdata extends WeatherMapDataSource
 
         $matches = 0;
 
-        if (preg_match("/^wmdata:([^:]*):(.*)", $targetstring, $matches)) {
+        if (preg_match("/^wmdata:([^:]*):(.*)", $targetString, $matches)) {
             $datafile = $matches[1];
             $dataname = $matches[2];
         }
 
         if (file_exists($datafile)) {
-            $fd = fopen($targetstring, "r");
+            $fd = fopen($targetString, "r");
             if ($fd) {
                 $found = false;
                 while (!feof($fd)) {

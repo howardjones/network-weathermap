@@ -193,6 +193,17 @@ class WeatherMapNode extends WeatherMapItem
         // Finally, the colours
     }
 
+    function colourizeImage($imageRef, $tintColour) {
+
+        list ($red, $green, $blue) = $tintColour->getComponents();
+
+        if (function_exists("imagefilter") && $this->get_hint("use_imagefilter") == 1) {
+            imagefilter($imageRef, IMG_FILTER_COLORIZE, $red, $green, $blue);
+        } else {
+            imagecolorize($imageRef, $red, $green, $blue);
+        }
+    }
+
     // make a mini-image, containing this node and nothing else
     // figure out where the real NODE centre is, relative to the top-left corner.
     function preRender($im, &$map)
@@ -495,11 +506,7 @@ class WeatherMapNode extends WeatherMapItem
                     $icon_im = imagecreatefromfile($realiconfile);
 
                     if (true === isset($colicon)) {
-                        if (function_exists("imagefilter") && $this->get_hint("use_imagefilter") == 1) {
-                            imagefilter($icon_im, IMG_FILTER_COLORIZE, $colicon->red, $colicon->green, $colicon->blue);
-                        } else {
-                            imagecolorize($icon_im, $colicon->red, $colicon->green, $colicon->blue);
-                        }
+                        $this->colourizeImage($icon_im, $colicon);
                     }
 
                     if ($icon_im) {

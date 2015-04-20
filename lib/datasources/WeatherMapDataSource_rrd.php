@@ -10,9 +10,12 @@ include_once(dirname(__FILE__)."/../ds-common.php");
 class WeatherMapDataSource_rrd extends WeatherMapDataSource
 {
 
+
     function Init(&$map)
     {
         global $config;
+
+        $this->owner = $map;
 
         if ($map->context=='cacti') {
             wm_debug("RRD DS: path_rra is ".$config["rra_path"]." - your rrd pathname must be exactly this to use poller_output\n");
@@ -40,11 +43,11 @@ class WeatherMapDataSource_rrd extends WeatherMapDataSource
         return(false);
     }
 
-    function Recognise($targetstring)
+    function Recognise($targetString)
     {
-        if (preg_match("/^(.*\.rrd):([\-a-zA-Z0-9_]+):([\-a-zA-Z0-9_]+)$/", $targetstring, $matches)) {
+        if (preg_match("/^(.*\.rrd):([\-a-zA-Z0-9_]+):([\-a-zA-Z0-9_]+)$/", $targetString, $matches)) {
             return true;
-        } elseif (preg_match("/^(.*\.rrd)$/", $targetstring, $matches)) {
+        } elseif (preg_match("/^(.*\.rrd)$/", $targetString, $matches)) {
             return true;
         } else {
             return false;
@@ -370,11 +373,18 @@ class WeatherMapDataSource_rrd extends WeatherMapDataSource
         wm_debug("RRD ReadDataFromRealRRD: Returning (".($data[IN]===null?'null':$data[IN]).",".($data[OUT]===null?'null':$data[OUT]).", $data_time)\n");
     }
 
-    // Actually read data from a data source, and return it
-    // returns a 3-part array (invalue, outvalue and datavalid time_t)
-    // invalue and outvalue should be -1,-1 if there is no valid data
-    // data_time is intended to allow more informed graphing in the future
-    function ReadData($targetstring, &$map, &$item)
+    /**
+     * Actually read data from a data source, and return it
+     * returns a 3-part array (invalue, outvalue and datavalid time_t)
+     * invalue and outvalue should be null,null if there is no valid data
+     * data_time is intended to allow more informed graphing in the future
+     *
+     * @param string $targetString The string from the config file
+     * @param the $map A reference to the map object (redundant)
+     * @param the $mapItem A reference to the object this target is attached to
+     * @return array invalue, outvalue, unix timestamp that the data was valid
+     */
+    function ReadData($targetString, &$map, &$mapItem)
     {
         $dsnames[IN] = "traffic_in";
         $dsnames[OUT] = "traffic_out";
@@ -382,7 +392,7 @@ class WeatherMapDataSource_rrd extends WeatherMapDataSource
         $data[OUT] = null;
         $SQL[IN] = 'select null';
         $SQL[OUT] = 'select null';
-        $rrdfile = $targetstring;
+        $rrdfile = $targetString;
 
         if ($map->get_hint("rrd_default_in_ds") !== null) {
             $dsnames[IN] = $map->get_hint("rrd_default_in_ds");
@@ -397,7 +407,7 @@ class WeatherMapDataSource_rrd extends WeatherMapDataSource
 
         $data_time = 0;
 
-        if (1 === preg_match("/^(.*\.rrd):([\-a-zA-Z0-9_]+):([\-a-zA-Z0-9_]+)$/", $targetstring, $matches)) {
+        if (1 === preg_match("/^(.*\.rrd):([\-a-zA-Z0-9_]+):([\-a-zA-Z0-9_]+)$/", $targetString, $matches)) {
             $rrdfile = $matches[1];
 
             $dsnames[IN] = $matches[2];
@@ -461,7 +471,7 @@ class WeatherMapDataSource_rrd extends WeatherMapDataSource
 
         if ($use_poller_output == 1) {
             wm_debug("Going to try poller_output, as requested.\n");
-            WeatherMapDataSource_rrd::wmrrd_read_from_poller_output($rrdfile, "AVERAGE", $start, $end, $dsnames, $data, $map, $data_time, $item);
+            WeatherMapDataSource_rrd::wmrrd_read_from_poller_output($rrdfile, "AVERAGE", $start, $end, $dsnames, $data, $map, $data_time, $mapItem);
         }
 
         // if poller_output didn't get anything, or if it couldn't/didn't run, do it the old-fashioned way
@@ -477,10 +487,10 @@ class WeatherMapDataSource_rrd extends WeatherMapDataSource
                 # $values=array();
 
                 if ($aggregatefunction != '') {
-                    WeatherMapDataSource_rrd::wmrrd_read_from_real_rrdtool_aggregate($rrdfile, $cfname, $aggregatefunction, $start, $end, $dsnames, $data, $map, $data_time, $item);
+                    WeatherMapDataSource_rrd::wmrrd_read_from_real_rrdtool_aggregate($rrdfile, $cfname, $aggregatefunction, $start, $end, $dsnames, $data, $map, $data_time, $mapItem);
                 } else {
                     // do this the tried and trusted old-fashioned way
-                    WeatherMapDataSource_rrd::wmrrd_read_from_real_rrdtool($rrdfile, $cfname, $start, $end, $dsnames, $data, $map, $data_time, $item);
+                    WeatherMapDataSource_rrd::wmrrd_read_from_real_rrdtool($rrdfile, $cfname, $start, $end, $dsnames, $data, $map, $data_time, $mapItem);
                 }
             } else {
                 wm_warn("Target $rrdfile doesn't exist. Is it a file? [WMRRD06]\n");

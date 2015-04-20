@@ -39,6 +39,7 @@
         </ul>
         <ul>
             <li><a href="https://codeclimate.com/github/howardjones/network-weathermap">Code Climate</a></li>
+            <li><a href="https://github.com/howardjones/network-weathermap">Github</a></li>
         </ul>
 
     </div>

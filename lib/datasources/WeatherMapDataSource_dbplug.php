@@ -28,22 +28,22 @@ class WeatherMapDataSource_dbplug extends WeatherMapDataSource
         return(true);
     }
 
-    function Recognise($targetstring)
+    function Recognise($targetString)
     {
-        if (preg_match("/^dbplug:([^:]+)$/", $targetstring)) {
+        if (preg_match("/^dbplug:([^:]+)$/", $targetString)) {
             return true;
         } else {
             return false;
         }
     }
 
-    function ReadData($targetstring, &$map, &$item)
+    function ReadData($targetString, &$map, &$mapItem)
     {
         $data[IN] = null;
         $data[OUT] = null;
         $data_time = 0;
 
-        if (preg_match("/^dbplug:([^:]+)$/", $targetstring, $matches)) {
+        if (preg_match("/^dbplug:([^:]+)$/", $targetString, $matches)) {
             $database_user = $map->get_hint('dbplug_dbuser');
             $database_pass = $map->get_hint('dbplug_dbpass');
             $database_name = $map->get_hint('dbplug_dbname');

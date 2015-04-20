@@ -48,13 +48,13 @@ class WeatherMapDataSource_dsstats extends WeatherMapDataSource
 
     # dsstats:<datatype>:<local_data_id>:<rrd_name_in>:<rrd_name_out>
 
-    function Recognise($targetstring)
+    function Recognise($targetString)
     {
-        if (preg_match("/^dsstats:([a-z]+):(\d+):([\-a-zA-Z0-9_]+):([\-a-zA-Z0-9_]+)$/", $targetstring)) {
+        if (preg_match("/^dsstats:([a-z]+):(\d+):([\-a-zA-Z0-9_]+):([\-a-zA-Z0-9_]+)$/", $targetString)) {
             return true;
         }
 
-        if (preg_match("/^dsstats:(\d+):([\-a-zA-Z0-9_]+):([\-a-zA-Z0-9_]+)$/", $targetstring)) {
+        if (preg_match("/^dsstats:(\d+):([\-a-zA-Z0-9_]+):([\-a-zA-Z0-9_]+)$/", $targetString)) {
             return true;
         }
 
@@ -65,7 +65,7 @@ class WeatherMapDataSource_dsstats extends WeatherMapDataSource
     // returns a 3-part array (invalue, outvalue and datavalid time_t)
     // invalue and outvalue should be -1,-1 if there is no valid data
     // data_time is intended to allow more informed graphing in the future
-    function ReadData($targetstring, &$map, &$item)
+    function ReadData($targetString, &$map, &$mapItem)
     {
         $dsnames[IN] = "traffic_in";
         $dsnames[OUT] = "traffic_out";
@@ -79,7 +79,7 @@ class WeatherMapDataSource_dsstats extends WeatherMapDataSource
         $datatype = "";
         $field = "";
 
-        if (preg_match("/^dsstats:(\d+):([\-a-zA-Z0-9_]+):([\-a-zA-Z0-9_]+)$/", $targetstring, $matches)) {
+        if (preg_match("/^dsstats:(\d+):([\-a-zA-Z0-9_]+):([\-a-zA-Z0-9_]+)$/", $targetString, $matches)) {
             $local_data_id = $matches[1];
             $dsnames[IN] = $matches[2];
             $dsnames[OUT] = $matches[3];
@@ -90,7 +90,7 @@ class WeatherMapDataSource_dsstats extends WeatherMapDataSource
                     $datatype = $map->get_hint("dsstats_default_type");
                     wm_debug("Default datatype changed to ".$datatype.".\n");
             }
-        } elseif (preg_match("/^dsstats:([a-z]+):(\d+):([\-a-zA-Z0-9_]+):([\-a-zA-Z0-9_]+)$/", $targetstring, $matches)) {
+        } elseif (preg_match("/^dsstats:([a-z]+):(\d+):([\-a-zA-Z0-9_]+):([\-a-zA-Z0-9_]+)$/", $targetString, $matches)) {
             $dsnames[IN] = $matches[3];
             $dsnames[OUT] = $matches[4];
             $datatype = $matches[1];
@@ -190,7 +190,7 @@ class WeatherMapDataSource_dsstats extends WeatherMapDataSource
         // fill all that other information (ifSpeed, etc)
         // (but only if it's not switched off!)
         if (($map->get_hint("dsstats_no_cacti_extras") === null) && $local_data_id>0) {
-            UpdateCactiData($item, $local_data_id);
+            UpdateCactiData($mapItem, $local_data_id);
         }
 
         wm_debug("DSStats ReadData: Returning (".($data[IN]===null?'null':$data[IN]).",".($data[OUT]===null?'null':$data[OUT]).",$data_time)\n");

@@ -31,7 +31,7 @@ class WeatherMapDataSource
      * @return bool Returns true or false, depending on whether it wants to handle this TARGET
      *
      */
-    public function Recognise($targetstring)
+    public function Recognise($targetString)
     {
         return false;
     }
@@ -39,12 +39,12 @@ class WeatherMapDataSource
     /**
      * the actual ReadData
      *
-     * @param $targetstring A clause from a TARGET line, after being processed by ProcessString
+     * @param $targetString A clause from a TARGET line, after being processed by ProcessString
      * @param $map the WeatherMap main object
-     * @param $item the specific WeatherMapItem that this target is for
+     * @param $mapItem the specific WeatherMapItem that this target is for
      * @return array an array of two values (in,out). -1,-1 if it couldn't get valid data
      */
-    public function ReadData($targetstring, &$map, &$item)
+    public function ReadData($targetString, &$map, &$mapItem)
     {
         return(array(-1, -1));
     }

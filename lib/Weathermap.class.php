@@ -583,8 +583,7 @@ class WeatherMap extends WeatherMapBase
         wm_debug("Preprocessing targets\n");
 
         foreach ($itemList as $oneMapItem) {
-
-            if($oneMapItem->isTemplate()) {
+            if ($oneMapItem->isTemplate()) {
                 continue;
             }
 
@@ -598,14 +597,23 @@ class WeatherMap extends WeatherMapBase
                     if ($this->plugins['data'][$matchedBy]['active']) {
                         $target->registerWithPlugin($this, $oneMapItem);
                     } else {
-                        wm_warn(sprintf("ProcessTargets: %s %s, target: %s was recognised as a valid TARGET by a plugin that is unable to run (%s) [WMWARN07]\n",
-                            $oneMapItem->my_type(), $oneMapItem->name, $target, $matchedBy));
+                        wm_warn(sprintf(
+                            "ProcessTargets: %s %s, target: %s was recognised as a valid TARGET by a plugin that is unable to run (%s) [WMWARN07]\n",
+                            $oneMapItem->my_type(),
+                            $oneMapItem->name,
+                            $target,
+                            $matchedBy
+                        ));
                     }
                 }
 
                 if ($matchedBy == "") {
-                    wm_warn(sprintf("ProcessTargets: %s, %s, target: %s was not recognised as a valid TARGET [WMWARN08]\n",
-                        $oneMapItem->my_type(), $oneMapItem->name, $target));
+                    wm_warn(sprintf(
+                        "ProcessTargets: %s, %s, target: %s was not recognised as a valid TARGET [WMWARN08]\n",
+                        $oneMapItem->my_type(),
+                        $oneMapItem->name,
+                        $target
+                    ));
                 }
             }
         }
@@ -619,7 +627,6 @@ class WeatherMap extends WeatherMapBase
         $channels = array(IN,OUT);
 
         foreach ($itemList as $mapItem) {
-
             $type = $mapItem->my_type();
             $name = $mapItem->name;
 
@@ -632,7 +639,7 @@ class WeatherMap extends WeatherMapBase
             wm_debug("-------------------------------------------------------------\n");
             wm_debug("ReadData for $type $name: \n");
 
-            if ( $mapItem->isTemplate()) {
+            if ($mapItem->isTemplate()) {
                 wm_debug("ReadData: Skipping $type $name that looks like a template\n.");
                 continue;
             }
@@ -657,7 +664,7 @@ class WeatherMap extends WeatherMapBase
                 }
 
                 // This was the only target, and it's failed
-                if (!$target->hasValidData() && $nTargets == 1 ) {
+                if (!$target->hasValidData() && $nTargets == 1) {
                     // this is to allow null to be passed through from DS plugins in the case of a single target
                     // we've never defined what x + null is, so we'll treat that as a 0
 
@@ -2362,7 +2369,6 @@ class WeatherMap extends WeatherMapBase
         // loop through everything. Figure out along the way if it's a node or a link
 
         foreach ($allItems as $mapItem) {
-
             $type = $mapItem->my_type();
             $prefix = substr($type, 0, 1);
 
@@ -2472,7 +2478,7 @@ class WeatherMap extends WeatherMapBase
 
     function generateSortedImagemap($imagemapname)
     {
-        $html="\n".'<map name="' . $imagemapname . '" id="' . $imagemapname . '">';
+        $html = "\n" . '<map name="' . $imagemapname . '" id="' . $imagemapname . '">';
 
         $all_layers = array_keys($this->seen_zlayers);
         rsort($all_layers);
@@ -2501,8 +2507,6 @@ class WeatherMap extends WeatherMapBase
                 // will match up with the draw order (last drawn should be first hit)
                 foreach (array_reverse($z_items) as $it) {
                     if ($it->name != 'DEFAULT' && $it->name != ":: DEFAULT ::") {
-                        $name = "";
-
                         foreach ($it->imap_areas as $areaname) {
                             // skip the linkless areas if we are in the editor - they're redundant
                             $html .= $this->imap->exactHTML($areaname, true, ($this->context != 'editor'));

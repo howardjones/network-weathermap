@@ -73,25 +73,25 @@ class WeatherMapDataSource_cactithold extends WeatherMapDataSource
         return(false);
     }
 
-    function Recognise($targetstring)
+    function Recognise($targetString)
     {
-        if (preg_match("/^cacti(thold|monitor):(\d+)$/", $targetstring)) {
+        if (preg_match("/^cacti(thold|monitor):(\d+)$/", $targetString)) {
             return true;
-        } elseif (preg_match("/^cactithold:(\d+):(\d+)$/", $targetstring)) {
+        } elseif (preg_match("/^cactithold:(\d+):(\d+)$/", $targetString)) {
             return true;
         } else {
             return false;
         }
     }
 
-    function ReadData($targetstring, &$map, &$item)
+    function ReadData($targetString, &$map, &$mapItem)
     {
 
         $data[IN] = null;
         $data[OUT] = null;
         $data_time = 0;
 
-        if (preg_match("/^cactithold:(\d+):(\d+)$/", $targetstring, $matches)) {
+        if (preg_match("/^cactithold:(\d+):(\d+)$/", $targetString, $matches)) {
             // Returns 0 if threshold is not breached, 1 if it is.
             // use target aggregation to build these up into a 'badness' percentage
             // takes the same two values that are visible in thold's own URLs (the actual thold ID isn't shown anywhere)
@@ -109,7 +109,7 @@ class WeatherMapDataSource_cactithold extends WeatherMapDataSource
                 }
                 $data[OUT] = 0;
             }
-        } elseif (preg_match("/^cacti(thold|monitor):(\d+)$/", $targetstring, $matches)) {
+        } elseif (preg_match("/^cacti(thold|monitor):(\d+)$/", $targetString, $matches)) {
             $type = $matches[1];
             $id = intval($matches[2]);
 
@@ -168,18 +168,18 @@ class WeatherMapDataSource_cactithold extends WeatherMapDataSource
 
                     $data[IN] = $state;
                     $data[OUT] = 0;
-                    $item->add_note("state", $statename);
-                    $item->add_note("cacti_description", $result['description']);
+                    $mapItem->add_note("state", $statename);
+                    $mapItem->add_note("cacti_description", $result['description']);
 
-                    $item->add_note("cacti_hostname", $result['hostname']);
-                    $item->add_note("cacti_curtime", $result['cur_time']);
-                    $item->add_note("cacti_avgtime", $result['avg_time']);
-                    $item->add_note("cacti_mintime", $result['min_time']);
-                    $item->add_note("cacti_maxtime", $result['max_time']);
-                    $item->add_note("cacti_availability", $result['availability']);
+                    $mapItem->add_note("cacti_hostname", $result['hostname']);
+                    $mapItem->add_note("cacti_curtime", $result['cur_time']);
+                    $mapItem->add_note("cacti_avgtime", $result['avg_time']);
+                    $mapItem->add_note("cacti_mintime", $result['min_time']);
+                    $mapItem->add_note("cacti_maxtime", $result['max_time']);
+                    $mapItem->add_note("cacti_availability", $result['availability']);
 
-                    $item->add_note("cacti_faildate", $result['status_fail_date']);
-                    $item->add_note("cacti_recdate", $result['status_rec_date']);
+                    $mapItem->add_note("cacti_faildate", $result['status_fail_date']);
+                    $mapItem->add_note("cacti_recdate", $result['status_rec_date']);
                 }
                 wm_debug("CactiTHold ReadData: Basic state for host $id is $state/$statename\n");
 
@@ -210,15 +210,15 @@ class WeatherMapDataSource_cactithold extends WeatherMapDataSource
                 if (($numfailing > 0) && ($numthresh > 0) && ($state==3)) {
                     $state = 4;
                     $statename = "tholdbreached";
-                    $item->add_note("state", $statename);
-                    $item->add_note("thold_failcount", $numfailing);
-                    $item->add_note("thold_failpercent", ($numfailing/$numthresh)*100);
+                    $mapItem->add_note("state", $statename);
+                    $mapItem->add_note("thold_failcount", $numfailing);
+                    $mapItem->add_note("thold_failpercent", ($numfailing/$numthresh)*100);
                     $data[IN] = $state;
                     $data[OUT] = $numfailing;
                     wm_debug("CactiTHold ReadData: State is $state/$statename\n");
                 } elseif ($numthresh>0) {
-                    $item->add_note("thold_failcount", 0);
-                    $item->add_note("thold_failpercent", 0);
+                    $mapItem->add_note("thold_failcount", 0);
+                    $mapItem->add_note("thold_failpercent", 0);
                     wm_debug("CactiTHold ReadData: Leaving state as $state\n");
                 }
             }

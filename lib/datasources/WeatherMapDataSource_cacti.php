@@ -19,22 +19,22 @@ class WeatherMapDataSource_cacti extends WeatherMapDataSource
         return (false);
     }
 
-    function Recognise($targetstring)
+    function Recognise($targetString)
     {
-        if (1 === preg_match('/^cacti:(\d+)$/', $targetstring)) {
+        if (1 === preg_match('/^cacti:(\d+)$/', $targetString)) {
             return true;
         } else {
             return false;
         }
     }
 
-    function ReadData($targetstring, &$map, &$item)
+    function ReadData($targetString, &$map, &$mapItem)
     {
         $data[IN] = null;
         $data[OUT] = null;
         $data_time = 0;
 
-        if (1 === preg_match('/^cacti:(\d+)$/', $targetstring, $matches)) {
+        if (1 === preg_match('/^cacti:(\d+)$/', $targetString, $matches)) {
             $local_data_id = intval($matches[1]);
 
             $SQL = 'select * from weathermap_data where local_data_id='.$local_data_id;

@@ -21,7 +21,7 @@ class WeatherMapRunner
     
     private $workingImageFileName;
     
-    function __construct($config_directory, $output_directory, $config_file, $filehash, $imageformat)
+    public function __construct($config_directory, $output_directory, $config_file, $filehash, $imageformat)
     {
         $this->mapConfigFileName = $config_directory . DIRECTORY_SEPARATOR . $config_file;
         $this->htmlOutputFileName = $output_directory . DIRECTORY_SEPARATOR . $filehash.".html";
@@ -36,8 +36,8 @@ class WeatherMapRunner
         // temporary file used to write files before moving them into place
         $this->workingImageFileName = $output_directory . DIRECTORY_SEPARATOR . $filehash . '.tmp.png';
     }
-    
-    function LoadMap()
+
+    public function LoadMap()
     {
         if (file_exists($this->mapConfigFileName)) {
             $this->map = new Weathermap;
@@ -49,8 +49,8 @@ class WeatherMapRunner
 
         wm_warn("Mapfile $this->mapConfigFileName is not readable or doesn't exist [WMPOLL04]\n");
     }
-    
-    function Run()
+
+    public function Run()
     {
         weathermap_memory_check("MEM postread $this->config_file");
         $this->map->ReadData();
@@ -62,7 +62,7 @@ class WeatherMapRunner
         $this->map->DrawMap($this->workingImageFileName, $this->thumbnailImageFileName, read_config_option("weathermap_thumbsize"));
     }
     
-    function CleanUp()
+    public function CleanUp()
     {
         $this->map->CleanUp();
         unset($this->map);

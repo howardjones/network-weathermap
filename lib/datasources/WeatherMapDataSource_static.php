@@ -8,29 +8,29 @@
 class WeatherMapDataSource_static extends WeatherMapDataSource
 {
 
-    function Recognise($targetstring)
+    function Recognise($targetString)
     {
-        if (preg_match("/^static:(\-?\d+\.?\d*[KMGT]?):(\-?\d+\.?\d*[KMGT]?)$/", $targetstring) ||
-            preg_match("/^static:(\-?\d+\.?\d*[KMGT]?)$/", $targetstring) ) {
+        if (preg_match("/^static:(\-?\d+\.?\d*[KMGT]?):(\-?\d+\.?\d*[KMGT]?)$/", $targetString) ||
+            preg_match("/^static:(\-?\d+\.?\d*[KMGT]?)$/", $targetString) ) {
             return true;
         } else {
             return false;
         }
     }
 
-    function ReadData($targetstring, &$map, &$item)
+    function ReadData($targetString, &$map, &$mapItem)
     {
         $inbw = null;
         $outbw = null;
         $data_time=0;
 
-        if (preg_match("/^static:(\-?\d+\.?\d*[KMGT]*):(\-?\d+\.?\d*[KMGT]*)$/", $targetstring, $matches)) {
+        if (preg_match("/^static:(\-?\d+\.?\d*[KMGT]*):(\-?\d+\.?\d*[KMGT]*)$/", $targetString, $matches)) {
             $inbw = wmInterpretNumberWithMetricPrefix($matches[1], $map->kilo);
             $outbw = wmInterpretNumberWithMetricPrefix($matches[2], $map->kilo);
             $data_time = time();
         }
 
-        if (preg_match("/^static:(\-?\d+\.?\d*[KMGT]*)$/", $targetstring, $matches)) {
+        if (preg_match("/^static:(\-?\d+\.?\d*[KMGT]*)$/", $targetString, $matches)) {
             $inbw = wmInterpretNumberWithMetricPrefix($matches[1], $map->kilo);
             $outbw = $inbw;
             $data_time = time();

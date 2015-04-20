@@ -7,25 +7,25 @@
 class WeatherMapDataSource_mrtg extends WeatherMapDataSource
 {
 
-    function Recognise($targetstring)
+    function Recognise($targetString)
     {
-        if (preg_match("/\.(htm|html)$/", $targetstring)) {
+        if (preg_match("/\.(htm|html)$/", $targetString)) {
             return true;
         } else {
             return false;
         }
     }
 
-    function ReadData($targetstring, &$map, &$item)
+    function ReadData($targetString, &$map, &$mapItem)
     {
         $data[IN] = null;
         $data[OUT] = null;
         $data_time = 0;
 
-        $matchvalue= $item->get_hint('mrtg_value');
-        $matchperiod = $item->get_hint('mrtg_period');
-        $swap = intval($item->get_hint('mrtg_swap'));
-        $negate = intval($item->get_hint('mrtg_negate'));
+        $matchvalue= $mapItem->get_hint('mrtg_value');
+        $matchperiod = $mapItem->get_hint('mrtg_period');
+        $swap = intval($mapItem->get_hint('mrtg_swap'));
+        $negate = intval($mapItem->get_hint('mrtg_negate'));
 
         if ($matchvalue =='') {
             $matchvalue = "cu";
@@ -34,7 +34,7 @@ class WeatherMapDataSource_mrtg extends WeatherMapDataSource
             $matchperiod = "d";
         }
 
-        $fd=fopen($targetstring, "r");
+        $fd=fopen($targetString, "r");
 
         if ($fd) {
             while (!feof($fd)) {
@@ -50,12 +50,12 @@ class WeatherMapDataSource_mrtg extends WeatherMapDataSource
             }
             fclose($fd);
             # don't bother with the modified time if the target is a URL
-            if (! preg_match('/^[a-z]+:\/\//', $targetstring)) {
-                $data_time = filemtime($targetstring);
+            if (! preg_match('/^[a-z]+:\/\//', $targetString)) {
+                $data_time = filemtime($targetString);
             }
         } else {
             // some error code to go in here
-            wm_debug("MRTG ReadData: Couldn't open ($targetstring). \n");
+            wm_debug("MRTG ReadData: Couldn't open ($targetString). \n");
         }
 
         if ($swap==1) {

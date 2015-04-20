@@ -3,9 +3,9 @@
 class WeatherMapDataSource_time extends WeatherMapDataSource
 {
 
-    function Recognise($targetstring)
+    function Recognise($targetString)
     {
-        if (preg_match("/^time:(.*)$/", $targetstring)) {
+        if (preg_match("/^time:(.*)$/", $targetString)) {
             if (preg_match("/^[234]\./", phpversion())) {
                 wm_warn("Time DS Plugin recognised a TARGET, but needs PHP5+ to run. [WMTIME01]\n");
                 return false;
@@ -16,8 +16,13 @@ class WeatherMapDataSource_time extends WeatherMapDataSource
         return false;
     }
 
-    // function ReadData($targetstring, $configline, $itemtype, $itemname, $map)
-    function ReadData($targetstring, &$map, &$item)
+    /**
+     * @param string $targetString The string from the config file
+     * @param the $map A reference to the map object (redundant)
+     * @param the $mapItem A reference to the object this target is attached to
+     * @return array invalue, outvalue, unix timestamp that the data was valid
+     */
+    function ReadData($targetString, &$map, &$mapItem)
     {
         $data[IN] = null;
         $data[OUT] = null;
@@ -25,7 +30,7 @@ class WeatherMapDataSource_time extends WeatherMapDataSource
 
         $matches=0;
 
-        if (preg_match("/^time:(.*)$/", $targetstring, $matches)) {
+        if (preg_match("/^time:(.*)$/", $targetString, $matches)) {
             $timezone = $matches[1];
 
             $offset = "now";
@@ -51,12 +56,12 @@ class WeatherMapDataSource_time extends WeatherMapDataSource
                     wm_debug("Time ReadData: Timezone exists: $tz\n");
                     $dateTime = new DateTime($offset, new DateTimeZone($tz));
 
-                    $item->add_note("time_time12", $dateTime->format("h:i"));
-                    $item->add_note("time_time12ap", $dateTime->format("h:i A"));
-                    $item->add_note("time_time24", $dateTime->format("H:i"));
-                    $item->add_note("time_timet", $dateTime->format("U"));
+                    $mapItem->add_note("time_time12", $dateTime->format("h:i"));
+                    $mapItem->add_note("time_time12ap", $dateTime->format("h:i A"));
+                    $mapItem->add_note("time_time24", $dateTime->format("H:i"));
+                    $mapItem->add_note("time_timet", $dateTime->format("U"));
 
-                    $item->add_note("time_timezone", $tz);
+                    $mapItem->add_note("time_timezone", $tz);
                     $data[IN] = $dateTime->format("H");
                     $data_time = time();
                     $data[OUT] = $dateTime->format("i");
@@ -68,7 +73,7 @@ class WeatherMapDataSource_time extends WeatherMapDataSource
             }
         } else {
             // some error code to go in here
-            wm_warn("Time ReadData: Couldn't recognize $targetstring \n");
+            wm_warn("Time ReadData: Couldn't recognize $targetString \n");
         }
 
         wm_debug("Time ReadData: Returning (".($data[IN]===null?'null':$data[IN]).",".($data[OUT]===null?'null':$data[OUT]).",$data_time)\n");

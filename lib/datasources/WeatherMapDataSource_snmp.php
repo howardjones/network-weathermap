@@ -30,16 +30,16 @@ class WeatherMapDataSource_snmp extends WeatherMapDataSource
     }
 
 
-    function Recognise($targetstring)
+    function Recognise($targetString)
     {
-        if (preg_match("/^snmp:([^:]+):([^:]+):([^:]+):([^:]+)$/", $targetstring)) {
+        if (preg_match("/^snmp:([^:]+):([^:]+):([^:]+):([^:]+)$/", $targetString)) {
             return true;
         } else {
             return false;
         }
     }
 
-    function ReadData($targetstring, &$map, &$item)
+    function ReadData($targetString, &$map, &$mapItem)
     {
         $data[IN] = null;
         $data[OUT] = null;
@@ -67,7 +67,7 @@ class WeatherMapDataSource_snmp extends WeatherMapDataSource
             wm_debug("Number of retries changed to ".$retries.".\n");
         }
 
-        if (preg_match("/^snmp:([^:]+):([^:]+):([^:]+):([^:]+)$/", $targetstring, $matches)) {
+        if (preg_match("/^snmp:([^:]+):([^:]+):([^:]+):([^:]+)$/", $targetString, $matches)) {
             $community = $matches[1];
             $host = $matches[2];
             $in_oid = $matches[3];
@@ -98,7 +98,7 @@ class WeatherMapDataSource_snmp extends WeatherMapDataSource
                     $in_result = snmpget($host, $community, $in_oid, $timeout, $retries);
                     if ($in_result !== false) {
                         $data[IN] = floatval($in_result);
-                        $item->add_hint("snmp_in_raw", $in_result);
+                        $mapItem->add_hint("snmp_in_raw", $in_result);
                     } else {
                         $this->down_cache{$host}++;
                     }
@@ -109,7 +109,7 @@ class WeatherMapDataSource_snmp extends WeatherMapDataSource
                         // use floatval() here to force the output to be *some* kind of number
                         // just in case the stupid formatting stuff doesn't stop net-snmp returning 'down' instead of 2
                         $data[OUT] = floatval($out_result);
-                        $item->add_hint("snmp_out_raw", $out_result);
+                        $mapItem->add_hint("snmp_out_raw", $out_result);
                     } else {
                         $this->down_cache{$host}++;
                     }

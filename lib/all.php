@@ -32,7 +32,8 @@
     require_once dirname(__FILE__).'/WMLinkGeometryFactory.class.php';
 
     require_once dirname(__FILE__).'/WMColour.class.php';
-    
+    require_once dirname(__FILE__).'/WMTarget.class.php';
+
     require_once dirname(__FILE__).'/WeatherMapNode.class.php';
     require_once dirname(__FILE__).'/WeatherMapLink.class.php';
     require_once dirname(__FILE__).'/WeatherMapConfig.php';

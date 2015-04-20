@@ -210,6 +210,7 @@ class WeatherMapItem extends WeatherMapBase
     public $overlibwidth;
     public $overlibheight;
     public $overlibcaption;
+
     public $descendents; # if I change, who could inherit that change?
     public $config;  # config set on this node specifically
     public $parent;

@@ -540,81 +540,67 @@ class WeatherMap extends WeatherMapBase
         wm_debug("Finished Initialising Plugins...\n");
     }
 
-    function preProcessTargets()
+    /**
+     * Create an array of all the nodes and links, mixed together.
+     * readData() makes several passes through this list.
+     *
+     * @return array
+     */
+    function buildAllItemsList()
     {
-        wm_debug("Preprocessing targets\n");
+        $allItems = array();
 
         $listOfItemLists = array(&$this->links, &$this->nodes);
         reset($listOfItemLists);
 
-        wm_debug("Preprocessing targets\n");
-
         while (list($outerListCount,) = each($listOfItemLists)) {
             unset($itemList);
-            $itemList = & $listOfItemLists[$outerListCount];
+            $itemList = &$listOfItemLists[$outerListCount];
 
             reset($itemList);
             while (list($innerListCount,) = each($itemList)) {
                 unset($oneMapItem);
-                $oneMapItem = & $itemList[$innerListCount];
+                $oneMapItem = &$itemList[$innerListCount];
+                $allItems []= $oneMapItem;
+            }
+        }
+        return $allItems;
+    }
 
-                $type = $oneMapItem->my_type();
-                $name = $oneMapItem->name;
+    /**
+     * For each mapitem, loop through all its targets and find a plugin
+     * that recognises them. Then register the target with the plugin
+     * so that it can potentially pre-fetch or optimise in some way.
+     *
+     * @param $itemList
+     */
+    function preProcessTargets($itemList)
+    {
+        wm_debug("Preprocessing targets\n");
 
-                if (!$oneMapItem->isTemplate()) {
-                    if (count($oneMapItem->targets) > 0) {
-                        $targetIndex = 0;
-                        foreach ($oneMapItem->targets as $target) {
-                            wm_debug("ProcessTargets: New Target: $target[4]\n");
-                            // processstring won't use notes (only hints) for this string
+        foreach ($itemList as $oneMapItem) {
 
-                            $targetString = $this->processString($target[4], $oneMapItem, false, false);
-                            if ($target[4] != $targetString) {
-                                wm_debug("Targetstring is now $targetString\n");
+            $type = $oneMapItem->my_type();
+            $name = $oneMapItem->name;
+
+            if (!$oneMapItem->isTemplate()) {
+                if (count($oneMapItem->targets) > 0) {
+                    foreach ($oneMapItem->targets as $target) {
+                        wm_debug("ProcessTargets: New Target: $target\n");
+
+                        $target->preProcess($oneMapItem, $this);
+                        $matchedBy = $target->findHandlingPlugin($this->plugins['data']);
+
+                        if ($matchedBy != "") {
+                            if ($this->activeDataSourceClasses[$matchedBy]) {
+                                $target->registerWithPlugin($this->plugins['data'], $this, $oneMapItem);
+                            } else {
+                                wm_warn("ProcessTargets: $type $name, target: $target was recognised as a valid TARGET by a plugin that is unable to run ($matchedBy) [WMWARN07]\n");
                             }
+                        }
 
-                            // if the targetstring starts with a -, then we're taking this value OFF the aggregate
-                            $multiply = 1;
-
-                            if (preg_match("/^-(.*)/", $targetString, $matches)) {
-                                $targetString = $matches[1];
-                                $multiply = -1 * $multiply;
-                            }
-
-                            // if the remaining targetstring starts with a number and a *-, then this is a scale factor
-                            if (preg_match("/^(\d+\.?\d*)\*(.*)/", $targetString, $matches)) {
-                                $targetString = $matches[2];
-                                $multiply = $multiply * floatval($matches[1]);
-                            }
-
-                            $matched = false;
-                            $matchedBy = '';
-
-                            foreach ($this->plugins['data'] as $name => $pluginObject) {
-                                if (!$matched) {
-                                    $recognised = $pluginObject->Recognise($targetString);
-
-                                    if ($recognised) {
-                                        $matched = true;
-                                        $matchedBy = $name;
-
-                                        if ($this->activeDataSourceClasses[$name]) {
-                                            $pluginObject->Register($targetString, $this, $oneMapItem);
-
-                                            $oneMapItem->targets[$targetIndex][1] = $multiply;
-                                            $oneMapItem->targets[$targetIndex][0] = $targetString;
-                                            $oneMapItem->targets[$targetIndex][5] = $matchedBy;
-                                        } else {
-                                            wm_warn("ProcessTargets: $type $name, target: $targetString on config line $target[3] of $target[2] was recognised as a valid TARGET by a plugin that is unable to run ($pluginObject) [WMWARN07]\n");
-                                        }
-                                    }
-                                }
-                            }
-                            if (!$matched) {
-                                wm_warn("ProcessTargets: $type $name, target: $targetString on config line $target[3] of $target[2] was not recognised as a valid TARGET [WMWARN08]\n");
-                            }
-
-                            $targetIndex++;
+                        if ($matchedBy == "") {
+                            wm_warn("ProcessTargets: $type $name, target: $target was not recognised as a valid TARGET [WMWARN08]\n");
                         }
                     }
                 }
@@ -624,196 +610,185 @@ class WeatherMap extends WeatherMapBase
 
     function readData()
     {
+        // we skip readdata completely in sizedebug mode
+        if ($this->sizedebug != 0) {
+            wm_debug("Size Debugging is on. Skipping readData.\n");
+            return;
+        }
+
+        $allMapItems = $this->buildAllItemsList();
+
         $this->initialiseDatasourcePlugins();
 
         wm_debug("======================================\n");
         wm_debug("ReadData: Updating link data for all links and nodes\n");
 
-        // we skip readdata completely in sizedebug mode
-        if ($this->sizedebug == 0) {
-            $this->preProcessTargets();
+        // process all the targets and find a plugin for them
+        $this->preProcessTargets($allMapItems);
 
-            wm_debug("======================================\n");
-            wm_debug("Starting prefetch\n");
-            foreach ($this->plugins['data'] as $name => $pluginObject) {
-                $pluginObject->Prefetch($this);
+        // give all the plugins a chance to prefetch their results
+        wm_debug("======================================\n");
+        wm_debug("Starting prefetch\n");
+        foreach ($this->plugins['data'] as $name => $pluginObject) {
+            $pluginObject->Prefetch($this);
+        }
+
+        wm_debug("======================================\n");
+        wm_debug("Starting main collection loop\n");
+
+        $channels = array(IN,OUT);
+
+        foreach ($allMapItems as $oneMapItem) {
+
+            $type = $oneMapItem->my_type();
+
+            $totals = array();
+            foreach ($channels as $channel) {
+                $totals[$channel] = 0;
+            }
+            $datatime = 0;
+
+            $name = $oneMapItem->name;
+            wm_debug("-------------------------------------------------------------\n");
+            wm_debug("ReadData for $type $name: \n");
+
+            if ( $oneMapItem->isTemplate()) {
+                wm_debug("ReadData: Skipping $type $name that looks like a template\n.");
+                continue;
             }
 
-            wm_debug("======================================\n");
-            wm_debug("Starting main collection loop\n");
+            $nTargets = count($oneMapItem->targets);
 
-            $listOfItemLists = array(&$this->links, &$this->nodes);
-            reset($listOfItemLists);
+            if ($nTargets == 0) {
+                wm_debug("ReadData: No targets for $type $name\n");
+                continue;
+            }
 
-            while (list($outerListCount,) = each($listOfItemLists)) {
-                unset($itemList);
-                $itemList = & $listOfItemLists[$outerListCount];
+            foreach ($oneMapItem->targets as $target) {
+                wm_debug("ReadData: New Target: $target\n");
+                $target->readData($this->plugins['data'], $this, $oneMapItem);
 
-                reset($itemList);
-                while (list($innerListCount,) = each($itemList)) {
-                    unset($oneMapItem);
-                    $oneMapItem = & $itemList[$innerListCount];
+                if ($target->hasValidData()) {
+                    $results = $target->getData();
+                    $datatime = array_shift($results);
 
-                    $type = $oneMapItem->my_type();
+                    foreach ($channels as $channel) {
+                        wm_debug("Adding %f to total for channel %d\n", $results[$channel], $channel);
+                        $totals[$channel] += $results[$channel];
+                    }
+                    wm_debug("Running totals: %s\n", join(" ", $totals));
+                } else {
+                    wm_debug("Invalid data?\n");
+                }
 
-                    $total_in = 0;
-                    $total_out = 0;
-                    $name = $oneMapItem->name;
-                    wm_debug("\n");
-                    wm_debug("ReadData for $type $name: \n");
+                if (!$target->hasValidData() && $nTargets == 1 ) {
+                    // this is to allow null to be passed through from DS plugins in the case of a single target
+                    // we've never defined what x + null is, so we'll treat that as a 0
 
-                    if (! $oneMapItem->isTemplate()) {
-                        $nTargets = count($oneMapItem->targets);
+                    foreach ($channels as $channel) {
+                        $totals[$channel] = null;
+                    }
+                }
 
-                        if ($nTargets > 0) {
-                            $targetIndex = 0;
-                            foreach ($oneMapItem->targets as $target) {
-                                wm_debug("ReadData: New Target: $target[4]\n");
-
-                                $targetstring = $target[0];
-                                $multiply = $target[1];
-
-                                $in = 0;
-                                $out = 0;
-                                $datatime = 0;
-                                if ($target[4] != '') {
-                                    // processstring won't use notes (only hints) for this string
-
-                                    $targetstring = $this->processString($target[0], $oneMapItem, false, false);
-                                    if ($target[0] != $targetstring) {
-                                        wm_debug("Targetstring is now $targetstring\n");
-                                    }
-                                    if ($multiply != 1) {
-                                        wm_debug("Will multiply result by $multiply\n");
-                                    }
-
-                                    if ($target[0] != "") {
-                                        $matched_by = $target[5];
-                                        list($in, $out, $datatime) = $this->plugins['data'][$target[5]]->ReadData($targetstring, $this, $oneMapItem);
-                                    }
-
-                                    // TODO - untangle this mess!
-
-                                    if (($in === null) && ($out === null)) {
-                                        $in = 0;
-                                        $out = 0;
-                                        wm_warn("ReadData: $type $name, target: $targetstring on config line $target[3] of $target[2] had no valid data, according to $matched_by [WMWARN70]\n");
-
-                                        // this is to allow null to be passed through from DS plugins in the case of a single target
-                                        // we've never defined what x + null is, so we'll treat that as a 0
-                                        if ($nTargets == 1) {
-                                            $total_in = null;
-                                            $total_out = null;
-                                        }
-                                    } else {
-                                        // force null to 0, for the purpose of totals
-                                        // if ($in === null) $in = 0;
-                                        // if ($out === null) $out = 0;
-
-                                        if ($multiply != 1) {
-                                            wm_debug("Pre-multiply: $in $out\n");
-
-                                            $in = $multiply * $in;
-                                            $out = $multiply * $out;
-
-                                            wm_debug("Post-multiply: $in $out\n");
-                                        }
-
-                                        if ($nTargets > 1) {
-                                            $total_in = $total_in + $in;
-                                            $total_out = $total_out + $out;
-                                        } else {
-                                            $total_in = $in;
-                                            $total_out = $out;
-                                        }
-                                    }
-                                    wm_debug(sprintf("Aggregate so far: %s,%s\n", wm_value_or_null($total_in), wm_value_or_null($total_out)));
-                                    # keep a track of the range of dates for data sources (mainly for MRTG/textfile based DS)
-                                    if ($datatime > 0) {
-                                        if ($this->max_data_time == null || $datatime > $this->max_data_time) {
-                                            $this->max_data_time = $datatime;
-                                        }
-                                        if ($this->min_data_time == null || $datatime < $this->min_data_time) {
-                                            $this->min_data_time = $datatime;
-                                        }
-
-                                        wm_debug("DataTime MINMAX: " . $this->min_data_time . " -> " . $this->max_data_time . "\n");
-                                    }
-                                }
-                                $targetIndex++;
-                            }
-
-                            wm_debug("ReadData complete for $type $name: $total_in $total_out\n");
-                        } else {
-                            wm_debug("ReadData: No targets for $type $name\n");
-                        }
-                    } else {
-                        wm_debug("ReadData: Skipping $type $name that looks like a template\n.");
+                # keep a track of the range of dates for data sources (mainly for MRTG/textfile based DS)
+                if ($datatime > 0) {
+                    if ($this->max_data_time == null || $datatime > $this->max_data_time) {
+                        $this->max_data_time = $datatime;
+                    }
+                    if ($this->min_data_time == null || $datatime < $this->min_data_time) {
+                        $this->min_data_time = $datatime;
                     }
 
-                    $oneMapItem->bandwidth_in = $total_in;
-                    $oneMapItem->bandwidth_out = $total_out;
-
-                    if ($type == 'LINK' && $oneMapItem->duplex == 'half') {
-                        // in a half duplex link, in and out share a common bandwidth pool, so percentages need to include both
-                        wm_debug("Calculating percentage using half-duplex\n");
-                        $oneMapItem->outpercent = (($total_in + $total_out) / ($oneMapItem->max_bandwidth_out)) * 100;
-                        $oneMapItem->inpercent = (($total_out + $total_in) / ($oneMapItem->max_bandwidth_in)) * 100;
-                        if ($oneMapItem->max_bandwidth_out != $oneMapItem->max_bandwidth_in) {
-                            wm_warn("ReadData: $type $name: You're using asymmetric bandwidth AND half-duplex in the same link. That makes no sense. [WMWARN44]\n");
-                        }
-                    } else {
-                        $oneMapItem->outpercent = (($total_out) / ($oneMapItem->max_bandwidth_out)) * 100;
-                        $oneMapItem->inpercent = (($total_in) / ($oneMapItem->max_bandwidth_in)) * 100;
-                    }
-
-                    $warn_in = true;
-                    $warn_out = true;
-                    if ($type == 'NODE' && $oneMapItem->scalevar == 'in') {
-                        $warn_out = false;
-                    }
-                    if ($type == 'NODE' && $oneMapItem->scalevar == 'out') {
-                        $warn_in = false;
-                    }
-
-                    if ($oneMapItem->scaletype == 'percent') {
-                        list($incol, $inscalekey, $inscaletag) = $this->colourFromValue($oneMapItem->inpercent, $oneMapItem->usescale, $oneMapItem->name, true, $warn_in);
-                        list($outcol, $outscalekey, $outscaletag) = $this->colourFromValue($oneMapItem->outpercent, $oneMapItem->usescale, $oneMapItem->name, true, $warn_out);
-                    } else {
-                        // use absolute values, if that's what is requested
-                        list($incol, $inscalekey, $inscaletag) = $this->colourFromValue($oneMapItem->bandwidth_in, $oneMapItem->usescale, $oneMapItem->name, false, $warn_in);
-                        list($outcol, $outscalekey, $outscaletag) = $this->colourFromValue($oneMapItem->bandwidth_out, $oneMapItem->usescale, $oneMapItem->name, false, $warn_out);
-                    }
-
-                    $oneMapItem->add_note("inscalekey", $inscalekey);
-                    $oneMapItem->add_note("outscalekey", $outscalekey);
-
-                    $oneMapItem->add_note("inscaletag", $inscaletag);
-                    $oneMapItem->add_note("outscaletag", $outscaletag);
-
-                    $oneMapItem->add_note("inscalecolor", $incol->asHTML());
-                    $oneMapItem->add_note("outscalecolor", $outcol->asHTML());
-
-                    $oneMapItem->colours[IN] = $incol;
-                    $oneMapItem->colours[OUT] = $outcol;
-
-                    ### warn("TAGS (setting) |$inscaletag| |$outscaletag| \n");
-
-                    wm_debug(sprintf("ReadData: Setting %s,%s for %s\n", wm_value_or_null($total_in), wm_value_or_null($total_out), $name));
-                    unset($oneMapItem);
+                    wm_debug("DataTime MINMAX: " . $this->min_data_time . " -> " . $this->max_data_time . "\n");
                 }
             }
 
-            wm_debug("======================================\n");
-            wm_debug("Starting cleanup\n");
+            wm_debug("ReadData complete for %s %s: %s\n", $type, $name, join(" ", $totals));
 
-            foreach ($this->plugins['data'] as $name => $pluginObject) {
-                $pluginObject->CleanUp($this);
+            // bodge for now: TODO these should be set in Reset() and readConfig()
+            $oneMapItem->maxValues[IN] = $oneMapItem->max_bandwidth_in;
+            $oneMapItem->maxValues[OUT] = $oneMapItem->max_bandwidth_out;
+
+            $oneMapItem->bandwidth_in = $totals[IN];
+            $oneMapItem->bandwidth_out = $totals[OUT];
+            // TODO this should replace the above 2 lines
+            foreach ($channels as $channel) {
+                $oneMapItem->absoluteUsages[$channel] = $totals[$channel];
+                $oneMapItem->percentUsages[$channel] = ($totals[$channel] / $oneMapItem->maxValues[$channel]) * 100;
+            }
+            $oneMapItem->outpercent = (($totals[OUT]) / ($oneMapItem->max_bandwidth_out)) * 100;
+            $oneMapItem->inpercent = (($totals[IN]) / ($oneMapItem->max_bandwidth_in)) * 100;
+
+            if ($type == 'LINK' && $oneMapItem->duplex == 'half') {
+                // in a half duplex link, in and out share a common bandwidth pool, so percentages need to include both
+                wm_debug("Calculating percentage using half-duplex\n");
+                $oneMapItem->outpercent = (($totals[IN] + $totals[OUT]) / ($oneMapItem->max_bandwidth_out)) * 100;
+                $oneMapItem->inpercent = (($totals[IN] + $totals[OUT]) / ($oneMapItem->max_bandwidth_in)) * 100;
+
+                if ($oneMapItem->max_bandwidth_out != $oneMapItem->max_bandwidth_in) {
+                    wm_warn("ReadData: $type $name: You're using asymmetric bandwidth AND half-duplex in the same link. That makes no sense. [WMWARN44]\n");
+                }
             }
 
-            wm_debug("ReadData Completed.\n");
-            wm_debug("------------------------------\n");
+            $warn_in = true;
+            $warn_out = true;
+            if ($type == 'NODE' && $oneMapItem->scalevar == 'in') {
+                $warn_out = false;
+            }
+            if ($type == 'NODE' && $oneMapItem->scalevar == 'out') {
+                $warn_in = false;
+            }
+
+            if ($oneMapItem->scaletype == 'percent') {
+                list($incol, $inscalekey, $inscaletag) = $this->colourFromValue($oneMapItem->inpercent, $oneMapItem->usescale, $oneMapItem->name, true, $warn_in);
+                list($outcol, $outscalekey, $outscaletag) = $this->colourFromValue($oneMapItem->outpercent, $oneMapItem->usescale, $oneMapItem->name, true, $warn_out);
+
+                foreach ($channels as $channel) {
+                    list($col, $scalekey, $scaletag) = $this->colourFromValue($oneMapItem->percentUsages[$channel], $oneMapItem->usescale, $oneMapItem->name, true, $warn_out);
+                    $oneMapItem->channelScaleColours[$channel] = $col;
+                    $oneMapItem->colours[$channel] = $col;
+                }
+            } else {
+                // use absolute values, if that's what is requested
+                list($incol, $inscalekey, $inscaletag) = $this->colourFromValue($oneMapItem->bandwidth_in, $oneMapItem->usescale, $oneMapItem->name, false, $warn_in);
+                list($outcol, $outscalekey, $outscaletag) = $this->colourFromValue($oneMapItem->bandwidth_out, $oneMapItem->usescale, $oneMapItem->name, false, $warn_out);
+
+                foreach ($channels as $channel) {
+                    list($col, $scalekey, $scaletag) = $this->colourFromValue($oneMapItem->absoluteUsages[$channel], $oneMapItem->usescale, $oneMapItem->name, false, $warn_out);
+                    $oneMapItem->channelScaleColours[$channel] = $col;
+                    $oneMapItem->colours[$channel] = $col;
+                }
+            }
+
+            $oneMapItem->add_note("inscalekey", $inscalekey);
+            $oneMapItem->add_note("outscalekey", $outscalekey);
+
+            $oneMapItem->add_note("inscaletag", $inscaletag);
+            $oneMapItem->add_note("outscaletag", $outscaletag);
+
+            $oneMapItem->add_note("inscalecolor", $incol->asHTML());
+            $oneMapItem->add_note("outscalecolor", $outcol->asHTML());
+
+//            $oneMapItem->colours[IN] = $incol;
+//            $oneMapItem->colours[OUT] = $outcol;
+
+            ### warn("TAGS (setting) |$inscaletag| |$outscaletag| \n");
+
+            wm_debug(sprintf("ReadData: Setting %s,%s for %s\n", wm_value_or_null($totals[IN]), wm_value_or_null($totals[OUT]), $name));
+            unset($oneMapItem);
         }
+
+
+        wm_debug("======================================\n");
+        wm_debug("Starting cleanup\n");
+
+        foreach ($this->plugins['data'] as $name => $pluginObject) {
+            $pluginObject->CleanUp($this);
+        }
+
+        wm_debug("ReadData Completed.\n");
+        wm_debug("------------------------------\n");
+
     }
 
     // nodename is a vestigal parameter, from the days when nodes were just big labels

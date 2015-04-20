@@ -15,52 +15,61 @@ class ConfigTest extends PHPUnit_Framework_TestCase
     protected static $compare;
 
     /**
+     * Read a config file, write an image.
+     * Compare the image to the 'reference' image that we generated when the
+     * test config was originally written. Because different PNG/gd versions
+     * actually produce different bytes for the same image, we use ImageMagick's
+     * 'compare' to do this. This also produces a nice visual diff image.
+     *
+     * Currently this test does most of the heavy lifting for our code coverage.
+     * Each test config should have a small scope of tested features if possible, or
+     * a specific previous bug to avoid regressions.
+     *
      * @dataProvider configlist
      */
-    public function testConfigOutput($conffile, $referenceimagefile)
+    public function testConfigOutput($configFileName, $referenceImageFileName)
     {
-        $outputimagefile = self::$result1dir . DIRECTORY_SEPARATOR . $conffile . ".png";
-        $comparisonimagefile = self::$diffdir . DIRECTORY_SEPARATOR . $conffile . ".png";
-        $outputhtmlfile = self::$result1dir . DIRECTORY_SEPARATOR . $conffile . ".html";
+        $outputImageFileName = self::$result1dir . DIRECTORY_SEPARATOR . $configFileName . ".png";
+        $comparisonImageFileName = self::$diffdir . DIRECTORY_SEPARATOR . $configFileName . ".png";
+        $outputHTMLFileName = self::$result1dir . DIRECTORY_SEPARATOR . $configFileName . ".html";
 
-        $compare_output = $comparisonimagefile . ".txt";
-        if (file_exists($compare_output)) {
-            unlink($compare_output);
+        $compareOutputFileName = $comparisonImageFileName . ".txt";
+        if (file_exists($compareOutputFileName)) {
+            unlink($compareOutputFileName);
         }
 
-        $nwarns = TestOutput_RunTest(self::$testdir . DIRECTORY_SEPARATOR . $conffile, $outputimagefile, $outputhtmlfile, '', '');
+        $warningCount = TestOutput_RunTest(self::$testdir . DIRECTORY_SEPARATOR . $configFileName, $outputImageFileName, $outputHTMLFileName, '', '');
 
         // if REQUIRES_VERSION was set, and set to a newer version, then this test is known to fail
-        if ($nwarns < 0) {
+        if ($warningCount < 0) {
             $this->markTestIncomplete('This test is for a future feature');
             chdir($previouswd);
             return;
         }
 
-        $this->assertEquals(0, $nwarns, "Warnings were generated");
+        $this->assertEquals(0, $warningCount, "Warnings were generated");
 
         # $COMPARE -metric AE $reference $result $destination  > $destination2 2>&1
         $cmd = sprintf("%s -metric AE \"%s\" \"%s\" \"%s\"",
             self::$compare,
-            $referenceimagefile,
-            $outputimagefile,
-            $comparisonimagefile
+            $referenceImageFileName,
+            $outputImageFileName,
+            $comparisonImageFileName
         );
 
         if (file_exists(self::$compare)) {
 
-            $fd2 = fopen($comparisonimagefile . ".txt", "w");
+            $fd2 = fopen($comparisonImageFileName . ".txt", "w");
             fwrite($fd2, $cmd . "\r\n\r\n");
             fwrite($fd2, getcwd() . "\r\n\r\n");
 
-            # $fd = popen($cmd,"r");
-            $descriptorspec = array(
+            $descriptorSpec = array(
                 0 => array("pipe", "r"), // stdin is a pipe that the child will read from
                 1 => array("pipe", "w"), // stdout is a pipe that the child will write to
                 2 => array("pipe", "w") // stderr is a pipe to write to
             );
             $pipes = array();
-            $process = proc_open($cmd, $descriptorspec, $pipes, getcwd(), NULL, array('bypass_shell' => TRUE));
+            $process = proc_open($cmd, $descriptorSpec, $pipes, getcwd(), NULL, array('bypass_shell' => TRUE));
             $output = "";
 
             if (is_resource($process)) {
@@ -79,17 +88,22 @@ class ConfigTest extends PHPUnit_Framework_TestCase
             $lines = explode("\n", $output);
             $output = $lines[0];
 
-            $this->AssertEquals("0", $output, "Image Output did not match reference for $conffile via IM");
-
+            $this->AssertEquals("0", $output, "Image Output did not match reference for $configFileName via IM");
         }
     }
 
     /**
+     * Read a config, write an image, write a config (an editor cycle)
+     * then read *that* config, write an image.
+     * then compare the two output images - they should be identical
+     * (both are written by the same GD/png combo, so they should be
+     * byte-identical this time)
+     *
      * @dataProvider configlist
+     * @after testConfigOutput
      */
     public function testWriteConfigConsistency($conffile, $referenceimagefile)
     {
-       # return;
 
         $output_image_round1 = self::$result1dir . DIRECTORY_SEPARATOR . $conffile . ".png";
         $output_image_round2 = self::$result2dir . DIRECTORY_SEPARATOR . $conffile . ".png";
@@ -122,15 +136,20 @@ class ConfigTest extends PHPUnit_Framework_TestCase
             sort($files);
             closedir($dh);
         } else {
-           # die("Test directory ".self::$testdir." doesn't exist!");
+           throw new Exception("Test directory ".self::$testdir." doesn't exist!");
         }
 
         foreach ($files as $file) {
+            #if (false === strpos($file, "target")) {
+            #    continue;
+            #}
+
             if (substr($file, -5, 5) == '.conf') {
-                $imagefile = $file . ".png";
+                # $imagefile = $file . ".png";
                 $reference = self::$referencedir . DIRECTORY_SEPARATOR . $file . ".png";
 
                 if (file_exists($reference)) {
+
                     $conflist[] = array($file, $reference);
 
                     $title = get_map_title(self::$testdir . DIRECTORY_SEPARATOR . $file);
@@ -159,6 +178,11 @@ class ConfigTest extends PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
+        global $WEATHERMAP_DEBUGGING;
+
+        // sometimes useful to figure out what's going on!
+        $WEATHERMAP_DEBUGGING = false;
+
         self::$previouswd = getcwd();
         chdir(dirname(__FILE__) . DIRECTORY_SEPARATOR . "../..");
     }
@@ -204,7 +228,7 @@ class ConfigTest extends PHPUnit_Framework_TestCase
         }
 
         if( ! file_exists(self::$compare)) {
-            die("Compare path doesn't exist (or isn't executable) - do you have Imagemagick? \n");
+            throw new Exception("Compare path doesn't exist (or isn't executable) - do you have Imagemagick? \n");
         }
     }
 

@@ -22,18 +22,27 @@ class WeatherMapLink extends WeatherMapItem
     var $max_bandwidth_in,     $max_bandwidth_out;
     var $max_bandwidth_in_cfg, $max_bandwidth_out_cfg;
     var $targets = array();
+
+    public $percentUsages = array();
+    public $absoluteUsages = array();
+    public $maxValues = array();
+    public $maxValuesConfigured = array();
+    var $channelScaleColours = array();
+
     var $a_offset,             $b_offset;
     var $a_offset_dx,   $b_offset_dx;
     var $a_offset_dy,   $b_offset_dy;
     var $a_offset_resolved, $b_offset_resolved;
+
     var $in_ds,                $out_ds;
+
     var $colours = array();
     var $inpercent,            $outpercent;
     var $inherit_fieldlist;
     var $vialist = array();
     var $viastyle;
     var $usescale, $duplex;
-    var $scaletype;
+    var $scaletype; // absolute or percent
     var $outlinecolour;
     var $bwoutlinecolour;
     var $bwboxcolour;
@@ -606,11 +615,7 @@ class WeatherMapLink extends WeatherMapItem
                 $output .= "\tTARGET";
 
                 foreach ($this->targets as $target) {
-                    if (strpos($target[4], " ") === false) {
-                        $output .= " " . $target[4];
-                    } else {
-                        $output .= ' "' . $target[4] . '"';
-                    }
+                    $output .= " " . $target->asConfig();
                 }
                 $output .= "\n";
             }

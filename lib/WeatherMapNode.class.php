@@ -18,6 +18,10 @@ class WeatherMapNode extends WeatherMapItem
     var $labelangle;
     var $name;
 
+    var $percentValues = array();
+    var $absoluteValues = array();
+    var $maxValues = array();
+
     // var $notes; // for internal 'notes' between plugins
     var $colours = array(); // SCALE colours
 
@@ -813,11 +817,7 @@ class WeatherMapNode extends WeatherMapItem
                 $output .= "\tTARGET";
 
                 foreach ($this->targets as $target) {
-                    if (strpos($target[4], " ") === false) {
-                        $output .= " " . $target[4];
-                    } else {
-                        $output .= ' "' . $target[4] . '"';
-                    }
+                    $output .= " " . $target->asConfig();
                 }
                 $output .= "\n";
             }

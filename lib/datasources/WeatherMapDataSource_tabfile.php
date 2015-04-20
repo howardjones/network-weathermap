@@ -9,7 +9,7 @@ class WeatherMapDataSource_tabfile extends WeatherMapDataSource
 
     function Recognise($targetstring)
     {
-        if (preg_match("/\.(tsv|txt)$/", $targetstring)) {
+        if (preg_match('/\.(tsv|txt)$/', $targetstring)) {
             return true;
         } else {
             return false;
@@ -26,7 +26,21 @@ class WeatherMapDataSource_tabfile extends WeatherMapDataSource
 
         # $matches=0;
 
-        $fd=fopen($targetstring, "r");
+        $fullpath = realpath($targetstring);
+
+        wm_debug("Opening $fullpath\n");
+
+        if (! file_exists($fullpath)) {
+            wm_warn("File '$fullpath' doesn't exist.");
+            return array(null, null, null);
+        }
+
+        if (! is_readable($fullpath)) {
+            wm_warn("File '$fullpath' isn't readable.");
+            return array(null, null, null);
+        }
+
+        $fd=fopen($fullpath, "r");
 
         if ($fd) {
             while (!feof($fd)) {

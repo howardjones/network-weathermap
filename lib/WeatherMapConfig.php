@@ -919,10 +919,9 @@ class WeatherMapConfigReader
         }
     }
 
-
     // parseString is based on code from:
     // http://www.webscriptexpert.com/Php/Space-Separated%20Tag%20Parser/
-    private function parseString($input)
+    public function parseString($input)
     {
         $output = array (); // Array of Output
         $cPhraseQuote = null; // Record of the quote that opened the current phrase
@@ -1435,44 +1434,43 @@ class WeatherMapConfigReader
         return true;
     }
 
-    private function handleNODE_USESCALE($fullcommand, $args, $matches)
+    private function handleNODE_USESCALE($fullCommand, $args, $matches)
     {
-        $svar = '';
-        $stype = 'percent';
+        $scaleChannel = '';
+        $scaleType = 'percent';
 
         // in or out?
         if (isset($matches[3])) {
-            $svar = trim($matches[3]);
+            $scaleChannel = trim($matches[3]);
         }
 
         // percent or absolute?
         if (isset($matches[6])) {
-            $stype = strtolower(trim($matches[6]));
+            $scaleType = strtolower(trim($matches[6]));
         }
 
         // opens the door for other scaley things...
         switch (strtoupper($args[0])) {
             case 'USEICONSCALE':
-                $varname = 'iconscalevar';
-                $uvarname = 'useiconscale';
-                $tvarname = 'iconscaletype';
+                $channelPropertyName = 'iconscalevar';
+                $scalePropertyName = 'useiconscale';
+                $scaleTypePropertyName = 'iconscaletype';
                 break;
             default:
-                $varname = 'scalevar';
-                $uvarname = 'usescale';
-                $tvarname = 'scaletype';
+                $channelPropertyName = 'scalevar';
+                $scalePropertyName = 'usescale';
+                $scaleTypePropertyName = 'scaletype';
                 break;
         }
 
-        if ($svar != '') {
-            $this->currentObject->$varname = $svar;
+        if ($scaleChannel != '') {
+            $this->currentObject->$channelPropertyName = $scaleChannel;
         }
-        $this->currentObject->$tvarname = $stype;
-        $this->currentObject->$uvarname = $matches[2];
+        $this->currentObject->$scaleTypePropertyName = $scaleType;
+        $this->currentObject->$scalePropertyName = $matches[2];
 
         return true;
     }
-
 
     private function handleFONTDEFINE($fullcommand, $args, $matches)
     {
@@ -1499,7 +1497,6 @@ class WeatherMapConfigReader
         }
 
         if (! is_null($newFontObject)) {
-            // $this->mapObject->fonts[$args[1]] = $newFontObject;
             $this->mapObject->fonts->addFont($args[1], $newFontObject);
             return true;
         }
@@ -1513,6 +1510,12 @@ class WeatherMapConfigReader
 
         $urls = preg_split('/\s+/', $matches[1], -1, PREG_SPLIT_NO_EMPTY);
 
+        if ($args[0] == 'OVERLIBGRAPH') {
+            $this->currentObject->overliburl[IN] = $urls;
+            $this->currentObject->overliburl[OUT] = $urls;
+            return true;
+        }
+
         if ($args[0] == 'INOVERLIBGRAPH') {
             $index = IN;
         }
@@ -1521,19 +1524,12 @@ class WeatherMapConfigReader
             $index = OUT;
         }
 
-        if ($args[0] == 'OVERLIBGRAPH') {
-            $this->currentObject->overliburl[IN] = $urls;
-            $this->currentObject->overliburl[OUT] = $urls;
-        } else {
-            $this->currentObject->overliburl[$index] = $urls;
-        }
-
+        $this->currentObject->overliburl[$index] = $urls;
         return true;
     }
 
     private function handleCOLOR($fullcommand, $args, $matches)
     {
-        $key = $args[0];
         $field = str_replace("color", "colour", strtolower($args[0]));
         $val = strtolower($args[1]);
 
@@ -1547,33 +1543,6 @@ class WeatherMapConfigReader
         $this->currentObject->$field = $wmc;
 
         return true;
-
-        // this is a regular colour setting thing
-        if (isset($args[2])) {
-            $this->currentObject->$field = array($args[1], $args[2], $args[3]);
-
-            return true;
-        }
-
-        if ($val == 'none') {
-            $this->currentObject->$field = array(-1, -1, -1);
-
-            return true;
-        }
-
-        if ($val == 'contrast') {
-            $this->currentObject->$field = array(-3, -3, -3);
-
-            return true;
-        }
-
-        if ($val == 'copy') {
-            $this->currentObject->$field = array(-2, -2, -2);
-
-            return true;
-        }
-
-        return false;
     }
 
     private function handleTARGET($fullcommand, $args, $matches)
@@ -1582,25 +1551,9 @@ class WeatherMapConfigReader
         $this->currentObject->targets = array();
         array_shift($args); // take off the actual TARGET keyword
 
+        // Now loop through all the rest
         foreach ($args as $arg) {
-            // we store the original TARGET string, and line number, along with the breakdown, to make nicer error messages later
-            // array of 7 things:
-            // - only 0,1,2,3,4 are used at the moment (more used to be before DS plugins)
-            // 0 => final target string (filled in by ReadData)
-            // 1 => multiplier (filled in by ReadData)
-            // 2 => config filename where this line appears
-            // 3 => linenumber in that file
-            // 4 => the original target string
-            // 5 => the plugin to use to pull data
-            $newTarget = array(
-                '',
-                '',
-                $this->currentSource,
-                $this->lineCount,
-                $arg,
-                "",
-                ""
-            );
+            $newTarget = new WMTarget($arg, $this->currentSource, $this->lineCount);
 
             if ($this->currentObject) {
                 wm_debug("  TARGET: $arg\n");

@@ -197,6 +197,8 @@ class WeatherMapNode extends WeatherMapItem
 
         list ($red, $green, $blue) = $tintColour->getComponents();
 
+        // TODO - bug? Shouldn't this be per-map and not per-node?
+        // Also, if this was a parameter to this function, it wouldn't need to be a method at all
         if (function_exists("imagefilter") && $this->get_hint("use_imagefilter") == 1) {
             imagefilter($imageRef, IMG_FILTER_COLORIZE, $red, $green, $blue);
         } else {

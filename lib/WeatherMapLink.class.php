@@ -187,6 +187,9 @@ class WeatherMapLink extends WeatherMapItem
         return array(IN, OUT);
     }
 
+
+
+
     function drawComments($gdImage)
     {
         wm_debug("Link ".$this->name.": Drawing comments.\n");
@@ -320,7 +323,8 @@ class WeatherMapLink extends WeatherMapItem
     }
 
     /***
-     * Precalculate the colours necessary for this link.
+     * @param $map
+     * @throws WMException
      */
     function preCalculate(&$map)
     {
@@ -400,31 +404,20 @@ class WeatherMapLink extends WeatherMapItem
         wm_debug("Link ".$this->name.": Drawing bwlabels.\n");
 
         $directions = $this->getDirectionList();
-        $labelPositions = array();
         $labelOffsets = array();
-        $percentages = array();
-        $bandwidths = array();
-        $max_bandwidths = array();
 
         // TODO - this stuff should all be in arrays already!
         $labelOffsets[IN] = $this->labeloffset_in;
         $labelOffsets[OUT] = $this->labeloffset_out;
-        $percentages[IN] = $this->inpercent;
-        $percentages[OUT] = $this->outpercent;
-        $bandwidths[IN] = $this->bandwidth_in;
-        $bandwidths[OUT] = $this->bandwidth_out;
-        $max_bandwidths[IN] = $this->max_bandwidth_in;
-        $max_bandwidths[OUT] = $this->max_bandwidth_out;
 
         foreach ($directions as $direction) {
             list ($position, $index, $angle, $distance) = $this->geometry->findPointAndAngleAtPercentageDistance($labelOffsets[$direction]);
 
-            $percentage = $percentages[$direction
-            ];
-            $bandwidth = $bandwidths[$direction];
+            $percentage = $this->percentUsages[$direction];
+            $bandwidth = $this->absoluteUsages[$direction];
 
             if ($this->owner->sizedebug) {
-                $bandwidth = $max_bandwidths[$direction];
+                $bandwidth = $this->maxValues[$direction];
             }
 
             $label_text = $this->owner->ProcessString($this->bwlabelformats[$direction], $this);
@@ -442,25 +435,81 @@ class WeatherMapLink extends WeatherMapItem
                     $angle = 0;
                 }
 
-                $this->owner->drawLabelRotated(
+                $this->drawLabelRotated(
                     $gdImage,
-                    $position->x,
-                    $position->y,
+                    $position,
                     $angle,
                     $label_text,
-                    $this->bwfont,
                     $padding,
-                    $this->name,
-                    $this->bwfontcolour,
-                    $this->bwboxcolour,
-                    $this->bwoutlinecolour,
-                    $this->owner, // XXX - why is this passed?
                     $direction
                 );
             }
         }
 
     }
+
+    function normaliseAngle($angle)
+    {
+        $out = $angle;
+        
+        if (abs($out) > 90) {
+            $out -= 180;
+        }
+        if ($out < -180) {
+            $out += 360;
+        }
+
+        return $out;
+    }
+
+    private function drawLabelRotated($im, $centre, $angle, $text, $padding, $direction)
+    {
+        $fontObject = $this->owner->fonts->getFont($this->bwfont);
+        list($strWidth, $strHeight) = $fontObject->calculateImageStringSize($text);
+
+        $angle = $this->normaliseAngle($angle);
+        $radianAngle = -deg2rad($angle);
+
+        $extra = 3;
+
+        $topleft_x = $centre->x - ($strWidth / 2) - $padding - $extra;
+        $topleft_y = $centre->y - ($strHeight / 2) - $padding - $extra;
+
+        $botright_x = $centre->x + ($strWidth / 2) + $padding + $extra;
+        $botright_y = $centre->y + ($strHeight / 2) + $padding + $extra;
+
+        // a box. the last point is the start point for the text.
+        $points = array($topleft_x, $topleft_y, $topleft_x, $botright_y, $botright_x, $botright_y, $botright_x, $topleft_y, $centre->x - $strWidth / 2, $centre->y + $strHeight / 2 + 1);
+
+        if ($radianAngle != 0) {
+            rotateAboutPoint($points, $centre->x, $centre->y, $radianAngle);
+        }
+
+        if ($this->bwboxcolour->isRealColour()) {
+            imagefilledpolygon($im, $points, 4, $this->bwboxcolour->gdAllocate($im));
+        }
+
+        if ($this->bwoutlinecolour->isRealColour()) {
+            imagepolygon($im, $points, 4, $this->bwoutlinecolour->gdAllocate($im));
+        }
+
+        $fontObject->drawImageString($im, $points[8], $points[9], $text, $this->bwfontcolour->gdallocate($im), $angle);
+
+        $areaname = "LINK:L" . $this->id . ':' . ($direction + 2);
+
+        // the rectangle is about half the size in the HTML, and easier to optimise/detect in the browser
+        if ($angle == 0) {
+            // TODO: We can also optimise for 90, 180, 270 degrees
+            $this->owner->imap->addArea("Rectangle", $areaname, '', array($topleft_x, $topleft_y, $botright_x, $botright_y));
+            wm_debug("Adding Rectangle imagemap for $areaname\n");
+        } else {
+            $this->owner->imap->addArea("Polygon", $areaname, '', $points);
+            wm_debug("Adding Poly imagemap for $areaname\n");
+        }
+        // Make a note that we added this area
+        $this->imap_areas[] = $areaname;
+    }
+
 
     function getConfig()
     {

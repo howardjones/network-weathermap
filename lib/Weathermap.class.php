@@ -811,66 +811,6 @@ class WeatherMap extends WeatherMapBase
 
     }
 
-    // nodename is a vestigal parameter, from the days when nodes were just big labels
-    function drawLabelRotated($im, $centre_x, $centre_y, $angle, $text, $font, $padding, $linkname, $textcolour, $bgcolour, $outlinecolour, &$map, $direction)
-    {
-        $fontObject = $this->fonts->getFont($font);
-        list($strwidth, $strheight) = $fontObject->calculateImageStringSize($text);
-
-        if (abs($angle) > 90) {
-            $angle -= 180;
-        }
-        if ($angle < -180) {
-            $angle += 360;
-        }
-
-        $rangle = -deg2rad($angle);
-
-        $extra = 3;
-
-        $topleft_x = $centre_x - ($strwidth / 2) - $padding - $extra;
-        $topleft_y = $centre_y - ($strheight / 2) - $padding - $extra;
-
-        $botright_x = $centre_x + ($strwidth / 2) + $padding + $extra;
-        $botright_y = $centre_y + ($strheight / 2) + $padding + $extra;
-
-        // a box. the last point is the start point for the text.
-        $points = array($topleft_x, $topleft_y, $topleft_x, $botright_y, $botright_x, $botright_y, $botright_x, $topleft_y, $centre_x - $strwidth / 2, $centre_y + $strheight / 2 + 1);
-
-        if ($rangle != 0) {
-            rotateAboutPoint($points, $centre_x, $centre_y, $rangle);
-        }
-
-        if ($bgcolour->isRealColour()) {
-            $bgcol = $bgcolour->gdAllocate($im);
-            imagefilledpolygon($im, $points, 4, $bgcol);
-        }
-
-        if ($outlinecolour->isRealColour()) {
-            $outlinecol = $outlinecolour->gdAllocate($im);
-            imagepolygon($im, $points, 4, $outlinecol);
-        }
-
-        $textcol = $textcolour->gdallocate($im);
-
-
-        $fontObject->drawImageString($im, $points[8], $points[9], $text, $textcol, $angle);
-
-        $areaname = "LINK:L" . $map->links[$linkname]->id . ':' . ($direction + 2);
-
-        // the rectangle is about half the size in the HTML, and easier to optimise/detect in the browser
-        if ($angle == 0) {
-            // TODO: We can also optimise for 90, 180, 270 degrees
-            $map->imap->addArea("Rectangle", $areaname, '', array($topleft_x, $topleft_y, $botright_x, $botright_y));
-            wm_debug("Adding Rectangle imagemap for $areaname\n");
-        } else {
-            $map->imap->addArea("Polygon", $areaname, '', $points);
-            wm_debug("Adding Poly imagemap for $areaname\n");
-        }
-        // Make a note that we added this area
-        $this->links[$linkname]->imap_areas[] = $areaname;
-    }
-
     // This should be in WeatherMapScale - All scale lookups are done here
     function colourFromValue($value, $scalename = "DEFAULT", $name = "", $is_percent = true, $scale_warning = true)
     {

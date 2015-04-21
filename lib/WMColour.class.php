@@ -8,10 +8,10 @@
  */
 class WMColour
 {
-    private $red;
-    private $green;
-    private $blue;
-    private $alpha;
+    protected $red;
+    protected $green;
+    protected $blue;
+    protected $alpha;
     
     // take in an existing value and create a Colour object for it
     function __construct()
@@ -63,6 +63,10 @@ class WMColour
     // return true if two colours are identical
     function equals($colour2)
     {
+        if (null==$colour2) {
+            throw new WMException("Comparison With Null");
+        }
+
         if ($this->red == $colour2->red && $this->green == $colour2->green
             && $this->blue == $colour2->blue && $this->alpha == $colour2->alpha) {
             return true;
@@ -123,7 +127,7 @@ class WMColour
     // - things like scale colours are used in multiple images now (the scale, several nodes, the main map...)
     function gdAllocate($image_ref)
     {
-        if (true === $this->isNone()) {
+        if (false === $this->isRealColour()) {
             return null;
         }
 
@@ -157,6 +161,15 @@ class WMColour
     // - optionally take a format string, so we can use it for other things (like WriteConfig, or hex in stylesheets)
     function asString($format = 'RGB(%d,%d,%d)')
     {
+        if ($this->isNone()) {
+            return 'none';
+        }
+        if ($this->isCopy()) {
+            return 'copy';
+        }
+        if ($this->isContrast()) {
+            return 'contrast';
+        }
         return (sprintf($format, $this->red, $this->green, $this->blue));
     }
 
@@ -170,16 +183,6 @@ class WMColour
      */
     function asConfig()
     {
-        if ($this->isNone()) {
-            return 'none';
-        }
-        if ($this->isCopy()) {
-            return 'copy';
-        }
-        if ($this->isContrast()) {
-            return 'contrast';
-        }
-        
         return $this->asString('%d %d %d');
     }
 

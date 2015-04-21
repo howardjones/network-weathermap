@@ -260,7 +260,7 @@ class WMSpine
         for ($i = $endCursor; $i > $splitIndex; $i--) {
             $newEntry = $this->points[$i];
             $newDistance = $totalDistance - $newEntry[1];
-                wm_debug("  $totalDistance => $newDistance  \n");
+           //     wm_debug("  $totalDistance => $newDistance  \n");
             $newEntry[1] = $newDistance;
             $spine2->addRawEntry($newEntry);
         }

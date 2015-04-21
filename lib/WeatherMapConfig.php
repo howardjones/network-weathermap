@@ -1067,9 +1067,6 @@ class WeatherMapConfigReader
         $this->mapObject->colours[$matches[1]][$key]['special'] = 0;
 
         if (isset($matches[10]) && $matches[10] == 'none') {
-//            $this->mapObject->colours[$matches[1]][$key]['red1'] = -1;
-//            $this->mapObject->colours[$matches[1]][$key]['green1'] = -1;
-//            $this->mapObject->colours[$matches[1]][$key]['blue1'] = -1;
             $this->mapObject->colours[$matches[1]][$key]['c1'] = new WMColour('none');
 
             $colour1 = new WMColour("none");
@@ -1077,20 +1074,12 @@ class WeatherMapConfigReader
         } else {
             $colour1 = new WMColour((int)($matches[4]), (int)($matches[5]), (int)($matches[6]));
             $colour2 = $colour1;
-
-//            $this->mapObject->colours[$matches[1]][$key]['red1'] = (int)($matches[4]);
-//            $this->mapObject->colours[$matches[1]][$key]['green1'] = (int)($matches[5]);
-//            $this->mapObject->colours[$matches[1]][$key]['blue1'] = (int)($matches[6]);
             $this->mapObject->colours[$matches[1]][$key]['c1'] = $colour1;
         }
 
         // this is the second colour, if there is one
         if (isset($matches[7]) && $matches[7] != '') {
             $colour2 = new WMColour((int)($matches[7]), (int)($matches[8]), (int)($matches[9]));
-
-//            $this->mapObject->colours[$matches[1]][$key]['red2'] = (int)($matches[7]);
-//            $this->mapObject->colours[$matches[1]][$key]['green2'] = (int)($matches[8]);
-//            $this->mapObject->colours[$matches[1]][$key]['blue2'] = (int)($matches[9]);
             $this->mapObject->colours[$matches[1]][$key]['c2'] = $colour2;
         }
 
@@ -1104,9 +1093,9 @@ class WeatherMapConfigReader
 
         // we count if we've seen any default scale, otherwise, we have to add
         // one at the end.
-        if ($matches[1] == 'DEFAULT') {
-            $this->mapObject->scalesseen++;
-        }
+//        if ($matches[1] == 'DEFAULT') {
+//            $this->mapObject->scalesseen++;
+//        }
 
         return true;
     }

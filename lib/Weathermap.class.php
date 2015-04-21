@@ -71,7 +71,6 @@ class WeatherMap extends WeatherMapBase
         $white,
         $grey,
         $selected;
-    var $scalesseen;
 
     var $activeDataSourceClasses;
     var $thumb_width, $thumb_height;
@@ -161,7 +160,6 @@ class WeatherMap extends WeatherMapBase
 
     function reset()
     {
-        $this->scalesseen = 0;
         $this->next_id = 100;
 
         foreach (array_keys($this->inherit_fieldlist) as $fld) {
@@ -470,7 +468,7 @@ class WeatherMap extends WeatherMapBase
      * @param string $type - Which kind of plugin are we loading?
      * @param string $dir - Where to load from?
      */
-    function loadPlugins($type = "data", $dir = "lib/datasources")
+    private function loadPlugins($type = "data", $dir = "lib/datasources")
     {
         wm_debug("Beginning to load $type plugins from $dir\n");
 
@@ -523,7 +521,7 @@ class WeatherMap extends WeatherMapBase
      * Loop through the datasource plugins, allowing them to initialise any internals.
      * The plugins can also refuse to run, if resources they need aren't available.
      */
-    function initialiseAllPlugins()
+    private function initialiseAllPlugins()
     {
         wm_debug("Running Init() for Data Source Plugins...\n");
 
@@ -550,7 +548,7 @@ class WeatherMap extends WeatherMapBase
      *
      * @return array
      */
-    function buildAllItemsList()
+    private function buildAllItemsList()
     {
         $allItems = array();
 
@@ -578,7 +576,7 @@ class WeatherMap extends WeatherMapBase
      *
      * @param $itemList
      */
-    function preProcessTargets($itemList)
+    private function preProcessTargets($itemList)
     {
         wm_debug("Preprocessing targets\n");
 
@@ -619,7 +617,7 @@ class WeatherMap extends WeatherMapBase
         }
     }
 
-    function readDataFromTargets($itemList)
+    private function readDataFromTargets($itemList)
     {
         wm_debug("======================================\n");
         wm_debug("Starting main collection loop\n");
@@ -762,7 +760,7 @@ class WeatherMap extends WeatherMapBase
         }
     }
 
-    function prefetchPlugins()
+    private function prefetchPlugins()
     {
         // give all the plugins a chance to prefetch their results
         wm_debug("======================================\n");
@@ -772,7 +770,7 @@ class WeatherMap extends WeatherMapBase
         }
     }
 
-    function cleanupPlugins($type)
+    private function cleanupPlugins($type)
     {
         wm_debug("======================================\n");
         wm_debug("Starting cleanup\n");
@@ -810,6 +808,11 @@ class WeatherMap extends WeatherMapBase
         wm_debug("------------------------------\n");
 
     }
+
+    protected static function () {
+
+    }
+
 
     // This should be in WeatherMapScale - All scale lookups are done here
     function colourFromValue($value, $scalename = "DEFAULT", $name = "", $is_percent = true, $scale_warning = true)
@@ -904,7 +907,7 @@ class WeatherMap extends WeatherMapBase
     }
 
 
-    function scaleEntrySort($a, $b)
+    private function scaleEntrySort($a, $b)
     {
         if ($a['bottom'] == $b['bottom']) {
             if ($a['top'] < $b['top']) {
@@ -924,7 +927,7 @@ class WeatherMap extends WeatherMapBase
     }
 
 
-    function drawLegendHorizontal($gdTargetImage, $scaleName = "DEFAULT", $keyWidth = 400)
+    private function drawLegendHorizontal($gdTargetImage, $scaleName = "DEFAULT", $keyWidth = 400)
     {
         $title = $this->keytext[$scaleName];
 
@@ -1008,7 +1011,7 @@ class WeatherMap extends WeatherMapBase
 
     }
 
-    function drawLegendVertical($im, $scalename = "DEFAULT", $height = 400, $inverted = false)
+    private function drawLegendVertical($im, $scalename = "DEFAULT", $height = 400, $inverted = false)
     {
         $title = $this->keytext[$scalename];
 
@@ -1094,7 +1097,7 @@ class WeatherMap extends WeatherMapBase
         $this->imap_areas[] = $areaname;
     }
 
-    function drawLegendClassic($im, $scaleName = "DEFAULT", $useTags = false)
+    private function drawLegendClassic($im, $scaleName = "DEFAULT", $useTags = false)
     {
         $title = $this->keytext[$scaleName];
 
@@ -1246,7 +1249,7 @@ class WeatherMap extends WeatherMapBase
         }
     }
 
-    function drawTimestamp($gdImage, $fontNumber, $colour, $which = "")
+    private function drawTimestamp($gdImage, $fontNumber, $colour, $which = "")
     {
         // add a timestamp to the corner, so we can tell if it's all being updated
         $fontObject = $this->fonts->getFont($fontNumber);
@@ -1286,7 +1289,7 @@ class WeatherMap extends WeatherMapBase
         $this->imap_areas[] = $areaname;
     }
 
-    function drawTitle($gdImage, $fontNumber, $colour)
+    private function drawTitle($gdImage, $fontNumber, $colour)
     {
         $string = $this->processString($this->title, $this);
         $fontObject = $this->fonts->getFont($fontNumber);
@@ -1356,6 +1359,7 @@ class WeatherMap extends WeatherMapBase
         }
 
         $this->populateDefaultScales();
+        $this->replicateScaleSettings();
         $this->buildZLayers();
         $this->resolveRelativePositions();
         $this->runProcessorPlugins("pre");
@@ -1363,10 +1367,17 @@ class WeatherMap extends WeatherMapBase
 
     // *************************************
 
-    function populateDefaultScales()
+    private function populateDefaultScales()
     {
         // load some default colouring, otherwise it all goes wrong
-        if ($this->scalesseen == 0) {
+
+        wm_debug("Hello!\n");
+
+        $count = $this->scales['DEFAULT']->spanCount();
+
+        $this->scales['DEFAULT']->populateDefaultsIfNecessary();
+
+        if ($count == 0) {
             wm_debug("Adding default SCALE colour set (no SCALE lines seen).\n");
             $defaults = array(
                 '0_0' => array(
@@ -1448,17 +1459,36 @@ class WeatherMap extends WeatherMapBase
                 $this->colours['DEFAULT'][$key]['key'] = $key;
                 $this->colours['DEFAULT'][$key]['c1'] = new WMColour($def['red1'], $def['green1'], $def['blue1']);
                 $this->colours['DEFAULT'][$key]['c2'] = null;
-                $this->scalesseen++;
+                // $this->scalesseen++;
                 $this->numscales['DEFAULT']++;
             }
             // we have a 0-0 line now, so we need to hide that.
             $this->add_hint("key_hidezero_DEFAULT", 1);
         } else {
-            wm_debug("Already have $this->scalesseen scales, no defaults added.\n");
+            wm_debug("Already have %d scales, no defaults added.\n", $this->scales['DEFAULT']->spanCount());
         }
     }
 
-    function buildZLayers()
+    /**
+     * Temporary function to bridge between the old and new
+     * scale-worlds. Just until the ConfigReader updates these
+     * directly.
+     */
+    private function replicateScaleSettings()
+    {
+        foreach ($this->scales as $name=>$scaleObject) {
+
+            $scaleObject->keypos = new WMPoint($this->keyx[$name], $this->keyy[$name]);
+            $scaleObject->keystyle = $this->keystyle[$name];
+            $scaleObject->keytitle = $this->keytext[$name];
+
+            $scaleObject->keyoutlinecolour = $this->colourtable['KEYOUTLINE'];
+            $scaleObject->keytextcolour = $this->colourtable['KEYTEXT'];
+            $scaleObject->keybgcolour = $this->colourtable['KEYBG'];
+        }
+    }
+
+    private function buildZLayers()
     {
         wm_debug("Building cache of z-layers and finalising bandwidth.\n");
 
@@ -1491,7 +1521,7 @@ class WeatherMap extends WeatherMapBase
         wm_debug("Found " . sizeof($this->seen_zlayers) . " z-layers including builtins (0,100).\n");
     }
 
-    function runProcessorPlugins($stage = "pre")
+    private function runProcessorPlugins($stage = "pre")
     {
         wm_debug("Running $stage-processing plugins...\n");
         foreach ($this->plugins[$stage] as $name => $pluginEntry) {
@@ -1501,7 +1531,7 @@ class WeatherMap extends WeatherMapBase
         wm_debug("Finished $stage-processing plugins...\n");
     }
 
-    function resolveRelativePositions()
+    private function resolveRelativePositions()
     {
         // calculate any relative positions here - that way, nothing else
         // really needs to know about them
@@ -1739,52 +1769,52 @@ class WeatherMap extends WeatherMapBase
             $locale = localeconv();
             $decimal_point = $locale['decimal_point'];
 
-            foreach ($colours as $k => $colour) {
-                if (!isset($colour['special']) || ! $colour['special']) {
-                    $top = rtrim(rtrim(sprintf("%f", $colour['top']), "0"), $decimal_point);
-                    $bottom= rtrim(rtrim(sprintf("%f", $colour['bottom']), "0"), $decimal_point);
+            // Disable the old scale-output stuff for now
+            if (1==0) {
+                foreach ($colours as $k => $colour) {
+                    if (!isset($colour['special']) || !$colour['special']) {
+                        $top = rtrim(rtrim(sprintf("%f", $colour['top']), "0"), $decimal_point);
+                        $bottom = rtrim(rtrim(sprintf("%f", $colour['bottom']), "0"), $decimal_point);
 
-                    if ($bottom > 1000) {
-                        $bottom = wmFormatNumberWithMetricPrefix($colour['bottom'], $this->kilo);
+                        if ($bottom > 1000) {
+                            $bottom = wmFormatNumberWithMetricPrefix($colour['bottom'], $this->kilo);
+                        }
+
+                        if ($top > 1000) {
+                            $top = wmFormatNumberWithMetricPrefix($colour['top'], $this->kilo);
+                        }
+
+                        $tag = (isset($colour['tag']) ? $colour['tag'] : '');
+
+                        if (($colour['c1']->isNone())) {
+                            $output .= sprintf("SCALE %s %-4s %-4s   none   %s\n", $scalename, $bottom, $top, $tag);
+                        } elseif (!isset($colour['c2'])) {
+                            $output .= sprintf(
+                                "SCALE %s %-4s %-4s %s  %s\n",
+                                $scalename,
+                                $bottom,
+                                $top,
+                                $colour['c1']->asConfig(),
+                                $tag
+                            );
+                        } else {
+                            $output .= sprintf(
+                                "SCALE %s %-4s %-4s %s   %s    %s\n",
+                                $scalename,
+                                $bottom,
+                                $top,
+                                $colour['c1']->asConfig(),
+                                $colour['c2']->asConfig(),
+                                $tag
+                            );
+                        }
                     }
-
-                    if ($top > 1000) {
-                        $top = wmFormatNumberWithMetricPrefix($colour['top'], $this->kilo);
-                    }
-
-                    $tag = (isset($colour['tag'])? $colour['tag']:'');
-
-                    if (($colour['c1']->isNone())) {
-                        $output.=sprintf("SCALE %s %-4s %-4s   none   %s\n", $scalename, $bottom, $top, $tag);
-                    } elseif (!isset($colour['c2'])) {
-                        $output.=sprintf(
-                            "SCALE %s %-4s %-4s %s  %s\n",
-                            $scalename,
-                            $bottom,
-                            $top,
-                            $colour['c1']->asConfig(),
-                            $tag
-                        );
-                    } else {
-                        $output.=sprintf(
-                            "SCALE %s %-4s %-4s %s   %s    %s\n",
-                            $scalename,
-                            $bottom,
-                            $top,
-                            $colour['c1']->asConfig(),
-                            $colour['c2']->asConfig(),
-                            $tag
-                        );
-                    }
-                } else {
-                    $output .= sprintf("%sCOLOR %s\n", $k, $colour['c1']->asConfig());
                 }
+                $output .= "\n";
             }
-            $output .= "\n";
         }
 
-
-        if (1==0) {
+        if (1==1) {
             // TODO - These should replace the stuff above
             $output .= "# new colourtable stuff (duplicated above right now TODO)\n";
             foreach ($this->colourtable as $k => $c) {
@@ -1887,7 +1917,7 @@ class WeatherMap extends WeatherMapBase
     // this way, it's the pretty icons that suffer if there aren't enough colours, and
     // not the actual useful data
     // we skip any gradient scales
-    function preAllocateScaleColours($im, $refname = 'gdref1')
+    private function preAllocateScaleColours($im, $refname = 'gdref1')
     {
         foreach ($this->colours as $scalename => $colours) {
             foreach ($colours as $key => $colour) {
@@ -1998,26 +2028,32 @@ class WeatherMap extends WeatherMapBase
                 wm_debug("Drawing layer $z\n");
                 // all the map 'furniture' is fixed at z=1000
                 if ($z==1000) {
-                    foreach ($this->colours as $scalename => $colours) {
-                        wm_debug("Drawing KEY for $scalename if necessary.\n");
+                    foreach ($this->scales as $scaleName => $scaleObject) {
+                        wm_debug("Drawing KEY for $scaleName if necessary.\n");
 
-                        if ((isset($this->numscales[$scalename])) && (isset($this->keyx[$scalename])) && ($this->keyx[$scalename] >= 0) && ($this->keyy[$scalename] >= 0)) {
-                            if ($this->keystyle[$scalename]=='classic') {
-                                $this->drawLegendClassic($image, $scalename, false);
-                            }
-                            if ($this->keystyle[$scalename]=='horizontal') {
-                                $this->drawLegendHorizontal($image, $scalename, $this->keysize[$scalename]);
-                            }
-                            if ($this->keystyle[$scalename]=='vertical') {
-                                $this->drawLegendVertical($image, $scalename, $this->keysize[$scalename]);
-                            }
-                            if ($this->keystyle[$scalename]=='inverted') {
-                                $this->drawLegendVertical($image, $scalename, $this->keysize[$scalename], true);
-                            }
-                            if ($this->keystyle[$scalename]=='tags') {
-                                $this->drawLegendClassic($image, $scalename, true);
+                        if (1==1) {
+                            if ((isset($this->numscales[$scaleName])) && (isset($this->keyx[$scaleName])) && ($this->keyx[$scaleName] >= 0) && ($this->keyy[$scaleName] >= 0)) {
+
+                                if ($this->keystyle[$scaleName] == 'classic') {
+                                    $this->drawLegendClassic($image, $scaleName, false);
+                                }
+                                if ($this->keystyle[$scaleName] == 'horizontal') {
+                                    $this->drawLegendHorizontal($image, $scaleName, $this->keysize[$scaleName]);
+                                }
+                                if ($this->keystyle[$scaleName] == 'vertical') {
+                                    $this->drawLegendVertical($image, $scaleName, $this->keysize[$scaleName]);
+                                }
+                                if ($this->keystyle[$scaleName] == 'inverted') {
+                                    $this->drawLegendVertical($image, $scaleName, $this->keysize[$scaleName], true);
+                                }
+                                if ($this->keystyle[$scaleName] == 'tags') {
+                                    $this->drawLegendClassic($image, $scaleName, true);
+                                }
                             }
                         }
+
+                        // the new scale object draws its own legend
+                        $this->scales[$scaleName]->drawLegend($image);
                     }
 
                     $this->drawTimestamp($image, $this->timefont, $this->colourtable['TIME']->gdallocate($image));
@@ -2211,7 +2247,7 @@ class WeatherMap extends WeatherMapBase
         $this->scales = null;
     }
 
-    function processOverlib($mapItem, $dirs)
+    function processOverlib($mapItem, $dirs, $prefix)
     {
         // skip all this if it's a template node
         if ($mapItem->isTemplate()) {
@@ -2328,7 +2364,7 @@ class WeatherMap extends WeatherMapBase
             }
 
             if ($this->htmlstyle == "overlib") {
-                $this->processOverlib($mapItem, $dirs);
+                $this->processOverlib($mapItem, $dirs, $prefix);
             }
 
             // now look at infourls

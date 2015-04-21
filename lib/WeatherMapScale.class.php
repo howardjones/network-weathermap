@@ -17,6 +17,7 @@ class WeatherMapScale
     var $scalemisscolour;
     var $keyfont;
     var $owner;
+    var $imap;
 
     var $scaleType;
 
@@ -24,6 +25,7 @@ class WeatherMapScale
     {
         $this->name = $name;
         $this->scaleType = "percent";
+        $this->imap = new HTML_ImageMap();
 
         $this->Reset($owner);
     }
@@ -34,11 +36,9 @@ class WeatherMapScale
 
         assert($this->owner->kilo != 0);
 
-        $this->keypos = array();
         $this->keystyle = 'classic';
         $this->colours = array();
-        $this->keypos[X] = -1;
-        $this->keypos[Y] = -1;
+        $this->keypos = null;
         $this->keytitle = "Traffic Load";
         $this->keysize = 0;
 
@@ -56,7 +56,7 @@ class WeatherMapScale
         return count($this->colours);
     }
 
-    public function populateDefaults()
+    public function populateDefaultsIfNecessary()
     {
         if ($this->spanCount() == 0) {
             wm_debug("Adding default SCALE colour set (no SCALE lines seen).\n");
@@ -114,7 +114,7 @@ class WeatherMapScale
         $this->colours[$key]['bottom'] = $lowValue;
         $this->colours[$key]['top'] = $highValue;
 
-        wm_debug("%s %s->%s", $this->name, $lowValue, $highValue);
+        wm_debug("%s %s->%s\n", $this->name, $lowValue, $highValue);
     }
 
     public function getConfig()
@@ -124,82 +124,95 @@ class WeatherMapScale
 
         $output = "# All settings for scale ".$this->name."\n";
 
-        $output .= sprintf(
-            "\tKEYPOS %s %d %d %s\n",
-            $this->name,
-            $this->keypos[X],
-            $this->keypos[Y],
-            $this->keytitle
-        );
+        if(1==0) {
+            if (null === $this->keypos) {
+                $output .= sprintf(
+                    "\tKEYPOS %s %s %s\n",
+                    $this->name,
+                    "-1 -1",
+                    $this->keytitle
+                );
+            } else {
+                $output .= sprintf(
+                    "\tKEYPOS %s %s %s\n",
+                    $this->name,
+                    $this->keypos->asConfig(),
+                    $this->keytitle
+                );
+            }
 
-        // TODO - need to add size if non-standard
-        $output .= sprintf(
-            "\tKEYSTYLE %s %s\n",
-            $this->name,
-            $this->keystyle
-        );
+            // TODO - need to add size if non-standard
+            $output .= sprintf(
+                "\tKEYSTYLE %s %s\n",
+                $this->name,
+                $this->keystyle
+            );
 
-        $output .= sprintf(
-            "\tKEYBGCOLOR %s %s\n",
-            $this->name,
-            $this->keybgcolour->as_config()
-        );
+            $output .= sprintf(
+                "\tKEYBGCOLOR %s %s\n",
+                $this->name,
+                $this->keybgcolour->asConfig()
+            );
 
-        $output .= sprintf(
-            "\tKEYTEXTCOLOR %s %s\n",
-            $this->name,
-            $this->keytextcolour->as_config()
-        );
+            $output .= sprintf(
+                "\tKEYTEXTCOLOR %s %s\n",
+                $this->name,
+                $this->keytextcolour->asConfig()
+            );
 
-        $output .= sprintf(
-            "\tKEYOUTLINECOLOR %s %s\n",
-            $this->name,
-            $this->keyoutlinecolour->as_config()
-        );
+            $output .= sprintf(
+                "\tKEYOUTLINECOLOR %s %s\n",
+                $this->name,
+                $this->keyoutlinecolour->asConfig()
+            );
 
-        $output .= sprintf(
-            "\tSCALEMISSCOLOR %s %s\n",
-            $this->name,
-            $this->scalemisscolour->as_config()
-        );
+            $output .= sprintf(
+                "\tSCALEMISSCOLOR %s %s\n",
+                $this->name,
+                $this->scalemisscolour->asConfig()
+            );
+        }
 
         $locale = localeconv();
         $decimal_point = $locale['decimal_point'];
 
         $output .= "\n";
 
-        foreach ($this->colours as $colour) {
-            $top = rtrim(rtrim(sprintf("%f", $colour['top']), "0"), $decimal_point);
+        foreach ($this->colours as $scaleEntry) {
+            $top = rtrim(rtrim(sprintf("%f", $scaleEntry['top']), "0"), $decimal_point);
 
-            $bottom = rtrim(rtrim(sprintf("%f", $colour['bottom']), "0"), $decimal_point);
+            $bottom = rtrim(rtrim(sprintf("%f", $scaleEntry['bottom']), "0"), $decimal_point);
 
             if ($bottom > $this->owner->kilo) {
-                $bottom = wmFormatNumberWithMetricPrefix($colour['bottom'], $this->owner->kilo);
+                $bottom = wmFormatNumberWithMetricPrefix($scaleEntry['bottom'], $this->owner->kilo);
             }
 
             if ($top > $this->owner->kilo) {
-                $top = wmFormatNumberWithMetricPrefix($colour['top'], $this->owner->kilo);
+                $top = wmFormatNumberWithMetricPrefix($scaleEntry['top'], $this->owner->kilo);
             }
 
-            $tag = (isset($colour['tag']) ? $colour['tag'] : '');
+            $tag = (isset($scaleEntry['tag']) ? $scaleEntry['tag'] : '');
 
-            if ($colour['c1']->equals($colour['c2'])) {
+            // Non-real colour, c1==c2 and c2==null all mean a single SCALE colour
+            if ( (!$scaleEntry['c1']->isRealColour())
+                || (null === $scaleEntry['c2'])
+                || $scaleEntry['c1']->equals($scaleEntry['c2'])) {
                 $output .= sprintf(
-                    "\tSCALE %s %-4s %-4s   %s   %s\n",
+                    "\tSCALE %s %-4s %-4s  %s  %s\n",
                     $this->name,
                     $bottom,
                     $top,
-                    $colour['c1']->as_config(),
+                    $scaleEntry['c1']->asConfig(),
                     $tag
                 );
             } else {
                 $output .= sprintf(
-                    "\tSCALE %s %-4s %-4s   %s  %s  %s\n",
+                    "\tSCALE %s %-4s %-4s  %s  %s  %s\n",
                     $this->name,
                     $bottom,
                     $top,
-                    $colour['c1']->as_config(),
-                    $colour['c2']->as_config(),
+                    $scaleEntry['c1']->asConfig(),
+                    $scaleEntry['c2']->asConfig(),
                     $tag
                 );
             }
@@ -286,10 +299,13 @@ class WeatherMapScale
 
     function DrawLegend($gdTargetImage)
     {
+        wm_debug("New scale\n");
         // don't draw if the position is the default -1,-1
-        if ($this->keypos[X] == -1 && $this->keypos[Y] == -1) {
+        if ($this->keypos->x == -1 && $this->keypos->y == -1) {
             return;
         }
+
+        wm_debug("New scale - still drawing\n");
 
         $gdScaleImage = null;
 
@@ -312,11 +328,12 @@ class WeatherMapScale
                 break;
         }
 
-        $xTarget = $this->keypos[X];
-        $yTarget = $this->keypos[Y];
+        $xTarget = $this->keypos->x;
+        $yTarget = $this->keypos->y;
         $width = imagesx($gdScaleImage);
         $height = imagesy($gdScaleImage);
 
+        wm_debug("New scale - blitting\n");
         imagecopy($gdTargetImage, $gdScaleImage, $xTarget, $yTarget, 0, 0, $width, $height);
 
         $areaName = "LEGEND:" . $this->name;
@@ -329,7 +346,7 @@ class WeatherMapScale
     function DrawLegendClassic($useTags = false)
     {
         // TODO - This doesn't draw anything!
-        $gdImage = imagecreate(100, 100);
+        $gdImage = imagecreate(100, 150);
 
         return $gdImage;
     }
@@ -337,7 +354,7 @@ class WeatherMapScale
     function DrawLegendVertical($height = 400, $inverted = true)
     {
         // TODO - This doesn't draw anything!
-        $gdImage = imagecreate(100, 100);
+        $gdImage = imagecreate(50, 100);
 
         return $gdImage;
     }
@@ -345,7 +362,7 @@ class WeatherMapScale
     function DrawLegendHorizontal($width = 400)
     {
         // TODO - This doesn't draw anything!
-        $gdImage = imagecreate(100, 100);
+        $gdImage = imagecreate(100, 50);
 
         return $gdImage;
     }

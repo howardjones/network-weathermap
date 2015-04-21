@@ -39,7 +39,7 @@ class WeatherMapScaleTest extends PHPUnit_Framework_TestCase {
 
     public function testScaleManagement()
     {
-        $this->object->populateDefaults();
+        $this->object->populateDefaultsIfNecessary();
         $this->assertEquals(9, $this->object->spanCount());
 
         list($min, $max) = $this->object->FindScaleExtent();

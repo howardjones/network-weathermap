@@ -134,12 +134,14 @@ class WMPoint
         return $newPoint;
     }
 
-    /**
-     * @return string
-     */
     public function asString()
     {
         return $this->__toString();
+    }
+
+    public function asConfig()
+    {
+        return sprintf("%d %d", $this->x, $this->y);
     }
 
     public function __toString()

@@ -723,21 +723,21 @@ class WeatherMap extends WeatherMapBase
             }
 
             if ($mapItem->scaletype == 'percent') {
-                list($incol, $inscalekey, $inscaletag) = $this->colourFromValue($mapItem->inpercent, $mapItem->usescale, $mapItem->name, true, $warn_in);
-                list($outcol, $outscalekey, $outscaletag) = $this->colourFromValue($mapItem->outpercent, $mapItem->usescale, $mapItem->name, true, $warn_out);
+                list($incol, $inscalekey, $inscaletag) = $this->scales[$mapItem->usescale]->colourFromValue($mapItem->inpercent, $mapItem->name, true, $warn_in);
+                list($outcol, $outscalekey, $outscaletag) = $this->scales[$mapItem->usescale]->colourFromValue($mapItem->outpercent, $mapItem->name, true, $warn_out);
 
                 foreach ($channels as $channel) {
-                    list($col, $scalekey, $scaletag) = $this->colourFromValue($mapItem->percentUsages[$channel], $mapItem->usescale, $mapItem->name, true, $warn_out);
+                    list($col, $scalekey, $scaletag) = $this->scales[$mapItem->usescale]->colourFromValue($mapItem->percentUsages[$channel], $mapItem->name, true, $warn_out);
                     $mapItem->channelScaleColours[$channel] = $col;
                     $mapItem->colours[$channel] = $col;
                 }
             } else {
                 // use absolute values, if that's what is requested
-                list($incol, $inscalekey, $inscaletag) = $this->colourFromValue($mapItem->bandwidth_in, $mapItem->usescale, $mapItem->name, false, $warn_in);
-                list($outcol, $outscalekey, $outscaletag) = $this->colourFromValue($mapItem->bandwidth_out, $mapItem->usescale, $mapItem->name, false, $warn_out);
+                list($incol, $inscalekey, $inscaletag) = $this->scales[$mapItem->usescale]->colourFromValue($mapItem->bandwidth_in, $mapItem->name, false, $warn_in);
+                list($outcol, $outscalekey, $outscaletag) = $this->scales[$mapItem->usescale]->colourFromValue($mapItem->bandwidth_out, $mapItem->name, false, $warn_out);
 
                 foreach ($channels as $channel) {
-                    list($col, $scalekey, $scaletag) = $this->colourFromValue($mapItem->absoluteUsages[$channel], $mapItem->usescale, $mapItem->name, false, $warn_out);
+                    list($col, $scalekey, $scaletag) = $this->scales[$mapItem->usescale]->colourFromValue($mapItem->absoluteUsages[$channel], $mapItem->name, false, $warn_out);
                     $mapItem->channelScaleColours[$channel] = $col;
                     $mapItem->colours[$channel] = $col;
                 }
@@ -809,14 +809,12 @@ class WeatherMap extends WeatherMapBase
 
     }
 
-    protected static function () {
-
-    }
-
-
     // This should be in WeatherMapScale - All scale lookups are done here
     function colourFromValue($value, $scalename = "DEFAULT", $name = "", $is_percent = true, $scale_warning = true)
     {
+
+        throw new WMException("Legacy code called");
+
         $tag = '';
         $matchsize = null;
         $matchkey = null;
@@ -904,349 +902,6 @@ class WeatherMap extends WeatherMapBase
 
         // and you'll only get white for a link with no colour assigned
         return array(new WMColour(255, 255, 255), '', '');
-    }
-
-
-    private function scaleEntrySort($a, $b)
-    {
-        if ($a['bottom'] == $b['bottom']) {
-            if ($a['top'] < $b['top']) {
-                return -1;
-            }
-            if ($a['top'] > $b['top']) {
-                return 1;
-            }
-            return 0;
-        }
-
-        if ($a['bottom'] < $b['bottom']) {
-            return -1;
-        }
-
-        return 1;
-    }
-
-
-    private function drawLegendHorizontal($gdTargetImage, $scaleName = "DEFAULT", $keyWidth = 400)
-    {
-        $title = $this->keytext[$scaleName];
-
-        $nScales = $this->numscales[$scaleName];
-
-        wm_debug("Drawing $nScales colours into SCALE\n");
-
-        # $font = $this->keyfont;
-        $fontObject = $this->fonts->getFont($this->keyfont);
-
-        $x = 0;
-        $y = 0;
-
-        $scaleFactor = $keyWidth / 100;
-
-        list($tileWidth, $tileHeight) = $fontObject->calculateImageStringSize("100%");
-
-        $boxLeft = $x;
-        $scaleLeft = $boxLeft + 4 + $scaleFactor / 2;
-        $boxRight = $scaleLeft + $keyWidth + $tileWidth + 4 + $scaleFactor / 2;
-
-        $boxTop = $y;
-        $scaleTop = $boxTop + $tileHeight + 6;
-        $scaleBottom = $scaleTop + $tileHeight * 1.5;
-        $boxBottom = $scaleBottom + $tileHeight * 2 + 6;
-
-        $gdScaleImage = imagecreatetruecolor($boxRight + 1, $boxBottom + 1);
-        $scaleReference = 'gdref_legend_' . $scaleName;
-
-        // Start with a transparent box, in case the fill or outline colour is 'none'
-        imageSaveAlpha($gdScaleImage, true);
-        $transparentColour = imagecolorallocatealpha($gdScaleImage, 128, 0, 0, 127);
-        imagefill($gdScaleImage, 0, 0, $transparentColour);
-
-        $this->preAllocateScaleColours($gdScaleImage, $scaleReference);
-
-        $bgColour = $this->colourtable['KEYBG'];
-        $outlineColour = $this->colourtable['KEYOUTLINE'];
-
-        wm_debug("BG is $bgColour, Outline is $outlineColour\n");
-
-        if ($bgColour->isRealColour()) {
-            imagefilledrectangle($gdScaleImage, $boxLeft, $boxTop, $boxRight, $boxBottom, $bgColour->gdAllocate($gdScaleImage));
-        }
-
-        if ($outlineColour->isRealColour()) {
-            imagerectangle($gdScaleImage, $boxLeft, $boxTop, $boxRight, $boxBottom, $outlineColour->gdAllocate($gdScaleImage));
-        }
-
-        $fontObject->drawImageString($gdScaleImage, $scaleLeft, $scaleBottom + $tileHeight * 2 + 2, $title, $this->colourtable['KEYTEXT']->gdAllocate($gdScaleImage));
-
-        for ($percentage = 0; $percentage <= 100; $percentage++) {
-            $xOffset = $percentage * $scaleFactor;
-
-            if (($percentage % 25) == 0) {
-                imageline($gdScaleImage, $scaleLeft + $xOffset, $scaleTop - $tileHeight, $scaleLeft + $xOffset, $scaleBottom + $tileHeight, $this->colourtable['KEYTEXT']->gdAllocate($gdScaleImage));
-                $labelString = sprintf("%d%%", $percentage);
-                $fontObject->drawImageString($gdScaleImage, $scaleLeft + $xOffset + 2, $scaleTop - 2, $labelString, $this->colourtable['KEYTEXT']->gdAllocate($gdScaleImage));
-            }
-
-            list($col,) = $this->colourFromValue($percentage, $scaleName);
-            if ($col->isRealColour()) {
-                $cc = $col->gdAllocate($gdScaleImage);
-                imagefilledrectangle($gdScaleImage, $scaleLeft + $xOffset - $scaleFactor / 2, $scaleTop, $scaleLeft + $xOffset + $scaleFactor / 2, $scaleBottom, $cc);
-            }
-        }
-
-
-        // TODO: this should be in a different method - all drawLegendXXX should return a gdImage instead,
-        //   and ONE place handles the drawing and imagemap
-        imagecopy($gdTargetImage, $gdScaleImage, $this->keyx[$scaleName], $this->keyy[$scaleName], 0, 0, imagesx($gdScaleImage), imagesy($gdScaleImage));
-        $this->keyimage[$scaleName] = $gdScaleImage;
-
-        $xTarget = $this->keyx[$scaleName];
-        $yTarget = $this->keyy[$scaleName];
-
-        $areaName = "LEGEND:" . $scaleName;
-        $this->imap->addArea("Rectangle", $areaName, '', array($xTarget + $boxLeft, $yTarget + $boxTop, $xTarget + $boxRight, $yTarget + $boxBottom));
-        // TODO: stop tracking z-order seperately. addArea() should take the z layer
-        $this->imap_areas[] = $areaName;
-
-    }
-
-    private function drawLegendVertical($im, $scalename = "DEFAULT", $height = 400, $inverted = false)
-    {
-        $title = $this->keytext[$scalename];
-
-        # $colours=$this->colours[$scalename];
-        $nscales = $this->numscales[$scalename];
-
-        wm_debug("Drawing $nscales colours into SCALE\n");
-
-        $font = $this->keyfont;
-
-        $scalefactor = $height / 100;
-
-        list($tilewidth, $tileheight) = $this->myimagestringsize($font, "100%");
-
-        $box_left = 0;
-        $box_top = 0;
-
-        $scale_left = $box_left + $scalefactor * 2 + 4;
-        $scale_right = $scale_left + $tileheight * 2;
-        $box_right = $scale_right + $tilewidth + $scalefactor * 2 + 4;
-
-        list($titlewidth,) = $this->myimagestringsize($font, $title);
-        if (($box_left + $titlewidth + $scalefactor * 3) > $box_right) {
-            $box_right = $box_left + $scalefactor * 4 + $titlewidth;
-        }
-
-        $scale_top = $box_top + 4 + $scalefactor + $tileheight * 2;
-        $scale_bottom = $scale_top + $height;
-        $box_bottom = $scale_bottom + $scalefactor + $tileheight / 2 + 4;
-
-        $gdScaleImage = imagecreatetruecolor($box_right + 1, $box_bottom + 1);
-        $scale_ref = 'gdref_legend_' . $scalename;
-
-        // Start with a transparent box, in case the fill or outline colour is 'none'
-        imageSaveAlpha($gdScaleImage, true);
-        $nothing = imagecolorallocatealpha($gdScaleImage, 128, 0, 0, 127);
-        imagefill($gdScaleImage, 0, 0, $nothing);
-
-        $this->preAllocateScaleColours($gdScaleImage, $scale_ref);
-
-        $bgColour = $this->colourtable['KEYBG'];
-        $outlineColour = $this->colourtable['KEYOUTLINE'];
-
-        wm_debug("BG is $bgColour, Outline is $outlineColour\n");
-
-        if ($bgColour->isRealColour()) {
-            imagefilledrectangle($gdScaleImage, $box_left, $box_top, $box_right, $box_bottom, $bgColour->gdAllocate($gdScaleImage));
-        }
-
-        if ($outlineColour->isRealColour()) {
-            imagerectangle($gdScaleImage, $box_left, $box_top, $box_right, $box_bottom, $outlineColour->gdAllocate($gdScaleImage));
-        }
-
-        $this->myimagestring($gdScaleImage, $font, $scale_left - $scalefactor, $scale_top - $tileheight, $title, $this->colourtable['KEYTEXT']->gdAllocate($gdScaleImage));
-
-        for ($p = 0; $p <= 100; $p++) {
-            if ($inverted) {
-                $delta_y = (100 - $p) * $scalefactor;
-            } else {
-                $delta_y = $p * $scalefactor;
-            }
-
-            if (($p % 25) == 0) {
-                imageline($gdScaleImage, $scale_left - $scalefactor, $scale_top + $delta_y, $scale_right + $scalefactor, $scale_top + $delta_y, $this->colourtable['KEYTEXT']->gdAllocate($gdScaleImage));
-                $labelstring = sprintf("%d%%", $p);
-                $this->myimagestring($gdScaleImage, $font, $scale_right + $scalefactor * 2, $scale_top + $delta_y + $tileheight / 2, $labelstring, $this->colourtable['KEYTEXT']->gdAllocate($gdScaleImage));
-            }
-
-            list($col,) = $this->colourFromValue($p, $scalename);
-            if ($col->isRealColour()) {
-                imagefilledrectangle($gdScaleImage, $scale_left, $scale_top + $delta_y - $scalefactor / 2, $scale_right, $scale_top + $delta_y + $scalefactor / 2, $col->gdAllocate($gdScaleImage));
-            }
-        }
-
-        imagecopy($im, $gdScaleImage, $this->keyx[$scalename], $this->keyy[$scalename], 0, 0, imagesx($gdScaleImage), imagesy($gdScaleImage));
-        $this->keyimage[$scalename] = $gdScaleImage;
-
-        $origin_x = $this->keyx[$scalename];
-        $origin_y = $this->keyy[$scalename];
-
-        $areaname = "LEGEND:$scalename";
-        $this->imap->addArea("Rectangle", $areaname, '', array($origin_x + $box_left, $origin_y + $box_top, $origin_x + $box_right, $origin_y + $box_bottom));
-        $this->imap_areas[] = $areaname;
-    }
-
-    private function drawLegendClassic($im, $scaleName = "DEFAULT", $useTags = false)
-    {
-        $title = $this->keytext[$scaleName];
-
-        $colours = $this->colours[$scaleName];
-        usort($colours, array("Weathermap", "scaleEntrySort"));
-
-        $nscales = $this->numscales[$scaleName];
-
-        wm_debug("Drawing $nscales colours into SCALE\n");
-
-        $hide_zero = intval($this->get_hint("key_hidezero_" . $scaleName));
-        $hide_percent = intval($this->get_hint("key_hidepercent_" . $scaleName));
-
-        // did we actually hide anything?
-        $hid_zero = false;
-        if (($hide_zero == 1) && isset($colours['0_0'])) {
-            $nscales--;
-            $hid_zero = true;
-        }
-
-        $font = $this->keyfont;
-
-        $x = $this->keyx[$scaleName];
-        $y = $this->keyy[$scaleName];
-
-        list($tileWidth, $tileHeight) = $this->myimagestringsize($font, "MMMM");
-        $tileHeight = $tileHeight * 1.1;
-        $tileSpacing = $tileHeight + 2;
-
-        if (($this->keyx[$scaleName] >= 0) && ($this->keyy[$scaleName] >= 0)) {
-            list($minwidth,) = $this->myimagestringsize($font, 'MMMM 100%-100%');
-            list($minminwidth,) = $this->myimagestringsize($font, 'MMMM ');
-            list($boxwidth,) = $this->myimagestringsize($font, $title);
-
-            if ($useTags) {
-                $max_tag = 0;
-                foreach ($colours as $colour) {
-                    if (isset($colour['tag'])) {
-                        list($w,) = $this->myimagestringsize($font, $colour['tag']);
-                        if ($w > $max_tag) {
-                            $max_tag = $w;
-                        }
-                    }
-                }
-
-                // now we can tweak the widths, appropriately to allow for the tag strings
-                if (($max_tag + $minminwidth) > $minwidth) {
-                    $minwidth = $minminwidth + $max_tag;
-                }
-            }
-
-            $minwidth += 10;
-            $boxwidth += 10;
-
-            if ($boxwidth < $minwidth) {
-                $boxwidth = $minwidth;
-            }
-
-            $boxheight = $tileSpacing * ($nscales + 1) + 10;
-
-            $boxx = 0;
-            $boxy = 0;
-
-            wm_debug("Scale Box is %dx%d\n", $boxwidth + 1, $boxheight + 1);
-
-            $gdScaleImage = imagecreatetruecolor($boxwidth + 1, $boxheight + 1);
-
-            // Start with a transparent box, in case the fill or outline colour is 'none'
-            imageSaveAlpha($gdScaleImage, true);
-            $nothing = imagecolorallocatealpha($gdScaleImage, 128, 0, 0, 127);
-            imagefill($gdScaleImage, 0, 0, $nothing);
-
-            $scale_ref = 'gdref_legend_' . $scaleName;
-            $this->preAllocateScaleColours($gdScaleImage, $scale_ref);
-
-            $bgColour = $this->colourtable['KEYBG'];
-            $outlineColour = $this->colourtable['KEYOUTLINE'];
-
-            if ($bgColour->isRealColour()) {
-                imagefilledrectangle($gdScaleImage, $boxx, $boxy, $boxx + $boxwidth, $boxy + $boxheight, $bgColour->gdAllocate($gdScaleImage));
-            }
-
-            if ($outlineColour->isRealColour()) {
-                imagerectangle($gdScaleImage, $boxx, $boxy, $boxx + $boxwidth, $boxy + $boxheight, $outlineColour->gdAllocate($gdScaleImage));
-            }
-
-            $this->myimagestring($gdScaleImage, $font, $boxx + 4, $boxy + 4 + $tileHeight, $title, $this->colourtable['KEYTEXT']->gdAllocate($gdScaleImage));
-
-            $i = 1;
-
-            foreach ($colours as $colour) {
-                if (!isset($colour['special']) || $colour['special'] == 0) {
-                    // pick a value in the middle...
-                    $value = ($colour['bottom'] + $colour['top']) / 2;
-                    wm_debug(sprintf("%f-%f (%f)  %s\n", $colour['bottom'], $colour['top'], $value, $colour['c1']));
-
-                    #  debug("$i: drawing\n");
-                    if (($hide_zero == 0) || $colour['key'] != '0_0') {
-                        $y = $boxy + $tileSpacing * $i + 8;
-                        $x = $boxx + 6;
-
-                        $fudgefactor = 0;
-                        if ($hid_zero && $colour['bottom'] == 0) {
-                            // calculate a small offset that can be added, which will hide the zero-value in a
-                            // gradient, but not make the scale incorrect. A quarter of a pixel should do it.
-                            $fudgefactor = ($colour['top'] - $colour['bottom']) / ($tileWidth * 4);
-                        }
-
-                        // if it's a gradient, red2 is defined, and we need to sweep the values
-                        if (isset($colour['c2'])) {
-                            for ($n = 0; $n <= $tileWidth; $n++) {
-                                $value = $fudgefactor + $colour['bottom'] + ($n / $tileWidth) * ($colour['top'] - $colour['bottom']);
-                                list($ccol,) = $this->colourFromValue($value, $scaleName, "", false);
-                                $col = $ccol->gdallocate($gdScaleImage);
-                                imagefilledrectangle($gdScaleImage, $x + $n, $y, $x + $n, $y + $tileHeight, $col);
-                            }
-                        } else {
-                            // pick a value in the middle...
-                            list($ccol,) = $this->colourFromValue($value, $scaleName, "", false);
-                            $col = $ccol->gdallocate($gdScaleImage);
-                            imagefilledrectangle($gdScaleImage, $x, $y, $x + $tileWidth, $y + $tileHeight, $col);
-                        }
-
-                        if ($useTags) {
-                            $labelstring = "";
-                            if (isset($colour['tag'])) {
-                                $labelstring = $colour['tag'];
-                            }
-                        } else {
-                            $labelstring = sprintf("%s-%s", $colour['bottom'], $colour['top']);
-                            if ($hide_percent == 0) {
-                                $labelstring .= "%";
-                            }
-                        }
-
-                        $this->myimagestring($gdScaleImage, $font, $x + 4 + $tileWidth, $y + $tileHeight, $labelstring, $this->colourtable['KEYTEXT']->gdAllocate($gdScaleImage));
-                        $i++;
-                    }
-                }
-            }
-
-            imagecopy($im, $gdScaleImage, $this->keyx[$scaleName], $this->keyy[$scaleName], 0, 0, imagesx($gdScaleImage), imagesy($gdScaleImage));
-            $this->keyimage[$scaleName] = $gdScaleImage;
-
-            $areaname = "LEGEND:$scaleName";
-
-            $this->imap->addArea("Rectangle", $areaname, '', array($this->keyx[$scaleName], $this->keyy[$scaleName], $this->keyx[$scaleName] + $boxwidth, $this->keyy[$scaleName] + $boxheight));
-            $this->imap_areas[] = $areaname;
-        }
     }
 
     private function drawTimestamp($gdImage, $fontNumber, $colour, $which = "")
@@ -1376,6 +1031,8 @@ class WeatherMap extends WeatherMapBase
         $count = $this->scales['DEFAULT']->spanCount();
 
         $this->scales['DEFAULT']->populateDefaultsIfNecessary();
+        
+        $this->scales['none'] = new WeatherMapScale("none", $this);
 
         if ($count == 0) {
             wm_debug("Adding default SCALE colour set (no SCALE lines seen).\n");
@@ -1476,15 +1133,21 @@ class WeatherMap extends WeatherMapBase
      */
     private function replicateScaleSettings()
     {
-        foreach ($this->scales as $name=>$scaleObject) {
-
-            $scaleObject->keypos = new WMPoint($this->keyx[$name], $this->keyy[$name]);
-            $scaleObject->keystyle = $this->keystyle[$name];
-            $scaleObject->keytitle = $this->keytext[$name];
-
+        foreach ($this->scales as $scaleName=>$scaleObject) {
             $scaleObject->keyoutlinecolour = $this->colourtable['KEYOUTLINE'];
             $scaleObject->keytextcolour = $this->colourtable['KEYTEXT'];
             $scaleObject->keybgcolour = $this->colourtable['KEYBG'];
+            $scaleObject->keyfont = $this->fonts->getFont($this->keyfont);
+
+
+            if ((isset($this->numscales[$scaleName])) && isset($this->keyx[$scaleName])) {
+                $scaleObject->keypos = new WMPoint($this->keyx[$scaleName], $this->keyy[$scaleName]);
+                $scaleObject->keystyle = $this->keystyle[$scaleName];
+                $scaleObject->keytitle = $this->keytext[$scaleName];
+                if (isset($this->keysize[$scaleName])) {
+                    $scaleObject->keysize = $this->keysize[$scaleName];
+                }
+            }
         }
     }
 
@@ -2031,27 +1694,6 @@ class WeatherMap extends WeatherMapBase
                     foreach ($this->scales as $scaleName => $scaleObject) {
                         wm_debug("Drawing KEY for $scaleName if necessary.\n");
 
-                        if (1==1) {
-                            if ((isset($this->numscales[$scaleName])) && (isset($this->keyx[$scaleName])) && ($this->keyx[$scaleName] >= 0) && ($this->keyy[$scaleName] >= 0)) {
-
-                                if ($this->keystyle[$scaleName] == 'classic') {
-                                    $this->drawLegendClassic($image, $scaleName, false);
-                                }
-                                if ($this->keystyle[$scaleName] == 'horizontal') {
-                                    $this->drawLegendHorizontal($image, $scaleName, $this->keysize[$scaleName]);
-                                }
-                                if ($this->keystyle[$scaleName] == 'vertical') {
-                                    $this->drawLegendVertical($image, $scaleName, $this->keysize[$scaleName]);
-                                }
-                                if ($this->keystyle[$scaleName] == 'inverted') {
-                                    $this->drawLegendVertical($image, $scaleName, $this->keysize[$scaleName], true);
-                                }
-                                if ($this->keystyle[$scaleName] == 'tags') {
-                                    $this->drawLegendClassic($image, $scaleName, true);
-                                }
-                            }
-                        }
-
                         // the new scale object draws its own legend
                         $this->scales[$scaleName]->drawLegend($image);
                     }
@@ -2181,39 +1823,46 @@ class WeatherMap extends WeatherMapBase
                 }
             }
 
-            if (function_exists('imagecopyresampled')) {
-                // if one is specified, and we can, write a thumbnail too
-                if ($thumbnailfile != '') {
-                    $result = false;
-                    if ($this->width > $this->height) {
-                        $factor=($thumbnailmax / $this->width);
-                    } else {
-                        $factor =($thumbnailmax / $this->height);
-                    }
+            $this->createThumbnailFile($thumbnailfile, $image, $thumbnailmax);
 
-                    $this->thumb_width = $this->width * $factor;
-                    $this->thumb_height = $this->height * $factor;
-
-                    $imagethumb=imagecreatetruecolor($this->thumb_width, $this->thumb_height);
-                    imagecopyresampled($imagethumb, $image, 0, 0, 0, 0, $this->thumb_width, $this->thumb_height, $this->width, $this->height);
-                    $result = imagepng($imagethumb, $thumbnailfile);
-                    imagedestroy($imagethumb);
-
-
-
-                    if (($result===false)) {
-                        if (file_exists($filename)) {
-                            wm_warn("Failed to overwrite existing image file $filename - permissions of existing file are wrong? [WMWARN15]");
-                        } else {
-                            wm_warn("Failed to create image file $filename - permissions of output directory are wrong? [WMWARN16]");
-                        }
-                    }
-                }
-            } else {
-                wm_warn("Skipping thumbnail creation, since we don't have the necessary function. [WMWARN17]");
-            }
             imagedestroy($image);
         }
+    }
+
+    // if one is specified, and we can, write a thumbnail too
+    protected function createThumbnailFile($outputFileName, $sourceImageRef, $maximumDimension) {
+        if (!function_exists('imagecopyresampled')) {
+            wm_warn("Skipping thumbnail creation, since we don't have the necessary function. [WMWARN17]");
+            return;
+        }
+
+        if($outputFileName == '') {
+            return;
+        }
+
+        $result = false;
+        if ($this->width > $this->height) {
+            $factor = ($maximumDimension / $this->width);
+        } else {
+            $factor = ($maximumDimension / $this->height);
+        }
+
+        $this->thumb_width = $this->width * $factor;
+        $this->thumb_height = $this->height * $factor;
+
+        $thumbImageRef = imagecreatetruecolor($this->thumb_width, $this->thumb_height);
+        imagecopyresampled($thumbImageRef, $sourceImageRef, 0, 0, 0, 0, $this->thumb_width, $this->thumb_height, $this->width, $this->height);
+        $result = imagepng($thumbImageRef, $outputFileName);
+        imagedestroy($thumbImageRef);
+
+        if (($result===false)) {
+            if (file_exists($outputFileName)) {
+                wm_warn("Failed to overwrite existing thumbnail image file $outputFileName - permissions of existing file are wrong? [WMWARN15]");
+            } else {
+                wm_warn("Failed to create thumbnail image file $outputFileName - permissions of output directory are wrong? [WMWARN16]");
+            }
+        }
+
     }
 
     /**

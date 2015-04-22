@@ -33,6 +33,8 @@ if [ $fflag -eq 1 ]; then
 
     vendor/bin/phpcpd lib/  > test-suite/cut-paste.txt
 
-    vendor/bin/phpcs -p --tab-width=4 -s --extensions=php --standard=weathermap-phpcs.xml --report-full=test-suite/phpcs-report-PSR-1-2.txt lib
+    # this is mostly PSR2, with a few things excluded (namespaces) and a few things added (commented code)
+    # CentOS 6 (my theoretical target system) currently ships with PHP 5.1, so no namespaces
+    vendor/bin/phpcs -p --tab-width=4 -s --extensions=php --standard=docs/dev/phpcs/ruleset.xml --report-full=test-suite/phpcs-report-PSR-1-2.txt lib
 
 fi

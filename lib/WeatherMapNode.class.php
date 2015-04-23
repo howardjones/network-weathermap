@@ -389,10 +389,10 @@ class WeatherMapNode extends WeatherMapItem
                     }
 
                     if ($this->iconscaletype == 'percent') {
-                        list($fill, ,) = $map->ColourFromValue($pc, $this->useiconscale, $this->name);
+                         list($fill, ,) = $map->scales[$this->useiconscale]->ColourFromValue($pc, $this->name);
                     } else {
-                        // use the absolute value if we aren't doing percentage scales.
-                        list($fill, ,) = $map->ColourFromValue($val, $this->useiconscale, $this->name, false);
+                         // use the absolute value if we aren't doing percentage scales.
+                        list($fill, ,) = $map->scales[$this->useiconscale]->ColourFromValue($pc, $this->name, false);
                     }
                 }
 

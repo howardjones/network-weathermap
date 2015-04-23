@@ -276,6 +276,7 @@ class WeatherMapScale
         $colour = new WMColour(0, 0, 0);
         $tag = '';
         $matchSize = null;
+        $candidate = null;
 
         foreach ($this->colours as $key => $scaleEntry) {
             if (($value >= $scaleEntry['bottom']) and ($value <= $scaleEntry['top'])) {

@@ -287,6 +287,7 @@ class WeatherMap extends WeatherMapBase
      */
     function myimagestringsize($fontNumber, $string)
     {
+        // throw new WMException("Still using myimagestring");
         $fontObject = $this->fonts->getFont($fontNumber);
         return $fontObject->calculateImageStringSize($string);
     }
@@ -809,101 +810,6 @@ class WeatherMap extends WeatherMapBase
 
     }
 
-    // This should be in WeatherMapScale - All scale lookups are done here
-    function colourFromValue($value, $scalename = "DEFAULT", $name = "", $is_percent = true, $scale_warning = true)
-    {
-
-        throw new WMException("Legacy code called");
-
-        $tag = '';
-        $matchsize = null;
-        $matchkey = null;
-
-        $nowarn_clipping = intval($this->get_hint("nowarn_clipping"));
-        $nowarn_scalemisses = (!$scale_warning) || intval($this->get_hint("nowarn_scalemisses"));
-
-        if (isset($this->colours[$scalename])) {
-            $colours = $this->colours[$scalename];
-
-            if ($is_percent && $value > 100) {
-                if ($nowarn_clipping == 0) {
-                    wm_warn("ColourFromValue: Clipped $value% to 100% for item $name [WMWARN33]\n");
-                }
-                $value = 100;
-            }
-
-            if ($is_percent && $value < 0) {
-                if ($nowarn_clipping == 0) {
-                    wm_warn("ColourFromValue: Clipped $value% to 0% for item $name [WMWARN34]\n");
-                }
-                $value = 0;
-            }
-
-            foreach ($colours as $key => $scaleEntry) {
-                if ((!isset($scaleEntry['special']) || $scaleEntry['special'] == 0)
-                    and ($value >= $scaleEntry['bottom'])
-                    and ($value <= $scaleEntry['top'])
-                ) {
-                    $range = $scaleEntry['top'] - $scaleEntry['bottom'];
-
-                    // change in behaviour - with multiple matching ranges for a value, the smallest range wins
-                    if (is_null($matchsize) || ($range < $matchsize)) {
-                        $matchsize = $range;
-                        $matchkey = $key;
-
-                        # wm_debug("CFV $name $scalename $value '$tag' $key $r $g $b\n");
-                    }
-                }
-            }
-
-            // TODO: this should use the 'c1' property, not the individual RGB properties
-
-            // if we have a match, figure out the actual
-            // colour (for gradients) and return it
-            if (!is_null($matchsize)) {
-                $scaleEntry = $colours[$matchkey];
-
-                if (isset($scaleEntry['c2'])) {
-                    if ($scaleEntry["bottom"] == $scaleEntry["top"]) {
-                        $ratio = 0;
-                    } else {
-                        $ratio = ($value - $scaleEntry["bottom"]) / ($scaleEntry["top"] - $scaleEntry["bottom"]);
-                    }
-
-                    $col = $scaleEntry['c1']->blendWith($scaleEntry['c2'], $ratio);
-                } else {
-                    $col = $scaleEntry['c1'];
-                }
-
-                if (isset($scaleEntry['tag'])) {
-                    $tag = $scaleEntry['tag'];
-                }
-                return (array($col, $matchkey, $tag));
-            }
-
-        } else {
-            if ($scalename != 'none') {
-                wm_warn("ColourFromValue: Attempted to use non-existent scale: $scalename for item $name [WMWARN09]\n");
-            } else {
-                return array(new WMColour(255, 255, 255), '', '');
-            }
-        }
-
-        // shouldn't really get down to here if there's a complete SCALE
-
-        // you'll only get grey for a COMPLETELY quiet link if there's no 0 in the SCALE lines
-        if ($value == 0) {
-            return array(new WMColour(192, 192, 192), '', '');
-        }
-
-        if ($nowarn_scalemisses == 0) {
-            wm_warn("ColourFromValue: Scale $scalename doesn't include a line for $value" . ($is_percent ? "%" : "") . " while drawing item $name [WMWARN29]\n");
-        }
-
-        // and you'll only get white for a link with no colour assigned
-        return array(new WMColour(255, 255, 255), '', '');
-    }
-
     private function drawTimestamp($gdImage, $fontNumber, $colour, $which = "")
     {
         // add a timestamp to the corner, so we can tell if it's all being updated
@@ -1031,7 +937,7 @@ class WeatherMap extends WeatherMapBase
         $count = $this->scales['DEFAULT']->spanCount();
 
         $this->scales['DEFAULT']->populateDefaultsIfNecessary();
-        
+
         $this->scales['none'] = new WeatherMapScale("none", $this);
 
         if ($count == 0) {

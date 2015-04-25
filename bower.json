@@ -19,9 +19,14 @@
     "json2": "*",
     "marionette": "~2.1.0",
     "jquery-idletimer": "~1.0.1",
-    "jquery.colorpicker": "~1.0.9"
+    "jquery.colorpicker": "~1.0.9",
+    "jquery-fastlivefilter": "~1.0.3"
   },
   "resolutions": {
     "jquery": ">= 1.9.0"
+  },
+  "devDependencies": {
+    "mocha": "~2.2.4",
+    "chai": "~2.2.0"
   }
 }

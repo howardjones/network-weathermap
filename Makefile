@@ -25,7 +25,7 @@ release:
 	echo Building release $(RELNAME)
 
 	rm -rf $(RELDIR)
-	mkdir $(RELDIR)
+	mkdir -p $(RELDIR)
 	mkdir -p $(RELDIR)/random-bits $(RELDIR)/lib/datasources $(RELDIR)/lib/port $(RELDIR)/lib/pre $(RELDIR)/vendor $(RELDIR)/images $(RELDIR)/editor-resources $(RELDIR)/output $(RELDIR)/configs $(RELDIR)/cacti-resources $(RELDIR)/plugin-images $(RELDIR)/docs
 	grep -q ENABLED=true editor.php
 	tar cTf packing.list - | (cd $(RELDIR); tar xvf -)
@@ -33,6 +33,7 @@ release:
 	cd $(RELBASE); tar cvfz $(RELNAME).tgz weathermap
 	# Add in test code, and repackage
 	tar cTf packing.list-tests - | (cd $(RELDIR); tar xvf -)
+	mkdir -p $(RELDIR)/test-suite/diffs
 	cd $(RELBASE); zip -r $(RELNAME)-tests.zip weathermap/*
 	cd $(RELBASE); tar cvfz $(RELNAME)-tests.tgz weathermap
 	# rm -rf $(RELDIR)
@@ -45,6 +46,11 @@ test:
 	phpunit Tests/
 	grep  Output test-suite/diffs/*.txt | grep -v '|0|' | awk -F: '{ print $1;}' | sed -e 's/.png.txt//' -e 's/test-suite\/diffs\///' > test-suite/failing-images.txt
 	test-suite/make-failing-summary.pl test-suite/failing-images.txt test-suite/summary.html > test-suite/summary-failing.html
+
+# build a release, then run tests in the release packaging directing (tests for packing.list issues)
+releasetest: release
+	cd $(RELDIR) && /usr/local/bin/composer install
+	cd $(RELDIR) && $(RELDIR)/test.sh
 
 testcoverage:	
 	phpunit --coverage-html test-suite/code-coverage/ Tests/

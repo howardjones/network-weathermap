@@ -3,6 +3,7 @@
 // This file is from Network Weathermap v0.98
 
 require_once dirname(__FILE__).'/lib/all.php';
+require_once dirname(__FILE__).'/lib/SimpleTemplate.class.php';
 require_once dirname(__FILE__).'/lib/WeatherMapEditor.class.php';
 require_once dirname(__FILE__).'/lib/WeatherMapEditorUI.class.php';
 

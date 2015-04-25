@@ -21,18 +21,19 @@ class WeatherMap extends WeatherMapBase
     var $imap;
     var $colours;
     var $configfile;
-    var $imagefile,
-        $imageuri;
+    var $imagefile;
+    var $imageuri;
     var $rrdtool;
 
     var $kilo;
-    var $sizedebug,
-        $widthmod,
-        $debugging;
-    var $keyfont,
-        $timefont;
+    var $sizedebug;
+    var $widthmod;
+    var $debugging;
+    var $keyfont;
+    var $timefont;
 
-    var $width, $height;
+    var $width;
+    var $height;
 
     var $keyx, $keyy, $keyimage, $keytext; // arrays
 
@@ -150,6 +151,7 @@ class WeatherMap extends WeatherMapBase
         );
 
         $this->reset();
+        $this->loadAllPlugins();
 
     }
 
@@ -217,17 +219,31 @@ class WeatherMap extends WeatherMapBase
 
         $this->links['DEFAULT'] = & $deflink2;
 
-        assert('is_object($this->nodes[":: DEFAULT ::"])');
-        assert('is_object($this->links[":: DEFAULT ::"])');
-        assert('is_object($this->nodes["DEFAULT"])');
-        assert('is_object($this->links["DEFAULT"])');
-
         // ************************************
 
         $this->imap = new HTML_ImageMap('weathermap');
         $this->colours = array();
         $this->colourtable = array();
 
+        $this->populateDefaultColours();
+
+        $this->configfile = '';
+        $this->imagefile = '';
+        $this->imageuri = '';
+
+        $this->fonts = new WMFontTable();
+        $this->fonts->init();
+
+        wm_debug("WeatherMap class Reset() complete\n");
+    }
+
+    private function loadAllPlugins() {
+        $this->loadPlugins('data', dirname(__FILE__) . DIRECTORY_SEPARATOR . 'datasources');
+        $this->loadPlugins('pre', dirname(__FILE__) . DIRECTORY_SEPARATOR . 'pre');
+        $this->loadPlugins('post', dirname(__FILE__) . DIRECTORY_SEPARATOR . 'post');
+    }
+
+    private function populateDefaultColours() {
         wm_debug("Adding default map colour set.\n");
         $defaults = array(
             'KEYTEXT' => array('bottom' => -2, 'top' => -1, 'red' => 0, 'green' => 0, 'blue' => 0),
@@ -241,19 +257,6 @@ class WeatherMap extends WeatherMapBase
         foreach ($defaults as $key => $def) {
             $this->colourtable[$key] = new WMColour($def['red'], $def['green'], $def['blue']);
         }
-
-        $this->configfile = '';
-        $this->imagefile = '';
-        $this->imageuri = '';
-
-        $this->fonts = new WMFontTable();
-        $this->fonts->init();
-
-        $this->loadPlugins('data', dirname(__FILE__) . DIRECTORY_SEPARATOR . 'datasources');
-        $this->loadPlugins('pre', dirname(__FILE__) . DIRECTORY_SEPARATOR . 'pre');
-        $this->loadPlugins('post', dirname(__FILE__) . DIRECTORY_SEPARATOR . 'post');
-
-        wm_debug("WeatherMap class Reset() complete\n");
     }
 
     /**
@@ -466,19 +469,51 @@ class WeatherMap extends WeatherMapBase
      * Search a directory for plugin class files, and load them. Each one is then
      * instantiated once, and saved into the map object.
      *
-     * @param string $type - Which kind of plugin are we loading?
-     * @param string $dir - Where to load from?
+     * @param string $pluginType - Which kind of plugin are we loading?
+     * @param string $searchDirectory - Where to load from?
      */
-    private function loadPlugins($type = "data", $dir = "lib/datasources")
+    private function loadPlugins($pluginType = "data", $searchDirectory = "lib/datasources")
     {
-        wm_debug("Beginning to load $type plugins from $dir\n");
+        wm_debug("Beginning to load $pluginType plugins from $searchDirectory\n");
 
+        $directoryHandle = $this->resolveDirectoryAndOpen($searchDirectory);
+
+        if (!$directoryHandle) {
+            wm_warn("Couldn't open $pluginType Plugin directory ($searchDirectory). Things will probably go wrong. [WMWARN06]\n");
+            return;
+        }
+
+        while ($file = readdir($directoryHandle)) {
+            $fullFilePath = $searchDirectory . DIRECTORY_SEPARATOR . $file;
+
+            if (is_file($fullFilePath) && preg_match('/\.php$/', $fullFilePath)) {
+                wm_debug("Loading $pluginType Plugin class from $file\n");
+
+                include_once($fullFilePath);
+                $class = preg_replace("/\.php$/", "", $file);
+
+                wm_debug("Loaded $pluginType Plugin class $class from $file\n");
+
+                $this->plugins[$pluginType][$class]['object'] = new $class;
+                $this->plugins[$pluginType][$class]['active'] = true;
+
+                if (!isset($this->plugins[$pluginType][$class])) {
+                    wm_debug("** Failed to create an object for plugin $pluginType/$class\n");
+                    $this->plugins[$pluginType][$class]['active'] = false;
+                }
+            }
+        }
+        wm_debug("Finished loading plugins.\n");
+    }
+
+    private function resolveDirectoryAndOpen($dir){
         if (!file_exists($dir)) {
             $dir = dirname(__FILE__) . DIRECTORY_SEPARATOR . $dir;
             wm_debug("Relative path didn't exist. Trying $dir\n");
         }
         $directoryHandle = @opendir($dir);
 
+        // XXX - is this ever necessary?
         if (!$directoryHandle) { // try to find it with the script, if the relative path fails
             $srcdir = substr($_SERVER['argv'][0], 0, strrpos($_SERVER['argv'][0], DIRECTORY_SEPARATOR));
             $directoryHandle = opendir($srcdir . DIRECTORY_SEPARATOR . $dir);
@@ -487,35 +522,7 @@ class WeatherMap extends WeatherMapBase
             }
         }
 
-        if (!$directoryHandle) {
-            wm_warn("Couldn't open $type Plugin directory ($dir). Things will probably go wrong. [WMWARN06]\n");
-            return;
-        }
-
-        while ($file = readdir($directoryHandle)) {
-            $realfile = $dir . DIRECTORY_SEPARATOR . $file;
-
-            if (is_file($realfile) && preg_match('/\.php$/', $realfile)) {
-                wm_debug("Loading $type Plugin class from $file\n");
-
-                include_once($realfile);
-                $class = preg_replace("/\.php$/", "", $file);
-
-                wm_debug("Loaded $type Plugin class $class from $file\n");
-
-                $this->plugins[$type][$class]['object'] = new $class;
-                $this->plugins[$type][$class]['active'] = true;
-
-                if (!isset($this->plugins[$type][$class])) {
-                    wm_debug("** Failed to create an object for plugin $type/$class\n");
-                    $this->plugins[$type][$class]['active'] = false;
-                } else {
-                    wm_debug("Instantiated $class.\n");
-                }
-            } else {
-                wm_debug("Skipping $file\n");
-            }
-        }
+        return $directoryHandle;
     }
 
     /**
@@ -859,10 +866,11 @@ class WeatherMap extends WeatherMapBase
             $string = wmStringAnonymise($string);
         }
 
-        list($boxwidth, $boxheight) = $fontObject->calculateImageStringSize($string);
+        list($textWidth, $textHeight) = $fontObject->calculateImageStringSize($string);
 
+        // XXX what is this supposed to do?
         $x = 10;
-        $y = $this->titley - $boxheight;
+        $y = $this->titley - $textHeight;
 
         if (($this->titlex >= 0) && ($this->titley >= 0)) {
             $x = $this->titlex;
@@ -871,7 +879,7 @@ class WeatherMap extends WeatherMapBase
 
         $fontObject->drawImageString($gdImage, $x, $y, $string, $colour);
 
-        $this->imap->addArea("Rectangle", "TITLE", '', array($x, $y, $x + $boxwidth, $y - $boxheight));
+        $this->imap->addArea("Rectangle", "TITLE", '', array($x, $y, $x + $textWidth, $y - $textHeight));
         $this->imap_areas[] = 'TITLE';
     }
 
@@ -1172,57 +1180,6 @@ class WeatherMap extends WeatherMapBase
 
         wm_debug("-----------------------------------\n");
 
-    }
-
-    function writeJSONFile($filename)
-    {
-
-        if ($filename != "") {
-            $fd = fopen($filename, 'w');
-            # $output = '';
-
-            if ($fd) {
-                $data = array();
-                $data['nodes'] = array();
-                $data['links'] = array();
-                $data['scales'] = array();
-
-                foreach ($this->scales as $scale) {
-                    $data['scales'][$scale->name] = array();
-                }
-
-                foreach ($this->nodes as $node) {
-                    $data['nodes'][$node->name] = array();
-
-                    $data['nodes'][$node->name]["x"] = $node->x;
-                    $data['nodes'][$node->name]["y"] = $node->y;
-
-                    $data['nodes'][$node->name]["bounding_boxes"] = array();
-                    foreach ($node->boundingboxes as $bb) {
-                        $data['nodes'][$node->name]["bounding_boxes"][] = array($bb[0], $bb[1], $bb[2], $bb[3]);
-                    }
-
-                    $data['nodes'][$node->name]["template"] = false;
-                    if ($node->x === null) {
-                        $data['nodes'][$node->name]["template"] = true;
-                    }
-                }
-
-                foreach ($this->links as $link) {
-                    $data['links'][$link->name] = array();
-                    $data['links'][$link->name]["width"] = $link->width;
-                    $data['links'][$link->name]["nodes"] = array($link->a->name, $link->b->name);
-
-                    $data['links'][$link->name]["template"] = false;
-                    if ($link->a === null) {
-                        $data['links'][$link->name]["template"] = true;
-                    }
-                }
-
-                fputs($fd, json_encode($data, JSON_PRETTY_PRINT));
-
-            }
-        }
     }
 
     function writeDataFile($filename)

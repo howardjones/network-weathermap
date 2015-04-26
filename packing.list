@@ -377,7 +377,7 @@
 ./editor-resources/templates/main.php
 ./editor-resources/newedit.js
 ./editor-resources/editor.css
-./editor-resources/editor13.js
+./editor-resources/editor.js
 ./editor-resources/oldeditor.css
 ./editor-resources/editor.js
 ./editor-resources/editor13.css

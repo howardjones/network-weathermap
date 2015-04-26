@@ -10,7 +10,6 @@ include_once(dirname(__FILE__)."/../ds-common.php");
 class WeatherMapDataSource_rrd extends WeatherMapDataSource
 {
 
-
     function Init(&$map)
     {
         global $config;

@@ -121,6 +121,10 @@ $(document).ready( function() {
 
     }
 
+    if (selected_host >= 0) {
+        $("select#host_id").val(selected_host);
+    }
+
     $('span.filter').show();
     $('#filterstring').fastLiveFilter("#dslist");
 

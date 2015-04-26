@@ -6,18 +6,18 @@
 
 class WeatherMapLink extends WeatherMapItem
 {
-    var $owner;
+//    var $owner;
     var $name;
     var $id;
     var $a,                    $b; // the ends - references to nodes
     var $width,                $arrowstyle, $linkstyle;
     var $bwfont,               $labelstyle, $labelboxstyle;
     var $zorder;
-    var $overliburl = array();
-    var $infourl = array();
-    var $notes;
-    var $overlibcaption = array();
-    var $overlibwidth,         $overlibheight;
+//    var $overliburl = array();
+//    var $infourl = array();
+//    var $notes;
+//    var $overlibcaption = array();
+//    var $overlibwidth,         $overlibheight;
     var $bandwidth_in,         $bandwidth_out;
     var $max_bandwidth_in,     $max_bandwidth_out;
     var $max_bandwidth_in_cfg, $max_bandwidth_out_cfg;
@@ -38,7 +38,7 @@ class WeatherMapLink extends WeatherMapItem
 
     var $colours = array();
     var $inpercent,            $outpercent;
-    var $inherit_fieldlist;
+//    var $inherit_fieldlist;
     var $vialist = array();
     var $viastyle;
     var $usescale, $duplex;
@@ -59,12 +59,14 @@ class WeatherMapLink extends WeatherMapItem
     var $labeloffset_in, $labeloffset_out;
     var $commentoffset_in, $commentoffset_out;
     var $template;
-    var $config;
-    var $descendents;
+//    var $config;
+//    var $descendents;
     var $geometry;  // contains all the spine-related data (WMLinkGeometry)
 
-    function WeatherMapLink()
+    function __construct()
     {
+        parent::__construct();
+
         $this->inherit_fieldlist=array(
             'my_default' => null,
             'width' => 7,
@@ -121,8 +123,6 @@ class WeatherMapLink extends WeatherMapItem
             'max_bandwidth_in_cfg' => '100M',
             'max_bandwidth_out_cfg' => '100M'
         );
-        $this->config = array();
-        $this->descendents = array();
     }
 
     function reset(&$newowner)
@@ -299,6 +299,10 @@ class WeatherMapLink extends WeatherMapItem
 
     function preChecks(&$map)
     {
+        if ($this->isTemplate()) {
+            return;
+        }
+
         wm_debug("Link ".$this->name.": pre-checks.\n");
         // Get the positions of the end-points
         $x1 = $this->a->x;
@@ -756,12 +760,13 @@ class WeatherMapLink extends WeatherMapItem
 
         $tgt='';
 
+        $i = 0;
         foreach ($this->targets as $target) {
-            if (strpos($target[4], " ") === false) {
-                $tgt .= $target[4] . ' ';
-            } else {
-                $tgt .= '"'.$target[4] . '" ';
+            if ($i>0) {
+               print " ";
             }
+            $tgt .= $target->asConfig();
+            $i++;
         }
 
         $output.=jsEscape(trim($tgt));

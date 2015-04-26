@@ -23,9 +23,15 @@ class WeatherMapBase
 
     protected $inherit_fieldlist;
 
+    function __construct()
+    {
+        $this->config = array();
+        $this->descendents = array();
+    }
+
     public function my_type()
     {
-        return "MAP";
+        return "BASE";
     }
 
     /**
@@ -211,12 +217,27 @@ class WeatherMapItem extends WeatherMapBase
     public $overlibheight;
     public $overlibcaption;
 
-    public $descendents; # if I change, who could inherit that change?
-    public $config;  # config set on this node specifically
+//    public $descendents; # if I change, who could inherit that change?
+//    public $config;  # config set on this node specifically
     public $parent;
     public $my_default;
     public $defined_in;
     public $config_override;   # used by the editor to allow text-editing
+
+    public $imageMapAreas;
+    public $zIndex;
+
+    function __construct()
+    {
+        parent::__construct();
+
+        $this->zIndex = 1000;
+        $this->imageMapAreas = array();
+        $this->descendents = array();
+        $this->parent = null;
+        $this->infourl = array();
+        $this->overliburl = array();
+    }
 
     public function my_type()
     {
@@ -233,7 +254,6 @@ class WeatherMapItem extends WeatherMapBase
         return $this->defined_in;
     }
 
-
     /**
      * Accessor for the variables that should be visible to ProcessString {} tokens.
      * Side-effect - none of the others are available anymore, and ALL are decoupled from the
@@ -244,5 +264,25 @@ class WeatherMapItem extends WeatherMapBase
     public function getValue($name)
     {
 
+    }
+
+    public function preChecks($owner)
+    {
+
+    }
+
+    public function preCalculate($owner)
+    {
+
+    }
+
+    public function draw($imageRef, $owner)
+    {
+
+    }
+
+    public function isTemplate()
+    {
+        return false;
     }
 }

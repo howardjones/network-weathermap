@@ -10,7 +10,7 @@
 // ******************************************
 // sensible defaults
 $cacti_base = '../../';
-$cacti_base = '/var/www/html/cacti-0.8.8c';
+$cacti_base = '/var/www/html/ni_cacti';
 
 $config['base_url'] = $cacti_url;
 

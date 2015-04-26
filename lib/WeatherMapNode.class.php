@@ -6,7 +6,7 @@
 
 class WeatherMapNode extends WeatherMapItem
 {
-    var $owner;
+//    var $owner;
     var $id;
     var $x, $y;
     var $original_x, $original_y, $relative_resolved;
@@ -25,11 +25,11 @@ class WeatherMapNode extends WeatherMapItem
     // var $notes; // for internal 'notes' between plugins
     var $colours = array(); // SCALE colours
 
-    var $infourl = array();
-    var $overliburl = array();
-    var $overlibwidth;
-    var $overlibheight;
-    var $overlibcaption = array();
+//    var $infourl = array();
+//    var $overliburl = array();
+//    var $overlibwidth;
+//    var $overlibheight;
+//    var $overlibcaption = array();
     var $notestext = array();
 
     var $selected = 0;
@@ -41,7 +41,7 @@ class WeatherMapNode extends WeatherMapItem
     var $max_bandwidth_in_cfg, $max_bandwidth_out_cfg;
     var $labeloffset, $labeloffsetx, $labeloffsety;
 
-    var $inherit_fieldlist;
+//    var $inherit_fieldlist;
 
     var $labelbgcolour;
     var $labeloutlinecolour;
@@ -64,12 +64,14 @@ class WeatherMapNode extends WeatherMapItem
     var $boundingboxes = array();
     var $named_offsets = array();
 
-    var $config = array();
+//    var $config = array();
     var $runtime = array();
-    var $descendents = array();
+//    var $descendents = array();
 
     function __construct()
     {
+        parent::__construct();
+
         $this->inherit_fieldlist = array
         (
             'boundingboxes' => array(),
@@ -131,8 +133,7 @@ class WeatherMapNode extends WeatherMapItem
         $this->polar = false;
         $this->pos_named = false;
         $this->image = null;
-        $this->config = array();
-        $this->descendents = array();
+
     }
 
     function isTemplate()

@@ -10,6 +10,7 @@
         var rra_path = <?php echo $rra_path ?>;
         var aggregate = <?php echo $aggregate ?>;
         var overlib = <?php echo $overlib ?>;
+        var selected_host = <?php echo $selected_host ?>;
 
         $(document).ready(function() {
             $("select#host_id").val(<?php echo $selected_host ?>);

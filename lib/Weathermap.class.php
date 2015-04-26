@@ -1554,6 +1554,7 @@ class WeatherMap extends WeatherMapBase
                 wm_debug("Drawing layer $z\n");
                 // all the map 'furniture' is fixed at z=1000
                 if ($z==1000) {
+                    // TODO - these legends should just be other objects in the zlayer, not special cases
                     foreach ($this->scales as $scaleName => $scaleObject) {
                         wm_debug("Drawing KEY for $scaleName if necessary.\n");
 
@@ -1561,6 +1562,7 @@ class WeatherMap extends WeatherMapBase
                         $this->scales[$scaleName]->drawLegend($image);
                     }
 
+                    // TODO - these textitems should just be other objects in the zlayer, not special cases
                     $this->drawTimestamp($image, $this->timefont, $this->colourtable['TIME']->gdallocate($image));
                     if (! is_null($this->min_data_time)) {
                         $this->drawTimestamp($image, $this->timefont, $this->colourtable['TIME']->gdallocate($image), "MIN");
@@ -1571,33 +1573,41 @@ class WeatherMap extends WeatherMapBase
 
                 if (is_array($z_items)) {
                     foreach ($z_items as $it) {
-                        if (strtolower(get_class($it))=='weathermaplink') {
-                            // only draw LINKs if they have NODES defined (not templates)
-                            // (also, check if the link still exists - if this is in the editor, it may have been deleted by now)
-                            if (isset($this->links[$it->name]) && isset($it->a) && isset($it->b)) {
-                                wm_debug("Drawing LINK ".$it->name."\n");
-                                $this->links[$it->name]->preChecks($this);
-                                $this->links[$it->name]->preCalculate($this);
-                                $this->links[$it->name]->draw($image, $this);
+
+                        $it->preChecks($this);
+                        $it->preCalculate($this);
+                        $it->draw($image, $this);
+
+                        // by putting the methods above in the MapItem base class, we can delegate all this logic
+                        if(1==0) {
+                            if (strtolower(get_class($it)) == 'weathermaplink') {
+                                // only draw LINKs if they have NODES defined (not templates)
+                                // (also, check if the link still exists - if this is in the editor, it may have been deleted by now)
+                                if (isset($this->links[$it->name]) && isset($it->a) && isset($it->b)) {
+                                    wm_debug("Drawing LINK " . $it->name . "\n");
+                                    $this->links[$it->name]->preChecks($this);
+                                    $this->links[$it->name]->preCalculate($this);
+                                    $this->links[$it->name]->draw($image, $this);
+                                }
                             }
-                        }
-                        if (strtolower(get_class($it))=='weathermapnode') {
-                            // if (!is_null($it->x)) $it->pre_render($image, $this);
-                            if ($withnodes) {
-                                // don't try and draw template nodes
-                                if (isset($this->nodes[$it->name]) && !is_null($it->x)) {
-                                    # print "::".get_class($it)."\n";
-                                    wm_debug("Drawing NODE ".$it->name."\n");
-                                    $this->nodes[$it->name]->Draw($image, $this);
-                                    $ii=0;
-                                    foreach ($this->nodes[$it->name]->boundingboxes as $bbox) {
-                                        $areaname = "NODE:N". $it->id . ":" . $ii;
-                                        $this->imap->addArea("Rectangle", $areaname, '', $bbox);
-                                        wm_debug("Adding imagemap area");
-                                        $this->nodes[$it->name]->imap_areas[] = $areaname;
-                                        $ii++;
+                            if (strtolower(get_class($it)) == 'weathermapnode') {
+                                // if (!is_null($it->x)) $it->pre_render($image, $this);
+                                if ($withnodes) {
+                                    // don't try and draw template nodes
+                                    if (isset($this->nodes[$it->name]) && !is_null($it->x)) {
+                                        # print "::".get_class($it)."\n";
+                                        wm_debug("Drawing NODE " . $it->name . "\n");
+                                        $this->nodes[$it->name]->Draw($image, $this);
+                                        $ii = 0;
+                                        foreach ($this->nodes[$it->name]->boundingboxes as $bbox) {
+                                            $areaname = "NODE:N" . $it->id . ":" . $ii;
+                                            $this->imap->addArea("Rectangle", $areaname, '', $bbox);
+                                            wm_debug("Adding imagemap area");
+                                            $this->nodes[$it->name]->imap_areas[] = $areaname;
+                                            $ii++;
+                                        }
+                                        wm_debug("Added $ii bounding boxes too\n");
                                     }
-                                    wm_debug("Added $ii bounding boxes too\n");
                                 }
                             }
                         }

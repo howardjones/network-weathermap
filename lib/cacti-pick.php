@@ -1,6 +1,5 @@
 <?php
 
-
 function pickerDispatch($request)
 {
     if (isset($request['command'])) {
@@ -22,7 +21,7 @@ function pickerDispatch($request)
 function jsEscape($str)
 {
     $str = str_replace('\\', '\\\\', $str);
-    $str = str_replace("'", "\\\'", $str);
+    $str = str_replace("'", "\\'", $str);
 
     $str = "'".$str."'";
 
@@ -36,7 +35,7 @@ function jsEscape($str)
 $b is equal to $b */
 function usortNaturalHosts($a, $b)
 {
-    return strnatcmp($a['name'], $b['name']);
+    return strnatcasecmp($a['name'], $b['name']);
 }
 
 /** usort_natural_titles - sorts two values naturally (ie. ab1, ab2, ab7, ab10, ab20)
@@ -44,19 +43,9 @@ function usortNaturalHosts($a, $b)
 @arg $b - the second string to compare
 @returns - '1' if $a is greater than $b, '-1' if $a is less than $b, or '0' if
 $b is equal to $b */
-function usortNaturalTitles($a, $b)
+function usortNaturalDescriptions($a, $b)
 {
-    return strnatcasecmp($a['title_cache'], $b['title_cache']);
-}
-
-/** usort_natural_names - sorts two values naturally (ie. ab1, ab2, ab7, ab10, ab20)
-@arg $a - the first string to compare
-@arg $b - the second string to compare
-@returns - '1' if $a is greater than $b, '-1' if $a is less than $b, or '0' if
-$b is equal to $b */
-function usortNaturalNames($a, $b)
-{
-    return strnatcasecmp($a['name_cache'], $b['name_cache']);
+    return strnatcasecmp($a['description'], $b['description']);
 }
 
 function link_pick_step1($request)
@@ -87,7 +76,7 @@ function link_pick_step1($request)
     $SQL_picklist .= " order by name_cache;";
 
     $sources = db_fetch_assoc($SQL_picklist);
-    uasort($sources, "usortNaturalTitles");
+    uasort($sources, "usortNaturalDescriptions");
 
     $hosts = cactiHostList();
 
@@ -152,7 +141,6 @@ function link_pick_step2($local_data_id)
         <script type="text/javascript">window.onload = update_source_link_step2(<?php echo $graph_id ?>);</script>
     </head><body>This window should disappear in a moment.</body></html>
     <?php
-    // end of link step 2
 }
 
 function node_pick_step1($request)
@@ -177,16 +165,16 @@ function node_pick_step1($request)
     cactiDatabaseConnect();
 
     $sources = db_fetch_assoc($SQL_picklist);
-    uasort($sources, "usortNaturalTitles");
+    uasort($sources, "usortNaturalDescriptions");
 
     $hosts = cactiHostList();
 
     $tpl = new SimpleTemplate();
     $tpl->set("title", "Pick a graph");
-    $tpl->set("selected_host", $host_id);
     $tpl->set("hosts", $hosts);
     $tpl->set("sources", $sources);
     $tpl->set("overlib", ($overlib ? 1 : 0));
+    $tpl->set("selected_host", $host_id);
     $tpl->set("aggregate", ($aggregate ? 1 : 0));
     $tpl->set("base_url", isset($config['base_url']) ? $config['base_url'] : '');
     $tpl->set("rra_path", jsEscape($config['rra_path']));

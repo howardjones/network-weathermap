@@ -2,30 +2,38 @@
 
 /**
  * Collect together everything scale-related
+ *
+ * Probably should separate out the legend-drawing from the CFV stuff.
+ *
  */
-class WeatherMapScale
+class WeatherMapScale extends WeatherMapItem
 {
-    var $colours;
-    var $name;
-    var $keypos;
-    var $keytitle;
-    var $keystyle;
-    var $keysize;
-    var $keytextcolour;
-    var $keyoutlinecolour;
-    var $keybgcolour;
-    var $scalemisscolour;
-    var $keyfont;
-    var $owner;
+    public $colours;
+    public $name;
+    public $keypos;
+    public $keytitle;
+    public $keystyle;
+    public $keysize;
+    public $keytextcolour;
+    public $keyoutlinecolour;
+    public $keybgcolour;
+    public $scalemisscolour;
+    public $keyfont;
+    public $owner;
 
-    var $scaleType;
+    public $scaleType;
 
-    function __construct($name, &$owner)
+    public function __construct($name, &$owner)
     {
         $this->name = $name;
         $this->scaleType = "percent";
 
         $this->Reset($owner);
+    }
+
+    public function my_type()
+    {
+        return "SCALE";
     }
 
     public function Reset(&$owner)

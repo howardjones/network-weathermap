@@ -497,22 +497,25 @@ class WeatherMap extends WeatherMapBase
         while ($file = readdir($directoryHandle)) {
             $fullFilePath = $searchDirectory . DIRECTORY_SEPARATOR . $file;
 
-            if (is_file($fullFilePath) && preg_match('/\.php$/', $fullFilePath)) {
-                wm_debug("Loading $pluginType Plugin class from $file\n");
-
-                include_once($fullFilePath);
-                $class = preg_replace("/\.php$/", "", $file);
-
-                wm_debug("Loaded $pluginType Plugin class $class from $file\n");
-
-                $this->plugins[$pluginType][$class]['object'] = new $class;
-                $this->plugins[$pluginType][$class]['active'] = true;
-
-                if (!isset($this->plugins[$pluginType][$class])) {
-                    wm_debug("** Failed to create an object for plugin $pluginType/$class\n");
-                    $this->plugins[$pluginType][$class]['active'] = false;
-                }
+            if (!is_file($fullFilePath) || !preg_match('/\.php$/', $fullFilePath)) {
+                continue;
             }
+
+            wm_debug("Loading $pluginType Plugin class from $file\n");
+
+            $class = preg_replace("/\\.php$/", "", $file);
+            include_once($fullFilePath);
+
+            wm_debug("Loaded $pluginType Plugin class $class from $file\n");
+
+            $this->plugins[$pluginType][$class]['object'] = new $class;
+            $this->plugins[$pluginType][$class]['active'] = true;
+
+            if (!isset($this->plugins[$pluginType][$class])) {
+                wm_debug("** Failed to create an object for plugin $pluginType/$class\n");
+                $this->plugins[$pluginType][$class]['active'] = false;
+            }
+
         }
         wm_debug("Finished loading plugins.\n");
     }

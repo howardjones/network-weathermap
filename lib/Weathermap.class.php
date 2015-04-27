@@ -637,13 +637,6 @@ class WeatherMap extends WeatherMapBase
         wm_debug("======================================\n");
         wm_debug("Starting main collection loop\n");
 
-        $channels = array(IN,OUT);
-
-        $totals = array();
-        foreach ($channels as $channel) {
-            $totals[$channel] = 0;
-        }
-
         foreach ($itemList as $mapItem) {
 
             if ($mapItem->isTemplate()) {
@@ -1851,54 +1844,69 @@ class WeatherMap extends WeatherMapBase
      */
     private function prepareOutputImage()
     {
-        $bgimage = null;
+        $bgImageRef = $this->loadBackgroundImage($this->background);
 
-        // do the basic prep work
-        if ($this->background != '') {
-            if (is_readable($this->background)) {
-                $bgimage = imagecreatefromfile($this->background);
+        $outputImageRef = imagecreatetruecolor($this->width, $this->height);
 
-                if (!$bgimage) {
-                    wm_warn("Failed to open background image.  One possible reason: Is your BACKGROUND really a PNG?\n");
-                } else {
-                    $this->width = imagesx($bgimage);
-                    $this->height = imagesy($bgimage);
-                }
-            } else {
-                wm_warn("Your background image file could not be read. Check the filename, and permissions, for " . $this->background . "\n");
-            }
-        }
-
-        $image = imagecreatetruecolor($this->width, $this->height);
-
-        if (!$image) {
+        if (!$outputImageRef) {
             wm_warn("Couldn't create output image in memory (" . $this->width . "x" . $this->height . ").");
             throw new WMException("ImageCreationError");
         }
 
-        ImageAlphaBlending($image, true);
+        ImageAlphaBlending($outputImageRef, true);
+        $this->enableAntiAliasing($outputImageRef);
 
+        // by here, we should have a valid image handle
+
+        $this->selected = myimagecolorallocate($outputImageRef, 255, 0, 0); // for selections in the editor
+
+        if ($bgImageRef) {
+            imagecopy($outputImageRef, $bgImageRef, 0, 0, 0, 0, $this->width, $this->height);
+            imagedestroy($bgImageRef);
+        } else {
+            // fill with background colour anyway, since the background image failed to load
+            imagefilledrectangle($outputImageRef, 0, 0, $this->width, $this->height, $this->colourtable['BG']->gdallocate($outputImageRef));
+        }
+
+        return $outputImageRef;
+    }
+
+    /**
+     * @return null|resource
+     */
+    private function loadBackgroundImage($background)
+    {
+        $bgImageRef = null;
+
+        // do the basic prep work
+        if ($background != '') {
+            if (is_readable($background)) {
+                $bgImageRef = imagecreatefromfile($this->background);
+
+                if (!$bgImageRef) {
+                    wm_warn("Failed to open background image.  One possible reason: Is your BACKGROUND really a PNG?\n");
+                } else {
+                    $this->width = imagesx($bgImageRef);
+                    $this->height = imagesy($bgImageRef);
+                }
+            } else {
+                wm_warn("Your background image file could not be read. Check the filename, and permissions, for $background\n");
+            }
+        }
+        return $bgImageRef;
+    }
+
+    /**
+     * @param $outputImageRef
+     */
+    private function enableAntiAliasing($outputImageRef)
+    {
         if ($this->get_hint("antialias") == 1) {
             // Turn on anti-aliasing if it exists and it was requested
             if (function_exists("imageantialias")) {
-                imageantialias($image, true);
+                imageantialias($outputImageRef, true);
             }
         }
-        // by here, we should have a valid image handle
-
-        $this->selected=myimagecolorallocate($image, 255, 0, 0); // for selections in the editor
-        // XXX - is this necessary anymore?
-        // $this->preAllocateScaleColours($image);
-
-        if ($bgimage) {
-            imagecopy($image, $bgimage, 0, 0, 0, 0, $this->width, $this->height);
-            imagedestroy($bgimage);
-        } else {
-            // fill with background colour anyway, since the background image failed to load
-            imagefilledrectangle($image, 0, 0, $this->width, $this->height, $this->colourtable['BG']->gdallocate($image));
-        }
-
-        return $image;
     }
 }
 

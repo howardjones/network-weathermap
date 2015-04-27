@@ -13,11 +13,6 @@ class WeatherMapLink extends WeatherMapItem
     var $width,                $arrowstyle, $linkstyle;
     var $bwfont,               $labelstyle, $labelboxstyle;
     var $zorder;
-//    var $overliburl = array();
-//    var $infourl = array();
-//    var $notes;
-//    var $overlibcaption = array();
-//    var $overlibwidth,         $overlibheight;
     var $bandwidth_in,         $bandwidth_out;
     var $max_bandwidth_in,     $max_bandwidth_out;
     var $max_bandwidth_in_cfg, $max_bandwidth_out_cfg;
@@ -38,7 +33,6 @@ class WeatherMapLink extends WeatherMapItem
 
     var $colours = array();
     var $inpercent,            $outpercent;
-//    var $inherit_fieldlist;
     var $vialist = array();
     var $viastyle;
     var $usescale, $duplex;
@@ -59,8 +53,6 @@ class WeatherMapLink extends WeatherMapItem
     var $labeloffset_in, $labeloffset_out;
     var $commentoffset_in, $commentoffset_out;
     var $template;
-//    var $config;
-//    var $descendents;
     var $geometry;  // contains all the spine-related data (WMLinkGeometry)
 
     function __construct()
@@ -186,9 +178,6 @@ class WeatherMapLink extends WeatherMapItem
 
         return array(IN, OUT);
     }
-
-
-
 
     function drawComments($gdImage)
     {

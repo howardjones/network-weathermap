@@ -54,8 +54,6 @@ class WeatherMap extends WeatherMapBase
     var $need_size_precalc;
     var $keystyle, $keysize;
     var $rrdtool_check;
-    var $inherit_fieldlist;
-
 
     var $min_ds_time;
     var $max_ds_time;
@@ -67,7 +65,6 @@ class WeatherMap extends WeatherMapBase
     var $minstamptext, $maxstamptext;
 
     var $context;
-    var $name;
     var $black,
         $white,
         $grey,
@@ -88,7 +85,6 @@ class WeatherMap extends WeatherMapBase
     var $jsincludes = array();
     var $parent = null;
 
-    var $config = array();
     var $runtime = array();
 
     function WeatherMap()
@@ -460,8 +456,8 @@ class WeatherMap extends WeatherMapBase
     function populateRandomData()
     {
         foreach ($this->links as $link) {
-            $this->links[$link->name]->bandwidth_in = rand(0, $link->max_bandwidth_in);
-            $this->links[$link->name]->bandwidth_out = rand(0, $link->max_bandwidth_out);
+            $link->bandwidth_in = rand(0, $link->max_bandwidth_in);
+            $link->bandwidth_out = rand(0, $link->max_bandwidth_out);
         }
     }
 
@@ -604,9 +600,8 @@ class WeatherMap extends WeatherMapBase
                         $target->registerWithPlugin($this, $oneMapItem);
                     } else {
                         wm_warn(sprintf(
-                            "ProcessTargets: %s %s, target: %s was recognised as a valid TARGET by a plugin that is unable to run (%s) [WMWARN07]\n",
-                            $oneMapItem->my_type(),
-                            $oneMapItem->name,
+                            "ProcessTargets: %s, target: %s was recognised as a valid TARGET by a plugin that is unable to run (%s) [WMWARN07]\n",
+                            $oneMapItem,
                             $target,
                             $matchedBy
                         ));
@@ -615,9 +610,8 @@ class WeatherMap extends WeatherMapBase
 
                 if ($matchedBy == "") {
                     wm_warn(sprintf(
-                        "ProcessTargets: %s, %s, target: %s was not recognised as a valid TARGET [WMWARN08]\n",
-                        $oneMapItem->my_type(),
-                        $oneMapItem->name,
+                        "ProcessTargets: %s, target: %s was not recognised as a valid TARGET [WMWARN08]\n",
+                        $oneMapItem,
                         $target
                     ));
                 }
@@ -633,8 +627,8 @@ class WeatherMap extends WeatherMapBase
         $channels = array(IN,OUT);
 
         foreach ($itemList as $mapItem) {
-            $type = $mapItem->my_type();
-            $name = $mapItem->name;
+//            $type = $mapItem->my_type();
+//            $name = $mapItem->name;
 
             $totals = array();
             foreach ($channels as $channel) {
@@ -643,10 +637,10 @@ class WeatherMap extends WeatherMapBase
             $datatime = 0;
 
             wm_debug("-------------------------------------------------------------\n");
-            wm_debug("ReadData for $type $name: \n");
+            wm_debug("ReadData for $mapItem: \n");
 
             if ($mapItem->isTemplate()) {
-                wm_debug("ReadData: Skipping $type $name that looks like a template\n.");
+                wm_debug("ReadData: Skipping $mapItem that looks like a template\n.");
                 continue;
             }
 
@@ -692,7 +686,7 @@ class WeatherMap extends WeatherMapBase
                 }
             }
 
-            wm_debug("ReadData complete for %s %s: %s\n", $type, $name, join(" ", $totals));
+            wm_debug("ReadData complete for %s: %s\n", $mapItem, join(" ", $totals));
 
             // NOTE - this part still happens even if there were no targets
 
@@ -703,6 +697,7 @@ class WeatherMap extends WeatherMapBase
             $mapItem->bandwidth_in = $totals[IN];
             $mapItem->bandwidth_out = $totals[OUT];
             // TODO this should replace the above 2 lines
+            // TODO it should also be in some superclass of Node and Link
             foreach ($channels as $channel) {
                 $mapItem->absoluteUsages[$channel] = $totals[$channel];
                 $mapItem->percentUsages[$channel] = ($totals[$channel] / $mapItem->maxValues[$channel]) * 100;
@@ -710,24 +705,28 @@ class WeatherMap extends WeatherMapBase
             $mapItem->outpercent = (($totals[OUT]) / ($mapItem->max_bandwidth_out)) * 100;
             $mapItem->inpercent = (($totals[IN]) / ($mapItem->max_bandwidth_in)) * 100;
 
-            if ($type == 'LINK' && $mapItem->duplex == 'half') {
+            if ($mapItem->my_type() == 'LINK' && $mapItem->duplex == 'half') {
                 // in a half duplex link, in and out share a common bandwidth pool, so percentages need to include both
                 wm_debug("Calculating percentage using half-duplex\n");
                 $mapItem->outpercent = (($totals[IN] + $totals[OUT]) / ($mapItem->max_bandwidth_out)) * 100;
                 $mapItem->inpercent = (($totals[IN] + $totals[OUT]) / ($mapItem->max_bandwidth_in)) * 100;
 
                 if ($mapItem->max_bandwidth_out != $mapItem->max_bandwidth_in) {
-                    wm_warn("ReadData: $type $name: You're using asymmetric bandwidth AND half-duplex in the same link. That makes no sense. [WMWARN44]\n");
+                    wm_warn("ReadData: $mapItem: You're using asymmetric bandwidth AND half-duplex in the same link. That makes no sense. [WMWARN44]\n");
                 }
             }
 
             $warn_in = true;
             $warn_out = true;
-            if ($type == 'NODE' && $mapItem->scalevar == 'in') {
-                $warn_out = false;
-            }
-            if ($type == 'NODE' && $mapItem->scalevar == 'out') {
-                $warn_in = false;
+
+            // Nodes only use one channel, so don't warn for the unused channel
+            if ($mapItem->my_type() == 'NODE') {
+                if ($mapItem->scalevar == 'in') {
+                    $warn_out = false;
+                }
+                if ($mapItem->scalevar == 'out') {
+                    $warn_in = false;
+                }
             }
 
             if ($mapItem->scaletype == 'percent') {
@@ -763,7 +762,7 @@ class WeatherMap extends WeatherMapBase
             $mapItem->colours[IN] = $incol;
             $mapItem->colours[OUT] = $outcol;
 
-            wm_debug(sprintf("ReadData: Setting %s,%s for %s\n", wm_value_or_null($totals[IN]), wm_value_or_null($totals[OUT]), $name));
+            wm_debug("ReadData: Setting %s,%s for %s\n", wm_value_or_null($totals[IN]), wm_value_or_null($totals[OUT]), $mapItem);
             unset($mapItem);
         }
     }
@@ -1065,6 +1064,7 @@ class WeatherMap extends WeatherMapBase
         }
     }
 
+    // TODO - SRP!!! This function builds the z-layers, and also calculates the maximums!
     private function buildZLayers()
     {
         wm_debug("Building cache of z-layers and finalising bandwidth.\n");
@@ -1082,13 +1082,12 @@ class WeatherMap extends WeatherMapBase
             $item->maxValues[IN] = wmInterpretNumberWithMetricPrefix($item->max_bandwidth_in_cfg, $this->kilo);
             $item->maxValues[OUT] = wmInterpretNumberWithMetricPrefix($item->max_bandwidth_out_cfg, $this->kilo);
 
-            // TODO - remove PHP4ism
             if ($item->my_type() == "LINK") {
-                $this->links[$item->name]->max_bandwidth_in = wmInterpretNumberWithMetricPrefix($item->max_bandwidth_in_cfg, $this->kilo);
-                $this->links[$item->name]->max_bandwidth_out = wmInterpretNumberWithMetricPrefix($item->max_bandwidth_out_cfg, $this->kilo);
+                $item->max_bandwidth_in = wmInterpretNumberWithMetricPrefix($item->max_bandwidth_in_cfg, $this->kilo);
+                $item->max_bandwidth_out = wmInterpretNumberWithMetricPrefix($item->max_bandwidth_out_cfg, $this->kilo);
             } elseif ($item->my_type() == "NODE") {
-                $this->nodes[$item->name]->max_bandwidth_in = wmInterpretNumberWithMetricPrefix($item->max_bandwidth_in_cfg, $this->kilo);
-                $this->nodes[$item->name]->max_bandwidth_out = wmInterpretNumberWithMetricPrefix($item->max_bandwidth_out_cfg, $this->kilo);
+                $item->max_bandwidth_in = wmInterpretNumberWithMetricPrefix($item->max_bandwidth_in_cfg, $this->kilo);
+                $item->max_bandwidth_out = wmInterpretNumberWithMetricPrefix($item->max_bandwidth_out_cfg, $this->kilo);
             } else {
                 wm_warn("Internal bug - found an item of type: " . $item->my_type() . "\n");
             }
@@ -1140,15 +1139,15 @@ class WeatherMap extends WeatherMapBase
                                 $newpos_x = $rx + $distance * sin(deg2rad($angle));
                                 $newpos_y = $ry - $distance * cos(deg2rad($angle));
                                 wm_debug("->$newpos_x,$newpos_y\n");
-                                $this->nodes[$node->name]->x = $newpos_x;
-                                $this->nodes[$node->name]->y = $newpos_y;
-                                $this->nodes[$node->name]->relative_resolved = true;
+                                $node->x = $newpos_x;
+                                $node->y = $newpos_y;
+                                $node->relative_resolved = true;
                                 $set++;
                             } elseif ($node->pos_named) {
                                 $off_name = $node->relative_name;
                                 if (isset($this->nodes[$node->relative_to]->named_offsets[$off_name])) {
-                                    $this->nodes[$node->name]->x = $rx + $this->nodes[$node->relative_to]->named_offsets[$off_name][0];
-                                    $this->nodes[$node->name]->y = $ry + $this->nodes[$node->relative_to]->named_offsets[$off_name][1];
+                                    $node->x = $rx + $this->nodes[$node->relative_to]->named_offsets[$off_name][0];
+                                    $node->y = $ry + $this->nodes[$node->relative_to]->named_offsets[$off_name][1];
                                 } else {
                                     $skipped++;
                                 }
@@ -1156,12 +1155,12 @@ class WeatherMap extends WeatherMapBase
                                 // save the relative coords, so that WriteConfig can work
                                 // resolve the relative stuff
 
-                                $newpos_x = $rx + $this->nodes[$node->name]->x;
-                                $newpos_y = $ry + $this->nodes[$node->name]->y;
+                                $newpos_x = $rx + $node->x;
+                                $newpos_y = $ry + $node->y;
                                 wm_debug("->$newpos_x,$newpos_y\n");
-                                $this->nodes[$node->name]->x = $newpos_x;
-                                $this->nodes[$node->name]->y = $newpos_y;
-                                $this->nodes[$node->name]->relative_resolved = true;
+                                $node->x = $newpos_x;
+                                $node->y = $newpos_y;
+                                $node->relative_resolved = true;
                                 $set++;
                             }
                         }

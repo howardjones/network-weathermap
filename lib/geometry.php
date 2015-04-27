@@ -148,6 +148,24 @@ class WMPoint
     {
         return sprintf("(%f,%f)", $this->x, $this->y);
     }
+
+    public function translate($deltaX, $deltaY)
+    {
+        $this->x += $deltaX;
+        $this->y += $deltaY;
+
+        return $this;
+    }
+
+    public function translatePolar($angle, $distance)
+    {
+        $radiansAngle = deg2rad($angle);
+
+        $this->x += $distance * sin($radiansAngle);
+        $this->y += -$distance * cos($radiansAngle);
+
+        return $this;
+    }
 }
 
 /**

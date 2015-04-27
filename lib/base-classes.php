@@ -15,6 +15,8 @@ class WMException extends Exception
     
 class WeatherMapBase
 {
+    public $name;
+
     protected $notes = array();
     protected $hints = array();
     protected $imap_areas = array();
@@ -27,6 +29,11 @@ class WeatherMapBase
     {
         $this->config = array();
         $this->descendents = array();
+    }
+
+    function __toString()
+    {
+        return $this->my_type() . " " . (isset($this->name) ? $this->name : "[unnamed]");
     }
 
     public function my_type()
@@ -183,12 +190,12 @@ class WeatherMapBase
     {
         $notified = array();
         $notified []= $this->name;
-        wm_debug("Recalculating %s %s\n", $this->my_type(), $this->name);
+        wm_debug("Recalculating %s\n", $this);
         $this->preCalculate();
 
         foreach ($this->descendents as $child) {
-            wm_debug("  %s notifying %s\n", $this->name, $child->name);
-            $new_notified = $child->recalculate();
+            wm_debug("  %s notifying %s\n", $this, $child);
+            $new_notified = $child->preCalculate();
             foreach ($new_notified as $n) {
                 $notified []= $n;
             }

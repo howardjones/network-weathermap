@@ -107,7 +107,7 @@ class WMTarget
         list($in, $out, $datatime) = $this->pluginObject->ReadData($this->finalTargetString, $map, $mapItem);
 
         if ($in === null && $out === null) {
-            wm_warn(sprintf("ReadData: %s %s, target: %s had no valid data, according to %s [WMWARN70]\n", $mapItem->my_type(), $mapItem->name, $this->finalTargetString, $this->pluginName));
+            wm_warn(sprintf("ReadData: %s, target: %s had no valid data, according to %s [WMWARN70]\n", $mapItem, $this->finalTargetString, $this->pluginName));
             return;
         }
 

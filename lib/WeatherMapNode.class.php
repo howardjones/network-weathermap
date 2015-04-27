@@ -6,7 +6,6 @@
 
 class WeatherMapNode extends WeatherMapItem
 {
-//    var $owner;
     var $id;
     var $x, $y;
     var $original_x, $original_y, $relative_resolved;
@@ -22,14 +21,8 @@ class WeatherMapNode extends WeatherMapItem
     var $absoluteValues = array();
     var $maxValues = array();
 
-    // var $notes; // for internal 'notes' between plugins
     var $colours = array(); // SCALE colours
 
-//    var $infourl = array();
-//    var $overliburl = array();
-//    var $overlibwidth;
-//    var $overlibheight;
-//    var $overlibcaption = array();
     var $notestext = array();
 
     var $selected = 0;
@@ -40,8 +33,6 @@ class WeatherMapNode extends WeatherMapItem
     var $max_bandwidth_in, $max_bandwidth_out;
     var $max_bandwidth_in_cfg, $max_bandwidth_out_cfg;
     var $labeloffset, $labeloffsetx, $labeloffsety;
-
-//    var $inherit_fieldlist;
 
     var $labelbgcolour;
     var $labeloutlinecolour;
@@ -64,9 +55,7 @@ class WeatherMapNode extends WeatherMapItem
     var $boundingboxes = array();
     var $named_offsets = array();
 
-//    var $config = array();
     var $runtime = array();
-//    var $descendents = array();
 
     function __construct()
     {
@@ -337,8 +326,8 @@ class WeatherMapNode extends WeatherMapItem
                     $txt_y = $this->y - ($strheight / 2);
                 }
             }
-            $map->nodes[$this->name]->width = $boxWidth;
-            $map->nodes[$this->name]->height = $boxHeight;
+            $this->width = $boxWidth;
+            $this->height = $boxHeight;
         }
 
         // figure out a bounding rectangle for the icon
@@ -555,10 +544,10 @@ class WeatherMapNode extends WeatherMapItem
                 $icon_x2 = $this->x + $icon_w / 2;
                 $icon_y2 = $this->y + $icon_h / 2;
 
-                $map->nodes[$this->name]->width = imagesx($icon_im);
-                $map->nodes[$this->name]->height = imagesy($icon_im);
+                $this->width = imagesx($icon_im);
+                $this->height = imagesy($icon_im);
 
-                $map->nodes[$this->name]->boundingboxes[] = array($icon_x1, $icon_y1, $icon_x2, $icon_y2);
+                $this->boundingboxes[] = array($icon_x1, $icon_y1, $icon_x2, $icon_y2);
             }
         }
 
@@ -582,7 +571,7 @@ class WeatherMapNode extends WeatherMapItem
         $label_y2 += ($this->labeloffsety + $dy);
 
         if ($this->label != '') {
-            $map->nodes[$this->name]->boundingboxes[] = array($label_x1, $label_y1, $label_x2, $label_y2);
+            $this->boundingboxes[] = array($label_x1, $label_y1, $label_x2, $label_y2);
         }
 
         // work out the bounding box of the whole thing
@@ -638,13 +627,13 @@ class WeatherMapNode extends WeatherMapItem
                 // would be nice if it was thicker, too...
                 imagerectangle($node_im, $label_x1 + 1, $label_y1 + 1, $label_x2 - 1, $label_y2 - 1, $map->selected);
             } else {
-                $label_outline_colour = $this->labeloutlinecolour;
+                // $label_outline_colour = $this->labeloutlinecolour;
                 if ($this->labeloutlinecolour->isRealColour()) {
                     imagerectangle($node_im, $label_x1, $label_y1, $label_x2, $label_y2, $this->labeloutlinecolour->gdallocate($node_im));
                 }
             }
 
-            $shcol = $this->labelfontshadowcolour;
+           // $shcol = $this->labelfontshadowcolour;
             if ($this->labelfontshadowcolour->isRealColour()) {
                 $map->myimagestring(
                     $node_im,
@@ -678,10 +667,10 @@ class WeatherMapNode extends WeatherMapItem
             );
         }
 
-        $map->nodes[$this->name]->centre_x = $this->x - $bbox_x1;
-        $map->nodes[$this->name]->centre_y = $this->y - $bbox_y1;
+        $this->centre_x = $this->x - $bbox_x1;
+        $this->centre_y = $this->y - $bbox_y1;
 
-        $map->nodes[$this->name]->image = $node_im;
+        $this->image = $node_im;
     }
 
     // draw the node, using the pre_render() output
@@ -964,7 +953,7 @@ class WeatherMapNode extends WeatherMapItem
 
     public function getValue($name)
     {
-        wm_debug("Fetching %s\n", $name);
+        wm_debug("Fetching %s from %s\n", $name, $this);
         if (property_exists($this, $name)) {
             return $this->$name;
         }

@@ -104,7 +104,7 @@ class WMTarget
             wm_debug("Will multiply result by %f\n", $this->scaleFactor);
         }
 
-        list($in, $out, $datatime) = $this->pluginObject->ReadData($this->finalTargetString, $map, $mapItem);
+        list($in, $out, $dataTime) = $this->pluginObject->ReadData($this->finalTargetString, $map, $mapItem);
 
         if ($in === null && $out === null) {
             wm_warn(sprintf("ReadData: %s, target: %s had no valid data, according to %s [WMWARN70]\n", $mapItem, $this->finalTargetString, $this->pluginName));
@@ -118,7 +118,7 @@ class WMTarget
 
         $this->values[IN] = $in;
         $this->values[OUT] = $out;
-        $this->timestamp = $datatime;
+        $this->timestamp = $dataTime;
         $this->dataValid = true;
     }
 

@@ -604,34 +604,29 @@ class WeatherMap extends WeatherMapBase
                 continue;
             }
 
-            foreach ($oneMapItem->targets as $target) {
-                wm_debug("ProcessTargets: New Target: $target\n");
-
-                $target->preProcess($oneMapItem, $this);
-                $matchedBy = $target->findHandlingPlugin($this->plugins['data']);
-
-                if ($matchedBy != "") {
-                    if ($this->plugins['data'][$matchedBy]['active']) {
-                        $target->registerWithPlugin($this, $oneMapItem);
-                    } else {
-                        wm_warn(sprintf(
-                            "ProcessTargets: %s, target: %s was recognised as a valid TARGET by a plugin that is unable to run (%s) [WMWARN07]\n",
-                            $oneMapItem,
-                            $target,
-                            $matchedBy
-                        ));
-                    }
-                }
-
-                if ($matchedBy == "") {
-                    wm_warn(sprintf(
-                        "ProcessTargets: %s, target: %s was not recognised as a valid TARGET [WMWARN08]\n",
-                        $oneMapItem,
-                        $target
-                    ));
-                }
-            }
+            $oneMapItem->prepareForDataCollection();
         }
+    }
+
+    /**
+     * Keep track of the current minimum and maximum timestamp for collected data
+     *
+     * @param $dataTime
+     */
+    public function registerDataTime($dataTime)
+    {
+        if ($dataTime==0) {
+            return;
+        }
+
+        if ($this->max_data_time == null || $dataTime > $this->max_data_time) {
+            $this->max_data_time = $dataTime;
+        }
+
+        if ($this->min_data_time == null || $dataTime < $this->min_data_time) {
+            $this->min_data_time = $dataTime;
+        }
+        wm_debug("Current DataTime MINMAX: " . $this->min_data_time . " -> " . $this->max_data_time . "\n");
     }
 
     private function readDataFromTargets($itemList)
@@ -641,143 +636,24 @@ class WeatherMap extends WeatherMapBase
 
         $channels = array(IN,OUT);
 
+        $totals = array();
+        foreach ($channels as $channel) {
+            $totals[$channel] = 0;
+        }
+
         foreach ($itemList as $mapItem) {
-//            $type = $mapItem->my_type();
-//            $name = $mapItem->name;
-
-            $totals = array();
-            foreach ($channels as $channel) {
-                $totals[$channel] = 0;
-            }
-            $datatime = 0;
-
-            wm_debug("-------------------------------------------------------------\n");
-            wm_debug("ReadData for $mapItem: \n");
 
             if ($mapItem->isTemplate()) {
                 wm_debug("ReadData: Skipping $mapItem that looks like a template\n.");
                 continue;
             }
 
-            $nTargets = count($mapItem->targets);
-
-            foreach ($mapItem->targets as $target) {
-                wm_debug("ReadData: New Target: $target\n");
-                $target->readData($this, $mapItem);
-
-                if ($target->hasValidData()) {
-                    $results = $target->getData();
-                    $datatime = array_shift($results);
-
-                    foreach ($channels as $channel) {
-                        wm_debug("Adding %f to total for channel %d\n", $results[$channel], $channel);
-                        $totals[$channel] += $results[$channel];
-                    }
-                    wm_debug("Running totals: %s\n", join(" ", $totals));
-                } else {
-                    wm_debug("Invalid data?\n");
-                }
-
-                // This was the only target, and it's failed
-                if (!$target->hasValidData() && $nTargets == 1) {
-                    // this is to allow null to be passed through from DS plugins in the case of a single target
-                    // we've never defined what x + null is, so we'll treat that as a 0
-
-                    foreach ($channels as $channel) {
-                        $totals[$channel] = null;
-                    }
-                }
-
-                # keep a track of the range of dates for data sources (mainly for MRTG/textfile based DS)
-                if ($datatime > 0) {
-                    if ($this->max_data_time == null || $datatime > $this->max_data_time) {
-                        $this->max_data_time = $datatime;
-                    }
-                    if ($this->min_data_time == null || $datatime < $this->min_data_time) {
-                        $this->min_data_time = $datatime;
-                    }
-
-                    wm_debug("DataTime MINMAX: " . $this->min_data_time . " -> " . $this->max_data_time . "\n");
-                }
-            }
-
-            wm_debug("ReadData complete for %s: %s\n", $mapItem, join(" ", $totals));
+            $mapItem->performDataCollection();
 
             // NOTE - this part still happens even if there were no targets
+            $mapItem->aggregateDataResults();
+            $mapItem->calculateScaleColours();
 
-            // bodge for now: TODO these should be set in Reset() and readConfig()
-            $mapItem->maxValues[IN] = $mapItem->max_bandwidth_in;
-            $mapItem->maxValues[OUT] = $mapItem->max_bandwidth_out;
-
-            $mapItem->bandwidth_in = $totals[IN];
-            $mapItem->bandwidth_out = $totals[OUT];
-            // TODO this should replace the above 2 lines
-            // TODO it should also be in some superclass of Node and Link
-            foreach ($channels as $channel) {
-                $mapItem->absoluteUsages[$channel] = $totals[$channel];
-                $mapItem->percentUsages[$channel] = ($totals[$channel] / $mapItem->maxValues[$channel]) * 100;
-            }
-            $mapItem->outpercent = (($totals[OUT]) / ($mapItem->max_bandwidth_out)) * 100;
-            $mapItem->inpercent = (($totals[IN]) / ($mapItem->max_bandwidth_in)) * 100;
-
-            if ($mapItem->my_type() == 'LINK' && $mapItem->duplex == 'half') {
-                // in a half duplex link, in and out share a common bandwidth pool, so percentages need to include both
-                wm_debug("Calculating percentage using half-duplex\n");
-                $mapItem->outpercent = (($totals[IN] + $totals[OUT]) / ($mapItem->max_bandwidth_out)) * 100;
-                $mapItem->inpercent = (($totals[IN] + $totals[OUT]) / ($mapItem->max_bandwidth_in)) * 100;
-
-                if ($mapItem->max_bandwidth_out != $mapItem->max_bandwidth_in) {
-                    wm_warn("ReadData: $mapItem: You're using asymmetric bandwidth AND half-duplex in the same link. That makes no sense. [WMWARN44]\n");
-                }
-            }
-
-            $warn_in = true;
-            $warn_out = true;
-
-            // Nodes only use one channel, so don't warn for the unused channel
-            if ($mapItem->my_type() == 'NODE') {
-                if ($mapItem->scalevar == 'in') {
-                    $warn_out = false;
-                }
-                if ($mapItem->scalevar == 'out') {
-                    $warn_in = false;
-                }
-            }
-
-            if ($mapItem->scaletype == 'percent') {
-                list($incol, $inscalekey, $inscaletag) = $this->scales[$mapItem->usescale]->colourFromValue($mapItem->inpercent, $mapItem->name, true, $warn_in);
-                list($outcol, $outscalekey, $outscaletag) = $this->scales[$mapItem->usescale]->colourFromValue($mapItem->outpercent, $mapItem->name, true, $warn_out);
-
-                foreach ($channels as $channel) {
-                    list($col, $scalekey, $scaletag) = $this->scales[$mapItem->usescale]->colourFromValue($mapItem->percentUsages[$channel], $mapItem->name, true, $warn_out);
-                    $mapItem->channelScaleColours[$channel] = $col;
-                    $mapItem->colours[$channel] = $col;
-                }
-            } else {
-                // use absolute values, if that's what is requested
-                list($incol, $inscalekey, $inscaletag) = $this->scales[$mapItem->usescale]->colourFromValue($mapItem->bandwidth_in, $mapItem->name, false, $warn_in);
-                list($outcol, $outscalekey, $outscaletag) = $this->scales[$mapItem->usescale]->colourFromValue($mapItem->bandwidth_out, $mapItem->name, false, $warn_out);
-
-                foreach ($channels as $channel) {
-                    list($col, $scalekey, $scaletag) = $this->scales[$mapItem->usescale]->colourFromValue($mapItem->absoluteUsages[$channel], $mapItem->name, false, $warn_out);
-                    $mapItem->channelScaleColours[$channel] = $col;
-                    $mapItem->colours[$channel] = $col;
-                }
-            }
-
-            $mapItem->add_note("inscalekey", $inscalekey);
-            $mapItem->add_note("outscalekey", $outscalekey);
-
-            $mapItem->add_note("inscaletag", $inscaletag);
-            $mapItem->add_note("outscaletag", $outscaletag);
-
-            $mapItem->add_note("inscalecolor", $incol->asHTML());
-            $mapItem->add_note("outscalecolor", $outcol->asHTML());
-
-            $mapItem->colours[IN] = $incol;
-            $mapItem->colours[OUT] = $outcol;
-
-            wm_debug("ReadData: Setting %s,%s for %s\n", wm_value_or_null($totals[IN]), wm_value_or_null($totals[OUT]), $mapItem);
             unset($mapItem);
         }
     }
@@ -1143,6 +1019,7 @@ class WeatherMap extends WeatherMapBase
                     }
 
                     $anchorNode = $this->nodes[$anchorName];
+                    wm_debug("Found anchor node: $anchorNode\n");
 
                     // check if we are relative to another node which is in turn relative to something
                     // we need to resolve that one before we can resolve this one!
@@ -1152,7 +1029,7 @@ class WeatherMap extends WeatherMapBase
                         continue;
                     }
 
-                    $result = $node->resolveRelativePosition($anchorNode->getPosition());
+                    $result = $node->resolveRelativePosition($anchorNode);
 
                     if ($result) {
                         $changeCount++;

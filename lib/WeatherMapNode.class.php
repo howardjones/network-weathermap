@@ -691,8 +691,10 @@ class WeatherMapNode extends WeatherMapDataItem
         return $this->relative_to;
     }
 
-    function resolveRelativePosition($anchorPosition)
+    function resolveRelativePosition($anchorNode)
     {
+        $anchorPosition = $anchorNode->getPosition();
+
         if ($this->polar) {
             // treat this one as a POLAR relative coordinate.
             // - draw rings around a node!
@@ -701,7 +703,7 @@ class WeatherMapNode extends WeatherMapDataItem
 
             $now = $anchorPosition->copy();
             $now->translatePolar($angle, $distance);
-            wm_debug("$this -> $now\n");
+            wm_debug("POLAR $this -> $now\n");
             $this->setPosition($now);
             $this->relative_resolved = true;
             return true;
@@ -709,18 +711,19 @@ class WeatherMapNode extends WeatherMapDataItem
 
         if ($this->pos_named) {
             $off_name = $this->relative_name;
-            if (isset($this->nodes[$this->relative_to]->named_offsets[$off_name])) {
+            if (isset($anchorNode->named_offsets[$off_name])) {
 
                 $now = $anchorPosition->copy();
                 $now->translate(
-                    $this->nodes[$this->relative_to]->named_offsets[$off_name][0],
-                    $this->nodes[$this->relative_to]->named_offsets[$off_name][1]
+                    $anchorNode->named_offsets[$off_name][0],
+                    $anchorNode->named_offsets[$off_name][1]
                 );
-                wm_debug("$this -> $now\n");
+                wm_debug("NAMED OFFSET $this -> $now\n");
                 $this->setPosition($now);
                 $this->relative_resolved = true;
                 return true;
             }
+            wm_debug("Fell through named offset.\n");
             return false;
         }
 
@@ -728,7 +731,7 @@ class WeatherMapNode extends WeatherMapDataItem
         $now = $this->getPosition();
         $now->translate($anchorPosition->x, $anchorPosition->y);
 
-        wm_debug("$this -> $now\n");
+        wm_debug("OFFSET $this -> $now\n");
         $this->setPosition($now);
         $this->relative_resolved = true;
 

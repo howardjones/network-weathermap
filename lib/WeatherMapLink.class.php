@@ -516,14 +516,17 @@ class WeatherMapLink extends WeatherMapDataItem
         $areaName = "LINK:L" . $this->id . ':' . ($direction + 2);
 
         // the rectangle is about half the size in the HTML, and easier to optimise/detect in the browser
-        if ($angle == 0) {
-            // TODO: We can also optimise for 90, 180, 270 degrees
-            $newArea = new HTML_ImageMap_Area_Rectangle($areaName, "", array(array($topleft_x, $topleft_y, $botright_x, $botright_y)));
-            // $this->owner->imap->addArea("Rectangle", $areaname, '', array($topleft_x, $topleft_y, $botright_x, $botright_y));
+        if ( ($angle % 90) == 0) {
+            // We optimise for 0, 90, 180, 270 degrees - find the rectangle from the rotated points
+            $rectanglePoints = array();
+            $rectanglePoints[] = min($points[0], $points[2]);
+            $rectanglePoints[] = min($points[1], $points[3]);
+            $rectanglePoints[] = max($points[0], $points[2]);
+            $rectanglePoints[] = max($points[1], $points[3]);
+            $newArea = new HTML_ImageMap_Area_Rectangle($areaName, "", array($rectanglePoints));
             wm_debug("Adding Rectangle imagemap for $areaName\n");
         } else {
             $newArea = new HTML_ImageMap_Area_Polygon($areaName, "", array($points));
-            // $this->owner->imap->addArea("Polygon", $areaname, '', $points);
             wm_debug("Adding Poly imagemap for $areaName\n");
         }
         // Make a note that we added this area

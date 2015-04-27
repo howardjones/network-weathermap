@@ -12,7 +12,7 @@ class WeatherMapEditorTest extends PHPUnit_Framework_TestCase {
 
     protected static $previouswd;
 
-    function testNodeAdd()
+    public function testNodeAdd()
     {
         $editor = new WeatherMapEditor();
         $editor->newConfig();
@@ -24,11 +24,11 @@ class WeatherMapEditorTest extends PHPUnit_Framework_TestCase {
         $c = $editor->getConfig();
 
         $fh = fopen(self::$result1dir.DIRECTORY_SEPARATOR."editortest-add.conf", "w");
-        fputs($fh,$c);
+        fputs($fh, $c);
         fclose($fh);
     }
 
-    function testNodeClone()
+    public function testNodeClone()
     {
         $editor = new WeatherMapEditor();
         $editor->newConfig();
@@ -43,11 +43,11 @@ class WeatherMapEditorTest extends PHPUnit_Framework_TestCase {
         $c = $editor->getConfig();
 
         $fh = fopen(self::$result1dir.DIRECTORY_SEPARATOR."editortest-clone.conf", "w");
-        fputs($fh,$c);
+        fputs($fh, $c);
         fclose($fh);
     }
 
-    function setUp()
+    public function setUp()
     {
         self::$previouswd = getcwd();
         chdir(dirname(__FILE__).DIRECTORY_SEPARATOR."../..");

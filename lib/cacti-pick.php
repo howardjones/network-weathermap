@@ -137,6 +137,7 @@ function link_pick_step2($local_data_id)
 
     $graph_id = cactiGraphFromDSID($local_data_id);
 
+    // TODO: this should be a 3rd template.
     ?>
     <html><head>
         <script type="text/javascript" src="vendor/jquery/dist/jquery.min.js" ></script>

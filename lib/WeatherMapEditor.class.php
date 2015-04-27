@@ -92,7 +92,7 @@ class WeatherMapEditor
 
             $node->reset($this->map);
 
-            $node->setPosition($x, $y);
+            $node->setPosition(new WMPoint($x, $y));
             $node->setDefined($this->map->configfile);
 
             // needs to know if zlayer exists.
@@ -308,8 +308,9 @@ class WeatherMapEditor
             $node->template = $this->map->nodes[$sourcename]->template;
 
             $node->name = $newnodename;
-            list($x, $y) = $node->getPosition();
-            $node->setPosition($x + 30, $y + 30);
+            $now = $node->getPosition();
+            $now->translate(30, 30);
+            $node->setPosition($now);
             $node->setDefined($this->map->configfile);
 
             $this->map->nodes[$newnodename] = $node;

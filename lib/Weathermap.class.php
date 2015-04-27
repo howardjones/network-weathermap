@@ -1113,6 +1113,11 @@ class WeatherMap extends WeatherMapBase
         wm_debug("Finished $stage-processing plugins...\n");
     }
 
+    private function nodeExists($nodeName)
+    {
+        return array_key_exists($nodeName, $this->nodes);
+    }
+
     private function resolveRelativePositions()
     {
         // calculate any relative positions here - that way, nothing else
@@ -1120,64 +1125,43 @@ class WeatherMap extends WeatherMapBase
 
         wm_debug("Resolving relative positions for NODEs...\n");
         // safety net for cyclic dependencies
-        $i = 100;
+        $iterations = 100;
         do {
             $skipped = 0;
-            $set = 0;
+            $changeCount = 0;
+
             foreach ($this->nodes as $node) {
-                if (($node->relative_to != '') && (!$node->relative_resolved)) {
-                    wm_debug("Resolving relative position for NODE " . $node->name . " to " . $node->relative_to . "\n");
-                    if (array_key_exists($node->relative_to, $this->nodes)) {
-                        // check if we are relative to another node which is in turn relative to something
-                        // we need to resolve that one before we can resolve this one!
-                        if (($this->nodes[$node->relative_to]->relative_to != '') && (!$this->nodes[$node->relative_to]->relative_resolved)) {
-                            wm_debug("Skipping unresolved relative_to. Let's hope it's not a circular one\n");
-                            $skipped++;
-                        } else {
-                            $rx = $this->nodes[$node->relative_to]->x;
-                            $ry = $this->nodes[$node->relative_to]->y;
+                if (($node->isRelativePositioned()) && (!$node->isRelativePositionResolved())) {
 
-                            if ($node->polar) {
-                                // treat this one as a POLAR relative coordinate.
-                                // - draw rings around a node!
-                                $angle = $node->x;
-                                $distance = $node->y;
-                                $newpos_x = $rx + $distance * sin(deg2rad($angle));
-                                $newpos_y = $ry - $distance * cos(deg2rad($angle));
-                                wm_debug("->$newpos_x,$newpos_y\n");
-                                $node->x = $newpos_x;
-                                $node->y = $newpos_y;
-                                $node->relative_resolved = true;
-                                $set++;
-                            } elseif ($node->pos_named) {
-                                $off_name = $node->relative_name;
-                                if (isset($this->nodes[$node->relative_to]->named_offsets[$off_name])) {
-                                    $node->x = $rx + $this->nodes[$node->relative_to]->named_offsets[$off_name][0];
-                                    $node->y = $ry + $this->nodes[$node->relative_to]->named_offsets[$off_name][1];
-                                } else {
-                                    $skipped++;
-                                }
-                            } else {
-                                // save the relative coords, so that WriteConfig can work
-                                // resolve the relative stuff
+                    $anchorName = $node->getRelativeAnchor();
 
-                                $newpos_x = $rx + $node->x;
-                                $newpos_y = $ry + $node->y;
-                                wm_debug("->$newpos_x,$newpos_y\n");
-                                $node->x = $newpos_x;
-                                $node->y = $newpos_y;
-                                $node->relative_resolved = true;
-                                $set++;
-                            }
-                        }
-                    } else {
-                        wm_warn("NODE " . $node->name . " has a relative position to an unknown node (" . $node->relative_to . ")! [WMWARN10]\n");
+                    wm_debug("Resolving relative position for $node to $anchorName\n");
+
+                    if (! $this->nodeExists($node->relative_to)) {
+                        wm_warn("NODE " . $node->name . " has a relative position to an unknown node ($anchorName)! [WMWARN10]\n");
+                        continue;
+                    }
+
+                    $anchorNode = $this->nodes[$anchorName];
+
+                    // check if we are relative to another node which is in turn relative to something
+                    // we need to resolve that one before we can resolve this one!
+                    if (($anchorNode->isRelativePositioned()) && (!$anchorNode->isRelativePositionResolved())) {
+                        wm_debug("Skipping unresolved relative_to. Let's hope it's not a circular one\n");
+                        $skipped++;
+                        continue;
+                    }
+
+                    $result = $node->resolveRelativePosition($anchorNode->getPosition());
+
+                    if ($result) {
+                        $changeCount++;
                     }
                 }
             }
-            wm_debug("Relative Positions Cycle $i - set $set and Skipped $skipped for unresolved dependencies\n");
-            $i--;
-        } while (($set > 0) && ($i != 0));
+            wm_debug("Relative Positions Cycle $iterations - set $changeCount and Skipped $skipped for unresolved dependencies\n");
+            $iterations--;
+        } while (($changeCount > 0) && ($iterations > 0));
 
         if ($skipped > 0) {
             wm_warn("There are Circular dependencies in relative POSITION lines for $skipped nodes. [WMWARN11]\n");
@@ -1190,22 +1174,22 @@ class WeatherMap extends WeatherMapBase
     function writeDataFile($filename)
     {
         if ($filename != "") {
-            $fd = fopen($filename, 'w');
+            $fileHandle = fopen($filename, 'w');
 
-            if ($fd) {
+            if ($fileHandle) {
                 foreach ($this->nodes as $node) {
                     if (!preg_match("/^::\s/", $node->name) && sizeof($node->targets) > 0) {
-                        fputs($fd, sprintf("N_%s\t%f\t%f\r\n", $node->name, $node->bandwidth_in, $node->bandwidth_out));
+                        fputs($fileHandle, sprintf("N_%s\t%f\t%f\r\n", $node->name, $node->bandwidth_in, $node->bandwidth_out));
                     }
                 }
 
                 foreach ($this->links as $link) {
                     if (!preg_match("/^::\s/", $link->name) && sizeof($link->targets) > 0) {
-                        fputs($fd, sprintf("L_%s\t%f\t%f\r\n", $link->name, $link->bandwidth_in, $link->bandwidth_out));
+                        fputs($fileHandle, sprintf("L_%s\t%f\t%f\r\n", $link->name, $link->bandwidth_in, $link->bandwidth_out));
                     }
                 }
 
-                fclose($fd);
+                fclose($fileHandle);
             }
         }
     }
@@ -1697,21 +1681,20 @@ class WeatherMap extends WeatherMapBase
 
             $overlibhtml = "onmouseover=\"return overlib('";
 
-            $n = 0;
+            $index = 0;
             if (sizeof($mapItem->overliburl[$dir]) > 0) {
-                // print "ARRAY:".is_array($link->overliburl[$dir])."\n";
                 foreach ($mapItem->overliburl[$dir] as $url) {
-                    if ($n>0) {
+                    if ($index>0) {
                         $overlibhtml .= '&lt;br /&gt;';
                     }
                     $overlibhtml .= "&lt;img $img_extra src=" . $this->processString($url, $mapItem) . "&gt;";
-                    $n++;
+                    $index++;
                 }
             }
 
             if (trim($mapItem->notestext[$dir]) != '') {
                 # put in a linebreak if there was an image AND notes
-                if ($n>0) {
+                if ($index>0) {
                     $overlibhtml .= '&lt;br /&gt;';
                 }
                 $note = $this->processString($mapItem->notestext[$dir], $mapItem);

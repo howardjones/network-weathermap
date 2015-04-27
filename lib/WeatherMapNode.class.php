@@ -8,6 +8,7 @@ class WeatherMapNode extends WeatherMapDataItem
 {
     var $id;
     var $x, $y;
+    var $position; // to replace the above eventually
     var $original_x, $original_y, $relative_resolved;
     var $width;
     var $height;
@@ -125,13 +126,14 @@ class WeatherMapNode extends WeatherMapDataItem
 
     public function getPosition()
     {
-        return array($this->x, $this->y);
+        return new WMPoint($this->x, $this->y);
     }
 
-    public function setPosition($x, $y)
+    public function setPosition($point)
     {
-        $this->x = $x;
-        $this->y = $y;
+        $this->x = $point->x;
+        $this->y = $point->y;
+        $this->position = $point;
     }
 
     public function cleanUp()
@@ -180,7 +182,8 @@ class WeatherMapNode extends WeatherMapDataItem
         // Finally, the colours
     }
 
-    function colourizeImage($imageRef, $tintColour) {
+    function colourizeImage($imageRef, $tintColour)
+    {
 
         list ($red, $green, $blue) = $tintColour->getComponents();
 
@@ -376,9 +379,9 @@ class WeatherMapNode extends WeatherMapDataItem
                     }
 
                     if ($this->iconscaletype == 'percent') {
-                         list($fill, ,) = $map->scales[$this->useiconscale]->ColourFromValue($pc, $this->name);
+                        list($fill, ,) = $map->scales[$this->useiconscale]->ColourFromValue($pc, $this->name);
                     } else {
-                         // use the absolute value if we aren't doing percentage scales.
+                        // use the absolute value if we aren't doing percentage scales.
                         list($fill, ,) = $map->scales[$this->useiconscale]->ColourFromValue($pc, $this->name, false);
                     }
                 }
@@ -630,7 +633,7 @@ class WeatherMapNode extends WeatherMapDataItem
                 }
             }
 
-           // $shcol = $this->labelfontshadowcolour;
+            // $shcol = $this->labelfontshadowcolour;
             if ($this->labelfontshadowcolour->isRealColour()) {
                 $map->myimagestring(
                     $node_im,
@@ -668,6 +671,68 @@ class WeatherMapNode extends WeatherMapDataItem
         $this->centre_y = $this->y - $bbox_y1;
 
         $this->image = $node_im;
+    }
+
+    function isRelativePositionResolved()
+    {
+        return $this->relative_resolved;
+    }
+
+    function isRelativePositioned()
+    {
+        if ($this->relative_to != "") {
+            return true;
+        }
+        return false;
+    }
+
+    function getRelativeAnchor()
+    {
+        return $this->relative_to;
+    }
+
+    function resolveRelativePosition($anchorPosition)
+    {
+        if ($this->polar) {
+            // treat this one as a POLAR relative coordinate.
+            // - draw rings around a node!
+            $angle = $this->x;
+            $distance = $this->y;
+
+            $now = $anchorPosition->copy();
+            $now->translatePolar($angle, $distance);
+            wm_debug("$this -> $now\n");
+            $this->setPosition($now);
+            $this->relative_resolved = true;
+            return true;
+        }
+
+        if ($this->pos_named) {
+            $off_name = $this->relative_name;
+            if (isset($this->nodes[$this->relative_to]->named_offsets[$off_name])) {
+
+                $now = $anchorPosition->copy();
+                $now->translate(
+                    $this->nodes[$this->relative_to]->named_offsets[$off_name][0],
+                    $this->nodes[$this->relative_to]->named_offsets[$off_name][1]
+                );
+                wm_debug("$this -> $now\n");
+                $this->setPosition($now);
+                $this->relative_resolved = true;
+                return true;
+            }
+            return false;
+        }
+
+        // resolve the relative stuff
+        $now = $this->getPosition();
+        $now->translate($anchorPosition->x, $anchorPosition->y);
+
+        wm_debug("$this -> $now\n");
+        $this->setPosition($now);
+        $this->relative_resolved = true;
+
+        return true;
     }
 
     // draw the node, using the pre_render() output

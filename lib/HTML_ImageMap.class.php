@@ -121,7 +121,7 @@ class HTML_ImageMap_Area_Polygon extends HTML_ImageMap_Area
         $this->npoints = count($c)/2;
 
         if (intval($this->npoints) != ($this->npoints)) {
-            die('Odd number of points in HTML_ImageMap_Area_Polygon!');
+            throw new Exception('Odd number of array elements ('.$this->npoints.') in HTML_ImageMap_Area_Polygon!');
         }
 
         for ($i=0; $i<count($c); $i+=2) {
@@ -148,8 +148,11 @@ class HTML_ImageMap_Area_Rectangle extends HTML_ImageMap_Area
 
     function HTML_ImageMap_Area_Rectangle($name = "", $href = "", $coords)
     {
-
         $c = $coords[0];
+
+        if ( count($c) != 4) {
+            throw new Exception('Incorrect number of array elements in HTML_ImageMap_Area_Rectangle!');
+        }
 
         $x1 = round($c[0]);
         $y1 = round($c[1]);
@@ -407,8 +410,6 @@ class HTML_ImageMap
     function subHTML($namefilter = "", $reverseorder = false, $skipnolinks = false)
     {
         $html = "";
-        # $l = strlen($namefilter);
-        # $preg = '/'.$namefilter.'/';
 
         foreach ($this->shapes as $shape) {
             # if ( ($namefilter == "") || ( preg_match($preg,$shape->name) ))

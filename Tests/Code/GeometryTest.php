@@ -14,6 +14,56 @@ class GeometryTest  extends PHPUnit_Framework_TestCase {
     {
     }
 
+    public function testTranslate()
+    {
+        $p1 = new WMPoint(20, 30);
+
+        $p1->translate(5, 6);
+        $this->assertTrue($p1->identical(new WMPoint(25, 36)));
+
+        $p2 = $p1->translate(-15, -16);
+        $this->assertInstanceOf("WMPoint", $p2);
+
+        $this->assertTrue($p1->identical(new WMPoint(10, 20)));
+        $this->assertTrue($p2->identical(new WMPoint(10, 20)));
+        $this->assertEquals($p1, $p2);
+
+        $p3 = $p1->translate(10, 0)->translate(0, 20);
+        $this->assertTrue($p3->identical(new WMPoint(20, 40)));
+    }
+
+    public function testTranslatePolar()
+    {
+        $p1 = new WMPoint(20, 30);
+
+        $p2 = $p1->translatePolar(0, 20);
+
+        $this->assertInstanceOf("WMPoint", $p2, "translatePolar() returns itself for chaining");
+        $this->assertEquals($p1, $p2);
+        $this->assertTrue($p1->closeEnough(new WMPoint(20, 10)), "The new point is 20 units up");
+        $this->assertTrue($p2->closeEnough(new WMPoint(20, 10)), "The new point is 20 units up");
+
+        $p1 = new WMPoint(20, 30);
+        $p1->translatePolar(180, 20);
+        $this->assertTrue($p1->closeEnough(new WMPoint(20, 50)), "The new point is 20 units down");
+
+        $p1 = new WMPoint(20, 30);
+        $p1->translatePolar(90, 20);
+        $this->assertTrue($p1->closeEnough(new WMPoint(40, 30)), "The new point is 20 units right");
+
+        $p1 = new WMPoint(20, 30);
+        $p1->translatePolar(270, 20);
+        $this->assertTrue($p1->closeEnough(new WMPoint(0, 30)), "The new point is 20 units left");
+
+        $p1 = new WMPoint(20, 30);
+        $p1->translatePolar(135, 20);
+        $this->assertTrue($p1->closeEnough(new WMPoint(34.142135, 44.142135)));
+
+        $p1 = new WMPoint(20, 30);
+        $p1->translatePolar(45, 20);
+        $this->assertTrue($p1->closeEnough(new WMPoint(34.142135, 15.85786)));
+    }
+
     public function testMisc()
     {
         $p1 = new WMPoint(0,0);

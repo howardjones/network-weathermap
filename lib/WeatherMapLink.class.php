@@ -4,56 +4,56 @@
 // http://www.network-weathermap.com/
 // Released under the GNU Public License
 
-class WeatherMapLink extends WeatherMapItem
+class WeatherMapLink extends WeatherMapDataItem
 {
 //    var $owner;
-    var $name;
-    var $id;
-    var $a,                    $b; // the ends - references to nodes
-    var $width,                $arrowstyle, $linkstyle;
-    var $bwfont,               $labelstyle, $labelboxstyle;
-    var $zorder;
-    var $bandwidth_in,         $bandwidth_out;
-    var $max_bandwidth_in,     $max_bandwidth_out;
-    var $max_bandwidth_in_cfg, $max_bandwidth_out_cfg;
-    var $targets = array();
+    public $name;
+    public $id;
 
-    public $percentUsages = array();
-    public $absoluteUsages = array();
-    public $maxValues = array();
-    public $maxValuesConfigured = array();
-    var $channelScaleColours = array();
+    public $width;
+    public $arrowstyle;
+    public $linkstyle;
+    public $bwfont;
+    public $labelstyle;
+    public $labelboxstyle;
 
-    var $a_offset,             $b_offset;
-    var $a_offset_dx,   $b_offset_dx;
-    var $a_offset_dy,   $b_offset_dy;
-    var $a_offset_resolved, $b_offset_resolved;
+    public $a;
+    public $b; // the ends - references to nodes
+    public $a_offset;
+    public $b_offset;
+    public $a_offset_dx;
+    public $b_offset_dx;
+    public $a_offset_dy;
+    public $b_offset_dy;
+    public $a_offset_resolved;
+    public $b_offset_resolved;
 
-    var $in_ds,                $out_ds;
+    public $in_ds;
+    public $out_ds;
 
-    var $colours = array();
-    var $inpercent,            $outpercent;
-    var $vialist = array();
-    var $viastyle;
-    var $usescale, $duplex;
-    var $scaletype; // absolute or percent
-    var $outlinecolour;
-    var $bwoutlinecolour;
-    var $bwboxcolour;
-    var $splitpos;
-    var $commentfont;
-    var $notestext = array();
-    var $inscalekey,$outscalekey;
-    var $inscaletag, $outscaletag;
-    var $commentfontcolour;
-    var $commentstyle;
-    var $bwfontcolour;
-    var $comments = array();
-    var $bwlabelformats = array();
-    var $labeloffset_in, $labeloffset_out;
-    var $commentoffset_in, $commentoffset_out;
-    var $template;
-    var $geometry;  // contains all the spine-related data (WMLinkGeometry)
+    public $colours = array();
+    public $vialist = array();
+    public $viastyle;
+    public $duplex;
+    public $outlinecolour;
+    public $bwoutlinecolour;
+    public $bwboxcolour;
+    public $splitpos;
+    public $commentfont;
+    public $notestext = array();
+    public $commentfontcolour;
+    public $commentstyle;
+    public $bwfontcolour;
+    public $comments = array();
+    public $bwlabelformats = array();
+
+    public $labeloffset_in;
+    public $labeloffset_out;
+    public $commentoffset_in;
+    public $commentoffset_out;
+
+    public $template;
+    public $geometry;  // contains all the spine-related data (WMLinkGeometry)
 
     function __construct()
     {
@@ -170,7 +170,7 @@ class WeatherMapLink extends WeatherMapItem
         }
     }
 
-    function getDirectionList()
+    private function getDirectionList()
     {
         if ($this->linkstyle == "oneway") {
             return array(OUT);
@@ -390,6 +390,28 @@ class WeatherMapLink extends WeatherMapItem
         } else {
             wm_debug("Skipping link with no geometry attached\n");
         }
+
+        $this->makeImageMapAreas();
+    }
+
+    private function makeImageMapAreas()
+    {
+        if (!isset($this->geometry)) {
+            return;
+        }
+
+        foreach ($this->getDirectionList() as $direction) {
+            $areaName = "LINK:L" . $this->id . ":$direction";
+
+            $polyPoints = $this->geometry->getDrawnPolygon($direction);
+
+            $newArea = new HTML_ImageMap_Area_Polygon($areaName, "", array($polyPoints));
+            $this->owner->imap->addArea($newArea);
+            wm_debug("Adding Poly imagemap for %s\n", $areaName);
+
+            $this->imap_areas[] = $areaName;
+            $this->imageMapAreas[] = $newArea;
+        }
     }
 
     function drawBandwidthLabels($gdImage)
@@ -455,7 +477,7 @@ class WeatherMapLink extends WeatherMapItem
         return $out;
     }
 
-    private function drawLabelRotated($im, $centre, $angle, $text, $padding, $direction)
+    private function drawLabelRotated($imageRef, $centre, $angle, $text, $padding, $direction)
     {
         $fontObject = $this->owner->fonts->getFont($this->bwfont);
         list($strWidth, $strHeight) = $fontObject->calculateImageStringSize($text);
@@ -478,29 +500,36 @@ class WeatherMapLink extends WeatherMapItem
             rotateAboutPoint($points, $centre->x, $centre->y, $radianAngle);
         }
 
+        $textY = array_pop($points);
+        $textX = array_pop($points);
+
         if ($this->bwboxcolour->isRealColour()) {
-            imagefilledpolygon($im, $points, 4, $this->bwboxcolour->gdAllocate($im));
+            imagefilledpolygon($imageRef, $points, 4, $this->bwboxcolour->gdAllocate($imageRef));
         }
 
         if ($this->bwoutlinecolour->isRealColour()) {
-            imagepolygon($im, $points, 4, $this->bwoutlinecolour->gdAllocate($im));
+            imagepolygon($imageRef, $points, 4, $this->bwoutlinecolour->gdAllocate($imageRef));
         }
 
-        $fontObject->drawImageString($im, $points[8], $points[9], $text, $this->bwfontcolour->gdallocate($im), $angle);
+        $fontObject->drawImageString($imageRef, $textX, $textY, $text, $this->bwfontcolour->gdallocate($imageRef), $angle);
 
-        $areaname = "LINK:L" . $this->id . ':' . ($direction + 2);
+        $areaName = "LINK:L" . $this->id . ':' . ($direction + 2);
 
         // the rectangle is about half the size in the HTML, and easier to optimise/detect in the browser
         if ($angle == 0) {
             // TODO: We can also optimise for 90, 180, 270 degrees
-            $this->owner->imap->addArea("Rectangle", $areaname, '', array($topleft_x, $topleft_y, $botright_x, $botright_y));
-            wm_debug("Adding Rectangle imagemap for $areaname\n");
+            $newArea = new HTML_ImageMap_Area_Rectangle($areaName, "", array(array($topleft_x, $topleft_y, $botright_x, $botright_y)));
+            // $this->owner->imap->addArea("Rectangle", $areaname, '', array($topleft_x, $topleft_y, $botright_x, $botright_y));
+            wm_debug("Adding Rectangle imagemap for $areaName\n");
         } else {
-            $this->owner->imap->addArea("Polygon", $areaname, '', $points);
-            wm_debug("Adding Poly imagemap for $areaname\n");
+            $newArea = new HTML_ImageMap_Area_Polygon($areaName, "", array($points));
+            // $this->owner->imap->addArea("Polygon", $areaname, '', $points);
+            wm_debug("Adding Poly imagemap for $areaName\n");
         }
         // Make a note that we added this area
-        $this->imap_areas[] = $areaname;
+        $this->imap_areas[] = $areaName;
+        $this->imageMapAreas[] = $newArea;
+        $this->owner->imap->addArea($newArea);
     }
 
 

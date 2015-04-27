@@ -211,21 +211,15 @@ class WeatherMapBase
     }
 }
 
-// The 'things on the map' class. More common code (mainly variables, actually)
+/**
+ * Class WeatherMapItem - anything drawn on the map inherits from this.
+ */
 class WeatherMapItem extends WeatherMapBase
 {
     // TODO - we should be able to make most of these protected
     public $owner;
-
     public $configline;
-    public $infourl;
-    public $overliburl;
-    public $overlibwidth;
-    public $overlibheight;
-    public $overlibcaption;
 
-//    public $descendents; # if I change, who could inherit that change?
-//    public $config;  # config set on this node specifically
     public $parent;
     public $my_default;
     public $defined_in;
@@ -233,6 +227,7 @@ class WeatherMapItem extends WeatherMapBase
 
     public $imageMapAreas;
     public $zIndex;
+    public $zorder;
 
     function __construct()
     {
@@ -242,8 +237,6 @@ class WeatherMapItem extends WeatherMapBase
         $this->imageMapAreas = array();
         $this->descendents = array();
         $this->parent = null;
-        $this->infourl = array();
-        $this->overliburl = array();
     }
 
     public function my_type()
@@ -292,4 +285,68 @@ class WeatherMapItem extends WeatherMapBase
     {
         return false;
     }
+
+    public function getImageMapAreas()
+    {
+        return $this->imageMapAreas;
+    }
+
+    public function getZIndex()
+    {
+        return $this->zorder;
+    }
+}
+
+/**
+ * Class WeatherMapDataItem - Everything that collects data from DS plugins,
+ * uses scales, etc, inherits from here.
+ *
+ */
+class WeatherMapDataItem extends WeatherMapItem
+{
+    // arrays to replace a lot of what follows. Paving the way for >2 channels of data.
+    // (and generally less duplicated code)
+    public $percentValues = array();
+    public $absoluteValues = array();
+    public $maxValues = array();
+    public $targets = array();
+
+    public $bandwidth_in;
+    public $bandwidth_out;
+    public $inpercent;
+    public $outpercent;
+    public $max_bandwidth_in;
+    public $max_bandwidth_out;
+    public $max_bandwidth_in_cfg;
+    public $max_bandwidth_out_cfg;
+    public $usescale;
+    public $scaletype;
+    public $inscalekey;
+    public $outscalekey;
+    public $inscaletag;
+    public $outscaletag;
+    public $percentUsages = array();
+    public $absoluteUsages = array();
+    public $maxValuesConfigured = array();
+    public $channelScaleColours = array();
+
+    public $infourl;
+    public $overliburl;
+    public $overlibwidth;
+    public $overlibheight;
+    public $overlibcaption;
+
+    function __construct()
+    {
+        parent::__construct();
+
+        $this->infourl = array();
+        $this->overliburl = array();
+    }
+
+    private function getDirectionList()
+    {
+        return array(IN, OUT);
+    }
+
 }

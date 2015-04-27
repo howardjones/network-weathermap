@@ -4,7 +4,7 @@
 // http://www.network-weathermap.com/
 // Released under the GNU Public License
 
-class WeatherMapNode extends WeatherMapItem
+class WeatherMapNode extends WeatherMapDataItem
 {
     var $id;
     var $x, $y;
@@ -17,21 +17,12 @@ class WeatherMapNode extends WeatherMapItem
     var $labelangle;
     var $name;
 
-    var $percentValues = array();
-    var $absoluteValues = array();
-    var $maxValues = array();
-
     var $colours = array(); // SCALE colours
 
     var $notestext = array();
 
     var $selected = 0;
     var $iconfile, $iconscalew, $iconscaleh;
-    var $targets = array();
-    var $bandwidth_in, $bandwidth_out;
-    var $inpercent, $outpercent;
-    var $max_bandwidth_in, $max_bandwidth_out;
-    var $max_bandwidth_in_cfg, $max_bandwidth_out_cfg;
     var $labeloffset, $labeloffsetx, $labeloffsety;
 
     var $labelbgcolour;
@@ -39,11 +30,8 @@ class WeatherMapNode extends WeatherMapItem
     var $labelfontcolour;
     var $labelfontshadowcolour;
     var $cachefile;
-    var $usescale;
     var $useiconscale;
-    var $scaletype, $iconscaletype;
-    var $inscalekey, $outscalekey;
-    var $inscaletag, $outscaletag;
+    var $iconscaletype;
     var $scalevar, $iconscalevar;
 
     var $image;
@@ -155,6 +143,15 @@ class WeatherMapNode extends WeatherMapItem
         $this->parent = null;
         $this->descendents = null;
     }
+
+    private function getDirectionList()
+    {
+        if ($this->scalevar == 'in') {
+            return array(IN);
+        }
+        return array(OUT);
+    }
+
 
     /***
      * precalculate the colours to be used, and the bounding boxes for labels and icons (if they exist)
@@ -682,6 +679,22 @@ class WeatherMapNode extends WeatherMapItem
         if (isset($this->image)) {
             imagealphablending($im, true);
             imagecopy($im, $this->image, $this->x - $this->centre_x, $this->y - $this->centre_y, 0, 0, imagesx($this->image), imagesy($this->image));
+        }
+
+        // XXX - Hiding this here so Weathermap::drawMapImage doesn't need to know about it
+        $this->makeImageMapAreas();
+    }
+
+    private function makeImageMapAreas()
+    {
+        $index = 0;
+        foreach ($this->boundingboxes as $bbox) {
+            $areaName = "NODE:N" . $this->id . ":" . $index;
+            $newArea = new HTML_ImageMap_Area_Rectangle($areaName, "", array($bbox));
+            wm_debug("Adding imagemap area");
+            $this->imageMapAreas[] = $newArea;
+            $this->imap_areas[] = $areaName; // XXX - what is this used for?
+            $index++;
         }
     }
 

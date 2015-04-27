@@ -217,6 +217,18 @@ class WMLinkGeometry
         $this->findArrowPoints();
     }
 
+    function getDrawnPolygon($direction)
+    {
+        $polyPoints = array();
+
+        foreach ($this->drawnCurves[$direction] as $point) {
+            $polyPoints[] = round($point->x);
+            $polyPoints[] = round($point->y);
+        }
+
+        return $polyPoints;
+    }
+
     function draw($gdImage)
     {
         if (is_null($this->curvePoints)) {
@@ -235,15 +247,7 @@ class WMLinkGeometry
         $linkName = $this->name;
 
         foreach ($this->directions as $direction) {
-            $curve = $this->drawnCurves[$direction];
-            $polyline = array();
-
-            foreach ($curve as $point) {
-                $polyline[] = round($point->x);
-                $polyline[] = round($point->y);
-               // $polyline[] = $point->x;
-               // $polyline[] = $point->y;
-            }
+            $polyline = $this->getDrawnPolygon($direction);
 
             if (! $this->fillColours[$direction]->isNone()) {
                 imagefilledpolygon($gdImage, $polyline, count($polyline) / 2, $this->fillColours[$direction]->gdAllocate($gdImage));

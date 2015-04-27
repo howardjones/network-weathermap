@@ -21,20 +21,20 @@ function update_source_link_step1(dataid,datasource)
     var newlocation;
     var fullpath;
 
-    if (typeof window.opener == "object") {
+    if (typeof window.opener === "object") {
         fullpath = datasource.replace(/<path_rra>/, rra_path);
-        if(document.forms['mini'].aggregate.checked)
+        if(document.forms.mini.aggregate.checked)
         {
-            opener.document.forms["frmMain"].link_target.value = opener.document.forms["frmMain"].link_target.value  + " " + fullpath;
+            opener.document.forms.frmMain.link_target.value = opener.document.forms.frmMain.link_target.value  + " " + fullpath;
         } else {
-            opener.document.forms["frmMain"].link_target.value = fullpath;
+            opener.document.forms.frmMain.link_target.value = fullpath;
         }
     }
-    if(document.forms['mini'].overlib.checked) {
+    if(document.forms.mini.overlib.checked) {
         newlocation = 'cacti-pick.php?command=link_step2&dataid=' + dataid;
-        self.location = newlocation;
+        window.location = newlocation;
     } else {
-        self.close();
+        window.close();
     }
 }
 
@@ -42,19 +42,20 @@ function update_source_link_step2(graphid)
 {
     var graph_url, info_url;
 
-    if (typeof window.opener == "object") {
+    if (typeof window.opener === "object") {
 
         graph_url = base_url + 'graph_image.php?local_graph_id=' + graphid + '&rra_id=0&graph_nolegend=true&graph_height=100&graph_width=300';
         info_url = base_url + 'graph.php?rra_id=all&local_graph_id=' + graphid;
 
-        opener.document.forms["frmMain"].link_infourl.value = info_url;
-        opener.document.forms["frmMain"].link_hover.value = graph_url;
+        opener.document.forms.frmMain.link_infourl.value = info_url;
+        opener.document.forms.frmMain.link_hover.value = graph_url;
     }
-    self.close();
+    window.close();
 }
 
 function dataSelected(event)
 {
+    var newlocation;
     var data_id = $(this).data("source-id");
     var path = $(this).data("path");
 
@@ -63,42 +64,42 @@ function dataSelected(event)
     console.log(fullpath);
 
     if (window.opener && typeof window.opener == "object") {
-        if(document.forms['mini'].aggregate.checked)
+        if(document.forms.mini.aggregate.checked)
         {
-            opener.document.forms["frmMain"].link_target.value = opener.document.forms["frmMain"].link_target.value  + " " + fullpath;
+            opener.document.forms.frmMain.link_target.value = opener.document.forms.frmMain.link_target.value  + " " + fullpath;
         } else {
-            opener.document.forms["frmMain"].link_target.value = fullpath;
+            opener.document.forms.frmMain.link_target.value = fullpath;
         }
     }
 
     // If it's just a TARGET update, we're done, otherwise go onto step 2 to find a matching graph
-    if(document.forms['mini'].overlib.checked) {
+    if(document.forms.mini.overlib.checked) {
         newlocation = 'cacti-pick.php?command=link_step2&dataid=' + data_id;
-        self.location = newlocation;
+        window.location = newlocation;
     } else {
-        self.close();
+        window.close();
     }
 }
 
 function nodeGraphSelected(event)
 {
     var graph_id = $(this).data("graph-id");
-    var width = $(this).data("width");
-    var height = $(this).data("height");
+   // var width = $(this).data("width");
+   // var height = $(this).data("height");
 
     var graph_url = base_url + 'graph_image.php?rra_id=0&graph_nolegend=true&graph_height=100&graph_width=300&local_graph_id=' + graph_id;
     var info_url = base_url + 'graph.php?rra_id=all&local_graph_id=' + graph_id;
 
     console.log(graph_url);
 
-    if (window.opener && typeof window.opener == "object") {
+    if (window.opener && typeof window.opener === "object") {
         // only set the overlib URL unless the box is checked
-        if( document.forms['mini'].overlib.checked) {
-            opener.document.forms["frmMain"].node_infourl.value = info_url;
+        if( document.forms.mini.overlib.checked) {
+            opener.document.forms.frmMain.node_infourl.value = info_url;
         }
-        opener.document.forms["frmMain"].node_hover.value = graph_url;
+        opener.document.forms.frmMain.node_hover.value = graph_url;
     }
-    self.close();
+    this.close();
 }
 
 $(document).ready( function() {
@@ -106,7 +107,7 @@ $(document).ready( function() {
     $("#dslist li:even").addClass("row1");
 
     $('#host_id').change( function () {
-        applyDSFilterChange(document.mini)
+        applyDSFilterChange(document.mini);
     });
 
     $("body.data-picker span.ds_includegraph").show();
@@ -114,11 +115,11 @@ $(document).ready( function() {
     $("body.data-picker span.ds_dsstats").show();
 
     if (aggregate) {
-
+        // TODO: Check what this did before!
     }
 
     if (overlib) {
-
+        // TODO: Check what this did before!
     }
 
     if (selected_host >= 0) {

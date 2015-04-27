@@ -6,9 +6,12 @@
 /*global Links:false */
 /*global LinkIDs:false */
 /*global document:false */
+/*global wmPickerWindow:false */
 /*jslint vars: true, plusplus: true, devel: true, nomen: true, indent: 4, maxerr: 50 */
 
 _.templateSettings.variable = "rc";
+
+var wmPickerWindow;
 
 var wmEditor = {
     KEYCODE_ESCAPE : 27,
@@ -177,6 +180,29 @@ var wmEditor = {
         jQuery("#param").val(name);
         jQuery("#dlgLinkProperties").show().draggable({handle: "h3"});
         jQuery("#link_bandwidth_in").focus();
+
+        jQuery("#link_cactipick").click(wmEditor.openCactiDSPicker);
+
+    },
+
+    openCactiDSPicker: function() {
+        wmEditor.openPickerWindow("cacti-pick.php?command=link_step1");
+        return false;
+    },
+
+    openCactiGraphPicker: function() {
+        wmEditor.openPickerWindow("cacti-pick.php?command=node_step1");
+        return false;
+    },
+
+    openPickerWindow: function(url) {
+        if (!wmPickerWindow || wmPickerWindow.closed) {
+            wmPickerWindow = window.open("", "openCactiDSPicker", "scrollbars=1,status=1,height=400,width=400,resizable=1");
+        } else if (wmPickerWindow.focus) {
+            // window is already open and focusable, so bring it to the front
+            wmPickerWindow.focus();
+        }
+        wmPickerWindow.location = url;
     },
 
     showNodeProperties: function (name) {

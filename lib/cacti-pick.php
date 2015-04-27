@@ -133,12 +133,18 @@ function cactiGraphFromDSID($local_data_id)
  */
 function link_pick_step2($local_data_id)
 {
+    global $config;
+
     $graph_id = cactiGraphFromDSID($local_data_id);
 
     ?>
     <html><head>
+        <script type="text/javascript" src="vendor/jquery/dist/jquery.min.js" ></script>
         <script type="text/javascript" src="editor-resources/cacti-pick.js"></script>
-        <script type="text/javascript">window.onload = update_source_link_step2(<?php echo $graph_id ?>);</script>
+        <script type="text/javascript">
+            var base_url = <?php echo isset($config['base_url']) ? $config['base_url'] : ''; ?>;
+            window.onload = update_source_link_step2(<?php echo $graph_id ?>);
+        </script>
     </head><body>This window should disappear in a moment.</body></html>
     <?php
 }

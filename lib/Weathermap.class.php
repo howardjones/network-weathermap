@@ -824,6 +824,7 @@ class WeatherMap extends WeatherMapBase
         $this->replicateScaleSettings();
         $this->buildZLayers();
         $this->resolveRelativePositions();
+        $this->updateMaxValues();
         $this->runProcessorPlugins("pre");
     }
 
@@ -949,10 +950,9 @@ class WeatherMap extends WeatherMapBase
         }
     }
 
-    // TODO - SRP!!! This function builds the z-layers, and also calculates the maximums!
     private function buildZLayers()
     {
-        wm_debug("Building cache of z-layers and finalising bandwidth.\n");
+        wm_debug("Building cache of z-layers.\n");
 
         $allItems = $this->buildAllItemsList();
 
@@ -962,24 +962,19 @@ class WeatherMap extends WeatherMapBase
                 $this->seen_zlayers[$z] = array();
             }
             array_push($this->seen_zlayers[$z], $item);
-
-            // while we're looping through, let's set the real bandwidths
-            $item->maxValues[IN] = wmInterpretNumberWithMetricPrefix($item->max_bandwidth_in_cfg, $this->kilo);
-            $item->maxValues[OUT] = wmInterpretNumberWithMetricPrefix($item->max_bandwidth_out_cfg, $this->kilo);
-
-            if ($item->my_type() == "LINK") {
-                $item->max_bandwidth_in = wmInterpretNumberWithMetricPrefix($item->max_bandwidth_in_cfg, $this->kilo);
-                $item->max_bandwidth_out = wmInterpretNumberWithMetricPrefix($item->max_bandwidth_out_cfg, $this->kilo);
-            } elseif ($item->my_type() == "NODE") {
-                $item->max_bandwidth_in = wmInterpretNumberWithMetricPrefix($item->max_bandwidth_in_cfg, $this->kilo);
-                $item->max_bandwidth_out = wmInterpretNumberWithMetricPrefix($item->max_bandwidth_out_cfg, $this->kilo);
-            } else {
-                wm_warn("Internal bug - found an item of type: " . $item->my_type() . "\n");
-            }
-
-            wm_debug(sprintf("   Setting bandwidth on " . $item->my_type() . " $item->name (%s -> %d bps, %s -> %d bps, KILO = %d)\n", $item->max_bandwidth_in_cfg, $item->max_bandwidth_in, $item->max_bandwidth_out_cfg, $item->max_bandwidth_out, $this->kilo));
         }
         wm_debug("Found " . sizeof($this->seen_zlayers) . " z-layers including builtins (0,100).\n");
+    }
+
+    private function updateMaxValues()
+    {
+        wm_debug("Finalising bandwidth.\n");
+
+        $allItems = $this->buildAllItemsList();
+
+        foreach ($allItems as $item) {
+            $item->updateMaxValues($this->kilo);
+        }
     }
 
     private function runProcessorPlugins($stage = "pre")

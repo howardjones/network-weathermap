@@ -354,6 +354,18 @@ class WeatherMapDataItem extends WeatherMapItem
         return array(IN, OUT);
     }
 
+    public function updateMaxValues($kilo)
+    {
+        // while we're looping through, let's set the real bandwidths
+        $this->maxValues[IN] = wmInterpretNumberWithMetricPrefix($this->max_bandwidth_in_cfg, $kilo);
+        $this->maxValues[OUT] = wmInterpretNumberWithMetricPrefix($this->max_bandwidth_out_cfg, $kilo);
+
+        $this->max_bandwidth_in = $this->maxValues[IN];
+        $this->max_bandwidth_out = $this->maxValues[OUT];
+
+        wm_debug(sprintf("   Setting bandwidth on %s (%s -> %d bps, %s -> %d bps, KILO = %d)\n", $this, $this->max_bandwidth_in_cfg, $this->max_bandwidth_in, $this->max_bandwidth_out_cfg, $this->max_bandwidth_out, $kilo));
+    }
+
     public function prepareForDataCollection()
     {
         foreach ($this->targets as $target) {

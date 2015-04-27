@@ -999,39 +999,42 @@ class WeatherMap extends WeatherMapBase
 
         wm_debug("Resolving relative positions for NODEs...\n");
         // safety net for cyclic dependencies
-        $iterations = 100;
+        $maxIterations = 100;
+        $iterations = $maxIterations;
         do {
             $skipped = 0;
             $changeCount = 0;
 
             foreach ($this->nodes as $node) {
-                if (($node->isRelativePositioned()) && (!$node->isRelativePositionResolved())) {
+                // if it's not relative, or already dealt with, skip to the next one
+                if ( !$node->isRelativePositioned() || $node->isRelativePositionResolved()) {
+                    continue;
+                }
 
-                    $anchorName = $node->getRelativeAnchor();
+                $anchorName = $node->getRelativeAnchor();
 
-                    wm_debug("Resolving relative position for $node to $anchorName\n");
+                wm_debug("Resolving relative position for $node to $anchorName\n");
 
-                    if (! $this->nodeExists($node->relative_to)) {
-                        wm_warn("NODE " . $node->name . " has a relative position to an unknown node ($anchorName)! [WMWARN10]\n");
-                        continue;
-                    }
+                if (! $this->nodeExists($node->relative_to)) {
+                    wm_warn("NODE " . $node->name . " has a relative position to an unknown node ($anchorName)! [WMWARN10]\n");
+                    continue;
+                }
 
-                    $anchorNode = $this->nodes[$anchorName];
-                    wm_debug("Found anchor node: $anchorNode\n");
+                $anchorNode = $this->nodes[$anchorName];
+                wm_debug("Found anchor node: $anchorNode\n");
 
-                    // check if we are relative to another node which is in turn relative to something
-                    // we need to resolve that one before we can resolve this one!
-                    if (($anchorNode->isRelativePositioned()) && (!$anchorNode->isRelativePositionResolved())) {
-                        wm_debug("Skipping unresolved relative_to. Let's hope it's not a circular one\n");
-                        $skipped++;
-                        continue;
-                    }
+                // check if we are relative to another node which is in turn relative to something
+                // we need to resolve that one before we can resolve this one!
+                if (($anchorNode->isRelativePositioned()) && (!$anchorNode->isRelativePositionResolved())) {
+                    wm_debug("Skipping unresolved relative_to. Let's hope it's not a circular one\n");
+                    $skipped++;
+                    continue;
+                }
 
-                    $result = $node->resolveRelativePosition($anchorNode);
+                $result = $node->resolveRelativePosition($anchorNode);
 
-                    if ($result) {
-                        $changeCount++;
-                    }
+                if ($result) {
+                    $changeCount++;
                 }
             }
             wm_debug("Relative Positions Cycle $iterations - set $changeCount and Skipped $skipped for unresolved dependencies\n");
@@ -1039,11 +1042,8 @@ class WeatherMap extends WeatherMapBase
         } while (($changeCount > 0) && ($iterations > 0));
 
         if ($skipped > 0) {
-            wm_warn("There are Circular dependencies in relative POSITION lines for $skipped nodes. [WMWARN11]\n");
+            wm_warn("There are probably Circular dependencies in relative POSITION lines for $skipped nodes (or $maxIterations levels of relative positioning). [WMWARN11]\n");
         }
-
-        wm_debug("-----------------------------------\n");
-
     }
 
     function writeDataFile($filename)
@@ -1067,6 +1067,26 @@ class WeatherMap extends WeatherMapBase
                 fclose($fileHandle);
             }
         }
+    }
+
+    private function getConfigForPosition($keyword, $fieldnames, $object1, $object2)
+    {
+        $write = false;
+        $string = $keyword;
+
+        for ($i=0; $i<count($fieldnames); $i++) {
+            $string .= " " . $object1->$fieldnames[$i];
+
+            if ($object1->$fieldnames[$i] != $object2[$fieldnames[$i]]) {
+                $write = true;
+            }
+        }
+        $string .= "\n";
+
+        if (! $write) {
+            return "";
+        }
+        return $string;
     }
 
     function getConfig()
@@ -1108,28 +1128,10 @@ class WeatherMap extends WeatherMapBase
             }
         }
 
-        if (($this->timex != $this->inherit_fieldlist['timex'])
-            || ($this->timey != $this->inherit_fieldlist['timey'])
-            || ($this->stamptext != $this->inherit_fieldlist['stamptext'])) {
-            $output .= "TIMEPOS " . $this->timex . " " . $this->timey . " " . $this->stamptext . "\n";
-        }
-
-        if (($this->mintimex != $this->inherit_fieldlist['mintimex'])
-            || ($this->mintimey != $this->inherit_fieldlist['mintimey'])
-            || ($this->minstamptext != $this->inherit_fieldlist['minstamptext'])) {
-            $output .= "MINTIMEPOS " . $this->mintimex . " " . $this->mintimey . " " . $this->minstamptext . "\n";
-        }
-
-        if (($this->maxtimex != $this->inherit_fieldlist['maxtimex'])
-            || ($this->maxtimey != $this->inherit_fieldlist['maxtimey'])
-            || ($this->maxstamptext != $this->inherit_fieldlist['maxstamptext'])) {
-            $output .= "MAXTIMEPOS " . $this->maxtimex . " " . $this->maxtimey . " " . $this->maxstamptext . "\n";
-        }
-
-        if (($this->titlex != $this->inherit_fieldlist['titlex'])
-            || ($this->titley != $this->inherit_fieldlist['titley'])) {
-            $output .= "TITLEPOS " . $this->titlex . " " . $this->titley . "\n";
-        }
+        $output .= $this->getConfigForPosition("TIMEPOS", array("timex","timey","stamptext"), $this, $this->inherit_fieldlist);
+        $output .= $this->getConfigForPosition("MINTIMEPOS", array("mintimex","mintimey","minstamptext"), $this, $this->inherit_fieldlist);
+        $output .= $this->getConfigForPosition("MAXTIMEPOS", array("maxtimex","maxtimey","maxstamptext"), $this, $this->inherit_fieldlist);
+        $output .= $this->getConfigForPosition("TITLEPOS", array("titlex","titley"), $this, $this->inherit_fieldlist);
 
         $output.="\n";
 
@@ -1459,14 +1461,15 @@ class WeatherMap extends WeatherMapBase
         $result = imagepng($thumbImageRef, $outputFileName);
         imagedestroy($thumbImageRef);
 
-        if (($result===false)) {
-            if (file_exists($outputFileName)) {
-                wm_warn("Failed to overwrite existing thumbnail image file $outputFileName - permissions of existing file are wrong? [WMWARN15]");
-            } else {
-                wm_warn("Failed to create thumbnail image file $outputFileName - permissions of output directory are wrong? [WMWARN16]");
-            }
+        if($result!==false) {
+            return;
         }
 
+        if (file_exists($outputFileName)) {
+            wm_warn("Failed to overwrite existing thumbnail image file $outputFileName - permissions of existing file are wrong? [WMWARN15]");
+        } else {
+            wm_warn("Failed to create thumbnail image file $outputFileName - permissions of output directory are wrong? [WMWARN16]");
+        }
     }
 
     /**
@@ -1767,7 +1770,7 @@ class WeatherMap extends WeatherMapBase
     private function drawRelativePositionOverlay($imageRef, $overlayColour)
     {
         foreach ($this->nodes as $node) {
-            if ($node->relative_to != '') {
+            if (! $node->isTemplate() && $node->isRelativePositioned()) {
                 $rel_x = $this->nodes[$node->relative_to]->x;
                 $rel_y = $this->nodes[$node->relative_to]->y;
                 imagearc($imageRef, $node->x, $node->y, 15, 15, 0, 360, $overlayColour);

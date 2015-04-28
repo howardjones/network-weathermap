@@ -254,12 +254,13 @@ function weathermap_run_maps($mydir, $map_id = -1)
     
     $weathermap_mem_highwater = 0;
 
-    WMMemoryNote('weathermap_initial_memory');
+    // This one makes Cacti's database.php puke...
+    // WMMemoryNote('weathermap_initial_memory');
 
-    // require_once $mydir.DIRECTORY_SEPARATOR."lib".DIRECTORY_SEPARATOR."HTML_ImageMap.class.php";
-    require_once $mydir.DIRECTORY_SEPARATOR."lib".DIRECTORY_SEPARATOR."all.php";
+    require_once "all.php";
 
-    WMMemoryNote('weathermap_loaded_memory');
+    // and this..
+    // WMMemoryNote('weathermap_loaded_memory');
 
     $total_warnings = 0;
     $warning_notes = "";

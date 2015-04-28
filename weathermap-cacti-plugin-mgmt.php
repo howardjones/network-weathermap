@@ -1,14 +1,12 @@
 <?php
 
-/** This file is from Weathermap version 0.97d */
+/** This file is from Weathermap version 0.98 */
 
 chdir('../../');
 require_once "./include/auth.php";
 require_once "./include/config.php";
 
 require_once $config["library_path"] . "/database.php";
-
-$weathermap_confdir = realpath(dirname(__FILE__).'/configs');
 
 // include the weathermap class so that we can get the version
 require_once dirname(__FILE__)."/lib/globals.php";
@@ -24,6 +22,6 @@ if (isset($_POST['action'])) {
     $action = $_GET['action'];
 }
 
-wmuiMgmtPluginDispatcher($action, $_REQUEST);
+wmuiMgmtPluginDispatcher($action, $_REQUEST, $weathermap_confdir);
 
 // vim:ts=4:sw=4:

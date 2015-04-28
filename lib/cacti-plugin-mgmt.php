@@ -4,6 +4,8 @@ function wmuiMgmtPluginDispatcher($action, $request)
 {
     global $config;
 
+    $weathermapConfigPath = realpath(dirname(__FILE__).'/configs');
+
     switch ($action) {
         case 'group_update':
             wmuiHandleGroupUpdate($request);
@@ -131,9 +133,9 @@ function wmuiMgmtPluginDispatcher($action, $request)
             require_once $config["base_path"] . "/include/top_header.php";
 
             if (isset($request['show']) && $request['show'] == 'all') {
-                wmuiMapFilePicker(true);
+                wmuiMapFilePicker($weathermapConfigPath, true);
             } else {
-                wmuiMapFilePicker(false);
+                wmuiMapFilePicker($weathermapConfigPath, false);
             }
             require_once $config["base_path"] . "/include/bottom_footer.php";
             break;
@@ -896,9 +898,8 @@ function wmMapManagementList()
 
 }
 
-function wmuiMapFilePicker($show_all = false)
+function wmuiMapFilePicker($configDirectory, $show_all = false)
 {
-    global $weathermap_confdir;
     global $colors;
 
     $loaded=array();
@@ -911,73 +912,80 @@ function wmuiMapFilePicker($show_all = false)
         }
     }
 
-    html_start_box("<strong>Available Weathermap Configuration Files</strong>", "78%", $colors["header"], "1", "center", "");
+    if (!is_dir($configDirectory)) {
+        print "There is no directory named $configDirectory - you will need to create it, and set it to be readable by the webserver. If you want to upload configuration files from inside Cacti, then it should be <i>writable</i> by the webserver too.";
+        return;
+    }
+
     $nFiles=0;
 
-    if (is_dir($weathermap_confdir)) {
-        $dirhandle = opendir($weathermap_confdir);
-        if ($dirhandle) {
-            $nSkipped = 0;
-            html_header(array("", "", "Config File", "Title", ""), 2);
+    $directoryHandle = opendir($configDirectory);
 
-            while ($file = readdir($dirhandle)) {
-                $realfile = $weathermap_confdir.'/'.$file;
+    if (!$directoryHandle) {
+        print "Can't open $configDirectory to read - you should set it to be readable by the webserver.";
+        return;
+    }
 
-                // skip .-prefixed files like .htaccess, since it seems
-                // that otherwise people will add them as map config files.
-                // and the index.php too - for the same reason
-                if (substr($file, 0, 1) != '.' && $file != "index.php") {
-                    $used = in_array($file, $loaded);
-                    $flags[$file] = '';
-                    if ($used) {
-                        $flags[$file] = 'USED';
-                    }
+    $nSkipped = 0;
 
-                    if (is_file($realfile)) {
-                        if ($used && !$show_all) {
-                            $nSkipped++;
-                        } else {
-                            $title = wmMapGetTitleFromFile($realfile);
-                            $titles[$file] = $title;
-                            $nFiles++;
-                        }
-                    }
-                }
+
+    while ($file = readdir($directoryHandle)) {
+        $realfile = $configDirectory.'/'.$file;
+
+        // skip .-prefixed files like .htaccess, since it seems
+        // that otherwise people will add them as map config files.
+        // and the index.php too - for the same reason
+        if (substr($file, 0, 1) != '.' && $file != "index.php") {
+            $used = in_array($file, $loaded);
+            $flags[$file] = '';
+            if ($used) {
+                $flags[$file] = 'USED';
             }
-            closedir($dirhandle);
 
-            if ($nFiles>0) {
-                ksort($titles);
-
-                $nFiles=0;
-                foreach ($titles as $file => $title) {
-                    $title = $titles[$file];
-                    form_alternate_row_color($colors["alternate"], $colors["light"], $nFiles);
-                    print '<td><a href="?action=addmap&amp;file='.$file.'" title="Add the configuration file">Add</a></td>';
-                    print '<td><a href="?action=viewconfig&amp;file='.$file.'" title="View the configuration file in a new window" target="_blank">View</a></td>';
-                    print '<td>'.htmlspecialchars($file);
-                    if ($flags[$file] == 'USED') {
-                        print ' <b>(USED)</b>';
-                    }
-                    print '</td>';
-                    print '<td><em>'.htmlspecialchars($title).'</em></td>';
-                    print '</tr>';
+            if (is_file($realfile)) {
+                if ($used && !$show_all) {
+                    $nSkipped++;
+                } else {
+                    $title = wmMapGetTitleFromFile($realfile);
+                    $titles[$file] = $title;
                     $nFiles++;
                 }
             }
-
-            if (($nFiles + $nSkipped) == 0) {
-                print "<tr><td>No files were found in the configs directory.</td></tr>";
-            }
-
-            if (($nFiles == 0) && $nSkipped>0) {
-                print "<tr><td>($nSkipped files weren't shown because they are already in the database</td></tr>";
-            }
-        } else {
-            print "<tr><td>Can't open $weathermap_confdir to read - you should set it to be readable by the webserver.</td></tr>";
         }
-    } else {
-        print "<tr><td>There is no directory named $weathermap_confdir - you will need to create it, and set it to be readable by the webserver. If you want to upload configuration files from inside Cacti, then it should be <i>writable</i> by the webserver too.</td></tr>";
+    }
+    closedir($directoryHandle);
+
+    if (($nFiles + $nSkipped) == 0) {
+        print "No files were found in the configs directory.";
+        return;
+    }
+
+    if (($nFiles == 0) && $nSkipped>0) {
+        print "($nSkipped files weren't shown because they are already in the database)";
+        return;
+    }
+
+    html_start_box("<strong>Available Weathermap Configuration Files</strong>", "78%", $colors["header"], "1", "center", "");
+    html_header(array("", "", "Config File", "Title", ""), 2);
+
+    if ($nFiles>0) {
+        ksort($titles);
+
+        $nFiles=0;
+        foreach ($titles as $file => $title) {
+            $title = $titles[$file];
+            form_alternate_row_color($colors["alternate"], $colors["light"], $nFiles);
+            print '<td><a href="?action=addmap&amp;file='.$file.'" title="Add the configuration file">Add</a></td>';
+            print '<td><a href="?action=viewconfig&amp;file='.$file.'" title="View the configuration file in a new window" target="_blank">View</a></td>';
+            print '<td>'.htmlspecialchars($file);
+            if ($flags[$file] == 'USED') {
+                print ' <b>(USED)</b>';
+            }
+            print '</td>';
+            print '<td><em>'.htmlspecialchars($title).'</em></td>';
+            print '</tr>';
+            $nFiles++;
+        }
     }
 
     html_end_box();
@@ -985,6 +993,7 @@ function wmuiMapFilePicker($show_all = false)
     if ($nSkipped>0) {
         print "<p align=center>Some files are not shown because they have already been added. You can <a href='?action=addmap_picker&show=all'>show these files too</a>, if you need to.</p>";
     }
+
     if ($show_all) {
         print "<p align=center>Some files are shown even though they have already been added. You can <a href='?action=addmap_picker'>hide those files too</a>, if you need to.</p>";
     }

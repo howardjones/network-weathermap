@@ -2,16 +2,12 @@ VERSION=0.98pre
 RELBASE=dist
 RELNAME=php-weathermap-$(VERSION)
 RELDIR=$(RELBASE)/weathermap
+CACTIDIR=/var/www/html/cactiauto/plugins
+CACTIDB=cactiauto
+CACTIUSER=cacti
+WwWUSER=www-data
 
 all: ready manual release
-
-random-bits/suite-1.png:  random-bits/suite-1.conf
-	php weathermap --config  random-bits/suite-1.conf --output random-bits/suite-1.png
-
-random-bits/suite-2.png:  random-bits/suite-2.conf
-	php weathermap --config  random-bits/suite-2.conf --output random-bits/suite-2.png
-
-ready: random-bits/suite-1.png random-bits/suite-2.png
 
 manual:	docs/index.html
 	touch docs/src/index.xml
@@ -23,7 +19,6 @@ clean:
 
 release: 
 	echo Building release $(RELNAME)
-
 	rm -rf $(RELDIR)
 	mkdir -p $(RELDIR)
 	mkdir -p $(RELDIR)/random-bits $(RELDIR)/lib/datasources $(RELDIR)/lib/port $(RELDIR)/lib/pre $(RELDIR)/vendor $(RELDIR)/images $(RELDIR)/editor-resources $(RELDIR)/output $(RELDIR)/configs $(RELDIR)/cacti-resources $(RELDIR)/plugin-images $(RELDIR)/docs
@@ -42,26 +37,34 @@ release:
 	cp -f $(RELBASE)/$(RELNAME)-tests.zip  $(RELBASE)/$(RELNAME).zip docs/dev/vagrant-testers
 	ls -l $(RELBASE)
 
-test:	
-	phpunit Tests/
-	grep  Output test-suite/diffs/*.txt | grep -v '|0|' | awk -F: '{ print $1;}' | sed -e 's/.png.txt//' -e 's/test-suite\/diffs\///' > test-suite/failing-images.txt
-	test-suite/make-failing-summary.pl test-suite/failing-images.txt test-suite/summary.html > test-suite/summary-failing.html
+test:
+	./test.sh
 
 # build a release, then run tests in the release packaging directing (tests for packing.list issues)
 releasetest: release
 	cd $(RELDIR) && /usr/local/bin/composer install
 	cd $(RELDIR) && $(RELDIR)/test.sh
 
-testcoverage:	
-	phpunit --coverage-html test-suite/code-coverage/ Tests/
+deploycacti: release
+	touch $(CACTIDIR)/weathermap
+	rm -rf $(CACTIDIR)/weathermap
+	unzip $(RELBASE)/$(RELNAME).zip -d $(CACTIDIR)
+	chown -R $(CACTIUSER) $(CACTIDIR)/weathermap/output
+	chown -R $(WWWUSER) $(CACTIDIR)/weathermap/configs
+
+# You will want to (1) use a TEST cacti install for this and
+# (2) create a .my.cnf with your credentials, so you don't go crazy
+# (3) actually create test-suite/cacti-running.sql - this is a dump of the Cacti DB from
+# just after I changed the password, so all the paths are correct but no plugins are installed etc.
+cleancacti:
+	mysqladmin drop -f $(CACTIDB)
+	mysqladmin create $(CACTIDB)
+	mysql $(CACTIDB) < test-suite/cacti-running.sql
 
 sql:
-	mysqldump -n --add-drop-table --no-data -uroot -p cacti weathermap_maps > weathermap.sql
-	mysqldump -n --add-drop-table --no-data -uroot -p cacti weathermap_auth >> weathermap.sql
-	mysqldump -n --add-drop-table --no-data -uroot -p cacti weathermap_groups >> weathermap.sql
-	mysqldump -n --add-drop-table --no-data -uroot -p cacti weathermap_settings >> weathermap.sql
-	mysqldump -n --add-drop-table --no-data -uroot -p cacti weathermap_data >> weathermap.sql
-
-tag:
-	svn copy http://www.network-weathermap.com/svn/repos/trunk http://www.network-weathermap.com/svn/repos/tags/version-$(VERSION) -m "Tagging $(VERSION) for release"
+	mysqldump -n --add-drop-table --no-data $(CACTIDB) weathermap_maps > weathermap.sql
+	mysqldump -n --add-drop-table --no-data $(CACTIDB) weathermap_auth >> weathermap.sql
+	mysqldump -n --add-drop-table --no-data $(CACTIDB) weathermap_groups >> weathermap.sql
+	mysqldump -n --add-drop-table --no-data $(CACTIDB) weathermap_settings >> weathermap.sql
+	mysqldump -n --add-drop-table --no-data $(CACTIDB) weathermap_data >> weathermap.sql
 

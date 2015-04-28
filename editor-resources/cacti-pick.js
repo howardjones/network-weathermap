@@ -23,26 +23,6 @@ function applyDSFilterChange(objForm) {
     document.location = strURL;
 }
 
-function update_source_link_step1(dataid, datasource) {
-    var newlocation;
-    var fullpath;
-
-    if (typeof window.opener === "object") {
-        fullpath = datasource.replace(/<path_rra>/, rra_path);
-        if (document.forms.mini.aggregate.checked) {
-            opener.document.forms.frmMain.link_target.value = opener.document.forms.frmMain.link_target.value + " " + fullpath;
-        } else {
-            opener.document.forms.frmMain.link_target.value = fullpath;
-        }
-    }
-    if (document.forms.mini.overlib.checked) {
-        newlocation = 'cacti-pick.php?command=link_step2&dataid=' + dataid;
-        window.location = newlocation;
-    } else {
-        window.close();
-    }
-}
-
 function update_source_link_step2(graphid) {
     var graph_url, info_url;
 

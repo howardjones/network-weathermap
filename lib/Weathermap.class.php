@@ -67,7 +67,6 @@ class WeatherMap extends WeatherMapBase
     var $context;
     var $selected;
 
-    var $activeDataSourceClasses;
     var $thumb_width, $thumb_height;
     var $has_includes;
     var $has_overlibs;
@@ -1284,12 +1283,12 @@ class WeatherMap extends WeatherMapBase
     {
         wm_debug("Writing config to $filename (read from $this->configfile)\n");
 
-        $fd=fopen($filename, "w");
+        $fileHandle = fopen($filename, "w");
 
-        if ($fd) {
+        if ($fileHandle) {
             $output = $this->getConfig();
-            fwrite($fd, $output);
-            fclose($fd);
+            fwrite($fileHandle, $output);
+            fclose($fileHandle);
         } else {
             wm_warn("Couldn't open config file $filename for writing");
             return (false);

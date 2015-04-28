@@ -117,16 +117,16 @@ class WeatherMapLink extends WeatherMapDataItem
         );
     }
 
-    function reset(&$newowner)
+    function reset(&$newOwner)
     {
-        $this->owner=$newowner;
+        $this->owner = $newOwner;
 
         $template = $this->template;
         if ($template == '') {
             $template = "DEFAULT";
         }
 
-        wm_debug("Resetting $this->name with $template\n");
+        wm_debug("Resetting $this with $template\n");
 
         // the internal default-default gets it's values from inherit_fieldlist
         // everything else comes from a link object - the template.
@@ -145,7 +145,7 @@ class WeatherMapLink extends WeatherMapDataItem
         // to stop the editor tanking, now that colours are decided earlier in ReadData
         $this->colours[IN] = new WMColour(192, 192, 192);
         $this->colours[OUT] = new WMColour(192, 192, 192);
-        $this->id = $newowner->next_id++;
+        $this->id = $newOwner->next_id++;
     }
 
     function my_type()

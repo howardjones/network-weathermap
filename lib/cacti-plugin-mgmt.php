@@ -628,9 +628,7 @@ function wmMapManagementList()
 
     // since it's apparently becoming a more common issue, just check that the tables
     // actually exist in the database!
-    $queryrows =
-        db_fetch_assoc("show table status like 'weathermap%'");
-    if (sizeof($queryrows)==0) {
+    if (! wmCheckTablesExist()) {
         print "<div class='wm_warning'>Something bad has happened - none of the weathermap tables exist. This is probably a bug in setup.php - please look for a solution in the forums.</div>";
     }
 

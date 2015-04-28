@@ -2,145 +2,177 @@
 
 function wmuiUserPluginDispatcher($action, $request)
 {
-    global $config;
-
     switch ($action) {
         case 'viewthumb': // FALL THROUGH
         case 'viewthumb48': // FALL THROUGH
         case 'viewimage':
-            $id = -1;
-
-            if (isset($_GET['id']) && (!is_numeric($_GET['id']) || strlen($_GET['id']) == 20)) {
-                $id = wmTranslateHashToID($_GET['id']);
-            }
-
-            if (isset($_GET['id']) && is_numeric($_GET['id'])) {
-                $id = intval($_GET['id']);
-            }
-
-            if ($id >= 0) {
-                $imageformat = strtolower(read_config_option("weathermap_output_format"));
-
-                $userid = (isset($_SESSION["sess_user_id"]) ? intval($_SESSION["sess_user_id"]) : 1);
-
-                $map = db_fetch_assoc("select weathermap_maps.* from weathermap_auth,weathermap_maps where weathermap_maps.id=weathermap_auth.mapid and (userid=" . $userid . " or userid=0) and  active='on' and weathermap_maps.id=" . $id . " LIMIT 1");
-
-                if (sizeof($map) == 1) {
-                    $imagefile = dirname(__FILE__) . '/../output/' . $map[0]['filehash'] . "." . $imageformat;
-                    if ($action == 'viewthumb') {
-                        $imagefile = dirname(__FILE__) . '/../output/' . $map[0]['filehash'] . ".thumb." . $imageformat;
-                    }
-                    if ($action == 'viewthumb48') {
-                        $imagefile = dirname(__FILE__) . '/../output/' . $map[0]['filehash'] . ".thumb48." . $imageformat;
-                    }
-
-                    header('Content-type: image/png');
-
-                    if (file_exists($imagefile)) {
-                        readfile($imagefile);
-                    } else {
-                        wmGenerateGreyImage(48, 48);
-                    }
-                } elseif ($action == "viewthumb48") {
-                    // in the management view, a disabled map will fail the query above, so generate *something*
-                    header('Content-type: image/png');
-                    wmGenerateGreyImage(48, 48);
-                }
-            }
+            wmuiHandleImageOutput($request, $action);
             // if we get here, they didn't have permission
             break;
         case 'viewmapcycle':
-            $fullscreen = 0;
-            if ((isset($_GET['fullscreen']) && is_numeric($_GET['fullscreen']))) {
-                $fullscreen = intval($_GET['fullscreen']);
-            }
-
-            if ($fullscreen == 1) {
-                print "<!DOCTYPE html>\n";
-                print "<html><head>";
-                print '<LINK rel="stylesheet" type="text/css" media="screen" href="cacti-resources/weathermap.css">';
-                print "</head><body id='wm_fullscreen'>";
-            } else {
-                include_once $config["base_path"] . "/include/top_graph_header.php";
-            }
-
-            print "<div id=\"overDiv\" style=\"position:absolute; visibility:hidden; z-index:1000;\"></div>\n";
-            print "<script type=\"text/javascript\" src=\"vendor/overlib.js\"><!-- overLIB (c) Erik Bosrup --></script> \n";
-
-            $groupid = -1;
-            if ((isset($_GET['group']) && is_numeric($_GET['group']))) {
-                $groupid = intval($_GET['group']);
-            }
-
-            wmuiFullMapView(true, false, $groupid, $fullscreen);
-
-            if ($fullscreen == 1) {
-                print "</body></html>";
-            } else {
-                wmVersionBox();
-                include_once $config["base_path"] . "/include/bottom_footer.php";
-            }
+            wmuiHandleViewCycle($request);
             break;
         case 'viewmap':
-            require_once $config["base_path"] . "/include/top_graph_header.php";
-            print "<div id=\"overDiv\" style=\"position:absolute; visibility:hidden; z-index:1000;\"></div>\n";
-            print "<script type=\"text/javascript\" src=\"vendor/overlib.js\"><!-- overLIB (c) Erik Bosrup --></script> \n";
-
-            $id = -1;
-
-            if (isset($_GET['id']) && (!is_numeric($_GET['id']) || strlen($_GET['id']) == 20)) {
-                $id = wmTranslateHashToID($_GET['id']);
-            }
-
-            if (isset($_GET['id']) && is_numeric($_GET['id'])) {
-                $id = intval($_GET['id']);
-            }
-
-            if ($id >= 0) {
-                wmuiSingleMapView($id);
-            }
-
-            wmVersionBox();
-
-            require_once $config["base_path"] . "/include/bottom_footer.php";
+            wmuiHandleView($request);
             break;
         default:
-            require_once $config["base_path"] . "/include/top_graph_header.php";
-            print "<div id=\"overDiv\" style=\"position:absolute; visibility:hidden; z-index:1000;\"></div>\n";
-            print "<script type=\"text/javascript\" src=\"vendor/overlib.js\"><!-- overLIB (c) Erik Bosrup --></script> \n";
-
-            $group_id = -1;
-            if (isset($_GET['group_id']) && (is_numeric($_GET['group_id']))) {
-                $group_id = intval($_GET['group_id']);
-                $_SESSION['wm_last_group'] = $group_id;
-            } else {
-                if (isset($_SESSION['wm_last_group'])) {
-                    $group_id = intval($_SESSION['wm_last_group']);
-                }
-            }
-
-            $tabs = wmGetValidTabs();
-            $tab_ids = array_keys($tabs);
-
-            if (($group_id == -1) && (sizeof($tab_ids) > 0)) {
-                $group_id = $tab_ids[0];
-            }
-
-            if (read_config_option("weathermap_pagestyle") == 0) {
-                wmuiThumbnailView($group_id);
-            }
-
-            if (read_config_option("weathermap_pagestyle") == 1) {
-                wmuiFullMapView(false, false, $group_id);
-            }
-
-            if (read_config_option("weathermap_pagestyle") == 2) {
-                wmuiFullMapView(false, true, $group_id);
-            }
-
-            wmVersionBox();
-            require_once($config["base_path"] . "/include/bottom_footer.php");
+            wmuiHandleMainView($request);
             break;
+    }
+}
+
+/**
+ * @param $config
+ */
+function wmuiHandleMainView($request)
+{
+    global $config;
+    
+    require_once $config["base_path"] . "/include/top_graph_header.php";
+    print "<div id=\"overDiv\" style=\"position:absolute; visibility:hidden; z-index:1000;\"></div>\n";
+    print "<script type=\"text/javascript\" src=\"vendor/overlib.js\"><!-- overLIB (c) Erik Bosrup --></script> \n";
+
+    $group_id = -1;
+    if (isset($request['group_id']) && (is_numeric($request['group_id']))) {
+        $group_id = intval($request['group_id']);
+        $_SESSION['wm_last_group'] = $group_id;
+    } else {
+        if (isset($_SESSION['wm_last_group'])) {
+            $group_id = intval($_SESSION['wm_last_group']);
+        }
+    }
+
+    $tabs = wmGetValidTabs();
+    $tab_ids = array_keys($tabs);
+
+    if (($group_id == -1) && (sizeof($tab_ids) > 0)) {
+        $group_id = $tab_ids[0];
+    }
+
+    if (read_config_option("weathermap_pagestyle") == 0) {
+        wmuiThumbnailView($group_id);
+    }
+
+    if (read_config_option("weathermap_pagestyle") == 1) {
+        wmuiFullMapView(false, false, $group_id);
+    }
+
+    if (read_config_option("weathermap_pagestyle") == 2) {
+        wmuiFullMapView(false, true, $group_id);
+    }
+
+    wmVersionBox();
+    require_once($config["base_path"] . "/include/bottom_footer.php");
+}
+
+function wmuiHandleView($request)
+{
+    global $config;
+    
+    require_once $config["base_path"] . "/include/top_graph_header.php";
+    print "<div id=\"overDiv\" style=\"position:absolute; visibility:hidden; z-index:1000;\"></div>\n";
+    print "<script type=\"text/javascript\" src=\"vendor/overlib.js\"><!-- overLIB (c) Erik Bosrup --></script> \n";
+
+    $id = -1;
+
+    if (isset($request['id']) && (!is_numeric($request['id']) || strlen($request['id']) == 20)) {
+        $id = wmTranslateHashToID($request['id']);
+    }
+
+    if (isset($request['id']) && is_numeric($request['id'])) {
+        $id = intval($request['id']);
+    }
+
+    if ($id >= 0) {
+        wmuiSingleMapView($id);
+    }
+
+    wmVersionBox();
+
+    require_once $config["base_path"] . "/include/bottom_footer.php";
+}
+
+function wmuiHandleViewCycle($request)
+{
+    global $config;
+
+    $fullscreen = false;
+    if ((isset($request['fullscreen']) && is_numeric($request['fullscreen']))) {
+        if (intval($request['fullscreen']) == 1) {
+            $fullscreen = true;
+        }
+    }
+
+    if ($fullscreen === true) {
+        print "<!DOCTYPE html>\n";
+        print "<html><head>";
+        print '<LINK rel="stylesheet" type="text/css" media="screen" href="cacti-resources/weathermap.css">';
+        print "</head><body id='wm_fullscreen'>";
+    } else {
+        include_once $config["base_path"] . "/include/top_graph_header.php";
+    }
+
+    print "<div id=\"overDiv\" style=\"position:absolute; visibility:hidden; z-index:1000;\"></div>\n";
+    print "<script type=\"text/javascript\" src=\"vendor/overlib.js\"><!-- overLIB (c) Erik Bosrup --></script> \n";
+
+    $groupid = -1;
+    if ((isset($request['group']) && is_numeric($request['group']))) {
+        $groupid = intval($request['group']);
+    }
+
+    wmuiFullMapView(true, false, $groupid, $fullscreen);
+
+    if ($fullscreen === true) {
+        print "</body></html>";
+    } else {
+        wmVersionBox();
+        include_once $config["base_path"] . "/include/bottom_footer.php";
+    }
+}
+
+/**
+ * @param $action
+ */
+function wmuiHandleImageOutput($request, $action)
+{
+    $id = -1;
+
+    if (isset($request['id']) && (!is_numeric($request['id']) || strlen($request['id']) == 20)) {
+        $id = wmTranslateHashToID($request['id']);
+    }
+
+    if (isset($request['id']) && is_numeric($request['id'])) {
+        $id = intval($request['id']);
+    }
+
+    if ($id >= 0) {
+        $imageformat = strtolower(read_config_option("weathermap_output_format"));
+
+        $userid = (isset($_SESSION["sess_user_id"]) ? intval($_SESSION["sess_user_id"]) : 1);
+
+        $map = db_fetch_assoc("select weathermap_maps.* from weathermap_auth,weathermap_maps where weathermap_maps.id=weathermap_auth.mapid and (userid=" . $userid . " or userid=0) and  active='on' and weathermap_maps.id=" . $id . " LIMIT 1");
+
+        if (sizeof($map) == 1) {
+            $imagefile = dirname(__FILE__) . '/../output/' . $map[0]['filehash'] . "." . $imageformat;
+            if ($action == 'viewthumb') {
+                $imagefile = dirname(__FILE__) . '/../output/' . $map[0]['filehash'] . ".thumb." . $imageformat;
+            }
+            if ($action == 'viewthumb48') {
+                $imagefile = dirname(__FILE__) . '/../output/' . $map[0]['filehash'] . ".thumb48." . $imageformat;
+            }
+
+            header('Content-type: image/png');
+
+            if (file_exists($imagefile)) {
+                readfile($imagefile);
+            } else {
+                wmGenerateGreyImage(48, 48);
+            }
+        } elseif ($action == "viewthumb48") {
+            // in the management view, a disabled map will fail the query above, so generate *something*
+            header('Content-type: image/png');
+            wmGenerateGreyImage(48, 48);
+        }
     }
 }
 
@@ -300,7 +332,7 @@ function wmuiThumbnailView($limit_to_group = -1)
     }
 }
 
-function wmuiFullMapView($cycle = false, $firstonly = false, $limit_to_group = -1, $fullscreen = 0)
+function wmuiFullMapView($cycle = false, $firstonly = false, $limit_to_group = -1, $fullscreen = false)
 {
     global $colors;
 
@@ -360,7 +392,7 @@ function wmuiFullMapView($cycle = false, $firstonly = false, $limit_to_group = -
     }
 
     // only draw the whole screen if we're not cycling, or we're cycling without fullscreen mode
-    if ($cycle == false || $fullscreen==0) {
+    if ($cycle === false || $fullscreen===false) {
         html_graph_start_box(2, true);
         ?>
         <tr bgcolor="<?php print $colors["panel"];?>">
@@ -409,7 +441,7 @@ function wmuiFullMapView($cycle = false, $firstonly = false, $limit_to_group = -
             }
 
             print '<div class="weathermapholder" id="mapholder_'.$map['filehash'].'">';
-            if ($cycle == false || $fullscreen==0) {
+            if ($cycle === false || $fullscreen===false) {
                 html_graph_start_box(1, true);
 
                 ?>
@@ -437,7 +469,7 @@ function wmuiFullMapView($cycle = false, $firstonly = false, $limit_to_group = -
             }
 
 
-            if ($cycle == false || $fullscreen==0) {
+            if ($cycle === false || $fullscreen===false) {
                 print '</td></tr>';
                 html_graph_end_box();
             }

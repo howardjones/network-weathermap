@@ -6,144 +6,32 @@ function wmuiMgmtPluginDispatcher($action, $request)
 
     switch ($action) {
         case 'group_update':
-            $id = -1;
-            $newname = "";
-            if (isset($request['id']) && is_numeric($request['id'])) {
-                $id = intval($request['id']);
-            }
-            if (isset($request['gname']) && (strlen($request['gname']) > 0)) {
-                $newname = $request['gname'];
-            }
-
-            if ($id >= 0 && $newname != "") {
-                wmGroupRename($id, $newname);
-            }
-            if ($id < 0 && $newname != "") {
-                wmGroupAdd($newname);
-            }
-            header("Location: weathermap-cacti-plugin-mgmt.php?action=groupadmin");
-
+            wmuiHandleGroupUpdate($request);
             break;
         case 'groupadmin_delete':
-            $id = -1;
-
-            if (isset($request['id']) && is_numeric($request['id'])) {
-                $id = intval($request['id']);
-            }
-
-            if ($id >= 1) {
-                wmGroupDelete($id);
-            }
-            header("Location: weathermap-cacti-plugin-mgmt.php?action=groupadmin");
+            wmuiHandleGroupDelete($request);
             break;
         case 'group_form':
-            $id = -1;
-
-            require_once $config["base_path"] . "/include/top_header.php";
-            if (isset($request['id']) && is_numeric($request['id'])) {
-                $id = intval($request['id']);
-            }
-
-            if ($id >= 0) {
-                wmuiGroupForm($id);
-            }
-
-            wmGenerateFooterLinks();
-            require_once($config["base_path"] . "/include/bottom_footer.php");
+            wmuiHandleGroupForm($request, $config);
             break;
         case 'groupadmin':
-            require_once($config["base_path"] . "/include/top_header.php");
-            wmuiGroupList();
-            wmGenerateFooterLinks();
-            require_once $config["base_path"] . "/include/bottom_footer.php";
+            wmuiHandleGroupSelect($config);
             break;
         case 'chgroup_update':
-            $mapid = -1;
-            $groupid = -1;
-
-            if (isset($request['map_id']) && is_numeric($request['map_id'])) {
-                $mapid = intval($request['map_id']);
-            }
-            if (isset($request['new_group']) && is_numeric($request['new_group'])) {
-                $groupid = intval($request['new_group']);
-            }
-
-            if (($groupid > 0) && ($mapid >= 0)) {
-                wmMapSetGroup($mapid, $groupid);
-            }
-
-            header("Location: weathermap-cacti-plugin-mgmt.php");
+            wmuiHandleChangeGroup($request);
             break;
         case 'chgroup':
-            if (isset($request['id']) && is_numeric($request['id'])) {
-                require_once($config["base_path"] . "/include/top_header.php");
-                wmuiMapGroupChangePage(intval($request['id']));
-                require_once($config["base_path"] . "/include/bottom_footer.php");
-            } else {
-                print "Something got lost back there.";
-            }
+            wmuiHandleGroupChangeForm($request, $config);
             break;
         case 'map_settings_delete':
-            $mapid = null;
-            $settingid = null;
-            if (isset($request['mapid']) && is_numeric($request['mapid'])) {
-                $mapid = intval($request['mapid']);
-            }
-            if (isset($request['id']) && is_numeric($request['id'])) {
-                $settingid = intval($request['id']);
-            }
-
-            if (!is_null($mapid) && !is_null($settingid)) {
-                // create setting
-                wmMapSettingDelete($mapid, $settingid);
-            }
-            header("Location: weathermap-cacti-plugin-mgmt.php?action=map_settings&id=" . $mapid);
+            wmuiHandleMapSettingsDelete($request);
             break;
         // this is the save option from the map_settings_form
         case 'save':
-            $mapid = null;
-            $settingid = null;
-            $name = '';
-            $value = '';
-
-            if (isset($request['mapid']) && is_numeric($request['mapid'])) {
-                $mapid = intval($request['mapid']);
-            }
-
-            if (isset($request['id']) && is_numeric($request['id'])) {
-                $settingid = intval($request['id']);
-            }
-
-            if (isset($request['name']) && $request['name']) {
-                $name = $request['name'];
-            }
-
-            if (isset($request['value']) && $request['value']) {
-                $value = $request['value'];
-            }
-
-            if (!is_null($mapid) && $settingid == 0) {
-                // create setting
-                wmMapSettingAdd($mapid, $name, $value);
-            } elseif (!is_null($mapid) && !is_null($settingid)) {
-                // update setting
-                wmMapSettingUpdate($mapid, $settingid, $name, $value);
-            }
-            header("Location: weathermap-cacti-plugin-mgmt.php?action=map_settings&id=" . $mapid);
+            wmuiHandleMapSettingsSave($request);
             break;
         case 'map_settings_form':
-            if (isset($request['mapid']) && is_numeric($request['mapid'])) {
-                require_once($config["base_path"] . "/include/top_header.php");
-
-                if (isset($request['id']) && is_numeric($request['id'])) {
-                    wmuiMapSettingsForm(intval($request['mapid']), intval($request['id']));
-                } else {
-                    wmuiMapSettingsForm(intval($request['mapid']));
-                }
-
-                wmGenerateFooterLinks();
-                require_once($config["base_path"] . "/include/bottom_footer.php");
-            }
+            wmuiHandleMapSettingsForm($request, $config);
             break;
         case 'map_settings':
             if (isset($request['id']) && is_numeric($request['id'])) {
@@ -263,48 +151,259 @@ function wmuiMgmtPluginDispatcher($action, $request)
             break;
         case 'rebuildnow':
 
-            require_once $config["base_path"] . "/include/top_header.php";
-
-            print "<h3>REALLY Rebuild all maps?</h3><strong>NOTE: Because your Cacti poller process probably doesn't run ";
-            print "as the same user as your webserver, it's possible this will fail with file permission problems even ";
-            print "though the normal poller process runs fine. In some situations, it MAY have memory_limit problems, if";
-            print " your mod_php/ISAPI module uses a different php.ini to your command-line PHP.</strong><hr>";
-
-            print "<p>It is recommended that you don't use this feature, ";
-            print "unless you understand and accept the problems it may cause.</p>";
-
-            print "<h4><a href=\"weathermap-cacti-plugin-mgmt.php?action=rebuildnow2\">YES</a></h4>";
-            print "<h1><a href=\"weathermap-cacti-plugin-mgmt.php\">NO</a></h1>";
-            require_once $config["base_path"] . "/include/bottom_footer.php";
+            wmuiHandleRebuildNow($config);
             break;
         case 'rebuildnow2':
-            require_once dirname(__FILE__) . DIRECTORY_SEPARATOR . "all.php";
-            require_once dirname(__FILE__) . DIRECTORY_SEPARATOR . "lib" . DIRECTORY_SEPARATOR . "poller-common.php";
-
-            require_once $config["base_path"] . "/include/top_header.php";
-            print "<h3>Rebuilding all maps</h3><strong>NOTE: Because your Cacti poller process probably doesn't run as ";
-            print "the same user as your webserver, it's possible this will fail with file permission problems even ";
-            print "though the normal poller process runs fine. In some situations, it MAY have memory_limit problems, if ";
-            print "your mod_php/ISAPI module uses a different php.ini to your command-line PHP.</strong><hr><pre>";
-
-            weathermap_run_maps(dirname(__FILE__));
-
-            print "</pre>";
-            print "<hr /><h3>Done.</h3>";
-            require_once $config["base_path"] . "/include/bottom_footer.php";
+            wmuiHandleRebuildNowStep2($config);
 
             break;
         // by default, just list the map setup
         default:
-            require_once $config["base_path"] . "/include/top_header.php";
-            wmMapManagementList4();
-            wmMapManagementList();
-
-            wmGenerateFooterLinks();
-            require_once $config["base_path"] . "/include/bottom_footer.php";
+            wmuiHandleManagementMainScreen($config);
             break;
     }
 }
+
+/**
+ * @param $config
+ */
+function wmuiHandleManagementMainScreen($config)
+{
+    require_once $config["base_path"] . "/include/top_header.php";
+    // wmMapManagementList4();
+    wmMapManagementList();
+
+    wmGenerateFooterLinks();
+    require_once $config["base_path"] . "/include/bottom_footer.php";
+}
+
+/**
+ * @param $config
+ */
+function wmuiHandleRebuildNowStep2($config)
+{
+    require_once dirname(__FILE__) . DIRECTORY_SEPARATOR . "all.php";
+    require_once dirname(__FILE__) . DIRECTORY_SEPARATOR . "lib" . DIRECTORY_SEPARATOR . "poller-common.php";
+
+    require_once $config["base_path"] . "/include/top_header.php";
+    print "<h3>Rebuilding all maps</h3><strong>NOTE: Because your Cacti poller process probably doesn't run as ";
+    print "the same user as your webserver, it's possible this will fail with file permission problems even ";
+    print "though the normal poller process runs fine. In some situations, it MAY have memory_limit problems, if ";
+    print "your mod_php/ISAPI module uses a different php.ini to your command-line PHP.</strong><hr><pre>";
+
+    weathermap_run_maps(dirname(__FILE__));
+
+    print "</pre>";
+    print "<hr /><h3>Done.</h3>";
+    require_once $config["base_path"] . "/include/bottom_footer.php";
+}
+
+/**
+ * @param $config
+ */
+function wmuiHandleRebuildNow($config)
+{
+    require_once $config["base_path"] . "/include/top_header.php";
+
+    print "<h3>REALLY Rebuild all maps?</h3><strong>NOTE: Because your Cacti poller process probably doesn't run ";
+    print "as the same user as your webserver, it's possible this will fail with file permission problems even ";
+    print "though the normal poller process runs fine. In some situations, it MAY have memory_limit problems, if";
+    print " your mod_php/ISAPI module uses a different php.ini to your command-line PHP.</strong><hr>";
+
+    print "<p>It is recommended that you don't use this feature, ";
+    print "unless you understand and accept the problems it may cause.</p>";
+
+    print "<h4><a href=\"weathermap-cacti-plugin-mgmt.php?action=rebuildnow2\">YES</a></h4>";
+    print "<h1><a href=\"weathermap-cacti-plugin-mgmt.php\">NO</a></h1>";
+    require_once $config["base_path"] . "/include/bottom_footer.php";
+}
+
+/**
+ * @param $request
+ * @param $config
+ */
+function wmuiHandleMapSettingsForm($request, $config)
+{
+    if (isset($request['mapid']) && is_numeric($request['mapid'])) {
+        require_once($config["base_path"] . "/include/top_header.php");
+
+        if (isset($request['id']) && is_numeric($request['id'])) {
+            wmuiMapSettingsForm(intval($request['mapid']), intval($request['id']));
+        } else {
+            wmuiMapSettingsForm(intval($request['mapid']));
+        }
+
+        wmGenerateFooterLinks();
+        require_once($config["base_path"] . "/include/bottom_footer.php");
+    }
+}
+
+/**
+ * @param $request
+ */
+function wmuiHandleMapSettingsSave($request)
+{
+    $mapid = null;
+    $settingid = null;
+    $name = '';
+    $value = '';
+
+    if (isset($request['mapid']) && is_numeric($request['mapid'])) {
+        $mapid = intval($request['mapid']);
+    }
+
+    if (isset($request['id']) && is_numeric($request['id'])) {
+        $settingid = intval($request['id']);
+    }
+
+    if (isset($request['name']) && $request['name']) {
+        $name = $request['name'];
+    }
+
+    if (isset($request['value']) && $request['value']) {
+        $value = $request['value'];
+    }
+
+    if (!is_null($mapid) && $settingid == 0) {
+        // create setting
+        wmMapSettingAdd($mapid, $name, $value);
+    } elseif (!is_null($mapid) && !is_null($settingid)) {
+        // update setting
+        wmMapSettingUpdate($mapid, $settingid, $name, $value);
+    }
+    header("Location: weathermap-cacti-plugin-mgmt.php?action=map_settings&id=" . $mapid);
+}
+
+/**
+ * @param $request
+ */
+function wmuiHandleMapSettingsDelete($request)
+{
+    $mapid = null;
+    $settingid = null;
+    if (isset($request['mapid']) && is_numeric($request['mapid'])) {
+        $mapid = intval($request['mapid']);
+    }
+    if (isset($request['id']) && is_numeric($request['id'])) {
+        $settingid = intval($request['id']);
+    }
+
+    if (!is_null($mapid) && !is_null($settingid)) {
+        // create setting
+        wmMapSettingDelete($mapid, $settingid);
+    }
+    header("Location: weathermap-cacti-plugin-mgmt.php?action=map_settings&id=" . $mapid);
+}
+
+/**
+ * @param $request
+ * @param $config
+ */
+function wmuiHandleGroupChangeForm($request, $config)
+{
+    if (isset($request['id']) && is_numeric($request['id'])) {
+        require_once($config["base_path"] . "/include/top_header.php");
+        wmuiMapGroupChangePage(intval($request['id']));
+        require_once($config["base_path"] . "/include/bottom_footer.php");
+    } else {
+        print "Something got lost back there.";
+    }
+}
+
+/**
+ * @param $request
+ */
+function wmuiHandleChangeGroup($request)
+{
+    $mapid = -1;
+    $groupid = -1;
+
+    if (isset($request['map_id']) && is_numeric($request['map_id'])) {
+        $mapid = intval($request['map_id']);
+    }
+    if (isset($request['new_group']) && is_numeric($request['new_group'])) {
+        $groupid = intval($request['new_group']);
+    }
+
+    if (($groupid > 0) && ($mapid >= 0)) {
+        wmMapSetGroup($mapid, $groupid);
+    }
+
+    header("Location: weathermap-cacti-plugin-mgmt.php");
+}
+
+/**
+ * @param $config
+ */
+function wmuiHandleGroupSelect($config)
+{
+    require_once($config["base_path"] . "/include/top_header.php");
+    wmuiGroupList();
+    wmGenerateFooterLinks();
+    require_once $config["base_path"] . "/include/bottom_footer.php";
+}
+
+/**
+ * @param $request
+ * @param $config
+ */
+function wmuiHandleGroupForm($request, $config)
+{
+    $id = -1;
+
+    require_once $config["base_path"] . "/include/top_header.php";
+    if (isset($request['id']) && is_numeric($request['id'])) {
+        $id = intval($request['id']);
+    }
+
+    if ($id >= 0) {
+        wmuiGroupForm($id);
+    }
+
+    wmGenerateFooterLinks();
+    require_once($config["base_path"] . "/include/bottom_footer.php");
+}
+
+/**
+ * @param $request
+ */
+function wmuiHandleGroupDelete($request)
+{
+    $id = -1;
+
+    if (isset($request['id']) && is_numeric($request['id'])) {
+        $id = intval($request['id']);
+    }
+
+    if ($id >= 1) {
+        wmGroupDelete($id);
+    }
+    header("Location: weathermap-cacti-plugin-mgmt.php?action=groupadmin");
+}
+
+/**
+ * @param $request
+ */
+function wmuiHandleGroupUpdate($request)
+{
+    $id = -1;
+    $newname = "";
+    if (isset($request['id']) && is_numeric($request['id'])) {
+        $id = intval($request['id']);
+    }
+    if (isset($request['gname']) && (strlen($request['gname']) > 0)) {
+        $newname = $request['gname'];
+    }
+
+    if ($id >= 0 && $newname != "") {
+        wmGroupRename($id, $newname);
+    }
+    if ($id < 0 && $newname != "") {
+        wmGroupAdd($newname);
+    }
+    header("Location: weathermap-cacti-plugin-mgmt.php?action=groupadmin");
+}
+
 ///////////////////////////////////////////////////////////////////////////
 
 
@@ -1286,6 +1385,8 @@ function wmMapSettingDelete($mapid, $settingid)
 function wmuiMapGroupChangePage($id)
 {
     global $colors;
+
+    $n = 0;
 
     $title = db_fetch_cell("select titlecache from weathermap_maps where id=".intval($id));
     $curgroup = db_fetch_cell("select group_id from weathermap_maps where id=".intval($id));

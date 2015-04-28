@@ -73,23 +73,34 @@ function wmuiHandleView($request)
     print "<div id=\"overDiv\" style=\"position:absolute; visibility:hidden; z-index:1000;\"></div>\n";
     print "<script type=\"text/javascript\" src=\"vendor/overlib.js\"><!-- overLIB (c) Erik Bosrup --></script> \n";
 
-    $id = -1;
+    $mapID = wmuiDeduceMapID($request);
 
-    if (isset($request['id']) && (!is_numeric($request['id']) || strlen($request['id']) == 20)) {
-        $id = wmTranslateHashToID($request['id']);
-    }
-
-    if (isset($request['id']) && is_numeric($request['id'])) {
-        $id = intval($request['id']);
-    }
-
-    if ($id >= 0) {
-        wmuiSingleMapView($id);
+    if ($mapID >= 0) {
+        wmuiSingleMapView($mapID);
     }
 
     wmVersionBox();
 
     require_once $config["base_path"] . "/include/bottom_footer.php";
+}
+
+/**
+ * @param $request
+ * @return int
+ */
+function wmuiDeduceMapID($request)
+{
+    $mapID = -1;
+
+    if (isset($request['id']) && (!is_numeric($request['id']) || strlen($request['id']) == 20)) {
+        $mapID = wmTranslateHashToID($request['id']);
+    }
+
+    if (isset($request['id']) && is_numeric($request['id'])) {
+        $mapID = intval($request['id']);
+        return $mapID;
+    }
+    return $mapID;
 }
 
 function wmuiHandleViewCycle($request)
@@ -135,44 +146,40 @@ function wmuiHandleViewCycle($request)
  */
 function wmuiHandleImageOutput($request, $action)
 {
-    $id = -1;
+    $mapID = wmuiDeduceMapID($request);
 
-    if (isset($request['id']) && (!is_numeric($request['id']) || strlen($request['id']) == 20)) {
-        $id = wmTranslateHashToID($request['id']);
+    if ($mapID < 0) {
+        return;
+    }
+    $imageFormat = strtolower(read_config_option("weathermap_output_format"));
+
+    $userID = wmGetCactiUserID();
+
+    $map = db_fetch_assoc("select weathermap_maps.* from weathermap_auth,weathermap_maps where weathermap_maps.id=weathermap_auth.mapid and (userid=" . $userID . " or userid=0) and  active='on' and weathermap_maps.id=" . $mapID . " LIMIT 1");
+
+    if (sizeof($map) != 1) {
+        // in the management view, a disabled map will fail the query above, so generate *something*
+        header('Content-type: image/png');
+        wmGenerateGreyImage(48, 48);
     }
 
-    if (isset($request['id']) && is_numeric($request['id'])) {
-        $id = intval($request['id']);
+    $insert = ".";
+    if ($action == 'viewthumb') {
+        $insert = ".thumb.";
     }
 
-    if ($id >= 0) {
-        $imageformat = strtolower(read_config_option("weathermap_output_format"));
+    if ($action == 'viewthumb48') {
+        $insert = ".thumb48.";
+    }
 
-        $userid = (isset($_SESSION["sess_user_id"]) ? intval($_SESSION["sess_user_id"]) : 1);
+    $imageFileName = dirname(__FILE__) . '/../output/' . $map[0]['filehash'] . $insert . $imageFormat;
 
-        $map = db_fetch_assoc("select weathermap_maps.* from weathermap_auth,weathermap_maps where weathermap_maps.id=weathermap_auth.mapid and (userid=" . $userid . " or userid=0) and  active='on' and weathermap_maps.id=" . $id . " LIMIT 1");
+    header('Content-type: image/png');
 
-        if (sizeof($map) == 1) {
-            $imagefile = dirname(__FILE__) . '/../output/' . $map[0]['filehash'] . "." . $imageformat;
-            if ($action == 'viewthumb') {
-                $imagefile = dirname(__FILE__) . '/../output/' . $map[0]['filehash'] . ".thumb." . $imageformat;
-            }
-            if ($action == 'viewthumb48') {
-                $imagefile = dirname(__FILE__) . '/../output/' . $map[0]['filehash'] . ".thumb48." . $imageformat;
-            }
-
-            header('Content-type: image/png');
-
-            if (file_exists($imagefile)) {
-                readfile($imagefile);
-            } else {
-                wmGenerateGreyImage(48, 48);
-            }
-        } elseif ($action == "viewthumb48") {
-            // in the management view, a disabled map will fail the query above, so generate *something*
-            header('Content-type: image/png');
-            wmGenerateGreyImage(48, 48);
-        }
+    if (file_exists($imageFileName)) {
+        readfile($imageFileName);
+    } else {
+        wmGenerateGreyImage(48, 48);
     }
 }
 
@@ -182,20 +189,17 @@ function wmuiSingleMapView($mapid)
 
     $is_wm_admin = false;
 
-    $outdir = dirname(__FILE__).'/../output/';
+    $outputDirectory = dirname(__FILE__).'/../output/';
 
-    $userid = (isset($_SESSION["sess_user_id"]) ? intval($_SESSION["sess_user_id"]) : 1);
+    $userid = wmGetCactiUserID();
     $map = db_fetch_assoc("select weathermap_maps.* from weathermap_auth,weathermap_maps where weathermap_maps.id=weathermap_auth.mapid and active='on' and (userid=".$userid." or userid=0) and weathermap_maps.id=".$mapid);
 
 
     if (sizeof($map)) {
         print do_hook_function('weathermap_page_top', '');
 
-        $htmlfile = $outdir.$map[0]['filehash'].".html";
-        $maptitle = $map[0]['titlecache'];
-        if ($maptitle == '') {
-            $maptitle= "Map for config file: ".$map[0]['configfile'];
-        }
+        $htmlFileName = $outputDirectory.$map[0]['filehash'].".html";
+        $mapTitle = ( $map[0]['titlecache'] == "" ? "Map for config file: ".$map[0]['configfile'] : $map[0]['titlecache']);
 
         wmGenerateMapSelectorBox($mapid);
 
@@ -203,7 +207,7 @@ function wmuiSingleMapView($mapid)
         ?>
         <tr bgcolor="<?php print $colors["panel"];?>"><td><table width="100%" cellpadding="0"
                                                                  cellspacing="0"><tr><td class="textHeader"
-                                                                                         nowrap><?php print $maptitle;
+                                                                                         nowrap><?php print $mapTitle;
 
                                                                                             if ($is_wm_admin) {
                                                                                                 print "<span style='font-size: 80%'>";
@@ -217,8 +221,8 @@ function wmuiSingleMapView($mapid)
         <tr><td>
         <?php
 
-        if (file_exists($htmlfile)) {
-            include $htmlfile;
+        if (file_exists($htmlFileName)) {
+            include $htmlFileName;
         } else {
             print "<div align=\"center\" style=\"padding:20px\"><em>This map hasn't been created yet.";
 
@@ -229,7 +233,7 @@ function wmuiSingleMapView($mapid)
                 $realm_id2 = $user_auth_realm_filenames[basename('weathermap-cacti-plugin.php')];
             }
 
-            $userid = (isset($_SESSION["sess_user_id"]) ? intval($_SESSION["sess_user_id"]) : 1);
+            $userid = wmGetCactiUserID();
 
             if ((db_fetch_assoc(
                 "select user_auth_realm.realm_id from user_auth_realm where user_auth_realm.user_id='" . $userid . "' and user_auth_realm.realm_id='$realm_id2'"
@@ -247,7 +251,7 @@ function wmuiThumbnailView($limit_to_group = -1)
 {
     global $colors;
 
-    $userid = (isset($_SESSION["sess_user_id"]) ? intval($_SESSION["sess_user_id"]) : 1);
+    $userid = wmGetCactiUserID();
     $maplist_SQL = "select distinct weathermap_maps.* from weathermap_auth,weathermap_maps where weathermap_maps.id=weathermap_auth.mapid and active='on' and ";
 
     if ($limit_to_group >0) {
@@ -338,11 +342,11 @@ function wmuiFullMapView($cycle = false, $firstonly = false, $limit_to_group = -
 
     $_SESSION['custom']=false;
 
-    $userid = (isset($_SESSION["sess_user_id"]) ? intval($_SESSION["sess_user_id"]) : 1);
+    $userid = wmGetCactiUserID();
 
     $maplist_SQL = "select distinct weathermap_maps.* from weathermap_auth,weathermap_maps where weathermap_maps.id=weathermap_auth.mapid and active='on' and ";
 
-    if ($limit_to_group >0) {
+    if ($limit_to_group > 0) {
         $maplist_SQL .= " weathermap_maps.group_id=".$limit_to_group." and ";
     }
 
@@ -427,13 +431,11 @@ function wmuiFullMapView($cycle = false, $firstonly = false, $limit_to_group = -
         wmGenerateGroupTabs($limit_to_group);
     }
 
-    $i = 0;
     if (sizeof($maplist) > 0) {
         print "<div class='all_map_holder $class'>";
 
         $outdir = dirname(__FILE__).'/../output/';
         foreach ($maplist as $map) {
-            $i++;
             $htmlfile = $outdir.$map['filehash'].".html";
             $maptitle = $map['titlecache'];
             if ($maptitle == '') {
@@ -517,7 +519,7 @@ function wmVersionBox()
     if (isset($user_auth_realm_filenames['weathermap-cacti-plugin-mgmt.php'])) {
         $realm_id2 = $user_auth_realm_filenames['weathermap-cacti-plugin-mgmt.php'];
     }
-    $userid = (isset($_SESSION["sess_user_id"]) ? intval($_SESSION["sess_user_id"]) : 1);
+    $userid = wmGetCactiUserID();
 
     if ((db_fetch_assoc(
         "select user_auth_realm.realm_id from user_auth_realm where user_auth_realm.user_id='"
@@ -572,7 +574,7 @@ function wmGenerateMapSelectorBox($current_id = 0)
         return false;
     }
 
-    $userid = (isset($_SESSION["sess_user_id"]) ? intval($_SESSION["sess_user_id"]) : 1);
+    $userid = wmGetCactiUserID();
     $maps = db_fetch_assoc("select distinct weathermap_maps.*,weathermap_groups.name, weathermap_groups.sortorder as gsort from weathermap_groups,weathermap_auth,weathermap_maps where weathermap_maps.group_id=weathermap_groups.id and weathermap_maps.id=weathermap_auth.mapid and active='on' and (userid=".$userid." or userid=0) order by gsort, sortorder");
 
     if (sizeof($maps)>1) {
@@ -641,7 +643,7 @@ function wmGenerateMapSelectorBox($current_id = 0)
 function wmGetValidTabs()
 {
     $tabs = array();
-    $userid = (isset($_SESSION["sess_user_id"]) ? intval($_SESSION["sess_user_id"]) : 1);
+    $userid = wmGetCactiUserID();
     $maps = db_fetch_assoc("select weathermap_maps.*, weathermap_groups.name as group_name from weathermap_auth,weathermap_maps, weathermap_groups where weathermap_groups.id=weathermap_maps.group_id and weathermap_maps.id=weathermap_auth.mapid and active='on' and (userid=".$userid." or userid=0) order by weathermap_groups.sortorder");
 
     foreach ($maps as $map) {
@@ -649,6 +651,16 @@ function wmGetValidTabs()
     }
 
     return($tabs);
+}
+
+/**
+ * @return int
+ */
+function wmGetCactiUserID()
+{
+    $userid = (isset($_SESSION["sess_user_id"]) ? intval($_SESSION["sess_user_id"]) : 1);
+
+    return $userid;
 }
 
 function wmGenerateGroupTabs($current_tab)
@@ -685,10 +697,10 @@ function wmGenerateGroupTabs($current_tab)
 
 function wmGenerateGreyImage($w, $h)
 {
-    $im = imagecreate($w, $h);
+    $imageRef = imagecreate($w, $h);
     $shade = 240;
     // The first colour allocated becomes the background colour of the image. No need to fill
-    $grey = imagecolorallocate($im, $shade, $shade, $shade);
-    imagepng($im);
+    imagecolorallocate($imageRef, $shade, $shade, $shade);
+    imagepng($imageRef);
 
 }

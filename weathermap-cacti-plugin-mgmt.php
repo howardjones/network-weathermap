@@ -22,6 +22,8 @@ if (isset($_POST['action'])) {
     $action = $_GET['action'];
 }
 
-wmuiMgmtPluginDispatcher($action, $_REQUEST, $weathermap_confdir);
+$plugin = new WeatherMapCactiManagementPlugin($config, $colors);
+
+$plugin->dispatch($action, $_REQUEST);
 
 // vim:ts=4:sw=4:

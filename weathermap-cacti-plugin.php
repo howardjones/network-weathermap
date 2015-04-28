@@ -19,6 +19,8 @@ if (isset($_POST['action'])) {
     $action = $_GET['action'];
 }
 
-wmuiUserPluginDispatcher($action, $_REQUEST);
+$plugin = new WeatherMapCactiUserPlugin($config);
+
+$plugin->dispatch($action, $_REQUEST);
 
 // vim:ts=4:sw=4:

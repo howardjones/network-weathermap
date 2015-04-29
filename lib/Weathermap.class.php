@@ -42,14 +42,14 @@ class WeatherMap extends WeatherMapBase
     var $title,
         $titlefont;
 
-    var $htmloutputfile,
-        $imageoutputfile;
+    var $htmloutputfile;
+    var $imageoutputfile;
     var $dataoutputfile;
 
     var $htmlstylesheet;
 
-    var $defaultlink,
-        $defaultnode;
+    var $defaultlink;
+    var $defaultnode;
 
     var $need_size_precalc;
     var $keystyle, $keysize;
@@ -689,7 +689,7 @@ class WeatherMap extends WeatherMapBase
 
         $allMapItems = $this->buildAllItemsList();
 
-        $this->initialiseAllPlugins();
+       // $this->initialiseAllPlugins();
 
         // process all the targets and find a plugin for them
         $this->preProcessTargets($allMapItems);
@@ -820,6 +820,8 @@ class WeatherMap extends WeatherMapBase
         $this->buildZLayers();
         $this->resolveRelativePositions();
         $this->updateMaxValues();
+
+        $this->initialiseAllPlugins();
         $this->runProcessorPlugins("pre");
     }
 
@@ -972,7 +974,7 @@ class WeatherMap extends WeatherMapBase
         }
     }
 
-    private function runProcessorPlugins($stage = "pre")
+    public function runProcessorPlugins($stage = "pre")
     {
         wm_debug("Running $stage-processing plugins...\n");
         foreach ($this->plugins[$stage] as $name => $pluginEntry) {

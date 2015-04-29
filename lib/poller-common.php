@@ -242,10 +242,15 @@ function WMMemoryNote($label)
     }
 }
 
+class WeathermapPollerRuntime
+{
+
+}
+
 function weathermap_run_maps($mydir, $map_id = -1)
 {
-    global $weathermap_debugging, $WEATHERMAP_VERSION;
-    global $weathermap_map;
+    global $weathermap_debugging;
+    global $WEATHERMAP_VERSION;
     global $weathermap_warncount;
     global $weathermap_poller_start_time;
     global $weathermap_error_suppress;
@@ -292,288 +297,262 @@ function weathermap_run_maps($mydir, $map_id = -1)
         cacti_log("Weathermap $WEATHERMAP_VERSION starting - $mode_message\n", true, "WEATHERMAP");
     }
 
-    if (wm_module_checks()) {
-        weathermap_memory_check("MEM Initial");
-        // move to the weathermap folder so all those relatives paths don't *have* to be absolute
-        $orig_cwd = getcwd();
-        chdir($mydir);
-
-        db_execute("replace into settings values('weathermap_last_start_time','".mysql_real_escape_string($start_time)."')");
-
-        // first, see if the output directory exists and is writable
-        if (weathermap_directory_writeable($outputDirectory)) {
-            $maplist = weathermap_get_runlist($map_id, $quietLogging);
-
-            wm_debug("Iterating all maps.");
-
-            $imageFormat = strtolower(read_config_option("weathermap_output_format"));
-            $rrdtool_path =  read_config_option("path_rrdtool");
-
-            foreach ($maplist as $map) {
-                // reset the warning counter
-                $weathermap_warncount=0;
-                // this is what will prefix log entries for this map
-                $weathermap_map = "[Map ".$map['id']."] ".$map['configfile'];
-
-                wm_debug("FIRST TOUCH\n");
-
-                $runner = new WeatherMapRunner($configDirectory, $outputDirectory, $map['configfile'], $map['filehash'], $imageFormat);
-
-                $mapfile = $configDirectory . DIRECTORY_SEPARATOR . $map['configfile'];
-                $htmlFilename = $outputDirectory . DIRECTORY_SEPARATOR . $map['filehash'].".html";
-                $imageFilename = $outputDirectory . DIRECTORY_SEPARATOR . $map['filehash'].".".$imageFormat;
-                $thumbImageFilename = $outputDirectory . DIRECTORY_SEPARATOR . $map['filehash'].".thumb.".$imageFormat;
-                $thumb48ImageFilename = $outputDirectory . DIRECTORY_SEPARATOR . $map['filehash'].".thumb48.".$imageFormat;
-
-                $jsonfile  = $outputDirectory . DIRECTORY_SEPARATOR . $map['filehash'].".json";
-
-                $statsfile = $outputDirectory . DIRECTORY_SEPARATOR . $map['filehash'] . '.stats.txt';
-                $dataFilename = $outputDirectory . DIRECTORY_SEPARATOR . $map['filehash'] . '.results.txt';
-                // used to write files before moving them into place
-                $tempfile = $outputDirectory . DIRECTORY_SEPARATOR . $map['filehash'] . '.tmp.png';
-
-                $runner->LoadMap();
-
-                if (file_exists($mapfile)) {
-                    if ($quietLogging==0) {
-                        wm_warn("Map: $mapfile -> $htmlFilename & $imageFilename\n", true);
-                    }
-                    db_execute("replace into settings values('weathermap_last_started_file','".mysql_real_escape_string($weathermap_map)."')");
-
-                    if ($global_debug === false && ($map['debug']=='on' || $map['debug']=='once')) {
-                        $weathermap_debugging = true;
-                        wm_debug("Per-map debugging enabled for this map.\n");
-                    } else {
-                        $weathermap_debugging = $global_debug;
-                    }
-                    $mapStartTime = microtime(true);
-
-                    weathermap_memory_check("MEM starting $mapCount");
-                    $wmap = new Weathermap;
-                    $wmap->context = "cacti";
-
-                    // we can grab the rrdtool path from Cacti's config, in this case
-                    $wmap->rrdtool  = $rrdtool_path;
-
-                    $wmap->ReadConfig($mapfile);
-
-                    $wmap->add_hint("mapgroup", $map['groupname']);
-                    $wmap->add_hint("mapgroupextra", ($map['group_id'] ==1 ? "" : $map['groupname'] ));
-
-                    # in the order of precedence - global extras, group extras, and finally map extras
-                    $queries = array();
-                    $queries[] = "select * from weathermap_settings where mapid=0 and groupid=0";
-                    $queries[] = "select * from weathermap_settings where mapid=0 and groupid=".intval($map['group_id']);
-                    $queries[] = "select * from weathermap_settings where mapid=".intval($map['id']);
-
-                    foreach ($queries as $sql) {
-                        $settingrows = db_fetch_assoc($sql);
-                        if (is_array($settingrows) && count($settingrows) > 0) {
-                            foreach ($settingrows as $setting) {
-                                $set_it = false;
-                                if ($setting['mapid']==0 && $setting['groupid']==0) {
-                                    wm_debug("Setting additional (all maps) option: ".$setting['optname']." to '".$setting['optvalue']."'\n");
-                                    $set_it = true;
-                                } elseif ($setting['groupid']!=0) {
-                                    wm_debug("Setting additional (all maps in group) option: ".$setting['optname']." to '".$setting['optvalue']."'\n");
-                                    $set_it = true;
-                                } else {
-                                    wm_debug("Setting additional map-global option: ".$setting['optname']." to '".$setting['optvalue']."'\n");
-                                    $set_it = true;
-                                }
-                                if ($set_it) {
-                                    $wmap->add_hint($setting['optname'], $setting['optvalue']);
-
-                                    if (substr($setting['optname'], 0, 7)=='nowarn_') {
-                                        $code = strtoupper(substr($setting['optname'], 7));
-                                        $weathermap_error_suppress[] = $code;
-                                    }
-                                }
-                            }
-                        }
-                    }
-
-
-                    weathermap_memory_check("MEM postread $mapCount");
-                    $wmap->readData();
-                    weathermap_memory_check("MEM postdata $mapCount");
-
-                    $configured_imageuri = $wmap->imageuri;
-                    $wmap->imageuri = 'weathermap-cacti-plugin.php?action=viewimage&id='.$map['filehash']."&time=".time();
-
-                    if ($quietLogging==0) {
-                        wm_warn("About to write image file. If this is the last message in your log, increase memory_limit in php.ini [WMPOLL01]\n", true);
-                    }
-                    weathermap_memory_check("MEM pre-render $mapCount");
-
-                    // Write the image to a temporary file first - it turns out that libpng is not that fast
-                    // and this way we avoid showing half a map
-                    $wmap->drawMapImage($tempfile, $thumbImageFilename, read_config_option("weathermap_thumbsize"));
-
-                    // Firstly, don't move or delete anything if the image saving failed
-                    if (file_exists($tempfile)) {
-                        // Don't try and delete a non-existent file (first run)
-                        if (file_exists($imageFilename)) {
-                            unlink($imageFilename);
-                        }
-                        rename($tempfile, $imageFilename);
-                    }
-
-                    $gdThumbImage = imagecreatefrompng($thumbImageFilename);
-                    $gdThumb48Image = imagecreatetruecolor(48, 48);
-                    imagecopyresampled($gdThumb48Image, $gdThumbImage, 0, 0, 0, 0, 48, 48, imagesx($gdThumbImage), imagesy($gdThumbImage));
-                    imagepng($gdThumb48Image, $thumb48ImageFilename);
-                    imagedestroy($gdThumb48Image);
-                    imagedestroy($gdThumbImage);
-
-                    if ($quietLogging==0) {
-                        wm_warn("Wrote map to $imageFilename and $thumbImageFilename\n", true);
-                    }
-                    $fileHandle = @fopen($htmlFilename, 'w');
-                    if ($fileHandle != false) {
-                        fwrite($fileHandle, $wmap->makeHTML('weathermap_'.$map['filehash'].'_imap'));
-                        fclose($fileHandle);
-                        wm_debug("Wrote HTML to $htmlFilename");
-                    } else {
-                        if (file_exists($htmlFilename)) {
-                            wm_warn("Failed to overwrite $htmlFilename - permissions of existing file are wrong? [WMPOLL02]\n");
-                        } else {
-                            wm_warn("Failed to create $htmlFilename - permissions of output directory are wrong? [WMPOLL03]\n");
-                        }
-                    }
-
-
-                    $wmap->writeDataFile($dataFilename);
-
-                    // put back the configured imageuri
-                    $wmap->imageuri = $configured_imageuri;
-
-                    // if an htmloutputfile was configured, output the HTML there too
-                    // but using the configured imageuri and imagefilename
-                    if ($wmap->htmloutputfile != "") {
-                        $htmlFilename = $wmap->htmloutputfile;
-                        $fileHandle = @fopen($htmlFilename, 'w');
-
-                        if ($fileHandle !== false) {
-                            fwrite(
-                                $fileHandle,
-                                $wmap->makeHTML('weathermap_' . $map['filehash'] . '_imap')
-                            );
-                            fclose($fileHandle);
-                            wm_debug("Wrote HTML to %s\n", $htmlFilename);
-                        } else {
-                            if (true === file_exists($htmlFilename)) {
-                                wm_warn('Failed to overwrite ' . $htmlFilename
-                                    . " - permissions of existing file are wrong? [WMPOLL02]\n");
-                            } else {
-                                wm_warn('Failed to create ' . $htmlFilename
-                                    . " - permissions of output directory are wrong? [WMPOLL03]\n");
-                            }
-                        }
-                    }
-
-                    if ($wmap->imageoutputfile != "" && $wmap->imageoutputfile != "weathermap.png" && file_exists($imageFilename)) {
-                        // copy the existing file to the configured location too
-                        @copy($imageFilename, $wmap->imageoutputfile);
-                    }
-
-                    // If archiving is enabled for this map, then save copies with datestamps, for animation etc
-                    if ($map['archiving'] == 'on') {
-                        // TODO - additionally save a copy with a datestamp file format
-                        $archiveDatestamp = strftime("%Y-%m-%d-%H-%M", $weathermap_poller_start_time);
-                        $archiveFilename = $outputDirectory . DIRECTORY_SEPARATOR . sprintf("%s-archive-%s.%s", $map['filehash'], $archiveDatestamp, $imageFormat);
-                        @copy($imageFilename, $archiveFilename);
-
-                        weathermap_manage_archiving($map['filehash'] . "-archive-", $outputDirectory);
-                    }
-
-                    // if the user explicitly defined a data file, write it there too
-                    if ($wmap->dataoutputfile) {
-                        $map->WriteDataFile($map->dataoutputfile);
-                    }
-
-                    $processedTitle = $wmap->processString($wmap->title, $wmap);
-
-                    db_execute("update weathermap_maps set titlecache='".mysql_real_escape_string($processedTitle)."' where id=".intval($map['id']));
-                    if (intval($wmap->thumb_width) > 0) {
-                        db_execute("update weathermap_maps set thumb_width=".intval($wmap->thumb_width).", thumb_height=".intval($wmap->thumb_height)." where id=".intval($map['id']));
-                    }
-
-                    $runner->CleanUp();
-                    unset($runner);
-
-                    $wmap->cleanUp();
-                    unset($wmap);
-
-                    $mapEndTime = microtime(true);
-
-                    $mapDuration = $mapEndTime - $mapStartTime;
-                    wm_debug("TIME: $mapfile took %f seconds.\n", $mapDuration);
-                    weathermap_memory_check("MEM after $mapCount");
-                    $mapCount++;
-                    db_execute("replace into settings values('weathermap_last_finished_file','".mysql_real_escape_string($weathermap_map)."')");
-                } else {
-                    wm_warn("Mapfile $mapfile is not readable or doesn't exist [WMPOLL04]\n");
-                }
-
-                // if the debug mode was set to once for this map, then that
-                // time has now passed, and it can be turned off again.
-                $newDebugState = $map['debug'];
-                if ($newDebugState == 'once') {
-                    $newDebugState = 'off';
-                }
-
-                db_execute(sprintf(
-                    "update weathermap_maps set warncount=%d, runtime=%f, debug='%s',lastrun=NOW() where id=%d",
-                    $weathermap_warncount,
-                    $mapDuration,
-                    $newDebugState,
-                    $map['id']
-                ));
-
-                $total_warnings += $weathermap_warncount;
-                $weathermap_warncount = 0;
-                $weathermap_map="";
-            }
-            wm_debug("Iterated all $mapCount maps.\n");
-        } else {
-            wm_warn("Output directory ($outputDirectory) doesn't exist!. No maps created. You probably need to create that directory, and make it writable by the poller process (like you did with the RRA directory) [WMPOLL07]\n");
-            $total_warnings++;
-            $warning_notes .= " (Output directory problem prevents any maps running WMPOLL07)";
-        }
-                
-        weathermap_memory_check("MEM Final");
-        chdir($orig_cwd);
-        
-        $end_time = microtime(true);
-        $duration = $end_time - $start_time;
-        
-        $stats_string = sprintf('%s: %d maps were run in %.2f seconds with %d warnings', date(DATE_RFC822), $mapCount, $duration, $total_warnings);
-        
-        if (true === function_exists("memory_get_peak_usage")) {
-            $peak_memory = memory_get_peak_usage();
-            db_execute("replace into settings values('weathermap_peak_memory','"
-                    . $peak_memory . "')");
-            $stats_string .= sprintf(" using %sbytes peak memory", wmFormatNumberWithMetricPrefix($peak_memory));
-        }
-
-        if ($quietLogging==0) {
-            wm_warn("STATS: Weathermap $WEATHERMAP_VERSION run complete - $stats_string\n", true);
-        }
-        db_execute("replace into settings values('weathermap_last_stats','".mysql_real_escape_string($stats_string)."')");
-        db_execute("replace into settings values('weathermap_last_finish_time','".mysql_real_escape_string($end_time)."')");
-        db_execute("replace into settings values('weathermap_last_map_count','". mysql_real_escape_string($mapCount) . "')");
-
-        if (true === function_exists('memory_get_usage')) {
-            db_execute("replace into settings values('weathermap_final_memory','" . memory_get_usage() . "')");
-            db_execute("replace into settings values('weathermap_highwater_memory','" . $weathermap_mem_highwater . "')");
-        }
-        if (true === function_exists("memory_get_peak_usage")) {
-            db_execute("replace into settings values('weathermap_peak_memory','" . memory_get_peak_usage() . "')");
-        }
-    } else {
+    if (!wm_module_checks()) {
         wm_warn("Required modules for PHP Weathermap $WEATHERMAP_VERSION were not present. Not running. [WMPOLL08]\n");
+        return;
     }
+
+    weathermap_memory_check("MEM Initial");
+    // move to the weathermap folder so all those relatives paths don't *have* to be absolute
+    $orig_cwd = getcwd();
+    chdir($mydir);
+
+    db_execute("replace into settings values('weathermap_last_start_time','".mysql_real_escape_string($start_time)."')");
+
+    // first, see if the output directory exists and is writable
+    if (weathermap_directory_writeable($outputDirectory)) {
+        $mapList = weathermap_get_runlist($map_id, $quietLogging);
+
+        wm_debug("Iterating all maps.");
+
+        $imageFormat = strtolower(read_config_option("weathermap_output_format"));
+        $rrdtool_path =  read_config_option("path_rrdtool");
+
+        foreach ($mapList as $mapParameters) {
+            $weathermap_warncount = 0;
+            weathermap_run_map($mapParameters, $configDirectory, $outputDirectory, $imageFormat, $quietLogging, $global_debug, $mapCount, $rrdtool_path, $weathermap_error_suppress, $weathermap_poller_start_time, $total_warnings);
+            $total_warnings += $weathermap_warncount;
+            $mapCount++;
+        }
+        wm_debug("Iterated all $mapCount maps.\n");
+    } else {
+        wm_warn("Output directory ($outputDirectory) doesn't exist!. No maps created. You probably need to create that directory, and make it writable by the poller process (like you did with the RRA directory) [WMPOLL07]\n");
+        $total_warnings++;
+        $warning_notes .= " (Output directory problem prevents any maps running WMPOLL07)";
+    }
+
+    weathermap_memory_check("MEM Final");
+    chdir($orig_cwd);
+
+    $end_time = microtime(true);
+    $duration = $end_time - $start_time;
+
+    $stats_string = sprintf('%s: %d maps were run in %.2f seconds with %d warnings', date(DATE_RFC822), $mapCount, $duration, $total_warnings);
+
+    if (true === function_exists("memory_get_peak_usage")) {
+        $peak_memory = memory_get_peak_usage();
+        db_execute("replace into settings values('weathermap_peak_memory','"
+                . $peak_memory . "')");
+        $stats_string .= sprintf(" using %sbytes peak memory", wmFormatNumberWithMetricPrefix($peak_memory));
+    }
+
+    if ($quietLogging==0) {
+        wm_warn("STATS: Weathermap $WEATHERMAP_VERSION run complete - $stats_string\n", true);
+    }
+
+    db_execute("replace into settings values('weathermap_last_stats','".mysql_real_escape_string($stats_string)."')");
+    db_execute("replace into settings values('weathermap_last_finish_time','".mysql_real_escape_string($end_time)."')");
+    db_execute("replace into settings values('weathermap_last_map_count','". mysql_real_escape_string($mapCount) . "')");
+
+    if (true === function_exists('memory_get_usage')) {
+        db_execute("replace into settings values('weathermap_final_memory','" . memory_get_usage() . "')");
+        db_execute("replace into settings values('weathermap_highwater_memory','" . $weathermap_mem_highwater . "')");
+    }
+    if (true === function_exists("memory_get_peak_usage")) {
+        db_execute("replace into settings values('weathermap_peak_memory','" . memory_get_peak_usage() . "')");
+    }
+}
+
+/**
+ * @param $mapParameters
+ * @param $configDirectory
+ * @param $outputDirectory
+ * @param $imageFormat
+ * @param $quietLogging
+ * @param $global_debug
+ * @param $mapCount
+ * @param $rrdtool_path
+ * @param $weathermap_error_suppress
+ * @param $weathermap_poller_start_time
+ * @param $total_warnings
+ * @return array
+ */
+function weathermap_run_map($mapParameters, $configDirectory, $outputDirectory, $imageFormat, $quietLogging, $global_debug, $mapCount, $rrdtool_path, $weathermap_error_suppress, $weathermap_poller_start_time, $total_warnings)
+{
+    global $weathermap_debugging;
+    global $weathermap_error_suppress;
+
+    // reset the warning counter
+    $weathermap_warncount = 0;
+
+    // this is what will prefix log entries for this map
+    $logTag = "[Map " . $mapParameters['id'] . "] " . $mapParameters['configfile'];
+
+    wm_debug("$logTag - FIRST TOUCH\n");
+
+    $runner = new WeatherMapRunner($configDirectory, $outputDirectory, $mapParameters['configfile'], $mapParameters['filehash'], $imageFormat);
+
+    if ($global_debug === false && ($mapParameters['debug'] == 'on' || $mapParameters['debug'] == 'once')) {
+        $weathermap_debugging = true;
+        $runner->setDebug(true);
+        wm_debug("$logTag - Per-map debugging enabled for this map.\n");
+    } else {
+        $weathermap_debugging = $global_debug;
+        $runner->setDebug(false);
+    }
+
+    $runner->setRrdtool($rrdtool_path);
+
+    // Log where we are up to so the Cacti UI can tell someone
+    db_execute("replace into settings values('weathermap_last_started_file','" . mysql_real_escape_string($logTag) . "')");
+
+    $runner->LoadMap();
+
+    $mapStartTime = microtime(true);
+
+    weathermap_memory_check("MEM starting $mapCount");
+    // $weathermapObject = new Weathermap;
+    // $weathermapObject->context = "cacti";
+
+    // we can grab the rrdtool path from Cacti's config, in this case
+    // $weathermapObject->rrdtool = $rrdtool_path;
+
+    // $weathermapObject->ReadConfig($mapfile);
+
+    $runner->applyAllHints($mapParameters);
+
+
+
+//    weathermap_memory_check("MEM postread");
+//        $weathermapObject->readData();
+//        weathermap_memory_check("MEM postdata");
+
+
+
+        if ($quietLogging == 0) {
+            wm_warn("About to write image file. If this is the last message in your log, increase memory_limit in php.ini [WMPOLL01]\n", true);
+        }
+        weathermap_memory_check("MEM pre-render");
+
+    // used to write files before moving them into place
+//    $tempImageFilename = $outputDirectory . DIRECTORY_SEPARATOR . $mapParameters['filehash'] . '.tmp.png';
+//    $imageFilename = $outputDirectory . DIRECTORY_SEPARATOR . $mapParameters['filehash'] . "." . $imageFormat;
+//    $thumbImageFilename = $outputDirectory . DIRECTORY_SEPARATOR . $mapParameters['filehash'] . ".thumb." . $imageFormat;
+//    $thumb48ImageFilename = $outputDirectory . DIRECTORY_SEPARATOR . $mapParameters['filehash'] . ".thumb48." . $imageFormat;
+
+        // Write the image to a temporary file first - it turns out that libpng is not that fast
+        // and this way we avoid showing half a map
+        // $weathermapObject->drawMapImage($tempImageFilename, $thumbImageFilename, read_config_option("weathermap_thumbsize"));
+        $runner->run();
+
+//        // Firstly, don't move or delete anything if the image saving failed
+//        if (file_exists($tempImageFilename)) {
+//            // Don't try and delete a non-existent file (first run)
+//            if (file_exists($imageFilename)) {
+//                unlink($imageFilename);
+//            }
+//            rename($tempImageFilename, $imageFilename);
+//        }
+//
+//        $gdThumbImage = imagecreatefrompng($thumbImageFilename);
+//        $gdThumb48Image = imagecreatetruecolor(48, 48);
+//        imagecopyresampled($gdThumb48Image, $gdThumbImage, 0, 0, 0, 0, 48, 48, imagesx($gdThumbImage), imagesy($gdThumbImage));
+//        imagepng($gdThumb48Image, $thumb48ImageFilename);
+//        imagedestroy($gdThumb48Image);
+//        imagedestroy($gdThumbImage);
+
+        // $configured_imageuri = $weathermapObject->imageuri;
+        // $weathermapObject->imageuri = 'weathermap-cacti-plugin.php?action=viewimage&id=' . $mapParameters['filehash'] . "&time=" . time();
+
+//        if ($quietLogging == 0) {
+//            wm_warn("Wrote map to $imageFilename and $thumbImageFilename\n", true);
+//        }
+        $runner->createAllHTML();
+        $runner->writeDataFile();
+
+        // $weathermapObject->writeDataFile($dataFilename);
+
+        // put back the configured imageuri
+        // $weathermapObject->imageuri = $configured_imageuri;
+
+        // if an htmloutputfile was configured, output the HTML there too
+        // but using the configured imageuri and imagefilename
+//        if ($weathermapObject->htmloutputfile != "") {
+//            $htmlFilename = $weathermapObject->htmloutputfile;
+//
+//            $fileHandle = @fopen($htmlFilename, 'w');
+//
+//            if ($fileHandle !== false) {
+//                fwrite(
+//                    $fileHandle,
+//                    $weathermapObject->makeHTML('weathermap_' . $mapParameters['filehash'] . '_imap')
+//                );
+//                fclose($fileHandle);
+//                wm_debug("Wrote HTML to %s\n", $htmlFilename);
+//            } else {
+//                if (true === file_exists($htmlFilename)) {
+//                    wm_warn('Failed to overwrite ' . $htmlFilename
+//                        . " - permissions of existing file are wrong? [WMPOLL02]\n");
+//                } else {
+//                    wm_warn('Failed to create ' . $htmlFilename
+//                        . " - permissions of output directory are wrong? [WMPOLL03]\n");
+//                }
+//            }
+//        }
+
+//        if ($weathermapObject->imageoutputfile != "" && $weathermapObject->imageoutputfile != "weathermap.png" && file_exists($imageFilename)) {
+//            // copy the existing file to the configured location too
+//            @copy($imageFilename, $weathermapObject->imageoutputfile);
+//        }
+
+        // If archiving is enabled for this map, then save copies with datestamps, for animation etc
+        if ($mapParameters['archiving'] == 'on') {
+            // TODO - additionally save a copy with a datestamp file format
+            $archiveDatestamp = strftime("%Y-%m-%d-%H-%M", $weathermap_poller_start_time);
+            $archiveFilename = $outputDirectory . DIRECTORY_SEPARATOR . sprintf("%s-archive-%s.%s", $mapParameters['filehash'], $archiveDatestamp, $imageFormat);
+            @copy($imageFilename, $archiveFilename);
+
+            weathermap_manage_archiving($mapParameters['filehash'] . "-archive-", $outputDirectory);
+        }
+
+        db_execute("update weathermap_maps set titlecache='" . mysql_real_escape_string($runner->getProcessedTitle()) . "' where id=" . intval($mapParameters['id']));
+
+        // XXX - is this even useds?
+//        if (intval($weathermapObject->thumb_width) > 0) {
+//            db_execute("update weathermap_maps set thumb_width=" . intval($weathermapObject->thumb_width) . ", thumb_height=" . intval($weathermapObject->thumb_height) . " where id=" . intval($mapParameters['id']));
+//        }
+
+        $runner->cleanUp();
+        unset($runner);
+
+        // $weathermapObject->cleanUp();
+        // unset($weathermapObject);
+
+        $mapEndTime = microtime(true);
+
+        $mapDuration = $mapEndTime - $mapStartTime;
+        wm_debug("TIME: %s took %f seconds.\n", $mapParameters['configfile'], $mapDuration);
+        weathermap_memory_check("MEM after");
+        db_execute("replace into settings values('weathermap_last_finished_file','" . mysql_real_escape_string($logTag) . "')");
+
+    // if the debug mode was set to once for this map, then that
+    // time has now passed, and it can be turned off again.
+    $newDebugState = $mapParameters['debug'];
+    if ($newDebugState == 'once') {
+        $newDebugState = 'off';
+    }
+
+    db_execute(sprintf(
+        "update weathermap_maps set warncount=%d, runtime=%f, debug='%s',lastrun=NOW() where id=%d",
+        $weathermap_warncount,
+        $mapDuration,
+        $newDebugState,
+        $mapParameters['id']
+    ));
+
+//    $total_warnings += $weathermap_warncount;
+
+    return;
 }
 
 // vim:ts=4:sw=4:

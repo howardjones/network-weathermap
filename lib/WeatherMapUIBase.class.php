@@ -55,8 +55,8 @@ class WeatherMapUIBase
      *
      * @param string $type
      * @param string $value
-     *
-     * @returns bool
+     * @return bool
+     * @throws WMException
      */
     public function validateArgument($type, $value)
     {
@@ -81,7 +81,7 @@ class WeatherMapUIBase
         }
     }
 
-    public function validateArgMaphash($value)
+    private function validateArgMaphash($value)
     {
         // a map hash is an MD5 hash - 20 hex characters
         if (strlen($value) != 20) {
@@ -94,12 +94,12 @@ class WeatherMapUIBase
         return true;
     }
 
-    public function validateArgString($value)
+    private function validateArgString($value)
     {
         return true;
     }
 
-    public function validateArgMapFilename($value)
+    private function validateArgMapFilename($value)
     {
         if ($value == wmeSanitizeConfigFile($value)) {
             return true;
@@ -107,7 +107,7 @@ class WeatherMapUIBase
         return false;
     }
 
-    public function validateArgJavascriptName($value)
+    private function validateArgJavascriptName($value)
     {
         if ($value == wmeSanitizeName($value)) {
             return true;
@@ -115,7 +115,7 @@ class WeatherMapUIBase
         return false;
     }
 
-    public function validateArgName($value)
+    private function validateArgName($value)
     {
         if ($value == wmeSanitizeName($value)) {
             return true;
@@ -123,7 +123,7 @@ class WeatherMapUIBase
         return false;
     }
 
-    public function validateArgInt($value)
+    private function validateArgInt($value)
     {
         if (is_int($value)) {
             return true;

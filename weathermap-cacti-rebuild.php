@@ -11,6 +11,7 @@
 # $cacti_base = "/XAMPP/htdocs/cacti-0.8.7e/";
 # (the following usually works)
 $cacti_base = "../../";
+$cacti_base = "/var/www/html/cactiauto/";
 
 
 require_once dirname(__FILE__).DIRECTORY_SEPARATOR."setup.php";

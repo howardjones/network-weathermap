@@ -2,7 +2,7 @@
 
 class WMLinkGeometryFactory
 {
-    public function create($style)
+    public static function create($style)
     {
         if ($style=='angled') {
             return new WMAngledLinkGeometry();

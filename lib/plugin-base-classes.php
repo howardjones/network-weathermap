@@ -90,7 +90,7 @@ class WeatherMapDataSource
  */
 class WeatherMapPreProcessor
 {
-    private $owner;
+    protected $owner;
 
     public function Init(&$map)
     {
@@ -118,7 +118,7 @@ class WeatherMapPreProcessor
  */
 class WeatherMapPostProcessor
 {
-    private $owner;
+    protected $owner;
 
     public function Init(&$map)
     {

@@ -1,34 +1,33 @@
 <?php
 
-
 class WeatherMapCactiUserPlugin
 {
-    var $config;
+    public $config;
+
+    public $handlers = array(
+        "viewthumb" => "handleBigThumb",
+        "viewthumb48" => "handleLittleThumb",
+        "viewimage" => "handleImage",
+        "viewmap" => "handleViewCycle",
+        "viewmapcycle" => "handleView",
+        ":: DEFAULT ::" => "handleMainView"
+    );
 
     public function __construct($config)
     {
         $this->config = $config;
     }
 
-
     public function dispatch($action, $request)
     {
-        switch ($action) {
-            case 'viewthumb': // FALL THROUGH
-            case 'viewthumb48': // FALL THROUGH
-            case 'viewimage':
-                $this->wmuiHandleImageOutput($request, $action);
-                // if we get here, they didn't have permission
-                break;
-            case 'viewmapcycle':
-                $this->wmuiHandleViewCycle($request);
-                break;
-            case 'viewmap':
-                $this->wmuiHandleView($request);
-                break;
-            default:
-                $this->handleMainView($request);
-                break;
+        if (array_key_exists($action, $this->handlers)) {
+            $handler = $this->handlers[$action];
+            $this->$handler($request);
+        }
+
+        if (array_key_exists(":: DEFAULT ::", $this->handlers)) {
+            $handler = $this->handlers[":: DEFAULT ::"];
+            $this->$handler($request);
         }
     }
 
@@ -77,7 +76,7 @@ class WeatherMapCactiUserPlugin
         require_once($config["base_path"] . "/include/bottom_footer.php");
     }
 
-    public function wmuiHandleView($request)
+    public function handleView($request)
     {
         global $config;
 
@@ -85,7 +84,7 @@ class WeatherMapCactiUserPlugin
         print "<div id=\"overDiv\" style=\"position:absolute; visibility:hidden; z-index:1000;\"></div>\n";
         print "<script type=\"text/javascript\" src=\"vendor/overlib.js\"><!-- overLIB (c) Erik Bosrup --></script> \n";
 
-        $mapID = $this->wmuiDeduceMapID($request);
+        $mapID = $this->deduceMapID($request);
 
         if ($mapID >= 0) {
             $this->wmuiSingleMapView($mapID);
@@ -100,12 +99,12 @@ class WeatherMapCactiUserPlugin
      * @param $request
      * @return int
      */
-    public function wmuiDeduceMapID($request)
+    public function deduceMapID($request)
     {
         $mapID = -1;
 
         if (isset($request['id']) && (!is_numeric($request['id']) || strlen($request['id']) == 20)) {
-            $mapID = $this->wmTranslateHashToID($request['id']);
+            $mapID = $this->translateHashToID($request['id']);
         }
 
         if (isset($request['id']) && is_numeric($request['id'])) {
@@ -115,7 +114,7 @@ class WeatherMapCactiUserPlugin
         return $mapID;
     }
 
-    public function wmuiHandleViewCycle($request)
+    public function handleViewCycle($request)
     {
         global $config;
 
@@ -153,12 +152,27 @@ class WeatherMapCactiUserPlugin
         }
     }
 
+    public function handleImage($request)
+    {
+
+    }
+
+    public function handleBigThumb($request)
+    {
+
+    }
+
+    public function handleLittleThumb($request)
+    {
+
+    }
+
     /**
      * @param $action
      */
-    public function wmuiHandleImageOutput($request, $action)
+    public function wmuiHandleImageOutput($request)
     {
-        $mapID = $this->wmuiDeduceMapID($request);
+        $mapID = $this->deduceMapID($request);
 
         if ($mapID < 0) {
             return;
@@ -529,7 +543,7 @@ class WeatherMapCactiUserPlugin
         }
     }
 
-    public function wmTranslateHashToID($idname)
+    public function translateHashToID($idname)
     {
         $SQL = "select id from weathermap_maps where configfile='" . mysql_real_escape_string($idname)
             . "' or filehash='" . mysql_real_escape_string($idname) . "'";
@@ -580,7 +594,7 @@ class WeatherMapCactiUserPlugin
     }
 
 
-    public function wmStreamBinaryFile($filename)
+    public function streamBinaryFile($filename)
     {
         $chunksize = 1 * (1024 * 1024); // how many bytes per chunk
 
@@ -597,7 +611,7 @@ class WeatherMapCactiUserPlugin
         return $status;
     }
 
-    public function wmGenerateMapSelectorBox($current_id = 0)
+    public function generateMapSelectorBox($current_id = 0)
     {
         global $colors;
 

@@ -16,7 +16,8 @@
 
     require_once dirname(__FILE__).'/base-classes.php';
     require_once dirname(__FILE__).'/plugin-base-classes.php';
-    
+    require_once dirname(__FILE__).'/WeatherMapDataItem.class.php';
+
     require_once dirname(__FILE__).'/fonts.php';
     require_once dirname(__FILE__).'/WeatherMapTextItem.class.php';
     require_once dirname(__FILE__).'/WeatherMapScale.class.php';

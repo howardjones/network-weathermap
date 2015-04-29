@@ -2,203 +2,88 @@
 
 class WeatherMapCactiManagementPlugin
 {
-    var $config;
-    var $configPath;
-    var $colours;
+    public $config;
+    public $configPath;
+    public $colours;
+    public $cactiBasePath;
+
+    public $handlers = array(
+        "group_update" => "handleGroupUpdate",
+        "groupadmin_delete" => "handleGroupDelete",
+        "groupadmin" => "handleGroupSelect",
+        "group_form" => "handleGroupForm",
+        "chgroup_update" => "handleChangeGroup",
+        "chgroup" => "handleGroupChangeForm",
+
+        "map_settings_delete" => "handleMapSettingsDelete",
+        "map_settings_form" => "handleMapSettingsForm",
+        "map_settings" => "handleMapSettingsPage",
+        "save" => "handleMapSettingsSave",
+
+        "perms_add_user" => "handlePermissionsAddUser",
+        "perms_delete_user" => "handlePermissionsDeleteUser",
+        "perms_edit" => "handlePermissionsPage",
+
+        "delete_map" => "handleDeleteMap",
+        "deactivate_map" => "handleDeactivateMap",
+        "activate_map" => "handleActivateMap",
+        "viewconfig" => "handleViewConfig",
+        "addmap" => "handleMapListAdd",
+        "addmap_picker" => "handleMapPicker",
+
+        "move_map_up" => "handleMapOrderUp",
+        "move_map_down" => "handleMapOrderDown",
+
+        "move_group_up" => "handleGroupOrderUp",
+        "move_group_down" => "handleGroupOrderDown",
+
+        "rebuildnow" => "handleRebuildNowStep1",
+        "rebuildnow2" => "handleRebuildNowStep2",
+
+        ":: DEFAULT ::" => "handleManagementMainScreen"
+    );
 
     public function __construct($config, $colours)
     {
         $this->config = $config;
         $this->colours = $colours;
         $this->configPath = realpath(dirname(__FILE__).'/../configs');
+        $this->cactiBasePath = $config["base_path"];
     }
 
     public function dispatch($action, $request)
     {
-        global $config;
+        if (array_key_exists($action, $this->handlers)) {
+            $handler = $this->handlers[$action];
+            $this->$handler($request);
+        }
 
-        switch ($action) {
-            case 'group_update':
-                $this->wmuiHandleGroupUpdate($request);
-                break;
-            case 'groupadmin_delete':
-                $this->wmuiHandleGroupDelete($request);
-                break;
-            case 'group_form':
-                $this->wmuiHandleGroupForm($request, $config);
-                break;
-            case 'groupadmin':
-                $this->wmuiHandleGroupSelect($config);
-                break;
-            case 'chgroup_update':
-                $this->wmuiHandleChangeGroup($request);
-                break;
-            case 'chgroup':
-                $this->wmuiHandleGroupChangeForm($request, $config);
-                break;
-            case 'map_settings_delete':
-                $this->wmuiHandleMapSettingsDelete($request);
-                break;
-            // this is the save option from the map_settings_form
-            case 'save':
-                $this->wmuiHandleMapSettingsSave($request);
-                break;
-            case 'map_settings_form':
-                $this->wmuiHandleMapSettingsForm($request, $config);
-                break;
-            case 'map_settings':
-                if (isset($request['id']) && is_numeric($request['id'])) {
-                    require_once($config["base_path"] . "/include/top_header.php");
-                    $this->wmuiMapSettingsPage(intval($request['id']));
-                    wmGenerateFooterLinks();
-                    require_once($config["base_path"] . "/include/bottom_footer.php");
-                }
-                break;
-            case 'perms_add_user':
-                if (isset($request['mapid']) && is_numeric($request['mapid'])
-                    && isset($request['userid']) && is_numeric($request['userid'])
-                ) {
-                    $this->wmPermissionsUserAdd(intval($request['mapid']), intval($request['userid']));
-                    header("Location: weathermap-cacti-plugin-mgmt.php?action=perms_edit&id=" . intval($request['mapid']));
-                }
-                break;
-            case 'perms_delete_user':
-                if (isset($request['mapid']) && is_numeric($request['mapid'])
-                    && isset($request['userid']) && is_numeric($request['userid'])
-                ) {
-                    $this->wmPermissionsUserDelete($request['mapid'], $request['userid']);
-                    header("Location: weathermap-cacti-plugin-mgmt.php?action=perms_edit&id=" . $request['mapid']);
-                }
-                break;
-            case 'perms_edit':
-                if (isset($request['id']) && is_numeric($request['id'])) {
-                    require_once($config["base_path"] . "/include/top_header.php");
-                    $this->wmuiMapPermissionsPage($request['id']);
-                    require_once($config["base_path"] . "/include/bottom_footer.php");
-                } else {
-                    print "Something got lost back there.";
-                }
-                break;
-            case 'delete_map':
-                if (isset($request['id']) && is_numeric($request['id'])) {
-                    $this->wmMapDelete($request['id']);
-                }
-                header("Location: weathermap-cacti-plugin-mgmt.php");
-                break;
-            case 'deactivate_map':
-                if (isset($request['id']) && is_numeric($request['id'])) {
-                    $this->wmMapDeactivate($request['id']);
-                }
-                header("Location: weathermap-cacti-plugin-mgmt.php");
-                break;
-            case 'activate_map':
-                if (isset($request['id']) && is_numeric($request['id'])) {
-                    $this->wmMapActivate($request['id']);
-                }
-                header("Location: weathermap-cacti-plugin-mgmt.php");
-                break;
-            case 'move_map_up':
-                if (isset($request['id']) && is_numeric($request['id']) &&
-                    isset($request['order']) && is_numeric($request['order'])
-                ) {
-                    $this->wmMapMove($request['id'], $request['order'], -1);
-                }
-                header("Location: weathermap-cacti-plugin-mgmt.php");
-                break;
-            case 'move_map_down':
-                if (isset($request['id']) && is_numeric($request['id']) &&
-                    isset($request['order']) && is_numeric($request['order'])
-                ) {
-                    $this->wmMapMove($request['id'], $request['order'], +1);
-                }
-                header("Location: weathermap-cacti-plugin-mgmt.php");
-                break;
-            case 'move_group_up':
-                if (isset($request['id']) && is_numeric($request['id']) &&
-                    isset($request['order']) && is_numeric($request['order'])
-                ) {
-                    $this->wmMapGroupMove(intval($request['id']), intval($request['order']), -1);
-                }
-                header("Location: weathermap-cacti-plugin-mgmt.php?action=groupadmin");
-                break;
-            case 'move_group_down':
-                if (isset($request['id']) && is_numeric($request['id']) &&
-                    isset($request['order']) && is_numeric($request['order'])
-                ) {
-                    $this->wmMapGroupMove(intval($request['id']), intval($request['order']), 1);
-                }
-                header("Location: weathermap-cacti-plugin-mgmt.php?action=groupadmin");
-                break;
-            case 'viewconfig':
-                require_once $config["base_path"] . "/include/top_graph_header.php";
-
-                if (isset($request['file'])) {
-                    $this->wmuiPreviewConfig($request['file']);
-                } else {
-                    print "No such file.";
-                }
-                require_once $config["base_path"] . "/include/bottom_footer.php";
-                break;
-            case 'addmap_picker':
-
-                require_once $config["base_path"] . "/include/top_header.php";
-
-                if (isset($request['show']) && $request['show'] == 'all') {
-                    $this->wmuiMapFilePicker(true);
-                } else {
-                    $this->wmuiMapFilePicker(false);
-                }
-                require_once $config["base_path"] . "/include/bottom_footer.php";
-                break;
-            case 'addmap':
-                if (isset($request['file'])) {
-                    $this->wmMapAdd($request['file']);
-                    header("Location: weathermap-cacti-plugin-mgmt.php");
-                } else {
-                    print "No such file.";
-                }
-                break;
-            case 'editor':
-                // chdir(dirname(__FILE__));
-                // include_once('./weathermap-cacti-plugin-editor.php');
-                break;
-            case 'rebuildnow':
-
-                $this->wmuiHandleRebuildNow($config);
-                break;
-            case 'rebuildnow2':
-                $this->wmuiHandleRebuildNowStep2($config);
-
-                break;
-            // by default, just list the map setup
-            default:
-                $this->wmuiHandleManagementMainScreen($config);
-                break;
+        if (array_key_exists(":: DEFAULT ::", $this->handlers)) {
+            $handler = $this->handlers[":: DEFAULT ::"];
+            $this->$handler($request);
         }
     }
 
     /**
-     * @param $config
      */
-    public function wmuiHandleManagementMainScreen($config)
+    public function handleManagementMainScreen()
     {
-        require_once $config["base_path"] . "/include/top_header.php";
+        require_once $this->cactiBasePath . "/include/top_header.php";
         // $this->wmMapManagementList4();
         $this->wmMapManagementList();
 
         wmGenerateFooterLinks();
-        require_once $config["base_path"] . "/include/bottom_footer.php";
+        require_once $this->cactiBasePath . "/include/bottom_footer.php";
     }
 
     /**
-     * @param $config
      */
-    public function wmuiHandleRebuildNowStep2($config)
+    public function handleRebuildNowStep2()
     {
         require_once dirname(__FILE__) . DIRECTORY_SEPARATOR . "all.php";
         require_once dirname(__FILE__) . DIRECTORY_SEPARATOR . "lib" . DIRECTORY_SEPARATOR . "poller-common.php";
 
-        require_once $config["base_path"] . "/include/top_header.php";
+        require_once $this->cactiBasePath . "/include/top_header.php";
         print "<h3>Rebuilding all maps</h3><strong>NOTE: Because your Cacti poller process probably doesn't run as ";
         print "the same user as your webserver, it's possible this will fail with file permission problems even ";
         print "though the normal poller process runs fine. In some situations, it MAY have memory_limit problems, if ";
@@ -208,15 +93,14 @@ class WeatherMapCactiManagementPlugin
 
         print "</pre>";
         print "<hr /><h3>Done.</h3>";
-        require_once $config["base_path"] . "/include/bottom_footer.php";
+        require_once $this->cactiBasePath . "/include/bottom_footer.php";
     }
 
     /**
-     * @param $config
      */
-    public function wmuiHandleRebuildNow($config)
+    public function handleRebuildNowStep1()
     {
-        require_once $config["base_path"] . "/include/top_header.php";
+        require_once $this->cactiBasePath . "/include/top_header.php";
 
         print "<h3>REALLY Rebuild all maps?</h3><strong>NOTE: Because your Cacti poller process probably doesn't run ";
         print "as the same user as your webserver, it's possible this will fail with file permission problems even ";
@@ -228,17 +112,16 @@ class WeatherMapCactiManagementPlugin
 
         print "<h4><a href=\"weathermap-cacti-plugin-mgmt.php?action=rebuildnow2\">YES</a></h4>";
         print "<h1><a href=\"weathermap-cacti-plugin-mgmt.php\">NO</a></h1>";
-        require_once $config["base_path"] . "/include/bottom_footer.php";
+        require_once $this->cactiBasePath . "/include/bottom_footer.php";
     }
 
     /**
      * @param $request
-     * @param $config
      */
-    public function wmuiHandleMapSettingsForm($request, $config)
+    public function handleMapSettingsForm($request)
     {
         if (isset($request['mapid']) && is_numeric($request['mapid'])) {
-            require_once($config["base_path"] . "/include/top_header.php");
+            require_once($this->cactiBasePath . "/include/top_header.php");
 
             if (isset($request['id']) && is_numeric($request['id'])) {
                 $this->wmuiMapSettingsForm(intval($request['mapid']), intval($request['id']));
@@ -247,14 +130,14 @@ class WeatherMapCactiManagementPlugin
             }
 
             wmGenerateFooterLinks();
-            require_once($config["base_path"] . "/include/bottom_footer.php");
+            require_once($this->cactiBasePath . "/include/bottom_footer.php");
         }
     }
 
     /**
      * @param $request
      */
-    public function wmuiHandleMapSettingsSave($request)
+    public function handleMapSettingsSave($request)
     {
         $mapid = null;
         $settingid = null;
@@ -290,7 +173,7 @@ class WeatherMapCactiManagementPlugin
     /**
      * @param $request
      */
-    public function wmuiHandleMapSettingsDelete($request)
+    public function handleMapSettingsDelete($request)
     {
         $mapid = null;
         $settingid = null;
@@ -310,14 +193,13 @@ class WeatherMapCactiManagementPlugin
 
     /**
      * @param $request
-     * @param $config
      */
-    public function wmuiHandleGroupChangeForm($request, $config)
+    public function handleGroupChangeForm($request)
     {
         if (isset($request['id']) && is_numeric($request['id'])) {
-            require_once($config["base_path"] . "/include/top_header.php");
+            require_once($this->cactiBasePath . "/include/top_header.php");
             $this->wmuiMapGroupChangePage(intval($request['id']));
-            require_once($config["base_path"] . "/include/bottom_footer.php");
+            require_once($this->cactiBasePath . "/include/bottom_footer.php");
         } else {
             print "Something got lost back there.";
         }
@@ -326,7 +208,7 @@ class WeatherMapCactiManagementPlugin
     /**
      * @param $request
      */
-    public function wmuiHandleChangeGroup($request)
+    public function handleChangeGroup($request)
     {
         $mapid = -1;
         $groupid = -1;
@@ -346,25 +228,23 @@ class WeatherMapCactiManagementPlugin
     }
 
     /**
-     * @param $config
      */
-    public function wmuiHandleGroupSelect($config)
+    public function handleGroupSelect()
     {
-        require_once($config["base_path"] . "/include/top_header.php");
+        require_once($this->cactiBasePath . "/include/top_header.php");
         $this->wmuiGroupList();
         wmGenerateFooterLinks();
-        require_once $config["base_path"] . "/include/bottom_footer.php";
+        require_once $this->cactiBasePath . "/include/bottom_footer.php";
     }
 
     /**
      * @param $request
-     * @param $config
      */
-    public function wmuiHandleGroupForm($request, $config)
+    public function handleGroupForm($request)
     {
         $id = -1;
 
-        require_once $config["base_path"] . "/include/top_header.php";
+        require_once $this->cactiBasePath . "/include/top_header.php";
         if (isset($request['id']) && is_numeric($request['id'])) {
             $id = intval($request['id']);
         }
@@ -374,13 +254,13 @@ class WeatherMapCactiManagementPlugin
         }
 
         wmGenerateFooterLinks();
-        require_once($config["base_path"] . "/include/bottom_footer.php");
+        require_once($this->cactiBasePath . "/include/bottom_footer.php");
     }
 
     /**
      * @param $request
      */
-    public function wmuiHandleGroupDelete($request)
+    public function handleGroupDelete($request)
     {
         $id = -1;
 
@@ -397,7 +277,7 @@ class WeatherMapCactiManagementPlugin
     /**
      * @param $request
      */
-    public function wmuiHandleGroupUpdate($request)
+    public function handleGroupUpdate($request)
     {
         $id = -1;
         $newname = "";
@@ -706,7 +586,6 @@ class WeatherMapCactiManagementPlugin
 
     public function wmMapManagementList()
     {
-        global $colors;
         global $i_understand_file_permissions_and_how_to_fix_them;
 
         $last_started = read_config_option("weathermap_last_started_file", true);
@@ -725,7 +604,7 @@ class WeatherMapCactiManagementPlugin
             }
         }
 
-        html_start_box("<strong>Weathermaps</strong>", "78%", $colors["header"], "3", "center", "weathermap-cacti-plugin-mgmt.php?action=addmap_picker");
+        html_start_box("<strong>Weathermaps</strong>", "78%", $this->colours["header"], "3", "center", "weathermap-cacti-plugin-mgmt.php?action=addmap_picker");
 
         $headers = array("", "Config File", "Title", "Group", "Last Run", "Active", "Settings", "Sort Order", "Accessible By", "");
 
@@ -750,7 +629,7 @@ class WeatherMapCactiManagementPlugin
 
         $had_warnings = 0;
         if (is_array($queryrows)) {
-            form_alternate_row_color($colors["alternate"], $colors["light"], $i);
+            form_alternate_row_color($this->colours["alternate"], $this->colours["light"], $i);
             print "<td></td>";
             print "<td>ALL MAPS</td><td>(special settings for all maps)</td><td></td><td></td>";
             print "<td></td>";
@@ -774,7 +653,7 @@ class WeatherMapCactiManagementPlugin
             print "</tr>";
             $i++;
 
-            $rowcols = array($colors["light"], $colors["alternate"]);
+            $rowcols = array($this->colours["light"], $this->colours["alternate"]);
 
             foreach ($queryrows as $map) {
                 printf("<tr bgcolor='#%s'>", $rowcols[$i%2]);
@@ -911,8 +790,8 @@ class WeatherMapCactiManagementPlugin
 
     public function wmuiMapFilePicker($showAllFiles = false)
     {
-        $colors = $this->colours;
-        $configDirectory = $this->configPath;
+        $this->colours = $this->colours;
+        $this->configDirectory = $this->configPath;
 
         $loaded=array();
         $flags=array();
@@ -924,17 +803,17 @@ class WeatherMapCactiManagementPlugin
             }
         }
 
-        if (!is_dir($configDirectory)) {
-            print "There is no directory named $configDirectory - you will need to create it, and set it to be readable by the webserver. If you want to upload configuration files from inside Cacti, then it should be <i>writable</i> by the webserver too.";
+        if (!is_dir($this->configDirectory)) {
+            print "There is no directory named $this->configDirectory - you will need to create it, and set it to be readable by the webserver. If you want to upload configuration files from inside Cacti, then it should be <i>writable</i> by the webserver too.";
             return;
         }
 
         $nFiles=0;
 
-        $directoryHandle = opendir($configDirectory);
+        $directoryHandle = opendir($this->configDirectory);
 
         if (!$directoryHandle) {
-            print "Can't open $configDirectory to read - you should set it to be readable by the webserver.";
+            print "Can't open $this->configDirectory to read - you should set it to be readable by the webserver.";
             return;
         }
 
@@ -942,7 +821,7 @@ class WeatherMapCactiManagementPlugin
 
 
         while ($file = readdir($directoryHandle)) {
-            $realfile = $configDirectory.'/'.$file;
+            $realfile = $this->configDirectory.'/'.$file;
 
             // skip .-prefixed files like .htaccess, since it seems
             // that otherwise people will add them as map config files.
@@ -981,7 +860,7 @@ class WeatherMapCactiManagementPlugin
             return;
         }
 
-        html_start_box("<strong>Available Weathermap Configuration Files</strong>", "78%", $colors["header"], "1", "center", "");
+        html_start_box("<strong>Available Weathermap Configuration Files</strong>", "78%", $this->colours["header"], "1", "center", "");
         html_header(array("", "", "Config File", "Title", ""), 2);
 
         if ($nFiles>0) {
@@ -990,7 +869,7 @@ class WeatherMapCactiManagementPlugin
             $nFiles=0;
             foreach ($titles as $file => $title) {
                 $title = $titles[$file];
-                form_alternate_row_color($colors["alternate"], $colors["light"], $nFiles);
+                form_alternate_row_color($this->colours["alternate"], $this->colours["light"], $nFiles);
                 print '<td><a href="?action=addmap&amp;file='.$file.'" title="Add the configuration file">Add</a></td>';
                 print '<td><a href="?action=viewconfig&amp;file='.$file.'" title="View the configuration file in a new window" target="_blank">View</a></td>';
                 print '<td>'.htmlspecialchars($file);
@@ -1017,9 +896,6 @@ class WeatherMapCactiManagementPlugin
 
     public function wmuiPreviewConfig($file)
     {
-        global $weathermap_confdir;
-        global $colors;
-
         chdir($weathermap_confdir);
 
         $path_parts = pathinfo($file);
@@ -1030,9 +906,9 @@ class WeatherMapCactiManagementPlugin
             // print "$file_dir != $weathermap_confdir";
             print "<h3>Path mismatch</h3>";
         } else {
-            html_start_box("<strong>Preview of $file</strong>", "98%", $colors["header"], "3", "center", "");
+            html_start_box("<strong>Preview of $file</strong>", "98%", $this->colours["header"], "3", "center", "");
 
-            print '<tr><td valign="top" bgcolor="#'.$colors["light"].'" class="textArea">';
+            print '<tr><td valign="top" bgcolor="#'.$this->colours["light"].'" class="textArea">';
             print '<pre>';
             $realfile = $weathermap_confdir.'/'.$file;
             if (is_file($realfile)) {
@@ -1051,7 +927,6 @@ class WeatherMapCactiManagementPlugin
 
     public function wmMapAdd($file)
     {
-        global $weathermap_confdir;
 
         chdir($weathermap_confdir);
 
@@ -1153,7 +1028,6 @@ class WeatherMapCactiManagementPlugin
 
     public function wmuiMapPermissionsPage($id)
     {
-        global $colors;
 
         $title = db_fetch_cell("select titlecache from weathermap_maps where id=".intval($id));
 
@@ -1182,12 +1056,12 @@ class WeatherMapCactiManagementPlugin
             }
         }
 
-        html_start_box("<strong>Edit permissions for Weathermap $id: $title</strong>", "70%", $colors["header"], "2", "center", "");
+        html_start_box("<strong>Edit permissions for Weathermap $id: $title</strong>", "70%", $this->colours["header"], "2", "center", "");
         html_header(array("Username", ""));
 
         $row = 0;
         foreach ($mapuserids as $user) {
-            form_alternate_row_color($colors["alternate"], $colors["light"], $row);
+            form_alternate_row_color($this->colours["alternate"], $this->colours["light"], $row);
             print "<td>".$users[$user]."</td>";
             print '<td><a href="?action=perms_delete_user&mapid='.$id.'&userid='.$user.'"><img src="../../images/delete_icon.gif" width="10" height="10" border="0" alt="Remove permissions for this user to see this map"></a></td>';
 
@@ -1199,7 +1073,7 @@ class WeatherMapCactiManagementPlugin
         }
         html_end_box();
 
-        html_start_box("", "70%", $colors["header"], "3", "center", "");
+        html_start_box("", "70%", $this->colours["header"], "3", "center", "");
         print "<tr>";
         if ($userselect == '') {
             print "<td><em>There aren't any users left to add!</em></td></tr>";
@@ -1214,7 +1088,6 @@ class WeatherMapCactiManagementPlugin
 
     public function wmuiMapSettingsPage($id)
     {
-        global $colors;
 
         if ($id==0) {
             $title = "Additional settings for ALL maps";
@@ -1254,7 +1127,7 @@ class WeatherMapCactiManagementPlugin
             $this->wmuiMapSettingsReadOnly(-$map['group_id'], "Group Settings (".htmlspecialchars($groupname).")");
         }
 
-        html_start_box("<strong>$title</strong>", "70%", $colors["header"], "2", "center", "weathermap-cacti-plugin-mgmt.php?action=map_settings_form&mapid=".intval($id));
+        html_start_box("<strong>$title</strong>", "70%", $this->colours["header"], "2", "center", "weathermap-cacti-plugin-mgmt.php?action=map_settings_form&mapid=".intval($id));
         html_header(array("", "Name", "Value", ""));
 
         $row=0;
@@ -1262,7 +1135,7 @@ class WeatherMapCactiManagementPlugin
         if (is_array($settingrows)) {
             if (sizeof($settingrows)>0) {
                 foreach ($settingrows as $setting) {
-                    form_alternate_row_color($colors["alternate"], $colors["light"], $row);
+                    form_alternate_row_color($this->colours["alternate"], $this->colours["light"], $row);
                     print '<td><a href="?action=map_settings_form&mapid='.$id.'&id='.intval($setting['id']).'"><img src="../../images/graph_properties.gif" width="16" height="16" border="0" alt="Edit this definition">Edit</a></td>';
                     print "<td>".htmlspecialchars($setting['optname'])."</td>";
                     print "<td>".htmlspecialchars($setting['optvalue'])."</td>";
@@ -1291,7 +1164,6 @@ class WeatherMapCactiManagementPlugin
 
     public function wmuiMapSettingsReadOnly($id, $title = "Settings")
     {
-        global $colors;
 
         if ($id == 0) {
             $query = "select * from weathermap_settings where mapid=0 and groupid=0";
@@ -1305,14 +1177,14 @@ class WeatherMapCactiManagementPlugin
 
         $settings = db_fetch_assoc($query);
 
-        html_start_box("<strong>$title</strong>", "70%", $colors["header"], "2", "center", "");
+        html_start_box("<strong>$title</strong>", "70%", $this->colours["header"], "2", "center", "");
         html_header(array("", "Name", "Value", ""));
 
         $row=0;
 
         if (sizeof($settings)>0) {
             foreach ($settings as $setting) {
-                form_alternate_row_color($colors["alternate"], $colors["light"], $row);
+                form_alternate_row_color($this->colours["alternate"], $this->colours["light"], $row);
                 print "<td></td>";
                 print "<td>".htmlspecialchars($setting['optname'])."</td>";
                 print "<td>".htmlspecialchars($setting['optvalue'])."</td>";
@@ -1321,7 +1193,7 @@ class WeatherMapCactiManagementPlugin
                 $row++;
             }
         } else {
-            form_alternate_row_color($colors["alternate"], $colors["light"], $row);
+            form_alternate_row_color($this->colours["alternate"], $this->colours["light"], $row);
             print "<td colspan=4><em>No Settings</em></td>";
             print "</tr>";
         }
@@ -1332,7 +1204,6 @@ class WeatherMapCactiManagementPlugin
 
     public function wmuiMapSettingsForm($mapid = 0, $settingid = 0)
     {
-        global $colors;
 
         // print "Per-map settings for map $id";
 
@@ -1378,7 +1249,7 @@ class WeatherMapCactiManagementPlugin
             $title = "per-map setting for Weathermap $mapid: $title";
         }
 
-        html_start_box("<strong>$action $title</strong>", "98%", $colors["header"], "3", "center", "");
+        html_start_box("<strong>$action $title</strong>", "98%", $this->colours["header"], "3", "center", "");
         draw_edit_form(array("config"=>$values_ar, "fields"=>$field_ar));
         html_end_box();
 
@@ -1409,7 +1280,6 @@ class WeatherMapCactiManagementPlugin
 
     public function wmuiMapGroupChangePage($id)
     {
-        global $colors;
 
         $n = 0;
 
@@ -1419,9 +1289,9 @@ class WeatherMapCactiManagementPlugin
         print "<form>";
         print "<input type=hidden name='map_id' value='".$id."'>";
         print "<input type=hidden name='action' value='chgroup_update'>";
-        html_start_box("<strong>Edit map group for Weathermap $id: $title</strong>", "70%", $colors["header"], "2", "center", "");
+        html_start_box("<strong>Edit map group for Weathermap $id: $title</strong>", "70%", $this->colours["header"], "2", "center", "");
 
-        form_alternate_row_color($colors["alternate"], $colors["light"], $n++);
+        form_alternate_row_color($this->colours["alternate"], $this->colours["light"], $n++);
         print "<td><strong>Choose an existing Group:</strong><select name='new_group'>";
         $SQL = "select * from weathermap_groups order by sortorder";
         $results = db_fetch_assoc($SQL);
@@ -1472,9 +1342,8 @@ class WeatherMapCactiManagementPlugin
 
     public function wmuiGroupList()
     {
-        global $colors;
 
-        html_start_box("<strong>Edit Map Groups</strong>", "70%", $colors["header"], "2", "center", "weathermap-cacti-plugin-mgmt.php?action=group_form&id=0");
+        html_start_box("<strong>Edit Map Groups</strong>", "70%", $this->colours["header"], "2", "center", "weathermap-cacti-plugin-mgmt.php?action=group_form&id=0");
         html_header(array("", "Group Name", "Settings", "Sort Order", ""));
 
         $groups = db_fetch_assoc("select * from weathermap_groups order by sortorder");
@@ -1484,7 +1353,7 @@ class WeatherMapCactiManagementPlugin
         if (is_array($groups)) {
             if (sizeof($groups)>0) {
                 foreach ($groups as $group) {
-                    form_alternate_row_color($colors["alternate"], $colors["light"], $row);
+                    form_alternate_row_color($this->colours["alternate"], $this->colours["light"], $row);
                     print '<td><a href="weathermap-cacti-plugin-mgmt.php?action=group_form&id='.intval($group['id']).'"><img src="../../images/graph_properties.gif" width="16" height="16" border="0" alt="Rename This Group" title="Rename This Group">Rename</a></td>';
                     print "<td>".htmlspecialchars($group['name'])."</td>";
 
@@ -1589,5 +1458,186 @@ class WeatherMapCactiManagementPlugin
         }
 
         return $groups;
+    }
+
+    /**
+     * @param $request
+     */
+    private function handleMapSettingsPage($request)
+    {
+        if (isset($request['id']) && is_numeric($request['id'])) {
+            require_once($this->cactiBasePath . "/include/top_header.php");
+            $this->wmuiMapSettingsPage(intval($request['id']));
+            wmGenerateFooterLinks();
+            require_once($this->cactiBasePath . "/include/bottom_footer.php");
+        }
+    }
+
+    /**
+     * @param $request
+     */
+    private function handlePermissionsAddUser($request)
+    {
+        if (isset($request['mapid']) && is_numeric($request['mapid'])
+            && isset($request['userid']) && is_numeric($request['userid'])
+        ) {
+            $this->wmPermissionsUserAdd(intval($request['mapid']), intval($request['userid']));
+            header("Location: weathermap-cacti-plugin-mgmt.php?action=perms_edit&id=" . intval($request['mapid']));
+        }
+    }
+
+    /**
+     * @param $request
+     */
+    private function handlePermissionsDeleteUser($request)
+    {
+        if (isset($request['mapid']) && is_numeric($request['mapid'])
+            && isset($request['userid']) && is_numeric($request['userid'])
+        ) {
+            $this->wmPermissionsUserDelete($request['mapid'], $request['userid']);
+            header("Location: weathermap-cacti-plugin-mgmt.php?action=perms_edit&id=" . $request['mapid']);
+        }
+    }
+
+    /**
+     * @param $request
+     */
+    private function handlePermissionsPage($request)
+    {
+        if (isset($request['id']) && is_numeric($request['id'])) {
+            require_once($this->cactiBasePath . "/include/top_header.php");
+            $this->wmuiMapPermissionsPage($request['id']);
+            require_once($this->cactiBasePath . "/include/bottom_footer.php");
+        } else {
+            print "Something got lost back there.";
+        }
+    }
+
+    /**
+     * @param $request
+     */
+    private function handleDeleteMap($request)
+    {
+        if (isset($request['id']) && is_numeric($request['id'])) {
+            $this->wmMapDelete($request['id']);
+        }
+        header("Location: weathermap-cacti-plugin-mgmt.php");
+    }
+
+    /**
+     * @param $request
+     */
+    private function handleDeactivateMap($request)
+    {
+        if (isset($request['id']) && is_numeric($request['id'])) {
+            $this->wmMapDeactivate($request['id']);
+        }
+        header("Location: weathermap-cacti-plugin-mgmt.php");
+    }
+
+    /**
+     * @param $request
+     */
+    private function handleActivateMap($request)
+    {
+        if (isset($request['id']) && is_numeric($request['id'])) {
+            $this->wmMapActivate($request['id']);
+        }
+        header("Location: weathermap-cacti-plugin-mgmt.php");
+    }
+
+    /**
+     * @param $request
+     */
+    private function handleMapOrderUp($request)
+    {
+        if (isset($request['id']) && is_numeric($request['id']) &&
+            isset($request['order']) && is_numeric($request['order'])
+        ) {
+            $this->wmMapMove($request['id'], $request['order'], -1);
+        }
+        header("Location: weathermap-cacti-plugin-mgmt.php");
+    }
+
+    /**
+     * @param $request
+     */
+    private function handleMapOrderDown($request)
+    {
+        if (isset($request['id']) && is_numeric($request['id']) &&
+            isset($request['order']) && is_numeric($request['order'])
+        ) {
+            $this->wmMapMove($request['id'], $request['order'], +1);
+        }
+        header("Location: weathermap-cacti-plugin-mgmt.php");
+    }
+
+    /**
+     * @param $request
+     */
+    private function handleGroupOrderUp($request)
+    {
+        if (isset($request['id']) && is_numeric($request['id']) &&
+            isset($request['order']) && is_numeric($request['order'])
+        ) {
+            $this->wmMapGroupMove(intval($request['id']), intval($request['order']), -1);
+        }
+        header("Location: weathermap-cacti-plugin-mgmt.php?action=groupadmin");
+    }
+
+    /**
+     * @param $request
+     */
+    private function handleGroupOrderDown($request)
+    {
+        if (isset($request['id']) && is_numeric($request['id']) &&
+            isset($request['order']) && is_numeric($request['order'])
+        ) {
+            $this->wmMapGroupMove(intval($request['id']), intval($request['order']), 1);
+        }
+        header("Location: weathermap-cacti-plugin-mgmt.php?action=groupadmin");
+    }
+
+    /**
+     * @param $request
+     */
+    private function handleMapListAdd($request)
+    {
+        if (isset($request['file'])) {
+            $this->wmMapAdd($request['file']);
+            header("Location: weathermap-cacti-plugin-mgmt.php");
+        } else {
+            print "No such file.";
+        }
+    }
+
+    /**
+     * @param $request
+     */
+    private function handleMapPicker($request)
+    {
+        require_once $this->cactiBasePath . "/include/top_header.php";
+
+        if (isset($request['show']) && $request['show'] == 'all') {
+            $this->wmuiMapFilePicker(true);
+        } else {
+            $this->wmuiMapFilePicker(false);
+        }
+        require_once $this->cactiBasePath . "/include/bottom_footer.php";
+    }
+
+    /**
+     * @param $request
+     */
+    private function handleViewConfig($request)
+    {
+        require_once $this->cactiBasePath . "/include/top_graph_header.php";
+
+        if (isset($request['file'])) {
+            $this->wmuiPreviewConfig($request['file']);
+        } else {
+            print "No such file.";
+        }
+        require_once $this->cactiBasePath . "/include/bottom_footer.php";
     }
 }

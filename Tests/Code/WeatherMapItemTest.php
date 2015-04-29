@@ -28,10 +28,6 @@ class WeatherMapItemTest extends PHPUnit_Framework_TestCase {
     protected function tearDown() {
     }
 
-
-    /**
-     * @todo Implement testMy_type().
-     */
     public function testMy_type() {
         $this->assertEquals("ITEM", $this->object->my_type());
     }

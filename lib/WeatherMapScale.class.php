@@ -130,7 +130,7 @@ class WeatherMapScale extends WeatherMapItem
 
         $output = "# All settings for scale ".$this->name."\n";
 
-        if(1==0) {
+        if (1==0) {
             if (null === $this->keypos) {
                 $output .= sprintf(
                     "\tKEYPOS %s %s %s\n",
@@ -200,7 +200,7 @@ class WeatherMapScale extends WeatherMapItem
             $tag = (isset($scaleEntry['tag']) ? $scaleEntry['tag'] : '');
 
             // Non-real colour, c1==c2 and c2==null all mean a single SCALE colour
-            if ( (!$scaleEntry['c1']->isRealColour())
+            if ((!$scaleEntry['c1']->isRealColour())
                 || (null === $scaleEntry['c2'])
                 || $scaleEntry['c1']->equals($scaleEntry['c2'])) {
                 $output .= sprintf(
@@ -279,7 +279,8 @@ class WeatherMapScale extends WeatherMapItem
         return (array ($col, $key, $tag));
     }
 
-    protected function findScaleHit($value) {
+    protected function findScaleHit($value)
+    {
 
         $colour = new WMColour(0, 0, 0);
         $tag = '';
@@ -566,7 +567,6 @@ class WeatherMapScale extends WeatherMapItem
         $fontObject->drawImageString($gdScaleImage, $scaleLeft - $scaleFactor, $scaleTop - $tileHeight, $title, $this->keytextcolour->gdAllocate($gdScaleImage));
 
         for ($percentage = 0; $percentage <= 100; $percentage++) {
-
             if ($inverted) {
                 $deltaY = (100 - $percentage) * $scaleFactor;
             } else {
@@ -592,12 +592,14 @@ class WeatherMapScale extends WeatherMapItem
 //                    $scale_top + $delta_y - $scalefactor / 2,
 //                    $scale_right, $scale_top + $delta_y + $scalefactor / 2,
 //                    $col->gdAllocate($gdScaleImage));
-                imagefilledrectangle($gdScaleImage,
+                imagefilledrectangle(
+                    $gdScaleImage,
                     $scaleLeft,
                     $scaleTop + $deltaY - $scaleFactor/2,
                     $scaleRight,
                     $scaleTop + $deltaY + $scaleFactor/2,
-                    $cc);
+                    $cc
+                );
             }
         }
 
@@ -631,7 +633,7 @@ class WeatherMapScale extends WeatherMapItem
         $scaleBottom = $scaleTop + $tileHeight * 1.5;
         $boxBottom = $scaleBottom + $tileHeight * 2 + 6;
 
-        wm_debug("Size is %dx%d (From %dx%d tile)\n",$boxRight+1, $boxBottom+1, $tileWidth, $tileHeight);
+        wm_debug("Size is %dx%d (From %dx%d tile)\n", $boxRight+1, $boxBottom+1, $tileWidth, $tileHeight);
 
         $gdScaleImage = imagecreatetruecolor($boxRight + 1, $boxBottom + 1);
         $scaleReference = 'gdref_legend_' . $this->name;

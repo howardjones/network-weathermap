@@ -26,5 +26,4 @@ class WeatherMapTextItem extends WeatherMapItem
     {
         return "TEXT";
     }
-
 }

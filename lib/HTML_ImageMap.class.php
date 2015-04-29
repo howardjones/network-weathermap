@@ -150,7 +150,7 @@ class HTML_ImageMap_Area_Rectangle extends HTML_ImageMap_Area
     {
         $c = $coords[0];
 
-        if ( count($c) != 4) {
+        if (count($c) != 4) {
             throw new Exception('Incorrect number of array elements in HTML_ImageMap_Area_Rectangle!');
         }
 

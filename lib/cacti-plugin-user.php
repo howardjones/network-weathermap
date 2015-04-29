@@ -277,8 +277,8 @@ class WeatherMapCactiUserPlugin extends WeatherMapUIBase
                 $userid = $this->getCactiUserID();
 
                 if ((db_fetch_assoc(
-                        "select user_auth_realm.realm_id from user_auth_realm where user_auth_realm.user_id='" . $userid . "' and user_auth_realm.realm_id='$realm_id2'"
-                    )) || (empty($realm_id2))
+                    "select user_auth_realm.realm_id from user_auth_realm where user_auth_realm.user_id='" . $userid . "' and user_auth_realm.realm_id='$realm_id2'"
+                )) || (empty($realm_id2))
                 ) {
                     print " (If this message stays here for more than one poller cycle, then check your cacti.log file for errors!)";
                 }
@@ -486,19 +486,19 @@ class WeatherMapCactiUserPlugin extends WeatherMapUIBase
             print "<div class='all_map_holder $class'>";
 
             $outdir = dirname(__FILE__) . '/../output/';
-        foreach ($maplist as $map) {
-            $htmlfile = $outdir . $map['filehash'] . ".html";
-            $maptitle = $map['titlecache'];
-            if ($maptitle == '') {
-                $maptitle = "Map for config file: " . $map['configfile'];
-            }
+            foreach ($maplist as $map) {
+                $htmlfile = $outdir . $map['filehash'] . ".html";
+                $maptitle = $map['titlecache'];
+                if ($maptitle == '') {
+                    $maptitle = "Map for config file: " . $map['configfile'];
+                }
 
-            print '<div class="weathermapholder" id="mapholder_' . $map['filehash'] . '">';
-        if ($cycle === false || $fullscreen === false) {
-            html_graph_start_box(1, true);
+                print '<div class="weathermapholder" id="mapholder_' . $map['filehash'] . '">';
+                if ($cycle === false || $fullscreen === false) {
+                    html_graph_start_box(1, true);
 
-            ?>
-            <tr bgcolor="#<?php echo $colors["header_panel"] ?>">
+                    ?>
+                    <tr bgcolor="#<?php echo $colors["header_panel"] ?>">
                 <td colspan="3">
                     <table width="100%" cellspacing="0" cellpadding="3" border="0">
                         <tr>
@@ -509,42 +509,42 @@ class WeatherMapCactiUserPlugin extends WeatherMapUIBase
                         </tr>
                     </table>
                 </td>
-            </tr>
-            <tr>
-            <td>
-        <?php
-        }
+                </tr>
+                <tr>
+                <td>
+                <?php
+                }
 
-        if (file_exists($htmlfile)) {
-            include($htmlfile);
-        } else {
-            print "<div align=\"center\" style=\"padding:20px\"><em>This map hasn't been created yet.</em></div>";
-        }
+                if (file_exists($htmlfile)) {
+                    include($htmlfile);
+                } else {
+                    print "<div align=\"center\" style=\"padding:20px\"><em>This map hasn't been created yet.</em></div>";
+                }
 
 
-        if ($cycle === false || $fullscreen === false) {
-            print '</td></tr>';
-            html_graph_end_box();
-        }
-        print '</div>';
-        }
-        print "</div>";
+                if ($cycle === false || $fullscreen === false) {
+                    print '</td></tr>';
+                    html_graph_end_box();
+                }
+                print '</div>';
+            }
+            print "</div>";
 
-        if ($cycle) {
-        $refreshtime = read_config_option("weathermap_cycle_refresh");
-        $poller_cycle = read_config_option("poller_interval"); ?>
-            <script type="text/javascript" src="cacti-resources/map-cycle.js"></script>
-            <script type="text/javascript">
-                $(document).ready(public function () {
-                    WMcycler.start({
-                        fullscreen: <?php echo ($fullscreen ? "1" : "0"); ?>,
-                        poller_cycle: <?php echo $poller_cycle * 1000; ?>,
-                        period: <?php echo $refreshtime  * 1000; ?>
+            if ($cycle) {
+                $refreshtime = read_config_option("weathermap_cycle_refresh");
+                $poller_cycle = read_config_option("poller_interval"); ?>
+                <script type="text/javascript" src="cacti-resources/map-cycle.js"></script>
+                <script type="text/javascript">
+                    $(document).ready(public function () {
+                        WMcycler.start({
+                            fullscreen: <?php echo ($fullscreen ? "1" : "0"); ?>,
+                            poller_cycle: <?php echo $poller_cycle * 1000; ?>,
+                            period: <?php echo $refreshtime  * 1000; ?>
+                        });
                     });
-                });
-            </script>
-            <?php
-        }
+                </script>
+                <?php
+            }
         } else {
             print "<div align=\"center\" style=\"padding:20px\"><em>You Have No Maps</em></div>\n";
         }
@@ -575,9 +575,9 @@ class WeatherMapCactiUserPlugin extends WeatherMapUIBase
         $userid = $this->getCactiUserID();
 
         if ((db_fetch_assoc(
-                "select user_auth_realm.realm_id from user_auth_realm where user_auth_realm.user_id='"
-                . $userid . "' and user_auth_realm.realm_id='$realm_id2'"
-            )) || (empty($realm_id2))
+            "select user_auth_realm.realm_id from user_auth_realm where user_auth_realm.user_id='"
+            . $userid . "' and user_auth_realm.realm_id='$realm_id2'"
+        )) || (empty($realm_id2))
         ) {
             $pagefoot .= " --- <a href='weathermap-cacti-plugin-mgmt.php' title='Go to the map management page'>";
             $pagefoot .= "Weathermap Management</a> | <a target=\"_blank\" href=\"docs/\">Local Documentation</a>";

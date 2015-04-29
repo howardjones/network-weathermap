@@ -247,13 +247,15 @@ class WeatherMap extends WeatherMapBase
         wm_debug("WeatherMap class Reset() complete\n");
     }
 
-    private function loadAllPlugins() {
+    private function loadAllPlugins()
+    {
         $this->loadPlugins('data', dirname(__FILE__) . DIRECTORY_SEPARATOR . 'datasources');
         $this->loadPlugins('pre', dirname(__FILE__) . DIRECTORY_SEPARATOR . 'pre');
         $this->loadPlugins('post', dirname(__FILE__) . DIRECTORY_SEPARATOR . 'post');
     }
 
-    private function populateDefaultColours() {
+    private function populateDefaultColours()
+    {
         wm_debug("Adding default map colour set.\n");
         $defaults = array(
             'KEYTEXT' => array('bottom' => -2, 'top' => -1, 'red' => 0, 'green' => 0, 'blue' => 0),
@@ -519,7 +521,8 @@ class WeatherMap extends WeatherMapBase
         wm_debug("Finished loading plugins.\n");
     }
 
-    private function resolveDirectoryAndOpen($dir){
+    private function resolveDirectoryAndOpen($dir)
+    {
         if (!file_exists($dir)) {
             $dir = dirname(__FILE__) . DIRECTORY_SEPARATOR . $dir;
             wm_debug("Relative path didn't exist. Trying $dir\n");
@@ -637,7 +640,6 @@ class WeatherMap extends WeatherMapBase
         wm_debug("Starting main collection loop\n");
 
         foreach ($itemList as $mapItem) {
-
             if ($mapItem->isTemplate()) {
                 wm_debug("ReadData: Skipping $mapItem that looks like a template\n.");
                 continue;
@@ -924,7 +926,7 @@ class WeatherMap extends WeatherMapBase
      */
     private function replicateScaleSettings()
     {
-        foreach ($this->scales as $scaleName=>$scaleObject) {
+        foreach ($this->scales as $scaleName => $scaleObject) {
             $scaleObject->keyoutlinecolour = $this->colourtable['KEYOUTLINE'];
             $scaleObject->keytextcolour = $this->colourtable['KEYTEXT'];
             $scaleObject->keybgcolour = $this->colourtable['KEYBG'];
@@ -999,7 +1001,7 @@ class WeatherMap extends WeatherMapBase
 
             foreach ($this->nodes as $node) {
                 // if it's not relative, or already dealt with, skip to the next one
-                if ( !$node->isRelativePositioned() || $node->isRelativePositionResolved()) {
+                if (!$node->isRelativePositioned() || $node->isRelativePositionResolved()) {
                     continue;
                 }
 
@@ -1384,12 +1386,11 @@ class WeatherMap extends WeatherMapBase
 
             if (is_array($z_items)) {
                 foreach ($z_items as $it) {
-
                     $it->preChecks($this);
                     $it->preCalculate($this);
                     $it->draw($imageRef, $this);
 
-                    foreach ($it->getImageMapAreas() as $name=>$area) {
+                    foreach ($it->getImageMapAreas() as $name => $area) {
                         $this->imap->addArea($area);
                     }
                 }
@@ -1428,14 +1429,15 @@ class WeatherMap extends WeatherMapBase
     }
 
     // if one is specified, and we can, write a thumbnail too
-    protected function createThumbnailFile($outputFileName, $sourceImageRef, $maximumDimension) {
+    protected function createThumbnailFile($outputFileName, $sourceImageRef, $maximumDimension)
+    {
 
         if (!function_exists('imagecopyresampled')) {
             wm_warn("Skipping thumbnail creation, since we don't have the necessary function. [WMWARN17]");
             return;
         }
 
-        if($outputFileName == '') {
+        if ($outputFileName == '') {
             return;
         }
 
@@ -1453,7 +1455,7 @@ class WeatherMap extends WeatherMapBase
         $result = imagepng($thumbImageRef, $outputFileName);
         imagedestroy($thumbImageRef);
 
-        if($result!==false) {
+        if ($result!==false) {
             return;
         }
 

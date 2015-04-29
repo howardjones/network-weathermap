@@ -712,7 +712,6 @@ class WeatherMapNode extends WeatherMapDataItem
         if ($this->pos_named) {
             $off_name = $this->relative_name;
             if (isset($anchorNode->named_offsets[$off_name])) {
-
                 $now = $anchorPosition->copy();
                 $now->translate(
                     $anchorNode->named_offsets[$off_name][0],

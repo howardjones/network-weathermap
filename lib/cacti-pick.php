@@ -3,7 +3,6 @@
 function pickerDispatch($request)
 {
     if (isset($request['command'])) {
-
         if ($request["command"]=='link_step1') {
             link_pick_step1($request);
         }

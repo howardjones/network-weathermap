@@ -1,6 +1,7 @@
 <?php
 
-class WeatherMapUIBase {
+class WeatherMapUIBase
+{
     public $commands;
     const ARG_OPTIONAL = 2;
     const ARG_TYPE = 1;
@@ -126,5 +127,108 @@ class WeatherMapUIBase {
 
         return false;
     }
+}
 
+
+/**
+ * Clean up URI (function taken from Cacti) to protect against XSS
+ */
+function wmeSanitizeURI($str)
+{
+    static $drop_char_match =   array(' ','^', '$', '<', '>', '`', '\'', '"', '|', '+', '[', ']', '{', '}', ';', '!', '%');
+    static $drop_char_replace = array('', '', '',  '',  '',  '',  '',   '',  '',  '',  '',  '',  '',  '',  '',  '', '');
+
+    return str_replace($drop_char_match, $drop_char_replace, urldecode($str));
+}
+
+// much looser sanitise for general strings that shouldn't have HTML in them
+function wmeSanitizeString($str)
+{
+    static $drop_char_match =   array('<', '>' );
+    static $drop_char_replace = array('', '');
+
+    return str_replace($drop_char_match, $drop_char_replace, urldecode($str));
+}
+
+function wmeValidateBandwidth($bandwidth)
+{
+    if (preg_match('/^(\d+\.?\d*[KMGT]?)$/', $bandwidth)) {
+        return true;
+    }
+    return false;
+}
+
+function wmeValidateOneOf($input, $validChoices = array(), $caseSensitive = false)
+{
+    if (! $caseSensitive) {
+        $input = strtolower($input);
+    }
+
+    foreach ($validChoices as $choice) {
+        if (! $caseSensitive) {
+            $choice = strtolower($choice);
+        }
+        if ($choice == $input) {
+            return true;
+        }
+    }
+
+    return false;
+}
+
+// Labels for Nodes, Links and Scales shouldn't have spaces in
+function wmeSanitizeName($str)
+{
+    return str_replace(array(" "), "", $str);
+}
+
+function wmeSanitizeSelected($str)
+{
+    $result = urldecode($str);
+
+    if (! preg_match("/^(LINK|NODE):/", $result)) {
+        return "";
+    }
+    return wmeSanitizeName($result);
+}
+
+function wmeSanitizeFile($filename, $allowed_exts = array())
+{
+    $filename = wmeSanitizeURI($filename);
+
+    if ($filename == "") {
+        return "";
+    }
+
+    $clean = false;
+    foreach ($allowed_exts as $ext) {
+        $match = ".".$ext;
+
+        if (substr($filename, -strlen($match), strlen($match)) == $match) {
+            $clean = true;
+        }
+    }
+    if (! $clean) {
+        return "";
+    }
+    return $filename;
+}
+
+function wmeSanitizeConfigFile($filename)
+{
+    # If we've been fed something other than a .conf filename, just pretend it didn't happen
+    $filename = wmeSanitizeFile($filename, array("conf"));
+
+    # on top of the url stuff, we don't ever need to see a / in a config filename
+    # (CVE-2013-3739)
+    if (strstr($filename, "/") !== false) {
+        $filename = "";
+    }
+    if (strstr($filename, "?") !== false) {
+        $filename = "";
+    }
+    if (strstr($filename, "*") !== false) {
+        $filename = "";
+    }
+    return $filename;
 }

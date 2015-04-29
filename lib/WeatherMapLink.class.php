@@ -516,7 +516,7 @@ class WeatherMapLink extends WeatherMapDataItem
         $areaName = "LINK:L" . $this->id . ':' . ($direction + 2);
 
         // the rectangle is about half the size in the HTML, and easier to optimise/detect in the browser
-        if ( ($angle % 90) == 0) {
+        if (($angle % 90) == 0) {
             // We optimise for 0, 90, 180, 270 degrees - find the rectangle from the rotated points
             $rectanglePoints = array();
             $rectanglePoints[] = min($points[0], $points[2]);
@@ -784,7 +784,7 @@ class WeatherMapLink extends WeatherMapDataItem
         $i = 0;
         foreach ($this->targets as $target) {
             if ($i>0) {
-               print " ";
+                print " ";
             }
             $tgt .= $target->asConfig();
             $i++;

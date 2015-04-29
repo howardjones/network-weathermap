@@ -240,5 +240,4 @@ class WeatherMapDataItem extends WeatherMapItem
         $this->colours[IN] = $incol;
         $this->colours[OUT] = $outcol;
     }
-
 }

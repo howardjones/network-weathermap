@@ -8,9 +8,8 @@
  *  validation of input etc. Mostly class methods.
  */
 
-class WeatherMapEditorUI
+class WeatherMapEditorUI extends WeatherMapUIBase
 {
-
     var $editor;
 
     var $selected = "";
@@ -233,126 +232,6 @@ class WeatherMapEditorUI
         "nothing" => array("args" => array(array("mapname","mapfile")), "handler"=>"cmdDoNothing", "no_save" => true)
     );
 
-    /**
-     * Given an array of request variables (usually $_REQUEST), check that the
-     * request is a valid one. Does the action exist? Do the arguments match the action?
-     * Do they all match the expected type?
-     *
-     * @param string $action
-     * @param string[] $request
-     *
-     * @return bool
-     *
-     */
-    function validateRequest($action, $request)
-    {
-        if (!array_key_exists($action, $this->commands)) {
-            return false;
-        }
-            
-        // Now check all the required arguments exist, and are appropriate types
-        $validation = $this->commands[$action];
-        foreach ($validation['args'] as $arg) {
-            $required = true;
-            // some args are optional (not many)
-            if (isset($arg[2]) && $arg[2]===true) {
-                $required = false;
-            }
-            // fail if a required arg is missing
-            if ($required && !isset($request[$arg[0]])) {
-                return false;
-            }
-            // Go through the args, and check they look right
-            $type = $arg[1];
-            if (isset($request[$arg[0]])) {
-                $value = $request[$arg[0]];
-                if (!$this->validateArgument($type, $value)) {
-                    return false;
-                }
-            }
-        }
-        
-        // if we're still here, then it looked OK
-        return true;
-    }
-    
-    /**
-     * Validate that a single value matches the expected type
-     *
-     * @param string $type
-     * @param string $value
-     *
-     * @returns bool
-     */
-    function validateArgument($type, $value)
-    {
-        switch ($type) {
-            case "int":
-                if (is_int($value)) {
-                    return true;
-                }
-                if ((is_numeric($value)&&(intval($value)==floatval($value)))) {
-                    return true;
-                }
-                break;
-            case "name":
-                if ($value == wmeSanitizeName($value)) {
-                    return true;
-                }
-                return false;
-            case "jsname":
-                if ($value == wmeSanitizeName($value)) {
-                    return true;
-                }
-                return false;
-            case "mapfile":
-                if ($value == wmeSanitizeConfigFile($value)) {
-                    return true;
-                }
-                return false;
-            case "string":
-                return true;
-            default:
-                // a type was specified that we didn't know - probably a problem
-                return false;
-        }
-        return false;
-    }
-
-    /**
-     * Call the relevant function to handle this request.
-     * Pass only the expected (and by now, validated) parameters
-     * from the HTTP request
-     *
-     * @param string $action
-     * @param string[] $request
-     *
-     * @returns bool
-     */
-    function dispatchRequest($action, $request, $editor)
-    {
-        if (!array_key_exists($action, $this->commands)) {
-            return false;
-        }
-
-        $command_info = $this->commands[$action];
-
-        $params = array();
-        foreach ($command_info['args'] as $arg) {
-            if (isset($request[$arg[0]])) {
-                $params[$arg[0]] = $request[$arg[0]];
-            }
-        }
-
-        if (isset($command_info['handler'])) {
-            $handler = $command_info['handler'];
-            $result = $this->$handler($params, $editor);
-
-            return $result;
-        }
-
-        return false;
-    }
 
     function setLogMessage($message)
     {
@@ -414,6 +293,7 @@ class WeatherMapEditorUI
     function cmdDrawMap($params, $editor)
     {
         header("Content-type: image/png");
+        // If the config file hasn't changed, then the image produced shouldn't have, either
         $etag = md5_file($this->mapfile);
         header("Etag: $etag");
 
@@ -694,7 +574,7 @@ class WeatherMapEditorUI
                 
     }
 
-    function getTitleFromConfig($filename)
+    function getTitleFromConfig($filename, $defaultTitle="")
     {
         $title = "";
 
@@ -709,6 +589,11 @@ class WeatherMapEditorUI
             }
             fclose($fileHandle);
         }
+
+        if ($title == "") {
+            $title = $defaultTitle;
+        }
+
         return $title;
     }
 
@@ -716,47 +601,45 @@ class WeatherMapEditorUI
     {
         $titles = array();
         $notes = array();
-        
+
         $errorString = "";
-                       
-        if (is_dir($mapDirectory)) {
-            $n = 0; // TODO - nothing seems to increment this!
-            $directoryHandle = opendir($mapDirectory);
-        
-            if ($directoryHandle) {
-                while (false !== ($file = readdir($directoryHandle))) {
-                    $realfile = $mapDirectory . DIRECTORY_SEPARATOR . $file;
-                    $note = "";
-        
-                    // skip directories, unreadable files, .files and anything that doesn't come through the sanitiser unchanged
-                    if ((is_file($realfile)) && (is_readable($realfile)) && (!preg_match("/^\./", $file)) && (wmeSanitizeConfigFile($file) == $file )) {
-                        if (!is_writable($realfile)) {
-                            $note .= "(read-only)";
-                        }
 
-                        $title = $this->getTitleFromConfig($realfile);
-                        if ($title=="") {
-                            $title='(no title)';
-                        }
-
-                        $titles[$file] = $title;
-                        $notes[$file] = $note;
-                    }
-                }
-                closedir($directoryHandle);
-            } else {
-                $errorString = "Can't open mapdir to read.";
-            }
-        
-            ksort($titles);
-        
-            if ($n == 0) {
-                $errorString = "No files in mapdir";
-            }
-        } else {
+        if (!is_dir($mapDirectory)) {
             $errorString = "NO DIRECTORY named $mapDirectory";
+            return array($titles, $notes, $errorString);
         }
-        
+
+        $n = 0;
+        $directoryHandle = opendir($mapDirectory);
+
+        if (!$directoryHandle) {
+            $errorString = "Can't open map directory to read.";
+            return array($titles, $notes, $errorString);
+        }
+
+        while (false !== ($file = readdir($directoryHandle))) {
+            $realfile = $mapDirectory . DIRECTORY_SEPARATOR . $file;
+            $note = "";
+
+            // skip directories, unreadable files, .files and anything that doesn't come through the sanitiser unchanged
+            if ((is_file($realfile)) && (is_readable($realfile)) && (!preg_match('/^\./', $file)) && (wmeSanitizeConfigFile($file) == $file)) {
+                if (!is_writable($realfile)) {
+                    $note .= "(read-only)";
+                }
+
+                $titles[$file] = $this->getTitleFromConfig($realfile, "(no title)");
+                $notes[$file] = $note;
+                $n++;
+            }
+        }
+        closedir($directoryHandle);
+
+        ksort($titles);
+
+        if ($n == 0) {
+            $errorString = "No usable files in map directory";
+        }
+
         return array($titles, $notes, $errorString);
     }
     
@@ -893,25 +776,25 @@ function wmeSanitizeString($str)
     return str_replace($drop_char_match, $drop_char_replace, urldecode($str));
 }
 
-function wmeValidateBandwidth($bw)
+function wmeValidateBandwidth($bandwidth)
 {
-    if (preg_match("/^(\d+\.?\d*[KMGT]?)$/", $bw)) {
+    if (preg_match('/^(\d+\.?\d*[KMGT]?)$/', $bandwidth)) {
         return true;
     }
     return false;
 }
 
-function wmeValidateOneOf($input, $valid = array(), $case_sensitive = false)
+function wmeValidateOneOf($input, $validChoices = array(), $caseSensitive = false)
 {
-    if (! $case_sensitive) {
+    if (! $caseSensitive) {
         $input = strtolower($input);
     }
 
-    foreach ($valid as $v) {
-        if (! $case_sensitive) {
-            $v = strtolower($v);
+    foreach ($validChoices as $choice) {
+        if (! $caseSensitive) {
+            $choice = strtolower($choice);
         }
-        if ($v == $input) {
+        if ($choice == $input) {
             return true;
         }
     }
@@ -927,12 +810,12 @@ function wmeSanitizeName($str)
 
 function wmeSanitizeSelected($str)
 {
-    $res = urldecode($str);
+    $result = urldecode($str);
 
-    if (! preg_match("/^(LINK|NODE):/", $res)) {
+    if (! preg_match("/^(LINK|NODE):/", $result)) {
         return "";
     }
-    return wmeSanitizeName($res);
+    return wmeSanitizeName($result);
 }
 
 function wmeSanitizeFile($filename, $allowed_exts = array())

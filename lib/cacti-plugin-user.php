@@ -1,10 +1,10 @@
 <?php
 
-class WeatherMapCactiUserPlugin
+class WeatherMapCactiUserPlugin extends WeatherMapUIBase
 {
     public $config;
 
-    public $handlers = array(
+    public $commands = array(
         'viewthumb' => array( 'handler'=>'handleBigThumb', 'args'=>array() ),
         'viewthumb48' => array( 'handler'=>'handleLittleThumb', 'args'=>array() ),
         'viewimage' => array( 'handler'=>'handleImage', 'args'=>array() ),
@@ -22,11 +22,11 @@ class WeatherMapCactiUserPlugin
     {
         $handler = null;
 
-        if (array_key_exists($action, $this->handlers)) {
-            $handler = $this->handlers[$action];
+        if (array_key_exists($action, $this->commands)) {
+            $handler = $this->commands[$action];
         }
-        if (array_key_exists(":: DEFAULT ::", $this->handlers)) {
-            $handler = $this->handlers[":: DEFAULT ::"];
+        if (array_key_exists(":: DEFAULT ::", $this->commands)) {
+            $handler = $this->commands[":: DEFAULT ::"];
         }
         if (null === $handler) {
             return;

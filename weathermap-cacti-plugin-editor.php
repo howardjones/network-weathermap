@@ -19,5 +19,5 @@
 
     $FROM_CACTI = true;
 
-    require_once dirname(__FILE__).'/editor13.php';
+    require_once dirname(__FILE__).'/editor.php';
 

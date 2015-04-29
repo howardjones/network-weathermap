@@ -1,6 +1,6 @@
 <?php
 
-class WeatherMapCactiManagementPlugin
+class WeatherMapCactiManagementPlugin extends WeatherMapUIBase
 {
     public $config;
     public $configPath;
@@ -9,7 +9,7 @@ class WeatherMapCactiManagementPlugin
 
     public $i_understand_file_permissions_and_how_to_fix_them;
 
-    public $handlers = array(
+    public $commands = array(
         'groupadmin_delete' => array('handler' => 'handleGroupDelete', 'args' => array()),
         'groupadmin' => array('handler' => 'handleGroupSelect', 'args' => array()),
         'group_form' => array('handler' => 'handleGroupForm', 'args' => array()),
@@ -50,11 +50,11 @@ class WeatherMapCactiManagementPlugin
     {
         $handler = null;
 
-        if (array_key_exists($action, $this->handlers)) {
-            $handler = $this->handlers[$action];
+        if (array_key_exists($action, $this->commands)) {
+            $handler = $this->commands[$action];
         }
-        if (array_key_exists(":: DEFAULT ::", $this->handlers)) {
-            $handler = $this->handlers[":: DEFAULT ::"];
+        if (array_key_exists(":: DEFAULT ::", $this->commands)) {
+            $handler = $this->commands[":: DEFAULT ::"];
         }
         if (null === $handler) {
             return;

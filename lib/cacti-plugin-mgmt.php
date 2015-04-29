@@ -46,26 +46,6 @@ class WeatherMapCactiManagementPlugin extends WeatherMapUIBase
         $this->i_understand_file_permissions_and_how_to_fix_them = false;
     }
 
-    public function dispatch($action, $request)
-    {
-        $handler = null;
-
-        if (array_key_exists($action, $this->commands)) {
-            $handler = $this->commands[$action];
-        }
-        if (array_key_exists(":: DEFAULT ::", $this->commands)) {
-            $handler = $this->commands[":: DEFAULT ::"];
-        }
-        if (null === $handler) {
-            return;
-        }
-
-        // TODO - add argument parse/validation in here
-
-        $handlerMethod = $handler['handler'];
-        $this->$handlerMethod($request);
-    }
-
     /**
      */
     public function handleManagementMainScreen()
@@ -399,7 +379,6 @@ class WeatherMapCactiManagementPlugin extends WeatherMapUIBase
 
         if ($last_stats != "") {
             print "<div align='center'><strong>Last Completed Run:</strong> $last_stats</div>";
-        } else {
         }
 
         if ($had_warnings>0) {
@@ -416,7 +395,7 @@ class WeatherMapCactiManagementPlugin extends WeatherMapUIBase
             print "<div class='wm_mapgroup'>";
             printf("<h3 class=wm_group>%s <span class='wm_controls'>[Add Map][Settings][Rename][Delete][Move Up][Move Down]</span></h3>\n", $groupname);
 
-            $i = 0;
+            $index = 0;
 
             $queryrows = db_fetch_assoc(sprintf("select weathermap_maps.* from weathermap_maps where weathermap_maps.group_id=%d order by sortorder", $group_id));
 
@@ -425,7 +404,7 @@ class WeatherMapCactiManagementPlugin extends WeatherMapUIBase
 
                 foreach ($queryrows as $map) {
                     $classes = "maplist-entry";
-                    if ($i %2 == 0) {
+                    if ($index % 2 == 0) {
                         $classes .= " alt-row";
                     }
                     if ($map['active'] == 'off') {

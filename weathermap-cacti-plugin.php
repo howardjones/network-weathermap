@@ -19,7 +19,7 @@ if (isset($_POST['action'])) {
     $action = $_GET['action'];
 }
 
-$plugin = new WeatherMapCactiUserPlugin($config);
+$plugin = new WeatherMapCactiUserPlugin($config, $colours);
 
 $plugin->dispatch($action, $_REQUEST);
 

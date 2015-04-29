@@ -33,6 +33,8 @@ class WeatherMapDataItem extends WeatherMapItem
     public $maxValuesConfigured = array();
     public $channelScaleColours = array();
 
+    public $scalevar;
+
     public $infourl;
     public $overliburl;
     public $overlibwidth;
@@ -45,16 +47,18 @@ class WeatherMapDataItem extends WeatherMapItem
 
         $this->infourl = array();
         $this->overliburl = array();
+        $this->scalevar = null;
+        $this->duplex = null;
     }
 
     private function getDirectionList()
     {
-        return array(IN, OUT);
+        return array("in"=>IN, "out"=>OUT);
     }
 
     private function getChannelList()
     {
-        return array(IN, OUT);
+        return array("in"=>IN, "out"=>OUT);
     }
 
     public function updateMaxValues($kilo)
@@ -108,13 +112,14 @@ class WeatherMapDataItem extends WeatherMapItem
         wm_debug("ReadData for $this: \n");
 
         $totals = array();
-        foreach ($channels as $channel) {
+        foreach ($channels as $channelName => $channel) {
             $totals[$channel] = 0;
             $this->absoluteUsages[$channel] = 0;
         }
         $dataTime = 0;
 
         $nTargets = count($this->targets);
+        $nFails = 0;
 
         foreach ($this->targets as $target) {
             wm_debug("ReadData: New Target: $target\n");
@@ -131,16 +136,7 @@ class WeatherMapDataItem extends WeatherMapItem
                 wm_debug("Running totals: %s\n", join(" ", $totals));
             } else {
                 wm_debug("Invalid data?\n");
-            }
-
-            // this->owner was the only target, and it's failed
-            if (!$target->hasValidData() && $nTargets == 1) {
-                // this->owner is to allow null to be passed through from DS plugins in the case of a single target
-                // we've never defined what x + null is, so we'll treat that as a 0
-
-                foreach ($channels as $channel) {
-                    $totals[$channel] = null;
-                }
+                $nFails++;
             }
 
             # keep a track of the range of dates for data sources (mainly for MRTG/textfile based DS)
@@ -149,10 +145,19 @@ class WeatherMapDataItem extends WeatherMapItem
             }
         }
 
-        $this->bandwidth_in = $totals[IN];
-        $this->bandwidth_out = $totals[OUT];
+        // that was the only target, and it's failed
+        if ($nFails == 1 && $nTargets == 1) {
+            // this is to allow null to be passed through from DS plugins in the case of a single target
+            // we've never defined what x + null is, so we'll treat that as a 0
 
-        foreach ($channels as $channel) {
+            foreach ($channels as $channel) {
+                $totals[$channel] = null;
+            }
+        }
+
+        foreach ($channels as $channelName => $channel) {
+            $bwvar = "bandwidth_" . $channelName;
+            $this->$bwvar = $totals[$channel];
             $this->absoluteUsages[$channel] = $totals[$channel];
         }
 
@@ -164,80 +169,62 @@ class WeatherMapDataItem extends WeatherMapItem
     {
         $channels = $this->getChannelList();
 
-        // bodge for now: TODO these should be set in Reset() and readConfig()
-        $this->maxValues[IN] = $this->max_bandwidth_in;
-        $this->maxValues[OUT] = $this->max_bandwidth_out;
+        foreach ($channels as $channelName => $channel) {
+            // bodge for now: TODO these should be set in Reset() and readConfig()
+            $maxvar = "max_bandwidth_" . $channelName;
+            $this->maxValues[$channel] = $this->$maxvar;
 
-        foreach ($channels as $channel) {
-            $this->percentUsages[$channel] = ($this->absoluteUsages[$channel] / $this->maxValues[$channel]) * 100;
-        }
+            $value = $this->absoluteUsages[$channel];
 
-        $this->outpercent = $this->percentUsages[OUT];
-        $this->inpercent = $this->percentUsages[IN];
-
-        if ($this->my_type() == 'LINK' && $this->duplex == 'half') {
-            // in a half duplex link, in and out share a common bandwidth pool, so percentages need to include both
-            wm_debug("Calculating percentage using half-duplex\n");
-            $this->outpercent = (($this->absoluteUsages[IN] + $this->absoluteUsages[OUT]) / ($this->maxValues[OUT])) * 100;
-            $this->inpercent = (($this->absoluteUsages[IN] + $this->absoluteUsages[OUT]) / ($this->maxValues[IN])) * 100;
-
-            if ($this->max_bandwidth_out != $this->max_bandwidth_in) {
-                wm_warn("ReadData: $this: You're using asymmetric bandwidth AND half-duplex in the same link. That makes no sense. [WMWARN44]\n");
+            if ($this->duplex == 'half') {
+                wm_debug("Calculating percentage using half-duplex\n");
+                // in a half duplex link, in and out share a common bandwidth pool, so percentages need to include both
+                $value = ($this->absoluteUsages[IN] + $this->absoluteUsages[OUT]);
             }
 
-            $this->percentUsages[OUT] = $this->outpercent;
-            $this->percentUsages[IN] = $this->inpercent;
+            $this->percentUsages[$channel] = ($value / $this->maxValues[$channel]) * 100;
+            $pcvar = $channelName . "percent";
+            $this->$pcvar = $this->percentUsages[$channel];
         }
+
+//            if ($this->max_bandwidth_out != $this->max_bandwidth_in) {
+//                wm_warn("ReadData: $this: You're using asymmetric bandwidth AND half-duplex in the same link. That makes no sense. [WMWARN44]\n");
+//            }
     }
 
     public function calculateScaleColours()
     {
         $channels = $this->getChannelList();
 
-        $warn_in = true;
-        $warn_out = true;
+        $warnings[IN] = true;
+        $warnings[OUT] = true;
 
         // Nodes only use one channel, so don't warn for the unused channel
-        if ($this->my_type() == 'NODE') {
+        if ($this->scalevar !== null) {
             if ($this->scalevar == 'in') {
-                $warn_out = false;
+                $warnings[OUT] = false;
             }
             if ($this->scalevar == 'out') {
-                $warn_in = false;
+                $warnings[IN] = false;
             }
         }
 
-        if ($this->scaletype == 'percent') {
-            list($incol, $inscalekey, $inscaletag) = $this->owner->scales[$this->usescale]->colourFromValue($this->inpercent, $this->name, true, $warn_in);
-            list($outcol, $outscalekey, $outscaletag) = $this->owner->scales[$this->usescale]->colourFromValue($this->outpercent, $this->name, true, $warn_out);
+        // use absolute values, if that's what is requested
+        foreach ($channels as $channelName => $channel) {
+            $isPercent = true;
+            $value = $this->percentUsages[$channel];
 
-            foreach ($channels as $channel) {
-                list($col, $scalekey, $scaletag) = $this->owner->scales[$this->usescale]->colourFromValue($this->percentUsages[$channel], $this->name, true, $warn_out);
-                $this->channelScaleColours[$channel] = $col;
-                $this->colours[$channel] = $col;
+            if ($this->scaletype == 'absolute') {
+                $value = $this->absoluteUsages[$channel];
+                $isPercent = false;
             }
-        } else {
-            // use absolute values, if that's what is requested
-            list($incol, $inscalekey, $inscaletag) = $this->owner->scales[$this->usescale]->colourFromValue($this->bandwidth_in, $this->name, false, $warn_in);
-            list($outcol, $outscalekey, $outscaletag) = $this->owner->scales[$this->usescale]->colourFromValue($this->bandwidth_out, $this->name, false, $warn_out);
 
-            foreach ($channels as $channel) {
-                list($col, $scalekey, $scaletag) = $this->owner->scales[$this->usescale]->colourFromValue($this->absoluteUsages[$channel], $this->name, false, $warn_out);
-                $this->channelScaleColours[$channel] = $col;
-                $this->colours[$channel] = $col;
-            }
+            list($col, $scalekey, $scaletag) = $this->owner->scales[$this->usescale]->colourFromValue($value, $this->name, $isPercent, $warnings[$channel]);
+            $this->channelScaleColours[$channel] = $col;
+            $this->colours[$channel] = $col;
+            $this->add_note($channelName . "scalekey", $scalekey);
+            $this->add_note($channelName . "scaletag", $scaletag);
+            $this->add_note($channelName . "scalecolor", $col->asHTML());
         }
-
-        $this->add_note("inscalekey", $inscalekey);
-        $this->add_note("outscalekey", $outscalekey);
-
-        $this->add_note("inscaletag", $inscaletag);
-        $this->add_note("outscaletag", $outscaletag);
-
-        $this->add_note("inscalecolor", $incol->asHTML());
-        $this->add_note("outscalecolor", $outcol->asHTML());
-
-        $this->colours[IN] = $incol;
-        $this->colours[OUT] = $outcol;
     }
 }

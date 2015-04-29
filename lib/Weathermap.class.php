@@ -574,6 +574,7 @@ class WeatherMap extends WeatherMapBase
      */
     private function buildAllItemsList()
     {
+        // TODO - this should probably be a static
         $allItems = array();
 
         $listOfItemLists = array(&$this->links, &$this->nodes);
@@ -587,7 +588,7 @@ class WeatherMap extends WeatherMapBase
             while (list($innerListCount,) = each($itemList)) {
                 unset($oneMapItem);
                 $oneMapItem = &$itemList[$innerListCount];
-                $allItems []= $oneMapItem;
+                $allItems [] = $oneMapItem;
             }
         }
         return $allItems;

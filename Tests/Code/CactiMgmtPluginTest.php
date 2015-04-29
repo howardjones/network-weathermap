@@ -9,7 +9,8 @@ class CactiMgmtPluginTest extends PHPUnit_Framework_TestCase {
     public function setUp()
     {
         $dummyConfig = array("base_path"=>"/tmp");
-        $this->object = new WeatherMapCactiUserPlugin($dummyConfig);
+        $dummyColors = array();
+        $this->object = new WeatherMapCactiUserPlugin($dummyConfig, $dummyColors);
     }
 
     function testValidCommandMap()

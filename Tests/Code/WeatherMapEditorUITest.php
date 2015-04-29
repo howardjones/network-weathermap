@@ -32,6 +32,17 @@ class WeatherMapEditorUITest extends PHPUnit_Framework_TestCase {
         $this->assertFalse($ui->validateArgument("jsname", "two words"));
         $this->assertTrue($ui->validateArgument("jsname", "oneword"));
 
+
+    }
+
+    /**
+     * @throws WMException
+     * @expectedException WMException
+     */
+    function testValidateArgsException()
+    {
+        $ui = new WeatherMapEditorUI();
+
         // there is no type called 'black'
         $this->assertFalse($ui->validateArgument("black", "white"),"Black is not a recognised type");
     }

@@ -29,10 +29,14 @@ echo
 if [ $fflag -eq 1 ]; then
 
 	echo "Running code quality and test coverage reports."
+
+	mkdir -p reports
+
 	vendor/bin/phpmd lib/ html unusedcode > test-suite/md-unused.html
 	vendor/bin/phpmd lib/ html codesize,design,naming,cleancode > test-suite/md-rest.html
 
-    vendor/bin/phpcpd lib/  > test-suite/cut-paste.txt
+	vendor/bin/phpmd lib/ xml codesize,design,naming,cleancode,unusedcode > reports/pmd.xml
+    vendor/bin/phpcpd --fuzzy --progress --min-tokens=30 --log-pmd=reports/cpd.xml lib/  > test-suite/cut-paste.txt
 
     # this is mostly PSR2, with a few things excluded (namespaces) and a few things added (commented code)
     # CentOS 6 (my theoretical target system) currently ships with PHP 5.1, so no namespaces

@@ -60,36 +60,79 @@ class WeatherMapUIBase
      */
     public function validateArgument($type, $value)
     {
-        switch ($type) {
-            case "int":
-                if (is_int($value)) {
-                    return true;
-                }
-                if ((is_numeric($value) && (intval($value) == floatval($value)))) {
-                    return true;
-                }
-                break;
-            case "name":
-                if ($value == wmeSanitizeName($value)) {
-                    return true;
-                }
-                return false;
-            case "jsname":
-                if ($value == wmeSanitizeName($value)) {
-                    return true;
-                }
-                return false;
-            case "mapfile":
-                if ($value == wmeSanitizeConfigFile($value)) {
-                    return true;
-                }
-                return false;
-            case "string":
-                return true;
-            default:
-                // a type was specified that we didn't know - probably a problem
-                return false;
+        $types = array(
+            "int" => "validateArgInt",
+            "name" => "validateArgName",
+            "jsname" => "validateArgJavascriptName",
+            "mapfile" => "validateArgMapFilename",
+            "string" => "validateArgString",
+            "maphash" => "validateArgMapHash"
+        );
+
+        $handler = null;
+
+        if (array_key_exists($type, $types)) {
+            $handler = $types[$type];
+            return $this->$handler($value);
         }
+
+        if ($type != "") {
+            throw new WMException("ValidateArgs saw unknown type");
+        }
+    }
+
+    public function validateArgMaphash($value)
+    {
+        // a map hash is an MD5 hash - 20 hex characters
+        if (strlen($value) != 20) {
+            return false;
+        }
+        $result = preg_match('/[^0-9a-f]/', $value);
+        if ($result) {
+            return false;
+        }
+        return true;
+    }
+
+    public function validateArgString($value)
+    {
+        return true;
+    }
+
+    public function validateArgMapFilename($value)
+    {
+        if ($value == wmeSanitizeConfigFile($value)) {
+            return true;
+        }
+        return false;
+    }
+
+    public function validateArgJavascriptName($value)
+    {
+        if ($value == wmeSanitizeName($value)) {
+            return true;
+        }
+        return false;
+    }
+
+    public function validateArgName($value)
+    {
+        if ($value == wmeSanitizeName($value)) {
+            return true;
+        }
+        return false;
+    }
+
+    public function validateArgInt($value)
+    {
+        if (is_int($value)) {
+            return true;
+        }
+
+        if ((is_numeric($value) && (intval($value) == floatval($value)))) {
+            return true;
+        }
+
         return false;
     }
 
@@ -126,6 +169,26 @@ class WeatherMapUIBase
         }
 
         return false;
+    }
+
+    public function dispatch($action, $request)
+    {
+        $handler = null;
+
+        if (array_key_exists($action, $this->commands)) {
+            $handler = $this->commands[$action];
+        }
+        if (array_key_exists(":: DEFAULT ::", $this->commands)) {
+            $handler = $this->commands[":: DEFAULT ::"];
+        }
+        if (null === $handler) {
+            return;
+        }
+
+        // TODO - add argument parse/validation in here
+
+        $handlerMethod = $handler['handler'];
+        $this->$handlerMethod($request);
     }
 }
 

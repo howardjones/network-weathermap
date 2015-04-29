@@ -7,40 +7,34 @@ class WeatherMapCactiManagementPlugin
     public $colours;
     public $cactiBasePath;
 
+    public $i_understand_file_permissions_and_how_to_fix_them;
+
     public $handlers = array(
-        "group_update" => "handleGroupUpdate",
-        "groupadmin_delete" => "handleGroupDelete",
-        "groupadmin" => "handleGroupSelect",
-        "group_form" => "handleGroupForm",
-        "chgroup_update" => "handleChangeGroup",
-        "chgroup" => "handleGroupChangeForm",
-
-        "map_settings_delete" => "handleMapSettingsDelete",
-        "map_settings_form" => "handleMapSettingsForm",
-        "map_settings" => "handleMapSettingsPage",
-        "save" => "handleMapSettingsSave",
-
-        "perms_add_user" => "handlePermissionsAddUser",
-        "perms_delete_user" => "handlePermissionsDeleteUser",
-        "perms_edit" => "handlePermissionsPage",
-
-        "delete_map" => "handleDeleteMap",
-        "deactivate_map" => "handleDeactivateMap",
-        "activate_map" => "handleActivateMap",
-        "viewconfig" => "handleViewConfig",
-        "addmap" => "handleMapListAdd",
-        "addmap_picker" => "handleMapPicker",
-
-        "move_map_up" => "handleMapOrderUp",
-        "move_map_down" => "handleMapOrderDown",
-
-        "move_group_up" => "handleGroupOrderUp",
-        "move_group_down" => "handleGroupOrderDown",
-
-        "rebuildnow" => "handleRebuildNowStep1",
-        "rebuildnow2" => "handleRebuildNowStep2",
-
-        ":: DEFAULT ::" => "handleManagementMainScreen"
+        'groupadmin_delete' => array('handler' => 'handleGroupDelete', 'args' => array()),
+        'groupadmin' => array('handler' => 'handleGroupSelect', 'args' => array()),
+        'group_form' => array('handler' => 'handleGroupForm', 'args' => array()),
+        'chgroup_update' => array('handler' => 'handleChangeGroup', 'args' => array()),
+        'chgroup' => array('handler' => 'handleGroupChangeForm', 'args' => array()),
+        'map_settings_delete' => array('handler' => 'handleMapSettingsDelete', 'args' => array()),
+        'map_settings_form' => array('handler' => 'handleMapSettingsForm', 'args' => array()),
+        'map_settings' => array('handler' => 'handleMapSettingsPage', 'args' => array()),
+        'save' => array('handler' => 'handleMapSettingsSave', 'args' => array()),
+        'perms_add_user' => array('handler' => 'handlePermissionsAddUser', 'args' => array()),
+        'perms_delete_user' => array('handler' => 'handlePermissionsDeleteUser', 'args' => array()),
+        'perms_edit' => array('handler' => 'handlePermissionsPage', 'args' => array()),
+        'delete_map' => array('handler' => 'handleDeleteMap', 'args' => array()),
+        'deactivate_map' => array('handler' => 'handleDeactivateMap', 'args' => array()),
+        'activate_map' => array('handler' => 'handleActivateMap', 'args' => array()),
+        'viewconfig' => array('handler' => 'handleViewConfig', 'args' => array()),
+        'addmap' => array('handler' => 'handleMapListAdd', 'args' => array()),
+        'addmap_picker' => array('handler' => 'handleMapPicker', 'args' => array()),
+        'move_map_up' => array('handler' => 'handleMapOrderUp', 'args' => array()),
+        'move_map_down' => array('handler' => 'handleMapOrderDown', 'args' => array()),
+        'move_group_up' => array('handler' => 'handleGroupOrderUp', 'args' => array()),
+        'move_group_down' => array('handler' => 'handleGroupOrderDown', 'args' => array()),
+        'rebuildnow' => array('handler' => 'handleRebuildNowStep1', 'args' => array()),
+        'rebuildnow2' => array('handler' => 'handleRebuildNowStep2', 'args' => array()),
+        ':: DEFAULT ::' => array('handler' => 'handleManagementMainScreen', 'args' => array())
     );
 
     public function __construct($config, $colours)
@@ -49,19 +43,27 @@ class WeatherMapCactiManagementPlugin
         $this->colours = $colours;
         $this->configPath = realpath(dirname(__FILE__).'/../configs');
         $this->cactiBasePath = $config["base_path"];
+        $this->i_understand_file_permissions_and_how_to_fix_them = false;
     }
 
     public function dispatch($action, $request)
     {
+        $handler = null;
+
         if (array_key_exists($action, $this->handlers)) {
             $handler = $this->handlers[$action];
-            $this->$handler($request);
         }
-
         if (array_key_exists(":: DEFAULT ::", $this->handlers)) {
             $handler = $this->handlers[":: DEFAULT ::"];
-            $this->$handler($request);
         }
+        if (null === $handler) {
+            return;
+        }
+
+        // TODO - add argument parse/validation in here
+
+        $handlerMethod = $handler['handler'];
+        $this->$handlerMethod($request);
     }
 
     /**
@@ -89,7 +91,7 @@ class WeatherMapCactiManagementPlugin
         print "though the normal poller process runs fine. In some situations, it MAY have memory_limit problems, if ";
         print "your mod_php/ISAPI module uses a different php.ini to your command-line PHP.</strong><hr><pre>";
 
-        weathermap_run_maps(dirname(__FILE__));
+        weathermap_run_maps(realpath(dirname(__FILE__)."/.."));
 
         print "</pre>";
         print "<hr /><h3>Done.</h3>";
@@ -586,7 +588,6 @@ class WeatherMapCactiManagementPlugin
 
     public function wmMapManagementList()
     {
-        global $i_understand_file_permissions_and_how_to_fix_them;
 
         $last_started = read_config_option("weathermap_last_started_file", true);
         $last_finished = read_config_option("weathermap_last_finished_file", true);
@@ -781,7 +782,7 @@ class WeatherMapCactiManagementPlugin
         print "<div align='center'>";
         print "<a href='weathermap-cacti-plugin-mgmt.php?action=groupadmin'><img src='cacti-resources/img/button_editgroups.png' border=0 alt='Edit Groups' /></a>";
         print "&nbsp;<a href='../../settings.php?tab=misc'><img src='cacti-resources/img/button_settings.gif' border=0 alt='Settings' /></a>";
-        if ($i>0 && $i_understand_file_permissions_and_how_to_fix_them) {
+        if ($i>0 && $this->i_understand_file_permissions_and_how_to_fix_them) {
             print '<br /><a href="?action=rebuildnow"><img src="cacti-resources/img/btn_recalc.png" border="0" alt="Rebuild All Maps Right Now"><br />(Experimental - You should NOT need to use this normally)</a><br />';
         }
         print "</div>";

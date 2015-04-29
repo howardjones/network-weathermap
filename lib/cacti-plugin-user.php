@@ -5,12 +5,12 @@ class WeatherMapCactiUserPlugin
     public $config;
 
     public $handlers = array(
-        "viewthumb" => "handleBigThumb",
-        "viewthumb48" => "handleLittleThumb",
-        "viewimage" => "handleImage",
-        "viewmap" => "handleViewCycle",
-        "viewmapcycle" => "handleView",
-        ":: DEFAULT ::" => "handleMainView"
+        'viewthumb' => array( 'handler'=>'handleBigThumb', 'args'=>array() ),
+        'viewthumb48' => array( 'handler'=>'handleLittleThumb', 'args'=>array() ),
+        'viewimage' => array( 'handler'=>'handleImage', 'args'=>array() ),
+        'viewmap' => array( 'handler'=>'handleViewCycle', 'args'=>array() ),
+        'viewmapcycle' => array( 'handler'=>'handleView', 'args'=>array() ),
+        ':: DEFAULT ::' => array( 'handler'=>'handleMainView', 'args'=>array() )
     );
 
     public function __construct($config)
@@ -20,15 +20,22 @@ class WeatherMapCactiUserPlugin
 
     public function dispatch($action, $request)
     {
+        $handler = null;
+
         if (array_key_exists($action, $this->handlers)) {
             $handler = $this->handlers[$action];
-            $this->$handler($request);
         }
-
         if (array_key_exists(":: DEFAULT ::", $this->handlers)) {
             $handler = $this->handlers[":: DEFAULT ::"];
-            $this->$handler($request);
         }
+        if (null === $handler) {
+            return;
+        }
+
+        // TODO - add argument parse/validation in here
+
+        $handlerMethod = $handler['handler'];
+        $this->$handlerMethod($request);
     }
 
     /**

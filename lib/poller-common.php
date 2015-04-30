@@ -517,7 +517,7 @@ function weathermap_run_map($mapParameters, $configDirectory, $outputDirectory, 
 
         db_execute("update weathermap_maps set titlecache='" . mysql_real_escape_string($runner->getProcessedTitle()) . "' where id=" . intval($mapParameters['id']));
 
-        // XXX - is this even useds?
+        // XXX - is this even used?
 //        if (intval($weathermapObject->thumb_width) > 0) {
 //            db_execute("update weathermap_maps set thumb_width=" . intval($weathermapObject->thumb_width) . ", thumb_height=" . intval($weathermapObject->thumb_height) . " where id=" . intval($mapParameters['id']));
 //        }

@@ -163,27 +163,13 @@ function weathermap_setup_table()
 
     cacti_log("WM setup_table Creating Tables\n", true, "WEATHERMAP");
 
-    $sql = "show tables";
-    $result = db_fetch_assoc($sql) or die (mysql_error());
-
-    $tables = array();
-    $sql = array();
-
-    foreach ($result as $index => $arr) {
-        foreach ($arr as $t) {
-            $tables[] = $t;
-        }
-    }
-
-    $sql[] = "update weathermap_maps set sortorder=id where sortorder is null;";
+    $tables = weathermap_get_table_list();
 
     if (!in_array('weathermap_maps', $tables)) {
         $sql = weathermap_setup_maps_table($sql);
     } else {
         $sql = weathermap_update_maps_table($sql);
     }
-
-    $sql[] = "update weathermap_maps set filehash=LEFT(MD5(concat(id,configfile,rand())),20) where filehash = '';";
 
     if (!in_array('weathermap_auth', $tables)) {
         $sql = weathermap_setup_auth_table($sql);
@@ -203,14 +189,36 @@ function weathermap_setup_table()
         $sql = weathermap_update_data_table($sql);
     }
 
+    $sql[] = "update weathermap_maps set sortorder=id where sortorder is null;";
+    $sql[] = "update weathermap_maps set filehash=LEFT(MD5(concat(id,configfile,rand())),20) where filehash = '';";
+
     // create the settings entries, if necessary
     $sql = weathermap_setup_settings($sql, $myversion);
 
     if (!empty($sql)) {
         foreach ($sql as $s) {
-            $result = db_execute($s);
+            db_execute($s);
         }
     }
+}
+
+/**
+ * @return array
+ */
+function weathermap_get_table_list()
+{
+    $sql = "show tables";
+    $result = db_fetch_assoc($sql) or die (mysql_error());
+
+    $tables = array();
+    $sql = array();
+
+    foreach ($result as $index => $arr) {
+        foreach ($arr as $t) {
+            $tables[] = $t;
+        }
+    }
+    return $tables;
 }
 
 /**
@@ -220,54 +228,24 @@ function weathermap_setup_table()
  */
 function weathermap_setup_settings($sql, $myversion)
 {
-    $pagestyle = read_config_option("weathermap_pagestyle");
-    if ($pagestyle == '' or $pagestyle < 0 or $pagestyle > 2) {
-        $sql[] = "replace into settings values('weathermap_pagestyle',0)";
-    }
+    $defaults = array(
+        "weathermap_pagestyle" => 0,
+        "weathermap_cycle_refresh" => 0,
+        "weathermap_render_period" => 0,
+        "weathermap_quiet_logging" => 0,
+        "weathermap_render_counter" => 0,
+        "weathermap_output_format" => "png",
+        "weathermap_thumbsize" => 250,
+        "weathermap_map_selector" => 1,
+        "weathermap_all_tab" => 0,
+        "weathermap_debug_data_only" => 1
+    );
 
-    $cycledelay = read_config_option("weathermap_cycle_refresh");
-    if ($cycledelay == '' or intval($cycledelay < 0)) {
-        $sql[] = "replace into settings values('weathermap_cycle_refresh',0)";
-    }
-
-    $renderperiod = read_config_option("weathermap_render_period");
-    if ($renderperiod == '' or intval($renderperiod < -1)) {
-        $sql[] = "replace into settings values('weathermap_render_period',0)";
-    }
-
-    $quietlogging = read_config_option("weathermap_quiet_logging");
-    if ($quietlogging == '' or intval($quietlogging < -1)) {
-        $sql[] = "replace into settings values('weathermap_quiet_logging',0)";
-    }
-
-    $rendercounter = read_config_option("weathermap_render_counter");
-    if ($rendercounter == '' or intval($rendercounter < 0)) {
-        $sql[] = "replace into settings values('weathermap_render_counter',0)";
-    }
-
-    $outputformat = read_config_option("weathermap_output_format");
-    if ($outputformat == '') {
-        $sql[] = "replace into settings values('weathermap_output_format','png')";
-    }
-
-    $tsize = read_config_option("weathermap_thumbsize");
-    if ($tsize == '' or $tsize < 1) {
-        $sql[] = "replace into settings values('weathermap_thumbsize',250)";
-    }
-
-    $ms = read_config_option("weathermap_map_selector");
-    if ($ms == '' or intval($ms) < 0 or intval($ms) > 1) {
-        $sql[] = "replace into settings values('weathermap_map_selector',1)";
-    }
-
-    $at = read_config_option("weathermap_all_tab");
-    if ($at == '' or intval($at) < 0 or intval($at) > 1) {
-        $sql[] = "replace into settings values('weathermap_all_tab',0)";
-    }
-
-    $ddo = read_config_option("weathermap_debug_data_only");
-    if ($ddo == '' or intval($ddo) < 0 or intval($ddo) > 1) {
-        $sql[] = "replace into settings values('weathermap_debug_data_only',1)";
+    foreach ($defaults as $key => $defaultValue) {
+        $current = read_config_option($key);
+        if ($key == '') {
+            $sql[] = sprintf("replace into settings values('%s','%s')", $key, $defaultValue);
+        }
     }
 
     // update the version, so we can skip this next time
@@ -545,10 +523,10 @@ function weathermap_poller_top()
 {
     global $weathermap_poller_start_time;
 
-    $n = time();
+    $now = time();
 
     // round to the nearest minute, since that's all we need for the crontab-style stuff
-    $weathermap_poller_start_time = $n - ($n%60);
+    $weathermap_poller_start_time = $now - ($now%60);
 
 }
 
@@ -595,62 +573,13 @@ function weathermap_poller_output($rrd_update_array)
             cacti_log("WM poller_output: Looking for $file ($local_data_id) (".$required['data_source_path'].")\n", true, "WEATHERMAP");
         }
 
-        if (isset($rrd_update_array[$file]) && is_array($rrd_update_array[$file]) && isset($rrd_update_array[$file]['times']) && is_array($rrd_update_array[$file]['times']) && isset( $rrd_update_array{$file}['times'][key($rrd_update_array[$file]['times'])]{$dsname})) {
-            $value = $rrd_update_array{$file}['times'][key($rrd_update_array[$file]['times'])]{$dsname};
-            $time = key($rrd_update_array[$file]['times']);
-
-            if (read_config_option("log_verbosity") >= POLLER_VERBOSITY_MEDIUM) {
-                cacti_log("WM poller_output: Got one! $file:$dsname -> $time $value\n", true, "WEATHERMAP");
-            }
-
-            $period = $time - $required['last_time'];
-            $lastval = $required['last_value'];
-
-            // if the new value is a NaN, we'll give 0 instead, and pretend it didn't happen from the point
-            // of view of the counter etc. That way, we don't get those enormous spikes. Still doesn't deal with
-            // reboots very well, but it should improve it for drops.
-            if ($value == 'U') {
-                $newvalue = 0;
-                $newlastvalue = $lastval;
-                $newtime = $required['last_time'];
-            } else {
-                $newlastvalue = $value;
-                $newtime = $time;
-
-                switch($required['data_source_type_id']) {
-                    case 1: //GAUGE
-                        $newvalue = $value;
-                        break;
-                    case 2: //COUNTER
-                        if ($value >= $lastval) {
-                            // Everything is normal
-                            $newvalue = $value - $lastval;
-                        } else {
-                            // Possible overflow, see if its 32bit or 64bit
-                            if ($lastval > 4294967295) {
-                                $newvalue = (18446744073709551615 - $lastval) + $value;
-                            } else {
-                                $newvalue = (4294967295 - $lastval) + $value;
-                            }
-                        }
-                        $newvalue = $newvalue / $period;
-                        break;
-                    case 3: //DERIVE
-                        $newvalue = ($value-$lastval) / $period;
-                        break;
-                    case 4: //ABSOLUTE
-                        $newvalue = $value / $period;
-                        break;
-                    default: // do something somewhat sensible in case something odd happens
-                        $newvalue = $value;
-                        wm_warn("poller_output found an unknown data_source_type_id for $file:$dsname");
-                        break;
-                }
-            }
-            db_execute("UPDATE weathermap_data SET last_time=$newtime, last_calc='$newvalue', last_value='$newlastvalue',sequence=sequence+1  where id = " . $required['id']);
-            if ($logging >= POLLER_VERBOSITY_DEBUG) {
-                cacti_log("WM poller_output: Final value is $newvalue (was $lastval, period was $period)\n", true, "WEATHERMAP");
-            }
+        // TODO - is all this really necessary?
+        if (isset($rrd_update_array[$file])
+            && is_array($rrd_update_array[$file])
+            && isset($rrd_update_array[$file]['times'])
+            && is_array($rrd_update_array[$file]['times'])
+            && isset($rrd_update_array{$file}['times'][key($rrd_update_array[$file]['times'])]{$dsname})) {
+            weathermap_process_value($rrd_update_array, $file, $dsname, $required, $logging);
         }
     }
 
@@ -659,6 +588,74 @@ function weathermap_poller_output($rrd_update_array)
     }
 
     return $rrd_update_array;
+}
+
+/**
+ * @param $rrd_update_array
+ * @param $file
+ * @param $dsname
+ * @param $required
+ * @param $logging
+ */
+function weathermap_process_value($rrd_update_array, $file, $dsname, $required, $logging)
+{
+    $value = $rrd_update_array{$file}['times'][key($rrd_update_array[$file]['times'])]{$dsname};
+    $time = key($rrd_update_array[$file]['times']);
+
+    if (read_config_option("log_verbosity") >= POLLER_VERBOSITY_MEDIUM) {
+        cacti_log("WM poller_output: Got one! $file:$dsname -> $time $value\n", true, "WEATHERMAP");
+    }
+
+    $period = $time - $required['last_time'];
+    $lastval = $required['last_value'];
+
+    // if the new value is a NaN, we'll give 0 instead, and pretend it didn't happen from the point
+    // of view of the counter etc. That way, we don't get those enormous spikes. Still doesn't deal with
+    // reboots very well, but it should improve it for drops.
+    if ($value == 'U') {
+        $newvalue = 0;
+        $newlastvalue = $lastval;
+        $newtime = $required['last_time'];
+    } else {
+        $newlastvalue = $value;
+        $newtime = $time;
+
+        switch ($required['data_source_type_id']) {
+            case 1: //GAUGE
+                $newvalue = $value;
+                break;
+            case 2: //COUNTER
+                if ($value >= $lastval) {
+                    // Everything is normal
+                    $newvalue = $value - $lastval;
+                } else {
+                    // Possible overflow, see if its 32bit or 64bit
+                    if ($lastval > 4294967295) {
+                        $newvalue = (18446744073709551615 - $lastval) + $value;
+                    } else {
+                        $newvalue = (4294967295 - $lastval) + $value;
+                    }
+                }
+                $newvalue = $newvalue / $period;
+                break;
+            case 3: //DERIVE
+                $newvalue = ($value - $lastval) / $period;
+                break;
+            case 4: //ABSOLUTE
+                $newvalue = $value / $period;
+                break;
+            default: // do something somewhat sensible in case something odd happens
+                $newvalue = $value;
+                wm_warn("poller_output found an unknown data_source_type_id for $file:$dsname");
+                break;
+        }
+    }
+
+    db_execute("UPDATE weathermap_data SET last_time=$newtime, last_calc='$newvalue', last_value='$newlastvalue',sequence=sequence+1  where id = " . $required['id']);
+
+    if ($logging >= POLLER_VERBOSITY_DEBUG) {
+        cacti_log("WM poller_output: Final value is $newvalue (was $lastval, period was $period)\n", true, "WEATHERMAP");
+    }
 }
 
 function weathermap_poller_bottom()

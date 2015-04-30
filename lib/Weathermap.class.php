@@ -170,6 +170,14 @@ class WeatherMap extends WeatherMapBase
         throw new WMException("NoSuchLink");
     }
 
+    function getScale($name)
+    {
+        if (isset($this->scales[$name])) {
+            return $this->scales[$name];
+        }
+        throw new WMException("NoSuchScale");
+    }
+
     function reset()
     {
         $this->next_id = 100;

@@ -2,11 +2,11 @@
 
 function getTriangleArea($point1, $point2, $point3)
 {
-    $a = abs($point1->x * ($point2->y - $point3->y)
+    $area = abs($point1->x * ($point2->y - $point3->y)
         + $point2->x * ($point3->y - $point1->y)
         + $point3->x * ($point1->y - $point2->y)) / 2.0;
 
-    return $a;
+    return $area;
 }
     
 /**
@@ -15,7 +15,6 @@ function getTriangleArea($point1, $point2, $point3)
  * we use enough points in various places to make it worth a small class to
  * save some variable-pairs.
  *
- * TODO: Actually USE this, where we can.
  */
 
 class WMPoint

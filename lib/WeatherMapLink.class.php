@@ -6,9 +6,6 @@
 
 class WeatherMapLink extends WeatherMapDataItem
 {
-//    var $owner;
-    public $id;
-
     public $width;
     public $arrowstyle;
     public $linkstyle;
@@ -30,7 +27,6 @@ class WeatherMapLink extends WeatherMapDataItem
     public $in_ds;
     public $out_ds;
 
-    public $colours = array();
     public $vialist = array();
     public $viastyle;
     public $outlinecolour;
@@ -50,7 +46,6 @@ class WeatherMapLink extends WeatherMapDataItem
     public $commentoffset_in;
     public $commentoffset_out;
 
-    public $template;
     public $geometry;  // contains all the spine-related data (WMLinkGeometry)
 
     function __construct()

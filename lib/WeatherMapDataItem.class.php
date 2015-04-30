@@ -9,10 +9,12 @@ class WeatherMapDataItem extends WeatherMapItem
 {
     // arrays to replace a lot of what follows. Paving the way for >2 channels of data.
     // (and generally less duplicated code)
-    public $percentValues = array();
-    public $absoluteValues = array();
     public $maxValues = array();
     public $targets = array();
+    public $percentUsages = array();
+    public $absoluteUsages = array();
+    public $maxValuesConfigured = array();
+    public $channelScaleColours = array();
 
     public $bandwidth_in;
     public $bandwidth_out;
@@ -22,17 +24,14 @@ class WeatherMapDataItem extends WeatherMapItem
     public $max_bandwidth_out;
     public $max_bandwidth_in_cfg;
     public $max_bandwidth_out_cfg;
-    public $usescale;
-    public $scaletype;
+
     public $inscalekey;
     public $outscalekey;
     public $inscaletag;
     public $outscaletag;
-    public $percentUsages = array();
-    public $absoluteUsages = array();
-    public $maxValuesConfigured = array();
-    public $channelScaleColours = array();
 
+    public $usescale;
+    public $scaletype;
     public $scalevar;
 
     public $infourl;
@@ -40,6 +39,7 @@ class WeatherMapDataItem extends WeatherMapItem
     public $overlibwidth;
     public $overlibheight;
     public $overlibcaption;
+
     public $id;
     public $colours = array();
     public $template;
@@ -53,6 +53,9 @@ class WeatherMapDataItem extends WeatherMapItem
         $this->scalevar = null;
         $this->duplex = null;
         $this->template = null;
+
+        $this->colours[IN] = new WMColour(192, 192, 192);
+        $this->colours[OUT] = new WMColour(192, 192, 192);
     }
 
     function reset(&$newOwner)
@@ -62,29 +65,18 @@ class WeatherMapDataItem extends WeatherMapItem
 
         if ($templateName == '') {
             $templateName = "DEFAULT";
+            $this->template = $templateName;
         }
-        $this->template = $templateName;
 
         wm_debug("Resetting $this with $templateName\n");
 
         // the internal default-default gets it's values from inherit_fieldlist
         // everything else comes from a node object - the template.
         if ($this->name == ':: DEFAULT ::') {
-            foreach (array_keys($this->inherit_fieldlist) as $fld) {
-                $this->$fld = $this->inherit_fieldlist[$fld];
-            }
-            $this->parent = null;
+            $this->resetDefault();
         } else {
-            $templateObject = $this->getTemplateObject();
-            $this->copyFrom($templateObject);
-            $this->parent = $templateObject;
-            $this->parent->descendents [] = $this;
+            $this->resetNormalObject();
         }
-
-        // to stop the editor tanking, now that colours are decided earlier in ReadData
-        // XXX - is this still necessary?
-        $this->colours[IN] = new WMColour(192, 192, 192);
-        $this->colours[OUT] = new WMColour(192, 192, 192);
 
         $this->id = $newOwner->next_id++;
     }
@@ -149,39 +141,13 @@ class WeatherMapDataItem extends WeatherMapItem
         wm_debug("-------------------------------------------------------------\n");
         wm_debug("ReadData for $this: \n");
 
-        $totals = array();
         foreach ($channels as $channelName => $channel) {
-            $totals[$channel] = 0;
             $this->absoluteUsages[$channel] = 0;
         }
-        $dataTime = 0;
 
         $nTargets = count($this->targets);
-        $nFails = 0;
 
-        foreach ($this->targets as $target) {
-            wm_debug("ReadData: New Target: $target\n");
-            $target->readData($this->owner, $this);
-
-            if ($target->hasValidData()) {
-                $results = $target->getData();
-                $dataTime = array_shift($results);
-
-                foreach ($channels as $channel) {
-                    wm_debug("Adding %f to total for channel %d\n", $results[$channel], $channel);
-                    $totals[$channel] += $results[$channel];
-                }
-                wm_debug("Running totals: %s\n", join(" ", $totals));
-            } else {
-                wm_debug("Invalid data?\n");
-                $nFails++;
-            }
-
-            # keep a track of the range of dates for data sources (mainly for MRTG/textfile based DS)
-            if ($dataTime > 0) {
-                $this->owner->registerDataTime($dataTime);
-            }
-        }
+        $nFails = $this->collectDataFromTargets($channels);
 
         // that was the only target, and it's failed
         if ($nFails == 1 && $nTargets == 1) {
@@ -189,18 +155,21 @@ class WeatherMapDataItem extends WeatherMapItem
             // we've never defined what x + null is, so we'll treat that as a 0
 
             foreach ($channels as $channel) {
-                $totals[$channel] = null;
+                $this->absoluteUsages[$channel] = null;
             }
         }
 
+        // copy to the old named variables, for now. XXX - remove these
         foreach ($channels as $channelName => $channel) {
             $bwvar = "bandwidth_" . $channelName;
-            $this->$bwvar = $totals[$channel];
-            $this->absoluteUsages[$channel] = $totals[$channel];
+            $this->$bwvar = $this->absoluteUsages[$channel];
         }
 
-        wm_debug("ReadData complete for %s: %s\n", $this, join(" ", $totals));
-        wm_debug("ReadData: Setting %s,%s for %s\n", wm_value_or_null($totals[IN]), wm_value_or_null($totals[OUT]), $this);
+        wm_debug("ReadData complete for %s: %s\n", $this, join(" ", $this->absoluteUsages));
+        wm_debug("ReadData: Setting %s,%s for %s\n",
+            wm_value_or_null($this->absoluteUsages[IN]),
+            wm_value_or_null($this->absoluteUsages[OUT]),
+            $this);
     }
 
     public function aggregateDataResults()
@@ -234,18 +203,7 @@ class WeatherMapDataItem extends WeatherMapItem
     {
         $channels = $this->getChannelList();
 
-        $warnings[IN] = true;
-        $warnings[OUT] = true;
-
-        // Nodes only use one channel, so don't warn for the unused channel
-        if ($this->scalevar !== null) {
-            if ($this->scalevar == 'in') {
-                $warnings[OUT] = false;
-            }
-            if ($this->scalevar == 'out') {
-                $warnings[IN] = false;
-            }
-        }
+        $scale = $this->owner->getScale($this->usescale);
 
         // use absolute values, if that's what is requested
         foreach ($channels as $channelName => $channel) {
@@ -257,12 +215,68 @@ class WeatherMapDataItem extends WeatherMapItem
                 $isPercent = false;
             }
 
-            list($col, $scalekey, $scaletag) = $this->owner->scales[$this->usescale]->colourFromValue($value, $this->name, $isPercent, $warnings[$channel]);
+            $logWarnings = ($this->scalevar === null)
+                || ($this->scalevar=='in' && $channelName=='out')
+                || ($this->scalevar=='out' && $channelName=='in');
+
+            list($col, $scalekey, $scaletag) = $scale->colourFromValue($value, $this->name, $isPercent, $logWarnings);
             $this->channelScaleColours[$channel] = $col;
             $this->colours[$channel] = $col;
             $this->add_note($channelName . "scalekey", $scalekey);
             $this->add_note($channelName . "scaletag", $scaletag);
             $this->add_note($channelName . "scalecolor", $col->asHTML());
         }
+    }
+
+    /**
+     * @param $channels
+     * @param $nFails
+     * @return array
+     */
+    private function collectDataFromTargets($channels)
+    {
+        $nFails = 0;
+        $dataTime = 0;
+
+        foreach ($this->targets as $target) {
+            wm_debug("ReadData: New Target: $target\n");
+            $target->readData($this->owner, $this);
+
+            if ($target->hasValidData()) {
+                $results = $target->getData();
+                $dataTime = array_shift($results);
+
+                foreach ($channels as $channel) {
+                    wm_debug("Adding %f to total for channel %d\n", $results[$channel], $channel);
+                    $this->absoluteUsages[$channel] += $results[$channel];
+                }
+                wm_debug("Running totals: %s\n", join(" ", $this->absoluteUsages));
+            } else {
+                wm_debug("Invalid data?\n");
+                $nFails++;
+            }
+
+            # keep a track of the range of dates for data sources (mainly for MRTG/textfile based DS)
+            if ($dataTime > 0) {
+                $this->owner->registerDataTime($dataTime);
+            }
+        }
+        return array($nFails);
+    }
+
+    private function resetDefault()
+    {
+        foreach (array_keys($this->inherit_fieldlist) as $fld) {
+            $this->$fld = $this->inherit_fieldlist[$fld];
+        }
+        $this->parent = null;
+    }
+
+    private function resetNormalObject()
+    {
+        $templateObject = $this->getTemplateObject();
+        $this->copyFrom($templateObject);
+        $this->parent = $templateObject;
+        $this->parent->descendents [] = $this;
     }
 }

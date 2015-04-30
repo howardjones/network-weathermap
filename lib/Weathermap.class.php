@@ -83,8 +83,10 @@ class WeatherMap extends WeatherMapBase
 
     var $runtime = array();
 
-    function WeatherMap()
+    public function __construct()
     {
+        parent::__construct();
+
         $this->inherit_fieldlist = array
         (
             'width' => 800,
@@ -119,8 +121,6 @@ class WeatherMap extends WeatherMapBase
             'timefont' => 2,
             'timex' => 0,
             'timey' => 0,
-            'fonts' => null,
-
             'mintimex' => -10000,
             'mintimey' => -10000,
             'maxtimex' => -10000,
@@ -142,9 +142,22 @@ class WeatherMap extends WeatherMapBase
             'name' => 'MAP'
         );
 
+        $this->min_ds_time = null;
+        $this->max_ds_time = null;
+
+        $this->scales = array();
+
+        $this->colourtable = array();
+
+        $this->configfile = '';
+        $this->imagefile = '';
+        $this->imageuri = '';
+
+        $this->fonts = new WMFontTable();
+        $this->fonts->init();
+
         $this->reset();
         $this->loadAllPlugins();
-
     }
 
     function my_type()
@@ -186,71 +199,21 @@ class WeatherMap extends WeatherMapBase
             $this->$fld = $this->inherit_fieldlist[$fld];
         }
 
-        $this->min_ds_time = null;
-        $this->max_ds_time = null;
-
         $this->nodes = array(); // an array of WeatherMapNodes
         $this->links = array(); // an array of WeatherMapLinks
 
         // these are the default defaults
         // by putting them into a normal object, we can use the
         // same code for writing out LINK DEFAULT as any other link.
-        wm_debug("Creating ':: DEFAULT ::' DEFAULT LINK\n");
 
-        // these two are used for default settings
-        $deflink = new WeatherMapLink;
-        $deflink->name = ":: DEFAULT ::";
-        $deflink->template = ":: DEFAULT ::";
-        $deflink->reset($this);
-
-        $this->links[':: DEFAULT ::'] = & $deflink;
-
-        wm_debug("Creating ':: DEFAULT ::' DEFAULT NODE\n");
-        $defnode = new WeatherMapNode;
-        $defnode->name = ":: DEFAULT ::";
-        $defnode->template = ":: DEFAULT ::";
-        $defnode->reset($this);
-
-        $this->nodes[':: DEFAULT ::'] = & $defnode;
-
-        $this->scales = array();
-        $this->scales['DEFAULT'] = new WeatherMapScale("DEFAULT", $this);
-
-        $this->colourtable = array();
-
-        // ************************************
-        // now create the DEFAULT link and node, based on those.
-        // these can be modified by the user, but their template (and therefore comparison in WriteConfig) is ':: DEFAULT ::'
-        wm_debug("Creating actual DEFAULT NODE from :: DEFAULT ::\n");
-        $defnode2 = new WeatherMapNode;
-        $defnode2->name = "DEFAULT";
-        $defnode2->template = ":: DEFAULT ::";
-        $defnode2->reset($this);
-
-        $this->nodes['DEFAULT'] = & $defnode2;
-
-        wm_debug("Creating actual DEFAULT LINK from :: DEFAULT ::\n");
-        $deflink2 = new WeatherMapLink;
-        $deflink2->name = "DEFAULT";
-        $deflink2->template = ":: DEFAULT ::";
-        $deflink2->reset($this);
-
-        $this->links['DEFAULT'] = & $deflink2;
-
-        // ************************************
+        $this->createDefaultNodes();
+        $this->createDefaultLinks();
 
         $this->imap = new HTML_ImageMap('weathermap');
         $this->colours = array();
-        $this->colourtable = array();
 
+        $this->scales['DEFAULT'] = new WeatherMapScale("DEFAULT", $this);
         $this->populateDefaultColours();
-
-        $this->configfile = '';
-        $this->imagefile = '';
-        $this->imageuri = '';
-
-        $this->fonts = new WMFontTable();
-        $this->fonts->init();
 
         wm_debug("WeatherMap class Reset() complete\n");
     }
@@ -317,10 +280,6 @@ class WeatherMap extends WeatherMapBase
 
     function processString($input, &$context, $include_notes = true, $multiline = false)
     {
-        if ($input === '') {
-            return '';
-        }
-
         // don't bother with all this regexp rubbish if there's nothing to match
         if (false === strpos($input, "{")) {
             return $input;
@@ -335,32 +294,7 @@ class WeatherMap extends WeatherMapBase
             $context_description = $context_type;
         }
 
-        // next, shortcut all the regexps for very common tokens
-        if ($context_type === 'node') {
-            $input = str_replace("{node:this:graph_id}", $context->get_hint("graph_id"), $input);
-            $input = str_replace("{node:this:name}", $context->name, $input);
-        }
-
-        if ($context_type === 'link') {
-            $input = str_replace("{link:this:graph_id}", $context->get_hint("graph_id"), $input);
-            $input = str_replace("{link:this:name}", $context->name, $input);
-
-            if (false !== strpos($input, "{")) {
-                // TODO - shortcuts for standard bwlabel formats, if there is still a token
-
-                //if (strpos($input,"{link:this:bandwidth_in:%2k}") !== false) {
-                //    $temp = mysprintf("%2k",$context->hints['bandwidth_in']);
-                //    $input = str_replace("{link:this:bandwidth_in:%2k}", $temp, $input);
-                //}
-
-                // define('FMT_BITS_IN',"{link:this:bandwidth_in:%2k}");
-                // define('FMT_BITS_OUT',"{link:this:bandwidth_out:%2k}");
-                // define('FMT_UNFORM_IN',"{link:this:bandwidth_in}");
-                // define('FMT_UNFORM_OUT',"{link:this:bandwidth_out}");
-                // define('FMT_PERC_IN',"{link:this:inpercent:%.2f}%");
-                // define('FMT_PERC_OUT',"{link:this:outpercent:%.2f}%");
-            }
-        }
+        $input = $this->applyProcessStringShortcuts($input, $context, $context_type);
 
         // check if we can now quit early before the regexp stuff
         if (false === strpos($input, "{")) {
@@ -369,66 +303,41 @@ class WeatherMap extends WeatherMapBase
 
         $output = $input;
 
-        while (preg_match('/(\{(?:node|map|link)[^}]+\})/', $input, $matches)) {
+        while (preg_match('/(\{((?:node|map|link)[^}]+)\})/', $input, $matches)) {
             $value = "[UNKNOWN]";
             $format = "";
-            $key = $matches[1];
+            $keyContents = $matches[2];
+            $key = "{" . $matches[2] . "}";
 
-            if (preg_match('/\{(node|map|link):([^}]+)\}/', $key, $matches)) {
-                $type = $matches[1];
-                $args = $matches[2];
+            $parts = explode(":", $keyContents);
+            $type = array_shift($parts);
+            $args = join(":", $parts);
 
-                if ($type == 'map') {
-                    $the_item = $this;
-                    if (preg_match('/map:([^:]+):*([^:]*)/', $args, $matches)) {
-                        $args = $matches[1];
-                        $format = $matches[2];
-                    }
-                }
+            $partCount = count($parts);
 
-                if (($type == 'link') || ($type == 'node')) {
-                    if (preg_match("/([^:]+):([^:]+):*([^:]*)/", $args, $matches)) {
-                        $itemname = $matches[1];
-                        $args = $matches[2];
-                        $format = $matches[3];
+            if ($partCount > 0 && $type == 'map') {
+                $the_item = $this;
+                $args = $parts[0];
+                $format = (isset($parts[1]) ? $parts[1] : "");
+            }
 
-                        $the_item = null;
-                        if (($itemname == "this") && ($type == strtolower($context->my_type()))) {
-                            $the_item = $context;
-                        } elseif (strtolower($context->my_type()) == "link" && $type == 'node' && ($itemname == '_linkstart_' || $itemname == '_linkend_')) {
-                            // this refers to the two nodes at either end of this link
-                            if ($itemname == '_linkstart_') {
-                                $the_item = $context->a;
-                            }
+            if ($partCount > 1 && (($type == 'link') || ($type == 'node'))) {
+                $itemname = $parts[0];
+                $args = $parts[1];
+                $format = (isset($parts[2]) ? $parts[2] : "");
 
-                            if ($itemname == '_linkend_') {
-                                $the_item = $context->b;
-                            }
-                        } elseif (($itemname == "parent") && ($type == strtolower($context->my_type())) && ($type == 'node') && ($context->relative_to != '')) {
-                            $the_item = $this->nodes[$context->relative_to];
-                        } else {
-                            if (($type == 'link') && isset($this->links[$itemname])) {
-                                $the_item = $this->links[$itemname];
-                            }
-                            if (($type == 'node') && isset($this->nodes[$itemname])) {
-                                $the_item = $this->nodes[$itemname];
-                            }
-                        }
-                    }
-                }
+                $the_item = $this->processStringFindContext($context, $itemname, $type);
+            }
 
-                if (is_null($the_item)) {
-                    wm_warn("ProcessString: $key refers to unknown item (context is $context_description) [WMWARN05]\n");
-                } else {
-                    wm_debug("ProcessString: Found appropriate item: " . get_class($the_item) . " " . $the_item->name . "\n");
+            if (is_null($the_item)) {
+                wm_warn("ProcessString: $key refers to unknown item (context is $context_description) [WMWARN05]\n");
+            } else {
+                wm_debug("ProcessString: Found appropriate item: " . get_class($the_item) . " " . $the_item->name . "\n");
 
-                    $value = $this->findItemValue($the_item, $args, $value, $include_notes);
-                }
+                $value = $this->findItemValue($the_item, $args, $value, $include_notes);
             }
 
             // format, and sanitise the value string here, before returning it
-
-            // if ($value===null) $value='null';
 
             wm_debug("ProcessString: replacing %s with %s \n", $key, $value);
 
@@ -437,6 +346,8 @@ class WeatherMap extends WeatherMapBase
                 wm_debug("ProcessString: formatted $format to $value\n");
             }
 
+            // We track the input and a clean output string separately, to stop people doing
+            // weird things like setting variables to also include tokens
             $input = str_replace($key, '', $input);
             $output = str_replace($key, $value, $output);
         }
@@ -496,19 +407,10 @@ class WeatherMap extends WeatherMapBase
     {
         wm_debug("Beginning to load $pluginType plugins from $searchDirectory\n");
 
-        $directoryHandle = $this->resolveDirectoryAndOpen($searchDirectory);
 
-        if (!$directoryHandle) {
-            wm_warn("Couldn't open $pluginType Plugin directory ($searchDirectory). Things will probably go wrong. [WMWARN06]\n");
-            return;
-        }
+        $pluginList = $this->getPluginFileList($pluginType, $searchDirectory);
 
-        while ($file = readdir($directoryHandle)) {
-            $fullFilePath = $searchDirectory . DIRECTORY_SEPARATOR . $file;
-
-            if (!is_file($fullFilePath) || !preg_match('/\.php$/', $fullFilePath)) {
-                continue;
-            }
+        foreach ($pluginList as $fullFilePath=>$file) {
 
             wm_debug("Loading $pluginType Plugin class from $file\n");
 
@@ -1007,8 +909,8 @@ class WeatherMap extends WeatherMapBase
         $maxIterations = 100;
         $iterations = $maxIterations;
         do {
-            $skipped = 0;
-            $changeCount = 0;
+            $nSkipped = 0;
+            $nChanged = 0;
 
             foreach ($this->nodes as $node) {
                 // if it's not relative, or already dealt with, skip to the next one
@@ -1020,34 +922,32 @@ class WeatherMap extends WeatherMapBase
 
                 wm_debug("Resolving relative position for $node to $anchorName\n");
 
-                if (! $this->nodeExists($node->relative_to)) {
+                if (! $this->nodeExists($anchorName)) {
                     wm_warn("NODE " . $node->name . " has a relative position to an unknown node ($anchorName)! [WMWARN10]\n");
                     continue;
                 }
 
-                $anchorNode = $this->nodes[$anchorName];
+                $anchorNode = $this->getNode($anchorName);
                 wm_debug("Found anchor node: $anchorNode\n");
 
                 // check if we are relative to another node which is in turn relative to something
                 // we need to resolve that one before we can resolve this one!
                 if (($anchorNode->isRelativePositioned()) && (!$anchorNode->isRelativePositionResolved())) {
                     wm_debug("Skipping unresolved relative_to. Let's hope it's not a circular one\n");
-                    $skipped++;
+                    $nSkipped++;
                     continue;
                 }
 
-                $result = $node->resolveRelativePosition($anchorNode);
-
-                if ($result) {
-                    $changeCount++;
+                if ($node->resolveRelativePosition($anchorNode)) {
+                    $nChanged++;
                 }
             }
-            wm_debug("Relative Positions Cycle $iterations - set $changeCount and Skipped $skipped for unresolved dependencies\n");
+            wm_debug("Relative Positions Cycle $iterations/$maxIterations - set $nChanged and Skipped $nSkipped for unresolved dependencies\n");
             $iterations--;
-        } while (($changeCount > 0) && ($iterations > 0));
+        } while (($nChanged > 0) && ($iterations > 0));
 
-        if ($skipped > 0) {
-            wm_warn("There are probably Circular dependencies in relative POSITION lines for $skipped nodes (or $maxIterations levels of relative positioning). [WMWARN11]\n");
+        if ($nSkipped > 0) {
+            wm_warn("There are probably Circular dependencies in relative POSITION lines for $nSkipped nodes (or $maxIterations levels of relative positioning). [WMWARN11]\n");
         }
     }
 
@@ -1124,10 +1024,12 @@ class WeatherMap extends WeatherMapBase
             $keyword = $param[1];
 
             if ($this->$field != $this->inherit_fieldlist[$field]) {
-                if ($param[2] == CONFIG_TYPE_COLOR) {
+                $type = $param[2];
+
+                if ($type == CONFIG_TYPE_COLOR) {
                     $output.="$keyword " . render_colour($this->$field) . "\n";
                 }
-                if ($param[2] == CONFIG_TYPE_LITERAL) {
+                if ($type == CONFIG_TYPE_LITERAL) {
                     $output.="$keyword " . $this->$field . "\n";
                 }
             }
@@ -1163,68 +1065,19 @@ class WeatherMap extends WeatherMapBase
                 }
                 $output.="KEYSTYLE  " . $scalename." ". $this->keystyle[$scalename] . $extra . "\n";
             }
-            $locale = localeconv();
-            $decimal_point = $locale['decimal_point'];
-
-            // Disable the old scale-output stuff for now
-            if (1==0) {
-                foreach ($colours as $k => $colour) {
-                    if (!isset($colour['special']) || !$colour['special']) {
-                        $top = rtrim(rtrim(sprintf("%f", $colour['top']), "0"), $decimal_point);
-                        $bottom = rtrim(rtrim(sprintf("%f", $colour['bottom']), "0"), $decimal_point);
-
-                        if ($bottom > 1000) {
-                            $bottom = wmFormatNumberWithMetricPrefix($colour['bottom'], $this->kilo);
-                        }
-
-                        if ($top > 1000) {
-                            $top = wmFormatNumberWithMetricPrefix($colour['top'], $this->kilo);
-                        }
-
-                        $tag = (isset($colour['tag']) ? $colour['tag'] : '');
-
-                        if (($colour['c1']->isNone())) {
-                            $output .= sprintf("SCALE %s %-4s %-4s   none   %s\n", $scalename, $bottom, $top, $tag);
-                        } elseif (!isset($colour['c2'])) {
-                            $output .= sprintf(
-                                "SCALE %s %-4s %-4s %s  %s\n",
-                                $scalename,
-                                $bottom,
-                                $top,
-                                $colour['c1']->asConfig(),
-                                $tag
-                            );
-                        } else {
-                            $output .= sprintf(
-                                "SCALE %s %-4s %-4s %s   %s    %s\n",
-                                $scalename,
-                                $bottom,
-                                $top,
-                                $colour['c1']->asConfig(),
-                                $colour['c2']->asConfig(),
-                                $tag
-                            );
-                        }
-                    }
-                }
-                $output .= "\n";
-            }
         }
 
-        if (1==1) {
-            // TODO - These should replace the stuff above
-            $output .= "# new colourtable stuff (duplicated above right now TODO)\n";
-            foreach ($this->colourtable as $k => $c) {
-                $output .= sprintf("%sCOLOR %s\n", $k, $c->asConfig());
-            }
-            $output .= "\n";
-
-            foreach ($this->scales as $s) {
-                $output .= $s->getConfig();
-            }
-
-            $output .= "\n";
+        $output .= "# new colourtable stuff (duplicated above right now TODO)\n";
+        foreach ($this->colourtable as $k => $c) {
+            $output .= sprintf("%sCOLOR %s\n", $k, $c->asConfig());
         }
+        $output .= "\n";
+
+        foreach ($this->scales as $s) {
+            $output .= $s->getConfig();
+        }
+
+        $output .= "\n";
 
         foreach ($this->hints as $hintname => $hint) {
             $output .= "SET $hintname $hint\n";
@@ -1240,47 +1093,62 @@ class WeatherMap extends WeatherMapBase
 
         $output.="\n# End of global section\n\n";
 
-        foreach (array("template","normal") as $which) {
-            if ($which == "template") {
-                $output .= "\n# TEMPLATE-only NODEs:\n";
-            }
-            if ($which == "normal") {
-                $output .= "\n# regular NODEs:\n";
-            }
+        $allMapItems = $this->buildAllItemsList();
 
-            foreach ($this->nodes as $node) {
-                if (!preg_match("/^::\s/", $node->name)) {
-                    wm_debug("WriteConfig: Considering Node %s defined in %s\n", $node->name, $node->getDefined());
-                    if ($node->getDefined() == $this->configfile) {
-                        if ($which=="template" && $node->x === null) {
-                            wm_debug("TEMPLATE\n");
-                            $output .= $node->getConfig();
-                        }
-                        if ($which=="normal" && $node->x !== null) {
-                            $output .= $node->getConfig();
-                        }
-                    } else {
-                        wm_debug("Not writing Node $node->name - defined in another file\n");
-                    }
+        usort($allMapItems, array($this, 'getConfigSort'));
+
+        foreach ($allMapItems as $mapItem) {
+            if ($mapItem->getDefined() == $this->configfile) {
+                if (!preg_match("/^::\s/", $mapItem->name)) {
+                    $output .= $mapItem->getConfig();
                 }
             }
+        }
 
-            if ($which == "template") {
-                $output .= "\n# TEMPLATE-only LINKs:\n";
-            }
-            if ($which == "normal") {
-                $output .= "\n# regular LINKs:\n";
-            }
+        if(1==0) {
 
-            foreach ($this->links as $link) {
-                if (!preg_match("/^::\s/", $link->name)) {
-                    wm_debug("WriteConfig: Considering Link %s defined in %s\n", $link->name, $link->getDefined());
-                    if ($link->getDefined() == $this->configfile) {
-                        if ($which=="template" && $link->a === null) {
-                            $output .= $link->getConfig();
+            foreach (array("template", "normal") as $which) {
+                if ($which == "template") {
+                    $output .= "\n# TEMPLATE-only NODEs:\n";
+                }
+                if ($which == "normal") {
+                    $output .= "\n# regular NODEs:\n";
+                }
+
+                foreach ($this->nodes as $node) {
+                    if (!preg_match("/^::\s/", $node->name)) {
+                        wm_debug("WriteConfig: Considering Node %s defined in %s\n", $node->name, $node->getDefined());
+                        if ($node->getDefined() == $this->configfile) {
+                            if ($which == "template" && $node->x === null) {
+                                wm_debug("TEMPLATE\n");
+                                $output .= $node->getConfig();
+                            }
+                            if ($which == "normal" && $node->x !== null) {
+                                $output .= $node->getConfig();
+                            }
+                        } else {
+                            wm_debug("Not writing Node $node->name - defined in another file\n");
                         }
-                        if ($which=="normal" && $link->a !== null) {
-                            $output .= $link->getConfig();
+                    }
+                }
+
+                if ($which == "template") {
+                    $output .= "\n# TEMPLATE-only LINKs:\n";
+                }
+                if ($which == "normal") {
+                    $output .= "\n# regular LINKs:\n";
+                }
+
+                foreach ($this->links as $link) {
+                    if (!preg_match("/^::\s/", $link->name)) {
+                        wm_debug("WriteConfig: Considering Link %s defined in %s\n", $link->name, $link->getDefined());
+                        if ($link->getDefined() == $this->configfile) {
+                            if ($which == "template" && $link->a === null) {
+                                $output .= $link->getConfig();
+                            }
+                            if ($which == "normal" && $link->a !== null) {
+                                $output .= $link->getConfig();
+                            }
                         }
                     }
                 }
@@ -1290,6 +1158,46 @@ class WeatherMap extends WeatherMapBase
         $output .= "\n\n# That's All Folks!\n";
 
         return $output;
+    }
+
+    function getConfigSort($a, $b)
+    {
+        $values = array("NODE"=>1, "LINK"=>2);
+
+        $type_a = $values[$a->my_type()];
+        $type_b = $values[$b->my_type()];
+
+        $template_a = ($a->isTemplate() ? 1 : 2);
+        $template_b = ($b->isTemplate() ? 1 : 2);
+
+        $name_a = $a->name;
+        $name_b = $b->name;
+
+        if ($type_a < $type_b) {
+            return -1;
+        }
+
+        if ($type_a > $type_b) {
+            return 1;
+        }
+
+        if ($template_a < $template_b) {
+            return -1;
+        }
+
+        if ($template_a > $template_b) {
+            return 1;
+        }
+
+        if ($name_a == "DEFAULT") {
+            return 1;
+        }
+
+        if ($name_b == "DEFAULT") {
+            return -1;
+        }
+
+        return strcmp($name_a, $name_b);
     }
 
     function writeConfig($filename)
@@ -1919,6 +1827,150 @@ class WeatherMap extends WeatherMapBase
                 imageantialias($outputImageRef, true);
             }
         }
+    }
+
+    private function createDefaultLinks()
+    {
+        wm_debug("Creating ':: DEFAULT ::' DEFAULT LINK\n");
+
+        // these two are used for default settings
+        $deflink = new WeatherMapLink;
+        $deflink->name = ":: DEFAULT ::";
+        $deflink->template = ":: DEFAULT ::";
+        $deflink->reset($this);
+
+        $this->links[':: DEFAULT ::'] = & $deflink;
+
+        wm_debug("Creating actual DEFAULT LINK from :: DEFAULT ::\n");
+        $deflink2 = new WeatherMapLink;
+        $deflink2->name = "DEFAULT";
+        $deflink2->template = ":: DEFAULT ::";
+        $deflink2->reset($this);
+
+        $this->links['DEFAULT'] = &$deflink2;
+    }
+
+    private function createDefaultNodes()
+    {
+        wm_debug("Creating ':: DEFAULT ::' DEFAULT NODE\n");
+        $defnode = new WeatherMapNode;
+        $defnode->name = ":: DEFAULT ::";
+        $defnode->template = ":: DEFAULT ::";
+        $defnode->reset($this);
+
+        $this->nodes[':: DEFAULT ::'] = &$defnode;
+
+        // ************************************
+        // now create the DEFAULT link and node, based on those.
+        // these can be modified by the user, but their template (and therefore comparison in WriteConfig) is ':: DEFAULT ::'
+        wm_debug("Creating actual DEFAULT NODE from :: DEFAULT ::\n");
+        $defnode2 = new WeatherMapNode;
+        $defnode2->name = "DEFAULT";
+        $defnode2->template = ":: DEFAULT ::";
+        $defnode2->reset($this);
+
+        $this->nodes['DEFAULT'] = &$defnode2;
+    }
+
+    /**
+     * @param $input
+     * @param $context
+     * @param $context_type
+     * @return mixed
+     */
+    private function applyProcessStringShortcuts($input, &$context, $context_type)
+    {
+// next, shortcut all the regexps for very common tokens
+        if ($context_type === 'node') {
+            $input = str_replace("{node:this:graph_id}", $context->get_hint("graph_id"), $input);
+            $input = str_replace("{node:this:name}", $context->name, $input);
+        }
+
+        if ($context_type === 'link') {
+            $input = str_replace("{link:this:graph_id}", $context->get_hint("graph_id"), $input);
+            $input = str_replace("{link:this:name}", $context->name, $input);
+
+            if (false !== strpos($input, "{")) {
+                // TODO - shortcuts for standard bwlabel formats, if there is still a token
+
+                //if (strpos($input,"{link:this:bandwidth_in:%2k}") !== false) {
+                //    $temp = mysprintf("%2k",$context->hints['bandwidth_in']);
+                //    $input = str_replace("{link:this:bandwidth_in:%2k}", $temp, $input);
+                //}
+
+                // define('FMT_BITS_IN',"{link:this:bandwidth_in:%2k}");
+                // define('FMT_BITS_OUT',"{link:this:bandwidth_out:%2k}");
+                // define('FMT_UNFORM_IN',"{link:this:bandwidth_in}");
+                // define('FMT_UNFORM_OUT',"{link:this:bandwidth_out}");
+                // define('FMT_PERC_IN',"{link:this:inpercent:%.2f}%");
+                // define('FMT_PERC_OUT',"{link:this:outpercent:%.2f}%");
+            }
+            return $input;
+        }
+        return $input;
+    }
+
+    /**
+     * @param $context
+     * @param $itemname
+     * @param $type
+     * @return mixed
+     */
+    private function processStringFindContext(&$context, $itemname, $type)
+    {
+        if (($itemname == "this") && ($type == strtolower($context->my_type()))) {
+            $the_item = $context;
+            return $the_item;
+        } elseif (strtolower($context->my_type()) == "link" && $type == 'node' && ($itemname == '_linkstart_' || $itemname == '_linkend_')) {
+            // this refers to the two nodes at either end of this link
+            if ($itemname == '_linkstart_') {
+                $the_item = $context->a;
+            }
+
+            if ($itemname == '_linkend_') {
+                $the_item = $context->b;
+                return $the_item;
+            }
+            return $the_item;
+        } elseif (($itemname == "parent") && ($type == strtolower($context->my_type())) && ($type == 'node') && ($context->relative_to != '')) {
+            $the_item = $this->nodes[$context->relative_to];
+            return $the_item;
+        } else {
+            if (($type == 'link') && isset($this->links[$itemname])) {
+                $the_item = $this->links[$itemname];
+            }
+            if (($type == 'node') && isset($this->nodes[$itemname])) {
+                $the_item = $this->nodes[$itemname];
+                return $the_item;
+            }
+            return $the_item;
+        }
+    }
+
+    /**
+     * @param $pluginType
+     * @param $searchDirectory
+     * @return array
+     */
+    private function getPluginFileList($pluginType, $searchDirectory)
+    {
+        $directoryHandle = $this->resolveDirectoryAndOpen($searchDirectory);
+
+        $pluginList = array();
+        if (!$directoryHandle) {
+            wm_warn("Couldn't open $pluginType Plugin directory ($searchDirectory). Things will probably go wrong. [WMWARN06]\n");
+        }
+
+        while ($file = readdir($directoryHandle)) {
+            $fullFilePath = $searchDirectory . DIRECTORY_SEPARATOR . $file;
+
+            if (!is_file($fullFilePath) || !preg_match('/\.php$/', $fullFilePath)) {
+                continue;
+            }
+
+            $pluginList[$fullFilePath] = $file;
+        }
+        return $pluginList;
     }
 }
 

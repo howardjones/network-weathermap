@@ -3,12 +3,12 @@
 # the config-based tests require imagemagick's compare command
 sudo apt-get install imagemagick
 # phpdoc needs the XSL extension
-sudo apt-get install php5-xsl graphviz
+sudo apt-get install php5-xsl graphviz php5-curl php5-gd
 # the documentation compilation process needs xsltproc
 sudo apt-get install xsltproc
 
 # First, we'll need Bower for web packages, and composer for PHP packages
-sudo apt-get install nodejs
+sudo apt-get install nodejs npm
 sudo npm install -g bower
 
 wget https://getcomposer.org/composer.phar

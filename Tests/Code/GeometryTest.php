@@ -297,14 +297,14 @@ class GeometryTest  extends PHPUnit_Framework_TestCase {
     {
         $bb1 = new WMBoundingBox();
 
-        $bb1->addPoint(0,0);
+        $bb1->addPoint(0, 0);
 
         $this->assertEquals("[(0.000000,0.000000)x(0.000000,0.000000)]", "$bb1");
 
-        $bb1->addPoint(10,0);
-        $bb1->addPoint(-10,0);
-        $bb1->addPoint(10,10);
-        $bb1->addPoint(-10,-10);
+        $bb1->addPoint(10, 0);
+        $bb1->addPoint(-10, 0);
+        $bb1->addPoint(10, 10);
+        $bb1->addPoint(-10, -10);
 
         $this->assertEquals("[(-10.000000,-10.000000)x(10.000000,10.000000)]", "$bb1");
 

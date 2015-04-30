@@ -7,7 +7,6 @@
 class WeatherMapLink extends WeatherMapDataItem
 {
 //    var $owner;
-    public $name;
     public $id;
 
     public $width;
@@ -34,7 +33,6 @@ class WeatherMapLink extends WeatherMapDataItem
     public $colours = array();
     public $vialist = array();
     public $viastyle;
-    public $duplex;
     public $outlinecolour;
     public $bwoutlinecolour;
     public $bwboxcolour;
@@ -117,35 +115,9 @@ class WeatherMapLink extends WeatherMapDataItem
         );
     }
 
-    function reset(&$newOwner)
+    function getTemplateObject()
     {
-        $this->owner = $newOwner;
-
-        $template = $this->template;
-        if ($template == '') {
-            $template = "DEFAULT";
-        }
-
-        wm_debug("Resetting $this with $template\n");
-
-        // the internal default-default gets it's values from inherit_fieldlist
-        // everything else comes from a link object - the template.
-        if ($this->name==':: DEFAULT ::') {
-            foreach (array_keys($this->inherit_fieldlist) as $fld) {
-                $this->$fld=$this->inherit_fieldlist[$fld];
-            }
-            $this->parent = null;
-        } else {
-            $this->copyFrom($this->owner->links[$template]);
-            $this->parent = $this->owner->links[$template];
-            $this->parent->descendents []= $this;       // TODO - should fix up the descendents list of the previous parent
-        }
-        $this->template = $template;
-
-        // to stop the editor tanking, now that colours are decided earlier in ReadData
-        $this->colours[IN] = new WMColour(192, 192, 192);
-        $this->colours[OUT] = new WMColour(192, 192, 192);
-        $this->id = $newOwner->next_id++;
+        return $this->owner->getLink($this->template);
     }
 
     function my_type()
@@ -336,7 +308,8 @@ class WeatherMapLink extends WeatherMapDataItem
         foreach ($this->vialist as $via) {
             // if the via has a third element, the first two are relative to that node
             if (isset($via[2])) {
-                $points[] = new WMPoint($map->nodes[$via[2]]->x + $via[0], $map->nodes[$via[2]]->y + $via[1]);
+                $relativeTo = $map->getNode($via[2]);
+                $points[] = new WMPoint($relativeTo->x + $via[0], $relativeTo->y + $via[1]);
             } else {
                 $points[] = new WMPoint($via[0], $via[1]);
             }
@@ -543,7 +516,7 @@ class WeatherMapLink extends WeatherMapDataItem
         if ($this->config_override != '') {
             $output = $this->config_override."\n";
         } else {
-            $default_default = $this->owner->links[$this->template];
+            $default_default = $this->getTemplateObject();
 
             wm_debug("Writing config for LINK $this->name against $this->template\n");
 

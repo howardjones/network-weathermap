@@ -40,6 +40,9 @@ class WeatherMapDataItem extends WeatherMapItem
     public $overlibwidth;
     public $overlibheight;
     public $overlibcaption;
+    public $id;
+    public $colours = array();
+    public $template;
 
     function __construct()
     {
@@ -49,6 +52,41 @@ class WeatherMapDataItem extends WeatherMapItem
         $this->overliburl = array();
         $this->scalevar = null;
         $this->duplex = null;
+        $this->template = null;
+    }
+
+    function reset(&$newOwner)
+    {
+        $this->owner = $newOwner;
+        $templateName = $this->template;
+
+        if ($templateName == '') {
+            $templateName = "DEFAULT";
+        }
+        $this->template = $templateName;
+
+        wm_debug("Resetting $this with $templateName\n");
+
+        // the internal default-default gets it's values from inherit_fieldlist
+        // everything else comes from a node object - the template.
+        if ($this->name == ':: DEFAULT ::') {
+            foreach (array_keys($this->inherit_fieldlist) as $fld) {
+                $this->$fld = $this->inherit_fieldlist[$fld];
+            }
+            $this->parent = null;
+        } else {
+            $templateObject = $this->getTemplateObject();
+            $this->copyFrom($templateObject);
+            $this->parent = $templateObject;
+            $this->parent->descendents [] = $this;
+        }
+
+        // to stop the editor tanking, now that colours are decided earlier in ReadData
+        // XXX - is this still necessary?
+        $this->colours[IN] = new WMColour(192, 192, 192);
+        $this->colours[OUT] = new WMColour(192, 192, 192);
+
+        $this->id = $newOwner->next_id++;
     }
 
     private function getDirectionList()

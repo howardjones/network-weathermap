@@ -6,7 +6,6 @@
 
 class WeatherMapNode extends WeatherMapDataItem
 {
-    var $id;
     var $x, $y;
     var $position; // to replace the above eventually
     var $original_x, $original_y, $relative_resolved;
@@ -16,9 +15,8 @@ class WeatherMapNode extends WeatherMapDataItem
     var $processedLabel; // the label after processing (what is actually drawn)
     var $labelfont;
     var $labelangle;
-    var $name;
 
-    var $colours = array(); // SCALE colours
+    // SCALE colours
 
     var $notestext = array();
 
@@ -33,13 +31,11 @@ class WeatherMapNode extends WeatherMapDataItem
     var $cachefile;
     var $useiconscale;
     var $iconscaletype;
-    var $scalevar, $iconscalevar;
+    var $iconscalevar;
 
     var $image;
     var $centre_x, $centre_y;
     var $relative_to;
-    var $zorder;
-    var $template;
     var $polar;
     var $boundingboxes = array();
     var $named_offsets = array();
@@ -765,36 +761,9 @@ class WeatherMapNode extends WeatherMapDataItem
         }
     }
 
-    function reset(&$newowner)
+    function getTemplateObject()
     {
-        $this->owner = $newowner;
-        $template = $this->template;
-
-        if ($template == '') {
-            $template = "DEFAULT";
-        }
-
-        wm_debug("Resetting $this->name with $template\n");
-
-        // the internal default-default gets it's values from inherit_fieldlist
-        // everything else comes from a node object - the template.
-        if ($this->name == ':: DEFAULT ::') {
-            foreach (array_keys($this->inherit_fieldlist) as $fld) {
-                $this->$fld = $this->inherit_fieldlist[$fld];
-            }
-            $this->parent = null;
-        } else {
-            $this->copyFrom($this->owner->nodes[$template]);
-            $this->parent = $this->owner->nodes[$template];
-            $this->parent->descendents [] = $this;
-        }
-        $this->template = $template;
-
-        // to stop the editor tanking, now that colours are decided earlier in ReadData
-        $this->colours[IN] = new WMColour(192, 192, 192);
-        $this->colours[OUT] = new WMColour(192, 192, 192);
-
-        $this->id = $newowner->next_id++;
+        return $this->owner->getNode($this->template);
     }
 
     function copyFrom(&$source)
@@ -822,7 +791,7 @@ class WeatherMapNode extends WeatherMapDataItem
             $output = $this->config_override . "\n";
         } else {
             // this is our template. Anything we do different should be written
-            $default_default = $this->owner->nodes[$this->template];
+            $default_default = $this->getTemplateObject();
 
             wm_debug("Writing config for NODE $this->name against $this->template\n");
 

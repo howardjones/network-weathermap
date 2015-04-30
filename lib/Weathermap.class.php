@@ -1105,56 +1105,6 @@ class WeatherMap extends WeatherMapBase
             }
         }
 
-        if(1==0) {
-
-            foreach (array("template", "normal") as $which) {
-                if ($which == "template") {
-                    $output .= "\n# TEMPLATE-only NODEs:\n";
-                }
-                if ($which == "normal") {
-                    $output .= "\n# regular NODEs:\n";
-                }
-
-                foreach ($this->nodes as $node) {
-                    if (!preg_match("/^::\s/", $node->name)) {
-                        wm_debug("WriteConfig: Considering Node %s defined in %s\n", $node->name, $node->getDefined());
-                        if ($node->getDefined() == $this->configfile) {
-                            if ($which == "template" && $node->x === null) {
-                                wm_debug("TEMPLATE\n");
-                                $output .= $node->getConfig();
-                            }
-                            if ($which == "normal" && $node->x !== null) {
-                                $output .= $node->getConfig();
-                            }
-                        } else {
-                            wm_debug("Not writing Node $node->name - defined in another file\n");
-                        }
-                    }
-                }
-
-                if ($which == "template") {
-                    $output .= "\n# TEMPLATE-only LINKs:\n";
-                }
-                if ($which == "normal") {
-                    $output .= "\n# regular LINKs:\n";
-                }
-
-                foreach ($this->links as $link) {
-                    if (!preg_match("/^::\s/", $link->name)) {
-                        wm_debug("WriteConfig: Considering Link %s defined in %s\n", $link->name, $link->getDefined());
-                        if ($link->getDefined() == $this->configfile) {
-                            if ($which == "template" && $link->a === null) {
-                                $output .= $link->getConfig();
-                            }
-                            if ($which == "normal" && $link->a !== null) {
-                                $output .= $link->getConfig();
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
         $output .= "\n\n# That's All Folks!\n";
 
         return $output;

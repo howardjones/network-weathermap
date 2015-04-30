@@ -37,6 +37,12 @@ class WMPoint
         return false;
     }
 
+    public function set($newX, $newY)
+    {
+        $this->x = $newX;
+        $this->y = $newY;
+    }
+
     /**
      * round() - round the coordinates to their nearest integers, in place.
      */
@@ -289,8 +295,8 @@ class WMVector
 
 class WMRectangle
 {
-    private $topLeft;
-    private $bottomRight;
+    public $topLeft;
+    public $bottomRight;
 
     public function __construct($x1, $y1, $x2, $y2)
     {
@@ -309,6 +315,28 @@ class WMRectangle
 
         $this->topLeft = new WMPoint($x1, $y1);
         $this->bottomRight = new WMPoint($x2, $y2);
+    }
+
+    public function identical($otherRect)
+    {
+        return ($this->topLeft->identical($otherRect->topLeft) && $this->bottomRight->identical($otherRect->bottomRight));
+    }
+
+    public function copy()
+    {
+        return new WMRectangle($this->topLeft->x, $this->topLeft->y, $this->bottomRight->x, $this->bottomRight->y);
+    }
+
+    public function translate($deltaX, $deltaY)
+    {
+        $this->topLeft->translate($deltaX, $deltaY);
+        $this->bottomRight->translate($deltaX, $deltaY);
+    }
+
+    public function inflate($amount)
+    {
+        $this->topLeft->translate(-$amount, -$amount);
+        $this->bottomRight->translate($amount, $amount);
     }
 
     public function width()
@@ -420,43 +448,50 @@ class WMLineSegment
 
 class WMBoundingBox
 {
-    private $minimum_x;
-    private $maximum_x;
-    private $maximum_y;
-    private $minimum_y;
+    private $minimumX;
+    private $maximumX;
+    private $maximumY;
+    private $minimumY;
 
     public function __construct()
     {
-        $minimum_x = null;
-        $maximum_x = null;
-        $maximum_y = null;
-        $minimum_y = null;
+        $this->minimumX = null;
+        $this->maximumX = null;
+        $this->maximumY = null;
+        $this->minimumY = null;
     }
 
     public function addPoint($x, $y)
     {
-        if (is_null($this->minimum_x) || $x < $this->minimum_x) {
-            $this->minimum_x = $x;
+        if (is_null($this->minimumX) || $x < $this->minimumX) {
+            $this->minimumX = $x;
         }
-        if (is_null($this->maximum_x) || $x > $this->maximum_x) {
-            $this->maximum_x = $x;
+        if (is_null($this->maximumX) || $x > $this->maximumX) {
+            $this->maximumX = $x;
         }
-        if (is_null($this->minimum_y) || $y < $this->minimum_y) {
-            $this->minimum_y = $y;
+        if (is_null($this->minimumY) || $y < $this->minimumY) {
+            $this->minimumY = $y;
         }
-        if (is_null($this->maximum_y) || $y > $this->maximum_y) {
-            $this->maximum_y = $y;
+        if (is_null($this->maximumY) || $y > $this->maximumY) {
+            $this->maximumY = $y;
         }
     }
 
     public function getBoundingRectangle()
     {
-        return new WMRectangle($this->minimum_x, $this->minimum_y, $this->maximum_x, $this->maximum_y);
+        if (null === $this->minimumX) {
+            throw new WMException("No Bounding Box until points are added");
+        }
+        return new WMRectangle($this->minimumX, $this->minimumY, $this->maximumX, $this->maximumY);
     }
 
     public function __toString()
     {
-        $r = $this->getBoundingRectangle();
+        try {
+            $r = $this->getBoundingRectangle();
+        } catch (WMException $e) {
+            $r = "[Empty BBox]";
+        }
         return "$r";
     }
 }

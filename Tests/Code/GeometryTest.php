@@ -1,10 +1,4 @@
 <?php
-/**
- * Created by IntelliJ IDEA.
- * User: Howard Jones
- * Date: 24/05/2014
- * Time: 15:07
- */
 
 require_once dirname(__FILE__).'/../../lib/all.php';
 
@@ -262,20 +256,21 @@ class GeometryTest  extends PHPUnit_Framework_TestCase {
 
     public function testRectangle()
     {
-        $r1 = new WMRectangle(10,10,20,40);
-        $r2 = new WMRectangle(20,40,10,10);
+        $r1 = new WMRectangle(10, 10, 20, 40);
+        $r1a = new WMRectangle(10, 10, 20, 40);
+        $r2 = new WMRectangle(20, 40, 10, 10);
 
-        $this->assertTrue($r1->containsPoint(new WMPoint(15,15)));
-        $this->assertTrue($r2->containsPoint(new WMPoint(15,15)));
+        $this->assertTrue($r1->containsPoint(new WMPoint(15, 15)));
+        $this->assertTrue($r2->containsPoint(new WMPoint(15, 15)));
 
-        $this->assertTrue($r1->containsPoint(new WMPoint(10,10)));
-        $this->assertTrue($r2->containsPoint(new WMPoint(10,10)));
+        $this->assertTrue($r1->containsPoint(new WMPoint(10, 10)));
+        $this->assertTrue($r2->containsPoint(new WMPoint(10, 10)));
 
-        $this->assertTrue($r1->containsPoint(new WMPoint(20,40)));
-        $this->assertTrue($r2->containsPoint(new WMPoint(20,40)));
+        $this->assertTrue($r1->containsPoint(new WMPoint(20, 40)));
+        $this->assertTrue($r2->containsPoint(new WMPoint(20, 40)));
 
-        $this->assertFalse($r1->containsPoint(new WMPoint(2,40)));
-        $this->assertFalse($r2->containsPoint(new WMPoint(2,40)));
+        $this->assertFalse($r1->containsPoint(new WMPoint(2, 40)));
+        $this->assertFalse($r2->containsPoint(new WMPoint(2, 40)));
 
         $this->assertEquals($r1->width(), 10);
         $this->assertEquals($r2->width(), 10);
@@ -283,6 +278,18 @@ class GeometryTest  extends PHPUnit_Framework_TestCase {
         $this->assertEquals($r1->height(), 30);
         $this->assertEquals($r2->height(), 30);
 
+        $this->assertTrue($r1->identical($r1a));
+
+        $r1->inflate(5);
+
+        $this->assertTrue($r1->identical(new WMRectangle(5, 5, 25, 45)));
+
+        $r1->inflate(-5);
+        $this->assertTrue($r1->identical($r1a));
+
+        $r1b = $r1a->copy();
+        $this->assertInstanceOf("WMRectangle", $r1b);
+        $this->assertTrue($r1a->identical($r1b));
 
     }
 

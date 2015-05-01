@@ -1,5 +1,7 @@
 <?php
 
+require_once "WeatherMapUIBase.class.php";
+
 class WeatherMapCactiManagementPlugin extends WeatherMapUIBase
 {
     public $config;
@@ -26,8 +28,8 @@ class WeatherMapCactiManagementPlugin extends WeatherMapUIBase
         'deactivate_map' => array('handler' => 'handleDeactivateMap', 'args' => array()),
         'activate_map' => array('handler' => 'handleActivateMap', 'args' => array()),
         'viewconfig' => array('handler' => 'handleViewConfig', 'args' => array()),
-        'addmap' => array('handler' => 'handleMapListAdd', 'args' => array()),
-        'addmap_picker' => array('handler' => 'handleMapPicker', 'args' => array()),
+        'addmap' => array('handler' => 'handleMapListAdd', 'args' => array(array("file","mapfile"))),
+        'addmap_picker' => array('handler' => 'handleMapPicker', 'args' => array(array("show_all", "bool"))),
         'move_map_up' => array('handler' => 'handleMapOrderUp', 'args' => array()),
         'move_map_down' => array('handler' => 'handleMapOrderDown', 'args' => array()),
         'move_group_up' => array('handler' => 'handleGroupOrderUp', 'args' => array()),
@@ -48,7 +50,7 @@ class WeatherMapCactiManagementPlugin extends WeatherMapUIBase
 
     /**
      */
-    public function handleManagementMainScreen()
+    public function handleManagementMainScreen($request, $appObject)
     {
         require_once $this->cactiBasePath . "/include/top_header.php";
         // $this->wmMapManagementList4();
@@ -60,7 +62,7 @@ class WeatherMapCactiManagementPlugin extends WeatherMapUIBase
 
     /**
      */
-    public function handleRebuildNowStep2()
+    public function handleRebuildNowStep2($request, $appObject)
     {
         require_once dirname(__FILE__) . DIRECTORY_SEPARATOR . "all.php";
         require_once dirname(__FILE__) . DIRECTORY_SEPARATOR . "lib" . DIRECTORY_SEPARATOR . "poller-common.php";
@@ -80,7 +82,7 @@ class WeatherMapCactiManagementPlugin extends WeatherMapUIBase
 
     /**
      */
-    public function handleRebuildNowStep1()
+    public function handleRebuildNowStep1($request, $appObject)
     {
         require_once $this->cactiBasePath . "/include/top_header.php";
 
@@ -100,7 +102,7 @@ class WeatherMapCactiManagementPlugin extends WeatherMapUIBase
     /**
      * @param $request
      */
-    public function handleMapSettingsForm($request)
+    public function handleMapSettingsForm($request, $appObject)
     {
         if (isset($request['mapid']) && is_numeric($request['mapid'])) {
             require_once($this->cactiBasePath . "/include/top_header.php");
@@ -119,7 +121,7 @@ class WeatherMapCactiManagementPlugin extends WeatherMapUIBase
     /**
      * @param $request
      */
-    public function handleMapSettingsSave($request)
+    public function handleMapSettingsSave($request, $appObject)
     {
         $mapid = null;
         $settingid = null;
@@ -155,7 +157,7 @@ class WeatherMapCactiManagementPlugin extends WeatherMapUIBase
     /**
      * @param $request
      */
-    public function handleMapSettingsDelete($request)
+    public function handleMapSettingsDelete($request, $appObject)
     {
         $mapid = null;
         $settingid = null;
@@ -176,7 +178,7 @@ class WeatherMapCactiManagementPlugin extends WeatherMapUIBase
     /**
      * @param $request
      */
-    public function handleGroupChangeForm($request)
+    public function handleGroupChangeForm($request, $appObject)
     {
         if (isset($request['id']) && is_numeric($request['id'])) {
             require_once($this->cactiBasePath . "/include/top_header.php");
@@ -190,7 +192,7 @@ class WeatherMapCactiManagementPlugin extends WeatherMapUIBase
     /**
      * @param $request
      */
-    public function handleChangeGroup($request)
+    public function handleChangeGroup($request, $appObject)
     {
         $mapid = -1;
         $groupid = -1;
@@ -211,7 +213,7 @@ class WeatherMapCactiManagementPlugin extends WeatherMapUIBase
 
     /**
      */
-    public function handleGroupSelect()
+    public function handleGroupSelect($request, $appObject)
     {
         require_once($this->cactiBasePath . "/include/top_header.php");
         $this->wmuiGroupList();
@@ -222,7 +224,7 @@ class WeatherMapCactiManagementPlugin extends WeatherMapUIBase
     /**
      * @param $request
      */
-    public function handleGroupForm($request)
+    public function handleGroupForm($request, $appObject)
     {
         $id = -1;
 
@@ -242,7 +244,7 @@ class WeatherMapCactiManagementPlugin extends WeatherMapUIBase
     /**
      * @param $request
      */
-    public function handleGroupDelete($request)
+    public function handleGroupDelete($request, $appObject)
     {
         $id = -1;
 
@@ -259,7 +261,7 @@ class WeatherMapCactiManagementPlugin extends WeatherMapUIBase
     /**
      * @param $request
      */
-    public function handleGroupUpdate($request)
+    public function handleGroupUpdate($request, $appObject)
     {
         $id = -1;
         $newname = "";
@@ -789,6 +791,8 @@ class WeatherMapCactiManagementPlugin extends WeatherMapUIBase
         }
 
         $nFiles=0;
+        $nSkipped = 0;
+
 
         $directoryHandle = opendir($this->configDirectory);
 
@@ -796,9 +800,6 @@ class WeatherMapCactiManagementPlugin extends WeatherMapUIBase
             print "Can't open $this->configDirectory to read - you should set it to be readable by the webserver.";
             return;
         }
-
-        $nSkipped = 0;
-
 
         while ($file = readdir($directoryHandle)) {
             $realfile = $this->configDirectory.'/'.$file;
@@ -836,7 +837,7 @@ class WeatherMapCactiManagementPlugin extends WeatherMapUIBase
         }
 
         if (($nFiles == 0) && $nSkipped>0) {
-            print "($nSkipped files weren't shown because they are already in the database - <a href='?action=addmap_picker&show=all'>Show Them</a>)";
+            print "($nSkipped files weren't shown because they are already in the database - <a href='?action=addmap_picker&show_all=1'>Show Them</a>)";
             return;
         }
 
@@ -907,6 +908,7 @@ class WeatherMapCactiManagementPlugin extends WeatherMapUIBase
 
     public function wmMapAdd($file)
     {
+        $weathermap_confdir = $this->configPath;
 
         chdir($weathermap_confdir);
 
@@ -918,7 +920,7 @@ class WeatherMapCactiManagementPlugin extends WeatherMapUIBase
             print "<h3>Path mismatch</h3>";
         } else {
             $realfile = $weathermap_confdir.DIRECTORY_SEPARATOR.$file;
-            $title = wmMapGetTitleFromFile($realfile);
+            $title = $this->wmMapGetTitleFromFile($realfile);
 
             $file = mysql_real_escape_string($file);
             $title = mysql_real_escape_string($title);
@@ -1443,7 +1445,7 @@ class WeatherMapCactiManagementPlugin extends WeatherMapUIBase
     /**
      * @param $request
      */
-    private function handleMapSettingsPage($request)
+    protected function handleMapSettingsPage($request, $appObject)
     {
         if (isset($request['id']) && is_numeric($request['id'])) {
             require_once($this->cactiBasePath . "/include/top_header.php");
@@ -1456,7 +1458,7 @@ class WeatherMapCactiManagementPlugin extends WeatherMapUIBase
     /**
      * @param $request
      */
-    private function handlePermissionsAddUser($request)
+    protected function handlePermissionsAddUser($request, $appObject)
     {
         if (isset($request['mapid']) && is_numeric($request['mapid'])
             && isset($request['userid']) && is_numeric($request['userid'])
@@ -1469,7 +1471,7 @@ class WeatherMapCactiManagementPlugin extends WeatherMapUIBase
     /**
      * @param $request
      */
-    private function handlePermissionsDeleteUser($request)
+    protected function handlePermissionsDeleteUser($request, $appObject)
     {
         if (isset($request['mapid']) && is_numeric($request['mapid'])
             && isset($request['userid']) && is_numeric($request['userid'])
@@ -1482,7 +1484,7 @@ class WeatherMapCactiManagementPlugin extends WeatherMapUIBase
     /**
      * @param $request
      */
-    private function handlePermissionsPage($request)
+    protected function handlePermissionsPage($request, $appObject)
     {
         if (isset($request['id']) && is_numeric($request['id'])) {
             require_once($this->cactiBasePath . "/include/top_header.php");
@@ -1496,7 +1498,7 @@ class WeatherMapCactiManagementPlugin extends WeatherMapUIBase
     /**
      * @param $request
      */
-    private function handleDeleteMap($request)
+    protected function handleDeleteMap($request, $appObject)
     {
         if (isset($request['id']) && is_numeric($request['id'])) {
             $this->wmMapDelete($request['id']);
@@ -1507,7 +1509,7 @@ class WeatherMapCactiManagementPlugin extends WeatherMapUIBase
     /**
      * @param $request
      */
-    private function handleDeactivateMap($request)
+    protected function handleDeactivateMap($request, $appObject)
     {
         if (isset($request['id']) && is_numeric($request['id'])) {
             $this->wmMapDeactivate($request['id']);
@@ -1518,7 +1520,7 @@ class WeatherMapCactiManagementPlugin extends WeatherMapUIBase
     /**
      * @param $request
      */
-    private function handleActivateMap($request)
+    protected function handleActivateMap($request, $appObject)
     {
         if (isset($request['id']) && is_numeric($request['id'])) {
             $this->wmMapActivate($request['id']);
@@ -1529,7 +1531,7 @@ class WeatherMapCactiManagementPlugin extends WeatherMapUIBase
     /**
      * @param $request
      */
-    private function handleMapOrderUp($request)
+    protected function handleMapOrderUp($request)
     {
         if (isset($request['id']) && is_numeric($request['id']) &&
             isset($request['order']) && is_numeric($request['order'])
@@ -1542,7 +1544,7 @@ class WeatherMapCactiManagementPlugin extends WeatherMapUIBase
     /**
      * @param $request
      */
-    private function handleMapOrderDown($request)
+    protected function handleMapOrderDown($request, $appObject)
     {
         if (isset($request['id']) && is_numeric($request['id']) &&
             isset($request['order']) && is_numeric($request['order'])
@@ -1555,7 +1557,7 @@ class WeatherMapCactiManagementPlugin extends WeatherMapUIBase
     /**
      * @param $request
      */
-    private function handleGroupOrderUp($request)
+    protected function handleGroupOrderUp($request, $appObject)
     {
         if (isset($request['id']) && is_numeric($request['id']) &&
             isset($request['order']) && is_numeric($request['order'])
@@ -1568,7 +1570,7 @@ class WeatherMapCactiManagementPlugin extends WeatherMapUIBase
     /**
      * @param $request
      */
-    private function handleGroupOrderDown($request)
+    protected function handleGroupOrderDown($request, $appObject)
     {
         if (isset($request['id']) && is_numeric($request['id']) &&
             isset($request['order']) && is_numeric($request['order'])
@@ -1581,7 +1583,7 @@ class WeatherMapCactiManagementPlugin extends WeatherMapUIBase
     /**
      * @param $request
      */
-    private function handleMapListAdd($request)
+    protected function handleMapListAdd($request, $appObject)
     {
         if (isset($request['file'])) {
             $this->wmMapAdd($request['file']);
@@ -1594,11 +1596,11 @@ class WeatherMapCactiManagementPlugin extends WeatherMapUIBase
     /**
      * @param $request
      */
-    private function handleMapPicker($request)
+    protected function handleMapPicker($request, $appObject)
     {
         require_once $this->cactiBasePath . "/include/top_header.php";
 
-        if (isset($request['show']) && $request['show'] == 'all') {
+        if (isset($request['show_all']) && $request['show_all'] == '1') {
             $this->wmuiMapFilePicker(true);
         } else {
             $this->wmuiMapFilePicker(false);
@@ -1609,7 +1611,7 @@ class WeatherMapCactiManagementPlugin extends WeatherMapUIBase
     /**
      * @param $request
      */
-    private function handleViewConfig($request)
+    protected function handleViewConfig($request, $appObject)
     {
         require_once $this->cactiBasePath . "/include/top_graph_header.php";
 

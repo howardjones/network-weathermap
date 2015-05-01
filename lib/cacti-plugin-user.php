@@ -1,17 +1,28 @@
 <?php
 
+require_once "WeatherMapUIBase.class.php";
+
 class WeatherMapCactiUserPlugin extends WeatherMapUIBase
 {
     public $config;
     public $colours;
 
     public $commands = array(
-        'viewthumb' => array( 'handler'=>'handleBigThumb', 'args'=>array() ),
-        'viewthumb48' => array( 'handler'=>'handleLittleThumb', 'args'=>array() ),
-        'viewimage' => array( 'handler'=>'handleImage', 'args'=>array() ),
-        'viewmap' => array( 'handler'=>'handleViewCycle', 'args'=>array() ),
-        'viewmapcycle' => array( 'handler'=>'handleView', 'args'=>array() ),
-        ':: DEFAULT ::' => array( 'handler'=>'handleMainView', 'args'=>array() )
+        'viewthumb' => array('handler' => 'handleBigThumb', 'args' => array(array("id", "hash"))),
+        'viewthumb48' => array('handler' => 'handleLittleThumb', 'args' => array(array("id", "hash"))),
+        'viewimage' => array('handler' => 'handleImage', 'args' => array(array("id", "hash"))),
+        'viewmap' => array('handler' => 'handleViewCycle', 'args' => array(array("id", "hash"))),
+        'viewmapcycle' => array(
+            'handler' => 'handleView', 'args' => array(
+                array("fullscreen", "int", true),
+                array("group", "int", true)
+            )),
+        ':: DEFAULT ::' => array(
+            'handler' => 'handleMainView',
+            'args' => array(
+                array("group_id", "int", true)
+            )
+        )
     );
 
     public function __construct($config, $colours)
@@ -24,7 +35,7 @@ class WeatherMapCactiUserPlugin extends WeatherMapUIBase
      * @param $request
      * @internal param $config
      */
-    public function handleMainView($request)
+    public function handleMainView($request, $appObject)
     {
         global $config;
 
@@ -33,8 +44,8 @@ class WeatherMapCactiUserPlugin extends WeatherMapUIBase
         print "<script type=\"text/javascript\" src=\"vendor/overlib.js\"><!-- overLIB (c) Erik Bosrup --></script> \n";
 
         $group_id = -1;
-        if (isset($request['group_id']) && (is_numeric($request['group_id']))) {
-            $group_id = intval($request['group_id']);
+        if (isset($request['group_id'])) {
+            $group_id = $request['group_id'];
             $_SESSION['wm_last_group'] = $group_id;
         } else {
             if (isset($_SESSION['wm_last_group'])) {
@@ -66,7 +77,7 @@ class WeatherMapCactiUserPlugin extends WeatherMapUIBase
         require_once($config["base_path"] . "/include/bottom_footer.php");
     }
 
-    public function handleView($request)
+    public function handleView($request, $appObject)
     {
         global $config;
 
@@ -104,7 +115,7 @@ class WeatherMapCactiUserPlugin extends WeatherMapUIBase
         return $mapID;
     }
 
-    public function handleViewCycle($request)
+    public function handleViewCycle($request, $appObject)
     {
         global $config;
 
@@ -142,17 +153,17 @@ class WeatherMapCactiUserPlugin extends WeatherMapUIBase
         }
     }
 
-    public function handleImage($request)
+    public function handleImage($request, $appObject)
     {
 
     }
 
-    public function handleBigThumb($request)
+    public function handleBigThumb($request, $appObject)
     {
 
     }
 
-    public function handleLittleThumb($request)
+    public function handleLittleThumb($request, $appObject)
     {
 
     }
@@ -160,7 +171,7 @@ class WeatherMapCactiUserPlugin extends WeatherMapUIBase
     /**
      * @param $action
      */
-    public function wmuiHandleImageOutput($request)
+    public function wmuiHandleImageOutput($request, $appObject)
     {
         $mapID = $this->deduceMapID($request);
 
@@ -694,37 +705,14 @@ class WeatherMapCactiUserPlugin extends WeatherMapUIBase
         $showLiveLinks = intval(read_config_option("weathermap_live_view"));
 
         $this->generateGroupTabs($limit_to_group);
-        $i = 0;
         if (sizeof($maplist) > 0) {
             $outdir = dirname(__FILE__) . '/../output/';
-
             $imageformat = strtolower(read_config_option("weathermap_output_format"));
 
             html_graph_start_box(1, false);
             print "<tr><td class='wm_gallery'>";
             foreach ($maplist as $map) {
-                $i++;
-
-                $imgsize = "";
-                $thumbfile = $outdir . $map['filehash'] . ".thumb." . $imageformat;
-                $thumburl = "?action=viewthumb&id=" . $map['filehash'] . "&time=" . time();
-                if ($map['thumb_width'] > 0) {
-                    $imgsize = ' WIDTH="' . $map['thumb_width'] . '" HEIGHT="' . $map['thumb_height'] . '" ';
-                }
-                $maptitle = $map['titlecache'];
-                if ($maptitle == '') {
-                    $maptitle = "Map for config file: " . $map['configfile'];
-                }
-                print '<div class="wm_thumbcontainer" style="margin: 2px; border: 1px solid #bbbbbb; padding: 2px; float:left;">';
-                if (file_exists($thumbfile)) {
-                    print '<div class="wm_thumbtitle" style="font-size: 1.2em; font-weight: bold; text-align: center">' . $maptitle . '</div><a href="weathermap-cacti-plugin.php?action=viewmap&id=' . $map['filehash'] . '"><img class="wm_thumb" ' . $imgsize . 'src="' . $thumburl . '" alt="' . $maptitle . '" border="0" hspace="5" vspace="5" title="' . $maptitle . '"/></a>';
-                } else {
-                    print "(thumbnail for map not created yet)";
-                }
-                if ($showLiveLinks == 1) {
-                    print "<a href='?action=liveview&id=" . $map['filehash'] . "'>(live)</a>";
-                }
-                print '</div> ';
+                $this->drawOneThumbnail($map, $imageformat, $showLiveLinks, $outdir);
             }
             print "</td></tr>";
             html_graph_end_box();
@@ -750,5 +738,39 @@ class WeatherMapCactiUserPlugin extends WeatherMapUIBase
         $mapList = db_fetch_assoc($maplist_SQL);
 
         return $mapList;
+    }
+
+    /**
+     * @param $mapRecord
+     * @param $imageFormat
+     * @param $showLiveLinks
+     * @param $imageDirectory
+     */
+    private function drawOneThumbnail($mapRecord, $imageFormat, $showLiveLinks, $imageDirectory)
+    {
+        $imgSize = "";
+        $thumbnailFilename = $imageDirectory . $mapRecord['filehash'] . ".thumb." . $imageFormat;
+        $thumbnailURL = "?action=viewthumb&id=" . $mapRecord['filehash'] . "&time=" . time();
+
+        if ($mapRecord['thumb_width'] > 0) {
+            $imgSize = sprintf(' WIDTH="%d" HEIGHT="%d" ', $mapRecord['thumb_width'], $mapRecord['thumb_height']);
+        }
+        $mapTitle = $mapRecord['titlecache'];
+        if ($mapTitle == '') {
+            $mapTitle = "Map for config file: " . $mapRecord['configfile'];
+        }
+        print '<div class="wm_thumbcontainer" style="margin: 2px; border: 1px solid #bbbbbb; padding: 2px; float:left;">';
+        if (file_exists($thumbnailFilename)) {
+            print '<div class="wm_thumbtitle" style="font-size: 1.2em; font-weight: bold; text-align: center">' . $mapTitle;
+            print '</div><a href="weathermap-cacti-plugin.php?action=viewmap&id=' . $mapRecord['filehash'];
+            print '"><img class="wm_thumb" ' . $imgSize . 'src="' . $thumbnailURL . '" alt="' . $mapTitle;
+            print '" border="0" hspace="5" vspace="5" title="' . $mapTitle . '"/></a>';
+        } else {
+            print "(thumbnail for map not created yet)";
+        }
+        if ($showLiveLinks == 1) {
+            print "<a href='?action=liveview&id=" . $mapRecord['filehash'] . "'>(live)</a>";
+        }
+        print '</div> ';
     }
 }

@@ -67,6 +67,7 @@ class WeatherMapUIBase
             "jsname" => "validateArgJavascriptName",
             "mapfile" => "validateArgMapFilename",
             "string" => "validateArgString",
+            "bool" => "validateArgBool",
             "maphash" => "validateArgMapHash"
         );
 
@@ -137,6 +138,15 @@ class WeatherMapUIBase
         return false;
     }
 
+    private function validateArgBool($value)
+    {
+        if ($value == "0" || $value == "1") {
+            return true;
+        }
+
+        return false;
+    }
+
     /**
      * Call the relevant function to handle this request.
      * Pass only the expected (and by now, validated) parameters
@@ -144,13 +154,18 @@ class WeatherMapUIBase
      *
      * @param string $action
      * @param string[] $request
+     * @param object $appObject - a reference to a relevant object (Editor in EditorUI)
      *
      * @returns bool
      */
-    public function dispatchRequest($action, $request, $editor)
+    public function dispatchRequest($action, $request, $appObject)
     {
         if (!array_key_exists($action, $this->commands)) {
-            return false;
+            if (array_key_exists(":: DEFAULT ::", $this->commands)) {
+                $action = ":: DEFAULT ::";
+            } else {
+                return false;
+            }
         }
 
         $command_info = $this->commands[$action];
@@ -164,10 +179,12 @@ class WeatherMapUIBase
 
         if (isset($command_info['handler'])) {
             $handler = $command_info['handler'];
-            $result = $this->$handler($params, $editor);
+            $result = $this->$handler($params, $appObject);
 
             return $result;
         }
+
+        print "NOPE";
 
         return false;
     }

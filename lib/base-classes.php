@@ -105,7 +105,7 @@ class WeatherMapBase
      * @param $keyname
      * @return array
      */
-    public function getConfig($keyname)
+    public function getConfigValue($keyname)
     {
         if (isset($this->config[$keyname])) {
             return array($this->config[$keyname], CONF_FOUND_DIRECT);
@@ -128,7 +128,7 @@ class WeatherMapBase
         }
     }
 
-    public function getConfigWithoutInheritance($keyname)
+    public function getConfigValueWithoutInheritance($keyname)
     {
         if (isset($this->config[$keyname])) {
             return $this->config[$keyname];
@@ -142,7 +142,7 @@ class WeatherMapBase
      *
      * return an array of the objects that were notified
      */
-    public function setConfig($keyname, $value, $recalculate = false)
+    public function setConfigValue($keyname, $value, $recalculate = false)
     {
         wm_debug("Settings config %s = %s\n", $keyname, $value);
         if (is_null($value)) {
@@ -158,7 +158,7 @@ class WeatherMapBase
         return array($this->name);
     }
 
-    public function addConfig($keyname, $value, $recalculate = false)
+    public function addConfigValue($keyname, $value, $recalculate = false)
     {
         wm_debug("Appending config %s = %s\n", $keyname, $value);
         if (is_null($this->config[$keyname])) {

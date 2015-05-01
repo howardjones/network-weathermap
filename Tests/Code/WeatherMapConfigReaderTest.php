@@ -6,7 +6,8 @@ class WeatherMapConfigReaderTest extends PHPUnit_Framework_TestCase {
 
     public function setup()
     {
-        $this->object = new WeatherMapConfigReader();
+        $this->mapObject = new WeatherMap();
+        $this->object = new WeatherMapConfigReader($this->mapObject);
     }
 
     public function testParseString()

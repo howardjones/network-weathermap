@@ -778,7 +778,7 @@ class WeatherMapNode extends WeatherMapDataItem
         }
     }
 
-    function getConfig()
+    public function getConfig()
     {
         $output = '';
 
@@ -789,170 +789,160 @@ class WeatherMapNode extends WeatherMapDataItem
         // at write-time - it should include the leading NODE xyz line (to allow for renaming)
         if ($this->config_override != '') {
             $output = $this->config_override . "\n";
-        } else {
-            // this is our template. Anything we do different should be written
-            $default_default = $this->getTemplateObject();
+            return ($output);
+        }
 
-            wm_debug("Writing config for NODE $this->name against $this->template\n");
+        // this is our template. Anything we do different should be written
+        $default_default = $this->getTemplateObject();
 
-            $basic_params = array(
-                array('label', 'LABEL', CONFIG_TYPE_LITERAL),
-                array('zorder', 'ZORDER', CONFIG_TYPE_LITERAL),
-                array('labeloffset', 'LABELOFFSET', CONFIG_TYPE_LITERAL),
-                array('labelfont', 'LABELFONT', CONFIG_TYPE_LITERAL),
-                array('labelangle', 'LABELANGLE', CONFIG_TYPE_LITERAL),
-                array('overlibwidth', 'OVERLIBWIDTH', CONFIG_TYPE_LITERAL),
-                array('overlibheight', 'OVERLIBHEIGHT', CONFIG_TYPE_LITERAL),
+        wm_debug("Writing config for NODE $this->name against $this->template\n");
 
-                array('aiconoutlinecolour', 'AICONOUTLINECOLOR', CONFIG_TYPE_COLOR),
-                array('aiconfillcolour', 'AICONFILLCOLOR', CONFIG_TYPE_COLOR),
-                array('labeloutlinecolour', 'LABELOUTLINECOLOR', CONFIG_TYPE_COLOR),
-                array('labelfontshadowcolour', 'LABELFONTSHADOWCOLOR', CONFIG_TYPE_COLOR),
-                array('labelbgcolour', 'LABELBGCOLOR', CONFIG_TYPE_COLOR),
-                array('labelfontcolour', 'LABELFONTCOLOR', CONFIG_TYPE_COLOR)
-            );
+        $basic_params = array(
+            array("fieldName"=>'label', "configKeyword"=>'LABEL', "type"=>CONFIG_TYPE_LITERAL),
+            array("fieldName"=>'zorder', "configKeyword"=>'ZORDER', "type"=>CONFIG_TYPE_LITERAL),
+            array("fieldName"=>'labeloffset', "configKeyword"=>'LABELOFFSET', "type"=>CONFIG_TYPE_LITERAL),
+            array("fieldName"=>'labelfont', "configKeyword"=>'LABELFONT', "type"=>CONFIG_TYPE_LITERAL),
+            array("fieldName"=>'labelangle', "configKeyword"=>'LABELANGLE', "type"=>CONFIG_TYPE_LITERAL),
+            array("fieldName"=>'overlibwidth', "configKeyword"=>'OVERLIBWIDTH', "type"=>CONFIG_TYPE_LITERAL),
+            array("fieldName"=>'overlibheight', "configKeyword"=>'OVERLIBHEIGHT', "type"=>CONFIG_TYPE_LITERAL),
 
-            # TEMPLATE must come first. DEFAULT
-            if ($this->template != 'DEFAULT' && $this->template != ':: DEFAULT ::') {
-                $output .= "\tTEMPLATE " . $this->template . "\n";
-            }
+            array("fieldName"=>'aiconoutlinecolour', "configKeyword"=>'AICONOUTLINECOLOR', "type"=>CONFIG_TYPE_COLOR),
+            array("fieldName"=>'aiconfillcolour', "configKeyword"=>'AICONFILLCOLOR', "type"=>CONFIG_TYPE_COLOR),
+            array("fieldName"=>'labeloutlinecolour', "configKeyword"=>'LABELOUTLINECOLOR', "type"=>CONFIG_TYPE_COLOR),
+            array("fieldName"=>'labelfontshadowcolour', "configKeyword"=>'LABELFONTSHADOWCOLOR', "type"=>CONFIG_TYPE_COLOR),
+            array("fieldName"=>'labelbgcolour', "configKeyword"=>'LABELBGCOLOR', "type"=>CONFIG_TYPE_COLOR),
+            array("fieldName"=>'labelfontcolour', "configKeyword"=>'LABELFONTCOLOR', "type"=>CONFIG_TYPE_COLOR)
+        );
 
-            foreach ($basic_params as $param) {
-                $field = $param[0];
-                $keyword = $param[1];
+        # TEMPLATE must come first. DEFAULT
+        if ($this->template != 'DEFAULT' && $this->template != ':: DEFAULT ::') {
+            $output .= "\tTEMPLATE " . $this->template . "\n";
+        }
 
-                if ($this->$field != $default_default->$field) {
-                    if ($param[2] == CONFIG_TYPE_COLOR) {
-                        $output .= "\t$keyword " . $this->$field->asConfig() . "\n";
-                    }
-                    if ($param[2] == CONFIG_TYPE_LITERAL) {
-                        $output .= "\t$keyword " . $this->$field . "\n";
-                    }
+        foreach ($basic_params as $param) {
+            $field = $param["fieldName"];
+            $keyword = $param["configKeyword"];
+
+            if ($this->$field != $default_default->$field) {
+                if ($param["type"] == CONFIG_TYPE_COLOR) {
+                    $output .= "\t$keyword " . $this->$field->asConfig() . "\n";
                 }
-            }
-
-            // IN/OUT are the same, so we can use the simpler form here
-            if ($this->infourl[IN] != $default_default->infourl[IN]) {
-                $output .= "\tINFOURL " . $this->infourl[IN] . "\n";
-            }
-
-            if ($this->overlibcaption[IN] != $default_default->overlibcaption[IN]) {
-                $output .= "\tOVERLIBCAPTION " . $this->overlibcaption[IN] . "\n";
-            }
-
-            // IN/OUT are the same, so we can use the simpler form here
-            if ($this->notestext[IN] != $default_default->notestext[IN]) {
-                $output .= "\tNOTES " . $this->notestext[IN] . "\n";
-            }
-
-            if ($this->overliburl[IN] != $default_default->overliburl[IN]) {
-                $output .= "\tOVERLIBGRAPH " . join(" ", $this->overliburl[IN]) . "\n";
-            }
-
-            $val = $this->iconscalew . " " . $this->iconscaleh . " " . $this->iconfile;
-
-            $comparison = $default_default->iconscalew . " " . $default_default->iconscaleh . " " . $default_default->iconfile;
-
-            if ($val != $comparison) {
-                $output .= "\tICON ";
-                if ($this->iconscalew > 0) {
-                    $output .= $this->iconscalew . " " . $this->iconscaleh . " ";
+                if ($param["type"] == CONFIG_TYPE_LITERAL) {
+                    $output .= "\t$keyword " . $this->$field . "\n";
                 }
-                $output .= ($this->iconfile == '' ? 'none' : $this->iconfile) . "\n";
-            }
-
-            if ($this->targets != $default_default->targets) {
-                $output .= "\tTARGET";
-
-                foreach ($this->targets as $target) {
-                    $output .= " " . $target->asConfig();
-                }
-                $output .= "\n";
-            }
-
-            $val = $this->usescale . " " . $this->scalevar . " " . $this->scaletype;
-            $comparison = $default_default->usescale . " " . $default_default->scalevar . " " . $default_default->scaletype;
-
-            if (($val != $comparison)) {
-                $output .= "\tUSESCALE " . $val . "\n";
-            }
-
-            $val = $this->useiconscale . " " . $this->iconscalevar;
-            $comparison = $default_default->useiconscale . " " . $default_default->iconscalevar;
-
-            if ($val != $comparison) {
-                $output .= "\tUSEICONSCALE " . $val . "\n";
-            }
-
-            $val = $this->labeloffsetx . " " . $this->labeloffsety;
-            $comparison = $default_default->labeloffsetx . " " . $default_default->labeloffsety;
-
-            if ($comparison != $val) {
-                $output .= "\tLABELOFFSET " . $val . "\n";
-            }
-
-            $val = $this->x . " " . $this->y;
-            $comparison = $default_default->x . " " . $default_default->y;
-
-            if ($val != $comparison) {
-                if ($this->relative_to == '') {
-                    $output .= "\tPOSITION " . $val . "\n";
-                } else {
-                    if ($this->polar) {
-                        $output .= "\tPOSITION " . $this->relative_to . " " . $this->original_x . "r" . $this->original_y . "\n";
-                    } elseif ($this->pos_named) {
-                        $output .= "\tPOSITION " . $this->relative_to . ":" . $this->relative_name . "\n";
-                    } else {
-                        $output .= "\tPOSITION " . $this->relative_to . " " . $this->original_x . " " . $this->original_y . "\n";
-                    }
-                }
-            }
-
-            if (($this->max_bandwidth_in != $default_default->max_bandwidth_in)
-                || ($this->max_bandwidth_out != $default_default->max_bandwidth_out)
-                || ($this->name == 'DEFAULT')
-            ) {
-                if ($this->max_bandwidth_in == $this->max_bandwidth_out) {
-                    $output .= "\tMAXVALUE " . $this->max_bandwidth_in_cfg . "\n";
-                } else {
-                    $output .= "\tMAXVALUE " . $this->max_bandwidth_in_cfg . " " . $this->max_bandwidth_out_cfg . "\n";
-                }
-            }
-
-            foreach ($this->named_offsets as $off_name => $off_pos) {
-                // if the offset exists with different values, or
-                // doesn't exist at all in the template, we need to write
-                // some config for it
-                if ((array_key_exists($off_name, $default_default->named_offsets))) {
-                    $ox = $default_default->named_offsets[$off_name][0];
-                    $oy = $default_default->named_offsets[$off_name][1];
-
-                    if ($ox != $off_pos[0] || $oy != $off_pos[1]) {
-                        $output .= sprintf("\tDEFINEOFFSET %s %d %d\n", $off_name, $off_pos[0], $off_pos[1]);
-                    }
-                } else {
-                    $output .= sprintf("\tDEFINEOFFSET %s %d %d\n", $off_name, $off_pos[0], $off_pos[1]);
-                }
-            }
-
-            foreach ($this->hints as $hintname => $hint) {
-                // all hints for DEFAULT node are for writing
-                // only changed ones, or unique ones, otherwise
-                if (($this->name == 'DEFAULT')
-                    ||
-                    (isset($default_default->hints[$hintname])
-                        &&
-                        $default_default->hints[$hintname] != $hint)
-                    ||
-                    (!isset($default_default->hints[$hintname]))
-                ) {
-                    $output .= "\tSET $hintname $hint\n";
-                }
-            }
-            if ($output != '') {
-                $output = "NODE " . $this->name . "\n$output\n";
             }
         }
+
+        // IN/OUT are the same, so we can use the simpler form here
+        if ($this->infourl[IN] != $default_default->infourl[IN]) {
+            $output .= "\tINFOURL " . $this->infourl[IN] . "\n";
+        }
+
+        if ($this->overlibcaption[IN] != $default_default->overlibcaption[IN]) {
+            $output .= "\tOVERLIBCAPTION " . $this->overlibcaption[IN] . "\n";
+        }
+
+        // IN/OUT are the same, so we can use the simpler form here
+        if ($this->notestext[IN] != $default_default->notestext[IN]) {
+            $output .= "\tNOTES " . $this->notestext[IN] . "\n";
+        }
+
+        if ($this->overliburl[IN] != $default_default->overliburl[IN]) {
+            $output .= "\tOVERLIBGRAPH " . join(" ", $this->overliburl[IN]) . "\n";
+        }
+
+        $val = $this->iconscalew . " " . $this->iconscaleh . " " . $this->iconfile;
+
+        $comparison = $default_default->iconscalew . " " . $default_default->iconscaleh . " " . $default_default->iconfile;
+
+        if ($val != $comparison) {
+            $output .= "\tICON ";
+            if ($this->iconscalew > 0) {
+                $output .= $this->iconscalew . " " . $this->iconscaleh . " ";
+            }
+            $output .= ($this->iconfile == '' ? 'none' : $this->iconfile) . "\n";
+        }
+
+        if ($this->targets != $default_default->targets) {
+            $output .= "\tTARGET";
+
+            foreach ($this->targets as $target) {
+                $output .= " " . $target->asConfig();
+            }
+            $output .= "\n";
+        }
+
+        $val = $this->usescale . " " . $this->scalevar . " " . $this->scaletype;
+        $comparison = $default_default->usescale . " " . $default_default->scalevar . " " . $default_default->scaletype;
+
+        if (($val != $comparison)) {
+            $output .= "\tUSESCALE " . $val . "\n";
+        }
+
+        $val = $this->useiconscale . " " . $this->iconscalevar;
+        $comparison = $default_default->useiconscale . " " . $default_default->iconscalevar;
+
+        if ($val != $comparison) {
+            $output .= "\tUSEICONSCALE " . $val . "\n";
+        }
+
+        $val = $this->labeloffsetx . " " . $this->labeloffsety;
+        $comparison = $default_default->labeloffsetx . " " . $default_default->labeloffsety;
+
+        if ($comparison != $val) {
+            $output .= "\tLABELOFFSET " . $val . "\n";
+        }
+
+        $val = $this->x . " " . $this->y;
+        $comparison = $default_default->x . " " . $default_default->y;
+
+        if ($val != $comparison) {
+            if ($this->relative_to == '') {
+                $output .= "\tPOSITION " . $val . "\n";
+            } else {
+                if ($this->polar) {
+                    $output .= "\tPOSITION " . $this->relative_to . " " . $this->original_x . "r" . $this->original_y . "\n";
+                } elseif ($this->pos_named) {
+                    $output .= "\tPOSITION " . $this->relative_to . ":" . $this->relative_name . "\n";
+                } else {
+                    $output .= "\tPOSITION " . $this->relative_to . " " . $this->original_x . " " . $this->original_y . "\n";
+                }
+            }
+        }
+
+        if (($this->max_bandwidth_in != $default_default->max_bandwidth_in)
+            || ($this->max_bandwidth_out != $default_default->max_bandwidth_out)
+            || ($this->name == 'DEFAULT')
+        ) {
+            if ($this->max_bandwidth_in == $this->max_bandwidth_out) {
+                $output .= "\tMAXVALUE " . $this->max_bandwidth_in_cfg . "\n";
+            } else {
+                $output .= "\tMAXVALUE " . $this->max_bandwidth_in_cfg . " " . $this->max_bandwidth_out_cfg . "\n";
+            }
+        }
+
+        foreach ($this->named_offsets as $off_name => $off_pos) {
+            // if the offset exists with different values, or
+            // doesn't exist at all in the template, we need to write
+            // some config for it
+            if ((array_key_exists($off_name, $default_default->named_offsets))) {
+                $ox = $default_default->named_offsets[$off_name][0];
+                $oy = $default_default->named_offsets[$off_name][1];
+
+                if ($ox != $off_pos[0] || $oy != $off_pos[1]) {
+                    $output .= sprintf("\tDEFINEOFFSET %s %d %d\n", $off_name, $off_pos[0], $off_pos[1]);
+                }
+            } else {
+                $output .= sprintf("\tDEFINEOFFSET %s %d %d\n", $off_name, $off_pos[0], $off_pos[1]);
+            }
+        }
+
+        $output .= $this->getConfigHints($default_default);
+
+        if ($output != '') {
+            $output = "NODE " . $this->name . "\n$output\n";
+        }
+
         return ($output);
     }
 

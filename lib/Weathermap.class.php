@@ -693,8 +693,7 @@ class WeatherMap extends WeatherMapBase
      */
     function ReadConfig($input)
     {
-        $reader = new WeatherMapConfigReader();
-        $reader->Init($this);
+        $reader = new WeatherMapConfigReader($this);
 
         // check if $input is more than one line. if it is, it's a text of a config file
         // if it isn't, it's the filename
@@ -1123,14 +1122,6 @@ class WeatherMap extends WeatherMapBase
         $name_a = $a->name;
         $name_b = $b->name;
 
-        if ($type_a < $type_b) {
-            return -1;
-        }
-
-        if ($type_a > $type_b) {
-            return 1;
-        }
-
         if ($template_a < $template_b) {
             return -1;
         }
@@ -1145,6 +1136,14 @@ class WeatherMap extends WeatherMapBase
 
         if ($name_b == "DEFAULT") {
             return -1;
+        }
+
+        if ($type_a < $type_b) {
+            return -1;
+        }
+
+        if ($type_a > $type_b) {
+            return 1;
         }
 
         return strcmp($name_a, $name_b);

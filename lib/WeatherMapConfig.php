@@ -908,7 +908,7 @@ class WeatherMapConfigReader
         ) // end of link
     );
 
-    public function Init(&$map, $type = "GLOBAL", $object = null)
+    public function __construct(&$map, $type = "GLOBAL", $object = null)
     {
         $this->mapObject = $map;
         $this->currentType = $type;
@@ -917,6 +917,11 @@ class WeatherMapConfigReader
         } else {
             $this->currentObject = $object;
         }
+    }
+
+    public function __toString()
+    {
+        return "ConfigReader for '" . $this->currentSource . "''";
     }
 
     // parseString is based on code from:
@@ -998,8 +1003,7 @@ class WeatherMapConfigReader
             $this->mapObject->included_files[] = $filename;
             $this->mapObject->has_includes = true;
 
-            $reader = new WeatherMapConfigReader();
-            $reader->Init($this->mapObject);
+            $reader = new WeatherMapConfigReader($this->mapObject);
             $reader->readConfigFile($matches[1]);
 
             $this->currentType = "GLOBAL";
@@ -1197,7 +1201,7 @@ class WeatherMapConfigReader
             wm_debug("Loaded default LINK\n");
 
             if (sizeof($this->mapObject->nodes) > 2) {
-                wm_warn("LINK DEFAULT is not the first LINK. Defaults will not apply to earlier LINKs. [WMWARN26]\n");
+                wm_warn("$this LINK DEFAULT is not the first LINK. Defaults will not apply to earlier LINKs. [WMWARN26]\n");
             }
 
         } else {
@@ -1589,93 +1593,95 @@ class WeatherMapConfigReader
             $buffer = trim($buffer);
 
             if ($buffer == '' || substr($buffer, 0, 1) == '#') {
-                // this is a comment line, or a blank line
-                $lineMatched = true;
-            } else {
-                $this->objectLineCount++;
-                // break out the line into words (quoted strings are one word)
-                $args = $this::parseString($buffer);
-                wm_debug("  First: $args[0] in $this->currentType\n");
+                // this is a comment line, or a blank line, just skip to the next line
+                continue;
+            }
+
+            $this->objectLineCount++;
+            // break out the line into words (quoted strings are one word)
+            $args = $this::parseString($buffer);
+            wm_debug("  First: $args[0] in $this->currentType\n");
 
 
-                // From here, the aim of the game is to get out of this loop as
-                // early as possible, without running more preg_match calls than
-                // necessary. In 0.97, this per-line loop accounted for 50% of
-                // the running time!
+            // From here, the aim of the game is to get out of this loop as
+            // early as possible, without running more preg_match calls than
+            // necessary. In 0.97, this per-line loop accounted for 50% of
+            // the running time!
 
-                // this next loop replaces a whole pile of duplicated ifs with something with consistent handling
+            // this next loop replaces a whole pile of duplicated ifs with something with consistent handling
 
 
-                if (!$lineMatched && true === isset($args[0])) {
-                    // check if there is even an entry in this context for the current keyword
-                    if (true === isset($this->configKeywords[$this->currentType][$args[0]])) {
-                        // if there is, then the entry is an array of arrays - iterate them to validate the config
-                        wm_debug("    Possible!\n");
-                        foreach ($this->configKeywords[$this->currentType][$args[0]] as $keyword) {
-                            unset($matches);
-                            wm_debug("      Trying $keyword[1]\n");
-                            if ((substr($keyword[1], 0, 1) != '/') || (1 === preg_match($keyword[1], $buffer, $matches))) {
-                                wm_debug("Might be $args[0]\n");
+            if (!$lineMatched && true === isset($args[0])) {
+                // check if there is even an entry in this context for the current keyword
+                if (true === isset($this->configKeywords[$this->currentType][$args[0]])) {
 
-                                // if we came here without a regexp, then the \1 etc
-                                // refer to arg numbers, not match numbers
+                    // if there is, then the entry is an array of arrays - iterate them to validate the config
+                    wm_debug("    Possible!\n");
+                    foreach ($this->configKeywords[$this->currentType][$args[0]] as $keyword) {
+                        unset($matches);
+                        wm_debug("      Trying $keyword[1]\n");
+                        if ((substr($keyword[1], 0, 1) != '/') || (1 === preg_match($keyword[1], $buffer, $matches))) {
+                            wm_debug("Might be $args[0]\n");
 
-                                if (false === isset($matches)) {
-                                    $matches = $args;
-                                }
+                            // if we came here without a regexp, then the \1 etc
+                            // refer to arg numbers, not match numbers
 
-                                if (is_array($keyword[2])) {
-                                    foreach ($keyword[2] as $key => $val) {
-                                        // so we can poke in numbers too, if the value starts with #
-                                        // then take the # off, and treat the rest as a number literal
-                                        if (substr($val, 0, 1) === '#') {
-                                            $val = substr($val, 1);
-                                        } elseif (is_numeric($val)) {
-                                            // if it's a number, then it's a match number,
-                                            // otherwise it's a literal to be put into a variable
-                                            $val = $matches[$val];
-                                        }
+                            if (false === isset($matches)) {
+                                $matches = $args;
+                            }
 
-                                        // if there are [] in the string, it's an index into an array
-                                        // and the index will be one of the constants: IN or OUT
-                                        if (1 === preg_match('/^(.*)\[([^\]]+)\]$/', $key, $m)) {
-                                            $index = constant($m[2]);
-                                            $key = $m[1];
-                                            $this->currentObject->{$key}[$index] = $val;
-                                            $this->currentObject->setConfig($key . "." . $index, $val);
-                                        } elseif (substr($key, -1, 1) == "+") {
-                                            // if the key ends in a plus, it's an array we should append to
-                                            $key = substr($key, 0, -1);
-                                            array_push($this->currentObject->$key, $val);
-                                            array_push($this->currentObject->config[$key], $val);
-                                            $this->currentObject->addConfig($key, $val);
-
-                                        } else {
-                                            // otherwise, it's just the name of a property on the
-                                            // appropriate object.
-                                            wm_debug("      DONE! ($key, $val)\n");
-                                            $this->currentObject->$key = $val;
-                                            $this->currentObject->setConfig($key, $val);
-                                        }
+                            if (is_array($keyword[2])) {
+                                foreach ($keyword[2] as $key => $val) {
+                                    // so we can poke in numbers too, if the value starts with #
+                                    // then take the # off, and treat the rest as a number literal
+                                    if (substr($val, 0, 1) === '#') {
+                                        $val = substr($val, 1);
+                                    } elseif (is_numeric($val)) {
+                                        // if it's a number, then it's a match number,
+                                        // otherwise it's a literal to be put into a variable
+                                        $val = $matches[$val];
                                     }
+
+                                    // if there are [] in the string, it's an index into an array
+                                    // and the index will be one of the constants: IN or OUT
+                                    if (1 === preg_match('/^(.*)\[([^\]]+)\]$/', $key, $m)) {
+                                        $index = constant($m[2]);
+                                        $key = $m[1];
+                                        $this->currentObject->{$key}[$index] = $val;
+                                        $this->currentObject->setConfigValue($key . "." . $index, $val);
+                                    } elseif (substr($key, -1, 1) == "+") {
+                                        // if the key ends in a plus, it's an array we should append to
+                                        $key = substr($key, 0, -1);
+                                        array_push($this->currentObject->$key, $val);
+                                        array_push($this->currentObject->config[$key], $val);
+                                        $this->currentObject->addConfigValue($key, $val);
+
+                                    } else {
+                                        // otherwise, it's just the name of a property on the
+                                        // appropriate object.
+                                        wm_debug("      DONE! ($key, $val)\n");
+                                        $this->currentObject->$key = $val;
+                                        $this->currentObject->setConfigValue($key, $val);
+                                    }
+                                }
+                                $lineMatched = true;
+                            } else {
+                                // the third arg wasn't an array, it was a function name.
+                                // call that function to handle this keyword
+                                if (call_user_func(array($this, $keyword[2]), $buffer, $args, $matches)) {
                                     $lineMatched = true;
-                                } else {
-                                    // the third arg wasn't an array, it was a function name.
-                                    // call that function to handle this keyword
-                                    if (call_user_func(array($this, $keyword[2]), $buffer, $args, $matches)) {
-                                        $lineMatched = true;
-                                    }
                                 }
                             }
+                        }
 
-                            // jump out of this loop if there's been a match
-                            if ($lineMatched) {
-                                break;
-                            }
+                        // jump out of this loop if there's been a match
+                        if ($lineMatched) {
+                            break;
                         }
                     }
                 }
             }
+
 
             if ((!$lineMatched) && ($buffer != '')) {
                 wm_warn("Unrecognised config on line $this->lineCount: $buffer\n");
@@ -1695,23 +1701,21 @@ class WeatherMapConfigReader
     {
         $fileHandle = fopen($filename, "r");
 
-        if ($fileHandle) {
-            while (!feof($fileHandle)) {
-                $buffer = fgets($fileHandle, 16384);
-                // strip out any Windows line-endings that have gotten in here
-                $buffer = str_replace("\r", "", $buffer);
-                $lines[] = $buffer;
-            }
-            fclose($fileHandle);
-
-            $this->currentSource = $filename;
-            $result = $this->readConfigLines($lines);
-
-
-            return $result;
-        } else {
+        if (!$fileHandle) {
             return false;
         }
 
+        while (!feof($fileHandle)) {
+            $buffer = fgets($fileHandle, 16384);
+            // strip out any Windows line-endings that have gotten in here
+            $buffer = str_replace("\r", "", $buffer);
+            $lines[] = $buffer;
+        }
+        fclose($fileHandle);
+
+        $this->currentSource = $filename;
+        $result = $this->readConfigLines($lines);
+
+        return $result;
     }
 }

@@ -261,19 +261,14 @@ class WeatherMapLink extends WeatherMapDataItem
 
         wm_debug("Link ".$this->name.": pre-checks.\n");
         // Get the positions of the end-points
-        $x1 = $this->a->x;
-        $y1 = $this->a->y;
 
-        $x2 = $this->b->x;
-        $y2 = $this->b->y;
-
-        if (is_null($x1) || is_null($y1)) {
-            wm_warn("LINK " . $this->name . " uses a NODE (" . $this->a->name . ") with no POSITION! [WMWARN35]\n");
+        if ($this->a->isTemplate()) {
+            wm_warn("LINK " . $this->name . " uses a NODE (" . $this->a . ") with no POSITION! [WMWARN35]\n");
             return;
         }
 
-        if (is_null($x2) || is_null($y2)) {
-            wm_warn("LINK " . $this->name . " uses a NODE (" . $this->b->name . ")with no POSITION! [WMWARN35]\n");
+        if ($this->b->isTemplate()) {
+            wm_warn("LINK " . $this->name . " uses a NODE (" . $this->b . ")with no POSITION! [WMWARN35]\n");
             return;
         }
 
@@ -564,53 +559,10 @@ class WeatherMapLink extends WeatherMapDataItem
                 $output.="\tUSESCALE " . $val . "\n";
             }
 
-            if ($this->infourl[IN] == $this->infourl[OUT]) {
-                $dirs = array(IN=>""); // only use the IN value, since they're both the same, but don't prefix the output keyword
-            } else {
-                $dirs = array( IN=>"IN", OUT=>"OUT" );// the full monty two-keyword version
-            }
-
-            foreach ($dirs as $dir => $tdir) {
-                if ($this->infourl[$dir] != $default_default->infourl[$dir]) {
-                    $output .= "\t" . $tdir . "INFOURL " . $this->infourl[$dir] . "\n";
-                }
-            }
-
-            if ($this->overlibcaption[IN] == $this->overlibcaption[OUT]) {
-                $dirs = array(IN=>""); // only use the IN value, since they're both the same, but don't prefix the output keyword
-            } else {
-                $dirs = array( IN=>"IN", OUT=>"OUT" );// the full monty two-keyword version
-            }
-
-            foreach ($dirs as $dir => $tdir) {
-                if ($this->overlibcaption[$dir] != $default_default->overlibcaption[$dir]) {
-                    $output .= "\t".$tdir."OVERLIBCAPTION " . $this->overlibcaption[$dir] . "\n";
-                }
-            }
-
-            if ($this->notestext[IN] == $this->notestext[OUT]) {
-                $dirs = array(IN=>""); // only use the IN value, since they're both the same, but don't prefix the output keyword
-            } else {
-                $dirs = array( IN=>"IN", OUT=>"OUT" );// the full monty two-keyword version
-            }
-
-            foreach ($dirs as $dir => $tdir) {
-                if ($this->notestext[$dir] != $default_default->notestext[$dir]) {
-                    $output .= "\t" . $tdir . "NOTES " . $this->notestext[$dir] . "\n";
-                }
-            }
-
-            if ($this->overliburl[IN]==$this->overliburl[OUT]) {
-                $dirs = array(IN=>""); // only use the IN value, since they're both the same, but don't prefix the output keyword
-            } else {
-                $dirs = array( IN=>"IN", OUT=>"OUT" );// the full monty two-keyword version
-            }
-
-            foreach ($dirs as $dir => $tdir) {
-                if ($this->overliburl[$dir] != $default_default->overliburl[$dir]) {
-                    $output.="\t".$tdir."OVERLIBGRAPH " . join(" ", $this->overliburl[$dir]) . "\n";
-                }
-            }
+            $output .= $this->getConfigInOutOrBoth($default_default, "NOTES", "notestext");
+            $output .= $this->getConfigInOutOrBoth($default_default, "INFOURL", "infourl");
+            $output .= $this->getConfigInOutOrBoth($default_default, "OVERLIBGRAPH", "overliburl");
+            $output .= $this->getConfigInOutOrBoth($default_default, "OVERLIBCAPTION", "overlibcaption");
 
             // if formats have been set, but they're just the longform of the built-in styles, set them back to the built-in styles
             if ($this->labelstyle=='--' && $this->bwlabelformats[IN] == FMT_PERC_IN && $this->bwlabelformats[OUT] == FMT_PERC_OUT) {
@@ -715,17 +667,7 @@ class WeatherMapLink extends WeatherMapDataItem
                 }
             }
 
-            foreach ($this->hints as $hintname => $hint) {
-                // all hints for DEFAULT node are for writing
-                // only changed ones, or unique ones, otherwise
-                if (($this->name == 'DEFAULT')
-                || (isset($default_default->hints[$hintname])
-                && $default_default->hints[$hintname] != $hint)
-                || (!isset($default_default->hints[$hintname]))
-                ) {
-                    $output .= "\tSET $hintname $hint\n";
-                }
-            }
+            $output .= $this->getConfigHints($default_default);
 
             if ($output != '') {
                 $output = "LINK " . $this->name . "\n".$output."\n";
@@ -818,6 +760,38 @@ class WeatherMapLink extends WeatherMapDataItem
         }
         throw new WMException("NoSuchProperty");
     }
+
+    /**
+     * @param $output
+     * @param $default_default
+     * @return array
+     */
+    private function getConfigInOutOrBoth($default_default, $configKeyword, $fieldName)
+    {
+        $output = "";
+        $myArray = $this->$fieldName;
+        $theirArray = $default_default->$fieldName;
+
+        if ($myArray[IN] == $myArray[OUT]) {
+            $dirs = array(IN => ""); // only use the IN value, since they're both the same, but don't prefix the output keyword
+        } else {
+            $dirs = array(IN => "IN", OUT => "OUT");// the full monty two-keyword version
+        }
+
+        foreach ($dirs as $dir => $dirText) {
+
+            if ($myArray[$dir] != $theirArray[$dir]) {
+                $value = $myArray[$dir];
+                if (is_array($value)) {
+                    $value = join(" ", $value);
+                }
+                $output .= "\t" . $dirText . $configKeyword. " " . $value . "\n";
+            }
+        }
+        return $output;
+    }
+
+
 }
 
 // vim:ts=4:sw=4:

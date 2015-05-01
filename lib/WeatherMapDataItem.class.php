@@ -81,6 +81,28 @@ class WeatherMapDataItem extends WeatherMapItem
         $this->id = $newOwner->next_id++;
     }
 
+    /**
+     * @param $default_default
+     * @param $output
+     * @return string
+     */
+    protected function getConfigHints($default_default)
+    {
+        $output = "";
+        foreach ($this->hints as $hintname => $hint) {
+            // all hints for DEFAULT node are for writing
+            // only changed ones, or unique ones, otherwise
+            if (($this->name == 'DEFAULT')
+                || (isset($default_default->hints[$hintname])
+                    && $default_default->hints[$hintname] != $hint)
+                || (!isset($default_default->hints[$hintname]))
+            ) {
+                $output .= "\tSET $hintname $hint\n";
+            }
+        }
+        return $output;
+    }
+
     private function getDirectionList()
     {
         return array("in"=>IN, "out"=>OUT);

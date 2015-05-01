@@ -160,6 +160,11 @@ class WeatherMap extends WeatherMapBase
         $this->loadAllPlugins();
     }
 
+    public function __toString()
+    {
+        return "MAP";
+    }
+
     function my_type()
     {
         return "MAP";
@@ -286,13 +291,7 @@ class WeatherMap extends WeatherMapBase
         }
 
         $the_item = null;
-        $context_type = strtolower($context->my_type());
-
-        if ($context_type != "map") {
-            $context_description = $context_type . ":" . $context->name;
-        } else {
-            $context_description = $context_type;
-        }
+        $context_type = $this->getContextDescription($context);
 
         $input = $this->applyProcessStringShortcuts($input, $context, $context_type);
 
@@ -309,42 +308,7 @@ class WeatherMap extends WeatherMapBase
             $keyContents = $matches[2];
             $key = "{" . $matches[2] . "}";
 
-            $parts = explode(":", $keyContents);
-            $type = array_shift($parts);
-            $args = join(":", $parts);
-
-            $partCount = count($parts);
-
-            if ($partCount > 0 && $type == 'map') {
-                $the_item = $this;
-                $args = $parts[0];
-                $format = (isset($parts[1]) ? $parts[1] : "");
-            }
-
-            if ($partCount > 1 && (($type == 'link') || ($type == 'node'))) {
-                $itemname = $parts[0];
-                $args = $parts[1];
-                $format = (isset($parts[2]) ? $parts[2] : "");
-
-                $the_item = $this->processStringFindContext($context, $itemname, $type);
-            }
-
-            if (is_null($the_item)) {
-                wm_warn("ProcessString: $key refers to unknown item (context is $context_description) [WMWARN05]\n");
-            } else {
-                wm_debug("ProcessString: Found appropriate item: " . get_class($the_item) . " " . $the_item->name . "\n");
-
-                $value = $this->findItemValue($the_item, $args, $value, $include_notes);
-            }
-
-            // format, and sanitise the value string here, before returning it
-
-            wm_debug("ProcessString: replacing %s with %s \n", $key, $value);
-
-            if ($format != '') {
-                $value = wmSprintf($format, $value, $this->kilo);
-                wm_debug("ProcessString: formatted $format to $value\n");
-            }
+            $value = $this->processStringToken($include_notes, $keyContents, $key, $context);
 
             // We track the input and a clean output string separately, to stop people doing
             // weird things like setting variables to also include tokens
@@ -352,6 +316,153 @@ class WeatherMap extends WeatherMapBase
             $output = str_replace($key, $value, $output);
         }
         return ($output);
+    }
+
+    /**
+     * Given a token from ProcessString(), and the context for it, figure out the actual value and format @inheritdoc
+     *
+     * @param $include_notes
+     * @param $keyContents
+     * @param $key
+     * @param $contextDescription
+     * @param $value
+     * @return array
+     */
+    private function processStringToken($include_notes, $keyContents, $key, $context)
+    {
+        $value = "";
+
+        $contextDescription = $this->getContextDescription($context);
+        $parts = explode(":", $keyContents);
+        $type = array_shift($parts);
+        $args = join(":", $parts);
+
+        $partCount = count($parts);
+
+        if ($partCount > 0 && $type == 'map') {
+            $theItem = $this;
+            $args = $parts[0];
+            $format = (isset($parts[1]) ? $parts[1] : "");
+        }
+
+        if ($partCount > 1 && (($type == 'link') || ($type == 'node'))) {
+            $itemName = $parts[0];
+            $args = $parts[1];
+            $format = (isset($parts[2]) ? $parts[2] : "");
+
+            $theItem = $this->processStringFindReferredObject($context, $itemName, $type);
+        }
+
+        if (is_null($theItem)) {
+            wm_warn("ProcessString: $key refers to unknown item (context is $contextDescription) [WMWARN05]\n");
+            return "";
+        }
+
+        wm_debug("ProcessString: Found appropriate item: $theItem\n");
+
+        $value = $this->findItemValue($theItem, $args, $value, $include_notes);
+
+        // format, and sanitise the value string here, before returning it
+        wm_debug("ProcessString: replacing %s with %s \n", $key, $value);
+
+        if ($format != '') {
+            $value = wmSprintf($format, $value, $this->kilo);
+            wm_debug("ProcessString: formatted $format to $value\n");
+        }
+        return $value;
+    }
+
+    /**
+     * @param $context
+     * @return string
+     */
+    private function getContextDescription(&$context)
+    {
+        $context_type = strtolower($context->my_type());
+
+        if ($context_type != "map") {
+            $contextDescription = $context_type . ":" . $context->name;
+        } else {
+            $contextDescription = $context_type;
+        }
+        return $contextDescription;
+    }
+
+
+    /**
+     * @param $input
+     * @param $context
+     * @param $context_type
+     * @return mixed
+     */
+    private function applyProcessStringShortcuts($input, &$context, $context_type)
+    {
+// next, shortcut all the regexps for very common tokens
+        if ($context_type === 'node') {
+            $input = str_replace("{node:this:graph_id}", $context->get_hint("graph_id"), $input);
+            $input = str_replace("{node:this:name}", $context->name, $input);
+        }
+
+        if ($context_type === 'link') {
+            $input = str_replace("{link:this:graph_id}", $context->get_hint("graph_id"), $input);
+            $input = str_replace("{link:this:name}", $context->name, $input);
+
+            if (false !== strpos($input, "{")) {
+                // TODO - shortcuts for standard bwlabel formats, if there is still a token
+
+                //if (strpos($input,"{link:this:bandwidth_in:%2k}") !== false) {
+                //    $temp = mysprintf("%2k",$context->hints['bandwidth_in']);
+                //    $input = str_replace("{link:this:bandwidth_in:%2k}", $temp, $input);
+                //}
+
+                // define('FMT_BITS_IN',"{link:this:bandwidth_in:%2k}");
+                // define('FMT_BITS_OUT',"{link:this:bandwidth_out:%2k}");
+                // define('FMT_UNFORM_IN',"{link:this:bandwidth_in}");
+                // define('FMT_UNFORM_OUT',"{link:this:bandwidth_out}");
+                // define('FMT_PERC_IN',"{link:this:inpercent:%.2f}%");
+                // define('FMT_PERC_OUT',"{link:this:outpercent:%.2f}%");
+            }
+            return $input;
+        }
+        return $input;
+    }
+
+    /**
+     * @param $context
+     * @param $itemname
+     * @param $type
+     * @return mixed
+     */
+    private function processStringFindReferredObject(&$context, $itemname, $type)
+    {
+        if (($itemname == "this") && ($type == strtolower($context->my_type()))) {
+            return $context;
+        }
+
+        if ($context->my_type() == "LINK" && $type == 'node') {
+            // this refers to the two nodes at either end of this link
+            if ($itemname == '_linkstart_') {
+                return $context->a;
+            }
+
+            if ($itemname == '_linkend_') {
+                return $context->b;
+            }
+        }
+
+        if (($itemname == "parent") && ($type == "node") && ($context->my_type() == 'NODE') && ($context->isRelativePositioned())) {
+            return $this->getRelativeAnchor();
+        }
+
+        if (($type == 'link') && isset($this->links[$itemname])) {
+            return $this->links[$itemname];
+        }
+
+        if (($type == 'node') && isset($this->nodes[$itemname])) {
+            return $this->nodes[$itemname];
+        }
+        return null;
+
     }
 
     function findItemValue(&$mapItem, $variableName, $currentValue, $includeNotes = true)
@@ -431,6 +542,32 @@ class WeatherMap extends WeatherMapBase
         wm_debug("Finished loading plugins.\n");
     }
 
+    /**
+     * @param $pluginType
+     * @param $searchDirectory
+     * @return array
+     */
+    private function getPluginFileList($pluginType, $searchDirectory)
+    {
+        $directoryHandle = $this->resolveDirectoryAndOpen($searchDirectory);
+
+        $pluginList = array();
+        if (!$directoryHandle) {
+            wm_warn("Couldn't open $pluginType Plugin directory ($searchDirectory). Things will probably go wrong. [WMWARN06]\n");
+        }
+
+        while ($file = readdir($directoryHandle)) {
+            $fullFilePath = $searchDirectory . DIRECTORY_SEPARATOR . $file;
+
+            if (!is_file($fullFilePath) || !preg_match('/\.php$/', $fullFilePath)) {
+                continue;
+            }
+
+            $pluginList[$fullFilePath] = $file;
+        }
+        return $pluginList;
+    }
+
     private function resolveDirectoryAndOpen($dir)
     {
         if (!file_exists($dir)) {
@@ -484,10 +621,10 @@ class WeatherMap extends WeatherMapBase
      */
     private function buildAllItemsList()
     {
-        // TODO - this should probably be a static
+        // TODO - this should probably be a static, or otherwise cached
         $allItems = array();
 
-        $listOfItemLists = array(&$this->links, &$this->nodes);
+        $listOfItemLists = array(&$this->nodes, &$this->links);
         reset($listOfItemLists);
 
         while (list($outerListCount,) = each($listOfItemLists)) {
@@ -1111,42 +1248,31 @@ class WeatherMap extends WeatherMapBase
 
     function getConfigSort($a, $b)
     {
-        $values = array("NODE"=>1, "LINK"=>2);
+        $type_diff = strcmp($a->my_type(), $b->my_type());
+        $template_diff = strcmp(($a->isTemplate() ? 1 : 2), ($b->isTemplate() ? 1 : 2));
+        $name_diff = strcmp($a->name, $b->name);
 
-        $type_a = $values[$a->my_type()];
-        $type_b = $values[$b->my_type()];
-
-        $template_a = ($a->isTemplate() ? 1 : 2);
-        $template_b = ($b->isTemplate() ? 1 : 2);
-
-        $name_a = $a->name;
-        $name_b = $b->name;
-
-        if ($template_a < $template_b) {
-            return -1;
+        // templates come first
+        if($template_diff != 0) {
+            return $template_diff;
         }
 
-        if ($template_a > $template_b) {
+        // DEFAULT before all else
+        if ($a->name == "DEFAULT") {
             return 1;
         }
 
-        if ($name_a == "DEFAULT") {
-            return 1;
-        }
-
-        if ($name_b == "DEFAULT") {
+        if ($b->name == "DEFAULT") {
             return -1;
         }
 
-        if ($type_a < $type_b) {
-            return -1;
+        // NODEs before LINKs
+        if ($type_diff != 0) {
+            return -$type_diff;
         }
 
-        if ($type_a > $type_b) {
-            return 1;
-        }
-
-        return strcmp($name_a, $name_b);
+        // Then alpha for the rest
+        return $name_diff;
     }
 
     function writeConfig($filename)
@@ -1821,106 +1947,9 @@ class WeatherMap extends WeatherMapBase
         $this->nodes['DEFAULT'] = &$defnode2;
     }
 
-    /**
-     * @param $input
-     * @param $context
-     * @param $context_type
-     * @return mixed
-     */
-    private function applyProcessStringShortcuts($input, &$context, $context_type)
-    {
-// next, shortcut all the regexps for very common tokens
-        if ($context_type === 'node') {
-            $input = str_replace("{node:this:graph_id}", $context->get_hint("graph_id"), $input);
-            $input = str_replace("{node:this:name}", $context->name, $input);
-        }
 
-        if ($context_type === 'link') {
-            $input = str_replace("{link:this:graph_id}", $context->get_hint("graph_id"), $input);
-            $input = str_replace("{link:this:name}", $context->name, $input);
 
-            if (false !== strpos($input, "{")) {
-                // TODO - shortcuts for standard bwlabel formats, if there is still a token
 
-                //if (strpos($input,"{link:this:bandwidth_in:%2k}") !== false) {
-                //    $temp = mysprintf("%2k",$context->hints['bandwidth_in']);
-                //    $input = str_replace("{link:this:bandwidth_in:%2k}", $temp, $input);
-                //}
-
-                // define('FMT_BITS_IN',"{link:this:bandwidth_in:%2k}");
-                // define('FMT_BITS_OUT',"{link:this:bandwidth_out:%2k}");
-                // define('FMT_UNFORM_IN',"{link:this:bandwidth_in}");
-                // define('FMT_UNFORM_OUT',"{link:this:bandwidth_out}");
-                // define('FMT_PERC_IN',"{link:this:inpercent:%.2f}%");
-                // define('FMT_PERC_OUT',"{link:this:outpercent:%.2f}%");
-            }
-            return $input;
-        }
-        return $input;
-    }
-
-    /**
-     * @param $context
-     * @param $itemname
-     * @param $type
-     * @return mixed
-     */
-    private function processStringFindContext(&$context, $itemname, $type)
-    {
-        if (($itemname == "this") && ($type == strtolower($context->my_type()))) {
-            $the_item = $context;
-            return $the_item;
-        } elseif (strtolower($context->my_type()) == "link" && $type == 'node' && ($itemname == '_linkstart_' || $itemname == '_linkend_')) {
-            // this refers to the two nodes at either end of this link
-            if ($itemname == '_linkstart_') {
-                $the_item = $context->a;
-            }
-
-            if ($itemname == '_linkend_') {
-                $the_item = $context->b;
-                return $the_item;
-            }
-            return $the_item;
-        } elseif (($itemname == "parent") && ($type == strtolower($context->my_type())) && ($type == 'node') && ($context->relative_to != '')) {
-            $the_item = $this->nodes[$context->relative_to];
-            return $the_item;
-        } else {
-            if (($type == 'link') && isset($this->links[$itemname])) {
-                $the_item = $this->links[$itemname];
-            }
-            if (($type == 'node') && isset($this->nodes[$itemname])) {
-                $the_item = $this->nodes[$itemname];
-                return $the_item;
-            }
-            return $the_item;
-        }
-    }
-
-    /**
-     * @param $pluginType
-     * @param $searchDirectory
-     * @return array
-     */
-    private function getPluginFileList($pluginType, $searchDirectory)
-    {
-        $directoryHandle = $this->resolveDirectoryAndOpen($searchDirectory);
-
-        $pluginList = array();
-        if (!$directoryHandle) {
-            wm_warn("Couldn't open $pluginType Plugin directory ($searchDirectory). Things will probably go wrong. [WMWARN06]\n");
-        }
-
-        while ($file = readdir($directoryHandle)) {
-            $fullFilePath = $searchDirectory . DIRECTORY_SEPARATOR . $file;
-
-            if (!is_file($fullFilePath) || !preg_match('/\.php$/', $fullFilePath)) {
-                continue;
-            }
-
-            $pluginList[$fullFilePath] = $file;
-        }
-        return $pluginList;
-    }
 }
 
 // vim:ts=4:sw=4:

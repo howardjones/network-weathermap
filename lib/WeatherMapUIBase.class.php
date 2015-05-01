@@ -3,6 +3,7 @@
 class WeatherMapUIBase
 {
     public $commands;
+
     const ARG_OPTIONAL = 2;
     const ARG_TYPE = 1;
     const ARG_NAME = 0;

@@ -11,7 +11,6 @@
 
 class WeatherMapConfigReader
 {
-
     private $lineCount = 0;
     private $currentObject = null;
     private $currentType = "GLOBAL";
@@ -1610,11 +1609,9 @@ class WeatherMapConfigReader
 
             // this next loop replaces a whole pile of duplicated ifs with something with consistent handling
 
-
             if (!$lineMatched && true === isset($args[0])) {
                 // check if there is even an entry in this context for the current keyword
                 if (true === isset($this->configKeywords[$this->currentType][$args[0]])) {
-
                     // if there is, then the entry is an array of arrays - iterate them to validate the config
                     wm_debug("    Possible!\n");
                     foreach ($this->configKeywords[$this->currentType][$args[0]] as $keyword) {
@@ -1631,39 +1628,7 @@ class WeatherMapConfigReader
                             }
 
                             if (is_array($keyword[2])) {
-                                foreach ($keyword[2] as $key => $val) {
-                                    // so we can poke in numbers too, if the value starts with #
-                                    // then take the # off, and treat the rest as a number literal
-                                    if (substr($val, 0, 1) === '#') {
-                                        $val = substr($val, 1);
-                                    } elseif (is_numeric($val)) {
-                                        // if it's a number, then it's a match number,
-                                        // otherwise it's a literal to be put into a variable
-                                        $val = $matches[$val];
-                                    }
-
-                                    // if there are [] in the string, it's an index into an array
-                                    // and the index will be one of the constants: IN or OUT
-                                    if (1 === preg_match('/^(.*)\[([^\]]+)\]$/', $key, $m)) {
-                                        $index = constant($m[2]);
-                                        $key = $m[1];
-                                        $this->currentObject->{$key}[$index] = $val;
-                                        $this->currentObject->setConfigValue($key . "." . $index, $val);
-                                    } elseif (substr($key, -1, 1) == "+") {
-                                        // if the key ends in a plus, it's an array we should append to
-                                        $key = substr($key, 0, -1);
-                                        array_push($this->currentObject->$key, $val);
-                                        array_push($this->currentObject->config[$key], $val);
-                                        $this->currentObject->addConfigValue($key, $val);
-
-                                    } else {
-                                        // otherwise, it's just the name of a property on the
-                                        // appropriate object.
-                                        wm_debug("      DONE! ($key, $val)\n");
-                                        $this->currentObject->$key = $val;
-                                        $this->currentObject->setConfigValue($key, $val);
-                                    }
-                                }
+                                $this->readConfigSimpleLine($keyword, $matches);
                                 $lineMatched = true;
                             } else {
                                 // the third arg wasn't an array, it was a function name.
@@ -1717,5 +1682,47 @@ class WeatherMapConfigReader
         $result = $this->readConfigLines($lines);
 
         return $result;
+    }
+
+    /**
+     * @param $keyword
+     * @param $matches
+     * @param $m
+     */
+    private function readConfigSimpleLine($keyword, $matches)
+    {
+        foreach ($keyword[2] as $key => $val) {
+            // so we can poke in numbers too, if the value starts with #
+            // then take the # off, and treat the rest as a number literal
+            if (substr($val, 0, 1) === '#') {
+                $val = substr($val, 1);
+            } elseif (is_numeric($val)) {
+                // if it's a number, then it's a match number,
+                // otherwise it's a literal to be put into a variable
+                $val = $matches[$val];
+            }
+
+            // if there are [] in the string, it's an index into an array
+            // and the index will be one of the constants: IN or OUT
+            if (1 === preg_match('/^(.*)\[([^\]]+)\]$/', $key, $m)) {
+                $index = constant($m[2]);
+                $key = $m[1];
+                $this->currentObject->{$key}[$index] = $val;
+                $this->currentObject->setConfigValue($key . "." . $index, $val);
+            } elseif (substr($key, -1, 1) == "+") {
+                // if the key ends in a plus, it's an array we should append to
+                $key = substr($key, 0, -1);
+                array_push($this->currentObject->$key, $val);
+                array_push($this->currentObject->config[$key], $val);
+                $this->currentObject->addConfigValue($key, $val);
+
+            } else {
+                // otherwise, it's just the name of a property on the
+                // appropriate object.
+                wm_debug("      DONE! ($key, $val)\n");
+                $this->currentObject->$key = $val;
+                $this->currentObject->setConfigValue($key, $val);
+            }
+        }
     }
 }

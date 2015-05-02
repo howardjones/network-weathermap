@@ -316,6 +316,12 @@ function weathermap_run_maps($mydir, $map_id = -1)
         wm_debug("Iterating all maps.");
 
         $imageFormat = strtolower(read_config_option("weathermap_output_format"));
+        wm_debug("Format is fetched as $imageFormat\n");
+        if ($imageFormat == "") {
+            $imageFormat = "png";
+        }
+        wm_debug("Format is now $imageFormat\n");
+
         $rrdtool_path =  read_config_option("path_rrdtool");
 
         foreach ($mapList as $mapParameters) {
@@ -517,10 +523,6 @@ function weathermap_run_map($mapParameters, $configDirectory, $outputDirectory, 
 
         db_execute("update weathermap_maps set titlecache='" . mysql_real_escape_string($runner->getProcessedTitle()) . "' where id=" . intval($mapParameters['id']));
 
-        // XXX - is this even used?
-//        if (intval($weathermapObject->thumb_width) > 0) {
-//            db_execute("update weathermap_maps set thumb_width=" . intval($weathermapObject->thumb_width) . ", thumb_height=" . intval($weathermapObject->thumb_height) . " where id=" . intval($mapParameters['id']));
-//        }
 
         $runner->cleanUp();
         unset($runner);

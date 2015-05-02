@@ -1599,7 +1599,7 @@ class WeatherMapConfigReader
             $this->objectLineCount++;
             // break out the line into words (quoted strings are one word)
             $args = $this::parseString($buffer);
-            wm_debug("  First: $args[0] in $this->currentType\n");
+         #   wm_debug("  First: $args[0] in $this->currentType\n");
 
 
             // From here, the aim of the game is to get out of this loop as
@@ -1613,12 +1613,12 @@ class WeatherMapConfigReader
                 // check if there is even an entry in this context for the current keyword
                 if (true === isset($this->configKeywords[$this->currentType][$args[0]])) {
                     // if there is, then the entry is an array of arrays - iterate them to validate the config
-                    wm_debug("    Possible!\n");
+                  #  wm_debug("    Possible!\n");
                     foreach ($this->configKeywords[$this->currentType][$args[0]] as $keyword) {
                         unset($matches);
-                        wm_debug("      Trying $keyword[1]\n");
+                     #   wm_debug("      Trying $keyword[1]\n");
                         if ((substr($keyword[1], 0, 1) != '/') || (1 === preg_match($keyword[1], $buffer, $matches))) {
-                            wm_debug("Might be $args[0]\n");
+                         #   wm_debug("Might be $args[0]\n");
 
                             // if we came here without a regexp, then the \1 etc
                             // refer to arg numbers, not match numbers
@@ -1719,7 +1719,7 @@ class WeatherMapConfigReader
             } else {
                 // otherwise, it's just the name of a property on the
                 // appropriate object.
-                wm_debug("      DONE! ($key, $val)\n");
+               # wm_debug("      DONE! ($key, $val)\n");
                 $this->currentObject->$key = $val;
                 $this->currentObject->setConfigValue($key, $val);
             }

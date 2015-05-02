@@ -41,7 +41,6 @@
 ./configs/simple.conf
 ./configs/weathermap.conf
 ./configs/.htaccess
-./output/dummy-file.delete-me
 ./output/.htaccess
 ./output/index.php
 ./docs/index.html

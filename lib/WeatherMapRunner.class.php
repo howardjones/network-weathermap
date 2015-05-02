@@ -36,22 +36,26 @@ class WeatherMapRunner
     private $mapID;
     private $groupID;
     
-    public function __construct($config_directory, $output_directory, $config_file, $filehash, $imageformat)
+    public function __construct($configDirectory, $outputDirectory, $configFile, $fileHash, $imageFormat)
     {
-        $this->mapConfigFileName = $config_directory . DIRECTORY_SEPARATOR . $config_file;
-        $this->htmlOutputFileName = $output_directory . DIRECTORY_SEPARATOR . $filehash.".html";
-        $this->imageOutputFileName = $output_directory . DIRECTORY_SEPARATOR . $filehash.".".$imageformat;
-        $this->thumbnailImageFileName = $output_directory . DIRECTORY_SEPARATOR . $filehash.".thumb.".$imageformat;
-        $this->thumbimagefile2 = $output_directory . DIRECTORY_SEPARATOR . $filehash.".thumb48.".$imageformat;
+        wm_debug("Format is passed as $imageFormat\n");
 
-        $this->jsonOutputFileName  = $output_directory . DIRECTORY_SEPARATOR . $filehash.".json";
+        $this->mapConfigFileName = $configDirectory . DIRECTORY_SEPARATOR . $configFile;
+        $this->htmlOutputFileName = $outputDirectory . DIRECTORY_SEPARATOR . $fileHash.".html";
+        $this->imageOutputFileName = $outputDirectory . DIRECTORY_SEPARATOR . $fileHash.".".$imageFormat;
+        $this->thumbnailImageFileName = $outputDirectory . DIRECTORY_SEPARATOR . $fileHash.".thumb.".$imageFormat;
+        $this->thumbimagefile2 = $outputDirectory . DIRECTORY_SEPARATOR . $fileHash.".thumb48.".$imageFormat;
 
-        $this->statisticsOutputFileName = $output_directory . DIRECTORY_SEPARATOR . $filehash . '.stats.txt';
-        $this->resultsOutputFileName = $output_directory . DIRECTORY_SEPARATOR . $filehash . '.results.txt';
+        $this->jsonOutputFileName  = $outputDirectory . DIRECTORY_SEPARATOR . $fileHash.".json";
+
+        $this->statisticsOutputFileName = $outputDirectory . DIRECTORY_SEPARATOR . $fileHash . '.stats.txt';
+        $this->resultsOutputFileName = $outputDirectory . DIRECTORY_SEPARATOR . $fileHash . '.results.txt';
         // temporary file used to write files before moving them into place
-        $this->workingImageFileName = $output_directory . DIRECTORY_SEPARATOR . $filehash . '.tmp.png';
+        $this->workingImageFileName = $outputDirectory . DIRECTORY_SEPARATOR . $fileHash . '.tmp.png';
 
-        $this->filehash = $filehash;
+        wm_debug("Output image is ".$this->imageOutputFileName."\n");
+
+        $this->filehash = $fileHash;
 
         $this->mapObject = null;
         $this->warningCount = 0;
@@ -170,6 +174,15 @@ class WeatherMapRunner
         if ($alternateImageOutputFile != "" && $alternateImageOutputFile != "weathermap.png" && file_exists($this->imageOutputFileName)) {
             // copy the existing file to the configured location too
             @copy($this->imageOutputFileName, $alternateImageOutputFile);
+        }
+
+        if (intval($this->mapObject->thumb_width) > 0) {
+            db_execute(sprintf(
+                "update weathermap_maps set thumb_width='%d', thumb_height='%d' where id=%d",
+                $this->mapObject->thumb_width,
+                $this->mapObject->thumb_height,
+                $this->mapID
+            ));
         }
     }
 

@@ -243,7 +243,7 @@ function weathermap_setup_settings($sql, $myversion)
 
     foreach ($defaults as $key => $defaultValue) {
         $current = read_config_option($key);
-        if ($key == '') {
+        if ($current == '') {
             $sql[] = sprintf("replace into settings values('%s','%s')", $key, $defaultValue);
         }
     }

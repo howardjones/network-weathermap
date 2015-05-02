@@ -238,10 +238,13 @@ function weathermap_get_runlist($map_id = -1, $quietlogging)
 function WMMemoryNote($label)
 {
     if (true === function_exists('memory_get_usage')) {
-        db_execute("replace into settings values('%s','%s')", $label, memory_get_usage());
+        WMCactiAPI::setConfigOption($label, memory_get_usage());
     }
 }
 
+/**
+ * A class to contain all the global junk that a map run needs at the moment.
+ */
 class WeathermapPollerRuntime
 {
 
@@ -276,8 +279,8 @@ function weathermap_run_maps($mydir, $map_id = -1)
         $weathermap_poller_start_time = $start_time;
     }
 
-    $outputDirectory = $mydir.DIRECTORY_SEPARATOR.'output';
-    $configDirectory = $mydir.DIRECTORY_SEPARATOR.'configs';
+    $outputDirectory = realpath($mydir.DIRECTORY_SEPARATOR.'output');
+    $configDirectory = realpath($mydir.DIRECTORY_SEPARATOR.'configs');
 
     $mapCount = 0;
 
@@ -291,7 +294,7 @@ function weathermap_run_maps($mydir, $map_id = -1)
         $global_debug = false;
     }
     
-    $quietLogging = intval(read_config_option("weathermap_quiet_logging"));
+    $quietLogging = intval(WMCactiAPI::getConfigOption("weathermap_quiet_logging"), 0);
     // moved this outside the module_checks, so there should always be something in the logs!
     if ($quietLogging==0) {
         cacti_log("Weathermap $WEATHERMAP_VERSION starting - $mode_message\n", true, "WEATHERMAP");
@@ -307,7 +310,7 @@ function weathermap_run_maps($mydir, $map_id = -1)
     $orig_cwd = getcwd();
     chdir($mydir);
 
-    db_execute("replace into settings values('weathermap_last_start_time','".mysql_real_escape_string($start_time)."')");
+    WMCactiAPI::setConfigOption("weathermap_last_start_time", $start_time);
 
     // first, see if the output directory exists and is writable
     if (weathermap_directory_writeable($outputDirectory)) {
@@ -315,13 +318,7 @@ function weathermap_run_maps($mydir, $map_id = -1)
 
         wm_debug("Iterating all maps.");
 
-        $imageFormat = strtolower(read_config_option("weathermap_output_format"));
-        wm_debug("Format is fetched as $imageFormat\n");
-        if ($imageFormat == "") {
-            $imageFormat = "png";
-        }
-        wm_debug("Format is now $imageFormat\n");
-
+        $imageFormat = strtolower(WMCactiAPI::getConfigOption("weathermap_output_format", "png"));
         $rrdtool_path =  read_config_option("path_rrdtool");
 
         foreach ($mapList as $mapParameters) {
@@ -347,25 +344,24 @@ function weathermap_run_maps($mydir, $map_id = -1)
 
     if (true === function_exists("memory_get_peak_usage")) {
         $peak_memory = memory_get_peak_usage();
-        db_execute("replace into settings values('weathermap_peak_memory','"
-                . $peak_memory . "')");
-        $stats_string .= sprintf(" using %sbytes peak memory", wmFormatNumberWithMetricPrefix($peak_memory));
+        WMCactiAPI::setConfigOption("weathermap_peak_memory", wmFormatNumberWithMetricPrefix($peak_memory));
+        $stats_string .= sprintf(" using %sbytes peak memory", $peak_memory);
     }
 
     if ($quietLogging==0) {
         wm_warn("STATS: Weathermap $WEATHERMAP_VERSION run complete - $stats_string\n", true);
     }
 
-    db_execute("replace into settings values('weathermap_last_stats','".mysql_real_escape_string($stats_string)."')");
-    db_execute("replace into settings values('weathermap_last_finish_time','".mysql_real_escape_string($end_time)."')");
-    db_execute("replace into settings values('weathermap_last_map_count','". mysql_real_escape_string($mapCount) . "')");
+    WMCactiAPI::setConfigOption("weathermap_last_stats", $stats_string);
+    WMCactiAPI::setConfigOption("weathermap_last_finish_time", $end_time);
+    WMCactiAPI::setConfigOption("weathermap_last_map_count", $mapCount);
 
     if (true === function_exists('memory_get_usage')) {
-        db_execute("replace into settings values('weathermap_final_memory','" . memory_get_usage() . "')");
-        db_execute("replace into settings values('weathermap_highwater_memory','" . $weathermap_mem_highwater . "')");
+        WMCactiAPI::setConfigOption("weathermap_final_memory", memory_get_usage());
+        WMCactiAPI::setConfigOption("weathermap_highwater_memory", $weathermap_mem_highwater);
     }
     if (true === function_exists("memory_get_peak_usage")) {
-        db_execute("replace into settings values('weathermap_peak_memory','" . memory_get_peak_usage() . "')");
+        WMCactiAPI::setConfigOption("weathermap_peak_memory", memory_get_peak_usage());
     }
 }
 
@@ -410,7 +406,7 @@ function weathermap_run_map($mapParameters, $configDirectory, $outputDirectory, 
     $runner->setRrdtool($rrdtool_path);
 
     // Log where we are up to so the Cacti UI can tell someone
-    db_execute("replace into settings values('weathermap_last_started_file','" . mysql_real_escape_string($logTag) . "')");
+    WMCactiAPI::setConfigOption("weaathermap_last_started_file", $logTag);
 
     $runner->LoadMap();
 
@@ -427,9 +423,7 @@ function weathermap_run_map($mapParameters, $configDirectory, $outputDirectory, 
 
     $runner->applyAllHints($mapParameters);
 
-
-
-//    weathermap_memory_check("MEM postread");
+    //    weathermap_memory_check("MEM postread");
 //        $weathermapObject->readData();
 //        weathermap_memory_check("MEM postdata");
 
@@ -523,7 +517,6 @@ function weathermap_run_map($mapParameters, $configDirectory, $outputDirectory, 
 
         db_execute("update weathermap_maps set titlecache='" . mysql_real_escape_string($runner->getProcessedTitle()) . "' where id=" . intval($mapParameters['id']));
 
-
         $runner->cleanUp();
         unset($runner);
 
@@ -535,7 +528,8 @@ function weathermap_run_map($mapParameters, $configDirectory, $outputDirectory, 
         $mapDuration = $mapEndTime - $mapStartTime;
         wm_debug("TIME: %s took %f seconds.\n", $mapParameters['configfile'], $mapDuration);
         weathermap_memory_check("MEM after");
-        db_execute("replace into settings values('weathermap_last_finished_file','" . mysql_real_escape_string($logTag) . "')");
+
+        WMCactiAPI::setConfigOption("weaathermap_last_finished_file", $logTag);
 
     // if the debug mode was set to once for this map, then that
     // time has now passed, and it can be turned off again.
@@ -544,7 +538,7 @@ function weathermap_run_map($mapParameters, $configDirectory, $outputDirectory, 
         $newDebugState = 'off';
     }
 
-    db_execute(sprintf(
+    WMCactiAPI::executeDBQuery(sprintf(
         "update weathermap_maps set warncount=%d, runtime=%f, debug='%s',lastrun=NOW() where id=%d",
         $weathermap_warncount,
         $mapDuration,

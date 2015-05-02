@@ -38,8 +38,6 @@ class WeatherMapRunner
     
     public function __construct($configDirectory, $outputDirectory, $configFile, $fileHash, $imageFormat)
     {
-        wm_debug("Format is passed as $imageFormat\n");
-
         $this->mapConfigFileName = $configDirectory . DIRECTORY_SEPARATOR . $configFile;
         $this->htmlOutputFileName = $outputDirectory . DIRECTORY_SEPARATOR . $fileHash.".html";
         $this->imageOutputFileName = $outputDirectory . DIRECTORY_SEPARATOR . $fileHash.".".$imageFormat;
@@ -52,8 +50,6 @@ class WeatherMapRunner
         $this->resultsOutputFileName = $outputDirectory . DIRECTORY_SEPARATOR . $fileHash . '.results.txt';
         // temporary file used to write files before moving them into place
         $this->workingImageFileName = $outputDirectory . DIRECTORY_SEPARATOR . $fileHash . '.tmp.png';
-
-        wm_debug("Output image is ".$this->imageOutputFileName."\n");
 
         $this->filehash = $fileHash;
 
@@ -131,7 +127,11 @@ class WeatherMapRunner
 
         $this->dataTime = microtime(true);
 
-        $this->mapObject->drawMapImage($this->workingImageFileName, $this->thumbnailImageFileName, read_config_option("weathermap_thumbsize"));
+        $this->mapObject->drawMapImage(
+            $this->workingImageFileName,
+            $this->thumbnailImageFileName,
+            intval(read_config_option("weathermap_thumbsize"))
+        );
 
         $this->endTime = microtime(true);
 
@@ -163,10 +163,10 @@ class WeatherMapRunner
             rename($this->workingImageFileName, $this->imageOutputFileName);
         }
 
-        $gdThumbImage = imagecreatefrompng($this->thumbnailImageFileName);
+        $gdThumbImage = imagecreatefrompng($this->thumbnailImageFileName); // TODO - this might not be a PNG
         $gdThumb48Image = imagecreatetruecolor(48, 48);
         imagecopyresampled($gdThumb48Image, $gdThumbImage, 0, 0, 0, 0, 48, 48, imagesx($gdThumbImage), imagesy($gdThumbImage));
-        imagepng($gdThumb48Image, $this->thumbimagefile2);
+        imagepng($gdThumb48Image, $this->thumbimagefile2); // TODO - this might not be a PNG
         imagedestroy($gdThumb48Image);
         imagedestroy($gdThumbImage);
 
@@ -177,7 +177,7 @@ class WeatherMapRunner
         }
 
         if (intval($this->mapObject->thumb_width) > 0) {
-            db_execute(sprintf(
+            WMCactiAPI::executeDBQuery(sprintf(
                 "update weathermap_maps set thumb_width='%d', thumb_height='%d' where id=%d",
                 $this->mapObject->thumb_width,
                 $this->mapObject->thumb_height,

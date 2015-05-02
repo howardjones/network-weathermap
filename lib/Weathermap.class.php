@@ -1309,7 +1309,7 @@ class WeatherMap extends WeatherMapBase
         }
     }
 
-    function drawMapImage($filename = '', $thumbnailfile = '', $thumbnailmax = 250, $withnodes = true, $use_via_overlay = false, $use_rel_overlay = false)
+    function drawMapImage($imageFileName = '', $thumbnailFileName = '', $thumbnailMaxSize = 250, $includeNodes = true, $showVIAOverlay = false, $showRelativeOverlay = false)
     {
         wm_debug("Trace: DrawMap()\n");
 
@@ -1394,28 +1394,26 @@ class WeatherMap extends WeatherMapBase
         // $overlay = myimagecolorallocate($image, 200, 0, 0);
 
         // for the editor, we can optionally overlay some other stuff
-        if ($this->context == 'editor') {
-            if ($use_rel_overlay) {
-                $this->drawRelativePositionOverlay($imageRef, $this->selected);
-            }
+        if ($showRelativeOverlay) {
+            $this->drawRelativePositionOverlay($imageRef, $this->selected);
+        }
 
-            if ($use_via_overlay) {
-                $this->drawViaOverlay($imageRef, $this->selected);
-            }
+        if ($showVIAOverlay) {
+            $this->drawViaOverlay($imageRef, $this->selected);
         }
 
         // Ready to output the results...
 
-        if ($filename == 'null') {
+        if ($imageFileName == 'null') {
             // do nothing at all - we just wanted the HTML AREAs for the editor or HTML output
         } else {
             // write to the standard output (for the editor)
-            if ($filename == '') {
+            if ($imageFileName == '') {
                 imagepng($imageRef);
             } else {
                 // write to a file
-                $this->writeImageFile($filename, $imageRef);
-                $this->createThumbnailFile($thumbnailfile, $imageRef, $thumbnailmax);
+                $this->writeImageFile($imageFileName, $imageRef);
+                $this->createThumbnailFile($thumbnailFileName, $imageRef, $thumbnailMaxSize);
             }
         }
 
@@ -1425,6 +1423,8 @@ class WeatherMap extends WeatherMapBase
     // if one is specified, and we can, write a thumbnail too
     protected function createThumbnailFile($outputFileName, $sourceImageRef, $maximumDimension)
     {
+        wm_debug("Writing thumbnail to %s\n", $outputFileName);
+        wm_debug("Map size is (%dx%d), sized to %d\n", $this->width, $this->height, $maximumDimension);
 
         if (!function_exists('imagecopyresampled')) {
             wm_warn("Skipping thumbnail creation, since we don't have the necessary function. [WMWARN17]");
@@ -1436,20 +1436,38 @@ class WeatherMap extends WeatherMapBase
         }
 
         if ($this->width > $this->height) {
-            $factor = ($maximumDimension / $this->width);
+            $scaleFactor = ($maximumDimension / $this->width);
         } else {
-            $factor = ($maximumDimension / $this->height);
+            $scaleFactor = ($maximumDimension / $this->height);
         }
 
-        $this->thumb_width = $this->width * $factor;
-        $this->thumb_height = $this->height * $factor;
+        $this->thumb_width = $this->width * $scaleFactor;
+        $this->thumb_height = $this->height * $scaleFactor;
 
+        $fileHandle = fopen($outputFileName, "w+");
+        if (false === $fileHandle) {
+            wm_warn("Couldn't write to $outputFileName.");
+        } else {
+            wm_debug("Created file OK, deleting it now.\n");
+            fclose($fileHandle);
+            wm_debug("Test file closed.\n");
+            unlink($outputFileName);
+            wm_debug("Test file deleted.\n");
+        }
+
+        wm_debug("Creating thumbnail %dx%d...(factor was %f)\n", $this->thumb_width, $this->thumb_height, $scaleFactor);
         $thumbImageRef = imagecreatetruecolor($this->thumb_width, $this->thumb_height);
         imagecopyresampled($thumbImageRef, $sourceImageRef, 0, 0, 0, 0, $this->thumb_width, $this->thumb_height, $this->width, $this->height);
         $result = imagepng($thumbImageRef, $outputFileName);
         imagedestroy($thumbImageRef);
 
-        if ($result!==false) {
+        if ($result !== false) {
+            if (file_exists($outputFileName)) {
+                wm_debug("Wrote thumbnail OK\n");
+            } else {
+                wm_warn("Thumbnail file doesn't exist after writing: $outputFileName");
+            }
+
             return;
         }
 
@@ -1810,13 +1828,13 @@ class WeatherMap extends WeatherMapBase
         $result = false;
         $functions = true;
 
-        if (function_exists('imagejpeg') && preg_match("/\.jpg/i", $filename)) {
+        if (function_exists('imagejpeg') && preg_match('/\.jpg/i', $filename)) {
             wm_debug("Writing JPEG file to $filename\n");
             $result = imagejpeg($imageRef, $filename);
-        } elseif (function_exists('imagegif') && preg_match("/\.gif/i", $filename)) {
+        } elseif (function_exists('imagegif') && preg_match('/\.gif/i', $filename)) {
             wm_debug("Writing GIF file to $filename\n");
             $result = imagegif($imageRef, $filename);
-        } elseif (function_exists('imagepng') && preg_match("/\.png/i", $filename)) {
+        } elseif (function_exists('imagepng') && preg_match('/\.png/i', $filename)) {
             wm_debug("Writing PNG file to $filename\n");
             $result = imagepng($imageRef, $filename);
         } else {
@@ -1883,6 +1901,7 @@ class WeatherMap extends WeatherMapBase
                 } else {
                     $this->width = imagesx($bgImageRef);
                     $this->height = imagesy($bgImageRef);
+                    wm_debug("Resizing map to background image (%dx%d)\n", $this->width, $this->height);
                 }
             } else {
                 wm_warn("Your background image file could not be read. Check the filename, and permissions, for $background\n");

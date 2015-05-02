@@ -157,7 +157,7 @@ function weathermap_setup_table()
 
     // only bother with all this if it's a new install, a new version, or we're in a development version
     // - saves a handful of db hits per request!
-    if ($dbversion != "" && $dbversion == $myversion) {
+    if (strstr($myversion, "dev")===false && $dbversion != "" && $dbversion == $myversion) {
         return;
     }
 
@@ -475,6 +475,8 @@ function weathermap_show_tab()
 
 function weathermap_draw_navigation_text($nav)
 {
+    // I don't really know how this works! There needs to be one entry for each action though.
+
     $nav["weathermap-cacti-plugin.php:"] = array("title" => "Weathermap", "mapping" => "index.php:", "url" => "weathermap-cacti-plugin.php", "level" => "1");
     $nav["weathermap-cacti-plugin.php:viewmap"] = array("title" => "Weathermap", "mapping" => "index.php:", "url" => "weathermap-cacti-plugin.php", "level" => "1");
     $nav["weathermap-cacti-plugin.php:viewmapcycle"] = array("title" => "Weathermap", "mapping" => "index.php:", "url" => "weathermap-cacti-plugin.php", "level" => "1");
@@ -514,6 +516,8 @@ function weathermap_draw_navigation_text($nav)
     $nav["weathermap-cacti-plugin-mgmt.php:chgroup_update"] = array("title" => "Weathermap Management", "mapping" => "index.php:", "url" => "weathermap-cacti-plugin-mgmt.php", "level" => "1");
     $nav["weathermap-cacti-plugin-mgmt.php:groupadmin"] = array("title" => "Weathermap Management", "mapping" => "index.php:", "url" => "weathermap-cacti-plugin-mgmt.php", "level" => "1");
     $nav["weathermap-cacti-plugin-mgmt.php:groupadmin_delete"] = array("title" => "Weathermap Management", "mapping" => "index.php:", "url" => "weathermap-cacti-plugin-mgmt.php", "level" => "1");
+
+    $nav["weathermap-cacti-plugin-mgmt.php:settings_dump"] = array("title" => "Weathermap Management", "mapping" => "index.php:", "url" => "weathermap-cacti-plugin-mgmt.php", "level" => "1");
 
     return $nav;
 }

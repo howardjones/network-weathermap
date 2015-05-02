@@ -36,6 +36,7 @@ class WeatherMapCactiManagementPlugin extends WeatherMapUIBase
         'move_group_down' => array('handler' => 'handleGroupOrderDown', 'args' => array()),
         'rebuildnow' => array('handler' => 'handleRebuildNowStep1', 'args' => array()),
         'rebuildnow2' => array('handler' => 'handleRebuildNowStep2', 'args' => array()),
+        'settingsdump' => array('handler' => 'handleDumpSettings', 'args' => array()),
         ':: DEFAULT ::' => array('handler' => 'handleManagementMainScreen', 'args' => array())
     );
 
@@ -55,6 +56,32 @@ class WeatherMapCactiManagementPlugin extends WeatherMapUIBase
         require_once $this->cactiBasePath . "/include/top_header.php";
         // $this->wmMapManagementList4();
         $this->wmMapManagementList();
+
+        wmGenerateFooterLinks();
+        require_once $this->cactiBasePath . "/include/bottom_footer.php";
+    }
+
+    /**
+     */
+    public function handleDumpSettings($request, $appObject)
+    {
+        require_once $this->cactiBasePath . "/include/top_header.php";
+
+        $SQL = "select * from settings where name like 'weathermap_%' order by name";
+
+        $queryResults = db_fetch_assoc($SQL);
+
+        print "<table>";
+
+        foreach ($queryResults as $setting) {
+            printf(
+                "<tr><th>%s</th><td>%s</td></tr>\n",
+                htmlspecialchars($setting['name']),
+                htmlspecialchars($setting['value'])
+            );
+        }
+
+        print "</table>";
 
         wmGenerateFooterLinks();
         require_once $this->cactiBasePath . "/include/bottom_footer.php";
@@ -586,6 +613,8 @@ class WeatherMapCactiManagementPlugin extends WeatherMapUIBase
             }
         }
 
+        print "<p><a href='?action=settingsdump'>Cacti Settings Dump</a> (temporary link)</p>";
+
         html_start_box("<strong>Weathermaps</strong>", "78%", $this->colours["header"], "3", "center", "weathermap-cacti-plugin-mgmt.php?action=addmap_picker");
 
         $headers = array("", "Config File", "Title", "Group", "Last Run", "Active", "Settings", "Sort Order", "Accessible By", "");
@@ -927,13 +956,14 @@ class WeatherMapCactiManagementPlugin extends WeatherMapUIBase
             $SQL = "insert into weathermap_maps (configfile,titlecache,active,imagefile,htmlfile,filehash,config) VALUES ('$file','$title','on','','','','')";
             db_execute($SQL);
 
-            // add auth for 'admin'
+            // add auth for current user
             $last_id = mysql_insert_id();
             // $myuid = (int)$_SESSION["sess_user_id"];
             $myuid = (isset($_SESSION["sess_user_id"]) ? intval($_SESSION["sess_user_id"]) : 1);
             $SQL = "insert into weathermap_auth (mapid,userid) VALUES ($last_id,$myuid)";
             db_execute($SQL);
 
+            // Now we know the database ID, figure out the filehash
             db_execute("update weathermap_maps set filehash=LEFT(MD5(concat(id,configfile,rand())),20) where id=$last_id");
 
             $this->wmMapResort();

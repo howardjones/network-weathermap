@@ -7,6 +7,9 @@ class WeatherMapCactiUserPlugin extends WeatherMapUIBase
     public $config;
     public $colours;
 
+    private $outputDirectory;
+    private $imageFormat;
+
     public $commands = array(
         'viewthumb' => array('handler' => 'handleBigThumb', 'args' => array(array("id", "hash"))),
         'viewthumb48' => array('handler' => 'handleLittleThumb', 'args' => array(array("id", "hash"))),
@@ -25,10 +28,13 @@ class WeatherMapCactiUserPlugin extends WeatherMapUIBase
         )
     );
 
-    public function __construct($config, $colours)
+    public function __construct($config, $colours, $imageFormat)
     {
         $this->colours = $colours;
         $this->config = $config;
+
+        $this->outputDirectory = realpath(dirname(__FILE__) . '/../output/');
+        $this->imageFormat = $imageFormat;
     }
 
     /**
@@ -66,11 +72,11 @@ class WeatherMapCactiUserPlugin extends WeatherMapUIBase
         }
 
         if ($pageStyle == 1) {
-            $this->wmuiFullMapView(false, false, $group_id);
+            $this->drawFullMapView(false, false, $group_id);
         }
 
         if ($pageStyle == 2) {
-            $this->wmuiFullMapView(false, true, $group_id);
+            $this->drawFullMapView(false, true, $group_id);
         }
 
         $this->outputVersionBox();
@@ -143,7 +149,7 @@ class WeatherMapCactiUserPlugin extends WeatherMapUIBase
             $groupid = intval($request['group']);
         }
 
-        $this->wmuiFullMapView(true, false, $groupid, $fullscreen);
+        $this->drawFullMapView(true, false, $groupid, $fullscreen);
 
         if ($fullscreen === true) {
             print "</body></html>";
@@ -178,8 +184,6 @@ class WeatherMapCactiUserPlugin extends WeatherMapUIBase
         if ($mapID < 0) {
             return;
         }
-        $imageFormat = strtolower(read_config_option("weathermap_output_format"));
-
         $userID = $this->getCactiUserID();
 
         $map = db_fetch_assoc("select weathermap_maps.* from weathermap_auth,weathermap_maps where weathermap_maps.id=weathermap_auth.mapid and (userid=" . $userID . " or userid=0) and  active='on' and weathermap_maps.id=" . $mapID . " LIMIT 1");
@@ -199,7 +203,7 @@ class WeatherMapCactiUserPlugin extends WeatherMapUIBase
             $insert = ".thumb48.";
         }
 
-        $imageFileName = dirname(__FILE__) . '/../output/' . $map[0]['filehash'] . $insert . $imageFormat;
+        $imageFileName = $this->outputDirectory . '/' . $map[0]['filehash'] . $insert . $this->imageFormat;
 
         header('Content-type: image/png');
 
@@ -216,7 +220,7 @@ class WeatherMapCactiUserPlugin extends WeatherMapUIBase
 
         $is_wm_admin = false;
 
-        $outputDirectory = dirname(__FILE__) . '/../output/';
+        $outputDirectory = $this->outputDirectory;
 
         $userid = wmGetCactiUserID();
         $map = db_fetch_assoc("select weathermap_maps.* from weathermap_auth,weathermap_maps where weathermap_maps.id=weathermap_auth.mapid and active='on' and (userid=" . $userid . " or userid=0) and weathermap_maps.id=" . $mapid);
@@ -227,7 +231,7 @@ class WeatherMapCactiUserPlugin extends WeatherMapUIBase
 
         print do_hook_function('weathermap_page_top', '');
 
-        $htmlFileName = $outputDirectory . $map[0]['filehash'] . ".html";
+        $htmlFileName = $outputDirectory . DIRECTORY_SEPARATOR . $map[0]['filehash'] . ".html";
         $mapTitle = ($map[0]['titlecache'] == "" ? "Map for config file: " . $map[0]['configfile'] : $map[0]['titlecache']);
 
         wmGenerateMapSelectorBox($mapid);
@@ -284,32 +288,33 @@ class WeatherMapCactiUserPlugin extends WeatherMapUIBase
         html_graph_end_box();
     }
 
-    public function wmuiThumbnailView($limit_to_group = -1)
+    public function wmuiThumbnailView($limitToGroup = -1)
     {
-        $mapList = $this->getAuthorisedMaps($limit_to_group);
+        $mapList = $this->getAuthorisedMaps($limitToGroup);
         $mapCount = sizeof($mapList);
 
-        // if there's only one map, ignore the thumbnail setting and show it fullsize
+        // if there's only one map, ignore the thumbnail setting and show it full size
         if ($mapCount == 1) {
-            $this->wmuiFullMapView(false, false, $limit_to_group);
+            $this->drawFullMapView(false, false, $limitToGroup, false);
             return;
         }
+
         if ($mapCount > 1) {
-            $this->drawThumbnailView($limit_to_group, $mapList);
+            $this->drawThumbnailView($mapList, $limitToGroup);
             return;
         }
 
         print "<div align=\"center\" style=\"padding:20px\"><em>You Have No Maps</em></div>\n";
     }
 
-    public function wmuiFullMapView($cycle = false, $firstonly = false, $limit_to_group = -1, $fullscreen = false)
+    public function drawFullMapView($cycle = false, $firstOnly = false, $limitToGroup = -1, $showFullscreen = false)
     {
         $colors = $this->colours;
 
         $_SESSION['custom'] = false;
-        $mapList = $this->getAuthorisedMaps($limit_to_group);
+        $mapList = $this->getAuthorisedMaps($limitToGroup);
 
-        if ($firstonly) {
+        if ($firstOnly) {
             $mapList = array($mapList[0]);
         }
 
@@ -323,7 +328,7 @@ class WeatherMapCactiUserPlugin extends WeatherMapUIBase
         if ($cycle) {
             $class = "inplace";
         }
-        if ($fullscreen) {
+        if ($showFullscreen) {
             $class = "fullscreen";
         }
 
@@ -331,7 +336,7 @@ class WeatherMapCactiUserPlugin extends WeatherMapUIBase
             print "<script src='vendor/jquery/dist/jquery.min.js'></script>";
             print "<script src='vendor/jquery-idletimer/dist/idle-timer.min.js'></script>";
             $extra = "";
-            if ($limit_to_group > 0) {
+            if ($limitToGroup > 0) {
                 $extra = " in this group";
             }
             ?>
@@ -347,7 +352,7 @@ class WeatherMapCactiUserPlugin extends WeatherMapUIBase
                     <a id="cycle_next" href="#"><img border="0" src="cacti-resources/img/control_fastforward_blue.png"
                                                      width="16" height="16"/></a>
                     <a id="cycle_fullscreen"
-                       href="?action=viewmapcycle&fullscreen=1&group=<?php echo $limit_to_group; ?>"><img border="0"
+                       href="?action=viewmapcycle&fullscreen=1&group=<?php echo $limitToGroup; ?>"><img border="0"
                                                                                                           src="cacti-resources/img/arrow_out.png"
                                                                                                           width="16"
                                                                                                           height="16"/></a>
@@ -359,7 +364,7 @@ class WeatherMapCactiUserPlugin extends WeatherMapUIBase
         }
 
         // only draw the whole screen if we're not cycling, or we're cycling without fullscreen mode
-        if ($cycle === false || $fullscreen === false) {
+        if ($cycle === false || $showFullscreen === false) {
             html_graph_start_box(2, true);
             ?>
             <tr bgcolor="<?php print $colors["panel"]; ?>">
@@ -373,8 +378,8 @@ class WeatherMapCactiUserPlugin extends WeatherMapUIBase
                                     ?>
                                     (automatically cycle between full-size maps (<?php
 
-                                    if ($limit_to_group > 0) {
-                                        print '<a href = "?action=viewmapcycle&group=' . intval($limit_to_group)
+                                    if ($limitToGroup > 0) {
+                                        print '<a href = "?action=viewmapcycle&group=' . intval($limitToGroup)
                                             . '">within this group</a>, or ';
                                     }
                                     print ' <a href = "?action=viewmapcycle">all maps</a>';
@@ -391,22 +396,21 @@ class WeatherMapCactiUserPlugin extends WeatherMapUIBase
             <?php
             html_graph_end_box();
 
-            $this->generateGroupTabs($limit_to_group);
+            $this->generateGroupTabs($limitToGroup);
         }
 
         if (sizeof($mapList) > 0) {
             print "<div class='all_map_holder $class'>";
 
-            $outdir = dirname(__FILE__) . '/../output/';
             foreach ($mapList as $map) {
-                $htmlfile = $outdir . $map['filehash'] . ".html";
+                $htmlfile = $this->outputDirectory . DIRECTORY_SEPARATOR . $map['filehash'] . ".html";
                 $maptitle = $map['titlecache'];
                 if ($maptitle == '') {
                     $maptitle = "Map for config file: " . $map['configfile'];
                 }
 
                 print '<div class="weathermapholder" id="mapholder_' . $map['filehash'] . '">';
-                if ($cycle === false || $fullscreen === false) {
+                if ($cycle === false || $showFullscreen === false) {
                     html_graph_start_box(1, true);
 
                     ?>
@@ -434,7 +438,7 @@ class WeatherMapCactiUserPlugin extends WeatherMapUIBase
                 }
 
 
-                if ($cycle === false || $fullscreen === false) {
+                if ($cycle === false || $showFullscreen === false) {
                     print '</td></tr>';
                     html_graph_end_box();
                 }
@@ -443,15 +447,15 @@ class WeatherMapCactiUserPlugin extends WeatherMapUIBase
             print "</div>";
 
             if ($cycle) {
-                $refreshtime = read_config_option("weathermap_cycle_refresh");
-                $poller_cycle = read_config_option("poller_interval"); ?>
+                $refreshTime = read_config_option("weathermap_cycle_refresh");
+                $pollerInterval = read_config_option("poller_interval"); ?>
                 <script type="text/javascript" src="cacti-resources/map-cycle.js"></script>
                 <script type="text/javascript">
                     $(document).ready(public function () {
                         WMcycler.start({
-                            fullscreen: <?php echo ($fullscreen ? "1" : "0"); ?>,
-                            poller_cycle: <?php echo $poller_cycle * 1000; ?>,
-                            period: <?php echo $refreshtime  * 1000; ?>
+                            fullscreen: <?php echo ($showFullscreen ? "1" : "0"); ?>,
+                            poller_cycle: <?php echo $pollerInterval * 1000; ?>,
+                            period: <?php echo $refreshTime  * 1000; ?>
                         });
                     });
                 </script>
@@ -671,10 +675,10 @@ class WeatherMapCactiUserPlugin extends WeatherMapUIBase
     }
 
     /**
-     * @param $limit_to_group
-     * @param $maplist
+     * @param $limitToGroup
+     * @param $mapList
      */
-    private function drawThumbnailView($limit_to_group, $maplist)
+    private function drawThumbnailView($mapList, $limitToGroup)
     {
         $colors = $this->colours;
 
@@ -687,8 +691,8 @@ class WeatherMapCactiUserPlugin extends WeatherMapUIBase
                         <td class="textHeader" nowrap>Network Weathermaps</td>
                         <td align="right">
                             automatically cycle between full-size maps (<?php
-                            if ($limit_to_group > 0) {
-                                print '<a href = "?action=viewmapcycle&group=' . intval($limit_to_group) . '">within this group</a>, or ';
+                            if ($limitToGroup > 0) {
+                                print '<a href = "?action=viewmapcycle&group=' . intval($limitToGroup) . '">within this group</a>, or ';
                             }
                             print ' <a href = "?action=viewmapcycle">all maps</a>'; ?>)
                         </td>
@@ -704,15 +708,12 @@ class WeatherMapCactiUserPlugin extends WeatherMapUIBase
         html_graph_end_box();
         $showLiveLinks = intval(read_config_option("weathermap_live_view"));
 
-        $this->generateGroupTabs($limit_to_group);
-        if (sizeof($maplist) > 0) {
-            $outdir = dirname(__FILE__) . '/../output/';
-            $imageformat = strtolower(read_config_option("weathermap_output_format"));
-
+        $this->generateGroupTabs($limitToGroup);
+        if (sizeof($mapList) > 0) {
             html_graph_start_box(1, false);
             print "<tr><td class='wm_gallery'>";
-            foreach ($maplist as $map) {
-                $this->drawOneThumbnail($map, $imageformat, $showLiveLinks, $outdir);
+            foreach ($mapList as $map) {
+                $this->drawOneThumbnail($map, $showLiveLinks);
             }
             print "</td></tr>";
             html_graph_end_box();
@@ -746,11 +747,11 @@ class WeatherMapCactiUserPlugin extends WeatherMapUIBase
      * @param $showLiveLinks
      * @param $imageDirectory
      */
-    private function drawOneThumbnail($mapRecord, $imageFormat, $showLiveLinks, $imageDirectory)
+    private function drawOneThumbnail($mapRecord, $showLiveLinks)
     {
         $imgSize = "";
-        $thumbnailFilename = $imageDirectory . $mapRecord['filehash'] . ".thumb." . $imageFormat;
-        $thumbnailURL = "?action=viewthumb&id=" . $mapRecord['filehash'] . "&time=" . time();
+        $thumbnailFilename = $this->outputDirectory . DIRECTORY_SEPARATOR .  $mapRecord['filehash'] . ".thumb." . $this->imageFormat;
+        $thumbnailImageURL = "?action=viewthumb&id=" . $mapRecord['filehash'] . "&time=" . time();
 
         if ($mapRecord['thumb_width'] > 0) {
             $imgSize = sprintf(' WIDTH="%d" HEIGHT="%d" ', $mapRecord['thumb_width'], $mapRecord['thumb_height']);
@@ -763,10 +764,10 @@ class WeatherMapCactiUserPlugin extends WeatherMapUIBase
         if (file_exists($thumbnailFilename)) {
             print '<div class="wm_thumbtitle" style="font-size: 1.2em; font-weight: bold; text-align: center">' . $mapTitle;
             print '</div><a href="weathermap-cacti-plugin.php?action=viewmap&id=' . $mapRecord['filehash'];
-            print '"><img class="wm_thumb" ' . $imgSize . 'src="' . $thumbnailURL . '" alt="' . $mapTitle;
+            print '"><img class="wm_thumb" ' . $imgSize . 'src="' . $thumbnailImageURL . '" alt="' . $mapTitle;
             print '" border="0" hspace="5" vspace="5" title="' . $mapTitle . '"/></a>';
         } else {
-            print "(thumbnail for map not created yet)";
+            print "(thumbnail for map not created yet for $thumbnailFilename)";
         }
         if ($showLiveLinks == 1) {
             print "<a href='?action=liveview&id=" . $mapRecord['filehash'] . "'>(live)</a>";

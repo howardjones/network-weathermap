@@ -35,7 +35,7 @@ function plugin_weathermap_uninstall()
     // This function doesn't seem to ever be called, in Cacti 0.8.8b
     // on the assumption that it will one day work, clear the stored version number from the settings
     // so that an uninstall/reinstall on the plugin would force the db schema to be checked
-    set_config_option("weathermap_version", "");
+    WMCactiAPI::setConfigOption("weathermap_version", "");
 }
 
 function plugin_weathermap_version()
@@ -69,5 +69,6 @@ function plugin_weathermap_upgrade()
 
 require "lib/cacti-plugin-hooks.php";
 require "lib/cacti-plugin-poller.php";
+require "lib/WMCactiAPI.class.php";
 
 // vim:ts=4:sw=4:

@@ -11,6 +11,7 @@ require_once "./include/auth.php";
 require_once dirname(__FILE__)."/lib/globals.php";
 require_once dirname(__FILE__)."/lib/cacti-plugin-user.php";
 require_once dirname(__FILE__)."/lib/cacti-plugin-common.php";
+require_once dirname(__FILE__)."/lib/WMCactiAPI.class.php";
 
 $action = "";
 if (isset($_POST['action'])) {
@@ -19,7 +20,7 @@ if (isset($_POST['action'])) {
     $action = $_GET['action'];
 }
 
-$plugin = new WeatherMapCactiUserPlugin($config, $colors);
+$plugin = new WeatherMapCactiUserPlugin($config, $color, WMCactiAPI::getConfigOption("weathermap_image_format", "png"));
 
 $plugin->dispatchRequest($action, $_REQUEST, null);
 

@@ -48,42 +48,16 @@ function wm_module_checks()
  */
 function wm_debug($string)
 {
-    global $weathermap_debugging;
-    global $weathermap_debugging_readdata;
     global $weathermap_map;
-    global $weathermap_debug_suppress;
-    
-    if ($weathermap_debugging_readdata) {
-        $is_readdata = false;
-        
-        if (false !== strpos("ReadData", $string)) {
-            $is_readdata = true;
-        }
-    }
-    
-    if ($weathermap_debugging || ($weathermap_debugging_readdata && $is_readdata)) {
+
+    if (wm_debug_shouldDebug($string)) {
         if (func_num_args() > 1) {
             $args = func_get_args();
             $string = call_user_func_array('sprintf', $args);
         }
         
-        $calling_fn = "";
-        if (function_exists("debug_backtrace")) {
-            $backtrace = debug_backtrace();
-            $index = 1;
-            
-            $function = (true === isset($backtrace[$index]['function'])) ? $backtrace[$index]['function'] : '';
-            $index = 0;
-            $file = (true === isset($backtrace[$index]['file'])) ? basename($backtrace[$index]['file']) : '';
-            $line = (true === isset($backtrace[$index]['line'])) ? $backtrace[$index]['line'] : '';
-            
-            $calling_fn = " [$function@$file:$line]";
-            
-            if (is_array($weathermap_debug_suppress) && in_array(strtolower($function), $weathermap_debug_suppress)) {
-                return;
-            }
-        }
-        
+        $calling_fn = wm_debug_getCallingFunction();
+
         // use Cacti's debug log, if we are running from the poller
         if (function_exists('debug_log_insert') && (! function_exists('wmeShowStartPage'))) {
             cacti_log("DEBUG:$calling_fn " . ($weathermap_map == '' ? '' : $weathermap_map . ": ") . rtrim($string), true, "WEATHERMAP");
@@ -91,15 +65,54 @@ function wm_debug($string)
             $stderr = fopen('php://stderr', 'w');
             fwrite($stderr, "DEBUG:$calling_fn " . ($weathermap_map == '' ? '' : $weathermap_map . ": ") . $string);
             fclose($stderr);
-            
-            // mostly this is overkill, but it's sometimes useful (mainly in the editor)
-            if (1 == 0) {
-                $log = fopen('debug.log', 'a');
-                fwrite($log, "DEBUG:$calling_fn " . ($weathermap_map == '' ? '' : $weathermap_map . ": ") . $string);
-                fclose($log);
-            }
         }
     }
+}
+
+/**
+ * @param $string
+ * @param $weathermap_debugging_readdata
+ * @return bool
+ */
+function wm_debug_shouldDebug($string)
+{
+    global $weathermap_debugging_readdata;
+    global $weathermap_debugging;
+
+    if ($weathermap_debugging_readdata) {
+        $isReadData = false;
+
+        if (false !== strpos("ReadData", $string)) {
+            $isReadData = true;
+        }
+    }
+
+    if ($weathermap_debugging || ($weathermap_debugging_readdata && $isReadData)) {
+        return true;
+    }
+    return false;
+}
+
+/**
+ * @return string
+ */
+function wm_debug_getCallingFunction()
+{
+    $calling_fn = "";
+
+    if (function_exists("debug_backtrace")) {
+        $backtrace = debug_backtrace();
+        $index = 2;
+
+        $function = (true === isset($backtrace[$index]['function'])) ? $backtrace[$index]['function'] : '';
+        $index = 0;
+        $file = (true === isset($backtrace[$index]['file'])) ? basename($backtrace[$index]['file']) : '';
+        $line = (true === isset($backtrace[$index]['line'])) ? $backtrace[$index]['line'] : '';
+
+        $calling_fn = " [$function@$file:$line]";
+        return $calling_fn;
+    }
+    return $calling_fn;
 }
 
 function wm_warn($string, $notice_only = false, $code = "")
@@ -461,58 +474,53 @@ function wmDrawMarkerCross($gdImage, $colour, $point, $size = 5)
 
 function wmDrawMarkerDiamond($gdImage, $colour, $point, $size = 10)
 {
-    $x = $point->x;
-    $y = $point->y;
-
     $points = array ();
-    
-    $points[] = $x - $size;
-    $points[] = $y;
-    
-    $points[] = $x;
-    $points[] = $y - $size;
-    
-    $points[] = $x + $size;
-    $points[] = $y;
-    
-    $points[] = $x;
-    $points[] = $y + $size;
-    
-    $num_points = 4;
-    
-    imagepolygon($gdImage, $points, $num_points, $colour);
+
+    $point->translate(-$size, 0);
+    $points[] = $point->x;
+    $points[] = $point->y;
+
+    $point->translate($size, -$size);
+    $points[] = $point->x;
+    $points[] = $point->y;
+
+    $point->translate($size, $size);
+    $points[] = $point->x;
+    $points[] = $point->y;
+
+    $point->translate(-$size, $size);
+    $points[] = $point->x;
+    $points[] = $point->y;
+
+    imagepolygon($gdImage, $points, 4, $colour);
 }
 
 function wmDrawMarkerBox($gdImage, $colour, $point, $size = 10)
 {
-    $x = $point->x;
-    $y = $point->y;
-
     $points = array ();
-    
-    $points[] = $x - $size;
-    $points[] = $y - $size;
-    
-    $points[] = $x + $size;
-    $points[] = $y - $size;
-    
-    $points[] = $x + $size;
-    $points[] = $y + $size;
-    
-    $points[] = $x - $size;
-    $points[] = $y + $size;
-    
-    $num_points = 4;
-    
-    imagepolygon($gdImage, $points, $num_points, $colour);
+
+    $point->translate(-$size, -$size);
+    $points[] = $point->x;
+    $points[] = $point->y;
+
+    $point->translate($size *2, 0);
+    $points[] = $point->x;
+    $points[] = $point->y;
+
+    $point->translate(0, $size *2);
+    $points[] = $point->x;
+    $points[] = $point->y;
+
+    $point->translate(-$size *2, 0);
+    $points[] = $point->x;
+    $points[] = $point->y;
+
+    imagepolygon($gdImage, $points, 4, $colour);
 }
 
 function wmDrawMarkerCircle($gdImage, $colour, $point, $size = 10)
 {
-    $x = $point->x;
-    $y = $point->y;
-
-    imagearc($gdImage, $x, $y, $size, $size, 0, 360, $colour);
+    imagearc($gdImage, $point->x, $point->y, $size, $size, 0, 360, $colour);
 }
 
 /**

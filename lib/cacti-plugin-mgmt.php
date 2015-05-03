@@ -12,28 +12,37 @@ class WeatherMapCactiManagementPlugin extends WeatherMapUIBase
     public $i_understand_file_permissions_and_how_to_fix_them;
 
     public $commands = array(
-        'groupadmin_delete' => array('handler' => 'handleGroupDelete', 'args' => array()),
+        'groupadmin_delete' => array('handler' => 'handleGroupDelete', 'args' => array(array("id","int"))),
         'groupadmin' => array('handler' => 'handleGroupSelect', 'args' => array()),
-        'group_form' => array('handler' => 'handleGroupForm', 'args' => array()),
-        'chgroup_update' => array('handler' => 'handleChangeGroup', 'args' => array()),
-        'chgroup' => array('handler' => 'handleGroupChangeForm', 'args' => array()),
-        'map_settings_delete' => array('handler' => 'handleMapSettingsDelete', 'args' => array()),
-        'map_settings_form' => array('handler' => 'handleMapSettingsForm', 'args' => array()),
-        'map_settings' => array('handler' => 'handleMapSettingsPage', 'args' => array()),
-        'save' => array('handler' => 'handleMapSettingsSave', 'args' => array()),
-        'perms_add_user' => array('handler' => 'handlePermissionsAddUser', 'args' => array()),
-        'perms_delete_user' => array('handler' => 'handlePermissionsDeleteUser', 'args' => array()),
-        'perms_edit' => array('handler' => 'handlePermissionsPage', 'args' => array()),
-        'delete_map' => array('handler' => 'handleDeleteMap', 'args' => array()),
-        'deactivate_map' => array('handler' => 'handleDeactivateMap', 'args' => array()),
-        'activate_map' => array('handler' => 'handleActivateMap', 'args' => array()),
-        'viewconfig' => array('handler' => 'handleViewConfig', 'args' => array()),
+        'group_form' => array('handler' => 'handleGroupForm', 'args' => array(array("id","int"))),
+        'group_update' => array('handler' => 'handleGroupUpdate', 'args' => array(array("id","int"),array("gname","non-empty-string"))),
+        'move_group_up' => array('handler' => 'handleGroupOrderUp', 'args' => array(array("id","int"),array("order","int"))),
+        'move_group_down' => array('handler' => 'handleGroupOrderDown', 'args' => array(array("id","int"),array("order","int"))),
+
+        'chgroup_update' => array('handler' => 'handleMapChangeGroup', 'args' => array(array("map_id","int"),array("new_group","int"))),
+        'chgroup' => array('handler' => 'handleMapGroupChangeForm', 'args' => array(array("id","int"))),
+
+        'map_settings_delete' => array('handler' => 'handleMapSettingsDelete', 'args' => array(array("mapid","int"),array("id","int"))),
+        'map_settings_form' => array('handler' => 'handleMapSettingsForm', 'args' => array(array("mapid","int"))),
+        'map_settings' => array('handler' => 'handleMapSettingsPage', 'args' => array(array("id","int"))),
+        'save' => array('handler' => 'handleMapSettingsSave', 'args' => array(array("mapid","int"),array("id","int"),array("name","non-empty-string"),array("value","string"))),
+
+        'perms_add_user' => array('handler' => 'handlePermissionsAddUser', 'args' => array(array("mapid","int"),array("userid","int"))),
+        'perms_delete_user' => array('handler' => 'handlePermissionsDeleteUser', 'args' => array(array("mapid","int"),array("userid","int"))),
+        'perms_edit' => array('handler' => 'handlePermissionsPage', 'args' => array(array("id","int"))),
+
+        'delete_map' => array('handler' => 'handleDeleteMap', 'args' => array(array("id","int"))),
+        'deactivate_map' => array('handler' => 'handleDeactivateMap', 'args' => array(array("id","int"))),
+        'activate_map' => array('handler' => 'handleActivateMap', 'args' => array(array("id","int"))),
+
         'addmap' => array('handler' => 'handleMapListAdd', 'args' => array(array("file","mapfile"))),
         'addmap_picker' => array('handler' => 'handleMapPicker', 'args' => array(array("show_all", "bool"))),
-        'move_map_up' => array('handler' => 'handleMapOrderUp', 'args' => array()),
-        'move_map_down' => array('handler' => 'handleMapOrderDown', 'args' => array()),
-        'move_group_up' => array('handler' => 'handleGroupOrderUp', 'args' => array()),
-        'move_group_down' => array('handler' => 'handleGroupOrderDown', 'args' => array()),
+
+        'move_map_up' => array('handler' => 'handleMapOrderUp', 'args' => array(array("id","int"),array("order","int"))),
+        'move_map_down' => array('handler' => 'handleMapOrderDown', 'args' => array(array("id","int"),array("order","int"))),
+
+        'viewconfig' => array('handler' => 'handleViewConfig', 'args' => array( array("file","mapfile") )),
+
         'rebuildnow' => array('handler' => 'handleRebuildNowStep1', 'args' => array()),
         'rebuildnow2' => array('handler' => 'handleRebuildNowStep2', 'args' => array()),
         'settingsdump' => array('handler' => 'handleDumpSettings', 'args' => array()),
@@ -53,19 +62,19 @@ class WeatherMapCactiManagementPlugin extends WeatherMapUIBase
      */
     public function handleManagementMainScreen($request, $appObject)
     {
-        require_once $this->cactiBasePath . "/include/top_header.php";
+        WMCactiAPI::pageTopConsole();
         // $this->wmMapManagementList4();
         $this->wmMapManagementList();
 
         wmGenerateFooterLinks();
-        require_once $this->cactiBasePath . "/include/bottom_footer.php";
+        WMCactiAPI::pageBottom();
     }
 
     /**
      */
     public function handleDumpSettings($request, $appObject)
     {
-        require_once $this->cactiBasePath . "/include/top_header.php";
+        WMCactiAPI::pageTopConsole();
 
         $SQL = "select * from settings where name like 'weathermap_%' order by name";
 
@@ -84,7 +93,7 @@ class WeatherMapCactiManagementPlugin extends WeatherMapUIBase
         print "</table>";
 
         wmGenerateFooterLinks();
-        require_once $this->cactiBasePath . "/include/bottom_footer.php";
+        WMCactiAPI::pageBottom();
     }
 
     /**
@@ -94,7 +103,7 @@ class WeatherMapCactiManagementPlugin extends WeatherMapUIBase
         require_once dirname(__FILE__) . DIRECTORY_SEPARATOR . "all.php";
         require_once dirname(__FILE__) . DIRECTORY_SEPARATOR . "lib" . DIRECTORY_SEPARATOR . "poller-common.php";
 
-        require_once $this->cactiBasePath . "/include/top_header.php";
+        WMCactiAPI::pageTopConsole();
         print "<h3>Rebuilding all maps</h3><strong>NOTE: Because your Cacti poller process probably doesn't run as ";
         print "the same user as your webserver, it's possible this will fail with file permission problems even ";
         print "though the normal poller process runs fine. In some situations, it MAY have memory_limit problems, if ";
@@ -104,14 +113,14 @@ class WeatherMapCactiManagementPlugin extends WeatherMapUIBase
 
         print "</pre>";
         print "<hr /><h3>Done.</h3>";
-        require_once $this->cactiBasePath . "/include/bottom_footer.php";
+        WMCactiAPI::pageBottom();
     }
 
     /**
      */
     public function handleRebuildNowStep1($request, $appObject)
     {
-        require_once $this->cactiBasePath . "/include/top_header.php";
+        WMCactiAPI::pageTopConsole();
 
         print "<h3>REALLY Rebuild all maps?</h3><strong>NOTE: Because your Cacti poller process probably doesn't run ";
         print "as the same user as your webserver, it's possible this will fail with file permission problems even ";
@@ -123,7 +132,7 @@ class WeatherMapCactiManagementPlugin extends WeatherMapUIBase
 
         print "<h4><a href=\"weathermap-cacti-plugin-mgmt.php?action=rebuildnow2\">YES</a></h4>";
         print "<h1><a href=\"weathermap-cacti-plugin-mgmt.php\">NO</a></h1>";
-        require_once $this->cactiBasePath . "/include/bottom_footer.php";
+        WMCactiAPI::pageBottom();
     }
 
     /**
@@ -132,7 +141,7 @@ class WeatherMapCactiManagementPlugin extends WeatherMapUIBase
     public function handleMapSettingsForm($request, $appObject)
     {
         if (isset($request['mapid']) && is_numeric($request['mapid'])) {
-            require_once($this->cactiBasePath . "/include/top_header.php");
+            WMCactiAPI::pageTopConsole();
 
             if (isset($request['id']) && is_numeric($request['id'])) {
                 $this->wmuiMapSettingsForm(intval($request['mapid']), intval($request['id']));
@@ -141,7 +150,7 @@ class WeatherMapCactiManagementPlugin extends WeatherMapUIBase
             }
 
             wmGenerateFooterLinks();
-            require_once($this->cactiBasePath . "/include/bottom_footer.php");
+            WMCactiAPI::pageBottom();
         }
     }
 
@@ -205,12 +214,12 @@ class WeatherMapCactiManagementPlugin extends WeatherMapUIBase
     /**
      * @param $request
      */
-    public function handleGroupChangeForm($request, $appObject)
+    public function handleMapGroupChangeForm($request, $appObject)
     {
         if (isset($request['id']) && is_numeric($request['id'])) {
-            require_once($this->cactiBasePath . "/include/top_header.php");
+            WMCactiAPI::pageTopConsole();
             $this->wmuiMapGroupChangePage(intval($request['id']));
-            require_once($this->cactiBasePath . "/include/bottom_footer.php");
+            WMCactiAPI::pageBottom();
         } else {
             print "Something got lost back there.";
         }
@@ -219,7 +228,7 @@ class WeatherMapCactiManagementPlugin extends WeatherMapUIBase
     /**
      * @param $request
      */
-    public function handleChangeGroup($request, $appObject)
+    public function handleMapChangeGroup($request, $appObject)
     {
         $mapid = -1;
         $groupid = -1;
@@ -242,10 +251,10 @@ class WeatherMapCactiManagementPlugin extends WeatherMapUIBase
      */
     public function handleGroupSelect($request, $appObject)
     {
-        require_once($this->cactiBasePath . "/include/top_header.php");
+        WMCactiAPI::pageTopConsole();
         $this->wmuiGroupList();
         wmGenerateFooterLinks();
-        require_once $this->cactiBasePath . "/include/bottom_footer.php";
+        WMCactiAPI::pageBottom();
     }
 
     /**
@@ -255,7 +264,7 @@ class WeatherMapCactiManagementPlugin extends WeatherMapUIBase
     {
         $id = -1;
 
-        require_once $this->cactiBasePath . "/include/top_header.php";
+        WMCactiAPI::pageTopConsole();
         if (isset($request['id']) && is_numeric($request['id'])) {
             $id = intval($request['id']);
         }
@@ -265,7 +274,7 @@ class WeatherMapCactiManagementPlugin extends WeatherMapUIBase
         }
 
         wmGenerateFooterLinks();
-        require_once($this->cactiBasePath . "/include/bottom_footer.php");
+        WMCactiAPI::pageBottom();
     }
 
     /**
@@ -330,7 +339,7 @@ class WeatherMapCactiManagementPlugin extends WeatherMapUIBase
         }
         if (!empty($sql)) {
             for ($a = 0; $a < count($sql); $a++) {
-                $result = db_execute($sql[$a]);
+                $result = WMCactiAPI::executeDBQuery($sql[$a]);
             }
         }
     }
@@ -346,7 +355,7 @@ class WeatherMapCactiManagementPlugin extends WeatherMapUIBase
         }
         if (!empty($sql)) {
             for ($a = 0; $a < count($sql); $a++) {
-                $result = db_execute($sql[$a]);
+                $result = WMCactiAPI::executeDBQuery($sql[$a]);
             }
         }
     }
@@ -369,7 +378,7 @@ class WeatherMapCactiManagementPlugin extends WeatherMapUIBase
         }
         if (!empty($sql)) {
             for ($a = 0; $a < count($sql); $a++) {
-                $result = db_execute($sql[$a]);
+                $result = WMCactiAPI::executeDBQuery($sql[$a]);
             }
         }
     }
@@ -391,7 +400,7 @@ class WeatherMapCactiManagementPlugin extends WeatherMapUIBase
         }
         if (!empty($sql)) {
             for ($a = 0; $a < count($sql); $a++) {
-                $result = db_execute($sql[$a]);
+                $result = WMCactiAPI::executeDBQuery($sql[$a]);
             }
         }
     }
@@ -906,6 +915,8 @@ class WeatherMapCactiManagementPlugin extends WeatherMapUIBase
 
     public function wmuiPreviewConfig($file)
     {
+        $weathermap_confdir = $this->configPath;
+
         chdir($weathermap_confdir);
 
         $path_parts = pathinfo($file);
@@ -954,17 +965,17 @@ class WeatherMapCactiManagementPlugin extends WeatherMapUIBase
             $file = mysql_real_escape_string($file);
             $title = mysql_real_escape_string($title);
             $SQL = "insert into weathermap_maps (configfile,titlecache,active,imagefile,htmlfile,filehash,config) VALUES ('$file','$title','on','','','','')";
-            db_execute($SQL);
+            WMCactiAPI::executeDBQuery($SQL);
 
             // add auth for current user
             $last_id = mysql_insert_id();
             // $myuid = (int)$_SESSION["sess_user_id"];
             $myuid = (isset($_SESSION["sess_user_id"]) ? intval($_SESSION["sess_user_id"]) : 1);
             $SQL = "insert into weathermap_auth (mapid,userid) VALUES ($last_id,$myuid)";
-            db_execute($SQL);
+            WMCactiAPI::executeDBQuery($SQL);
 
             // Now we know the database ID, figure out the filehash
-            db_execute("update weathermap_maps set filehash=LEFT(MD5(concat(id,configfile,rand())),20) where id=$last_id");
+            WMCactiAPI::executeDBQuery("update weathermap_maps set filehash=LEFT(MD5(concat(id,configfile,rand())),20) where id=$last_id");
 
             $this->wmMapResort();
         }
@@ -996,25 +1007,25 @@ class WeatherMapCactiManagementPlugin extends WeatherMapUIBase
     public function wmMapDeactivate($id)
     {
         $SQL = "update weathermap_maps set active='off' where id=" . $id;
-        db_execute($SQL);
+        WMCactiAPI::executeDBQuery($SQL);
     }
 
     public function wmMapActivate($id)
     {
         $SQL = "update weathermap_maps set active='on' where id=" . $id;
-        db_execute($SQL);
+        WMCactiAPI::executeDBQuery($SQL);
     }
 
     public function wmMapDelete($id)
     {
         $SQL = "delete from weathermap_maps where id=".$id;
-        db_execute($SQL);
+        WMCactiAPI::executeDBQuery($SQL);
 
         $SQL = "delete from weathermap_auth where mapid=".$id;
-        db_execute($SQL);
+        WMCactiAPI::executeDBQuery($SQL);
 
         $SQL = "delete from weathermap_settings where mapid=".$id;
-        db_execute($SQL);
+        WMCactiAPI::executeDBQuery($SQL);
 
         $this->wmMapResort();
     }
@@ -1022,20 +1033,20 @@ class WeatherMapCactiManagementPlugin extends WeatherMapUIBase
     public function wmMapSetGroup($mapid, $groupid)
     {
         $SQL = sprintf("update weathermap_maps set group_id=%d where id=%d", $groupid, $mapid);
-        db_execute($SQL);
+        WMCactiAPI::executeDBQuery($SQL);
         $this->wmMapResort();
     }
 
     public function wmPermissionsUserAdd($mapid, $userid)
     {
         $SQL = "insert into weathermap_auth (mapid,userid) values($mapid,$userid)";
-        db_execute($SQL);
+        WMCactiAPI::executeDBQuery($SQL);
     }
 
     public function wmPermissionsUserDelete($mapid, $userid)
     {
         $SQL = "delete from weathermap_auth where mapid=$mapid and userid=$userid";
-        db_execute($SQL);
+        WMCactiAPI::executeDBQuery($SQL);
     }
 
     public function wmuiMapPermissionsPage($id)
@@ -1272,22 +1283,22 @@ class WeatherMapCactiManagementPlugin extends WeatherMapUIBase
     public function wmMapSettingAdd($mapid, $name, $value)
     {
         if ($mapid >0) {
-            db_execute("insert into weathermap_settings (mapid, optname, optvalue) values ($mapid, '".mysql_real_escape_string($name)."', '".mysql_real_escape_string($value)."')");
+            WMCactiAPI::executeDBQuery("insert into weathermap_settings (mapid, optname, optvalue) values ($mapid, '".mysql_real_escape_string($name)."', '".mysql_real_escape_string($value)."')");
         } elseif ($mapid <0) {
-            db_execute("insert into weathermap_settings (mapid, groupid, optname, optvalue) values (0, -$mapid, '".mysql_real_escape_string($name)."', '".mysql_real_escape_string($value)."')");
+            WMCactiAPI::executeDBQuery("insert into weathermap_settings (mapid, groupid, optname, optvalue) values (0, -$mapid, '".mysql_real_escape_string($name)."', '".mysql_real_escape_string($value)."')");
         } else {
-            db_execute("insert into weathermap_settings (mapid, groupid, optname, optvalue) values (0, 0, '".mysql_real_escape_string($name)."', '".mysql_real_escape_string($value)."')");
+            WMCactiAPI::executeDBQuery("insert into weathermap_settings (mapid, groupid, optname, optvalue) values (0, 0, '".mysql_real_escape_string($name)."', '".mysql_real_escape_string($value)."')");
         }
     }
 
     public function wmMapSettingUpdate($mapid, $settingid, $name, $value)
     {
-        db_execute("update weathermap_settings set optname='".mysql_real_escape_string($name)."', optvalue='".mysql_real_escape_string($value)."' where id=".intval($settingid));
+        WMCactiAPI::executeDBQuery("update weathermap_settings set optname='".mysql_real_escape_string($name)."', optvalue='".mysql_real_escape_string($value)."' where id=".intval($settingid));
     }
 
     public function wmMapSettingDelete($mapid, $settingid)
     {
-        db_execute("delete from weathermap_settings where id=".intval($settingid)." and mapid=".intval($mapid));
+        WMCactiAPI::executeDBQuery("delete from weathermap_settings where id=".intval($settingid)." and mapid=".intval($mapid));
     }
 
     public function wmuiMapGroupChangePage($id)
@@ -1341,7 +1352,7 @@ class WeatherMapCactiManagementPlugin extends WeatherMapUIBase
 
         print "<form action=weathermap-cacti-plugin-mgmt.php>\n<input type=hidden name=action value=group_update />\n";
 
-        print "Group Name: <input name=gname value='".htmlspecialchars($grouptext)."'/>\n";
+        print "Group Name: <input name='gname' value='".htmlspecialchars($grouptext)."'/>\n";
         if ($id>0) {
             print "<input type=hidden name=id value=$id />\n";
             print "Group Name: <input type=submit value='Update' />\n";
@@ -1424,7 +1435,7 @@ class WeatherMapCactiManagementPlugin extends WeatherMapUIBase
             mysql_escape_string($newname),
             $sortorder
         );
-        db_execute($SQL);
+        WMCactiAPI::executeDBQuery($SQL);
     }
 
     public function wmGroupRename($id, $newname)
@@ -1434,7 +1445,7 @@ class WeatherMapCactiManagementPlugin extends WeatherMapUIBase
         }
 
         $SQL = sprintf("update weathermap_groups set name='%s' where id=%d", mysql_escape_string($newname), $id);
-        db_execute($SQL);
+        WMCactiAPI::executeDBQuery($SQL);
     }
 
     public function wmGroupDelete($id)
@@ -1446,8 +1457,8 @@ class WeatherMapCactiManagementPlugin extends WeatherMapUIBase
         $SQL2 = "UPDATE weathermap_maps set group_id=$newid where group_id=".$id;
         # then delete the group
         $SQL3 = "DELETE from weathermap_groups where id=".$id;
-        db_execute($SQL2);
-        db_execute($SQL3);
+        WMCactiAPI::executeDBQuery($SQL2);
+        WMCactiAPI::executeDBQuery($SQL3);
     }
 
     public function wmGenerateCactiUserList()
@@ -1478,10 +1489,10 @@ class WeatherMapCactiManagementPlugin extends WeatherMapUIBase
     protected function handleMapSettingsPage($request, $appObject)
     {
         if (isset($request['id']) && is_numeric($request['id'])) {
-            require_once($this->cactiBasePath . "/include/top_header.php");
+            WMCactiAPI::pageTopConsole();
             $this->wmuiMapSettingsPage(intval($request['id']));
             wmGenerateFooterLinks();
-            require_once($this->cactiBasePath . "/include/bottom_footer.php");
+            WMCactiAPI::pageBottom();
         }
     }
 
@@ -1517,9 +1528,9 @@ class WeatherMapCactiManagementPlugin extends WeatherMapUIBase
     protected function handlePermissionsPage($request, $appObject)
     {
         if (isset($request['id']) && is_numeric($request['id'])) {
-            require_once($this->cactiBasePath . "/include/top_header.php");
+            WMCactiAPI::pageTopConsole();
             $this->wmuiMapPermissionsPage($request['id']);
-            require_once($this->cactiBasePath . "/include/bottom_footer.php");
+            WMCactiAPI::pageBottom();
         } else {
             print "Something got lost back there.";
         }
@@ -1628,14 +1639,14 @@ class WeatherMapCactiManagementPlugin extends WeatherMapUIBase
      */
     protected function handleMapPicker($request, $appObject)
     {
-        require_once $this->cactiBasePath . "/include/top_header.php";
+        WMCactiAPI::pageTopConsole();
 
         if (isset($request['show_all']) && $request['show_all'] == '1') {
             $this->wmuiMapFilePicker(true);
         } else {
             $this->wmuiMapFilePicker(false);
         }
-        require_once $this->cactiBasePath . "/include/bottom_footer.php";
+        WMCactiAPI::pageBottom();
     }
 
     /**
@@ -1643,13 +1654,8 @@ class WeatherMapCactiManagementPlugin extends WeatherMapUIBase
      */
     protected function handleViewConfig($request, $appObject)
     {
-        require_once $this->cactiBasePath . "/include/top_graph_header.php";
-
-        if (isset($request['file'])) {
-            $this->wmuiPreviewConfig($request['file']);
-        } else {
-            print "No such file.";
-        }
-        require_once $this->cactiBasePath . "/include/bottom_footer.php";
+        WMCactiAPI::pageTop();
+        $this->wmuiPreviewConfig($request['file']);
+        WMCactiAPI::pageBottom();
     }
 }

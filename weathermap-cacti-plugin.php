@@ -20,7 +20,7 @@ if (isset($_POST['action'])) {
     $action = $_GET['action'];
 }
 
-$plugin = new WeatherMapCactiUserPlugin($config, $color, WMCactiAPI::getConfigOption("weathermap_image_format", "png"));
+$plugin = new WeatherMapCactiUserPlugin($config, $colors, WMCactiAPI::getConfigOption("weathermap_image_format", "png"));
 
 $plugin->dispatchRequest($action, $_REQUEST, null);
 

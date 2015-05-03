@@ -23,7 +23,7 @@ function weathermap_page_title($t)
     }
 
     $mapid = $matches[1];
-    if (preg_match("/^\d+$/", $mapid)) {
+    if (preg_match('/^\d+$/', $mapid)) {
         $title = db_fetch_cell("SELECT titlecache from weathermap_maps where ID=" . intval($mapid));
     } else {
         $title = db_fetch_cell("SELECT titlecache from weathermap_maps where filehash='" . mysql_real_escape_string($mapid) . "'");
@@ -164,6 +164,7 @@ function weathermap_setup_table()
     cacti_log("WM setup_table Creating Tables\n", true, "WEATHERMAP");
 
     $tables = weathermap_get_table_list();
+    $sql = array();
 
     if (!in_array('weathermap_maps', $tables)) {
         $sql = weathermap_setup_maps_table($sql);
@@ -293,8 +294,8 @@ function weathermap_update_data_table($sql)
 function weathermap_setup_data_table($sql)
 {
     $sql[] = "CREATE TABLE IF NOT EXISTS weathermap_data (id int(11) NOT NULL auto_increment,
-                rrdfile varchar(255) NOT NULL,data_source_name varchar(19) NOT NULL,
-                  last_time int(11) NOT NULL,last_value varchar(255) NOT NULL,
+                rrdfile varchar(255) NOT NULL, data_source_name varchar(19) NOT NULL,
+                  last_time int(11) NOT NULL, last_value varchar(255) NOT NULL,
                 last_calc varchar(255) NOT NULL, sequence int(11) NOT NULL, local_data_id int(11) NOT NULL DEFAULT 0, PRIMARY KEY  (id), KEY rrdfile (rrdfile),
                   KEY local_data_id (local_data_id), KEY data_source_name (data_source_name) ) ENGINE=MyISAM;";
     return $sql;

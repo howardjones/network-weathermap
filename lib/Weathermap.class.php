@@ -1000,11 +1000,11 @@ class WeatherMap extends WeatherMapBase
         $allItems = $this->buildAllItemsList();
 
         foreach ($allItems as $item) {
-            $z = $item->getZIndex();
-            if (!isset($this->seen_zlayers[$z]) || !is_array($this->seen_zlayers[$z])) {
-                $this->seen_zlayers[$z] = array();
+            $zIndex = $item->getZIndex();
+            if (!isset($this->seen_zlayers[$zIndex]) || !is_array($this->seen_zlayers[$zIndex])) {
+                $this->seen_zlayers[$zIndex] = array();
             }
-            array_push($this->seen_zlayers[$z], $item);
+            array_push($this->seen_zlayers[$zIndex], $item);
         }
         wm_debug("Found " . sizeof($this->seen_zlayers) . " z-layers including builtins (0,100).\n");
     }
@@ -1424,7 +1424,6 @@ class WeatherMap extends WeatherMapBase
     protected function createThumbnailFile($outputFileName, $sourceImageRef, $maximumDimension)
     {
         wm_debug("Writing thumbnail to %s\n", $outputFileName);
-        wm_debug("Map size is (%dx%d), sized to %d\n", $this->width, $this->height, $maximumDimension);
 
         if (!function_exists('imagecopyresampled')) {
             wm_warn("Skipping thumbnail creation, since we don't have the necessary function. [WMWARN17]");
@@ -1444,17 +1443,6 @@ class WeatherMap extends WeatherMapBase
         $this->thumb_width = $this->width * $scaleFactor;
         $this->thumb_height = $this->height * $scaleFactor;
 
-        $fileHandle = fopen($outputFileName, "w+");
-        if (false === $fileHandle) {
-            wm_warn("Couldn't write to $outputFileName.");
-        } else {
-            wm_debug("Created file OK, deleting it now.\n");
-            fclose($fileHandle);
-            wm_debug("Test file closed.\n");
-            unlink($outputFileName);
-            wm_debug("Test file deleted.\n");
-        }
-
         wm_debug("Creating thumbnail %dx%d...(factor was %f)\n", $this->thumb_width, $this->thumb_height, $scaleFactor);
         $thumbImageRef = imagecreatetruecolor($this->thumb_width, $this->thumb_height);
         imagecopyresampled($thumbImageRef, $sourceImageRef, 0, 0, 0, 0, $this->thumb_width, $this->thumb_height, $this->width, $this->height);
@@ -1462,12 +1450,6 @@ class WeatherMap extends WeatherMapBase
         imagedestroy($thumbImageRef);
 
         if ($result !== false) {
-            if (file_exists($outputFileName)) {
-                wm_debug("Wrote thumbnail OK\n");
-            } else {
-                wm_warn("Thumbnail file doesn't exist after writing: $outputFileName");
-            }
-
             return;
         }
 

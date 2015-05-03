@@ -499,7 +499,7 @@ class WeatherMapLink extends WeatherMapDataItem
     }
 
 
-    function getConfig()
+    public function getConfig()
     {
         $output='';
 

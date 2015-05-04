@@ -459,68 +459,67 @@ function rotateAboutPoint(&$points, $centre_x, $centre_y, $angle = 0)
 
 // ///////////////////////////////////////////////////////////////////////////////////////
 
-
-
 function wmDrawMarkerCross($gdImage, $colour, $point, $size = 5)
 {
-    $x = $point->x;
-    $y = $point->y;
+    $relative_moves = array(
+        array(-1,0),
+        array(2,0),
+        array(-1,0),
+        array(0,-1),
+        array(0,2)
+    );
 
-    imageline($gdImage, $x, $y, $x + $size, $y + $size, $colour);
-    imageline($gdImage, $x, $y, $x - $size, $y + $size, $colour);
-    imageline($gdImage, $x, $y, $x + $size, $y - $size, $colour);
-    imageline($gdImage, $x, $y, $x - $size, $y - $size, $colour);
+    wmDrawMarkerPolygon($gdImage, $colour, $point, $size, $relative_moves);
 }
 
 function wmDrawMarkerDiamond($gdImage, $colour, $point, $size = 10)
 {
-    $points = array ();
+    $relative_moves = array(
+        array(-1,0),
+        array(1,-1),
+        array(1,1),
+        array(-1,1),
+    );
 
-    $point->translate(-$size, 0);
-    $points[] = $point->x;
-    $points[] = $point->y;
-
-    $point->translate($size, -$size);
-    $points[] = $point->x;
-    $points[] = $point->y;
-
-    $point->translate($size, $size);
-    $points[] = $point->x;
-    $points[] = $point->y;
-
-    $point->translate(-$size, $size);
-    $points[] = $point->x;
-    $points[] = $point->y;
-
-    imagepolygon($gdImage, $points, 4, $colour);
+    wmDrawMarkerPolygon($gdImage, $colour, $point, $size, $relative_moves);
 }
 
 function wmDrawMarkerBox($gdImage, $colour, $point, $size = 10)
 {
-    $points = array ();
+    $relative_moves = array(
+        array(-1,-1),
+        array(2,0),
+        array(0,2),
+        array(-2,0),
+    );
 
-    $point->translate(-$size, -$size);
-    $points[] = $point->x;
-    $points[] = $point->y;
-
-    $point->translate($size *2, 0);
-    $points[] = $point->x;
-    $points[] = $point->y;
-
-    $point->translate(0, $size *2);
-    $points[] = $point->x;
-    $points[] = $point->y;
-
-    $point->translate(-$size *2, 0);
-    $points[] = $point->x;
-    $points[] = $point->y;
-
-    imagepolygon($gdImage, $points, 4, $colour);
+    wmDrawMarkerPolygon($gdImage, $colour, $point, $size, $relative_moves);
 }
 
 function wmDrawMarkerCircle($gdImage, $colour, $point, $size = 10)
 {
     imagearc($gdImage, $point->x, $point->y, $size, $size, 0, 360, $colour);
+}
+
+
+/**
+ * @param $gdImage
+ * @param $colour
+ * @param $point
+ * @param $size
+ * @param $relative_moves
+ */
+function wmDrawMarkerPolygon($gdImage, $colour, $point, $size, $relative_moves)
+{
+    $points = array();
+
+    foreach ($relative_moves as $move) {
+        $point->translate($move[0] * $size, $move[1] * $size);
+        $points[] = $point->x;
+        $points[] = $point->y;
+    }
+
+    imagepolygon($gdImage, $points, count($relative_moves), $colour);
 }
 
 /**

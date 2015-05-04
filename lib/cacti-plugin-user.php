@@ -245,7 +245,7 @@ class WeatherMapCactiUserPlugin extends WeatherMapUIBase
     private function drawFullMapView($firstOnly = false, $limitToGroup = -1)
     {
         // make sure that we use the Cacti refresh meta tags
-        $_SESSION['custom'] = false;
+        WMCactiAPI::enableGraphRefresh();
         $mapList = $this->getAuthorisedMaps($limitToGroup);
 
         if (count($mapList) == 0) {
@@ -393,21 +393,15 @@ class WeatherMapCactiUserPlugin extends WeatherMapUIBase
             return false;
         }
 
-        $groupCounts = array();
+        $nGroups = $this->countUniqueFieldValues($maps, "group_name");
 
-        foreach ($maps as $map) {
-            $groupCounts[$map['group_name']] = 1;
-        }
-        $nGroups = count(array_keys($groupCounts));
+        $selectOptions = array();
 
-        $options = array();
-
-        // second pass through - we know how many groups there are, and what the ID is for our map, now
-        // so build up the list options for the select box
+        // build up the list options for the select box
         $lastGroupSeen = "------lasdjflkjsdlfkjlksdjflksjdflkjsldjlkjsd";
         foreach ($maps as $map) {
             if ($nGroups > 1 && $map['group_name'] != $lastGroupSeen) {
-                $options[] = array($map['name'], $currentMapHash, "heading", false);
+                $selectOptions[] = array($map['name'], $currentMapHash, "heading", false);
                 $lastGroupSeen = $map['group_name'];
             }
             $option = array($map['titlecache'], $map['filehash'], "", false);
@@ -418,10 +412,10 @@ class WeatherMapCactiUserPlugin extends WeatherMapUIBase
             if ($nGroups > 1) {
                 $option[0] = " - " . $option[0];
             }
-            $options[] = $option;
+            $selectOptions[] = $option;
         }
 
-        $this->renderOptionsList($options);
+        $this->renderOptionsList($selectOptions);
 
         return true;
     }
@@ -695,7 +689,6 @@ class WeatherMapCactiUserPlugin extends WeatherMapUIBase
     {
         global $user_auth_realm_filenames;
 
-        $is_admin = false;
         $realm_id2 = 0;
 
         if (isset($user_auth_realm_filenames['weathermap-cacti-plugin-mgmt.php'])) {
@@ -704,13 +697,13 @@ class WeatherMapCactiUserPlugin extends WeatherMapUIBase
         $userID = $this->getUserID();
 
         if ((db_fetch_assoc(
-                "select user_auth_realm.realm_id from user_auth_realm where user_auth_realm.user_id='"
-                . $userID . "' and user_auth_realm.realm_id='$realm_id2'"
-            )) || (empty($realm_id2))
+            "select user_auth_realm.realm_id from user_auth_realm where user_auth_realm.user_id='"
+            . $userID . "' and user_auth_realm.realm_id='$realm_id2'"
+        )) || (empty($realm_id2))
         ) {
-            $is_admin = true;
+            return true;
         }
-        return $is_admin;
+        return false;
     }
 
     /**
@@ -725,15 +718,11 @@ class WeatherMapCactiUserPlugin extends WeatherMapUIBase
         $group_id = -1;
         if (isset($request['group_id'])) {
             $group_id = $request['group_id'];
-            $_SESSION['wm_last_group'] = $group_id;
-            return $group_id;
-        } else {
-            if (isset($_SESSION['wm_last_group'])) {
-                $group_id = intval($_SESSION['wm_last_group']);
-                return $group_id;
-            }
+            WMCactiAPI::saveSessionVariable("wm_last_group", $group_id);
             return $group_id;
         }
+
+        return WMCactiAPI::getSessionVariable("wm_last_group", $group_id);
     }
 
     private function outputFullScreenPageTop()
@@ -776,8 +765,8 @@ class WeatherMapCactiUserPlugin extends WeatherMapUIBase
 
     private function outputCycleInitialisation($showFullscreen)
     {
-        $refreshTime = WMCactiAPI::getConfigOption("weathermap_cycle_refresh");
-        $pollerInterval = WMCactiAPI::getConfigOption("poller_interval"); ?>
+        $refreshTime = WMCactiAPI::getConfigOption("weathermap_cycle_refresh", 20);
+        $pollerInterval = WMCactiAPI::getConfigOption("poller_interval", 300); ?>
 
         <script type="text/javascript" src="cacti-resources/map-cycle.js"></script>
         <script type="text/javascript">
@@ -894,5 +883,18 @@ class WeatherMapCactiUserPlugin extends WeatherMapUIBase
             print "</div>";
         }
         print "</div>";
+    }
+
+    /**
+     * @param $itemList
+     * @return array
+     */
+    private function countUniqueFieldValues($itemList, $fieldName)
+    {
+        $valueCounts = array();
+        foreach ($itemList as $item) {
+            $valueCounts[$item[$fieldName]] = 1;
+        }
+        return count(array_keys($valueCounts));
     }
 }

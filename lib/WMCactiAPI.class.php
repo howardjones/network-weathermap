@@ -71,4 +71,22 @@ class WMCactiAPI
 
         return $userID;
     }
+
+    public static function enableGraphRefresh()
+    {
+        $_SESSION['custom'] = false;
+    }
+
+    public static function saveSessionVariable($name, $value)
+    {
+        $_SESSION[$name] = $value;
+    }
+
+    public static function getSessionVariable($name, $defaultValue)
+    {
+        if (isset($_SESSION[$name])) {
+            return $_SESSION[$name];
+        }
+        return $defaultValue;
+    }
 }

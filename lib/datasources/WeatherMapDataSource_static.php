@@ -25,13 +25,13 @@ class WeatherMapDataSource_static extends WeatherMapDataSource
         $data_time=0;
 
         if (preg_match("/^static:(\-?\d+\.?\d*[KMGT]*):(\-?\d+\.?\d*[KMGT]*)$/", $targetString, $matches)) {
-            $inbw = wmInterpretNumberWithMetricPrefix($matches[1], $map->kilo);
-            $outbw = wmInterpretNumberWithMetricPrefix($matches[2], $map->kilo);
+            $inbw = WMUtility::interpretNumberWithMetricPrefix($matches[1], $map->kilo);
+            $outbw = WMUtility::interpretNumberWithMetricPrefix($matches[2], $map->kilo);
             $data_time = time();
         }
 
         if (preg_match("/^static:(\-?\d+\.?\d*[KMGT]*)$/", $targetString, $matches)) {
-            $inbw = wmInterpretNumberWithMetricPrefix($matches[1], $map->kilo);
+            $inbw = WMUtility::interpretNumberWithMetricPrefix($matches[1], $map->kilo);
             $outbw = $inbw;
             $data_time = time();
         }

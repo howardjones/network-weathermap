@@ -56,8 +56,8 @@ class WeatherMapDataSource_tabfile extends WeatherMapDataSource
                 $parts = explode("\t", $buffer);
 
                 if ($parts[0] == $itemName) {
-                    $data[IN] = ($parts[1]=="-" ? null : wmInterpretNumberWithMetricPrefix($parts[1]) );
-                    $data[OUT] = ($parts[2]=="-" ? null : wmInterpretNumberWithMetricPrefix($parts[2]) );
+                    $data[IN] = ($parts[1]=="-" ? null : WMUtility::interpretNumberWithMetricPrefix($parts[1]) );
+                    $data[OUT] = ($parts[2]=="-" ? null : WMUtility::interpretNumberWithMetricPrefix($parts[2]) );
                 }
             }
             $stats = stat($targetString);

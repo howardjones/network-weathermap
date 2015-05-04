@@ -277,7 +277,7 @@ class WeatherMapNode extends WeatherMapDataItem
             // if screenshot_mode is enabled, wipe any letters to X and wipe any IP address to 127.0.0.1
             // hopefully that will preserve enough information to show cool stuff without leaking info
             if ($map->get_hint('screenshot_mode') == 1) {
-                $this->processedLabel = wmStringAnonymise($this->processedLabel);
+                $this->processedLabel = WMUtility::stringAnonymise($this->processedLabel);
             }
 
             list($strwidth, $strheight) = $map->myimagestringsize($this->labelfont, $this->processedLabel);
@@ -554,7 +554,7 @@ class WeatherMapNode extends WeatherMapDataItem
             $this->labeloffsetx = 0;
             $this->labeloffsety = 0;
 
-            list($dx, $dy) = wmCalculateOffset(
+            list($dx, $dy) = WMUtility::calculateOffset(
                 $this->labeloffset,
                 ($icon_w + $boxWidth - 1),
                 ($icon_h + $boxHeight)
@@ -955,12 +955,12 @@ class WeatherMapNode extends WeatherMapDataItem
         $output .= "\"id\":" . $this->id . ", ";
         $output .= "ox:" . $this->original_x . ", ";
         $output .= "oy:" . $this->original_y . ", ";
-        $output .= "relative_to:" . jsEscape($this->relative_to) . ", ";
-        $output .= "label:" . jsEscape($this->label) . ", ";
-        $output .= "name:" . jsEscape($this->name) . ", ";
-        $output .= "infourl:" . jsEscape($this->infourl[IN]) . ", ";
-        $output .= "overlibcaption:" . jsEscape($this->overlibcaption[IN]) . ", ";
-        $output .= "overliburl:" . jsEscape(join(" ", $this->overliburl[IN])) . ", ";
+        $output .= "relative_to:" . WMUtility::jsEscape($this->relative_to) . ", ";
+        $output .= "label:" . WMUtility::jsEscape($this->label) . ", ";
+        $output .= "name:" . WMUtility::jsEscape($this->name) . ", ";
+        $output .= "infourl:" . WMUtility::jsEscape($this->infourl[IN]) . ", ";
+        $output .= "overlibcaption:" . WMUtility::jsEscape($this->overlibcaption[IN]) . ", ";
+        $output .= "overliburl:" . WMUtility::jsEscape(join(" ", $this->overliburl[IN])) . ", ";
         $output .= "overlibwidth:" . $this->overlibheight . ", ";
         $output .= "overlibheight:" . $this->overlibwidth . ", ";
         if (sizeof($this->boundingboxes) > 0) {
@@ -970,9 +970,9 @@ class WeatherMapNode extends WeatherMapDataItem
         }
 
         if (preg_match("/^(none|nink|inpie|outpie|box|rbox|gauge|round)$/", $this->iconfile)) {
-            $output .= "iconfile:" . jsEscape("::" . $this->iconfile);
+            $output .= "iconfile:" . WMUtility::jsEscape("::" . $this->iconfile);
         } else {
-            $output .= "iconfile:" . jsEscape($this->iconfile);
+            $output .= "iconfile:" . WMUtility::jsEscape($this->iconfile);
         }
 
         return $output;
@@ -981,12 +981,12 @@ class WeatherMapNode extends WeatherMapDataItem
     function asJS()
     {
         $output = '';
-        $output .= "Nodes[" . jsEscape($this->name) . "] = {";
+        $output .= "Nodes[" . WMUtility::jsEscape($this->name) . "] = {";
 
         $output .= $this->asJSCore();
 
         $output .= "};\n";
-        $output .= "NodeIDs[\"N" . $this->id . "\"] = " . jsEscape($this->name) . ";\n";
+        $output .= "NodeIDs[\"N" . $this->id . "\"] = " . WMUtility::jsEscape($this->name) . ";\n";
         return $output;
     }
 

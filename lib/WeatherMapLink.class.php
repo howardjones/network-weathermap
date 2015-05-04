@@ -172,7 +172,7 @@ class WeatherMapLink extends WeatherMapDataItem
             $comment = $this->owner->ProcessString($this->comments[$direction], $this);
 
             if ($this->owner->get_hint('screenshot_mode')==1) {
-                $comment=wmStringAnonymise($comment);
+                $comment = WMUtility::stringAnonymise($comment);
             }
 
             if ($comment == '') {
@@ -292,7 +292,7 @@ class WeatherMapLink extends WeatherMapDataItem
 
         $points = array();
 
-        list($dx, $dy) = wmCalculateOffset($this->a_offset, $this->a->width, $this->a->height);
+        list($dx, $dy) = WMUtility::calculateOffset($this->a_offset, $this->a->width, $this->a->height);
         $points[] = new WMPoint($this->a->x + $dx, $this->a->y + $dy);
 
         foreach ($this->vialist as $via) {
@@ -305,7 +305,7 @@ class WeatherMapLink extends WeatherMapDataItem
             }
         }
 
-        list($dx, $dy) = wmCalculateOffset($this->b_offset, $this->b->width, $this->b->height);
+        list($dx, $dy) = WMUtility::calculateOffset($this->b_offset, $this->b->width, $this->b->height);
         $points[] = new WMPoint($this->b->x + $dx, $this->b->y + $dy);
 
         if ($points[0]->closeEnough($points[1]) && sizeof($this->vialist)==0) {
@@ -400,13 +400,13 @@ class WeatherMapLink extends WeatherMapDataItem
 
             $label_text = $this->owner->ProcessString($this->bwlabelformats[$direction], $this);
             if ($label_text != '') {
-                wm_debug("Bandwidth for label is " . wm_value_or_null($bandwidth) . " (label is '$label_text')\n");
+                wm_debug("Bandwidth for label is " . WMUtility::valueOrNull($bandwidth) . " (label is '$label_text')\n");
                 $padding = intval($this->get_hint('bwlabel_padding'));
 
                 // if screenshot_mode is enabled, wipe any letters to X and wipe any IP address to 127.0.0.1
                 // hopefully that will preserve enough information to show cool stuff without leaking info
                 if ($this->owner->get_hint('screenshot_mode') == 1) {
-                    $label_text = wmStringAnonymise($label_text);
+                    $label_text = WMUtility::stringAnonymise($label_text);
                 }
 
                 if ($this->labelboxstyle != 'angled') {
@@ -700,25 +700,25 @@ class WeatherMapLink extends WeatherMapDataItem
             $i++;
         }
 
-        $output.=jsEscape(trim($tgt));
+        $output.=WMUtility::jsEscape(trim($tgt));
         $output.=",";
 
-        $output.="bw_in:" . jsEscape($this->max_bandwidth_in_cfg) . ", ";
-        $output.="bw_out:" . jsEscape($this->max_bandwidth_out_cfg) . ", ";
+        $output.="bw_in:" . WMUtility::jsEscape($this->max_bandwidth_in_cfg) . ", ";
+        $output.="bw_out:" . WMUtility::jsEscape($this->max_bandwidth_out_cfg) . ", ";
 
-        $output.="name:" . jsEscape($this->name) . ", ";
+        $output.="name:" . WMUtility::jsEscape($this->name) . ", ";
         $output.="overlibwidth:'" . $this->overlibheight . "', ";
         $output.="overlibheight:'" . $this->overlibwidth . "', ";
-        $output.="overlibcaption:" . jsEscape($this->overlibcaption[IN]) . ", ";
+        $output.="overlibcaption:" . WMUtility::jsEscape($this->overlibcaption[IN]) . ", ";
 
-        $output.="commentin:" . jsEscape($this->comments[IN]) . ", ";
+        $output.="commentin:" . WMUtility::jsEscape($this->comments[IN]) . ", ";
         $output.="commentposin:" . intval($this->commentoffset_in) . ", ";
 
-        $output.="commentout:" . jsEscape($this->comments[OUT]) . ", ";
+        $output.="commentout:" . WMUtility::jsEscape($this->comments[OUT]) . ", ";
         $output.="commentposout:" . intval($this->commentoffset_out) . ", ";
 
-        $output.="infourl:" . jsEscape($this->infourl[IN]) . ", ";
-        $output.="overliburl:" . jsEscape(join(" ", $this->overliburl[IN])). ", ";
+        $output.="infourl:" . WMUtility::jsEscape($this->infourl[IN]) . ", ";
+        $output.="overliburl:" . WMUtility::jsEscape(join(" ", $this->overliburl[IN])). ", ";
 
         $output .= "via: [";
         $nItem = 0;
@@ -728,7 +728,7 @@ class WeatherMapLink extends WeatherMapDataItem
             }
             $output .= sprintf("[%d,%d", $via[0], $via[1]);
             if (isset($via[2])) {
-                $output .= ",".jsEscape($via[2]);
+                $output .= ",".WMUtility::jsEscape($via[2]);
             }
             $output .= "]";
 
@@ -743,12 +743,12 @@ class WeatherMapLink extends WeatherMapDataItem
     function asJS()
     {
         $output='';
-        $output.="Links[" . jsEscape($this->name) . "] = {";
+        $output.="Links[" . WMUtility::jsEscape($this->name) . "] = {";
 
         $output .= $this->asJSCore();
 
         $output.="};\n";
-        $output .= "LinkIDs[\"L" . $this->id . "\"] = ". jsEscape($this->name) . ";\n";
+        $output .= "LinkIDs[\"L" . $this->id . "\"] = ". WMUtility::jsEscape($this->name) . ";\n";
         return $output;
     }
 

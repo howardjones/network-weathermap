@@ -1058,14 +1058,14 @@ class WeatherMapConfigReader
         $colour1 = null;
         $colour2 = null;
 
-        $bottom = wmInterpretNumberWithMetricPrefix($matches[2], $this->mapObject->kilo);
-        $top = wmInterpretNumberWithMetricPrefix($matches[3], $this->mapObject->kilo);
+        $bottom = WMUtility::interpretNumberWithMetricPrefix($matches[2], $this->mapObject->kilo);
+        $top = WMUtility::interpretNumberWithMetricPrefix($matches[3], $this->mapObject->kilo);
 
         $this->mapObject->colours[$matches[1]][$key]['key'] = $key;
         $this->mapObject->colours[$matches[1]][$key]['tag'] = $tag;
 
-        $this->mapObject->colours[$matches[1]][$key]['bottom'] = wmInterpretNumberWithMetricPrefix($matches[2], $this->mapObject->kilo);
-        $this->mapObject->colours[$matches[1]][$key]['top'] = wmInterpretNumberWithMetricPrefix($matches[3], $this->mapObject->kilo);
+        $this->mapObject->colours[$matches[1]][$key]['bottom'] = WMUtility::interpretNumberWithMetricPrefix($matches[2], $this->mapObject->kilo);
+        $this->mapObject->colours[$matches[1]][$key]['top'] = WMUtility::interpretNumberWithMetricPrefix($matches[3], $this->mapObject->kilo);
 
         $this->mapObject->colours[$matches[1]][$key]['special'] = 0;
 

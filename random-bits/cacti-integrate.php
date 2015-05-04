@@ -454,8 +454,8 @@ foreach ($map->links as $link) {
                 if($total_speed > 0) {
                     $map->links[$name]->max_bandwidth_in = $total_speed;
                     $map->links[$name]->max_bandwidth_out = $total_speed;
-                    $map->links[$name]->max_bandwidth_in_cfg = wmFormatNumberWithMetricPrefix($total_speed);
-                    $map->links[$name]->max_bandwidth_out_cfg = wmFormatNumberWithMetricPrefix($total_speed);
+                    $map->links[$name]->max_bandwidth_in_cfg = WMUtility::formatNumberWithMetricPrefix($total_speed);
+                    $map->links[$name]->max_bandwidth_out_cfg = WMUtility::formatNumberWithMetricPrefix($total_speed);
                                 
                     if ($map_widths) {
                         foreach ($width_map as $map_speed => $map_width) {

@@ -190,11 +190,11 @@ class WeatherMapScale extends WeatherMapItem
             $bottom = rtrim(rtrim(sprintf("%f", $scaleEntry['bottom']), "0"), $decimal_point);
 
             if ($bottom > $this->owner->kilo) {
-                $bottom = wmFormatNumberWithMetricPrefix($scaleEntry['bottom'], $this->owner->kilo);
+                $bottom = WMUtility::formatNumberWithMetricPrefix($scaleEntry['bottom'], $this->owner->kilo);
             }
 
             if ($top > $this->owner->kilo) {
-                $top = wmFormatNumberWithMetricPrefix($scaleEntry['top'], $this->owner->kilo);
+                $top = WMUtility::formatNumberWithMetricPrefix($scaleEntry['top'], $this->owner->kilo);
             }
 
             $tag = (isset($scaleEntry['tag']) ? $scaleEntry['tag'] : '');

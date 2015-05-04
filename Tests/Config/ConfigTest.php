@@ -233,6 +233,72 @@ class ConfigTest extends PHPUnit_Framework_TestCase
 
 }
 
+
+/**
+ * Run a config-based test.
+ * Read in config from $conffile, and produce an image and HTML output
+ * Optionally Produce a new config file in $newconffile (for testing WriteConfig)
+ * Optionally collect config-keyword-coverage stats about this config file
+ *
+ * @param string $conffile
+ * @param string $imagefile
+ * @param string $htmlfile
+ * @param string $newconffile
+ * @param string $coveragefile
+ */
+function TestOutput_RunTest($conffile, $imagefile, $htmlfile, $newconffile)
+{
+    global $WEATHERMAP_VERSION;
+
+    $map = new WeatherMap();
+
+    $map->ReadConfig($conffile);
+    $skip = 0;
+    $nwarns = 0;
+
+    if (!strstr($WEATHERMAP_VERSION, "dev")) {
+        // Allow tests to be from the future. Global SET in test file can exempt test from running
+        // SET REQUIRES_VERSION 0.98
+        // but don't check if the current version is a dev version
+        $required_version = $map->get_hint("REQUIRES_VERSION");
+
+        if ($required_version != "") {
+            // doesn't need to be complete, just in the right order
+            $known_versions = array (
+                "0.97",
+                "0.97a",
+                "0.97b",
+                "0.98"
+            );
+            $my_version = array_search($WEATHERMAP_VERSION, $known_versions);
+            $req_version = array_search($required_version, $known_versions);
+            if ($req_version > $my_version) {
+                $skip = 1;
+                $nwarns = - 1;
+            }
+        }
+    }
+
+    if ($skip == 0) {
+        $map->readData();
+        $map->drawMapImage($imagefile);
+        $map->imagefile = $imagefile;
+
+        if ($htmlfile != '') {
+            OutputHTML($htmlfile, $map);
+        }
+        if ($newconffile != '') {
+            $map->writeConfig($newconffile);
+        }
+        $nwarns = $map->warncount;
+    }
+
+    $map->cleanUp();
+    unset($map);
+
+    return intval($nwarns);
+}
+
 function get_map_title($realfile) {
 	$title = "";
 	$fd=fopen($realfile, "r");

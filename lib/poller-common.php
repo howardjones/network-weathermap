@@ -11,7 +11,7 @@ function weathermap_memory_check($note = "MEM")
         if ($mem > $weathermap_mem_highwater) {
             $weathermap_mem_highwater = $mem;
         }
-        $mem_used = wmFormatNumberWithMetricPrefix($mem);
+        $mem_used = WMUtility::formatNumberWithMetricPrefix($mem);
         $mem_allowed = ini_get("memory_limit");
         wm_debug("%s: memory_get_usage() says %sBytes used. Limit is %s\n", $note, $mem_used, $mem_allowed);
 
@@ -344,7 +344,7 @@ function weathermap_run_maps($mydir, $map_id = -1)
 
     if (true === function_exists("memory_get_peak_usage")) {
         $peak_memory = memory_get_peak_usage();
-        WMCactiAPI::setConfigOption("weathermap_peak_memory", wmFormatNumberWithMetricPrefix($peak_memory));
+        WMCactiAPI::setConfigOption("weathermap_peak_memory", WMUtility::formatNumberWithMetricPrefix($peak_memory));
         $stats_string .= sprintf(" using %sbytes peak memory", $peak_memory);
     }
 

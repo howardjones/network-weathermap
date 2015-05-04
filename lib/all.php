@@ -24,7 +24,9 @@
     require_once dirname(__FILE__).'/Weathermap.class.php';
 
     require_once dirname(__FILE__).'/WeatherMap.functions.php';
-    
+    require_once dirname(__FILE__).'/WMUtility.class.php';
+    require_once dirname(__FILE__).'/WMImageUtility.php';
+
     require_once dirname(__FILE__).'/image-functions.php';
     require_once dirname(__FILE__).'/geometry.php';
     require_once dirname(__FILE__).'/WMSpine.class.php';

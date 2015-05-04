@@ -366,7 +366,7 @@ class WeatherMap extends WeatherMapBase
         wm_debug("ProcessString: replacing %s with %s \n", $key, $value);
 
         if ($format != '') {
-            $value = wmSprintf($format, $value, $this->kilo);
+            $value = WMUtility::sprintf($format, $value, $this->kilo);
             wm_debug("ProcessString: formatted $format to $value\n");
         }
         return $value;
@@ -798,7 +798,7 @@ class WeatherMap extends WeatherMapBase
         $fontObject = $this->fonts->getFont($fontNumber);
 
         if ($this->get_hint('screenshot_mode') == 1) {
-            $string = wmStringAnonymise($string);
+            $string = WMUtility::stringAnonymise($string);
         }
 
         list($textWidth, $textHeight) = $fontObject->calculateImageStringSize($string);
@@ -1646,10 +1646,10 @@ class WeatherMap extends WeatherMapBase
         $mapName = array_pop(explode("/", $this->configfile));
 
         $javascript .= "var Map = {\n";
-        $javascript .= sprintf('  "file": %s,', jsEscape($mapName));
-        $javascript .= sprintf('  "width": %s,', jsEscape($this->width));
-        $javascript .= sprintf('  "height": %s,', jsEscape($this->height));
-        $javascript .= sprintf('  "title": %s,', jsEscape($this->title));
+        $javascript .= sprintf('  "file": %s,', WMUtility::jsEscape($mapName));
+        $javascript .= sprintf('  "width": %s,', WMUtility::jsEscape($this->width));
+        $javascript .= sprintf('  "height": %s,', WMUtility::jsEscape($this->height));
+        $javascript .= sprintf('  "title": %s,', WMUtility::jsEscape($this->title));
         $javascript .= "\n};\n";
 
         return $javascript;

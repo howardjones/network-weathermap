@@ -1,6 +1,7 @@
 <?php
-// require_once 'PHPUnit/Framework.php';
+
 require_once dirname(__FILE__).'/../../lib/all.php';
+include_once dirname(__FILE__)."/../WMTestSupport.class.php";
 
 class ConfigTest extends PHPUnit_Framework_TestCase
 {
@@ -38,7 +39,7 @@ class ConfigTest extends PHPUnit_Framework_TestCase
             unlink($compareOutputFileName);
         }
 
-        $warningCount = TestOutput_RunTest(self::$testdir . DIRECTORY_SEPARATOR . $configFileName, $outputImageFileName, $outputHTMLFileName, '', '');
+        $warningCount = WMTestSupport::TestOutput_RunTest(self::$testdir . DIRECTORY_SEPARATOR . $configFileName, $outputImageFileName, $outputHTMLFileName, '', '');
 
         // if REQUIRES_VERSION was set, and set to a newer version, then this test is known to fail
         if ($warningCount < 0) {
@@ -108,8 +109,8 @@ class ConfigTest extends PHPUnit_Framework_TestCase
 
         $outputconfigfile = self::$result1dir . DIRECTORY_SEPARATOR . $conffile;
 
-        TestOutput_RunTest(self::$testdir . DIRECTORY_SEPARATOR . $conffile, $output_image_round1, '', $outputconfigfile, '');
-        TestOutput_RunTest(self::$result1dir . DIRECTORY_SEPARATOR . $conffile, $output_image_round2, '', '', '');
+        WMTestSupport::TestOutput_RunTest(self::$testdir . DIRECTORY_SEPARATOR . $conffile, $output_image_round1, '', $outputconfigfile, '');
+        WMTestSupport::TestOutput_RunTest(self::$result1dir . DIRECTORY_SEPARATOR . $conffile, $output_image_round2, '', '', '');
 
         $ref_output1 = md5_file($output_image_round1);
         $ref_output2 = md5_file($output_image_round2);
@@ -121,16 +122,16 @@ class ConfigTest extends PHPUnit_Framework_TestCase
     {
         self::checkPaths();
 
-        $fd = fopen("test-suite/summary.html", "w");
-        fputs($fd, "<html><head><title>Test summary</title><style>img {border: 1px solid black; }</style></head><body><h3>Test Summary</h3>(result - reference - diff)<br/>\n");
+        $fileHandle = fopen("test-suite/summary.html", "w");
+        fputs($fileHandle, "<html><head><title>Test summary</title><style>img {border: 1px solid black; }</style></head><body><h3>Test Summary</h3>(result - reference - diff)<br/>\n");
 
         $conflist = array();
-        $files = array();
 
         if (is_dir(self::$testdir)) {
             $dh = opendir(self::$testdir);
             $files = array();
-            while ($files[] = readdir($dh)) ;
+            while ($files[] = readdir($dh)) {
+            };
             sort($files);
             closedir($dh);
         } else {
@@ -138,21 +139,15 @@ class ConfigTest extends PHPUnit_Framework_TestCase
         }
 
         foreach ($files as $file) {
-            #if (false === strpos($file, "target")) {
-            #    continue;
-            #}
-
             if (substr($file, -5, 5) == '.conf') {
-                # $imagefile = $file . ".png";
                 $reference = self::$referencedir . DIRECTORY_SEPARATOR . $file . ".png";
 
                 if (file_exists($reference)) {
-
                     $conflist[] = array($file, $reference);
 
-                    $title = get_map_title(self::$testdir . DIRECTORY_SEPARATOR . $file);
+                    $title = WMTestSupport::get_map_title(self::$testdir . DIRECTORY_SEPARATOR . $file);
 
-                    fputs($fd, sprintf("<h4>%s <a href=\"tests/%s\">[conf]</a> <em>%s</em></h4><p><nobr>Out:<img align=middle src='results1-%s/%s.png'> Ref:<img src='references/%s.png' align=middle> Diff:<img align=middle src='diffs/%s.png'></nobr></p>\n",
+                    fputs($fileHandle, sprintf("<h4>%s <a href=\"tests/%s\">[conf]</a> <em>%s</em></h4><p><nobr>Out:<img align=middle src='results1-%s/%s.png'> Ref:<img src='references/%s.png' align=middle> Diff:<img align=middle src='diffs/%s.png'></nobr></p>\n",
                         $file, $file, htmlspecialchars($title),
                         self::$phptag, $file,
                         $file,
@@ -163,8 +158,8 @@ class ConfigTest extends PHPUnit_Framework_TestCase
             }
         }
 
-        fputs($fd, "</body></html>");
-        fclose($fd);
+        fputs($fileHandle, "</body></html>");
+        fclose($fileHandle);
 
         return $conflist;
     }
@@ -229,91 +224,5 @@ class ConfigTest extends PHPUnit_Framework_TestCase
             throw new Exception("Compare path doesn't exist (or isn't executable) - do you have Imagemagick? \n");
         }
     }
-
-
-}
-
-
-/**
- * Run a config-based test.
- * Read in config from $conffile, and produce an image and HTML output
- * Optionally Produce a new config file in $newconffile (for testing WriteConfig)
- * Optionally collect config-keyword-coverage stats about this config file
- *
- * @param string $conffile
- * @param string $imagefile
- * @param string $htmlfile
- * @param string $newconffile
- * @param string $coveragefile
- */
-function TestOutput_RunTest($conffile, $imagefile, $htmlfile, $newconffile)
-{
-    global $WEATHERMAP_VERSION;
-
-    $map = new WeatherMap();
-
-    $map->ReadConfig($conffile);
-    $skip = 0;
-    $nwarns = 0;
-
-    if (!strstr($WEATHERMAP_VERSION, "dev")) {
-        // Allow tests to be from the future. Global SET in test file can exempt test from running
-        // SET REQUIRES_VERSION 0.98
-        // but don't check if the current version is a dev version
-        $required_version = $map->get_hint("REQUIRES_VERSION");
-
-        if ($required_version != "") {
-            // doesn't need to be complete, just in the right order
-            $known_versions = array (
-                "0.97",
-                "0.97a",
-                "0.97b",
-                "0.98"
-            );
-            $my_version = array_search($WEATHERMAP_VERSION, $known_versions);
-            $req_version = array_search($required_version, $known_versions);
-            if ($req_version > $my_version) {
-                $skip = 1;
-                $nwarns = - 1;
-            }
-        }
-    }
-
-    if ($skip == 0) {
-        $map->readData();
-        $map->drawMapImage($imagefile);
-        $map->imagefile = $imagefile;
-
-        if ($htmlfile != '') {
-            OutputHTML($htmlfile, $map);
-        }
-        if ($newconffile != '') {
-            $map->writeConfig($newconffile);
-        }
-        $nwarns = $map->warncount;
-    }
-
-    $map->cleanUp();
-    unset($map);
-
-    return intval($nwarns);
-}
-
-function get_map_title($realfile) {
-	$title = "";
-	$fd=fopen($realfile, "r");
-	if ($fd) {
-		while (!feof($fd)) {
-			$buffer=fgets($fd, 1024);
-	
-			if (preg_match("/^\s*TITLE\s+(.*)/i", $buffer, $matches)) {
-				$title= $matches[1];
-				break;
-			}
-		}
-	
-		fclose ($fd);
-	}
-	return $title;
 }
 

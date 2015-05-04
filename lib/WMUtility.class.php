@@ -51,6 +51,7 @@ class WMUtility {
             "m" => 60,
             "s" => 1
         );
+
         foreach ($periods as $periodSuffix => $timePeriod) {
             $slot = floor($value / $timePeriod);
             $value = $value - $slot * $timePeriod;
@@ -59,9 +60,11 @@ class WMUtility {
                 $results [] = sprintf("%d%s", $slot, $periodSuffix);
             }
         }
+
         if (sizeof($results) == 0) {
-            $results [] = "0s";
+            return "0s";
         }
+
         return implode($joinCharacter, array_slice($results, 0, $precision));
     }
 
@@ -196,7 +199,7 @@ class WMUtility {
 
         if ($number < 0) {
             $number = abs($number);
-            $sign = - 1;
+            $sign = -1;
         }
 
         $number = round($number, $precision);

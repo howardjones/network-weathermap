@@ -4,8 +4,8 @@ require_once "WeatherMapUIBase.class.php";
 
 class WeatherMapCactiUserPlugin extends WeatherMapUIBase
 {
-    public $config;
-    public $colours;
+    private $config;
+    private $colours;
 
     private $outputDirectory;
     private $imageFormat;
@@ -41,7 +41,7 @@ class WeatherMapCactiUserPlugin extends WeatherMapUIBase
      * @param $request
      * @internal param $config
      */
-    public function handleMainView($request, $appObject)
+    protected function handleMainView($request, $appObject)
     {
         WMCactiAPI::pageTop();
         $this->outputOverlibSupport();
@@ -72,7 +72,7 @@ class WeatherMapCactiUserPlugin extends WeatherMapUIBase
         WMCactiAPI::pageBottom();
     }
 
-    public function handleView($request, $appObject)
+    protected function handleView($request, $appObject)
     {
         WMCactiAPI::pageTop();
 
@@ -89,7 +89,7 @@ class WeatherMapCactiUserPlugin extends WeatherMapUIBase
      * @param $request
      * @return int
      */
-    public function deduceMapID($request)
+    private function deduceMapID($request)
     {
         $mapID = -1;
 
@@ -104,7 +104,7 @@ class WeatherMapCactiUserPlugin extends WeatherMapUIBase
         return $mapID;
     }
 
-    public function handleViewCycle($request, $appObject)
+    protected function handleViewCycle($request, $appObject)
     {
         $fullscreen = false;
         if ((isset($request['fullscreen']) && is_numeric($request['fullscreen']))) {
@@ -131,34 +131,30 @@ class WeatherMapCactiUserPlugin extends WeatherMapUIBase
         }
     }
 
-    public function handleImage($request, $appObject)
+    protected function handleImage($request, $appObject)
     {
         $fileNameInsert = ".";
         $filehash = $request['id'];
         $this->outputMapImage($filehash, $fileNameInsert);
     }
 
-    public function handleBigThumb($request, $appObject)
+    protected function handleBigThumb($request, $appObject)
     {
         $fileNameInsert = ".thumb.";
         $filehash = $request['id'];
         $this->outputMapImage($filehash, $fileNameInsert);
     }
 
-    public function handleLittleThumb($request, $appObject)
+    protected function handleLittleThumb($request, $appObject)
     {
         $fileNameInsert = ".thumb48.";
         $filehash = $request['id'];
         $this->outputMapImage($filehash, $fileNameInsert);
     }
 
-    public function outputSingleMapView($mapID)
+    private function outputSingleMapView($mapID)
     {
         $colors = $this->colours;
-
-        $isAdmin = $this->isWeathermapAdmin();
-
-        $outputDirectory = $this->outputDirectory;
 
         $map = $this->getMapIfAllowed($mapID);
 
@@ -166,49 +162,56 @@ class WeatherMapCactiUserPlugin extends WeatherMapUIBase
             return;
         }
 
-        print do_hook_function('weathermap_page_top', '');
-
-        $htmlFileName = $outputDirectory . DIRECTORY_SEPARATOR . $map['filehash'] . ".html";
+        $htmlFileName = $this->outputDirectory . DIRECTORY_SEPARATOR . $map['filehash'] . ".html";
         $mapTitle = ($map['titlecache'] == "" ? "Map for config file: " . $map['configfile'] : $map['titlecache']);
 
-        $this->outputMapSelectorBox($mapID);
+        $this->singleMapHeader($mapID, $mapTitle, $map['filehash']);
+
+        if (file_exists($htmlFileName)) {
+            include $htmlFileName;
+        } else {
+            print '<div align="center" style="padding:20px"><em>This map hasn\'t been created yet.</em></div>';
+        }
+        print "</td></tr>";
+        html_graph_end_box();
+    }
+
+    private function singleMapHeader($mapID, $mapTitle, $mapHash)
+    {
+        $colors = $this->colours;
+
+        print do_hook_function('weathermap_page_top', '');
+
+        $this->outputMapSelectorBox($mapHash);
 
         html_graph_start_box(1, true);
         ?>
         <tr bgcolor="<?php print $colors["panel"]; ?>">
             <td>
-                <table width="100%" cellpadding="0"
-                       cellspacing="0">
+                <table width="100%" cellpadding="0" cellspacing="0">
                     <tr>
                         <td class="textHeader"
-                            nowrap><?php print $mapTitle;
+                            nowrap><?php
 
-                            if ($isAdmin) {
+                            print $mapTitle;
+
+                            if ($this->isWeathermapAdmin()) {
                                 print "<span style='font-size: 80%'>";
                                 print "[ <a href='weathermap-cacti-plugin-mgmt.php?action=map_settings&id=" . $mapID . "'>Map Settings</a> |";
                                 print "<a href='weathermap-cacti-plugin-mgmt.php?action=perms_edit&id=" . $mapID . "'>Map Permissions</a> |";
                                 print "<a href=''>Edit Map</a> ]";
                                 print "</span>";
                             }
-
                             ?></td>
                     </tr>
                 </table>
             </td>
         </tr>
         <tr><td>
-        <?php
-
-        if (file_exists($htmlFileName)) {
-            include $htmlFileName;
-        } else {
-            print "<div align=\"center\" style=\"padding:20px\"><em>This map hasn't been created yet.</em></div>";
-        }
-        print "</td></tr>";
-        html_graph_end_box();
+            <?php
     }
 
-    public function wmuiThumbnailView($limitToGroup = -1)
+    private function wmuiThumbnailView($limitToGroup = -1)
     {
         $mapList = $this->getAuthorisedMaps($limitToGroup);
         $mapCount = sizeof($mapList);
@@ -227,71 +230,21 @@ class WeatherMapCactiUserPlugin extends WeatherMapUIBase
         print "<div align=\"center\" style=\"padding:20px\"><em>You Have No Maps</em></div>\n";
     }
 
-    public function drawFullMapFullscreenCycle($limitToGroup = -1)
+    private function drawFullMapFullscreenCycle($limitToGroup = -1)
     {
-        $class = "fullscreen";
-        $mapList = $this->getAuthorisedMaps($limitToGroup);
-        $this->outputOverlibSupport();
-        $this->outputCycleComponents($limitToGroup, "fullscreen");
-
-        if (sizeof($mapList) == 0) {
-            print "<div align=\"center\" style=\"padding:20px\"><em>You Have No Maps</em></div>\n";
-            return;
-        }
-        print "<div class='all_map_holder $class'>";
-        foreach ($mapList as $map) {
-            $htmlfile = $this->outputDirectory . DIRECTORY_SEPARATOR . $map['filehash'] . ".html";
-            $mapTitle = $map['titlecache'];
-            if ($mapTitle == '') {
-                $mapTitle = "Map for config file: " . $map['configfile'];
-            }
-            print '<div class="weathermapholder" id="mapholder_' . $map['filehash'] . '">';
-            if (file_exists($htmlfile)) {
-                include($htmlfile);
-            } else {
-                print "<div align=\"center\" style=\"padding:20px\"><em>This map hasn't been created yet.</em></div>";
-            }
-            print "</div>";
-        }
-
-        print "</div>";
+        $this->drawCycleCommon($limitToGroup, "fullscreen");
         $this->outputCycleInitialisation(true);
     }
 
-    public function drawFullMapCycle($limitToGroup = -1)
+    private function drawFullMapCycle($limitToGroup = -1)
     {
-        $class = "inplace";
-        $mapList = $this->getAuthorisedMaps($limitToGroup);
-        $this->outputOverlibSupport();
-        $this->outputCycleComponents($limitToGroup, "inplace");
-
-        if (sizeof($mapList) == 0) {
-            print "<div align=\"center\" style=\"padding:20px\"><em>You Have No Maps</em></div>\n";
-            return;
-        }
-        print "<div class='all_map_holder $class'>";
-        foreach ($mapList as $map) {
-            $htmlfile = $this->outputDirectory . DIRECTORY_SEPARATOR . $map['filehash'] . ".html";
-            $mapTitle = $map['titlecache'];
-            if ($mapTitle == '') {
-                $mapTitle = "Map for config file: " . $map['configfile'];
-            }
-            print '<div class="weathermapholder" id="mapholder_' . $map['filehash'] . '">';
-            if (file_exists($htmlfile)) {
-                include($htmlfile);
-            } else {
-                print "<div align=\"center\" style=\"padding:20px\"><em>This map hasn't been created yet.</em></div>";
-            }
-            print "</div>";
-        }
-        print "</div>";
+        $this->drawCycleCommon($limitToGroup, "inplace");
         $this->outputCycleInitialisation(false);
     }
 
-    public function drawFullMapView($firstOnly = false, $limitToGroup = -1)
+    private function drawFullMapView($firstOnly = false, $limitToGroup = -1)
     {
-        $colors = $this->colours;
-
+        // make sure that we use the Cacti refresh meta tags
         $_SESSION['custom'] = false;
         $mapList = $this->getAuthorisedMaps($limitToGroup);
 
@@ -324,7 +277,7 @@ class WeatherMapCactiUserPlugin extends WeatherMapUIBase
         print "</div>";
     }
 
-    public function drawOneFullMap($mapRecord){
+    private function drawOneFullMap($mapRecord){
 
         $colors = $this->colours;
 
@@ -366,7 +319,7 @@ class WeatherMapCactiUserPlugin extends WeatherMapUIBase
             print '</div>';
     }
 
-    public function translateHashToID($fileHash)
+    private function translateHashToID($fileHash)
     {
         $SQL = "select id from weathermap_maps where configfile='" . mysql_real_escape_string($fileHash)
             . "' or filehash='" . mysql_real_escape_string($fileHash) . "'";
@@ -375,7 +328,7 @@ class WeatherMapCactiUserPlugin extends WeatherMapUIBase
         return $mapID;
     }
 
-    public function outputVersionBox()
+    private function outputVersionBox()
     {
         global $WEATHERMAP_VERSION;
 
@@ -409,7 +362,7 @@ class WeatherMapCactiUserPlugin extends WeatherMapUIBase
     }
 
 
-    public function streamBinaryFile($filename)
+    private function streamBinaryFile($filename)
     {
         $chunksize = 1 * (1024 * 1024); // how many bytes per chunk
 
@@ -426,10 +379,8 @@ class WeatherMapCactiUserPlugin extends WeatherMapUIBase
         return $status;
     }
 
-    public function outputMapSelectorBox($currentMapID = 0)
+    private function outputMapSelectorBox($currentMapHash)
     {
-        $colors = $this->colours;
-
         $shouldShowSelector = intval(WMCactiAPI::getConfigOption("weathermap_map_selector", 0));
 
         if ($shouldShowSelector == 0) {
@@ -442,18 +393,42 @@ class WeatherMapCactiUserPlugin extends WeatherMapUIBase
             return false;
         }
 
-        $nGroups = 0;
-        $lastGroupSeen = "------lasdjflkjsdlfkjlksdjflksjdflkjsldjlkjsd";
+        $groupCounts = array();
 
         foreach ($maps as $map) {
-            if ($currentMapID == $map['id']) {
-                $nullhash = $map['filehash'];
-            }
-            if ($map['group_name'] != $lastGroupSeen) {
-                $nGroups++;
+            $groupCounts[$map['group_name']] = 1;
+        }
+        $nGroups = count(array_keys($groupCounts));
+
+        $options = array();
+
+        // second pass through - we know how many groups there are, and what the ID is for our map, now
+        // so build up the list options for the select box
+        $lastGroupSeen = "------lasdjflkjsdlfkjlksdjflksjdflkjsldjlkjsd";
+        foreach ($maps as $map) {
+            if ($nGroups > 1 && $map['group_name'] != $lastGroupSeen) {
+                $options[] = array($map['name'], $currentMapHash, "heading", false);
                 $lastGroupSeen = $map['group_name'];
             }
+            $option = array($map['titlecache'], $map['filehash'], "", false);
+            if ($currentMapHash == $map['filehash']) {
+                $option[3] = true;
+            }
+            // if we're showing group headings, then indent the map names
+            if ($nGroups > 1) {
+                $option[0] = " - " . $option[0];
+            }
+            $options[] = $option;
         }
+
+        $this->renderOptionsList($options);
+
+        return true;
+    }
+
+    private function renderOptionsList($options)
+    {
+        $colors = $this->colours;
 
         html_graph_start_box(3, true);
         ?>
@@ -470,23 +445,16 @@ class WeatherMapCactiUserPlugin extends WeatherMapUIBase
                                 <select name="id">
                                     <?php
 
-                                    $lastGroupSeen = "------lasdjflkjsdlfkjlksdjflksjdflkjsldjlkjsd";
-                                    foreach ($maps as $map) {
-                                        if ($nGroups > 1 && $map['group_name'] != $lastGroupSeen) {
-                                            print "<option style='font-weight: bold; font-style: italic' value='$nullhash'>" . htmlspecialchars($map['name']) . "</option>";
-                                            $lastGroupSeen = $map['group_name'];
-                                        }
-                                        print '<option ';
-                                        if ($currentMapID == $map['id']) {
-                                            print " SELECTED ";
-                                        }
-                                        print 'value="' . $map['filehash'] . '">';
-                                        // if we're showing group headings, then indent the map names
-                                        if ($nGroups > 1) {
-                                            print " - ";
-                                        }
-                                        print htmlspecialchars($map['titlecache']) . '</option>';
+                                    foreach ($options as $option) {
+                                        printf(
+                                            "<option value=\"%s\" class=\"%s\" %s>%s</option>\n",
+                                            htmlspecialchars($option[1]),
+                                            $option[2],
+                                            $option[3] ? "SELECTED" : "",
+                                            htmlspecialchars($option[0])
+                                        );
                                     }
+
                                     ?>
                                 </select>
                                 &nbsp;<input type="image" src="../../images/button_go.gif" alt="Go"
@@ -499,11 +467,9 @@ class WeatherMapCactiUserPlugin extends WeatherMapUIBase
         </tr>
         <?php
         html_graph_end_box(false);
-
-        return true;
     }
 
-    public function getValidTabs()
+    private function getValidTabs()
     {
         $tabs = array();
 
@@ -521,14 +487,14 @@ class WeatherMapCactiUserPlugin extends WeatherMapUIBase
     /**
      * @return int
      */
-    public function getUserID()
+    private function getUserID()
     {
         $userID = WMCactiAPI::getUserID();
 
         return $userID;
     }
 
-    public function outputGroupTabs($current_tab)
+    private function outputGroupTabs($current_tab)
     {
         $tabs = $this->getValidTabs();
 
@@ -896,5 +862,37 @@ class WeatherMapCactiUserPlugin extends WeatherMapUIBase
         </tr>
         <?php
         html_graph_end_box();
+    }
+
+    /**
+     * @param $limitToGroup
+     * @param $class
+     */
+    private function drawCycleCommon($limitToGroup, $class)
+    {
+        $mapList = $this->getAuthorisedMaps($limitToGroup);
+        $this->outputOverlibSupport();
+        $this->outputCycleComponents($limitToGroup, $class);
+
+        if (sizeof($mapList) == 0) {
+            print "<div align=\"center\" style=\"padding:20px\"><em>You Have No Maps</em></div>\n";
+            // return;
+        }
+        print "<div class='all_map_holder $class'>";
+        foreach ($mapList as $map) {
+            $htmlfile = $this->outputDirectory . DIRECTORY_SEPARATOR . $map['filehash'] . ".html";
+            $mapTitle = $map['titlecache'];
+            if ($mapTitle == '') {
+                $mapTitle = "Map for config file: " . $map['configfile'];
+            }
+            print '<div class="weathermapholder" id="mapholder_' . $map['filehash'] . '">';
+            if (file_exists($htmlfile)) {
+                include($htmlfile);
+            } else {
+                print "<div align=\"center\" style=\"padding:20px\"><em>This map hasn't been created yet.</em></div>";
+            }
+            print "</div>";
+        }
+        print "</div>";
     }
 }

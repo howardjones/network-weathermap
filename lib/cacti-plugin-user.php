@@ -61,11 +61,11 @@ class WeatherMapCactiUserPlugin extends WeatherMapUIBase
         }
 
         if ($pageStyle == 1) {
-            $this->drawFullMapView(false, false, $group_id);
+            $this->drawFullMapView(false, $group_id);
         }
 
         if ($pageStyle == 2) {
-            $this->drawFullMapView(false, true, $group_id);
+            $this->drawFullMapView(true, $group_id);
         }
 
         $this->outputVersionBox();
@@ -106,8 +106,6 @@ class WeatherMapCactiUserPlugin extends WeatherMapUIBase
 
     public function handleViewCycle($request, $appObject)
     {
-        $config = $this->config;
-
         $fullscreen = false;
         if ((isset($request['fullscreen']) && is_numeric($request['fullscreen']))) {
             if (intval($request['fullscreen']) == 1) {
@@ -122,17 +120,12 @@ class WeatherMapCactiUserPlugin extends WeatherMapUIBase
 
         if ($fullscreen === true) {
             $this->outputFullScreenPageTop();
-        } else {
-            WMCactiAPI::pageTop();
-        }
-
-        $this->outputOverlibSupport();
-
-        $this->drawFullMapView(true, false, $groupid, $fullscreen);
-
-        if ($fullscreen === true) {
+            $this->drawFullMapFullscreenCycle($groupid);
             $this->outputFullScreenPageBottom();
         } else {
+            WMCactiAPI::pageTop();
+            $this->outputOverlibSupport();
+            $this->drawFullMapCycle($groupid);
             $this->outputVersionBox();
             WMCactiAPI::pageBottom();
         }
@@ -222,7 +215,7 @@ class WeatherMapCactiUserPlugin extends WeatherMapUIBase
 
         // if there's only one map, ignore the thumbnail setting and show it full size
         if ($mapCount == 1) {
-            $this->drawFullMapView(false, false, $limitToGroup, false);
+            $this->drawFullMapView(false, $limitToGroup, false);
             return;
         }
 
@@ -234,7 +227,68 @@ class WeatherMapCactiUserPlugin extends WeatherMapUIBase
         print "<div align=\"center\" style=\"padding:20px\"><em>You Have No Maps</em></div>\n";
     }
 
-    public function drawFullMapView($cycle = false, $firstOnly = false, $limitToGroup = -1, $showFullscreen = false)
+    public function drawFullMapFullscreenCycle($limitToGroup = -1)
+    {
+        $class = "fullscreen";
+        $mapList = $this->getAuthorisedMaps($limitToGroup);
+        $this->outputOverlibSupport();
+        $this->outputCycleComponents($limitToGroup, "fullscreen");
+
+        if (sizeof($mapList) == 0) {
+            print "<div align=\"center\" style=\"padding:20px\"><em>You Have No Maps</em></div>\n";
+            return;
+        }
+        print "<div class='all_map_holder $class'>";
+        foreach ($mapList as $map) {
+            $htmlfile = $this->outputDirectory . DIRECTORY_SEPARATOR . $map['filehash'] . ".html";
+            $mapTitle = $map['titlecache'];
+            if ($mapTitle == '') {
+                $mapTitle = "Map for config file: " . $map['configfile'];
+            }
+            print '<div class="weathermapholder" id="mapholder_' . $map['filehash'] . '">';
+            if (file_exists($htmlfile)) {
+                include($htmlfile);
+            } else {
+                print "<div align=\"center\" style=\"padding:20px\"><em>This map hasn't been created yet.</em></div>";
+            }
+            print "</div>";
+        }
+
+        print "</div>";
+        $this->outputCycleInitialisation(true);
+    }
+
+    public function drawFullMapCycle($limitToGroup = -1)
+    {
+        $class = "inplace";
+        $mapList = $this->getAuthorisedMaps($limitToGroup);
+        $this->outputOverlibSupport();
+        $this->outputCycleComponents($limitToGroup, "inplace");
+
+        if (sizeof($mapList) == 0) {
+            print "<div align=\"center\" style=\"padding:20px\"><em>You Have No Maps</em></div>\n";
+            return;
+        }
+        print "<div class='all_map_holder $class'>";
+        foreach ($mapList as $map) {
+            $htmlfile = $this->outputDirectory . DIRECTORY_SEPARATOR . $map['filehash'] . ".html";
+            $mapTitle = $map['titlecache'];
+            if ($mapTitle == '') {
+                $mapTitle = "Map for config file: " . $map['configfile'];
+            }
+            print '<div class="weathermapholder" id="mapholder_' . $map['filehash'] . '">';
+            if (file_exists($htmlfile)) {
+                include($htmlfile);
+            } else {
+                print "<div align=\"center\" style=\"padding:20px\"><em>This map hasn't been created yet.</em></div>";
+            }
+            print "</div>";
+        }
+        print "</div>";
+        $this->outputCycleInitialisation(false);
+    }
+
+    public function drawFullMapView($firstOnly = false, $limitToGroup = -1)
     {
         $colors = $this->colours;
 
@@ -255,77 +309,61 @@ class WeatherMapCactiUserPlugin extends WeatherMapUIBase
             $pageTitle = "Network Weathermaps";
         }
 
-        $class = "";
-        if ($cycle) {
-            $class = "inplace";
-        }
-        if ($showFullscreen) {
-            $class = "fullscreen";
-        }
-
-        if ($cycle) {
-            $this->outputCycleComponents($limitToGroup, $class);
-        }
-
-        // only draw the whole screen if we're not cycling, or we're cycling without fullscreen mode
-        if ($cycle === false || $showFullscreen === false) {
-           $this->outputMapViewHeader($pageTitle, $cycle, $limitToGroup);
-        }
+        $this->outputMapViewHeader($pageTitle, $cycle, $limitToGroup);
 
         if (sizeof($mapList) == 0) {
             print "<div align=\"center\" style=\"padding:20px\"><em>You Have No Maps</em></div>\n";
             return;
         }
 
-        print "<div class='all_map_holder $class'>";
+        print "<div class='all_map_holder'>";
 
-        foreach ($mapList as $map) {
-            $htmlfile = $this->outputDirectory . DIRECTORY_SEPARATOR . $map['filehash'] . ".html";
-            $mapTitle = $map['titlecache'];
-            if ($mapTitle == '') {
-                $mapTitle = "Map for config file: " . $map['configfile'];
-            }
+        foreach ($mapList as $mapRecord) {
+            $this->drawOneFullMap($mapRecord);
+        }
+        print "</div>";
+    }
 
-            print '<div class="weathermapholder" id="mapholder_' . $map['filehash'] . '">';
-            if ($cycle === false || $showFullscreen === false) {
-                html_graph_start_box(1, true);
+    public function drawOneFullMap($mapRecord){
 
-                ?>
-                <tr bgcolor="#<?php echo $colors["header_panel"] ?>">
-            <td colspan="3">
-                <table width="100%" cellspacing="0" cellpadding="3" border="0">
-                    <tr>
-                        <td align="left" class="textHeaderDark">
-                            <a name="map_<?php echo $map['filehash']; ?>">
-                            </a><?php print htmlspecialchars($mapTitle); ?>
-                        </td>
-                    </tr>
-                </table>
-            </td>
-            </tr>
-            <tr>
-            <td>
+        $colors = $this->colours;
+
+        $htmlFileName = $this->outputDirectory . DIRECTORY_SEPARATOR . $mapRecord['filehash'] . ".html";
+        $mapTitle = $mapRecord['titlecache'];
+        if ($mapTitle == '') {
+            $mapTitle = "Map for config file: " . $mapRecord['configfile'];
+        }
+        print '<div class="weathermapholder" id="mapholder_' . $mapRecord['filehash'] . '">';
+
+        html_graph_start_box(1, true);
+        ?>
+    <tr bgcolor="#<?php echo $colors["header_panel"] ?>">
+        <td colspan="3">
+            <table width="100%" cellspacing="0" cellpadding="3" border="0">
+                <tr>
+                    <td align="left" class="textHeaderDark">
+                        <a name="map_<?php echo $mapRecord['filehash']; ?>">
+                        </a><?php print htmlspecialchars($mapTitle); ?>
+                    </td>
+                </tr>
+            </table>
+        </td>
+    </tr>
+    <tr>
+        <td>
             <?php
-            }
 
-            if (file_exists($htmlfile)) {
-                include($htmlfile);
+
+            if (file_exists($htmlFileName)) {
+                include($htmlFileName);
             } else {
                 print "<div align=\"center\" style=\"padding:20px\"><em>This map hasn't been created yet.</em></div>";
             }
 
+            print '</td></tr>';
+            html_graph_end_box();
 
-            if ($cycle === false || $showFullscreen === false) {
-                print '</td></tr>';
-                html_graph_end_box();
-            }
             print '</div>';
-        }
-        print "</div>";
-
-        if ($cycle) {
-            $this->outputCycleInitialisation($showFullscreen);
-        }
     }
 
     public function translateHashToID($fileHash)
@@ -417,7 +455,6 @@ class WeatherMapCactiUserPlugin extends WeatherMapUIBase
             }
         }
 
-        /* include graph view filter selector */
         html_graph_start_box(3, true);
         ?>
         <tr bgcolor="<?php print $colors["panel"]; ?>" class="noprint">
@@ -778,7 +815,7 @@ class WeatherMapCactiUserPlugin extends WeatherMapUIBase
 
         <script type="text/javascript" src="cacti-resources/map-cycle.js"></script>
         <script type="text/javascript">
-            $(document).ready(public function () {
+            $(document).ready(function () {
                 WMcycler.start({
                     fullscreen: <?php echo ($showFullscreen ? "1" : "0"); ?>,
                     poller_cycle: <?php echo $pollerInterval * 1000; ?>,

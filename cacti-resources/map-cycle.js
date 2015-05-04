@@ -46,6 +46,14 @@ var WMcycler = {
             }
         }
     },
+    forceReload: function (that) {
+        var d = new Date(),
+            newurl = $(that).find('img').attr("src");
+
+        newurl = newurl.replace(/time=\d+/, "time=" + d.getTime());
+
+        $(that).find('img').attr("src", newurl);
+    },
 
     // change to the next (or previous) map, reset the countdown, update the bar
     switchMap : function (direction) {
@@ -69,7 +77,7 @@ var WMcycler = {
             now.fadeOut(1200, function () {
                 // now that we're done with it, force a reload on the image just
                 // passed
-                this.forceReload();
+                WMcycler.forceReload(this);
             });
             next.fadeIn(1200);
         } else {
@@ -78,7 +86,7 @@ var WMcycler = {
             now.hide(1, function () {
                 // now that we're done with it, force a reload on the image just
                 // passed
-                this.forceReload();
+                // WMcycler.forceReload();
             });
             next.show(1);
         }
@@ -90,14 +98,6 @@ var WMcycler = {
         this.updateProgress();
     },
 
-    forceReload: function () {
-        var d = new Date(),
-            newurl = $(this).find('img').attr("src");
-
-        newurl = newurl.replace(/time=\d+/, "time=" + d.getTime());
-
-        $(this).find('img').attr("src", newurl);
-    },
 
     hideControls: function () {
         $("#wmcyclecontrolbox").fadeOut(500);

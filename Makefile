@@ -52,6 +52,12 @@ deploycacti: release
 	chown -R $(CACTIUSER) $(CACTIDIR)/weathermap/output
 	chown -R $(WWWUSER) $(CACTIDIR)/weathermap/configs
 
+softdeploycacti: release
+	touch $(CACTIDIR)/weathermap
+	unzip -n $(RELBASE)/$(RELNAME).zip -d $(CACTIDIR)
+	chown -R $(CACTIUSER) $(CACTIDIR)/weathermap/output
+	chown -R $(WWWUSER) $(CACTIDIR)/weathermap/configs
+
 # You will want to (1) use a TEST cacti install for this and
 # (2) create a .my.cnf with your credentials, so you don't go crazy
 # (3) actually create test-suite/cacti-running.sql - this is a dump of the Cacti DB from

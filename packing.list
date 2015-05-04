@@ -5,6 +5,7 @@
 ./vendor/underscore/LICENSE
 ./vendor/jquery-ui/jquery-ui.min.js
 ./vendor/jquery-ui/MIT-LICENSE.txt
+./vendor/jquery-ui/themes/ui-lightness/jquery-ui.min.css
 ./vendor/bootstrap/dist/js/bootstrap.min.js
 ./vendor/bootstrap/dist/fonts/glyphicons-halflings-regular.eot
 ./vendor/bootstrap/dist/fonts/glyphicons-halflings-regular.svg

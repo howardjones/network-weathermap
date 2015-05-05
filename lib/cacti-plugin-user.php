@@ -20,12 +20,12 @@ class WeatherMapCactiUserPlugin extends WeatherMapUIBase
                 array("fullscreen", "int", true),
                 array("group", "int", true)
             )),
-        ':: DEFAULT ::' => array(
+            ':: DEFAULT ::' => array(
             'handler' => 'handleMainView',
             'args' => array(
                 array("group_id", "int", true)
             )
-        )
+            )
     );
 
     public function __construct($config, $colours, $imageFormat)
@@ -277,7 +277,8 @@ class WeatherMapCactiUserPlugin extends WeatherMapUIBase
         print "</div>";
     }
 
-    private function drawOneFullMap($mapRecord){
+    private function drawOneFullMap($mapRecord)
+    {
 
         $colors = $this->colours;
 

@@ -779,7 +779,6 @@ class WeatherMapLink extends WeatherMapDataItem
         }
 
         foreach ($dirs as $dir => $dirText) {
-
             if ($myArray[$dir] != $theirArray[$dir]) {
                 $value = $myArray[$dir];
                 if (is_array($value)) {
@@ -790,8 +789,6 @@ class WeatherMapLink extends WeatherMapDataItem
         }
         return $output;
     }
-
-
 }
 
 // vim:ts=4:sw=4:

@@ -521,8 +521,7 @@ class WeatherMap extends WeatherMapBase
 
         $pluginList = $this->getPluginFileList($pluginType, $searchDirectory);
 
-        foreach ($pluginList as $fullFilePath=>$file) {
-
+        foreach ($pluginList as $fullFilePath => $file) {
             wm_debug("Loading $pluginType Plugin class from $file\n");
 
             $class = preg_replace("/\\.php$/", "", $file);
@@ -1253,7 +1252,7 @@ class WeatherMap extends WeatherMapBase
         $name_diff = strcmp($a->name, $b->name);
 
         // templates come first
-        if($template_diff != 0) {
+        if ($template_diff != 0) {
             return $template_diff;
         }
 
@@ -1947,10 +1946,6 @@ class WeatherMap extends WeatherMapBase
 
         $this->nodes['DEFAULT'] = &$defnode2;
     }
-
-
-
-
 }
 
 // vim:ts=4:sw=4:

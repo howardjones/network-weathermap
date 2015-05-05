@@ -429,9 +429,9 @@ function weathermap_run_map($mapParameters, $configDirectory, $outputDirectory, 
 
 
 
-        if ($quietLogging == 0) {
-            wm_warn("About to write image file. If this is the last message in your log, increase memory_limit in php.ini [WMPOLL01]\n", true);
-        }
+    if ($quietLogging == 0) {
+        wm_warn("About to write image file. If this is the last message in your log, increase memory_limit in php.ini [WMPOLL01]\n", true);
+    }
         weathermap_memory_check("MEM pre-render");
 
     // used to write files before moving them into place
@@ -506,14 +506,14 @@ function weathermap_run_map($mapParameters, $configDirectory, $outputDirectory, 
 //        }
 
         // If archiving is enabled for this map, then save copies with datestamps, for animation etc
-        if ($mapParameters['archiving'] == 'on') {
-            // TODO - additionally save a copy with a datestamp file format
-            $archiveDatestamp = strftime("%Y-%m-%d-%H-%M", $weathermap_poller_start_time);
-            $archiveFilename = $outputDirectory . DIRECTORY_SEPARATOR . sprintf("%s-archive-%s.%s", $mapParameters['filehash'], $archiveDatestamp, $imageFormat);
-            @copy($imageFilename, $archiveFilename);
+    if ($mapParameters['archiving'] == 'on') {
+        // TODO - additionally save a copy with a datestamp file format
+        $archiveDatestamp = strftime("%Y-%m-%d-%H-%M", $weathermap_poller_start_time);
+        $archiveFilename = $outputDirectory . DIRECTORY_SEPARATOR . sprintf("%s-archive-%s.%s", $mapParameters['filehash'], $archiveDatestamp, $imageFormat);
+        @copy($imageFilename, $archiveFilename);
 
-            weathermap_manage_archiving($mapParameters['filehash'] . "-archive-", $outputDirectory);
-        }
+        weathermap_manage_archiving($mapParameters['filehash'] . "-archive-", $outputDirectory);
+    }
 
         db_execute("update weathermap_maps set titlecache='" . mysql_real_escape_string($runner->getProcessedTitle()) . "' where id=" . intval($mapParameters['id']));
 

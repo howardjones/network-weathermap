@@ -63,5 +63,4 @@ class WMImageUtility
 
         imagepolygon($gdImage, $points, count($relative_moves), $colour);
     }
-
 }

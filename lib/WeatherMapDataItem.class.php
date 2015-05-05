@@ -188,10 +188,12 @@ class WeatherMapDataItem extends WeatherMapItem
         }
 
         wm_debug("ReadData complete for %s: %s\n", $this, join(" ", $this->absoluteUsages));
-        wm_debug("ReadData: Setting %s,%s for %s\n",
+        wm_debug(
+            "ReadData: Setting %s,%s for %s\n",
             WMUtility::valueOrNull($this->absoluteUsages[IN]),
             WMUtility::valueOrNull($this->absoluteUsages[OUT]),
-            $this);
+            $this
+        );
     }
 
     public function aggregateDataResults()

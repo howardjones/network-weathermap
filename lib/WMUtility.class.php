@@ -3,7 +3,8 @@
 /**
  * Class WMUtility - string-handling/formatting utility functions
  */
-class WMUtility {
+class WMUtility
+{
     /**
      * Aka 'screenshotify' - takes a string and masks out any word longer than 2 characters
      * Also turns any IP address to 127.0.0.1

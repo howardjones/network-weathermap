@@ -47,6 +47,8 @@ class WMTestSupport {
      * Optionally Produce a new config file in $newconffile (for testing WriteConfig)
      * Optionally collect config-keyword-coverage stats about this config file
      *
+     * From: https://jtreminio.com/2013/03/unit-testing-tutorial-part-3-testing-protected-private-methods-coverage-reports-and-crap/
+     *
      * @param string $conffile
      * @param string $imagefile
      * @param string $htmlfile

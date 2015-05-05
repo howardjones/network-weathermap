@@ -89,7 +89,7 @@ class WeatherMapRunner
 
     public function canRun()
     {
-        if($this->mapObject === null) {
+        if ($this->mapObject === null) {
             return false;
         }
         return true;
@@ -283,5 +283,4 @@ class WeatherMapRunner
     {
         $this->rrdtool = $rrdtool;
     }
-
 }

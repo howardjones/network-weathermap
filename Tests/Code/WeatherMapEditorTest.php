@@ -2,6 +2,7 @@
 
 require_once dirname(__FILE__) . '/../../lib/all.php';
 require_once dirname(__FILE__) . '/../../lib/WeatherMapEditor.class.php';
+include_once dirname(__FILE__)."/../WMTestSupport.class.php";
 
 class WeatherMapEditorTest extends PHPUnit_Framework_TestCase {
 
@@ -23,7 +24,27 @@ class WeatherMapEditorTest extends PHPUnit_Framework_TestCase {
 
         $c = $editor->getConfig();
 
-        $fh = fopen(self::$result1dir.DIRECTORY_SEPARATOR."editortest-add.conf", "w");
+        $fh = fopen(self::$result1dir.DIRECTORY_SEPARATOR."editortest-addnode.conf", "w");
+        fputs($fh, $c);
+        fclose($fh);
+    }
+
+    public function testLinkAdd()
+    {
+        $editor = new WeatherMapEditor();
+        $editor->newConfig();
+
+        $editor->addNode(100, 100, "node1");
+        $editor->addNode(100, 200, "node2");
+        $editor->addNode(200, 200, "node3");
+
+        $editor->addLink("node1", "node2");
+        $editor->addLink("node1", "node3", "named_link");
+        $editor->addLink("node2", "node3", "other_named_link", "named_link");
+
+        $c = $editor->getConfig();
+
+        $fh = fopen(self::$result1dir.DIRECTORY_SEPARATOR."editortest-addlink.conf", "w");
         fputs($fh, $c);
         fclose($fh);
     }

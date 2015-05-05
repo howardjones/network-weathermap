@@ -58,7 +58,7 @@ class WeatherMapDataItem extends WeatherMapItem
         $this->colours[OUT] = new WMColour(192, 192, 192);
     }
 
-    function reset(&$newOwner)
+    protected function reset(&$newOwner)
     {
         $this->owner = $newOwner;
         $templateName = $this->template;
@@ -78,7 +78,9 @@ class WeatherMapDataItem extends WeatherMapItem
             $this->resetNormalObject();
         }
 
-        $this->id = $newOwner->next_id++;
+        if (null !== $newOwner) {
+            $this->id = $newOwner->next_id++;
+        }
     }
 
     /**

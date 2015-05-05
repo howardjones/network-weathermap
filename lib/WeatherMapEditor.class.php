@@ -64,164 +64,171 @@ class WeatherMapEditor
         return $this->map->getConfig();
     }
     
-    function addNode($x, $y, $nodename = "", $template = "DEFAULT")
+    function addNode($x, $y, $nodeName = "", $template = "DEFAULT")
     {
         if (! $this->isLoaded()) {
             throw new WMException("Map must be loaded before editing API called.");
         }
 
-        $success = false;
-        $log = "";
-        $newnodename = null;
+        $newNodeName = null;
 
         // Generate a node name for ourselves if one wasn't supplied
-        if ($nodename == "") {
-            $newnodename = sprintf("node%05d", time()%10000);
-            while (array_key_exists($newnodename, $this->map->nodes)) {
-                $newnodename .= "a";
+        if ($nodeName == "") {
+            $newNodeName = sprintf("node%05d", time()%10000);
+            while ($this->map->nodeExists($newNodeName)) {
+                $newNodeName .= "a";
             }
         } else {
-            $newnodename = $nodename;
+            $newNodeName = $nodeName;
         }
 
         // Check again - if they are specifying a name, it's possible for it to exist
-        if (!array_key_exists($newnodename, $this->map->nodes)) {
-            $node = new WeatherMapNode;
-            $node->name = $newnodename;
-            $node->template = $template;
+        if (!$this->map->nodeExists($newNodeName)) {
+            $newNode = new WeatherMapNode($newNodeName, $template, $this->map);
 
-            $node->reset($this->map);
-
-            $node->setPosition(new WMPoint($x, $y));
-            $node->setDefined($this->map->configfile);
-
-            // needs to know if zlayer exists.
-            if (!array_key_exists($node->zorder, $this->map->seen_zlayers)) {
-                $this->map->seen_zlayers[$node->zorder] = array();
-            }
-            array_push($this->map->seen_zlayers[$node->zorder], $node);
+            $newNode->setPosition(new WMPoint($x, $y));
+            $newNode->setDefined($this->map->configfile);
 
             // only insert a label if there's no LABEL in the DEFAULT node.
             // otherwise, respect the template.
-            if ($this->map->nodes['DEFAULT']->label == $this->map->nodes[':: DEFAULT ::']->label) {
-                $node->label = "Node";
+            $default = $this->map->getNode("DEFAULT");
+            $default_default = $this->map->getNode(":: DEFAULT ::");
+
+            if ($default->label == $default_default->label) {
+                $newNode->label = "Node";
             }
 
-            $this->map->nodes[$node->name] = $node;
-            $log = "added a node called $newnodename at $x,$y to $this->mapfile";
+            $this->map->addNode($newNode);
+            $log = "added a node called $newNodeName at $x,$y to $this->mapfile";
             $success = true;
         } else {
             $log = "Requested node name already exists";
             $success = false;
         }
 
-        return array($newnodename, $success, $log);
+        return array($newNodeName, $success, $log);
     }
-    
+
     /**
      * moveNode - move a node, taking into account any relative nodes, and any links that
      * join to it, dealing with VIAs in an attractive way.
      *
-     * @param string $node_name
-     * @param number $x
-     * @param number $y
-     *
-     * @return array (number of affected nodes, number of affected links, list of affected nodes, list of affected links)
+     * @param string $nodeName
+     * @param number $newX
+     * @param number $newY
+     * @return array
+     * @throws WMException
      */
-    function moveNode($node_name, $x, $y)
+    function moveNode($nodeName, $newX, $newY)
     {
         if (! $this->isLoaded()) {
             throw new WMException("Map must be loaded before editing API called.");
         }
 
-        $n_links = 0;
-        $n_nodes = 0;
+        // if the node doesn't exist, nothing will be changing
+        if (!$this->map->nodeExists($nodeName)) {
+            return array(0, 0, 0, 0);
+        }
+
+        $movingNode = $this->map->getNode($nodeName);
+
         $affected_nodes = array();
         $affected_links = array();
 
-        if (isset($this->map->nodes[$node_name])) {
-            // This is a complicated bit. Find out if this node is involved in any
-            // links that have VIAs. If it is, we want to rotate those VIA points
-            // about the *other* node in the link
-            foreach ($this->map->links as $link) {
-                if ((count($link->vialist)>0)  && (($link->a->name == $node_name) || ($link->b->name == $node_name))) {
-                    $affected_links[] = $link->name;
+        // This is a complicated bit. Find out if this node is involved in any
+        // links that have VIAs. If it is, we want to rotate those VIA points
+        // about the *other* node in the link
+        foreach ($this->map->links as $link) {
+            if ((count($link->vialist)>0)  && (($link->a->name == $nodeName) || ($link->b->name == $nodeName))) {
+                $affected_links[] = $link->name;
 
-                    // get the other node from us
-                    if ($link->a->name == $node_name) {
-                        $pivot = $link->b;
+                // get the other node from us
+                if ($link->a->name == $nodeName) {
+                    $pivot = $link->b;
+                }
+
+                if ($link->b->name == $nodeName) {
+                    $pivot = $link->a;
+                }
+
+                // this is a weird special case, but it is possible, with link offsets
+                // if the link starts and ends on this node, translate any VIAs
+                if (($link->a->name == $nodeName) && ($link->b->name == $nodeName)) {
+                    $dx = $link->a->x - $newX;
+                    $dy = $link->a->y - $newY;
+
+                    for ($count=0; $count<count($link->vialist); $count++) {
+                        $link->vialist[$count][0] = $link->vialist[$count][0] - $dx;
+                        $link->vialist[$count][1] = $link->vialist[$count][1] - $dy;
+                    }
+                } else {
+                    $pivotX = $pivot->x;
+                    $pivotY = $pivot->y;
+
+                    $newPoint = new WMPoint($newX, $newY);
+                    $pivotPoint = $pivot->getPosition();
+                    $movingPoint = $movingNode->getPosition();
+
+                    $oldVector = $pivotPoint->vectorToPoint($movingPoint);
+                    $newVector = $pivotPoint->vectorToPoint($newPoint);
+
+//                    $dx_old = $pivotX - $movingNode->x;
+//                    $dy_old = $pivotY - $movingNode->y;
+//                    $dx_new = $pivotX - $newX;
+//                    $dy_new = $pivotY - $newY;
+//                    $l_old = sqrt($dx_old*$dx_old + $dy_old*$dy_old);
+//                    $l_new = sqrt($dx_new*$dx_new + $dy_new*$dy_new);
+//
+//                    $angle_old = rad2deg(atan2(-$dy_old, $dx_old));
+//                    $angle_new = rad2deg(atan2(-$dy_new, $dx_new));
+
+                    $angle_old = $oldVector->getAngle();
+                    $angle_new = $newVector->getAngle();
+                    $l_new = $newVector->getLength();
+                    $l_old = $oldVector->getLength();
+
+                    # $log .= "$pivx,$pivy\n$dx_old $dy_old $l_old => $angle_old\n";
+                    # $log .= "$dx_new $dy_new $l_new => $angle_new\n";
+
+                    // the geometry stuff uses a different point format, helpfully
+                    $points = array();
+                    foreach ($link->vialist as $via) {
+                        $points[] = $via[0];
+                        $points[] = $via[1];
                     }
 
-                    if ($link->b->name == $node_name) {
-                        $pivot = $link->a;
+                    $scaleFactor = $l_new/$l_old;
+
+                    // rotate so that link is along the axis
+                    rotateAboutPoint($points, $pivotX, $pivotY, deg2rad($angle_old));
+                    // do the scaling in here
+                    for ($count=0; $count<(count($points)/2); $count++) {
+                        $basex = ($points[$count*2] - $pivotX) * $scaleFactor + $pivotX;
+                        $points[$count*2] = $basex;
                     }
+                    // rotate back so that link is along the new direction
+                    rotateAboutPoint($points, $pivotX, $pivotY, deg2rad(-$angle_new));
 
-                    // this is a wierd special case, but it is possible, with link offsets
-                    if (($link->a->name == $node_name) && ($link->b->name == $node_name)) {
-                        $dx = $link->a->x - $x;
-                        $dy = $link->a->y - $y;
-
-                        for ($count=0; $count<count($link->vialist); $count++) {
-                            $link->vialist[$count][0] = $link->vialist[$count][0]-$dx;
-                            $link->vialist[$count][1] = $link->vialist[$count][1]-$dy;
+                    // now put the modified points back into the vialist again
+                    $viaCount = 0;
+                    $count = 0;
+                    foreach ($points as $p) {
+                        // skip a point if it positioned relative to a node. Those shouldn't be rotated (well, IMHO)
+                        if (!isset($link->vialist[$viaCount][2])) {
+                            $link->vialist[$viaCount][$count]=$p;
                         }
-                    } else {
-                        $pivx = $pivot->x;
-                        $pivy = $pivot->y;
-
-                        $dx_old = $pivx - $this->map->nodes[$node_name]->x;
-                        $dy_old = $pivy - $this->map->nodes[$node_name]->y;
-                        $dx_new = $pivx - $x;
-                        $dy_new = $pivy - $y;
-                        $l_old = sqrt($dx_old*$dx_old + $dy_old*$dy_old);
-                        $l_new = sqrt($dx_new*$dx_new + $dy_new*$dy_new);
-
-                        $angle_old = rad2deg(atan2(-$dy_old, $dx_old));
-                        $angle_new = rad2deg(atan2(-$dy_new, $dx_new));
-
-                        # $log .= "$pivx,$pivy\n$dx_old $dy_old $l_old => $angle_old\n";
-                        # $log .= "$dx_new $dy_new $l_new => $angle_new\n";
-
-                        // the geometry stuff uses a different point format, helpfully
-                        $points = array();
-                        foreach ($link->vialist as $via) {
-                            $points[] = $via[0];
-                            $points[] = $via[1];
-                        }
-
-                        $scalefactor = $l_new/$l_old;
-
-                        // rotate so that link is along the axis
-                        rotateAboutPoint($points, $pivx, $pivy, deg2rad($angle_old));
-                        // do the scaling in here
-                        for ($count=0; $count<(count($points)/2); $count++) {
-                            $basex = ($points[$count*2] - $pivx) * $scalefactor + $pivx;
-                            $points[$count*2] = $basex;
-                        }
-                        // rotate back so that link is along the new direction
-                        rotateAboutPoint($points, $pivx, $pivy, deg2rad(-$angle_new));
-
-                        // now put the modified points back into the vialist again
-                        $viaCount = 0;
-                        $count = 0;
-                        foreach ($points as $p) {
-                            // skip a point if it positioned relative to a node. Those shouldn't be rotated (well, IMHO)
-                            if (!isset($link->vialist[$viaCount][2])) {
-                                $link->vialist[$viaCount][$count]=$p;
-                            }
-                            $count++;
-                            if ($count==2) {
-                                $count=0;
-                                $viaCount++;
-                            }
+                        $count++;
+                        if ($count==2) {
+                            $count=0;
+                            $viaCount++;
                         }
                     }
                 }
             }
-
-            $this->map->nodes[$node_name]->x = $x;
-            $this->map->nodes[$node_name]->y = $y;
         }
+
+        $movingNode->x = $newX;
+        $movingNode->y = $newY;
 
         $n_links = count($affected_links);
         $n_nodes = count($affected_nodes);
@@ -274,55 +281,53 @@ class WeatherMapEditor
         return array($n_nodes, $n_links, $affected_nodes, $affected_links ,$log);
     }
 
-    function cloneNode($sourcename, $targetname = "", $or_fail = false)
+    function cloneNode($sourceNodeName, $targetName = "", $or_fail = false)
     {
         if (! $this->isLoaded()) {
             throw new WMException("Map must be loaded before editing API called.");
         }
 
-        if (isset($this->map->nodes[$sourcename])) {
-            $log = "cloned node ".$sourcename;
+        if ($this->map->nodeExists($sourceNodeName)) {
+            $log = "cloned node ".$sourceNodeName;
+            $sourceNode = $this->map->nodes[$sourceNodeName];
 
             // Try to use the requested name, if possible, and if specified
-            $newnodename = ($targetname != "" ? $targetname : $sourcename);
+            $newNodeName = ($targetName != "" ? $targetName : $sourceNodeName);
 
-            if ($targetname != "" && $or_fail && isset($this->map->nodes[$newnodename])) {
+            if ($targetName != "" && $or_fail && $this->map->nodeExists($newNodeName)) {
                 return array(false, null, "Requested name already exists");
             }
 
-            if (isset($this->map->nodes[$newnodename])) {
-                $newnodename = $sourcename;
+            if (isset($this->map->nodes[$newNodeName])) {
+                $newNodeName = $sourceNodeName;
                 do {
-                    $newnodename = $newnodename."_copy";
-                } while (isset($this->map->nodes[$newnodename]));
+                    $newNodeName = $newNodeName."_copy";
+                } while (isset($this->map->nodes[$newNodeName]));
             }
 
-            $log .= " into $newnodename";
+            $log .= " into $newNodeName";
 
-            $node = new WeatherMapNode;
-            $node->reset($this->map);
-            $node->copyFrom($this->map->nodes[$sourcename]);
+            $newNode = new WeatherMapNode($newNodeName, $sourceNode->template, $this->map);
+            $newNode->copyFrom($sourceNode);
 
             # CopyFrom skips this one, because it's also the function used by template inheritance
             # - but for Clone, we DO want to copy the template too
-            $node->template = $this->map->nodes[$sourcename]->template;
+          //  $node->template = $sourceNode->template;
 
-            $node->name = $newnodename;
-            $now = $node->getPosition();
+            $now = $newNode->getPosition();
             $now->translate(30, 30);
-            $node->setPosition($now);
-            $node->setDefined($this->map->configfile);
+            $newNode->setPosition($now);
+            $newNode->setDefined($this->map->configfile);
 
-            $this->map->nodes[$newnodename] = $node;
-            array_push($this->map->seen_zlayers[$node->zorder], $node);
+            $this->map->addNode($newNode);
 
-            return array(true, $newnodename, $log);
+            return array(true, $newNodeName, $log);
         }
 
         return array(false, null, "Request source does not exist");
     }
         
-    function addLink($node1, $node2, $linkname = "", $template = "DEFAULT")
+    function addLink($nodeName1, $nodeName2, $linkName = "", $template = "DEFAULT")
     {
         if (! $this->isLoaded()) {
             throw new WMException("Map must be loaded before editing API called.");
@@ -330,35 +335,30 @@ class WeatherMapEditor
 
         $success = false;
         $log = "";
-        $newlinkname = null;
+        $newLinkName = "";
 
-        if ($node1 != $node2 && isset($this->map->nodes[$node1]) && isset($this->map->nodes[$node2])) {
-            $newlink = new WeatherMapLink;
-            $newlink->reset($this->map);
-
-            $newlink->a = $this->map->nodes[$node1];
-            $newlink->b = $this->map->nodes[$node2];
+        // XXX - do we care if node1==node2?
+        if ($nodeName1 != $nodeName2 && $this->map->nodeExists($nodeName1) && $this->map->nodeExists($nodeName2)) {
+            $newLinkName = ($linkName != "" ? $linkName : "$nodeName1-$nodeName2");
 
             // make sure the link name is unique. We can have multiple links between
             // the same nodes, these days
-            $newlinkname = "$node1-$node2";
-            while (array_key_exists($newlinkname, $this->map->links)) {
-                $newlinkname .= "a";
+            while (array_key_exists($newLinkName, $this->map->links)) {
+                $newLinkName .= "a";
             }
-            $newlink->name = $newlinkname;
-            $newlink->defined_in = $this->map->configfile;
-            $this->map->links[$newlinkname] = $newlink;
 
-            // needs to know if zlayer exists.
-            if (!array_key_exists($newlink->zorder, $this->map->seen_zlayers)) {
-                $this->map->seen_zlayers[$newlink->zorder] = array();
-            }
-            array_push($this->map->seen_zlayers[$newlink->zorder], $newlink);
+            $newLink = new WeatherMapLink($newLinkName, $template, $this->map);
+            $newLink->defined_in = $this->map->configfile;
+
+            $newLink->setEndNodes($this->map->getNode($nodeName1), $this->map->getNode($nodeName2));
+
+            $this->map->addLink($newLink);
+
             $success = true;
-            $log = "created link $newlinkname between $node1 and $node2";
+            $log = "created link $newLinkName between $nodeName1 and $nodeName2";
         }
 
-        return array($newlinkname, $success, $log);
+        return array($newLinkName, $success, $log);
 
     }
     
@@ -500,7 +500,7 @@ class WeatherMapEditor
         $done = array();
         
         foreach ($this->map->links as $link) {
-            if (isset($link->a) && isset($link->b)) {
+            if (!$link->isTemplate()) {
                 $route = $link->a->name . " " . $link->b->name;
                 if (strcmp($link->a->name, $link->b->name) > 0) {
                     $route = $link->b->name . " " . $link->a->name;

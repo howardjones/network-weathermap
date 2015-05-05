@@ -180,12 +180,30 @@ class WeatherMap extends WeatherMapBase
         throw new WMException("NoSuchNode");
     }
 
+    function addNode($newObject)
+    {
+        if ($this->nodeExists($newObject->name)) {
+            throw new WMException("NodeAlreadyExists");
+        }
+        $this->nodes[$newObject->name] = $newObject;
+        $this->addItemToZLayer($newObject, $newObject->getZIndex());
+    }
+
     function getLink($name)
     {
         if (isset($this->links[$name])) {
             return $this->links[$name];
         }
         throw new WMException("NoSuchLink");
+    }
+
+    function addLink($newObject)
+    {
+        if ($this->linkExists($newObject->name)) {
+            throw new WMException("LinkAlreadyExists");
+        }
+        $this->links[$newObject->name] = $newObject;
+        $this->addItemToZLayer($newObject, $newObject->getZIndex());
     }
 
     function getScale($name)
@@ -1000,12 +1018,17 @@ class WeatherMap extends WeatherMapBase
 
         foreach ($allItems as $item) {
             $zIndex = $item->getZIndex();
-            if (!isset($this->seen_zlayers[$zIndex]) || !is_array($this->seen_zlayers[$zIndex])) {
-                $this->seen_zlayers[$zIndex] = array();
-            }
-            array_push($this->seen_zlayers[$zIndex], $item);
+            $this->addItemToZLayer($item, $zIndex);
         }
         wm_debug("Found " . sizeof($this->seen_zlayers) . " z-layers including builtins (0,100).\n");
+    }
+
+    private function addItemToZLayer($item, $zIndex)
+    {
+        if (!isset($this->seen_zlayers[$zIndex]) || !is_array($this->seen_zlayers[$zIndex])) {
+            $this->seen_zlayers[$zIndex] = array();
+        }
+        array_push($this->seen_zlayers[$zIndex], $item);
     }
 
     private function updateMaxValues()
@@ -1029,9 +1052,14 @@ class WeatherMap extends WeatherMapBase
         wm_debug("Finished $stage-processing plugins...\n");
     }
 
-    private function nodeExists($nodeName)
+    public function nodeExists($nodeName)
     {
         return array_key_exists($nodeName, $this->nodes);
+    }
+
+    public function linkExists($linkName)
+    {
+        return array_key_exists($linkName, $this->links);
     }
 
     private function resolveRelativePositions()
@@ -1466,6 +1494,8 @@ class WeatherMap extends WeatherMapBase
      */
     function cleanUp()
     {
+        parent::cleanUp();
+
         $all_layers = array_keys($this->seen_zlayers);
 
         foreach ($all_layers as $z) {
@@ -1909,42 +1939,46 @@ class WeatherMap extends WeatherMapBase
         wm_debug("Creating ':: DEFAULT ::' DEFAULT LINK\n");
 
         // these two are used for default settings
-        $deflink = new WeatherMapLink;
-        $deflink->name = ":: DEFAULT ::";
-        $deflink->template = ":: DEFAULT ::";
-        $deflink->reset($this);
+        $deflink = new WeatherMapLink(":: DEFAULT ::", ":: DEFAULT ::", $this);
+        $this->addLink($deflink);
+//        $deflink->name = ":: DEFAULT ::";
+//        $deflink->template = ":: DEFAULT ::";
+//        $deflink->reset($this);
 
-        $this->links[':: DEFAULT ::'] = & $deflink;
+//        $this->links[':: DEFAULT ::'] = & $deflink;
 
         wm_debug("Creating actual DEFAULT LINK from :: DEFAULT ::\n");
-        $deflink2 = new WeatherMapLink;
-        $deflink2->name = "DEFAULT";
-        $deflink2->template = ":: DEFAULT ::";
-        $deflink2->reset($this);
+        $deflink2 = new WeatherMapLink("DEFAULT", ":: DEFAULT ::", $this);
+        $this->addLink($deflink2);
+//        $deflink2->name = "DEFAULT";
+//        $deflink2->template = ":: DEFAULT ::";
+//        $deflink2->reset($this);
 
-        $this->links['DEFAULT'] = &$deflink2;
+//        $this->links['DEFAULT'] = &$deflink2;
     }
 
     private function createDefaultNodes()
     {
         wm_debug("Creating ':: DEFAULT ::' DEFAULT NODE\n");
-        $defnode = new WeatherMapNode;
-        $defnode->name = ":: DEFAULT ::";
-        $defnode->template = ":: DEFAULT ::";
-        $defnode->reset($this);
+        $defnode = new WeatherMapNode(":: DEFAULT ::", ":: DEFAULT ::", $this);
+        $this->addNode($defnode);
+       // $defnode->name = ":: DEFAULT ::";
+       // $defnode->template = ":: DEFAULT ::";
+       // $defnode->reset($this);
 
-        $this->nodes[':: DEFAULT ::'] = &$defnode;
+//        $this->nodes[':: DEFAULT ::'] = &$defnode;
 
         // ************************************
         // now create the DEFAULT link and node, based on those.
         // these can be modified by the user, but their template (and therefore comparison in WriteConfig) is ':: DEFAULT ::'
         wm_debug("Creating actual DEFAULT NODE from :: DEFAULT ::\n");
-        $defnode2 = new WeatherMapNode;
-        $defnode2->name = "DEFAULT";
-        $defnode2->template = ":: DEFAULT ::";
-        $defnode2->reset($this);
+        $defnode2 = new WeatherMapNode("DEFAULT", ":: DEFAULT ::", $this);
+        $this->addNode($defnode2);
+//        $defnode2->name = "DEFAULT";
+//        $defnode2->template = ":: DEFAULT ::";
+//        $defnode2->reset($this);
 
-        $this->nodes['DEFAULT'] = &$defnode2;
+//        $this->nodes['DEFAULT'] = &$defnode2;
     }
 }
 

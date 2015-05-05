@@ -22,6 +22,7 @@ class WeatherMapBase
     protected $imap_areas = array();
     protected $config = array();
     protected $descendents = array();
+    protected $dependencies = array();
 
     protected $inherit_fieldlist;
 
@@ -29,6 +30,7 @@ class WeatherMapBase
     {
         $this->config = array();
         $this->descendents = array();
+        $this->dependencies = array();
     }
 
     function __toString()
@@ -208,6 +210,35 @@ class WeatherMapBase
         $this->template = $template_name;
         wm_debug("Resetting to template %s %s\n", $this->my_type(), $template_name);
         $this->reset($owner);
+    }
+
+    // by tracking which objects depend on each other, we can reduce the number of full-table searches for a single object
+    // (mostly in the editor for things like moving nodes)
+
+    public function addDependency($object)
+    {
+        $this->dependencies[] = $object;
+    }
+
+    public function removeDependency($leavingObject)
+    {
+        foreach ($this->dependencies as $key => $object) {
+            if ($leavingObject === $object) {
+                // delete it
+                unset($this->dependencies[$key]);
+            }
+        }
+    }
+
+    public function getDependencies()
+    {
+        return $this->dependencies;
+    }
+
+    public function cleanUp()
+    {
+        $this->dependencies = array();
+        $this->descendents = array();
     }
 }
 

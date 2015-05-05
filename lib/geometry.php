@@ -93,10 +93,7 @@ class WMPoint
 
     public function distanceToPoint($p2)
     {
-        $v = $this->vectorToPoint($p2);
-        $d = $v->length();
-
-        return $d;
+        return $this->vectorToPoint($p2)->length();
     }
 
     public function copy()
@@ -202,7 +199,7 @@ class WMVector
     public function getSlope()
     {
         if ($this->dx == 0) {
-            // special case - if slope is infinite, fudge it to be REALLY BIG instead
+            // special case - if slope is infinite, fudge it to be REALLY BIG instead. Close enough for TV.
             wm_debug("Slope is infinite.\n");
             return 1e10;
         }
@@ -416,13 +413,13 @@ class WMLine
             throw new WMException("ParallelLinesNeverCross");
         }
 
-        $b1 = $this->getYIntercept();
-        $b2 = $line2->getYIntercept();
+        $intercept1 = $this->getYIntercept();
+        $intercept2 = $line2->getYIntercept();
 
-        $xi = ($b2 - $b1) / ($slope1 - $slope2);
-        $yi = $b1 + $slope1*$xi;
+        $xCrossing = ($intercept2 - $intercept1) / ($slope1 - $slope2);
+        $yCrossing = $intercept1 + $slope1*$xCrossing;
 
-        return new WMPoint($xi, $yi);
+        return new WMPoint($xCrossing, $yCrossing);
     }
 }
 class WMLineSegment

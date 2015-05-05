@@ -48,9 +48,13 @@ class WeatherMapLink extends WeatherMapDataItem
 
     public $geometry;  // contains all the spine-related data (WMLinkGeometry)
 
-    function __construct()
+    function __construct($name, $template, $owner)
     {
         parent::__construct();
+
+        $this->name = $name;
+        $this->owner = $owner;
+        $this->template = $template;
 
         $this->inherit_fieldlist=array(
             'my_default' => null,
@@ -108,6 +112,8 @@ class WeatherMapLink extends WeatherMapDataItem
             'max_bandwidth_in_cfg' => '100M',
             'max_bandwidth_out_cfg' => '100M'
         );
+
+        $this->reset($owner);
     }
 
     function getTemplateObject()
@@ -246,6 +252,8 @@ class WeatherMapLink extends WeatherMapDataItem
     
     public function cleanUp()
     {
+        parent::cleanUp();
+
         $this->owner = null;
         $this->a = null;
         $this->b = null;
@@ -759,6 +767,31 @@ class WeatherMapLink extends WeatherMapDataItem
             return $this->$name;
         }
         throw new WMException("NoSuchProperty");
+    }
+
+    /**
+     * Set the new ends for a link.
+     *
+     * @param $node1
+     * @param $node2
+     */
+    public function setEndNodes($node1, $node2)
+    {
+        if (null !== $this->a) {
+            $this->a->removeDependency($this);
+        }
+        if (null !== $this->b) {
+            $this->b->removeDependency($this);
+        }
+        $this->a = $node1;
+        $this->b = $node2;
+
+        if (null !== $this->a) {
+            $this->a->addDependency($this);
+        }
+        if (null !== $this->b) {
+            $this->b->addDependency($this);
+        }
     }
 
     /**

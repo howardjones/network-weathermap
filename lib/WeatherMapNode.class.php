@@ -42,9 +42,13 @@ class WeatherMapNode extends WeatherMapDataItem
 
     var $runtime = array();
 
-    function __construct()
+    function __construct($name, $template, $owner)
     {
         parent::__construct();
+
+        $this->name = $name;
+        $this->owner = $owner;
+        $this->template = $template;
 
         $this->inherit_fieldlist = array
         (
@@ -108,6 +112,7 @@ class WeatherMapNode extends WeatherMapDataItem
         $this->pos_named = false;
         $this->image = null;
 
+        $this->reset($owner);
     }
 
     function isTemplate()
@@ -134,6 +139,8 @@ class WeatherMapNode extends WeatherMapDataItem
 
     public function cleanUp()
     {
+        parent::cleanUp();
+
         if (isset($this->image)) {
             imagedestroy($this->image);
         }

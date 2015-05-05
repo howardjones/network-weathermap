@@ -1176,9 +1176,9 @@ class WeatherMapConfigReader
                 wm_warn("Duplicate node name " . $matches[1] . " at line $this->lineCount - only the last one defined is used. [WMWARN24]\n");
             }
 
-            $this->currentObject = new WeatherMapNode();
-            $this->currentObject->name = $matches[1];
-            $this->currentObject->reset($this->mapObject);
+            $this->currentObject = new WeatherMapNode($matches[1], "DEFAULT", $this->mapObject);
+//            $this->currentObject->name = $matches[1];
+//            $this->currentObject->reset($this->mapObject);
             wm_debug("Created new NODE\n");
         }
         $this->objectLineCount = 0;
@@ -1207,9 +1207,9 @@ class WeatherMapConfigReader
             if (isset($this->mapObject->links[$matches[1]])) {
                 wm_warn("Duplicate link name " . $matches[1] . " at line $this->lineCount - only the last one defined is used. [WMWARN25]\n");
             }
-            $this->currentObject = new WeatherMapLink();
-            $this->currentObject->name = $matches[1];
-            $this->currentObject->reset($this->mapObject);
+            $this->currentObject = new WeatherMapLink($matches[1], "DEFAULT", $this->mapObject);
+//            $this->currentObject->name = $matches[1];
+//            $this->currentObject->reset($this->mapObject);
             wm_debug("Created new LINK\n");
         }
         $this->currentType = "LINK";

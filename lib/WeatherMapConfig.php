@@ -1283,14 +1283,14 @@ class WeatherMapConfigReader
         }
 
         if (preg_match('/^([^:]+):([A-Za-z][A-Za-z0-9\-_]*)$/i', $input, $submatches)) {
-            $other_node = $submatches[1];
-            if (array_key_exists($submatches[2], $this->mapObject->nodes[$other_node]->named_offsets)) {
+            $otherNode = $this->mapObject->getNode($submatches[1]);
+            if (array_key_exists($submatches[2], $otherNode->named_offsets)) {
                 $named_offset = $submatches[2];
                 $nodename = preg_replace("/:$named_offset$/i", '', $input);
 
                 $endoffset = $named_offset;
-                $offset_dx = $this->mapObject->nodes[$other_node]->named_offsets[$named_offset][0];
-                $offset_dy = $this->mapObject->nodes[$other_node]->named_offsets[$named_offset][1];
+                $offset_dx = $otherNode->named_offsets[$named_offset][0];
+                $offset_dy = $otherNode->named_offsets[$named_offset][1];
             }
         }
 
@@ -1302,22 +1302,22 @@ class WeatherMapConfigReader
     {
         $offset_dx = array();
         $offset_dy = array();
-        $nodenames = array();
-        $endoffset = array();
+        $nodeNames = array();
+        $endOffsets = array();
 
         if (preg_match("/^NODES\s+(\S+)\s+(\S+)\s*$/i", $fullcommand, $matches)) {
             $valid_nodes = 2;
 
             foreach (array(1, 2) as $i) {
-                $endoffset[$i] = 'C';
-                $nodenames[$i] = $matches[$i];
+                $endOffsets[$i] = 'C';
+                $nodeNames[$i] = $matches[$i];
                 $offset_dx[$i] = 0;
                 $offset_dy[$i] = 0;
 
-                list($offset_dx[$i], $offset_dy[$i], $nodenames[$i], $endoffset[$i], $need_size_precalc) = $this->interpretNodeSpec($matches[$i]);
+                list($offset_dx[$i], $offset_dy[$i], $nodeNames[$i], $endOffsets[$i], $need_size_precalc) = $this->interpretNodeSpec($matches[$i]);
 
-                if (!array_key_exists($nodenames[$i], $this->mapObject->nodes)) {
-                    wm_warn("Unknown node '" . $nodenames[$i] . "' on line $this->lineCount of config\n");
+                if (!array_key_exists($nodeNames[$i], $this->mapObject->nodes)) {
+                    wm_warn("Unknown node '" . $nodeNames[$i] . "' on line $this->lineCount of config\n");
                     $valid_nodes--;
                 }
             }
@@ -1325,10 +1325,11 @@ class WeatherMapConfigReader
             // TODO - really, this should kill the whole link, and reset for the next one
             // XXX this error case will not work in the handler function
             if ($valid_nodes == 2) {
-                $this->currentObject->a = $this->mapObject->nodes[$nodenames[1]];
-                $this->currentObject->b = $this->mapObject->nodes[$nodenames[2]];
-                $this->currentObject->a_offset = $endoffset[1];
-                $this->currentObject->b_offset = $endoffset[2];
+                // $this->currentObject->a = $nodeA;
+                // $this->currentObject->b = $nodeB;
+                $this->currentObject->setEndNodes($this->mapObject->getNode($nodeNames[1]), $this->mapObject->getNode($nodeNames[2]));
+                $this->currentObject->a_offset = $endOffsets[1];
+                $this->currentObject->b_offset = $endOffsets[2];
 
                 // lash-up to avoid having to pass loads of context to calc_offset
                 // - named offsets require access to the internals of the node, when they are

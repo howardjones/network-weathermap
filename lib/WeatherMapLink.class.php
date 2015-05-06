@@ -777,6 +777,14 @@ class WeatherMapLink extends WeatherMapDataItem
      */
     public function setEndNodes($node1, $node2)
     {
+        if (null ==! $node1 && null === $node2) {
+            throw new WMException("PartiallyRealLink");
+        }
+
+        if (null ==! $node2 && null === $node1) {
+            throw new WMException("PartiallyRealLink");
+        }
+
         if (null !== $this->a) {
             $this->a->removeDependency($this);
         }

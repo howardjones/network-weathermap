@@ -437,7 +437,7 @@ class WeatherMapEditor
         return false;
     }
     
-    function tidyLink($linkname)
+    function tidyLink($linkName)
     {
         if (! $this->isLoaded()) {
             throw new WMException("Map must be loaded before editing API called.");
@@ -445,7 +445,8 @@ class WeatherMapEditor
 
         // draw a map and throw it away, to calculate all the bounding boxes
         $this->map->drawMapImage('null');
-        $this->_tidy_link($linkname);
+        $link = $this->map->getLink($linkName);
+        $this->tidyOneLink($link);
     }
 
     function tidyAllLinks()
@@ -485,9 +486,9 @@ class WeatherMapEditor
      * _retidy_links - find all links that have previously been tidied (_tidied hint) and tidy them again
      * UNLESS $ignore_tidied is set, then do every single link (for editor testing)
      *
-     * @param boolean $ignore_tidied
+     * @param boolean $ignoreTidied
      */
-    function _retidyLinks($ignore_tidied = false)
+    function _retidyLinks($ignoreTidied = false)
     {
         if (! $this->isLoaded()) {
             throw new WMException("Map must be loaded before editing API called.");
@@ -497,221 +498,119 @@ class WeatherMapEditor
         $this->map->drawMapImage('null');
         
         $routes = array();
-        $done = array();
-        
+//        $done = array();
+
+        // build a list of non-template links with their route - a simple key that we can use to tell if two
+        // links go between the same nodes
         foreach ($this->map->links as $link) {
             if (!$link->isTemplate()) {
-                $route = $link->a->name . " " . $link->b->name;
-                if (strcmp($link->a->name, $link->b->name) > 0) {
-                    $route = $link->b->name . " " . $link->a->name;
+                $route = $this->makeRouteKey($link);
+                if ((!$ignoreTidied || $link->get_hint("_tidied") == 0)) {
+                    $routes[$route][] = $link;
                 }
-                $routes[$route][] = $link->name;
             }
         }
         
-        foreach ($this->map->links as $link) {
-            if (isset($link->a) && isset($link->b)) {
-                $route = $link->a->name . " " . $link->b->name;
+        foreach ($routes as $route=>$linkList) {
+//            if (!$linkList->isTemplate()) {
+//                $route = $link->a->name . " " . $link->b->name;
+//
+//                if (strcmp($link->a->name, $link->b->name) > 0) {
+//                    $route = $link->b->name . " " . $link->a->name;
+//                }
 
-                if (strcmp($link->a->name, $link->b->name) > 0) {
-                    $route = $link->b->name . " " . $link->a->name;
-                }
-
-                if (($ignore_tidied || $link->get_hint("_tidied") == 1) && !isset($done[$route])) {
-                    if (sizeof($routes[$route]) == 1) {
-                        $this->_tidy_link($link->name);
-                        $done[$route] = 1;
+//                if (($ignoreTidied || $linkList->get_hint("_tidied") == 1)) {
+                    if (sizeof($linkList) == 1) {
+                        $this->tidyOneLink($linkList[0]);
+//                        $done[$route] = 1;
                     } else {
                         # handle multi-links specially...
-                        $this->_tidy_links($routes[$route]);
+                        $this->_tidy_links($linkList);
+//                        $this->_tidy_links($routes[$route]);
                         // mark it so we don't do it again when the other links come by
-                        $done[$route] = 1;
-                    }
+//                        $done[$route] = 1;
+//                    }
                 }
             }
-        }
+//        }
     }
     
     /**
-     * _tidy_link - change link offsets so that link is horizonal or vertical, if possible.
+     * tidyOneLink - change link offsets so that link is horizonal or vertical, if possible.
      *  if not possible, change offsets to the closest facing compass points
      *
-     * @param string $target - the link name to tidy
+     * @param string $link - the link name to tidy
      * @param int $linknumber - if this is part of a group, which number in the group
      * @param int $linktotal - if this is part of a group, how many total in the group
      * @param bool $ignore_tidied - whether to take notice of the "_tidied" hint
      */
-    function _tidy_link($target, $linknumber = 1, $linktotal = 1, $ignore_tidied = false)
+    private function tidyOneLink($link, $linknumber = 1, $linktotal = 1, $ignore_tidied = false)
     {
-        // print "\n-----------------------------------\nTidying $target...\n";
-        if (isset($this->map->links[$target]) and isset($this->map->links[$target]->a)) {
-            $node_a = $this->map->links[$target]->a;
-            $node_b = $this->map->links[$target]->b;
-             
-            $new_a_offset = "0:0";
-            $new_b_offset = "0:0";
-        
-            // Update TODO: if the nodes are already directly left/right or up/down, then use compass-points, not pixel offsets
-            // (e.g. N90) so if the label changes, they won't need to be re-tidied
-        
-            // First bounding box in the node's boundingbox array is the icon, if there is one, or the label if not.
-            $bb_a = $node_a->boundingboxes[0];
-            $bb_b = $node_b->boundingboxes[0];
-        
-            // figure out if they share any x or y coordinates
-            $x_overlap = $this->range_overlaps($bb_a[0], $bb_a[2], $bb_b[0], $bb_b[2]);
-            $y_overlap = $this->range_overlaps($bb_a[1], $bb_a[3], $bb_b[1], $bb_b[3]);
-        
-            $a_x_offset = 0;
-            $a_y_offset = 0;
-            $b_x_offset = 0;
-            $b_y_offset = 0;
-        
-            // if they are side by side, and there's some common y coords, make link horizontal
-            if (!$x_overlap && $y_overlap) {
-                // print "SIDE BY SIDE\n";
-        
-                // snap the X coord to the appropriate edge of the node
-                if ($bb_a[2] < $bb_b[0]) {
-                    $a_x_offset = $bb_a[2] - $node_a->x;
-                    $b_x_offset = $bb_b[0] - $node_b->x;
-                }
-
-                if ($bb_b[2] < $bb_a[0]) {
-                    $a_x_offset = $bb_a[0] - $node_a->x;
-                    $b_x_offset = $bb_b[2] - $node_b->x;
-                }
-        
-                // this should be true whichever way around they are
-                list($min_overlap,$max_overlap) = $this->common_range($bb_a[1], $bb_a[3], $bb_b[1], $bb_b[3]);
-                $overlap = $max_overlap - $min_overlap;
-                $n = $overlap/($linktotal+1);
-        
-                $a_y_offset = $min_overlap + ($linknumber*$n) - $node_a->y;
-                $b_y_offset = $min_overlap + ($linknumber*$n) - $node_b->y;
-
-                $new_a_offset = $this->simplifyOffset($a_x_offset, $a_y_offset);
-                $new_b_offset = $this->simplifyOffset($b_x_offset, $b_y_offset);
-            }
-        
-            // if they are above and below, and there's some common x coords, make link vertical
-            if (!$y_overlap && $x_overlap) {
-                // print "ABOVE/BELOW\n";
-        
-                // snap the Y coord to the appropriate edge of the node
-                if ($bb_a[3] < $bb_b[1]) {
-                    $a_y_offset = $bb_a[3] - $node_a->y;
-                    $b_y_offset = $bb_b[1] - $node_b->y;
-                }
-                if ($bb_b[3] < $bb_a[1]) {
-                    $a_y_offset = $bb_a[1] - $node_a->y;
-                    $b_y_offset = $bb_b[3] - $node_b->y;
-                }
-        
-                list($min_overlap,$max_overlap) = $this->common_range($bb_a[0], $bb_a[2], $bb_b[0], $bb_b[2]);
-                $overlap = $max_overlap - $min_overlap;
-                $n = $overlap/($linktotal+1);
-        
-                // move the X coord to the centre of the overlapping area
-                $a_x_offset = $min_overlap + ($linknumber*$n) - $node_a->x;
-                $b_x_offset = $min_overlap + ($linknumber*$n) - $node_b->x;
-
-                $new_a_offset = $this->simplifyOffset($a_x_offset, $a_y_offset);
-                $new_b_offset = $this->simplifyOffset($b_x_offset, $b_y_offset);
-            }
-        
-            // if no common coordinates, figure out the best diagonal...
-            if ((1==0) && !$y_overlap && !$x_overlap) {
-                $pt_a = new WMPoint($node_a->x, $node_a->y);
-                $pt_b = new WMPoint($node_b->x, $node_b->y);
-                 
-        
-                $line = new WMLineSegment($pt_a, $pt_b);
-        
-                $tangent = $line->vector;
-                $tangent->normalise();
-        
-                $normal = $tangent->getNormal();
-        
-                $pt_a->addVector($normal, 15 * ($linknumber-1));
-                $pt_b->addVector($normal, 15 * ($linknumber-1));
-        
-                $a_x_offset = $pt_a->x - $node_a->x;
-                $a_y_offset = $pt_a->y - $node_a->y;
-        
-                $b_x_offset = $pt_b->x - $node_b->x;
-                $b_y_offset = $pt_b->y - $node_b->y;
-
-                $new_a_offset = $this->simplifyOffset($a_x_offset, $a_y_offset);
-                $new_b_offset = $this->simplifyOffset($b_x_offset, $b_y_offset);
-            }
-        
-            // if no common coordinates, figure out the best diagonal...
-            // currently - brute force search the compass points for the shortest distance
-            // potentially - intersect link line with rectangles to get exact crossing point
-            if (1==0 && !$y_overlap && !$x_overlap) {
-                // print "DIAGONAL\n";
-        
-                $corners = array("NE","E","SE","S","SW","W","NW","N");
-        
-                // start with what we have now
-                $best_distance = distance($node_a->x, $node_a->y, $node_b->x, $node_b->y);
-                $best_offset_a = "C";
-                $best_offset_b = "C";
-        
-                foreach ($corners as $corner1) {
-                    list ($ax,$ay) = WMUtility::calculateOffset($corner1, $bb_a[2] - $bb_a[0], $bb_a[3] - $bb_a[1]);
-        
-                    $axx = $node_a->x + $ax;
-                    $ayy = $node_a->y + $ay;
-        
-                    foreach ($corners as $corner2) {
-                        list($bx,$by) = WMUtility::calculateOffset($corner2, $bb_b[2] - $bb_b[0], $bb_b[3] - $bb_b[1]);
-        
-                        $bxx = $node_b->x + $bx;
-                        $byy = $node_b->y + $by;
-        
-                        $distance = distance($axx, $ayy, $bxx, $byy);
-                        if ($distance < $best_distance) {
-                            // print "from $corner1 ($axx, $ayy) to $corner2 ($bxx, $byy): ";
-                            // print "NEW BEST $d\n";
-                            $best_distance = $distance;
-                            $best_offset_a = $corner1;
-                            $best_offset_b = $corner2;
-                        }
-                    }
-                }
-                // Step back a bit from the edge, to hide the corners of the link
-                $new_a_offset = $best_offset_a."85";
-                $new_b_offset = $best_offset_b."85";
-            }
-        
-            // unwritten/implied - if both overlap, you're doing something weird and you're on your own
-
-            // finally, update the offsets
-            $this->map->links[$target]->a_offset = $new_a_offset;
-            $this->map->links[$target]->b_offset = $new_b_offset;
-            // and also add a note that this link was tidied, and is eligible for automatic tidying
-            $this->map->links[$target]->add_hint("_tidied", 1);
+        if ($link->isTemplate()) {
+            return;
         }
+
+        $node_a = $link->a;
+        $node_b = $link->b;
+
+        // Update TODO: if the nodes are already directly left/right or up/down, then use compass-points, not pixel offsets
+        // (e.g. N90) so if the label changes, they won't need to be re-tidied
+
+        // First bounding box in the node's boundingbox array is the icon, if there is one, or the label if not.
+        $bb_a = $node_a->boundingboxes[0];
+        $bb_b = $node_b->boundingboxes[0];
+
+        // figure out if they share any x or y coordinates
+        $xOverlaps = $this->rangeOverlaps(array($bb_a[0], $bb_a[2]), array($bb_b[0], $bb_b[2]));
+        $yOverlaps = $this->rangeOverlaps(array($bb_a[1], $bb_a[3]), array($bb_b[1], $bb_b[3]));
+
+        $a_x_offset = 0;
+        $a_y_offset = 0;
+        $b_x_offset = 0;
+        $b_y_offset = 0;
+
+        // if they are side by side, and there's some common y coords, make link horizontal
+        if (!$xOverlaps && $yOverlaps) {
+            list($a_x_offset, $b_x_offset) = $this->tidySimpleDimension($bb_a, $bb_b, $node_a, $node_b, 0, "x");
+            list($a_y_offset, $b_y_offset) = $this->tidyComplexDimension($bb_a, $bb_b, $node_a, $node_b, 1, "y", $linknumber, $linktotal);
+        }
+
+        // if they are above and below, and there's some common x coords, make link vertical
+        if (!$yOverlaps && $xOverlaps) {
+            list($a_x_offset, $b_x_offset) = $this->tidyComplexDimension($bb_a, $bb_b, $node_a, $node_b, 0, "x", $linknumber, $linktotal);
+            list($a_y_offset, $b_y_offset) = $this->tidySimpleDimension($bb_a, $bb_b, $node_a, $node_b, 1, "y");
+        }
+
+        if (!$xOverlaps && !$yOverlaps) {
+            // TODO - Do something clever here - nearest corners, or an angled-VIA link?
+        }
+
+        // unwritten/implied - if both overlap, you're doing something weird and you're on your own
+
+        // make the simplest possible offset string and finally, update the offsets
+        $link->a_offset = $this->simplifyOffset($a_x_offset, $a_y_offset);
+        $link->b_offset = $this->simplifyOffset($b_x_offset, $b_y_offset);
+
+        // and also add a note that this link was tidied, and is eligible for automatic retidying
+        $link->add_hint("_tidied", 1);
     }
     
     /**
      * _tidy_links - for a group of links between the same two nodes, distribute them
      * nicely.
      *
-     * @param string[] $links - the link names to treat as a group
+     * @param WeatherMapLink[] $links - the links to treat as a group
      * @param bool $ignore_tidied - whether to take notice of the "_tidied" hint
      *
      */
     function _tidy_links($links, $ignore_tidied = false)
     {
         // not very efficient, but it saves looking for special cases (a->b & b->a together)
-        $ntargets = count($targets);
+        $nTargets = count($links);
         
         $i = 1;
-        foreach ($links as $target) {
-            $this->_tidy_link($target, $i, $ntargets, $ignore_tidied);
+        foreach ($links as $link) {
+            $this->tidyOneLink($link, $i, $nTargets, $ignore_tidied);
             $i++;
         }
     }
@@ -768,24 +667,23 @@ class WeatherMapEditor
             throw new WMException("Map must be loaded before editing API called.");
         }
 
+        throw new WMException("unimplemented");
     }
-    
-    
+
+
     /**
-     * range_overlaps - check if two ranges have anything in common. Used for tidy()
+     * rangeOverlaps - check if two ranges have anything in common. Used for tidy()
      *
-     * @param unknown $a_min
-     * @param unknown $a_max
-     * @param unknown $b_min
-     * @param unknown $b_max
-     * @return boolean
+     * @param float[] $rangeA
+     * @param float[] $rangeB
+     * @return bool
      */
-    function range_overlaps($a_min, $a_max, $b_min, $b_max)
+    function rangeOverlaps($rangeA, $rangeB)
     {
-        if ($a_min > $b_max) {
+        if ($rangeA[0] > $rangeB[1]) {
             return false;
         }
-        if ($b_min > $a_max) {
+        if ($rangeB[0] > $rangeA[1]) {
             return false;
         }
     
@@ -793,30 +691,18 @@ class WeatherMapEditor
     }
     
     /**
-     * common_range - find the range of numbers where two ranges overlap. Used for tidy()
+     * findCommonRange - find the range of numbers where two ranges overlap. Used for tidy()
      *
-     * @param number $a_min
-     * @param number $a_max
-     * @param number $b_min
-     * @param number $b_max
+     * @param number[] $rangeA
+     * @param number[] $rangeB
      * @return number list($min,$max)
      */
-    function common_range($a_min, $a_max, $b_min, $b_max)
+    function findCommonRange($rangeA, $rangeB)
     {
-        $min_overlap = max($a_min, $b_min);
-        $max_overlap = min($a_max, $b_max);
+        $min_overlap = max($rangeA[0], $rangeB[0]);
+        $max_overlap = min($rangeA[1], $rangeB[1]);
     
         return array($min_overlap, $max_overlap);
-    }
-    
-    /* distance - find the distance between two points
-     *
-    */
-    function distance($ax, $ay, $bx, $by)
-    {
-        $dx = $bx - $ax;
-        $dy = $by - $ay;
-        return sqrt($dx*$dx + $dy*$dy);
     }
 
     /**
@@ -829,20 +715,20 @@ class WeatherMapEditor
      */
     function simplifyOffset($x_offset, $y_offset)
     {
-        if ($x_offset== 0 && $y_offset==0) {
+        if ($x_offset == 0 && $y_offset == 0) {
             return "";
         }
 
-        if ($x_offset==0) {
-            if ($y_offset<0) {
+        if ($x_offset == 0) {
+            if ($y_offset < 0) {
                 return "N95";
             } else {
                 return "S95";
             }
         }
 
-        if ($y_offset==0) {
-            if ($x_offset <0) {
+        if ($y_offset == 0) {
+            if ($x_offset < 0) {
                 return "W95";
             } else {
                 return "E95";
@@ -850,5 +736,71 @@ class WeatherMapEditor
         }
 
         return sprintf("%d:%d", $x_offset, $y_offset);
+    }
+
+    /**
+     * @param $linkList
+     * @return string
+     */
+    private function makeRouteKey($linkList)
+    {
+        $route = $linkList->a->name . " " . $linkList->b->name;
+        if (strcmp($linkList->a->name, $linkList->b->name) > 0) {
+            $route = $linkList->b->name . " " . $linkList->a->name;
+            return $route;
+        }
+        return $route;
+    }
+
+    /**
+     * @param $bb_a
+     * @param $bb_b
+     * @param $node_a
+     * @param $node_b
+     * @param $simpleIndex
+     * @param $simpleCoordinate
+     * @return array
+     */
+    private function tidySimpleDimension($bb_a, $bb_b, $node_a, $node_b, $simpleIndex, $simpleCoordinate)
+    {
+// snap the easy coord to the appropriate edge of the node
+        // [A] [B]
+        if ($bb_a[$simpleIndex + 2] < $bb_b[$simpleIndex]) {
+            $a_x_offset = $bb_a[$simpleIndex + 2] - $node_a->$simpleCoordinate;
+            $b_x_offset = $bb_b[$simpleIndex] - $node_b->$simpleCoordinate;
+        }
+
+        // [B] [A]
+        if ($bb_b[$simpleIndex + 2] < $bb_a[$simpleIndex]) {
+            $a_x_offset = $bb_a[$simpleIndex] - $node_a->$simpleCoordinate;
+            $b_x_offset = $bb_b[$simpleIndex + 2] - $node_b->$simpleCoordinate;
+            return array($a_x_offset, $b_x_offset);
+        }
+        return array($a_x_offset, $b_x_offset);
+    }
+
+    /**
+     * @param $bb_a
+     * @param $bb_b
+     * @param $node_a
+     * @param $node_b
+     * @param $hardIndex
+     * @param $hardCoordinate
+     * @param $linkIndex
+     * @param $linkCount
+     * @return array
+     */
+    private function tidyComplexDimension($bb_a, $bb_b, $node_a, $node_b, $hardIndex, $hardCoordinate, $linkIndex, $linkCount)
+    {
+// find the overlapping span for the 'hard' coordinate, then divide it into $linkTotal equal steps
+        // this should be true whichever way around they are
+        list($min_overlap, $max_overlap) = $this->findCommonRange(array($bb_a[$hardIndex], $bb_a[$hardIndex + 2]), array($bb_b[$hardIndex], $bb_b[$hardIndex + 2]));
+        $overlap = $max_overlap - $min_overlap;
+        $stepPerLink = $overlap / ($linkCount + 1);
+
+        $a_y_offset = $min_overlap + ($linkIndex * $stepPerLink) - $node_a->$hardCoordinate;
+        $b_y_offset = $min_overlap + ($linkIndex * $stepPerLink) - $node_b->$hardCoordinate;
+
+        return array($a_y_offset, $b_y_offset);
     }
 }

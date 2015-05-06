@@ -3,7 +3,7 @@
 # the config-based tests require imagemagick's compare command
 sudo apt-get install imagemagick
 # phpdoc needs the XSL extension
-sudo apt-get install php5-xsl graphviz php5-curl php5-gd
+sudo apt-get install php5-xsl graphviz php5-curl php5-gd php5-xdebug
 # the documentation compilation process needs xsltproc
 sudo apt-get install xsltproc
 

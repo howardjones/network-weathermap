@@ -157,7 +157,6 @@ class WeatherMapNode extends WeatherMapDataItem
         return array(OUT);
     }
 
-
     /***
      * precalculate the colours to be used, and the bounding boxes for labels and icons (if they exist)
      *

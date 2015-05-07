@@ -9,6 +9,11 @@ class WeatherMapDataSource
 {
     var $owner;
 
+    public function __construct()
+    {
+        
+    }
+
     /**
      * Initialize - called after config has been read (so SETs are processed)
      * but just before ReadData. Used to allow plugins to verify their dependencies

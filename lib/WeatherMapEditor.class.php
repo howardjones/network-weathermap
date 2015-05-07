@@ -511,7 +511,7 @@ class WeatherMapEditor
             }
         }
         
-        foreach ($routes as $route=>$linkList) {
+        foreach ($routes as $route => $linkList) {
 //            if (!$linkList->isTemplate()) {
 //                $route = $link->a->name . " " . $link->b->name;
 //
@@ -520,18 +520,18 @@ class WeatherMapEditor
 //                }
 
 //                if (($ignoreTidied || $linkList->get_hint("_tidied") == 1)) {
-                    if (sizeof($linkList) == 1) {
-                        $this->tidyOneLink($linkList[0]);
+            if (sizeof($linkList) == 1) {
+                $this->tidyOneLink($linkList[0]);
 //                        $done[$route] = 1;
-                    } else {
-                        # handle multi-links specially...
-                        $this->_tidy_links($linkList);
+            } else {
+                # handle multi-links specially...
+                $this->_tidy_links($linkList);
 //                        $this->_tidy_links($routes[$route]);
-                        // mark it so we don't do it again when the other links come by
+                // mark it so we don't do it again when the other links come by
 //                        $done[$route] = 1;
 //                    }
-                }
             }
+        }
 //        }
     }
     

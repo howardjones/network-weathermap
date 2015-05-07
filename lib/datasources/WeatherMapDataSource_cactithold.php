@@ -23,8 +23,6 @@
 
 class WeatherMapDataSource_cactithold extends WeatherMapDataSource
 {
-    protected $regexpsHandled;
-
     public function __construct()
     {
         parent::__construct();
@@ -245,15 +243,19 @@ class WeatherMapDataSource_cactithold extends WeatherMapDataSource
 
         if (isset($plugins) && in_array('thold', $plugins)) {
             $thold_present = true;
-            return $thold_present;
         }
+
         return $thold_present;
     }
 
     private function checkForTholdTables()
     {
         $sql = "show tables";
-        $result = db_fetch_assoc($sql) or die (mysql_error());
+        $result = db_fetch_assoc($sql);
+        if (null === $result || !is_array($result) || count($result)==0) {
+            throw new Exception(mysql_error());
+        }
+
         $tables = array();
 
         foreach ($result as $arr) {

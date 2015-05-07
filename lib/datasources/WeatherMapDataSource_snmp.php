@@ -15,6 +15,15 @@
 
 class WeatherMapDataSource_snmp extends WeatherMapDataSource
 {
+    private $snmpSavedQuickPrint;
+    private $snmpSavedValueRetrieval;
+
+    public function __construct()
+    {
+        parent::__construct();
+
+        $this->regexpsHandled = array('/^snmp:([^:]+):([^:]+):([^:]+):([^:]+)$/');
+    }
 
     function Init(&$map)
     {
@@ -29,103 +38,50 @@ class WeatherMapDataSource_snmp extends WeatherMapDataSource
         return(false);
     }
 
-
-    function Recognise($targetString)
-    {
-        if (preg_match("/^snmp:([^:]+):([^:]+):([^:]+):([^:]+)$/", $targetString)) {
-            return true;
-        } else {
-            return false;
-        }
-    }
-
-    function ReadData($targetString, &$map, &$mapItem)
+    public function ReadData($targetString, &$map, &$mapItem)
     {
         $data[IN] = null;
         $data[OUT] = null;
         $data_time = 0;
 
-        $timeout = 1000000;
-        $retries = 2;
-        $abort_count = 0;
+        $timeout = intval($this->owner->get_hint("snmp_timeout", 1000000));
+        $abort_count = intval($this->owner->get_hint("snmp_abort_count"), 0);
+        $retries = intval($this->owner->get_hint("snmp_retries"), 2);
 
-        $in_result = null;
-        $out_result = null;
-
-        if ($map->get_hint("snmp_timeout") != '') {
-            $timeout = intval($map->get_hint("snmp_timeout"));
-            wm_debug("Timeout changed to ".$timeout." microseconds.\n");
-        }
-
-        if ($map->get_hint("snmp_abort_count") != '') {
-            $abort_count = intval($map->get_hint("snmp_abort_count"));
-            wm_debug("Will abort after $abort_count failures for a given host.\n");
-        }
-
-        if ($map->get_hint("snmp_retries") != '') {
-            $retries = intval($map->get_hint("snmp_retries"));
-            wm_debug("Number of retries changed to ".$retries.".\n");
-        }
-
-        if (preg_match("/^snmp:([^:]+):([^:]+):([^:]+):([^:]+)$/", $targetString, $matches)) {
+        if (preg_match($this->regexpsHandled[0], $targetString, $matches)) {
             $community = $matches[1];
             $host = $matches[2];
-            $in_oid = $matches[3];
-            $out_oid = $matches[4];
+
+            $oids = array();
+            $oids[IN] = $matches[3];
+            $oids[OUT] = $matches[4];
 
             if (($abort_count == 0)
                 || (
-                    ( $abort_count>0 )
+                    ( $abort_count > 0 )
                     && ( !isset($this->down_cache[$host]) || intval($this->down_cache[$host]) < $abort_count )
                 )
               ) {
-                if (function_exists("snmp_get_quick_print")) {
-                    $was = snmp_get_quick_print();
-                    snmp_set_quick_print(1);
-                }
-                if (function_exists("snmp_get_valueretrieval")) {
-                    $was2 = snmp_get_valueretrieval();
-                }
+                $this->changeSNMPSettings();
 
-                if (function_exists('snmp_set_oid_output_format')) {
-                    snmp_set_oid_output_format(SNMP_OID_OUTPUT_NUMERIC);
-                }
-                if (function_exists('snmp_set_valueretrieval')) {
-                    snmp_set_valueretrieval(SNMP_VALUE_PLAIN);
-                }
+                $channels = array("in"=>IN, "out"=>OUT);
 
-                if ($in_oid != '-') {
-                    $in_result = snmpget($host, $community, $in_oid, $timeout, $retries);
-                    if ($in_result !== false) {
-                        $data[IN] = floatval($in_result);
-                        $mapItem->add_hint("snmp_in_raw", $in_result);
-                    } else {
-                        $this->down_cache{$host}++;
+                foreach ($channels as $channelName => $channel) {
+                    if ($oids[$channel] != '-') {
+                        $result = snmpget($host, $community, $oids[$channel], $timeout, $retries);
+                        if ($result !== false) {
+                            $data[$channel] = floatval($result);
+                            $mapItem->add_hint("snmp_".$channelName."_raw", $result);
+                        } else {
+                            $this->down_cache{$host}++;
+                        }
                     }
+                    wm_debug("SNMP ReadData: Got $result for $channelName\n");
                 }
-                if ($out_oid != '-') {
-                    $out_result = snmpget($host, $community, $out_oid, $timeout, $retries);
-                    if ($out_result !== false) {
-                        // use floatval() here to force the output to be *some* kind of number
-                        // just in case the stupid formatting stuff doesn't stop net-snmp returning 'down' instead of 2
-                        $data[OUT] = floatval($out_result);
-                        $mapItem->add_hint("snmp_out_raw", $out_result);
-                    } else {
-                        $this->down_cache{$host}++;
-                    }
-                }
-
-                wm_debug("SNMP ReadData: Got $in_result and $out_result\n");
 
                 $data_time = time();
+                $this->restoreSNMPSettings();
 
-                // Restore the SNMP settings as before
-                if (function_exists("snmp_set_quick_print")) {
-                    snmp_set_quick_print($was);
-                }
-                if (function_exists("snmp_set_valueretrieval")) {
-                    snmp_set_valueretrieval($was2);
-                }
             } else {
                 wm_warn("SNMP for $host has reached $abort_count failures. Skipping. [WMSNMP01]");
             }
@@ -134,6 +90,35 @@ class WeatherMapDataSource_snmp extends WeatherMapDataSource
         wm_debug("SNMP ReadData: Returning (".($data[IN]===null?'null':$data[IN]).",".($data[OUT]===null?'null':$data[OUT]).",$data_time)\n");
 
         return (array($data[IN], $data[OUT], $data_time));
+    }
+
+    private function restoreSNMPSettings()
+    {
+// Restore the SNMP settings as before
+        if (function_exists("snmp_set_quick_print")) {
+            snmp_set_quick_print($this->snmpSavedQuickPrint);
+        }
+        if (function_exists("snmp_set_valueretrieval")) {
+            snmp_set_valueretrieval($this->snmpSavedValueRetrieval);
+        }
+    }
+
+    private function changeSNMPSettings()
+    {
+        if (function_exists("snmp_get_quick_print")) {
+            $this->snmpSavedQuickPrint = snmp_get_quick_print();
+            snmp_set_quick_print(1);
+        }
+        if (function_exists("snmp_get_valueretrieval")) {
+            $this->snmpSavedValueRetrieval = snmp_get_valueretrieval();
+        }
+
+        if (function_exists('snmp_set_oid_output_format')) {
+            snmp_set_oid_output_format(SNMP_OID_OUTPUT_NUMERIC);
+        }
+        if (function_exists('snmp_set_valueretrieval')) {
+            snmp_set_valueretrieval(SNMP_VALUE_PLAIN);
+        }
     }
 }
 

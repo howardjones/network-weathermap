@@ -65,13 +65,13 @@ class WeatherMapBase
         $this->notes[$name] = $value;
     }
 
-    public function get_note($name)
+    public function get_note($name, $defaultValue = null)
     {
         if (isset($this->notes[$name])) {
             return($this->notes[$name]);
         }
 
-        return(null);
+        return($defaultValue);
     }
 
     public function delete_note($name)
@@ -85,13 +85,13 @@ class WeatherMapBase
         $this->hints[$name] = $value;
     }
 
-    public function get_hint($name)
+    public function get_hint($name, $defaultValue = null)
     {
         if (isset($this->hints[$name])) {
             return($this->hints[$name]);
         }
 
-        return(null);
+        return($defaultValue);
     }
 
     public function delete_hint($name)

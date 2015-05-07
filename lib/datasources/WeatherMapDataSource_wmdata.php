@@ -2,62 +2,45 @@
 
 class WeatherMapDataSource_wmdata extends WeatherMapDataSource
 {
-    function Recognise($targetString)
+    public function __construct()
     {
-        if (preg_match("/^wmdata:.*$/", $targetString)) {
-            return true;
-        } else {
-            return false;
-        }
+        parent::__construct();
+
+        $this->regexpsHandled = array('/^wmdata:([^:]*):(.*)');
     }
 
-    // function ReadData($targetstring, $configline, $itemtype, $itemname, $map)
     function ReadData($targetString, &$map, &$mapItem)
     {
         $data[IN] = null;
         $data[OUT] = null;
         $data_time = 0;
-        # $itemname = $item->name;
 
         $matches = 0;
 
-        if (preg_match("/^wmdata:([^:]*):(.*)", $targetString, $matches)) {
-            $datafile = $matches[1];
-            $dataname = $matches[2];
+        if (preg_match($this->regexpsHandled[0], $targetString, $matches)) {
+            $dataFileName = $matches[1];
+            $dataItemName = $matches[2];
         }
 
-        if (file_exists($datafile)) {
-            $fd = fopen($targetString, "r");
-            if ($fd) {
-                $found = false;
-                while (!feof($fd)) {
-                    $buffer = fgets($fd, 4096);
-                    # strip out any Windows line-endings that have gotten in here
-                    $buffer = str_replace("\r", "", $buffer);
+        if (! file_exists($dataFileName)) {
+            wm_warn("WMData ReadData: $dataFileName doesn't exist [WMWMDATA01]");
+            return array(null, null, 0);
+        }
 
-                    $fields = explode("\t", $buffer);
-                    if ($fields[0] == $dataname) {
-                        $data[IN] = $fields[1];
-                        $data[OUT] = $fields[2];
-                        $found = true;
-                    }
-                }
+        $fileHandle = fopen($targetString, "r");
+        if (!$fileHandle) {
+            wm_warn("WMData ReadData: Couldn't open ($dataFileName). [WMWMDATA02]\n");
+            return array(null, null, 0);
+        }
 
-                if ($found===true) {
-                    $stats = stat($datafile);
-                    $data_time = $stats['mtime'];
-                } else {
-                    wm_warn("WMData ReadData: Data name ($dataname) didn't exist in ($datafile). [WMWMDATA03]\n");
-                }
-                
-            } else {
-                wm_warn("WMData ReadData: Couldn't open ($datafile). [WMWMDATA02]\n");
-            }
+        list($found, $data) = $this->findDataItem($fileHandle, $dataItemName, $data);
 
+        if ($found===true) {
+            $stats = stat($dataFileName);
+            $data_time = $stats['mtime'];
         } else {
-            wm_warn("WMData ReadData: $datafile doesn't exist [WMWMDATA01]");
+            wm_warn("WMData ReadData: Data name '$dataItemName' didn't exist in '$dataFileName'. [WMWMDATA03]\n");
         }
-
 
         wm_debug(
             sprintf(
@@ -73,6 +56,31 @@ class WeatherMapDataSource_wmdata extends WeatherMapDataSource
             $data[OUT],
             $data_time
         ));
+    }
+
+    /**
+     * @param $fileHandle
+     * @param $dataItemName
+     * @param $data
+     * @return array
+     */
+    private function findDataItem($fileHandle, $dataItemName, $data)
+    {
+        $found = false;
+        while (!feof($fileHandle)) {
+            $buffer = fgets($fileHandle, 4096);
+            # strip out any Windows line-endings that have gotten in here
+            $buffer = str_replace("\r", "", $buffer);
+
+            $fields = explode("\t", $buffer);
+            if ($fields[0] == $dataItemName) {
+                $data[IN] = $fields[1];
+                $data[OUT] = $fields[2];
+                $found = true;
+            }
+        }
+
+        return array($found, $data);
     }
 }
 

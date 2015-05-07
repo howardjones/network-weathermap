@@ -19,6 +19,11 @@ class WeatherMapDataSource_fping extends WeatherMapDataSource
         #
         $this->fping_cmd = "/usr/local/sbin/fping";
 
+        if (is_executable($this->fping_cmd)) {
+            wm_debug("FPing ReadData: Can't find fping executable. Check path at line 20 of WeatherMapDataSource_fping.php]\n");
+            return false;
+        }
+
         return(true);
     }
 
@@ -27,7 +32,7 @@ class WeatherMapDataSource_fping extends WeatherMapDataSource
     // SO... don't do anything in here that relies on the things that Init looked for, because they might not exist!
     function Recognise($targetString)
     {
-        if (preg_match("/^fping:(\S+)$/", $targetString, $matches)) {
+        if (preg_match('/^fping:(\S+)$/', $targetString, $matches)) {
             // save the address. This way, we can do ONE fping call for all the pings in the map.
             // fping does it all in parallel, so 10 hosts takes the same time as 1
             $this->addresscache[] = $matches[1];
@@ -48,14 +53,16 @@ class WeatherMapDataSource_fping extends WeatherMapDataSource
             $ping_count = 5;
         }
 
-        if (preg_match("/^fping:(\S+)$/", $targetString, $matches)) {
+        if (preg_match('/^fping:(\S+)$/', $targetString, $matches)) {
             $target = $matches[1];
 
-            $pattern = "/^$target\s:";
+            $pattern = '/^$target\s:';
             for ($i=0; $i<$ping_count; $i++) {
-                $pattern .= "\s(\S+)";
+                $pattern .= '\s(\S+)';
             }
             $pattern .= "/";
+
+            // TODO - this doesn't really validate the target in any way!!
 
             if (is_executable($this->fping_cmd)) {
                 $command = $this->fping_cmd." -t100 -r1 -p20 -u -C $ping_count -i10 -q $target 2>&1";
@@ -113,7 +120,7 @@ class WeatherMapDataSource_fping extends WeatherMapDataSource
                     }
                 }
             } else {
-                wm_warn("FPing ReadData: Can't find fping executable. Check path at line 19 of WeatherMapDataSource_fping.php [WMFPING01]\n");
+                wm_warn("FPing ReadData: Can't find fping executable. Check path at line 20 of WeatherMapDataSource_fping.php [WMFPING01]\n");
             }
         }
 

@@ -2,7 +2,6 @@
 
 class WeatherMapDataSource_time extends WeatherMapDataSource
 {
-
     function Recognise($targetString)
     {
         if (preg_match("/^time:(.*)$/", $targetString)) {

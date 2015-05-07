@@ -1,5 +1,7 @@
 # Network Weathermap
 
+[![Join the chat at https://gitter.im/howardjones/network-weathermap](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/howardjones/network-weathermap?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+
 [![Build Status](https://travis-ci.org/howardjones/network-weathermap.svg?branch=master)](https://travis-ci.org/howardjones/network-weathermap)
 [![Test Coverage](https://codeclimate.com/github/howardjones/network-weathermap/badges/coverage.svg)](https://codeclimate.com/github/howardjones/network-weathermap)
 [![Code Climate](https://codeclimate.com/github/howardjones/network-weathermap/badges/gpa.svg)](https://codeclimate.com/github/howardjones/network-weathermap)

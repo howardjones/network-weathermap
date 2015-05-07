@@ -7,11 +7,12 @@
  */
 class WeatherMapDataSource
 {
-    var $owner;
+    protected $owner;
+    protected $regexpsHandled;
 
     public function __construct()
     {
-        
+        $this->regexpsHandled = array();
     }
 
     /**
@@ -33,11 +34,18 @@ class WeatherMapDataSource
     /**
      * called with the TARGET string by map->ReadData()
      *
+     * Default implementation just checks the regexps in regexpsHandled[], so you may not need to implement at all.
+     *
      * @return bool Returns true or false, depending on whether it wants to handle this TARGET
      *
      */
     public function Recognise($targetString)
     {
+        foreach ($this->regexpsHandled as $regexp) {
+            if (preg_match($regexp, $targetString)) {
+                return true;
+            }
+        }
         return false;
     }
 

@@ -29,6 +29,13 @@
 
     require_once dirname(__FILE__).'/image-functions.php';
     require_once dirname(__FILE__).'/geometry.php';
+    require_once dirname(__FILE__).'/WMPoint.class.php';
+    require_once dirname(__FILE__).'/WMVector.class.php';
+    require_once dirname(__FILE__).'/WMLine.class.php';
+    require_once dirname(__FILE__).'/WMRectangle.class.php';
+    require_once dirname(__FILE__).'/WMBoundingBox.class.php';
+    require_once dirname(__FILE__).'/CatmullRom.class.php';
+
     require_once dirname(__FILE__).'/WMSpine.class.php';
     require_once dirname(__FILE__).'/WMLinkGeometry.class.php';
     require_once dirname(__FILE__).'/WMAngledLinkGeometry.class.php';

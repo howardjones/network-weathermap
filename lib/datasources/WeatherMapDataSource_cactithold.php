@@ -23,7 +23,7 @@
 
 class WeatherMapDataSource_cactithold extends WeatherMapDataSource
 {
-    private $regexpsHandled;
+    protected $regexpsHandled;
 
     public function __construct()
     {
@@ -36,7 +36,7 @@ class WeatherMapDataSource_cactithold extends WeatherMapDataSource
         );
     }
 
-    function Init(&$map)
+    public function Init(&$map)
     {
 
         if ($map->context == 'cacti') {
@@ -58,19 +58,8 @@ class WeatherMapDataSource_cactithold extends WeatherMapDataSource
         return(false);
     }
 
-    function Recognise($targetString)
+    public function ReadData($targetString, &$map, &$mapItem)
     {
-        foreach ($this->regexpsHandled as $regexp) {
-            if (preg_match($regexp, $targetString)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    function ReadData($targetString, &$map, &$mapItem)
-    {
-
         $data[IN] = null;
         $data[OUT] = null;
         $data_time = 0;
@@ -152,7 +141,6 @@ class WeatherMapDataSource_cactithold extends WeatherMapDataSource
         $stateName = '';
 
         $SQL = "select * from host where id=$id";
-
         $hostInfo = db_fetch_row($SQL);
 
         if (isset($hostInfo)) {
@@ -166,19 +154,7 @@ class WeatherMapDataSource_cactithold extends WeatherMapDataSource
             }
             $stateName = $states[$state];
 
-            $data[OUT] = 0;
-
-            $mapItem->add_note("cacti_description", $hostInfo['description']);
-
-            $mapItem->add_note("cacti_hostname", $hostInfo['hostname']);
-            $mapItem->add_note("cacti_curtime", $hostInfo['cur_time']);
-            $mapItem->add_note("cacti_avgtime", $hostInfo['avg_time']);
-            $mapItem->add_note("cacti_mintime", $hostInfo['min_time']);
-            $mapItem->add_note("cacti_maxtime", $hostInfo['max_time']);
-            $mapItem->add_note("cacti_availability", $hostInfo['availability']);
-
-            $mapItem->add_note("cacti_faildate", $hostInfo['status_fail_date']);
-            $mapItem->add_note("cacti_recdate", $hostInfo['status_rec_date']);
+            $this->recordAdditionalNotes($mapItem, $hostInfo);
         }
         wm_debug("CactiTHold ReadData: Basic state for host $id is $state/$stateName\n");
 
@@ -311,6 +287,25 @@ class WeatherMapDataSource_cactithold extends WeatherMapDataSource
             return $data;
         }
         return $data;
+    }
+
+    /**
+     * @param $mapItem
+     * @param $hostInfo
+     */
+    private function recordAdditionalNotes(&$mapItem, $hostInfo)
+    {
+        $mapItem->add_note("cacti_description", $hostInfo['description']);
+
+        $mapItem->add_note("cacti_hostname", $hostInfo['hostname']);
+        $mapItem->add_note("cacti_curtime", $hostInfo['cur_time']);
+        $mapItem->add_note("cacti_avgtime", $hostInfo['avg_time']);
+        $mapItem->add_note("cacti_mintime", $hostInfo['min_time']);
+        $mapItem->add_note("cacti_maxtime", $hostInfo['max_time']);
+        $mapItem->add_note("cacti_availability", $hostInfo['availability']);
+
+        $mapItem->add_note("cacti_faildate", $hostInfo['status_fail_date']);
+        $mapItem->add_note("cacti_recdate", $hostInfo['status_rec_date']);
     }
 }
 

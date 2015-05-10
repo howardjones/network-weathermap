@@ -95,24 +95,10 @@ class WeatherMapDataSource_dsstats extends WeatherMapDataSource
 
     private function checkForDSStatsTables()
     {
-        $sql = "show tables";
-        $result = db_fetch_assoc($sql);
-        if (null === $result || !is_array($result) || count($result)==0) {
-            throw new Exception(mysql_error());
-        }
-
-        $tables = array();
-        foreach ($result as $arr) {
-            foreach ($arr as $t) {
-                $tables[] = $t;
-            }
-        }
-
-        if (!in_array('data_source_stats_hourly_last', $tables)) {
-            wm_debug('ReadData DSStats: data_source_stats_hourly_last database table not found. [DSSTATS003]\n');
+        if (!WMCactiAPI::checkForTable('data_source_stats_hourly_last')) {
+            wm_debug('ReadData CactiTHold: thold_data database table not found. [THOLD003]\n');
             return false;
         }
-
         return true;
     }
 

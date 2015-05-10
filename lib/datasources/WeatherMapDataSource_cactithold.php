@@ -143,9 +143,7 @@ class WeatherMapDataSource_cactithold extends WeatherMapDataSource
 
         if (isset($hostInfo)) {
             // create a note, which can be used in icon filenames or labels more nicely
-            if ($hostInfo['status'] == 1 || $hostInfo['status'] == 2 || $hostInfo['status'] == 3 || $hostInfo['status'] == 5) {
-                $state = $hostInfo['status'];
-            }
+            $state = $hostInfo['status'];
 
             if ($hostInfo['disabled']) {
                 $state = 0;
@@ -250,21 +248,7 @@ class WeatherMapDataSource_cactithold extends WeatherMapDataSource
 
     private function checkForTholdTables()
     {
-        $sql = "show tables";
-        $result = db_fetch_assoc($sql);
-        if (null === $result || !is_array($result) || count($result)==0) {
-            throw new Exception(mysql_error());
-        }
-
-        $tables = array();
-
-        foreach ($result as $arr) {
-            foreach ($arr as $t) {
-                $tables[] = $t;
-            }
-        }
-
-        if (!in_array('thold_data', $tables)) {
+        if (!WMCactiAPI::checkForTable('thold_data')) {
             wm_debug('ReadData CactiTHold: thold_data database table not found. [THOLD003]\n');
             return false;
         }

@@ -89,4 +89,27 @@ class WMCactiAPI
         }
         return $defaultValue;
     }
+
+    public static function checkForTable($tableName)
+    {
+        $sql = "show tables";
+        $result = db_fetch_assoc($sql);
+        if (null === $result || !is_array($result) || count($result)==0) {
+            throw new Exception(mysql_error());
+        }
+
+        $tables = array();
+
+        foreach ($result as $arr) {
+            foreach ($arr as $t) {
+                $tables[] = $t;
+            }
+        }
+
+        if (!in_array($tableName, $tables)) {
+            return false;
+        }
+
+        return true;
+    }
 }

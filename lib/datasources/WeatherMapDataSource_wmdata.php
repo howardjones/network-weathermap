@@ -6,7 +6,7 @@ class WeatherMapDataSource_wmdata extends WeatherMapDataSource
     {
         parent::__construct();
 
-        $this->regexpsHandled = array('/^wmdata:([^:]*):(.*)');
+        $this->regexpsHandled = array('/^wmdata:([^:]*):(.*)/');
     }
 
     function ReadData($targetString, &$map, &$mapItem)

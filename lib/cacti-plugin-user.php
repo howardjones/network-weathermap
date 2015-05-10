@@ -14,18 +14,26 @@ class WeatherMapCactiUserPlugin extends WeatherMapUIBase
         'viewthumb' => array('handler' => 'handleBigThumb', 'args' => array(array("id", "hash"))),
         'viewthumb48' => array('handler' => 'handleLittleThumb', 'args' => array(array("id", "hash"))),
         'viewimage' => array('handler' => 'handleImage', 'args' => array(array("id", "hash"))),
+
         'viewmap' => array('handler' => 'handleView', 'args' => array(array("id", "hash"), array("group_id", "int", true))),
-        'viewmapcycle' => array(
-            'handler' => 'handleViewCycle', 'args' => array(
-                array("fullscreen", "int", true),
-                array("group", "int", true)
-            )),
-            ':: DEFAULT ::' => array(
+
+        'viewcycle_fullscreen' => array('handler' => 'handleViewCycleFullscreen', 'args' => array(array("id", "hash"))),
+        'viewcycle_filtered_fullscreen' => array('handler' => 'handleViewCycleFilteredFullscreen', 'args' => array(array("id", "hash"), array("group_id", "int", true))),
+
+        'viewcycle' => array('handler' => 'handleViewCycle', 'args' => array(array("id", "hash"))),
+        'viewcycle_filtered' => array('handler' => 'handleViewCycleFiltered', 'args' => array(array("id", "hash"), array("group_id", "int", true))),
+
+//        'viewmapcycle' => array(
+//            'handler' => 'handleViewCycle', 'args' => array(
+//                array("fullscreen", "int", true),
+//                array("group", "int", true)
+//            )),
+        ':: DEFAULT ::' => array(
             'handler' => 'handleMainView',
             'args' => array(
                 array("group_id", "int", true)
             )
-            )
+        )
     );
 
     public function __construct($config, $colours, $imageFormat)
@@ -104,58 +112,55 @@ class WeatherMapCactiUserPlugin extends WeatherMapUIBase
         return $mapID;
     }
 
+    protected function handleViewCycleFullscreen($request, $appObject)
+    {
+        $this->outputFullScreenPageTop();
+        $this->drawFullMapFullscreenCycle();
+        $this->outputFullScreenPageBottom();
+    }
+
+    protected function handleViewCycleFilteredFullscreen($request, $appObject)
+    {
+        $this->outputFullScreenPageTop();
+        $this->drawFullMapFullscreenCycle(intval($request['group']));
+        $this->outputFullScreenPageBottom();
+    }
+
     protected function handleViewCycle($request, $appObject)
     {
-        $fullscreen = false;
-        if ((isset($request['fullscreen']) && is_numeric($request['fullscreen']))) {
-            if (intval($request['fullscreen']) == 1) {
-                $fullscreen = true;
-            }
-        }
+        WMCactiAPI::pageTop();
+        $this->outputOverlibSupport();
+        $this->drawFullMapCycle();
+        $this->outputVersionBox();
+        WMCactiAPI::pageBottom();
+    }
 
-        $groupid = -1;
-        if ((isset($request['group']) && is_numeric($request['group']))) {
-            $groupid = intval($request['group']);
-        }
-
-        if ($fullscreen === true) {
-            $this->outputFullScreenPageTop();
-            $this->drawFullMapFullscreenCycle($groupid);
-            $this->outputFullScreenPageBottom();
-        } else {
-            WMCactiAPI::pageTop();
-            $this->outputOverlibSupport();
-            $this->drawFullMapCycle($groupid);
-            $this->outputVersionBox();
-            WMCactiAPI::pageBottom();
-        }
+    protected function handleViewCycleFiltered($request, $appObject)
+    {
+        WMCactiAPI::pageTop();
+        $this->outputOverlibSupport();
+        $this->drawFullMapCycle(intval($request['group']));
+        $this->outputVersionBox();
+        WMCactiAPI::pageBottom();
     }
 
     protected function handleImage($request, $appObject)
     {
-        $fileNameInsert = ".";
-        $filehash = $request['id'];
-        $this->outputMapImage($filehash, $fileNameInsert);
+        $this->outputMapImage($request['id'], ".");
     }
 
     protected function handleBigThumb($request, $appObject)
     {
-        $fileNameInsert = ".thumb.";
-        $filehash = $request['id'];
-        $this->outputMapImage($filehash, $fileNameInsert);
+        $this->outputMapImage($request['id'], ".thumb.");
     }
 
     protected function handleLittleThumb($request, $appObject)
     {
-        $fileNameInsert = ".thumb48.";
-        $filehash = $request['id'];
-        $this->outputMapImage($filehash, $fileNameInsert);
+        $this->outputMapImage($request['id'], ".thumb48.");
     }
 
     private function outputSingleMapView($mapID)
     {
-        $colors = $this->colours;
-
         $map = $this->getMapIfAllowed($mapID);
 
         if (null === $map) {
@@ -163,7 +168,7 @@ class WeatherMapCactiUserPlugin extends WeatherMapUIBase
         }
 
         $htmlFileName = $this->outputDirectory . DIRECTORY_SEPARATOR . $map['filehash'] . ".html";
-        $mapTitle = ($map['titlecache'] == "" ? "Map for config file: " . $map['configfile'] : $map['titlecache']);
+        $mapTitle = $this->getMapTitle($map);
 
         $this->singleMapHeader($mapID, $mapTitle, $map['filehash']);
 
@@ -283,10 +288,7 @@ class WeatherMapCactiUserPlugin extends WeatherMapUIBase
         $colors = $this->colours;
 
         $htmlFileName = $this->outputDirectory . DIRECTORY_SEPARATOR . $mapRecord['filehash'] . ".html";
-        $mapTitle = $mapRecord['titlecache'];
-        if ($mapTitle == '') {
-            $mapTitle = "Map for config file: " . $mapRecord['configfile'];
-        }
+        $mapTitle = $this->getMapTitle($mapRecord);
         print '<div class="weathermapholder" id="mapholder_' . $mapRecord['filehash'] . '">';
 
         html_graph_start_box(1, true);
@@ -399,20 +401,25 @@ class WeatherMapCactiUserPlugin extends WeatherMapUIBase
         $selectOptions = array();
 
         // build up the list options for the select box
-        $lastGroupSeen = "------lasdjflkjsdlfkjlksdjflksjdflkjsldjlkjsd";
-        foreach ($maps as $map) {
-            if ($nGroups > 1 && $map['group_name'] != $lastGroupSeen) {
-                $selectOptions[] = array($map['name'], $currentMapHash, "heading", false);
-                $lastGroupSeen = $map['group_name'];
+        $lastGroupSeen = "------lflkjsldjlkjsd";
+        foreach ($maps as $mapRecord) {
+            // if there's a new group, slip in a heading
+            if ($mapRecord['group_name'] != $lastGroupSeen) {
+                $selectOptions[] = array($mapRecord['group_name'], $currentMapHash, "heading", false);
+                $lastGroupSeen = $mapRecord['group_name'];
             }
-            $option = array($map['titlecache'], $map['filehash'], "", false);
-            if ($currentMapHash == $map['filehash']) {
+
+            $option = array($mapRecord['titlecache'], $mapRecord['filehash'], "", false);
+
+            if ($nGroups > 1) {
+                // if we're showing group headings, then indent the map names
+                $option[0] = "-   " . $option[0];
+            }
+
+            if ($currentMapHash == $mapRecord['filehash']) {
                 $option[3] = true;
             }
-            // if we're showing group headings, then indent the map names
-            if ($nGroups > 1) {
-                $option[0] = " - " . $option[0];
-            }
+
             $selectOptions[] = $option;
         }
 
@@ -423,52 +430,28 @@ class WeatherMapCactiUserPlugin extends WeatherMapUIBase
 
     private function renderOptionsList($options)
     {
-        $colors = $this->colours;
+        print '<form name="weathermap_select" method="post" action="">';
+        print '<input name="action" value="viewmap" type="hidden">';
 
-        html_graph_start_box(3, true);
-        ?>
-        <tr bgcolor="<?php print $colors["panel"]; ?>" class="noprint">
-            <form name="weathermap_select" method="post" action="">
-                <input name="action" value="viewmap" type="hidden">
-                <td class="noprint">
-                    <table width="100%" cellpadding="0" cellspacing="0">
-                        <tr class="noprint">
-                            <td nowrap style='white-space: nowrap;' width="40">
-                                &nbsp;<strong>Jump To Map:</strong>&nbsp;
-                            </td>
-                            <td>
-                                <select name="id">
-                                    <?php
+        print '<select name="id">';
 
-                                    foreach ($options as $option) {
-                                        printf(
-                                            "<option value=\"%s\" class=\"%s\" %s>%s</option>\n",
-                                            htmlspecialchars($option[1]),
-                                            $option[2],
-                                            $option[3] ? "SELECTED" : "",
-                                            htmlspecialchars($option[0])
-                                        );
-                                    }
+        foreach ($options as $option) {
+            printf(
+                "<option value=\"%s\" class=\"%s\" %s>%s</option>\n",
+                htmlspecialchars($option[1]),
+                $option[2],
+                $option[3] ? "SELECTED" : "",
+                htmlspecialchars($option[0])
+            );
+        }
+        print '</select><input type="submit" value="Go">';
 
-                                    ?>
-                                </select>
-                                &nbsp;<input type="image" src="../../images/button_go.gif" alt="Go"
-                                             border="0" align="absmiddle">
-                            </td>
-                        </tr>
-                    </table>
-                </td>
-            </form>
-        </tr>
-        <?php
-        html_graph_end_box(false);
+        print '</form>';
     }
 
     private function getValidTabs()
     {
         $tabs = array();
-
-        return $tabs;
 
         $maps = $this->getAuthorisedMapsWithGroups();
 
@@ -609,10 +592,7 @@ class WeatherMapCactiUserPlugin extends WeatherMapUIBase
         if ($mapRecord['thumb_width'] > 0) {
             $imgSize = sprintf(' WIDTH="%d" HEIGHT="%d" ', $mapRecord['thumb_width'], $mapRecord['thumb_height']);
         }
-        $mapTitle = $mapRecord['titlecache'];
-        if ($mapTitle == '') {
-            $mapTitle = "Map for config file: " . $mapRecord['configfile'];
-        }
+        $mapTitle = $this->getMapTitle($mapRecord);
         print '<div class="wm_thumbcontainer" style="margin: 2px; border: 1px solid #bbbbbb; padding: 2px; float:left;">';
         if (file_exists($thumbnailFilename)) {
             print '<div class="wm_thumbtitle" style="font-size: 1.2em; font-weight: bold; text-align: center">' . $mapTitle;
@@ -744,8 +724,10 @@ class WeatherMapCactiUserPlugin extends WeatherMapUIBase
         print "<script src='vendor/jquery/dist/jquery.min.js'></script>";
         print "<script src='vendor/jquery-idletimer/dist/idle-timer.min.js'></script>";
         $extra = "";
+        $fullscreenURL = "?action=viewcycle_fullscreen";
         if ($limitToGroup > 0) {
             $extra = " in this group";
+            $fullscreenURL = "?action=viewcycle_filtered_fullscreen&group=" . $limitToGroup;
         }
         ?>
         <div id="wmcyclecontrolbox" class="<?php print $class ?>">
@@ -755,7 +737,7 @@ class WeatherMapCactiUserPlugin extends WeatherMapUIBase
                 <a id="cycle_prev" href="#"><img border="0" src="cacti-resources/img/control_rewind_blue.png" width="16" height="16"/></a>
                 <a id="cycle_pause" href="#"><img border="0" src="cacti-resources/img/control_pause_blue.png" width="16" height="16"/></a>
                 <a id="cycle_next" href="#"><img border="0" src="cacti-resources/img/control_fastforward_blue.png" width="16" height="16"/></a>
-                <a id="cycle_fullscreen" href="?action=viewmapcycle&fullscreen=1&group=<?php echo $limitToGroup; ?>"><img border="0"
+                <a id="cycle_fullscreen" href="<?php echo $fullscreenURL; ?>"><img border="0"
                         src="cacti-resources/img/arrow_out.png" width="16" height="16"/></a>
                 Showing <span id="wm_current_map">1</span> of <span id="wm_total_map">1</span>.
                 Cycling all available maps<?php echo $extra; ?>.
@@ -800,10 +782,10 @@ class WeatherMapCactiUserPlugin extends WeatherMapUIBase
                                 (automatically cycle between full-size maps (<?php
 
                                 if ($limitToGroup > 0) {
-                                    print '<a href = "?action=viewmapcycle&group=' . intval($limitToGroup)
+                                    print '<a href = "?action=viewcycle_filtered&group=' . intval($limitToGroup)
                                         . '">within this group</a>, or ';
                                 }
-                                print ' <a href = "?action=viewmapcycle">all maps</a>';
+                                print ' <a href = "?action=viewcycle">all maps</a>';
                                 ?>)
 
                                 <?php
@@ -838,16 +820,16 @@ class WeatherMapCactiUserPlugin extends WeatherMapUIBase
                         <td align="right">
                             automatically cycle between full-size maps (<?php
                             if ($limitToGroup > 0) {
-                                print '<a href = "?action=viewmapcycle&group=' . intval($limitToGroup) . '">within this group</a>, or ';
+                                print '<a href = "?action=viewcycle_filtered&group=' . intval($limitToGroup) . '">within this group</a>, or ';
                             }
-                            print ' <a href = "?action=viewmapcycle">all maps</a>'; ?>)
+                            print ' <a href = "?action=viewcycle">all maps</a>'; ?>)
                         </td>
                     </tr>
                 </table>
             </td>
         </tr>
         <tr>
-            <td><i>Click on thumbnails for a full view (or you can <a href="?action=viewmapcycle">automatically
+            <td><i>Click on thumbnails for a full view (or you can <a href="?action=viewcycle">automatically
                         cycle</a> between full-size maps)</i></td>
         </tr>
         <?php
@@ -871,10 +853,7 @@ class WeatherMapCactiUserPlugin extends WeatherMapUIBase
         print "<div class='all_map_holder $class'>";
         foreach ($mapList as $map) {
             $htmlfile = $this->outputDirectory . DIRECTORY_SEPARATOR . $map['filehash'] . ".html";
-            $mapTitle = $map['titlecache'];
-            if ($mapTitle == '') {
-                $mapTitle = "Map for config file: " . $map['configfile'];
-            }
+
             print '<div class="weathermapholder" id="mapholder_' . $map['filehash'] . '">';
             if (file_exists($htmlfile)) {
                 include($htmlfile);
@@ -897,5 +876,17 @@ class WeatherMapCactiUserPlugin extends WeatherMapUIBase
             $valueCounts[$item[$fieldName]] = 1;
         }
         return count(array_keys($valueCounts));
+    }
+
+    /**
+     * @param $map
+     */
+    private function getMapTitle($map)
+    {
+        $mapTitle = $map['titlecache'];
+        if ($mapTitle == '') {
+            $mapTitle = "Map for config file: " . $map['configfile'];
+        }
+        return $mapTitle;
     }
 }

@@ -481,8 +481,8 @@ class WeatherMapCactiUserPlugin extends WeatherMapUIBase
             print "<p></p><table class='tabs' width='100%' cellspacing='0' cellpadding='3' align='center'><tr>\n";
 
             if (sizeof($tabs) > 0) {
-                $show_all = intval(WMCactiAPI::getConfigOption("weathermap_all_tab"));
-                if ($show_all == 1) {
+                $showAll = intval(WMCactiAPI::getConfigOption("weathermap_all_tab", 0));
+                if ($showAll == 1) {
                     $tabs['-2'] = "All Maps";
                 }
 
@@ -498,10 +498,10 @@ class WeatherMapCactiUserPlugin extends WeatherMapUIBase
 
             print "<td></td>\n</tr></table>\n";
 
-            return (true);
-        } else {
-            return (false);
+            return true;
         }
+
+        return false;
     }
 
     private function outputGreyPNG($w, $h)

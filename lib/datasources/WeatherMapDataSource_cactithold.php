@@ -248,12 +248,12 @@ class WeatherMapDataSource_cactithold extends WeatherMapDataSource
 
     private function checkForTholdTables()
     {
-        if (!WMCactiAPI::checkForTable('thold_data')) {
-            wm_debug('ReadData CactiTHold: thold_data database table not found. [THOLD003]\n');
-            return false;
+        if (WMCactiAPI::checkForTable('thold_data')) {
+            return true;
         }
 
-        return true;
+        wm_debug('ReadData CactiTHold: thold_data database table not found. [THOLD003]\n');
+        return false;
     }
 
     /**

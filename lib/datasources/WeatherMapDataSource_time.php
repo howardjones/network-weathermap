@@ -2,17 +2,38 @@
 
 class WeatherMapDataSource_time extends WeatherMapDataSource
 {
-    function Recognise($targetString)
+    private $timezones;
+
+    public function __construct()
     {
-        if (preg_match("/^time:(.*)$/", $targetString)) {
-            if (preg_match("/^[234]\./", phpversion())) {
+        parent::__construct();
+
+        $this->timezones = array();
+    }
+
+    public function Recognise($targetString)
+    {
+        if (preg_match('/^time:(.*)$/', $targetString)) {
+            if (preg_match('/^[234]\./', phpversion())) {
                 wm_warn("Time DS Plugin recognised a TARGET, but needs PHP5+ to run. [WMTIME01]\n");
                 return false;
             }
+            $this->recognised++;
             return true;
         }
 
         return false;
+    }
+
+    public function Prefetch(&$map)
+    {
+        if ($this->recognised > 0) {
+            $timezone_identifiers = DateTimeZone::listIdentifiers();
+            foreach ($timezone_identifiers as $tz) {
+                $this->timezones[strtolower($tz)] = $tz;
+
+            }
+        }
     }
 
     /**
@@ -48,25 +69,24 @@ class WeatherMapDataSource_time extends WeatherMapDataSource
 
             $timezone_l = strtolower($timezone);
 
-            $timezone_identifiers = DateTimeZone::listIdentifiers();
+            if (array_key_exists($timezone_l, $this->timezones)) {
+                $tz = $this->timezones[$timezone_l];
+                wm_debug("Time ReadData: Timezone exists: $tz\n");
+                $dateTime = new DateTime($offset, new DateTimeZone($tz));
 
-            foreach ($timezone_identifiers as $tz) {
-                if (strtolower($tz) == $timezone_l) {
-                    wm_debug("Time ReadData: Timezone exists: $tz\n");
-                    $dateTime = new DateTime($offset, new DateTimeZone($tz));
+                $mapItem->add_note("time_time12", $dateTime->format("h:i"));
+                $mapItem->add_note("time_time12ap", $dateTime->format("h:i A"));
+                $mapItem->add_note("time_time24", $dateTime->format("H:i"));
+                $mapItem->add_note("time_timet", $dateTime->format("U"));
 
-                    $mapItem->add_note("time_time12", $dateTime->format("h:i"));
-                    $mapItem->add_note("time_time12ap", $dateTime->format("h:i A"));
-                    $mapItem->add_note("time_time24", $dateTime->format("H:i"));
-                    $mapItem->add_note("time_timet", $dateTime->format("U"));
+                $mapItem->add_note("time_timezone", $tz);
 
-                    $mapItem->add_note("time_timezone", $tz);
-                    $data[IN] = $dateTime->format("H");
-                    $data_time = time();
-                    $data[OUT] = $dateTime->format("i");
-                    $matches++;
-                }
+                $data[IN] = $dateTime->format("H");
+                $data[OUT] = $dateTime->format("i");
+                $data_time = time();
+                $matches++;
             }
+
             if ($matches==0) {
                 wm_warn("Time ReadData: Couldn't recognize $timezone as a valid timezone name [WMTIME02]\n");
             }

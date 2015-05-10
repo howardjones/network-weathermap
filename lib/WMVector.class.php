@@ -58,15 +58,11 @@ class WMVector
     {
         $len = $this->length();
 
-        $nx1 = 0;
-        $ny1 = 0;
-
-        if ($len > 0) {
-            $nx1 = $this->dy / $len;
-            $ny1 = - $this->dx / $len;
+        if ($len==0) {
+            return new WMVector(0, 0);
         }
 
-        return new WMVector($nx1, $ny1);
+        return new WMVector($this->dy / $len, -$this->dx / $len);
     }
 
     /**
@@ -75,6 +71,7 @@ class WMVector
     public function normalise()
     {
         $len = $this->length();
+
         if ($len > 0 && $len != 1) {
             $this->dx = $this->dx / $len;
             $this->dy = $this->dy / $len;
@@ -92,9 +89,9 @@ class WMVector
         if (($this->dx == 0) && ($this->dy == 0)) {
             return 0;
         }
-        $slen = ($this->dx) * ($this->dx) + ($this->dy) * ($this->dy);
+        $squaredLength = ($this->dx) * ($this->dx) + ($this->dy) * ($this->dy);
 
-        return $slen;
+        return $squaredLength;
     }
 
     /**
@@ -102,6 +99,10 @@ class WMVector
      */
     public function length()
     {
+        if ($this->dx==0 && $this->dy==0) {
+            return 0;
+        }
+
         return (sqrt($this->squaredLength()));
     }
 

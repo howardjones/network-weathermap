@@ -124,7 +124,7 @@ class HTML_ImageMap_Area_Polygon extends HTML_ImageMap_Area
             throw new Exception('Odd number of array elements ('.$this->npoints.') in HTML_ImageMap_Area_Polygon!');
         }
 
-        for ($i=0; $i<count($c); $i+=2) {
+        for ($i=0; $i< $this->npoints; $i+=2) {
             $x = round($c[$i]);
             $y = round($c[$i+1]);
             $point = array($x, $y);

@@ -9,9 +9,12 @@ class WeatherMapDataSource
 {
     protected $owner;
     protected $regexpsHandled;
+    protected $recognised;
+
 
     public function __construct()
     {
+        $this->recognised = 0;
         $this->regexpsHandled = array();
     }
 
@@ -43,6 +46,7 @@ class WeatherMapDataSource
     {
         foreach ($this->regexpsHandled as $regexp) {
             if (preg_match($regexp, $targetString)) {
+                $this->recognised++;
                 return true;
             }
         }

@@ -47,7 +47,6 @@ class WMCurvedLinkGeometry extends WMLinkGeometry
             for ($i=0; $i <= $this->arrowIndexes[$direction]; $i++) {
                 $here = $this->splitCurves[$direction]->getPoint($i);
                 $tangent = $here->vectorToPoint($this->splitCurves[$direction]->getPoint($i+1));
-                $tangent->normalise();
                 $normal = $tangent->getNormal();
 
                 $there[] = $here->copy()->addVector($normal, $width);

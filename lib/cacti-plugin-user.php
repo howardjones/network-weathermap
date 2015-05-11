@@ -15,7 +15,7 @@ class WeatherMapCactiUserPlugin extends WeatherMapUIBase
         'viewthumb48' => array('handler' => 'handleLittleThumb', 'args' => array(array("id", "hash"))),
         'viewimage' => array('handler' => 'handleImage', 'args' => array(array("id", "hash"))),
 
-        'viewmap' => array('handler' => 'handleView', 'args' => array(array("id", "hash"), array("group_id", "int", true))),
+        'viewmap' => array('handler' => 'handleViewMap', 'args' => array(array("id", "hash"), array("group_id", "int", true))),
 
         'viewcycle_fullscreen' => array('handler' => 'handleViewCycleFullscreen', 'args' => array(array("id", "hash"))),
         'viewcycle_filtered_fullscreen' => array('handler' => 'handleViewCycleFilteredFullscreen', 'args' => array(array("id", "hash"), array("group_id", "int", true))),
@@ -29,7 +29,7 @@ class WeatherMapCactiUserPlugin extends WeatherMapUIBase
 //                array("group", "int", true)
 //            )),
         ':: DEFAULT ::' => array(
-            'handler' => 'handleMainView',
+            'handler' => 'handleDefaultView',
             'args' => array(
                 array("group_id", "int", true)
             )
@@ -49,38 +49,44 @@ class WeatherMapCactiUserPlugin extends WeatherMapUIBase
      * @param $request
      * @internal param $config
      */
-    protected function handleMainView($request, $appObject)
+    protected function handleDefaultView($request, $appObject)
     {
         WMCactiAPI::pageTop();
         $this->outputOverlibSupport();
 
-        $tabs = $this->getValidTabs();
-        $tab_ids = array_keys($tabs);
-
-        $group_id = $this->getRequiredGroup($request);
-        if (($group_id == -1) && (sizeof($tab_ids) > 0)) {
-            $group_id = $tab_ids[0];
-        }
-
         $pageStyle = WMCactiAPI::getConfigOption("weathermap_pagestyle", 0);
 
-        if ($pageStyle == 0) {
-            $this->wmuiThumbnailView($group_id);
-        }
+        $limitToGroup = $this->getGroupFilter($request);
 
-        if ($pageStyle == 1) {
-            $this->drawFullMapView(false, $group_id);
-        }
+        $mapList = $this->getAuthorisedMaps($limitToGroup);
 
+        // "First-only" style
         if ($pageStyle == 2) {
-            $this->drawFullMapView(true, $group_id);
+            $mapList = array($mapList[0]);
+        }
+        $mapCount = sizeof($mapList);
+
+        $this->outputMapHeader($mapList, false, $limitToGroup);
+        // $this->outputGroupTabs($limitToGroup);
+        // outputHeader HERE
+        // outputGroupTabs HERE
+        // pass only the relevant mapList (already filtered) to the drawXXXX method
+
+        if ($pageStyle == 0 && $mapCount > 1) {
+            $this->drawThumbnailView($mapList);
+        } else {
+            $this->drawFullMapView($mapList);
+        }
+
+        if ($mapCount==0) {
+            print "<div align=\"center\" style=\"padding:20px\"><em>You Have No Maps</em></div>\n";
         }
 
         $this->outputVersionBox();
         WMCactiAPI::pageBottom();
     }
 
-    protected function handleView($request, $appObject)
+    protected function handleViewMap($request, $appObject)
     {
         WMCactiAPI::pageTop();
 
@@ -94,22 +100,22 @@ class WeatherMapCactiUserPlugin extends WeatherMapUIBase
     }
 
     /**
+     * Figure out which tab to show in the main view. If one was requested, use that. Otherwise use the first one.
+     *
      * @param $request
      * @return int
      */
-    private function deduceMapID($request)
+    protected function getGroupFilter($request)
     {
-        $mapID = -1;
+        $tabs = $this->getValidTabs();
+        $tab_ids = array_keys($tabs);
 
-        if (isset($request['id']) && (!is_numeric($request['id']) || strlen($request['id']) == 20)) {
-            $mapID = $this->translateHashToID($request['id']);
+        $limitToGroup = $this->getRequiredGroup($request);
+        // XXX - will this ever be true?
+        if (($limitToGroup == -1) && (sizeof($tab_ids) > 0)) {
+            $limitToGroup = $tab_ids[0];
         }
-
-        if (isset($request['id']) && is_numeric($request['id'])) {
-            $mapID = intval($request['id']);
-            return $mapID;
-        }
-        return $mapID;
+        return $limitToGroup;
     }
 
     protected function handleViewCycleFullscreen($request, $appObject)
@@ -216,25 +222,6 @@ class WeatherMapCactiUserPlugin extends WeatherMapUIBase
             <?php
     }
 
-    private function wmuiThumbnailView($limitToGroup = -1)
-    {
-        $mapList = $this->getAuthorisedMaps($limitToGroup);
-        $mapCount = sizeof($mapList);
-
-        // if there's only one map, ignore the thumbnail setting and show it full size
-        if ($mapCount == 1) {
-            $this->drawFullMapView(false, $limitToGroup, false);
-            return;
-        }
-
-        if ($mapCount > 1) {
-            $this->drawThumbnailView($mapList, $limitToGroup);
-            return;
-        }
-
-        print "<div align=\"center\" style=\"padding:20px\"><em>You Have No Maps</em></div>\n";
-    }
-
     private function drawFullMapFullscreenCycle($limitToGroup = -1)
     {
         $this->drawCycleCommon($limitToGroup, "fullscreen");
@@ -247,30 +234,12 @@ class WeatherMapCactiUserPlugin extends WeatherMapUIBase
         $this->outputCycleInitialisation(false);
     }
 
-    private function drawFullMapView($firstOnly = false, $limitToGroup = -1)
+    private function drawFullMapView($mapList)
     {
         // make sure that we use the Cacti refresh meta tags
         WMCactiAPI::enableGraphRefresh();
-        $mapList = $this->getAuthorisedMaps($limitToGroup);
 
         if (count($mapList) == 0) {
-            return;
-        }
-
-        if ($firstOnly) {
-            $mapList = array($mapList[0]);
-        }
-
-        if (sizeof($mapList) == 1) {
-            $pageTitle = "Network Weathermap";
-        } else {
-            $pageTitle = "Network Weathermaps";
-        }
-
-        $this->outputMapViewHeader($pageTitle, $cycle, $limitToGroup);
-
-        if (sizeof($mapList) == 0) {
-            print "<div align=\"center\" style=\"padding:20px\"><em>You Have No Maps</em></div>\n";
             return;
         }
 
@@ -279,6 +248,7 @@ class WeatherMapCactiUserPlugin extends WeatherMapUIBase
         foreach ($mapList as $mapRecord) {
             $this->drawOneFullMap($mapRecord);
         }
+
         print "</div>";
     }
 
@@ -362,24 +332,6 @@ class WeatherMapCactiUserPlugin extends WeatherMapUIBase
         </tr>
         <?php
         html_graph_end_box();
-    }
-
-
-    private function streamBinaryFile($filename)
-    {
-        $chunksize = 1 * (1024 * 1024); // how many bytes per chunk
-
-        $handle = fopen($filename, 'rb');
-        if ($handle === false) {
-            return false;
-        }
-
-        while (!feof($handle)) {
-            $buffer = fread($handle, $chunksize);
-            echo $buffer;
-        }
-        $status = fclose($handle);
-        return $status;
     }
 
     private function outputMapSelectorBox($currentMapHash)
@@ -517,19 +469,15 @@ class WeatherMapCactiUserPlugin extends WeatherMapUIBase
      * @param $limitToGroup
      * @param $mapList
      */
-    private function drawThumbnailView($mapList, $limitToGroup)
+    private function drawThumbnailView($mapList)
     {
-        $this->outputThumbnailViewHeader($limitToGroup);
-
         $showLiveLinks = intval(WMCactiAPI::getConfigOption("weathermap_live_view", 0));
-
-        $this->outputGroupTabs($limitToGroup);
 
         if (sizeof($mapList) > 0) {
             html_graph_start_box(1, false);
             print "<tr><td class='wm_gallery'>";
-            foreach ($mapList as $map) {
-                $this->drawOneThumbnail($map, $showLiveLinks);
+            foreach ($mapList as $mapRecord) {
+                $this->drawOneThumbnail($mapRecord, $showLiveLinks);
             }
             print "</td></tr>";
             html_graph_end_box();
@@ -696,14 +644,14 @@ class WeatherMapCactiUserPlugin extends WeatherMapUIBase
      */
     private function getRequiredGroup($request)
     {
-        $group_id = -1;
+        $groupID = -1;
         if (isset($request['group_id'])) {
-            $group_id = $request['group_id'];
-            WMCactiAPI::saveSessionVariable("wm_last_group", $group_id);
-            return $group_id;
+            $groupID = $request['group_id'];
+            WMCactiAPI::saveSessionVariable("wm_last_group", $groupID);
+            return $groupID;
         }
 
-        return WMCactiAPI::getSessionVariable("wm_last_group", $group_id);
+        return WMCactiAPI::getSessionVariable("wm_last_group", $groupID);
     }
 
     private function outputFullScreenPageTop()
@@ -764,7 +712,7 @@ class WeatherMapCactiUserPlugin extends WeatherMapUIBase
         <?php
     }
 
-    private function outputMapViewHeader($pageTitle, $cycle, $limitToGroup)
+    private function outputMapViewHeader($pageTitle, $isCycling, $limitingToGroup)
     {
         $colors = $this->colours;
 
@@ -777,12 +725,12 @@ class WeatherMapCactiUserPlugin extends WeatherMapUIBase
                         <td class="textHeader" nowrap> <?php print $pageTitle; ?> </td>
                         <td align="right">
                             <?php
-                            if (!$cycle) {
+                            if (!$isCycling) {
                                 ?>
                                 (automatically cycle between full-size maps (<?php
 
-                                if ($limitToGroup > 0) {
-                                    print '<a href = "?action=viewcycle_filtered&group=' . intval($limitToGroup)
+                                if ($limitingToGroup > 0) {
+                                    print '<a href = "?action=viewcycle_filtered&group=' . intval($limitingToGroup)
                                         . '">within this group</a>, or ';
                                 }
                                 print ' <a href = "?action=viewcycle">all maps</a>';
@@ -799,41 +747,7 @@ class WeatherMapCactiUserPlugin extends WeatherMapUIBase
         <?php
         html_graph_end_box();
 
-        $this->outputGroupTabs($limitToGroup);
-    }
-
-    /**
-     * @param $limitToGroup
-     * @param $colors
-     */
-    private function outputThumbnailViewHeader($limitToGroup)
-    {
-        $colors = $this->colours;
-
-        html_graph_start_box(2, true);
-        ?>
-        <tr bgcolor="<?php print $colors["panel"]; ?>">
-            <td>
-                <table width="100%" cellpadding="0" cellspacing="0">
-                    <tr>
-                        <td class="textHeader" nowrap>Network Weathermaps</td>
-                        <td align="right">
-                            automatically cycle between full-size maps (<?php
-                            if ($limitToGroup > 0) {
-                                print '<a href = "?action=viewcycle_filtered&group=' . intval($limitToGroup) . '">within this group</a>, or ';
-                            }
-                            print ' <a href = "?action=viewcycle">all maps</a>'; ?>)
-                        </td>
-                    </tr>
-                </table>
-            </td>
-        </tr>
-        <tr>
-            <td><i>Click on thumbnails for a full view (or you can <a href="?action=viewcycle">automatically
-                        cycle</a> between full-size maps)</i></td>
-        </tr>
-        <?php
-        html_graph_end_box();
+        $this->outputGroupTabs($limitingToGroup);
     }
 
     /**
@@ -888,5 +802,19 @@ class WeatherMapCactiUserPlugin extends WeatherMapUIBase
             $mapTitle = "Map for config file: " . $map['configfile'];
         }
         return $mapTitle;
+    }
+
+    /**
+     * @param $mapList
+     */
+    private function outputMapHeader($mapList, $cycle, $limitToGroup)
+    {
+        if (sizeof($mapList) == 1) {
+            $pageTitle = "Network Weathermap";
+        } else {
+            $pageTitle = "Network Weathermaps";
+        }
+
+        $this->outputMapViewHeader($pageTitle, $cycle, $limitToGroup);
     }
 }

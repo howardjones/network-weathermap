@@ -1177,8 +1177,6 @@ class WeatherMapConfigReader
             }
 
             $this->currentObject = new WeatherMapNode($matches[1], "DEFAULT", $this->mapObject);
-//            $this->currentObject->name = $matches[1];
-//            $this->currentObject->reset($this->mapObject);
             wm_debug("Created new NODE\n");
         }
         $this->objectLineCount = 0;
@@ -1208,8 +1206,6 @@ class WeatherMapConfigReader
                 wm_warn("Duplicate link name " . $matches[1] . " at line $this->lineCount - only the last one defined is used. [WMWARN25]\n");
             }
             $this->currentObject = new WeatherMapLink($matches[1], "DEFAULT", $this->mapObject);
-//            $this->currentObject->name = $matches[1];
-//            $this->currentObject->reset($this->mapObject);
             wm_debug("Created new LINK\n");
         }
         $this->currentType = "LINK";

@@ -79,12 +79,19 @@ class WMLinkGeometry
     {
         $previousPoint = new WMPoint(-101.111, -2345234.333);
 
+        $removed = 0;
         foreach ($this->controlPoints as $key => $cp) {
             if ($cp->closeEnough($previousPoint)) {
-                wm_debug("Dumping useless duplicate point on curve");
+                wm_debug("Dumping useless duplicate point on curve ($previousPoint =~ $cp)\n");
                 unset($this->controlPoints[$key]);
+                $removed++;
             }
             $previousPoint = $cp;
+        }
+        
+        if ($removed > 0) {
+            // if points are removed, there are gaps in the index values. Other things assume they are in sequence
+            $this->controlPoints = array_values($this->controlPoints);
         }
     }
 

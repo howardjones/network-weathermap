@@ -149,6 +149,102 @@ class WeatherMapNode extends WeatherMapDataItem
         $this->descendents = null;
     }
 
+    /**
+     * @param $map
+     * @param $iconImageRef
+     * @param $ink
+     * @return array
+     */
+    protected function drawAIconNINK(&$map, $iconImageRef, $ink)
+    {
+        $rx = $this->iconscalew / 2 - 1;
+        $ry = $this->iconscaleh / 2 - 1;
+        $size = $this->iconscalew;
+        $quarter = $size / 4;
+
+        $col1 = $this->colours[OUT];
+        $col2 = $this->colours[IN];
+
+        assert('!is_null($col1)');
+        assert('!is_null($col2)');
+
+        imagefilledarc($iconImageRef, $rx - 1, $ry, $size, $size, 270, 90, $col1->gdallocate($iconImageRef), IMG_ARC_PIE);
+        imagefilledarc($iconImageRef, $rx + 1, $ry, $size, $size, 90, 270, $col2->gdallocate($iconImageRef), IMG_ARC_PIE);
+
+        imagefilledarc($iconImageRef, $rx - 1, $ry + $quarter, $quarter * 2, $quarter * 2, 0, 360, $col1->gdallocate($iconImageRef), IMG_ARC_PIE);
+        imagefilledarc($iconImageRef, $rx + 1, $ry - $quarter, $quarter * 2, $quarter * 2, 0, 360, $col2->gdallocate($iconImageRef), IMG_ARC_PIE);
+
+        if ($ink !== null && !$ink->isNone()) {
+            // XXX - need a font definition from somewhere for NINK text
+            $font = 1;
+
+            $inLabel = $map->ProcessString("{node:this:bandwidth_in:%.1k}", $this);
+            $outLabel = $map->ProcessString("{node:this:bandwidth_out:%.1k}", $this);
+
+            list($twid, $thgt) = $map->myimagestringsize($font, $inLabel);
+            $map->myimagestring($iconImageRef, $font, $rx - $twid / 2, $ry - $quarter + ($thgt / 2), $inLabel, $ink->gdallocate($iconImageRef));
+
+            list($twid, $thgt) = $map->myimagestringsize($font, $outLabel);
+            $map->myimagestring($iconImageRef, $font, $rx - $twid / 2, $ry + $quarter + ($thgt / 2), $outLabel, $ink->gdallocate($iconImageRef));
+
+            imageellipse($iconImageRef, $rx, $ry, $rx * 2, $ry * 2, $ink->gdallocate($iconImageRef));
+        }
+    }
+
+    /**
+     * @param $fill
+     * @param $iconImageRef
+     * @param $ink
+     * @return array
+     */
+    protected function drawAIconRound($iconImageRef, $fill, $ink)
+    {
+        $rx = $this->iconscalew / 2 - 1;
+        $ry = $this->iconscaleh / 2 - 1;
+
+        if ($fill !== null && !$fill->isNone()) {
+            imagefilledellipse($iconImageRef, $rx, $ry, $rx * 2, $ry * 2, $fill->gdAllocate($iconImageRef));
+        }
+
+        if ($ink !== null && !$ink->isNone()) {
+            imageellipse($iconImageRef, $rx, $ry, $rx * 2, $ry * 2, $ink->gdallocate($iconImageRef));
+            return array($rx, $ry);
+        }
+        return array($rx, $ry);
+    }
+
+    /**
+     * @param $iconImageRef
+     * @param $fill
+     * @param $ink
+     */
+    protected function drawAIconRoundedBox($iconImageRef, $fill, $ink)
+    {
+        if ($fill !== null && !$fill->isNone()) {
+            imagefilledroundedrectangle($iconImageRef, 0, 0, $this->iconscalew - 1, $this->iconscaleh - 1, 4, $fill->gdAllocate($iconImageRef));
+        }
+
+        if ($ink !== null && !$ink->isNone()) {
+            imageroundedrectangle($iconImageRef, 0, 0, $this->iconscalew - 1, $this->iconscaleh - 1, 4, $ink->gdallocate($iconImageRef));
+        }
+    }
+
+    /**
+     * @param $iconImageRef
+     * @param $fill
+     * @param $ink
+     */
+    protected function drawAIconBox($iconImageRef, $fill, $ink)
+    {
+        if ($fill !== null && !$fill->isNone()) {
+            imagefilledrectangle($iconImageRef, 0, 0, $this->iconscalew - 1, $this->iconscaleh - 1, $fill->gdAllocate($iconImageRef));
+        }
+
+        if ($ink !== null && !$ink->isNone()) {
+            imagerectangle($iconImageRef, 0, 0, $this->iconscalew - 1, $this->iconscaleh - 1, $ink->gdallocate($iconImageRef));
+        }
+    }
+
     private function getDirectionList()
     {
         if ($this->scalevar == 'in') {
@@ -393,71 +489,19 @@ class WeatherMapNode extends WeatherMapDataItem
                 }
 
                 if ($this->iconfile == 'box') {
-                    if ($fill !== null && !$fill->isNone()) {
-                        imagefilledrectangle($icon_im, 0, 0, $this->iconscalew - 1, $this->iconscaleh - 1, $fill->gdAllocate($icon_im));
-                    }
-
-                    if ($ink !== null && !$ink->isNone()) {
-                        imagerectangle($icon_im, 0, 0, $this->iconscalew - 1, $this->iconscaleh - 1, $ink->gdallocate($icon_im));
-                    }
+                    $this->drawAIconBox($icon_im, $fill, $ink);
                 }
 
                 if ($this->iconfile == 'rbox') {
-                    if ($fill !== null && !$fill->isNone()) {
-                        imagefilledroundedrectangle($icon_im, 0, 0, $this->iconscalew - 1, $this->iconscaleh - 1, 4, $fill->gdAllocate($icon_im));
-                    }
-
-                    if ($ink !== null && !$ink->isNone()) {
-                        imageroundedrectangle($icon_im, 0, 0, $this->iconscalew - 1, $this->iconscaleh - 1, 4, $ink->gdallocate($icon_im));
-                    }
+                    $this->drawAIconRoundedBox($icon_im, $fill, $ink);
                 }
 
                 if ($this->iconfile == 'round') {
-                    $rx = $this->iconscalew / 2 - 1;
-                    $ry = $this->iconscaleh / 2 - 1;
-
-                    if ($fill !== null && !$fill->isNone()) {
-                        imagefilledellipse($icon_im, $rx, $ry, $rx * 2, $ry * 2, $fill->gdAllocate($icon_im));
-                    }
-
-                    if ($ink !== null && !$ink->isNone()) {
-                        imageellipse($icon_im, $rx, $ry, $rx * 2, $ry * 2, $ink->gdallocate($icon_im));
-                    }
+                    $this->drawAIconRound($icon_im, $fill, $ink);
                 }
 
                 if ($this->iconfile == 'nink') {
-                    $rx = $this->iconscalew / 2 - 1;
-                    $ry = $this->iconscaleh / 2 - 1;
-                    $size = $this->iconscalew;
-                    $quarter = $size / 4;
-
-                    $col1 = $this->colours[OUT];
-                    $col2 = $this->colours[IN];
-
-                    assert('!is_null($col1)');
-                    assert('!is_null($col2)');
-
-                    imagefilledarc($icon_im, $rx - 1, $ry, $size, $size, 270, 90, $col1->gdallocate($icon_im), IMG_ARC_PIE);
-                    imagefilledarc($icon_im, $rx + 1, $ry, $size, $size, 90, 270, $col2->gdallocate($icon_im), IMG_ARC_PIE);
-
-                    imagefilledarc($icon_im, $rx - 1, $ry + $quarter, $quarter * 2, $quarter * 2, 0, 360, $col1->gdallocate($icon_im), IMG_ARC_PIE);
-                    imagefilledarc($icon_im, $rx + 1, $ry - $quarter, $quarter * 2, $quarter * 2, 0, 360, $col2->gdallocate($icon_im), IMG_ARC_PIE);
-
-                    if ($ink !== null && !$ink->isNone()) {
-                        // XXX - need a font definition from somewhere for NINK text
-                        $font = 1;
-
-                        $instr = $map->ProcessString("{node:this:bandwidth_in:%.1k}", $this);
-                        $outstr = $map->ProcessString("{node:this:bandwidth_out:%.1k}", $this);
-
-                        list($twid, $thgt) = $map->myimagestringsize($font, $instr);
-                        $map->myimagestring($icon_im, $font, $rx - $twid / 2, $ry - $quarter + ($thgt / 2), $instr, $ink->gdallocate($icon_im));
-
-                        list($twid, $thgt) = $map->myimagestringsize($font, $outstr);
-                        $map->myimagestring($icon_im, $font, $rx - $twid / 2, $ry + $quarter + ($thgt / 2), $outstr, $ink->gdallocate($icon_im));
-
-                        imageellipse($icon_im, $rx, $ry, $rx * 2, $ry * 2, $ink->gdallocate($icon_im));
-                    }
+                    $this->drawAIconNINK($map, $icon_im, $ink);
                 }
 
                 // XXX - needs proper colours

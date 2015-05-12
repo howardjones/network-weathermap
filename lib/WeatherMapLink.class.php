@@ -331,8 +331,9 @@ class WeatherMapLink extends WeatherMapDataItem
         // for bulging animations, modulate the width with the percentage value
         if (($map->widthmod) || ($map->get_hint('link_bulge') == 1)) {
             // a few 0.1s and +1s to fix div-by-zero, and invisible links
-            $widths[0] = (($widths[0] * $this->inpercent * 1.5 + 0.1) / 100) + 1;
-            $widths[1] = (($widths[1] * $this->outpercent * 1.5 + 0.1) / 100) + 1;
+
+            $widths[0] = (($widths[0] * $this->percentUsages[IN] * 1.5 + 0.1) / 100) + 1;
+            $widths[1] = (($widths[1] * $this->percentUsages[OUT] * 1.5 + 0.1) / 100) + 1;
         }
 
         $style = $this->viastyle;

@@ -255,12 +255,12 @@ class WeatherMapNode extends WeatherMapDataItem
             $val = 0;
 
             if ($this->iconscalevar == 'in') {
-                $pc = $this->inpercent;
-                $val = $this->bandwidth_in;
+                $pc = $this->percentUsages[IN];
+                $val = $this->absoluteUsages[IN];
             }
             if ($this->iconscalevar == 'out') {
-                $pc = $this->outpercent;
-                $val = $this->bandwidth_out;
+                $pc = $this->percentUsages[OUT];
+                $val = $this->absoluteUsages[OUT];
             }
 
             if ($this->iconscaletype == 'percent') {
@@ -371,13 +371,12 @@ class WeatherMapNode extends WeatherMapDataItem
                     $val = 0;
 
                     if ($this->iconscalevar == 'in') {
-                        $pc = $this->inpercent;
-                        $val = $this->bandwidth_in;
+                        $pc = $this->percentUsages[IN];
+                        $val = $this->absoluteUsages[IN];
                     }
-
                     if ($this->iconscalevar == 'out') {
-                        $pc = $this->outpercent;
-                        $val = $this->bandwidth_out;
+                        $pc = $this->percentUsages[OUT];
+                        $val = $this->absoluteUsages[OUT];
                     }
 
                     if ($this->iconscaletype == 'percent') {
@@ -464,10 +463,10 @@ class WeatherMapNode extends WeatherMapDataItem
                 // XXX - needs proper colours
                 if ($this->iconfile == 'inpie' || $this->iconfile == 'outpie') {
                     if ($this->iconfile == 'inpie') {
-                        $segment_angle = (($this->inpercent) / 100) * 360;
+                        $segment_angle = (($this->percentUsages[IN]) / 100) * 360;
                     }
                     if ($this->iconfile == 'outpie') {
-                        $segment_angle = (($this->outpercent) / 100) * 360;
+                        $segment_angle = (($this->percentUsages[OUT]) / 100) * 360;
                     }
 
                     $rx = $this->iconscalew / 2 - 1;

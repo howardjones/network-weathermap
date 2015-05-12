@@ -44,7 +44,7 @@ class WeatherMapDataItem extends WeatherMapItem
     public $colours = array();
     public $template;
 
-    function __construct()
+    public function __construct()
     {
         parent::__construct();
 
@@ -54,14 +54,11 @@ class WeatherMapDataItem extends WeatherMapItem
         $this->duplex = null;
         $this->template = null;
 
-        $this->colours[IN] = new WMColour(192, 192, 192);
-        $this->colours[OUT] = new WMColour(192, 192, 192);
-
-        $this->percentUsages[IN] = null;
-        $this->percentUsages[OUT] = null;
-
-        $this->absoluteUsages[IN] = null;
-        $this->absoluteUsages[OUT] = null;
+        foreach ($this->getChannelList() as $channelName => $channelIndex) {
+            $this->colours[$channelIndex] = new WMColour(192, 192, 192);
+            $this->percentUsages[$channelIndex] = null;
+            $this->absoluteUsages[$channelIndex] = null;
+        }
     }
 
     protected function reset(&$newOwner)

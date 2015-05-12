@@ -24,13 +24,12 @@ $dumpafter=0;
 $dumpstats=0;
 $randomdata=0;
 $dumpconfig='';
-$dumpjsonconfig='';
 $readconfigonly=0;
 $defines=array();
 
 // **************************************************************************************
 // THIS IS THE ONE LINE IN HERE YOU MIGHT HAVE TO CHANGE!
-$rrdtool="/opt/local/bin/rrdtool";
+$rrdtool="/usr/bin/rrdtool";
 // (on Windows, use / instead of \ in pathnames - c:/rrdtool/bin/rrdtool.exe for example)
 // **************************************************************************************
 
@@ -56,8 +55,7 @@ $long_opts=array
         "dumpafter",
         "bulge",
         "sizedebug",
-        "dumpconfig=",
-        "dumpjsonconfig="
+        "dumpconfig="
     );
 
 $args=$cg->readPHPArgv();
@@ -91,9 +89,6 @@ if (sizeof($gopts) > 0) {
             case '--dumpconfig':
                 $dumpconfig=$o[1];
                 break;
-            case '--dumpjsonconfig':
-                $dumpjsonconfig=$o[1];
-                break;
             case '--randomdata':
                 $randomdata=1;
                 break;
@@ -117,6 +112,7 @@ if (sizeof($gopts) > 0) {
             case '--debug':
                 $options_output['debugging'] = true;
                 $weathermap_debugging=true;
+                // $wm_debug = WMDebugFactory::create();
                 // enable assertion handling
                 assert_options(ASSERT_ACTIVE, 1);
                 assert_options(ASSERT_WARNING, 0);
@@ -267,36 +263,6 @@ if ($map->ReadConfig($configfile)) {
         if ($dumpafter == 1) {
             print_r($map);
         }
-    }
-
-    if ($dumpjsonconfig != "") {
-        print "{";
-        print "\n\"map\": \n";
-        print json_encode($map->config, JSON_PRETTY_PRINT);
-        print ",\n";
-        print "\"nodes\": {\n";
-        $i = 0;
-        foreach ($map->nodes as $item) {
-            if ($i > 0) {
-                print ",\n";
-            }
-            print jsEscape($item->name).":";
-            print json_encode($item->config, JSON_PRETTY_PRINT);
-            $i++;
-        }
-        print ",\n\"links\": {\n";
-        $i = 0;
-        foreach ($map->links as $item) {
-            if ($i > 0) {
-                print ",\n";
-            }
-            print jsEscape($item->name).":";
-            print json_encode($item->config, JSON_PRETTY_PRINT);
-            $i++;
-        }
-        print "}\n";
-        print "}\n";
-        print "}\n";
     }
 } else {
     die ("\n\nCould not read Weathermap config file. No output produced. Maybe try --help?\n");

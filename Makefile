@@ -17,7 +17,7 @@ manual:	docs/index.html
 clean:
 	rm docs/src/contents.xml test-suite/results1-php5/* test-suite/results2-php5/* test-suite/diffs/* ./test-suite/code-coverage/*
 
-release: 
+release: sql
 	echo Building release $(RELNAME)
 	rm -rf $(RELDIR)
 	mkdir -p $(RELDIR)

@@ -56,6 +56,12 @@ class WeatherMapDataItem extends WeatherMapItem
 
         $this->colours[IN] = new WMColour(192, 192, 192);
         $this->colours[OUT] = new WMColour(192, 192, 192);
+
+        $this->percentUsages[IN] = null;
+        $this->percentUsages[OUT] = null;
+
+        $this->absoluteUsages[IN] = null;
+        $this->absoluteUsages[OUT] = null;
     }
 
     protected function reset(&$newOwner)

@@ -20,9 +20,11 @@ class WMFont
 
                 return true;
             }
-            throw new WMException("FontLoadFailed");
+            wm_warn("Could not load font - $filename");
+            return false;
         } else {
-            throw new WMException("TrueTypeModuleUnavailable");
+            wm_warn("Truetype support not available in GD. Unable to load font.");
+            return false;
         }
 
         return false;

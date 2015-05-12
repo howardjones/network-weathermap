@@ -88,7 +88,7 @@ class WMLinkGeometry
             }
             $previousPoint = $cp;
         }
-        
+
         if ($removed > 0) {
             // if points are removed, there are gaps in the index values. Other things assume they are in sequence
             $this->controlPoints = array_values($this->controlPoints);

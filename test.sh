@@ -42,4 +42,6 @@ if [ $fflag -eq 1 ]; then
     # CentOS 6 (my theoretical target system) currently ships with PHP 5.1, so no namespaces
     vendor/bin/phpcs -p --tab-width=4 -s --extensions=php --standard=docs/dev/phpcs/ruleset.xml --report-full=test-suite/phpcs-report-PSR-1-2.txt lib
 
+    doxygen network-weathermap.doxy 
+
 fi

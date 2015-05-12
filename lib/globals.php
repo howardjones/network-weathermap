@@ -8,7 +8,7 @@
     
     // don't produce debug output for these functions
     $weathermap_debug_suppress = array (
-    #    'processstring',
+        'processstring',
         'mysprintf'
     );
     
@@ -17,5 +17,5 @@
     
     // Turn on ALL error reporting for now.
     // error_reporting (E_ALL|E_STRICT);
-    error_reporting(E_ALL);
-    error_reporting(E_ALL & ~E_STRICT);
+    // error_reporting(E_ALL);
+    // error_reporting(E_ALL & ~E_STRICT);

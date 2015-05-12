@@ -17,7 +17,7 @@ class WeatherMapDataSource_fping extends WeatherMapDataSource
         #
         # You may need to change the line below to have something like "/usr/local/bin/fping" or "/usr/bin/fping" instead.
         #
-        $this->fping_cmd = "/usr/local/sbin/fping";
+        $this->fping_cmd = "/usr/bin/fping";
 
         if (is_executable($this->fping_cmd)) {
             wm_debug("FPing ReadData: Can't find fping executable. Check path at line 20 of WeatherMapDataSource_fping.php]\n");

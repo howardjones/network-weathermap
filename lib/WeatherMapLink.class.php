@@ -304,13 +304,17 @@ class WeatherMapLink extends WeatherMapDataItem
         $points[] = new WMPoint($this->a->x + $dx, $this->a->y + $dy);
 
         foreach ($this->vialist as $via) {
+            wm_debug("VIALIST...\n");
             // if the via has a third element, the first two are relative to that node
             if (isset($via[2])) {
                 $relativeTo = $map->getNode($via[2]);
-                $points[] = new WMPoint($relativeTo->x + $via[0], $relativeTo->y + $via[1]);
+                wm_debug("Relative to $relativeTo\n");
+                $point = new WMPoint($relativeTo->x + $via[0], $relativeTo->y + $via[1]);
             } else {
-                $points[] = new WMPoint($via[0], $via[1]);
+                $point = new WMPoint($via[0], $via[1]);
             }
+            wm_debug("Adding $point\n");
+            $points[] = $point;
         }
 
         list($dx, $dy) = WMUtility::calculateOffset($this->b_offset, $this->b->width, $this->b->height);

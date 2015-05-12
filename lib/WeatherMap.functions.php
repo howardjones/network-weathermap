@@ -4,6 +4,7 @@
 // http://www.network-weathermap.com/
 // Released under the GNU Public License
 
+
 // Utility functions
 // Check for GD & PNG support This is just in here so that both the editor and CLI can use it without the need for another file
 function wm_module_checks()
@@ -105,7 +106,7 @@ function wm_debug_getCallingFunction()
         $index = 2;
 
         $function = (true === isset($backtrace[$index]['function'])) ? $backtrace[$index]['function'] : '';
-        $index = 0;
+        $index = 1;
         $file = (true === isset($backtrace[$index]['file'])) ? basename($backtrace[$index]['file']) : '';
         $line = (true === isset($backtrace[$index]['line'])) ? $backtrace[$index]['line'] : '';
 

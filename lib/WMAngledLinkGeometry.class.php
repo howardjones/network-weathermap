@@ -3,14 +3,13 @@
 class WMAngledLinkGeometry extends WMLinkGeometry
 {
 
-    function calculateSpine($pointsPerSpan = 5)
+    public function calculateSpine($pointsPerSpan = 5)
     {
         $nPoints = count($this->controlPoints);
 
         for ($i = 0; $i < ($nPoints - 1); $i ++) {
             // still subdivide the straight line, because other stuff makes assumptions about
             // how often there is a point - at least find_distance_coords_angle breaks
-
             $tangent = $this->controlPoints[$i]->vectorToPoint($this->controlPoints[$i+1]);
 
             for ($j = 0; $j < $pointsPerSpan; $j ++) {
@@ -22,7 +21,7 @@ class WMAngledLinkGeometry extends WMLinkGeometry
         $this->curvePoints->addPoint($this->controlPoints[$nPoints-1]);
     }
 
-    function generateOutlines()
+    public function generateOutlines()
     {
         foreach ($this->directions as $direction) {
             // we build up two sets of points here. One is "above" the central spine, and the other below.
@@ -40,24 +39,27 @@ class WMAngledLinkGeometry extends WMLinkGeometry
             // before the main loop, add in the jump out to the corners
             // if this is the first step, then we need to go from the middle to the outside edge first
             //(the loop may not run, but these corners are required)
-            $i = 0;
-            $tangent = $simple->getPoint($i)->vectorToPoint($simple->getPoint($i+1));
+            $index = 0;
+            $tangent = $simple->getPoint($index)->vectorToPoint($simple->getPoint($index+1));
             $normal = $tangent->getNormal();
 
-            $there[] = $simple->getPoint($i)->copy()->addVector($normal, $width);
-            array_unshift($back, $simple->getPoint($i)->copy()->addVector($normal, - $width));
+            $there[] = $simple->getPoint($index)->copy()->addVector($normal, $width);
+            array_unshift($back, $simple->getPoint($index)->copy()->addVector($normal, - $width));
 
-            $maxStartIndex = $simple->pointCount() - 2;
+            $maxStartingIndex = $simple->pointCount() - 2;
 
-            wm_debug("We'll loop through %d steps.", $maxStartIndex + 1);
+            wm_debug("We'll loop through %d steps.", $maxStartingIndex + 1);
 
-            for ($i = 0; $i < $maxStartIndex; $i ++) {
-                $point = $simple->getPoint($i);
-                $nextPoint = $simple->getPoint($i+1);
-                $nextNextPoint = $simple->getPoint($i+2);
+            for ($index = 0; $index < $maxStartingIndex; $index ++) {
+                $point = $simple->getPoint($index);
+                $nextPoint = $simple->getPoint($index+1);
+                $nextNextPoint = $simple->getPoint($index+2);
 
                 // Get the next two line segments, and figure out the angle between them
                 // (different angles are dealt with differently)
+
+                // TODO - we're actually calculating every tangent and normal twice here.
+                // At the end of the loop, we should shuffle things up, and only calculate the nextNext ones here.
                 $tangent = $point->vectorToPoint($nextPoint);
                 $nextTangent = $nextPoint->vectorToPoint($nextNextPoint);
 
@@ -83,15 +85,15 @@ class WMAngledLinkGeometry extends WMLinkGeometry
                 // Find the two points where the outline of the fatter line turn
                 // One of these is the inside corner, and one the outside, depending on the angle
 
-                $p1 = $point->copy()->addVector($normal, $width);
-                $p2 = $nextPoint->copy()->addVector($normal, $width);
-                $p3 = $nextPoint->copy()->addVector($nextNormal, $width);
-                $p4 = $nextNextPoint->copy()->addVector($nextNormal, $width);
+                $point1 = $point->copy()->addVector($normal, $width);
+                $point2 = $nextPoint->copy()->addVector($normal, $width);
+                $point3 = $nextPoint->copy()->addVector($nextNormal, $width);
+                $point4 = $nextNextPoint->copy()->addVector($nextNormal, $width);
 
-                wm_debug("%s->%s crossing %s->%s\n", $p1, $p2, $p3, $p4);
+                wm_debug("%s->%s crossing %s->%s\n", $point1, $point2, $point3, $point4);
 
-                $line1 = $p1->lineToPoint($p2);
-                $line2 = $p3->lineToPoint($p4);
+                $line1 = $point1->lineToPoint($point2);
+                $line2 = $point3->lineToPoint($point4);
 
                 $crossingPoint1 = $line1->findCrossingPoint($line2);
 
@@ -99,15 +101,15 @@ class WMAngledLinkGeometry extends WMLinkGeometry
 
                 // Now do all that again, with the points on the other side
 
-                $p1 = $point->copy()->addVector($normal, -$width);
-                $p2 = $nextPoint->copy()->addVector($normal, -$width);
-                $p3 = $nextPoint->copy()->addVector($nextNormal, -$width);
-                $p4 = $nextNextPoint->copy()->addVector($nextNormal, -$width);
+                $point1 = $point->copy()->addVector($normal, -$width);
+                $point2 = $nextPoint->copy()->addVector($normal, -$width);
+                $point3 = $nextPoint->copy()->addVector($nextNormal, -$width);
+                $point4 = $nextNextPoint->copy()->addVector($nextNormal, -$width);
 
-                wm_debug("%s->%s crossing %s->%s\n", $p1, $p2, $p3, $p4);
+                wm_debug("%s->%s crossing %s->%s\n", $point1, $point2, $point3, $point4);
 
-                $line3 = $p1->lineToPoint($p2);
-                $line4 = $p3->lineToPoint($p4);
+                $line3 = $point1->lineToPoint($point2);
+                $line4 = $point3->lineToPoint($point4);
 
                 $crossingPoint2 = $line3->findCrossingPoint($line4);
 

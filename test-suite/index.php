@@ -38,7 +38,10 @@
             <li><?php file_link("cut-paste.txt", "Cut & paste detector") ?>(updated by 'test.sh -f')</li>
         </ul>
         <ul>
-            <li><a href="cacti-0.8.8c/">Local Test Cacti</a></li>
+            <li><a href="doxy/">Doxygen output</a></li>
+        </ul>
+        <ul>
+            <li><a href="../../cacti-0.8.8c/">Local Test Cacti</a></li>
         </ul>
         <ul>
             <li><a href="https://codeclimate.com/github/howardjones/network-weathermap">Code Climate</a></li>

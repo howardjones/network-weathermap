@@ -1197,7 +1197,7 @@ class WeatherMapConfigReader
             $this->currentObject = $this->mapObject->links['DEFAULT'];
             wm_debug("Loaded default LINK\n");
 
-            if (sizeof($this->mapObject->nodes) > 2) {
+            if (sizeof($this->mapObject->links) > 2) {
                 wm_warn("$this LINK DEFAULT is not the first LINK. Defaults will not apply to earlier LINKs. [WMWARN26]\n");
             }
 
@@ -1229,13 +1229,14 @@ class WeatherMapConfigReader
 
     private function handleVIA($fullcommand, $args, $matches)
     {
-        if (preg_match("/^\s*VIA\s+(\S+)\s+([-+]?\d+)\s+([-+]?\d+)\s*$/i", $fullcommand, $matches)) {
+        if (preg_match('/^\s*VIA\s+(\S+)\s+([-+]?\d+)\s+([-+]?\d+)\s*$/i', $fullcommand, $matches)) {
             $this->currentObject->vialist[] = array($matches[2], $matches[3], $matches[1]);
+            wm_debug("RELATIVE VIA\n");
 
             return true;
         }
 
-        if (preg_match("/^\s*VIA\s+([-+]?\d+)\s+([-+]?\d+)\s*$/i", $fullcommand, $matches)) {
+        if (preg_match('/^\s*VIA\s+([-+]?\d+)\s+([-+]?\d+)\s*$/i', $fullcommand, $matches)) {
             $this->currentObject->vialist[] = array($matches[1], $matches[2]);
 
             return true;

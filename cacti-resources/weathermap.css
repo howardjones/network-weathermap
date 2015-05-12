@@ -34,6 +34,20 @@ div.wm_mapgroup table { border-top: 1px solid #eee; }
 
 .wm_warning { padding:5px; width: 50%; border: 2px red solid; margin: 5px auto 15px auto; background-color: #fee; }
 
+
+
+
+/* .all_map_holder { margin-left: auto; margin-right: auto;  } */
+
+tr.fig, tr.fig td { border-top: 1px solid gray; }
+
+td.groupheader { background-color: #009; color: white; font-weight: bold; }
+
+
+.wm_expanded { height: 200px; border-left: 1px solid gray; border-bottom: 1px solid gray; border-right: 1px solid gray; }
+
+/* Cycle-related stuff */
+
 body#wm_fullscreen { font-family: sans-serif; margin: 0; border: 0; padding: 0; background-color: black; }
 
 #wmcyclecontrolbox.fullscreen {
@@ -41,15 +55,15 @@ body#wm_fullscreen { font-family: sans-serif; margin: 0; border: 0; padding: 0; 
     opacity: 0.9;
     position: fixed;
     left: 10px;
-    top: 10px; 
+    top: 10px;
 }
 
-#wmcyclecontrolbox {    
+#wmcyclecontrolbox {
     background-color: rgb(255,255,255);
     padding: 10px;
     border: solid 1px black;
-    width: 450px;    
-    font-size: small;       
+    width: 450px;
+    font-size: small;
 }
 
 #wmcyclecontrolbox.fullscreen #cycle_fullscreen { display: none; }
@@ -62,11 +76,4 @@ body#wm_fullscreen { font-family: sans-serif; margin: 0; border: 0; padding: 0; 
 
 .inplace .weathermapholder { display: none; }
 
-/* .all_map_holder { margin-left: auto; margin-right: auto;  } */
-
-tr.fig, tr.fig td { border-top: 1px solid gray; }
-
-td.groupheader { background-color: #009; color: white; font-weight: bold; }
-
-
-.wm_expanded { height: 200px; border-left: 1px solid gray; border-bottom: 1px solid gray; border-right: 1px solid gray; } 
+#wm_cyclecontrols a img { width: 16px; height: 16px; border: 0; }

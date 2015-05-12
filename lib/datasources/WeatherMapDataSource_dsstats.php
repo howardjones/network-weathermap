@@ -17,6 +17,8 @@ class WeatherMapDataSource_dsstats extends WeatherMapDataSource
 
     function Init(&$map)
     {
+        $this->owner = $map;
+
         if ($map->context=='cacti') {
             if (! $this->checkForDSStatsPlugin()) {
                 return false;

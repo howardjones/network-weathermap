@@ -120,32 +120,48 @@ class WeatherMapCactiUserPlugin extends WeatherMapUIBase
 
     protected function handleViewCycleFullscreen($request, $appObject)
     {
+        $mapList = $this->getAuthorisedMaps();
+
         $this->outputFullScreenPageTop();
-        $this->drawFullMapFullscreenCycle();
+        $this->outputOverlibSupport();
+        $this->outputCycleComponents(false, 'fullscreen');
+
+        $this->drawFullMapFullscreenCycle($mapList, false);
         $this->outputFullScreenPageBottom();
     }
 
     protected function handleViewCycleFilteredFullscreen($request, $appObject)
     {
+        $mapList = $this->getAuthorisedMaps(intval($request['group']));
+
         $this->outputFullScreenPageTop();
-        $this->drawFullMapFullscreenCycle(intval($request['group']));
+        $this->outputOverlibSupport();
+        $this->outputCycleComponents(true, 'fullscreen');
+        $this->drawFullMapFullscreenCycle($mapList, true);
         $this->outputFullScreenPageBottom();
     }
 
     protected function handleViewCycle($request, $appObject)
     {
+        $mapList = $this->getAuthorisedMaps();
+
         WMCactiAPI::pageTop();
         $this->outputOverlibSupport();
-        $this->drawFullMapCycle();
+        $this->outputCycleComponents(false, 'inline');
+        $this->drawFullMapCycle($mapList, false);
         $this->outputVersionBox();
         WMCactiAPI::pageBottom();
     }
 
     protected function handleViewCycleFiltered($request, $appObject)
     {
+        $mapList = $this->getAuthorisedMaps(intval($request['group']));
+
         WMCactiAPI::pageTop();
         $this->outputOverlibSupport();
-        $this->drawFullMapCycle(intval($request['group']));
+        $this->outputCycleComponents(true, 'inline');
+
+        $this->drawFullMapCycle($mapList, true);
         $this->outputVersionBox();
         WMCactiAPI::pageBottom();
     }
@@ -222,15 +238,15 @@ class WeatherMapCactiUserPlugin extends WeatherMapUIBase
             <?php
     }
 
-    private function drawFullMapFullscreenCycle($limitToGroup = -1)
+    private function drawFullMapFullscreenCycle($mapList, $isFiltered)
     {
-        $this->drawCycleCommon($limitToGroup, "fullscreen");
+        $this->drawCycleCommon($mapList, $isFiltered, "fullscreen");
         $this->outputCycleInitialisation(true);
     }
 
-    private function drawFullMapCycle($limitToGroup = -1)
+    private function drawFullMapCycle($mapList, $isFiltered)
     {
-        $this->drawCycleCommon($limitToGroup, "inplace");
+        $this->drawCycleCommon($mapList, $isFiltered, "inplace");
         $this->outputCycleInitialisation(false);
     }
 
@@ -667,13 +683,11 @@ class WeatherMapCactiUserPlugin extends WeatherMapUIBase
         print "</body></html>";
     }
 
-    private function outputCycleComponents($limitToGroup, $class)
+    private function outputCycleComponents($isFiltered, $class)
     {
-        print "<script src='vendor/jquery/dist/jquery.min.js'></script>";
-        print "<script src='vendor/jquery-idletimer/dist/idle-timer.min.js'></script>";
         $extra = "";
         $fullscreenURL = "?action=viewcycle_fullscreen";
-        if ($limitToGroup > 0) {
+        if ($isFiltered) {
             $extra = " in this group";
             $fullscreenURL = "?action=viewcycle_filtered_fullscreen&group=" . $limitToGroup;
         }
@@ -681,12 +695,11 @@ class WeatherMapCactiUserPlugin extends WeatherMapUIBase
         <div id="wmcyclecontrolbox" class="<?php print $class ?>">
             <div id="wm_progress"></div>
             <div id="wm_cyclecontrols">
-                <a id="cycle_stop" href="?action="><img border="0" src="cacti-resources/img/control_stop_blue.png" width="16" height="16"/></a>
-                <a id="cycle_prev" href="#"><img border="0" src="cacti-resources/img/control_rewind_blue.png" width="16" height="16"/></a>
-                <a id="cycle_pause" href="#"><img border="0" src="cacti-resources/img/control_pause_blue.png" width="16" height="16"/></a>
-                <a id="cycle_next" href="#"><img border="0" src="cacti-resources/img/control_fastforward_blue.png" width="16" height="16"/></a>
-                <a id="cycle_fullscreen" href="<?php echo $fullscreenURL; ?>"><img border="0"
-                        src="cacti-resources/img/arrow_out.png" width="16" height="16"/></a>
+                <a id="cycle_stop" href="?action="><img src="cacti-resources/img/control_stop_blue.png"/></a>
+                <a id="cycle_prev" href="#"><img src="cacti-resources/img/control_rewind_blue.png"/></a>
+                <a id="cycle_pause" href="#"><img src="cacti-resources/img/control_pause_blue.png"/></a>
+                <a id="cycle_next" href="#"><img src="cacti-resources/img/control_fastforward_blue.png"/></a>
+                <a id="cycle_fullscreen" href="<?php echo $fullscreenURL; ?>"><img src="cacti-resources/img/arrow_out.png"/></a>
                 Showing <span id="wm_current_map">1</span> of <span id="wm_total_map">1</span>.
                 Cycling all available maps<?php echo $extra; ?>.
             </div>
@@ -699,12 +712,16 @@ class WeatherMapCactiUserPlugin extends WeatherMapUIBase
         $refreshTime = WMCactiAPI::getConfigOption("weathermap_cycle_refresh", 20);
         $pollerInterval = WMCactiAPI::getConfigOption("poller_interval", 300); ?>
 
-        <script type="text/javascript" src="cacti-resources/map-cycle.js"></script>
+        <script src='vendor/jquery/dist/jquery.min.js'></script>
+        <script src='vendor/jquery-idletimer/dist/idle-timer.min.js'></script>
+        <script src="cacti-resources/map-cycle.js"></script>
         <script type="text/javascript">
             $(document).ready(function () {
                 WMcycler.start({
                     fullscreen: <?php echo ($showFullscreen ? "1" : "0"); ?>,
                     poller_cycle: <?php echo $pollerInterval * 1000; ?>,
+                    isFiltered: true,
+                    fullScreenURL: '',
                     period: <?php echo $refreshTime  * 1000; ?>
                 });
             });
@@ -754,16 +771,16 @@ class WeatherMapCactiUserPlugin extends WeatherMapUIBase
      * @param $limitToGroup
      * @param $class
      */
-    private function drawCycleCommon($limitToGroup, $class)
+    private function drawCycleCommon($mapList, $isFiltered, $class)
     {
-        $mapList = $this->getAuthorisedMaps($limitToGroup);
-        $this->outputOverlibSupport();
-        $this->outputCycleComponents($limitToGroup, $class);
-
         if (sizeof($mapList) == 0) {
             print "<div align=\"center\" style=\"padding:20px\"><em>You Have No Maps</em></div>\n";
-            // return;
+            return;
         }
+
+        // $mapList = $this->getAuthorisedMaps($limitToGroup);
+
+
         print "<div class='all_map_holder $class'>";
         foreach ($mapList as $map) {
             $htmlfile = $this->outputDirectory . DIRECTORY_SEPARATOR . $map['filehash'] . ".html";

@@ -623,7 +623,9 @@ class WeatherMap extends WeatherMapBase
 
                 if (!$ret) {
                     wm_debug("Marking $name plugin as inactive, since Init() failed\n");
-                    $pluginEntry['active'] = false;
+                    // $pluginEntry['active'] = false;
+                    $this->plugins[$type][$name]['active'] = false;
+                    wm_debug("State is now %s\n", $this->plugins['data'][$name]['active']);
                 }
             }
         }

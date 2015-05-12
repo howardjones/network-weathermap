@@ -77,7 +77,7 @@ class WMTarget
             $isRecognised = $pluginEntry['object']->Recognise($this->finalTargetString);
 
             if ($isRecognised) {
-                wm_debug("plugin %s says it can handle it\n", $name);
+                wm_debug("plugin %s says it can handle it (state=%s)\n", $name, $pluginEntry['active']);
                 $this->pluginName = $name;
                 $this->pluginObject = $pluginEntry['object'];
                 $this->pluginRunnable = $pluginEntry['active'];
@@ -95,6 +95,7 @@ class WMTarget
 
     public function readData(&$map, &$mapItem)
     {
+        wm_debug("ReadData for $mapItem ($this->pluginName $this->pluginRunnable)\n");
         if (! $this->pluginRunnable) {
             wm_debug("Plugin %s isn't runnable\n", $this->pluginName);
             return;

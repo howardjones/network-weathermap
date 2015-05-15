@@ -14,135 +14,9 @@ class WMFont
         $this->loaded = false;
     }
 
-    function initTTF($filename, $size)
-    {
-        if (!function_exists("imagettfbbox")) {
-            wm_warn("Truetype support not available in GD. Unable to load font.");
-            return false;
-        }
-
-        // test if this font is valid, before adding it to the font table...
-        $bounds = @imagettfbbox($size, 0, $filename, "Ignore me");
-        if (isset($bounds[0])) {
-            $this->file = $filename;
-            $this->size = $size;
-            $this->type = "truetype";
-
-            return true;
-        }
-        wm_warn("Could not load font - $filename");
-        return false;
-
-    }
-
-    private function isTrueType()
-    {
-        if ($this->type == 'truetype') {
-            return true;
-        }
-        return false;
-    }
-
-    private function isGD()
-    {
-        if ($this->type == 'gd') {
-            return true;
-        }
-        if ($this->type == 'GD builtin') {
-            return true;
-        }
-        return false;
-    }
-
     public function isLoaded()
     {
         return $this->loaded;
-    }
-
-    function initGD($filename)
-    {
-        $gdFontID = imageloadfont($filename);
-
-        if ($gdFontID) {
-            $this->gdnumber = $gdFontID;
-            $this->file = $filename;
-            $this->type = "gd";
-
-            return true;
-        } else {
-            return false;
-        }
-    }
-
-    function initGDBuiltin($gdNumber)
-    {
-        $this->gdnumber = $gdNumber;
-        $this->type = "GD builtin";
-
-        return true;
-    }
-
-    function drawImageString($gdImage, $x, $y, $string, $colour, $angle = 0)
-    {
-        if ($this->isGD()) {
-            imagestring($gdImage, $this->gdnumber, $x, $y - imagefontheight($this->gdnumber), $string, $colour);
-            if ($angle != 0) {
-                wm_warn("Angled text doesn't work with non-FreeType fonts [WMWARN02]\n");
-            }
-        }
-
-        if ($this->isTrueType()) {
-            imagettftext($gdImage, $this->size, $angle, $x, $y, $colour, $this->file, $string);
-        }
-    }
-
-    function calculateImageStringSize($string)
-    {
-        $lines = explode("\n", $string);
-        $lineCount = sizeof($lines);
-        $maxLineLength = $this->calculateMaxLineLength($lines);
-
-        if ($this->isGD()) {
-            return array(imagefontwidth($this->gdnumber) * $maxLineLength, $lineCount * imagefontheight($this->gdnumber));
-        }
-
-        if ($this->isTrueType()) {
-            $height = 0;
-            $width = 0;
-            foreach ($lines as $line) {
-                $bounds = imagettfbbox($this->size, 0, $this->file, $line);
-                $charWidth = $bounds[4] - $bounds[0];
-                $charHeight = $bounds[1] - $bounds[5];
-                if ($charWidth > $width) {
-                    $width = $charWidth;
-                }
-                $height += ($charHeight * 1.2);
-            }
-
-            return (array($width, $height));
-        }
-
-        return (array(0,0));
-    }
-
-    public function getConfig($fontNumber)
-    {
-        if ($this->type == 'truetype') {
-            return sprintf("FONTDEFINE %d %s %d\n", $fontNumber, $this->file, $this->size);
-        }
-
-        if ($this->type == 'gd') {
-            return sprintf("FONTDEFINE %d %s\n", $fontNumber, $this->file);
-        }
-    }
-
-    public function isValid()
-    {
-        if ($this->type=="") {
-            return false;
-        }
-
-        return true;
     }
 
     /**
@@ -186,6 +60,27 @@ class WMTrueTypeFont extends WMFont
             return "";
         }
         return sprintf("FONTDEFINE %d %s %d\n", $fontNumber, $this->file, $this->size);
+    }
+
+    private function initTTF($filename, $size)
+    {
+        if (!function_exists("imagettfbbox")) {
+            wm_warn("Truetype support not available in GD. Unable to load font.");
+            return false;
+        }
+
+        // test if this font is valid, before adding it to the font table...
+        $bounds = @imagettfbbox($size, 0, $filename, "Ignore me");
+        if (isset($bounds[0])) {
+            $this->file = $filename;
+            $this->size = $size;
+            $this->type = "truetype";
+
+            return true;
+        }
+        wm_warn("Could not load font - $filename");
+        return false;
+
     }
 
     public function calculateImageStringSize($string)
@@ -244,6 +139,21 @@ class WMGDFont extends WMFont
 
         return array(imagefontwidth($this->gdnumber) * $maxLineLength, $lineCount * imagefontheight($this->gdnumber));
     }
+
+    private function initGD($filename)
+    {
+        $gdFontID = imageloadfont($filename);
+
+        if ($gdFontID) {
+            $this->gdnumber = $gdFontID;
+            $this->file = $filename;
+            $this->type = "gd";
+
+            return true;
+        } else {
+            return false;
+        }
+    }
 }
 
 class WMFontTable
@@ -276,7 +186,8 @@ class WMFontTable
         if (! isset($this->table[$fontNumber])) {
             return false;
         }
-        return $this->table[$fontNumber]->isValid();
+
+        return $this->table[$fontNumber]->isLoaded();
     }
 
     public function getFont($fontNumber)

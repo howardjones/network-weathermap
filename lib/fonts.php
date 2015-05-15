@@ -56,9 +56,6 @@ class WMTrueTypeFont extends WMFont
 
     public function getConfig($fontNumber)
     {
-        if ($fontNumber < 6) {
-            return "";
-        }
         return sprintf("FONTDEFINE %d %s %d\n", $fontNumber, $this->file, $this->size);
     }
 
@@ -128,6 +125,9 @@ class WMGDFont extends WMFont
 
     public function getConfig($fontNumber)
     {
+        if ($fontNumber < 6) {
+            return "";
+        }
         return sprintf("FONTDEFINE %d %s\n", $fontNumber, $this->file);
     }
 
@@ -138,6 +138,14 @@ class WMGDFont extends WMFont
         $maxLineLength = $this->calculateMaxLineLength($lines);
 
         return array(imagefontwidth($this->gdnumber) * $maxLineLength, $lineCount * imagefontheight($this->gdnumber));
+    }
+
+    private function initGDBuiltin($gdNumber)
+    {
+        $this->gdnumber = $gdNumber;
+        $this->type = "GD builtin";
+
+        return true;
     }
 
     private function initGD($filename)
@@ -163,9 +171,7 @@ class WMFontTable
     public function init()
     {
         for ($i = 1; $i < 6; $i++) {
-            $newFont = new WMFont();
-            $newFont->initGDBuiltin($i);
-
+            $newFont = new WMGDFont($i);
             $this->addFont($i, $newFont);
         }
     }

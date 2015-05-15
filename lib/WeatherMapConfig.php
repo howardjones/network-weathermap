@@ -1467,20 +1467,24 @@ class WeatherMapConfigReader
         if (isset($args[3])) {
             wm_debug("New TrueType font in slot %d\n", $args[1]);
 
-            $newFontObject = new WMFont();
-            $fontOK = $newFontObject->initTTF($args[2], $args[3]);
+            $newFontObject = $this->mapObject->fonts->makeFontObject("truetype", $args[2], $args[3]);
 
-            if (! $fontOK) {
+            # $newFontObject = new WMFont();
+            # $fontOK = $newFontObject->initTTF($args[2], $args[3]);
+
+            if (! $newFontObject->isLoaded()) {
                 wm_warn("Failed to load ttf font " . $args[2] . " - at config line $this->lineCount\n [WMWARN30]");
             }
 
         } else {
             wm_debug("New GD font in slot %d\n", $args[1]);
 
-            $newFontObject = new WMFont();
-            $fontOK = $newFontObject->initGD($args[2]);
+            $newFontObject = $this->mapObject->fonts->makeFontObject("gd", $args[2]);
+            # $newFontObject = new WMFont();
+            # $fontOK = $newFontObject->initGD($args[2]);
 
-            if (!$fontOK) {
+            // XXX - why do we do this with GD fonts but not truetype?
+            if (!$newFontObject->isLoaded()) {
                 wm_warn("Failed to load GD font: " . $args[2] . " ($newfont) at config line $this->lineCount [WMWARN32]\n");
                 $newFontObject = null;
             }

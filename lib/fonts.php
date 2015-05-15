@@ -3,10 +3,10 @@
 
 class WMFont
 {
-    var $type;
-    var $file;
-    var $gdnumber;
-    var $size;
+    private $type;
+    private $file;
+    private $gdnumber;
+    private $size;
 
     function initTTF($filename, $size)
     {
@@ -121,6 +121,26 @@ class WMFont
 
         return (array(0,0));
     }
+
+    public function getConfig($fontNumber)
+    {
+        if ($this->type == 'truetype') {
+            return sprintf("FONTDEFINE %d %s %d\n", $fontNumber, $this->file, $this->size);
+        }
+
+        if ($this->type == 'gd') {
+            return sprintf("FONTDEFINE %d %s\n", $fontNumber, $this->file);
+        }
+    }
+
+    public function isValid()
+    {
+        if ($this->type=="") {
+            return false;
+        }
+
+        return true;
+    }
 }
 
 class WMFontTable
@@ -153,11 +173,7 @@ class WMFontTable
         if (! isset($this->table[$fontNumber])) {
             return false;
         }
-        if ($this->table[$fontNumber]->type=="") {
-            return false;
-        }
-
-        return true;
+        return $this->table[$fontNumber]->isValid();
     }
 
     public function getFont($fontNumber)
@@ -186,17 +202,10 @@ class WMFontTable
         $output = "";
         if (count($this->table) > 0) {
             foreach ($this->table as $fontNumber => $fontObject) {
-                if ($fontObject->type == 'truetype') {
-                    $output .= sprintf("FONTDEFINE %d %s %d\n", $fontNumber, $fontObject->file, $fontObject->size);
-                }
-
-                if ($fontObject->type == 'gd') {
-                    $output .= sprintf("FONTDEFINE %d %s\n", $fontNumber, $fontObject->file);
-                }
+                $output .= $fontObject->getConfig($fontNumber);
             }
-
-            $output .= "\n";
         }
+        $output .= "\n";
 
         return $output;
     }

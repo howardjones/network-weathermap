@@ -61,29 +61,25 @@ class WeatherMapDataSource_fping extends WeatherMapDataSource
             return array(null, null, 0);
         }
 
-        $pattern = '/^$target\s:';
-        for ($i=0; $i<$ping_count; $i++) {
-            $pattern .= '\s(\S+)';
-        }
-        $pattern .= "/";
+        $pattern = $this->buildMatchPattern($target, $ping_count);
 
-        // TODO - this doesn't really validate the target in any way!!
-
-        if (!is_executable($this->fping_cmd)) {
-            wm_warn("FPing ReadData: Can't find fping executable. Check path at line 20 of WeatherMapDataSource_fping.php [WMFPING01]\n");
-            return array(null, null, 0);
-        }
-
-        $command = $this->fping_cmd." -t100 -r1 -p20 -u -C $ping_count -i10 -q $target 2>&1";
-        wm_debug("Running $command\n");
-        $pipe = popen($command, "r");
+        $pipe = $this->openPipeToFping($target, $ping_count);
 
         if (!isset($pipe)) {
             wm_warn("FPing ReadData: Couldn't open pipe to fping [WMFPING04]\n");
             return array(null, null, 0);
         }
 
-        list($count, $hitcount, $loss, $ave, $min, $max) = $this->readDataFromFping($pipe, $pattern, $target, $ping_count, $matches);
+        list($count, $hitcount, $loss, $ave, $min, $max) = $this->readDataFromFping($pipe, $pattern, $ping_count);
+        pclose($pipe);
+
+        if ($count == 0) {
+            wm_warn("FPing ReadData: No lines read. Bad hostname? ($target) [WMFPING03]\n");
+        }
+
+        if ($count > 0 && $hitcount == 0) {
+            wm_warn("FPing ReadData: $count lines read. But nothing returned for target??? ($target) Try running with DEBUG to see output.  [WMFPING02]\n");
+        }
 
         if ($hitcount >0) {
             $data[IN] = $ave;
@@ -105,7 +101,7 @@ class WeatherMapDataSource_fping extends WeatherMapDataSource
      * @param $matches
      * @return array
      */
-    protected function readDataFromFping($pipe, $pattern, $target, $ping_count, $matches)
+    protected function readDataFromFping($pipe, $pattern, $ping_count)
     {
         $count = 0;
         $hitcount = 0;
@@ -116,7 +112,7 @@ class WeatherMapDataSource_fping extends WeatherMapDataSource
             wm_debug("Output: $line");
 
             if (preg_match($pattern, $line, $matches)) {
-                wm_debug("Found output line for $target\n");
+                wm_debug("Found output line\n");
                 $hitcount++;
                 $loss = 0;
                 $ave = 0;
@@ -141,15 +137,6 @@ class WeatherMapDataSource_fping extends WeatherMapDataSource
                 wm_debug("Result: $cnt $min -> $max $ave $loss\n");
             }
         }
-        pclose($pipe);
-
-        if ($count == 0) {
-            wm_warn("FPing ReadData: No lines read. Bad hostname? ($target) [WMFPING03]\n");
-        }
-
-        if ($count > 0 && $hitcount == 0) {
-            wm_warn("FPing ReadData: $count lines read. But nothing returned for target??? ($target) Try running with DEBUG to see output.  [WMFPING02]\n");
-        }
 
         return array($count, $hitcount, $loss, $ave, $min, $max);
     }
@@ -167,6 +154,44 @@ class WeatherMapDataSource_fping extends WeatherMapDataSource
             return array($matches, $target);
         }
         return $target;
+    }
+
+    /**
+     * @param $ping_count
+     * @param $target
+     * @return resource
+     */
+    protected function openPipeToFping($target, $ping_count)
+    {
+        // TODO - this doesn't really validate the target in any way!!
+        if (!is_executable($this->fping_cmd)) {
+            wm_warn("FPing ReadData: Can't find fping executable. Check path at line 20 of WeatherMapDataSource_fping.php [WMFPING01]\n");
+            return null;
+        }
+
+        $command = $this->fping_cmd . " -t100 -r1 -p20 -u -C $ping_count -i10 -q $target 2>&1";
+        wm_debug("Running $command\n");
+        $pipe = popen($command, "r");
+
+        if (!isset($pipe)) {
+            wm_warn("FPing ReadData: Couldn't open pipe to fping [WMFPING04]\n");
+        }
+
+        return $pipe;
+    }
+
+    /**
+     * @param $ping_count
+     * @return string
+     */
+    protected function buildMatchPattern($target, $ping_count)
+    {
+        $pattern = '/^' . $target . '\s:';
+        for ($i = 0; $i < $ping_count; $i++) {
+            $pattern .= '\s(\S+)';
+        }
+        $pattern .= "/";
+        return $pattern;
     }
 }
 

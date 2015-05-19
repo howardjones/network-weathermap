@@ -157,37 +157,39 @@ class WeatherMapNode extends WeatherMapDataItem
      */
     protected function drawAIconNINK(&$map, $iconImageRef, $ink)
     {
-        $rx = $this->iconscalew / 2 - 1;
-        $ry = $this->iconscaleh / 2 - 1;
+        $radiusX = $this->iconscalew / 2 - 1;
+        $radiusY = $this->iconscaleh / 2 - 1;
         $size = $this->iconscalew;
         $quarter = $size / 4;
 
-        $col1 = $this->colours[OUT];
-        $col2 = $this->colours[IN];
+        $colour1 = $this->colours[OUT]->gdallocate($iconImageRef);
+        $colour2 = $this->colours[IN]->gdallocate($iconImageRef);
 
-        assert('!is_null($col1)');
-        assert('!is_null($col2)');
+        imagefilledarc($iconImageRef, $radiusX - 1, $radiusY, $size, $size, 270, 90, $colour1, IMG_ARC_PIE);
+        imagefilledarc($iconImageRef, $radiusX + 1, $radiusY, $size, $size, 90, 270, $colour2, IMG_ARC_PIE);
 
-        imagefilledarc($iconImageRef, $rx - 1, $ry, $size, $size, 270, 90, $col1->gdallocate($iconImageRef), IMG_ARC_PIE);
-        imagefilledarc($iconImageRef, $rx + 1, $ry, $size, $size, 90, 270, $col2->gdallocate($iconImageRef), IMG_ARC_PIE);
-
-        imagefilledarc($iconImageRef, $rx - 1, $ry + $quarter, $quarter * 2, $quarter * 2, 0, 360, $col1->gdallocate($iconImageRef), IMG_ARC_PIE);
-        imagefilledarc($iconImageRef, $rx + 1, $ry - $quarter, $quarter * 2, $quarter * 2, 0, 360, $col2->gdallocate($iconImageRef), IMG_ARC_PIE);
+        imagefilledarc($iconImageRef, $radiusX - 1, $radiusY + $quarter, $quarter * 2, $quarter * 2, 0, 360, $colour1, IMG_ARC_PIE);
+        imagefilledarc($iconImageRef, $radiusX + 1, $radiusY - $quarter, $quarter * 2, $quarter * 2, 0, 360, $colour2, IMG_ARC_PIE);
 
         if ($ink !== null && !$ink->isNone()) {
             // XXX - need a font definition from somewhere for NINK text
             $font = 1;
+            $inkGD = $ink->gdallocate($iconImageRef);
 
-            $inLabel = $map->ProcessString("{node:this:bandwidth_in:%.1k}", $this);
-            $outLabel = $map->ProcessString("{node:this:bandwidth_out:%.1k}", $this);
+            $directions = array(
+                array("in", -1),
+                array("out", +1)
+            );
 
-            list($twid, $thgt) = $map->myimagestringsize($font, $inLabel);
-            $map->myimagestring($iconImageRef, $font, $rx - $twid / 2, $ry - $quarter + ($thgt / 2), $inLabel, $ink->gdallocate($iconImageRef));
+            foreach ($directions as $direction) {
+                $name = $direction[0];
+                $label = $map->ProcessString("{node:this:bandwidth_$name:%.1k}", $this);
 
-            list($twid, $thgt) = $map->myimagestringsize($font, $outLabel);
-            $map->myimagestring($iconImageRef, $font, $rx - $twid / 2, $ry + $quarter + ($thgt / 2), $outLabel, $ink->gdallocate($iconImageRef));
+                list($twid, $thgt) = $map->myimagestringsize($font, $label);
+                $map->myimagestring($iconImageRef, $font, $radiusX - $twid / 2, $radiusY + $direction[1] * $quarter + ($thgt / 2), $label, $inkGD);
+            }
 
-            imageellipse($iconImageRef, $rx, $ry, $rx * 2, $ry * 2, $ink->gdallocate($iconImageRef));
+            imageellipse($iconImageRef, $radiusX, $radiusY, $radiusX * 2, $radiusY * 2, $inkGD);
         }
     }
 

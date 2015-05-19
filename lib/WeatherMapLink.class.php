@@ -731,14 +731,7 @@ class WeatherMapLink extends WeatherMapDataItem
 
     function asJS()
     {
-        $output='';
-        $output.="Links[" . WMUtility::jsEscape($this->name) . "] = {";
-
-        $output .= $this->asJSCore();
-
-        $output.="};\n";
-        $output .= "LinkIDs[\"L" . $this->id . "\"] = ". WMUtility::jsEscape($this->name) . ";\n";
-        return $output;
+        return parent::asJS("Link", "L");
     }
 
     public function getValue($name)

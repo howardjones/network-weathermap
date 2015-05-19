@@ -386,4 +386,17 @@ class WeatherMapDataItem extends WeatherMapItem
         $this->parent = $templateObject;
         $this->parent->descendents [] = $this;
     }
+
+    protected function asJS($type = "Thing", $prefix = "T")
+    {
+        $output = '';
+        $output .= $type . "s[" . WMUtility::jsEscape($this->name) . "] = {";
+
+        $output .= $this->asJSCore();
+
+        $output .= "};\n";
+        $output .= $type . "IDs[\"" . $prefix . $this->id . "\"] = ". WMUtility::jsEscape($this->name) . ";\n";
+
+        return $output;
+    }
 }

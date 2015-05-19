@@ -1001,14 +1001,7 @@ class WeatherMapNode extends WeatherMapDataItem
 
     function asJS()
     {
-        $output = '';
-        $output .= "Nodes[" . WMUtility::jsEscape($this->name) . "] = {";
-
-        $output .= $this->asJSCore();
-
-        $output .= "};\n";
-        $output .= "NodeIDs[\"N" . $this->id . "\"] = " . WMUtility::jsEscape($this->name) . ";\n";
-        return $output;
+        return parent::asJS("Node", "N");
     }
 
     public function getValue($name)

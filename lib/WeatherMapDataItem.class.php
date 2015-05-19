@@ -108,6 +108,66 @@ class WeatherMapDataItem extends WeatherMapItem
         return $output;
     }
 
+    /**
+     * @param $output
+     * @param $default_default
+     * @return array
+     */
+    protected function getConfigInOutOrBoth($default_default, $configKeyword, $fieldName)
+    {
+        $output = "";
+        $myArray = $this->$fieldName;
+        $theirArray = $default_default->$fieldName;
+
+        if ($myArray[IN] == $myArray[OUT]) {
+            $dirs = array(IN => ""); // only use the IN value, since they're both the same, but don't prefix the output keyword
+        } else {
+            $dirs = array(IN => "IN", OUT => "OUT");// the full monty two-keyword version
+        }
+
+        foreach ($dirs as $dir => $dirText) {
+            if ($myArray[$dir] != $theirArray[$dir]) {
+                $value = $myArray[$dir];
+                if (is_array($value)) {
+                    $value = join(" ", $value);
+                }
+                $output .= "\t" . $dirText . $configKeyword . " " . $value . "\n";
+            }
+        }
+        return $output;
+    }
+
+    /**
+     * @param $output
+     * @param $basic_params
+     * @param $default_default
+     * @return string
+     */
+    protected function getConfigSimple($basic_params, $default_default)
+    {
+        $output = "";
+
+        # TEMPLATE must come first. DEFAULT
+        if ($this->template != 'DEFAULT' && $this->template != ':: DEFAULT ::') {
+            $output .= "\tTEMPLATE " . $this->template . "\n";
+        }
+
+        foreach ($basic_params as $param) {
+            $field = $param["fieldName"];
+            $keyword = $param["configKeyword"];
+
+            if ($this->$field != $default_default->$field) {
+                if ($param["type"] == CONFIG_TYPE_COLOR) {
+                    $output .= "\t$keyword " . $this->$field->asConfig() . "\n";
+                }
+                if ($param["type"] == CONFIG_TYPE_LITERAL) {
+                    $output .= "\t$keyword " . $this->$field . "\n";
+                }
+            }
+        }
+        return $output;
+    }
+
     private function getDirectionList()
     {
         return array("in"=>IN, "out"=>OUT);
@@ -159,6 +219,24 @@ class WeatherMapDataItem extends WeatherMapItem
                 ));
             }
         }
+    }
+
+    protected function getMaxValueConfig($default_default)
+    {
+        $output = "";
+
+        if (($this->max_bandwidth_in != $default_default->max_bandwidth_in)
+            || ($this->max_bandwidth_out != $default_default->max_bandwidth_out)
+            || ($this->name == 'DEFAULT')
+        ) {
+            if ($this->max_bandwidth_in == $this->max_bandwidth_out) {
+                $output .= "\tMAXVALUE " . $this->max_bandwidth_in_cfg . "\n";
+            } else {
+                $output .= "\tMAXVALUE " . $this->max_bandwidth_in_cfg . " " . $this->max_bandwidth_out_cfg . "\n";
+            }
+        }
+
+        return $output;
     }
 
     public function performDataCollection()

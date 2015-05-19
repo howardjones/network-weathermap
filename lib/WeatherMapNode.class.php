@@ -852,8 +852,6 @@ class WeatherMapNode extends WeatherMapDataItem
             array("fieldName"=>'labeloffset', "configKeyword"=>'LABELOFFSET', "type"=>CONFIG_TYPE_LITERAL),
             array("fieldName"=>'labelfont', "configKeyword"=>'LABELFONT', "type"=>CONFIG_TYPE_LITERAL),
             array("fieldName"=>'labelangle', "configKeyword"=>'LABELANGLE', "type"=>CONFIG_TYPE_LITERAL),
-            array("fieldName"=>'overlibwidth', "configKeyword"=>'OVERLIBWIDTH', "type"=>CONFIG_TYPE_LITERAL),
-            array("fieldName"=>'overlibheight', "configKeyword"=>'OVERLIBHEIGHT', "type"=>CONFIG_TYPE_LITERAL),
 
             array("fieldName"=>'aiconoutlinecolour', "configKeyword"=>'AICONOUTLINECOLOR', "type"=>CONFIG_TYPE_COLOR),
             array("fieldName"=>'aiconfillcolour', "configKeyword"=>'AICONFILLCOLOR', "type"=>CONFIG_TYPE_COLOR),
@@ -863,24 +861,7 @@ class WeatherMapNode extends WeatherMapDataItem
             array("fieldName"=>'labelfontcolour', "configKeyword"=>'LABELFONTCOLOR', "type"=>CONFIG_TYPE_COLOR)
         );
 
-        # TEMPLATE must come first. DEFAULT
-        if ($this->template != 'DEFAULT' && $this->template != ':: DEFAULT ::') {
-            $output .= "\tTEMPLATE " . $this->template . "\n";
-        }
-
-        foreach ($basic_params as $param) {
-            $field = $param["fieldName"];
-            $keyword = $param["configKeyword"];
-
-            if ($this->$field != $default_default->$field) {
-                if ($param["type"] == CONFIG_TYPE_COLOR) {
-                    $output .= "\t$keyword " . $this->$field->asConfig() . "\n";
-                }
-                if ($param["type"] == CONFIG_TYPE_LITERAL) {
-                    $output .= "\t$keyword " . $this->$field . "\n";
-                }
-            }
-        }
+        $output .= $this->getConfigSimple($basic_params, $default_default);
 
         // IN/OUT are the same, so we can use the simpler form here
         if ($this->infourl[IN] != $default_default->infourl[IN]) {
@@ -959,16 +940,9 @@ class WeatherMapNode extends WeatherMapDataItem
             }
         }
 
-        if (($this->max_bandwidth_in != $default_default->max_bandwidth_in)
-            || ($this->max_bandwidth_out != $default_default->max_bandwidth_out)
-            || ($this->name == 'DEFAULT')
-        ) {
-            if ($this->max_bandwidth_in == $this->max_bandwidth_out) {
-                $output .= "\tMAXVALUE " . $this->max_bandwidth_in_cfg . "\n";
-            } else {
-                $output .= "\tMAXVALUE " . $this->max_bandwidth_in_cfg . " " . $this->max_bandwidth_out_cfg . "\n";
-            }
-        }
+        $output .= $this->getMaxValueConfig($default_default);
+
+        $output .= $this->getConfigHints($default_default);
 
         foreach ($this->named_offsets as $off_name => $off_pos) {
             // if the offset exists with different values, or
@@ -985,8 +959,6 @@ class WeatherMapNode extends WeatherMapDataItem
                 $output .= sprintf("\tDEFINEOFFSET %s %d %d\n", $off_name, $off_pos[0], $off_pos[1]);
             }
         }
-
-        $output .= $this->getConfigHints($default_default);
 
         if ($output != '') {
             $output = "NODE " . $this->name . "\n$output\n";

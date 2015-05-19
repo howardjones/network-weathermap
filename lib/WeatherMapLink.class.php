@@ -524,46 +524,31 @@ class WeatherMapLink extends WeatherMapDataItem
             wm_debug("Writing config for LINK $this->name against $this->template\n");
 
             $basic_params = array(
-                    array('width','WIDTH',CONFIG_TYPE_LITERAL),
-                    array('zorder','ZORDER',CONFIG_TYPE_LITERAL),
-                    array('overlibwidth','OVERLIBWIDTH',CONFIG_TYPE_LITERAL),
-                    array('overlibheight','OVERLIBHEIGHT',CONFIG_TYPE_LITERAL),
-                    array('arrowstyle','ARROWSTYLE',CONFIG_TYPE_LITERAL),
-                    array('viastyle','VIASTYLE',CONFIG_TYPE_LITERAL),
-                    array('linkstyle','LINKSTYLE',CONFIG_TYPE_LITERAL),
-                    array('splitpos','SPLITPOS',CONFIG_TYPE_LITERAL),
-                    array('duplex','DUPLEX',CONFIG_TYPE_LITERAL),
-                    array('commentstyle','COMMENTSTYLE',CONFIG_TYPE_LITERAL),
-                    array('labelboxstyle','BWSTYLE',CONFIG_TYPE_LITERAL),
+                array("fieldName"=>'zorder', "configKeyword"=>'ZORDER', "type"=>CONFIG_TYPE_LITERAL),
+                array("fieldName"=>'overlibwidth', "configKeyword"=>'OVERLIBWIDTH', "type"=>CONFIG_TYPE_LITERAL),
+                array("fieldName"=>'overlibheight', "configKeyword"=>'OVERLIBHEIGHT', "type"=>CONFIG_TYPE_LITERAL),
 
-                    array('bwfont','BWFONT',CONFIG_TYPE_LITERAL),
-                    array('commentfont','COMMENTFONT',CONFIG_TYPE_LITERAL),
+                array("fieldName"=>'width',"configKeyword"=>'WIDTH',"type"=>CONFIG_TYPE_LITERAL),
+                array("fieldName"=>'arrowstyle',"configKeyword"=>'ARROWSTYLE',"type"=>CONFIG_TYPE_LITERAL),
+                array("fieldName"=>'viastyle',"configKeyword"=>'VIASTYLE',"type"=>CONFIG_TYPE_LITERAL),
+                array("fieldName"=>'linkstyle',"configKeyword"=>'LINKSTYLE',"type"=>CONFIG_TYPE_LITERAL),
+                array("fieldName"=>'splitpos',"configKeyword"=>'SPLITPOS',"type"=>CONFIG_TYPE_LITERAL),
+                array("fieldName"=>'duplex',"configKeyword"=>'DUPLEX',"type"=>CONFIG_TYPE_LITERAL),
+                array("fieldName"=>'commentstyle',"configKeyword"=>'COMMENTSTYLE',"type"=>CONFIG_TYPE_LITERAL),
+                array("fieldName"=>'labelboxstyle',"configKeyword"=>'BWSTYLE',"type"=>CONFIG_TYPE_LITERAL),
 
-                    array('bwoutlinecolour','BWOUTLINECOLOR',CONFIG_TYPE_COLOR),
-                    array('bwboxcolour','BWBOXCOLOR',CONFIG_TYPE_COLOR),
-                    array('outlinecolour','OUTLINECOLOR',CONFIG_TYPE_COLOR),
-                    array('commentfontcolour','COMMENTFONTCOLOR',CONFIG_TYPE_COLOR),
-                    array('bwfontcolour','BWFONTCOLOR',CONFIG_TYPE_COLOR)
-                );
+                array("fieldName"=>'bwfont',"configKeyword"=>'BWFONT',"type"=>CONFIG_TYPE_LITERAL),
+                array("fieldName"=>'commentfont',"configKeyword"=>'COMMENTFONT',"type"=>CONFIG_TYPE_LITERAL),
 
-            # TEMPLATE must come first. DEFAULT
-            if ($this->template != 'DEFAULT' && $this->template != ':: DEFAULT ::') {
-                $output .= "\tTEMPLATE " . $this->template . "\n";
-            }
+                array("fieldName"=>'bwoutlinecolour',"configKeyword"=>'BWOUTLINECOLOR',"type"=>CONFIG_TYPE_COLOR),
+                array("fieldName"=>'bwboxcolour',"configKeyword"=>'BWBOXCOLOR',"type"=>CONFIG_TYPE_COLOR),
+                array("fieldName"=>'outlinecolour',"configKeyword"=>'OUTLINECOLOR',"type"=>CONFIG_TYPE_COLOR),
+                array("fieldName"=>'commentfontcolour',"configKeyword"=>'COMMENTFONTCOLOR',"type"=>CONFIG_TYPE_COLOR),
+                array("fieldName"=>'bwfontcolour',"configKeyword"=>'BWFONTCOLOR',"type"=>CONFIG_TYPE_COLOR)
+            );
 
-            foreach ($basic_params as $param) {
-                $field = $param[0];
-                $keyword = $param[1];
 
-                if ($this->$field != $default_default->$field) {
-                    if ($param[2] == CONFIG_TYPE_COLOR) {
-                        $output .= "\t$keyword " . $this->$field->asConfig() . "\n";
-                    }
-                    if ($param[2] == CONFIG_TYPE_LITERAL) {
-                        $output .= "\t$keyword " . $this->$field . "\n";
-                    }
-                }
-            }
+            $output .= $this->getConfigSimple($basic_params, $default_default);
 
             $val = $this->usescale . " " . $this->scaletype;
             $comparison = $default_default->usescale . " " . $default_default->scaletype;
@@ -669,16 +654,7 @@ class WeatherMapLink extends WeatherMapDataItem
                 }
             }
 
-            if (($this->max_bandwidth_in != $default_default->max_bandwidth_in)
-            || ($this->max_bandwidth_out != $default_default->max_bandwidth_out)
-            || ($this->name == 'DEFAULT')
-            ) {
-                if ($this->max_bandwidth_in == $this->max_bandwidth_out) {
-                    $output .= "\tBANDWIDTH " . $this->max_bandwidth_in_cfg . "\n";
-                } else {
-                    $output .= "\tBANDWIDTH " . $this->max_bandwidth_in_cfg . " " . $this->max_bandwidth_out_cfg . "\n";
-                }
-            }
+            $output .= $this->getMaxValueConfig($default_default);
 
             $output .= $this->getConfigHints($default_default);
 
@@ -805,35 +781,6 @@ class WeatherMapLink extends WeatherMapDataItem
         if (null !== $this->b) {
             $this->b->addDependency($this);
         }
-    }
-
-    /**
-     * @param $output
-     * @param $default_default
-     * @return array
-     */
-    private function getConfigInOutOrBoth($default_default, $configKeyword, $fieldName)
-    {
-        $output = "";
-        $myArray = $this->$fieldName;
-        $theirArray = $default_default->$fieldName;
-
-        if ($myArray[IN] == $myArray[OUT]) {
-            $dirs = array(IN => ""); // only use the IN value, since they're both the same, but don't prefix the output keyword
-        } else {
-            $dirs = array(IN => "IN", OUT => "OUT");// the full monty two-keyword version
-        }
-
-        foreach ($dirs as $dir => $dirText) {
-            if ($myArray[$dir] != $theirArray[$dir]) {
-                $value = $myArray[$dir];
-                if (is_array($value)) {
-                    $value = join(" ", $value);
-                }
-                $output .= "\t" . $dirText . $configKeyword. " " . $value . "\n";
-            }
-        }
-        return $output;
     }
 }
 

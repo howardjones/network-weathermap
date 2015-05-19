@@ -7,15 +7,15 @@
 
 class WeatherMapDataSource_static extends WeatherMapDataSource
 {
-
-    function Recognise($targetString)
+    public function __construct()
     {
-        if (preg_match("/^static:(\-?\d+\.?\d*[KMGT]?):(\-?\d+\.?\d*[KMGT]?)$/", $targetString) ||
-            preg_match("/^static:(\-?\d+\.?\d*[KMGT]?)$/", $targetString) ) {
-            return true;
-        } else {
-            return false;
-        }
+        parent::__construct();
+
+        $this->regexpsHandled = array(
+            '/^static:(\-?\d+\.?\d*[KMGT]?):(\-?\d+\.?\d*[KMGT]?)$/',
+            '/^static:(\-?\d+\.?\d*[KMGT]?)$/'
+        );
+
     }
 
     function ReadData($targetString, &$map, &$mapItem)
@@ -24,13 +24,13 @@ class WeatherMapDataSource_static extends WeatherMapDataSource
         $outbw = null;
         $data_time=0;
 
-        if (preg_match("/^static:(\-?\d+\.?\d*[KMGT]*):(\-?\d+\.?\d*[KMGT]*)$/", $targetString, $matches)) {
+        if (preg_match($this->regexpsHandled[0], $targetString, $matches)) {
             $inbw = WMUtility::interpretNumberWithMetricPrefix($matches[1], $map->kilo);
             $outbw = WMUtility::interpretNumberWithMetricPrefix($matches[2], $map->kilo);
             $data_time = time();
         }
 
-        if (preg_match("/^static:(\-?\d+\.?\d*[KMGT]*)$/", $targetString, $matches)) {
+        if (preg_match($this->regexpsHandled[1], $targetString, $matches)) {
             $inbw = WMUtility::interpretNumberWithMetricPrefix($matches[1], $map->kilo);
             $outbw = $inbw;
             $data_time = time();

@@ -128,7 +128,14 @@ class WMUtility
         return (array (0, 0));
     }
 
+    public static function interpretNumberWithMetricPrefixOrNull($inputString, $kilo = 1000)
+    {
+        if ($inputString == '-') {
+            return null;
+        }
 
+        return self::interpretNumberWithMetricPrefix($inputString, $kilo);
+    }
 
     public static function interpretNumberWithMetricPrefix($inputString, $kilo = 1000)
     {

@@ -92,7 +92,7 @@ class WeatherMapDataSource_fping extends WeatherMapDataSource
             $mapItem->add_note("fping_max", $max);
         }
 
-        wm_debug("FPing ReadData: Returning (".($data[IN]===null?'null':$data[IN]).",".($data[OUT]===null?'null':$data[OUT]).", $data_time)\n");
+        wm_debug("FPing ReadData: Returning (". WMUtility::valueOrNull($data[IN]) . "," . WMUtility::valueOrNull($data[OUT]).", $data_time)\n");
 
         return( array($data[IN], $data[OUT], $data_time) );
     }

@@ -32,20 +32,7 @@ class WeatherMapDataSource_tabfile extends WeatherMapDataSource
         $itemName = $mapItem->name;
 
         $fullpath = realpath($targetString);
-
-        wm_debug("Opening $fullpath\n");
-
-        if (! file_exists($fullpath)) {
-            wm_warn("File '$fullpath' doesn't exist.");
-            return array(null, null, null);
-        }
-
-        if (! is_readable($fullpath)) {
-            wm_warn("File '$fullpath' isn't readable.");
-            return array(null, null, null);
-        }
-
-        $fileHandle=fopen($fullpath, "r");
+        $fileHandle = $this->validateAndOpenFile($fullpath);
 
         if ($fileHandle) {
             $data = $this->readDataFromTSV($fileHandle, $itemName);
@@ -56,7 +43,7 @@ class WeatherMapDataSource_tabfile extends WeatherMapDataSource
             wm_warn("TabText ReadData: Couldn't open ($fullpath). [WMTABDATA01]\n");
         }
 
-        wm_debug("TabText ReadData: Returning (".($data[IN]===null ? 'null' : $data[IN]) . "," . ($data[OUT]===null ? 'null' : $data[OUT]).",$dataTime)\n");
+        wm_debug("TabText ReadData: Returning (" . WMUtility::valueOrNull($data[IN]) . "," . WMUtility::valueOrNull($data[OUT]) . ",$dataTime)\n");
 
         return( array($data[IN], $data[OUT], $dataTime) );
     }
@@ -82,12 +69,34 @@ class WeatherMapDataSource_tabfile extends WeatherMapDataSource
             $parts = explode("\t", $buffer);
 
             if ($parts[0] == $itemName) {
-                $data[IN] = ($parts[1] == "-" ? null : WMUtility::interpretNumberWithMetricPrefix($parts[1]));
-                $data[OUT] = ($parts[2] == "-" ? null : WMUtility::interpretNumberWithMetricPrefix($parts[2]));
+                $data[IN] = WMUtility::interpretNumberWithMetricPrefixOrNull($parts[1]);
+                $data[OUT] = WMUtility::interpretNumberWithMetricPrefixOrNull($parts[2]);
             }
         }
 
         return $data;
+    }
+
+    /**
+     * @param $fullpath
+     * @return resource
+     */
+    protected function validateAndOpenFile($fullpath)
+    {
+        wm_debug("Opening $fullpath\n");
+
+        if (!file_exists($fullpath)) {
+            wm_warn("File '$fullpath' doesn't exist.");
+            return null;
+        }
+
+        if (!is_readable($fullpath)) {
+            wm_warn("File '$fullpath' isn't readable.");
+            return null;
+        }
+
+        $fileHandle = fopen($fullpath, "r");
+        return $fileHandle;
     }
 }
 

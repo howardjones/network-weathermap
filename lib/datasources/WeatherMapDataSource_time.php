@@ -95,7 +95,7 @@ class WeatherMapDataSource_time extends WeatherMapDataSource
             wm_warn("Time ReadData: Couldn't recognize $targetString \n");
         }
 
-        wm_debug("Time ReadData: Returning (".($data[IN]===null?'null':$data[IN]).",".($data[OUT]===null?'null':$data[OUT]).",$data_time)\n");
+        wm_debug("Time ReadData: Returning (". WMUtility::valueOrNull($data[IN]) . "," . WMUtility::valueOrNull($data[OUT]).",$data_time)\n");
 
         return (array($data[IN], $data[OUT], $data_time));
     }

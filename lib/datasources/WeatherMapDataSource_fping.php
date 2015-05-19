@@ -85,7 +85,7 @@ class WeatherMapDataSource_fping extends WeatherMapDataSource
 
         list($count, $hitcount, $loss, $ave, $min, $max) = $this->readDataFromFping($pipe, $pattern, $target, $ping_count, $matches);
 
-         if ($hitcount >0) {
+        if ($hitcount >0) {
             $data[IN] = $ave;
             $data[OUT] = $loss;
             $mapItem->add_note("fping_min", $min);

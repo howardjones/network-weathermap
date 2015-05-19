@@ -443,6 +443,9 @@ class WeatherMapNode extends WeatherMapDataItem
             $label_x2 = $this->x + $halfWidth;
             $label_y2 = $this->y + $halfHeight;
 
+            $labelBoundingBox->addPoint($this->x - $halfWidth, $this->y - $halfHeight);
+            $labelBoundingBox->addPoint($this->x + $halfWidth, $this->y + $halfHeight);
+
             wm_debug("Node->pre_render: " . $this->name . " Label Metrics are: $stringWidth x $stringHeight -> $boxWidth x $boxHeight\n");
 
             if ($this->labelangle == 90) {

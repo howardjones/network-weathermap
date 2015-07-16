@@ -26,6 +26,8 @@ $randomdata=0;
 $dumpconfig='';
 $readconfigonly=0;
 $defines=array();
+$daemon=0;
+$daemon_args="";
 
 // **************************************************************************************
 // THIS IS THE ONE LINE IN HERE YOU MIGHT HAVE TO CHANGE!
@@ -55,7 +57,9 @@ $long_opts=array
         "dumpafter",
         "bulge",
         "sizedebug",
-        "dumpconfig="
+        "dumpconfig=",
+        "daemon=",
+        "chdir"
     );
 
 $args=$cg->readPHPArgv();
@@ -130,6 +134,13 @@ if (sizeof($gopts) > 0) {
             case '--output':
                 $imagefile=$o[1];
                 break;
+            case '--daemon':
+                $daemon=1;
+                $daemon_args=$o[1];
+                break;
+            case '--chdir':
+			   	$chdir = $o[1];
+                break;
             case '--define':
                 preg_match("/^([^=]+)=(.*)\s*$/", $o[1], $matches);
                 if (isset($matches[2])) {
@@ -155,6 +166,8 @@ if (sizeof($gopts) > 0) {
 
                 print " --config {filename}      -  filename to read from. Default weathermap.conf\n";
                 print " --output {filename}      -  filename to write image. Default weathermap.png\n";
+                print " --daemon {path}          -  path to network location of the rrdcached daemon\n";
+                print " --chdir {path}           -  path to change to before running rrdtool\n";
                 print " --htmloutput {filename}  -  filename to write HTML. Default weathermap.html\n\n";
 
                 print " --image-uri {uri}        -  URI to prefix <img> tags in HTML.\n";
@@ -190,6 +203,12 @@ if (isset($options_output['debugging']) && $options_output['debugging']) {
 $map=new Weathermap;
 $map->rrdtool = $rrdtool;
 $map->context="cli";
+$map->daemon=$daemon;
+$map->daemon_args=$daemon_args;
+
+if(isset($chdir)) {
+	$map->chdir=$chdir;
+}
 
 // now stuff in all the others, that we got from getopts
 foreach ($options_output as $key => $value) {

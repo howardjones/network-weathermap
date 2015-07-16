@@ -189,6 +189,10 @@ class WeatherMapDataSource_rrd extends WeatherMapDataSource
         }
         $command .= " " . $extra_options;
 
+        if ($map->chdir) {
+            $command = "cd " . $map->chdir . "; " . $command;
+        }
+
         wm_debug("RRD ReadData: Running: $command\n");
         $pipe=popen($command, "r");
 
@@ -274,6 +278,9 @@ class WeatherMapDataSource_rrd extends WeatherMapDataSource
         }
         $command .= " " . $extra_options;
 
+        if ($map->chdir) {
+            $command = "cd " . $map->chdir . "; " . $command;
+        }
 
         wm_debug("RRD ReadData: Running: $command\n");
         $pipe=popen($command, "r");
@@ -470,7 +477,7 @@ class WeatherMapDataSource_rrd extends WeatherMapDataSource
             if ($use_poller_output == 1) {
                 wm_debug("poller_output didn't get anything useful. Kicking it old skool.\n");
             }
-            if (file_exists($rrdfile)) {
+            if(file_exists($rrdfile) or file_exists($map->chdir."/".$rrdfile)) {
                 wm_debug("RRD ReadData: Target DS names are ".$dsnames[IN]." and ".$dsnames[OUT]."\n");
 
                 # $values=array();

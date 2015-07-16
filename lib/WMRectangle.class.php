@@ -24,6 +24,11 @@ class WMRectangle
         $this->bottomRight = new WMPoint($xPoint2, $yPoint2);
     }
 
+    public function getCentre()
+    {
+        return new WMPoint(($this->bottomRight->x - $this->topLeft->x) /2, ($this->bottomRight->y - $this->topLeft->y) /2);
+    }
+
     public function identical($otherRect)
     {
         return ($this->topLeft->identical($otherRect->topLeft) && $this->bottomRight->identical($otherRect->bottomRight));

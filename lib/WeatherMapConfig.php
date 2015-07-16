@@ -281,7 +281,7 @@ class WeatherMapConfigReader
                 ),
                 array(
                     'NODE',
-                    '/^AICONOUTLINECOLOR\s+(none)$/',
+                    '/^AICONOUTLINECOLOR\s+(copy|none)$/',
                     'handleCOLOR'
                 ),
             ),

@@ -139,7 +139,7 @@ if (sizeof($gopts) > 0) {
                 $daemon_args=$o[1];
                 break;
             case '--chdir':
-			   	$chdir = $o[1];
+                $chdir = $o[1];
                 break;
             case '--define':
                 preg_match("/^([^=]+)=(.*)\s*$/", $o[1], $matches);

@@ -6,4 +6,10 @@ test-suite/summary.html
 weathermap.iml
 weathermap.ipr
 weathermap.iws
-
+# build
+!build/phpmd.xml
+!build/phpunit.xml
+!build/phpdox.xml
+!build/phpcs.xml
+!build/network-weathermap.doxy
+build/*

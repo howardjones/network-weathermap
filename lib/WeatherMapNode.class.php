@@ -105,8 +105,13 @@ class WMNodeArtificialIcon extends WMNodeIcon
 //    protected $iconfile;
 //    protected $name;
 
+    protected $aiconFillColour;
+    protected $aiconInkColour;
+    protected $iconFillColour;
+    protected $aiconOutlineColour;
+    protected $labelFillColour;
 
-    public function __construct($node)
+    public function __construct($node, $aiconInkColour, $aiconFillColour, $iconFillColour, $aiconOutlineColour, $labelFillColour)
     {
         parent::__construct($node);
 
@@ -114,9 +119,26 @@ class WMNodeArtificialIcon extends WMNodeIcon
         $this->iconscalew = $node->iconscalew;
         $this->iconscaleh = $node->iconscaleh;
         $this->name = $node->name;
+
+        if (! self::isAICONName($this->iconfile)) {
+            throw new WMException("AICON with invalid type");
+        }
+
+        $this->aiconOutlineColour = $aiconOutlineColour;
+        $this->aiconFillColour = $aiconFillColour;
+        $this->iconFillColour = $iconFillColour;
+        $this->aiconInkColour = $aiconInkColour;
+        $this->labelFillColour = $labelFillColour;
     }
 
-    public function preRender($aiconInkColour, $aiconFillColour, $iconFillColour, $aiconOutlineColour, $labelFillColour)
+    public static function isAICONName($name)
+    {
+        $artificialIconNames = array('rbox', 'round', 'box', 'inpie', 'outpie', 'gauge', 'nink');
+
+        return in_array($name, $artificialIconNames);
+    }
+
+    public function preRender()
     {
         wm_debug("Artificial Icon type " . $this->iconfile . " for $this->name\n");
         // this is an artificial icon - we don't load a file for it
@@ -875,27 +897,21 @@ class WeatherMapNode extends WeatherMapDataItem
             $icon_w = 0;
             $icon_h = 0;
 
-            $artificialIconNames = array('rbox', 'round', 'box', 'inpie', 'outpie', 'gauge', 'nink');
+//            $artificialIconNames = array('rbox', 'round', 'box', 'inpie', 'outpie', 'gauge', 'nink');
 
-            if (in_array($this->iconfile, $artificialIconNames)) {
-                $iconObj = new WMNodeArtificialIcon($this);
+            //if (in_array($this->iconfile, $artificialIconNames)) {
+            if (WMNodeArtificialIcon::isAICONName($this->iconfile)) {
+                $iconObj = new WMNodeArtificialIcon($this, $aiconInkColour, $aiconFillColour, $iconFillColour, $aiconOutlineColour, $labelFillColour);
             } else {
                 $iconObj = new WMNodeImageIcon($this);
             }
 
             $iconObj->calculateGeometry();
-
-            if ($this->iconfile == 'rbox' || $this->iconfile == 'box' || $this->iconfile == 'round' || $this->iconfile == 'inpie' || $this->iconfile == 'outpie' || $this->iconfile == 'gauge' || $this->iconfile == 'nink') {
-                $iconObj->preRender();
-
-            } else {
-                $iconObj->preRender();
-            }
+            $iconObj->preRender();
 
             $iconImageRef = $iconObj->getImageRef();
 
             if ($iconImageRef) {
-
                 $icon_w2 = imagesx($iconImageRef) / 2;
                 $icon_h2 = imagesy($iconImageRef) / 2;
                 $iconRect = new WMRectangle(-$icon_w2, -$icon_h2, $icon_w2, $icon_h2);

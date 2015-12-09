@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<phpdox xmlns="http://xml.phpdox.net/config">
+    <project name="Network Weathermap" source="../lib" workdir="../build/phpdox">
+        <collector publiconly="false">
+            <include mask="*.php" />
+        </collector>
+
+        <generator output="../build">
+            <enrich base="${basedir}/logs">
+                <source type="build" />
+                <source type="git">
+                    <history enabled="true" limit="15" />
+                </source>
+                <source type="checkstyle" />
+                <source type="pmd" />
+                <source type="phploc" />
+                <source type="phpunit">
+                    <coverage path="../coverage/xml" />
+                </source>
+            </enrich>
+
+            <build engine="html" enabled="true" output="api">
+                <file extension="html" />
+            </build>
+        </generator>
+    </project>
+</phpdox>

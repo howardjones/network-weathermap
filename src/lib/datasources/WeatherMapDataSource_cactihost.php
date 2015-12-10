@@ -3,6 +3,27 @@
 class WeatherMapDataSource_cactihost extends WeatherMapDataSource
 {
 
+    // (4 is tholdbreached in cactimonitor, so skipped here for compatibility)
+    private static $state_map = array(
+        5 => "unknown",
+        3 => "up",
+        2 => "recovering",
+        1 => "down",
+        0 => "disabled"
+    );
+
+    private static $result_map = array(
+        "cacti_description" => "description",
+        "cacti_hostname" => "hostname",
+        "cacti_curtime" => "cur_time",
+        "cacti_avgtime" => "avg_time",
+        "cacti_mintime" => "min_time",
+        "cacti_maxtime" => "max_time",
+        "cacti_availability" => "availability",
+        "cacti_faildate" => "status_fail_date",
+        "cacti_recdate" => "status_rec_date"
+    );
+
     function Init(&$map)
     {
         if ($map->context == 'cacti') {
@@ -20,7 +41,7 @@ class WeatherMapDataSource_cactihost extends WeatherMapDataSource
 
     function Recognise($targetString)
     {
-        if (preg_match("/^cactihost:(\d+)$/", $targetString)) {
+        if (preg_match('/^cactihost:(\d+)$/', $targetString)) {
             return true;
         } else {
             return false;
@@ -34,36 +55,10 @@ class WeatherMapDataSource_cactihost extends WeatherMapDataSource
         $data[OUT] = null;
         $data_time = 0;
 
-        $state_map = array(
-            5 => "unknown",
-            3 => "up",
-            2 => "recovering",
-            1 => "down",
-            0 => "disabled"
-        );
-
-        $result_map = array(
-            "cacti_description" => "description",
-            "cacti_hostname" => "hostname",
-            "cacti_curtime" => "cur_time",
-            "cacti_avgtime" => "avg_time",
-            "cacti_mintime" => "min_time",
-            "cacti_maxtime" => "max_time",
-            "cacti_availability" => "availability",
-            "cacti_faildate" => "status_fail_date",
-            "cacti_recdate" => "status_rec_date"
-        );
-
         if (preg_match('/^cactihost:(\d+)$/', $targetString, $matches)) {
             $cacti_id = intval($matches[1]);
 
             $SQL = "select * from host where id=$cacti_id";
-            // 0=disabled
-            // 1=down
-            // 2=recovering
-            // 3=up
-            // (4 is tholdbreached in cactimonitor, so skipped here for compatibility)
-            // 5=unknown
 
             $result = db_fetch_row($SQL);
             if (isset($result)) {
@@ -75,14 +70,14 @@ class WeatherMapDataSource_cactihost extends WeatherMapDataSource
                     $state = 0;
                 }
 
-                $statename = $state_map[$result['status']];
+                $statename = self::$state_map[$result['status']];
 
 
                 $data[IN] = $state;
                 $data[OUT] = $state;
                 $mapItem->add_note("state", $statename);
 
-                foreach ($result_map as $name=>$result_name) {
+                foreach (self::$result_map as $name => $result_name) {
                     $mapItem->add_note($name, $result[$result_name]);
                 }
             }

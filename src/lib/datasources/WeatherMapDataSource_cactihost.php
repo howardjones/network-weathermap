@@ -7,7 +7,7 @@ class WeatherMapDataSource_cactihost extends WeatherMapDataSource
     {
         if ($map->context == 'cacti') {
             if (function_exists('db_fetch_row')) {
-                return(true);
+                return (true);
             } else {
                 wm_debug('ReadData CactiHost: Cacti database library not found.\n');
             }
@@ -15,7 +15,7 @@ class WeatherMapDataSource_cactihost extends WeatherMapDataSource
             wm_debug("ReadData CactiHost: Can only run from Cacti environment.\n");
         }
 
-        return(false);
+        return (false);
     }
 
     function Recognise($targetString)
@@ -34,7 +34,27 @@ class WeatherMapDataSource_cactihost extends WeatherMapDataSource
         $data[OUT] = null;
         $data_time = 0;
 
-        if (preg_match("/^cactihost:(\d+)$/", $targetString, $matches)) {
+        $state_map = array(
+            5 => "unknown",
+            3 => "up",
+            2 => "recovering",
+            1 => "down",
+            0 => "disabled"
+        );
+
+        $result_map = array(
+            "cacti_description" => "description",
+            "cacti_hostname" => "hostname",
+            "cacti_curtime" => "cur_time",
+            "cacti_avgtime" => "avg_time",
+            "cacti_mintime" => "min_time",
+            "cacti_maxtime" => "max_time",
+            "cacti_availability" => "availability",
+            "cacti_faildate" => "status_fail_date",
+            "cacti_recdate" => "status_rec_date"
+        );
+
+        if (preg_match('/^cactihost:(\d+)$/', $targetString, $matches)) {
             $cacti_id = intval($matches[1]);
 
             $SQL = "select * from host where id=$cacti_id";
@@ -45,52 +65,32 @@ class WeatherMapDataSource_cactihost extends WeatherMapDataSource
             // (4 is tholdbreached in cactimonitor, so skipped here for compatibility)
             // 5=unknown
 
-            $state = -1;
             $result = db_fetch_row($SQL);
             if (isset($result)) {
                 // create a note, which can be used in icon filenames or labels more nicely
-                if ($result['status'] == 5) {
-                    $state = 5;
-                    $statename = 'unknown';
-                }
 
-                if ($result['status'] == 1) {
-                    $state = 1;
-                    $statename = 'down';
-                }
-                if ($result['status'] == 2) {
-                    $state = 2;
-                    $statename = 'recovering';
-                }
-                if ($result['status'] == 3) {
-                    $state = 3;
-                    $statename = 'up';
-                }
+                $state = $result['status'];
+
                 if ($result['disabled']) {
                     $state = 0;
-                    $statename = 'disabled';
                 }
+
+                $statename = $state_map[$result['status']];
+
 
                 $data[IN] = $state;
                 $data[OUT] = $state;
                 $mapItem->add_note("state", $statename);
-                $mapItem->add_note("cacti_description", $result['description']);
 
-                $mapItem->add_note("cacti_hostname", $result['hostname']);
-                $mapItem->add_note("cacti_curtime", $result['cur_time']);
-                $mapItem->add_note("cacti_avgtime", $result['avg_time']);
-                $mapItem->add_note("cacti_mintime", $result['min_time']);
-                $mapItem->add_note("cacti_maxtime", $result['max_time']);
-                $mapItem->add_note("cacti_availability", $result['availability']);
-
-                $mapItem->add_note("cacti_faildate", $result['status_fail_date']);
-                $mapItem->add_note("cacti_recdate", $result['status_rec_date']);
+                foreach ($result_map as $name=>$result_name) {
+                    $mapItem->add_note($name, $result[$result_name]);
+                }
             }
         }
 
-        wm_debug("CactiHost ReadData: Returning (".($data[IN]===null?'null':$data[IN]).",".($data[OUT]===null?'null':$data[OUT]).",$data_time)\n");
+        wm_debug("CactiHost ReadData: Returning (" . ($data[IN] === null ? 'null' : $data[IN]) . "," . ($data[OUT] === null ? 'null' : $data[OUT]) . ",$data_time)\n");
 
-        return( array($data[IN], $data[OUT], $data_time) );
+        return (array($data[IN], $data[OUT], $data_time));
     }
 }
 

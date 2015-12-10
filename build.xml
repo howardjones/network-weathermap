@@ -45,7 +45,7 @@
     <target name="lint" unless="lint.done" description="Perform syntax check of sourcecode files">
         <apply executable="php" taskname="lint">
             <arg value="-l"/>
-            <fileset dir="${basedir}/lib">
+            <fileset dir="${basedir}/src">
                 <include name="**/*.php"/>
                 <modified/>
             </fileset>
@@ -59,7 +59,7 @@
     <target name="phploc" unless="phploc.done" description="Measure project size using PHPLOC and print human readable output. Intended for usage on the command line.">
         <exec executable="${phploc}" taskname="phploc">
             <arg value="--count-tests"/>
-            <arg path="${basedir}/lib"/>
+            <arg path="${basedir}/src"/>
             <arg path="${basedir}/Tests"/>
         </exec>
         <property name="phploc.done" value="true"/>
@@ -71,7 +71,7 @@
             <arg path="${basedir}/build/logs/phploc.csv"/>
             <arg value="--log-xml"/>
             <arg path="${basedir}/build/logs/phploc.xml"/>
-            <arg path="${basedir}/lib"/>
+            <arg path="${basedir}/src"/>
             <arg path="${basedir}/Tests"/>
         </exec>
         <property name="phploc.done" value="true"/>
@@ -81,13 +81,13 @@
             <arg value="--jdepend-xml=${basedir}/build/logs/jdepend.xml"/>
             <arg value="--jdepend-chart=${basedir}/build/pdepend/dependencies.svg"/>
             <arg value="--overview-pyramid=${basedir}/build/pdepend/overview-pyramid.svg"/>
-            <arg path="${basedir}/lib"/>
+            <arg path="${basedir}/src"/>
         </exec>
         <property name="pdepend.done" value="true"/>
     </target>
     <target name="phpmd" unless="phpmd.done" description="Perform project mess detection using PHPMD and print human readable output. Intended for usage on the command line before committing.">
         <exec executable="${phpmd}" taskname="phpmd">
-            <arg path="${basedir}/lib"/>
+            <arg path="${basedir}/src"/>
             <arg value="text"/>
             <arg path="${basedir}/build/phpmd.xml"/>
         </exec>
@@ -95,7 +95,7 @@
     </target>
     <target name="phpmd-ci" unless="phpmd.done" depends="prepare" description="Perform project mess detection using PHPMD and log result in XML format. Intended for usage within a continuous integration environment.">
         <exec executable="${phpmd}" taskname="phpmd">
-            <arg path="${basedir}/lib"/>
+            <arg path="${basedir}/src"/>
             <arg value="xml"/>
             <arg path="${basedir}/build/phpmd.xml"/>
             <arg value="--reportfile"/>
@@ -108,7 +108,7 @@
             <arg value="--standard=PSR2"/>
             <arg value="--extensions=php"/>
             <arg value="--ignore=autoload.php"/>
-            <arg path="${basedir}/lib"/>
+            <arg path="${basedir}/src"/>
             <arg path="${basedir}/Tests"/>
         </exec>
         <property name="phpcs.done" value="true"/>
@@ -120,14 +120,14 @@
             <arg value="--standard=PSR2"/>
             <arg value="--extensions=php"/>
             <arg value="--ignore=autoload.php"/>
-            <arg path="${basedir}/lib"/>
+            <arg path="${basedir}/src"/>
             <arg path="${basedir}/Tests"/>
         </exec>
         <property name="phpcs.done" value="true"/>
     </target>
     <target name="phpcpd" unless="phpcpd.done" description="Find duplicate code using PHPCPD and print human readable output. Intended for usage on the command line before committing.">
         <exec executable="${phpcpd}" taskname="phpcpd">
-            <arg path="${basedir}/lib"/>
+            <arg path="${basedir}/src"/>
         </exec>
         <property name="phpcpd.done" value="true"/>
     </target>
@@ -135,7 +135,7 @@
         <exec executable="${phpcpd}" taskname="phpcpd">
             <arg value="--log-pmd"/>
             <arg path="${basedir}/build/logs/pmd-cpd.xml"/>
-            <arg path="${basedir}/lib"/>
+            <arg path="${basedir}/src"/>
         </exec>
         <property name="phpcpd.done" value="true"/>
     </target>

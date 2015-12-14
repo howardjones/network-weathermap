@@ -24,6 +24,16 @@ class WeatherMapDataSource_cactihost extends WeatherMapDataSource
         "cacti_recdate" => "status_rec_date"
     );
 
+    public function __construct()
+    {
+        parent::__construct();
+
+        $this->regexpsHandled = array(
+            '/^cactihost:(\d+)$/'
+        );
+
+    }
+
     function Init(&$map)
     {
         if ($map->context == 'cacti') {
@@ -39,15 +49,6 @@ class WeatherMapDataSource_cactihost extends WeatherMapDataSource
         return (false);
     }
 
-    function Recognise($targetString)
-    {
-        if (preg_match('/^cactihost:(\d+)$/', $targetString)) {
-            return true;
-        } else {
-            return false;
-        }
-    }
-
     function ReadData($targetString, &$map, &$mapItem)
     {
 
@@ -58,34 +59,47 @@ class WeatherMapDataSource_cactihost extends WeatherMapDataSource
         if (preg_match('/^cactihost:(\d+)$/', $targetString, $matches)) {
             $cacti_id = intval($matches[1]);
 
-            $SQL = "select * from host where id=$cacti_id";
-
-            $result = db_fetch_row($SQL);
-            if (isset($result)) {
-                // create a note, which can be used in icon filenames or labels more nicely
-
-                $state = $result['status'];
-
-                if ($result['disabled']) {
-                    $state = 0;
-                }
-
-                $statename = self::$state_map[$result['status']];
-
-
-                $data[IN] = $state;
-                $data[OUT] = $state;
-                $mapItem->add_note("state", $statename);
-
-                foreach (self::$result_map as $name => $result_name) {
-                    $mapItem->add_note($name, $result[$result_name]);
-                }
-            }
+            $data = $this->readDataFromCacti($mapItem, $cacti_id, $data);
         }
 
         wm_debug("CactiHost ReadData: Returning (" . ($data[IN] === null ? 'null' : $data[IN]) . "," . ($data[OUT] === null ? 'null' : $data[OUT]) . ",$data_time)\n");
 
         return (array($data[IN], $data[OUT], $data_time));
+    }
+
+    /**
+     * @param $mapItem
+     * @param $cacti_id
+     * @param $data
+     * @return mixed
+     */
+    private function readDataFromCacti(&$mapItem, $cacti_id, $data)
+    {
+        $SQL = "select * from host where id=$cacti_id";
+
+        $result = db_fetch_row($SQL);
+        if (isset($result)) {
+            // create a note, which can be used in icon filenames or labels more nicely
+
+            $state = $result['status'];
+
+            if ($result['disabled']) {
+                $state = 0;
+            }
+
+            $statename = self::$state_map[$result['status']];
+
+
+            $data[IN] = $state;
+            $data[OUT] = $state;
+            $mapItem->add_note("state", $statename);
+
+            foreach (self::$result_map as $name => $result_name) {
+                $mapItem->add_note($name, $result[$result_name]);
+            }
+            return $data;
+        }
+        return $data;
     }
 }
 

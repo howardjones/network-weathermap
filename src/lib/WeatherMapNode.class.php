@@ -753,7 +753,7 @@ class WeatherMapNode extends WeatherMapDataItem
      *
      * TODO: write this.
      */
-    function preCalculate()
+    function preCalculate(&$owner)
     {
         // don't bother doing anything if it's a template
         if ($this->isTemplate()) {
@@ -1292,9 +1292,9 @@ class WeatherMapNode extends WeatherMapDataItem
         return $output;
     }
 
-    function asJS()
+    function asJS($type="Node", $prefix="N")
     {
-        return parent::asJS("Node", "N");
+        return parent::asJS($type, $prefix);
     }
 
     public function getValue($name)

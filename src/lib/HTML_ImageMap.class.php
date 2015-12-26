@@ -25,17 +25,17 @@ class HTML_ImageMap_Area
         $html = "";
         if ($this->name != "") {
             // $h .= " alt=\"".$this->name."\" ";
-            $html .= "id=\"".$this->name."\" ";
+            $html .= "id=\"" . $this->name . "\" ";
         }
 
         if ($this->href != "") {
-            $html .= "href=\"".$this->href."\" ";
+            $html .= "href=\"" . $this->href . "\" ";
         } else {
             $html .= "nohref ";
         }
 
         if ($this->extrahtml != "") {
-            $html .= $this->extrahtml." ";
+            $html .= $this->extrahtml . " ";
         }
         return $html;
     }
@@ -49,43 +49,44 @@ class HTML_ImageMap_Area_Polygon extends HTML_ImageMap_Area
 
     function asHTML()
     {
+        $flatPoints = array();
         foreach ($this->points as $point) {
-            $flatpoints[] = $point[0];
-            $flatpoints[] = $point[1];
+            $flatPoints[] = $point[0];
+            $flatPoints[] = $point[1];
         }
-        $coordstring = join(",", $flatpoints);
+        $coordstring = join(",", $flatPoints);
 
-        return '<area '.$this->common_html().'shape="poly" coords="'.$coordstring.'" />';
+        return '<area ' . $this->common_html() . 'shape="poly" coords="' . $coordstring . '" />';
     }
 
     function asJSON()
     {
-        $json = "{ \"shape\":'poly', \"npoints\":".$this->npoints.", \"name\":'".$this->name."',";
+        $json = "{ \"shape\":'poly', \"npoints\":" . $this->npoints . ", \"name\":'" . $this->name . "',";
 
         $xlist = '';
         $ylist = '';
         foreach ($this->points as $point) {
-            $xlist .= $point[0].",";
-            $ylist .= $point[1].",";
+            $xlist .= $point[0] . ",";
+            $ylist .= $point[1] . ",";
         }
         $xlist = rtrim($xlist, ", ");
         $ylist = rtrim($ylist, ", ");
-        $json .= " \"x\": [ $xlist ], \"y\":[ $ylist ], \"minx\": ".$this->minx.", \"miny\": ".$this->miny.", \"maxx\":".$this->maxx.", \"maxy\":".$this->maxy."}";
+        $json .= " \"x\": [ $xlist ], \"y\":[ $ylist ], \"minx\": " . $this->minx . ", \"miny\": " . $this->miny . ", \"maxx\":" . $this->maxx . ", \"maxy\":" . $this->maxy . "}";
 
-        return($json);
+        return ($json);
     }
 
     function hitTest($x, $y)
     {
-        $c = 0;
+        $result = 0;
         // do the easy bounding-box test first.
-        if (($x < $this->minx) || ($x>$this->maxx) || ($y<$this->miny) || ($y>$this->maxy)) {
+        if (($x < $this->minx) || ($x > $this->maxx) || ($y < $this->miny) || ($y > $this->maxy)) {
             return false;
         }
 
         // Algorithm from from
         // http://www.ecse.rpi.edu/Homepages/wrf/Research/Short_Notes/pnpoly.html#The%20C%20Code
-        for ($i = 0, $j = $this->npoints-1; $i < $this->npoints; $j = $i++) {
+        for ($i = 0, $j = $this->npoints - 1; $i < $this->npoints; $j = $i++) {
             // print "Checking: $i, $j\n";
             $x1 = $this->points[$i][0];
             $y1 = $this->points[$i][1];
@@ -94,12 +95,12 @@ class HTML_ImageMap_Area_Polygon extends HTML_ImageMap_Area
 
             //  print "($x,$y) vs ($x1,$y1)-($x2,$y2)\n";
 
-            if (((($y1<=$y) && ($y<$y2)) || (($y2<=$y) && ($y<$y1))) && ($x < ($x2 - $x1) * ($y - $y1) / ($y2 - $y1) + $x1)) {
-                $c = !$c;
+            if (((($y1 <= $y) && ($y < $y2)) || (($y2 <= $y) && ($y < $y1))) && ($x < ($x2 - $x1) * ($y - $y1) / ($y2 - $y1) + $x1)) {
+                $result = !$result;
             }
         }
 
-        return ($c);
+        return $result;
     }
 
     function Draw($gdimage, $colour)
@@ -109,27 +110,29 @@ class HTML_ImageMap_Area_Polygon extends HTML_ImageMap_Area
             $pts[] = $point[0];
             $pts[] = $point[1];
         }
-        imagepolygon($gdimage, $pts, count($pts)/2, $colour);
+        imagepolygon($gdimage, $pts, count($pts) / 2, $colour);
     }
 
     function HTML_ImageMap_Area_Polygon($name = "", $href = "", $coords)
     {
-        $c = $coords[0];
+        $xlist = array();
+        $ylist = array();
+        $points = $coords[0];
 
         $this->name = $name;
-        $this->href= $href;
-        $this->npoints = count($c)/2;
+        $this->href = $href;
+        $this->npoints = count($points) / 2;
 
         if (intval($this->npoints) != ($this->npoints)) {
-            throw new Exception('Odd number of array elements ('.$this->npoints.') in HTML_ImageMap_Area_Polygon!');
+            throw new Exception('Odd number of array elements (' . $this->npoints . ') in HTML_ImageMap_Area_Polygon!');
         }
 
-        for ($i=0; $i< $this->npoints; $i+=2) {
-            $x = round($c[$i]);
-            $y = round($c[$i+1]);
-            $point = array($x, $y);
-            $xlist[] = $x; // these two are used to get the bounding box in a moment
-            $ylist[] = $y;
+        for ($i = 0; $i < $this->npoints; $i += 2) {
+            $point_x = round($points[$i]);
+            $point_y = round($points[$i + 1]);
+            $point = array($point_x, $point_y);
+            $xlist[] = $point_x; // these two are used to get the bounding box in a moment
+            $ylist[] = $point_y;
             $this->points[] = $point;
         }
 
@@ -137,43 +140,41 @@ class HTML_ImageMap_Area_Polygon extends HTML_ImageMap_Area
         $this->maxx = max($xlist);
         $this->miny = min($ylist);
         $this->maxy = max($ylist);
-
-        //        print $this->asHTML()."\n";
     }
 }
 
 class HTML_ImageMap_Area_Rectangle extends HTML_ImageMap_Area
 {
-    var $x1, $x2, $y1, $y2;
+    var $topLeft_x, $bottomRight_x, $topLeft_y, $bottomRight_y;
 
     function HTML_ImageMap_Area_Rectangle($name = "", $href = "", $coords)
     {
-        $c = $coords[0];
+        $points = $coords[0];
 
-        if (count($c) != 4) {
+        if (count($points) != 4) {
             throw new Exception('Incorrect number of array elements in HTML_ImageMap_Area_Rectangle!');
         }
 
-        $x1 = round($c[0]);
-        $y1 = round($c[1]);
-        $x2 = round($c[2]);
-        $y2 = round($c[3]);
+        $point1_x = round($points[0]);
+        $point1_y = round($points[1]);
+        $point2_x = round($points[2]);
+        $point2_y = round($points[3]);
 
         // sort the points, so that the first is the top-left
-        if ($x1>$x2) {
-            $this->x1=$x2;
-            $this->x2=$x1;
+        if ($point1_x > $point2_x) {
+            $this->topLeft_x = $point2_x;
+            $this->bottomRight_x = $point1_x;
         } else {
-            $this->x1=$x1;
-            $this->x2=$x2;
+            $this->topLeft_x = $point1_x;
+            $this->bottomRight_x = $point2_x;
         }
 
-        if ($y1>$y2) {
-            $this->y1=$y2;
-            $this->y2=$y1;
+        if ($point1_y > $point2_y) {
+            $this->topLeft_y = $point2_y;
+            $this->bottomRight_y = $point1_y;
         } else {
-            $this->y1=$y1;
-            $this->y2=$y2;
+            $this->topLeft_y = $point1_y;
+            $this->bottomRight_y = $point2_y;
         }
 
         $this->name = $name;
@@ -182,27 +183,27 @@ class HTML_ImageMap_Area_Rectangle extends HTML_ImageMap_Area
 
     function hitTest($x, $y)
     {
-        return (($x > $this->x1) && ($x < $this->x2) && ($y > $this->y1) && ($y < $this->y2));
+        return (($x > $this->topLeft_x) && ($x < $this->bottomRight_x) && ($y > $this->topLeft_y) && ($y < $this->bottomRight_y));
     }
 
     function asHTML()
     {
-        $coordstring = join(",", array($this->x1, $this->y1, $this->x2, $this->y2));
-        return '<area '.$this->common_html().'shape="rect" coords="'.$coordstring.'" />';
+        $coordstring = join(",", array($this->topLeft_x, $this->topLeft_y, $this->bottomRight_x, $this->bottomRight_y));
+        return '<area ' . $this->common_html() . 'shape="rect" coords="' . $coordstring . '" />';
     }
 
     function asJSON()
     {
         $json = "{ \"shape\":'rect', ";
-        $json .= " \"x1\":".$this->x1.", \"y1\":".$this->y1.", \"x2\":".$this->x2.", \"y2\":".$this->y2.", \"name\":'".$this->name."'}";
+        $json .= " \"x1\":" . $this->topLeft_x . ", \"y1\":" . $this->topLeft_y . ", \"x2\":" . $this->bottomRight_x . ", \"y2\":" . $this->bottomRight_y . ", \"name\":'" . $this->name . "'}";
 
-        return($json);
+        return ($json);
     }
 
 
     function Draw($gdimage, $colour)
     {
-        imagerectangle($gdimage, $this->x1, $this->y1, $this->x2, $this->y2, $colour);
+        imagerectangle($gdimage, $this->topLeft_x, $this->topLeft_y, $this->bottomRight_x, $this->bottomRight_y, $colour);
     }
 }
 
@@ -213,7 +214,7 @@ class HTML_ImageMap_Area_Circle extends HTML_ImageMap_Area
     function asHTML()
     {
         $coordstring = join(",", array($this->centre_x, $this->centre_y, $this->edge_x, $this->edge_y));
-        return '<area '.$this->common_html().'shape="circle" coords="'.$coordstring.'" />';
+        return '<area ' . $this->common_html() . 'shape="circle" coords="' . $coordstring . '" />';
     }
 
     function hitTest($x, $y)
@@ -231,19 +232,19 @@ class HTML_ImageMap_Area_Circle extends HTML_ImageMap_Area
     {
         $radius = abs($this->centre_x - $this->edge_x);
         imageellipse($gdimage, $this->centre_x, $this->centre_y, $radius, $radius, $colour);
-        imagerectangle($gdimage, $this->x1, $this->y1, $this->x2, $this->y2, $colour);
+       // imagerectangle($gdimage, $this->x1, $this->y1, $this->x2, $this->y2, $colour);
     }
 
     function HTML_ImageMap_Area_Circle($name = "", $href = "", $coords)
     {
-        $c = $coords[0];
+        $points = $coords[0];
 
         $this->name = $name;
         $this->href = $href;
-        $this->centre_x = round($c[0]);
-        $this->centre_y = round($c[1]);
-        $this->edge_x = round($c[2]);
-        $this->edge_y = round($c[3]);
+        $this->centre_x = round($points[0]);
+        $this->centre_y = round($points[1]);
+        $this->edge_x = round($points[2]);
+        $this->edge_y = round($points[3]);
     }
 }
 
@@ -297,11 +298,11 @@ class HTML_ImageMap
             $elementObject = &$element;
         } else {
             $args = func_get_args();
-            $className = "HTML_ImageMap_Area_".$element;
+            $className = "HTML_ImageMap_Area_" . $element;
             $elementObject = new $className($args[1], $args[2], array_slice($args, 3));
         }
 
-        $this->shapes[ $elementObject->name ] = &$elementObject;
+        $this->shapes[$elementObject->name] = &$elementObject;
         $this->nshapes++;
     }
 
@@ -310,7 +311,7 @@ class HTML_ImageMap
     //   (e.g. pick a building, in a campus map)
     function hitTest($x, $y, $namefilter = "")
     {
-        $preg = '/'.$namefilter.'/';
+        $preg = '/' . $namefilter . '/';
         foreach ($this->shapes as $shape) {
             if ($shape->hitTest($x, $y)) {
                 if (($namefilter == "") || (preg_match($preg, $shape->name))) {
@@ -349,15 +350,14 @@ class HTML_ImageMap
     function setPropSub($which, $what, $where)
     {
         $count = 0;
-        for ($i=0; $i<count($this->shapes); $i++) {
-            if (($where == "") || ( strstr($this->shapes[$i]->name, $where) != false)) {
-                switch ($which)
-                {
+        for ($i = 0; $i < count($this->shapes); $i++) {
+            if (($where == "") || (strstr($this->shapes[$i]->name, $where) != false)) {
+                switch ($which) {
                     case 'href':
-                            $this->shapes[$i]->href= $what;
+                        $this->shapes[$i]->href = $what;
                         break;
                     case 'extrahtml':
-                            $this->shapes[$i]->extrahtml= $what;
+                        $this->shapes[$i]->extrahtml = $what;
                         break;
                 }
                 $count++;
@@ -371,11 +371,11 @@ class HTML_ImageMap
     {
         $html = '<map';
         if ($this->name != "") {
-            $html .= ' name="'.$this->name.'"';
+            $html .= ' name="' . $this->name . '"';
         }
-        $html .=">\n";
+        $html .= ">\n";
         foreach ($this->shapes as $shape) {
-            $html .= $shape->asHTML()."\n";
+            $html .= $shape->asHTML() . "\n";
             $html .= "\n";
         }
         $html .= "</map>\n";
@@ -387,13 +387,13 @@ class HTML_ImageMap
     {
         $json = '';
 
-        $preg = '/'.$namefilter.'/';
+        $preg = '/' . $namefilter . '/';
         foreach ($this->shapes as $shape) {
-            if (($namefilter == "") || ( preg_match($preg, $shape->name))) {
+            if (($namefilter == "") || (preg_match($preg, $shape->name))) {
                 if ($reverseorder) {
-                    $json = $shape->asJSON().",\n".$json;
+                    $json = $shape->asJSON() . ",\n" . $json;
                 } else {
-                    $json .= $shape->asJSON().",\n";
+                    $json .= $shape->asJSON() . ",\n";
                 }
             }
         }
@@ -413,12 +413,12 @@ class HTML_ImageMap
 
         foreach ($this->shapes as $shape) {
             # if ( ($namefilter == "") || ( preg_match($preg,$shape->name) ))
-            if (($namefilter == "") || ( strstr($shape->name, $namefilter) !== false )) {
+            if (($namefilter == "") || (strstr($shape->name, $namefilter) !== false)) {
                 if (!$skipnolinks || $shape->href != "" || $shape->extrahtml != "") {
                     if ($reverseorder) {
-                        $html = $shape->asHTML()."\n".$html;
+                        $html = $shape->asHTML() . "\n" . $html;
                     } else {
-                        $html .= $shape->asHTML()."\n";
+                        $html .= $shape->asHTML() . "\n";
                     }
                 }
 

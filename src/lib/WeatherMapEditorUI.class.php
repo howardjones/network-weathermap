@@ -329,10 +329,10 @@ class WeatherMapEditorUI extends WeatherMapUIBase
      */
     function cmdAddNode($params, $editor)
     {
-        $x = $this->snap($params['x']);
-        $y = $this->snap($params['y']);
+        $nodeX = $this->snap($params['x']);
+        $nodeY = $this->snap($params['y']);
 
-        list($newname, $success, $log) = $editor->addNode($x, $y);
+        list($newname, $success, $log) = $editor->addNode($nodeX, $nodeY);
         $this->setLogMessage($log);
     }
 
@@ -609,7 +609,7 @@ class WeatherMapEditorUI extends WeatherMapUIBase
             return array($titles, $notes, $errorString);
         }
 
-        $n = 0;
+        $numListed = 0;
         $directoryHandle = opendir($mapDirectory);
 
         if (!$directoryHandle) {
@@ -629,14 +629,14 @@ class WeatherMapEditorUI extends WeatherMapUIBase
 
                 $titles[$file] = $this->getTitleFromConfig($realfile, "(no title)");
                 $notes[$file] = $note;
-                $n++;
+                $numListed++;
             }
         }
         closedir($directoryHandle);
 
         ksort($titles);
 
-        if ($n == 0) {
+        if ($numListed == 0) {
             $errorString = "No usable files in map directory";
         }
 

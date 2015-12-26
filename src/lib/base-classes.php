@@ -297,17 +297,17 @@ class WeatherMapItem extends WeatherMapBase
 
     }
 
-    public function preChecks($owner)
+    public function preChecks(&$owner)
     {
 
     }
 
-    public function preCalculate($owner)
+    public function preCalculate(&$owner)
     {
 
     }
 
-    public function draw($imageRef, $owner)
+    public function draw($im, &$map)
     {
 
     }

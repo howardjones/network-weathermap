@@ -729,9 +729,9 @@ class WeatherMapLink extends WeatherMapDataItem
         return $output;
     }
 
-    function asJS()
+    function asJS($type="Link", $prefix="L")
     {
-        return parent::asJS("Link", "L");
+        return parent::asJS($type, $prefix);
     }
 
     public function getValue($name)

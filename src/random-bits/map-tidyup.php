@@ -31,7 +31,7 @@ $converted = 0;
 $candidates = 0;
 $totaltargets = 0;
 
-$cg = new Console_Getopt();
+$getopt = new Console_Getopt();
 $short_opts = '';
 $long_opts = array (
     'help',
@@ -40,8 +40,8 @@ $long_opts = array (
     'debug'
 );
 
-$args = $cg->readPHPArgv();
-$ret = $cg->getopt($args, $short_opts, $long_opts);
+$args = $getopt->readPHPArgv();
+$ret = $getopt->getopt($args, $short_opts, $long_opts);
 
 if (PEAR::isError($ret)) {
     die('Error in command line: ' . $ret->getMessage() . "\n (try --help)\n");

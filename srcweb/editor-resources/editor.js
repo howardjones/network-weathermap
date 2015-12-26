@@ -11,7 +11,7 @@
 
 _.templateSettings.variable = "rc";
 
-var wmPickerWindow;
+var wmPickerWindow = null;
 
 var wmEditor = {
     KEYCODE_ESCAPE : 27,
@@ -128,10 +128,10 @@ var wmEditor = {
 
         if (action === 'add_link') {
             jQuery("#param").val(NodeIDs[objectid]);
-            document.frmMain.submit();
+            document['frmMain'].submit();
         } else if (action === 'add_link2') {
             jQuery("#param").val(NodeIDs[objectid]);
-            document.frmMain.submit();
+            document['frmMain'].submit();
         } else {
             console.log("Showing node properties for " + name);
 
@@ -256,15 +256,15 @@ var wmEditor = {
     },
     handleDeleteNode: function () {
         jQuery('#action').val('delete_node');
-        document.frmMain.submit();
+        document['frmMain'].submit();
     },
     handleDeleteLink: function () {
         jQuery('#action').val('delete_link');
-        document.frmMain.submit();
+        document['frmMain'].submit();
     },
     handleStraighten: function () {
         jQuery('#action').val('straight_link');
-        document.frmMain.submit();
+        document['frmMain'].submit();
     },
     handleAddVia: function () {
         console.log("in handleAddVia - setting xy mode");
@@ -274,11 +274,11 @@ var wmEditor = {
     },
     handleTidyLink: function () {
         jQuery('#action').val('link_tidy');
-        document.frmMain.submit();
+        document['frmMain'].submit();
     },
     handleCloneNode: function () {
         jQuery('#action').val('clone_node');
-        document.frmMain.submit();
+        document['frmMain'].submit();
     },
     handleMoveNode: function () {
         console.log("move node - setting xy mode");

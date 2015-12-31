@@ -1,8 +1,8 @@
 <?php
 
-require_once dirname(__FILE__).'/../../lib/WeatherMapUIBase.class.php';
-require_once dirname(__FILE__).'/../../lib/cacti-plugin-mgmt.php';
-require_once dirname(__FILE__).'/../../lib/cacti-plugin-common.php';
+require_once dirname(__FILE__).'/../../src/lib/WeatherMapUIBase.class.php';
+require_once dirname(__FILE__).'/../../src/lib/cacti-plugin-mgmt.php';
+require_once dirname(__FILE__).'/../../src/lib/cacti-plugin-common.php';
 
 class CactiMgmtPluginTest extends PHPUnit_Framework_TestCase {
 

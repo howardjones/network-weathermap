@@ -26,7 +26,7 @@ class WMUtility
     }
 
     // PHP < 5.3 doesn't support anonymous functions, so here's a little function for wmStringAnonymise (screenshotify)
-    function stringAnonymiseReplacer($matches)
+    static function stringAnonymiseReplacer($matches)
     {
         return str_repeat('x', strlen($matches[1]));
     }

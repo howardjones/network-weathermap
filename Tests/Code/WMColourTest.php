@@ -1,6 +1,6 @@
 <?php
 
-require_once dirname(__FILE__) . '/../../lib/all.php';
+require_once dirname(__FILE__) . '/../../src/lib/all.php';
 
 
 class WMColourTest extends PHPUnit_Framework_TestCase {

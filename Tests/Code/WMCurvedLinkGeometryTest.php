@@ -1,6 +1,6 @@
 <?php
 
-require_once dirname(__FILE__) . '/../../lib/all.php';
+require_once dirname(__FILE__) . '/../../src/lib/all.php';
 
 class WMCurvedLinkGeometryTest extends PHPUnit_Framework_TestCase {
     public function testRun() {

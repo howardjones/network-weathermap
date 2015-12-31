@@ -344,7 +344,7 @@ class WeatherMapLink extends WeatherMapDataItem
         }
 
         $this->geometry = WMLinkGeometryFactory::create($style);
-        $this->geometry->Init($this, $points, $widths, ($this->linkstyle=='oneway'?1:2), $this->splitpos, $this->arrowstyle);
+        $this->geometry->Init($this, $points, $widths, ($this->linkstyle == 'oneway' ? 1 : 2), $this->splitpos, $this->arrowstyle);
     }
 
 

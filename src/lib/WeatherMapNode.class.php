@@ -48,21 +48,22 @@ class WMNodeImageIcon extends WMNodeIcon
 {
     public function __construct($node)
     {
-        parent::__construct();
+        parent::__construct($node);
     }
 
     public function preRender()
     {
-        $realiconfile = $this->map->ProcessString($this->iconfile, $this);
+        $realiconfile = $this->node->owner->ProcessString($this->iconfile, $this);
 
         if (is_readable($realiconfile)) {
-            imagealphablending($im, true);
+            // TODO - this should be in Draw(), not here.
+            // imagealphablending($im, true);
 
             // draw the supplied icon, instead of the labelled box
             $iconImageRef = imagecreatefromfile($realiconfile);
 
-            if (true === isset($iconFillColour)) {
-                $this->colourizeImage($iconImageRef, $iconFillColour);
+            if (true === isset($this->iconFillColour)) {
+                $this->colourizeImage($iconImageRef, $this->iconFillColour);
             }
 
             if ($iconImageRef) {
@@ -108,10 +109,10 @@ class WMNodeArtificialIcon extends WMNodeIcon
     protected $aiconFillColour;
     protected $aiconInkColour;
     protected $iconFillColour;
-    protected $aiconOutlineColour;
+    // protected $aiconOutlineColour; // ???
     protected $labelFillColour;
 
-    public function __construct($node, $aiconInkColour, $aiconFillColour, $iconFillColour, $aiconOutlineColour, $labelFillColour)
+    public function __construct($node, $aiconInkColour, $aiconFillColour, $iconFillColour, $labelFillColour)
     {
         parent::__construct($node);
 
@@ -124,7 +125,7 @@ class WMNodeArtificialIcon extends WMNodeIcon
             throw new WMException("AICON with invalid type");
         }
 
-        $this->aiconOutlineColour = $aiconOutlineColour;
+        // $this->aiconOutlineColour = $aiconOutlineColour;
         $this->aiconFillColour = $aiconFillColour;
         $this->iconFillColour = $iconFillColour;
         $this->aiconInkColour = $aiconInkColour;
@@ -148,32 +149,35 @@ class WMNodeArtificialIcon extends WMNodeIcon
         $fill = null;
         $ink = null;
 
-//        $aiconFillColour = $this->aiconfillcolour;
-//        $aiconInkColour = $this->aiconoutlinecolour;
+        $aiconFillColour = $this->aiconFillColour;
+        $aiconInkColour = $this->aiconInkColour;
 
-        // if useiconscale isn't set, then use the static colour defined, or copy the colour from the label
-        if ($this->useiconscale == "none") {
-            if ($aiconFillColour->isCopy() && !$labelFillColour->isNone()) {
-                $fill = $labelFillColour;
-            } else {
-                if ($aiconFillColour->isRealColour()) {
-                    $fill = $aiconFillColour;
-                }
-            }
-        } else {
-            // if useiconscale IS defined, use that to figure out the fill colour
+        $fill = $aiconFillColour;
+        $ink = $aiconInkColour;
 
-            $fill = $iconFillColour;
-        }
+//        // if useiconscale isn't set, then use the static colour defined, or copy the colour from the label
+//        if ($this->useiconscale == "none") {
+//            if ($aiconFillColour->isCopy() && !$labelFillColour->isNone()) {
+//                $fill = $labelFillColour;
+//            } else {
+//                if ($aiconFillColour->isRealColour()) {
+//                    $fill = $aiconFillColour;
+//                }
+//            }
+//        } else {
+//            // if useiconscale IS defined, use that to figure out the fill colour
+//
+//            $fill = $iconFillColour;
+//        }
 
-        // support 'none' and 'copy' for AICON outlines too
-        if (!$this->aiconoutlinecolour->isNone() && $this->aiconoutlinecolor->isCopy()) {
-            $ink = $labelFillColour;
-        } else {
-            if ($aiconOutlineColour->isRealColour()) {
-                $ink = $aiconInkColour;
-            }
-        }
+//        // support 'none' and 'copy' for AICON outlines too
+//        if (!$this->aiconoutlinecolour->isNone() && $this->aiconoutlinecolor->isCopy()) {
+//            $ink = $labelFillColour;
+//        } else {
+//            if ($aiconOutlineColour->isRealColour()) {
+//                $ink = $aiconInkColour;
+//            }
+//        }
 
         wm_debug("AICON colours are $ink and $fill\n");
 
@@ -235,10 +239,10 @@ class WMNodeArtificialIcon extends WMNodeIcon
 
             foreach ($directions as $direction) {
                 $name = $direction[0];
-                $label = $this->owner->ProcessString("{node:this:bandwidth_$name:%.1k}", $this);
+                $label = $this->node->owner->ProcessString("{node:this:bandwidth_$name:%.1k}", $this->node);
 
-                list($twid, $thgt) = $this->owner->myimagestringsize($font, $label);
-                $this->owner->myimagestring($iconImageRef, $font, $radiusX - $twid / 2, $radiusY + $direction[1] * $quarter + ($thgt / 2), $label, $inkGD);
+                list($twid, $thgt) = $this->node->owner->myimagestringsize($font, $label);
+                $this->node->owner->myimagestring($iconImageRef, $font, $radiusX - $twid / 2, $radiusY + $direction[1] * $quarter + ($thgt / 2), $label, $inkGD);
             }
 
             imageellipse($iconImageRef, $radiusX, $radiusY, $radiusX * 2, $radiusY * 2, $inkGD);
@@ -304,10 +308,10 @@ class WMNodeArtificialIcon extends WMNodeIcon
     protected function drawAIconPie($iconImageRef, $fill, $ink)
     {
         if ($this->iconfile == 'inpie') {
-            $segment_angle = (($this->percentUsages[IN]) / 100) * 360;
+            $segment_angle = (($this->node->percentUsages[IN]) / 100) * 360;
         }
         if ($this->iconfile == 'outpie') {
-            $segment_angle = (($this->percentUsages[OUT]) / 100) * 360;
+            $segment_angle = (($this->node->percentUsages[OUT]) / 100) * 360;
         }
 
         $radiusX = $this->iconscalew / 2 - 1;
@@ -399,12 +403,6 @@ class WMNodeLabel
 
         $this->labelRectangle = new WMRectangle($this->x - $halfWidth, $this->y - $halfHeight, $this->x + $halfWidth, $this->y + $halfHeight);
 
-//        $label_x1 = $this->x - $halfWidth;
-//        $label_y1 = $this->y - $halfHeight;
-//
-//        $label_x2 = $this->x + $halfWidth;
-//        $label_y2 = $this->y + $halfHeight;
-
         $this->boundingBox->addPoint($this->x - $halfWidth, $this->y - $halfHeight);
         $this->boundingBox->addPoint($this->x + $halfWidth, $this->y + $halfHeight);
 
@@ -417,28 +415,19 @@ class WMNodeLabel
 
         if ($this->labelAngle == 90) {
             $textPosition->translate($stringHalfHeight, $stringHalfWidth);
-//            $textX = $this->x + $stringHalfHeight;
-//            $textY = $this->y + $stringHalfWidth;
         }
 
         if ($this->labelAngle == 270) {
             $textPosition->translate(-$stringHalfHeight, - $stringHalfWidth);
-//            $textX = $this->x - ($stringHalfHeight);
-//            $textY = $this->y - ($stringHalfWidth);
         }
 
         if ($this->labelAngle == 0) {
             $textPosition->translate(-$stringHalfWidth, $stringHalfHeight);
-//            $textX = $this->x - ($stringHalfWidth);
-//            $textY = $this->y + ($stringHalfHeight);
         }
 
         if ($this->labelAngle == 180) {
             $textPosition->translate($stringHalfWidth, -$stringHalfHeight);
-//            $textX = $this->x + ($stringHalfWidth);
-//            $textY = $this->y - ($stringHalfHeight);
         }
-//        $this->textPosition = new WMPoint($textX, $textY);
         $this->textPosition = $textPosition;
 
         $this->width = $boxWidth;
@@ -491,12 +480,12 @@ class WMNodeLabel
         if ($this->labelShadowColour->isRealColour()) {
             $this->map->myimagestring(
                 $imageRef,
-                $this->labelfont,
+                $this->labelFont,
                 $txt_x + 1,
                 $txt_y + 1,
-                $this->processedLabel,
+                $this->labelString,
                 $this->labelShadowColour->gdallocate($imageRef),
-                $this->labelangle
+                $this->labelAngle
             );
         }
 
@@ -513,10 +502,10 @@ class WMNodeLabel
 
         $this->map->myimagestring(
             $imageRef,
-            $this->node->labelfont,
+            $this->labelFont,
             $txt_x,
             $txt_y,
-            $this->node->processedLabel,
+            $this->labelString,
             $txcol->gdAllocate($imageRef),
             $this->labelAngle
         );
@@ -554,6 +543,8 @@ class WeatherMapNode extends WeatherMapDataItem
     public $labeloutlinecolour;
     public $labelfontcolour;
     public $labelfontshadowcolour;
+    public $aiconfillcolour;
+    public $aiconoutlinecolour;
     public $cachefile;
     public $useiconscale;
     public $iconscaletype;
@@ -842,53 +833,6 @@ class WeatherMapNode extends WeatherMapDataItem
 
             $labelObj->preRender($labelFillColour, $this->labeloutlinecolour, $this->labelfontshadowcolour, $this->labelfontcolour);
 
-//            $padding = 4.0;
-//            $padFactor = 1.0;
-//
-//
-//            list($stringWidth, $stringHeight) = $map->myimagestringsize($this->labelfont, $this->processedLabel);
-//
-//            if ($this->labelangle == 90 || $this->labelangle == 270) {
-//                $boxWidth = ($stringHeight * $padFactor) + $padding;
-//                $boxHeight = ($stringWidth * $padFactor) + $padding;
-//            } else {
-//                $boxWidth = ($stringWidth * $padFactor) + $padding;
-//                $boxHeight = ($stringHeight * $padFactor) + $padding;
-//            }
-//
-//            $halfWidth = $boxWidth / 2;
-//            $halfHeight = $boxHeight / 2;
-//
-//            $label_x1 = $this->x - $halfWidth;
-//            $label_y1 = $this->y - $halfHeight;
-//
-//            $label_x2 = $this->x + $halfWidth;
-//            $label_y2 = $this->y + $halfHeight;
-//
-//            wm_debug("Node->pre_render: " . $this->name . " Label Metrics are: $stringWidth x $stringHeight -> $boxWidth x $boxHeight\n");
-//
-//            if ($this->labelangle == 90) {
-//                $txt_x = $this->x + ($stringHeight / 2);
-//                $txt_y = $this->y + ($stringWidth / 2);
-//            }
-//
-//            if ($this->labelangle == 270) {
-//                $txt_x = $this->x - ($stringHeight / 2);
-//                $txt_y = $this->y - ($stringWidth / 2);
-//            }
-//
-//            if ($this->labelangle == 0) {
-//                $txt_x = $this->x - ($stringWidth / 2);
-//                $txt_y = $this->y + ($stringHeight / 2);
-//            }
-//
-//            if ($this->labelangle == 180) {
-//                $txt_x = $this->x + ($stringWidth / 2);
-//                $txt_y = $this->y - ($stringHeight / 2);
-//            }
-//
-//            $this->width = $boxWidth;
-//            $this->height = $boxHeight;
         }
 
         // figure out a bounding rectangle for the icon
@@ -897,11 +841,23 @@ class WeatherMapNode extends WeatherMapDataItem
             $icon_w = 0;
             $icon_h = 0;
 
-//            $artificialIconNames = array('rbox', 'round', 'box', 'inpie', 'outpie', 'gauge', 'nink');
-
-            //if (in_array($this->iconfile, $artificialIconNames)) {
             if (WMNodeArtificialIcon::isAICONName($this->iconfile)) {
-                $iconObj = new WMNodeArtificialIcon($this, $aiconInkColour, $aiconFillColour, $iconFillColour, $aiconOutlineColour, $labelFillColour);
+
+                $aiconFillColour = $this->aiconfillcolour;
+                $aiconInkColour = $this->aiconoutlinecolour;
+
+                // if useiconscale isn't defined, use the static colours defined by AICONFILLCOLOR and AICONOUTLINECOLOR
+                // (or copy the colour from the label fill colour)
+                if ($this->useiconscale == 'none') {
+                    if ($aiconFillColour->isCopy() && ! $labelFillColour->isNone()) {
+                        $aiconFillColour = $labelFillColour;
+                    }
+                } else {
+                    // if useiconscale IS defined, use that to figure out the file colour
+                    $aiconFillColour = $this->calculateIconFillColour();
+                }
+
+                $iconObj = new WMNodeArtificialIcon($this, $aiconInkColour, $aiconFillColour, $iconFillColour, $labelFillColour);
             } else {
                 $iconObj = new WMNodeImageIcon($this);
             }
@@ -991,18 +947,18 @@ class WeatherMapNode extends WeatherMapDataItem
         $icon_y1 -= $bbox_y1;
 
 
-        $labelObj->translate( -$bbox_x1 + $deltaX + $this->labeloffsetx, -$bbox_y1 + $deltaY + $this->labeloffsety);
 
         // Draw the icon, if any
         if (isset($iconImageRef)) {
-            $iconObj->draw($node_im);
+            $iconObj->draw($node_im, $icon_x1, $icon_y1);
 //            imagecopy($node_im, $iconImageRef, $icon_x1, $icon_y1, 0, 0, imagesx($iconImageRef), imagesy($iconImageRef));
 //            imagedestroy($iconImageRef);
         }
 
         // Draw the label, if any
         if ($this->label != '') {
-          $labelObj->draw($node_im);
+            $labelObj->translate( -$bbox_x1 + $deltaX + $this->labeloffsetx, -$bbox_y1 + $deltaY + $this->labeloffsety);
+            $labelObj->draw($node_im);
         }
 
         $this->centre_x = $this->x - $bbox_x1;

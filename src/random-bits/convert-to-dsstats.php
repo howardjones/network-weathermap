@@ -1,22 +1,21 @@
 <?php
 
-    #
-    # Change the uncommented line to point to your Cacti installation
-    #
+    // Change the uncommented line to point to your Cacti installation
+    //
     $cacti_base = dirname(__FILE__) . "/../../";
-    # $cacti_base = "C:/xampp/htdocs/cacti/";
-    # $cacti_base = "/var/www/html/cacti/";
-    # $cacti_base = "/Applications/XAMPP/htdocs/cacti/";
+    // $cacti_base = "C:/xampp/htdocs/cacti/";
+    // $cacti_base = "/var/www/html/cacti/";
+    // $cacti_base = "/Applications/XAMPP/htdocs/cacti/";
 
     // check if the goalposts have moved
     if (is_dir($cacti_base) && file_exists($cacti_base . "/include/global.php")) {
         // include the cacti-config, so we know about the database
-        require_once($cacti_base . "/include/global.php");
+        require_once $cacti_base . "/include/global.php";
     } elseif (is_dir($cacti_base) && file_exists($cacti_base . "/include/config.php")) {
         // include the cacti-config, so we know about the database
-        require_once($cacti_base . "/include/config.php");
+        require_once $cacti_base . "/include/config.php";
     } else {
-        die("Couldn't find a usable Cacti config - check the first few lines of " . __FILE__ . "\n");
+        throw new Exception("Couldn't find a usable Cacti config - check the first few lines of " . __FILE__);
     }
 
     require_once 'Weathermap.class.php';
@@ -29,7 +28,7 @@
     $candidates = 0;
     $totaltargets = 0;
 
-    $cg = new Console_Getopt();
+    $getopt = new Console_Getopt();
     $short_opts = '';
     $long_opts = array
     (
@@ -40,11 +39,11 @@
         "reverse",
     );
 
-    $args = $cg->readPHPArgv();
-    $ret = $cg->getopt($args, $short_opts, $long_opts);
+    $args = $getopt->readPHPArgv();
+    $ret = $getopt->getopt($args, $short_opts, $long_opts);
 
     if (PEAR::isError($ret)) {
-        die ("Error in command line: " . $ret->getMessage() . "\n (try --help)\n");
+        throw new Exception("Error in command line: " . $ret->getMessage() . "\n (try --help)\n");
     }
 
     $gopts = $ret[0];
@@ -71,7 +70,7 @@
                     print "Usage: php convert-to-dstats.php [options]\n\n";
                     print " --input {filename}         - File to read from\n";
                     print " --output {filename}        - File to write to\n";
-                    #	print " --reverse                  - Convert from DSStats to RRDtool instead\n";
+                    // print " --reverse                  - Convert from DSStats to RRDtool instead\n";
                     print " --debug                    - Enable debugging output\n";
                     print " --help                    - Show this message\n";
                     exit();
@@ -80,8 +79,7 @@
     }
 
     if ($inputfile == "" || $outputfile == "") {
-        print "You must specify an input and output file. See --help.\n";
-        exit();
+        throw new Exception("You must specify an input and output file. See --help.\n");
     }
 
     $map = new WeatherMap;
@@ -121,18 +119,18 @@
                         wm_debug("ReadData: New Target: $target[4]\n");
 
                         $targetstring = $target[0];
-                        $multiply = $target[1];
+                        $targetExplicitMultiplier = $target[1];
 
                         if ($reverse == 0 && $target[5] == "WeatherMapDataSource_rrd") {
                             $candidates++;
-                            # list($in,$out,$datatime) =  $map->plugins['data'][ $target[5] ]->ReadData($targetstring, $map, $myobj);
+                            // list($in,$out,$datatime) =  $map->plugins['data'][ $target[5] ]->ReadData($targetstring, $map, $myobj);
                             wm_debug("ConvertDS: $targetstring is a candidate for conversion.");
                             $rrdfile = $targetstring;
-                            $multiplier = 8;
+                            $targetImpliedMultiplier = 8;
                             $dsnames[IN] = "traffic_in";
                             $dsnames[OUT] = "traffic_out";
 
-                            if (preg_match("/^(.*\.rrd):([\-a-zA-Z0-9_]+):([\-a-zA-Z0-9_]+)$/", $targetstring, $matches)) {
+                            if (preg_match('/^(.*\.rrd):([\-a-zA-Z0-9_]+):([\-a-zA-Z0-9_]+)$/', $targetstring, $matches)) {
                                 $rrdfile = $matches[1];
 
                                 $dsnames[IN] = $matches[2];
@@ -145,17 +143,17 @@
                             }
                             if (preg_match("/^gauge:(.*)/", $rrdfile, $matches)) {
                                 $rrdfile = $matches[1];
-                                $multiplier = 1;
+                                $targetImpliedMultiplier = 1;
                             }
-                            if (preg_match("/^scale:([+-]?\d*\.?\d*):(.*)/", $rrdfile, $matches)) {
+                            if (preg_match('/^scale:([+-]?\d*\.?\d*):(.*)/', $rrdfile, $matches)) {
                                 $rrdfile = $matches[2];
-                                $multiplier = $matches[1];
+                                $targetImpliedMultiplier = $matches[1];
                             }
 
                             $path_rra = $config["rra_path"];
                             $db_rrdname = $rrdfile;
                             $db_rrdname = str_replace($path_rra, "<path_rra>", $db_rrdname);
-                            # special case for relative paths
+                            // special case for relative paths
                             $db_rrdname = str_replace("../../rra", "<path_rra>", $db_rrdname);
 
                             if ($db_rrdname != $rrdfile) {
@@ -167,15 +165,16 @@
 
                                 if ((sizeof($results) > 0) && (isset($results[0]['local_data_id']))) {
                                     $new_target = sprintf("dsstats:%d:%s:%s", $results[0]['local_data_id'], $dsnames[IN], $dsnames[OUT]);
-                                    $m = $multiply * $multiplier;
-                                    if ($m != 1) {
-                                        if ($m == -1) $new_target = "-" . $new_target;
-                                        if ($m == intval($m)) {
-                                            $new_target = sprintf("%d*%s", $m, $new_target);
-                                        } else {
-                                            $new_target = sprintf("%f*%s", $m, $new_target);
+                                    $multiplier = $targetExplicitMultiplier * $targetImpliedMultiplier;
+                                    if ($multiplier != 1) {
+                                        if ($multiplier == -1) {
+                                            $new_target = "-" . $new_target;
                                         }
-
+                                        if ($multiplier == intval($multiplier)) {
+                                            $new_target = sprintf("%d*%s", $multiplier, $new_target);
+                                        } else {
+                                            $new_target = sprintf("%f*%s", $multiplier, $new_target);
+                                        }
                                     }
 
                                     wm_debug("ConvertDS: Converting to $new_target");

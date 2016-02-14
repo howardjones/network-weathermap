@@ -138,7 +138,7 @@ class WMPoint
 
     public function __toString()
     {
-        return sprintf("(%f,%f)", $this->x, $this->y);
+        return sprintf("(%s,%s)", floatval($this->x), floatval($this->y));
     }
 
     public function translate($deltaX, $deltaY)

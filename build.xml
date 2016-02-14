@@ -32,6 +32,7 @@
         <delete dir="${basedir}/build/logs"/>
         <delete dir="${basedir}/build/pdepend"/>
         <delete dir="${basedir}/build/phpdox"/>
+        <delete dir="${basedir}/build/dist"/>
         <property name="clean.done" value="true"/>
     </target>
     <target name="prepare" unless="prepare.done" depends="clean" description="Prepare for build">
@@ -40,6 +41,7 @@
         <mkdir dir="${basedir}/build/logs"/>
         <mkdir dir="${basedir}/build/pdepend"/>
         <mkdir dir="${basedir}/build/phpdox"/>
+        <mkdir dir="${basedir}/build/dist"/>
         <property name="prepare.done" value="true"/>
     </target>
     <target name="lint" unless="lint.done" description="Perform syntax check of sourcecode files">

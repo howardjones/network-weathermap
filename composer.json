@@ -10,7 +10,9 @@
     }
   ],
   "require": {
-    "phpdocumentor/phpdocumentor": "2.*"
+    "phpdocumentor/phpdocumentor": "2.*",
+    "pear/console_commandline": "^1.2",
+    "pear/console_getopt": "^1.4"
   },
   "require-dev": {
     "jelix/fakeserverconf": "dev-master",

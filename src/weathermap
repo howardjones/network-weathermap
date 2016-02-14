@@ -6,7 +6,7 @@
 // http://www.network-weathermap.com/
 // Released under the GNU Public License
 
-require_once 'Console/Getopt.php';
+require_once 'vendor/pear/console_getopt/Console/Getopt.php';
 
 require_once dirname(__FILE__).'/lib/all.php';
 

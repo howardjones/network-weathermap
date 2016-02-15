@@ -19,38 +19,38 @@ function myimagecolorallocate($image, $red, $green, $blue)
 }
 
 // take the same set of points that imagepolygon does, but don't close the shape
-function imagepolyline($image, $points, $npoints, $color)
+function imagepolyline($imageRef, $points, $npoints, $color)
 {
     for ($i = 0; $i < ($npoints - 1); $i ++) {
-        imageline($image, $points [$i * 2], $points [$i * 2 + 1], $points [$i * 2 + 2], $points [$i * 2 + 3], $color);
+        imageline($imageRef, $points [$i * 2], $points [$i * 2 + 1], $points [$i * 2 + 2], $points [$i * 2 + 3], $color);
     }
 }
 
 // draw a filled round-cornered rectangle
-function imagefilledroundedrectangle($image, $x1, $y1, $x2, $y2, $radius, $color)
+function imagefilledroundedrectangle($imageRef, $x1, $y1, $x2, $y2, $radius, $color)
 {
-    imagefilledrectangle($image, $x1, $y1 + $radius, $x2, $y2 - $radius, $color);
-    imagefilledrectangle($image, $x1 + $radius, $y1, $x2 - $radius, $y2, $color);
+    imagefilledrectangle($imageRef, $x1, $y1 + $radius, $x2, $y2 - $radius, $color);
+    imagefilledrectangle($imageRef, $x1 + $radius, $y1, $x2 - $radius, $y2, $color);
 
-    imagefilledarc($image, $x1 + $radius, $y1 + $radius, $radius * 2, $radius * 2, 0, 360, $color, IMG_ARC_PIE);
-    imagefilledarc($image, $x2 - $radius, $y1 + $radius, $radius * 2, $radius * 2, 0, 360, $color, IMG_ARC_PIE);
+    imagefilledarc($imageRef, $x1 + $radius, $y1 + $radius, $radius * 2, $radius * 2, 0, 360, $color, IMG_ARC_PIE);
+    imagefilledarc($imageRef, $x2 - $radius, $y1 + $radius, $radius * 2, $radius * 2, 0, 360, $color, IMG_ARC_PIE);
 
-    imagefilledarc($image, $x1 + $radius, $y2 - $radius, $radius * 2, $radius * 2, 0, 360, $color, IMG_ARC_PIE);
-    imagefilledarc($image, $x2 - $radius, $y2 - $radius, $radius * 2, $radius * 2, 0, 360, $color, IMG_ARC_PIE);
+    imagefilledarc($imageRef, $x1 + $radius, $y2 - $radius, $radius * 2, $radius * 2, 0, 360, $color, IMG_ARC_PIE);
+    imagefilledarc($imageRef, $x2 - $radius, $y2 - $radius, $radius * 2, $radius * 2, 0, 360, $color, IMG_ARC_PIE);
 }
 
 // draw a round-cornered rectangle
-function imageroundedrectangle($image, $x1, $y1, $x2, $y2, $radius, $color)
+function imageroundedrectangle($imageRef, $x1, $y1, $x2, $y2, $radius, $color)
 {
-    imageline($image, $x1 + $radius, $y1, $x2 - $radius, $y1, $color);
-    imageline($image, $x1 + $radius, $y2, $x2 - $radius, $y2, $color);
-    imageline($image, $x1, $y1 + $radius, $x1, $y2 - $radius, $color);
-    imageline($image, $x2, $y1 + $radius, $x2, $y2 - $radius, $color);
+    imageline($imageRef, $x1 + $radius, $y1, $x2 - $radius, $y1, $color);
+    imageline($imageRef, $x1 + $radius, $y2, $x2 - $radius, $y2, $color);
+    imageline($imageRef, $x1, $y1 + $radius, $x1, $y2 - $radius, $color);
+    imageline($imageRef, $x2, $y1 + $radius, $x2, $y2 - $radius, $color);
 
-    imagearc($image, $x1 + $radius, $y1 + $radius, $radius * 2, $radius * 2, 180, 270, $color);
-    imagearc($image, $x2 - $radius, $y1 + $radius, $radius * 2, $radius * 2, 270, 360, $color);
-    imagearc($image, $x1 + $radius, $y2 - $radius, $radius * 2, $radius * 2, 90, 180, $color);
-    imagearc($image, $x2 - $radius, $y2 - $radius, $radius * 2, $radius * 2, 0, 90, $color);
+    imagearc($imageRef, $x1 + $radius, $y1 + $radius, $radius * 2, $radius * 2, 180, 270, $color);
+    imagearc($imageRef, $x2 - $radius, $y1 + $radius, $radius * 2, $radius * 2, 270, 360, $color);
+    imagearc($imageRef, $x1 + $radius, $y2 - $radius, $radius * 2, $radius * 2, 90, 180, $color);
+    imagearc($imageRef, $x2 - $radius, $y2 - $radius, $radius * 2, $radius * 2, 0, 90, $color);
 }
 
 function imagecreatefromfile($filename)
@@ -59,6 +59,7 @@ function imagecreatefromfile($filename)
 
     if (is_readable($filename)) {
         list ( , , $type, ) = getimagesize($filename);
+
         switch ($type) {
             case IMAGETYPE_GIF:
                 if (imagetypes() & IMG_GIF) {
@@ -98,16 +99,16 @@ function imagecreatefromfile($filename)
 // Much nicer colorization than imagefilter does, AND no special requirements.
 // Preserves white, black and transparency.
 //
-function imagecolorize($im, $r, $g, $b)
+function imagecolorize($imageRef, $red, $green, $blue)
 {
     // The function only accepts indexed colour images.
     // Unfortunately, imagetruecolortopalette is pretty crappy, so you are
     // probably better off using Paint.NET/Gimp etc to make an indexed colour
     // version of the icon, rather than rely on this
-    if (imageistruecolor($im)) {
+    if (imageistruecolor($imageRef)) {
         wm_debug("imagecolorize requires paletted images - this is a truecolor image. Converting.");
-        imagetruecolortopalette($im, false, 256);
-        wm_debug("Converted image has %d colours.\n", imagecolorstotal($im));
+        imagetruecolortopalette($imageRef, false, 256);
+        wm_debug("Converted image has %d colours.\n", imagecolorstotal($imageRef));
     }
 
     // We will create a monochromatic palette based on the input color
@@ -115,14 +116,14 @@ function imagecolorize($im, $r, $g, $b)
 
     // Input color luminosity: this is equivalent to the
     // position of the input color in the monochromatic palette 765=255*3
-    $lum_inp = round(255 * ($r + $g + $b) / 765);
+    $inputLuminosity = round(255 * ($red + $green + $blue) / 765);
 
     // We fill the palette entry with the input color at its
     // corresponding position
 
-    $pal[$lum_inp]['r'] = $r;
-    $pal[$lum_inp]['g'] = $g;
-    $pal[$lum_inp]['b'] = $b;
+    $pal[$inputLuminosity]['r'] = $red;
+    $pal[$inputLuminosity]['g'] = $green;
+    $pal[$inputLuminosity]['b'] = $blue;
 
     // Now we complete the palette, first we'll do it to
     // the black,and then to the white.
@@ -130,52 +131,51 @@ function imagecolorize($im, $r, $g, $b)
     // FROM input to black
     // ===================
     // how many colors between black and input
-    $steps_to_black = $lum_inp;
+    $stepsToBlack = $inputLuminosity;
 
     // The step size for each component
-    if ($steps_to_black) {
-        $step_size_red = $r / $steps_to_black;
-        $step_size_green = $g / $steps_to_black;
-        $step_size_blue = $b / $steps_to_black;
+    if ($stepsToBlack) {
+        $stepSizeRed = $red / $stepsToBlack;
+        $stepSizeGreen = $green / $stepsToBlack;
+        $stepSizeBlue = $blue / $stepsToBlack;
     }
 
-    for ($i = $steps_to_black; $i >= 0; $i --) {
-        $pal[$steps_to_black - $i]['r'] = $r - round($step_size_red * $i);
-        $pal[$steps_to_black - $i]['g'] = $g - round($step_size_green * $i);
-        $pal[$steps_to_black - $i]['b'] = $b - round($step_size_blue * $i);
+    for ($i = $stepsToBlack; $i >= 0; $i--) {
+        $pal[$stepsToBlack - $i]['r'] = $red - round($stepSizeRed * $i);
+        $pal[$stepsToBlack - $i]['g'] = $green - round($stepSizeGreen * $i);
+        $pal[$stepsToBlack - $i]['b'] = $blue - round($stepSizeBlue * $i);
     }
 
     // From input to white:
     // ===================
     // how many colors between input and white
-    $steps_to_white = 255 - $lum_inp;
+    $stepsToWhite = 255 - $inputLuminosity;
 
-    if ($steps_to_white) {
-        $step_size_red = (255 - $r) / $steps_to_white;
-        $step_size_green = (255 - $g) / $steps_to_white;
-        $step_size_blue = (255 - $b) / $steps_to_white;
-    } else {
-        $step_size_red = $step_size_green = $step_size_blue = 0;
+    $stepSizeRed = $stepSizeGreen = $stepSizeBlue = 0;
+
+    if ($stepsToWhite) {
+        $stepSizeRed = (255 - $red) / $stepsToWhite;
+        $stepSizeGreen = (255 - $green) / $stepsToWhite;
+        $stepSizeBlue = (255 - $blue) / $stepsToWhite;
     }
 
     // The step size for each component
-    for ($i = ($lum_inp + 1); $i <= 255; $i ++) {
-        $pal[$i]['r'] = $r + round($step_size_red * ($i - $lum_inp));
-        $pal[$i]['g'] = $g + round($step_size_green * ($i - $lum_inp));
-        $pal[$i]['b'] = $b + round($step_size_blue * ($i - $lum_inp));
+    for ($i = ($inputLuminosity + 1); $i <= 255; $i++) {
+        $pal[$i]['r'] = $red + round($stepSizeRed * ($i - $inputLuminosity));
+        $pal[$i]['g'] = $green + round($stepSizeGreen * ($i - $inputLuminosity));
+        $pal[$i]['b'] = $blue + round($stepSizeBlue * ($i - $inputLuminosity));
     }
 
     // --- End of palette creation
 
-    // Now,let's change the original palette into the one we
-    // created
-    for ($c = 0; $c < imagecolorstotal($im); $c ++) {
-        $col = imagecolorsforindex($im, $c);
-        $lum_src = round(255 * ($col['red'] + $col['green'] + $col['blue']) / 765);
-        $col_out = $pal[$lum_src];
+    // Now,let's change the original palette into the one we created
+    for ($index = 0; $index < imagecolorstotal($imageRef); $index++) {
+        $inputColour = imagecolorsforindex($imageRef, $index);
+        $sourceLuminosity = round(255 * ($inputColour['red'] + $inputColour['green'] + $inputColour['blue']) / 765);
+        $outputColour = $pal[$sourceLuminosity];
 
-        imagecolorset($im, $c, $col_out['r'], $col_out['g'], $col_out['b']);
+        imagecolorset($imageRef, $index, $outputColour['r'], $outputColour['g'], $outputColour['b']);
     }
 
-    return ($im);
+    return ($imageRef);
 }

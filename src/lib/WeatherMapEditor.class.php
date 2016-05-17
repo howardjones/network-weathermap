@@ -678,7 +678,7 @@ class WeatherMapEditor
      * @param float[] $rangeB
      * @return bool
      */
-    function rangeOverlaps($rangeA, $rangeB)
+    static function rangeOverlaps($rangeA, $rangeB)
     {
         if ($rangeA[0] > $rangeB[1]) {
             return false;
@@ -697,7 +697,7 @@ class WeatherMapEditor
      * @param number[] $rangeB
      * @return number list($min,$max)
      */
-    function findCommonRange($rangeA, $rangeB)
+    static function findCommonRange($rangeA, $rangeB)
     {
         $min_overlap = max($rangeA[0], $rangeB[0]);
         $max_overlap = min($rangeA[1], $rangeB[1]);
@@ -713,7 +713,7 @@ class WeatherMapEditor
      * @param int $y_offset
      * @return string
      */
-    function simplifyOffset($x_offset, $y_offset)
+    static function simplifyOffset($x_offset, $y_offset)
     {
         if ($x_offset == 0 && $y_offset == 0) {
             return "";

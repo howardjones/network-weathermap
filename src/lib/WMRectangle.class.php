@@ -73,6 +73,11 @@ class WMRectangle
         return false;
     }
 
+    public function asArray()
+    {
+        return array($this->topLeft->x, $this->topLeft->y, $this->bottomRight->x, $this->bottomRight->y);
+    }
+
     public function __toString()
     {
         return sprintf("[%sx%s]", $this->topLeft, $this->bottomRight);

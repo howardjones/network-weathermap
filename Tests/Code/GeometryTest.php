@@ -10,208 +10,208 @@ class GeometryTest  extends PHPUnit_Framework_TestCase {
 
     public function testTranslate()
     {
-        $p1 = new WMPoint(20, 30);
+        $point1 = new WMPoint(20, 30);
 
-        $p1->translate(5, 6);
-        $this->assertTrue($p1->identical(new WMPoint(25, 36)));
+        $point1->translate(5, 6);
+        $this->assertTrue($point1->identical(new WMPoint(25, 36)));
 
-        $p2 = $p1->translate(-15, -16);
-        $this->assertInstanceOf("WMPoint", $p2);
+        $point2 = $point1->translate(-15, -16);
+        $this->assertInstanceOf("WMPoint", $point2);
 
-        $this->assertTrue($p1->identical(new WMPoint(10, 20)));
-        $this->assertTrue($p2->identical(new WMPoint(10, 20)));
-        $this->assertEquals($p1, $p2);
+        $this->assertTrue($point1->identical(new WMPoint(10, 20)));
+        $this->assertTrue($point2->identical(new WMPoint(10, 20)));
+        $this->assertEquals($point1, $point2);
 
-        $p3 = $p1->translate(10, 0)->translate(0, 20);
-        $this->assertTrue($p3->identical(new WMPoint(20, 40)));
+        $point3 = $point1->translate(10, 0)->translate(0, 20);
+        $this->assertTrue($point3->identical(new WMPoint(20, 40)));
     }
 
     public function testTranslatePolar()
     {
-        $p1 = new WMPoint(20, 30);
+        $point1 = new WMPoint(20, 30);
 
-        $p2 = $p1->translatePolar(0, 20);
+        $point2 = $point1->translatePolar(0, 20);
 
-        $this->assertInstanceOf("WMPoint", $p2, "translatePolar() returns itself for chaining");
-        $this->assertEquals($p1, $p2);
-        $this->assertTrue($p1->closeEnough(new WMPoint(20, 10)), "The new point is 20 units up");
-        $this->assertTrue($p2->closeEnough(new WMPoint(20, 10)), "The new point is 20 units up");
+        $this->assertInstanceOf("WMPoint", $point2, "translatePolar() returns itself for chaining");
+        $this->assertEquals($point1, $point2);
+        $this->assertTrue($point1->closeEnough(new WMPoint(20, 10)), "The new point is 20 units up");
+        $this->assertTrue($point2->closeEnough(new WMPoint(20, 10)), "The new point is 20 units up");
 
-        $p1 = new WMPoint(20, 30);
-        $p1->translatePolar(180, 20);
-        $this->assertTrue($p1->closeEnough(new WMPoint(20, 50)), "The new point is 20 units down");
+        $point1 = new WMPoint(20, 30);
+        $point1->translatePolar(180, 20);
+        $this->assertTrue($point1->closeEnough(new WMPoint(20, 50)), "The new point is 20 units down");
 
-        $p1 = new WMPoint(20, 30);
-        $p1->translatePolar(90, 20);
-        $this->assertTrue($p1->closeEnough(new WMPoint(40, 30)), "The new point is 20 units right");
+        $point1 = new WMPoint(20, 30);
+        $point1->translatePolar(90, 20);
+        $this->assertTrue($point1->closeEnough(new WMPoint(40, 30)), "The new point is 20 units right");
 
-        $p1 = new WMPoint(20, 30);
-        $p1->translatePolar(270, 20);
-        $this->assertTrue($p1->closeEnough(new WMPoint(0, 30)), "The new point is 20 units left");
+        $point1 = new WMPoint(20, 30);
+        $point1->translatePolar(270, 20);
+        $this->assertTrue($point1->closeEnough(new WMPoint(0, 30)), "The new point is 20 units left");
 
-        $p1 = new WMPoint(20, 30);
-        $p1->translatePolar(135, 20);
-        $this->assertTrue($p1->closeEnough(new WMPoint(34.142135, 44.142135)));
+        $point1 = new WMPoint(20, 30);
+        $point1->translatePolar(135, 20);
+        $this->assertTrue($point1->closeEnough(new WMPoint(34.142135, 44.142135)));
 
-        $p1 = new WMPoint(20, 30);
-        $p1->translatePolar(45, 20);
-        $this->assertTrue($p1->closeEnough(new WMPoint(34.142135, 15.85786)));
+        $point1 = new WMPoint(20, 30);
+        $point1->translatePolar(45, 20);
+        $this->assertTrue($point1->closeEnough(new WMPoint(34.142135, 15.85786)));
     }
 
     public function testMisc()
     {
-        $p1 = new WMPoint(0,0);
-        $p2 = new WMPoint(10,0);
-        $p3 = new WMPoint(0,10);
+        $ooint1 = new WMPoint(0,0);
+        $point2 = new WMPoint(10,0);
+        $point3 = new WMPoint(0,10);
 
-        $this->assertEquals(50, getTriangleArea($p1, $p2, $p3));
+        $this->assertEquals(50, getTriangleArea($ooint1, $point2, $point3));
 
-        $p1 = new WMPoint(6,35);
-        $p2 = new WMPoint(15,10);
-        $p3 = new WMPoint(50,29);
+        $ooint1 = new WMPoint(6,35);
+        $point2 = new WMPoint(15,10);
+        $point3 = new WMPoint(50,29);
 
-        $this->assertEquals(523, getTriangleArea($p1, $p2, $p3));
+        $this->assertEquals(523, getTriangleArea($ooint1, $point2, $point3));
     }
 
     public function testCatmullRom()
     {
 
         // simple straight line case (both ends have duplicated control points)
-        $c = new CatmullRom1D(0,0,10,10);
+        $curve = new CatmullRom1D(0,0,10,10);
 
-        $this->assertEquals(0,$c->calculate(0));
-        $this->assertEquals(5,$c->calculate(0.5));
-        $this->assertEquals(10,$c->calculate(1));
+        $this->assertEquals(0,$curve->calculate(0));
+        $this->assertEquals(5,$curve->calculate(0.5));
+        $this->assertEquals(10,$curve->calculate(1));
     }
 
     public function testPoint()
     {
-        $p1 = new WMPoint(10,13);
-        $p2 = new WMPoint(-40,40);
-        $p3 = new WMPoint(30,33);
-        $p4 = new WMPoint(10,13);
-        $p5 = new WMPoint(10.001,13.001);
-        $p6 = new WMPoint(10.1,13.1);
-        $p8 = new WMPoint(-10,13);
+        $point1 = new WMPoint(10,13);
+        $point2 = new WMPoint(-40,40);
+        $point3 = new WMPoint(30,33);
+        $point4 = new WMPoint(10,13);
+        $point5 = new WMPoint(10.001,13.001);
+        $point6 = new WMPoint(10.1,13.1);
+        $point8 = new WMPoint(-10,13);
 
-        $this->assertTrue($p1->identical($p4));
-        $this->assertTrue($p4->identical($p1));
-        $this->assertFalse($p4->identical($p2));
+        $this->assertTrue($point1->identical($point4));
+        $this->assertTrue($point4->identical($point1));
+        $this->assertFalse($point4->identical($point2));
 
-        $this->assertTrue($p1->closeEnough($p5));
-        $this->assertFalse($p1->closeEnough($p6));
+        $this->assertTrue($point1->closeEnough($point5));
+        $this->assertFalse($point1->closeEnough($point6));
 
-        $p5->round();
-        $this->assertTrue($p1->identical($p5));
+        $point5->round();
+        $this->assertTrue($point1->identical($point5));
 
-        $p7 = $p1->copy();
-        $this->assertTrue($p1->identical($p7));
+        $point7 = $point1->copy();
+        $this->assertTrue($point1->identical($point7));
 
-        $this->assertEquals( sqrt(800), $p1->distanceToPoint($p3));
-        $this->assertEquals( sqrt(800), $p3->distanceToPoint($p1));
-        $this->assertEquals(20, $p1->distanceToPoint($p8));
-        $this->assertEquals(20, $p8->distanceToPoint($p1));
-
-
-        $v1 = new WMVector(10,40);
-        $v2 = $p1->vectorToPoint($p2);
-
-        $p = $p1->LERPWith($p3, 0.5);
-        $this->assertTrue( $p->identical(new WMPoint(20,23)));
-
-        $p = $p1->LERPWith($p3, -0.5);
-        $this->assertTrue( $p->identical(new WMPoint(0,3)));
-
-        $p = $p1->LERPWith($p3, 2.0);
-        $this->assertTrue( $p->identical(new WMPoint(50,53)));
+        $this->assertEquals( sqrt(800), $point1->distanceToPoint($point3));
+        $this->assertEquals( sqrt(800), $point3->distanceToPoint($point1));
+        $this->assertEquals(20, $point1->distanceToPoint($point8));
+        $this->assertEquals(20, $point8->distanceToPoint($point1));
 
 
-        $this->assertEquals("(10.000000,13.000000)", $p1->asString());
-        $this->assertEquals("(30.000000,33.000000)", $p3->asString());
+        $vector1 = new WMVector(10,40);
+        $vector2 = $point1->vectorToPoint($point2);
 
-        $this->assertEquals("(10.000000,13.000000)", "$p1");
-        $this->assertEquals("(30.000000,33.000000)", "$p3");
+        $point9 = $point1->LERPWith($point3, 0.5);
+        $this->assertTrue( $point9->identical(new WMPoint(20,23)));
 
-        $p->addVector($v1, 1.0);
-        $this->assertTrue( $p->identical(new WMPoint(60,93)));
+        $point9 = $point1->LERPWith($point3, -0.5);
+        $this->assertTrue( $point9->identical(new WMPoint(0,3)));
 
-        $p->addVector($v1, -2.0);
-        $this->assertTrue( $p->identical(new WMPoint(40,13)));
+        $point9 = $point1->LERPWith($point3, 2.0);
+        $this->assertTrue( $point9->identical(new WMPoint(50,53)));
 
-        $p->addVector($v1, 0);
-        $this->assertTrue( $p->identical(new WMPoint(40,13)));
 
-        $l = $p->lineToPoint($p1);
-        $this->assertEquals("/(40.000000,13.000000)-[-30.000000,0.000000]/", "$l");
+        $this->assertEquals("(10.000000,13.000000)", $point1->asString());
+        $this->assertEquals("(30.000000,33.000000)", $point3->asString());
+
+        $this->assertEquals("(10.000000,13.000000)", "$point1");
+        $this->assertEquals("(30.000000,33.000000)", "$point3");
+
+        $point9->addVector($vector1, 1.0);
+        $this->assertTrue( $point9->identical(new WMPoint(60,93)));
+
+        $point9->addVector($vector1, -2.0);
+        $this->assertTrue( $point9->identical(new WMPoint(40,13)));
+
+        $point9->addVector($vector1, 0);
+        $this->assertTrue( $point9->identical(new WMPoint(40,13)));
+
+        $line1 = $point9->lineToPoint($point1);
+        $this->assertEquals("/(40.000000,13.000000)-[-30.000000,0.000000]/", "$line1");
 
     }
 
     public function testVector()
     {
-        $slope_infinity = 10000000000.0;
+        $infiniteSlope = 10000000000.0;
 
-        $v1 = new WMVector(0,0);
-        $v2 = new WMVector(10,0);
-        $v3 = new WMVector(0,5);
-        $v4 = new WMVector(-20,20);
-        $v5 = new WMVector(10,20);
+        $vector1 = new WMVector(0,0);
+        $vector2 = new WMVector(10,0);
+        $vector3 = new WMVector(0,5);
+        $vector4 = new WMVector(-20,20);
+        $vector5 = new WMVector(10,20);
 
-        $this->assertEquals(0, $v1->length());
-        $this->assertEquals(10, $v2->length());
-        $this->assertEquals(5, $v3->length());
-        $this->assertEquals(sqrt(800), $v4->length());
-        $this->assertEquals(sqrt(500), $v5->length());
+        $this->assertEquals(0, $vector1->length());
+        $this->assertEquals(10, $vector2->length());
+        $this->assertEquals(5, $vector3->length());
+        $this->assertEquals(sqrt(800), $vector4->length());
+        $this->assertEquals(sqrt(500), $vector5->length());
 
-        $this->assertEquals(800, $v4->squaredLength());
-        $this->assertEquals(500, $v5->squaredLength());
+        $this->assertEquals(800, $vector4->squaredLength());
+        $this->assertEquals(500, $vector5->squaredLength());
 
-        $this->assertEquals($slope_infinity, $v1->getSlope());
-        $this->assertEquals(0, $v1->getAngle());
+        $this->assertEquals($infiniteSlope, $vector1->getSlope());
+        $this->assertEquals(0, $vector1->getAngle());
 
-        $this->assertEquals(0, $v2->getSlope());
-        $this->assertEquals(0, $v2->getAngle());
+        $this->assertEquals(0, $vector2->getSlope());
+        $this->assertEquals(0, $vector2->getAngle());
 
-        $this->assertEquals($slope_infinity, $v3->getSlope());
-        $this->assertEquals(-90, $v3->getAngle());
+        $this->assertEquals($infiniteSlope, $vector3->getSlope());
+        $this->assertEquals(-90, $vector3->getAngle());
 
-        $this->assertEquals(-1, $v4->getSlope());
-        $this->assertEquals(-135, $v4->getAngle());
+        $this->assertEquals(-1, $vector4->getSlope());
+        $this->assertEquals(-135, $vector4->getAngle());
 
-        $this->assertEquals("[0.000000,0.000000]", $v1->asString());
-        $this->assertEquals("[0.000000,5.000000]", $v3->asString());
+        $this->assertEquals("[0.000000,0.000000]", $vector1->asString());
+        $this->assertEquals("[0.000000,5.000000]", $vector3->asString());
 
-        $this->assertEquals("[0.000000,0.000000]", "$v1");
-        $this->assertEquals("[0.000000,5.000000]", "$v3");
+        $this->assertEquals("[0.000000,0.000000]", "$vector1");
+        $this->assertEquals("[0.000000,5.000000]", "$vector3");
 
-        $v4->flip();
-        $this->assertEquals("[20.000000,-20.000000]", $v4->asString());
+        $vector4->flip();
+        $this->assertEquals("[20.000000,-20.000000]", $vector4->asString());
 
-        $n1 = $v4->getNormal();
-        $this->assertEquals("[-0.707107,-0.707107]", "$n1");
+        $normal1 = $vector4->getNormal();
+        $this->assertEquals("[-0.707107,-0.707107]", "$normal1");
 
-        $v4->flip();
-        $n2 = $v4->getNormal();
-        $this->assertEquals("[0.707107,0.707107]", "$n2");
+        $vector4->flip();
+        $normal2 = $vector4->getNormal();
+        $this->assertEquals("[0.707107,0.707107]", "$normal2");
 
 
-        $v2->normalise();
-        $v3->normalise();
-        $v4->normalise();
-        $v5->normalise();
+        $vector2->normalise();
+        $vector3->normalise();
+        $vector4->normalise();
+        $vector5->normalise();
 
-        $this->assertEquals(1, $v2->length());
-        $this->assertEquals(1, $v3->length());
-        $this->assertEquals(1, $v4->length());
-        $this->assertEquals(1, $v5->length());
+        $this->assertEquals(1, $vector2->length());
+        $this->assertEquals(1, $vector3->length());
+        $this->assertEquals(1, $vector4->length());
+        $this->assertEquals(1, $vector5->length());
 
-        $v2->rotate(45);
-        $this->assertEquals(1, $v2->length());
+        $vector2->rotate(45);
+        $this->assertEquals(1, $vector2->length());
 
-        $v2->rotate(45);
-        $this->assertEquals(1, $v2->length());
+        $vector2->rotate(45);
+        $this->assertEquals(1, $vector2->length());
 
-        $v2->rotate(90);
-        $this->assertEquals(1, $v2->length());
+        $vector2->rotate(90);
+        $this->assertEquals(1, $vector2->length());
 
 
     }
@@ -222,13 +222,13 @@ class GeometryTest  extends PHPUnit_Framework_TestCase {
         $line3 = new WMLine(new WMPoint(70,0), new WMVector(1,0) );
 
         $this->setExpectedException("WMException");
-        $point = $line1->findCrossingPoint($line3);
+        $line1->findCrossingPoint($line3);
     }
 
     public function testLineSegment()
     {
-        $ls = new WMLineSegment( new WMPoint(12,36), new WMPoint(72,19));
-        $this->assertEquals("{(12.000000,36.000000)--(72.000000,19.000000)}","$ls");
+        $lineseg1 = new WMLineSegment( new WMPoint(12,36), new WMPoint(72,19));
+        $this->assertEquals("{(12.000000,36.000000)--(72.000000,19.000000)}","$lineseg1");
     }
 
     public function testLine()
@@ -256,61 +256,61 @@ class GeometryTest  extends PHPUnit_Framework_TestCase {
 
     public function testRectangle()
     {
-        $r1 = new WMRectangle(10, 10, 20, 40);
-        $r1a = new WMRectangle(10, 10, 20, 40);
-        $r2 = new WMRectangle(20, 40, 10, 10);
+        $rect1 = new WMRectangle(10, 10, 20, 40);
+        $rect1a = new WMRectangle(10, 10, 20, 40);
+        $rect2 = new WMRectangle(20, 40, 10, 10);
 
-        $this->assertTrue($r1->containsPoint(new WMPoint(15, 15)));
-        $this->assertTrue($r2->containsPoint(new WMPoint(15, 15)));
+        $this->assertTrue($rect1->containsPoint(new WMPoint(15, 15)));
+        $this->assertTrue($rect2->containsPoint(new WMPoint(15, 15)));
 
-        $this->assertTrue($r1->containsPoint(new WMPoint(10, 10)));
-        $this->assertTrue($r2->containsPoint(new WMPoint(10, 10)));
+        $this->assertTrue($rect1->containsPoint(new WMPoint(10, 10)));
+        $this->assertTrue($rect2->containsPoint(new WMPoint(10, 10)));
 
-        $this->assertTrue($r1->containsPoint(new WMPoint(20, 40)));
-        $this->assertTrue($r2->containsPoint(new WMPoint(20, 40)));
+        $this->assertTrue($rect1->containsPoint(new WMPoint(20, 40)));
+        $this->assertTrue($rect2->containsPoint(new WMPoint(20, 40)));
 
-        $this->assertFalse($r1->containsPoint(new WMPoint(2, 40)));
-        $this->assertFalse($r2->containsPoint(new WMPoint(2, 40)));
+        $this->assertFalse($rect1->containsPoint(new WMPoint(2, 40)));
+        $this->assertFalse($rect2->containsPoint(new WMPoint(2, 40)));
 
-        $this->assertEquals($r1->width(), 10);
-        $this->assertEquals($r2->width(), 10);
+        $this->assertEquals($rect1->width(), 10);
+        $this->assertEquals($rect2->width(), 10);
 
-        $this->assertEquals($r1->height(), 30);
-        $this->assertEquals($r2->height(), 30);
+        $this->assertEquals($rect1->height(), 30);
+        $this->assertEquals($rect2->height(), 30);
 
-        $this->assertTrue($r1->identical($r1a));
+        $this->assertTrue($rect1->identical($rect1a));
 
-        $r1->inflate(5);
+        $rect1->inflate(5);
 
-        $this->assertTrue($r1->identical(new WMRectangle(5, 5, 25, 45)));
+        $this->assertTrue($rect1->identical(new WMRectangle(5, 5, 25, 45)));
 
-        $r1->inflate(-5);
-        $this->assertTrue($r1->identical($r1a));
+        $rect1->inflate(-5);
+        $this->assertTrue($rect1->identical($rect1a));
 
-        $r1b = $r1a->copy();
-        $this->assertInstanceOf("WMRectangle", $r1b);
-        $this->assertTrue($r1a->identical($r1b));
+        $rect1b = $rect1a->copy();
+        $this->assertInstanceOf("WMRectangle", $rect1b);
+        $this->assertTrue($rect1a->identical($rect1b));
 
     }
 
     public function testBoundingBox()
     {
-        $bb1 = new WMBoundingBox();
+        $boundingbox1 = new WMBoundingBox();
 
-        $bb1->addPoint(0, 0);
+        $boundingbox1->addPoint(0, 0);
 
-        $this->assertEquals("[(0.000000,0.000000)x(0.000000,0.000000)]", "$bb1");
+        $this->assertEquals("[(0.000000,0.000000)x(0.000000,0.000000)]", "$boundingbox1");
 
-        $bb1->addPoint(10, 0);
-        $bb1->addPoint(-10, 0);
-        $bb1->addPoint(10, 10);
-        $bb1->addPoint(-10, -10);
+        $boundingbox1->addPoint(10, 0);
+        $boundingbox1->addPoint(-10, 0);
+        $boundingbox1->addPoint(10, 10);
+        $boundingbox1->addPoint(-10, -10);
 
-        $this->assertEquals("[(-10.000000,-10.000000)x(10.000000,10.000000)]", "$bb1");
+        $this->assertEquals("[(-10.000000,-10.000000)x(10.000000,10.000000)]", "$boundingbox1");
 
-        $r = $bb1->getBoundingRectangle();
+        $rect1 = $boundingbox1->getBoundingRectangle();
 
-        $this->assertEquals("[(-10.000000,-10.000000)x(10.000000,10.000000)]", "$r");
+        $this->assertEquals("[(-10.000000,-10.000000)x(10.000000,10.000000)]", "$rect1");
 
     }
 

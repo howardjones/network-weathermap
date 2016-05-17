@@ -63,7 +63,12 @@
  */
 function file_link($filename, $description)
 {
-    printf("<a href='%s'>%s</a> (%s) ", $filename, htmlspecialchars($description), file_age($filename));
+    if (file_exists($filename)) {
+        printf("<a href='%s'>%s</a> (%s) ", $filename, htmlspecialchars($description), file_age($filename));
+    } else {
+        printf("%s is missing", $filename);
+    }
+
 }
 
 /**

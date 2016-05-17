@@ -456,7 +456,7 @@ class WeatherMapScale extends WeatherMapItem
         // $this->myimagestring($gdScaleImage, $font, 4, 4 + $tileHeight, $title, $this->colourtable['KEYTEXT']->gdAllocate($gdScaleImage));
         $fontObject->drawImageString($gdScaleImage, 4, 4 + $tileHeight, $title, $this->keytextcolour->gdAllocate($gdScaleImage));
 
-        $i = 1;
+        $rowNumber = 1;
 
         foreach ($this->colours as $key => $scaleEntry) {
             if (!isset($scaleEntry['special']) || $scaleEntry['special'] == 0) {
@@ -465,7 +465,7 @@ class WeatherMapScale extends WeatherMapItem
                 wm_debug(sprintf("%f-%f (%f)  %s\n", $scaleEntry['bottom'], $scaleEntry['top'], $value, $scaleEntry['c1']));
 
                 if (($hide_zero == 0) || $key != '0_0') {
-                    $y = $tileSpacing * $i + 8;
+                    $y = $tileSpacing * $rowNumber + 8;
                     $x = 6;
 
                     $fudgeFactor = 0;
@@ -479,15 +479,15 @@ class WeatherMapScale extends WeatherMapItem
                     if (isset($scaleEntry['c2']) && ! $scaleEntry['c1']->equals($scaleEntry['c2'])) {
                         for ($n = 0; $n <= $tileWidth; $n++) {
                             $value = $fudgeFactor + $scaleEntry['bottom'] + ($n / $tileWidth) * ($scaleEntry['top'] - $scaleEntry['bottom']);
-                            list($ccol,) = $this->findScaleHit($value);
-                            $col = $ccol->gdallocate($gdScaleImage);
-                            imagefilledrectangle($gdScaleImage, $x + $n, $y, $x + $n, $y + $tileHeight, $col);
+                            list($entryColour,) = $this->findScaleHit($value);
+                            $gdColourRef = $entryColour->gdallocate($gdScaleImage);
+                            imagefilledrectangle($gdScaleImage, $x + $n, $y, $x + $n, $y + $tileHeight, $gdColourRef);
                         }
                     } else {
                         // pick a value in the middle...
-                        list($ccol,) = $this->findScaleHit($value);
-                        $col = $ccol->gdallocate($gdScaleImage);
-                        imagefilledrectangle($gdScaleImage, $x, $y, $x + $tileWidth, $y + $tileHeight, $col);
+                        list($entryColour,) = $this->findScaleHit($value);
+                        $gdColourRef = $entryColour->gdallocate($gdScaleImage);
+                        imagefilledrectangle($gdScaleImage, $x, $y, $x + $tileWidth, $y + $tileHeight, $gdColourRef);
                     }
 
                     if ($useTags) {
@@ -502,7 +502,7 @@ class WeatherMapScale extends WeatherMapItem
                         }
                     }
                     $fontObject->drawImageString($gdScaleImage, $x + 4 + $tileWidth, $y + $tileHeight, $labelString, $this->keytextcolour->gdAllocate($gdScaleImage));
-                    $i++;
+                    $rowNumber++;
                 }
             }
         }
@@ -521,8 +521,8 @@ class WeatherMapScale extends WeatherMapItem
 
         $fontObject = $this->keyfont;
 
-        $x = 0;
-        $y = 0;
+//        $x = 0;
+//        $y = 0;
 
         $scaleFactor = $keyHeight / 100;
 
@@ -586,7 +586,7 @@ class WeatherMapScale extends WeatherMapItem
             list($col,) = $this->findScaleHit($percentage);
 
             if ($col->isRealColour()) {
-                $cc = $col->gdAllocate($gdScaleImage);
+                $gdColourRef = $col->gdAllocate($gdScaleImage);
 //                imagefilledrectangle($gdScaleImage,
 //                    $scale_left,
 //                    $scale_top + $delta_y - $scalefactor / 2,
@@ -598,7 +598,7 @@ class WeatherMapScale extends WeatherMapItem
                     $scaleTop + $deltaY - $scaleFactor/2,
                     $scaleRight,
                     $scaleTop + $deltaY + $scaleFactor/2,
-                    $cc
+                    $gdColourRef
                 );
             }
         }
@@ -673,8 +673,8 @@ class WeatherMapScale extends WeatherMapItem
             list($col,) = $this->findScaleHit($percentage);
 
             if ($col->isRealColour()) {
-                $cc = $col->gdAllocate($gdScaleImage);
-                imagefilledrectangle($gdScaleImage, $scaleLeft + $xOffset - $scaleFactor / 2, $scaleTop, $scaleLeft + $xOffset + $scaleFactor / 2, $scaleBottom, $cc);
+                $gdColourRef = $col->gdAllocate($gdScaleImage);
+                imagefilledrectangle($gdScaleImage, $scaleLeft + $xOffset - $scaleFactor / 2, $scaleTop, $scaleLeft + $xOffset + $scaleFactor / 2, $scaleBottom, $gdColourRef);
             }
         }
 
@@ -702,19 +702,19 @@ class WeatherMapScale extends WeatherMapItem
         usort($this->colours, array("WeatherMapScale", "scaleEntrySort"));
     }
 
-    private function scaleEntrySort($a, $b)
+    private function scaleEntrySort($left, $right)
     {
-        if ($a['bottom'] == $b['bottom']) {
-            if ($a['top'] < $b['top']) {
+        if ($left['bottom'] == $right['bottom']) {
+            if ($left['top'] < $right['top']) {
                 return -1;
             }
-            if ($a['top'] > $b['top']) {
+            if ($left['top'] > $right['top']) {
                 return 1;
             }
             return 0;
         }
 
-        if ($a['bottom'] < $b['bottom']) {
+        if ($left['bottom'] < $right['bottom']) {
             return -1;
         }
 

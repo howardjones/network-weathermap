@@ -992,11 +992,6 @@
             $nothing = imagecolorallocatealpha($node_im, 128, 0, 0, 0);
             imagefill($node_im, 0, 0, $nothing);
 
-<<<<<<< HEAD
-        if ($labelObj) {
-            $labelObj->translate(-$bbox_x1 + $deltaX + $this->labeloffsetx, -$bbox_y1 + $deltaY + $this->labeloffsety);
-        }
-=======
 //            $label_x1 -= $bbox_x1;
 //            $label_x2 -= $bbox_x1;
 //            $label_y1 -= $bbox_y1;
@@ -1008,7 +1003,6 @@
             // used in draw() to position the whole node image around the centre point
             $this->centre_x = $this->x - $this->boundingboxes[0]->width()/2;
             $this->centre_y = $this->y - $this->boundingboxes[0]->height()/2;
->>>>>>> c9f8315dba2093e7186f6c5a30cd00b1393c390b
 
             // Draw the icon, if any
             if (isset($iconImageRef)) {

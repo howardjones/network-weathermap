@@ -1,4 +1,8 @@
-<project name="network-weathermap" default="full-build">
+<project name="network-weathermap" default="full-build-parallel">
+
+     <property name="WEATHERMAPVERSION" value="1.0.0pre"/>
+     <buildnumber file="weathermap.build.number"/>
+
      <property name="pdepend" value="${basedir}/vendor/bin/pdepend"/>
      <property name="phpcpd"  value="${basedir}/vendor/bin/phpcpd"/>
      <property name="phpcs"   value="${basedir}/vendor/bin/phpcs"/>
@@ -14,6 +18,45 @@
     <!--
      Adjust the threadCount attribute's value to the number of CPUs
     -->
+
+    <target name="dist-prep" depends="clean">
+        <mkdir dir="dist/${WEATHERMAPVERSION}" />
+        <mkdir dir="dist/${WEATHERMAPVERSION}/weathermap" />
+    </target>
+
+    <target name="dist-main" depends="dist-prep">
+    </target>
+
+    <target name="dist-with-tests" depends="dist-main">
+
+    </target>
+
+    <target name="dist" depends="dist-main,dist-with-tests,manual" description="Create the tar and zip artifacts for download"/>
+
+    <target name="archive-zip">
+        <zip destfile="dist/php-weathermap-${WEATHERMAPVERSION}.zip" basedir="dist/${WEATHERMAPVERSION}/weathermap" />
+    </target>
+
+    <target name="archive-tar">
+        <tar destfile="dist/php-weathermap-${WEATHERMAPVERSION}.tgz" compression="gzip" basedir="dist/${WEATHERMAPVERSION}/weathermap" />
+    </target>
+
+    <target name="dist-archives" depends="dist,archive-zip,archive-tar" />
+
+    <target name="manual-contents-page">
+	<copy file="docs/src/contents.xml-base" tofile="docs/src/contents.xml"/>
+	<xslt basedir="docs/src" destdir="docs/src" in="docs/src/index.xml" out="docs/src/contents.xml" style="docs/src/contents.xsl">
+		<sysproperty key="org.apache.xerces.xni.parser.XMLParserConfiguration"
+                 value="org.apache.xerces.parsers.XIncludeParserConfiguration"/>
+	</xslt>
+	</target>
+
+    <target name="manual-main" depends="manual-contents-page" />
+
+    <target name="manual-links" depends="manual-main" />
+
+    <target name="manual" depends="manual-links" />
+
     <target name="static-analysis-parallel" description="Performs static analysis (executing the tools in parallel)">
         <parallel threadCount="4">
             <sequential>
@@ -32,6 +75,7 @@
         <delete dir="${basedir}/build/logs"/>
         <delete dir="${basedir}/build/pdepend"/>
         <delete dir="${basedir}/build/phpdox"/>
+        <delete dir="${basedir}/dist"/>
         <property name="clean.done" value="true"/>
     </target>
     <target name="prepare" unless="prepare.done" depends="clean" description="Prepare for build">
@@ -40,12 +84,13 @@
         <mkdir dir="${basedir}/build/logs"/>
         <mkdir dir="${basedir}/build/pdepend"/>
         <mkdir dir="${basedir}/build/phpdox"/>
+        <mkdir dir="${basedir}/dist/weathermap"/>
         <property name="prepare.done" value="true"/>
     </target>
     <target name="lint" unless="lint.done" description="Perform syntax check of sourcecode files">
         <apply executable="php" taskname="lint">
             <arg value="-l"/>
-            <fileset dir="${basedir}/lib">
+            <fileset dir="${basedir}/src">
                 <include name="**/*.php"/>
                 <modified/>
             </fileset>
@@ -59,7 +104,7 @@
     <target name="phploc" unless="phploc.done" description="Measure project size using PHPLOC and print human readable output. Intended for usage on the command line.">
         <exec executable="${phploc}" taskname="phploc">
             <arg value="--count-tests"/>
-            <arg path="${basedir}/lib"/>
+            <arg path="${basedir}/src"/>
             <arg path="${basedir}/Tests"/>
         </exec>
         <property name="phploc.done" value="true"/>
@@ -71,7 +116,7 @@
             <arg path="${basedir}/build/logs/phploc.csv"/>
             <arg value="--log-xml"/>
             <arg path="${basedir}/build/logs/phploc.xml"/>
-            <arg path="${basedir}/lib"/>
+            <arg path="${basedir}/src"/>
             <arg path="${basedir}/Tests"/>
         </exec>
         <property name="phploc.done" value="true"/>
@@ -81,13 +126,13 @@
             <arg value="--jdepend-xml=${basedir}/build/logs/jdepend.xml"/>
             <arg value="--jdepend-chart=${basedir}/build/pdepend/dependencies.svg"/>
             <arg value="--overview-pyramid=${basedir}/build/pdepend/overview-pyramid.svg"/>
-            <arg path="${basedir}/lib"/>
+            <arg path="${basedir}/src"/>
         </exec>
         <property name="pdepend.done" value="true"/>
     </target>
     <target name="phpmd" unless="phpmd.done" description="Perform project mess detection using PHPMD and print human readable output. Intended for usage on the command line before committing.">
         <exec executable="${phpmd}" taskname="phpmd">
-            <arg path="${basedir}/lib"/>
+            <arg path="${basedir}/src"/>
             <arg value="text"/>
             <arg path="${basedir}/build/phpmd.xml"/>
         </exec>
@@ -95,7 +140,7 @@
     </target>
     <target name="phpmd-ci" unless="phpmd.done" depends="prepare" description="Perform project mess detection using PHPMD and log result in XML format. Intended for usage within a continuous integration environment.">
         <exec executable="${phpmd}" taskname="phpmd">
-            <arg path="${basedir}/lib"/>
+            <arg path="${basedir}/src"/>
             <arg value="xml"/>
             <arg path="${basedir}/build/phpmd.xml"/>
             <arg value="--reportfile"/>
@@ -108,7 +153,7 @@
             <arg value="--standard=PSR2"/>
             <arg value="--extensions=php"/>
             <arg value="--ignore=autoload.php"/>
-            <arg path="${basedir}/lib"/>
+            <arg path="${basedir}/src"/>
             <arg path="${basedir}/Tests"/>
         </exec>
         <property name="phpcs.done" value="true"/>
@@ -120,14 +165,14 @@
             <arg value="--standard=PSR2"/>
             <arg value="--extensions=php"/>
             <arg value="--ignore=autoload.php"/>
-            <arg path="${basedir}/lib"/>
+            <arg path="${basedir}/src"/>
             <arg path="${basedir}/Tests"/>
         </exec>
         <property name="phpcs.done" value="true"/>
     </target>
     <target name="phpcpd" unless="phpcpd.done" description="Find duplicate code using PHPCPD and print human readable output. Intended for usage on the command line before committing.">
         <exec executable="${phpcpd}" taskname="phpcpd">
-            <arg path="${basedir}/lib"/>
+            <arg path="${basedir}/src"/>
         </exec>
         <property name="phpcpd.done" value="true"/>
     </target>
@@ -135,7 +180,7 @@
         <exec executable="${phpcpd}" taskname="phpcpd">
             <arg value="--log-pmd"/>
             <arg path="${basedir}/build/logs/pmd-cpd.xml"/>
-            <arg path="${basedir}/lib"/>
+            <arg path="${basedir}/src"/>
         </exec>
         <property name="phpcpd.done" value="true"/>
     </target>

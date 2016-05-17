@@ -1,6 +1,6 @@
 <?php
 
-require_once dirname(__FILE__) . '/../lib/poller-common.php';
+require_once dirname(__FILE__) . '/../src/lib/poller-common.php';
 
 class RunnerTest extends PHPUnit_Framework_TestCase {
 

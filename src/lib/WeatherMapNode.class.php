@@ -48,15 +48,15 @@ class WMNodeImageIcon extends WMNodeIcon
 {
     public function __construct($node)
     {
-        parent::__construct();
+        parent::__construct($node);
     }
 
     public function preRender()
     {
-        $realiconfile = $this->map->ProcessString($this->iconfile, $this);
+        $realiconfile = $this->node->owner->ProcessString($this->iconfile, $this);
 
         if (is_readable($realiconfile)) {
-            imagealphablending($im, true);
+            ///// imagealphablending($mapImageRef, true);
 
             // draw the supplied icon, instead of the labelled box
             $iconImageRef = imagecreatefromfile($realiconfile);
@@ -990,8 +990,9 @@ class WeatherMapNode extends WeatherMapDataItem
         $icon_x1 -= $bbox_x1;
         $icon_y1 -= $bbox_y1;
 
-
-        $labelObj->translate( -$bbox_x1 + $deltaX + $this->labeloffsetx, -$bbox_y1 + $deltaY + $this->labeloffsety);
+        if ($labelObj) {
+            $labelObj->translate(-$bbox_x1 + $deltaX + $this->labeloffsetx, -$bbox_y1 + $deltaY + $this->labeloffsety);
+        }
 
         // Draw the icon, if any
         if (isset($iconImageRef)) {

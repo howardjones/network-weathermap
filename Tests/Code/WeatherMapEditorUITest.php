@@ -1,8 +1,8 @@
 <?php
 
-require_once dirname(__FILE__) . '/../../lib/all.php';
-require_once dirname(__FILE__) . '/../../lib/WeatherMapEditor.class.php';
-require_once dirname(__FILE__) . '/../../lib/WeatherMapEditorUI.class.php';
+require_once dirname(__FILE__) . '/../../src/lib/all.php';
+require_once dirname(__FILE__) . '/../../src/lib/WeatherMapEditor.class.php';
+require_once dirname(__FILE__) . '/../../src/lib/WeatherMapEditorUI.class.php';
 
 class WeatherMapEditorUITest extends PHPUnit_Framework_TestCase {
     function testParameterValidation()
@@ -22,8 +22,8 @@ class WeatherMapEditorUITest extends PHPUnit_Framework_TestCase {
         $this->assertFalse($ui->validateArgument("mapfile", "simple.map"));
         $this->assertFalse($ui->validateArgument("mapfile", ".htaccess"));
         $this->assertFalse($ui->validateArgument("mapfile", "index.php"));
-        $this->assertFalse($ui->validateArgument("mapfile", "../lib/test.conf"));
-        $this->assertFalse($ui->validateArgument("mapfile", "../lib/test.php"));
+        $this->assertFalse($ui->validateArgument("mapfile", "../src/lib/test.conf"));
+        $this->assertFalse($ui->validateArgument("mapfile", "../src/lib/test.php"));
 
         $this->assertFalse($ui->validateArgument("name", "two words"));
         $this->assertTrue($ui->validateArgument("name", "oneword"));

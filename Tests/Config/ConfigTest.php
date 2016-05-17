@@ -1,6 +1,6 @@
 <?php
 
-require_once dirname(__FILE__).'/../../lib/all.php';
+require_once dirname(__FILE__).'/../../src/lib/all.php';
 include_once dirname(__FILE__)."/../WMTestSupport.class.php";
 
 class ConfigTest extends PHPUnit_Framework_TestCase

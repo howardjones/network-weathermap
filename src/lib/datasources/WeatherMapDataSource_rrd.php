@@ -44,9 +44,9 @@ class WeatherMapDataSource_rrd extends WeatherMapDataSource
 
     function Recognise($targetString)
     {
-        if (preg_match("/^(.*\.rrd):([\-a-zA-Z0-9_]+):([\-a-zA-Z0-9_]+)$/", $targetString, $matches)) {
+        if (preg_match('/^(.*\.rrd):([\-a-zA-Z0-9_]+):([\-a-zA-Z0-9_]+)$/', $targetString, $matches)) {
             return true;
-        } elseif (preg_match("/^(.*\.rrd)$/", $targetString, $matches)) {
+        } elseif (preg_match('/^(.*\.rrd)$/', $targetString, $matches)) {
             return true;
         } else {
             return false;
@@ -414,7 +414,7 @@ class WeatherMapDataSource_rrd extends WeatherMapDataSource
             $multiplier = 1;
         }
 
-        if (preg_match("/^scale:([+-]?\d*\.?\d*):(.*)/", $rrdfile, $matches)) {
+        if (preg_match('/^scale:([+-]?\d*\.?\d*):(.*)/', $rrdfile, $matches)) {
             $rrdfile = $matches[2];
             $multiplier = $matches[1];
         }
@@ -423,7 +423,7 @@ class WeatherMapDataSource_rrd extends WeatherMapDataSource
 
         // try and make a complete path, if we've been given a clue
         // (if the path starts with a . or a / then assume the user knows what they are doing)
-        if (!preg_match("/^(\/|\.)/", $rrdfile)) {
+        if (!preg_match('/^(\/|\.)/', $rrdfile)) {
             $rrdbase = $map->get_hint('rrd_default_path');
             if ($rrdbase !== null) {
                 $rrdfile = $rrdbase."/".$rrdfile;

@@ -1145,9 +1145,9 @@ class WeatherMap extends WeatherMapBase
         $string = $keyword;
 
         for ($i=0; $i<count($fieldnames); $i++) {
-            $string .= " " . $object1->$fieldnames[$i];
+            $string .= " " . $object1->{$fieldnames[$i]};
 
-            if ($object1->$fieldnames[$i] != $object2[$fieldnames[$i]]) {
+            if ($object1->{$fieldnames[$i]} != $object2[$fieldnames[$i]]) {
                 $write = true;
             }
         }

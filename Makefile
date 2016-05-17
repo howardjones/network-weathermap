@@ -29,8 +29,8 @@ release: sql
 	# Add in test code, and repackage
 	tar cTf packing.list-tests - | (cd $(RELDIR); tar xvf -)
 	mkdir -p $(RELDIR)/test-suite/diffs
-	cd $(RELBASE); zip -r $(RELNAME)-tests.zip weathermap/*
-	cd $(RELBASE); tar cvfz $(RELNAME)-tests.tgz weathermap
+	cd $(RELBASE); zip -r $(RELNAME)-with-tests.zip weathermap/*
+	cd $(RELBASE); tar cvfz $(RELNAME)-with-tests.tgz weathermap
 	# rm -rf $(RELDIR)
 	echo $(RENAME) built in $(RELBASE)
 	# copy the results into the Vagrant shared directory, ready for test installations

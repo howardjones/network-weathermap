@@ -4,635 +4,6 @@
 // http://www.network-weathermap.com/
 // Released under the GNU Public License
 
-class WMNodeIcon
-{
-    protected $type;
-    protected $boundingBox;
-    protected $node;
-
-    protected $widthScale;
-    protected $heightScale;
-
-    protected $iconImageRef;
-
-    protected $iconFileName;
-
-    public function __construct($node)
-    {
-        $this->type = "";
-        $this->node = $node;
-        $this->boundingBox = new WMBoundingBox("Icon for $node->name");
-        $this->boundingBox->addPoint(0, 0);
-
-        $this->iconFileName = $node->iconfile;
-        $this->widthScale = $node->iconscalew;
-        $this->heightScale = $node->iconscaleh;
-        $this->iconImageRef = null;
-    }
-
-    public function calculateGeometry()
-    {
-
-    }
-
-    public function draw($targetImageRef)
-    {
-        $boundingBox = $this->getBoundingBox();
-
-        $icon_x = -($boundingBox->width() / 2);
-        $icon_y = -($boundingBox->height() / 2);
-
-        wm_debug("Drawing into icon at $icon_x, $icon_y\n");
-
-        imagecopy($targetImageRef, $this->iconImageRef, $icon_x, $icon_y, 0, 0,
-            imagesx($this->iconImageRef),
-            imagesy($this->iconImageRef));
-        imagedestroy($this->iconImageRef);
-    }
-
-    public function getBoundingBox()
-    {
-        $iconImageRef = $this->iconImageRef;
-
-        if ($iconImageRef) {
-            $iconHalfWidth = imagesx($iconImageRef) / 2;
-            $iconHalfHeight = imagesy($iconImageRef) / 2;
-            $iconRect = new WMRectangle(-$iconHalfWidth, -$iconHalfHeight, $iconHalfWidth, $iconHalfHeight);
-        } else {
-            $iconRect = new WMRectangle(0, 0, 0, 0);
-        }
-
-        return $iconRect;
-    }
-
-    public function getImageRef()
-    {
-        return $this->iconImageRef;
-    }
-}
-
-class WMNodeImageIcon extends WMNodeIcon
-{
-    public function __construct($node)
-    {
-        parent::__construct($node);
-    }
-
-    public function preRender($iconFile, $scaleWidth = null, $scaleHeight = null)
-    {
-
-        if (is_readable($iconFile)) {
-            // TODO - this should be in Draw(), not here.
-            // imagealphablending($im, true);
-
-            // draw the supplied icon, instead of the labelled box
-            $this->iconImageRef = imagecreatefromfile($iconFile);
-
-            if (true === isset($this->iconFillColour)) {
-                $this->colourizeImage($this->iconImageRef, $this->iconFillColour);
-            }
-
-            if ($this->iconImageRef) {
-                $iconWidth = imagesx($this->iconImageRef);
-                $iconHeight = imagesy($this->iconImageRef);
-
-                if (($scaleWidth * $scaleHeight) > 0) {
-                    wm_debug("If this is the last thing in your logs, you probably have a buggy GD library. Get > 2.0.33 or use PHP builtin.\n");
-
-                    imagealphablending($this->iconImageRef, true);
-
-                    // figure out which dimension to use when scaling the icon, so that it is all still visible
-                    wm_debug("SCALING ICON here\n");
-                    if ($iconWidth > $iconHeight) {
-                        $scaleFactor = $iconWidth / $scaleWidth;
-                    } else {
-                        $scaleFactor = $iconHeight / $scaleHeight;
-                    }
-                    $newWidth = $iconWidth / $scaleFactor;
-                    $newHeight = $iconHeight / $scaleFactor;
-
-                    // Scale, and replace the original image with the scaled one
-                    $scaledImage = imagecreatetruecolor($newWidth, $newHeight);
-                    imagealphablending($scaledImage, false);
-                    imagecopyresampled($scaledImage, $this->iconImageRef, 0, 0, 0, 0, $newWidth, $newHeight, $iconWidth,
-                        $iconHeight);
-                    imagedestroy($this->iconImageRef);
-                    $this->iconImageRef = $scaledImage;
-                }
-            } else {
-                throw new WeathermapRuntimeWarning("Couldn't open ICON: '" . $iconFile . "' - is it a PNG, JPEG or GIF? [WMWARN37]");
-                //    wm_warn("Couldn't open ICON: '" . $realiconfile . "' - is it a PNG, JPEG or GIF? [WMWARN37]\n");
-            }
-        } else {
-            if ($iconFile != 'none') {
-                throw new WeathermapRuntimeWarning("ICON '" . $iconFile . "' does not exist, or is not readable. Check path and permissions. [WMARN38]");
-                // wm_warn("ICON '" . $realiconfile . "' does not exist, or is not readable. Check path and permissions. [WMARN38]\n");
-            }
-        }
-    }
-}
-
-class WMNodeArtificialIcon extends WMNodeIcon
-{
-    protected $aiconFillColour;
-    protected $aiconInkColour;
-
-    protected $iconFillColour;
-    // protected $aiconOutlineColour; // ???
-    protected $labelFillColour;
-
-
-    private static $types = array(
-        'rbox' => "WMNodeRoundedBoxIcon",
-        'round' => "WMNodeRoundIcon",
-        'box' => "WMNodeBoxIcon",
-        'inpie' => "WMNodePieIcon",
-        'outpie' => "WMNodePieIcon",
-        #'gauge' => "",
-        'nink' => "WMNodeNINKIcon"
-    );
-
-    public function __construct($node, $aiconInkColour, $aiconFillColour, $iconFillColour, $labelFillColour)
-    {
-        parent::__construct($node);
-
-        $this->iconFileName = $node->iconfile;
-        $this->widthScale = $node->iconscalew;
-        $this->heightScale = $node->iconscaleh;
-        $this->name = $node->name;
-
-        if (!self::isAICONName($this->iconFileName)) {
-            throw new WeathermapRuntimeWarning("AICON with invalid type");
-        }
-
-        // $this->aiconOutlineColour = $aiconOutlineColour;
-        $this->aiconFillColour = $aiconFillColour;
-        $this->iconFillColour = $iconFillColour;
-        $this->aiconInkColour = $aiconInkColour;
-        $this->labelFillColour = $labelFillColour;
-    }
-
-    public static function isAICONName($name)
-    {
-        return array_key_exists($name, self::$types);
-    }
-
-    public static function createAICON(
-        $name,
-        $node,
-        $aiconInkColour,
-        $aiconFillColour,
-        $iconFillColour,
-        $labelFillColour
-    ) {
-        $class = self::$types{$name};
-
-        $iconObj = new $class($node, $aiconInkColour, $aiconFillColour, $iconFillColour,
-            $labelFillColour);
-
-        return $iconObj;
-    }
-
-    public function drawAIcon()
-    {
-
-    }
-
-    public function preRender()
-    {
-        wm_debug("Artificial Icon type " . $this->iconFileName . " for $this->name\n");
-        // this is an artificial icon - we don't load a file for it
-
-        $this->createEmptyImage();
-
-        $fill = $this->aiconFillColour;
-        $ink = $this->aiconInkColour;
-
-//        // if useiconscale isn't set, then use the static colour defined, or copy the colour from the label
-//        if ($this->useiconscale == "none") {
-//            if ($aiconFillColour->isCopy() && !$labelFillColour->isNone()) {
-//                $fill = $labelFillColour;
-//            } else {
-//                if ($aiconFillColour->isRealColour()) {
-//                    $fill = $aiconFillColour;
-//                }
-//            }
-//        } else {
-//            // if useiconscale IS defined, use that to figure out the fill colour
-//
-//            $fill = $iconFillColour;
-//        }
-
-//        // support 'none' and 'copy' for AICON outlines too
-//        if (!$this->aiconoutlinecolour->isNone() && $this->aiconoutlinecolor->isCopy()) {
-//            $ink = $labelFillColour;
-//        } else {
-//            if ($aiconOutlineColour->isRealColour()) {
-//                $ink = $aiconInkColour;
-//            }
-//        }
-
-        wm_debug("AICON colours are $ink and $fill\n");
-
-        $this->drawAIcon();
-
-    }
-
-
-    protected function createEmptyImage()
-    {
-        $this->iconImageRef = imagecreatetruecolor($this->widthScale, $this->heightScale);
-        imageSaveAlpha($this->iconImageRef, true);
-
-        $nothing = imagecolorallocatealpha($this->iconImageRef, 128, 0, 0, 127);
-        imagefill($this->iconImageRef, 0, 0, $nothing);
-    }
-
-
-}
-
-class WMNodeNINKIcon extends WMNodeArtificialIcon
-{
-    public function drawAIcon()
-    {
-        $iconImageRef = $this->iconImageRef;
-        $fill = $this->aiconFillColour;
-        $ink = $this->aiconInkColour;
-
-        $radiusX = $this->widthScale / 2 - 1;
-        $radiusY = $this->heightScale / 2 - 1;
-        $size = $this->widthScale;
-        $quarter = $size / 4;
-
-        $colour1 = $this->node->colours[OUT]->gdallocate($iconImageRef);
-        $colour2 = $this->node->colours[IN]->gdallocate($iconImageRef);
-
-        imagefilledarc($iconImageRef, $radiusX - 1, $radiusY, $size, $size, 270, 90, $colour1, IMG_ARC_PIE);
-        imagefilledarc($iconImageRef, $radiusX + 1, $radiusY, $size, $size, 90, 270, $colour2, IMG_ARC_PIE);
-
-        imagefilledarc($iconImageRef, $radiusX - 1, $radiusY + $quarter, $quarter * 2, $quarter * 2, 0, 360, $colour1,
-            IMG_ARC_PIE);
-        imagefilledarc($iconImageRef, $radiusX + 1, $radiusY - $quarter, $quarter * 2, $quarter * 2, 0, 360, $colour2,
-            IMG_ARC_PIE);
-
-        if ($ink !== null && !$ink->isNone()) {
-            // XXX - need a font definition from somewhere for NINK text
-            $font = 1;
-            $inkGD = $ink->gdallocate($iconImageRef);
-
-            $directions = array(
-                array("in", -1),
-                array("out", +1)
-            );
-
-            foreach ($directions as $direction) {
-                $name = $direction[0];
-                $label = $this->node->owner->ProcessString("{node:this:bandwidth_$name:%.1k}", $this->node);
-
-                list($twid, $thgt) = $this->node->owner->myimagestringsize($font, $label);
-                $this->node->owner->myimagestring($iconImageRef, $font, $radiusX - $twid / 2,
-                    $radiusY + $direction[1] * $quarter + ($thgt / 2), $label, $inkGD);
-            }
-
-            imageellipse($iconImageRef, $radiusX, $radiusY, $radiusX * 2, $radiusY * 2, $inkGD);
-        }
-    }
-}
-
-class WMNodeBoxIcon extends WMNodeArtificialIcon
-{
-    public function drawAIcon()
-    {
-        $iconImageRef = $this->iconImageRef;
-        $fill = $this->aiconFillColour;
-        $ink = $this->aiconInkColour;
-
-        if ($fill !== null && !$fill->isNone()) {
-            imagefilledrectangle($iconImageRef, 0, 0, $this->widthScale - 1, $this->heightScale - 1,
-                $fill->gdAllocate($iconImageRef));
-        }
-
-        if ($ink !== null && !$ink->isNone()) {
-            imagerectangle($iconImageRef, 0, 0, $this->widthScale - 1, $this->heightScale - 1,
-                $ink->gdallocate($iconImageRef));
-        }
-    }
-
-}
-
-class WMNodeRoundedBoxIcon extends WMNodeArtificialIcon
-{
-    public function drawAIcon()
-    {
-        $iconImageRef = $this->iconImageRef;
-        $fill = $this->aiconFillColour;
-        $ink = $this->aiconInkColour;
-
-        if ($fill !== null && !$fill->isNone()) {
-            imagefilledroundedrectangle($iconImageRef, 0, 0, $this->widthScale - 1, $this->heightScale - 1, 4,
-                $fill->gdAllocate($iconImageRef));
-        }
-
-        if ($ink !== null && !$ink->isNone()) {
-            imageroundedrectangle($iconImageRef, 0, 0, $this->widthScale - 1, $this->heightScale - 1, 4,
-                $ink->gdallocate($iconImageRef));
-        }
-    }
-
-}
-
-class WMNodeRoundIcon extends WMNodeArtificialIcon
-{
-    public function drawAIcon()
-    {
-        $iconImageRef = $this->iconImageRef;
-        $fill = $this->aiconFillColour;
-        $ink = $this->aiconInkColour;
-
-        $radiusX = $this->widthScale / 2 - 1;
-        $radiusY = $this->heightScale / 2 - 1;
-
-        if ($fill !== null && !$fill->isNone()) {
-            imagefilledellipse($iconImageRef, $radiusX, $radiusY, $radiusX * 2, $radiusY * 2,
-                $fill->gdAllocate($iconImageRef));
-        }
-
-        if ($ink !== null && !$ink->isNone()) {
-            imageellipse($iconImageRef, $radiusX, $radiusY, $radiusX * 2, $radiusY * 2,
-                $ink->gdallocate($iconImageRef));
-        }
-    }
-
-}
-
-class WMNodePieIcon extends WMNodeArtificialIcon
-{
-    public function drawAIcon()
-    {
-        $iconImageRef = $this->iconImageRef;
-        $fill = $this->aiconFillColour;
-        $ink = $this->aiconInkColour;
-
-        if ($this->iconFileName == 'inpie') {
-            $segment_angle = (($this->node->percentUsages[IN]) / 100) * 360;
-        }
-        if ($this->iconFileName == 'outpie') {
-            $segment_angle = (($this->node->percentUsages[OUT]) / 100) * 360;
-        }
-
-        $radiusX = $this->widthScale / 2 - 1;
-        $radiusY = $this->heightScale / 2 - 1;
-
-        if ($fill !== null && !$fill->isNone()) {
-            imagefilledellipse($iconImageRef, $radiusX, $radiusY, $radiusX * 2, $radiusY * 2,
-                $fill->gdAllocate($iconImageRef));
-        }
-
-        if ($ink !== null && !$ink->isNone()) {
-            imagefilledarc($iconImageRef, $radiusX, $radiusY, $radiusX * 2, $radiusY * 2, 0, $segment_angle,
-                $ink->gdallocate($iconImageRef), IMG_ARC_PIE);
-        }
-
-        if ($fill !== null && !$fill->isNone()) {
-            imageellipse($iconImageRef, $radiusX, $radiusY, $radiusX * 2, $radiusY * 2,
-                $fill->gdAllocate($iconImageRef));
-        }
-    }
-}
-
-class WMNodeLabel
-{
-    private $boundingBox;
-    private $node;
-    private $map;
-
-    private $textPosition;
-    private $labelPosition;
-    private $labelAngle;
-    private $labelString;
-    private $labelFont;
-    private $labelRectangle;
-
-    private $x;
-    private $y;
-    private $name;
-
-    private $labelFillColour;
-    private $labelOutlineColour;
-    private $labelShadowColour;
-    private $labelTextColour;
-    private $selectedColour;
-
-    private $stringHeight;
-    private $stringWidth;
-
-    public function __construct($node)
-    {
-        $this->node = $node;
-        $this->map = $node->owner;
-
-        $position = $node->getPosition();
-
-        $this->boundingBox = new WMBoundingBox("Label for $node->name");
-        $this->boundingBox->addWMPoint($position);
-        $this->textPosition = $position;
-        $this->labelPosition = $position;
-        $this->labelAngle = $node->labelangle;
-
-        $this->x = $position->x;
-        $this->y = $position->y;
-        $this->name = $node->name;
-    }
-
-    public function getBoundingBox()
-    {
-        return $this->boundingBox->getBoundingRectangle();
-    }
-
-    /**
-     * Calculate the bounding box of the label, centred around 0,0 so it can be used to position the
-     * label relative to the icon (if there is one) by the parent Node drawing function. Only the label
-     * needs to know how text is laid out - the node should just see boxes (via getBoundingBox)
-     *
-     * @param $labelString
-     * @param $labelFont
-     */
-    public function calculateGeometry($labelString, $labelFont)
-    {
-        $this->labelFont = $labelFont;
-        $this->labelString = $labelString;
-
-        list($stringWidth, $stringHeight) = $this->map->myimagestringsize($labelFont, $labelString);
-
-        $stringHalfHeight = $stringHeight / 2;
-        $stringHalfWidth = $stringWidth / 2;
-
-        $this->textPosition = new WMPoint(0, 0);
-
-        wm_debug("Node->Label->pre_render: centred: $this->textPosition\n");
-
-        $this->stringHeight = $stringHeight;
-        $this->stringWidth = $stringHalfWidth;
-        $this->calculateOutlineGeometry();
-
-        if ($this->labelAngle == 90) {
-            $this->textPosition = new WMPoint($stringHalfHeight, $stringHalfWidth);
-//                $this->translate($stringHalfHeight, $stringHalfWidth);
-        }
-
-        if ($this->labelAngle == 270) {
-            $this->textPosition = new WMPoint(-$stringHalfHeight, -$stringHalfWidth);
-//                $this->translate(-$stringHalfHeight, -$stringHalfWidth);
-        }
-
-        if ($this->labelAngle == 0) {
-            $this->textPosition = new WMPoint(-$stringHalfWidth, -$stringHalfHeight);
-//                $this->translate(-$stringHalfWidth, -$stringHalfHeight);
-        }
-
-        if ($this->labelAngle == 180) {
-            $this->textPosition = new WMPoint($stringHalfWidth, $stringHalfHeight);
-//                $this->translate($stringHalfWidth, $stringHalfHeight);
-        }
-        wm_debug("Node->Label->pre_render: final: $this->textPosition\n");
-
-        wm_debug("Node->Label->pre_render: " . $this->name . " Label Metrics are: $stringWidth x $stringHeight\n");
-
-        $this->boundingBox->addRectangle($this->labelRectangle);
-
-    }
-
-    public function translate($deltaX, $deltaY)
-    {
-        $this->textPosition->translate($deltaX, $deltaY);
-        wm_debug("Node->Label: translated by $deltaX, $deltaY: $this->textPosition\n");
-        $this->calculateOutlineGeometry();
-    }
-
-    public function preRender(
-        $labelFillColour,
-        $labelOutlineColour,
-        $labelShadowColour,
-        $labelTextColour,
-        $selectedColour
-    ) {
-        $this->labelFillColour = $labelFillColour;
-        $this->labelOutlineColour = $labelOutlineColour;
-        $this->labelShadowColour = $labelShadowColour;
-        $this->labelTextColour = $labelTextColour;
-        $this->selectedColour = $selectedColour;
-    }
-
-    public function draw($imageRef, $centre_x, $centre_y)
-    {
-        $txt_x = $this->textPosition->x;
-        $txt_y = $this->textPosition->y;
-
-        wm_debug("$this->labelRectangle + $centre_x + $centre_y\n");
-
-        // XXX - this had better be temporary!
-        $label_x1 = $this->labelRectangle->topLeft->x + $centre_x;
-        $label_y1 = $this->labelRectangle->topLeft->y + $centre_y;
-        $label_x2 = $this->labelRectangle->bottomRight->x + $centre_x;
-        $label_y2 = $this->labelRectangle->bottomRight->y + $centre_y;
-
-        wm_debug("DRAW FINAL TXT $txt_x,$txt_y\n");
-        wm_debug("DRAW FINAL RECT $label_x1,$label_y1-$label_x2,$label_y2\n");
-
-        // if there's an icon, then you can choose to have no background
-
-        if (!$this->labelFillColour->isNone()) {
-            imagefilledrectangle($imageRef, $label_x1, $label_y1, $label_x2, $label_y2,
-                $this->labelFillColour->gdAllocate($imageRef));
-        }
-
-        if ($this->node->selected) {
-            imagerectangle($imageRef, $label_x1, $label_y1, $label_x2, $label_y2, $this->selectedColour);
-            // would be nice if it was thicker, too...
-            imagerectangle($imageRef, $label_x1 + 1, $label_y1 + 1, $label_x2 - 1, $label_y2 - 1,
-                $this->selectedColour);
-        } else {
-            // $label_outline_colour = $this->labeloutlinecolour;
-            if ($this->labelOutlineColour->isRealColour()) {
-                imagerectangle($imageRef, $label_x1, $label_y1, $label_x2, $label_y2,
-                    $this->labelOutlineColour->gdallocate($imageRef));
-            }
-        }
-
-        if ($this->labelShadowColour->isRealColour()) {
-            $this->node->owner->myimagestring(
-                $imageRef,
-                $this->labelFont,
-                $txt_x + 1 + $centre_x,
-                $txt_y + 1 + $centre_y,
-                $this->labelString,
-                $this->labelShadowColour->gdallocate($imageRef),
-                $this->labelAngle
-            );
-        }
-
-        $txcol = $this->labelTextColour;
-
-        if ($txcol->isContrast()) {
-            if ($this->labelFillColour->isRealColour()) {
-                $txcol = $this->labelFillColour->getContrastingColour();
-            } else {
-                wm_warn("You can't make a contrast with 'none' - guessing black. [WMWARN43]\n");
-                $txcol = new WMColour(0, 0, 0);
-            }
-        }
-
-        $this->map->myimagestring(
-            $imageRef,
-            $this->labelFont,
-            $txt_x + $centre_x,
-            $txt_y + $centre_y,
-            $this->labelString,
-            $txcol->gdAllocate($imageRef),
-            $this->labelAngle
-        );
-    }
-
-    /**
-     * Calculate the surrounding rectangle for a given size of text.
-     *
-     * @param $stringHeight
-     * @param $stringWidth
-     *
-     * @return array
-     */
-    private function calculateOutlineGeometry()
-    {
-        $stringHeight = $this->stringHeight;
-        $stringWidth = $this->stringWidth;
-
-        $padding = 4.0;
-        $padFactor = 1.0;
-
-        if ($this->labelAngle == 90 || $this->labelAngle == 270) {
-            $boxWidth = ($stringHeight * $padFactor) + $padding;
-            $boxHeight = ($stringWidth * $padFactor) + $padding;
-        } else {
-            $boxWidth = ($stringWidth * $padFactor) + $padding;
-            $boxHeight = ($stringHeight * $padFactor) + $padding;
-        }
-
-        $halfWidth = $boxWidth / 2;
-        $halfHeight = $boxHeight / 2;
-
-        wm_debug("box is $boxWidth x $boxHeight\n");
-        wm_debug("position is $this->textPosition\n");
-
-        $this->labelRectangle = new WMRectangle($this->textPosition->x - $halfWidth,
-            $this->textPosition->y - $halfHeight,
-            $this->textPosition->x + $halfWidth,
-            $this->textPosition->y + $halfHeight);
-
-        wm_debug("Node->Label->pre_render: Rect is $this->labelRectangle\n");
-
-        return array($boxWidth, $boxHeight);
-    }
-}
 
 class WeatherMapNode extends WeatherMapDataItem
 {
@@ -657,6 +28,7 @@ class WeatherMapNode extends WeatherMapDataItem
     public $iconfile;
     public $iconscalew;
     public $iconscaleh;
+
     public $labeloffset;
     public $labeloffsetx;
     public $labeloffsety;
@@ -667,6 +39,7 @@ class WeatherMapNode extends WeatherMapDataItem
     public $labelfontshadowcolour;
     public $aiconfillcolour;
     public $aiconoutlinecolour;
+
     public $cachefile;
     public $useiconscale;
     public $iconscaletype;
@@ -678,7 +51,11 @@ class WeatherMapNode extends WeatherMapDataItem
     public $relative_to;
     public $polar;
     public $boundingboxes = array();
+    public $subObjects = array();
     public $named_offsets = array();
+
+    public $drawable = false;
+    public $resolvedColours = array();
 
     public $runtime = array();
 
@@ -735,6 +112,14 @@ class WeatherMapNode extends WeatherMapDataItem
             'labelfontshadowcolour' => new WMColour('none'),
             'aiconoutlinecolour' => new WMColour(0, 0, 0),
             'aiconfillcolour' => new WMColour('copy'), // copy from the node label
+            'resolvedColours' => array(
+                'labeloutline' => null,
+                'labelbg' => null,
+                'labelfont' => null,
+                'labelfontshadow' => null,
+                'aiconfill' => null,
+                'aiconoutline' => null
+            ),
             'labeloffset' => '',
             'labeloffsetx' => 0,
             'labeloffsety' => 0,
@@ -752,6 +137,7 @@ class WeatherMapNode extends WeatherMapDataItem
         $this->polar = false;
         $this->pos_named = false;
         $this->image = null;
+        $this->drawable = false;
 
         $this->reset($owner);
     }
@@ -804,7 +190,6 @@ class WeatherMapNode extends WeatherMapDataItem
         if (!empty($this->targets) && $this->usescale != 'none') {
             if ($this->scalevar == 'in') {
                 $labelFillColour = $this->colours[IN];
-
             }
 
             if ($this->scalevar == 'out') {
@@ -812,7 +197,6 @@ class WeatherMapNode extends WeatherMapDataItem
 
                 return $labelFillColour;
             }
-
             return $labelFillColour;
         } else {
             $labelFillColour = $this->labelbgcolour;
@@ -867,6 +251,102 @@ class WeatherMapNode extends WeatherMapDataItem
         return array(OUT);
     }
 
+
+    function preCalculateColours(&$owner)
+    {
+        wm_debug("Trace");
+
+        $labelFillColour = $this->calculateFillColour();
+        $iconFillColour = $this->calculateIconFillColour();
+
+        $aiconFillColour = $this->aiconfillcolour;
+        $aiconInkColour = $this->aiconoutlinecolour;
+
+        // if useiconscale isn't defined, use the static colours defined by AICONFILLCOLOR and AICONOUTLINECOLOR
+        // (or copy the colour from the label fill colour)
+        if ($this->useiconscale == 'none') {
+            if ($aiconFillColour->isCopy() && !$labelFillColour->isNone()) {
+                $aiconFillColour = $labelFillColour;
+            }
+        } else {
+            // if useiconscale IS defined, use that to figure out the file colour
+            $aiconFillColour = $iconFillColour;
+        }
+
+        $this->resolvedColours['labelfill'] = $labelFillColour;
+        $this->resolvedColours['iconfill'] = $iconFillColour;
+        $this->resolvedColours['aiconfill'] = $aiconFillColour;
+        $this->resolvedColours['aiconoutline'] = $aiconInkColour;
+
+        foreach ($this->resolvedColours as $k => $v) {
+            wm_debug("%s: %s", $k, $v);
+        }
+    }
+
+    function preCalculateGeometry(&$owner)
+    {
+        wm_debug("Trace");
+
+        // First, figure out the icon
+        if ($this->iconfile != '') {
+            wm_debug("Has icon - creating subcomponent");
+            $iconImageRef = null;
+            $icon_w = 0;
+            $icon_h = 0;
+
+            if (WMNodeArtificialIcon::isAICONName($this->iconfile)) {
+                wm_debug("Artificial");
+
+                $iconObj = WMNodeArtificialIcon::createAICON($this->iconfile, $this, $aiconInkColour, $aiconFillColour,
+                    $iconFillColour,
+                    $labelFillColour);
+            } else {
+                wm_debug("Legit Image");
+                $iconObj = new WMNodeImageIcon($this, $this->owner->ProcessString($this->iconfile, $this),
+                    $this->iconscalew, $this->iconscaleh);
+            }
+
+            wm_debug($iconObj);
+
+            $iconObj->calculateGeometry();
+            //XXX - this isn't correct
+            //$iconObj->preRender();
+
+            $iconImageRef = $iconObj->getImageRef();
+
+            if ($iconImageRef) {
+
+                $icon_bb = $iconObj->getBoundingBox();
+
+                // $this->boundingboxes[] = array($icon_x1, $icon_y1, $icon_x2, $icon_y2);
+            }
+
+            $this->subObjects [] = $iconObj;
+
+        }
+
+        // figure out a bounding rectangle for the label
+        if ($this->label != '') {
+            wm_debug("Has label - creating subcomponent");
+            $labelObj = new WMNodeLabel($this);
+
+            $this->processedLabel = $owner->processString($this->label, $this, true, true);
+
+            // if screenshot_mode is enabled, wipe any letters to X and wipe any IP address to 127.0.0.1
+            // hopefully that will preserve enough information to show cool stuff without leaking info
+            if ($owner->get_hint('screenshot_mode') == 1) {
+                $this->processedLabel = WMUtility::stringAnonymise($this->processedLabel);
+            }
+
+            $labelObj->calculateGeometry($this->processedLabel, $this->labelfont);
+
+            $this->subObjects [] = $labelObj;
+
+//            $labelObj->preRender($labelFillColour, $this->labeloutlinecolour, $this->labelfontshadowcolour,
+//                $this->labelfontcolour, $this->owner->selected);
+        }
+    }
+
     /***
      * precalculate the colours to be used, and the bounding boxes for labels and icons (if they exist)
      *
@@ -876,23 +356,27 @@ class WeatherMapNode extends WeatherMapDataItem
      */
     function preCalculate(&$owner)
     {
+        wm_debug("------------------------------------------------");
         wm_debug("Calculating node geometry for %s", $this);
-        // don't bother doing anything if it's a template
+
+        // don't bother drawing if it's a template
         if ($this->isTemplate()) {
+            wm_debug("%s is a pure template. Skipping.", $this);
             return;
         }
 
-        // apparently, some versions of the gd extension will crash
-        // if we continue...
+        // apparently, some versions of the gd extension will crash if we continue...
         if ($this->label == '' && $this->iconfile == '') {
+            wm_debug("%s has no label OR icon. Skipping.", $this);
             return;
         }
 
-        // First, figure out the icon
+        $this->drawable = true;
 
-        // Next, figure out the label
+        $this->preCalculateColours($owner);
+        $this->preCalculateGeometry($owner);
 
-        // Finally, the colours
+        wm_debug("------------------------------------------------");
     }
 
     function colourizeImage($imageRef, $tintColour)
@@ -913,14 +397,11 @@ class WeatherMapNode extends WeatherMapDataItem
     // figure out where the real NODE centre is, relative to the top-left corner.
     function preRender(&$map)
     {
+        wm_debug("------------------------------------------------");
+        wm_debug($this);
 
-        // don't bother drawing if it's a template
-        if ($this->isTemplate()) {
-            return;
-        }
-
-        // apparently, some versions of the gd extension will crash if we continue...
-        if ($this->label == '' && $this->iconfile == '') {
+        if (!$this->drawable) {
+            wm_debug("Skipping undrawable %s", $this);
             return;
         }
 
@@ -930,11 +411,10 @@ class WeatherMapNode extends WeatherMapDataItem
         // work out the bounding box of the whole thing
         $totalBoundingBox = new WMBoundingBox("TotalBB for $this->name");
 
-        $labelFillColour = $this->calculateFillColour();
-        $iconFillColour = $this->calculateIconFillColour();
 
         // figure out a bounding rectangle for the label
         if ($this->label != '') {
+            wm_debug("Has label - creating subcomponent");
             $labelObj = new WMNodeLabel($this);
 
             $this->processedLabel = $map->processString($this->label, $this, true, true);
@@ -947,40 +427,32 @@ class WeatherMapNode extends WeatherMapDataItem
 
             $labelObj->calculateGeometry($this->processedLabel, $this->labelfont);
 
-            $labelObj->preRender($labelFillColour, $this->labeloutlinecolour, $this->labelfontshadowcolour,
+            $labelObj->preRender($this->resolvedColours['labelfill'], $this->labeloutlinecolour,
+                $this->labelfontshadowcolour,
                 $this->labelfontcolour, $this->owner->selected);
         }
 
         // figure out a bounding rectangle for the icon
         if ($this->iconfile != '') {
+            wm_debug("Has icon - creating subcomponent");
             $iconImageRef = null;
             $icon_w = 0;
             $icon_h = 0;
 
             if (WMNodeArtificialIcon::isAICONName($this->iconfile)) {
-
-                $aiconFillColour = $this->aiconfillcolour;
-                $aiconInkColour = $this->aiconoutlinecolour;
-
-                // if useiconscale isn't defined, use the static colours defined by AICONFILLCOLOR and AICONOUTLINECOLOR
-                // (or copy the colour from the label fill colour)
-                if ($this->useiconscale == 'none') {
-                    if ($aiconFillColour->isCopy() && !$labelFillColour->isNone()) {
-                        $aiconFillColour = $labelFillColour;
-                    }
-                } else {
-                    // if useiconscale IS defined, use that to figure out the file colour
-                    $aiconFillColour = $this->calculateIconFillColour();
-                }
+                wm_debug("Artificial");
 
                 # $iconObj = new WMNodeArtificialIcon($this, $aiconInkColour, $aiconFillColour, $iconFillColour,                     $labelFillColour);
                 $iconObj = WMNodeArtificialIcon::createAICON($this->iconfile, $this, $aiconInkColour, $aiconFillColour,
                     $iconFillColour,
                     $labelFillColour);
             } else {
+                wm_debug("Legit");
                 $iconObj = new WMNodeImageIcon($this, $this->owner->ProcessString($this->iconfile, $this),
                     $this->iconscalew, $this->iconscaleh);
             }
+
+            wm_debug($iconObj);
 
             $iconObj->calculateGeometry();
             //XXX - this isn't correct
@@ -1043,6 +515,7 @@ class WeatherMapNode extends WeatherMapDataItem
 //            $temp_height = $bbox_y2 - $bbox_y1;
 
         if ($bbox->width() + $bbox->height() == 0) {
+            wm_debug("0-size bounding box. Nothing to draw for %s", $this);
             return;
         }
 
@@ -1073,8 +546,6 @@ class WeatherMapNode extends WeatherMapDataItem
         // Draw the icon, if any
         if (isset($iconImageRef)) {
             $iconObj->draw($node_im, $this->x, $this->y);
-//            imagecopy($node_im, $iconImageRef, $icon_x1, $icon_y1, 0, 0, imagesx($iconImageRef), imagesy($iconImageRef));
-//            imagedestroy($iconImageRef);
         }
 
         // Draw the label, if any
@@ -1082,7 +553,6 @@ class WeatherMapNode extends WeatherMapDataItem
             //          $labelObj->translate(-$bbox_x1 + $deltaX + $this->labeloffsetx, -$bbox_y1 + $deltaY + $this->labeloffsety);
             $labelObj->draw($node_im, $this->centre_x + $deltaX, $this->centre_y + $deltaY);
         }
-
 
         $this->image = $node_im;
     }

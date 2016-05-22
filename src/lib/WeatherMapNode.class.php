@@ -10,10 +10,12 @@ class WMNodeIcon
     protected $boundingBox;
     protected $node;
 
-    protected $iconscalew;
-    protected $iconscaleh;
+    protected $widthScale;
+    protected $heightScale;
 
     protected $iconImageRef;
+
+    protected $iconFileName;
 
     public function __construct($node)
     {
@@ -22,9 +24,9 @@ class WMNodeIcon
         $this->boundingBox = new WMBoundingBox("Icon for $node->name");
         $this->boundingBox->addPoint(0, 0);
 
-        $this->iconfile = $node->iconfile;
-        $this->iconscalew = $node->iconscalew;
-        $this->iconscaleh = $node->iconscaleh;
+        $this->iconFileName = $node->iconfile;
+        $this->widthScale = $node->iconscalew;
+        $this->heightScale = $node->iconscaleh;
         $this->iconImageRef = null;
     }
 
@@ -33,7 +35,7 @@ class WMNodeIcon
 
     }
 
-    public function draw($imageRef)
+    public function draw($targetImageRef)
     {
         $boundingBox = $this->getBoundingBox();
 
@@ -42,7 +44,7 @@ class WMNodeIcon
 
         wm_debug("Drawing into icon at $icon_x, $icon_y\n");
 
-        imagecopy($imageRef, $this->iconImageRef, $icon_x, $icon_y, 0, 0,
+        imagecopy($targetImageRef, $this->iconImageRef, $icon_x, $icon_y, 0, 0,
             imagesx($this->iconImageRef),
             imagesy($this->iconImageRef));
         imagedestroy($this->iconImageRef);
@@ -132,25 +134,34 @@ class WMNodeImageIcon extends WMNodeIcon
 
 class WMNodeArtificialIcon extends WMNodeIcon
 {
-//    protected $iconfile;
-//    protected $name;
-
     protected $aiconFillColour;
     protected $aiconInkColour;
+
     protected $iconFillColour;
     // protected $aiconOutlineColour; // ???
     protected $labelFillColour;
+
+
+    private static $types = array(
+        'rbox' => "WMNodeRoundedBoxIcon",
+        'round' => "WMNodeRoundIcon",
+        'box' => "WMNodeBoxIcon",
+        'inpie' => "WMNodePieIcon",
+        'outpie' => "WMNodePieIcon",
+        #'gauge' => "",
+        'nink' => "WMNodeNINKIcon"
+    );
 
     public function __construct($node, $aiconInkColour, $aiconFillColour, $iconFillColour, $labelFillColour)
     {
         parent::__construct($node);
 
-        $this->iconfile = $node->iconfile;
-        $this->iconscalew = $node->iconscalew;
-        $this->iconscaleh = $node->iconscaleh;
+        $this->iconFileName = $node->iconfile;
+        $this->widthScale = $node->iconscalew;
+        $this->heightScale = $node->iconscaleh;
         $this->name = $node->name;
 
-        if (!self::isAICONName($this->iconfile)) {
+        if (!self::isAICONName($this->iconFileName)) {
             throw new WeathermapRuntimeWarning("AICON with invalid type");
         }
 
@@ -163,26 +174,39 @@ class WMNodeArtificialIcon extends WMNodeIcon
 
     public static function isAICONName($name)
     {
-        $artificialIconNames = array('rbox', 'round', 'box', 'inpie', 'outpie', 'gauge', 'nink');
+        return array_key_exists($name, self::$types);
+    }
 
-        return in_array($name, $artificialIconNames);
+    public static function createAICON(
+        $name,
+        $node,
+        $aiconInkColour,
+        $aiconFillColour,
+        $iconFillColour,
+        $labelFillColour
+    ) {
+        $class = self::$types{$name};
+
+        $iconObj = new $class($node, $aiconInkColour, $aiconFillColour, $iconFillColour,
+            $labelFillColour);
+
+        return $iconObj;
+    }
+
+    public function drawAIcon()
+    {
+
     }
 
     public function preRender()
     {
-        wm_debug("Artificial Icon type " . $this->iconfile . " for $this->name\n");
+        wm_debug("Artificial Icon type " . $this->iconFileName . " for $this->name\n");
         // this is an artificial icon - we don't load a file for it
 
         $this->createEmptyImage();
 
-        $fill = null;
-        $ink = null;
-
-        $aiconFillColour = $this->aiconFillColour;
-        $aiconInkColour = $this->aiconInkColour;
-
-        $fill = $aiconFillColour;
-        $ink = $aiconInkColour;
+        $fill = $this->aiconFillColour;
+        $ink = $this->aiconInkColour;
 
 //        // if useiconscale isn't set, then use the static colour defined, or copy the colour from the label
 //        if ($this->useiconscale == "none") {
@@ -210,41 +234,34 @@ class WMNodeArtificialIcon extends WMNodeIcon
 
         wm_debug("AICON colours are $ink and $fill\n");
 
-        if ($this->iconfile == 'box') {
-            $this->drawAIconBox($this->iconImageRef, $fill, $ink);
-        }
+        $this->drawAIcon();
 
-        if ($this->iconfile == 'rbox') {
-            $this->drawAIconRoundedBox($this->iconImageRef, $fill, $ink);
-        }
-
-        if ($this->iconfile == 'round') {
-            $this->drawAIconRound($this->iconImageRef, $fill, $ink);
-        }
-
-        if ($this->iconfile == 'nink') {
-            $this->drawAIconNINK($this->iconImageRef, $ink);
-        }
-
-        // XXX - needs proper colours
-        if ($this->iconfile == 'inpie' || $this->iconfile == 'outpie') {
-            $this->drawAIconPie($this->iconImageRef, $fill, $ink);
-        }
-
-        if ($this->iconfile == 'gauge') {
-            wm_warn('gauge AICON not implemented yet [WMWARN99]');
-        }
     }
 
-    /**
-     * @param $iconImageRef
-     * @param $ink
-     */
-    protected function drawAIconNINK($iconImageRef, $ink)
+
+    protected function createEmptyImage()
     {
-        $radiusX = $this->iconscalew / 2 - 1;
-        $radiusY = $this->iconscaleh / 2 - 1;
-        $size = $this->iconscalew;
+        $this->iconImageRef = imagecreatetruecolor($this->widthScale, $this->heightScale);
+        imageSaveAlpha($this->iconImageRef, true);
+
+        $nothing = imagecolorallocatealpha($this->iconImageRef, 128, 0, 0, 127);
+        imagefill($this->iconImageRef, 0, 0, $nothing);
+    }
+
+
+}
+
+class WMNodeNINKIcon extends WMNodeArtificialIcon
+{
+    public function drawAIcon()
+    {
+        $iconImageRef = $this->iconImageRef;
+        $fill = $this->aiconFillColour;
+        $ink = $this->aiconInkColour;
+
+        $radiusX = $this->widthScale / 2 - 1;
+        $radiusY = $this->heightScale / 2 - 1;
+        $size = $this->widthScale;
         $quarter = $size / 4;
 
         $colour1 = $this->node->colours[OUT]->gdallocate($iconImageRef);
@@ -280,16 +297,60 @@ class WMNodeArtificialIcon extends WMNodeIcon
             imageellipse($iconImageRef, $radiusX, $radiusY, $radiusX * 2, $radiusY * 2, $inkGD);
         }
     }
+}
 
-    /**
-     * @param $fill
-     * @param $iconImageRef
-     * @param $ink
-     */
-    protected function drawAIconRound($iconImageRef, $fill, $ink)
+class WMNodeBoxIcon extends WMNodeArtificialIcon
+{
+    public function drawAIcon()
     {
-        $radiusX = $this->iconscalew / 2 - 1;
-        $radiusY = $this->iconscaleh / 2 - 1;
+        $iconImageRef = $this->iconImageRef;
+        $fill = $this->aiconFillColour;
+        $ink = $this->aiconInkColour;
+
+        if ($fill !== null && !$fill->isNone()) {
+            imagefilledrectangle($iconImageRef, 0, 0, $this->widthScale - 1, $this->heightScale - 1,
+                $fill->gdAllocate($iconImageRef));
+        }
+
+        if ($ink !== null && !$ink->isNone()) {
+            imagerectangle($iconImageRef, 0, 0, $this->widthScale - 1, $this->heightScale - 1,
+                $ink->gdallocate($iconImageRef));
+        }
+    }
+
+}
+
+class WMNodeRoundedBoxIcon extends WMNodeArtificialIcon
+{
+    public function drawAIcon()
+    {
+        $iconImageRef = $this->iconImageRef;
+        $fill = $this->aiconFillColour;
+        $ink = $this->aiconInkColour;
+
+        if ($fill !== null && !$fill->isNone()) {
+            imagefilledroundedrectangle($iconImageRef, 0, 0, $this->widthScale - 1, $this->heightScale - 1, 4,
+                $fill->gdAllocate($iconImageRef));
+        }
+
+        if ($ink !== null && !$ink->isNone()) {
+            imageroundedrectangle($iconImageRef, 0, 0, $this->widthScale - 1, $this->heightScale - 1, 4,
+                $ink->gdallocate($iconImageRef));
+        }
+    }
+
+}
+
+class WMNodeRoundIcon extends WMNodeArtificialIcon
+{
+    public function drawAIcon()
+    {
+        $iconImageRef = $this->iconImageRef;
+        $fill = $this->aiconFillColour;
+        $ink = $this->aiconInkColour;
+
+        $radiusX = $this->widthScale / 2 - 1;
+        $radiusY = $this->heightScale / 2 - 1;
 
         if ($fill !== null && !$fill->isNone()) {
             imagefilledellipse($iconImageRef, $radiusX, $radiusY, $radiusX * 2, $radiusY * 2,
@@ -302,58 +363,25 @@ class WMNodeArtificialIcon extends WMNodeIcon
         }
     }
 
-    /**
-     * @param $iconImageRef
-     * @param $fill
-     * @param $ink
-     */
-    protected function drawAIconRoundedBox($iconImageRef, $fill, $ink)
+}
+
+class WMNodePieIcon extends WMNodeArtificialIcon
+{
+    public function drawAIcon()
     {
-        if ($fill !== null && !$fill->isNone()) {
-            imagefilledroundedrectangle($iconImageRef, 0, 0, $this->iconscalew - 1, $this->iconscaleh - 1, 4,
-                $fill->gdAllocate($iconImageRef));
-        }
+        $iconImageRef = $this->iconImageRef;
+        $fill = $this->aiconFillColour;
+        $ink = $this->aiconInkColour;
 
-        if ($ink !== null && !$ink->isNone()) {
-            imageroundedrectangle($iconImageRef, 0, 0, $this->iconscalew - 1, $this->iconscaleh - 1, 4,
-                $ink->gdallocate($iconImageRef));
-        }
-    }
-
-    /**
-     * @param $iconImageRef
-     * @param $fill
-     * @param $ink
-     */
-    protected function drawAIconBox($iconImageRef, $fill, $ink)
-    {
-        if ($fill !== null && !$fill->isNone()) {
-            imagefilledrectangle($iconImageRef, 0, 0, $this->iconscalew - 1, $this->iconscaleh - 1,
-                $fill->gdAllocate($iconImageRef));
-        }
-
-        if ($ink !== null && !$ink->isNone()) {
-            imagerectangle($iconImageRef, 0, 0, $this->iconscalew - 1, $this->iconscaleh - 1,
-                $ink->gdallocate($iconImageRef));
-        }
-    }
-
-    /**
-     * @param $fill
-     * @param $iconImageRef
-     * @param $ink
-     */
-    protected function drawAIconPie($iconImageRef, $fill, $ink)
-    {
-        if ($this->iconfile == 'inpie') {
+        if ($this->iconFileName == 'inpie') {
             $segment_angle = (($this->node->percentUsages[IN]) / 100) * 360;
         }
-        if ($this->iconfile == 'outpie') {
+        if ($this->iconFileName == 'outpie') {
             $segment_angle = (($this->node->percentUsages[OUT]) / 100) * 360;
         }
 
-        $radiusX = $this->iconscalew / 2 - 1;
-        $radiusY = $this->iconscaleh / 2 - 1;
+        $radiusX = $this->widthScale / 2 - 1;
+        $radiusY = $this->heightScale / 2 - 1;
 
         if ($fill !== null && !$fill->isNone()) {
             imagefilledellipse($iconImageRef, $radiusX, $radiusY, $radiusX * 2, $radiusY * 2,
@@ -369,15 +397,6 @@ class WMNodeArtificialIcon extends WMNodeIcon
             imageellipse($iconImageRef, $radiusX, $radiusY, $radiusX * 2, $radiusY * 2,
                 $fill->gdAllocate($iconImageRef));
         }
-    }
-
-    protected function createEmptyImage()
-    {
-        $this->iconImageRef = imagecreatetruecolor($this->iconscalew, $this->iconscaleh);
-        imageSaveAlpha($this->iconImageRef, true);
-
-        $nothing = imagecolorallocatealpha($this->iconImageRef, 128, 0, 0, 127);
-        imagefill($this->iconImageRef, 0, 0, $nothing);
     }
 }
 
@@ -954,7 +973,9 @@ class WeatherMapNode extends WeatherMapDataItem
                     $aiconFillColour = $this->calculateIconFillColour();
                 }
 
-                $iconObj = new WMNodeArtificialIcon($this, $aiconInkColour, $aiconFillColour, $iconFillColour,
+                # $iconObj = new WMNodeArtificialIcon($this, $aiconInkColour, $aiconFillColour, $iconFillColour,                     $labelFillColour);
+                $iconObj = WMNodeArtificialIcon::createAICON($this->iconfile, $this, $aiconInkColour, $aiconFillColour,
+                    $iconFillColour,
                     $labelFillColour);
             } else {
                 $iconObj = new WMNodeImageIcon($this, $this->owner->ProcessString($this->iconfile, $this),

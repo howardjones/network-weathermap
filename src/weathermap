@@ -181,10 +181,11 @@ if (sizeof($gopts) > 0) {
 
 // set this BEFORE we create the map object, so we get the debug output from Reset(), as well
 if (isset($options_output['debugging']) && $options_output['debugging']) {
-    $weathermap_debugging=true;
+//    $weathermap_debugging=true;
     wm_debug("------------------------------------\n");
     wm_debug("Starting PHP-Weathermap run, with config: $configfile\n");
     wm_debug("------------------------------------\n");
+    $wm_debug_logger = WMDebugFactory::update(true);
 }
 
 $map=new Weathermap;

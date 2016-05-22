@@ -21,3 +21,10 @@ after_script:
   - vendor/bin/test-reporter
 script:
   - phpunit build/phpunit.xml
+notifications:
+  webhooks:
+    urls:
+      - https://webhooks.gitter.im/e/7094f12e4b57b80da9ef
+    on_success: change
+    on_failure: change
+    on_start: never

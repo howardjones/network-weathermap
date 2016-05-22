@@ -13,7 +13,7 @@ require_once dirname(__FILE__) . '/exceptions.php';
 
 require_once dirname(__FILE__) . '/php-compat.php';
 
-require_once dirname(__FILE__).'/WMDebug.php';
+require_once dirname(__FILE__) . '/WMDebug.php';
 
 require_once dirname(__FILE__) . '/HTML_ImageMap.class.php';
 
@@ -55,5 +55,3 @@ require_once dirname(__FILE__) . '/WeatherMapConfig.php';
 require_once dirname(__FILE__) . '/WeatherMapRunner.class.php';
 
 $wm_debug_logger = WMDebugFactory::create();
-
-print_r($wm_debug_logger);

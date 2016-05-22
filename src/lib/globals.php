@@ -16,6 +16,6 @@
     $weathermap_error_suppress = array();
     
     // Turn on ALL error reporting for now.
-    // error_reporting (E_ALL|E_STRICT);
+    error_reporting (E_ALL|E_STRICT);
     // error_reporting(E_ALL);
     // error_reporting(E_ALL & ~E_STRICT);

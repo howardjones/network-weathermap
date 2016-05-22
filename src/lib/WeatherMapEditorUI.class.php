@@ -567,7 +567,7 @@ class WeatherMapEditorUI extends WeatherMapUIBase
         }
     }
     
-    function WeatherMapEditorUI()
+    function __construct()
     {
         $this->unpackCookie();
         $this->editor = new WeatherMapEditor();

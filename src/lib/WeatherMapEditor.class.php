@@ -15,7 +15,7 @@ class WeatherMapEditor
     var $map;
     var $mapfile;
     
-    function WeatherMapEditor()
+    function __construct()
     {
         $this->map = null;
     }

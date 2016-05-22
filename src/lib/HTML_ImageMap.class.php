@@ -113,7 +113,7 @@ class HTML_ImageMap_Area_Polygon extends HTML_ImageMap_Area
         imagepolygon($gdimage, $pts, count($pts) / 2, $colour);
     }
 
-    function HTML_ImageMap_Area_Polygon($name = "", $href = "", $coords)
+    function __construct($name = "", $href = "", $coords)
     {
         $xlist = array();
         $ylist = array();
@@ -147,7 +147,7 @@ class HTML_ImageMap_Area_Rectangle extends HTML_ImageMap_Area
 {
     var $topLeft_x, $bottomRight_x, $topLeft_y, $bottomRight_y;
 
-    function HTML_ImageMap_Area_Rectangle($name = "", $href = "", $coords)
+    function __construct($name = "", $href = "", $coords)
     {
         $points = $coords[0];
 
@@ -235,7 +235,7 @@ class HTML_ImageMap_Area_Circle extends HTML_ImageMap_Area
        // imagerectangle($gdimage, $this->x1, $this->y1, $this->x2, $this->y2, $colour);
     }
 
-    function HTML_ImageMap_Area_Circle($name = "", $href = "", $coords)
+    function __construct($name = "", $href = "", $coords)
     {
         $points = $coords[0];
 
@@ -255,7 +255,7 @@ class HTML_ImageMap
     var $name;
     var $zLayers;
 
-    function HTML_ImageMap($name = "")
+    function __construct($name = "")
     {
         $this->Reset();
         $this->name = $name;

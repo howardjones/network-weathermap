@@ -891,8 +891,9 @@ class WeatherMapNode extends WeatherMapDataItem
 
     // make a mini-image, containing this node and nothing else
     // figure out where the real NODE centre is, relative to the top-left corner.
-    function preRender($im, &$map)
+    function preRender(&$map)
     {
+
         // don't bother drawing if it's a template
         if ($this->isTemplate()) {
             return;
@@ -916,7 +917,7 @@ class WeatherMapNode extends WeatherMapDataItem
         if ($this->label != '') {
             $labelObj = new WMNodeLabel($this);
 
-            $this->processedLabel = $map->ProcessString($this->label, $this, true, true);
+            $this->processedLabel = $map->processString($this->label, $this, true, true);
 
             // if screenshot_mode is enabled, wipe any letters to X and wipe any IP address to 127.0.0.1
             // hopefully that will preserve enough information to show cool stuff without leaking info

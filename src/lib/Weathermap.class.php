@@ -1378,7 +1378,7 @@ class WeatherMap extends WeatherMapBase
             // don't try and draw template nodes
             wm_debug("Pre-rendering ".$node->name." to get bounding boxes.\n");
             if (!$node->isTemplate()) {
-                $node->preRender($imageRef, $this);
+                $node->preRender($this);
             }
         }
 

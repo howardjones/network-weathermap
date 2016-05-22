@@ -232,7 +232,7 @@ class WeatherMap extends WeatherMapBase
         $this->createDefaultNodes();
         $this->createDefaultLinks();
 
-        $this->imap = new HTML_ImageMap('weathermap');
+        $this->imap = new HTMLImageMap('weathermap');
         $this->colours = array();
 
         $this->scales['DEFAULT'] = new WeatherMapScale("DEFAULT", $this);

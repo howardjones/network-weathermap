@@ -545,11 +545,13 @@ class WeatherMapNode extends WeatherMapDataItem
 
         // Draw the icon, if any
         if (isset($iconImageRef)) {
+            wm_debug("Drawing icon image");
             $iconObj->draw($node_im, $this->x, $this->y);
         }
 
         // Draw the label, if any
         if ($this->label != '') {
+            wm_debug("Drawing label");
             //          $labelObj->translate(-$bbox_x1 + $deltaX + $this->labeloffsetx, -$bbox_y1 + $deltaY + $this->labeloffsety);
             $labelObj->draw($node_im, $this->centre_x + $deltaX, $this->centre_y + $deltaY);
         }
@@ -628,13 +630,17 @@ class WeatherMapNode extends WeatherMapDataItem
     // draw the node, using the pre_render() output
     function draw($im, &$map)
     {
+        wm_debug("trace %s", $this);
         // take the offset we figured out earlier, and just blit the image on. Who says "blit" anymore?
 
         // it's possible that there is no image, so better check.
         if (!is_null($this->image)) {
+            wm_debug("Drawing node image into map for %s", $this);
             imagealphablending($im, true);
             imagecopy($im, $this->image, $this->x - $this->centre_x, $this->y - $this->centre_y, 0, 0,
                 imagesx($this->image), imagesy($this->image));
+        } else {
+            wm_debug("null image");
         }
 
         // XXX - Hiding this here so Weathermap::drawMapImage doesn't need to know about it
@@ -646,7 +652,7 @@ class WeatherMapNode extends WeatherMapDataItem
         $index = 0;
         foreach ($this->boundingboxes as $bbox) {
             $areaName = "NODE:N" . $this->id . ":" . $index;
-            $newArea = new HTML_ImageMap_Area_Rectangle($areaName, "", array($bbox->asArray()));
+            $newArea = new HTMLImageMapAreaRectangle($areaName, "", array($bbox->asArray()));
             wm_debug("Adding imagemap area $bbox\n");
             $this->imageMapAreas[] = $newArea;
             $this->imap_areas[] = $areaName; // XXX - what is this used for?

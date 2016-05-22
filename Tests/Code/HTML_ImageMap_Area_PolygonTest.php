@@ -9,7 +9,7 @@ require_once dirname(__FILE__) . '/../../src/lib/HTML_ImageMap.class.php';
  */
 class HTML_ImageMap_Area_PolygonTest extends PHPUnit_Framework_TestCase {
     /**
-     * @var HTML_ImageMap_Area_Polygon
+     * @var HTMLImageMapAreaPolygon
      */
     protected $object;
 
@@ -20,11 +20,11 @@ class HTML_ImageMap_Area_PolygonTest extends PHPUnit_Framework_TestCase {
     protected function setUp() {
         $this->objects = array();
         // triangle
-        $this->objects[] = new HTML_ImageMap_Area_Polygon("testarea","testhref", array(array(100,100,200,300,50,200)));
+        $this->objects[] = new HTMLImageMapAreaPolygon("testarea","testhref", array(array(100,100,200,300,50,200)));
         // square
-        $this->objects[] = new HTML_ImageMap_Area_Polygon("testarea","testhref", array(array(100,100,200,100,200,200,100,200)));
+        $this->objects[] = new HTMLImageMapAreaPolygon("testarea","testhref", array(array(100,100,200,100,200,200,100,200)));
         // U shaped
-        $this->objects[] = new HTML_ImageMap_Area_Polygon("testarea","testhref", array(array(100,100,150,100,150,150,200,150,250,100,250,200,100,200)));
+        $this->objects[] = new HTMLImageMapAreaPolygon("testarea","testhref", array(array(100,100,150,100,150,150,200,150,250,100,250,200,100,200)));
 
    }
 

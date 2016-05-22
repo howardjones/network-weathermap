@@ -381,7 +381,7 @@ class WeatherMapLink extends WeatherMapDataItem
 
             $polyPoints = $this->geometry->getDrawnPolygon($direction);
 
-            $newArea = new HTML_ImageMap_Area_Polygon($areaName, "", array($polyPoints));
+            $newArea = new HTMLImageMapAreaPolygon($areaName, "", array($polyPoints));
             $this->owner->imap->addArea($newArea);
             wm_debug("Adding Poly imagemap for %s\n", $areaName);
 
@@ -499,10 +499,10 @@ class WeatherMapLink extends WeatherMapDataItem
             $rectanglePoints[] = min($points[1], $points[3]);
             $rectanglePoints[] = max($points[0], $points[2]);
             $rectanglePoints[] = max($points[1], $points[3]);
-            $newArea = new HTML_ImageMap_Area_Rectangle($areaName, "", array($rectanglePoints));
+            $newArea = new HTMLImageMapAreaRectangle($areaName, "", array($rectanglePoints));
             wm_debug("Adding Rectangle imagemap for $areaName\n");
         } else {
-            $newArea = new HTML_ImageMap_Area_Polygon($areaName, "", array($points));
+            $newArea = new HTMLImageMapAreaPolygon($areaName, "", array($points));
             wm_debug("Adding Poly imagemap for $areaName\n");
         }
         // Make a note that we added this area

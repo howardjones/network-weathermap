@@ -9,7 +9,7 @@ require_once dirname(__FILE__) . '/../../src/lib/HTML_ImageMap.class.php';
  */
 class HTML_ImageMap_Area_CircleTest extends PHPUnit_Framework_TestCase {
     /**
-     * @var HTML_ImageMap_Area_Circle
+     * @var HTMLImageMapAreaCircle
      */
     protected $object;
 
@@ -18,7 +18,7 @@ class HTML_ImageMap_Area_CircleTest extends PHPUnit_Framework_TestCase {
      * This method is called before a test is executed.
      */
     protected function setUp() {
-        $this->object = new HTML_ImageMap_Area_Circle("testname","testhref",array(array(100,100,150,100)));
+        $this->object = new HTMLImageMapAreaCircle("testname","testhref",array(array(100,100,150,100)));
     }
 
     /**

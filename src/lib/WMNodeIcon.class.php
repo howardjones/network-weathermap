@@ -32,11 +32,6 @@ class WMNodeIcon
         return sprintf("%s %s [%dx%d]", get_class($this), $this->iconFileName, $this->widthScale, $this->heightScale);
     }
 
-    public function calculateGeometry()
-    {
-
-    }
-
     public function draw($targetImageRef)
     {
         $boundingBox = $this->getBoundingBox();
@@ -54,6 +49,11 @@ class WMNodeIcon
 
     public function getBoundingBox()
     {
+        return $this->boundingBox;
+    }
+
+    public function calculateGeometry()
+    {
         $iconImageRef = $this->iconImageRef;
 
         if ($iconImageRef) {
@@ -64,7 +64,7 @@ class WMNodeIcon
             $iconRect = new WMRectangle(0, 0, 0, 0);
         }
 
-        return $iconRect;
+        $this->boundingBox = $iconRect;
     }
 
     public function getImageRef()
@@ -78,11 +78,6 @@ class WMNodeImageIcon extends WMNodeIcon
     public function __construct($node)
     {
         parent::__construct($node);
-    }
-
-    public function calculateGeometry()
-    {
-
     }
 
     public function preRender($iconFile, $scaleWidth = null, $scaleHeight = null)
@@ -141,14 +136,6 @@ class WMNodeImageIcon extends WMNodeIcon
 
 class WMNodeArtificialIcon extends WMNodeIcon
 {
-    protected $aiconFillColour;
-    protected $aiconInkColour;
-
-    protected $iconFillColour;
-    // protected $aiconOutlineColour; // ???
-    protected $labelFillColour;
-
-
     private static $types = array(
         'rbox' => "WMNodeRoundedBoxIcon",
         'round' => "WMNodeRoundIcon",
@@ -158,6 +145,11 @@ class WMNodeArtificialIcon extends WMNodeIcon
         #'gauge' => "",
         'nink' => "WMNodeNINKIcon"
     );
+    protected $aiconFillColour;
+    protected $aiconInkColour;
+    // protected $aiconOutlineColour; // ???
+    protected $iconFillColour;
+    protected $labelFillColour;
 
     public function __construct($node, $aiconInkColour, $aiconFillColour, $iconFillColour, $labelFillColour)
     {
@@ -184,11 +176,6 @@ class WMNodeArtificialIcon extends WMNodeIcon
         return array_key_exists($name, self::$types);
     }
 
-    public function getFinalDimensions()
-    {
-        return new WMRectangle(0, 0, $this->widthScale, $this->heightScale);
-    }
-
     public static function createAICON(
         $name,
         $node,
@@ -205,9 +192,14 @@ class WMNodeArtificialIcon extends WMNodeIcon
         return $iconObj;
     }
 
-    public function drawAIcon()
+    public function getFinalDimensions()
     {
+        return new WMRectangle(0, 0, $this->widthScale, $this->heightScale);
+    }
 
+    public function calculateGeometry()
+    {
+        parent::calculateGeometry();
     }
 
     public function preRender()
@@ -250,7 +242,6 @@ class WMNodeArtificialIcon extends WMNodeIcon
 
     }
 
-
     protected function createEmptyImage()
     {
         $this->iconImageRef = imagecreatetruecolor($this->widthScale, $this->heightScale);
@@ -258,6 +249,11 @@ class WMNodeArtificialIcon extends WMNodeIcon
 
         $nothing = imagecolorallocatealpha($this->iconImageRef, 128, 0, 0, 127);
         imagefill($this->iconImageRef, 0, 0, $nothing);
+    }
+
+    public function drawAIcon()
+    {
+
     }
 
 

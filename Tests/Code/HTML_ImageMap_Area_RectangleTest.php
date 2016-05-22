@@ -9,7 +9,7 @@ require_once dirname(__FILE__) . '/../../src/lib/HTML_ImageMap.class.php';
  */
 class HTML_ImageMap_Area_RectangleTest extends PHPUnit_Framework_TestCase {
     /**
-     * @var HTML_ImageMap_Area_Rectangle
+     * @var HTMLImageMapAreaRectangle
      */
     protected $object;
 
@@ -19,8 +19,8 @@ class HTML_ImageMap_Area_RectangleTest extends PHPUnit_Framework_TestCase {
      */
     protected function setUp() {
         $this->objects = array();
-        $this->objects[] = new HTML_ImageMap_Area_Rectangle("testarea","testhref", array(array(50,20,150,170)));
-        $this->objects[] = new HTML_ImageMap_Area_Rectangle("testarea","testhref", array(array(150,170,50,20)));
+        $this->objects[] = new HTMLImageMapAreaRectangle("testarea","testhref", array(array(50,20,150,170)));
+        $this->objects[] = new HTMLImageMapAreaRectangle("testarea","testhref", array(array(150,170,50,20)));
     }
 
     /**

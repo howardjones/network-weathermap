@@ -8,13 +8,13 @@ class WMRectangle
     public function __construct($xPoint1, $yPoint1, $xPoint2, $yPoint2)
     {
         // swap points around so that topLeft is actually top-left
-        if ($xPoint2<$xPoint1) {
+        if ($xPoint2 < $xPoint1) {
             $tmp = $xPoint1;
             $xPoint1 = $xPoint2;
             $xPoint2 = $tmp;
         }
 
-        if ($yPoint2<$yPoint1) {
+        if ($yPoint2 < $yPoint1) {
             $tmp = $yPoint1;
             $yPoint1 = $yPoint2;
             $yPoint2 = $tmp;
@@ -26,7 +26,20 @@ class WMRectangle
 
     public function getCentre()
     {
-        return new WMPoint(($this->bottomRight->x - $this->topLeft->x) /2, ($this->bottomRight->y - $this->topLeft->y) /2);
+        return new WMPoint(($this->bottomRight->x - $this->topLeft->x) / 2,
+            ($this->bottomRight->y - $this->topLeft->y) / 2);
+    }
+
+    public function reCentre($new_centre)
+    {
+        $newX = -$this->width() / 2;
+        $newY = -$this->height() / 2;
+
+        $this->translate($newX - $this->topLeft->x, $newY - $this->topLeft->y);
+        $this->translate($new_centre->x, $new_centre->y);
+
+        return new WMPoint(($this->bottomRight->x - $this->topLeft->x) / 2,
+            ($this->bottomRight->y - $this->topLeft->y) / 2);
     }
 
     public function identical($otherRect)
@@ -66,7 +79,8 @@ class WMRectangle
         if ($this->topLeft->x <= $p->x
             && $this->bottomRight->x >= $p->x
             && $this->topLeft->y <= $p->y
-            && $this->bottomRight->y >= $p->y) {
+            && $this->bottomRight->y >= $p->y
+        ) {
             return true;
         }
 

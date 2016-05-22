@@ -9,7 +9,7 @@ require_once dirname(__FILE__) . '/../../src/lib/HTML_ImageMap.class.php';
  */
 class HTML_ImageMap_AreaTest extends PHPUnit_Framework_TestCase {
     /**
-     * @var HTML_ImageMap_Area
+     * @var HTMLImageMapArea
      */
     protected $object;
 
@@ -18,7 +18,7 @@ class HTML_ImageMap_AreaTest extends PHPUnit_Framework_TestCase {
      * This method is called before a test is executed.
      */
     protected function setUp() {
-        $this->object = new HTML_ImageMap_Area;
+        $this->object = new HTMLImageMapArea;
     }
 
     /**

@@ -25,6 +25,7 @@ class WMNodeIcon
         $this->iconfile = $node->iconfile;
         $this->iconscalew = $node->iconscalew;
         $this->iconscaleh = $node->iconscaleh;
+        $this->iconImageRef = null;
     }
 
     public function calculateGeometry()
@@ -41,7 +42,9 @@ class WMNodeIcon
 
         wm_debug("Drawing into icon at $icon_x, $icon_y\n");
 
-        imagecopy($imageRef, $this->iconImageRef, $icon_x, $icon_y, 0, 0, imagesx($this->iconImageRef), imagesy($this->iconImageRef));
+        imagecopy($imageRef, $this->iconImageRef, $icon_x, $icon_y, 0, 0,
+            imagesx($this->iconImageRef),
+            imagesy($this->iconImageRef));
         imagedestroy($this->iconImageRef);
     }
 
@@ -50,9 +53,9 @@ class WMNodeIcon
         $iconImageRef = $this->iconImageRef;
 
         if ($iconImageRef) {
-            $icon_w2 = imagesx($iconImageRef) / 2;
-            $icon_h2 = imagesy($iconImageRef) / 2;
-            $iconRect = new WMRectangle(-$icon_w2, -$icon_h2, $icon_w2, $icon_h2);
+            $iconHalfWidth = imagesx($iconImageRef) / 2;
+            $iconHalfHeight = imagesy($iconImageRef) / 2;
+            $iconRect = new WMRectangle(-$iconHalfWidth, -$iconHalfHeight, $iconHalfWidth, $iconHalfHeight);
         } else {
             $iconRect = new WMRectangle(0, 0, 0, 0);
         }
@@ -109,17 +112,18 @@ class WMNodeImageIcon extends WMNodeIcon
                     // Scale, and replace the original image with the scaled one
                     $scaledImage = imagecreatetruecolor($newWidth, $newHeight);
                     imagealphablending($scaledImage, false);
-                    imagecopyresampled($scaledImage, $this->iconImageRef, 0, 0, 0, 0, $newWidth, $newHeight, $iconWidth, $iconHeight);
+                    imagecopyresampled($scaledImage, $this->iconImageRef, 0, 0, 0, 0, $newWidth, $newHeight, $iconWidth,
+                        $iconHeight);
                     imagedestroy($this->iconImageRef);
                     $this->iconImageRef = $scaledImage;
                 }
             } else {
-                throw new WeathermapRuntimeWarning("Couldn't open ICON: '" . $realiconfile . "' - is it a PNG, JPEG or GIF? [WMWARN37]");
+                throw new WeathermapRuntimeWarning("Couldn't open ICON: '" . $iconFile . "' - is it a PNG, JPEG or GIF? [WMWARN37]");
                 //    wm_warn("Couldn't open ICON: '" . $realiconfile . "' - is it a PNG, JPEG or GIF? [WMWARN37]\n");
             }
         } else {
-            if ($realiconfile != 'none') {
-                throw new WeathermapRuntimeWarning("ICON '" . $realiconfile . "' does not exist, or is not readable. Check path and permissions. [WMARN38]");
+            if ($iconFile != 'none') {
+                throw new WeathermapRuntimeWarning("ICON '" . $iconFile . "' does not exist, or is not readable. Check path and permissions. [WMARN38]");
                 // wm_warn("ICON '" . $realiconfile . "' does not exist, or is not readable. Check path and permissions. [WMARN38]\n");
             }
         }
@@ -249,8 +253,10 @@ class WMNodeArtificialIcon extends WMNodeIcon
         imagefilledarc($iconImageRef, $radiusX - 1, $radiusY, $size, $size, 270, 90, $colour1, IMG_ARC_PIE);
         imagefilledarc($iconImageRef, $radiusX + 1, $radiusY, $size, $size, 90, 270, $colour2, IMG_ARC_PIE);
 
-        imagefilledarc($iconImageRef, $radiusX - 1, $radiusY + $quarter, $quarter * 2, $quarter * 2, 0, 360, $colour1, IMG_ARC_PIE);
-        imagefilledarc($iconImageRef, $radiusX + 1, $radiusY - $quarter, $quarter * 2, $quarter * 2, 0, 360, $colour2, IMG_ARC_PIE);
+        imagefilledarc($iconImageRef, $radiusX - 1, $radiusY + $quarter, $quarter * 2, $quarter * 2, 0, 360, $colour1,
+            IMG_ARC_PIE);
+        imagefilledarc($iconImageRef, $radiusX + 1, $radiusY - $quarter, $quarter * 2, $quarter * 2, 0, 360, $colour2,
+            IMG_ARC_PIE);
 
         if ($ink !== null && !$ink->isNone()) {
             // XXX - need a font definition from somewhere for NINK text
@@ -267,7 +273,8 @@ class WMNodeArtificialIcon extends WMNodeIcon
                 $label = $this->node->owner->ProcessString("{node:this:bandwidth_$name:%.1k}", $this->node);
 
                 list($twid, $thgt) = $this->node->owner->myimagestringsize($font, $label);
-                $this->node->owner->myimagestring($iconImageRef, $font, $radiusX - $twid / 2, $radiusY + $direction[1] * $quarter + ($thgt / 2), $label, $inkGD);
+                $this->node->owner->myimagestring($iconImageRef, $font, $radiusX - $twid / 2,
+                    $radiusY + $direction[1] * $quarter + ($thgt / 2), $label, $inkGD);
             }
 
             imageellipse($iconImageRef, $radiusX, $radiusY, $radiusX * 2, $radiusY * 2, $inkGD);
@@ -285,11 +292,13 @@ class WMNodeArtificialIcon extends WMNodeIcon
         $radiusY = $this->iconscaleh / 2 - 1;
 
         if ($fill !== null && !$fill->isNone()) {
-            imagefilledellipse($iconImageRef, $radiusX, $radiusY, $radiusX * 2, $radiusY * 2, $fill->gdAllocate($iconImageRef));
+            imagefilledellipse($iconImageRef, $radiusX, $radiusY, $radiusX * 2, $radiusY * 2,
+                $fill->gdAllocate($iconImageRef));
         }
 
         if ($ink !== null && !$ink->isNone()) {
-            imageellipse($iconImageRef, $radiusX, $radiusY, $radiusX * 2, $radiusY * 2, $ink->gdallocate($iconImageRef));
+            imageellipse($iconImageRef, $radiusX, $radiusY, $radiusX * 2, $radiusY * 2,
+                $ink->gdallocate($iconImageRef));
         }
     }
 
@@ -301,11 +310,13 @@ class WMNodeArtificialIcon extends WMNodeIcon
     protected function drawAIconRoundedBox($iconImageRef, $fill, $ink)
     {
         if ($fill !== null && !$fill->isNone()) {
-            imagefilledroundedrectangle($iconImageRef, 0, 0, $this->iconscalew - 1, $this->iconscaleh - 1, 4, $fill->gdAllocate($iconImageRef));
+            imagefilledroundedrectangle($iconImageRef, 0, 0, $this->iconscalew - 1, $this->iconscaleh - 1, 4,
+                $fill->gdAllocate($iconImageRef));
         }
 
         if ($ink !== null && !$ink->isNone()) {
-            imageroundedrectangle($iconImageRef, 0, 0, $this->iconscalew - 1, $this->iconscaleh - 1, 4, $ink->gdallocate($iconImageRef));
+            imageroundedrectangle($iconImageRef, 0, 0, $this->iconscalew - 1, $this->iconscaleh - 1, 4,
+                $ink->gdallocate($iconImageRef));
         }
     }
 
@@ -317,11 +328,13 @@ class WMNodeArtificialIcon extends WMNodeIcon
     protected function drawAIconBox($iconImageRef, $fill, $ink)
     {
         if ($fill !== null && !$fill->isNone()) {
-            imagefilledrectangle($iconImageRef, 0, 0, $this->iconscalew - 1, $this->iconscaleh - 1, $fill->gdAllocate($iconImageRef));
+            imagefilledrectangle($iconImageRef, 0, 0, $this->iconscalew - 1, $this->iconscaleh - 1,
+                $fill->gdAllocate($iconImageRef));
         }
 
         if ($ink !== null && !$ink->isNone()) {
-            imagerectangle($iconImageRef, 0, 0, $this->iconscalew - 1, $this->iconscaleh - 1, $ink->gdallocate($iconImageRef));
+            imagerectangle($iconImageRef, 0, 0, $this->iconscalew - 1, $this->iconscaleh - 1,
+                $ink->gdallocate($iconImageRef));
         }
     }
 
@@ -343,15 +356,18 @@ class WMNodeArtificialIcon extends WMNodeIcon
         $radiusY = $this->iconscaleh / 2 - 1;
 
         if ($fill !== null && !$fill->isNone()) {
-            imagefilledellipse($iconImageRef, $radiusX, $radiusY, $radiusX * 2, $radiusY * 2, $fill->gdAllocate($iconImageRef));
+            imagefilledellipse($iconImageRef, $radiusX, $radiusY, $radiusX * 2, $radiusY * 2,
+                $fill->gdAllocate($iconImageRef));
         }
 
         if ($ink !== null && !$ink->isNone()) {
-            imagefilledarc($iconImageRef, $radiusX, $radiusY, $radiusX * 2, $radiusY * 2, 0, $segment_angle, $ink->gdallocate($iconImageRef), IMG_ARC_PIE);
+            imagefilledarc($iconImageRef, $radiusX, $radiusY, $radiusX * 2, $radiusY * 2, 0, $segment_angle,
+                $ink->gdallocate($iconImageRef), IMG_ARC_PIE);
         }
 
         if ($fill !== null && !$fill->isNone()) {
-            imageellipse($iconImageRef, $radiusX, $radiusY, $radiusX * 2, $radiusY * 2, $fill->gdAllocate($iconImageRef));
+            imageellipse($iconImageRef, $radiusX, $radiusY, $radiusX * 2, $radiusY * 2,
+                $fill->gdAllocate($iconImageRef));
         }
     }
 
@@ -474,8 +490,13 @@ class WMNodeLabel
         $this->calculateOutlineGeometry();
     }
 
-    public function preRender($labelFillColour, $labelOutlineColour, $labelShadowColour, $labelTextColour, $selectedColour)
-    {
+    public function preRender(
+        $labelFillColour,
+        $labelOutlineColour,
+        $labelShadowColour,
+        $labelTextColour,
+        $selectedColour
+    ) {
         $this->labelFillColour = $labelFillColour;
         $this->labelOutlineColour = $labelOutlineColour;
         $this->labelShadowColour = $labelShadowColour;
@@ -502,17 +523,20 @@ class WMNodeLabel
         // if there's an icon, then you can choose to have no background
 
         if (!$this->labelFillColour->isNone()) {
-            imagefilledrectangle($imageRef, $label_x1, $label_y1, $label_x2, $label_y2, $this->labelFillColour->gdAllocate($imageRef));
+            imagefilledrectangle($imageRef, $label_x1, $label_y1, $label_x2, $label_y2,
+                $this->labelFillColour->gdAllocate($imageRef));
         }
 
         if ($this->node->selected) {
             imagerectangle($imageRef, $label_x1, $label_y1, $label_x2, $label_y2, $this->selectedColour);
             // would be nice if it was thicker, too...
-            imagerectangle($imageRef, $label_x1 + 1, $label_y1 + 1, $label_x2 - 1, $label_y2 - 1, $this->selectedColour);
+            imagerectangle($imageRef, $label_x1 + 1, $label_y1 + 1, $label_x2 - 1, $label_y2 - 1,
+                $this->selectedColour);
         } else {
             // $label_outline_colour = $this->labeloutlinecolour;
             if ($this->labelOutlineColour->isRealColour()) {
-                imagerectangle($imageRef, $label_x1, $label_y1, $label_x2, $label_y2, $this->labelOutlineColour->gdallocate($imageRef));
+                imagerectangle($imageRef, $label_x1, $label_y1, $label_x2, $label_y2,
+                    $this->labelOutlineColour->gdallocate($imageRef));
             }
         }
 
@@ -667,7 +691,8 @@ class WeatherMapNode extends WeatherMapDataItem
             'relative_resolved' => false,
             'x' => null,
             'y' => null,
-            'inscalekey' => '', 'outscalekey' => '',
+            'inscalekey' => '',
+            'outscalekey' => '',
             'original_x' => 0,
             'original_y' => 0,
             'inpercent' => 0,
@@ -901,7 +926,8 @@ class WeatherMapNode extends WeatherMapDataItem
 
             $labelObj->calculateGeometry($this->processedLabel, $this->labelfont);
 
-            $labelObj->preRender($labelFillColour, $this->labeloutlinecolour, $this->labelfontshadowcolour, $this->labelfontcolour, $this->owner->selected);
+            $labelObj->preRender($labelFillColour, $this->labeloutlinecolour, $this->labelfontshadowcolour,
+                $this->labelfontcolour, $this->owner->selected);
         }
 
         // figure out a bounding rectangle for the icon
@@ -926,9 +952,11 @@ class WeatherMapNode extends WeatherMapDataItem
                     $aiconFillColour = $this->calculateIconFillColour();
                 }
 
-                $iconObj = new WMNodeArtificialIcon($this, $aiconInkColour, $aiconFillColour, $iconFillColour, $labelFillColour);
+                $iconObj = new WMNodeArtificialIcon($this, $aiconInkColour, $aiconFillColour, $iconFillColour,
+                    $labelFillColour);
             } else {
-                $iconObj = new WMNodeImageIcon($this, $this->owner->ProcessString($this->iconfile, $this), $this->iconscalew, $this->iconscaleh);
+                $iconObj = new WMNodeImageIcon($this, $this->owner->ProcessString($this->iconfile, $this),
+                    $this->iconscalew, $this->iconscaleh);
             }
 
             $iconObj->calculateGeometry();
@@ -990,8 +1018,16 @@ class WeatherMapNode extends WeatherMapDataItem
 
 //            $temp_width = $bbox_x2 - $bbox_x1;
 //            $temp_height = $bbox_y2 - $bbox_y1;
+
+        if ($bbox->width() + $bbox->height() == 0) {
+            return;
+        }
+
         // create an image of that size and draw into it
         $node_im = imagecreatetruecolor($bbox->width(), $bbox->height());
+        if ($node_im === false) {
+            throw new WeathermapInternalFail("Failed to create node image");
+        }
         // ImageAlphaBlending($node_im, false);
         imagesavealpha($node_im, true);
 
@@ -1102,9 +1138,10 @@ class WeatherMapNode extends WeatherMapDataItem
         // take the offset we figured out earlier, and just blit the image on. Who says "blit" anymore?
 
         // it's possible that there is no image, so better check.
-        if (isset($this->image)) {
+        if (!is_null($this->image)) {
             imagealphablending($im, true);
-            imagecopy($im, $this->image, $this->x - $this->centre_x, $this->y - $this->centre_y, 0, 0, imagesx($this->image), imagesy($this->image));
+            imagecopy($im, $this->image, $this->x - $this->centre_x, $this->y - $this->centre_y, 0, 0,
+                imagesx($this->image), imagesy($this->image));
         }
 
         // XXX - Hiding this here so Weathermap::drawMapImage doesn't need to know about it
@@ -1168,10 +1205,22 @@ class WeatherMapNode extends WeatherMapDataItem
             array("fieldName" => 'labelfont', "configKeyword" => 'LABELFONT', "type" => CONFIG_TYPE_LITERAL),
             array("fieldName" => 'labelangle', "configKeyword" => 'LABELANGLE', "type" => CONFIG_TYPE_LITERAL),
 
-            array("fieldName" => 'aiconoutlinecolour', "configKeyword" => 'AICONOUTLINECOLOR', "type" => CONFIG_TYPE_COLOR),
+            array(
+                "fieldName" => 'aiconoutlinecolour',
+                "configKeyword" => 'AICONOUTLINECOLOR',
+                "type" => CONFIG_TYPE_COLOR
+            ),
             array("fieldName" => 'aiconfillcolour', "configKeyword" => 'AICONFILLCOLOR', "type" => CONFIG_TYPE_COLOR),
-            array("fieldName" => 'labeloutlinecolour', "configKeyword" => 'LABELOUTLINECOLOR', "type" => CONFIG_TYPE_COLOR),
-            array("fieldName" => 'labelfontshadowcolour', "configKeyword" => 'LABELFONTSHADOWCOLOR', "type" => CONFIG_TYPE_COLOR),
+            array(
+                "fieldName" => 'labeloutlinecolour',
+                "configKeyword" => 'LABELOUTLINECOLOR',
+                "type" => CONFIG_TYPE_COLOR
+            ),
+            array(
+                "fieldName" => 'labelfontshadowcolour',
+                "configKeyword" => 'LABELFONTSHADOWCOLOR',
+                "type" => CONFIG_TYPE_COLOR
+            ),
             array("fieldName" => 'labelbgcolour', "configKeyword" => 'LABELBGCOLOR', "type" => CONFIG_TYPE_COLOR),
             array("fieldName" => 'labelfontcolour', "configKeyword" => 'LABELFONTCOLOR', "type" => CONFIG_TYPE_COLOR)
         );
@@ -1300,7 +1349,8 @@ class WeatherMapNode extends WeatherMapDataItem
         $output .= "overlibwidth:" . $this->overlibheight . ", ";
         $output .= "overlibheight:" . $this->overlibwidth . ", ";
         if (sizeof($this->boundingboxes) > 0) {
-            $output .= sprintf("bbox:[%d,%d, %d,%d], ", $this->boundingboxes[0][0], $this->boundingboxes[0][1], $this->boundingboxes[0][2], $this->boundingboxes[0][3]);
+            $output .= sprintf("bbox:[%d,%d, %d,%d], ", $this->boundingboxes[0][0], $this->boundingboxes[0][1],
+                $this->boundingboxes[0][2], $this->boundingboxes[0][3]);
         } else {
             $output .= "bbox: [], ";
         }

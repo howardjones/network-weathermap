@@ -7,7 +7,7 @@ class WMLinkGeometryFactoryTest extends PHPUnit_Framework_TestCase {
         $this->assertInstanceOf('WMAngledLinkGeometry', WMLinkGeometryFactory::create('angled'));
         $this->assertInstanceOf('WMCurvedLinkGeometry', WMLinkGeometryFactory::create('curved'));
 
-        $this->setExpectedException("WMException");
+        $this->setExpectedException("WeathermapInternalFail");
         WMLinkGeometryFactory::create('antelope');
     }
 }

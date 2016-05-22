@@ -221,7 +221,7 @@ class GeometryTest  extends PHPUnit_Framework_TestCase {
         $line1 = new WMLine(new WMPoint(50,50), new WMVector(1,0) );
         $line3 = new WMLine(new WMPoint(70,0), new WMVector(1,0) );
 
-        $this->setExpectedException("WMException");
+        $this->setExpectedException("WeathermapInternalFail");
         $line1->findCrossingPoint($line3);
     }
 

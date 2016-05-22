@@ -298,6 +298,11 @@ class WeatherMapItem extends WeatherMapBase
 
     }
 
+    public function preRender(&$owner)
+    {
+
+    }
+
     public function preCalculate(&$owner)
     {
 

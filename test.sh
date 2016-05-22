@@ -36,12 +36,12 @@ if [ $fflag -eq 1 ]; then
 	vendor/bin/phpmd lib/ html codesize,design,naming,cleancode > test-suite/md-rest.html
 
 	vendor/bin/phpmd lib/ xml codesize,design,naming,cleancode,unusedcode > reports/pmd.xml
-    vendor/bin/phpcpd --fuzzy --progress --min-tokens=30 --log-pmd=reports/cpd.xml lib/  > test-suite/cut-paste.txt
+        vendor/bin/phpcpd --fuzzy --progress --min-tokens=30 --log-pmd=reports/cpd.xml lib/  > test-suite/cut-paste.txt
 
     # this is mostly PSR2, with a few things excluded (namespaces) and a few things added (commented code)
     # CentOS 6 (my theoretical target system) currently ships with PHP 5.1, so no namespaces
     vendor/bin/phpcs -p --tab-width=4 -s --extensions=php --standard=docs/dev/phpcs/ruleset.xml --report-full=test-suite/phpcs-report-PSR-1-2.txt lib
 
-    doxygen network-weathermap.doxy 
+#    doxygen network-weathermap.doxy 
 
 fi

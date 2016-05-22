@@ -297,9 +297,14 @@ class WeatherMapNode extends WeatherMapDataItem
             if (WMNodeArtificialIcon::isAICONName($this->iconfile)) {
                 wm_debug("Artificial");
 
-                $iconObj = WMNodeArtificialIcon::createAICON($this->iconfile, $this, $aiconInkColour, $aiconFillColour,
-                    $iconFillColour,
-                    $labelFillColour);
+                $iconObj = WMNodeArtificialIcon::createAICON(
+                    $this->iconfile,
+                    $this,
+                    $this->resolvedColours['aiconoutline'],
+                    $this->resolvedColours['aiconfill'],
+                    $this->resolvedColours['iconfill'],
+                    $this->resolvedColours['labelfill']
+                );
             } else {
                 wm_debug("Legit Image");
                 $iconObj = new WMNodeImageIcon($this, $this->owner->ProcessString($this->iconfile, $this),
@@ -321,8 +326,7 @@ class WeatherMapNode extends WeatherMapDataItem
                 // $this->boundingboxes[] = array($icon_x1, $icon_y1, $icon_x2, $icon_y2);
             }
 
-            $this->subObjects [] = $iconObj;
-
+            $this->subObjects['icon'] = $iconObj;
         }
 
         // figure out a bounding rectangle for the label
@@ -340,7 +344,7 @@ class WeatherMapNode extends WeatherMapDataItem
 
             $labelObj->calculateGeometry($this->processedLabel, $this->labelfont);
 
-            $this->subObjects [] = $labelObj;
+            $this->subObjects['label'] = $labelObj;
 
 //            $labelObj->preRender($labelFillColour, $this->labeloutlinecolour, $this->labelfontshadowcolour,
 //                $this->labelfontcolour, $this->owner->selected);
@@ -405,68 +409,91 @@ class WeatherMapNode extends WeatherMapDataItem
             return;
         }
 
-        $iconObj = null;
-        $labelObj = null;
+        $iconObj = getWithDefault($this->subObjects['icon'], null);
+        $labelObj = getWithDefault($this->subObjects['label'], null);
 
         // work out the bounding box of the whole thing
         $totalBoundingBox = new WMBoundingBox("TotalBB for $this->name");
 
+        // TODO - nothing actually calls preRender() at the moment
 
-        // figure out a bounding rectangle for the label
-        if ($this->label != '') {
-            wm_debug("Has label - creating subcomponent");
-            $labelObj = new WMNodeLabel($this);
+        if (!is_null($iconObj)) {
+            $iconObj->preRender($this->iconfile, $this->iconscalew, $this->iconscaleh);
+        }
 
-            $this->processedLabel = $map->processString($this->label, $this, true, true);
-
-            // if screenshot_mode is enabled, wipe any letters to X and wipe any IP address to 127.0.0.1
-            // hopefully that will preserve enough information to show cool stuff without leaking info
-            if ($map->get_hint('screenshot_mode') == 1) {
-                $this->processedLabel = WMUtility::stringAnonymise($this->processedLabel);
-            }
-
-            $labelObj->calculateGeometry($this->processedLabel, $this->labelfont);
-
-            $labelObj->preRender($this->resolvedColours['labelfill'], $this->labeloutlinecolour,
+        if (!is_null($labelObj)) {
+            $labelObj->preRender(
+                $this->resolvedColours['labelfill'],
+                $this->labeloutlinecolour,
                 $this->labelfontshadowcolour,
-                $this->labelfontcolour, $this->owner->selected);
+                $this->labelfontcolour,
+                $this->owner->selected
+            );
         }
 
-        // figure out a bounding rectangle for the icon
-        if ($this->iconfile != '') {
-            wm_debug("Has icon - creating subcomponent");
-            $iconImageRef = null;
-            $icon_w = 0;
-            $icon_h = 0;
 
-            if (WMNodeArtificialIcon::isAICONName($this->iconfile)) {
-                wm_debug("Artificial");
-
-                # $iconObj = new WMNodeArtificialIcon($this, $aiconInkColour, $aiconFillColour, $iconFillColour,                     $labelFillColour);
-                $iconObj = WMNodeArtificialIcon::createAICON($this->iconfile, $this, $aiconInkColour, $aiconFillColour,
-                    $iconFillColour,
-                    $labelFillColour);
-            } else {
-                wm_debug("Legit");
-                $iconObj = new WMNodeImageIcon($this, $this->owner->ProcessString($this->iconfile, $this),
-                    $this->iconscalew, $this->iconscaleh);
-            }
-
-            wm_debug($iconObj);
-
-            $iconObj->calculateGeometry();
-            //XXX - this isn't correct
-            //$iconObj->preRender();
-
-            $iconImageRef = $iconObj->getImageRef();
-
-            if ($iconImageRef) {
-
-                $icon_bb = $iconObj->getBoundingBox();
-
-                // $this->boundingboxes[] = array($icon_x1, $icon_y1, $icon_x2, $icon_y2);
-            }
-        }
+//
+//
+//        // figure out a bounding rectangle for the label
+//        if ($this->label != '') {
+//            wm_debug("Has label - creating subcomponent");
+//            $labelObj = new WMNodeLabel($this);
+//
+//            $this->processedLabel = $map->processString($this->label, $this, true, true);
+//
+//            // if screenshot_mode is enabled, wipe any letters to X and wipe any IP address to 127.0.0.1
+//            // hopefully that will preserve enough information to show cool stuff without leaking info
+//            if ($map->get_hint('screenshot_mode') == 1) {
+//                $this->processedLabel = WMUtility::stringAnonymise($this->processedLabel);
+//            }
+//
+//            $labelObj->calculateGeometry($this->processedLabel, $this->labelfont);
+//
+//            $labelObj->preRender($this->resolvedColours['labelfill'], $this->labeloutlinecolour,
+//                $this->labelfontshadowcolour,
+//                $this->labelfontcolour, $this->owner->selected);
+//        }
+//
+//        // figure out a bounding rectangle for the icon
+//        if ($this->iconfile != '') {
+//            wm_debug("Has icon - creating subcomponent");
+//            $iconImageRef = null;
+//            $icon_w = 0;
+//            $icon_h = 0;
+//
+//            if (WMNodeArtificialIcon::isAICONName($this->iconfile)) {
+//                wm_debug("Artificial");
+//
+//                # $iconObj = new WMNodeArtificialIcon($this, $aiconInkColour, $aiconFillColour, $iconFillColour,                     $labelFillColour);
+//                $iconObj = WMNodeArtificialIcon::createAICON(
+//                    $this->iconfile,
+//                    $this,
+//                    $this->resolvedColours['aiconoutline'],
+//                    $this->resolvedColours['aiconfill'],
+//                    $this->resolvedColours['iconfill'],
+//                    $this->resolvedColours['labelfill']
+//                );
+//            } else {
+//                wm_debug("Legit");
+//                $iconObj = new WMNodeImageIcon($this, $this->owner->ProcessString($this->iconfile, $this),
+//                    $this->iconscalew, $this->iconscaleh);
+//            }
+//
+//            wm_debug($iconObj);
+//
+//            $iconObj->calculateGeometry();
+//            //XXX - this isn't correct
+//            //$iconObj->preRender();
+//
+//            $iconImageRef = $iconObj->getImageRef();
+//
+//            if ($iconImageRef) {
+//
+//                $icon_bb = $iconObj->getBoundingBox();
+//
+//                // $this->boundingboxes[] = array($icon_x1, $icon_y1, $icon_x2, $icon_y2);
+//            }
+//        }
 
         // do any offset calculations
         $deltaX = 0;
@@ -528,7 +555,7 @@ class WeatherMapNode extends WeatherMapDataItem
         imagesavealpha($node_im, true);
 
         $nothing = imagecolorallocatealpha($node_im, 128, 0, 0, 127);
-        $nothing = imagecolorallocatealpha($node_im, 128, 0, 0, 0);
+       // $nothing = imagecolorallocatealpha($node_im, 128, 0, 0, 0);
         imagefill($node_im, 0, 0, $nothing);
 
 //            $label_x1 -= $bbox_x1;

@@ -26,25 +26,27 @@ class WMRectangle
 
     public function getCentre()
     {
-        return new WMPoint(($this->bottomRight->x - $this->topLeft->x) / 2,
-            ($this->bottomRight->y - $this->topLeft->y) / 2);
+        return new WMPoint(
+            ($this->bottomRight->x - $this->topLeft->x) / 2,
+            ($this->bottomRight->y - $this->topLeft->y) / 2
+        );
     }
 
-    public function reCentre($new_centre)
+    public function reCentre($newCentre)
     {
         $newX = -$this->width() / 2;
         $newY = -$this->height() / 2;
 
-        $this->translate($newX - $this->topLeft->x, $newY - $this->topLeft->y);
-        $this->translate($new_centre->x, $new_centre->y);
-
-        return new WMPoint(($this->bottomRight->x - $this->topLeft->x) / 2,
-            ($this->bottomRight->y - $this->topLeft->y) / 2);
+        $this->translate(-$this->topLeft->x, -$this->topLeft->y);
+        $this->translate($newX + $newCentre->x, $newY + $newCentre->y);
     }
 
     public function identical($otherRect)
     {
-        return ($this->topLeft->identical($otherRect->topLeft) && $this->bottomRight->identical($otherRect->bottomRight));
+        return (
+            $this->topLeft->identical($otherRect->topLeft) &&
+            $this->bottomRight->identical($otherRect->bottomRight)
+        );
     }
 
     public function copy()
@@ -74,12 +76,12 @@ class WMRectangle
         return ($this->bottomRight->y - $this->topLeft->y);
     }
 
-    public function containsPoint($p)
+    public function containsPoint($testPoint)
     {
-        if ($this->topLeft->x <= $p->x
-            && $this->bottomRight->x >= $p->x
-            && $this->topLeft->y <= $p->y
-            && $this->bottomRight->y >= $p->y
+        if ($this->topLeft->x <= $testPoint->x
+            && $this->bottomRight->x >= $testPoint->x
+            && $this->topLeft->y <= $testPoint->y
+            && $this->bottomRight->y >= $testPoint->y
         ) {
             return true;
         }

@@ -202,7 +202,7 @@ class WMNodeArtificialIcon extends WMNodeIcon
         parent::calculateGeometry();
     }
 
-    public function preRender()
+    public function preRender($iconFile, $scaleWidth = null, $scaleHeight = null)
     {
         wm_debug("Artificial Icon type " . $this->iconFileName . " for $this->name\n");
         // this is an artificial icon - we don't load a file for it

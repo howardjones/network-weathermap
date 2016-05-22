@@ -127,5 +127,9 @@ function OutputHTML($htmlfile, &$map, $refresh = 300)
     fclose($filehandle);
 }
 
+function getWithDefault(&$var, $default = null)
+{
+    return isset($var) ? $var : $default;
+}
 
 // vim:ts=4:sw=4:

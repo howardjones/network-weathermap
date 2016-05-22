@@ -14,7 +14,7 @@ class WMColour
     protected $alpha;
     
     // take in an existing value and create a Colour object for it
-    function __construct()
+    public function __construct()
     {
         // a set of 3 colours
         if (func_num_args() === 3) {
@@ -61,7 +61,7 @@ class WMColour
     }
 
     // return true if two colours are identical
-    function equals($colour2)
+    public function equals($colour2)
     {
         if (null==$colour2) {
             throw new WeathermapInternalFail("Comparison With Null");
@@ -75,7 +75,7 @@ class WMColour
     }
     
     // take this colour, and that colour, and make a new one in the ratio given
-    function blendWith($colour2, $ratio)
+    public function blendWith($colour2, $ratio)
     {
         $red = $this->red + ($colour2->red - $this->red) * $ratio;
         $green = $this->green + ($colour2->green - $this->green) * $ratio;
@@ -85,7 +85,7 @@ class WMColour
     }
     
     // Is this a transparent/none colour?
-    function isRealColour()
+    public function isRealColour()
     {
         if ($this->red >= 0 && $this->green >= 0 && $this->blue >= 0) {
             return true;
@@ -95,7 +95,7 @@ class WMColour
     }
     
     // Is this a transparent/none colour?
-    function isNone()
+    public function isNone()
     {
         if ($this->red == - 1 && $this->green == - 1 && $this->blue == - 1) {
             return true;
@@ -105,7 +105,7 @@ class WMColour
     }
     
     // Is this a contrast colour?
-    function isContrast()
+    public function isContrast()
     {
         if ($this->red == - 3 && $this->green == - 3 && $this->blue == - 3) {
             return true;
@@ -115,7 +115,7 @@ class WMColour
     }
     
     // Is this a copy colour?
-    function isCopy()
+    public function isCopy()
     {
         if ($this->red == - 2 && $this->green == - 2 && $this->blue == - 2) {
             return true;
@@ -125,7 +125,7 @@ class WMColour
     
     // allocate a colour in the appropriate image context
     // - things like scale colours are used in multiple images now (the scale, several nodes, the main map...)
-    function gdAllocate($image_ref)
+    public function gdAllocate($image_ref)
     {
         if (false === $this->isRealColour()) {
             return null;
@@ -135,8 +135,13 @@ class WMColour
     }
     
     // based on an idea from: http://www.bennadel.com/index.cfm?dax=blog:902.view
-    function getContrastingColourAsArray()
+    public function getContrastingColourAsArray()
     {
+        if (! $this->isRealColour()) {
+            wm_warn("You can't make a contrast with 'none' - guessing black. [WMWARN43]\n");
+            return (array(0, 0, 0));
+        }
+
         if ((($this->red + $this->green + $this->blue) > 500) || ($this->green > 140)) {
             return (array (
                     0,
@@ -152,14 +157,14 @@ class WMColour
             ));
     }
 
-    function getContrastingColour()
+    public function getContrastingColour()
     {
         return new WMColour($this->getContrastingColourAsArray());
     }
     
     // make a printable version, for debugging
     // - optionally take a format string, so we can use it for other things (like WriteConfig, or hex in stylesheets)
-    function asString($format = 'RGB(%d,%d,%d)')
+    public function asString($format = 'RGB(%d,%d,%d)')
     {
         if ($this->isNone()) {
             return 'none';
@@ -173,7 +178,7 @@ class WMColour
         return (sprintf($format, $this->red, $this->green, $this->blue));
     }
 
-    function __toString()
+    public function __toString()
     {
         return $this->asString();
     }
@@ -181,12 +186,12 @@ class WMColour
     /**
      * Produce a string ready to drop into a config file by WriteConfig
      */
-    function asConfig()
+    public function asConfig()
     {
         return $this->asString('%d %d %d');
     }
 
-    function asHTML()
+    public function asHTML()
     {
         if (true === $this->isRealColour()) {
             return $this->asString('#%02x%02x%02x');

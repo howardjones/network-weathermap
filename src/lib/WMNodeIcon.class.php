@@ -36,14 +36,21 @@ class WMNodeIcon
     {
         $boundingBox = $this->getBoundingBox();
 
-        $icon_x = -($boundingBox->width() / 2);
-        $icon_y = -($boundingBox->height() / 2);
+        $iconX = -($boundingBox->width() / 2);
+        $iconY = -($boundingBox->height() / 2);
 
-        wm_debug("Drawing into icon at $icon_x, $icon_y\n");
+        wm_debug("Drawing into icon at $iconX, $iconY\n");
 
-        imagecopy($targetImageRef, $this->iconImageRef, $icon_x, $icon_y, 0, 0,
+        imagecopy(
+            $targetImageRef,
+            $this->iconImageRef,
+            $iconX,
+            $iconY,
+            0,
+            0,
             imagesx($this->iconImageRef),
-            imagesy($this->iconImageRef));
+            imagesy($this->iconImageRef)
+        );
         imagedestroy($this->iconImageRef);
     }
 
@@ -275,13 +282,51 @@ class WMNodeNINKIcon extends WMNodeArtificialIcon
         $colour1 = $this->node->colours[OUT]->gdallocate($iconImageRef);
         $colour2 = $this->node->colours[IN]->gdallocate($iconImageRef);
 
-        imagefilledarc($iconImageRef, $radiusX - 1, $radiusY, $size, $size, 270, 90, $colour1, IMG_ARC_PIE);
-        imagefilledarc($iconImageRef, $radiusX + 1, $radiusY, $size, $size, 90, 270, $colour2, IMG_ARC_PIE);
+        imagefilledarc(
+            $iconImageRef,
+            $radiusX - 1,
+            $radiusY,
+            $size,
+            $size,
+            270,
+            90,
+            $colour1,
+            IMG_ARC_PIE
+        );
+        imagefilledarc(
+            $iconImageRef,
+            $radiusX + 1,
+            $radiusY,
+            $size,
+            $size,
+            90,
+            270,
+            $colour2,
+            IMG_ARC_PIE
+        );
 
-        imagefilledarc($iconImageRef, $radiusX - 1, $radiusY + $quarter, $quarter * 2, $quarter * 2, 0, 360, $colour1,
-            IMG_ARC_PIE);
-        imagefilledarc($iconImageRef, $radiusX + 1, $radiusY - $quarter, $quarter * 2, $quarter * 2, 0, 360, $colour2,
-            IMG_ARC_PIE);
+        imagefilledarc(
+            $iconImageRef,
+            $radiusX - 1,
+            $radiusY + $quarter,
+            $quarter * 2,
+            $quarter * 2,
+            0,
+            360,
+            $colour1,
+            IMG_ARC_PIE
+        );
+        imagefilledarc(
+            $iconImageRef,
+            $radiusX + 1,
+            $radiusY - $quarter,
+            $quarter * 2,
+            $quarter * 2,
+            0,
+            360,
+            $colour2,
+            IMG_ARC_PIE
+        );
 
         if ($ink !== null && !$ink->isNone()) {
             // XXX - need a font definition from somewhere for NINK text
@@ -298,8 +343,14 @@ class WMNodeNINKIcon extends WMNodeArtificialIcon
                 $label = $this->node->owner->ProcessString("{node:this:bandwidth_$name:%.1k}", $this->node);
 
                 list($twid, $thgt) = $this->node->owner->myimagestringsize($font, $label);
-                $this->node->owner->myimagestring($iconImageRef, $font, $radiusX - $twid / 2,
-                    $radiusY + $direction[1] * $quarter + ($thgt / 2), $label, $inkGD);
+                $this->node->owner->myimagestring(
+                    $iconImageRef,
+                    $font,
+                    $radiusX - $twid / 2,
+                    $radiusY + $direction[1] * $quarter + ($thgt / 2),
+                    $label,
+                    $inkGD
+                );
             }
 
             imageellipse($iconImageRef, $radiusX, $radiusY, $radiusX * 2, $radiusY * 2, $inkGD);
@@ -311,18 +362,29 @@ class WMNodeBoxIcon extends WMNodeArtificialIcon
 {
     public function drawAIcon()
     {
-        $iconImageRef = $this->iconImageRef;
         $fill = $this->aiconFillColour;
         $ink = $this->aiconInkColour;
 
         if ($fill !== null && !$fill->isNone()) {
-            imagefilledrectangle($iconImageRef, 0, 0, $this->widthScale - 1, $this->heightScale - 1,
-                $fill->gdAllocate($iconImageRef));
+            imagefilledrectangle(
+                $this->iconImageRef,
+                0,
+                0,
+                $this->widthScale - 1,
+                $this->heightScale - 1,
+                $fill->gdAllocate($this->iconImageRef)
+            );
         }
 
         if ($ink !== null && !$ink->isNone()) {
-            imagerectangle($iconImageRef, 0, 0, $this->widthScale - 1, $this->heightScale - 1,
-                $ink->gdallocate($iconImageRef));
+            imagerectangle(
+                $this->iconImageRef,
+                0,
+                0,
+                $this->widthScale - 1,
+                $this->heightScale - 1,
+                $ink->gdallocate($this->iconImageRef)
+            );
         }
     }
 
@@ -332,18 +394,31 @@ class WMNodeRoundedBoxIcon extends WMNodeArtificialIcon
 {
     public function drawAIcon()
     {
-        $iconImageRef = $this->iconImageRef;
         $fill = $this->aiconFillColour;
         $ink = $this->aiconInkColour;
 
         if ($fill !== null && !$fill->isNone()) {
-            imagefilledroundedrectangle($iconImageRef, 0, 0, $this->widthScale - 1, $this->heightScale - 1, 4,
-                $fill->gdAllocate($iconImageRef));
+            imagefilledroundedrectangle(
+                $this->iconImageRef,
+                0,
+                0,
+                $this->widthScale - 1,
+                $this->heightScale - 1,
+                4,
+                $fill->gdAllocate($this->iconImageRef)
+            );
         }
 
         if ($ink !== null && !$ink->isNone()) {
-            imageroundedrectangle($iconImageRef, 0, 0, $this->widthScale - 1, $this->heightScale - 1, 4,
-                $ink->gdallocate($iconImageRef));
+            imageroundedrectangle(
+                $this->iconImageRef,
+                0,
+                0,
+                $this->widthScale - 1,
+                $this->heightScale - 1,
+                4,
+                $ink->gdallocate($this->iconImageRef)
+            );
         }
     }
 
@@ -354,7 +429,6 @@ class WMNodeRoundIcon extends WMNodeArtificialIcon
 
     public function drawAIcon()
     {
-        $iconImageRef = $this->iconImageRef;
         $fill = $this->aiconFillColour;
         $ink = $this->aiconInkColour;
 
@@ -362,13 +436,25 @@ class WMNodeRoundIcon extends WMNodeArtificialIcon
         $radiusY = $this->heightScale / 2 - 1;
 
         if ($fill !== null && !$fill->isNone()) {
-            imagefilledellipse($iconImageRef, $radiusX, $radiusY, $radiusX * 2, $radiusY * 2,
-                $fill->gdAllocate($iconImageRef));
+            imagefilledellipse(
+                $this->iconImageRef,
+                $radiusX,
+                $radiusY,
+                $radiusX * 2,
+                $radiusY * 2,
+                $fill->gdAllocate($this->iconImageRef)
+            );
         }
 
         if ($ink !== null && !$ink->isNone()) {
-            imageellipse($iconImageRef, $radiusX, $radiusY, $radiusX * 2, $radiusY * 2,
-                $ink->gdallocate($iconImageRef));
+            imageellipse(
+                $this->iconImageRef,
+                $radiusX,
+                $radiusY,
+                $radiusX * 2,
+                $radiusY * 2,
+                $ink->gdallocate($this->iconImageRef)
+            );
         }
     }
 
@@ -378,33 +464,54 @@ class WMNodePieIcon extends WMNodeArtificialIcon
 {
     public function drawAIcon()
     {
-        $iconImageRef = $this->iconImageRef;
         $fill = $this->aiconFillColour;
         $ink = $this->aiconInkColour;
+        $segmentAngle = 0;
 
         if ($this->iconFileName == 'inpie') {
-            $segment_angle = (($this->node->percentUsages[IN]) / 100) * 360;
+            $segmentAngle = (($this->node->percentUsages[IN]) / 100) * 360;
         }
         if ($this->iconFileName == 'outpie') {
-            $segment_angle = (($this->node->percentUsages[OUT]) / 100) * 360;
+            $segmentAngle = (($this->node->percentUsages[OUT]) / 100) * 360;
         }
 
         $radiusX = $this->widthScale / 2 - 1;
         $radiusY = $this->heightScale / 2 - 1;
 
         if ($fill !== null && !$fill->isNone()) {
-            imagefilledellipse($iconImageRef, $radiusX, $radiusY, $radiusX * 2, $radiusY * 2,
-                $fill->gdAllocate($iconImageRef));
+            imagefilledellipse(
+                $this->iconImageRef,
+                $radiusX,
+                $radiusY,
+                $radiusX * 2,
+                $radiusY * 2,
+                $fill->gdAllocate($this->iconImageRef)
+            );
         }
 
         if ($ink !== null && !$ink->isNone()) {
-            imagefilledarc($iconImageRef, $radiusX, $radiusY, $radiusX * 2, $radiusY * 2, 0, $segment_angle,
-                $ink->gdallocate($iconImageRef), IMG_ARC_PIE);
+            imagefilledarc(
+                $this->iconImageRef,
+                $radiusX,
+                $radiusY,
+                $radiusX * 2,
+                $radiusY * 2,
+                0,
+                $segmentAngle,
+                $ink->gdallocate($this->iconImageRef),
+                IMG_ARC_PIE
+            );
         }
 
         if ($fill !== null && !$fill->isNone()) {
-            imageellipse($iconImageRef, $radiusX, $radiusY, $radiusX * 2, $radiusY * 2,
-                $fill->gdAllocate($iconImageRef));
+            imageellipse(
+                $this->iconImageRef,
+                $radiusX,
+                $radiusY,
+                $radiusX * 2,
+                $radiusY * 2,
+                $fill->gdAllocate($this->iconImageRef)
+            );
         }
     }
 }

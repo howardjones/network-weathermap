@@ -9,14 +9,19 @@ php:
 env:
   - DB=mysql
 before_install:
-  - apt-get update -qq
-  - apt-get install -y imagemagick xsltproc rrdtool
+#  - sudo apt-get update -qq
+#  - sudo apt-get install -y imagemagick xsltproc rrdtool
   - mkdir -p build/log
 install:
   - composer install --dev
 addons:
   code_climate:
     repo_token: 858ba1f597a441ed0b8abfefb2db2ecc09309285da99bd165ebcf1b580ced776
+  apt:
+    packages:
+      - imagemagick
+      - rrdtool
+      - xsltproc
 after_script:
   - vendor/bin/test-reporter
 script:

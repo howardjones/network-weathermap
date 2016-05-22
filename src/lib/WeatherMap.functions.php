@@ -47,9 +47,8 @@ function wm_module_checks()
  *            string... the first string is treated as a sprintf format string.
  *            Following params are fed to sprintf()
  */
+
 // TODO - replace calls to this with WMDebug class and WMDebugFactory.
-
-
 function wm_debug($string)
 {
     global $wm_debug_logger;
@@ -57,76 +56,7 @@ function wm_debug($string)
     call_user_func_array(array($wm_debug_logger, "log"), func_get_args());
 }
 
-function old_wm_debug($string)
-{
-    global $weathermap_map;
-
-    if (wm_debug_shouldDebug($string)) {
-        if (func_num_args() > 1) {
-            $args = func_get_args();
-            $string = call_user_func_array('sprintf', $args);
-        }
-
-        $calling_fn = wm_debug_getCallingFunction();
-
-        // use Cacti's debug log, if we are running from the poller
-        if (function_exists('debug_log_insert') && (!function_exists('wmeShowStartPage'))) {
-            cacti_log("DEBUG:$calling_fn " . ($weathermap_map == '' ? '' : $weathermap_map . ": ") . rtrim($string), true, "WEATHERMAP");
-        } else {
-            $stderr = fopen('php://stderr', 'w');
-            fwrite($stderr, "DEBUG:$calling_fn " . ($weathermap_map == '' ? '' : $weathermap_map . ": ") . $string);
-            fclose($stderr);
-        }
-    }
-}
-
-/**
- * @param $string
- * @param $weathermap_debugging_readdata
- * @return bool
- */
-function wm_debug_shouldDebug($string)
-{
-    global $weathermap_debugging_readdata;
-    global $weathermap_debugging;
-
-    if ($weathermap_debugging_readdata) {
-        $isReadData = false;
-
-        if (false !== strpos("ReadData", $string)) {
-            $isReadData = true;
-        }
-    }
-
-    if ($weathermap_debugging || ($weathermap_debugging_readdata && $isReadData)) {
-        return true;
-    }
-    return false;
-}
-
-/**
- * @return string
- */
-function wm_debug_getCallingFunction()
-{
-    $calling_fn = "";
-
-    if (function_exists("debug_backtrace")) {
-        $backtrace = debug_backtrace();
-        $index = 2;
-
-        $function = (true === isset($backtrace[$index]['function'])) ? $backtrace[$index]['function'] : '';
-        $index = 1;
-        $file = (true === isset($backtrace[$index]['file'])) ? basename($backtrace[$index]['file']) : '';
-        $line = (true === isset($backtrace[$index]['line'])) ? $backtrace[$index]['line'] : '';
-
-        $calling_fn = " [$function@$file:$line]";
-        return $calling_fn;
-    }
-    return $calling_fn;
-}
-
-function wm_warn($string, $notice_only = false, $code = "")
+function wm_warn($string, $noticeOnly = false, $code = "")
 {
     global $weathermap_map;
     global $weathermap_warncount;
@@ -138,12 +68,14 @@ function wm_warn($string, $notice_only = false, $code = "")
         $code = $matches[1];
     }
 
-    if ((true === is_array($weathermap_error_suppress)) && (true === in_array(strtoupper($code), $weathermap_error_suppress))) {
+    if ((true === is_array($weathermap_error_suppress)) && (true === in_array(strtoupper($code),
+                $weathermap_error_suppress))
+    ) {
         // This error code has been deliberately disabled.
         return;
     }
 
-    if (!$notice_only) {
+    if (!$noticeOnly) {
         $weathermap_warncount++;
         $message .= "WARNING: ";
     }
@@ -172,19 +104,26 @@ function OutputHTML($htmlfile, &$map, $refresh = 300)
     global $WEATHERMAP_VERSION;
 
     $filehandle = fopen($htmlfile, 'w');
-    fwrite($filehandle, '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head>');
+    fwrite($filehandle,
+        '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head>');
     if ($map->htmlstylesheet != '') {
         fwrite($filehandle, '<link rel="stylesheet" type="text/css" href="' . $map->htmlstylesheet . '" />');
     }
-    fwrite($filehandle, '<meta http-equiv="refresh" content="' . intval($refresh) . '" /><title>' . $map->processString($map->title, $map) . '</title></head><body>');
+    fwrite($filehandle,
+        '<meta http-equiv="refresh" content="' . intval($refresh) . '" /><title>' . $map->processString($map->title,
+            $map) . '</title></head><body>');
 
     if ($map->htmlstyle == "overlib") {
-        fwrite($filehandle, "<div id=\"overDiv\" style=\"position:absolute; visibility:hidden; z-index:1000;\"></div>\n");
-        fwrite($filehandle, "<script type=\"text/javascript\" src=\"vendor/overlib.js\"><!-- overLIB (c) Erik Bosrup --></script> \n");
+        fwrite($filehandle,
+            "<div id=\"overDiv\" style=\"position:absolute; visibility:hidden; z-index:1000;\"></div>\n");
+        fwrite($filehandle,
+            "<script type=\"text/javascript\" src=\"vendor/overlib.js\"><!-- overLIB (c) Erik Bosrup --></script> \n");
     }
 
     fwrite($filehandle, $map->makeHTML());
-    fwrite($filehandle, '<hr /><span id="byline">Network Map created with <a href="http://www.network-weathermap.com/?vs=' . $WEATHERMAP_VERSION . '">PHP Network Weathermap v' . $WEATHERMAP_VERSION . '</a></span></body></html>');
+
+    fwrite($filehandle,
+        '<hr /><span id="byline">Network Map created with <a href="http://www.network-weathermap.com/?vs=' . $WEATHERMAP_VERSION . '">PHP Network Weathermap v' . $WEATHERMAP_VERSION . '</a></span></body></html>');
     fclose($filehandle);
 }
 

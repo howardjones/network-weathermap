@@ -13,16 +13,22 @@
 class WMDebugNull
 {
     protected $onlyReadData;
-    protected $context_name;
+    protected $contextName;
+
+    public function __construct($context_name, $onlyReadData)
+    {
+        $this->contextName = $context_name;
+        $this->onlyReadData = $onlyReadData;
+    }
 
     public function log($string)
     {
         return;
     }
 
-    public function setContext($filename)
+    public function setContext($newContext)
     {
-        return;
+        $this->contextName = $newContext;
     }
 
     protected function shouldLog($string)
@@ -37,18 +43,6 @@ class WMDebugNull
  */
 class WMDebugLogging extends WMDebugNull
 {
-    public function __construct($mapname, $onlyReadData = false)
-    {
-        $this->mapname = $mapname;
-        $this->onlyReadData = $onlyReadData;
-        $this->context_name = "";
-    }
-
-    public function setContext($filename)
-    {
-        $this->context_name = $filename;
-    }
-
     public function log($string)
     {
         if (! $this->shouldLog($string)) {
@@ -62,7 +56,7 @@ class WMDebugLogging extends WMDebugNull
 
         $calling_fn = $this->getCallingFunction();
 
-        $message = "DEBUG:$calling_fn " . ($this->context_name == '' ? '' : $this->context_name . ": ") . rtrim($string) . "\n";
+        $message = "DEBUG:$calling_fn " . ($this->contextName == '' ? '' : $this->contextName . ": ") . rtrim($string) . "\n";
 
         $this->doLog($message);
     }
@@ -79,7 +73,7 @@ class WMDebugLogging extends WMDebugNull
      */
     private function getCallingFunction()
     {
-        $calling_fn = "";
+        $callingFunction = "";
 
         if (function_exists("debug_backtrace")) {
             $backtrace = debug_backtrace();
@@ -90,10 +84,10 @@ class WMDebugLogging extends WMDebugNull
             $file = (true === isset($backtrace[$index]['file'])) ? basename($backtrace[$index]['file']) : '';
             $line = (true === isset($backtrace[$index]['line'])) ? $backtrace[$index]['line'] : '';
 
-            $calling_fn = " [$function@$file:$line]";
-            return $calling_fn;
+            $callingFunction = " [$function@$file:$line]";
+            return $callingFunction;
         }
-        return $calling_fn;
+        return $callingFunction;
     }
 
     protected function shouldLog($string)
@@ -132,11 +126,11 @@ class WMDebugLoggingCacti extends WMDebugLogging
  */
 class WMDebugFactory
 {
-    public static function update($new_status)
+    public static function update($newStatus)
     {
         global $weathermap_debugging;
 
-        $weathermap_debugging = $new_status;
+        $weathermap_debugging = $newStatus;
 
         return self::create();
     }

@@ -114,11 +114,13 @@ class WMNodeImageIcon extends WMNodeIcon
                     $this->iconImageRef = $scaledImage;
                 }
             } else {
-                wm_warn("Couldn't open ICON: '" . $realiconfile . "' - is it a PNG, JPEG or GIF? [WMWARN37]\n");
+                throw new WeathermapRuntimeWarning("Couldn't open ICON: '" . $realiconfile . "' - is it a PNG, JPEG or GIF? [WMWARN37]");
+                //    wm_warn("Couldn't open ICON: '" . $realiconfile . "' - is it a PNG, JPEG or GIF? [WMWARN37]\n");
             }
         } else {
             if ($realiconfile != 'none') {
-                wm_warn("ICON '" . $realiconfile . "' does not exist, or is not readable. Check path and permissions. [WMARN38]\n");
+                throw new WeathermapRuntimeWarning("ICON '" . $realiconfile . "' does not exist, or is not readable. Check path and permissions. [WMARN38]");
+                // wm_warn("ICON '" . $realiconfile . "' does not exist, or is not readable. Check path and permissions. [WMARN38]\n");
             }
         }
     }
@@ -145,7 +147,7 @@ class WMNodeArtificialIcon extends WMNodeIcon
         $this->name = $node->name;
 
         if (!self::isAICONName($this->iconfile)) {
-            throw new WMException("AICON with invalid type");
+            throw new WeathermapRuntimeWarning("AICON with invalid type");
         }
 
         // $this->aiconOutlineColour = $aiconOutlineColour;
@@ -991,7 +993,7 @@ class WeatherMapNode extends WeatherMapDataItem
         // create an image of that size and draw into it
         $node_im = imagecreatetruecolor($bbox->width(), $bbox->height());
         // ImageAlphaBlending($node_im, false);
-        imageSaveAlpha($node_im, true);
+        imagesavealpha($node_im, true);
 
         $nothing = imagecolorallocatealpha($node_im, 128, 0, 0, 127);
         $nothing = imagecolorallocatealpha($node_im, 128, 0, 0, 0);
@@ -1323,7 +1325,7 @@ class WeatherMapNode extends WeatherMapDataItem
         if (property_exists($this, $name)) {
             return $this->$name;
         }
-        throw new WMException("NoSuchProperty");
+        throw new WeathermapRuntimeWarning("NoSuchProperty");
     }
 }
 // vim:ts=4:sw=4:

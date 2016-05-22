@@ -64,7 +64,7 @@ class WMColour
     function equals($colour2)
     {
         if (null==$colour2) {
-            throw new WMException("Comparison With Null");
+            throw new WeathermapInternalFail("Comparison With Null");
         }
 
         if ($this->red == $colour2->red && $this->green == $colour2->green

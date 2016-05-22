@@ -28,7 +28,6 @@
     </target>
 
     <target name="dist-with-tests" depends="dist-main">
-
     </target>
 
     <target name="dist" depends="dist-main,dist-with-tests,manual" description="Create the tar and zip artifacts for download"/>
@@ -84,7 +83,8 @@
         <mkdir dir="${basedir}/build/logs"/>
         <mkdir dir="${basedir}/build/pdepend"/>
         <mkdir dir="${basedir}/build/phpdox"/>
-        <mkdir dir="${basedir}/dist/weathermap"/>
+        <mkdir dir="${basedir}/dist/${WEATHERMAPVERSION}" />
+        <mkdir dir="${basedir}/dist/${WEATHERMAPVERSION}/weathermap" />
         <property name="prepare.done" value="true"/>
     </target>
     <target name="lint" unless="lint.done" description="Perform syntax check of sourcecode files">

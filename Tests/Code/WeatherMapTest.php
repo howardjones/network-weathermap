@@ -39,7 +39,7 @@ class WeatherMapTest extends PHPUnit_Framework_TestCase
     }
 
     /**
-     * @throws WMException
+     * @throws WeathermapInternalFail
      * @covers WeatherMap::getNode
      * @covers WeatherMap::getLink
      */
@@ -58,9 +58,9 @@ class WeatherMapTest extends PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException WMException
+     * @expectedException WeathermapInternalFail
      * @expectedExceptionMessage NoSuchNode
-     * @throws WMException
+     * @throws WeathermapInternalFail
      */
     public function testNodeAccessorException()
     {
@@ -68,9 +68,9 @@ class WeatherMapTest extends PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException WMException
+     * @expectedException WeathermapInternalFail
      * @expectedExceptionMessage NoSuchLink
-     * @throws WMException
+     * @throws WeathermapInternalFail
      */
     public function testLinkAccessorException()
     {

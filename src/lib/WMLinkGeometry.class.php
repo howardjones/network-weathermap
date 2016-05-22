@@ -35,7 +35,7 @@ class WMLinkGeometry
      * @param int[] $widths
      * @param int $directions
      * @param int $splitPosition
-     * @throws WMException
+     * @throws WeathermapInternalFail
      */
     function Init(&$link, $controlPoints, $widths, $directions = 2, $splitPosition = 50, $arrowStyle = "classic")
     {
@@ -62,7 +62,7 @@ class WMLinkGeometry
         $this->processControlPoints();
 
         if (count($this->controlPoints) <= 1) {
-            throw new WMException("OneDimensionalLink");
+            throw new WeathermapInternalFail("OneDimensionalLink");
         }
 
         $this->arrowStyle = $arrowStyle;
@@ -239,7 +239,7 @@ class WMLinkGeometry
     function draw($gdImage)
     {
         if (is_null($this->curvePoints)) {
-            throw new WMException("DrawingEmptySpline");
+            throw new WeathermapInternalFail("DrawingEmptySpline");
         }
 
         if (($this->arrowWidths[IN] + $this->arrowWidths[OUT] * 1.2) > $this->curvePoints->totalDistance()) {

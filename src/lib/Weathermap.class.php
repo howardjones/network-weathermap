@@ -177,13 +177,13 @@ class WeatherMap extends WeatherMapBase
         if (isset($this->nodes[$name])) {
             return $this->nodes[$name];
         }
-        throw new WMException("NoSuchNode");
+        throw new WeathermapInternalFail("NoSuchNode");
     }
 
     function addNode($newObject)
     {
         if ($this->nodeExists($newObject->name)) {
-            throw new WMException("NodeAlreadyExists");
+            throw new WeathermapInternalFail("NodeAlreadyExists");
         }
         $this->nodes[$newObject->name] = $newObject;
         $this->addItemToZLayer($newObject, $newObject->getZIndex());
@@ -194,13 +194,13 @@ class WeatherMap extends WeatherMapBase
         if (isset($this->links[$name])) {
             return $this->links[$name];
         }
-        throw new WMException("NoSuchLink");
+        throw new WeathermapInternalFail("NoSuchLink");
     }
 
     function addLink($newObject)
     {
         if ($this->linkExists($newObject->name)) {
-            throw new WMException("LinkAlreadyExists");
+            throw new WeathermapInternalFail("LinkAlreadyExists");
         }
         $this->links[$newObject->name] = $newObject;
         $this->addItemToZLayer($newObject, $newObject->getZIndex());
@@ -211,7 +211,7 @@ class WeatherMap extends WeatherMapBase
         if (isset($this->scales[$name])) {
             return $this->scales[$name];
         }
-        throw new WMException("NoSuchScale");
+        throw new WeathermapInternalFail("NoSuchScale");
     }
 
     function reset()
@@ -504,7 +504,7 @@ class WeatherMap extends WeatherMapBase
         // Previously this was directly accessing properties of map items
         try {
             $value = $mapItem->getValue($variableName);
-        } catch (WMException $e) {
+        } catch (WeathermapInternalFail $e) {
             // give up, and pass back the current value
             return $currentValue;
         }
@@ -1778,7 +1778,7 @@ class WeatherMap extends WeatherMapBase
         if (property_exists($this, $name)) {
             return $this->$name;
         }
-        throw new WMException("NoSuchProperty");
+        throw new WeathermapInternalFail("NoSuchProperty");
     }
 
     /**
@@ -1866,7 +1866,7 @@ class WeatherMap extends WeatherMapBase
 
     /**
      * @return array
-     * @throws WMException
+     * @throws WeathermapInternalFail
      */
     private function prepareOutputImage()
     {
@@ -1876,7 +1876,7 @@ class WeatherMap extends WeatherMapBase
 
         if (!$outputImageRef) {
             wm_warn("Couldn't create output image in memory (" . $this->width . "x" . $this->height . ").");
-            throw new WMException("ImageCreationError");
+            throw new WeathermapInternalFail("ImageCreationError");
         }
 
         ImageAlphaBlending($outputImageRef, true);

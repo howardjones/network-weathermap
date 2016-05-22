@@ -49,7 +49,7 @@ class WMBoundingBox
     public function getBoundingRectangle()
     {
         if (null === $this->minimumX) {
-            throw new WMException("No Bounding Box until points are added");
+            throw new WeathermapInternalFail("No Bounding Box until points are added");
         }
         return new WMRectangle($this->minimumX, $this->minimumY, $this->maximumX, $this->maximumY);
     }
@@ -58,7 +58,7 @@ class WMBoundingBox
     {
         try {
             $r = $this->getBoundingRectangle();
-        } catch (WMException $e) {
+        } catch (WeathermapInternalFail $e) {
             $r = "[Empty BBox]";
         }
         return "$r";

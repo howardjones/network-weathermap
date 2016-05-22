@@ -57,7 +57,7 @@ class WeatherMapUIBase
      * @param string $type
      * @param string $value
      * @return bool
-     * @throws WMException
+     * @throws WeathermapInternalFail
      */
     public function validateArgument($type, $value)
     {
@@ -79,7 +79,7 @@ class WeatherMapUIBase
         }
 
         if ($type != "") {
-            throw new WMException("ValidateArgs saw unknown type");
+            throw new WeathermapInternalFail("ValidateArgs saw unknown type");
         }
     }
 

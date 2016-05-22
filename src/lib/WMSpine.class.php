@@ -122,7 +122,7 @@ class WMSpine
         // then linearly interpolate to get a more accurate point
         // this saves having quite so many points-per-curve
         if (count($this->points) === 0) {
-            throw new WMException("Called findPointAtDistance with an empty WMSpline");
+            throw new WeathermapInternalFail("Called findPointAtDistance with an empty WMSpline");
         }
 
         $foundIndex = $this->findIndexNearDistance($targetDistance);
@@ -188,7 +188,7 @@ class WMSpine
      *
      * @param $targetDistance
      * @return int - index of the point found
-     * @throws WMException
+     * @throws WeathermapInternalFail
      */
     function findIndexNearDistance($targetDistance)
     {
@@ -236,7 +236,7 @@ class WMSpine
             }
         }
 
-        throw new WMException("Howie's crappy binary search is wrong after all.\n");
+        throw new WeathermapInternalFail("Howie's crappy binary search is wrong after all.\n");
     }
 
     /** split - split the Spine into two new spines, with splitIndex in the first one

@@ -1,5 +1,7 @@
 language: php
 php:
+  - "7.0"
+  - "5.6"
   - "5.5"
   - "5.4"
   - "5.3"
@@ -17,3 +19,5 @@ addons:
     repo_token: 858ba1f597a441ed0b8abfefb2db2ecc09309285da99bd165ebcf1b580ced776
 after_script:
   - vendor/bin/test-reporter
+script:
+  - phpunit build/phpunit.xml

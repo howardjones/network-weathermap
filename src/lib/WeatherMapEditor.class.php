@@ -67,7 +67,7 @@ class WeatherMapEditor
     function addNode($x, $y, $nodeName = "", $template = "DEFAULT")
     {
         if (! $this->isLoaded()) {
-            throw new WMException("Map must be loaded before editing API called.");
+            throw new WeathermapInternalFail("Map must be loaded before editing API called.");
         }
 
         $newNodeName = null;
@@ -117,12 +117,12 @@ class WeatherMapEditor
      * @param number $newX
      * @param number $newY
      * @return array
-     * @throws WMException
+     * @throws WeathermapInternalFail
      */
     function moveNode($nodeName, $newX, $newY)
     {
         if (! $this->isLoaded()) {
-            throw new WMException("Map must be loaded before editing API called.");
+            throw new WeathermapInternalFail("Map must be loaded before editing API called.");
         }
 
         // if the node doesn't exist, nothing will be changing
@@ -239,16 +239,16 @@ class WeatherMapEditor
     function updateNode($nodename)
     {
         if (! $this->isLoaded()) {
-            throw new WMException("Map must be loaded before editing API called.");
+            throw new WeathermapInternalFail("Map must be loaded before editing API called.");
         }
 
-        throw new WMException("unimplemented");
+        throw new WeathermapInternalFail("unimplemented");
     }
     
     function deleteNode($nodename)
     {
         if (! $this->isLoaded()) {
-            throw new WMException("Map must be loaded before editing API called.");
+            throw new WeathermapInternalFail("Map must be loaded before editing API called.");
         }
 
         $log = "";
@@ -284,7 +284,7 @@ class WeatherMapEditor
     function cloneNode($sourceNodeName, $targetName = "", $or_fail = false)
     {
         if (! $this->isLoaded()) {
-            throw new WMException("Map must be loaded before editing API called.");
+            throw new WeathermapInternalFail("Map must be loaded before editing API called.");
         }
 
         if ($this->map->nodeExists($sourceNodeName)) {
@@ -330,7 +330,7 @@ class WeatherMapEditor
     function addLink($nodeName1, $nodeName2, $linkName = "", $template = "DEFAULT")
     {
         if (! $this->isLoaded()) {
-            throw new WMException("Map must be loaded before editing API called.");
+            throw new WeathermapInternalFail("Map must be loaded before editing API called.");
         }
 
         $success = false;
@@ -365,16 +365,16 @@ class WeatherMapEditor
     function updateLink()
     {
         if (! $this->isLoaded()) {
-            throw new WMException("Map must be loaded before editing API called.");
+            throw new WeathermapInternalFail("Map must be loaded before editing API called.");
         }
 
-        throw new WMException("unimplemented");
+        throw new WeathermapInternalFail("unimplemented");
     }
 
     function deleteLink($linkname)
     {
         if (! $this->isLoaded()) {
-            throw new WMException("Map must be loaded before editing API called.");
+            throw new WeathermapInternalFail("Map must be loaded before editing API called.");
         }
 
         if (isset($this->map->links[$linkname])) {
@@ -394,10 +394,10 @@ class WeatherMapEditor
     function cloneLink($sourcename, $targetname = "")
     {
         if (! $this->isLoaded()) {
-            throw new WMException("Map must be loaded before editing API called.");
+            throw new WeathermapInternalFail("Map must be loaded before editing API called.");
         }
 
-        throw new WMException("unimplemented");
+        throw new WeathermapInternalFail("unimplemented");
     }
     
     /**
@@ -412,7 +412,7 @@ class WeatherMapEditor
     function setLinkVia($linkname, $x, $y)
     {
         if (! $this->isLoaded()) {
-            throw new WMException("Map must be loaded before editing API called.");
+            throw new WeathermapInternalFail("Map must be loaded before editing API called.");
         }
 
         if (isset($this->map->links[$linkname])) {
@@ -426,7 +426,7 @@ class WeatherMapEditor
     function clearLinkVias($linkname)
     {
         if (! $this->isLoaded()) {
-            throw new WMException("Map must be loaded before editing API called.");
+            throw new WeathermapInternalFail("Map must be loaded before editing API called.");
         }
 
         if (isset($this->map->links[$linkname])) {
@@ -440,7 +440,7 @@ class WeatherMapEditor
     function tidyLink($linkName)
     {
         if (! $this->isLoaded()) {
-            throw new WMException("Map must be loaded before editing API called.");
+            throw new WeathermapInternalFail("Map must be loaded before editing API called.");
         }
 
         // draw a map and throw it away, to calculate all the bounding boxes
@@ -452,7 +452,7 @@ class WeatherMapEditor
     function tidyAllLinks()
     {
         if (! $this->isLoaded()) {
-            throw new WMException("Map must be loaded before editing API called.");
+            throw new WeathermapInternalFail("Map must be loaded before editing API called.");
         }
 
         // draw a map and throw it away, to calculate all the bounding boxes
@@ -463,7 +463,7 @@ class WeatherMapEditor
     function retidyAllLinks()
     {
         if (! $this->isLoaded()) {
-            throw new WMException("Map must be loaded before editing API called.");
+            throw new WeathermapInternalFail("Map must be loaded before editing API called.");
         }
         
         // draw a map and throw it away, to calculate all the bounding boxes
@@ -474,7 +474,7 @@ class WeatherMapEditor
     function retidyLinks()
     {
         if (! $this->isLoaded()) {
-            throw new WMException("Map must be loaded before editing API called.");
+            throw new WeathermapInternalFail("Map must be loaded before editing API called.");
         }
         
         // draw a map and throw it away, to calculate all the bounding boxes
@@ -491,7 +491,7 @@ class WeatherMapEditor
     function _retidyLinks($ignoreTidied = false)
     {
         if (! $this->isLoaded()) {
-            throw new WMException("Map must be loaded before editing API called.");
+            throw new WeathermapInternalFail("Map must be loaded before editing API called.");
         }
     
         // draw a map and throw it away, to calculate all the bounding boxes
@@ -622,7 +622,7 @@ class WeatherMapEditor
     function untidyLinks()
     {
         if (! $this->isLoaded()) {
-            throw new WMException("Map must be loaded before editing API called.");
+            throw new WeathermapInternalFail("Map must be loaded before editing API called.");
         }
         
         foreach ($this->map->links as $link) {
@@ -634,7 +634,7 @@ class WeatherMapEditor
     function placeLegend($x, $y, $scalename = "DEFAULT")
     {
         if (! $this->isLoaded()) {
-            throw new WMException("Map must be loaded before editing API called.");
+            throw new WeathermapInternalFail("Map must be loaded before editing API called.");
         }
         
         $this->map->keyx[$scalename] = $x;
@@ -644,7 +644,7 @@ class WeatherMapEditor
     function placeTitle($x, $y)
     {
         if (! $this->isLoaded()) {
-            throw new WMException("Map must be loaded before editing API called.");
+            throw new WeathermapInternalFail("Map must be loaded before editing API called.");
         }
         
         $this->map->timex = $x;
@@ -654,7 +654,7 @@ class WeatherMapEditor
     function placeTimestamp($x, $y)
     {
         if (! $this->isLoaded()) {
-            throw new WMException("Map must be loaded before editing API called.");
+            throw new WeathermapInternalFail("Map must be loaded before editing API called.");
         }
         
         $this->map->timex = $x;
@@ -664,10 +664,10 @@ class WeatherMapEditor
     function asJS()
     {
         if (! $this->isLoaded()) {
-            throw new WMException("Map must be loaded before editing API called.");
+            throw new WeathermapInternalFail("Map must be loaded before editing API called.");
         }
 
-        throw new WMException("unimplemented");
+        throw new WeathermapInternalFail("unimplemented");
     }
 
 

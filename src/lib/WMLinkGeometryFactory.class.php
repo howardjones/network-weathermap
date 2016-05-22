@@ -5,7 +5,7 @@ class WMLinkGeometryFactory
     /**
      * @param $style
      * @return WMAngledLinkGeometry|WMCurvedLinkGeometry
-     * @throws WMException
+     * @throws WeathermapInternalFail
      *
      * Create a geometry-generator for a link.
      *
@@ -19,6 +19,6 @@ class WMLinkGeometryFactory
             return new WMCurvedLinkGeometry();
         }
 
-        throw new WMException("UnexpectedViaStyle");
+        throw new WeathermapInternalFail("UnexpectedViaStyle");
     }
 }

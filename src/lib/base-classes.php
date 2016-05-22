@@ -5,10 +5,6 @@
 // Released under the GNU Public License
 
 
-class WMException extends Exception
-{
-
-}
 
 // Links, Nodes and the Map object inherit from this class ultimately.
 // Just to make some common code common.

@@ -37,7 +37,7 @@ class WMLine
      *
      * @param $line2 the other line
      * @return WMPoint the crossing point
-     * @throws WMException
+     * @throws WeathermapInternalFail
      */
     public function findCrossingPoint($line2)
     {
@@ -47,7 +47,7 @@ class WMLine
         if ($slope1 == $slope2) {
             // for a general case, this should probably be handled better
             // but for our use, there should never be parallel lines
-            throw new WMException("ParallelLinesNeverCross");
+            throw new WeathermapInternalFail("ParallelLinesNeverCross");
         }
 
         $intercept1 = $this->getYIntercept();

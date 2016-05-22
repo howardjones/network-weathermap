@@ -237,7 +237,7 @@ class WeatherMapScale extends WeatherMapItem
         $nowarn_scalemisses = (!$showScaleWarnings) || intval($this->owner->get_hint("nowarn_scalemisses"));
 
         if (!isset($this->colours)) {
-            throw new WMException("ColourFromValue: SCALE $scaleName used with no spans defined?");
+            throw new WeathermapInternalFail("ColourFromValue: SCALE $scaleName used with no spans defined?");
         }
 
         if ($this->spanCount() == 0) {

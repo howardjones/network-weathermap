@@ -36,8 +36,8 @@ class WeatherMapEditorUITest extends PHPUnit_Framework_TestCase {
     }
 
     /**
-     * @throws WMException
-     * @expectedException WMException
+     * @throws WeathermapInternalFail
+     * @expectedException WeathermapInternalFail
      */
     function testValidateArgsException()
     {

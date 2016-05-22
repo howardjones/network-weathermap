@@ -32,6 +32,7 @@ class WeatherMapRunner
     private $startTime;
     private $endTime;
     private $dataTime;
+    private $precalcTime;
 
     private $mapID;
     private $groupID;
@@ -123,9 +124,15 @@ class WeatherMapRunner
         weathermap_memory_check("MEM postdata");
 
         $this->mapObject->runProcessorPlugins("post");
-        weathermap_memory_check("MEM pre-render");
 
         $this->dataTime = microtime(true);
+        weathermap_memory_check("MEM pre-calc");
+
+        $this->preCalculate($this->mapObject);
+
+        $this->precalcTime = microtime(true);
+
+        weathermap_memory_check("MEM pre-render");
 
         $this->mapObject->drawMapImage(
             $this->workingImageFileName,

@@ -179,6 +179,11 @@ class WeatherMapBase
         return array($this->name);
     }
 
+    public function preCalculate(&$owner)
+    {
+        
+    }
+    
     /**
      * Do any pre-drawing calculations needed, then let any items that use us as a template
      * do theirs, too. Recursively build up a list of the affected objects so we could
@@ -189,11 +194,11 @@ class WeatherMapBase
         $notified = array();
         $notified []= $this->name;
         wm_debug("Recalculating %s\n", $this);
-        $this->preCalculate();
+        $this->preCalculate($this);
 
         foreach ($this->descendents as $child) {
             wm_debug("  %s notifying %s\n", $this, $child);
-            $new_notified = $child->preCalculate();
+            $new_notified = $child->preCalculate($this);
             foreach ($new_notified as $n) {
                 $notified []= $n;
             }

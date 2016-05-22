@@ -90,6 +90,7 @@ class WMTestSupport {
 
         if ($skip == 0) {
             $map->readData();
+            $map->preCalculate($map);
             $map->drawMapImage($imagefile);
             $map->imagefile = $imagefile;
 

@@ -1338,6 +1338,19 @@ class WeatherMap extends WeatherMapBase
         }
     }
 
+    public function preCalculate(&$owner)
+    {
+        wm_debug("preCalculating everything");
+
+        foreach ($this->nodes as $node) {
+            $node->preCalculate($this);
+        }
+        foreach ($this->links as $link) {
+            $link->preCalculate($this);
+        }
+    }
+
+
     function drawMapImage($imageFileName = '', $thumbnailFileName = '', $thumbnailMaxSize = 250, $includeNodes = true, $showVIAOverlay = false, $showRelativeOverlay = false)
     {
         wm_debug("Trace: DrawMap()\n");
@@ -1409,8 +1422,8 @@ class WeatherMap extends WeatherMapBase
 
             if (is_array($z_items)) {
                 foreach ($z_items as $it) {
-                    $it->preChecks($this);
-                    $it->preCalculate($this);
+                    # $it->preChecks($this);
+                    # $it->preCalculate($this);
                     $it->draw($imageRef, $this);
 
                     foreach ($it->getImageMapAreas() as $name => $area) {

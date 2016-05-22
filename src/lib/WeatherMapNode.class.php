@@ -857,6 +857,7 @@ class WeatherMapNode extends WeatherMapDataItem
      */
     function preCalculate(&$owner)
     {
+        wm_debug("Calculating node geometry for %s", $this);
         // don't bother doing anything if it's a template
         if ($this->isTemplate()) {
             return;

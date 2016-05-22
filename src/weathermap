@@ -238,6 +238,8 @@ if ($map->ReadConfig($configfile)) {
             }
         }
 
+        $map->preCalculate($map);
+
         if ($imagefile != '') {
             $map->drawMapImage($imagefile);
             $map->imagefile=$imagefile;

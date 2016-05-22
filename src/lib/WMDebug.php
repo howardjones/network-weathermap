@@ -15,9 +15,9 @@ class WMDebugNull
     protected $onlyReadData;
     protected $contextName;
 
-    public function __construct($context_name, $onlyReadData)
+    public function __construct($contextName, $onlyReadData=false)
     {
-        $this->contextName = $context_name;
+        $this->contextName = $contextName;
         $this->onlyReadData = $onlyReadData;
     }
 
@@ -147,6 +147,6 @@ class WMDebugFactory
             }
             return new WMDebugLogging($weathermap_map, $weathermap_debugging_readdata);
         }
-        return new WMDebugNull();
+        return new WMDebugNull($weathermap_map, $weathermap_debugging_readdata);
     }
 }

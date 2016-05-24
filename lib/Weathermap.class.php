@@ -7,6 +7,7 @@
 require_once "HTML_ImageMap.class.php";
 
 require_once "WeatherMap.functions.php";
+require_once "geometry.php";
 require_once "WeatherMapNode.class.php";
 require_once "WeatherMapLink.class.php";
 
@@ -1078,7 +1079,7 @@ function DrawLabelRotated($im, $x, $y, $angle, $text, $font, $padding, $linkname
 	$points = array($x1,$y1, $x1,$y2, $x2,$y2, $x2,$y1,   $x-$strwidth/2, $y+$strheight/2 + 1);
 	$npoints = count($points)/2;
 
-	RotateAboutPoint($points, $x,$y, $rangle);
+	rotateAboutPoint($points, $x,$y, $rangle);
 
 	if ($bgcolour != array
 		(

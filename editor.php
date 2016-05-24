@@ -690,7 +690,7 @@ else
 					    # $log .= "Scale by $scalefactor along link-line";
 					    
 					    // rotate so that link is along the axis
-					    RotateAboutPoint($points,$pivx, $pivy, deg2rad($angle_old));
+					    rotateAboutPoint($points,$pivx, $pivy, deg2rad($angle_old));
 					    // do the scaling in here
 					    for($i=0; $i<(count($points)/2); $i++)
 					    {
@@ -698,7 +698,7 @@ else
 						    $points[$i*2] = $basex;
 					    }
 					    // rotate back so that link is along the new direction
-					    RotateAboutPoint($points,$pivx, $pivy, deg2rad(-$angle_new));
+					    rotateAboutPoint($points,$pivx, $pivy, deg2rad(-$angle_new));
 					    
 					    // now put the modified points back into the vialist again
 					    $v = 0; $i = 0;

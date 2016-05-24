@@ -4,7 +4,7 @@ require_once 'lib/editor.inc.php';
 require_once 'lib/Weathermap.class.php';
 
 // so that you can't have the editor active, and not know about it.
-$ENABLED=true;
+$ENABLED=false;
 
 if(! $ENABLED)
 {
@@ -133,7 +133,7 @@ else
 		
 		$sourcemapname = wm_editor_sanitize_conffile($sourcemapname);
 		
-		if($$sourcemapname != "") {
+		if($sourcemapname != "") {
 		    $sourcemap = $mapdir.'/'.$sourcemapname;
 		    if( file_exists($sourcemap) && is_readable($sourcemap) ) {
 			$map->ReadConfig($sourcemap);
@@ -947,9 +947,9 @@ else
 		}
 ?>
 	</style>
-  <link rel="stylesheet" type="text/css" media="screen" href="editor.css" />
+  <link rel="stylesheet" type="text/css" media="screen" href="editor-resources/oldeditor.css" />
 <script src="editor-resources/jquery-latest.min.js" type="text/javascript"></script>
-<script src="editor.js" type="text/javascript"></script>
+<script src="editor-resources/editor.js" type="text/javascript"></script>
 	<script type="text/javascript">
 	
 	var fromplug=<?php echo ($fromplug==TRUE ? 1:0); ?>;

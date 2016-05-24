@@ -225,6 +225,7 @@ class WeatherMap extends WeatherMapBase
 	var $min_data_time, $max_data_time;
 	var $htmloutputfile,
 		$imageoutputfile;
+	var $dataoutputfile;
 	var $htmlstylesheet;
 	var $defaultlink,
 		$defaultnode;
@@ -281,6 +282,7 @@ class WeatherMap extends WeatherMapBase
 				'imageoutputfile' => '',
 				'imageuri' => '',
 				'htmloutputfile' => '',
+				'dataoutputfile' => '',
 				'htmlstylesheet' => '',
 				'labelstyle' => 'percent', // redundant?
 				'htmlstyle' => 'static',
@@ -1942,6 +1944,7 @@ function ReadConfig($input, $is_include=FALSE)
 					array('GLOBAL','/^\s*HTMLOUTPUTFILE\s+(.*)\s*$/i',array('htmloutputfile'=>1)),
 					array('GLOBAL','/^\s*HTMLSTYLESHEET\s+(.*)\s*$/i',array('htmlstylesheet'=>1)),
 					array('GLOBAL','/^\s*IMAGEOUTPUTFILE\s+(.*)\s*$/i',array('imageoutputfile'=>1)),
+					array('GLOBAL','/^\s*DATAOUTPUTFILE\s+(.*)\s*$/i',array('dataoutputfile'=>1)),
 					array('GLOBAL','/^\s*IMAGEURI\s+(.*)\s*$/i',array('imageuri'=>1)),
 					array('GLOBAL','/^\s*TITLE\s+(.*)\s*$/i',array('title'=>1)),
 					array('GLOBAL','/^\s*HTMLSTYLE\s+(static|overlib)\s*$/i',array('htmlstyle'=>1)),
@@ -2865,6 +2868,7 @@ function WriteConfig($filename)
 				array('titlefont','TITLEFONT',CONFIG_TYPE_LITERAL),
 				array('title','TITLE',CONFIG_TYPE_LITERAL),
 				array('htmloutputfile','HTMLOUTPUTFILE',CONFIG_TYPE_LITERAL),
+				array('dataoutputfile','DATAOUTPUTFILE',CONFIG_TYPE_LITERAL),
 				array('htmlstylesheet','HTMLSTYLESHEET',CONFIG_TYPE_LITERAL),
 				array('imageuri','IMAGEURI',CONFIG_TYPE_LITERAL),
 				array('imageoutputfile','IMAGEOUTPUTFILE',CONFIG_TYPE_LITERAL)

@@ -13,6 +13,11 @@ are really facets of the same thing - lack of input validation. 0.97b improves t
 
 Thanks to Gerry Eisenhaur and Daniel Ricardo dos Santos respectively for their security bug reports.
 
+
+0.97d
+FIXED - MySQL error in table-creation. MySQL 5.6 is fussier.
+
+
 0.97b	FIXED - absolute SCALE definitions didn't support K (thanks wwwdrich)
     FIXED - memory leak in poller code. Memory usage is MUCH lower now.
     FIXED - updated mysql schema commands to use modern ENGINE instead of TYPE;

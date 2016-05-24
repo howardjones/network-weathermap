@@ -283,7 +283,7 @@ function weathermap_setup_table () {
 				titlecache text NOT NULL,
 				filehash varchar (40) NOT NULL default '',
 				warncount int(11) NOT NULL default 0,
-				config text NOT NULL default '',
+				config text NOT NULL,
 				thumb_width int(11) NOT NULL default 0,
 				thumb_height int(11) NOT NULL default 0,
 				schedule varchar(32) NOT NULL default '*',

@@ -53,7 +53,7 @@ class WeatherMapDataSource_external extends WeatherMapDataSource {
 				$i=0;
 				while( ($i <5) && ! feof($pipe) )
 				{
-					$lines[$i++] = fgets($pipe,1024);
+					$lines[$i++] = rtrim(fgets($pipe,1024));
 				}
 				pclose($pipe);
 

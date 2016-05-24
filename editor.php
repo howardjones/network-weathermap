@@ -2,6 +2,10 @@
 	
 require_once 'lib/editor.inc.php';
 require_once 'lib/Weathermap.class.php';
+require_once 'lib/geometry.php';
+require_once 'lib/WMPoint.class.php';
+require_once 'lib/WMVector.class.php';
+require_once 'lib/WMLine.class.php';
 
 // so that you can't have the editor active, and not know about it.
 $ENABLED=false;

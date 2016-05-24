@@ -130,29 +130,57 @@ function js_escape($str, $wrap=TRUE)
 	return ($str);
 }
 
-function mysprintf($format,$value,$kilo=1000)
+function mysprintf($format, $value, $kilo = 1000)
 {
 	$output = "";
 
 	wm_debug("mysprintf: $format $value\n");
-	if(preg_match('/%(\d*\.?\d*)k/',$format,$matches))
-	{
+	if (preg_match('/%(\d*\.?\d*)k/', $format, $matches)) {
 		$spec = $matches[1];
 		$places = 2;
-		if($spec !='')
-		{
-			preg_match('/(\d*)\.?(\d*)/',$spec,$matches);
-			if($matches[2] != '') $places=$matches[2];
+		if ($spec != '') {
+			preg_match('/(\d*)\.?(\d*)/', $spec, $matches);
+			if ($matches[2] != '') {
+				$places = $matches[2];
+			}
 			// we don't really need the justification (pre-.) part...
-		}	
+		}
 		wm_debug("KMGT formatting $value with $spec.\n");
 		$result = nice_scalar($value, $kilo, $places);
-		$output = preg_replace("/%".$spec."k/",$format,$result);
-	}
-	else
-	{
+		$output = preg_replace("/%" . $spec . "k/", $format, $result);
+	} elseif (preg_match('/%(-*)(\d*)([Tt])/', $format, $matches)) {
+		$spec = $matches [3];
+		$precision = ($matches [2] == '' ? 10 : intval($matches [2]));
+		$joinchar = " ";
+		if ($matches [1] == "-") {
+			$joinchar = " ";
+		}
+		// special formatting for time_t (t) and SNMP TimeTicks (T)
+		if ($spec == "T") {
+			$value = $value / 100;
+		}
+		$results = array();
+		$periods = array(
+			"y" => 24 * 60 * 60 * 365,
+			"d" => 24 * 60 * 60,
+			"h" => 60 * 60,
+			"m" => 60,
+			"s" => 1
+		);
+		foreach ($periods as $periodsuffix => $timeperiod) {
+			$slot = floor($value / $timeperiod);
+			$value = $value - $slot * $timeperiod;
+			if ($slot > 0) {
+				$results [] = sprintf("%d%s", $slot, $periodsuffix);
+			}
+		}
+		if (sizeof($results) == 0) {
+			$results [] = "0s";
+		}
+		$output = implode($joinchar, array_slice($results, 0, $precision));
+	} else {
 		wm_debug("Falling through to standard sprintf\n");
-		$output = sprintf($format,$value);
+		$output = sprintf($format, $value);
 	}
 	return $output;
 }

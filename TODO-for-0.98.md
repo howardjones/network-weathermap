@@ -19,7 +19,7 @@
 *  detect if Boost is installed and enabled, and recommend poller_output
 *  editor 'tidy' function
 *  editor MRU for picker
-*  %t and %T support in ProcessString
+*  ~~%t and %T support in ProcessString~~
 
 Commit old enough to have old-style code layout in it(!):
 https://github.com/howardjones/network-weathermap/tree/3d8ae103dcddd67b1a1c9db109f5985e496ecd77

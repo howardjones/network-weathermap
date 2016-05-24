@@ -199,3 +199,5 @@
 ./weathermap-cacti-plugin.php
 ./weathermap-cacti-rebuild.php
 ./weathermap.conf
+./cacti-resources/weathermap.css
+./cacti-resources/map-cycle.js

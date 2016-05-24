@@ -2832,6 +2832,28 @@ function ReadConfig_Commit(&$curobj)
 	}
 }
 
+function WriteDataFile($filename)
+{
+	if($filename != "") {
+		$fd = fopen($filename, 'w');
+		# $output = '';
+		if($fd) {
+			foreach ($this->nodes as $node) {
+				if (!preg_match('/^::\s/', $node->name) && sizeof($node->targets)>0 )  {
+					fputs($fd, sprintf("N_%s\t%f\t%f\r\n", $node->name, $node->bandwidth_in, $node->bandwidth_out));
+				}
+			}
+			foreach ($this->links as $link) {
+				if (!preg_match('/^::\s/', $link->name) && sizeof($link->targets)>0) {
+					fputs($fd, sprintf("L_%s\t%f\t%f\r\n", $link->name, $link->bandwidth_in, $link->bandwidth_out));
+				}
+			}
+
+			fclose($fd);
+		}
+	}
+}
+
 function WriteConfig($filename)
 {
 	global $WEATHERMAP_VERSION;

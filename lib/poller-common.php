@@ -125,6 +125,7 @@ function weathermap_run_maps($mydir) {
 							$htmlfile = $outdir.DIRECTORY_SEPARATOR.$map['filehash'].".html";
 							$imagefile = $outdir.DIRECTORY_SEPARATOR.$map['filehash'].".".$imageformat;
 							$thumbimagefile = $outdir.DIRECTORY_SEPARATOR.$map['filehash'].".thumb.".$imageformat;
+							$resultsfile = $outdir . DIRECTORY_SEPARATOR . $map['filehash'] . '.results.txt';
 
 							if(file_exists($mapfile))
 							{
@@ -207,6 +208,8 @@ function weathermap_run_maps($mydir) {
 										wm_warn("Failed to create $htmlfile - permissions of output directory are wrong? [WMPOLL03]\n");
 									}
 								}
+
+								$wmap->WriteDataFile($resultsfile);
 
 								$processed_title = $wmap->ProcessString($wmap->title,$wmap);
 								

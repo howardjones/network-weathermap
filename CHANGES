@@ -6,15 +6,21 @@ repeat "error reports" in the forums.
 0.98
     FIXED - MySQL error in table-creation. MySQL 5.6 is fussier.
     FIXED - Editor 'delete link' broken
+    FIXED - KILO was ignored when processing %k in special tokens
     FIXED - Various fixes for PHP deprecated or strict-mode warnings
     FIXED - Line-ending trimming in 'external script' data source
     FIXED - Config file path validation issue in editor (CVE-2013-3739)
     FIXED - Cloning a templated node in editor retains the template in the clone
     FIXED - cacti_use_ifspeed incorrect when interfaces > 20M and ifhighspeed available
     FIXED - More PHP 5.3/5.4/strict related errors (split -> explode)
+    CHANGE - (Cacti plugin only) images are written to a temporary file first, to avoid displaying half-written images
+
     CHANGE - if there are actually 0 maps in the database, the 'Weathermaps'
              tab gives some basic instructions.
     ADDED - Special token formatting can handle timeticks and time_t formatting (%T and %t respectively)
+    ADDED - new DATAOUTPUTFILE allows collected data to be written to a file for later use (automatically enabled in Cacti)
+    ADDED - IMAGEOUTPUTFILE and HTMLOUTPUTFILE are honoured in Cacti poller as a location for a second copy of those files.
+
 
 0.97c had no additional changes - it's just 0.97b with some silly errors fixed, and  all
 the CSS files included with the correct paths. There were also reports of problems with the

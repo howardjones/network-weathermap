@@ -14,12 +14,17 @@
 *  ~~Add a warning for no maps on main tab if there are NO MAPS~~
 *  Add note on editor that config names must have no space and end in .conf
 *  ~~DATAOUTPUTFILE~~
-*  HTMLOUTPUTFILE and IMAGEOUTPUTFILE in Cacti
+*  ~~HTMLOUTPUTFILE and IMAGEOUTPUTFILE in Cacti~~
 *  new image-cycle
 *  detect if Boost is installed and enabled, and recommend poller_output
 *  editor 'tidy' function
-*  editor MRU for picker
+*  editor MRU for picker  http://forums.cacti.net/viewtopic.php?f=16&t=50649
 *  ~~%t and %T support in ProcessString~~
+*  Document %d in manual http://forums.cacti.net/viewtopic.php?f=16&t=22677
 
 Commit old enough to have old-style code layout in it(!):
 https://github.com/howardjones/network-weathermap/tree/3d8ae103dcddd67b1a1c9db109f5985e496ecd77
+
+## Small features
+
+* In-editor generator for switch port arrays http://forums.cacti.net/viewtopic.php?f=16&t=52618

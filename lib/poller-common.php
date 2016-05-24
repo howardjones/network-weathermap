@@ -226,7 +226,7 @@ function weathermap_run_maps($mydir) {
 								$wmap->WriteDataFile($resultsfile);
 								// if the user explicitly defined a data file, write it there too
 								if ($wmap->dataoutputfile) {
-									$map->WriteDataFile($map->dataoutputfile);
+									$wmap->WriteDataFile($wmap->dataoutputfile);
 								}
 
 								// put back the configured imageuri

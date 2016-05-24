@@ -56,7 +56,7 @@ $args=$cg->readPHPArgv();
 
 $ret=$cg->getopt($args, $short_opts, $long_opts);
 
-if (PEAR::isError($ret)) { die ("Error in command line: " . $ret->getMessage() . "\n (try --help)\n"); }
+if ((new PEAR)->isError($ret)) { die ("Error in command line: " . $ret->getMessage() . "\n (try --help)\n"); }
 
 $gopts=$ret[0];
 

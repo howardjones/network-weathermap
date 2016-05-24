@@ -142,7 +142,7 @@ class WeatherMapDataSource_dsstats extends WeatherMapDataSource {
 			$SQL = sprintf("select %s as name, %s as result from %s where local_data_id=%d and (%s='%s' or %s='%s')", 
 					$keyfield, $field, 
 					$table, $local_data_id, $keyfield, 
-					mysql_escape_string($dsnames[IN]), $keyfield, mysql_escape_string($dsnames[OUT])
+					mysql_real_escape_string($dsnames[IN]), $keyfield, mysql_real_escape_string($dsnames[OUT])
 				);
 
 			$results = db_fetch_assoc($SQL);

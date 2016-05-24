@@ -1288,7 +1288,7 @@ function weathermap_group_editor()
 function weathermap_group_create($newname)
 {
 	$sortorder = db_fetch_cell("select max(sortorder)+1 from weathermap_groups");
-	$SQL = sprintf("insert into weathermap_groups (name, sortorder) values ('%s',%d)", mysql_escape_string($newname), $sortorder);
+	$SQL = sprintf("insert into weathermap_groups (name, sortorder) values ('%s',%d)", mysql_real_escape_string($newname), $sortorder);
 #	print $SQL;
 	db_execute($SQL);
 }
@@ -1296,7 +1296,7 @@ function weathermap_group_create($newname)
 function weathermap_group_update($id, $newname)
 {
 	
-	$SQL = sprintf("update weathermap_groups set name='%s' where id=%d", mysql_escape_string($newname), $id);
+	$SQL = sprintf("update weathermap_groups set name='%s' where id=%d", mysql_real_escape_string($newname), $id);
 #	print $SQL;
 	db_execute($SQL);
 }

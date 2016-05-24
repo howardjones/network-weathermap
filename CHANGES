@@ -15,8 +15,9 @@ Thanks to Gerry Eisenhaur and Daniel Ricardo dos Santos respectively for their s
 
 
 0.97d
-FIXED - MySQL error in table-creation. MySQL 5.6 is fussier.
-FIXED - Editor 'delete link' broken
+    FIXED - MySQL error in table-creation. MySQL 5.6 is fussier.
+    FIXED - Editor 'delete link' broken
+    FIXED - Various fixes for PHP deprecated or strict-mode warnings
 
 
 0.97b	FIXED - absolute SCALE definitions didn't support K (thanks wwwdrich)

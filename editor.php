@@ -791,7 +791,7 @@ else
 		$target = wm_editor_sanitize_name($_REQUEST['param']);
 		$log = "delete link ".$target;
 
-		if(isset($map->links[target])) {
+		if(isset($map->links[$target])) {
 		    unset($map->links[$target]);
 		    
 		    $map->WriteConfig($mapfile);

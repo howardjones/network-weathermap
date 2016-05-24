@@ -544,14 +544,14 @@ class WeatherMap extends WeatherMapBase
 		$output = $input;
 		
 		# while( preg_match("/(\{[^}]+\})/",$input,$matches) )
-		while( preg_match("/(\{(?:node|map|link)[^}]+\})/",$input,$matches) )
+		while( preg_match('/(\{(?:node|map|link)[^}]+\})/',$input,$matches) )
 		{
 			$value = "[UNKNOWN]";
 			$format = "";
 			$key = $matches[1];
 			wm_debug("ProcessString: working on ".$key."\n");
 
-			if ( preg_match("/\{(node|map|link):([^}]+)\}/",$key,$matches) )
+			if ( preg_match('/\{(node|map|link):([^}]+)\}/',$key,$matches) )
 			{
 				$type = $matches[1];
 				$args = $matches[2];
@@ -660,7 +660,7 @@ class WeatherMap extends WeatherMapBase
 			{
 
 		#		debug("Formatting with mysprintf($format,$value)\n");
-				$value = mysprintf($format,$value);
+				$value = mysprintf($format,$value, $this->kilo);
 			}
 
 		#	debug("ProcessString: formatted to $value\n");

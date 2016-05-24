@@ -135,13 +135,13 @@ function mysprintf($format,$value,$kilo=1000)
 	$output = "";
 
 	wm_debug("mysprintf: $format $value\n");
-	if(preg_match("/%(\d*\.?\d*)k/",$format,$matches))
+	if(preg_match('/%(\d*\.?\d*)k/',$format,$matches))
 	{
 		$spec = $matches[1];
 		$places = 2;
 		if($spec !='')
 		{
-			preg_match("/(\d*)\.?(\d*)/",$spec,$matches);
+			preg_match('/(\d*)\.?(\d*)/',$spec,$matches);
 			if($matches[2] != '') $places=$matches[2];
 			// we don't really need the justification (pre-.) part...
 		}	

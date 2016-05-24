@@ -39,7 +39,8 @@ function UpdateCactiData(&$item, $local_data_id)
 
 			# see https://lists.oetiker.ch/pipermail/mrtg/2004-November/029312.html
 			if ($ifHighSpeed > 20) {
-				$speed = $ifHighSpeed . "M";
+				// NOTE: this is NOT using $kilo - it's always 1000000 bits/sec according to the MIB
+				$speed = $ifHighSpeed * 1000000;
 			}
 
 			if ($speed > 0) {

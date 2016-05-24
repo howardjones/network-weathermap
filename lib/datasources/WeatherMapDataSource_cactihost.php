@@ -87,4 +87,3 @@ class WeatherMapDataSource_cactihost extends WeatherMapDataSource {
 
 
 // vim:ts=4:sw=4:
-?>

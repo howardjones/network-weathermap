@@ -13,4 +13,3 @@
         default:
             print "{result: 0}";
     }
-?>

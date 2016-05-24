@@ -275,4 +275,3 @@ function weathermap_run_maps($mydir) {
 }
 
 // vim:ts=4:sw=4:
-?>

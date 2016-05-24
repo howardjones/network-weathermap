@@ -152,4 +152,3 @@ class WeatherMapDataSource_snmp extends WeatherMapDataSource {
 }
 
 // vim:ts=4:sw=4:
-?>

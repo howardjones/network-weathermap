@@ -1314,5 +1314,4 @@ function weathermap_group_delete($id)
 }
 
 // vim:ts=4:sw=4:
-?>
 

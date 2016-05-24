@@ -989,4 +989,3 @@ class WeatherMapNode extends WeatherMapItem
 };
 
 // vim:ts=4:sw=4:
-?>

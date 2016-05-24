@@ -43,4 +43,3 @@
 	
 	print "...nope. We got past the risky part, so that's good.\nYour GD library looks healthy.\n";
 	print ($env=='CLI'?"\n":"\n<p>");
-?>

@@ -70,4 +70,3 @@ class WeatherMapDataSource_time extends WeatherMapDataSource {
 }
 
 // vim:ts=4:sw=4:
-?>

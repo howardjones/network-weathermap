@@ -2086,4 +2086,3 @@ function draw_spine($im, $spine,$col)
 	
 
 // vim:ts=4:sw=4:
-?>

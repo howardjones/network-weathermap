@@ -851,4 +851,3 @@ class WeatherMapLink extends WeatherMapItem
 };
 
 // vim:ts=4:sw=4:
-?>

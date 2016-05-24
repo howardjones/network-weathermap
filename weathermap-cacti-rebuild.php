@@ -33,4 +33,3 @@ weathermap_setup_table();
 weathermap_run_maps(dirname(__FILE__) );
 
 // vim:ts=4:sw=4:
-?>

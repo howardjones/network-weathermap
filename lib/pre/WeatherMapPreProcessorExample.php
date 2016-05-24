@@ -13,4 +13,3 @@ class WeatherMapPreProcessorExample extends WeatherMapPreProcessor {
 }
 
 // vim:ts=4:sw=4:
-?>

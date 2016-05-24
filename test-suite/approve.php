@@ -12,4 +12,3 @@
 		print "Failed to handled $last_result";
 	}
 
-?>

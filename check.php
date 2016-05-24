@@ -192,7 +192,7 @@
 		else
 		{
 		    $wnotes = wordwrap($notes,50);
-			$lines = split("\n",$wnotes);
+			$lines = explode("\n",$wnotes);
 			$i=0;
 			foreach ($lines as $noteline)
 			{

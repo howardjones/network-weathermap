@@ -620,4 +620,3 @@ class WeatherMapDataSource_rrd extends WeatherMapDataSource {
 }
 
 // vim:ts=4:sw=4:
-?>

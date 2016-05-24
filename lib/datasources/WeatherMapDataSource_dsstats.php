@@ -202,4 +202,3 @@ class WeatherMapDataSource_dsstats extends WeatherMapDataSource {
 }
 
 // vim:ts=4:sw=4:
-?>

@@ -392,4 +392,3 @@ function fetch_cached_file($filename, $mapfile)
 
     return ($content);
 }
-?>

@@ -74,4 +74,3 @@ class WeatherMapDataSource_wmdata extends WeatherMapDataSource
 }
 
 // vim:ts=4:sw=4:
-?>

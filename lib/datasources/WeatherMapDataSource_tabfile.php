@@ -58,4 +58,3 @@ class WeatherMapDataSource_tabfile extends WeatherMapDataSource {
 }
 
 // vim:ts=4:sw=4:
-?>

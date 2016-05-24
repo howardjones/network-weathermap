@@ -26,4 +26,3 @@ class WeatherMapPostProcessorExample extends WeatherMapPostProcessor
 }
 
 // vim:ts=4:sw=4:
-?>

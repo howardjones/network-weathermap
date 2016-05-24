@@ -463,4 +463,3 @@ function editor_log($str)
 }
 
 // vim:ts=4:sw=4:
-?>

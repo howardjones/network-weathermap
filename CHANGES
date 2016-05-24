@@ -14,6 +14,8 @@ repeat "error reports" in the forums.
     FIXED - Cloning a templated node in editor retains the template in the clone
     FIXED - cacti_use_ifspeed incorrect when interfaces > 20M and ifhighspeed available
     FIXED - More PHP 5.3/5.4/strict related errors (split -> explode)
+    CHANGE - Editor data picker improved sort (thanks shd)
+    
     CHANGE - (Cacti plugin only) images are written to a temporary file first, to avoid displaying half-written images
     CHANGE - if there are actually 0 maps in the database, the 'Weathermaps' tab gives some basic instructions.
     ADDED - Special token formatting can handle timeticks and time_t formatting (%T and %t respectively)

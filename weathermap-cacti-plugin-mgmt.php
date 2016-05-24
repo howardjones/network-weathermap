@@ -414,6 +414,23 @@ function weathermap_group_move($id,$junk,$direction)
 	}
 }
 
+function get_table_list()
+{
+	$sql = "show tables";
+	$result = db_fetch_assoc($sql) or die (mysql_error());
+
+	$tables = array();
+	$sql = array();
+
+	foreach($result as $index => $arr) {
+		foreach ($arr as $t) {
+			$tables[] = $t;
+		}
+	}
+
+	return $tables;
+}
+
 function maplist()
 {
 	global $colors, $menu;
@@ -429,17 +446,25 @@ function maplist()
 	$last_finish_time = intval(read_config_option("weathermap_last_finish_time",true));
 	$poller_interval = intval(read_config_option("poller_interval"));
 
-	if( ($last_finish_time - $last_start_time) > $poller_interval ) {
-
-	if( ($last_started != $last_finished) && ($last_started != "") ) {
+	$tables = get_table_list();
+	if (!in_array('weathermap_maps', $tables)) {
 		print '<div align="center" class="wm_warning"><p>';
-		print "Last time it ran, Weathermap did NOT complete it's run. It failed during processing for '$last_started'. ";
-		print "This <strong>may</strong> have affected other plugins that run during the poller process. </p><p>";
-		print "You should either disable this map, or fault-find. Possible causes include memory_limit issues. The log may have more information.";
+		print 'The weathermap_maps table is missing completely from the database. Something went wrong with the installation process.';
 		print '</p></div>';
 	}
+
+	if( ($last_finish_time - $last_start_time) > $poller_interval ) {
+		if( ($last_started != $last_finished) && ($last_started != "") ) {
+			print '<div align="center" class="wm_warning"><p>';
+			print "Last time it ran, Weathermap did NOT complete it's run. It failed during processing for '$last_started'. ";
+			print "This <strong>may</strong> have affected other plugins that run during the poller process. </p><p>";
+			print "You should either disable this map, or fault-find. Possible causes include memory_limit issues. The log may have more information.";
+			print '</p></div>';
+		}
 	}
-	
+
+
+
 	html_start_box("<strong>Weathermaps</strong>", "78%", $colors["header"], "3", "center", "weathermap-cacti-plugin-mgmt.php?action=addmap_picker");
 
 	html_header(array("Config File", "Title", "Group", "Active", "Settings", "Sort Order", "Accessible By",""));

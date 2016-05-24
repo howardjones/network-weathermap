@@ -8,6 +8,7 @@ repeat "error reports" in the forums.
     FIXED - Editor 'delete link' broken
     FIXED - Various fixes for PHP deprecated or strict-mode warnings
     FIXED - Line-ending trimming in 'external script' data source
+    FIXED - Config file path validation issue in editor (CVE-2013-3739)
     CHANGE - if there are actually 0 maps in the database, the 'Weathermaps'
              tab gives some basic instructions.
 

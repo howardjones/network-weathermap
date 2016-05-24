@@ -43,7 +43,7 @@ function wm_editor_sanitize_string($str) {
 
 function wm_editor_validate_bandwidth($bw) {
   
-    if(preg_match( "/^(\d+\.?\d*[KMGT]?)$/", $bw) ) {
+    if(preg_match( '/^(\d+\.?\d*[KMGT]?)$/', $bw) ) {
 	return true;
     }
     return false;
@@ -82,11 +82,11 @@ function wm_editor_sanitize_file($filename,$allowed_exts=array()) {
         
     $ok = false;
     foreach ($allowed_exts as $ext) {
-	$match = ".".$ext;
-	
-	if( substr($filename, -strlen($match),strlen($match)) == $match) {
-	    $ok = true;
-	}
+		$match = ".".$ext;
+
+		if( substr($filename, -strlen($match),strlen($match)) == $match) {
+			$ok = true;
+		}
     }    
     if(! $ok ) return "";
     return $filename;
@@ -98,8 +98,14 @@ function wm_editor_sanitize_conffile($filename) {
     
     # If we've been fed something other than a .conf filename, just pretend it didn't happen
     if ( substr($filename,-5,5) != ".conf" ) {
-	$filename = ""; 
-     }
+		$filename = "";
+	}
+
+	# on top of the url stuff, we don't ever need to see a / in a config filename (CVE-2013-3739)
+	if (strstr($filename,"/") !== false ) {
+		$filename = "";
+	}
+
     return $filename;
 }
 
@@ -181,7 +187,7 @@ function show_editor_startpage()
 					while (!feof($fd)) {
 						$buffer=fgets($fd, 4096);
 	
-						if (preg_match("/^\s*TITLE\s+(.*)/i", $buffer, $matches)) { 
+						if (preg_match('/^\s*TITLE\s+(.*)/i', $buffer, $matches)) {
 						    $title= wm_editor_sanitize_string($matches[1]); 
 						}
 					}
@@ -265,7 +271,7 @@ function snap($coord, $gridsnap = 0)
 }
 
 
-function extract_with_validation($array, $paramarray)
+function extract_with_validation($array, $paramarray, $prefix = "")
 {
 	$all_present=true;
 	$candidates=array( );

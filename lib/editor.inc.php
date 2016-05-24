@@ -161,6 +161,8 @@ function show_editor_startpage()
 	print '<input name="plug" type="hidden" value="'.$fromplug.'">';
 
 	print '<input type="submit" value="Create">';
+
+	print '<p><small>Note: filenames must contain no spaces and end in .conf</small></p>';
 	print '</form>';
 
 	$titles = array();
@@ -594,7 +596,7 @@ function tidy_link(&$map,$target, $linknumber=1, $linktotal=1, $ignore_tidied=FA
 			$tangent = $line->vector;
 			$tangent->normalise();
 
-			$normal = $tangent->get_normal();
+			$normal = $tangent->getNormal();
 
 			$pt_a->AddVector( $normal, 15 * ($linknumber-1) );
 			$pt_b->AddVector( $normal, 15 * ($linknumber-1) );

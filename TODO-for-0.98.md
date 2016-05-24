@@ -5,14 +5,14 @@
 *  ~~Config file path validation issue in editor (CVE-2013-3739)~~
 *  ~~KILO was ignored when processing %k in special tokens~~
 *  ~~nowarn_WMxxxx actually works!~~
-*  rounding error 'kinks' in angled VIA links
+*  ~~rounding error 'kinks' in angled VIA links~~
 *  ~~Cloning a templated node in editor retains the template in the clone~~
 *  Imagemap sortorder problem in editor. If you can see it, you can click it.
 *  ~~cacti_use_ifspeed incorrect when interfaces > 20M and ifhighspeed available~~
 *  if permissions in Cacti said Anyone *and* you, then no map images are shown
 *  Add a warning for missing tables on manage
 *  ~~Add a warning for no maps on main tab if there are NO MAPS~~
-*  Add note on editor that config names must have no space and end in .conf
+*  ~~Add note on editor that config names must have no space and end in .conf~~
 *  ~~DATAOUTPUTFILE~~
 *  ~~HTMLOUTPUTFILE and IMAGEOUTPUTFILE in Cacti~~
 *  new image-cycle
@@ -28,3 +28,4 @@ https://github.com/howardjones/network-weathermap/tree/3d8ae103dcddd67b1a1c9db10
 ## Small features
 
 * In-editor generator for switch port arrays http://forums.cacti.net/viewtopic.php?f=16&t=52618
+

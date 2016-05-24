@@ -1111,7 +1111,13 @@ function draw_straight($image, &$curvepoints, $widths, $outlinecolour, $fillcolo
 				$numpoints++;
 			}
 			// $finalpoints[] contains a complete outline of the line at this stage
-			
+
+			// round to the nearest integer (up OR down). We do this now
+			// so that GD doesn't just round everything down and make straight lines slightly off
+			for ($i=0; $i<sizeof($finalpoints); $i++) {
+				$finalpoints[$i] = round($finalpoints[$i]);
+			}
+
 			if (!is_null($fillcolours[$dir]))
 			{
 				wimagefilledpolygon($image, $finalpoints, count($finalpoints) / 2, $arrowsettings[4]); 

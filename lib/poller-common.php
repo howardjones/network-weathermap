@@ -150,32 +150,33 @@ function weathermap_run_maps($mydir) {
 								$queries[] = "select * from weathermap_settings where mapid=0 and groupid=".intval($map['group_id']);
 								$queries[] = "select * from weathermap_settings where mapid=".intval($map['id']);
 
-								foreach ($queries as $sql)
-								{
+								foreach ($queries as $sql) {
 									$settingrows = db_fetch_assoc($sql);
-									if( is_array($settingrows) && count($settingrows) > 0 ) 
-									{ 
+									if (is_array($settingrows) && count($settingrows) > 0) {
+										foreach ($settingrows as $setting) {
+											$set_it = false;
+											if ($setting['mapid'] == 0 && $setting['groupid'] == 0) {
+												wm_debug("Setting additional (all maps) option: " . $setting['optname'] . " to '" . $setting['optvalue'] . "'\n");
+												$set_it = true;
+											} elseif ($setting['groupid'] != 0) {
+												wm_debug("Setting additional (all maps in group) option: " . $setting['optname'] . " to '" . $setting['optvalue'] . "'\n");
+												$set_it = true;
+											} else {
+												wm_debug("Setting additional map-global option: " . $setting['optname'] . " to '" . $setting['optvalue'] . "'\n");
+												$set_it = true;
+											}
+											if ($set_it) {
+												$wmap->add_hint($setting['optname'], $setting['optvalue']);
 
-									foreach ($settingrows as $setting)
-									{
-										if($setting['mapid']==0 && $setting['groupid']==0)
-										{
-											wm_debug("Setting additional (all maps) option: ".$setting['optname']." to '".$setting['optvalue']."'\n");
-											$wmap->add_hint($setting['optname'],$setting['optvalue']);
-										}
-										elseif($setting['groupid']!=0)
-										{
-											wm_debug("Setting additional (all maps in group) option: ".$setting['optname']." to '".$setting['optvalue']."'\n");
-											$wmap->add_hint($setting['optname'],$setting['optvalue']);
-										}
-										else
-										{	wm_debug("Setting additional map-global option: ".$setting['optname']." to '".$setting['optvalue']."'\n");
-											$wmap->add_hint($setting['optname'],$setting['optvalue']);
+												if (substr($setting['optname'], 0, 7) == 'nowarn_') {
+													$code = strtoupper(substr($setting['optname'], 7));
+													$weathermap_error_suppress[] = $code;
+												}
+											}
 										}
 									}
-									}
-								}																
-								
+								}
+
 								weathermap_memory_check("MEM postread $mapcount");
 								$wmap->ReadData();
 								weathermap_memory_check("MEM postdata $mapcount");

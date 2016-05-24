@@ -13,8 +13,8 @@
 *  Add a warning for missing tables on manage
 *  ~~Add a warning for no maps on main tab if there are NO MAPS~~
 *  Add note on editor that config names must have no space and end in .conf
-*  DATAOUTPUTFILE
-*  HTMLOUTFILE and IMAGEOUTPUTFILE in Cacti
+*  ~~DATAOUTPUTFILE~~
+*  HTMLOUTPUTFILE and IMAGEOUTPUTFILE in Cacti
 *  new image-cycle
 *  detect if Boost is installed and enabled, and recommend poller_output
 *  editor 'tidy' function

@@ -11,9 +11,9 @@ function getTriangleArea($point1, $point2, $point3)
 
 class WMLineSegment
 {
-    private $point1;
-    private $point2;
-    private $vector;
+    public $point1;
+    public $point2;
+    public $vector;
 
     public function __construct($p1, $p2)
     {

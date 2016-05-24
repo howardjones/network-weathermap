@@ -1,0 +1,79 @@
+@CHARSET "ISO-8859-1";
+
+.sortable-placeholder { border: 3px dashed gray; height: 48px; }
+.draghandle { cursor: move }
+
+tr.wm_map_disabled { color: #ccc; }
+
+td.wm_maptitle { padding-right: 20px; }
+span.wm_maptitle { font-size: 150%; }
+.wm_controls { font-size: 70%; color: lightgray;}
+.wm_maplist { padding-left: 100px; padding-bottom: 50px; }
+
+.wm_mapgroup { padding-left: 30px; }
+
+img.thumb48 { border: 1px solid #eee; }
+td.maptable_thumb { width: 66px; }
+td.maptable_disc { width: 12px; }
+td.maptable_delete { width: 20px; }
+td.maptable_perms {width: 150px; }
+td.maptable_names { width: 400px; }
+td.maptable_status { width: 100px; }
+td.maptable_settings { width: 80px; }
+td.maptable_active { width: 50px; }
+ 
+div.wm_mapgroup table { border-top: 1px solid #eee; }
+.wm_warningcount { border: 2px red solid; padding: 2px; }
+
+.wm_maplist tr td { border-bottom: 1px solid #cccccc; }
+.wm_maplist tr th { color: gray; font-weight: normal; }
+
+.xwm_maplist tr.alt-row { background-color: #eef; }
+
+.wm_map_extra { display: none; }
+
+.wm_warning { padding:5px; width: 50%; border: 2px red solid; margin: 5px auto 15px auto; background-color: #fee; }
+
+
+
+
+/* .all_map_holder { margin-left: auto; margin-right: auto;  } */
+
+tr.fig, tr.fig td { border-top: 1px solid gray; }
+
+td.groupheader { background-color: #009; color: white; font-weight: bold; }
+
+
+.wm_expanded { height: 200px; border-left: 1px solid gray; border-bottom: 1px solid gray; border-right: 1px solid gray; }
+
+/* Cycle-related stuff */
+
+body#wm_fullscreen { font-family: sans-serif; margin: 0; border: 0; padding: 0; background-color: black; }
+
+#wmcyclecontrolbox.fullscreen {
+    z-index: 100;
+    opacity: 0.9;
+    position: fixed;
+    left: 10px;
+    top: 10px;
+}
+
+#wmcyclecontrolbox {
+    background-color: rgb(255,255,255);
+    padding: 10px;
+    border: solid 1px black;
+    width: 450px;
+    font-size: small;
+}
+
+#wmcyclecontrolbox.fullscreen #cycle_fullscreen { display: none; }
+
+#wm_progress { width: 450px; background-color: rgb(128,128,128); height: 8px; margin-bottom: 2px; }
+
+#wm_progress.paused { background-color: rgb(128,0,0); }
+
+.fullscreen .weathermapholder { display: none; position: absolute;  }
+
+.inplace .weathermapholder { display: none; }
+
+#wm_cyclecontrols a img { width: 16px; height: 16px; border: 0; }

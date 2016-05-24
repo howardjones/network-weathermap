@@ -3153,7 +3153,12 @@ function DrawMap($filename = '', $thumbnailfile = '', $thumbnailmax = 250, $with
 	else
 	{
 		ImageAlphaBlending($image, true);
-		# imageantialias($image,true);
+		if($this->get_hint("antialias") == 1) {
+			// Turn on anti-aliasing if it exists and it was requested
+			if(function_exists("imageantialias")) {
+				imageantialias($image,true);
+			}
+		}
 
 		// by here, we should have a valid image handle
 

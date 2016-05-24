@@ -126,6 +126,7 @@ function weathermap_run_maps($mydir) {
 							$imagefile = $outdir.DIRECTORY_SEPARATOR.$map['filehash'].".".$imageformat;
 							$thumbimagefile = $outdir.DIRECTORY_SEPARATOR.$map['filehash'].".thumb.".$imageformat;
 							$resultsfile = $outdir . DIRECTORY_SEPARATOR . $map['filehash'] . '.results.txt';
+							$tempfile = $outdir . DIRECTORY_SEPARATOR . $map['filehash'] . '.tmp.png';
 
 							if(file_exists($mapfile))
 							{
@@ -183,13 +184,25 @@ function weathermap_run_maps($mydir) {
 
 								// why did I change this before? It's useful...
 								// $wmap->imageuri = $config['url_path'].'/plugins/weathermap/output/weathermap_'.$map['id'].".".$imageformat;
+								$configured_imageuri = $wmap->imageuri;
 								$wmap->imageuri = 'weathermap-cacti-plugin.php?action=viewimage&id='.$map['filehash']."&time=".time();
 	
 								if($quietlogging==0) wm_warn("About to write image file. If this is the last message in your log, increase memory_limit in php.ini [WMPOLL01]\n",TRUE);
 								weathermap_memory_check("MEM pre-render $mapcount");
-								
-								$wmap->DrawMap($imagefile,$thumbimagefile,read_config_option("weathermap_thumbsize"));
-								
+
+								// Write the image to a temporary file first - it turns out that libpng is not that fast
+								// and this way we avoid showing half a map
+								$wmap->DrawMap($tempfile,$thumbimagefile,read_config_option("weathermap_thumbsize"));
+
+								// Firstly, don't move or delete anything if the image saving failed
+								if (file_exists($tempfile)) {
+									// Don't try and delete a non-existent file (first run)
+									if (file_exists($imagefile)) {
+										unlink($imagefile);
+									}
+									rename($tempfile, $imagefile);
+								}
+
 								if($quietlogging==0) wm_warn("Wrote map to $imagefile and $thumbimagefile\n",TRUE);
 								$fd = @fopen($htmlfile, 'w');
 								if($fd != FALSE)
@@ -215,6 +228,37 @@ function weathermap_run_maps($mydir) {
 								if ($wmap->dataoutputfile) {
 									$map->WriteDataFile($map->dataoutputfile);
 								}
+
+								// put back the configured imageuri
+								$wmap->imageuri = $configured_imageuri;
+
+								// if an htmloutputfile was configured, output the HTML there too
+								// but using the configured imageuri and imagefilename
+								if ($wmap->htmloutputfile != "") {
+									$htmlfile = $wmap->htmloutputfile;
+									$fd = @fopen($htmlfile, 'w');
+
+									if ($fd !== false) {
+										fwrite($fd,
+											$wmap->MakeHTML('weathermap_' . $map['filehash'] . '_imap'));
+										fclose($fd);
+										wm_debug("Wrote HTML to %s\n", $htmlfile);
+									} else {
+										if (true === file_exists($htmlfile)) {
+											wm_warn('Failed to overwrite ' . $htmlfile
+												. " - permissions of existing file are wrong? [WMPOLL02]\n");
+										} else {
+											wm_warn('Failed to create ' . $htmlfile
+												. " - permissions of output directory are wrong? [WMPOLL03]\n");
+										}
+									}
+								}
+
+								if($wmap->imageoutputfile != "" && $wmap->imageoutputfile != "weathermap.png" && file_exists($imagefile)) {
+									// copy the existing image file to the configured location too
+									@copy($imagefile, $wmap->imageoutputfile);
+								}
+
 								$processed_title = $wmap->ProcessString($wmap->title,$wmap);
 								
 								db_execute("update weathermap_maps set titlecache='".mysql_real_escape_string($processed_title)."' where id=".intval($map['id']));

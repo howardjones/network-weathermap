@@ -252,7 +252,7 @@ class WeatherMapNode extends WeatherMapDataItem
     }
 
 
-    function preCalculateColours(&$owner)
+    protected function preCalculateColours(&$owner)
     {
         wm_debug("Trace");
 
@@ -283,7 +283,7 @@ class WeatherMapNode extends WeatherMapDataItem
         }
     }
 
-    function preCalculateGeometry(&$owner)
+    protected function preCalculateGeometry(&$owner)
     {
         wm_debug("Trace");
 
@@ -301,13 +301,11 @@ class WeatherMapNode extends WeatherMapDataItem
                     $this->iconfile,
                     $this,
                     $this->resolvedColours['aiconoutline'],
-                    $this->resolvedColours['aiconfill'],
-                    $this->resolvedColours['iconfill'],
-                    $this->resolvedColours['labelfill']
+                    $this->resolvedColours['aiconfill']
                 );
             } else {
                 wm_debug("Legit Image");
-                $iconObj = new WMNodeImageIcon($this, $this->owner->ProcessString($this->iconfile, $this),
+                $iconObj = new WMNodeImageIcon($this, $this->owner->processString($this->iconfile, $this),
                     $this->iconscalew, $this->iconscaleh);
             }
 
@@ -356,12 +354,13 @@ class WeatherMapNode extends WeatherMapDataItem
      *
      * This is the only stuff that needs to be done if we're doing an editing pass. No actual drawing is necessary.
      *
-     * TODO: write this.
      */
-    function preCalculate(&$owner)
+    public function preCalculate(&$owner)
     {
         wm_debug("------------------------------------------------");
         wm_debug("Calculating node geometry for %s", $this);
+
+        $this->drawable = false;
 
         // don't bother drawing if it's a template
         if ($this->isTemplate()) {
@@ -383,7 +382,7 @@ class WeatherMapNode extends WeatherMapDataItem
         wm_debug("------------------------------------------------");
     }
 
-    function colourizeImage($imageRef, $tintColour)
+    public function colourizeImage($imageRef, $tintColour)
     {
 
         list ($red, $green, $blue) = $tintColour->getComponents();
@@ -399,7 +398,7 @@ class WeatherMapNode extends WeatherMapDataItem
 
     // make a mini-image, containing this node and nothing else
     // figure out where the real NODE centre is, relative to the top-left corner.
-    function preRender(&$map)
+    public function preRender(&$map)
     {
         wm_debug("------------------------------------------------");
         wm_debug($this);
@@ -475,7 +474,7 @@ class WeatherMapNode extends WeatherMapDataItem
 //                );
 //            } else {
 //                wm_debug("Legit");
-//                $iconObj = new WMNodeImageIcon($this, $this->owner->ProcessString($this->iconfile, $this),
+//                $iconObj = new WMNodeImageIcon($this, $this->owner->processString($this->iconfile, $this),
 //                    $this->iconscalew, $this->iconscaleh);
 //            }
 //
@@ -518,17 +517,17 @@ class WeatherMapNode extends WeatherMapDataItem
 
 
         if ($iconObj) {
-            $brect = $iconObj->getBoundingBox();
-            $totalBoundingBox->addRectangle($brect);
-            $this->boundingboxes[] = $brect;
+            $boundingRect = $iconObj->getBoundingBox();
+            $totalBoundingBox->addRectangle($boundingRect);
+            $this->boundingboxes[] = $boundingRect;
         }
 
         if ($labelObj) {
             $labelObj->translate($deltaX, $deltaY);
             $labelObj->translate($this->labeloffsetx, $this->labeloffsety);
-            $brect = $labelObj->getBoundingBox();
-            $totalBoundingBox->addRectangle($brect);
-            $this->boundingboxes[] = $brect;
+            $boundingRect = $labelObj->getBoundingBox();
+            $totalBoundingBox->addRectangle($boundingRect);
+            $this->boundingboxes[] = $boundingRect;
         }
 
         $bbox = $totalBoundingBox->getBoundingRectangle();
@@ -586,12 +585,12 @@ class WeatherMapNode extends WeatherMapDataItem
         $this->image = $node_im;
     }
 
-    function isRelativePositionResolved()
+    public function isRelativePositionResolved()
     {
         return $this->relative_resolved;
     }
 
-    function isRelativePositioned()
+    public function isRelativePositioned()
     {
         if ($this->relative_to != "") {
             return true;
@@ -600,12 +599,12 @@ class WeatherMapNode extends WeatherMapDataItem
         return false;
     }
 
-    function getRelativeAnchor()
+    public function getRelativeAnchor()
     {
         return $this->relative_to;
     }
 
-    function resolveRelativePosition($anchorNode)
+    public function resolveRelativePosition($anchorNode)
     {
         $anchorPosition = $anchorNode->getPosition();
 
@@ -655,7 +654,7 @@ class WeatherMapNode extends WeatherMapDataItem
     }
 
     // draw the node, using the pre_render() output
-    function draw($im, &$map)
+    public function draw($im, &$map)
     {
         wm_debug("trace %s", $this);
         // take the offset we figured out earlier, and just blit the image on. Who says "blit" anymore?

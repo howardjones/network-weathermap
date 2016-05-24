@@ -128,7 +128,7 @@ class WeatherMapRunner
         $this->dataTime = microtime(true);
         weathermap_memory_check("MEM pre-calc");
 
-        $this->preCalculate($this->mapObject);
+        $this->mapObject->preCalculate($this->mapObject);
 
         $this->precalcTime = microtime(true);
 

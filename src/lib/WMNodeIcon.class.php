@@ -154,11 +154,9 @@ class WMNodeArtificialIcon extends WMNodeIcon
     );
     protected $aiconFillColour;
     protected $aiconInkColour;
-    // protected $aiconOutlineColour; // ???
-    protected $iconFillColour;
-    protected $labelFillColour;
+    protected $name;
 
-    public function __construct($node, $aiconInkColour, $aiconFillColour, $iconFillColour, $labelFillColour)
+    public function __construct($node, $aiconInkColour, $aiconFillColour)
     {
         parent::__construct($node);
 
@@ -171,11 +169,8 @@ class WMNodeArtificialIcon extends WMNodeIcon
             throw new WeathermapRuntimeWarning("AICON with invalid type");
         }
 
-        // $this->aiconOutlineColour = $aiconOutlineColour;
         $this->aiconFillColour = $aiconFillColour;
-        $this->iconFillColour = $iconFillColour;
         $this->aiconInkColour = $aiconInkColour;
-        $this->labelFillColour = $labelFillColour;
     }
 
     public static function isAICONName($name)
@@ -187,14 +182,11 @@ class WMNodeArtificialIcon extends WMNodeIcon
         $name,
         $node,
         $aiconInkColour,
-        $aiconFillColour,
-        $iconFillColour,
-        $labelFillColour
+        $aiconFillColour
     ) {
         $class = self::$types{$name};
 
-        $iconObj = new $class($node, $aiconInkColour, $aiconFillColour, $iconFillColour,
-            $labelFillColour);
+        $iconObj = new $class($node, $aiconInkColour, $aiconFillColour);
 
         return $iconObj;
     }
@@ -218,30 +210,6 @@ class WMNodeArtificialIcon extends WMNodeIcon
 
         $fill = $this->aiconFillColour;
         $ink = $this->aiconInkColour;
-
-//        // if useiconscale isn't set, then use the static colour defined, or copy the colour from the label
-//        if ($this->useiconscale == "none") {
-//            if ($aiconFillColour->isCopy() && !$labelFillColour->isNone()) {
-//                $fill = $labelFillColour;
-//            } else {
-//                if ($aiconFillColour->isRealColour()) {
-//                    $fill = $aiconFillColour;
-//                }
-//            }
-//        } else {
-//            // if useiconscale IS defined, use that to figure out the fill colour
-//
-//            $fill = $iconFillColour;
-//        }
-
-//        // support 'none' and 'copy' for AICON outlines too
-//        if (!$this->aiconoutlinecolour->isNone() && $this->aiconoutlinecolor->isCopy()) {
-//            $ink = $labelFillColour;
-//        } else {
-//            if ($aiconOutlineColour->isRealColour()) {
-//                $ink = $aiconInkColour;
-//            }
-//        }
 
         wm_debug("AICON colours are $ink and $fill\n");
 
@@ -271,7 +239,6 @@ class WMNodeNINKIcon extends WMNodeArtificialIcon
     public function drawAIcon()
     {
         $iconImageRef = $this->iconImageRef;
-        $fill = $this->aiconFillColour;
         $ink = $this->aiconInkColour;
 
         $radiusX = $this->widthScale / 2 - 1;
@@ -279,8 +246,8 @@ class WMNodeNINKIcon extends WMNodeArtificialIcon
         $size = $this->widthScale;
         $quarter = $size / 4;
 
-        $colour1 = $this->node->colours[OUT]->gdallocate($iconImageRef);
-        $colour2 = $this->node->colours[IN]->gdallocate($iconImageRef);
+        $colour1 = $this->node->colours[OUT]->gdAllocate($iconImageRef);
+        $colour2 = $this->node->colours[IN]->gdAllocate($iconImageRef);
 
         imagefilledarc(
             $iconImageRef,
@@ -331,7 +298,7 @@ class WMNodeNINKIcon extends WMNodeArtificialIcon
         if ($ink !== null && !$ink->isNone()) {
             // XXX - need a font definition from somewhere for NINK text
             $font = 1;
-            $inkGD = $ink->gdallocate($iconImageRef);
+            $inkGD = $ink->gdAllocate($iconImageRef);
 
             $directions = array(
                 array("in", -1),
@@ -340,7 +307,7 @@ class WMNodeNINKIcon extends WMNodeArtificialIcon
 
             foreach ($directions as $direction) {
                 $name = $direction[0];
-                $label = $this->node->owner->ProcessString("{node:this:bandwidth_$name:%.1k}", $this->node);
+                $label = $this->node->owner->processString("{node:this:bandwidth_$name:%.1k}", $this->node);
 
                 list($twid, $thgt) = $this->node->owner->myimagestringsize($font, $label);
                 $this->node->owner->myimagestring(
@@ -383,7 +350,7 @@ class WMNodeBoxIcon extends WMNodeArtificialIcon
                 0,
                 $this->widthScale - 1,
                 $this->heightScale - 1,
-                $ink->gdallocate($this->iconImageRef)
+                $ink->gdAllocate($this->iconImageRef)
             );
         }
     }
@@ -417,7 +384,7 @@ class WMNodeRoundedBoxIcon extends WMNodeArtificialIcon
                 $this->widthScale - 1,
                 $this->heightScale - 1,
                 4,
-                $ink->gdallocate($this->iconImageRef)
+                $ink->gdAllocate($this->iconImageRef)
             );
         }
     }
@@ -426,7 +393,6 @@ class WMNodeRoundedBoxIcon extends WMNodeArtificialIcon
 
 class WMNodeRoundIcon extends WMNodeArtificialIcon
 {
-
     public function drawAIcon()
     {
         $fill = $this->aiconFillColour;
@@ -453,7 +419,7 @@ class WMNodeRoundIcon extends WMNodeArtificialIcon
                 $radiusY,
                 $radiusX * 2,
                 $radiusY * 2,
-                $ink->gdallocate($this->iconImageRef)
+                $ink->gdAllocate($this->iconImageRef)
             );
         }
     }
@@ -498,7 +464,7 @@ class WMNodePieIcon extends WMNodeArtificialIcon
                 $radiusY * 2,
                 0,
                 $segmentAngle,
-                $ink->gdallocate($this->iconImageRef),
+                $ink->gdAllocate($this->iconImageRef),
                 IMG_ARC_PIE
             );
         }

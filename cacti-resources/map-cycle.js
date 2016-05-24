@@ -109,6 +109,9 @@ var WMcycler = {
 
     start : function (initialData) {
 
+
+	$('.weathermapholder').hide();
+
         this.period = initialData.period;
         this.poller_cycle = initialData.poller_cycle;
         this.fullscreen = initialData.fullscreen;

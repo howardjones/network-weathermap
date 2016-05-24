@@ -280,7 +280,11 @@ if ($map->ReadConfig($configfile))
 
 	if ($dumpstats != '')
 		$map->DumpStats();
-		
+
+	if ($map->dataoutputfile != '') {
+		$map->WriteDataFile($map->dataoutputfile);
+	}
+
 	if ($dumpafter == 1)
 		print_r ($map);
 		

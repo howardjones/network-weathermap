@@ -210,7 +210,10 @@ function weathermap_run_maps($mydir) {
 								}
 
 								$wmap->WriteDataFile($resultsfile);
-
+								// if the user explicitly defined a data file, write it there too
+								if ($wmap->dataoutputfile) {
+									$map->WriteDataFile($map->dataoutputfile);
+								}
 								$processed_title = $wmap->ProcessString($wmap->title,$wmap);
 								
 								db_execute("update weathermap_maps set titlecache='".mysql_real_escape_string($processed_title)."' where id=".intval($map['id']));

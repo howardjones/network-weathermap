@@ -719,73 +719,56 @@ else
 		}
 		break;
 
-    case "link_align_horizontal":
+
+	case "link_tidy":
 		$map->ReadConfig($mapfile);
 
 		$target = wm_editor_sanitize_name($_REQUEST['param']);
-		
-		if(isset($map->links[target])) {
-		    $log = "align link ".$target;	
-		    
-		    $a_y = $map->links[$target]->a->y;
-		    $b_y = $map->links[$target]->b->y;
-		    
-		    $diff = $b_y - $a_y;
-		    $newoffset = "0:$diff";
-		    
-		    // if we've already done this once, try the other way around...
-		    if($map->links[$target]->a_offset == $newoffset)
-		    {
-			$diff = $a_y - $b_y;
-			$newoffset = "0:$diff";
-			$map->links[$target]->b_offset = $newoffset;
-			$map->links[$target]->a_offset = "C";
-		    }
-		    else
-		    {
-			// the standard thing
-			$map->links[$target]->a_offset = $newoffset;
-			$map->links[$target]->b_offset = "C";
-		    }     
-    
-		    $map->WriteConfig($mapfile);
-		}
-                break;
 
-    case "link_align_vertical":
+		if(isset($map->links[$target])) {
+			// draw a map and throw it away, to calculate all the bounding boxes
+			$map->DrawMap('null');
+
+			tidy_link($map,$target);
+
+			$map->WriteConfig($mapfile);
+		}
+		break;
+	case "retidy":
 		$map->ReadConfig($mapfile);
 
-		$target = wm_editor_sanitize_name($_REQUEST['param']);
-		
-		if(isset($map->links[target])) {		    
-		    $log = "align link ".$target;
-    
-		    $a_x = $map->links[$target]->a->x;
-		    $b_x = $map->links[$target]->b->x;
-		    
-		    $diff = $b_x - $a_x;
-		    $newoffset = "$diff:0";
-		    
-		    // if we've already done this once, try the other way around...
-		    if($map->links[$target]->a_offset == $newoffset)
-		    {
-			$diff = $a_x - $b_x;
-			$newoffset = "$diff:0";
-			$map->links[$target]->b_offset = $newoffset;
-			$map->links[$target]->a_offset = "C";
-		    }
-		    else
-		    {
-			// the standard thing
-			$map->links[$target]->a_offset = $newoffset;
-			$map->links[$target]->b_offset = "C";
-		    }     
-    
-		    $map->WriteConfig($mapfile);
-		}
-                break;
+		// draw a map and throw it away, to calculate all the bounding boxes
+		$map->DrawMap('null');
+		retidy_links($map);
 
-	case "delete_link":
+		$map->WriteConfig($mapfile);
+
+		break;
+
+	case "retidy_all":
+		$map->ReadConfig($mapfile);
+
+		// draw a map and throw it away, to calculate all the bounding boxes
+		$map->DrawMap('null');
+		retidy_links($map,TRUE);
+
+		$map->WriteConfig($mapfile);
+
+		break;
+
+	case "untidy":
+		$map->ReadConfig($mapfile);
+
+		// draw a map and throw it away, to calculate all the bounding boxes
+		$map->DrawMap('null');
+		untidy_links($map);
+
+		$map->WriteConfig($mapfile);
+
+		break;
+
+
+		case "delete_link":
 		$map->ReadConfig($mapfile);
 
 		$target = wm_editor_sanitize_name($_REQUEST['param']);
@@ -1002,7 +985,13 @@ else
 	  src="<?php echo $imageurl; ?>" id="xycapture" /><img src=
 	  "<?php echo $imageurl; ?>" id="existingdata" alt="Weathermap" usemap="#weathermap_imap"
 	   />
-	   <div class="debug"><p><strong>Debug:</strong> <a href="?<?php echo ($fromplug==TRUE ? 'plug=1&amp;' : ''); ?>action=nothing&amp;mapname=<?php echo  htmlspecialchars($mapname) ?>">Do Nothing</a> 
+	   <div class="debug"><p><strong>Debug:</strong>
+			   <a href="?<?php echo ($fromplug==TRUE ? 'plug=1&amp;' : ''); ?>action=retidy_all&amp;mapname=<?php echo  htmlspecialchars($mapname) ?>">Re-tidy ALL</a>
+			   <a href="?<?php echo ($fromplug==TRUE ? 'plug=1&amp;' : ''); ?>action=retidy&amp;mapname=<?php echo  htmlspecialchars($mapname) ?>">Re-tidy</a>
+			   <a href="?<?php echo ($fromplug==TRUE ? 'plug=1&amp;' : ''); ?>action=untidy&amp;mapname=<?php echo  htmlspecialchars($mapname) ?>">Un-tidy</a>
+
+
+			   <a href="?<?php echo ($fromplug==TRUE ? 'plug=1&amp;' : ''); ?>action=nothing&amp;mapname=<?php echo  htmlspecialchars($mapname) ?>">Do Nothing</a>
 	   <span><label for="mapname">mapfile</label><input type="text" name="mapname" value="<?php echo htmlspecialchars($mapname); ?>" /></span>
 	   <span><label for="action">action</label><input type="text" id="action" name="action" value="<?php echo htmlspecialchars($newaction); ?>" /></span>
 	  <span><label for="param">param</label><input type="text" name="param" id="param" value="" /></span>
@@ -1192,8 +1181,7 @@ else
 			  <th></th>
 			  <td><a class="dlgTitlebar" id="link_delete">Delete
 			  Link</a><a class="dlgTitlebar" id="link_edit">Edit</a><a
-                            class="dlgTitlebar" id="link_vert">Vert</a><a
-                            class="dlgTitlebar" id="link_horiz">Horiz</a><a 
+					  class="dlgTitlebar" id="link_tidy">Tidy</a><a
 							class="dlgTitlebar" id="link_via">Via</a> 
                         </td>
 			</tr>

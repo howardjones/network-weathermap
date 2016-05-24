@@ -4,7 +4,7 @@
 *  Fix 5.3-7.0 strict errors
 *  ~~Config file path validation issue in editor (CVE-2013-3739)~~
 *  ~~KILO was ignored when processing %k in special tokens~~
-*  nowarn_WMxxxx actually works!
+*  ~~nowarn_WMxxxx actually works!~~
 *  rounding error 'kinks' in angled VIA links
 *  ~~Cloning a templated node in editor retains the template in the clone~~
 *  Imagemap sortorder problem in editor. If you can see it, you can click it.
@@ -17,7 +17,7 @@
 *  ~~HTMLOUTPUTFILE and IMAGEOUTPUTFILE in Cacti~~
 *  new image-cycle
 *  detect if Boost is installed and enabled, and recommend poller_output
-*  editor 'tidy' function
+*  ~~editor 'tidy' function~~
 *  editor MRU for picker  http://forums.cacti.net/viewtopic.php?f=16&t=50649
 *  ~~%t and %T support in ProcessString~~
 *  Document %d in manual http://forums.cacti.net/viewtopic.php?f=16&t=22677

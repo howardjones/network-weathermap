@@ -14,13 +14,12 @@ repeat "error reports" in the forums.
     FIXED - cacti_use_ifspeed incorrect when interfaces > 20M and ifhighspeed available
     FIXED - More PHP 5.3/5.4/strict related errors (split -> explode)
     CHANGE - (Cacti plugin only) images are written to a temporary file first, to avoid displaying half-written images
-
-    CHANGE - if there are actually 0 maps in the database, the 'Weathermaps'
-             tab gives some basic instructions.
+    CHANGE - if there are actually 0 maps in the database, the 'Weathermaps' tab gives some basic instructions.
     ADDED - Special token formatting can handle timeticks and time_t formatting (%T and %t respectively)
     ADDED - new DATAOUTPUTFILE allows collected data to be written to a file for later use (automatically enabled in Cacti)
     ADDED - IMAGEOUTPUTFILE and HTMLOUTPUTFILE are honoured in Cacti poller as a location for a second copy of those files.
-
+    ADDED - Editor 'tidy link' function replaces Vert & Horiz, and does much nicer job
+    ADDED - 'retidy' option in editor to recalculate all links previously positioned with 'tidy'.
 
 0.97c had no additional changes - it's just 0.97b with some silly errors fixed, and  all
 the CSS files included with the correct paths. There were also reports of problems with the

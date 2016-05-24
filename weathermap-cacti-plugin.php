@@ -380,6 +380,9 @@ function weathermap_thumbview($limit_to_group = -1)
 {
 	global $colors;
 
+	$total_map_count_SQL = "select count(*) as total from weathermap_maps";
+	$total_map_count = db_fetch_cell($total_map_count_SQL);
+
 	$userid = (isset($_SESSION["sess_user_id"]) ? intval($_SESSION["sess_user_id"]) : 1);
 	$maplist_SQL = "select distinct weathermap_maps.* from weathermap_auth,weathermap_maps where weathermap_maps.id=weathermap_auth.mapid and active='on' and ";
 	if($limit_to_group >0) $maplist_SQL .= " weathermap_maps.group_id=".$limit_to_group." and ";
@@ -461,7 +464,14 @@ function weathermap_thumbview($limit_to_group = -1)
 		}
 		else
 		{
-			print "<div align=\"center\" style=\"padding:20px\"><em>You Have No Maps</em></div>\n";
+			print "<div align=\"center\" style=\"padding:20px\"><em>You Have No Maps</em>\n";
+
+			if ($total_map_count == 0) {
+				print '<p>To add a map to the schedule, go to the <a href="weathermap-cacti-plugin-mgmt.php">Manage...Weathermaps page</a> and add one.</p>';
+			}
+
+			print "</div>";
+
 		}
 	}
 }

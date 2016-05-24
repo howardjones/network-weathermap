@@ -461,6 +461,36 @@ function get_fontlist(&$map,$name,$current)
     return($output);
 }
 
+
+function range_overlaps($a_min, $a_max, $b_min, $b_max)
+{
+	if ($a_min > $b_max) {
+		return false;
+	}
+	if ($b_min > $a_max) {
+		return false;
+	}
+
+	return true;
+}
+function common_range ($a_min,$a_max, $b_min, $b_max)
+{
+	$min_overlap = max($a_min, $b_min);
+	$max_overlap = min($a_max, $b_max);
+
+	return array($min_overlap,$max_overlap);
+}
+/* distance - find the distance between two points
+ *
+ */
+function distance ($ax,$ay, $bx,$by)
+{
+	$dx = $bx - $ax;
+	$dy = $by - $ay;
+	return sqrt( $dx*$dx + $dy*$dy );
+}
+
+
 function tidy_links(&$map,$targets, $ignore_tidied=FALSE)
 {
 	// not very efficient, but it saves looking for special cases (a->b & b->a together)

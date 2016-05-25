@@ -6,7 +6,11 @@
 
     <anchor>GLOBAL_COLORS</anchor>
 
-    <definition>BGCOLOR <meta>red</meta> <meta>green</meta> <meta>blue</meta></definition>
+    <definition>BGCOLOR
+        <meta>red</meta>
+        <meta>green</meta>
+        <meta>blue</meta>
+    </definition>
 
     <definition>TIMECOLOR
 
@@ -35,14 +39,11 @@
         <meta>blue</meta>
     </definition>
 
-    <definition>KEYOUTLINECOLOR
+    <definition>KEYOUTLINECOLOR <meta>red</meta> <meta>green</meta> <meta>blue</meta> </definition>
 
-        <meta>red</meta>
-
-        <meta>green</meta>
-
-        <meta>blue</meta>
+    <definition>KEYOUTLINECOLOR none
     </definition>
+
 
     <definition>KEYBGCOLOR
 
@@ -53,15 +54,24 @@
         <meta>blue</meta>
     </definition>
 
+
+    <definition>KEYBGCOLOR none
+    </definition>
+
     <description xmlns="http://www.w3.org/1999/xhtml">
         <p>Specify the colours used for drawing the global elements of the map.</p>
 
         <p>red, green and blue are numbers from 0 to 255.</p>
+
+        <p>You can also choose not to draw either the outline or background rectangle for
+            keys by specifying 'none' for those.
+        </p>
     </description>
 
     <changes>
+        <change version="0.98">Added 'none' option for KEYBGCOLOR and KEYOUTLINECOLOR</change>
         <change version="0.8">Added TIMECOLOR, TITLECOLOR, KEYTEXTCOLOR,
-        KEYOUTLINECOLOR and KEYBGCOLOR.
+            KEYOUTLINECOLOR and KEYBGCOLOR.
         </change>
 
         <change version="0.7">Added BGCOLOR.

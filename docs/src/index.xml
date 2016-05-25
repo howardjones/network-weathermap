@@ -140,6 +140,7 @@
         <xi:include href = "global_height.xml" />
 
         <xi:include href = "global_htmloutputfile.xml" />
+        <xi:include href = "global_dataoutputfile.xml" />
 
         <xi:include href = "global_htmlstylesheet.xml" />
 

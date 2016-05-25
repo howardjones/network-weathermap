@@ -12,14 +12,17 @@
     </definition>
 
     <description xmlns="http://www.w3.org/1999/xhtml">
-        <p>This specifies the name of the HTML file that will be generated. </p>
+        <p>This specifies the name of the HTML file that will be generated.</p>
 
         <p>The equivalent command-line option takes precedence over this configuration
-        line, if both are used. If you are generating maps using the Cacti plugin, then
-        this directive is ignored.</p>
+            line, if both are used.
+        </p>
     </description>
 
     <changes>
+        <change version="0.98">This now creates a second copy of the file in the location specified, when using the
+            Cacti plugin.
+        </change>
         <change version="0.7">Added HTMLOUTPUTFILE.
         </change>
     </changes>

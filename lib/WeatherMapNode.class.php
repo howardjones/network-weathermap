@@ -630,7 +630,6 @@ class WeatherMapNode extends WeatherMapItem
 			#       print "FINAL TEXT at $txt_x , $txt_y\n";
 
 			// if there's an icon, then you can choose to have no background
-			print $col;
 			if(! $col->is_none() )
 			{
 			    imagefilledrectangle($node_im, $label_x1, $label_y1, $label_x2, $label_y2, $col->gdallocate($node_im));
@@ -698,7 +697,6 @@ class WeatherMapNode extends WeatherMapItem
 		# $this->image = $node_im;
 		$map->nodes[$this->name]->image = $node_im;
 
-		print "\n";
 	}
 
 	function update_cache($cachedir,$mapname)

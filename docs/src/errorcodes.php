@@ -2,7 +2,7 @@
         include "vars.php";
         $PAGE_TITLE="Error Code Reference";
         $PATH_EXTRA="../";
-        include "common-page-head.html";
+        include "common-page-head.php";
 ?>
 
             <h3>Error Code Reference</h3>
@@ -42,7 +42,7 @@
                 </dd>
 
                 <dt id="WMWARN02">[WMWARN02],
-                <span id = "WMWARN04">[WMWARN04]</a></dt>
+                <span id = "WMWARN04">[WMWARN04]</span></dt>
 
                 <dd><p>"Angled text doesn't work with non-FreeType fonts "</p>
 
@@ -70,9 +70,7 @@
 
                 </dd>
 
-                <dt id="WMWARN03">[WMWARN03]</a>
-
-                </dt>
+                <dt id="WMWARN03">[WMWARN03]</dt>
 
                 <dd><p>"Using a non-existent special font (<em>fontnumber</em>)
                 - falling back to internal GD fonts "</p>
@@ -410,7 +408,7 @@
 
                 </dd>
 
-                <dt id="WMWARN33">[WMWARN34]</dt>
+                <dt id="WMWARN34">[WMWARN34]</dt>
 
                 <dd><p>"NewColourFromPercent: Clipped <em>number</em>% to 0% for item
                 <em>itemname</em>"</p>
@@ -561,7 +559,26 @@
                 isn't possible to draw.</p>
 
                 </dd>
-
+                
+                <dt id="WMWARN50">[WMWARN50]</dt>
+                <dd>
+                <p>"Skipping too-short line"</p>
+                <p>To draw a link correctly with arrows, requires a certain distance between nodes. If your nodes are too close together, Weathermap will just skip drawing the link. This distance depends on the width of
+                the link (because the arrows are in proportion to the width). Try reducing the WIDTH of the link, changing to ARROWSTYLE compact, or moving the nodes further apart.</p>
+                </dd>
+               
+				<dt id="WMWARN70">[WMWARN70]</dt>
+                <dd>
+                <p>"ReadData: {map item} target: {target} on config line {line} of {file} had no valid data, according to {plugin}"</p>
+                <p>
+                This tells you that for a given <em>map item</em> defined on that line of that config file, there is no data. Weathermap
+                has figured out which datasource plugin should be used, but that plugin was unable to get data for this target. It could
+                be a NaN in an rrd file, a non-existent file for several data sources, or a network timeout for some others. Usually the
+                plugin will also log some detail just before this, but you might need to turn on DEBUG loggging to see that. 
+                </p>
+                </dd>
+                
+                
                 <dt id="WMWARN99">[WMWARN99]</dt>
 
                 <dd><p>"<em>something</em> not implemented yet"</p>
@@ -646,7 +663,7 @@
                 your server. Depending on the version of PHP, this can be quite low (8M
                 in older versions). Weathermap uses a lot (relatively) of memory to
                 produce the large image files. If it hits the PHP memory limit, then PHP
-                just kills the script with no warning. Because it log that it is dead
+                just kills the script with no warning. Because it can't log that it is dead
                 (because it is dead), it logs just before the 'risk' happens.
                 <em>If this log message is
                 <strong>not</strong> the last message in your log file, then
@@ -702,7 +719,7 @@
 
                 </dd>
 
-                <dt id="WMPOLL05">[WMPOLL06]</dt>
+                <dt id="WMPOLL06">[WMPOLL06]</dt>
 
                 <dd><p>"Output directory (<em>directory</em>) isn't writable (tried to
                 create '<em>filename</em>'). No maps created. You probably need to make
@@ -922,5 +939,4 @@
                 </dd>
 	</dl>
 <?php
-        include "common-page-foot.html";
-?>
+        include "common-page-foot.php";

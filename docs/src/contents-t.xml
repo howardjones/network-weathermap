@@ -73,6 +73,7 @@
       <p xmlns="" id="context_GLOBAL">
         <a class="tocentry" href="#GLOBAL_BACKGROUND">BACKGROUND</a>
         <a class="tocentry" href="#GLOBAL_COLORS">*COLOR</a>
+        <a class="tocentry" href="#GLOBAL_DATAOUTPUTFILE">DATAOUTPUTFILE</a>
         <a class="tocentry" href="#GLOBAL_FONT">*FONT</a>
         <a class="tocentry" href="#GLOBAL_FONTDEFINE">FONTDEFINE</a>
         <a class="tocentry" href="#GLOBAL_HEIGHT">HEIGHT</a>

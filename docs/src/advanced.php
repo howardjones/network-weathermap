@@ -1,10 +1,10 @@
 <?php
         include "vars.php";
         $PAGE_TITLE="Advanced Topics";
-        include "common-page-head.html";
+        include "common-page-head.php";
 ?>
 
-            <h2 id = "advtopics" id = "advtopics">Advanced Topics</h2>
+            <h2 id = "advtopics">Advanced Topics</h2>
 
             <p>This page contains information for the more advanced corners of
             Weathermap usage. I assume that you are more familiar with the basics of map
@@ -265,7 +265,7 @@
                 <tr><th>{link:this:bandwidth_in:%d}</th><td>force to integer</td>
                 </tr>
 
-                <tr><th>{link:this:bandwidth_in:%04d}</th><td>force to integer, and padd
+                <tr><th>{link:this:bandwidth_in:%04d}</th><td>force to integer, and pad
                 to 4 digits with zeroes</td>
                 </tr>
 
@@ -280,6 +280,12 @@
 
                 <tr><th>{link:this:bandwidth_in:%0.2k}</th><td>as above, but limit the
                 floating-point part to 2 decimal places (Weathermap special)</td>
+                </tr>
+                
+                <tr><th>{link:this:bandwidth_in:%t}</th><td>Format a duration in seconds in human-readable form (Weathermap special)</td>
+                <tr><th>{link:this:bandwidth_in:%T}</th><td>Format a duration in hundredths-of-seconds (aka SNMP TimeTicks) in human-readable form (Weathermap special)</td>
+                <tr><th>{link:this:bandwidth_in:%2T} {link:this:bandwidth_in:%2t}</th><td>Format a duration in human-readable form show only the 2 most significant parts. e.g. 1y34d13m3s becomes 1y34d (Weathermap special)</td>
+                
                 </tr>
             </table>
 
@@ -404,5 +410,4 @@
             network, or a total network uptime based on the uptimes of all nodes.
             Currently, there aren't any of these plugins, but the hooks are available.</p>
 <?php
-        include "common-page-foot.html";
-?>
+        include "common-page-foot.php";

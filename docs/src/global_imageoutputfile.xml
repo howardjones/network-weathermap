@@ -16,12 +16,11 @@
         The format chosen is based on the file-extension. </p>
 
         <p>The equivalent command-line option takes precedence over this configuration
-        line, if both are used. </p><p>If you are generating maps using the Cacti
-        plugin, then this directive is ignored. You can set the output format in the
-        Cacti Settings page.</p>
+        line, if both are used. </p>
     </description>
 
     <changes>
+        <change version="0.98">This now creates a second copy of the file in the location specified, when using the Cacti plugin.</change>
         <change version="0.9">Added JPEG and GIF support.
         </change>
 

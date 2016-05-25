@@ -1,4 +1,4 @@
-<?php include 'vars.php'; $PAGE_TITLE='Configuration Reference'; include 'common-page-head.html'; ?><h2 id="configref">Configuration Reference</h2><p>This page is automatically compiled, and documents all the
+<?php include 'vars.php'; $PAGE_TITLE='Configuration Reference'; include 'common-page-head.php'; ?><h2 id="configref">Configuration Reference</h2><p>This page is automatically compiled, and documents all the
                     configuration directives that are available in PHP Weathermap
                     <?php echo $WEATHERMAP_VERSION; ?>.  </p>
     <h2 class="configsection">Introduction</h2>
@@ -76,6 +76,7 @@
       <p xmlns="" id="context_GLOBAL">
         <a class="tocentry" href="#GLOBAL_BACKGROUND">BACKGROUND</a>
         <a class="tocentry" href="#GLOBAL_COLORS">*COLOR</a>
+        <a class="tocentry" href="#GLOBAL_DATAOUTPUTFILE">DATAOUTPUTFILE</a>
         <a class="tocentry" href="#GLOBAL_FONT">*FONT</a>
         <a class="tocentry" href="#GLOBAL_FONTDEFINE">FONTDEFINE</a>
         <a class="tocentry" href="#GLOBAL_HEIGHT">HEIGHT</a>
@@ -104,10 +105,12 @@
     <h2 id="s_scope_NODE" class="configsection">Node-specific Configuration Directives</h2>
         <div class="referenceentry">
   <h3 id="NODE_NODE">NODE</h3>
-  <div class="definition">NODE
+  <div class="definition">
+    <pre>NODE
 
         <em class="meta">nodename</em>
-    </div>
+    </pre>
+  </div>
   <div class="description">
  <p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">The initial definition of a <a href="#NODE_NODE">NODE.</a> This must come before any other 
  configuration related to this node. </p> 
@@ -131,10 +134,12 @@
 
         <div class="referenceentry">
   <h3 id="NODE_TEMPLATE">TEMPLATE</h3>
-  <div class="definition">TEMPLATE
+  <div class="definition">
+    <pre>TEMPLATE
 
         <em class="meta">nodename</em>
-    </div>
+    </pre>
+  </div>
   <div class="description">
  <p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">By default, each new node starts with the same set of properties. You can 
  change the default properties by defining a node called DEFAULT. </p> 
@@ -151,7 +156,9 @@
   <div class="examples">
     <h4>Examples</h4>
     <blockquote class="example">
-      <cite>NODE Templates in use - with template-only nodes</cite>
+      <small>
+        <cite>NODE Templates in use - with template-only nodes</cite>
+      </small>
       <pre>NODE server
             </pre>
     </blockquote>
@@ -168,20 +175,24 @@
 
         <div class="referenceentry">
   <h3 id="NODE_POSITION">POSITION</h3>
-  <div class="definition">POSITION
+  <div class="definition">
+    <pre>POSITION
 
         <em class="meta">x-coord</em>
 
         <em class="meta">y-coord</em>
-    </div>
-  <div class="definition">POSITION
+    </pre>
+  </div>
+  <div class="definition">
+    <pre>POSITION
 
         <em class="meta">nodename</em>
 
         <em class="meta">x-coord</em>
 
         <em class="meta">y-coord</em>
-    </div>
+    </pre>
+  </div>
   <div class="description">
  <p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Specifies where to place the node on the map. Coordinates are in pixel units, 
  with the origin at the top-left of the map. </p> 
@@ -194,9 +205,11 @@
   <div class="examples">
     <h4>Examples</h4>
     <blockquote class="example">
-      <cite>Example of a 'sub-node', that will be 20 pixels above the main
+      <small>
+        <cite>Example of a 'sub-node', that will be 20 pixels above the main
         node, wherever that gets moved to. It is used to show additional information
         about the main node.</cite>
+      </small>
       <pre>
                 NODE main_node POSITION 200 320 LABEL MAIN
 
@@ -216,10 +229,12 @@
 
         <div class="referenceentry">
   <h3 id="NODE_LABEL">LABEL</h3>
-  <div class="definition">LABEL
+  <div class="definition">
+    <pre>LABEL
 
         <em class="meta">labeltext</em>
-    </div>
+    </pre>
+  </div>
   <div class="description">
  <p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Specifies a label for the node. Everything to the end of the line is used. </p> 
  <p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">If the node has an <a href="#NODE_ICON">ICON</a> defined as well, then you can specify the position of 
@@ -241,34 +256,44 @@
 
         <div class="referenceentry">
   <h3 id="NODE_TARGET">TARGET</h3>
-  <div class="definition">TARGET
+  <div class="definition">
+    <pre>TARGET
 
         <em class="meta">targetspec</em>
-    </div>
-  <div class="definition">TARGET
+    </pre>
+  </div>
+  <div class="definition">
+    <pre>TARGET
 
         <em class="meta">targetspec</em>
 
         <em class="meta">targetspec</em>
-    </div>
-  <div class="definition">TARGET
+    </pre>
+  </div>
+  <div class="definition">
+    <pre>TARGET
 
         <em class="meta">targetspec</em>
 
         -
 
         <em class="meta">targetspec</em>
-    </div>
-  <div class="definition">TARGET
+    </pre>
+  </div>
+  <div class="definition">
+    <pre>TARGET
 
         <em class="meta">targetspec</em>
 
         n*
 
         <em class="meta">targetspec</em>
-    </div>
-  <div class="definition">TARGET "<em class="meta">targetspec</em>"
-    </div>
+    </pre>
+  </div>
+  <div class="definition">
+    <pre>TARGET "<em class="meta">targetspec</em>"
+    </pre>
+  </div>
   <div class="description">
  <p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Specifies where to look for the current "throughput" information for this 
  <a href="#NODE_NODE">NODE.</a> You can also specify multiple targets, which will then be added together 
@@ -297,13 +322,17 @@
   <div class="examples">
     <h4>Examples</h4>
     <blockquote class="example">
-      <cite>Using multiple data sources for one link</cite>
+      <small>
+        <cite>Using multiple data sources for one link</cite>
+      </small>
       <pre>TARGET link1a.rrd link1b.rrd
             </pre>
     </blockquote>
     <blockquote class="example">
-      <cite>Taking the input from one file, and output from
+      <small>
+        <cite>Taking the input from one file, and output from
         another</cite>
+      </small>
       <pre>TARGET poot.rrd:-:DS1 poot2.rrd:DS0:-
             </pre>
     </blockquote>
@@ -337,16 +366,20 @@
 
         <div class="referenceentry">
   <h3 id="NODE_USESCALE">USESCALE</h3>
-  <div class="definition">USESCALE
+  <div class="definition">
+    <pre>USESCALE
 
         <em class="meta">scalename</em>
-    </div>
-  <div class="definition">USESCALE
+    </pre>
+  </div>
+  <div class="definition">
+    <pre>USESCALE
 
         <em class="meta">scalename</em>
 
         <em class="meta">{in,out}</em>
-    </div>
+    </pre>
+  </div>
   <div class="description">
  <p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Specify which <a href="#GLOBAL_SCALE">SCALE</a> to use to decide the colour of this node. </p> 
  <p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">After the percentage usage is calculated (using BANDWIDTH/MAXVALUE and data 
@@ -380,16 +413,20 @@
 
         <div class="referenceentry">
   <h3 id="NODE_MAXVALUE">MAXVALUE</h3>
-  <div class="definition">MAXVALUE
+  <div class="definition">
+    <pre>MAXVALUE
 
         <em class="meta">max-value</em>
-    </div>
-  <div class="definition">MAXVALUE
+    </pre>
+  </div>
+  <div class="definition">
+    <pre>MAXVALUE
 
         <em class="meta">max-in-value</em>
 
         <em class="meta">max-out-value</em>
-    </div>
+    </pre>
+  </div>
   <div class="description">
  <p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Specifies the maximum value(s) for the node, in the same way that <a href="#LINK_BANDWIDTH">BANDWIDTH</a> 
  does for a <a href="#LINK_LINK">LINK.</a> These are used to calculate the percentage usage value, which 
@@ -409,20 +446,26 @@
 
         <div class="referenceentry">
   <h3 id="NODE_ICON">ICON</h3>
-  <div class="definition">ICON
+  <div class="definition">
+    <pre>ICON
 
         <em class="meta">iconimagefile</em>
-    </div>
-  <div class="definition">ICON
+    </pre>
+  </div>
+  <div class="definition">
+    <pre>ICON
 
         <em class="meta">maxwidth</em>
 
         <em class="meta">maxheight</em>
 
         <em class="meta">iconimagefile</em>
-    </div>
-  <div class="definition">ICON none
-    </div>
+    </pre>
+  </div>
+  <div class="definition">
+    <pre>ICON none
+    </pre>
+  </div>
   <div class="description">
  <p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Specifies an icon to use for the node. </p> 
  <p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">The filename can either be a full path to the image, or a relative one. </p> 
@@ -493,16 +536,20 @@
 
         <div class="referenceentry">
   <h3 id="NODE_USEICONSCALE">USEICONSCALE</h3>
-  <div class="definition">USEICONSCALE
+  <div class="definition">
+    <pre>USEICONSCALE
 
         <em class="meta">scalename</em>
-    </div>
-  <div class="definition">USEICONSCALE
+    </pre>
+  </div>
+  <div class="definition">
+    <pre>USEICONSCALE
 
         <em class="meta">scalename</em>
 
         <em class="meta">{in,out}</em>
-    </div>
+    </pre>
+  </div>
   <div class="description">
  <p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Specify which <a href="#GLOBAL_SCALE">SCALE</a> to use to decide the colour of the icon for this node. </p> 
  <p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">After the percentage usage is calculated (using BANDWIDTH/MAXVALUE and data 
@@ -536,16 +583,20 @@
 
         <div class="referenceentry">
   <h3 id="NODE_LABELOFFSET">LABELOFFSET</h3>
-  <div class="definition">LABELOFFSET
+  <div class="definition">
+    <pre>LABELOFFSET
 
         <em class="meta">compass-point</em>
-    </div>
-  <div class="definition">LABELOFFSET
+    </pre>
+  </div>
+  <div class="definition">
+    <pre>LABELOFFSET
 
         <em class="meta">x-offset</em>
 
         <em class="meta">y-offset</em>
-    </div>
+    </pre>
+  </div>
   <div class="description">
  <p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">If you specify an <a href="#NODE_ICON">ICON,</a> and also a <a href="#NODE_LABEL">LABEL,</a> then you will find that the label 
  is often hard to read. <a href="#NODE_LABELOFFSET">LABELOFFSET</a> allows you to move the position of the <a href="#NODE_LABEL">LABEL,</a> 
@@ -574,10 +625,12 @@
 
         <div class="referenceentry">
   <h3 id="NODE_LABELANGLE">LABELANGLE</h3>
-  <div class="definition">LABELANGLE
+  <div class="definition">
+    <pre>LABELANGLE
 
         <em class="meta">angle</em>
-    </div>
+    </pre>
+  </div>
   <div class="description">
  <p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Specifies a rotation angle of the label for a node. Allowed angles are 0, 90, 
  180 and 270 degrees. The rotation is around the centre of the label, after any 
@@ -603,10 +656,12 @@
 
         <div class="referenceentry">
   <h3 id="NODE_LABELFONT">LABELFONT</h3>
-  <div class="definition">LABELFONT
+  <div class="definition">
+    <pre>LABELFONT
 
         <em class="meta">fontnumber</em>
-    </div>
+    </pre>
+  </div>
   <div class="description">
  <p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Specify the font used for drawing the <a href="#NODE_LABEL">LABEL.</a> </p> 
  <p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Fonts are specified by number. The GD library that Weathermap uses has 5 
@@ -630,54 +685,66 @@
 
         <div class="referenceentry">
   <h3 id="NODE_COLORS">*COLOR</h3>
-  <div class="definition">LABELFONTCOLOR
+  <div class="definition">
+    <pre>LABELFONTCOLOR
 
         <em class="meta">red</em>
 
         <em class="meta">green</em>
 
         <em class="meta">blue</em>
-    </div>
-  <div class="definition">LABELFONTSHADOWCOLOR
+    </pre>
+  </div>
+  <div class="definition">
+    <pre>LABELFONTSHADOWCOLOR
 
         <em class="meta">red</em>
 
         <em class="meta">green</em>
 
         <em class="meta">blue</em>
-    </div>
-  <div class="definition">LABELBGCOLOR
+    </pre>
+  </div>
+  <div class="definition">
+    <pre>LABELBGCOLOR
 
         <em class="meta">red</em>
 
         <em class="meta">green</em>
 
         <em class="meta">blue</em>
-    </div>
-  <div class="definition">LABELOUTLINECOLOR
+    </pre>
+  </div>
+  <div class="definition">
+    <pre>LABELOUTLINECOLOR
 
         <em class="meta">red</em>
 
         <em class="meta">green</em>
 
         <em class="meta">blue</em>
-    </div>
-  <div class="definition">AICONOUTLINECOLOR
+    </pre>
+  </div>
+  <div class="definition">
+    <pre>AICONOUTLINECOLOR
 
         <em class="meta">red</em>
 
         <em class="meta">green</em>
 
         <em class="meta">blue</em>
-    </div>
-  <div class="definition">AICONFILLCOLOR
+    </pre>
+  </div>
+  <div class="definition">
+    <pre>AICONFILLCOLOR
 
         <em class="meta">red</em>
 
         <em class="meta">green</em>
 
         <em class="meta">blue</em>
-    </div>
+    </pre>
+  </div>
   <div class="description">
  <p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Specify the colours used for drawing the <a href="#NODE_LABEL">LABEL.</a> </p> 
  <p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">red, green and blue are numbers from 0 to 255. </p> 
@@ -713,10 +780,12 @@
 
         <div class="referenceentry">
   <h3 id="NODE_INFOURL">INFOURL</h3>
-  <div class="definition">INFOURL
+  <div class="definition">
+    <pre>INFOURL
 
         <em class="meta">url</em>
-    </div>
+    </pre>
+  </div>
   <div class="description">
  <p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Creates a hyperlink in the HTML output. </p> 
  <p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">If you are using the HTML output facility, then a link is added to the 
@@ -727,16 +796,20 @@
 
         <div class="referenceentry">
   <h3 id="NODE_OVERLIBGRAPH">OVERLIBGRAPH</h3>
-  <div class="definition">OVERLIBGRAPH
+  <div class="definition">
+    <pre>OVERLIBGRAPH
 
         <em class="meta">url</em>
-    </div>
-  <div class="definition">OVERLIBGRAPH
+    </pre>
+  </div>
+  <div class="definition">
+    <pre>OVERLIBGRAPH
 
         <em class="meta">url</em>
 
         <em class="meta">url</em>...
-    </div>
+    </pre>
+  </div>
   <div class="description">
  <p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Creates a popup image in the HTML output. </p> 
  <p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">If you are using the HTML output facility, and <a href="#GLOBAL_HTMLSTYLE">HTMLSTYLE</a> is set to 'overlib', 
@@ -754,7 +827,9 @@
   <div class="examples">
     <h4>Examples</h4>
     <blockquote class="example">
-      <cite>Typical use of OVERLIBGRAPH</cite>
+      <small>
+        <cite>Typical use of OVERLIBGRAPH</cite>
+      </small>
       <pre>OVERLIBGRAPH http://www.yoursite.net/mrtg/router1-cpu-daily.png
             </pre>
     </blockquote>
@@ -771,10 +846,12 @@
 
         <div class="referenceentry">
   <h3 id="NODE_OVERLIBWIDTH">OVERLIBWIDTH</h3>
-  <div class="definition">OVERLIBWIDTH
+  <div class="definition">
+    <pre>OVERLIBWIDTH
 
         <em class="meta">imagewidth</em>
-    </div>
+    </pre>
+  </div>
   <div class="description">
  <p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Specify the width, in pixels of the graph image referred to by <a href="#NODE_OVERLIBGRAPH">OVERLIBGRAPH</a> 
  line. </p> 
@@ -796,10 +873,12 @@
 
         <div class="referenceentry">
   <h3 id="NODE_OVERLIBHEIGHT">OVERLIBHEIGHT</h3>
-  <div class="definition">OVERLIBHEIGHT
+  <div class="definition">
+    <pre>OVERLIBHEIGHT
 
         <em class="meta">imagewidth</em>
-    </div>
+    </pre>
+  </div>
   <div class="description">
  <p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Specify the width, in pixels of the graph image referred to by <a href="#NODE_OVERLIBGRAPH">OVERLIBGRAPH</a> 
  line. </p> 
@@ -821,10 +900,12 @@
 
         <div class="referenceentry">
   <h3 id="NODE_OVERLIBCAPTION">OVERLIBCAPTION</h3>
-  <div class="definition">OVERLIBCAPTION
+  <div class="definition">
+    <pre>OVERLIBCAPTION
 
         <em class="meta">caption text</em>
-    </div>
+    </pre>
+  </div>
   <div class="description">
  <p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Specify the caption used for the popup HTML 'window' if you have also 
  specified an <a href="#NODE_OVERLIBGRAPH">OVERLIBGRAPH</a> line. By default, this is the name of the <a href="#NODE_NODE">NODE.</a> </p> 
@@ -843,10 +924,12 @@
 
         <div class="referenceentry">
   <h3 id="NODE_NOTES">NOTES</h3>
-  <div class="definition">NOTES
+  <div class="definition">
+    <pre>NOTES
 
         <em class="meta">notes text</em>
-    </div>
+    </pre>
+  </div>
   <div class="description">
  <p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Specifies the text or HTML notes for a node. </p> 
  <p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">The 
@@ -868,12 +951,14 @@
 
         <div class="referenceentry">
   <h3 id="NODE_SET">SET</h3>
-  <div class="definition">SET
+  <div class="definition">
+    <pre>SET
 
         <em class="meta">hintname</em>
 
         <em class="meta">hintvalue</em>
-    </div>
+    </pre>
+  </div>
   <div class="description">
  <p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Specifies a value for a <em>hint variable</em>. </p> 
  <p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Hint Variables allow the user to pass settings to the internals of Weathermap 
@@ -897,10 +982,12 @@
 
         <div class="referenceentry">
   <h3 id="NODE_ZORDER">ZORDER</h3>
-  <div class="definition">ZORDER
+  <div class="definition">
+    <pre>ZORDER
 
         <em class="meta">z-coord</em>
-    </div>
+    </pre>
+  </div>
   <div class="description">
  <p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Specifies the order in which to draw this item on the map. </p> 
  <p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">By default, all nodes are drawn above all links. There are some situations 
@@ -927,10 +1014,12 @@
     <h2 id="s_scope_LINK" class="configsection">Link-specific Configuration Directives</h2>
         <div class="referenceentry">
   <h3 id="LINK_LINK">LINK</h3>
-  <div class="definition">LINK
+  <div class="definition">
+    <pre>LINK
 
         <em class="meta">linkname</em>
-    </div>
+    </pre>
+  </div>
   <div class="description">
  <p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">The first line of a <a href="#LINK_LINK">LINK</a> definition. </p> 
  <p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">The linkname must be unique within the map, and must not contain spaces. The 
@@ -946,10 +1035,12 @@
 
         <div class="referenceentry">
   <h3 id="LINK_TEMPLATE">TEMPLATE</h3>
-  <div class="definition">TEMPLATE
+  <div class="definition">
+    <pre>TEMPLATE
 
         <em class="meta">linkname</em>
-    </div>
+    </pre>
+  </div>
   <div class="description">
  <p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">By default, each new link starts with the same set of properties. You can 
  change the default properties by defining a link called DEFAULT. </p> 
@@ -966,7 +1057,9 @@
   <div class="examples">
     <h4>Examples</h4>
     <blockquote class="example">
-      <cite>LINK Templates in use - with template-only links</cite>
+      <small>
+        <cite>LINK Templates in use - with template-only links</cite>
+      </small>
       <pre>LINK bigpipe WIDTH 8 ARROWSTYLE classic
 
                 LINK smallpipe WIDTH 3 ARROWSTYLE compact
@@ -988,30 +1081,38 @@
 
         <div class="referenceentry">
   <h3 id="LINK_NODES">NODES</h3>
-  <div class="definition">NODES
+  <div class="definition">
+    <pre>NODES
 
         <em class="meta">nodename{:compassoffset}</em>
 
         <em class="meta">nodename{:compassoffset}</em>
-    </div>
-  <div class="definition">NODES
+    </pre>
+  </div>
+  <div class="definition">
+    <pre>NODES
 
         <em class="meta">nodename{:compassoffset}{percentage}</em>
 
         <em class="meta">nodename{:compassoffset}{percentage}</em>
-    </div>
-  <div class="definition">NODES
+    </pre>
+  </div>
+  <div class="definition">
+    <pre>NODES
 
         <em class="meta">nodename{:xoffset:yoffset}</em>
 
         <em class="meta">nodename{:xoffset:yoffset}</em>
-    </div>
-  <div class="definition">NODES
+    </pre>
+  </div>
+  <div class="definition">
+    <pre>NODES
 
         <em class="meta">nodename{:angle}r{radius}</em>
 
         <em class="meta">nodename{:angle}r{radius}</em>
-    </div>
+    </pre>
+  </div>
   <div class="description">
  <p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">These are the <a href="#NODE_NODE">NODEs</a> that this link joins. There can be only two. They are the 
  'nodename's from the <a href="#NODE_NODE">NODE</a> line for each node. </p> 
@@ -1060,32 +1161,42 @@
   <div class="examples">
     <h4>Examples</h4>
     <blockquote class="example">
-      <cite>Defining a simple link</cite>
+      <small>
+        <cite>Defining a simple link</cite>
+      </small>
       <pre>LINK mylink NODES node1 node2
             </pre>
     </blockquote>
     <blockquote class="example">
-      <cite>Two parallel links, using offsets</cite>
+      <small>
+        <cite>Two parallel links, using offsets</cite>
+      </small>
       <pre>LINK firstlink NODES node1:E node2:E
 
                 LINK secondlink NODES node1:W node2:W
             </pre>
     </blockquote>
     <blockquote class="example">
-      <cite>Two parallel links, using percentage compass offsets to bring
+      <small>
+        <cite>Two parallel links, using percentage compass offsets to bring
         the links closer together</cite>
+      </small>
       <pre>LINK firstlink NODES node1:E50 node2:E50
 
                 LINK secondlink NODES node1:W50 node2:W50
             </pre>
     </blockquote>
     <blockquote class="example">
-      <cite>An offset link using pixel offsets</cite>
+      <small>
+        <cite>An offset link using pixel offsets</cite>
+      </small>
       <pre>LINK firstlink NODES node1:-10:10 node2:20:12
             </pre>
     </blockquote>
     <blockquote class="example">
-      <cite>An offset link using polar coordinates</cite>
+      <small>
+        <cite>An offset link using polar coordinates</cite>
+      </small>
       <pre>LINK firstlink NODES node1:45r20 node2:225r20
             </pre>
     </blockquote>
@@ -1111,34 +1222,44 @@
 
         <div class="referenceentry">
   <h3 id="LINK_TARGET">TARGET</h3>
-  <div class="definition">TARGET
+  <div class="definition">
+    <pre>TARGET
 
         <em class="meta">targetspec</em>
-    </div>
-  <div class="definition">TARGET
+    </pre>
+  </div>
+  <div class="definition">
+    <pre>TARGET
 
         <em class="meta">targetspec</em>
 
         <em class="meta">targetspec</em>
-    </div>
-  <div class="definition">TARGET
+    </pre>
+  </div>
+  <div class="definition">
+    <pre>TARGET
 
         <em class="meta">targetspec</em>
 
         -
 
         <em class="meta">targetspec</em>
-    </div>
-  <div class="definition">TARGET
+    </pre>
+  </div>
+  <div class="definition">
+    <pre>TARGET
 
         <em class="meta">targetspec</em>
 
         n*
 
         <em class="meta">targetspec</em>
-    </div>
-  <div class="definition">TARGET "<em class="meta">targetspec</em>"
-    </div>
+    </pre>
+  </div>
+  <div class="definition">
+    <pre>TARGET "<em class="meta">targetspec</em>"
+    </pre>
+  </div>
   <div class="description">
  <p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Specifies where to look for the current throughput information for this <a href="#LINK_LINK">LINK.</a> 
  You can also specify multiple targets, which will then be added together to make 
@@ -1164,13 +1285,17 @@
   <div class="examples">
     <h4>Examples</h4>
     <blockquote class="example">
-      <cite>Using multiple data sources for one link</cite>
+      <small>
+        <cite>Using multiple data sources for one link</cite>
+      </small>
       <pre>TARGET link1a.rrd link1b.rrd
             </pre>
     </blockquote>
     <blockquote class="example">
-      <cite>Taking the input from one file, and output from
+      <small>
+        <cite>Taking the input from one file, and output from
         another</cite>
+      </small>
       <pre>TARGET poot.rrd:-:DS1 poot2.rrd:DS0:-
             </pre>
     </blockquote>
@@ -1204,22 +1329,28 @@
 
         <div class="referenceentry">
   <h3 id="LINK_USESCALE">USESCALE</h3>
-  <div class="definition">USESCALE
+  <div class="definition">
+    <pre>USESCALE
 
         <em class="meta">scalename</em>
-    </div>
-  <div class="definition">USESCALE
+    </pre>
+  </div>
+  <div class="definition">
+    <pre>USESCALE
 
         <em class="meta">scalename</em>
 
         percent
-    </div>
-  <div class="definition">USESCALE
+    </pre>
+  </div>
+  <div class="definition">
+    <pre>USESCALE
 
         <em class="meta">scalename</em>
 
         absolute
-    </div>
+    </pre>
+  </div>
   <div class="description">
  <p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Specify which <a href="#GLOBAL_SCALE">SCALE</a> to use to decide the colour of this link. </p> 
  <p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">After the percentage usage is calculated (using <a href="#LINK_BANDWIDTH">BANDWIDTH</a> and data from the 
@@ -1243,10 +1374,12 @@
 
         <div class="referenceentry">
   <h3 id="LINK_WIDTH">WIDTH</h3>
-  <div class="definition">WIDTH
+  <div class="definition">
+    <pre>WIDTH
 
         <em class="meta">width</em>
-    </div>
+    </pre>
+  </div>
   <div class="description">
  <p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Specifies the width of this link when drawn. The 
  <em>width</em> value can be any positive number (including non-integers). </p> 
@@ -1275,16 +1408,20 @@
 
         <div class="referenceentry">
   <h3 id="LINK_BANDWIDTH">BANDWIDTH</h3>
-  <div class="definition">BANDWIDTH
+  <div class="definition">
+    <pre>BANDWIDTH
 
         <em class="meta">max-bandwidth</em>
-    </div>
-  <div class="definition">BANDWIDTH
+    </pre>
+  </div>
+  <div class="definition">
+    <pre>BANDWIDTH
 
         <em class="meta">max-in-bandwidth</em>
 
         <em class="meta">max-out-bandwidth</em>
-    </div>
+    </pre>
+  </div>
   <div class="description">
  <p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Specifies the maximum throughput of this link, in bits per second. </p> 
  <p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">This is used to calculate the percentage utilisation, which in turn is used 
@@ -1298,7 +1435,9 @@
   <div class="examples">
     <h4>Examples</h4>
     <blockquote class="example">
-      <cite>A typical ADSL line (as seen from the CPE)</cite>
+      <small>
+        <cite>A typical ADSL line (as seen from the CPE)</cite>
+      </small>
       <pre>BANDWIDTH 2M 256K
             </pre>
     </blockquote>
@@ -1323,14 +1462,18 @@
 
         <div class="referenceentry">
   <h3 id="LINK_DUPLEX">DUPLEX</h3>
-  <div class="definition">DUPLEX
+  <div class="definition">
+    <pre>DUPLEX
 
         <em class="meta">full</em>
-    </div>
-  <div class="definition">DUPLEX
+    </pre>
+  </div>
+  <div class="definition">
+    <pre>DUPLEX
 
         <em class="meta">half</em>
-    </div>
+    </pre>
+  </div>
   <div class="description">
  <p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">'half' indicates that the bandwidth specified by the <a href="#LINK_BANDWIDTH">BANDWIDTH</a> keyword is 
  half-duplex rather than the default full. </p> 
@@ -1349,10 +1492,12 @@
 
         <div class="referenceentry">
   <h3 id="LINK_BWLABEL">BWLABEL</h3>
-  <div class="definition">BWLABEL
+  <div class="definition">
+    <pre>BWLABEL
 
         <em class="meta">formatname</em>
-    </div>
+    </pre>
+  </div>
   <div class="description">
  <p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Specifies the type of 'bandwidth' label shown on each link. </p> 
  <p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">The default is 'percent', but you can also have 'none', 'unformatted' or 
@@ -1379,10 +1524,12 @@
 
         <div class="referenceentry">
   <h3 id="LINK_INBWFORMAT">INBWFORMAT</h3>
-  <div class="definition">INBWFORMAT
+  <div class="definition">
+    <pre>INBWFORMAT
 
         <em class="meta">string</em>
-    </div>
+    </pre>
+  </div>
   <div class="description">
  <p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Specifies a custom string to use for the inbound data <a href="#LINK_BWLABEL">BWLABEL</a> bandwidth 
  labels. </p> 
@@ -1399,7 +1546,9 @@
   <div class="examples">
     <h4>Examples</h4>
     <blockquote class="example">
-      <cite>Providing more information in the bwlabel</cite>
+      <small>
+        <cite>Providing more information in the bwlabel</cite>
+      </small>
       <pre>INBWFORMAT {link:this:inpercent}% of
             {link:this:max_bandwidth_in:%k}b/sec
             </pre>
@@ -1417,10 +1566,12 @@
 
         <div class="referenceentry">
   <h3 id="LINK_OUTBWFORMAT">OUTBWFORMAT</h3>
-  <div class="definition">OUTBWFORMAT
+  <div class="definition">
+    <pre>OUTBWFORMAT
 
         <em class="meta">string</em>
-    </div>
+    </pre>
+  </div>
   <div class="description">
  <p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Specifies a custom string to use for the outbound data <a href="#LINK_BWLABEL">BWLABEL</a> bandwidth 
  labels. </p> 
@@ -1438,10 +1589,12 @@
 
         <div class="referenceentry">
   <h3 id="LINK_BWSTYLE">BWSTYLE</h3>
-  <div class="definition">BWSTYLE
+  <div class="definition">
+    <pre>BWSTYLE
 
         <em class="meta">formatname</em>
-    </div>
+    </pre>
+  </div>
   <div class="description">
  <p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Specifies the style used to draw the box around the 'bandwidth' label shown 
  on each link. </p> 
@@ -1469,12 +1622,14 @@
 
         <div class="referenceentry">
   <h3 id="LINK_BWLABELPOS">BWLABELPOS</h3>
-  <div class="definition">BWLABELPOS
+  <div class="definition">
+    <pre>BWLABELPOS
 
         <em class="meta">inposition</em>
 
         <em class="meta">outposition</em>
-    </div>
+    </pre>
+  </div>
   <div class="description">
  <p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Specifies the position of the 'bandwidth' labels shown on each link. </p> 
  <p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">The two position values are percentages along the link arrow, from the first 
@@ -1499,10 +1654,12 @@
 
         <div class="referenceentry">
   <h3 id="LINK_BWFONT">BWFONT</h3>
-  <div class="definition">BWFONT
+  <div class="definition">
+    <pre>BWFONT
 
         <em class="meta">fontnumber</em>
-    </div>
+    </pre>
+  </div>
   <div class="description">
  <p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Specify the font used for drawing the <a href="#LINK_BWLABEL">BWLABEL</a> boxes. </p> 
  <p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Fonts are specified by number. The GD library that Weathermap uses has 5 
@@ -1515,10 +1672,12 @@
 
         <div class="referenceentry">
   <h3 id="LINK_INCOMMENT">INCOMMENT</h3>
-  <div class="definition">INCOMMENT
+  <div class="definition">
+    <pre>INCOMMENT
 
         <em class="meta">string</em>
-    </div>
+    </pre>
+  </div>
   <div class="description">
  <p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Specifies a comment for the input side of a <a href="#LINK_LINK">LINK.</a> </p> 
  <p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">The link comment appears as text running alongside the link arrow. The font 
@@ -1541,10 +1700,12 @@
 
         <div class="referenceentry">
   <h3 id="LINK_OUTCOMMENT">OUTCOMMENT</h3>
-  <div class="definition">OUTCOMMENT
+  <div class="definition">
+    <pre>OUTCOMMENT
 
         <em class="meta">string</em>
-    </div>
+    </pre>
+  </div>
   <div class="description">
  <p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Specifies a comment for the output side of a <a href="#LINK_LINK">LINK.</a> </p> 
  <p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">The link comment appears as text running alongside the link arrow. The font 
@@ -1567,10 +1728,12 @@
 
         <div class="referenceentry">
   <h3 id="LINK_COMMENTFONT">COMMENTFONT</h3>
-  <div class="definition">COMMENTFONT
+  <div class="definition">
+    <pre>COMMENTFONT
 
         <em class="meta">fontnumber</em>
-    </div>
+    </pre>
+  </div>
   <div class="description">
  <p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Specify the font used for drawing the <a href="#LINK_INCOMMENT">INCOMMENT</a> and <a href="#LINK_OUTCOMMENT">OUTCOMMENT</a> text. </p> 
  <p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Fonts are specified by number. The GD library that Weathermap uses has 5 
@@ -1593,12 +1756,14 @@
 
         <div class="referenceentry">
   <h3 id="LINK_COMMENTPOS">COMMENTPOS</h3>
-  <div class="definition">COMMENTPOS
+  <div class="definition">
+    <pre>COMMENTPOS
 
         <em class="meta">inposition</em>
 
         <em class="meta">outposition</em>
-    </div>
+    </pre>
+  </div>
   <div class="description">
  <p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Specify the position along the link used for drawing the <a href="#LINK_INCOMMENT">INCOMMENT</a> and 
  <a href="#LINK_OUTCOMMENT">OUTCOMMENT</a> text. </p> 
@@ -1618,10 +1783,14 @@
 
         <div class="referenceentry">
   <h3 id="LINK_COMMENTSTYLE">COMMENTSTYLE</h3>
-  <div class="definition">COMMENTSTYLE edge
-    </div>
-  <div class="definition">COMMENTSTYLE center
-    </div>
+  <div class="definition">
+    <pre>COMMENTSTYLE edge
+    </pre>
+  </div>
+  <div class="definition">
+    <pre>COMMENTSTYLE center
+    </pre>
+  </div>
   <div class="description">
  <p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Specify whether link comments run along the outside edge of the link, or down 
  the centre of the link arrow. </p> 
@@ -1642,10 +1811,12 @@
 
         <div class="referenceentry">
   <h3 id="LINK_SPLITPOS">SPLITPOS</h3>
-  <div class="definition">SPLITPOS
+  <div class="definition">
+    <pre>SPLITPOS
 
         <em class="meta">position</em>
-    </div>
+    </pre>
+  </div>
   <div class="description">
  <p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Specify the position of the 'split' between the in and out arrows in a link. 
  <em>position</em> is a percentage, and defaults to 50. </p> 
@@ -1662,46 +1833,56 @@
 
         <div class="referenceentry">
   <h3 id="LINK_COLORS">*COLOR</h3>
-  <div class="definition">OUTLINECOLOR
+  <div class="definition">
+    <pre>OUTLINECOLOR
 
         <em class="meta">red</em>
 
         <em class="meta">green</em>
 
         <em class="meta">blue</em>
-    </div>
-  <div class="definition">BWOUTLINECOLOR
+    </pre>
+  </div>
+  <div class="definition">
+    <pre>BWOUTLINECOLOR
 
         <em class="meta">red</em>
 
         <em class="meta">green</em>
 
         <em class="meta">blue</em>
-    </div>
-  <div class="definition">BWFONTCOLOR
+    </pre>
+  </div>
+  <div class="definition">
+    <pre>BWFONTCOLOR
 
         <em class="meta">red</em>
 
         <em class="meta">green</em>
 
         <em class="meta">blue</em>
-    </div>
-  <div class="definition">BWBOXCOLOR
+    </pre>
+  </div>
+  <div class="definition">
+    <pre>BWBOXCOLOR
 
         <em class="meta">red</em>
 
         <em class="meta">green</em>
 
         <em class="meta">blue</em>
-    </div>
-  <div class="definition">COMMENTFONTCOLOR
+    </pre>
+  </div>
+  <div class="definition">
+    <pre>COMMENTFONTCOLOR
 
         <em class="meta">red</em>
 
         <em class="meta">green</em>
 
         <em class="meta">blue</em>
-    </div>
+    </pre>
+  </div>
   <div class="description">
  <p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Specify the colours used for drawing the link. </p> 
  <p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">red, green and blue are numbers from 0 to 255. </p> 
@@ -1751,10 +1932,12 @@
 
         <div class="referenceentry">
   <h3 id="LINK_INFOURL">INFOURL</h3>
-  <div class="definition">INFOURL
+  <div class="definition">
+    <pre>INFOURL
 
         <em class="meta">url</em>
-    </div>
+    </pre>
+  </div>
   <div class="description">
  <p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Creates a hyperlink in the HTML output. </p> 
  <p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">If you are using the HTML output facility, then a link is added to the 
@@ -1775,14 +1958,18 @@
 
         <div class="referenceentry">
   <h3 id="LINK_ININFOURL">ININFOURL</h3>
-  <div class="definition">ININFOURL
+  <div class="definition">
+    <pre>ININFOURL
 
         <em class="meta">url</em>
-    </div>
-  <div class="definition">ININFOURL
+    </pre>
+  </div>
+  <div class="definition">
+    <pre>ININFOURL
 
         <em class="meta">url</em>
-    </div>
+    </pre>
+  </div>
   <div class="description">
  <p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Same as <a href="#LINK_INFOURL">INFOURL,</a> but specifies a hyperlink for only the 'in' side of a 
  link. </p> 
@@ -1799,14 +1986,18 @@
 
         <div class="referenceentry">
   <h3 id="LINK_OUTINFOURL">OUTINFOURL</h3>
-  <div class="definition">OUTINFOURL
+  <div class="definition">
+    <pre>OUTINFOURL
 
         <em class="meta">url</em>
-    </div>
-  <div class="definition">OUTINFOURL
+    </pre>
+  </div>
+  <div class="definition">
+    <pre>OUTINFOURL
 
         <em class="meta">url</em>
-    </div>
+    </pre>
+  </div>
   <div class="description">
  <p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Same as <a href="#LINK_INFOURL">INFOURL,</a> but specifies a hyperlink for only the 'out' side of a 
  link. </p> 
@@ -1823,10 +2014,12 @@
 
         <div class="referenceentry">
   <h3 id="LINK_OVERLIBGRAPH">OVERLIBGRAPH</h3>
-  <div class="definition">OVERLIBGRAPH
+  <div class="definition">
+    <pre>OVERLIBGRAPH
 
         <em class="meta">url</em>
-    </div>
+    </pre>
+  </div>
   <div class="description">
  <p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Creates a popup image in the HTML output. </p> 
  <p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">If you are using the HTML output facility, and <a href="#GLOBAL_HTMLSTYLE">HTMLSTYLE</a> is set to 'overlib', 
@@ -1846,7 +2039,9 @@
   <div class="examples">
     <h4>Examples</h4>
     <blockquote class="example">
-      <cite>Typical use of OVERLIBGRAPH</cite>
+      <small>
+        <cite>Typical use of OVERLIBGRAPH</cite>
+      </small>
       <pre>OVERLIBGRAPH http://www.yoursite.net/mrtg/router1-link2-daily.png
             </pre>
     </blockquote>
@@ -1871,16 +2066,20 @@
 
         <div class="referenceentry">
   <h3 id="LINK_INOVERLIBGRAPH">INOVERLIBGRAPH</h3>
-  <div class="definition">INOVERLIBGRAPH
+  <div class="definition">
+    <pre>INOVERLIBGRAPH
 
         <em class="meta">url</em>
-    </div>
-  <div class="definition">INOVERLIBGRAPH
+    </pre>
+  </div>
+  <div class="definition">
+    <pre>INOVERLIBGRAPH
 
         <em class="meta">url</em>
 
         <em class="meta">url</em>...
-    </div>
+    </pre>
+  </div>
   <div class="description">
  <p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Same as <a href="#LINK_OVERLIBGRAPH">OVERLIBGRAPH,</a> but specifies a pop-up graph for only the 'in' side of 
  a link. </p> 
@@ -1900,16 +2099,20 @@
 
         <div class="referenceentry">
   <h3 id="LINK_OUTOVERLIBGRAPH">OUTOVERLIBGRAPH</h3>
-  <div class="definition">OUTOVERLIBGRAPH
+  <div class="definition">
+    <pre>OUTOVERLIBGRAPH
 
         <em class="meta">url</em>
-    </div>
-  <div class="definition">OUTOVERLIBGRAPH
+    </pre>
+  </div>
+  <div class="definition">
+    <pre>OUTOVERLIBGRAPH
 
         <em class="meta">url</em>
 
         <em class="meta">url</em>...
-    </div>
+    </pre>
+  </div>
   <div class="description">
  <p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Same as <a href="#LINK_OVERLIBGRAPH">OVERLIBGRAPH,</a> but specifies a pop-up graph for only the 'out' side of 
  a link. </p> 
@@ -1929,10 +2132,12 @@
 
         <div class="referenceentry">
   <h3 id="LINK_OVERLIBWIDTH">OVERLIBWIDTH</h3>
-  <div class="definition">OVERLIBWIDTH
+  <div class="definition">
+    <pre>OVERLIBWIDTH
 
         <em class="meta">imagewidth</em>
-    </div>
+    </pre>
+  </div>
   <div class="description">
  <p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Specify the width, in pixels of the graph image referred to by <a href="#LINK_OVERLIBGRAPH">OVERLIBGRAPH</a> 
  line. </p> 
@@ -1954,10 +2159,12 @@
 
         <div class="referenceentry">
   <h3 id="LINK_OVERLIBHEIGHT">OVERLIBHEIGHT</h3>
-  <div class="definition">OVERLIBHEIGHT
+  <div class="definition">
+    <pre>OVERLIBHEIGHT
 
         <em class="meta">imagewidth</em>
-    </div>
+    </pre>
+  </div>
   <div class="description">
  <p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Specify the width, in pixels of the graph image referred to by <a href="#LINK_OVERLIBGRAPH">OVERLIBGRAPH</a> 
  line. </p> 
@@ -1979,10 +2186,12 @@
 
         <div class="referenceentry">
   <h3 id="LINK_OVERLIBCAPTION">OVERLIBCAPTION</h3>
-  <div class="definition">OVERLIBCAPTION
+  <div class="definition">
+    <pre>OVERLIBCAPTION
 
         <em class="meta">caption text</em>
-    </div>
+    </pre>
+  </div>
   <div class="description">
  <p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Specify the caption used for the popup HTML 'window' if you have also 
  specified an <a href="#LINK_OVERLIBGRAPH">OVERLIBGRAPH</a> line. By default, this is the name of the <a href="#LINK_LINK">LINK.</a> </p> 
@@ -2001,10 +2210,12 @@
 
         <div class="referenceentry">
   <h3 id="LINK_INOVERLIBCAPTION">INOVERLIBCAPTION</h3>
-  <div class="definition">INOVERLIBCAPTION
+  <div class="definition">
+    <pre>INOVERLIBCAPTION
 
         <em class="meta">caption text</em>
-    </div>
+    </pre>
+  </div>
   <div class="description">
  <p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Same as <a href="#LINK_OVERLIBCAPTION">OVERLIBCAPTION,</a> but specifies a pop-up graph caption for only the 
  'in' side of a link. </p> 
@@ -2024,10 +2235,12 @@
 
         <div class="referenceentry">
   <h3 id="LINK_OUTOVERLIBCAPTION">OUTOVERLIBCAPTION</h3>
-  <div class="definition">OUTOVERLIBCAPTION
+  <div class="definition">
+    <pre>OUTOVERLIBCAPTION
 
         <em class="meta">caption text</em>
-    </div>
+    </pre>
+  </div>
   <div class="description">
  <p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Same as <a href="#LINK_OVERLIBCAPTION">OVERLIBCAPTION,</a> but specifies a pop-up graph caption for only the 
  'out' side of a link. </p> 
@@ -2047,10 +2260,12 @@
 
         <div class="referenceentry">
   <h3 id="LINK_NOTES">NOTES</h3>
-  <div class="definition">NOTES
+  <div class="definition">
+    <pre>NOTES
 
         <em class="meta">notes text</em>
-    </div>
+    </pre>
+  </div>
   <div class="description">
  <p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Specifies the text or HTML notes for a link. </p> 
  <p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">The 
@@ -2077,14 +2292,18 @@
 
         <div class="referenceentry">
   <h3 id="LINK_INNOTES">INNOTES</h3>
-  <div class="definition">INNOTES
+  <div class="definition">
+    <pre>INNOTES
 
         <em class="meta">url</em>
-    </div>
-  <div class="definition">INNOTES
+    </pre>
+  </div>
+  <div class="definition">
+    <pre>INNOTES
 
         <em class="meta">notes text</em>
-    </div>
+    </pre>
+  </div>
   <div class="description">
  <p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Same as <a href="#LINK_NOTES">NOTES,</a> but specifies a text box for only the 'in' side of a link. </p> 
   </div>
@@ -2100,14 +2319,18 @@
 
         <div class="referenceentry">
   <h3 id="LINK_OUTNOTES">OUTNOTES</h3>
-  <div class="definition">OUTNOTES
+  <div class="definition">
+    <pre>OUTNOTES
 
         <em class="meta">url</em>
-    </div>
-  <div class="definition">OUTNOTES
+    </pre>
+  </div>
+  <div class="definition">
+    <pre>OUTNOTES
 
         <em class="meta">notes text</em>
-    </div>
+    </pre>
+  </div>
   <div class="description">
  <p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Same as <a href="#LINK_NOTES">NOTES,</a> but specifies a pop-up text box for only the 'out' side of a 
  link. </p> 
@@ -2124,20 +2347,24 @@
 
         <div class="referenceentry">
   <h3 id="LINK_VIA">VIA</h3>
-  <div class="definition">VIA
+  <div class="definition">
+    <pre>VIA
 
         <em class="meta">x-coord</em>
 
         <em class="meta">y-coord</em>
-    </div>
-  <div class="definition">VIA
+    </pre>
+  </div>
+  <div class="definition">
+    <pre>VIA
 
         <em class="meta">nodename</em>
 
         <em class="meta">x-offset</em>
 
         <em class="meta">y-offset</em>
-    </div>
+    </pre>
+  </div>
   <div class="description">
  <p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Specify an additional point that a link must pass through. </p> 
  <p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">A link normally goes in a straight line between the two nodes listed in the 
@@ -2168,10 +2395,14 @@
 
         <div class="referenceentry">
   <h3 id="LINK_VIASTYLE">VIASTYLE</h3>
-  <div class="definition">VIASTYLE curved
-    </div>
-  <div class="definition">VIASTYLE angled
-    </div>
+  <div class="definition">
+    <pre>VIASTYLE curved
+    </pre>
+  </div>
+  <div class="definition">
+    <pre>VIASTYLE angled
+    </pre>
+  </div>
   <div class="description">
  <p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">When using <a href="#LINK_VIA">VIA</a> to define a non-straight <a href="#LINK_LINK">LINK,</a> you can choose to have a curved 
  link, where the curve passes through each <a href="#LINK_VIA">VIA</a> point, or an angled link where 
@@ -2193,10 +2424,14 @@
 
         <div class="referenceentry">
   <h3 id="LINK_LINKSTYLE">LINKSTYLE</h3>
-  <div class="definition">LINKSTYLE oneway
-    </div>
-  <div class="definition">LINKSTYLE twoway
-    </div>
+  <div class="definition">
+    <pre>LINKSTYLE oneway
+    </pre>
+  </div>
+  <div class="definition">
+    <pre>LINKSTYLE twoway
+    </pre>
+  </div>
   <div class="description">
  <p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Specifies the whether the link should be drawn with one or two arrows. </p> 
  <p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">A 'standard' (twoway) link has two arrows 
@@ -2220,16 +2455,20 @@
 
         <div class="referenceentry">
   <h3 id="LINK_ARROWSTYLE">ARROWSTYLE</h3>
-  <div class="definition">ARROWSTYLE
+  <div class="definition">
+    <pre>ARROWSTYLE
 
         <em class="meta">stylename</em>
-    </div>
-  <div class="definition">ARROWSTYLE
+    </pre>
+  </div>
+  <div class="definition">
+    <pre>ARROWSTYLE
 
         <em class="meta">width</em>
 
         <em class="meta">length</em>
-    </div>
+    </pre>
+  </div>
   <div class="description">
  <p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Specifies the style of arrowhead used for drawing links. </p> 
  <p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">The default is 'classic' which has a wide arrowhead. You can also choose 
@@ -2257,12 +2496,14 @@
 
         <div class="referenceentry">
   <h3 id="LINK_SET">SET</h3>
-  <div class="definition">SET
+  <div class="definition">
+    <pre>SET
 
         <em class="meta">hintname</em>
 
         <em class="meta">hintvalue</em>
-    </div>
+    </pre>
+  </div>
   <div class="description">
  <p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Specifies a value for a <em>hint variable</em>. </p> 
  <p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Hint Variables allow the user to pass settings to the internals of Weathermap 
@@ -2286,10 +2527,12 @@
 
         <div class="referenceentry">
   <h3 id="LINK_ZORDER">ZORDER</h3>
-  <div class="definition">ZORDER
+  <div class="definition">
+    <pre>ZORDER
 
         <em class="meta">z-coord</em>
-    </div>
+    </pre>
+  </div>
   <div class="description">
  <p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Specifies the order in which to draw this item on the map. </p> 
  <p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">By default, all nodes are drawn above all links. There are some situations 
@@ -2316,7 +2559,9 @@
     <h2 id="s_scope_GLOBAL" class="configsection">Global Configuration Directives</h2>
         <div class="referenceentry">
   <h3 id="GLOBAL_BACKGROUND">BACKGROUND</h3>
-  <div class="definition">BACKGROUND <em class="meta">imagefile</em></div>
+  <div class="definition">
+    <pre>BACKGROUND <em class="meta">imagefile</em></pre>
+  </div>
   <div class="description">
  <p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Specify an PNG, JPEG or GIF image file to be used as a background image. </p> 
  <p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Any <a href="#GLOBAL_WIDTH">WIDTH</a> and <a href="#GLOBAL_HEIGHT">HEIGHT</a> specifications will be ignored 
@@ -2334,10 +2579,12 @@
 
         <div class="referenceentry">
   <h3 id="GLOBAL_WIDTH">WIDTH</h3>
-  <div class="definition">WIDTH
+  <div class="definition">
+    <pre>WIDTH
 
         <em class="meta">map-width</em>
-    </div>
+    </pre>
+  </div>
   <div class="description">
  <p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Specifies the width of the map image in pixels. </p> 
  <p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">If a <a href="#GLOBAL_BACKGROUND">BACKGROUND</a> is specified, and the imagefile is successfully loaded, then 
@@ -2348,10 +2595,12 @@
 
         <div class="referenceentry">
   <h3 id="GLOBAL_HEIGHT">HEIGHT</h3>
-  <div class="definition">HEIGHT
+  <div class="definition">
+    <pre>HEIGHT
 
         <em class="meta">map-height</em>
-    </div>
+    </pre>
+  </div>
   <div class="description">
  <p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Specifies the height of the map image in pixels. </p> 
  <p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">If a <a href="#GLOBAL_BACKGROUND">BACKGROUND</a> is specified, and the imagefile is successfully loaded, then 
@@ -2362,21 +2611,47 @@
 
         <div class="referenceentry">
   <h3 id="GLOBAL_HTMLOUTPUTFILE">HTMLOUTPUTFILE</h3>
-  <div class="definition">HTMLOUTPUTFILE
+  <div class="definition">
+    <pre>HTMLOUTPUTFILE
 
         <em class="meta">htmlfile</em>
-    </div>
+    </pre>
+  </div>
   <div class="description">
  <p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">This specifies the name of the HTML file that will be generated. </p> 
  <p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">The equivalent command-line option takes precedence over this configuration 
- line, if both are used. If you are generating maps using the Cacti plugin, then 
- this directive is ignored. </p> 
+ line, if both are used. 
+ </p> 
   </div>
   <div class="changes">
     <h4>Change History</h4>
     <dl class="small">
+      <dt>0.98</dt>
+      <dd>This now creates a second copy of the file in the location specified, when using the
+            Cacti plugin.
+        </dd>
       <dt>0.7</dt>
       <dd>Added HTMLOUTPUTFILE.
+        </dd>
+    </dl>
+  </div>
+</div>
+        <div class="referenceentry">
+  <h3 id="GLOBAL_DATAOUTPUTFILE">DATAOUTPUTFILE</h3>
+  <div class="definition">
+    <pre>DATAOUTPUTFILE
+
+        <em class="meta">datafile</em>
+    </pre>
+  </div>
+  <div class="description">
+ <p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">TODO </p> 
+  </div>
+  <div class="changes">
+    <h4>Change History</h4>
+    <dl class="small">
+      <dt>0.98</dt>
+      <dd>Added DATAOUTPUTFILE
         </dd>
     </dl>
   </div>
@@ -2384,10 +2659,12 @@
 
         <div class="referenceentry">
   <h3 id="GLOBAL_HTMLSTYLESHEET">HTMLSTYLESHEET</h3>
-  <div class="definition">HTMLSTYLESHEET
+  <div class="definition">
+    <pre>HTMLSTYLESHEET
 
         <em class="meta">URL</em>
-    </div>
+    </pre>
+  </div>
   <div class="description">
  <p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Specifies a CSS stylesheet to reference, when generating HTML. </p> 
  <p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">When HTML output is enabled, this allows you to include your own CSS 
@@ -2404,22 +2681,23 @@
 
         <div class="referenceentry">
   <h3 id="GLOBAL_IMAGEOUTPUTFILE">IMAGEOUTPUTFILE</h3>
-  <div class="definition">IMAGEOUTPUTFILE
+  <div class="definition">
+    <pre>IMAGEOUTPUTFILE
 
         <em class="meta">imagefile</em>
-    </div>
+    </pre>
+  </div>
   <div class="description">
  <p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">This specifies the name of the PNG, JPEG or GIF file that will be generated. 
  The format chosen is based on the file-extension. </p> 
  <p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">The equivalent command-line option takes precedence over this configuration 
  line, if both are used. </p> 
- <p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">If you are generating maps using the Cacti 
- plugin, then this directive is ignored. You can set the output format in the 
- Cacti Settings page. </p> 
   </div>
   <div class="changes">
     <h4>Change History</h4>
     <dl class="small">
+      <dt>0.98</dt>
+      <dd>This now creates a second copy of the file in the location specified, when using the Cacti plugin.</dd>
       <dt>0.9</dt>
       <dd>Added JPEG and GIF support.
         </dd>
@@ -2432,9 +2710,11 @@
 
         <div class="referenceentry">
   <h3 id="GLOBAL_IMAGEURI">IMAGEURI</h3>
-  <div class="definition">IMAGEURI 
+  <div class="definition">
+    <pre>IMAGEURI 
         <em class="meta">image-uri</em>
-    </div>
+    </pre>
+  </div>
   <div class="description">
  <p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">If you are generating output files using <a href="#GLOBAL_HTMLOUTPUTFILE">HTMLOUTPUTFILE</a> and <a href="#GLOBAL_IMAGEOUTPUTFILE">IMAGEOUTPUTFILE</a> 
  that are in a different directory to the weathermap installation, then the HTML 
@@ -2457,20 +2737,24 @@
 
         <div class="referenceentry">
   <h3 id="GLOBAL_FONTDEFINE">FONTDEFINE</h3>
-  <div class="definition">FONTDEFINE
+  <div class="definition">
+    <pre>FONTDEFINE
 
         <em class="meta">fontnumber</em>
 
         <em class="meta">gdfontfile</em>
-    </div>
-  <div class="definition">FONTDEFINE
+    </pre>
+  </div>
+  <div class="definition">
+    <pre>FONTDEFINE
 
         <em class="meta">fontnumber</em>
 
         <em class="meta">ttffontfile</em>
 
         <em class="meta">fontsize</em>
-    </div>
+    </pre>
+  </div>
   <div class="description">
  <p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Defines a custom font to be used for text within the map. </p> 
  <p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">By default, the GD library used by Weathermap has 5 fonts, numbered 1-5. 
@@ -2505,8 +2789,10 @@
   <div class="examples">
     <h4>Examples</h4>
     <blockquote class="example">
-      <cite>Defining a new Truetype font, with the font file in the
+      <small>
+        <cite>Defining a new Truetype font, with the font file in the
         weathermap directory</cite>
+      </small>
       <pre>FONTDEFINE 10 VeraBd 16
             </pre>
     </blockquote>
@@ -2523,18 +2809,24 @@
 
         <div class="referenceentry">
   <h3 id="GLOBAL_FONT">*FONT</h3>
-  <div class="definition">TITLEFONT
+  <div class="definition">
+    <pre>TITLEFONT
 
         <em class="meta">fontnumber</em>
-    </div>
-  <div class="definition">KEYFONT
+    </pre>
+  </div>
+  <div class="definition">
+    <pre>KEYFONT
 
         <em class="meta">fontnumber</em>
-    </div>
-  <div class="definition">TIMEFONT
+    </pre>
+  </div>
+  <div class="definition">
+    <pre>TIMEFONT
 
         <em class="meta">fontnumber</em>
-    </div>
+    </pre>
+  </div>
   <div class="description">
  <p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Specify the fonts used for various text. </p> 
  <p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Fonts are specified by number. The GD library that Weathermap uses has 5 
@@ -2561,57 +2853,79 @@
 
         <div class="referenceentry">
   <h3 id="GLOBAL_COLORS">*COLOR</h3>
-  <div class="definition">BGCOLOR <em class="meta">red</em> <em class="meta">green</em> <em class="meta">blue</em></div>
-  <div class="definition">TIMECOLOR
+  <div class="definition">
+    <pre>BGCOLOR
+        <em class="meta">red</em>
+        <em class="meta">green</em>
+        <em class="meta">blue</em>
+    </pre>
+  </div>
+  <div class="definition">
+    <pre>TIMECOLOR
 
         <em class="meta">red</em>
 
         <em class="meta">green</em>
 
         <em class="meta">blue</em>
-    </div>
-  <div class="definition">TITLECOLOR
+    </pre>
+  </div>
+  <div class="definition">
+    <pre>TITLECOLOR
 
         <em class="meta">red</em>
 
         <em class="meta">green</em>
 
         <em class="meta">blue</em>
-    </div>
-  <div class="definition">KEYTEXTCOLOR
+    </pre>
+  </div>
+  <div class="definition">
+    <pre>KEYTEXTCOLOR
 
         <em class="meta">red</em>
 
         <em class="meta">green</em>
 
         <em class="meta">blue</em>
-    </div>
-  <div class="definition">KEYOUTLINECOLOR
+    </pre>
+  </div>
+  <div class="definition">
+    <pre>KEYOUTLINECOLOR <em class="meta">red</em> <em class="meta">green</em> <em class="meta">blue</em> </pre>
+  </div>
+  <div class="definition">
+    <pre>KEYOUTLINECOLOR none
+    </pre>
+  </div>
+  <div class="definition">
+    <pre>KEYBGCOLOR
 
         <em class="meta">red</em>
 
         <em class="meta">green</em>
 
         <em class="meta">blue</em>
-    </div>
-  <div class="definition">KEYBGCOLOR
-
-        <em class="meta">red</em>
-
-        <em class="meta">green</em>
-
-        <em class="meta">blue</em>
-    </div>
+    </pre>
+  </div>
+  <div class="definition">
+    <pre>KEYBGCOLOR none
+    </pre>
+  </div>
   <div class="description">
  <p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Specify the colours used for drawing the global elements of the map. </p> 
  <p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">red, green and blue are numbers from 0 to 255. </p> 
+ <p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">You can also choose not to draw either the outline or background rectangle for 
+ keys by specifying 'none' for those. 
+ </p> 
   </div>
   <div class="changes">
     <h4>Change History</h4>
     <dl class="small">
+      <dt>0.98</dt>
+      <dd>Added 'none' option for KEYBGCOLOR and KEYOUTLINECOLOR</dd>
       <dt>0.8</dt>
       <dd>Added TIMECOLOR, TITLECOLOR, KEYTEXTCOLOR,
-        KEYOUTLINECOLOR and KEYBGCOLOR.
+            KEYOUTLINECOLOR and KEYBGCOLOR.
         </dd>
       <dt>0.7</dt>
       <dd>Added BGCOLOR.
@@ -2622,20 +2936,24 @@
 
         <div class="referenceentry">
   <h3 id="GLOBAL_TIMEPOS">TIMEPOS</h3>
-  <div class="definition">TIMEPOS
+  <div class="definition">
+    <pre>TIMEPOS
 
         <em class="meta">x-pos</em>
 
         <em class="meta">y-pos</em>
-    </div>
-  <div class="definition">TIMEPOS
+    </pre>
+  </div>
+  <div class="definition">
+    <pre>TIMEPOS
 
         <em class="meta">x-pos</em>
 
         <em class="meta">y-pos</em>
 
         <em class="meta">formatstring</em>
-    </div>
+    </pre>
+  </div>
   <div class="description">
  <p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Specifies where to draw the timestamp on the map. </p> 
  <p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">If no <a href="#GLOBAL_TIMEPOS">TIMEPOS</a> line is given, then the timestamp is drawn in the top-right 
@@ -2665,20 +2983,24 @@
 
         <div class="referenceentry">
   <h3 id="GLOBAL_MINTIMEPOS">MINTIMEPOS</h3>
-  <div class="definition">MINTIMEPOS
+  <div class="definition">
+    <pre>MINTIMEPOS
 
         <em class="meta">x-pos</em>
 
         <em class="meta">y-pos</em>
-    </div>
-  <div class="definition">MINTIMEPOS
+    </pre>
+  </div>
+  <div class="definition">
+    <pre>MINTIMEPOS
 
         <em class="meta">x-pos</em>
 
         <em class="meta">y-pos</em>
 
         <em class="meta">formatstring</em>
-    </div>
+    </pre>
+  </div>
   <div class="description">
  <p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Specifies where to draw the 'oldest data' timestamp on the map. </p> 
  <p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">The data collection part of weathermap collects a timestamp for each piece of 
@@ -2710,20 +3032,24 @@
 
         <div class="referenceentry">
   <h3 id="GLOBAL_MAXTIMEPOS">MAXTIMEPOS</h3>
-  <div class="definition">MAXTIMEPOS
+  <div class="definition">
+    <pre>MAXTIMEPOS
 
         <em class="meta">x-pos</em>
 
         <em class="meta">y-pos</em>
-    </div>
-  <div class="definition">MAXTIMEPOS
+    </pre>
+  </div>
+  <div class="definition">
+    <pre>MAXTIMEPOS
 
         <em class="meta">x-pos</em>
 
         <em class="meta">y-pos</em>
 
         <em class="meta">formatstring</em>
-    </div>
+    </pre>
+  </div>
   <div class="description">
  <p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Specifies where to draw the 'newest data' timestamp on the map. </p> 
  <p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">The data collection part of weathermap collects a timestamp for each piece of 
@@ -2755,10 +3081,12 @@
 
         <div class="referenceentry">
   <h3 id="GLOBAL_TITLE">TITLE</h3>
-  <div class="definition">TITLE
+  <div class="definition">
+    <pre>TITLE
 
         <em class="meta">titlestring</em>
-    </div>
+    </pre>
+  </div>
   <div class="description">
  <p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Specifies the title text. </p> 
  <p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">The <a href="#GLOBAL_TITLE">TITLE</a> is shown in file-selectors for both the editor and the Cacti 
@@ -2769,20 +3097,24 @@
 
         <div class="referenceentry">
   <h3 id="GLOBAL_TITLEPOS">TITLEPOS</h3>
-  <div class="definition">TITLEPOS
+  <div class="definition">
+    <pre>TITLEPOS
 
         <em class="meta">x-pos</em>
 
         <em class="meta">y-pos</em>
-    </div>
-  <div class="definition">TITLEPOS
+    </pre>
+  </div>
+  <div class="definition">
+    <pre>TITLEPOS
 
         <em class="meta">x-pos</em>
 
         <em class="meta">y-pos</em>
 
         <em class="meta">headingstring</em>
-    </div>
+    </pre>
+  </div>
   <div class="description">
  <p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Specifies the position of the title text. </p> 
  <p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">If no <a href="#GLOBAL_TITLEPOS">TITLEPOS</a> line is given, then no title is drawn. You can optionally 
@@ -2803,10 +3135,12 @@
 
         <div class="referenceentry">
   <h3 id="GLOBAL_KILO">KILO</h3>
-  <div class="definition">KILO
+  <div class="definition">
+    <pre>KILO
 
         <em class="meta">number</em>
-    </div>
+    </pre>
+  </div>
   <div class="description">
  <p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Specifies base value for kilo, mega and giga abbreviations. </p> 
  <p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Both <a href="#LINK_BANDWIDTH">BANDWIDTH</a> and <a href="#LINK_BWLABEL">BWLABEL</a> can use K,M,G,T as abbreviations for thousands, 
@@ -2825,10 +3159,12 @@
 
         <div class="referenceentry">
   <h3 id="GLOBAL_HTMLSTYLE">HTMLSTYLE</h3>
-  <div class="definition">HTMLSTYLE
+  <div class="definition">
+    <pre>HTMLSTYLE
 
         <em class="meta">formatname</em>
-    </div>
+    </pre>
+  </div>
   <div class="description">
  <p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Specifies the HTML output style. </p> 
  <p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">When HTML output is enabled, there are two variations, which you can choose 
@@ -2841,7 +3177,8 @@
 
         <div class="referenceentry">
   <h3 id="GLOBAL_SCALE">SCALE</h3>
-  <div class="definition">SCALE
+  <div class="definition">
+    <pre>SCALE
 
         <em class="meta">min</em>
 
@@ -2852,8 +3189,10 @@
         <em class="meta">green</em>
 
         <em class="meta">blue</em>
-    </div>
-  <div class="definition">SCALE
+    </pre>
+  </div>
+  <div class="definition">
+    <pre>SCALE
 
         <em class="meta">scalename</em>
 
@@ -2866,8 +3205,10 @@
         <em class="meta">green</em>
 
         <em class="meta">blue</em>
-    </div>
-  <div class="definition">SCALE
+    </pre>
+  </div>
+  <div class="definition">
+    <pre>SCALE
 
         <em class="meta">min</em>
 
@@ -2884,78 +3225,10 @@
         <em class="meta">green2</em>
 
         <em class="meta">blue2</em>
-    </div>
-  <div class="definition">SCALE
-
-        <em class="meta">scalename</em>
-
-        <em class="meta">min</em>
-
-        <em class="meta">max</em>
-
-        <em class="meta">red</em>
-
-        <em class="meta">green</em>
-
-        <em class="meta">blue</em>
-
-        <em class="meta">red2</em>
-
-        <em class="meta">green2</em>
-
-        <em class="meta">blue2</em>
-    </div>
-  <div class="definition">SCALE
-
-        <em class="meta">min</em>
-
-        <em class="meta">max</em>
-
-        <em class="meta">red</em>
-
-        <em class="meta">green</em>
-
-        <em class="meta">blue</em>
-
-        <em class="meta">tagtext</em>
-    </div>
-  <div class="definition">SCALE
-
-        <em class="meta">scalename</em>
-
-        <em class="meta">min</em>
-
-        <em class="meta">max</em>
-
-        <em class="meta">red</em>
-
-        <em class="meta">green</em>
-
-        <em class="meta">blue</em>
-
-        <em class="meta">tagtext</em>
-    </div>
-  <div class="definition">SCALE
-
-        <em class="meta">min</em>
-
-        <em class="meta">max</em>
-
-        <em class="meta">red</em>
-
-        <em class="meta">green</em>
-
-        <em class="meta">blue</em>
-
-        <em class="meta">red2</em>
-
-        <em class="meta">green2</em>
-
-        <em class="meta">blue2</em>
-
-        <em class="meta">tagtext</em>
-    </div>
-  <div class="definition">SCALE
+    </pre>
+  </div>
+  <div class="definition">
+    <pre>SCALE
 
         <em class="meta">scalename</em>
 
@@ -2974,17 +3247,98 @@
         <em class="meta">green2</em>
 
         <em class="meta">blue2</em>
+    </pre>
+  </div>
+  <div class="definition">
+    <pre>SCALE
+
+        <em class="meta">min</em>
+
+        <em class="meta">max</em>
+
+        <em class="meta">red</em>
+
+        <em class="meta">green</em>
+
+        <em class="meta">blue</em>
 
         <em class="meta">tagtext</em>
-    </div>
-  <div class="definition">SCALE
+    </pre>
+  </div>
+  <div class="definition">
+    <pre>SCALE
+
+        <em class="meta">scalename</em>
+
+        <em class="meta">min</em>
+
+        <em class="meta">max</em>
+
+        <em class="meta">red</em>
+
+        <em class="meta">green</em>
+
+        <em class="meta">blue</em>
+
+        <em class="meta">tagtext</em>
+    </pre>
+  </div>
+  <div class="definition">
+    <pre>SCALE
+
+        <em class="meta">min</em>
+
+        <em class="meta">max</em>
+
+        <em class="meta">red</em>
+
+        <em class="meta">green</em>
+
+        <em class="meta">blue</em>
+
+        <em class="meta">red2</em>
+
+        <em class="meta">green2</em>
+
+        <em class="meta">blue2</em>
+
+        <em class="meta">tagtext</em>
+    </pre>
+  </div>
+  <div class="definition">
+    <pre>SCALE
+
+        <em class="meta">scalename</em>
+
+        <em class="meta">min</em>
+
+        <em class="meta">max</em>
+
+        <em class="meta">red</em>
+
+        <em class="meta">green</em>
+
+        <em class="meta">blue</em>
+
+        <em class="meta">red2</em>
+
+        <em class="meta">green2</em>
+
+        <em class="meta">blue2</em>
+
+        <em class="meta">tagtext</em>
+    </pre>
+  </div>
+  <div class="definition">
+    <pre>SCALE
 
         <em class="meta">min</em>
 
         <em class="meta">max</em>
 
         none
-    </div>
+    </pre>
+  </div>
   <div class="description">
  <p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Defines one 'span' within the link colour-coding table. </p> 
  <p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude"><a href="#GLOBAL_SCALE">SCALE</a> is used to specify how <a href="#NODE_NODE">NODEs</a> and <a href="#LINK_LINK">LINKs</a> are colour-coded according to 
@@ -3030,13 +3384,17 @@
   <div class="examples">
     <h4>Examples</h4>
     <blockquote class="example">
-      <cite>Setting up a (very simple) colour scale. Colours run smoothly
+      <small>
+        <cite>Setting up a (very simple) colour scale. Colours run smoothly
         from green to red.</cite>
+      </small>
       <pre>SCALE 0 100 0 255 0 255 0 0
             </pre>
     </blockquote>
     <blockquote class="example">
-      <cite>The default scale set</cite>
+      <small>
+        <cite>The default scale set</cite>
+      </small>
       <pre>SCALE 1 10 140 0 255 SCALE 10 25 32 32 255 SCALE 25 40 0 192 255
             SCALE 40 55 0 240 0 SCALE 55 70 240 240 0 SCALE 70 85 255 192 0 SCALE 85 100
             255 0 0
@@ -3076,38 +3434,46 @@
 
         <div class="referenceentry">
   <h3 id="GLOBAL_KEYPOS">KEYPOS</h3>
-  <div class="definition">KEYPOS
+  <div class="definition">
+    <pre>KEYPOS
 
         <em class="meta">x-pos</em>
 
         <em class="meta">y-pos</em>
-    </div>
-  <div class="definition">KEYPOS
-
-        <em class="meta">x-pos</em>
-
-        <em class="meta">y-pos</em>
-
-        <em class="meta">headingstring</em>
-    </div>
-  <div class="definition">KEYPOS
-
-        <em class="meta">scalename</em>
-
-        <em class="meta">x-pos</em>
-
-        <em class="meta">y-pos</em>
-    </div>
-  <div class="definition">KEYPOS
-
-        <em class="meta">scalename</em>
+    </pre>
+  </div>
+  <div class="definition">
+    <pre>KEYPOS
 
         <em class="meta">x-pos</em>
 
         <em class="meta">y-pos</em>
 
         <em class="meta">headingstring</em>
-    </div>
+    </pre>
+  </div>
+  <div class="definition">
+    <pre>KEYPOS
+
+        <em class="meta">scalename</em>
+
+        <em class="meta">x-pos</em>
+
+        <em class="meta">y-pos</em>
+    </pre>
+  </div>
+  <div class="definition">
+    <pre>KEYPOS
+
+        <em class="meta">scalename</em>
+
+        <em class="meta">x-pos</em>
+
+        <em class="meta">y-pos</em>
+
+        <em class="meta">headingstring</em>
+    </pre>
+  </div>
   <div class="description">
  <p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Specifies the position of the key, or legend, that shows what each 
  colour-range in a scale means. If a scalename is not given, then "DEFAULT" is 
@@ -3137,30 +3503,38 @@
 
         <div class="referenceentry">
   <h3 id="GLOBAL_KEYSTYLE">KEYSTYLE</h3>
-  <div class="definition">KEYSTYLE
+  <div class="definition">
+    <pre>KEYSTYLE
 
         <em class="meta">stylename</em>
-    </div>
-  <div class="definition">KEYSTYLE
-
-        <em class="meta">stylename</em>
-
-        <em class="meta">size</em>
-    </div>
-  <div class="definition">KEYSTYLE
-
-        <em class="meta">scalename</em>
-
-        <em class="meta">stylename</em>
-    </div>
-  <div class="definition">KEYSTYLE
-
-        <em class="meta">scalename</em>
+    </pre>
+  </div>
+  <div class="definition">
+    <pre>KEYSTYLE
 
         <em class="meta">stylename</em>
 
         <em class="meta">size</em>
-    </div>
+    </pre>
+  </div>
+  <div class="definition">
+    <pre>KEYSTYLE
+
+        <em class="meta">scalename</em>
+
+        <em class="meta">stylename</em>
+    </pre>
+  </div>
+  <div class="definition">
+    <pre>KEYSTYLE
+
+        <em class="meta">scalename</em>
+
+        <em class="meta">stylename</em>
+
+        <em class="meta">size</em>
+    </pre>
+  </div>
   <div class="description">
  <p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Specifies the style of the key, or legend, that shows what each colour-range 
  means. If a scalename is not given, then "DEFAULT" is assumed. Valid stylenames 
@@ -3196,8 +3570,10 @@
   <div class="examples">
     <h4>Examples</h4>
     <blockquote class="example">
-      <cite>Hiding percentage signs, and the 'absolute zero' SCALE entry
+      <small>
+        <cite>Hiding percentage signs, and the 'absolute zero' SCALE entry
         in a key.</cite>
+      </small>
       <pre>SET key_hidezero_DEFAULT 1 SET key_hidepercent_DEFAULT 1
             </pre>
     </blockquote>
@@ -3221,12 +3597,14 @@
 
         <div class="referenceentry">
   <h3 id="GLOBAL_SET">SET</h3>
-  <div class="definition">SET
+  <div class="definition">
+    <pre>SET
 
         <em class="meta">hintname</em>
 
         <em class="meta">hintvalue</em>
-    </div>
+    </pre>
+  </div>
   <div class="description">
  <p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Specifies a value for a <em>hint variable</em>. </p> 
  <p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Hint Variables allow the user to pass settings to the internals of Weathermap 
@@ -3241,19 +3619,25 @@
   <div class="examples">
     <h4>Examples</h4>
     <blockquote class="example">
-      <cite>Enabling 'bulging link mode' in the link-rendering
+      <small>
+        <cite>Enabling 'bulging link mode' in the link-rendering
         code.</cite>
+      </small>
       <pre>SET link_bulge 1
             </pre>
     </blockquote>
     <blockquote class="example">
-      <cite>Enabling 'screenshot mode' to anonymise a map in 0.95 or
+      <small>
+        <cite>Enabling 'screenshot mode' to anonymise a map in 0.95 or
         newer.</cite>
+      </small>
       <pre>SET screenshot_mode 1
             </pre>
     </blockquote>
     <blockquote class="example">
-      <cite>Disabling 'WMWARN50' messages from appearing</cite>
+      <small>
+        <cite>Disabling 'WMWARN50' messages from appearing</cite>
+      </small>
       <pre>SET nowarn_WMWARN50 1
             </pre>
     </blockquote>
@@ -3270,10 +3654,12 @@
 
         <div class="referenceentry">
   <h3 id="GLOBAL_INCLUDE">INCLUDE</h3>
-  <div class="definition">INCLUDE
+  <div class="definition">
+    <pre>INCLUDE
 
         <em class="meta">filename</em>
-    </div>
+    </pre>
+  </div>
   <div class="description">
  <p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Include the contents of an additional file within the current map 
  configuration file. </p> 
@@ -3310,4 +3696,4 @@
   </div>
 </div>
     
-<?php include 'common-page-foot.html'; ?>
+<?php include 'common-page-foot.php'; ?>

@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configentry>
+    <keyword>DATAOUTPUTFILE</keyword>
+
+    <scope>GLOBAL</scope>
+
+    <anchor>GLOBAL_DATAOUTPUTFILE</anchor>
+
+    <definition>DATAOUTPUTFILE
+
+        <meta>datafile</meta>
+    </definition>
+
+    <description xmlns="http://www.w3.org/1999/xhtml">
+        <p>Specifies a file to write a dump of all the data collected
+        during the rendering of the map.</p>
+        <p>The file is in a tab-separated file format suitable for reading using the
+        <a href="targets.html#wmdata">wmdata datasource plugin</a>, which allows one map to refer to data in another map.</p>
+        <p>If you are using the Cacti plugin, this data is always saved in the output/ directory, in addition to anywhere you specify with this command.</p>
+    </description>
+
+    <changes>
+        <change version="0.98">Added DATAOUTPUTFILE
+        </change>
+
+    </changes>
+</configentry>

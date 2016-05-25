@@ -18,7 +18,7 @@ function disabled_plugin_weathermap_version()
 
 function weathermap_version () {
 	return array( 	'name'    	=> 'weathermap',
-		'version'       => '0.97b',
+		'version'       => '0.98',
 		'longname'      => 'PHP Network Weathermap',
 		'author'        => 'Howard Jones',
 		'homepage'      => 'http://www.network-weathermap.com/',
@@ -812,4 +812,3 @@ function weathermap_poller_bottom() {
 }
 
 // vim:ts=4:sw=4:
-?>

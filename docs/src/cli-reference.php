@@ -12,7 +12,7 @@
                     <tt>./weathermap [--config <i>configfile</i>] [--output
                     <i>pngfile</i>] [--htmloutput <i>htmlfile</i>] [--image-uri
                     <i>URI</i>] [--debug] [--dumpafter] [--dumpconfig
-                    <i>newconfigfile</i>] [--sizedebug] [--define var=value]</tt>
+                    <i>newconfigfile</i>] [--sizedebug] [--define var=value] [--no-warn={errorcodes}</tt>
                 </div>As you can see,
                 <i>all</i> the parameters are optional! By default the script will look
                 for a configuration file called
@@ -51,6 +51,11 @@
                 for this run. It is equivalent to a
                 <a href = "config-reference.html#GLOBAL_SET">SET</a> line in the global
                 section of the map configuration file.</p>
+
+                <p><tt class="clioption">--nowarn</tt> allows you to disable specific warnings by
+                providing a list of the WMARNxxx codes for them. You shouldn't need to do this, but if you (for example)
+                have an interface that can physically go above the BANDWIDTH you have set for it, you can use
+                this to disable the 'clipped to 100%' warning that you would get.</p>
 
                 <p><tt class="clioption">--htmloutput</tt> specifies the name for an HTML file to be
                 generated to go with the PNG image file. This HTML can include imagemap

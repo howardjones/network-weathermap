@@ -2645,7 +2645,11 @@
     </pre>
   </div>
   <div class="description">
- <p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">TODO </p> 
+ <p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Specifies a file to write a dump of all the data collected 
+ during the rendering of the map. </p> 
+ <p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">The file is in a tab-separated file format suitable for reading using the 
+ <a href="targets.html#wmdata">wmdata datasource plugin</a>, which allows one map to refer to data in another map. </p> 
+ <p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">If you are using the Cacti plugin, this data is always saved in the output/ directory, in addition to anywhere you specify with this command. </p> 
   </div>
   <div class="changes">
     <h4>Change History</h4>

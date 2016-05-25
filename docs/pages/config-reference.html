@@ -3,7 +3,7 @@
     <head>
         <link rel = "stylesheet" type = "text/css" media = "screen" href = "../../vendor/bootstrap/css/bootstrap.min.css" />        
         <link rel = "stylesheet" type = "text/css" href = "../manual.css" />
-        <title>PHP Weathermap v0.97b - Configuration Reference</title>
+        <title>PHP Weathermap v0.98 - Configuration Reference</title>
     </head>
 
     <body>
@@ -12,7 +12,7 @@
 	<div class="container">
 		<div class="navbar-header" id="nav">
 			<a class="navbar-brand" href="http://www.network-weathermap.com/">Weathermap
-                v0.97b</a>
+                v0.98</a>
 			<ul class="nav navbar-nav">
 				<li><a href="main.html">Contents</a></li>
 				<li><a href="main.html#installation">Installation</a></li>
@@ -36,7 +36,7 @@
 <div class="container">
 
 <div id = "header">
-    <h1>PHP Weathermap v0.97b </h1>
+    <h1>PHP Weathermap v0.98 </h1>
 
     <h4>Copyright &copy; 2005-2016 Howard Jones,
     <tt><a href = "mailto:howie@thingy.com">howie@thingy.com</a></tt>. (<a
@@ -44,7 +44,7 @@
 </div>
 <h2 id="configref">Configuration Reference</h2><p>This page is automatically compiled, and documents all the
                     configuration directives that are available in PHP Weathermap
-                    v0.97b.  </p>
+                    v0.98.  </p>
     <h2 class="configsection">Introduction</h2>
         <div class="preamble">
   <div xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude" id="contents">
@@ -2689,7 +2689,11 @@
     </pre>
   </div>
   <div class="description">
- <p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">TODO </p> 
+ <p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Specifies a file to write a dump of all the data collected 
+ during the rendering of the map. </p> 
+ <p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">The file is in a tab-separated file format suitable for reading using the 
+ <a href="targets.html#wmdata">wmdata datasource plugin</a>, which allows one map to refer to data in another map. </p> 
+ <p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">If you are using the Cacti plugin, this data is always saved in the output/ directory, in addition to anywhere you specify with this command. </p> 
   </div>
   <div class="changes">
     <h4>Change History</h4>

@@ -26,6 +26,7 @@ repeat "error reports" in the forums.
     ADDED - 'retidy' option in editor to recalculate all links previously positioned with 'tidy'.
     ADDED - KEYBGCOLOR and KEYOUTLINECOLOR both accept 'none'
     ADDED - command-line weathermap has new --no-warn option to disable warnings
+    ADDED - AICONFILLCOLOR accepts 'none' for drawing giant transparent shapes.
 
 0.97c had no additional changes - it's just 0.97b with some silly errors fixed, and  all
 the CSS files included with the correct paths. There were also reports of problems with the

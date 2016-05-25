@@ -2582,7 +2582,7 @@ function ReadConfig($input, $is_include=FALSE)
 					$linematched++;
 				}
 
-				if($val == 'none' && ($matches[1]=='LABELFONTSHADOW' || $matches[1]=='LABELBG' || $matches[1]=='LABELOUTLINE' || $matches[1]=='AICONOUTLINE'))
+				if($val == 'none' && ($matches[1]=='LABELFONTSHADOW' || $matches[1]=='LABELBG' || $matches[1]=='LABELOUTLINE' || $matches[1]=='AICONFILL' || $matches[1]=='AICONOUTLINE'))
 				{
 					$curnode->$field=array(-1,-1,-1);
 					$linematched++;
@@ -3046,14 +3046,14 @@ function WriteConfig($filename)
 				} else {
 
 					if (($colour['red1'] == -1) && ($colour['green1'] == -1) && ($colour['blue1'] == -1)) {
-						$output .= sprintf("%sCOLOR none", $k);
+						$output .= sprintf("%sCOLOR none\n", $k);
 					} else {
 						$output .= sprintf("%sCOLOR %d %d %d\n", $k, $colour['red1'], $colour['green1'],
 							$colour['blue1']);
 					}
 				}
-				$output .= "\n";
 			}
+			$output .= "\n";
 		}
 
 		foreach ($this->hints as $hintname => $hint) {

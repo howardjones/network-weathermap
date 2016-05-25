@@ -3182,7 +3182,18 @@ function DrawMap($filename = '', $thumbnailfile = '', $thumbnailmax = 250, $with
 	wm_debug("=====================================\n");
 	wm_debug("Start of Map Drawing\n");
 
-	$this->datestamp = strftime($this->stamptext, time());
+
+	// if we're running tests, we force the time to a particular value,
+        // so the output can be compared to a reference image more easily
+        $testmode = intval($this->get_hint("testmode"));
+
+        if ($testmode == 1) {
+            $maptime = 1270813792;
+            date_default_timezone_set('UTC');
+        } else {
+            $maptime = time();
+        }
+        $this->datestamp = strftime($this->stamptext, $maptime);
 
 	// do the basic prep work
 	if ($this->background != '')

@@ -277,14 +277,43 @@ function myimagecolorallocate($image, $red, $green, $blue)
 	return (imagecolorallocate($image, $red, $green, $blue));
 }
 
+// PHP < 5.3 doesn't support anonymous functions, so here's a little function for screenshotify
+function screenshotify_xxx($matches)
+{
+	return str_repeat('x',strlen($matches[1]));
+}
+
+
 function screenshotify($input)
 {
-	$tmp = $input;
-	
-	$tmp = preg_replace("/\b\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}\b/","127.0.0.1",$tmp);
-	$tmp = preg_replace("/([A-Za-z]{3,})/e","str_repeat('x',strlen('\\1'))",$tmp);
-				
-	return($tmp);
+	$output = $input;
+	$output = preg_replace ( '/\b\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}\b/', "127.0.0.1", $output );
+	$output = preg_replace_callback ( '/([A-Za-z]{3,})/', "screenshotify_xxx", $output );
+	return ($output);
+}
+
+function is_copy($arr)
+{
+	if ($arr['red1'] == -2 && $arr['green1'] == -2 && $arr['blue1'] == -2) {
+		return true;
+	}
+	return false;
+}
+
+function is_contrast($arr)
+{
+	if ($arr['red1'] == -3 && $arr['green1'] == -3 && $arr['blue1'] == -3) {
+		return true;
+	}
+	return false;
+}
+
+function is_none($arr)
+{
+	if ($arr['red1'] == -1 && $arr['green1'] == -1 && $arr['blue1'] == -1) {
+		return true;
+	}
+	return false;
 }
 
 function render_colour($col)

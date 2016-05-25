@@ -1377,13 +1377,22 @@ function DrawLegend_Horizontal($im,$scalename="DEFAULT",$width=400)
 
 	$scale_im = imagecreatetruecolor($box_right+1, $box_bottom+1);
 	$scale_ref = 'gdref_legend_'.$scalename;
+
+	// Start with a transparent box, in case the fill or outline colour is 'none'
+	imageSaveAlpha($scale_im, true);
+	$nothing = imagecolorallocatealpha($scale_im, 128, 0, 0, 127);
+	imagefill($scale_im, 0, 0, $nothing);
+
 	$this->AllocateScaleColours($scale_im,$scale_ref);
 
-	wimagefilledrectangle($scale_im, $box_left, $box_top, $box_right, $box_bottom,
-		$this->colours['DEFAULT']['KEYBG'][$scale_ref]);
-	wimagerectangle($scale_im, $box_left, $box_top, $box_right, $box_bottom,
-		$this->colours['DEFAULT']['KEYOUTLINE'][$scale_ref]);
-
+	if (!is_none($this->colours['DEFAULT']['KEYBG'])) {
+		wimagefilledrectangle($scale_im, $box_left, $box_top, $box_right, $box_bottom,
+			$this->colours['DEFAULT']['KEYBG'][$scale_ref]);
+	}
+	if (!is_none($this->colours['DEFAULT']['KEYOUTLINE'])) {
+		wimagerectangle($scale_im, $box_left, $box_top, $box_right, $box_bottom,
+			$this->colours['DEFAULT']['KEYOUTLINE'][$scale_ref]);
+	}
 	$this->myimagestring($scale_im, $font, $scale_left, $scale_bottom + $tileheight * 2 + 2 , $title,
 		$this->colours['DEFAULT']['KEYTEXT'][$scale_ref]);
 
@@ -1461,12 +1470,22 @@ function DrawLegend_Vertical($im,$scalename="DEFAULT",$height=400,$inverted=fals
 
 	$scale_im = imagecreatetruecolor($box_right+1, $box_bottom+1);
 	$scale_ref = 'gdref_legend_'.$scalename;
+
+	// Start with a transparent box, in case the fill or outline colour is 'none'
+	imageSaveAlpha($scale_im, true);
+	$nothing = imagecolorallocatealpha($scale_im, 128, 0, 0, 127);
+	imagefill($scale_im, 0, 0, $nothing);
+
 	$this->AllocateScaleColours($scale_im,$scale_ref);
 
-	wimagefilledrectangle($scale_im, $box_left, $box_top, $box_right, $box_bottom,
-		$this->colours['DEFAULT']['KEYBG']['gdref1']);
-	wimagerectangle($scale_im, $box_left, $box_top, $box_right, $box_bottom,
-		$this->colours['DEFAULT']['KEYOUTLINE']['gdref1']);
+	if (!is_none($this->colours['DEFAULT']['KEYBG'])) {
+		wimagefilledrectangle($scale_im, $box_left, $box_top, $box_right, $box_bottom,
+			$this->colours['DEFAULT']['KEYBG']['gdref1']);
+	}
+	if (!is_none($this->colours['DEFAULT']['KEYOUTLINE'])) {
+		wimagerectangle($scale_im, $box_left, $box_top, $box_right, $box_bottom,
+			$this->colours['DEFAULT']['KEYOUTLINE']['gdref1']);
+	}
 
 	$this->myimagestring($scale_im, $font, $scale_left-$scalefactor, $scale_top - $tileheight , $title,
 		$this->colours['DEFAULT']['KEYTEXT']['gdref1']);
@@ -1592,12 +1611,23 @@ function DrawLegend_Classic($im,$scalename="DEFAULT",$use_tags=FALSE)
 
 		$scale_im = imagecreatetruecolor($boxwidth+1, $boxheight+1);
 		$scale_ref = 'gdref_legend_'.$scalename;
+
+		// Start with a transparent box, in case the fill or outline colour is 'none'
+		imageSaveAlpha($scale_im, true);
+		$nothing = imagecolorallocatealpha($scale_im, 128, 0, 0, 127);
+		imagefill($scale_im, 0, 0, $nothing);
+
 		$this->AllocateScaleColours($scale_im,$scale_ref);
 
-		wimagefilledrectangle($scale_im, $boxx, $boxy, $boxx + $boxwidth, $boxy + $boxheight,
-			$this->colours['DEFAULT']['KEYBG'][$scale_ref]);
-		wimagerectangle($scale_im, $boxx, $boxy, $boxx + $boxwidth, $boxy + $boxheight,
-			$this->colours['DEFAULT']['KEYOUTLINE'][$scale_ref]);
+		if (! is_none($this->colours['DEFAULT']['KEYBG'])) {
+			wimagefilledrectangle($scale_im, $boxx, $boxy, $boxx + $boxwidth, $boxy + $boxheight,
+				$this->colours['DEFAULT']['KEYBG'][$scale_ref]);
+		}
+		if (! is_none($this->colours['DEFAULT']['KEYOUTLINE'])) {
+			wimagerectangle($scale_im, $boxx, $boxy, $boxx + $boxwidth, $boxy + $boxheight,
+				$this->colours['DEFAULT']['KEYOUTLINE'][$scale_ref]);
+		}
+
 		$this->myimagestring($scale_im, $font, $boxx + 4, $boxy + 4 + $tileheight, $title,
 			$this->colours['DEFAULT']['KEYTEXT'][$scale_ref]);
 
@@ -2504,22 +2534,38 @@ function ReadConfig($input, $is_include=FALSE)
 			}
 			
 			if (preg_match(
-				"/^\s*(TIME|TITLE|KEYBG|KEYTEXT|KEYOUTLINE|BG)COLOR\s+(\d+)\s+(\d+)\s+(\d+)\s*$/i",
+				"/^\s*(TIME|TITLE|KEYBG|KEYTEXT|KEYOUTLINE|BG)COLOR\s+((\d+)\s+(\d+)\s+(\d+)|none)\s*$/i",
 				$buffer,
 				$matches))
 			{
 				$key=$matches[1];
-								
-				# "Found colour line for $key\n";
-				$this->colours['DEFAULT'][$key]['red1']=$matches[2];
-				$this->colours['DEFAULT'][$key]['green1']=$matches[3];
-				$this->colours['DEFAULT'][$key]['blue1']=$matches[4];
-				$this->colours['DEFAULT'][$key]['bottom']=-2;
-				$this->colours['DEFAULT'][$key]['top']=-1;
-				$this->colours['DEFAULT'][$key]['special']=1;
+				$val = strtolower($matches[2]);
 
-				$linematched++;
+				# "Found colour line for $key\n";
+				if(isset($matches[3]))	// this is a regular colour setting thing
+				{
+					$this->colours['DEFAULT'][$key]['red1'] = $matches[3];
+					$this->colours['DEFAULT'][$key]['green1'] = $matches[4];
+					$this->colours['DEFAULT'][$key]['blue1'] = $matches[5];
+					$this->colours['DEFAULT'][$key]['bottom'] = -2;
+					$this->colours['DEFAULT'][$key]['top'] = -1;
+					$this->colours['DEFAULT'][$key]['special'] = 1;
+					$linematched++;
+				}
+
+				if ($val == 'none' && ($matches[1]=='KEYBG' || $matches[1]=='KEYOUTLINE')) {
+					$this->colours['DEFAULT'][$key]['red1'] = -1;
+					$this->colours['DEFAULT'][$key]['green1'] = -1;
+					$this->colours['DEFAULT'][$key]['blue1'] = -1;
+					$this->colours['DEFAULT'][$key]['bottom'] = -2;
+					$this->colours['DEFAULT'][$key]['top'] = -1;
+					$this->colours['DEFAULT'][$key]['special'] = 1;
+					$linematched++;
+				}
 			}
+
+
+
 
 			if (($last_seen == 'NODE') && (preg_match(
 				"/^\s*(AICONOUTLINE|AICONFILL|LABELFONT|LABELFONTSHADOW|LABELBG|LABELOUTLINE)COLOR\s+((\d+)\s+(\d+)\s+(\d+)|none|contrast|copy)\s*$/i",
@@ -2570,7 +2616,7 @@ function ReadConfig($input, $is_include=FALSE)
 					$linematched++;
 				}
 				
-				if($val == 'none' && ($key=='BWBOX' || $key=='BWOUTLINE' || $key=='OUTLINE'))
+				if($val == 'none' && ($key=='BWBOX' || $key=='BWOUTLINE' || $key=='OUTLINE' || $key=='KEYOUTLINE' || $key=='KEYBG'))
 				{
 					// print "***********************************\n";
 					$curlink->$field=array(-1,-1,-1);
@@ -2859,164 +2905,170 @@ function WriteConfig($filename)
 {
 	global $WEATHERMAP_VERSION;
 
-	$fd=fopen($filename, "w");
-	$output="";
+	$fd = fopen($filename, "w");
+	$output = "";
 
-	if ($fd)
-	{
-		$output.="# Automatically generated by php-weathermap v$WEATHERMAP_VERSION\n\n";
+	if ($fd) {
+		$output .= "# Automatically generated by php-weathermap v$WEATHERMAP_VERSION\n\n";
 
-		if (count($this->fonts) > 0)
-		{
-			foreach ($this->fonts as $fontnumber => $font)
-			{
-				if ($font->type == 'truetype')
-					$output.=sprintf("FONTDEFINE %d %s %d\n", $fontnumber, $font->file, $font->size);
+		if (count($this->fonts) > 0) {
+			foreach ($this->fonts as $fontnumber => $font) {
+				if ($font->type == 'truetype') {
+					$output .= sprintf("FONTDEFINE %d %s %d\n", $fontnumber, $font->file, $font->size);
+				}
 
-				if ($font->type == 'gd')
-					$output.=sprintf("FONTDEFINE %d %s\n", $fontnumber, $font->file);
+				if ($font->type == 'gd') {
+					$output .= sprintf("FONTDEFINE %d %s\n", $fontnumber, $font->file);
+				}
 			}
 
-			$output.="\n";
+			$output .= "\n";
 		}
 
 		$basic_params = array(
-				array('background','BACKGROUND',CONFIG_TYPE_LITERAL),
-				array('width','WIDTH',CONFIG_TYPE_LITERAL),
-				array('height','HEIGHT',CONFIG_TYPE_LITERAL),
-				array('htmlstyle','HTMLSTYLE',CONFIG_TYPE_LITERAL),
-				array('kilo','KILO',CONFIG_TYPE_LITERAL),
-				array('keyfont','KEYFONT',CONFIG_TYPE_LITERAL),
-				array('timefont','TIMEFONT',CONFIG_TYPE_LITERAL),
-				array('titlefont','TITLEFONT',CONFIG_TYPE_LITERAL),
-				array('title','TITLE',CONFIG_TYPE_LITERAL),
-				array('htmloutputfile','HTMLOUTPUTFILE',CONFIG_TYPE_LITERAL),
-				array('dataoutputfile','DATAOUTPUTFILE',CONFIG_TYPE_LITERAL),
-				array('htmlstylesheet','HTMLSTYLESHEET',CONFIG_TYPE_LITERAL),
-				array('imageuri','IMAGEURI',CONFIG_TYPE_LITERAL),
-				array('imageoutputfile','IMAGEOUTPUTFILE',CONFIG_TYPE_LITERAL)
-			);
+			array('background', 'BACKGROUND', CONFIG_TYPE_LITERAL),
+			array('width', 'WIDTH', CONFIG_TYPE_LITERAL),
+			array('height', 'HEIGHT', CONFIG_TYPE_LITERAL),
+			array('htmlstyle', 'HTMLSTYLE', CONFIG_TYPE_LITERAL),
+			array('kilo', 'KILO', CONFIG_TYPE_LITERAL),
+			array('keyfont', 'KEYFONT', CONFIG_TYPE_LITERAL),
+			array('timefont', 'TIMEFONT', CONFIG_TYPE_LITERAL),
+			array('titlefont', 'TITLEFONT', CONFIG_TYPE_LITERAL),
+			array('title', 'TITLE', CONFIG_TYPE_LITERAL),
+			array('htmloutputfile', 'HTMLOUTPUTFILE', CONFIG_TYPE_LITERAL),
+			array('dataoutputfile', 'DATAOUTPUTFILE', CONFIG_TYPE_LITERAL),
+			array('htmlstylesheet', 'HTMLSTYLESHEET', CONFIG_TYPE_LITERAL),
+			array('imageuri', 'IMAGEURI', CONFIG_TYPE_LITERAL),
+			array('imageoutputfile', 'IMAGEOUTPUTFILE', CONFIG_TYPE_LITERAL)
+		);
 
-		foreach ($basic_params as $param)
-		{
+		foreach ($basic_params as $param) {
 			$field = $param[0];
 			$keyword = $param[1];
 
-			if ($this->$field != $this->inherit_fieldlist[$field])
-			{
-				if($param[2] == CONFIG_TYPE_COLOR) $output.="$keyword " . render_colour($this->$field) . "\n";
-				if($param[2] == CONFIG_TYPE_LITERAL) $output.="$keyword " . $this->$field . "\n";
+			if ($this->$field != $this->inherit_fieldlist[$field]) {
+				if ($param[2] == CONFIG_TYPE_COLOR) {
+					$output .= "$keyword " . render_colour($this->$field) . "\n";
+				}
+				if ($param[2] == CONFIG_TYPE_LITERAL) {
+					$output .= "$keyword " . $this->$field . "\n";
+				}
 			}
 		}
 
 		if (($this->timex != $this->inherit_fieldlist['timex'])
 			|| ($this->timey != $this->inherit_fieldlist['timey'])
-			|| ($this->stamptext != $this->inherit_fieldlist['stamptext']))
-				$output.="TIMEPOS " . $this->timex . " " . $this->timey . " " . $this->stamptext . "\n";
+			|| ($this->stamptext != $this->inherit_fieldlist['stamptext'])
+		) {
+			$output .= "TIMEPOS " . $this->timex . " " . $this->timey . " " . $this->stamptext . "\n";
+		}
 
 		if (($this->mintimex != $this->inherit_fieldlist['mintimex'])
 			|| ($this->mintimey != $this->inherit_fieldlist['mintimey'])
-			|| ($this->minstamptext != $this->inherit_fieldlist['minstamptext']))
-				$output.="MINTIMEPOS " . $this->mintimex . " " . $this->mintimey . " " . $this->minstamptext . "\n";
-		
+			|| ($this->minstamptext != $this->inherit_fieldlist['minstamptext'])
+		) {
+			$output .= "MINTIMEPOS " . $this->mintimex . " " . $this->mintimey . " " . $this->minstamptext . "\n";
+		}
+
 		if (($this->maxtimex != $this->inherit_fieldlist['maxtimex'])
 			|| ($this->maxtimey != $this->inherit_fieldlist['maxtimey'])
-			|| ($this->maxstamptext != $this->inherit_fieldlist['maxstamptext']))
-				$output.="MAXTIMEPOS " . $this->maxtimex . " " . $this->maxtimey . " " . $this->maxstamptext . "\n";
-						
-		if (($this->titlex != $this->inherit_fieldlist['titlex'])
-			|| ($this->titley != $this->inherit_fieldlist['titley']))
-				$output.="TITLEPOS " . $this->titlex . " " . $this->titley . "\n";
-
-		$output.="\n";
-
-		foreach ($this->colours as $scalename=>$colours)
-		{
-		  // not all keys will have keypos but if they do, then all three vars should be defined
-		if ( (isset($this->keyx[$scalename])) && (isset($this->keyy[$scalename])) && (isset($this->keytext[$scalename]))
-		    && (($this->keytext[$scalename] != $this->inherit_fieldlist['keytext'])
-			|| ($this->keyx[$scalename] != $this->inherit_fieldlist['keyx'])
-			|| ($this->keyy[$scalename] != $this->inherit_fieldlist['keyy'])))
-			{
-			     // sometimes a scale exists but without defaults. A proper scale object would sort this out...
-			     if($this->keyx[$scalename] == '') { $this->keyx[$scalename] = -1; }
-			     if($this->keyy[$scalename] == '') { $this->keyy[$scalename] = -1; }
-
-				$output.="KEYPOS " . $scalename." ". $this->keyx[$scalename] . " " . $this->keyy[$scalename] . " " . $this->keytext[$scalename] . "\n";
-            }
-
-		if ( (isset($this->keystyle[$scalename])) &&  ($this->keystyle[$scalename] != $this->inherit_fieldlist['keystyle']['DEFAULT']) )
-		{
-			$extra='';
-			if ( (isset($this->keysize[$scalename])) &&  ($this->keysize[$scalename] != $this->inherit_fieldlist['keysize']['DEFAULT']) )
-			{
-				$extra = " ".$this->keysize[$scalename];
-			}
-			$output.="KEYSTYLE  " . $scalename." ". $this->keystyle[$scalename] . $extra . "\n";
+			|| ($this->maxstamptext != $this->inherit_fieldlist['maxstamptext'])
+		) {
+			$output .= "MAXTIMEPOS " . $this->maxtimex . " " . $this->maxtimey . " " . $this->maxstamptext . "\n";
 		}
-		$locale = localeconv();
-		$decimal_point = $locale['decimal_point'];
 
-			foreach ($colours as $k => $colour)
-			{
-				if (!isset($colour['special']) || ! $colour['special'] )
-				{
-					$top = rtrim(rtrim(sprintf("%f",$colour['top']),"0"),$decimal_point);
-					$bottom= rtrim(rtrim(sprintf("%f",$colour['bottom']),"0"),$decimal_point);
+		if (($this->titlex != $this->inherit_fieldlist['titlex'])
+			|| ($this->titley != $this->inherit_fieldlist['titley'])
+		) {
+			$output .= "TITLEPOS " . $this->titlex . " " . $this->titley . "\n";
+		}
 
-                                        if ($bottom > 1000) {
-                                            $bottom = nice_bandwidth($colour['bottom'], $this->kilo);
-                                        }
+		$output .= "\n";
 
-                                        if ($top > 1000) {
-                                            $top = nice_bandwidth($colour['top'], $this->kilo);
-                                        }
+		foreach ($this->colours as $scalename => $colours) {
+			// not all keys will have keypos but if they do, then all three vars should be defined
+			if ((isset($this->keyx[$scalename])) && (isset($this->keyy[$scalename])) && (isset($this->keytext[$scalename]))
+				&& (($this->keytext[$scalename] != $this->inherit_fieldlist['keytext'])
+					|| ($this->keyx[$scalename] != $this->inherit_fieldlist['keyx'])
+					|| ($this->keyy[$scalename] != $this->inherit_fieldlist['keyy']))
+			) {
+				// sometimes a scale exists but without defaults. A proper scale object would sort this out...
+				if ($this->keyx[$scalename] == '') {
+					$this->keyx[$scalename] = -1;
+				}
+				if ($this->keyy[$scalename] == '') {
+					$this->keyy[$scalename] = -1;
+				}
 
-					$tag = (isset($colour['tag'])? $colour['tag']:'');
+				$output .= "KEYPOS " . $scalename . " " . $this->keyx[$scalename] . " " . $this->keyy[$scalename] . " " . $this->keytext[$scalename] . "\n";
+			}
 
-					if( ($colour['red1'] == -1) && ($colour['green1'] == -1) && ($colour['blue1'] == -1))
-					{
-						$output.=sprintf("SCALE %s %-4s %-4s   none   %s\n", $scalename,
+			if ((isset($this->keystyle[$scalename])) && ($this->keystyle[$scalename] != $this->inherit_fieldlist['keystyle']['DEFAULT'])) {
+				$extra = '';
+				if ((isset($this->keysize[$scalename])) && ($this->keysize[$scalename] != $this->inherit_fieldlist['keysize']['DEFAULT'])) {
+					$extra = " " . $this->keysize[$scalename];
+				}
+				$output .= "KEYSTYLE  " . $scalename . " " . $this->keystyle[$scalename] . $extra . "\n";
+			}
+			$locale = localeconv();
+			$decimal_point = $locale['decimal_point'];
+
+			foreach ($colours as $k => $colour) {
+				if (!isset($colour['special']) || !$colour['special']) {
+					$top = rtrim(rtrim(sprintf("%f", $colour['top']), "0"), $decimal_point);
+					$bottom = rtrim(rtrim(sprintf("%f", $colour['bottom']), "0"), $decimal_point);
+
+					if ($bottom > 1000) {
+						$bottom = nice_bandwidth($colour['bottom'], $this->kilo);
+					}
+
+					if ($top > 1000) {
+						$top = nice_bandwidth($colour['top'], $this->kilo);
+					}
+
+					$tag = (isset($colour['tag']) ? $colour['tag'] : '');
+
+					if (($colour['red1'] == -1) && ($colour['green1'] == -1) && ($colour['blue1'] == -1)) {
+						$output .= sprintf("SCALE %s %-4s %-4s   none   %s\n", $scalename,
 							$bottom, $top, $tag);
-					}
-					elseif (!isset($colour['red2']))
-					{
-						$output.=sprintf("SCALE %s %-4s %-4s %3d %3d %3d  %s\n", $scalename,
+					} elseif (!isset($colour['red2'])) {
+						$output .= sprintf("SCALE %s %-4s %-4s %3d %3d %3d  %s\n", $scalename,
 							$bottom, $top,
-							$colour['red1'],            $colour['green1'], $colour['blue1'],$tag);
-					}
-					else
-					{
-						$output.=sprintf("SCALE %s %-4s %-4s %3d %3d %3d   %3d %3d %3d    %s\n", $scalename,
+							$colour['red1'], $colour['green1'], $colour['blue1'], $tag);
+					} else {
+						$output .= sprintf("SCALE %s %-4s %-4s %3d %3d %3d   %3d %3d %3d    %s\n", $scalename,
 							$bottom, $top,
 							$colour['red1'],
-							$colour['green1'],                     $colour['blue1'],
-							$colour['red2'],                       $colour['green2'],
+							$colour['green1'], $colour['blue1'],
+							$colour['red2'], $colour['green2'],
 							$colour['blue2'], $tag);
 					}
+				} else {
+
+					if (($colour['red1'] == -1) && ($colour['green1'] == -1) && ($colour['blue1'] == -1)) {
+						$output .= sprintf("%sCOLOR none", $k);
+					} else {
+						$output .= sprintf("%sCOLOR %d %d %d\n", $k, $colour['red1'], $colour['green1'],
+							$colour['blue1']);
+					}
 				}
-				else { $output.=sprintf("%sCOLOR %d %d %d\n", $k, $colour['red1'], $colour['green1'],
-					$colour['blue1']); }
+				$output .= "\n";
 			}
-			$output .= "\n";
 		}
 
-		foreach ($this->hints as $hintname=>$hint)
-		{
+		foreach ($this->hints as $hintname => $hint) {
 			$output .= "SET $hintname $hint\n";
 		}
-		
+
 		// this doesn't really work right, but let's try anyway
-		if($this->has_includes)
-		{
+		if ($this->has_includes) {
 			$output .= "\n# Included files\n";
-			foreach ($this->included_files as $ifile)
-			{
+			foreach ($this->included_files as $ifile) {
 				$output .= "INCLUDE $ifile\n";
 			}
 		}
 
-		$output.="\n# End of global section\n\n";
+		$output .= "\n# End of global section\n\n";
 
 		fwrite($fd, $output);
 
@@ -3025,51 +3077,59 @@ function WriteConfig($filename)
 
 		# fwrite($fd, "\n\n# Node definitions:\n");
 
-		foreach (array("template","normal") as $which)
-		{
-			if($which == "template") fwrite($fd,"\n# TEMPLATE-only NODEs:\n");
-			if($which == "normal") fwrite($fd,"\n# regular NODEs:\n");
-			
-			foreach ($this->nodes as $node)
-			{
-				if(!preg_match("/^::\s/",$node->name))
-				{
-					if($node->defined_in == $this->configfile)
-					{
+		foreach (array("template", "normal") as $which) {
+			if ($which == "template") {
+				fwrite($fd, "\n# TEMPLATE-only NODEs:\n");
+			}
+			if ($which == "normal") {
+				fwrite($fd, "\n# regular NODEs:\n");
+			}
 
-						if($which=="template" && $node->x === NULL)  { wm_debug("TEMPLATE\n"); fwrite($fd,$node->WriteConfig()); }
-						if($which=="normal" && $node->x !== NULL) { fwrite($fd,$node->WriteConfig()); }
+			foreach ($this->nodes as $node) {
+				if (!preg_match("/^::\s/", $node->name)) {
+					if ($node->defined_in == $this->configfile) {
+
+						if ($which == "template" && $node->x === null) {
+							wm_debug("TEMPLATE\n");
+							fwrite($fd, $node->WriteConfig());
+						}
+						if ($which == "normal" && $node->x !== null) {
+							fwrite($fd, $node->WriteConfig());
+						}
 					}
 				}
 			}
-			
-			if($which == "template") fwrite($fd,"\n# TEMPLATE-only LINKs:\n");
-			if($which == "normal") fwrite($fd,"\n# regular LINKs:\n");
-			
-			foreach ($this->links as $link)
-			{
-				if(!preg_match("/^::\s/",$link->name))
-				{
-					if($link->defined_in == $this->configfile)
-					{
-						if($which=="template" && $link->a === NULL) fwrite($fd,$link->WriteConfig());
-						if($which=="normal" && $link->a !== NULL) fwrite($fd,$link->WriteConfig());
+
+			if ($which == "template") {
+				fwrite($fd, "\n# TEMPLATE-only LINKs:\n");
+			}
+			if ($which == "normal") {
+				fwrite($fd, "\n# regular LINKs:\n");
+			}
+
+			foreach ($this->links as $link) {
+				if (!preg_match('/^::\s/', $link->name)) {
+					if ($link->defined_in == $this->configfile) {
+						if ($which == "template" && $link->a === null) {
+							fwrite($fd, $link->WriteConfig());
+						}
+						if ($which == "normal" && $link->a !== null) {
+							fwrite($fd, $link->WriteConfig());
+						}
 					}
 				}
 			}
-		}		
+		}
 
 		fwrite($fd, "\n\n# That's All Folks!\n");
 
 		fclose($fd);
-	}
-	else
-	{
-		wm_warn ("Couldn't open config file $filename for writing");
-		return (FALSE);
+	} else {
+		wm_warn("Couldn't open config file $filename for writing");
+		return (false);
 	}
 
-	return (TRUE);
+	return (true);
 }
 
 // pre-allocate colour slots for the colours used by the arrows

@@ -23,6 +23,7 @@ repeat "error reports" in the forums.
     ADDED - IMAGEOUTPUTFILE and HTMLOUTPUTFILE are honoured in Cacti poller as a location for a second copy of those files.
     ADDED - Editor 'tidy link' function replaces Vert & Horiz, and does much nicer job
     ADDED - 'retidy' option in editor to recalculate all links previously positioned with 'tidy'.
+    ADDED - KEYBGCOLOR and KEYOUTLINECOLOR both accept 'none'
 
 0.97c had no additional changes - it's just 0.97b with some silly errors fixed, and  all
 the CSS files included with the correct paths. There were also reports of problems with the

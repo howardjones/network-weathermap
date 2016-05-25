@@ -17,7 +17,9 @@ class ConfigTest extends PHPUnit_Framework_TestCase
         chdir(dirname(__FILE__).DIRECTORY_SEPARATOR."..");
 
 		$compare_output = $comparisonimagefile.".txt";
+		if(file_exists($compare_output)) {
 		unlink($compare_output);
+		}
 		
         $nwarns = TestOutput_RunTest($testdir.DIRECTORY_SEPARATOR.$conffile, $outputimagefile, $outputhtmlfile, '', 'config-coverage.txt');
 
@@ -99,6 +101,7 @@ class ConfigTest extends PHPUnit_Framework_TestCase
         $outputconfigfile = $result1dir.DIRECTORY_SEPARATOR.$conffile;
 
         TestOutput_RunTest($testdir.DIRECTORY_SEPARATOR.$conffile, $outputimagefile, '', $outputconfigfile, '');
+	$this->assertTrue(file_exists($outputconfigfile), "Expected config output file doesn't exist");
         TestOutput_RunTest($result1dir.DIRECTORY_SEPARATOR.$conffile, $outputimagefile2, '', '', '');
 
         $ref_output1 = md5_file($outputimagefile);

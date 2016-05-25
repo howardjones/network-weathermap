@@ -1,0 +1,28 @@
+{
+  "name": "howardjones/network-weathermap",
+  "license": "GPL",
+  "minimum-stability": "dev",
+  "prefer-stable": true,
+  "authors": [
+    {
+      "name": "Howard Jones",
+      "email": "howie@thingy.com"
+    }
+  ],
+  "require": {
+    "phpdocumentor/phpdocumentor": "2.*",
+    "pear/console_commandline": "^1.2",
+    "pear/console_getopt": "^1.4"
+  },
+  "require-dev": {
+    "jelix/fakeserverconf": "dev-master",
+    "codeclimate/php-test-reporter": "0.1.*",
+    "phpunit/phpunit": "~4.4",
+    "phpmd/phpmd": "~2.1",
+    "sebastian/phpcpd": "~2.0",
+    "squizlabs/php_codesniffer": "~2.0",
+    "phpunit/phpunit-selenium": ">=1.2",
+    "theseer/phpdox": "*",
+    "phploc/phploc": "~2.0"
+  }
+}

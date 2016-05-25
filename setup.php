@@ -10,65 +10,63 @@
 
 *******************************************************************************/
 
-// who knows why this changed... not me.
-function disabled_plugin_weathermap_version()
+
+function plugin_weathermap_install()
 {
-	return(weathermap_version());
+	api_plugin_register_hook('weathermap', 'config_arrays', 'weathermap_config_arrays', 'setup.php');
+	api_plugin_register_hook('weathermap', 'config_settings', 'weathermap_config_settings', 'setup.php');
+
+	api_plugin_register_hook('weathermap', 'top_header_tabs', 'weathermap_show_tab', 'setup.php');
+	api_plugin_register_hook('weathermap', 'top_graph_header_tabs', 'weathermap_show_tab', 'setup.php');
+	api_plugin_register_hook('weathermap', 'draw_navigation_text', 'weathermap_draw_navigation_text', 'setup.php');
+
+	api_plugin_register_hook('weathermap', 'top_graph_refresh', 'weathermap_top_graph_refresh', 'setup.php');
+	api_plugin_register_hook('weathermap', 'page_title', 'weathermap_page_title', 'setup.php');
+	api_plugin_register_hook('weathermap', 'page_head', 'weathermap_page_head', 'setup.php');
+
+	api_plugin_register_hook('weathermap', 'poller_top', 'weathermap_poller_top', 'setup.php');
+	api_plugin_register_hook('weathermap', 'poller_output', 'weathermap_poller_output', 'setup.php');
+	api_plugin_register_hook('weathermap', 'poller_bottom', 'weathermap_poller_bottom', 'setup.php');
+
+	weathermap_setup_table();
 }
 
-function weathermap_version () {
-	return array( 	'name'    	=> 'weathermap',
+function plugin_weathermap_uninstall()
+{
+	// This function doesn't seem to ever be called, in Cacti 0.8.8b
+	// on the assumption that it will one day work, clear the stored version number from the settings
+	// so that an uninstall/reinstall on the plugin would force the db schema to be checked
+	db_execute("replace into settings values('weathermap_version','')");
+}
+
+function plugin_weathermap_version()
+{
+	return array(       'name'          => 'weathermap',
 		'version'       => '0.98',
 		'longname'      => 'PHP Network Weathermap',
 		'author'        => 'Howard Jones',
 		'homepage'      => 'http://www.network-weathermap.com/',
 		'webpage'      => 'http://www.network-weathermap.com/',
-		'email' 	=> 'howie@thingy.com',
+		'email'         => 'howie@thingy.com',
 		'url'           => 'http://www.network-weathermap.com/versions.php'
 	);
 }
 
-function disabled_plugin_weathermap_uninstall() {
-	// doesn't really do anything. Here to remind me.
-	
-	// not sure what it should really do.
+/* somehow this function is still required in PA 3.x, even though it checks for plugin_weathermap_version() */
+function weathermap_version()
+{
+	return plugin_weathermap_version();
 }
 
-function disabled_plugin_weathermap_check_config() {
-	// doesn't really do anything either because it's not implemented yet in PIA. Would be handy if it was.
-	
-	if(!function_exists("imagecreate")) return FALSE;
-	if(!function_exists("preg_match")) return FALSE;
-	if(!function_exists("imagecreatetruecolor")) return FALSE;
-	if(!function_exists("imagecreatefrompng")) return FALSE;
-	if(!function_exists("imagepng")) return FALSE;
-	if(!function_exists("imageSaveAlpha")) return FALSE;
-	if(!function_exists("imagealphablending")) return FALSE;
-	
-//	if(!function_exists("imagecopyresampled")) return FALSE;
-	
-	return TRUE;
+function plugin_weathermap_check_config()
+{
+	return true;
 }
 
-function disabled_plugin_weathermap_install () {
-
-	api_plugin_register_hook('weathermap', 'config_arrays',         'weathermap_config_arrays',        'setup.php');
-	api_plugin_register_hook('weathermap', 'draw_navigation_text',  'weathermap_draw_navigation_text', 'setup.php');
-	api_plugin_register_hook('weathermap', 'config_settings',       'weathermap_config_settings',      'setup.php');
-	api_plugin_register_hook('weathermap', 'top_header_tabs',       'weathermap_show_tab',             'setup.php');
-	api_plugin_register_hook('weathermap', 'top_graph_header_tabs', 'weathermap_show_tab',             'setup.php');
-
-	api_plugin_register_hook('weathermap', 'poller_bottom', 'weathermap_poller_bottom',             'setup.php');
-	api_plugin_register_hook('weathermap', 'poller_top', 'weathermap_poller_top',             'setup.php');
-	api_plugin_register_hook('weathermap', 'poller_output', 'weathermap_poller_output',             'setup.php');
-	
-	api_plugin_register_hook('weathermap', 'top_graph_refresh', 'weathermap_top_graph_refresh',             'setup.php');
-	api_plugin_register_hook('weathermap', 'page_title', 'weathermap_page_title',             'setup.php');
-	api_plugin_register_hook('weathermap', 'page_head', 'weathermap_page_head',             'setup.php');
-
-	weathermap_setup_table ();
+function plugin_weathermap_upgrade()
+{
+	return false;
 }
-
 
 function plugin_init_weathermap() {
 	global $plugin_hooks;

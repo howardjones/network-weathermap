@@ -22,8 +22,8 @@
 *  editor MRU for picker  http://forums.cacti.net/viewtopic.php?f=16&t=50649
 *  ~~%t and %T support in ProcessString~~
 *  ~~Document %d in manual http://forums.cacti.net/viewtopic.php?f=16&t=22677~~
-*  AICONFILLCOLOR accepts 'none' for drawing giant transparent shapes.
-*  Switch to new-style plugin
+*  ~~AICONFILLCOLOR accepts 'none' for drawing giant transparent shapes.~~
+*  ~~Switch to new-style plugin~~
 *  ~~Fix horrible formatting of manual~~
 
 Commit old enough to have old-style code layout in it(!):

@@ -17,6 +17,7 @@
 *  ~~HTMLOUTPUTFILE and IMAGEOUTPUTFILE in Cacti~~
 *  ~~new image-cycle~~
 *  ~~detect if Boost is installed and enabled, and recommend poller_output~~
+  *  the 'click here to add global setting' doesn't yet
 *  ~~editor 'tidy' function~~
 *  editor MRU for picker  http://forums.cacti.net/viewtopic.php?f=16&t=50649
 *  ~~%t and %T support in ProcessString~~

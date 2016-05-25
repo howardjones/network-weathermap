@@ -203,11 +203,34 @@ case 'mrss':
 	break;
 
 case 'viewmapcycle':
-	include_once($config["base_path"]."/include/top_graph_header.php");
+
+	$fullscreen = 0;
+	if ((isset($_REQUEST['fullscreen']) && is_numeric($_REQUEST['fullscreen'] ) )) {
+            $fullscreen = intval($_REQUEST['fullscreen']);
+        }
+		
+	if ($fullscreen==1) {
+	    print "<!DOCTYPE html>\n";
+		print "<html><head>";
+		print '<LINK rel="stylesheet" type="text/css" media="screen" href="cacti-resources/weathermap.css">';		
+		print "</head><body id='wm_fullscreen'>";
+	} else {
+		include_once($config["base_path"]."/include/top_graph_header.php");
+	}		
+
 	print "<div id=\"overDiv\" style=\"position:absolute; visibility:hidden; z-index:1000;\"></div>\n";
 	print "<script type=\"text/javascript\" src=\"overlib.js\"><!-- overLIB (c) Erik Bosrup --></script> \n";
-	weathermap_fullview(TRUE);
-	weathermap_versionbox();
+
+
+	$groupid = -1;
+        if ( (isset($_REQUEST['group']) && is_numeric($_REQUEST['group'] ) )) {
+            $groupid = intval($_REQUEST['group']);
+        }
+
+	weathermap_fullview(true, false, $groupid, $fullscreen);
+	if($fullscreen == 0) {
+		weathermap_versionbox();
+	}
 
 	include_once($config["base_path"]."/include/bottom_footer.php");
 	break;
@@ -479,87 +502,86 @@ function weathermap_thumbview($limit_to_group = -1)
 function weathermap_fullview($cycle=FALSE, $firstonly=FALSE, $limit_to_group = -1, $fullscreen = 0)
 {
 	global $colors;
-
 	$_SESSION['custom']=false;
-
 	$userid = (isset($_SESSION["sess_user_id"]) ? intval($_SESSION["sess_user_id"]) : 1);
-	# $query = "select distinct weathermap_maps.* from weathermap_auth,weathermap_maps where weathermap_maps.id=weathermap_auth.mapid and active='on' and (userid=".$userid." or userid=0) order by sortorder, id";
+	
 	$maplist_SQL = "select distinct weathermap_maps.* from weathermap_auth,weathermap_maps where weathermap_maps.id=weathermap_auth.mapid and active='on' and ";
+	
 	if($limit_to_group >0) $maplist_SQL .= " weathermap_maps.group_id=".$limit_to_group." and ";
+	
 	$maplist_SQL .= " (userid=".$userid." or userid=0) order by sortorder, id";
-
 	if($firstonly) { $maplist_SQL .= " LIMIT 1"; }
-
-	$maplist = db_fetch_assoc( $maplist_SQL );
-	html_graph_start_box(2,true);
-
-	if(sizeof($maplist) == 1)
-	{
+        $maplist = db_fetch_assoc( $maplist_SQL );
+        
+	if(sizeof($maplist) == 1) {
 		$pagetitle = "Network Weathermap";
-	}
-	else
-	{
+	} else {
 		$pagetitle = "Network Weathermaps";
 	}
-
 	$class = "";
 	if($cycle) $class = "inplace";
 	if($fullscreen) $class = "fullscreen";
-
+	
 	if($cycle) {
-		print "<script src='vendor/jquery.min.js'></script>";
-		print "<script src='vendor/idle-timer.min.js'></script>";
-		$extra = "";
-		if($limit_to_group > 0) $extra = " in this group";
-
+        print "<script src='vendor/jquery.min.js'></script>";
+        print "<script src='vendor/idle-timer.min.js'></script>";
+        $extra = "";
+        if($limit_to_group > 0) $extra = " in this group";
 		?>
-		<div id="wmcyclecontrolbox" class="<?php print $class ?>">
-			<div id="wm_progress"></div>
-			<div id="wm_cyclecontrols">
-				<a id="cycle_stop" href="?action="><img src="cacti-resources/img/control_stop_blue.png" width="16" height="16" /></a>
-				<a id="cycle_prev" href="#"><img src="cacti-resources/img/control_rewind_blue.png" width="16" height="16" /></a>
-				<a id="cycle_pause" href="#"><img src="cacti-resources/img/control_pause_blue.png" width="16" height="16" /></a>
-				<a id="cycle_next" href="#"><img src="cacti-resources/img/control_fastforward_blue.png" width="16" height="16" /></a>
-				<a id="cycle_fullscreen" href="?action=viewmapcycle&fullscreen=1&group=<?php echo $limit_to_group; ?>"><img src="cacti-resources/img/arrow_out.png" width="16" height="16" /></a>
-				Showing <span id="wm_current_map">1</span> of <span id="wm_total_map">1</span>.
-				Cycling all available maps<?php echo $extra; ?>.
-			</div>
-		</div>
-		<?php
-	}
+					<div id="wmcyclecontrolbox" class="<?php print $class ?>">
+						<div id="wm_progress"></div>
+						<div id="wm_cyclecontrols">
+						<a id="cycle_stop" href="?action="><img src="cacti-resources/img/control_stop_blue.png" width="16" height="16" /></a>
+						<a id="cycle_prev" href="#"><img src="cacti-resources/img/control_rewind_blue.png" width="16" height="16" /></a>
+						<a id="cycle_pause" href="#"><img src="cacti-resources/img/control_pause_blue.png" width="16" height="16" /></a>
+						<a id="cycle_next" href="#"><img src="cacti-resources/img/control_fastforward_blue.png" width="16" height="16" /></a>
+						<a id="cycle_fullscreen" href="?action=viewmapcycle&fullscreen=1&group=<?php echo $limit_to_group; ?>"><img src="cacti-resources/img/arrow_out.png" width="16" height="16" /></a>
+						Showing <span id="wm_current_map">1</span> of <span id="wm_total_map">1</span>. 
+						Cycling all available maps<?php echo $extra; ?>.
+						</div>
+					</div>
+				<?php
+			}	
+		
+	// only draw the whole screen if we're not cycling, or we're cycling without fullscreen mode
+	if ($cycle == false || $fullscreen==0) {
+		html_graph_start_box(2,true);
 ?>
-<tr bgcolor="<?php print $colors["panel"];?>">
+			<tr bgcolor="<?php print $colors["panel"];?>">
 				<td>
-						<table width="100%" cellpadding="0" cellspacing="0">
-								<tr>
-								   <td class="textHeader" nowrap> <?php print $pagetitle; ?> </td>
-				<td align="right">
-				<?php if(! $cycle) { ?>
-					(automatically cycle between full-size maps (<?php
+					<table width="100%" cellpadding="0" cellspacing="0">
+							<tr>
+							   	<td class="textHeader" nowrap> <?php print $pagetitle; ?> </td>
+								<td align = "right">
+                        <?php if (!$cycle) { ?>
+                        (automatically cycle between full-size maps (<?php
+                                
+                                if ($limit_to_group > 0) {
+                                    
+                                    print '<a href = "?action=viewmapcycle&group='.intval($limit_to_group).'">within this group</a>, or ';
+                                } 
+                                print ' <a href = "?action=viewmapcycle">all maps</a>';                                
+                            ?>)                        
 
-					if ($limit_to_group > 0) {
-
-						print '<a href = "?action=viewmapcycle&group='.intval($limit_to_group).'">within this group</a>, or ';
-					}
-					print ' <a href = "?action=viewmapcycle">all maps</a>';
-					?>)
-				<?php } else { ?>
-				Cycling all available maps. <a href="?action=">Stop.</a>
-				<?php }?>
+                        <?php
+                        }
+			
+                        ?>
+                    			</td>
+							</tr>
+					</table>
 				</td>
-				</tr>
-			</table>
-		</td>
-</tr>
+			</tr>
 <?php
-	html_graph_end_box();
-
-	weathermap_tabs($limit_to_group);
+		html_graph_end_box();
+	
+		weathermap_tabs($limit_to_group);	
+	}
 	
 	$i = 0;
-	if (sizeof($maplist) > 0)
-	{
-
+	if (sizeof($maplist) > 0) {
+		print "<div class='all_map_holder $class'>";
+		
 		$outdir = dirname(__FILE__).'/output/';
 		$confdir = dirname(__FILE__).'/configs/';
 		foreach ($maplist as $map)
@@ -568,79 +590,64 @@ function weathermap_fullview($cycle=FALSE, $firstonly=FALSE, $limit_to_group = -
 			$htmlfile = $outdir.$map['filehash'].".html";
 			$maptitle = $map['titlecache'];
 			if($maptitle == '') $maptitle= "Map for config file: ".$map['configfile'];
-			
+						
 			print '<div class="weathermapholder" id="mapholder_'.$map['filehash'].'">';
-if($cycle == false || $fullscreen==0) {
-html_graph_start_box(1,true);
-
+			if($cycle == false || $fullscreen==0) {
+				html_graph_start_box(1,true);
+				
 ?>
-	<tr bgcolor="#<?php echo $colors["header_panel"] ?>">
-		<td colspan="3">
-			<table width="100%" cellspacing="0" cellpadding="3" border="0">
-				<tr>
-					<td align="left" class="textHeaderDark">
-						<a name="map_<?php echo $map['filehash']; ?>">
-						</a><?php print htmlspecialchars($maptitle); ?>
-					</td>
-				</tr>
-			</table>
-		</td>
-	</tr>
-<tr>
-	<td>
-		<?php
-		}
-			if(file_exists($htmlfile))
-			{
-				include($htmlfile);
+		<tr bgcolor="#<?php echo $colors["header_panel"] ?>">
+				<td colspan="3">
+						<table width="100%" cellspacing="0" cellpadding="3" border="0">
+								<tr>
+									<td align="left" class="textHeaderDark">
+                                    	<a name="map_<?php echo $map['filehash']; ?>">
+                                        </a><?php print htmlspecialchars($maptitle); ?>
+                                    </td>
+								</tr>
+						</table>
+				</td>
+		</tr>
+		<tr>
+			<td>
+<?php
 			}
-			else
-			{
+			
+			if (file_exists($htmlfile)) {
+				include($htmlfile);
+			} else {
 				print "<div align=\"center\" style=\"padding:20px\"><em>This map hasn't been created yet.</em></div>";
 			}
-
-		if ($cycle == false || $fullscreen==0) {
-			print '</td></tr>';
-			html_graph_end_box();
-		}
+			
+			if ($cycle == false || $fullscreen==0) {
+				print '</td></tr>';
+				html_graph_end_box();				
+			}
 			print '</div>';
 		}
-
-
-		if($cycle)
-		{
+		print "</div>";
+		
+		if ($cycle) {
 			$refreshtime = read_config_option("weathermap_cycle_refresh");
-			// OK, so the Cycle plugin does all this with a <META> tag at the bottom of the body
-			// that overrides the one at the top (that Cacti puts there). Unfortunately, that
-			// isn't valid HTML! So here's a Javascript driven way to do it
-
-			// It has the advantage that the image switching is cleaner, too.
-			// We also do a nice thing of taking the poller-period (5 mins), and the
-			// available maps, and making sure each one gets equal time in the 5 minute period.
-
-			$refreshtime = read_config_option("weathermap_cycle_refresh");
-			$poller_cycle = read_config_option("poller_interval");
-
-			?>
-			<script type="text/javascript" src="cacti-resources/map-cycle.js"></script>
-			<script type = "text/javascript">
-				$(document).ready( function() {
-					WMcycler.start({ fullscreen: <?php echo ($fullscreen ? "1" : "0"); ?>,
-						poller_cycle: <?php echo $poller_cycle * 1000; ?>,
-						period: <?php echo $refreshtime  * 1000; ?>});
-				});
-			</script>
-			<?php
-
+			$poller_cycle = read_config_option("poller_interval");			
+?>        
+		<script type="text/javascript" src="cacti-resources/map-cycle.js"></script>
+		<script type = "text/javascript">        
+			$(document).ready( function() {
+				WMcycler.start({ fullscreen: <?php echo ($fullscreen ? "1" : "0"); ?>, 
+				    poller_cycle: <?php echo $poller_cycle * 1000; ?>, 
+				    period: <?php echo $refreshtime  * 1000; ?>});
+			});
+		</script>
+<?php
 		}
 	}
 	else
 	{
 		print "<div align=\"center\" style=\"padding:20px\"><em>You Have No Maps</em></div>\n";
 	}
-
-
 }
+
 
 function weathermap_translate_id($idname)
 {

@@ -84,9 +84,7 @@
 
     <xsl:template match = "definition">
         <div class = "definition">
-        	<pre>
             <xsl:apply-templates />
-        	</pre>
         </div>
     </xsl:template>
 

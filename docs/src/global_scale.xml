@@ -222,9 +222,16 @@
 
         <example><caption>The default scale set</caption>
 
-            <content>SCALE 1 10 140 0 255 SCALE 10 25 32 32 255 SCALE 25 40 0 192 255
-            SCALE 40 55 0 240 0 SCALE 55 70 240 240 0 SCALE 70 85 255 192 0 SCALE 85 100
-            255 0 0
+            <content>
+SCALE 0 0 192 192 192
+SCALE 0 1 255 255 255
+SCALE 1 10 140 0 255
+SCALE 10 25 32 32 255
+SCALE 25 40 0 192 255
+SCALE 40 55 0 240 0
+SCALE 55 70 240 240 0
+SCALE 70 85 255 192 0
+SCALE 85 100 255 0 0
             </content>
         </example>
     </examples>

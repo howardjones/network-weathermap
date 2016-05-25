@@ -80,7 +80,8 @@
         <example><caption>Hiding percentage signs, and the 'absolute zero' SCALE entry
         in a key.</caption>
 
-            <content>SET key_hidezero_DEFAULT 1 SET key_hidepercent_DEFAULT 1
+            <content>SET key_hidezero_DEFAULT 1
+SET key_hidepercent_DEFAULT 1
             </content>
         </example>
     </examples>

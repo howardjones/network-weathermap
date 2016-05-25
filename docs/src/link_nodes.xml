@@ -105,15 +105,18 @@
     <examples>
         <example><caption>Defining a simple link</caption>
 
-            <content>LINK mylink NODES node1 node2
+            <content>LINK mylink
+    NODES node1 node2
             </content>
         </example>
 
         <example><caption>Two parallel links, using offsets</caption>
 
-            <content>LINK firstlink NODES node1:E node2:E
+            <content>LINK firstlink
+    NODES node1:E node2:E
 
-                LINK secondlink NODES node1:W node2:W
+LINK secondlink
+    NODES node1:W node2:W
             </content>
         </example>
 
@@ -122,19 +125,22 @@
 
             <content>LINK firstlink NODES node1:E50 node2:E50
 
-                LINK secondlink NODES node1:W50 node2:W50
+LINK secondlink
+    NODES node1:W50 node2:W50
             </content>
         </example>
 
         <example><caption>An offset link using pixel offsets</caption>
 
-            <content>LINK firstlink NODES node1:-10:10 node2:20:12
+            <content>LINK firstlink
+    NODES node1:-10:10 node2:20:12
             </content>
         </example>
 
         <example><caption>An offset link using polar coordinates</caption>
 
-            <content>LINK firstlink NODES node1:45r20 node2:225r20
+            <content>LINK firstlink
+    NODES node1:45r20 node2:225r20
             </content>
         </example>
     </examples>

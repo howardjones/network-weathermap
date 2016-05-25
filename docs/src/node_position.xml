@@ -39,9 +39,13 @@
         about the main node.</caption>
 
             <content>
-                NODE main_node POSITION 200 320 LABEL MAIN
+NODE main_node
+    POSITION 200 320
+    LABEL MAIN
 
-                NODE sub_node POSITION main_node 0 -20 LABEL {nodes:main_node:invalue}
+NODE sub_node
+    POSITION main_node 0 -20
+    LABEL {nodes:main_node:invalue}
             </content>
         </example>
     </examples>

@@ -6,11 +6,7 @@
 
     <anchor>GLOBAL_COLORS</anchor>
 
-    <definition>BGCOLOR
-        <meta>red</meta>
-        <meta>green</meta>
-        <meta>blue</meta>
-    </definition>
+    <definition>BGCOLOR        <meta>red</meta>         <meta>green</meta>        <meta>blue</meta>     </definition>
 
     <definition>TIMECOLOR
 

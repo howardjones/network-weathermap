@@ -31,12 +31,18 @@
     <examples>
         <example><caption>LINK Templates in use - with template-only links</caption>
 
-            <content>LINK bigpipe WIDTH 8 ARROWSTYLE classic
+            <content>LINK bigpipe
+    WIDTH 8
+    ARROWSTYLE classic
 
-                LINK smallpipe WIDTH 3 ARROWSTYLE compact
+LINK smallpipe
+    WIDTH 3
+    ARROWSTYLE compact
 
-                # this link uses the bigpipe template, so it doesn't need any
-            formatting/styling commands LINK a_real_link TEMPLATE bigpipe NODES rtr1 rtr2
+# this link uses the bigpipe template, so it doesn't need any formatting/styling commands
+LINK a_real_link
+    TEMPLATE bigpipe
+    NODES rtr1 rtr2
             </content>
         </example>
     </examples>

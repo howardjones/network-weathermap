@@ -1710,7 +1710,7 @@ class Colour
 			$this->b = $ary[2];
 		}
 	}
-	
+
 	// Is this a transparent/none colour?
 	function is_real()
 	{
@@ -1802,6 +1802,11 @@ class Colour
 	function as_string($format = "RGB(%d,%d,%d)")
 	{
 		return (sprintf($format, $this->r, $this->g, $this->b));
+	}
+
+	function __toString()
+	{
+		return $this->as_string();
 	}
 	
 	function as_config()

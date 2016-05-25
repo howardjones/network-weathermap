@@ -22,6 +22,7 @@
 *  editor MRU for picker  http://forums.cacti.net/viewtopic.php?f=16&t=50649
 *  ~~%t and %T support in ProcessString~~
 *  Document %d in manual http://forums.cacti.net/viewtopic.php?f=16&t=22677
+*  AICONFILLCOLOR accepts 'none' for drawing giant transparent shapes.
 
 Commit old enough to have old-style code layout in it(!):
 https://github.com/howardjones/network-weathermap/tree/3d8ae103dcddd67b1a1c9db109f5985e496ecd77

@@ -181,13 +181,13 @@ class WeatherMapNode extends WeatherMapItem
 			if($this->iconscalevar == 'in')
 			{
 				$pc = $this->inpercent;
-				$col = $this->colours[IN];
+				//$col = $this->colours[IN];
 				$val = $this->bandwidth_in;
 			}
 			if($this->iconscalevar == 'out')
 			{
 				$pc = $this->outpercent;
-				$col = $this->colours[OUT];
+				//$col = $this->colours[OUT];
 				$val = $this->bandwidth_out;
 			}
 
@@ -296,15 +296,45 @@ class WeatherMapNode extends WeatherMapItem
 				$aifill = new Colour($this->aiconfillcolour);
 				$aiink = new Colour($this->aiconoutlinecolour);
 
-				if ( $aifill->is_copy() && !$col->is_none() )
-				{
-					$fill = $col;
-				}
-				else
-				{
-					if($aifill->is_real())
+				// if useiconscale isn't set, then use the static
+				// colour defined, or copy the colour from the label
+				if($this->useiconscale == "none") {
+
+					if ( $aifill->is_copy() && !$col->is_none() )
 					{
-						$fill = $aifill;
+						$fill = $col;
+					}
+					else
+					{
+						if($aifill->is_real())
+						{
+							$fill = $aifill;
+						}
+					}
+				} else {
+					// if useiconscale IS defined, use that to figure out
+					// the fill colour
+					$pc = 0;
+					$val = 0;
+
+					if ($this->iconscalevar == 'in') {
+						$pc = $this->inpercent;
+						$val = $this->bandwidth_in;
+					}
+
+					if ($this->iconscalevar == 'out') {
+						$pc = $this->outpercent;
+						$val = $this->bandwidth_out;
+					}
+
+					if ($this->iconscaletype == 'percent') {
+						list($fill, $junk, $junk) =
+						$map->NewColourFromPercent($val, $this->useiconscale,$this->name, FALSE );
+
+					} else {
+						// use the absolute value if we aren't doing percentage scales.
+						list($fill,  $junk, $junk) =
+							$map->NewColourFromPercent($val, $this->useiconscale,$this->name, FALSE );
 					}
 				}
 
@@ -445,11 +475,11 @@ class WeatherMapNode extends WeatherMapItem
 					}
 					else
 					{
-                                            if(isset($colicon))
-                                            {
-                                                // debug("Skipping unavailable imagefilter() call.\n");
-                                                imagecolorize($icon_im, $colicon->r, $colicon->g, $colicon->b);
-                                            }
+						if(isset($colicon))
+						{
+							// debug("Skipping unavailable imagefilter() call.\n");
+							imagecolorize($icon_im, $colicon->r, $colicon->g, $colicon->b);
+						}
 					}
 
 					wm_debug("If this is the last thing in your logs, you probably have a buggy GD library. Get > 2.0.33 or use PHP builtin.\n");
@@ -600,7 +630,7 @@ class WeatherMapNode extends WeatherMapItem
 			#       print "FINAL TEXT at $txt_x , $txt_y\n";
 
 			// if there's an icon, then you can choose to have no background
-
+			print $col;
 			if(! $col->is_none() )
 			{
 			    imagefilledrectangle($node_im, $label_x1, $label_y1, $label_x2, $label_y2, $col->gdallocate($node_im));
@@ -667,6 +697,8 @@ class WeatherMapNode extends WeatherMapItem
 
 		# $this->image = $node_im;
 		$map->nodes[$this->name]->image = $node_im;
+
+		print "\n";
 	}
 
 	function update_cache($cachedir,$mapname)

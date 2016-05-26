@@ -142,7 +142,13 @@ class ConfigTest extends PHPUnit_Framework_TestCase
         $conflist = array();
 
         $dh = opendir($testdir);
-        while ($file = readdir($dh)) {
+        $files = array();
+        while ($files[] = readdir($dh)) {
+        };
+        sort($files);
+        closedir($dh);
+
+        foreach ($files as $file) {
             if(substr($file,-5,5) == '.conf') {
                 $imagefile = $file.".png";
                 $reference = $referencedir.DIRECTORY_SEPARATOR.$file.".png";
@@ -155,7 +161,6 @@ class ConfigTest extends PHPUnit_Framework_TestCase
                 }
             }
         }
-        closedir($dh);
         chdir($previouswd);
 
 	fputs($fd,"</body></html>");

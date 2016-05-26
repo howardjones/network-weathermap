@@ -37,6 +37,18 @@ else
 }
 
 // ******************************************
+if (isset($_SESSION['cacti']['weathermap']['last_used_host_id'][0]) ) 
+	{
+	print "<b>Last Host Selected:</b><br>";
+	$last['id'] = array_reverse($_SESSION['cacti']['weathermap']['last_used_host_id']);
+	$last['name'] = array_reverse($_SESSION['cacti']['weathermap']['last_used_host_name']);
+	
+	foreach ($last['id'] as $key => $id)
+		{
+		list($name) = split(" - ", $last['name'][$key], 2);
+		print "<a href=cacti-pick.php?host_id=".$id."&command=link_step1&overlib=1&aggregate=0>[".$name."]</a><br>";
+		}
+	} 
 
 function js_escape($str)
 {
@@ -61,6 +73,7 @@ if(isset($_REQUEST['command']) && $_REQUEST["command"]=='link_step2')
 	$result = mysql_query($SQL_graphid) or die('Query failed: ' . mysql_error());
 	$line = mysql_fetch_array($result, MYSQL_ASSOC);
 	$graphid = $line['local_graph_id'];
+	$hostid = $_REQUEST['host_id'];
 
 ?>
 <html>
@@ -92,6 +105,14 @@ This window should disappear in a moment.
 </body>
 </html>
 <?php
+	if ($hostid > 0)
+		{
+		$_SESSION['cacti']['weathermap']['last_used_host_id'][] 	=	$hostid;
+		$_SESSION['cacti']['weathermap']['last_used_host_name'][] 	=	$line['title_cache'];
+	
+		$_SESSION['cacti']['weathermap']['last_used_host_id'] = array_slice($_SESSION['cacti']['weathermap']['last_used_host_id'], -5);
+		$_SESSION['cacti']['weathermap']['last_used_host_name'] = array_slice($_SESSION['cacti']['weathermap']['last_used_host_name'], -5);
+		}
 	// end of link step 2
 }
 
@@ -127,7 +148,7 @@ if(isset($_REQUEST['command']) && $_REQUEST["command"]=='link_step1')
 		}).show();
 	});
 
-	function update_source_step1(dataid,datasource)
+	function update_source_step1(dataid,datasource,host_id)
 	{
 		var newlocation;
 		var fullpath;
@@ -147,7 +168,7 @@ if(isset($_REQUEST['command']) && $_REQUEST["command"]=='link_step1')
 		}
 		if(document.forms['mini'].overlib.checked)
 		{
-			newlocation = 'cacti-pick.php?command=link_step2&dataid=' + dataid;
+			newlocation = 'cacti-pick.php?command=link_step2&dataid=' + dataid + '&host_id=' + host_id;
 			self.location = newlocation;
 		}
 		else
@@ -251,7 +272,7 @@ if(sizeof($hosts) > 0) {
 			//while ($line = mysql_fetch_array($result, MYSQL_ASSOC)) {
 			echo "<li class=\"row".($i%2)."\">";
 			$key = $line['local_data_id']."','".$line['data_source_path'];
-			echo "<a href=\"#\" onclick=\"update_source_step1('$key')\">". $line['name_cache'] . "</a>";
+			echo "<a href=\"#\" onclick=\"update_source_step1('$key','$host_id')\">". $line['name_cache'] . "</a>";
 			echo "</li>\n";
 			
 			$i++;

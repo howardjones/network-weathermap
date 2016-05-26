@@ -104,15 +104,16 @@ if(isset($_REQUEST['command']) && $_REQUEST["command"]=='link_step2')
 This window should disappear in a moment.
 </body>
 </html>
-<?php
-	if ($hostid > 0)
-		{
-		$_SESSION['cacti']['weathermap']['last_used_host_id'][] 	=	$hostid;
-		$_SESSION['cacti']['weathermap']['last_used_host_name'][] 	=	$line['title_cache'];
-	
-		$_SESSION['cacti']['weathermap']['last_used_host_id'] = array_slice($_SESSION['cacti']['weathermap']['last_used_host_id'], -5);
-		$_SESSION['cacti']['weathermap']['last_used_host_name'] = array_slice($_SESSION['cacti']['weathermap']['last_used_host_name'], -5);
-		}
+	<?php
+	if ($hostid > 0 && !in_array($hostid, $_SESSION['cacti']['weathermap']['last_used_host_id'])) {
+		$_SESSION['cacti']['weathermap']['last_used_host_id'][] = $hostid;
+		$_SESSION['cacti']['weathermap']['last_used_host_name'][] = $line['title_cache'];
+
+		$_SESSION['cacti']['weathermap']['last_used_host_id'] = array_slice($_SESSION['cacti']['weathermap']['last_used_host_id'],
+			-5);
+		$_SESSION['cacti']['weathermap']['last_used_host_name'] = array_slice($_SESSION['cacti']['weathermap']['last_used_host_name'],
+			-5);
+	}
 	// end of link step 2
 }
 

@@ -6,14 +6,19 @@
 [![Test Coverage](https://codeclimate.com/github/howardjones/network-weathermap/badges/coverage.svg)](https://codeclimate.com/github/howardjones/network-weathermap)
 [![Code Climate](https://codeclimate.com/github/howardjones/network-weathermap/badges/gpa.svg)](https://codeclimate.com/github/howardjones/network-weathermap)
 
-*TEST RELEASE* for 0.98
+*TEST RELEASE* for 1.0
 
 Note - this is undergoing pretty dramatic refactoring and reorganisation at the moment. I'd wait
-a little while before forking for any work - HJ Dec 20th 2014
+a little while before forking for any work. - HJ, May 2016
+
+[There is now a 'maintenance branch' which contains usable updates.](/howardjones/network-weathermap/tree/0.97-maintenance)
+
+That branch also provides releases, which is what you probably want:
+https://github.com/howardjones/network-weathermap/releases
 
 ---
 
-This is PHP Network Weathermap, version 0.98 by Howard Jones (howie@thingy.com)
+This is PHP Network Weathermap, version 1.0 by Howard Jones (howie@thingy.com)
 
 See the docs/ sub-directory for full HTML documentation, FAQ and example config.
 

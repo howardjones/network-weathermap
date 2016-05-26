@@ -11,7 +11,8 @@
 Note - this is undergoing pretty dramatic refactoring and reorganisation at the moment. I'd wait
 a little while before forking for any work. - HJ, May 2016
 
-[There is now a 'maintenance branch' which contains usable updates.](/howardjones/network-weathermap/tree/0.97-maintenance)
+There is now a 'maintenance branch' which contains usable updates.
+https://github.com/howardjones/network-weathermap/tree/0.97-maintenance
 
 That branch also provides releases, which is what you probably want:
 https://github.com/howardjones/network-weathermap/releases

@@ -114,35 +114,16 @@
 
             <h4>Getting Started</h4>
 
-            <p>To actually enable the plugin, you need to add a line to your Cacti
-            config file. This file is includes/config.php for Cacti 0.8.6 and
-            includes/global.php for Cacti 0.8.7(a through f), then includes/config.php again for 0.8.7g and newer:
+    <p>Log in to the Cacti application, and go to the Plugin Management page.
+        You should see the Weathermap plugin as an uninstalled plugin. Click the 'install' icon
+        next to its name, and then click the 'enable' icon that appears next to that. If you are logged in
+        as the 'admin' user, you should see the 'Weathermap' tab appear at the top of the Cacti page.</p>
 
-            <div class = "shell">
-                <pre>
-                                $plugins = array();
-                                $plugins[] = 'monitor';
-                                <b>$plugins[] = 'weathermap';</b>
-</pre>
-            </div>
+    <p>That's it! The Weathermap plugin is installed. </p>
+    <p>To allow other users to see it, you need to go to the User Management page in Cacti, and grant those users
+        the extra permissions that should appear there now, to either View Weathermaps (for customers) and/or Manage Weathermaps (for admin users).</p>
 
-            <p>
-            Now, refresh your Cacti page, to be sure that everything is still working
-            right. If not, remove the line you just added and you should return to
-            normal. Make a note of any error message and let me know!
-            </p>
-
-            <p>
-            <img src = "../images/cacti_step1.png" />Assuming it all looks fine (but not
-            very different), you can start to enable Weathermap. Log in as 'admin' or
-            another user with User Management rights, go to the User Management section
-            under Tools in the Cacti console, and then choose your own username from the
-            list. Check the two new 'realms' boxes that should be there
-            - View Weathermaps, and Manage Weathermaps
-            - and then click Save. A 'Weathermap' tab should appear at the top of the
-            page.</p>
-
-            <p>That's it! The Weathermap plugin is installed. To go further, you need
+    <p>To go further, you need
             some weathermap configuration files to define your maps. You can do this in
             two ways
             - using the Web-based map editor, or by editing the text-based configuration

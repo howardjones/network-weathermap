@@ -468,7 +468,6 @@ function weathermap_config_arrays () {
 		$user_auth_realms[43]='Plugin -> Weathermap: View';
 		$user_auth_realm_filenames['weathermap-cacti-plugin.php'] = 43;
 		$user_auth_realm_filenames['weathermap-cacti-plugin-mgmt.php'] = 42;
-#		$user_auth_realm_filenames['weathermap-cacti-plugin-mgmt-groups.php'] = 42;
 	}
 	// if there is support for custom graph tree types, then register ourselves
 	if(isset($tree_item_handlers))

@@ -92,7 +92,7 @@ function attach_click_events()
     
     if(fromplug===1)
     {
-        jQuery("#tb_newfile").click( function() {window.location = "weathermap-cacti-plugin-mgmt.php";} )
+        jQuery("#tb_newfile").html('Return to<br>Cacti').click( function() {window.location = "weathermap-cacti-plugin-mgmt.php";} )
     }
     else
     {
@@ -520,7 +520,7 @@ function show_itemtext(itemtype,name)
 //    $('#item_configtext').block();
     
     jQuery.ajax( { type: "GET",
-                url: 'editor.php',
+                url: editor_url,
                 data: {action: 'fetch_config',
                         item_type: itemtype,
                         item_name: name,

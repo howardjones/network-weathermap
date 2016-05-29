@@ -34,6 +34,7 @@ permissions differently, unfortunately.
     ADDED - AICONFILLCOLOR accepts 'none' for drawing giant transparent shapes.
     ADDED - Extra warning for Boost users about poller_output
     ADDED - Cacti data picker in editor tracks most recently used hosts (thanks Zdolny)
+    ADDED - New permission in Cacti: edit maps. Maps can be edited by authorized users without needing to enable the editor in the source code.
 
 0.97c had no additional changes - it's just 0.97b with some silly errors fixed, and  all
 the CSS files included with the correct paths. There were also reports of problems with the

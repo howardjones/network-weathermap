@@ -25,7 +25,7 @@
 *  ~~editor MRU for picker  http://forums.cacti.net/viewtopic.php?f=16&t=50649~~
 *  if permissions in Cacti said Anyone *and* you, then no map images are shown
 *  Imagemap sortorder problem in editor. If you can see it, you can click it.
-*  Update manual to at least include correct installation instructions!
+*  ~~Update manual to at least include correct installation instructions!~~
 
 Commit old enough to have old-style code layout in it(!) for reference:
 https://github.com/howardjones/network-weathermap/tree/3d8ae103dcddd67b1a1c9db109f5985e496ecd77

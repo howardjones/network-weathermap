@@ -13,8 +13,11 @@ $ENABLED=false;
 // If we're embedded in the Cacti UI (included from weathermap-cacti-plugin-editor.php), then authentication has happened. Enable the editor.
 if (isset($FROM_CACTI) && $FROM_CACTI == true) {
     $ENABLED = true;
+	$editor_name = "weathermap-cacti-plugin-editor.php";
+
 } else {
     $FROM_CACTI = false;
+	$editor_name = "editor.php";
 }
 
 if(! $ENABLED)
@@ -132,6 +135,9 @@ else
 	
 	$fromplug = FALSE;
 	if(isset($_REQUEST['plug']) && (intval($_REQUEST['plug'])==1) ) { $fromplug = TRUE; }
+	if($FROM_CACTI) {
+		$fromplug = TRUE;
+	}
 	
 	switch($action)
 	{
@@ -951,6 +957,7 @@ else
 	<script type="text/javascript">
 	
 	var fromplug=<?php echo ($fromplug==TRUE ? 1:0); ?>;
+	var editor_url = '<?php echo $editor_name; ?>';
 	
 	// the only javascript in here should be the objects representing the map itself
 	// all code should be in editor.js
@@ -989,7 +996,7 @@ else
 	  <li class="tb_help"><span id="tb_help">or click a Node or Link to edit it's properties</span></li>
 	</ul>
   </div>
-  <form action="editor.php" method="post" name="frmMain">
+  <form action="<?php echo $editor_name ?>" method="post" name="frmMain">
 	<div align="center" id="mainarea">
 		<input type="hidden" name="plug" value="<?php echo ($fromplug==TRUE ? 1 : 0) ?>" />
 	 <input style="display:none" type="image"

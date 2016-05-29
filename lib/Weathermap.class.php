@@ -526,9 +526,18 @@ class WeatherMap extends WeatherMapBase
 		}
 	}
 
-	function ProcessString($input,&$context, $include_notes=TRUE,$multiline=FALSE)
+	function ProcessString($input, &$context, $include_notes = true, $multiline = false)
 	{
 		# debug("ProcessString: input is $input\n");
+
+		if($input === '') {
+			return '';
+		}
+
+		// don't bother with all this regexp rubbish if there's nothing to match
+		if(false === strpos($input, "{")) {
+			return $input;
+		}
 
 		assert('is_scalar($input)');
 
@@ -543,6 +552,20 @@ class WeatherMap extends WeatherMapBase
 			$input = str_replace("\\n","\n",$i);
 			# if($i != $input)  warn("$i into $input\n");
 		}
+
+		if($context_description === 'node') {
+			$input = str_replace("{node:this:graph_id}", $context->get_hint("graph_id" ), $input);
+			$input = str_replace("{node:this:name}", $context->name, $input);
+		}
+
+		if($context_description === 'link') {
+			$input = str_replace("{link:this:graph_id}", $context->get_hint("graph_id" ), $input);
+		}
+
+		// check if we can now quit early before the regexp stuff
+		if(false === strpos($input, "{")) {
+			return $input;
+ 		}
 
 		$output = $input;
 		

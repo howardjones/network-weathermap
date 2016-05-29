@@ -7,6 +7,9 @@ IMPORTANT NOTE - you may need to reset permissions on your users after upgrading
 finally switched to the "new-style" plugin API that's been around for 5+ years. This handles
 permissions differently, unfortunately.
 
+0.98a
+
+
 0.98
     FIXED - MySQL error in table-creation. MySQL 5.6 is fussier.
     FIXED - Editor 'delete link' broken

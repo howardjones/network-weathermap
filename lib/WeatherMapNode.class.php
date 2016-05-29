@@ -501,13 +501,16 @@ class WeatherMapNode extends WeatherMapItem
 							{
 								$scalefactor = $icon_h/$this->iconscaleh;
 							}
-							$new_width = $icon_w / $scalefactor;
-							$new_height = $icon_h / $scalefactor;
-							$scaled = imagecreatetruecolor($new_width, $new_height);
-							imagealphablending($scaled,false);
-							imagecopyresampled($scaled, $icon_im, 0, 0, 0, 0, $new_width, $new_height, $icon_w, $icon_h);
-							imagedestroy($icon_im);
-							$icon_im = $scaled;
+							if ($scalefactor != 1.0) {
+								$new_width = $icon_w / $scalefactor;
+								$new_height = $icon_h / $scalefactor;
+								$scaled = imagecreatetruecolor($new_width, $new_height);
+								imagealphablending($scaled, false);
+								imagecopyresampled($scaled, $icon_im, 0, 0, 0, 0, $new_width, $new_height, $icon_w,
+									$icon_h);
+								imagedestroy($icon_im);
+								$icon_im = $scaled;
+							}
 
 						}
 					}

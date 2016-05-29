@@ -463,12 +463,10 @@ function weathermap_config_arrays () {
 	if (function_exists('api_plugin_register_realm')) {
 		api_plugin_register_realm('weathermap', 'weathermap-cacti-plugin.php', 'Plugin -> Weathermap: View', 1);
 		api_plugin_register_realm('weathermap', 'weathermap-cacti-plugin-mgmt.php', 'Plugin -> Weathermap: Configure/Manage', 1);
-	} else {		
-		$user_auth_realms[42]='Plugin -> Weathermap: Configure/Manage';
-		$user_auth_realms[43]='Plugin -> Weathermap: View';
-		$user_auth_realm_filenames['weathermap-cacti-plugin.php'] = 43;
-		$user_auth_realm_filenames['weathermap-cacti-plugin-mgmt.php'] = 42;
+	        api_plugin_register_realm('weathermap', 'weathermap-cacti-plugin-editor.php', 'Plugin -> Weathermap: Edit Maps', 1);
+
 	}
+
 	// if there is support for custom graph tree types, then register ourselves
 	if(isset($tree_item_handlers))
 	{

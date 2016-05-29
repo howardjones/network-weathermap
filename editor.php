@@ -8,7 +8,14 @@ require_once 'lib/WMVector.class.php';
 require_once 'lib/WMLine.class.php';
 
 // so that you can't have the editor active, and not know about it.
-$ENABLED=true;
+$ENABLED=false;
+
+// If we're embedded in the Cacti UI (included from weathermap-cacti-plugin-editor.php), then authentication has happened. Enable the editor.
+if (isset($FROM_CACTI) && $FROM_CACTI == true) {
+    $ENABLED = true;
+} else {
+    $FROM_CACTI = false;
+}
 
 if(! $ENABLED)
 {

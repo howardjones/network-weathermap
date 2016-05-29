@@ -451,6 +451,19 @@ function maplist()
 	$last_finish_time = intval(read_config_option("weathermap_last_finish_time",true));
 	$poller_interval = intval(read_config_option("poller_interval"));
 
+	if (! wm_module_checks()) {
+		
+		print '<div align="center" class="wm_warning"><p>';
+
+ print "<b>Required PHP extensions are not present in your mod_php/ISAPI PHP module. Please check your PHP setup to ensure you have the GD extension installed and enabled.</b><p>";
+        print "If you find that the weathermap tool itself is working, from the command-line or Cacti poller, then it is possible that you have two different PHP installations. The Editor uses the same PHP that webpages on your server use, but the main weathermap tool uses the command-line PHP interpreter.<p>";
+        print "<p>You should also run <a href=\"check.php\">check.php</a> to help make sure that there are no problems.</p><hr/>";
+
+
+		print '</p></div>';
+		exit();
+	}
+
 	$tables = get_table_list();
 	if (!in_array('weathermap_maps', $tables)) {
 		print '<div align="center" class="wm_warning"><p>';

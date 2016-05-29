@@ -674,7 +674,7 @@ function weathermap_versionbox()
 	{
 		$pagefoot .= " --- <a href='weathermap-cacti-plugin-mgmt.php' title='Go to the map management page'>Weathermap Management</a>";
 		$pagefoot .= " | <a target=\"_blank\" href=\"docs/\">Local Documentation</a>";
-		$pagefoot .= " | <a target=\"_blank\" href=\"editor.php\">Editor</a>";
+		$pagefoot .= " | <a target=\"_blank\" href=\"weathermap-cacti-plugin-editor.php\">Editor</a>";
 	}
 			
 	

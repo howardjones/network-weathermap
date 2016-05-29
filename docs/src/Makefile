@@ -2,7 +2,7 @@ GLOBALS = global_*.xml intro_*.xml
 LINKS = link_*.xml
 NODES = node_*.xml
 
-VERSION ?= 0.98rc1
+VERSION ?= 0.98
 
 all: config-reference.php
 

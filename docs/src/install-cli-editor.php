@@ -76,7 +76,7 @@
             </p>
 
             <div class = "shell">
-                <tt>./weathermap</tt>
+                <code>./weathermap</code>
 
                 <br />
 
@@ -84,9 +84,9 @@
 
                 <br />
 
-                <tt>php weathermap</tt> (on Windows you will need this one)
+                <code>php weathermap</code> (on Windows you will need this one)
             </div><p>from a shell or command prompt, and get a (rather boring)
-            <tt>weathermap.png</tt> file in return. If you don't, you
+            <code>weathermap.png</code> file in return. If you don't, you
             <i>should</i> get some kind of error to help you figure out why.</p>
 
             <h4>Editor</h4>
@@ -94,13 +94,9 @@
             <p>Once you have weathermap itself working, continue onto the editor:</p>
 
             <p>
-            Copy the <tt>editor-config.php-dist</tt> file to
-            <tt>editor-config.php</tt>. If you use Cacti, and want to be able to pick
-            data sources from your Cacti installation by name, edit the file and make
-            sure that the line that sets
-            <tt>$cacti_base</tt> is correct, and that the base URI below that is also
-            correct for your Cacti installation (these two lines are marked CHANGE in
-            the file).
+            If you use Cacti, and want to be able to pick
+            data sources from your Cacti installation by name, you should use the
+                integrated access to the editor described on the '<a href="install-cacti-editor.html">Install Cacti + Editor</a>' page.
             </p>
 
             <p>
@@ -113,7 +109,7 @@
                                 chmod u+w configs</pre>
             </div>
 
-            In a pinch, you can just <tt>chmod 777 configs</tt>, but this
+            In a pinch, you can just <code>chmod 777 configs</code>, but this
             <em>really isn't</em> a recommended solution for a production system.</p>
 
             <p>On Windows, the same applies
@@ -151,13 +147,13 @@
             </p>
 
             <p>
-            <strong>Important Security Note:</strong> The editor allows
-            <i>anyone</i> who can access editor.php to change the configuration files
-            for your network weathermaps. There is no authentication built-in for
-            editing, even with the Cacti Plugin. This is why the configuration file
-            doesn't exist by default
-            - the editor won't work until you choose to make it work. It's recommended
-            that you either:
+                <strong>Important Security Note:</strong> The editor allows
+                <i>anyone</i> who can access editor.php to change the configuration files
+                for your network weathermaps. There is no authentication built-in for
+                editing, except with the Cacti Plugin. This is why direct access to the
+                editor is disabled by default
+                - the editor won't work until you choose to make it work, or give permissions in Cacti. It's recommended
+                that you either:
 
             <ul><li>change the ownership of configuration files so that the editor can't
             write to them once they are complete, or </li><li>use your webserver's

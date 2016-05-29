@@ -42,14 +42,85 @@
  <tt><a href = "mailto:howie@thingy.com">howie@thingy.com</a></tt>. (<a 
  href = "http://www.network-weathermap.com/">Website</a>)</h4> 
 </div> 
+
+ <h2 id="changes098">Changes For This Version (0.97c to 0.98)</h2> 
+
+ <p>This is a roll-up of all the small bugfixes for the last couple of years, especially those that stop Weathermap 
+ working with newer MySQL or PHP versions. There is a more substantial 1.0 release in the works, but I will 
+ backport 
+ any simple improvements or fixes to 0.98(abcd) releases. There are also small usability changes aimed at 
+ reducing 
+ repeat "error reports" in the forums. </p> 
+
+ <p>Another part of this change is that the Weathermap code is now hosted on <a 
+ href="https://github.com/howardjones/network-weathermap/">github</a>. There is 
+ also an <a href="https://github.com/howardjones/network-weathermap/issues">issue tracker</a>. There 
+ are two branches of code there, one (<a 
+ href="https://github.com/howardjones/network-weathermap/tree/0.97-maintenance">0.97-maintenance</a>) is for 
+ this 0.98 series of smaller changes, and the other (<a 
+ href="https://github.com/howardjones/network-weathermap/tree/master">master</a>) branch 
+ is for the ongoing rewrite work. For now, if you want to track useful work, that will be on the 0.97-maintenance 
+ branch. </p> 
+
+ <p>IMPORTANT NOTE - you may need to reset permissions on your users after upgrading, as I've 
+ finally switched to the "new-style" plugin API that's been around for 5+ years. This handles 
+ permissions differently, unfortunately. The new permissions have been in a few releases of Weathermap already 
+ so you should check if this affects you after installation. </p> 
+
+ <h3>Fixes</h3> 
+ <ul> 
+ <li>MySQL error in table-creation. MySQL 5.6 is fussier. 
+ <li>Editor 'delete link' broken 
+ <li><a href="config-reference.html#GLOBAL_KILO">KILO</a> was ignored when processing %k in special tokens 
+ <li>Various fixes for PHP deprecated or strict-mode warnings 
+ <li>Line-ending trimming in 'external script' data source 
+ <li>rounding error 'kinks' in angled <a href="config-reference.html#LINK_VIA">VIA</a> links 
+ <li>Config file path validation issue in editor (CVE-2013-3739) 
+ <li>Cloning a templated node in editor retains the template in the clone 
+ <li>cacti_use_ifspeed incorrect when interfaces > 20M and ifhighspeed available 
+ <li>More PHP 5.3/5.4/strict related errors (split -> explode) 
+ </ul><h3>Changes</h3> 
+ <ul> 
+ <li>Finally switch to "new-style" plugin API. 
+ <li>Editor data picker improved sort (thanks shd) 
+ <li>(Cacti plugin only) images are written to a temporary file first, to avoid displaying half-written images 
+ <li>Editor no longer uses editor-config.php 
+ </ul><h3>New Features</h3> 
+ <ul> 
+ <li>Weathermap will use anti-aliasing if your GD supports it (php-bundled GD doesn't) (thanks shd) 
+ <li>Special token formatting can handle timeticks and time_t formatting (%T and %t respectively) 
+ <li>new <a href="config-reference.html#GLOBAL_DATAOUTPUTFILE">DATAOUTPUTFILE</a> allows collected data to be written to a file for later use (automatically enabled in 
+ Cacti) 
+ <li>new wmdata: datasource plugin can read data from files produced by <a href="config-reference.html#GLOBAL_DATAOUTPUTFILE">DATAOUTPUTFILE</a> 
+ <li><a href="config-reference.html#GLOBAL_IMAGEOUTPUTFILE">IMAGEOUTPUTFILE</a> and <a href="config-reference.html#GLOBAL_HTMLOUTPUTFILE">HTMLOUTPUTFILE</a> are honoured in Cacti poller as a location for a second copy of those 
+ files. 
+ <li>Editor 'tidy link' function replaces Vert & Horiz, and does much nicer job 
+ <li>'retidy' option in editor to recalculate all links previously positioned with 'tidy'. 
+ <li><a href="config-reference.html#GLOBAL_COLORS">KEYBGCOLOR</a> and <a href="config-reference.html#GLOBAL_COLORS">KEYOUTLINECOLOR</a> both accept 'none' 
+ <li>command-line weathermap has new --no-warn option to disable warnings 
+ <li><a href="config-reference.html#NODE_COLORS">AICONFILLCOLOR</a> accepts 'none' for drawing giant transparent shapes. 
+ <li>Extra warning for Boost users about poller_output 
+ <li>if there are actually 0 maps in the database, the 'Weathermaps' tab gives some basic instructions. 
+ <li>Cacti data picker in editor tracks most recently used hosts (thanks Zdolny) 
+ <li>New permission in Cacti: edit maps. Maps can be edited by authorized users without needing to enable the 
+ editor in the source code. 
+
+ </ul> 
+
+ <h2 id="changes097c">Changes For This Version (0.97b to 0.97c)</h2> 
+
+ <p>0.97c had no additional changes - it's just 0.97b with some silly errors fixed, and all 
+ the CSS files included with the correct paths. There were also reports of problems with the 
+ actual zip file. </p> 
+
  <h2 id="changes097b">Changes For This Version (0.97a to 0.97b)</h2> 
  <p>0.97b is a special release starting from 0.97a and backporting all the quick bugfixes from the 0.98 code. 
-There are larger structural changes in 0.98 and new features, but these bugfixes were useful enough to 
-warrant a new 0.97 release (especially the mysql schema change). A real 0.98 release will follow in 
-due course. </p> 
+ There are larger structural changes in 0.98 and new features, but these bugfixes were useful enough to 
+ warrant a new 0.97 release (especially the mysql schema change). A real 0.98 release will follow in 
+ due course. </p> 
  <p>Also late addition to 0.97b - a couple of security analysts have pointed out flaws in the editor. 
-First, the ability to remotely create .php files and then cross-site-scripting vulnerabilities. Both 
-are really facets of the same thing - lack of input validation. 0.97b improves this a great deal. </p> 
+ First, the ability to remotely create .php files and then cross-site-scripting vulnerabilities. Both 
+ are really facets of the same thing - lack of input validation. 0.97b improves this a great deal. </p> 
  <p>Thanks to Gerry Eisenhaur and Daniel Ricardo dos Santos respectively for their security bug reports. </p> 
  <h3>Fixes</h3> 
  <ul> 
@@ -71,7 +142,9 @@ are really facets of the same thing - lack of input validation. 0.97b improves t
  <li>Manual updates for changes in Cacti, and improvements in styling.</li> 
 
  <li>The Cacti UI will warn you about fundamental file permissions problems</li> 
- <li>Moved all PHP that doesn't need to be web-accessible into lib. See <a href="main.html#security">Security notes</a>.</li> 
+ <li>Moved all PHP that doesn't need to be web-accessible into lib. See <a href="main.html#security">Security 
+ notes</a>. 
+ </li> 
  <li>Editor won't deal with config files that don't have a .conf extension</li> 
  <li>General improvements in input validation and output escaping in editor</li> 
  <li>'External Script' datasource plugin is disabled by default in new installs (NOT upgrades though!)</li> 
@@ -92,40 +165,48 @@ are really facets of the same thing - lack of input validation. 0.97b improves t
  <li>Incorrect action URL in 'map selector' combo box for Cacti users.</li> 
 
  <li>cacti_graph_id set to 0 instead of ID, by rrd/poller_output and 
- dsstats plugins (thanks sh0x)</li> 
+ dsstats plugins (thanks sh0x) 
+ </li> 
 
  <li>'classic' legend drew 'hidden' colour values for things like key 
- background colour. (thanks jmayniac)</li> 
+ background colour. (thanks jmayniac) 
+ </li> 
 
  <li>PHP 5.3 deprecated code in HTML_Imagemap.class.php</li> 
 
  <li>'Show Only First' option ignored in Cacti (thanks inko_nick)</li> 
 
  <li>Editor deals with overlapping nodes on different ZORDERS 
- properly.</li> 
+ properly. 
+ </li> 
 
  <li>"property of non-object in editor.php line 466" while editing map 
- properties (thanks to iNeo)</li> 
+ properties (thanks to iNeo) 
+ </li> 
 
- <li>no-data option on command-line didn't work </li> 
+ <li>no-data option on command-line didn't work</li> 
 
- <li>Clone Node was broken in 0.97 </li> 
+ <li>Clone Node was broken in 0.97</li> 
 
  <li>Maps with per-user permissions show up multiple times in map 
- selector</li> 
+ selector 
+ </li> 
 
  <li>Removed incorrect warning about imagefilter and USEICONSCALE.</li> 
 
  <li>string escaping bug with editor and direct config changes (thanks 
- uhtred)</li> 
+ uhtred) 
+ </li> 
 
  <li>--imageuri was ignored on command-line (thanks Marcus Stögbauer)</li> 
 
  <li>links with targets containing spaces are broken by the editor 
- (thanks Andreas Braun)</li> 
+ (thanks Andreas Braun) 
+ </li> 
 
  <li>deprecated jQuery function call in cacti-pick.php (thanks again 
- Andreas Braun)</li> 
+ Andreas Braun) 
+ </li> 
  </ul> 
 
  <h3>Changes</h3> 
@@ -138,10 +219,12 @@ are really facets of the same thing - lack of input validation. 0.97b improves t
  <li>Updated jQuery to latest</li> 
 
  <li>Number formatting will pick 1G over 1000M (and similar) (thanks 
- cerbum)</li> 
+ cerbum) 
+ </li> 
 
  <li>The editor is disabled by default 
- - see top of editor.php (and install guide)</li> 
+ - see top of editor.php (and install guide) 
+ </li> 
  </ul> 
 
  <h3>New Features</h3> 
@@ -170,51 +253,62 @@ are really facets of the same thing - lack of input validation. 0.97b improves t
  <li>Uninitialized variable in ReadData when plugin is disabled</li> 
 
  <li>Zero-length link check didn't include offsets (thanks Ryan 
- Botoluzzi)</li> 
+ Botoluzzi) 
+ </li> 
 
  <li>Cacti-pick should get right rra path for packagers that move the rra 
- directory (e.g. Ubuntu, Debian *again*)</li> 
+ directory (e.g. Ubuntu, Debian *again*) 
+ </li> 
 
  <li>DS plugins that return one value and a null should work properly</li> 
 
  <li>"Strange" characters (e.g. /) in <a href="config-reference.html#NODE_NODE">NODE</a> and <a href="config-reference.html#LINK_LINK">LINK</a> names broke the 
- imagemap.</li> 
+ imagemap. 
+ </li> 
 
  <li>Map Style settings in editor were broken after internal defaults 
- changes</li> 
+ changes 
+ </li> 
 
  <li>Imagemap no longer contains areas with no href defined</li> 
 
  <li><a href="config-reference.html#LINK_SPLITPOS">SPLITPOS</a> was ignored with <a href="config-reference.html#LINK_VIASTYLE">VIASTYLE</a> angled (thanks to uhtred)</li> 
 
  <li><a href="config-reference.html#NODE_COLORS">'AICONOUTLINECOLOR</a> none' is actually valid now (thanks to mgb & 
- Leathon)</li> 
+ Leathon) 
+ </li> 
 
  <li>readdir() loop never stops, on some systems (thanks to 
- jerebernard)</li> 
+ jerebernard) 
+ </li> 
 
  <li>bad regexp in the MRTG DS plugin (thanks to Matt McMahon)</li> 
 
  <li>0.96 had a new 'time' DS plugin - now documented!</li> 
 
  <li>NCFPC only complains about missing scale lines on <a href="config-reference.html#NODE_NODE">NODEs</a> for the 
- variable that is in use.</li> 
+ variable that is in use. 
+ </li> 
  </ul> 
 
  <h3>New Features</h3> 
 
  <ul> 
  <li><a href="config-reference.html#NODE_USEICONSCALE">USEICONSCALE</a> no longer has special dependencies 
- - and the colours are nicer too.</li> 
+ - and the colours are nicer too. 
+ </li> 
 
  <li>Option of a dropdown selector to navigate between maps (in full-size 
- view)</li> 
+ view) 
+ </li> 
 
  <li>Maps can be organised into groups in Cacti plugin. These appear 
- as tabs in the UI for viewing maps.</li> 
+ as tabs in the UI for viewing maps. 
+ </li> 
 
  <li>Extra variables can be defined per-group, so all maps in a group can 
- have similar settings (e.g. a "24hr average" tab).</li> 
+ have similar settings (e.g. a "24hr average" tab). 
+ </li> 
 
  <li><a href="config-reference.html#GLOBAL_INCLUDE">INCLUDE</a> keyword to include a file of common definitions (based on 
  work by BorisL) 
@@ -223,22 +317,27 @@ are really facets of the same thing - lack of input validation. 0.97b improves t
  </li> 
 
  <li>Warning for maps that contain <a href="config-reference.html#LINK_OVERLIBGRAPH">OVERLIBGRAPH</a> but not <a href="config-reference.html#GLOBAL_HTMLSTYLE">'HTMLSTYLE</a> 
- overlib'</li> 
+ overlib' 
+ </li> 
 
  <li>Warning for use of <a href="config-reference.html#LINK_TEMPLATE">TEMPLATE</a> not as the first line of an object 
- (overwrites settings otherwise)</li> 
+ (overwrites settings otherwise) 
+ </li> 
 
  <li><a href="config-reference.html#GLOBAL_SCALE">SCALE</a> will accept values below 0, and also above 100</li> 
 
  <li><a href="config-reference.html#LINK_USESCALE">USESCALE</a> has two new options: absolute and percent, which allows you 
- to have a <a href="config-reference.html#GLOBAL_SCALE">SCALE</a> of absolute values</li> 
+ to have a <a href="config-reference.html#GLOBAL_SCALE">SCALE</a> of absolute values 
+ </li> 
 
  <li>New datasource plugin to support statistics from TheWitness's 
  DSStats Cacti Plugin. This gets you daily,weekly,monthly and annual 
- stats with no complicated rrdtool stuff.</li> 
+ stats with no complicated rrdtool stuff. 
+ </li> 
 
  <li>New converter to take a rrdtool-based map config and make it into a 
- DSStats-based one</li> 
+ DSStats-based one 
+ </li> 
 
  <li>static datasource can be used for negative values</li> 
 
@@ -247,10 +346,12 @@ are really facets of the same thing - lack of input validation. 0.97b improves t
  <li>SNMP datasource has option to give up on a failing host</li> 
 
  <li><a href="config-reference.html#NODE_LABELOFFSET">LABELOFFSET</a> supports percentage compass offsets and radial offsets, 
- like <a href="config-reference.html#LINK_NODES">NODES</a> does.</li> 
+ like <a href="config-reference.html#LINK_NODES">NODES</a> does. 
+ </li> 
 
  <li>Percentage compass offsets <a href="config-reference.html#LINK_NODES">(NODES</a> and <a href="config-reference.html#NODE_LABELOFFSET">LABELOFFSET)</a> support &gt; 100% 
- offsets</li> 
+ offsets 
+ </li> 
  </ul> 
 
  <h2 id="changes096a">Changes For This Version (0.96 to 0.96a)</h2> 
@@ -261,19 +362,24 @@ are really facets of the same thing - lack of input validation. 0.97b improves t
 
  <ul> 
  <li>New z-ordering code did not work correctly on PHP4. This broke (at 
- least) the editor. (thanks toe_cutter)</li> 
+ least) the editor. (thanks toe_cutter) 
+ </li> 
 
  <li> \n is no longer treated as a newline in <a href="config-reference.html#LINK_TARGET">TARGETs</a> (thanks 
- NetAdmin)</li> 
+ NetAdmin) 
+ </li> 
 
  <li> <a href="config-reference.html#GLOBAL_KILO">KILO</a> was broken completely between 0.95b and 0.96 (thanks Jethro 
- Binks)</li> 
+ Binks) 
+ </li> 
 
  <li> Link comments in certain positions could cause div-by-zero errors. 
- (thanks again Jethro)</li> 
+ (thanks again Jethro) 
+ </li> 
 
  <li> <a href="config-reference.html#NODE_USEICONSCALE">USEICONSCALE</a> didn't colorise (broken between 0.95b and 0.96 again) 
- (thanks colejv)</li> 
+ (thanks colejv) 
+ </li> 
 
  <li> Managed to make <a href="config-reference.html#NODE_LABELOFFSET">LABELOFFSET</a> case-sensitive.</li> 
  </ul> 
@@ -286,7 +392,8 @@ are really facets of the same thing - lack of input validation. 0.97b improves t
  <li>Cacti poller_output support works more reliably/at all on Windows</li> 
 
  <li>Renaming a node in the editor correctly handles other 
- relatively-positioned nodes and vias</li> 
+ relatively-positioned nodes and vias 
+ </li> 
 
  <li>Minor issue with CRLF in map title for Cacti Plugin</li> 
 
@@ -299,7 +406,8 @@ are really facets of the same thing - lack of input validation. 0.97b improves t
  <li>DEFAULT <a href="config-reference.html#GLOBAL_SCALE">SCALE</a> covers 0-100 properly (Thanks Dan Fusselman)</li> 
 
  <li>Scaled <a href="config-reference.html#NODE_ICON">ICON</a> in DEFAULT didn't get overwritten properly in nodes 
- (Thanks Fabrizio Carusi)</li> 
+ (Thanks Fabrizio Carusi) 
+ </li> 
 
  <li>No more floating-point imagemap coords (Thanks Trond Aspelund)</li> 
 
@@ -312,7 +420,8 @@ are really facets of the same thing - lack of input validation. 0.97b improves t
  <li>MRTG datasource tried to stat() URLs</li> 
 
  <li>Error reporting for CLI --define was bad. --help text was out of 
- date.</li> 
+ date. 
+ </li> 
 
  <li>Editor will honour <a href="config-reference.html#NODE_LABEL">LABEL</a> from <a href="config-reference.html#NODE_NODE">NODE</a> DEFAULT, if it is set.</li> 
  </ul> 
@@ -321,49 +430,62 @@ are really facets of the same thing - lack of input validation. 0.97b improves t
 
  <ul> 
  <li>Cacti plugin uses "processed" map title now (allows {} tokens in the 
- title)</li> 
+ title) 
+ </li> 
 
  <li>A <a href="config-reference.html#NODE_NODE">NODE</a> with no <a href="config-reference.html#NODE_POSITION">POSITION</a> is not drawn, instead of drawn at 0,0. 
- Useful for templates.</li> 
+ Useful for templates. 
+ </li> 
 
  <li>A <a href="config-reference.html#LINK_LINK">LINK</a> with no <a href="config-reference.html#LINK_NODES">NODES</a> is no longer an error. Also for templates.</li> 
 
  <li>The link_bulge secret mode bulges each side of a link independently 
- now</li> 
+ now 
+ </li> 
 
  <li>whitespace is stripped from the beginning and end of each line 
- before parsing</li> 
+ before parsing 
+ </li> 
  </ul> 
 
  <h3>New Features</h3> 
 
  <ul> 
  <li><a href="config-reference.html#LINK_TEMPLATE">TEMPLATE</a> allows a node or link to copy it's settings from another, 
- instead of from DEFAULT.</li> 
+ instead of from DEFAULT. 
+ </li> 
 
  <li>RRD datasource can take <a href="config-reference.html#GLOBAL_SET">SET</a> rrd_default_path to make configs a 
- little easier to read.</li> 
+ little easier to read. 
+ </li> 
 
  <li>RRD datasource can take <a href="config-reference.html#GLOBAL_SET">SET</a> rrd_default_in_ds and rrd_default_out_ds 
- for non-Cacti users.</li> 
+ for non-Cacti users. 
+ </li> 
 
  <li>RRD datasource can get Cacti query information (in poller_output 
- mode ONLY) - like ifAlias, ifSpeed etc</li> 
+ mode ONLY) - like ifAlias, ifSpeed etc 
+ </li> 
 
  <li>RRD datasource can take the ifSpeed/ifHighSpeed from the above, and 
- use it in the map.</li> 
+ use it in the map. 
+ </li> 
 
  <li>RRD datasource fills in Cacti cacti_path_rra and cacti_url with 
- Cacti base path and URL</li> 
+ Cacti base path and URL 
+ </li> 
 
  <li>RRD datasource can take global <a href="config-reference.html#GLOBAL_SET">SET</a> rrd_options to add extra options 
- to rrdtool command lines</li> 
+ to rrdtool command lines 
+ </li> 
 
  <li>SNMP datasource also stores the raw data from the SNMP agent in 
- snmp_raw_in/snmp_raw_out</li> 
+ snmp_raw_in/snmp_raw_out 
+ </li> 
 
  <li>SNMP datasource allows '-' as an OID, similar to '-' targets in 
- RRDs.</li> 
+ RRDs. 
+ </li> 
 
  <li>Control the drawing order with ZORDER.</li> 
 
@@ -372,40 +494,52 @@ are really facets of the same thing - lack of input validation. 0.97b improves t
  <li>Warning for probably-incorrect <a href="config-reference.html#LINK_BWLABELPOS">BWLABELPOS</a> where in&lt;out</li> 
 
  <li>New global <a href="config-reference.html#GLOBAL_SET">SET</a> variables to disable some common warnings you may not 
- care about :-)</li> 
+ care about :-) 
+ </li> 
 
  <li>Cacti management screen shows number of warnings for each map last 
- time it ran</li> 
+ time it ran 
+ </li> 
 
  <li>Cacti management screen also has a link to the log entries for the 
- map in question</li> 
+ map in question 
+ </li> 
 
  <li>The <a href="config-reference.html#LINK_TARGET">TARGET</a> aggregation thing can also take scale factors now: 
- -5.5*myrrdfile.rrd</li> 
+ -5.5*myrrdfile.rrd 
+ </li> 
 
  <li>Cacti plugin caches thumbnail sizes, improving thumbnail view 
- rendering</li> 
+ rendering 
+ </li> 
 
  <li>Cacti plugin allows adding the same map twice (more useful than it 
- sounds)</li> 
+ sounds) 
+ </li> 
 
  <li>Cacti plugin allows setting of map-global variables in the 
- management UI</li> 
+ management UI 
+ </li> 
 
  <li>Cacti plugin allows settings of global map-global (across all maps) 
- variables too</li> 
+ variables too 
+ </li> 
 
  <li>Cacti plugin adds links in 'user' pages to management screen (if you 
- are an admin)</li> 
+ are an admin) 
+ </li> 
 
  <li><a href="config-reference.html#GLOBAL_HTMLSTYLESHEET">HTMLSTYLESHEET</a> keyword allows you to specify a URL for a CSS 
- stylesheet (CLI tool only)</li> 
+ stylesheet (CLI tool only) 
+ </li> 
 
  <li>A few extra CSS id and class attributes, to make styling the page 
- easier.</li> 
+ easier. 
+ </li> 
 
  <li>New token: in/outscalecolor contains HTML colour code of node/link 
- colours for use in NOTES</li> 
+ colours for use in <a href="config-reference.html#LINK_NOTES">NOTES</a> 
+ </li> 
 
  <li>New <a href="config-reference.html#LINK_NODES">NODES</a> offset type - angle+radius</li> 
 
@@ -414,36 +548,44 @@ are really facets of the same thing - lack of input validation. 0.97b improves t
  <li><a href="config-reference.html#GLOBAL_KEYSTYLE">"KEYSTYLE</a> inverted" - to get a thermometer-style vertical legend.</li> 
 
  <li><a href="config-reference.html#LINK_COMMENTSTYLE">"COMMENTSTYLE</a> center" to make comments run along the centre of a 
- link arrow. (and 'edge' for the usual)</li> 
+ link arrow. (and 'edge' for the usual) 
+ </li> 
 
  <li><a href="config-reference.html#LINK_COLORS">COMMENTFONTCOLOR</a> accepts 'contrast' as an option, for when it's over 
- a link</li> 
+ a link 
+ </li> 
 
  <li><a href="config-reference.html#LINK_VIASTYLE">VIASTYLE</a> angled (or curved) - you can turn sharp corners now</li> 
 
  <li>Comment (and pos) editing in editor (based on code by Zdolny)</li> 
 
  <li>Editor Settings dialog works, and allows you to set grid-snap and 
- some overlays</li> 
+ some overlays 
+ </li> 
 
  <li><a href="config-reference.html#GLOBAL_SCALE">SCALE</a> allows 'none' as a colour (for non-gradients). Only affects 
- <a href="config-reference.html#LINK_LINK">LINKs</a> so far.</li> 
+ <a href="config-reference.html#LINK_LINK">LINKs</a> so far. 
+ </li> 
 
  <li>fping plugin allows for changing the number of pings.</li> 
 
  <li><a href="config-reference.html#LINK_TARGET">TARGET</a> strings can be enclosed in quotes, to allow spaces in them 
- (mainly for external ! scripts)</li> 
+ (mainly for external ! scripts) 
+ </li> 
 
  <li><a href="config-reference.html#GLOBAL_KEYSTYLE">"KEYSTYLE</a> tags" 
- - like classic, but uses the scale tags instead of percentages.</li> 
+ - like classic, but uses the scale tags instead of percentages. 
+ </li> 
 
  <li>scripts in random-bits to help with automatic/assisted mapping.</li> 
 
  <li>lots more pretty pictures in the manual, so you can see what I 
- mean.</li> 
+ mean. 
+ </li> 
 
  <li><a href="config-reference.html#GLOBAL_IMAGEURI">IMAGEURI</a> keyword to match --image-uri command-line option (ignored 
- in Cacti plugin)</li> 
+ in Cacti plugin) 
+ </li> 
 
  <li><a href="config-reference.html#GLOBAL_MINTIMEPOS">MINTIMEPOS</a> and <a href="config-reference.html#GLOBAL_MAXTIMEPOS">MAXTIMEPOS</a> to track data source times</li> 
  </ul> 
@@ -462,7 +604,8 @@ are really facets of the same thing - lack of input validation. 0.97b improves t
  <li><a href="config-reference.html#LINK_ININFOURL">ININFOURL</a> / <a href="config-reference.html#LINK_OUTINFOURL">OUTINFOURL,</a> <a href="config-reference.html#LINK_INOVERLIBGRAPH">INOVERLIBGRAPH</a> 
  / <a href="config-reference.html#LINK_OUTOVERLIBGRAPH">OUTOVERLIBGRAPH</a> are not handled well by the editor. If you edit a map 
  that uses these, then the 'in' side of the link will be copied to the 
- 'out' side. New editor will handle this better.</li> 
+ 'out' side. New editor will handle this better. 
+ </li> 
  </ul> 
 
  <h3>Fixes</h3> 
@@ -473,20 +616,25 @@ are really facets of the same thing - lack of input validation. 0.97b improves t
  <li>Editor doesn't throw away <a href="config-reference.html#GLOBAL_WIDTH">WIDTH</a> and <a href="config-reference.html#GLOBAL_HEIGHT">HEIGHT</a> with no BG image</li> 
 
  <li>Cacti Data-source and Graph picker doesn't restrict scrolling or 
- resizing anymore</li> 
+ resizing anymore 
+ </li> 
 
  <li>weathermap-cacti-rebuild.php to work on both Cacti 0.8.6 and 
- 0.8.7</li> 
+ 0.8.7 
+ </li> 
 
  <li>weathermap-cacti-rebuild.php to flat-out fail if Cacti environment 
- is wrong.</li> 
+ is wrong. 
+ </li> 
 
  <li>SNMP DS plugin had a typo that stopped it working at all (and no-one 
  noticed for almost a year :-) ). (thanks to Fratissier Christophe for 
- pointing it out)</li> 
+ pointing it out) 
+ </li> 
 
  <li>Added some better controls into SNMP DS plugin. You can correctly 
- pull interface oper/admin status, for example, now.</li> 
+ pull interface oper/admin status, for example, now. 
+ </li> 
  </ul> 
 
  <h3>Changes</h3> 
@@ -496,79 +644,98 @@ are really facets of the same thing - lack of input validation. 0.97b improves t
  <strong>(breaks user-developed DS plugins)</strong></li> 
 
  <li>the scale: prefix for the RRD DS plugin can take negative scale 
- factors</li> 
+ factors 
+ </li> 
 
  <li>(internal) plugins are each created as a single object now. Result: 
- the plugin can cache results internally.</li> 
+ the plugin can cache results internally. 
+ </li> 
 
  <li>(internal) broke out some of the larger classes (node, link) into 
- separate files.</li> 
+ separate files. 
+ </li> 
  </ul> 
 
  <h3>New Features</h3> 
 
  <ul> 
  <li>You can add a 'tag' to a <a href="config-reference.html#GLOBAL_SCALE">SCALE</a> line, to be used in <a href="config-reference.html#NODE_ICON">ICON</a> or <a href="config-reference.html#NODE_LABEL">LABELs</a> 
- later.</li> 
+ later. 
+ </li> 
 
  <li><a href="config-reference.html#NODE_USEICONSCALE">USEICONSCALE</a> - colorize icon images (based on patches from llow)</li> 
 
  <li>screenshot mode. <a href="config-reference.html#GLOBAL_SET">"SET</a> screenshot_mode 1" at the top of the map will 
- anonymise all labels, comments and bwlabels.</li> 
+ anonymise all labels, comments and bwlabels. 
+ </li> 
 
  <li><a href="config-reference.html#NODE_COLORS">LABELFONTCOLOR</a> can use a special value of 'contrast' to always 
- contrast with the label colour.</li> 
+ contrast with the label colour. 
+ </li> 
 
  <li>Artificial Icons. Special icon 'filenames' 
  - 'box' 'round' 'rbox' create a shaped icon without any file. See <a href="config-reference.html#NODE_ICON">ICON</a> 
- and <a href="config-reference.html#NODE_COLORS">AICONFILLCOLOR</a> for more.</li> 
+ and <a href="config-reference.html#NODE_COLORS">AICONFILLCOLOR</a> for more. 
+ </li> 
 
  <li>Map titles show up in browser title now.</li> 
 
  <li>a basic 'live view' function which generates a map on demand. 
- Sometimes. It's not very useful.</li> 
+ Sometimes. It's not very useful. 
+ </li> 
 
  <li><a href="config-reference.html#NODE_LABELANGLE">LABELANGLE</a> allows you to rotate node labels to 90,180,270 degrees. 
- Needs truetype font.</li> 
+ Needs truetype font. 
+ </li> 
 
  <li>improved data-source picker in editor: host filter</li> 
 
  <li>improved data-source picker in editor: option to aggregate data 
- sources</li> 
+ sources 
+ </li> 
 
  <li>Moved data-source picker changes across into the graph-picker for 
- <a href="config-reference.html#NODE_NODE">NODEs</a> too.</li> 
+ <a href="config-reference.html#NODE_NODE">NODEs</a> too. 
+ </li> 
 
  <li><a href="config-reference.html#LINK_SPLITPOS">SPLITPOS</a> keyword to control position of midpoint in links</li> 
 
  <li><a href="config-reference.html#LINK_VIA">VIA</a> can be positioned relative to <a href="config-reference.html#NODE_NODE">NODEs</a> (like <a href="config-reference.html#NODE_NODE">NODEs</a> can) (thanks 
- again to llow) </li> 
+ again to llow) 
+ </li> 
 
  <li>Weathermap has a hook in the map viewing page to allow other plugins 
- to add code there</li> 
+ to add code there 
+ </li> 
 
  <li>.htaccess files bundled with Weathermap to restrict direct access to 
- configs and output</li> 
+ configs and output 
+ </li> 
 
  <li>filenames for output are much less guessable now 
  <strong>(may break external references to maps)</strong></li> 
 
  <li>You can use <a href="config-reference.html#LINK_DUPLEX">'DUPLEX</a> half' on a link to make the bandwidth percentage 
- calculate work for half-duplex links</li> 
+ calculate work for half-duplex links 
+ </li> 
 
  <li><a href="config-reference.html#LINK_ININFOURL">ININFOURL</a> / <a href="config-reference.html#LINK_OUTINFOURL">OUTINFOURL,</a> <a href="config-reference.html#LINK_INOVERLIBGRAPH">INOVERLIBGRAPH</a> / <a href="config-reference.html#LINK_OUTOVERLIBGRAPH">OUTOVERLIBGRAPH,</a> <a href="config-reference.html#LINK_INNOTES">INNOTES</a> 
  / <a href="config-reference.html#LINK_OUTNOTES">OUTNOTES,</a> <a href="config-reference.html#LINK_INOVERLIBCAPTION">INOVERLIBCAPTION</a> 
  / <a href="config-reference.html#LINK_OUTOVERLIBCAPTION">OUTOVERLIBCAPTION</a> allow you to have different urls for the in and out 
- side of links (based on idea from llow)</li> 
+ side of links (based on idea from llow) 
+ </li> 
 
  <li><a href="config-reference.html#LINK_OVERLIBGRAPH">OVERLIBGRAPH</a> (and IN/OUT versions) can take multiple URLs separated 
- by spaces (again from idea by llow)</li> 
+ by spaces (again from idea by llow) 
+ </li> 
 
  <li>debug/warning log output contains the map name, and the debug output 
- is marked DEBUG</li> 
+ is marked DEBUG 
+ </li> 
 
  <li>debug log output contains the calling function, file/line number, 
- too. Making debugging-by-mail easier.</li> 
+ too. Making debugging-by-mail easier. 
+ </li> 
 
  <li>fping: <a href="config-reference.html#LINK_TARGET">TARGET</a> to do live pings of devices. See targets.html</li> 
 
@@ -577,7 +744,8 @@ are really facets of the same thing - lack of input validation. 0.97b improves t
  <li>an additional check-gdbug.php to spot bad GD installs</li> 
 
  <li>MRTG DS plugin can do a few new tricks. See <a href="config-reference.html#LINK_TARGET">TARGET</a> and 
- targets.html</li> 
+ <a href="targets.html">targets.html</a> 
+ </li> 
  </ul> 
 
  <h2 id="changes0941">Changes For This Version (0.94 to 0.941)</h2> 
@@ -604,40 +772,48 @@ are really facets of the same thing - lack of input validation. 0.97b improves t
 
  <ul> 
  <li>Finally a better tab image, and a red 'active' one too, for the 
- Cacti plugin.</li> 
+ Cacti plugin. 
+ </li> 
  </ul> 
 
  <h3>New Features</h3> 
 
  <ul> 
  <li><a href="config-reference.html#LINK_INBWFORMAT">INBWFORMAT</a> and <a href="config-reference.html#LINK_OUTBWFORMAT">OUTBWFORMAT</a> allow you to format the text for <a href="config-reference.html#LINK_BWLABEL">BWLABEL,</a> 
- same as for COMMENTs</li> 
+ same as for COMMENTs 
+ </li> 
 
  <li>New cactithold/cactimonitor data source plugin reads data from 
  Cacti's Threshold plugin. (Original development for this plugin was paid 
- for by Stellar Consulting - Thanks!)</li> 
+ for by Stellar Consulting - Thanks!) 
+ </li> 
 
  <li>New <a href="config-reference.html#LINK_LINKSTYLE">LINKSTYLE</a> command allows you to have one-way (one arrow) 
- links.</li> 
+ links. 
+ </li> 
 
  <li>RRD DS can use Cacti's poller_output to get data without running 
  RRDtool at all. (this also means it can work with the Boost plugin for 
  large installations) See 
- <a href = "targets.html">targets.html</a> for more info on this one.</li> 
+ <a href="targets.html">targets.html</a> for more info on this one. 
+ </li> 
 
  <li>Editor 
  - Align horizontal and Align-vertical for links. Calculates link offsets 
- to make link vertical/horizontal.</li> 
+ to make link vertical/horizontal. 
+ </li> 
  </ul> 
 
  <h3>Fixes</h3> 
 
  <ul> 
  <li>"Full Screen Maps" mode in Cacti Plugin was broken by me adding the 
- "View Only First" mode.</li> 
+ "View Only First" mode. 
+ </li> 
 
  <li>Imagemaps for horiz/vert format legend were wrong in editor (thanks 
- to Alex Moura for pointing this out)</li> 
+ to Alex Moura for pointing this out) 
+ </li> 
 
  <li>Changes for compatibility with Cacti 0.8.7's moved config file.</li> 
  </ul> 
@@ -649,49 +825,60 @@ are really facets of the same thing - lack of input validation. 0.97b improves t
  <ul> 
  <li>The auth realm names for Cacti have been changed to match ReportIt 
  and Aggregate 
- - easier to tell who does what (Plugin -&gt; Weathermap: View Maps)</li> 
+ - easier to tell who does what (Plugin -&gt; Weathermap: View Maps) 
+ </li> 
 
  <li>Editor warns about older editor-config.php format now</li> 
 
  <li>Formatted numbers (Mega, Kilo etc) now can include milli, micro and 
- nano (m,u,n).</li> 
+ nano (m,u,n). 
+ </li> 
  </ul> 
 
  <h3>New Features</h3> 
 
  <ul> 
  <li>weathermap-cacti-plugin.php?action=viewmap&amp;id=mapfilename works 
- as well as a map number - useful for crosslinks</li> 
+ as well as a map number - useful for crosslinks 
+ </li> 
 
  <li>Warning for duplicate node or link names</li> 
 
  <li>unique code for each warning message, and a page to explain it on 
- the website. Ugh.</li> 
+ the website. Ugh. 
+ </li> 
 
  <li>warning in editor file-selector so you can tell if the file is 
- read-only</li> 
+ read-only 
+ </li> 
 
  <li>click config filename to edit in editor from Cacti (thanks to 
- streaker69)</li> 
+ streaker69) 
+ </li> 
 
  <li>cactihost: DS plugin fetches a bunch of other stats from Cacti's DB 
- now, too (like availability and response times)</li> 
+ now, too (like availability and response times) 
+ </li> 
 
  <li>Picking Cacti sources from editor has a javascript "live filter" 
- feature now (needs a little work)</li> 
+ feature now (needs a little work) 
+ </li> 
 
  <li>node coordinates are directly editable in the editor now</li> 
 
  <li>File picker allows you to use an existing map as a template</li> 
 
  <li>Editor now allows you to clone a node with all it's styling 
- intact.</li> 
+ intact. 
+ </li> 
 
  <li>When picking coordinates (new node, move node, move timestamp etc), 
- you can see the coordinates</li> 
+ you can see the coordinates 
+ </li> 
 
  <li>Editor toolbar fixed to window, to make it easier to scroll around 
- large maps</li> 
+ large maps 
+ </li> 
 
  <li>RRD Datasource has improved warnings for non-existent DS names</li> 
 
@@ -702,26 +889,32 @@ are really facets of the same thing - lack of input validation. 0.97b improves t
  <li>Docs link in management page too (streaker69)</li> 
 
  <li>Editor has a better warning for unwriteable files and directory 
- now.</li> 
+ now. 
+ </li> 
 
  <li>When you come TO the editor from Cacti, the Change File goes BACK to 
- Cacti</li> 
+ Cacti 
+ </li> 
 
  <li>"Show Only First" mode in Cacti UI 
- - useful for heirarchies of maps with a parent.</li> 
+ - useful for heirarchies of maps with a parent. 
+ </li> 
 
  <li>scale: prefix for RRD datasource 
- - multiply/divide by any value as you read an rrd datasource</li> 
+ - multiply/divide by any value as you read an rrd datasource 
+ </li> 
  </ul> 
 
  <h3>Fixes</h3> 
 
  <ul> 
  <li>RRD doesn't consider DSes other than the ones you named when finding 
- a valid line.</li> 
+ a valid line. 
+ </li> 
 
  <li>editor-generated node names are a bit shorter (and easier to read) 
- now.</li> 
+ now. 
+ </li> 
 
  <li>keyboard focus switches nicely to the popup dialogs now.</li> 
 
@@ -730,7 +923,8 @@ are really facets of the same thing - lack of input validation. 0.97b improves t
  <li><a href="config-reference.html#LINK_COMMENTPOS">COMMENTPOS</a> 0 doesn't kill everything anymore</li> 
 
  <li>OVERLIB would behave incorrectly with PHP4 and relatively positioned 
- nodes (Bernd Ziller)</li> 
+ nodes (Bernd Ziller) 
+ </li> 
 
  <li>Better-validating HTML produced</li> 
 
@@ -739,7 +933,8 @@ are really facets of the same thing - lack of input validation. 0.97b improves t
  <li>divide-by-zero error for some (?) PHP versions in poller</li> 
 
  <li>the key_hidezero secret setting hides the zero in a gradient in a 
- classic scale too.</li> 
+ classic scale too. 
+ </li> 
  </ul> 
 
  <h2 id="changes092">Changes For This Version (0.91 to 0.92)</h2> 
@@ -748,35 +943,41 @@ are really facets of the same thing - lack of input validation. 0.97b improves t
 
  <ul> 
  <li><a href="config-reference.html#LINK_BWSTYLE">BWSTYLE</a> allows you to align the <a href="config-reference.html#LINK_BWLABEL">BWLABEL</a> boxes with their links. 
- Looks nice!</li> 
+ Looks nice! 
+ </li> 
 
  <li><a href="config-reference.html#LINK_COMMENTPOS">COMMENTPOS</a> allows you to move comments, much like <a href="config-reference.html#LINK_BWLABELPOS">BWLABELPOS</a> for 
- BWLABELs</li> 
+ <a href="config-reference.html#LINK_BWLABEL">BWLABELs</a> 
+ </li> 
 
  <li>The editor works the way you'd expect for defaults now.</li> 
 
  <li>The editor does a bunch of clever maths when moving a node that is 
- part of a curved link to make a sensible result (I like this one).</li> 
+ part of a curved link to make a sensible result (I like this one). 
+ </li> 
 
  <li>The editor will let you pick an <a href="config-reference.html#LINK_INFOURL">INFOURL</a> and <a href="config-reference.html#LINK_OVERLIBGRAPH">OVERLIBGRAPH</a> for a <a href="config-reference.html#NODE_NODE">NODE</a> 
- from your Cacti graphs (but not a <a href="config-reference.html#LINK_TARGET">TARGET</a> yet).</li> 
+ from your Cacti graphs (but not a <a href="config-reference.html#LINK_TARGET">TARGET</a> yet). 
+ </li> 
 
  <li>The editor doesn't <em>require</em> an 
  <tt>editor-config.php</tt> anymore, but if you <em>do</em> have one, 
  <strong>make sure it's based on the editor-config.php-dist in this 
- version</strong>. This file has changed.</li> 
+ version</strong>. This file has changed. 
+ </li> 
 
  <li>Secret <a href="config-reference.html#GLOBAL_SET">SET</a> codes: key_hidepercent_<em>scalename</em> and 
  key_hidezero_<em>scalename</em> 
 
- <br /> 
+ <br/> 
 
  You can set these at the top of the config file, for each scale (change 
  <em>scalename</em> to the scale name). 
  <tt><a href="config-reference.html#GLOBAL_SET">SET</a> key_hidezero_DEFAULT 1</tt> hides the 0-&gt;0 line if there is 
  one, in a 'classic' style legend for that scale. 
  <tt><a href="config-reference.html#GLOBAL_SET">SET</a> key_hidepercent_scalename 1</tt> hides the percentage signs in 
- the 'classic' style legend for that scale.</li> 
+ the 'classic' style legend for that scale. 
+ </li> 
  </ul> 
 
  <h3>Fixes</h3> 
@@ -785,13 +986,16 @@ are really facets of the same thing - lack of input validation. 0.97b improves t
  <li><a href="config-reference.html#GLOBAL_SET">SET</a> in a DEFAULT node or link wasn't inherited properly.</li> 
 
  <li>weathermap.conf is a simple map again. I accidentally packaged my 
- test map for 0.9 and 0.91</li> 
+ test map for 0.9 and 0.91 
+ </li> 
 
  <li>Any unreadable files in the configs/ directory would kill the 
- editor</li> 
+ editor 
+ </li> 
 
  <li>One PHP short_tag remained, which upsets some PHP installs (seems to 
- be mainly Windows)</li> 
+ be mainly Windows) 
+ </li> 
  </ul> 
 
  <h2 id="changes091">Changes For This Version (0.9 to 0.91)</h2> 
@@ -806,7 +1010,8 @@ are really facets of the same thing - lack of input validation. 0.97b improves t
  <ul> 
  <li>'Quiet Mode' Logging 
  - in the Cacti plugin, there is a new setting to make Weathermap log 
- <em>only</em> errors in the standard 'LOW' logging setting.</li> 
+ <em>only</em> errors in the standard 'LOW' logging setting. 
+ </li> 
 
  <li>Subtractive Aggregation 
  - if one of the clauses in a <a href="config-reference.html#LINK_TARGET">TARGET</a> line begins with a '-', then that 
@@ -815,12 +1020,14 @@ are really facets of the same thing - lack of input validation. 0.97b improves t
  Netscreen firewalls don't give per-policy bandwidth stats, so to find 
  out how much traffic is going to the internet, and how much to a VPN, 
  you can start with the total interface traffic, and take out the VPN 
- traffic (which you can measure), to leave the Internet traffic.</li> 
+ traffic (which you can measure), to leave the Internet traffic. 
+ </li> 
 
  <li>There is a new 
  <em>check.php</em> script, that verifies some basic requirements of your 
  PHP installation. It's mainly useful during installation, so it's 
- described in the installation instructions.</li> 
+ described in the installation instructions. 
+ </li> 
 
  <li>A couple of additional variables are available in the 'special 
  string tokens' 
@@ -828,35 +1035,41 @@ are really facets of the same thing - lack of input validation. 0.97b improves t
  line that was triggered for the 'in' and 'out' values of a map object. 
  You can use this to do some things like changing icons based on a value, 
  without needing to write a plugin yourself. It's pretty obscure, but 
- could be handy.</li> 
+ could be handy. 
+ </li> 
  </ul> 
 
  <h3>Fixes</h3> 
 
  <ul> 
  <li>RRD bug with '-' DS names. This was fixed in 0.9pre3, but somehow 
- slipped through.</li> 
+ slipped through. 
+ </li> 
 
  <li>ReadConfig doesn't complain about <a href="config-reference.html#GLOBAL_KEYPOS">KEYPOS</a> DEFAULT -1 -1 (as written 
- by WriteConfig) anymore</li> 
+ by WriteConfig) anymore 
+ </li> 
 
  <li>The MRTG plugin made some assumptions that broke handling of MRTG 
- html files on remote systems. It doesn't now.</li> 
+ html files on remote systems. It doesn't now. 
+ </li> 
 
  <li><a href="config-reference.html#LINK_NOTES">NOTES</a> was not fully tested, and broke cactihost: targets, at 
- least.</li> 
+ least. 
+ </li> 
 
  <li><a href="config-reference.html#GLOBAL_KILO">KILO</a> was broken - fixed now.</li> 
 
  <li><a href="config-reference.html#LINK_BWLABELPOS">BWLABELPOS</a> was handled badly by the editor 
- - it would swap them over</li> 
+ - it would swap them over 
+ </li> 
  </ul> 
 
  <h2 id="changes09">Changes For This Version (0.82 to 0.9)</h2> 
 
  <p>I've divided the changes up into chunks. Most of the serious work was 
  done in the 
- <a href = "#structural">Structural Changes</a> section, but there are plenty 
+ <a href="#structural">Structural Changes</a> section, but there are plenty 
  of things for everyone. These are brief descriptions 
  - see the Config Reference for the full detail. I've mentioned the 
  appropriate configuration keywords if there are any. </p> 
@@ -914,7 +1127,6 @@ are really facets of the same thing - lack of input validation. 0.97b improves t
  now. </p> 
 
 
-
  <h3 id="structural">Structural Changes</h3> 
 
  <p>The internal structure of Weathermap has changed quite a lot in this 
@@ -931,13 +1143,16 @@ are really facets of the same thing - lack of input validation. 0.97b improves t
  <ul> 
  <li><strong>static</strong> 
  - if you need to fix a data value, you can do it without an external 
- text file.</li> 
+ text file. 
+ </li> 
 
  <li><strong>cactihost</strong> 
- - read the up/down status of a host in Cacti</li> 
+ - read the up/down status of a host in Cacti 
+ </li> 
 
  <li><strong>gauge</strong> 
- - Read RRD values without any special treatment.</li> 
+ - Read RRD values without any special treatment. 
+ </li> 
  </ul> 
 
  <p>The RRD plugin also has some improvements in dealing with error 
@@ -974,7 +1189,8 @@ are really facets of the same thing - lack of input validation. 0.97b improves t
  <li>Add extra <a href="config-reference.html#NODE_NODE">"sub-NODEs"</a> around a <a href="config-reference.html#NODE_NODE">NODE,</a> with addional information</li> 
 
  <li>Use generic <a href="config-reference.html#LINK_TARGET">TARGET,</a> <a href="config-reference.html#LINK_INFOURL">INFOURL,</a> <a href="config-reference.html#LINK_OVERLIBGRAPH">OVERLIBGRAPH</a> lines in the DEFAULT link 
- and node</li> 
+ and node 
+ </li> 
  </ul> 
 
  <h4>Arbitrary Parameters</h4> 
@@ -1023,13 +1239,16 @@ are really facets of the same thing - lack of input validation. 0.97b improves t
 
  <ul> 
  <li>Wierd bug in HTML_ImageMap if you have a lot of similarly-named 
- <a href="config-reference.html#NODE_NODE">NODEs</a> or LINKs.</li> 
+ <a href="config-reference.html#NODE_NODE">NODEs</a> or <a href="config-reference.html#LINK_LINK">LINKs.</a> 
+ </li> 
 
  <li>Floating-point limits in <a href="config-reference.html#GLOBAL_SCALE">SCALEs</a> work correctly now. Also, you can 
- specify a 0-0 <a href="config-reference.html#GLOBAL_SCALE">SCALE</a> line and it will always take precedence.</li> 
+ specify a 0-0 <a href="config-reference.html#GLOBAL_SCALE">SCALE</a> line and it will always take precedence. 
+ </li> 
 
  <li>Cacti plugin doesn't assume 'admin' user always exists, and that 
- users are never deleted.</li> 
+ users are never deleted. 
+ </li> 
 
  <li>Cacti plugin's Cycle mode works in IE now.</li> 
 
@@ -1042,7 +1261,8 @@ are really facets of the same thing - lack of input validation. 0.97b improves t
  <li>Editor deals properly with pathnames containing '\' on Windows.</li> 
 
  <li>Editor lets you pick JPG and GIF images too, since we now support 
- them</li> 
+ them 
+ </li> 
 
  <li>Close-together nodes don't crash the curve-drawing anymore</li> 
  </ul> 

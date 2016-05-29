@@ -3,7 +3,7 @@ working with newer MySQL or PHP versions. There is a more substantial 1.0 releas
 any simple improvements or fixes to 0.98(abcd) releases. There are also small usability changes aimed at reducing
 repeat "error reports" in the forums.
 
-IMPORTANT NOTE - you will need to reset permissions on your users after upgrading, as I've
+IMPORTANT NOTE - you may need to reset permissions on your users after upgrading, as I've
 finally switched to the "new-style" plugin API that's been around for 5+ years. This handles
 permissions differently, unfortunately.
 
@@ -21,7 +21,7 @@ permissions differently, unfortunately.
     CHANGE - Finally switch to "new-style" plugin API.
     CHANGE - Editor data picker improved sort (thanks shd)
     CHANGE - (Cacti plugin only) images are written to a temporary file first, to avoid displaying half-written images
-    CHANGE - if there are actually 0 maps in the database, the 'Weathermaps' tab gives some basic instructions.
+    CHANGE - Editor no longer uses editor-config.php
     ADDED - Weathermap will use anti-aliasing if your GD supports it (php-bundled GD doesn't) (thanks shd)
     ADDED - Special token formatting can handle timeticks and time_t formatting (%T and %t respectively)
     ADDED - new DATAOUTPUTFILE allows collected data to be written to a file for later use (automatically enabled in Cacti)
@@ -33,6 +33,7 @@ permissions differently, unfortunately.
     ADDED - command-line weathermap has new --no-warn option to disable warnings
     ADDED - AICONFILLCOLOR accepts 'none' for drawing giant transparent shapes.
     ADDED - Extra warning for Boost users about poller_output
+    ADDED - if there are actually 0 maps in the database, the 'Weathermaps' tab gives some basic instructions.
     ADDED - Cacti data picker in editor tracks most recently used hosts (thanks Zdolny)
     ADDED - New permission in Cacti: edit maps. Maps can be edited by authorized users without needing to enable the editor in the source code.
 

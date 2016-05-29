@@ -166,33 +166,17 @@ the extra permissions that should appear there now, to either View Weathermaps (
             new files, and change existing files in the configs folder.</p>
             </p>
 
-            <p>Since version 0.97, you now also need to enable the editor. The reason is
-            so that you can't have the editor enabled without knowing about it. The
-            editor allows access to your config files without authentication (it doesn't
-            use Cacti's authentication), so you should consider using features in your
-            webserver to limit who can access
-            <tt>editor.php</tt>. For example, on an Apache server, something like:
+            <p>Since version 0.98, you no longer need to edit the editor.php to enable it unless
+            you want to use the editor outside of Cacti. Otherwise, you can edit existing maps
+            by clicking on their name in the list of maps in the Cacti Manage..Weathermaps page, or
+            by clicking the 'Weathermap Editor' link at the bottom of the page to create new
+            maps or edit maps not currently being used.</p>
+<p>You will need to have the Cacti permission 'Edit Weathermaps' to be able to do this.</p>
 
-            <pre>
-                            &lt;Directory /var/www/html/cacti/plugins/weathermap&gt;
-                                &lt;Files editor.php&gt;
-                                    Order Deny,Allow
-                                    Deny from all
-                                    Allow from 127.0.0.1
-                                &lt;/FilesMatch&gt;
-                            &lt;/Directory&gt;
-            </pre>
-            When you are happy that the world can't edit your maps, then enable the
-            editor. This is done by editing the top of editor.php and changing
-            <code>$ENABLED=false;</code> to <code>$ENABLED=true;</code></p>
-
-            <p>
-            You should now be able to go to
-            http://your.server/cacti/plugins/weathermap/editor.php in a browser, and get
-            a welcome page that offers to load or create a config file. That's it. All
-            done. Please see the
+            <p>Please see the
             <a href = "editor.html">editor manual page</a> for more about
-            <i>using</i> the editor!
+            <i>using</i> the editor! And check the '<a href="install-cli-editor.html">CLI Editor installation</a>' page for information
+                about using the editor without Cacti integration.
             </p>
 
             <p>You can also edit an existing map from the Cacti web interface, by
@@ -203,9 +187,9 @@ the extra permissions that should appear there now, to either View Weathermaps (
             <strong>Important Security Note:</strong> The editor allows
             <i>anyone</i> who can access editor.php to change the configuration files
             for your network weathermaps. There is no authentication built-in for
-            editing, even with the Cacti Plugin. This is why the configuration file
-            doesn't exist by default
-            - the editor won't work until you choose to make it work. It's recommended
+            editing, except with the Cacti Plugin. This is why direct access to the
+                editor is disabled by default
+            - the editor won't work until you choose to make it work, or give permissions in Cacti. It's recommended
             that you either:
 
             <ul><li>change the ownership of configuration files so that the editor can't

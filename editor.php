@@ -14,10 +14,15 @@ $ENABLED=false;
 if (isset($FROM_CACTI) && $FROM_CACTI == true) {
     $ENABLED = true;
 	$editor_name = "weathermap-cacti-plugin-editor.php";
-
+	$cacti_base = $config["base_path"];
+	$cacti_url = $config['url_path'];
+	$cacti_found = true;
 } else {
     $FROM_CACTI = false;
 	$editor_name = "editor.php";
+	$cacti_base = '../../';
+	$cacti_url = '/';
+	$cacti_found = false;
 }
 
 if(! $ENABLED)
@@ -29,12 +34,8 @@ if(! $ENABLED)
 
 // sensible defaults
 $mapdir='configs';
-$cacti_base = '../../';
-$cacti_url = '/';
 $ignore_cacti=FALSE;
 $configerror = '';
-
-$config_loaded = @include_once 'editor-config.php';
 
 // these are all set via the Editor Settings dialog, in the editor, now.
 $use_overlay = FALSE; // set to TRUE to enable experimental overlay showing VIAs
@@ -50,10 +51,7 @@ if( isset($_COOKIE['wmeditor']))
     if( (isset($parts[2])) && (intval($parts[2]) != 0) ) { $grid_snap_value = intval($parts[2]); }   
 }
 
-if( isset($config) )
-{
-    $configerror = 'OLD editor config file format. The format of this file changed in version 0.92 - please check the new editor-config.php-dist and update your editor-config.php file. [WMEDIT02]';
-}
+if ($FROM_CACTI==false) {
 
 // check if the goalposts have moved
 if( is_dir($cacti_base) && file_exists($cacti_base."/include/global.php") )
@@ -75,18 +73,15 @@ else
 {
 	$cacti_found = FALSE;
 }
-
-if($cacti_found && isset($plugins))
-{
-	# here, we know we're part of a plugin - do auth stuff
-}
-
-if(! is_writable($mapdir))
-{
-	$configerror = "The map config directory is not writable by the web server user. You will not be able to edit any files until this is corrected. [WMEDIT01]";
 }
 
 chdir(dirname(__FILE__));
+
+if(! is_writable($mapdir))
+{
+	$configerror = "The map config directory ($mapdir) is not writable by the web server user. You will not be able to edit any files until this is corrected. [WMEDIT01]";
+}
+
 
 $action = '';
 $mapname = '';

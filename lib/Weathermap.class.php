@@ -3766,16 +3766,20 @@ function SortedImagemap($imagemapname)
                         foreach($z_items as $it)
                         {
                                 # print "     " . $it->name . "\n";
-                                if($it->name != 'DEFAULT' && $it->name != ":: DEFAULT ::")
-                                {
-                                        $name = "";
-                                        if(strtolower(get_class($it))=='weathermaplink') $name = "LINK:L";
-                                        if(strtolower(get_class($it))=='weathermapnode') $name = "NODE:N";
-                                        $name .= $it->id . ":";
-                                        wm_debug("      Writing $name from imagemap\n");
-                                        // skip the linkless areas if we are in the editor - they're redundant
-                                        $html .= $this->imap->subHTML($name,true,($this->context != 'editor'));
-                                }
+							if ($it->name != 'DEFAULT' && $it->name != ":: DEFAULT ::") {
+								$name = "";
+								$class_lower = strtolower(get_class($it));
+								if ($class_lower == 'weathermaplink') {
+									$name = "LINK:L";
+								}
+								if ($class_lower == 'weathermapnode') {
+									$name = "NODE:N";
+								}
+								$name .= $it->id . ":";
+								wm_debug("      Writing $name from imagemap\n");
+								// skip the linkless areas if we are in the editor - they're redundant
+								$html .= $this->imap->subHTML($name, true, ($this->context != 'editor'));
+							}
                         }
                 }
         }

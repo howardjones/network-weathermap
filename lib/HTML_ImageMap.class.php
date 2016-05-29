@@ -300,22 +300,18 @@ class HTML_ImageMap
 	function setProp($which, $what, $where)
 	{
 		$count = 0;
-		$shape_count = count($this->shapes);
-		for($i=0; $i< $shape_count; $i++)
-		{
+		foreach ($this->shapes as $shape) {
 			// this USED to be a substring match, but that broke some things
 			// and wasn't actually used as one anywhere.
-			if( ($where == "") || ( $this->shapes[$i]->name==$where) )
-			{
-				switch($which)
-				{
-				case 'href':
-					$this->shapes[$i]->href= $what;
-					break;
-				case 'extrahtml':
-					$this->shapes[$i]->extrahtml= $what;
-					#print "IMAGEMAP: Found $where and adding $which\n";
-					break;
+			if (($where == "") || ($shape->name == $where)) {
+				switch ($which) {
+					case 'href':
+						$shape->href = $what;
+						break;
+					case 'extrahtml':
+						$shape->extrahtml = $what;
+						#print "IMAGEMAP: Found $where and adding $which\n";
+						break;
 				}
 				$count++;
 			}
@@ -323,32 +319,27 @@ class HTML_ImageMap
 		return $count;
 	}
 
-        // update a property on all elements in the map that match a name as a substring
-        // (use it for retro-actively adding in link information to a pre-built geometry before generating HTML)
-        // returns the number of elements that were matched/changed
-        function setPropSub($which, $what, $where)
-        {
-
-                $count = 0;
-			$shape_count = count($this->shapes);
-			for($i=0; $i< $shape_count; $i++)
-                {
-                        if( ($where == "") || ( strstr($this->shapes[$i]->name,$where)!=FALSE ) )
-                        {
-                                switch($which)
-                                {
-                                case 'href':
-                                        $this->shapes[$i]->href= $what;
-                                        break;
-                                case 'extrahtml':
-                                        $this->shapes[$i]->extrahtml= $what;
-                                        break;
-                                }
-                                $count++;
-                        }
-                }
-                return $count;
-        }
+	// update a property on all elements in the map that match a name as a substring
+	// (use it for retro-actively adding in link information to a pre-built geometry before generating HTML)
+	// returns the number of elements that were matched/changed
+	function setPropSub($which, $what, $where)
+	{
+		$count = 0;
+		foreach ($this->shapes as $shape) {
+			if (($where == "") || (strstr($shape->name, $where) != false)) {
+				switch ($which) {
+					case 'href':
+						$shape->href = $what;
+						break;
+					case 'extrahtml':
+						$shape->extrahtml = $what;
+						break;
+				}
+				$count++;
+			}
+		}
+		return $count;
+	}
 
 	// Return the imagemap as an HTML client-side imagemap for inclusion in a page
 	function asHTML()
@@ -401,12 +392,10 @@ class HTML_ImageMap
 	function subHTML($namefilter="",$reverseorder=false, $skipnolinks=false)
 	{
 		$html = "";
-		$preg = '/'.$namefilter.'/';
-		
+
 		foreach ($this->shapes as $shape)
 		{
-			# if( ($namefilter == "") || ( preg_match($preg,$shape->name) ))
-			if( ($namefilter == "") || ( strstr($shape->name, $namefilter) !== FALSE ))
+			if( ($namefilter == "") || ( strpos($shape->name, $namefilter) === 0))
 			{
 				if(!$skipnolinks || $shape->href != "" || $shape->extrahtml != "" )
 				{

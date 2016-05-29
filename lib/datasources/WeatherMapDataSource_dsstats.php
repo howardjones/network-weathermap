@@ -80,7 +80,8 @@ class WeatherMapDataSource_dsstats extends WeatherMapDataSource {
 	function ReadData($targetstring, &$map, &$item)
 	{
 		global $config;
-		
+
+		$local_data_id = NULL;
 		$dsnames[IN] = "traffic_in";
 		$dsnames[OUT] = "traffic_out";
 		$data[IN] = NULL;
@@ -193,8 +194,12 @@ class WeatherMapDataSource_dsstats extends WeatherMapDataSource {
 		}
 
 		// fill all that other information (ifSpeed, etc)
-		if($local_data_id>0) UpdateCactiData($item, $local_data_id);
-		
+		// (but only if it's not switched off!)
+		if (($map->get_hint("dsstats_no_cacti_extras") === null) && $local_data_id > 0) {
+			UpdateCactiData($item, $local_data_id);
+		}
+
+
 		wm_debug ("DSStats ReadData: Returning (".($data[IN]===NULL?'NULL':$data[IN]).",".($data[OUT]===NULL?'NULL':$data[OUT]).",$data_time)\n");
 		
 		return( array($data[IN], $data[OUT], $data_time) );

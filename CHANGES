@@ -8,7 +8,8 @@ finally switched to the "new-style" plugin API that's been around for 5+ years. 
 permissions differently, unfortunately.
 
 0.98a
-
+    CHANGE - Various performance improvements (thanks to xx)
+    CHANGE - dsstats data plugin can skip looking up additional Cacti data by setting dsstats_no_cacti_extras
 
 0.98
     FIXED - MySQL error in table-creation. MySQL 5.6 is fussier.

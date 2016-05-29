@@ -302,20 +302,20 @@ class HTML_ImageMap
 	function setProp($which, $what, $where)
 	{
 		$count = 0;
-		foreach ($this->shapes as $shape) {
+
+		if (true === isset($this->shapes[$where])) {
 			// this USED to be a substring match, but that broke some things
 			// and wasn't actually used as one anywhere.
-			if (($where == "") || ($shape->name == $where)) {
-				switch ($which) {
-					case 'href':
-						$shape->href = $what;
-						break;
-					case 'extrahtml':
-						$shape->extrahtml = $what;
-						#print "IMAGEMAP: Found $where and adding $which\n";
-						break;
-				}
-				$count++;
+			switch ($which) {
+				case 'href':
+					$this->shapes[$where]->href = $what;
+					$count++;
+					break;
+
+				case 'extrahtml':
+					$this->shapes[$where]->extrahtml = $what;
+					$count++;
+					break;
 			}
 		}
 		return $count;

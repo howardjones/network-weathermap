@@ -3519,35 +3519,34 @@ function PreloadMapHTML()
 
 				$dirs = array();
 				//print "\n\nConsidering a $type - ".$myobj->name.".\n";
-				if($type == 'LINK') $dirs = array(IN=>array(0,2), OUT=>array(1,3));
-				if($type == 'NODE') $dirs = array(IN=>array(0,1,2,3));
-				
-				// check to see if any of the relevant things have a value
-				$change = "";
-				foreach ($dirs as $d=>$parts)
-				{
-					//print "$d - ".join(" ",$parts)."\n";
-					$change .= join('',$myobj->overliburl[$d]);
-					$change .= $myobj->notestext[$d];
-				}
-				
+				if ($type == 'LINK') $dirs = array(IN=>array(0,2), OUT=>array(1,3));
+				if ($type == 'NODE') $dirs = array(IN=>array(0,1,2,3));
+
 				if ($this->htmlstyle == "overlib")
 				{
+					// check to see if any of the relevant things have a value
+					$change = "";
+					foreach ($dirs as $d => $parts) {
+						//print "$d - ".join(" ",$parts)."\n";
+						$change .= join('', $myobj->overliburl[$d]);
+						$change .= $myobj->notestext[$d];
+					}
+
 					//print "CHANGE: $change\n";
 
 					// skip all this if it's a template node
-					if($type=='LINK' && ! isset($myobj->a->name)) { $change = ''; }
-					if($type=='NODE' && ! isset($myobj->x)) { $change = ''; }
+					if ($type=='LINK' && ! isset($myobj->a->name)) { $change = ''; }
+					if ($type=='NODE' && ! isset($myobj->x)) { $change = ''; }
 
-					if($change != '')
+					if ($change != '')
 					{
 						//print "Something to be done.\n";
-						if($type=='NODE')
+						if ($type=='NODE')
 						{
 							$mid_x = $myobj->x;
 							$mid_y = $myobj->y;
 						}
-						if($type=='LINK')
+						if ($type=='LINK')
 						{
 							$a_x = $this->nodes[$myobj->a->name]->x;
 							$a_y = $this->nodes[$myobj->a->name]->y;
@@ -3625,17 +3624,11 @@ function PreloadMapHTML()
 				{
 					foreach ($parts as $part)
 					{
-						# $areaname = $type.":" . $myobj->name . ":" . $part;
 						$areaname = $type.":" . $prefix . $myobj->id. ":" . $part;
-						//print "INFOURL for $areaname - ";
-												
-						if ( ($this->htmlstyle != 'editor') && ($myobj->infourl[$dir] != '') ) {
-							$this->imap->setProp("href", $this->ProcessString($myobj->infourl[$dir],$myobj), $areaname);
-							//print "Setting.\n";
-						}
-						else
-						{
-							//print "NOT Setting.\n";
+
+						if (($this->htmlstyle != 'editor') && ($myobj->infourl[$dir] != '')) {
+							$this->imap->setProp("href", $this->ProcessString($myobj->infourl[$dir], $myobj),
+								$areaname);
 						}
 					}
 				}

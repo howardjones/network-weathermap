@@ -245,6 +245,7 @@ class HTML_ImageMap
 	var $shapes;
 	var $nshapes;
 	var $name;
+	var $shapetree;
 
 	function HTML_ImageMap($name="")
 	{
@@ -255,6 +256,7 @@ class HTML_ImageMap
 	function Reset()
 	{
 		$this->shapes = array();
+		$this->shapetree = array();
 		$this->nshapes = 0;
 		$this->name = "";
 	}
@@ -270,7 +272,7 @@ class HTML_ImageMap
 			$elementObject = new $className($args[1],$args[2],array_slice($args, 3));
 		}
 
-		$this->shapes[] =& $elementObject;
+		$this->shapes[$elementObject->name] = &$elementObject;
 		$this->nshapes++;
 		//      print $this->nshapes." shapes\n";
 	}
@@ -360,59 +362,75 @@ class HTML_ImageMap
 		return $html;
 	}
 
-	function subJSON($namefilter="",$reverseorder=false)
+	function subJSON($namefilter = "", $reverseorder = false)
 	{
 		$json = '';
 
-		$preg = '/'.$namefilter.'/';
-		foreach ($this->shapes as $shape)
-		{
-			if( ($namefilter == "") || ( preg_match($preg,$shape->name) ))
-			{
-				if($reverseorder)
-				{
-					$json = $shape->asJSON().",\n".$json;
-				}
-				else
-				{
-					$json .= $shape->asJSON().",\n";
+		$preg = '/' . $namefilter . '/';
+		foreach ($this->shapes as $shape) {
+			if (($namefilter == "") || (preg_match($preg, $shape->name))) {
+				if ($reverseorder) {
+					$json = $shape->asJSON() . ",\n" . $json;
+				} else {
+					$json .= $shape->asJSON() . ",\n";
 				}
 			}
 		}
-		$json = rtrim($json,"\n, ");
+		$json = rtrim($json, "\n, ");
 		$json .= "\n";
 
 		return $json;
 	}
 
 	// return HTML for a subset of the map, specified by the filter string
-	// (suppose you want some partof your UI to have precedence over another part
-	//  - the imagemap is checked from top-to-bottom in the HTML)
+	// (suppose you want some part of your UI to have precedence over another part
+	// - the imagemap is checked from top-to-bottom in the HTML)
 	// - skipnolinks -> in normal HTML output, we don't need areas for things with no href
-	function subHTML($namefilter="",$reverseorder=false, $skipnolinks=false)
+	// - reverseorder -> produce the map in the opposite order to the order the items were created
+	function subHTML($namefilter = "", $reverseorder = false, $skipnolinks = false)
 	{
 		$html = "";
 
-		foreach ($this->shapes as $shape)
-		{
-			if( ($namefilter == "") || ( strpos($shape->name, $namefilter) === 0))
-			{
-				if(!$skipnolinks || $shape->href != "" || $shape->extrahtml != "" )
-				{
-					if($reverseorder)
-					{
-						$html = $shape->asHTML()."\n".$html;
-					}
-					else
-					{
-						$html .= $shape->asHTML()."\n";
+		$n = 0;
+		$i = 0;
+		foreach ($this->shapes as $shape) {
+			$i++;
+			if (($namefilter == "") || (strpos($shape->name, $namefilter) === 0)) {
+				if ($shape->href != "" || !$skipnolinks || $shape->extrahtml != "") {
+					$n++;
+					if ($reverseorder) {
+						$html = $shape->asHTML() . "\n" . $html;
+					} else {
+						$html .= $shape->asHTML() . "\n";
 					}
 				}
 
 			}
 		}
+		print "$namefilter $n of $i\n";
 		return $html;
 	}
+
+	function exactHTML($name = '', $reverseorder = false, $skipnolinks = false)
+	{
+		$html = '';
+		$shape = $this->shapes[$name];
+
+		if (true === isset($shape)) {
+			if ((false === $skipnolinks) || ($shape->href !== '')
+				|| ($shape->extrahtml !== '')
+			) {
+				if ($reverseorder === true) {
+					$html = $shape->asHTML() . "\n" . $html;
+				} else {
+					$html .= $shape->asHTML() . "\n";
+				}
+			}
+		}
+
+		return $html;
+	}
+
 
 }
 // vim:ts=4:sw=4:

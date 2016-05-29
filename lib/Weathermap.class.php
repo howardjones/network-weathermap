@@ -113,6 +113,7 @@ class WeatherMapBase
 	var $notes = array();
 	var $hints = array();
 	var $inherit_fieldlist;
+	var $imap_areas = array ();
 
 	function add_note($name,$value)
 	{
@@ -1144,6 +1145,7 @@ function DrawLabelRotated($im, $x, $y, $angle, $text, $font, $padding, $linkname
 		$map->imap->addArea("Polygon", $areaname, '', $points);
 		wm_debug ("Adding Poly imagemap for $areaname\n");
 	}
+	$this->links[$linkname]->imap_areas[] = $areaname;
 
 }
 
@@ -1378,8 +1380,10 @@ function DrawLegend_Horizontal($im,$scalename="DEFAULT",$width=400)
     $rx = $this->keyx[$scalename];
     $ry = $this->keyy[$scalename];
 
-	$this->imap->addArea("Rectangle", "LEGEND:$scalename", '',
+	$areaname = "LEGEND:$scalename";
+	$this->imap->addArea("Rectangle", $areaname, '',
 		array($rx+$box_left, $ry+$box_top, $rx+$box_right, $ry+$box_bottom));
+	$this->imap_areas[] = $areaname;
 }
 
 function DrawLegend_Vertical($im,$scalename="DEFAULT",$height=400,$inverted=false)
@@ -1482,8 +1486,10 @@ function DrawLegend_Vertical($im,$scalename="DEFAULT",$height=400,$inverted=fals
 
 	$rx = $this->keyx[$scalename];
 	$ry = $this->keyy[$scalename];
-	$this->imap->addArea("Rectangle", "LEGEND:$scalename", '',
+	$areaname = "LEGEND:$scalename";
+	$this->imap->addArea("Rectangle", $areaname, '',
 		array($rx+$box_left, $ry+$box_top, $rx+$box_right, $ry+$box_bottom));
+	$this->imap_areas[] = $areaname;
 }
 
 function DrawLegend_Classic($im,$scalename="DEFAULT",$use_tags=FALSE)
@@ -1653,10 +1659,12 @@ function DrawLegend_Classic($im,$scalename="DEFAULT",$use_tags=FALSE)
 			}
 		}
 
-		$this->imap->addArea("Rectangle", "LEGEND:$scalename", '',
+		$areaname = "LEGEND:$scalename";
+		$this->imap->addArea("Rectangle", $areaname, '',
 			array($this->keyx[$scalename], $this->keyy[$scalename], $this->keyx[$scalename] + $boxwidth, $this->keyy[$scalename] + $boxheight));
 		# $this->imap->setProp("href","#","LEGEND");
 		# $this->imap->setProp("extrahtml","onclick=\"position_legend();\"","LEGEND");
+		$this->imap_areas[] = $areaname;
 
 	}
 }
@@ -1698,7 +1706,9 @@ function DrawTimestamp($im, $font, $colour, $which="")
 	}
 		
 	$this->myimagestring($im, $font, $x, $y, $stamp, $colour);
-	$this->imap->addArea("Rectangle", $which."TIMESTAMP", '', array($x, $y, $x + $boxwidth, $y - $boxheight));
+	$areaname = $which . "TIMESTAMP";
+	$this->imap->addArea("Rectangle", $areaname, '', array($x, $y, $x + $boxwidth, $y - $boxheight));
+	$this->imap_areas[] = $areaname;
 }
 
 function DrawTitle($im, $font, $colour)
@@ -1721,6 +1731,7 @@ function DrawTitle($im, $font, $colour)
 	$this->myimagestring($im, $font, $x, $y, $string, $colour);
 
 	$this->imap->addArea("Rectangle", "TITLE", '', array($x, $y, $x + $boxwidth, $y - $boxheight));
+	$this->imap_areas[] = 'TITLE';
 }
 
 function ReadConfig($input, $is_include=FALSE)
@@ -3252,7 +3263,9 @@ function DrawMap($filename = '', $thumbnailfile = '', $thumbnailmax = 250, $with
 			{
 				foreach($z_items as $it)
 				{
-					if(strtolower(get_class($it))=='weathermaplink')
+					$class_lower = strtolower(get_class($it));
+
+					if ($class_lower =='weathermaplink')
 					{
 						// only draw LINKs if they have NODES defined (not templates)
 						// (also, check if the link still exists - if this is in the editor, it may have been deleted by now)
@@ -3262,23 +3275,24 @@ function DrawMap($filename = '', $thumbnailfile = '', $thumbnailmax = 250, $with
 							$this->links[$it->name]->Draw($image, $this);
 						}
 					}
-					if(strtolower(get_class($it))=='weathermapnode')
+					if ($class_lower =='weathermapnode')
 					{
 						// if(!is_null($it->x)) $it->pre_render($image, $this);
-						if($withnodes)
+						if ($withnodes)
 						{
 							// don't try and draw template nodes
-							if( isset($this->nodes[$it->name]) && !is_null($it->x))
+							if (isset($this->nodes[$it->name]) && !is_null($it->x))
 							{
 								# print "::".get_class($it)."\n";
 								wm_debug("Drawing NODE ".$it->name."\n");
 								$this->nodes[$it->name]->NewDraw($image, $this);
 								$ii=0;
-								foreach($this->nodes[$it->name]->boundingboxes as $bbox)
+								foreach ($this->nodes[$it->name]->boundingboxes as $bbox)
 								{
 									# $areaname = "NODE:" . $it->name . ':'.$ii;
 									$areaname = "NODE:N". $it->id . ":" . $ii;
 									$this->imap->addArea("Rectangle", $areaname, '', $bbox);
+									$this->nodes[$it->name]->imap_areas[] = $areaname;
 									wm_debug("Adding imagemap area");
 									$ii++;
 								}
@@ -3735,59 +3749,47 @@ function MakeHTML($imagemapname = "weathermap_imap")
 	return ($html);
 }
 
-function SortedImagemap($imagemapname)
-{
-        $html='<map name="' . $imagemapname . '" id="' . $imagemapname . '">';
+	function SortedImagemap($imagemapname)
+	{
+		$html = '<map name="' . $imagemapname . '" id="' . $imagemapname . '">';
 
-        # $html.=$this->imap->subHTML("NODE:",true);
-        # $html.=$this->imap->subHTML("LINK:",true);
+		$all_layers = array_keys($this->seen_zlayers);
+		rsort($all_layers);
 
-        $all_layers = array_keys($this->seen_zlayers);
-        rsort($all_layers);
+		wm_debug("Starting to dump imagemap in reverse Z-order...\n");
+		foreach ($all_layers as $z) {
+			wm_debug("Writing HTML for layer $z\n");
+			$z_items = $this->seen_zlayers[$z];
+			if (is_array($z_items)) {
+				wm_debug("   Found things for layer $z\n");
 
-        wm_debug("Starting to dump imagemap in reverse Z-order...\n");
-        // this is not precisely efficient, but it'll get us going
-        // XXX - get Imagemap to store Z order, or map items to store the imagemap
-        foreach ($all_layers as $z)
-        {
-                wm_debug("Writing HTML for layer $z\n");
-                $z_items = $this->seen_zlayers[$z];
-                if(is_array($z_items))
-                {
-                        wm_debug("   Found things for layer $z\n");
+				// at z=1000, the legends and timestamps live
+				if ($z == 1000) {
+					wm_debug("     Builtins fit here.\n");
 
-                        // at z=1000, the legends and timestamps live
-                        if($z == 1000) {
-                            wm_debug("     Builtins fit here.\n");
-                            $html .= $this->imap->subHTML("LEGEND:",true,($this->context != 'editor'));
-                            $html .= $this->imap->subHTML("TIMESTAMP",true,($this->context != 'editor'));
-                        }
+					foreach ($this->imap_areas as $areaname) {
+						// skip the linkless areas if we are in the editor - they're redundant
+						$html .= $this->imap->exactHTML($areaname, true, ($this->context
+							!= 'editor'));
+					}
+				}
 
-                        foreach($z_items as $it)
-                        {
-                                # print "     " . $it->name . "\n";
-							if ($it->name != 'DEFAULT' && $it->name != ":: DEFAULT ::") {
-								$name = "";
-								$class_lower = strtolower(get_class($it));
-								if ($class_lower == 'weathermaplink') {
-									$name = "LINK:L";
-								}
-								if ($class_lower == 'weathermapnode') {
-									$name = "NODE:N";
-								}
-								$name .= $it->id . ":";
-								wm_debug("      Writing $name from imagemap\n");
-								// skip the linkless areas if we are in the editor - they're redundant
-								$html .= $this->imap->subHTML($name, true, ($this->context != 'editor'));
-							}
-                        }
-                }
-        }
+				foreach ($z_items as $it) {
+					if ($it->name != 'DEFAULT' && $it->name != ":: DEFAULT ::") {
+						foreach ($it->imap_areas as $areaname) {
+							// skip the linkless areas if we are in the editor - they're redundant
+							$html .= $this->imap->exactHTML(
+								$areaname, true, ($this->context != 'editor'));
+						}
+					}
+				}
+			}
+		}
 
-        $html.='</map>';
+		$html .= '</map>';
 
-	return($html);
-}
+		return ($html);
+	}
 
 // update any editor cache files.
 // if the config file is newer than the cache files, or $agelimit seconds have passed,

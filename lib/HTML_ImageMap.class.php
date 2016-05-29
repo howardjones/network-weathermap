@@ -300,7 +300,8 @@ class HTML_ImageMap
 	function setProp($which, $what, $where)
 	{
 		$count = 0;
-		for($i=0; $i<count($this->shapes); $i++)
+		$shape_count = count($this->shapes);
+		for($i=0; $i< $shape_count; $i++)
 		{
 			// this USED to be a substring match, but that broke some things
 			// and wasn't actually used as one anywhere.
@@ -329,7 +330,8 @@ class HTML_ImageMap
         {
 
                 $count = 0;
-                for($i=0; $i<count($this->shapes); $i++)
+			$shape_count = count($this->shapes);
+			for($i=0; $i< $shape_count; $i++)
                 {
                         if( ($where == "") || ( strstr($this->shapes[$i]->name,$where)!=FALSE ) )
                         {

@@ -43,6 +43,7 @@ function wm_debug($string)
 	global $weathermap_map;
 	global $weathermap_debug_suppress;
 
+
 	if ($weathermap_debugging)
 	{
 		$calling_fn = "";

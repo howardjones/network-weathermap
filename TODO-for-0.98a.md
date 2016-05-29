@@ -15,3 +15,7 @@ https://github.com/howardjones/network-weathermap/tree/3d8ae103dcddd67b1a1c9db10
 ---
 ## TODO for 0.98b
 
+
+
+# last checkin for previous ReadConfig rewrite
+https://github.com/howardjones/network-weathermap/blob/f2f636190baf3767d376074e9766bb554bf82be5/Weathermap.class.php

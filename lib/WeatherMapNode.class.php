@@ -473,6 +473,7 @@ class WeatherMapNode extends WeatherMapItem
 						wm_warn("Couldn't open ICON: '" . $this->iconfile . "' - is it a PNG, JPEG or GIF? [WMWARN37]\n");
 					}
 
+					// TODO - this needs to happen BEFORE rescaling
 					if (function_exists("imagefilter") && isset($colicon) && $this->get_hint("use_imagefilter") == 1) {
 						wm_debug("Colorizing (imagefilter)...\n");
 						imagefilter($icon_im, IMG_FILTER_COLORIZE, $colicon->r, $colicon->g, $colicon->b);
@@ -507,8 +508,6 @@ class WeatherMapNode extends WeatherMapItem
 			}
 
 		}
-
-
 
 		// do any offset calculations
 		$dx=0;

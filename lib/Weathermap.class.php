@@ -163,6 +163,7 @@ class WMImageLoader
 			if ($scalefactor != 1.0) {
 				$new_width = $icon_w / $scalefactor;
 				$new_height = $icon_h / $scalefactor;
+
 				$scaled = imagecreatetruecolor($new_width, $new_height);
 				imagealphablending($scaled, false);
 				imagecopyresampled($scaled, $icon_im, 0, 0, 0, 0, $new_width, $new_height, $icon_w,
@@ -254,6 +255,14 @@ class WMImageLoader
 				}
 			}
 			if(!is_null($new_image) && $this->cacheable($width, $height)) {
+
+				if (imageistruecolor($new_image)) {
+					wm_debug("Source image is TC\n");
+				} else {
+					wm_debug("Source image is not TC\n");
+				}
+
+
 				wm_debug("Caching $key $new_image\n");
 				$this->cache[$key] = $new_image;
 				$result_image = $this->imageduplicate($new_image);

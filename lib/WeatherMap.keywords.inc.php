@@ -281,6 +281,11 @@ $WM_config_keywords2 = array(
                 '/^AICONFILLCOLOR\s+(copy)$/',
                 'ReadConfig_Handle_COLOR'
             ),
+            array(
+                'NODE',
+                '/^AICONFILLCOLOR\s+(none)$/',
+                'ReadConfig_Handle_COLOR'
+            ),
         ),
         'LABELOUTLINECOLOR' => array(
             array(

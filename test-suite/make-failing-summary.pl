@@ -1,6 +1,7 @@
 #!/usr/bin/perl
 
 # 	test-suites/make-failing-summary.pl test-suite/failing-images.txt test-suite/summary.html > test-suite/failing-summary.html
+use Image::Size;
 
 $failing_list = $ARGV[0];
 $summary = $ARGV[1];
@@ -33,7 +34,13 @@ while(<SUMMARY>) {
 			}
 			close(DIFF);
 
-			print "$differences differences.<br>";
+            ($x, $y) = imgsize("test-suite/references/${conf}.png");
+            $totalpixels = $x * $y;
+
+            $percent = sprintf("%.2f%%", $differences/$totalpixels*100);
+
+			print "$percent - $differences differences.<br>";
+
 			print "<a href='approve.php?cf=".$conf."'>Approve left image as new reference</a>";
 			print "<hr>";
 		}

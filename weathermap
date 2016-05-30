@@ -215,7 +215,7 @@ foreach ($options_output as $key=>$value)
 
 $weathermap_map = $configfile;
 
-if ($map->ReadConfig($configfile))
+if ($map->ReadConfig16($configfile))
 {
 	// allow command-lines to override the config file, but provide a default if neither are present
 	if ($imagefile == '')

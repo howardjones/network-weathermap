@@ -106,7 +106,89 @@ class WeatherMapPostProcessor
 	function run(&$map) { return FALSE; }
 }
 
+class WMImageLoader
+{
+	var $cache = array();
 
+	function load_image($filename) {
+
+	}
+
+	// we don't want to be caching huge images (they are probably the background, and won't be re-used)
+	function cacheable($width, $height) {
+		if ($width * $height > 65536) {
+			return false;
+		}
+		return true;
+	}
+
+	function imagecreatescaledfromfile($filename, $scalew, $scaleh)
+	{
+		list($width, $height, $type, $attr) = getimagesize($filename);
+
+		if ($width == $scalew && $height == $scaleh) {
+			return $this->imagecreatefromfile($filename);
+		}
+		$key = sprintf("%s:%d:%d", $filename, $scalew, $scaleh);
+	}
+
+	function imagecreatefromfile($filename)
+	{
+		$bgimage=NULL;
+		$formats = imagetypes();
+		if (is_readable($filename))
+		{
+			list($width, $height, $type, $attr) = getimagesize($filename);
+			$key = $filename;
+
+			switch($type)
+			{
+				case IMAGETYPE_GIF:
+					if(imagetypes() & IMG_GIF)
+					{
+						$bgimage=imagecreatefromgif($filename);
+					}
+					else
+					{
+						wm_warn("Image file $filename is GIF, but GIF is not supported by your GD library. [WMIMG01]\n");
+					}
+					break;
+
+				case IMAGETYPE_JPEG:
+					if(imagetypes() & IMG_JPEG)
+					{
+						$bgimage=imagecreatefromjpeg($filename);
+					}
+					else
+					{
+						wm_warn("Image file $filename is JPEG, but JPEG is not supported by your GD library. [WMIMG02]\n");
+					}
+					break;
+
+				case IMAGETYPE_PNG:
+					if(imagetypes() & IMG_PNG)
+					{
+						$bgimage=imagecreatefrompng($filename);
+					}
+					else
+					{
+						wm_warn("Image file $filename is PNG, but PNG is not supported by your GD library. [WMIMG03]\n");
+					}
+					break;
+
+				default:
+					wm_warn("Image file $filename wasn't recognised (type=$type). Check format is supported by your GD library. [WMIMG04]\n");
+					break;
+			}
+		}
+		else
+		{
+			wm_warn("Image file $filename is unreadable. Check permissions. [WMIMG05]\n");
+		}
+		return $bgimage;
+	}
+
+}
 
 
 /**

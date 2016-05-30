@@ -456,10 +456,15 @@ function imagecolorize($input_im, $r, $g, $b)
     //The step size for each component
     if ($steps_to_black)
     {
-        $step_size_red = $r / $steps_to_black;
-        $step_size_green = $g / $steps_to_black;
-        $step_size_blue = $b / $steps_to_black;
+        $step_size_red = $r / ($steps_to_black);
+        $step_size_green = $g / ($steps_to_black);
+        $step_size_blue = $b / ($steps_to_black);
     }
+
+	$pal[0]['r'] = '255';
+	$pal[0]['g'] = '255';
+	$pal[0]['b'] = '255';
+	$pal[0]['a'] = '127';
 
     for ($i = $steps_to_black; $i >= 0; $i--)
     {
@@ -495,13 +500,16 @@ function imagecolorize($input_im, $r, $g, $b)
     //Now,let's change the original palette into the one we
     //created
 	$total_colors = imagecolorstotal($input_im);
+	// imagecolorset($input_im, 0, 0,0,0,255);
+
 	for ($c = 0; $c < $total_colors; $c++)
     {
         $col = imagecolorsforindex($input_im, $c);
-        $lum_src = round(255 * ($col['red'] + $col['green'] + $col['blue']) / 765);
-        $col_out = $pal[$lum_src];
 
-		wm_debug("dd\n");
+		$lum_src = round(255 * ($col['red'] + $col['green'] + $col['blue']) / 765);
+		$col_out = $pal[$lum_src];
+//		if ($col['alpha']>0) { $col_out = 0; }
+
 
 //        printf("%d (%d,%d,%d) -> %d -> (%d,%d,%d)\n", $c,
 //                   $col['red'], $col['green'], $col['blue'],

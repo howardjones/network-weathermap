@@ -116,10 +116,79 @@ class WMImageLoader
 
 	// we don't want to be caching huge images (they are probably the background, and won't be re-used)
 	function cacheable($width, $height) {
+		return false;
+
 		if ($width * $height > 65536) {
 			return false;
 		}
 		return true;
+	}
+
+	function imagecreatescaledcolourizedfromfile($filename, $scalew, $scaleh, $colour, $colour_method) {
+
+		wm_debug("Getting a (maybe cached) scaled coloured image for $filename at $scalew x $scaleh with $colour\n");
+
+		$key = sprintf("%s:%d:%d:%02x%02x%02x:%s", $filename, $scalew, $scaleh,
+			$colour->r, $colour->g, $colour->b, $colour_method);
+		wm_debug("$key\n");
+
+		if (array_key_exists($key, $this->cache)) {
+			wm_debug("Cache hit for $key\n");
+			$icon_im = $this->cache[$key];
+			wm_debug("From cache: $icon_im\n");
+			$real_im = $this->imageduplicate($icon_im);
+		} else {
+			wm_debug("Cache miss - processing\n");
+			$icon_im = $this->imagecreatefromfile($filename);
+			// imagealphablending($icon_im, true);
+
+			$icon_w = imagesx($icon_im);
+			$icon_h = imagesy($icon_im);
+
+			wm_debug("$colour_method\n");
+			if ($colour_method == 'imagefilter') {
+				wm_debug("Colorizing (imagefilter)...\n");
+				imagefilter($icon_im, IMG_FILTER_COLORIZE, $colour->r, $colour->g, $colour->b);
+			}
+
+			if ($colour_method == 'imagecolorize') {
+				wm_debug("Colorizing (imagecolorize)...\n");
+				imagecolorize($icon_im, $colour->r, $colour->g, $colour->b);
+			}
+
+			if ($scalew > 0 && $scaleh > 0) {
+
+				wm_debug("If this is the last thing in your logs, you probably have a buggy GD library. Get > 2.0.33 or use PHP builtin.\n");
+
+				wm_debug("SCALING ICON here\n");
+				if ($icon_w > $icon_h) {
+					$scalefactor = $icon_w / $scalew;
+				} else {
+					$scalefactor = $icon_h / $scaleh;
+				}
+				if ($scalefactor != 1.0) {
+					$new_width = $icon_w / $scalefactor;
+					$new_height = $icon_h / $scalefactor;
+
+					$scaled = imagecreatetruecolor($new_width, $new_height);
+					imagealphablending($scaled, false);
+					imagecopyresampled($scaled, $icon_im, 0, 0, 0, 0, $new_width, $new_height, $icon_w,
+						$icon_h);
+					imagedestroy($icon_im);
+					$icon_im = $scaled;
+				}
+			}
+			if($this->cacheable($scalew, $scaleh)) {
+				wm_debug("Caching $key $icon_im\n");
+				$this->cache[$key] = $icon_im;
+				$real_im = $this->imageduplicate($icon_im);
+			} else {
+				$real_im = $icon_im;
+			}
+		}
+
+		wm_debug("Returning $real_im\n");
+		return ($real_im);
 	}
 
 	function imagecreatescaledfromfile($filename, $scalew, $scaleh)
@@ -143,11 +212,11 @@ class WMImageLoader
 		if (array_key_exists($key, $this->cache)) {
 			wm_debug("Cache hit for $key\n");
 			$icon_im = $this->cache[$key];
+			wm_debug("From cache: $icon_im\n");
 			$real_im = $this->imageduplicate($icon_im);
 		} else {
 			wm_debug("Cache miss - processing\n");
 			$icon_im = $this->imagecreatefromfile($filename);
-			imagealphablending($icon_im, true);
 
 			$icon_w = imagesx($icon_im);
 			$icon_h = imagesy($icon_im);
@@ -165,6 +234,7 @@ class WMImageLoader
 				$new_height = $icon_h / $scalefactor;
 
 				$scaled = imagecreatetruecolor($new_width, $new_height);
+				imagesavealpha($scaled, true);
 				imagealphablending($scaled, false);
 				imagecopyresampled($scaled, $icon_im, 0, 0, 0, 0, $new_width, $new_height, $icon_w,
 					$icon_h);
@@ -172,7 +242,7 @@ class WMImageLoader
 				$icon_im = $scaled;
 			}
 			if($this->cacheable($scalew, $scaleh)) {
-				wm_debug("Caching $key");
+				wm_debug("Caching $key $icon_im\n");
 				$this->cache[$key] = $icon_im;
 				$real_im = $this->imageduplicate($icon_im);
 			} else {
@@ -186,22 +256,28 @@ class WMImageLoader
 
 	function imageduplicate($source_im)
 	{
-		$icon_w = imagesx($source_im);
-		$icon_h = imagesy($source_im);
+		$source_width = imagesx($source_im);
+		$source_height = imagesy($source_im);
 
 		if (imageistruecolor($source_im)) {
-			wm_debug("Duplicating $icon_w x $icon_h TC image\n");
-			$new_im = imagecreatetruecolor($icon_w, $icon_h);
+			wm_debug("Duplicating $source_width x $source_height TC image\n");
+			$new_im = imagecreatetruecolor($source_width, $source_height);
+			imagealphablending($new_im, false);
+			imagesavealpha($new_im, true);
 		} else {
-			wm_debug("Duplicating $icon_w x $icon_h palette image\n");
-			$new_im = imagecreate($icon_w, $icon_h);
+			wm_debug("Duplicating $source_width x $source_height palette image\n");
+			$new_im = imagecreate($source_width, $source_height);
+			$trans = imagecolortransparent($source_im);
+			if ($trans >= 0) {
+				wm_debug("Duplicating transparency in indexed image\n");
+				$rgb = imagecolorsforindex($source_im, $trans);
+				$trans_index = imagecolorallocatealpha($new_im, $rgb['red'], $rgb['green'], $rgb['blue'],
+					$rgb['alpha']);
+				imagefill($new_im, 0, 0, $trans_index);
+			}
 		}
-		imagesavealpha($new_im, true);
-		$nothing = imagecolorallocatealpha($new_im, 128, 0, 0, 127);
-		imagefill($new_im, 0, 0, $nothing);
 
-		imagealphablending($new_im, true);
-		imagecopy($new_im, $source_im, 0, 0, 0, 0, $icon_w, $icon_h);
+		imagecopy($new_im, $source_im, 0, 0, 0, 0, $source_width, $source_height);
 
 		return $new_im;
 	}
@@ -218,7 +294,7 @@ class WMImageLoader
 			if (array_key_exists($key, $this->cache)) {
 				wm_debug("Cache hit! for $key\n");
 				$cache_image = $this->cache[$key];
-				wm_debug("$cache_image\n");
+				wm_debug("From cache: $cache_image\n");
 				$new_image = $this->imageduplicate($cache_image);
 				wm_debug("$new_image\n");
 			} else {
@@ -227,6 +303,7 @@ class WMImageLoader
 				switch ($type) {
 					case IMAGETYPE_GIF:
 						if (imagetypes() & IMG_GIF) {
+							wm_debug("Load gif\n");
 							$new_image = imagecreatefromgif($filename);
 						} else {
 							wm_warn("Image file $filename is GIF, but GIF is not supported by your GD library. [WMIMG01]\n");
@@ -235,6 +312,7 @@ class WMImageLoader
 
 					case IMAGETYPE_JPEG:
 						if (imagetypes() & IMG_JPEG) {
+							wm_debug("Load jpg\n");
 							$new_image = imagecreatefromjpeg($filename);
 						} else {
 							wm_warn("Image file $filename is JPEG, but JPEG is not supported by your GD library. [WMIMG02]\n");
@@ -243,6 +321,7 @@ class WMImageLoader
 
 					case IMAGETYPE_PNG:
 						if (imagetypes() & IMG_PNG) {
+							wm_debug("Load png\n");
 							$new_image = imagecreatefrompng($filename);
 						} else {
 							wm_warn("Image file $filename is PNG, but PNG is not supported by your GD library. [WMIMG03]\n");
@@ -255,14 +334,6 @@ class WMImageLoader
 				}
 			}
 			if(!is_null($new_image) && $this->cacheable($width, $height)) {
-
-				if (imageistruecolor($new_image)) {
-					wm_debug("Source image is TC\n");
-				} else {
-					wm_debug("Source image is not TC\n");
-				}
-
-
 				wm_debug("Caching $key $new_image\n");
 				$this->cache[$key] = $new_image;
 				$result_image = $this->imageduplicate($new_image);

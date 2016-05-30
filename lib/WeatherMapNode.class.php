@@ -285,7 +285,7 @@ class WeatherMapNode extends WeatherMapItem
 				// this is an artificial icon - we don't load a file for it
 
 				$icon_im = imagecreatetruecolor($this->iconscalew,$this->iconscaleh);
-				imageSaveAlpha($icon_im, TRUE);
+				imagesavealpha($icon_im, TRUE);
 
 				$nothing=imagecolorallocatealpha($icon_im,128,0,0,127);
 				imagefill($icon_im, 0, 0, $nothing);
@@ -459,30 +459,38 @@ class WeatherMapNode extends WeatherMapItem
 				if($this->iconfile=='gauge') { wm_warn('gauge AICON not implemented yet [WMWARN99]'); }
 
 			}
-			else
-			{
-				$this->iconfile = $map->ProcessString($this->iconfile ,$this);
+			else {
+				$this->iconfile = $map->ProcessString($this->iconfile, $this);
+
 				if (is_readable($this->iconfile)) {
 					imagealphablending($im, true);
 					// draw the supplied icon, instead of the labelled box
+					if (isset($colicon)) {
+						$colour_method = "imagecolorize";
+						if (function_exists("imagefilter") && $map->get_hint("use_imagefilter") == 1) {
+							$colour_method = "imagefilter";
+						}
 
-					$icon_im = $this->owner->imagecache->imagecreatescaledfromfile($this->iconfile, $this->iconscalew,
-						$this->iconscaleh);
+						$icon_im = $this->owner->imagecache->imagecreatescaledcolourizedfromfile(
+							$this->iconfile,
+							$this->iconscalew,
+							$this->iconscaleh,
+							$colicon,
+							$colour_method);
+
+					} else {
+						$icon_im = $this->owner->imagecache->imagecreatescaledfromfile(
+							$this->iconfile,
+							$this->iconscalew,
+							$this->iconscaleh);
+					}
 
 					if (!$icon_im) {
 						wm_warn("Couldn't open ICON: '" . $this->iconfile . "' - is it a PNG, JPEG or GIF? [WMWARN37]\n");
 					}
 
 					// TODO - this needs to happen BEFORE rescaling
-					if (function_exists("imagefilter") && isset($colicon) && $this->get_hint("use_imagefilter") == 1) {
-						wm_debug("Colorizing (imagefilter)...\n");
-						imagefilter($icon_im, IMG_FILTER_COLORIZE, $colicon->r, $colicon->g, $colicon->b);
-					} else {
-						if (isset($colicon)) {
-							wm_debug("Colorizing (imagecolorize)...\n");
-							$icon_im = imagecolorize($icon_im, $colicon->r, $colicon->g, $colicon->b);
-						}
-					}
+
 				} else {
 					if ($this->iconfile != 'none') {
 						wm_warn("ICON '" . $this->iconfile . "' does not exist, or is not readable. Check path and permissions. [WMARN38]\n");
@@ -548,14 +556,14 @@ class WeatherMapNode extends WeatherMapItem
 		// (so we can have close-spaced icons better)
 
 
-		$temp_width = $bbox_x2-$bbox_x1;
-		$temp_height = $bbox_y2-$bbox_y1;
+		$temp_width = $bbox_x2 - $bbox_x1;
+		$temp_height = $bbox_y2 - $bbox_y1;
 		// create an image of that size and draw into it
-		$node_im=imagecreatetruecolor($temp_width,$temp_height );
+		$node_im = imagecreatetruecolor($temp_width, $temp_height);
 		// ImageAlphaBlending($node_im, FALSE);
-		imageSaveAlpha($node_im, TRUE);
+		imagesavealpha($node_im, true);
 
-		$nothing=imagecolorallocatealpha($node_im,128,0,0,127);
+		$nothing = imagecolorallocatealpha($node_im, 128, 0, 0, 127);
 		imagefill($node_im, 0, 0, $nothing);
 
 		#$col = $col->gdallocate($node_im);
@@ -574,8 +582,7 @@ class WeatherMapNode extends WeatherMapItem
 
 
 		// Draw the icon, if any
-		if(isset($icon_im))
-		{
+		if (isset($icon_im)) {
 			imagecopy($node_im, $icon_im, $icon_x1, $icon_y1, 0, 0, imagesx($icon_im), imagesy($icon_im));
 			imagedestroy($icon_im);
 		}

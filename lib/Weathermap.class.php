@@ -126,65 +126,142 @@ class WMImageLoader
 	{
 		list($width, $height, $type, $attr) = getimagesize($filename);
 
+		wm_debug("Getting a (maybe cached) image for $filename at $scalew x $scaleh\n");
+
+		// do the non-scaling version if no scaling is required
+		if ($scalew == 0 && $scaleh == 0) {
+			wm_debug("No scaling, punt to regular\n");
+			return $this->imagecreatefromfile($filename);
+		}
+
 		if ($width == $scalew && $height == $scaleh) {
+			wm_debug("No scaling, punt to regular\n");
 			return $this->imagecreatefromfile($filename);
 		}
 		$key = sprintf("%s:%d:%d", $filename, $scalew, $scaleh);
+
+		if (array_key_exists($key, $this->cache)) {
+			wm_debug("Cache hit for $key\n");
+			$icon_im = $this->cache[$key];
+			$real_im = $this->imageduplicate($icon_im);
+		} else {
+			wm_debug("Cache miss - processing\n");
+			$icon_im = $this->imagecreatefromfile($filename);
+			imagealphablending($icon_im, true);
+
+			$icon_w = imagesx($icon_im);
+			$icon_h = imagesy($icon_im);
+
+			wm_debug("If this is the last thing in your logs, you probably have a buggy GD library. Get > 2.0.33 or use PHP builtin.\n");
+
+			wm_debug("SCALING ICON here\n");
+			if ($icon_w > $icon_h) {
+				$scalefactor = $icon_w / $scalew;
+			} else {
+				$scalefactor = $icon_h / $scaleh;
+			}
+			if ($scalefactor != 1.0) {
+				$new_width = $icon_w / $scalefactor;
+				$new_height = $icon_h / $scalefactor;
+				$scaled = imagecreatetruecolor($new_width, $new_height);
+				imagealphablending($scaled, false);
+				imagecopyresampled($scaled, $icon_im, 0, 0, 0, 0, $new_width, $new_height, $icon_w,
+					$icon_h);
+				imagedestroy($icon_im);
+				$icon_im = $scaled;
+			}
+			if($this->cacheable($scalew, $scaleh)) {
+				wm_debug("Caching $key");
+				$this->cache[$key] = $icon_im;
+				$real_im = $this->imageduplicate($icon_im);
+			} else {
+				$real_im = $icon_im;
+			}
+		}
+
+		wm_debug("Returning $real_im\n");
+		return ($real_im);
+	}
+
+	function imageduplicate($source_im)
+	{
+		$icon_w = imagesx($source_im);
+		$icon_h = imagesy($source_im);
+		wm_debug("Duplicating $icon_w x $icon_h image\n");
+
+		$new_im = imagecreatetruecolor($icon_w, $icon_h);
+		imageSaveAlpha($new_im, true);
+		$nothing = imagecolorallocatealpha($new_im, 128, 0, 0, 127);
+		imagefill($new_im, 0, 0, $nothing);
+
+		imagealphablending($new_im, true);
+		imagecopy($new_im, $source_im, 0, 0, 0, 0, $icon_w, $icon_h);
+
+		return $new_im;
 	}
 
 	function imagecreatefromfile($filename)
 	{
 		$bgimage=NULL;
+		$newimage=NULL;
 		$formats = imagetypes();
 		if (is_readable($filename))
 		{
 			list($width, $height, $type, $attr) = getimagesize($filename);
 			$key = $filename;
 
-			switch($type)
-			{
-				case IMAGETYPE_GIF:
-					if(imagetypes() & IMG_GIF)
-					{
-						$bgimage=imagecreatefromgif($filename);
-					}
-					else
-					{
-						wm_warn("Image file $filename is GIF, but GIF is not supported by your GD library. [WMIMG01]\n");
-					}
-					break;
+			if (array_key_exists($key, $this->cache)) {
+				wm_debug("Cache hit! for $key\n");
+				$cacheimage = $this->cache[$key];
+				wm_debug("$cacheimage\n");
+				$newimage = $this->imageduplicate($cacheimage);
+				wm_debug("$newimage\n");
+			} else {
+				wm_debug("Cache miss - processing\n");
 
-				case IMAGETYPE_JPEG:
-					if(imagetypes() & IMG_JPEG)
-					{
-						$bgimage=imagecreatefromjpeg($filename);
-					}
-					else
-					{
-						wm_warn("Image file $filename is JPEG, but JPEG is not supported by your GD library. [WMIMG02]\n");
-					}
-					break;
+				switch ($type) {
+					case IMAGETYPE_GIF:
+						if (imagetypes() & IMG_GIF) {
+							$newimage = imagecreatefromgif($filename);
+						} else {
+							wm_warn("Image file $filename is GIF, but GIF is not supported by your GD library. [WMIMG01]\n");
+						}
+						break;
 
-				case IMAGETYPE_PNG:
-					if(imagetypes() & IMG_PNG)
-					{
-						$bgimage=imagecreatefrompng($filename);
-					}
-					else
-					{
-						wm_warn("Image file $filename is PNG, but PNG is not supported by your GD library. [WMIMG03]\n");
-					}
-					break;
+					case IMAGETYPE_JPEG:
+						if (imagetypes() & IMG_JPEG) {
+							$newimage = imagecreatefromjpeg($filename);
+						} else {
+							wm_warn("Image file $filename is JPEG, but JPEG is not supported by your GD library. [WMIMG02]\n");
+						}
+						break;
 
-				default:
-					wm_warn("Image file $filename wasn't recognised (type=$type). Check format is supported by your GD library. [WMIMG04]\n");
-					break;
+					case IMAGETYPE_PNG:
+						if (imagetypes() & IMG_PNG) {
+							$newimage = imagecreatefrompng($filename);
+						} else {
+							wm_warn("Image file $filename is PNG, but PNG is not supported by your GD library. [WMIMG03]\n");
+						}
+						break;
+
+					default:
+						wm_warn("Image file $filename wasn't recognised (type=$type). Check format is supported by your GD library. [WMIMG04]\n");
+						break;
+				}
+			}
+			if(!is_null($newimage) && $this->cacheable($width, $height)) {
+				wm_debug("Caching $key $newimage\n");
+				$this->cache[$key] = $newimage;
+				$bgimage = $this->imageduplicate($newimage);
+			} else {
+				$bgimage = $newimage;
 			}
 		}
 		else
 		{
 			wm_warn("Image file $filename is unreadable. Check permissions. [WMIMG05]\n");
 		}
+		wm_debug("Returning $bgimage\n");
 		return $bgimage;
 	}
 
@@ -625,6 +702,7 @@ class WeatherMap extends WeatherMapBase
 	var $context;
 	var $cachefolder,$mapcache,$cachefile_version;
 	var $name;
+	var $imagecache;
 	var $black,
 		$white,
 		$grey,
@@ -714,6 +792,7 @@ class WeatherMap extends WeatherMapBase
 	
 	function Reset()
 	{
+		$this->imagecache = new WMImageLoader();
 		$this->next_id = 100;
 		foreach (array_keys($this->inherit_fieldlist)as $fld) { $this->$fld=$this->inherit_fieldlist[$fld]; }
 		

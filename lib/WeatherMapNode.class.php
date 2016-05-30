@@ -462,65 +462,29 @@ class WeatherMapNode extends WeatherMapItem
 			else
 			{
 				$this->iconfile = $map->ProcessString($this->iconfile ,$this);
-				if (is_readable($this->iconfile))
-				{
+				if (is_readable($this->iconfile)) {
 					imagealphablending($im, true);
 					// draw the supplied icon, instead of the labelled box
 
-					$icon_im = imagecreatefromfile($this->iconfile);
-					# $icon_im = imagecreatefrompng($this->iconfile);
-					if(function_exists("imagefilter") && isset($colicon) && $this->get_hint("use_imagefilter")==1)
-					{						
-						imagefilter($icon_im, IMG_FILTER_COLORIZE, $colicon->r, $colicon->g, $colicon->b);						
+					$icon_im = $this->owner->imagecache->imagecreatescaledfromfile($this->iconfile, $this->iconscalew,
+						$this->iconscaleh);
+
+					if (!$icon_im) {
+						wm_warn("Couldn't open ICON: '" . $this->iconfile . "' - is it a PNG, JPEG or GIF? [WMWARN37]\n");
 					}
-					else
-					{
-						if(isset($colicon))
-						{
-							// debug("Skipping unavailable imagefilter() call.\n");
+
+					if (function_exists("imagefilter") && isset($colicon) && $this->get_hint("use_imagefilter") == 1) {
+						wm_debug("Colorizing (imagefilter)...\n");
+						imagefilter($icon_im, IMG_FILTER_COLORIZE, $colicon->r, $colicon->g, $colicon->b);
+					} else {
+						if (isset($colicon)) {
+							wm_debug("Colorizing (imagecolorize)...\n");
 							imagecolorize($icon_im, $colicon->r, $colicon->g, $colicon->b);
 						}
 					}
-
-					wm_debug("If this is the last thing in your logs, you probably have a buggy GD library. Get > 2.0.33 or use PHP builtin.\n");
-					if ($icon_im)
-					{
-						$icon_w = imagesx($icon_im);
-						$icon_h = imagesy($icon_im);
-
-						if(($this->iconscalew * $this->iconscaleh) > 0)
-						{
-							imagealphablending($icon_im, true);
-
-							wm_debug("SCALING ICON here\n");
-							if($icon_w > $icon_h)
-							{
-								$scalefactor = $icon_w/$this->iconscalew;
-							}
-							else
-							{
-								$scalefactor = $icon_h/$this->iconscaleh;
-							}
-							if ($scalefactor != 1.0) {
-								$new_width = $icon_w / $scalefactor;
-								$new_height = $icon_h / $scalefactor;
-								$scaled = imagecreatetruecolor($new_width, $new_height);
-								imagealphablending($scaled, false);
-								imagecopyresampled($scaled, $icon_im, 0, 0, 0, 0, $new_width, $new_height, $icon_w,
-									$icon_h);
-								imagedestroy($icon_im);
-								$icon_im = $scaled;
-							}
-
-						}
-					}
-					else { wm_warn ("Couldn't open ICON: '" . $this->iconfile . "' - is it a PNG, JPEG or GIF? [WMWARN37]\n"); }
-				}
-				else
-				{
-					if($this->iconfile != 'none')
-					{
-						wm_warn ("ICON '" . $this->iconfile . "' does not exist, or is not readable. Check path and permissions. [WMARN38]\n");
+				} else {
+					if ($this->iconfile != 'none') {
+						wm_warn("ICON '" . $this->iconfile . "' does not exist, or is not readable. Check path and permissions. [WMARN38]\n");
 					}
 				}
 			}

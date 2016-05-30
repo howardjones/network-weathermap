@@ -1144,7 +1144,8 @@ function draw_straight($image, &$curvepoints, $widths, $outlinecolour, $fillcolo
 
 			// round to the nearest integer (up OR down). We do this now
 			// so that GD doesn't just round everything down and make straight lines slightly off
-			for ($i=0; $i<sizeof($finalpoints); $i++) {
+			$point_count = sizeof($finalpoints);
+			for ($i=0; $i< $point_count; $i++) {
 				$finalpoints[$i] = round($finalpoints[$i]);
 			}
 

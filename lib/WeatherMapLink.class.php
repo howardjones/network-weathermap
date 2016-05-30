@@ -384,7 +384,7 @@ class WeatherMapLink extends WeatherMapItem
 			// Calculate the spine points - the actual not a curve really, but we
 			// need to create the array, and calculate the distance bits, otherwise
 			// things like bwlabels won't know where to go.
-			
+
 			$this->curvepoints = calc_straight($xpoints, $ypoints);
 							
 			// then draw the "curve" itself

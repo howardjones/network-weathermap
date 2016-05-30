@@ -187,10 +187,15 @@ class WMImageLoader
 	{
 		$icon_w = imagesx($source_im);
 		$icon_h = imagesy($source_im);
-		wm_debug("Duplicating $icon_w x $icon_h image\n");
 
-		$new_im = imagecreatetruecolor($icon_w, $icon_h);
-		imageSaveAlpha($new_im, true);
+		if (imageistruecolor($source_im)) {
+			wm_debug("Duplicating $icon_w x $icon_h TC image\n");
+			$new_im = imagecreatetruecolor($icon_w, $icon_h);
+		} else {
+			wm_debug("Duplicating $icon_w x $icon_h palette image\n");
+			$new_im = imagecreate($icon_w, $icon_h);
+		}
+		imagesavealpha($new_im, true);
 		$nothing = imagecolorallocatealpha($new_im, 128, 0, 0, 127);
 		imagefill($new_im, 0, 0, $nothing);
 
@@ -202,9 +207,8 @@ class WMImageLoader
 
 	function imagecreatefromfile($filename)
 	{
-		$bgimage=NULL;
-		$newimage=NULL;
-		$formats = imagetypes();
+		$result_image=NULL;
+		$new_image=NULL;
 		if (is_readable($filename))
 		{
 			list($width, $height, $type, $attr) = getimagesize($filename);
@@ -212,17 +216,17 @@ class WMImageLoader
 
 			if (array_key_exists($key, $this->cache)) {
 				wm_debug("Cache hit! for $key\n");
-				$cacheimage = $this->cache[$key];
-				wm_debug("$cacheimage\n");
-				$newimage = $this->imageduplicate($cacheimage);
-				wm_debug("$newimage\n");
+				$cache_image = $this->cache[$key];
+				wm_debug("$cache_image\n");
+				$new_image = $this->imageduplicate($cache_image);
+				wm_debug("$new_image\n");
 			} else {
 				wm_debug("Cache miss - processing\n");
 
 				switch ($type) {
 					case IMAGETYPE_GIF:
 						if (imagetypes() & IMG_GIF) {
-							$newimage = imagecreatefromgif($filename);
+							$new_image = imagecreatefromgif($filename);
 						} else {
 							wm_warn("Image file $filename is GIF, but GIF is not supported by your GD library. [WMIMG01]\n");
 						}
@@ -230,7 +234,7 @@ class WMImageLoader
 
 					case IMAGETYPE_JPEG:
 						if (imagetypes() & IMG_JPEG) {
-							$newimage = imagecreatefromjpeg($filename);
+							$new_image = imagecreatefromjpeg($filename);
 						} else {
 							wm_warn("Image file $filename is JPEG, but JPEG is not supported by your GD library. [WMIMG02]\n");
 						}
@@ -238,7 +242,7 @@ class WMImageLoader
 
 					case IMAGETYPE_PNG:
 						if (imagetypes() & IMG_PNG) {
-							$newimage = imagecreatefrompng($filename);
+							$new_image = imagecreatefrompng($filename);
 						} else {
 							wm_warn("Image file $filename is PNG, but PNG is not supported by your GD library. [WMIMG03]\n");
 						}
@@ -249,20 +253,20 @@ class WMImageLoader
 						break;
 				}
 			}
-			if(!is_null($newimage) && $this->cacheable($width, $height)) {
-				wm_debug("Caching $key $newimage\n");
-				$this->cache[$key] = $newimage;
-				$bgimage = $this->imageduplicate($newimage);
+			if(!is_null($new_image) && $this->cacheable($width, $height)) {
+				wm_debug("Caching $key $new_image\n");
+				$this->cache[$key] = $new_image;
+				$result_image = $this->imageduplicate($new_image);
 			} else {
-				$bgimage = $newimage;
+				$result_image = $new_image;
 			}
 		}
 		else
 		{
 			wm_warn("Image file $filename is unreadable. Check permissions. [WMIMG05]\n");
 		}
-		wm_debug("Returning $bgimage\n");
-		return $bgimage;
+		wm_debug("Returning $result_image\n");
+		return $result_image;
 	}
 
 }

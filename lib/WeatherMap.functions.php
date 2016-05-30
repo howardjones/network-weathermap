@@ -426,7 +426,9 @@ function imagecreatefromfile($filename)
 // Much nicer colorization than imagefilter does, AND no special requirements.
 // Preserves white, black and transparency.
 //
-function imagecolorize($im, $r, $g, $b)
+// DOES require a non-truecolor image though!
+//
+function imagecolorize($input_im, $r, $g, $b)
 {
     //We will create a monochromatic palette based on
     //the input color
@@ -461,7 +463,7 @@ function imagecolorize($im, $r, $g, $b)
 
     for ($i = $steps_to_black; $i >= 0; $i--)
     {
-        $pal[$steps_to_black - $i]['r'] = $r - round($step_size_red * $i);
+		$pal[$steps_to_black - $i]['r'] = $r - round($step_size_red * $i);
         $pal[$steps_to_black - $i]['g'] = $g - round($step_size_green * $i);
         $pal[$steps_to_black - $i]['b'] = $b - round($step_size_blue * $i);
     }
@@ -492,22 +494,25 @@ function imagecolorize($im, $r, $g, $b)
 
     //Now,let's change the original palette into the one we
     //created
-    for ($c = 0; $c < imagecolorstotal($im); $c++)
+	$total_colors = imagecolorstotal($input_im);
+	for ($c = 0; $c < $total_colors; $c++)
     {
-        $col = imagecolorsforindex($im, $c);
+        $col = imagecolorsforindex($input_im, $c);
         $lum_src = round(255 * ($col['red'] + $col['green'] + $col['blue']) / 765);
         $col_out = $pal[$lum_src];
 
-   #     printf("%d (%d,%d,%d) -> %d -> (%d,%d,%d)\n", $c,
-   #                $col['red'], $col['green'], $col['blue'],
-   #                $lum_src,
-   #                $col_out['r'], $col_out['g'], $col_out['b']
-   #             );
+		wm_debug("dd\n");
 
-        imagecolorset($im, $c, $col_out['r'], $col_out['g'], $col_out['b']);
+//        printf("%d (%d,%d,%d) -> %d -> (%d,%d,%d)\n", $c,
+//                   $col['red'], $col['green'], $col['blue'],
+//                   $lum_src,
+//                   $col_out['r'], $col_out['g'], $col_out['b']
+//                );
+
+        imagecolorset($input_im, $c, $col_out['r'], $col_out['g'], $col_out['b']);
     }
    
-    return($im);
+    return($input_im);
 }
 
 // find the point where a line from x1,y1 through x2,y2 crosses another line through x3,y3 and x4,y4

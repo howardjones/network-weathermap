@@ -479,7 +479,7 @@ class WeatherMapNode extends WeatherMapItem
 					} else {
 						if (isset($colicon)) {
 							wm_debug("Colorizing (imagecolorize)...\n");
-							imagecolorize($icon_im, $colicon->r, $colicon->g, $colicon->b);
+							$icon_im = imagecolorize($icon_im, $colicon->r, $colicon->g, $colicon->b);
 						}
 					}
 				} else {

@@ -1394,15 +1394,62 @@ function unformat_number($instring, $kilo = 1000)
 	return ($number);
 }
 
+/**
+ * Take a formatted number (1.2K, 55M) and produce a regular number from it
+ *
+ * @param string $instring
+ * @param int $kilo
+ * @return float
+ */
+function wm_unformat_number($instring, $kilo = 1000)
+{
+	$matches = 0;
+	$number = 0;
+
+	if (1 === preg_match('/([0-9\.]+)(M|G|K|T|m|u)/', $instring, $matches)) {
+		$number = floatval($matches[1]);
+
+		if ($matches[2] === 'K') {
+			$number = $number * $kilo;
+		}
+
+		if ($matches[2] === 'M') {
+			$number = $number * $kilo * $kilo;
+		}
+
+		if ($matches[2] === 'G') {
+			$number = $number * $kilo * $kilo * $kilo;
+		}
+
+		if ($matches[2] === 'T') {
+			$number = $number * $kilo * $kilo * $kilo * $kilo;
+		}
+
+		// new, for absolute datastyle. Think seconds.
+		if ($matches[2] === 'm') {
+			$number = $number / $kilo;
+		}
+
+		if ($matches[2] === 'u') {
+			$number = $number / ($kilo * $kilo);
+		}
+	} else {
+		$number = floatval($instring);
+	}
+
+	return ($number);
+}
+
+
 // given a compass-point, and a width & height, return a tuple of the x,y offsets
 function calc_offset($offsetstring, $width, $height)
 {
-	if(preg_match("/^([-+]?\d+):([-+]?\d+)$/",$offsetstring,$matches))
+	if(preg_match('/^([-+]?\d+):([-+]?\d+)$/',$offsetstring,$matches))
 	{
 		wm_debug("Numeric Offset found\n");
 		return(array($matches[1],$matches[2]));
 	}
-	elseif(preg_match("/(NE|SE|NW|SW|N|S|E|W|C)(\d+)?$/i",$offsetstring,$matches))
+	elseif(preg_match('/(NE|SE|NW|SW|N|S|E|W|C)(\d+)?$/i',$offsetstring,$matches))
 	{
 		$multiply = 1;
 		if( isset($matches[2] ) )
@@ -1463,7 +1510,7 @@ function calc_offset($offsetstring, $width, $height)
 			break;
 		}
 	}
-	elseif( preg_match("/(-?\d+)r(\d+)$/i",$offsetstring,$matches) )
+	elseif( preg_match('/(-?\d+)r(\d+)$/i',$offsetstring,$matches) )
 	{
 		$angle = intval($matches[1]);
 		$distance = intval($matches[2]);

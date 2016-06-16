@@ -52,6 +52,26 @@ function plugin_weathermap_version()
 	);
 }
 
+
+// There must be a nicer way that this.
+// To support both mysql (0.8.8) and PDO (1.0) database calls, we will
+// need to figure out which one is in play
+function weathermap_is_in_new_cacti()
+{
+	global $config;
+
+	$cacti_version = $config['cacti_version'];
+
+	if (substr($cacti_version,0,1) == '1') {
+		return true;
+	}
+	return false;
+}
+
+function weathermap_sql_escape($string) {
+	return mysql_real_escape_string($string);
+}
+
 /* somehow this function is still required in PA 3.x, even though it checks for plugin_weathermap_version() */
 function weathermap_version()
 {
@@ -128,7 +148,7 @@ function weathermap_page_title( $t )
 						}
 						else
 						{
-							$title = db_fetch_cell("SELECT titlecache from weathermap_maps where filehash='".mysql_real_escape_string($mapid)."'");
+							$title = db_fetch_cell("SELECT titlecache from weathermap_maps where filehash='".weathermap_sql_escape($mapid)."'");
 						}
                         if(isset($title)) $t .= " - $title";
                 }

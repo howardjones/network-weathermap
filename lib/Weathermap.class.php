@@ -531,9 +531,9 @@ class WeatherMapScale
 		$tag = '';
 		$matchsize = null;
 
-		$nowarn_clipping = intval($owner->get_hint("nowarn_clipping"));
+		$nowarn_clipping = intval($this->owner->get_hint("nowarn_clipping"));
 		$nowarn_scalemisses = (!$scale_warning)
-			|| intval($owner->get_hint("nowarn_scalemisses"));
+			|| intval($this->owner->get_hint("nowarn_scalemisses"));
 
 
 		if (isset($this->colours)) {
@@ -586,7 +586,7 @@ class WeatherMapScale
 				}
 			}
 
-			wm_debug("CFV $name $scalename $value '$tag' $key ".$col->as_config()."\n");
+			wm_debug("CFV $name $this->name $value '$tag' $key ".$col->as_config()."\n");
 
 			return (array (
 				$col,
@@ -2479,7 +2479,7 @@ function DrawTitle($im, $font, $colour)
 			$newfont_id = imageloadfont($args[2]);
 			if ($newfont_id) {
 				$new_font = new WMFont();
-				$new_font->type = "truetype";
+				$new_font->type = "gd";
 				$new_font->file = $args[2];
 				$new_font->gdnumber = $newfont_id;
 				$this->fonts[$args[1]] = $new_font;

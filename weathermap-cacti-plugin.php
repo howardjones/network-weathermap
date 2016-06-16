@@ -651,7 +651,7 @@ function weathermap_fullview($cycle=FALSE, $firstonly=FALSE, $limit_to_group = -
 
 function weathermap_translate_id($idname)
 {
-	$SQL = "select id from weathermap_maps where configfile='".mysql_real_escape_string($idname)."' or filehash='".mysql_real_escape_string($idname)."'";
+	$SQL = "select id from weathermap_maps where configfile='".weathermap_sql_escape($idname)."' or filehash='".weathermap_sql_escape_escape_string($idname)."'";
 	$map = db_fetch_assoc($SQL);
 
 	return($map[0]['id']);	

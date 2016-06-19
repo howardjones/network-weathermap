@@ -15,6 +15,9 @@ https://github.com/howardjones/network-weathermap/tree/3d8ae103dcddd67b1a1c9db10
 ---
 ## TODO for 0.98b
 
+*  Pull new Cacti plugin layout from master (input validation etc)
+*  Pull new editor layout?
+
 
 
 # last checkin for previous ReadConfig rewrite
@@ -37,3 +40,4 @@ https://github.com/howardjones/network-weathermap/blob/f2f636190baf3767d376074e9
       and not background images which will be huge and never reused.
 
 * string drawing doesn't understand WMFont 
+

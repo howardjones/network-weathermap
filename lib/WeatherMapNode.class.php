@@ -285,7 +285,7 @@ class WeatherMapNode extends WeatherMapItem
 				// this is an artificial icon - we don't load a file for it
 
 				$icon_im = imagecreatetruecolor($this->iconscalew,$this->iconscaleh);
-				imageSaveAlpha($icon_im, TRUE);
+				imagesavealpha($icon_im, TRUE);
 
 				$nothing=imagecolorallocatealpha($icon_im,128,0,0,127);
 				imagefill($icon_im, 0, 0, $nothing);
@@ -459,68 +459,41 @@ class WeatherMapNode extends WeatherMapItem
 				if($this->iconfile=='gauge') { wm_warn('gauge AICON not implemented yet [WMWARN99]'); }
 
 			}
-			else
-			{
-				$this->iconfile = $map->ProcessString($this->iconfile ,$this);
-				if (is_readable($this->iconfile))
-				{
+			else {
+				$this->iconfile = $map->ProcessString($this->iconfile, $this);
+
+				if (is_readable($this->iconfile)) {
 					imagealphablending($im, true);
 					// draw the supplied icon, instead of the labelled box
-
-					$icon_im = imagecreatefromfile($this->iconfile);
-					# $icon_im = imagecreatefrompng($this->iconfile);
-					if(function_exists("imagefilter") && isset($colicon) && $this->get_hint("use_imagefilter")==1)
-					{						
-						imagefilter($icon_im, IMG_FILTER_COLORIZE, $colicon->r, $colicon->g, $colicon->b);						
-					}
-					else
-					{
-						if(isset($colicon))
-						{
-							// debug("Skipping unavailable imagefilter() call.\n");
-							imagecolorize($icon_im, $colicon->r, $colicon->g, $colicon->b);
+					if (isset($colicon)) {
+						$colour_method = "imagecolorize";
+						if (function_exists("imagefilter") && $map->get_hint("use_imagefilter") == 1) {
+							$colour_method = "imagefilter";
 						}
+
+						$icon_im = $this->owner->imagecache->imagecreatescaledcolourizedfromfile(
+							$this->iconfile,
+							$this->iconscalew,
+							$this->iconscaleh,
+							$colicon,
+							$colour_method);
+
+					} else {
+						$icon_im = $this->owner->imagecache->imagecreatescaledfromfile(
+							$this->iconfile,
+							$this->iconscalew,
+							$this->iconscaleh);
 					}
 
-					wm_debug("If this is the last thing in your logs, you probably have a buggy GD library. Get > 2.0.33 or use PHP builtin.\n");
-					if ($icon_im)
-					{
-						$icon_w = imagesx($icon_im);
-						$icon_h = imagesy($icon_im);
-
-						if(($this->iconscalew * $this->iconscaleh) > 0)
-						{
-							imagealphablending($icon_im, true);
-
-							wm_debug("SCALING ICON here\n");
-							if($icon_w > $icon_h)
-							{
-								$scalefactor = $icon_w/$this->iconscalew;
-							}
-							else
-							{
-								$scalefactor = $icon_h/$this->iconscaleh;
-							}
-							if ($scalefactor != 1.0) {
-								$new_width = $icon_w / $scalefactor;
-								$new_height = $icon_h / $scalefactor;
-								$scaled = imagecreatetruecolor($new_width, $new_height);
-								imagealphablending($scaled, false);
-								imagecopyresampled($scaled, $icon_im, 0, 0, 0, 0, $new_width, $new_height, $icon_w,
-									$icon_h);
-								imagedestroy($icon_im);
-								$icon_im = $scaled;
-							}
-
-						}
+					if (!$icon_im) {
+						wm_warn("Couldn't open ICON: '" . $this->iconfile . "' - is it a PNG, JPEG or GIF? [WMWARN37]\n");
 					}
-					else { wm_warn ("Couldn't open ICON: '" . $this->iconfile . "' - is it a PNG, JPEG or GIF? [WMWARN37]\n"); }
-				}
-				else
-				{
-					if($this->iconfile != 'none')
-					{
-						wm_warn ("ICON '" . $this->iconfile . "' does not exist, or is not readable. Check path and permissions. [WMARN38]\n");
+
+					// TODO - this needs to happen BEFORE rescaling
+
+				} else {
+					if ($this->iconfile != 'none') {
+						wm_warn("ICON '" . $this->iconfile . "' does not exist, or is not readable. Check path and permissions. [WMARN38]\n");
 					}
 				}
 			}
@@ -535,16 +508,14 @@ class WeatherMapNode extends WeatherMapItem
 				$icon_x2 = $this->x + $icon_w / 2;
 				$icon_y2 = $this->y + $icon_h / 2;
 
-				$map->nodes[$this->name]->width = imagesx($icon_im);
-				$map->nodes[$this->name]->height = imagesy($icon_im);
+				$map->nodes[$this->name]->width = $icon_w;
+				$map->nodes[$this->name]->height = $icon_h;
 
 				// $map->imap->addArea("Rectangle", "NODE:" . $this->name . ':0', '', array($icon_x1, $icon_y1, $icon_x2, $icon_y2));
 				$map->nodes[$this->name]->boundingboxes[] = array($icon_x1, $icon_y1, $icon_x2, $icon_y2);
 			}
 
 		}
-
-
 
 		// do any offset calculations
 		$dx=0;
@@ -558,10 +529,6 @@ class WeatherMapNode extends WeatherMapItem
 				($icon_w + $boxwidth -1),
 				($icon_h + $boxheight)
 			);
-
-			#$this->labeloffsetx = $dx;
-			#$this->labeloffsety = $dy;
-
 		}
 
 		$label_x1 += ($this->labeloffsetx + $dx);
@@ -571,7 +538,6 @@ class WeatherMapNode extends WeatherMapItem
 
 		if($this->label != '')
 		{
-			// $map->imap->addArea("Rectangle", "NODE:" . $this->name .':1', '', array($label_x1, $label_y1, $label_x2, $label_y2));
 			$map->nodes[$this->name]->boundingboxes[] = array($label_x1, $label_y1, $label_x2, $label_y2);
 		}
 
@@ -590,14 +556,14 @@ class WeatherMapNode extends WeatherMapItem
 		// (so we can have close-spaced icons better)
 
 
-		$temp_width = $bbox_x2-$bbox_x1;
-		$temp_height = $bbox_y2-$bbox_y1;
+		$temp_width = $bbox_x2 - $bbox_x1;
+		$temp_height = $bbox_y2 - $bbox_y1;
 		// create an image of that size and draw into it
-		$node_im=imagecreatetruecolor($temp_width,$temp_height );
+		$node_im = imagecreatetruecolor($temp_width, $temp_height);
 		// ImageAlphaBlending($node_im, FALSE);
-		imageSaveAlpha($node_im, TRUE);
+		imagesavealpha($node_im, true);
 
-		$nothing=imagecolorallocatealpha($node_im,128,0,0,127);
+		$nothing = imagecolorallocatealpha($node_im, 128, 0, 0, 127);
 		imagefill($node_im, 0, 0, $nothing);
 
 		#$col = $col->gdallocate($node_im);
@@ -616,8 +582,7 @@ class WeatherMapNode extends WeatherMapItem
 
 
 		// Draw the icon, if any
-		if(isset($icon_im))
-		{
+		if (isset($icon_im)) {
 			imagecopy($node_im, $icon_im, $icon_x1, $icon_y1, 0, 0, imagesx($icon_im), imagesy($icon_im));
 			imagedestroy($icon_im);
 		}
@@ -684,18 +649,6 @@ class WeatherMapNode extends WeatherMapItem
 
 		$map->nodes[$this->name]->centre_x = $this->x - $bbox_x1;
 		$map->nodes[$this->name]->centre_y = $this->y - $bbox_y1;
-
-		if(1==0)
-		{
-
-			imageellipse($node_im, $this->centre_x, $this->centre_y, 8, 8, $map->selected);
-
-			foreach (array("N","S","E","W","NE","NW","SE","SW") as $corner)
-			{
-				list($dx, $dy)=calc_offset($corner, $this->width, $this->height);
-				imageellipse($node_im, $this->centre_x + $dx, $this->centre_y + $dy, 5, 5, $map->selected);
-			}
-		}
 
 		# $this->image = $node_im;
 		$map->nodes[$this->name]->image = $node_im;

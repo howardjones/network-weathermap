@@ -296,7 +296,9 @@ if ($map->ReadConfig($configfile))
 
 	if ($dumpafter == 1)
 		print_r ($map);
-		
+
+//	print_r($map->imagecache);
+
 #	print_r ($map->node_template_tree);
 #	print_r ($map->link_template_tree);
 	

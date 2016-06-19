@@ -426,7 +426,9 @@ function imagecreatefromfile($filename)
 // Much nicer colorization than imagefilter does, AND no special requirements.
 // Preserves white, black and transparency.
 //
-function imagecolorize($im, $r, $g, $b)
+// DOES require a non-truecolor image though!
+//
+function imagecolorize($input_im, $r, $g, $b)
 {
     //We will create a monochromatic palette based on
     //the input color
@@ -454,14 +456,19 @@ function imagecolorize($im, $r, $g, $b)
     //The step size for each component
     if ($steps_to_black)
     {
-        $step_size_red = $r / $steps_to_black;
-        $step_size_green = $g / $steps_to_black;
-        $step_size_blue = $b / $steps_to_black;
+        $step_size_red = $r / ($steps_to_black);
+        $step_size_green = $g / ($steps_to_black);
+        $step_size_blue = $b / ($steps_to_black);
     }
+
+	$pal[0]['r'] = '255';
+	$pal[0]['g'] = '255';
+	$pal[0]['b'] = '255';
+	$pal[0]['a'] = '127';
 
     for ($i = $steps_to_black; $i >= 0; $i--)
     {
-        $pal[$steps_to_black - $i]['r'] = $r - round($step_size_red * $i);
+		$pal[$steps_to_black - $i]['r'] = $r - round($step_size_red * $i);
         $pal[$steps_to_black - $i]['g'] = $g - round($step_size_green * $i);
         $pal[$steps_to_black - $i]['b'] = $b - round($step_size_blue * $i);
     }
@@ -492,22 +499,28 @@ function imagecolorize($im, $r, $g, $b)
 
     //Now,let's change the original palette into the one we
     //created
-    for ($c = 0; $c < imagecolorstotal($im); $c++)
+	$total_colors = imagecolorstotal($input_im);
+	// imagecolorset($input_im, 0, 0,0,0,255);
+
+	for ($c = 0; $c < $total_colors; $c++)
     {
-        $col = imagecolorsforindex($im, $c);
-        $lum_src = round(255 * ($col['red'] + $col['green'] + $col['blue']) / 765);
-        $col_out = $pal[$lum_src];
+        $col = imagecolorsforindex($input_im, $c);
 
-   #     printf("%d (%d,%d,%d) -> %d -> (%d,%d,%d)\n", $c,
-   #                $col['red'], $col['green'], $col['blue'],
-   #                $lum_src,
-   #                $col_out['r'], $col_out['g'], $col_out['b']
-   #             );
+		$lum_src = round(255 * ($col['red'] + $col['green'] + $col['blue']) / 765);
+		$col_out = $pal[$lum_src];
+//		if ($col['alpha']>0) { $col_out = 0; }
 
-        imagecolorset($im, $c, $col_out['r'], $col_out['g'], $col_out['b']);
+
+//        printf("%d (%d,%d,%d) -> %d -> (%d,%d,%d)\n", $c,
+//                   $col['red'], $col['green'], $col['blue'],
+//                   $lum_src,
+//                   $col_out['r'], $col_out['g'], $col_out['b']
+//                );
+
+        imagecolorset($input_im, $c, $col_out['r'], $col_out['g'], $col_out['b']);
     }
    
-    return($im);
+    return($input_im);
 }
 
 // find the point where a line from x1,y1 through x2,y2 crosses another line through x3,y3 and x4,y4
@@ -1144,7 +1157,8 @@ function draw_straight($image, &$curvepoints, $widths, $outlinecolour, $fillcolo
 
 			// round to the nearest integer (up OR down). We do this now
 			// so that GD doesn't just round everything down and make straight lines slightly off
-			for ($i=0; $i<sizeof($finalpoints); $i++) {
+			$point_count = sizeof($finalpoints);
+			for ($i=0; $i< $point_count; $i++) {
 				$finalpoints[$i] = round($finalpoints[$i]);
 			}
 
@@ -1394,15 +1408,62 @@ function unformat_number($instring, $kilo = 1000)
 	return ($number);
 }
 
+/**
+ * Take a formatted number (1.2K, 55M) and produce a regular number from it
+ *
+ * @param string $instring
+ * @param int $kilo
+ * @return float
+ */
+function wm_unformat_number($instring, $kilo = 1000)
+{
+	$matches = 0;
+	$number = 0;
+
+	if (1 === preg_match('/([0-9\.]+)(M|G|K|T|m|u)/', $instring, $matches)) {
+		$number = floatval($matches[1]);
+
+		if ($matches[2] === 'K') {
+			$number = $number * $kilo;
+		}
+
+		if ($matches[2] === 'M') {
+			$number = $number * $kilo * $kilo;
+		}
+
+		if ($matches[2] === 'G') {
+			$number = $number * $kilo * $kilo * $kilo;
+		}
+
+		if ($matches[2] === 'T') {
+			$number = $number * $kilo * $kilo * $kilo * $kilo;
+		}
+
+		// new, for absolute datastyle. Think seconds.
+		if ($matches[2] === 'm') {
+			$number = $number / $kilo;
+		}
+
+		if ($matches[2] === 'u') {
+			$number = $number / ($kilo * $kilo);
+		}
+	} else {
+		$number = floatval($instring);
+	}
+
+	return ($number);
+}
+
+
 // given a compass-point, and a width & height, return a tuple of the x,y offsets
 function calc_offset($offsetstring, $width, $height)
 {
-	if(preg_match("/^([-+]?\d+):([-+]?\d+)$/",$offsetstring,$matches))
+	if(preg_match('/^([-+]?\d+):([-+]?\d+)$/',$offsetstring,$matches))
 	{
 		wm_debug("Numeric Offset found\n");
 		return(array($matches[1],$matches[2]));
 	}
-	elseif(preg_match("/(NE|SE|NW|SW|N|S|E|W|C)(\d+)?$/i",$offsetstring,$matches))
+	elseif(preg_match('/(NE|SE|NW|SW|N|S|E|W|C)(\d+)?$/i',$offsetstring,$matches))
 	{
 		$multiply = 1;
 		if( isset($matches[2] ) )
@@ -1463,7 +1524,7 @@ function calc_offset($offsetstring, $width, $height)
 			break;
 		}
 	}
-	elseif( preg_match("/(-?\d+)r(\d+)$/i",$offsetstring,$matches) )
+	elseif( preg_match('/(-?\d+)r(\d+)$/i',$offsetstring,$matches) )
 	{
 		$angle = intval($matches[1]);
 		$distance = intval($matches[2]);
@@ -2135,6 +2196,180 @@ function draw_spine($im, $spine,$col)
         return intval($nwarns);
     }
 
-	
+
+/**
+ * Utility class used for colour calculations in Weathermap.
+ *
+ * Allows representation of any RGBA colour, plus some special
+ * pseudocolours.
+ *
+ */
+class WMColour
+{
+	var $r, $g, $b, $alpha;
+
+
+	// take in an existing value and create a Colour object for it
+	function WMColour()
+	{
+		if (func_num_args() === 3)       # a set of 3 colours
+		{
+			$this->r = func_get_arg(0); # r
+			$this->g = func_get_arg(1); # g
+			$this->b = func_get_arg(2); # b
+		}
+
+		if (func_num_args() === 1) {
+			if(gettype(func_get_arg(0)) === 'array') # an array of 3 colours
+			{
+				$ary = func_get_arg(0);
+				$this->r = $ary[0];
+				$this->g = $ary[1];
+				$this->b = $ary[2];
+			} else {
+				// a single scalar argument - should be a 'special' colour
+				$arg = func_get_arg(0);
+
+				if($arg == 'none') {
+					$this->r = -1;
+					$this->g = -1;
+					$this->b = -1;
+				}
+
+				if($arg == 'copy') {
+					$this->r = -2;
+					$this->g = -2;
+					$this->b = -2;
+				}
+
+				if($arg == 'contrast') {
+					$this->r = -3;
+					$this->g = -3;
+					$this->b = -3;
+				}
+			}
+
+		}
+	}
+
+	// return true if two colours are identical
+	function equals($c2) {
+		if( $this->r == $c2->r
+			&& $this->g == $c2->g
+			&& $this->b == $c2->b
+			&& $this->alpha == $c2->alpha
+		) {
+			return true;
+		}
+		return false;
+	}
+
+	// TODO - take this colour, and that colour, and make a new one in the ratio given
+	function linterp_with($c2, $ratio) {
+
+	}
+
+	// Is this a transparent/none colour?
+	function is_real()
+	{
+		if ($this->r >= 0 && $this->g >= 0 && $this->b >= 0) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+
+	// Is this a transparent/none colour?
+	function is_none()
+	{
+		if ($this->r == -1 && $this->g == -1 && $this->b == -1) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+
+	// Is this a contrast colour?
+	function is_contrast()
+	{
+		if ($this->r == -3 && $this->g == -3 && $this->b == -3) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+
+	// Is this a copy colour?
+	function is_copy()
+	{
+		if ($this->r == -2 && $this->g == -2 && $this->b == -2) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+
+// allocate a colour in the appropriate image context
+// - things like scale colours are used in multiple images now (the scale, several nodes, the main map...)
+	function gdallocate($image_ref)
+	{
+		if (true === $this->is_none()) {
+			return null;
+		} else {
+			return (myimagecolorallocate($image_ref, $this->r, $this->g, $this->b));
+		}
+	}
+
+	// based on an idea from: http://www.bennadel.com/index.cfm?dax=blog:902.view
+	function contrast_ary()
+	{
+		if ((($this->r + $this->g + $this->b) > 500) || ($this->g > 140)) {
+			return (array (
+				0,
+				0,
+				0
+			));
+		} else {
+			return (array (
+				255,
+				255,
+				255
+			));
+		}
+	}
+
+	function contrast()
+	{
+		return (new WMColour($this->contrast_ary()));
+	}
+
+// make a printable version, for debugging
+// - optionally take a format string, so we can use it for other things (like WriteConfig, or hex in stylesheets)
+	function as_string($format = 'RGB(%d,%d,%d)')
+	{
+		return (sprintf($format, $this->r, $this->g, $this->b));
+	}
+
+	/**
+	 * Produce a string ready to drop into a config file by WriteConfig
+	 */
+	function as_config()
+	{
+		if($this->is_none()) { return 'none'; }
+		if($this->is_copy()) { return 'copy'; }
+		if($this->is_contrast()) { return 'contrast'; }
+
+		return $this->as_string('%d %d %d');
+	}
+
+	function as_html()
+	{
+		if (true === $this->is_real()) {
+			return $this->as_string('#%02x%02x%02x');;
+		} else {
+			return '';
+		}
+	}
+}
 
 // vim:ts=4:sw=4:

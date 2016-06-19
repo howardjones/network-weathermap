@@ -834,8 +834,8 @@ function add_config($file)
 		$realfile = $weathermap_confdir.DIRECTORY_SEPARATOR.$file;
 		$title = wmap_get_title($realfile);
 
-		$file = mysql_real_escape_string($file);
-		$title = mysql_real_escape_string($title);
+		$file = weathermap_sql_escape($file);
+		$title = weathermap_sql_escape($title);
 		$SQL = "insert into weathermap_maps (configfile,titlecache,active,imagefile,htmlfile,filehash,config) VALUES ('$file','$title','on','','','','')";
 		db_execute($SQL);
 
@@ -1183,20 +1183,20 @@ function weathermap_setting_save($mapid,$name,$value)
 {
 	if($mapid >0)
 	{
-		db_execute("replace into weathermap_settings (mapid, optname, optvalue) values ($mapid,'".mysql_real_escape_string($name)."','".mysql_real_escape_string($value)."')");
+		db_execute("replace into weathermap_settings (mapid, optname, optvalue) values ($mapid,'".weathermap_sql_escape($name)."','".weathermap_sql_escape($value)."')");
 	}
 	elseif($mapid <0)
 	{
-		db_execute("insert into weathermap_settings (mapid, groupid, optname, optvalue) values (0, -$mapid,'".mysql_real_escape_string($name)."','".mysql_real_escape_string($value)."')");
+		db_execute("insert into weathermap_settings (mapid, groupid, optname, optvalue) values (0, -$mapid,'".weathermap_sql_escape($name)."','".weathermap_sql_escape($value)."')");
 	}
 	else
 	{
-		db_execute("insert into weathermap_settings (mapid, groupid, optname, optvalue) values (0, 0,'".mysql_real_escape_string($name)."','".mysql_real_escape_string($value)."')");
+		db_execute("insert into weathermap_settings (mapid, groupid, optname, optvalue) values (0, 0,'".weathermap_sql_escape($name)."','".weathermap_sql_escape($value)."')");
 	}
 }
 function weathermap_setting_update($mapid,$settingid,$name,$value)
 {
-	db_execute("update weathermap_settings set optname='".mysql_real_escape_string($name)."', optvalue='".mysql_real_escape_string($value)."' where id=".intval($settingid));
+	db_execute("update weathermap_settings set optname='".weathermap_sql_escape($name)."', optvalue='".weathermap_sql_escape($value)."' where id=".intval($settingid));
 }
 
 function weathermap_setting_delete($mapid,$settingid)
@@ -1349,7 +1349,7 @@ function weathermap_group_editor()
 function weathermap_group_create($newname)
 {
 	$sortorder = db_fetch_cell("select max(sortorder)+1 from weathermap_groups");
-	$SQL = sprintf("insert into weathermap_groups (name, sortorder) values ('%s',%d)", mysql_real_escape_string($newname), $sortorder);
+	$SQL = sprintf("insert into weathermap_groups (name, sortorder) values ('%s',%d)", weathermap_sql_escape($newname), $sortorder);
 #	print $SQL;
 	db_execute($SQL);
 }
@@ -1357,7 +1357,7 @@ function weathermap_group_create($newname)
 function weathermap_group_update($id, $newname)
 {
 
-	$SQL = sprintf("update weathermap_groups set name='%s' where id=%d", mysql_real_escape_string($newname), $id);
+	$SQL = sprintf("update weathermap_groups set name='%s' where id=%d", weathermap_sql_escape($newname), $id);
 #	print $SQL;
 	db_execute($SQL);
 }

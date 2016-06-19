@@ -15,6 +15,9 @@ https://github.com/howardjones/network-weathermap/tree/3d8ae103dcddd67b1a1c9db10
 ---
 ## TODO for 0.98b
 
+*  Pull new Cacti plugin layout from master (input validation etc)
+*  Pull new editor layout?
+
 
 
 # last checkin for previous ReadConfig rewrite
@@ -22,8 +25,19 @@ https://github.com/howardjones/network-weathermap/blob/f2f636190baf3767d376074e9
 
 ###  Performance: 
 
+*  ~~readconfig changes from before~~
+*  ~~htmlimagemap direct-access~~
+*  ~~processstring shortcuts~~
+
 *  imagecreatefromfile isn't that fast - a cache for icon files might be useful
 *  imagecopyresampled also
 *  imagettftext
 
 *  rip out all the wimage* stuff
+*  add a 'get scaled icon' function and put the caching in there
+   *  so multiple same-scaled copies of the same icon are not loaded or scaled
+   *  do that only for images small than (say 128x128) which are obviously icons
+      and not background images which will be huge and never reused.
+
+* string drawing doesn't understand WMFont 
+

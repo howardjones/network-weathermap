@@ -10,8 +10,12 @@ $weathermap_confdir = realpath(dirname(__FILE__).'/configs');
 
 // include the weathermap class so that we can get the version
 include_once(dirname(__FILE__)."/lib/Weathermap.class.php");
+include_once(dirname(__FILE__)."/lib/database.php");
+include_once(dirname(__FILE__)."/lib/WeathermapManager.class.php");
 
 $i_understand_file_permissions_and_how_to_fix_them = FALSE;
+
+$manager = new WeathermapManager(weathermap_get_pdo());
 
 $action = "";
 if (isset($_POST['action'])) {
@@ -855,58 +859,64 @@ function add_config($file)
 function wmap_get_title($filename)
 {
 	$title = "(no title)";
-	$fd = fopen($filename,"r");
-	while (!feof($fd))
-	{
-		$buffer = fgets($fd,4096);
-		if(preg_match("/^\s*TITLE\s+(.*)/i",$buffer, $matches))
-		{
+	$fd = fopen($filename, "r");
+	while (!feof($fd)) {
+		$buffer = fgets($fd, 4096);
+		if (preg_match('/^\s*TITLE\s+(.*)/i', $buffer, $matches)) {
 			$title = $matches[1];
 		}
 		// this regexp is tweaked from the ReadConfig version, to only match TITLEPOS lines *with* a title appended
-		if(preg_match("/^\s*TITLEPOS\s+\d+\s+\d+\s+(.+)/i",$buffer, $matches))
-		{
+		if (preg_match('/^\s*TITLEPOS\s+\d+\s+\d+\s+(.+)/i', $buffer, $matches)) {
 			$title = $matches[1];
 		}
 		// strip out any DOS line endings that got through
-		$title=str_replace("\r", "", $title);
+		$title = str_replace("\r", "", $title);
 	}
 	fclose($fd);
 
-	return($title);
+	return $title;
 }
 
 function map_deactivate($id)
 {
-	$SQL = "update weathermap_maps set active='off' where id=".$id;
-	db_execute($SQL);
+	global $manager;
+	$manager->updateMap($id, array('active' => 'off'));
+//	$SQL = "update weathermap_maps set active='off' where id=".$id;
+//	db_execute($SQL);
 }
 
 function map_activate($id)
 {
-	$SQL = "update weathermap_maps set active='on' where id=".$id;
-	db_execute($SQL);
+	global $manager;
+	$manager->updateMap($id, array('active' => 'off'));
+//	$SQL = "update weathermap_maps set active='on' where id=".$id;
+//	db_execute($SQL);
 }
 
 function map_delete($id)
 {
-	$SQL = "delete from weathermap_maps where id=".$id;
-	db_execute($SQL);
-
-	$SQL = "delete from weathermap_auth where mapid=".$id;
-	db_execute($SQL);
-
-	$SQL = "delete from weathermap_settings where mapid=".$id;
-	db_execute($SQL);
+	global $manager;
+	$manager->deleteMap($id);
+//	$SQL = "delete from weathermap_maps where id=".$id;
+//	db_execute($SQL);
+//
+//	$SQL = "delete from weathermap_auth where mapid=".$id;
+//	db_execute($SQL);
+//
+//	$SQL = "delete from weathermap_settings where mapid=".$id;
+//	db_execute($SQL);
 
 	map_resort();
 }
 
-function weathermap_set_group($mapid,$groupid)
+function weathermap_set_group($mapid, $groupid)
 {
+	global $manager;
 	# print "UPDATING";
-	$SQL = sprintf("update weathermap_maps set group_id=%d where id=%d", $groupid, $mapid);
-	db_execute($SQL);
+	$manager->updateMap($mapid, array('group_id' => $groupid));
+
+//	$SQL = sprintf("update weathermap_maps set group_id=%d where id=%d", $groupid, $mapid);
+//	db_execute($SQL);
 	map_resort();
 }
 

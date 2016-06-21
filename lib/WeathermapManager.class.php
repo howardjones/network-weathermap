@@ -30,7 +30,7 @@ class WeathermapManager
 
     public function getMap($id)
     {
-        $statement = $this->pdo->prepare("select * from weathermap_maps where id=?");
+        $statement = $this->pdo->prepare("SELECT * FROM weathermap_maps WHERE id=?");
         $statement->execute(array($id));
         $map = $statement->fetch(PDO::FETCH_OBJ);
 
@@ -49,14 +49,14 @@ class WeathermapManager
         }
         $set = substr($set, 0, -2);
 
-        return $set;
+        return array($set, $values);
     }
 
     public function updateMap($id, $data)
     {
         // $data = ['name' => 'foo','submit' => 'submit']; // data for insert
         $allowed = ["active", "sortorder", "group_id"]; // allowed fields
-        $set = $this->make_set($data, $allowed);
+        list($set, $values) = $this->make_set($data, $allowed);
 
         $values['id'] = $id;
 
@@ -66,17 +66,98 @@ class WeathermapManager
 
     public function deleteMap($id)
     {
-        $this->pdo->prepare("delete from weathermap_maps where id=?")->execute(array($id));
-        $this->pdo->prepare("delete from weathermap_auth where mapid=?")->execute(array($id));
-        $this->pdo->prepare("delete from weathermap_settings where mapid=?")->execute(array($id));
+        $this->pdo->prepare("DELETE FROM weathermap_maps WHERE id=?")->execute(array($id));
+        $this->pdo->prepare("DELETE FROM weathermap_auth WHERE mapid=?")->execute(array($id));
+        $this->pdo->prepare("DELETE FROM weathermap_settings WHERE mapid=?")->execute(array($id));
     }
 
     public function addPermission($map_id, $user_id)
     {
-        $this->pdo->prepare("insert into weathermap_auth (mapid,userid) values(?,?)")->execute(array($map_id, $user_id));
+        $this->pdo->prepare("INSERT INTO weathermap_auth (mapid,userid) VALUES(?,?)")->execute(array($map_id, $user_id));
     }
+
     public function removePermission($map_id, $user_id)
     {
-        $this->pdo->prepare("delete from weathermap_auth where mapid=? and userid=?")->execute(array($map_id, $user_id));
+        $this->pdo->prepare("DELETE FROM weathermap_auth WHERE mapid=? AND userid=?")->execute(array($map_id, $user_id));
     }
+
+    // Repair the sort order column (for when something is deleted or inserted, or moved between groups)
+    // our primary concern is to make the sort order consistent, rather than any special 'correctness'
+    public function resortMaps()
+    {
+        $stmt = $this->pdo->query('SELECT * FROM weathermap_maps ORDER BY group_id,sortorder;');
+
+        $newMapOrder = array();
+
+        $i = 1;
+        $lastGroupSeen = -1020.5;
+        foreach ($stmt as $map) {
+            if ($lastGroupSeen != $map['group_id']) {
+                $lastGroupSeen = $map['group_id'];
+                $i = 1;
+            }
+            $newMapOrder[$map['id']] = $i;
+            $i++;
+        }
+
+        $statement = $this->pdo - prepare("UPDATE weathermap_maps SET sortorder=? WHERE id=?");
+
+        if (!empty($newMapOrder)) {
+            foreach ($newMapOrder as $mapId => $sortOrder) {
+                $result = $statement->execute(array($sortOrder, $mapId));
+            }
+        }
+
+    }
+
+    public function moveMap($mapId, $direction)
+    {
+        $source = $this->pdo->query('SELECT * FROM weathermap_maps WHERE id=?;')->execute(array($mapId));
+
+//        $source = db_fetch_assoc("select * from weathermap_maps where id=$mapId");
+        $oldOrder = $source[0]['sortorder'];
+        $group = $source[0]['group_id'];
+
+        $newOrder = $oldOrder + $direction;
+        $target = $this->pdo->query("SELECT * FROM weathermap_maps WHERE group_id=? AND sortorder =?")->execute(array($group, $newOrder));
+//        $target = db_fetch_assoc("select * from weathermap_maps where group_id=$group and sortorder = $newOrder");
+
+        if (!empty($target[0]['id'])) {
+            $otherId = $target[0]['id'];
+            // move $mapid in direction $direction
+            $this->pdo->prepare("UPDATE weathermap_maps SET sortorder =? WHERE id=?")->execute(array($newOrder, $mapId));
+//            $sql[] = "update weathermap_maps set sortorder = $newOrder where id=$mapId";
+            // then find the other one with the same sortorder and move that in the opposite direction
+            $this->pdo->prepare("UPDATE weathermap_maps SET sortorder =? WHERE id=?")->execute(array($oldOrder, $otherId));
+//            $sql[] = "update weathermap_maps set sortorder = $oldOrder where id=$otherId";
+        }
+
+    }
+
+    public function moveGroup($groupId, $direction)
+    {
+
+    }
+
+    public function resortGroups()
+    {
+        $stmt = $this->pdo->query('SELECT * FROM weathermap_groups ORDER BY sortorder;');
+
+        $newGroupOrder = array();
+
+        $i = 1;
+        foreach ($stmt as $map) {
+            $newGroupOrder[$map['id']] = $i;
+            $i++;
+        }
+        $statement = $this->pdo - prepare("UPDATE weathermap_groups SET sortorder=? WHERE id=?");
+
+        if (!empty($newGroupOrder)) {
+            foreach ($newGroupOrder as $mapId => $sortOrder) {
+                $result = $statement->execute(array($sortOrder, $mapId));
+            }
+        }
+
+    }
+
 }

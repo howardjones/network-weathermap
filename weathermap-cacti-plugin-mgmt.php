@@ -333,29 +333,6 @@ function weathermap_footer_links()
     html_end_box();
 }
 
-// Repair the sort order column (for when something is deleted or inserted, or moved between groups)
-// our primary concern is to make the sort order consistent, rather than any special 'correctness'
-function map_resort()
-{
-    global $manager;
-
-    $manager->resortMaps();
-}
-
-// Repair the sort order column (for when something is deleted or inserted)
-function weathermap_group_resort()
-{
-    global $manager;
-
-    $manager->resortGroups();
-}
-
-function map_move($mapid, $junk, $direction)
-{
-    global $manager;
-
-    $manager->moveMap($mapid, $direction);
-}
 
 function weathermap_group_move($id, $junk, $direction)
 {
@@ -785,52 +762,7 @@ function wmap_get_title($filename)
     return $title;
 }
 
-function map_deactivate($id)
-{
-    global $manager;
-    $manager->updateMap($id, array('active' => 'off'));
 
-}
-
-function map_activate($id)
-{
-    global $manager;
-    $manager->updateMap($id, array('active' => 'on'));
-}
-
-function map_delete($id)
-{
-    global $manager;
-    $manager->deleteMap($id);
-}
-
-function weathermap_set_group($mapid, $groupid)
-{
-    global $manager;
-    # print "UPDATING";
-    $manager->updateMap($mapid, array('group_id' => $groupid));
-    $manager->resortMaps();
-
-//	$SQL = sprintf("update weathermap_maps set group_id=%d where id=%d", $groupid, $mapid);
-//	db_execute($SQL);
-//	map_resort();
-}
-
-function perms_add_user($mapid, $userid)
-{
-    global $manager;
-    $manager->addPermission($mapid, $userid);
-//    $SQL = "insert into weathermap_auth (mapid,userid) values($mapid,$userid)";
-//    db_execute($SQL);
-}
-
-function perms_delete_user($mapid, $userid)
-{
-    global $manager;
-    $manager->removePermission($mapid, $userid);
-//    $SQL = "delete from weathermap_auth where mapid=$mapid and userid=$userid";
-//    db_execute($SQL);
-}
 
 function perms_list($id)
 {
@@ -1056,26 +988,6 @@ function weathermap_map_settings_form($mapid = 0, $settingid = 0)
 
 }
 
-function weathermap_setting_save($mapid, $name, $value)
-{
-    if ($mapid > 0) {
-        db_execute("replace into weathermap_settings (mapid, optname, optvalue) values ($mapid,'" . weathermap_sql_escape($name) . "','" . weathermap_sql_escape($value) . "')");
-    } elseif ($mapid < 0) {
-        db_execute("insert into weathermap_settings (mapid, groupid, optname, optvalue) values (0, -$mapid,'" . weathermap_sql_escape($name) . "','" . weathermap_sql_escape($value) . "')");
-    } else {
-        db_execute("insert into weathermap_settings (mapid, groupid, optname, optvalue) values (0, 0,'" . weathermap_sql_escape($name) . "','" . weathermap_sql_escape($value) . "')");
-    }
-}
-
-function weathermap_setting_update($mapid, $settingid, $name, $value)
-{
-    db_execute("update weathermap_settings set optname='" . weathermap_sql_escape($name) . "', optvalue='" . weathermap_sql_escape($value) . "' where id=" . intval($settingid));
-}
-
-function weathermap_setting_delete($mapid, $settingid)
-{
-    db_execute("delete from weathermap_settings where id=" . intval($settingid) . " and mapid=" . intval($mapid));
-}
 
 function weathermap_chgroup($id)
 {
@@ -1205,30 +1117,109 @@ function weathermap_group_editor()
 
 function weathermap_group_create($newname)
 {
-    $sortorder = db_fetch_cell("select max(sortorder)+1 from weathermap_groups");
-    $SQL = sprintf("insert into weathermap_groups (name, sortorder) values ('%s',%d)", weathermap_sql_escape($newname), $sortorder);
-#	print $SQL;
-    db_execute($SQL);
+    global $manager;
+
+    $manager->createGroup($newname);
 }
 
 function weathermap_group_update($id, $newname)
 {
+    global $manager;
 
-    $SQL = sprintf("update weathermap_groups set name='%s' where id=%d", weathermap_sql_escape($newname), $id);
-#	print $SQL;
-    db_execute($SQL);
+    $manager->renameGroup($id, $newname);
 }
 
 function weathermap_group_delete($id)
 {
-    $SQL1 = "SELECT MIN(id) from weathermap_groups where id <> " . $id;
-    $newid = db_fetch_cell($SQL1);
-    # move any maps out of this group into a still-existing one
-    $SQL2 = "UPDATE weathermap_maps set group_id=$newid where group_id=" . $id;
-    # then delete the group
-    $SQL3 = "DELETE from weathermap_groups where id=" . $id;
-    db_execute($SQL2);
-    db_execute($SQL3);
+    global $manager;
+
+    $manager->deleteGroup($id);
 }
+
+function weathermap_setting_save($mapid, $name, $value)
+{
+    global $manager;
+
+    $manager->mapSettingSave($mapid, $name, $value);
+}
+
+function weathermap_setting_update($mapid, $settingid, $name, $value)
+{
+    global $manager;
+
+    $manager->mapSettingUpdate($settingid, $name, $value);
+}
+
+function weathermap_setting_delete($mapid, $settingid)
+{
+    global $manager;
+
+    $manager->mapSettingDelete($mapid, $settingid);
+}
+
+function map_deactivate($id)
+{
+    global $manager;
+
+    $manager->disableMap($id);
+}
+
+function map_activate($id)
+{
+    global $manager;
+
+    $manager->activateMap($id);
+}
+
+function map_delete($id)
+{
+    global $manager;
+
+    $manager->deleteMap($id);
+}
+
+function weathermap_set_group($mapid, $groupid)
+{
+    global $manager;
+
+    $manager->setMapGroup($mapid, $groupid);
+}
+
+function perms_add_user($mapid, $userid)
+{
+    global $manager;
+    $manager->addPermission($mapid, $userid);
+}
+
+function perms_delete_user($mapid, $userid)
+{
+    global $manager;
+    $manager->removePermission($mapid, $userid);
+}
+
+// Repair the sort order column (for when something is deleted or inserted, or moved between groups)
+// our primary concern is to make the sort order consistent, rather than any special 'correctness'
+function map_resort()
+{
+    global $manager;
+
+    $manager->resortMaps();
+}
+
+// Repair the sort order column (for when something is deleted or inserted)
+function weathermap_group_resort()
+{
+    global $manager;
+
+    $manager->resortGroups();
+}
+
+function map_move($mapid, $junk, $direction)
+{
+    global $manager;
+
+    $manager->moveMap($mapid, $direction);
+}
+
 
 // vim:ts=4:sw=4:

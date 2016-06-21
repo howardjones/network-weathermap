@@ -1,2 +1,17 @@
 # Created by .ignore support plugin (hsz.mobi)
 .idea/
+build
+build/*
+dist/*
+!build/phpmd.xml
+!build/phpunit.xml
+!build/phpdox.xml
+!build/phpcs.xml
+!build/network-weathermap.doxy
+vendor/*
+docs/dev/generated/
+docs/dev/phpcs/
+docs/dev/vagrant-testers/*.zip
+node_modules/
+reports/
+

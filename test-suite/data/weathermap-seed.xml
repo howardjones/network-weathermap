@@ -1,0 +1,381 @@
+<?xml version="1.0"?>
+<mysqldump xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+<database name="cacti">
+	<table_structure name="weathermap_maps">
+		<field Field="id" Type="int(11)" Null="NO" Key="PRI" Extra="auto_increment" Comment="" />
+		<field Field="sortorder" Type="int(11)" Null="NO" Key="" Default="0" Extra="" Comment="" />
+		<field Field="group_id" Type="int(11)" Null="NO" Key="" Default="1" Extra="" Comment="" />
+		<field Field="active" Type="set('on','off')" Null="NO" Key="" Default="on" Extra="" Comment="" />
+		<field Field="configfile" Type="text" Null="NO" Key="" Extra="" Comment="" />
+		<field Field="imagefile" Type="text" Null="NO" Key="" Extra="" Comment="" />
+		<field Field="htmlfile" Type="text" Null="NO" Key="" Extra="" Comment="" />
+		<field Field="titlecache" Type="text" Null="NO" Key="" Extra="" Comment="" />
+		<field Field="filehash" Type="varchar(40)" Null="NO" Key="" Default="" Extra="" Comment="" />
+		<field Field="warncount" Type="int(11)" Null="NO" Key="" Default="0" Extra="" Comment="" />
+		<field Field="config" Type="text" Null="NO" Key="" Extra="" Comment="" />
+		<field Field="thumb_width" Type="int(11)" Null="NO" Key="" Default="0" Extra="" Comment="" />
+		<field Field="thumb_height" Type="int(11)" Null="NO" Key="" Default="0" Extra="" Comment="" />
+		<field Field="schedule" Type="varchar(32)" Null="NO" Key="" Default="*" Extra="" Comment="" />
+		<field Field="archiving" Type="set('on','off')" Null="NO" Key="" Default="off" Extra="" Comment="" />
+		<key Table="weathermap_maps" Non_unique="0" Key_name="PRIMARY" Seq_in_index="1" Column_name="id" Collation="A" Cardinality="6" Null="" Index_type="BTREE" Comment="" Index_comment="" />
+		<options Name="weathermap_maps" Engine="MyISAM" Version="10" Row_format="Dynamic" Rows="6" Avg_row_length="93" Data_length="560" Max_data_length="281474976710655" Index_length="2048" Data_free="0" Auto_increment="8" Create_time="2016-05-25 22:53:22" Update_time="2016-06-21 16:04:01" Collation="latin1_swedish_ci" Create_options="" Comment="" />
+	</table_structure>
+	<table_data name="weathermap_maps">
+	<row>
+		<field name="id">1</field>
+		<field name="sortorder">5</field>
+		<field name="group_id">1</field>
+		<field name="active">on</field>
+		<field name="configfile">simple.conf</field>
+		<field name="imagefile"></field>
+		<field name="htmlfile"></field>
+		<field name="titlecache">test</field>
+		<field name="filehash">b4964c0d7f4f300f1675</field>
+		<field name="warncount">0</field>
+		<field name="config"></field>
+		<field name="thumb_width">0</field>
+		<field name="thumb_height">0</field>
+		<field name="schedule">*</field>
+		<field name="archiving">off</field>
+	</row>
+	<row>
+		<field name="id">2</field>
+		<field name="sortorder">6</field>
+		<field name="group_id">1</field>
+		<field name="active">on</field>
+		<field name="configfile">097-simple.conf</field>
+		<field name="imagefile"></field>
+		<field name="htmlfile"></field>
+		<field name="titlecache">0.97 DS changes</field>
+		<field name="filehash">505796aabcca62711707</field>
+		<field name="warncount">0</field>
+		<field name="config"></field>
+		<field name="thumb_width">0</field>
+		<field name="thumb_height">0</field>
+		<field name="schedule">*</field>
+		<field name="archiving">off</field>
+	</row>
+	<row>
+		<field name="id">5</field>
+		<field name="sortorder">3</field>
+		<field name="group_id">1</field>
+		<field name="active">on</field>
+		<field name="configfile">097-test.conf</field>
+		<field name="imagefile"></field>
+		<field name="htmlfile"></field>
+		<field name="titlecache">0.96 Test Map {map:titleextra}</field>
+		<field name="filehash">87c16c1c3430a9ccfd1a</field>
+		<field name="warncount">0</field>
+		<field name="config"></field>
+		<field name="thumb_width">0</field>
+		<field name="thumb_height">0</field>
+		<field name="schedule">*</field>
+		<field name="archiving">off</field>
+	</row>
+	<row>
+		<field name="id">4</field>
+		<field name="sortorder">4</field>
+		<field name="group_id">1</field>
+		<field name="active">on</field>
+		<field name="configfile">torture.conf</field>
+		<field name="imagefile"></field>
+		<field name="htmlfile"></field>
+		<field name="titlecache">(no title)</field>
+		<field name="filehash">abec33d43367435356aa</field>
+		<field name="warncount">0</field>
+		<field name="config"></field>
+		<field name="thumb_width">0</field>
+		<field name="thumb_height">0</field>
+		<field name="schedule">*</field>
+		<field name="archiving">off</field>
+	</row>
+	<row>
+		<field name="id">6</field>
+		<field name="sortorder">2</field>
+		<field name="group_id">1</field>
+		<field name="active">on</field>
+		<field name="configfile">094-test.conf</field>
+		<field name="imagefile"></field>
+		<field name="htmlfile"></field>
+		<field name="titlecache">Testing THold DS</field>
+		<field name="filehash">a7914efbc053964d7711</field>
+		<field name="warncount">0</field>
+		<field name="config"></field>
+		<field name="thumb_width">0</field>
+		<field name="thumb_height">0</field>
+		<field name="schedule">*</field>
+		<field name="archiving">off</field>
+	</row>
+	<row>
+		<field name="id">7</field>
+		<field name="sortorder">1</field>
+		<field name="group_id">1</field>
+		<field name="active">on</field>
+		<field name="configfile">switch-status-2.conf</field>
+		<field name="imagefile"></field>
+		<field name="htmlfile"></field>
+		<field name="titlecache">same map as switch-status.conf, but with every port scaled</field>
+		<field name="filehash">99639caa5ed4ab8ad7a2</field>
+		<field name="warncount">0</field>
+		<field name="config"></field>
+		<field name="thumb_width">0</field>
+		<field name="thumb_height">0</field>
+		<field name="schedule">*</field>
+		<field name="archiving">off</field>
+	</row>
+	</table_data>
+	<table_structure name="weathermap_data">
+		<field Field="id" Type="int(11)" Null="NO" Key="PRI" Extra="auto_increment" Comment="" />
+		<field Field="rrdfile" Type="varchar(255)" Null="NO" Key="MUL" Extra="" Comment="" />
+		<field Field="data_source_name" Type="varchar(19)" Null="NO" Key="MUL" Extra="" Comment="" />
+		<field Field="last_time" Type="int(11)" Null="NO" Key="" Extra="" Comment="" />
+		<field Field="last_value" Type="varchar(255)" Null="NO" Key="" Extra="" Comment="" />
+		<field Field="last_calc" Type="varchar(255)" Null="NO" Key="" Extra="" Comment="" />
+		<field Field="sequence" Type="int(11)" Null="NO" Key="" Extra="" Comment="" />
+		<field Field="local_data_id" Type="int(11)" Null="NO" Key="MUL" Default="0" Extra="" Comment="" />
+		<key Table="weathermap_data" Non_unique="0" Key_name="PRIMARY" Seq_in_index="1" Column_name="id" Collation="A" Cardinality="0" Null="" Index_type="BTREE" Comment="" Index_comment="" />
+		<key Table="weathermap_data" Non_unique="1" Key_name="rrdfile" Seq_in_index="1" Column_name="rrdfile" Collation="A" Null="" Index_type="BTREE" Comment="" Index_comment="" />
+		<key Table="weathermap_data" Non_unique="1" Key_name="local_data_id" Seq_in_index="1" Column_name="local_data_id" Collation="A" Null="" Index_type="BTREE" Comment="" Index_comment="" />
+		<key Table="weathermap_data" Non_unique="1" Key_name="data_source_name" Seq_in_index="1" Column_name="data_source_name" Collation="A" Null="" Index_type="BTREE" Comment="" Index_comment="" />
+		<options Name="weathermap_data" Engine="MyISAM" Version="10" Row_format="Dynamic" Rows="0" Avg_row_length="0" Data_length="0" Max_data_length="281474976710655" Index_length="2048" Data_free="0" Auto_increment="1" Create_time="2016-05-25 22:53:22" Update_time="2016-05-25 22:53:22" Collation="latin1_swedish_ci" Create_options="" Comment="" />
+	</table_structure>
+	<table_data name="weathermap_data">
+	</table_data>
+	<table_structure name="weathermap_auth">
+		<field Field="userid" Type="mediumint(9)" Null="NO" Key="" Default="0" Extra="" Comment="" />
+		<field Field="mapid" Type="int(11)" Null="NO" Key="" Default="0" Extra="" Comment="" />
+		<options Name="weathermap_auth" Engine="MyISAM" Version="10" Row_format="Fixed" Rows="6" Avg_row_length="8" Data_length="48" Max_data_length="2251799813685247" Index_length="1024" Data_free="0" Create_time="2016-05-25 22:53:22" Update_time="2016-06-21 16:04:01" Collation="latin1_swedish_ci" Create_options="" Comment="" />
+	</table_structure>
+	<table_data name="weathermap_auth">
+	<row>
+		<field name="userid">1</field>
+		<field name="mapid">1</field>
+	</row>
+	<row>
+		<field name="userid">1</field>
+		<field name="mapid">2</field>
+	</row>
+	<row>
+		<field name="userid">1</field>
+		<field name="mapid">4</field>
+	</row>
+	<row>
+		<field name="userid">1</field>
+		<field name="mapid">5</field>
+	</row>
+	<row>
+		<field name="userid">1</field>
+		<field name="mapid">6</field>
+	</row>
+	<row>
+		<field name="userid">1</field>
+		<field name="mapid">7</field>
+	</row>
+	</table_data>
+	<table_structure name="weathermap_groups">
+		<field Field="id" Type="int(11)" Null="NO" Key="PRI" Extra="auto_increment" Comment="" />
+		<field Field="name" Type="varchar(128)" Null="NO" Key="" Default="" Extra="" Comment="" />
+		<field Field="sortorder" Type="int(11)" Null="NO" Key="" Default="0" Extra="" Comment="" />
+		<key Table="weathermap_groups" Non_unique="0" Key_name="PRIMARY" Seq_in_index="1" Column_name="id" Collation="A" Cardinality="2" Null="" Index_type="BTREE" Comment="" Index_comment="" />
+		<options Name="weathermap_groups" Engine="MyISAM" Version="10" Row_format="Dynamic" Rows="2" Avg_row_length="22" Data_length="44" Max_data_length="281474976710655" Index_length="2048" Data_free="0" Auto_increment="3" Create_time="2016-05-25 22:53:22" Update_time="2016-06-21 16:01:31" Collation="latin1_swedish_ci" Create_options="" Comment="" />
+	</table_structure>
+	<table_data name="weathermap_groups">
+	<row>
+		<field name="id">1</field>
+		<field name="name">Weathermaps</field>
+		<field name="sortorder">2</field>
+	</row>
+	<row>
+		<field name="id">2</field>
+		<field name="name">g1</field>
+		<field name="sortorder">1</field>
+	</row>
+	</table_data>
+	<table_structure name="weathermap_settings">
+		<field Field="id" Type="int(11)" Null="NO" Key="PRI" Extra="auto_increment" Comment="" />
+		<field Field="mapid" Type="int(11)" Null="NO" Key="" Default="0" Extra="" Comment="" />
+		<field Field="groupid" Type="int(11)" Null="NO" Key="" Default="0" Extra="" Comment="" />
+		<field Field="optname" Type="varchar(128)" Null="NO" Key="" Default="" Extra="" Comment="" />
+		<field Field="optvalue" Type="varchar(128)" Null="NO" Key="" Default="" Extra="" Comment="" />
+		<key Table="weathermap_settings" Non_unique="0" Key_name="PRIMARY" Seq_in_index="1" Column_name="id" Collation="A" Cardinality="1" Null="" Index_type="BTREE" Comment="" Index_comment="" />
+		<options Name="weathermap_settings" Engine="MyISAM" Version="10" Row_format="Dynamic" Rows="1" Avg_row_length="48" Data_length="96" Max_data_length="281474976710655" Index_length="2048" Data_free="48" Auto_increment="6" Create_time="2016-05-25 22:53:22" Update_time="2016-05-26 06:55:19" Collation="latin1_swedish_ci" Create_options="" Comment="" />
+	</table_structure>
+	<table_data name="weathermap_settings">
+	<row>
+		<field name="id">5</field>
+		<field name="mapid">0</field>
+		<field name="groupid">0</field>
+		<field name="optname">rrd_use_poller_output</field>
+		<field name="optvalue">1</field>
+	</row>
+	</table_data>
+	<table_structure name="settings">
+		<field Field="name" Type="varchar(50)" Null="NO" Key="PRI" Default="" Extra="" Comment="" />
+		<field Field="value" Type="varchar(255)" Null="NO" Key="" Default="" Extra="" Comment="" />
+		<key Table="settings" Non_unique="0" Key_name="PRIMARY" Seq_in_index="1" Column_name="name" Collation="A" Cardinality="40" Null="" Index_type="BTREE" Comment="" Index_comment="" />
+		<options Name="settings" Engine="MyISAM" Version="10" Row_format="Dynamic" Rows="40" Avg_row_length="33" Data_length="1356" Max_data_length="281474976710655" Index_length="4096" Data_free="0" Create_time="2016-05-25 22:51:05" Update_time="2016-05-26 06:25:03" Collation="latin1_swedish_ci" Create_options="" Comment="" />
+	</table_structure>
+	<table_data name="settings">
+	<row>
+		<field name="name">path_rrdtool</field>
+		<field name="value">/usr/local/bin/rrdtool</field>
+	</row>
+	<row>
+		<field name="name">path_php_binary</field>
+		<field name="value">/usr/bin/php</field>
+	</row>
+	<row>
+		<field name="name">path_snmpwalk</field>
+		<field name="value">/usr/bin/snmpwalk</field>
+	</row>
+	<row>
+		<field name="name">path_snmpget</field>
+		<field name="value">/usr/bin/snmpget</field>
+	</row>
+	<row>
+		<field name="name">path_snmpbulkwalk</field>
+		<field name="value">/usr/bin/snmpbulkwalk</field>
+	</row>
+	<row>
+		<field name="name">path_snmpgetnext</field>
+		<field name="value">/usr/bin/snmpgetnext</field>
+	</row>
+	<row>
+		<field name="name">path_cactilog</field>
+		<field name="value">/Applications/XAMPP/xamppfiles/htdocs/cacti/log/cacti.log</field>
+	</row>
+	<row>
+		<field name="name">snmp_version</field>
+		<field name="value">net-snmp</field>
+	</row>
+	<row>
+		<field name="name">rrdtool_version</field>
+		<field name="value">rrd-1.2.x</field>
+	</row>
+	<row>
+		<field name="name">weathermap_pagestyle</field>
+		<field name="value">0</field>
+	</row>
+	<row>
+		<field name="name">weathermap_cycle_refresh</field>
+		<field name="value">0</field>
+	</row>
+	<row>
+		<field name="name">weathermap_render_period</field>
+		<field name="value">0</field>
+	</row>
+	<row>
+		<field name="name">weathermap_quiet_logging</field>
+		<field name="value">0</field>
+	</row>
+	<row>
+		<field name="name">weathermap_render_counter</field>
+		<field name="value">0</field>
+	</row>
+	<row>
+		<field name="name">weathermap_output_format</field>
+		<field name="value">png</field>
+	</row>
+	<row>
+		<field name="name">weathermap_thumbsize</field>
+		<field name="value">250</field>
+	</row>
+	<row>
+		<field name="name">weathermap_map_selector</field>
+		<field name="value">1</field>
+	</row>
+	<row>
+		<field name="name">weathermap_all_tab</field>
+		<field name="value">0</field>
+	</row>
+	<row>
+		<field name="name">weathermap_db_version</field>
+		<field name="value">0.98</field>
+	</row>
+	<row>
+		<field name="name">weathermap_version</field>
+		<field name="value"></field>
+	</row>
+	<row>
+		<field name="name">boost_rrd_update_enable</field>
+		<field name="value">on</field>
+	</row>
+	<row>
+		<field name="name">boost_rrd_update_system_enable</field>
+		<field name="value"></field>
+	</row>
+	<row>
+		<field name="name">boost_rrd_update_interval</field>
+		<field name="value">60</field>
+	</row>
+	<row>
+		<field name="name">boost_rrd_update_max_records</field>
+		<field name="value">1000000</field>
+	</row>
+	<row>
+		<field name="name">boost_rrd_update_max_records_per_select</field>
+		<field name="value">50000</field>
+	</row>
+	<row>
+		<field name="name">boost_rrd_update_string_length</field>
+		<field name="value">2000</field>
+	</row>
+	<row>
+		<field name="name">boost_poller_mem_limit</field>
+		<field name="value">1024</field>
+	</row>
+	<row>
+		<field name="name">boost_rrd_update_max_runtime</field>
+		<field name="value">1200</field>
+	</row>
+	<row>
+		<field name="name">boost_redirect</field>
+		<field name="value"></field>
+	</row>
+	<row>
+		<field name="name">boost_server_enable</field>
+		<field name="value"></field>
+	</row>
+	<row>
+		<field name="name">boost_server_effective_user</field>
+		<field name="value">root</field>
+	</row>
+	<row>
+		<field name="name">boost_server_multiprocess</field>
+		<field name="value">1</field>
+	</row>
+	<row>
+		<field name="name">boost_path_rrdupdate</field>
+		<field name="value"></field>
+	</row>
+	<row>
+		<field name="name">boost_server_hostname</field>
+		<field name="value">localhost</field>
+	</row>
+	<row>
+		<field name="name">boost_server_listen_port</field>
+		<field name="value">9050</field>
+	</row>
+	<row>
+		<field name="name">boost_server_timeout</field>
+		<field name="value">2</field>
+	</row>
+	<row>
+		<field name="name">boost_server_clients</field>
+		<field name="value">127.0.0.1</field>
+	</row>
+	<row>
+		<field name="name">boost_png_cache_enable</field>
+		<field name="value"></field>
+	</row>
+	<row>
+		<field name="name">boost_png_cache_directory</field>
+		<field name="value"></field>
+	</row>
+	<row>
+		<field name="name">path_boost_log</field>
+		<field name="value"></field>
+	</row>
+	</table_data>
+</database>
+</mysqldump>

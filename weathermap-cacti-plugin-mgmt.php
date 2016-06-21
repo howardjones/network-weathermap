@@ -14,8 +14,7 @@ include_once(dirname(__FILE__) . "/lib/database.php");
 include_once(dirname(__FILE__) . "/lib/WeathermapManager.class.php");
 
 $i_understand_file_permissions_and_how_to_fix_them = FALSE;
-
-$manager = new WeathermapManager(weathermap_get_pdo());
+$my_name = "weathermap-cacti-plugin-mgmt.php";
 
 $action = "";
 if (isset($_POST['action'])) {
@@ -28,7 +27,7 @@ switch ($action) {
 
     case 'enable_poller_output':
         weathermap_setting_save(0, 'rrd_use_poller_output', 1);
-        header("Location: weathermap-cacti-plugin-mgmt.php?action=map_settings&id=0");
+        header("Location: ?action=map_settings&id=0");
         break;
 
     case 'group_update':
@@ -43,7 +42,7 @@ switch ($action) {
 
         if ($id >= 0 && $newname != "") weathermap_group_update($id, $newname);
         if ($id < 0 && $newname != "") weathermap_group_create($newname);
-        header("Location: weathermap-cacti-plugin-mgmt.php?action=groupadmin");
+        header("Location: ?action=groupadmin");
 
         break;
 
@@ -58,7 +57,7 @@ switch ($action) {
         if ($id >= 1) {
             weathermap_group_delete($id);
         }
-        header("Location: weathermap-cacti-plugin-mgmt.php?action=groupadmin");
+        header("Location: ?action=groupadmin");
         break;
 
     case 'group_form':
@@ -100,7 +99,7 @@ switch ($action) {
             weathermap_set_group($mapid, $groupid);
         }
 
-        header("Location: weathermap-cacti-plugin-mgmt.php");
+        header("Location: " . $my_name);
         break;
 
     case 'chgroup':
@@ -127,7 +126,7 @@ switch ($action) {
             // create setting
             weathermap_setting_delete($mapid, $settingid);
         }
-        header("Location: weathermap-cacti-plugin-mgmt.php?action=map_settings&id=" . $mapid);
+        header("Location: ?action=map_settings&id=" . $mapid);
         break;
 
 // this is the save option from the map_settings_form
@@ -158,7 +157,7 @@ switch ($action) {
             // update setting
             weathermap_setting_update($mapid, $settingid, $name, $value);
         }
-        header("Location: weathermap-cacti-plugin-mgmt.php?action=map_settings&id=" . $mapid);
+        header("Location: ?action=map_settings&id=" . $mapid);
         break;
 
     case 'map_settings_form':
@@ -189,7 +188,7 @@ switch ($action) {
             && isset($_REQUEST['userid']) && is_numeric($_REQUEST['userid'])
         ) {
             perms_add_user(intval($_REQUEST['mapid']), intval($_REQUEST['userid']));
-            header("Location: weathermap-cacti-plugin-mgmt.php?action=perms_edit&id=" . intval($_REQUEST['mapid']));
+            header("Location: ?action=perms_edit&id=" . intval($_REQUEST['mapid']));
         }
         break;
     case 'perms_delete_user':
@@ -197,7 +196,7 @@ switch ($action) {
             && isset($_REQUEST['userid']) && is_numeric($_REQUEST['userid'])
         ) {
             perms_delete_user($_REQUEST['mapid'], $_REQUEST['userid']);
-            header("Location: weathermap-cacti-plugin-mgmt.php?action=perms_edit&id=" . $_REQUEST['mapid']);
+            header("Location: ?action=perms_edit&id=" . $_REQUEST['mapid']);
         }
         break;
     case 'perms_edit':
@@ -218,27 +217,25 @@ switch ($action) {
 
     case 'deactivate_map':
         if (isset($_REQUEST['id']) && is_numeric($_REQUEST['id'])) map_deactivate($_REQUEST['id']);
-        header("Location: weathermap-cacti-plugin-mgmt.php");
+        header("Location: " . $my_name);
         break;
 
     case 'activate_map':
         if (isset($_REQUEST['id']) && is_numeric($_REQUEST['id'])) map_activate($_REQUEST['id']);
-        header("Location: weathermap-cacti-plugin-mgmt.php");
+        header("Location: " . $my_name);
         break;
 
     case 'move_map_up':
-        if (isset($_REQUEST['id']) && is_numeric($_REQUEST['id']) &&
-            isset($_REQUEST['order']) && is_numeric($_REQUEST['order'])
-        )
-            map_move($_REQUEST['id'], $_REQUEST['order'], -1);
-        header("Location: weathermap-cacti-plugin-mgmt.php");
+        if (isset($_REQUEST['id']) && is_numeric($_REQUEST['id']))
+            map_move($_REQUEST['id'], null, -1);
+
+        header("Location: " . $my_name);
         break;
     case 'move_map_down':
-        if (isset($_REQUEST['id']) && is_numeric($_REQUEST['id']) &&
-            isset($_REQUEST['order']) && is_numeric($_REQUEST['order'])
-        )
-            map_move($_REQUEST['id'], $_REQUEST['order'], +1);
-        header("Location: weathermap-cacti-plugin-mgmt.php");
+        if (isset($_REQUEST['id']) && is_numeric($_REQUEST['id']))
+            map_move($_REQUEST['id'], null, +1);
+
+        header("Location: " . $my_name);
         break;
 
     case 'move_group_up':
@@ -246,14 +243,14 @@ switch ($action) {
             isset($_REQUEST['order']) && is_numeric($_REQUEST['order'])
         )
             weathermap_group_move(intval($_REQUEST['id']), intval($_REQUEST['order']), -1);
-        header("Location: weathermap-cacti-plugin-mgmt.php?action=groupadmin");
+        header("Location: ?action=groupadmin");
         break;
     case 'move_group_down':
         if (isset($_REQUEST['id']) && is_numeric($_REQUEST['id']) &&
             isset($_REQUEST['order']) && is_numeric($_REQUEST['order'])
         )
             weathermap_group_move(intval($_REQUEST['id']), intval($_REQUEST['order']), 1);
-        header("Location: weathermap-cacti-plugin-mgmt.php?action=groupadmin");
+        header("Location: ?action=groupadmin");
         break;
 
     case 'viewconfig':
@@ -280,17 +277,14 @@ switch ($action) {
     case 'addmap':
         if (isset($_REQUEST['file'])) {
             add_config($_REQUEST['file']);
-            header("Location: weathermap-cacti-plugin-mgmt.php");
+            header("Location: " . $my_name);
         } else {
             print "No such file.";
         }
 
         break;
 
-    case 'editor':
-        // chdir(dirname(__FILE__));
-        // include_once('./weathermap-cacti-plugin-editor.php');
-        break;
+
 
     case 'rebuildnow':
 
@@ -793,33 +787,19 @@ function map_deactivate($id)
 {
     global $manager;
     $manager->updateMap($id, array('active' => 'off'));
-//	$SQL = "update weathermap_maps set active='off' where id=".$id;
-//	db_execute($SQL);
+
 }
 
 function map_activate($id)
 {
     global $manager;
-    $manager->updateMap($id, array('active' => 'off'));
-//	$SQL = "update weathermap_maps set active='on' where id=".$id;
-//	db_execute($SQL);
+    $manager->updateMap($id, array('active' => 'on'));
 }
 
 function map_delete($id)
 {
     global $manager;
     $manager->deleteMap($id);
-    $manager->resortMaps();
-//	$SQL = "delete from weathermap_maps where id=".$id;
-//	db_execute($SQL);
-//
-//	$SQL = "delete from weathermap_auth where mapid=".$id;
-//	db_execute($SQL);
-//
-//	$SQL = "delete from weathermap_settings where mapid=".$id;
-//	db_execute($SQL);
-
-//	map_resort();
 }
 
 function weathermap_set_group($mapid, $groupid)
@@ -828,6 +808,7 @@ function weathermap_set_group($mapid, $groupid)
     # print "UPDATING";
     $manager->updateMap($mapid, array('group_id' => $groupid));
     $manager->resortMaps();
+
 //	$SQL = sprintf("update weathermap_maps set group_id=%d where id=%d", $groupid, $mapid);
 //	db_execute($SQL);
 //	map_resort();

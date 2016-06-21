@@ -69,6 +69,8 @@ class WeathermapManager
         $this->pdo->prepare("DELETE FROM weathermap_maps WHERE id=?")->execute(array($id));
         $this->pdo->prepare("DELETE FROM weathermap_auth WHERE mapid=?")->execute(array($id));
         $this->pdo->prepare("DELETE FROM weathermap_settings WHERE mapid=?")->execute(array($id));
+
+        $this->resortMaps();
     }
 
     public function addPermission($map_id, $user_id)
@@ -100,11 +102,11 @@ class WeathermapManager
             $i++;
         }
 
-        $statement = $this->pdo - prepare("UPDATE weathermap_maps SET sortorder=? WHERE id=?");
+        $statement = $this->pdo->prepare("UPDATE weathermap_maps SET sortorder=? WHERE id=?");
 
         if (!empty($newMapOrder)) {
             foreach ($newMapOrder as $mapId => $sortOrder) {
-                $result = $statement->execute(array($sortOrder, $mapId));
+                 $statement->execute(array($sortOrder, $mapId));
             }
         }
 
@@ -150,11 +152,11 @@ class WeathermapManager
             $newGroupOrder[$map['id']] = $i;
             $i++;
         }
-        $statement = $this->pdo - prepare("UPDATE weathermap_groups SET sortorder=? WHERE id=?");
+        $statement = $this->pdo->prepare("UPDATE weathermap_groups SET sortorder=? WHERE id=?");
 
         if (!empty($newGroupOrder)) {
             foreach ($newGroupOrder as $mapId => $sortOrder) {
-                $result = $statement->execute(array($sortOrder, $mapId));
+                 $statement->execute(array($sortOrder, $mapId));
             }
         }
 

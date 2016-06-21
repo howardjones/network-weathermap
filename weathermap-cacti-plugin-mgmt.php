@@ -16,6 +16,8 @@ include_once(dirname(__FILE__) . "/lib/WeathermapManager.class.php");
 $i_understand_file_permissions_and_how_to_fix_them = FALSE;
 $my_name = "weathermap-cacti-plugin-mgmt.php";
 
+$manager = new WeathermapManager(weathermap_get_pdo());
+
 $action = "";
 if (isset($_POST['action'])) {
     $action = $_POST['action'];

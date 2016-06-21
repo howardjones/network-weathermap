@@ -71,6 +71,12 @@ class WeathermapManagerTest extends PHPUnit_Extensions_Database_TestCase
         $pos = $this->getMapOrder();
         $this->assertEquals($pos, array(6, 7, 5, 4, 1, 2));
 
+        // and moving back down should work as expected after a failed move up
+        $this->manager->moveMap(6, 1);
+        $pos = $this->getMapOrder();
+        $this->assertEquals($pos, array(7, 6, 5, 4, 1, 2));
+
+
     }
 
     public function testMoveMapDown()
@@ -87,6 +93,11 @@ class WeathermapManagerTest extends PHPUnit_Extensions_Database_TestCase
         $this->manager->moveMap(1, 1);
         $pos = $this->getMapOrder();
         $this->assertEquals($pos, array(7, 6, 5, 4, 2, 1));
+
+        // and moving back up should work as expected after a failed move down
+        $this->manager->moveMap(1, -1);
+        $pos = $this->getMapOrder();
+        $this->assertEquals($pos, array(7, 6, 5, 4, 1, 2));
     }
 
     public function testDeleteMap()

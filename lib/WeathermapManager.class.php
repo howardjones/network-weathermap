@@ -114,14 +114,14 @@ class WeathermapManager
 
     public function moveMap($mapId, $direction)
     {
-        $source = $this->pdo->query('SELECT * FROM weathermap_maps WHERE id=?;')->execute(array($mapId));
+        $source = $this->pdo->prepare('SELECT * FROM weathermap_maps WHERE id=?;')->execute(array($mapId));
 
 //        $source = db_fetch_assoc("select * from weathermap_maps where id=$mapId");
         $oldOrder = $source[0]['sortorder'];
         $group = $source[0]['group_id'];
 
         $newOrder = $oldOrder + $direction;
-        $target = $this->pdo->query("SELECT * FROM weathermap_maps WHERE group_id=? AND sortorder =?")->execute(array($group, $newOrder));
+        $target = $this->pdo->prepare("SELECT * FROM weathermap_maps WHERE group_id=? AND sortorder =?")->execute(array($group, $newOrder));
 //        $target = db_fetch_assoc("select * from weathermap_maps where group_id=$group and sortorder = $newOrder");
 
         if (!empty($target[0]['id'])) {

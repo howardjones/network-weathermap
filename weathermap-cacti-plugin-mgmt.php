@@ -286,8 +286,6 @@ switch ($action) {
 
         break;
 
-
-
     case 'rebuildnow':
 
         include_once($config["base_path"] . "/include/top_header.php");
@@ -334,48 +332,10 @@ function weathermap_footer_links()
 }
 
 
-function weathermap_group_move($id, $junk, $direction)
-{
-    $source = db_fetch_assoc("select * from weathermap_groups where id=$id");
-    $oldorder = $source[0]['sortorder'];
-
-    $neworder = $oldorder + $direction;
-    $target = db_fetch_assoc("select * from weathermap_groups where sortorder = $neworder");
-
-    if (!empty($target[0]['id'])) {
-        $otherid = $target[0]['id'];
-        // move $mapid in direction $direction
-        $sql[] = "update weathermap_groups set sortorder = $neworder where id=$id";
-        // then find the other one with the same sortorder and move that in the opposite direction
-        $sql[] = "update weathermap_groups set sortorder = $oldorder where id=$otherid";
-    }
-    if (!empty($sql)) {
-        for ($a = 0; $a < count($sql); $a++) {
-            $result = db_execute($sql[$a]);
-        }
-    }
-}
-
-function get_table_list()
-{
-    $sql = "show tables";
-    $result = db_fetch_assoc($sql) or die (mysql_error());
-
-    $tables = array();
-    $sql = array();
-
-    foreach ($result as $index => $arr) {
-        foreach ($arr as $t) {
-            $tables[] = $t;
-        }
-    }
-
-    return $tables;
-}
 
 function maplist()
 {
-    global $colors, $menu;
+    global $colors;
     global $i_understand_file_permissions_and_how_to_fix_them;
 
     #print "<pre>";
@@ -401,7 +361,7 @@ function maplist()
         exit();
     }
 
-    $tables = get_table_list();
+    $tables = get_table_list(weathermap_get_pdo());
     if (!in_array('weathermap_maps', $tables)) {
         print '<div align="center" class="wm_warning"><p>';
         print 'The weathermap_maps table is missing completely from the database. Something went wrong with the installation process.';
@@ -1140,21 +1100,21 @@ function weathermap_setting_save($mapid, $name, $value)
 {
     global $manager;
 
-    $manager->mapSettingSave($mapid, $name, $value);
+    $manager->saveMapSetting($mapid, $name, $value);
 }
 
 function weathermap_setting_update($mapid, $settingid, $name, $value)
 {
     global $manager;
 
-    $manager->mapSettingUpdate($settingid, $name, $value);
+    $manager->updateMapSetting($settingid, $name, $value);
 }
 
 function weathermap_setting_delete($mapid, $settingid)
 {
     global $manager;
 
-    $manager->mapSettingDelete($mapid, $settingid);
+    $manager->deleteMapSetting($mapid, $settingid);
 }
 
 function map_deactivate($id)
@@ -1221,5 +1181,11 @@ function map_move($mapid, $junk, $direction)
     $manager->moveMap($mapid, $direction);
 }
 
+function weathermap_group_move($id, $junk, $direction)
+{
+    global $manager;
+
+    $manager->moveGroup($id, $direction);
+}
 
 // vim:ts=4:sw=4:

@@ -139,31 +139,43 @@ class WeathermapManager
 
     public function moveMap($mapId, $direction)
     {
-        $source = $this->pdo->prepare('SELECT * FROM weathermap_maps WHERE id=?;')->execute(array($mapId));
-
-//        $source = db_fetch_assoc("select * from weathermap_maps where id=$mapId");
-        $oldOrder = $source[0]['sortorder'];
-        $group = $source[0]['group_id'];
+        $source = $this->getMap($mapId);
+        $oldOrder = intval($source->sortorder);
+        $group = $source->group_id;
 
         $newOrder = $oldOrder + $direction;
-        $target = $this->pdo->prepare("SELECT * FROM weathermap_maps WHERE group_id=? AND sortorder =?")->execute(array($group, $newOrder));
-//        $target = db_fetch_assoc("select * from weathermap_maps where group_id=$group and sortorder = $newOrder");
 
-        if (!empty($target[0]['id'])) {
-            $otherId = $target[0]['id'];
+        $statement = $this->pdo->prepare("SELECT * FROM weathermap_maps WHERE group_id=? AND sortorder =? LIMIT 1");
+        $statement->execute(array($group, $newOrder));
+        $target = $statement->fetch(PDO::FETCH_OBJ);
+
+        if (!empty($target->id)) {
+            $otherId = $target->id;
             // move $mapid in direction $direction
             $this->pdo->prepare("UPDATE weathermap_maps SET sortorder =? WHERE id=?")->execute(array($newOrder, $mapId));
-//            $sql[] = "update weathermap_maps set sortorder = $newOrder where id=$mapId";
             // then find the other one with the same sortorder and move that in the opposite direction
             $this->pdo->prepare("UPDATE weathermap_maps SET sortorder =? WHERE id=?")->execute(array($oldOrder, $otherId));
-//            $sql[] = "update weathermap_maps set sortorder = $oldOrder where id=$otherId";
         }
-
     }
 
     public function moveGroup($groupId, $direction)
     {
+        $source = $this->getMap($groupId);
 
+        $oldOrder = intval($source->sortorder);
+        $newOrder = $oldOrder + $direction;
+
+        $statement = $this->pdo->prepare("SELECT * FROM weathermap_groups WHERE sortorder =? LIMIT 1");
+        $statement->execute(array($newOrder));
+        $target = $statement->fetch(PDO::FETCH_OBJ);
+
+        if (!empty($target->id)) {
+            $otherId = $target->id;
+            // move $mapid in direction $direction
+            $this->pdo->prepare("UPDATE weathermap_groups SET sortorder = ? WHERE id=?")->execute(array($newOrder, $groupId));
+            // then find the other one with the same sortorder and move that in the opposite direction
+            $this->pdo->prepare("UPDATE weathermap_groups SET sortorder = ? WHERE id=?")->execute(array($oldOrder, $otherId));
+        }
     }
 
     public function resortGroups()
@@ -186,7 +198,7 @@ class WeathermapManager
         }
     }
 
-    public function mapSettingSave($mapId, $name, $value)
+    public function saveMapSetting($mapId, $name, $value)
     {
         if ($mapId > 0) {
             // map setting
@@ -206,7 +218,7 @@ class WeathermapManager
         }
     }
 
-    public function mapSettingUpdate($settingId, $name, $value)
+    public function updateMapSetting($settingId, $name, $value)
     {
         $data = array("optname" => $name, "optvalue" => $value);
 
@@ -219,7 +231,7 @@ class WeathermapManager
         $stmt->execute($values);
     }
 
-    public function mapSettingDelete($mapId, $settingId)
+    public function deleteMapSetting($mapId, $settingId)
     {
         $this->pdo->prepare("DELETE FROM weathermap_settings WHERE id=? AND mapid=?")->execute(array($settingId, $mapId));
     }
@@ -232,19 +244,20 @@ class WeathermapManager
 
     public function deleteGroup($groupId)
     {
-        $statement = $this->pdo->prepare("SELECT MIN(id) as first_group FROM weathermap_groups WHERE id <> ?");
+        $statement = $this->pdo->prepare("SELECT MIN(id) AS first_group FROM weathermap_groups WHERE id <> ?");
         $statement->execute(array($groupId));
         $newId = $statement->fetchColumn();
 
         # move any maps out of this group into a still-existing one
-        $this->pdo->prepare("UPDATE weathermap_maps set group_id=? where group_id=?")->execute(array($newId, $groupId));
+        $this->pdo->prepare("UPDATE weathermap_maps SET group_id=? WHERE group_id=?")->execute(array($newId, $groupId));
 
         # then delete the group
         $this->pdo->prepare("DELETE FROM weathermap_groups WHERE id=?")->execute(array($groupId));
 
         # Finally, resort, just in case
         $this->resortGroups();
-      }
+        $this->resortMaps();
+    }
 
     public function renameGroup($groupId, $newName)
     {

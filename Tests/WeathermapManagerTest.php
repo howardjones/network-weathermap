@@ -1,6 +1,6 @@
 <?php
 
-require_once 'lib/WeathermapManager.class.php';
+require_once dirname(__FILE__) . '/../lib/WeathermapManager.class.php';
 
 class WeathermapManagerTest extends PHPUnit_Extensions_Database_TestCase
 {

@@ -22,9 +22,11 @@ class WeathermapManager
 {
 
     var $pdo;
+    var $configDirectory;
 
-    public function __construct($pdo)
+    public function __construct($pdo, $configDirectory)
     {
+        $this->configDirectory = $configDirectory;
         $this->pdo = $pdo;
     }
 
@@ -44,6 +46,24 @@ class WeathermapManager
         $group = $statement->fetch(PDO::FETCH_OBJ);
 
         return $group;
+    }
+
+    public function getMaps()
+    {
+        $statement = $this->pdo->query("SELECT * FROM weathermap_maps ORDER BY group_id, sortorder");
+        $statement->execute();
+        $maps = $statement->fetchAll(PDO::FETCH_OBJ);
+
+        return $maps;
+    }
+
+    public function getGroups()
+    {
+        $statement = $this->pdo->query("SELECT * FROM weathermap_groups ORDER BY sortorder");
+        $statement->execute();
+        $groups = $statement->fetchAll(PDO::FETCH_OBJ);
+
+        return $groups;
     }
 
     private function make_set($data, $allowed)
@@ -152,9 +172,15 @@ class WeathermapManager
         if (!empty($target->id)) {
             $otherId = $target->id;
             // move $mapid in direction $direction
-            $this->pdo->prepare("UPDATE weathermap_maps SET sortorder =? WHERE id=?")->execute(array($newOrder, $mapId));
+            $this->pdo->prepare("UPDATE weathermap_maps SET sortorder =? WHERE id=?")->execute(array(
+                $newOrder,
+                $mapId
+            ));
             // then find the other one with the same sortorder and move that in the opposite direction
-            $this->pdo->prepare("UPDATE weathermap_maps SET sortorder =? WHERE id=?")->execute(array($oldOrder, $otherId));
+            $this->pdo->prepare("UPDATE weathermap_maps SET sortorder =? WHERE id=?")->execute(array(
+                $oldOrder,
+                $otherId
+            ));
         }
     }
 
@@ -172,9 +198,15 @@ class WeathermapManager
         if (!empty($target->id)) {
             $otherId = $target->id;
             // move $mapid in direction $direction
-            $this->pdo->prepare("UPDATE weathermap_groups SET sortorder = ? WHERE id=?")->execute(array($newOrder, $groupId));
+            $this->pdo->prepare("UPDATE weathermap_groups SET sortorder = ? WHERE id=?")->execute(array(
+                $newOrder,
+                $groupId
+            ));
             // then find the other one with the same sortorder and move that in the opposite direction
-            $this->pdo->prepare("UPDATE weathermap_groups SET sortorder = ? WHERE id=?")->execute(array($oldOrder, $otherId));
+            $this->pdo->prepare("UPDATE weathermap_groups SET sortorder = ? WHERE id=?")->execute(array(
+                $oldOrder,
+                $otherId
+            ));
         }
     }
 
@@ -233,13 +265,19 @@ class WeathermapManager
 
     public function deleteMapSetting($mapId, $settingId)
     {
-        $this->pdo->prepare("DELETE FROM weathermap_settings WHERE id=? AND mapid=?")->execute(array($settingId, $mapId));
+        $this->pdo->prepare("DELETE FROM weathermap_settings WHERE id=? AND mapid=?")->execute(array(
+            $settingId,
+            $mapId
+        ));
     }
 
     public function createGroup($groupName)
     {
         $sortOrder = $this->pdo->query("SELECT max(sortorder)+1 AS next_id FROM weathermap_groups")->fetchColumn();
-        $this->pdo->prepare("INSERT INTO weathermap_groups(name, sortorder) VALUES(?,?)")->execute(array($groupName, $sortOrder));
+        $this->pdo->prepare("INSERT INTO weathermap_groups(name, sortorder) VALUES(?,?)")->execute(array(
+            $groupName,
+            $sortOrder
+        ));
     }
 
     public function deleteGroup($groupId)
@@ -262,6 +300,65 @@ class WeathermapManager
     public function renameGroup($groupId, $newName)
     {
         $this->pdo->prepare("UPDATE weathermap_groups SET name=? WHERE id=?")->execute(array($newName, $groupId));
+    }
+
+    function extractMapTitle($filename)
+    {
+        $title = "(no title)";
+        $fd = fopen($filename, "r");
+        while (!feof($fd)) {
+            $buffer = fgets($fd, 4096);
+            if (preg_match('/^\s*TITLE\s+(.*)/i', $buffer, $matches)) {
+                $title = $matches[1];
+            }
+            // this regexp is tweaked from the ReadConfig version, to only match TITLEPOS lines *with* a title appended
+            if (preg_match('/^\s*TITLEPOS\s+\d+\s+\d+\s+(.+)/i', $buffer, $matches)) {
+                $title = $matches[1];
+            }
+            // strip out any DOS line endings that got through
+            $title = str_replace("\r", "", $title);
+        }
+        fclose($fd);
+
+        return $title;
+    }
+
+    public function addMap($mapFilename)
+    {
+        chdir($this->configDirectory);
+
+        $pathParts = pathinfo($mapFilename);
+        $fileDirectory = realpath($pathParts['dirname']);
+
+        // TODO - this still takes user data and puts it in the database uncleansed
+
+        if ($fileDirectory != $this->configDirectory) {
+            // someone is trying to read arbitrary files?
+            throw new Exception("Path mismatch");
+        } else {
+            $realfile = $this->configDirectory . DIRECTORY_SEPARATOR . $mapFilename;
+            $title = $this->extractMapTitle($realfile);
+
+            $statement = $this->pdo->prepare("INSERT INTO weathermap_maps (configfile,titlecache,active,imagefile,htmlfile,filehash,config) VALUES (?,?,'on','','','','')");
+            $statement->execute(array($mapFilename, $title));
+            $newMapId = $this->pdo->lastInsertId();
+
+            // add auth for 'current user'
+            $myuid = (isset($_SESSION["sess_user_id"]) ? intval($_SESSION["sess_user_id"]) : 1);
+
+            $statement = $this->pdo->prepare("insert into weathermap_auth (mapid,userid) VALUES (?,?");
+            $statement->execute(array($newMapId, $myuid));
+//            $SQL = "insert into weathermap_auth (mapid,userid) VALUES ($newMapId,$myuid)";
+//            db_execute($SQL);
+
+            // now we've got an ID, fill in the filehash
+            $statement = $this->pdo->prepare("update weathermap_maps set filehash=LEFT(MD5(concat(id,configfile,rand())),20) where id=?");
+            $statement->execute(array($newMapId));
+
+//            db_execute("update weathermap_maps set filehash=LEFT(MD5(concat(id,configfile,rand())),20) where id=$newMapId");
+
+            $this->resortMaps();
+        }
     }
 
 }

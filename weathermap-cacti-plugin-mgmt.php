@@ -16,7 +16,7 @@ include_once(dirname(__FILE__) . "/lib/WeathermapManager.class.php");
 $i_understand_file_permissions_and_how_to_fix_them = FALSE;
 $my_name = "weathermap-cacti-plugin-mgmt.php";
 
-$manager = new WeathermapManager(weathermap_get_pdo());
+$manager = new WeathermapManager(weathermap_get_pdo(), $weathermap_confdir);
 
 $action = "";
 if (isset($_POST['action'])) {
@@ -293,7 +293,7 @@ switch ($action) {
         print "<h3>REALLY Rebuild all maps?</h3><strong>NOTE: Because your Cacti poller process probably doesn't run as the same user as your webserver, it's possible this will fail with file permission problems even though the normal poller process runs fine. In some situations, it MAY have memory_limit problems, if your mod_php/ISAPI module uses a different php.ini to your command-line PHP.</strong><hr>";
 
         print "<p>It is recommended that you don't use this feature, unless you understand and accept the problems it may cause.</p>";
-        print "<h4><a href=\"weathermap-cacti-plugin-mgmt.php?action=rebuildnow2\">YES</a></h4>";
+        print "<h4><a href=\"?action=rebuildnow2\">YES</a></h4>";
         print "<h1><a href=\"weathermap-cacti-plugin-mgmt.php\">NO</a></h1>";
         include_once($config["base_path"] . "/include/bottom_footer.php");
         break;
@@ -337,10 +337,6 @@ function maplist()
 {
     global $colors;
     global $i_understand_file_permissions_and_how_to_fix_them;
-
-    #print "<pre>";
-    #print_r($menu);
-    #print "</pre>";
 
     $last_started = read_config_option("weathermap_last_started_file", true);
     $last_finished = read_config_option("weathermap_last_finished_file", true);
@@ -397,7 +393,7 @@ function maplist()
     }
 
 
-    html_start_box("<strong>Weathermaps</strong>", "78%", $colors["header"], "3", "center", "weathermap-cacti-plugin-mgmt.php?action=addmap_picker");
+    html_start_box("<strong>Weathermaps</strong>", "78%", $colors["header"], "3", "center", "?action=addmap_picker");
 
     html_header(array("Config File", "Title", "Group", "Active", "Settings", "Sort Order", "Accessible By", ""));
 
@@ -528,7 +524,7 @@ function maplist()
     }
 
     print "<div align='center'>";
-    print "<a href='weathermap-cacti-plugin-mgmt.php?action=groupadmin'><img src='images/button_editgroups.png' border=0 alt='Edit Groups' /></a>";
+    print "<a href='?action=groupadmin'><img src='images/button_editgroups.png' border=0 alt='Edit Groups' /></a>";
     print "&nbsp;<a href='../../settings.php?tab=misc'><img src='images/button_settings.gif' border=0 alt='Settings' /></a>";
     if ($i > 0 && $i_understand_file_permissions_and_how_to_fix_them) {
         print '<br /><a href="?action=rebuildnow"><img src="images/btn_recalc.png" border="0" alt="Rebuild All Maps Right Now"><br />(Experimental - You should NOT need to use this normally)</a><br />';
@@ -541,6 +537,7 @@ function addmap_picker($show_all = false)
 {
     global $weathermap_confdir;
     global $colors;
+    global $manager;
 
     $loaded = array();
     $flags = array();
@@ -552,7 +549,6 @@ function addmap_picker($show_all = false)
 
         }
     }
-    # $loaded[]='index.php';
 
     html_start_box("<strong>Available Weathermap Configuration Files</strong>", "78%", $colors["header"], "1", "center", "");
 
@@ -579,7 +575,7 @@ function addmap_picker($show_all = false)
                         if ($used && !$show_all) {
                             $skipped++;
                         } else {
-                            $title = wmap_get_title($realfile);
+                            $title = $manager->extractTitle($realfile);
                             $titles[$file] = $title;
                             $i++;
                         }
@@ -665,62 +661,7 @@ function preview_config($file)
     }
 }
 
-function add_config($file)
-{
-    global $weathermap_confdir;
-    global $colors;
 
-    chdir($weathermap_confdir);
-
-    $path_parts = pathinfo($file);
-    $file_dir = realpath($path_parts['dirname']);
-
-    if ($file_dir != $weathermap_confdir) {
-        // someone is trying to read arbitrary files?
-        // print "$file_dir != $weathermap_confdir";
-        print "<h3>Path mismatch</h3>";
-    } else {
-        $realfile = $weathermap_confdir . DIRECTORY_SEPARATOR . $file;
-        $title = wmap_get_title($realfile);
-
-        $file = weathermap_sql_escape($file);
-        $title = weathermap_sql_escape($title);
-        $SQL = "insert into weathermap_maps (configfile,titlecache,active,imagefile,htmlfile,filehash,config) VALUES ('$file','$title','on','','','','')";
-        db_execute($SQL);
-
-        // add auth for 'admin'
-        $last_id = mysql_insert_id();
-        // $myuid = (int)$_SESSION["sess_user_id"];
-        $myuid = (isset($_SESSION["sess_user_id"]) ? intval($_SESSION["sess_user_id"]) : 1);
-        $SQL = "insert into weathermap_auth (mapid,userid) VALUES ($last_id,$myuid)";
-        db_execute($SQL);
-
-        db_execute("update weathermap_maps set filehash=LEFT(MD5(concat(id,configfile,rand())),20) where id=$last_id");
-
-        map_resort();
-    }
-}
-
-function wmap_get_title($filename)
-{
-    $title = "(no title)";
-    $fd = fopen($filename, "r");
-    while (!feof($fd)) {
-        $buffer = fgets($fd, 4096);
-        if (preg_match('/^\s*TITLE\s+(.*)/i', $buffer, $matches)) {
-            $title = $matches[1];
-        }
-        // this regexp is tweaked from the ReadConfig version, to only match TITLEPOS lines *with* a title appended
-        if (preg_match('/^\s*TITLEPOS\s+\d+\s+\d+\s+(.+)/i', $buffer, $matches)) {
-            $title = $matches[1];
-        }
-        // strip out any DOS line endings that got through
-        $title = str_replace("\r", "", $title);
-    }
-    fclose($fd);
-
-    return $title;
-}
 
 
 
@@ -828,7 +769,7 @@ function weathermap_map_settings($id)
 
     }
 
-    html_start_box("<strong>$title</strong>", "70%", $colors["header"], "2", "center", "weathermap-cacti-plugin-mgmt.php?action=map_settings_form&mapid=" . intval($id));
+    html_start_box("<strong>$title</strong>", "70%", $colors["header"], "2", "center", "?action=map_settings_form&mapid=" . intval($id));
     html_header(array("", "Name", "Value", ""));
 
     $n = 0;
@@ -944,7 +885,7 @@ function weathermap_map_settings_form($mapid = 0, $settingid = 0)
     draw_edit_form(array("config" => $values_ar, "fields" => $field_ar));
     html_end_box();
 
-    form_save_button("weathermap-cacti-plugin-mgmt.php?action=map_settings&id=" . $mapid);
+    form_save_button("?action=map_settings&id=" . $mapid);
 
 }
 
@@ -952,9 +893,11 @@ function weathermap_map_settings_form($mapid = 0, $settingid = 0)
 function weathermap_chgroup($id)
 {
     global $colors;
+    global $manager;
 
-    $title = db_fetch_cell("select titlecache from weathermap_maps where id=" . intval($id));
-    $curgroup = db_fetch_cell("select group_id from weathermap_maps where id=" . intval($id));
+    $map = $manager->getMap($id);
+    $title = $map->titlecache;
+    $curgroup = $map->group_id;
 
     $n = 0;
 
@@ -963,16 +906,15 @@ function weathermap_chgroup($id)
     print "<input type=hidden name='action' value='chgroup_update'>";
     html_start_box("<strong>Edit map group for Weathermap $id: $title</strong>", "70%", $colors["header"], "2", "center", "");
 
-    # html_header(array("Group Name", ""));
     form_alternate_row_color($colors["alternate"], $colors["light"], $n++);
     print "<td><strong>Choose an existing Group:</strong><select name='new_group'>";
-    $SQL = "select * from weathermap_groups order by sortorder";
-    $results = db_fetch_assoc($SQL);
 
-    foreach ($results as $grp) {
+    $groups = $manager->getGroups();
+
+    foreach ($groups as $grp) {
         print "<option ";
-        if ($grp['id'] == $curgroup) print " SELECTED ";
-        print "value=" . $grp['id'] . ">" . htmlspecialchars($grp['name']) . "</option>";
+        if ($grp->id == $curgroup) print " SELECTED ";
+        print "value=" . $grp->id . ">" . htmlspecialchars($grp->name) . "</option>";
     }
 
     print "</select>";
@@ -990,24 +932,25 @@ function weathermap_chgroup($id)
 function weathermap_group_form($id = 0)
 {
     global $colors, $config;
+    global $manager;
 
-    $grouptext = "";
+    $groupName = "";
     // if id==0, it's an Add, otherwise it's an editor.
     if ($id == 0) {
         print "Adding a group...";
     } else {
         print "Editing group $id\n";
-        $grouptext = db_fetch_cell("select name from weathermap_groups where id=" . $id);
+        $group = $manager->getGroup($id);
+        $groupName = $group->name;
     }
 
     print "<form action=weathermap-cacti-plugin-mgmt.php>\n<input type=hidden name=action value=group_update />\n";
 
-    print "Group Name: <input name=gname value='" . htmlspecialchars($grouptext) . "'/>\n";
+    print "Group Name: <input name=gname value='" . htmlspecialchars($groupName) . "'/>\n";
     if ($id > 0) {
         print "<input type=hidden name=id value=$id />\n";
         print "Group Name: <input type=submit value='Update' />\n";
     } else {
-        # print "<input type=hidden name=id value=$id />\n";
         print "Group Name: <input type=submit value='Add' />\n";
     }
 
@@ -1018,28 +961,32 @@ function weathermap_group_form($id = 0)
 function weathermap_group_editor()
 {
     global $colors, $config;
+    global $manager;
 
-    html_start_box("<strong>Edit Map Groups</strong>", "70%", $colors["header"], "2", "center", "weathermap-cacti-plugin-mgmt.php?action=group_form&id=0");
+    html_start_box("<strong>Edit Map Groups</strong>", "70%", $colors["header"], "2", "center",
+        "?action=group_form&id=0");
     html_header(array("", "Group Name", "Settings", "Sort Order", ""));
 
-    $groups = db_fetch_assoc("select * from weathermap_groups order by sortorder");
-
+//    $groups = db_fetch_assoc("select * from weathermap_groups order by sortorder");
+    $groups = $manager->getGroups();
     $n = 0;
 
     if (is_array($groups)) {
         if (sizeof($groups) > 0) {
             foreach ($groups as $group) {
                 form_alternate_row_color($colors["alternate"], $colors["light"], $n);
-                print '<td><a href="weathermap-cacti-plugin-mgmt.php?action=group_form&id=' . intval($group['id']) . '"><img src="../../images/graph_properties.gif" width="16" height="16" border="0" alt="Rename This Group" title="Rename This Group">Rename</a></td>';
-                print "<td>" . htmlspecialchars($group['name']) . "</td>";
+                print '<td><a href="?action=group_form&id=' . intval($group->id) . '"><img src="../../images/graph_properties.gif" width="16" height="16" border="0" alt="Rename This Group" title="Rename This Group">Rename</a></td>';
+                print "<td>" . htmlspecialchars($group->name) . "</td>";
 
                 print "<td>";
 
-                print "<a href='?action=map_settings&id=-" . $group['id'] . "'>";
-                $setting_count = db_fetch_cell("select count(*) from weathermap_settings where mapid=0 and groupid=" . $group['id']);
+                print "<a href='?action=map_settings&id=-" . $group->id . "'>";
+                $setting_count = db_fetch_cell("SELECT count(*) FROM weathermap_settings WHERE mapid=0 AND groupid=" . $group->id);
                 if ($setting_count > 0) {
                     print $setting_count . " special";
-                    if ($setting_count > 1) print "s";
+                    if ($setting_count > 1) {
+                        print "s";
+                    }
                 } else {
                     print "standard";
                 }
@@ -1050,15 +997,14 @@ function weathermap_group_editor()
 
                 print '<td>';
 
-                print '<a href="weathermap-cacti-plugin-mgmt.php?action=move_group_up&order=' . $group['sortorder'] . '&id=' . $group['id'] . '"><img src="../../images/move_up.gif" width="14" height="10" border="0" alt="Move Group Up" title="Move Group Up"></a>';
-                print '<a href="weathermap-cacti-plugin-mgmt.php?action=move_group_down&order=' . $group['sortorder'] . '&id=' . $group['id'] . '"><img src="../../images/move_down.gif" width="14" height="10" border="0" alt="Move Group Down" title="Move Group Down"></a>';
-// print $map['sortorder'];
+                print '<a href="?action=move_group_up&order=' . $group->sortorder . '&id=' . $group['id'] . '"><img src="../../images/move_up.gif" width="14" height="10" border="0" alt="Move Group Up" title="Move Group Up"></a>';
+                print '<a href="?action=move_group_down&order=' . $group->sortorder . '&id=' . $group['id'] . '"><img src="../../images/move_down.gif" width="14" height="10" border="0" alt="Move Group Down" title="Move Group Down"></a>';
 
                 print "</td>";
 
                 print '<td>';
                 if ($group['id'] > 1) {
-                    print '<a href="weathermap-cacti-plugin-mgmt.php?action=groupadmin_delete&id=' . intval($group['id']) . '"><img src="../../images/delete_icon.gif" width="10" height="10" border="0" alt="Remove this definition from this map"></a>';
+                    print '<a href="?action=groupadmin_delete&id=' . intval($group->id) . '"><img src="../../images/delete_icon.gif" width="10" height="10" border="0" alt="Remove this definition from this map"></a>';
                 }
                 print '</td>';
 
@@ -1187,5 +1133,16 @@ function weathermap_group_move($id, $junk, $direction)
 
     $manager->moveGroup($id, $direction);
 }
+
+
+function add_config($file)
+{
+    global $weathermap_confdir;
+    global $colors;
+    global $manager;
+
+    $manager->addMap($file);
+}
+
 
 // vim:ts=4:sw=4:

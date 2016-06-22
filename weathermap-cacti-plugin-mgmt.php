@@ -575,7 +575,7 @@ function addmap_picker($show_all = false)
                         if ($used && !$show_all) {
                             $skipped++;
                         } else {
-                            $title = $manager->extractTitle($realfile);
+                            $title = $manager->extractMapTitle($realfile);
                             $titles[$file] = $title;
                             $i++;
                         }
@@ -997,13 +997,13 @@ function weathermap_group_editor()
 
                 print '<td>';
 
-                print '<a href="?action=move_group_up&order=' . $group->sortorder . '&id=' . $group['id'] . '"><img src="../../images/move_up.gif" width="14" height="10" border="0" alt="Move Group Up" title="Move Group Up"></a>';
-                print '<a href="?action=move_group_down&order=' . $group->sortorder . '&id=' . $group['id'] . '"><img src="../../images/move_down.gif" width="14" height="10" border="0" alt="Move Group Down" title="Move Group Down"></a>';
+                print '<a href="?action=move_group_up&order=' . $group->sortorder . '&id=' . $group->id . '"><img src="../../images/move_up.gif" width="14" height="10" border="0" alt="Move Group Up" title="Move Group Up"></a>';
+                print '<a href="?action=move_group_down&order=' . $group->sortorder . '&id=' . $group->id . '"><img src="../../images/move_down.gif" width="14" height="10" border="0" alt="Move Group Down" title="Move Group Down"></a>';
 
                 print "</td>";
 
                 print '<td>';
-                if ($group['id'] > 1) {
+                if ($group->id > 1) {
                     print '<a href="?action=groupadmin_delete&id=' . intval($group->id) . '"><img src="../../images/delete_icon.gif" width="10" height="10" border="0" alt="Remove this definition from this map"></a>';
                 }
                 print '</td>';

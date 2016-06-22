@@ -346,16 +346,12 @@ class WeathermapManager
             // add auth for 'current user'
             $myuid = (isset($_SESSION["sess_user_id"]) ? intval($_SESSION["sess_user_id"]) : 1);
 
-            $statement = $this->pdo->prepare("insert into weathermap_auth (mapid,userid) VALUES (?,?");
+            $statement = $this->pdo->prepare("insert into weathermap_auth (mapid,userid) VALUES (?,?)");
             $statement->execute(array($newMapId, $myuid));
-//            $SQL = "insert into weathermap_auth (mapid,userid) VALUES ($newMapId,$myuid)";
-//            db_execute($SQL);
 
             // now we've got an ID, fill in the filehash
             $statement = $this->pdo->prepare("update weathermap_maps set filehash=LEFT(MD5(concat(id,configfile,rand())),20) where id=?");
             $statement->execute(array($newMapId));
-
-//            db_execute("update weathermap_maps set filehash=LEFT(MD5(concat(id,configfile,rand())),20) where id=$newMapId");
 
             $this->resortMaps();
         }

@@ -57,6 +57,15 @@ class WeathermapManager
         return $maps;
     }
 
+    public function getMapsWithGroups()
+    {
+        $statement = $this->pdo->query("SELECT weathermap_maps.*, weathermap_groups.name AS groupname FROM weathermap_maps, weathermap_groups WHERE weathermap_maps.group_id=weathermap_groups.id ORDER BY weathermap_groups.sortorder,sortorder");
+        $statement->execute();
+        $maps = $statement->fetchAll(PDO::FETCH_OBJ);
+
+        return $maps;
+    }
+
     public function getGroups()
     {
         $statement = $this->pdo->query("SELECT * FROM weathermap_groups ORDER BY sortorder");

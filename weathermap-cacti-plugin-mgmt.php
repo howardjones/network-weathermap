@@ -398,11 +398,12 @@ function maplist()
 
     html_header(array("Config File", "Title", "Group", "Active", "Settings", "Sort Order", "Accessible By", ""));
 
-    $query = db_fetch_assoc("select id,username from user_auth");
+    $userlist = $manager->getUserList();
+//    $query = db_fetch_assoc("select id,username from user_auth");
     $users[0] = 'Anyone';
 
-    foreach ($query as $user) {
-        $users[$user['id']] = $user['username'];
+    foreach ($userlist as $user) {
+        $users[$user->id] = $user->username;
     }
 
     $i = 0;
@@ -472,7 +473,7 @@ function maplist()
 
             print '<a href="?action=move_map_up&order=' . $map['sortorder'] . '&id=' . $map['id'] . '"><img src="../../images/move_up.gif" width="14" height="10" border="0" alt="Move Map Up" title="Move Map Up"></a>';
             print '<a href="?action=move_map_down&order=' . $map['sortorder'] . '&id=' . $map['id'] . '"><img src="../../images/move_down.gif" width="14" height="10" border="0" alt="Move Map Down" title="Move Map Down"></a>';
-// print $map['sortorder'];
+ print $map['sortorder'];
 
             print "</td>";
 
@@ -512,7 +513,7 @@ function maplist()
 
     html_end_box();
 
-    $last_stats = read_config_option("weathermap_last_stats", true);
+    $last_stats = $manager->getAppSetting("weathermap_last_stats", true);
 
     if ($last_stats != "") {
         print "<div align='center'><strong>Last Completed Run:</strong> $last_stats</div>";
@@ -1000,7 +1001,7 @@ function weathermap_group_editor()
 
                 print '<a href="?action=move_group_up&order=' . $group->sortorder . '&id=' . $group->id . '"><img src="../../images/move_up.gif" width="14" height="10" border="0" alt="Move Group Up" title="Move Group Up"></a>';
                 print '<a href="?action=move_group_down&order=' . $group->sortorder . '&id=' . $group->id . '"><img src="../../images/move_down.gif" width="14" height="10" border="0" alt="Move Group Down" title="Move Group Down"></a>';
-
+                print $group->sortorder;
                 print "</td>";
 
                 print '<td>';

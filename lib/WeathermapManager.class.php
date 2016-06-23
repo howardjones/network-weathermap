@@ -178,7 +178,7 @@ class WeathermapManager
         $statement->execute(array($group, $newOrder));
         $target = $statement->fetch(PDO::FETCH_OBJ);
 
-        if (!empty($target->id)) {
+        if ($target !== false) {
             $otherId = $target->id;
             // move $mapid in direction $direction
             $this->pdo->prepare("UPDATE weathermap_maps SET sortorder =? WHERE id=?")->execute(array(
@@ -195,7 +195,7 @@ class WeathermapManager
 
     public function moveGroup($groupId, $direction)
     {
-        $source = $this->getMap($groupId);
+        $source = $this->getGroup($groupId);
 
         $oldOrder = intval($source->sortorder);
         $newOrder = $oldOrder + $direction;
@@ -204,7 +204,7 @@ class WeathermapManager
         $statement->execute(array($newOrder));
         $target = $statement->fetch(PDO::FETCH_OBJ);
 
-        if (!empty($target->id)) {
+        if ($target !== false) {
             $otherId = $target->id;
             // move $mapid in direction $direction
             $this->pdo->prepare("UPDATE weathermap_groups SET sortorder = ? WHERE id=?")->execute(array(

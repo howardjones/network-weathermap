@@ -74,6 +74,7 @@ class WeathermapManagerTest extends PHPUnit_Extensions_Database_TestCase
         return $result;
     }
 
+
     public function testMoveMapUp()
     {
         $pos = $this->getMapOrder();
@@ -147,16 +148,61 @@ class WeathermapManagerTest extends PHPUnit_Extensions_Database_TestCase
 
     public function testGroupCreate()
     {
-        $this->assertEquals(2, $this->getConnection()->getRowCount('weathermap_groups'), "Pre-Condition");
+        $pos = $this->getGroupOrder();
+        $this->assertEquals($pos, array(2, 1, 3));
+
+        $this->assertEquals(3, $this->getConnection()->getRowCount('weathermap_groups'), "Pre-Condition");
         $this->manager->createGroup("G2");
-        $this->assertEquals(3, $this->getConnection()->getRowCount('weathermap_groups'), "Group create failed");
+        $this->assertEquals(4, $this->getConnection()->getRowCount('weathermap_groups'), "Group create failed");
+
+        $pos = $this->getGroupOrder();
+        $this->assertEquals($pos, array(2, 1, 3, 4));
     }
 
     public function testGroupDelete()
     {
-        $this->assertEquals(2, $this->getConnection()->getRowCount('weathermap_groups'), "Pre-Condition");
+        $pos = $this->getGroupOrder();
+        $this->assertEquals($pos, array(2, 1, 3));
+
+        $this->assertEquals(3, $this->getConnection()->getRowCount('weathermap_groups'), "Pre-Condition");
         $this->manager->deleteGroup(2);
-        $this->assertEquals(1, $this->getConnection()->getRowCount('weathermap_groups'), "Group delete failed");
+        $this->assertEquals(2, $this->getConnection()->getRowCount('weathermap_groups'), "Group delete failed");
+        $pos = $this->getGroupOrder();
+        $this->assertEquals($pos, array(1, 3));
+
+    }
+
+    public function testGroupMove()
+    {
+        $pos = $this->getGroupOrder();
+        $this->assertEquals($pos, array(2, 1, 3));
+
+        $this->manager->moveGroup(1, 1);
+
+        $pos = $this->getGroupOrder();
+        $this->assertEquals($pos, array(2, 3, 1));
+
+        $this->manager->moveGroup(3, -1);
+
+        $pos = $this->getGroupOrder();
+        $this->assertEquals($pos, array(3, 2, 1));
+
+        $this->manager->moveGroup(3, -1);
+
+        $pos = $this->getGroupOrder();
+        $this->assertEquals($pos, array(3, 2, 1));
+
+        $this->manager->moveGroup(1, 1);
+
+        $pos = $this->getGroupOrder();
+        $this->assertEquals($pos, array(3, 2, 1));
+
+        $this->manager->moveGroup(1, -1);
+
+        $pos = $this->getGroupOrder();
+        $this->assertEquals($pos, array(3, 1, 2));
+
+
     }
 
     public function testAppSettings()

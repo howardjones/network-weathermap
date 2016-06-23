@@ -241,17 +241,15 @@ switch ($action) {
         break;
 
     case 'move_group_up':
-        if (isset($_REQUEST['id']) && is_numeric($_REQUEST['id']) &&
-            isset($_REQUEST['order']) && is_numeric($_REQUEST['order'])
+        if (isset($_REQUEST['id']) && is_numeric($_REQUEST['id'])
         )
-            weathermap_group_move(intval($_REQUEST['id']), intval($_REQUEST['order']), -1);
+            weathermap_group_move(intval($_REQUEST['id']), -1);
         header("Location: ?action=groupadmin");
         break;
     case 'move_group_down':
-        if (isset($_REQUEST['id']) && is_numeric($_REQUEST['id']) &&
-            isset($_REQUEST['order']) && is_numeric($_REQUEST['order'])
+        if (isset($_REQUEST['id']) && is_numeric($_REQUEST['id'])
         )
-            weathermap_group_move(intval($_REQUEST['id']), intval($_REQUEST['order']), 1);
+            weathermap_group_move(intval($_REQUEST['id']), 1);
         header("Location: ?action=groupadmin");
         break;
 
@@ -999,8 +997,8 @@ function weathermap_group_editor()
 
                 print '<td>';
 
-                print '<a href="?action=move_group_up&order=' . $group->sortorder . '&id=' . $group->id . '"><img src="../../images/move_up.gif" width="14" height="10" border="0" alt="Move Group Up" title="Move Group Up"></a>';
-                print '<a href="?action=move_group_down&order=' . $group->sortorder . '&id=' . $group->id . '"><img src="../../images/move_down.gif" width="14" height="10" border="0" alt="Move Group Down" title="Move Group Down"></a>';
+                print '<a href="?action=move_group_up&id=' . $group->id . '"><img src="../../images/move_up.gif" width="14" height="10" border="0" alt="Move Group Up" title="Move Group Up"></a>';
+                print '<a href="?action=move_group_down&id=' . $group->id . '"><img src="../../images/move_down.gif" width="14" height="10" border="0" alt="Move Group Down" title="Move Group Down"></a>';
                 print $group->sortorder;
                 print "</td>";
 
@@ -1129,7 +1127,7 @@ function map_move($mapid, $junk, $direction)
     $manager->moveMap($mapid, $direction);
 }
 
-function weathermap_group_move($id, $junk, $direction)
+function weathermap_group_move($id, $direction)
 {
     global $manager;
 

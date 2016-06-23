@@ -346,15 +346,49 @@ class WeathermapManager
             // add auth for 'current user'
             $myuid = (isset($_SESSION["sess_user_id"]) ? intval($_SESSION["sess_user_id"]) : 1);
 
-            $statement = $this->pdo->prepare("insert into weathermap_auth (mapid,userid) VALUES (?,?)");
+            $statement = $this->pdo->prepare("INSERT INTO weathermap_auth (mapid,userid) VALUES (?,?)");
             $statement->execute(array($newMapId, $myuid));
 
             // now we've got an ID, fill in the filehash
-            $statement = $this->pdo->prepare("update weathermap_maps set filehash=LEFT(MD5(concat(id,configfile,rand())),20) where id=?");
+            $statement = $this->pdo->prepare("UPDATE weathermap_maps SET filehash=LEFT(MD5(concat(id,configfile,rand())),20) WHERE id=?");
             $statement->execute(array($newMapId));
 
             $this->resortMaps();
         }
     }
 
+    public function getAppSetting($name, $default_value = "")
+    {
+        $statement = $this->pdo->prepare("SELECT value FROM settings WHERE name=?");
+        $statement->execute(array($name));
+        $result = $statement->fetchColumn();
+
+        if ($result === false) {
+            return $default_value;
+        }
+
+        return $result;
+    }
+
+    public function setAppSetting($name, $value)
+    {
+        $statement = $this->pdo->prepare("REPLACE INTO settings (name, value) VALUES (?,?)");
+        $statement->execute(array($name, $value));
+
+    }
+
+    public function deleteAppSetting($name)
+    {
+        $statement = $this->pdo->prepare("DELETE FROM settings WHERE name=?");
+        $statement->execute(array($name));
+    }
+
+    public function getUserList()
+    {
+        $statement = $this->pdo->query("SELECT * FROM user_auth");
+        $statement->execute();
+        $users = $statement->fetchAll(PDO::FETCH_OBJ);
+
+        return $users;
+    }
 }

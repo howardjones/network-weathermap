@@ -337,6 +337,7 @@ function maplist()
 {
     global $colors;
     global $i_understand_file_permissions_and_how_to_fix_them;
+    global $manager;
 
     $last_started = read_config_option("weathermap_last_started_file", true);
     $last_finished = read_config_option("weathermap_last_finished_file", true);
@@ -364,7 +365,7 @@ function maplist()
         print '</p></div>';
     }
 
-    $boost_enabled = read_config_option('boost_rrd_update_enable', 'off');
+    $boost_enabled = $manager->getAppSetting('boost_rrd_update_enable', 'off');
     $has_global_poller_output = false;
 
     if ($boost_enabled == 'on') {

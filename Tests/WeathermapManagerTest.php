@@ -27,7 +27,10 @@ class WeathermapManagerTest extends PHPUnit_Extensions_Database_TestCase
     {
         parent::setUp();
 
-        $this->manager = new WeathermapManager(self::$pdo);
+        $weathermap_confdir = realpath(dirname(__FILE__) . '/../configs');
+
+
+        $this->manager = new WeathermapManager(self::$pdo, $weathermap_confdir);
     }
 
     /**
@@ -46,6 +49,20 @@ class WeathermapManagerTest extends PHPUnit_Extensions_Database_TestCase
     private function getMapOrder()
     {
         $statement = self::$pdo->prepare("SELECT id FROM weathermap_maps ORDER BY sortorder");
+        $statement->execute();
+        $order = $statement->fetchAll(PDO::FETCH_NUM);
+
+        $result = array();
+        foreach ($order as $suborder) {
+            $result [] = $suborder[0];
+        }
+
+        return $result;
+    }
+
+    private function getGroupOrder()
+    {
+        $statement = self::$pdo->prepare("SELECT id FROM weathermap_groups ORDER BY sortorder");
         $statement->execute();
         $order = $statement->fetchAll(PDO::FETCH_NUM);
 
@@ -102,10 +119,13 @@ class WeathermapManagerTest extends PHPUnit_Extensions_Database_TestCase
 
     public function testDeleteMap()
     {
+        $pos = $this->getMapOrder();
+        $this->assertEquals($pos, array(7, 6, 5, 4, 1, 2));
         $this->assertEquals(6, $this->getConnection()->getRowCount('weathermap_maps'), "Pre-Condition");
         $this->manager->deleteMap(6);
         $this->assertEquals(5, $this->getConnection()->getRowCount('weathermap_maps'), "Delete failed");
-
+        $pos = $this->getMapOrder();
+        $this->assertEquals($pos, array(7, 5, 4, 1, 2));
     }
 
     public function testDisableMap()
@@ -137,5 +157,27 @@ class WeathermapManagerTest extends PHPUnit_Extensions_Database_TestCase
         $this->assertEquals(2, $this->getConnection()->getRowCount('weathermap_groups'), "Pre-Condition");
         $this->manager->deleteGroup(2);
         $this->assertEquals(1, $this->getConnection()->getRowCount('weathermap_groups'), "Group delete failed");
+    }
+
+    public function testAppSettings()
+    {
+        $this->assertEquals(40, $this->getConnection()->getRowCount('settings'), "Pre-Condition");
+
+        $this->manager->setAppSetting("fish", "trout");
+        $this->assertEquals(41, $this->getConnection()->getRowCount('settings'), "Add failed");
+
+        $result = $this->manager->getAppSetting("fish");
+        $this->assertEquals("trout", $result);
+
+        $this->manager->setAppSetting("fish", "carp");
+        $this->assertEquals(41, $this->getConnection()->getRowCount('settings'), "Update failed");
+        $result = $this->manager->getAppSetting("fish");
+        $this->assertEquals("carp", $result);
+
+
+        $result = $this->manager->getAppSetting("dog", "pitbull");
+        $this->assertEquals("pitbull", $result);
+
+
     }
 }

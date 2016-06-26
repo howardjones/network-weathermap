@@ -364,10 +364,9 @@ function maplist()
     }
 
     $boost_enabled = $manager->getAppSetting('boost_rrd_update_enable', 'off');
-    $has_global_poller_output = false;
 
     if ($boost_enabled == 'on') {
-        $sql = "select optvalue from weathermap_settings where optname='rrd_use_poller_output' and mapid=0";
+        $sql = "SELECT optvalue FROM weathermap_settings WHERE optname='rrd_use_poller_output' AND mapid=0";
         $result = db_fetch_row($sql);
         if (isset($result['optvalue'])) {
             $has_global_poller_output = $result['optvalue'];
@@ -405,20 +404,24 @@ function maplist()
     }
 
     $i = 0;
-    $queryrows = db_fetch_assoc("select weathermap_maps.*, weathermap_groups.name as groupname from weathermap_maps, weathermap_groups where weathermap_maps.group_id=weathermap_groups.id order by weathermap_groups.sortorder,sortorder");
+    // $queryrows = db_fetch_assoc("select weathermap_maps.*, weathermap_groups.name as groupname from weathermap_maps, weathermap_groups where weathermap_maps.group_id=weathermap_groups.id order by weathermap_groups.sortorder,sortorder");
     // or die (mysql_error("Could not connect to database") )
+
+    $maps = $manager->getMapsWithGroups();
 
     $previous_id = -2;
     $had_warnings = 0;
-    if (is_array($queryrows)) {
+    if (is_array($maps)) {
         form_alternate_row_color($colors["alternate"], $colors["light"], $i);
         print "<td>ALL MAPS</td><td>(special settings for all maps)</td><td></td><td></td>";
 
         print "<td><a href='?action=map_settings&id=0'>";
-        $setting_count = db_fetch_cell("select count(*) from weathermap_settings where mapid=0 and groupid=0");
+        $setting_count = db_fetch_cell("SELECT count(*) FROM weathermap_settings WHERE mapid=0 AND groupid=0");
         if ($setting_count > 0) {
             print $setting_count . " special";
-            if ($setting_count > 1) print "s";
+            if ($setting_count > 1) {
+                print "s";
+            }
         } else {
             print "standard";
         }
@@ -431,33 +434,34 @@ function maplist()
         print "</tr>";
         $i++;
 
-        foreach ($queryrows as $map) {
+        foreach ($maps as $map) {
             form_alternate_row_color($colors["alternate"], $colors["light"], $i);
 
-            print '<td><a title="Click to start editor with this file" href="weathermap-cacti-plugin-editor.php?action=nothing&mapname=' . htmlspecialchars($map['configfile']) . '">' . htmlspecialchars($map['configfile']) . '</a>';
-            if ($map['warncount'] > 0) {
+            print '<td><a title="Click to start editor with this file" href="weathermap-cacti-plugin-editor.php?action=nothing&mapname=' . htmlspecialchars($map->configfile) . '">' . htmlspecialchars($map->configfile) . '</a>';
+            if ($map->warncount > 0) {
                 $had_warnings++;
 
-                print '<a href="../../utilities.php?tail_lines=500&message_type=2&action=view_logfile&filter=' . urlencode($map['configfile']) . '" title="Check cacti.log for this map"><img border=0 src="images/exclamation.png" title="' . $map['warncount'] . ' warnings last time this map was run. Check your logs.">' . $map['warncount'] . "</a>";
+                print '<a href="../../utilities.php?tail_lines=500&message_type=2&action=view_logfile&filter=' . urlencode($map->configfile) . '" title="Check cacti.log for this map"><img border=0 src="images/exclamation.png" title="' . $map->warncount . ' warnings last time this map was run. Check your logs.">' . $map->warncount . "</a>";
             }
             print "</td>";
 
-            #		print '<a href="?action=editor&plug=1&mapname='.htmlspecialchars($map['configfile']).'">[edit]</a></td>';
-            print '<td>' . htmlspecialchars($map['titlecache']) . '</td>';
-            print '<td><a title="Click to change group" href="?action=chgroup&id=' . $map['id'] . '">' . htmlspecialchars($map['groupname']) . '</a></td>';
+            print '<td>' . htmlspecialchars($map->titlecache) . '</td>';
+            print '<td><a title="Click to change group" href="?action=chgroup&id=' . $map->id . '">' . htmlspecialchars($map->groupname) . '</a></td>';
 
-            if ($map['active'] == 'on') {
-                print '<td class="wm_enabled"><a title="Click to Deactivate" href="?action=deactivate_map&id=' . $map['id'] . '"><font color="green">Yes</font></a>';
+            if ($map->active == 'on') {
+                print '<td class="wm_enabled"><a title="Click to Deactivate" href="?action=deactivate_map&id=' . $map->id . '"><font color="green">Yes</font></a>';
             } else {
-                print '<td class="wm_disabled"><a title="Click to Activate" href="?action=activate_map&id=' . $map['id'] . '"><font color="red">No</font></a>';
+                print '<td class="wm_disabled"><a title="Click to Activate" href="?action=activate_map&id=' . $map->id . '"><font color="red">No</font></a>';
             }
             print "<td>";
 
-            print "<a href='?action=map_settings&id=" . $map['id'] . "'>";
-            $setting_count = db_fetch_cell("select count(*) from weathermap_settings where mapid=" . $map['id']);
+            print "<a href='?action=map_settings&id=" . $map->id . "'>";
+            $setting_count = db_fetch_cell("SELECT count(*) FROM weathermap_settings WHERE mapid=" . $map->id);
             if ($setting_count > 0) {
                 print $setting_count . " special";
-                if ($setting_count > 1) print "s";
+                if ($setting_count > 1) {
+                    print "s";
+                }
             } else {
                 print "standard";
             }
@@ -469,14 +473,14 @@ function maplist()
 
             print '<td>';
 
-            print '<a href="?action=move_map_up&order=' . $map['sortorder'] . '&id=' . $map['id'] . '"><img src="../../images/move_up.gif" width="14" height="10" border="0" alt="Move Map Up" title="Move Map Up"></a>';
-            print '<a href="?action=move_map_down&order=' . $map['sortorder'] . '&id=' . $map['id'] . '"><img src="../../images/move_down.gif" width="14" height="10" border="0" alt="Move Map Down" title="Move Map Down"></a>';
- print $map['sortorder'];
+            print '<a href="?action=move_map_up&order=' . $map->sortorder . '&id=' . $map->id . '"><img src="../../images/move_up.gif" width="14" height="10" border="0" alt="Move Map Up" title="Move Map Up"></a>';
+            print '<a href="?action=move_map_down&order=' . $map->sortorder . '&id=' . $map->id . '"><img src="../../images/move_down.gif" width="14" height="10" border="0" alt="Move Map Down" title="Move Map Down"></a>';
+            print $map->sortorder;
 
             print "</td>";
 
             print '<td>';
-            $UserSQL = 'select * from weathermap_auth where mapid=' . $map['id'] . ' order by userid';
+            $UserSQL = 'SELECT * FROM weathermap_auth WHERE mapid=' . $map->id . ' ORDER BY userid';
             $userlist = db_fetch_assoc($UserSQL);
 
             $mapusers = array();
@@ -486,7 +490,7 @@ function maplist()
                 }
             }
 
-            print '<a title="Click to edit permissions" href="?action=perms_edit&id=' . $map['id'] . '">';
+            print '<a title="Click to edit permissions" href="?action=perms_edit&id=' . $map->id . '">';
             if (count($mapusers) == 0) {
                 print "(no users)";
             } else {
@@ -495,9 +499,8 @@ function maplist()
             print '</a>';
 
             print '</td>';
-            //  print '<td><a href="?action=editor&mapname='.urlencode($map['configfile']).'">Edit Map</a></td>';
             print '<td>';
-            print '<a href="?action=delete_map&id=' . $map['id'] . '"><img src="../../images/delete_icon.gif" width="10" height="10" border="0" alt="Delete Map" title="Delete Map"></a>';
+            print '<a href="?action=delete_map&id=' . $map->id . '"><img src="../../images/delete_icon.gif" width="10" height="10" border="0" alt="Delete Map" title="Delete Map"></a>';
             print '</td>';
 
             print '</tr>';
@@ -511,7 +514,7 @@ function maplist()
 
     html_end_box();
 
-    $last_stats = $manager->getAppSetting("weathermap_last_stats", true);
+    $last_stats = $manager->getAppSetting("weathermap_last_stats", "");
 
     if ($last_stats != "") {
         print "<div align='center'><strong>Last Completed Run:</strong> $last_stats</div>";
@@ -668,10 +671,10 @@ function preview_config($file)
 function perms_list($id)
 {
     global $colors;
+    global $manager;
 
-    // $title_sql = "select titlecache from weathermap_maps where id=$id";
-    $title = db_fetch_cell("select titlecache from weathermap_maps where id=" . intval($id));
-    // $title = $results[0]['titlecache'];
+    $map = $manager->getMap($id);
+    $title = $map->titlecache;
 
     $auth_sql = "select * from weathermap_auth where mapid=$id order by userid";
 
@@ -729,6 +732,7 @@ function perms_list($id)
 function weathermap_map_settings($id)
 {
     global $colors, $config;
+    global $manager;
 
     if ($id == 0) {
         $title = "Additional settings for ALL maps";
@@ -804,6 +808,7 @@ function weathermap_map_settings($id)
 function weathermap_readonly_settings($id, $title = "Settings")
 {
     global $colors, $config;
+    global $manager;
 
     if ($id == 0) $query = "select * from weathermap_settings where mapid=0 and groupid=0";
     if ($id < 0) $query = "select * from weathermap_settings where mapid=0 and groupid=" . (-intval($id));

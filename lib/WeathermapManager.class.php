@@ -92,8 +92,7 @@ class WeathermapManager
 
     public function updateMap($mapId, $data)
     {
-        // $data = ['name' => 'foo','submit' => 'submit']; // data for insert
-        $allowed = ["active", "sortorder", "group_id"]; // allowed fields
+        $allowed = array("active", "sortorder", "group_id"); // allowed fields
         list($set, $values) = $this->make_set($data, $allowed);
 
         $values['id'] = $mapId;
@@ -263,7 +262,7 @@ class WeathermapManager
     {
         $data = array("optname" => $name, "optvalue" => $value);
 
-        $allowed = ["optname", "optvalue"]; // allowed fields
+        $allowed = array("optname", "optvalue"); // allowed fields
         list($set, $values) = $this->make_set($data, $allowed);
 
         $values['id'] = $settingId;
@@ -278,6 +277,37 @@ class WeathermapManager
             $settingId,
             $mapId
         ));
+    }
+
+    public function getAllMapSettings($mapId)
+    {
+        $map = $this->getMap($mapId);
+
+        $s1 = $this->getMapSettings(0);
+        $s2 = $this->getMapSettings(-$map->group_id);
+        $s3 = $this->getMapSettings($mapId);
+
+        // TODO combine all of these, overwriting earlier keys
+    }
+
+    public function getMapSettings($mapId)
+    {
+        if ($mapId == 0) {
+            $statement = $this->pdo->query("SELECT * FROM weathermap_settings WHERE mapid=0 AND groupid=0");
+            $statement->execute();
+        }
+        if ($mapId < 0) {
+            $statement = $this->pdo->prepare("SELECT * FROM weathermap_settings WHERE mapid=0 AND groupid=?");
+            $statement->execute(array((-intval($mapId))));
+        }
+        if ($mapId > 0) {
+            $statement = $this->pdo->prepare("SELECT * FROM weathermap_settings WHERE mapid=?");
+            $statement->execute(array(intval($mapId)));
+        }
+
+        $settings = $statement->fetchAll(PDO::FETCH_OBJ);
+
+        return $settings;
     }
 
     public function createGroup($groupName)

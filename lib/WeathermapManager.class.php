@@ -57,6 +57,16 @@ class WeathermapManager
         return $maps;
     }
 
+    public function getMapsInGroup($groupId)
+    {
+        $statement = $this->pdo->query("SELECT * FROM weathermap_maps WHERE group_id=? ORDER BY sortorder");
+        $statement->execute(array($groupId));
+        $maps = $statement->fetchAll(PDO::FETCH_OBJ);
+
+        return $maps;
+    }
+
+
     public function getMapsWithGroups()
     {
         $statement = $this->pdo->query("SELECT weathermap_maps.*, weathermap_groups.name AS groupname FROM weathermap_maps, weathermap_groups WHERE weathermap_maps.group_id=weathermap_groups.id ORDER BY weathermap_groups.sortorder,sortorder");
@@ -310,6 +320,45 @@ class WeathermapManager
         return $settings;
     }
 
+    public function getMapSettingById($settingId)
+    {
+        $statement = $this->pdo->prepare("SELECT * FROM weathermap_settings WHERE id=?");
+        $statement->execute(array($settingId));
+        $setting = $statement->fetch(PDO::FETCH_OBJ);
+
+        return $setting;
+    }
+
+    public function getMapSettingByName($mapId, $name, $defaultValue)
+    {
+        $statement = $this->pdo->prepare("SELECT * FROM weathermap_settings WHERE mapid=? AND optname=?");
+        $statement->execute(array($mapId, $name));
+        $setting = $statement->fetch(PDO::FETCH_OBJ);
+
+        if ($setting !== false) {
+            $setting = $defaultValue;
+        } else {
+            $setting = $setting->optvalue;
+        }
+
+        return $setting;
+    }
+
+    public function getMapSettingCount($mapId, $groupId)
+    {
+        if (is_null($groupId)) {
+            $statement = $this->pdo->prepare("SELECT count(*) FROM weathermap_settings WHERE mapid=?");
+            $statement->execute(array($mapId));
+
+        } else {
+            $statement = $this->pdo->prepare("SELECT count(*) FROM weathermap_settings WHERE mapid=? AND groupid=?");
+            $statement->execute(array($mapId, $groupId));
+        }
+        $count = $statement->fetchColumn();
+
+        return $count;
+    }
+
     public function createGroup($groupName)
     {
         $sortOrder = $this->pdo->query("SELECT max(sortorder)+1 AS next_id FROM weathermap_groups")->fetchColumn();
@@ -395,6 +444,18 @@ class WeathermapManager
             $this->resortMaps();
         }
     }
+
+    public function getMapAuthUsers($mapId)
+    {
+        $statement = $this->pdo->prepare('SELECT * FROM weathermap_auth WHERE mapid=? ORDER BY userid');
+        $statement->execute(array($mapId));
+        $users = $statement->fetchAll(PDO::FETCH_OBJ);
+
+        return $users;
+    }
+
+    // Below here will migrate into a Cacti API class at some point soon
+    // (to allow for other hosts to have equivalent functions)
 
     public function getAppSetting($name, $default_value = "")
     {

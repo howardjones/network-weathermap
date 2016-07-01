@@ -39,7 +39,7 @@ CREATE TABLE `weathermap_maps` (
   `schedule` varchar(32) NOT NULL DEFAULT '*',
   `archiving` set('on','off') NOT NULL DEFAULT 'off',
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM AUTO_INCREMENT=8 DEFAULT CHARSET=latin1;
+) ENGINE=MyISAM AUTO_INCREMENT=11 DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -90,7 +90,7 @@ CREATE TABLE `weathermap_groups` (
   `name` varchar(128) NOT NULL DEFAULT '',
   `sortorder` int(11) NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM AUTO_INCREMENT=3 DEFAULT CHARSET=latin1;
+) ENGINE=MyISAM AUTO_INCREMENT=6 DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -123,6 +123,37 @@ CREATE TABLE `settings` (
   PRIMARY KEY (`name`)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `user_auth`
+--
+
+DROP TABLE IF EXISTS `user_auth`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `user_auth` (
+  `id` mediumint(8) unsigned NOT NULL AUTO_INCREMENT,
+  `username` varchar(50) NOT NULL DEFAULT '0',
+  `password` varchar(50) NOT NULL DEFAULT '0',
+  `realm` mediumint(8) NOT NULL DEFAULT '0',
+  `full_name` varchar(100) DEFAULT '0',
+  `must_change_password` char(2) DEFAULT NULL,
+  `show_tree` char(2) DEFAULT 'on',
+  `show_list` char(2) DEFAULT 'on',
+  `show_preview` char(2) NOT NULL DEFAULT 'on',
+  `graph_settings` char(2) DEFAULT NULL,
+  `login_opts` tinyint(1) NOT NULL DEFAULT '1',
+  `policy_graphs` tinyint(1) unsigned NOT NULL DEFAULT '1',
+  `policy_trees` tinyint(1) unsigned NOT NULL DEFAULT '1',
+  `policy_hosts` tinyint(1) unsigned NOT NULL DEFAULT '1',
+  `policy_graph_templates` tinyint(1) unsigned NOT NULL DEFAULT '1',
+  `enabled` char(2) NOT NULL DEFAULT 'on',
+  PRIMARY KEY (`id`),
+  KEY `username` (`username`),
+  KEY `realm` (`realm`),
+  KEY `enabled` (`enabled`)
+) ENGINE=MyISAM AUTO_INCREMENT=4 DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
@@ -133,4 +164,4 @@ CREATE TABLE `settings` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2016-06-21 21:15:50
+-- Dump completed on 2016-07-01 21:26:58

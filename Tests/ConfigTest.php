@@ -15,6 +15,9 @@ class ConfigTest extends PHPUnit_Framework_TestCase
     protected static $previouswd;
     protected static $compare;
 
+    protected static $testsuite;
+    protected static $confdir;
+
     /**
      * Read a config file, write an image.
      * Compare the image to the 'reference' image that we generated when the
@@ -126,7 +129,11 @@ class ConfigTest extends PHPUnit_Framework_TestCase
     {
         self::checkPaths();
 
-        $fileHandle = fopen("test-suite/summary.html", "w");
+        $summary_file = self::$testsuite . DIRECTORY_SEPARATOR . "summary.html";
+        $fileHandle = fopen($summary_file, "w");
+        if ($fileHandle === false) {
+            throw new Exception("Failed to open summary file: $summary_file");
+        }
         fputs($fileHandle,
             "<html><head><title>Test summary</title><style>img {border: 1px solid black; }</style></head><body><h3>Test Summary</h3>(result - reference - diff)<br/>\n");
 
@@ -179,11 +186,15 @@ class ConfigTest extends PHPUnit_Framework_TestCase
     {
         global $WEATHERMAP_DEBUGGING;
 
+        parent::setUp();
+
         // sometimes useful to figure out what's going on!
         $WEATHERMAP_DEBUGGING = false;
 
         self::$previouswd = getcwd();
         chdir(dirname(__FILE__) . DIRECTORY_SEPARATOR . "..");
+
+
     }
 
     // this has to happen before the dataprovider runs, but
@@ -193,13 +204,19 @@ class ConfigTest extends PHPUnit_Framework_TestCase
         $version = explode('.', PHP_VERSION);
         $phptag = "php" . $version[0];
 
-        self::$phptag = "php" . $version[0];
-        self::$result1dir = "test-suite" . DIRECTORY_SEPARATOR . "results1-$phptag";
-        self::$result2dir = "test-suite" . DIRECTORY_SEPARATOR . "results2-$phptag";
-        self::$diffdir = "test-suite" . DIRECTORY_SEPARATOR . "diffs";
+        $here = dirname(__FILE__);
+        $test_suite = $here . DIRECTORY_SEPARATOR . ".." . DIRECTORY_SEPARATOR . "test-suite";
 
-        self::$testdir = "test-suite" . DIRECTORY_SEPARATOR . "tests";
-        self::$referencedir = "test-suite" . DIRECTORY_SEPARATOR . "references";
+        self::$phptag = "php" . $version[0];
+        self::$result1dir = $test_suite . DIRECTORY_SEPARATOR . "results1-$phptag";
+        self::$result2dir = $test_suite . DIRECTORY_SEPARATOR . "results2-$phptag";
+        self::$diffdir = $test_suite . DIRECTORY_SEPARATOR . "diffs";
+
+        self::$testdir = $test_suite . DIRECTORY_SEPARATOR . "tests";
+        self::$referencedir = $test_suite . DIRECTORY_SEPARATOR . "references";
+
+        self::$testsuite = $test_suite;
+
 
         if (!file_exists(self::$result1dir)) {
             mkdir(self::$result1dir);
@@ -216,7 +233,7 @@ class ConfigTest extends PHPUnit_Framework_TestCase
         $compares = array(
             "/usr/bin/compare",
             "/usr/local/bin/compare",
-            "test-suite" . DIRECTORY_SEPARATOR . "tools" . DIRECTORY_SEPARATOR . "compare.exe"
+            $test_suite . DIRECTORY_SEPARATOR . "tools" . DIRECTORY_SEPARATOR . "compare.exe"
         );
 
         foreach ($compares as $c) {

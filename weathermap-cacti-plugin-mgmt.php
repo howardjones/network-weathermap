@@ -330,18 +330,9 @@ function weathermap_footer_links()
 }
 
 
-
-function maplist()
+function maplist_warnings()
 {
-    global $colors;
-    global $i_understand_file_permissions_and_how_to_fix_them;
     global $manager;
-
-    $last_started = read_config_option("weathermap_last_started_file", true);
-    $last_finished = read_config_option("weathermap_last_finished_file", true);
-    $last_start_time = intval(read_config_option("weathermap_last_start_time", true));
-    $last_finish_time = intval(read_config_option("weathermap_last_finish_time", true));
-    $poller_interval = intval(read_config_option("poller_interval"));
 
     if (!wm_module_checks()) {
 
@@ -366,19 +357,24 @@ function maplist()
     $boost_enabled = $manager->getAppSetting('boost_rrd_update_enable', 'off');
 
     if ($boost_enabled == 'on') {
-        $sql = "SELECT optvalue FROM weathermap_settings WHERE optname='rrd_use_poller_output' AND mapid=0";
-        $result = db_fetch_row($sql);
-        if (isset($result['optvalue'])) {
-            $has_global_poller_output = $result['optvalue'];
-        } else {
-            $has_global_poller_output = false;
-        }
+
+        $has_global_poller_output = $manager->getMapSettingByName(0, "rrd_use_poller_output", false);
+
         if (!$has_global_poller_output) {
             print '<div align="center" class="wm_warning"><p>';
             print "You are using the Boost plugin to update RRD files. Because this delays data being written to the files, it causes issues with Weathermap updates. You can resolve this by using Weathermap's 'poller_output' support, which grabs data directly from the poller. <a href=\"?action=enable_poller_output\">You can enable that globally by clicking here</a>";
             print '</p></div>';
         }
     }
+
+    $last_started = $manager->getAppSetting("weathermap_last_started_file", true);
+    $last_finished = $manager->getAppSetting("weathermap_last_finished_file", true);
+    $last_start_time = intval($manager->getAppSetting("weathermap_last_start_time", true));
+    $last_finish_time = intval($manager->getAppSetting("weathermap_last_finish_time", true));
+    $poller_interval = intval($manager->getAppSetting("poller_interval"));
+
+    maplist_warnings();
+
 
     if (($last_finish_time - $last_start_time) > $poller_interval) {
         if (($last_started != $last_finished) && ($last_started != "")) {
@@ -390,13 +386,21 @@ function maplist()
         }
     }
 
+}
+
+
+function maplist()
+{
+    global $colors;
+    global $i_understand_file_permissions_and_how_to_fix_them;
+    global $manager;
+
 
     html_start_box("<strong>Weathermaps</strong>", "78%", $colors["header"], "3", "center", "?action=addmap_picker");
 
     html_header(array("Config File", "Title", "Group", "Active", "Settings", "Sort Order", "Accessible By", ""));
 
     $userlist = $manager->getUserList();
-//    $query = db_fetch_assoc("select id,username from user_auth");
     $users[0] = 'Anyone';
 
     foreach ($userlist as $user) {
@@ -404,8 +408,6 @@ function maplist()
     }
 
     $i = 0;
-    // $queryrows = db_fetch_assoc("select weathermap_maps.*, weathermap_groups.name as groupname from weathermap_maps, weathermap_groups where weathermap_maps.group_id=weathermap_groups.id order by weathermap_groups.sortorder,sortorder");
-    // or die (mysql_error("Could not connect to database") )
 
     $maps = $manager->getMapsWithGroups();
 
@@ -416,7 +418,7 @@ function maplist()
         print "<td>ALL MAPS</td><td>(special settings for all maps)</td><td></td><td></td>";
 
         print "<td><a href='?action=map_settings&id=0'>";
-        $setting_count = db_fetch_cell("SELECT count(*) FROM weathermap_settings WHERE mapid=0 AND groupid=0");
+        $setting_count = $manager->getMapSettingCount(0, 0);
         if ($setting_count > 0) {
             print $setting_count . " special";
             if ($setting_count > 1) {
@@ -456,7 +458,7 @@ function maplist()
             print "<td>";
 
             print "<a href='?action=map_settings&id=" . $map->id . "'>";
-            $setting_count = db_fetch_cell("SELECT count(*) FROM weathermap_settings WHERE mapid=" . $map->id);
+            $setting_count = $manager->getMapSettingCount($map->id);
             if ($setting_count > 0) {
                 print $setting_count . " special";
                 if ($setting_count > 1) {
@@ -480,13 +482,12 @@ function maplist()
             print "</td>";
 
             print '<td>';
-            $UserSQL = 'SELECT * FROM weathermap_auth WHERE mapid=' . $map->id . ' ORDER BY userid';
-            $userlist = db_fetch_assoc($UserSQL);
 
+            $userlist = $manager->getMapAuthUsers($map->id);
             $mapusers = array();
             foreach ($userlist as $user) {
-                if (array_key_exists($user['userid'], $users)) {
-                    $mapusers[] = $users[$user['userid']];
+                if (array_key_exists($user->userid, $users)) {
+                    $mapusers[] = $users[$user->userid];
                 }
             }
 
@@ -544,11 +545,12 @@ function addmap_picker($show_all = false)
 
     $loaded = array();
     $flags = array();
+
     // find out what maps are already in the database, so we can skip those
-    $queryrows = db_fetch_assoc("select * from weathermap_maps");
-    if (is_array($queryrows)) {
-        foreach ($queryrows as $map) {
-            $loaded[] = $map['configfile'];
+    $existing_maps = $manager->getMaps();
+    if (is_array($existing_maps)) {
+        foreach ($existing_maps as $map) {
+            $loaded[] = $map->configfile;
 
         }
     }
@@ -840,26 +842,30 @@ function weathermap_readonly_settings($id, $title = "Settings")
 
 }
 
-function weathermap_map_settings_form($mapid = 0, $settingid = 0)
+function weathermap_map_settings_form($mapId = 0, $settingId = 0)
 {
     global $colors, $config;
+    global $manager;
 
-    // print "Per-map settings for map $id";
-
-    if ($mapid > 0) $title = db_fetch_cell("select titlecache from weathermap_maps where id=" . intval($mapid));
-    if ($mapid < 0) $title = db_fetch_cell("select name from weathermap_groups where id=" . intval(-$mapid));
-    // print "Settings edit/add form.";
+    if ($mapId < 0) {
+        $item = $manager->getGroup(-$mapId);
+        $title = $item->name;
+    }
+    if ($mapId > 0) {
+        $item = $manager->getMap($mapId);
+        $title = $item->titlecache;
+    }
 
     $name = "";
     $value = "";
 
-    if ($settingid != 0) {
+    if ($settingId != 0) {
 
-        $result = db_fetch_assoc("select * from weathermap_settings where id=" . intval($settingid));
+        $setting = $manager->getMapSettingById($settingId);
 
-        if (is_array($result) && sizeof($result) > 0) {
-            $name = $result[0]['optname'];
-            $value = $result[0]['optvalue'];
+        if ($setting !== false) {
+            $name = $setting->optname;
+            $value = $setting->optvalue;
         }
     }
 
@@ -868,29 +874,43 @@ function weathermap_map_settings_form($mapid = 0, $settingid = 0)
     $values_ar = array();
 
     $field_ar = array(
-        "mapid" => array("friendly_name" => "Map ID", "method" => "hidden_zero", "value" => $mapid),
-        "id" => array("friendly_name" => "Setting ID", "method" => "hidden_zero", "value" => $settingid),
-        "name" => array("friendly_name" => "Name", "method" => "textbox", "max_length" => 128, "description" => "The name of the map-global SET variable", "value" => $name),
-        "value" => array("friendly_name" => "Value", "method" => "textbox", "max_length" => 128, "description" => "What to set it to", "value" => $value)
+        "mapid" => array("friendly_name" => "Map ID", "method" => "hidden_zero", "value" => $mapId),
+        "id" => array("friendly_name" => "Setting ID", "method" => "hidden_zero", "value" => $settingId),
+        "name" => array(
+            "friendly_name" => "Name",
+            "method" => "textbox",
+            "max_length" => 128,
+            "description" => "The name of the map-global SET variable",
+            "value" => $name
+        ),
+        "value" => array(
+            "friendly_name" => "Value",
+            "method" => "textbox",
+            "max_length" => 128,
+            "description" => "What to set it to",
+            "value" => $value
+        )
     );
 
     $action = "Edit";
-    if ($settingid == 0) $action = "Create";
+    if ($settingId == 0) {
+        $action = "Create";
+    }
 
-    if ($mapid == 0) {
+    if ($mapId == 0) {
         $title = "setting for ALL maps";
-    } elseif ($mapid < 0) {
-        $grpid = -$mapid;
-        $title = "per-group setting for Group $grpid: $title";
+    } elseif ($mapId < 0) {
+        $groupId = -$mapId;
+        $title = "per-group setting for Group $groupId: $title";
     } else {
-        $title = "per-map setting for Weathermap $mapid: $title";
+        $title = "per-map setting for Weathermap $mapId: $title";
     }
 
     html_start_box("<strong>$action $title</strong>", "98%", $colors["header"], "3", "center", "");
     draw_edit_form(array("config" => $values_ar, "fields" => $field_ar));
     html_end_box();
 
-    form_save_button("?action=map_settings&id=" . $mapid);
+    form_save_button("?action=map_settings&id=" . $mapId);
 
 }
 

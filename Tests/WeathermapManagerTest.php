@@ -27,8 +27,13 @@ class WeathermapManagerTest extends PHPUnit_Extensions_Database_TestCase
     {
         parent::setUp();
 
-        $weathermap_confdir = realpath(dirname(__FILE__) . '/../configs');
+        $here = realpath(dirname(__FILE__));
+        $test_suite = $here . DIRECTORY_SEPARATOR . ".." . DIRECTORY_SEPARATOR . "test-suite";
 
+        $weathermap_confdir = $here . DIRECTORY_SEPARATOR . ".." . DIRECTORY_SEPARATOR . 'configs';
+
+        $this->confdir = $weathermap_confdir;
+        $this->testsuite = $test_suite;
 
         $this->manager = new WeathermapManager(self::$pdo, $weathermap_confdir);
     }
@@ -41,9 +46,35 @@ class WeathermapManagerTest extends PHPUnit_Extensions_Database_TestCase
         return $this->createMySQLXMLDataSet(dirname(__FILE__) . '/../test-suite/data/weathermap-seed.xml');
     }
 
+    public function testAddBadMap()
+    {
+        $pos = $this->getMapOrder();
+        $this->assertEquals($pos, array(7, 6, 5, 4, 1, 2));
+        $this->expectException(Exception::class);
+        $this->manager->addMap($this->testsuite . DIRECTORY_SEPARATOR . "tests" . DIRECTORY_SEPARATOR . "simple-node-1.conf");
+        $pos = $this->getMapOrder();
+        $this->assertEquals($pos, array(7, 6, 5, 4, 1, 2, 8));
+    }
+
     public function testAddMap()
     {
+        $pos = $this->getMapOrder();
+        $this->assertEquals($pos, array(7, 6, 5, 4, 1, 2));
+        $this->expectException(Exception::class);
+        $this->manager->addMap($this->confdir . DIRECTORY_SEPARATOR . "simple.conf");
+        $pos = $this->getMapOrder();
+        $this->assertEquals($pos, array(7, 6, 5, 4, 1, 2, 8));
 
+        $map = $this->manager->getMap(8);
+
+        $this->assertNotNull($map);
+        $this->assertInstanceOf(stdClass::class, $map);
+
+        $this->assertNotEmpty($map->filehash);
+        $this->assertNotEmpty($map->titlecache);
+        $this->assertNotEmpty($map->group_id);
+        $this->assertNotEmpty($map->sortorder);
+        $this->assertEquals($map->active, 'on');
     }
 
     private function getMapOrder()
@@ -74,6 +105,15 @@ class WeathermapManagerTest extends PHPUnit_Extensions_Database_TestCase
         return $result;
     }
 
+    public function testGetMaps()
+    {
+        $pos = $this->getMapOrder();
+        $this->assertEquals($pos, array(7, 6, 5, 4, 1, 2));
+
+        $maps = $this->manager->getMaps();
+        $this->assertEquals(sizeof($pos), sizeof($maps));
+        $this->assertInstanceOf(stdClass::class, $maps[0]);
+    }
 
     public function testMoveMapUp()
     {
@@ -223,7 +263,6 @@ class WeathermapManagerTest extends PHPUnit_Extensions_Database_TestCase
 
         $result = $this->manager->getAppSetting("dog", "pitbull");
         $this->assertEquals("pitbull", $result);
-
-
     }
+
 }

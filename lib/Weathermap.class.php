@@ -508,7 +508,7 @@ class WeatherMap extends WeatherMapBase
 						$cx = $bounds[4] - $bounds[0];
 						$cy = $bounds[1] - $bounds[5];
 						if($cx > $xsize) $xsize = $cx;
-						$ysize += ($cy*1.2);
+						$ysize += ($cy*1.2) + $this->fonts[$fontnumber]->fudge;
 						# warn("Adding $cy (x was $cx)\n");
 					}
 					#$bounds=imagettfbbox($this->fonts[$fontnumber]->size, 0, $this->fonts[$fontnumber]->file,
@@ -2464,7 +2464,7 @@ function ReadConfig($input, $is_include=FALSE)
 
 			
 			// truetype font definition (actually, we don't really check if it's truetype) - filename + size
-			if (preg_match("/^\s*FONTDEFINE\s+(\d+)\s+(\S+)\s+(\d+)\s*$/i", $buffer, $matches))
+			if (preg_match("/^\s*FONTDEFINE\s+(\d+)\s+(\S+)\s+(\d+)(?:\s+(-?\d+))?\s*$/i", $buffer, $matches))
 			{
 				if (function_exists("imagettfbbox"))
 				{
@@ -2477,6 +2477,7 @@ function ReadConfig($input, $is_include=FALSE)
 						$this->fonts[$matches[1]]->type="truetype";
 						$this->fonts[$matches[1]]->file=$matches[2];
 						$this->fonts[$matches[1]]->size=$matches[3];
+						$this->fonts[$matches[1]]->fudge=isset($matches[4]) ? $matches[4] : 0;
 					}
 					else { wm_warn
 						("Failed to load ttf font " . $matches[2] . " - at config line $linecount [WMWARN30]");
@@ -2914,7 +2915,7 @@ function WriteConfig($filename)
 		if (count($this->fonts) > 0) {
 			foreach ($this->fonts as $fontnumber => $font) {
 				if ($font->type == 'truetype') {
-					$output .= sprintf("FONTDEFINE %d %s %d\n", $fontnumber, $font->file, $font->size);
+					$output .= sprintf("FONTDEFINE %d %s %d %d\n", $fontnumber, $font->file, $font->size, $font->fudge);
 				}
 
 				if ($font->type == 'gd') {

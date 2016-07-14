@@ -8,6 +8,8 @@ include_once("./include/auth.php");
 
 // include the weathermap class so that we can get the version
 include_once(dirname(__FILE__)."/lib/Weathermap.class.php");
+include_once(dirname(__FILE__) . "/lib/database.php");
+include_once(dirname(__FILE__) . "/lib/WeathermapManager.class.php");
 
 $action = "";
 if (isset($_POST['action'])) {
@@ -15,6 +17,8 @@ if (isset($_POST['action'])) {
 } else if (isset($_GET['action'])) {
 	$action = $_GET['action'];
 }
+
+$manager = new WeathermapManager(weathermap_get_pdo(), $weathermap_confdir);
 
 switch($action)
 {

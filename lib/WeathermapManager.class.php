@@ -33,7 +33,7 @@ class WeathermapManager
     public function getMap($mapId)
     {
         $statement = $this->pdo->prepare("SELECT * FROM weathermap_maps WHERE id=?");
-        $statement->execute(array($mapId));
+        $statement->execute(array(intval($mapId)));
         $map = $statement->fetch(PDO::FETCH_OBJ);
 
         return $map;
@@ -116,6 +116,20 @@ class WeathermapManager
         $set = substr($set, 0, -2);
 
         return array($set, $values);
+    }
+
+    public function getTabs($userId)
+    {
+        $statement = $this->pdo->prepare("select DISTINCTROW weathermap_maps.group_id as id, weathermap_groups.name as group_name from weathermap_auth,weathermap_maps, weathermap_groups where weathermap_groups.id=weathermap_maps.group_id and weathermap_maps.id=weathermap_auth.mapid and active='on' and (userid=? or userid=0) order by weathermap_groups.sortorder");
+        $statement->execute(array($userId));
+        $maps = $statement->fetchAll(PDO::FETCH_ASSOC);
+
+        foreach ($maps as $map)
+        {
+            $tabs[$map['id']] = $map['group_name'];
+        }
+
+        return $tabs;
     }
 
     public function updateMap($mapId, $data)
@@ -362,7 +376,7 @@ class WeathermapManager
         return $setting;
     }
 
-    public function getMapSettingCount($mapId, $groupId)
+    public function getMapSettingCount($mapId, $groupId=null)
     {
         if (is_null($groupId)) {
             $statement = $this->pdo->prepare("SELECT count(*) FROM weathermap_settings WHERE mapid=?");

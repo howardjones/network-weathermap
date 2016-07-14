@@ -4,7 +4,8 @@ $guest_account = true;
 
 chdir('../../');
 include_once("./include/auth.php");
-// include_once("./include/config.php");
+
+$weathermap_confdir = realpath(dirname(__FILE__) . '/configs');
 
 // include the weathermap class so that we can get the version
 include_once(dirname(__FILE__)."/lib/Weathermap.class.php");
@@ -140,7 +141,9 @@ default:
 		}
 	}
 
-	$tabs = weathermap_get_valid_tabs();
+	$userid = (isset($_SESSION["sess_user_id"]) ? intval($_SESSION["sess_user_id"]) : 1);
+	$tabs = $manager->getTabs($userid);
+
 	$tab_ids = array_keys($tabs);
 	if (($group_id == -1) && (sizeof($tab_ids)>0))
 	{
@@ -165,12 +168,6 @@ default:
 	break;
 }
 
-
-function weathermap_cycleview()
-{
-
-}
-
 function weathermap_singleview($mapid)
 {
 	global $colors;
@@ -182,7 +179,7 @@ function weathermap_singleview($mapid)
 	$confdir = dirname(__FILE__).'/configs/';
 
 	$userid = (isset($_SESSION["sess_user_id"]) ? intval($_SESSION["sess_user_id"]) : 1);
-	$map = $manager->getMapWithAccess($userid, $id);
+	$map = $manager->getMapWithAccess($userid, $mapid);
 
 
 	if (sizeof($map))
@@ -223,18 +220,8 @@ if ($is_wm_admin)
 		{
 			print "<div align=\"center\" style=\"padding:20px\"><em>This map hasn't been created yet.";
 
-			global $config, $user_auth_realms, $user_auth_realm_filenames;
-			$realm_id2 = 0;
-
-			if (isset($user_auth_realm_filenames[basename('weathermap-cacti-plugin.php')])) {
-				$realm_id2 = $user_auth_realm_filenames[basename('weathermap-cacti-plugin.php')];
-			}
-			
-			$userid = (isset($_SESSION["sess_user_id"]) ? intval($_SESSION["sess_user_id"]) : 1);
-			if ((db_fetch_assoc("select user_auth_realm.realm_id from user_auth_realm where user_auth_realm.user_id='" . $userid . "' and user_auth_realm.realm_id='$realm_id2'")) || (empty($realm_id2))) {
-
+			if (weathermap_is_admin()) {
 					print " (If this message stays here for more than one poller cycle, then check your cacti.log file for errors!)";
-
 				}
 			print "</em></div>";
 		}
@@ -244,17 +231,27 @@ if ($is_wm_admin)
 	}
 }
 
-function weathermap_show_manage_tab()
+function weathermap_is_admin()
 {
-	global $config, $user_auth_realms, $user_auth_realm_filenames;
+	global $user_auth_realms, $user_auth_realm_filenames;
 	$realm_id2 = 0;
 
 	if (isset($user_auth_realm_filenames['weathermap-cacti-plugin-mgmt.php'])) {
 		$realm_id2 = $user_auth_realm_filenames['weathermap-cacti-plugin-mgmt.php'];
 	}
 	$userid = (isset($_SESSION["sess_user_id"]) ? intval($_SESSION["sess_user_id"]) : 1);
-	if ((db_fetch_assoc("select user_auth_realm.realm_id from user_auth_realm where user_auth_realm.user_id='" . $userid . "' and user_auth_realm.realm_id='$realm_id2'")) || (empty($realm_id2))) {
 
+	if ((db_fetch_assoc("select user_auth_realm.realm_id from user_auth_realm where user_auth_realm.user_id='" . $userid . "' and user_auth_realm.realm_id='$realm_id2'")) || (empty($realm_id2))) {
+		return true;
+	}
+	return false;
+}
+
+function weathermap_show_manage_tab()
+{
+	global $config;
+
+	if (weathermap_is_admin()) {
 		print '<a href="' . $config['url_path'] . 'plugins/weathermap/weathermap-cacti-plugin-mgmt.php">Manage Maps</a>';
 	}
 }
@@ -522,24 +519,16 @@ function weathermap_fullview($cycle=FALSE, $firstonly=FALSE, $limit_to_group = -
 function weathermap_versionbox()
 {
 	global $WEATHERMAP_VERSION, $colors;
-	global $user_auth_realm_filenames;
-		
+
 	$pagefoot = "Powered by <a href=\"http://www.network-weathermap.com/?v=$WEATHERMAP_VERSION\">PHP Weathermap version $WEATHERMAP_VERSION</a>";
 	
-	$realm_id2 = 0;
-
-	if (isset($user_auth_realm_filenames['weathermap-cacti-plugin-mgmt.php'])) {
-		$realm_id2 = $user_auth_realm_filenames['weathermap-cacti-plugin-mgmt.php'];
-	}
-	$userid = (isset($_SESSION["sess_user_id"]) ? intval($_SESSION["sess_user_id"]) : 1);
-	if ((db_fetch_assoc("select user_auth_realm.realm_id from user_auth_realm where user_auth_realm.user_id='" . $userid . "' and user_auth_realm.realm_id='$realm_id2'")) || (empty($realm_id2))) 
+	if (weathermap_is_admin())
 	{
 		$pagefoot .= " --- <a href='weathermap-cacti-plugin-mgmt.php' title='Go to the map management page'>Weathermap Management</a>";
 		$pagefoot .= " | <a target=\"_blank\" href=\"docs/\">Local Documentation</a>";
 		$pagefoot .= " | <a target=\"_blank\" href=\"weathermap-cacti-plugin-editor.php\">Editor</a>";
 	}
-			
-	
+
 	html_graph_start_box(1,true);
 
 ?>
@@ -557,21 +546,6 @@ function weathermap_versionbox()
 }
 
 
-function readfile_chunked($filename) {
-    $chunksize = 1*(1024*1024); // how many bytes per chunk
-	
-    $handle = fopen($filename, 'rb');
-    if ($handle === false) {
-		return false;
-	}
-	
-    while (!feof($handle)) {
-        $buffer = fread($handle, $chunksize);
-        echo $buffer;
-    }
-    $status = fclose($handle);
-    return $status;
-} 
 
 function weathermap_footer_links()
 {
@@ -656,32 +630,16 @@ function weathermap_mapselector($current_id = 0)
 	}
 }
 
-function weathermap_get_valid_tabs()
-{
-	global $manager;
-
-	$tabs = array();
-	$userid = (isset($_SESSION["sess_user_id"]) ? intval($_SESSION["sess_user_id"]) : 1);
-	$maps = db_fetch_assoc("select weathermap_maps.*, weathermap_groups.name as group_name from weathermap_auth,weathermap_maps, weathermap_groups where weathermap_groups.id=weathermap_maps.group_id and weathermap_maps.id=weathermap_auth.mapid and active='on' and (userid=".$userid." or userid=0) order by weathermap_groups.sortorder");
-
-	// select DISTINCTROW weathermap_maps.group_id as id, weathermap_groups.name as group_name from weathermap_auth,weathermap_maps, weathermap_groups where weathermap_groups.id=weathermap_maps.group_id and weathermap_maps.id=weathermap_auth.mapid and active='on' and (userid=? or userid=0) order by weathermap_groups.sortorder
-
-
-	foreach ($maps as $map)
-	{
-		$tabs[$map['group_id']] = $map['group_name'];
-	}
-
-	return($tabs);
-}
 
 function weathermap_tabs($current_tab)
 {
 	global $colors;
+	global $manager;
 
 	// $current_tab=2;
+	$userid = (isset($_SESSION["sess_user_id"]) ? intval($_SESSION["sess_user_id"]) : 1);
 
-	$tabs = weathermap_get_valid_tabs();
+	$tabs = $manager->getTabs($userid);
 
 	if (sizeof($tabs) > 1) {
 		/* draw the categories tabs on the top of the page */

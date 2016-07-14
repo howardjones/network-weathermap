@@ -740,30 +740,30 @@ function weathermap_map_settings($id)
         $title = "Additional settings for ALL maps";
         $nonemsg = "There are no settings for all maps yet. You can add some by clicking Add up in the top-right, or choose a single map from the management screen to add settings for that map.";
         $type = "global";
-        $settingrows = db_fetch_assoc("select * from weathermap_settings where mapid=0 and groupid=0");
+        $settingrows = db_fetch_assoc("SELECT * FROM weathermap_settings WHERE mapid=0 AND groupid=0");
 
     } elseif ($id < 0) {
         $group_id = -intval($id);
-        $groupname = db_fetch_cell("select name from weathermap_groups where id=" . $group_id);
-        $title = "Edit per-map settings for Group " . $group_id . ": " . $groupname;
+        $group = $manager->getGroup($group_id);
+
+        $title = "Edit per-map settings for Group " . $group->id . ": " . $group->name;
         $nonemsg = "There are no per-group settings for this group yet. You can add some by clicking Add up in the top-right.";
         $type = "group";
-        $settingrows = db_fetch_assoc("select * from weathermap_settings where groupid=" . $group_id);
+        $settingrows = db_fetch_assoc("SELECT * FROM weathermap_settings WHERE groupid=" . $group_id);
     } else {
         // print "Per-map settings for map $id";
-        $map = db_fetch_row("select * from weathermap_maps where id=" . intval($id));
+        $map = $manager->getMap($id);
 
-        $groupname = db_fetch_cell("select name from weathermap_groups where id=" . intval($map['group_id']));
+        $groupname = db_fetch_cell("SELECT name FROM weathermap_groups WHERE id=" . intval($map->group_id));
         $title = "Edit per-map settings for Weathermap $id: " . $map['titlecache'];
         $nonemsg = "There are no per-map settings for this map yet. You can add some by clicking Add up in the top-right.";
         $type = "map";
-        $settingrows = db_fetch_assoc("select * from weathermap_settings where mapid=" . intval($id));
+        $settingrows = db_fetch_assoc("SELECT * FROM weathermap_settings WHERE mapid=" . intval($id));
     }
 
     if ($type == "group") {
         print "<p>All maps in this group are also affected by the following GLOBAL settings (group overrides global, map overrides group, but BOTH override SET commands within the map config file):</p>";
         weathermap_readonly_settings(0, "Global Settings");
-
     }
 
     if ($type == "map") {
@@ -775,7 +775,8 @@ function weathermap_map_settings($id)
 
     }
 
-    html_start_box("<strong>$title</strong>", "70%", $colors["header"], "2", "center", "?action=map_settings_form&mapid=" . intval($id));
+    html_start_box("<strong>$title</strong>", "70%", $colors["header"], "2", "center",
+        "?action=map_settings_form&mapid=" . intval($id));
     html_header(array("", "Name", "Value", ""));
 
     $n = 0;
@@ -802,8 +803,12 @@ function weathermap_map_settings($id)
     html_end_box();
 
     print "<div align=center>";
-    if ($type == "group") print "<a href='?action=groupadmin'>Back to Group Admin</a>";
-    if ($type == "global") print "<a href='?action='>Back to Map Admin</a>";
+    if ($type == "group") {
+        print "<a href='?action=groupadmin'>Back to Group Admin</a>";
+    }
+    if ($type == "global") {
+        print "<a href='?action='>Back to Map Admin</a>";
+    }
     print "</div>";
 }
 
@@ -812,9 +817,15 @@ function weathermap_readonly_settings($id, $title = "Settings")
     global $colors, $config;
     global $manager;
 
-    if ($id == 0) $query = "select * from weathermap_settings where mapid=0 and groupid=0";
-    if ($id < 0) $query = "select * from weathermap_settings where mapid=0 and groupid=" . (-intval($id));
-    if ($id > 0) $query = "select * from weathermap_settings where mapid=" . intval($id);
+    if ($id == 0) {
+        $query = "SELECT * FROM weathermap_settings WHERE mapid=0 AND groupid=0";
+    }
+    if ($id < 0) {
+        $query = "SELECT * FROM weathermap_settings WHERE mapid=0 AND groupid=" . (-intval($id));
+    }
+    if ($id > 0) {
+        $query = "SELECT * FROM weathermap_settings WHERE mapid=" . intval($id);
+    }
 
     $settings = db_fetch_assoc($query);
 
@@ -839,7 +850,6 @@ function weathermap_readonly_settings($id, $title = "Settings")
     }
 
     html_end_box();
-
 }
 
 function weathermap_map_settings_form($mapId = 0, $settingId = 0)

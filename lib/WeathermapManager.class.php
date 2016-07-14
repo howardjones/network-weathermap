@@ -57,6 +57,24 @@ class WeathermapManager
         return $maps;
     }
 
+    public function getMapWithAccess($userId, $mapId)
+    {
+        $statement = $this->pdo->query("SELECT weathermap_maps.* FROM weathermap_auth,weathermap_maps WHERE weathermap_maps.id=weathermap_auth.mapid AND active='on' AND (userid=? OR userid=0) AND weathermap_maps.id=?");
+        $statement->execute(array($userId, $mapId));
+        $maps = $statement->fetchAll(PDO::FETCH_OBJ);
+
+        return $maps;
+    }
+
+    public function getMapTotalCount()
+    {
+        $statement = $this->pdo->query("select count(*) as total from weathermap_maps");
+        $statement->execute();
+        $total_map_count = $statement->fetchColumn();
+
+        return $total_map_count;
+    }
+
     public function getMapsInGroup($groupId)
     {
         $statement = $this->pdo->query("SELECT * FROM weathermap_maps WHERE group_id=? ORDER BY sortorder");
@@ -452,6 +470,19 @@ class WeathermapManager
         $users = $statement->fetchAll(PDO::FETCH_OBJ);
 
         return $users;
+    }
+
+    public function translateFileHash($id_or_filename)
+    {
+        $SQL = "select id from weathermap_maps where configfile=? or filehash=?";
+        $map = db_fetch_assoc($SQL);
+
+        $statement = $this->pdo->prepare("select id from weathermap_maps where configfile=? or filehash=?");
+        $statement->execute(array($id_or_filename, $id_or_filename));
+
+        $result = $statement->fetchColumn();
+
+        return $result;
     }
 
     // Below here will migrate into a Cacti API class at some point soon

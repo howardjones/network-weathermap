@@ -66,6 +66,14 @@ class WeathermapManager
         return $maps;
     }
 
+    public function getMapAuth($mapId)
+    {
+        $statement = $this->pdo->prepare("SELECT * FROM weathermap_auth WHERE mapid=? ORDER BY userid");
+        $statement->execute(array($mapId));
+
+        return $statement->fetchAll(PDO::FETCH_OBJ);
+    }
+
     public function getMapTotalCount()
     {
         $statement = $this->pdo->query("select count(*) as total from weathermap_maps");
@@ -528,11 +536,25 @@ class WeathermapManager
         $statement->execute(array($name));
     }
 
-    public function getUserList()
+    public function getUserList($include_anyone=false)
     {
-        $statement = $this->pdo->query("SELECT * FROM user_auth");
+        $statement = $this->pdo->query("SELECT id, username, full_name, enabled FROM user_auth");
         $statement->execute();
-        $users = $statement->fetchAll(PDO::FETCH_OBJ);
+        $userlist = $statement->fetchAll(PDO::FETCH_OBJ);
+
+        $users = array();
+
+        foreach ($userlist as $user) {
+            $users[$user->id] = $user;
+        }
+
+        if ($include_anyone) {
+            $users[0] = new stdClass();
+            $users[0]->id = 0;
+            $users[0]->username = "Anyone";
+            $users[0]->full_name = "Anyone";
+            $users[0]->enabled = true;
+        }
 
         return $users;
     }

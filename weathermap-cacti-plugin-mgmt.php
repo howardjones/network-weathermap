@@ -678,27 +678,30 @@ function perms_list($id)
     $map = $manager->getMap($id);
     $title = $map->titlecache;
 
-    $auth_sql = "select * from weathermap_auth where mapid=$id order by userid";
+    $users = $manager->getUserList(true);
+    $auth = $manager->getMapAuth($id);
 
-    $query = db_fetch_assoc("select id,username from user_auth order by username");
-    $users[0] = 'Anyone';
-    foreach ($query as $user) {
-        $users[$user['id']] = $user['username'];
-    }
+//    $users[0] = 'Anyone';
 
-    $auth_results = db_fetch_assoc($auth_sql);
+//    $auth_sql = "select * from weathermap_auth where mapid=$id order by userid";
+//    $auth_results = db_fetch_assoc($auth_sql);
+
     $mapusers = array();
     $mapuserids = array();
-    foreach ($auth_results as $user) {
-        if (isset($users[$user['userid']])) {
-            $mapusers[] = $users[$user['userid']];
-            $mapuserids[] = $user['userid'];
+
+    // build an array of userids that are allowed to see this map (and that actually exist)
+    foreach ($auth as $user) {
+        if (isset($users[$user->userid])) {
+            $mapusers[] = $users[$user->userid];
+            $mapuserids[] = $user->userid;
         }
     }
 
     $userselect = "";
-    foreach ($users as $uid => $name) {
-        if (!in_array($uid, $mapuserids)) $userselect .= "<option value=\"$uid\">$name</option>\n";
+    foreach ($users as $uid => $user) {
+        if (!in_array($uid, $mapuserids)) {
+            $userselect .= sprintf("<option value=\"%s\">%s</option>\n", $uid, $user->username);
+        }
     }
 
     html_start_box("<strong>Edit permissions for Weathermap $id: $title</strong>", "70%", $colors["header"], "2", "center", "");
@@ -707,7 +710,7 @@ function perms_list($id)
     $n = 0;
     foreach ($mapuserids as $user) {
         form_alternate_row_color($colors["alternate"], $colors["light"], $n);
-        print "<td>" . $users[$user] . "</td>";
+        print "<td>" . $users[$user]->username . "</td>";
         print '<td><a href="?action=perms_delete_user&mapid=' . $id . '&userid=' . $user . '"><img src="../../images/delete_icon.gif" width="10" height="10" border="0" alt="Remove permissions for this user to see this map"></a></td>';
 
         print "</tr>";
@@ -751,11 +754,10 @@ function weathermap_map_settings($id)
         $type = "group";
         $settingrows = db_fetch_assoc("SELECT * FROM weathermap_settings WHERE groupid=" . $group_id);
     } else {
-        // print "Per-map settings for map $id";
         $map = $manager->getMap($id);
 
         $groupname = db_fetch_cell("SELECT name FROM weathermap_groups WHERE id=" . intval($map->group_id));
-        $title = "Edit per-map settings for Weathermap $id: " . $map['titlecache'];
+        $title = "Edit per-map settings for Weathermap $id: " . $map->titlecache;
         $nonemsg = "There are no per-map settings for this map yet. You can add some by clicking Add up in the top-right.";
         $type = "map";
         $settingrows = db_fetch_assoc("SELECT * FROM weathermap_settings WHERE mapid=" . intval($id));

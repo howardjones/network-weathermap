@@ -1056,7 +1056,7 @@ class WeatherMap extends WeatherMapBase
 						$cx = $bounds[4] - $bounds[0];
 						$cy = $bounds[1] - $bounds[5];
 						if($cx > $xsize) $xsize = $cx;
-						$ysize += ($cy*1.2);
+						$ysize += ($cy*1.2) - $this->fonts[$fontnumber]->v_offset;  # subtract v_offset, due to coordinate system
 						# warn("Adding $cy (x was $cx)\n");
 					}
 					#$bounds=imagettfbbox($this->fonts[$fontnumber]->size, 0, $this->fonts[$fontnumber]->file,
@@ -2462,6 +2462,7 @@ function DrawTitle($im, $font, $colour)
 					$new_font->type = "truetype";
 					$new_font->file = $args[2];
 					$new_font->size = $args[3];
+					$new_font->v_offset = isset($args[4]) ? $args[4] : 0;
 					$this->fonts[$args[1]] = $new_font;
 				} else {
 					wm_warn("Failed to load ttf font " . $args[2]
@@ -3279,7 +3280,7 @@ function WriteConfig($filename)
 		if (count($this->fonts) > 0) {
 			foreach ($this->fonts as $fontnumber => $font) {
 				if ($font->type == 'truetype') {
-					$output .= sprintf("FONTDEFINE %d %s %d\n", $fontnumber, $font->file, $font->size);
+					$output .= sprintf("FONTDEFINE %d %s %d %d\n", $fontnumber, $font->file, $font->size, $font->v_offset);
 				}
 
 				if ($font->type == 'gd') {

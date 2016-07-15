@@ -6,6 +6,7 @@
 $WM_config_keywords2 = array(
     'GLOBAL' => array(
         'FONTDEFINE' => array(
+            array('GLOBAL', '/^\s*FONTDEFINE\s+(\d+)\s+(\S+)\s+(\d+)\s+(-?\d)\s*$/i','ReadConfig_Handle_FONTDEFINE'),
             array('GLOBAL', '/^\s*FONTDEFINE\s+(\d+)\s+(\S+)\s+(\d+)\s*$/i', 'ReadConfig_Handle_FONTDEFINE'),
             array('GLOBAL', '/^\s*FONTDEFINE\s+(\d+)\s+(\S+)\s*$/i', 'ReadConfig_Handle_FONTDEFINE'),
         ),

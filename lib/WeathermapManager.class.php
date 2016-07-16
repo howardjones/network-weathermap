@@ -66,6 +66,15 @@ class WeathermapManager
         return $maps;
     }
 
+    public function getMapsWithAccessAndGroups($userId)
+    {
+        $statement = $this->pdo->query("select distinct weathermap_maps.*,weathermap_groups.name, weathermap_groups.sortorder as gsort from weathermap_groups,weathermap_auth,weathermap_maps where weathermap_maps.group_id=weathermap_groups.id and weathermap_maps.id=weathermap_auth.mapid and active='on' and (userid=? or userid=0) order by gsort, sortorder");
+        $statement->execute(array($userId));
+        $maps = $statement->fetchAll(PDO::FETCH_OBJ);
+
+        return $maps;
+    }
+
     public function getMapAuth($mapId)
     {
         $statement = $this->pdo->prepare("SELECT * FROM weathermap_auth WHERE mapid=? ORDER BY userid");

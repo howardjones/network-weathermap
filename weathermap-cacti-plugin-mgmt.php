@@ -667,9 +667,6 @@ function preview_config($file)
 }
 
 
-
-
-
 function perms_list($id)
 {
     global $colors;
@@ -681,53 +678,53 @@ function perms_list($id)
     $users = $manager->getUserList(true);
     $auth = $manager->getMapAuth($id);
 
-//    $users[0] = 'Anyone';
-
-//    $auth_sql = "select * from weathermap_auth where mapid=$id order by userid";
-//    $auth_results = db_fetch_assoc($auth_sql);
-
-    $mapusers = array();
     $mapuserids = array();
 
     // build an array of userids that are allowed to see this map (and that actually exist)
     foreach ($auth as $user) {
         if (isset($users[$user->userid])) {
-            $mapusers[] = $users[$user->userid];
             $mapuserids[] = $user->userid;
         }
     }
 
-    $userselect = "";
+    // now build the list of users that exist but aren't currently allowed (for the picklist)
+    $candidate_users = array();
     foreach ($users as $uid => $user) {
         if (!in_array($uid, $mapuserids)) {
-            $userselect .= sprintf("<option value=\"%s\">%s</option>\n", $uid, $user->username);
+            $candidate_users [] = $user;
         }
     }
 
-    html_start_box("<strong>Edit permissions for Weathermap $id: $title</strong>", "70%", $colors["header"], "2", "center", "");
+    html_start_box("<strong>Edit permissions for Weathermap $id: $title</strong>", "70%", $colors["header"], "2",
+        "center", "");
     html_header(array("Username", ""));
 
     $n = 0;
     foreach ($mapuserids as $user) {
         form_alternate_row_color($colors["alternate"], $colors["light"], $n);
-        print "<td>" . $users[$user]->username . "</td>";
+        print "<td>" . htmlspecialchars($users[$user]->username) . "</td>";
         print '<td><a href="?action=perms_delete_user&mapid=' . $id . '&userid=' . $user . '"><img src="../../images/delete_icon.gif" width="10" height="10" border="0" alt="Remove permissions for this user to see this map"></a></td>';
 
         print "</tr>";
         $n++;
     }
-    if ($n == 0) {
+
+    if (sizeof($mapuserids) == 0) {
         print "<tr><td><em><strong>nobody</strong> can see this map</em></td></tr>";
     }
+
     html_end_box();
 
     html_start_box("", "70%", $colors["header"], "3", "center", "");
     print "<tr>";
-    if ($userselect == '') {
+    if (sizeof($candidate_users) == 0) {
         print "<td><em>There aren't any users left to add!</em></td></tr>";
     } else {
         print "<td><form action=\"\">Allow <input type=\"hidden\" name=\"action\" value=\"perms_add_user\"><input type=\"hidden\" name=\"mapid\" value=\"$id\"><select name=\"userid\">";
-        print $userselect;
+        foreach ($candidate_users as $user) {
+            printf("<option value=\"%s\">%s</option>\n", $user->id, $user->username);
+        }
+
         print "</select> to see this map <input type=\"submit\" value=\"Update\"></form></td>";
         print "</tr>";
     }
@@ -736,15 +733,14 @@ function perms_list($id)
 
 function weathermap_map_settings($id)
 {
-    global $colors, $config;
+    global $colors;
     global $manager;
 
     if ($id == 0) {
         $title = "Additional settings for ALL maps";
         $nonemsg = "There are no settings for all maps yet. You can add some by clicking Add up in the top-right, or choose a single map from the management screen to add settings for that map.";
         $type = "global";
-        $settingrows = db_fetch_assoc("SELECT * FROM weathermap_settings WHERE mapid=0 AND groupid=0");
-
+        $settingrows = $manager->getMapSettings(0);
     } elseif ($id < 0) {
         $group_id = -intval($id);
         $group = $manager->getGroup($group_id);
@@ -752,29 +748,25 @@ function weathermap_map_settings($id)
         $title = "Edit per-map settings for Group " . $group->id . ": " . $group->name;
         $nonemsg = "There are no per-group settings for this group yet. You can add some by clicking Add up in the top-right.";
         $type = "group";
-        $settingrows = db_fetch_assoc("SELECT * FROM weathermap_settings WHERE groupid=" . $group_id);
+        $settingrows = $manager->getMapSettings(-$group_id);
+
+        print "<p>All maps in this group are also affected by the following GLOBAL settings (group overrides global, map overrides group, but BOTH override SET commands within the map config file):</p>";
+        weathermap_readonly_settings(0, "Global Settings");
+
     } else {
         $map = $manager->getMap($id);
+        $group = $manager->getGroup($map->group_id);
 
-        $groupname = db_fetch_cell("SELECT name FROM weathermap_groups WHERE id=" . intval($map->group_id));
         $title = "Edit per-map settings for Weathermap $id: " . $map->titlecache;
         $nonemsg = "There are no per-map settings for this map yet. You can add some by clicking Add up in the top-right.";
         $type = "map";
-        $settingrows = db_fetch_assoc("SELECT * FROM weathermap_settings WHERE mapid=" . intval($id));
-    }
+        $settingrows = $manager->getMapSettings(intval($id));
 
-    if ($type == "group") {
-        print "<p>All maps in this group are also affected by the following GLOBAL settings (group overrides global, map overrides group, but BOTH override SET commands within the map config file):</p>";
-        weathermap_readonly_settings(0, "Global Settings");
-    }
-
-    if ($type == "map") {
         print "<p>This map is also affected by the following GLOBAL and GROUP settings (group overrides global, map overrides group, but BOTH override SET commands within the map config file):</p>";
 
         weathermap_readonly_settings(0, "Global Settings");
 
-        weathermap_readonly_settings(-$map['group_id'], "Group Settings (" . htmlspecialchars($groupname) . ")");
-
+        weathermap_readonly_settings(-$map->group_id, "Group Settings (" . htmlspecialchars($group->name) . ")");
     }
 
     html_start_box("<strong>$title</strong>", "70%", $colors["header"], "2", "center",
@@ -782,7 +774,6 @@ function weathermap_map_settings($id)
     html_header(array("", "Name", "Value", ""));
 
     $n = 0;
-
 
     if (is_array($settingrows)) {
         if (sizeof($settingrows) > 0) {
@@ -820,16 +811,19 @@ function weathermap_readonly_settings($id, $title = "Settings")
     global $manager;
 
     if ($id == 0) {
-        $query = "SELECT * FROM weathermap_settings WHERE mapid=0 AND groupid=0";
+    //    $query = "SELECT * FROM weathermap_settings WHERE mapid=0 AND groupid=0";
+        $settings = $manager->getMapSettings(0);
     }
     if ($id < 0) {
-        $query = "SELECT * FROM weathermap_settings WHERE mapid=0 AND groupid=" . (-intval($id));
+        // $query = "SELECT * FROM weathermap_settings WHERE mapid=0 AND groupid=" . (-intval($id));
+        $settings = $manager->getMapSettings(-intval($id));
     }
     if ($id > 0) {
-        $query = "SELECT * FROM weathermap_settings WHERE mapid=" . intval($id);
+    //    $query = "SELECT * FROM weathermap_settings WHERE mapid=" . intval($id);
+        $settings = $manager->getMapSettings(intval($id));
     }
 
-    $settings = db_fetch_assoc($query);
+    //$settings = db_fetch_assoc($query);
 
     html_start_box("<strong>$title</strong>", "70%", $colors["header"], "2", "center", "");
     html_header(array("", "Name", "Value", ""));
@@ -840,7 +834,7 @@ function weathermap_readonly_settings($id, $title = "Settings")
         foreach ($settings as $setting) {
             form_alternate_row_color($colors["alternate"], $colors["light"], $n);
             print "<td></td>";
-            print "<td>" . htmlspecialchars($setting['optname']) . "</td><td>" . htmlspecialchars($setting['optvalue']) . "</td>";
+            print "<td>" . htmlspecialchars($setting->optname) . "</td><td>" . htmlspecialchars($setting->optvalue) . "</td>";
             print "<td></td>";
             print "</tr>";
             $n++;
@@ -1018,7 +1012,7 @@ function weathermap_group_editor()
                 print "<td>";
 
                 print "<a href='?action=map_settings&id=-" . $group->id . "'>";
-                $setting_count = db_fetch_cell("SELECT count(*) FROM weathermap_settings WHERE mapid=0 AND groupid=" . $group->id);
+                $setting_count = $manager->getMapSettingCount(0, $group->id);
                 if ($setting_count > 0) {
                     print $setting_count . " special";
                     if ($setting_count > 1) {

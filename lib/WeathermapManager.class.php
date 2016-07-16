@@ -92,11 +92,24 @@ class WeathermapManager
         return $maps;
     }
 
-
     public function getMapsWithGroups()
     {
         $statement = $this->pdo->query("SELECT weathermap_maps.*, weathermap_groups.name AS groupname FROM weathermap_maps, weathermap_groups WHERE weathermap_maps.group_id=weathermap_groups.id ORDER BY weathermap_groups.sortorder,sortorder");
         $statement->execute();
+        $maps = $statement->fetchAll(PDO::FETCH_OBJ);
+
+        return $maps;
+    }
+
+    public function getMapsForUser($userId, $groupId = null)
+    {
+        if (is_null($groupId)) {
+            $statement = $this->pdo->query("SELECT DISTINCT weathermap_maps.* FROM weathermap_auth,weathermap_maps WHERE weathermap_maps.id=weathermap_auth.mapid AND active='on' AND  (userid=? OR userid=0) ORDER BY sortorder, id");
+            $statement->execute(array($userId));
+        } else {
+            $statement = $this->pdo->query("SELECT DISTINCT weathermap_maps.* FROM weathermap_auth,weathermap_maps WHERE weathermap_maps.id=weathermap_auth.mapid AND active='on' AND  weathermap_maps.group_id=? AND  (userid=? OR userid=0) ORDER BY sortorder, id");
+            $statement->execute(array($groupId, $userId));
+        }
         $maps = $statement->fetchAll(PDO::FETCH_OBJ);
 
         return $maps;
@@ -557,5 +570,18 @@ class WeathermapManager
         }
 
         return $users;
+    }
+
+    public function checkUserForRealm($userId, $realmId)
+    {
+        $statement = $this->pdo->query("select user_auth_realm.realm_id from user_auth_realm where user_auth_realm.user_id=? and user_auth_realm.realm_id=?");
+        $statement->execute(array($userId, $realmId));
+        $userlist = $statement->fetchAll(PDO::FETCH_OBJ);
+
+        if (sizeof($userlist) > 0) {
+            return true;
+        }
+
+        return false;
     }
 }

@@ -351,7 +351,6 @@ function weathermap_thumbview($limit_to_group = -1)
 			if ($total_map_count == 0) {
 				print '<p>To add a map to the schedule, go to the <a href="weathermap-cacti-plugin-mgmt.php">Manage...Weathermaps page</a> and add one.</p>';
 			}
-
 			print "</div>";
 		}
 	}

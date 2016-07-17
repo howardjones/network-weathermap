@@ -1,0 +1,95 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+# Vagrantfile API/syntax version. Don't touch unless you know what you're doing!
+VAGRANTFILE_API_VERSION = "2"
+
+Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
+
+  if Vagrant.has_plugin?("vagrant-cachier")
+      # Configure cached packages to be shared between instances of the same base box.
+      # More info on the "Usage" link above
+      config.cache.scope = :box
+
+  end
+
+  # Every Vagrant virtual environment requires a box to build off of.
+  config.vm.network "forwarded_port", guest: 80, host: 8080
+  config.vm.synced_folder "../data", "/vagrant_data"
+
+  # just the specialisations for each OS-specific box
+  # I use the Bento project's boxes where possible, since they are all
+  # built the same way for their automated testing
+
+  config.vm.define :u1604 do |u1604|
+      # PHP 7, mysql 5.7
+      u1604.vm.provision :shell, :path => "vagrant-cacti-u1604.sh"
+	    u1604.vm.box = "bento/ubuntu-16.04"
+  end
+
+
+  # config.vm.define :u1404 do |u1404|
+  #   # PHP 5.5, mysql 5.5
+  #   u1404.vm.provision :shell, :path => "vagrant-cacti-u1404.sh"
+	# 	u1404.vm.box = "bento/ubuntu-14.04"
+  # end
+
+
+  # config.vm.define :u1204 do |u1204|
+  #   # PHP 5.3, mysql 5.5
+  #   u1204.vm.provision :shell, :path => "vagrant-cacti-u1204.sh"
+	# 	u1204.vm.box = "bento/ubuntu-12.04"
+  # end
+
+  ##############################################################################
+
+  # config.vm.define :centos7 do |centos7|
+  #       centos7.vm.provision :shell, :path => "vagrant-cacti-centos7.sh"
+  #   centos7.vm.box = "bento/centos-7.2"
+  # end
+
+
+  # config.vm.define :centos6 do |centos6|
+  #       centos6.vm.provision :shell, :path => "vagrant-cacti-centos6.sh"
+  # 	centos6.vm.box = "bento/centos-6.7"
+  # end
+
+
+  # config.vm.define :centos5 do |centos5|
+  #       centos5.vm.provision :shell, :path => "vagrant-cacti-centos5.sh"
+  # 	centos5.vm.box = "bento/centos-5.11"
+  # end
+
+
+  # config.vm.define :deb84 do |deb84|
+  #       deb84.vm.provision :shell, :path => "vagrant-cacti-deb84.sh"
+	# 	deb84.vm.box = "bento/debian-8.4"
+  # end
+
+
+  # config.vm.define :deb74 do |deb74|
+  #       deb74.vm.provision :shell, :path => "vagrant-cacti-deb74.sh"
+	# 	deb74.vm.box = "bento/debian-7.4"
+  # end
+
+
+  # config.vm.define :freebsd10 do |freebsd10|
+  #       freebsd10.vm.provision :shell, :path => "vagrant-cacti-freebsd10.sh"
+  #   freebsd10.vm.box = "bento/freebsd-10.3"
+  # end
+
+
+  # config.vm.define :freebsd9 do |freebsd9|
+  #       freebsd9.vm.provision :shell, :path => "vagrant-cacti-freebsd9.sh"
+	# 	freebsd9.vm.box = "bento/freebsd-9.3"
+  # end
+
+
+  # config.vm.define :win2008 do |win2008|
+  #   # win2008.vm.provision :shell, :path => "vagrant-cacti-win2008.ps1"
+	# 	win2008.vm.box = "windows-server-2008-r2-eval"
+	# 	win2008.vm.communicator = "winrm"
+	# 	config.vm.network "forwarded_port", guest: 3389, host: 13389
+  # end
+
+end

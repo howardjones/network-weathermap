@@ -2,21 +2,40 @@
 
 ## Introduction ##
 
-So you can play along at home, here are some notes on how Weathermap prepared
+So you can play along at home, here are some notes on how Weathermap is prepared
 for release, how to create a dev environment, and how to complete the pre-release
-testing. 
+testing.
 
 First, I use two VMs: one for actual coding, and a second as a clean system to do
-final testing. A lot of the subversion repo doesn't end up in the final zip, so 
-it's quite easy to accidentally miss a file out of the packing.list and have a 
+final testing. A lot of the subversion repo doesn't end up in the final zip, so
+it's quite easy to accidentally miss a file out of the packing.list and have a
 broken version. Two totally separate Cacti installs in one box would also work.
-Both VMs are built using a script to get the appropriate packages installed 
+Both VMs are built using a script to get the appropriate packages installed
 in a consistent manner. The script is here: <a href="install-notes.txt">install-notes.txt</a>.
+
+## Vagrant ##
+
+To make it easier to test on multiple PHP versions and operating systems, I've started
+created Vagrant provisioning scripts to quickly get a Cacti installation up and running
+on various OS. Those all live in the `docs/dev/vagrant-testers` directory, along with
+a Vagrantfile. You probably don't want to uncomment all the vm definitions, but each one will
+create a Cacti VM for the specified OS, downloading the base box if necessary. Once you have
+Virtualbox and Vagrant installed, the following should get you going:
+
+    # allows vagrant to cache APT/Yum/composer packages locally, in between box rebuilds
+    vagrant plugin install vagrant-cachier
+    # on Windows, allows you to use 'vagrant putty' to connect to the box
+    vagrant plugin install vagrant-multi-putty
+
+    # to build the box (if necessary) and start it up
+    vagrant up
+
+Tested so far: Ubuntu 12.04 LTS, 14.04, and 16.04 LTS
 
 ## Basic Philosophy ##
 
-Any time someone has to ask a question about how something in Weathermap works, I 
-treat it as a failure - either the feature is too complicated, or the manual doesn't 
+Any time someone has to ask a question about how something in Weathermap works, I
+treat it as a failure - either the feature is too complicated, or the manual doesn't
 explain it well enough. Possibly, the user has totally misunderstood what should
 happen, in which case I let myself off the hook, but that's not the default position.
 
@@ -36,9 +55,10 @@ the testing works as follows:
 * run it
 * compare the two generated image files (to see if the config is "losing" bits - WriteConfig bugs)
 * compare the generated image to a reference image (to see if the config works as expected)
-  
+
 Tests/ConfigTest.php does this for every .conf file that it finds in the test-suite/tests
-directory. There are around 150 tests so far. Each one tests a particular feature or
+directory that also has a corresponding image in the references/ directory. There are
+around 150 tests so far. Each one tests a particular feature or
 combination. Every time I find a new problem, I add new tests. Every time I add a new
 feature, I add new tests. This covers a lot of the core weathermap features by now.
 
@@ -51,8 +71,15 @@ The test runner looks for that, and will skip tests when runn with a lower versi
 exception is if the current version includes 'dev' in the name - then it will always run all
 tests.
 
+There is also a special test-related setting to ensure that maps with a timestamp in them always
+show the same time:
+
+    SET testmode 1
+
+to avoid getting failures comparing to a reference image that was generated at another time.
+
 After the tests have run, you can look at test-suite/index.html to get summary reports of all
-image-comparison tests, or just the failing ones. ImageMagick is used to compare images, so 
+image-comparison tests, or just the failing ones. ImageMagick is used to compare images, so
 each 'result' is 3 images - the output from the test, the reference image, and a comparison
 image, which shows pink where there are differences. Sometimes it's just that different
 platforms have different Freetype or GD versions, and so fonts are shifted around by a pixel
@@ -76,7 +103,7 @@ The manual is produced in a somewhat convoluted way, but it seemed like a good i
 and is intended to reduce the formatting errors in the final result.
 
 The manual is 'compiled' from HTML/PHP source files for the text pages, and from XML files for the
-configuration reference. Each config reference section has a specific structure that is turned into 
+configuration reference. Each config reference section has a specific structure that is turned into
 HTML by a couple of XSLT scripts and xsltproc - one for the table of contents, and one for the rest.
 A perl script then extracts the table of contents, and uses it to turn any references to config keywords
 in any pages into links to the correct reference section. Finally, each page is run through PHP, so we
@@ -84,9 +111,9 @@ can do variable substitution for things like the version number, and "top & tail
 with the CSS headers etc.
 
 The nice thing with this workflow is that if you break the XML, it all just stops. You don't end up with
-a manual where everything is in 36-point Comic Sans or anything too crazy. You also don't need to worry 
+a manual where everything is in 36-point Comic Sans or anything too crazy. You also don't need to worry
 about formatting beyond the occasional 'em' or 'strong'. Links to other sections are made for you. All
-sectional formatting is made for you. The links between sections are (nearly) always correct. 
+sectional formatting is made for you. The links between sections are (nearly) always correct.
 
 Also, the example map in the manual is fiddled with a little bit to add the dummy graphs. This is taken
 care of in the project Makefile.

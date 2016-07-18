@@ -14,82 +14,120 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   end
 
   # Every Vagrant virtual environment requires a box to build off of.
-  config.vm.network "forwarded_port", guest: 80, host: 8080
+
   config.vm.synced_folder "../data", "/vagrant_data"
 
   # just the specialisations for each OS-specific box
   # I use the Bento project's boxes where possible, since they are all
   # built the same way for their automated testing
 
-  config.vm.define :u1604 do |u1604|
+  config.vm.define :u1604, autostart: false do |v|
       # PHP 7, mysql 5.7
-      u1604.vm.provision :shell, :path => "vagrant-cacti-u1604.sh"
-	    u1604.vm.box = "bento/ubuntu-16.04"
+      v.vm.provision :shell, :path => "vagrant-cacti-u1604.sh"
+	    v.vm.box = "bento/ubuntu-16.04"
+      v.vm.network "forwarded_port", guest: 80, host: 8080
+      v.vm.post_up_message = "Ubuntu 16 on http://localhost:8080/"
   end
 
 
-  # config.vm.define :u1404 do |u1404|
-  #   # PHP 5.5, mysql 5.5
-  #   u1404.vm.provision :shell, :path => "vagrant-cacti-u1404.sh"
-	# 	u1404.vm.box = "bento/ubuntu-14.04"
-  # end
+  config.vm.define :u1404 , autostart: true do |v|
+    # PHP 5.5, mysql 5.5
+    v.vm.provision :shell, :path => "vagrant-cacti-u1404.sh"
+		v.vm.box = "bento/ubuntu-14.04"
+    v.vm.network "forwarded_port", guest: 80, host: 8081
+    v.vm.post_up_message = "Ubuntu 14 on http://localhost:8081/"
+  end
 
 
-  # config.vm.define :u1204 do |u1204|
-  #   # PHP 5.3, mysql 5.5
-  #   u1204.vm.provision :shell, :path => "vagrant-cacti-u1204.sh"
-	# 	u1204.vm.box = "bento/ubuntu-12.04"
-  # end
+  config.vm.define :u1204, autostart: false do |v|
+    # PHP 5.3, mysql 5.5
+    v.vm.provision :shell, :path => "vagrant-cacti-u1204.sh"
+		v.vm.box = "bento/ubuntu-12.04"
+    v.vm.network "forwarded_port", guest: 80, host: 8082
+    v.vm.post_up_message = "Ubuntu 12 on http://localhost:8082/"
+  end
+
+
+  config.vm.define :centos7 , autostart: false do |v|
+    # php 5.4, mariadb 5.5
+    v.vm.provision :shell, :path => "vagrant-cacti-centos7.sh"
+    v.vm.box = "bento/centos-7.2"
+    v.vm.network "forwarded_port", guest: 80, host: 8083
+    v.vm.post_up_message = "CentOS 7 on http://localhost:8083/"
+  end
+
+
+  config.vm.define :centos6 , autostart: false do |v|
+    # pgp 5.3, mysql 5.1
+    v.vm.provision :shell, :path => "vagrant-cacti-centos6.sh"
+  	v.vm.box = "bento/centos-6.7"
+    v.vm.network "forwarded_port", guest: 80, host: 8084
+    v.vm.post_up_message = "CentOS 6 on http://localhost:8084/"
+  end
+
+
+  config.vm.define :centos5 , autostart: false do |v|
+    # php 5.1, mysql 5.0
+    v.vm.provision :shell, :path => "vagrant-cacti-centos5.sh"
+  	v.vm.box = "bento/centos-5.11"
+    v.vm.network "forwarded_port", guest: 80, host: 8085
+    v.vm.post_up_message = "CentOS 5 on http://localhost:8085/"
+  end
+
+
+  config.vm.define :deb8 , autostart: false do |v|
+    # php 5.6, mysql 5.5
+    v.vm.provision :shell, :path => "vagrant-cacti-deb8.sh"
+		v.vm.box = "bento/debian-8.4"
+    v.vm.network "forwarded_port", guest: 80, host: 8086
+    v.vm.post_up_message = "Debian 8 on http://localhost:8086/"
+  end
+
+
+  config.vm.define :deb7 , autostart: false do |v|
+    # php 5.4, mysql 5.5
+    v.vm.provision :shell, :path => "vagrant-cacti-deb7.sh"
+		v.vm.box = "bento/debian-7.10"
+    v.vm.network "forwarded_port", guest: 80, host: 8088
+    v.vm.post_up_message = "Debian 7 on http://localhost:8088/"
+  end
 
   ##############################################################################
+  # below here are untested
 
-  # config.vm.define :centos7 do |centos7|
-  #       centos7.vm.provision :shell, :path => "vagrant-cacti-centos7.sh"
-  #   centos7.vm.box = "bento/centos-7.2"
-  # end
-
-
-  # config.vm.define :centos6 do |centos6|
-  #       centos6.vm.provision :shell, :path => "vagrant-cacti-centos6.sh"
-  # 	centos6.vm.box = "bento/centos-6.7"
-  # end
+  config.vm.define :freebsd10 , autostart: false do |v|
+    v.vm.provision :shell, :path => "vagrant-cacti-freebsd10.sh"
+    v.vm.box = "bento/freebsd-10.3"
+    v.vm.network "forwarded_port", guest: 80, host: 8089
+    v.vm.post_up_message = "FreeBSD 10 on http://localhost:8089/"
+  end
 
 
-  # config.vm.define :centos5 do |centos5|
-  #       centos5.vm.provision :shell, :path => "vagrant-cacti-centos5.sh"
-  # 	centos5.vm.box = "bento/centos-5.11"
-  # end
+  config.vm.define :freebsd9 , autostart: false do |v|
+    v.vm.provision :shell, :path => "vagrant-cacti-freebsd9.sh"
+		v.vm.box = "bento/freebsd-9.3"
+    v.vm.network "forwarded_port", guest: 80, host: 8090
+    v.vm.post_up_message = "FreeBSD 9 on http://localhost:8090/"
+  end
 
 
-  # config.vm.define :deb84 do |deb84|
-  #       deb84.vm.provision :shell, :path => "vagrant-cacti-deb84.sh"
-	# 	deb84.vm.box = "bento/debian-8.4"
-  # end
+  config.vm.define :win2008 , autostart: false do |v|
+    # win2008.vm.provision :shell, :path => "vagrant-cacti-win2008.ps1"
+		v.vm.box = "windows-server-2008-r2-eval"
+		v.vm.communicator = "winrm"
+		config.vm.network "forwarded_port", guest: 3389, host: 13389
+    v.vm.network "forwarded_port", guest: 80, host: 8091
+    v.vm.post_up_message = "Windows 2008 on http://localhost:8091/  and RDP 13389"
+  end
+  
 
-
-  # config.vm.define :deb74 do |deb74|
-  #       deb74.vm.provision :shell, :path => "vagrant-cacti-deb74.sh"
-	# 	deb74.vm.box = "bento/debian-7.4"
-  # end
-
-
-  # config.vm.define :freebsd10 do |freebsd10|
-  #       freebsd10.vm.provision :shell, :path => "vagrant-cacti-freebsd10.sh"
-  #   freebsd10.vm.box = "bento/freebsd-10.3"
-  # end
-
-
-  # config.vm.define :freebsd9 do |freebsd9|
-  #       freebsd9.vm.provision :shell, :path => "vagrant-cacti-freebsd9.sh"
-	# 	freebsd9.vm.box = "bento/freebsd-9.3"
-  # end
-
-
-  # config.vm.define :win2008 do |win2008|
-  #   # win2008.vm.provision :shell, :path => "vagrant-cacti-win2008.ps1"
-	# 	win2008.vm.box = "windows-server-2008-r2-eval"
-	# 	win2008.vm.communicator = "winrm"
-	# 	config.vm.network "forwarded_port", guest: 3389, host: 13389
-  # end
+  config.vm.define :win2012 , autostart: false do |v|
+    # win2008.vm.provision :shell, :path => "vagrant-cacti-win2008.ps1"
+		v.vm.box = "windows-server-2012-eval"
+		v.vm.communicator = "winrm"
+		config.vm.network "forwarded_port", guest: 3389, host: 13390
+    v.vm.network "forwarded_port", guest: 80, host: 8092
+    v.vm.post_up_message = "Windows 2012 on http://localhost:8092/ and RDP 13390"
+  end
 
 end

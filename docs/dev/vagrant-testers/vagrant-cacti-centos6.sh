@@ -1,3 +1,7 @@
+#!/bin/bash
+
+# working: 17 July 2016
+
 sudo rpm -Uvh http://dl.fedoraproject.org/pub/epel/6/x86_64/epel-release-6-8.noarch.rpm
 sudo yum install -y rrdtool net-snmp-utils apg
 sudo yum install -y mysql-server mysql-client
@@ -19,7 +23,7 @@ sudo yum install -y gcc kernel-headers net-snmp-devel
 WEBROOT="/var/www/html"
 echo "Starting installation for Cacti $CACTI_VERSION"
 
-sudo mkdir ${WEBROOT}/cacti
+sudo mkdir -p ${WEBROOT}/cacti
 
 sudo useradd -d ${WEBROOT}/cacti cacti
 
@@ -30,6 +34,11 @@ fi
 sudo tar --strip-components 1 --directory=${WEBROOT}/cacti -xvf /vagrant/cacti-${CACTI_VERSION}.tar.gz
 sudo chown -R cacti ${WEBROOT}/cacti/rra
 sudo chown -R cacti ${WEBROOT}/cacti/log
+
+# fix the config file to include the prefix
+cp ${WEBROOT}/cacti/include/config.php  ${WEBROOT}/cacti/include/config.php-dist
+head -n -1 ${WEBROOT}/cacti/include/config.php-dist > ${WEBROOT}/cacti/include/config.php
+echo '$url_path = "/cacti/";' >> ${WEBROOT}/cacti/include/config.php
 
 mysql -uroot <<EOF
 create database cacti;

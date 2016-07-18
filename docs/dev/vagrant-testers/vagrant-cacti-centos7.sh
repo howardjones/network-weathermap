@@ -1,16 +1,20 @@
-sudo rpm -Uvh http://dl.fedoraproject.org/pub/epel/6/x86_64/epel-release-6-8.noarch.rpm
+#!/bin/bash
+
+# working: 17 July 2016
+
+sudo rpm -Uvh http://dl.fedoraproject.org/pub/epel/7/x86_64/e/epel-release-7-7.noarch.rpm
 sudo yum install -y rrdtool net-snmp-utils apg
-sudo yum install -y mysql-server mysql-client
+sudo yum install -y mariadb-server
 # yum install php-session php-sockets php-snmp php-gd php-xml php-mysql httpd mod_php
 sudo yum install -y php-session php-sockets php-gd php-xml php-mysql httpd mod_php
 # Extras for SPINE
 sudo yum install -y subversion php-ldap unzip
-sudo yum install -y autoconf mysql-devel libtool automake
+sudo yum install -y autoconf mariadb-devel libtool automake
 sudo yum install -y gcc kernel-headers net-snmp-devel
 
-/sbin/chkconfig mysqld on
+/sbin/chkconfig mariadb on
 /sbin/chkconfig httpd on
-/sbin/service mysqld start
+/sbin/service mariadb start
 /sbin/service httpd start
 
 # Get the common settings (CACTI_VERSION etc)

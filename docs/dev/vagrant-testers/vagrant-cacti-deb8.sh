@@ -1,29 +1,30 @@
 #!/bin/bash
 
-# working: 17 July 2016
+# working: 18 July 2016
 
-sudo rpm -Uvh http://dl.fedoraproject.org/pub/epel/5/x86_64/epel-release-5-4.noarch.rpm
-sudo yum install -y rrdtool net-snmp-utils apg
-sudo yum install -y mysql-server mysql-client
-# yum install php-session php-sockets php-snmp php-gd php-xml php-mysql httpd mod_php
-sudo yum install -y php-session php-sockets php-gd php-xml php-mysql httpd mod_php
-# Extras for SPINE
-sudo yum install -y subversion php-ldap unzip
-sudo yum install -y autoconf mysql-devel libtool automake
-sudo yum install -y gcc kernel-headers net-snmp-devel
+# stop apt-get from hanging, waiting for a mysql password
+export DEBIAN_FRONTEND=noninteractive
 
-/sbin/chkconfig mysqld on
-/sbin/chkconfig httpd on
-/sbin/service mysqld start
-/sbin/service httpd start
+sudo debconf-set-selections <<< 'mysql-server mysql-server/root_password password TestPassword'
+sudo debconf-set-selections <<< 'mysql-server mysql-server/root_password_again password TestPassword'
+
+sudo apt-get update -y
+
+## For 'real' install:
+sudo apt-get install -y mysql-server snmp rrdtool php5-cli php5-mysql apache2 libapache2-mod-php5 unzip php5-snmp php5-gd
+# ## For dev/test, we need these too
+sudo apt-get install -y subversion make xsltproc imagemagick zip curl phpunit
+#
 
 # Get the common settings (CACTI_VERSION etc)
 . /vagrant/settings.sh
 
-WEBROOT="/var/www/html"
 echo "Starting installation for Cacti $CACTI_VERSION"
 
+WEBROOT="/var/www/html"
+
 sudo mkdir -p ${WEBROOT}/cacti
+sudo rm ${WEBROOT}/index.html
 
 sudo useradd -d ${WEBROOT}/cacti cacti
 
@@ -35,21 +36,24 @@ sudo tar --strip-components 1 --directory=${WEBROOT}/cacti -xvf /vagrant/cacti-$
 sudo chown -R cacti ${WEBROOT}/cacti/rra
 sudo chown -R cacti ${WEBROOT}/cacti/log
 
+
 # fix the config file to include the prefix
 cp ${WEBROOT}/cacti/include/config.php  ${WEBROOT}/cacti/include/config.php-dist
 head -n -1 ${WEBROOT}/cacti/include/config.php-dist > ${WEBROOT}/cacti/include/config.php
 echo '$url_path = "/cacti/";' >> ${WEBROOT}/cacti/include/config.php
 
-mysql -uroot <<EOF
+
+mysql -uroot -pTestPassword <<EOF
 create database cacti;
 grant all on cacti.* to cactiuser@localhost identified by 'cactiuser';
 flush privileges;
 EOF
 
 if [ -f /vagrant/cacti-${CACTI_VERSION}-post-install.sql ]; then
-  mysql -uroot cacti < /vagrant/cacti-${CACTI_VERSION}-post-install.sql
+  mysql -uroot -pTestPassword cacti < /vagrant/cacti-${CACTI_VERSION}-post-install.sql
 else
-  mysql -uroot cacti < ${WEBROOT}/cacti/cacti.sql
+  mysql -uroot -pTestPassword cacti < ${WEBROOT}/cacti/cacti.sql
 fi
 
-sudo echo '# */5 * * * * cacti /usr/bin/php ${WEBROOT}/cacti/poller.php > ${WEBROOT}/last-cacti-poll.txt 2>&' >> /etc/crontab
+
+sudo echo '# */5 * * * * cacti /usr/bin/php ${WEBROOT}/cacti/poller.php > ${WEBROOT}/last-cacti-poll.txt 2>&' > /etc/cron.d/cacti

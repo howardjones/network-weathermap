@@ -27,10 +27,26 @@ Virtualbox and Vagrant installed, the following should get you going:
     # on Windows, allows you to use 'vagrant putty' to connect to the box
     vagrant plugin install vagrant-multi-putty
 
-    # to build the box (if necessary) and start it up
+    # to build the default box (if necessary) and start it up
+    # (the default is Ubuntu 14 with PHP 5.5)
     vagrant up
 
-Tested so far: Ubuntu 12.04 LTS, 14.04, and 16.04 LTS
+    # to see what others are available:
+    vagrant status
+
+    # and to start one of those up:
+    vagrant up deb8
+
+
+Provision scripts tested so far:
+* Ubuntu 12.04 LTS
+* Ubuntu 14.04
+* Ubuntu 16.04 LTS
+* CentOS 5
+* CentOS 6
+* CentOS 7
+* Debian 8
+* Debian 7
 
 ## Basic Philosophy ##
 

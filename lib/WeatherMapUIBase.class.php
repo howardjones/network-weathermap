@@ -81,6 +81,7 @@ class WeatherMapUIBase
         if ($type != "") {
             throw new WeathermapInternalFail("ValidateArgs saw unknown type");
         }
+        return false;
     }
 
     private function validateArgMaphash($value)

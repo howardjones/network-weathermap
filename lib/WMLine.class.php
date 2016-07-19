@@ -35,7 +35,7 @@ class WMLine
     /**
      * Find the point where this line and another one cross
      *
-     * @param $line2 the other line
+     * @param WMLine $line2 the other line
      * @return WMPoint the crossing point
      * @throws WeathermapInternalFail
      */

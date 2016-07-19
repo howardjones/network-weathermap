@@ -347,7 +347,7 @@ function maplist_warnings()
         exit();
     }
 
-    $tables = get_table_list(weathermap_get_pdo());
+    $tables = weathermap_get_table_list(weathermap_get_pdo());
     if (!in_array('weathermap_maps', $tables)) {
         print '<div align="center" class="wm_warning"><p>';
         print 'The weathermap_maps table is missing completely from the database. Something went wrong with the installation process.';

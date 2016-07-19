@@ -1,5 +1,7 @@
 <?php
 
+// NOTE: this is included in setup.php, so stuff in here pollutes the Cacti namespace
+
 function weathermap_get_pdo()
 {
     // This is the Cacti standard settings
@@ -7,8 +9,7 @@ function weathermap_get_pdo()
     global $config;
 
     $cacti_version = $config["cacti_version"];
-
-
+    
     // TODO: Do clever stuff in here to get us the host application's PDO session, if possible.
 
     $host = $database_hostname;
@@ -30,7 +31,7 @@ function weathermap_get_pdo()
 }
 
 
-function get_table_list($pdo)
+function weathermap_get_table_list($pdo)
 {
 
     $statement = $pdo->query("show tables");

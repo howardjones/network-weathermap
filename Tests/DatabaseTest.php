@@ -35,7 +35,7 @@ class DatabaseTest extends PHPUnit_Extensions_Database_TestCase
 
     public function testListTables()
     {
-        $table_list = get_table_list(self::$pdo);
+        $table_list = weathermap_get_table_list(self::$pdo);
 
         $this->assertEquals($table_list, array('settings', 'weathermap_auth', 'weathermap_data', 'weathermap_groups', 'weathermap_maps', 'weathermap_settings'));
 

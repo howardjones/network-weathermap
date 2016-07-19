@@ -3,14 +3,14 @@
 $guest_account = true;
 
 chdir('../../');
-include_once("./include/auth.php");
+require_once "./include/auth.php";
 
 $weathermap_confdir = realpath(dirname(__FILE__) . '/configs');
 
 // include the weathermap class so that we can get the version
-include_once(dirname(__FILE__)."/lib/Weathermap.class.php");
-include_once(dirname(__FILE__) . "/lib/database.php");
-include_once(dirname(__FILE__) . "/lib/WeathermapManager.class.php");
+require_once dirname(__FILE__)."/lib/Weathermap.class.php";
+require_once dirname(__FILE__) . "/lib/database.php";
+require_once dirname(__FILE__) . "/lib/WeathermapManager.class.php";
 
 $action = "";
 if (isset($_POST['action'])) {

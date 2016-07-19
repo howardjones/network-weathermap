@@ -11,22 +11,12 @@ $config['base_url'] = $cacti_url;
 
 @include_once 'editor-config.php';
 
-// check if the goalposts have moved
-if (is_dir($cacti_base) && file_exists($cacti_base . "/include/global.php")) {
+if (is_dir($cacti_base) && file_exists($cacti_base . "/include/config.php")) {
     // include the cacti-config, so we know about the database
-    include_once($cacti_base . "/include/global.php");
-    // $config['base_url'] = $cacti_url;
-    $config['base_url'] = (isset($config['url_path']) ? $config['url_path'] : $cacti_url);
-    $cacti_found = true;
-    // print "global";
-} elseif (is_dir($cacti_base) && file_exists($cacti_base . "/include/config.php")) {
-    // include the cacti-config, so we know about the database
-    include_once($cacti_base . "/include/config.php");
+    include_once $cacti_base . "/include/config.php";
 
-    // $config['base_url'] = $cacti_url;
     $config['base_url'] = (isset($config['url_path']) ? $config['url_path'] : $cacti_url);
     $cacti_found = true;
-    // print "config";
 } else {
     $cacti_found = false;
 }
@@ -60,15 +50,10 @@ if (isset($_SESSION['cacti']['weathermap']['last_used_host_id'][0])) {
 if (isset($_REQUEST['command']) && $_REQUEST["command"] == 'link_step2') {
     $dataid = intval($_REQUEST['dataid']);
 
-    $SQL_graphid = sprintf("SELECT graph_templates_item.local_graph_id, title_cache FROM graph_templates_item,graph_templates_graph,data_template_rrd WHERE graph_templates_graph.local_graph_id = graph_templates_item.local_graph_id  AND task_item_id=data_template_rrd.id AND local_data_id=%d LIMIT 1;",
-        $dataid);
+    $statement = $pdo->prepare("SELECT graph_templates_item.local_graph_id, title_cache FROM graph_templates_item,graph_templates_graph,data_template_rrd WHERE graph_templates_graph.local_graph_id = graph_templates_item.local_graph_id  AND task_item_id=data_template_rrd.id AND local_data_id=? LIMIT 1;")
+    $statement->execute(array($dataid));
+    $line = $statement->fetch(PDO::FETCH_ASSOC);
 
-    $link = mysql_connect($database_hostname, $database_username, $database_password)
-    or die('Could not connect: ' . mysql_error());
-    mysql_selectdb($database_default, $link) or die('Could not select database: ' . mysql_error());
-
-    $result = mysql_query($SQL_graphid) or die('Query failed: ' . mysql_error());
-    $line = mysql_fetch_array($result, MYSQL_ASSOC);
     $graphid = $line['local_graph_id'];
     $hostid = $_REQUEST['host_id'];
 
@@ -227,8 +212,6 @@ if (isset($_REQUEST['command']) && $_REQUEST["command"] == 'link_step1') {
     <body>
     <?php
 
-    $SQL_picklist = "SELECT data_local.host_id, data_template_data.local_data_id, data_template_data.name_cache, data_template_data.active, data_template_data.data_source_path FROM data_local,data_template_data,data_input,data_template WHERE data_local.id=data_template_data.local_data_id AND data_input.id=data_template_data.data_input_id AND data_local.data_template_id=data_template.id ";
-
     $host_id = -1;
 
     $overlib = true;
@@ -237,21 +220,24 @@ if (isset($_REQUEST['command']) && $_REQUEST["command"] == 'link_step1') {
     if (isset($_REQUEST['aggregate'])) {
         $aggregate = ($_REQUEST['aggregate'] == 0 ? false : true);
     }
+
     if (isset($_REQUEST['overlib'])) {
         $overlib = ($_REQUEST['overlib'] == 0 ? false : true);
     }
 
-
-    if (isset($_REQUEST['host_id'])) {
-        $host_id = intval($_REQUEST['host_id']);
-        if ($host_id >= 0) {
-            $SQL_picklist .= " and data_local.host_id=$host_id ";
-        }
+    if (isset($_REQUEST['host_id']) && intval($_REQUEST['host_id']) >= 0) {
+        $statement = $pdo->prepare("SELECT data_local.host_id, data_template_data.local_data_id, data_template_data.name_cache, data_template_data.active, data_template_data.data_source_path FROM data_local,data_template_data,data_input,data_template WHERE data_local.id=data_template_data.local_data_id AND data_input.id=data_template_data.data_input_id AND data_local.data_template_id=data_template.id  AND data_local.host_id=?  ORDER BY name_cache;");
+        $statement->execute(array(intval($_REQUEST['host_id'])));
+    } else {
+        $statement = $pdo->prepare("SELECT data_local.host_id, data_template_data.local_data_id, data_template_data.name_cache, data_template_data.active, data_template_data.data_source_path FROM data_local,data_template_data,data_input,data_template WHERE data_local.id=data_template_data.local_data_id AND data_input.id=data_template_data.data_input_id AND data_local.data_template_id=data_template.id  ORDER BY name_cache;");
+        $statement->execute();
     }
 
-    $SQL_picklist .= " order by name_cache;";
+    $queryrows = $statement->fetchAll(PDO::FETCH_ASSOC);
 
-    $hosts = db_fetch_assoc("SELECT id,CONCAT_WS('',description,' (',hostname,')') AS name FROM host ORDER BY description,hostname");
+    $hosts_stmt = $pdo->prepare("SELECT id,CONCAT_WS('',description,' (',hostname,')') AS name FROM host ORDER BY description,hostname");
+    $hosts_stmt->execute();
+    $hosts = $hosts_stmt->fetchAll(PDO::FETCH_ASSOC);
     ?>
 
     <h3>Pick a data source:</h3>
@@ -263,12 +249,13 @@ if (isset($_REQUEST['command']) && $_REQUEST["command"] == 'link_step1') {
 
             print '<option ' . ($host_id == -1 ? 'SELECTED' : '') . ' value="-1">Any</option>';
             print '<option ' . ($host_id == 0 ? 'SELECTED' : '') . ' value="0">None</option>';
+
             foreach ($hosts as $host) {
                 print '<option ';
                 if ($host_id == $host['id']) {
                     print " SELECTED ";
                 }
-                print 'value="' . $host['id'] . '">' . $host['name'] . '</option>';
+                print 'value="' . $host['id'] . '">' . htmlspecialchars($host['name']) . '</option>';
             }
             print '</select><br />';
         }
@@ -276,37 +263,30 @@ if (isset($_REQUEST['command']) && $_REQUEST["command"] == 'link_step1') {
         print '<span class="filter" style="display: none;">Filter: <input id="filterstring" name="filterstring" size="20"> (case-sensitive)<br /></span>';
         print '<input id="overlib" name="overlib" type="checkbox" value="yes" ' . ($overlib ? 'CHECKED' : '') . '> <label for="overlib">Also set OVERLIBGRAPH and INFOURL.</label><br />';
         print '<input id="aggregate" name="aggregate" type="checkbox" value="yes" ' . ($aggregate ? 'CHECKED' : '') . '> <label for="aggregate">Append TARGET to existing one (Aggregate)</label>';
-
-        print '</form><div class="listcontainer"><ul id="dslist">';
-
-        $queryrows = db_fetch_assoc($SQL_picklist);
-
-        // print $SQL_picklist;
-
-        $i = 0;
-        if (is_array($queryrows) && sizeof($queryrows) > 0) {
-            foreach ($queryrows as $line) {
-                //while ($line = mysql_fetch_array($result, MYSQL_ASSOC)) {
-                echo "<li class=\"row" . ($i % 2) . "\">";
-                $key = $line['local_data_id'] . "','" . $line['data_source_path'];
-                echo "<a href=\"#\" onclick=\"update_source_step1('$key','$host_id')\">" . $line['name_cache'] . "</a>";
-                echo "</li>\n";
-
-                $i++;
-            }
-        } else {
-            print "<li>No results...</li>";
-        }
-
-        // Free resultset
-        //mysql_free_result($result);
-
-        // Closing connection
-        //mysql_close($link);
-
         ?>
+    </form>
+    <div class="listcontainer">
+        <ul id="dslist">
+            <?php
+
+            $i = 0;
+
+            if (is_array($queryrows) && sizeof($queryrows) > 0) {
+                foreach ($queryrows as $line) {
+                    echo "<li class=\"row" . ($i % 2) . "\">";
+                    $key = $line['local_data_id'] . "','" . $line['data_source_path'];
+                    echo "<a href=\"#\" onclick=\"update_source_step1('$key','$host_id')\">" . $line['name_cache'] . "</a>";
+                    echo "</li>\n";
+
+                    $i++;
+                }
+            } else {
+                print "<li>No results...</li>";
+            }
+
+            ?>
         </ul>
-        </div>
+    </div>
     </body>
     </html>
     <?php
@@ -314,7 +294,6 @@ if (isset($_REQUEST['command']) && $_REQUEST["command"] == 'link_step1') {
 
 if (isset($_REQUEST['command']) && $_REQUEST["command"] == 'node_step1') {
     $host_id = -1;
-    $SQL_picklist = "SELECT graph_templates_graph.id, graph_local.host_id, graph_templates_graph.local_graph_id, graph_templates_graph.height, graph_templates_graph.width, graph_templates_graph.title_cache, graph_templates.name, graph_local.host_id	FROM (graph_local,graph_templates_graph) LEFT JOIN graph_templates ON (graph_local.graph_template_id=graph_templates.id) WHERE graph_local.id=graph_templates_graph.local_graph_id ";
 
     $overlib = true;
     $aggregate = false;
@@ -326,17 +305,19 @@ if (isset($_REQUEST['command']) && $_REQUEST["command"] == 'node_step1') {
         $overlib = ($_REQUEST['overlib'] == 0 ? false : true);
     }
 
-
-    if (isset($_REQUEST['host_id'])) {
-        $host_id = intval($_REQUEST['host_id']);
-        if ($host_id >= 0) {
-            $SQL_picklist .= " and graph_local.host_id=$host_id ";
-        }
+    if (isset($_REQUEST['host_id']) && intval($_REQUEST['host_id']) >= 0) {
+        $statement = $pdo->prepare("SELECT graph_templates_graph.id, graph_local.host_id, graph_templates_graph.local_graph_id, graph_templates_graph.height, graph_templates_graph.width, graph_templates_graph.title_cache, graph_templates.name, graph_local.host_id	FROM (graph_local,graph_templates_graph) LEFT JOIN graph_templates ON (graph_local.graph_template_id=graph_templates.id) WHERE graph_local.id=graph_templates_graph.local_graph_id AND graph_local.host_id=? ORDER BY title_cache");
+        $statement->execute(array(intval($_REQUEST['host_id'])));
+    } else {
+        $statement = $pdo->prepare("SELECT graph_templates_graph.id, graph_local.host_id, graph_templates_graph.local_graph_id, graph_templates_graph.height, graph_templates_graph.width, graph_templates_graph.title_cache, graph_templates.name, graph_local.host_id	FROM (graph_local,graph_templates_graph) LEFT JOIN graph_templates ON (graph_local.graph_template_id=graph_templates.id) WHERE graph_local.id=graph_templates_graph.local_graph_id ORDER BY title_cache");
+        $statement->execute(array());
     }
-    $SQL_picklist .= " order by title_cache";
 
-    $hosts = db_fetch_assoc("SELECT id,CONCAT_WS('',description,' (',hostname,')') AS name FROM host ORDER BY description,hostname");
+    $queryrows = $statement->fetchAll(PDO::FETCH_ASSOC);
 
+    $hosts_stmt = $pdo->prepare("SELECT id,CONCAT_WS('',description,' (',hostname,')') AS name FROM host ORDER BY description,hostname");
+    $hosts_stmt->execute();
+    $hosts = $hosts_stmt->fetchAll(PDO::FETCH_ASSOC);
     ?>
     <html>
     <head>
@@ -376,14 +357,6 @@ if (isset($_REQUEST['command']) && $_REQUEST["command"] == 'node_step1') {
                     strURL = strURL + "&overlib=0";
                 }
 
-                //if( objForm.aggregate.checked)
-                //{
-                //	strURL = strURL + "&aggregate=1";
-                //}
-                //else
-                //{
-                //	strURL = strURL + "&aggregate=0";
-                //}
                 document.location = strURL;
             }
 
@@ -391,7 +364,7 @@ if (isset($_REQUEST['command']) && $_REQUEST["command"] == 'node_step1') {
         <script type="text/javascript">
 
             function update_source_step1(graphid) {
-                var graph_url, hover_url;
+                var graph_url, hover_url, info_url;
 
                 var base_url = '<?php echo isset($config['base_url']) ? $config['base_url'] : ''; ?>';
 
@@ -469,25 +442,26 @@ if (isset($_REQUEST['command']) && $_REQUEST["command"] == 'node_step1') {
 
         print '<span class="filter" style="display: none;">Filter: <input id="filterstring" name="filterstring" size="20"> (case-sensitive)<br /></span>';
         print '<input id="overlib" name="overlib" type="checkbox" value="yes" ' . ($overlib ? 'CHECKED' : '') . '> <label for="overlib">Set both OVERLIBGRAPH and INFOURL.</label><br />';
-
-        print '</form><div class="listcontainer"><ul id="dslist">';
-
-        $queryrows = db_fetch_assoc($SQL_picklist);
-
-        $i = 0;
-        if (is_array($queryrows) && sizeof($queryrows) > 0) {
-            foreach ($queryrows as $line) {
-                echo "<li class=\"row" . ($i % 2) . "\">";
-                $key = $line['local_graph_id'];
-                echo "<a href=\"#\" onclick=\"update_source_step1('$key')\">" . $line['title_cache'] . "</a>";
-                echo "</li>\n";
-                $i++;
-            }
-        } else {
-            print "No results...";
-        }
-
         ?>
+    </form>
+    <div class="listcontainer">
+        <ul id="dslist">
+            <?php
+
+            $i = 0;
+            if (is_array($queryrows) && sizeof($queryrows) > 0) {
+                foreach ($queryrows as $line) {
+                    echo "<li class=\"row" . ($i % 2) . "\">";
+                    $key = $line['local_graph_id'];
+                    echo "<a href=\"#\" onclick=\"update_source_step1('$key')\">" . $line['title_cache'] . "</a>";
+                    echo "</li>\n";
+                    $i++;
+                }
+            } else {
+                print "No results...";
+            }
+
+            ?>
         </ul>
     </body>
     </html>

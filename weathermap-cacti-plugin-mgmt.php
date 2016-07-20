@@ -807,23 +807,18 @@ function weathermap_map_settings($id)
 
 function weathermap_readonly_settings($id, $title = "Settings")
 {
-    global $colors, $config;
+    global $colors;
     global $manager;
 
     if ($id == 0) {
-    //    $query = "SELECT * FROM weathermap_settings WHERE mapid=0 AND groupid=0";
         $settings = $manager->getMapSettings(0);
     }
     if ($id < 0) {
-        // $query = "SELECT * FROM weathermap_settings WHERE mapid=0 AND groupid=" . (-intval($id));
         $settings = $manager->getMapSettings(-intval($id));
     }
     if ($id > 0) {
-    //    $query = "SELECT * FROM weathermap_settings WHERE mapid=" . intval($id);
         $settings = $manager->getMapSettings(intval($id));
     }
-
-    //$settings = db_fetch_assoc($query);
 
     html_start_box("<strong>$title</strong>", "70%", $colors["header"], "2", "center", "");
     html_header(array("", "Name", "Value", ""));

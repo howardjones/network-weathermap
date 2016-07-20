@@ -387,7 +387,7 @@ function weathermap_setup_table()
             $statement = $pdo->query("show columns from weathermap_data from " . $database_default);
             $result = $statement->fetchAll(PDO::FETCH_ASSOC);
 
-            while ($row = mysql_fetch_array($result, MYSQL_ASSOC)) {
+            foreach ($result as $row) {
                 if ($row['Field'] == 'local_data_id') {
                     $found_ldi = true;
                 }
@@ -485,16 +485,21 @@ function weathermap_config_arrays()
 function weathermap_show_tab()
 {
     global $config, $user_auth_realm_filenames;
-    $realm_id2 = 0;
+    $realm_id = 0;
 
     if (isset($user_auth_realm_filenames[basename('weathermap-cacti-plugin.php')])) {
-        $realm_id2 = $user_auth_realm_filenames[basename('weathermap-cacti-plugin.php')];
+        $realm_id = $user_auth_realm_filenames[basename('weathermap-cacti-plugin.php')];
     }
 
     $tabstyle = intval(read_config_option("superlinks_tabstyle"));
     $userid = (isset($_SESSION["sess_user_id"]) ? intval($_SESSION["sess_user_id"]) : 1);
 
-    if ((db_fetch_assoc("select user_auth_realm.realm_id from user_auth_realm where user_auth_realm.user_id='" . $userid . "' and user_auth_realm.realm_id='$realm_id2'")) || (empty($realm_id2))) {
+    $pdo = weathermap_get_pdo();
+    $stmt = $pdo->prepare("select user_auth_realm.realm_id from user_auth_realm where user_auth_realm.user_id=? and user_auth_realm.realm_id=?");
+    $stmt->execute(array($userid, $realm_id));
+    $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+    if ((sizeof($result) > 0) || (empty($realm_id))) {
 
         if ($tabstyle > 0) {
             $prefix = "s_";
@@ -759,7 +764,6 @@ function weathermap_poller_output($rrd_update_array)
 
     $weathermap_data_update = $pdo->prepare("\"UPDATE weathermap_data SET last_time=?, last_calc='?', last_value='?',sequence=sequence+1  where id = ?");
 
-
     $log_verbosity = read_config_option("log_verbosity");
 
     if ($log_verbosity >= POLLER_VERBOSITY_DEBUG) {
@@ -769,9 +773,7 @@ function weathermap_poller_output($rrd_update_array)
     // partially borrowed from Jimmy Conner's THold plugin.
     // (although I do things slightly differently - I go from filenames, and don't use the poller_interval)
 
-
     // new version works with *either* a local_data_id or rrdfile in the weathermap_data table, and returns BOTH
-//    $requiredlist = db_fetch_assoc("SELECT DISTINCT weathermap_data.id, weathermap_data.last_value, weathermap_data.last_time, weathermap_data.data_source_name, data_template_data.data_source_path, data_template_data.local_data_id, data_template_rrd.data_source_type_id FROM weathermap_data, data_template_data, data_template_rrd WHERE weathermap_data.local_data_id=data_template_data.local_data_id AND data_template_rrd.local_data_id=data_template_data.local_data_id AND weathermap_data.local_data_id<>0;");
 
     $stmt = $pdo->query("SELECT DISTINCT weathermap_data.id, weathermap_data.last_value, weathermap_data.last_time, weathermap_data.data_source_name, data_template_data.data_source_path, data_template_data.local_data_id, data_template_rrd.data_source_type_id");
     $requiredlist = $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -860,7 +862,7 @@ function weathermap_poller_output($rrd_update_array)
                 }
             }
 
-           // db_execute("UPDATE weathermap_data SET last_time=$newtime, last_calc='$newvalue', last_value='$newlastvalue',sequence=sequence+1  where id = " . $required['id']);
+            // db_execute("UPDATE weathermap_data SET last_time=$newtime, last_calc='$newvalue', last_value='$newlastvalue',sequence=sequence+1  where id = " . $required['id']);
 
             $weathermap_data_update->execute(array($newtime, $newvalue, $newlastvalue, $required['id']));
             if ($log_verbosity >= POLLER_VERBOSITY_DEBUG) {
@@ -885,6 +887,8 @@ function weathermap_poller_bottom()
     include_once($config["library_path"] . DIRECTORY_SEPARATOR . "database.php");
     include_once(dirname(__FILE__) . DIRECTORY_SEPARATOR . "lib" . DIRECTORY_SEPARATOR . "poller-common.php");
 
+    $pdo = weathermap_get_pdo();
+
     weathermap_setup_table();
 
     $renderperiod = read_config_option("weathermap_render_period");
@@ -907,10 +911,10 @@ function weathermap_poller_bottom()
                     "WEATHERMAP");
             }
         }
-        # cacti_log("Weathermap counter is $rendercounter. period is $renderperiod.", true, "WEATHERMAP");
         // increment the counter
         $newcount = ($rendercounter + 1) % 1000;
-        db_execute("REPLACE INTO settings VALUES('weathermap_render_counter'," . $newcount . ")");
+        $statement = $pdo->prepare("REPLACE INTO settings VALUES('weathermap_render_counter',?)");
+        $statement->execute(array($newcount));
     }
 }
 

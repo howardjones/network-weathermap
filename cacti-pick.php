@@ -35,6 +35,36 @@ function js_escape($str)
     return ($str);
 }
 
+/* usort_natural_hosts - sorts two values naturally (ie. ab1, ab2, ab7, ab10, ab20)
+   @arg $a - the first string to compare
+   @arg $b - the second string to compare
+   @returns - '1' if $a is greater than $b, '-1' if $a is less than $b, or '0' if
+     $b is equal to $b */
+function usort_natural_hosts($a, $b)
+{
+    return strnatcmp($a['name'], $b['name']);
+}
+
+/* usort_natural_titles - sorts two values naturally (ie. ab1, ab2, ab7, ab10, ab20)
+   @arg $a - the first string to compare
+   @arg $b - the second string to compare
+   @returns - '1' if $a is greater than $b, '-1' if $a is less than $b, or '0' if
+   $b is equal to $b */
+function usort_natural_titles($a, $b)
+{
+    return strnatcasecmp($a['title_cache'], $b['title_cache']);
+}
+
+/* usort_natural_names - sorts two values naturally (ie. ab1, ab2, ab7, ab10, ab20)
+   @arg $a - the first string to compare
+   @arg $b - the second string to compare
+   @returns - '1' if $a is greater than $b, '-1' if $a is less than $b, or '0' if
+   $b is equal to $b */
+function usort_natural_names($a, $b)
+{
+    return strnatcasecmp($a['name_cache'], $b['name_cache']);
+}
+
 // ******************************************
 if (isset($_SESSION['cacti']['weathermap']['last_used_host_id'][0])) {
     print "<b>Last Host Selected:</b><br>";
@@ -250,6 +280,8 @@ if (isset($_REQUEST['command']) && $_REQUEST["command"] == 'link_step1') {
             print '<option ' . ($host_id == -1 ? 'SELECTED' : '') . ' value="-1">Any</option>';
             print '<option ' . ($host_id == 0 ? 'SELECTED' : '') . ' value="0">None</option>';
 
+            uasort($hosts, "usort_natural_hosts");
+
             foreach ($hosts as $host) {
                 print '<option ';
                 if ($host_id == $host['id']) {
@@ -272,6 +304,9 @@ if (isset($_REQUEST['command']) && $_REQUEST["command"] == 'link_step1') {
             $i = 0;
 
             if (is_array($queryrows) && sizeof($queryrows) > 0) {
+
+                uasort($queryrows, "usort_natural_names");
+
                 foreach ($queryrows as $line) {
                     echo "<li class=\"row" . ($i % 2) . "\">";
                     $key = $line['local_data_id'] . "','" . $line['data_source_path'];
@@ -430,6 +465,9 @@ if (isset($_REQUEST['command']) && $_REQUEST["command"] == 'node_step1') {
 
             print '<option ' . ($host_id == -1 ? 'SELECTED' : '') . ' value="-1">Any</option>';
             print '<option ' . ($host_id == 0 ? 'SELECTED' : '') . ' value="0">None</option>';
+
+            uasort($hosts, "usort_natural_hosts");
+
             foreach ($hosts as $host) {
                 print '<option ';
                 if ($host_id == $host['id']) {
@@ -449,6 +487,9 @@ if (isset($_REQUEST['command']) && $_REQUEST["command"] == 'node_step1') {
             <?php
 
             $i = 0;
+
+            uasort($queryrows, "usort_natural_titles");
+
             if (is_array($queryrows) && sizeof($queryrows) > 0) {
                 foreach ($queryrows as $line) {
                     echo "<li class=\"row" . ($i % 2) . "\">";

@@ -10,12 +10,12 @@ $cacti_base = dirname(__FILE__) . "/../../";
 # $cacti_base = "/Applications/XAMPP/htdocs/cacti/";
 
 // check if the goalposts have moved
-if (is_dir($cacti_base) && file_exists($cacti_base . "/include/global.php")) {
+if (is_dir($cacti_base) && file_exists($cacti_base . "include/global.php")) {
     // include the cacti-config, so we know about the database
-    require_once($cacti_base . "/include/global.php");
-} elseif (is_dir($cacti_base) && file_exists($cacti_base . "/include/config.php")) {
+    require_once $cacti_base . "/include/global.php";
+} elseif (is_dir($cacti_base) && file_exists($cacti_base . "include/config.php")) {
     // include the cacti-config, so we know about the database
-    require_once($cacti_base . "/include/config.php");
+    require_once $cacti_base . "include/config.php";
 } else {
     die("Couldn't find a usable Cacti config - check the first few lines of " . __FILE__
         . "\n");

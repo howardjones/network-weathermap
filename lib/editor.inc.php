@@ -67,9 +67,9 @@ function wm_editor_sanitize_name($str) {
 
 function wm_editor_sanitize_selected($str) {        
 	$res = urldecode($str);
-	
-	if( ! preg_match("/^(LINK|NODE):/",$res)) {
-	    return "";
+
+	if (!preg_match('/^(LINK|NODE):/', $res)) {
+		return "";
 	}
 	return wm_editor_sanitize_name($res);
 }
@@ -174,35 +174,37 @@ function show_editor_startpage()
 		$dh=opendir($mapdir);
 
 		if ($dh) {
-		    while (false !== ($file = readdir($dh))) {
-			$realfile=$mapdir . DIRECTORY_SEPARATOR . $file;
-			$note = "";
-	
-			// skip directories, unreadable files, .files and anything that doesn't come through the sanitiser unchanged
-			if ( (is_file($realfile)) && (is_readable($realfile)) && (!preg_match("/^\./",$file) )  && ( wm_editor_sanitize_conffile($file) == $file ) ) {
-				if (!is_writable($realfile)) {
-					$note .= "(read-only)";
-				}
-				$title='(no title)';
-				$fd=fopen($realfile, "r");
-				if ($fd) {
-					while (!feof($fd)) {
-						$buffer=fgets($fd, 4096);
-	
-						if (preg_match('/^\s*TITLE\s+(.*)/i', $buffer, $matches)) {
-						    $title= wm_editor_sanitize_string($matches[1]); 
-						}
+			while (false !== ($file = readdir($dh))) {
+				$realfile = $mapdir . DIRECTORY_SEPARATOR . $file;
+				$note = "";
+
+				// skip directories, unreadable files, .files and anything that doesn't come through the sanitiser unchanged
+				if ((is_file($realfile)) && (is_readable($realfile)) && (!preg_match('/^\./',
+						$file)) && (wm_editor_sanitize_conffile($file) == $file)
+				) {
+					if (!is_writable($realfile)) {
+						$note .= "(read-only)";
 					}
-	
-					fclose ($fd);
-					$titles[$file] = $title;
-					$notes[$file] = $note;
-					$n++;
+					$title = '(no title)';
+					$fd = fopen($realfile, "r");
+					if ($fd) {
+						while (!feof($fd)) {
+							$buffer = fgets($fd, 4096);
+
+							if (preg_match('/^\s*TITLE\s+(.*)/i', $buffer, $matches)) {
+								$title = wm_editor_sanitize_string($matches[1]);
+							}
+						}
+
+						fclose($fd);
+						$titles[$file] = $title;
+						$notes[$file] = $note;
+						$n++;
+					}
 				}
 			}
-		    }
 
-		    closedir ($dh);
+			closedir($dh);
 		} else { 
             $errorstring = "Can't open mapdir to read."; 
         }

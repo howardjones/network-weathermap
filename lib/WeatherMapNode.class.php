@@ -930,7 +930,7 @@ class WeatherMapNode extends WeatherMapItem
 		$js.="overliburl:" . js_escape(join(" ",$this->overliburl[IN])) . ", ";
 		$js.="overlibwidth:" . $this->overlibheight . ", ";
 		$js.="overlibheight:" . $this->overlibwidth . ", ";
-		if(preg_match("/^(none|nink|inpie|outpie|box|rbox|gauge|round)$/",$this->iconfile))
+		if(preg_match('/^(none|nink|inpie|outpie|box|rbox|gauge|round)$/',$this->iconfile))
 		{
 			$js.="iconfile:" . js_escape("::".$this->iconfile);
 		}

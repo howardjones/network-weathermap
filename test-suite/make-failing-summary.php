@@ -46,7 +46,7 @@ while (!feof($f)) {
             $d = fopen($diff_file, "r");
             while (!feof($d)) {
                 $dline = fgets($d);
-                if (preg_match("/^Output: \\|(\\d+)/", $dline, $matches)) {
+                if (preg_match('/^Output: \\|(\\d+)/', $dline, $matches)) {
                     $differences = intval($matches[1]);
                 }
             }

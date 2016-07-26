@@ -18,7 +18,7 @@ function weathermap_cron_part($value,$checkstring)
 	if($checkstring == '*') return(true);
 	if($checkstring == sprintf("%s",$value) ) return(true);
 	
-	if( preg_match("/\*\/(\d+)/",$checkstring, $matches))
+	if( preg_match('/\*\/(\d+)/',$checkstring, $matches))
 	{
 		$mod = $matches[1];
 		if( ($value % $mod ) == 0) return true;
@@ -53,8 +53,8 @@ function weathermap_run_maps($mydir) {
 	global $weathermap_warncount;
 	global $weathermap_poller_start_time;
 
-	include_once($mydir.DIRECTORY_SEPARATOR."lib".DIRECTORY_SEPARATOR."HTML_ImageMap.class.php");
-	include_once($mydir.DIRECTORY_SEPARATOR."lib".DIRECTORY_SEPARATOR."Weathermap.class.php");
+	include_once $mydir.DIRECTORY_SEPARATOR."lib".DIRECTORY_SEPARATOR."HTML_ImageMap.class.php";
+	include_once $mydir.DIRECTORY_SEPARATOR."lib".DIRECTORY_SEPARATOR."Weathermap.class.php";
 
 	$total_warnings = 0;
 	$warning_notes = "";

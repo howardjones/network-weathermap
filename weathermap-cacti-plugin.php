@@ -78,7 +78,7 @@ case 'viewmapcycle':
 		print '<LINK rel="stylesheet" type="text/css" media="screen" href="cacti-resources/weathermap.css">';		
 		print "</head><body id='wm_fullscreen'>";
 	} else {
-		include_once($config["base_path"]."/include/top_graph_header.php");
+		include_once $config["base_path"]."/include/top_graph_header.php";
 	}		
 
 	print "<div id=\"overDiv\" style=\"position:absolute; visibility:hidden; z-index:1000;\"></div>\n";
@@ -95,11 +95,11 @@ case 'viewmapcycle':
 		weathermap_versionbox();
 	}
 
-	include_once($config["base_path"]."/include/bottom_footer.php");
+	include_once $config["base_path"]."/include/bottom_footer.php";
 	break;
 
 case 'viewmap':
-	include_once($config["base_path"]."/include/top_graph_header.php");
+	include_once $config["base_path"]."/include/top_graph_header.php";
 	print "<div id=\"overDiv\" style=\"position:absolute; visibility:hidden; z-index:1000;\"></div>\n";
 	print "<script type=\"text/javascript\" src=\"overlib.js\"><!-- overLIB (c) Erik Bosrup --></script> \n";
 
@@ -119,11 +119,11 @@ case 'viewmap':
 	
 	weathermap_versionbox();
 
-	include_once($config["base_path"]."/include/bottom_footer.php");
+	include_once $config["base_path"]."/include/bottom_footer.php";
 	break;
 
 default:
-	include_once($config["base_path"]."/include/top_graph_header.php");
+	include_once $config["base_path"]."/include/top_graph_header.php";
 	print "<div id=\"overDiv\" style=\"position:absolute; visibility:hidden; z-index:1000;\"></div>\n";
 	print "<script type=\"text/javascript\" src=\"overlib.js\"><!-- overLIB (c) Erik Bosrup --></script> \n";
 
@@ -164,7 +164,7 @@ default:
 	}
 
 	weathermap_versionbox();
-	include_once($config["base_path"]."/include/bottom_footer.php");
+	include_once $config["base_path"]."/include/bottom_footer.php";
 	break;
 }
 

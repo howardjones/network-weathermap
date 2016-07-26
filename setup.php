@@ -253,8 +253,7 @@ function weathermap_config_settings()
 function weathermap_setup_table()
 {
     global $config, $database_default;
-    global $WEATHERMAP_VERSION;
-    include_once($config["library_path"] . DIRECTORY_SEPARATOR . "database.php");
+    include_once $config["library_path"] . DIRECTORY_SEPARATOR . "database.php";
 
     $dbversion = read_config_option("weathermap_db_version");
 
@@ -265,7 +264,7 @@ function weathermap_setup_table()
 
     // only bother with all this if it's a new install, a new version, or we're in a development version
     // - saves a handful of db hits per request!
-    if (($dbversion == "") || (preg_match("/dev$/", $myversion)) || ($dbversion != $myversion)) {
+    if (($dbversion == "") || (preg_match('/dev$/', $myversion)) || ($dbversion != $myversion)) {
 
         $statement = $pdo->query("show tables");
         $result = $statement->fetchAll(PDO::FETCH_ASSOC);
@@ -884,8 +883,8 @@ function weathermap_poller_bottom()
     global $config;
     global $WEATHERMAP_VERSION;
 
-    include_once($config["library_path"] . DIRECTORY_SEPARATOR . "database.php");
-    include_once(dirname(__FILE__) . DIRECTORY_SEPARATOR . "lib" . DIRECTORY_SEPARATOR . "poller-common.php");
+    include_once $config["library_path"] . DIRECTORY_SEPARATOR . "database.php";
+    include_once dirname(__FILE__) . DIRECTORY_SEPARATOR . "lib" . DIRECTORY_SEPARATOR . "poller-common.php";
 
     $pdo = weathermap_get_pdo();
 

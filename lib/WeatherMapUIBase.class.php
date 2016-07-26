@@ -268,7 +268,7 @@ function wmeSanitizeSelected($str)
 {
     $result = urldecode($str);
 
-    if (! preg_match("/^(LINK|NODE):/", $result)) {
+    if (! preg_match('/^(LINK|NODE):/', $result)) {
         return "";
     }
     return wmeSanitizeName($result);

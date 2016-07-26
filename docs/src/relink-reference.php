@@ -14,7 +14,7 @@ while (($buffer = fgets($f, 4096)) !== false) {
         $scope = $matches[1];
     }
 
-    if (preg_match("/href=\"([^\"]+)\">([^<]+)</", $buffer, $matches)) {
+    if (preg_match('/href="([^"]+)">([^<]+)</', $buffer, $matches)) {
         $keyword = $matches[2];
         $url = $matches[1];
         $map [ $scope . '|' . $keyword ] = $url;

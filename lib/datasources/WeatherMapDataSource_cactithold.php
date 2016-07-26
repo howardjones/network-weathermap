@@ -79,11 +79,11 @@ $thold_present = false;
 
 	function Recognise($targetstring)
 	{
-		if(preg_match("/^cacti(thold|monitor):(\d+)$/",$targetstring,$matches))
+		if(preg_match('/^cacti(thold|monitor):(\d+)$/',$targetstring,$matches))
 		{
 			return TRUE;
 		}
-		elseif(preg_match("/^cactithold:(\d+):(\d+)$/",$targetstring,$matches))
+		elseif(preg_match('/^cactithold:(\d+):(\d+)$/',$targetstring,$matches))
 		{
 			return TRUE;
 		}
@@ -100,7 +100,7 @@ $thold_present = false;
 		$data[OUT] = NULL;
 		$data_time = 0;
 
-		if(preg_match("/^cactithold:(\d+):(\d+)$/",$targetstring,$matches))
+		if(preg_match('/^cactithold:(\d+):(\d+)$/',$targetstring,$matches))
 		{
 			// Returns 0 if threshold is not breached, 1 if it is.
 			// use target aggregation to build these up into a 'badness' percentage
@@ -118,7 +118,7 @@ $thold_present = false;
 				$data[OUT] = 0;
 			}
 		}
-		elseif(preg_match("/^cacti(thold|monitor):(\d+)$/",$targetstring,$matches))
+		elseif(preg_match('/^cacti(thold|monitor):(\d+)$/',$targetstring,$matches))
 		{
 			$type = $matches[1];
 			$id = intval($matches[2]);

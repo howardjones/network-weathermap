@@ -25,7 +25,7 @@ class WeatherMapDataSource_cactihost extends WeatherMapDataSource {
 
 	function Recognise($targetstring)
 	{
-		if(preg_match("/^cactihost:(\d+)$/",$targetstring,$matches))
+		if(preg_match('/^cactihost:(\d+)$/',$targetstring,$matches))
 		{
 			return TRUE;
 		}
@@ -42,7 +42,7 @@ class WeatherMapDataSource_cactihost extends WeatherMapDataSource {
 		$data[OUT] = NULL;
 		$data_time = 0;
 
-		if(preg_match("/^cactihost:(\d+)$/",$targetstring,$matches))
+		if(preg_match('/^cactihost:(\d+)$/',$targetstring,$matches))
 		{
 			$cacti_id = intval($matches[1]);
 

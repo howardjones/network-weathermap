@@ -20,12 +20,12 @@ if (isset($FROM_CACTI) && $FROM_CACTI == true) {
 } else {
     $FROM_CACTI = false;
 	$editor_name = "editor.php";
-	$cacti_base = '../../';
+	$cacti_base = dirname(__FILE__) . "/../../";
 	$cacti_url = '/';
 	$cacti_found = false;
 }
 
-if(! $ENABLED)
+if (! $ENABLED)
 {
     print "<p>The editor has not been enabled yet. You need to set ENABLED=true at the top of editor.php</p>";
     print "<p>Before you do that, you should consider using FilesMatch (in Apache) or similar to limit who can access the editor. There is more information in the install guide section of the manual.</p>";
@@ -42,29 +42,29 @@ $use_overlay = FALSE; // set to TRUE to enable experimental overlay showing VIAs
 $use_relative_overlay = FALSE; // set to TRUE to enable experimental overlay showing relative-positioning
 $grid_snap_value = 0; // set non-zero to snap to a grid of that spacing
 
-if( isset($_COOKIE['wmeditor']))
+if (isset($_COOKIE['wmeditor']))
 {
     $parts = explode(":",$_COOKIE['wmeditor']);
     
-    if( (isset($parts[0])) && (intval($parts[0]) == 1) ) { $use_overlay = TRUE; }
-    if( (isset($parts[1])) && (intval($parts[1]) == 1) ) { $use_relative_overlay = TRUE; }
-    if( (isset($parts[2])) && (intval($parts[2]) != 0) ) { $grid_snap_value = intval($parts[2]); }   
+    if ((isset($parts[0])) && (intval($parts[0]) == 1) ) { $use_overlay = TRUE; }
+    if ((isset($parts[1])) && (intval($parts[1]) == 1) ) { $use_relative_overlay = TRUE; }
+    if ((isset($parts[2])) && (intval($parts[2]) != 0) ) { $grid_snap_value = intval($parts[2]); }   
 }
 
 if ($FROM_CACTI==false) {
 
 // check if the goalposts have moved
-if( is_dir($cacti_base) && file_exists($cacti_base."/include/global.php") )
+if (is_dir($cacti_base) && file_exists($cacti_base."include/global.php") )
 {
 	// include the cacti-config, so we know about the database
-	include_once($cacti_base."/include/global.php");
+	include_once $cacti_base."include/global.php";
 	$config['base_url'] = $cacti_url;
 	$cacti_found = TRUE;
 }
-elseif( is_dir($cacti_base) && file_exists($cacti_base."/include/config.php") )
+elseif (is_dir($cacti_base) && file_exists($cacti_base."include/config.php") )
 {
 	// include the cacti-config, so we know about the database
-	include_once($cacti_base."/include/config.php");
+	include_once $cacti_base."/include/config.php";
 
 	$config['base_url'] = $cacti_url;
 	$cacti_found = TRUE;
@@ -77,7 +77,7 @@ else
 
 chdir(dirname(__FILE__));
 
-if(! is_writable($mapdir))
+if (! is_writable($mapdir))
 {
 	$configerror = "The map config directory ($mapdir) is not writable by the web server user. You will not be able to edit any files until this is corrected. [WMEDIT01]";
 }
@@ -92,7 +92,7 @@ $param = '';
 $param2 = '';
 $log = '';
 
-if(!wm_module_checks())
+if (!wm_module_checks())
 {
 	print "<b>Required PHP extensions are not present in your mod_php/ISAPI PHP module. Please check your PHP setup to ensure you have the GD extension installed and enabled.</b><p>";
 	print "If you find that the weathermap tool itself is working, from the command-line or Cacti poller, then it is possible that you have two different PHP installations. The Editor uses the same PHP that webpages on your server use, but the main weathermap tool uses the command-line PHP interpreter.<p>";
@@ -102,13 +102,13 @@ if(!wm_module_checks())
 	exit();
 }
 
-if(isset($_REQUEST['action'])) { $action = $_REQUEST['action']; }
-if(isset($_REQUEST['mapname'])) { $mapname = $_REQUEST['mapname'];  $mapname = wm_editor_sanitize_conffile($mapname); }
-if(isset($_REQUEST['selected'])) { $selected = wm_editor_sanitize_selected($_REQUEST['selected']); }
+if (isset($_REQUEST['action'])) { $action = $_REQUEST['action']; }
+if (isset($_REQUEST['mapname'])) { $mapname = $_REQUEST['mapname'];  $mapname = wm_editor_sanitize_conffile($mapname); }
+if (isset($_REQUEST['selected'])) { $selected = wm_editor_sanitize_selected($_REQUEST['selected']); }
 
 $weathermap_debugging=FALSE;
 
-if($mapname == '')
+if ($mapname == '')
 {
 	// this is the file-picker/welcome page
 	show_editor_startpage();
@@ -129,8 +129,8 @@ else
 	$map->context = 'editor';
 	
 	$fromplug = FALSE;
-	if(isset($_REQUEST['plug']) && (intval($_REQUEST['plug'])==1) ) { $fromplug = TRUE; }
-	if($FROM_CACTI) {
+	if (isset($_REQUEST['plug']) && (intval($_REQUEST['plug'])==1) ) { $fromplug = TRUE; }
+	if ($FROM_CACTI) {
 		$fromplug = TRUE;
 	}
 	
@@ -141,13 +141,13 @@ else
 		break;
 
 	case 'newmapcopy':
-		if(isset($_REQUEST['sourcemap'])) { $sourcemapname = $_REQUEST['sourcemap']; }
+		if (isset($_REQUEST['sourcemap'])) { $sourcemapname = $_REQUEST['sourcemap']; }
 		
 		$sourcemapname = wm_editor_sanitize_conffile($sourcemapname);
 		
-		if($sourcemapname != "") {
+		if ($sourcemapname != "") {
 		    $sourcemap = $mapdir.'/'.$sourcemapname;
-		    if( file_exists($sourcemap) && is_readable($sourcemap) ) {
+		    if (file_exists($sourcemap) && is_readable($sourcemap) ) {
 			$map->ReadConfig($sourcemap);
 			$map->WriteConfig($mapfile);
 		    }
@@ -181,7 +181,7 @@ else
 			list($width,$height) = $map->myimagestringsize($fontnumber,$string);
 			list($kwidth,$kheight) = $map->myimagestringsize($keyfont,$keystring);
 			
-			if($kwidth > $width) $width = $kwidth;
+			if ($kwidth > $width) $width = $kwidth;
 			
 			$y = ($sampleheight/2) + $height/2;
 			$map->myimagestring($im, $fontnumber, $x, $y, $string, $black);
@@ -203,15 +203,15 @@ else
 		header('Content-type: image/png');
 		$map->ReadConfig($mapfile);
 
-		if($selected != '')
+		if ($selected != '')
 		{
-			if(substr($selected,0,5) == 'NODE:')
+			if (substr($selected,0,5) == 'NODE:')
 			{
 				$nodename = substr($selected,5);
 				$map->nodes[$nodename]->selected=1;
 			}
 
-			if(substr($selected,0,5) == 'LINK:')
+			if (substr($selected,0,5) == 'LINK:')
 			{
 				$linkname = substr($selected,5);
 				$map->links[$linkname]->selected=1;
@@ -245,14 +245,14 @@ else
 	    
 	    $ok=FALSE;
 
-	    if($item_type == 'node'){
+	    if ($item_type == 'node'){
 		if (isset($map->nodes[$item_name])) {
 		    print $map->nodes[$item_name]->WriteConfig();
 		    $ok = TRUE;
 		}
 	    }
-	    if($item_type == 'link') {
-		if(isset($map->links[$item_name])) {
+	    if ($item_type == 'link') {
+		if (isset($map->links[$item_name])) {
 		    print $map->links[$item_name]->WriteConfig();
 		    $ok = TRUE;
 		}
@@ -271,7 +271,7 @@ else
 		$link_name = $_REQUEST['link_name'];
 		$link_config = fix_gpc_string($_REQUEST['item_configtext']);
 
-		if(isset($map->links[$link_name])) {		                
+		if (isset($map->links[$link_name])) {		                
 		    $map->links[$link_name]->config_override = $link_config;
 		    
 		    $map->WriteConfig($mapfile);
@@ -290,7 +290,7 @@ else
 		$node_name = $_REQUEST['node_name'];
 		$node_config = fix_gpc_string($_REQUEST['item_configtext']);
 		
-		if(isset($map->nodes[$node_name])) {		                
+		if (isset($map->nodes[$node_name])) {		                
 		    $map->nodes[$node_name]->config_override = $node_config;
 		    
 		    $map->WriteConfig($mapfile);
@@ -310,9 +310,9 @@ else
 		$new_node_name = $_REQUEST['node_new_name'];
 
 		// first check if there's a rename...
-		if($node_name != $new_node_name && strpos($new_node_name," ") === false)
+		if ($node_name != $new_node_name && strpos($new_node_name," ") === false)
 		{
-		    if(!isset($map->nodes[$new_node_name]))
+		    if (!isset($map->nodes[$new_node_name]))
 		    {
 			    // we need to rename the node first.					
 			    $newnode = $map->nodes[$node_name];
@@ -324,7 +324,7 @@ else
 			    // First, relatively-positioned NODEs	
 			    foreach ($map->nodes as $node)
 			    {
-				    if($node->relative_to == $node_name)
+				    if ($node->relative_to == $node_name)
 				    {
 					    $map->nodes[$node->name]->relative_to = $new_node_name;
 				    }
@@ -332,24 +332,24 @@ else
 			    // Next, LINKs that use this NODE as an end.	
 			    foreach ($map->links as $link)
 			    {
-				if(isset($link->a))
+				if (isset($link->a))
 				{
-				    if($link->a->name == $node_name)
+				    if ($link->a->name == $node_name)
 				    {
 					    $map->links[$link->name]->a = $newnode;
 				    }
-				    if($link->b->name == $node_name)
+				    if ($link->b->name == $node_name)
 				    {
 					    $map->links[$link->name]->b = $newnode;
 				    }
 				    // while we're here, VIAs can also be relative to a NODE,
 				    // so check if any of those need to change
-				    if( (count($link->vialist)>0) )
+				    if ((count($link->vialist)>0) )
 				    {
 					$vv=0;
 					foreach($link->vialist as $v)
 					{
-					    if(isset($v[2]) && $v[2] == $node_name)
+					    if (isset($v[2]) && $v[2] == $node_name)
 					    {
 						// die PHP4, die!
 						$map->links[$link->name]->vialist[$vv][2] = $new_node_name;
@@ -378,14 +378,14 @@ else
 		$map->nodes[$new_node_name]->x = intval($_REQUEST['node_x']);
 		$map->nodes[$new_node_name]->y = intval($_REQUEST['node_y']);
 
-		if($_REQUEST['node_iconfilename'] == '--NONE--')
+		if ($_REQUEST['node_iconfilename'] == '--NONE--')
 		{
 		    $map->nodes[$new_node_name]->iconfile='';   
 		}
 		else
 		{
 		    // AICONs mess this up, because they're not fully supported by the editor, but it can still break them
-		    if($_REQUEST['node_iconfilename'] != '--AICON--') {
+		    if ($_REQUEST['node_iconfilename'] != '--AICON--') {
 			    $iconfile = stripslashes($_REQUEST['node_iconfilename']);			    
 			    $map->nodes[$new_node_name]->iconfile = $iconfile;
 		    }
@@ -398,7 +398,7 @@ else
 		$map->ReadConfig($mapfile);
 		$link_name = $_REQUEST['link_name'];
 
-		if(strpos($link_name," ") === false) {
+		if (strpos($link_name," ") === false) {
 		    $map->links[$link_name]->width = floatval($_REQUEST['link_width']);
 		    $map->links[$link_name]->infourl[IN] = wm_editor_sanitize_string($_REQUEST['link_infourl']);
 		    $map->links[$link_name]->infourl[OUT] = wm_editor_sanitize_string($_REQUEST['link_infourl']);
@@ -424,7 +424,7 @@ else
 			// if it's an RRD file, then allow for the user to specify the
 			// DSs to be used. The default is traffic_in, traffic_out, which is
 			// OK for Cacti (most of the time), but if you have other RRDs...
-			if(preg_match("/(.*\.rrd):([\-a-zA-Z0-9_]+):([\-a-zA-Z0-9_]+)$/i",$target,$matches))
+			if (preg_match('/(.*\.rrd):([\-a-zA-Z0-9_]+):([\-a-zA-Z0-9_]+)$/i',$target,$matches))
 			{
 				$newtarget[0] = $matches[1];
 				$newtarget[1] = $matches[2];
@@ -438,17 +438,17 @@ else
 		    $bwin = $_REQUEST['link_bandwidth_in'];
 		    $bwout = $_REQUEST['link_bandwidth_out'];
 
-		    if(isset($_REQUEST['link_bandwidth_out_cb']) && $_REQUEST['link_bandwidth_out_cb'] == 'symmetric')
+		    if (isset($_REQUEST['link_bandwidth_out_cb']) && $_REQUEST['link_bandwidth_out_cb'] == 'symmetric')
 		    {
 			    $bwout = $bwin;
 		    }
 
-		    if(wm_editor_validate_bandwidth($bwin)) {
+		    if (wm_editor_validate_bandwidth($bwin)) {
 			$map->links[$link_name]->max_bandwidth_in_cfg = $bwin;
 			$map->links[$link_name]->max_bandwidth_in = unformat_number($bwin, $map->kilo);
 		    
 		    }
-		    if(wm_editor_validate_bandwidth($bwout)) {
+		    if (wm_editor_validate_bandwidth($bwout)) {
 			$map->links[$link_name]->max_bandwidth_out_cfg = $bwout;		    
 			$map->links[$link_name]->max_bandwidth_out = unformat_number($bwout, $map->kilo);
 		    }
@@ -472,7 +472,7 @@ else
 		$map->height = intval($_REQUEST['map_height']);
 
 		// XXX sanitise this a bit
-		if($_REQUEST['map_bgfile'] == '--NONE--')
+		if ($_REQUEST['map_bgfile'] == '--NONE--')
 		{
 		    $map->background='';    
 		}
@@ -495,15 +495,15 @@ else
 		$bwin_old = $map->links['DEFAULT']->max_bandwidth_in_cfg;
 		$bwout_old = $map->links['DEFAULT']->max_bandwidth_out_cfg;
 		
-		if(! wm_editor_validate_bandwidth($bwin)) {
+		if (! wm_editor_validate_bandwidth($bwin)) {
 		    $bwin = $bwin_old;
 		}
 
-		if(! wm_editor_validate_bandwidth($bwout)) {
+		if (! wm_editor_validate_bandwidth($bwout)) {
 		    $bwout = $bwout_old;
 		}		
 
-		if( ($bwin_old != $bwin) || ($bwout_old != $bwout) )
+		if (($bwin_old != $bwin) || ($bwout_old != $bwout) )
 		{
 			$map->links['DEFAULT']->max_bandwidth_in_cfg = $bwin;
 			$map->links['DEFAULT']->max_bandwidth_out_cfg = $bwout;
@@ -513,7 +513,7 @@ else
 			// $map->defaultlink->SetBandwidth($bwin,$bwout);
 			foreach ($map->links as $link)
 			{
-			    if( ($link->max_bandwidth_in_cfg == $bwin_old) || ($link->max_bandwidth_out_cfg == $bwout_old) )
+			    if (($link->max_bandwidth_in_cfg == $bwin_old) || ($link->max_bandwidth_out_cfg == $bwout_old) )
 			    {
 	    //			$link->SetBandwidth($bwin,$bwout);
 				    $link_name = $link->name;
@@ -531,7 +531,7 @@ else
 	case 'set_map_style':
 		$map->ReadConfig($mapfile);
 
-		if(wm_editor_validate_one_of($_REQUEST['mapstyle_htmlstyle'],array('static','overlib'),false)) {
+		if (wm_editor_validate_one_of($_REQUEST['mapstyle_htmlstyle'],array('static','overlib'),false)) {
 		    $map->htmlstyle = strtolower($_REQUEST['mapstyle_htmlstyle']); 		    
 		}
 
@@ -567,7 +567,7 @@ else
 		# $b = substr($b,0,-2);
 		$log = "[$a -> $b]";
 
-		if($a != $b && isset($map->nodes[$a]) && isset($map->nodes[$b]) )
+		if ($a != $b && isset($map->nodes[$a]) && isset($map->nodes[$b]) )
 		{
 			$newlink = new WeatherMapLink;
 			$newlink->Reset($map);
@@ -628,7 +628,7 @@ else
 
 		$map->ReadConfig($mapfile);
 
-		if(isset($map->links[$link_name])) {
+		if (isset($map->links[$link_name])) {
 		    $map->links[$link_name]->vialist = array(array(0 =>$x, 1=>$y));
 		    $map->WriteConfig($mapfile);
 		}
@@ -643,19 +643,19 @@ else
 
 		$map->ReadConfig($mapfile);
 
-		if(isset($map->nodes[$node_name])) {
+		if (isset($map->nodes[$node_name])) {
 		    // This is a complicated bit. Find out if this node is involved in any
 		    // links that have VIAs. If it is, we want to rotate those VIA points
 		    // about the *other* node in the link
 		    foreach ($map->links as $link)
 		    {
-			    if( (count($link->vialist)>0)  && (($link->a->name == $node_name) || ($link->b->name == $node_name)) )
+			    if ((count($link->vialist)>0)  && (($link->a->name == $node_name) || ($link->b->name == $node_name)) )
 			    {	
 				    // get the other node from us
-				    if($link->a->name == $node_name) $pivot = $link->b;
-				    if($link->b->name == $node_name) $pivot = $link->a; 
+				    if ($link->a->name == $node_name) $pivot = $link->b;
+				    if ($link->b->name == $node_name) $pivot = $link->a; 
 				    
-				    if( ($link->a->name == $node_name) && ($link->b->name == $node_name) )
+				    if (($link->a->name == $node_name) && ($link->b->name == $node_name) )
 				    {
 					    // this is a wierd special case, but it is possible
 					    # $log .= "Special case for node1->node1 links\n";
@@ -713,12 +713,12 @@ else
 					    foreach($points as $p)
 					    {
 						    // skip a point if it positioned relative to a node. Those shouldn't be rotated (well, IMHO)
-						    if(!isset($link->vialist[$v][2]))
+						    if (!isset($link->vialist[$v][2]))
 						    {
 							    $link->vialist[$v][$i]=$p;
 						    }
 						    $i++;
-						    if($i==2) { $i=0; $v++;}					
+						    if ($i==2) { $i=0; $v++;}					
 					    }
 				    }
 			    }
@@ -737,7 +737,7 @@ else
 
 		$target = wm_editor_sanitize_name($_REQUEST['param']);
 
-		if(isset($map->links[$target])) {
+		if (isset($map->links[$target])) {
 			// draw a map and throw it away, to calculate all the bounding boxes
 			$map->DrawMap('null');
 
@@ -786,7 +786,7 @@ else
 		$target = wm_editor_sanitize_name($_REQUEST['param']);
 		$log = "delete link ".$target;
 
-		if(isset($map->links[$target])) {
+		if (isset($map->links[$target])) {
 		    unset($map->links[$target]);
 		    
 		    $map->WriteConfig($mapfile);
@@ -818,7 +818,7 @@ else
 		
 		// only insert a label if there's no LABEL in the DEFAULT node.
 		// otherwise, respect the template.
-		if($map->nodes['DEFAULT']->label == $map->nodes[':: DEFAULT ::']->label)
+		if ($map->nodes['DEFAULT']->label == $map->nodes[':: DEFAULT ::']->label)
 		{
 			$node->label = "Node";
 		}
@@ -843,14 +843,14 @@ else
 		$map->ReadConfig($mapfile);
 
 		$target = wm_editor_sanitize_name($_REQUEST['param']);
-		if(isset($map->nodes[$target])) {
+		if (isset($map->nodes[$target])) {
 		    $log = "delete node ".$target;
     
 		    foreach ($map->links as $link)
 		    {
-			    if( isset($link->a) )
+			    if (isset($link->a) )
 			    {
-				    if( ($target == $link->a->name) || ($target == $link->b->name) )
+				    if (($target == $link->a->name) || ($target == $link->b->name) )
 				    {
 					    unset($map->links[$link->name]);
 				    }
@@ -867,7 +867,7 @@ else
 		$map->ReadConfig($mapfile);
 
 		$target = wm_editor_sanitize_name($_REQUEST['param']);
-		if(isset($map->nodes[$target])) {
+		if (isset($map->nodes[$target])) {
 		    $log = "clone node ".$target;
     
 		    $newnodename = $target;
@@ -909,7 +909,7 @@ else
 	// now we'll just draw the full editor page, with our new knowledge
 
 	$imageurl = '?mapname='.urlencode($mapname) . '&amp;action=draw';
-	if($selected != '')
+	if ($selected != '')
 	{
 		$imageurl .= '&amp;selected='.urlencode(wm_editor_sanitize_selected($selected));
 	}
@@ -917,10 +917,10 @@ else
 	$imageurl .= '&amp;unique='.time();
 
 	// build up the editor's list of used images
-	if($map->background != '') $map->used_images[] = $map->background;
+	if ($map->background != '') $map->used_images[] = $map->background;
 	foreach ($map->nodes as $n)
 	{
-		if($n->iconfile != '' && ! preg_match("/^(none|nink|inpie|outpie|box|rbox|gauge|round)$/",$n->iconfile))
+		if ($n->iconfile != '' && ! preg_match('/^(none|nink|inpie|outpie|box|rbox|gauge|round)$/',$n->iconfile))
 			$map->used_images[] = $n->iconfile;		
 	}
 
@@ -939,7 +939,7 @@ else
 <?php
 		// if the cacti config was included properly, then 
 		// this will be non-empty, and we can unhide the cacti links in the Link Properties box
-		if( ! isset($config['cacti_version']) )
+		if (! isset($config['cacti_version']) )
 		{
 			echo "    .cactilink { display: none; }\n";
 			echo "    .cactinode { display: none; }\n";
@@ -962,7 +962,7 @@ else
 	// append any images used in the map that aren't in the images folder
 	foreach ($map->used_images as $im)
 	{
-		if(! in_array($im,$imlist))
+		if (! in_array($im,$imlist))
 		{
 			$imlist[]=$im;
 		}
@@ -1068,7 +1068,7 @@ else
 			<td><select id="node_iconfilename" name="node_iconfilename">
 
 <?php
-	if(count($imlist)==0)
+	if (count($imlist)==0)
 	{
 		print '<option value="--NONE--">(no images are available)</option>';
 	}
@@ -1265,7 +1265,7 @@ else
 			<td><select name="map_bgfile">
 
 <?php
-	if(count($imlist)==0)
+	if (count($imlist)==0)
 	{
 		print '<option value="--NONE--">(no images are available)</option>';
 	}
@@ -1275,7 +1275,7 @@ else
 		foreach ($imlist as $im)
 		{
 			print "<option ";		
-    			if($map->background == $im) print " selected ";
+    			if ($map->background == $im) print " selected ";
 			print "value=\"".htmlspecialchars($im)."\">".htmlspecialchars($im)."</option>\n";
 		}
 	}

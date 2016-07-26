@@ -5,47 +5,40 @@
 //     filename.rrd:ds_in:ds_out
 //
 
-include_once(dirname(__FILE__)."/../ds-common.php");
+include_once dirname(__FILE__)."/../ds-common.php";
 
 class WeatherMapDataSource_rrd extends WeatherMapDataSource {
 
 	function Init(&$map)
 	{
 		global $config;
-		#if (extension_loaded('RRDTool')) // fetch the values via the RRDtool Extension
-		#{
-	#		debug("RRD DS: Using RRDTool php extension.\n");
-#			return(TRUE);
-#		}
-#		else
-#		{
-			if($map->context=='cacti')
-			{			
-				wm_debug("RRD DS: path_rra is ".$config["rra_path"]." - your rrd pathname must be exactly this to use poller_output\n");
-				// save away a couple of useful global SET variables
-				$map->add_hint("cacti_path_rra",$config["rra_path"]);
-				$map->add_hint("cacti_url",$config['url_path']);
-			}
-			if (file_exists($map->rrdtool)) {
-				if((function_exists('is_executable')) && (!is_executable($map->rrdtool)))
-				{
-					wm_warn("RRD DS: RRDTool exists but is not executable? [WMRRD01]\n");
-					return(FALSE);
-				}
-				$map->rrdtool_check="FOUND";
-				return(TRUE); 
-			}
-			// normally, DS plugins shouldn't really pollute the logs
-			// this particular one is important to most users though...
-			if($map->context=='cli')
+
+		if($map->context=='cacti')
+		{
+			wm_debug("RRD DS: path_rra is ".$config["rra_path"]." - your rrd pathname must be exactly this to use poller_output\n");
+			// save away a couple of useful global SET variables
+			$map->add_hint("cacti_path_rra",$config["rra_path"]);
+			$map->add_hint("cacti_url",$config['url_path']);
+		}
+		if (file_exists($map->rrdtool)) {
+			if((function_exists('is_executable')) && (!is_executable($map->rrdtool)))
 			{
-				wm_warn("RRD DS: Can't find RRDTOOL. Check line 29 of the 'weathermap' script.\nRRD-based TARGETs will fail. [WMRRD02]\n");
+				wm_warn("RRD DS: RRDTool exists but is not executable? [WMRRD01]\n");
+				return(FALSE);
 			}
-			if($map->context=='cacti')
-			{    // unlikely to ever occur
-				wm_warn("RRD DS: Can't find RRDTOOL. Check your Cacti config. [WMRRD03]\n");
-			}
-#		}
+			$map->rrdtool_check="FOUND";
+			return(TRUE);
+		}
+		// normally, DS plugins shouldn't really pollute the logs
+		// this particular one is important to most users though...
+		if($map->context=='cli')
+		{
+			wm_warn("RRD DS: Can't find RRDTOOL. Check line 29 of the 'weathermap' script.\nRRD-based TARGETs will fail. [WMRRD02]\n");
+		}
+		if($map->context=='cacti')
+		{    // unlikely to ever occur
+			wm_warn("RRD DS: Can't find RRDTOOL. Check your Cacti config. [WMRRD03]\n");
+		}
 
 		return(FALSE);
 	}

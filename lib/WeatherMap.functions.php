@@ -1391,7 +1391,7 @@ function unformat_number($instring, $kilo = 1000)
 	$matches=0;
 	$number=0;
 
-	if (preg_match("/([0-9\.]+)(M|G|K|T|m|u)/", $instring, $matches))
+	if (preg_match('/([0-9\.]+)(M|G|K|T|m|u)/', $instring, $matches))
 	{
 		$number=floatval($matches[1]);
 

@@ -54,7 +54,7 @@ define("X",0);
 define("Y",1);
 define("DISTANCE",2);
 
-require_once("WeatherMap.keywords.inc.php");
+require_once "WeatherMap.keywords.inc.php";
 
 // ***********************************************
 
@@ -1117,7 +1117,6 @@ class WeatherMap extends WeatherMapBase
 
 		$output = $input;
 		
-		# while( preg_match("/(\{[^}]+\})/",$input,$matches) )
 		while( preg_match('/(\{(?:node|map|link)[^}]+\})/',$input,$matches) )
 		{
 			$value = "[UNKNOWN]";
@@ -1134,7 +1133,7 @@ class WeatherMap extends WeatherMapBase
 				if($type == 'map')
 				{
 					$the_item = $this;
-					if(preg_match("/map:([^:]+):*([^:]*)/",$args,$matches))
+					if(preg_match('/map:([^:]+):*([^:]*)/',$args,$matches))
 					{
 						$args = $matches[1];
 						$format = $matches[2];
@@ -1143,7 +1142,7 @@ class WeatherMap extends WeatherMapBase
 
 				if(($type == 'link') || ($type == 'node'))
 				{
-					if(preg_match("/([^:]+):([^:]+):*([^:]*)/",$args,$matches))
+					if(preg_match('/([^:]+):([^:]+):*([^:]*)/',$args,$matches))
 					{
 						$itemname = $matches[1];
 						$args = $matches[2];
@@ -1281,15 +1280,19 @@ function LoadPlugins( $type="data", $dir="lib/datasources" )
 			{
 				wm_debug("Loading $type Plugin class from $file\n");
 
-				include_once( $realfile );
-				$class = preg_replace( "/\.php$/", "", $file );
+				include_once $realfile;
+				$class = preg_replace( '/\.php$/', '', $file );
 				if($type == 'data')
 				{
 					$this->datasourceclasses [$class]= $class;
 					$this->activedatasourceclasses[$class]=1;
 				}
-				if($type == 'pre') $this->preprocessclasses [$class]= $class;
-				if($type == 'post') $this->postprocessclasses [$class]= $class;
+				if($type == 'pre') {
+					$this->preprocessclasses [$class]= $class;
+				}
+				if($type == 'post') {
+					$this->postprocessclasses [$class]= $class;
+				}
 
 				wm_debug("Loaded $type Plugin class $class from $file\n");
 				$this->plugins[$type][$class] = new $class;
@@ -1376,14 +1379,14 @@ function ProcessTargets()
 
 						// if the targetstring starts with a -, then we're taking this value OFF the aggregate
 						$multiply = 1;
-						if(preg_match("/^-(.*)/",$targetstring,$matches))
+						if(preg_match('/^-(.*)/',$targetstring,$matches))
 						{
 							$targetstring = $matches[1];
 							$multiply = -1 * $multiply;
 						}
 						
 						// if the remaining targetstring starts with a number and a *-, then this is a scale factor
-						if(preg_match("/^(\d+\.?\d*)\*(.*)/",$targetstring,$matches))
+						if(preg_match('/^(\d+\.?\d*)\*(.*)/',$targetstring,$matches))
 						{
 							$targetstring = $matches[2];
 							$multiply = $multiply * floatval($matches[1]);
@@ -2289,7 +2292,7 @@ function DrawTitle($im, $font, $colour)
 	function ReadConfig_Handle_VIA($fullcommand, $args, $matches, &$curobj, $filename,
 		$linecount)
 	{
-		if (preg_match("/^\s*VIA\s+([-+]?\d+)\s+([-+]?\d+)\s*$/i", $fullcommand,
+		if (preg_match('/^\s*VIA\s+([-+]?\d+)\s+([-+]?\d+)\s*$/i', $fullcommand,
 			$matches)) {
 			$curobj->vialist[] = array (
 				$matches[1],
@@ -2297,7 +2300,7 @@ function DrawTitle($im, $font, $colour)
 			);
 			return true;
 		}
-		if (preg_match("/^\s*VIA\s+(\S+)\s+([-+]?\d+)\s+([-+]?\d+)\s*$/i", $fullcommand,
+		if (preg_match('/^\s*VIA\s+(\S+)\s+([-+]?\d+)\s+([-+]?\d+)\s*$/i', $fullcommand,
 			$matches)) {
 			$curobj->vialist[] = array (
 				$matches[2],
@@ -2327,11 +2330,11 @@ function DrawTitle($im, $font, $colour)
 						preg_replace('/:(NE|SE|NW|SW|N|S|E|W|C)\d+$/i', '', $matches[$i]);
 					$this->need_size_precalc = true;
 				}
-				if (preg_match("/:(NE|SE|NW|SW|N|S|E|W|C)$/i", $matches[$i], $submatches))
+				if (preg_match('/:(NE|SE|NW|SW|N|S|E|W|C)$/i', $matches[$i], $submatches))
 				{
 					$endoffset[$i] = $submatches[1];
 					$nodenames[$i] =
-						preg_replace("/:(NE|SE|NW|SW|N|S|E|W|C)$/i", '', $matches[$i]);
+						preg_replace('/:(NE|SE|NW|SW|N|S|E|W|C)$/i', '', $matches[$i]);
 					$this->need_size_precalc = true;
 				}
 				if (preg_match('/:(-?\d+r\d+)$/i', $matches[$i], $submatches)) {
@@ -3451,7 +3454,7 @@ function WriteConfig($filename)
 			}
 
 			foreach ($this->nodes as $node) {
-				if (!preg_match("/^::\s/", $node->name)) {
+				if (!preg_match('/^::\s/', $node->name)) {
 					if ($node->defined_in == $this->configfile) {
 
 						if ($which == "template" && $node->x === null) {
@@ -3769,39 +3772,29 @@ function DrawMap($filename = '', $thumbnailfile = '', $thumbnailmax = 250, $with
 		}
 		else
 		{
-			if ($filename == '') { imagepng ($image); }
-			else {
-				$result = FALSE;
-				$functions = TRUE;
-				if(function_exists('imagejpeg') && preg_match("/\.jpg/i",$filename))
-				{
+			if ($filename == '') {
+				imagepng($image);
+			} else {
+				$result = false;
+				$functions = true;
+				if (function_exists('imagejpeg') && preg_match('/\.jpg/i', $filename)) {
 					wm_debug("Writing JPEG file to $filename\n");
 					$result = imagejpeg($image, $filename);
-				}
-				elseif(function_exists('imagegif') && preg_match("/\.gif/i",$filename))
-				{
+				} elseif (function_exists('imagegif') && preg_match('/\.gif/i', $filename)) {
 					wm_debug("Writing GIF file to $filename\n");
 					$result = imagegif($image, $filename);
-				}
-				elseif(function_exists('imagepng') && preg_match("/\.png/i",$filename))
-				{
+				} elseif (function_exists('imagepng') && preg_match('/\.png/i', $filename)) {
 					wm_debug("Writing PNG file to $filename\n");
 					$result = imagepng($image, $filename);
-				}
-				else
-				{
+				} else {
 					wm_warn("Failed to write map image. No function existed for the image format you requested. [WMWARN12]\n");
-					$functions = FALSE;
+					$functions = false;
 				}
 
-				if(($result==FALSE) && ($functions==TRUE))
-				{
-					if(file_exists($filename))
-					{
+				if (($result == false) && ($functions == true)) {
+					if (file_exists($filename)) {
 						wm_warn("Failed to overwrite existing image file $filename - permissions of existing file are wrong? [WMWARN13]");
-					}
-					else
-					{
+					} else {
 						wm_warn("Failed to create image file $filename - permissions of output directory are wrong? [WMWARN14]");
 					}
 				}

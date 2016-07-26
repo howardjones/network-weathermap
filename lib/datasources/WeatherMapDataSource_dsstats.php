@@ -1,6 +1,6 @@
 <?php
 
-include_once(dirname(__FILE__)."/../ds-common.php");
+include_once dirname(__FILE__)."/../ds-common.php";
 
 class WeatherMapDataSource_dsstats extends WeatherMapDataSource {
 
@@ -57,17 +57,12 @@ class WeatherMapDataSource_dsstats extends WeatherMapDataSource {
 
 	function Recognise($targetstring)
 	{
-		if(preg_match("/^dsstats:([a-z]+):(\d+):([\-a-zA-Z0-9_]+):([\-a-zA-Z0-9_]+)$/",$targetstring,$matches))
-		{
-			return TRUE;
-		}
-		elseif(preg_match("/^dsstats:(\d+):([\-a-zA-Z0-9_]+):([\-a-zA-Z0-9_]+)$/",$targetstring,$matches))
-		{
-			return TRUE;
-		}
-		else
-		{
-			return FALSE;
+		if (preg_match('/^dsstats:([a-z]+):(\d+):([\-a-zA-Z0-9_]+):([\-a-zA-Z0-9_]+)$/', $targetstring, $matches)) {
+			return true;
+		} elseif (preg_match('/^dsstats:(\d+):([\-a-zA-Z0-9_]+):([\-a-zA-Z0-9_]+)$/', $targetstring, $matches)) {
+			return true;
+		} else {
+			return false;
 		}
 	}
 
@@ -96,20 +91,19 @@ class WeatherMapDataSource_dsstats extends WeatherMapDataSource {
 		$datatype = "";
 		$field = "";
 
-		if(preg_match("/^dsstats:(\d+):([\-a-zA-Z0-9_]+):([\-a-zA-Z0-9_]+)$/",$targetstring,$matches))
-		{
+		if (preg_match('/^dsstats:(\d+):([\-a-zA-Z0-9_]+):([\-a-zA-Z0-9_]+)$/', $targetstring, $matches)) {
 			$local_data_id = $matches[1];
 			$dsnames[IN] = $matches[2];
 			$dsnames[OUT] = $matches[3];
 
 			$datatype = "last";
 
-			if($map->get_hint("dsstats_default_type") != '') {
-					$datatype = $map->get_hint("dsstats_default_type");
-					wm_debug("Default datatype changed to ".$datatype.".\n");
+			if ($map->get_hint("dsstats_default_type") != '') {
+				$datatype = $map->get_hint("dsstats_default_type");
+				wm_debug("Default datatype changed to " . $datatype . ".\n");
 			}
-		}elseif(preg_match("/^dsstats:([a-z]+):(\d+):([\-a-zA-Z0-9_]+):([\-a-zA-Z0-9_]+)$/",$targetstring,$matches))
-		{
+		} elseif (preg_match('/^dsstats:([a-z]+):(\d+):([\-a-zA-Z0-9_]+):([\-a-zA-Z0-9_]+)$/', $targetstring,
+			$matches)) {
 			$dsnames[IN] = $matches[3];
 			$dsnames[OUT] = $matches[4];
 			$datatype = $matches[1];

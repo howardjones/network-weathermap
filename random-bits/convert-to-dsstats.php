@@ -12,12 +12,12 @@
 	if( is_dir($cacti_base) && file_exists($cacti_base."/include/global.php") )
 	{
 	        // include the cacti-config, so we know about the database
-	        require_once($cacti_base."/include/global.php");
+	        require_once $cacti_base."include/global.php";
 	}
 	elseif( is_dir($cacti_base) && file_exists($cacti_base."/include/config.php") )
 	{
 	        // include the cacti-config, so we know about the database
-	        require_once($cacti_base."/include/config.php");
+	        require_once $cacti_base."include/config.php";
 	}
 	else
 	{
@@ -145,7 +145,7 @@
 							$dsnames[IN] = "traffic_in";
 							$dsnames[OUT] = "traffic_out";
 							
-							if(preg_match("/^(.*\.rrd):([\-a-zA-Z0-9_]+):([\-a-zA-Z0-9_]+)$/",$targetstring,$matches))
+							if(preg_match('/^(.*\.rrd):([\-a-zA-Z0-9_]+):([\-a-zA-Z0-9_]+)$/',$targetstring,$matches))
 							{
 								$rrdfile = $matches[1];
 								
@@ -154,16 +154,16 @@
 											
 								wm_debug("ConvertDS: Special DS names seen (".$dsnames[IN]." and ".$dsnames[OUT].").\n");
 							}
-							if(preg_match("/^rrd:(.*)/",$rrdfile,$matches))
+							if(preg_match('/^rrd:(.*)/',$rrdfile,$matches))
 							{
 								$rrdfile = $matches[1];
 							}
-							if(preg_match("/^gauge:(.*)/",$rrdfile,$matches))
+							if(preg_match('/^gauge:(.*)/',$rrdfile,$matches))
 							{
 								$rrdfile = $matches[1];
 								$multiplier = 1;
 							}
-							if(preg_match("/^scale:([+-]?\d*\.?\d*):(.*)/",$rrdfile,$matches)) 
+							if(preg_match('/^scale:([+-]?\d*\.?\d*):(.*)/',$rrdfile,$matches))
 							{
 									$rrdfile = $matches[2];
 									$multiplier = $matches[1];

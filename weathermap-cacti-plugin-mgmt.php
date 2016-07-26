@@ -1,17 +1,17 @@
 <?php
 
 chdir('../../');
-include_once("./include/auth.php");
-include_once("./include/config.php");
+include_once "./include/auth.php";
+include_once "./include/config.php";
 
-include_once($config["library_path"] . "/database.php");
+include_once $config["library_path"] . "/database.php";
 
 $weathermap_confdir = realpath(dirname(__FILE__) . '/configs');
 
 // include the weathermap class so that we can get the version
-include_once(dirname(__FILE__) . "/lib/Weathermap.class.php");
-include_once(dirname(__FILE__) . "/lib/database.php");
-include_once(dirname(__FILE__) . "/lib/WeathermapManager.class.php");
+include_once dirname(__FILE__) . "/lib/Weathermap.class.php";
+include_once dirname(__FILE__) . "/lib/database.php";
+include_once dirname(__FILE__) . "/lib/WeathermapManager.class.php";
 
 $i_understand_file_permissions_and_how_to_fix_them = FALSE;
 $my_name = "weathermap-cacti-plugin-mgmt.php";
@@ -66,7 +66,7 @@ switch ($action) {
 
         $id = -1;
 
-        include_once($config["base_path"] . "/include/top_header.php");
+        include_once $config["base_path"] . "/include/top_header.php";
         if (isset($_REQUEST['id']) && is_numeric($_REQUEST['id'])) {
             $id = intval($_REQUEST['id']);
         }
@@ -76,14 +76,14 @@ switch ($action) {
         }
 
         weathermap_footer_links();
-        include_once($config["base_path"] . "/include/bottom_footer.php");
+        include_once $config["base_path"] . "/include/bottom_footer.php";
         break;
 
     case 'groupadmin':
-        include_once($config["base_path"] . "/include/top_header.php");
+        include_once $config["base_path"] . "/include/top_header.php";
         weathermap_group_editor();
         weathermap_footer_links();
-        include_once($config["base_path"] . "/include/bottom_footer.php");
+        include_once $config["base_path"] . "/include/bottom_footer.php";
         break;
 
     case 'chgroup_update':
@@ -106,9 +106,9 @@ switch ($action) {
 
     case 'chgroup':
         if (isset($_REQUEST['id']) && is_numeric($_REQUEST['id'])) {
-            include_once($config["base_path"] . "/include/top_header.php");
+            include_once $config["base_path"] . "/include/top_header.php";
             weathermap_chgroup(intval($_REQUEST['id']));
-            include_once($config["base_path"] . "/include/bottom_footer.php");
+            include_once $config["base_path"] . "/include/bottom_footer.php";
         } else {
             print "Something got lost back there.";
         }
@@ -164,7 +164,7 @@ switch ($action) {
 
     case 'map_settings_form':
         if (isset($_REQUEST['mapid']) && is_numeric($_REQUEST['mapid'])) {
-            include_once($config["base_path"] . "/include/top_header.php");
+            include_once $config["base_path"] . "/include/top_header.php";
 
             if (isset($_REQUEST['id']) && is_numeric($_REQUEST['id'])) {
                 weathermap_map_settings_form(intval($_REQUEST['mapid']), intval($_REQUEST['id']));
@@ -173,15 +173,15 @@ switch ($action) {
             }
 
             weathermap_footer_links();
-            include_once($config["base_path"] . "/include/bottom_footer.php");
+            include_once $config["base_path"] . "/include/bottom_footer.php";
         }
         break;
     case 'map_settings':
         if (isset($_REQUEST['id']) && is_numeric($_REQUEST['id'])) {
-            include_once($config["base_path"] . "/include/top_header.php");
+            include_once $config["base_path"] . "/include/top_header.php";
             weathermap_map_settings(intval($_REQUEST['id']));
             weathermap_footer_links();
-            include_once($config["base_path"] . "/include/bottom_footer.php");
+            include_once $config["base_path"] . "/include/bottom_footer.php";
         }
         break;
 
@@ -203,9 +203,9 @@ switch ($action) {
         break;
     case 'perms_edit':
         if (isset($_REQUEST['id']) && is_numeric($_REQUEST['id'])) {
-            include_once($config["base_path"] . "/include/top_header.php");
+            include_once $config["base_path"] . "/include/top_header.php";
             perms_list($_REQUEST['id']);
-            include_once($config["base_path"] . "/include/bottom_footer.php");
+            include_once $config["base_path"] . "/include/bottom_footer.php";
         } else {
             print "Something got lost back there.";
         }
@@ -254,24 +254,24 @@ switch ($action) {
         break;
 
     case 'viewconfig':
-        include_once($config["base_path"] . "/include/top_graph_header.php");
+        include_once $config["base_path"] . "/include/top_graph_header.php";
         if (isset($_REQUEST['file'])) {
             preview_config($_REQUEST['file']);
         } else {
             print "No such file.";
         }
-        include_once($config["base_path"] . "/include/bottom_footer.php");
+        include_once $config["base_path"] . "/include/bottom_footer.php";
         break;
 
     case 'addmap_picker':
 
-        include_once($config["base_path"] . "/include/top_header.php");
+        include_once $config["base_path"] . "/include/top_header.php";
         if (isset($_REQUEST['show']) && $_REQUEST['show'] == 'all') {
             addmap_picker(true);
         } else {
             addmap_picker(false);
         }
-        include_once($config["base_path"] . "/include/bottom_footer.php");
+        include_once $config["base_path"] . "/include/bottom_footer.php";
         break;
 
     case 'addmap':
@@ -286,35 +286,35 @@ switch ($action) {
 
     case 'rebuildnow':
 
-        include_once($config["base_path"] . "/include/top_header.php");
+        include_once $config["base_path"] . "/include/top_header.php";
 
         print "<h3>REALLY Rebuild all maps?</h3><strong>NOTE: Because your Cacti poller process probably doesn't run as the same user as your webserver, it's possible this will fail with file permission problems even though the normal poller process runs fine. In some situations, it MAY have memory_limit problems, if your mod_php/ISAPI module uses a different php.ini to your command-line PHP.</strong><hr>";
 
         print "<p>It is recommended that you don't use this feature, unless you understand and accept the problems it may cause.</p>";
         print "<h4><a href=\"?action=rebuildnow2\">YES</a></h4>";
         print "<h1><a href=\"weathermap-cacti-plugin-mgmt.php\">NO</a></h1>";
-        include_once($config["base_path"] . "/include/bottom_footer.php");
+        include_once $config["base_path"] . "/include/bottom_footer.php";
         break;
 
     case 'rebuildnow2':
-        include_once(dirname(__FILE__) . DIRECTORY_SEPARATOR . "Weathermap.class.php");
-        include_once(dirname(__FILE__) . DIRECTORY_SEPARATOR . "lib" . DIRECTORY_SEPARATOR . "poller-common.php");
+        include_once dirname(__FILE__) . DIRECTORY_SEPARATOR . "Weathermap.class.php";
+        include_once dirname(__FILE__) . DIRECTORY_SEPARATOR . "lib" . DIRECTORY_SEPARATOR . "poller-common.php";
 
-        include_once($config["base_path"] . "/include/top_header.php");
+        include_once $config["base_path"] . "/include/top_header.php";
         print "<h3>Rebuilding all maps</h3><strong>NOTE: Because your Cacti poller process probably doesn't run as the same user as your webserver, it's possible this will fail with file permission problems even though the normal poller process runs fine. In some situations, it MAY have memory_limit problems, if your mod_php/ISAPI module uses a different php.ini to your command-line PHP.</strong><hr><pre>";
         weathermap_run_maps(dirname(__FILE__));
         print "</pre>";
         print "<hr /><h3>Done.</h3>";
-        include_once($config["base_path"] . "/include/bottom_footer.php");
+        include_once $config["base_path"] . "/include/bottom_footer.php";
 
         break;
 
     // by default, just list the map setup
     default:
-        include_once($config["base_path"] . "/include/top_header.php");
+        include_once $config["base_path"] . "/include/top_header.php";
         maplist();
         weathermap_footer_links();
-        include_once($config["base_path"] . "/include/bottom_footer.php");
+        include_once $config["base_path"] . "/include/bottom_footer.php";
         break;
 }
 

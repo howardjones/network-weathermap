@@ -30,7 +30,7 @@ $pdo = weathermap_get_pdo();
 function js_escape($str)
 {
     $str = str_replace('\\', '\\\\', $str);
-    $str = str_replace("'", "\\\'", $str);
+    $str = str_replace("'", "\\'", $str);
 
     $str = "'" . $str . "'";
 

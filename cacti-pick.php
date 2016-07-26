@@ -11,17 +11,19 @@ $config['base_url'] = $cacti_url;
 
 @include_once 'editor-config.php';
 
-if (is_dir($cacti_base) && file_exists($cacti_base . "/include/config.php")) {
+if (is_dir($cacti_base) && file_exists($cacti_base . "/include/global.php")) {
     // include the cacti-config, so we know about the database
-    include_once $cacti_base . "/include/config.php";
+    include_once $cacti_base . "/include/global.php";
 
     $config['base_url'] = (isset($config['url_path']) ? $config['url_path'] : $cacti_url);
     $cacti_found = true;
+
+    require_once dirname(__FILE__) . "/lib/database.php";
 } else {
     $cacti_found = false;
+    exit();
 }
 
-require_once dirname(__FILE__) . "/lib/database.php";
 
 $pdo = weathermap_get_pdo();
 
@@ -80,7 +82,7 @@ if (isset($_SESSION['cacti']['weathermap']['last_used_host_id'][0])) {
 if (isset($_REQUEST['command']) && $_REQUEST["command"] == 'link_step2') {
     $dataid = intval($_REQUEST['dataid']);
 
-    $statement = $pdo->prepare("SELECT graph_templates_item.local_graph_id, title_cache FROM graph_templates_item,graph_templates_graph,data_template_rrd WHERE graph_templates_graph.local_graph_id = graph_templates_item.local_graph_id  AND task_item_id=data_template_rrd.id AND local_data_id=? LIMIT 1;")
+    $statement = $pdo->prepare("SELECT graph_templates_item.local_graph_id, title_cache FROM graph_templates_item,graph_templates_graph,data_template_rrd WHERE graph_templates_graph.local_graph_id = graph_templates_item.local_graph_id  AND task_item_id=data_template_rrd.id AND local_data_id=? LIMIT 1;");
     $statement->execute(array($dataid));
     $line = $statement->fetch(PDO::FETCH_ASSOC);
 

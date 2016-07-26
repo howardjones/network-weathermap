@@ -2,6 +2,7 @@
 
 // NOTE: this is included in setup.php, so stuff in here pollutes the Cacti namespace
 
+
 function weathermap_get_pdo()
 {
     // This is the Cacti standard settings

@@ -7,6 +7,7 @@ $failing_list_file = $argv[1];
 $summary_file = $argv[2];
 
 $failcount = 0;
+$fails = array();
 
 $f = fopen($failing_list_file, "r");
 
@@ -34,7 +35,7 @@ while (!feof($f)) {
         $conf = str_replace("<h4>", "", $conf);
         $conf = str_replace("<hr>", "", $conf);
 
-        if ($fails[$conf] == 1) {
+        if (in_array($conf, $fails) && $fails[$conf] == 1) {
             print $line;
 
             $diff_file = "test-suite/diffs/" . $conf . ".png.txt";
@@ -73,10 +74,9 @@ while (!feof($f)) {
 fclose($f);
 
 $c = sizeof($percents);
+$summary = "";
 
 if ($c > 0) {
-
-    $summary = "";
     $total = array_sum($percents);
     $m = max($percents);
 

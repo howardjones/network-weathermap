@@ -19,7 +19,7 @@ while (!feof($f)) {
 }
 fclose($f);
 
-print "<p>$failcount failing</p>";
+# print "<p>$failcount failing</p>";
 
 $f = fopen($summary_file, "r");
 
@@ -35,7 +35,9 @@ while (!feof($f)) {
         $conf = str_replace("<h4>", "", $conf);
         $conf = str_replace("<hr>", "", $conf);
 
-        if (in_array($conf, $fails) && $fails[$conf] == 1) {
+//        print "$conf\n";
+
+        if (array_key_exists($conf, $fails)  && $fails[$conf] == 1) {
             print $line;
 
             $diff_file = "test-suite/diffs/" . $conf . ".png.txt";

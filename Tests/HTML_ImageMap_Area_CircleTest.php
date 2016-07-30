@@ -62,4 +62,3 @@ class HTML_ImageMap_Area_CircleTest extends PHPUnit_Framework_TestCase {
 
     }
 }
-?>

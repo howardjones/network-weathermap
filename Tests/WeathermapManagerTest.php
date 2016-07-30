@@ -77,6 +77,20 @@ class WeathermapManagerTest extends PHPUnit_Extensions_Database_TestCase
         $this->assertEquals($map->active, 'on');
     }
 
+    public function testMapTitle()
+    {
+        $file1 = $this->confdir . DIRECTORY_SEPARATOR . "simple.conf";
+        $file2 = $this->confdir . DIRECTORY_SEPARATOR . "switch-status.conf";
+        $file3 = $this->confdir . DIRECTORY_SEPARATOR . "non-existent.conf";
+        $file4 = $this->testsuite . DIRECTORY_SEPARATOR . "tests" . DIRECTORY_SEPARATOR . "conf_titlepos2.conf";
+
+        $this->assertEquals("Simple Map", $this->manager->extractMapTitle($file1));
+        $this->assertEquals("(no title)", $this->manager->extractMapTitle($file2));
+        $this->assertEquals("(no file)", $this->manager->extractMapTitle($file3));
+        $this->assertEquals("New Title", $this->manager->extractMapTitle($file4));
+
+    }
+
     private function getMapOrder()
     {
         $statement = self::$pdo->prepare("SELECT id FROM weathermap_maps ORDER BY sortorder");
@@ -263,6 +277,38 @@ class WeathermapManagerTest extends PHPUnit_Extensions_Database_TestCase
 
         $result = $this->manager->getAppSetting("dog", "pitbull");
         $this->assertEquals("pitbull", $result);
+
+        $this->manager->deleteAppSetting("fish");
+        $this->assertEquals(40, $this->getConnection()->getRowCount('settings'), "Update failed");
+        $result = $this->manager->getAppSetting("fish", "tuna");
+        $this->assertEquals("tuna", $result);
+
+    }
+
+    public function testCactiUsers()
+    {
+        $this->assertEquals(2, $this->getConnection()->getRowCount('user_auth'), "Pre-Condition");
+
+        $users = $this->manager->getUserList();
+        $this->assertEquals(2, sizeof($users), "via API");
+
+        $users = $this->manager->getUserList(true);
+        $this->assertEquals(3, sizeof($users), "via API with Anyone");
+
+        $user1 = $users[1];
+        $this->assertInstanceOf(stdClass::class, $user1);
+        $this->assertEquals("admin", $user1->username);
+        $this->assertEquals(1, $user1->id);
+    }
+
+    public function testCactiPerms()
+    {
+        $users = $this->manager->getUserList();
+        $this->assertEquals(2, sizeof($users));
+
+        $this->assertTrue($this->manager->checkUserForRealm(1, 1));
+        $this->assertFalse($this->manager->checkUserForRealm(1, 33));
+        $this->assertFalse($this->manager->checkUserForRealm(19, 1));
     }
 
 }

@@ -68,7 +68,7 @@ class WeathermapManager
 
     public function getMapsWithAccessAndGroups($userId)
     {
-        $statement = $this->pdo->query("select distinct weathermap_maps.*,weathermap_groups.name, weathermap_groups.sortorder as gsort from weathermap_groups,weathermap_auth,weathermap_maps where weathermap_maps.group_id=weathermap_groups.id and weathermap_maps.id=weathermap_auth.mapid and active='on' and (userid=? or userid=0) order by gsort, sortorder");
+        $statement = $this->pdo->query("SELECT DISTINCT weathermap_maps.*,weathermap_groups.name, weathermap_groups.sortorder AS gsort FROM weathermap_groups,weathermap_auth,weathermap_maps WHERE weathermap_maps.group_id=weathermap_groups.id AND weathermap_maps.id=weathermap_auth.mapid AND active='on' AND (userid=? OR userid=0) ORDER BY gsort, sortorder");
         $statement->execute(array($userId));
         $maps = $statement->fetchAll(PDO::FETCH_OBJ);
 
@@ -85,7 +85,7 @@ class WeathermapManager
 
     public function getMapTotalCount()
     {
-        $statement = $this->pdo->query("select count(*) as total from weathermap_maps");
+        $statement = $this->pdo->query("SELECT count(*) AS total FROM weathermap_maps");
         $statement->execute();
         $total_map_count = $statement->fetchColumn();
 
@@ -150,12 +150,11 @@ class WeathermapManager
 
     public function getTabs($userId)
     {
-        $statement = $this->pdo->prepare("select DISTINCTROW weathermap_maps.group_id as id, weathermap_groups.name as group_name from weathermap_auth,weathermap_maps, weathermap_groups where weathermap_groups.id=weathermap_maps.group_id and weathermap_maps.id=weathermap_auth.mapid and active='on' and (userid=? or userid=0) order by weathermap_groups.sortorder");
+        $statement = $this->pdo->prepare("SELECT DISTINCTROW weathermap_maps.group_id AS id, weathermap_groups.name AS group_name FROM weathermap_auth,weathermap_maps, weathermap_groups WHERE weathermap_groups.id=weathermap_maps.group_id AND weathermap_maps.id=weathermap_auth.mapid AND active='on' AND (userid=? OR userid=0) ORDER BY weathermap_groups.sortorder");
         $statement->execute(array($userId));
         $maps = $statement->fetchAll(PDO::FETCH_ASSOC);
 
-        foreach ($maps as $map)
-        {
+        foreach ($maps as $map) {
             $tabs[$map['id']] = $map['group_name'];
         }
 
@@ -406,7 +405,7 @@ class WeathermapManager
         return $setting;
     }
 
-    public function getMapSettingCount($mapId, $groupId=null)
+    public function getMapSettingCount($mapId, $groupId = null)
     {
         if (is_null($groupId)) {
             $statement = $this->pdo->prepare("SELECT count(*) FROM weathermap_settings WHERE mapid=?");
@@ -454,21 +453,26 @@ class WeathermapManager
 
     function extractMapTitle($filename)
     {
-        $title = "(no title)";
-        $fd = fopen($filename, "r");
-        while (!feof($fd)) {
-            $buffer = fgets($fd, 4096);
-            if (preg_match('/^\s*TITLE\s+(.*)/i', $buffer, $matches)) {
-                $title = $matches[1];
+        $title = "(no file)";
+
+        if (file_exists($filename)) {
+            $title = "(no title)";
+
+            $fd = fopen($filename, "r");
+            while (!feof($fd)) {
+                $buffer = fgets($fd, 4096);
+                if (preg_match('/^\s*TITLE\s+(.*)/i', $buffer, $matches)) {
+                    $title = $matches[1];
+                }
+                // this regexp is tweaked from the ReadConfig version, to only match TITLEPOS lines *with* a title appended
+                if (preg_match('/^\s*TITLEPOS\s+\d+\s+\d+\s+(.+)/i', $buffer, $matches)) {
+                    $title = $matches[1];
+                }
+                // strip out any DOS line endings that got through
+                $title = str_replace("\r", "", $title);
             }
-            // this regexp is tweaked from the ReadConfig version, to only match TITLEPOS lines *with* a title appended
-            if (preg_match('/^\s*TITLEPOS\s+\d+\s+\d+\s+(.+)/i', $buffer, $matches)) {
-                $title = $matches[1];
-            }
-            // strip out any DOS line endings that got through
-            $title = str_replace("\r", "", $title);
+            fclose($fd);
         }
-        fclose($fd);
 
         return $title;
     }
@@ -518,10 +522,10 @@ class WeathermapManager
 
     public function translateFileHash($id_or_filename)
     {
-        $SQL = "select id from weathermap_maps where configfile=? or filehash=?";
+        $SQL = "SELECT id FROM weathermap_maps WHERE configfile=? OR filehash=?";
         $map = db_fetch_assoc($SQL);
 
-        $statement = $this->pdo->prepare("select id from weathermap_maps where configfile=? or filehash=?");
+        $statement = $this->pdo->prepare("SELECT id FROM weathermap_maps WHERE configfile=? OR filehash=?");
         $statement->execute(array($id_or_filename, $id_or_filename));
 
         $result = $statement->fetchColumn();
@@ -558,7 +562,7 @@ class WeathermapManager
         $statement->execute(array($name));
     }
 
-    public function getUserList($include_anyone=false)
+    public function getUserList($include_anyone = false)
     {
         $statement = $this->pdo->query("SELECT id, username, full_name, enabled FROM user_auth");
         $statement->execute();
@@ -583,7 +587,7 @@ class WeathermapManager
 
     public function checkUserForRealm($userId, $realmId)
     {
-        $statement = $this->pdo->prepare("select user_auth_realm.realm_id from user_auth_realm where user_auth_realm.user_id=? and user_auth_realm.realm_id=?");
+        $statement = $this->pdo->prepare("SELECT user_auth_realm.realm_id FROM user_auth_realm WHERE user_auth_realm.user_id=? AND user_auth_realm.realm_id=?");
         $statement->execute(array($userId, $realmId));
         $userlist = $statement->fetchAll(PDO::FETCH_OBJ);
 

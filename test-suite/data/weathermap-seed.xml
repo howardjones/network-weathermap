@@ -408,5 +408,176 @@
                 <field name="value"></field>
             </row>
         </table_data>
+
+        <table_structure name="user_auth">
+            <field Field="id" Type="mediumint(8) unsigned" Null="NO" Key="PRI" Extra="auto_increment" Comment="" />
+            <field Field="username" Type="varchar(50)" Null="NO" Key="MUL" Default="0" Extra="" Comment="" />
+            <field Field="password" Type="varchar(50)" Null="NO" Key="" Default="0" Extra="" Comment="" />
+            <field Field="realm" Type="mediumint(8)" Null="NO" Key="MUL" Default="0" Extra="" Comment="" />
+            <field Field="full_name" Type="varchar(100)" Null="YES" Key="" Default="0" Extra="" Comment="" />
+            <field Field="must_change_password" Type="char(2)" Null="YES" Key="" Extra="" Comment="" />
+            <field Field="show_tree" Type="char(2)" Null="YES" Key="" Default="on" Extra="" Comment="" />
+            <field Field="show_list" Type="char(2)" Null="YES" Key="" Default="on" Extra="" Comment="" />
+            <field Field="show_preview" Type="char(2)" Null="NO" Key="" Default="on" Extra="" Comment="" />
+            <field Field="graph_settings" Type="char(2)" Null="YES" Key="" Extra="" Comment="" />
+            <field Field="login_opts" Type="tinyint(1)" Null="NO" Key="" Default="1" Extra="" Comment="" />
+            <field Field="policy_graphs" Type="tinyint(1) unsigned" Null="NO" Key="" Default="1" Extra="" Comment="" />
+            <field Field="policy_trees" Type="tinyint(1) unsigned" Null="NO" Key="" Default="1" Extra="" Comment="" />
+            <field Field="policy_hosts" Type="tinyint(1) unsigned" Null="NO" Key="" Default="1" Extra="" Comment="" />
+            <field Field="policy_graph_templates" Type="tinyint(1) unsigned" Null="NO" Key="" Default="1" Extra="" Comment="" />
+            <field Field="enabled" Type="char(2)" Null="NO" Key="MUL" Default="on" Extra="" Comment="" />
+            <key Table="user_auth" Non_unique="0" Key_name="PRIMARY" Seq_in_index="1" Column_name="id" Collation="A" Cardinality="2" Null="" Index_type="BTREE" Comment="" Index_comment="" />
+            <key Table="user_auth" Non_unique="1" Key_name="username" Seq_in_index="1" Column_name="username" Collation="A" Null="" Index_type="BTREE" Comment="" Index_comment="" />
+            <key Table="user_auth" Non_unique="1" Key_name="realm" Seq_in_index="1" Column_name="realm" Collation="A" Null="" Index_type="BTREE" Comment="" Index_comment="" />
+            <key Table="user_auth" Non_unique="1" Key_name="enabled" Seq_in_index="1" Column_name="enabled" Collation="A" Null="" Index_type="BTREE" Comment="" Index_comment="" />
+            <options Name="user_auth" Engine="MyISAM" Version="10" Row_format="Dynamic" Rows="2" Avg_row_length="72" Data_length="144" Max_data_length="281474976710655" Index_length="5120" Data_free="0" Auto_increment="4" Create_time="2016-05-25 22:51:05" Update_time="2016-05-25 22:52:00" Collation="latin1_swedish_ci" Create_options="" Comment="" />
+        </table_structure>
+        <table_data name="user_auth">
+            <row>
+                <field name="id">1</field>
+                <field name="username">admin</field>
+                <field name="password">f633c61683da283f0cbbac923eca8ea3</field>
+                <field name="realm">0</field>
+                <field name="full_name">Administrator</field>
+                <field name="must_change_password"></field>
+                <field name="show_tree">on</field>
+                <field name="show_list">on</field>
+                <field name="show_preview">on</field>
+                <field name="graph_settings">on</field>
+                <field name="login_opts">1</field>
+                <field name="policy_graphs">1</field>
+                <field name="policy_trees">1</field>
+                <field name="policy_hosts">1</field>
+                <field name="policy_graph_templates">1</field>
+                <field name="enabled">on</field>
+            </row>
+            <row>
+                <field name="id">3</field>
+                <field name="username">guest</field>
+                <field name="password">43e9a4ab75570f5b</field>
+                <field name="realm">0</field>
+                <field name="full_name">Guest Account</field>
+                <field name="must_change_password">on</field>
+                <field name="show_tree">on</field>
+                <field name="show_list">on</field>
+                <field name="show_preview">on</field>
+                <field name="graph_settings">on</field>
+                <field name="login_opts">3</field>
+                <field name="policy_graphs">1</field>
+                <field name="policy_trees">1</field>
+                <field name="policy_hosts">1</field>
+                <field name="policy_graph_templates">1</field>
+                <field name="enabled"></field>
+            </row>
+        </table_data>
+        <table_structure name="user_auth_perms">
+            <field Field="user_id" Type="mediumint(8) unsigned" Null="NO" Key="PRI" Default="0" Extra="" Comment="" />
+            <field Field="item_id" Type="mediumint(8) unsigned" Null="NO" Key="PRI" Default="0" Extra="" Comment="" />
+            <field Field="type" Type="tinyint(2) unsigned" Null="NO" Key="PRI" Default="0" Extra="" Comment="" />
+            <key Table="user_auth_perms" Non_unique="0" Key_name="PRIMARY" Seq_in_index="1" Column_name="user_id" Collation="A" Null="" Index_type="BTREE" Comment="" Index_comment="" />
+            <key Table="user_auth_perms" Non_unique="0" Key_name="PRIMARY" Seq_in_index="2" Column_name="item_id" Collation="A" Null="" Index_type="BTREE" Comment="" Index_comment="" />
+            <key Table="user_auth_perms" Non_unique="0" Key_name="PRIMARY" Seq_in_index="3" Column_name="type" Collation="A" Cardinality="0" Null="" Index_type="BTREE" Comment="" Index_comment="" />
+            <key Table="user_auth_perms" Non_unique="1" Key_name="user_id" Seq_in_index="1" Column_name="user_id" Collation="A" Null="" Index_type="BTREE" Comment="" Index_comment="" />
+            <key Table="user_auth_perms" Non_unique="1" Key_name="user_id" Seq_in_index="2" Column_name="type" Collation="A" Null="" Index_type="BTREE" Comment="" Index_comment="" />
+            <options Name="user_auth_perms" Engine="MyISAM" Version="10" Row_format="Fixed" Rows="0" Avg_row_length="0" Data_length="0" Max_data_length="2251799813685247" Index_length="1024" Data_free="0" Create_time="2016-05-25 22:51:05" Update_time="2016-05-25 22:51:05" Collation="latin1_swedish_ci" Create_options="" Comment="" />
+        </table_structure>
+        <table_data name="user_auth_perms">
+        </table_data>
+        <table_structure name="user_auth_realm">
+            <field Field="realm_id" Type="mediumint(8) unsigned" Null="NO" Key="PRI" Default="0" Extra="" Comment="" />
+            <field Field="user_id" Type="mediumint(8) unsigned" Null="NO" Key="PRI" Default="0" Extra="" Comment="" />
+            <key Table="user_auth_realm" Non_unique="0" Key_name="PRIMARY" Seq_in_index="1" Column_name="realm_id" Collation="A" Null="" Index_type="BTREE" Comment="" Index_comment="" />
+            <key Table="user_auth_realm" Non_unique="0" Key_name="PRIMARY" Seq_in_index="2" Column_name="user_id" Collation="A" Cardinality="21" Null="" Index_type="BTREE" Comment="" Index_comment="" />
+            <key Table="user_auth_realm" Non_unique="1" Key_name="user_id" Seq_in_index="1" Column_name="user_id" Collation="A" Null="" Index_type="BTREE" Comment="" Index_comment="" />
+            <options Name="user_auth_realm" Engine="MyISAM" Version="10" Row_format="Fixed" Rows="21" Avg_row_length="7" Data_length="147" Max_data_length="1970324836974591" Index_length="3072" Data_free="0" Create_time="2016-05-25 22:51:05" Update_time="2016-06-21 15:48:33" Collation="latin1_swedish_ci" Create_options="" Comment="" />
+        </table_structure>
+        <table_data name="user_auth_realm">
+            <row>
+                <field name="realm_id">1</field>
+                <field name="user_id">1</field>
+            </row>
+            <row>
+                <field name="realm_id">2</field>
+                <field name="user_id">1</field>
+            </row>
+            <row>
+                <field name="realm_id">3</field>
+                <field name="user_id">1</field>
+            </row>
+            <row>
+                <field name="realm_id">4</field>
+                <field name="user_id">1</field>
+            </row>
+            <row>
+                <field name="realm_id">5</field>
+                <field name="user_id">1</field>
+            </row>
+            <row>
+                <field name="realm_id">7</field>
+                <field name="user_id">1</field>
+            </row>
+            <row>
+                <field name="realm_id">7</field>
+                <field name="user_id">3</field>
+            </row>
+            <row>
+                <field name="realm_id">8</field>
+                <field name="user_id">1</field>
+            </row>
+            <row>
+                <field name="realm_id">9</field>
+                <field name="user_id">1</field>
+            </row>
+            <row>
+                <field name="realm_id">10</field>
+                <field name="user_id">1</field>
+            </row>
+            <row>
+                <field name="realm_id">11</field>
+                <field name="user_id">1</field>
+            </row>
+            <row>
+                <field name="realm_id">12</field>
+                <field name="user_id">1</field>
+            </row>
+            <row>
+                <field name="realm_id">13</field>
+                <field name="user_id">1</field>
+            </row>
+            <row>
+                <field name="realm_id">14</field>
+                <field name="user_id">1</field>
+            </row>
+            <row>
+                <field name="realm_id">15</field>
+                <field name="user_id">1</field>
+            </row>
+            <row>
+                <field name="realm_id">16</field>
+                <field name="user_id">1</field>
+            </row>
+            <row>
+                <field name="realm_id">17</field>
+                <field name="user_id">1</field>
+            </row>
+            <row>
+                <field name="realm_id">101</field>
+                <field name="user_id">1</field>
+            </row>
+            <row>
+                <field name="realm_id">104</field>
+                <field name="user_id">1</field>
+            </row>
+            <row>
+                <field name="realm_id">105</field>
+                <field name="user_id">1</field>
+            </row>
+            <row>
+                <field name="realm_id">106</field>
+                <field name="user_id">1</field>
+            </row>
+        </table_data>
+
+
     </database>
 </mysqldump>

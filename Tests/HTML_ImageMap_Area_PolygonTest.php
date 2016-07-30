@@ -71,4 +71,3 @@ class HTML_ImageMap_Area_PolygonTest extends PHPUnit_Framework_TestCase {
         );
     }
 }
-?>

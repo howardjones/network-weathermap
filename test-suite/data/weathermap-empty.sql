@@ -39,7 +39,7 @@ CREATE TABLE `weathermap_maps` (
   `schedule` varchar(32) NOT NULL DEFAULT '*',
   `archiving` set('on','off') NOT NULL DEFAULT 'off',
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM AUTO_INCREMENT=11 DEFAULT CHARSET=latin1;
+) ENGINE=MyISAM AUTO_INCREMENT=12 DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -154,6 +154,37 @@ CREATE TABLE `user_auth` (
   KEY `enabled` (`enabled`)
 ) ENGINE=MyISAM AUTO_INCREMENT=4 DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `user_auth_perms`
+--
+
+DROP TABLE IF EXISTS `user_auth_perms`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `user_auth_perms` (
+  `user_id` mediumint(8) unsigned NOT NULL DEFAULT '0',
+  `item_id` mediumint(8) unsigned NOT NULL DEFAULT '0',
+  `type` tinyint(2) unsigned NOT NULL DEFAULT '0',
+  PRIMARY KEY (`user_id`,`item_id`,`type`),
+  KEY `user_id` (`user_id`,`type`)
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `user_auth_realm`
+--
+
+DROP TABLE IF EXISTS `user_auth_realm`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `user_auth_realm` (
+  `realm_id` mediumint(8) unsigned NOT NULL DEFAULT '0',
+  `user_id` mediumint(8) unsigned NOT NULL DEFAULT '0',
+  PRIMARY KEY (`realm_id`,`user_id`),
+  KEY `user_id` (`user_id`)
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
@@ -164,4 +195,4 @@ CREATE TABLE `user_auth` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2016-07-01 21:26:58
+-- Dump completed on 2016-07-30 14:33:36

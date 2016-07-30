@@ -41,3 +41,7 @@ https://github.com/howardjones/network-weathermap/blob/f2f636190baf3767d376074e9
 
 * string drawing doesn't understand WMFont 
 
+
+
+/Applications/XAMPP/bin/mysqldump --no-data -u root --password= cacti weathermap_maps weathermap_data weathermap_auth weathermap_groups weathermap_settings settings user_auth user_auth_perms user_auth_realm > test-suite/data/weathermap-empty.sql
+/Applications/XAMPP/bin/mysqldump --xml  -u root --password= cacti weathermap_maps weathermap_data weathermap_auth weathermap_groups weathermap_settings settings user_auth > file.xml

@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<phpunit colors="true"
+         stopOnFailure="false"
+         convertErrorsToExceptions="true"
+         convertNoticesToExceptions="true"
+         convertWarningsToExceptions="true">
+    <php>
+        <var name="DB_DSN" value="mysql:dbname=weathermaptest;host=127.0.0.1"/>
+        <var name="DB_USER" value="weathermaptest"/>
+        <var name="DB_PASSWD" value="weathermaptest"/>
+        <var name="DB_DBNAME" value="weathermaptest"/>
+    </php>
+
+    <testsuites>
+        <testsuite name="Weathermap Test Suite">
+            <directory>../Tests/</directory>
+            <exclude>../Tests/ConfigTest.php</exclude>
+        </testsuite>
+    </testsuites>
+
+    <filter>
+        <whitelist>
+            <directory>../</directory>
+            <exclude>
+                <directory>../Tests</directory>
+                <directory>../phpcallgraph-0.8.0</directory>
+                <directory>../cacti-0.8.8c</directory>
+                <directory>../editcache</directory>
+                <directory>../images</directory>
+                <directory>../vendor</directory>
+                <directory>../docs</directory>
+                <directory>../dist</directory>
+                <directory>../output</directory>
+                <directory>../edit-cache</directory>
+                <directory>../build</directory>
+                <directory>../test-suite</directory>
+            </exclude>
+        </whitelist>
+    </filter>
+
+    <php>
+        <ini name="memory_limit" value="2048M"/>
+        <ini name="xdebug.max_nesting_level" value="500"/>
+    </php>
+
+    <logging>
+        <!--<log type="coverage-html" target="coverage" />-->
+        <log type="coverage-xml" target="coverage/xml"/>
+        <log type="coverage-clover" target="logs/clover.xml"/>
+        <log type="coverage-crap4j" target="logs/crap4j.xml"/>
+        <log type="junit" target="logs/junit.xml" logIncompleteSkipped="false"/>
+    </logging>
+
+</phpunit>

@@ -780,10 +780,10 @@ function weathermap_map_settings($id)
         if (sizeof($settingrows) > 0) {
             foreach ($settingrows as $setting) {
                 form_alternate_row_color($colors["alternate"], $colors["light"], $n);
-                print '<td><a href="?action=map_settings_form&mapid=' . $id . '&id=' . intval($setting['id']) . '"><img src="../../images/graph_properties.gif" width="16" height="16" border="0" alt="Edit this definition">Edit</a></td>';
-                print "<td>" . htmlspecialchars($setting['optname']) . "</td>";
-                print "<td>" . htmlspecialchars($setting['optvalue']) . "</td>";
-                print '<td><a href="?action=map_settings_delete&mapid=' . $id . '&id=' . intval($setting['id']) . '"><img src="../../images/delete_icon_large.gif" width="12" height="12" border="0" alt="Remove this definition from this map"></a></td>';
+                print '<td><a href="?action=map_settings_form&mapid=' . $id . '&id=' . intval($setting->id) . '"><img src="../../images/graph_properties.gif" width="16" height="16" border="0" alt="Edit this definition">Edit</a></td>';
+                print "<td>" . htmlspecialchars($setting->optname) . "</td>";
+                print "<td>" . htmlspecialchars($setting->optvalue) . "</td>";
+                print '<td><a href="?action=map_settings_delete&mapid=' . $id . '&id=' . intval($setting->id) . '"><img src="../../images/delete_icon_large.gif" width="12" height="12" border="0" alt="Remove this definition from this map"></a></td>';
                 print "</tr>";
                 $n++;
             }

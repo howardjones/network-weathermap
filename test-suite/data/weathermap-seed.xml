@@ -155,7 +155,7 @@
         <table_structure name="weathermap_auth">
             <field Field="userid" Type="mediumint(9)" Null="NO" Key="" Default="0" Extra="" Comment=""/>
             <field Field="mapid" Type="int(11)" Null="NO" Key="" Default="0" Extra="" Comment=""/>
-            <options Name="weathermap_auth" Engine="MyISAM" Version="10" Row_format="Fixed" Rows="6" Avg_row_length="8"
+            <options Name="weathermap_auth" Engine="MyISAM" Version="10" Row_format="Fixed" Rows="7" Avg_row_length="8"
                      Data_length="48" Max_data_length="2251799813685247" Index_length="1024" Data_free="0"
                      Create_time="2016-05-25 22:53:22" Update_time="2016-06-21 16:04:01" Collation="latin1_swedish_ci"
                      Create_options="" Comment=""/>
@@ -183,6 +183,10 @@
             </row>
             <row>
                 <field name="userid">1</field>
+                <field name="mapid">7</field>
+            </row>
+            <row>
+                <field name="userid">2</field>
                 <field name="mapid">7</field>
             </row>
         </table_data>

@@ -4,6 +4,22 @@ $PAGE_TITLE = "Changes for this version";
 include "common-page-head.php";
 ?>
 
+    <h2 id="changes098a">Changes For This Version (0.98 to 0.98a)</h2>
+
+<h3>Fixes</h3>
+    <ul>
+        <li>PHP 5.3 bug introduced in 0.98 for command line tool</li>
+    </ul>
+<h3>Changes</h3>
+    <ul>
+        <li>Replaced configuration</li>
+    </ul>
+<h3>New Features</h3>
+    <ul>
+        <li></li>
+    </ul>
+
+
     <h2 id="changes098">Changes For This Version (0.97c to 0.98)</h2>
 
     <p>This is a roll-up of all the small bugfixes for the last couple of years, especially those that stop Weathermap

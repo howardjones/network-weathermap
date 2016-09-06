@@ -483,7 +483,8 @@ function maplist()
 
             print '<td>';
 
-            $userlist = $manager->getMapAuthUsers($map->id);
+            $userlist = $manager->
+            getMapAuthUsers($map->id);
             $mapusers = array();
             foreach ($userlist as $user) {
                 if (array_key_exists($user->userid, $users)) {

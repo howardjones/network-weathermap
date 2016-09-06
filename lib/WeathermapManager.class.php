@@ -110,6 +110,15 @@ class WeathermapManager
         return $maps;
     }
 
+    public function getMapRunList()
+    {
+        $statement = $this->pdo->query("select m.*, g.name as groupname from weathermap_maps m,weathermap_groups g where m.group_id=g.id and active='on' order by sortorder,id");
+        $statement->execute();
+        $maps = $statement->fetchAll(PDO::FETCH_OBJ);
+
+        return $maps;
+    }
+
     public function getMapsForUser($userId, $groupId = null)
     {
         if (is_null($groupId)) {
@@ -154,6 +163,7 @@ class WeathermapManager
         $statement->execute(array($userId));
         $maps = $statement->fetchAll(PDO::FETCH_ASSOC);
 
+        $tabs = array();
         foreach ($maps as $map) {
             $tabs[$map['id']] = $map['group_name'];
         }
@@ -163,7 +173,7 @@ class WeathermapManager
 
     public function updateMap($mapId, $data)
     {
-        $allowed = array("active", "sortorder", "group_id"); // allowed fields
+        $allowed = array("active", "sortorder", "group_id", "thumb_width", "thumb_height", "titlecache"); // allowed fields
         list($set, $values) = $this->make_set($data, $allowed);
 
         $values['id'] = $mapId;
@@ -314,17 +324,17 @@ class WeathermapManager
         if ($mapId > 0) {
             // map setting
             $data = array("id" => $mapId, "name" => $name, "value" => $value);
-            $statement = $this->pdo->prepare("REPLACE INTO weathermap_settings (mapid, optname, optvalue) VALUES (:id, :name, :value)");
+            $statement = $this->pdo->prepare("INSERT INTO weathermap_settings (mapid, optname, optvalue) VALUES (:id, :name, :value)");
             $statement->execute($data);
         } elseif ($mapId < 0) {
             // group setting
             $data = array("groupid" => -$mapId, "name" => $name, "value" => $value);
-            $statement = $this->pdo->prepare("REPLACE INTO weathermap_settings (mapid, groupid, optname, optvalue) VALUES (0, :groupid,  :name, :value)");
+            $statement = $this->pdo->prepare("INSERT INTO weathermap_settings (mapid, groupid, optname, optvalue) VALUES (0, :groupid,  :name, :value)");
             $statement->execute($data);
         } else {
             // Global setting
             $data = array("name" => $name, "value" => $value);
-            $statement = $this->pdo->prepare("REPLACE INTO weathermap_settings (mapid, groupid, optname, optvalue) VALUES (0, 0,  :name, :value)");
+            $statement = $this->pdo->prepare("INSERT INTO weathermap_settings (mapid, groupid, optname, optvalue) VALUES (0, 0,  :name, :value)");
             $statement->execute($data);
         }
     }
@@ -350,15 +360,27 @@ class WeathermapManager
         ));
     }
 
+    // This isn't actually used anywhere...
     public function getAllMapSettings($mapId)
     {
         $map = $this->getMap($mapId);
-
+        $result = array();
         $s1 = $this->getMapSettings(0);
         $s2 = $this->getMapSettings(-$map->group_id);
         $s3 = $this->getMapSettings($mapId);
 
-        // TODO combine all of these, overwriting earlier keys
+        foreach (array($s1, $s2, $s3) as $s) {
+            foreach ($s as $setting) {
+                $result[$setting->optname] = $setting;
+            }
+        }
+
+        $out = new stdClass();
+        foreach ($result as $k=>$v) {
+            $out->$k = $v;
+        }
+
+        return $out;
     }
 
     public function getMapSettings($mapId)
@@ -410,7 +432,6 @@ class WeathermapManager
         if (is_null($groupId)) {
             $statement = $this->pdo->prepare("SELECT count(*) FROM weathermap_settings WHERE mapid=?");
             $statement->execute(array($mapId));
-
         } else {
             $statement = $this->pdo->prepare("SELECT count(*) FROM weathermap_settings WHERE mapid=? AND groupid=?");
             $statement->execute(array($mapId, $groupId));
@@ -488,7 +509,7 @@ class WeathermapManager
 
         if ($fileDirectory != $this->configDirectory) {
             // someone is trying to read arbitrary files?
-            throw new Exception("Path mismatch");
+            throw new Exception("Path mismatch - $fileDirectory != " . $this->configDirectory);
         } else {
             $realfile = $this->configDirectory . DIRECTORY_SEPARATOR . $mapFilename;
             $title = $this->extractMapTitle($realfile);
@@ -522,9 +543,6 @@ class WeathermapManager
 
     public function translateFileHash($id_or_filename)
     {
-        $SQL = "SELECT id FROM weathermap_maps WHERE configfile=? OR filehash=?";
-        $map = db_fetch_assoc($SQL);
-
         $statement = $this->pdo->prepare("SELECT id FROM weathermap_maps WHERE configfile=? OR filehash=?");
         $statement->execute(array($id_or_filename, $id_or_filename));
 

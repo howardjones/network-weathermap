@@ -170,7 +170,7 @@ function weathermap_run_maps($mydir)
 									if (is_array($settingrows) && count($settingrows) > 0) {
 										foreach ($settingrows as $setting) {
 											wm_debug("Setting additional ($settingType) option: " . $setting->optname . " to '" . $setting->optvalue . "'\n");
-											$wmap->add_hint($setting['optname'], $setting['optvalue']);
+											$wmap->add_hint($setting->optname, $setting->optvalue);
 
 											if (substr($setting->optname, 0, 7) == 'nowarn_') {
 												$code = strtoupper(substr($setting->optname, 7));

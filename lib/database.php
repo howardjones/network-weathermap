@@ -18,11 +18,12 @@ function weathermap_get_pdo()
     $user = $database_username;
     $pass = $database_password;
 
+    $pdo = NULL;
+
     try {
         # MySQL with PDO_MYSQL
         $pdo = new PDO("mysql:host=$host;dbname=$dbname", $user, $pass);
         $pdo->setAttribute( PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION );
-
     }
     catch(PDOException $e) {
         echo $e->getMessage();

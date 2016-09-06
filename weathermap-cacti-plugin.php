@@ -582,11 +582,11 @@ function weathermap_mapselector($current_id = 0)
 		$lastgroup = "------lasdjflkjsdlfkjlksdjflksjdflkjsldjlkjsd";
 		foreach ($maps as $map)
 		{
-			if ($current_id == $map['id']) $nullhash = $map['filehash'];
-			if ($map['name'] != $lastgroup)
+			if ($current_id == $map->id) $nullhash = $map->filehash;
+			if ($map->name != $lastgroup)
 			{
 				$ngroups++;
-				$lastgroup = $map['name'];
+				$lastgroup = $map->name;
 			}
 		}
 

@@ -63,7 +63,7 @@ class WeathermapManager
 
     public function getMapWithAccess($userId, $mapId)
     {
-        $statement = $this->pdo->query("SELECT weathermap_maps.* FROM weathermap_auth,weathermap_maps WHERE weathermap_maps.id=weathermap_auth.mapid AND active='on' AND (userid=? OR userid=0) AND weathermap_maps.id=?");
+        $statement = $this->pdo->prepare("SELECT weathermap_maps.* FROM weathermap_auth,weathermap_maps WHERE weathermap_maps.id=weathermap_auth.mapid AND active='on' AND (userid=? OR userid=0) AND weathermap_maps.id=?");
         $statement->execute(array($userId, $mapId));
         $maps = $statement->fetchAll(PDO::FETCH_OBJ);
 
@@ -72,7 +72,7 @@ class WeathermapManager
 
     public function getMapsWithAccessAndGroups($userId)
     {
-        $statement = $this->pdo->query("SELECT DISTINCT weathermap_maps.*,weathermap_groups.name, weathermap_groups.sortorder AS gsort FROM weathermap_groups,weathermap_auth,weathermap_maps WHERE weathermap_maps.group_id=weathermap_groups.id AND weathermap_maps.id=weathermap_auth.mapid AND active='on' AND (userid=? OR userid=0) ORDER BY gsort, sortorder");
+        $statement = $this->pdo->prepare("SELECT DISTINCT weathermap_maps.*,weathermap_groups.name, weathermap_groups.sortorder AS gsort FROM weathermap_groups,weathermap_auth,weathermap_maps WHERE weathermap_maps.group_id=weathermap_groups.id AND weathermap_maps.id=weathermap_auth.mapid AND active='on' AND (userid=? OR userid=0) ORDER BY gsort, sortorder");
         $statement->execute(array($userId));
         $maps = $statement->fetchAll(PDO::FETCH_OBJ);
 
@@ -98,7 +98,7 @@ class WeathermapManager
 
     public function getMapsInGroup($groupId)
     {
-        $statement = $this->pdo->query("SELECT * FROM weathermap_maps WHERE group_id=? ORDER BY sortorder");
+        $statement = $this->pdo->prepare("SELECT * FROM weathermap_maps WHERE group_id=? ORDER BY sortorder");
         $statement->execute(array($groupId));
         $maps = $statement->fetchAll(PDO::FETCH_OBJ);
 

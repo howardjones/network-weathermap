@@ -277,7 +277,7 @@ function weathermap_setup_table()
         }
 
         $database_updates = array();
-        $database_updates[] = "UPDATE weathermap_maps SET sortorder=id WHERE sortorder IS NULL;";
+        # $database_updates[] = "UPDATE weathermap_maps SET sortorder=id WHERE sortorder IS NULL;";
 
         if (!in_array('weathermap_maps', $tables)) {
             $database_updates[] = "CREATE TABLE weathermap_maps (

@@ -1,4 +1,5 @@
 <?php
+
 // PHP Weathermap 0.98
 // Copyright Howard Jones, 2005-2016 howie@thingy.com
 // http://www.network-weathermap.com/
@@ -18,8 +19,8 @@ $weathermap_warncount=0;
 $weathemap_lazycounter=0;
 
 // Dummy array for some future code
-$WM_config_keywords2 = array ();
-
+// $WM_config_keywords2 = array ();
+ 
 // don't produce debug output for these functions
 $weathermap_debug_suppress = array (
     'processstring',
@@ -29,9 +30,9 @@ $weathermap_debug_suppress = array (
 // don't output warnings/errors for these codes (WMxxx)
 $weathermap_error_suppress = array();
 
-// Turn on ALL error reporting for now.
+// Turn on ALL error reporting for now (this stops PEAR Console_Getopt from working).
 // error_reporting (E_ALL|E_STRICT);
-error_reporting (E_ALL);
+error_reporting (E_ALL^E_STRICT);
 
 // parameterise the in/out stuff a bit
 define("IN",0);
@@ -2602,6 +2603,9 @@ function DrawTitle($im, $font, $colour)
 		$last_seen = 'GLOBAL';
 		$filename = '';
 		$objectlinecount = 0;
+
+		wm_warn("Keywords: ".sizeof($WM_config_keywords2));
+
 		// check if $input is more than one line. if it is, it's a text of a config file
 		// if it isn't, it's the filename
 		$lines = array ();

@@ -6,7 +6,7 @@
 
 require_once "HTML_ImageMap.class.php";
 
-class WeatherMapLink extends WeatherMapItem
+class WeatherMapLink extends WeatherMapDataItem
 {
 	var $owner,                $name;
 	var $id;
@@ -54,7 +54,75 @@ class WeatherMapLink extends WeatherMapItem
 	var $commentoffset_in, $commentoffset_out;
 	var $template;
 
-	function WeatherMapLink() { $this->inherit_fieldlist=array
+    function __construct($name, $template, $owner)
+    {
+        parent::__construct();
+
+        $this->name = $name;
+        $this->owner = $owner;
+        $this->template = $template;
+
+        $this->inherit_fieldlist=array(
+            'my_default' => null,
+            'width' => 7,
+            'commentfont' => 1,
+            'bwfont' => 2,
+            'template' => ':: DEFAULT ::',
+            'splitpos'=>50,
+            'labeloffset_out' => 25,
+            'labeloffset_in' => 75,
+            'commentoffset_out' => 5,
+            'commentoffset_in' => 95,
+            'commentstyle' => 'edge',
+            'arrowstyle' => 'classic',
+            'viastyle' => 'curved',
+            'usescale' => 'DEFAULT',
+            'scaletype' => 'percent',
+            'targets' => array(),
+            'duplex' => 'full',
+            'infourl' => array('',''),
+            'notes' => array(),
+            'hints' => array(),
+            'comments' => array('',''),
+            'bwlabelformats' => array(FMT_PERC_IN,FMT_PERC_OUT),
+            'overliburl' => array(array(),array()),
+            'notestext' => array(IN=>'',OUT=>''),
+            'labelstyle' => 'percent',
+            'labelboxstyle' => 'classic',
+            'linkstyle' => 'twoway',
+            'overlibwidth' => 0,
+            'overlibheight' => 0,
+            'outlinecolour' => new WMColour(0, 0, 0),
+            'bwoutlinecolour' => new WMColour(0, 0, 0),
+            'bwfontcolour' => new WMColour(0, 0, 0),
+            'bwboxcolour' => new WMColour(255, 255, 255),
+            'commentfontcolour' => new WMColour(192, 192, 192),
+            'inpercent'=>0,
+            'outpercent'=>0,
+            'inscalekey'=>'',
+            'outscalekey'=>'',
+            'a_offset' => 'C',
+            'b_offset' => 'C',
+            'a_offset_dx' => 0,
+            'a_offset_dy' => 0,
+            'b_offset_dx' => 0,
+            'b_offset_dy' => 0,
+            'a_offset_resolved' => false,
+            'b_offset_resolved' => false,
+            'zorder' => 300,
+            'overlibcaption' => array('', ''),
+            'max_bandwidth_in' => 100000000,
+            'max_bandwidth_out' => 100000000,
+            'bandwidth_in' => 0,
+            'bandwidth_out' => 0,
+            'max_bandwidth_in_cfg' => '100M',
+            'max_bandwidth_out_cfg' => '100M'
+        );
+
+        $this->reset($owner);
+    }
+
+	function __WeatherMapLink() { $this->inherit_fieldlist=array
 		(
 			'my_default' => NULL,
 			'width' => 7,
@@ -109,7 +177,7 @@ class WeatherMapLink extends WeatherMapItem
 	//  $this->targets = array();
 	}
 
-	function Reset(&$newowner)
+	function _Reset(&$newowner)
 	{
 		$this->owner=$newowner;
 		
@@ -140,7 +208,27 @@ class WeatherMapLink extends WeatherMapItem
 
 	function my_type() {  return "LINK"; }
 
-	function CopyFrom(&$source)
+	function getTemplateObject()
+    {
+        return $this->owner->getLink($this->template);
+    }
+
+    function isTemplate()
+    {
+        return !isset($this->a);
+    }
+
+
+    private function getDirectionList()
+    {
+        if ($this->linkstyle == "oneway") {
+            return array(OUT);
+        }
+
+        return array(IN, OUT);
+    }
+
+    function CopyFrom(&$source)
 	{
 		wm_debug("Initialising LINK $this->name from $source->name\n");
 		assert('is_object($source)');

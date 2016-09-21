@@ -39,47 +39,49 @@ function wm_module_checks()
 
 function wm_debug($string)
 {
-	global $weathermap_debugging;
-	global $weathermap_map;
-	global $weathermap_debug_suppress;
+    global $weathermap_debugging;
+    global $weathermap_map;
+    global $weathermap_debug_suppress;
 
+    if (func_num_args() > 1) {
+        $args = func_get_args();
+        $string = call_user_func_array('sprintf', $args);
+    }
 
-	if ($weathermap_debugging)
-	{
-		$calling_fn = "";
-		if(function_exists("debug_backtrace"))
-		{
-			$bt = debug_backtrace();
-			$index = 1;
-		# 	$class = (isset($bt[$index]['class']) ? $bt[$index]['class'] : '');
-        		$function = (isset($bt[$index]['function']) ? $bt[$index]['function'] : '');
-			$index = 0;
-			$file = (isset($bt[$index]['file']) ? basename($bt[$index]['file']) : '');
-        		$line = (isset($bt[$index]['line']) ? $bt[$index]['line'] : '');
+    if ($weathermap_debugging) {
+        $calling_fn = "";
+        if (function_exists("debug_backtrace")) {
+            $bt = debug_backtrace();
+            $index = 1;
+            # 	$class = (isset($bt[$index]['class']) ? $bt[$index]['class'] : '');
+            $function = (isset($bt[$index]['function']) ? $bt[$index]['function'] : '');
+            $index = 0;
+            $file = (isset($bt[$index]['file']) ? basename($bt[$index]['file']) : '');
+            $line = (isset($bt[$index]['line']) ? $bt[$index]['line'] : '');
 
-			$calling_fn = " [$function@$file:$line]";
+            $calling_fn = " [$function@$file:$line]";
 
-			if(is_array($weathermap_debug_suppress) && in_array(strtolower($function),$weathermap_debug_suppress)) return;
-		}
+            if (is_array($weathermap_debug_suppress) && in_array(strtolower($function), $weathermap_debug_suppress)) {
+                return;
+            }
+        }
 
-		// use Cacti's debug log, if we are running from the poller
-		if (function_exists('debug_log_insert') && (!function_exists('show_editor_startpage')))
-		{ cacti_log("DEBUG:$calling_fn " . ($weathermap_map==''?'':$weathermap_map.": ") . rtrim($string), true, "WEATHERMAP"); }
-		else
-		{
-			$stderr=fopen('php://stderr', 'w');
-			fwrite($stderr, "DEBUG:$calling_fn " . ($weathermap_map==''?'':$weathermap_map.": ") . $string);
-			fclose ($stderr);
+        // use Cacti's debug log, if we are running from the poller
+        if (function_exists('debug_log_insert') && (!function_exists('show_editor_startpage'))) {
+            cacti_log("DEBUG:$calling_fn " . ($weathermap_map == '' ? '' : $weathermap_map . ": ") . rtrim($string), true, "WEATHERMAP");
+        } else {
+            $stderr = fopen('php://stderr', 'w');
+            fwrite($stderr, "DEBUG:$calling_fn " . ($weathermap_map == '' ? '' : $weathermap_map . ": ") . $string);
+            fclose($stderr);
 
-			// mostly this is overkill, but it's sometimes useful (mainly in the editor)
-			if(1==0)
-			{
-				$log=fopen('debug.log', 'a');
-				fwrite($log, "DEBUG:$calling_fn " . ($weathermap_map==''?'':$weathermap_map.": ") . $string);
-				fclose ($log);
-			}
-		}
-	}
+            // mostly this is overkill, but it's sometimes useful (mainly in the editor)
+            if (1 == 0) {
+                $log = fopen('debug.log', 'a');
+                fwrite($log, "DEBUG:$calling_fn " . ($weathermap_map == '' ? '' : $weathermap_map . ": ") . $string);
+                fclose($log);
+            }
+        }
+    }
 }
 
 function wm_warn($string,$notice_only=FALSE)
@@ -1692,13 +1694,13 @@ function nice_scalar($number, $kilo = 1000, $decimals=1)
 // ***********************************************
 
 // Skeleton class just to keep strict mode quiet. 
-class WMFont
-{
-	var $type;
-	var $file;
-	var $gdnumber;
-	var $size;
-}
+//class WMFont
+//{
+//	var $type;
+//	var $file;
+//	var $gdnumber;
+//	var $size;
+//}
 
 // we use enough points in various places to make it worth a small class to save some variable-pairs.
 class Point
@@ -2204,7 +2206,7 @@ function draw_spine($im, $spine,$col)
  * pseudocolours.
  *
  */
-class WMColour
+class oldWMColour
 {
 	var $r, $g, $b, $alpha;
 

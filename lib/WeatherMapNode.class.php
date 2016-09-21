@@ -6,7 +6,7 @@
 
 require_once "HTML_ImageMap.class.php";
 
-class WeatherMapNode extends WeatherMapItem
+class WeatherMapNode extends WeatherMapDataItem
 {
 	var $owner;
 	var $id;
@@ -55,8 +55,89 @@ class WeatherMapNode extends WeatherMapItem
 	var $polar;
 	var $boundingboxes=array();
 
-	function WeatherMapNode()
+
+    function __construct($name, $template, $owner)
+    {
+        parent::__construct();
+
+        $this->name = $name;
+        $this->owner = $owner;
+        $this->template = $template;
+
+        $this->width = 0;
+        $this->height = 0;
+        $this->centre_x = 0;
+        $this->centre_y = 0;
+        $this->polar = false;
+        $this->pos_named = false;
+        $this->image = null;
+        $this->drawable = false;
+
+        $this->inherit_fieldlist= array
+        (
+            'boundingboxes' => array(),
+            'my_default' => NULL,
+            'label' => '',
+            'proclabel' => '',
+            'usescale' => 'DEFAULT',
+            'scaletype' => 'percent',
+            'iconscaletype' => 'percent',
+            'useiconscale' => 'none',
+            'scalevar' => 'in',
+            'template' => ':: DEFAULT ::',
+            'iconscalevar' => 'in',
+            'labelfont' => 3,
+            'relative_to' => '',
+            'relative_resolved' => FALSE,
+            'x' => NULL,
+            'y' => NULL,
+            'inscalekey' => '', 'outscalekey' => '',
+            #'incolour'=>-1,'outcolour'=>-1,
+            'original_x' => 0,
+            'original_y' => 0,
+            'inpercent' => 0,
+            'outpercent' => 0,
+            'labelangle' => 0,
+            'iconfile' => '',
+            'iconscalew' => 0,
+            'iconscaleh' => 0,
+            'targets' => array(),
+            'infourl' => array(IN => '', OUT => ''),
+            'notestext' => array(IN => '', OUT => ''),
+            'notes' => array(),
+            'hints' => array(),
+            'overliburl' => array(IN => array(), OUT => array()),
+            'overlibwidth' => 0,
+            'overlibheight' => 0,
+            'overlibcaption' => array(IN => '', OUT => ''),
+            'labeloutlinecolour' => array(0, 0, 0),
+            'labelbgcolour' => array(255, 255, 255),
+            'labelfontcolour' => array(0, 0, 0),
+            'labelfontshadowcolour' => array(-1, -1, -1),
+            'aiconoutlinecolour' => array(0, 0, 0),
+            'aiconfillcolour' => array(-2, -2, -2), // copy from the node label
+            'labeloffset' => '',
+            'labeloffsetx' => 0,
+            'labeloffsety' => 0,
+            'zorder' => 600,
+            'max_bandwidth_in' => 100,
+            'max_bandwidth_out' => 100,
+            'max_bandwidth_in_cfg' => '100',
+            'max_bandwidth_out_cfg' => '100'
+        );
+
+
+        $this->reset($owner);
+    }
+
+    function isTemplate()
+    {
+        return is_null($this->x);
+    }
+
+    function __WeatherMapNode()
 	{
+
 		$this->inherit_fieldlist=array
 			(
 				'boundingboxes'=>array(),
@@ -120,6 +201,19 @@ class WeatherMapNode extends WeatherMapItem
 
 	function my_type() {  return "NODE"; }
 
+
+    public function getPosition()
+    {
+        return new WMPoint($this->x, $this->y);
+    }
+
+    public function setPosition($point)
+    {
+        $this->x = $point->x;
+        $this->y = $point->y;
+        $this->position = $point;
+    }
+
 	// make a mini-image, containing this node and nothing else
 	// figure out where the real NODE centre is, relative to the top-left corner.
 	function pre_render($im, &$map)
@@ -127,7 +221,7 @@ class WeatherMapNode extends WeatherMapItem
 		// don't bother drawing if there's no position - it's a template
 		if( is_null($this->x) ) return;
 		if( is_null($this->y) ) return;
-		
+
 		// apparently, some versions of the gd extension will crash
 		// if we continue...
 		if($this->label == '' && $this->iconfile=='') return;
@@ -157,7 +251,7 @@ class WeatherMapNode extends WeatherMapItem
 				$col = $this->colours[IN];
 
 			}
-			
+
 			if($this->scalevar == 'out')
 			{
 				$pc = $this->outpercent;
@@ -193,13 +287,13 @@ class WeatherMapNode extends WeatherMapItem
 
 			if($this->iconscaletype=='percent')
 			{
-				list($colicon,$node_iconscalekey,$icontag) = 
-					$map->NewColourFromPercent($pc, $this->useiconscale,$this->name );	
+				list($colicon,$node_iconscalekey,$icontag) =
+					$map->NewColourFromPercent($pc, $this->useiconscale,$this->name );
 			}
 			else
 			{
 				// use the absolute value if we aren't doing percentage scales.
-				list($colicon,$node_iconscalekey,$icontag) = 
+				list($colicon,$node_iconscalekey,$icontag) =
 					$map->NewColourFromPercent($val, $this->useiconscale,$this->name, FALSE );
 			}
 		}
@@ -211,11 +305,11 @@ class WeatherMapNode extends WeatherMapItem
 			$padfactor = 1.0;
 
 			$this->proclabel = $map->ProcessString($this->label,$this,TRUE,TRUE);
-			
+
 			// if screenshot_mode is enabled, wipe any letters to X and wipe any IP address to 127.0.0.1
 			// hopefully that will preserve enough information to show cool stuff without leaking info
 			if($map->get_hint('screenshot_mode')==1)  $this->proclabel = screenshotify($this->proclabel);
-			
+
 			list($strwidth, $strheight) = $map->myimagestringsize($this->labelfont, $this->proclabel);
 
 			if($this->labelangle==90 || $this->labelangle==270)
@@ -223,7 +317,7 @@ class WeatherMapNode extends WeatherMapItem
 				$boxwidth = ($strheight * $padfactor) + $padding;
 				$boxheight = ($strwidth * $padfactor) + $padding;
 				wm_debug ("Node->pre_render: ".$this->name." Label Metrics are: $strwidth x $strheight -> $boxwidth x $boxheight\n");
-				
+
 				$label_x1 = $this->x - ($boxwidth / 2);
 				$label_y1 = $this->y - ($boxheight / 2);
 
@@ -241,13 +335,13 @@ class WeatherMapNode extends WeatherMapItem
 					$txt_y = $this->y - ($strwidth / 2);
 				}
 			}
-			
+
 			if($this->labelangle==0 || $this->labelangle==180)
 			{
 				$boxwidth = ($strwidth * $padfactor) + $padding;
 				$boxheight = ($strheight * $padfactor) + $padding;
 				wm_debug ("Node->pre_render: ".$this->name." Label Metrics are: $strwidth x $strheight -> $boxwidth x $boxheight\n");
-							
+
 				$label_x1 = $this->x - ($boxwidth / 2);
 				$label_y1 = $this->y - ($boxheight / 2);
 
@@ -256,7 +350,7 @@ class WeatherMapNode extends WeatherMapItem
 
 				$txt_x = $this->x - ($strwidth / 2);
 				$txt_y = $this->y + ($strheight / 2);
-				
+
 				if($this->labelangle==180)
 				{
 					$txt_x = $this->x + ($strwidth / 2);
@@ -386,75 +480,75 @@ class WeatherMapNode extends WeatherMapItem
 				}
 
 				if($this->iconfile=='nink')
-				{ 
+				{
 					// print "NINK **************************************************************\n";
 					$rx = $this->iconscalew/2-1;
 					$ry = $this->iconscaleh/2-1;
 					$size = $this->iconscalew;
-					$quarter = $size/4;				
-					
+					$quarter = $size/4;
+
 					$col1 = $this->colours[OUT];
 					$col2 = $this->colours[IN];
-					
+
 					assert('!is_null($col1)');
 					assert('!is_null($col2)');
-					
+
 					imagefilledarc($icon_im, $rx-1, $ry, $size, $size, 270,90, $col1->gdallocate($icon_im), IMG_ARC_PIE);
 					imagefilledarc($icon_im, $rx+1, $ry, $size, $size, 90,270, $col2->gdallocate($icon_im), IMG_ARC_PIE);
 
 					imagefilledarc($icon_im, $rx-1, $ry+$quarter, $quarter*2, $quarter*2, 0,360, $col1->gdallocate($icon_im), IMG_ARC_PIE);
 					imagefilledarc($icon_im, $rx+1, $ry-$quarter, $quarter*2, $quarter*2, 0,360, $col2->gdallocate($icon_im), IMG_ARC_PIE);
-					
+
 					if($ink !== NULL && !$ink->is_none())
 					{
 						// XXX - need a font definition from somewhere for NINK text
 						$font = 1;
-						
+
 						$instr = $map->ProcessString("{node:this:bandwidth_in:%.1k}",$this);
 						$outstr = $map->ProcessString("{node:this:bandwidth_out:%.1k}",$this);
-																		
+
 						list($twid,$thgt) = $map->myimagestringsize($font,$instr);
 						$map->myimagestring($icon_im, $font, $rx - $twid/2, $ry- $quarter + ($thgt/2),$instr,$ink->gdallocate($icon_im));
-						
+
 						list($twid,$thgt) = $map->myimagestringsize($font,$outstr);
 						$map->myimagestring($icon_im, $font, $rx - $twid/2,  $ry + $quarter + ($thgt/2),$outstr,$ink->gdallocate($icon_im));
-						
-						imageellipse($icon_im,$rx,$ry,$rx*2,$ry*2,$ink->gdallocate($icon_im) );	
+
+						imageellipse($icon_im,$rx,$ry,$rx*2,$ry*2,$ink->gdallocate($icon_im) );
 						// imagearc($icon_im, $rx,$ry,$quarter*4,$quarter*4, 0,360, $ink->gdallocate($icon_im));
 					}
 					// print "NINK ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n";
 				}
-				
+
 				// XXX - needs proper colours
 				if($this->iconfile=='inpie' || $this->iconfile=='outpie')
-				{ 
+				{
 					# list($colpie,$node_iconscalekey,$icontag) = $map->NewColourFromPercent($pc, $this->useiconscale,$this->name);
-					
+
 					if($this->iconfile=='inpie') $segment_angle = (($this->inpercent)/100) * 360;
 					if($this->iconfile=='outpie') $segment_angle = (($this->outpercent)/100) * 360;
-					
+
 					$rx = $this->iconscalew/2-1;
 					$ry = $this->iconscaleh/2-1;
-										
+
 					if($fill !== NULL && !$fill->is_none() )
 					{
 						imagefilledellipse($icon_im, $rx, $ry, $rx*2, $ry*2, $fill->gdallocate($icon_im) );
 					}
-					
+
 					if($ink !== NULL && !$ink->is_none())
 					{
 						// imagefilledarc  ( resource $image  , int $cx  , int $cy  , int $width  , int $height  , int $start  , int $end  , int $color  , int $style  )
 						imagefilledarc($icon_im, $rx, $ry, $rx*2,$ry*2, 0, $segment_angle, $ink->gdallocate($icon_im) , IMG_ARC_PIE);
 					}
-					
+
 					if($fill !== NULL && !$fill->is_none() )
 					{
 						imageellipse($icon_im, $rx, $ry, $rx*2, $ry*2, $fill->gdallocate($icon_im) );
 					}
-					
-					// warn('inpie AICON not implemented yet [WMWARN99]'); 
+
+					// warn('inpie AICON not implemented yet [WMWARN99]');
 				}
-				
+
 				// if($this->iconfile=='outpie') { warn('outpie AICON not implemented yet [WMWARN99]'); }
 				if($this->iconfile=='gauge') { wm_warn('gauge AICON not implemented yet [WMWARN99]'); }
 
@@ -687,11 +781,11 @@ class WeatherMapNode extends WeatherMapItem
 	{
 		$this->owner=$newowner;
 		$template = $this->template;
-        
+
 		if($template == '') $template = "DEFAULT";
 
 		wm_debug("Resetting $this->name with $template\n");
-		
+
 		// the internal default-default gets it's values from inherit_fieldlist
 		// everything else comes from a node object - the template.
 		if($this->name==':: DEFAULT ::')
@@ -701,14 +795,14 @@ class WeatherMapNode extends WeatherMapItem
 		}
 		else
 		{
-			$this->CopyFrom($this->owner->nodes[$template]); 
+			$this->CopyFrom($this->owner->nodes[$template]);
 		}
 		$this->template = $template;
-		
+
 		// to stop the editor tanking, now that colours are decided earlier in ReadData
 		$this->colours[IN] = new Colour(192,192,192);
 		$this->colours[OUT] = new Colour(192,192,192);
-		
+
 		$this->id = $newowner->next_id++;
 	}
 
@@ -716,7 +810,7 @@ class WeatherMapNode extends WeatherMapItem
 	{
 		wm_debug("Initialising NODE $this->name from $source->name\n");
 		assert('is_object($source)');
-		
+
 		foreach (array_keys($this->inherit_fieldlist)as $fld) {
 			if($fld != 'template') $this->$fld=$source->$fld;
 		}
@@ -725,7 +819,7 @@ class WeatherMapNode extends WeatherMapItem
 	function WriteConfig()
 	{
 		$output='';
-				
+
 		# $output .= "# ID ".$this->id." - first seen in ".$this->defined_in."\n";
 
 		// This allows the editor to wholesale-replace a single node's configuration
@@ -738,9 +832,9 @@ class WeatherMapNode extends WeatherMapItem
 		{
 			# $defdef = $this->owner->defaultnode;
 			$dd = $this->owner->nodes[$this->template];
-			
+
 			wm_debug("Writing config for NODE $this->name against $this->template\n");
-			
+
 			# $field = 'zorder'; $keyword = 'ZORDER';
 			$basic_params = array(
 					# array('template','TEMPLATE',CONFIG_TYPE_LITERAL),
@@ -759,13 +853,13 @@ class WeatherMapNode extends WeatherMapItem
 					array('labelbgcolour','LABELBGCOLOR',CONFIG_TYPE_COLOR),
 					array('labelfontcolour','LABELFONTCOLOR',CONFIG_TYPE_COLOR)
 				);
-			
+
 			# TEMPLATE must come first. DEFAULT
 			if($this->template != 'DEFAULT' && $this->template != ':: DEFAULT ::')
 			{
 				$output.="\tTEMPLATE " . $this->template . "\n";
 			}
-			
+
 			foreach ($basic_params as $param)
 			{
 				$field = $param[0];
@@ -784,7 +878,7 @@ class WeatherMapNode extends WeatherMapItem
 			#$comparison=($this->name == 'DEFAULT'
 			#? $this->inherit_fieldlist['infourl'][IN] : $defdef->infourl[IN]);
 			if ($this->infourl[IN] != $dd->infourl[IN]) { $output.="\tINFOURL " . $this->infourl[IN] . "\n"; }
-			
+
 			#$comparison=($this->name == 'DEFAULT'
 			#? $this->inherit_fieldlist['overlibcaption'][IN] : $defdef->overlibcaption[IN]);
 			if ($this->overlibcaption[IN] != $dd->overlibcaption[IN]) { $output.="\tOVERLIBCAPTION " . $this->overlibcaption[IN] . "\n"; }
@@ -817,17 +911,17 @@ class WeatherMapNode extends WeatherMapItem
 			{
 				$output.="\tTARGET";
 
-				foreach ($this->targets as $target) { 
-					if(strpos($target[4]," ") == FALSE) 
+				foreach ($this->targets as $target) {
+					if(strpos($target[4]," ") == FALSE)
 					{
-						$output.=" " . $target[4]; 
+						$output.=" " . $target[4];
 					}
 					else
 					{
-						$output.=' "' . $target[4].'"'; 
+						$output.=' "' . $target[4].'"';
 					}
 				}
-				
+
 
 				$output.="\n";
 			}
@@ -844,7 +938,7 @@ class WeatherMapNode extends WeatherMapItem
 #				($this->name == 'DEFAULT' ? $this->inherit_fieldlist['iconscalevar'] : $defdef->iconscalevar);
 			$val = $this->useiconscale . " " . $this->iconscalevar;
 			$comparison= $dd->useiconscale . " " . $dd->iconscalevar;
-				
+
 			if ( $val != $comparison) { $output.="\tUSEICONSCALE " .$val . "\n"; }
 
 			#$comparison = ($this->name == 'DEFAULT'
@@ -855,11 +949,11 @@ class WeatherMapNode extends WeatherMapItem
 
 			if ($comparison != $val ) { $output.="\tLABELOFFSET " . $val . "\n"; }
 
-			#$comparison=($this->name == 'DEFAULT' ? $this->inherit_fieldlist['x'] : $defdef->x) . " " . 
+			#$comparison=($this->name == 'DEFAULT' ? $this->inherit_fieldlist['x'] : $defdef->x) . " " .
 			#			($this->name == 'DEFAULT' ? $this->inherit_fieldlist['y'] : $defdef->y);
 			$val = $this->x . " " . $this->y;
 			$comparison = $dd->x . " " . $dd->y;
-			
+
 			if ($val != $comparison)
 			{
 				if($this->relative_to == '')
@@ -938,7 +1032,7 @@ class WeatherMapNode extends WeatherMapItem
 		{
 			$js.="iconfile:" . js_escape($this->iconfile);
 		}
-		
+
 		$js .= "};\n";
 		$js .= "NodeIDs[\"N" . $this->id . "\"] = ". js_escape($this->name) . ";\n";
 		return $js;
@@ -972,6 +1066,85 @@ class WeatherMapNode extends WeatherMapItem
 		$js .= "},\n";
 		return $js;
 	}
+
+
+    public function isRelativePositionResolved()
+    {
+        return $this->relative_resolved;
+    }
+
+    public function isRelativePositioned()
+    {
+        if ($this->relative_to != "") {
+            return true;
+        }
+
+        return false;
+    }
+
+    public function getRelativeAnchor()
+    {
+        return $this->relative_to;
+    }
+
+    public function resolveRelativePosition($anchorNode)
+    {
+        $anchorPosition = $anchorNode->getPosition();
+
+        if ($this->polar) {
+            // treat this one as a POLAR relative coordinate.
+            // - draw rings around a node!
+            $angle = $this->x;
+            $distance = $this->y;
+
+            $now = $anchorPosition->copy();
+            $now->translatePolar($angle, $distance);
+            wm_debug("POLAR $this -> $now\n");
+            $this->setPosition($now);
+            $this->relative_resolved = true;
+
+            return true;
+        }
+
+        if ($this->pos_named) {
+            $off_name = $this->relative_name;
+            if (isset($anchorNode->named_offsets[$off_name])) {
+                $now = $anchorPosition->copy();
+                $now->translate(
+                    $anchorNode->named_offsets[$off_name][0],
+                    $anchorNode->named_offsets[$off_name][1]
+                );
+                wm_debug("NAMED OFFSET $this -> $now\n");
+                $this->setPosition($now);
+                $this->relative_resolved = true;
+
+                return true;
+            }
+            wm_debug("Fell through named offset.\n");
+
+            return false;
+        }
+
+        // resolve the relative stuff
+        $now = $this->getPosition();
+        $now->translate($anchorPosition->x, $anchorPosition->y);
+
+        wm_debug("OFFSET $this -> $now\n");
+        $this->setPosition($now);
+        $this->relative_resolved = true;
+
+        return true;
+    }
+
+    private function getDirectionList()
+    {
+        if ($this->scalevar == 'in') {
+            return array(IN);
+        }
+
+        return array(OUT);
+    }
+
 };
 
 // vim:ts=4:sw=4:

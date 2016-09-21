@@ -8,19 +8,31 @@
 require_once "HTML_ImageMap.class.php";
 
 require_once "WeatherMap.functions.php";
+require_once "base-classes.php";
+require_once "plugin-base-classes.php";
 require_once "geometry.php";
+require_once "WMPoint.class.php";
+require_once "WMVector.class.php";
+require_once "WMLine.class.php";
+require_once "WMUtility.class.php";
+require_once "WMTarget.class.php";
+require_once "WMColour.class.php";
+require_once "fonts.php";
+
+require_once "WeatherMapConfigReader.class.php";
+require_once "WeatherMapScale.class.php";
+
+require_once "WeatherMapDataItem.class.php";
 require_once "WeatherMapNode.class.php";
 require_once "WeatherMapLink.class.php";
 
-$WEATHERMAP_VERSION="0.98";
-$weathermap_debugging=FALSE;
-$weathermap_map="";
-$weathermap_warncount=0;
-$weathemap_lazycounter=0;
 
-// Dummy array for some future code
-// $WM_config_keywords2 = array ();
- 
+$WEATHERMAP_VERSION = "0.98";
+$weathermap_debugging = FALSE;
+$weathermap_map = "";
+$weathermap_warncount = 0;
+$weathemap_lazycounter = 0;
+
 // don't produce debug output for these functions
 $weathermap_debug_suppress = array (
     'processstring',
@@ -59,53 +71,6 @@ require_once "WeatherMap.keywords.inc.php";
 
 // ***********************************************
 
-// template class for data sources. All data sources extend this class.
-// I really wish PHP4 would just die overnight
-class WeatherMapDataSource
-{
-	// Initialize - called after config has been read (so SETs are processed)
-	// but just before ReadData. Used to allow plugins to verify their dependencies
-	// (if any) and bow out gracefully. Return FALSE to signal that the plugin is not
-	// in a fit state to run at the moment.
-	function Init(&$map) { return TRUE; }
-
-	// called with the TARGET string. Returns TRUE or FALSE, depending on whether it wants to handle this TARGET
-	// called by map->ReadData()
-	function Recognise( $targetstring ) { return FALSE; }
-
-	// the actual ReadData
-	//   returns an array of two values (in,out). -1,-1 if it couldn't get valid data
-	//   configline is passed in, to allow for better error messages
-	//   itemtype and itemname may be used as part of the target (e.g. for TSV source line)
-	// function ReadData($targetstring, $configline, $itemtype, $itemname, $map) { return (array(-1,-1)); }
-	function ReadData($targetstring, &$map, &$item)
-	{
-		return(array(-1,-1));
-	}
-	
-	// pre-register a target + context, to allow a plugin to batch up queries to a slow database, or snmp for example
-	function Register($targetstring, &$map, &$item)
-	{
-	
-	}
-	
-	// called before ReadData, to allow plugins to DO the prefetch of targets known from Register
-	function Prefetch()
-	{
-		
-	}
-}
-
-// template classes for the pre- and post-processor plugins
-class WeatherMapPreProcessor
-{
-	function run(&$map) { return FALSE; }
-}
-
-class WeatherMapPostProcessor
-{
-	function run(&$map) { return FALSE; }
-}
 
 class WMImageLoader
 {
@@ -117,6 +82,7 @@ class WMImageLoader
 
 	// we don't want to be caching huge images (they are probably the background, and won't be re-used)
 	function cacheable($width, $height) {
+	    // for now, disable this. The imageduplicate() function doesn't work in all cases.
 		return false;
 
 		if ($width * $height > 65536) {
@@ -352,382 +318,7 @@ class WMImageLoader
 
 }
 
-
-/**
- * Collect together everything scale-related
- */
-class WeatherMapScale
-{
-	var $colours;
-	var $name;
-	var $keypos;
-	var $keytitle;
-	var $keystyle;
-	var $keysize;
-	var $keytextcolour;
-	var $keyoutlinecolour;
-	var $keybgcolour;
-	var $scalemisscolour;
-	var $owner;
-
-	function WeatherMapScale($name, &$owner)
-	{
-		$this->name = $name;
-
-		$this->Reset($owner);
-	}
-
-	function Reset(&$owner)
-	{
-		$this->owner = $owner;
-
-		assert($this->owner->kilo != 0);
-
-		$this->keypos = array();
-		$this->keystyle = 'classic';
-		$this->colours = array();
-		$this->keypos[X] = -1;
-		$this->keypos[Y] = -1;
-		$this->keytitle = "Traffic Load";
-		$this->keysize = 0;
-
-		$this->SetColour("KEYBG", new WMColour(255,255,255));
-		$this->SetColour("KEYOUTLINE", new WMColour(0,0,0));
-		$this->SetColour("KEYTEXT", new WMColour(0,0,0));
-		$this->SetColour("SCALEMISS", new WMColour(255,255,255));
-
-		assert(isset($owner));
-
-	}
-
-	function SpanCount()
-	{
-		return count($this->colours);
-	}
-
-	function PopulateDefaults()
-	{
-		//   $this->AddSpan();
-
-	}
-
-	function SetColour($name, $colour)
-	{
-		assert(isset($this->owner));
-		assert($this->owner->kilo != 0);
-
-		switch (strtoupper($name))
-		{
-			case 'KEYTEXT':
-				$this->keytextcolour = $colour;
-				break;
-			case 'KEYBG':
-				$this->keybgcolour = $colour;
-				break;
-			case 'KEYOUTLINE':
-				$this->keyoutlinecolour = $colour;
-				break;
-			case 'SCALEMISS':
-				$this->scalemisscolour = $colour;
-				break;
-			default:
-				wm_warn("Unexpected colour name in WeatherMapScale->SetColour");
-				break;
-		}
-	}
-
-	function AddSpan($lowvalue, $highvalue, $colour1, $colour2=null, $tag='')
-	{
-		assert(isset($this->owner));
-		$key = $lowvalue . '_' . $highvalue;
-
-		$this->colours[$key]['c1'] = $colour1;
-		$this->colours[$key]['c2'] = $colour2;
-		$this->colours[$key]['tag'] = $tag;
-		$this->colours[$key]['bottom'] = $lowvalue;
-		$this->colours[$key]['top'] = $highvalue;
-
-		wm_debug($this->name." ".$lowvalue."->".$highvalue);
-	}
-
-	function WriteConfig()
-	{
-		assert(isset($this->owner));
-		// TODO - These should all check against the defaults
-
-		$output = "# All settings for scale ".$this->name."\n";
-
-		$output .= sprintf("\tKEYPOS %s %d %d %s\n",
-			$this->name,
-			$this->keypos[X], $this->keypos[Y],
-			$this->keytitle
-		);
-
-		// TODO - need to add size if non-standard
-		$output .= sprintf("\tKEYSTYLE %s %s\n",
-			$this->name,
-			$this->keystyle
-		);
-
-		$output .= sprintf("\tKEYBGCOLOR %s %s\n",
-			$this->name,
-			$this->keybgcolour->as_config()
-		);
-
-		$output .= sprintf("\tKEYTEXTCOLOR %s %s\n",
-			$this->name,
-			$this->keytextcolour->as_config()
-		);
-
-		$output .= sprintf("\tKEYOUTLINECOLOR %s %s\n",
-			$this->name,
-			$this->keyoutlinecolour->as_config()
-		);
-
-		$output .= sprintf("\tSCALEMISSCOLOR %s %s\n",
-			$this->name,
-			$this->scalemisscolour->as_config()
-		);
-
-		$locale = localeconv();
-		$decimal_point = $locale['decimal_point'];
-
-		$output .= "\n";
-
-		foreach ($this->colours as $k => $colour) {
-			$top = rtrim(rtrim(sprintf("%f", $colour['top']), "0"),
-				$decimal_point);
-
-			$bottom = rtrim(rtrim(sprintf("%f", $colour['bottom']), "0"),
-				$decimal_point);
-
-			if ($bottom > $this->owner->kilo) {
-				$bottom = wm_nice_bandwidth($colour['bottom'], $this->owner->kilo);
-			}
-
-			if ($top > $this->owner->kilo) {
-				$top = wm_nice_bandwidth($colour['top'], $this->owner->kilo);
-			}
-
-			$tag = (isset($colour['tag']) ? $colour['tag'] : '');
-
-			if($colour['c1']->equals($colour['c2'])) {
-				$output .= sprintf("\tSCALE %s %-4s %-4s   %s   %s\n",
-					$this->name, $bottom, $top, $colour['c1']->as_config(),$tag);
-			} else {
-				$output .= sprintf("\tSCALE %s %-4s %-4s   %s  %s  %s\n",
-					$this->name, $bottom, $top, $colour['c1']->as_config(),
-					$colour['c2']->as_config(), $tag);
-			}
-		}
-
-		$output .= "\n";
-
-		return $output;
-	}
-
-	function ColourFromValue($value, $name = '', $is_percent = true, $scale_warning = true)
-	{
-		$col = new WMColour(0, 0, 0);
-		$tag = '';
-		$matchsize = null;
-
-		$nowarn_clipping = intval($this->owner->get_hint("nowarn_clipping"));
-		$nowarn_scalemisses = (!$scale_warning)
-			|| intval($this->owner->get_hint("nowarn_scalemisses"));
-
-
-		if (isset($this->colours)) {
-			$colours = $this->colours;
-
-			if ($is_percent && $value > 100) {
-				if ($nowarn_clipping == 0) {
-					wm_warn(
-						"ColourFromValue: Clipped $value% to 100% for item $name [WMWARN33]\n");
-				}
-				$value = 100;
-			}
-
-			if ($is_percent && $value < 0) {
-				if ($nowarn_clipping == 0) {
-					wm_warn(
-						"ColourFromValue: Clipped $value% to 0% for item $name [WMWARN34]\n");
-				}
-				$value = 0;
-			}
-
-			foreach ($colours as $key => $colour) {
-				if (($value >= $colour['bottom']) and ($value <= $colour['top'])) {
-					$range = $colour['top'] - $colour['bottom'];
-
-					$candidate = null;
-
-					if($colour['c1']->equals($colour['c2'])) {
-						$candidate = $colour['c1'];
-					} else {
-						if ($colour["bottom"] == $colour["top"]) {
-							$ratio = 0;
-						} else {
-							$ratio = ($value - $colour["bottom"])
-								/ ($colour["top"] - $colour["bottom"]);
-						}
-						$candidate = $colour['c1']->linterp($colour['c2'], $ratio);
-					}
-
-					// change in behaviour - with multiple matching ranges for a value, the smallest range wins
-					if (is_null($matchsize) || ($range < $matchsize)) {
-						$col = $candidate;
-						$matchsize = $range;
-
-						if (isset($colour['tag'])) {
-							$tag = $colour['tag'];
-						}
-					}
-
-				}
-			}
-
-			wm_debug("CFV $name $this->name $value '$tag' $key ".$col->as_config()."\n");
-
-			return (array (
-				$col,
-				$key,
-				$tag
-			));
-
-		} else {
-			return array (
-				$this->scalemisscolour,
-				'',
-				''
-			);
-		}
-
-		// shouldn't really get down to here if there's a complete SCALE
-
-		// you'll only get grey for a COMPLETELY quiet link if there's no 0 in the SCALE lines
-		if ($value == 0) {
-			return array (
-				new WMColour(192, 192, 192),
-				'',
-				''
-			);
-		}
-
-		if ($nowarn_scalemisses == 0) {
-			wm_warn(
-				"ColourFromValue: Scale $scalename doesn't include a line for $value"
-				. ($is_percent ? "%" : "") . " while drawing item $name [WMWARN29]\n");
-		}
-		// and you'll only get white for a link with no colour assigned
-		return array (
-			new WMColour(255, 255, 255),
-			'',
-			''
-		);
-	}
-
-	function FindScaleExtent()
-	{
-		$max = -999999999999999999999;
-		$min = -$max;
-
-		$colours = $this->colours;
-
-		foreach ($colours as $key => $colour) {
-			if (!$colour['special']) {
-				$min = min($colour['bottom'], $min);
-				$max = max($colour['top'], $max);
-			}
-		}
-
-		return array (
-			$min,
-			$max
-		);
-	}
-
-}
-
-
 // ***********************************************
-
-// Links, Nodes and the Map object inherit from this class ultimately.
-// Just to make some common code common.
-class WeatherMapBase
-{
-	var $notes = array();
-	var $hints = array();
-	var $inherit_fieldlist;
-	var $imap_areas = array ();
-
-	function add_note($name,$value)
-	{
-		wm_debug("Adding note $name='$value' to ".$this->name."\n");
-		$this->notes[$name] = $value;
-	}
-
-	function get_note($name)
-	{
-		if(isset($this->notes[$name]))
-		{
-		//	debug("Found note $name in ".$this->name." with value of ".$this->notes[$name].".\n");
-			return($this->notes[$name]);
-		}
-		else
-		{
-		//	debug("Looked for note $name in ".$this->name." which doesn't exist.\n");
-			return(NULL);
-		}
-	}
-
-	function add_hint($name,$value)
-	{
-		wm_debug("Adding hint $name='$value' to ".$this->name."\n");
-		$this->hints[$name] = $value;
-		# warn("Adding hint $name to ".$this->my_type()."/".$this->name."\n");
-	}
-
-
-	function get_hint($name)
-	{
-		if(isset($this->hints[$name]))
-		{
-		//	debug("Found hint $name in ".$this->name." with value of ".$this->hints[$name].".\n");
-			return($this->hints[$name]);
-		}
-		else
-		{
-		//	debug("Looked for hint $name in ".$this->name." which doesn't exist.\n");
-			return(NULL);
-		}
-	}
-}
-
-class WeatherMapConfigItem
-{
-	var $defined_in;
-	var $name;
-	var $value;
-	var $type;
-}
-
-// The 'things on the map' class. More common code (mainly variables, actually)
-class WeatherMapItem extends WeatherMapBase
-{
-	var $owner;
-
-	var $configline;
-	var $infourl;
-	var $overliburl;
-	var $overlibwidth, $overlibheight;
-	var $overlibcaption;
-	var $my_default;
-	var $defined_in;
-	var $config_override;	# used by the editor to allow text-editing
-
-	function my_type() {  return "ITEM"; }
-}
 
 class WeatherMap extends WeatherMapBase
 {
@@ -811,8 +402,88 @@ class WeatherMap extends WeatherMapBase
     var $colourtable = array();
     var $warncount = 0;
 
+    var $scales;
+    var $fonts;
+    var $numscales;
 
-	function WeatherMap()
+    public function __construct()
+    {
+        parent::__construct();
+
+        $this->inherit_fieldlist=array
+        (
+            'width' => 800,
+            'height' => 600,
+            'kilo' => 1000,
+            'numscales' => array('DEFAULT' => 0),
+            'datasourceclasses' => array(),
+            'preprocessclasses' => array(),
+            'postprocessclasses' => array(),
+            'included_files' => array(),
+            'context' => '',
+            'dumpconfig' => FALSE,
+            'rrdtool_check' => '',
+            'background' => '',
+            'imageoutputfile' => '',
+            'imageuri' => '',
+            'htmloutputfile' => '',
+            'dataoutputfile' => '',
+            'htmlstylesheet' => '',
+            'labelstyle' => 'percent', // redundant?
+            'htmlstyle' => 'static',
+            'keystyle' => array('DEFAULT' => 'classic'),
+            'title' => 'Network Weathermap',
+            'keytext' => array('DEFAULT' => 'Traffic Load'),
+            'keyx' => array('DEFAULT' => -1),
+            'keyy' => array('DEFAULT' => -1),
+            'keyimage' => array(),
+            'keysize' => array('DEFAULT' => 400),
+            'stamptext' => 'Created: %b %d %Y %H:%M:%S',
+            'keyfont' => 4,
+            'titlefont' => 2,
+            'timefont' => 2,
+            'timex' => 0,
+            'timey' => 0,
+
+            'mintimex' => -10000,
+            'mintimey' => -10000,
+            'maxtimex' => -10000,
+            'maxtimey' => -10000,
+            'minstamptext' => 'Oldest Data: %b %d %Y %H:%M:%S',
+            'maxstamptext' => 'Newest Data: %b %d %Y %H:%M:%S',
+
+            'thumb_width' => 0,
+            'thumb_height' => 0,
+            'titlex' => -1,
+            'titley' => -1,
+            'cachefolder' => 'cached',
+            'mapcache' => '',
+            'sizedebug' => FALSE,
+            'debugging' => FALSE,
+            'widthmod' => FALSE,
+            'has_includes' => FALSE,
+            'has_overlibs' => FALSE,
+            'name' => 'MAP'
+        );
+
+        $this->min_ds_time = null;
+        $this->max_ds_time = null;
+
+        $this->scales = array();
+
+        $this->colourtable = array();
+
+        $this->configfile = '';
+        $this->imagefile = '';
+        $this->imageuri = '';
+
+        $this->fonts = new WMFontTable();
+        $this->fonts->init();
+
+        $this->Reset();
+    }
+
+    function __WeatherMap()
 	{
 		$this->inherit_fieldlist=array
 			(
@@ -874,7 +545,12 @@ class WeatherMap extends WeatherMapBase
 	}
 
 	function my_type() {  return "MAP"; }
-	
+
+    public function __toString()
+    {
+        return "MAP";
+    }
+
 	function Reset()
 	{
 		$this->imagecache = new WMImageLoader();
@@ -886,28 +562,11 @@ class WeatherMap extends WeatherMapBase
 
 		$this->need_size_precalc=FALSE;
 
-		$this->nodes=array(); // an array of WeatherMapNodes
+        $this->nodes=array(); // an array of WeatherMapNodes
 		$this->links=array(); // an array of WeatherMapLinks
-		
-		// these are the default defaults
-                // by putting them into a normal object, we can use the
-                // same code for writing out LINK DEFAULT as any other link.
-                wm_debug("Creating ':: DEFAULT ::' DEFAULT LINK\n");
-                // these two are used for default settings
-                $deflink = new WeatherMapLink;
-                $deflink->name=":: DEFAULT ::";
-                $deflink->template=":: DEFAULT ::";
-                $deflink->Reset($this);
-               
-                $this->links[':: DEFAULT ::'] = &$deflink;
 
-                wm_debug("Creating ':: DEFAULT ::' DEFAULT NODE\n");
-                $defnode = new WeatherMapNode;
-                $defnode->name=":: DEFAULT ::";
-                $defnode->template=":: DEFAULT ::";
-                $defnode->Reset($this);
-               
-                $this->nodes[':: DEFAULT ::'] = &$defnode;
+        $this->createDefaultLinks();
+        $this->createDefaultNodes();
                 
        	$this->node_template_tree = array();
        	$this->link_template_tree = array();
@@ -915,77 +574,116 @@ class WeatherMap extends WeatherMapBase
 		$this->node_template_tree['DEFAULT'] = array();
 		$this->link_template_tree['DEFAULT'] = array();
 
+        assert('is_object($this->nodes[":: DEFAULT ::"])');
+        assert('is_object($this->links[":: DEFAULT ::"])');
+        assert('is_object($this->nodes["DEFAULT"])');
+        assert('is_object($this->links["DEFAULT"])');
 
-// ************************************
-		// now create the DEFAULT link and node, based on those.
-		// these can be modified by the user, but their template (and therefore comparison in WriteConfig) is ':: DEFAULT ::'
-		wm_debug("Creating actual DEFAULT NODE from :: DEFAULT ::\n");
-                $defnode2 = new WeatherMapNode;
-                $defnode2->name = "DEFAULT";
-                $defnode2->template = ":: DEFAULT ::";
-                $defnode2->Reset($this);
-		
-                $this->nodes['DEFAULT'] = &$defnode2;
-
-		wm_debug("Creating actual DEFAULT LINK from :: DEFAULT ::\n");
-                $deflink2 = new WeatherMapLink;
-                $deflink2->name = "DEFAULT";
-                $deflink2->template = ":: DEFAULT ::";
-                $deflink2->Reset($this);
-		
-                $this->links['DEFAULT'] = &$deflink2;
-
-// for now, make the old defaultlink and defaultnode work too.
-//                $this->defaultlink = $this->links['DEFAULT'];
-//                $this->defaultnode = $this->nodes['DEFAULT'];
-
-                assert('is_object($this->nodes[":: DEFAULT ::"])');
-                assert('is_object($this->links[":: DEFAULT ::"])');
-				assert('is_object($this->nodes["DEFAULT"])');
-                assert('is_object($this->links["DEFAULT"])');
-
-// ************************************
 
 
 		$this->imap=new HTML_ImageMap('weathermap');
-		$this->colours=array
-			(
-				);
-
-		wm_debug ("Adding default map colour set.\n");
-		$defaults=array
-			(
-				'KEYTEXT' => array('bottom' => -2, 'top' => -1, 'red1' => 0, 'green1' => 0, 'blue1' => 0, 'special' => 1),
-				'KEYOUTLINE' => array('bottom' => -2, 'top' => -1, 'red1' => 0, 'green1' => 0, 'blue1' => 0, 'special' => 1),
-				'KEYBG' => array('bottom' => -2, 'top' => -1, 'red1' => 255, 'green1' => 255, 'blue1' => 255, 'special' => 1),
-				'BG' => array('bottom' => -2, 'top' => -1, 'red1' => 255, 'green1' => 255, 'blue1' => 255, 'special' => 1),
-				'TITLE' => array('bottom' => -2, 'top' => -1, 'red1' => 0, 'green1' => 0, 'blue1' => 0, 'special' => 1),
-				'TIME' => array('bottom' => -2, 'top' => -1, 'red1' => 0, 'green1' => 0, 'blue1' => 0, 'special' => 1)
-			);
-
-		foreach ($defaults as $key => $def) { $this->colours['DEFAULT'][$key]=$def; }
+        $this->colours = array();
 
 		$this->configfile='';
 		$this->imagefile='';
 		$this->imageuri='';
+//
+//		$this->fonts=array();
+//
+//		// Adding these makes the editor's job a little easier, mainly
+//		for($i=1; $i<=5; $i++)
+//		{
+//			$this->fonts[$i] = new WMFont();
+//			$this->fonts[$i]->type="GD builtin";
+//			$this->fonts[$i]->file='';
+//			$this->fonts[$i]->size=0;
+//		}
 
-		$this->fonts=array();
+		$this->loadAllPlugins();
 
-		// Adding these makes the editor's job a little easier, mainly
-		for($i=1; $i<=5; $i++)
-		{
-			$this->fonts[$i] = new WMFont();
-			$this->fonts[$i]->type="GD builtin";
-			$this->fonts[$i]->file='';
-			$this->fonts[$i]->size=0;
-		}
+        $this->scales['DEFAULT'] = new WeatherMapScale("DEFAULT", $this);
+        $this->populateDefaultColours();
 
-		$this->LoadPlugins('data', dirname(__FILE__) . DIRECTORY_SEPARATOR . 'datasources');
-		$this->LoadPlugins('pre', dirname(__FILE__) . DIRECTORY_SEPARATOR . 'pre');
-		$this->LoadPlugins('post', dirname(__FILE__) . DIRECTORY_SEPARATOR . 'post');
-		
 		wm_debug("WeatherMap class Reset() complete\n");
 	}
+
+    // Simple accessors to stop the editor from reaching inside objects quite so much
+
+    function getNode($name)
+    {
+        if (isset($this->nodes[$name])) {
+            return $this->nodes[$name];
+        }
+        throw new WeathermapInternalFail("NoSuchNode");
+    }
+
+    function addNode($newObject)
+    {
+        if ($this->nodeExists($newObject->name)) {
+            throw new WeathermapInternalFail("NodeAlreadyExists");
+        }
+        $this->nodes[$newObject->name] = $newObject;
+        $this->addItemToZLayer($newObject, $newObject->getZIndex());
+    }
+
+    function getLink($name)
+    {
+        if (isset($this->links[$name])) {
+            return $this->links[$name];
+        }
+        throw new WeathermapInternalFail("NoSuchLink");
+    }
+
+    function addLink($newObject)
+    {
+        if ($this->linkExists($newObject->name)) {
+            throw new WeathermapInternalFail("LinkAlreadyExists");
+        }
+        $this->links[$newObject->name] = $newObject;
+        $this->addItemToZLayer($newObject, $newObject->getZIndex());
+    }
+
+    function getScale($name)
+    {
+        if (isset($this->scales[$name])) {
+            return $this->scales[$name];
+        }
+        throw new WeathermapInternalFail("NoSuchScale");
+    }
+
+
+
+    private function loadAllPlugins()
+    {
+        $this->loadPlugins('data', dirname(__FILE__) . DIRECTORY_SEPARATOR . 'datasources');
+        $this->loadPlugins('pre', dirname(__FILE__) . DIRECTORY_SEPARATOR . 'pre');
+        $this->loadPlugins('post', dirname(__FILE__) . DIRECTORY_SEPARATOR . 'post');
+    }
+
+    private function populateDefaultColours()
+    {
+        wm_debug("Adding default map colour set.\n");
+        $defaults = array(
+            'KEYTEXT' => array('bottom' => -2, 'top' => -1, 'red' => 0, 'green' => 0, 'blue' => 0),
+            'KEYOUTLINE' => array('bottom' => -2, 'top' => -1, 'red' => 0, 'green' => 0, 'blue' => 0),
+            'KEYBG' => array('bottom' => -2, 'top' => -1, 'red' => 255, 'green' => 255, 'blue' => 255),
+            'BG' => array('bottom' => -2, 'top' => -1, 'red' => 255, 'green' => 255, 'blue' => 255),
+            'TITLE' => array('bottom' => -2, 'top' => -1, 'red' => 0, 'green' => 0, 'blue' => 0),
+            'TIME' => array('bottom' => -2, 'top' => -1, 'red' => 0, 'green' => 0, 'blue' => 0)
+        );
+
+        foreach ($defaults as $key => $def) {
+
+            $this->colourtable[$key] = new WMColour($def['red'], $def['green'], $def['blue']);
+        }
+
+        // legacy style
+        foreach ($defaults as $key => $def) {
+
+            $this->colours['DEFAULT'][$key] = $def;
+            $this->colours['DEFAULT'][$key]['c1'] = $this->colourtable[$key];
+        }
+    }
 
 	function myimagestring($image, $fontnumber, $x, $y, $string, $colour, $angle=0)
 	{
@@ -1254,92 +952,143 @@ function RandomData()
 	}
 }
 
-function LoadPlugins( $type="data", $dir="lib/datasources" )
-{
-	wm_debug("Beginning to load $type plugins from $dir\n");
-        
-    if ( ! file_exists($dir)) {
-        $dir = dirname(__FILE__) . DIRECTORY_SEPARATOR . $dir;
-        wm_debug("Relative path didn't exist. Trying $dir\n");
+    /**
+     * Search a directory for plugin class files, and load them. Each one is then
+     * instantiated once, and saved into the map object.
+     *
+     * @param string $pluginType - Which kind of plugin are we loading?
+     * @param string $searchDirectory - Where to load from?
+     */
+    private function loadPlugins($pluginType = "data", $searchDirectory = "lib/datasources")
+    {
+        wm_debug("Beginning to load $pluginType plugins from $searchDirectory\n");
+
+
+        $pluginList = $this->getPluginFileList($pluginType, $searchDirectory);
+
+        foreach ($pluginList as $fullFilePath => $file) {
+            wm_debug("Loading $pluginType Plugin class from $file\n");
+
+            $class = preg_replace("/\\.php$/", "", $file);
+            include_once($fullFilePath);
+
+            wm_debug("Loaded $pluginType Plugin class $class from $file\n");
+
+            $this->plugins[$pluginType][$class]['object'] = new $class;
+            $this->plugins[$pluginType][$class]['active'] = true;
+
+            if (!isset($this->plugins[$pluginType][$class])) {
+                wm_debug("** Failed to create an object for plugin $pluginType/$class\n");
+                $this->plugins[$pluginType][$class]['active'] = false;
+            }
+
+        }
+        wm_debug("Finished loading plugins.\n");
     }
-	# $this->datasourceclasses = array();
-	$dh=@opendir($dir);
 
-	if(!$dh) {	// try to find it with the script, if the relative path fails
-		$srcdir = substr($_SERVER['argv'][0], 0, strrpos($_SERVER['argv'][0], DIRECTORY_SEPARATOR));
-		$dh = opendir($srcdir.DIRECTORY_SEPARATOR.$dir);
-		if ($dh) $dir = $srcdir.DIRECTORY_SEPARATOR.$dir;
-	}
+    /**
+     * @param $pluginType
+     * @param $searchDirectory
+     * @return array
+     */
+    private function getPluginFileList($pluginType, $searchDirectory)
+    {
+        $directoryHandle = $this->resolveDirectoryAndOpen($searchDirectory);
 
-	if ($dh)
-	{
-		while ($file=readdir($dh))
-		{
-			$realfile = $dir . DIRECTORY_SEPARATOR . $file;
+        $pluginList = array();
+        if (!$directoryHandle) {
+            wm_warn("Couldn't open $pluginType Plugin directory ($searchDirectory). Things will probably go wrong. [WMWARN06]\n");
+        }
 
-			if( is_file($realfile) && preg_match( '/\.php$/', $realfile ) )
-			{
-				wm_debug("Loading $type Plugin class from $file\n");
+        while ($file = readdir($directoryHandle)) {
+            $fullFilePath = $searchDirectory . DIRECTORY_SEPARATOR . $file;
 
-				include_once $realfile;
-				$class = preg_replace( '/\.php$/', '', $file );
-				if($type == 'data')
-				{
-					$this->datasourceclasses [$class]= $class;
-					$this->activedatasourceclasses[$class]=1;
-				}
-				if($type == 'pre') {
-					$this->preprocessclasses [$class]= $class;
-				}
-				if($type == 'post') {
-					$this->postprocessclasses [$class]= $class;
-				}
+            if (!is_file($fullFilePath) || !preg_match('/\.php$/', $fullFilePath)) {
+                continue;
+            }
 
-				wm_debug("Loaded $type Plugin class $class from $file\n");
-				$this->plugins[$type][$class] = new $class;
-				if(! isset($this->plugins[$type][$class]))
-				{
-					wm_debug("** Failed to create an object for plugin $type/$class\n");
-				}
-				else
-				{
-					wm_debug("Instantiated $class.\n");
-				}
-			}
-			else
-			{
-				wm_debug("Skipping $file\n");
-			}
-		}
-	}
-	else
-	{
-		wm_warn("Couldn't open $type Plugin directory ($dir). Things will probably go wrong. [WMWARN06]\n");
-	}
-}
+            $pluginList[$fullFilePath] = $file;
+        }
+        return $pluginList;
+    }
 
-function DatasourceInit()
-{
-	wm_debug("Running Init() for Data Source Plugins...\n");
-	foreach ($this->datasourceclasses as $ds_class)
-	{
-		// make an instance of the class
-		$dsplugins[$ds_class] = new $ds_class;
-		wm_debug("Running $ds_class"."->Init()\n");
-		# $ret = call_user_func(array($ds_class, 'Init'), $this);
-		assert('isset($this->plugins["data"][$ds_class])');
+    private function resolveDirectoryAndOpen($dir)
+    {
+        if (!file_exists($dir)) {
+            $dir = dirname(__FILE__) . DIRECTORY_SEPARATOR . $dir;
+            wm_debug("Relative path didn't exist. Trying $dir\n");
+        }
+        $directoryHandle = @opendir($dir);
 
-		$ret = $this->plugins['data'][$ds_class]->Init($this);
+        // XXX - is this ever necessary?
+        if (!$directoryHandle) { // try to find it with the script, if the relative path fails
+            $srcdir = substr($_SERVER['argv'][0], 0, strrpos($_SERVER['argv'][0], DIRECTORY_SEPARATOR));
+            $directoryHandle = opendir($srcdir . DIRECTORY_SEPARATOR . $dir);
+            if ($directoryHandle) {
+                $dir = $srcdir . DIRECTORY_SEPARATOR . $dir;
+            }
+        }
 
-		if(! $ret)
-		{
-			wm_debug("Removing $ds_class from Data Source list, since Init() failed\n");
-			$this->activedatasourceclasses[$ds_class]=0;
-			# unset($this->datasourceclasses[$ds_class]);
-		}
-	}
-	wm_debug("Finished Initialising Plugins...\n");	
-}
+        return $directoryHandle;
+    }
+
+    /**
+     * Loop through the datasource plugins, allowing them to initialise any internals.
+     * The plugins can also refuse to run, if resources they need aren't available.
+     */
+    private function initialiseAllPlugins()
+    {
+        wm_debug("Running Init() for all Plugins...\n");
+
+        foreach (array('data', 'pre', 'post') as $type) {
+            wm_debug("Initialising $type Plugins...\n");
+
+            foreach ($this->plugins[$type] as $name => $pluginEntry) {
+                wm_debug("Running $name" . "->Init()\n");
+
+                $ret = $pluginEntry['object']->Init($this);
+
+                if (!$ret) {
+                    wm_debug("Marking $name plugin as inactive, since Init() failed\n");
+                    // $pluginEntry['active'] = false;
+                    $this->plugins[$type][$name]['active'] = false;
+                    wm_debug("State is now %s\n", $this->plugins['data'][$name]['active']);
+                }
+            }
+        }
+        wm_debug("Finished Initialising Plugins...\n");
+    }
+
+    public function runProcessorPlugins($stage = "pre")
+    {
+        wm_debug("Running $stage-processing plugins...\n");
+        foreach ($this->plugins[$stage] as $name => $pluginEntry) {
+            wm_debug("Running %s->run()\n", $name);
+            $pluginEntry['object']->run($this);
+        }
+        wm_debug("Finished $stage-processing plugins...\n");
+    }
+
+    function DatasourceInit()
+    {
+        wm_debug("Running Init() for Data Source Plugins...\n");
+        foreach ($this->datasourceclasses as $ds_class) {
+            // make an instance of the class
+            $dsplugins[$ds_class] = new $ds_class;
+            wm_debug("Running $ds_class" . "->Init()\n");
+            # $ret = call_user_func(array($ds_class, 'Init'), $this);
+            assert('isset($this->plugins["data"][$ds_class])');
+
+            $ret = $this->plugins['data'][$ds_class]->Init($this);
+
+            if (!$ret) {
+                wm_debug("Removing $ds_class from Data Source list, since Init() failed\n");
+                $this->activedatasourceclasses[$ds_class] = 0;
+                # unset($this->datasourceclasses[$ds_class]);
+            }
+        }
+        wm_debug("Finished Initialising Plugins...\n");
+    }
 
 function ProcessTargets()
 {
@@ -1443,7 +1192,7 @@ function ProcessTargets()
 	}
 }
 
-function ReadData()
+function oldReadData()
 {
 	$this->DatasourceInit();
 
@@ -1634,9 +1383,13 @@ function ReadData()
 }
 
 // nodename is a vestigal parameter, from the days when nodes were just big labels
+// TODO - this is only used by Link - it doesn't need to be here
 function DrawLabelRotated($im, $x, $y, $angle, $text, $font, $padding, $linkname, $textcolour, $bgcolour, $outlinecolour, &$map, $direction)
 {
-	list($strwidth, $strheight)=$this->myimagestringsize($font, $text);
+	// list($strwidth, $strheight)=$this->myimagestringsize($font, $text);
+
+    $fontObject = $this->fonts->getFont($font);
+    list($strwidth, $strheight) = $fontObject->calculateImageStringSize($text);
 
 	if(abs($angle)>90)  $angle -= 180;
 	if($angle < -180) $angle +=360;
@@ -1652,35 +1405,28 @@ function DrawLabelRotated($im, $x, $y, $angle, $text, $font, $padding, $linkname
 
 	// a box. the last point is the start point for the text.
 	$points = array($x1,$y1, $x1,$y2, $x2,$y2, $x2,$y1,   $x-$strwidth/2, $y+$strheight/2 + 1);
-	$npoints = count($points)/2;
+	// $npoints = count($points)/2;
 
 	rotateAboutPoint($points, $x,$y, $rangle);
 
-	if ($bgcolour != array
-		(
-			-1,
-			-1,
-			-1
-		))
+	if ($bgcolour->isRealColour())
 	{
-		$bgcol=myimagecolorallocate($im, $bgcolour[0], $bgcolour[1], $bgcolour[2]);
+		// $bgcol = myimagecolorallocate($im, $bgcolour[0], $bgcolour[1], $bgcolour[2]);
+        $bgcol = $bgcolour->gdAllocate($im);
 		# imagefilledrectangle($im, $x1, $y1, $x2, $y2, $bgcol);
 		wimagefilledpolygon($im,$points,4,$bgcol);
 	}
 
-	if ($outlinecolour != array
-		(
-			-1,
-			-1,
-			-1
-		))
+	if ($outlinecolour->isRealColour())
 	{
-		$outlinecol=myimagecolorallocate($im, $outlinecolour[0], $outlinecolour[1], $outlinecolour[2]);
+		// $outlinecol=myimagecolorallocate($im, $outlinecolour[0], $outlinecolour[1], $outlinecolour[2]);
+        $outlinecol = $outlinecolour->gdAllocate($im);
 		# imagerectangle($im, $x1, $y1, $x2, $y2, $outlinecol);
 		wimagepolygon($im,$points,4,$outlinecol);
 	}
 
-	$textcol=myimagecolorallocate($im, $textcolour[0], $textcolour[1], $textcolour[2]);
+	// $textcol=myimagecolorallocate($im, $textcolour[0], $textcolour[1], $textcolour[2]);
+    $textcol = $textcolour->gdAllocate($im);
 	$this->myimagestring($im, $font, $points[8], $points[9], $text, $textcol,$angle);
 
 	$areaname = "LINK:L".$map->links[$linkname]->id.':'.($direction+2);
@@ -2287,311 +2033,266 @@ function DrawTitle($im, $font, $colour)
 
 
 
+    /**
+     * ReadConfig reads in either a file or part of a config and modifies the current map.
+     *
+     * Temporary new ReadConfig, using the new table of keywords
+     * However, this also expects a bunch of other internal change (WMColour, WMScale etc)
+     *
+     * @param $input string Either a filename or a fragment of config in a string
+     * @return bool indicates success or failure     *
+     *
+     */
+    function ReadConfig($input)
+    {
+        $reader = new WeatherMapConfigReader($this);
+
+        // check if $input is more than one line. if it is, it's a text of a config file
+        // if it isn't, it's the filename
+
+        if ((strchr($input, "\n") != false) || (strchr($input, "\r") != false)) {
+            wm_debug("ReadConfig Detected that this is a config fragment.\n");
+            // strip out any Windows line-endings that have gotten in here
+            $input = str_replace("\r", "", $input);
+            $lines = explode("\n", $input);
+            $filename = "{text insert}";
+
+            $reader->readConfigLines($lines);
+
+        } else {
+            wm_debug("ReadConfig Detected that this is a config filename.\n");
+            $reader->readConfigFile($input);
+            $this->configfile = $input;
+        }
+
+        $this->postReadConfigTasks();
+
+        return (true);
+    }
+
+    function postReadConfigTasks()
+    {
+        if ($this->has_overlibs && $this->htmlstyle == 'static') {
+            wm_warn("OVERLIBGRAPH is used, but HTMLSTYLE is static. This is probably wrong. [WMWARN41]\n");
+        }
+
+        $this->populateDefaultScales();
+        $this->replicateScaleSettings();
+        $this->buildZLayers();
+        $this->resolveRelativePositions();
+        $this->updateMaxValues();
+
+
+        $this->initialiseAllPlugins();
+        $this->runProcessorPlugins("pre");
+    }
 
 
 
-	function ReadConfig_Handle_VIA($fullcommand, $args, $matches, &$curobj, $filename,
-		$linecount)
-	{
-		if (preg_match('/^\s*VIA\s+([-+]?\d+)\s+([-+]?\d+)\s*$/i', $fullcommand,
-			$matches)) {
-			$curobj->vialist[] = array (
-				$matches[1],
-				$matches[2]
-			);
-			return true;
-		}
-		if (preg_match('/^\s*VIA\s+(\S+)\s+([-+]?\d+)\s+([-+]?\d+)\s*$/i', $fullcommand,
-			$matches)) {
-			$curobj->vialist[] = array (
-				$matches[2],
-				$matches[3],
-				$matches[1]
-			);
-			return true;
-		}
-		return false;
-	}
-	function ReadConfig_Handle_NODES($fullcommand, $args, $matches, &$curobj, $filename,
-		$linecount)
-	{
-		if (preg_match('/^NODES\s+(\S+)\s+(\S+)\s*$/i', $fullcommand, $matches)) {
-			$valid_nodes = 2;
-			foreach (array (
-						 1,
-						 2
-					 ) as $i) {
-				$endoffset[$i] = 'C';
-				$nodenames[$i] = $matches[$i];
-				// percentage of compass - must be first
-				if (preg_match('/:(NE|SE|NW|SW|N|S|E|W|C)(\d+)$/i', $matches[$i],
-					$submatches)) {
-					$endoffset[$i] = $submatches[1] . $submatches[2];
-					$nodenames[$i] =
-						preg_replace('/:(NE|SE|NW|SW|N|S|E|W|C)\d+$/i', '', $matches[$i]);
-					$this->need_size_precalc = true;
-				}
-				if (preg_match('/:(NE|SE|NW|SW|N|S|E|W|C)$/i', $matches[$i], $submatches))
-				{
-					$endoffset[$i] = $submatches[1];
-					$nodenames[$i] =
-						preg_replace('/:(NE|SE|NW|SW|N|S|E|W|C)$/i', '', $matches[$i]);
-					$this->need_size_precalc = true;
-				}
-				if (preg_match('/:(-?\d+r\d+)$/i', $matches[$i], $submatches)) {
-					$endoffset[$i] = $submatches[1];
-					$nodenames[$i] = preg_replace('/:(-?\d+r\d+)$/i', '', $matches[$i]);
-					$this->need_size_precalc = true;
-				}
-				if (preg_match('/:([-+]?\d+):([-+]?\d+)$/i', $matches[$i], $submatches)) {
-					$xoff = $submatches[1];
-					$yoff = $submatches[2];
-					$endoffset[$i] = $xoff . ":" . $yoff;
-					$nodenames[$i] = preg_replace("/:$xoff:$yoff$/i", '', $matches[$i]);
-					$this->need_size_precalc = true;
-				}
-				if (!array_key_exists($nodenames[$i], $this->nodes)) {
-					wm_warn("Unknown node '" . $nodenames[$i]
-						. "' on line $linecount of config\n");
-					$valid_nodes--;
-				}
-			}
-			// TODO - really, this should kill the whole link, and reset for the next one
-			// XXX this error case will not work in the handler function
-			if ($valid_nodes == 2) {
-				$curobj->a = $this->nodes[$nodenames[1]];
-				$curobj->b = $this->nodes[$nodenames[2]];
-				$curobj->a_offset = $endoffset[1];
-				$curobj->b_offset = $endoffset[2];
-			} else {
-				// this'll stop the current link being added
-				$last_seen = "broken";
-			}
-			return true;
-		}
-		return false;
-	}
-	function ReadConfig_Handle_SET($fullcommand, $args, $matches, &$curobj, $filename,
-		$linecount)
-	{
-		global $weathermap_error_suppress;
+    private function populateDefaultScales()
+    {
+        // load some default colouring, otherwise it all goes wrong
+        $count = $this->scales['DEFAULT']->spanCount();
 
-		if (preg_match('/^SET\s+(\S+)\s+(.*)\s*$/i', $fullcommand, $matches)) {
-			$curobj->add_hint($matches[1], trim($matches[2]));
+        $this->scales['DEFAULT']->populateDefaultsIfNecessary();
 
-			if($curobj->my_type() == "map" && substr($matches[1],0,7)=='nowarn_') {
-				$weathermap_error_suppress[$matches[1]] = 1;
-			}
-			return true;
-		}
-		// allow setting a variable to ""
-		if (preg_match('/^SET\s+(\S+)\s*$/i', $fullcommand, $matches)) {
-			$curobj->add_hint($matches[1], '');
-			if($curobj->my_type() == "map" && substr($matches[1],0,7)=='nowarn_') {
-				$weathermap_error_suppress[$matches[1]] = 1;
-			}
-			return true;
-		}
-		return false;
-	}
-	function ReadConfig_Handle_GLOBALCOLOR($fullcommand, $args, $matches, &$curobj,
-		$filename, $linecount)
-	{
-		$key = str_replace("COLOR", "", strtoupper($args[0]));
-		$val = strtolower($args[1]);
+        $this->scales['none'] = new WeatherMapScale("none", $this);
 
-		if (isset($args[2])) // this is a regular colour setting thing
-		{
-			$r = $args[1];
-			$g = $args[2];
-			$b = $args[3];
-		}
-		if ($args[1] == 'none') {
-			$r = -1;
-			$g = -1;
-			$b = -1;
-		}
-		$this->colours['DEFAULT'][$key]['red1'] = $r;
-		$this->colours['DEFAULT'][$key]['green1'] = $g;
-		$this->colours['DEFAULT'][$key]['blue1'] = $b;
-		$this->colours['DEFAULT'][$key]['bottom'] = -2;
-		$this->colours['DEFAULT'][$key]['top'] = -1;
-		$this->colours['DEFAULT'][$key]['special'] = 1;
+        if ($count == 0) {
+            // This bit should go away, once everything uses WMScale
+            wm_debug("Adding default SCALE colour set (no SCALE lines seen).\n");
+            $defaults = array(
+                '0_0' => array(
+                    'bottom' => 0,
+                    'top' => 0,
+                    'red1' => 192,
+                    'green1' => 192,
+                    'blue1' => 192
+                ),
+                '0_1' => array(
+                    'bottom' => 0,
+                    'top' => 1,
+                    'red1' => 255,
+                    'green1' => 255,
+                    'blue1' => 255
+                ),
+                '1_10' => array(
+                    'bottom' => 1,
+                    'top' => 10,
+                    'red1' => 140,
+                    'green1' => 0,
+                    'blue1' => 255
+                ),
+                '10_25' => array(
+                    'bottom' => 10,
+                    'top' => 25,
+                    'red1' => 32,
+                    'green1' => 32,
+                    'blue1' => 255
+                ),
+                '25_40' => array(
+                    'bottom' => 25,
+                    'top' => 40,
+                    'red1' => 0,
+                    'green1' => 192,
+                    'blue1' => 255
+                ),
+                '40_55' => array(
+                    'bottom' => 40,
+                    'top' => 55,
+                    'red1' => 0,
+                    'green1' => 240,
+                    'blue1' => 0
+                ),
+                '55_70' => array(
+                    'bottom' => 55,
+                    'top' => 70,
+                    'red1' => 240,
+                    'green1' => 240,
+                    'blue1' => 0
+                ),
+                '70_85' => array(
+                    'bottom' => 70,
+                    'top' => 85,
+                    'red1' => 255,
+                    'green1' => 192,
+                    'blue1' => 0
+                ),
+                '85_100' => array(
+                    'bottom' => 85,
+                    'top' => 100,
+                    'red1' => 255,
+                    'green1' => 0,
+                    'blue1' => 0
+                )
+            );
 
-		return true;
-	}
-	function ReadConfig_Handle_NODE_USESCALE($fullcommand, $args, $matches, &$curobj, $filename,   $linecount)
-	{
-		$svar = '';
-		$stype = 'percent';
-		// in or out?
-		if (isset($matches[3])) {
-			$svar = trim($matches[3]);
-		}
-		// percent or absolute?
-		if (isset($matches[6])) {
-			$stype = strtolower(trim($matches[6]));
-		}
-		// opens the door for other scaley things...
-		switch (strtoupper($args[0])) {
-			case 'USEICONSCALE':
-				$varname = 'iconscalevar';
-				$uvarname = 'useiconscale';
-				$tvarname = 'iconscaletype';
-				break;
-			default:
-				$varname = 'scalevar';
-				$uvarname = 'usescale';
-				$tvarname = 'scaletype';
-				break;
-		}
-		if ($svar != '') {
-			$curobj->$varname = $svar;
-		}
-		$curobj->$tvarname = $stype;
-		$curobj->$uvarname = $matches[2];
-		return true;
-	}
-	function ReadConfig_Handle_FONTDEFINE($fullcommand, $args, $matches, &$curobj, $filename,
-		$linecount)
-	{
-		if(isset($args[3])) {
-			wm_debug("New TrueType font in slot %d\n",$args[1]);
-			if (function_exists("imagettfbbox")) {
-// test if this font is valid, before adding it to the font table...
-				$bounds =
-					@imagettfbbox($args[3], 0, $args[2], "Ignore me");
-				if (isset($bounds[0])) {
-					$new_font = new WMFont();
-					$new_font->type = "truetype";
-					$new_font->file = $args[2];
-					$new_font->size = $args[3];
-					$this->fonts[$args[1]] = $new_font;
-				} else {
-					wm_warn("Failed to load ttf font " . $args[2]
-						. " - at config line $linecount\n [WMWARN30]");
-				}
-			} else {
-				wm_warn(
-					"imagettfbbox() is not a defined function. You don't seem to have FreeType compiled into your gd module. [WMWARN31]\n");
-			}
-			return true;
-		}
-		else
-		{
-			wm_debug("New GD font in slot %d\n",$args[1]);
-			$newfont_id = imageloadfont($args[2]);
-			if ($newfont_id) {
-				$new_font = new WMFont();
-				$new_font->type = "gd";
-				$new_font->file = $args[2];
-				$new_font->gdnumber = $newfont_id;
-				$this->fonts[$args[1]] = $new_font;
-			} else {
-				wm_warn("Failed to load GD font: " . $args[2]
-					. " ($newfont_id) at config line $linecount [WMWARN32]\n");
-			}
-			return true;
-		}
+            foreach ($defaults as $key => $def) {
+                $this->colours['DEFAULT'][$key] = $def;
+                $this->colours['DEFAULT'][$key]['key'] = $key;
+                $this->colours['DEFAULT'][$key]['c1'] = new WMColour($def['red1'], $def['green1'], $def['blue1']);
+                $this->colours['DEFAULT'][$key]['c2'] = null;
 
-		return false;
-	}
-	function ReadConfig_Handle_OVERLIB($fullcommand, $args, $matches, &$curobj, $filename,
-		$linecount)
-	{
-		$this->has_overlibs = true;
-		$urls = preg_split('/\s+/', $matches[1], -1, PREG_SPLIT_NO_EMPTY);
-		if ($args[0] == 'INOVERLIBGRAPH') {
-			$index = IN;
-		}
-		if ($args[0] == 'OUTOVERLIBGRAPH') {
-			$index = OUT;
-		}
-		if ($args[0] == 'OVERLIBGRAPH') {
-			$curobj->overliburl[IN] = $urls;
-			$curobj->overliburl[OUT] = $urls;
-		} else {
-			$curobj->overliburl[$index] = $urls;
-		}
-		return true;
-	}
-	function ReadConfig_Handle_COLOR($fullcommand, $args, $matches, &$curobj, $filename,
-		$linecount)
-	{
-		$key = $args[0];
-		$field = str_replace("color", "colour", strtolower($args[0]));
-		$val = strtolower($args[1]);
+                $this->numscales['DEFAULT']++;
+            }
+            // we have a 0-0 line now, so we need to hide that.
+            $this->add_hint("key_hidezero_DEFAULT", 1);
+        } else {
+            wm_debug("Already have %d scales, no defaults added.\n", $this->scales['DEFAULT']->spanCount());
+        }
+    }
 
-		if (isset($args[2])) // this is a regular colour setting thing
-		{
-			$curobj->$field = array (
-				$args[1],
-				$args[2],
-				$args[3]
-			);
-			return true;
-		}
-		if ($val == 'none') {
-			$curobj->$field = array (
-				-1,
-				-1,
-				-1
-			);
-			return true;
-		}
-		if ($val == 'contrast') {
-			$curobj->$field = array (
-				-3,
-				-3,
-				-3
-			);
-			return true;
-		}
-		if ($val == 'copy') {
-			$curobj->$field = array (
-				-2,
-				-2,
-				-2
-			);
-			return true;
-		}
-		return false;
-	}
-	function ReadConfig_Handle_TARGET($fullcommand, $args, $matches, &$curobj, $filename,
-		$linecount)
-	{
-// wipe any existing targets, otherwise things in the DEFAULT accumulate with the new ones
-		$curobj->targets = array ();
-		array_shift($args); // take off the actual TARGET keyword
-		foreach ($args as $arg) {
-// we store the original TARGET string, and line number, along with the breakdown, to make nicer error messages later
-// array of 7 things:
-// - only 0,1,2,3,4 are used at the moment (more used to be before DS plugins)
-// 0 => final target string (filled in by ReadData)
-// 1 => multiplier (filled in by ReadData)
-// 2 => config filename where this line appears
-// 3 => linenumber in that file
-// 4 => the original target string
-// 5 => the plugin to use to pull data
-			$newtarget = array (
-				'',
-				'',
-				$filename,
-				$linecount,
-				$arg,
-				"",
-				""
-			);
-			if ($curobj) {
-				wm_debug("  TARGET: $arg\n");
-				$curobj->targets[] = $newtarget;
-			}
-		}
-		return true;
-	}
+    /**
+     * Temporary function to bridge between the old and new
+     * scale-worlds. Just until the ConfigReader updates these
+     * directly.
+     */
+    private function replicateScaleSettings()
+    {
+        foreach ($this->scales as $scaleName => $scaleObject) {
+            $scaleObject->keyoutlinecolour = $this->colourtable['KEYOUTLINE'];
+            $scaleObject->keytextcolour = $this->colourtable['KEYTEXT'];
+            $scaleObject->keybgcolour = $this->colourtable['KEYBG'];
+            $scaleObject->keyfont = $this->fonts->getFont($this->keyfont);
+
+            if ((isset($this->numscales[$scaleName])) && isset($this->keyx[$scaleName])) {
+                $scaleObject->keypos = new WMPoint($this->keyx[$scaleName], $this->keyy[$scaleName]);
+                $scaleObject->keystyle = $this->keystyle[$scaleName];
+                $scaleObject->keytitle = $this->keytext[$scaleName];
+                if (isset($this->keysize[$scaleName])) {
+                    $scaleObject->keysize = $this->keysize[$scaleName];
+                }
+            }
+        }
+    }
 
 
-	function ReadConfig($input, $is_include = false)
+    private function buildZLayers()
+    {
+        wm_debug("Building cache of z-layers.\n");
+
+        $allItems = $this->buildAllItemsList();
+
+        foreach ($allItems as $item) {
+            $zIndex = $item->getZIndex();
+            $this->addItemToZLayer($item, $zIndex);
+        }
+        wm_debug("Found " . sizeof($this->seen_zlayers) . " z-layers including builtins (0,100).\n");
+    }
+
+    private function addItemToZLayer($item, $zIndex)
+    {
+        if (!isset($this->seen_zlayers[$zIndex]) || !is_array($this->seen_zlayers[$zIndex])) {
+            $this->seen_zlayers[$zIndex] = array();
+        }
+        array_push($this->seen_zlayers[$zIndex], $item);
+    }
+
+    private function updateMaxValues()
+    {
+        wm_debug("Finalising bandwidth.\n");
+
+        $allItems = $this->buildAllItemsList();
+
+        foreach ($allItems as $item) {
+            $item->updateMaxValues($this->kilo);
+        }
+    }
+
+    private function resolveRelativePositions()
+    {
+        // calculate any relative positions here - that way, nothing else
+        // really needs to know about them
+
+        wm_debug("Resolving relative positions for NODEs...\n");
+        // safety net for cyclic dependencies
+        $maxIterations = 100;
+        $iterations = $maxIterations;
+        do {
+            $nSkipped = 0;
+            $nChanged = 0;
+
+            foreach ($this->nodes as $node) {
+                // if it's not relative, or already dealt with, skip to the next one
+                if (!$node->isRelativePositioned() || $node->isRelativePositionResolved()) {
+                    continue;
+                }
+
+                $anchorName = $node->getRelativeAnchor();
+
+                wm_debug("Resolving relative position for $node to $anchorName\n");
+
+                if (!$this->nodeExists($anchorName)) {
+                    wm_warn("NODE " . $node->name . " has a relative position to an unknown node ($anchorName)! [WMWARN10]\n");
+                    continue;
+                }
+
+                $anchorNode = $this->getNode($anchorName);
+                wm_debug("Found anchor node: $anchorNode\n");
+
+                // check if we are relative to another node which is in turn relative to something
+                // we need to resolve that one before we can resolve this one!
+                if (($anchorNode->isRelativePositioned()) && (!$anchorNode->isRelativePositionResolved())) {
+                    wm_debug("Skipping unresolved relative_to. Let's hope it's not a circular one\n");
+                    $nSkipped++;
+                    continue;
+                }
+
+                if ($node->resolveRelativePosition($anchorNode)) {
+                    $nChanged++;
+                }
+            }
+            wm_debug("Relative Positions Cycle $iterations/$maxIterations - set $nChanged and Skipped $nSkipped for unresolved dependencies\n");
+            $iterations--;
+        } while (($nChanged > 0) && ($iterations > 0));
+
+        if ($nSkipped > 0) {
+            wm_warn("There are probably Circular dependencies in relative POSITION lines for $nSkipped nodes (or $maxIterations levels of relative positioning). [WMWARN11]\n");
+        }
+    }
+
+
+    function oldReadConfig($input, $is_include = false)
 	{
 		global $WM_config_keywords2;
 		$curnode = null;
@@ -3508,24 +3209,25 @@ function WriteConfig($filename)
 // this way, it's the pretty icons that suffer if there aren't enough colours, and
 // not the actual useful data
 // we skip any gradient scales
-function AllocateScaleColours($im,$refname='gdref1')
-{
-	# $colours=$this->colours['DEFAULT'];
-	foreach ($this->colours as $scalename=>$colours)
-	{
-		foreach ($colours as $key => $colour)
-		{
-			if ( (!isset($this->colours[$scalename][$key]['red2']) ) && (!isset( $this->colours[$scalename][$key][$refname] )) )
-			{
-				$r=$colour['red1'];
-				$g=$colour['green1'];
-				$b=$colour['blue1'];
-				wm_debug ("AllocateScaleColours: $scalename/$refname $key ($r,$g,$b)\n");
-				$this->colours[$scalename][$key][$refname]=myimagecolorallocate($im, $r, $g, $b);
-			}			
-		}
-	}
-}
+    private function preAllocateScaleColours($im, $refname = 'gdref1')
+    {
+        foreach ($this->colours as $scalename => $colours) {
+
+            print_r($this->colours[$scalename]);
+
+            foreach ($colours as $key => $colour) {
+                // only do this for non-gradients (c2 is null)
+                if ((!isset($this->colours[$scalename][$key]['c2'])) && (!isset($this->colours[$scalename][$key][$refname]))) {
+
+                    wm_debug("AllocateScaleColours: %s/%s %s\n", $scalename, $refname, $key);
+
+                    $this->colours[$scalename][$key][$refname] = $this->colours[$scalename][$key]['c1']->gdAllocate($im);
+                    wm_debug("AllocateScaleColours: %s/%s %s %s\n", $scalename, $refname, $key,
+                        $this->colours[$scalename][$key]['c1']);
+                }
+            }
+        }
+    }
 
 function DrawMap($filename = '', $thumbnailfile = '', $thumbnailmax = 250, $withnodes = TRUE, $use_via_overlay = FALSE, $use_rel_overlay=FALSE)
 {
@@ -3613,7 +3315,7 @@ function DrawMap($filename = '', $thumbnailfile = '', $thumbnailmax = 250, $with
 		$this->grey=myimagecolorallocate($image, 192, 192, 192);
 		$this->selected=myimagecolorallocate($image, 255, 0, 0); // for selections in the editor
 
-		$this->AllocateScaleColours($image);
+		$this->preAllocateScaleColours($image);
 
 		// fill with background colour anyway, in case the background image failed to load
 		wimagefilledrectangle($image, 0, 0, $this->width, $this->height, $this->colours['DEFAULT']['BG']['gdref1']);
@@ -4435,6 +4137,189 @@ function DumpStats($filename="")
 #               print "Saved $i non-zero coverage stats.\n";
         }
 
+
+
+
+    public function nodeExists($nodeName)
+    {
+        return array_key_exists($nodeName, $this->nodes);
+    }
+
+    public function linkExists($linkName)
+    {
+        return array_key_exists($linkName, $this->links);
+    }
+
+    /**
+     * Create an array of all the nodes and links, mixed together.
+     * readData() makes several passes through this list.
+     *
+     * @return array
+     */
+    private function buildAllItemsList()
+    {
+        // TODO - this should probably be a static, or otherwise cached
+        $allItems = array();
+
+        $listOfItemLists = array(&$this->nodes, &$this->links);
+        reset($listOfItemLists);
+
+        while (list($outerListCount,) = each($listOfItemLists)) {
+            unset($itemList);
+            $itemList = &$listOfItemLists[$outerListCount];
+
+            reset($itemList);
+            while (list($innerListCount,) = each($itemList)) {
+                unset($oneMapItem);
+                $oneMapItem = &$itemList[$innerListCount];
+                $allItems [] = $oneMapItem;
+            }
+        }
+        return $allItems;
+    }
+
+
+    /**
+     * For each mapitem, loop through all its targets and find a plugin
+     * that recognises them. Then register the target with the plugin
+     * so that it can potentially pre-fetch or optimise in some way.
+     *
+     * @param $itemList
+     */
+    private function preProcessTargets($itemList)
+    {
+        wm_debug("Preprocessing targets\n");
+
+        foreach ($itemList as $oneMapItem) {
+            if ($oneMapItem->isTemplate()) {
+                continue;
+            }
+
+            $oneMapItem->prepareForDataCollection();
+        }
+    }
+
+    /**
+     * Keep track of the current minimum and maximum timestamp for collected data
+     *
+     * @param $dataTime
+     */
+    public function registerDataTime($dataTime)
+    {
+        if ($dataTime == 0) {
+            return;
+        }
+
+        if ($this->max_data_time == null || $dataTime > $this->max_data_time) {
+            $this->max_data_time = $dataTime;
+        }
+
+        if ($this->min_data_time == null || $dataTime < $this->min_data_time) {
+            $this->min_data_time = $dataTime;
+        }
+        wm_debug("Current DataTime MINMAX: " . $this->min_data_time . " -> " . $this->max_data_time . "\n");
+    }
+
+    private function readDataFromTargets($itemList)
+    {
+        wm_debug("======================================\n");
+        wm_debug("Starting main collection loop\n");
+
+        foreach ($itemList as $mapItem) {
+            if ($mapItem->isTemplate()) {
+                wm_debug("ReadData: Skipping $mapItem that looks like a template\n.");
+                continue;
+            }
+
+            $mapItem->performDataCollection();
+
+            // NOTE - this part still happens even if there were no targets
+            $mapItem->aggregateDataResults();
+            $mapItem->calculateScaleColours();
+
+            unset($mapItem);
+        }
+    }
+
+    private function prefetchPlugins()
+    {
+        // give all the plugins a chance to prefetch their results
+        wm_debug("======================================\n");
+        wm_debug("Starting DS plugin prefetch\n");
+        foreach ($this->plugins['data'] as $name => $pluginEntry) {
+            $pluginEntry['object']->Prefetch($this);
+        }
+    }
+
+    private function cleanupPlugins($type)
+    {
+        wm_debug("======================================\n");
+        wm_debug("Starting DS plugin cleanup\n");
+
+        foreach ($this->plugins[$type] as $name => $pluginEntry) {
+            $pluginEntry['object']->CleanUp($this);
+        }
+    }
+
+
+    function readData()
+    {
+        // we skip readdata completely in sizedebug mode
+        if ($this->sizedebug != 0) {
+            wm_debug("Size Debugging is on. Skipping readData.\n");
+            return;
+        }
+
+        wm_debug("======================================\n");
+        wm_debug("ReadData: Updating link data for all links and nodes\n");
+
+        $allMapItems = $this->buildAllItemsList();
+
+        // $this->initialiseAllPlugins();
+
+        // process all the targets and find a plugin for them
+        $this->preProcessTargets($allMapItems);
+
+        $this->prefetchPlugins();
+
+        $this->readDataFromTargets($allMapItems);
+
+        $this->cleanupPlugins('data');
+
+        wm_debug("ReadData Completed.\n");
+        wm_debug("------------------------------\n");
+
+    }
+
+
+
+    public function createDefaultNodes()
+    {
+        wm_debug("Creating ':: DEFAULT ::' DEFAULT NODE\n");
+        $defnode = new WeatherMapNode(":: DEFAULT ::", ":: DEFAULT ::", $this);
+
+        $this->nodes[':: DEFAULT ::'] = &$defnode;
+
+        wm_debug("Creating actual DEFAULT NODE from :: DEFAULT ::\n");
+        $defnode2 = new WeatherMapNode("DEFAULT", ":: DEFAULT ::", $this);
+        $this->nodes['DEFAULT'] = &$defnode2;
+    }
+
+    public function createDefaultLinks()
+    {
+        // these are the default defaults
+        // by putting them into a normal object, we can use the
+        // same code for writing out LINK DEFAULT as any other link.
+        wm_debug("Creating ':: DEFAULT ::' DEFAULT LINK\n");
+        // these two are used for default settings
+        $deflink = new WeatherMapLink(":: DEFAULT ::", ":: DEFAULT ::", $this);
+
+        $this->links[':: DEFAULT ::'] = &$deflink;
+
+        wm_debug("Creating actual DEFAULT LINK from :: DEFAULT ::\n");
+        $deflink2 = new WeatherMapLink("DEFAULT", ":: DEFAULT ::", $this);
+        $this->links['DEFAULT'] = &$deflink2;
+    }
 
 
 };

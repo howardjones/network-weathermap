@@ -3,23 +3,41 @@
 
 # 	test-suites/make-failing-summary.php test-suite/failing-images.txt test-suite/summary.html > test-suite/failing-summary.html
 
-$failing_list_file = $argv[1];
-$summary_file = $argv[2];
+$dir = "test-suite/diffs";
+$summary_file = "test-suite/summary.html";
 
 $failcount = 0;
 $fails = array();
+$different = array();
 
-$f = fopen($failing_list_file, "r");
+if (is_dir($dir)) {
+    if ($dh = opendir($dir)) {
+        while (($file = readdir($dh)) !== false) {
+            $file = "$dir/$file";
 
-while (!feof($f)) {
-    $filename = fgets($f);
-    $filename = trim($filename);
-    $fails[$filename] = 1;
-    $failcount++;
+            if (substr($file, -4, 4) == '.txt') {
+                $fd = fopen($file,"r");
+                if ($fd) {
+                    while (!feof($fd)) {
+                        $line = fgets($fd);
+
+                        if (preg_match('/^Output: \|(\d+)\|/', $line, $matches)) {
+                            if ($matches[1] != '0') {
+                                $realfilename = str_replace(".png.txt", "", $file);
+                                $realfilename = str_replace("test-suite/diffs/", "", $realfilename);
+                                $fails[$realfilename] = 1;
+                                $failcount++;
+                                $different[$realfilename] = intval($matches[1]);
+                            }
+                        }
+                    }
+                    fclose($fd);
+                }
+            }
+        }
+        closedir($dh);
+    }
 }
-fclose($f);
-
-# print "<p>$failcount failing</p>";
 
 $f = fopen($summary_file, "r");
 
@@ -37,33 +55,33 @@ while (!feof($f)) {
 
 //        print "$conf\n";
 
-        if (array_key_exists($conf, $fails)  && $fails[$conf] == 1) {
+        if (array_key_exists($conf, $fails) && $fails[$conf] == 1) {
             print $line;
 
             $diff_file = "test-suite/diffs/" . $conf . ".png.txt";
             $reference_file = "test-suite/references/" . $conf . ".png";
 
-            $differences = 0;
+            $pixels_different = $different[$conf];
             $percent = 0;
 
-            $d = fopen($diff_file, "r");
-            while (!feof($d)) {
-                $dline = fgets($d);
-                if (preg_match('/^Output: \\|(\\d+)/', $dline, $matches)) {
-                    $differences = intval($matches[1]);
-                }
-            }
-            fclose($d);
+//            $d = fopen($diff_file, "r");
+//            while (!feof($d)) {
+//                $dline = fgets($d);
+//                if (preg_match('/^Output: \\|(\\d+)/', $dline, $matches)) {
+//                    $differences = intval($matches[1]);
+//                }
+//            }
+//            fclose($d);
 
             $dimensions = getimagesize($reference_file);
             $totalpixels = $dimensions[0] * $dimensions[1];
 
-            $percent = sprintf("%.2f%%", $differences / $totalpixels * 100);
+            $percent = sprintf("%.2f%%", $pixels_different / $totalpixels * 100);
             array_push($percents, $percent);
 
             print sprintf("<p><b>To run:</b><code>./weathermap --config test-suite/tests/%s --debug --no-data</code></p>\n",
                 $conf);
-            print "<p>$percent - $differences differences.</p>\n";
+            print "<p>$percent - $pixels_different differences.</p>\n";
 
             print "<a href='approve.php?cf=" . $conf . "'>Approve left image as new reference</a>\n";
             print "<hr>";

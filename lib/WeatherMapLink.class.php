@@ -122,60 +122,6 @@ class WeatherMapLink extends WeatherMapDataItem
         $this->reset($owner);
     }
 
-	function __WeatherMapLink() { $this->inherit_fieldlist=array
-		(
-			'my_default' => NULL,
-			'width' => 7,
-			'commentfont' => 1,
-			'bwfont' => 2,
-			'template' => ':: DEFAULT ::',
-			'splitpos'=>50,
-			'labeloffset_out' => 25,
-			'labeloffset_in' => 75,
-			'commentoffset_out' => 5,
-			'commentoffset_in' => 95,
-			'commentstyle' => 'edge',
-			'arrowstyle' => 'classic',
-			'viastyle' => 'curved',
-			'usescale' => 'DEFAULT',
-			'scaletype' => 'percent',
-			'targets' => array(),
-			'duplex' => 'full',
-			'infourl' => array('',''),
-			'notes' => array(),
-			'hints' => array(),
-			'comments' => array('',''),
-			'bwlabelformats' => array(FMT_PERC_IN,FMT_PERC_OUT),
-			'overliburl' => array(array(),array()),
-			'notestext' => array(IN=>'',OUT=>''),
-			'labelstyle' => 'percent',
-			'labelboxstyle' => 'classic',
-			'linkstyle' => 'twoway',
-			'overlibwidth' => 0,
-			'overlibheight' => 0,
-			'outlinecolour' => array(0, 0, 0),
-			'bwoutlinecolour' => array(0, 0, 0),
-			'bwfontcolour' => array(0, 0, 0),
-			'bwboxcolour' => array(255, 255, 255),
-			'commentfontcolour' => array(192,192,192),
-			'inpercent'=>0, 'outpercent'=>0,
-			'inscalekey'=>'', 'outscalekey'=>'',
-			# 'incolour'=>-1,'outcolour'=>-1,
-			'a_offset' => 'C',
-			'b_offset' => 'C',
-			#'incomment' => '',
-			#'outcomment' => '',
-			'zorder' => 300,
-			'overlibcaption' => array('',''),
-			'max_bandwidth_in' => 100000000,
-			'max_bandwidth_out' => 100000000,
-			'max_bandwidth_in_cfg' => '100M',
-			'max_bandwidth_out_cfg' => '100M'
-		);
-	// $this->a_offset = 'C';
-	// $this->b_offset = 'C';
-	//  $this->targets = array();
-	}
 
 	function _Reset(&$newowner)
 	{
@@ -241,139 +187,130 @@ class WeatherMapLink extends WeatherMapDataItem
 // image = GD image references
 // col = array of Colour objects
 // widths = array of link widths
-	function DrawComments($image,$col,$widths)
-	{
-		$curvepoints =& $this->curvepoints;
-		$last = count($curvepoints)-1;
-				
-		$totaldistance = $curvepoints[$last][2];
-				
-		$start[OUT] = 0;
-		$commentpos[OUT] = $this->commentoffset_out;
-		$commentpos[IN] = $this->commentoffset_in;
-		$start[IN] = $last;
-		
-		if($this->linkstyle=="oneway")
-		{
-			$dirs = array(OUT);
-		}
-		else
-		{
-			$dirs = array(OUT,IN);
-		}
-		
-		foreach ($dirs as $dir)
-		{
-			
-		
-			// Time to deal with Link Comments, if any
-			$comment = $this->owner->ProcessString($this->comments[$dir], $this);
-			
-			# print "COMMENT: $comment";
-			
-			if($this->owner->get_hint('screenshot_mode')==1)  $comment=screenshotify($comment);
-	
-			if($comment != '')
-			{
-				# print "\n\n----------------------------------------------------------------\nComment $dir for ".$this->name."\n";;
-			
-				list($textlength, $textheight) = $this->owner->myimagestringsize($this->commentfont, $comment);
-				
-				$extra_percent = $commentpos[$dir];
-				
-				// $font = $this->commentfont;
-				// nudge pushes the comment out along the link arrow a little bit
-				// (otherwise there are more problems with text disappearing underneath links)
-				# $nudgealong = 0; $nudgeout=0;
-				$nudgealong = intval($this->get_hint("comment_nudgealong"));
-				$nudgeout = intval($this->get_hint("comment_nudgeout"));		
-	
-				$extra = ($totaldistance * ($extra_percent/100));
-				# $comment_index = find_distance($curvepoints,$extra);
-				
-				list($x,$y,$comment_index,$angle) = find_distance_coords_angle($curvepoints,$extra);
-							
-				#  print "$extra_percent => $extra ($totaldistance)\n";
-				#printf("  Point A is %f,%f\n",$curvepoints[$comment_index][0], $curvepoints[$comment_index][1]);
-				#printf("  Point B is %f,%f\n",$curvepoints[$comment_index+1][0], $curvepoints[$comment_index+1][1]);
-				#printf("  Point X is %f,%f\n",$x, $y);
-							
-				# if( ($comment_index != 0)) print "I ";
-				# if (($x != $curvepoints[$comment_index][0]) ) print "X ";
-				# if (($y != $curvepoints[$comment_index][1]) ) print "Y ";
-				# print "\n";
-							
-				if( ($comment_index != 0) && (($x != $curvepoints[$comment_index][0]) || ($y != $curvepoints[$comment_index][1])) )
-				{
-				#	print "  -> Path 1\n";
-					$dx = $x - $curvepoints[$comment_index][0];
-					$dy = $y - $curvepoints[$comment_index][1];
-				}
-				else
-				{			
-				#	print "  -> Path 2\n";
-					$dx = $curvepoints[$comment_index+1][0] - $x;
-					$dy = $curvepoints[$comment_index+1][1] - $y;
-				}
-								
-				$centre_distance = $widths[$dir] + 4 + $nudgeout;
-				if($this->commentstyle == 'center')
-				{
-					$centre_distance = $nudgeout - ($textheight/2);
-				}
-								
-				// find the normal to our link, so we can get outside the arrow
-				
-				$l=sqrt(($dx * $dx) + ($dy * $dy));
-				
-				# print "$extra => $comment_index/$last => $x,$y => $dx,$dy => $l\n";
-				
-				$dx = $dx/$l; 	$dy = $dy/$l;
-				$nx = $dy;  $ny = -$dx;
-				$flipped=FALSE;
-				
-				// if the text will be upside-down, rotate it, flip it, and right-justify it
-				// not quite as catchy as Missy's version
-				if(abs($angle)>90)
-				{
-					# $col = $map->selected;
-					$angle -= 180;
-					if($angle < -180) $angle +=360;
-					$edge_x = $x + $nudgealong*$dx - $nx * $centre_distance;
-					$edge_y = $y + $nudgealong*$dy - $ny * $centre_distance;
-					# $comment .= "@";
-					$flipped = TRUE;
-				}
-				else
-				{
-					$edge_x = $x + $nudgealong*$dx + $nx * $centre_distance;
-					$edge_y = $y + $nudgealong*$dy + $ny * $centre_distance;
-				}
-				
-				
-				
-				if( !$flipped && ($extra + $textlength) > $totaldistance)
-				{					
-					$edge_x -= $dx * $textlength;
-					$edge_y -= $dy * $textlength;
-					# $comment .= "#";
-				}
-				
-				if( $flipped && ($extra - $textlength) < 0)
-				{					
-					$edge_x += $dx * $textlength;
-					$edge_y += $dy * $textlength;
-					# $comment .= "%";
-				}
-				
-				// FINALLY, draw the text!
-				# imagefttext($image, $fontsize, $angle, $edge_x, $edge_y, $col, $font,$comment);
-				$this->owner->myimagestring($image, $this->commentfont, $edge_x, $edge_y, $comment, $col[$dir], $angle);
-				#imagearc($image,$x,$y,10,10,0, 360,$this->owner->selected);
-				#imagearc($image,$edge_x,$edge_y,10,10,0, 360,$this->owner->selected);
-			}
-		}
-	}
+    function DrawComments($image, $col, $widths)
+    {
+        $curvepoints =& $this->curvepoints;
+        $last = count($curvepoints) - 1;
+
+        $totaldistance = $curvepoints[$last][2];
+
+        $start[OUT] = 0;
+        $commentpos[OUT] = $this->commentoffset_out;
+        $commentpos[IN] = $this->commentoffset_in;
+        $start[IN] = $last;
+
+        $fontObject = $this->owner->fonts->getFont($this->commentfont);
+
+        if ($this->linkstyle == "oneway") {
+            $dirs = array(OUT);
+        } else {
+            $dirs = array(OUT, IN);
+        }
+
+        foreach ($dirs as $dir) {
+            // Time to deal with Link Comments, if any
+            $comment = $this->owner->ProcessString($this->comments[$dir], $this);
+
+            # print "COMMENT: $comment";
+
+            if ($this->owner->get_hint('screenshot_mode') == 1) {
+                $comment = screenshotify($comment);
+            }
+
+            if ($comment != '') {
+                # print "\n\n----------------------------------------------------------------\nComment $dir for ".$this->name."\n";;
+
+                // list($textlength, $textheight) = $this->owner->myimagestringsize($this->commentfont, $comment);
+                list($textlength, $textheight) = $fontObject->calculateImageStringSize($comment);
+
+                $extra_percent = $commentpos[$dir];
+
+                // $font = $this->commentfont;
+                // nudge pushes the comment out along the link arrow a little bit
+                // (otherwise there are more problems with text disappearing underneath links)
+                # $nudgealong = 0; $nudgeout=0;
+                $nudgealong = intval($this->get_hint("comment_nudgealong"));
+                $nudgeout = intval($this->get_hint("comment_nudgeout"));
+
+                $extra = ($totaldistance * ($extra_percent / 100));
+                # $comment_index = find_distance($curvepoints,$extra);
+
+                list($x, $y, $comment_index, $angle) = find_distance_coords_angle($curvepoints, $extra);
+
+                #  print "$extra_percent => $extra ($totaldistance)\n";
+                #printf("  Point A is %f,%f\n",$curvepoints[$comment_index][0], $curvepoints[$comment_index][1]);
+                #printf("  Point B is %f,%f\n",$curvepoints[$comment_index+1][0], $curvepoints[$comment_index+1][1]);
+                #printf("  Point X is %f,%f\n",$x, $y);
+
+                # if( ($comment_index != 0)) print "I ";
+                # if (($x != $curvepoints[$comment_index][0]) ) print "X ";
+                # if (($y != $curvepoints[$comment_index][1]) ) print "Y ";
+                # print "\n";
+
+                if (($comment_index != 0) && (($x != $curvepoints[$comment_index][0]) || ($y != $curvepoints[$comment_index][1]))) {
+                    #	print "  -> Path 1\n";
+                    $dx = $x - $curvepoints[$comment_index][0];
+                    $dy = $y - $curvepoints[$comment_index][1];
+                } else {
+                    #	print "  -> Path 2\n";
+                    $dx = $curvepoints[$comment_index + 1][0] - $x;
+                    $dy = $curvepoints[$comment_index + 1][1] - $y;
+                }
+
+                $centre_distance = $widths[$dir] + 4 + $nudgeout;
+                if ($this->commentstyle == 'center') {
+                    $centre_distance = $nudgeout - ($textheight / 2);
+                }
+
+                // find the normal to our link, so we can get outside the arrow
+
+                $l = sqrt(($dx * $dx) + ($dy * $dy));
+
+                # print "$extra => $comment_index/$last => $x,$y => $dx,$dy => $l\n";
+
+                $dx = $dx / $l;
+                $dy = $dy / $l;
+                $nx = $dy;
+                $ny = -$dx;
+                $flipped = FALSE;
+
+                // if the text will be upside-down, rotate it, flip it, and right-justify it
+                // not quite as catchy as Missy's version
+                if (abs($angle) > 90) {
+                    # $col = $map->selected;
+                    $angle -= 180;
+                    if ($angle < -180) $angle += 360;
+                    $edge_x = $x + $nudgealong * $dx - $nx * $centre_distance;
+                    $edge_y = $y + $nudgealong * $dy - $ny * $centre_distance;
+                    # $comment .= "@";
+                    $flipped = TRUE;
+                } else {
+                    $edge_x = $x + $nudgealong * $dx + $nx * $centre_distance;
+                    $edge_y = $y + $nudgealong * $dy + $ny * $centre_distance;
+                }
+
+
+                if (!$flipped && ($extra + $textlength) > $totaldistance) {
+                    $edge_x -= $dx * $textlength;
+                    $edge_y -= $dy * $textlength;
+                    # $comment .= "#";
+                }
+
+                if ($flipped && ($extra - $textlength) < 0) {
+                    $edge_x += $dx * $textlength;
+                    $edge_y += $dy * $textlength;
+                    # $comment .= "%";
+                }
+
+                // FINALLY, draw the text!
+                # imagefttext($image, $fontsize, $angle, $edge_x, $edge_y, $col, $font,$comment);
+                // $this->owner->myimagestring($image, $this->commentfont, $edge_x, $edge_y, $comment, $col[$dir], $angle);
+                $fontObject->drawImageString($image, $edge_x, $edge_y, $comment, $col[$dir], $angle);
+                #imagearc($image,$x,$y,10,10,0, 360,$this->owner->selected);
+                #imagearc($image,$edge_x,$edge_y,10,10,0, 360,$this->owner->selected);
+            }
+        }
+    }
 
 	function Draw($im, &$map)
 	{
@@ -410,8 +347,8 @@ class WeatherMapLink extends WeatherMapDataItem
 		}
 
 		
-		$outlinecol = new Colour($this->outlinecolour);
-		$commentcol = new Colour($this->commentfontcolour);
+		$outlinecol = $this->outlinecolour;
+		$commentcol = $this->commentfontcolour;
 		
 		$outline_colour = $outlinecol->gdallocate($im);
 				
@@ -492,12 +429,12 @@ class WeatherMapLink extends WeatherMapDataItem
 		}
 
 		
-		if ( !$commentcol->is_none() )
+		if ( !$commentcol->isNone() )
 		{			
-			if($commentcol->is_contrast())
+			if($commentcol->isContrast())
 			{
-				$commentcol_in = $link_in_colour->contrast();
-				$commentcol_out = $link_out_colour->contrast();
+				$commentcol_in = $link_in_colour->getContrastingColour();
+				$commentcol_out = $link_out_colour->getContrastingColour();
 			}
 			else
 			{
@@ -652,8 +589,12 @@ class WeatherMapLink extends WeatherMapDataItem
 				if ($this->$field != $dd->$field) 
 				#if (1==1)
 				{ 
-					if($param[2] == CONFIG_TYPE_COLOR) $output.="\t$keyword " . render_colour($this->$field) . "\n"; 
-					if($param[2] == CONFIG_TYPE_LITERAL) $output.="\t$keyword " . $this->$field . "\n"; 
+					if($param[2] == CONFIG_TYPE_COLOR) {
+					    $output.="\t$keyword " . $this->$field->asConfig() . "\n";
+                    }
+					if($param[2] == CONFIG_TYPE_LITERAL) {
+					    $output.="\t$keyword " . $this->$field . "\n";
+                    }
 				}
 			}		
 
@@ -758,12 +699,8 @@ class WeatherMapLink extends WeatherMapDataItem
 				$output.="\tTARGET";
 	
 				foreach ($this->targets as $target) { 
-					if(strpos($target[4]," ") == FALSE) {
-						$output .= " " . $target[4]; 
-					} else {
-						$output .= ' "' . $target[4] . '"'; 
-					}
-				}	
+                    $output .= " " . $target->asConfig();
+				}
 				$output .= "\n";
 			}
 				

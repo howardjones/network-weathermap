@@ -383,8 +383,8 @@ foreach ($map->links as $link) {
                 print "    SPEED $total_speed\n";
                 $map->links[$name]->max_bandwidth_in = $total_speed;
                 $map->links[$name]->max_bandwidth_out = $total_speed;
-                $map->links[$name]->max_bandwidth_in_cfg = nice_bandwidth($total_speed);
-                $map->links[$name]->max_bandwidth_out_cfg = nice_bandwidth($total_speed);
+                $map->links[$name]->max_bandwidth_in_cfg = wm_nice_bandwidth($total_speed);
+                $map->links[$name]->max_bandwidth_out_cfg = wm_nice_bandwidth($total_speed);
 
                 if ($map_widths) {
                     foreach ($width_map as $map_speed => $map_width) {

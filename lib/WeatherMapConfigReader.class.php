@@ -748,6 +748,44 @@ class WeatherMapConfigReader
                     array('splitpos' => 1)
                 ),
             ),
+            'BWLABEL' => array(
+                array(
+                    'LINK',
+                    '/^BWLABEL\s+bits\s*$/i',
+                    array(
+                        'labelstyle' => 'bits',
+                        'bwlabelformats[IN]' => FMT_BITS_IN,
+                        'bwlabelformats[OUT]' => FMT_BITS_OUT,
+                    )
+                ),
+                array(
+                    'LINK',
+                    '/^BWLABEL\s+percent\s*$/i',
+                    array(
+                        'labelstyle' => 'percent',
+                        'bwlabelformats[IN]' => FMT_PERC_IN,
+                        'bwlabelformats[OUT]' => FMT_PERC_OUT,
+                    )
+                ),
+                array(
+                    'LINK',
+                    '/^BWLABEL\s+unformatted\s*$/i',
+                    array(
+                        'labelstyle' => 'unformatted',
+                        'bwlabelformats[IN]' => FMT_UNFORM_IN,
+                        'bwlabelformats[OUT]' => FMT_UNFORM_OUT,
+                    )
+                ),
+                array(
+                    'LINK',
+                    '/^BWLABEL\s+none\s*$/i',
+                    array(
+                        'labelstyle' => 'none',
+                        'bwlabelformats[IN]' => '',
+                        'bwlabelformats[OUT]' => '',
+                    )
+                ),
+            ),
             'BWLABELPOS' => array(
                 array(
                     'LINK',
@@ -802,6 +840,7 @@ class WeatherMapConfigReader
                     '/^ARROWSTYLE\s+(classic|compact)\s*$/i',
                     array('arrowstyle' => 1)
                 ),
+                array('LINK', '/^\s*ARROWSTYLE\s+(\d+)\s+(\d+)\s*$/i', 'handleARROWSTYLE'),
             ),
             'VIASTYLE' => array(
                 array(
@@ -1578,5 +1617,148 @@ class WeatherMapConfigReader
 
         return true;
     }
+
+    private function handleARROWSTYLE($fullcommand, $args, $matches)
+    {
+        $this->currentObject->arrowstyle = $matches[1] . ' ' . $matches[2];
+        return true;
+    }
+
+// TODO: refactor this - it doesn't need to be one big handler anymore (multiple regexps for different styles?)
+    private function handleSCALE($fullcommand, $args, $matches)
+    {
+        // The default scale name is DEFAULT
+        if ($matches[1] == '') {
+            $matches[1] = 'DEFAULT';
+        } else {
+            $matches[1] = trim($matches[1]);
+        }
+
+        if (isset($this->mapObject->scales[$matches[1]])) {
+            $newscale = $this->mapObject->scales[$matches[1]];
+        } else {
+            $this->mapObject->scales[$matches[1]] = new WeatherMapScale($matches[1], $this->mapObject);
+            $newscale = $this->mapObject->scales[$matches[1]];
+        }
+
+        $key = $matches[2] . '_' . $matches[3];
+        $tag = $matches[11];
+
+        $colour1 = null;
+        $colour2 = null;
+
+        $bottom = WMUtility::interpretNumberWithMetricPrefix($matches[2], $this->mapObject->kilo);
+        $top = WMUtility::interpretNumberWithMetricPrefix($matches[3], $this->mapObject->kilo);
+
+        $this->mapObject->colours[$matches[1]][$key]['key'] = $key;
+        $this->mapObject->colours[$matches[1]][$key]['tag'] = $tag;
+
+        $this->mapObject->colours[$matches[1]][$key]['bottom'] = WMUtility::interpretNumberWithMetricPrefix($matches[2], $this->mapObject->kilo);
+        $this->mapObject->colours[$matches[1]][$key]['top'] = WMUtility::interpretNumberWithMetricPrefix($matches[3], $this->mapObject->kilo);
+
+        $this->mapObject->colours[$matches[1]][$key]['special'] = 0;
+
+        if (isset($matches[10]) && $matches[10] == 'none') {
+            $this->mapObject->colours[$matches[1]][$key]['c1'] = new WMColour('none');
+
+            $colour1 = new WMColour("none");
+
+        } else {
+            $colour1 = new WMColour((int)($matches[4]), (int)($matches[5]), (int)($matches[6]));
+            $colour2 = $colour1;
+            $this->mapObject->colours[$matches[1]][$key]['c1'] = $colour1;
+        }
+
+        // this is the second colour, if there is one
+        if (isset($matches[7]) && $matches[7] != '') {
+            $colour2 = new WMColour((int)($matches[7]), (int)($matches[8]), (int)($matches[9]));
+            $this->mapObject->colours[$matches[1]][$key]['c2'] = $colour2;
+        }
+
+        $newscale->AddSpan($bottom, $top, $colour1, $colour2, $tag);
+
+        if (!isset($this->mapObject->numscales[$matches[1]])) {
+            $this->mapObject->numscales[$matches[1]] = 1;
+        } else {
+            $this->mapObject->numscales[$matches[1]]++;
+        }
+
+        // we count if we've seen any default scale, otherwise, we have to add
+        // one at the end.
+//        if ($matches[1] == 'DEFAULT') {
+//            $this->mapObject->scalesseen++;
+//        }
+
+        return true;
+    }
+
+    private function handleKEYSTYLE($fullcommand, $args, $matches)
+    {
+        $whichKey = trim($matches[1]);
+
+        if ($whichKey == '') {
+            $whichKey = 'DEFAULT';
+        }
+        $this->mapObject->keystyle[$whichKey] = strtolower($matches[2]);
+
+        if (isset($matches[3]) && $matches[3] != '') {
+            $this->mapObject->keysize[$whichKey] = $matches[3];
+        } else {
+            $this->mapObject->keysize[$whichKey] = $this->mapObject->keysize['DEFAULT'];
+        }
+
+        return true;
+    }
+
+    private function handleKEYPOS($fullcommand, $args, $matches)
+    {
+        $whichKey = trim($matches[1]);
+
+        if ($whichKey == '') {
+            $whichKey = 'DEFAULT';
+        }
+
+        $this->mapObject->keyx[$whichKey] = $matches[2];
+        $this->mapObject->keyy[$whichKey] = $matches[3];
+        $extra = trim($matches[4]);
+
+        if ($extra != '') {
+            $this->mapObject->keytext[$whichKey] = $extra;
+        }
+
+        // it's possible to have keypos before the scale is defined.
+        // this is to make it at least mostly consistent internally
+        if (!isset($this->mapObject->keytext[$whichKey])) {
+            $this->mapObject->keytext[$whichKey] = "DEFAULT TITLE";
+        }
+
+        if (!isset($this->mapObject->keystyle[$whichKey])) {
+            $this->mapObject->keystyle[$whichKey] = "classic";
+        }
+
+        return true;
+    }
+
+
+    private function handleTEMPLATE($fullcommand, $args, $matches)
+    {
+        $templateName = $matches[1];
+
+        if (($this->currentType == 'NODE' && isset($this->mapObject->nodes[$templateName]))
+            || ($this->currentType == 'LINK' && isset($this->mapObject->links[$templateName]))
+        ) {
+            $this->currentObject->setTemplate($matches[1], $this->mapObject);
+
+            if ($this->objectLineCount > 1) {
+                wm_warn("line $this->lineCount: TEMPLATE is not first line of object. Some data may be lost. [WMWARN39]\n");
+            }
+            return true;
+        }
+
+        wm_warn("line $this->lineCount: $last_seen TEMPLATE '$templateName' doesn't exist! (if it does exist, check it's defined first) [WMWARN40]\n");
+
+        return false;
+    }
+
 
 }

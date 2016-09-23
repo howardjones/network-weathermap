@@ -55,7 +55,7 @@ class ConfigTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(0, $warningCount, "Warnings were generated");
 
         # $COMPARE -metric AE $reference $result $destination  > $destination2 2>&1
-        $cmd = sprintf("%s -metric AE \"%s\" \"%s\" \"%s\"",
+        $cmd = sprintf("%s -metric AE -dissimilarity-threshold 1 \"%s\" \"%s\" \"%s\"",
             self::$compare,
             $referenceImageFileName,
             $outputImageFileName,
@@ -79,6 +79,7 @@ class ConfigTest extends PHPUnit_Framework_TestCase
 
             if (is_resource($process)) {
                 $output = fread($pipes[2], 2000);
+                $output = trim($output); // newer imagemagick versions add a CRLF to the output
                 fclose($pipes[0]);
                 fclose($pipes[1]);
                 fclose($pipes[2]);
@@ -91,7 +92,7 @@ class ConfigTest extends PHPUnit_Framework_TestCase
 
             // it turns out that some versions of compare output two lines, and some don't, so trim.
             $lines = explode("\n", $output);
-            $output = $lines[0];
+
 
             $this->AssertEquals("0", $output, "Image Output did not match reference for $configFileName via IM");
         }
@@ -118,8 +119,10 @@ class ConfigTest extends PHPUnit_Framework_TestCase
         WMTestSupport::TestOutput_RunTest(self::$result1dir . DIRECTORY_SEPARATOR . $conffile, $output_image_round2, '',
             '', '');
 
-        $ref_output1 = md5_file($output_image_round1);
-        $ref_output2 = md5_file($output_image_round2);
+//        $ref_output1 = md5_file($output_image_round1);
+//        $ref_output2 = md5_file($output_image_round2);
+        $ref_output1 = file_get_contents($output_image_round1);
+        $ref_output2 = file_get_contents($output_image_round2);
 
         $this->assertEquals($ref_output1, $ref_output2,
             "Config Output from WriteConfig did not match original for $conffile");

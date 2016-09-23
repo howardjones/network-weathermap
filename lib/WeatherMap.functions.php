@@ -193,6 +193,8 @@ function mysprintf($format, $value, $kilo = 1000)
 
 function wm_parse_string($input)
 {
+    throw new WeathermapDeprecatedException("wm_parse_string called");
+
     $output = array();            // Array of Output
     $cPhraseQuote = null;   // Record of the quote that opened the current phrase
     $sPhrase = null;                // Temp storage for the current phrase we are building
@@ -297,6 +299,8 @@ function screenshotify($input)
 
 function is_copy($arr)
 {
+    throw new WeathermapDeprecatedException("is_copy called");
+
 	if ($arr['red1'] == -2 && $arr['green1'] == -2 && $arr['blue1'] == -2) {
 		return true;
 	}
@@ -305,6 +309,8 @@ function is_copy($arr)
 
 function is_contrast($arr)
 {
+    throw new WeathermapDeprecatedException("is_contrast called");
+
 	if ($arr['red1'] == -3 && $arr['green1'] == -3 && $arr['blue1'] == -3) {
 		return true;
 	}
@@ -313,6 +319,7 @@ function is_contrast($arr)
 
 function is_none($arr)
 {
+    throw new WeathermapDeprecatedException("is_none called");
 	if ($arr['red1'] == -1 && $arr['green1'] == -1 && $arr['blue1'] == -1) {
 		return true;
 	}
@@ -321,6 +328,8 @@ function is_none($arr)
 
 function render_colour($col)
 {
+    throw new WeathermapDeprecatedException("render_colour called");
+
 	if (($col[0] == -1) && ($col[1] == -1) && ($col[1] == -1)) { return 'none'; }
 	else if (($col[0] == -2) && ($col[1] == -2) && ($col[1] == -2)) { return 'copy'; }
 	else if (($col[0] == -3) && ($col[1] == -3) && ($col[1] == -3)) { return 'contrast'; }
@@ -1572,7 +1581,7 @@ function format_number($number, $precision = 2, $trailing_zeroes = 0)
 	else { return ($integer . "." . $decimal); }
 }
 
-function nice_bandwidth($number, $kilo = 1000,$decimals=1,$below_one=TRUE)
+function wm_nice_bandwidth($number, $kilo = 1000, $decimals=1, $below_one=TRUE)
 {
 	$suffix='';
 
@@ -1756,6 +1765,8 @@ class Colour
 	// take in an existing value and create a Colour object for it
 	function Colour()
 	{
+	    throw new Exception("old Colour class used");
+
 		if(func_num_args() == 3) # a set of 3 colours
 		{
 			$this->r = func_get_arg(0); # r

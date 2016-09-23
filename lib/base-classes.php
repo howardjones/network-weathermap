@@ -153,6 +153,12 @@ class WeatherMapBase
         return array($this->name);
     }
 
+    public function setTemplate($template_name, $owner)
+    {
+        $this->template = $template_name;
+        wm_debug("Resetting to template %s %s\n", $this->my_type(), $template_name);
+        $this->reset($owner);
+    }
 
 }
 

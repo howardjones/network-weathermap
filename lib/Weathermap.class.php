@@ -28,7 +28,7 @@ require_once "WeatherMapNode.class.php";
 require_once "WeatherMapLink.class.php";
 
 
-$WEATHERMAP_VERSION = "0.98";
+$WEATHERMAP_VERSION = "0.98a";
 $weathermap_debugging = FALSE;
 $weathermap_map = "";
 $weathermap_warncount = 0;

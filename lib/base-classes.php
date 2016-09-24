@@ -38,14 +38,14 @@ class WeatherMapBase
         $this->notes[$name] = $value;
     }
 
-    function get_note($name)
+    function get_note($name, $default = NULL)
     {
         if (isset($this->notes[$name])) {
             //	debug("Found note $name in ".$this->name." with value of ".$this->notes[$name].".\n");
-            return ($this->notes[$name]);
+            return $this->notes[$name];
         } else {
             //	debug("Looked for note $name in ".$this->name." which doesn't exist.\n");
-            return (NULL);
+            return $default;
         }
     }
 
@@ -57,14 +57,14 @@ class WeatherMapBase
     }
 
 
-    function get_hint($name)
+    function get_hint($name, $default = NULL)
     {
         if (isset($this->hints[$name])) {
             //	debug("Found hint $name in ".$this->name." with value of ".$this->hints[$name].".\n");
-            return ($this->hints[$name]);
+            return $this->hints[$name];
         } else {
             //	debug("Looked for hint $name in ".$this->name." which doesn't exist.\n");
-            return (NULL);
+            return $default;
         }
     }
 

@@ -10,33 +10,34 @@
 
 // You could also fetch interface states from IF-MIB with it.
 
-// TARGET snmp:public:hostname:1.3.6.1.4.1.3711.1.1:1.3.6.1.4.1.3711.1.2
+// TARGET snmp2c:public:hostname:1.3.6.1.4.1.3711.1.1:1.3.6.1.4.1.3711.1.2
 // (that is, TARGET snmp:community:host:in_oid:out_oid
 
-class WeatherMapDataSource_snmp extends WeatherMapDataSource
+class WeatherMapDataSource_snmpv2c extends WeatherMapDataSource
 {
+    protected $down_cache;
 
     function Init(&$map)
     {
         // We can keep a list of unresponsive nodes, so we can give up earlier
         $this->down_cache = array();
 
-        if (function_exists('snmpget')) {
-            return (TRUE);
+        if (function_exists('snmp2_get')) {
+            return TRUE;
         }
-        wm_debug("SNMP DS: snmpget() not found. Do you have the PHP SNMP module?\n");
+        wm_debug("SNMP2c DS: snmp2_get() not found. Do you have the PHP SNMP module?\n");
 
-        return (FALSE);
+        return FALSE;
     }
 
 
     function Recognise($targetstring)
     {
-        if (preg_match("/^snmp:([^:]+):([^:]+):([^:]+):([^:]+)$/", $targetstring, $matches)) {
+        if (preg_match("/^snmp2c:([^:]+):([^:]+):([^:]+):([^:]+)$/", $targetstring, $matches)) {
             return TRUE;
-        } else {
-            return FALSE;
         }
+        return FALSE;
+
     }
 
     function ReadData($targetstring, &$map, &$item)
@@ -60,7 +61,7 @@ class WeatherMapDataSource_snmp extends WeatherMapDataSource
         wm_debug("Will abort after $abort_count failures for a given host.\n");
         wm_debug("Number of retries changed to " . $retries . ".\n");
 
-        if (preg_match("/^snmp:([^:]+):([^:]+):([^:]+):([^:]+)$/", $targetstring, $matches)) {
+        if (preg_match("/^snmp2c:([^:]+):([^:]+):([^:]+):([^:]+)$/", $targetstring, $matches)) {
             $community = $matches[1];
             $host = $matches[2];
             $in_oid = $matches[3];
@@ -89,7 +90,7 @@ class WeatherMapDataSource_snmp extends WeatherMapDataSource
                 }
 
                 if ($in_oid != '-') {
-                    $in_result = snmpget($host, $community, $in_oid, $timeout, $retries);
+                    $in_result = snmp2_get($host, $community, $in_oid, $timeout, $retries);
                     if ($in_result !== FALSE) {
                         $data[IN] = floatval($in_result);
                         $item->add_hint("snmp_in_raw", $in_result);
@@ -98,7 +99,7 @@ class WeatherMapDataSource_snmp extends WeatherMapDataSource
                     }
                 }
                 if ($out_oid != '-') {
-                    $out_result = snmpget($host, $community, $out_oid, $timeout, $retries);
+                    $out_result = snmp2_get($host, $community, $out_oid, $timeout, $retries);
                     if ($out_result !== FALSE) {
                         // use floatval() here to force the output to be *some* kind of number
                         // just in case the stupid formatting stuff doesn't stop net-snmp returning 'down' instead of 2
@@ -109,7 +110,7 @@ class WeatherMapDataSource_snmp extends WeatherMapDataSource
                     }
                 }
 
-                wm_debug("SNMP ReadData: Got $in_result and $out_result\n");
+                wm_debug("SNMP2c ReadData: Got $in_result and $out_result\n");
 
                 $data_time = time();
 
@@ -121,9 +122,9 @@ class WeatherMapDataSource_snmp extends WeatherMapDataSource
             }
         }
 
-        wm_debug("SNMP ReadData: Returning (" . ($data[IN] === NULL ? 'NULL' : $data[IN]) . "," . ($data[OUT] === NULL ? 'NULL' : $data[OUT]) . ",$data_time)\n");
+        wm_debug("SNMP2c ReadData: Returning (" . ($data[IN] === NULL ? 'NULL' : $data[IN]) . "," . ($data[OUT] === NULL ? 'NULL' : $data[OUT]) . ",$data_time)\n");
 
-        return (array($data[IN], $data[OUT], $data_time));
+        return array($data[IN], $data[OUT], $data_time);
     }
 }
 

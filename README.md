@@ -1,6 +1,6 @@
-## PHP Network Weathermap 0.98
+## PHP Network Weathermap 0.98a
 
-This is PHP Network Weathermap, version 0.98 by Howard Jones (howie@thingy.com)
+This is PHP Network Weathermap, version 0.98a by Howard Jones (howie@thingy.com)
 
 See the docs sub-directory for full HTML documentation, FAQ and example config.
 
@@ -11,8 +11,19 @@ See COPYING for the license under which php-weathermap is released.
 There is much more information, tutorials and updates available at:
     http://www.network-weathermap.com/
 
+## Project Admin 
 
-----
+For news and updates, see http://www.network-weathermap.com/
+(also twitter @netweathermap and Facebook)
+
+For issue tracking and bug reports use the Github issue tracker: https://github.com/howardjones/network-weathermap/issues  
+
+I'm trying managing feature requests with FeatHub. You can add features here, and vote for them too:
+
+[![Feature Requests](http://feathub.com/howardjones/network-weathermap?format=svg)](http://feathub.com/howardjones/network-weathermap)
+
+
+## Credits
 
 PHP Weathermap contains components from other software developers:
 

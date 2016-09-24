@@ -119,10 +119,8 @@ class ConfigTest extends PHPUnit_Framework_TestCase
         WMTestSupport::TestOutput_RunTest(self::$result1dir . DIRECTORY_SEPARATOR . $conffile, $output_image_round2, '',
             '', '');
 
-//        $ref_output1 = md5_file($output_image_round1);
-//        $ref_output2 = md5_file($output_image_round2);
-        $ref_output1 = file_get_contents($output_image_round1);
-        $ref_output2 = file_get_contents($output_image_round2);
+        $ref_output1 = md5_file($output_image_round1);
+        $ref_output2 = md5_file($output_image_round2);
 
         $this->assertEquals($ref_output1, $ref_output2,
             "Config Output from WriteConfig did not match original for $conffile");

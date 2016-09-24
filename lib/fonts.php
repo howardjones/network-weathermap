@@ -2,11 +2,11 @@
 
 class WMFont
 {
-   public $type;
-   public $file;
-   public $gdnumber;
-   public $size;
-   public $loaded;
+    public $type;
+    public $file;
+    public $gdnumber;
+    public $size;
+    public $loaded;
 
     public function __construct()
     {
@@ -20,7 +20,7 @@ class WMFont
 
     /**
      * @param $lines
-     * @return array
+     * @return int
      */
     protected function calculateMaxLineLength($lines)
     {
@@ -157,9 +157,9 @@ class WMGDFont extends WMFont
             $this->type = "gd";
 
             return true;
-        } else {
-            return false;
         }
+        return false;
+
     }
 }
 
@@ -173,6 +173,11 @@ class WMFontTable
             $newFont = new WMGDFont($i);
             $this->addFont($i, $newFont);
         }
+    }
+
+    public function count()
+    {
+        return sizeof($this->table);
     }
 
     public function addFont($fontNumber, $font)
@@ -238,5 +243,7 @@ class WMFontTable
         if ($type == "gd") {
             return new WMGDFont($file);
         }
+
+        throw new WeathermapInternalFail("Requested non-existent font type");
     }
 }

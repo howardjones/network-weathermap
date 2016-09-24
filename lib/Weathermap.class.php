@@ -398,7 +398,7 @@ class WeatherMap extends WeatherMapBase
 	var $node_template_tree;
 	var $link_template_tree;
     var $dsinfocache=array();
-	
+
 	var $plugins = array();
 	var $included_files = array();
 	var $usage_stats = array();
@@ -523,14 +523,14 @@ class WeatherMap extends WeatherMapBase
 				'timefont' => 2,
 				'timex' => 0,
 				'timey' => 0,
-				
+
 				'mintimex' => -10000,
 				'mintimey' => -10000,
 				'maxtimex' => -10000,
 				'maxtimey' => -10000,
 				'minstamptext' => 'Oldest Data: %b %d %Y %H:%M:%S',
 				'maxstamptext' => 'Newest Data: %b %d %Y %H:%M:%S',
-				
+
 				'thumb_width' => 0,
 				'thumb_height' => 0,
 				'titlex' => -1,
@@ -542,7 +542,7 @@ class WeatherMap extends WeatherMapBase
 				'widthmod' => FALSE,
 				'has_includes' => FALSE,
 				'has_overlibs' => FALSE,
-				'name' => 'MAP'				
+				'name' => 'MAP'
 			);
 
 		$this->Reset();
@@ -560,7 +560,7 @@ class WeatherMap extends WeatherMapBase
 		$this->imagecache = new WMImageLoader();
 		$this->next_id = 100;
 		foreach (array_keys($this->inherit_fieldlist)as $fld) { $this->$fld=$this->inherit_fieldlist[$fld]; }
-		
+
 		$this->min_ds_time = NULL;
 		$this->max_ds_time = NULL;
 
@@ -571,10 +571,10 @@ class WeatherMap extends WeatherMapBase
 
         $this->createDefaultLinks();
         $this->createDefaultNodes();
-                
+
        	$this->node_template_tree = array();
        	$this->link_template_tree = array();
-       	
+
 		$this->node_template_tree['DEFAULT'] = array();
 		$this->link_template_tree['DEFAULT'] = array();
 
@@ -677,109 +677,18 @@ class WeatherMap extends WeatherMapBase
         );
 
         foreach ($defaults as $key => $def) {
-
             $this->colourtable[$key] = new WMColour($def['red'], $def['green'], $def['blue']);
         }
 
         // legacy style
         foreach ($defaults as $key => $def) {
-
             $this->colours['DEFAULT'][$key] = $def;
             $this->colours['DEFAULT'][$key]['c1'] = $this->colourtable[$key];
+            $this->colours['DEFAULT'][$key]['special'] = true;
         }
     }
 
-	function myimagestring($image, $fontnumber, $x, $y, $string, $colour, $angle=0)
-	{
-        throw new WeathermapDeprecatedException("Still using myimagestring");
 
-		// if it's supposed to be a special font, and it hasn't been defined, then fall through
-		if ($fontnumber > 5 && $this->fonts->isValid($fontnumber))
-		{
-			wm_warn ("Using a non-existent special font ($fontnumber) - falling back to internal GD fonts [WMWARN03]\n");
-			if($angle != 0) wm_warn("Angled text doesn't work with non-FreeType fonts [WMWARN02]\n");
-			$fontnumber=5;
-		}
-
-		if (($fontnumber > 0) && ($fontnumber < 6))
-		{
-			imagestring($image, $fontnumber, $x, $y - imagefontheight($fontnumber), $string, $colour);
-			if($angle != 0) wm_warn("Angled text doesn't work with non-FreeType fonts [WMWARN02]\n");
-		}
-		else
-		{
-			// look up what font is defined for this slot number
-			if ($this->fonts[$fontnumber]->type == 'truetype')
-			{
-				wimagettftext($image, $this->fonts[$fontnumber]->size, $angle, $x, $y,
-					$colour, $this->fonts[$fontnumber]->file, $string);
-			}
-
-			if ($this->fonts[$fontnumber]->type == 'gd')
-			{
-				imagestring($image, $this->fonts[$fontnumber]->gdnumber,
-					$x,      $y - imagefontheight($this->fonts[$fontnumber]->gdnumber),
-					$string, $colour);
-				if($angle != 0) wm_warn("Angled text doesn't work with non-FreeType fonts [WMWARN04]\n");
-			}
-		}
-	}
-
-	function myimagestringsize($fontnumber, $string)
-	{
-        throw new WeathermapDeprecatedException("Still using myimagestring");
-
-		$linecount = 1;
-		
-		$lines = explode("\n",$string);
-		$linecount = sizeof($lines);
-		$maxlinelength=0;
-		foreach($lines as $line)
-		{
-			$l = strlen($line);
-			if($l > $maxlinelength) $maxlinelength = $l;
-		}
-				
-		if (($fontnumber > 0) && ($fontnumber < 6))
-		{ return array(imagefontwidth($fontnumber) * $maxlinelength, $linecount * imagefontheight($fontnumber)); }
-		else
-		{
-			// look up what font is defined for this slot number
-			if (!isset($this->fonts[$fontnumber]))
-			{
-				wm_warn ("Using a non-existent special font ($fontnumber) - falling back to internal GD fonts [WMWARN36]\n");
-				$fontnumber=5;
-				return array(imagefontwidth($fontnumber) * $maxlinelength, $linecount * imagefontheight($fontnumber));
-			}
-			else
-			{
-				if ($this->fonts[$fontnumber]->type == 'truetype')
-				{
-					$ysize = 0;
-					$xsize = 0;
-					foreach($lines as $line)
-					{
-						$bounds=imagettfbbox($this->fonts[$fontnumber]->size, 0, $this->fonts[$fontnumber]->file, $line);
-						$cx = $bounds[4] - $bounds[0];
-						$cy = $bounds[1] - $bounds[5];
-						if($cx > $xsize) $xsize = $cx;
-						$ysize += ($cy*1.2);
-						# warn("Adding $cy (x was $cx)\n");
-					}
-					#$bounds=imagettfbbox($this->fonts[$fontnumber]->size, 0, $this->fonts[$fontnumber]->file,
-					#	$string);
-					# return (array($bounds[4] - $bounds[0], $bounds[1] - $bounds[5]));
-					# warn("Size of $string is $xsize x $ysize over $linecount lines\n");
-					
-					return(array($xsize,$ysize));
-				}
-
-				if ($this->fonts[$fontnumber]->type == 'gd')
-				{ return array(imagefontwidth($this->fonts[$fontnumber]->gdnumber) * $maxlinelength,
-					$linecount * imagefontheight($this->fonts[$fontnumber]->gdnumber)); }
-			}
-		}
-	}
 
 	function ProcessString($input, &$context, $include_notes = true, $multiline = false)
 	{
@@ -797,7 +706,7 @@ class WeatherMap extends WeatherMapBase
 		assert('is_scalar($input)');
 
 		$context_description = strtolower( $context->my_type() );
-		if($context_description != "map") $context_description .= ":" . $context->name; 
+		if($context_description != "map") $context_description .= ":" . $context->name;
 
 		wm_debug("Trace: ProcessString($input, $context_description)\n");
 
@@ -823,7 +732,7 @@ class WeatherMap extends WeatherMapBase
  		}
 
 		$output = $input;
-		
+
 		while( preg_match('/(\{(?:node|map|link)[^}]+\})/',$input,$matches) )
 		{
 			$value = "[UNKNOWN]";
@@ -869,7 +778,7 @@ class WeatherMap extends WeatherMapBase
 							{
 								$the_item = $context->a;
 							}
-							
+
 							if($itemname == '_linkend_')
 							{
 								$the_item = $context->b;
@@ -1100,13 +1009,14 @@ function RandomData()
 
 function ProcessTargets()
 {
+    throw new WeathermapDeprecatedException("old targets");
 	wm_debug("Preprocessing targets\n");
-	
+
 	$allitems = array(&$this->links, &$this->nodes);
 	reset($allitems);
-	
+
 	wm_debug("Preprocessing targets\n");
-	
+
 	while( list($kk,) = each($allitems))
 	{
 		unset($objects);
@@ -1117,11 +1027,11 @@ function ProcessTargets()
 		{
 			unset($myobj);
 			$myobj = &$objects[$k];
-			
+
 			$type = $myobj->my_type();
 			$name=$myobj->name;
-			
-			
+
+
 			if( ($type=='LINK' && isset($myobj->a)) || ($type=='NODE' && !is_null($myobj->x) ) )
 			{
 				if (count($myobj->targets)>0)
@@ -1131,7 +1041,7 @@ function ProcessTargets()
 					{
 						wm_debug ("ProcessTargets: New Target: $target[4]\n");
 						// processstring won't use notes (only hints) for this string
-						
+
 						$targetstring = $this->ProcessString($target[4], $myobj, FALSE, FALSE);
 						if($target[4] != $targetstring) wm_debug("Targetstring is now $targetstring\n");
 
@@ -1142,14 +1052,14 @@ function ProcessTargets()
 							$targetstring = $matches[1];
 							$multiply = -1 * $multiply;
 						}
-						
+
 						// if the remaining targetstring starts with a number and a *-, then this is a scale factor
 						if(preg_match('/^(\d+\.?\d*)\*(.*)/',$targetstring,$matches))
 						{
 							$targetstring = $matches[2];
 							$multiply = $multiply * floatval($matches[1]);
 						}
-						
+
 						$matched = FALSE;
 						$matched_by = '';
 						foreach ($this->datasourceclasses as $ds_class)
@@ -1160,10 +1070,10 @@ function ProcessTargets()
 								$recognised = $this->plugins['data'][$ds_class]->Recognise($targetstring);
 
 								if( $recognised )
-								{	
+								{
 									$matched = TRUE;
 									$matched_by = $ds_class;
-																		
+
 									if($this->activedatasourceclasses[$ds_class])
 									{
 										$this->plugins['data'][$ds_class]->Register($targetstring, $this, $myobj);
@@ -1178,7 +1088,7 @@ function ProcessTargets()
 											$this->links[$name]->targets[$tindex][1] = $multiply;
 											$this->links[$name]->targets[$tindex][0] = $targetstring;
 											$this->links[$name]->targets[$tindex][5] = $matched_by;
-										}											
+										}
 									}
 									else
 									{
@@ -1190,8 +1100,8 @@ function ProcessTargets()
 						if(! $matched)
 						{
 							wm_warn("ProcessTargets: $type $name, target: $target[4] on config line $target[3] of $target[2] was not recognised as a valid TARGET [WMWARN08]\n");
-						}							
-						
+						}
+
 						$tindex++;
 					}
 				}
@@ -1203,596 +1113,58 @@ function ProcessTargets()
 
 // nodename is a vestigal parameter, from the days when nodes were just big labels
 // TODO - this is only used by Link - it doesn't need to be here
-function DrawLabelRotated($im, $x, $y, $angle, $text, $font, $padding, $linkname, $textcolour, $bgcolour, $outlinecolour, &$map, $direction)
-{
-	// list($strwidth, $strheight)=$this->myimagestringsize($font, $text);
+    function DrawLabelRotated($im, $x, $y, $angle, $text, $font, $padding, $linkname, $textcolour, $bgcolour, $outlinecolour, &$map, $direction)
+    {
+        $fontObject = $this->fonts->getFont($font);
+        list($strwidth, $strheight) = $fontObject->calculateImageStringSize($text);
 
-    $fontObject = $this->fonts->getFont($font);
-    list($strwidth, $strheight) = $fontObject->calculateImageStringSize($text);
+        if (abs($angle) > 90) $angle -= 180;
+        if ($angle < -180) $angle += 360;
 
-	if(abs($angle)>90)  $angle -= 180;
-	if($angle < -180) $angle +=360;
+        $rangle = -deg2rad($angle);
 
-	$rangle = -deg2rad($angle);
+        $extra = 3;
 
-	$extra=3;
+        $x1 = $x - ($strwidth / 2) - $padding - $extra;
+        $x2 = $x + ($strwidth / 2) + $padding + $extra;
+        $y1 = $y - ($strheight / 2) - $padding - $extra;
+        $y2 = $y + ($strheight / 2) + $padding + $extra;
 
-	$x1= $x - ($strwidth / 2) - $padding - $extra;
-	$x2= $x + ($strwidth / 2) + $padding + $extra;
-	$y1= $y - ($strheight / 2) - $padding - $extra;
-	$y2= $y + ($strheight / 2) + $padding + $extra;
+        // a box. the last point is the start point for the text.
+        $points = array($x1, $y1, $x1, $y2, $x2, $y2, $x2, $y1, $x - $strwidth / 2, $y + $strheight / 2 + 1);
 
-	// a box. the last point is the start point for the text.
-	$points = array($x1,$y1, $x1,$y2, $x2,$y2, $x2,$y1,   $x-$strwidth/2, $y+$strheight/2 + 1);
-	// $npoints = count($points)/2;
+        rotateAboutPoint($points, $x, $y, $rangle);
 
-	rotateAboutPoint($points, $x,$y, $rangle);
+        if ($bgcolour->isRealColour()) {
+            $bgcol = $bgcolour->gdAllocate($im);
+            imagefilledpolygon($im, $points, 4, $bgcol);
+        }
 
-	if ($bgcolour->isRealColour())
-	{
-		// $bgcol = myimagecolorallocate($im, $bgcolour[0], $bgcolour[1], $bgcolour[2]);
-        $bgcol = $bgcolour->gdAllocate($im);
-		# imagefilledrectangle($im, $x1, $y1, $x2, $y2, $bgcol);
-		wimagefilledpolygon($im,$points,4,$bgcol);
-	}
+        if ($outlinecolour->isRealColour()) {
+            $outlinecol = $outlinecolour->gdAllocate($im);
+            imagepolygon($im, $points, 4, $outlinecol);
+        }
 
-	if ($outlinecolour->isRealColour())
-	{
-		// $outlinecol=myimagecolorallocate($im, $outlinecolour[0], $outlinecolour[1], $outlinecolour[2]);
-        $outlinecol = $outlinecolour->gdAllocate($im);
-		# imagerectangle($im, $x1, $y1, $x2, $y2, $outlinecol);
-		wimagepolygon($im,$points,4,$outlinecol);
-	}
+        $textcol = $textcolour->gdAllocate($im);
+        $fontObject->drawImageString($im, $points[8], $points[9], $text, $textcol, $angle);
 
-	// $textcol=myimagecolorallocate($im, $textcolour[0], $textcolour[1], $textcolour[2]);
-    $textcol = $textcolour->gdAllocate($im);
-	// $this->myimagestring($im, $font, $points[8], $points[9], $text, $textcol,$angle);
-    $fontObject->drawImageString($im, $points[8], $points[9], $text, $textcol, $angle);
+        $areaname = "LINK:L" . $map->links[$linkname]->id . ':' . ($direction + 2);
 
-	$areaname = "LINK:L".$map->links[$linkname]->id.':'.($direction+2);
-	
-	// the rectangle is about half the size in the HTML, and easier to optimise/detect in the browser
-	if($angle==0)
-	{
-		$map->imap->addArea("Rectangle", $areaname, '', array($x1, $y1, $x2, $y2));
-		wm_debug ("Adding Rectangle imagemap for $areaname\n");
-	}
-	else
-	{
-		$map->imap->addArea("Polygon", $areaname, '', $points);
-		wm_debug ("Adding Poly imagemap for $areaname\n");
-	}
-	$this->links[$linkname]->imap_areas[] = $areaname;
+        // the rectangle is about half the size in the HTML, and easier to optimise/detect in the browser
+        if ($angle == 0) {
+            $map->imap->addArea("Rectangle", $areaname, '', array($x1, $y1, $x2, $y2));
+            wm_debug("Adding Rectangle imagemap for $areaname\n");
+        } else {
+            $map->imap->addArea("Polygon", $areaname, '', $points);
+            wm_debug("Adding Poly imagemap for $areaname\n");
+        }
+        $this->links[$linkname]->imap_areas[] = $areaname;
 
-}
-
-function ColourFromPercent($image, $percent,$scalename="DEFAULT",$name="")
-{
-	$col = NULL;
-	$tag = '';
-	
-	$nowarn_clipping = intval($this->get_hint("nowarn_clipping"));
-	$nowarn_scalemisses = intval($this->get_hint("nowarn_scalemisses"));
-
-	$bt = debug_backtrace();
-	$function = (isset($bt[1]['function']) ? $bt[1]['function'] : '');
-	print "$function calls ColourFromPercent\n";
-
-	exit();
-
-}
-
-function NewColourFromPercent($value,$scalename="DEFAULT",$name="",$is_percent=TRUE, $scale_warning=TRUE)
-{
-    throw new WeathermapDeprecatedException("Still using wm NCFPC");
-
-    $col = new WMColour(0,0,0);
-	$tag = '';
-	$matchsize = NULL;
-
-	$nowarn_clipping = intval($this->get_hint("nowarn_clipping"));
-	$nowarn_scalemisses = (!$scale_warning) || intval($this->get_hint("nowarn_scalemisses"));
-	
-	if(isset($this->colours[$scalename]))
-	{
-		$colours=$this->colours[$scalename];
-
-		if ($is_percent && $value > 100)
-		{
-			if($nowarn_clipping==0) wm_warn ("NewColourFromPercent: Clipped $value% to 100% for item $name [WMWARN33]\n");
-			$value = 100;
-		}
-		
-		if ($is_percent && $value < 0)
-		{
-			if($nowarn_clipping==0) wm_warn ("NewColourFromPercent: Clipped $value% to 0% for item $name [WMWARN34]\n");
-			$value = 0;
-		}
-
-		foreach ($colours as $key => $colour)
-		{
-			if ( (!isset($colour['special']) || $colour['special'] == 0) and ($value >= $colour['bottom']) and ($value <= $colour['top']))
-			{
-				$range = $colour['top'] - $colour['bottom'];
-				if (isset($colour['red2']))
-				{
-					if($colour["bottom"] == $colour["top"])
-					{
-						$ratio = 0;
-					}
-					else
-					{
-						$ratio=($value - $colour["bottom"]) / ($colour["top"] - $colour["bottom"]);
-					}
-
-					$r=$colour["red1"] + ($colour["red2"] - $colour["red1"]) * $ratio;
-					$g=$colour["green1"] + ($colour["green2"] - $colour["green1"]) * $ratio;
-					$b=$colour["blue1"] + ($colour["blue2"] - $colour["blue1"]) * $ratio;
-				}
-				else {
-					$r=$colour["red1"];
-					$g=$colour["green1"];
-					$b=$colour["blue1"];
-
-					# $col = new Colour($r, $g, $b);
-					# $col = $colour['gdref1'];
-				}
-				
-				// change in behaviour - with multiple matching ranges for a value, the smallest range wins
-				if( is_null($matchsize) || ($range < $matchsize) ) 
-				{
-					$col = new WMColour($r, $g, $b);
-					$matchsize = $range;
-				}
-				
-				if(isset($colour['tag'])) $tag = $colour['tag'];
-				#### warn(">>NCFPC TAGS $tag\n");
-				wm_debug("NCFPC $name $scalename $value '$tag' $key $r $g $b\n");
-
-				return(array($col,$key,$tag));
-			}
-		}
-	}
-	else
-	{
-		if($scalename != 'none')
-		{
-			wm_warn("ColourFromPercent: Attempted to use non-existent scale: $scalename for item $name [WMWARN09]\n");
-		}
-		else
-		{
-			return array(new Colour(255,255,255),'','');
-		}
-	}
-
-	// shouldn't really get down to here if there's a complete SCALE
-
-	// you'll only get grey for a COMPLETELY quiet link if there's no 0 in the SCALE lines
-	if ($value == 0) { return array(new WMColour(192,192,192),'',''); }
-
-	if($nowarn_scalemisses==0) wm_warn("NewColourFromPercent: Scale $scalename doesn't include a line for $value".($is_percent ? "%" : "")." while drawing item $name [WMWARN29]\n");
-
-	// and you'll only get white for a link with no colour assigned
-	return array(new WMColour(255,255,255),'','');
-}
-
-
-function coloursort($a, $b)
-{
-	if ($a['bottom'] == $b['bottom'])
-	{
-		if($a['top'] < $b['top']) { return -1; };
-		if($a['top'] > $b['top']) { return 1; };
-		return 0;
-	}
-
-	if ($a['bottom'] < $b['bottom']) { return -1; }
-
-	return 1;
-}
-
-function FindScaleExtent($scalename="DEFAULT")
-{
-	$max = -999999999999999999999;
-	$min = - $max;
-	
-	if(isset($this->colours[$scalename]))
-	{
-		$colours=$this->colours[$scalename];
-
-		foreach ($colours as $key => $colour)
-		{
-			if(! $colour['special'])
-			{
-				$min = min($colour['bottom'], $min);
-				$max = max($colour['top'],  $max);
-			}
-		}
-	}
-	else
-	{
-		wm_warn("FindScaleExtent: non-existent SCALE $scalename [WMWARN43]\n");
-	}
-	return array($min, $max);
-}
-
-function DrawLegend_Horizontal($im,$scalename="DEFAULT",$width=400)
-{
-	$title=$this->keytext[$scalename];
-
-	$colours=$this->colours[$scalename];
-	$nscales=$this->numscales[$scalename];
-
-	wm_debug("Drawing $nscales colours into SCALE\n");
-
-	$font=$this->keyfont;
-
-	# $x=$this->keyx[$scalename];
-	# $y=$this->keyy[$scalename];
-	$x = 0;
-	$y = 0;
-
-	# $width = 400;
-	$scalefactor = $width/100;
-
-	list($tilewidth, $tileheight)=$this->myimagestringsize($font, "100%");
-	$box_left = $x;
-	# $box_left = 0;
-	$scale_left = $box_left + 4 + $scalefactor/2;
-	$box_right = $scale_left + $width + $tilewidth + 4 + $scalefactor/2;
-	$scale_right = $scale_left + $width;
-
-	$box_top = $y;
-	# $box_top = 0;
-	$scale_top = $box_top + $tileheight + 6;
-	$scale_bottom = $scale_top + $tileheight * 1.5;
-	$box_bottom = $scale_bottom + $tileheight * 2 + 6;
-
-	$scale_im = imagecreatetruecolor($box_right+1, $box_bottom+1);
-	$scale_ref = 'gdref_legend_'.$scalename;
-
-	// Start with a transparent box, in case the fill or outline colour is 'none'
-	imageSaveAlpha($scale_im, true);
-	$nothing = imagecolorallocatealpha($scale_im, 128, 0, 0, 127);
-	imagefill($scale_im, 0, 0, $nothing);
-
-	$this->AllocateScaleColours($scale_im,$scale_ref);
-
-	if (!is_none($this->colours['DEFAULT']['KEYBG'])) {
-		wimagefilledrectangle($scale_im, $box_left, $box_top, $box_right, $box_bottom,
-			$this->colours['DEFAULT']['KEYBG'][$scale_ref]);
-	}
-	if (!is_none($this->colours['DEFAULT']['KEYOUTLINE'])) {
-		wimagerectangle($scale_im, $box_left, $box_top, $box_right, $box_bottom,
-			$this->colours['DEFAULT']['KEYOUTLINE'][$scale_ref]);
-	}
-	$this->myimagestring($scale_im, $font, $scale_left, $scale_bottom + $tileheight * 2 + 2 , $title,
-		$this->colours['DEFAULT']['KEYTEXT'][$scale_ref]);
-
-	for($p=0;$p<=100;$p++)
-	{
-		$dx = $p*$scalefactor;
-
-		if( ($p % 25) == 0)
-		{
-			imageline($scale_im, $scale_left + $dx, $scale_top - $tileheight,
-				$scale_left + $dx, $scale_bottom + $tileheight,
-				$this->colours['DEFAULT']['KEYTEXT'][$scale_ref]);
-			$labelstring=sprintf("%d%%", $p);
-			$this->myimagestring($scale_im, $font, $scale_left + $dx + 2, $scale_top - 2, $labelstring,
-				$this->colours['DEFAULT']['KEYTEXT'][$scale_ref]);
-		}
-
-		list($col,$junk) = $this->NewColourFromPercent($p,$scalename);
-		if($col->is_real())
-		{
-			$cc = $col->gdallocate($scale_im);
-			wimagefilledrectangle($scale_im, $scale_left + $dx - $scalefactor/2, $scale_top,
-				$scale_left + $dx + $scalefactor/2, $scale_bottom,
-				$cc);
-		}
-	}
-
-	imagecopy($im,$scale_im,$this->keyx[$scalename],$this->keyy[$scalename],0,0,imagesx($scale_im),imagesy($scale_im));
-	$this->keyimage[$scalename] = $scale_im;
-
-    $rx = $this->keyx[$scalename];
-    $ry = $this->keyy[$scalename];
-
-	$areaname = "LEGEND:$scalename";
-	$this->imap->addArea("Rectangle", $areaname, '',
-		array($rx+$box_left, $ry+$box_top, $rx+$box_right, $ry+$box_bottom));
-	$this->imap_areas[] = $areaname;
-}
-
-function DrawLegend_Vertical($im,$scalename="DEFAULT",$height=400,$inverted=false)
-{
-	$title=$this->keytext[$scalename];
-
-	$colours=$this->colours[$scalename];
-	$nscales=$this->numscales[$scalename];
-
-	wm_debug("Drawing $nscales colours into SCALE\n");
-
-	$font=$this->keyfont;
-
-	$x=$this->keyx[$scalename];
-	$y=$this->keyy[$scalename];
-
-	# $height = 400;
-	$scalefactor = $height/100;
-
-	list($tilewidth, $tileheight)=$this->myimagestringsize($font, "100%");
-
-	# $box_left = $x;
-	# $box_top = $y;
-	$box_left = 0;
-	$box_top = 0;
-
-	$scale_left = $box_left+$scalefactor*2 +4 ;
-	$scale_right = $scale_left + $tileheight*2;
-	$box_right = $scale_right + $tilewidth + $scalefactor*2 + 4;
-
-	list($titlewidth,$titleheight) = $this->myimagestringsize($font,$title);
-	if( ($box_left + $titlewidth + $scalefactor*3) > $box_right)
-	{
-		$box_right = $box_left + $scalefactor*4 + $titlewidth;
-	}
-
-	$scale_top = $box_top + 4 + $scalefactor + $tileheight*2;
-	$scale_bottom = $scale_top + $height;
-	$box_bottom = $scale_bottom + $scalefactor + $tileheight/2 + 4;
-
-	$scale_im = imagecreatetruecolor($box_right+1, $box_bottom+1);
-	$scale_ref = 'gdref_legend_'.$scalename;
-
-	// Start with a transparent box, in case the fill or outline colour is 'none'
-	imageSaveAlpha($scale_im, true);
-	$nothing = imagecolorallocatealpha($scale_im, 128, 0, 0, 127);
-	imagefill($scale_im, 0, 0, $nothing);
-
-	$this->AllocateScaleColours($scale_im,$scale_ref);
-
-	if (!is_none($this->colours['DEFAULT']['KEYBG'])) {
-		wimagefilledrectangle($scale_im, $box_left, $box_top, $box_right, $box_bottom,
-			$this->colours['DEFAULT']['KEYBG']['gdref1']);
-	}
-	if (!is_none($this->colours['DEFAULT']['KEYOUTLINE'])) {
-		wimagerectangle($scale_im, $box_left, $box_top, $box_right, $box_bottom,
-			$this->colours['DEFAULT']['KEYOUTLINE']['gdref1']);
-	}
-
-	$this->myimagestring($scale_im, $font, $scale_left-$scalefactor, $scale_top - $tileheight , $title,
-		$this->colours['DEFAULT']['KEYTEXT']['gdref1']);
-
-	$updown = 1;
-	if($inverted) $updown = -1;
-		
-
-	for($p=0;$p<=100;$p++)
-	{
-		if($inverted)
-		{
-			$dy = (100-$p) * $scalefactor;
-		}
-		else
-		{
-			$dy = $p*$scalefactor;
-		}
-	
-		if( ($p % 25) == 0)
-		{
-			imageline($scale_im, $scale_left - $scalefactor, $scale_top + $dy,
-				$scale_right + $scalefactor, $scale_top + $dy,
-				$this->colours['DEFAULT']['KEYTEXT'][$scale_ref]);
-			$labelstring=sprintf("%d%%", $p);
-			$this->myimagestring($scale_im, $font, $scale_right + $scalefactor*2 , $scale_top + $dy + $tileheight/2,
-				$labelstring,  $this->colours['DEFAULT']['KEYTEXT'][$scale_ref]);
-		}
-
-		list($col,$junk) = $this->NewColourFromPercent($p,$scalename);
-		if( $col->is_real())
-		{
-			$cc = $col->gdallocate($scale_im);
-			wimagefilledrectangle($scale_im, $scale_left, $scale_top + $dy - $scalefactor/2,
-				$scale_right, $scale_top + $dy + $scalefactor/2,
-				$cc);
-		}
-	}
-
-	imagecopy($im,$scale_im,$this->keyx[$scalename],$this->keyy[$scalename],0,0,imagesx($scale_im),imagesy($scale_im));
-	$this->keyimage[$scalename] = $scale_im;
-
-	$rx = $this->keyx[$scalename];
-	$ry = $this->keyy[$scalename];
-	$areaname = "LEGEND:$scalename";
-	$this->imap->addArea("Rectangle", $areaname, '',
-		array($rx+$box_left, $ry+$box_top, $rx+$box_right, $ry+$box_bottom));
-	$this->imap_areas[] = $areaname;
-}
-
-function DrawLegend_Classic($im,$scalename="DEFAULT",$use_tags=FALSE)
-{
-	$title=$this->keytext[$scalename];
-
-	$colours=$this->colours[$scalename];
-	usort($colours, array("Weathermap", "coloursort"));
-	
-	$nscales=$this->numscales[$scalename];
-
-	wm_debug("Drawing $nscales colours into SCALE\n");
-
-	$hide_zero = intval($this->get_hint("key_hidezero_".$scalename));
-	$hide_percent = intval($this->get_hint("key_hidepercent_".$scalename));
-
-	// did we actually hide anything?
-	$hid_zero = FALSE;
-	if( ($hide_zero == 1) && isset($colours['0_0']) )
-	{
-		$nscales--;
-		$hid_zero = TRUE;
-	}
-
-	$font=$this->keyfont;
-
-	$x=$this->keyx[$scalename];
-	$y=$this->keyy[$scalename];
-
-	list($tilewidth, $tileheight)=$this->myimagestringsize($font, "MMMM");
-	$tileheight=$tileheight * 1.1;
-	$tilespacing=$tileheight + 2;
-
-	if (($this->keyx[$scalename] >= 0) && ($this->keyy[$scalename] >= 0))
-	{
-
-		# $minwidth = imagefontwidth($font) * strlen('XX 100%-100%')+10;
-		# $boxwidth = imagefontwidth($font) * strlen($title) + 10;
-		list($minwidth, $junk)=$this->myimagestringsize($font, 'MMMM 100%-100%');
-		list($minminwidth, $junk)=$this->myimagestringsize($font, 'MMMM ');
-		list($boxwidth, $junk)=$this->myimagestringsize($font, $title);
-		
-		if($use_tags)
-		{
-			$max_tag = 0;
-			foreach ($colours as $colour)
-			{
-				if ( isset($colour['tag']) )
-				{
-					list($w, $junk)=$this->myimagestringsize($font, $colour['tag']);
-					# print $colour['tag']." $w \n";
-					if($w > $max_tag) $max_tag = $w;
-				}
-			}
-			
-			// now we can tweak the widths, appropriately to allow for the tag strings
-			# print "$max_tag > $minwidth?\n";
-			if( ($max_tag + $minminwidth) > $minwidth) $minwidth = $minminwidth + $max_tag;
-			# print "minwidth is now $minwidth\n";
-		}
-
-		$minwidth+=10;
-		$boxwidth+=10;
-
-		if ($boxwidth < $minwidth) { $boxwidth=$minwidth; }
-
-		$boxheight=$tilespacing * ($nscales + 1) + 10;
-
-		$boxx=$x; $boxy=$y;
-		$boxx=0;
-		$boxy=0;
-
-		// allow for X11-style negative positioning
-		if ($boxx < 0) { $boxx+=$this->width; }
-
-		if ($boxy < 0) { $boxy+=$this->height; }
-
-		$scale_im = imagecreatetruecolor($boxwidth+1, $boxheight+1);
-		$scale_ref = 'gdref_legend_'.$scalename;
-
-		// Start with a transparent box, in case the fill or outline colour is 'none'
-		imageSaveAlpha($scale_im, true);
-		$nothing = imagecolorallocatealpha($scale_im, 128, 0, 0, 127);
-		imagefill($scale_im, 0, 0, $nothing);
-
-		$this->AllocateScaleColours($scale_im,$scale_ref);
-
-		if (! is_none($this->colours['DEFAULT']['KEYBG'])) {
-			wimagefilledrectangle($scale_im, $boxx, $boxy, $boxx + $boxwidth, $boxy + $boxheight,
-				$this->colours['DEFAULT']['KEYBG'][$scale_ref]);
-		}
-		if (! is_none($this->colours['DEFAULT']['KEYOUTLINE'])) {
-			wimagerectangle($scale_im, $boxx, $boxy, $boxx + $boxwidth, $boxy + $boxheight,
-				$this->colours['DEFAULT']['KEYOUTLINE'][$scale_ref]);
-		}
-
-		$this->myimagestring($scale_im, $font, $boxx + 4, $boxy + 4 + $tileheight, $title,
-			$this->colours['DEFAULT']['KEYTEXT'][$scale_ref]);
-
-		$i=1;
-
-		foreach ($colours as $colour)
-		{
-			if (!isset($colour['special']) || $colour['special'] == 0)
-			// if ( 1==1 || $colour['bottom'] >= 0)
-			{
-				// pick a value in the middle...
-				$value = ($colour['bottom'] + $colour['top']) / 2;
-				wm_debug(sprintf("%f-%f (%f)  %d %d %d\n", $colour['bottom'], $colour['top'], $value, $colour['red1'], $colour['green1'], $colour['blue1']));
-				
-				#  debug("$i: drawing\n");
-				if( ($hide_zero == 0) || $colour['key'] != '0_0')
-				{
-					$y=$boxy + $tilespacing * $i + 8;
-					$x=$boxx + 6;
-
-					$fudgefactor = 0;
-					if( $hid_zero && $colour['bottom']==0 )
-					{
-						// calculate a small offset that can be added, which will hide the zero-value in a
-						// gradient, but not make the scale incorrect. A quarter of a pixel should do it.
-						$fudgefactor = ($colour['top'] - $colour['bottom'])/($tilewidth*4);
-						# warn("FUDGING $fudgefactor\n");
-					}
-
-					// if it's a gradient, red2 is defined, and we need to sweep the values
-					if (isset($colour['red2']))
-					{
-						for ($n=0; $n <= $tilewidth; $n++)
-						{
-							$value
-								=  $fudgefactor + $colour['bottom'] + ($n / $tilewidth) * ($colour['top'] - $colour['bottom']);
-							list($ccol,$junk) = $this->NewColourFromPercent($value, $scalename, "", FALSE);
-							$col = $ccol->gdallocate($scale_im);
-							wimagefilledrectangle($scale_im, $x + $n, $y, $x + $n, $y + $tileheight,
-								$col);
-						}
-					}
-					else
-					{
-						// pick a value in the middle...
-						//$value = ($colour['bottom'] + $colour['top']) / 2;
-						list($ccol,$junk) = $this->NewColourFromPercent($value, $scalename, "", FALSE);
-						$col = $ccol->gdallocate($scale_im);
-						wimagefilledrectangle($scale_im, $x, $y, $x + $tilewidth, $y + $tileheight,
-							$col);
-					}
-
-					if($use_tags)
-					{
-						$labelstring = "";
-						if(isset($colour['tag'])) $labelstring = $colour['tag'];
-					}
-					else
-					{
-						$labelstring=sprintf("%s-%s", $colour['bottom'], $colour['top']);
-						if($hide_percent==0) { $labelstring.="%"; }
-					}
-										
-					$this->myimagestring($scale_im, $font, $x + 4 + $tilewidth, $y + $tileheight, $labelstring,
-						$this->colours['DEFAULT']['KEYTEXT'][$scale_ref]);
-					$i++;
-				}
-				imagecopy($im,$scale_im,$this->keyx[$scalename],$this->keyy[$scalename],0,0,imagesx($scale_im),imagesy($scale_im));
-				$this->keyimage[$scalename] = $scale_im;
-
-			}
-		}
-
-		$areaname = "LEGEND:$scalename";
-		$this->imap->addArea("Rectangle", $areaname, '',
-			array($this->keyx[$scalename], $this->keyy[$scalename], $this->keyx[$scalename] + $boxwidth, $this->keyy[$scalename] + $boxheight));
-		# $this->imap->setProp("href","#","LEGEND");
-		# $this->imap->setProp("extrahtml","onclick=\"position_legend();\"","LEGEND");
-		$this->imap_areas[] = $areaname;
-
-	}
-}
+    }
 
     function DrawTimestamp($im, $font, $colour, $which = "")
     {
         // add a timestamp to the corner, so we can tell if it's all being updated
-        # $datestring = "Created: ".date("M d Y H:i:s",time());
-        # $this->datestamp=strftime($this->stamptext, time());
 
         $fontObject = $this->fonts->getFont($font);
 
@@ -1835,7 +1207,9 @@ function DrawLegend_Classic($im,$scalename="DEFAULT",$use_tags=FALSE)
         $fontObject = $this->fonts->getFont($font);
         $string = $this->ProcessString($this->title, $this);
 
-        if ($this->get_hint('screenshot_mode') == 1) $string = screenshotify($string);
+        if ($this->get_hint('screenshot_mode') == 1) {
+            $string = screenshotify($string);
+        }
 
         list($boxwidth, $boxheight) = $fontObject->calculateImageStringSize($string);
 
@@ -1914,94 +1288,17 @@ function DrawLegend_Classic($im,$scalename="DEFAULT",$use_tags=FALSE)
     private function populateDefaultScales()
     {
         // load some default colouring, otherwise it all goes wrong
-        $count = $this->scales['DEFAULT']->spanCount();
 
-        $this->scales['DEFAULT']->populateDefaultsIfNecessary();
+        $did_populate = $this->scales['DEFAULT']->populateDefaultsIfNecessary();
+
+        if ($did_populate) {
+            // we have a 0-0 line now, so we need to hide that.
+            // (but respect the user's wishes if they defined a scale)
+            $this->add_hint("key_hidezero_DEFAULT", 1);
+        }
 
         $this->scales['none'] = new WeatherMapScale("none", $this);
 
-        if ($count == 0) {
-            // This bit should go away, once everything uses WMScale
-            wm_debug("Adding default SCALE colour set (no SCALE lines seen).\n");
-            $defaults = array(
-                '0_0' => array(
-                    'bottom' => 0,
-                    'top' => 0,
-                    'red1' => 192,
-                    'green1' => 192,
-                    'blue1' => 192
-                ),
-                '0_1' => array(
-                    'bottom' => 0,
-                    'top' => 1,
-                    'red1' => 255,
-                    'green1' => 255,
-                    'blue1' => 255
-                ),
-                '1_10' => array(
-                    'bottom' => 1,
-                    'top' => 10,
-                    'red1' => 140,
-                    'green1' => 0,
-                    'blue1' => 255
-                ),
-                '10_25' => array(
-                    'bottom' => 10,
-                    'top' => 25,
-                    'red1' => 32,
-                    'green1' => 32,
-                    'blue1' => 255
-                ),
-                '25_40' => array(
-                    'bottom' => 25,
-                    'top' => 40,
-                    'red1' => 0,
-                    'green1' => 192,
-                    'blue1' => 255
-                ),
-                '40_55' => array(
-                    'bottom' => 40,
-                    'top' => 55,
-                    'red1' => 0,
-                    'green1' => 240,
-                    'blue1' => 0
-                ),
-                '55_70' => array(
-                    'bottom' => 55,
-                    'top' => 70,
-                    'red1' => 240,
-                    'green1' => 240,
-                    'blue1' => 0
-                ),
-                '70_85' => array(
-                    'bottom' => 70,
-                    'top' => 85,
-                    'red1' => 255,
-                    'green1' => 192,
-                    'blue1' => 0
-                ),
-                '85_100' => array(
-                    'bottom' => 85,
-                    'top' => 100,
-                    'red1' => 255,
-                    'green1' => 0,
-                    'blue1' => 0
-                )
-            );
-
-            foreach ($defaults as $key => $def) {
-                $this->colours['DEFAULT'][$key] = $def;
-                $this->colours['DEFAULT'][$key]['key'] = $key;
-                $this->colours['DEFAULT'][$key]['c1'] = new WMColour($def['red1'], $def['green1'], $def['blue1']);
-                $this->colours['DEFAULT'][$key]['c2'] = null;
-
-                $this->numscales['DEFAULT']++;
-            }
-            // we have a 0-0 line now, so we need to hide that.
-            $this->add_hint("key_hidezero_DEFAULT", 1);
-        } else {
-            wm_debug("Already have %d scales, no defaults added.\n", $this->scales['DEFAULT']->spanCount());
-        }
     }
 
     /**
@@ -2175,31 +1472,18 @@ function WriteConfig($filename)
 		$output .= "# Automatically generated by php-weathermap v$WEATHERMAP_VERSION\n\n";
 
         $output .= $this->fonts->getConfig();
-
-//		if (count($this->fonts) > 0) {
-//			foreach ($this->fonts as $fontnumber => $font) {
-//				if ($font->type == 'truetype') {
-//					$output .= sprintf("FONTDEFINE %d %s %d\n", $fontnumber, $font->file, $font->size);
-//				}
-//
-//				if ($font->type == 'gd') {
-//					$output .= sprintf("FONTDEFINE %d %s\n", $fontnumber, $font->file);
-//				}
-//			}
-//
-//        }
         $output .= "\n";
 
         $basic_params = array(
-			array('background', 'BACKGROUND', CONFIG_TYPE_LITERAL),
-			array('width', 'WIDTH', CONFIG_TYPE_LITERAL),
-			array('height', 'HEIGHT', CONFIG_TYPE_LITERAL),
-			array('htmlstyle', 'HTMLSTYLE', CONFIG_TYPE_LITERAL),
-			array('kilo', 'KILO', CONFIG_TYPE_LITERAL),
-			array('keyfont', 'KEYFONT', CONFIG_TYPE_LITERAL),
-			array('timefont', 'TIMEFONT', CONFIG_TYPE_LITERAL),
-			array('titlefont', 'TITLEFONT', CONFIG_TYPE_LITERAL),
-			array('title', 'TITLE', CONFIG_TYPE_LITERAL),
+            array('title', 'TITLE', CONFIG_TYPE_LITERAL),
+            array('width', 'WIDTH', CONFIG_TYPE_LITERAL),
+            array('height', 'HEIGHT', CONFIG_TYPE_LITERAL),
+            array('background', 'BACKGROUND', CONFIG_TYPE_LITERAL),
+            array('htmlstyle', 'HTMLSTYLE', CONFIG_TYPE_LITERAL),
+            array('kilo', 'KILO', CONFIG_TYPE_LITERAL),
+            array('keyfont', 'KEYFONT', CONFIG_TYPE_LITERAL),
+            array('timefont', 'TIMEFONT', CONFIG_TYPE_LITERAL),
+            array('titlefont', 'TITLEFONT', CONFIG_TYPE_LITERAL),
 			array('htmloutputfile', 'HTMLOUTPUTFILE', CONFIG_TYPE_LITERAL),
 			array('dataoutputfile', 'DATAOUTPUTFILE', CONFIG_TYPE_LITERAL),
 			array('htmlstylesheet', 'HTMLSTYLESHEET', CONFIG_TYPE_LITERAL),
@@ -2250,81 +1534,15 @@ function WriteConfig($filename)
 
 		$output .= "\n";
 
-		foreach ($this->colours as $scalename => $colours) {
-			// not all keys will have keypos but if they do, then all three vars should be defined
-			if ((isset($this->keyx[$scalename])) && (isset($this->keyy[$scalename])) && (isset($this->keytext[$scalename]))
-				&& (($this->keytext[$scalename] != $this->inherit_fieldlist['keytext'])
-					|| ($this->keyx[$scalename] != $this->inherit_fieldlist['keyx'])
-					|| ($this->keyy[$scalename] != $this->inherit_fieldlist['keyy']))
-			) {
-				// sometimes a scale exists but without defaults. A proper scale object would sort this out...
-				if ($this->keyx[$scalename] == '') {
-					$this->keyx[$scalename] = -1;
-				}
-				if ($this->keyy[$scalename] == '') {
-					$this->keyy[$scalename] = -1;
-				}
+        foreach ($this->colourtable as $k => $colour) {
+            $output .= sprintf("%sCOLOR %s\n", $k, $colour->asConfig());
+        }
+        $output .= "\n";
 
-				$output .= "KEYPOS " . $scalename . " " . $this->keyx[$scalename] . " " . $this->keyy[$scalename] . " " . $this->keytext[$scalename] . "\n";
-			}
-
-			if ((isset($this->keystyle[$scalename])) && ($this->keystyle[$scalename] != $this->inherit_fieldlist['keystyle']['DEFAULT'])) {
-				$extra = '';
-				if ((isset($this->keysize[$scalename])) && ($this->keysize[$scalename] != $this->inherit_fieldlist['keysize']['DEFAULT'])) {
-					$extra = " " . $this->keysize[$scalename];
-				}
-				$output .= "KEYSTYLE  " . $scalename . " " . $this->keystyle[$scalename] . $extra . "\n";
-			}
-			$locale = localeconv();
-			$decimal_point = $locale['decimal_point'];
-
-            if (1==0) {
-                foreach ($colours as $k => $colour) {
-                    if (!isset($colour['special']) || !$colour['special']) {
-                        $top = rtrim(rtrim(sprintf("%f", $colour['top']), "0"), $decimal_point);
-                        $bottom = rtrim(rtrim(sprintf("%f", $colour['bottom']), "0"), $decimal_point);
-
-                        if ($bottom > 1000) {
-                            $bottom = wm_nice_bandwidth($colour['bottom'], $this->kilo);
-                        }
-
-                        if ($top > 1000) {
-                            $top = wm_nice_bandwidth($colour['top'], $this->kilo);
-                        }
-
-                        $tag = (isset($colour['tag']) ? $colour['tag'] : '');
-
-                        if (($colour['red1'] == -1) && ($colour['green1'] == -1) && ($colour['blue1'] == -1)) {
-                            $output .= sprintf("SCALE %s %-4s %-4s   none   %s\n", $scalename,
-                                $bottom, $top, $tag);
-                        } elseif (!isset($colour['red2'])) {
-                            $output .= sprintf("SCALE %s %-4s %-4s %3d %3d %3d  %s\n", $scalename,
-                                $bottom, $top,
-                                $colour['red1'], $colour['green1'], $colour['blue1'], $tag);
-                        } else {
-                            $output .= sprintf("SCALE %s %-4s %-4s %3d %3d %3d   %3d %3d %3d    %s\n", $scalename,
-                                $bottom, $top,
-                                $colour['red1'],
-                                $colour['green1'], $colour['blue1'],
-                                $colour['red2'], $colour['green2'],
-                                $colour['blue2'], $tag);
-                        }
-                    } else {
-
-                        if (($colour['red1'] == -1) && ($colour['green1'] == -1) && ($colour['blue1'] == -1)) {
-                            $output .= sprintf("%sCOLOR none\n", $k);
-                        } else {
-                            $output .= sprintf("%sCOLOR %d %d %d\n", $k, $colour['red1'], $colour['green1'],
-                                $colour['blue1']);
-                        }
-                    }
-                }
-            }
-            foreach ($this->scales as $scale_name=>$scale) {
-                $output .= $scale->getConfig();
-            }
-			$output .= "\n";
-		}
+        foreach ($this->scales as $scale_name=>$scale) {
+            $output .= $scale->getConfig();
+        }
+        $output .= "\n";
 
 		foreach ($this->hints as $hintname => $hint) {
 			$output .= "SET $hintname $hint\n";
@@ -2341,11 +1559,6 @@ function WriteConfig($filename)
 		$output .= "\n# End of global section\n\n";
 
 		fwrite($fd, $output);
-
-		## fwrite($fd,$this->nodes['DEFAULT']->WriteConfig());
-		## fwrite($fd,$this->links['DEFAULT']->WriteConfig());
-
-		# fwrite($fd, "\n\n# Node definitions:\n");
 
 		foreach (array("template", "normal") as $which) {
 			if ($which == "template") {
@@ -2427,7 +1640,6 @@ function WriteConfig($filename)
 function DrawMap($filename = '', $thumbnailfile = '', $thumbnailmax = 250, $withnodes = TRUE, $use_via_overlay = FALSE, $use_rel_overlay=FALSE)
 {
 	wm_debug("Trace: DrawMap()\n");
-	metadump("# start",true);
 	$bgimage=NULL;
 	if($this->configfile != "")
 	{
@@ -2485,7 +1697,7 @@ function DrawMap($filename = '', $thumbnailfile = '', $thumbnailmax = 250, $with
 			. $this->background . "\n"); }
 	}
 
-	$image=wimagecreatetruecolor($this->width, $this->height);
+	$image=imagecreatetruecolor($this->width, $this->height);
 
 	# $image = imagecreate($this->width, $this->height);
 	if (!$image) { wm_warn
@@ -2513,7 +1725,7 @@ function DrawMap($filename = '', $thumbnailfile = '', $thumbnailmax = 250, $with
 		$this->preAllocateScaleColours($image);
 
 		// fill with background colour anyway, in case the background image failed to load
-		wimagefilledrectangle($image, 0, 0, $this->width, $this->height, $this->colours['DEFAULT']['BG']['gdref1']);
+		imagefilledrectangle($image, 0, 0, $this->width, $this->height, $this->colours['DEFAULT']['BG']['gdref1']);
 
 		if ($bgimage)
 		{
@@ -2531,7 +1743,7 @@ function DrawMap($filename = '', $thumbnailfile = '', $thumbnailmax = 250, $with
 			wm_debug("Pre-rendering ".$node->name." to get bounding boxes.\n");
 			if(!is_null($node->x)) $this->nodes[$node->name]->pre_render($image, $this);
 		}
-		
+
 		$all_layers = array_keys($this->seen_zlayers);
 		sort($all_layers);
 
@@ -2572,7 +1784,7 @@ function DrawMap($filename = '', $thumbnailfile = '', $thumbnailmax = 250, $with
 				}
 				$this->DrawTitle($image, $this->titlefont, $this->colours['DEFAULT']['TITLE']['gdref1']);
 			}
-			
+
 			if(is_array($z_items))
 			{
 				foreach($z_items as $it)
@@ -2612,21 +1824,21 @@ function DrawMap($filename = '', $thumbnailfile = '', $thumbnailmax = 250, $with
 								}
 								wm_debug("Added $ii bounding boxes too\n");
 							}
-						}						
+						}
 					}
 				}
 			}
 		}
 
 		$overlay = myimagecolorallocate($image, 200, 0, 0);
-		
+
 		// for the editor, we can optionally overlay some other stuff
         if($this->context == 'editor')
         {
 		if($use_rel_overlay)
 		{
 		#		$overlay = myimagecolorallocate($image, 200, 0, 0);
-		
+
 			// first, we can show relatively positioned NODEs
 			foreach ($this->nodes as $node) {
 					if($node->relative_to != '')
@@ -2637,13 +1849,13 @@ function DrawMap($filename = '', $thumbnailfile = '', $thumbnailmax = 250, $with
 									15,15,0,360,$overlay);
 							imagearc($image,$node->x, $node->y,
 									16,16,0,360,$overlay);
-		
+
 							imageline($image,$node->x, $node->y,
 									$rel_x, $rel_y, $overlay);
 					}
 			}
 		}
-		
+
 		if($use_via_overlay)
 		{
 			// then overlay VIAs, so they can be seen
@@ -2657,7 +1869,7 @@ function DrawMap($filename = '', $thumbnailfile = '', $thumbnailmax = 250, $with
 						$y = $this->nodes[$via[2]]->y + $via[1];
 					}
 					else
-					{	
+					{
 						$x = $via[0];
 						$y = $via[1];
 					}
@@ -2669,7 +1881,7 @@ function DrawMap($filename = '', $thumbnailfile = '', $thumbnailmax = 250, $with
         }
 
 		#$this->myimagestring($image, 3, 200, 100, "Test 1\nLine 2", $overlay,0);
-		
+
 #	$this->myimagestring($image, 30, 100, 100, "Test 1\nLine 2", $overlay,0);
 		#$this->myimagestring($image, 30, 200, 200, "Test 1\nLine 2", $overlay,45);
 
@@ -2735,8 +1947,8 @@ function DrawMap($filename = '', $thumbnailfile = '', $thumbnailmax = 250, $with
 					$this->width, $this->height);
 				$result = imagepng($imagethumb, $thumbnailfile);
 				imagedestroy($imagethumb);
-				
-				
+
+
 
 				if(($result==FALSE))
 				{
@@ -2863,7 +2075,7 @@ function PreloadMapHTML()
 						}
 						$left=""; $above="";
 						$img_extra = "";
-					
+
 						if ($myobj->overlibwidth != 0)
 						{
 							$left="WIDTH," . $myobj->overlibwidth . ",";
@@ -2871,7 +2083,7 @@ function PreloadMapHTML()
 
 							if ($mid_x > $center_x) $left.="LEFT,";
 						}
-						
+
 						if ($myobj->overlibheight != 0)
 						{
 							$above="HEIGHT," . $myobj->overlibheight . ",";
@@ -2879,7 +2091,7 @@ function PreloadMapHTML()
 
 							if ($mid_y > $center_y) $above.="ABOVE,";
 						}
-						
+
 						foreach ($dirs as $dir=>$parts)
 						{
 							$caption = ($myobj->overlibcaption[$dir] != '' ? $myobj->overlibcaption[$dir] : $myobj->name);
@@ -2911,18 +2123,18 @@ function PreloadMapHTML()
 							}
 							$overlibhtml .= "',DELAY,250,${left}${above}CAPTION,'" . $caption
 							. "');\"  onmouseout=\"return nd();\"";
-							
+
 							foreach ($parts as $part)
 							{
 								$areaname = $type.":" . $prefix . $myobj->id. ":" . $part;
 								//print "INFOURL for $areaname - ";
-							
+
 								$this->imap->setProp("extrahtml", $overlibhtml, $areaname);
 							}
-						}			
+						}
 					} // if change
 				} // overlib?
-				
+
 				// now look at inforurls
 				foreach ($dirs as $dir=>$parts)
 				{
@@ -2936,10 +2148,10 @@ function PreloadMapHTML()
 						}
 					}
 				}
-			
+
 			}
 		}
-	
+
 }
 
 function asJS()
@@ -2976,7 +2188,7 @@ function asJSON()
 	}
 	$json = rtrim($json,", \n");
 	$json .= "\n},\n";
-	
+
 	$json .= "\"nodes\": {\n";
 	$json .= $this->defaultnode->asJSON();
 	foreach ($this->nodes as $node) { $json .= $node->asJSON(); }
@@ -3017,25 +2229,25 @@ function MakeHTML($imagemapname = "weathermap_imap")
 	$html='';
 
 	$html .= '<div class="weathermapimage" style="margin-left: auto; margin-right: auto; width: '.$this->width.'px;" >';
-	if ( $this->imageuri != '') { 
+	if ( $this->imageuri != '') {
 		$html.=sprintf(
 			'<img id="wmapimage" src="%s" width="%d" height="%d" border="0" usemap="#%s"',
 			$this->imageuri,
 			$this->width,
 			$this->height,
 			$imagemapname
-		); 
+		);
 		//$html .=  'alt="network weathermap" ';
 		$html .= '/>';
 		}
-	else { 
+	else {
 		$html.=sprintf(
 			'<img id="wmapimage" src="%s" width="%d" height="%d" border="0" usemap="#%s"',
 			$this->imagefile,
 			$this->width,
 			$this->height,
 			$imagemapname
-		); 
+		);
 		//$html .=  'alt="network weathermap" ';
 		$html .= '/>';
 	}
@@ -3094,8 +2306,8 @@ function MakeHTML($imagemapname = "weathermap_imap")
 // ALWAYS deletes files in the cache folder older than $agelimit, also!
 function CacheUpdate($agelimit=600)
 {
-	global $weathermap_lazycounter; 
-	
+	global $weathermap_lazycounter;
+
 	$cachefolder = $this->cachefolder;
 	$configchanged = filemtime($this->configfile );
 	// make a unique, but safe, prefix for all cachefiles related to this map config
@@ -3154,19 +2366,19 @@ function CacheUpdate($agelimit=600)
 		$json = rtrim($json,", \n");
 		fputs($fd,$json);
 		fclose($fd);
-		
+
 		$json = "";
 		$fd = fopen($cachefolder.DIRECTORY_SEPARATOR.$cacheprefix."_tree.json","w");
 		$id = 10;	// first ID for user-supplied thing
-		
+
 		$json .= "{ id: 1, text: 'SCALEs'\n, children: [\n";
 		foreach ($this->colours as $scalename=>$colours)
 		{
-			$json .= "{ id: " . $id++ . ", text:" . js_escape($scalename) . ", leaf: true }, \n";			
+			$json .= "{ id: " . $id++ . ", text:" . js_escape($scalename) . ", leaf: true }, \n";
 		}
 		$json = rtrim($json,", \n");
 		$json .= "]},\n";
-		
+
 		$json .= "{ id: 2, text: 'FONTs',\n children: [\n";
 		foreach ($this->fonts as $fontnumber => $font)
 		{
@@ -3177,19 +2389,19 @@ function CacheUpdate($agelimit=600)
 				$json .= sprintf("{ id: %d, text: %s, leaf: true}, \n", $id++, js_escape("Font $fontnumber (GD)"));
 		}
 		$json = rtrim($json,", \n");
-		$json .= "]},\n";		
-		
+		$json .= "]},\n";
+
 		$json .= "{ id: 3, text: 'NODEs',\n children: [\n";
 		$json .= "{ id: ". $id++ . ", text: 'DEFAULT', children: [\n";
-		
+
 		$weathemap_lazycounter = $id;
 		// pass the list of subordinate nodes to the recursive tree function
 		$json .= $this->MakeTemplateTree( $this->node_template_tree );
 		$id = $weathermap_lazycounter;
-		
-		$json = rtrim($json,", \n");		
+
+		$json = rtrim($json,", \n");
 		$json .= "]} ]},\n";
-		
+
 		$json .= "{ id: 4, text: 'LINKs',\n children: [\n";
 		$json .= "{ id: ". $id++ . ", text: 'DEFAULT', children: [\n";
 		$weathemap_lazycounter = $id;
@@ -3197,10 +2409,10 @@ function CacheUpdate($agelimit=600)
 		$id = $weathermap_lazycounter;
 		$json = rtrim($json,", \n");
 		$json .= "]} ]}\n";
-				
+
 		fputs($fd,"[". $json . "]");
 		fclose($fd);
-		
+
 		$fd = fopen($cachefolder.DIRECTORY_SEPARATOR.$cacheprefix."_nodes.json","w");
 		$json = "";
 //		$json = $this->defaultnode->asJSON(TRUE);
@@ -3261,11 +2473,11 @@ function CacheUpdate($agelimit=600)
 function MakeTemplateTree( &$tree_list, $startpoint="DEFAULT")
 {
 	global $weathermap_lazycounter;
-	 
+
 	$output = "";
 	foreach ($tree_list[$startpoint] as $subnode)
 	{
-		$output .= "{ id: " . $weathermap_lazycounter++ . ", text: " . js_escape($subnode); 
+		$output .= "{ id: " . $weathermap_lazycounter++ . ", text: " . js_escape($subnode);
 		if( isset($tree_list[$subnode]))
 		{
 			$output .= ", children: [ \n";
@@ -3279,7 +2491,7 @@ function MakeTemplateTree( &$tree_list, $startpoint="DEFAULT")
 		}
 		$output .= "}, \n";
 	}
-	
+
 	return($output);
 }
 
@@ -3290,7 +2502,7 @@ function DumpStats($filename="")
 	{
 		$report .= sprintf("%70s => %d\n",$key,$val);
 	}
-	
+
 	if($filename == "") print $report;
 }
 
@@ -3393,12 +2605,12 @@ function DumpStats($filename="")
     {
         wm_debug("Preprocessing targets\n");
 
-        foreach ($itemList as $oneMapItem) {
-            if ($oneMapItem->isTemplate()) {
+        foreach ($itemList as $mapItem) {
+            if ($mapItem->isTemplate()) {
                 continue;
             }
 
-            $oneMapItem->prepareForDataCollection();
+            $mapItem->prepareForDataCollection();
         }
     }
 

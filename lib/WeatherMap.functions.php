@@ -1175,7 +1175,7 @@ function draw_straight($image, &$curvepoints, $widths, $outlinecolour, $fillcolo
 
 			if (!is_null($fillcolours[$dir]))
 			{
-				wimagefilledpolygon($image, $finalpoints, count($finalpoints) / 2, $arrowsettings[4]); 
+				imagefilledpolygon($image, $finalpoints, count($finalpoints) / 2, $arrowsettings[4]);
 			}
 			else
 			{
@@ -1188,7 +1188,7 @@ function draw_straight($image, &$curvepoints, $widths, $outlinecolour, $fillcolo
 		
 			if (!is_null($outlinecolour))
 			{
-				wimagepolygon($image, $finalpoints, count($finalpoints) / 2, $arrowsettings[5]);
+				imagepolygon($image, $finalpoints, count($finalpoints) / 2, $arrowsettings[5]);
 			}
 			else
 			{
@@ -1328,7 +1328,7 @@ function draw_curve($image, &$curvepoints, $widths, $outlinecolour, $fillcolours
 
 		if (!is_null($fillcolours[$arrayindex]))
 		{
-			wimagefilledpolygon($image, $there_points, count($there_points) / 2, $arrowsettings[$dir][4]); 
+			imagefilledpolygon($image, $there_points, count($there_points) / 2, $arrowsettings[$dir][4]);
 		}
 		else
 		{
@@ -1342,7 +1342,7 @@ function draw_curve($image, &$curvepoints, $widths, $outlinecolour, $fillcolours
 
 		if (!is_null($outlinecolour))
 		{
-			wimagepolygon($image, $there_points, count($there_points) / 2, $arrowsettings[$dir][5]);
+			imagepolygon($image, $there_points, count($there_points) / 2, $arrowsettings[$dir][5]);
 		}
 		else
 		{
@@ -1702,28 +1702,6 @@ function nice_scalar($number, $kilo = 1000, $decimals=1)
 
 // ***********************************************
 
-// Skeleton class just to keep strict mode quiet. 
-//class WMFont
-//{
-//	var $type;
-//	var $file;
-//	var $gdnumber;
-//	var $size;
-//}
-
-// we use enough points in various places to make it worth a small class to save some variable-pairs.
-class Point
-{
-	var $x, $y;
-	
-	function Point($x=0,$y=0)
-	{
-		$this->x = $x;
-		$this->y = $y;
-	}
-}
-
-// similarly for 2D vectors
 class Vector
 {
 	var $dx, $dy;
@@ -1757,270 +1735,6 @@ class Vector
 	}
 }
 
-class Colour
-{
-	var $r,$g,$b, $alpha;
-	
-	
-	// take in an existing value and create a Colour object for it
-	function Colour()
-	{
-	    throw new Exception("old Colour class used");
-
-		if(func_num_args() == 3) # a set of 3 colours
-		{
-			$this->r = func_get_arg(0); # r
-			$this->g = func_get_arg(1); # g
-			$this->b = func_get_arg(2); # b
-			#print "3 args";
-			#print $this->as_string()."--";
-		}
-		
-		if( (func_num_args() == 1) && gettype(func_get_arg(0))=='array' ) # an array of 3 colours
-		{
-			#print "1 args";
-			$ary = func_get_arg(0);
-			$this->r = $ary[0];
-			$this->g = $ary[1];
-			$this->b = $ary[2];
-		}
-	}
-
-	// Is this a transparent/none colour?
-	function is_real()
-	{
-		if($this->r >= 0 && $this->g >=0 && $this->b >= 0)
-		{
-			return true;
-		}
-		else
-		{
-			return false;
-		}
-	}
-	
-	// Is this a transparent/none colour?
-	function is_none()
-	{
-		if($this->r == -1 && $this->g == -1 && $this->b == -1)
-		{
-			return true;
-		}
-		else
-		{
-			return false;
-		}
-	}
-	
-	// Is this a contrast colour?
-	function is_contrast()
-	{
-		if($this->r == -3 && $this->g == -3 && $this->b == -3)
-		{
-			return true;
-		}
-		else
-		{
-			return false;
-		}
-	}
-	
-	// Is this a copy colour?
-	function is_copy()
-	{
-		if($this->r == -2 && $this->g == -2 && $this->b == -2)
-		{
-			return true;
-		}
-		else
-		{
-			return false;
-		}
-	}
-	
-	// allocate a colour in the appropriate image context
-	// - things like scale colours are used in multiple images now (the scale, several nodes, the main map...)
-	function gdallocate($image_ref)
-	{
-		if($this->is_none())
-		{
-			return NULL;
-		}
-		else
-		{
-			return(myimagecolorallocate($image_ref, $this->r, $this->g, $this->b));
-		}
-	}
-	
-	// based on an idea from: http://www.bennadel.com/index.cfm?dax=blog:902.view
-	function contrast_ary()
-	{
-		if( (($this->r + $this->g + $this->b) > 500)
-		 || ($this->g > 140)
-		)
-		{
-			return( array(0,0,0) );
-		}
-		else
-		{
-			return( array(255,255,255) );
-		}
-	}
-	
-	function contrast()
-	{
-		return( new Colour($this->contrast_ary() ) );
-	}
-	
-	// make a printable version, for debugging
-	// - optionally take a format string, so we can use it for other things (like WriteConfig, or hex in stylesheets)
-	function as_string($format = "RGB(%d,%d,%d)")
-	{
-		return (sprintf($format, $this->r, $this->g, $this->b));
-	}
-
-	function __toString()
-	{
-		return $this->as_string();
-	}
-	
-	function as_config()
-	{
-		return $this->as_string("%d %d %d");
-	}
-	
-	function as_html()
-	{
-		if($this->is_real())
-		{
-			return $this->as_string("#%02x%02x%02x");
-		}
-		else
-		{
-			return "";
-		}
-	}
-}
-
-// A series of wrapper functions around all the GD function calls
-// - I added these in so I could make a 'metafile' easily of all the
-//   drawing commands for a map. I have a basic Perl-Cairo script that makes
-//   anti-aliased maps from these, using Cairo instead of GD.
-
-function metadump($string, $truncate=FALSE)
-{
-	// comment this line to get a metafile for this map
-	return;
-
-	if($truncate)
-	{
-		$fd = fopen("metadump.txt","w+");
-	}
-	else
-	{
-		$fd = fopen("metadump.txt","a");
-	}
-	fputs($fd,$string."\n");
-	fclose($fd);
-}
-
-function metacolour(&$col)
-{
-	return ($col['red1']." ".$col['green1']." ".$col['blue1']);
-}
-
-function wimagecreate($width,$height)
-{
-	metadump("NEWIMAGE $width $height");
-	return(imagecreate($width,$height));
-}
-
-function wimagefilledrectangle( $image ,$x1, $y1, $x2, $y2, $color )
-{
-	if ($color===NULL) return;
-	
-	$col = imagecolorsforindex($image, $color);
-	$r = $col['red']; $g = $col['green']; $b = $col['blue']; $a = $col['alpha'];
-	$r = $r/255; $g=$g/255; $b=$b/255; $a=(127-$a)/127;
-
-	metadump("FRECT $x1 $y1 $x2 $y2 $r $g $b $a");
-	return(imagefilledrectangle( $image ,$x1, $y1, $x2, $y2, $color ));
-}
-
-function wimagerectangle( $image ,$x1, $y1, $x2, $y2, $color )
-{
-	if ($color===NULL) return;
-	
-	$col = imagecolorsforindex($image, $color);
-	$r = $col['red']; $g = $col['green']; $b = $col['blue']; $a = $col['alpha'];
-	$r = $r/255; $g=$g/255; $b=$b/255; $a=(127-$a)/127;
-
-	metadump("RECT $x1 $y1 $x2 $y2 $r $g $b $a");
-	return(imagerectangle( $image ,$x1, $y1, $x2, $y2, $color ));
-}
-
-function wimagepolygon($image, $points, $num_points, $color)
-{
-	if ($color===NULL) return;
-	
-	$col = imagecolorsforindex($image, $color);
-	$r = $col['red']; $g = $col['green']; $b = $col['blue']; $a = $col['alpha'];
-	$r = $r/255; $g=$g/255; $b=$b/255; $a=(127-$a)/127;
-	
-	$pts = "";
-	for ($i=0; $i < $num_points; $i++)
-        {
-		$pts .= $points[$i * 2]." ";
-		$pts .= $points[$i * 2+1]." ";
-        }
-	
-	metadump("POLY $num_points ".$pts." $r $g $b $a");
-
-	return(imagepolygon($image, $points, $num_points, $color));
-}
-
-function wimagefilledpolygon($image, $points, $num_points, $color)
-{
-	if ($color===NULL) return;
-	
-	$col = imagecolorsforindex($image, $color);
-	$r = $col['red']; $g = $col['green']; $b = $col['blue']; $a = $col['alpha'];
-	$r = $r/255; $g=$g/255; $b=$b/255; $a=(127-$a)/127;
-	
-	$pts = "";
-	for ($i=0; $i < $num_points; $i++)
-        {
-		$pts .= $points[$i * 2]." ";
-		$pts .= $points[$i * 2+1]." ";
-        }
-	
-	metadump("FPOLY $num_points ".$pts." $r $g $b $a");
-
-	return(imagefilledpolygon($image, $points, $num_points, $color));
-}
-
-function wimagecreatetruecolor($width, $height)
-{
-	
-
-	metadump("BLANKIMAGE $width $height");
-
-	return imagecreatetruecolor($width,$height);
-
-}
-
-function wimagettftext($image, $size, $angle, $x, $y, $color, $file, $string)
-{
-	if ($color===NULL) return;
-
-	$col = imagecolorsforindex($image, $color);
-	$r = $col['red']; $g = $col['green']; $b = $col['blue']; $a = $col['alpha'];
-	$r = $r/255; $g=$g/255; $b=$b/255; $a=(127-$a)/127;
-
-	metadump("TEXT $x $y $angle $size $file $r $g $b $a $string");
-
-	return(imagettftext($image, $size, $angle, $x, $y, $color, $file, $string));
-}
 
 function wm_draw_marker_diamond($im, $col, $x, $y, $size=10)
 {
@@ -2152,237 +1866,62 @@ function draw_spine($im, $spine,$col)
      * @param string $coveragefile
      */
 
-    function TestOutput_RunTest($conffile, $imagefile, $htmlfile, $newconffile, $coveragefile)
-    {
-        global $weathermap_map;
-	global $WEATHERMAP_VERSION;
+function TestOutput_RunTest($conffile, $imagefile, $htmlfile, $newconffile, $coveragefile)
+{
+    global $weathermap_map;
+    global $WEATHERMAP_VERSION;
 
-        $map = new WeatherMap();
-        if($coveragefile != '') {
-            $map->SeedCoverage();
-            if(file_exists($coveragefile) ) {
-                $map->LoadCoverage($coveragefile);
+    $map = new WeatherMap();
+    if ($coveragefile != '') {
+        $map->SeedCoverage();
+        if (file_exists($coveragefile)) {
+            $map->LoadCoverage($coveragefile);
+        }
+    }
+    $weathermap_map = $conffile;
+    $map->ReadConfig($conffile);
+    $skip = 0;
+    $nwarns = 0;
+
+    if (!strstr($WEATHERMAP_VERSION, "dev")) {
+        # Allow tests to be from the future. Global SET in test file can excempt test from running
+        # SET REQUIRES_VERSION 0.98
+        # but don't check if the current version is a dev version
+        $required_version = $map->get_hint("REQUIRES_VERSION");
+
+        if ($required_version != "") {
+            // doesan't need to be complete, just in the right order
+            $known_versions = array("0.97", "0.97a", "0.97b", "0.98");
+            $my_version = array_search($WEATHERMAP_VERSION, $known_versions);
+            $req_version = array_search($required_version, $known_versions);
+            if ($req_version > $my_version) {
+                $skip = 1;
+                $nwarns = -1;
             }
         }
-        $weathermap_map = $conffile;
-        $map->ReadConfig($conffile);
-	$skip = 0;
-	$nwarns = 0;
-
-	if( ! strstr($WEATHERMAP_VERSION, "dev" )) {
-		# Allow tests to be from the future. Global SET in test file can excempt test from running
-		# SET REQUIRES_VERSION 0.98
-		# but don't check if the current version is a dev version
-		$required_version = $map->get_hint("REQUIRES_VERSION");
-
-		if($required_version != "") {	
-			// doesan't need to be complete, just in the right order
-			$known_versions = array("0.97","0.97a","0.97b","0.98");
-			$my_version = array_search($WEATHERMAP_VERSION,$known_versions);	
-			$req_version = array_search($required_version,$known_versions);	
-			if($req_version > $my_version) {
-				$skip = 1;
-				$nwarns = -1;
-			}
-		}
-	}
-
-	if( $skip == 0) {
-       		$map->ReadData();
-       		$map->DrawMap($imagefile);
-        	$map->imagefile=$imagefile;
-        	if($htmlfile != '') {
-        	    TestOutput_HTML($htmlfile, $map);
-        	}
-        	if($newconffile != '') {
-        	    $map->WriteConfig($newconffile);
-        	}
-        	if($coveragefile != '') {
-        	    $map->SaveCoverage($coveragefile);
-        	}
-        	$nwarns = $map->warncount;
-	}
-	
-        $map->CleanUp();
-        unset ($map);
-
-        return intval($nwarns);
     }
 
+    if ($skip == 0) {
+        $map->ReadData();
+        $map->DrawMap($imagefile);
+        $map->imagefile = $imagefile;
+        if ($htmlfile != '') {
+            TestOutput_HTML($htmlfile, $map);
+        }
+        if ($newconffile != '') {
+            $map->WriteConfig($newconffile);
+        }
+        if ($coveragefile != '') {
+            $map->SaveCoverage($coveragefile);
+        }
+        $nwarns = $map->warncount;
+    }
 
-/**
- * Utility class used for colour calculations in Weathermap.
- *
- * Allows representation of any RGBA colour, plus some special
- * pseudocolours.
- *
- */
-class oldWMColour
-{
-	var $r, $g, $b, $alpha;
+    $map->CleanUp();
+    unset ($map);
 
-
-	// take in an existing value and create a Colour object for it
-	function WMColour()
-	{
-		if (func_num_args() === 3)       # a set of 3 colours
-		{
-			$this->r = func_get_arg(0); # r
-			$this->g = func_get_arg(1); # g
-			$this->b = func_get_arg(2); # b
-		}
-
-		if (func_num_args() === 1) {
-			if(gettype(func_get_arg(0)) === 'array') # an array of 3 colours
-			{
-				$ary = func_get_arg(0);
-				$this->r = $ary[0];
-				$this->g = $ary[1];
-				$this->b = $ary[2];
-			} else {
-				// a single scalar argument - should be a 'special' colour
-				$arg = func_get_arg(0);
-
-				if($arg == 'none') {
-					$this->r = -1;
-					$this->g = -1;
-					$this->b = -1;
-				}
-
-				if($arg == 'copy') {
-					$this->r = -2;
-					$this->g = -2;
-					$this->b = -2;
-				}
-
-				if($arg == 'contrast') {
-					$this->r = -3;
-					$this->g = -3;
-					$this->b = -3;
-				}
-			}
-
-		}
-	}
-
-	// return true if two colours are identical
-	function equals($c2) {
-		if( $this->r == $c2->r
-			&& $this->g == $c2->g
-			&& $this->b == $c2->b
-			&& $this->alpha == $c2->alpha
-		) {
-			return true;
-		}
-		return false;
-	}
-
-	// TODO - take this colour, and that colour, and make a new one in the ratio given
-	function linterp_with($c2, $ratio) {
-
-	}
-
-	// Is this a transparent/none colour?
-	function is_real()
-	{
-		if ($this->r >= 0 && $this->g >= 0 && $this->b >= 0) {
-			return true;
-		} else {
-			return false;
-		}
-	}
-
-	// Is this a transparent/none colour?
-	function is_none()
-	{
-		if ($this->r == -1 && $this->g == -1 && $this->b == -1) {
-			return true;
-		} else {
-			return false;
-		}
-	}
-
-	// Is this a contrast colour?
-	function is_contrast()
-	{
-		if ($this->r == -3 && $this->g == -3 && $this->b == -3) {
-			return true;
-		} else {
-			return false;
-		}
-	}
-
-	// Is this a copy colour?
-	function is_copy()
-	{
-		if ($this->r == -2 && $this->g == -2 && $this->b == -2) {
-			return true;
-		} else {
-			return false;
-		}
-	}
-
-// allocate a colour in the appropriate image context
-// - things like scale colours are used in multiple images now (the scale, several nodes, the main map...)
-	function gdallocate($image_ref)
-	{
-		if (true === $this->is_none()) {
-			return null;
-		} else {
-			return (myimagecolorallocate($image_ref, $this->r, $this->g, $this->b));
-		}
-	}
-
-	// based on an idea from: http://www.bennadel.com/index.cfm?dax=blog:902.view
-	function contrast_ary()
-	{
-		if ((($this->r + $this->g + $this->b) > 500) || ($this->g > 140)) {
-			return (array (
-				0,
-				0,
-				0
-			));
-		} else {
-			return (array (
-				255,
-				255,
-				255
-			));
-		}
-	}
-
-	function contrast()
-	{
-		return (new WMColour($this->contrast_ary()));
-	}
-
-// make a printable version, for debugging
-// - optionally take a format string, so we can use it for other things (like WriteConfig, or hex in stylesheets)
-	function as_string($format = 'RGB(%d,%d,%d)')
-	{
-		return (sprintf($format, $this->r, $this->g, $this->b));
-	}
-
-	/**
-	 * Produce a string ready to drop into a config file by WriteConfig
-	 */
-	function as_config()
-	{
-		if($this->is_none()) { return 'none'; }
-		if($this->is_copy()) { return 'copy'; }
-		if($this->is_contrast()) { return 'contrast'; }
-
-		return $this->as_string('%d %d %d');
-	}
-
-	function as_html()
-	{
-		if (true === $this->is_real()) {
-			return $this->as_string('#%02x%02x%02x');;
-		} else {
-			return '';
-		}
-	}
+    return intval($nwarns);
 }
+
 
 // vim:ts=4:sw=4:

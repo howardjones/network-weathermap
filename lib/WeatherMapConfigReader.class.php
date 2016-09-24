@@ -48,6 +48,7 @@ class WeatherMapConfigReader
 
 
             'FONTDEFINE' => array(
+                array('GLOBAL', '/^\s*FONTDEFINE\s+(\d+)\s+(\S+)\s+(\d+)\s+(-?\d+)\s*$/i','handleFONTDEFINE'),
                 array('GLOBAL', '/^\s*FONTDEFINE\s+(\d+)\s+(\S+)\s+(\d+)\s*$/i', 'handleFONTDEFINE'),
                 array('GLOBAL', '/^\s*FONTDEFINE\s+(\d+)\s+(\S+)\s*$/i', 'handleFONTDEFINE'),
             ),
@@ -1473,6 +1474,10 @@ class WeatherMapConfigReader
             wm_debug("New TrueType font in slot %d\n", $args[1]);
 
             $newFontObject = $this->mapObject->fonts->makeFontObject("truetype", $args[2], $args[3]);
+
+            if (isset($args[4])) {
+                $newFontObject->v_offset = $args[4];
+            }
 
             # $newFontObject = new WMFont();
             # $fontOK = $newFontObject->initTTF($args[2], $args[3]);

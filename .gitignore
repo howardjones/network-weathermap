@@ -15,4 +15,5 @@ docs/dev/vagrant-testers/*.zip
 node_modules/
 reports/
 output/*
-
+test-suite/results*
+test-suite/diffs/*

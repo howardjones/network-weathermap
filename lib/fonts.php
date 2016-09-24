@@ -40,12 +40,14 @@ class WMTrueTypeFont extends WMFont
 {
     public $file;
     public $size;
+    public $v_offset;
 
-    public function __construct($filename, $size)
+    public function __construct($filename, $size, $v_offset = 0)
     {
         parent::__construct();
 
         $this->loaded = $this->initTTF($filename, $size);
+        $this->v_offset = $v_offset;
     }
 
     public function drawImageString($gdImage, $x, $y, $string, $colour, $angle = 0)
@@ -55,7 +57,11 @@ class WMTrueTypeFont extends WMFont
 
     public function getConfig($fontNumber)
     {
-        return sprintf("FONTDEFINE %d %s %d\n", $fontNumber, $this->file, $this->size);
+        if ($this->v_offset != 0){
+            return sprintf("FONTDEFINE %d %s %d %d\n", $fontNumber, $this->file, $this->size, $this->v_offset);
+        } else {
+            return sprintf("FONTDEFINE %d %s %d\n", $fontNumber, $this->file, $this->size);
+        }
     }
 
     private function initTTF($filename, $size)
@@ -92,7 +98,7 @@ class WMTrueTypeFont extends WMFont
             if ($charWidth > $width) {
                 $width = $charWidth;
             }
-            $height += ($charHeight * 1.2);
+            $height += ($charHeight * 1.2) - $this->v_offset;  # subtract v_offset, due to coordinate system
         }
 
         return (array($width, $height));

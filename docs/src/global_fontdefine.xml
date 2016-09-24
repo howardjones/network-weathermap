@@ -7,19 +7,21 @@
     <anchor>GLOBAL_FONTDEFINE</anchor>
 
     <definition>FONTDEFINE
-
         <meta>fontnumber</meta>
-
         <meta>gdfontfile</meta>
     </definition>
 
     <definition>FONTDEFINE
-
         <meta>fontnumber</meta>
-
         <meta>ttffontfile</meta>
-
         <meta>fontsize</meta>
+    </definition>
+
+    <definition>FONTDEFINE
+        <meta>fontnumber</meta>
+        <meta>ttffontfile</meta>
+        <meta>fontsize</meta>
+        <meta>v_offset</meta>
     </definition>
 
     <description xmlns="http://www.w3.org/1999/xhtml">
@@ -38,6 +40,15 @@
         generally a lot nicer! This time, you need to specify the size that the font
         should be rendered at. The size is in pixels. You can load the same font into
         multiple fontnumbers with different sizes to use in different parts of a map.</p>
+
+        <p>The TrueType format takes an optional 4th component as a vertical offset
+                    for all text rendered in this font.  Size is in whole-number pixels, relative
+                    to the baseline of the font.  Negative numbers move the text down, positive
+                    numbers move the text up.  This can be used to fine-tune text placement in
+                    links, and other locations on the map.  It may, for example,  be used to render
+                    the BWLABEL text above or below a link arrow, instead of on top of it..</p>
+
+
 
         <p>The freetype library used in PHP makes a somewhat complex set of rules for
         where it will search for truetype fonts. The two easiest options are:

@@ -12,6 +12,9 @@ permissions differently, unfortunately.
     CHANGE - Replaced entire configuration parser (part of performance changes)
     CHANGE - dsstats data plugin can skip looking up additional Cacti data by setting dsstats_no_cacti_extras
     CHANGE - Moved all database access to use PDO, to avoid PHP 7.0 issues
+    CHANGE - lots of internal changes mostly pulled over from refactoring project:
+             * New WMTarget, ConfigReader, WMColour and Scale classes
+             * New Manager class handles all database access for Cacti plugin
     FIXED - PHP 5.3 bug introduced in command-line tool in 0.98
 
 0.98

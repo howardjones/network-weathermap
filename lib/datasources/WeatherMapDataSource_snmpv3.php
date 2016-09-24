@@ -13,16 +13,14 @@
 // TARGET snmp2c:public:hostname:1.3.6.1.4.1.3711.1.1:1.3.6.1.4.1.3711.1.2
 // (that is, TARGET snmp:community:host:in_oid:out_oid
 
+// http://feathub.com/howardjones/network-weathermap/+1
+
 class WeatherMapDataSource_snmpv3 extends WeatherMapDataSource
 {
     protected $down_cache;
 
     function Init(&$map)
     {
-        return FALSE;
-
-        // TODO: this hasn't been altered for SNMPv3 at all!
-
         // We can keep a list of unresponsive nodes, so we can give up earlier
         $this->down_cache = array();
 
@@ -65,7 +63,7 @@ class WeatherMapDataSource_snmpv3 extends WeatherMapDataSource
         wm_debug("Will abort after $abort_count failures for a given host.\n");
         wm_debug("Number of retries changed to " . $retries . ".\n");
 
-        if (preg_match("/^snmp3:([^:]+):([^:]+):([^:]+):([^:]+)$/", $targetstring, $matches)) {
+        if (preg_match('/^snmp3:([^:]+):([^:]+):([^:]+):([^:]+)$/', $targetstring, $matches)) {
             $profile_name = $matches[1];
             $host = $matches[2];
             $in_oid = $matches[3];
@@ -89,6 +87,7 @@ class WeatherMapDataSource_snmpv3 extends WeatherMapDataSource
                 if (function_exists('snmp_set_oid_output_format')) {
                     snmp_set_oid_output_format(SNMP_OID_OUTPUT_NUMERIC);
                 }
+
                 if (function_exists('snmp_set_valueretrieval')) {
                     snmp_set_valueretrieval(SNMP_VALUE_PLAIN);
                 }
@@ -108,16 +107,16 @@ class WeatherMapDataSource_snmpv3 extends WeatherMapDataSource
                 $import = $map->get_hint("snmpv3_" . $profile_name . "_import");
 
                 if (is_null($import)) {
-                    $auth_username = $map->get_hint("snmpv3_" . $profile_name . "_username", "username");
-                    $auth_seclevel = $map->get_hint("snmpv3_" . $profile_name . "_username", "authPriv");
-                    $auth_authpass = $map->get_hint("snmpv3_" . $profile_name . "_username", "password");
-                    $auth_authproto = $map->get_hint("snmpv3_" . $profile_name . "_username", "sha1");
-                    $auth_privpass = $map->get_hint("snmpv3_" . $profile_name . "_username", "password");
-                    $auth_privproto = $map->get_hint("snmpv3_" . $profile_name . "_username", "sha1");
+                    $auth_username = $map->get_hint("snmpv3_" . $profile_name . "_username", "");
+                    $auth_seclevel = $map->get_hint("snmpv3_" . $profile_name . "_username", "noAuthNoPriv");
+                    $auth_authpass = $map->get_hint("snmpv3_" . $profile_name . "_username", "");
+                    $auth_authproto = $map->get_hint("snmpv3_" . $profile_name . "_username", "");
+                    $auth_privpass = $map->get_hint("snmpv3_" . $profile_name . "_username", "");
+                    $auth_privproto = $map->get_hint("snmpv3_" . $profile_name . "_username", "");
                 } else {
                     // TODO: some magic to get the SNMP settings from Cacti in here
                     $auth_username = "";
-                    $auth_seclevel = "";
+                    $auth_seclevel = "noAuthNoPriv";
                     $auth_authpass = "";
                     $auth_authproto = "";
                     $auth_privpass = "";
@@ -152,15 +151,15 @@ class WeatherMapDataSource_snmpv3 extends WeatherMapDataSource
                         snmp_set_quick_print($was);
                     }
                 }
-            else {
-                    wm_warn("SNMP for $host has reached $abort_count failures. Skipping. [WMSNMP01]");
-                }
+            } else {
+                wm_warn("SNMP for $host has reached $abort_count failures. Skipping. [WMSNMP01]");
             }
-
-            wm_debug("SNMP3 ReadData: Returning (" . ($data[IN] === NULL ? 'NULL' : $data[IN]) . "," . ($data[OUT] === NULL ? 'NULL' : $data[OUT]) . ",$data_time)\n");
-
-            return array($data[IN], $data[OUT], $data_time);
         }
+
+        wm_debug("SNMP3 ReadData: Returning (" . ($data[IN] === NULL ? 'NULL' : $data[IN]) . "," . ($data[OUT] === NULL ? 'NULL' : $data[OUT]) . ",$data_time)\n");
+
+        return array($data[IN], $data[OUT], $data_time);
     }
+}
 
 // vim:ts=4:sw=4:

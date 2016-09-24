@@ -13,6 +13,8 @@
 // TARGET snmp2c:public:hostname:1.3.6.1.4.1.3711.1.1:1.3.6.1.4.1.3711.1.2
 // (that is, TARGET snmp:community:host:in_oid:out_oid
 
+// http://feathub.com/howardjones/network-weathermap/+2
+
 class WeatherMapDataSource_snmpv2c extends WeatherMapDataSource
 {
     protected $down_cache;

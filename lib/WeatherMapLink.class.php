@@ -779,58 +779,81 @@ class WeatherMapLink extends WeatherMapDataItem
 		return($output);
 	}
 
-	function asJS()
-	{
-		$js='';
-		$js.="Links[" . js_escape($this->name) . "] = {";
-		$js .= "\"id\":" . $this->id. ", ";
 
-		if (isset($this->a))
-		{
-			$js.="a:'" . $this->a->name . "', ";
-			$js.="b:'" . $this->b->name . "', ";
-		}
 
-		$js.="width:'" . $this->width . "', ";
-		$js.="target:";
+    function asJSCore()
+    {
+        $output = "";
 
-		$tgt='';
+        $output .= "\"id\":" . $this->id. ", ";
+        if (isset($this->a)) {
+            $output.="a:'" . $this->a->name . "', ";
+            $output.="b:'" . $this->b->name . "', ";
+        }
 
-		foreach ($this->targets as $target) { 
-			if(strpos($target[4]," ") == FALSE) {
-				$tgt .= $target[4] . ' ';
-			} else {
-				$tgt .= '"'.$target[4] . '" ';
-			}
-		}
+        $output.="width:'" . $this->width . "', ";
+        $output.="target:";
 
-		$js.=js_escape(trim($tgt));
-		$js.=",";
+        $tgt='';
 
-		$js.="bw_in:" . js_escape($this->max_bandwidth_in_cfg) . ", ";
-		$js.="bw_out:" . js_escape($this->max_bandwidth_out_cfg) . ", ";
+        $i = 0;
+        foreach ($this->targets as $target) {
+            if ($i>0) {
+                print " ";
+            }
+            $tgt .= $target->asConfig();
+            $i++;
+        }
 
-		$js.="name:" . js_escape($this->name) . ", ";
-		$js.="overlibwidth:'" . $this->overlibheight . "', ";
-		$js.="overlibheight:'" . $this->overlibwidth . "', ";
-		$js.="overlibcaption:" . js_escape($this->overlibcaption[IN]) . ", ";
-		
-		$js.="commentin:" . js_escape($this->comments[IN]) . ", ";
-		$js.="commentposin:" . intval($this->commentoffset_in) . ", ";
-		
-		$js.="commentout:" . js_escape($this->comments[OUT]) . ", ";
-		$js.="commentposout:" . intval($this->commentoffset_out) . ", ";
+        $output.=WMUtility::jsEscape(trim($tgt));
+        $output.=",";
 
-		$js.="infourl:" . js_escape($this->infourl[IN]) . ", ";
-		$js.="overliburl:" . js_escape(join(" ",$this->overliburl[IN]));
-		
-		$js.="};\n";
-		$js .= "LinkIDs[\"L" . $this->id . "\"] = ". js_escape($this->name) . ";\n";
-		return $js;
-	}
+        $output.="bw_in:" . WMUtility::jsEscape($this->max_bandwidth_in_cfg) . ", ";
+        $output.="bw_out:" . WMUtility::jsEscape($this->max_bandwidth_out_cfg) . ", ";
+
+        $output.="name:" . WMUtility::jsEscape($this->name) . ", ";
+        $output.="overlibwidth:'" . $this->overlibheight . "', ";
+        $output.="overlibheight:'" . $this->overlibwidth . "', ";
+        $output.="overlibcaption:" . WMUtility::jsEscape($this->overlibcaption[IN]) . ", ";
+
+        $output.="commentin:" . WMUtility::jsEscape($this->comments[IN]) . ", ";
+        $output.="commentposin:" . intval($this->commentoffset_in) . ", ";
+
+        $output.="commentout:" . WMUtility::jsEscape($this->comments[OUT]) . ", ";
+        $output.="commentposout:" . intval($this->commentoffset_out) . ", ";
+
+        $output.="infourl:" . WMUtility::jsEscape($this->infourl[IN]) . ", ";
+        $output.="overliburl:" . WMUtility::jsEscape(join(" ", $this->overliburl[IN])). ", ";
+
+        $output .= "via: [";
+        $nItem = 0;
+        foreach ($this->vialist as $via) {
+            if ($nItem > 0) {
+                $output .= ", ";
+            }
+            $output .= sprintf("[%d,%d", $via[0], $via[1]);
+            if (isset($via[2])) {
+                $output .= ",".WMUtility::jsEscape($via[2]);
+            }
+            $output .= "]";
+
+            $nItem++;
+        }
+
+        $output .= "]";
+
+        return $output;
+    }
+
+    function asJS($type="Link", $prefix="L")
+    {
+        return parent::asJS($type, $prefix);
+    }
 
 	function asJSON($complete=TRUE)
 	{
+	    throw new WeathermapDeprecatedException("deprec");
+
 		$js = '';
 		$js .= "" . js_escape($this->name) . ": {";
 		$js .= "\"id\":" . $this->id. ", ";

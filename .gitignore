@@ -17,3 +17,4 @@ reports/
 output/*
 test-suite/results*
 test-suite/diffs/*
+docs/dev/vagrant-testers/.vagrant/

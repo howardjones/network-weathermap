@@ -946,40 +946,48 @@ class WeatherMapNode extends WeatherMapDataItem
 		return ($output);
 	}
 
-	function asJS()
-	{
-		$js = '';
-		$js .= "Nodes[" . js_escape($this->name) . "] = {";
-		$js .= "x:" . (is_null($this->x)? "'null'" : $this->x) . ", ";
-		$js .= "y:" . (is_null($this->y)? "'null'" : $this->y) . ", ";
-		$js .= "\"id\":" . $this->id. ", ";
-		// $js.="y:" . $this->y . ", ";
-		$js.="ox:" . $this->original_x . ", ";
-		$js.="oy:" . $this->original_y . ", ";
-		$js.="relative_to:" . js_escape($this->relative_to) . ", ";
-		$js.="label:" . js_escape($this->label) . ", ";
-		$js.="name:" . js_escape($this->name) . ", ";
-		$js.="infourl:" . js_escape($this->infourl[IN]) . ", ";
-		$js.="overlibcaption:" . js_escape($this->overlibcaption[IN]) . ", ";
-		$js.="overliburl:" . js_escape(join(" ",$this->overliburl[IN])) . ", ";
-		$js.="overlibwidth:" . $this->overlibheight . ", ";
-		$js.="overlibheight:" . $this->overlibwidth . ", ";
-		if (preg_match('/^(none|nink|inpie|outpie|box|rbox|gauge|round)$/',$this->iconfile))
-		{
-			$js.="iconfile:" . js_escape("::".$this->iconfile);
-		}
-		else
-		{
-			$js.="iconfile:" . js_escape($this->iconfile);
-		}
+    function asJSCore()
+    {
+        $output = "";
 
-		$js .= "};\n";
-		$js .= "NodeIDs[\"N" . $this->id . "\"] = ". js_escape($this->name) . ";\n";
-		return $js;
-	}
+        $output .= "x:" . (is_null($this->x) ? "'null'" : $this->x) . ", ";
+        $output .= "y:" . (is_null($this->y) ? "'null'" : $this->y) . ", ";
+        $output .= "\"id\":" . $this->id . ", ";
+        $output .= "ox:" . $this->original_x . ", ";
+        $output .= "oy:" . $this->original_y . ", ";
+        $output .= "relative_to:" . WMUtility::jsEscape($this->relative_to) . ", ";
+        $output .= "label:" . WMUtility::jsEscape($this->label) . ", ";
+        $output .= "name:" . WMUtility::jsEscape($this->name) . ", ";
+        $output .= "infourl:" . WMUtility::jsEscape($this->infourl[IN]) . ", ";
+        $output .= "overlibcaption:" . WMUtility::jsEscape($this->overlibcaption[IN]) . ", ";
+        $output .= "overliburl:" . WMUtility::jsEscape(join(" ", $this->overliburl[IN])) . ", ";
+        $output .= "overlibwidth:" . $this->overlibheight . ", ";
+        $output .= "overlibheight:" . $this->overlibwidth . ", ";
+        if (sizeof($this->boundingboxes) > 0) {
+            $output .= sprintf("bbox:[%d,%d, %d,%d], ", $this->boundingboxes[0][0], $this->boundingboxes[0][1],
+                $this->boundingboxes[0][2], $this->boundingboxes[0][3]);
+        } else {
+            $output .= "bbox: [], ";
+        }
+
+        if (preg_match("/^(none|nink|inpie|outpie|box|rbox|gauge|round)$/", $this->iconfile)) {
+            $output .= "iconfile:" . WMUtility::jsEscape("::" . $this->iconfile);
+        } else {
+            $output .= "iconfile:" . WMUtility::jsEscape($this->iconfile);
+        }
+
+        return $output;
+    }
+
+    function asJS($type = "Node", $prefix = "N")
+    {
+        return parent::asJS($type, $prefix);
+    }
 
 	function asJSON($complete=TRUE)
 	{
+        throw new WeathermapDeprecatedException("deprec");
+
 		$js = '';
 		$js .= "" . js_escape($this->name) . ": {";
 		$js .= "\"id\":" . $this->id. ", ";

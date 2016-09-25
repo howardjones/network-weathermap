@@ -387,6 +387,11 @@ class WeatherMapDataItem extends WeatherMapItem
         $this->parent->descendents [] = $this;
     }
 
+    protected function asJSCore()
+    {
+        return "";
+    }
+
     protected function asJS($type = "Thing", $prefix = "T")
     {
         $output = '';

@@ -24,6 +24,7 @@
     "squizlabs/php_codesniffer": "~2.0",
     "phpunit/phpunit-selenium": ">=1.2",
     "theseer/phpdox": "*",
-    "phploc/phploc": "~3.0"
+    "phploc/phploc": "~3.0",
+    "phing/phing": "^2.15"
   }
 }

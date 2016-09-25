@@ -380,7 +380,7 @@ class WeatherMap extends WeatherMapBase
 	var $mintimey, $maxtimey;
 	var $minstamptext, $maxstamptext;
 	var $context;
-	var $cachefolder,$mapcache,$cachefile_version;
+
 	var $name;
 	var $imagecache;
 	var $black,
@@ -401,8 +401,7 @@ class WeatherMap extends WeatherMapBase
 
 	var $plugins = array();
 	var $included_files = array();
-	var $usage_stats = array();
-	var $coverage = array();
+
     var $colourtable = array();
     var $warncount = 0;
 
@@ -967,7 +966,6 @@ function RandomData()
 
                 if (!$ret) {
                     wm_debug("Marking $name plugin as inactive, since Init() failed\n");
-                    // $pluginEntry['active'] = false;
                     $this->plugins[$type][$name]['active'] = false;
                     wm_debug("State is now %s\n", $this->plugins['data'][$name]['active']);
                 }
@@ -979,136 +977,18 @@ function RandomData()
     public function runProcessorPlugins($stage = "pre")
     {
         wm_debug("Running $stage-processing plugins...\n");
-        foreach ($this->plugins[$stage] as $name => $pluginEntry) {
-            wm_debug("Running %s->run()\n", $name);
-            $pluginEntry['object']->run($this);
-        }
+
+        $this->pluginMethod($stage, "run");
+//        foreach ($this->plugins[$stage] as $name => $pluginEntry) {
+//            wm_debug("Running %s->run()\n", $name);
+//            if ($pluginEntry['active']) {
+//                $pluginEntry['object']->run($this);
+//            }
+//        }
         wm_debug("Finished $stage-processing plugins...\n");
     }
 
-    function DatasourceInit()
-    {
-        wm_debug("Running Init() for Data Source Plugins...\n");
-        foreach ($this->datasourceclasses as $ds_class) {
-            // make an instance of the class
-            $dsplugins[$ds_class] = new $ds_class;
-            wm_debug("Running $ds_class" . "->Init()\n");
-            # $ret = call_user_func(array($ds_class, 'Init'), $this);
-            assert('isset($this->plugins["data"][$ds_class])');
 
-            $ret = $this->plugins['data'][$ds_class]->Init($this);
-
-            if (!$ret) {
-                wm_debug("Removing $ds_class from Data Source list, since Init() failed\n");
-                $this->activedatasourceclasses[$ds_class] = 0;
-                # unset($this->datasourceclasses[$ds_class]);
-            }
-        }
-        wm_debug("Finished Initialising Plugins...\n");
-    }
-
-function ProcessTargets()
-{
-    throw new WeathermapDeprecatedException("old targets");
-	wm_debug("Preprocessing targets\n");
-
-	$allitems = array(&$this->links, &$this->nodes);
-	reset($allitems);
-
-	wm_debug("Preprocessing targets\n");
-
-	while( list($kk,) = each($allitems))
-	{
-		unset($objects);
-		$objects = &$allitems[$kk];
-
-		reset($objects);
-		while (list($k,) = each($objects))
-		{
-			unset($myobj);
-			$myobj = &$objects[$k];
-
-			$type = $myobj->my_type();
-			$name=$myobj->name;
-
-
-			if( ($type=='LINK' && isset($myobj->a)) || ($type=='NODE' && !is_null($myobj->x) ) )
-			{
-				if (count($myobj->targets)>0)
-				{
-					$tindex = 0;
-					foreach ($myobj->targets as $target)
-					{
-						wm_debug ("ProcessTargets: New Target: $target[4]\n");
-						// processstring won't use notes (only hints) for this string
-
-						$targetstring = $this->ProcessString($target[4], $myobj, FALSE, FALSE);
-						if($target[4] != $targetstring) wm_debug("Targetstring is now $targetstring\n");
-
-						// if the targetstring starts with a -, then we're taking this value OFF the aggregate
-						$multiply = 1;
-						if(preg_match('/^-(.*)/',$targetstring,$matches))
-						{
-							$targetstring = $matches[1];
-							$multiply = -1 * $multiply;
-						}
-
-						// if the remaining targetstring starts with a number and a *-, then this is a scale factor
-						if(preg_match('/^(\d+\.?\d*)\*(.*)/',$targetstring,$matches))
-						{
-							$targetstring = $matches[2];
-							$multiply = $multiply * floatval($matches[1]);
-						}
-
-						$matched = FALSE;
-						$matched_by = '';
-						foreach ($this->datasourceclasses as $ds_class)
-						{
-							if(!$matched)
-							{
-								// $recognised = call_user_func(array($ds_class, 'Recognise'), $targetstring);
-								$recognised = $this->plugins['data'][$ds_class]->Recognise($targetstring);
-
-								if( $recognised )
-								{
-									$matched = TRUE;
-									$matched_by = $ds_class;
-
-									if($this->activedatasourceclasses[$ds_class])
-									{
-										$this->plugins['data'][$ds_class]->Register($targetstring, $this, $myobj);
-										if($type == 'NODE')
-										{
-											$this->nodes[$name]->targets[$tindex][1] = $multiply;
-											$this->nodes[$name]->targets[$tindex][0] = $targetstring;
-											$this->nodes[$name]->targets[$tindex][5] = $matched_by;
-										}
-										if($type == 'LINK')
-										{
-											$this->links[$name]->targets[$tindex][1] = $multiply;
-											$this->links[$name]->targets[$tindex][0] = $targetstring;
-											$this->links[$name]->targets[$tindex][5] = $matched_by;
-										}
-									}
-									else
-									{
-										wm_warn("ProcessTargets: $type $name, target: $targetstring on config line $target[3] of $target[2] was recognised as a valid TARGET by a plugin that is unable to run ($ds_class) [WMWARN07]\n");
-									}
-								}
-							}
-						}
-						if(! $matched)
-						{
-							wm_warn("ProcessTargets: $type $name, target: $target[4] on config line $target[3] of $target[2] was not recognised as a valid TARGET [WMWARN08]\n");
-						}
-
-						$tindex++;
-					}
-				}
-			}
-		}
-	}
-}
 
 
 // nodename is a vestigal parameter, from the days when nodes were just big labels
@@ -1231,9 +1111,6 @@ function ProcessTargets()
 
     /**
      * ReadConfig reads in either a file or part of a config and modifies the current map.
-     *
-     * Temporary new ReadConfig, using the new table of keywords
-     * However, this also expects a bunch of other internal change (WMColour, WMScale etc)
      *
      * @param $input string Either a filename or a fragment of config in a string
      * @return bool indicates success or failure     *
@@ -1410,56 +1287,27 @@ function ProcessTargets()
         }
     }
 
-	function ReadConfig_Commit(&$curobj)
-	{
-		if (is_null($curobj)) {
-			return;
-		}
-		$last_seen = $curobj->my_type();
-		// first, save the previous item, before starting work on the new one
-		if ($last_seen == "NODE") {
-			$this->nodes[$curobj->name] = $curobj;
-			wm_debug("Saving Node: " . $curobj->name . "\n");
-			if ($curobj->template == 'DEFAULT') {
-				$this->node_template_tree["DEFAULT"][] = $curobj->name;
-			}
-		}
-		if ($last_seen == "LINK") {
-			if (isset($curobj->a) && isset($curobj->b)) {
-				$this->links[$curobj->name] = $curobj;
-				wm_debug("Saving Link: " . $curobj->name . "\n");
-			} else {
-				$this->links[$curobj->name] = $curobj;
-				wm_debug("Saving Template-Only Link: " . $curobj->name . "\n");
-			}
-			if ($curobj->template == 'DEFAULT') {
-				$this->link_template_tree["DEFAULT"][] = $curobj->name;
-			}
-		}
-	}
 
 
-function WriteDataFile($filename)
-{
-	if($filename != "") {
-		$fd = fopen($filename, 'w');
-		# $output = '';
-		if($fd) {
-			foreach ($this->nodes as $node) {
-				if (!preg_match('/^::\s/', $node->name) && sizeof($node->targets)>0 )  {
-					fputs($fd, sprintf("N_%s\t%f\t%f\r\n", $node->name, $node->bandwidth_in, $node->bandwidth_out));
-				}
-			}
-			foreach ($this->links as $link) {
-				if (!preg_match('/^::\s/', $link->name) && sizeof($link->targets)>0) {
-					fputs($fd, sprintf("L_%s\t%f\t%f\r\n", $link->name, $link->bandwidth_in, $link->bandwidth_out));
-				}
-			}
-
-			fclose($fd);
-		}
-	}
-}
+    function WriteDataFile($filename)
+    {
+        if ($filename != "") {
+            $fd = fopen($filename, 'w');
+            if ($fd) {
+                foreach ($this->nodes as $node) {
+                    if (!preg_match('/^::\s/', $node->name) && sizeof($node->targets) > 0) {
+                        fputs($fd, sprintf("N_%s\t%f\t%f\r\n", $node->name, $node->bandwidth_in, $node->bandwidth_out));
+                    }
+                }
+                foreach ($this->links as $link) {
+                    if (!preg_match('/^::\s/', $link->name) && sizeof($link->targets) > 0) {
+                        fputs($fd, sprintf("L_%s\t%f\t%f\r\n", $link->name, $link->bandwidth_in, $link->bandwidth_out));
+                    }
+                }
+                fclose($fd);
+            }
+        }
+    }
 
 function WriteConfig($filename)
 {
@@ -1761,21 +1609,6 @@ function DrawMap($filename = '', $thumbnailfile = '', $thumbnailmax = 250, $with
                     $this->scales[$scaleName]->drawLegend($image);
                 }
 
-//
-//				foreach ($this->colours as $scalename=>$colours)
-//				{
-//					wm_debug("Drawing KEY for $scalename if necessary.\n");
-//
-//					if( (isset($this->numscales[$scalename])) && (isset($this->keyx[$scalename])) && ($this->keyx[$scalename] >= 0) && ($this->keyy[$scalename] >= 0) )
-//					{
-//						if($this->keystyle[$scalename]=='classic') $this->DrawLegend_Classic($image,$scalename,FALSE);
-//						if($this->keystyle[$scalename]=='horizontal') $this->DrawLegend_Horizontal($image,$scalename,$this->keysize[$scalename]);
-//						if($this->keystyle[$scalename]=='vertical') $this->DrawLegend_Vertical($image,$scalename,$this->keysize[$scalename]);
-//						if($this->keystyle[$scalename]=='inverted') $this->DrawLegend_Vertical($image,$scalename,$this->keysize[$scalename],true);
-//						if($this->keystyle[$scalename]=='tags') $this->DrawLegend_Classic($image,$scalename,TRUE);
-//					}
-//				}
-
 				$this->DrawTimestamp($image, $this->timefont, $this->colours['DEFAULT']['TIME']['gdref1']);
 				if(! is_null($this->min_data_time))
 				{
@@ -1833,57 +1666,43 @@ function DrawMap($filename = '', $thumbnailfile = '', $thumbnailmax = 250, $with
 		$overlay = myimagecolorallocate($image, 200, 0, 0);
 
 		// for the editor, we can optionally overlay some other stuff
-        if($this->context == 'editor')
-        {
-		if($use_rel_overlay)
-		{
-		#		$overlay = myimagecolorallocate($image, 200, 0, 0);
+        if ($this->context == 'editor') {
+            if ($use_rel_overlay) {
+                #		$overlay = myimagecolorallocate($image, 200, 0, 0);
 
-			// first, we can show relatively positioned NODEs
-			foreach ($this->nodes as $node) {
-					if($node->relative_to != '')
-					{
-							$rel_x = $this->nodes[$node->relative_to]->x;
-							$rel_y = $this->nodes[$node->relative_to]->y;
-							imagearc($image,$node->x, $node->y,
-									15,15,0,360,$overlay);
-							imagearc($image,$node->x, $node->y,
-									16,16,0,360,$overlay);
+                // first, we can show relatively positioned NODEs
+                foreach ($this->nodes as $node) {
+                    if ($node->relative_to != '') {
+                        $rel_x = $this->nodes[$node->relative_to]->x;
+                        $rel_y = $this->nodes[$node->relative_to]->y;
+                        imagearc($image, $node->x, $node->y,
+                            15, 15, 0, 360, $overlay);
+                        imagearc($image, $node->x, $node->y,
+                            16, 16, 0, 360, $overlay);
 
-							imageline($image,$node->x, $node->y,
-									$rel_x, $rel_y, $overlay);
-					}
-			}
-		}
+                        imageline($image, $node->x, $node->y,
+                            $rel_x, $rel_y, $overlay);
+                    }
+                }
+            }
 
-		if($use_via_overlay)
-		{
-			// then overlay VIAs, so they can be seen
-			foreach($this->links as $link)
-			{
-				foreach ($link->vialist as $via)
-				{
-					if(isset($via[2]))
-					{
-						$x = $this->nodes[$via[2]]->x + $via[0];
-						$y = $this->nodes[$via[2]]->y + $via[1];
-					}
-					else
-					{
-						$x = $via[0];
-						$y = $via[1];
-					}
-					imagearc($image, $x,$y, 10,10,0,360,$overlay);
-					imagearc($image, $x,$y, 12,12,0,360,$overlay);
-				}
-			}
-		}
+            if ($use_via_overlay) {
+                // then overlay VIAs, so they can be seen
+                foreach ($this->links as $link) {
+                    foreach ($link->vialist as $via) {
+                        if (isset($via[2])) {
+                            $x = $this->nodes[$via[2]]->x + $via[0];
+                            $y = $this->nodes[$via[2]]->y + $via[1];
+                        } else {
+                            $x = $via[0];
+                            $y = $via[1];
+                        }
+                        imagearc($image, $x, $y, 10, 10, 0, 360, $overlay);
+                        imagearc($image, $x, $y, 12, 12, 0, 360, $overlay);
+                    }
+                }
+            }
         }
-
-		#$this->myimagestring($image, 3, 200, 100, "Test 1\nLine 2", $overlay,0);
-
-#	$this->myimagestring($image, 30, 100, 100, "Test 1\nLine 2", $overlay,0);
-		#$this->myimagestring($image, 30, 200, 200, "Test 1\nLine 2", $overlay,45);
 
 		// Ready to output the results...
 
@@ -2154,67 +1973,27 @@ function PreloadMapHTML()
 
 }
 
-function asJS()
-{
-	$js='';
+    function asJS()
+    {
+        $js = '';
 
-	$js .= "var Links = new Array();\n";
-	$js .= "var LinkIDs = new Array();\n";
-	# $js.=$this->defaultlink->asJS();
+        $js .= "var Links = new Array();\n";
+        $js .= "var LinkIDs = new Array();\n";
 
-	foreach ($this->links as $link) { $js.=$link->asJS(); }
+        foreach ($this->links as $link) {
+            $js .= $link->asJS();
+        }
 
-	$js .= "var Nodes = new Array();\n";
-	$js .= "var NodeIDs = new Array();\n";
-	# $js.=$this->defaultnode->asJS();
+        $js .= "var Nodes = new Array();\n";
+        $js .= "var NodeIDs = new Array();\n";
 
-	foreach ($this->nodes as $node) { $js.=$node->asJS(); }
+        foreach ($this->nodes as $node) {
+            $js .= $node->asJS();
+        }
 
-	return $js;
-}
+        return $js;
+    }
 
-function asJSON()
-{
-	$json = '';
-
-	$json .= "{ \n";
-
-	$json .= "\"map\": {  \n";
-	foreach (array_keys($this->inherit_fieldlist)as $fld)
-	{
-		$json .= js_escape($fld).": ";
-		$json .= js_escape($this->$fld);
-		$json .= ",\n";
-	}
-	$json = rtrim($json,", \n");
-	$json .= "\n},\n";
-
-	$json .= "\"nodes\": {\n";
-	$json .= $this->defaultnode->asJSON();
-	foreach ($this->nodes as $node) { $json .= $node->asJSON(); }
-	$json = rtrim($json,", \n");
-	$json .= "\n},\n";
-
-
-
-	$json .= "\"links\": {\n";
-	$json .= $this->defaultlink->asJSON();
-	foreach ($this->links as $link) { $json .= $link->asJSON(); }
-	$json = rtrim($json,", \n");
-	$json .= "\n},\n";
-
-	$json .= "'imap': [\n";
-	$json .= $this->imap->subJSON("NODE:");
-	// should check if there WERE nodes...
-	$json .= ",\n";
-	$json .= $this->imap->subJSON("LINK:");
-	$json .= "\n]\n";
-	$json .= "\n";
-
-	$json .= ", 'valid': 1}\n";
-
-	return($json);
-}
 
 // This method MUST run *after* DrawMap. It relies on DrawMap to call the map-drawing bits
 // which will populate the ImageMap with regions.
@@ -2299,261 +2078,6 @@ function MakeHTML($imagemapname = "weathermap_imap")
 
 		return ($html);
 	}
-
-// update any editor cache files.
-// if the config file is newer than the cache files, or $agelimit seconds have passed,
-// then write new stuff, otherwise just return.
-// ALWAYS deletes files in the cache folder older than $agelimit, also!
-function CacheUpdate($agelimit=600)
-{
-	global $weathermap_lazycounter;
-
-	$cachefolder = $this->cachefolder;
-	$configchanged = filemtime($this->configfile );
-	// make a unique, but safe, prefix for all cachefiles related to this map config
-	// we use CRC32 because it makes for a shorter filename, and collisions aren't the end of the world.
-	$cacheprefix = dechex(crc32($this->configfile));
-
-	wm_debug("Comparing files in $cachefolder starting with $cacheprefix, with date of $configchanged\n");
-
-	$dh=opendir($cachefolder);
-
-	if ($dh)
-	{
-		while ($file=readdir($dh))
-		{
-			$realfile = $cachefolder . DIRECTORY_SEPARATOR . $file;
-
-			if(is_file($realfile) && ( preg_match('/^'.$cacheprefix.'/',$file) ))
-				//                                            if (is_file($realfile) )
-			{
-				wm_debug("$realfile\n");
-				if( (filemtime($realfile) < $configchanged) || ((time() - filemtime($realfile)) > $agelimit) )
-				{
-					wm_debug("Cache: deleting $realfile\n");
-					unlink($realfile);
-				}
-			}
-		}
-		closedir ($dh);
-
-		foreach ($this->nodes as $node)
-		{
-			if(isset($node->image))
-			{
-				$nodefile = $cacheprefix."_".dechex(crc32($node->name)).".png";
-				$this->nodes[$node->name]->cachefile = $nodefile;
-				imagepng($node->image,$cachefolder.DIRECTORY_SEPARATOR.$nodefile);
-			}
-		}
-
-		foreach ($this->keyimage as $key=>$image)
-		{
-				$scalefile = $cacheprefix."_scale_".dechex(crc32($key)).".png";
-				$this->keycache[$key] = $scalefile;
-				imagepng($image,$cachefolder.DIRECTORY_SEPARATOR.$scalefile);
-		}
-
-
-		$json = "";
-		$fd = fopen($cachefolder.DIRECTORY_SEPARATOR.$cacheprefix."_map.json","w");
-		foreach (array_keys($this->inherit_fieldlist)as $fld)
-		{
-			$json .= js_escape($fld).": ";
-			$json .= js_escape($this->$fld);
-			$json .= ",\n";
-		}
-		$json = rtrim($json,", \n");
-		fputs($fd,$json);
-		fclose($fd);
-
-		$json = "";
-		$fd = fopen($cachefolder.DIRECTORY_SEPARATOR.$cacheprefix."_tree.json","w");
-		$id = 10;	// first ID for user-supplied thing
-
-		$json .= "{ id: 1, text: 'SCALEs'\n, children: [\n";
-		foreach ($this->colours as $scalename=>$colours)
-		{
-			$json .= "{ id: " . $id++ . ", text:" . js_escape($scalename) . ", leaf: true }, \n";
-		}
-		$json = rtrim($json,", \n");
-		$json .= "]},\n";
-
-		$json .= "{ id: 2, text: 'FONTs',\n children: [\n";
-		foreach ($this->fonts as $fontnumber => $font)
-		{
-			if ($font->type == 'truetype')
-				$json .= sprintf("{ id: %d, text: %s, leaf: true}, \n", $id++, js_escape("Font $fontnumber (TT)"));
-
-			if ($font->type == 'gd')
-				$json .= sprintf("{ id: %d, text: %s, leaf: true}, \n", $id++, js_escape("Font $fontnumber (GD)"));
-		}
-		$json = rtrim($json,", \n");
-		$json .= "]},\n";
-
-		$json .= "{ id: 3, text: 'NODEs',\n children: [\n";
-		$json .= "{ id: ". $id++ . ", text: 'DEFAULT', children: [\n";
-
-		$weathemap_lazycounter = $id;
-		// pass the list of subordinate nodes to the recursive tree function
-		$json .= $this->MakeTemplateTree( $this->node_template_tree );
-		$id = $weathermap_lazycounter;
-
-		$json = rtrim($json,", \n");
-		$json .= "]} ]},\n";
-
-		$json .= "{ id: 4, text: 'LINKs',\n children: [\n";
-		$json .= "{ id: ". $id++ . ", text: 'DEFAULT', children: [\n";
-		$weathemap_lazycounter = $id;
-		$json .= $this->MakeTemplateTree( $this->link_template_tree );
-		$id = $weathermap_lazycounter;
-		$json = rtrim($json,", \n");
-		$json .= "]} ]}\n";
-
-		fputs($fd,"[". $json . "]");
-		fclose($fd);
-
-		$fd = fopen($cachefolder.DIRECTORY_SEPARATOR.$cacheprefix."_nodes.json","w");
-		$json = "";
-//		$json = $this->defaultnode->asJSON(TRUE);
-		foreach ($this->nodes as $node) { $json .= $node->asJSON(TRUE); }
-		$json = rtrim($json,", \n");
-		fputs($fd,$json);
-		fclose($fd);
-
-		$fd = fopen($cachefolder.DIRECTORY_SEPARATOR.$cacheprefix."_nodes_lite.json","w");
-		$json = "";
-//		$json = $this->defaultnode->asJSON(FALSE);
-		foreach ($this->nodes as $node) { $json .= $node->asJSON(FALSE); }
-		$json = rtrim($json,", \n");
-		fputs($fd,$json);
-		fclose($fd);
-
-
-
-		$fd = fopen($cachefolder.DIRECTORY_SEPARATOR.$cacheprefix."_links.json","w");
-		$json = "";
-//		$json = $this->defaultlink->asJSON(TRUE);
-		foreach ($this->links as $link) { $json .= $link->asJSON(TRUE); }
-		$json = rtrim($json,", \n");
-		fputs($fd,$json);
-		fclose($fd);
-
-		$fd = fopen($cachefolder.DIRECTORY_SEPARATOR.$cacheprefix."_links_lite.json","w");
-		$json = "";
-//		$json = $this->defaultlink->asJSON(FALSE);
-		foreach ($this->links as $link) { $json .= $link->asJSON(FALSE); }
-		$json = rtrim($json,", \n");
-		fputs($fd,$json);
-		fclose($fd);
-
-		$fd = fopen($cachefolder.DIRECTORY_SEPARATOR.$cacheprefix."_imaphtml.json","w");
-		$json = $this->imap->subHTML("LINK:");
-		fputs($fd,$json);
-		fclose($fd);
-
-
-		$fd = fopen($cachefolder.DIRECTORY_SEPARATOR.$cacheprefix."_imap.json","w");
-		$json = '';
-		$nodejson = trim($this->imap->subJSON("NODE:"));
-		if($nodejson != '')
-		{
-			$json .= $nodejson;
-			// should check if there WERE nodes...
-			$json .= ",\n";
-		}
-		$json .= $this->imap->subJSON("LINK:");
-		fputs($fd,$json);
-		fclose($fd);
-
-	}
-	else { wm_debug("Couldn't read cache folder.\n"); }
-}
-
-function MakeTemplateTree( &$tree_list, $startpoint="DEFAULT")
-{
-	global $weathermap_lazycounter;
-
-	$output = "";
-	foreach ($tree_list[$startpoint] as $subnode)
-	{
-		$output .= "{ id: " . $weathermap_lazycounter++ . ", text: " . js_escape($subnode);
-		if( isset($tree_list[$subnode]))
-		{
-			$output .= ", children: [ \n";
-			$output .= $this->MakeTemplateTree($tree_list, $subnode);
-			$output = rtrim($output,", \n");
-			$output .= "] \n";
-		}
-		else
-		{
-			$output .= ", leaf: true ";
-		}
-		$output .= "}, \n";
-	}
-
-	return($output);
-}
-
-function DumpStats($filename="")
-{
-	$report = "Feature Statistics:\n\n";
-	foreach ($this->usage_stats as $key=>$val)
-	{
-		$report .= sprintf("%70s => %d\n",$key,$val);
-	}
-
-	if($filename == "") print $report;
-}
-
- function SeedCoverage()
-        {
-                global $WM_config_keywords2;
-
-                foreach ( array_keys($WM_config_keywords2) as $context) {
-                        foreach ( array_keys($WM_config_keywords2[$context]) as $keyword) {
-                                foreach ( $WM_config_keywords2[$context][$keyword] as $patternarray) {
-                                        $key = sprintf("%s:%s:%s",$context, $keyword ,$patternarray[1]);
-                                        $this->coverage[$key] = 0;
-                                }
-                        }
-                }
-        }
-
-        function LoadCoverage($file)
-        {
-                return 0;
-                $i=0;
-                $fd = fopen($file,"r");
-                if(is_resource($fd)) {
-                    while(! feof($fd)) {
-                            $line = fgets($fd,1024);
-                            $line = trim($line);
-                            list($val,$key) = explode("\t",$line);
-                            if($key != "") {
-                                $this->coverage[$key] = $val;
-                            }
-                            if($val > 0) { $i++; }
-                    }
-                    fclose($fd);
-                }
-#               print "Loaded $i non-zero coverage stats.\n";
-        }
-
-        function SaveCoverage($file)
-        {
-                $i=0;
-                $fd = fopen($file,"w+");
-                foreach ($this->coverage as $key=>$val) {
-                        fputs($fd, "$val\t$key\n");
-                        if($val > 0) { $i++; }
-                }
-                fclose($fd);
-#               print "Saved $i non-zero coverage stats.\n";
-        }
-
-
-
 
     public function nodeExists($nodeName)
     {
@@ -2661,8 +2185,22 @@ function DumpStats($filename="")
         // give all the plugins a chance to prefetch their results
         wm_debug("======================================\n");
         wm_debug("Starting DS plugin prefetch\n");
-        foreach ($this->plugins['data'] as $name => $pluginEntry) {
-            $pluginEntry['object']->Prefetch($this);
+        $this->pluginMethod("data", "Prefetch");
+//        foreach ($this->plugins['data'] as $name => $pluginEntry) {
+//            $pluginEntry['object']->Prefetch($this);
+//        }
+    }
+
+    private function pluginMethod($type, $method)
+    {
+        wm_debug("======================================\n");
+        wm_debug("Running $type plugin $method method\n");
+
+        foreach ($this->plugins[$type] as $name => $pluginEntry) {
+            if ($pluginEntry['active']) {
+                wm_debug("Running $name->$method()\n");
+                $pluginEntry['object']->$method($this);
+            }
         }
     }
 
@@ -2670,10 +2208,13 @@ function DumpStats($filename="")
     {
         wm_debug("======================================\n");
         wm_debug("Starting DS plugin cleanup\n");
+        $this->pluginMethod("data", "CleanUp");
 
-        foreach ($this->plugins[$type] as $name => $pluginEntry) {
-            $pluginEntry['object']->CleanUp($this);
-        }
+//        foreach ($this->plugins[$type] as $name => $pluginEntry) {
+//            if ($pluginEntry['active']) {
+//                $pluginEntry['object']->CleanUp($this);
+//            }
+//        }
     }
 
 

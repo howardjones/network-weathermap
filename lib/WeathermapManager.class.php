@@ -163,7 +163,7 @@ class WeathermapManager
 
     public function getTabs($userId)
     {
-        $statement = $this->pdo->prepare("SELECT DISTINCTROW weathermap_maps.group_id AS id, weathermap_groups.name AS group_name FROM weathermap_auth,weathermap_maps, weathermap_groups WHERE weathermap_groups.id=weathermap_maps.group_id AND weathermap_maps.id=weathermap_auth.mapid AND active='on' AND (userid=? OR userid=0) ORDER BY weathermap_groups.sortorder");
+        $statement = $this->pdo->prepare("SELECT DISTINCTROW weathermap_maps.group_id AS id, weathermap_groups.name AS group_name, weathermap_groups.sortorder FROM weathermap_auth,weathermap_maps, weathermap_groups WHERE weathermap_groups.id=weathermap_maps.group_id AND weathermap_maps.id=weathermap_auth.mapid AND active='on' AND (userid=? OR userid=0) ORDER BY weathermap_groups.sortorder");
         $statement->execute(array($userId));
         $maps = $statement->fetchAll(PDO::FETCH_ASSOC);
 

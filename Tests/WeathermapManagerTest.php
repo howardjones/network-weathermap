@@ -421,6 +421,9 @@ class WeathermapManagerTest extends PHPUnit_Extensions_Database_TestCase
         $this->manager->addPermission($mapId, $guestUser);
         $maps = $this->manager->getMapsForUser($guestUser);
         $this->assertEquals(2, sizeof($maps));
+        $maps = $this->manager->getMapsForUser($guestUser,2);
+        $this->assertEquals(0, sizeof($maps));
+
 
         $users = $this->manager->getMapAuthUsers($mapId);
         $this->assertEquals(2, sizeof($users));
@@ -436,6 +439,8 @@ class WeathermapManagerTest extends PHPUnit_Extensions_Database_TestCase
         $this->assertFalse($this->objarray_includes($users, "userid", $guestUser));
         $this->assertTrue($this->objarray_includes($users, "userid", 1));
 
+        $users = $this->manager->getMapAuth(7);
+        $this->assertEquals(2, sizeof($users));
 
     }
 
@@ -443,6 +448,68 @@ class WeathermapManagerTest extends PHPUnit_Extensions_Database_TestCase
     {
         $this->assertEquals(7, $this->manager->translateFileHash("99639caa5ed4ab8ad7a2"));
         $this->assertEquals(7, $this->manager->translateFileHash("switch-status-2.conf"));
+    }
+
+    public function testAccess()
+    {
+        $adminUser = 1;
+        $guestUser = 2;
+        $nosuchUser = 17;
+
+        $maps = $this->manager->getMapWithAccess($adminUser, 1);
+        $this->assertEquals(1, sizeof($maps));
+
+        $maps = $this->manager->getMapWithAccess($guestUser, 1);
+        $this->assertEquals(0, sizeof($maps));
+
+        $maps = $this->manager->getMapWithAccess($guestUser, 7);
+        $this->assertEquals(1, sizeof($maps));
+
+        $maps = $this->manager->getMapWithAccess($nosuchUser, 1);
+        $this->assertEquals(0, sizeof($maps));
+
+        ####
+
+        $maps = $this->manager->getMapsWithAccessAndGroups($adminUser);
+        $this->assertEquals(6, sizeof($maps));
+
+        $maps = $this->manager->getMapsWithAccessAndGroups($guestUser);
+        $this->assertEquals(1, sizeof($maps));
+
+        $maps = $this->manager->getMapsWithAccessAndGroups($nosuchUser);
+        $this->assertEquals(0, sizeof($maps));
+
+    }
+
+    public function testListManagement()
+    {
+        $count = $this->manager->getMapTotalCount();
+        $this->assertEquals(6, $count);
+
+        $maps = $this->manager->getMapsInGroup(1);
+        $this->assertEquals(6, sizeof($maps));
+        $this->assertInstanceOf(stdClass::class, $maps[0]);
+
+        $maps = $this->manager->getMapsInGroup(2);
+        $this->assertEquals(0, sizeof($maps));
+
+
+        $maps = $this->manager->getMapsWithGroups();
+        $this->assertEquals(6, sizeof($maps));
+        $this->assertInstanceOf(stdClass::class, $maps[0]);
+        $this->assertObjectHasAttribute("groupname", $maps[0]);
+
+        $maps = $this->manager->getMapRunList();
+        $this->assertEquals(6, sizeof($maps));
+        $this->assertInstanceOf(stdClass::class, $maps[0]);
+        // TODO - check ordering!
+
+        $this->manager->disableMap(1);
+
+        $maps = $this->manager->getMapRunList();
+        $this->assertEquals(5, sizeof($maps));
+        $this->assertInstanceOf(stdClass::class, $maps[0]);
+
     }
 
 }

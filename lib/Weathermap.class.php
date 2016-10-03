@@ -7,18 +7,31 @@
 
 require_once "HTML_ImageMap.class.php";
 
-require_once "WeatherMap.functions.php";
 require_once "exceptions.php";
 require_once "base-classes.php";
 require_once "plugin-base-classes.php";
 require_once "geometry.php";
+require_once "image-functions.php";
+require_once "CatmullRom.class.php";
+
 require_once "WMPoint.class.php";
 require_once "WMVector.class.php";
 require_once "WMLine.class.php";
+require_once "WMRectangle.class.php";
+
 require_once "WMUtility.class.php";
+require_once "WMImageUtility.php";
+
 require_once "WMTarget.class.php";
 require_once "WMColour.class.php";
 require_once "fonts.php";
+
+
+require_once "WMSpine.class.php";
+require_once "WMLinkGeometryFactory.class.php";
+require_once "WMLinkGeometry.class.php";
+require_once "WMAngledLinkGeometry.class.php";
+require_once "WMCurvedLinkGeometry.class.php";
 
 require_once "WeatherMapConfigReader.class.php";
 require_once "WeatherMapScale.class.php";
@@ -26,6 +39,9 @@ require_once "WeatherMapScale.class.php";
 require_once "WeatherMapDataItem.class.php";
 require_once "WeatherMapNode.class.php";
 require_once "WeatherMapLink.class.php";
+
+
+require_once "WeatherMap.functions.php";
 
 
 $WEATHERMAP_VERSION = "0.98a";
@@ -1485,9 +1501,20 @@ function WriteConfig($filename)
         }
     }
 
+    public function preCalculate()
+    {
+        wm_debug("preCalculating everything\n");
+
+        $allMapItems = $this->buildAllItemsList();
+
+        foreach ($allMapItems as $item) {
+            $item->preCalculate($this);
+        }
+    }
+
 function DrawMap($filename = '', $thumbnailfile = '', $thumbnailmax = 250, $withnodes = TRUE, $use_via_overlay = FALSE, $use_rel_overlay=FALSE)
 {
-	wm_debug("Trace: DrawMap()\n");
+    wm_debug("Trace: DrawMap()\n");
 	$bgimage=NULL;
 	if($this->configfile != "")
 	{
@@ -1511,6 +1538,7 @@ function DrawMap($filename = '', $thumbnailfile = '', $thumbnailmax = 250, $with
 	wm_debug("=====================================\n");
 	wm_debug("Start of Map Drawing\n");
 
+    $this->preCalculate();
 
 	// if we're running tests, we force the time to a particular value,
         // so the output can be compared to a reference image more easily
@@ -1552,7 +1580,7 @@ function DrawMap($filename = '', $thumbnailfile = '', $thumbnailmax = 250, $with
 		("Couldn't create output image in memory (" . $this->width . "x" . $this->height . ")."); }
 	else
 	{
-		ImageAlphaBlending($image, true);
+		imagealphablending($image, true);
 		if($this->get_hint("antialias") == 1) {
 			// Turn on anti-aliasing if it exists and it was requested
 			if(function_exists("imageantialias")) {
@@ -1622,43 +1650,44 @@ function DrawMap($filename = '', $thumbnailfile = '', $thumbnailmax = 250, $with
 			{
 				foreach($z_items as $it)
 				{
-					$class_lower = strtolower(get_class($it));
+                    wm_debug("Drawing " . $it->my_type() . " " . $it->name . "\n");
+				    $it->Draw($image, $this);
 
-					if ($class_lower =='weathermaplink')
-					{
-						// only draw LINKs if they have NODES defined (not templates)
-						// (also, check if the link still exists - if this is in the editor, it may have been deleted by now)
-						if ( isset($this->links[$it->name]) && isset($it->a) && isset($it->b))
-						{
-							wm_debug("Drawing LINK ".$it->name."\n");
-							$this->links[$it->name]->Draw($image, $this);
-						}
-					}
-					if ($class_lower =='weathermapnode')
-					{
-						// if(!is_null($it->x)) $it->pre_render($image, $this);
-						if ($withnodes)
-						{
-							// don't try and draw template nodes
-							if (isset($this->nodes[$it->name]) && !is_null($it->x))
-							{
-								# print "::".get_class($it)."\n";
-								wm_debug("Drawing NODE ".$it->name."\n");
-								$this->nodes[$it->name]->NewDraw($image, $this);
-								$ii=0;
-								foreach ($this->nodes[$it->name]->boundingboxes as $bbox)
-								{
-									# $areaname = "NODE:" . $it->name . ':'.$ii;
-									$areaname = "NODE:N". $it->id . ":" . $ii;
-									$this->imap->addArea("Rectangle", $areaname, '', $bbox);
-									$this->nodes[$it->name]->imap_areas[] = $areaname;
-									wm_debug("Adding imagemap area");
-									$ii++;
-								}
-								wm_debug("Added $ii bounding boxes too\n");
-							}
-						}
-					}
+                    if(1==0) {
+                        $class_lower = strtolower(get_class($it));
+
+                        if ($class_lower == 'weathermaplink') {
+                            // only draw LINKs if they have NODES defined (not templates)
+                            // (also, check if the link still exists - if this is in the editor, it may have been deleted by now)
+                            if (isset($this->links[$it->name]) && isset($it->a) && isset($it->b)) {
+                                wm_debug("Drawing LINK " . $it->name . "\n");
+                                $this->links[$it->name]->Draw($image, $this);
+                            }
+                        }
+
+                        if ($class_lower == 'weathermapnode') {
+                            // if(!is_null($it->x)) $it->pre_render($image, $this);
+                            if ($withnodes) {
+                                // don't try and draw template nodes
+                                if (isset($this->nodes[$it->name]) && !is_null($it->x)) {
+                                    # print "::".get_class($it)."\n";
+                                    wm_debug("Drawing NODE " . $it->name . "\n");
+                                    $this->nodes[$it->name]->Draw($image, $this);
+                                    $ii = 0;
+                                    foreach ($this->nodes[$it->name]->boundingboxes as $bbox) {
+                                        # $areaname = "NODE:" . $it->name . ':'.$ii;
+                                        $areaname = "NODE:N" . $it->id . ":" . $ii;
+                                        $this->imap->addArea("Rectangle", $areaname, '', $bbox);
+                                        $this->nodes[$it->name]->imap_areas[] = $areaname;
+                                        wm_debug("Adding imagemap area");
+                                        $ii++;
+                                    }
+                                    wm_debug("Added $ii bounding boxes too\n");
+                                }
+                            }
+                        }
+                    }
+
 				}
 			}
 		}
@@ -1790,39 +1819,32 @@ function DrawMap($filename = '', $thumbnailfile = '', $thumbnailmax = 250, $with
 	}
 }
 
-function CleanUp()
-{
-	$all_layers = array_keys($this->seen_zlayers);
+    function CleanUp()
+    {
+        parent::cleanUp();
 
-    foreach ($all_layers as $z) {
-        $this->seen_zlayers[$z] = null;
-    }
+        $all_layers = array_keys($this->seen_zlayers);
 
-    foreach ($this->links as $link) {
-        $link->owner = null;
-        $link->a = null;
-        $link->b = null;
-
-        unset($link);
-    }
-
-    foreach ($this->nodes as $node) {
-        // destroy all the images we created, to prevent memory leaks
-
-        if (isset($node->image)) {
-            imagedestroy($node->image);
+        foreach ($all_layers as $z) {
+            $this->seen_zlayers[$z] = null;
         }
-        $node->owner = null;
-        unset($node);
+
+        foreach ($this->links as $link) {
+            $link->cleanUp();
+            unset($link);
+        }
+
+        foreach ($this->nodes as $node) {
+            $node->cleanUp();
+            unset($node);
+        }
+
+        // Clear up the other random hashes of information
+        $this->dsinfocache = null;
+        $this->colourtable = null;
+        $this->usage_stats = null;
+        $this->scales = null;
     }
-
-            // Clear up the other random hashes of information
-    $this->dsinfocache = null;
-    $this->colourtable = null;
-    $this->usage_stats = null;
-    $this->scales = null;
-
-}
 
 function PreloadMapHTML()
 {
@@ -2039,7 +2061,7 @@ function MakeHTML($imagemapname = "weathermap_imap")
 
 	function SortedImagemap($imagemapname)
 	{
-		$html = '<map name="' . $imagemapname . '" id="' . $imagemapname . '">';
+		$html = "\n<map name=\"" . $imagemapname . '" id="' . $imagemapname . "\">\n";
 
 		$all_layers = array_keys($this->seen_zlayers);
 		rsort($all_layers);
@@ -2057,18 +2079,33 @@ function MakeHTML($imagemapname = "weathermap_imap")
 
 					foreach ($this->imap_areas as $areaname) {
 						// skip the linkless areas if we are in the editor - they're redundant
-						$html .= $this->imap->exactHTML($areaname, true, ($this->context
+						$html .= "\t".$this->imap->exactHTML($areaname, true, ($this->context
 							!= 'editor'));
+                        $html .= "\n";
 					}
+
+					foreach ($this->scales as $it) {
+                        foreach ($it->getImageMapAreas() as $area) {
+                            wm_debug("$area\n");
+                            // skip the linkless areas if we are in the editor - they're redundant
+                            $html .= "\t".$area->asHTML();
+                            $html .= "\n";
+                        }
+                        $html .= "\n";
+                    }
 				}
 
-				foreach ($z_items as $it) {
+                // we reverse the array for each zlayer so that the imagemap order
+                // will match up with the draw order (last drawn should be first hit)
+				foreach (array_reverse($z_items) as $it) {
 					if ($it->name != 'DEFAULT' && $it->name != ":: DEFAULT ::") {
-						foreach ($it->imap_areas as $areaname) {
+						foreach ($it->getImageMapAreas() as $area) {
+						    wm_debug("$area\n");
 							// skip the linkless areas if we are in the editor - they're redundant
-							$html .= $this->imap->exactHTML(
-								$areaname, true, ($this->context != 'editor'));
+                            $html .= "\t".$area->asHTML();
+                            $html .= "\n";
 						}
+                        $html .= "\n";
 					}
 				}
 			}

@@ -137,6 +137,7 @@ class ConfigTest extends PHPUnit_Framework_TestCase
         }
         fputs($fileHandle,
             "<html><head><title>Test summary</title><style>img {border: 1px solid black; }</style></head><body><h3>Test Summary</h3>(result - reference - diff)<br/>\n");
+        fputs($fileHandle, "<p>" . date("Y-m-d H:i:s") . "</p>\n");
 
         $conflist = array();
 

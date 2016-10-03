@@ -18,6 +18,10 @@ class WMPoint
         $this->y = $y;
     }
 
+    /**
+     * @param WMPoint $point2
+     * @return bool
+     */
     public function identical($point2)
     {
         if (($this->x == $point2->x) && ($this->y == $point2->y)) {
@@ -44,7 +48,7 @@ class WMPoint
     /**
      * Compare two points to within a few decimal places - good enough for graphics! (and unit tests)
      *
-     * @param $point2
+     * @param WMPoint $point2
      * @return bool
      */
     public function closeEnough($point2)
@@ -81,6 +85,10 @@ class WMPoint
         // Distance to point1, distance to point2, distance to line
     }
 
+    /**
+     * @param WMPoint $p2
+     * @return float
+     */
     public function distanceToPoint($p2)
     {
         return $this->vectorToPoint($p2)->length();
@@ -118,8 +126,8 @@ class WMPoint
      */
     public function LERPWith($point2, $ratio)
     {
-        $x = $this->x + $ratio * ($point2->x - $this->x);
-        $y = $this->y + $ratio * ($point2->y - $this->y);
+        $x = (1 - $ratio) * $this->x + $ratio * ($point2->x);
+        $y = (1 - $ratio) * $this->y + $ratio * ($point2->y);
 
         $newPoint = new WMPoint($x, $y);
 
@@ -138,7 +146,7 @@ class WMPoint
 
     public function __toString()
     {
-        return sprintf("(%s,%s)", floatval($this->x), floatval($this->y));
+        return sprintf("(%.2f,%.2f)", floatval($this->x), floatval($this->y));
     }
 
     public function translate($deltaX, $deltaY)

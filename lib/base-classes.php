@@ -160,6 +160,12 @@ class WeatherMapBase
         $this->reset($owner);
     }
 
+    public function cleanUp()
+    {
+        $this->dependencies = array();
+        $this->descendents = array();
+    }
+
 }
 
 class WeatherMapConfigItem
@@ -183,6 +189,19 @@ class WeatherMapItem extends WeatherMapBase
     var $my_default;
     var $defined_in;
     var $config_override;    # used by the editor to allow text-editing
+    protected $descendents = array();
+    protected $dependencies = array();
+
+    public $imap_areas;
+    public $zorder;
+
+    function __construct()
+    {
+        parent::__construct();
+
+        $this->zorder = 1000;
+        $this->imap_areas = array();
+    }
 
     function my_type()
     {
@@ -193,5 +212,12 @@ class WeatherMapItem extends WeatherMapBase
     {
         return $this->zorder;
     }
+
+    public function getImageMapAreas()
+    {
+        return $this->imap_areas;
+    }
+
+
 }
 

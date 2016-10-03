@@ -10,12 +10,12 @@ class WeatherMapNode extends WeatherMapDataItem
 {
 	var $owner;
 	var $id;
+    var $drawable;
 	var $x,	$y;
 	var $original_x, $original_y,$relative_resolved;
 	var $width, $height;
 	var $label, $proclabel, $labelfont;
 	var $labelangle;
-	var $name;
 	var $infourl = array();
 	var $notes;
 	var $colours = array();
@@ -50,7 +50,6 @@ class WeatherMapNode extends WeatherMapDataItem
 	var $image;
 	var $centre_x, $centre_y;
 	var $relative_to;
-	var $zorder;
 	var $template;
 	var $polar;
 	var $boundingboxes=array();
@@ -157,7 +156,12 @@ class WeatherMapNode extends WeatherMapDataItem
 	// figure out where the real NODE centre is, relative to the top-left corner.
 	function pre_render($im, &$map)
 	{
-		// don't bother drawing if there's no position - it's a template
+        if (!$this->drawable) {
+            wm_debug("Skipping undrawable %s", $this);
+            return;
+        }
+
+        // don't bother drawing if there's no position - it's a template
 		if (is_null($this->x) ) return;
 		if (is_null($this->y) ) return;
 
@@ -705,10 +709,43 @@ class WeatherMapNode extends WeatherMapDataItem
 		imagepng($this->image,$cachename);
 	}
 
+    /***
+     * precalculate the colours to be used, and the bounding boxes for labels and icons (if they exist)
+     *
+     * This is the only stuff that needs to be done if we're doing an editing pass. No actual drawing is necessary.
+     *
+     */
+    public function preCalculate(&$owner)
+    {
+        wm_debug("------------------------------------------------\n");
+        wm_debug("Calculating node geometry for %s\n", $this);
+
+        $this->drawable = false;
+
+        // don't bother drawing if it's a template
+        if ($this->isTemplate()) {
+            wm_debug("%s is a pure template. Skipping.\n", $this);
+            return;
+        }
+
+        // apparently, some versions of the gd extension will crash if we continue...
+        if ($this->label == '' && $this->iconfile == '') {
+            wm_debug("%s has no label OR icon. Skipping.\n", $this);
+            return;
+        }
+
+        $this->drawable = true;
+    }
+
 	// draw the node, using the pre_render() output
-	function NewDraw($im, &$map)
+	function Draw($im, &$map)
 	{
-		// take the offset we figured out earlier, and just blit
+        if (!$this->drawable) {
+            wm_debug("Skipping undrawable %s\n", $this);
+            return;
+        }
+
+        // take the offset we figured out earlier, and just blit
 		// the image on. Who says "blit" anymore?
 
 		// it's possible that there is no image, so better check.
@@ -718,7 +755,22 @@ class WeatherMapNode extends WeatherMapDataItem
 			imagecopy ( $im, $this->image, $this->x - $this->centre_x, $this->y - $this->centre_y, 0, 0, imagesx($this->image), imagesy($this->image) );
 		}
 
+		$this->makeImageMapAreas();
+
 	}
+
+
+    private function makeImageMapAreas()
+    {
+        $index = 0;
+        foreach ($this->boundingboxes as $bbox) {
+            $areaName = "NODE:N" . $this->id . ":" . $index;
+            $newArea = new HTML_ImageMap_Area_Rectangle($areaName, "", $bbox);
+            wm_debug("Adding imagemap area ".join(",", $bbox)."\n");
+            $this->imap_areas[] = $newArea;
+            $index++;
+        }
+    }
 
 	// take the pre-rendered node and write it to a file so that
 	// the editor can get at it.
@@ -1091,6 +1143,19 @@ class WeatherMapNode extends WeatherMapDataItem
         }
 
         return array(OUT);
+    }
+
+    public function cleanUp()
+    {
+        parent::cleanUp();
+
+        if (isset($this->image)) {
+            imagedestroy($this->image);
+        }
+        $this->owner = null;
+        $this->parent = null;
+        $this->descendents = null;
+        $this->image = null;
     }
 
 };

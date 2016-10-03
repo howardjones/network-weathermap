@@ -9,7 +9,6 @@
 class WeatherMapScale extends WeatherMapItem
 {
     public $colours;
-    public $name;
     public $keypos;
     public $keytitle;
     public $keystyle;
@@ -19,7 +18,6 @@ class WeatherMapScale extends WeatherMapItem
     public $keybgcolour;
     public $scalemisscolour;
     public $keyfont;
-    public $owner;
 
     public $scaleType;
 
@@ -393,9 +391,13 @@ class WeatherMapScale extends WeatherMapItem
 
         $areaName = "LEGEND:" . $this->name;
 
-        $this->owner->imap->addArea("Rectangle", $areaName, '', array($xTarget, $yTarget, $xTarget + $width, $yTarget + $height));
+//        $this->owner->imap->addArea("Rectangle", $areaName, '', array($xTarget, $yTarget, $xTarget + $width, $yTarget + $height));
+
+        $newArea = new HTML_ImageMap_Area_Rectangle($areaName, "", array(array($xTarget, $yTarget, $xTarget + $width, $yTarget + $height)));
+        $this->owner->imap->addArea($newArea);
+
         // TODO: stop tracking z-order separately. addArea() should take the z layer
-        $this->imap_areas[] = $areaName;
+        $this->imap_areas[] = $newArea;
     }
 
     function DrawLegendClassic($useTags = false)

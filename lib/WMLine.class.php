@@ -8,6 +8,11 @@ class WMLine
     private $point;
     private $vector;
 
+    /**
+     * WMLine constructor.
+     * @param $p WMPoint
+     * @param $v WMVector
+     */
     public function __construct($p, $v)
     {
         $this->point = $p;

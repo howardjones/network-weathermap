@@ -140,6 +140,11 @@ class HTML_ImageMap_Area_Polygon extends HTML_ImageMap_Area
 		//        print $this->asHTML()."\n";
 	}
 
+    public function __toString()
+    {
+        return "Polygon";
+	}
+
 }
 
 class HTML_ImageMap_Area_Rectangle extends HTML_ImageMap_Area
@@ -204,6 +209,10 @@ class HTML_ImageMap_Area_Rectangle extends HTML_ImageMap_Area
 		return($json);
 	}
 
+    public function __toString()
+    {
+        return "Rectangle";
+    }
 }
 
 class HTML_ImageMap_Area_Circle extends HTML_ImageMap_Area
@@ -238,6 +247,11 @@ class HTML_ImageMap_Area_Circle extends HTML_ImageMap_Area
 		$this->edgex = round($c[2]);
 		$this->edgey = round($c[3]);
 	}
+
+    public function __toString()
+    {
+        return "Circle";
+    }
 }
 
 class HTML_ImageMap

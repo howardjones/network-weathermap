@@ -14,7 +14,6 @@ class WeatherMapLink extends WeatherMapDataItem
 	var $a,                    $b; // the ends - references to nodes
 	var $width,                $arrowstyle, $linkstyle;
 	var $bwfont,               $labelstyle, $labelboxstyle;
-	var $zorder;
 	var $overliburl = array();
 	var $infourl = array();
 	var $notes;
@@ -53,6 +52,9 @@ class WeatherMapLink extends WeatherMapDataItem
 	var $labeloffset_in, $labeloffset_out;
 	var $commentoffset_in, $commentoffset_out;
 	var $template;
+
+    public $geometry;  // contains all the spine-related data (WMLinkGeometry)
+
 
     function __construct($name, $template, $owner)
     {
@@ -184,10 +186,109 @@ class WeatherMapLink extends WeatherMapDataItem
 		}
 	}
 
+    function drawComments($gdImage)
+    {
+        wm_debug("Link ".$this->name.": Drawing comments.\n");
+
+        $directions = $this->getDirectionList();
+        $commentPositions = array();
+
+        $commentColours = array();
+        $gdCommentColours = array();
+
+        $commentPositions[OUT] = $this->commentoffset_out;
+        $commentPositions[IN] = $this->commentoffset_in;
+
+        $widthList = $this->geometry->getWidths();
+
+        $fontObject = $this->owner->fonts->getFont($this->commentfont);
+
+        foreach ($directions as $direction) {
+            wm_debug("Link ".$this->name.": Drawing comments for direction $direction\n");
+
+            $widthList[$direction] *= 1.1;
+
+            // Time to deal with Link Comments, if any
+            $comment = $this->owner->ProcessString($this->comments[$direction], $this);
+
+            if ($this->owner->get_hint('screenshot_mode')==1) {
+                $comment = WMUtility::stringAnonymise($comment);
+            }
+
+            if ($comment == '') {
+                wm_debug("Link ".$this->name." no text for direction $direction\n");
+                break;
+            }
+
+            $commentColours[$direction] = $this->commentfontcolour;
+
+            if ($this->commentfontcolour->isContrast()) {
+                $commentColours[$direction] = $this->colours[$direction]->getContrastingColour();
+            }
+
+            $gdCommentColours[$direction] = $commentColours[$direction]->gdAllocate($gdImage);
+
+            # list($textWidth, $textHeight) = $this->owner->myimagestringsize($this->commentfont, $comment);
+            list($textWidth, $textHeight) = $fontObject->calculateImageStringSize($comment);
+
+            // nudge pushes the comment out along the link arrow a little bit
+            // (otherwise there are more problems with text disappearing underneath links)
+            $nudgeAlong = intval($this->get_hint("comment_nudgealong"));
+            $nudgeOut = intval($this->get_hint("comment_nudgeout"));
+
+            list ($position, $comment_index, $angle, $distance) = $this->geometry->findPointAndAngleAtPercentageDistance($commentPositions[$direction]);
+
+            $tangent = $this->geometry->findTangentAtIndex($comment_index);
+            $tangent->normalise();
+
+            $centreDistance = $widthList[$direction] + 4 + $nudgeOut;
+
+            if ($this->commentstyle == 'center') {
+                $centreDistance = $nudgeOut - ($textHeight/2);
+            }
+            // find the normal to our link, so we can get outside the arrow
+            $normal = $tangent->getNormal();
+
+            $flipped = false;
+
+            $edge = $position;
+
+            // if the text will be upside-down, rotate it, flip it, and right-justify it
+            // not quite as catchy as Missy's version
+            if (abs($angle) > 90) {
+                $angle -= 180;
+                if ($angle < -180) {
+                    $angle +=360;
+                }
+                $edge->addVector($tangent, $nudgeAlong);
+                $edge->addVector($normal, -$centreDistance);
+                $flipped = true;
+            } else {
+                $edge->addVector($tangent, $nudgeAlong);
+                $edge->addVector($normal, $centreDistance);
+            }
+
+            $maxLength = $this->geometry->totalDistance();
+
+            if (!$flipped && ($distance + $textWidth) > $maxLength) {
+                $edge->addVector($tangent, -$textWidth);
+            }
+
+            if ($flipped && ($distance - $textWidth) < 0) {
+                $edge->addVector($tangent, $textWidth);
+            }
+
+            wm_debug("Link ".$this->name." writing $comment at $edge and angle $angle for direction $direction\n");
+
+            // FINALLY, draw the text!
+            $fontObject->drawImageString($gdImage, $edge->x, $edge->y, $comment, $gdCommentColours[$direction], $angle);
+        }
+    }
+
 // image = GD image references
 // col = array of Colour objects
 // widths = array of link widths
-    function DrawComments($image, $col, $widths)
+    function OldDrawComments($image, $col, $widths)
     {
         $curvepoints =& $this->curvepoints;
         $last = count($curvepoints) - 1;
@@ -312,8 +413,258 @@ class WeatherMapLink extends WeatherMapDataItem
         }
     }
 
-	function Draw($im, &$map)
+    /***
+     * @param $map
+     * @throws WeathermapInternalFail
+     */
+    function preCalculate(&$map)
+    {
+        wm_debug("Link ".$this->name.": Calculating geometry.\n");
+
+        // don't bother doing anything if it's a template
+        if ($this->isTemplate()) {
+            return;
+        }
+
+        $points = array();
+
+        list($dx, $dy) = WMUtility::calculateOffset($this->a_offset, $this->a->width, $this->a->height);
+        $points[] = new WMPoint($this->a->x + $dx, $this->a->y + $dy);
+
+        wm_debug("POINTS SO FAR:".join(" ", $points)."\n");
+
+        foreach ($this->vialist as $via) {
+            wm_debug("VIALIST...\n");
+            // if the via has a third element, the first two are relative to that node
+            if (isset($via[2])) {
+                $relativeTo = $map->getNode($via[2]);
+                wm_debug("Relative to $relativeTo\n");
+                $point = new WMPoint($relativeTo->x + $via[0], $relativeTo->y + $via[1]);
+            } else {
+                $point = new WMPoint($via[0], $via[1]);
+            }
+            wm_debug("Adding $point\n");
+            $points[] = $point;
+        }
+        wm_debug("POINTS SO FAR:".join(" ", $points)."\n");
+
+        list($dx, $dy) = WMUtility::calculateOffset($this->b_offset, $this->b->width, $this->b->height);
+        $points[] = new WMPoint($this->b->x + $dx, $this->b->y + $dy);
+
+        wm_debug("POINTS SO FAR:".join(" ", $points)."\n");
+
+        if ($points[0]->closeEnough($points[1]) && sizeof($this->vialist)==0) {
+            wm_warn("Zero-length link ".$this->name." skipped. [WMWARN45]");
+            $this->geometry = null;
+            return;
+        }
+
+        $widths = array($this->width, $this->width);
+
+        // for bulging animations, modulate the width with the percentage value
+        if (($map->widthmod) || ($map->get_hint('link_bulge') == 1)) {
+            // a few 0.1s and +1s to fix div-by-zero, and invisible links
+
+            $widths[IN] = (($widths[IN] * $this->percentUsages[IN] * 1.5 + 0.1) / 100) + 1;
+            $widths[OUT] = (($widths[OUT] * $this->percentUsages[OUT] * 1.5 + 0.1) / 100) + 1;
+        }
+
+        $style = $this->viastyle;
+
+        // don't bother with any curve stuff if there aren't any Vias defined, even if the style is 'curved'
+        if (count($this->vialist)==0) {
+            wm_debug("Forcing to angled (no vias)\n");
+            $style = "angled";
+        }
+
+        $this->geometry = WMLinkGeometryFactory::create($style);
+        $this->geometry->Init($this, $points, $widths, ($this->linkstyle == 'oneway' ? 1 : 2), $this->splitpos, $this->arrowstyle);
+    }
+
+    function Draw($im, &$map)
+    {
+        wm_debug("Link ".$this->name.": Drawing.\n");
+        // If there is geometry to draw, draw it
+        if (!is_null($this->geometry)) {
+
+            wm_debug(get_class($this->geometry). "\n");
+
+            $this->geometry->setOutlineColour($this->outlinecolour);
+            $this->geometry->setFillColours(array($this->colours[IN], $this->colours[OUT]));
+
+            $this->geometry->draw($im);
+
+            if (!$this->commentfontcolour->isNone()) {
+                $this->drawComments($im);
+            }
+
+            $this->drawBandwidthLabels($im);
+
+        } else {
+            wm_debug("Skipping link with no geometry attached\n");
+        }
+
+        $this->makeImageMapAreas();
+
+
+    }
+
+    private function makeImageMapAreas()
+    {
+        if (!isset($this->geometry)) {
+            return;
+        }
+
+        foreach ($this->getDirectionList() as $direction) {
+            $areaName = "LINK:L" . $this->id . ":$direction";
+
+            $polyPoints = $this->geometry->getDrawnPolygon($direction);
+
+            $newArea = new HTML_ImageMap_Area_Polygon($areaName, "", array($polyPoints));
+            $this->owner->imap->addArea($newArea);
+            wm_debug("Adding Poly imagemap for %s\n", $areaName);
+
+            $this->imap_areas[] = $newArea;
+            // $this->imageMapAreas[] = $newArea;
+        }
+    }
+
+    function drawBandwidthLabels($gdImage)
+    {
+        wm_debug("Link ".$this->name.": Drawing bwlabels.\n");
+
+        $directions = $this->getDirectionList();
+        $labelOffsets = array();
+
+        // TODO - this stuff should all be in arrays already!
+        $labelOffsets[IN] = $this->labeloffset_in;
+        $labelOffsets[OUT] = $this->labeloffset_out;
+
+        foreach ($directions as $direction) {
+            list ($position, $index, $angle, $distance) = $this->geometry->findPointAndAngleAtPercentageDistance($labelOffsets[$direction]);
+
+            $percentage = $this->percentUsages[$direction];
+            $bandwidth = $this->absoluteUsages[$direction];
+
+            if ($this->owner->sizedebug) {
+                $bandwidth = $this->maxValues[$direction];
+            }
+
+            $label_text = $this->owner->ProcessString($this->bwlabelformats[$direction], $this);
+            if ($label_text != '') {
+                wm_debug("Bandwidth for label is " . WMUtility::valueOrNull($bandwidth) . " (label is '$label_text')\n");
+                $padding = intval($this->get_hint('bwlabel_padding'));
+
+                // if screenshot_mode is enabled, wipe any letters to X and wipe any IP address to 127.0.0.1
+                // hopefully that will preserve enough information to show cool stuff without leaking info
+                if ($this->owner->get_hint('screenshot_mode') == 1) {
+                    $label_text = WMUtility::stringAnonymise($label_text);
+                }
+
+                if ($this->labelboxstyle != 'angled') {
+                    $angle = 0;
+                }
+
+                $this->drawLabelRotated(
+                    $gdImage,
+                    $position,
+                    $angle,
+                    $label_text,
+                    $padding,
+                    $direction
+                );
+            }
+        }
+
+    }
+
+
+    function normaliseAngle($angle)
+    {
+        $out = $angle;
+
+        if (abs($out) > 90) {
+            $out -= 180;
+        }
+        if ($out < -180) {
+            $out += 360;
+        }
+
+        return $out;
+    }
+
+    private function drawLabelRotated($imageRef, $centre, $angle, $text, $padding, $direction)
+    {
+        $fontObject = $this->owner->fonts->getFont($this->bwfont);
+        list($strWidth, $strHeight) = $fontObject->calculateImageStringSize($text);
+
+        $angle = $this->normaliseAngle($angle);
+        $radianAngle = -deg2rad($angle);
+
+        $extra = 3;
+
+        $topleft_x = $centre->x - ($strWidth / 2) - $padding - $extra;
+        $topleft_y = $centre->y - ($strHeight / 2) - $padding - $extra;
+
+        $botright_x = $centre->x + ($strWidth / 2) + $padding + $extra;
+        $botright_y = $centre->y + ($strHeight / 2) + $padding + $extra;
+
+        // a box. the last point is the start point for the text.
+        $points = array($topleft_x, $topleft_y, $topleft_x, $botright_y, $botright_x, $botright_y, $botright_x, $topleft_y, $centre->x - $strWidth / 2, $centre->y + $strHeight / 2 + 1);
+
+        if ($radianAngle != 0) {
+            rotateAboutPoint($points, $centre->x, $centre->y, $radianAngle);
+        }
+
+        $textY = array_pop($points);
+        $textX = array_pop($points);
+
+        if ($this->bwboxcolour->isRealColour()) {
+            imagefilledpolygon($imageRef, $points, 4, $this->bwboxcolour->gdAllocate($imageRef));
+        }
+
+        if ($this->bwoutlinecolour->isRealColour()) {
+            imagepolygon($imageRef, $points, 4, $this->bwoutlinecolour->gdAllocate($imageRef));
+        }
+
+        $fontObject->drawImageString($imageRef, $textX, $textY, $text, $this->bwfontcolour->gdallocate($imageRef), $angle);
+
+        $areaName = "LINK:L" . $this->id . ':' . ($direction + 2);
+
+        // the rectangle is about half the size in the HTML, and easier to optimise/detect in the browser
+        if (($angle % 90) == 0) {
+            // We optimise for 0, 90, 180, 270 degrees - find the rectangle from the rotated points
+            $rectanglePoints = array();
+            $rectanglePoints[] = min($points[0], $points[2]);
+            $rectanglePoints[] = min($points[1], $points[3]);
+            $rectanglePoints[] = max($points[0], $points[2]);
+            $rectanglePoints[] = max($points[1], $points[3]);
+            $newArea = new HTML_ImageMap_Area_Rectangle($areaName, "", array($rectanglePoints));
+            wm_debug("Adding Rectangle imagemap for $areaName\n");
+        } else {
+            $newArea = new HTML_ImageMap_Area_Polygon($areaName, "", array($points));
+            wm_debug("Adding Poly imagemap for $areaName\n");
+        }
+        // Make a note that we added this area
+        $this->imap_areas[] = $newArea;
+        // $this->imageMapAreas[] = $newArea;
+        $this->owner->imap->addArea($newArea);
+    }
+
+
+
+
+    function oldDraw($im, &$map)
 	{
+	    if ($this->isTemplate()) {
+	        wm_debug("Skipping template\n");
+	        return;
+        }
+
+	    wm_debug("My name is ". $this->name. "\n");
+	    wm_debug("My A is ". $this->a. "\n");
+	    wm_debug("My B is ". $this->b. "\n");
+
 		// Get the positions of the end-points
 		$x1=$map->nodes[$this->a->name]->x;
 		$y1=$map->nodes[$this->a->name]->y;
@@ -532,9 +883,11 @@ class WeatherMapLink extends WeatherMapDataItem
 				}
 			}
 		}
+
 	}
 
-	function WriteConfig()
+
+    function WriteConfig()
 	{
 		$output='';
 		# $output .= "# ID ".$this->id." - first seen in ".$this->defined_in."\n";
@@ -896,6 +1249,17 @@ class WeatherMapLink extends WeatherMapDataItem
 		$js.="},\n";
 		return $js;
 	}
+
+    public function cleanUp()
+    {
+        parent::cleanUp();
+
+        $this->owner = null;
+        $this->a = null;
+        $this->b = null;
+        $this->parent = null;
+        $this->descendents = null;
+    }
 };
 
 // vim:ts=4:sw=4:

@@ -1,9 +1,14 @@
 <?php
 
+
+
+ $version = explode('.', PHP_VERSION);
+        $phptag = "php" . $version[0];
+
 	$test = ( isset($_REQUEST['cf']) ? $_REQUEST['cf'] : '');
 
 	$reference = "references/$test.png"; 
-	$last_result = "results1-php7/$test.png"; 
+	$last_result = "results1-$phptag/$test.png"; 
 
 	if( file_exists($last_result) ) {
 		copy($last_result,$reference);

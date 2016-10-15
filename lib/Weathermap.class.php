@@ -1538,8 +1538,6 @@ function DrawMap($filename = '', $thumbnailfile = '', $thumbnailmax = 250, $with
 	wm_debug("=====================================\n");
 	wm_debug("Start of Map Drawing\n");
 
-    $this->preCalculate();
-
 	// if we're running tests, we force the time to a particular value,
         // so the output can be compared to a reference image more easily
         $testmode = intval($this->get_hint("testmode"));
@@ -1613,12 +1611,19 @@ function DrawMap($filename = '', $thumbnailfile = '', $thumbnailmax = 250, $with
 
 		// do the node rendering stuff first, regardless of where they are actually drawn.
 		// this is so we can get the size of the nodes, which links will need if they use offsets
+    // TODO - the geometry part should be in preCalculate()
 		foreach ($this->nodes as $node)
 		{
 			// don't try and draw template nodes
 			wm_debug("Pre-rendering ".$node->name." to get bounding boxes.\n");
-			if(!is_null($node->x)) $this->nodes[$node->name]->pre_render($image, $this);
+			if (!is_null($node->x)) {
+        $this->nodes[$node->name]->preCalculate($this);
+        $this->nodes[$node->name]->pre_render($image, $this);
+      }
 		}
+
+    $this->preCalculate();
+
 
 		$all_layers = array_keys($this->seen_zlayers);
 		sort($all_layers);

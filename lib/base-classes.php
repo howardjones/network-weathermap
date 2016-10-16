@@ -69,6 +69,16 @@ class WeatherMapBase
     }
 
 
+    public function delete_hint($name)
+    {
+        unset($this->hints[$name]);
+    }
+
+    public function delete_note($name)
+    {
+        unset($this->notes[$name]);
+    }
+
     /**
      * Get a value for a config variable. Follow the template inheritance tree if necessary.
      * Return an array with the value followed by the status (whether it came from the source object or

@@ -4,7 +4,7 @@
 
 class WeatherMapPreProcessorCactihosts extends WeatherMapPreProcessor {
 
-    function run(&$map)
+    function run()
     {
         wm_debug("Cactihosts Preprocessor in the hizouse\n");
 

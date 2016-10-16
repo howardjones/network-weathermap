@@ -81,7 +81,7 @@ class WMSpineTest extends PHPUnit_Framework_TestCase {
         // D
         $result = $testSpine->findPointAndAngleAtDistance(300);
 
-        $this->assertTrue( $result[0]->identical(new WMPoint(50,150)) );
+        $this->assertTrue( $result[0]->closeEnough(new WMPoint(50,150)), $result[0]." isn't right" );
         $this->assertEquals(180, $result[2]);
 
         // E

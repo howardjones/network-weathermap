@@ -42,6 +42,8 @@ class ConfigTest extends PHPUnit_Framework_TestCase
             unlink($compareOutputFileName);
         }
 
+        $this->assertFileExists($referenceImageFileName, "reference image missing");
+
         $warningCount = WMTestSupport::TestOutput_RunTest(self::$testdir . DIRECTORY_SEPARATOR . $configFileName,
             $outputImageFileName, $outputHTMLFileName, '', '');
 
@@ -156,7 +158,7 @@ class ConfigTest extends PHPUnit_Framework_TestCase
             if (substr($file, -5, 5) == '.conf') {
                 $reference = self::$referencedir . DIRECTORY_SEPARATOR . $file . ".png";
 
-                if (file_exists($reference)) {
+                # if (file_exists($reference)) {
                     $conflist[] = array($file, $reference);
 
                     $title = WMTestSupport::get_map_title(self::$testdir . DIRECTORY_SEPARATOR . $file);
@@ -169,7 +171,7 @@ class ConfigTest extends PHPUnit_Framework_TestCase
                             $file
                         ));
 
-                }
+                # }
             }
         }
 

@@ -116,6 +116,6 @@ class WMVector
      */
     public function __toString()
     {
-        return sprintf("[%f,%f]", $this->dx, $this->dy);
+        return sprintf("[%.2f,%.2f]", $this->dx, $this->dy);
     }
 }

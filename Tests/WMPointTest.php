@@ -23,6 +23,10 @@ class WMPointTest extends PHPUnit_Framework_TestCase
         $p3 = $p1->LERPWith($p2, 0.5);
         $this->assertEquals(150, $p3->x);
         $this->assertEquals(150, $p3->y);
+
+        $p3 = $p1->LERPWith($p2, 0.25);
+        $this->assertEquals(125, $p3->x);
+        $this->assertEquals(175, $p3->y);
     }
 
 

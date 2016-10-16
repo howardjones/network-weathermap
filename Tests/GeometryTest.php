@@ -126,11 +126,11 @@ class GeometryTest  extends PHPUnit_Framework_TestCase {
         $this->assertTrue( $point9->identical(new WMPoint(50,53)));
 
 
-        $this->assertEquals("(10.000000,13.000000)", $point1->asString());
-        $this->assertEquals("(30.000000,33.000000)", $point3->asString());
+        $this->assertEquals("(10.00,13.00)", $point1->asString());
+        $this->assertEquals("(30.00,33.00)", $point3->asString());
 
-        $this->assertEquals("(10.000000,13.000000)", "$point1");
-        $this->assertEquals("(30.000000,33.000000)", "$point3");
+        $this->assertEquals("(10.00,13.00)", "$point1");
+        $this->assertEquals("(30.00,33.00)", "$point3");
 
         $point9->addVector($vector1, 1.0);
         $this->assertTrue( $point9->identical(new WMPoint(60,93)));
@@ -142,7 +142,7 @@ class GeometryTest  extends PHPUnit_Framework_TestCase {
         $this->assertTrue( $point9->identical(new WMPoint(40,13)));
 
         $line1 = $point9->lineToPoint($point1);
-        $this->assertEquals("/(40.000000,13.000000)-[-30.000000,0.000000]/", "$line1");
+        $this->assertEquals("/(40.00,13.00)-[-30.00,0.00]/", "$line1");
 
     }
 
@@ -177,21 +177,21 @@ class GeometryTest  extends PHPUnit_Framework_TestCase {
         $this->assertEquals(-1, $vector4->getSlope());
         $this->assertEquals(-135, $vector4->getAngle());
 
-        $this->assertEquals("[0.000000,0.000000]", $vector1->asString());
-        $this->assertEquals("[0.000000,5.000000]", $vector3->asString());
+        $this->assertEquals("[0.00,0.00]", $vector1->asString());
+        $this->assertEquals("[0.00,5.00]", $vector3->asString());
 
-        $this->assertEquals("[0.000000,0.000000]", "$vector1");
-        $this->assertEquals("[0.000000,5.000000]", "$vector3");
+        $this->assertEquals("[0.00,0.00]", "$vector1");
+        $this->assertEquals("[0.00,5.00]", "$vector3");
 
         $vector4->flip();
-        $this->assertEquals("[20.000000,-20.000000]", $vector4->asString());
+        $this->assertEquals("[20.00,-20.00]", $vector4->asString());
 
         $normal1 = $vector4->getNormal();
-        $this->assertEquals("[-0.707107,-0.707107]", "$normal1");
+        $this->assertEquals("[-0.71,-0.71]", "$normal1");
 
         $vector4->flip();
         $normal2 = $vector4->getNormal();
-        $this->assertEquals("[0.707107,0.707107]", "$normal2");
+        $this->assertEquals("[0.71,0.71]", "$normal2");
 
 
         $vector2->normalise();
@@ -228,7 +228,7 @@ class GeometryTest  extends PHPUnit_Framework_TestCase {
     public function testLineSegment()
     {
         $lineseg1 = new WMLineSegment( new WMPoint(12,36), new WMPoint(72,19));
-        $this->assertEquals("{(12.000000,36.000000)--(72.000000,19.000000)}","$lineseg1");
+        $this->assertEquals("{(12.00,36.00)--(72.00,19.00)}","$lineseg1");
     }
 
     public function testLine()
@@ -299,18 +299,18 @@ class GeometryTest  extends PHPUnit_Framework_TestCase {
 
         $boundingbox1->addPoint(0, 0);
 
-        $this->assertEquals("[(0.000000,0.000000)x(0.000000,0.000000)]", "$boundingbox1");
+        $this->assertEquals("[(0.00,0.00)x(0.00,0.00)]", "$boundingbox1");
 
         $boundingbox1->addPoint(10, 0);
         $boundingbox1->addPoint(-10, 0);
         $boundingbox1->addPoint(10, 10);
         $boundingbox1->addPoint(-10, -10);
 
-        $this->assertEquals("[(-10.000000,-10.000000)x(10.000000,10.000000)]", "$boundingbox1");
+        $this->assertEquals("[(-10.00,-10.00)x(10.00,10.00)]", "$boundingbox1");
 
         $rect1 = $boundingbox1->getBoundingRectangle();
 
-        $this->assertEquals("[(-10.000000,-10.000000)x(10.000000,10.000000)]", "$rect1");
+        $this->assertEquals("[(-10.00,-10.00)x(10.00,10.00)]", "$rect1");
 
     }
 

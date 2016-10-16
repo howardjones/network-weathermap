@@ -8,10 +8,10 @@ class CatmullRom1D
     private $cParam;
     private $dParam;
 
-    public function __construct($point0, $point1, $point2, $point4)
+    public function __construct($point0, $point1, $point2, $point3)
     {
-        $this->aParam = - $point0 + 3 * $point1 - 3 * $point2 + $point4;
-        $this->bParam = 2 * $point0 - 5 * $point1 + 4 * $point2 - $point4;
+        $this->aParam = - $point0 + 3 * $point1 - 3 * $point2 + $point3;
+        $this->bParam = 2 * $point0 - 5 * $point1 + 4 * $point2 - $point3;
         $this->cParam = - $point0 + $point2;
         $this->dParam = 2 * $point1;
     }

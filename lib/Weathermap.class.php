@@ -5,86 +5,8 @@
 // http://www.network-weathermap.com/
 // Released under the GNU Public License
 
-require_once "HTML_ImageMap.class.php";
+require_once "all.php";
 
-require_once "exceptions.php";
-require_once "base-classes.php";
-require_once "plugin-base-classes.php";
-require_once "geometry.php";
-require_once "image-functions.php";
-require_once "CatmullRom.class.php";
-
-require_once "WMPoint.class.php";
-require_once "WMVector.class.php";
-require_once "WMLine.class.php";
-require_once "WMRectangle.class.php";
-
-require_once "WMUtility.class.php";
-require_once "WMImageUtility.php";
-
-require_once "WMTarget.class.php";
-require_once "WMColour.class.php";
-require_once "fonts.php";
-
-
-require_once "WMSpine.class.php";
-require_once "WMLinkGeometryFactory.class.php";
-require_once "WMLinkGeometry.class.php";
-require_once "WMAngledLinkGeometry.class.php";
-require_once "WMCurvedLinkGeometry.class.php";
-
-require_once "WeatherMapConfigReader.class.php";
-require_once "WeatherMapScale.class.php";
-
-require_once "WeatherMapDataItem.class.php";
-require_once "WeatherMapNode.class.php";
-require_once "WeatherMapLink.class.php";
-
-
-require_once "WeatherMap.functions.php";
-
-
-$WEATHERMAP_VERSION = "0.98a";
-$weathermap_debugging = FALSE;
-$weathermap_map = "";
-$weathermap_warncount = 0;
-$weathemap_lazycounter = 0;
-
-// don't produce debug output for these functions
-$weathermap_debug_suppress = array (
-    'processstring',
-    'mysprintf'
-);
-
-// don't output warnings/errors for these codes (WMxxx)
-$weathermap_error_suppress = array();
-
-// Turn on ALL error reporting for now (this stops PEAR Console_Getopt from working).
-// error_reporting (E_ALL|E_STRICT);
-error_reporting (E_ALL^E_STRICT);
-
-// parameterise the in/out stuff a bit
-define("IN",0);
-define("OUT",1);
-define("WMCHANNELS",2);
-
-define('CONFIG_TYPE_LITERAL',0);
-define('CONFIG_TYPE_COLOR',1);
-
-// some strings that are used in more than one place
-define('FMT_BITS_IN',"{link:this:bandwidth_in:%2k}");
-define('FMT_BITS_OUT',"{link:this:bandwidth_out:%2k}");
-define('FMT_UNFORM_IN',"{link:this:bandwidth_in}");
-define('FMT_UNFORM_OUT',"{link:this:bandwidth_out}");
-define('FMT_PERC_IN',"{link:this:inpercent:%.2f}%");
-define('FMT_PERC_OUT',"{link:this:outpercent:%.2f}%");
-
-// the fields within a spine triple
-define("X",0);
-define("Y",1);
-define("DISTANCE",2);
-
-require_once "WeatherMap.keywords.inc.php";
 
 // ***********************************************
 

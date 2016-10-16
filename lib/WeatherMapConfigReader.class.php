@@ -1113,6 +1113,8 @@ class WeatherMapConfigReader
     }
 
 
+
+
     private
     function commitItem()
     {
@@ -1762,6 +1764,34 @@ class WeatherMapConfigReader
 
         wm_warn("line $this->lineCount: $last_seen TEMPLATE '$templateName' doesn't exist! (if it does exist, check it's defined first) [WMWARN40]\n");
 
+        return false;
+    }
+
+  private function handleINCLUDE($fullcommand, $args, $matches)
+    {
+        $filename = $matches[1];
+
+        if (file_exists($filename)) {
+            wm_debug("Including '{$filename}'\n");
+
+            if (in_array($filename, $this->mapObject->included_files)) {
+                wm_warn("Attempt to include '$filename' twice! Skipping it.\n");
+                return (false);
+            }
+
+            $this->mapObject->included_files[] = $filename;
+            $this->mapObject->has_includes = true;
+
+            $reader = new WeatherMapConfigReader($this->mapObject);
+            $reader->readConfigFile($matches[1]);
+
+            $this->currentType = "GLOBAL";
+            $this->currentObject = $this->mapObject;
+
+            return true;
+        }
+
+        wm_warn("INCLUDE File '{$matches[1]}' not found!\n");
         return false;
     }
 

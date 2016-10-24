@@ -17,11 +17,12 @@
     "phpdocumentor/phpdocumentor": "2.*",
     "phpunit/dbunit": "^2.0",
     "codeclimate/php-test-reporter": "0.3.*",
-    "phpunit/phpunit": "~5.4",
+    "phpunit/phpunit": "~5.6",
     "phpmd/phpmd": "~2.1",
     "sebastian/phpcpd": "~2.0",
     "squizlabs/php_codesniffer": "~2.0",
     "theseer/phpdox": "*",
-    "phploc/phploc": "~3.0"
+    "phploc/phploc": "~3.0",
+    "phpunit/php-code-coverage": "^4.0"
   }
 }

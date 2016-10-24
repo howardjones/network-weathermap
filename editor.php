@@ -8,7 +8,7 @@ require_once 'lib/WMVector.class.php';
 require_once 'lib/WMLine.class.php';
 
 // so that you can't have the editor active, and not know about it.
-$ENABLED=false;
+$ENABLED=true;
 
 // If we're embedded in the Cacti UI (included from weathermap-cacti-plugin-editor.php), then authentication has happened. Enable the editor.
 if (isset($FROM_CACTI) && $FROM_CACTI == true) {
@@ -108,6 +108,7 @@ if (isset($_REQUEST['selected'])) { $selected = wm_editor_sanitize_selected($_RE
 
 $weathermap_debugging=FALSE;
 
+
 if ($mapname == '')
 {
 	// this is the file-picker/welcome page
@@ -156,43 +157,10 @@ else
 
 	case 'font_samples':
 		$map->ReadConfig($mapfile);
-		ksort($map->fonts);
+
 		header('Content-type: image/png');
 
-		$keyfont = 2;
-		$keyheight = imagefontheight($keyfont)+2;
-		
-		$sampleheight = 32;
-		// $im = imagecreate(250,imagefontheight(5)+5);
-		$im = imagecreate(2000,$sampleheight);
-		$imkey = imagecreate(2000,$keyheight);
-
-		$white = imagecolorallocate($im,255,255,255);
-		$black = imagecolorallocate($im,0,0,0);
-		$whitekey = imagecolorallocate($imkey,255,255,255);
-		$blackkey = imagecolorallocate($imkey,0,0,0);
-
-		$x = 3;
-		#for($i=1; $i< 6; $i++)
-		foreach ($map->fonts as $fontnumber => $font)
-		{
-			$string = "Abc123%";
-			$keystring = "Font $fontnumber";
-			list($width,$height) = $map->myimagestringsize($fontnumber,$string);
-			list($kwidth,$kheight) = $map->myimagestringsize($keyfont,$keystring);
-			
-			if ($kwidth > $width) $width = $kwidth;
-			
-			$y = ($sampleheight/2) + $height/2;
-			$map->myimagestring($im, $fontnumber, $x, $y, $string, $black);
-			$map->myimagestring($imkey, $keyfont,$x,$keyheight,"Font $fontnumber",$blackkey);
-						
-			$x = $x + $width + 6;
-		}
-		$im2 = imagecreate($x,$sampleheight + $keyheight);
-		imagecopy($im2,$im, 0,0, 0,0, $x, $sampleheight);
-		imagecopy($im2,$imkey, 0,$sampleheight, 0,0,  $x, $keyheight);
-		imagedestroy($im);
+		$im2 = generate_fontsamples($map);
 		imagepng($im2);
 		imagedestroy($im2);
 
@@ -602,8 +570,10 @@ else
 
 		$map->ReadConfig($mapfile);
 
-		$map->keyx[$scalename] = $x;
-		$map->keyy[$scalename] = $y;
+		// $map->keyx[$scalename] = $x;
+		// $map->keyy[$scalename] = $y;
+		
+		$map->scales[$scalename]->keypos = new WMPoint($x, $y);
 
 		$map->WriteConfig($mapfile);
 		break;

@@ -449,15 +449,16 @@ function handle_inheritance(&$map, &$inheritables)
 function get_fontlist(&$map,$name,$current)
 {
     $output = '<select class="fontcombo" name="'.$name.'">';
-        
-    ksort($map->fonts);
 
-    foreach ($map->fonts as $fontnumber => $font) {		
+    $fonts = $map->fonts->getList();
+    ksort($fonts);
+
+    foreach ($fonts as $fontnumber => $font) {
         $output .= '<option ';
         if ($current == $fontnumber) {
             $output .= 'SELECTED';
         }
-        $output .= ' value="'.$fontnumber.'">'.$fontnumber.' ('.$font->type.')</option>';
+        $output .= ' value="'.$fontnumber.'">'.$fontnumber.' ('.$font['type'].')</option>';
     }
         
     $output .= "</select>";
@@ -717,5 +718,57 @@ function editor_log($str)
     // fputs($f, $str);
     // fclose($f);
 }
+
+/**
+ * @param $map
+ * @return resource
+ */
+function generate_fontsamples($map)
+{
+    $keyfont = 2;
+    $keyfont_obj = $map->fonts->getFont($keyfont);
+    $keyheight = imagefontheight($keyfont) + 2;
+    $sampleheight = 32;
+
+    $im_fonts = imagecreate(2000, $sampleheight);
+    $im_key = imagecreate(2000, $keyheight);
+
+    $white = imagecolorallocate($im_fonts, 255, 255, 255);
+    $black = imagecolorallocate($im_fonts, 0, 0, 0);
+
+    $whitekey = imagecolorallocate($im_key, 255, 255, 255);
+    $blackkey = imagecolorallocate($im_key, 0, 0, 0);
+
+    $fonts = $map->fonts->getList();
+    ksort($fonts);
+
+    $x = 3;
+    foreach ($fonts as $fontnumber => $font) {
+        $string = "Abc123%";
+        $keystring = "Font $fontnumber";
+
+        $font_obj = $map->fonts->getFont($fontnumber);
+
+        list($width, $height) = $font_obj->calculateImageStringSize($string);
+        list($kwidth, $kheight) = $keyfont_obj->calculateImageStringSize($keystring);
+
+        if ($kwidth > $width) {
+            $width = $kwidth;
+        }
+
+        $y = ($sampleheight / 2) + $height / 2;
+        $font_obj->drawImageString($im_fonts, $x, $y, $string, $black);
+        $keyfont_obj->drawImageString($im_key, $x, $keyheight, "Font $fontnumber", $blackkey);
+
+        $x = $x + $width + 6;
+    }
+
+    $final_image = imagecreate($x, $sampleheight + $keyheight);
+    imagecopy($final_image, $im_fonts, 0, 0, 0, 0, $x, $sampleheight);
+    imagecopy($final_image, $im_key, 0, $sampleheight, 0, 0, $x, $keyheight);
+    imagedestroy($im_fonts);
+    return $final_image;
+}
+
 
 // vim:ts=4:sw=4:

@@ -1143,45 +1143,45 @@ class WeatherMapLink extends WeatherMapDataItem
     {
         $output = "";
 
-        $output .= "\"id\":" . $this->id. ", ";
+        $output .= "\"id\":" . $this->id . ", ";
         if (isset($this->a)) {
-            $output.="a:'" . $this->a->name . "', ";
-            $output.="b:'" . $this->b->name . "', ";
+            $output .= "a:'" . $this->a->name . "', ";
+            $output .= "b:'" . $this->b->name . "', ";
         }
 
-        $output.="width:'" . $this->width . "', ";
-        $output.="target:";
+        $output .= "width:'" . $this->width . "', ";
+        $output .= "target:";
 
-        $tgt='';
+        $tgt = '';
 
         $i = 0;
         foreach ($this->targets as $target) {
-            if ($i>0) {
-                print " ";
+            if ($i > 0) {
+                $tgt .= " ";
             }
             $tgt .= $target->asConfig();
             $i++;
         }
 
-        $output.=WMUtility::jsEscape(trim($tgt));
-        $output.=",";
+        $output .= WMUtility::jsEscape(trim($tgt));
+        $output .= ",";
 
-        $output.="bw_in:" . WMUtility::jsEscape($this->max_bandwidth_in_cfg) . ", ";
-        $output.="bw_out:" . WMUtility::jsEscape($this->max_bandwidth_out_cfg) . ", ";
+        $output .= "bw_in:" . WMUtility::jsEscape($this->max_bandwidth_in_cfg) . ", ";
+        $output .= "bw_out:" . WMUtility::jsEscape($this->max_bandwidth_out_cfg) . ", ";
 
-        $output.="name:" . WMUtility::jsEscape($this->name) . ", ";
-        $output.="overlibwidth:'" . $this->overlibheight . "', ";
-        $output.="overlibheight:'" . $this->overlibwidth . "', ";
-        $output.="overlibcaption:" . WMUtility::jsEscape($this->overlibcaption[IN]) . ", ";
+        $output .= "name:" . WMUtility::jsEscape($this->name) . ", ";
+        $output .= "overlibwidth:'" . $this->overlibheight . "', ";
+        $output .= "overlibheight:'" . $this->overlibwidth . "', ";
+        $output .= "overlibcaption:" . WMUtility::jsEscape($this->overlibcaption[IN]) . ", ";
 
-        $output.="commentin:" . WMUtility::jsEscape($this->comments[IN]) . ", ";
-        $output.="commentposin:" . intval($this->commentoffset_in) . ", ";
+        $output .= "commentin:" . WMUtility::jsEscape($this->comments[IN]) . ", ";
+        $output .= "commentposin:" . intval($this->commentoffset_in) . ", ";
 
-        $output.="commentout:" . WMUtility::jsEscape($this->comments[OUT]) . ", ";
-        $output.="commentposout:" . intval($this->commentoffset_out) . ", ";
+        $output .= "commentout:" . WMUtility::jsEscape($this->comments[OUT]) . ", ";
+        $output .= "commentposout:" . intval($this->commentoffset_out) . ", ";
 
-        $output.="infourl:" . WMUtility::jsEscape($this->infourl[IN]) . ", ";
-        $output.="overliburl:" . WMUtility::jsEscape(join(" ", $this->overliburl[IN])). ", ";
+        $output .= "infourl:" . WMUtility::jsEscape($this->infourl[IN]) . ", ";
+        $output .= "overliburl:" . WMUtility::jsEscape(join(" ", $this->overliburl[IN])) . ", ";
 
         $output .= "via: [";
         $nItem = 0;
@@ -1191,7 +1191,7 @@ class WeatherMapLink extends WeatherMapDataItem
             }
             $output .= sprintf("[%d,%d", $via[0], $via[1]);
             if (isset($via[2])) {
-                $output .= ",".WMUtility::jsEscape($via[2]);
+                $output .= "," . WMUtility::jsEscape($via[2]);
             }
             $output .= "]";
 

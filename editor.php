@@ -366,63 +366,48 @@ else
 		$map->ReadConfig($mapfile);
 		$link_name = $_REQUEST['link_name'];
 
-		if (strpos($link_name," ") === false) {
-		    $map->links[$link_name]->width = floatval($_REQUEST['link_width']);
-		    $map->links[$link_name]->infourl[IN] = wm_editor_sanitize_string($_REQUEST['link_infourl']);
-		    $map->links[$link_name]->infourl[OUT] = wm_editor_sanitize_string($_REQUEST['link_infourl']);
-		    $urls = preg_split('/\s+/', $_REQUEST['link_hover'], -1, PREG_SPLIT_NO_EMPTY);
-		    $map->links[$link_name]->overliburl[IN] = $urls;
-		    $map->links[$link_name]->overliburl[OUT] = $urls;
-		    
-		    $map->links[$link_name]->comments[IN] =  wm_editor_sanitize_string($_REQUEST['link_commentin']);
-		    $map->links[$link_name]->comments[OUT] = wm_editor_sanitize_string($_REQUEST['link_commentout']);
-		    $map->links[$link_name]->commentoffset_in =  intval($_REQUEST['link_commentposin']);
-		    $map->links[$link_name]->commentoffset_out = intval($_REQUEST['link_commentposout']); 
+		if (strpos($link_name, " ") === false) {
+			$map->links[$link_name]->width = floatval($_REQUEST['link_width']);
+			$map->links[$link_name]->infourl[IN] = wm_editor_sanitize_string($_REQUEST['link_infourl']);
+			$map->links[$link_name]->infourl[OUT] = wm_editor_sanitize_string($_REQUEST['link_infourl']);
+			$urls = preg_split('/\s+/', $_REQUEST['link_hover'], -1, PREG_SPLIT_NO_EMPTY);
+			$map->links[$link_name]->overliburl[IN] = $urls;
+			$map->links[$link_name]->overliburl[OUT] = $urls;
 
-		    // $map->links[$link_name]->target = $_REQUEST['link_target'];
+			$map->links[$link_name]->comments[IN] = wm_editor_sanitize_string($_REQUEST['link_commentin']);
+			$map->links[$link_name]->comments[OUT] = wm_editor_sanitize_string($_REQUEST['link_commentout']);
+			$map->links[$link_name]->commentoffset_in = intval($_REQUEST['link_commentposin']);
+			$map->links[$link_name]->commentoffset_out = intval($_REQUEST['link_commentposout']);
 
-		    $targets = preg_split('/\s+/',$_REQUEST['link_target'],-1,PREG_SPLIT_NO_EMPTY); 
-		    $new_target_list = array();
+			// $map->links[$link_name]->target = $_REQUEST['link_target'];
 
-		    foreach ($targets as $target)
-		    {
-			// we store the original TARGET string, and line number, along with the breakdown, to make nicer error messages later
-			$newtarget = array($target,'traffic_in','traffic_out',0,$target);
+			$targets = preg_split('/\s+/', $_REQUEST['link_target'], -1, PREG_SPLIT_NO_EMPTY);
+			$new_target_list = array();
 
-			// if it's an RRD file, then allow for the user to specify the
-			// DSs to be used. The default is traffic_in, traffic_out, which is
-			// OK for Cacti (most of the time), but if you have other RRDs...
-			if (preg_match('/(.*\.rrd):([\-a-zA-Z0-9_]+):([\-a-zA-Z0-9_]+)$/i',$target,$matches))
-			{
-				$newtarget[0] = $matches[1];
-				$newtarget[1] = $matches[2];
-				$newtarget[2] = $matches[3];
+			foreach ($targets as $target) {
+				$new_target_list[] = new WMTarget($target, "", 0);
 			}
-			// now we've (maybe) messed with it, we'll store the array of target specs
-			$new_target_list[] = $newtarget;
-		    }
-		    $map->links[$link_name]->targets = $new_target_list;
+			$map->links[$link_name]->targets = $new_target_list;
 
-		    $bwin = $_REQUEST['link_bandwidth_in'];
-		    $bwout = $_REQUEST['link_bandwidth_out'];
+			$bwin = $_REQUEST['link_bandwidth_in'];
+			$bwout = $_REQUEST['link_bandwidth_out'];
 
-		    if (isset($_REQUEST['link_bandwidth_out_cb']) && $_REQUEST['link_bandwidth_out_cb'] == 'symmetric')
-		    {
-			    $bwout = $bwin;
-		    }
+			if (isset($_REQUEST['link_bandwidth_out_cb']) && $_REQUEST['link_bandwidth_out_cb'] == 'symmetric') {
+				$bwout = $bwin;
+			}
 
-		    if (wm_editor_validate_bandwidth($bwin)) {
-			$map->links[$link_name]->max_bandwidth_in_cfg = $bwin;
-			$map->links[$link_name]->max_bandwidth_in = unformat_number($bwin, $map->kilo);
-		    
-		    }
-		    if (wm_editor_validate_bandwidth($bwout)) {
-			$map->links[$link_name]->max_bandwidth_out_cfg = $bwout;		    
-			$map->links[$link_name]->max_bandwidth_out = unformat_number($bwout, $map->kilo);
-		    }
-		    // $map->links[$link_name]->SetBandwidth($bwin,$bwout);
-		    
-		    $map->WriteConfig($mapfile);
+			if (wm_editor_validate_bandwidth($bwin)) {
+				$map->links[$link_name]->max_bandwidth_in_cfg = $bwin;
+				$map->links[$link_name]->max_bandwidth_in = unformat_number($bwin, $map->kilo);
+
+			}
+			if (wm_editor_validate_bandwidth($bwout)) {
+				$map->links[$link_name]->max_bandwidth_out_cfg = $bwout;
+				$map->links[$link_name]->max_bandwidth_out = unformat_number($bwout, $map->kilo);
+			}
+			// $map->links[$link_name]->SetBandwidth($bwin,$bwout);
+
+			$map->WriteConfig($mapfile);
 		}
 		break;
 
@@ -537,16 +522,6 @@ else
 
 		if ($a != $b && isset($map->nodes[$a]) && isset($map->nodes[$b]) )
 		{
-			$newlink = new WeatherMapLink;
-			$newlink->Reset($map);
-			
-			$newlink->a = $map->nodes[$a];
-			$newlink->b = $map->nodes[$b];
-			
-			// $newlink->SetBandwidth($map->defaultlink->max_bandwidth_in_cfg, $map->defaultlink->max_bandwidth_out_cfg);
-						
-			$newlink->width = $map->links['DEFAULT']->width;
-
 			// make sure the link name is unique. We can have multiple links between
 			// the same nodes, these days
 			$newlinkname = "$a-$b";
@@ -554,10 +529,16 @@ else
 			{
 				$newlinkname .= "a";
 			}
-			$newlink->name = $newlinkname;
+			
+			$newlink = new WeatherMapLink($newlinkname, "DEFAULT", $map);
+			
+			$newlink->a = $map->nodes[$a];
+			$newlink->b = $map->nodes[$b];
+						
 			$newlink->defined_in = $map->configfile;
-			$map->links[$newlinkname] = $newlink;
-			array_push($map->seen_zlayers[$newlink->zorder], $newlink);
+			$map->addLink($newlink);
+			# $map->links[$newlinkname] = $newlink;
+			# array_push($map->seen_zlayers[$newlink->zorder], $newlink);
 
 			$map->WriteConfig($mapfile);
 		}          
@@ -775,16 +756,13 @@ else
 			$newnodename .= "a";
 		}
 		
-		$node = new WeatherMapNode;
-		$node->name = $newnodename;
-		$node->template = "DEFAULT";
-		$node->Reset($map);
+		$node = new WeatherMapNode($newnodename, "DEFAULT", $map);
 				
 		$node->x = $x;
 		$node->y = $y;
 		$node->defined_in = $map->configfile;
 				
-		array_push($map->seen_zlayers[$node->zorder], $node);			
+		# array_push($map->seen_zlayers[$node->zorder], $node);			
 		
 		// only insert a label if there's no LABEL in the DEFAULT node.
 		// otherwise, respect the template.
@@ -793,7 +771,8 @@ else
 			$node->label = "Node";
 		}
 		
-		$map->nodes[$node->name] = $node;
+		# $map->nodes[$node->name] = $node;
+		$map->addNode($node);
 		$log = "added a node called $newnodename at $x,$y to $mapfile";
 						
 		$map->WriteConfig($mapfile);

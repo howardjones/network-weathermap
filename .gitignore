@@ -3,6 +3,7 @@
 build
 build/*
 dist/*
+composer.lock
 !build/phpmd.xml
 !build/phpunit.xml
 !build/phpdox.xml
@@ -17,4 +18,6 @@ reports/
 output/*
 test-suite/results*
 test-suite/diffs/*
+test-suite/summary.html
+test-suite/summary-failing.html
 docs/dev/vagrant-testers/.vagrant/

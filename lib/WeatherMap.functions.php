@@ -1496,7 +1496,7 @@ class Vector
 {
 	var $dx, $dy;
 	
-	function Vector($dx=0,$dy=0)
+	function __construct($dx=0,$dy=0)
 	{
 		$this->dx = $dx;
 		$this->dy = $dy;

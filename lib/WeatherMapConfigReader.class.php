@@ -12,9 +12,11 @@
 class WeatherMapConfigReader
 {
     private $lineCount = 0;
+    /** @var WeatherMapDataItem $currentObject */
     private $currentObject = null;
     private $currentType = "GLOBAL";
     private $currentSource = "";
+    /** @var WeatherMap $mapObject */
     private $mapObject = null;
     private $objectLineCount = 0;
 
@@ -48,7 +50,7 @@ class WeatherMapConfigReader
 
 
             'FONTDEFINE' => array(
-                array('GLOBAL', '/^\s*FONTDEFINE\s+(\d+)\s+(\S+)\s+(\d+)\s+(-?\d+)\s*$/i','handleFONTDEFINE'),
+                array('GLOBAL', '/^\s*FONTDEFINE\s+(\d+)\s+(\S+)\s+(\d+)\s+(-?\d+)\s*$/i', 'handleFONTDEFINE'),
                 array('GLOBAL', '/^\s*FONTDEFINE\s+(\d+)\s+(\S+)\s+(\d+)\s*$/i', 'handleFONTDEFINE'),
                 array('GLOBAL', '/^\s*FONTDEFINE\s+(\d+)\s+(\S+)\s*$/i', 'handleFONTDEFINE'),
             ),
@@ -204,7 +206,7 @@ class WeatherMapConfigReader
             ),
             'HEIGHT' => array(
                 array(
-                    '(GLOBAL)',
+                    'GLOBAL',
                     '/^HEIGHT\s+(\d+)\s*$/i',
                     array('height' => 1)
                 ),
@@ -416,13 +418,13 @@ class WeatherMapConfigReader
                     )
                 ),
             ),
-            'ORIGIN' => array(
-                array(
-                    'NODE',
-                    '/^ORIGIN\s+(C|NE|SE|NW|SW|N|S|E|W)/i',
-                    array('position_origin' => 1)
-                )
-            ),
+//            'ORIGIN' => array(
+//                array(
+//                    'NODE',
+//                    '/^ORIGIN\s+(C|NE|SE|NW|SW|N|S|E|W)/i',
+//                    array('position_origin' => 1)
+//                )
+//            ),
             'POSITION' => array(
                 array(
                     'NODE',
@@ -1113,8 +1115,6 @@ class WeatherMapConfigReader
     }
 
 
-
-
     private
     function commitItem()
     {
@@ -1249,7 +1249,6 @@ class WeatherMapConfigReader
     /**
      * @param $keyword
      * @param $matches
-     * @param $m
      */
     private
     function readConfigSimpleLine($keyword, $matches)
@@ -1276,7 +1275,7 @@ class WeatherMapConfigReader
                 // if the key ends in a plus, it's an array we should append to
                 $key = substr($key, 0, -1);
                 array_push($this->currentObject->$key, $val);
-                array_push($this->currentObject->config[$key], $val);
+                // array_push($this->currentObject->config[$key], $val);
                 $this->currentObject->addConfigValue($key, $val);
 
             } else {
@@ -1767,7 +1766,7 @@ class WeatherMapConfigReader
         return false;
     }
 
-  private function handleINCLUDE($fullcommand, $args, $matches)
+    private function handleINCLUDE($fullcommand, $args, $matches)
     {
         $filename = $matches[1];
 
@@ -1795,5 +1794,53 @@ class WeatherMapConfigReader
         return false;
     }
 
+    /**
+     * Go through the configKeywords array, making sure that all the functions and members
+     * referenced by name in strings actually exist! Used only by phpunit.
+     */
+    public function selfValidate()
+    {
+        $classes = array(
+            "GLOBAL" => "WeatherMap",
+            "LINK" => "WeatherMapLink",
+            "NODE" => "WeatherMapNode"
+        );
 
+        $result = true;
+
+        foreach ($this->configKeywords as $scope => $keywords) {
+            foreach ($keywords as $keyword => $matches) {
+                foreach ($matches as $match) {
+                    // This isn't actually used anymore, but it might as well be consistent at least
+                    if ($match[0] != $scope) {
+                        wm_warn("$scope:$keyword arg0 is not $scope");
+                        $result = false;
+                    }
+                    # $match[1] is a regexp or string match
+                    # $match[2] is either an array of properties to set, or a function to handle it
+                    if (is_array($match[2])) {
+                        # TODO: if it's a list of variables, check they exist on the relevant object (from scope)
+                        foreach ($match[2] as $key=>$val) {
+                            if (1 === preg_match('/^(.*)\[([^\]]+)\]$/', $key, $m)) {
+                                $key = $m[1];
+                            }
+
+                            if (! property_exists($classes[$scope], $key)) {
+                                wm_warn("$scope:$keyword tries to set nonexistent property $key");
+                                $result = false;
+                            }
+                        }
+                    } else {
+                        # TODO: if it's a handleXXXX function, check that exists
+                        if (! method_exists($this, $match[2])) {
+                            wm_warn("$scope:$keyword has a missing handler ($match[2])");
+                            $result = false;
+                        }
+                    }
+                }
+            }
+        }
+
+        return $result;
+    }
 }

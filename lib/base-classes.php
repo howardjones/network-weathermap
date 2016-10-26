@@ -176,6 +176,20 @@ class WeatherMapBase
         $this->descendents = array();
     }
 
+    public function recalculate()
+    {
+        /*
+         * The idea here is to maintain a list of the items that inherit from this one, so if we change
+         * something we can avoid necessarily redrawing the whole map just to get (e.g.) new imagemap coords
+         *
+         * In the future it would allow a client-side drawing editor to know which items are "dirty" after a change, too.
+         *
+         */
+        throw new WeathermapUnimplementedException("Dynamic dependencies not implemented yet");
+
+        return 0;
+    }
+    
 }
 
 class WeatherMapConfigItem

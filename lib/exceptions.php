@@ -16,3 +16,8 @@ class WeathermapDeprecatedException extends Exception
 {
     // this is to fence off old code when refactoring
 }
+
+class WeathermapUnimplementedException extends Exception
+{
+    // this is to fence off old code when refactoring
+}

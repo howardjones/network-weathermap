@@ -6,7 +6,7 @@ function weathermap_memory_check($note="MEM")
 {
 	if (function_exists("memory_get_usage"))
 	{
-		$mem_used = wm_nice_bandwidth(memory_get_usage());
+		$mem_used = WMUtility::formatNumberWithMetricSuffix(memory_get_usage());
 		$mem_allowed = ini_get("memory_limit");
 		wm_debug("$note: memory_get_usage() says ".$mem_used."Bytes used. Limit is ".$mem_allowed."\n");
 	}

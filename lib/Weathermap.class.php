@@ -759,16 +759,12 @@ class WeatherMap extends WeatherMapBase
 
             # if($format != '') $value = sprintf($format,$value);
             if ($format != '') {
-
-                #		debug("Formatting with mysprintf($format,$value)\n");
-                $value = mysprintf($format, $value, $this->kilo);
+                $value = WMUtility::sprintf($format, $value, $this->kilo);
             }
 
-            #	debug("ProcessString: formatted to $value\n");
             $input = str_replace($key, '', $input);
             $output = str_replace($key, $value, $output);
         }
-        #debug("ProcessString: output is $output\n");
         return ($output);
     }
 
@@ -1001,7 +997,7 @@ function RandomData()
         $string = $this->ProcessString($this->title, $this);
 
         if ($this->get_hint('screenshot_mode') == 1) {
-            $string = screenshotify($string);
+            $string = WMUtility::stringAnonymise($string);
         }
 
         list($boxwidth, $boxheight) = $fontObject->calculateImageStringSize($string);
@@ -2068,6 +2064,7 @@ function MakeHTML($imagemapname = "weathermap_imap")
     {
         wm_debug("Preprocessing targets\n");
 
+        /** @var WeatherMapDataItem $mapItem */
         foreach ($itemList as $mapItem) {
             if ($mapItem->isTemplate()) {
                 continue;

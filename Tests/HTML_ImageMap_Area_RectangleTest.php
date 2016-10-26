@@ -54,24 +54,5 @@ class HTML_ImageMap_Area_RectangleTest extends PHPUnit_Framework_TestCase {
         }
     }
 
-    /**
-     * @todo Implement testAsHTML().
-     */
-    public function testAsHTML() {
-        // Remove the following lines when you implement this test.
-        $this->markTestIncomplete(
-                'This test has not been implemented yet.'
-        );
-    }
 
-    /**
-     * @todo Implement testAsJSON().
-     */
-    public function testAsJSON() {
-        // Remove the following lines when you implement this test.
-        $this->markTestIncomplete(
-                'This test has not been implemented yet.'
-        );
-    }
 }
-?>

@@ -630,13 +630,13 @@ function tidy_link(&$map,$target, $linknumber=1, $linktotal=1, $ignore_tidied=FA
 			$best_offset_b = "C";
 
 			foreach ($corners as $corner1) {
-				list ($ax,$ay) = calc_offset($corner1, $bb_a[2] - $bb_a[0], $bb_a[3] - $bb_a[1]);
+				list ($ax,$ay) = WMUtility::calculateOffset($corner1, $bb_a[2] - $bb_a[0], $bb_a[3] - $bb_a[1]);
 
 				$axx = $node_a->x + $ax;
 				$ayy = $node_a->y + $ay;
 
 				foreach ($corners as $corner2) {
-					list($bx,$by) = calc_offset($corner2, $bb_b[2] - $bb_b[0], $bb_b[3] - $bb_b[1]);
+					list($bx,$by) = WMUtility::calculateOffset($corner2, $bb_b[2] - $bb_b[0], $bb_b[3] - $bb_b[1]);
 
 					$bxx = $node_b->x + $bx;
 					$byy = $node_b->y + $by;

@@ -181,8 +181,8 @@ class WeatherMapDataItem extends WeatherMapItem
     public function updateMaxValues($kilo)
     {
         // while we're looping through, let's set the real bandwidths
-        $this->maxValues[IN] = WMUtility::interpretNumberWithMetricPrefix($this->max_bandwidth_in_cfg, $kilo);
-        $this->maxValues[OUT] = WMUtility::interpretNumberWithMetricPrefix($this->max_bandwidth_out_cfg, $kilo);
+        $this->maxValues[IN] = WMUtility::interpretNumberWithMetricSuffix($this->max_bandwidth_in_cfg, $kilo);
+        $this->maxValues[OUT] = WMUtility::interpretNumberWithMetricSuffix($this->max_bandwidth_out_cfg, $kilo);
 
         $this->max_bandwidth_in = $this->maxValues[IN];
         $this->max_bandwidth_out = $this->maxValues[OUT];
@@ -192,6 +192,7 @@ class WeatherMapDataItem extends WeatherMapItem
 
     public function prepareForDataCollection()
     {
+        /** @var WMTarget $target */
         foreach ($this->targets as $target) {
             wm_debug("ProcessTargets: New Target: $target\n");
 

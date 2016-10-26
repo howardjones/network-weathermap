@@ -26,7 +26,7 @@ ini_set('include_path',
     ini_get('include_path') . PATH_SEPARATOR . $cacti_root . PATH_SEPARATOR . $cacti_root . '/plugins/weathermap'
     . PATH_SEPARATOR . $cacti_root . '/plugins/weathermap/random-bits');
 
-require_once 'Weathermap.class.php';
+require_once 'lib/all.php';
 require_once 'Console/Getopt.php';
 
 include_once 'include/global.php';
@@ -383,8 +383,8 @@ foreach ($map->links as $link) {
                 print "    SPEED $total_speed\n";
                 $map->links[$name]->max_bandwidth_in = $total_speed;
                 $map->links[$name]->max_bandwidth_out = $total_speed;
-                $map->links[$name]->max_bandwidth_in_cfg = wm_nice_bandwidth($total_speed);
-                $map->links[$name]->max_bandwidth_out_cfg = wm_nice_bandwidth($total_speed);
+                $map->links[$name]->max_bandwidth_in_cfg = WMUtility::formatNumberWithMetricSuffix($total_speed);
+                $map->links[$name]->max_bandwidth_out_cfg = WMUtility::formatNumberWithMetricSuffix($total_speed);
 
                 if ($map_widths) {
                     foreach ($width_map as $map_speed => $map_width) {

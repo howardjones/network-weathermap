@@ -125,27 +125,34 @@ class WMUtility
 
         // TODO - where is the named offset handling!!
         wm_warn("Got a position offset that didn't make sense ($offsetstring).");
-        return (array (0, 0));
+        return (array(0, 0));
     }
 
-    public static function interpretNumberWithMetricPrefixOrNull($inputString, $kilo = 1000)
+    public static function interpretNumberWithMetricSuffixOrNull($inputString, $kilo = 1000)
     {
         if ($inputString == '-') {
             return null;
         }
 
-        return self::interpretNumberWithMetricPrefix($inputString, $kilo);
+        return self::interpretNumberWithMetricSuffix($inputString, $kilo);
     }
 
-    public static function interpretNumberWithMetricPrefix($inputString, $kilo = 1000)
+    /**
+     * Take a string with SI suffix and make a real number out of it
+     *
+     * @param $inputString string of the number to interpret, with any SI suffix
+     * @param int $kilo base for kilo (usually 1000 or 1024)
+     * @return float
+     */
+    public static function interpretNumberWithMetricSuffix($inputString, $kilo = 1000)
     {
         $lookup = array(
             "K" => $kilo,
             "M" => $kilo * $kilo,
             "G" => $kilo * $kilo * $kilo,
             "T" => $kilo * $kilo * $kilo * $kilo,
-            "m" => 1/$kilo,
-            "u" => 1/($kilo*$kilo)
+            "m" => 1 / $kilo,
+            "u" => 1 / ($kilo * $kilo)
         );
 
         if (preg_match('/([0-9\.]+)(M|G|K|T|m|u)/', $inputString, $matches)) {
@@ -166,7 +173,7 @@ class WMUtility
      * @param int $decimals how many decimal places to display
      * @return string the resulting formatted number
      */
-    public static function formatNumberWithMetricPrefix($number, $kilo = 1000, $decimals = 1)
+    public static function formatNumberWithMetricSuffix($number, $kilo = 1000, $decimals = 1)
     {
         $lookup = array(
             "T" => $kilo * $kilo * $kilo * $kilo,
@@ -174,9 +181,9 @@ class WMUtility
             "M" => $kilo * $kilo,
             "K" => $kilo,
             "" => 1,
-            "m" => 1/$kilo,
-            "u" => 1/($kilo*$kilo),
-            "n" => 1/($kilo*$kilo*$kilo)
+            "m" => 1 / $kilo,
+            "u" => 1 / ($kilo * $kilo),
+            "n" => 1 / ($kilo * $kilo * $kilo)
         );
 
         $prefix = '';
@@ -192,7 +199,7 @@ class WMUtility
 
         foreach ($lookup as $suffix => $unit) {
             if ($number >= $unit) {
-                return $prefix . self::formatNumber($number/$unit, $decimals) . $suffix;
+                return $prefix . self::formatNumber($number / $unit, $decimals) . $suffix;
             }
         }
 
@@ -217,7 +224,7 @@ class WMUtility
             $decimal = substr($number, strlen($integer) + 1);
         }
 
-        if (! isset($decimal)) {
+        if (!isset($decimal)) {
             $decimal = '';
         }
 
@@ -257,7 +264,7 @@ class WMUtility
             if ($matches[2] != "") {
                 $places = intval($matches[2]);
             }
-            return self::formatNumberWithMetricPrefix($value, $kilo, $places);
+            return self::formatNumberWithMetricSuffix($value, $kilo, $places);
 
         } elseif (preg_match('/%(-*)(\d*)([Tt])/', $format, $matches)) {
             $precision = ($matches[2] == '' ? 10 : intval($matches[2]));

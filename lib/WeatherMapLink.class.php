@@ -315,7 +315,7 @@ class WeatherMapLink extends WeatherMapDataItem
             # print "COMMENT: $comment";
 
             if ($this->owner->get_hint('screenshot_mode') == 1) {
-                $comment = screenshotify($comment);
+                $comment = WMUtility::stringAnonymise($comment);
             }
 
             if ($comment != '') {
@@ -688,11 +688,11 @@ class WeatherMapLink extends WeatherMapDataItem
 			wm_warn("LINK ".$this->name." probably has it's BWLABELPOSs the wrong way around [WMWARN50]\n");
 		}
 
-		list($dx, $dy)=calc_offset($this->a_offset, $map->nodes[$this->a->name]->width, $map->nodes[$this->a->name]->height);
+		list($dx, $dy)=WMUtility::calculateOffset($this->a_offset, $map->nodes[$this->a->name]->width, $map->nodes[$this->a->name]->height);
 		$x1+=$dx;
 		$y1+=$dy;
 
-		list($dx, $dy)=calc_offset($this->b_offset, $map->nodes[$this->b->name]->width, $map->nodes[$this->b->name]->height);
+		list($dx, $dy)=WMUtility::calculateOffset($this->b_offset, $map->nodes[$this->b->name]->width, $map->nodes[$this->b->name]->height);
 		$x2+=$dx;
 		$y2+=$dy;
 
@@ -870,7 +870,7 @@ class WeatherMapLink extends WeatherMapDataItem
 
 					// if screenshot_mode is enabled, wipe any letters to X and wipe any IP address to 127.0.0.1
 					// hopefully that will preserve enough information to show cool stuff without leaking info
-					if($map->get_hint('screenshot_mode')==1)  $thelabel = screenshotify($thelabel);
+					if($map->get_hint('screenshot_mode')==1)  $thelabel = WMUtility::stringAnonymise($thelabel);
 
 					if($this->labelboxstyle == 'angled')
 					{
@@ -1208,52 +1208,6 @@ class WeatherMapLink extends WeatherMapDataItem
         return parent::asJS($type, $prefix);
     }
 
-	function asJSON($complete=TRUE)
-	{
-	    throw new WeathermapDeprecatedException("deprec");
-
-		$js = '';
-		$js .= "" . js_escape($this->name) . ": {";
-		$js .= "\"id\":" . $this->id. ", ";
-		if (isset($this->a))
-		{
-			$js.="\"a\":\"" . $this->a->name . "\", ";
-			$js.="\"b\":\"" . $this->b->name . "\", ";
-		}
-
-		if($complete)
-		{
-			$js.="\"infourl\":" . js_escape($this->infourl) . ", ";
-			$js.="\"overliburl\":" . js_escape($this->overliburl). ", ";
-			$js.="\"width\":\"" . $this->width . "\", ";
-			$js.="\"target\":";
-
-			$tgt="";
-
-			foreach ($this->targets as $target) { $tgt.=$target[4] . " "; }
-
-			$js.=js_escape(trim($tgt));
-			$js.=",";
-
-			$js.="\"bw_in\":" . js_escape($this->max_bandwidth_in_cfg) . ", ";
-			$js.="\"bw_out\":" . js_escape($this->max_bandwidth_out_cfg) . ", ";
-
-			$js.="\"name\":" . js_escape($this->name) . ", ";
-			$js.="\"overlibwidth\":\"" . $this->overlibheight . "\", ";
-			$js.="\"overlibheight\":\"" . $this->overlibwidth . "\", ";
-			$js.="\"overlibcaption\":" . js_escape($this->overlibcaption) . ", ";
-		}
-		$vias = "\"via\": [";
-		foreach ($this->vialist as $via)
-				$vias .= sprintf("[%d,%d,'%s'],", $via[0], $via[1],$via[2]);
-		$vias .= "],";
-		$vias = str_replace("],],", "]]", $vias);
-		$vias = str_replace("[],", "[]", $vias);
-		$js .= $vias;
-
-		$js.="},\n";
-		return $js;
-	}
 
     public function cleanUp()
     {

@@ -254,7 +254,7 @@ class WeatherMapNode extends WeatherMapDataItem
             // if screenshot_mode is enabled, wipe any letters to X and wipe any IP address to 127.0.0.1
             // hopefully that will preserve enough information to show cool stuff without leaking info
             if ($map->get_hint('screenshot_mode') == 1) {
-                $this->proclabel = screenshotify($this->proclabel);
+                $this->proclabel = WMUtility::stringAnonymise($this->proclabel);
             }
 
             $fontObject = $this->owner->fonts->getFont($this->labelfont);
@@ -573,7 +573,7 @@ class WeatherMapNode extends WeatherMapDataItem
 			$this->labeloffsetx = 0;
 			$this->labeloffsety = 0;
 
-			list($dx, $dy) = calc_offset($this->labeloffset,
+			list($dx, $dy) = WMUtility::calculateOffset($this->labeloffset,
 				($icon_w + $boxwidth -1),
 				($icon_h + $boxheight)
 			);
@@ -1036,36 +1036,6 @@ class WeatherMapNode extends WeatherMapDataItem
         return parent::asJS($type, $prefix);
     }
 
-	function asJSON($complete=TRUE)
-	{
-        throw new WeathermapDeprecatedException("deprec");
-
-		$js = '';
-		$js .= "" . js_escape($this->name) . ": {";
-		$js .= "\"id\":" . $this->id. ", ";
-		$js .= "\"x\":" . ($this->x - $this->centre_x). ", ";
-		$js .= "\"y\":" . ($this->y - $this->centre_y) . ", ";
-		$js .= "\"cx\":" . $this->centre_x. ", ";
-		$js .= "\"cy\":" . $this->centre_y . ", ";
-		$js .= "\"ox\":" . $this->original_x . ", ";
-		$js .= "\"oy\":" . $this->original_y . ", ";
-		$js .= "\"relative_to\":" . js_escape($this->relative_to) . ", ";
-		$js .= "\"name\":" . js_escape($this->name) . ", ";
-		if ($complete)
-		{
-			$js .= "\"label\":" . js_escape($this->label) . ", ";
-			$js .= "\"infourl\":" . js_escape($this->infourl) . ", ";
-			$js .= "\"overliburl\":" . js_escape($this->overliburl) . ", ";
-			$js .= "\"overlibcaption\":" . js_escape($this->overlibcaption) . ", ";
-
-			$js .= "\"overlibwidth\":" . $this->overlibheight . ", ";
-			$js .= "\"overlibheight\":" . $this->overlibwidth . ", ";
-			$js .= "\"iconfile\":" . js_escape($this->iconfile). ", ";
-		}
-		$js .= "\"iconcachefile\":" . js_escape($this->cachefile);
-		$js .= "},\n";
-		return $js;
-	}
 
 
     public function isRelativePositionResolved()

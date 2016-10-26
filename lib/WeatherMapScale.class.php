@@ -304,11 +304,11 @@ class WeatherMapScale extends WeatherMapItem
                 $decimal_point);
 
             if ($bottom > $this->owner->kilo) {
-                $bottom = wm_nice_bandwidth($colour['bottom'], $this->owner->kilo);
+                $bottom = WMUtility::formatNumberWithMetricSuffix($colour['bottom'], $this->owner->kilo);
             }
 
             if ($top > $this->owner->kilo) {
-                $top = wm_nice_bandwidth($colour['top'], $this->owner->kilo);
+                $top = WMUtility::formatNumberWithMetricSuffix($colour['top'], $this->owner->kilo);
             }
 
             $tag = (isset($colour['tag']) ? $colour['tag'] : '');
@@ -540,6 +540,13 @@ class WeatherMapScale extends WeatherMapItem
 
     }
 
+    /**
+     * @param int $keyHeight
+     * @param bool $inverted
+     * @return resource
+     *
+
+     */
     function DrawLegendVertical($keyHeight = 400, $inverted = false)
     {
         $title = $this->keytitle;
@@ -548,10 +555,8 @@ class WeatherMapScale extends WeatherMapItem
 
         wm_debug("Drawing $nScales colours into SCALE\n");
 
+        /** @var WMFont $fontObject */
         $fontObject = $this->keyfont;
-
-//        $x = 0;
-//        $y = 0;
 
         $scaleFactor = $keyHeight / 100;
 
@@ -580,7 +585,9 @@ class WeatherMapScale extends WeatherMapItem
 
         // $this->preAllocateScaleColours($gdScaleImage, $scaleReference)
 
+        /** @var WMColour $bgColour */
         $bgColour = $this->keybgcolour;
+        /** @var WMColour $outlineColour */
         $outlineColour = $this->keyoutlinecolour;
 
         wm_debug("BG is $bgColour, Outline is $outlineColour\n");
@@ -612,6 +619,7 @@ class WeatherMapScale extends WeatherMapItem
                 $fontObject->drawImageString($gdScaleImage, $scaleRight + $scaleFactor * 2, $scaleTop + $deltaY + $tileHeight / 2, $labelString, $this->keytextcolour->gdAllocate($gdScaleImage));
             }
 
+            /** @var WMColour $col */
             list($col,) = $this->findScaleHit($percentage);
 
             if ($col->isRealColour()) {
@@ -644,6 +652,7 @@ class WeatherMapScale extends WeatherMapItem
 
         wm_debug("Drawing $nScales colours into SCALE\n");
 
+        /** @var WMFont $fontObject */
         $fontObject = $this->keyfont;
 
         $x = 0;
@@ -674,7 +683,9 @@ class WeatherMapScale extends WeatherMapItem
 
         // $this->preAllocateScaleColours($gdScaleImage, $scaleReference);
 
+        /** @var WMColour $bgColour */
         $bgColour = $this->keybgcolour;
+        /** @var WMColour $outlineColour */
         $outlineColour = $this->keyoutlinecolour;
 
         wm_debug("BG is $bgColour, Outline is $outlineColour\n");

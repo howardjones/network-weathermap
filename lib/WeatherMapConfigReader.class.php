@@ -1654,14 +1654,14 @@ class WeatherMapConfigReader
         $colour1 = null;
         $colour2 = null;
 
-        $bottom = WMUtility::interpretNumberWithMetricPrefix($matches[2], $this->mapObject->kilo);
-        $top = WMUtility::interpretNumberWithMetricPrefix($matches[3], $this->mapObject->kilo);
+        $bottom = WMUtility::interpretNumberWithMetricSuffix($matches[2], $this->mapObject->kilo);
+        $top = WMUtility::interpretNumberWithMetricSuffix($matches[3], $this->mapObject->kilo);
 
         $this->mapObject->colours[$matches[1]][$key]['key'] = $key;
         $this->mapObject->colours[$matches[1]][$key]['tag'] = $tag;
 
-        $this->mapObject->colours[$matches[1]][$key]['bottom'] = WMUtility::interpretNumberWithMetricPrefix($matches[2], $this->mapObject->kilo);
-        $this->mapObject->colours[$matches[1]][$key]['top'] = WMUtility::interpretNumberWithMetricPrefix($matches[3], $this->mapObject->kilo);
+        $this->mapObject->colours[$matches[1]][$key]['bottom'] = WMUtility::interpretNumberWithMetricSuffix($matches[2], $this->mapObject->kilo);
+        $this->mapObject->colours[$matches[1]][$key]['top'] = WMUtility::interpretNumberWithMetricSuffix($matches[3], $this->mapObject->kilo);
 
         $this->mapObject->colours[$matches[1]][$key]['special'] = 0;
 
@@ -1762,7 +1762,7 @@ class WeatherMapConfigReader
             return true;
         }
 
-        wm_warn("line $this->lineCount: $last_seen TEMPLATE '$templateName' doesn't exist! (if it does exist, check it's defined first) [WMWARN40]\n");
+        wm_warn("line $this->lineCount: $this->currentType TEMPLATE '$templateName' doesn't exist! (if it does exist, check it's defined first) [WMWARN40]\n");
 
         return false;
     }

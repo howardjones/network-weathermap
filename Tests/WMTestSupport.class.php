@@ -77,7 +77,9 @@ class WMTestSupport
                     "0.97",
                     "0.97a",
                     "0.97b",
-                    "0.98"
+                    "0.97c",
+                    "0.98",
+                    "0.98a"
                 );
                 $my_version = array_search($WEATHERMAP_VERSION, $known_versions);
                 $req_version = array_search($required_version, $known_versions);
@@ -89,7 +91,7 @@ class WMTestSupport
         }
 
         if ($skip == 0) {
-            $map->ReadData();
+            $map->readData();
 //            $map->preCalculate($map);
             $map->DrawMap($imagefile);
             $map->imagefile = $imagefile;

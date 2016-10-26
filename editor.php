@@ -398,12 +398,12 @@ else
 
 			if (wm_editor_validate_bandwidth($bwin)) {
 				$map->links[$link_name]->max_bandwidth_in_cfg = $bwin;
-				$map->links[$link_name]->max_bandwidth_in = unformat_number($bwin, $map->kilo);
+				$map->links[$link_name]->max_bandwidth_in = WMUtility::interpretNumberWithMetricSuffixOrNull($bwin, $map->kilo);
 
 			}
 			if (wm_editor_validate_bandwidth($bwout)) {
 				$map->links[$link_name]->max_bandwidth_out_cfg = $bwout;
-				$map->links[$link_name]->max_bandwidth_out = unformat_number($bwout, $map->kilo);
+				$map->links[$link_name]->max_bandwidth_out = WMUtility::interpretNumberWithMetricSuffixOrNull($bwout, $map->kilo);
 			}
 			// $map->links[$link_name]->SetBandwidth($bwin,$bwout);
 
@@ -460,8 +460,8 @@ else
 		{
 			$map->links['DEFAULT']->max_bandwidth_in_cfg = $bwin;
 			$map->links['DEFAULT']->max_bandwidth_out_cfg = $bwout;
-			$map->links['DEFAULT']->max_bandwidth_in = unformat_number($bwin, $map->kilo);
-                        $map->links['DEFAULT']->max_bandwidth_out = unformat_number($bwout, $map->kilo);
+			$map->links['DEFAULT']->max_bandwidth_in = WMUtility::interpretNumberWithMetricSuffixOrNull($bwin, $map->kilo);
+                        $map->links['DEFAULT']->max_bandwidth_out = WMUtility::interpretNumberWithMetricSuffixOrNull($bwout, $map->kilo);
 			
 			// $map->defaultlink->SetBandwidth($bwin,$bwout);
 			foreach ($map->links as $link)
@@ -472,8 +472,8 @@ else
 				    $link_name = $link->name;
 				    $map->links[$link_name]->max_bandwidth_in_cfg = $bwin;
 				    $map->links[$link_name]->max_bandwidth_out_cfg = $bwout;
-				    $map->links[$link_name]->max_bandwidth_in = unformat_number($bwin, $map->kilo);
-				    $map->links[$link_name]->max_bandwidth_out = unformat_number($bwout, $map->kilo);
+				    $map->links[$link_name]->max_bandwidth_in = WMUtility::interpretNumberWithMetricSuffixOrNull($bwin, $map->kilo);
+				    $map->links[$link_name]->max_bandwidth_out = WMUtility::interpretNumberWithMetricSuffixOrNull($bwout, $map->kilo);
 			    }
 			}
 		}

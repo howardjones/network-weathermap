@@ -24,7 +24,7 @@ class WMTarget
     private $timestamp;
     private $dataValid = false;
 
-    public function __construct($targetString, $configFile, $lineNumber)
+    public function __construct($targetString, $configFile="", $lineNumber=0)
     {
         $this->originalTargetString = $targetString;
         $this->finalTargetString = $targetString;
@@ -45,11 +45,17 @@ class WMTarget
         return sprintf("%s on config line %s of %s", $this->finalTargetString, $this->configLineNumber, $this->configFileName);
     }
 
+    /**
+     * @param WeatherMapDataItem $mapItem
+     * @param WeatherMap $map
+     */
     public function preProcess(&$mapItem, &$map)
     {
+        // TODO - we could save the mapItem here for better error messages later
+
         // We're excluding notes from other plugins here
         // to stop plugin A from messing with plugin B
-        $this->finalTargetString = $map->processString($this->originalTargetString, $mapItem, false, false);
+        $this->finalTargetString = $map->ProcessString($this->originalTargetString, $mapItem, false, false);
 
         if ($this->originalTargetString != $this->finalTargetString) {
             wm_debug("Targetstring is now %s\n", $this->finalTargetString);

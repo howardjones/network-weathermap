@@ -4,27 +4,54 @@
 // I really wish PHP4 would just die overnight
 class WeatherMapDataSource
 {
+    protected $owner;
+    protected $regexpsHandled;
+    protected $recognised;
+
+
+    public function __construct()
+    {
+        $this->recognised = 0;
+        $this->regexpsHandled = array();
+    }
+
+
 // Initialize - called after config has been read (so SETs are processed)
 // but just before ReadData. Used to allow plugins to verify their dependencies
 // (if any) and bow out gracefully. Return FALSE to signal that the plugin is not
 // in a fit state to run at the moment.
     function Init(&$map)
     {
+        $this->owner = $map;
+
         return TRUE;
     }
 
-// called with the TARGET string. Returns TRUE or FALSE, depending on whether it wants to handle this TARGET
-// called by map->ReadData()
-    function Recognise($targetstring)
+    /**
+     * called with the TARGET string by map->ReadData()
+     *
+     * Default implementation just checks the regexps in regexpsHandled[], so you may not need to implement at all.
+     *
+     * @return bool Returns true or false, depending on whether it wants to handle this TARGET
+     *
+     */
+    public function Recognise($targetString)
     {
-        return FALSE;
+        foreach ($this->regexpsHandled as $regexp) {
+            if (preg_match($regexp, $targetString)) {
+                $this->recognised++;
+                return true;
+            }
+        }
+        return false;
     }
+
 
 // the actual ReadData
 //   returns an array of two values (in,out). -1,-1 if it couldn't get valid data
 //   configline is passed in, to allow for better error messages
 //   itemtype and itemname may be used as part of the target (e.g. for TSV source line)
-// function ReadData($targetstring, $configline, $itemtype, $itemname, $map) { return (array(-1,-1)); }
+
     function ReadData($targetstring, &$map, &$item)
     {
         return (array(-1, -1));

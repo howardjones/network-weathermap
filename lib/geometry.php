@@ -34,9 +34,9 @@ class WMLineSegment
  *
  * TODO: This should be using WMPoints! (And should be a method of WMPoint)
  *
- * @param $points array of ordinates (x,y,x,y,x,y...)
- * @param $centre_x centre of rotation, X coordinate
- * @param $centre_y centre of rotation, Y coordinate
+ * @param array $points array of ordinates (x,y,x,y,x,y...)
+ * @param float $centre_x centre of rotation, X coordinate
+ * @param float $centre_y centre of rotation, Y coordinate
  * @param int $angle angle in radians
  */
 function rotateAboutPoint(&$points, $centre_x, $centre_y, $angle = 0)

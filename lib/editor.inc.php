@@ -25,6 +25,9 @@ function fix_gpc_string($input)
 
 /**
  * Clean up URI (function taken from Cacti) to protect against XSS
+ *
+ * @param string $str string to clean
+ * @return string
  */
 function wm_editor_sanitize_uri($str) {
         static $drop_char_match =   array(' ','^', '$', '<', '>', '`', '\'', '"', '|', '+', '[', ']', '{', '}', ';', '!', '%');
@@ -34,6 +37,10 @@ function wm_editor_sanitize_uri($str) {
 }
 
 // much looser sanitise for general strings that shouldn't have HTML in them
+/**
+ * @param string $str string to clean
+ * @return string
+ */
 function wm_editor_sanitize_string($str) {
         static $drop_char_match =   array('<', '>' );
         static $drop_char_replace = array('', '');
@@ -41,22 +48,31 @@ function wm_editor_sanitize_string($str) {
         return str_replace($drop_char_match, $drop_char_replace, urldecode($str));
 }
 
+/**
+ * @param string $bw
+ * @return bool
+ */
 function wm_editor_validate_bandwidth($bw) {
   
     if(preg_match( '/^(\d+\.?\d*[KMGT]?)$/', $bw) ) {
-	return true;
+	    return true;
     }
     return false;
 }
 
-function wm_editor_validate_one_of($input,$valid=array(),$case_sensitive=false) {
-    if(! $case_sensitive ) $input = strtolower($input);
-    
-    foreach ($valid as $v) {
-	if(! $case_sensitive ) $v = strtolower($v);
-	if($v == $input) return true;
+function wm_editor_validate_one_of($input, $valid = array(), $case_sensitive = false)
+{
+    if (!$case_sensitive) {
+        $input = strtolower($input);
     }
-    
+
+    foreach ($valid as $v) {
+        if (!$case_sensitive) {
+            $v = strtolower($v);
+        }
+        if ($v == $input) return true;
+    }
+
     return false;
 }
 
@@ -74,37 +90,41 @@ function wm_editor_sanitize_selected($str) {
 	return wm_editor_sanitize_name($res);
 }
 
-function wm_editor_sanitize_file($filename,$allowed_exts=array()) {
-    
+function wm_editor_sanitize_file($filename, $allowed_exts = array())
+{
     $filename = wm_editor_sanitize_uri($filename);
-    
-    if ($filename == "") return "";
-        
+
+    if ($filename == "") {
+        return "";
+    }
+
     $ok = false;
     foreach ($allowed_exts as $ext) {
-		$match = ".".$ext;
+        $match = "." . $ext;
 
-		if( substr($filename, -strlen($match),strlen($match)) == $match) {
-			$ok = true;
-		}
-    }    
-    if(! $ok ) return "";
+        if (substr($filename, -strlen($match), strlen($match)) == $match) {
+            $ok = true;
+        }
+    }
+    if (!$ok) {
+        return "";
+    }
     return $filename;
 }
 
-function wm_editor_sanitize_conffile($filename) {
-    
+function wm_editor_sanitize_conffile($filename)
+{
     $filename = wm_editor_sanitize_uri($filename);
-    
-    # If we've been fed something other than a .conf filename, just pretend it didn't happen
-    if ( substr($filename,-5,5) != ".conf" ) {
-		$filename = "";
-	}
 
-	# on top of the url stuff, we don't ever need to see a / in a config filename (CVE-2013-3739)
-	if (strstr($filename,"/") !== false ) {
-		$filename = "";
-	}
+    # If we've been fed something other than a .conf filename, just pretend it didn't happen
+    if (substr($filename, -5, 5) != ".conf") {
+        $filename = "";
+    }
+
+    # on top of the url stuff, we don't ever need to see a / in a config filename (CVE-2013-3739)
+    if (strstr($filename, "/") !== false) {
+        $filename = "";
+    }
 
     return $filename;
 }

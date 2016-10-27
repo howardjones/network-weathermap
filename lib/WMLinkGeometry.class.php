@@ -18,7 +18,8 @@ class WMLinkGeometry
     protected $name;
 
     protected $controlPoints; // the points defined by the user for this link
-    protected $curvePoints; // the calculated spine for the whole link, used for distance calculations
+    /** @var  WMSpine $curvePoints the calculated spine for the whole link, used for distance calculations */
+    protected $curvePoints;
 
     protected $splitCurves; // The spines for each direction of the link
     protected $drawnCurves; // The actual list of WMPoints that will be drawn
@@ -183,6 +184,11 @@ class WMLinkGeometry
         return $this->curvePoints->totalDistance();
     }
 
+    /**
+     * @param int $index
+     * @return WMVector
+     *
+     */
     function findTangentAtIndex($index)
     {
         return $this->curvePoints->findTangentAtIndex($index);

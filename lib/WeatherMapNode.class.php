@@ -54,7 +54,13 @@ class WeatherMapNode extends WeatherMapDataItem
 	var $polar;
 	var $boundingboxes=array();
 
-
+    /**
+     * WeatherMapNode constructor.
+     *
+     * @param string $name
+     * @param string $template
+     * @param WeatherMap $owner
+     */
     function __construct($name, $template, $owner)
     {
         parent::__construct();
@@ -709,10 +715,12 @@ class WeatherMapNode extends WeatherMapDataItem
 		imagepng($this->image,$cachename);
 	}
 
-    /***
+    /**
      * precalculate the colours to be used, and the bounding boxes for labels and icons (if they exist)
      *
      * This is the only stuff that needs to be done if we're doing an editing pass. No actual drawing is necessary.
+     *
+     * @param WeatherMap $owner
      *
      */
     public function preCalculate(&$owner)
@@ -756,7 +764,6 @@ class WeatherMapNode extends WeatherMapDataItem
 		}
 
 		$this->makeImageMapAreas();
-
 	}
 
 

@@ -60,9 +60,9 @@ class WeatherMapDataSource
     /**
      * pre-register a target + context, to allow a plugin to batch up queries to a slow database, or SNMP for example
      *
-     * @param $targetstring A clause from a TARGET line, after being processed by ProcessString
-     * @param $map the WeatherMap main object
-     * @param $item the specific WeatherMapItem that this target is for
+     * @param string $targetstring A clause from a TARGET line, after being processed by ProcessString
+     * @param WeatherMap $map the WeatherMap main object
+     * @param WeatherMapDataItem $item the specific WeatherMapItem that this target is for
      */
     public function Register($targetstring, &$map, &$item)
     {
@@ -72,7 +72,7 @@ class WeatherMapDataSource
     /**
      * called before ReadData, to allow plugins to DO the prefetch of targets known from Register
      *
-     * @param $map the WeatherMap main object
+     * @param WeatherMap $map the WeatherMap main object
      */
     public function Prefetch(&$map)
     {
@@ -83,7 +83,7 @@ class WeatherMapDataSource
      * Run after all data collection
      * some plugin might need to update a local cache, close files, or other state
      *
-     * @param $map the WeatherMap main object
+     * @param WeatherMap $map the WeatherMap main object
      */
     public function CleanUp(&$map)
     {
@@ -112,7 +112,7 @@ class WeatherMapPreProcessor
     /**
      * The only API for a PreProcessor - do whatever it is that you are supposed to do.
      *
-     * @param $map the WeatherMap main object
+     * @param WeatherMap $map the WeatherMap main object
      * @return bool Success/Failure? Not currently interpreted.
      */
     public function run()
@@ -140,7 +140,7 @@ class WeatherMapPostProcessor
     /**
      * The only API for a PostProcessor - do whatever it is that you are supposed to do.
      *
-     * @param $map the WeatherMap main object
+     * @param WeatherMap $map the WeatherMap main object
      * @return bool Success/Failure? Not currently interpreted.
      */
     public function run()

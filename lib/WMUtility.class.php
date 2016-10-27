@@ -245,8 +245,8 @@ class WMUtility
      * Assumptions - this is called from ProcessString, so there will only ever be one token in
      * the format string, and nothing else.
      *
-     * @param $format a format string
-     * @param $value a value to be formatted
+     * @param string $format a format string
+     * @param mixed $value a value to be formatted
      * @param int $kilo the base value for kilo,mega,giga calculations (1000 or 1024 usually)
      * @return string the resulting string
      */
@@ -275,6 +275,12 @@ class WMUtility
         return sprintf($format, $value);
     }
 
+    /**
+     * Escape a string ready for embedding in Javascript code
+     *
+     * @param string $str string to escape
+     * @return string
+     */
     public static function jsEscape($str)
     {
         $str = str_replace('\\', '\\\\', $str);
@@ -285,6 +291,14 @@ class WMUtility
         return ($str);
     }
 
+    /**
+     * Print either a value, or the word 'null'.
+     *
+     * A recurring pattern in the readdata/ds plugins code where we're logging data values.
+     *
+     * @param mixed $value
+     * @return string
+     */
     public static function valueOrNull($value)
     {
         return ($value === null ? '{null}' : $value);

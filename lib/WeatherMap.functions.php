@@ -158,7 +158,7 @@ function wm_warn($string,$notice_only=FALSE)
         fclose ($fd);
     }
 
-	    /**
+/**
      * Run a config-based test.
      * Read in config from $conffile, and produce an image and HTML output
      * Optionally Produce a new config file in $newconffile (for testing WriteConfig)
@@ -171,12 +171,16 @@ function wm_warn($string,$notice_only=FALSE)
      * @param string $htmlfile
      * @param string $newconffile
      * @param string $coveragefile
+         *
+         * @return int number of warnings
      */
 
 function TestOutput_RunTest($conffile, $imagefile, $htmlfile, $newconffile, $coveragefile)
 {
     global $weathermap_map;
     global $WEATHERMAP_VERSION;
+
+    throw new WeathermapDeprecatedException("deprec");
 
     $map = new WeatherMap();
 

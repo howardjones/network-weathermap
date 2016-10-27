@@ -87,8 +87,7 @@ class WeatherMapDataItem extends WeatherMapItem
     }
 
     /**
-     * @param $default_default
-     * @param $output
+     * @param mixed $default_default
      * @return string
      */
     protected function getConfigHints($default_default)
@@ -109,9 +108,10 @@ class WeatherMapDataItem extends WeatherMapItem
     }
 
     /**
-     * @param $output
-     * @param $default_default
-     * @return array
+     * @param mixed $default_default
+     * @param string $configKeyword
+     * @param string $fieldName
+     * @return string
      */
     protected function getConfigInOutOrBoth($default_default, $configKeyword, $fieldName)
     {

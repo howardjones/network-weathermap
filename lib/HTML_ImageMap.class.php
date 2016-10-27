@@ -256,6 +256,7 @@ class HTML_ImageMap_Area_Circle extends HTML_ImageMap_Area
 
 class HTML_ImageMap
 {
+    /** @var  HTML_ImageMap_Area[] $shapes */
 	var $shapes;
 	var $nshapes;
 	var $name;

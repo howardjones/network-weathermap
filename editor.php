@@ -825,22 +825,22 @@ else
 			    $newnodename = $newnodename."_copy";
 		    } while(isset($map->nodes[$newnodename]));
 		    
-		    $node = new WeatherMapNode;
-		    $node->Reset($map);
-		    $node->CopyFrom($map->nodes[$target]);
+		    $node = new WeatherMapNode($newnodename, $map->nodes[$target]->template, $map);
+		    // $node->Reset($map);
+		    // $node->CopyFrom($map->nodes[$target]);
 
 			# CopyFrom skips this one, because it's also the function used by template inheritance
 			# - but for Clone, we DO want to copy the template too
 			$node->template = $map->nodes[$target]->template;
     
-		    $node->name = $newnodename;
+		    // $node->name = $newnodename;
 		    $node->x += 30;
 		    $node->y += 30;
 		    $node->defined_in = $mapfile;
-    
-    
-		    $map->nodes[$newnodename] = $node;
-		    array_push($map->seen_zlayers[$node->zorder], $node);
+
+			$map->addNode($node);
+            /// $map->nodes[$newnodename] = $node;
+		    // array_push($map->seen_zlayers[$node->zorder], $node);
     
 		    $map->WriteConfig($mapfile);
 		}

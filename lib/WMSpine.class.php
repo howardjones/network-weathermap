@@ -4,7 +4,7 @@
 class WMSpine
 {
     /**
-     * @var points - array of WMPoint + distance for points in a spine
+     * @var array points - array of WMPoint + distance for points in a spine
      */
     private $points;
 
@@ -223,7 +223,7 @@ class WMSpine
         }
 
         while ($left <= $right) {
-            $mid = floor(($left + $right) / 2);
+            $mid = intval(floor(($left + $right) / 2));
 
             if (($this->points[$mid][1] <= $targetDistance) && ($this->points[$mid + 1][1] > $targetDistance)) {
                 return $mid;
@@ -242,6 +242,9 @@ class WMSpine
     /** split - split the Spine into two new spines, with splitIndex in the first one
      *  used by the link-drawing code to make one curve into two arrows
      *
+     * @param int $splitIndex
+     *
+     * @returns WMSpine[] two new spines either side of the split
      */
     function split($splitIndex)
     {

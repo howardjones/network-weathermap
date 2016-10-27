@@ -206,6 +206,10 @@ class WMFontTable
         return $this->table[$fontNumber]->isLoaded();
     }
 
+    /**
+     * @param int $fontNumber
+     * @return WMFont
+     */
     public function getFont($fontNumber)
     {
         if (!$this->isValid($fontNumber)) {
@@ -227,6 +231,9 @@ class WMFontTable
         return $list;
     }
 
+    /**
+     * @return string
+     */
     public function getConfig()
     {
         $output = "";
@@ -240,6 +247,13 @@ class WMFontTable
         return $output;
     }
 
+    /**
+     * @param string $type
+     * @param string $file
+     * @param int $size
+     * @return WMGDFont|WMTrueTypeFont
+     * @throws WeathermapInternalFail
+     */
     public function makeFontObject($type, $file, $size = 0)
     {
         if ($type == "truetype") {

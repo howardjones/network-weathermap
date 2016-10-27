@@ -53,7 +53,8 @@ class WMTestSupport
      * @param string $imagefile
      * @param string $htmlfile
      * @param string $newconffile
-     * @param string $coveragefile
+     *
+     * @return int number of warnings
      */
     public static function TestOutput_RunTest($conffile, $imagefile, $htmlfile, $newconffile)
     {

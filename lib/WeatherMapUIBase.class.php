@@ -214,6 +214,10 @@ class WeatherMapUIBase
 
 /**
  * Clean up URI (function taken from Cacti) to protect against XSS
+ *
+ * @param string $str
+ * @return string
+ *
  */
 function wmeSanitizeURI($str)
 {

@@ -29,6 +29,9 @@ class ConfigTest extends PHPUnit_Framework_TestCase
      * Each test config should have a small scope of tested features if possible, or
      * a specific previous bug to avoid regressions.
      *
+     * @param string $configFileName config file to run
+     * @param string $referenceImageFileName image file with expected output
+     *
      * @dataProvider configlist
      */
     public function testConfigOutput($configFileName, $referenceImageFileName)
@@ -45,7 +48,7 @@ class ConfigTest extends PHPUnit_Framework_TestCase
         $this->assertFileExists($referenceImageFileName, "reference image missing");
 
         $warningCount = WMTestSupport::TestOutput_RunTest(self::$testdir . DIRECTORY_SEPARATOR . $configFileName,
-            $outputImageFileName, $outputHTMLFileName, '', '');
+            $outputImageFileName, $outputHTMLFileName, '');
 
         // if REQUIRES_VERSION was set, and set to a newer version, then this test is known to fail
         if ($warningCount < 0) {
@@ -107,6 +110,9 @@ class ConfigTest extends PHPUnit_Framework_TestCase
      * (both are written by the same GD/png combo, so they should be
      * byte-identical this time)
      *
+     * @param string $conffile config file to run
+     * @param string $referenceimagefile reference image (not used, just here because we share a dataprovider)
+     *
      * @dataProvider configlist
      */
     public function testWriteConfigConsistency($conffile, $referenceimagefile)
@@ -117,9 +123,9 @@ class ConfigTest extends PHPUnit_Framework_TestCase
         $outputconfigfile = self::$result1dir . DIRECTORY_SEPARATOR . $conffile;
 
         WMTestSupport::TestOutput_RunTest(self::$testdir . DIRECTORY_SEPARATOR . $conffile, $output_image_round1, '',
-            $outputconfigfile, '');
+            $outputconfigfile);
         WMTestSupport::TestOutput_RunTest(self::$result1dir . DIRECTORY_SEPARATOR . $conffile, $output_image_round2, '',
-            '', '');
+            '');
 
         $ref_output1 = md5_file($output_image_round1);
         $ref_output2 = md5_file($output_image_round2);

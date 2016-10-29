@@ -151,7 +151,7 @@ class HTML_ImageMap_Area_Rectangle extends HTML_ImageMap_Area
 {
 	var $x1,$x2,$y1,$y2;
 
-	function __construct ( $name="", $href="",$coords)
+	function __construct ( $name="", $href="", $coords)
 	{
 
 		$c = $coords[0];
@@ -211,7 +211,7 @@ class HTML_ImageMap_Area_Rectangle extends HTML_ImageMap_Area
 
     public function __toString()
     {
-        return "Rectangle";
+        return sprintf("Rectangle[%d,%d-%d,%d]", $this->x1, $this->y1, $this->x2, $this->y2);
     }
 }
 

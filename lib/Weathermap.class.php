@@ -264,8 +264,11 @@ class WMImageLoader
 
 class WeatherMap extends WeatherMapBase
 {
-	var $nodes = array(); // an array of WeatherMapNodes
-	var $links = array(); // an array of WeatherMapLinks
+    /** @var WeatherMapNode[] $nodes */
+	var $nodes = array();
+    /** @var WeatherMapLink[] $links */
+	var $links = array();
+
 	var $texts = array(); // an array containing all the extraneous text bits
 	var $used_images = array(); // an array of image filenames referred to (used by editor)
 	var $seen_zlayers = array(0=>array(),1000=>array()); // 0 is the background, 1000 is the legends, title, etc
@@ -1995,7 +1998,8 @@ function MakeHTML($imagemapname = "weathermap_imap")
 
                 // we reverse the array for each zlayer so that the imagemap order
                 // will match up with the draw order (last drawn should be first hit)
-				foreach (array_reverse($z_items) as $it) {
+                /** @var WeatherMapDataItem $it */
+                foreach (array_reverse($z_items) as $it) {
 					if ($it->name != 'DEFAULT' && $it->name != ":: DEFAULT ::") {
 						foreach ($it->getImageMapAreas() as $area) {
 						    wm_debug("$area\n");

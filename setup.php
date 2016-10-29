@@ -497,13 +497,16 @@ function weathermap_show_tab()
         } else {
             $prefix = "";
         }
+        $tab_name = $prefix . "tab_weathermap.gif";
+        $weathermap_base = $config['url_path'] . 'plugins/weathermap';
+        $weathermap_url = $weathermap_base . '/weathermap-cacti-plugin.php';
 
-        print '<a href="' . $config['url_path'] . 'plugins/weathermap/weathermap-cacti-plugin.php"><img src="' . $config['url_path'] . 'plugins/weathermap/images/' . $prefix . 'tab_weathermap';
-        // if we're ON a weathermap page, print '_red'
         if (preg_match('/plugins\/weathermap\/weathermap-cacti-plugin.php/', $_SERVER['REQUEST_URI'], $matches)) {
-            print "_red";
+            $tab_name = $prefix . "tab_weathermap_red.gif";
         }
-        print '.gif" alt="weathermap" align="absmiddle" border="0"></a>';
+        $tab_url = $weathermap_base . "/images/" . $tab_name;
+
+        printf('<a href="%s"><img src="%s" alt="Weathermap" align="absmiddle" border="0" /></a>', $weathermap_url, $tab_url);
 
     }
 

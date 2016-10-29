@@ -175,7 +175,7 @@ class WeatherMapNode extends WeatherMapDataItem
 		// if we continue...
 		if ($this->label == '' && $this->iconfile=='') return;
 
-		// start these off with sensible values, so that bbox
+		// start thesless e off with sensible values, so that bbox
 		// calculations are easier.
 		$icon_x1 = $this->x; $icon_x2 = $this->x;
 		$icon_y1 = $this->y; $icon_y2 = $this->y;
@@ -706,6 +706,7 @@ class WeatherMapNode extends WeatherMapDataItem
 		# $this->image = $node_im;
 		$map->nodes[$this->name]->image = $node_im;
 
+        $this->makeImageMapAreas();
 	}
 
 	function update_cache($cachedir,$mapname)
@@ -763,7 +764,7 @@ class WeatherMapNode extends WeatherMapDataItem
 			imagecopy ( $im, $this->image, $this->x - $this->centre_x, $this->y - $this->centre_y, 0, 0, imagesx($this->image), imagesy($this->image) );
 		}
 
-		$this->makeImageMapAreas();
+
 	}
 
 
@@ -772,8 +773,8 @@ class WeatherMapNode extends WeatherMapDataItem
         $index = 0;
         foreach ($this->boundingboxes as $bbox) {
             $areaName = "NODE:N" . $this->id . ":" . $index;
-            $newArea = new HTML_ImageMap_Area_Rectangle($areaName, "", $bbox);
-            wm_debug("Adding imagemap area ".join(",", $bbox)."\n");
+            $newArea = new HTML_ImageMap_Area_Rectangle($areaName, "", array($bbox));
+            wm_debug("Adding imagemap area [".join(",", $bbox)."] => $newArea \n");
             $this->imap_areas[] = $newArea;
             $index++;
         }

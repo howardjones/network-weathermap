@@ -7,12 +7,21 @@ class WeatherMapDataSource
     protected $owner;
     protected $regexpsHandled;
     protected $recognised;
+    protected $name;
+    protected $data;
+    protected $dataTime;
 
 
     public function __construct()
     {
         $this->recognised = 0;
         $this->regexpsHandled = array();
+
+        $this->data = array();
+        $this->dataTime = 0;
+        $this->data[IN] = null;
+        $this->data[OUT] = null;
+        $this->name = "Unnamed";
     }
 
 
@@ -47,14 +56,40 @@ class WeatherMapDataSource
     }
 
 
-// the actual ReadData
-//   returns an array of two values (in,out). -1,-1 if it couldn't get valid data
-//   configline is passed in, to allow for better error messages
-//   itemtype and itemname may be used as part of the target (e.g. for TSV source line)
-
+    /**
+     * the actual ReadData
+     * returns an array of two values (in,out). -1,-1 if it couldn't get valid data
+     *
+     * @param string $targetstring
+     * @param WeatherMap $map
+     * @param WeatherMapDataItem $item
+     * @return array
+     */
     function ReadData($targetstring, &$map, &$item)
     {
         return (array(-1, -1));
+    }
+
+    /**
+     * Prepare data for returning, and log it.
+     * Removing some move boilerplate from data plugins, and also making the move
+     * to multiple channels (>2) easier in the future.
+     *
+     * @return array
+     */
+    function ReturnData()
+    {
+        wm_debug(
+            sprintf(
+                "%s ReadData: Returning (%s, %s, %s)\n",
+                $this->name,
+                WMUtility::valueOrNull($this->data[IN]),
+                WMUtility::valueOrNull($this->data[OUT]),
+                $this->dataTime
+            )
+        );
+
+        return (array($this->data[IN], $this->data[OUT], $this->dataTime));
     }
 
     /**
@@ -89,6 +124,7 @@ class WeatherMapDataSource
     {
 
     }
+
 
 }
 

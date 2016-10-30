@@ -16,30 +16,30 @@ class WeatherMapDataSource_static extends WeatherMapDataSource
             '/^static:(\-?\d+\.?\d*[KMGT]?):(\-?\d+\.?\d*[KMGT]?)$/',
             '/^static:(\-?\d+\.?\d*[KMGT]?)$/'
         );
-
+        $this->name= "Static";
     }
 
+    /**
+     * @param string $targetstring The string from the config file
+     * @param WeatherMap $map A reference to the map object (redundant)
+     * @param WeatherMapDataItem $item A reference to the object this target is attached to
+     * @return array invalue, outvalue, unix timestamp that the data was valid
+     */
     function ReadData($targetstring, &$map, &$item)
     {
-        $inbw = NULL;
-        $outbw = NULL;
-        $data_time = 0;
-
         if (preg_match($this->regexpsHandled[0], $targetstring, $matches)) {
-            $inbw = WMUtility::interpretNumberWithMetricSuffix($matches[1], $map->kilo);
-            $outbw = WMUtility::interpretNumberWithMetricSuffix($matches[2], $map->kilo);
-            $data_time = time();
+            $this->data[IN] = WMUtility::interpretNumberWithMetricSuffix($matches[1], $map->kilo);
+            $this->data[OUT] = WMUtility::interpretNumberWithMetricSuffix($matches[2], $map->kilo);
+            $this->dataTime = time();
         }
 
         if (preg_match($this->regexpsHandled[1], $targetstring, $matches)) {
-            $inbw = WMUtility::interpretNumberWithMetricSuffix($matches[1], $map->kilo);
-            $outbw = $inbw;
-            $data_time = time();
+            $this->data[IN] = WMUtility::interpretNumberWithMetricSuffix($matches[1], $map->kilo);
+            $this->data[OUT] = $this->data[IN];
+            $this->dataTime = time();
         }
 
-        wm_debug("Static ReadData: Returning ($inbw,$outbw,$data_time)\n");
-
-        return (array($inbw, $outbw, $data_time));
+        return $this->ReturnData();
     }
 }
 

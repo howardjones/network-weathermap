@@ -75,7 +75,7 @@
 
                     <div class="modal-footer">
                         <small>PHP Weathermap <?php echo $WEATHERMAP_VERSION ?>
-                            Copyright &copy; 2005-2014 Howard Jones - howie@thingy.com
+                            Copyright &copy; 2005-2016 Howard Jones - howie@thingy.com
                             <br/>The current version should always be
                             <a href="http://www.network-weathermap.com/">available here</a>,
                             along with other related software. PHP Weathermap is licensed under the GNU Public License,

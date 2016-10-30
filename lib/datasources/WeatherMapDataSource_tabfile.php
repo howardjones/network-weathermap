@@ -6,6 +6,7 @@ class WeatherMapDataSource_tabfile extends WeatherMapDataSource
     {
         parent::__construct();
 
+        $this->name = "TabText";
         $this->regexpsHandled = array(
             '/\.(tsv|txt)$/'
         );
@@ -20,10 +21,6 @@ class WeatherMapDataSource_tabfile extends WeatherMapDataSource
      */
     public function ReadData($targetString, &$map, &$mapItem)
     {
-        $data[IN] = null;
-        $data[OUT] = null;
-        $dataTime = 0;
-
         $itemName = $mapItem->name;
 
         $fullpath = realpath($targetString);
@@ -31,16 +28,16 @@ class WeatherMapDataSource_tabfile extends WeatherMapDataSource
 
         if ($fileHandle) {
             $data = $this->readDataFromTSV($fileHandle, $itemName);
+            $this->data[IN] = $data[IN];
+            $this->data[OUT] = $data[OUT];
             $stats = stat($fullpath);
-            $dataTime = $stats['mtime'];
+            $this->dataTime = $stats['mtime'];
         } else {
             // some error code to go in here
             wm_warn("TabText ReadData: Couldn't open ($fullpath). [WMTABDATA01]\n");
         }
 
-        wm_debug("TabText ReadData: Returning (" . WMUtility::valueOrNull($data[IN]) . "," . WMUtility::valueOrNull($data[OUT]) . ",$dataTime)\n");
-
-        return (array($data[IN], $data[OUT], $dataTime));
+        return $this->ReturnData();
     }
 
     /**

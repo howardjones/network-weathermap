@@ -2,26 +2,30 @@
 
 class WeatherMapDataSource_wmdata extends WeatherMapDataSource
 {
-    function Recognise($targetstring)
+
+    public function __construct()
     {
-        if (preg_match("/^wmdata:.*$/", $targetstring, $matches)) {
-            return true;
-        } else {
-            return false;
-        }
+        parent::__construct();
+
+        $this->regexpsHandled = array(
+            '/^wmdata:([^:]*):(.*)'
+        );
+        $this->name= "WMData";
     }
 
-    // function ReadData($targetstring, $configline, $itemtype, $itemname, $map)
+    /**
+     * @param string $targetstring The string from the config file
+     * @param WeatherMap $map A reference to the map object (redundant)
+     * @param WeatherMapDataItem $item A reference to the object this target is attached to
+     * @return array invalue, outvalue, unix timestamp that the data was valid
+     */
     function ReadData($targetstring, &$map, &$item)
     {
-        $data[IN] = null;
-        $data[OUT] = null;
-        $data_time = 0;
-        $itemname = $item->name;
-
         $matches = 0;
+        $datafile = "";
+        $dataname = "";
 
-        if( preg_match("/^wmdata:([^:]*):(.*)", $targetstring, $matches)) {
+        if( preg_match($this->regexpsHandled[0], $targetstring, $matches)) {
             $datafile = $matches[1];
             $dataname = $matches[2];
         }
@@ -37,15 +41,15 @@ class WeatherMapDataSource_wmdata extends WeatherMapDataSource
 
                     $fields = explode("\t",$buffer);
                     if($fields[0] == $dataname) {
-                        $data[IN] = $fields[1];
-                        $data[OUT] = $fields[2];
+                        $this->data[IN] = $fields[1];
+                        $this->data[OUT] = $fields[2];
                         $found = true;
                     }
                 }
 
                 if($found===true) {
                     $stats = stat($datafile);
-                    $data_time = $stats['mtime'];
+                    $this->dataTime = $stats['mtime'];
                 } else {
                     wm_warn("WMData ReadData: Data name ($dataname) didn't exist in ($datafile). [WMWMDATA03]\n");
                 }
@@ -58,18 +62,7 @@ class WeatherMapDataSource_wmdata extends WeatherMapDataSource
             wm_warn("WMData ReadData: $datafile doesn't exist [WMWMDATA01]");
         }
 
-
-        wm_debug( sprintf("WMData ReadData: Returning (%s, %s, %s)\n",
-		        string_or_null($data[IN]),
-		        string_or_null($data[OUT]),
-		        $data_time
-        	));
-
-        return (array (
-            $data[IN],
-            $data[OUT],
-            $data_time
-        ));
+        return $this->ReturnData();
     }
 }
 

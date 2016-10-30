@@ -45,6 +45,7 @@ function plugin_weathermap_version()
     return array(
         'name' => 'weathermap',
         'version' => '0.98a',
+        'compat' => '0.8.8a',
         'longname' => 'PHP Network Weathermap',
         'author' => 'Howard Jones',
         'homepage' => 'http://www.network-weathermap.com/',
@@ -289,7 +290,7 @@ function weathermap_setup_table()
 				schedule VARCHAR(32) NOT NULL DEFAULT '*',
 				archiving SET('on','off') NOT NULL DEFAULT 'off',
 				PRIMARY KEY  (id)
-			) ENGINE=MyISAM;";
+			);";
         } else {
             # Check that all the table columns exist for weathermap_maps
             # There have been a number of changes over versions.
@@ -341,7 +342,7 @@ function weathermap_setup_table()
             $database_updates[] = "CREATE TABLE weathermap_auth (
 				userid MEDIUMINT(9) NOT NULL DEFAULT '0',
 				mapid INT(11) NOT NULL DEFAULT '0'
-			) ENGINE=MyISAM;";
+			);";
         }
 
 
@@ -351,7 +352,7 @@ function weathermap_setup_table()
 				`name` VARCHAR( 128 ) NOT NULL DEFAULT '',
 				`sortorder` INT(11) NOT NULL DEFAULT 0,
 				PRIMARY KEY (id)
-				) ENGINE=MyISAM;";
+				);";
             $database_updates[] = "INSERT INTO weathermap_groups (id,name,sortorder) VALUES (1,'Weathermaps',1)";
         }
 
@@ -363,7 +364,7 @@ function weathermap_setup_table()
 				optname VARCHAR(128) NOT NULL DEFAULT '',
 				optvalue VARCHAR(128) NOT NULL DEFAULT '',
 				PRIMARY KEY  (id)
-			) ENGINE=MyISAM;";
+			);";
         }
 
         if (!in_array('weathermap_data', $tables)) {
@@ -371,7 +372,7 @@ function weathermap_setup_table()
 				rrdfile VARCHAR(255) NOT NULL,data_source_name VARCHAR(19) NOT NULL,
 				  last_time INT(11) NOT NULL,last_value VARCHAR(255) NOT NULL,
 				last_calc VARCHAR(255) NOT NULL, sequence INT(11) NOT NULL, local_data_id INT(11) NOT NULL DEFAULT 0, PRIMARY KEY  (id), KEY rrdfile (rrdfile),
-				  KEY local_data_id (local_data_id), KEY data_source_name (data_source_name) ) ENGINE=MyISAM";
+				  KEY local_data_id (local_data_id), KEY data_source_name (data_source_name) )";
         } else {
             $found_ldi = false;
 

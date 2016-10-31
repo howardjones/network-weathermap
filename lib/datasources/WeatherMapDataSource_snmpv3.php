@@ -132,7 +132,7 @@ class WeatherMapDataSource_snmpv3 extends WeatherMapDataSource
                     if (function_exists("db_fetch_row")) {
 
                         // this is something that should be cached or done in prefetch
-                        $result = db_fetch_assoc(sprintf("select * from host where id=%d LIMIT 1", intval($import)));
+                        $result = db_fetch_assoc(sprintf("select * from host where snmp_version=3 and id=%d LIMIT 1", intval($import)));
 
                         if (! $result) {
                             wm_warn("snmpv3_" . $profile_name . "_import failed to read data from Cacti host profile");
@@ -146,7 +146,7 @@ class WeatherMapDataSource_snmpv3 extends WeatherMapDataSource
                                 "privproto" => "snmp_priv_protocol"
                             );
                             foreach ($mapping as $param => $fieldname) {
-                                $params[$param] = $result[$fieldname];
+                                $params[$param] = $result[0][$fieldname];
                             }
                             if ($params['privproto'] == "[None]" || $params['privpass'] == '') {
                                 $params['seclevel'] = "authNoPriv";

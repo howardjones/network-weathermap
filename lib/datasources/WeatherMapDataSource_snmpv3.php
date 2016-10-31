@@ -125,10 +125,12 @@ class WeatherMapDataSource_snmpv3 extends WeatherMapDataSource
                 } else {
                     // if they are to be copied from a Cacti profile...
 
+                    foreach ($parts as $keyname => $default) {
+                        $params[$keyname] = $default;
+                    }
+
                     if (function_exists("db_fetch_row")) {
-                        foreach ($parts as $keyname => $default) {
-                            $params[$keyname] = $default;
-                        }
+
                         // this is something that should be cached or done in prefetch
                         $result = db_fetch_assoc(sprintf("select * from host where id=%d LIMIT 1", intval($import)));
 
@@ -169,17 +171,21 @@ class WeatherMapDataSource_snmpv3 extends WeatherMapDataSource
                     'out' => OUT
                 );
                 $results = array();
+                $results[IN] = null;
+                $results[OUT] = null;
 
-                foreach ($channels as $name => $id) {
-                    if ($oids[$id] != '-') {
-                        $oid = $oids[$id];
-                        wm_debug("Going to get $oid\n");
-                        $results[$id] = snmp3_get($host, $params['username'], $params['seclevel'], $params['authproto'], $params['authpass'], $params['privproto'], $params['privpass'], $oid, $timeout, $retries);
-                        if ($results[$id] !== FALSE) {
-                            $data[$id] = floatval($get_results);
-                            $item->add_hint("snmp_" . $name . "_raw", $results[$id]);
-                        } else {
-                            $this->down_cache{$host}++;
+                if ($params['username'] != "") {
+                    foreach ($channels as $name => $id) {
+                        if ($oids[$id] != '-') {
+                            $oid = $oids[$id];
+                            wm_debug("Going to get $oid\n");
+                            $results[$id] = snmp3_get($host, $params['username'], $params['seclevel'], $params['authproto'], $params['authpass'], $params['privproto'], $params['privpass'], $oid, $timeout, $retries);
+                            if ($results[$id] !== FALSE) {
+                                $data[$id] = floatval($get_results);
+                                $item->add_hint("snmp_" . $name . "_raw", $results[$id]);
+                            } else {
+                                $this->down_cache{$host}++;
+                            }
                         }
                     }
                 }

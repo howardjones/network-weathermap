@@ -117,18 +117,46 @@ class WeatherMapDataSource_snmpv3 extends WeatherMapDataSource
 
                 $params = array();
 
-
+                // If they are explicitly defined...
                 if (is_null($import)) {
                     foreach ($parts as $keyname => $default) {
                         $params[$keyname] = $map->get_hint("snmpv3_" . $profile_name . "_" . $keyname, $default);
                     }
                 } else {
-                    foreach ($parts as $keyname => $default) {
-                        $params[$keyname] = $default;
-                    }
+                    // if they are to be copied from a Cacti profile...
 
-                    // TODO: some magic to get the SNMP settings from Cacti in here
-                    throw new WeathermapUnimplementedException("Profile copying not written yet!");
+                    if (function_exists("db_fetch_row")) {
+                        foreach ($parts as $keyname => $default) {
+                            $params[$keyname] = $default;
+                        }
+                        // this is something that should be cached or done in prefetch
+                        $result = db_fetch_assoc(sprintf("select * from host where id=%d LIMIT 1", intval($import)));
+
+                        if (! $result) {
+                            wm_warn("snmpv3_" . $profile_name . "_import failed to read data from Cacti host profile");
+                        } else {
+
+                            $mapping = array(
+                                "username" => "snmp_username",
+                                "authpass" => "snmp_password",
+                                "privpass" => "snmp_priv_passphrase",
+                                "authproto" => "snmp_auth_protocol",
+                                "privproto" => "snmp_priv_protocol"
+                            );
+                            foreach ($mapping as $param => $fieldname) {
+                                $params[$param] = $result[$fieldname];
+                            }
+                            if ($params['privproto'] == "[None]" || $params['privpass'] == '') {
+                                $params['seclevel'] = "authNoPriv";
+                                $params['privproto'] = "";
+                            } else {
+                                $params['seclevel'] = "authPriv";
+                            }
+                        }
+
+                    } else {
+                        wm_warn("snmpv3_" . $profile_name . "_import is set but not running in Cacti");
+                    }
                 }
 
                 ob_start();

@@ -9,7 +9,7 @@ class WeatherMapDataSource_dsstats extends WeatherMapDataSource {
 		global $config;
 		if($map->context=='cacti')
 		{
-			if( !function_exists('db_fetch_row') )
+			if( !function_exists('db_fetch_assoc') )
 			{
 				wm_debug("ReadData DSStats: Cacti database library not found. [DSSTATS001]\n");
 				return(FALSE);

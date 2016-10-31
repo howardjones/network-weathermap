@@ -1,5 +1,9 @@
 [info]
 compat = 0.8.8a
-author=howie@thingy.com
+author=Howard Jones
 homepage=http://www.network-weathermap.com/
 longname=Network Weathermap
+name=weathermap
+version=0.98a
+email=howie@thingy.com
+url=http://www.network-weathermap.com/versions.php

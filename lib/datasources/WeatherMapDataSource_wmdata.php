@@ -8,7 +8,7 @@ class WeatherMapDataSource_wmdata extends WeatherMapDataSource
         parent::__construct();
 
         $this->regexpsHandled = array(
-            '/^wmdata:([^:]*):(.*)'
+            '/^wmdata:([^:]*):(.*)/'
         );
         $this->name= "WMData";
     }

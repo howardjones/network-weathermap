@@ -10,8 +10,8 @@
 
 // You could also fetch interface states from IF-MIB with it.
 
-// TARGET snmp2c:public:hostname:1.3.6.1.4.1.3711.1.1:1.3.6.1.4.1.3711.1.2
-// (that is, TARGET snmp:community:host:in_oid:out_oid
+// TARGET snmp3:PROFILE1:hostname:1.3.6.1.4.1.3711.1.1:1.3.6.1.4.1.3711.1.2
+// (that is, TARGET snmp3:profilename:host:in_oid:out_oid
 
 // http://feathub.com/howardjones/network-weathermap/+1
 
@@ -52,7 +52,7 @@ class WeatherMapDataSource_snmpv3 extends WeatherMapDataSource
         $retries = 2;
         $abort_count = 0;
 
-        $in_result = NULL;
+        $get_results = NULL;
         $out_result = NULL;
 
         $timeout = intval($map->get_hint("snmp_timeout", $timeout));
@@ -66,8 +66,8 @@ class WeatherMapDataSource_snmpv3 extends WeatherMapDataSource
         if (preg_match('/^snmp3:([^:]+):([^:]+):([^:]+):([^:]+)$/', $targetstring, $matches)) {
             $profile_name = $matches[1];
             $host = $matches[2];
-            $in_oid = $matches[3];
-            $out_oid = $matches[4];
+            $oids[IN] = $matches[3];
+            $oids[OUT] = $matches[4];
 
             if (
                 ($abort_count == 0)
@@ -106,51 +106,65 @@ class WeatherMapDataSource_snmpv3 extends WeatherMapDataSource
 
                 $import = $map->get_hint("snmpv3_" . $profile_name . "_import");
 
+                $parts = array(
+                    "username" => "",
+                    "seclevel" => "noAuthNoPriv",
+                    "authpass" => "",
+                    "privpass" => "",
+                    "authproto" => "",
+                    "privproto" => ""
+                );
+
+                $params = array();
+
+
                 if (is_null($import)) {
-                    $auth_username = $map->get_hint("snmpv3_" . $profile_name . "_username", "");
-                    $auth_seclevel = $map->get_hint("snmpv3_" . $profile_name . "_username", "noAuthNoPriv");
-                    $auth_authpass = $map->get_hint("snmpv3_" . $profile_name . "_username", "");
-                    $auth_authproto = $map->get_hint("snmpv3_" . $profile_name . "_username", "");
-                    $auth_privpass = $map->get_hint("snmpv3_" . $profile_name . "_username", "");
-                    $auth_privproto = $map->get_hint("snmpv3_" . $profile_name . "_username", "");
+                    foreach ($parts as $keyname => $default) {
+                        $params[$keyname] = $map->get_hint("snmpv3_" . $profile_name . "_" . $keyname, $default);
+                    }
                 } else {
+                    foreach ($parts as $keyname => $default) {
+                        $params[$keyname] = $default;
+                    }
+
                     // TODO: some magic to get the SNMP settings from Cacti in here
-                    $auth_username = "";
-                    $auth_seclevel = "noAuthNoPriv";
-                    $auth_authpass = "";
-                    $auth_authproto = "";
-                    $auth_privpass = "";
-                    $auth_privproto = "";
+                    throw new WeathermapUnimplementedException("Profile copying not written yet!");
+                }
 
-                    if ($in_oid != '-') {
-                        $in_result = snmp3_get($host, $auth_username, $auth_seclevel, $auth_authproto, $auth_authpass, $auth_privproto, $auth_privpass, $in_oid, $timeout, $retries);
-                        if ($in_result !== FALSE) {
-                            $data[IN] = floatval($in_result);
-                            $item->add_hint("snmp_in_raw", $in_result);
+                ob_start();
+                var_dump($params);
+                $result = ob_get_clean();
+                wm_debug($result);
+
+                $channels = array(
+                    'in' => IN,
+                    'out' => OUT
+                );
+                $results = array();
+
+                foreach ($channels as $name => $id) {
+                    if ($oids[$id] != '-') {
+                        $oid = $oids[$id];
+                        wm_debug("Going to get $oid\n");
+                        $results[$id] = snmp3_get($host, $params['username'], $params['seclevel'], $params['authproto'], $params['authpass'], $params['privproto'], $params['privpass'], $oid, $timeout, $retries);
+                        if ($results[$id] !== FALSE) {
+                            $data[$id] = floatval($get_results);
+                            $item->add_hint("snmp_" . $name . "_raw", $results[$id]);
                         } else {
                             $this->down_cache{$host}++;
                         }
-                    }
-                    if ($out_oid != '-') {
-                        $out_result = snmp3_get($host, $auth_username, $auth_seclevel, $auth_authproto, $auth_authpass, $auth_privproto, $auth_privpass, $out_oid, $timeout, $retries);
-                        if ($out_result !== FALSE) {
-                            // use floatval() here to force the output to be *some* kind of number
-                            // just in case the stupid formatting stuff doesn't stop net-snmp returning 'down' instead of 2
-                            $data[OUT] = floatval($out_result);
-                            $item->add_hint("snmp_out_raw", $out_result);
-                        } else {
-                            $this->down_cache{$host}++;
-                        }
-                    }
-
-                    wm_debug("SNMP3 ReadData: Got $in_result and $out_result\n");
-
-                    $data_time = time();
-
-                    if (function_exists("snmp_set_quick_print")) {
-                        snmp_set_quick_print($was);
                     }
                 }
+
+
+                wm_debug("SNMP3 ReadData: Got %s and %s\n", $results[IN], $results[OUT]);
+
+                $data_time = time();
+
+                if (function_exists("snmp_set_quick_print")) {
+                    snmp_set_quick_print($was);
+                }
+
             } else {
                 wm_warn("SNMP for $host has reached $abort_count failures. Skipping. [WMSNMP01]");
             }

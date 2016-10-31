@@ -42,6 +42,9 @@ function plugin_weathermap_uninstall()
 
 function plugin_weathermap_version()
 {
+    global $config;
+    $info = parse_ini_file($config['base_path'] . '/plugins/weathermap/INFO', true);
+    return $info['info'];
     return array(
         'name' => 'weathermap',
         'version' => '0.98a',

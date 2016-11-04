@@ -93,18 +93,18 @@ class WeatherMapDataSource_snmpv3 extends WeatherMapDataSource
                 }
 
 
-                # snmpv3_PROFILE1_import 33
+                # snmp3_PROFILE1_import 33
                 #
                 # OR
                 #
-                # snmpv3_PROFILE1_username
-                # snmpv3_PROFILE1_seclevel
-                # snmpv3_PROFILE1_authproto
-                # snmpv3_PROFILE1_authpass
-                # snmpv3_PROFILE1_privproto
-                # snmpv3_PROFILE1_privpass
+                # snmp3_PROFILE1_username
+                # snmp3_PROFILE1_seclevel
+                # snmp3_PROFILE1_authproto
+                # snmp3_PROFILE1_authpass
+                # snmp3_PROFILE1_privproto
+                # snmp3_PROFILE1_privpass
 
-                $import = $map->get_hint("snmpv3_" . $profile_name . "_import");
+                $import = $map->get_hint("snmp3_" . $profile_name . "_import");
 
                 $parts = array(
                     "username" => "",
@@ -119,23 +119,25 @@ class WeatherMapDataSource_snmpv3 extends WeatherMapDataSource
 
                 // If they are explicitly defined...
                 if (is_null($import)) {
+                    wm_debug("SNMPv3 ReadData: no import, defining profile $profile_name from SET variables\n");
                     foreach ($parts as $keyname => $default) {
-                        $params[$keyname] = $map->get_hint("snmpv3_" . $profile_name . "_" . $keyname, $default);
+                        $params[$keyname] = $map->get_hint("snmp3_" . $profile_name . "_" . $keyname, $default);
                     }
                 } else {
+                    $import = intval($import);
                     // if they are to be copied from a Cacti profile...
+                    wm_debug("SNMPv3 ReadData: will try to import profile $profile_name from Cacti host id $import\n");
 
                     foreach ($parts as $keyname => $default) {
                         $params[$keyname] = $default;
                     }
 
                     if (function_exists("db_fetch_row")) {
-
                         // this is something that should be cached or done in prefetch
-                        $result = db_fetch_assoc(sprintf("select * from host where snmp_version=3 and id=%d LIMIT 1", intval($import)));
+                        $result = db_fetch_assoc(sprintf("select * from host where snmp_version=3 and id=%d LIMIT 1", $import));
 
                         if (! $result) {
-                            wm_warn("snmpv3_" . $profile_name . "_import failed to read data from Cacti host profile");
+                            wm_warn("SNMPv3 ReadData snmp3_" . $profile_name . "_import failed to read data from Cacti host id $import");
                         } else {
 
                             $mapping = array(
@@ -154,17 +156,15 @@ class WeatherMapDataSource_snmpv3 extends WeatherMapDataSource
                             } else {
                                 $params['seclevel'] = "authPriv";
                             }
+                            wm_debug("SNMPv3 ReadData Imported Cacti info for device %d into profile named %s\n", $import, $profile_name);
                         }
 
                     } else {
-                        wm_warn("snmpv3_" . $profile_name . "_import is set but not running in Cacti");
+                        wm_warn("SNMPv3 ReadData snmp3_" . $profile_name . "_import is set but not running in Cacti");
                     }
                 }
 
-                ob_start();
-                var_dump($params);
-                $result = ob_get_clean();
-                wm_debug($result);
+                wm_debug("SNMPv3 ReadData: SNMP settings are %s\n", json_encode($params));
 
                 $channels = array(
                     'in' => IN,
@@ -186,12 +186,15 @@ class WeatherMapDataSource_snmpv3 extends WeatherMapDataSource
                             } else {
                                 $this->down_cache{$host}++;
                             }
+                        } else {
+                            wm_debug("SNMPv3 ReadData: skipping $name channel: OID is '-'\n");
                         }
                     }
+                } else {
+                    wm_debug("SNMPv3 ReadData: no username defined, not going to try.\n");
                 }
 
-
-                wm_debug("SNMP3 ReadData: Got %s and %s\n", $results[IN], $results[OUT]);
+                wm_debug("SNMPv3 ReadData: Got '%s' and '%s'\n", $results[IN], $results[OUT]);
 
                 $data_time = time();
 
@@ -202,9 +205,11 @@ class WeatherMapDataSource_snmpv3 extends WeatherMapDataSource
             } else {
                 wm_warn("SNMP for $host has reached $abort_count failures. Skipping. [WMSNMP01]");
             }
+        } else {
+            wm_debug("SNMPv3 ReadData: regexp didn't match after Recognise did - this is odd!\n");
         }
 
-        wm_debug("SNMP3 ReadData: Returning (" . ($data[IN] === NULL ? 'NULL' : $data[IN]) . "," . ($data[OUT] === NULL ? 'NULL' : $data[OUT]) . ",$data_time)\n");
+        wm_debug("SNMPv3 ReadData: Returning (" . ($data[IN] === NULL ? 'NULL' : $data[IN]) . "," . ($data[OUT] === NULL ? 'NULL' : $data[OUT]) . ",$data_time)\n");
 
         return array($data[IN], $data[OUT], $data_time);
     }

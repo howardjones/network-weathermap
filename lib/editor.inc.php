@@ -129,6 +129,54 @@ function wm_editor_sanitize_conffile($filename)
     return $filename;
 }
 
+function get_config_files($mapdir)
+{
+    $titles = array();
+
+    if (is_dir($mapdir)) {
+        $n = 0;
+        $dh = opendir($mapdir);
+
+        if ($dh) {
+            while (false !== ($file = readdir($dh))) {
+                $realfile = $mapdir . DIRECTORY_SEPARATOR . $file;
+                $note = "";
+
+                // skip directories, unreadable files, .files and anything that doesn't come through the sanitiser unchanged
+                if ((is_file($realfile)) && (is_readable($realfile)) && (!preg_match('/^\./',
+                        $file)) && (wm_editor_sanitize_conffile($file) == $file)
+                ) {
+                    if (!is_writable($realfile)) {
+                        $note .= "(read-only)";
+                    }
+                    $title = '(no title)';
+                    $fd = fopen($realfile, "r");
+                    if ($fd) {
+                        while (!feof($fd)) {
+                            $buffer = fgets($fd, 4096);
+
+                            if (preg_match('/^\s*TITLE\s+(.*)/i', $buffer, $matches)) {
+                                $title = wm_editor_sanitize_string($matches[1]);
+                            }
+                        }
+
+                        fclose($fd);
+                        $titles[$file] = $title;
+                        $notes[$file] = $note;
+                        $n++;
+                    }
+                }
+            }
+
+            closedir($dh);
+        }
+
+        ksort($titles);
+
+        return $titles;
+    }
+}
+
 function show_editor_startpage()
 {
 	global $mapdir, $WEATHERMAP_VERSION, $config_loaded, $cacti_found, $ignore_cacti,$configerror;
@@ -184,6 +232,7 @@ function show_editor_startpage()
 
 	print '<p><small>Note: filenames must contain no spaces and end in .conf</small></p>';
 	print '</form>';
+
 
 	$titles = array();
 

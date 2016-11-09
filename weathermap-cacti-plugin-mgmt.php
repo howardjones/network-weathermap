@@ -27,6 +27,15 @@ if (isset($_POST['action'])) {
 
 switch ($action) {
 
+    case 'dump_maps':
+       	Header("Content-type: application/json"); 
+	$data = array(
+		"maps"=>$manager->getMaps(),
+		"groups"=>$manager->getGroups()
+	);
+	print json_encode($data);
+	break;
+
     case 'enable_poller_output':
         weathermap_setting_save(0, 'rrd_use_poller_output', 1);
         header("Location: ?action=map_settings&id=0");

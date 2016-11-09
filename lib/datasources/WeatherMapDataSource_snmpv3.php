@@ -181,7 +181,7 @@ class WeatherMapDataSource_snmpv3 extends WeatherMapDataSource
                             wm_debug("Going to get $oid\n");
                             $results[$id] = snmp3_get($host, $params['username'], $params['seclevel'], $params['authproto'], $params['authpass'], $params['privproto'], $params['privpass'], $oid, $timeout, $retries);
                             if ($results[$id] !== FALSE) {
-                                $data[$id] = floatval($get_results);
+                                $data[$id] = floatval($results[$id]);
                                 $item->add_hint("snmp_" . $name . "_raw", $results[$id]);
                             } else {
                                 $this->down_cache{$host}++;

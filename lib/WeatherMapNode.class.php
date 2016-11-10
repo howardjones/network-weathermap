@@ -8,49 +8,34 @@ require_once "HTML_ImageMap.class.php";
 
 class WeatherMapNode extends WeatherMapDataItem
 {
-	var $owner;
-	var $id;
     var $drawable;
 	var $x,	$y;
 	var $original_x, $original_y,$relative_resolved;
 	var $width, $height;
-	var $label, $proclabel, $labelfont;
+	var $label, $proclabel;
 	var $labelangle;
-	var $infourl = array();
-	var $notes;
-	var $colours = array();
-	var $overliburl;
-	var $overlibwidth, $overlibheight;
-	var $overlibcaption = array();
-	var $maphtml;
 	var $selected = 0;
-	var $iconfile, $iconscalew, $iconscaleh;
-	var $targets = array();
-	var $bandwidth_in, $bandwidth_out;
-	var $inpercent, $outpercent;
-	var $max_bandwidth_in, $max_bandwidth_out;
-	var $max_bandwidth_in_cfg, $max_bandwidth_out_cfg;
-	var $labeloffset, $labeloffsetx, $labeloffsety;
 
-	var $inherit_fieldlist;
+    var $pos_named;
+    var $named_offsets;
+    var $relative_name;
+
+	var $iconfile, $iconscalew, $iconscaleh;
+	var $labeloffset, $labeloffsetx, $labeloffsety;
 
 	var $labelbgcolour;
 	var $labeloutlinecolour;
 	var $labelfontcolour;
 	var $labelfontshadowcolour;
-	var $cachefile;
-	var $usescale;
+
+	var $labelfont;
+
 	var $useiconscale;
-	var $scaletype, $iconscaletype;
-	var $inscalekey,$outscalekey;
-	var $inscaletag, $outscaletag;
-	# var $incolour,$outcolour;
-	var $scalevar, $iconscalevar;
-	var $notestext = array();
+	var $iconscaletype;
+	var $iconscalevar;
 	var $image;
-	var $centre_x, $centre_y;
+	var $centre_x, $centre_y; // TODO these were for ORIGIN
 	var $relative_to;
-	var $template;
 	var $polar;
 	var $boundingboxes=array();
 
@@ -107,6 +92,7 @@ class WeatherMapNode extends WeatherMapDataItem
             'iconscalew' => 0,
             'iconscaleh' => 0,
             'targets' => array(),
+            'named_offsets' => array(),
             'infourl' => array(IN => '', OUT => ''),
             'notestext' => array(IN => '', OUT => ''),
             'notes' => array(),
@@ -177,16 +163,22 @@ class WeatherMapNode extends WeatherMapDataItem
 
 		// start thesless e off with sensible values, so that bbox
 		// calculations are easier.
-		$icon_x1 = $this->x; $icon_x2 = $this->x;
-		$icon_y1 = $this->y; $icon_y2 = $this->y;
-		$label_x1 = $this->x; $label_x2 = $this->x;
-		$label_y1 = $this->y; $label_y2 = $this->y;
-		$boxwidth = 0; $boxheight = 0;
+		$icon_x1 = $this->x;
+		$icon_x2 = $this->x;
+		$icon_y1 = $this->y;
+		$icon_y2 = $this->y;
+
+		$label_x1 = $this->x;
+		$label_x2 = $this->x;
+		$label_y1 = $this->y;
+		$label_y2 = $this->y;
+
+		$boxwidth = 0;
+		$boxheight = 0;
 		$icon_w = 0;
 		$icon_h = 0;
 
 		$col = new WMColour('none');
-		# print $col->as_string();
 
 		// if a target is specified, and you haven't forced no background, then the background will
 		// come from the SCALE in USESCALE
@@ -239,14 +231,12 @@ class WeatherMapNode extends WeatherMapDataItem
 			{
 				list($colicon,$node_iconscalekey,$icontag) =
                     $map->scales[$this->useiconscale]->colourFromValue($pc, $this->name);
-					// $map->NewColourFromPercent($pc, $this->useiconscale,$this->name );
 			}
 			else
 			{
 				// use the absolute value if we aren't doing percentage scales.
 				list($colicon,$node_iconscalekey,$icontag) =
                     $map->scales[$this->useiconscale]->colourFromValue($val, $this->name, false);
-					// $map->NewColourFromPercent($val, $this->useiconscale,$this->name, FALSE );
 			}
 		}
 
@@ -309,8 +299,10 @@ class WeatherMapNode extends WeatherMapDataItem
                 # $this->width = $boxwidth;
                 # $this->height = $boxheight;
             }
-            $map->nodes[$this->name]->width = $boxwidth;
-            $map->nodes[$this->name]->height = $boxheight;
+//            $map->nodes[$this->name]->width = $boxwidth;
+//            $map->nodes[$this->name]->height = $boxheight;
+            $this->width = $boxwidth;
+            $this->height = $boxheight;
 
             # print "TEXT at $txt_x , $txt_y\n";
         }
@@ -562,11 +554,14 @@ class WeatherMapNode extends WeatherMapDataItem
 				$icon_x2 = $this->x + $icon_w / 2;
 				$icon_y2 = $this->y + $icon_h / 2;
 
-				$map->nodes[$this->name]->width = $icon_w;
-				$map->nodes[$this->name]->height = $icon_h;
+//				$map->nodes[$this->name]->width = $icon_w;
+				$this->width = $icon_w;
+				$this->height = $icon_h;
+//				$map->nodes[$this->name]->height = $icon_h;
 
 				// $map->imap->addArea("Rectangle", "NODE:" . $this->name . ':0', '', array($icon_x1, $icon_y1, $icon_x2, $icon_y2));
-				$map->nodes[$this->name]->boundingboxes[] = array($icon_x1, $icon_y1, $icon_x2, $icon_y2);
+//				$map->nodes[$this->name]->boundingboxes[] = array($icon_x1, $icon_y1, $icon_x2, $icon_y2);
+				$this->boundingboxes[] = array($icon_x1, $icon_y1, $icon_x2, $icon_y2);
 			}
 
 		}
@@ -592,7 +587,8 @@ class WeatherMapNode extends WeatherMapDataItem
 
 		if ($this->label != '')
 		{
-			$map->nodes[$this->name]->boundingboxes[] = array($label_x1, $label_y1, $label_x2, $label_y2);
+			$this->boundingboxes[] = array($label_x1, $label_y1, $label_x2, $label_y2);
+//			$map->nodes[$this->name]->boundingboxes[] = array($label_x1, $label_y1, $label_x2, $label_y2);
 		}
 
 		// work out the bounding box of the whole thing
@@ -700,11 +696,14 @@ class WeatherMapNode extends WeatherMapDataItem
 		# imagerectangle($node_im,$label_x1,$label_y1,$label_x2,$label_y2,$map->black);
 		# imagerectangle($node_im,$icon_x1,$icon_y1,$icon_x2,$icon_y2,$map->black);
 
-		$map->nodes[$this->name]->centre_x = $this->x - $bbox_x1;
-		$map->nodes[$this->name]->centre_y = $this->y - $bbox_y1;
+		$this->centre_x = $this->x - $bbox_x1;
+//		$map->nodes[$this->name]->centre_x = $this->x - $bbox_x1;
+		$this->centre_y = $this->y - $bbox_y1;
+//		$map->nodes[$this->name]->centre_y = $this->y - $bbox_y1;
 
 		# $this->image = $node_im;
-		$map->nodes[$this->name]->image = $node_im;
+		$this->image = $node_im;
+//		$map->nodes[$this->name]->image = $node_im;
 
         $this->makeImageMapAreas();
 	}
@@ -815,106 +814,99 @@ class WeatherMapNode extends WeatherMapDataItem
 		$this->id = $newowner->next_id++;
 	}
 
-	function CopyFrom(&$source)
-	{
-		wm_debug("Initialising NODE $this->name from $source->name\n");
-		assert('is_object($source)');
 
-		foreach (array_keys($this->inherit_fieldlist)as $fld) {
-			if ($fld != 'template') $this->$fld=$source->$fld;
-		}
-	}
+    function WriteConfig()
+    {
+        $output = '';
 
-	function WriteConfig()
-	{
-		$output='';
+        # $output .= "# ID ".$this->id." - first seen in ".$this->defined_in."\n";
 
-		# $output .= "# ID ".$this->id." - first seen in ".$this->defined_in."\n";
+        // This allows the editor to wholesale-replace a single node's configuration
+        // at write-time - it should include the leading NODE xyz line (to allow for renaming)
+        if ($this->config_override != '') {
+            $output = $this->config_override . "\n";
+        } else {
+            # $defdef = $this->owner->defaultnode;
+            $dd = $this->owner->nodes[$this->template];
 
-		// This allows the editor to wholesale-replace a single node's configuration
-		// at write-time - it should include the leading NODE xyz line (to allow for renaming)
-		if ($this->config_override != '')
-		{
-			$output  = $this->config_override."\n";
-		}
-		else
-		{
-			# $defdef = $this->owner->defaultnode;
-			$dd = $this->owner->nodes[$this->template];
+            wm_debug("Writing config for NODE $this->name against $this->template\n");
 
-			wm_debug("Writing config for NODE $this->name against $this->template\n");
+            # $field = 'zorder'; $keyword = 'ZORDER';
+            $basic_params = array(
+                # array('template','TEMPLATE',CONFIG_TYPE_LITERAL),
+                array('label', 'LABEL', CONFIG_TYPE_LITERAL),
+                array('zorder', 'ZORDER', CONFIG_TYPE_LITERAL),
+                array('labeloffset', 'LABELOFFSET', CONFIG_TYPE_LITERAL),
+                array('labelfont', 'LABELFONT', CONFIG_TYPE_LITERAL),
+                array('labelangle', 'LABELANGLE', CONFIG_TYPE_LITERAL),
+                array('overlibwidth', 'OVERLIBWIDTH', CONFIG_TYPE_LITERAL),
+                array('overlibheight', 'OVERLIBHEIGHT', CONFIG_TYPE_LITERAL),
 
-			# $field = 'zorder'; $keyword = 'ZORDER';
-			$basic_params = array(
-					# array('template','TEMPLATE',CONFIG_TYPE_LITERAL),
-					array('label','LABEL',CONFIG_TYPE_LITERAL),
-					array('zorder','ZORDER',CONFIG_TYPE_LITERAL),
-					array('labeloffset','LABELOFFSET',CONFIG_TYPE_LITERAL),
-					array('labelfont','LABELFONT',CONFIG_TYPE_LITERAL),
-					array('labelangle','LABELANGLE',CONFIG_TYPE_LITERAL),
-					array('overlibwidth','OVERLIBWIDTH',CONFIG_TYPE_LITERAL),
-					array('overlibheight','OVERLIBHEIGHT',CONFIG_TYPE_LITERAL),
+                array('aiconoutlinecolour', 'AICONOUTLINECOLOR', CONFIG_TYPE_COLOR),
+                array('aiconfillcolour', 'AICONFILLCOLOR', CONFIG_TYPE_COLOR),
+                array('labeloutlinecolour', 'LABELOUTLINECOLOR', CONFIG_TYPE_COLOR),
+                array('labelfontshadowcolour', 'LABELFONTSHADOWCOLOR', CONFIG_TYPE_COLOR),
+                array('labelbgcolour', 'LABELBGCOLOR', CONFIG_TYPE_COLOR),
+                array('labelfontcolour', 'LABELFONTCOLOR', CONFIG_TYPE_COLOR)
+            );
 
-					array('aiconoutlinecolour','AICONOUTLINECOLOR',CONFIG_TYPE_COLOR),
-					array('aiconfillcolour','AICONFILLCOLOR',CONFIG_TYPE_COLOR),
-					array('labeloutlinecolour','LABELOUTLINECOLOR',CONFIG_TYPE_COLOR),
-					array('labelfontshadowcolour','LABELFONTSHADOWCOLOR',CONFIG_TYPE_COLOR),
-					array('labelbgcolour','LABELBGCOLOR',CONFIG_TYPE_COLOR),
-					array('labelfontcolour','LABELFONTCOLOR',CONFIG_TYPE_COLOR)
-				);
+            # TEMPLATE must come first. DEFAULT
+            if ($this->template != 'DEFAULT' && $this->template != ':: DEFAULT ::') {
+                $output .= "\tTEMPLATE " . $this->template . "\n";
+            }
 
-			# TEMPLATE must come first. DEFAULT
-			if ($this->template != 'DEFAULT' && $this->template != ':: DEFAULT ::')
-			{
-				$output.="\tTEMPLATE " . $this->template . "\n";
-			}
+            foreach ($basic_params as $param) {
+                $field = $param[0];
+                $keyword = $param[1];
 
-			foreach ($basic_params as $param)
-			{
-				$field = $param[0];
-				$keyword = $param[1];
+                #	$comparison=($this->name == 'DEFAULT' ? $this->inherit_fieldlist[$field] : $defdef->$field);
+                if ($this->$field != $dd->$field) {
+                    if ($param[2] == CONFIG_TYPE_COLOR) $output .= "\t$keyword " . $this->$field->asConfig() . "\n";
+                    if ($param[2] == CONFIG_TYPE_LITERAL) $output .= "\t$keyword " . $this->$field . "\n";
+                }
+            }
 
-			#	$comparison=($this->name == 'DEFAULT' ? $this->inherit_fieldlist[$field] : $defdef->$field);
-				if ($this->$field != $dd->$field)
-				{
-					if ($param[2] == CONFIG_TYPE_COLOR) $output.="\t$keyword " . $this->$field->asConfig() . "\n";
-					if ($param[2] == CONFIG_TYPE_LITERAL) $output.="\t$keyword " . $this->$field . "\n";
-				}
-			}
-
-			// IN/OUT are the same, so we can use the simpler form here
+            // IN/OUT are the same, so we can use the simpler form here
 #			print_r($this->infourl);
-			#$comparison=($this->name == 'DEFAULT'
-			#? $this->inherit_fieldlist['infourl'][IN] : $defdef->infourl[IN]);
-			if ($this->infourl[IN] != $dd->infourl[IN]) { $output.="\tINFOURL " . $this->infourl[IN] . "\n"; }
+            #$comparison=($this->name == 'DEFAULT'
+            #? $this->inherit_fieldlist['infourl'][IN] : $defdef->infourl[IN]);
+            if ($this->infourl[IN] != $dd->infourl[IN]) {
+                $output .= "\tINFOURL " . $this->infourl[IN] . "\n";
+            }
 
-			#$comparison=($this->name == 'DEFAULT'
-			#? $this->inherit_fieldlist['overlibcaption'][IN] : $defdef->overlibcaption[IN]);
-			if ($this->overlibcaption[IN] != $dd->overlibcaption[IN]) { $output.="\tOVERLIBCAPTION " . $this->overlibcaption[IN] . "\n"; }
+            #$comparison=($this->name == 'DEFAULT'
+            #? $this->inherit_fieldlist['overlibcaption'][IN] : $defdef->overlibcaption[IN]);
+            if ($this->overlibcaption[IN] != $dd->overlibcaption[IN]) {
+                $output .= "\tOVERLIBCAPTION " . $this->overlibcaption[IN] . "\n";
+            }
 
-			// IN/OUT are the same, so we can use the simpler form here
-			# $comparison=($this->name == 'DEFAULT'
-			# ? $this->inherit_fieldlist['notestext'][IN] : $defdef->notestext[IN]);
-			if ($this->notestext[IN] != $dd->notestext[IN]) { $output.="\tNOTES " . $this->notestext[IN] . "\n"; }
+            // IN/OUT are the same, so we can use the simpler form here
+            # $comparison=($this->name == 'DEFAULT'
+            # ? $this->inherit_fieldlist['notestext'][IN] : $defdef->notestext[IN]);
+            if ($this->notestext[IN] != $dd->notestext[IN]) {
+                $output .= "\tNOTES " . $this->notestext[IN] . "\n";
+            }
 
-			# $comparison=($this->name == 'DEFAULT'
-			# ? $this->inherit_fieldlist['overliburl'][IN] : $defdef->overliburl[IN]);
-			if ($this->overliburl[IN] != $dd->overliburl[IN]) { $output.="\tOVERLIBGRAPH " . join(" ",$this->overliburl[IN]) . "\n"; }
+            # $comparison=($this->name == 'DEFAULT'
+            # ? $this->inherit_fieldlist['overliburl'][IN] : $defdef->overliburl[IN]);
+            if ($this->overliburl[IN] != $dd->overliburl[IN]) {
+                $output .= "\tOVERLIBGRAPH " . join(" ", $this->overliburl[IN]) . "\n";
+            }
 
-			$val = $this->iconscalew. " " . $this->iconscaleh. " " .$this->iconfile;
+            $val = $this->iconscalew . " " . $this->iconscaleh . " " . $this->iconfile;
 
-			$comparison = $dd->iconscalew. " " . $dd->iconscaleh . " " . $dd->iconfile;
+            $comparison = $dd->iconscalew . " " . $dd->iconscaleh . " " . $dd->iconfile;
 
-			if ($val != $comparison) {
-				$output.="\tICON ";
-				if ($this->iconscalew > 0) {
-					$output .= $this->iconscalew." ".$this->iconscaleh." ";
-				}
-				$output .= ($this->iconfile=='' ?  'none' : $this->iconfile) . "\n";
-			}
+            if ($val != $comparison) {
+                $output .= "\tICON ";
+                if ($this->iconscalew > 0) {
+                    $output .= $this->iconscalew . " " . $this->iconscaleh . " ";
+                }
+                $output .= ($this->iconfile == '' ? 'none' : $this->iconfile) . "\n";
+            }
 
-			# $comparison=($this->name == 'DEFAULT'
-			# ? $this->inherit_fieldlist['targets'] : $defdef->targets);
+            # $comparison=($this->name == 'DEFAULT'
+            # ? $this->inherit_fieldlist['targets'] : $defdef->targets);
 
             if ($this->targets != $dd->targets) {
                 $output .= "\tTARGET";
@@ -926,85 +918,102 @@ class WeatherMapNode extends WeatherMapDataItem
                 $output .= "\n";
             }
 
-		#	$comparison = ($this->name == 'DEFAULT' ? $this->inherit_fieldlist['usescale'] : $defdef->usescale) . " " .
-		#		($this->name == 'DEFAULT' ? $this->inherit_fieldlist['scalevar'] : $defdef->scalevar);
-			$val = $this->usescale . " " . $this->scalevar . " " . $this->scaletype;
-			$comparison = $dd->usescale . " " . $dd->scalevar . " " . $dd->scaletype;
+            #	$comparison = ($this->name == 'DEFAULT' ? $this->inherit_fieldlist['usescale'] : $defdef->usescale) . " " .
+            #		($this->name == 'DEFAULT' ? $this->inherit_fieldlist['scalevar'] : $defdef->scalevar);
+            $val = $this->usescale . " " . $this->scalevar . " " . $this->scaletype;
+            $comparison = $dd->usescale . " " . $dd->scalevar . " " . $dd->scaletype;
 
-			if (($val != $comparison) ) { $output.="\tUSESCALE " . $val . "\n"; }
+            if (($val != $comparison)) {
+                $output .= "\tUSESCALE " . $val . "\n";
+            }
 
 #			$comparison = ($this->name == 'DEFAULT'
 #				? $this->inherit_fieldlist['useiconscale'] : $defdef->useiconscale) . " " .
 #				($this->name == 'DEFAULT' ? $this->inherit_fieldlist['iconscalevar'] : $defdef->iconscalevar);
-			$val = $this->useiconscale . " " . $this->iconscalevar;
-			$comparison= $dd->useiconscale . " " . $dd->iconscalevar;
+            $val = $this->useiconscale . " " . $this->iconscalevar;
+            $comparison = $dd->useiconscale . " " . $dd->iconscalevar;
 
-			if ($val != $comparison) { $output.="\tUSEICONSCALE " .$val . "\n"; }
+            if ($val != $comparison) {
+                $output .= "\tUSEICONSCALE " . $val . "\n";
+            }
 
-			#$comparison = ($this->name == 'DEFAULT'
-			#? $this->inherit_fieldlist['labeloffsetx'] : $defdef->labeloffsetx) . " " . ($this->name == 'DEFAULT'
-		#		? $this->inherit_fieldlist['labeloffsety'] : $defdef->labeloffsety);
-			$val = $this->labeloffsetx . " " . $this->labeloffsety;
-			$comparison = $dd->labeloffsetx . " " . $dd->labeloffsety;
+            #$comparison = ($this->name == 'DEFAULT'
+            #? $this->inherit_fieldlist['labeloffsetx'] : $defdef->labeloffsetx) . " " . ($this->name == 'DEFAULT'
+            #		? $this->inherit_fieldlist['labeloffsety'] : $defdef->labeloffsety);
+            $val = $this->labeloffsetx . " " . $this->labeloffsety;
+            $comparison = $dd->labeloffsetx . " " . $dd->labeloffsety;
 
-			if ($comparison != $val ) { $output.="\tLABELOFFSET " . $val . "\n"; }
+            if ($comparison != $val) {
+                $output .= "\tLABELOFFSET " . $val . "\n";
+            }
 
-			#$comparison=($this->name == 'DEFAULT' ? $this->inherit_fieldlist['x'] : $defdef->x) . " " .
-			#			($this->name == 'DEFAULT' ? $this->inherit_fieldlist['y'] : $defdef->y);
-			$val = $this->x . " " . $this->y;
-			$comparison = $dd->x . " " . $dd->y;
+            #$comparison=($this->name == 'DEFAULT' ? $this->inherit_fieldlist['x'] : $defdef->x) . " " .
+            #			($this->name == 'DEFAULT' ? $this->inherit_fieldlist['y'] : $defdef->y);
+            $val = $this->x . " " . $this->y;
+            $comparison = $dd->x . " " . $dd->y;
 
-			if ($val != $comparison)
-			{
-				if ($this->relative_to == '')
-				{ $output.="\tPOSITION " . $val . "\n"; }
-				else
-				{
-					if ($this->polar)
-					{
-						$output .= "\tPOSITION ".$this->relative_to . " " .  $this->original_x . "r" . $this->original_y . "\n";
-					}
-					else
-					{
-						$output.="\tPOSITION " . $this->relative_to . " " .  $this->original_x . " " . $this->original_y . "\n";
-					}
-				}
-			}
+            if ($val != $comparison) {
+                if ($this->relative_to == '') {
+                    $output .= "\tPOSITION " . $val . "\n";
+                } else {
+                    if ($this->polar) {
+                        $output .= "\tPOSITION " . $this->relative_to . " " . $this->original_x . "r" . $this->original_y . "\n";
+                    } else {
+                        $output .= "\tPOSITION " . $this->relative_to . " " . $this->original_x . " " . $this->original_y . "\n";
+                    }
+                }
+            }
 
-			if (($this->max_bandwidth_in != $dd->max_bandwidth_in)
-				|| ($this->max_bandwidth_out != $dd->max_bandwidth_out)
-					|| ($this->name == 'DEFAULT'))
-			{
-				if ($this->max_bandwidth_in == $this->max_bandwidth_out)
-				{ $output.="\tMAXVALUE " . $this->max_bandwidth_in_cfg . "\n"; }
-				else { $output
-				.="\tMAXVALUE " . $this->max_bandwidth_in_cfg . " " . $this->max_bandwidth_out_cfg . "\n"; }
-			}
+            if (($this->max_bandwidth_in != $dd->max_bandwidth_in)
+                || ($this->max_bandwidth_out != $dd->max_bandwidth_out)
+                || ($this->name == 'DEFAULT')
+            ) {
+                if ($this->max_bandwidth_in == $this->max_bandwidth_out) {
+                    $output .= "\tMAXVALUE " . $this->max_bandwidth_in_cfg . "\n";
+                } else {
+                    $output
+                        .= "\tMAXVALUE " . $this->max_bandwidth_in_cfg . " " . $this->max_bandwidth_out_cfg . "\n";
+                }
+            }
 
-			foreach ($this->hints as $hintname=>$hint)
-			{
-			  // all hints for DEFAULT node are for writing
-			  // only changed ones, or unique ones, otherwise
-			      if (
-			    ($this->name == 'DEFAULT')
-			  ||
-				    (isset($dd->hints[$hintname])
-				    &&
-				    $dd->hints[$hintname] != $hint)
-				  ||
-				    (!isset($dd->hints[$hintname]))
-				)
-			      {
-			    $output .= "\tSET $hintname $hint\n";
-			      }
-			}
-			if ($output != '')
-			{
-				$output = "NODE " . $this->name . "\n$output\n";
-			}
-		}
-		return ($output);
-	}
+            foreach ($this->hints as $hintname => $hint) {
+                // all hints for DEFAULT node are for writing
+                // only changed ones, or unique ones, otherwise
+                if (
+                    ($this->name == 'DEFAULT')
+                    ||
+                    (isset($dd->hints[$hintname])
+                        &&
+                        $dd->hints[$hintname] != $hint)
+                    ||
+                    (!isset($dd->hints[$hintname]))
+                ) {
+                    $output .= "\tSET $hintname $hint\n";
+                }
+            }
+
+            foreach ($this->named_offsets as $off_name => $off_pos) {
+                // if the offset exists with different values, or
+                // doesn't exist at all in the template, we need to write
+                // some config for it
+                if ((array_key_exists($off_name, $dd->named_offsets))) {
+                    $offsetX = $dd->named_offsets[$off_name][0];
+                    $offsetY = $dd->named_offsets[$off_name][1];
+
+                    if ($offsetX != $off_pos[0] || $offsetY != $off_pos[1]) {
+                        $output .= sprintf("\tDEFINEOFFSET %s %d %d\n", $off_name, $off_pos[0], $off_pos[1]);
+                    }
+                } else {
+                    $output .= sprintf("\tDEFINEOFFSET %s %d %d\n", $off_name, $off_pos[0], $off_pos[1]);
+                }
+            }
+
+            if ($output != '') {
+                $output = "NODE " . $this->name . "\n$output\n";
+            }
+        }
+        return ($output);
+    }
 
     function asJSCore()
     {
@@ -1065,6 +1074,10 @@ class WeatherMapNode extends WeatherMapDataItem
         return $this->relative_to;
     }
 
+    /**
+     * @param WeatherMapNode $anchorNode
+     * @return bool
+     */
     public function resolveRelativePosition($anchorNode)
     {
         $anchorPosition = $anchorNode->getPosition();

@@ -43,6 +43,7 @@ class WeatherMapDataItem extends WeatherMapItem
     public $id;
     public $colours = array();
     public $template;
+    public $notestext = array();
 
     public function __construct()
     {
@@ -300,6 +301,7 @@ class WeatherMapDataItem extends WeatherMapItem
             $this->percentUsages[$channel] = ($value / $this->maxValues[$channel]) * 100;
             $pcvar = $channelName . "percent";
             $this->$pcvar = $this->percentUsages[$channel];
+            $this->add_note($pcvar, $this->percentUsages[$channel]);
         }
 
 //            if ($this->max_bandwidth_out != $this->max_bandwidth_in) {

@@ -170,6 +170,16 @@ class WeatherMapBase
         $this->reset($owner);
     }
 
+    function CopyFrom(&$source)
+    {
+        wm_debug("Initialising %s $this->name from $source->name\n", $this->my_type());
+        assert('is_object($source)');
+
+        foreach (array_keys($this->inherit_fieldlist)as $fld) {
+            if ($fld != 'template') $this->$fld=$source->$fld;
+        }
+    }
+
     public function cleanUp()
     {
         $this->dependencies = array();

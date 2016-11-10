@@ -273,7 +273,7 @@ class WeatherMap extends WeatherMapBase
 	var $used_images = array(); // an array of image filenames referred to (used by editor)
 	var $seen_zlayers = array(0=>array(),1000=>array()); // 0 is the background, 1000 is the legends, title, etc
 
-	var $config;
+	var $config = array();
 	var $next_id;
 	var $min_ds_time;
 	var $max_ds_time;
@@ -291,11 +291,8 @@ class WeatherMap extends WeatherMapBase
 	var $sizedebug,
 		$widthmod,
 		$debugging;
-	var $linkfont,
-		$nodefont,
-		$keyfont,
+	var $keyfont,
 		$timefont;
-	// var $bg_r, $bg_g, $bg_b;
 	var $timex,
 		$timey;
 	var $width,
@@ -2052,6 +2049,7 @@ function MakeHTML($imagemapname = "weathermap_imap")
         wm_debug("======================================\n");
         wm_debug("Starting main collection loop\n");
 
+        /** @var WeatherMapDataItem $mapItem */
         foreach ($itemList as $mapItem) {
             if ($mapItem->isTemplate()) {
                 wm_debug("ReadData: Skipping $mapItem that looks like a template\n.");

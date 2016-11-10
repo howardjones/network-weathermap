@@ -561,6 +561,13 @@ class WeatherMapConfigReader
                     array('label' => 1)
                 ),
             ),
+            'DEFINEOFFSET' => array(
+                array(
+                    'NODE',
+                    '/^DEFINEOFFSET\s+([A-Za-z][A-Za-z0-9_]*)\s+([-+]?\d+)\s+([-+]?\d+)/i',
+                    "handleDEFINEOFFSET"
+                ),
+            ),
             'LABELOFFSET' => array(
                 array(
                     'NODE',
@@ -1716,6 +1723,15 @@ class WeatherMapConfigReader
         return true;
     }
 
+    private function handleDEFINEOFFSET($fullcommand, $args, $matches)
+    {
+        wm_debug("Defining a named offset: ". $matches[1]."\n");
+        $this->currentObject->named_offsets[$matches[1]] = array(intval($matches[2]), intval($matches[3]));
+
+        return true;
+    }
+
+
     private function handleKEYPOS($fullcommand, $args, $matches)
     {
         $whichKey = trim($matches[1]);
@@ -1820,19 +1836,19 @@ class WeatherMapConfigReader
                     # $match[2] is either an array of properties to set, or a function to handle it
                     if (is_array($match[2])) {
                         # TODO: if it's a list of variables, check they exist on the relevant object (from scope)
-                        foreach ($match[2] as $key=>$val) {
+                        foreach ($match[2] as $key => $val) {
                             if (1 === preg_match('/^(.*)\[([^\]]+)\]$/', $key, $m)) {
                                 $key = $m[1];
                             }
 
-                            if (! property_exists($classes[$scope], $key)) {
+                            if (!property_exists($classes[$scope], $key)) {
                                 wm_warn("$scope:$keyword tries to set nonexistent property $key");
                                 $result = false;
                             }
                         }
                     } else {
                         # TODO: if it's a handleXXXX function, check that exists
-                        if (! method_exists($this, $match[2])) {
+                        if (!method_exists($this, $match[2])) {
                             wm_warn("$scope:$keyword has a missing handler ($match[2])");
                             $result = false;
                         }

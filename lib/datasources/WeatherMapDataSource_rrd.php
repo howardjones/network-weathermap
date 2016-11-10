@@ -293,16 +293,18 @@ class WeatherMapDataSource_rrd extends WeatherMapDataSource
             // then we can treat them both the same.
             $heads = preg_split('/\s+/', preg_replace('/^\s+/', "timestamp ", $headings));
 
-            fgets($pipe, 4096); // skip the blank line
             $buffer = '';
 
             while (!feof($pipe)) {
                 $line = fgets($pipe, 4096);
-                wm_debug("> " . $line);
-                $buffer .= $line;
-                $lines[] = $line;
-                $linecount++;
-
+                // there might (pre-1.5) or might not (1.5+) be a leading blank line
+                // we don't want to count it if there is
+                if (trim($line) != "") {
+                    wm_debug("> " . $line);
+                    $buffer .= $line;
+                    $lines[] = $line;
+                    $linecount++;
+                }
             }
             pclose($pipe);
 

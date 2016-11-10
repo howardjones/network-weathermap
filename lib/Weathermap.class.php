@@ -1553,42 +1553,6 @@ function DrawMap($filename = '', $thumbnailfile = '', $thumbnailmax = 250, $with
 				{
                     wm_debug("Drawing " . $it->my_type() . " " . $it->name . "\n");
 				    $it->Draw($image, $this);
-
-                    if(1==0) {
-                        $class_lower = strtolower(get_class($it));
-
-                        if ($class_lower == 'weathermaplink') {
-                            // only draw LINKs if they have NODES defined (not templates)
-                            // (also, check if the link still exists - if this is in the editor, it may have been deleted by now)
-                            if (isset($this->links[$it->name]) && isset($it->a) && isset($it->b)) {
-                                wm_debug("Drawing LINK " . $it->name . "\n");
-                                $this->links[$it->name]->Draw($image, $this);
-                            }
-                        }
-
-                        if ($class_lower == 'weathermapnode') {
-                            // if(!is_null($it->x)) $it->pre_render($image, $this);
-                            if ($withnodes) {
-                                // don't try and draw template nodes
-                                if (isset($this->nodes[$it->name]) && !is_null($it->x)) {
-                                    # print "::".get_class($it)."\n";
-                                    wm_debug("Drawing NODE " . $it->name . "\n");
-                                    $this->nodes[$it->name]->Draw($image, $this);
-                                    $ii = 0;
-                                    foreach ($this->nodes[$it->name]->boundingboxes as $bbox) {
-                                        # $areaname = "NODE:" . $it->name . ':'.$ii;
-                                        $areaname = "NODE:N" . $it->id . ":" . $ii;
-                                        $this->imap->addArea("Rectangle", $areaname, '', $bbox);
-                                        $this->nodes[$it->name]->imap_areas[] = $areaname;
-                                        wm_debug("Adding imagemap area");
-                                        $ii++;
-                                    }
-                                    wm_debug("Added $ii bounding boxes too\n");
-                                }
-                            }
-                        }
-                    }
-
 				}
 			}
 		}
@@ -1747,154 +1711,138 @@ function DrawMap($filename = '', $thumbnailfile = '', $thumbnailmax = 250, $with
         $this->scales = null;
     }
 
-function PreloadMapHTML()
-{
-	wm_debug("Trace: PreloadMapHTML()\n");
-		//   onmouseover="return overlib('<img src=graph.png>',DELAY,250,CAPTION,'$caption');"  onmouseout="return nd();"
+    function PreloadMapHTML()
+    {
+        wm_debug("Trace: PreloadMapHTML()\n");
+        //   onmouseover="return overlib('<img src=graph.png>',DELAY,250,CAPTION,'$caption');"  onmouseout="return nd();"
 
-		// find the middle of the map
-		$center_x=$this->width / 2;
-		$center_y=$this->height / 2;
+        // find the middle of the map
+        $center_x = $this->width / 2;
+        $center_y = $this->height / 2;
 
-		// loop through everything. Figure out along the way if it's a node or a link
-		$allitems = array(&$this->nodes, &$this->links);
-		reset($allitems);
+        // loop through everything. Figure out along the way if it's a node or a link
+        $allItems = $this->buildAllItemsList();
 
-		while( list($kk,) = each($allitems))
-		{
-			unset($objects);
-			# $objects = &$this->links;
-			$objects = &$allitems[$kk];
+        foreach ($allItems as $myobj) {
+            $type = $myobj->my_type();
+            $prefix = substr($type, 0, 1);
 
-			reset($objects);
-			while (list($k,) = each($objects))
-			{
-				unset($myobj);
-				$myobj = &$objects[$k];
+            $dirs = array();
+            //print "\n\nConsidering a $type - ".$myobj->name.".\n";
+            if ($type == 'LINK') {
+                $dirs = array(IN => array(0, 2), OUT => array(1, 3));
+            }
+            if ($type == 'NODE') {
+                $dirs = array(IN => array(0, 1, 2, 3));
+            }
 
-				$type = $myobj->my_type();
-				$prefix = substr($type,0,1);
+            if ($this->htmlstyle == "overlib") {
+                // check to see if any of the relevant things have a value
+                $change = "";
+                foreach ($dirs as $d => $parts) {
+                    $change .= join('', $myobj->overliburl[$d]);
+                    $change .= $myobj->notestext[$d];
+                }
 
-				$dirs = array();
-				//print "\n\nConsidering a $type - ".$myobj->name.".\n";
-				if ($type == 'LINK') $dirs = array(IN=>array(0,2), OUT=>array(1,3));
-				if ($type == 'NODE') $dirs = array(IN=>array(0,1,2,3));
+                // skip all this if it's a template node
+                if ($type == 'LINK' && !isset($myobj->a->name)) {
+                    $change = '';
+                }
+                if ($type == 'NODE' && !isset($myobj->x)) {
+                    $change = '';
+                }
 
-				if ($this->htmlstyle == "overlib")
-				{
-					// check to see if any of the relevant things have a value
-					$change = "";
-					foreach ($dirs as $d => $parts) {
-						//print "$d - ".join(" ",$parts)."\n";
-						$change .= join('', $myobj->overliburl[$d]);
-						$change .= $myobj->notestext[$d];
-					}
+                if ($change != '') {
+                    if ($type == 'NODE') {
+                        $mid_x = $myobj->x;
+                        $mid_y = $myobj->y;
+                    }
+                    if ($type == 'LINK') {
+                        $a_x = $this->nodes[$myobj->a->name]->x;
+                        $a_y = $this->nodes[$myobj->a->name]->y;
 
-					//print "CHANGE: $change\n";
+                        $b_x = $this->nodes[$myobj->b->name]->x;
+                        $b_y = $this->nodes[$myobj->b->name]->y;
 
-					// skip all this if it's a template node
-					if ($type=='LINK' && ! isset($myobj->a->name)) { $change = ''; }
-					if ($type=='NODE' && ! isset($myobj->x)) { $change = ''; }
+                        $mid_x = ($a_x + $b_x) / 2;
+                        $mid_y = ($a_y + $b_y) / 2;
+                    }
+                    $left = "";
+                    $above = "";
+                    $img_extra = "";
 
-					if ($change != '')
-					{
-						//print "Something to be done.\n";
-						if ($type=='NODE')
-						{
-							$mid_x = $myobj->x;
-							$mid_y = $myobj->y;
-						}
-						if ($type=='LINK')
-						{
-							$a_x = $this->nodes[$myobj->a->name]->x;
-							$a_y = $this->nodes[$myobj->a->name]->y;
+                    if ($myobj->overlibwidth != 0) {
+                        $left = "WIDTH," . $myobj->overlibwidth . ",";
+                        $img_extra .= " WIDTH=$myobj->overlibwidth";
 
-							$b_x = $this->nodes[$myobj->b->name]->x;
-							$b_y = $this->nodes[$myobj->b->name]->y;
+                        if ($mid_x > $center_x) {
+                            $left .= "LEFT,";
+                        }
+                    }
 
-							$mid_x=($a_x + $b_x) / 2;
-							$mid_y=($a_y + $b_y) / 2;
-						}
-						$left=""; $above="";
-						$img_extra = "";
+                    if ($myobj->overlibheight != 0) {
+                        $above = "HEIGHT," . $myobj->overlibheight . ",";
+                        $img_extra .= " HEIGHT=$myobj->overlibheight";
 
-						if ($myobj->overlibwidth != 0)
-						{
-							$left="WIDTH," . $myobj->overlibwidth . ",";
-							$img_extra .= " WIDTH=$myobj->overlibwidth";
+                        if ($mid_y > $center_y) {
+                            $above .= "ABOVE,";
+                        }
+                    }
 
-							if ($mid_x > $center_x) $left.="LEFT,";
-						}
+                    foreach ($dirs as $dir => $parts) {
+                        $caption = ($myobj->overlibcaption[$dir] != '' ? $myobj->overlibcaption[$dir] : $myobj->name);
+                        $caption = $this->ProcessString($caption, $myobj);
 
-						if ($myobj->overlibheight != 0)
-						{
-							$above="HEIGHT," . $myobj->overlibheight . ",";
-							$img_extra .= " HEIGHT=$myobj->overlibheight";
+                        $overlibhtml = "onmouseover=\"return overlib('";
 
-							if ($mid_y > $center_y) $above.="ABOVE,";
-						}
+                        $n = 0;
+                        if (sizeof($myobj->overliburl[$dir]) > 0) {
+                            // print "ARRAY:".is_array($link->overliburl[$dir])."\n";
+                            foreach ($myobj->overliburl[$dir] as $url) {
+                                if ($n > 0) {
+                                    $overlibhtml .= '&lt;br /&gt;';
+                                }
+                                $overlibhtml .= "&lt;img $img_extra src=" . $this->ProcessString($url, $myobj) . "&gt;";
+                                $n++;
+                            }
+                        }
+                        # print "Added $n for $dir\n";
+                        if (trim($myobj->notestext[$dir]) != '') {
+                            # put in a linebreak if there was an image AND notes
+                            if ($n > 0) {
+                                $overlibhtml .= '&lt;br /&gt;';
+                            }
+                            $note = $this->ProcessString($myobj->notestext[$dir], $myobj);
+                            $note = htmlspecialchars($note, ENT_NOQUOTES);
+                            $note = str_replace("'", "\\&apos;", $note);
+                            $note = str_replace('"', "&quot;", $note);
+                            $overlibhtml .= $note;
+                        }
+                        $overlibhtml .= "',DELAY,250,${left}${above}CAPTION,'" . $caption
+                            . "');\"  onmouseout=\"return nd();\"";
 
-						foreach ($dirs as $dir=>$parts)
-						{
-							$caption = ($myobj->overlibcaption[$dir] != '' ? $myobj->overlibcaption[$dir] : $myobj->name);
-							$caption = $this->ProcessString($caption,$myobj);
+                        foreach ($myobj->imap_areas as $area) {
+                            $area->extrahtml = $overlibhtml;
+                        }
+                    }
+                } // if change
+            } // overlib?
 
-							$overlibhtml = "onmouseover=\"return overlib('";
+            // now look at infourls
+            foreach ($dirs as $dir => $parts) {
+                foreach ($parts as $part) {
+                    $areaname = $type . ":" . $prefix . $myobj->id . ":" . $part;
 
-							$n = 0;
-							if(sizeof($myobj->overliburl[$dir]) > 0)
-							{
-								// print "ARRAY:".is_array($link->overliburl[$dir])."\n";
-								foreach ($myobj->overliburl[$dir] as $url)
-								{
-									if($n>0) { $overlibhtml .= '&lt;br /&gt;'; }
-									$overlibhtml .= "&lt;img $img_extra src=" . $this->ProcessString($url,$myobj) . "&gt;";
-									$n++;
-								}
-							}
-							# print "Added $n for $dir\n";
-							if(trim($myobj->notestext[$dir]) != '')
-							{
-								# put in a linebreak if there was an image AND notes
-								if($n>0) $overlibhtml .= '&lt;br /&gt;';
-								$note = $this->ProcessString($myobj->notestext[$dir],$myobj);
-								$note = htmlspecialchars($note, ENT_NOQUOTES);
-								$note=str_replace("'", "\\&apos;", $note);
-								$note=str_replace('"', "&quot;", $note);
-								$overlibhtml .= $note;
-							}
-							$overlibhtml .= "',DELAY,250,${left}${above}CAPTION,'" . $caption
-							. "');\"  onmouseout=\"return nd();\"";
+                    if (($this->htmlstyle != 'editor') && ($myobj->infourl[$dir] != '')) {
+                        foreach ($myobj->imap_areas as $area) {
+                            $area->href = $this->ProcessString($myobj->infourl[$dir], $myobj);
+                        }
+                    }
+                }
+            }
+        }
 
-							foreach ($parts as $part)
-							{
-								$areaname = $type.":" . $prefix . $myobj->id. ":" . $part;
-								//print "INFOURL for $areaname - ";
-
-								$this->imap->setProp("extrahtml", $overlibhtml, $areaname);
-							}
-						}
-					} // if change
-				} // overlib?
-
-				// now look at inforurls
-				foreach ($dirs as $dir=>$parts)
-				{
-					foreach ($parts as $part)
-					{
-						$areaname = $type.":" . $prefix . $myobj->id. ":" . $part;
-
-						if (($this->htmlstyle != 'editor') && ($myobj->infourl[$dir] != '')) {
-							$this->imap->setProp("href", $this->ProcessString($myobj->infourl[$dir], $myobj),
-								$areaname);
-						}
-					}
-				}
-
-			}
-		}
-
-}
+    }
 
     function asJS()
     {
@@ -1960,63 +1908,63 @@ function MakeHTML($imagemapname = "weathermap_imap")
 	return ($html);
 }
 
-	function SortedImagemap($imagemapname)
-	{
-		$html = "\n<map name=\"" . $imagemapname . '" id="' . $imagemapname . "\">\n";
+    function SortedImagemap($imagemapname)
+    {
+        $html = "\n<map name=\"" . $imagemapname . '" id="' . $imagemapname . "\">\n";
 
-		$all_layers = array_keys($this->seen_zlayers);
-		rsort($all_layers);
+        $all_layers = array_keys($this->seen_zlayers);
+        rsort($all_layers);
 
-		wm_debug("Starting to dump imagemap in reverse Z-order...\n");
-		foreach ($all_layers as $z) {
-			wm_debug("Writing HTML for layer $z\n");
-			$z_items = $this->seen_zlayers[$z];
-			if (is_array($z_items)) {
-				wm_debug("   Found things for layer $z\n");
+        wm_debug("Starting to dump imagemap in reverse Z-order...\n");
+        foreach ($all_layers as $z) {
+            wm_debug("Writing HTML for layer $z\n");
+            $z_items = $this->seen_zlayers[$z];
+            if (is_array($z_items)) {
+                wm_debug("   Found things for layer $z\n");
 
-				// at z=1000, the legends and timestamps live
-				if ($z == 1000) {
-					wm_debug("     Builtins fit here.\n");
+                // at z=1000, the legends and timestamps live
+                if ($z == 1000) {
+                    wm_debug("     Builtins fit here.\n");
 
-					foreach ($this->imap_areas as $areaname) {
-						// skip the linkless areas if we are in the editor - they're redundant
-						$html .= "\t".$this->imap->exactHTML($areaname, true, ($this->context
-							!= 'editor'));
+                    foreach ($this->imap_areas as $areaname) {
+                        // skip the linkless areas if we are in the editor - they're redundant
+                        $html .= "\t" . $this->imap->exactHTML($areaname, true, ($this->context
+                                != 'editor'));
                         $html .= "\n";
-					}
+                    }
 
-					foreach ($this->scales as $it) {
+                    foreach ($this->scales as $it) {
                         foreach ($it->getImageMapAreas() as $area) {
                             wm_debug("$area\n");
                             // skip the linkless areas if we are in the editor - they're redundant
-                            $html .= "\t".$area->asHTML();
+                            $html .= "\t" . $area->asHTML();
                             $html .= "\n";
                         }
                         $html .= "\n";
                     }
-				}
+                }
 
                 // we reverse the array for each zlayer so that the imagemap order
                 // will match up with the draw order (last drawn should be first hit)
                 /** @var WeatherMapDataItem $it */
                 foreach (array_reverse($z_items) as $it) {
-					if ($it->name != 'DEFAULT' && $it->name != ":: DEFAULT ::") {
-						foreach ($it->getImageMapAreas() as $area) {
-						    wm_debug("$area\n");
-							// skip the linkless areas if we are in the editor - they're redundant
-                            $html .= "\t".$area->asHTML();
+                    if ($it->name != 'DEFAULT' && $it->name != ":: DEFAULT ::") {
+                        foreach ($it->getImageMapAreas() as $area) {
+                            wm_debug("$area\n");
+                            // skip the linkless areas if we are in the editor - they're redundant
+                            $html .= "\t" . $area->asHTML();
                             $html .= "\n";
-						}
+                        }
                         $html .= "\n";
-					}
-				}
-			}
-		}
+                    }
+                }
+            }
+        }
 
-		$html .= '</map>';
+        $html .= '</map>';
 
-		return ($html);
-	}
+        return ($html);
+    }
 
     public function nodeExists($nodeName)
     {

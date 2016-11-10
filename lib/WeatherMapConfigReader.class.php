@@ -459,6 +459,17 @@ class WeatherMapConfigReader
                         'relative_resolved' => false
                     )
                 ),
+                array( # named offset
+                    'NODE',
+                    '/^POSITION\s+([A-Za-z][A-Za-z0-9\-_]*):([A-Za-z][A-Za-z0-9_]*)$/i',
+                    array(
+                        'relative_to' => 1,
+                        'relative_name' => 2,
+                        'pos_named' => true,
+                        'polar' => false,
+                        'relative_resolved' => false
+                    )
+                ),
             ),
             'INFOURL' => array(
                 array(

@@ -819,19 +819,15 @@ class WeatherMapNode extends WeatherMapDataItem
     {
         $output = '';
 
-        # $output .= "# ID ".$this->id." - first seen in ".$this->defined_in."\n";
-
         // This allows the editor to wholesale-replace a single node's configuration
         // at write-time - it should include the leading NODE xyz line (to allow for renaming)
         if ($this->config_override != '') {
             $output = $this->config_override . "\n";
         } else {
-            # $defdef = $this->owner->defaultnode;
             $dd = $this->owner->nodes[$this->template];
 
             wm_debug("Writing config for NODE $this->name against $this->template\n");
 
-            # $field = 'zorder'; $keyword = 'ZORDER';
             $basic_params = array(
                 # array('template','TEMPLATE',CONFIG_TYPE_LITERAL),
                 array('label', 'LABEL', CONFIG_TYPE_LITERAL),
@@ -859,7 +855,6 @@ class WeatherMapNode extends WeatherMapDataItem
                 $field = $param[0];
                 $keyword = $param[1];
 
-                #	$comparison=($this->name == 'DEFAULT' ? $this->inherit_fieldlist[$field] : $defdef->$field);
                 if ($this->$field != $dd->$field) {
                     if ($param[2] == CONFIG_TYPE_COLOR) $output .= "\t$keyword " . $this->$field->asConfig() . "\n";
                     if ($param[2] == CONFIG_TYPE_LITERAL) $output .= "\t$keyword " . $this->$field . "\n";
@@ -867,28 +862,19 @@ class WeatherMapNode extends WeatherMapDataItem
             }
 
             // IN/OUT are the same, so we can use the simpler form here
-#			print_r($this->infourl);
-            #$comparison=($this->name == 'DEFAULT'
-            #? $this->inherit_fieldlist['infourl'][IN] : $defdef->infourl[IN]);
             if ($this->infourl[IN] != $dd->infourl[IN]) {
                 $output .= "\tINFOURL " . $this->infourl[IN] . "\n";
             }
 
-            #$comparison=($this->name == 'DEFAULT'
-            #? $this->inherit_fieldlist['overlibcaption'][IN] : $defdef->overlibcaption[IN]);
             if ($this->overlibcaption[IN] != $dd->overlibcaption[IN]) {
                 $output .= "\tOVERLIBCAPTION " . $this->overlibcaption[IN] . "\n";
             }
 
             // IN/OUT are the same, so we can use the simpler form here
-            # $comparison=($this->name == 'DEFAULT'
-            # ? $this->inherit_fieldlist['notestext'][IN] : $defdef->notestext[IN]);
             if ($this->notestext[IN] != $dd->notestext[IN]) {
                 $output .= "\tNOTES " . $this->notestext[IN] . "\n";
             }
 
-            # $comparison=($this->name == 'DEFAULT'
-            # ? $this->inherit_fieldlist['overliburl'][IN] : $defdef->overliburl[IN]);
             if ($this->overliburl[IN] != $dd->overliburl[IN]) {
                 $output .= "\tOVERLIBGRAPH " . join(" ", $this->overliburl[IN]) . "\n";
             }
@@ -905,9 +891,6 @@ class WeatherMapNode extends WeatherMapDataItem
                 $output .= ($this->iconfile == '' ? 'none' : $this->iconfile) . "\n";
             }
 
-            # $comparison=($this->name == 'DEFAULT'
-            # ? $this->inherit_fieldlist['targets'] : $defdef->targets);
-
             if ($this->targets != $dd->targets) {
                 $output .= "\tTARGET";
 
@@ -918,8 +901,6 @@ class WeatherMapNode extends WeatherMapDataItem
                 $output .= "\n";
             }
 
-            #	$comparison = ($this->name == 'DEFAULT' ? $this->inherit_fieldlist['usescale'] : $defdef->usescale) . " " .
-            #		($this->name == 'DEFAULT' ? $this->inherit_fieldlist['scalevar'] : $defdef->scalevar);
             $val = $this->usescale . " " . $this->scalevar . " " . $this->scaletype;
             $comparison = $dd->usescale . " " . $dd->scalevar . " " . $dd->scaletype;
 
@@ -927,9 +908,6 @@ class WeatherMapNode extends WeatherMapDataItem
                 $output .= "\tUSESCALE " . $val . "\n";
             }
 
-#			$comparison = ($this->name == 'DEFAULT'
-#				? $this->inherit_fieldlist['useiconscale'] : $defdef->useiconscale) . " " .
-#				($this->name == 'DEFAULT' ? $this->inherit_fieldlist['iconscalevar'] : $defdef->iconscalevar);
             $val = $this->useiconscale . " " . $this->iconscalevar;
             $comparison = $dd->useiconscale . " " . $dd->iconscalevar;
 
@@ -937,9 +915,6 @@ class WeatherMapNode extends WeatherMapDataItem
                 $output .= "\tUSEICONSCALE " . $val . "\n";
             }
 
-            #$comparison = ($this->name == 'DEFAULT'
-            #? $this->inherit_fieldlist['labeloffsetx'] : $defdef->labeloffsetx) . " " . ($this->name == 'DEFAULT'
-            #		? $this->inherit_fieldlist['labeloffsety'] : $defdef->labeloffsety);
             $val = $this->labeloffsetx . " " . $this->labeloffsety;
             $comparison = $dd->labeloffsetx . " " . $dd->labeloffsety;
 
@@ -947,8 +922,6 @@ class WeatherMapNode extends WeatherMapDataItem
                 $output .= "\tLABELOFFSET " . $val . "\n";
             }
 
-            #$comparison=($this->name == 'DEFAULT' ? $this->inherit_fieldlist['x'] : $defdef->x) . " " .
-            #			($this->name == 'DEFAULT' ? $this->inherit_fieldlist['y'] : $defdef->y);
             $val = $this->x . " " . $this->y;
             $comparison = $dd->x . " " . $dd->y;
 
@@ -958,6 +931,8 @@ class WeatherMapNode extends WeatherMapDataItem
                 } else {
                     if ($this->polar) {
                         $output .= "\tPOSITION " . $this->relative_to . " " . $this->original_x . "r" . $this->original_y . "\n";
+                    } elseif ($this->pos_named) {
+                        $output .= "\tPOSITION " . $this->relative_to . ":" . $this->relative_name . "\n";
                     } else {
                         $output .= "\tPOSITION " . $this->relative_to . " " . $this->original_x . " " . $this->original_y . "\n";
                     }

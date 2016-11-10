@@ -22,7 +22,7 @@ class WeatherMapLink extends WeatherMapDataItem
     var $linkstyle;
     var $labelstyle;
     var $labelboxstyle;
-    var $selected;
+    var $selected; //TODO - can a link even BE selected?
     var $vialist = array();
     var $viastyle;
     var $duplex;

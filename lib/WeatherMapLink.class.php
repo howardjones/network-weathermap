@@ -13,6 +13,8 @@ class WeatherMapLink extends WeatherMapDataItem
 	/** @var  WeatherMapNode $b */
 	var $a,                    $b; // the ends - references to nodes
     var $a_offset,             $b_offset;
+    var $a_offset_dx, $a_offset_dy, $a_offset_resolved;
+    var $b_offset_dx, $b_offset_dy, $b_offset_resolved;
 
     var $labeloffset_in, $labeloffset_out;
     var $commentoffset_in, $commentoffset_out;
@@ -275,7 +277,7 @@ class WeatherMapLink extends WeatherMapDataItem
      */
     function preCalculate(&$map)
     {
-        wm_debug("Link ".$this->name.": Calculating geometry.\n");
+        wm_debug("Link " . $this->name . ": Calculating geometry.\n");
 
         // don't bother doing anything if it's a template
         if ($this->isTemplate()) {
@@ -284,13 +286,22 @@ class WeatherMapLink extends WeatherMapDataItem
 
         $points = array();
 
-				wm_debug("Offsets are %s and %s\n", $this->a_offset, $this->b_offset);
-				wm_debug("A node is %sx%s\n", $this->a->width, $this->a->height);
-        list($dx, $dy) = WMUtility::calculateOffset($this->a_offset, $this->a->width, $this->a->height);
-				wm_debug("A offset: $dx, $dy\n");
-				$points[] = new WMPoint($this->a->x + $dx, $this->a->y + $dy);
+        wm_debug("Offsets are %s and %s\n", $this->a_offset, $this->b_offset);
+        wm_debug("A node is %sx%s\n", $this->a->width, $this->a->height);
 
-        wm_debug("POINTS SO FAR:".join(" ", $points)."\n");
+
+        if ($this->a_offset_dx != 0 || $this->a_offset_dy != 0) {
+            wm_debug("Using offsets from earlier\n");
+            $dx = $this->a_offset_dx;
+            $dy = $this->a_offset_dy;
+        } else {
+            list($dx, $dy) = WMUtility::calculateOffset($this->a_offset, $this->a->width, $this->a->height);
+        }
+
+        wm_debug("A offset: $dx, $dy\n");
+        $points[] = new WMPoint($this->a->x + $dx, $this->a->y + $dy);
+
+        wm_debug("POINTS SO FAR:" . join(" ", $points) . "\n");
 
         foreach ($this->vialist as $via) {
             wm_debug("VIALIST...\n");
@@ -305,17 +316,23 @@ class WeatherMapLink extends WeatherMapDataItem
             wm_debug("Adding $point\n");
             $points[] = $point;
         }
-        wm_debug("POINTS SO FAR:".join(" ", $points)."\n");
+        wm_debug("POINTS SO FAR:" . join(" ", $points) . "\n");
 
-				wm_debug("B node is %sx%s\n", $this->b->width, $this->b->height);
-        list($dx, $dy) = WMUtility::calculateOffset($this->b_offset, $this->b->width, $this->b->height);
-				wm_debug("B offset: $dx, $dy\n");
+        wm_debug("B node is %sx%s\n", $this->b->width, $this->b->height);
+        if ($this->b_offset_dx != 0 || $this->b_offset_dy != 0) {
+            wm_debug("Using offsets from earlier\n");
+            $dx = $this->b_offset_dx;
+            $dy = $this->b_offset_dy;
+        } else {
+            list($dx, $dy) = WMUtility::calculateOffset($this->b_offset, $this->b->width, $this->b->height);
+        }
+        wm_debug("B offset: $dx, $dy\n");
         $points[] = new WMPoint($this->b->x + $dx, $this->b->y + $dy);
 
-        wm_debug("POINTS SO FAR:".join(" ", $points)."\n");
+        wm_debug("POINTS SO FAR:" . join(" ", $points) . "\n");
 
-        if ($points[0]->closeEnough($points[1]) && sizeof($this->vialist)==0) {
-            wm_warn("Zero-length link ".$this->name." skipped. [WMWARN45]");
+        if ($points[0]->closeEnough($points[1]) && sizeof($this->vialist) == 0) {
+            wm_warn("Zero-length link " . $this->name . " skipped. [WMWARN45]");
             $this->geometry = null;
             return;
         }
@@ -333,13 +350,14 @@ class WeatherMapLink extends WeatherMapDataItem
         $style = $this->viastyle;
 
         // don't bother with any curve stuff if there aren't any Vias defined, even if the style is 'curved'
-        if (count($this->vialist)==0) {
+        if (count($this->vialist) == 0) {
             wm_debug("Forcing to angled (no vias)\n");
             $style = "angled";
         }
 
         $this->geometry = WMLinkGeometryFactory::create($style);
-        $this->geometry->Init($this, $points, $widths, ($this->linkstyle == 'oneway' ? 1 : 2), $this->splitpos, $this->arrowstyle);
+        $this->geometry->Init($this, $points, $widths, ($this->linkstyle == 'oneway' ? 1 : 2), $this->splitpos,
+            $this->arrowstyle);
     }
 
     function Draw($im, &$map)

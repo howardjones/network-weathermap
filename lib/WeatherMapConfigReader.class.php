@@ -1340,32 +1340,29 @@ class WeatherMapConfigReader
 
         // percentage of compass - must be first
         if (preg_match('/:(NE|SE|NW|SW|N|S|E|W|C)(\d+)$/i', $input, $submatches)) {
+            wm_debug("Matching partial compass offset\n");
             $endoffset = $submatches[1] . $submatches[2];
             $nodename = preg_replace('/:(NE|SE|NW|SW|N|S|E|W|C)\d+$/i', '', $input);
             $need_size_precalc = true;
-        }
-
-        if (preg_match("/:(NE|SE|NW|SW|N|S|E|W|C)$/i", $input, $submatches)) {
+        } elseif (preg_match("/:(NE|SE|NW|SW|N|S|E|W|C)$/i", $input, $submatches)) {
+            wm_debug("Matching 100% compass offset\n");
             $endoffset = $submatches[1];
             $nodename = preg_replace('/:(NE|SE|NW|SW|N|S|E|W|C)$/i', '', $input);
             $need_size_precalc = true;
-        }
-
-        if (preg_match('/:(-?\d+r\d+)$/i', $input, $submatches)) {
+        } elseif (preg_match('/:(-?\d+r\d+)$/i', $input, $submatches)) {
+            wm_debug("Matching radial offset\n");
             $endoffset = $submatches[1];
             $nodename = preg_replace('/:(-?\d+r\d+)$/i', '', $input);
             $need_size_precalc = true;
-        }
-
-        if (preg_match('/:([-+]?\d+):([-+]?\d+)$/i', $input, $submatches)) {
+        } elseif (preg_match('/:([-+]?\d+):([-+]?\d+)$/i', $input, $submatches)) {
+            wm_debug("Matching regular x,y link offset\n");
             $xoff = $submatches[1];
             $yoff = $submatches[2];
             $endoffset = $xoff . ":" . $yoff;
             $nodename = preg_replace("/:$xoff:$yoff$/i", '', $input);
             $need_size_precalc = true;
-        }
-
-        if (preg_match('/^([^:]+):([A-Za-z][A-Za-z0-9\-_]*)$/i', $input, $submatches)) {
+        } elseif (preg_match('/^([^:]+):([A-Za-z][A-Za-z0-9\-_]*)$/i', $input, $submatches)) {
+            wm_debug("Matching node namedoffset %s on node %s\n", $submatches[2], $submatches[1]);
             $otherNode = $this->mapObject->getNode($submatches[1]);
             if (array_key_exists($submatches[2], $otherNode->named_offsets)) {
                 $named_offset = $submatches[2];
@@ -1390,39 +1387,9 @@ class WeatherMapConfigReader
         if (preg_match('/^NODES\s+(\S+)\s+(\S+)\s*$/i', $fullcommand, $matches)) {
             $valid_nodes = 2;
             foreach (array(1, 2) as $i) {
-                $endOffsets[$i] = 'C';
-                $nodeNames[$i] = $matches[$i];
-                $offset_dx[$i] = 0;
-                $offset_dy[$i] = 0;
 
                 list($offset_dx[$i], $offset_dy[$i], $nodeNames[$i], $endOffsets[$i], $need_size_precalc) = $this->interpretNodeSpec($matches[$i]);
 
-//                // percentage of compass - must be first
-//                if (preg_match('/:(NE|SE|NW|SW|N|S|E|W|C)(\d+)$/i', $matches[$i],
-//                    $submatches)) {
-//                    $endoffset[$i] = $submatches[1] . $submatches[2];
-//                    $nodenames[$i] =
-//                        preg_replace('/:(NE|SE|NW|SW|N|S|E|W|C)\d+$/i', '', $matches[$i]);
-//                    $this->need_size_precalc = true;
-//                }
-//                if (preg_match('/:(NE|SE|NW|SW|N|S|E|W|C)$/i', $matches[$i], $submatches)) {
-//                    $endoffset[$i] = $submatches[1];
-//                    $nodenames[$i] =
-//                        preg_replace('/:(NE|SE|NW|SW|N|S|E|W|C)$/i', '', $matches[$i]);
-//                    $this->need_size_precalc = true;
-//                }
-//                if (preg_match('/:(-?\d+r\d+)$/i', $matches[$i], $submatches)) {
-//                    $endoffset[$i] = $submatches[1];
-//                    $nodenames[$i] = preg_replace('/:(-?\d+r\d+)$/i', '', $matches[$i]);
-//                    $this->need_size_precalc = true;
-//                }
-//                if (preg_match('/:([-+]?\d+):([-+]?\d+)$/i', $matches[$i], $submatches)) {
-//                    $xoff = $submatches[1];
-//                    $yoff = $submatches[2];
-//                    $endoffset[$i] = $xoff . ":" . $yoff;
-//                    $nodenames[$i] = preg_replace("/:$xoff:$yoff$/i", '', $matches[$i]);
-//                    $this->need_size_precalc = true;
-//                }
                 if (!array_key_exists($nodeNames[$i], $this->mapObject->nodes)) {
                     wm_warn("Unknown node '" . $nodeNames[$i]
                         . "' on line $this->lineCount of config\n");
@@ -1440,16 +1407,20 @@ class WeatherMapConfigReader
                 // lash-up to avoid having to pass loads of context to calc_offset
                 // - named offsets require access to the internals of the node, when they are
                 //   resolved. Luckily we can resolve them here, and skip that.
-                if ($offset_dx[1] != 0 || $offset_dy[1] != 0) {
-                    $this->currentObject->a_offset_dx = $offset_dx[1];
-                    $this->currentObject->a_offset_dy = $offset_dy[1];
-                    $this->currentObject->a_offset_resolved = true;
-                }
 
-                if ($offset_dx[2] != 0 || $offset_dy[2] != 0) {
-                    $this->currentObject->b_offset_dx = $offset_dx[2];
-                    $this->currentObject->b_offset_dy = $offset_dy[2];
-                    $this->currentObject->b_offset_resolved = true;
+                foreach (array(1=>"a", 2=>"b") as $index=>$name) {
+                    if ($offset_dx[$index] != 0 || $offset_dy[$index] != 0) {
+                        wm_debug("Applying offset for $name end %s,%s\n", $offset_dx[$index], $offset_dy[$index]);
+
+                        // TODO - these should be arrays, not named properties
+                        $n1 = $name . "_offset_dx";
+                        $n2 = $name . "_offset_dy";
+                        $n3 = $name . "_offset_resolved";
+
+                        $this->currentObject->$n1 = $offset_dx[$index];
+                        $this->currentObject->$n2 = $offset_dy[$index];
+                        $this->currentObject->$n3 = true;
+                    }
                 }
 
             } else {

@@ -145,23 +145,19 @@ default:
 	$tabs = $manager->getTabs($userid);
 
 	$tab_ids = array_keys($tabs);
-	if (($group_id == -1) && (sizeof($tab_ids)>0))
-	{
-		$group_id = $tab_ids[0];
-	}
-	
-	if (read_config_option("weathermap_pagestyle") == 0)
-	{
-		weathermap_thumbview($group_id);
-	}
-	if (read_config_option("weathermap_pagestyle") == 1)
-	{
-		weathermap_fullview(FALSE,FALSE,$group_id);
-	}
-	if (read_config_option("weathermap_pagestyle") == 2)
-	{
-		weathermap_fullview(FALSE, TRUE, $group_id);
-	}
+    if (($group_id == -1) && (sizeof($tab_ids) > 0)) {
+        $group_id = $tab_ids[0];
+    }
+
+    if (read_config_option("weathermap_pagestyle") == 0) {
+        weathermap_thumbview($group_id);
+    }
+    if (read_config_option("weathermap_pagestyle") == 1) {
+        weathermap_fullview(false, false, $group_id);
+    }
+    if (read_config_option("weathermap_pagestyle") == 2) {
+        weathermap_fullview(false, true, $group_id);
+    }
 
 	weathermap_versionbox();
 	include_once $config["base_path"]."/include/bottom_footer.php";
@@ -597,7 +593,7 @@ function weathermap_mapselector($current_id = 0)
 				print "<option style='font-weight: bold; font-style: italic' value='$nullhash'>".htmlspecialchars($map->name)."</option>";
 				$lastgroup = $map->name;
 			}
-			print '<option ';
+			print '<op§tion ';
 			if ($current_id == $map->id) {
                 print " SELECTED ";
             }

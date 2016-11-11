@@ -8,14 +8,16 @@ finally switched to the "new-style" plugin API that's been around for 5+ years. 
 permissions differently, unfortunately.
 
 0.98a
-    CHANGE - Various performance improvements (thanks to ikorzha758 for lots of feedback)
+    CHANGE - Various performance improvements (thanks to ikorzha758 for lots of feedback back in 2014)
     CHANGE - Replaced entire configuration parser (part of performance changes)
     CHANGE - dsstats data plugin can skip looking up additional Cacti data by setting dsstats_no_cacti_extras
     CHANGE - Moved all database access to use PDO, to avoid PHP 7.0 issues
     CHANGE - lots of internal changes mostly pulled over from refactoring project:
              * New WMTarget, ConfigReader, WMColour and Scale classes
              * New Manager class handles all database access for Cacti plugin
+             * Rewritten drawing code for links
     FIXED - PHP 5.3 bug introduced in command-line tool in 0.98
+    ADDED - SNMPv2c and SNMPv3 datasource plugins
 
 0.98
     FIXED - MySQL error in table-creation. MySQL 5.6 is fussier.

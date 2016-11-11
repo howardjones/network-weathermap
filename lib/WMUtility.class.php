@@ -123,7 +123,6 @@ class WMUtility
             return $offsets;
         }
 
-        // TODO - where is the named offset handling!!
         wm_warn("Got a position offset that didn't make sense ($offsetstring).");
         return (array(0, 0));
     }

@@ -987,7 +987,7 @@ class WeatherMapNode extends WeatherMapDataItem
                 $output = "NODE " . $this->name . "\n$output\n";
             }
         }
-        return ($output);
+        return $output;
     }
 
     function asJSCore()

@@ -1,4 +1,4 @@
-<?php
+    <?php
 
 // PHP Weathermap 0.98
 // Copyright Howard Jones, 2005-2016 howie@thingy.com
@@ -97,7 +97,7 @@ class WMImageLoader
         }
 
         wm_debug("Returning $real_im\n");
-        return ($real_im);
+        return $real_im;
     }
 
 	function imagecreatescaledfromfile($filename, $scalew, $scaleh)
@@ -160,7 +160,7 @@ class WMImageLoader
 		}
 
 		wm_debug("Returning $real_im\n");
-		return ($real_im);
+		return $real_im;
 	}
 
 	function imageduplicate($source_im)
@@ -269,67 +269,67 @@ class WeatherMap extends WeatherMapBase
     /** @var WeatherMapLink[] $links */
 	var $links = array();
 
-	var $texts = array(); // an array containing all the extraneous text bits
-	var $used_images = array(); // an array of image filenames referred to (used by editor)
+	// var $texts = array(); // an array containing all the extraneous text bits
+	var $used_images = array(); // an array of image filenames referred to (used by editor ONLY)
 	var $seen_zlayers = array(0=>array(),1000=>array()); // 0 is the background, 1000 is the legends, title, etc
 
-	var $config = array();
 	var $next_id;
-	var $min_ds_time;
-	var $max_ds_time;
+
 	var $background;
-	var $htmlstyle;
-	var $imap;
-	var $colours;
-	var $configfile;
-	var $imagefile,
-		$imageuri;
-	var $rrdtool;
-	var $title,
-		$titlefont;
-	var $kilo;
-	var $sizedebug,
+    var $kilo;
+    var $width, $height;
+    var $htmlstyle;
+
+    var $imap;
+
+    var $colours;
+    var $rrdtool;
+
+    var $sizedebug,
 		$widthmod,
 		$debugging;
-	var $keyfont,
-		$timefont;
-	var $timex,
-		$timey;
-	var $width,
-		$height;
-	var $keyx,
-		$keyy, $keyimage;
-	var $titlex,
-		$titley;
-	var $keytext,
-		$stamptext, $datestamp;
-	var $min_data_time, $max_data_time;
-	var $htmloutputfile,
-		$imageoutputfile;
-	var $dataoutputfile;
-	var $htmlstylesheet;
-	var $defaultlink,
-		$defaultnode;
-	var $need_size_precalc;
-	var $keystyle,$keysize;
-	var $rrdtool_check;
-	var $inherit_fieldlist;
-	var $mintimex, $maxtimex;
-	var $mintimey, $maxtimey;
-	var $minstamptext, $maxstamptext;
-	var $context;
+    var $keyfont;
+    var $timefont;
 
-	var $name;
+    var $titlefont;
+    var $timex, $timey;
+
+    var $keyx, $keyy;
+
+	var $titlex, $titley;
+    var $mintimex, $maxtimex;
+    var $mintimey, $maxtimey;
+
+    var $min_ds_time;
+    var $max_ds_time;
+    var $minstamptext, $maxstamptext;
+    var $stamptext, $datestamp;
+    var $title;
+
+    var $keytext;
+    var $htmloutputfile;
+    var $imageoutputfile;
+    var $dataoutputfile;
+    var $htmlstylesheet;
+    var $configfile;
+    var $imagefile;
+
+    var $imageuri;
+    var $keystyle,$keysize;
+
+    var $min_data_time, $max_data_time;
+    var $context;
+
+    var $rrdtool_check;
+
 	var $imagecache;
-	var $black,
-		$white,
-		$grey,
-		$selected;
+	var $black, $white, $grey, $selected;
 
-	var $datasourceclasses;
-	var $preprocessclasses;
-	var $postprocessclasses;
-	var $activedatasourceclasses;
+//	var $datasourceclasses;
+//	var $preprocessclasses;
+//	var $postprocessclasses;
+//	var $activedatasourceclasses;
+
 	var $thumb_width, $thumb_height;
 	var $has_includes;
 	var $has_overlibs;
@@ -500,8 +500,6 @@ class WeatherMap extends WeatherMapBase
 
 		$this->min_ds_time = NULL;
 		$this->max_ds_time = NULL;
-
-		$this->need_size_precalc=FALSE;
 
         $this->nodes=array(); // an array of WeatherMapNodes
 		$this->links=array(); // an array of WeatherMapLinks
@@ -765,7 +763,7 @@ class WeatherMap extends WeatherMapBase
             $input = str_replace($key, '', $input);
             $output = str_replace($key, $value, $output);
         }
-        return ($output);
+        return $output;
     }
 
 function RandomData()
@@ -1049,7 +1047,7 @@ function RandomData()
 
         $this->postReadConfigTasks();
 
-        return (true);
+        return true;
     }
 
     function postReadConfigTasks()
@@ -1064,12 +1062,9 @@ function RandomData()
         $this->resolveRelativePositions();
         $this->updateMaxValues();
 
-
         $this->initialiseAllPlugins();
         $this->runProcessorPlugins("pre");
     }
-
-
 
     private function populateDefaultScales()
     {
@@ -1366,10 +1361,10 @@ function WriteConfig($filename)
 		fclose($fd);
 	} else {
 		wm_warn("Couldn't open config file $filename for writing");
-		return (false);
+		return false;
 	}
 
-	return (true);
+	return true;
 }
 
 // pre-allocate colour slots for the colours used by the arrows
@@ -1409,24 +1404,24 @@ function DrawMap($filename = '', $thumbnailfile = '', $thumbnailmax = 250, $with
 {
     wm_debug("Trace: DrawMap()\n");
 	$bgimage=NULL;
-	if($this->configfile != "")
-	{
-		$this->cachefile_version = crc32(file_get_contents($this->configfile));
-	}
-	else
-	{
-		$this->cachefile_version = crc32("........");
-	}
+//	if($this->configfile != "")
+//	{
+//		$this->cachefile_version = crc32(file_get_contents($this->configfile));
+//	}
+//	else
+//	{
+//		$this->cachefile_version = crc32("........");
+//	}
 
-	wm_debug("Running Post-Processing Plugins...\n");
-	foreach ($this->postprocessclasses as $post_class)
-	{
-		wm_debug("Running $post_class"."->run()\n");
-		//call_user_func_array(array($post_class, 'run'), array(&$this));
-		$this->plugins['post'][$post_class]->run($this);
-
-	}
-	wm_debug("Finished Post-Processing Plugins...\n");
+//	wm_debug("Running Post-Processing Plugins...\n");
+//	foreach ($this->postprocessclasses as $post_class)
+//	{
+//		wm_debug("Running $post_class"."->run()\n");
+//		//call_user_func_array(array($post_class, 'run'), array(&$this));
+//		$this->plugins['post'][$post_class]->run($this);
+//
+//	}
+//	wm_debug("Finished Post-Processing Plugins...\n");
 
 	wm_debug("=====================================\n");
 	wm_debug("Start of Map Drawing\n");
@@ -1902,7 +1897,7 @@ function MakeHTML($imagemapname = "weathermap_imap")
 
 	$html .= $this->SortedImagemap($imagemapname);
 
-	return ($html);
+	return $html;
 }
 
     function SortedImagemap($imagemapname)
@@ -1960,7 +1955,7 @@ function MakeHTML($imagemapname = "weathermap_imap")
 
         $html .= '</map>';
 
-        return ($html);
+        return $html;
     }
 
     public function nodeExists($nodeName)

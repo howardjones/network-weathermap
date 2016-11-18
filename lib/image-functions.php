@@ -98,6 +98,17 @@
         return $imageRef;
     }
 
+function    ImageTrueColorToPalette2( $image, $dither, $ncolors )
+{
+    $width = imagesx( $image );
+    $height = imagesy( $image );
+    $colors_handle = ImageCreateTrueColor( $width, $height );
+    ImageCopyMerge( $colors_handle, $image, 0, 0, 0, 0, $width, $height, 100 );
+    ImageTrueColorToPalette( $image, $dither, $ncolors );
+    ImageColorMatch( $colors_handle, $image );
+    ImageDestroy( $colors_handle );
+}
+
 // taken from here:
 // http://www.php.net/manual/en/function.imagefilter.php#62395
 // ( with some bugfixes and changes)
@@ -111,11 +122,16 @@
         // Unfortunately, imagetruecolortopalette is pretty crappy, so you are
         // probably better off using Paint.NET/Gimp etc to make an indexed colour
         // version of the icon, rather than rely on this
+
+        // return $imageRef;
+
         if (imageistruecolor($imageRef)) {
             wm_debug("imagecolorize requires paletted images - this is a truecolor image. Converting.");
             imagetruecolortopalette($imageRef, false, 256);
             wm_debug("Converted image has %d colours.\n", imagecolorstotal($imageRef));
         }
+
+        // return $imageRef;
 
         // We will create a monochromatic palette based on the input color
         // which will go from black to white

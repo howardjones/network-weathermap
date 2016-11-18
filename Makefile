@@ -1,4 +1,4 @@
-VERSION=0.98
+VERSION=0.98a
 RELBASE=../releases
 RELNAME=php-weathermap-$(VERSION)
 RELDIR=$(RELBASE)/weathermap
@@ -20,7 +20,7 @@ manual:	docs/index.html
 clean:
 	rm random-bits/suite-1.png random-bits/suite-2.png docs/src/contents.xml
 
-release: 
+release: sql
 	echo Building release $(RELNAME)
 	# mv $(RELDIR) $(RELDIR).$$
 	mkdir -p $(RELDIR)
@@ -33,7 +33,7 @@ release:
 test:	
 	vendor/bin/phpunit -c build/phpunit.xml
 	grep  Output test-suite/diffs/*.txt | grep -v '|0|' | awk -F: '{ print $1;}' | sed -e 's/.png.txt//' -e 's/test-suite\/diffs\///' > test-suite/failing-images.txt
-	test-suite/make-failing-summary.pl test-suite/failing-images.txt test-suite/summary.html > test-suite/summary-failing.html
+	php test-suite/make-failing-summary.php > test-suite/summary-failing.html
 
 testcoverage:	
 	phpunit --coverage-html test-suite/code-coverage/ Tests/

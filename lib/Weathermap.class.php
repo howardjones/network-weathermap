@@ -1,4 +1,4 @@
-    <?php
+<?php
 
 // PHP Weathermap 0.98
 // Copyright Howard Jones, 2005-2016 howie@thingy.com
@@ -47,7 +47,7 @@ class WMImageLoader
         } else {
             wm_debug("Cache miss - processing\n");
             $icon_im = $this->imagecreatefromfile($filename);
-            // imagealphablending($icon_im, true);
+        //    imagealphablending($icon_im, true);
 
             $icon_w = imagesx($icon_im);
             $icon_h = imagesy($icon_im);
@@ -322,6 +322,7 @@ class WeatherMap extends WeatherMapBase
 
     var $rrdtool_check;
 
+    /** @var  WMImageLoader $imagecache */
 	var $imagecache;
 	var $black, $white, $grey, $selected;
 

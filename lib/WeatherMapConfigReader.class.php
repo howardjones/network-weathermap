@@ -1183,7 +1183,7 @@ class WeatherMapConfigReader
 
     function readConfigLines($inputLines)
     {
-        wm_debug("in readConfig\n");
+        wm_debug("in readConfigLines\n");
 
         foreach ($inputLines as $buffer) {
             wm_debug("Processing: $buffer\n");
@@ -1233,7 +1233,6 @@ class WeatherMapConfigReader
     {
         $matches = null;
 
-        $lineMatched = false;
         if (true === isset($args[0])) {
             // check if there is even an entry in this context for the current keyword
             if (true === isset($this->configKeywords[$this->currentType][$args[0]])) {
@@ -1248,35 +1247,25 @@ class WeatherMapConfigReader
                         // if we came here without a regexp, then the \1 etc
                         // refer to arg numbers, not match numbers
 
-
-                        if (false === isset($matches)) {
-                            $params = $args;
-                        } else {
-                            $params = $matches;
-                        }
+                        $params = isset($matches) ? $matches : $args;
 
                         // The third array item is either an array of config variables to populate,
                         // or a function to call that will handle decoding this stuff
                         if (is_array($keyword[2])) {
-                            $this->readConfigSimpleLine($keyword, $params);
-                            $lineMatched = true;
+                            $this->readConfigSimpleAssignment($keyword, $params);
+                            return true;
                         } else {
                             // the third arg wasn't an array, it was a function name.
                             // call that function to handle this keyword
                             if (call_user_func(array($this, $keyword[2]), $buffer, $args, $params)) {
-                                $lineMatched = true;
+                                return true;
                             }
                         }
-                    }
-
-                    // jump out of this loop if there's been a match
-                    if ($lineMatched) {
-                        return $lineMatched;
                     }
                 }
             }
         }
-        return $lineMatched;
+        return false;
     }
 
 
@@ -1285,7 +1274,7 @@ class WeatherMapConfigReader
      * @param $matches
      */
     private
-    function readConfigSimpleLine($keyword, $matches)
+    function readConfigSimpleAssignment($keyword, $matches)
     {
         foreach ($keyword[2] as $key => $val) {
             // so we can poke in numbers too, if the value starts with #

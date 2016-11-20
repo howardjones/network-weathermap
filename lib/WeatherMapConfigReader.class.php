@@ -1156,89 +1156,6 @@ class WeatherMapConfigReader
         }
     }
 
-    function readConfigLines($inputLines)
-    {
-        $matches = null;
-
-        wm_debug("in readConfig\n");
-
-        foreach ($inputLines as $buffer) {
-            wm_debug("Processing: $buffer\n");
-            $lineMatched = false;
-            $this->lineCount++;
-
-            $buffer = trim($buffer);
-
-            if ($buffer == '' || substr($buffer, 0, 1) == '#') {
-                // this is a comment line, or a blank line, just skip to the next line
-                continue;
-            }
-
-            $this->objectLineCount++;
-            // break out the line into words (quoted strings are one word)
-            $args = $this::parseString($buffer);
-            wm_debug("  First: $args[0] in $this->currentType\n");
-
-
-            // From here, the aim of the game is to get out of this loop as
-            // early as possible, without running more preg_match calls than
-            // necessary. In 0.97, this per-line loop accounted for 50% of
-            // the running time!
-
-            // this next loop replaces a whole pile of duplicated ifs with something with consistent handling
-
-            if (!$lineMatched && true === isset($args[0])) {
-                // check if there is even an entry in this context for the current keyword
-                if (true === isset($this->configKeywords[$this->currentType][$args[0]])) {
-                    // if there is, then the entry is an array of arrays - iterate them to validate the config
-                    wm_debug("    Possible!\n");
-                    foreach ($this->configKeywords[$this->currentType][$args[0]] as $keyword) {
-                        unset($matches);
-                        wm_debug("      Trying $keyword[1]\n");
-                        if ((substr($keyword[1], 0, 1) != '/') || (1 === preg_match($keyword[1], $buffer, $matches))) {
-                            #   wm_debug("Might be $args[0]\n");
-
-                            // if we came here without a regexp, then the \1 etc
-                            // refer to arg numbers, not match numbers
-
-                            if (false === isset($matches)) {
-                                $matches = $args;
-                            }
-
-                            if (is_array($keyword[2])) {
-                                $this->readConfigSimpleLine($keyword, $matches);
-                                $lineMatched = true;
-                            } else {
-                                // the third arg wasn't an array, it was a function name.
-                                // call that function to handle this keyword
-                                if (call_user_func(array($this, $keyword[2]), $buffer, $args, $matches)) {
-                                    $lineMatched = true;
-                                }
-                            }
-                        }
-
-                        // jump out of this loop if there's been a match
-                        if ($lineMatched) {
-                            break;
-                        }
-                    }
-                }
-            }
-
-
-            if ((!$lineMatched) && ($buffer != '')) {
-                wm_warn("Unrecognised config on line $this->lineCount: $buffer\n");
-            }
-        }
-
-        // Commit the last item
-        $this->commitItem();
-
-        wm_debug("ReadConfig has finished reading the config ($this->lineCount lines)\n");
-        wm_debug("------------------------------------------\n");
-
-        return $this->lineCount;
-    }
 
     function readConfigFile($filename)
     {
@@ -1263,6 +1180,105 @@ class WeatherMapConfigReader
 
         return $result;
     }
+
+    function readConfigLines($inputLines)
+    {
+        wm_debug("in readConfig\n");
+
+        foreach ($inputLines as $buffer) {
+            wm_debug("Processing: $buffer\n");
+            $this->lineCount++;
+
+            $buffer = trim($buffer);
+
+            if ($buffer == '' || substr($buffer, 0, 1) == '#') {
+                // this is a comment line, or a blank line, just skip to the next line
+                continue;
+            }
+
+            $this->objectLineCount++;
+            // break out the line into words (quoted strings are one word)
+            $args = $this::parseString($buffer);
+            wm_debug("  First: $args[0] in $this->currentType\n");
+
+
+            // From here, the aim of the game is to get out of this loop as
+            // early as possible, without running more preg_match calls than
+            // necessary. In 0.97, this per-line loop accounted for 50% of
+            // the running time!
+
+            // this next loop replaces a whole pile of duplicated ifs with something with consistent handling
+            $lineMatched = $this->readConfigLine($args, $buffer);
+
+            if ((!$lineMatched) && ($buffer != '')) {
+                wm_warn("Unrecognised config on line $this->lineCount: $buffer\n");
+            }
+        }
+
+        // Commit the last item
+        $this->commitItem();
+
+        wm_debug("ReadConfig has finished reading the config ($this->lineCount lines)\n");
+        wm_debug("------------------------------------------\n");
+
+        return $this->lineCount;
+    }
+
+    /**
+     * @param $args
+     * @param $buffer
+     * @return bool
+     */
+    private function readConfigLine($args, $buffer)
+    {
+        $matches = null;
+
+        $lineMatched = false;
+        if (true === isset($args[0])) {
+            // check if there is even an entry in this context for the current keyword
+            if (true === isset($this->configKeywords[$this->currentType][$args[0]])) {
+                // if there is, then the entry is an array of arrays - iterate them to validate the config
+                wm_debug("    Possible!\n");
+                foreach ($this->configKeywords[$this->currentType][$args[0]] as $keyword) {
+                    unset($matches);
+                    wm_debug("      Trying $keyword[1]\n");
+                    if ((substr($keyword[1], 0, 1) != '/') || (1 === preg_match($keyword[1], $buffer, $matches))) {
+                        #   wm_debug("Might be $args[0]\n");
+
+                        // if we came here without a regexp, then the \1 etc
+                        // refer to arg numbers, not match numbers
+
+
+                        if (false === isset($matches)) {
+                            $params = $args;
+                        } else {
+                            $params = $matches;
+                        }
+
+                        // The third array item is either an array of config variables to populate,
+                        // or a function to call that will handle decoding this stuff
+                        if (is_array($keyword[2])) {
+                            $this->readConfigSimpleLine($keyword, $params);
+                            $lineMatched = true;
+                        } else {
+                            // the third arg wasn't an array, it was a function name.
+                            // call that function to handle this keyword
+                            if (call_user_func(array($this, $keyword[2]), $buffer, $args, $params)) {
+                                $lineMatched = true;
+                            }
+                        }
+                    }
+
+                    // jump out of this loop if there's been a match
+                    if ($lineMatched) {
+                        return $lineMatched;
+                    }
+                }
+            }
+        }
+        return $lineMatched;
+    }
+
 
     /**
      * @param $keyword
@@ -1408,7 +1424,7 @@ class WeatherMapConfigReader
                 // - named offsets require access to the internals of the node, when they are
                 //   resolved. Luckily we can resolve them here, and skip that.
 
-                foreach (array(1=>"a", 2=>"b") as $index=>$name) {
+                foreach (array(1 => "a", 2 => "b") as $index => $name) {
                     if ($offset_dx[$index] != 0 || $offset_dy[$index] != 0) {
                         wm_debug("Applying offset for $name end %s,%s\n", $offset_dx[$index], $offset_dy[$index]);
 
@@ -1867,6 +1883,46 @@ class WeatherMapConfigReader
     }
 
     /**
+     * Generate a basic Markdown-formatted summary of all known config keywords,
+     * and what they do (at least, what variables they affect, or which function
+     * handles them)
+     *
+     * @return int total entries in the keyword list
+     */
+    public function dumpKeywords()
+    {
+        $count = 0;
+        foreach ($this->configKeywords as $scope => $keywords) {
+            print "\n\n# $scope\n";
+            ksort($keywords);
+
+            foreach ($keywords as $keyword => $matches) {
+                print "\n## $keyword\n";
+                foreach ($matches as $match) {
+
+                    $nicer = str_replace("\\", "\\\\", $match[1]);
+
+                    print "\n### $nicer\n";
+                    if (is_array($match[2])) {
+                        foreach ($match[2] as $key => $val) {
+                            $escval = $val;
+                            if (substr($val, 0, 1) == "#") {
+                                $escval = "'" . substr($val, 1.) . "'";
+                            }
+
+                            print "\n* $escval => $scope->$key\n";
+                        }
+                    } else {
+                        print "\n* -> $match[2]()\n";
+                    }
+                    $count++;
+                }
+            }
+        }
+        return $count;
+    }
+
+    /**
      * Go through the configKeywords array, making sure that all the functions and members
      * referenced by name in strings actually exist! Used only by phpunit.
      */
@@ -1915,4 +1971,5 @@ class WeatherMapConfigReader
 
         return $result;
     }
+
 }

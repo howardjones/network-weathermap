@@ -14,6 +14,7 @@ random-bits/suite-2.png:  random-bits/suite-2.conf
 ready: random-bits/suite-1.png random-bits/suite-2.png
 
 manual:	docs/index.html
+	php dump-keywords.php | pandoc --from=markdown --to=html5 > docs/keywords.html
 	$(MAKE) -C docs/src VERSION=$(VERSION)
 	cd docs/example && ./bodge-example.sh
 	

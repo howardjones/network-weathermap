@@ -8,7 +8,9 @@
  */
 class WeatherMapScale extends WeatherMapItem
 {
-    public $colours;
+    public $entries;
+    public $colourtable;
+
     public $keypos;
     public $keytitle;
     public $keystyle;
@@ -30,7 +32,7 @@ class WeatherMapScale extends WeatherMapItem
         $this->inherit_fieldlist = array(
             "scaleType" => "percent",
             "keystyle" => "classic",
-            "colours" => array(),
+            "entries" => array(),
             "keybgcolour" => new WMColour(255, 255, 255),
             "keyoutlinecolour" => new WMColour(0, 0, 0),
             "keytextcolour" => new WMColour(0, 0, 0),
@@ -69,7 +71,7 @@ class WeatherMapScale extends WeatherMapItem
 
     public function spanCount()
     {
-        return count($this->colours);
+        return count($this->entries);
     }
 
     public function populateDefaultsIfNecessary()
@@ -123,11 +125,11 @@ class WeatherMapScale extends WeatherMapItem
         assert(isset($this->owner));
         $key = $lowValue . '_' . $highValue;
 
-        $this->colours[$key]['c1'] = $lowColour;
-        $this->colours[$key]['c2'] = $highColour;
-        $this->colours[$key]['tag'] = $tag;
-        $this->colours[$key]['bottom'] = $lowValue;
-        $this->colours[$key]['top'] = $highValue;
+        $this->entries[$key]['c1'] = $lowColour;
+        $this->entries[$key]['c2'] = $highColour;
+        $this->entries[$key]['tag'] = $tag;
+        $this->entries[$key]['bottom'] = $lowValue;
+        $this->entries[$key]['top'] = $highValue;
 
         wm_debug("%s %s->%s\n", $this->name, $lowValue, $highValue);
     }
@@ -141,7 +143,7 @@ class WeatherMapScale extends WeatherMapItem
         $nowarn_clipping = intval($this->owner->get_hint("nowarn_clipping"));
         $nowarn_scalemisses = (!$showScaleWarnings) || intval($this->owner->get_hint("nowarn_scalemisses"));
 
-        if (!isset($this->colours)) {
+        if (!isset($this->entries)) {
             throw new WeathermapInternalFail("ColourFromValue: SCALE $scaleName used with no spans defined?");
         }
 
@@ -193,7 +195,7 @@ class WeatherMapScale extends WeatherMapItem
         $matchKey = null;
         $candidate = null;
 
-        foreach ($this->colours as $key => $scaleEntry) {
+        foreach ($this->entries as $key => $scaleEntry) {
             if (($value >= $scaleEntry['bottom']) and ($value <= $scaleEntry['top'])) {
                 wm_debug("HIT for %s-%s\n", $scaleEntry["bottom"], $scaleEntry['top']);
 
@@ -296,30 +298,30 @@ class WeatherMapScale extends WeatherMapItem
             $output .= "\n";
         }
 
-        foreach ($this->colours as $k => $colour) {
-            $top = rtrim(rtrim(sprintf("%f", $colour['top']), "0"),
+        foreach ($this->entries as $k => $entry) {
+            $top = rtrim(rtrim(sprintf("%f", $entry['top']), "0"),
                 $decimal_point);
 
-            $bottom = rtrim(rtrim(sprintf("%f", $colour['bottom']), "0"),
+            $bottom = rtrim(rtrim(sprintf("%f", $entry['bottom']), "0"),
                 $decimal_point);
 
             if ($bottom > $this->owner->kilo) {
-                $bottom = WMUtility::formatNumberWithMetricSuffix($colour['bottom'], $this->owner->kilo);
+                $bottom = WMUtility::formatNumberWithMetricSuffix($entry['bottom'], $this->owner->kilo);
             }
 
             if ($top > $this->owner->kilo) {
-                $top = WMUtility::formatNumberWithMetricSuffix($colour['top'], $this->owner->kilo);
+                $top = WMUtility::formatNumberWithMetricSuffix($entry['top'], $this->owner->kilo);
             }
 
-            $tag = (isset($colour['tag']) ? $colour['tag'] : '');
+            $tag = (isset($entry['tag']) ? $entry['tag'] : '');
 
-            if (is_null($colour['c2']) || $colour['c1']->equals($colour['c2'])) {
+            if (is_null($entry['c2']) || $entry['c1']->equals($entry['c2'])) {
                 $output .= sprintf("\tSCALE %s %-4s %-4s   %s   %s\n",
-                    $this->name, $bottom, $top, $colour['c1']->asConfig(), $tag);
+                    $this->name, $bottom, $top, $entry['c1']->asConfig(), $tag);
             } else {
                 $output .= sprintf("\tSCALE %s %-4s %-4s   %s  %s  %s\n",
-                    $this->name, $bottom, $top, $colour['c1']->asConfig(),
-                    $colour['c2']->asConfig(), $tag);
+                    $this->name, $bottom, $top, $entry['c1']->asConfig(),
+                    $entry['c2']->asConfig(), $tag);
             }
         }
 
@@ -335,7 +337,7 @@ class WeatherMapScale extends WeatherMapItem
         $max = -999999999999999999999;
         $min = -$max;
 
-        $colours = $this->colours;
+        $colours = $this->entries;
 
         foreach ($colours as $key => $colour) {
             if (!$colour['special']) {
@@ -416,7 +418,7 @@ class WeatherMapScale extends WeatherMapItem
 
         // did we actually hide anything?
         $hid_zero = false;
-        if (($hide_zero == 1) && isset($this->colours['0_0'])) {
+        if (($hide_zero == 1) && isset($this->entries['0_0'])) {
             $nScales--;
             $hid_zero = true;
         }
@@ -435,7 +437,7 @@ class WeatherMapScale extends WeatherMapItem
         // TODO this should happen for numbers too! otherwise absolute scales are knackered
         if ($useTags) {
             $maxTagSize = 0;
-            foreach ($this->colours as $scaleEntry) {
+            foreach ($this->entries as $scaleEntry) {
                 if (isset($scaleEntry['tag'])) {
                     list($w,) = $fontObject->calculateImageStringSize($scaleEntry['tag']);
                     if ($w > $maxTagSize) {
@@ -487,7 +489,7 @@ class WeatherMapScale extends WeatherMapItem
 
         $rowNumber = 1;
 
-        foreach ($this->colours as $key => $scaleEntry) {
+        foreach ($this->entries as $key => $scaleEntry) {
             if (!isset($scaleEntry['special']) || $scaleEntry['special'] == 0) {
                 // pick a value in the middle...
                 $value = ($scaleEntry['bottom'] + $scaleEntry['top']) / 2;
@@ -725,7 +727,7 @@ class WeatherMapScale extends WeatherMapItem
     function sortScale()
     {
         // $colours = $this->colours[$scaleName];
-        usort($this->colours, array("WeatherMapScale", "scaleEntrySort"));
+        usort($this->entries, array("WeatherMapScale", "scaleEntrySort"));
     }
 
     private function scaleEntrySort($left, $right)

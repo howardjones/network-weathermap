@@ -1270,11 +1270,10 @@ class WeatherMapConfigReader
 
 
     /**
-     * @param $keyword
-     * @param $matches
+     * @param string[] $keyword The entry from configKeywords
+     * @param string[] $matches The list of parameters or regexp matches
      */
-    private
-    function readConfigSimpleAssignment($keyword, $matches)
+    private function readConfigSimpleAssignment($keyword, $matches)
     {
         foreach ($keyword[2] as $key => $val) {
             // so we can poke in numbers too, if the value starts with #
@@ -1300,7 +1299,6 @@ class WeatherMapConfigReader
                 array_push($this->currentObject->$key, $val);
                 // array_push($this->currentObject->config[$key], $val);
                 $this->currentObject->addConfigValue($key, $val);
-
             } else {
                 // otherwise, it's just the name of a property on the
                 // appropriate object.
@@ -1477,29 +1475,6 @@ class WeatherMapConfigReader
             $wmc = new WMColour($val);
         }
         $this->mapObject->colourtable[$key] = $wmc;
-
-        // below here is the old way
-
-        // this is a regular colour setting thing
-        if (isset($args[2])) {
-            $red = $args[1];
-            $green = $args[2];
-            $blue = $args[3];
-        }
-
-        if ($args[1] == 'none') {
-            $red = -1;
-            $green = -1;
-            $blue = -1;
-        }
-
-        $this->mapObject->colours['DEFAULT'][$key]['red1'] = $red;
-        $this->mapObject->colours['DEFAULT'][$key]['green1'] = $green;
-        $this->mapObject->colours['DEFAULT'][$key]['blue1'] = $blue;
-        $this->mapObject->colours['DEFAULT'][$key]['c1'] = $wmc;
-        $this->mapObject->colours['DEFAULT'][$key]['bottom'] = -2;
-        $this->mapObject->colours['DEFAULT'][$key]['top'] = -1;
-        $this->mapObject->colours['DEFAULT'][$key]['special'] = 1;
 
         return true;
     }
@@ -1708,12 +1683,10 @@ class WeatherMapConfigReader
             $matches[1] = trim($matches[1]);
         }
 
-        if (isset($this->mapObject->scales[$matches[1]])) {
-            $newscale = $this->mapObject->scales[$matches[1]];
-        } else {
+        if (!isset($this->mapObject->scales[$matches[1]])) {
             $this->mapObject->scales[$matches[1]] = new WeatherMapScale($matches[1], $this->mapObject);
-            $newscale = $this->mapObject->scales[$matches[1]];
         }
+        $newscale = $this->mapObject->scales[$matches[1]];
 
         $key = $matches[2] . '_' . $matches[3];
         $tag = $matches[11];
@@ -1724,44 +1697,19 @@ class WeatherMapConfigReader
         $bottom = WMUtility::interpretNumberWithMetricSuffix($matches[2], $this->mapObject->kilo);
         $top = WMUtility::interpretNumberWithMetricSuffix($matches[3], $this->mapObject->kilo);
 
-        $this->mapObject->colours[$matches[1]][$key]['key'] = $key;
-        $this->mapObject->colours[$matches[1]][$key]['tag'] = $tag;
-
-        $this->mapObject->colours[$matches[1]][$key]['bottom'] = WMUtility::interpretNumberWithMetricSuffix($matches[2], $this->mapObject->kilo);
-        $this->mapObject->colours[$matches[1]][$key]['top'] = WMUtility::interpretNumberWithMetricSuffix($matches[3], $this->mapObject->kilo);
-
-        $this->mapObject->colours[$matches[1]][$key]['special'] = 0;
-
         if (isset($matches[10]) && $matches[10] == 'none') {
-            $this->mapObject->colours[$matches[1]][$key]['c1'] = new WMColour('none');
-
             $colour1 = new WMColour("none");
-
         } else {
             $colour1 = new WMColour((int)($matches[4]), (int)($matches[5]), (int)($matches[6]));
             $colour2 = $colour1;
-            $this->mapObject->colours[$matches[1]][$key]['c1'] = $colour1;
         }
 
         // this is the second colour, if there is one
         if (isset($matches[7]) && $matches[7] != '') {
             $colour2 = new WMColour((int)($matches[7]), (int)($matches[8]), (int)($matches[9]));
-            $this->mapObject->colours[$matches[1]][$key]['c2'] = $colour2;
         }
 
         $newscale->AddSpan($bottom, $top, $colour1, $colour2, $tag);
-
-        if (!isset($this->mapObject->numscales[$matches[1]])) {
-            $this->mapObject->numscales[$matches[1]] = 1;
-        } else {
-            $this->mapObject->numscales[$matches[1]]++;
-        }
-
-        // we count if we've seen any default scale, otherwise, we have to add
-        // one at the end.
-//        if ($matches[1] == 'DEFAULT') {
-//            $this->mapObject->scalesseen++;
-//        }
 
         return true;
     }

@@ -34,6 +34,16 @@ class WMFont
         }
         return $maxLineLength;
     }
+
+    public function drawImageString($gdImage, $x, $y, $string, $colour, $angle = 0)
+    {
+
+    }
+
+    public function calculateImageStringSize($string)
+    {
+        return array(0, 0);
+    }
 }
 
 class WMTrueTypeFont extends WMFont
@@ -57,7 +67,7 @@ class WMTrueTypeFont extends WMFont
 
     public function getConfig($fontNumber)
     {
-        if ($this->v_offset != 0){
+        if ($this->v_offset != 0) {
             return sprintf("FONTDEFINE %d %s %d %d\n", $fontNumber, $this->file, $this->size, $this->v_offset);
         } else {
             return sprintf("FONTDEFINE %d %s %d\n", $fontNumber, $this->file, $this->size);

@@ -29,191 +29,190 @@ class WeatherMapConfigReader
         'GLOBAL' => array(
 
             'INCLUDE' => array(
-                array('GLOBAL', '/^\s*INCLUDE\s+(.*)\s*$/i', 'handleINCLUDE'),
+                array('/^\s*INCLUDE\s+(.*)\s*$/i', 'handleINCLUDE'),
             ),
 
             'SCALE' => array(
-                array('GLOBAL', '/^\s*SCALE\s+([A-Za-z][A-Za-z0-9_]*\s+)?(\-?\d+\.?\d*[munKMGT]?)\s+(\-?\d+\.?\d*[munKMGT]?)\s+(?:(\d+)\s+(\d+)\s+(\d+)(?:\s+(\d+)\s+(\d+)\s+(\d+))?|(none))\s*(.*)$/i', 'handleSCALE'),
+                array('/^\s*SCALE\s+([A-Za-z][A-Za-z0-9_]*\s+)?(\-?\d+\.?\d*[munKMGT]?)\s+(\-?\d+\.?\d*[munKMGT]?)\s+(?:(\d+)\s+(\d+)\s+(\d+)(?:\s+(\d+)\s+(\d+)\s+(\d+))?|(none))\s*(.*)$/i', 'handleSCALE'),
             ),
             'KEYSTYLE' => array(
-                array('GLOBAL', '/^\s*KEYSTYLE\s+([A-Za-z][A-Za-z0-9_]+\s+)?(classic|horizontal|vertical|inverted|tags)\s?(\d+)?\s*$/i', 'handleKEYSTYLE'),
+                array('/^\s*KEYSTYLE\s+([A-Za-z][A-Za-z0-9_]+\s+)?(classic|horizontal|vertical|inverted|tags)\s?(\d+)?\s*$/i', 'handleKEYSTYLE'),
             ),
             'KEYPOS' => array(
-                array('GLOBAL', '/^\s*KEYPOS\s+([A-Za-z][A-Za-z0-9_]*\s+)?(-?\d+)\s+(-?\d+)(.*)/i', 'handleKEYPOS'),
+                array('/^\s*KEYPOS\s+([A-Za-z][A-Za-z0-9_]*\s+)?(-?\d+)\s+(-?\d+)(.*)/i', 'handleKEYPOS'),
             ),
             'NODE' => array(
-                array('GLOBAL', '/^\s*NODE\s+(\S+)\s*$/i', 'handleNODE'),
+                array('/^\s*NODE\s+(\S+)\s*$/i', 'handleNODE'),
             ),
             'LINK' => array(
-                array('GLOBAL', '/^\s*LINK\s+(\S+)\s*$/i', 'handleLINK'),
+                array('/^\s*LINK\s+(\S+)\s*$/i', 'handleLINK'),
             ),
 
-
             'FONTDEFINE' => array(
-                array('GLOBAL', '/^\s*FONTDEFINE\s+(\d+)\s+(\S+)\s+(\d+)\s+(-?\d+)\s*$/i', 'handleFONTDEFINE'),
-                array('GLOBAL', '/^\s*FONTDEFINE\s+(\d+)\s+(\S+)\s+(\d+)\s*$/i', 'handleFONTDEFINE'),
-                array('GLOBAL', '/^\s*FONTDEFINE\s+(\d+)\s+(\S+)\s*$/i', 'handleFONTDEFINE'),
+                array('/^\s*FONTDEFINE\s+(\d+)\s+(\S+)\s+(\d+)\s+(-?\d+)\s*$/i', 'handleFONTDEFINE'),
+                array('/^\s*FONTDEFINE\s+(\d+)\s+(\S+)\s+(\d+)\s*$/i', 'handleFONTDEFINE'),
+                array('/^\s*FONTDEFINE\s+(\d+)\s+(\S+)\s*$/i', 'handleFONTDEFINE'),
             ),
             'KEYOUTLINECOLOR' => array(
                 array(
-                    'GLOBAL',
+
                     '/^KEYOUTLINECOLOR\s+(\d+)\s+(\d+)\s+(\d+)$/',
                     'handleGLOBALCOLOR'
                 ),
                 array(
-                    'GLOBAL',
+
                     '/^KEYOUTLINECOLOR\s+(none)$/',
                     'handleGLOBALCOLOR'
                 ),
             ),
             'KEYTEXTCOLOR' => array(
                 array(
-                    'GLOBAL',
+
                     '/^KEYTEXTCOLOR\s+(\d+)\s+(\d+)\s+(\d+)$/',
                     'handleGLOBALCOLOR'
                 ),
             ),
             'TITLECOLOR' => array(
                 array(
-                    'GLOBAL',
+
                     '/^TITLECOLOR\s+(\d+)\s+(\d+)\s+(\d+)$/',
                     'handleGLOBALCOLOR'
                 ),
             ),
             'TIMECOLOR' => array(
                 array(
-                    'GLOBAL',
+
                     '/^TIMECOLOR\s+(\d+)\s+(\d+)\s+(\d+)$/',
                     'handleGLOBALCOLOR'
                 ),
             ),
             'KEYBGCOLOR' => array(
                 array(
-                    'GLOBAL',
+
                     '/^KEYBGCOLOR\s+(\d+)\s+(\d+)\s+(\d+)$/',
                     'handleGLOBALCOLOR'
                 ),
                 array(
-                    'GLOBAL',
+
                     '/^KEYBGCOLOR\s+(none)$/',
                     'handleGLOBALCOLOR'
                 ),
             ),
             'BGCOLOR' => array(
                 array(
-                    'GLOBAL',
+
                     '/^BGCOLOR\s+(\d+)\s+(\d+)\s+(\d+)$/',
                     'handleGLOBALCOLOR'
                 ),
             ),
             'SET' => array(
                 array(
-                    'GLOBAL',
+
                     'SET',
                     'handleSET'
                 ),
             ),
             'HTMLSTYLESHEET' => array(
                 array(
-                    'GLOBAL',
+
                     '/^HTMLSTYLESHEET\s+(.*)\s*$/i',
                     array('htmlstylesheet' => 1)
                 ),
             ),
             'HTMLOUTPUTFILE' => array(
                 array(
-                    'GLOBAL',
+
                     '/^HTMLOUTPUTFILE\s+(.*)\s*$/i',
                     array('htmloutputfile' => 1)
                 ),
             ),
             'BACKGROUND' => array(
                 array(
-                    'GLOBAL',
+
                     '/^BACKGROUND\s+(.*)\s*$/i',
                     array('background' => 1)
                 ),
             ),
             'IMAGEOUTPUTFILE' => array(
                 array(
-                    'GLOBAL',
+
                     '/^IMAGEOUTPUTFILE\s+(.*)\s*$/i',
                     array('imageoutputfile' => 1)
                 ),
             ),
             'DATAOUTPUTFILE' => array(
                 array(
-                    'GLOBAL',
+
                     '/^DATAOUTPUTFILE\s+(.*)\s*$/i',
                     array('dataoutputfile' => 1)
                 ),
             ),
             'IMAGEURI' => array(
                 array(
-                    'GLOBAL',
+
                     '/^IMAGEURI\s+(.*)\s*$/i',
                     array('imageuri' => 1)
                 ),
             ),
             'TITLE' => array(
                 array(
-                    'GLOBAL',
+
                     '/^TITLE\s+(.*)\s*$/i',
                     array('title' => 1)
                 ),
             ),
             'HTMLSTYLE' => array(
                 array(
-                    'GLOBAL',
+
                     '/^HTMLSTYLE\s+(static|overlib)\s*$/i',
                     array('htmlstyle' => 1)
                 ),
             ),
             'KILO' => array(
                 array(
-                    'GLOBAL',
+
                     '/^KILO\s+(\d+)\s*$/i',
                     array('kilo' => 1)
                 ),
             ),
             'KEYFONT' => array(
                 array(
-                    'GLOBAL',
+
                     '/^KEYFONT\s+(\d+)\s*$/i',
                     array('keyfont' => 1)
                 ),
             ),
             'TITLEFONT' => array(
                 array(
-                    'GLOBAL',
+
                     '/^TITLEFONT\s+(\d+)\s*$/i',
                     array('titlefont' => 1)
                 ),
             ),
             'TIMEFONT' => array(
                 array(
-                    'GLOBAL',
+
                     '/^TIMEFONT\s+(\d+)\s*$/i',
                     array('timefont' => 1)
                 ),
             ),
             'WIDTH' => array(
                 array(
-                    'GLOBAL',
+
                     '/^WIDTH\s+(\d+)\s*$/i',
                     array('width' => 1)
                 ),
             ),
             'HEIGHT' => array(
                 array(
-                    'GLOBAL',
+
                     '/^HEIGHT\s+(\d+)\s*$/i',
                     array('height' => 1)
                 ),
             ),
             'TITLEPOS' => array(
                 array(
-                    'GLOBAL',
+
                     '/^TITLEPOS\s+(-?\d+)\s+(-?\d+)\s*$/i',
                     array(
                         'titlex' => 1,
@@ -221,7 +220,7 @@ class WeatherMapConfigReader
                     )
                 ),
                 array(
-                    'GLOBAL',
+
                     '/^TITLEPOS\s+(-?\d+)\s+(-?\d+)\s+(.*)\s*$/i',
                     array(
                         'titlex' => 1,
@@ -232,7 +231,7 @@ class WeatherMapConfigReader
             ),
             'TIMEPOS' => array(
                 array(
-                    'GLOBAL',
+
                     '/^TIMEPOS\s+(-?\d+)\s+(-?\d+)\s*$/i',
                     array(
                         'timex' => 1,
@@ -240,7 +239,7 @@ class WeatherMapConfigReader
                     )
                 ),
                 array(
-                    'GLOBAL',
+
                     '/^TIMEPOS\s+(-?\d+)\s+(-?\d+)\s+(.*)\s*$/i',
                     array(
                         'timex' => 1,
@@ -251,7 +250,7 @@ class WeatherMapConfigReader
             ),
             'MINTIMEPOS' => array(
                 array(
-                    'GLOBAL',
+
                     '/^MINTIMEPOS\s+(-?\d+)\s+(-?\d+)\s*$/i',
                     array(
                         'mintimex' => 1,
@@ -259,7 +258,7 @@ class WeatherMapConfigReader
                     )
                 ),
                 array(
-                    'GLOBAL',
+
                     '/^MINTIMEPOS\s+(-?\d+)\s+(-?\d+)\s+(.*)\s*$/i',
                     array(
                         'mintimex' => 1,
@@ -270,7 +269,7 @@ class WeatherMapConfigReader
             ),
             'MAXTIMEPOS' => array(
                 array(
-                    'GLOBAL',
+
                     '/^MAXTIMEPOS\s+(-?\d+)\s+(-?\d+)\s*$/i',
                     array(
                         'maxtimex' => 1,
@@ -278,7 +277,7 @@ class WeatherMapConfigReader
                     )
                 ),
                 array(
-                    'GLOBAL',
+
                     '/^MAXTIMEPOS\s+(-?\d+)\s+(-?\d+)\s+(.*)\s*$/i',
                     array(
                         'maxtimex' => 1,
@@ -290,109 +289,109 @@ class WeatherMapConfigReader
         ), // end of global
         'NODE' => array(
             'INCLUDE' => array(
-                array('NODE', '/^\s*INCLUDE\s+(.*)\s*$/i', 'handleINCLUDE'),
+                array('/^\s*INCLUDE\s+(.*)\s*$/i', 'handleINCLUDE'),
             ),
 
             'TEMPLATE' => array(
-                array('NODE', '/^\s*TEMPLATE\s+(\S+)\s*$/i', 'handleTEMPLATE')
+                array('/^\s*TEMPLATE\s+(\S+)\s*$/i', 'handleTEMPLATE')
             ),
 
             'NODE' => array(
-                array('NODE', '/^\s*NODE\s+(\S+)\s*$/i', 'handleNODE'),
+                array('/^\s*NODE\s+(\S+)\s*$/i', 'handleNODE'),
             ),
             'LINK' => array(
-                array('NODE', '/^\s*LINK\s+(\S+)\s*$/i', 'handleLINK'),
+                array('/^\s*LINK\s+(\S+)\s*$/i', 'handleLINK'),
             ),
 
             'TARGET' => array(
                 array(
-                    'NODE',
+
                     'TARGET',
                     'handleTARGET'
                 ),
             ),
             'SET' => array(
                 array(
-                    'NODE',
+
                     'SET',
                     'handleSET'
                 ),
             ),
             'AICONOUTLINECOLOR' => array(
                 array(
-                    'NODE',
+
                     '/^AICONOUTLINECOLOR\s+(\d+)\s+(\d+)\s+(\d+)$/',
                     'handleCOLOR'
                 ),
                 array(
-                    'NODE',
+
                     '/^AICONOUTLINECOLOR\s+(none)$/',
                     'handleCOLOR'
                 ),
             ),
             'AICONFILLCOLOR' => array(
                 array(
-                    'NODE',
+
                     '/^AICONFILLCOLOR\s+(\d+)\s+(\d+)\s+(\d+)$/',
                     'handleCOLOR'
                 ),
                 array(
-                    'NODE',
+
                     '/^AICONFILLCOLOR\s+(copy)$/',
                     'handleCOLOR'
                 ),
                 array(
-                    'NODE',
+
                     '/^AICONFILLCOLOR\s+(none)$/',
                     'handleCOLOR'
                 ),
             ),
             'LABELOUTLINECOLOR' => array(
                 array(
-                    'NODE',
+
                     '/^LABELOUTLINECOLOR\s+(\d+)\s+(\d+)\s+(\d+)$/',
                     'handleCOLOR'
                 ),
                 array(
-                    'NODE',
+
                     '/^LABELOUTLINECOLOR\s+(none)$/',
                     'handleCOLOR'
                 ),
             ),
             'LABELBGCOLOR' => array(
                 array(
-                    'NODE',
+
                     '/^LABELBGCOLOR\s+(\d+)\s+(\d+)\s+(\d+)$/',
                     'handleCOLOR'
                 ),
                 array(
-                    'NODE',
+
                     '/^LABELBGCOLOR\s+(none)$/',
                     'handleCOLOR'
                 ),
             ),
             'LABELFONTCOLOR' => array(
                 array(
-                    'NODE',
+
                     '/^LABELFONTCOLOR\s+(\d+)\s+(\d+)\s+(\d+)$/',
                     'handleCOLOR'
                 ),
                 array(
-                    'NODE',
+
                     '/^LABELFONTCOLOR\s+(contrast)$/',
                     'handleCOLOR'
                 ),
             ),
             'LABELFONTSHADOWCOLOR' => array(
                 array(
-                    'NODE',
+
                     '/^LABELFONTSHADOWCOLOR\s+(\d+)\s+(\d+)\s+(\d+)$/',
                     'handleCOLOR'
                 ),
             ),
             'NOTES' => array(
                 array(
-                    'NODE',
+
                     '/^NOTES\s+(.*)\s*$/i',
                     array(
                         'notestext[IN]' => 1,
@@ -402,7 +401,7 @@ class WeatherMapConfigReader
             ),
             'MAXVALUE' => array(
                 array(
-                    'NODE',
+
                     '/^(MAXVALUE)\s+(\d+\.?\d*[KMGT]?)\s+(\d+\.?\d*[KMGT]?)\s*$/i',
                     array(
                         'max_bandwidth_in_cfg' => 2,
@@ -410,7 +409,7 @@ class WeatherMapConfigReader
                     )
                 ),
                 array(
-                    'NODE',
+
                     '/^(MAXVALUE)\s+(\d+\.?\d*[KMGT]?)\s*$/i',
                     array(
                         'max_bandwidth_in_cfg' => 2,
@@ -420,14 +419,14 @@ class WeatherMapConfigReader
             ),
 //            'ORIGIN' => array(
 //                array(
-//                    'NODE',
+//                    
 //                    '/^ORIGIN\s+(C|NE|SE|NW|SW|N|S|E|W)/i',
 //                    array('position_origin' => 1)
 //                )
 //            ),
             'POSITION' => array(
                 array(
-                    'NODE',
+
                     '/^POSITION\s+([-+]?\d+)\s+([-+]?\d+)\s*$/i',
                     array(
                         'x' => 1,
@@ -435,7 +434,7 @@ class WeatherMapConfigReader
                     )
                 ),
                 array(
-                    'NODE',
+
                     '/^POSITION\s+(\S+)\s+([-+]?\d+)\s+([-+]?\d+)\s*$/i',
                     array(
                         'x' => 2,
@@ -447,7 +446,7 @@ class WeatherMapConfigReader
                     )
                 ),
                 array(
-                    'NODE',
+
                     '/^POSITION\s+(\S+)\s+([-+]?\d+)r(\d+)\s*$/i',
                     array(
                         'x' => 2,
@@ -460,7 +459,7 @@ class WeatherMapConfigReader
                     )
                 ),
                 array( # named offset
-                    'NODE',
+
                     '/^POSITION\s+([A-Za-z][A-Za-z0-9\-_]*):([A-Za-z][A-Za-z0-9_]*)$/i',
                     array(
                         'relative_to' => 1,
@@ -473,7 +472,7 @@ class WeatherMapConfigReader
             ),
             'INFOURL' => array(
                 array(
-                    'NODE',
+
                     '/^INFOURL\s+(.*)\s*$/i',
                     array(
                         'infourl[IN]' => 1,
@@ -483,7 +482,7 @@ class WeatherMapConfigReader
             ),
             'OVERLIBCAPTION' => array(
                 array(
-                    'NODE',
+
                     '/^OVERLIBCAPTION\s+(.*)\s*$/i',
                     array(
                         'overlibcaption[IN]' => 1,
@@ -493,42 +492,42 @@ class WeatherMapConfigReader
             ),
             'ZORDER' => array(
                 array(
-                    'NODE',
+
                     '/^ZORDER\s+([-+]?\d+)\s*$/i',
                     array('zorder' => 1)
                 ),
             ),
             'OVERLIBHEIGHT' => array(
                 array(
-                    'NODE',
+
                     '/^OVERLIBHEIGHT\s+(\d+)\s*$/i',
                     array('overlibheight' => 1)
                 ),
             ),
             'OVERLIBWIDTH' => array(
                 array(
-                    'NODE',
+
                     '/^OVERLIBWIDTH\s+(\d+)\s*$/i',
                     array('overlibwidth' => 1)
                 ),
             ),
             'LABELFONT' => array(
                 array(
-                    'NODE',
+
                     '/^LABELFONT\s+(\d+)\s*$/i',
                     array('labelfont' => 1)
                 ),
             ),
             'LABELANGLE' => array(
                 array(
-                    'NODE',
+
                     '/^LABELANGLE\s+(0|90|180|270)\s*$/i',
                     array('labelangle' => 1)
                 ),
             ),
             'ICON' => array(
                 array(
-                    'NODE',
+
                     '/^ICON\s+(\S+)\s*$/i',
                     array(
                         'iconfile' => 1,
@@ -537,12 +536,12 @@ class WeatherMapConfigReader
                     )
                 ),
                 array(
-                    'NODE',
+
                     '/^ICON\s+(\S+)\s*$/i',
                     array('iconfile' => 1)
                 ),
                 array(
-                    'NODE',
+
                     '/^ICON\s+(\d+)\s+(\d+)\s+(inpie|outpie|box|rbox|round|gauge|nink)\s*$/i',
                     array(
                         'iconfile' => 3,
@@ -551,7 +550,7 @@ class WeatherMapConfigReader
                     )
                 ),
                 array(
-                    'NODE',
+
                     '/^ICON\s+(\d+)\s+(\d+)\s+(\S+)\s*$/i',
                     array(
                         'iconfile' => 3,
@@ -562,26 +561,26 @@ class WeatherMapConfigReader
             ),
             'LABEL' => array(
                 array(
-                    'NODE',
+
                     '/^LABEL\s*$/i',
                     array('label' => '')
                 ), # special case for blank labels
                 array(
-                    'NODE',
+
                     '/^LABEL\s+(.*)\s*$/i',
                     array('label' => 1)
                 ),
             ),
             'DEFINEOFFSET' => array(
                 array(
-                    'NODE',
+
                     '/^DEFINEOFFSET\s+([A-Za-z][A-Za-z0-9_]*)\s+([-+]?\d+)\s+([-+]?\d+)/i',
                     "handleDEFINEOFFSET"
                 ),
             ),
             'LABELOFFSET' => array(
                 array(
-                    'NODE',
+
                     '/^LABELOFFSET\s+([-+]?\d+)\s+([-+]?\d+)\s*$/i',
                     array(
                         'labeloffsetx' => 1,
@@ -589,142 +588,142 @@ class WeatherMapConfigReader
                     )
                 ),
                 array(
-                    'NODE',
+
                     '/^LABELOFFSET\s+(C|NE|SE|NW|SW|N|S|E|W)\s*$/i',
                     array('labeloffset' => 1)
                 ),
                 array(
-                    'NODE',
+
                     '/^LABELOFFSET\s+((C|NE|SE|NW|SW|N|S|E|W)\d+)\s*$/i',
                     array('labeloffset' => 1)
                 ),
                 array(
-                    'NODE',
+
                     '/^LABELOFFSET\s+(-?\d+r\d+)\s*$/i',
                     array('labeloffset' => 1)
                 ),
             ),
             'USESCALE' => array(
                 array(
-                    'NODE',
+
                     '/^(USESCALE)\s+([A-Za-z][A-Za-z0-9_]*)(\s+(in|out))?(\s+(absolute|percent))?\s*$/i',
                     'handleNODE_USESCALE'
                 ),
             ),
             'USEICONSCALE' => array(
                 array(
-                    'NODE',
+
                     '/^(USEICONSCALE)\s+([A-Za-z][A-Za-z0-9_]*)(\s+(in|out))?(\s+(absolute|percent))?\s*$/i',
                     'handleNODE_USESCALE'
                 ),
             ),
             'OVERLIBGRAPH' => array(
-                array('NODE', '/^OVERLIBGRAPH\s+(.+)$/i', 'handleOVERLIB')
+                array('/^OVERLIBGRAPH\s+(.+)$/i', 'handleOVERLIB')
             ),
 
         ), // end of node
         'LINK' => array(
 
             'INCLUDE' => array(
-                array('LINK', '/^\s*INCLUDE\s+(.*)\s*$/i', 'handleINCLUDE'),
+                array('/^\s*INCLUDE\s+(.*)\s*$/i', 'handleINCLUDE'),
             ),
 
             'TEMPLATE' => array(
-                array('LINK', '/^\s*TEMPLATE\s+(\S+)\s*$/i', 'handleTEMPLATE')
+                array('/^\s*TEMPLATE\s+(\S+)\s*$/i', 'handleTEMPLATE')
             ),
             'NODE' => array(
-                array('LINK', '/^\s*NODE\s+(\S+)\s*$/i', 'handleNODE'),
+                array('/^\s*NODE\s+(\S+)\s*$/i', 'handleNODE'),
             ),
             'LINK' => array(
-                array('LINK', '/^\s*LINK\s+(\S+)\s*$/i', 'handleLINK'),
+                array('/^\s*LINK\s+(\S+)\s*$/i', 'handleLINK'),
             ),
 
             'TARGET' => array(
                 array(
-                    'LINK',
+
                     'TARGET',
                     'handleTARGET'
                 ),
             ),
             'SET' => array(
                 array(
-                    'LINK',
+
                     'SET',
                     'handleSET'
                 ),
             ),
             'NODES' => array(
                 array(
-                    'LINK',
+
                     'NODES',
                     'handleNODES'
                 ),
             ),
             'VIA' => array(
                 array(
-                    'LINK',
+
                     'VIA',
                     'handleVIA'
                 ),
             ),
             'COMMENTFONTCOLOR' => array(
                 array(
-                    'LINK',
+
                     '/^COMMENTFONTCOLOR\s+(\d+)\s+(\d+)\s+(\d+)$/',
                     'handleCOLOR'
                 ),
                 array(
-                    'LINK',
+
                     '/^COMMENTFONTCOLOR\s+(contrast)$/',
                     'handleCOLOR'
                 ),
             ),
             'OUTLINECOLOR' => array(
                 array(
-                    'LINK',
+
                     '/^OUTLINECOLOR\s+(\d+)\s+(\d+)\s+(\d+)$/',
                     'handleCOLOR'
                 ),
                 array(
-                    'LINK',
+
                     '/^OUTLINECOLOR\s+(none)$/',
                     'handleCOLOR'
                 ),
             ),
             'BWOUTLINECOLOR' => array(
                 array(
-                    'LINK',
+
                     '/^BWOUTLINECOLOR\s+(\d+)\s+(\d+)\s+(\d+)$/',
                     'handleCOLOR'
                 ),
                 array(
-                    'LINK',
+
                     '/^BWOUTLINECOLOR\s+(none)$/',
                     'handleCOLOR'
                 ),
             ),
             'BWBOXCOLOR' => array(
                 array(
-                    'LINK',
+
                     '/^BWBOXCOLOR\s+(\d+)\s+(\d+)\s+(\d+)$/',
                     'handleCOLOR'
                 ),
                 array(
-                    'LINK',
+
                     '/^BWBOXCOLOR\s+(none)$/',
                     'handleCOLOR'
                 ),
             ),
             'BWFONTCOLOR' => array(
                 array(
-                    'LINK',
+
                     '/^BWFONTCOLOR\s+(\d+)\s+(\d+)\s+(\d+)$/',
                     'handleCOLOR'
                 ),
             ),
             'NOTES' => array(
                 array(
-                    'LINK',
+
                     '/^NOTES\s+(.*)\s*$/i',
                     array(
                         'notestext[IN]' => 1,
@@ -734,7 +733,7 @@ class WeatherMapConfigReader
             ),
             'MAXVALUE' => array(
                 array(
-                    'LINK',
+
                     '/^(MAXVALUE)\s+(\d+\.?\d*[KMGT]?)\s+(\d+\.?\d*[KMGT]?)\s*$/i',
                     array(
                         'max_bandwidth_in_cfg' => 2,
@@ -742,7 +741,7 @@ class WeatherMapConfigReader
                     )
                 ),
                 array(
-                    'LINK',
+
                     '/^(MAXVALUE)\s+(\d+\.?\d*[KMGT]?)\s*$/i',
                     array(
                         'max_bandwidth_in_cfg' => 2,
@@ -752,26 +751,26 @@ class WeatherMapConfigReader
             ),
             'WIDTH' => array(
                 array(
-                    'LINK',
+
                     '/^WIDTH\s+(\d+)\s*$/i',
                     array('width' => 1)
                 ),
                 array(
-                    'LINK',
+
                     '/^WIDTH\s+(\d+\.\d+)\s*$/i',
                     array('width' => 1)
                 ),
             ),
             'SPLITPOS' => array(
                 array(
-                    'LINK',
+
                     '/^SPLITPOS\s+(\d+)\s*$/i',
                     array('splitpos' => 1)
                 ),
             ),
             'BWLABEL' => array(
                 array(
-                    'LINK',
+
                     '/^BWLABEL\s+bits\s*$/i',
                     array(
                         'labelstyle' => 'bits',
@@ -780,7 +779,7 @@ class WeatherMapConfigReader
                     )
                 ),
                 array(
-                    'LINK',
+
                     '/^BWLABEL\s+percent\s*$/i',
                     array(
                         'labelstyle' => 'percent',
@@ -789,7 +788,7 @@ class WeatherMapConfigReader
                     )
                 ),
                 array(
-                    'LINK',
+
                     '/^BWLABEL\s+unformatted\s*$/i',
                     array(
                         'labelstyle' => 'unformatted',
@@ -798,7 +797,7 @@ class WeatherMapConfigReader
                     )
                 ),
                 array(
-                    'LINK',
+
                     '/^BWLABEL\s+none\s*$/i',
                     array(
                         'labelstyle' => 'none',
@@ -809,7 +808,7 @@ class WeatherMapConfigReader
             ),
             'BWLABELPOS' => array(
                 array(
-                    'LINK',
+
                     '/^BWLABELPOS\s+(\d+)\s(\d+)\s*$/i',
                     array(
                         'labeloffset_in' => 1,
@@ -819,7 +818,7 @@ class WeatherMapConfigReader
             ),
             'COMMENTPOS' => array(
                 array(
-                    'LINK',
+
                     '/^COMMENTPOS\s+(\d+)\s(\d+)\s*$/i',
                     array(
                         'commentoffset_in' => 1,
@@ -829,80 +828,80 @@ class WeatherMapConfigReader
             ),
             'DUPLEX' => array(
                 array(
-                    'LINK',
+
                     '/^DUPLEX\s+(full|half)\s*$/i',
                     array('duplex' => 1)
                 ),
             ),
             'BWSTYLE' => array(
                 array(
-                    'LINK',
+
                     '/^BWSTYLE\s+(classic|angled)\s*$/i',
                     array('labelboxstyle' => 1)
                 ),
             ),
             'LINKSTYLE' => array(
                 array(
-                    'LINK',
+
                     '/^LINKSTYLE\s+(twoway|oneway)\s*$/i',
                     array('linkstyle' => 1)
                 ),
             ),
             'COMMENTSTYLE' => array(
                 array(
-                    'LINK',
+
                     '/^COMMENTSTYLE\s+(edge|center)\s*$/i',
                     array('commentstyle' => 1)
                 ),
             ),
             'ARROWSTYLE' => array(
                 array(
-                    'LINK',
+
                     '/^ARROWSTYLE\s+(classic|compact)\s*$/i',
                     array('arrowstyle' => 1)
                 ),
-                array('LINK', '/^\s*ARROWSTYLE\s+(\d+)\s+(\d+)\s*$/i', 'handleARROWSTYLE'),
+                array('/^\s*ARROWSTYLE\s+(\d+)\s+(\d+)\s*$/i', 'handleARROWSTYLE'),
             ),
             'VIASTYLE' => array(
                 array(
-                    'LINK',
+
                     '/^VIASTYLE\s+(curved|angled)\s*$/i',
                     array('viastyle' => 1)
                 ),
             ),
             'INCOMMENT' => array(
                 array(
-                    'LINK',
+
                     '/^INCOMMENT\s+(.*)\s*$/i',
                     array('comments[IN]' => 1)
                 ),
             ),
             'OUTCOMMENT' => array(
                 array(
-                    'LINK',
+
                     '/^OUTCOMMENT\s+(.*)\s*$/i',
                     array('comments[OUT]' => 1)
                 ),
             ),
 
             'OVERLIBGRAPH' => array(
-                array('LINK', '/^OVERLIBGRAPH\s+(.+)$/i', 'handleOVERLIB')
+                array('/^OVERLIBGRAPH\s+(.+)$/i', 'handleOVERLIB')
             ),
             'INOVERLIBGRAPH' => array(
-                array('LINK', '/^INOVERLIBGRAPH\s+(.+)$/i', 'handleOVERLIB')
+                array('/^INOVERLIBGRAPH\s+(.+)$/i', 'handleOVERLIB')
             ),
             'OUTOVERLIBGRAPH' => array(
-                array('LINK', '/^OUTOVERLIBGRAPH\s+(.+)$/i', 'handleOVERLIB')
+                array('/^OUTOVERLIBGRAPH\s+(.+)$/i', 'handleOVERLIB')
             ),
 
             'USESCALE' => array(
                 array(
-                    'LINK',
+
                     '/^USESCALE\s+([A-Za-z][A-Za-z0-9_]*)\s*$/i',
                     array('usescale' => 1)
                 ),
                 array(
-                    'LINK',
+
                     '/^USESCALE\s+([A-Za-z][A-Za-z0-9_]*)\s+(absolute|percent)\s*$/i',
                     array(
                         'usescale' => 1,
@@ -912,21 +911,21 @@ class WeatherMapConfigReader
             ),
             'BWFONT' => array(
                 array(
-                    'LINK',
+
                     '/^BWFONT\s+(\d+)\s*$/i',
                     array('bwfont' => 1)
                 ),
             ),
             'COMMENTFONT' => array(
                 array(
-                    'LINK',
+
                     '/^COMMENTFONT\s+(\d+)\s*$/i',
                     array('commentfont' => 1)
                 ),
             ),
             'BANDWIDTH' => array(
                 array(
-                    'LINK',
+
                     '/^(BANDWIDTH)\s+(\d+\.?\d*[KMGT]?)\s+(\d+\.?\d*[KMGT]?)\s*$/i',
                     array(
                         'max_bandwidth_in_cfg' => 2,
@@ -934,7 +933,7 @@ class WeatherMapConfigReader
                     )
                 ),
                 array(
-                    'LINK',
+
                     '/^(BANDWIDTH)\s+(\d+\.?\d*[KMGT]?)\s*$/i',
                     array(
                         'max_bandwidth_in_cfg' => 2,
@@ -944,7 +943,7 @@ class WeatherMapConfigReader
             ),
             'OUTBWFORMAT' => array(
                 array(
-                    'LINK',
+
                     '/^OUTBWFORMAT\s+(.*)\s*$/i',
                     array(
                         'bwlabelformats[OUT]' => 1,
@@ -954,7 +953,7 @@ class WeatherMapConfigReader
             ),
             'INBWFORMAT' => array(
                 array(
-                    'LINK',
+
                     '/^INBWFORMAT\s+(.*)\s*$/i',
                     array(
                         'bwlabelformats[IN]' => 1,
@@ -964,21 +963,21 @@ class WeatherMapConfigReader
             ),
             'INNOTES' => array(
                 array(
-                    'LINK',
+
                     '/^INNOTES\s+(.*)\s*$/i',
                     array('notestext[IN]' => 1)
                 ),
             ),
             'OUTNOTES' => array(
                 array(
-                    'LINK',
+
                     '/^OUTNOTES\s+(.*)\s*$/i',
                     array('notestext[OUT]' => 1)
                 ),
             ),
             'INFOURL' => array(
                 array(
-                    'LINK',
+
                     '/^INFOURL\s+(.*)\s*$/i',
                     array(
                         'infourl[IN]' => 1,
@@ -988,21 +987,21 @@ class WeatherMapConfigReader
             ),
             'ININFOURL' => array(
                 array(
-                    'LINK',
+
                     '/^ININFOURL\s+(.*)\s*$/i',
                     array('infourl[IN]' => 1)
                 ),
             ),
             'OUTINFOURL' => array(
                 array(
-                    'LINK',
+
                     '/^OUTINFOURL\s+(.*)\s*$/i',
                     array('infourl[OUT]' => 1)
                 ),
             ),
             'OVERLIBCAPTION' => array(
                 array(
-                    'LINK',
+
                     '/^OVERLIBCAPTION\s+(.*)\s*$/i',
                     array(
                         'overlibcaption[IN]' => 1,
@@ -1012,42 +1011,41 @@ class WeatherMapConfigReader
             ),
             'INOVERLIBCAPTION' => array(
                 array(
-                    'LINK',
+
                     '/^INOVERLIBCAPTION\s+(.*)\s*$/i',
                     array('overlibcaption[IN]' => 1)
                 ),
             ),
             'OUTOVERLIBCAPTION' => array(
                 array(
-                    'LINK',
+
                     '/^OUTOVERLIBCAPTION\s+(.*)\s*$/i',
                     array('overlibcaption[OUT]' => 1)
                 ),
             ),
             'ZORDER' => array(
                 array(
-                    'LINK',
+
                     '/^ZORDER\s+([-+]?\d+)\s*$/i',
                     array('zorder' => 1)
                 ),
             ),
             'OVERLIBWIDTH' => array(
                 array(
-                    'LINK',
+
                     '/^OVERLIBWIDTH\s+(\d+)\s*$/i',
                     array('overlibwidth' => 1)
                 ),
             ),
             'OVERLIBHEIGHT' => array(
                 array(
-                    'LINK',
+
                     '/^OVERLIBHEIGHT\s+(\d+)\s*$/i',
                     array('overlibheight' => 1)
                 ),
             ),
         ) // end of link
     );
-
 
     public
     function __construct(&$map, $type = "GLOBAL", $object = null)
@@ -1132,7 +1130,6 @@ class WeatherMapConfigReader
         return $output;
     }
 
-
     private
     function commitItem()
     {
@@ -1155,7 +1152,6 @@ class WeatherMapConfigReader
             $this->mapObject->links[$this->currentObject->name] = $this->currentObject;
         }
     }
-
 
     function readConfigFile($filename)
     {
@@ -1201,7 +1197,6 @@ class WeatherMapConfigReader
             $args = $this::parseString($buffer);
             wm_debug("  First: $args[0] in $this->currentType\n");
 
-
             // From here, the aim of the game is to get out of this loop as
             // early as possible, without running more preg_match calls than
             // necessary. In 0.97, this per-line loop accounted for 50% of
@@ -1240,8 +1235,8 @@ class WeatherMapConfigReader
                 wm_debug("    Possible!\n");
                 foreach ($this->configKeywords[$this->currentType][$args[0]] as $keyword) {
                     unset($matches);
-                    wm_debug("      Trying $keyword[1]\n");
-                    if ((substr($keyword[1], 0, 1) != '/') || (1 === preg_match($keyword[1], $buffer, $matches))) {
+                    wm_debug("      Trying $keyword[0]\n");
+                    if ((substr($keyword[0], 0, 1) != '/') || (1 === preg_match($keyword[0], $buffer, $matches))) {
                         #   wm_debug("Might be $args[0]\n");
 
                         // if we came here without a regexp, then the \1 etc
@@ -1249,15 +1244,15 @@ class WeatherMapConfigReader
 
                         $params = isset($matches) ? $matches : $args;
 
-                        // The third array item is either an array of config variables to populate,
+                        // The second array item is either an array of config variables to populate,
                         // or a function to call that will handle decoding this stuff
-                        if (is_array($keyword[2])) {
+                        if (is_array($keyword[1])) {
                             $this->readConfigSimpleAssignment($keyword, $params);
                             return true;
                         } else {
-                            // the third arg wasn't an array, it was a function name.
+                            // the second arg wasn't an array, it was a function name.
                             // call that function to handle this keyword
-                            if (call_user_func(array($this, $keyword[2]), $buffer, $args, $params)) {
+                            if (call_user_func(array($this, $keyword[1]), $buffer, $args, $params)) {
                                 return true;
                             }
                         }
@@ -1268,14 +1263,13 @@ class WeatherMapConfigReader
         return false;
     }
 
-
     /**
      * @param string[] $keyword The entry from configKeywords
      * @param string[] $matches The list of parameters or regexp matches
      */
     private function readConfigSimpleAssignment($keyword, $matches)
     {
-        foreach ($keyword[2] as $key => $val) {
+        foreach ($keyword[1] as $key => $val) {
             // so we can poke in numbers too, if the value starts with #
             // then take the # off, and treat the rest as a number literal
             if (substr($val, 0, 1) === '#') {
@@ -1309,7 +1303,6 @@ class WeatherMapConfigReader
         }
     }
 
-
     function handleVIA($fullcommand, $args, $matches)
     {
         if (preg_match('/^\s*VIA\s+([-+]?\d+)\s+([-+]?\d+)\s*$/i', $fullcommand,
@@ -1331,7 +1324,6 @@ class WeatherMapConfigReader
         }
         return false;
     }
-
 
     private function interpretNodeSpec($input)
     {
@@ -1607,7 +1599,6 @@ class WeatherMapConfigReader
         return true;
     }
 
-
     private function handleNODE($fullcommand, $args, $matches)
     {
 
@@ -1740,7 +1731,6 @@ class WeatherMapConfigReader
         return true;
     }
 
-
     private function handleKEYPOS($fullcommand, $args, $matches)
     {
         $whichKey = trim($matches[1]);
@@ -1769,7 +1759,6 @@ class WeatherMapConfigReader
 
         return true;
     }
-
 
     private function handleTEMPLATE($fullcommand, $args, $matches)
     {
@@ -1840,8 +1829,8 @@ class WeatherMapConfigReader
                     $nicer = str_replace("\\", "\\\\", $match[1]);
 
                     print "\n### $nicer\n";
-                    if (is_array($match[2])) {
-                        foreach ($match[2] as $key => $val) {
+                    if (is_array($match[1])) {
+                        foreach ($match[1] as $key => $val) {
                             $escval = $val;
                             if (substr($val, 0, 1) == "#") {
                                 $escval = "'" . substr($val, 1.) . "'";
@@ -1850,7 +1839,7 @@ class WeatherMapConfigReader
                             print "\n* $escval => $scope->$key\n";
                         }
                     } else {
-                        print "\n* -> $match[2]()\n";
+                        print "\n* -> $match[1]()\n";
                     }
                     $count++;
                 }
@@ -1876,16 +1865,13 @@ class WeatherMapConfigReader
         foreach ($this->configKeywords as $scope => $keywords) {
             foreach ($keywords as $keyword => $matches) {
                 foreach ($matches as $match) {
-                    // This isn't actually used anymore, but it might as well be consistent at least
-                    if ($match[0] != $scope) {
-                        wm_warn("$scope:$keyword arg0 is not $scope");
-                        $result = false;
-                    }
-                    # $match[1] is a regexp or string match
-                    # $match[2] is either an array of properties to set, or a function to handle it
-                    if (is_array($match[2])) {
+
+                    # $match[0] is a regexp or string match
+                    // TODO - can we validate a regexp?
+                    # $match[1] is either an array of properties to set, or a function to handle it
+                    if (is_array($match[1])) {
                         # TODO: if it's a list of variables, check they exist on the relevant object (from scope)
-                        foreach ($match[2] as $key => $val) {
+                        foreach ($match[1] as $key => $val) {
                             if (1 === preg_match('/^(.*)\[([^\]]+)\]$/', $key, $m)) {
                                 $key = $m[1];
                             }
@@ -1897,8 +1883,8 @@ class WeatherMapConfigReader
                         }
                     } else {
                         # TODO: if it's a handleXXXX function, check that exists
-                        if (!method_exists($this, $match[2])) {
-                            wm_warn("$scope:$keyword has a missing handler ($match[2])");
+                        if (!method_exists($this, $match[1])) {
+                            wm_warn("$scope:$keyword has a missing handler ($match[1])");
                             $result = false;
                         }
                     }

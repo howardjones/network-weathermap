@@ -1394,8 +1394,11 @@ class WeatherMapConfigReader
             // TODO - really, this should kill the whole link, and reset for the next one
             // XXX this error case will not work in the handler function
             if ($valid_nodes == 2) {
-                $this->currentObject->a = $this->mapObject->nodes[$nodeNames[1]];
-                $this->currentObject->b = $this->mapObject->nodes[$nodeNames[2]];
+//                $this->currentObject->a = $this->mapObject->nodes[$nodeNames[1]];
+//                $this->currentObject->b = $this->mapObject->nodes[$nodeNames[2]];
+
+                $this->currentObject->setEndNodes($this->mapObject->getNode($nodeNames[1]), $this->mapObject->getNode($nodeNames[2]));
+
                 $this->currentObject->a_offset = $endOffsets[1];
                 $this->currentObject->b_offset = $endOffsets[2];
 

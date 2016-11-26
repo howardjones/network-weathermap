@@ -967,9 +967,9 @@ else
 	// dimensions for the imagemap. Oh well.
 	$map->DrawMap('null');
 	$map->htmlstyle='editor';
-	$map->PreloadMapHTML();
+	$map->calculateImagemap();
 
-	print $map->SortedImagemap("weathermap_imap");
+	print $map->generateSortedImagemap("weathermap_imap");
 
 	#print $map->imap->subHTML("LEGEND:");
 	#print $map->imap->subHTML("TIMESTAMP");

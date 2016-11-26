@@ -4,10 +4,12 @@
 // http://www.network-weathermap.com/
 // Released under the GNU Public License
 
+require_once "WeatherMapUIBase.class.php";
+require_once 'SimpleTemplate.class.php';
+
 /** The various functions concerned with the actual presentation of the supplied editor, and
  *  validation of input etc. Mostly class methods.
  */
-
 class WeatherMapEditorUI extends WeatherMapUIBase
 {
     var $editor;
@@ -26,11 +28,10 @@ class WeatherMapEditorUI extends WeatherMapUIBase
     var $log_message = "";
     var $param2 = "";
     var $mapDirectory = "configs";
-    
+
     var $useOverlay = false;
     var $useOverlayRelative = false;
     var $gridSnapValue = 0;
-
 
     // All the valid commands, and their expected parameters, so we can centralise the validation
     var $commands = array(
@@ -173,7 +174,7 @@ class WeatherMapEditorUI extends WeatherMapUIBase
                 array("mapname", "mapfile"),
                 array("param", "name"),
             ),
-            "handler"=>"cmdDeleteNode"
+            "handler" => "cmdDeleteNode"
         ),
         "clone_node" => array(
             "args" => array(
@@ -229,9 +230,8 @@ class WeatherMapEditorUI extends WeatherMapUIBase
 //        "set_link_properties" => array(),
 //        "set_map_properties" => array(),
 //        "set_map_style" => array(),
-        "nothing" => array("args" => array(array("mapname","mapfile")), "handler"=>"cmdDoNothing", "no_save" => true)
+        "nothing" => array("args" => array(array("mapname", "mapfile")), "handler" => "cmdDoNothing", "no_save" => true)
     );
-
 
     function setLogMessage($message)
     {
@@ -260,7 +260,7 @@ class WeatherMapEditorUI extends WeatherMapUIBase
 
     function isEmbedded()
     {
-        return($this->fromPlugin);
+        return ($this->fromPlugin);
     }
 
     // cmd* methods below here translate form inputs into Editor API calls, which do the real work
@@ -320,10 +320,31 @@ class WeatherMapEditorUI extends WeatherMapUIBase
 
         if (isset($params['selected']) && substr($params['selected'], 0, 5) == 'NODE:') {
             $nodename = substr($params['selected'], 5);
-            $editor->map->nodes[$nodename]->selected=1;
+            $editor->map->nodes[$nodename]->selected = 1;
         }
 
         $editor->map->DrawMap('', '', 250, true, false, false);
+
+        return false;
+    }
+
+    function cmdDrawFontSamples($params, $editor)
+    {
+        header("Content-type: image/png");
+
+        // If the config file hasn't changed, then the image produced shouldn't have, either
+        $etag = md5_file($this->mapfile);
+        header("Etag: $etag");
+
+        if (isset($_SERVER['HTTP_IF_NONE_MATCH']) && trim($_SERVER['HTTP_IF_NONE_MATCH']) == $etag) {
+            header("HTTP/1.1 304 Not Modified");
+            return false;
+        }
+        $editor->loadConfig($this->mapfile);
+
+        $imageRef = $this->generateFontSampleImage($editor->map);
+        imagepng($imageRef);
+        imagedestroy($imageRef);
 
         return false;
     }
@@ -355,7 +376,7 @@ class WeatherMapEditorUI extends WeatherMapUIBase
 
     function cmdAddLinkInitial($params, $editor)
     {
-        $selected = 'NODE:'.$params['param'];
+        $selected = 'NODE:' . $params['param'];
         // mark the node so that it will be drawn in red next time
         $this->setSelected($selected);
         // pre-set an action, so we start in node-picking mode
@@ -467,13 +488,8 @@ class WeatherMapEditorUI extends WeatherMapUIBase
      */
     function cmdNewMapCopy($params, $editor)
     {
-        $editor->loadConfig($this->mapDirectory."/".$params['sourcemap']);
+        $editor->loadConfig($this->mapDirectory . "/" . $params['sourcemap']);
         $editor->saveConfig($this->mapfile);
-    }
-
-    function cmdDrawFontSamples($params, $editor)
-    {
-
     }
 
     function cmdGetItemConfig($params, $editor)
@@ -507,16 +523,16 @@ class WeatherMapEditorUI extends WeatherMapUIBase
             return ($coord);
         } else {
             $rest = $coord % $this->gridSnapValue;
-            return ($coord - $rest + round($rest/$this->gridSnapValue) * $this->gridSnapValue );
+            return ($coord - $rest + round($rest / $this->gridSnapValue) * $this->gridSnapValue);
         }
     }
-    
+
     // Labels for Nodes, Links and Scales shouldn't have spaces in
     function sanitizeName($str)
     {
         return str_replace(array(" "), "", $str);
     }
- 
+
     function moduleChecks()
     {
         if (!wm_module_checks()) {
@@ -527,7 +543,7 @@ class WeatherMapEditorUI extends WeatherMapUIBase
             exit();
         }
     }
- 
+
     /**
      * Attempt to load Cacti's config file - we'll need this to do integration like
      * the target picker.
@@ -536,25 +552,25 @@ class WeatherMapEditorUI extends WeatherMapUIBase
     {
         $this->foundCacti = false;
         // check if the goalposts have moved
-        if (is_dir($cacti_base) && file_exists($cacti_base."/include/global.php")) {
+        if (is_dir($cacti_base) && file_exists($cacti_base . "/include/global.php")) {
             // include the cacti-config, so we know about the database
-                include_once($cacti_base."/include/global.php");
-                $config['base_url'] = $cacti_url;
-                $cacti_found = true;
-        } elseif (is_dir($cacti_base) && file_exists($cacti_base."/include/config.php")) {
+            include_once($cacti_base . "/include/global.php");
+            $config['base_url'] = $cacti_url;
+            $cacti_found = true;
+        } elseif (is_dir($cacti_base) && file_exists($cacti_base . "/include/config.php")) {
             // include the cacti-config, so we know about the database
-                include_once($cacti_base."/include/config.php");
-        
-                $config['base_url'] = $cacti_url;
-                $cacti_found = true;
+            include_once($cacti_base . "/include/config.php");
+
+            $config['base_url'] = $cacti_url;
+            $cacti_found = true;
         } else {
             $cacti_found = false;
         }
-        
+
         $this->foundCacti = $cacti_found;
         return $this->foundCacti;
     }
-    
+
     function unpackCookie($cookiename = "wmeditor")
     {
         if (isset($_COOKIE[$cookiename])) {
@@ -571,19 +587,19 @@ class WeatherMapEditorUI extends WeatherMapUIBase
             }
         }
     }
-    
+
     function __construct()
     {
         $this->unpackCookie();
         $this->editor = new WeatherMapEditor();
-                
+
     }
 
     function getTitleFromConfig($filename, $defaultTitle = "")
     {
         $title = "";
 
-        $fileHandle=fopen($filename, "r");
+        $fileHandle = fopen($filename, "r");
         if ($fileHandle) {
             while (!feof($fileHandle)) {
                 $buffer = fgets($fileHandle, 4096);
@@ -647,34 +663,118 @@ class WeatherMapEditorUI extends WeatherMapUIBase
 
         return array($titles, $notes, $errorString);
     }
-    
+
+    function getAvailableImages($imagedir, $map)
+    {
+        $imagelist = array();
+
+        if (is_dir($imagedir)) {
+            $n = 0;
+            $dh = opendir($imagedir);
+
+            if ($dh) {
+                while ($file = readdir($dh)) {
+                    $realfile = $imagedir . DIRECTORY_SEPARATOR . $file;
+                    $uri = $imagedir . "/" . $file;
+
+                    if (is_readable($realfile) && (preg_match('/\.(gif|jpg|png)$/i', $file))) {
+                        $imagelist[] = $uri;
+                        $n++;
+                    }
+                }
+
+                closedir($dh);
+            }
+        }
+
+        foreach ($map->used_images as $im) {
+            if (!in_array($im, $imagelist)) {
+                $imagelist[] = $im;
+            }
+        }
+        sort($imagelist);
+
+        return $imagelist;
+    }
+
+    /**
+     * @param $map
+     * @return resource
+     */
+    function generateFontSampleImage($map)
+    {
+        $keyfont = 2;
+        $keyfont_obj = $map->fonts->getFont($keyfont);
+        $keyheight = imagefontheight($keyfont) + 2;
+        $sampleheight = 32;
+
+        $im_fonts = imagecreate(2000, $sampleheight);
+        $im_key = imagecreate(2000, $keyheight);
+
+        $white = imagecolorallocate($im_fonts, 255, 255, 255);
+        $black = imagecolorallocate($im_fonts, 0, 0, 0);
+
+        $whitekey = imagecolorallocate($im_key, 255, 255, 255);
+        $blackkey = imagecolorallocate($im_key, 0, 0, 0);
+
+        $fonts = $map->fonts->getList();
+        ksort($fonts);
+
+        $x = 3;
+        foreach ($fonts as $fontnumber => $font) {
+            $string = "Abc123%";
+            $keystring = "Font $fontnumber";
+
+            $font_obj = $map->fonts->getFont($fontnumber);
+
+            list($width, $height) = $font_obj->calculateImageStringSize($string);
+            list($kwidth, $kheight) = $keyfont_obj->calculateImageStringSize($keystring);
+
+            if ($kwidth > $width) {
+                $width = $kwidth;
+            }
+
+            $y = ($sampleheight / 2) + $height / 2;
+            $font_obj->drawImageString($im_fonts, $x, $y, $string, $black);
+            $keyfont_obj->drawImageString($im_key, $x, $keyheight, "Font $fontnumber", $blackkey);
+
+            $x = $x + $width + 6;
+        }
+
+        $final_image = imagecreate($x, $sampleheight + $keyheight);
+        imagecopy($final_image, $im_fonts, 0, 0, 0, 0, $x, $sampleheight);
+        imagecopy($final_image, $im_key, 0, $sampleheight, 0, 0, $x, $keyheight);
+        imagedestroy($im_fonts);
+        return $final_image;
+    }
+
     function showStartPage()
     {
         global $WEATHERMAP_VERSION;
 
         $tpl = new SimpleTemplate();
-        
+
         $tpl->set("WEATHERMAP_VERSION", $WEATHERMAP_VERSION);
         $tpl->set("fromplug", 1);
-        
+
         list($titles, $notes, $errorstring) = $this->getExistingConfigs($this->mapDirectory);
-        
+
         foreach ($titles as $file => $title) {
             $nicenote = htmlspecialchars($notes[$file]);
             $nicefile = htmlspecialchars($file);
             $nicetitle = htmlspecialchars($title);
-            
+
             $nicetitles[$nicefile] = $nicetitle;
             $nicenotes[$nicefile] = $nicenote;
         }
-        
+
         $tpl->set("errorstring", $errorstring);
         $tpl->set("titles", $nicetitles);
         $tpl->set("notes", $nicenotes);
-        
+
         echo $tpl->fetch("editor-resources/templates/front.php");
     }
-    
+
     function showMainPage($editor)
     {
         global $WEATHERMAP_VERSION;
@@ -698,32 +798,43 @@ class WeatherMapEditorUI extends WeatherMapUIBase
 
         // draw a map to throw away, just to get the imagemap updated
         $editor->map->DrawMap('null');
-        $editor->map->htmlstyle='editor';
+        $editor->map->htmlstyle = 'editor';
         $editor->map->calculateImageMap();
 
         $tpl->set("imagemap", $editor->map->generateSortedImagemap("weathermap_imap"));
         $tpl->set("map_json", $editor->map->asJS());
-        $tpl->set("images_json", "");
+
+        $tpl->set("editor_settings", "var editor_settings = {};\n");
 
         $tpl->set("map_width", $editor->map->width);
         $tpl->set("map_height", $editor->map->height);
         $tpl->set("log", $this->log_message);
+        $tpl->set("editor_name", "editor16.php");
 
-        echo $tpl->fetch("editor-resources/templates/main.php");
+        $imlist = $this->getAvailableImages("images", $editor->map);
+        $images_json = "\nvar imlist = " . json_encode($imlist) . ";\n";
+        $tpl->set("images_json", $images_json);
+
+        $fonts = $editor->map->fonts->getList();
+        ksort($fonts);
+        $fonts_json = "\nvar fontlist = " . json_encode($fonts) . ";\n";
+        $tpl->set("fonts_json", $fonts_json);
+
+        echo $tpl->fetch("editor-resources/templates/main-oldstyle.php");
     }
-    
+
     function main($request, $from_plugin = false)
     {
         $mapname = "";
         $action = "";
-        
+
         if (isset($request['action'])) {
             $action = strtolower(trim($request['action']));
         }
         if (isset($request['mapname'])) {
             $mapname = $request['mapname'];
 
-            if ($action=="newmap" || $action=="newmap_copy") {
+            if ($action == "newmap" || $action == "newmap_copy") {
                 $mapname .= ".conf";
             }
 
@@ -732,10 +843,10 @@ class WeatherMapEditorUI extends WeatherMapUIBase
                 exit();
             }
 
-            $this->mapfile = $this->mapDirectory."/".$mapname;
+            $this->mapfile = $this->mapDirectory . "/" . $mapname;
             $this->mapname = $mapname;
         }
-        
+
         if ($mapname == '') {
             $this->showStartPage();
         } else {
@@ -753,7 +864,7 @@ class WeatherMapEditorUI extends WeatherMapUIBase
                     $this->showMainPage($editor);
                 }
             } else {
-                print "FAIL";
+                print "VALIDATION FAIL";
             }
         }
     }

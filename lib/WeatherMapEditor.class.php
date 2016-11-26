@@ -764,7 +764,7 @@ class WeatherMapEditor
      */
     private function tidySimpleDimension($bb_a, $bb_b, $node_a, $node_b, $simpleIndex, $simpleCoordinate)
     {
-// snap the easy coord to the appropriate edge of the node
+        // snap the easy coord to the appropriate edge of the node
         // [A] [B]
         if ($bb_a[$simpleIndex + 2] < $bb_b[$simpleIndex]) {
             $a_x_offset = $bb_a[$simpleIndex + 2] - $node_a->$simpleCoordinate;
@@ -793,7 +793,7 @@ class WeatherMapEditor
      */
     private function tidyComplexDimension($bb_a, $bb_b, $node_a, $node_b, $hardIndex, $hardCoordinate, $linkIndex, $linkCount)
     {
-// find the overlapping span for the 'hard' coordinate, then divide it into $linkTotal equal steps
+        // find the overlapping span for the 'hard' coordinate, then divide it into $linkTotal equal steps
         // this should be true whichever way around they are
         list($min_overlap, $max_overlap) = $this->findCommonRange(array($bb_a[$hardIndex], $bb_a[$hardIndex + 2]), array($bb_b[$hardIndex], $bb_b[$hardIndex + 2]));
         $overlap = $max_overlap - $min_overlap;

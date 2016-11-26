@@ -56,7 +56,6 @@ class WeatherMapBase
         # warn("Adding hint $name to ".$this->my_type()."/".$this->name."\n");
     }
 
-
     function get_hint($name, $default = NULL)
     {
         if (isset($this->hints[$name])) {
@@ -67,7 +66,6 @@ class WeatherMapBase
             return $default;
         }
     }
-
 
     public function delete_hint($name)
     {
@@ -175,9 +173,32 @@ class WeatherMapBase
         wm_debug("Initialising %s $this->name from $source->name\n", $this->my_type());
         assert('is_object($source)');
 
-        foreach (array_keys($this->inherit_fieldlist)as $fld) {
-            if ($fld != 'template') $this->$fld=$source->$fld;
+        foreach (array_keys($this->inherit_fieldlist) as $fld) {
+            if ($fld != 'template') $this->$fld = $source->$fld;
         }
+    }
+
+    // by tracking which objects depend on each other, we can reduce the number of full-table searches for a single object
+    // (mostly in the editor for things like moving nodes)
+
+    public function addDependency($object)
+    {
+        $this->dependencies[] = $object;
+    }
+
+    public function removeDependency($leavingObject)
+    {
+        foreach ($this->dependencies as $key => $object) {
+            if ($leavingObject === $object) {
+                // delete it
+                unset($this->dependencies[$key]);
+            }
+        }
+    }
+
+    public function getDependencies()
+    {
+        return $this->dependencies;
     }
 
     public function cleanUp()
@@ -199,7 +220,7 @@ class WeatherMapBase
 
         return 0;
     }
-    
+
 }
 
 class WeatherMapConfigItem
@@ -252,6 +273,15 @@ class WeatherMapItem extends WeatherMapBase
         return $this->imap_areas;
     }
 
+    public function setDefined($source)
+    {
+        $this->defined_in = $source;
+    }
+
+    public function getDefined()
+    {
+        return $this->defined_in;
+    }
 
 }
 

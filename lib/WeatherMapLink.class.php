@@ -9,10 +9,10 @@ require_once "HTML_ImageMap.class.php";
 class WeatherMapLink extends WeatherMapDataItem
 {
 //	var $maphtml;
-	/** @var  WeatherMapNode $a */
-	/** @var  WeatherMapNode $b */
-	var $a,                    $b; // the ends - references to nodes
-    var $a_offset,             $b_offset;
+    /** @var  WeatherMapNode $a */
+    /** @var  WeatherMapNode $b */
+    var $a, $b; // the ends - references to nodes
+    var $a_offset, $b_offset;
     var $a_offset_dx, $a_offset_dy, $a_offset_resolved;
     var $b_offset_dx, $b_offset_dy, $b_offset_resolved;
 
@@ -60,13 +60,13 @@ class WeatherMapLink extends WeatherMapDataItem
         $this->owner = $owner;
         $this->template = $template;
 
-        $this->inherit_fieldlist=array(
+        $this->inherit_fieldlist = array(
             'my_default' => null,
             'width' => 7,
             'commentfont' => 1,
             'bwfont' => 2,
             'template' => ':: DEFAULT ::',
-            'splitpos'=>50,
+            'splitpos' => 50,
             'labeloffset_out' => 25,
             'labeloffset_in' => 75,
             'commentoffset_out' => 5,
@@ -78,13 +78,13 @@ class WeatherMapLink extends WeatherMapDataItem
             'scaletype' => 'percent',
             'targets' => array(),
             'duplex' => 'full',
-            'infourl' => array('',''),
+            'infourl' => array('', ''),
             'notes' => array(),
             'hints' => array(),
-            'comments' => array('',''),
-            'bwlabelformats' => array(FMT_PERC_IN,FMT_PERC_OUT),
-            'overliburl' => array(array(),array()),
-            'notestext' => array(IN=>'',OUT=>''),
+            'comments' => array('', ''),
+            'bwlabelformats' => array(FMT_PERC_IN, FMT_PERC_OUT),
+            'overliburl' => array(array(), array()),
+            'notestext' => array(IN => '', OUT => ''),
             'labelstyle' => 'percent',
             'labelboxstyle' => 'classic',
             'linkstyle' => 'twoway',
@@ -95,10 +95,10 @@ class WeatherMapLink extends WeatherMapDataItem
             'bwfontcolour' => new WMColour(0, 0, 0),
             'bwboxcolour' => new WMColour(255, 255, 255),
             'commentfontcolour' => new WMColour(192, 192, 192),
-            'inpercent'=>0,
-            'outpercent'=>0,
-            'inscalekey'=>'',
-            'outscalekey'=>'',
+            'inpercent' => 0,
+            'outpercent' => 0,
+            'inscalekey' => '',
+            'outscalekey' => '',
             'a_offset' => 'C',
             'b_offset' => 'C',
             'a_offset_dx' => 0,
@@ -120,39 +120,38 @@ class WeatherMapLink extends WeatherMapDataItem
         $this->reset($owner);
     }
 
+    function _Reset(&$newowner)
+    {
+        $this->owner = $newowner;
 
-	function _Reset(&$newowner)
-	{
-		$this->owner=$newowner;
+        $template = $this->template;
+        if ($template == '') $template = "DEFAULT";
 
-		$template = $this->template;
-                if($template == '') $template = "DEFAULT";
+        wm_debug("Resetting $this->name with $template\n");
 
-		wm_debug("Resetting $this->name with $template\n");
+        // the internal default-default gets it's values from inherit_fieldlist
+        // everything else comes from a link object - the template.
+        if ($this->name == ':: DEFAULT ::') {
+            foreach (array_keys($this->inherit_fieldlist) as $fld) {
+                $this->$fld = $this->inherit_fieldlist[$fld];
+            }
+        } else {
+            $this->CopyFrom($this->owner->links[$template]);
+        }
+        $this->template = $template;
 
-		// the internal default-default gets it's values from inherit_fieldlist
-		// everything else comes from a link object - the template.
-		if($this->name==':: DEFAULT ::')
-		{
-			foreach (array_keys($this->inherit_fieldlist) as $fld) {
-				$this->$fld=$this->inherit_fieldlist[$fld];
-			}
-		}
-		else
-		{
-			$this->CopyFrom($this->owner->links[$template]);
-		}
-		$this->template = $template;
+        // to stop the editor tanking, now that colours are decided earlier in ReadData
+        $this->colours[IN] = new WMColour(192, 192, 192);
+        $this->colours[OUT] = new WMColour(192, 192, 192);
+        $this->id = $newowner->next_id++;
+    }
 
-		// to stop the editor tanking, now that colours are decided earlier in ReadData
-		$this->colours[IN] = new WMColour(192,192,192);
-		$this->colours[OUT] = new WMColour(192,192,192);
-		$this->id = $newowner->next_id++;
-	}
+    function my_type()
+    {
+        return "LINK";
+    }
 
-	function my_type() {  return "LINK"; }
-
-	function getTemplateObject()
+    function getTemplateObject()
     {
         return $this->owner->getLink($this->template);
     }
@@ -161,7 +160,6 @@ class WeatherMapLink extends WeatherMapDataItem
     {
         return !isset($this->a);
     }
-
 
     private function getDirectionList()
     {
@@ -174,7 +172,7 @@ class WeatherMapLink extends WeatherMapDataItem
 
     function drawComments($gdImage)
     {
-        wm_debug("Link ".$this->name.": Drawing comments.\n");
+        wm_debug("Link " . $this->name . ": Drawing comments.\n");
 
         $directions = $this->getDirectionList();
         $commentPositions = array();
@@ -190,19 +188,19 @@ class WeatherMapLink extends WeatherMapDataItem
         $fontObject = $this->owner->fonts->getFont($this->commentfont);
 
         foreach ($directions as $direction) {
-            wm_debug("Link ".$this->name.": Drawing comments for direction $direction\n");
+            wm_debug("Link " . $this->name . ": Drawing comments for direction $direction\n");
 
             $widthList[$direction] *= 1.1;
 
             // Time to deal with Link Comments, if any
             $comment = $this->owner->ProcessString($this->comments[$direction], $this);
 
-            if ($this->owner->get_hint('screenshot_mode')==1) {
+            if ($this->owner->get_hint('screenshot_mode') == 1) {
                 $comment = WMUtility::stringAnonymise($comment);
             }
 
             if ($comment == '') {
-                wm_debug("Link ".$this->name." no text for direction $direction\n");
+                wm_debug("Link " . $this->name . " no text for direction $direction\n");
                 break;
             }
 
@@ -230,7 +228,7 @@ class WeatherMapLink extends WeatherMapDataItem
             $centreDistance = $widthList[$direction] + 4 + $nudgeOut;
 
             if ($this->commentstyle == 'center') {
-                $centreDistance = $nudgeOut - ($textHeight/2);
+                $centreDistance = $nudgeOut - ($textHeight / 2);
             }
             // find the normal to our link, so we can get outside the arrow
             $normal = $tangent->getNormal();
@@ -244,7 +242,7 @@ class WeatherMapLink extends WeatherMapDataItem
             if (abs($angle) > 90) {
                 $angle -= 180;
                 if ($angle < -180) {
-                    $angle +=360;
+                    $angle += 360;
                 }
                 $edge->addVector($tangent, $nudgeAlong);
                 $edge->addVector($normal, -$centreDistance);
@@ -264,7 +262,7 @@ class WeatherMapLink extends WeatherMapDataItem
                 $edge->addVector($tangent, $textWidth);
             }
 
-            wm_debug("Link ".$this->name." writing $comment at $edge and angle $angle for direction $direction\n");
+            wm_debug("Link " . $this->name . " writing $comment at $edge and angle $angle for direction $direction\n");
 
             // FINALLY, draw the text!
             $fontObject->drawImageString($gdImage, $edge->x, $edge->y, $comment, $gdCommentColours[$direction], $angle);
@@ -288,7 +286,6 @@ class WeatherMapLink extends WeatherMapDataItem
 
         wm_debug("Offsets are %s and %s\n", $this->a_offset, $this->b_offset);
         wm_debug("A node is %sx%s\n", $this->a->width, $this->a->height);
-
 
         if ($this->a_offset_dx != 0 || $this->a_offset_dy != 0) {
             wm_debug("Using offsets from earlier\n");
@@ -362,11 +359,11 @@ class WeatherMapLink extends WeatherMapDataItem
 
     function Draw($im, &$map)
     {
-        wm_debug("Link ".$this->name.": Drawing.\n");
+        wm_debug("Link " . $this->name . ": Drawing.\n");
         // If there is geometry to draw, draw it
         if (!is_null($this->geometry)) {
 
-            wm_debug(get_class($this->geometry). "\n");
+            wm_debug(get_class($this->geometry) . "\n");
 
             $this->geometry->setOutlineColour($this->outlinecolour);
             $this->geometry->setFillColours(array($this->colours[IN], $this->colours[OUT]));
@@ -384,7 +381,6 @@ class WeatherMapLink extends WeatherMapDataItem
         }
 
         $this->makeImageMapAreas();
-
 
     }
 
@@ -408,7 +404,7 @@ class WeatherMapLink extends WeatherMapDataItem
 
     function drawBandwidthLabels($gdImage)
     {
-        wm_debug("Link ".$this->name.": Drawing bwlabels.\n");
+        wm_debug("Link " . $this->name . ": Drawing bwlabels.\n");
 
         $directions = $this->getDirectionList();
         $labelOffsets = array();
@@ -454,7 +450,6 @@ class WeatherMapLink extends WeatherMapDataItem
         }
 
     }
-
 
     function normaliseAngle($angle)
     {
@@ -528,253 +523,240 @@ class WeatherMapLink extends WeatherMapDataItem
         $this->owner->imap->addArea($newArea);
     }
 
-
-
-
-
-
     function WriteConfig()
-	{
-		$output='';
+    {
+        $output = '';
 
-		if($this->config_override != '')
-		{
-			$output = $this->config_override."\n";
-		}
-		else
-		{
-			$dd = $this->owner->links[$this->template];
+        if ($this->config_override != '') {
+            $output = $this->config_override . "\n";
+        } else {
+            $dd = $this->owner->links[$this->template];
 
-			wm_debug("Writing config for LINK $this->name against $this->template\n");
+            wm_debug("Writing config for LINK $this->name against $this->template\n");
 
-			$basic_params = array(
-					array('width','WIDTH',CONFIG_TYPE_LITERAL),
-					array('zorder','ZORDER',CONFIG_TYPE_LITERAL),
-					array('overlibwidth','OVERLIBWIDTH',CONFIG_TYPE_LITERAL),
-					array('overlibheight','OVERLIBHEIGHT',CONFIG_TYPE_LITERAL),
-					array('arrowstyle','ARROWSTYLE',CONFIG_TYPE_LITERAL),
-					array('viastyle','VIASTYLE',CONFIG_TYPE_LITERAL),
-					array('linkstyle','LINKSTYLE',CONFIG_TYPE_LITERAL),
-					array('splitpos','SPLITPOS',CONFIG_TYPE_LITERAL),
-					array('duplex','DUPLEX',CONFIG_TYPE_LITERAL),
-					array('commentstyle','COMMENTSTYLE',CONFIG_TYPE_LITERAL),
-					array('labelboxstyle','BWSTYLE',CONFIG_TYPE_LITERAL),
-			//		array('usescale','USESCALE',CONFIG_TYPE_LITERAL),
+            $basic_params = array(
+                array('width', 'WIDTH', CONFIG_TYPE_LITERAL),
+                array('zorder', 'ZORDER', CONFIG_TYPE_LITERAL),
+                array('overlibwidth', 'OVERLIBWIDTH', CONFIG_TYPE_LITERAL),
+                array('overlibheight', 'OVERLIBHEIGHT', CONFIG_TYPE_LITERAL),
+                array('arrowstyle', 'ARROWSTYLE', CONFIG_TYPE_LITERAL),
+                array('viastyle', 'VIASTYLE', CONFIG_TYPE_LITERAL),
+                array('linkstyle', 'LINKSTYLE', CONFIG_TYPE_LITERAL),
+                array('splitpos', 'SPLITPOS', CONFIG_TYPE_LITERAL),
+                array('duplex', 'DUPLEX', CONFIG_TYPE_LITERAL),
+                array('commentstyle', 'COMMENTSTYLE', CONFIG_TYPE_LITERAL),
+                array('labelboxstyle', 'BWSTYLE', CONFIG_TYPE_LITERAL),
+                //		array('usescale','USESCALE',CONFIG_TYPE_LITERAL),
 
-					array('bwfont','BWFONT',CONFIG_TYPE_LITERAL),
-					array('commentfont','COMMENTFONT',CONFIG_TYPE_LITERAL),
+                array('bwfont', 'BWFONT', CONFIG_TYPE_LITERAL),
+                array('commentfont', 'COMMENTFONT', CONFIG_TYPE_LITERAL),
 
-					array('bwoutlinecolour','BWOUTLINECOLOR',CONFIG_TYPE_COLOR),
-					array('bwboxcolour','BWBOXCOLOR',CONFIG_TYPE_COLOR),
-					array('outlinecolour','OUTLINECOLOR',CONFIG_TYPE_COLOR),
-					array('commentfontcolour','COMMENTFONTCOLOR',CONFIG_TYPE_COLOR),
-					array('bwfontcolour','BWFONTCOLOR',CONFIG_TYPE_COLOR)
-				);
+                array('bwoutlinecolour', 'BWOUTLINECOLOR', CONFIG_TYPE_COLOR),
+                array('bwboxcolour', 'BWBOXCOLOR', CONFIG_TYPE_COLOR),
+                array('outlinecolour', 'OUTLINECOLOR', CONFIG_TYPE_COLOR),
+                array('commentfontcolour', 'COMMENTFONTCOLOR', CONFIG_TYPE_COLOR),
+                array('bwfontcolour', 'BWFONTCOLOR', CONFIG_TYPE_COLOR)
+            );
 
-			# TEMPLATE must come first. DEFAULT
-			if($this->template != 'DEFAULT' && $this->template != ':: DEFAULT ::')
-			{
-				$output.="\tTEMPLATE " . $this->template . "\n";
-			}
+            # TEMPLATE must come first. DEFAULT
+            if ($this->template != 'DEFAULT' && $this->template != ':: DEFAULT ::') {
+                $output .= "\tTEMPLATE " . $this->template . "\n";
+            }
 
-			foreach ($basic_params as $param)
-			{
-				$field = $param[0];
-				$keyword = $param[1];
+            foreach ($basic_params as $param) {
+                $field = $param[0];
+                $keyword = $param[1];
 
-				if ($this->$field != $dd->$field)
-				{
-					if($param[2] == CONFIG_TYPE_COLOR) {
-					    $output.="\t$keyword " . $this->$field->asConfig() . "\n";
+                if ($this->$field != $dd->$field) {
+                    if ($param[2] == CONFIG_TYPE_COLOR) {
+                        $output .= "\t$keyword " . $this->$field->asConfig() . "\n";
                     }
-					if($param[2] == CONFIG_TYPE_LITERAL) {
-					    $output.="\t$keyword " . $this->$field . "\n";
+                    if ($param[2] == CONFIG_TYPE_LITERAL) {
+                        $output .= "\t$keyword " . $this->$field . "\n";
                     }
-				}
-			}
+                }
+            }
 
-			$val = $this->usescale . " " . $this->scaletype;
-			$comparison = $dd->usescale . " " . $dd->scaletype;
+            $val = $this->usescale . " " . $this->scaletype;
+            $comparison = $dd->usescale . " " . $dd->scaletype;
 
-			if ( ($val != $comparison) ) { $output.="\tUSESCALE " . $val . "\n"; }
+            if (($val != $comparison)) {
+                $output .= "\tUSESCALE " . $val . "\n";
+            }
 
-			if ($this->infourl[IN] == $this->infourl[OUT]) {
-				$dirs = array(IN=>""); // only use the IN value, since they're both the same, but don't prefix the output keyword
-			} else {
-				$dirs = array( IN=>"IN", OUT=>"OUT" );// the full monty two-keyword version
-			}
+            if ($this->infourl[IN] == $this->infourl[OUT]) {
+                $dirs = array(IN => ""); // only use the IN value, since they're both the same, but don't prefix the output keyword
+            } else {
+                $dirs = array(IN => "IN", OUT => "OUT");// the full monty two-keyword version
+            }
 
-			foreach ($dirs as $dir=>$tdir) {
-				if ($this->infourl[$dir] != $dd->infourl[$dir]) {
-					$output .= "\t" . $tdir . "INFOURL " . $this->infourl[$dir] . "\n";
-				}
-			}
+            foreach ($dirs as $dir => $tdir) {
+                if ($this->infourl[$dir] != $dd->infourl[$dir]) {
+                    $output .= "\t" . $tdir . "INFOURL " . $this->infourl[$dir] . "\n";
+                }
+            }
 
-			if ($this->overlibcaption[IN] == $this->overlibcaption[OUT]) {
-				$dirs = array(IN=>""); // only use the IN value, since they're both the same, but don't prefix the output keyword
-			} else {
-				$dirs = array( IN=>"IN", OUT=>"OUT" );// the full monty two-keyword version
-			}
+            if ($this->overlibcaption[IN] == $this->overlibcaption[OUT]) {
+                $dirs = array(IN => ""); // only use the IN value, since they're both the same, but don't prefix the output keyword
+            } else {
+                $dirs = array(IN => "IN", OUT => "OUT");// the full monty two-keyword version
+            }
 
-			foreach ($dirs as $dir=>$tdir) {
-				if ($this->overlibcaption[$dir] != $dd->overlibcaption[$dir]) {
-					$output .= "\t".$tdir."OVERLIBCAPTION " . $this->overlibcaption[$dir] . "\n";
-				}
-			}
+            foreach ($dirs as $dir => $tdir) {
+                if ($this->overlibcaption[$dir] != $dd->overlibcaption[$dir]) {
+                    $output .= "\t" . $tdir . "OVERLIBCAPTION " . $this->overlibcaption[$dir] . "\n";
+                }
+            }
 
-			if ($this->notestext[IN] == $this->notestext[OUT]) {
-				$dirs = array(IN=>""); // only use the IN value, since they're both the same, but don't prefix the output keyword
-			} else {
-				$dirs = array( IN=>"IN", OUT=>"OUT" );// the full monty two-keyword version
-			}
+            if ($this->notestext[IN] == $this->notestext[OUT]) {
+                $dirs = array(IN => ""); // only use the IN value, since they're both the same, but don't prefix the output keyword
+            } else {
+                $dirs = array(IN => "IN", OUT => "OUT");// the full monty two-keyword version
+            }
 
-			foreach ($dirs as $dir=>$tdir) {
-				if ($this->notestext[$dir] != $dd->notestext[$dir]) {
-					$output .= "\t" . $tdir . "NOTES " . $this->notestext[$dir] . "\n";
-				}
-			}
+            foreach ($dirs as $dir => $tdir) {
+                if ($this->notestext[$dir] != $dd->notestext[$dir]) {
+                    $output .= "\t" . $tdir . "NOTES " . $this->notestext[$dir] . "\n";
+                }
+            }
 
-			if ($this->overliburl[IN]==$this->overliburl[OUT]) {
-				$dirs = array(IN=>""); // only use the IN value, since they're both the same, but don't prefix the output keyword
-			} else {
-				$dirs = array( IN=>"IN", OUT=>"OUT" );// the full monty two-keyword version
-			}
+            if ($this->overliburl[IN] == $this->overliburl[OUT]) {
+                $dirs = array(IN => ""); // only use the IN value, since they're both the same, but don't prefix the output keyword
+            } else {
+                $dirs = array(IN => "IN", OUT => "OUT");// the full monty two-keyword version
+            }
 
-			foreach ($dirs as $dir=>$tdir) {
-				if ($this->overliburl[$dir] != $dd->overliburl[$dir]) {
-					$output.="\t".$tdir."OVERLIBGRAPH " . join(" ",$this->overliburl[$dir]) . "\n";
-				}
-			}
+            foreach ($dirs as $dir => $tdir) {
+                if ($this->overliburl[$dir] != $dd->overliburl[$dir]) {
+                    $output .= "\t" . $tdir . "OVERLIBGRAPH " . join(" ", $this->overliburl[$dir]) . "\n";
+                }
+            }
 
-			// if formats have been set, but they're just the longform of the built-in styles, set them back to the built-in styles
-			if($this->labelstyle=='--' && $this->bwlabelformats[IN] == FMT_PERC_IN && $this->bwlabelformats[OUT] == FMT_PERC_OUT)
-			{
-				$this->labelstyle = 'percent';
-			}
-			if($this->labelstyle=='--' && $this->bwlabelformats[IN] == FMT_BITS_IN && $this->bwlabelformats[OUT] == FMT_BITS_OUT)
-			{
-				$this->labelstyle = 'bits';
-			}
-			if($this->labelstyle=='--' && $this->bwlabelformats[IN] == FMT_UNFORM_IN && $this->bwlabelformats[OUT] == FMT_UNFORM_OUT)
-			{
-				$this->labelstyle = 'unformatted';
-			}
+            // if formats have been set, but they're just the longform of the built-in styles, set them back to the built-in styles
+            if ($this->labelstyle == '--' && $this->bwlabelformats[IN] == FMT_PERC_IN && $this->bwlabelformats[OUT] == FMT_PERC_OUT) {
+                $this->labelstyle = 'percent';
+            }
+            if ($this->labelstyle == '--' && $this->bwlabelformats[IN] == FMT_BITS_IN && $this->bwlabelformats[OUT] == FMT_BITS_OUT) {
+                $this->labelstyle = 'bits';
+            }
+            if ($this->labelstyle == '--' && $this->bwlabelformats[IN] == FMT_UNFORM_IN && $this->bwlabelformats[OUT] == FMT_UNFORM_OUT) {
+                $this->labelstyle = 'unformatted';
+            }
 
-			// if specific formats have been set, then the style will be '--'
-			// if it isn't then use the named style
-			if ( ($this->labelstyle != $dd->labelstyle) && ($this->labelstyle != '--') ) {
-				$output .= "\tBWLABEL " . $this->labelstyle . "\n";
-			}
+            // if specific formats have been set, then the style will be '--'
+            // if it isn't then use the named style
+            if (($this->labelstyle != $dd->labelstyle) && ($this->labelstyle != '--')) {
+                $output .= "\tBWLABEL " . $this->labelstyle . "\n";
+            }
 
-			// if either IN or OUT field changes, then both must be written because a regular BWLABEL can't do it
-			// XXX this looks wrong
-			$comparison = $dd->bwlabelformats[IN];
-			$comparison2 = $dd->bwlabelformats[OUT];
+            // if either IN or OUT field changes, then both must be written because a regular BWLABEL can't do it
+            // XXX this looks wrong
+            $comparison = $dd->bwlabelformats[IN];
+            $comparison2 = $dd->bwlabelformats[OUT];
 
-			if ( ( $this->labelstyle == '--') && ( ($this->bwlabelformats[IN] != $comparison) || ($this->bwlabelformats[OUT]!= '--')) )
-			{
-				$output .= "\tINBWFORMAT " . $this->bwlabelformats[IN]. "\n";
-				$output .= "\tOUTBWFORMAT " . $this->bwlabelformats[OUT]. "\n";
-			}
+            if (($this->labelstyle == '--') && (($this->bwlabelformats[IN] != $comparison) || ($this->bwlabelformats[OUT] != '--'))) {
+                $output .= "\tINBWFORMAT " . $this->bwlabelformats[IN] . "\n";
+                $output .= "\tOUTBWFORMAT " . $this->bwlabelformats[OUT] . "\n";
+            }
 
-			$comparison = $dd->labeloffset_in;
-			$comparison2 = $dd->labeloffset_out;
+            $comparison = $dd->labeloffset_in;
+            $comparison2 = $dd->labeloffset_out;
 
-			if ( ($this->labeloffset_in != $comparison) || ($this->labeloffset_out != $comparison2) )
-			{ $output.="\tBWLABELPOS " . $this->labeloffset_in . " " . $this->labeloffset_out . "\n"; }
+            if (($this->labeloffset_in != $comparison) || ($this->labeloffset_out != $comparison2)) {
+                $output .= "\tBWLABELPOS " . $this->labeloffset_in . " " . $this->labeloffset_out . "\n";
+            }
 
-			$comparison=$dd->commentoffset_in.":".$dd->commentoffset_out;
-			$mine = $this->commentoffset_in.":".$this->commentoffset_out;
-			if ($mine != $comparison) { $output.="\tCOMMENTPOS " . $this->commentoffset_in." ".$this->commentoffset_out. "\n"; }
+            $comparison = $dd->commentoffset_in . ":" . $dd->commentoffset_out;
+            $mine = $this->commentoffset_in . ":" . $this->commentoffset_out;
+            if ($mine != $comparison) {
+                $output .= "\tCOMMENTPOS " . $this->commentoffset_in . " " . $this->commentoffset_out . "\n";
+            }
 
+            $comparison = $dd->targets;
 
-			$comparison=$dd->targets;
+            if ($this->targets != $comparison) {
+                $output .= "\tTARGET";
 
-			if ($this->targets != $comparison) {
-				$output.="\tTARGET";
-
-				foreach ($this->targets as $target) {
+                foreach ($this->targets as $target) {
                     $output .= " " . $target->asConfig();
-				}
-				$output .= "\n";
-			}
+                }
+                $output .= "\n";
+            }
 
-			foreach (array(IN,OUT) as $dir) {
-				if ($dir==IN) {
-					$tdir="IN";
-				}
-				if ($dir==OUT) {
-					$tdir="OUT";
-				}
+            foreach (array(IN, OUT) as $dir) {
+                if ($dir == IN) {
+                    $tdir = "IN";
+                }
+                if ($dir == OUT) {
+                    $tdir = "OUT";
+                }
 
-				$comparison=$dd->comments[$dir];
-				if ($this->comments[$dir] != $comparison) {
-					$output .= "\t" . $tdir . "COMMENT " . $this->comments[$dir] . "\n";
-				}
-			}
+                $comparison = $dd->comments[$dir];
+                if ($this->comments[$dir] != $comparison) {
+                    $output .= "\t" . $tdir . "COMMENT " . $this->comments[$dir] . "\n";
+                }
+            }
 
-			if (isset($this->a) && isset($this->b))	{
-				$output .= "\tNODES " . $this->a->name;
+            if (isset($this->a) && isset($this->b)) {
+                $output .= "\tNODES " . $this->a->name;
 
-				if ($this->a_offset != 'C') {
-					$output .= ":" . $this->a_offset;
-				}
+                if ($this->a_offset != 'C') {
+                    $output .= ":" . $this->a_offset;
+                }
 
-				$output .= " " . $this->b->name;
+                $output .= " " . $this->b->name;
 
-				if ($this->b_offset != 'C') {
-					$output .= ":" . $this->b_offset;
-				}
+                if ($this->b_offset != 'C') {
+                    $output .= ":" . $this->b_offset;
+                }
 
-				$output .= "\n";
-			}
+                $output .= "\n";
+            }
 
-			if (count($this->vialist) > 0) {
-				foreach ($this->vialist as $via) {
-					if( isset($via[2])) {
-						$output .= sprintf("\tVIA %s %d %d\n", $via[2],$via[0], $via[1]);
-					} else {
-						$output .= sprintf("\tVIA %d %d\n", $via[0], $via[1]);
-					}
-				}
-			}
+            if (count($this->vialist) > 0) {
+                foreach ($this->vialist as $via) {
+                    if (isset($via[2])) {
+                        $output .= sprintf("\tVIA %s %d %d\n", $via[2], $via[0], $via[1]);
+                    } else {
+                        $output .= sprintf("\tVIA %d %d\n", $via[0], $via[1]);
+                    }
+                }
+            }
 
-			if (($this->max_bandwidth_in != $dd->max_bandwidth_in)
-				|| ($this->max_bandwidth_out != $dd->max_bandwidth_out)
-					|| ($this->name == 'DEFAULT'))
-			{
-				if ($this->max_bandwidth_in == $this->max_bandwidth_out)
-				{ $output.="\tBANDWIDTH " . $this->max_bandwidth_in_cfg . "\n"; }
-				else { $output
-				.="\tBANDWIDTH " . $this->max_bandwidth_in_cfg . " " . $this->max_bandwidth_out_cfg . "\n"; }
-			}
+            if (($this->max_bandwidth_in != $dd->max_bandwidth_in)
+                || ($this->max_bandwidth_out != $dd->max_bandwidth_out)
+                || ($this->name == 'DEFAULT')
+            ) {
+                if ($this->max_bandwidth_in == $this->max_bandwidth_out) {
+                    $output .= "\tBANDWIDTH " . $this->max_bandwidth_in_cfg . "\n";
+                } else {
+                    $output
+                        .= "\tBANDWIDTH " . $this->max_bandwidth_in_cfg . " " . $this->max_bandwidth_out_cfg . "\n";
+                }
+            }
 
-			foreach ($this->hints as $hintname=>$hint)
-			{
-			  // all hints for DEFAULT node are for writing
-			  // only changed ones, or unique ones, otherwise
-			      if(
-			    ($this->name == 'DEFAULT')
-			  ||
-				    (isset($dd->hints[$hintname])
-				    &&
-				    $dd->hints[$hintname] != $hint)
-				  ||
-				    (!isset($dd->hints[$hintname]))
-				)
-			      {
-			    $output .= "\tSET $hintname $hint\n";
-			      }
-			}
+            foreach ($this->hints as $hintname => $hint) {
+                // all hints for DEFAULT node are for writing
+                // only changed ones, or unique ones, otherwise
+                if (
+                    ($this->name == 'DEFAULT')
+                    ||
+                    (isset($dd->hints[$hintname])
+                        &&
+                        $dd->hints[$hintname] != $hint)
+                    ||
+                    (!isset($dd->hints[$hintname]))
+                ) {
+                    $output .= "\tSET $hintname $hint\n";
+                }
+            }
 
-			if ($output != '') {
-				$output = "LINK " . $this->name . "\n".$output."\n";
-			}
-		}
-		return($output);
-	}
-
-
+            if ($output != '') {
+                $output = "LINK " . $this->name . "\n" . $output . "\n";
+            }
+        }
+        return ($output);
+    }
 
     function asJSCore()
     {
@@ -840,11 +822,10 @@ class WeatherMapLink extends WeatherMapDataItem
         return $output;
     }
 
-    function asJS($type="Link", $prefix="L")
+    function asJS($type = "Link", $prefix = "L")
     {
         return parent::asJS($type, $prefix);
     }
-
 
     public function cleanUp()
     {
@@ -856,6 +837,51 @@ class WeatherMapLink extends WeatherMapDataItem
         $this->parent = null;
         $this->descendents = null;
     }
-};
+
+    public function getValue($name)
+    {
+        wm_debug("Fetching %s\n", $name);
+        if (property_exists($this, $name)) {
+            return $this->$name;
+        }
+        throw new WeathermapInternalFail("NoSuchProperty");
+    }
+
+    /**
+     * Set the new ends for a link.
+     *
+     * @param $node1
+     * @param $node2
+     */
+    public function setEndNodes($node1, $node2)
+    {
+        if (null == !$node1 && null === $node2) {
+            throw new WeathermapInternalFail("PartiallyRealLink");
+        }
+
+        if (null == !$node2 && null === $node1) {
+            throw new WeathermapInternalFail("PartiallyRealLink");
+        }
+
+        if (null !== $this->a) {
+            $this->a->removeDependency($this);
+        }
+        if (null !== $this->b) {
+            $this->b->removeDependency($this);
+        }
+        $this->a = $node1;
+        $this->b = $node2;
+
+        if (null !== $this->a) {
+            $this->a->addDependency($this);
+        }
+        if (null !== $this->b) {
+            $this->b->addDependency($this);
+        }
+    }
+
+}
+
+;
 
 // vim:ts=4:sw=4:

@@ -1165,24 +1165,6 @@ function DrawMap($filename = '', $thumbnailfile = '', $thumbnailmax = 250, $with
 {
     wm_debug("Trace: DrawMap()\n");
 	$bgimage=NULL;
-//	if($this->configfile != "")
-//	{
-//		$this->cachefile_version = crc32(file_get_contents($this->configfile));
-//	}
-//	else
-//	{
-//		$this->cachefile_version = crc32("........");
-//	}
-
-//	wm_debug("Running Post-Processing Plugins...\n");
-//	foreach ($this->postprocessclasses as $post_class)
-//	{
-//		wm_debug("Running $post_class"."->run()\n");
-//		//call_user_func_array(array($post_class, 'run'), array(&$this));
-//		$this->plugins['post'][$post_class]->run($this);
-//
-//	}
-//	wm_debug("Finished Post-Processing Plugins...\n");
 
 	wm_debug("=====================================\n");
 	wm_debug("Start of Map Drawing\n");
@@ -1222,7 +1204,6 @@ function DrawMap($filename = '', $thumbnailfile = '', $thumbnailmax = 250, $with
 
 	$image=imagecreatetruecolor($this->width, $this->height);
 
-	# $image = imagecreate($this->width, $this->height);
 	if (!$image) { wm_warn
 		("Couldn't create output image in memory (" . $this->width . "x" . $this->height . ")."); }
 	else
@@ -1464,24 +1445,18 @@ function DrawMap($filename = '', $thumbnailfile = '', $thumbnailmax = 250, $with
         $this->scales = null;
     }
 
-    function PreloadMapHTML()
+    function calculateImagemap()
     {
-        wm_debug("Trace: PreloadMapHTML()\n");
-        //   onmouseover="return overlib('<img src=graph.png>',DELAY,250,CAPTION,'$caption');"  onmouseout="return nd();"
-
-        // find the middle of the map
-        $center_x = $this->width / 2;
-        $center_y = $this->height / 2;
+        wm_debug("Trace: calculateImagemap()\n");
 
         // loop through everything. Figure out along the way if it's a node or a link
         $allItems = $this->buildAllItemsList();
 
-        foreach ($allItems as $myobj) {
-            $type = $myobj->my_type();
-            $prefix = substr($type, 0, 1);
+        foreach ($allItems as $mapItem) {
+            $type = $mapItem->my_type();
+            # $prefix = substr($type, 0, 1);
 
             $dirs = array();
-            //print "\n\nConsidering a $type - ".$myobj->name.".\n";
             if ($type == 'LINK') {
                 $dirs = array(IN => array(0, 2), OUT => array(1, 3));
             }
@@ -1489,33 +1464,37 @@ function DrawMap($filename = '', $thumbnailfile = '', $thumbnailmax = 250, $with
                 $dirs = array(IN => array(0, 1, 2, 3));
             }
 
-            if ($this->htmlstyle == "overlib") {
-                // check to see if any of the relevant things have a value
+            // check to see if any of the relevant things have a value
+            $change = "";
+            foreach ($dirs as $d => $parts) {
+                $change .= join('', $mapItem->overliburl[$d]);
+                $change .= $mapItem->notestext[$d];
+            }
+            // skip all this if it's a template node
+            if ($mapItem->isTemplate()) {
                 $change = "";
-                foreach ($dirs as $d => $parts) {
-                    $change .= join('', $myobj->overliburl[$d]);
-                    $change .= $myobj->notestext[$d];
-                }
+            }
 
-                // skip all this if it's a template node
-                if ($type == 'LINK' && !isset($myobj->a->name)) {
-                    $change = '';
-                }
-                if ($type == 'NODE' && !isset($myobj->x)) {
-                    $change = '';
-                }
+            if ($this->htmlstyle == "overlib") {
 
                 if ($change != '') {
+
+                    // find the middle of the map
+                    $center_x = $this->width / 2;
+                    $center_y = $this->height / 2;
+
+                    $type = $mapItem->my_type();
+
                     if ($type == 'NODE') {
-                        $mid_x = $myobj->x;
-                        $mid_y = $myobj->y;
+                        $mid_x = $mapItem->x;
+                        $mid_y = $mapItem->y;
                     }
                     if ($type == 'LINK') {
-                        $a_x = $this->nodes[$myobj->a->name]->x;
-                        $a_y = $this->nodes[$myobj->a->name]->y;
+                        $a_x = $this->nodes[$mapItem->a->name]->x;
+                        $a_y = $this->nodes[$mapItem->a->name]->y;
 
-                        $b_x = $this->nodes[$myobj->b->name]->x;
-                        $b_y = $this->nodes[$myobj->b->name]->y;
+                        $b_x = $this->nodes[$mapItem->b->name]->x;
+                        $b_y = $this->nodes[$mapItem->b->name]->y;
 
                         $mid_x = ($a_x + $b_x) / 2;
                         $mid_y = ($a_y + $b_y) / 2;
@@ -1524,18 +1503,18 @@ function DrawMap($filename = '', $thumbnailfile = '', $thumbnailmax = 250, $with
                     $above = "";
                     $img_extra = "";
 
-                    if ($myobj->overlibwidth != 0) {
-                        $left = "WIDTH," . $myobj->overlibwidth . ",";
-                        $img_extra .= " WIDTH=$myobj->overlibwidth";
+                    if ($mapItem->overlibwidth != 0) {
+                        $left = "WIDTH," . $mapItem->overlibwidth . ",";
+                        $img_extra .= " WIDTH=$mapItem->overlibwidth";
 
                         if ($mid_x > $center_x) {
                             $left .= "LEFT,";
                         }
                     }
 
-                    if ($myobj->overlibheight != 0) {
-                        $above = "HEIGHT," . $myobj->overlibheight . ",";
-                        $img_extra .= " HEIGHT=$myobj->overlibheight";
+                    if ($mapItem->overlibheight != 0) {
+                        $above = "HEIGHT," . $mapItem->overlibheight . ",";
+                        $img_extra .= " HEIGHT=$mapItem->overlibheight";
 
                         if ($mid_y > $center_y) {
                             $above .= "ABOVE,";
@@ -1543,29 +1522,29 @@ function DrawMap($filename = '', $thumbnailfile = '', $thumbnailmax = 250, $with
                     }
 
                     foreach ($dirs as $dir => $parts) {
-                        $caption = ($myobj->overlibcaption[$dir] != '' ? $myobj->overlibcaption[$dir] : $myobj->name);
-                        $caption = $this->ProcessString($caption, $myobj);
+                        $caption = ($mapItem->overlibcaption[$dir] != '' ? $mapItem->overlibcaption[$dir] : $mapItem->name);
+                        $caption = $this->ProcessString($caption, $mapItem);
 
                         $overlibhtml = "onmouseover=\"return overlib('";
 
                         $n = 0;
-                        if (sizeof($myobj->overliburl[$dir]) > 0) {
+                        if (sizeof($mapItem->overliburl[$dir]) > 0) {
                             // print "ARRAY:".is_array($link->overliburl[$dir])."\n";
-                            foreach ($myobj->overliburl[$dir] as $url) {
+                            foreach ($mapItem->overliburl[$dir] as $url) {
                                 if ($n > 0) {
                                     $overlibhtml .= '&lt;br /&gt;';
                                 }
-                                $overlibhtml .= "&lt;img $img_extra src=" . $this->ProcessString($url, $myobj) . "&gt;";
+                                $overlibhtml .= "&lt;img $img_extra src=" . $this->ProcessString($url, $mapItem) . "&gt;";
                                 $n++;
                             }
                         }
                         # print "Added $n for $dir\n";
-                        if (trim($myobj->notestext[$dir]) != '') {
+                        if (trim($mapItem->notestext[$dir]) != '') {
                             # put in a linebreak if there was an image AND notes
                             if ($n > 0) {
                                 $overlibhtml .= '&lt;br /&gt;';
                             }
-                            $note = $this->ProcessString($myobj->notestext[$dir], $myobj);
+                            $note = $this->ProcessString($mapItem->notestext[$dir], $mapItem);
                             $note = htmlspecialchars($note, ENT_NOQUOTES);
                             $note = str_replace("'", "\\&apos;", $note);
                             $note = str_replace('"', "&quot;", $note);
@@ -1574,7 +1553,7 @@ function DrawMap($filename = '', $thumbnailfile = '', $thumbnailmax = 250, $with
                         $overlibhtml .= "',DELAY,250,${left}${above}CAPTION,'" . $caption
                             . "');\"  onmouseout=\"return nd();\"";
 
-                        foreach ($myobj->imap_areas as $area) {
+                        foreach ($mapItem->imap_areas as $area) {
                             $area->extrahtml = $overlibhtml;
                         }
                     }
@@ -1584,11 +1563,11 @@ function DrawMap($filename = '', $thumbnailfile = '', $thumbnailmax = 250, $with
             // now look at infourls
             foreach ($dirs as $dir => $parts) {
                 foreach ($parts as $part) {
-                    $areaname = $type . ":" . $prefix . $myobj->id . ":" . $part;
+                    # $areaname = $type . ":" . $prefix . $mapItem->id . ":" . $part;
 
-                    if (($this->htmlstyle != 'editor') && ($myobj->infourl[$dir] != '')) {
-                        foreach ($myobj->imap_areas as $area) {
-                            $area->href = $this->ProcessString($myobj->infourl[$dir], $myobj);
+                    if (($this->htmlstyle != 'editor') && ($mapItem->infourl[$dir] != '')) {
+                        foreach ($mapItem->imap_areas as $area) {
+                            $area->href = $this->ProcessString($mapItem->infourl[$dir], $mapItem);
                         }
                     }
                 }
@@ -1627,7 +1606,7 @@ function MakeHTML($imagemapname = "weathermap_imap")
 {
 	wm_debug("Trace: MakeHTML()\n");
 	// PreloadMapHTML fills in the ImageMap info, ready for the HTML to be created.
-	$this->PreloadMapHTML();
+	$this->calculateImagemap();
 
 	$html='';
 
@@ -1656,12 +1635,12 @@ function MakeHTML($imagemapname = "weathermap_imap")
 	}
 	$html .= '</div>';
 
-	$html .= $this->SortedImagemap($imagemapname);
+	$html .= $this->generateSortedImagemap($imagemapname);
 
 	return $html;
 }
 
-    function SortedImagemap($imagemapname)
+    function generateSortedImagemap($imagemapname)
     {
         $html = "\n<map name=\"" . $imagemapname . '" id="' . $imagemapname . "\">\n";
 

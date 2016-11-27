@@ -2,11 +2,21 @@
 
 class WeatherMapUIBase
 {
-    public $commands;
-
     const ARG_OPTIONAL = 2;
     const ARG_TYPE = 1;
     const ARG_NAME = 0;
+
+    private $types = array(
+        "int" => "validateArgInt",
+        "name" => "validateArgName",
+        "jsname" => "validateArgJavascriptName",
+        "mapfile" => "validateArgMapFilename",
+        "string" => "validateArgString",
+        "bool" => "validateArgBool",
+        "item_type" => "validateArgItemType",
+        "maphash" => "validateArgMapHash"
+    );
+    public $commands;
 
     /**
      * Given an array of request variables (usually $_REQUEST), check that the
@@ -61,25 +71,123 @@ class WeatherMapUIBase
      */
     public function validateArgument($type, $value)
     {
-        $types = array(
-            "int" => "validateArgInt",
-            "name" => "validateArgName",
-            "jsname" => "validateArgJavascriptName",
-            "mapfile" => "validateArgMapFilename",
-            "string" => "validateArgString",
-            "bool" => "validateArgBool",
-            "maphash" => "validateArgMapHash"
-        );
-
         $handler = null;
 
-        if (array_key_exists($type, $types)) {
-            $handler = $types[$type];
+        if (array_key_exists($type, $this->types)) {
+            $handler = $this->types[$type];
             return $this->$handler($value);
         }
 
         if ($type != "") {
             throw new WeathermapInternalFail("ValidateArgs saw unknown type");
+        }
+        return false;
+    }
+
+    /**
+     * Call the relevant function to handle this request.
+     * Pass only the expected (and by now, validated) parameters
+     * from the HTTP request
+     *
+     * @param string $action
+     * @param string[] $request
+     * @param object $appObject - a reference to a relevant object (Editor in EditorUI)
+     *
+     * @returns bool
+     */
+    public function dispatchRequest($action, $request, $appObject)
+    {
+        if (!array_key_exists($action, $this->commands)) {
+            if (array_key_exists(":: DEFAULT ::", $this->commands)) {
+                $action = ":: DEFAULT ::";
+            } else {
+                return false;
+            }
+        }
+
+        $command_info = $this->commands[$action];
+
+        $params = array();
+        foreach ($command_info['args'] as $arg) {
+            if (isset($request[$arg[self::ARG_NAME]])) {
+                $params[$arg[self::ARG_NAME]] = $request[$arg[self::ARG_NAME]];
+            }
+        }
+
+        if (isset($command_info['handler'])) {
+            $handler = $command_info['handler'];
+            $result = $this->$handler($params, $appObject);
+
+            return $result;
+        }
+
+        print "NOPE";
+
+        return false;
+    }
+
+    public function dispatch($action, $request)
+    {
+        $handler = null;
+
+        if (array_key_exists($action, $this->commands)) {
+            $handler = $this->commands[$action];
+        }
+        if (array_key_exists(":: DEFAULT ::", $this->commands)) {
+            $handler = $this->commands[":: DEFAULT ::"];
+        }
+        if (null === $handler) {
+            return;
+        }
+
+        // TODO - add argument parse/validation in here
+
+        $handlerMethod = $handler['handler'];
+        $this->$handlerMethod($request);
+    }
+
+    /**
+     * Run through the command list, making sure all the handler functions actually exist
+     * and the type list, checking that the validators do too
+     */
+    public function selfValidate()
+    {
+        $result = true;
+
+        foreach ($this->types as $type => $validator) {
+            if (!method_exists($this, $validator)) {
+                wm_warn("$type has a missing validator ($validator)");
+                $result = false;
+            }
+        }
+
+        foreach ($this->commands as $command => $detail) {
+            if (!isset($detail['handler'])) {
+                $result = false;
+                wm_warn("$command doesn't specify handler");
+            } else {
+                $handler = $detail['handler'];
+                if (!method_exists($this, $handler)) {
+                    wm_warn("$command has a missing handler ($handler)");
+                    $result = false;
+                }
+            }
+            foreach ($detail['args'] as $spec) {
+                $type = $spec[1];
+                if (!array_key_exists($type, $this->types)) {
+                    wm_warn("$command uses type $type which isn't defined");
+                    $result = false;
+                }
+            }
+
+        }
+        return $result;
+    }
+
+    private function validateArgItemType($value)
+    {
+        if ($value == "node" || $value == "link") {
+            return true;
         }
         return false;
     }
@@ -147,70 +255,7 @@ class WeatherMapUIBase
 
         return false;
     }
-
-    /**
-     * Call the relevant function to handle this request.
-     * Pass only the expected (and by now, validated) parameters
-     * from the HTTP request
-     *
-     * @param string $action
-     * @param string[] $request
-     * @param object $appObject - a reference to a relevant object (Editor in EditorUI)
-     *
-     * @returns bool
-     */
-    public function dispatchRequest($action, $request, $appObject)
-    {
-        if (!array_key_exists($action, $this->commands)) {
-            if (array_key_exists(":: DEFAULT ::", $this->commands)) {
-                $action = ":: DEFAULT ::";
-            } else {
-                return false;
-            }
-        }
-
-        $command_info = $this->commands[$action];
-
-        $params = array();
-        foreach ($command_info['args'] as $arg) {
-            if (isset($request[$arg[self::ARG_NAME]])) {
-                $params[$arg[self::ARG_NAME]] = $request[$arg[self::ARG_NAME]];
-            }
-        }
-
-        if (isset($command_info['handler'])) {
-            $handler = $command_info['handler'];
-            $result = $this->$handler($params, $appObject);
-
-            return $result;
-        }
-
-        print "NOPE";
-
-        return false;
-    }
-
-    public function dispatch($action, $request)
-    {
-        $handler = null;
-
-        if (array_key_exists($action, $this->commands)) {
-            $handler = $this->commands[$action];
-        }
-        if (array_key_exists(":: DEFAULT ::", $this->commands)) {
-            $handler = $this->commands[":: DEFAULT ::"];
-        }
-        if (null === $handler) {
-            return;
-        }
-
-        // TODO - add argument parse/validation in here
-
-        $handlerMethod = $handler['handler'];
-        $this->$handlerMethod($request);
-    }
 }
-
 
 /**
  * Clean up URI (function taken from Cacti) to protect against XSS
@@ -221,8 +266,8 @@ class WeatherMapUIBase
  */
 function wmeSanitizeURI($str)
 {
-    static $drop_char_match =   array(' ','^', '$', '<', '>', '`', '\'', '"', '|', '+', '[', ']', '{', '}', ';', '!', '%');
-    static $drop_char_replace = array('', '', '',  '',  '',  '',  '',   '',  '',  '',  '',  '',  '',  '',  '',  '', '');
+    static $drop_char_match = array(' ', '^', '$', '<', '>', '`', '\'', '"', '|', '+', '[', ']', '{', '}', ';', '!', '%');
+    static $drop_char_replace = array('', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '');
 
     return str_replace($drop_char_match, $drop_char_replace, urldecode($str));
 }
@@ -230,7 +275,7 @@ function wmeSanitizeURI($str)
 // much looser sanitise for general strings that shouldn't have HTML in them
 function wmeSanitizeString($str)
 {
-    static $drop_char_match =   array('<', '>' );
+    static $drop_char_match = array('<', '>');
     static $drop_char_replace = array('', '');
 
     return str_replace($drop_char_match, $drop_char_replace, urldecode($str));
@@ -246,12 +291,12 @@ function wmeValidateBandwidth($bandwidth)
 
 function wmeValidateOneOf($input, $validChoices = array(), $caseSensitive = false)
 {
-    if (! $caseSensitive) {
+    if (!$caseSensitive) {
         $input = strtolower($input);
     }
 
     foreach ($validChoices as $choice) {
-        if (! $caseSensitive) {
+        if (!$caseSensitive) {
             $choice = strtolower($choice);
         }
         if ($choice == $input) {
@@ -272,7 +317,7 @@ function wmeSanitizeSelected($str)
 {
     $result = urldecode($str);
 
-    if (! preg_match('/^(LINK|NODE):/', $result)) {
+    if (!preg_match('/^(LINK|NODE):/', $result)) {
         return "";
     }
     return wmeSanitizeName($result);
@@ -288,13 +333,13 @@ function wmeSanitizeFile($filename, $allowed_exts = array())
 
     $clean = false;
     foreach ($allowed_exts as $ext) {
-        $match = ".".$ext;
+        $match = "." . $ext;
 
         if (substr($filename, -strlen($match), strlen($match)) == $match) {
             $clean = true;
         }
     }
-    if (! $clean) {
+    if (!$clean) {
         return "";
     }
     return $filename;

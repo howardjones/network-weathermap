@@ -5,6 +5,7 @@
 // Released under the GNU Public License
 
 require_once "WeatherMapUIBase.class.php";
+require_once "WeatherMapEditor.class.php";
 require_once 'SimpleTemplate.class.php';
 
 /** The various functions concerned with the actual presentation of the supplied editor, and
@@ -92,7 +93,7 @@ class WeatherMapEditorUI extends WeatherMapUIBase
         "fetch_config" => array(
             "args" => array(
                 array("mapname", "mapfile"),
-                array("item_type", array("node", "link")),
+                array("item_type", "item_type"),
                 array("item_name", "name"),
             ),
             "handler" => "cmdGetItemConfig",
@@ -101,7 +102,7 @@ class WeatherMapEditorUI extends WeatherMapUIBase
         "set_link_config" => array(
             "args" => array(
                 array("mapname", "mapfile"),
-                array("item_configtext", "text"),
+                array("item_configtext", "string"),
                 array("link_name", "name"),
             ),
             "handler" => "cmdReplaceLinkConfig"
@@ -109,7 +110,7 @@ class WeatherMapEditorUI extends WeatherMapUIBase
         "set_node_config" => array(
             "args" => array(
                 array("mapname", "mapfile"),
-                array("item_configtext", "text"),
+                array("item_configtext", "string"),
                 array("node_name", "name"),
             ),
             "handler" => "cmdReplaceNodeConfig"
@@ -230,7 +231,12 @@ class WeatherMapEditorUI extends WeatherMapUIBase
 //        "set_link_properties" => array(),
 //        "set_map_properties" => array(),
 //        "set_map_style" => array(),
-        "nothing" => array("args" => array(array("mapname", "mapfile")), "handler" => "cmdDoNothing", "no_save" => true)
+        "nothing" => array(
+            "args" => array(
+                array("mapname", "mapfile")
+            ),
+            "handler" => "cmdDoNothing",
+            "no_save" => true)
     );
 
     function __construct()
@@ -410,7 +416,7 @@ class WeatherMapEditorUI extends WeatherMapUIBase
     function snap($coord)
     {
         if ($this->gridSnapValue == 0) {
-            return ($coord);
+            return $coord;
         } else {
             $rest = $coord % $this->gridSnapValue;
             return ($coord - $rest + round($rest / $this->gridSnapValue) * $this->gridSnapValue);
@@ -848,7 +854,7 @@ class WeatherMapEditorUI extends WeatherMapUIBase
 
     function isEmbedded()
     {
-        return ($this->fromPlugin);
+        return $this->fromPlugin;
     }
 
     function getAvailableImages($imagedir, $map)

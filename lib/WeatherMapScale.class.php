@@ -352,6 +352,12 @@ class WeatherMapScale extends WeatherMapItem
         );
     }
 
+    /**
+     * @param WMPoint $newPosition
+     */
+    function setPosition($newPosition) {
+        $this->keypos = $newPosition;
+    }
 
     function DrawLegend($gdTargetImage)
     {

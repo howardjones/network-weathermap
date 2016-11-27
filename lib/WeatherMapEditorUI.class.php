@@ -233,37 +233,29 @@ class WeatherMapEditorUI extends WeatherMapUIBase
         "nothing" => array("args" => array(array("mapname", "mapfile")), "handler" => "cmdDoNothing", "no_save" => true)
     );
 
-    function setLogMessage($message)
+    function __construct()
     {
-        $this->log_message = $message;
+        $this->unpackCookie();
+        $this->editor = new WeatherMapEditor();
+
     }
 
-    function setNextAction($action)
+    function unpackCookie($cookiename = "wmeditor")
     {
-        $this->next_action = $action;
-    }
+        if (isset($_COOKIE[$cookiename])) {
+            $parts = explode(":", $_COOKIE[$cookiename]);
 
-    function setParam2($value)
-    {
-        $this->param2 = $value;
+            if ((isset($parts[0])) && (intval($parts[0]) == 1)) {
+                $this->useOverlay = true;
+            }
+            if ((isset($parts[1])) && (intval($parts[1]) == 1)) {
+                $this->useOverlayRelative = true;
+            }
+            if ((isset($parts[2])) && (intval($parts[2]) != 0)) {
+                $this->gridSnapValue = intval($parts[2]);
+            }
+        }
     }
-
-    function setSelected($item)
-    {
-        $this->selected = $item;
-    }
-
-    function setEmbedded($state)
-    {
-        $this->fromPlugin = $state;
-    }
-
-    function isEmbedded()
-    {
-        return ($this->fromPlugin);
-    }
-
-    // cmd* methods below here translate form inputs into Editor API calls, which do the real work
 
     /**
      * @param string[] $params
@@ -349,6 +341,59 @@ class WeatherMapEditorUI extends WeatherMapUIBase
         return false;
     }
 
+    // cmd* methods below here translate form inputs into Editor API calls, which do the real work
+
+    /**
+     * @param $map
+     * @return resource
+     */
+    function generateFontSampleImage($map)
+    {
+        $keyfont = 2;
+        $keyfont_obj = $map->fonts->getFont($keyfont);
+        $keyheight = imagefontheight($keyfont) + 2;
+        $sampleheight = 32;
+
+        $im_fonts = imagecreate(2000, $sampleheight);
+        $im_key = imagecreate(2000, $keyheight);
+
+        $white = imagecolorallocate($im_fonts, 255, 255, 255);
+        $black = imagecolorallocate($im_fonts, 0, 0, 0);
+
+        $whitekey = imagecolorallocate($im_key, 255, 255, 255);
+        $blackkey = imagecolorallocate($im_key, 0, 0, 0);
+
+        $fonts = $map->fonts->getList();
+        ksort($fonts);
+
+        $x = 3;
+        foreach ($fonts as $fontnumber => $font) {
+            $string = "Abc123%";
+            $keystring = "Font $fontnumber";
+
+            $font_obj = $map->fonts->getFont($fontnumber);
+
+            list($width, $height) = $font_obj->calculateImageStringSize($string);
+            list($kwidth, $kheight) = $keyfont_obj->calculateImageStringSize($keystring);
+
+            if ($kwidth > $width) {
+                $width = $kwidth;
+            }
+
+            $y = ($sampleheight / 2) + $height / 2;
+            $font_obj->drawImageString($im_fonts, $x, $y, $string, $black);
+            $keyfont_obj->drawImageString($im_key, $x, $keyheight, "Font $fontnumber", $blackkey);
+
+            $x = $x + $width + 6;
+        }
+
+        $final_image = imagecreate($x, $sampleheight + $keyheight);
+        imagecopy($final_image, $im_fonts, 0, 0, 0, 0, $x, $sampleheight);
+        imagecopy($final_image, $im_key, 0, $sampleheight, 0, 0, $x, $keyheight);
+        imagedestroy($im_fonts);
+        return $final_image;
+    }
+
     /**
      * @param string[] $params
      * @param WeatherMapEditor $editor
@@ -360,6 +405,21 @@ class WeatherMapEditorUI extends WeatherMapUIBase
 
         list($newname, $success, $log) = $editor->addNode($nodeX, $nodeY);
         $this->setLogMessage($log);
+    }
+
+    function snap($coord)
+    {
+        if ($this->gridSnapValue == 0) {
+            return ($coord);
+        } else {
+            $rest = $coord % $this->gridSnapValue;
+            return ($coord - $rest + round($rest / $this->gridSnapValue) * $this->gridSnapValue);
+        }
+    }
+
+    function setLogMessage($message)
+    {
+        $this->log_message = $message;
     }
 
     /**
@@ -384,6 +444,21 @@ class WeatherMapEditorUI extends WeatherMapUIBase
         // store the first choice, so that on the next pick, both are available
         $this->setParam2($params['param']);
         $this->setLogMessage("Waiting for second node");
+    }
+
+    function setSelected($item)
+    {
+        $this->selected = $item;
+    }
+
+    function setNextAction($action)
+    {
+        $this->next_action = $action;
+    }
+
+    function setParam2($value)
+    {
+        $this->param2 = $value;
     }
 
     function cmdAddLinkFinal($params, $editor)
@@ -507,24 +582,29 @@ class WeatherMapEditorUI extends WeatherMapUIBase
 
     }
 
+    /**
+     * @param string[] $params
+     * @param WeatherMapEditor $editor
+     */
     function cmdMoveLegend($params, $editor)
     {
+        $x = $this->snap($params['x']);
+        $y = $this->snap($params['y']);
+        $scalename = $params['param'];
 
+        $editor->placeLegend($x, $y, $scalename);
     }
 
+    /**
+     * @param string[] $params
+     * @param WeatherMapEditor $editor
+     */
     function cmdMoveTimestamp($params, $editor)
     {
+        $x = $this->snap($params['x']);
+        $y = $this->snap($params['y']);
 
-    }
-
-    function snap($coord)
-    {
-        if ($this->gridSnapValue == 0) {
-            return ($coord);
-        } else {
-            $rest = $coord % $this->gridSnapValue;
-            return ($coord - $rest + round($rest / $this->gridSnapValue) * $this->gridSnapValue);
-        }
+        $editor->placeTimestamp($x, $y);
     }
 
     // Labels for Nodes, Links and Scales shouldn't have spaces in
@@ -571,51 +651,77 @@ class WeatherMapEditorUI extends WeatherMapUIBase
         return $this->foundCacti;
     }
 
-    function unpackCookie($cookiename = "wmeditor")
+    function main($request, $from_plugin = false)
     {
-        if (isset($_COOKIE[$cookiename])) {
-            $parts = explode(":", $_COOKIE[$cookiename]);
+        $mapname = "";
+        $action = "";
 
-            if ((isset($parts[0])) && (intval($parts[0]) == 1)) {
-                $this->useOverlay = true;
-            }
-            if ((isset($parts[1])) && (intval($parts[1]) == 1)) {
-                $this->useOverlayRelative = true;
-            }
-            if ((isset($parts[2])) && (intval($parts[2]) != 0)) {
-                $this->gridSnapValue = intval($parts[2]);
-            }
+        if (isset($request['action'])) {
+            $action = strtolower(trim($request['action']));
         }
-    }
+        if (isset($request['mapname'])) {
+            $mapname = $request['mapname'];
 
-    function __construct()
-    {
-        $this->unpackCookie();
-        $this->editor = new WeatherMapEditor();
+            if ($action == "newmap" || $action == "newmap_copy") {
+                $mapname .= ".conf";
+            }
 
-    }
+            // If there's something funny with the config filename, just stop.
+            if ($mapname != wmeSanitizeConfigFile($mapname)) {
+                exit();
+            }
 
-    function getTitleFromConfig($filename, $defaultTitle = "")
-    {
-        $title = "";
+            $this->mapfile = $this->mapDirectory . "/" . $mapname;
+            $this->mapname = $mapname;
+        }
 
-        $fileHandle = fopen($filename, "r");
-        if ($fileHandle) {
-            while (!feof($fileHandle)) {
-                $buffer = fgets($fileHandle, 4096);
-
-                if (preg_match("/^\s*TITLE\s+(.*)/i", $buffer, $matches)) {
-                    $title = $matches[1];
+        if ($mapname == '') {
+            $this->showStartPage();
+        } else {
+            if ($this->validateRequest($action, $request)) {
+                $editor = new WeatherMapEditor();
+                $this->setEmbedded($from_plugin);
+                if (!isset($this->commands[$action]['late_load'])) {
+                    $editor->loadConfig($this->mapfile);
                 }
+                $result = $this->dispatchRequest($action, $request, $editor);
+                if (!isset($this->commands[$action]['no_save'])) {
+                    $editor->saveConfig();
+                }
+                if ($result !== false) {
+                    $this->showMainPage($editor);
+                }
+            } else {
+                print "VALIDATION FAIL";
             }
-            fclose($fileHandle);
+        }
+    }
+
+    function showStartPage()
+    {
+        global $WEATHERMAP_VERSION;
+
+        $tpl = new SimpleTemplate();
+
+        $tpl->set("WEATHERMAP_VERSION", $WEATHERMAP_VERSION);
+        $tpl->set("fromplug", 1);
+
+        list($titles, $notes, $errorstring) = $this->getExistingConfigs($this->mapDirectory);
+
+        foreach ($titles as $file => $title) {
+            $nicenote = htmlspecialchars($notes[$file]);
+            $nicefile = htmlspecialchars($file);
+            $nicetitle = htmlspecialchars($title);
+
+            $nicetitles[$nicefile] = $nicetitle;
+            $nicenotes[$nicefile] = $nicenote;
         }
 
-        if ($title == "") {
-            $title = $defaultTitle;
-        }
+        $tpl->set("errorstring", $errorstring);
+        $tpl->set("titles", $nicetitles);
+        $tpl->set("notes", $nicenotes);
 
-        return $title;
+        echo $tpl->fetch("editor-resources/templates/front-oldstyle.php");
     }
 
     function getExistingConfigs($mapDirectory)
@@ -664,115 +770,32 @@ class WeatherMapEditorUI extends WeatherMapUIBase
         return array($titles, $notes, $errorString);
     }
 
-    function getAvailableImages($imagedir, $map)
+    function getTitleFromConfig($filename, $defaultTitle = "")
     {
-        $imagelist = array();
+        $title = "";
 
-        if (is_dir($imagedir)) {
-            $n = 0;
-            $dh = opendir($imagedir);
+        $fileHandle = fopen($filename, "r");
+        if ($fileHandle) {
+            while (!feof($fileHandle)) {
+                $buffer = fgets($fileHandle, 4096);
 
-            if ($dh) {
-                while ($file = readdir($dh)) {
-                    $realfile = $imagedir . DIRECTORY_SEPARATOR . $file;
-                    $uri = $imagedir . "/" . $file;
-
-                    if (is_readable($realfile) && (preg_match('/\.(gif|jpg|png)$/i', $file))) {
-                        $imagelist[] = $uri;
-                        $n++;
-                    }
+                if (preg_match("/^\s*TITLE\s+(.*)/i", $buffer, $matches)) {
+                    $title = $matches[1];
                 }
-
-                closedir($dh);
             }
+            fclose($fileHandle);
         }
 
-        foreach ($map->used_images as $im) {
-            if (!in_array($im, $imagelist)) {
-                $imagelist[] = $im;
-            }
+        if ($title == "") {
+            $title = $defaultTitle;
         }
-        sort($imagelist);
 
-        return $imagelist;
+        return $title;
     }
 
-    /**
-     * @param $map
-     * @return resource
-     */
-    function generateFontSampleImage($map)
+    function setEmbedded($state)
     {
-        $keyfont = 2;
-        $keyfont_obj = $map->fonts->getFont($keyfont);
-        $keyheight = imagefontheight($keyfont) + 2;
-        $sampleheight = 32;
-
-        $im_fonts = imagecreate(2000, $sampleheight);
-        $im_key = imagecreate(2000, $keyheight);
-
-        $white = imagecolorallocate($im_fonts, 255, 255, 255);
-        $black = imagecolorallocate($im_fonts, 0, 0, 0);
-
-        $whitekey = imagecolorallocate($im_key, 255, 255, 255);
-        $blackkey = imagecolorallocate($im_key, 0, 0, 0);
-
-        $fonts = $map->fonts->getList();
-        ksort($fonts);
-
-        $x = 3;
-        foreach ($fonts as $fontnumber => $font) {
-            $string = "Abc123%";
-            $keystring = "Font $fontnumber";
-
-            $font_obj = $map->fonts->getFont($fontnumber);
-
-            list($width, $height) = $font_obj->calculateImageStringSize($string);
-            list($kwidth, $kheight) = $keyfont_obj->calculateImageStringSize($keystring);
-
-            if ($kwidth > $width) {
-                $width = $kwidth;
-            }
-
-            $y = ($sampleheight / 2) + $height / 2;
-            $font_obj->drawImageString($im_fonts, $x, $y, $string, $black);
-            $keyfont_obj->drawImageString($im_key, $x, $keyheight, "Font $fontnumber", $blackkey);
-
-            $x = $x + $width + 6;
-        }
-
-        $final_image = imagecreate($x, $sampleheight + $keyheight);
-        imagecopy($final_image, $im_fonts, 0, 0, 0, 0, $x, $sampleheight);
-        imagecopy($final_image, $im_key, 0, $sampleheight, 0, 0, $x, $keyheight);
-        imagedestroy($im_fonts);
-        return $final_image;
-    }
-
-    function showStartPage()
-    {
-        global $WEATHERMAP_VERSION;
-
-        $tpl = new SimpleTemplate();
-
-        $tpl->set("WEATHERMAP_VERSION", $WEATHERMAP_VERSION);
-        $tpl->set("fromplug", 1);
-
-        list($titles, $notes, $errorstring) = $this->getExistingConfigs($this->mapDirectory);
-
-        foreach ($titles as $file => $title) {
-            $nicenote = htmlspecialchars($notes[$file]);
-            $nicefile = htmlspecialchars($file);
-            $nicetitle = htmlspecialchars($title);
-
-            $nicetitles[$nicefile] = $nicetitle;
-            $nicenotes[$nicefile] = $nicenote;
-        }
-
-        $tpl->set("errorstring", $errorstring);
-        $tpl->set("titles", $nicetitles);
-        $tpl->set("notes", $nicenotes);
-
-        echo $tpl->fetch("editor-resources/templates/front.php");
+        $this->fromPlugin = $state;
     }
 
     function showMainPage($editor)
@@ -823,49 +846,41 @@ class WeatherMapEditorUI extends WeatherMapUIBase
         echo $tpl->fetch("editor-resources/templates/main-oldstyle.php");
     }
 
-    function main($request, $from_plugin = false)
+    function isEmbedded()
     {
-        $mapname = "";
-        $action = "";
+        return ($this->fromPlugin);
+    }
 
-        if (isset($request['action'])) {
-            $action = strtolower(trim($request['action']));
-        }
-        if (isset($request['mapname'])) {
-            $mapname = $request['mapname'];
+    function getAvailableImages($imagedir, $map)
+    {
+        $imagelist = array();
 
-            if ($action == "newmap" || $action == "newmap_copy") {
-                $mapname .= ".conf";
-            }
+        if (is_dir($imagedir)) {
+            $n = 0;
+            $dh = opendir($imagedir);
 
-            // If there's something funny with the config filename, just stop.
-            if ($mapname != wmeSanitizeConfigFile($mapname)) {
-                exit();
-            }
+            if ($dh) {
+                while ($file = readdir($dh)) {
+                    $realfile = $imagedir . DIRECTORY_SEPARATOR . $file;
+                    $uri = $imagedir . "/" . $file;
 
-            $this->mapfile = $this->mapDirectory . "/" . $mapname;
-            $this->mapname = $mapname;
-        }
-
-        if ($mapname == '') {
-            $this->showStartPage();
-        } else {
-            if ($this->validateRequest($action, $request)) {
-                $editor = new WeatherMapEditor();
-                $this->setEmbedded($from_plugin);
-                if (!isset($this->commands[$action]['late_load'])) {
-                    $editor->loadConfig($this->mapfile);
+                    if (is_readable($realfile) && (preg_match('/\.(gif|jpg|png)$/i', $file))) {
+                        $imagelist[] = $uri;
+                        $n++;
+                    }
                 }
-                $result = $this->dispatchRequest($action, $request, $editor);
-                if (!isset($this->commands[$action]['no_save'])) {
-                    $editor->saveConfig();
-                }
-                if ($result !== false) {
-                    $this->showMainPage($editor);
-                }
-            } else {
-                print "VALIDATION FAIL";
+
+                closedir($dh);
             }
         }
+
+        foreach ($map->used_images as $im) {
+            if (!in_array($im, $imagelist)) {
+                $imagelist[] = $im;
+            }
+        }
+        sort($imagelist);
+
+        return $imagelist;
     }
 }

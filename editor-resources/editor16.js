@@ -19,8 +19,11 @@ function initJS16() {
     });
 
     jQuery.each(fontlist, function (index, value) {
+        // slot in the list of fonts in each of the select boxes where they are expected
         var newitem = jQuery("<option />").attr("value", value).text(value);
         jQuery(".fontlist").append(newitem);
     });
+
+
 
 }

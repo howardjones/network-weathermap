@@ -637,9 +637,8 @@ class WeatherMapEditor
         if (! $this->isLoaded()) {
             throw new WeathermapInternalFail("Map must be loaded before editing API called.");
         }
-        
-        $this->map->keyx[$scalename] = $x;
-        $this->map->keyy[$scalename] = $y;
+
+        $this->map->scales[$scalename]->setPosition(new WMPoint($x, $y));
     }
     
     function placeTitle($x, $y)
@@ -648,8 +647,8 @@ class WeatherMapEditor
             throw new WeathermapInternalFail("Map must be loaded before editing API called.");
         }
         
-        $this->map->timex = $x;
-        $this->map->timey = $y;
+        $this->map->titlex = $x;
+        $this->map->titley = $y;
     }
     
     function placeTimestamp($x, $y)

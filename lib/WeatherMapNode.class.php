@@ -9,35 +9,35 @@ require_once "HTML_ImageMap.class.php";
 class WeatherMapNode extends WeatherMapDataItem
 {
     var $drawable;
-	var $x,	$y;
-	var $original_x, $original_y,$relative_resolved;
-	var $width, $height;
-	var $label, $proclabel;
-	var $labelangle;
-	var $selected = 0;
+    var $x, $y;
+    var $original_x, $original_y, $relative_resolved;
+    var $width, $height;
+    var $label, $proclabel;
+    var $labelangle;
+    var $selected = 0;
 
     var $pos_named;
     var $named_offsets;
     var $relative_name;
 
-	var $iconfile, $iconscalew, $iconscaleh;
-	var $labeloffset, $labeloffsetx, $labeloffsety;
+    var $iconfile, $iconscalew, $iconscaleh;
+    var $labeloffset, $labeloffsetx, $labeloffsety;
 
-	var $labelbgcolour;
-	var $labeloutlinecolour;
-	var $labelfontcolour;
-	var $labelfontshadowcolour;
+    var $labelbgcolour;
+    var $labeloutlinecolour;
+    var $labelfontcolour;
+    var $labelfontshadowcolour;
 
-	var $labelfont;
+    var $labelfont;
 
-	var $useiconscale;
-	var $iconscaletype;
-	var $iconscalevar;
-	var $image;
-	var $centre_x, $centre_y; // TODO these were for ORIGIN
-	var $relative_to;
-	var $polar;
-	var $boundingboxes=array();
+    var $useiconscale;
+    var $iconscaletype;
+    var $iconscalevar;
+    var $image;
+    var $centre_x, $centre_y; // TODO these were for ORIGIN
+    var $relative_to;
+    var $polar;
+    var $boundingboxes = array();
 
     /**
      * WeatherMapNode constructor.
@@ -63,7 +63,7 @@ class WeatherMapNode extends WeatherMapDataItem
         $this->image = null;
         $this->drawable = false;
 
-        $this->inherit_fieldlist= array
+        $this->inherit_fieldlist = array
         (
             'boundingboxes' => array(),
             'my_default' => NULL,
@@ -119,33 +119,42 @@ class WeatherMapNode extends WeatherMapDataItem
             'max_bandwidth_out_cfg' => '100'
         );
 
-
         $this->reset($owner);
     }
 
-    function isTemplate()
+    function Reset(&$newowner)
     {
-        return is_null($this->x);
+        $this->owner = $newowner;
+        $template = $this->template;
+
+        if ($template == '') $template = "DEFAULT";
+
+        wm_debug("Resetting $this->name with $template\n");
+
+        // the internal default-default gets it's values from inherit_fieldlist
+        // everything else comes from a node object - the template.
+        if ($this->name == ':: DEFAULT ::') {
+            foreach (array_keys($this->inherit_fieldlist) as
+                     $fld) {
+                $this->$fld = $this->inherit_fieldlist[$fld];
+            }
+        } else {
+            $this->CopyFrom($this->owner->nodes[$template]);
+        }
+        $this->template = $template;
+
+        // to stop the editor tanking, now that colours are decided earlier in ReadData
+        $this->colours[IN] = new WMColour(192, 192, 192);
+        $this->colours[OUT] = new WMColour(192, 192, 192);
+
+        $this->id = $newowner->next_id++;
     }
 
-
-	function my_type() {  return "NODE"; }
-
-
-    public function getPosition()
+    function my_type()
     {
-        return new WMPoint($this->x, $this->y);
+        return "NODE";
     }
 
-    public function setPosition($point)
-    {
-        $this->x = $point->x;
-        $this->y = $point->y;
-        $this->position = $point;
-    }
-
-	// make a mini-image, containing this node and nothing else
-	// figure out where the real NODE centre is, relative to the top-left corner.
     function pre_render($im, &$map)
     {
         if (!$this->drawable) {
@@ -628,12 +637,32 @@ class WeatherMapNode extends WeatherMapDataItem
         $this->makeImageMapAreas();
     }
 
-    function update_cache($cachedir,$mapname)
-	{
-		$cachename = $cachedir."/node_".md5($mapname."/".$this->name).".png";
-		// save this image to a cache, for the editor
-		imagepng($this->image,$cachename);
-	}
+    function isTemplate()
+    {
+        return is_null($this->x);
+    }
+
+    // make a mini-image, containing this node and nothing else
+    // figure out where the real NODE centre is, relative to the top-left corner.
+
+    private function makeImageMapAreas()
+    {
+        $index = 0;
+        foreach ($this->boundingboxes as $bbox) {
+            $areaName = "NODE:N" . $this->id . ":" . $index;
+            $newArea = new HTML_ImageMap_Area_Rectangle($areaName, "", array($bbox));
+            wm_debug("Adding imagemap area [" . join(",", $bbox) . "] => $newArea \n");
+            $this->imap_areas[] = $newArea;
+            $index++;
+        }
+    }
+
+    function update_cache($cachedir, $mapname)
+    {
+        $cachename = $cachedir . "/node_" . md5($mapname . "/" . $this->name) . ".png";
+        // save this image to a cache, for the editor
+        imagepng($this->image, $cachename);
+    }
 
     /**
      * precalculate the colours to be used, and the bounding boxes for labels and icons (if they exist)
@@ -665,75 +694,31 @@ class WeatherMapNode extends WeatherMapDataItem
         $this->drawable = true;
     }
 
-	// draw the node, using the pre_render() output
-	function Draw($im, &$map)
-	{
+    // draw the node, using the pre_render() output
+    function Draw($im, &$map)
+    {
         if (!$this->drawable) {
             wm_debug("Skipping undrawable %s\n", $this);
             return;
         }
 
         // take the offset we figured out earlier, and just blit
-		// the image on. Who says "blit" anymore?
+        // the image on. Who says "blit" anymore?
 
-		// it's possible that there is no image, so better check.
-		if (isset($this->image))
-		{
-			imagealphablending($im, true);
-			imagecopy ( $im, $this->image, $this->x - $this->centre_x, $this->y - $this->centre_y, 0, 0, imagesx($this->image), imagesy($this->image) );
-		}
-
-
-	}
-
-
-    private function makeImageMapAreas()
-    {
-        $index = 0;
-        foreach ($this->boundingboxes as $bbox) {
-            $areaName = "NODE:N" . $this->id . ":" . $index;
-            $newArea = new HTML_ImageMap_Area_Rectangle($areaName, "", array($bbox));
-            wm_debug("Adding imagemap area [".join(",", $bbox)."] => $newArea \n");
-            $this->imap_areas[] = $newArea;
-            $index++;
+        // it's possible that there is no image, so better check.
+        if (isset($this->image)) {
+            imagealphablending($im, true);
+            imagecopy($im, $this->image, $this->x - $this->centre_x, $this->y - $this->centre_y, 0, 0, imagesx($this->image), imagesy($this->image));
         }
+
     }
 
-	// take the pre-rendered node and write it to a file so that
-	// the editor can get at it.
-	function WriteToCache()
-	{
-	}
+    function WriteToCache()
+    {
+    }
 
-	function Reset(&$newowner)
-	{
-		$this->owner=$newowner;
-		$template = $this->template;
-
-		if ($template == '') $template = "DEFAULT";
-
-		wm_debug("Resetting $this->name with $template\n");
-
-		// the internal default-default gets it's values from inherit_fieldlist
-		// everything else comes from a node object - the template.
-		if ($this->name==':: DEFAULT ::')
-		{
-			foreach (array_keys($this->inherit_fieldlist)as
-				$fld) { $this->$fld=$this->inherit_fieldlist[$fld]; }
-		}
-		else
-		{
-			$this->CopyFrom($this->owner->nodes[$template]);
-		}
-		$this->template = $template;
-
-		// to stop the editor tanking, now that colours are decided earlier in ReadData
-		$this->colours[IN] = new WMColour(192,192,192);
-		$this->colours[OUT] = new WMColour(192,192,192);
-
-		$this->id = $newowner->next_id++;
-	}
-
+    // take the pre-rendered node and write it to a file so that
+    // the editor can get at it.
 
     function WriteConfig()
     {
@@ -948,8 +933,6 @@ class WeatherMapNode extends WeatherMapDataItem
         return parent::asJS($type, $prefix);
     }
 
-
-
     public function isRelativePositionResolved()
     {
         return $this->relative_resolved;
@@ -1022,13 +1005,16 @@ class WeatherMapNode extends WeatherMapDataItem
         return true;
     }
 
-    private function getDirectionList()
+    public function getPosition()
     {
-        if ($this->scalevar == 'in') {
-            return array(IN);
-        }
+        return new WMPoint($this->x, $this->y);
+    }
 
-        return array(OUT);
+    public function setPosition($point)
+    {
+        $this->x = $point->x;
+        $this->y = $point->y;
+        $this->position = $point;
     }
 
     public function cleanUp()
@@ -1044,6 +1030,17 @@ class WeatherMapNode extends WeatherMapDataItem
         $this->image = null;
     }
 
-};
+    private function getDirectionList()
+    {
+        if ($this->scalevar == 'in') {
+            return array(IN);
+        }
+
+        return array(OUT);
+    }
+
+}
+
+;
 
 // vim:ts=4:sw=4:

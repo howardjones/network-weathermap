@@ -650,7 +650,8 @@ class WeatherMapNode extends WeatherMapDataItem
             wm_debug("Label colour is $col\n");
 
 			// if there's an icon, then you can choose to have no background
-			if (! $col->isNone() )
+			// if (! $col->isNone() )
+            if (! $this->labelbgcolour->isNone() )
 			{
 			    imagefilledrectangle($node_im, $label_x1, $label_y1, $label_x2, $label_y2, $col->gdallocate($node_im));
 			}

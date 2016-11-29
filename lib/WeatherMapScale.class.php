@@ -45,12 +45,6 @@ class WeatherMapScale extends WeatherMapItem
         $this->Reset($owner);
     }
 
-    public function my_type()
-    {
-        return "SCALE";
-    }
-
-
     public function Reset(&$owner)
     {
         $this->owner = $owner;
@@ -69,9 +63,9 @@ class WeatherMapScale extends WeatherMapItem
         assert(isset($owner));
     }
 
-    public function spanCount()
+    public function my_type()
     {
-        return count($this->entries);
+        return "SCALE";
     }
 
     public function populateDefaultsIfNecessary()
@@ -97,6 +91,25 @@ class WeatherMapScale extends WeatherMapItem
         }
     }
 
+    public function spanCount()
+    {
+        return count($this->entries);
+    }
+
+    public function addSpan($lowValue, $highValue, $lowColour, $highColour = null, $tag = '')
+    {
+        assert(isset($this->owner));
+        $key = $lowValue . '_' . $highValue;
+
+        $this->entries[$key]['c1'] = $lowColour;
+        $this->entries[$key]['c2'] = $highColour;
+        $this->entries[$key]['tag'] = $tag;
+        $this->entries[$key]['bottom'] = $lowValue;
+        $this->entries[$key]['top'] = $highValue;
+
+        wm_debug("%s %s->%s\n", $this->name, $lowValue, $highValue);
+    }
+
     public function setColour($name, $colour)
     {
         assert(isset($this->owner));
@@ -118,20 +131,6 @@ class WeatherMapScale extends WeatherMapItem
                 wm_warn("Unexpected colour name in WeatherMapScale->SetColour");
                 break;
         }
-    }
-
-    public function addSpan($lowValue, $highValue, $lowColour, $highColour = null, $tag = '')
-    {
-        assert(isset($this->owner));
-        $key = $lowValue . '_' . $highValue;
-
-        $this->entries[$key]['c1'] = $lowColour;
-        $this->entries[$key]['c2'] = $highColour;
-        $this->entries[$key]['tag'] = $tag;
-        $this->entries[$key]['bottom'] = $lowValue;
-        $this->entries[$key]['top'] = $highValue;
-
-        wm_debug("%s %s->%s\n", $this->name, $lowValue, $highValue);
     }
 
     public function colourFromValue($value, $itemName = '', $isPercentage = true, $showScaleWarnings = true)
@@ -340,10 +339,8 @@ class WeatherMapScale extends WeatherMapItem
         $colours = $this->entries;
 
         foreach ($colours as $key => $colour) {
-            if (!$colour['special']) {
-                $min = min($colour['bottom'], $min);
-                $max = max($colour['top'], $max);
-            }
+            $min = min($colour['bottom'], $min);
+            $max = max($colour['top'], $max);
         }
 
         return array(
@@ -355,7 +352,8 @@ class WeatherMapScale extends WeatherMapItem
     /**
      * @param WMPoint $newPosition
      */
-    function setPosition($newPosition) {
+    function setPosition($newPosition)
+    {
         $this->keypos = $newPosition;
     }
 
@@ -434,7 +432,6 @@ class WeatherMapScale extends WeatherMapItem
         list($tileWidth, $tileHeight) = $fontObject->calculateImageStringSize("MMMM");
         $tileHeight = $tileHeight * 1.1;
         $tileSpacing = $tileHeight + 2;
-
 
         list($minWidth,) = $fontObject->calculateImageStringSize('MMMM 100%-100%');
         list($minMinWidth,) = $fontObject->calculateImageStringSize('MMMM ');
@@ -548,6 +545,89 @@ class WeatherMapScale extends WeatherMapItem
 
     }
 
+    function sortScale()
+    {
+        // $colours = $this->colours[$scaleName];
+        usort($this->entries, array("WeatherMapScale", "scaleEntrySort"));
+    }
+
+    function DrawLegendHorizontal($keyWidth = 400)
+    {
+
+        $title = $this->keytitle;
+
+        $nScales = $this->spanCount();
+
+        wm_debug("Drawing $nScales colours into SCALE\n");
+
+        /** @var WMFont $fontObject */
+        $fontObject = $this->keyfont;
+
+        $x = 0;
+        $y = 0;
+
+        $scaleFactor = $keyWidth / 100;
+
+        list($tileWidth, $tileHeight) = $fontObject->calculateImageStringSize("100%");
+
+        $boxLeft = $x;
+        $scaleLeft = $boxLeft + 4 + $scaleFactor / 2;
+        $boxRight = $scaleLeft + $keyWidth + $tileWidth + 4 + $scaleFactor / 2;
+
+        $boxTop = $y;
+        $scaleTop = $boxTop + $tileHeight + 6;
+        $scaleBottom = $scaleTop + $tileHeight * 1.5;
+        $boxBottom = $scaleBottom + $tileHeight * 2 + 6;
+
+        wm_debug("Size is %dx%d (From %dx%d tile)\n", $boxRight + 1, $boxBottom + 1, $tileWidth, $tileHeight);
+
+        $gdScaleImage = imagecreatetruecolor($boxRight + 1, $boxBottom + 1);
+        $scaleReference = 'gdref_legend_' . $this->name;
+
+        // Start with a transparent box, in case the fill or outline colour is 'none'
+        imageSaveAlpha($gdScaleImage, true);
+        $transparentColour = imagecolorallocatealpha($gdScaleImage, 128, 0, 0, 127);
+        imagefill($gdScaleImage, 0, 0, $transparentColour);
+
+        // $this->preAllocateScaleColours($gdScaleImage, $scaleReference);
+
+        /** @var WMColour $bgColour */
+        $bgColour = $this->keybgcolour;
+        /** @var WMColour $outlineColour */
+        $outlineColour = $this->keyoutlinecolour;
+
+        wm_debug("BG is $bgColour, Outline is $outlineColour\n");
+
+        if ($bgColour->isRealColour()) {
+            imagefilledrectangle($gdScaleImage, $boxLeft, $boxTop, $boxRight, $boxBottom, $bgColour->gdAllocate($gdScaleImage));
+        }
+
+        if ($outlineColour->isRealColour()) {
+            imagerectangle($gdScaleImage, $boxLeft, $boxTop, $boxRight, $boxBottom, $outlineColour->gdAllocate($gdScaleImage));
+        }
+
+        $fontObject->drawImageString($gdScaleImage, $scaleLeft, $scaleBottom + $tileHeight * 2 + 2, $title, $this->keytextcolour->gdAllocate($gdScaleImage));
+
+        for ($percentage = 0; $percentage <= 100; $percentage++) {
+            $xOffset = $percentage * $scaleFactor;
+
+            if (($percentage % 25) == 0) {
+                imageline($gdScaleImage, $scaleLeft + $xOffset, $scaleTop - $tileHeight, $scaleLeft + $xOffset, $scaleBottom + $tileHeight, $this->keytextcolour->gdAllocate($gdScaleImage));
+                $labelString = sprintf("%d%%", $percentage);
+                $fontObject->drawImageString($gdScaleImage, $scaleLeft + $xOffset + 2, $scaleTop - 2, $labelString, $this->keytextcolour->gdAllocate($gdScaleImage));
+            }
+
+            list($col,) = $this->findScaleHit($percentage);
+
+            if ($col->isRealColour()) {
+                $gdColourRef = $col->gdAllocate($gdScaleImage);
+                imagefilledrectangle($gdScaleImage, $scaleLeft + $xOffset - $scaleFactor / 2, $scaleTop, $scaleLeft + $xOffset + $scaleFactor / 2, $scaleBottom, $gdColourRef);
+            }
+        }
+
+        return $gdScaleImage;
+    }
+
     /**
      * @param int $keyHeight
      * @param bool $inverted
@@ -649,91 +729,6 @@ class WeatherMapScale extends WeatherMapItem
         }
 
         return $gdScaleImage;
-    }
-
-    function DrawLegendHorizontal($keyWidth = 400)
-    {
-
-        $title = $this->keytitle;
-
-        $nScales = $this->spanCount();
-
-        wm_debug("Drawing $nScales colours into SCALE\n");
-
-        /** @var WMFont $fontObject */
-        $fontObject = $this->keyfont;
-
-        $x = 0;
-        $y = 0;
-
-        $scaleFactor = $keyWidth / 100;
-
-        list($tileWidth, $tileHeight) = $fontObject->calculateImageStringSize("100%");
-
-        $boxLeft = $x;
-        $scaleLeft = $boxLeft + 4 + $scaleFactor / 2;
-        $boxRight = $scaleLeft + $keyWidth + $tileWidth + 4 + $scaleFactor / 2;
-
-        $boxTop = $y;
-        $scaleTop = $boxTop + $tileHeight + 6;
-        $scaleBottom = $scaleTop + $tileHeight * 1.5;
-        $boxBottom = $scaleBottom + $tileHeight * 2 + 6;
-
-        wm_debug("Size is %dx%d (From %dx%d tile)\n", $boxRight + 1, $boxBottom + 1, $tileWidth, $tileHeight);
-
-        $gdScaleImage = imagecreatetruecolor($boxRight + 1, $boxBottom + 1);
-        $scaleReference = 'gdref_legend_' . $this->name;
-
-        // Start with a transparent box, in case the fill or outline colour is 'none'
-        imageSaveAlpha($gdScaleImage, true);
-        $transparentColour = imagecolorallocatealpha($gdScaleImage, 128, 0, 0, 127);
-        imagefill($gdScaleImage, 0, 0, $transparentColour);
-
-        // $this->preAllocateScaleColours($gdScaleImage, $scaleReference);
-
-        /** @var WMColour $bgColour */
-        $bgColour = $this->keybgcolour;
-        /** @var WMColour $outlineColour */
-        $outlineColour = $this->keyoutlinecolour;
-
-        wm_debug("BG is $bgColour, Outline is $outlineColour\n");
-
-
-        if ($bgColour->isRealColour()) {
-            imagefilledrectangle($gdScaleImage, $boxLeft, $boxTop, $boxRight, $boxBottom, $bgColour->gdAllocate($gdScaleImage));
-        }
-
-        if ($outlineColour->isRealColour()) {
-            imagerectangle($gdScaleImage, $boxLeft, $boxTop, $boxRight, $boxBottom, $outlineColour->gdAllocate($gdScaleImage));
-        }
-
-        $fontObject->drawImageString($gdScaleImage, $scaleLeft, $scaleBottom + $tileHeight * 2 + 2, $title, $this->keytextcolour->gdAllocate($gdScaleImage));
-
-        for ($percentage = 0; $percentage <= 100; $percentage++) {
-            $xOffset = $percentage * $scaleFactor;
-
-            if (($percentage % 25) == 0) {
-                imageline($gdScaleImage, $scaleLeft + $xOffset, $scaleTop - $tileHeight, $scaleLeft + $xOffset, $scaleBottom + $tileHeight, $this->keytextcolour->gdAllocate($gdScaleImage));
-                $labelString = sprintf("%d%%", $percentage);
-                $fontObject->drawImageString($gdScaleImage, $scaleLeft + $xOffset + 2, $scaleTop - 2, $labelString, $this->keytextcolour->gdAllocate($gdScaleImage));
-            }
-
-            list($col,) = $this->findScaleHit($percentage);
-
-            if ($col->isRealColour()) {
-                $gdColourRef = $col->gdAllocate($gdScaleImage);
-                imagefilledrectangle($gdScaleImage, $scaleLeft + $xOffset - $scaleFactor / 2, $scaleTop, $scaleLeft + $xOffset + $scaleFactor / 2, $scaleBottom, $gdColourRef);
-            }
-        }
-
-        return $gdScaleImage;
-    }
-
-
-    function sortScale()
-    {
-        // $colours = $this->colours[$scaleName];
-        usort($this->entries, array("WeatherMapScale", "scaleEntrySort"));
     }
 
     private function scaleEntrySort($left, $right)

@@ -21,6 +21,7 @@
         <?php echo $images_json; ?>
         <?php echo $fonts_json; ?>
         <?php echo $editor_settings; ?>
+        var editor_url = '<?php echo $editor_name; ?>';
         var fromplug = <?php echo $fromplug ?>;
     </script>
     <title>PHP Weathermap Editor <?php echo $WEATHERMAP_VERSION; ?></title>

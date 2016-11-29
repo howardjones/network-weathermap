@@ -8,31 +8,25 @@
  *  the map contents that an editor will need, without it needing to see inside the map object.
  *  (a second class, WeatherMapEditorUI, is concerned with the actual presentation of the supplied editor)
  */
-
 class WeatherMapEditor
 {
     /** @var WeatherMap $map */
     var $map;
     /** @var string $mapfile */
     var $mapfile;
-    
+
     function __construct()
     {
         $this->map = null;
     }
-    
-    function isLoaded()
-    {
-        return !is_null($this->map);
-    }
-    
+
     function newConfig()
     {
         $this->map = new WeatherMap();
         $this->map->context = "editor";
         $this->mapfile = "untitled";
     }
-    
+
     function loadConfig($filename)
     {
         $this->map = new WeatherMap();
@@ -64,10 +58,29 @@ class WeatherMapEditor
     {
         return $this->map->getConfig();
     }
-    
+
+    function getItemConfig($item_type, $item_name)
+    {
+        if ($item_type == 'node') {
+            if ($this->map->nodeExists($item_name)) {
+                $node = $this->map->getNode($item_name);
+                return $node->WriteConfig();
+            }
+        }
+
+        if ($item_type == 'link') {
+            if ($this->map->linkExists($item_name)) {
+                $link = $this->map->getlink($item_name);
+                return $link->WriteConfig();
+            }
+        }
+
+        return false;
+    }
+
     function addNode($x, $y, $nodeName = "", $template = "DEFAULT")
     {
-        if (! $this->isLoaded()) {
+        if (!$this->isLoaded()) {
             throw new WeathermapInternalFail("Map must be loaded before editing API called.");
         }
 
@@ -75,7 +88,7 @@ class WeatherMapEditor
 
         // Generate a node name for ourselves if one wasn't supplied
         if ($nodeName == "") {
-            $newNodeName = sprintf("node%05d", time()%10000);
+            $newNodeName = sprintf("node%05d", time() % 10000);
             while ($this->map->nodeExists($newNodeName)) {
                 $newNodeName .= "a";
             }
@@ -110,6 +123,11 @@ class WeatherMapEditor
         return array($newNodeName, $success, $log);
     }
 
+    function isLoaded()
+    {
+        return !is_null($this->map);
+    }
+
     /**
      * moveNode - move a node, taking into account any relative nodes, and any links that
      * join to it, dealing with VIAs in an attractive way.
@@ -122,7 +140,7 @@ class WeatherMapEditor
      */
     function moveNode($nodeName, $newX, $newY)
     {
-        if (! $this->isLoaded()) {
+        if (!$this->isLoaded()) {
             throw new WeathermapInternalFail("Map must be loaded before editing API called.");
         }
 
@@ -140,7 +158,7 @@ class WeatherMapEditor
         // links that have VIAs. If it is, we want to rotate those VIA points
         // about the *other* node in the link
         foreach ($this->map->links as $link) {
-            if ((count($link->vialist)>0)  && (($link->a->name == $nodeName) || ($link->b->name == $nodeName))) {
+            if ((count($link->vialist) > 0) && (($link->a->name == $nodeName) || ($link->b->name == $nodeName))) {
                 $affected_links[] = $link->name;
 
                 // get the other node from us
@@ -158,7 +176,7 @@ class WeatherMapEditor
                     $dx = $link->a->x - $newX;
                     $dy = $link->a->y - $newY;
 
-                    for ($count=0; $count<count($link->vialist); $count++) {
+                    for ($count = 0; $count < count($link->vialist); $count++) {
                         $link->vialist[$count][0] = $link->vialist[$count][0] - $dx;
                         $link->vialist[$count][1] = $link->vialist[$count][1] - $dy;
                     }
@@ -198,14 +216,14 @@ class WeatherMapEditor
                         $points[] = $via[1];
                     }
 
-                    $scaleFactor = $l_new/$l_old;
+                    $scaleFactor = $l_new / $l_old;
 
                     // rotate so that link is along the axis
                     rotateAboutPoint($points, $pivotX, $pivotY, deg2rad($angle_old));
                     // do the scaling in here
-                    for ($count=0; $count<(count($points)/2); $count++) {
-                        $basex = ($points[$count*2] - $pivotX) * $scaleFactor + $pivotX;
-                        $points[$count*2] = $basex;
+                    for ($count = 0; $count < (count($points) / 2); $count++) {
+                        $basex = ($points[$count * 2] - $pivotX) * $scaleFactor + $pivotX;
+                        $points[$count * 2] = $basex;
                     }
                     // rotate back so that link is along the new direction
                     rotateAboutPoint($points, $pivotX, $pivotY, deg2rad(-$angle_new));
@@ -216,11 +234,11 @@ class WeatherMapEditor
                     foreach ($points as $p) {
                         // skip a point if it positioned relative to a node. Those shouldn't be rotated (well, IMHO)
                         if (!isset($link->vialist[$viaCount][2])) {
-                            $link->vialist[$viaCount][$count]=$p;
+                            $link->vialist[$viaCount][$count] = $p;
                         }
                         $count++;
-                        if ($count==2) {
-                            $count=0;
+                        if ($count == 2) {
+                            $count = 0;
                             $viaCount++;
                         }
                     }
@@ -233,22 +251,54 @@ class WeatherMapEditor
 
         $n_links = count($affected_links);
         $n_nodes = count($affected_nodes);
-        
+
         return array($n_nodes, $n_links, $affected_nodes, $affected_links);
     }
-        
+
     function updateNode($nodename)
     {
-        if (! $this->isLoaded()) {
+        if (!$this->isLoaded()) {
             throw new WeathermapInternalFail("Map must be loaded before editing API called.");
         }
 
         throw new WeathermapInternalFail("unimplemented");
     }
-    
+
+    function replaceNodeConfig($nodeName, $newConfig)
+    {
+        if (!$this->isLoaded()) {
+            throw new WeathermapInternalFail("Map must be loaded before editing API called.");
+        }
+
+        // if the node doesn't exist, nothing will be changing
+        if (!$this->map->nodeExists($nodeName)) {
+            return false;
+        }
+
+        $node = $this->map->getNode($nodeName);
+        $node->replaceConfig($newConfig);
+        return true;
+    }
+
+    function replaceLinkConfig($linkName, $newConfig)
+    {
+        if (!$this->isLoaded()) {
+            throw new WeathermapInternalFail("Map must be loaded before editing API called.");
+        }
+
+        // if the link doesn't exist, nothing will be changing
+        if (!$this->map->linkExists($linkName)) {
+            return false;
+        }
+
+        $link = $this->map->getLink($linkName);
+        $link->replaceConfig($newConfig);
+        return true;
+    }
+
     function deleteNode($nodename)
     {
-        if (! $this->isLoaded()) {
+        if (!$this->isLoaded()) {
             throw new WeathermapInternalFail("Map must be loaded before editing API called.");
         }
 
@@ -261,7 +311,7 @@ class WeatherMapEditor
         if (isset($this->map->nodes[$nodename])) {
             $affected_nodes[] = $nodename;
 
-            $log = "delete node ".$nodename;
+            $log = "delete node " . $nodename;
 
             foreach ($this->map->links as $link) {
                 if (isset($link->a)) {
@@ -279,17 +329,17 @@ class WeatherMapEditor
 
         $n_nodes = count($affected_nodes);
         $n_links = count($affected_links);
-        return array($n_nodes, $n_links, $affected_nodes, $affected_links ,$log);
+        return array($n_nodes, $n_links, $affected_nodes, $affected_links, $log);
     }
 
     function cloneNode($sourceNodeName, $targetName = "", $or_fail = false)
     {
-        if (! $this->isLoaded()) {
+        if (!$this->isLoaded()) {
             throw new WeathermapInternalFail("Map must be loaded before editing API called.");
         }
 
         if ($this->map->nodeExists($sourceNodeName)) {
-            $log = "cloned node ".$sourceNodeName;
+            $log = "cloned node " . $sourceNodeName;
             $sourceNode = $this->map->nodes[$sourceNodeName];
 
             // Try to use the requested name, if possible, and if specified
@@ -302,7 +352,7 @@ class WeatherMapEditor
             if (isset($this->map->nodes[$newNodeName])) {
                 $newNodeName = $sourceNodeName;
                 do {
-                    $newNodeName = $newNodeName."_copy";
+                    $newNodeName = $newNodeName . "_copy";
                 } while (isset($this->map->nodes[$newNodeName]));
             }
 
@@ -313,7 +363,7 @@ class WeatherMapEditor
 
             # CopyFrom skips this one, because it's also the function used by template inheritance
             # - but for Clone, we DO want to copy the template too
-          //  $node->template = $sourceNode->template;
+            //  $node->template = $sourceNode->template;
 
             $now = $newNode->getPosition();
             $now->translate(30, 30);
@@ -327,10 +377,10 @@ class WeatherMapEditor
 
         return array(false, null, "Request source does not exist");
     }
-        
+
     function addLink($nodeName1, $nodeName2, $linkName = "", $template = "DEFAULT")
     {
-        if (! $this->isLoaded()) {
+        if (!$this->isLoaded()) {
             throw new WeathermapInternalFail("Map must be loaded before editing API called.");
         }
 
@@ -362,10 +412,10 @@ class WeatherMapEditor
         return array($newLinkName, $success, $log);
 
     }
-    
+
     function updateLink()
     {
-        if (! $this->isLoaded()) {
+        if (!$this->isLoaded()) {
             throw new WeathermapInternalFail("Map must be loaded before editing API called.");
         }
 
@@ -374,7 +424,7 @@ class WeatherMapEditor
 
     function deleteLink($linkname)
     {
-        if (! $this->isLoaded()) {
+        if (!$this->isLoaded()) {
             throw new WeathermapInternalFail("Map must be loaded before editing API called.");
         }
 
@@ -394,13 +444,13 @@ class WeatherMapEditor
      */
     function cloneLink($sourcename, $targetname = "")
     {
-        if (! $this->isLoaded()) {
+        if (!$this->isLoaded()) {
             throw new WeathermapInternalFail("Map must be loaded before editing API called.");
         }
 
         throw new WeathermapInternalFail("unimplemented");
     }
-    
+
     /**
      * setLinkVia - simple-minded add/replacement of a single VIA for a link.
      * Should be replaced by addLinkVia with intelligent handling of multiple VIAs
@@ -412,12 +462,12 @@ class WeatherMapEditor
      */
     function setLinkVia($linkname, $x, $y)
     {
-        if (! $this->isLoaded()) {
+        if (!$this->isLoaded()) {
             throw new WeathermapInternalFail("Map must be loaded before editing API called.");
         }
 
         if (isset($this->map->links[$linkname])) {
-            $this->map->links[$linkname]->vialist = array(array(0 =>$x, 1=>$y));
+            $this->map->links[$linkname]->vialist = array(array(0 => $x, 1 => $y));
 
             return true;
         }
@@ -426,7 +476,7 @@ class WeatherMapEditor
 
     function clearLinkVias($linkname)
     {
-        if (! $this->isLoaded()) {
+        if (!$this->isLoaded()) {
             throw new WeathermapInternalFail("Map must be loaded before editing API called.");
         }
 
@@ -437,10 +487,10 @@ class WeatherMapEditor
         }
         return false;
     }
-    
+
     function tidyLink($linkName)
     {
-        if (! $this->isLoaded()) {
+        if (!$this->isLoaded()) {
             throw new WeathermapInternalFail("Map must be loaded before editing API called.");
         }
 
@@ -450,92 +500,6 @@ class WeatherMapEditor
         $this->tidyOneLink($link);
     }
 
-    function tidyAllLinks()
-    {
-        if (! $this->isLoaded()) {
-            throw new WeathermapInternalFail("Map must be loaded before editing API called.");
-        }
-
-        // draw a map and throw it away, to calculate all the bounding boxes
-        $this->map->drawMapImage('null');
-        $this->_retidyLinks(true);
-    }
-
-    function retidyAllLinks()
-    {
-        if (! $this->isLoaded()) {
-            throw new WeathermapInternalFail("Map must be loaded before editing API called.");
-        }
-        
-        // draw a map and throw it away, to calculate all the bounding boxes
-        $this->map->drawMapImage('null');
-        $this->_retidyLinks(false);
-    }
-    
-    function retidyLinks()
-    {
-        if (! $this->isLoaded()) {
-            throw new WeathermapInternalFail("Map must be loaded before editing API called.");
-        }
-        
-        // draw a map and throw it away, to calculate all the bounding boxes
-        $this->map->drawMapImage('null');
-        $this->_retidyLinks();
-    }
-    
-    /**
-     * _retidy_links - find all links that have previously been tidied (_tidied hint) and tidy them again
-     * UNLESS $ignore_tidied is set, then do every single link (for editor testing)
-     *
-     * @param boolean $ignoreTidied
-     */
-    function _retidyLinks($ignoreTidied = false)
-    {
-        if (! $this->isLoaded()) {
-            throw new WeathermapInternalFail("Map must be loaded before editing API called.");
-        }
-    
-        // draw a map and throw it away, to calculate all the bounding boxes
-        $this->map->drawMapImage('null');
-        
-        $routes = array();
-//        $done = array();
-
-        // build a list of non-template links with their route - a simple key that we can use to tell if two
-        // links go between the same nodes
-        foreach ($this->map->links as $link) {
-            if (!$link->isTemplate()) {
-                $route = $this->makeRouteKey($link);
-                if ((!$ignoreTidied || $link->get_hint("_tidied") == 0)) {
-                    $routes[$route][] = $link;
-                }
-            }
-        }
-        
-        foreach ($routes as $route => $linkList) {
-//            if (!$linkList->isTemplate()) {
-//                $route = $link->a->name . " " . $link->b->name;
-//
-//                if (strcmp($link->a->name, $link->b->name) > 0) {
-//                    $route = $link->b->name . " " . $link->a->name;
-//                }
-
-//                if (($ignoreTidied || $linkList->get_hint("_tidied") == 1)) {
-            if (sizeof($linkList) == 1) {
-                $this->tidyOneLink($linkList[0]);
-//                        $done[$route] = 1;
-            } else {
-                # handle multi-links specially...
-                $this->_tidy_links($linkList);
-//                        $this->_tidy_links($routes[$route]);
-                // mark it so we don't do it again when the other links come by
-//                        $done[$route] = 1;
-//                    }
-            }
-        }
-//        }
-    }
-    
     /**
      * tidyOneLink - change link offsets so that link is horizonal or vertical, if possible.
      *  if not possible, change offsets to the closest facing compass points
@@ -595,81 +559,6 @@ class WeatherMapEditor
         // and also add a note that this link was tidied, and is eligible for automatic retidying
         $link->add_hint("_tidied", 1);
     }
-    
-    /**
-     * _tidy_links - for a group of links between the same two nodes, distribute them
-     * nicely.
-     *
-     * @param WeatherMapLink[] $links - the links to treat as a group
-     * @param bool $ignore_tidied - whether to take notice of the "_tidied" hint
-     *
-     */
-    function _tidy_links($links, $ignore_tidied = false)
-    {
-        // not very efficient, but it saves looking for special cases (a->b & b->a together)
-        $nTargets = count($links);
-        
-        $i = 1;
-        foreach ($links as $link) {
-            $this->tidyOneLink($link, $i, $nTargets, $ignore_tidied);
-            $i++;
-        }
-    }
-
-    /**
-     * untidyLinks - remove all link offsets from the map. Used mainly for testing.
-     *
-     */
-    function untidyLinks()
-    {
-        if (! $this->isLoaded()) {
-            throw new WeathermapInternalFail("Map must be loaded before editing API called.");
-        }
-        
-        foreach ($this->map->links as $link) {
-            $link->a_offset = "C";
-            $link->b_offset = "C";
-        }
-    }
-    
-    function placeLegend($x, $y, $scalename = "DEFAULT")
-    {
-        if (! $this->isLoaded()) {
-            throw new WeathermapInternalFail("Map must be loaded before editing API called.");
-        }
-
-        $this->map->scales[$scalename]->setPosition(new WMPoint($x, $y));
-    }
-    
-    function placeTitle($x, $y)
-    {
-        if (! $this->isLoaded()) {
-            throw new WeathermapInternalFail("Map must be loaded before editing API called.");
-        }
-        
-        $this->map->titlex = $x;
-        $this->map->titley = $y;
-    }
-    
-    function placeTimestamp($x, $y)
-    {
-        if (! $this->isLoaded()) {
-            throw new WeathermapInternalFail("Map must be loaded before editing API called.");
-        }
-        
-        $this->map->timex = $x;
-        $this->map->timey = $y;
-    }
-    
-    function asJS()
-    {
-        if (! $this->isLoaded()) {
-            throw new WeathermapInternalFail("Map must be loaded before editing API called.");
-        }
-
-        throw new WeathermapInternalFail("unimplemented");
-    }
-
 
     /**
      * rangeOverlaps - check if two ranges have anything in common. Used for tidy()
@@ -686,70 +575,8 @@ class WeatherMapEditor
         if ($rangeB[0] > $rangeA[1]) {
             return false;
         }
-    
+
         return true;
-    }
-    
-    /**
-     * findCommonRange - find the range of numbers where two ranges overlap. Used for tidy()
-     *
-     * @param number[] $rangeA
-     * @param number[] $rangeB
-     * @return number list($min,$max)
-     */
-    static function findCommonRange($rangeA, $rangeB)
-    {
-        $min_overlap = max($rangeA[0], $rangeB[0]);
-        $max_overlap = min($rangeA[1], $rangeB[1]);
-    
-        return array($min_overlap, $max_overlap);
-    }
-
-    /**
-     * Turn the offsets produced during Tidy into simpler ones, if possible.
-     * (including ':0:0' into '')
-     *
-     * @param int $x_offset
-     * @param int $y_offset
-     * @return string
-     */
-    static function simplifyOffset($x_offset, $y_offset)
-    {
-        if ($x_offset == 0 && $y_offset == 0) {
-            return "";
-        }
-
-        if ($x_offset == 0) {
-            if ($y_offset < 0) {
-                return "N95";
-            } else {
-                return "S95";
-            }
-        }
-
-        if ($y_offset == 0) {
-            if ($x_offset < 0) {
-                return "W95";
-            } else {
-                return "E95";
-            }
-        }
-
-        return sprintf("%d:%d", $x_offset, $y_offset);
-    }
-
-    /**
-     * @param $linkList
-     * @return string
-     */
-    private function makeRouteKey($linkList)
-    {
-        $route = $linkList->a->name . " " . $linkList->b->name;
-        if (strcmp($linkList->a->name, $linkList->b->name) > 0) {
-            $route = $linkList->b->name . " " . $linkList->a->name;
-            return $route;
-        }
-        return $route;
     }
 
     /**
@@ -802,5 +629,227 @@ class WeatherMapEditor
         $b_y_offset = $min_overlap + ($linkIndex * $stepPerLink) - $node_b->$hardCoordinate;
 
         return array($a_y_offset, $b_y_offset);
+    }
+
+    /**
+     * findCommonRange - find the range of numbers where two ranges overlap. Used for tidy()
+     *
+     * @param number[] $rangeA
+     * @param number[] $rangeB
+     * @return number list($min,$max)
+     */
+    static function findCommonRange($rangeA, $rangeB)
+    {
+        $min_overlap = max($rangeA[0], $rangeB[0]);
+        $max_overlap = min($rangeA[1], $rangeB[1]);
+
+        return array($min_overlap, $max_overlap);
+    }
+
+    /**
+     * Turn the offsets produced during Tidy into simpler ones, if possible.
+     * (including ':0:0' into '')
+     *
+     * @param int $x_offset
+     * @param int $y_offset
+     * @return string
+     */
+    static function simplifyOffset($x_offset, $y_offset)
+    {
+        if ($x_offset == 0 && $y_offset == 0) {
+            return "";
+        }
+
+        if ($x_offset == 0) {
+            if ($y_offset < 0) {
+                return "N95";
+            } else {
+                return "S95";
+            }
+        }
+
+        if ($y_offset == 0) {
+            if ($x_offset < 0) {
+                return "W95";
+            } else {
+                return "E95";
+            }
+        }
+
+        return sprintf("%d:%d", $x_offset, $y_offset);
+    }
+
+    function tidyAllLinks()
+    {
+        if (!$this->isLoaded()) {
+            throw new WeathermapInternalFail("Map must be loaded before editing API called.");
+        }
+
+        // draw a map and throw it away, to calculate all the bounding boxes
+        $this->map->drawMapImage('null');
+        $this->_retidyLinks(true);
+    }
+
+    /**
+     * _retidy_links - find all links that have previously been tidied (_tidied hint) and tidy them again
+     * UNLESS $ignore_tidied is set, then do every single link (for editor testing)
+     *
+     * @param boolean $ignoreTidied
+     */
+    function _retidyLinks($ignoreTidied = false)
+    {
+        if (!$this->isLoaded()) {
+            throw new WeathermapInternalFail("Map must be loaded before editing API called.");
+        }
+
+        // draw a map and throw it away, to calculate all the bounding boxes
+        $this->map->drawMapImage('null');
+
+        $routes = array();
+//        $done = array();
+
+        // build a list of non-template links with their route - a simple key that we can use to tell if two
+        // links go between the same nodes
+        foreach ($this->map->links as $link) {
+            if (!$link->isTemplate()) {
+                $route = $this->makeRouteKey($link);
+                if ((!$ignoreTidied || $link->get_hint("_tidied") == 0)) {
+                    $routes[$route][] = $link;
+                }
+            }
+        }
+
+        foreach ($routes as $route => $linkList) {
+//            if (!$linkList->isTemplate()) {
+//                $route = $link->a->name . " " . $link->b->name;
+//
+//                if (strcmp($link->a->name, $link->b->name) > 0) {
+//                    $route = $link->b->name . " " . $link->a->name;
+//                }
+
+//                if (($ignoreTidied || $linkList->get_hint("_tidied") == 1)) {
+            if (sizeof($linkList) == 1) {
+                $this->tidyOneLink($linkList[0]);
+//                        $done[$route] = 1;
+            } else {
+                # handle multi-links specially...
+                $this->_tidy_links($linkList);
+//                        $this->_tidy_links($routes[$route]);
+                // mark it so we don't do it again when the other links come by
+//                        $done[$route] = 1;
+//                    }
+            }
+        }
+//        }
+    }
+
+    /**
+     * @param $linkList
+     * @return string
+     */
+    private function makeRouteKey($linkList)
+    {
+        $route = $linkList->a->name . " " . $linkList->b->name;
+        if (strcmp($linkList->a->name, $linkList->b->name) > 0) {
+            $route = $linkList->b->name . " " . $linkList->a->name;
+            return $route;
+        }
+        return $route;
+    }
+
+    /**
+     * _tidy_links - for a group of links between the same two nodes, distribute them
+     * nicely.
+     *
+     * @param WeatherMapLink[] $links - the links to treat as a group
+     * @param bool $ignore_tidied - whether to take notice of the "_tidied" hint
+     *
+     */
+    function _tidy_links($links, $ignore_tidied = false)
+    {
+        // not very efficient, but it saves looking for special cases (a->b & b->a together)
+        $nTargets = count($links);
+
+        $i = 1;
+        foreach ($links as $link) {
+            $this->tidyOneLink($link, $i, $nTargets, $ignore_tidied);
+            $i++;
+        }
+    }
+
+    function retidyAllLinks()
+    {
+        if (!$this->isLoaded()) {
+            throw new WeathermapInternalFail("Map must be loaded before editing API called.");
+        }
+
+        // draw a map and throw it away, to calculate all the bounding boxes
+        $this->map->drawMapImage('null');
+        $this->_retidyLinks(false);
+    }
+
+    function retidyLinks()
+    {
+        if (!$this->isLoaded()) {
+            throw new WeathermapInternalFail("Map must be loaded before editing API called.");
+        }
+
+        // draw a map and throw it away, to calculate all the bounding boxes
+        $this->map->drawMapImage('null');
+        $this->_retidyLinks();
+    }
+
+    /**
+     * untidyLinks - remove all link offsets from the map. Used mainly for testing.
+     *
+     */
+    function untidyLinks()
+    {
+        if (!$this->isLoaded()) {
+            throw new WeathermapInternalFail("Map must be loaded before editing API called.");
+        }
+
+        foreach ($this->map->links as $link) {
+            $link->a_offset = "C";
+            $link->b_offset = "C";
+        }
+    }
+
+    function placeLegend($x, $y, $scalename = "DEFAULT")
+    {
+        if (!$this->isLoaded()) {
+            throw new WeathermapInternalFail("Map must be loaded before editing API called.");
+        }
+
+        $this->map->scales[$scalename]->setPosition(new WMPoint($x, $y));
+    }
+
+    function placeTitle($x, $y)
+    {
+        if (!$this->isLoaded()) {
+            throw new WeathermapInternalFail("Map must be loaded before editing API called.");
+        }
+
+        $this->map->titlex = $x;
+        $this->map->titley = $y;
+    }
+
+    function placeTimestamp($x, $y)
+    {
+        if (!$this->isLoaded()) {
+            throw new WeathermapInternalFail("Map must be loaded before editing API called.");
+        }
+
+        $this->map->timex = $x;
+        $this->map->timey = $y;
+    }
+
+    function asJS()
+    {
+        if (!$this->isLoaded()) {
+            throw new WeathermapInternalFail("Map must be loaded before editing API called.");
+        }
+
+        throw new WeathermapInternalFail("unimplemented");
     }
 }

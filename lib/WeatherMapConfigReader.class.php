@@ -56,52 +56,52 @@ class WeatherMapConfigReader
             'KEYOUTLINECOLOR' => array(
                 array(
 
-                    '/^KEYOUTLINECOLOR\s+(\d+)\s+(\d+)\s+(\d+)$/',
+                    '/^KEYOUTLINECOLOR\s+(\d+)\s+(\d+)\s+(\d+)$/i',
                     'handleGLOBALCOLOR'
                 ),
                 array(
 
-                    '/^KEYOUTLINECOLOR\s+(none)$/',
+                    '/^KEYOUTLINECOLOR\s+(none)$/i',
                     'handleGLOBALCOLOR'
                 ),
             ),
             'KEYTEXTCOLOR' => array(
                 array(
 
-                    '/^KEYTEXTCOLOR\s+(\d+)\s+(\d+)\s+(\d+)$/',
+                    '/^KEYTEXTCOLOR\s+(\d+)\s+(\d+)\s+(\d+)$/i',
                     'handleGLOBALCOLOR'
                 ),
             ),
             'TITLECOLOR' => array(
                 array(
 
-                    '/^TITLECOLOR\s+(\d+)\s+(\d+)\s+(\d+)$/',
+                    '/^TITLECOLOR\s+(\d+)\s+(\d+)\s+(\d+)$/i',
                     'handleGLOBALCOLOR'
                 ),
             ),
             'TIMECOLOR' => array(
                 array(
 
-                    '/^TIMECOLOR\s+(\d+)\s+(\d+)\s+(\d+)$/',
+                    '/^TIMECOLOR\s+(\d+)\s+(\d+)\s+(\d+)$/i',
                     'handleGLOBALCOLOR'
                 ),
             ),
             'KEYBGCOLOR' => array(
                 array(
 
-                    '/^KEYBGCOLOR\s+(\d+)\s+(\d+)\s+(\d+)$/',
+                    '/^KEYBGCOLOR\s+(\d+)\s+(\d+)\s+(\d+)$/i',
                     'handleGLOBALCOLOR'
                 ),
                 array(
 
-                    '/^KEYBGCOLOR\s+(none)$/',
+                    '/^KEYBGCOLOR\s+(none)$/i',
                     'handleGLOBALCOLOR'
                 ),
             ),
             'BGCOLOR' => array(
                 array(
 
-                    '/^BGCOLOR\s+(\d+)\s+(\d+)\s+(\d+)$/',
+                    '/^BGCOLOR\s+(\d+)\s+(\d+)\s+(\d+)$/i',
                     'handleGLOBALCOLOR'
                 ),
             ),
@@ -320,72 +320,72 @@ class WeatherMapConfigReader
             'AICONOUTLINECOLOR' => array(
                 array(
 
-                    '/^AICONOUTLINECOLOR\s+(\d+)\s+(\d+)\s+(\d+)$/',
+                    '/^AICONOUTLINECOLOR\s+(\d+)\s+(\d+)\s+(\d+)$/i',
                     'handleCOLOR'
                 ),
                 array(
 
-                    '/^AICONOUTLINECOLOR\s+(none)$/',
+                    '/^AICONOUTLINECOLOR\s+(none)$/i',
                     'handleCOLOR'
                 ),
             ),
             'AICONFILLCOLOR' => array(
                 array(
 
-                    '/^AICONFILLCOLOR\s+(\d+)\s+(\d+)\s+(\d+)$/',
+                    '/^AICONFILLCOLOR\s+(\d+)\s+(\d+)\s+(\d+)$/i',
                     'handleCOLOR'
                 ),
                 array(
 
-                    '/^AICONFILLCOLOR\s+(copy)$/',
+                    '/^AICONFILLCOLOR\s+(copy)$/i',
                     'handleCOLOR'
                 ),
                 array(
 
-                    '/^AICONFILLCOLOR\s+(none)$/',
+                    '/^AICONFILLCOLOR\s+(none)$/i',
                     'handleCOLOR'
                 ),
             ),
             'LABELOUTLINECOLOR' => array(
                 array(
 
-                    '/^LABELOUTLINECOLOR\s+(\d+)\s+(\d+)\s+(\d+)$/',
+                    '/^LABELOUTLINECOLOR\s+(\d+)\s+(\d+)\s+(\d+)$/i',
                     'handleCOLOR'
                 ),
                 array(
 
-                    '/^LABELOUTLINECOLOR\s+(none)$/',
+                    '/^LABELOUTLINECOLOR\s+(none)$/i',
                     'handleCOLOR'
                 ),
             ),
             'LABELBGCOLOR' => array(
                 array(
 
-                    '/^LABELBGCOLOR\s+(\d+)\s+(\d+)\s+(\d+)$/',
+                    '/^LABELBGCOLOR\s+(\d+)\s+(\d+)\s+(\d+)$/i',
                     'handleCOLOR'
                 ),
                 array(
 
-                    '/^LABELBGCOLOR\s+(none)$/',
+                    '/^LABELBGCOLOR\s+(none)$/i',
                     'handleCOLOR'
                 ),
             ),
             'LABELFONTCOLOR' => array(
                 array(
 
-                    '/^LABELFONTCOLOR\s+(\d+)\s+(\d+)\s+(\d+)$/',
+                    '/^LABELFONTCOLOR\s+(\d+)\s+(\d+)\s+(\d+)$/i',
                     'handleCOLOR'
                 ),
                 array(
 
-                    '/^LABELFONTCOLOR\s+(contrast)$/',
+                    '/^LABELFONTCOLOR\s+(contrast)$/i',
                     'handleCOLOR'
                 ),
             ),
             'LABELFONTSHADOWCOLOR' => array(
                 array(
 
-                    '/^LABELFONTSHADOWCOLOR\s+(\d+)\s+(\d+)\s+(\d+)$/',
+                    '/^LABELFONTSHADOWCOLOR\s+(\d+)\s+(\d+)\s+(\d+)$/i',
                     'handleCOLOR'
                 ),
             ),
@@ -669,19 +669,19 @@ class WeatherMapConfigReader
             'COMMENTFONTCOLOR' => array(
                 array(
 
-                    '/^COMMENTFONTCOLOR\s+(\d+)\s+(\d+)\s+(\d+)$/',
+                    '/^COMMENTFONTCOLOR\s+(\d+)\s+(\d+)\s+(\d+)$/i',
                     'handleCOLOR'
                 ),
                 array(
 
-                    '/^COMMENTFONTCOLOR\s+(contrast)$/',
+                    '/^COMMENTFONTCOLOR\s+(contrast)$/i',
                     'handleCOLOR'
                 ),
             ),
             'OUTLINECOLOR' => array(
                 array(
 
-                    '/^OUTLINECOLOR\s+(\d+)\s+(\d+)\s+(\d+)$/',
+                    '/^OUTLINECOLOR\s+(\d+)\s+(\d+)\s+(\d+)$/i',
                     'handleCOLOR'
                 ),
                 array(
@@ -693,31 +693,31 @@ class WeatherMapConfigReader
             'BWOUTLINECOLOR' => array(
                 array(
 
-                    '/^BWOUTLINECOLOR\s+(\d+)\s+(\d+)\s+(\d+)$/',
+                    '/^BWOUTLINECOLOR\s+(\d+)\s+(\d+)\s+(\d+)$/i',
                     'handleCOLOR'
                 ),
                 array(
 
-                    '/^BWOUTLINECOLOR\s+(none)$/',
+                    '/^BWOUTLINECOLOR\s+(none)$/i',
                     'handleCOLOR'
                 ),
             ),
             'BWBOXCOLOR' => array(
                 array(
 
-                    '/^BWBOXCOLOR\s+(\d+)\s+(\d+)\s+(\d+)$/',
+                    '/^BWBOXCOLOR\s+(\d+)\s+(\d+)\s+(\d+)$/i',
                     'handleCOLOR'
                 ),
                 array(
 
-                    '/^BWBOXCOLOR\s+(none)$/',
+                    '/^BWBOXCOLOR\s+(none)$/i',
                     'handleCOLOR'
                 ),
             ),
             'BWFONTCOLOR' => array(
                 array(
 
-                    '/^BWFONTCOLOR\s+(\d+)\s+(\d+)\s+(\d+)$/',
+                    '/^BWFONTCOLOR\s+(\d+)\s+(\d+)\s+(\d+)$/i',
                     'handleCOLOR'
                 ),
             ),

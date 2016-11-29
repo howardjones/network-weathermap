@@ -209,13 +209,15 @@ class WeatherMapEditorUI extends WeatherMapUIBase
             ),
             "handler" => "cmdUnTidyAllLinks"
         ),
-        "edit_link" => array(
+        "set_link_properties" => array(
             "args" => array(
                 array("mapname", "mapfile"),
                 array("param", "name"),
                 array("link_name", "name"),
                 array("link_bandwidth_in", "string"),
                 array("link_bandwidth_out", "string"),
+                array("link_bandwidth_out_cb", "string"),
+                array("link_width", "int"),
                 array("link_target", "string"),
                 array("link_hover", "string"),
                 array("link_infourl", "string"),
@@ -575,17 +577,26 @@ class WeatherMapEditorUI extends WeatherMapUIBase
 
     function cmdGetItemConfig($params, $editor)
     {
+        header('Content-type: text/plain');
 
+        $map = $editor->map;
+
+        $item_name = $params['item_name'];
+        $item_type = $params['item_type'];
+
+        print $editor->getItemConfig($item_type, $item_name);
+
+        return false;
     }
 
     function cmdReplaceNodeConfig($params, $editor)
     {
-
+        $editor->replaceNodeConfig($params['node_name'], $params['item_configtext']);
     }
 
     function cmdReplaceLinkConfig($params, $editor)
     {
-
+        $editor->replaceLinkConfig($params['link_name'], $params['item_configtext']);
     }
 
     /**

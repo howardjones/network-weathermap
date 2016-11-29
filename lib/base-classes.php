@@ -283,5 +283,10 @@ class WeatherMapItem extends WeatherMapBase
         return $this->defined_in;
     }
 
+    public function replaceConfig($newConfig)
+    {
+        $this->config_override = $newConfig;
+    }
+
 }
 

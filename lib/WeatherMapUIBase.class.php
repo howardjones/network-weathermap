@@ -143,7 +143,7 @@ class WeatherMapUIBase
         // TODO - add argument parse/validation in here
 
         $handlerMethod = $handler['handler'];
-        $this->$handlerMethod($request);
+        return $this->$handlerMethod($request);
     }
 
     /**

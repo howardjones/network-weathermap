@@ -173,66 +173,6 @@ class WeatherMap extends WeatherMapBase
         $this->Reset();
     }
 
-    function __WeatherMap()
-	{
-		$this->inherit_fieldlist=array
-			(
-				'width' => 800,
-				'height' => 600,
-				'kilo' => 1000,
-				'numscales' => array('DEFAULT' => 0),
-				'datasourceclasses' => array(),
-				'preprocessclasses' => array(),
-				'postprocessclasses' => array(),
-				'included_files' => array(),
-				'context' => '',
-				'dumpconfig' => FALSE,
-				'rrdtool_check' => '',
-				'background' => '',
-				'imageoutputfile' => '',
-				'imageuri' => '',
-				'htmloutputfile' => '',
-				'dataoutputfile' => '',
-				'htmlstylesheet' => '',
-				'labelstyle' => 'percent', // redundant?
-				'htmlstyle' => 'static',
-				'keystyle' => array('DEFAULT' => 'classic'),
-				'title' => 'Network Weathermap',
-				'keytext' => array('DEFAULT' => 'Traffic Load'),
-				'keyx' => array('DEFAULT' => -1),
-				'keyy' => array('DEFAULT' => -1),
-				'keyimage' => array(),
-				'keysize' => array('DEFAULT' => 400),
-				'stamptext' => 'Created: %b %d %Y %H:%M:%S',
-				'keyfont' => 4,
-				'titlefont' => 2,
-				'timefont' => 2,
-				'timex' => 0,
-				'timey' => 0,
-
-				'mintimex' => -10000,
-				'mintimey' => -10000,
-				'maxtimex' => -10000,
-				'maxtimey' => -10000,
-				'minstamptext' => 'Oldest Data: %b %d %Y %H:%M:%S',
-				'maxstamptext' => 'Newest Data: %b %d %Y %H:%M:%S',
-
-				'thumb_width' => 0,
-				'thumb_height' => 0,
-				'titlex' => -1,
-				'titley' => -1,
-				'cachefolder' => 'cached',
-				'mapcache' => '',
-				'sizedebug' => FALSE,
-				'debugging' => FALSE,
-				'widthmod' => FALSE,
-				'has_includes' => FALSE,
-				'has_overlibs' => FALSE,
-				'name' => 'MAP'
-			);
-
-		$this->Reset();
-	}
 
 	function my_type() {  return "MAP"; }
 
@@ -275,17 +215,7 @@ class WeatherMap extends WeatherMapBase
 		$this->configfile='';
 		$this->imagefile='';
 		$this->imageuri='';
-//
-//		$this->fonts=array();
-//
-//		// Adding these makes the editor's job a little easier, mainly
-//		for($i=1; $i<=5; $i++)
-//		{
-//			$this->fonts[$i] = new WMFont();
-//			$this->fonts[$i]->type="GD builtin";
-//			$this->fonts[$i]->file='';
-//			$this->fonts[$i]->size=0;
-//		}
+
 
 		$this->loadAllPlugins();
 
@@ -364,13 +294,6 @@ class WeatherMap extends WeatherMapBase
             $this->colourtable[$key] = new WMColour($def['red'], $def['green'], $def['blue']);
         }
 
-        // legacy style
-
-//        foreach ($defaults as $key => $def) {
-//            $this->colours['DEFAULT'][$key] = $def;
-//            $this->colours['DEFAULT'][$key]['c1'] = $this->colourtable[$key];
-//            $this->colours['DEFAULT'][$key]['special'] = true;
-//        }
     }
 
 
@@ -524,126 +447,6 @@ function RandomData()
 		$this->links[$link->name]->bandwidth_out=rand(0, $link->max_bandwidth_out);
 	}
 }
-
-    /**
-     * Search a directory for plugin class files, and load them. Each one is then
-     * instantiated once, and saved into the map object.
-     *
-     * @param string $pluginType - Which kind of plugin are we loading?
-     * @param string $searchDirectory - Where to load from?
-     */
-    private function loadPlugins($pluginType = "data", $searchDirectory = "lib/datasources")
-    {
-        wm_debug("Beginning to load $pluginType plugins from $searchDirectory\n");
-
-
-        $pluginList = $this->getPluginFileList($pluginType, $searchDirectory);
-
-        foreach ($pluginList as $fullFilePath => $file) {
-            wm_debug("Loading $pluginType Plugin class from $file\n");
-
-            $class = preg_replace("/\\.php$/", "", $file);
-            include_once($fullFilePath);
-
-            wm_debug("Loaded $pluginType Plugin class $class from $file\n");
-
-            $this->plugins[$pluginType][$class]['object'] = new $class;
-            $this->plugins[$pluginType][$class]['active'] = true;
-
-            if (!isset($this->plugins[$pluginType][$class])) {
-                wm_debug("** Failed to create an object for plugin $pluginType/$class\n");
-                $this->plugins[$pluginType][$class]['active'] = false;
-            }
-
-        }
-        wm_debug("Finished loading plugins.\n");
-    }
-
-    /**
-     * @param $pluginType
-     * @param $searchDirectory
-     * @return array
-     */
-    private function getPluginFileList($pluginType, $searchDirectory)
-    {
-        $directoryHandle = $this->resolveDirectoryAndOpen($searchDirectory);
-
-        $pluginList = array();
-        if (!$directoryHandle) {
-            wm_warn("Couldn't open $pluginType Plugin directory ($searchDirectory). Things will probably go wrong. [WMWARN06]\n");
-        }
-
-        while ($file = readdir($directoryHandle)) {
-            $fullFilePath = $searchDirectory . DIRECTORY_SEPARATOR . $file;
-
-            if (!is_file($fullFilePath) || !preg_match('/\.php$/', $fullFilePath)) {
-                continue;
-            }
-
-            $pluginList[$fullFilePath] = $file;
-        }
-        return $pluginList;
-    }
-
-    private function resolveDirectoryAndOpen($dir)
-    {
-        if (!file_exists($dir)) {
-            $dir = dirname(__FILE__) . DIRECTORY_SEPARATOR . $dir;
-            wm_debug("Relative path didn't exist. Trying $dir\n");
-        }
-        $directoryHandle = @opendir($dir);
-
-        // XXX - is this ever necessary?
-        if (!$directoryHandle) { // try to find it with the script, if the relative path fails
-            $srcdir = substr($_SERVER['argv'][0], 0, strrpos($_SERVER['argv'][0], DIRECTORY_SEPARATOR));
-            $directoryHandle = opendir($srcdir . DIRECTORY_SEPARATOR . $dir);
-            if ($directoryHandle) {
-                $dir = $srcdir . DIRECTORY_SEPARATOR . $dir;
-            }
-        }
-
-        return $directoryHandle;
-    }
-
-    /**
-     * Loop through the datasource plugins, allowing them to initialise any internals.
-     * The plugins can also refuse to run, if resources they need aren't available.
-     */
-    private function initialiseAllPlugins()
-    {
-        wm_debug("Running Init() for all Plugins...\n");
-
-        foreach (array('data', 'pre', 'post') as $type) {
-            wm_debug("Initialising $type Plugins...\n");
-
-            foreach ($this->plugins[$type] as $name => $pluginEntry) {
-                wm_debug("Running $name" . "->Init()\n");
-
-                $ret = $pluginEntry['object']->Init($this);
-
-                if (!$ret) {
-                    wm_debug("Marking $name plugin as inactive, since Init() failed\n");
-                    $this->plugins[$type][$name]['active'] = false;
-                    wm_debug("State is now %s\n", $this->plugins['data'][$name]['active']);
-                }
-            }
-        }
-        wm_debug("Finished Initialising Plugins...\n");
-    }
-
-    public function runProcessorPlugins($stage = "pre")
-    {
-        wm_debug("Running $stage-processing plugins...\n");
-
-        $this->pluginMethod($stage, "run");
-//        foreach ($this->plugins[$stage] as $name => $pluginEntry) {
-//            wm_debug("Running %s->run()\n", $name);
-//            if ($pluginEntry['active']) {
-//                $pluginEntry['object']->run($this);
-//            }
-//        }
-        wm_debug("Finished $stage-processing plugins...\n");
-    }
 
 
 
@@ -1812,15 +1615,130 @@ function MakeHTML($imagemapname = "weathermap_imap")
         }
     }
 
+    /**
+     * Search a directory for plugin class files, and load them. Each one is then
+     * instantiated once, and saved into the map object.
+     *
+     * @param string $pluginType - Which kind of plugin are we loading?
+     * @param string $searchDirectory - Where to load from?
+     */
+    private function loadPlugins($pluginType = "data", $searchDirectory = "lib/datasources")
+    {
+        wm_debug("Beginning to load $pluginType plugins from $searchDirectory\n");
+
+
+        $pluginList = $this->getPluginFileList($pluginType, $searchDirectory);
+
+        foreach ($pluginList as $fullFilePath => $file) {
+            wm_debug("Loading $pluginType Plugin class from $file\n");
+
+            $class = preg_replace("/\\.php$/", "", $file);
+            include_once($fullFilePath);
+
+            wm_debug("Loaded $pluginType Plugin class $class from $file\n");
+
+            $this->plugins[$pluginType][$class]['object'] = new $class;
+            $this->plugins[$pluginType][$class]['active'] = true;
+
+            if (!isset($this->plugins[$pluginType][$class])) {
+                wm_debug("** Failed to create an object for plugin $pluginType/$class\n");
+                $this->plugins[$pluginType][$class]['active'] = false;
+            }
+
+        }
+        wm_debug("Finished loading plugins.\n");
+    }
+
+    /**
+     * @param $pluginType
+     * @param $searchDirectory
+     * @return array
+     */
+    private function getPluginFileList($pluginType, $searchDirectory)
+    {
+        $directoryHandle = $this->resolveDirectoryAndOpen($searchDirectory);
+
+        $pluginList = array();
+        if (!$directoryHandle) {
+            wm_warn("Couldn't open $pluginType Plugin directory ($searchDirectory). Things will probably go wrong. [WMWARN06]\n");
+        }
+
+        while ($file = readdir($directoryHandle)) {
+            $fullFilePath = $searchDirectory . DIRECTORY_SEPARATOR . $file;
+
+            if (!is_file($fullFilePath) || !preg_match('/\.php$/', $fullFilePath)) {
+                continue;
+            }
+
+            $pluginList[$fullFilePath] = $file;
+        }
+        return $pluginList;
+    }
+
+    private function resolveDirectoryAndOpen($dir)
+    {
+        if (!file_exists($dir)) {
+            $dir = dirname(__FILE__) . DIRECTORY_SEPARATOR . $dir;
+            wm_debug("Relative path didn't exist. Trying $dir\n");
+        }
+        $directoryHandle = @opendir($dir);
+
+        // XXX - is this ever necessary?
+        if (!$directoryHandle) { // try to find it with the script, if the relative path fails
+            $srcdir = substr($_SERVER['argv'][0], 0, strrpos($_SERVER['argv'][0], DIRECTORY_SEPARATOR));
+            $directoryHandle = opendir($srcdir . DIRECTORY_SEPARATOR . $dir);
+            if ($directoryHandle) {
+                $dir = $srcdir . DIRECTORY_SEPARATOR . $dir;
+            }
+        }
+
+        return $directoryHandle;
+    }
+
+
+    /**
+     * Loop through the datasource plugins, allowing them to initialise any internals.
+     * The plugins can also refuse to run, if resources they need aren't available.
+     */
+    private function initialiseAllPlugins()
+    {
+        wm_debug("Running Init() for all Plugins...\n");
+
+        foreach (array('data', 'pre', 'post') as $type) {
+            wm_debug("Initialising $type Plugins...\n");
+
+            foreach ($this->plugins[$type] as $name => $pluginEntry) {
+                wm_debug("Running $name" . "->Init()\n");
+
+                $ret = $pluginEntry['object']->Init($this);
+
+                if (!$ret) {
+                    wm_debug("Marking $name plugin as inactive, since Init() failed\n");
+                    $this->plugins[$type][$name]['active'] = false;
+                    wm_debug("State is now %s\n", $this->plugins['data'][$name]['active']);
+                }
+            }
+        }
+        wm_debug("Finished Initialising Plugins...\n");
+    }
+
+    public function runProcessorPlugins($stage = "pre")
+    {
+        wm_debug("Running $stage-processing plugins...\n");
+
+        $this->pluginMethod($stage, "run");
+
+        wm_debug("Finished $stage-processing plugins...\n");
+    }
+
+
+
     private function prefetchPlugins()
     {
         // give all the plugins a chance to prefetch their results
         wm_debug("======================================\n");
         wm_debug("Starting DS plugin prefetch\n");
         $this->pluginMethod("data", "Prefetch");
-//        foreach ($this->plugins['data'] as $name => $pluginEntry) {
-//            $pluginEntry['object']->Prefetch($this);
-//        }
     }
 
     private function pluginMethod($type, $method)
@@ -1841,14 +1759,7 @@ function MakeHTML($imagemapname = "weathermap_imap")
         wm_debug("======================================\n");
         wm_debug("Starting DS plugin cleanup\n");
         $this->pluginMethod("data", "CleanUp");
-
-//        foreach ($this->plugins[$type] as $name => $pluginEntry) {
-//            if ($pluginEntry['active']) {
-//                $pluginEntry['object']->CleanUp($this);
-//            }
-//        }
     }
-
 
     function readData()
     {
@@ -1881,18 +1792,13 @@ function MakeHTML($imagemapname = "weathermap_imap")
 
     }
 
-
-
     public function createDefaultNodes()
     {
         wm_debug("Creating ':: DEFAULT ::' DEFAULT NODE\n");
-        $defnode = new WeatherMapNode(":: DEFAULT ::", ":: DEFAULT ::", $this);
-
-        $this->nodes[':: DEFAULT ::'] = &$defnode;
+        $this->addNode(new WeatherMapNode(":: DEFAULT ::", ":: DEFAULT ::", $this));
 
         wm_debug("Creating actual DEFAULT NODE from :: DEFAULT ::\n");
-        $defnode2 = new WeatherMapNode("DEFAULT", ":: DEFAULT ::", $this);
-        $this->nodes['DEFAULT'] = &$defnode2;
+        $this->addNode(new WeatherMapNode("DEFAULT", ":: DEFAULT ::", $this));
     }
 
     public function createDefaultLinks()
@@ -1902,15 +1808,20 @@ function MakeHTML($imagemapname = "weathermap_imap")
         // same code for writing out LINK DEFAULT as any other link.
         wm_debug("Creating ':: DEFAULT ::' DEFAULT LINK\n");
         // these two are used for default settings
-        $deflink = new WeatherMapLink(":: DEFAULT ::", ":: DEFAULT ::", $this);
-
-        $this->links[':: DEFAULT ::'] = &$deflink;
+        $this->addLink(new WeatherMapLink(":: DEFAULT ::", ":: DEFAULT ::", $this));
 
         wm_debug("Creating actual DEFAULT LINK from :: DEFAULT ::\n");
-        $deflink2 = new WeatherMapLink("DEFAULT", ":: DEFAULT ::", $this);
-        $this->links['DEFAULT'] = &$deflink2;
+        $this->addLink(new WeatherMapLink("DEFAULT", ":: DEFAULT ::", $this));
     }
 
+    public function getValue($name)
+    {
+        wm_debug("Fetching %s\n", $name);
+        if (property_exists($this, $name)) {
+            return $this->$name;
+        }
+        throw new WeathermapInternalFail("NoSuchProperty");
+    }
 
 };
 // vim:ts=4:sw=4:

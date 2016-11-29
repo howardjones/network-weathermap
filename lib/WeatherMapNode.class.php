@@ -1030,6 +1030,15 @@ class WeatherMapNode extends WeatherMapDataItem
         $this->image = null;
     }
 
+    public function getValue($name)
+    {
+        wm_debug("Fetching %s\n", $name);
+        if (property_exists($this, $name)) {
+            return $this->$name;
+        }
+        throw new WeathermapInternalFail("NoSuchProperty");
+    }
+
     private function getDirectionList()
     {
         if ($this->scalevar == 'in') {

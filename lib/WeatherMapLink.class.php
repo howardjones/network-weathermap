@@ -850,16 +850,17 @@ class WeatherMapLink extends WeatherMapDataItem
     /**
      * Set the new ends for a link.
      *
-     * @param $node1
-     * @param $node2
+     * @param WeatherMapNode $node1
+     * @param WeatherMapNode $node2
+     * @throws WeathermapInternalFail if passed any nulls (should never happen)
      */
     public function setEndNodes($node1, $node2)
     {
-        if (null == !$node1 && null === $node2) {
+        if (null !== $node1 && null === $node2) {
             throw new WeathermapInternalFail("PartiallyRealLink");
         }
 
-        if (null == !$node2 && null === $node1) {
+        if (null !== $node2 && null === $node1) {
             throw new WeathermapInternalFail("PartiallyRealLink");
         }
 

@@ -827,7 +827,7 @@ else
 		    
 		    $node = new WeatherMapNode($newnodename, $map->nodes[$target]->template, $map);
 		    // $node->Reset($map);
-		    // $node->CopyFrom($map->nodes[$target]);
+		    $node->CopyFrom($map->nodes[$target]);
 
 			# CopyFrom skips this one, because it's also the function used by template inheritance
 			# - but for Clone, we DO want to copy the template too

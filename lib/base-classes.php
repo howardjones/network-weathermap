@@ -138,6 +138,20 @@ class WeatherMapBase
         return array($this->name);
     }
 
+    public function recalculate()
+    {
+        /*
+         * The idea here is to maintain a list of the items that inherit from this one, so if we change
+         * something we can avoid necessarily redrawing the whole map just to get (e.g.) new imagemap coords
+         *
+         * In the future it would allow a client-side drawing editor to know which items are "dirty" after a change, too.
+         *
+         */
+        throw new WeathermapUnimplementedException("Dynamic dependencies not implemented yet");
+
+        return 0;
+    }
+
     public function addConfigValue($keyname, $value, $recalculate = false)
     {
         wm_debug("Appending config %s = %s\n", $keyname, $value);
@@ -168,6 +182,9 @@ class WeatherMapBase
         $this->reset($owner);
     }
 
+    // by tracking which objects depend on each other, we can reduce the number of full-table searches for a single object
+    // (mostly in the editor for things like moving nodes)
+
     function CopyFrom(&$source)
     {
         wm_debug("Initialising %s $this->name from $source->name\n", $this->my_type());
@@ -177,9 +194,6 @@ class WeatherMapBase
             if ($fld != 'template') $this->$fld = $source->$fld;
         }
     }
-
-    // by tracking which objects depend on each other, we can reduce the number of full-table searches for a single object
-    // (mostly in the editor for things like moving nodes)
 
     public function addDependency($object)
     {
@@ -207,20 +221,6 @@ class WeatherMapBase
         $this->descendents = array();
     }
 
-    public function recalculate()
-    {
-        /*
-         * The idea here is to maintain a list of the items that inherit from this one, so if we change
-         * something we can avoid necessarily redrawing the whole map just to get (e.g.) new imagemap coords
-         *
-         * In the future it would allow a client-side drawing editor to know which items are "dirty" after a change, too.
-         *
-         */
-        throw new WeathermapUnimplementedException("Dynamic dependencies not implemented yet");
-
-        return 0;
-    }
-
 }
 
 class WeatherMapConfigItem
@@ -244,11 +244,10 @@ class WeatherMapItem extends WeatherMapBase
     var $my_default;
     var $defined_in;
     var $config_override;    # used by the editor to allow text-editing
-    protected $descendents = array();
-    protected $dependencies = array();
-
     public $imap_areas;
     public $zorder;
+    protected $descendents = array();
+    protected $dependencies = array();
 
     function __construct()
     {

@@ -146,102 +146,90 @@ class WeatherMapNode extends WeatherMapDataItem
 
 	// make a mini-image, containing this node and nothing else
 	// figure out where the real NODE centre is, relative to the top-left corner.
-	function pre_render($im, &$map)
-	{
+    function pre_render($im, &$map)
+    {
         if (!$this->drawable) {
             wm_debug("Skipping undrawable %s", $this);
             return;
         }
 
-        // don't bother drawing if there's no position - it's a template
-		if (is_null($this->x) ) return;
-		if (is_null($this->y) ) return;
+        // don't bother drawing if it's a template
+        if ($this->isTemplate()) return;
 
-		// apparently, some versions of the gd extension will crash
-		// if we continue...
-		if ($this->label == '' && $this->iconfile=='') return;
+        // apparently, some versions of the gd extension will crash
+        // if we continue...
+        if ($this->label == '' && $this->iconfile == '') return;
 
-		// start thesless e off with sensible values, so that bbox
-		// calculations are easier.
-		$icon_x1 = $this->x;
-		$icon_x2 = $this->x;
-		$icon_y1 = $this->y;
-		$icon_y2 = $this->y;
+        // start these off with sensible values, so that bbox
+        // calculations are easier.
+        $icon_x1 = $this->x;
+        $icon_x2 = $this->x;
+        $icon_y1 = $this->y;
+        $icon_y2 = $this->y;
 
-		$label_x1 = $this->x;
-		$label_x2 = $this->x;
-		$label_y1 = $this->y;
-		$label_y2 = $this->y;
+        $label_x1 = $this->x;
+        $label_x2 = $this->x;
+        $label_y1 = $this->y;
+        $label_y2 = $this->y;
 
-		$boxwidth = 0;
-		$boxheight = 0;
-		$icon_w = 0;
-		$icon_h = 0;
+        $boxwidth = 0;
+        $boxheight = 0;
+        $icon_w = 0;
+        $icon_h = 0;
 
-		$col = new WMColour('none');
+        $col = new WMColour('none');
 
-		// if a target is specified, and you haven't forced no background, then the background will
-		// come from the SCALE in USESCALE
-		if (!empty($this->targets) && $this->usescale != 'none' )
-		{
-			$pc = 0;
+        // if a target is specified, and you haven't forced no background, then the background will
+        // come from the SCALE in USESCALE
+        if (!empty($this->targets) && $this->usescale != 'none') {
+            $pc = 0;
 
-			if ($this->scalevar == 'in')
-			{
-				$pc = $this->inpercent;
-				$col = $this->colours[IN];
+            if ($this->scalevar == 'in') {
+                $pc = $this->inpercent;
+                $col = $this->colours[IN];
 
-			}
+            }
 
-			if ($this->scalevar == 'out')
-			{
-				$pc = $this->outpercent;
-				$col = $this->colours[OUT];
+            if ($this->scalevar == 'out') {
+                $pc = $this->outpercent;
+                $col = $this->colours[OUT];
 
-			}
-		}
-		elseif (! $this->labelbgcolour->isNone())
-		{
-		    wm_debug("labelbgcolour=%s\n",$this->labelbgcolour);
-			// $col=myimagecolorallocate($node_im, $this->labelbgcolour[0], $this->labelbgcolour[1], $this->labelbgcolour[2]);
-			$col = $this->labelbgcolour;
-		}
+            }
+        } elseif (!$this->labelbgcolour->isNone()) {
+            wm_debug("labelbgcolour=%s\n", $this->labelbgcolour);
+            // $col=myimagecolorallocate($node_im, $this->labelbgcolour[0], $this->labelbgcolour[1], $this->labelbgcolour[2]);
+            $col = $this->labelbgcolour;
+        }
 
-		$colicon = null;
-		if (!empty($this->targets) && $this->useiconscale != 'none' )
-		{
-			wm_debug("Colorising the icon\n");
-			$pc = 0;
-			$val = 0;
+        $colicon = null;
+        if (!empty($this->targets) && $this->useiconscale != 'none') {
+            wm_debug("Colorising the icon\n");
+            $pc = 0;
+            $val = 0;
 
-			if ($this->iconscalevar == 'in')
-			{
-				$pc = $this->inpercent;
-				//$col = $this->colours[IN];
-				$val = $this->bandwidth_in;
-			}
-			if ($this->iconscalevar == 'out')
-			{
-				$pc = $this->outpercent;
-				//$col = $this->colours[OUT];
-				$val = $this->bandwidth_out;
-			}
+            if ($this->iconscalevar == 'in') {
+                $pc = $this->inpercent;
+                //$col = $this->colours[IN];
+                $val = $this->bandwidth_in;
+            }
+            if ($this->iconscalevar == 'out') {
+                $pc = $this->outpercent;
+                //$col = $this->colours[OUT];
+                $val = $this->bandwidth_out;
+            }
 
-			if ($this->iconscaletype=='percent')
-			{
-				list($colicon,$node_iconscalekey,$icontag) =
+            if ($this->iconscaletype == 'percent') {
+                list($colicon, $node_iconscalekey, $icontag) =
                     $map->scales[$this->useiconscale]->colourFromValue($pc, $this->name);
-			}
-			else
-			{
-				// use the absolute value if we aren't doing percentage scales.
-				list($colicon,$node_iconscalekey,$icontag) =
+            } else {
+                // use the absolute value if we aren't doing percentage scales.
+                list($colicon, $node_iconscalekey, $icontag) =
                     $map->scales[$this->useiconscale]->colourFromValue($val, $this->name, false);
-			}
-		}
+            }
+        }
 
-		// figure out a bounding rectangle for the label
-		if ($this->label != '') {
+        // figure out a bounding rectangle for the label
+        if ($this->label != '') {
             $padding = 4.0;
             $padfactor = 1.0;
 
@@ -307,143 +295,123 @@ class WeatherMapNode extends WeatherMapDataItem
             # print "TEXT at $txt_x , $txt_y\n";
         }
 
-		// figure out a bounding rectangle for the icon
-		if ($this->iconfile != '')
-		{
-			$icon_im = NULL;
-			$icon_w = 0;
-			$icon_h = 0;
+        // figure out a bounding rectangle for the icon
+        if ($this->iconfile != '') {
+            $icon_im = NULL;
+            $icon_w = 0;
+            $icon_h = 0;
 
-			if ($this->iconfile == 'rbox' || $this->iconfile == 'box' || $this->iconfile == 'round' || $this->iconfile == 'inpie' || $this->iconfile == 'outpie' || $this->iconfile == 'gauge' || $this->iconfile == 'nink')
-			{
-				wm_debug("Artificial Icon type " .$this->iconfile. " for $this->name\n");
-				// this is an artificial icon - we don't load a file for it
+            if ($this->iconfile == 'rbox' || $this->iconfile == 'box' || $this->iconfile == 'round' || $this->iconfile == 'inpie' || $this->iconfile == 'outpie' || $this->iconfile == 'gauge' || $this->iconfile == 'nink') {
+                wm_debug("Artificial Icon type " . $this->iconfile . " for $this->name\n");
+                // this is an artificial icon - we don't load a file for it
 
-				$icon_im = imagecreatetruecolor($this->iconscalew,$this->iconscaleh);
-				imagesavealpha($icon_im, TRUE);
+                $icon_im = imagecreatetruecolor($this->iconscalew, $this->iconscaleh);
+                imagesavealpha($icon_im, TRUE);
 
-				$nothing=imagecolorallocatealpha($icon_im,128,0,0,127);
-				imagefill($icon_im, 0, 0, $nothing);
+                $nothing = imagecolorallocatealpha($icon_im, 128, 0, 0, 127);
+                imagefill($icon_im, 0, 0, $nothing);
 
-				$fill = NULL;
-				$ink = NULL;
+                $fill = NULL;
+                $ink = NULL;
 
-				$aifill = $this->aiconfillcolour;
-				$aiink = $this->aiconoutlinecolour;
+                $aifill = $this->aiconfillcolour;
+                $aiink = $this->aiconoutlinecolour;
 
-				// if useiconscale isn't set, then use the static
-				// colour defined, or copy the colour from the label
-				if ($this->useiconscale == "none") {
+                // if useiconscale isn't set, then use the static
+                // colour defined, or copy the colour from the label
+                if ($this->useiconscale == "none") {
 
-					if ($aifill->isCopy() && !$col->isNone() )
-					{
-						$fill = $col;
-					}
-					else
-					{
-						if ($aifill->isRealColour())
-						{
-							$fill = $aifill;
-						}
-					}
-				} else {
-					// if useiconscale IS defined, use that to figure out
-					// the fill colour
-					$pc = 0;
-					$val = 0;
+                    if ($aifill->isCopy() && !$col->isNone()) {
+                        $fill = $col;
+                    } else {
+                        if ($aifill->isRealColour()) {
+                            $fill = $aifill;
+                        }
+                    }
+                } else {
+                    // if useiconscale IS defined, use that to figure out
+                    // the fill colour
+                    $pc = 0;
+                    $val = 0;
 
-					if ($this->iconscalevar == 'in') {
-						$pc = $this->inpercent;
-						$val = $this->bandwidth_in;
-					}
+                    if ($this->iconscalevar == 'in') {
+                        $pc = $this->inpercent;
+                        $val = $this->bandwidth_in;
+                    }
 
-					if ($this->iconscalevar == 'out') {
-						$pc = $this->outpercent;
-						$val = $this->bandwidth_out;
-					}
+                    if ($this->iconscalevar == 'out') {
+                        $pc = $this->outpercent;
+                        $val = $this->bandwidth_out;
+                    }
 
-					if ($this->iconscaletype == 'percent') {
-						list($fill, $junk, $junk) =
+                    if ($this->iconscaletype == 'percent') {
+                        list($fill, $junk, $junk) =
                             $this->owner->scales[$this->useiconscale]->ColourFromValue($pc, $this->name);
-						// $map->NewColourFromPercent($val, $this->useiconscale,$this->name, FALSE );
 
-					} else {
-						// use the absolute value if we aren't doing percentage scales.
-						list($fill,  $junk, $junk) =
+                    } else {
+                        // use the absolute value if we aren't doing percentage scales.
+                        list($fill, $junk, $junk) =
                             $this->owner->scales[$this->useiconscale]->ColourFromValue($val, $this->name, false);
-							// $map->NewColourFromPercent($val, $this->useiconscale,$this->name, FALSE );
-					}
-				}
+                    }
+                }
 
-				if ($this->aiconoutlinecolour != array(-1,-1,-1))
-				{
-					$ink=$aiink;
-				}
+                if ($this->aiconoutlinecolour != array(-1, -1, -1)) {
+                    $ink = $aiink;
+                }
 
-				wm_debug("ink is: $ink\n");
-				wm_debug("fill is: $fill\n");
+                wm_debug("ink is: $ink\n");
+                wm_debug("fill is: $fill\n");
 
-				if ($this->iconfile=='box')
-				{
-					if ($fill !== NULL && !$fill->isNone())
-					{
-						imagefilledrectangle($icon_im, 0, 0, $this->iconscalew-1, $this->iconscaleh-1, $fill->gdallocate($icon_im) );
-					}
+                if ($this->iconfile == 'box') {
+                    if ($fill !== NULL && !$fill->isNone()) {
+                        imagefilledrectangle($icon_im, 0, 0, $this->iconscalew - 1, $this->iconscaleh - 1, $fill->gdallocate($icon_im));
+                    }
 
-					if ($ink !== NULL && !$ink->isNone())
-					{
-						imagerectangle($icon_im, 0, 0, $this->iconscalew-1, $this->iconscaleh-1, $ink->gdallocate($icon_im) );
-					}
-				}
+                    if ($ink !== NULL && !$ink->isNone()) {
+                        imagerectangle($icon_im, 0, 0, $this->iconscalew - 1, $this->iconscaleh - 1, $ink->gdallocate($icon_im));
+                    }
+                }
 
-				if ($this->iconfile=='rbox')
-				{
-					if ($fill !== NULL && !$fill->isNone())
-					{
-						imagefilledroundedrectangle($icon_im, 0, 0, $this->iconscalew-1, $this->iconscaleh-1, 4, $fill->gdallocate($icon_im) );
-					}
+                if ($this->iconfile == 'rbox') {
+                    if ($fill !== NULL && !$fill->isNone()) {
+                        imagefilledroundedrectangle($icon_im, 0, 0, $this->iconscalew - 1, $this->iconscaleh - 1, 4, $fill->gdallocate($icon_im));
+                    }
 
-					if ($ink !== NULL && !$ink->isNone())
-					{
-						imageroundedrectangle($icon_im, 0, 0, $this->iconscalew-1, $this->iconscaleh-1, 4, $ink->gdallocate($icon_im) );
-					}
-				}
+                    if ($ink !== NULL && !$ink->isNone()) {
+                        imageroundedrectangle($icon_im, 0, 0, $this->iconscalew - 1, $this->iconscaleh - 1, 4, $ink->gdallocate($icon_im));
+                    }
+                }
 
-				if ($this->iconfile=='round')
-				{
-					$rx = $this->iconscalew/2-1;
-					$ry = $this->iconscaleh/2-1;
+                if ($this->iconfile == 'round') {
+                    $rx = $this->iconscalew / 2 - 1;
+                    $ry = $this->iconscaleh / 2 - 1;
 
-					if ($fill !== NULL && !$fill->isNone() )
-					{
-						imagefilledellipse($icon_im,$rx,$ry,$rx*2,$ry*2,$fill->gdallocate($icon_im) );
-					}
+                    if ($fill !== NULL && !$fill->isNone()) {
+                        imagefilledellipse($icon_im, $rx, $ry, $rx * 2, $ry * 2, $fill->gdallocate($icon_im));
+                    }
 
-					if ($ink !== NULL && !$ink->isNone())
-					{
-						imageellipse($icon_im,$rx,$ry,$rx*2,$ry*2,$ink->gdallocate($icon_im) );
-					}
-				}
+                    if ($ink !== NULL && !$ink->isNone()) {
+                        imageellipse($icon_im, $rx, $ry, $rx * 2, $ry * 2, $ink->gdallocate($icon_im));
+                    }
+                }
 
-				if ($this->iconfile=='nink')
-				{
-					// print "NINK **************************************************************\n";
-					$rx = $this->iconscalew/2-1;
-					$ry = $this->iconscaleh/2-1;
-					$size = $this->iconscalew;
-					$quarter = $size/4;
+                if ($this->iconfile == 'nink') {
+                    $rx = $this->iconscalew / 2 - 1;
+                    $ry = $this->iconscaleh / 2 - 1;
+                    $size = $this->iconscalew;
+                    $quarter = $size / 4;
 
-					$col1 = $this->colours[OUT];
-					$col2 = $this->colours[IN];
+                    $col1 = $this->colours[OUT];
+                    $col2 = $this->colours[IN];
 
-					assert('!is_null($col1)');
-					assert('!is_null($col2)');
+                    assert('!is_null($col1)');
+                    assert('!is_null($col2)');
 
-					imagefilledarc($icon_im, $rx-1, $ry, $size, $size, 270,90, $col1->gdallocate($icon_im), IMG_ARC_PIE);
-					imagefilledarc($icon_im, $rx+1, $ry, $size, $size, 90,270, $col2->gdallocate($icon_im), IMG_ARC_PIE);
+                    imagefilledarc($icon_im, $rx - 1, $ry, $size, $size, 270, 90, $col1->gdallocate($icon_im), IMG_ARC_PIE);
+                    imagefilledarc($icon_im, $rx + 1, $ry, $size, $size, 90, 270, $col2->gdallocate($icon_im), IMG_ARC_PIE);
 
-					imagefilledarc($icon_im, $rx-1, $ry+$quarter, $quarter*2, $quarter*2, 0,360, $col1->gdallocate($icon_im), IMG_ARC_PIE);
-					imagefilledarc($icon_im, $rx+1, $ry-$quarter, $quarter*2, $quarter*2, 0,360, $col2->gdallocate($icon_im), IMG_ARC_PIE);
+                    imagefilledarc($icon_im, $rx - 1, $ry + $quarter, $quarter * 2, $quarter * 2, 0, 360, $col1->gdallocate($icon_im), IMG_ARC_PIE);
+                    imagefilledarc($icon_im, $rx + 1, $ry - $quarter, $quarter * 2, $quarter * 2, 0, 360, $col2->gdallocate($icon_im), IMG_ARC_PIE);
 
                     if ($ink !== NULL && !$ink->isNone()) {
                         // XXX - need a font definition from somewhere for NINK text
@@ -459,222 +427,182 @@ class WeatherMapNode extends WeatherMapDataItem
                         list($twid, $thgt) = $fontObject->calculateImageStringSize($outstr);
                         $fontObject->drawImageString($icon_im, $rx - $twid / 2, $ry + $quarter + ($thgt / 2), $outstr, $ink->gdallocate($icon_im));
 
-                        // list($twid,$thgt) = $map->myimagestringsize($font,$instr);
-                        // $map->myimagestring($icon_im, $font, $rx - $twid/2, $ry- $quarter + ($thgt/2),$instr,$ink->gdallocate($icon_im));
-
-                        // list($twid,$thgt) = $map->myimagestringsize($font,$outstr);
-                        // $map->myimagestring($icon_im, $font, $rx - $twid/2,  $ry + $quarter + ($thgt/2),$outstr,$ink->gdallocate($icon_im));
-
                         imageellipse($icon_im, $rx, $ry, $rx * 2, $ry * 2, $ink->gdallocate($icon_im));
-                        // imagearc($icon_im, $rx,$ry,$quarter*4,$quarter*4, 0,360, $ink->gdallocate($icon_im));
                     }
-					// print "NINK ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n";
-				}
+                }
 
-				// XXX - needs proper colours
-				if ($this->iconfile=='inpie' || $this->iconfile=='outpie')
-				{
-					# list($colpie,$node_iconscalekey,$icontag) = $map->NewColourFromPercent($pc, $this->useiconscale,$this->name);
+                // XXX - needs proper colours
+                if ($this->iconfile == 'inpie' || $this->iconfile == 'outpie') {
 
-					if ($this->iconfile=='inpie') $segment_angle = (($this->inpercent)/100) * 360;
-					if ($this->iconfile=='outpie') $segment_angle = (($this->outpercent)/100) * 360;
+                    if ($this->iconfile == 'inpie') $segment_angle = (($this->inpercent) / 100) * 360;
+                    if ($this->iconfile == 'outpie') $segment_angle = (($this->outpercent) / 100) * 360;
 
-					$rx = $this->iconscalew/2-1;
-					$ry = $this->iconscaleh/2-1;
+                    $rx = $this->iconscalew / 2 - 1;
+                    $ry = $this->iconscaleh / 2 - 1;
 
-					if ($fill !== NULL && !$fill->isNone() )
-					{
-						imagefilledellipse($icon_im, $rx, $ry, $rx*2, $ry*2, $fill->gdallocate($icon_im) );
-					}
+                    if ($fill !== NULL && !$fill->isNone()) {
+                        imagefilledellipse($icon_im, $rx, $ry, $rx * 2, $ry * 2, $fill->gdallocate($icon_im));
+                    }
 
-					if ($ink !== NULL && !$ink->isNone())
-					{
-						// imagefilledarc  ( resource $image  , int $cx  , int $cy  , int $width  , int $height  , int $start  , int $end  , int $color  , int $style  )
-						imagefilledarc($icon_im, $rx, $ry, $rx*2,$ry*2, 0, $segment_angle, $ink->gdallocate($icon_im) , IMG_ARC_PIE);
-					}
+                    if ($ink !== NULL && !$ink->isNone()) {
+                        imagefilledarc($icon_im, $rx, $ry, $rx * 2, $ry * 2, 0, $segment_angle, $ink->gdallocate($icon_im), IMG_ARC_PIE);
+                    }
 
-					if ($fill !== NULL && !$fill->isNone() )
-					{
-						imageellipse($icon_im, $rx, $ry, $rx*2, $ry*2, $fill->gdallocate($icon_im) );
-					}
+                    if ($fill !== NULL && !$fill->isNone()) {
+                        imageellipse($icon_im, $rx, $ry, $rx * 2, $ry * 2, $fill->gdallocate($icon_im));
+                    }
+                }
 
-					// warn('inpie AICON not implemented yet [WMWARN99]');
-				}
+                if ($this->iconfile == 'gauge') {
+                    wm_warn('gauge AICON not implemented yet [WMWARN99]');
+                }
 
-				// if ($this->iconfile=='outpie') { warn('outpie AICON not implemented yet [WMWARN99]'); }
-				if ($this->iconfile=='gauge') { wm_warn('gauge AICON not implemented yet [WMWARN99]'); }
+            } else {
+                $this->iconfile = $map->ProcessString($this->iconfile, $this);
 
-			}
-			else {
-				$this->iconfile = $map->ProcessString($this->iconfile, $this);
+                if (is_readable($this->iconfile)) {
+                    imagealphablending($im, true);
+                    // draw the supplied icon, instead of the labelled box
+                    if (isset($colicon)) {
+                        $colour_method = "imagecolorize";
+                        if (function_exists("imagefilter") && $map->get_hint("use_imagefilter") == 1) {
+                            $colour_method = "imagefilter";
+                        }
 
-				if (is_readable($this->iconfile)) {
-					imagealphablending($im, true);
-					// draw the supplied icon, instead of the labelled box
-					if (isset($colicon)) {
-						$colour_method = "imagecolorize";
-						if (function_exists("imagefilter") && $map->get_hint("use_imagefilter") == 1) {
-							$colour_method = "imagefilter";
-						}
+                        $icon_im = $this->owner->imagecache->imagecreatescaledcolourizedfromfile(
+                            $this->iconfile,
+                            $this->iconscalew,
+                            $this->iconscaleh,
+                            $colicon,
+                            $colour_method);
 
-						$icon_im = $this->owner->imagecache->imagecreatescaledcolourizedfromfile(
-							$this->iconfile,
-							$this->iconscalew,
-							$this->iconscaleh,
-							$colicon,
-							$colour_method);
+                    } else {
+                        $icon_im = $this->owner->imagecache->imagecreatescaledfromfile(
+                            $this->iconfile,
+                            $this->iconscalew,
+                            $this->iconscaleh);
+                    }
 
-					} else {
-						$icon_im = $this->owner->imagecache->imagecreatescaledfromfile(
-							$this->iconfile,
-							$this->iconscalew,
-							$this->iconscaleh);
-					}
+                    if (!$icon_im) {
+                        wm_warn("Couldn't open ICON: '" . $this->iconfile . "' - is it a PNG, JPEG or GIF? [WMWARN37]\n");
+                    }
 
-					if (!$icon_im) {
-						wm_warn("Couldn't open ICON: '" . $this->iconfile . "' - is it a PNG, JPEG or GIF? [WMWARN37]\n");
-					}
+                    // TODO - this needs to happen BEFORE rescaling
 
-					// TODO - this needs to happen BEFORE rescaling
+                } else {
+                    if ($this->iconfile != 'none') {
+                        wm_warn("ICON '" . $this->iconfile . "' does not exist, or is not readable. Check path and permissions. [WMARN38]\n");
+                    }
+                }
+            }
 
-				} else {
-					if ($this->iconfile != 'none') {
-						wm_warn("ICON '" . $this->iconfile . "' does not exist, or is not readable. Check path and permissions. [WMARN38]\n");
-					}
-				}
-			}
+            if ($icon_im) {
+                $icon_w = imagesx($icon_im);
+                $icon_h = imagesy($icon_im);
 
-			if ($icon_im)
-			{
-				$icon_w = imagesx($icon_im);
-				$icon_h = imagesy($icon_im);
+                $icon_x1 = $this->x - $icon_w / 2;
+                $icon_y1 = $this->y - $icon_h / 2;
+                $icon_x2 = $this->x + $icon_w / 2;
+                $icon_y2 = $this->y + $icon_h / 2;
 
-				$icon_x1 = $this->x - $icon_w / 2;
-				$icon_y1 = $this->y - $icon_h / 2;
-				$icon_x2 = $this->x + $icon_w / 2;
-				$icon_y2 = $this->y + $icon_h / 2;
+                $this->width = $icon_w;
+                $this->height = $icon_h;
 
-//				$map->nodes[$this->name]->width = $icon_w;
-				$this->width = $icon_w;
-				$this->height = $icon_h;
-//				$map->nodes[$this->name]->height = $icon_h;
+                $this->boundingboxes[] = array($icon_x1, $icon_y1, $icon_x2, $icon_y2);
+            }
 
-				// $map->imap->addArea("Rectangle", "NODE:" . $this->name . ':0', '', array($icon_x1, $icon_y1, $icon_x2, $icon_y2));
-//				$map->nodes[$this->name]->boundingboxes[] = array($icon_x1, $icon_y1, $icon_x2, $icon_y2);
-				$this->boundingboxes[] = array($icon_x1, $icon_y1, $icon_x2, $icon_y2);
-			}
+        }
 
-		}
+        // do any offset calculations
+        $dx = 0;
+        $dy = 0;
+        if (($this->labeloffset != '') && (($this->iconfile != ''))) {
+            $this->labeloffsetx = 0;
+            $this->labeloffsety = 0;
 
-		// do any offset calculations
-		$dx=0;
-		$dy=0;
-		if (($this->labeloffset != '') && (($this->iconfile != '')) )
-		{
-			$this->labeloffsetx = 0;
-			$this->labeloffsety = 0;
+            list($dx, $dy) = WMUtility::calculateOffset($this->labeloffset,
+                ($icon_w + $boxwidth - 1),
+                ($icon_h + $boxheight)
+            );
+        }
 
-			list($dx, $dy) = WMUtility::calculateOffset($this->labeloffset,
-				($icon_w + $boxwidth -1),
-				($icon_h + $boxheight)
-			);
-		}
+        $label_x1 += ($this->labeloffsetx + $dx);
+        $label_x2 += ($this->labeloffsetx + $dx);
+        $label_y1 += ($this->labeloffsety + $dy);
+        $label_y2 += ($this->labeloffsety + $dy);
 
-		$label_x1 += ($this->labeloffsetx + $dx);
-		$label_x2 += ($this->labeloffsetx + $dx);
-		$label_y1 += ($this->labeloffsety + $dy);
-		$label_y2 += ($this->labeloffsety + $dy);
+        if ($this->label != '') {
+            $this->boundingboxes[] = array($label_x1, $label_y1, $label_x2, $label_y2);
+        }
 
-		if ($this->label != '')
-		{
-			$this->boundingboxes[] = array($label_x1, $label_y1, $label_x2, $label_y2);
-//			$map->nodes[$this->name]->boundingboxes[] = array($label_x1, $label_y1, $label_x2, $label_y2);
-		}
+        // work out the bounding box of the whole thing
 
-		// work out the bounding box of the whole thing
+        $bbox_x1 = min($label_x1, $icon_x1);
+        $bbox_x2 = max($label_x2, $icon_x2) + 1;
+        $bbox_y1 = min($label_y1, $icon_y1);
+        $bbox_y2 = max($label_y2, $icon_y2) + 1;
 
-		$bbox_x1 = min($label_x1,$icon_x1);
-		$bbox_x2 = max($label_x2,$icon_x2)+1;
-		$bbox_y1 = min($label_y1,$icon_y1);
-		$bbox_y2 = max($label_y2,$icon_y2)+1;
+        // create TWO imagemap entries - one for the label and one for the icon
+        // (so we can have close-spaced icons better)
 
-		#           imagerectangle($im,$bbox_x1,$bbox_y1,$bbox_x2,$bbox_y2,$map->selected);
-		#         imagerectangle($im,$label_x1,$label_y1,$label_x2,$label_y2,$map->black);
-		#       imagerectangle($im,$icon_x1,$icon_y1,$icon_x2,$icon_y2,$map->black);
+        $temp_width = $bbox_x2 - $bbox_x1;
+        $temp_height = $bbox_y2 - $bbox_y1;
+        // create an image of that size and draw into it
+        $node_im = imagecreatetruecolor($temp_width, $temp_height);
+        // ImageAlphaBlending($node_im, FALSE);
+        imagesavealpha($node_im, true);
 
-		// create TWO imagemap entries - one for the label and one for the icon
-		// (so we can have close-spaced icons better)
+        $nothing = imagecolorallocatealpha($node_im, 128, 0, 0, 127);
+        imagefill($node_im, 0, 0, $nothing);
 
+        $label_x1 -= $bbox_x1;
+        $label_x2 -= $bbox_x1;
+        $label_y1 -= $bbox_y1;
+        $label_y2 -= $bbox_y1;
 
-		$temp_width = $bbox_x2 - $bbox_x1;
-		$temp_height = $bbox_y2 - $bbox_y1;
-		// create an image of that size and draw into it
-		$node_im = imagecreatetruecolor($temp_width, $temp_height);
-		// ImageAlphaBlending($node_im, FALSE);
-		imagesavealpha($node_im, true);
+        $icon_x1 -= $bbox_x1;
+        $icon_x2 -= $bbox_x1;
+        $icon_y1 -= $bbox_y1;
+        $icon_y2 -= $bbox_y1;
 
-		$nothing = imagecolorallocatealpha($node_im, 128, 0, 0, 127);
-		imagefill($node_im, 0, 0, $nothing);
+        // Draw the icon, if any
+        if (isset($icon_im)) {
+            imagecopy($node_im, $icon_im, $icon_x1, $icon_y1, 0, 0, imagesx($icon_im), imagesy($icon_im));
+            imagedestroy($icon_im);
+        }
 
-		#$col = $col->gdallocate($node_im);
+        // Draw the label, if any
+        if ($this->label != '') {
+            $txt_x -= $bbox_x1;
+            $txt_x += ($this->labeloffsetx + $dx);
+            $txt_y -= $bbox_y1;
+            $txt_y += ($this->labeloffsety + $dy);
 
-		// imagefilledrectangle($node_im,0,0,$temp_width,$temp_height,  $nothing);
-
-		$label_x1 -= $bbox_x1;
-		$label_x2 -= $bbox_x1;
-		$label_y1 -= $bbox_y1;
-		$label_y2 -= $bbox_y1;
-
-		$icon_x1 -= $bbox_x1;
-		$icon_x2 -= $bbox_x1;
-		$icon_y1 -= $bbox_y1;
-		$icon_y2 -= $bbox_y1;
-
-
-		// Draw the icon, if any
-		if (isset($icon_im)) {
-			imagecopy($node_im, $icon_im, $icon_x1, $icon_y1, 0, 0, imagesx($icon_im), imagesy($icon_im));
-			imagedestroy($icon_im);
-		}
-
-		// Draw the label, if any
-		if ($this->label != '')
-		{
-			$txt_x -= $bbox_x1;
-			$txt_x += ($this->labeloffsetx + $dx);
-			$txt_y -= $bbox_y1;
-			$txt_y += ($this->labeloffsety + $dy);
-
-			#       print "FINAL TEXT at $txt_x , $txt_y\n";
+            #       print "FINAL TEXT at $txt_x , $txt_y\n";
 
             wm_debug("Label colour is $col\n");
 
-			// if there's an icon, then you can choose to have no background
-			// if (! $col->isNone() )
-            if (! $this->labelbgcolour->isNone() )
-			{
-			    imagefilledrectangle($node_im, $label_x1, $label_y1, $label_x2, $label_y2, $col->gdallocate($node_im));
-			}
+            // if there's an icon, then you can choose to have no background
+            // if (! $col->isNone() )
+            if (!$this->labelbgcolour->isNone()) {
+                imagefilledrectangle($node_im, $label_x1, $label_y1, $label_x2, $label_y2, $col->gdallocate($node_im));
+            }
 
-			if ($this->selected)
-			{
-				imagerectangle($node_im, $label_x1, $label_y1, $label_x2, $label_y2, $map->selected);
-				// would be nice if it was thicker, too...
-				imagerectangle($node_im, $label_x1 + 1, $label_y1 + 1, $label_x2 - 1, $label_y2 - 1, $map->selected);
-			}
-			else
-			{
-				$olcol = $this->labeloutlinecolour;
-				if ($olcol->isRealColour())
-				{
-					imagerectangle($node_im, $label_x1, $label_y1, $label_x2, $label_y2, $olcol->gdAllocate($node_im));
-				}
-			}
-			#}
+            if ($this->selected) {
+                imagerectangle($node_im, $label_x1, $label_y1, $label_x2, $label_y2, $map->selected);
+                // would be nice if it was thicker, too...
+                imagerectangle($node_im, $label_x1 + 1, $label_y1 + 1, $label_x2 - 1, $label_y2 - 1, $map->selected);
+            } else {
+                $olcol = $this->labeloutlinecolour;
+                if ($olcol->isRealColour()) {
+                    imagerectangle($node_im, $label_x1, $label_y1, $label_x2, $label_y2, $olcol->gdAllocate($node_im));
+                }
+            }
+            #}
 
             $fontObject = $this->owner->fonts->getFont($this->labelfont);
 
-			$shcol = $this->labelfontshadowcolour;
+            $shcol = $this->labelfontshadowcolour;
             if ($shcol->isRealColour()) {
                 $fontObject->drawImageString($node_im, $txt_x + 1, $txt_y + 1, $this->proclabel, $shcol->gdAllocate($node_im), $this->labelangle);
             }
@@ -690,26 +618,17 @@ class WeatherMapNode extends WeatherMapDataItem
                 }
             }
             $fontObject->drawImageString($node_im, $txt_x, $txt_y, $this->proclabel, $txcol->gdAllocate($node_im), $this->labelangle);
-			// $map->myimagestring($node_im, $this->labelfont, $txt_x, $txt_y, $this->proclabel, $txcol->gdallocate($node_im),$this->labelangle);
-			//$map->myimagestring($node_im, $this->labelfont, $txt_x, $txt_y, $this->proclabel, $txcol->gdallocate($node_im),90);
-		}
+        }
 
-		# imagerectangle($node_im,$label_x1,$label_y1,$label_x2,$label_y2,$map->black);
-		# imagerectangle($node_im,$icon_x1,$icon_y1,$icon_x2,$icon_y2,$map->black);
+        $this->centre_x = $this->x - $bbox_x1;
+        $this->centre_y = $this->y - $bbox_y1;
 
-		$this->centre_x = $this->x - $bbox_x1;
-//		$map->nodes[$this->name]->centre_x = $this->x - $bbox_x1;
-		$this->centre_y = $this->y - $bbox_y1;
-//		$map->nodes[$this->name]->centre_y = $this->y - $bbox_y1;
-
-		# $this->image = $node_im;
-		$this->image = $node_im;
-//		$map->nodes[$this->name]->image = $node_im;
+        $this->image = $node_im;
 
         $this->makeImageMapAreas();
-	}
+    }
 
-	function update_cache($cachedir,$mapname)
+    function update_cache($cachedir,$mapname)
 	{
 		$cachename = $cachedir."/node_".md5($mapname."/".$this->name).".png";
 		// save this image to a cache, for the editor

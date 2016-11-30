@@ -1528,7 +1528,7 @@ function MakeHTML($imagemapname = "weathermap_imap")
      *
      * @return array
      */
-    private function buildAllItemsList()
+    public function buildAllItemsList()
     {
         // TODO - this should probably be a static, or otherwise cached
         $allItems = array();

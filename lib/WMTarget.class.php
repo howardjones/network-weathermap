@@ -19,6 +19,7 @@ class WMTarget
 
     private $configLineNumber;
     private $configFileName;
+    private $mapItem;
 
     private $values = array();
     private $timestamp;
@@ -32,6 +33,7 @@ class WMTarget
         $this->configLineNumber = $lineNumber;
         $this->pluginRunnable = false;
         $this->pluginObject = null;
+        $this->mapItem = null;
 
         $this->values[IN] = null;
         $this->values[OUT] = null;
@@ -51,14 +53,14 @@ class WMTarget
      */
     public function preProcess(&$mapItem, &$map)
     {
-        // TODO - we could save the mapItem here for better error messages later
+        $this->mapItem = $mapItem;
 
         // We're excluding notes from other plugins here
         // to stop plugin A from messing with plugin B
         $this->finalTargetString = $map->ProcessString($this->originalTargetString, $mapItem, false, false);
 
         if ($this->originalTargetString != $this->finalTargetString) {
-            wm_debug("Targetstring is now %s\n", $this->finalTargetString);
+            wm_debug("%s: Targetstring is now %s\n", $mapItem, $this->finalTargetString);
         }
 
         // if the targetstring starts with a -, then we're taking this value OFF the aggregate
@@ -74,11 +76,14 @@ class WMTarget
             $this->finalTargetString = $matches[2];
             $this->scaleFactor = $this->scaleFactor * floatval($matches[1]);
         }
+        if ($this->scaleFactor != 1.0) {
+            wm_debug("%s: will scale by %f\n", $mapItem, $this->scaleFactor);
+        }
     }
 
     public function findHandlingPlugin($pluginList)
     {
-        wm_debug("Finding handler for '%s'\n", $this->finalTargetString);
+        wm_debug("Finding handler for %s '%s'\n", $this->mapItem, $this->finalTargetString);
         foreach ($pluginList as $name => $pluginEntry) {
             $isRecognised = $pluginEntry['object']->Recognise($this->finalTargetString);
 

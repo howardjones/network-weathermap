@@ -191,7 +191,15 @@ class WeatherMapBase
         assert('is_object($source)');
 
         foreach (array_keys($this->inherit_fieldlist) as $fld) {
-            if ($fld != 'template') $this->$fld = $source->$fld;
+            if ($fld != 'template') {
+                $this->$fld = $source->$fld;
+                if ($fld == 'targets') {
+                    $this->targets = array();
+                    foreach ($source->targets as $tgt) {
+                        $this->targets []= clone $tgt;
+                    }
+                }
+            }
         }
     }
 

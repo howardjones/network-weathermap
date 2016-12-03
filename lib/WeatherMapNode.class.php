@@ -853,21 +853,7 @@ class WeatherMapNode extends WeatherMapDataItem
 
             $output .= $this->getMaxValueConfig($dd, "MAXVALUE");
 
-            foreach ($this->hints as $hintname => $hint) {
-                // all hints for DEFAULT node are for writing
-                // only changed ones, or unique ones, otherwise
-                if (
-                    ($this->name == 'DEFAULT')
-                    ||
-                    (isset($dd->hints[$hintname])
-                        &&
-                        $dd->hints[$hintname] != $hint)
-                    ||
-                    (!isset($dd->hints[$hintname]))
-                ) {
-                    $output .= "\tSET $hintname $hint\n";
-                }
-            }
+            $output .= $this->getHintConfig($dd);
 
             foreach ($this->named_offsets as $off_name => $off_pos) {
                 // if the offset exists with different values, or
@@ -1035,6 +1021,7 @@ class WeatherMapNode extends WeatherMapDataItem
         }
         throw new WeathermapInternalFail("NoSuchProperty");
     }
+
 
     private function getDirectionList()
     {

@@ -726,22 +726,7 @@ class WeatherMapLink extends WeatherMapDataItem
             }
 
             $output .= $this->getMaxValueConfig($dd, "BANDWIDTH");
-
-            foreach ($this->hints as $hintname => $hint) {
-                // all hints for DEFAULT node are for writing
-                // only changed ones, or unique ones, otherwise
-                if (
-                    ($this->name == 'DEFAULT')
-                    ||
-                    (isset($dd->hints[$hintname])
-                        &&
-                        $dd->hints[$hintname] != $hint)
-                    ||
-                    (!isset($dd->hints[$hintname]))
-                ) {
-                    $output .= "\tSET $hintname $hint\n";
-                }
-            }
+            $output .= $this->getHintConfig($dd);
 
             if ($output != '') {
                 $output = "LINK " . $this->name . "\n" . $output . "\n";

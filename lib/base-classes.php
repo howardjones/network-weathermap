@@ -78,6 +78,33 @@ class WeatherMapBase
     }
 
     /**
+     * @param $dd
+     * @param $output
+     * @return string
+     */
+    public function getHintConfig($dd)
+    {
+        $output = "";
+        foreach ($this->hints as $hintName => $hint) {
+            // all hints for DEFAULT node are for writing
+            // only changed ones, or unique ones, otherwise
+            if (
+                ($this->name == 'DEFAULT')
+                ||
+                (isset($dd->hints[$hintName])
+                    &&
+                    $dd->hints[$hintName] != $hint)
+                ||
+                (!isset($dd->hints[$hintName]))
+            ) {
+                $output .= "\tSET $hintName $hint\n";
+            }
+        }
+        return $output;
+    }
+
+
+    /**
      * Get a value for a config variable. Follow the template inheritance tree if necessary.
      * Return an array with the value followed by the status (whether it came from the source object or
      * a template, or just didn't exist). This will replace all that CopyFrom stuff.

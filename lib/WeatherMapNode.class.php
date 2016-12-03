@@ -851,17 +851,7 @@ class WeatherMapNode extends WeatherMapDataItem
                 }
             }
 
-            if (($this->maxValues[IN] != $dd->maxValues[IN])
-                || ($this->maxValues[OUT] != $dd->maxValues[OUT])
-                || ($this->name == 'DEFAULT')
-            ) {
-                if ($this->maxValues[IN] == $this->maxValues[OUT]) {
-                    $output .= "\tMAXVALUE " . $this->maxValuesConfigured[IN] . "\n";
-                } else {
-                    $output
-                        .= "\tMAXVALUE " . $this->maxValuesConfigured[IN] . " " . $this->maxValuesConfigured[OUT] . "\n";
-                }
-            }
+            $output .= $this->getMaxValueConfig($dd, "MAXVALUE");
 
             foreach ($this->hints as $hintname => $hint) {
                 // all hints for DEFAULT node are for writing

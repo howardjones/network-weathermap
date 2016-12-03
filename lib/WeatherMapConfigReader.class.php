@@ -406,8 +406,8 @@ class WeatherMapConfigReader
                     array(
                         'maxValuesConfigured[IN]' => 2,
                         'maxValuesConfigured[OUT]' => 3,
-                        'max_bandwidth_in_cfg' => 2,
-                        'max_bandwidth_out_cfg' => 3
+//                        'max_bandwidth_in_cfg' => 2,
+//                        'max_bandwidth_out_cfg' => 3
                     )
                 ),
                 array(
@@ -416,8 +416,8 @@ class WeatherMapConfigReader
                     array(
                         'maxValuesConfigured[IN]' => 2,
                         'maxValuesConfigured[OUT]' => 2,
-                        'max_bandwidth_in_cfg' => 2,
-                        'max_bandwidth_out_cfg' => 2
+//                        'max_bandwidth_in_cfg' => 2,
+//                        'max_bandwidth_out_cfg' => 2
                     )
                 ),
             ),
@@ -742,8 +742,8 @@ class WeatherMapConfigReader
                     array(
                         'maxValuesConfigured[IN]' => 2,
                         'maxValuesConfigured[OUT]' => 3,
-                        'max_bandwidth_in_cfg' => 2,
-                        'max_bandwidth_out_cfg' => 3
+//                        'max_bandwidth_in_cfg' => 2,
+//                        'max_bandwidth_out_cfg' => 3
                     )
                 ),
                 array(
@@ -752,8 +752,8 @@ class WeatherMapConfigReader
                     array(
                         'maxValuesConfigured[IN]' => 2,
                         'maxValuesConfigured[OUT]' => 2,
-                        'max_bandwidth_in_cfg' => 2,
-                        'max_bandwidth_out_cfg' => 2
+//                        'max_bandwidth_in_cfg' => 2,
+//                        'max_bandwidth_out_cfg' => 2
                     )
                 ),
             ),
@@ -938,8 +938,8 @@ class WeatherMapConfigReader
                     array(
                         'maxValuesConfigured[IN]' => 2,
                         'maxValuesConfigured[OUT]' => 3,
-                        'max_bandwidth_in_cfg' => 2,
-                        'max_bandwidth_out_cfg' => 3
+//                        'max_bandwidth_in_cfg' => 2,
+//                        'max_bandwidth_out_cfg' => 3
                     )
                 ),
                 array(
@@ -948,8 +948,8 @@ class WeatherMapConfigReader
                     array(
                         'maxValuesConfigured[IN]' => 2,
                         'maxValuesConfigured[OUT]' => 2,
-                        'max_bandwidth_in_cfg' => 2,
-                        'max_bandwidth_out_cfg' => 2
+//                        'max_bandwidth_in_cfg' => 2,
+//                        'dwidth_out_cfg' => 2
                     )
                 ),
             ),

@@ -233,18 +233,18 @@ class WeatherMapDataItem extends WeatherMapItem
         }
     }
 
-    protected function getMaxValueConfig($default_default)
+    protected function getMaxValueConfig($default_default, $keyword = "MAXVALUE")
     {
         $output = "";
 
-        if (($this->max_bandwidth_in != $default_default->max_bandwidth_in)
-            || ($this->max_bandwidth_out != $default_default->max_bandwidth_out)
+        if (($this->maxValues[IN] != $default_default->maxValues[IN])
+            || ($this->maxValues[OUT] != $default_default->maxValues[OUT])
             || ($this->name == 'DEFAULT')
         ) {
-            if ($this->max_bandwidth_in == $this->max_bandwidth_out) {
-                $output .= "\tMAXVALUE " . $this->max_bandwidth_in_cfg . "\n";
+            if ($this->maxValues[IN] == $this->maxValues[OUT]) {
+                $output .= "\t$keyword " . $this->maxValuesConfigured[IN] . "\n";
             } else {
-                $output .= "\tMAXVALUE " . $this->max_bandwidth_in_cfg . " " . $this->max_bandwidth_out_cfg . "\n";
+                $output .= "\t$keyword " . $this->maxValuesConfigured[IN] . " " . $this->maxValuesConfigured[OUT] . "\n";
             }
         }
 

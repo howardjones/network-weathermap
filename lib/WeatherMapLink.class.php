@@ -85,6 +85,8 @@ class WeatherMapLink extends WeatherMapDataItem
             'bwlabelformats' => array(FMT_PERC_IN, FMT_PERC_OUT),
             'overliburl' => array(array(), array()),
             'notestext' => array(IN => '', OUT => ''),
+            'maxValuesConfigured' => array(IN => "100M", OUT => "100M"),
+            'maxValues' => array(IN => null, OUT => null),
             'labelstyle' => 'percent',
             'labelboxstyle' => 'classic',
             'linkstyle' => 'twoway',
@@ -95,8 +97,8 @@ class WeatherMapLink extends WeatherMapDataItem
             'bwfontcolour' => new WMColour(0, 0, 0),
             'bwboxcolour' => new WMColour(255, 255, 255),
             'commentfontcolour' => new WMColour(192, 192, 192),
-            'inpercent' => 0,
-            'outpercent' => 0,
+//            'inpercent' => 0,
+//            'outpercent' => 0,
             'inscalekey' => '',
             'outscalekey' => '',
             'a_offset' => 'C',
@@ -109,12 +111,12 @@ class WeatherMapLink extends WeatherMapDataItem
             'b_offset_resolved' => false,
             'zorder' => 300,
             'overlibcaption' => array('', ''),
-            'max_bandwidth_in' => 100000000,
-            'max_bandwidth_out' => 100000000,
-            'bandwidth_in' => 0,
-            'bandwidth_out' => 0,
-            'max_bandwidth_in_cfg' => '100M',
-            'max_bandwidth_out_cfg' => '100M'
+//            'max_bandwidth_in' => 100000000,
+//            'max_bandwidth_out' => 100000000,
+//            'bandwidth_in' => 0,
+//            'bandwidth_out' => 0,
+//            'max_bandwidth_in_cfg' => '100M',
+//            'max_bandwidth_out_cfg' => '100M'
         );
 
         $this->reset($owner);
@@ -723,15 +725,15 @@ class WeatherMapLink extends WeatherMapDataItem
                 }
             }
 
-            if (($this->max_bandwidth_in != $dd->max_bandwidth_in)
-                || ($this->max_bandwidth_out != $dd->max_bandwidth_out)
+            if (($this->maxValues[IN] != $dd->maxValues[IN])
+                || ($this->maxValues[OUT] != $dd->maxValues[OUT])
                 || ($this->name == 'DEFAULT')
             ) {
-                if ($this->max_bandwidth_in == $this->max_bandwidth_out) {
-                    $output .= "\tBANDWIDTH " . $this->max_bandwidth_in_cfg . "\n";
+                if ($this->maxValues[IN] == $this->maxValues[OUT]) {
+                    $output .= "\tBANDWIDTH " . $this->maxValuesConfigured[IN] . "\n";
                 } else {
                     $output
-                        .= "\tBANDWIDTH " . $this->max_bandwidth_in_cfg . " " . $this->max_bandwidth_out_cfg . "\n";
+                        .= "\tBANDWIDTH " . $this->maxValuesConfigured[IN] . " " . $this->maxValuesConfigured[OUT] . "\n";
                 }
             }
 

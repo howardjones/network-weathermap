@@ -11,19 +11,23 @@ class WeatherMapDataItem extends WeatherMapItem
     // (and generally less duplicated code)
     public $maxValues = array();
     public $targets = array();
+
     public $percentUsages = array();
     public $absoluteUsages = array();
     public $maxValuesConfigured = array();
     public $channelScaleColours = array();
 
-    public $bandwidth_in;
-    public $bandwidth_out;
-    public $inpercent;
-    public $outpercent;
-    public $max_bandwidth_in;
-    public $max_bandwidth_out;
-    public $max_bandwidth_in_cfg;
-    public $max_bandwidth_out_cfg;
+    public $scaleTags = array();
+    public $scaleKeys = array();
+
+//    public $bandwidth_in;
+//    public $bandwidth_out;
+//    public $inpercent;
+//    public $outpercent;
+//    public $max_bandwidth_in;
+//    public $max_bandwidth_out;
+//    public $max_bandwidth_in_cfg;
+//    public $max_bandwidth_out_cfg;
 
     public $inscalekey;
     public $outscalekey;
@@ -181,14 +185,20 @@ class WeatherMapDataItem extends WeatherMapItem
 
     public function updateMaxValues($kilo)
     {
-        // while we're looping through, let's set the real bandwidths
-        $this->maxValues[IN] = WMUtility::interpretNumberWithMetricSuffix($this->max_bandwidth_in_cfg, $kilo);
-        $this->maxValues[OUT] = WMUtility::interpretNumberWithMetricSuffix($this->max_bandwidth_out_cfg, $kilo);
+        foreach ($this->getChannelList() as $name => $const) {
+            $this->maxValues[$const] = WMUtility::interpretNumberWithMetricSuffix($this->maxValuesConfigured[$const],
+                $kilo);
+        }
+//        // while we're looping through, let's set the real bandwidths
+//        $this->maxValues[IN] = WMUtility::interpretNumberWithMetricSuffix($this->max_bandwidth_in_cfg, $kilo);
+//        $this->maxValues[OUT] = WMUtility::interpretNumberWithMetricSuffix($this->max_bandwidth_out_cfg, $kilo);
 
-        $this->max_bandwidth_in = $this->maxValues[IN];
-        $this->max_bandwidth_out = $this->maxValues[OUT];
+//        $this->max_bandwidth_in = $this->maxValues[IN];
+//        $this->max_bandwidth_out = $this->maxValues[OUT];
 
-        wm_debug(sprintf("   Setting bandwidth on %s (%s -> %d bps, %s -> %d bps, KILO = %d)\n", $this, $this->max_bandwidth_in_cfg, $this->max_bandwidth_in, $this->max_bandwidth_out_cfg, $this->max_bandwidth_out, $kilo));
+        wm_debug(sprintf("   Setting bandwidth on %s (%s -> %d bps, %s -> %d bps, KILO = %d)\n", $this,
+            $this->maxValuesConfigured[IN], $this->maxValues[IN], $this->maxValuesConfigured[OUT],
+            $this->maxValues[OUT], $kilo));
     }
 
     public function prepareForDataCollection()
@@ -287,8 +297,6 @@ class WeatherMapDataItem extends WeatherMapItem
 
         foreach ($channels as $channelName => $channel) {
             // bodge for now: TODO these should be set in Reset() and readConfig()
-            $maxvar = "max_bandwidth_" . $channelName;
-            $this->maxValues[$channel] = $this->$maxvar;
 
             $value = $this->absoluteUsages[$channel];
 
@@ -299,9 +307,11 @@ class WeatherMapDataItem extends WeatherMapItem
             }
 
             $this->percentUsages[$channel] = ($value / $this->maxValues[$channel]) * 100;
-            $pcvar = $channelName . "percent";
-            $this->$pcvar = $this->percentUsages[$channel];
-            $this->add_note($pcvar, $this->percentUsages[$channel]);
+
+            # set notes with the old names, so the properties are no longer necessary
+            $this->add_note($channelName . "percent", $this->percentUsages[$channel]);
+            $this->add_note("max_bandwidth_" . $channelName, $this->maxValues[$channel]);
+            $this->add_note("max_bandwidth_" . $channelName . "_cfg", $this->maxValuesConfigured[$channel]);
         }
 
 //            if ($this->max_bandwidth_out != $this->max_bandwidth_in) {

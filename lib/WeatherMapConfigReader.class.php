@@ -404,6 +404,8 @@ class WeatherMapConfigReader
 
                     '/^(MAXVALUE)\s+(\d+\.?\d*[KMGT]?)\s+(\d+\.?\d*[KMGT]?)\s*$/i',
                     array(
+                        'maxValuesConfigured[IN]' => 2,
+                        'maxValuesConfigured[OUT]' => 3,
                         'max_bandwidth_in_cfg' => 2,
                         'max_bandwidth_out_cfg' => 3
                     )
@@ -412,6 +414,8 @@ class WeatherMapConfigReader
 
                     '/^(MAXVALUE)\s+(\d+\.?\d*[KMGT]?)\s*$/i',
                     array(
+                        'maxValuesConfigured[IN]' => 2,
+                        'maxValuesConfigured[OUT]' => 2,
                         'max_bandwidth_in_cfg' => 2,
                         'max_bandwidth_out_cfg' => 2
                     )
@@ -736,6 +740,8 @@ class WeatherMapConfigReader
 
                     '/^(MAXVALUE)\s+(\d+\.?\d*[KMGT]?)\s+(\d+\.?\d*[KMGT]?)\s*$/i',
                     array(
+                        'maxValuesConfigured[IN]' => 2,
+                        'maxValuesConfigured[OUT]' => 3,
                         'max_bandwidth_in_cfg' => 2,
                         'max_bandwidth_out_cfg' => 3
                     )
@@ -744,6 +750,8 @@ class WeatherMapConfigReader
 
                     '/^(MAXVALUE)\s+(\d+\.?\d*[KMGT]?)\s*$/i',
                     array(
+                        'maxValuesConfigured[IN]' => 2,
+                        'maxValuesConfigured[OUT]' => 2,
                         'max_bandwidth_in_cfg' => 2,
                         'max_bandwidth_out_cfg' => 2
                     )
@@ -928,6 +936,8 @@ class WeatherMapConfigReader
 
                     '/^(BANDWIDTH)\s+(\d+\.?\d*[KMGT]?)\s+(\d+\.?\d*[KMGT]?)\s*$/i',
                     array(
+                        'maxValuesConfigured[IN]' => 2,
+                        'maxValuesConfigured[OUT]' => 3,
                         'max_bandwidth_in_cfg' => 2,
                         'max_bandwidth_out_cfg' => 3
                     )
@@ -936,6 +946,8 @@ class WeatherMapConfigReader
 
                     '/^(BANDWIDTH)\s+(\d+\.?\d*[KMGT]?)\s*$/i',
                     array(
+                        'maxValuesConfigured[IN]' => 2,
+                        'maxValuesConfigured[OUT]' => 2,
                         'max_bandwidth_in_cfg' => 2,
                         'max_bandwidth_out_cfg' => 2
                     )

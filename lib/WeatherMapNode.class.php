@@ -85,8 +85,8 @@ class WeatherMapNode extends WeatherMapDataItem
             #'incolour'=>-1,'outcolour'=>-1,
             'original_x' => 0,
             'original_y' => 0,
-            'inpercent' => 0,
-            'outpercent' => 0,
+//            'inpercent' => 0,
+//            'outpercent' => 0,
             'labelangle' => 0,
             'iconfile' => '',
             'iconscalew' => 0,
@@ -94,6 +94,8 @@ class WeatherMapNode extends WeatherMapDataItem
             'targets' => array(),
             'named_offsets' => array(),
             'infourl' => array(IN => '', OUT => ''),
+            'maxValuesConfigured' => array(IN => "100", OUT => "100"),
+            'maxValues' => array(IN => null, OUT => null),
             'notestext' => array(IN => '', OUT => ''),
             'notes' => array(),
             'hints' => array(),
@@ -113,10 +115,10 @@ class WeatherMapNode extends WeatherMapDataItem
             'labeloffsetx' => 0,
             'labeloffsety' => 0,
             'zorder' => 600,
-            'max_bandwidth_in' => 100,
-            'max_bandwidth_out' => 100,
-            'max_bandwidth_in_cfg' => '100',
-            'max_bandwidth_out_cfg' => '100'
+//            'max_bandwidth_in' => 100,
+//            'max_bandwidth_out' => 100,
+//            'max_bandwidth_in_cfg' => '100',
+//            'max_bandwidth_out_cfg' => '100'
         );
 
         $this->reset($owner);
@@ -194,13 +196,13 @@ class WeatherMapNode extends WeatherMapDataItem
             $pc = 0;
 
             if ($this->scalevar == 'in') {
-                $pc = $this->inpercent;
+                $pc = $this->percentUsages[IN];
                 $col = $this->colours[IN];
 
             }
 
             if ($this->scalevar == 'out') {
-                $pc = $this->outpercent;
+                $pc = $this->percentUsages[OUT];
                 $col = $this->colours[OUT];
 
             }
@@ -217,14 +219,14 @@ class WeatherMapNode extends WeatherMapDataItem
             $val = 0;
 
             if ($this->iconscalevar == 'in') {
-                $pc = $this->inpercent;
+                $pc = $this->percentUsages[IN];
                 //$col = $this->colours[IN];
-                $val = $this->bandwidth_in;
+                $val = $this->absoluteUsages[IN];
             }
             if ($this->iconscalevar == 'out') {
-                $pc = $this->outpercent;
+                $pc = $this->percentUsages[OUT];
                 //$col = $this->colours[OUT];
-                $val = $this->bandwidth_out;
+                $val = $this->absoluteUsages[OUT];
             }
 
             if ($this->iconscaletype == 'percent') {
@@ -344,13 +346,13 @@ class WeatherMapNode extends WeatherMapDataItem
                     $val = 0;
 
                     if ($this->iconscalevar == 'in') {
-                        $pc = $this->inpercent;
-                        $val = $this->bandwidth_in;
+                        $pc = $this->percentUsages[IN];
+                        $val = $this->absoluteUsages[IN];
                     }
 
                     if ($this->iconscalevar == 'out') {
-                        $pc = $this->outpercent;
-                        $val = $this->bandwidth_out;
+                        $pc = $this->percentUsages[OUT];
+                        $val = $this->absoluteUsages[OUT];
                     }
 
                     if ($this->iconscaletype == 'percent') {
@@ -443,21 +445,26 @@ class WeatherMapNode extends WeatherMapDataItem
                 // XXX - needs proper colours
                 if ($this->iconfile == 'inpie' || $this->iconfile == 'outpie') {
 
-                    if ($this->iconfile == 'inpie') $segment_angle = (($this->inpercent) / 100) * 360;
-                    if ($this->iconfile == 'outpie') $segment_angle = (($this->outpercent) / 100) * 360;
+                    if ($this->iconfile == 'inpie') {
+                        $segment_angle = (($this->percentUsages[IN]) / 100) * 360;
+                    }
+                    if ($this->iconfile == 'outpie') {
+                        $segment_angle = (($this->percentUsages[OUT]) / 100) * 360;
+                    }
 
                     $rx = $this->iconscalew / 2 - 1;
                     $ry = $this->iconscaleh / 2 - 1;
 
-                    if ($fill !== NULL && !$fill->isNone()) {
+                    if ($fill !== null && !$fill->isNone()) {
                         imagefilledellipse($icon_im, $rx, $ry, $rx * 2, $ry * 2, $fill->gdallocate($icon_im));
                     }
 
-                    if ($ink !== NULL && !$ink->isNone()) {
-                        imagefilledarc($icon_im, $rx, $ry, $rx * 2, $ry * 2, 0, $segment_angle, $ink->gdallocate($icon_im), IMG_ARC_PIE);
+                    if ($ink !== null && !$ink->isNone()) {
+                        imagefilledarc($icon_im, $rx, $ry, $rx * 2, $ry * 2, 0, $segment_angle,
+                            $ink->gdallocate($icon_im), IMG_ARC_PIE);
                     }
 
-                    if ($fill !== NULL && !$fill->isNone()) {
+                    if ($fill !== null && !$fill->isNone()) {
                         imageellipse($icon_im, $rx, $ry, $rx * 2, $ry * 2, $fill->gdallocate($icon_im));
                     }
                 }
@@ -844,15 +851,15 @@ class WeatherMapNode extends WeatherMapDataItem
                 }
             }
 
-            if (($this->max_bandwidth_in != $dd->max_bandwidth_in)
-                || ($this->max_bandwidth_out != $dd->max_bandwidth_out)
+            if (($this->maxValues[IN] != $dd->maxValues[IN])
+                || ($this->maxValues[OUT] != $dd->maxValues[OUT])
                 || ($this->name == 'DEFAULT')
             ) {
-                if ($this->max_bandwidth_in == $this->max_bandwidth_out) {
-                    $output .= "\tMAXVALUE " . $this->max_bandwidth_in_cfg . "\n";
+                if ($this->maxValues[IN] == $this->maxValues[OUT]) {
+                    $output .= "\tMAXVALUE " . $this->maxValuesConfigured[IN] . "\n";
                 } else {
                     $output
-                        .= "\tMAXVALUE " . $this->max_bandwidth_in_cfg . " " . $this->max_bandwidth_out_cfg . "\n";
+                        .= "\tMAXVALUE " . $this->maxValuesConfigured[IN] . " " . $this->maxValuesConfigured[OUT] . "\n";
                 }
             }
 

@@ -439,14 +439,13 @@ class WeatherMap extends WeatherMapBase
         return $output;
     }
 
-function RandomData()
-{
-	foreach ($this->links as $link)
-	{
-		$this->links[$link->name]->bandwidth_in=rand(0, $link->max_bandwidth_in);
-		$this->links[$link->name]->bandwidth_out=rand(0, $link->max_bandwidth_out);
-	}
-}
+    function RandomData()
+    {
+        foreach ($this->links as $link) {
+            $this->links[$link->name]->absoluteUsages[IN] = rand(0, $link->maxValues[IN]);
+            $this->links[$link->name]->absoluteUsages[IN] = rand(0, $link->maxValues[OUT]);
+        }
+    }
 
 
 
@@ -764,12 +763,12 @@ function RandomData()
             if ($fd) {
                 foreach ($this->nodes as $node) {
                     if (!preg_match('/^::\s/', $node->name) && sizeof($node->targets) > 0) {
-                        fputs($fd, sprintf("N_%s\t%f\t%f\r\n", $node->name, $node->bandwidth_in, $node->bandwidth_out));
+                        fputs($fd, sprintf("N_%s\t%f\t%f\r\n", $node->name, $node->absoluteUsages[IN], $node->absoluteUsages[OUT]));
                     }
                 }
                 foreach ($this->links as $link) {
                     if (!preg_match('/^::\s/', $link->name) && sizeof($link->targets) > 0) {
-                        fputs($fd, sprintf("L_%s\t%f\t%f\r\n", $link->name, $link->bandwidth_in, $link->bandwidth_out));
+                        fputs($fd, sprintf("L_%s\t%f\t%f\r\n", $link->name, $link->absoluteUsages[IN], $link->absoluteUsages[OUT]));
                     }
                 }
                 fclose($fd);

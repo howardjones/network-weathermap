@@ -1,11 +1,6 @@
-This is a roll-up of all the small bugfixes for the last couple of years, especially those that stop Weathermap
-working with newer MySQL or PHP versions. There is a more substantial 1.0 release in the works, but I will backport
-any simple improvements or fixes to 0.98(abcd) releases. There are also small usability changes aimed at reducing
-repeat "error reports" in the forums.
-
-IMPORTANT NOTE - you may need to reset permissions on your users after upgrading, as I've
-finally switched to the "new-style" plugin API that's been around for 5+ years. This handles
-permissions differently, unfortunately.
+After planning to only add small fixes to 0.98, some changes turned out to be larger than expected, and rather than half-solve
+something I knew was already taken care of in the larger rewrite, I've pulled over a lot of the code from that rewrite, and will
+probably discard the remains, making this the master branch again, at some point soon.
 
 0.98a
     CHANGE - Various performance improvements (thanks to ikorzha758 for lots of feedback back in 2014)
@@ -18,6 +13,12 @@ permissions differently, unfortunately.
              * Rewritten drawing code for links
     FIXED - PHP 5.3 bug introduced in command-line tool in 0.98
     ADDED - SNMPv2c and SNMPv3 datasource plugins
+    ADDED - Nodes can have named offsets defined with DEFINEOFFSET. Those names can be used in the NODES command for links
+            and also for positioning other nodes. Defined offsets are inherited in templates. Think of switch ports on a switch image.
+
+IMPORTANT NOTE for 0.98 and later - you may need to reset permissions on your users after upgrading, as I've
+finally switched to the "new-style" plugin API that's been around for 5+ years. This handles
+permissions differently, unfortunately.
 
 0.98
     FIXED - MySQL error in table-creation. MySQL 5.6 is fussier.

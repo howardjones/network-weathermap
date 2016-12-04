@@ -10,6 +10,7 @@ class WeatherMapDataItem extends WeatherMapItem
     // arrays to replace a lot of what follows. Paving the way for >2 channels of data.
     // (and generally less duplicated code)
     public $maxValues = array();
+    /** @var WMTarget[] $targets */
     public $targets = array();
 
     public $percentUsages = array();
@@ -45,6 +46,7 @@ class WeatherMapDataItem extends WeatherMapItem
     public $overlibcaption;
 
     public $id;
+    /** @var WMColour[] $colours */
     public $colours = array();
     public $template;
     public $notestext = array();

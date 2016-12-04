@@ -15,6 +15,7 @@ class WeatherMapNode extends WeatherMapDataItem
     var $label, $proclabel;
     var $labelangle;
     var $selected = 0;
+    var $position;
 
     var $pos_named;
     var $named_offsets;
@@ -23,9 +24,13 @@ class WeatherMapNode extends WeatherMapDataItem
     var $iconfile, $iconscalew, $iconscaleh;
     var $labeloffset, $labeloffsetx, $labeloffsety;
 
+    /** @var  WMColour $labelbgcolour */
     var $labelbgcolour;
+    /** @var  WMColour $labeloutlinecolour */
     var $labeloutlinecolour;
+    /** @var  WMColour $labelfontcolour */
     var $labelfontcolour;
+    /** @var  WMColour $labelfontshadowcolour */
     var $labelfontshadowcolour;
 
     var $labelfont;
@@ -38,6 +43,10 @@ class WeatherMapNode extends WeatherMapDataItem
     var $relative_to;
     var $polar;
     var $boundingboxes = array();
+    /** @var  WMColour $aiconfillcolour */
+    public $aiconfillcolour;
+    /** @var  WMColour $aiconoutlinecolour */
+    public $aiconoutlinecolour;
 
     /**
      * WeatherMapNode constructor.
@@ -157,6 +166,10 @@ class WeatherMapNode extends WeatherMapDataItem
         return "NODE";
     }
 
+    /**
+     * @param resource $im
+     * @param WeatherMap $map
+     */
     function pre_render($im, &$map)
     {
         if (!$this->drawable) {
@@ -173,6 +186,10 @@ class WeatherMapNode extends WeatherMapDataItem
 
         // start these off with sensible values, so that bbox
         // calculations are easier.
+
+        $txt_x = $this->x;
+        $txt_y = $this->y;
+
         $icon_x1 = $this->x;
         $icon_x2 = $this->x;
         $icon_y1 = $this->y;
@@ -445,6 +462,7 @@ class WeatherMapNode extends WeatherMapDataItem
                 // XXX - needs proper colours
                 if ($this->iconfile == 'inpie' || $this->iconfile == 'outpie') {
 
+                    $segment_angle = 0;
                     if ($this->iconfile == 'inpie') {
                         $segment_angle = (($this->percentUsages[IN]) / 100) * 360;
                     }
@@ -1008,7 +1026,7 @@ class WeatherMapNode extends WeatherMapDataItem
             imagedestroy($this->image);
         }
         $this->owner = null;
-        $this->parent = null;
+     //   $this->parent = null;
         $this->descendents = null;
         $this->image = null;
     }

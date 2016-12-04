@@ -61,7 +61,8 @@ $args = $cg->readPHPArgv();
 
 $ret = $cg->getopt($args, $short_opts, $long_opts);
 
-if ((new PEAR)->isError($ret)) {
+$pear = new PEAR;
+if ($pear->isError($ret)) {
     die ("Error in command line: " . $ret->getMessage() . "\n (try --help)\n");
 }
 
@@ -115,8 +116,8 @@ if (sizeof($gopts) > 0) {
                 $weathermap_debug_suppress = array();
             // FALL THROUGH
             case '--debug':
-                $options_output['debugging'] = TRUE;
-                $weathermap_debugging = TRUE;
+                $options_output['debugging'] = true;
+                $weathermap_debugging = true;
 
                 // enable assertion handling
                 assert_options(ASSERT_ACTIVE, 1);
@@ -135,12 +136,12 @@ if (sizeof($gopts) > 0) {
             case '--sizedebug':
             case '--no-data':
                 //$map->sizedebug=TRUE;
-                $options_output['sizedebug'] = TRUE;
+                $options_output['sizedebug'] = true;
                 break;
 
             case '--bulge':
                 //$map->widthmod=TRUE;
-                $options_output['widthmod'] = TRUE;
+                $options_output['widthmod'] = true;
                 break;
 
             case '--output':
@@ -199,7 +200,7 @@ if (sizeof($gopts) > 0) {
 
 // set this BEFORE we create the map object, so we get the debug output from Reset(), as well
 if (isset($options_output['debugging']) && $options_output['debugging']) {
-    $weathermap_debugging = TRUE;
+    $weathermap_debugging = true;
     wm_debug("------------------------------------\n");
     wm_debug("Starting PHP-Weathermap run, with config: $configfile\n");
     wm_debug("------------------------------------\n");
@@ -254,8 +255,6 @@ if ($map->ReadConfig($configfile)) {
         }
     }
 
-    # exit();
-
     if ($imagefile != '') {
         $map->DrawMap($imagefile);
         $map->imagefile = $imagefile;
@@ -267,8 +266,11 @@ if ($map->ReadConfig($configfile)) {
         $fd = fopen($htmlfile, 'w');
         fwrite($fd,
             '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head>');
-        if ($map->htmlstylesheet != '') fwrite($fd, '<link rel="stylesheet" type="text/css" href="' . $map->htmlstylesheet . '" />');
-        fwrite($fd, '<meta http-equiv="refresh" content="300" /><title>' . $map->ProcessString($map->title, $map) . '</title></head><body>');
+        if ($map->htmlstylesheet != '') {
+            fwrite($fd, '<link rel="stylesheet" type="text/css" href="' . $map->htmlstylesheet . '" />');
+        }
+        fwrite($fd, '<meta http-equiv="refresh" content="300" /><title>' . $map->ProcessString($map->title,
+                $map) . '</title></head><body>');
 
         if ($map->htmlstyle == "overlib") {
             fwrite($fd,
@@ -285,34 +287,29 @@ if ($map->ReadConfig($configfile)) {
         fclose($fd);
     }
 
-    if ($dumpconfig != '')
+    if ($dumpconfig != '') {
         $map->WriteConfig($dumpconfig);
+    }
 
-    if ($dumpstats != '')
+    if ($dumpstats != '') {
         $map->DumpStats();
+    }
 
     if ($map->dataoutputfile != '') {
         $map->WriteDataFile($map->dataoutputfile);
     }
 
-    if ($dumpafter == 1)
+    if ($dumpafter == 1) {
         print_r($map);
-
-//	print_r($map->imagecache);
-
-#	print_r ($map->node_template_tree);
-#	print_r ($map->link_template_tree);
-
-    # $map->cachefolder="editcache";
-    # $map->CacheUpdate(1);
+    }
 
     if ($setdebug) {
         foreach ($map->buildAllItemsList() as $item) {
             print "$item->name :\n";
-            foreach ($item->hints as $n=>$v) {
+            foreach ($item->hints as $n => $v) {
                 print "  SET $n = $v\n";
             }
-            foreach ($item->notes as $n=>$v) {
+            foreach ($item->notes as $n => $v) {
                 print "  -> $n = $v\n";
             }
             print "\n";
@@ -333,4 +330,4 @@ function my_assert_handler($file, $line, $code)
     exit();
 }
 
-// vim:ts=4:sw=4:
+/// vim:ts=4:sw=4:

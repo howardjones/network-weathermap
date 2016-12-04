@@ -78,8 +78,7 @@ class WeatherMapBase
     }
 
     /**
-     * @param $dd
-     * @param $output
+     * @param WeatherMapBase $dd
      * @return string
      */
     public function getHintConfig($dd)

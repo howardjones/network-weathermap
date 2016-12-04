@@ -34,10 +34,15 @@ class WeatherMapLink extends WeatherMapDataItem
     var $bwfont;
     var $commentfont;
 
+    /** @var WMColour $outlinecolour */
     var $outlinecolour;
+    /** @var  WMColour $bwoutlinecolour */
     var $bwoutlinecolour;
+    /** @var  WMColour $bwboxcolour */
     var $bwboxcolour;
+    /** @var  WMColour $commentfontcolour */
     var $commentfontcolour;
+    /** @var  WMColour $bwfontcolour */
     var $bwfontcolour;
 
     var $bwlabelformats = array();
@@ -222,6 +227,7 @@ class WeatherMapLink extends WeatherMapDataItem
             $nudgeAlong = intval($this->get_hint("comment_nudgealong"));
             $nudgeOut = intval($this->get_hint("comment_nudgeout"));
 
+            /** @var WMPoint $position */
             list ($position, $comment_index, $angle, $distance) = $this->geometry->findPointAndAngleAtPercentageDistance($commentPositions[$direction]);
 
             $tangent = $this->geometry->findTangentAtIndex($comment_index);
@@ -272,7 +278,7 @@ class WeatherMapLink extends WeatherMapDataItem
     }
 
     /***
-     * @param $map
+     * @param WeatherMap $map
      * @throws WeathermapInternalFail
      */
     function preCalculate(&$map)
@@ -685,13 +691,8 @@ class WeatherMapLink extends WeatherMapDataItem
                 $output .= "\n";
             }
 
-            foreach (array(IN, OUT) as $dir) {
-                if ($dir == IN) {
-                    $tdir = "IN";
-                }
-                if ($dir == OUT) {
-                    $tdir = "OUT";
-                }
+            foreach (array("IN", "OUT") as $tdir) {
+                $dir = constant($tdir);
 
                 $comparison = $dd->comments[$dir];
                 if ($this->comments[$dir] != $comparison) {
@@ -762,8 +763,8 @@ class WeatherMapLink extends WeatherMapDataItem
         $output .= WMUtility::jsEscape(trim($tgt));
         $output .= ",";
 
-        $output .= "bw_in:" . WMUtility::jsEscape($this->max_bandwidth_in_cfg) . ", ";
-        $output .= "bw_out:" . WMUtility::jsEscape($this->max_bandwidth_out_cfg) . ", ";
+        $output .= "bw_in:" . WMUtility::jsEscape($this->maxValuesConfigured[IN]) . ", ";
+        $output .= "bw_out:" . WMUtility::jsEscape($this->maxValuesConfigured[OUT]) . ", ";
 
         $output .= "name:" . WMUtility::jsEscape($this->name) . ", ";
         $output .= "overlibwidth:'" . $this->overlibheight . "', ";
@@ -811,7 +812,7 @@ class WeatherMapLink extends WeatherMapDataItem
         $this->owner = null;
         $this->a = null;
         $this->b = null;
-        $this->parent = null;
+       // $this->parent = null;
         $this->descendents = null;
     }
 

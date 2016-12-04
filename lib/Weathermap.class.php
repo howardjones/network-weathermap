@@ -9,6 +9,55 @@ require_once "all.php";
 
 // ***********************************************
 
+class WeatherMapTextItem
+{
+    var $configuredText;
+    var $processedText;
+    /** @var  WMPoint $position */
+    var $position;
+    var $font;
+    /** @var  WMColour $colour */
+    var $colour;
+
+    var $prefix;
+
+    function getConfig(&$map)
+    {
+        $output = "";
+
+        $output .= "# TITLEPOS\n";
+        $output .= "# TITLEFONT\n";
+        $output .= "# TITLECOLOR\n";
+
+        return $output;
+    }
+
+    function draw($imageRef, &$map)
+    {
+        $fontObject = $map->fonts->getFont($this->font);
+        $string = $this->ProcessString($this->configuredText, $map);
+
+        if ($map->get_hint('screenshot_mode') == 1) {
+            $string = WMUtility::stringAnonymise($string);
+        }
+
+        list($boxwidth, $boxheight) = $fontObject->calculateImageStringSize($string);
+
+        $x = 10;
+        $y = $this->position->y - $boxheight;
+
+        if (($this->position->x >= 0) && ($this->position->y >= 0)) {
+            $x = $this->position->x;
+            $y = $this->position->y;
+        }
+
+        $fontObject->drawImageString($imageRef, $x, $y, $string, $this->colour->gdAllocate($imageRef));
+
+        $map->imap->addArea("Rectangle", "TITLE", '', array($x, $y, $x + $boxwidth, $y - $boxheight));
+        $map->imap_areas[] = 'TITLE';
+    }
+}
+
 class WeatherMap extends WeatherMapBase
 {
     /** @var WeatherMapNode[] $nodes */
@@ -27,6 +76,7 @@ class WeatherMap extends WeatherMapBase
     var $width, $height;
     var $htmlstyle;
 
+    /** @var  HTML_ImageMap $imap */
     var $imap;
 
 //     var $colours;
@@ -92,6 +142,7 @@ class WeatherMap extends WeatherMapBase
     var $colourtable = array();
     var $warncount = 0;
 
+    /** @var WeatherMapScale[] $scales */
     var $scales;
     var $fonts;
     // var $numscales;
@@ -1057,15 +1108,14 @@ function DrawMap($filename = '', $thumbnailfile = '', $thumbnailmax = 250, $with
     // TODO - the geometry part should be in preCalculate()
 		foreach ($this->nodes as $node)
 		{
-			// don't try and draw template nodes
 			wm_debug("Pre-rendering ".$node->name." to get bounding boxes.\n");
-			if (!is_null($node->x)) {
-        $this->nodes[$node->name]->preCalculate($this);
-        $this->nodes[$node->name]->pre_render($image, $this);
-      }
+			if (! $node->isTemplate()) {
+                $node->preCalculate($this);
+                $node->pre_render($image, $this);
+            }
 		}
 
-    $this->preCalculate();
+        $this->preCalculate();
 
 
 		$all_layers = array_keys($this->seen_zlayers);

@@ -238,10 +238,10 @@ else
 
 		$link_name = $_REQUEST['link_name'];
 		$link_config = fix_gpc_string($_REQUEST['item_configtext']);
-
+        $link_config = str_replace (array("\r\n", "\n", "\r"), "\n", $link_config);
 		if (isset($map->links[$link_name])) {		                
-		    $map->links[$link_name]->config_override = $link_config;
-		    
+		    $map->links[$link_name]->replaceConfig($link_config);
+
 		    $map->WriteConfig($mapfile);
 		    // now clear and reload the map object, because the in-memory one is out of sync
 		    // - we don't know what changes the user made here, so we just have to reload.
@@ -257,10 +257,11 @@ else
 
 		$node_name = $_REQUEST['node_name'];
 		$node_config = fix_gpc_string($_REQUEST['item_configtext']);
+        $node_config = str_replace (array("\r\n", "\n", "\r"), "\n", $node_config);
 		
 		if (isset($map->nodes[$node_name])) {		                
-		    $map->nodes[$node_name]->config_override = $node_config;
-		    
+		    $map->nodes[$node_name]->replaceConfig($node_config);
+
 		    $map->WriteConfig($mapfile);
 		    // now clear and reload the map object, because the in-memory one is out of sync
 		    // - we don't know what changes the user made here, so we just have to reload.
@@ -458,22 +459,22 @@ else
 
 		if (($bwin_old != $bwin) || ($bwout_old != $bwout) )
 		{
-			$map->links['DEFAULT']->max_bandwidth_in_cfg = $bwin;
-			$map->links['DEFAULT']->max_bandwidth_out_cfg = $bwout;
-			$map->links['DEFAULT']->max_bandwidth_in = WMUtility::interpretNumberWithMetricSuffixOrNull($bwin, $map->kilo);
-                        $map->links['DEFAULT']->max_bandwidth_out = WMUtility::interpretNumberWithMetricSuffixOrNull($bwout, $map->kilo);
+			$map->links['DEFAULT']->maxValuesConfigured[IN] = $bwin;
+			$map->links['DEFAULT']->maxValuesConfigured[OUT] = $bwout;
+			$map->links['DEFAULT']->maxValues[IN] = WMUtility::interpretNumberWithMetricSuffixOrNull($bwin, $map->kilo);
+            $map->links['DEFAULT']->maxValues[OUT] = WMUtility::interpretNumberWithMetricSuffixOrNull($bwout, $map->kilo);
 			
-			// $map->defaultlink->SetBandwidth($bwin,$bwout);
+			// TODO $map->defaultlink->SetBandwidth($bwin,$bwout);
 			foreach ($map->links as $link)
 			{
-			    if (($link->max_bandwidth_in_cfg == $bwin_old) || ($link->max_bandwidth_out_cfg == $bwout_old) )
+			    if (($link->maxValuesConfigured[IN] == $bwin_old) || ($link->maxValuesConfigured[OUT] == $bwout_old) )
 			    {
-	    //			$link->SetBandwidth($bwin,$bwout);
+	    //		TODO	$link->SetBandwidth($bwin,$bwout);
 				    $link_name = $link->name;
-				    $map->links[$link_name]->max_bandwidth_in_cfg = $bwin;
-				    $map->links[$link_name]->max_bandwidth_out_cfg = $bwout;
-				    $map->links[$link_name]->max_bandwidth_in = WMUtility::interpretNumberWithMetricSuffixOrNull($bwin, $map->kilo);
-				    $map->links[$link_name]->max_bandwidth_out = WMUtility::interpretNumberWithMetricSuffixOrNull($bwout, $map->kilo);
+				    $map->links[$link_name]->maxValuesConfigured[IN] = $bwin;
+				    $map->links[$link_name]->maxValuesConfigured[OUT] = $bwout;
+				    $map->links[$link_name]->maxValues[IN] = WMUtility::interpretNumberWithMetricSuffixOrNull($bwin, $map->kilo);
+				    $map->links[$link_name]->maxValues[OUT] = WMUtility::interpretNumberWithMetricSuffixOrNull($bwout, $map->kilo);
 			    }
 			}
 		}

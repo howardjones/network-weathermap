@@ -1470,15 +1470,11 @@ class WeatherMapConfigReader
         $key = str_replace("COLOR", "", strtoupper($args[0]));
         $val = strtolower($args[1]);
 
-        $red = 0;
-        $green = 0;
-        $blue = 0;
-
         // this is a regular colour setting thing
-
         if (isset($args[2])) {
             $wmc = new WMColour($args[1], $args[2], $args[3]);
         } else {
+            // it's a special colour
             $wmc = new WMColour($val);
         }
         $this->mapObject->colourtable[$key] = $wmc;
@@ -1513,9 +1509,13 @@ class WeatherMapConfigReader
         }
         if ($svar != '') {
             $this->currentObject->$varname = $svar;
+            $this->currentObject->setConfigValue($varname, $svar);
         }
         $this->currentObject->$tvarname = $stype;
+        $this->currentObject->setConfigValue($tvarname, $stype);
         $this->currentObject->$uvarname = $matches[2];
+        $this->currentObject->setConfigValue($uvarname, $matches[2]);
+
         return true;
     }
 
@@ -1561,15 +1561,18 @@ class WeatherMapConfigReader
 
     function handleOVERLIB($fullcommand, $args, $matches)
     {
+
         $this->has_overlibs = true;
         $urls = preg_split('/\s+/', $matches[1], -1, PREG_SPLIT_NO_EMPTY);
-        if ($args[0] == 'INOVERLIBGRAPH') {
+        $keyword = strtoupper($args[0]);
+
+        if ($keyword == 'INOVERLIBGRAPH') {
             $index = IN;
         }
-        if ($args[0] == 'OUTOVERLIBGRAPH') {
+        if ($keyword == 'OUTOVERLIBGRAPH') {
             $index = OUT;
         }
-        if ($args[0] == 'OVERLIBGRAPH') {
+        if ($keyword == 'OVERLIBGRAPH') {
             $this->currentObject->overliburl[IN] = $urls;
             $this->currentObject->overliburl[OUT] = $urls;
         } else {
@@ -1676,6 +1679,7 @@ class WeatherMapConfigReader
     private function handleARROWSTYLE($fullcommand, $args, $matches)
     {
         $this->currentObject->arrowstyle = $matches[1] . ' ' . $matches[2];
+        $this->currentObject->setConfigValue("arrowstyle", $matches[1] . ' ' . $matches[2]);
         return true;
     }
 
@@ -1833,6 +1837,7 @@ class WeatherMapConfigReader
     public function dumpKeywords()
     {
         $count = 0;
+        print "# Complete configuration keyword list\n\n";
         foreach ($this->configKeywords as $scope => $keywords) {
             print "\n\n# $scope\n";
             ksort($keywords);
@@ -1841,20 +1846,20 @@ class WeatherMapConfigReader
                 print "\n## $keyword\n";
                 foreach ($matches as $match) {
 
-                    $nicer = str_replace("\\", "\\\\", $match[1]);
+                    $nicer = str_replace("\\", "\\\\", $match[0]);
 
                     print "\n### $nicer\n";
                     if (is_array($match[1])) {
                         foreach ($match[1] as $key => $val) {
                             $escval = $val;
                             if (substr($val, 0, 1) == "#") {
-                                $escval = "'" . substr($val, 1.) . "'";
+                                $escval = "\"" . substr($val, 1.) . "\"";
                             }
 
-                            print "\n* $escval => $scope->$key\n";
+                            print "\n* $escval &#x21d2; `$scope->$key`\n";
                         }
                     } else {
-                        print "\n* -> $match[1]()\n";
+                        print "\n* &#x2192; `$match[1]()`\n";
                     }
                     $count++;
                 }

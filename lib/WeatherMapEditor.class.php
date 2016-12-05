@@ -203,8 +203,8 @@ class WeatherMapEditor
 
                     $angle_old = $oldVector->getAngle();
                     $angle_new = $newVector->getAngle();
-                    $l_new = $newVector->getLength();
-                    $l_old = $oldVector->getLength();
+                    $l_new = $newVector->length();
+                    $l_old = $oldVector->length();
 
                     # $log .= "$pivx,$pivy\n$dx_old $dy_old $l_old => $angle_old\n";
                     # $log .= "$dx_new $dy_new $l_new => $angle_new\n";
@@ -504,7 +504,7 @@ class WeatherMapEditor
      * tidyOneLink - change link offsets so that link is horizonal or vertical, if possible.
      *  if not possible, change offsets to the closest facing compass points
      *
-     * @param string $link - the link name to tidy
+     * @param WeatherMapLink $link - the link to tidy
      * @param int $linknumber - if this is part of a group, which number in the group
      * @param int $linktotal - if this is part of a group, how many total in the group
      * @param bool $ignore_tidied - whether to take notice of the "_tidied" hint
@@ -636,7 +636,7 @@ class WeatherMapEditor
      *
      * @param number[] $rangeA
      * @param number[] $rangeB
-     * @return number list($min,$max)
+     * @return number[] list($min,$max)
      */
     static function findCommonRange($rangeA, $rangeB)
     {

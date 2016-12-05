@@ -1050,6 +1050,12 @@ class WeatherMapNode extends WeatherMapDataItem
         return array(OUT);
     }
 
+    function getTemplateObject()
+    {
+        return $this->owner->getNode($this->template);
+    }
+
+
 }
 
 ;

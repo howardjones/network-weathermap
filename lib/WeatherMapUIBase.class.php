@@ -137,7 +137,7 @@ class WeatherMapUIBase
             $handler = $this->commands[":: DEFAULT ::"];
         }
         if (null === $handler) {
-            return;
+            return null;
         }
 
         // TODO - add argument parse/validation in here

@@ -328,6 +328,11 @@ class WeatherMapEditorUI extends WeatherMapUIBase
         return false;
     }
 
+    /**
+     * @param string[] $params
+     * @param WeatherMapEditor $editor
+     * @return bool
+     */
     function cmdDrawFontSamples($params, $editor)
     {
         header("Content-type: image/png");
@@ -352,7 +357,7 @@ class WeatherMapEditorUI extends WeatherMapUIBase
     // cmd* methods below here translate form inputs into Editor API calls, which do the real work
 
     /**
-     * @param $map
+     * @param WeatherMap $map
      * @return resource
      */
     function generateFontSampleImage($map)
@@ -399,6 +404,7 @@ class WeatherMapEditorUI extends WeatherMapUIBase
         imagecopy($final_image, $im_fonts, 0, 0, 0, 0, $x, $sampleheight);
         imagecopy($final_image, $im_key, 0, $sampleheight, 0, 0, $x, $keyheight);
         imagedestroy($im_fonts);
+
         return $final_image;
     }
 
@@ -442,6 +448,10 @@ class WeatherMapEditorUI extends WeatherMapUIBase
         return $result;
     }
 
+    /**
+     * @param string[] $params
+     * @param WeatherMapEditor $editor
+     */
     function cmdAddLinkInitial($params, $editor)
     {
         $selected = 'NODE:' . $params['param'];
@@ -464,26 +474,43 @@ class WeatherMapEditorUI extends WeatherMapUIBase
         $this->next_action = $action;
     }
 
+
     function setParam2($value)
     {
         $this->param2 = $value;
     }
 
+    /**
+     * @param string[] $params
+     * @param WeatherMapEditor $editor
+     */
     function cmdAddLinkFinal($params, $editor)
     {
         $editor->addLink($params['param'], $params['param2']);
     }
 
+    /**
+     * @param string[] $params
+     * @param WeatherMapEditor $editor
+     */
     function cmdAddLinkVia($params, $editor)
     {
         $editor->setLinkVia($params['param'], $params['x'], $params['y']);
     }
 
+    /**
+     * @param string[] $params
+     * @param WeatherMapEditor $editor
+     */
     function cmdLinkStraighten($params, $editor)
     {
         $editor->clearLinkVias($params['param']);
     }
 
+    /**
+     * @param string[] $params
+     * @param WeatherMapEditor $editor
+     */
     function cmdEditLink($params, $editor)
     {
 
@@ -575,6 +602,10 @@ class WeatherMapEditorUI extends WeatherMapUIBase
         $editor->saveConfig($this->mapfile);
     }
 
+    /**
+     * @param string[] $params
+     * @param WeatherMapEditor $editor
+     */
     function cmdGetItemConfig($params, $editor)
     {
         header('Content-type: text/plain');
@@ -589,11 +620,19 @@ class WeatherMapEditorUI extends WeatherMapUIBase
         return false;
     }
 
+    /**
+     * @param string[] $params
+     * @param WeatherMapEditor $editor
+     */
     function cmdReplaceNodeConfig($params, $editor)
     {
         $editor->replaceNodeConfig($params['node_name'], $params['item_configtext']);
     }
 
+    /**
+     * @param string[] $params
+     * @param WeatherMapEditor $editor
+     */
     function cmdReplaceLinkConfig($params, $editor)
     {
         $editor->replaceLinkConfig($params['link_name'], $params['item_configtext']);

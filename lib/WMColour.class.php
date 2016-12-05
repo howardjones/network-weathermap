@@ -55,12 +55,21 @@ class WMColour
         }
     }
 
+    /**
+     * @return int[]
+     */
     public function getComponents()
     {
         return array($this->red, $this->green, $this->blue);
     }
 
-    // return true if two colours are identical
+    /**
+     * return true if two colours are identical
+     *
+     * @param WMColour $colour2
+     * @return bool
+     * @throws WeathermapInternalFail
+     */
     public function equals($colour2)
     {
         if (null == $colour2) {
@@ -75,7 +84,13 @@ class WMColour
         return false;
     }
 
-    // take this colour, and that colour, and make a new one in the ratio given
+    /**
+     * take this colour, and that colour, and make a new one in the ratio given
+     *
+     * @param WMColour $colour2
+     * @param float $ratio
+     * @return WMColour
+     */
     public function blendWith($colour2, $ratio)
     {
         $red = $this->red + ($colour2->red - $this->red) * $ratio;

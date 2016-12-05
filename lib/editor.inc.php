@@ -173,8 +173,8 @@ function get_config_files($mapdir)
 
         ksort($titles);
 
-        return $titles;
     }
+    return $titles;
 }
 
 function show_editor_startpage()

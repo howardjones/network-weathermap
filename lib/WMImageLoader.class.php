@@ -21,6 +21,14 @@ class WMImageLoader
         return true;
     }
 
+    /**
+     * @param string $filename
+     * @param int $scalew
+     * @param int $scaleh
+     * @param WMColour $colour
+     * @param string $colour_method
+     * @return null|resource
+     */
     function imagecreatescaledcolourizedfromfile($filename, $scalew, $scaleh, $colour, $colour_method)
     {
 

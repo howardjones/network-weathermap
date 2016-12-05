@@ -9,10 +9,13 @@
 class WMLinkGeometry
 {
     protected $linkWidths;
+    /** @var  WMColour[] $fillColours */
     protected $fillColours;
+    /** @var WMColour $outlineColour */
     protected $outlineColour;
     protected $directions;
     protected $splitPosition;
+
     protected $owner;
     protected $arrowStyle;
     protected $name;
@@ -21,6 +24,7 @@ class WMLinkGeometry
     /** @var  WMSpine $curvePoints the calculated spine for the whole link, used for distance calculations */
     protected $curvePoints;
 
+    /** @var  WMSpine[] $splitCurves */
     protected $splitCurves; // The spines for each direction of the link
     protected $drawnCurves; // The actual list of WMPoints that will be drawn
     protected $midDistance; // The distance along to link where the split for arrowheads will be

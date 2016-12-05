@@ -9,54 +9,6 @@ require_once "all.php";
 
 // ***********************************************
 
-class WeatherMapTextItem
-{
-    var $configuredText;
-    var $processedText;
-    /** @var  WMPoint $position */
-    var $position;
-    var $font;
-    /** @var  WMColour $colour */
-    var $colour;
-
-    var $prefix;
-
-    function getConfig(&$map)
-    {
-        $output = "";
-
-        $output .= "# TITLEPOS\n";
-        $output .= "# TITLEFONT\n";
-        $output .= "# TITLECOLOR\n";
-
-        return $output;
-    }
-
-    function draw($imageRef, &$map)
-    {
-        $fontObject = $map->fonts->getFont($this->font);
-        $string = $this->ProcessString($this->configuredText, $map);
-
-        if ($map->get_hint('screenshot_mode') == 1) {
-            $string = WMUtility::stringAnonymise($string);
-        }
-
-        list($boxwidth, $boxheight) = $fontObject->calculateImageStringSize($string);
-
-        $x = 10;
-        $y = $this->position->y - $boxheight;
-
-        if (($this->position->x >= 0) && ($this->position->y >= 0)) {
-            $x = $this->position->x;
-            $y = $this->position->y;
-        }
-
-        $fontObject->drawImageString($imageRef, $x, $y, $string, $this->colour->gdAllocate($imageRef));
-
-        $map->imap->addArea("Rectangle", "TITLE", '', array($x, $y, $x + $boxwidth, $y - $boxheight));
-        $map->imap_areas[] = 'TITLE';
-    }
-}
 
 class WeatherMap extends WeatherMapBase
 {
@@ -882,7 +834,7 @@ class WeatherMap extends WeatherMapBase
 
             if ($this->$field != $this->inherit_fieldlist[$field]) {
                 if ($param[2] == CONFIG_TYPE_COLOR) {
-                    $output .= "$keyword " . render_colour($this->$field) . "\n";
+                    $output .= "$keyword " . $this->$field->asConfig() . "\n";
                 }
                 if ($param[2] == CONFIG_TYPE_LITERAL) {
                     $output .= "$keyword " . $this->$field . "\n";
@@ -1083,7 +1035,7 @@ function DrawMap($filename = '', $thumbnailfile = '', $thumbnailmax = 250, $with
 		// by here, we should have a valid image handle
 
 		// save this away, now
-		$this->image=$image;
+		//$this->image=$image;
 
 		$this->white=myimagecolorallocate($image, 255, 255, 255);
 		$this->black=myimagecolorallocate($image, 0, 0, 0);
@@ -1232,13 +1184,13 @@ function DrawMap($filename = '', $thumbnailfile = '', $thumbnailmax = 250, $with
 			}
 		}
 
-		if($this->context == 'editor2')
-		{
-			$cachefile = $this->cachefolder.DIRECTORY_SEPARATOR.dechex(crc32($this->configfile))."_bg.".$this->cachefile_version.".png";
-			imagepng($image, $cachefile);
-			$cacheuri = $this->cachefolder.'/'.dechex(crc32($this->configfile))."_bg.".$this->cachefile_version.".png";
-			$this->mapcache = $cacheuri;
-		}
+//		if($this->context == 'editor2')
+//		{
+//			$cachefile = $this->cachefolder.DIRECTORY_SEPARATOR.dechex(crc32($this->configfile))."_bg.".$this->cachefile_version.".png";
+//			imagepng($image, $cachefile);
+//			$cacheuri = $this->cachefolder.'/'.dechex(crc32($this->configfile))."_bg.".$this->cachefile_version.".png";
+//			$this->mapcache = $cacheuri;
+//		}
 
 		if (function_exists('imagecopyresampled'))
 		{
@@ -1304,7 +1256,7 @@ function DrawMap($filename = '', $thumbnailfile = '', $thumbnailmax = 250, $with
         // Clear up the other random hashes of information
         $this->dsinfocache = null;
         $this->colourtable = null;
-        $this->usage_stats = null;
+    //    $this->usage_stats = null;
         $this->scales = null;
     }
 
@@ -1693,7 +1645,6 @@ function MakeHTML($imagemapname = "weathermap_imap")
                 wm_debug("** Failed to create an object for plugin $pluginType/$class\n");
                 $this->plugins[$pluginType][$class]['active'] = false;
             }
-
         }
         wm_debug("Finished loading plugins.\n");
     }

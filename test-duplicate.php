@@ -1,12 +1,6 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: howie
- * Date: 30/05/16
- * Time: 17:55
- */
 
-require_once 'lib/Weathermap.class.php';
+require_once 'lib/all.php';
 
 $loader = new WMImageLoader();
 
@@ -47,8 +41,8 @@ if (1==0) {
     draw_icon($im, $icon4, 250, 10);
 }
 
-$colour = new Colour(128,255,192);
-$colour = new Colour(64,128,96);
+$colour = new WMColour(128,255,192);
+$colour = new WMColour(64,128,96);
 
 $icon5 = $loader->imagecreatescaledcolourizedfromfile("images/grey-ball-64.png", 0, 0, $colour, 'imagecolorize');
 draw_icon($im, $icon5, 50, 100);

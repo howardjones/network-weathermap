@@ -1,0 +1,775 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="generator" content="pandoc">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <title></title>
+  <style type="text/css">code{white-space: pre;}</style>
+  <link rel="stylesheet" href="keywords.css">
+  <link rel="stylesheet" href="manual.css">
+  <!--[if lt IE 9]>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv-printshiv.min.js"></script>
+  <![endif]-->
+</head>
+<body>
+<h1 id="complete-configuration-keyword-list">Complete configuration keyword list</h1>
+<h1 id="global">GLOBAL</h1>
+<h2 id="background">BACKGROUND</h2>
+<h3 id="backgrounds.si">/^BACKGROUND\s+(.<em>)\s</em>$/i</h3>
+<ul>
+<li>1 ⇒ <code>GLOBAL-&gt;background</code></li>
+</ul>
+<h2 id="bgcolor">BGCOLOR</h2>
+<h3 id="bgcolorsdsdsdi">/^BGCOLOR\s+(\d+)\s+(\d+)\s+(\d+)$/i</h3>
+<ul>
+<li>→ <code>handleGLOBALCOLOR()</code></li>
+</ul>
+<h2 id="dataoutputfile">DATAOUTPUTFILE</h2>
+<h3 id="dataoutputfiles.si">/^DATAOUTPUTFILE\s+(.<em>)\s</em>$/i</h3>
+<ul>
+<li>1 ⇒ <code>GLOBAL-&gt;dataoutputfile</code></li>
+</ul>
+<h2 id="fontdefine">FONTDEFINE</h2>
+<h3 id="sfontdefinesdsssds-dsi">/^\s<em>FONTDEFINE\s+(\d+)\s+(\S+)\s+(\d+)\s+(-?\d+)\s</em>$/i</h3>
+<ul>
+<li>→ <code>handleFONTDEFINE()</code></li>
+</ul>
+<h3 id="sfontdefinesdsssdsi">/^\s<em>FONTDEFINE\s+(\d+)\s+(\S+)\s+(\d+)\s</em>$/i</h3>
+<ul>
+<li>→ <code>handleFONTDEFINE()</code></li>
+</ul>
+<h3 id="sfontdefinesdsssi">/^\s<em>FONTDEFINE\s+(\d+)\s+(\S+)\s</em>$/i</h3>
+<ul>
+<li>→ <code>handleFONTDEFINE()</code></li>
+</ul>
+<h2 id="height">HEIGHT</h2>
+<h3 id="heightsdsi">/^HEIGHT\s+(\d+)\s*$/i</h3>
+<ul>
+<li>1 ⇒ <code>GLOBAL-&gt;height</code></li>
+</ul>
+<h2 id="htmloutputfile">HTMLOUTPUTFILE</h2>
+<h3 id="htmloutputfiles.si">/^HTMLOUTPUTFILE\s+(.<em>)\s</em>$/i</h3>
+<ul>
+<li>1 ⇒ <code>GLOBAL-&gt;htmloutputfile</code></li>
+</ul>
+<h2 id="htmlstyle">HTMLSTYLE</h2>
+<h3 id="htmlstylesstaticoverlibsi">/^HTMLSTYLE\s+(static|overlib)\s*$/i</h3>
+<ul>
+<li>1 ⇒ <code>GLOBAL-&gt;htmlstyle</code></li>
+</ul>
+<h2 id="htmlstylesheet">HTMLSTYLESHEET</h2>
+<h3 id="htmlstylesheets.si">/^HTMLSTYLESHEET\s+(.<em>)\s</em>$/i</h3>
+<ul>
+<li>1 ⇒ <code>GLOBAL-&gt;htmlstylesheet</code></li>
+</ul>
+<h2 id="imageoutputfile">IMAGEOUTPUTFILE</h2>
+<h3 id="imageoutputfiles.si">/^IMAGEOUTPUTFILE\s+(.<em>)\s</em>$/i</h3>
+<ul>
+<li>1 ⇒ <code>GLOBAL-&gt;imageoutputfile</code></li>
+</ul>
+<h2 id="imageuri">IMAGEURI</h2>
+<h3 id="imageuris.si">/^IMAGEURI\s+(.<em>)\s</em>$/i</h3>
+<ul>
+<li>1 ⇒ <code>GLOBAL-&gt;imageuri</code></li>
+</ul>
+<h2 id="include">INCLUDE</h2>
+<h3 id="sincludes.si">/^\s<em>INCLUDE\s+(.</em>)\s*$/i</h3>
+<ul>
+<li>→ <code>handleINCLUDE()</code></li>
+</ul>
+<h2 id="keybgcolor">KEYBGCOLOR</h2>
+<h3 id="keybgcolorsdsdsdi">/^KEYBGCOLOR\s+(\d+)\s+(\d+)\s+(\d+)$/i</h3>
+<ul>
+<li>→ <code>handleGLOBALCOLOR()</code></li>
+</ul>
+<h3 id="keybgcolorsnonei">/^KEYBGCOLOR\s+(none)$/i</h3>
+<ul>
+<li>→ <code>handleGLOBALCOLOR()</code></li>
+</ul>
+<h2 id="keyfont">KEYFONT</h2>
+<h3 id="keyfontsdsi">/^KEYFONT\s+(\d+)\s*$/i</h3>
+<ul>
+<li>1 ⇒ <code>GLOBAL-&gt;keyfont</code></li>
+</ul>
+<h2 id="keyoutlinecolor">KEYOUTLINECOLOR</h2>
+<h3 id="keyoutlinecolorsdsdsdi">/^KEYOUTLINECOLOR\s+(\d+)\s+(\d+)\s+(\d+)$/i</h3>
+<ul>
+<li>→ <code>handleGLOBALCOLOR()</code></li>
+</ul>
+<h3 id="keyoutlinecolorsnonei">/^KEYOUTLINECOLOR\s+(none)$/i</h3>
+<ul>
+<li>→ <code>handleGLOBALCOLOR()</code></li>
+</ul>
+<h2 id="keypos">KEYPOS</h2>
+<h3 id="skeypossa-za-za-za-z0-9_s-ds-d.i">/^\s<em>KEYPOS\s+([A-Za-z][A-Za-z0-9_]</em>\s+)?(-?\d+)\s+(-?\d+)(.*)/i</h3>
+<ul>
+<li>→ <code>handleKEYPOS()</code></li>
+</ul>
+<h2 id="keystyle">KEYSTYLE</h2>
+<h3 id="skeystylesa-za-za-za-z0-9_sclassichorizontalverticalinvertedtagssdsi">/^\s<em>KEYSTYLE\s+([A-Za-z][A-Za-z0-9_]+\s+)?(classic|horizontal|vertical|inverted|tags)\s?(\d+)?\s</em>$/i</h3>
+<ul>
+<li>→ <code>handleKEYSTYLE()</code></li>
+</ul>
+<h2 id="keytextcolor">KEYTEXTCOLOR</h2>
+<h3 id="keytextcolorsdsdsdi">/^KEYTEXTCOLOR\s+(\d+)\s+(\d+)\s+(\d+)$/i</h3>
+<ul>
+<li>→ <code>handleGLOBALCOLOR()</code></li>
+</ul>
+<h2 id="kilo">KILO</h2>
+<h3 id="kilosdsi">/^KILO\s+(\d+)\s*$/i</h3>
+<ul>
+<li>1 ⇒ <code>GLOBAL-&gt;kilo</code></li>
+</ul>
+<h2 id="link">LINK</h2>
+<h3 id="slinksssi">/^\s<em>LINK\s+(\S+)\s</em>$/i</h3>
+<ul>
+<li>→ <code>handleLINK()</code></li>
+</ul>
+<h2 id="maxtimepos">MAXTIMEPOS</h2>
+<h3 id="maxtimeposs-ds-dsi">/^MAXTIMEPOS\s+(-?\d+)\s+(-?\d+)\s*$/i</h3>
+<ul>
+<li><p>1 ⇒ <code>GLOBAL-&gt;maxtimex</code></p></li>
+<li><p>2 ⇒ <code>GLOBAL-&gt;maxtimey</code></p></li>
+</ul>
+<h3 id="maxtimeposs-ds-ds.si">/^MAXTIMEPOS\s+(-?\d+)\s+(-?\d+)\s+(.<em>)\s</em>$/i</h3>
+<ul>
+<li><p>1 ⇒ <code>GLOBAL-&gt;maxtimex</code></p></li>
+<li><p>2 ⇒ <code>GLOBAL-&gt;maxtimey</code></p></li>
+<li><p>3 ⇒ <code>GLOBAL-&gt;maxstamptext</code></p></li>
+</ul>
+<h2 id="mintimepos">MINTIMEPOS</h2>
+<h3 id="mintimeposs-ds-dsi">/^MINTIMEPOS\s+(-?\d+)\s+(-?\d+)\s*$/i</h3>
+<ul>
+<li><p>1 ⇒ <code>GLOBAL-&gt;mintimex</code></p></li>
+<li><p>2 ⇒ <code>GLOBAL-&gt;mintimey</code></p></li>
+</ul>
+<h3 id="mintimeposs-ds-ds.si">/^MINTIMEPOS\s+(-?\d+)\s+(-?\d+)\s+(.<em>)\s</em>$/i</h3>
+<ul>
+<li><p>1 ⇒ <code>GLOBAL-&gt;mintimex</code></p></li>
+<li><p>2 ⇒ <code>GLOBAL-&gt;mintimey</code></p></li>
+<li><p>3 ⇒ <code>GLOBAL-&gt;minstamptext</code></p></li>
+</ul>
+<h2 id="node">NODE</h2>
+<h3 id="snodesssi">/^\s<em>NODE\s+(\S+)\s</em>$/i</h3>
+<ul>
+<li>→ <code>handleNODE()</code></li>
+</ul>
+<h2 id="scale">SCALE</h2>
+<h3 id="sscalesa-za-za-za-z0-9_s-d.dmunkmgts-d.dmunkmgtsdsdsdsdsdsdnones.i">/^\s<em>SCALE\s+([A-Za-z][A-Za-z0-9_]</em>\s+)?(\-?\d+\.?\d<em>[munKMGT]?)\s+(\-?\d+\.?\d</em>[munKMGT]?)\s+(?:(\d+)\s+(\d+)\s+(\d+)(?:\s+(\d+)\s+(\d+)\s+(\d+))?|(none))\s<em>(.</em>)$/i</h3>
+<ul>
+<li>→ <code>handleSCALE()</code></li>
+</ul>
+<h2 id="set">SET</h2>
+<h3 id="set-1">SET</h3>
+<ul>
+<li>→ <code>handleSET()</code></li>
+</ul>
+<h2 id="timecolor">TIMECOLOR</h2>
+<h3 id="timecolorsdsdsdi">/^TIMECOLOR\s+(\d+)\s+(\d+)\s+(\d+)$/i</h3>
+<ul>
+<li>→ <code>handleGLOBALCOLOR()</code></li>
+</ul>
+<h2 id="timefont">TIMEFONT</h2>
+<h3 id="timefontsdsi">/^TIMEFONT\s+(\d+)\s*$/i</h3>
+<ul>
+<li>1 ⇒ <code>GLOBAL-&gt;timefont</code></li>
+</ul>
+<h2 id="timepos">TIMEPOS</h2>
+<h3 id="timeposs-ds-dsi">/^TIMEPOS\s+(-?\d+)\s+(-?\d+)\s*$/i</h3>
+<ul>
+<li><p>1 ⇒ <code>GLOBAL-&gt;timex</code></p></li>
+<li><p>2 ⇒ <code>GLOBAL-&gt;timey</code></p></li>
+</ul>
+<h3 id="timeposs-ds-ds.si">/^TIMEPOS\s+(-?\d+)\s+(-?\d+)\s+(.<em>)\s</em>$/i</h3>
+<ul>
+<li><p>1 ⇒ <code>GLOBAL-&gt;timex</code></p></li>
+<li><p>2 ⇒ <code>GLOBAL-&gt;timey</code></p></li>
+<li><p>3 ⇒ <code>GLOBAL-&gt;stamptext</code></p></li>
+</ul>
+<h2 id="title">TITLE</h2>
+<h3 id="titles.si">/^TITLE\s+(.<em>)\s</em>$/i</h3>
+<ul>
+<li>1 ⇒ <code>GLOBAL-&gt;title</code></li>
+</ul>
+<h2 id="titlecolor">TITLECOLOR</h2>
+<h3 id="titlecolorsdsdsdi">/^TITLECOLOR\s+(\d+)\s+(\d+)\s+(\d+)$/i</h3>
+<ul>
+<li>→ <code>handleGLOBALCOLOR()</code></li>
+</ul>
+<h2 id="titlefont">TITLEFONT</h2>
+<h3 id="titlefontsdsi">/^TITLEFONT\s+(\d+)\s*$/i</h3>
+<ul>
+<li>1 ⇒ <code>GLOBAL-&gt;titlefont</code></li>
+</ul>
+<h2 id="titlepos">TITLEPOS</h2>
+<h3 id="titleposs-ds-dsi">/^TITLEPOS\s+(-?\d+)\s+(-?\d+)\s*$/i</h3>
+<ul>
+<li><p>1 ⇒ <code>GLOBAL-&gt;titlex</code></p></li>
+<li><p>2 ⇒ <code>GLOBAL-&gt;titley</code></p></li>
+</ul>
+<h3 id="titleposs-ds-ds.si">/^TITLEPOS\s+(-?\d+)\s+(-?\d+)\s+(.<em>)\s</em>$/i</h3>
+<ul>
+<li><p>1 ⇒ <code>GLOBAL-&gt;titlex</code></p></li>
+<li><p>2 ⇒ <code>GLOBAL-&gt;titley</code></p></li>
+<li><p>3 ⇒ <code>GLOBAL-&gt;title</code></p></li>
+</ul>
+<h2 id="width">WIDTH</h2>
+<h3 id="widthsdsi">/^WIDTH\s+(\d+)\s*$/i</h3>
+<ul>
+<li>1 ⇒ <code>GLOBAL-&gt;width</code></li>
+</ul>
+<h1 id="node-1">NODE</h1>
+<h2 id="aiconfillcolor">AICONFILLCOLOR</h2>
+<h3 id="aiconfillcolorsdsdsdi">/^AICONFILLCOLOR\s+(\d+)\s+(\d+)\s+(\d+)$/i</h3>
+<ul>
+<li>→ <code>handleCOLOR()</code></li>
+</ul>
+<h3 id="aiconfillcolorscopyi">/^AICONFILLCOLOR\s+(copy)$/i</h3>
+<ul>
+<li>→ <code>handleCOLOR()</code></li>
+</ul>
+<h3 id="aiconfillcolorsnonei">/^AICONFILLCOLOR\s+(none)$/i</h3>
+<ul>
+<li>→ <code>handleCOLOR()</code></li>
+</ul>
+<h2 id="aiconoutlinecolor">AICONOUTLINECOLOR</h2>
+<h3 id="aiconoutlinecolorsdsdsdi">/^AICONOUTLINECOLOR\s+(\d+)\s+(\d+)\s+(\d+)$/i</h3>
+<ul>
+<li>→ <code>handleCOLOR()</code></li>
+</ul>
+<h3 id="aiconoutlinecolorsnonei">/^AICONOUTLINECOLOR\s+(none)$/i</h3>
+<ul>
+<li>→ <code>handleCOLOR()</code></li>
+</ul>
+<h2 id="defineoffset">DEFINEOFFSET</h2>
+<h3 id="defineoffsetsa-za-za-za-z0-9_s-ds-di">/^DEFINEOFFSET\s+([A-Za-z][A-Za-z0-9_]*)\s+([-+]?\d+)\s+([-+]?\d+)/i</h3>
+<ul>
+<li>→ <code>handleDEFINEOFFSET()</code></li>
+</ul>
+<h2 id="icon">ICON</h2>
+<h3 id="iconsssi">/^ICON\s+(\S+)\s*$/i</h3>
+<ul>
+<li><p>1 ⇒ <code>NODE-&gt;iconfile</code></p></li>
+<li><p>&quot;0&quot; ⇒ <code>NODE-&gt;iconscalew</code></p></li>
+<li><p>&quot;0&quot; ⇒ <code>NODE-&gt;iconscaleh</code></p></li>
+</ul>
+<h3 id="iconsssi-1">/^ICON\s+(\S+)\s*$/i</h3>
+<ul>
+<li>1 ⇒ <code>NODE-&gt;iconfile</code></li>
+</ul>
+<h3 id="iconsdsdsinpieoutpieboxrboxroundgaugeninksi">/^ICON\s+(\d+)\s+(\d+)\s+(inpie|outpie|box|rbox|round|gauge|nink)\s*$/i</h3>
+<ul>
+<li><p>3 ⇒ <code>NODE-&gt;iconfile</code></p></li>
+<li><p>1 ⇒ <code>NODE-&gt;iconscalew</code></p></li>
+<li><p>2 ⇒ <code>NODE-&gt;iconscaleh</code></p></li>
+</ul>
+<h3 id="iconsdsdsssi">/^ICON\s+(\d+)\s+(\d+)\s+(\S+)\s*$/i</h3>
+<ul>
+<li><p>3 ⇒ <code>NODE-&gt;iconfile</code></p></li>
+<li><p>1 ⇒ <code>NODE-&gt;iconscalew</code></p></li>
+<li><p>2 ⇒ <code>NODE-&gt;iconscaleh</code></p></li>
+</ul>
+<h2 id="include-1">INCLUDE</h2>
+<h3 id="sincludes.si-1">/^\s<em>INCLUDE\s+(.</em>)\s*$/i</h3>
+<ul>
+<li>→ <code>handleINCLUDE()</code></li>
+</ul>
+<h2 id="infourl">INFOURL</h2>
+<h3 id="infourls.si">/^INFOURL\s+(.<em>)\s</em>$/i</h3>
+<ul>
+<li><p>1 ⇒ <code>NODE-&gt;infourl[IN]</code></p></li>
+<li><p>1 ⇒ <code>NODE-&gt;infourl[OUT]</code></p></li>
+</ul>
+<h2 id="label">LABEL</h2>
+<h3 id="labelsi">/^LABEL\s*$/i</h3>
+<ul>
+<li>⇒ <code>NODE-&gt;label</code></li>
+</ul>
+<h3 id="labels.si">/^LABEL\s+(.<em>)\s</em>$/i</h3>
+<ul>
+<li>1 ⇒ <code>NODE-&gt;label</code></li>
+</ul>
+<h2 id="labelangle">LABELANGLE</h2>
+<h3 id="labelangles090180270si">/^LABELANGLE\s+(0|90|180|270)\s*$/i</h3>
+<ul>
+<li>1 ⇒ <code>NODE-&gt;labelangle</code></li>
+</ul>
+<h2 id="labelbgcolor">LABELBGCOLOR</h2>
+<h3 id="labelbgcolorsdsdsdi">/^LABELBGCOLOR\s+(\d+)\s+(\d+)\s+(\d+)$/i</h3>
+<ul>
+<li>→ <code>handleCOLOR()</code></li>
+</ul>
+<h3 id="labelbgcolorsnonei">/^LABELBGCOLOR\s+(none)$/i</h3>
+<ul>
+<li>→ <code>handleCOLOR()</code></li>
+</ul>
+<h2 id="labelfont">LABELFONT</h2>
+<h3 id="labelfontsdsi">/^LABELFONT\s+(\d+)\s*$/i</h3>
+<ul>
+<li>1 ⇒ <code>NODE-&gt;labelfont</code></li>
+</ul>
+<h2 id="labelfontcolor">LABELFONTCOLOR</h2>
+<h3 id="labelfontcolorsdsdsdi">/^LABELFONTCOLOR\s+(\d+)\s+(\d+)\s+(\d+)$/i</h3>
+<ul>
+<li>→ <code>handleCOLOR()</code></li>
+</ul>
+<h3 id="labelfontcolorscontrasti">/^LABELFONTCOLOR\s+(contrast)$/i</h3>
+<ul>
+<li>→ <code>handleCOLOR()</code></li>
+</ul>
+<h2 id="labelfontshadowcolor">LABELFONTSHADOWCOLOR</h2>
+<h3 id="labelfontshadowcolorsdsdsdi">/^LABELFONTSHADOWCOLOR\s+(\d+)\s+(\d+)\s+(\d+)$/i</h3>
+<ul>
+<li>→ <code>handleCOLOR()</code></li>
+</ul>
+<h2 id="labeloffset">LABELOFFSET</h2>
+<h3 id="labeloffsets-ds-dsi">/^LABELOFFSET\s+([-+]?\d+)\s+([-+]?\d+)\s*$/i</h3>
+<ul>
+<li><p>1 ⇒ <code>NODE-&gt;labeloffsetx</code></p></li>
+<li><p>2 ⇒ <code>NODE-&gt;labeloffsety</code></p></li>
+</ul>
+<h3 id="labeloffsetscnesenwswnsewsi">/^LABELOFFSET\s+(C|NE|SE|NW|SW|N|S|E|W)\s*$/i</h3>
+<ul>
+<li>1 ⇒ <code>NODE-&gt;labeloffset</code></li>
+</ul>
+<h3 id="labeloffsetscnesenwswnsewdsi">/^LABELOFFSET\s+((C|NE|SE|NW|SW|N|S|E|W)\d+)\s*$/i</h3>
+<ul>
+<li>1 ⇒ <code>NODE-&gt;labeloffset</code></li>
+</ul>
+<h3 id="labeloffsets-drdsi">/^LABELOFFSET\s+(-?\d+r\d+)\s*$/i</h3>
+<ul>
+<li>1 ⇒ <code>NODE-&gt;labeloffset</code></li>
+</ul>
+<h2 id="labeloutlinecolor">LABELOUTLINECOLOR</h2>
+<h3 id="labeloutlinecolorsdsdsdi">/^LABELOUTLINECOLOR\s+(\d+)\s+(\d+)\s+(\d+)$/i</h3>
+<ul>
+<li>→ <code>handleCOLOR()</code></li>
+</ul>
+<h3 id="labeloutlinecolorsnonei">/^LABELOUTLINECOLOR\s+(none)$/i</h3>
+<ul>
+<li>→ <code>handleCOLOR()</code></li>
+</ul>
+<h2 id="link-1">LINK</h2>
+<h3 id="slinksssi-1">/^\s<em>LINK\s+(\S+)\s</em>$/i</h3>
+<ul>
+<li>→ <code>handleLINK()</code></li>
+</ul>
+<h2 id="maxvalue">MAXVALUE</h2>
+<h3 id="maxvaluesd.dkmgtsd.dkmgtsi">/^(MAXVALUE)\s+(\d+\.?\d<em>[KMGT]?)\s+(\d+\.?\d</em>[KMGT]?)\s*$/i</h3>
+<ul>
+<li><p>2 ⇒ <code>NODE-&gt;maxValuesConfigured[IN]</code></p></li>
+<li><p>3 ⇒ <code>NODE-&gt;maxValuesConfigured[OUT]</code></p></li>
+</ul>
+<h3 id="maxvaluesd.dkmgtsi">/^(MAXVALUE)\s+(\d+\.?\d<em>[KMGT]?)\s</em>$/i</h3>
+<ul>
+<li><p>2 ⇒ <code>NODE-&gt;maxValuesConfigured[IN]</code></p></li>
+<li><p>2 ⇒ <code>NODE-&gt;maxValuesConfigured[OUT]</code></p></li>
+</ul>
+<h2 id="node-2">NODE</h2>
+<h3 id="snodesssi-1">/^\s<em>NODE\s+(\S+)\s</em>$/i</h3>
+<ul>
+<li>→ <code>handleNODE()</code></li>
+</ul>
+<h2 id="notes">NOTES</h2>
+<h3 id="notess.si">/^NOTES\s+(.<em>)\s</em>$/i</h3>
+<ul>
+<li><p>1 ⇒ <code>NODE-&gt;notestext[IN]</code></p></li>
+<li><p>1 ⇒ <code>NODE-&gt;notestext[OUT]</code></p></li>
+</ul>
+<h2 id="overlibcaption">OVERLIBCAPTION</h2>
+<h3 id="overlibcaptions.si">/^OVERLIBCAPTION\s+(.<em>)\s</em>$/i</h3>
+<ul>
+<li><p>1 ⇒ <code>NODE-&gt;overlibcaption[IN]</code></p></li>
+<li><p>1 ⇒ <code>NODE-&gt;overlibcaption[OUT]</code></p></li>
+</ul>
+<h2 id="overlibgraph">OVERLIBGRAPH</h2>
+<h3 id="overlibgraphs.i">/^OVERLIBGRAPH\s+(.+)$/i</h3>
+<ul>
+<li>→ <code>handleOVERLIB()</code></li>
+</ul>
+<h2 id="overlibheight">OVERLIBHEIGHT</h2>
+<h3 id="overlibheightsdsi">/^OVERLIBHEIGHT\s+(\d+)\s*$/i</h3>
+<ul>
+<li>1 ⇒ <code>NODE-&gt;overlibheight</code></li>
+</ul>
+<h2 id="overlibwidth">OVERLIBWIDTH</h2>
+<h3 id="overlibwidthsdsi">/^OVERLIBWIDTH\s+(\d+)\s*$/i</h3>
+<ul>
+<li>1 ⇒ <code>NODE-&gt;overlibwidth</code></li>
+</ul>
+<h2 id="position">POSITION</h2>
+<h3 id="positions-ds-dsi">/^POSITION\s+([-+]?\d+)\s+([-+]?\d+)\s*$/i</h3>
+<ul>
+<li><p>1 ⇒ <code>NODE-&gt;x</code></p></li>
+<li><p>2 ⇒ <code>NODE-&gt;y</code></p></li>
+</ul>
+<h3 id="positionsss-ds-dsi">/^POSITION\s+(\S+)\s+([-+]?\d+)\s+([-+]?\d+)\s*$/i</h3>
+<ul>
+<li><p>2 ⇒ <code>NODE-&gt;x</code></p></li>
+<li><p>3 ⇒ <code>NODE-&gt;y</code></p></li>
+<li><p>2 ⇒ <code>NODE-&gt;original_x</code></p></li>
+<li><p>3 ⇒ <code>NODE-&gt;original_y</code></p></li>
+<li><p>1 ⇒ <code>NODE-&gt;relative_to</code></p></li>
+<li><p>⇒ <code>NODE-&gt;relative_resolved</code></p></li>
+</ul>
+<h3 id="positionsss-drdsi">/^POSITION\s+(\S+)\s+([-+]?\d+)r(\d+)\s*$/i</h3>
+<ul>
+<li><p>2 ⇒ <code>NODE-&gt;x</code></p></li>
+<li><p>3 ⇒ <code>NODE-&gt;y</code></p></li>
+<li><p>2 ⇒ <code>NODE-&gt;original_x</code></p></li>
+<li><p>3 ⇒ <code>NODE-&gt;original_y</code></p></li>
+<li><p>1 ⇒ <code>NODE-&gt;relative_to</code></p></li>
+<li><p>1 ⇒ <code>NODE-&gt;polar</code></p></li>
+<li><p>⇒ <code>NODE-&gt;relative_resolved</code></p></li>
+</ul>
+<h3 id="positionsa-za-za-za-z0-9-_a-za-za-za-z0-9_i">/^POSITION\s+([A-Za-z][A-Za-z0-9\-_]<em>):([A-Za-z][A-Za-z0-9_]</em>)$/i</h3>
+<ul>
+<li><p>1 ⇒ <code>NODE-&gt;relative_to</code></p></li>
+<li><p>2 ⇒ <code>NODE-&gt;relative_name</code></p></li>
+<li><p>1 ⇒ <code>NODE-&gt;pos_named</code></p></li>
+<li><p>⇒ <code>NODE-&gt;polar</code></p></li>
+<li><p>⇒ <code>NODE-&gt;relative_resolved</code></p></li>
+</ul>
+<h2 id="set-2">SET</h2>
+<h3 id="set-3">SET</h3>
+<ul>
+<li>→ <code>handleSET()</code></li>
+</ul>
+<h2 id="target">TARGET</h2>
+<h3 id="target-1">TARGET</h3>
+<ul>
+<li>→ <code>handleTARGET()</code></li>
+</ul>
+<h2 id="template">TEMPLATE</h2>
+<h3 id="stemplatesssi">/^\s<em>TEMPLATE\s+(\S+)\s</em>$/i</h3>
+<ul>
+<li>→ <code>handleTEMPLATE()</code></li>
+</ul>
+<h2 id="useiconscale">USEICONSCALE</h2>
+<h3 id="useiconscalesa-za-za-za-z0-9_sinoutsabsolutepercentsi">/^(USEICONSCALE)\s+([A-Za-z][A-Za-z0-9_]<em>)(\s+(in|out))?(\s+(absolute|percent))?\s</em>$/i</h3>
+<ul>
+<li>→ <code>handleNODE_USESCALE()</code></li>
+</ul>
+<h2 id="usescale">USESCALE</h2>
+<h3 id="usescalesa-za-za-za-z0-9_sinoutsabsolutepercentsi">/^(USESCALE)\s+([A-Za-z][A-Za-z0-9_]<em>)(\s+(in|out))?(\s+(absolute|percent))?\s</em>$/i</h3>
+<ul>
+<li>→ <code>handleNODE_USESCALE()</code></li>
+</ul>
+<h2 id="zorder">ZORDER</h2>
+<h3 id="zorders-dsi">/^ZORDER\s+([-+]?\d+)\s*$/i</h3>
+<ul>
+<li>1 ⇒ <code>NODE-&gt;zorder</code></li>
+</ul>
+<h1 id="link-2">LINK</h1>
+<h2 id="arrowstyle">ARROWSTYLE</h2>
+<h3 id="arrowstylesclassiccompactsi">/^ARROWSTYLE\s+(classic|compact)\s*$/i</h3>
+<ul>
+<li>1 ⇒ <code>LINK-&gt;arrowstyle</code></li>
+</ul>
+<h3 id="sarrowstylesdsdsi">/^\s<em>ARROWSTYLE\s+(\d+)\s+(\d+)\s</em>$/i</h3>
+<ul>
+<li>→ <code>handleARROWSTYLE()</code></li>
+</ul>
+<h2 id="bandwidth">BANDWIDTH</h2>
+<h3 id="bandwidthsd.dkmgtsd.dkmgtsi">/^(BANDWIDTH)\s+(\d+\.?\d<em>[KMGT]?)\s+(\d+\.?\d</em>[KMGT]?)\s*$/i</h3>
+<ul>
+<li><p>2 ⇒ <code>LINK-&gt;maxValuesConfigured[IN]</code></p></li>
+<li><p>3 ⇒ <code>LINK-&gt;maxValuesConfigured[OUT]</code></p></li>
+</ul>
+<h3 id="bandwidthsd.dkmgtsi">/^(BANDWIDTH)\s+(\d+\.?\d<em>[KMGT]?)\s</em>$/i</h3>
+<ul>
+<li><p>2 ⇒ <code>LINK-&gt;maxValuesConfigured[IN]</code></p></li>
+<li><p>2 ⇒ <code>LINK-&gt;maxValuesConfigured[OUT]</code></p></li>
+</ul>
+<h2 id="bwboxcolor">BWBOXCOLOR</h2>
+<h3 id="bwboxcolorsdsdsdi">/^BWBOXCOLOR\s+(\d+)\s+(\d+)\s+(\d+)$/i</h3>
+<ul>
+<li>→ <code>handleCOLOR()</code></li>
+</ul>
+<h3 id="bwboxcolorsnonei">/^BWBOXCOLOR\s+(none)$/i</h3>
+<ul>
+<li>→ <code>handleCOLOR()</code></li>
+</ul>
+<h2 id="bwfont">BWFONT</h2>
+<h3 id="bwfontsdsi">/^BWFONT\s+(\d+)\s*$/i</h3>
+<ul>
+<li>1 ⇒ <code>LINK-&gt;bwfont</code></li>
+</ul>
+<h2 id="bwfontcolor">BWFONTCOLOR</h2>
+<h3 id="bwfontcolorsdsdsdi">/^BWFONTCOLOR\s+(\d+)\s+(\d+)\s+(\d+)$/i</h3>
+<ul>
+<li>→ <code>handleCOLOR()</code></li>
+</ul>
+<h2 id="bwlabel">BWLABEL</h2>
+<h3 id="bwlabelsbitssi">/^BWLABEL\s+bits\s*$/i</h3>
+<ul>
+<li><p>bits ⇒ <code>LINK-&gt;labelstyle</code></p></li>
+<li><p>{link:this:bandwidth_in:%2k} ⇒ <code>LINK-&gt;bwlabelformats[IN]</code></p></li>
+<li><p>{link:this:bandwidth_out:%2k} ⇒ <code>LINK-&gt;bwlabelformats[OUT]</code></p></li>
+</ul>
+<h3 id="bwlabelspercentsi">/^BWLABEL\s+percent\s*$/i</h3>
+<ul>
+<li><p>percent ⇒ <code>LINK-&gt;labelstyle</code></p></li>
+<li><p>{link:this:inpercent:%.2f}% ⇒ <code>LINK-&gt;bwlabelformats[IN]</code></p></li>
+<li><p>{link:this:outpercent:%.2f}% ⇒ <code>LINK-&gt;bwlabelformats[OUT]</code></p></li>
+</ul>
+<h3 id="bwlabelsunformattedsi">/^BWLABEL\s+unformatted\s*$/i</h3>
+<ul>
+<li><p>unformatted ⇒ <code>LINK-&gt;labelstyle</code></p></li>
+<li><p>{link:this:bandwidth_in} ⇒ <code>LINK-&gt;bwlabelformats[IN]</code></p></li>
+<li><p>{link:this:bandwidth_out} ⇒ <code>LINK-&gt;bwlabelformats[OUT]</code></p></li>
+</ul>
+<h3 id="bwlabelsnonesi">/^BWLABEL\s+none\s*$/i</h3>
+<ul>
+<li><p>none ⇒ <code>LINK-&gt;labelstyle</code></p></li>
+<li><p>⇒ <code>LINK-&gt;bwlabelformats[IN]</code></p></li>
+<li><p>⇒ <code>LINK-&gt;bwlabelformats[OUT]</code></p></li>
+</ul>
+<h2 id="bwlabelpos">BWLABELPOS</h2>
+<h3 id="bwlabelpossdsdsi">/^BWLABELPOS\s+(\d+)\s(\d+)\s*$/i</h3>
+<ul>
+<li><p>1 ⇒ <code>LINK-&gt;labeloffset_in</code></p></li>
+<li><p>2 ⇒ <code>LINK-&gt;labeloffset_out</code></p></li>
+</ul>
+<h2 id="bwoutlinecolor">BWOUTLINECOLOR</h2>
+<h3 id="bwoutlinecolorsdsdsdi">/^BWOUTLINECOLOR\s+(\d+)\s+(\d+)\s+(\d+)$/i</h3>
+<ul>
+<li>→ <code>handleCOLOR()</code></li>
+</ul>
+<h3 id="bwoutlinecolorsnonei">/^BWOUTLINECOLOR\s+(none)$/i</h3>
+<ul>
+<li>→ <code>handleCOLOR()</code></li>
+</ul>
+<h2 id="bwstyle">BWSTYLE</h2>
+<h3 id="bwstylesclassicangledsi">/^BWSTYLE\s+(classic|angled)\s*$/i</h3>
+<ul>
+<li>1 ⇒ <code>LINK-&gt;labelboxstyle</code></li>
+</ul>
+<h2 id="commentfont">COMMENTFONT</h2>
+<h3 id="commentfontsdsi">/^COMMENTFONT\s+(\d+)\s*$/i</h3>
+<ul>
+<li>1 ⇒ <code>LINK-&gt;commentfont</code></li>
+</ul>
+<h2 id="commentfontcolor">COMMENTFONTCOLOR</h2>
+<h3 id="commentfontcolorsdsdsdi">/^COMMENTFONTCOLOR\s+(\d+)\s+(\d+)\s+(\d+)$/i</h3>
+<ul>
+<li>→ <code>handleCOLOR()</code></li>
+</ul>
+<h3 id="commentfontcolorscontrasti">/^COMMENTFONTCOLOR\s+(contrast)$/i</h3>
+<ul>
+<li>→ <code>handleCOLOR()</code></li>
+</ul>
+<h2 id="commentpos">COMMENTPOS</h2>
+<h3 id="commentpossdsdsi">/^COMMENTPOS\s+(\d+)\s(\d+)\s*$/i</h3>
+<ul>
+<li><p>1 ⇒ <code>LINK-&gt;commentoffset_in</code></p></li>
+<li><p>2 ⇒ <code>LINK-&gt;commentoffset_out</code></p></li>
+</ul>
+<h2 id="commentstyle">COMMENTSTYLE</h2>
+<h3 id="commentstylesedgecentersi">/^COMMENTSTYLE\s+(edge|center)\s*$/i</h3>
+<ul>
+<li>1 ⇒ <code>LINK-&gt;commentstyle</code></li>
+</ul>
+<h2 id="duplex">DUPLEX</h2>
+<h3 id="duplexsfullhalfsi">/^DUPLEX\s+(full|half)\s*$/i</h3>
+<ul>
+<li>1 ⇒ <code>LINK-&gt;duplex</code></li>
+</ul>
+<h2 id="inbwformat">INBWFORMAT</h2>
+<h3 id="inbwformats.si">/^INBWFORMAT\s+(.<em>)\s</em>$/i</h3>
+<ul>
+<li><p>1 ⇒ <code>LINK-&gt;bwlabelformats[IN]</code></p></li>
+<li><p>-- ⇒ <code>LINK-&gt;labelstyle</code></p></li>
+</ul>
+<h2 id="include-2">INCLUDE</h2>
+<h3 id="sincludes.si-2">/^\s<em>INCLUDE\s+(.</em>)\s*$/i</h3>
+<ul>
+<li>→ <code>handleINCLUDE()</code></li>
+</ul>
+<h2 id="incomment">INCOMMENT</h2>
+<h3 id="incomments.si">/^INCOMMENT\s+(.<em>)\s</em>$/i</h3>
+<ul>
+<li>1 ⇒ <code>LINK-&gt;comments[IN]</code></li>
+</ul>
+<h2 id="infourl-1">INFOURL</h2>
+<h3 id="infourls.si-1">/^INFOURL\s+(.<em>)\s</em>$/i</h3>
+<ul>
+<li><p>1 ⇒ <code>LINK-&gt;infourl[IN]</code></p></li>
+<li><p>1 ⇒ <code>LINK-&gt;infourl[OUT]</code></p></li>
+</ul>
+<h2 id="ininfourl">ININFOURL</h2>
+<h3 id="ininfourls.si">/^ININFOURL\s+(.<em>)\s</em>$/i</h3>
+<ul>
+<li>1 ⇒ <code>LINK-&gt;infourl[IN]</code></li>
+</ul>
+<h2 id="innotes">INNOTES</h2>
+<h3 id="innotess.si">/^INNOTES\s+(.<em>)\s</em>$/i</h3>
+<ul>
+<li>1 ⇒ <code>LINK-&gt;notestext[IN]</code></li>
+</ul>
+<h2 id="inoverlibcaption">INOVERLIBCAPTION</h2>
+<h3 id="inoverlibcaptions.si">/^INOVERLIBCAPTION\s+(.<em>)\s</em>$/i</h3>
+<ul>
+<li>1 ⇒ <code>LINK-&gt;overlibcaption[IN]</code></li>
+</ul>
+<h2 id="inoverlibgraph">INOVERLIBGRAPH</h2>
+<h3 id="inoverlibgraphs.i">/^INOVERLIBGRAPH\s+(.+)$/i</h3>
+<ul>
+<li>→ <code>handleOVERLIB()</code></li>
+</ul>
+<h2 id="link-3">LINK</h2>
+<h3 id="slinksssi-2">/^\s<em>LINK\s+(\S+)\s</em>$/i</h3>
+<ul>
+<li>→ <code>handleLINK()</code></li>
+</ul>
+<h2 id="linkstyle">LINKSTYLE</h2>
+<h3 id="linkstylestwowayonewaysi">/^LINKSTYLE\s+(twoway|oneway)\s*$/i</h3>
+<ul>
+<li>1 ⇒ <code>LINK-&gt;linkstyle</code></li>
+</ul>
+<h2 id="maxvalue-1">MAXVALUE</h2>
+<h3 id="maxvaluesd.dkmgtsd.dkmgtsi-1">/^(MAXVALUE)\s+(\d+\.?\d<em>[KMGT]?)\s+(\d+\.?\d</em>[KMGT]?)\s*$/i</h3>
+<ul>
+<li><p>2 ⇒ <code>LINK-&gt;maxValuesConfigured[IN]</code></p></li>
+<li><p>3 ⇒ <code>LINK-&gt;maxValuesConfigured[OUT]</code></p></li>
+</ul>
+<h3 id="maxvaluesd.dkmgtsi-1">/^(MAXVALUE)\s+(\d+\.?\d<em>[KMGT]?)\s</em>$/i</h3>
+<ul>
+<li><p>2 ⇒ <code>LINK-&gt;maxValuesConfigured[IN]</code></p></li>
+<li><p>2 ⇒ <code>LINK-&gt;maxValuesConfigured[OUT]</code></p></li>
+</ul>
+<h2 id="node-3">NODE</h2>
+<h3 id="snodesssi-2">/^\s<em>NODE\s+(\S+)\s</em>$/i</h3>
+<ul>
+<li>→ <code>handleNODE()</code></li>
+</ul>
+<h2 id="nodes">NODES</h2>
+<h3 id="nodes-1">NODES</h3>
+<ul>
+<li>→ <code>handleNODES()</code></li>
+</ul>
+<h2 id="notes-1">NOTES</h2>
+<h3 id="notess.si-1">/^NOTES\s+(.<em>)\s</em>$/i</h3>
+<ul>
+<li><p>1 ⇒ <code>LINK-&gt;notestext[IN]</code></p></li>
+<li><p>1 ⇒ <code>LINK-&gt;notestext[OUT]</code></p></li>
+</ul>
+<h2 id="outbwformat">OUTBWFORMAT</h2>
+<h3 id="outbwformats.si">/^OUTBWFORMAT\s+(.<em>)\s</em>$/i</h3>
+<ul>
+<li><p>1 ⇒ <code>LINK-&gt;bwlabelformats[OUT]</code></p></li>
+<li><p>-- ⇒ <code>LINK-&gt;labelstyle</code></p></li>
+</ul>
+<h2 id="outcomment">OUTCOMMENT</h2>
+<h3 id="outcomments.si">/^OUTCOMMENT\s+(.<em>)\s</em>$/i</h3>
+<ul>
+<li>1 ⇒ <code>LINK-&gt;comments[OUT]</code></li>
+</ul>
+<h2 id="outinfourl">OUTINFOURL</h2>
+<h3 id="outinfourls.si">/^OUTINFOURL\s+(.<em>)\s</em>$/i</h3>
+<ul>
+<li>1 ⇒ <code>LINK-&gt;infourl[OUT]</code></li>
+</ul>
+<h2 id="outlinecolor">OUTLINECOLOR</h2>
+<h3 id="outlinecolorsdsdsdi">/^OUTLINECOLOR\s+(\d+)\s+(\d+)\s+(\d+)$/i</h3>
+<ul>
+<li>→ <code>handleCOLOR()</code></li>
+</ul>
+<h3 id="outlinecolorsnone">/^OUTLINECOLOR\s+(none)$/</h3>
+<ul>
+<li>→ <code>handleCOLOR()</code></li>
+</ul>
+<h2 id="outnotes">OUTNOTES</h2>
+<h3 id="outnotess.si">/^OUTNOTES\s+(.<em>)\s</em>$/i</h3>
+<ul>
+<li>1 ⇒ <code>LINK-&gt;notestext[OUT]</code></li>
+</ul>
+<h2 id="outoverlibcaption">OUTOVERLIBCAPTION</h2>
+<h3 id="outoverlibcaptions.si">/^OUTOVERLIBCAPTION\s+(.<em>)\s</em>$/i</h3>
+<ul>
+<li>1 ⇒ <code>LINK-&gt;overlibcaption[OUT]</code></li>
+</ul>
+<h2 id="outoverlibgraph">OUTOVERLIBGRAPH</h2>
+<h3 id="outoverlibgraphs.i">/^OUTOVERLIBGRAPH\s+(.+)$/i</h3>
+<ul>
+<li>→ <code>handleOVERLIB()</code></li>
+</ul>
+<h2 id="overlibcaption-1">OVERLIBCAPTION</h2>
+<h3 id="overlibcaptions.si-1">/^OVERLIBCAPTION\s+(.<em>)\s</em>$/i</h3>
+<ul>
+<li><p>1 ⇒ <code>LINK-&gt;overlibcaption[IN]</code></p></li>
+<li><p>1 ⇒ <code>LINK-&gt;overlibcaption[OUT]</code></p></li>
+</ul>
+<h2 id="overlibgraph-1">OVERLIBGRAPH</h2>
+<h3 id="overlibgraphs.i-1">/^OVERLIBGRAPH\s+(.+)$/i</h3>
+<ul>
+<li>→ <code>handleOVERLIB()</code></li>
+</ul>
+<h2 id="overlibheight-1">OVERLIBHEIGHT</h2>
+<h3 id="overlibheightsdsi-1">/^OVERLIBHEIGHT\s+(\d+)\s*$/i</h3>
+<ul>
+<li>1 ⇒ <code>LINK-&gt;overlibheight</code></li>
+</ul>
+<h2 id="overlibwidth-1">OVERLIBWIDTH</h2>
+<h3 id="overlibwidthsdsi-1">/^OVERLIBWIDTH\s+(\d+)\s*$/i</h3>
+<ul>
+<li>1 ⇒ <code>LINK-&gt;overlibwidth</code></li>
+</ul>
+<h2 id="set-4">SET</h2>
+<h3 id="set-5">SET</h3>
+<ul>
+<li>→ <code>handleSET()</code></li>
+</ul>
+<h2 id="splitpos">SPLITPOS</h2>
+<h3 id="splitpossdsi">/^SPLITPOS\s+(\d+)\s*$/i</h3>
+<ul>
+<li>1 ⇒ <code>LINK-&gt;splitpos</code></li>
+</ul>
+<h2 id="target-2">TARGET</h2>
+<h3 id="target-3">TARGET</h3>
+<ul>
+<li>→ <code>handleTARGET()</code></li>
+</ul>
+<h2 id="template-1">TEMPLATE</h2>
+<h3 id="stemplatesssi-1">/^\s<em>TEMPLATE\s+(\S+)\s</em>$/i</h3>
+<ul>
+<li>→ <code>handleTEMPLATE()</code></li>
+</ul>
+<h2 id="usescale-1">USESCALE</h2>
+<h3 id="usescalesa-za-za-za-z0-9_si">/^USESCALE\s+([A-Za-z][A-Za-z0-9_]<em>)\s</em>$/i</h3>
+<ul>
+<li>1 ⇒ <code>LINK-&gt;usescale</code></li>
+</ul>
+<h3 id="usescalesa-za-za-za-z0-9_sabsolutepercentsi">/^USESCALE\s+([A-Za-z][A-Za-z0-9_]<em>)\s+(absolute|percent)\s</em>$/i</h3>
+<ul>
+<li><p>1 ⇒ <code>LINK-&gt;usescale</code></p></li>
+<li><p>2 ⇒ <code>LINK-&gt;scaletype</code></p></li>
+</ul>
+<h2 id="via">VIA</h2>
+<h3 id="via-1">VIA</h3>
+<ul>
+<li>→ <code>handleVIA()</code></li>
+</ul>
+<h2 id="viastyle">VIASTYLE</h2>
+<h3 id="viastylescurvedangledsi">/^VIASTYLE\s+(curved|angled)\s*$/i</h3>
+<ul>
+<li>1 ⇒ <code>LINK-&gt;viastyle</code></li>
+</ul>
+<h2 id="width-1">WIDTH</h2>
+<h3 id="widthsdsi-1">/^WIDTH\s+(\d+)\s*$/i</h3>
+<ul>
+<li>1 ⇒ <code>LINK-&gt;width</code></li>
+</ul>
+<h3 id="widthsd.dsi">/^WIDTH\s+(\d+\.\d+)\s*$/i</h3>
+<ul>
+<li>1 ⇒ <code>LINK-&gt;width</code></li>
+</ul>
+<h2 id="zorder-1">ZORDER</h2>
+<h3 id="zorders-dsi-1">/^ZORDER\s+([-+]?\d+)\s*$/i</h3>
+<ul>
+<li>1 ⇒ <code>LINK-&gt;zorder</code></li>
+</ul>
+<p>There were 146 variations</p>
+</body>
+</html>

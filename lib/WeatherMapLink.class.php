@@ -27,7 +27,6 @@ class WeatherMapLink extends WeatherMapDataItem
     var $selected; //TODO - can a link even BE selected?
     var $vialist = array();
     var $viastyle;
-    var $duplex;
     var $commentstyle;
     var $splitpos;
 
@@ -858,6 +857,8 @@ class WeatherMapLink extends WeatherMapDataItem
             $this->b->addDependency($this);
         }
     }
+
+
 
 }
 

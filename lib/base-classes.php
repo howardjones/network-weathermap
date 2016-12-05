@@ -10,6 +10,7 @@ class WeatherMapBase
     var $hints = array();
     var $inherit_fieldlist;
     var $imap_areas = array();
+    var $parent;
 
     protected $config = array();
     protected $descendents = array();
@@ -201,33 +202,6 @@ class WeatherMapBase
         return array($this->name);
     }
 
-    public function setTemplate($template_name, $owner)
-    {
-        $this->template = $template_name;
-        wm_debug("Resetting to template %s %s\n", $this->my_type(), $template_name);
-        $this->reset($owner);
-    }
-
-    // by tracking which objects depend on each other, we can reduce the number of full-table searches for a single object
-    // (mostly in the editor for things like moving nodes)
-
-    function CopyFrom(&$source)
-    {
-        wm_debug("Initialising %s $this->name from $source->name\n", $this->my_type());
-        assert('is_object($source)');
-
-        foreach (array_keys($this->inherit_fieldlist) as $fld) {
-            if ($fld != 'template') {
-                $this->$fld = $source->$fld;
-                if ($fld == 'targets') {
-                    $this->targets = array();
-                    foreach ($source->targets as $tgt) {
-                        $this->targets []= clone $tgt;
-                    }
-                }
-            }
-        }
-    }
 
     public function addDependency($object)
     {
@@ -268,6 +242,7 @@ class WeatherMapConfigItem
 // The 'things on the map' class. More common code (mainly variables, actually)
 class WeatherMapItem extends WeatherMapBase
 {
+    /** @var  WeatherMap $owner */
     var $owner;
 
     var $configline;

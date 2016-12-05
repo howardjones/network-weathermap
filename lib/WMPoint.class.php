@@ -59,7 +59,10 @@ class WMPoint
         return false;
     }
 
-
+    /**
+     * @param WMPoint $p2
+     * @return WMVector
+     */
     public function vectorToPoint($p2)
     {
         $v = new WMVector($p2->x - $this->x, $p2->y - $this->y);

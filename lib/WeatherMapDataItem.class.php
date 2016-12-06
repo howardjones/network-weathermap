@@ -24,15 +24,6 @@ class WeatherMapDataItem extends WeatherMapItem
     var $template;
     var $duplex;
 
-//    public $bandwidth_in;
-//    public $bandwidth_out;
-//    public $inpercent;
-//    public $outpercent;
-//    public $max_bandwidth_in;
-//    public $max_bandwidth_out;
-//    public $max_bandwidth_in_cfg;
-//    public $max_bandwidth_out_cfg;
-
     public $inscalekey;
     public $outscalekey;
     public $inscaletag;
@@ -154,12 +145,6 @@ class WeatherMapDataItem extends WeatherMapItem
             $this->maxValues[$const] = WMUtility::interpretNumberWithMetricSuffix($this->maxValuesConfigured[$const],
                 $kilo);
         }
-//        // while we're looping through, let's set the real bandwidths
-//        $this->maxValues[IN] = WMUtility::interpretNumberWithMetricSuffix($this->max_bandwidth_in_cfg, $kilo);
-//        $this->maxValues[OUT] = WMUtility::interpretNumberWithMetricSuffix($this->max_bandwidth_out_cfg, $kilo);
-
-//        $this->max_bandwidth_in = $this->maxValues[IN];
-//        $this->max_bandwidth_out = $this->maxValues[OUT];
 
         wm_debug(sprintf("   Setting bandwidth on %s (%s -> %d bps, %s -> %d bps, KILO = %d)\n", $this,
             $this->maxValuesConfigured[IN], $this->maxValues[IN], $this->maxValuesConfigured[OUT],
@@ -287,6 +272,10 @@ class WeatherMapDataItem extends WeatherMapItem
                 wm_debug("Calculating percentage using half-duplex\n");
                 // in a half duplex link, in and out share a common bandwidth pool, so percentages need to include both
                 $value = ($this->absoluteUsages[IN] + $this->absoluteUsages[OUT]);
+
+                if ($this->maxValues[OUT] != $this->maxValues[IN]) {
+                    wm_warn("ReadData: $this: You're using asymmetric bandwidth AND half-duplex in the same link. That makes no sense. [WMWARN44]\n");
+                }
             }
 
             $this->percentUsages[$channel] = ($value / $this->maxValues[$channel]) * 100;
@@ -297,9 +286,6 @@ class WeatherMapDataItem extends WeatherMapItem
             $this->add_note("max_bandwidth_" . $channelName . "_cfg", $this->maxValuesConfigured[$channel]);
         }
 
-//            if ($this->max_bandwidth_out != $this->max_bandwidth_in) {
-//                wm_warn("ReadData: $this: You're using asymmetric bandwidth AND half-duplex in the same link. That makes no sense. [WMWARN44]\n");
-//            }
     }
 
     public function calculateScaleColours()

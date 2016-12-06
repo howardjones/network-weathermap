@@ -20,7 +20,7 @@ function draw_icon($destination, $source, $x, $y)
 
 $weathermap_debugging = TRUE;
 
-if (1==0) {
+if (1==1) {
 
     $icon = $loader->imagecreatefromfile("images/grey-ball-64.png");
     print $icon;
@@ -53,7 +53,7 @@ draw_icon($im, $icon6, 120, 100);
 $icon6a = $loader->imagecreatescaledcolourizedfromfile("images/grey-ball-64.png", 32, 32, $colour, 'imagecolorize');
 draw_icon($im, $icon6a, 170, 100);
 
-if (1==0) {
+if (1==1) {
 
     $icon7 = $loader->imagecreatescaledcolourizedfromfile("images/grey-ball-64.png", 0, 0, $colour, 'imagefilter');
     draw_icon($im, $icon7, 50, 200);

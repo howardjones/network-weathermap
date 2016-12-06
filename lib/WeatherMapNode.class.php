@@ -94,8 +94,6 @@ class WeatherMapNode extends WeatherMapDataItem
             #'incolour'=>-1,'outcolour'=>-1,
             'original_x' => 0,
             'original_y' => 0,
-//            'inpercent' => 0,
-//            'outpercent' => 0,
             'labelangle' => 0,
             'iconfile' => '',
             'iconscalew' => 0,
@@ -124,10 +122,6 @@ class WeatherMapNode extends WeatherMapDataItem
             'labeloffsetx' => 0,
             'labeloffsety' => 0,
             'zorder' => 600,
-//            'max_bandwidth_in' => 100,
-//            'max_bandwidth_out' => 100,
-//            'max_bandwidth_in_cfg' => '100',
-//            'max_bandwidth_out_cfg' => '100'
         );
 
         $this->reset($owner);
@@ -759,21 +753,21 @@ class WeatherMapNode extends WeatherMapDataItem
             wm_debug("Writing config for NODE $this->name against $this->template\n");
 
             $basic_params = array(
-                # array('template','TEMPLATE',CONFIG_TYPE_LITERAL),
-                array('label', 'LABEL', CONFIG_TYPE_LITERAL),
-                array('zorder', 'ZORDER', CONFIG_TYPE_LITERAL),
-                array('labeloffset', 'LABELOFFSET', CONFIG_TYPE_LITERAL),
-                array('labelfont', 'LABELFONT', CONFIG_TYPE_LITERAL),
-                array('labelangle', 'LABELANGLE', CONFIG_TYPE_LITERAL),
-                array('overlibwidth', 'OVERLIBWIDTH', CONFIG_TYPE_LITERAL),
-                array('overlibheight', 'OVERLIBHEIGHT', CONFIG_TYPE_LITERAL),
+                # array('template','TEMPLATE',self::CONFIG_TYPE_LITERAL),
+                array('label', 'LABEL', self::CONFIG_TYPE_LITERAL),
+                array('zorder', 'ZORDER', self::CONFIG_TYPE_LITERAL),
+                array('labeloffset', 'LABELOFFSET', self::CONFIG_TYPE_LITERAL),
+                array('labelfont', 'LABELFONT', self::CONFIG_TYPE_LITERAL),
+                array('labelangle', 'LABELANGLE', self::CONFIG_TYPE_LITERAL),
+                array('overlibwidth', 'OVERLIBWIDTH', self::CONFIG_TYPE_LITERAL),
+                array('overlibheight', 'OVERLIBHEIGHT', self::CONFIG_TYPE_LITERAL),
 
-                array('aiconoutlinecolour', 'AICONOUTLINECOLOR', CONFIG_TYPE_COLOR),
-                array('aiconfillcolour', 'AICONFILLCOLOR', CONFIG_TYPE_COLOR),
-                array('labeloutlinecolour', 'LABELOUTLINECOLOR', CONFIG_TYPE_COLOR),
-                array('labelfontshadowcolour', 'LABELFONTSHADOWCOLOR', CONFIG_TYPE_COLOR),
-                array('labelbgcolour', 'LABELBGCOLOR', CONFIG_TYPE_COLOR),
-                array('labelfontcolour', 'LABELFONTCOLOR', CONFIG_TYPE_COLOR)
+                array('aiconoutlinecolour', 'AICONOUTLINECOLOR', self::CONFIG_TYPE_COLOR),
+                array('aiconfillcolour', 'AICONFILLCOLOR', self::CONFIG_TYPE_COLOR),
+                array('labeloutlinecolour', 'LABELOUTLINECOLOR', self::CONFIG_TYPE_COLOR),
+                array('labelfontshadowcolour', 'LABELFONTSHADOWCOLOR', self::CONFIG_TYPE_COLOR),
+                array('labelbgcolour', 'LABELBGCOLOR', self::CONFIG_TYPE_COLOR),
+                array('labelfontcolour', 'LABELFONTCOLOR', self::CONFIG_TYPE_COLOR)
             );
 
             # TEMPLATE must come first. DEFAULT
@@ -781,15 +775,8 @@ class WeatherMapNode extends WeatherMapDataItem
                 $output .= "\tTEMPLATE " . $this->template . "\n";
             }
 
-            foreach ($basic_params as $param) {
-                $field = $param[0];
-                $keyword = $param[1];
+            $output .= $this->getSimpleConfig($basic_params, $dd, $output);
 
-                if ($this->$field != $dd->$field) {
-                    if ($param[2] == CONFIG_TYPE_COLOR) $output .= "\t$keyword " . $this->$field->asConfig() . "\n";
-                    if ($param[2] == CONFIG_TYPE_LITERAL) $output .= "\t$keyword " . $this->$field . "\n";
-                }
-            }
 
             // IN/OUT are the same, so we can use the simpler form here
             if ($this->infourl[IN] != $dd->infourl[IN]) {

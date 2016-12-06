@@ -8,6 +8,14 @@ require_once "HTML_ImageMap.class.php";
 
 class WeatherMapLink extends WeatherMapDataItem
 {
+    const FMT_BITS_IN = "{link:this:bandwidth_in:%2k}";
+    const FMT_BITS_OUT = "{link:this:bandwidth_out:%2k}";
+    const FMT_UNFORM_IN = "{link:this:bandwidth_in}";
+    const FMT_UNFORM_OUT = "{link:this:bandwidth_out}";
+    const FMT_PERC_IN = "{link:this:inpercent:%.2f}%";
+    const FMT_PERC_OUT = "{link:this:outpercent:%.2f}%";
+    
+    
 //	var $maphtml;
     /** @var  WeatherMapNode $a */
     /** @var  WeatherMapNode $b */
@@ -86,7 +94,7 @@ class WeatherMapLink extends WeatherMapDataItem
             'notes' => array(),
             'hints' => array(),
             'comments' => array('', ''),
-            'bwlabelformats' => array(FMT_PERC_IN, FMT_PERC_OUT),
+            'bwlabelformats' => array(self::FMT_PERC_IN, self::FMT_PERC_OUT),
             'overliburl' => array(array(), array()),
             'notestext' => array(IN => '', OUT => ''),
             'maxValuesConfigured' => array(IN => "100M", OUT => "100M"),
@@ -101,8 +109,6 @@ class WeatherMapLink extends WeatherMapDataItem
             'bwfontcolour' => new WMColour(0, 0, 0),
             'bwboxcolour' => new WMColour(255, 255, 255),
             'commentfontcolour' => new WMColour(192, 192, 192),
-//            'inpercent' => 0,
-//            'outpercent' => 0,
             'inscalekey' => '',
             'outscalekey' => '',
             'a_offset' => 'C',
@@ -114,13 +120,7 @@ class WeatherMapLink extends WeatherMapDataItem
             'a_offset_resolved' => false,
             'b_offset_resolved' => false,
             'zorder' => 300,
-            'overlibcaption' => array('', ''),
-//            'max_bandwidth_in' => 100000000,
-//            'max_bandwidth_out' => 100000000,
-//            'bandwidth_in' => 0,
-//            'bandwidth_out' => 0,
-//            'max_bandwidth_in_cfg' => '100M',
-//            'max_bandwidth_out_cfg' => '100M'
+            'overlibcaption' => array('', '')
         );
 
         $this->reset($owner);
@@ -542,27 +542,27 @@ class WeatherMapLink extends WeatherMapDataItem
             wm_debug("Writing config for LINK $this->name against $this->template\n");
 
             $basic_params = array(
-                array('width', 'WIDTH', CONFIG_TYPE_LITERAL),
-                array('zorder', 'ZORDER', CONFIG_TYPE_LITERAL),
-                array('overlibwidth', 'OVERLIBWIDTH', CONFIG_TYPE_LITERAL),
-                array('overlibheight', 'OVERLIBHEIGHT', CONFIG_TYPE_LITERAL),
-                array('arrowstyle', 'ARROWSTYLE', CONFIG_TYPE_LITERAL),
-                array('viastyle', 'VIASTYLE', CONFIG_TYPE_LITERAL),
-                array('linkstyle', 'LINKSTYLE', CONFIG_TYPE_LITERAL),
-                array('splitpos', 'SPLITPOS', CONFIG_TYPE_LITERAL),
-                array('duplex', 'DUPLEX', CONFIG_TYPE_LITERAL),
-                array('commentstyle', 'COMMENTSTYLE', CONFIG_TYPE_LITERAL),
-                array('labelboxstyle', 'BWSTYLE', CONFIG_TYPE_LITERAL),
-                //		array('usescale','USESCALE',CONFIG_TYPE_LITERAL),
+                array('width', 'WIDTH', self::CONFIG_TYPE_LITERAL),
+                array('zorder', 'ZORDER', self::CONFIG_TYPE_LITERAL),
+                array('overlibwidth', 'OVERLIBWIDTH', self::CONFIG_TYPE_LITERAL),
+                array('overlibheight', 'OVERLIBHEIGHT', self::CONFIG_TYPE_LITERAL),
+                array('arrowstyle', 'ARROWSTYLE', self::CONFIG_TYPE_LITERAL),
+                array('viastyle', 'VIASTYLE', self::CONFIG_TYPE_LITERAL),
+                array('linkstyle', 'LINKSTYLE', self::CONFIG_TYPE_LITERAL),
+                array('splitpos', 'SPLITPOS', self::CONFIG_TYPE_LITERAL),
+                array('duplex', 'DUPLEX', self::CONFIG_TYPE_LITERAL),
+                array('commentstyle', 'COMMENTSTYLE', self::CONFIG_TYPE_LITERAL),
+                array('labelboxstyle', 'BWSTYLE', self::CONFIG_TYPE_LITERAL),
+                //		array('usescale','USESCALE',self::CONFIG_TYPE_LITERAL),
 
-                array('bwfont', 'BWFONT', CONFIG_TYPE_LITERAL),
-                array('commentfont', 'COMMENTFONT', CONFIG_TYPE_LITERAL),
+                array('bwfont', 'BWFONT', self::CONFIG_TYPE_LITERAL),
+                array('commentfont', 'COMMENTFONT', self::CONFIG_TYPE_LITERAL),
 
-                array('bwoutlinecolour', 'BWOUTLINECOLOR', CONFIG_TYPE_COLOR),
-                array('bwboxcolour', 'BWBOXCOLOR', CONFIG_TYPE_COLOR),
-                array('outlinecolour', 'OUTLINECOLOR', CONFIG_TYPE_COLOR),
-                array('commentfontcolour', 'COMMENTFONTCOLOR', CONFIG_TYPE_COLOR),
-                array('bwfontcolour', 'BWFONTCOLOR', CONFIG_TYPE_COLOR)
+                array('bwoutlinecolour', 'BWOUTLINECOLOR', self::CONFIG_TYPE_COLOR),
+                array('bwboxcolour', 'BWBOXCOLOR', self::CONFIG_TYPE_COLOR),
+                array('outlinecolour', 'OUTLINECOLOR', self::CONFIG_TYPE_COLOR),
+                array('commentfontcolour', 'COMMENTFONTCOLOR', self::CONFIG_TYPE_COLOR),
+                array('bwfontcolour', 'BWFONTCOLOR', self::CONFIG_TYPE_COLOR)
             );
 
             # TEMPLATE must come first. DEFAULT
@@ -570,19 +570,7 @@ class WeatherMapLink extends WeatherMapDataItem
                 $output .= "\tTEMPLATE " . $this->template . "\n";
             }
 
-            foreach ($basic_params as $param) {
-                $field = $param[0];
-                $keyword = $param[1];
-
-                if ($this->$field != $dd->$field) {
-                    if ($param[2] == CONFIG_TYPE_COLOR) {
-                        $output .= "\t$keyword " . $this->$field->asConfig() . "\n";
-                    }
-                    if ($param[2] == CONFIG_TYPE_LITERAL) {
-                        $output .= "\t$keyword " . $this->$field . "\n";
-                    }
-                }
-            }
+            $output .= $this->getSimpleConfig($basic_params, $dd, $output);
 
             $val = $this->usescale . " " . $this->scaletype;
             $comparison = $dd->usescale . " " . $dd->scaletype;
@@ -640,13 +628,13 @@ class WeatherMapLink extends WeatherMapDataItem
             }
 
             // if formats have been set, but they're just the longform of the built-in styles, set them back to the built-in styles
-            if ($this->labelstyle == '--' && $this->bwlabelformats[IN] == FMT_PERC_IN && $this->bwlabelformats[OUT] == FMT_PERC_OUT) {
+            if ($this->labelstyle == '--' && $this->bwlabelformats[IN] == self::FMT_PERC_IN && $this->bwlabelformats[OUT] == self::FMT_PERC_OUT) {
                 $this->labelstyle = 'percent';
             }
-            if ($this->labelstyle == '--' && $this->bwlabelformats[IN] == FMT_BITS_IN && $this->bwlabelformats[OUT] == FMT_BITS_OUT) {
+            if ($this->labelstyle == '--' && $this->bwlabelformats[IN] == self::FMT_BITS_IN && $this->bwlabelformats[OUT] == self::FMT_BITS_OUT) {
                 $this->labelstyle = 'bits';
             }
-            if ($this->labelstyle == '--' && $this->bwlabelformats[IN] == FMT_UNFORM_IN && $this->bwlabelformats[OUT] == FMT_UNFORM_OUT) {
+            if ($this->labelstyle == '--' && $this->bwlabelformats[IN] == self::FMT_UNFORM_IN && $this->bwlabelformats[OUT] == self::FMT_UNFORM_OUT) {
                 $this->labelstyle = 'unformatted';
             }
 
@@ -857,8 +845,6 @@ class WeatherMapLink extends WeatherMapDataItem
             $this->b->addDependency($this);
         }
     }
-
-
 
 }
 

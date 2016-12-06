@@ -4,6 +4,14 @@
 // Just to make some common code common.
 class WeatherMapBase
 {
+    // the source information for config fetching
+    const CONF_NOT_FOUND = 0;
+    const CONF_FOUND_DIRECT = 1;
+    const CONF_FOUND_INHERITED = 2;
+
+    const CONFIG_TYPE_LITERAL = 0;
+    const CONFIG_TYPE_COLOR = 1;
+
     public $name;
 
     var $notes = array();
@@ -115,16 +123,16 @@ class WeatherMapBase
     public function getConfigValue($keyname)
     {
         if (isset($this->config[$keyname])) {
-            return array($this->config[$keyname], CONF_FOUND_DIRECT);
+            return array($this->config[$keyname], self::CONF_FOUND_DIRECT);
         } else {
             if (!is_null($this->parent)) {
                 list($value, $direct) = $this->parent->getConfig($keyname);
-                if ($direct != CONF_NOT_FOUND) {
-                    $direct = CONF_FOUND_INHERITED;
+                if ($direct != self::CONF_NOT_FOUND) {
+                    $direct = self::CONF_FOUND_INHERITED;
                 }
             } else {
                 $value = null;
-                $direct = CONF_NOT_FOUND;
+                $direct = self::CONF_NOT_FOUND;
             }
 
             // if we got to the top of the tree without finding it, that's probably a typo in the original getConfig()
@@ -227,6 +235,30 @@ class WeatherMapBase
     {
         $this->dependencies = array();
         $this->descendents = array();
+    }
+
+    /**
+     * @param array basic_params
+     * @param WeatherMapBase $reference
+     * @return string
+     */
+    protected function getSimpleConfig($basic_params, $reference)
+    {
+        $output = "";
+        foreach ($basic_params as $param) {
+            $field = $param[0];
+            $keyword = $param[1];
+
+            if ($this->$field != $reference->$field) {
+                if ($param[2] == WeatherMapBase::CONFIG_TYPE_COLOR) {
+                    $output .= "\t$keyword " . $this->$field->asConfig() . "\n";
+                }
+                if ($param[2] == WeatherMapBase::CONFIG_TYPE_LITERAL) {
+                    $output .= "\t$keyword " . $this->$field . "\n";
+                }
+            }
+        }
+        return $output;
     }
 
 }

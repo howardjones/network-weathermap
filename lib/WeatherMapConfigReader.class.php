@@ -782,8 +782,8 @@ class WeatherMapConfigReader
                     '/^BWLABEL\s+bits\s*$/i',
                     array(
                         'labelstyle' => 'bits',
-                        'bwlabelformats[IN]' => FMT_BITS_IN,
-                        'bwlabelformats[OUT]' => FMT_BITS_OUT,
+                        'bwlabelformats[IN]' => WeatherMapLink::FMT_BITS_IN,
+                        'bwlabelformats[OUT]' => WeatherMapLink::FMT_BITS_OUT,
                     )
                 ),
                 array(
@@ -791,8 +791,8 @@ class WeatherMapConfigReader
                     '/^BWLABEL\s+percent\s*$/i',
                     array(
                         'labelstyle' => 'percent',
-                        'bwlabelformats[IN]' => FMT_PERC_IN,
-                        'bwlabelformats[OUT]' => FMT_PERC_OUT,
+                        'bwlabelformats[IN]' => WeatherMapLink::FMT_PERC_IN,
+                        'bwlabelformats[OUT]' => WeatherMapLink::FMT_PERC_OUT,
                     )
                 ),
                 array(
@@ -800,8 +800,8 @@ class WeatherMapConfigReader
                     '/^BWLABEL\s+unformatted\s*$/i',
                     array(
                         'labelstyle' => 'unformatted',
-                        'bwlabelformats[IN]' => FMT_UNFORM_IN,
-                        'bwlabelformats[OUT]' => FMT_UNFORM_OUT,
+                        'bwlabelformats[IN]' => WeatherMapLink::FMT_UNFORM_IN,
+                        'bwlabelformats[OUT]' => WeatherMapLink::FMT_UNFORM_OUT,
                     )
                 ),
                 array(

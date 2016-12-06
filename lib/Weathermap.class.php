@@ -812,20 +812,20 @@ class WeatherMap extends WeatherMapBase
         $output .= "\n";
 
         $basic_params = array(
-            array('title', 'TITLE', CONFIG_TYPE_LITERAL),
-            array('width', 'WIDTH', CONFIG_TYPE_LITERAL),
-            array('height', 'HEIGHT', CONFIG_TYPE_LITERAL),
-            array('background', 'BACKGROUND', CONFIG_TYPE_LITERAL),
-            array('htmlstyle', 'HTMLSTYLE', CONFIG_TYPE_LITERAL),
-            array('kilo', 'KILO', CONFIG_TYPE_LITERAL),
-            array('keyfont', 'KEYFONT', CONFIG_TYPE_LITERAL),
-            array('timefont', 'TIMEFONT', CONFIG_TYPE_LITERAL),
-            array('titlefont', 'TITLEFONT', CONFIG_TYPE_LITERAL),
-            array('htmloutputfile', 'HTMLOUTPUTFILE', CONFIG_TYPE_LITERAL),
-            array('dataoutputfile', 'DATAOUTPUTFILE', CONFIG_TYPE_LITERAL),
-            array('htmlstylesheet', 'HTMLSTYLESHEET', CONFIG_TYPE_LITERAL),
-            array('imageuri', 'IMAGEURI', CONFIG_TYPE_LITERAL),
-            array('imageoutputfile', 'IMAGEOUTPUTFILE', CONFIG_TYPE_LITERAL)
+            array('title', 'TITLE', self::CONFIG_TYPE_LITERAL),
+            array('width', 'WIDTH', self::CONFIG_TYPE_LITERAL),
+            array('height', 'HEIGHT', self::CONFIG_TYPE_LITERAL),
+            array('background', 'BACKGROUND', self::CONFIG_TYPE_LITERAL),
+            array('htmlstyle', 'HTMLSTYLE', self::CONFIG_TYPE_LITERAL),
+            array('kilo', 'KILO', self::CONFIG_TYPE_LITERAL),
+            array('keyfont', 'KEYFONT', self::CONFIG_TYPE_LITERAL),
+            array('timefont', 'TIMEFONT', self::CONFIG_TYPE_LITERAL),
+            array('titlefont', 'TITLEFONT', self::CONFIG_TYPE_LITERAL),
+            array('htmloutputfile', 'HTMLOUTPUTFILE', self::CONFIG_TYPE_LITERAL),
+            array('dataoutputfile', 'DATAOUTPUTFILE', self::CONFIG_TYPE_LITERAL),
+            array('htmlstylesheet', 'HTMLSTYLESHEET', self::CONFIG_TYPE_LITERAL),
+            array('imageuri', 'IMAGEURI', self::CONFIG_TYPE_LITERAL),
+            array('imageoutputfile', 'IMAGEOUTPUTFILE', self::CONFIG_TYPE_LITERAL)
         );
 
         foreach ($basic_params as $param) {
@@ -833,14 +833,15 @@ class WeatherMap extends WeatherMapBase
             $keyword = $param[1];
 
             if ($this->$field != $this->inherit_fieldlist[$field]) {
-                if ($param[2] == CONFIG_TYPE_COLOR) {
+                if ($param[2] == self::CONFIG_TYPE_COLOR) {
                     $output .= "$keyword " . $this->$field->asConfig() . "\n";
                 }
-                if ($param[2] == CONFIG_TYPE_LITERAL) {
+                if ($param[2] == self::CONFIG_TYPE_LITERAL) {
                     $output .= "$keyword " . $this->$field . "\n";
                 }
             }
         }
+
 
         $output .= $this->getConfigForPosition("TIMEPOS", array("timex", "timey", "stamptext"), $this,
             $this->inherit_fieldlist);

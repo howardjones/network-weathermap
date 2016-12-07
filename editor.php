@@ -398,13 +398,13 @@ else
 			}
 
 			if (wm_editor_validate_bandwidth($bwin)) {
-				$map->links[$link_name]->max_bandwidth_in_cfg = $bwin;
-				$map->links[$link_name]->max_bandwidth_in = WMUtility::interpretNumberWithMetricSuffixOrNull($bwin, $map->kilo);
+				$map->links[$link_name]->maxValuesConfigured[IN] = $bwin;
+				$map->links[$link_name]->maxValues[IN] = WMUtility::interpretNumberWithMetricSuffixOrNull($bwin, $map->kilo);
 
 			}
 			if (wm_editor_validate_bandwidth($bwout)) {
-				$map->links[$link_name]->max_bandwidth_out_cfg = $bwout;
-				$map->links[$link_name]->max_bandwidth_out = WMUtility::interpretNumberWithMetricSuffixOrNull($bwout, $map->kilo);
+				$map->links[$link_name]->maxValuesConfigured[OUT] = $bwout;
+				$map->links[$link_name]->maxValues[OUT] = WMUtility::interpretNumberWithMetricSuffixOrNull($bwout, $map->kilo);
 			}
 			// $map->links[$link_name]->SetBandwidth($bwin,$bwout);
 
@@ -446,8 +446,8 @@ else
 		$bwin = $_REQUEST['map_linkdefaultbwin'];
 		$bwout = $_REQUEST['map_linkdefaultbwout'];
 		
-		$bwin_old = $map->links['DEFAULT']->max_bandwidth_in_cfg;
-		$bwout_old = $map->links['DEFAULT']->max_bandwidth_out_cfg;
+		$bwin_old = $map->links['DEFAULT']->maxValuesConfigured[IN];
+		$bwout_old = $map->links['DEFAULT']->maxValuesConfigured[OUT];
 		
 		if (! wm_editor_validate_bandwidth($bwin)) {
 		    $bwin = $bwin_old;

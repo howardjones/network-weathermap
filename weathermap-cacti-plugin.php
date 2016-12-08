@@ -578,7 +578,9 @@ function weathermap_mapselector($current_id = 0)
 		$lastgroup = "------lasdjflkjsdlfkjlksdjflksjdflkjsldjlkjsd";
 		foreach ($maps as $map)
 		{
-			if ($current_id == $map->id) $nullhash = $map->filehash;
+			if ($current_id == $map->id) {
+			    $nullhash = $map->filehash;
+            }
 			if ($map->name != $lastgroup)
 			{
 				$ngroups++;
@@ -593,7 +595,7 @@ function weathermap_mapselector($current_id = 0)
 				print "<option style='font-weight: bold; font-style: italic' value='$nullhash'>".htmlspecialchars($map->name)."</option>";
 				$lastgroup = $map->name;
 			}
-			print '<op§tion ';
+			print '<option ';
 			if ($current_id == $map->id) {
                 print " SELECTED ";
             }

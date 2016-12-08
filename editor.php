@@ -966,6 +966,10 @@ else
 <?php        	
 	// we need to draw and throw away a map, to get the
 	// dimensions for the imagemap. Oh well.
+
+    // but save the actual htmlstyle, or the form will be wrong
+    $real_htmlstyle = $map->htmlstyle;
+
 	$map->DrawMap('null');
 	$map->htmlstyle='editor';
 	$map->calculateImagemap();
@@ -1266,9 +1270,9 @@ else
 		  </tr>
 		  <tr>
 			<th>HTML Style</th>
-			<td><select name="mapstyle_htmlstyle">
-			  <option <?php echo ($map->htmlstyle=='overlib' ? 'selected' : '') ?> value="overlib">Overlib (DHTML)</option>
-			  <option <?php echo ($map->htmlstyle=='static' ? 'selected' : '') ?> value="static">Static HTML</option>
+			<td><select name="mapstyle_htmlstyle" >
+			  <option <?php echo ($real_htmlstyle=='overlib' ? 'selected' : '') ?> value="overlib">Overlib (DHTML)</option>
+			  <option <?php echo ($real_htmlstyle=='static' ? 'selected' : '') ?> value="static">Static HTML</option>
 			</select></td>
 		  </tr>
 		  <tr>

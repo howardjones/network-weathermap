@@ -181,19 +181,6 @@ class WeatherMapNode extends WeatherMapDataItem
         // start these off with sensible values, so that bbox
         // calculations are easier.
 
-        $txt_x = $this->x;
-        $txt_y = $this->y;
-
-        $icon_x1 = $this->x;
-        $icon_x2 = $this->x;
-        $icon_y1 = $this->y;
-        $icon_y2 = $this->y;
-
-        $label_x1 = $this->x;
-        $label_x2 = $this->x;
-        $label_y1 = $this->y;
-        $label_y2 = $this->y;
-
         $boundingBox = new WMBoundingBox();
         $labelBox = new WMRectangle($this->x, $this->y, $this->x, $this->y);
         $iconBox = new WMRectangle($this->x, $this->y, $this->x, $this->y);
@@ -201,8 +188,8 @@ class WeatherMapNode extends WeatherMapDataItem
 
         $labelBoxWidth = 0;
         $labelBoxHeight = 0;
-        $icon_w = 0;
-        $icon_h = 0;
+        $iconWidth = 0;
+        $iconHeight = 0;
 
         $col = new WMColour('none');
 
@@ -214,17 +201,14 @@ class WeatherMapNode extends WeatherMapDataItem
             if ($this->scalevar == 'in') {
                 $pc = $this->percentUsages[IN];
                 $col = $this->colours[IN];
-
             }
 
             if ($this->scalevar == 'out') {
                 $pc = $this->percentUsages[OUT];
                 $col = $this->colours[OUT];
-
             }
         } elseif (!$this->labelbgcolour->isNone()) {
             wm_debug("labelbgcolour=%s\n", $this->labelbgcolour);
-            // $col=myimagecolorallocate($node_im, $this->labelbgcolour[0], $this->labelbgcolour[1], $this->labelbgcolour[2]);
             $col = $this->labelbgcolour;
         }
 
@@ -277,13 +261,9 @@ class WeatherMapNode extends WeatherMapDataItem
                 wm_debug("Node->pre_render: " . $this->name . " Label Metrics are: $stringWidth x $stringHeight -> $labelBoxWidth x $labelBoxHeight\n");
 
                 if ($this->labelangle == 90) {
-                    $txt_x = $this->x + ($stringHeight / 2);
-                    $txt_y = $this->y + ($stringWidth / 2);
                     $textPoint = new WMPoint($stringHeight/2, $stringWidth/2);
                 }
                 if ($this->labelangle == 270) {
-                    $txt_x = $this->x - ($stringHeight / 2);
-                    $txt_y = $this->y - ($stringWidth / 2);
                     $textPoint = new WMPoint(-$stringHeight/2, -$stringWidth/2);
                 }
             }
@@ -294,23 +274,13 @@ class WeatherMapNode extends WeatherMapDataItem
                 wm_debug("Node->pre_render: " . $this->name . " Label Metrics are: $stringWidth x $stringHeight -> $labelBoxWidth x $labelBoxHeight\n");
 
                 if ($this->labelangle == 0) {
-                    $txt_x = $this->x - ($stringWidth / 2);
-                    $txt_y = $this->y + ($stringHeight / 2);
-                    $textPoint = new WMPoint(-$stringHeight / 2, $stringWidth / 2);
+                    $textPoint = new WMPoint(-$stringWidth / 2, $stringHeight / 2);
                 }
 
                 if ($this->labelangle == 180) {
-                    $txt_x = $this->x + ($stringWidth / 2);
-                    $txt_y = $this->y - ($stringHeight / 2);
-                    $textPoint = new WMPoint(-$stringHeight/2, -$stringWidth/2);
+                    $textPoint = new WMPoint($stringWidth/2, -$stringHeight/2);
                 }
             }
-
-            $label_x1 = $this->x - ($labelBoxWidth / 2);
-            $label_y1 = $this->y - ($labelBoxHeight / 2);
-
-            $label_x2 = $this->x + ($labelBoxWidth / 2);
-            $label_y2 = $this->y + ($labelBoxHeight / 2);
 
             $textPoint->translate($this->x, $this->y);
 
@@ -319,12 +289,9 @@ class WeatherMapNode extends WeatherMapDataItem
 
             wm_debug("LABEL at %s\n", $labelBox);
 
-//            $map->nodes[$this->name]->width = $boxwidth;
-//            $map->nodes[$this->name]->height = $boxheight;
             $this->width = $labelBoxWidth;
             $this->height = $labelBoxHeight;
 
-            # print "TEXT at $txt_x , $txt_y\n";
         }
 
         //********************************
@@ -332,8 +299,8 @@ class WeatherMapNode extends WeatherMapDataItem
         // figure out a bounding rectangle for the icon
         if ($this->iconfile != '') {
             $icon_im = NULL;
-            $icon_w = 0;
-            $icon_h = 0;
+            $iconWidth = 0;
+            $iconHeight = 0;
 
             if ($this->iconfile == 'rbox' || $this->iconfile == 'box' || $this->iconfile == 'round' || $this->iconfile == 'inpie' || $this->iconfile == 'outpie' || $this->iconfile == 'gauge' || $this->iconfile == 'nink') {
                 $icon_im = $this->drawArtificialIcon($map, $col);
@@ -344,21 +311,16 @@ class WeatherMapNode extends WeatherMapDataItem
             //********************************
 
             if ($icon_im) {
-                $icon_w = imagesx($icon_im);
-                $icon_h = imagesy($icon_im);
+                $iconWidth = imagesx($icon_im);
+                $iconHeight = imagesy($icon_im);
 
-                $icon_x1 = $this->x - $icon_w / 2;
-                $icon_y1 = $this->y - $icon_h / 2;
-                $icon_x2 = $this->x + $icon_w / 2;
-                $icon_y2 = $this->y + $icon_h / 2;
-
-                $iconBox = new WMRectangle(-$icon_w/2, -$icon_h/2, $icon_w/2, $icon_h/2);
+                $iconBox = new WMRectangle(-$iconWidth/2, -$iconHeight/2, $iconWidth/2, $iconHeight/2);
                 $iconBox->translate($this->x, $this->y);
 
-                $this->width = $icon_w;
-                $this->height = $icon_h;
+                $this->width = $iconWidth;
+                $this->height = $iconHeight;
 
-                $this->boundingboxes[] = array($icon_x1, $icon_y1, $icon_x2, $icon_y2);
+                $this->boundingboxes[] = $iconBox->asArray();
                 $boundingBox->addRectangle($iconBox);
             }
         }
@@ -371,62 +333,41 @@ class WeatherMapNode extends WeatherMapDataItem
             $this->labeloffsety = 0;
 
             list($dx, $dy) = WMUtility::calculateOffset($this->labeloffset,
-                ($icon_w + $labelBoxWidth - 1),
-                ($icon_h + $labelBoxHeight)
+                ($iconWidth + $labelBoxWidth - 1),
+                ($iconHeight + $labelBoxHeight)
             );
         }
-
-        $label_x1 += ($this->labeloffsetx + $dx);
-        $label_x2 += ($this->labeloffsetx + $dx);
-        $label_y1 += ($this->labeloffsety + $dy);
-        $label_y2 += ($this->labeloffsety + $dy);
 
         $labelBox->translate($this->labeloffsetx + $dx, $this->labeloffsety + $dy);
 
         if ($this->label != '') {
-            $this->boundingboxes[] = array($label_x1, $label_y1, $label_x2, $label_y2);
+            $this->boundingboxes[] = $labelBox->asArray();
             $boundingBox->addRectangle($labelBox);
         }
 
         // work out the bounding box of the whole thing
 
-        $bbox_x1 = min($label_x1, $icon_x1);
-        $bbox_x2 = max($label_x2, $icon_x2) + 1;
-        $bbox_y1 = min($label_y1, $icon_y1);
-        $bbox_y2 = max($label_y2, $icon_y2) + 1;
-
         $totalBoundingBox = $boundingBox->getBoundingRectangle();
+        $totalBoundingBox->bottomRight->translate(1,1);
 
         // create TWO imagemap entries - one for the label and one for the icon
         // (so we can have close-spaced icons better)
 
-        $temp_width = $bbox_x2 - $bbox_x1;
-        $temp_height = $bbox_y2 - $bbox_y1;
         // create an image of that size and draw into it
-        $node_im = imagecreatetruecolor($temp_width, $temp_height);
+        $node_im = imagecreatetruecolor($totalBoundingBox->width(), $totalBoundingBox->height());
         // ImageAlphaBlending($node_im, FALSE);
         //imagesavealpha($node_im, true);
 
         $nothing = imagecolorallocatealpha($node_im, 128, 0, 0, 127);
         imagefill($node_im, 0, 0, $nothing);
 
-        $label_x1 -= $bbox_x1;
-        $label_x2 -= $bbox_x1;
-        $label_y1 -= $bbox_y1;
-        $label_y2 -= $bbox_y1;
-
         $labelBox->translate(-$totalBoundingBox->topLeft->x, -$totalBoundingBox->topLeft->y);
-
-        $icon_x1 -= $bbox_x1;
-        $icon_x2 -= $bbox_x1;
-        $icon_y1 -= $bbox_y1;
-        $icon_y2 -= $bbox_y1;
         $iconBox->translate(-$totalBoundingBox->topLeft->x, -$totalBoundingBox->topLeft->y);
 
         // Draw the icon, if any
         if (isset($icon_im)) {
             imagealphablending($node_im, true);
-            imagecopy($node_im, $icon_im, $icon_x1, $icon_y1, 0, 0, imagesx($icon_im), imagesy($icon_im));
+            imagecopy($node_im, $icon_im, $iconBox->topLeft->x, $iconBox->topLeft->y, 0, 0, imagesx($icon_im), imagesy($icon_im));
             imagedestroy($icon_im);
         }
 
@@ -434,55 +375,67 @@ class WeatherMapNode extends WeatherMapDataItem
         if ($this->label != '') {
             $textPoint->translate(-$totalBoundingBox->topLeft->x, -$totalBoundingBox->topLeft->y);
             $textPoint->translate($this->labeloffsetx+$dx, $this->labeloffsety+$dy);
-            $txt_x -= $bbox_x1;
-            $txt_x += ($this->labeloffsetx + $dx);
-            $txt_y -= $bbox_y1;
-            $txt_y += ($this->labeloffsety + $dy);
-
-            #       print "FINAL TEXT at $txt_x , $txt_y\n";
 
             wm_debug("Label colour is $col\n");
 
             // if there's an icon, then you can choose to have no background
-            // if (! $col->isNone() )
             if (!$this->labelbgcolour->isNone()) {
-                imagefilledrectangle($node_im, $label_x1, $label_y1, $label_x2, $label_y2, $col->gdallocate($node_im));
+                imagefilledrectangle($node_im,
+                    $labelBox->topLeft->x,
+                    $labelBox->topLeft->y,
+                    $labelBox->bottomRight->x,
+                    $labelBox->bottomRight->y,
+                    $col->gdallocate($node_im));
             }
 
             if ($this->selected) {
-                imagerectangle($node_im, $label_x1, $label_y1, $label_x2, $label_y2, $map->selected);
+                imagerectangle($node_im,
+                    $labelBox->topLeft->x,
+                    $labelBox->topLeft->y,
+                    $labelBox->bottomRight->x,
+                    $labelBox->bottomRight->y,
+                    $map->selected);
                 // would be nice if it was thicker, too...
-                imagerectangle($node_im, $label_x1 + 1, $label_y1 + 1, $label_x2 - 1, $label_y2 - 1, $map->selected);
+                imagerectangle($node_im,
+                    $labelBox->topLeft->x - 1,
+                    $labelBox->topLeft->y - 1,
+                    $labelBox->bottomRight->x + 1,
+                    $labelBox->bottomRight->y + 1,
+                    $map->selected);
             } else {
-                $olcol = $this->labeloutlinecolour;
-                if ($olcol->isRealColour()) {
-                    imagerectangle($node_im, $label_x1, $label_y1, $label_x2, $label_y2, $olcol->gdAllocate($node_im));
+                $outlineColour = $this->labeloutlinecolour;
+                if ($outlineColour->isRealColour()) {
+                    imagerectangle($node_im,
+                        $labelBox->topLeft->x,
+                        $labelBox->topLeft->y,
+                        $labelBox->bottomRight->x,
+                        $labelBox->bottomRight->y,
+                        $outlineColour->gdAllocate($node_im));
                 }
             }
-            #}
 
             $fontObject = $this->owner->fonts->getFont($this->labelfont);
 
-            $shcol = $this->labelfontshadowcolour;
-            if ($shcol->isRealColour()) {
-                $fontObject->drawImageString($node_im, $txt_x + 1, $txt_y + 1, $this->proclabel, $shcol->gdAllocate($node_im), $this->labelangle);
+            $shadowColour = $this->labelfontshadowcolour;
+            if ($shadowColour->isRealColour()) {
+                $fontObject->drawImageString($node_im, $textPoint->x + 1, $textPoint->y + 1, $this->proclabel, $shadowColour->gdAllocate($node_im), $this->labelangle);
             }
 
-            $txcol = $this->labelfontcolour;
+            $textColour = $this->labelfontcolour;
 
-            if ($txcol->isContrast()) {
+            if ($textColour->isContrast()) {
                 if ($col->isRealColour()) {
-                    $txcol = $col->getContrastingColour();
+                    $textColour = $col->getContrastingColour();
                 } else {
                     wm_warn("You can't make a contrast with 'none'. Guessing black. [WMWARN43]\n");
-                    $txcol = new WMColour(0, 0, 0);
+                    $textColour = new WMColour(0, 0, 0);
                 }
             }
-            $fontObject->drawImageString($node_im, $txt_x, $txt_y, $this->proclabel, $txcol->gdAllocate($node_im), $this->labelangle);
+            $fontObject->drawImageString($node_im,  $textPoint->x, $textPoint->y , $this->proclabel, $textColour->gdAllocate($node_im), $this->labelangle);
         }
 
-        $this->centre_x = $this->x - $bbox_x1;
-        $this->centre_y = $this->y - $bbox_y1;
+        $this->centre_x = $this->x - $totalBoundingBox->topLeft->x;
+        $this->centre_y = $this->y - $totalBoundingBox->topLeft->y;
 
         $this->image = $node_im;
 

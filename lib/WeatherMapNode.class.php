@@ -194,8 +194,13 @@ class WeatherMapNode extends WeatherMapDataItem
         $label_y1 = $this->y;
         $label_y2 = $this->y;
 
-        $boxwidth = 0;
-        $boxheight = 0;
+        $boundingBox = new WMBoundingBox();
+        $labelBox = new WMRectangle($this->x, $this->y, $this->x, $this->y);
+        $iconBox = new WMRectangle($this->x, $this->y, $this->x, $this->y);
+        $textPoint = new WMPoint($this->x, $this->y);
+
+        $labelBoxWidth = 0;
+        $labelBoxHeight = 0;
         $icon_w = 0;
         $icon_h = 0;
 
@@ -252,8 +257,8 @@ class WeatherMapNode extends WeatherMapDataItem
 
         // figure out a bounding rectangle for the label
         if ($this->label != '') {
-            $padding = 4.0;
-            $padfactor = 1.0;
+            $paddingConstant = 4.0;
+            $paddingFactor = 1.0;
 
             $this->proclabel = $map->ProcessString($this->label, $this, TRUE, TRUE);
 
@@ -264,55 +269,60 @@ class WeatherMapNode extends WeatherMapDataItem
             }
 
             $fontObject = $this->owner->fonts->getFont($this->labelfont);
-            list($strwidth, $strheight) = $fontObject->calculateImageStringSize($this->proclabel);
+            list($stringWidth, $stringHeight) = $fontObject->calculateImageStringSize($this->proclabel);
 
             if ($this->labelangle == 90 || $this->labelangle == 270) {
-                $boxwidth = ($strheight * $padfactor) + $padding;
-                $boxheight = ($strwidth * $padfactor) + $padding;
-                wm_debug("Node->pre_render: " . $this->name . " Label Metrics are: $strwidth x $strheight -> $boxwidth x $boxheight\n");
-
-                $label_x1 = $this->x - ($boxwidth / 2);
-                $label_y1 = $this->y - ($boxheight / 2);
-
-                $label_x2 = $this->x + ($boxwidth / 2);
-                $label_y2 = $this->y + ($boxheight / 2);
+                $labelBoxWidth = $stringHeight * $paddingFactor + $paddingConstant;
+                $labelBoxHeight = $stringWidth * $paddingFactor + $paddingConstant;
+                wm_debug("Node->pre_render: " . $this->name . " Label Metrics are: $stringWidth x $stringHeight -> $labelBoxWidth x $labelBoxHeight\n");
 
                 if ($this->labelangle == 90) {
-                    $txt_x = $this->x + ($strheight / 2);
-                    $txt_y = $this->y + ($strwidth / 2);
+                    $txt_x = $this->x + ($stringHeight / 2);
+                    $txt_y = $this->y + ($stringWidth / 2);
+                    $textPoint = new WMPoint($stringHeight/2, $stringWidth/2);
                 }
                 if ($this->labelangle == 270) {
-                    $txt_x = $this->x - ($strheight / 2);
-                    $txt_y = $this->y - ($strwidth / 2);
+                    $txt_x = $this->x - ($stringHeight / 2);
+                    $txt_y = $this->y - ($stringWidth / 2);
+                    $textPoint = new WMPoint(-$stringHeight/2, -$stringWidth/2);
                 }
             }
 
             if ($this->labelangle == 0 || $this->labelangle == 180) {
-                $boxwidth = ($strwidth * $padfactor) + $padding;
-                $boxheight = ($strheight * $padfactor) + $padding;
-                wm_debug("Node->pre_render: " . $this->name . " Label Metrics are: $strwidth x $strheight -> $boxwidth x $boxheight\n");
+                $labelBoxWidth = $stringWidth * $paddingFactor + $paddingConstant;
+                $labelBoxHeight = $stringHeight * $paddingFactor + $paddingConstant;
+                wm_debug("Node->pre_render: " . $this->name . " Label Metrics are: $stringWidth x $stringHeight -> $labelBoxWidth x $labelBoxHeight\n");
 
-                $label_x1 = $this->x - ($boxwidth / 2);
-                $label_y1 = $this->y - ($boxheight / 2);
-
-                $label_x2 = $this->x + ($boxwidth / 2);
-                $label_y2 = $this->y + ($boxheight / 2);
-
-                $txt_x = $this->x - ($strwidth / 2);
-                $txt_y = $this->y + ($strheight / 2);
-
-                if ($this->labelangle == 180) {
-                    $txt_x = $this->x + ($strwidth / 2);
-                    $txt_y = $this->y - ($strheight / 2);
+                if ($this->labelangle == 0) {
+                    $txt_x = $this->x - ($stringWidth / 2);
+                    $txt_y = $this->y + ($stringHeight / 2);
+                    $textPoint = new WMPoint(-$stringHeight / 2, $stringWidth / 2);
                 }
 
-                # $this->width = $boxwidth;
-                # $this->height = $boxheight;
+                if ($this->labelangle == 180) {
+                    $txt_x = $this->x + ($stringWidth / 2);
+                    $txt_y = $this->y - ($stringHeight / 2);
+                    $textPoint = new WMPoint(-$stringHeight/2, -$stringWidth/2);
+                }
             }
+
+            $label_x1 = $this->x - ($labelBoxWidth / 2);
+            $label_y1 = $this->y - ($labelBoxHeight / 2);
+
+            $label_x2 = $this->x + ($labelBoxWidth / 2);
+            $label_y2 = $this->y + ($labelBoxHeight / 2);
+
+            $textPoint->translate($this->x, $this->y);
+
+            $labelBox = new WMRectangle(-$labelBoxWidth/2, -$labelBoxHeight/2, $labelBoxWidth/2, $labelBoxHeight/2);
+            $labelBox->translate($this->x, $this->y);
+
+            wm_debug("LABEL at %s\n", $labelBox);
+
 //            $map->nodes[$this->name]->width = $boxwidth;
 //            $map->nodes[$this->name]->height = $boxheight;
-            $this->width = $boxwidth;
-            $this->height = $boxheight;
+            $this->width = $labelBoxWidth;
+            $this->height = $labelBoxHeight;
 
             # print "TEXT at $txt_x , $txt_y\n";
         }
@@ -342,10 +352,14 @@ class WeatherMapNode extends WeatherMapDataItem
                 $icon_x2 = $this->x + $icon_w / 2;
                 $icon_y2 = $this->y + $icon_h / 2;
 
+                $iconBox = new WMRectangle(-$icon_w/2, -$icon_h/2, $icon_w/2, $icon_h/2);
+                $iconBox->translate($this->x, $this->y);
+
                 $this->width = $icon_w;
                 $this->height = $icon_h;
 
                 $this->boundingboxes[] = array($icon_x1, $icon_y1, $icon_x2, $icon_y2);
+                $boundingBox->addRectangle($iconBox);
             }
         }
 
@@ -357,8 +371,8 @@ class WeatherMapNode extends WeatherMapDataItem
             $this->labeloffsety = 0;
 
             list($dx, $dy) = WMUtility::calculateOffset($this->labeloffset,
-                ($icon_w + $boxwidth - 1),
-                ($icon_h + $boxheight)
+                ($icon_w + $labelBoxWidth - 1),
+                ($icon_h + $labelBoxHeight)
             );
         }
 
@@ -367,8 +381,11 @@ class WeatherMapNode extends WeatherMapDataItem
         $label_y1 += ($this->labeloffsety + $dy);
         $label_y2 += ($this->labeloffsety + $dy);
 
+        $labelBox->translate($this->labeloffsetx + $dx, $this->labeloffsety + $dy);
+
         if ($this->label != '') {
             $this->boundingboxes[] = array($label_x1, $label_y1, $label_x2, $label_y2);
+            $boundingBox->addRectangle($labelBox);
         }
 
         // work out the bounding box of the whole thing
@@ -377,6 +394,8 @@ class WeatherMapNode extends WeatherMapDataItem
         $bbox_x2 = max($label_x2, $icon_x2) + 1;
         $bbox_y1 = min($label_y1, $icon_y1);
         $bbox_y2 = max($label_y2, $icon_y2) + 1;
+
+        $totalBoundingBox = $boundingBox->getBoundingRectangle();
 
         // create TWO imagemap entries - one for the label and one for the icon
         // (so we can have close-spaced icons better)
@@ -396,10 +415,13 @@ class WeatherMapNode extends WeatherMapDataItem
         $label_y1 -= $bbox_y1;
         $label_y2 -= $bbox_y1;
 
+        $labelBox->translate(-$totalBoundingBox->topLeft->x, -$totalBoundingBox->topLeft->y);
+
         $icon_x1 -= $bbox_x1;
         $icon_x2 -= $bbox_x1;
         $icon_y1 -= $bbox_y1;
         $icon_y2 -= $bbox_y1;
+        $iconBox->translate(-$totalBoundingBox->topLeft->x, -$totalBoundingBox->topLeft->y);
 
         // Draw the icon, if any
         if (isset($icon_im)) {
@@ -410,6 +432,8 @@ class WeatherMapNode extends WeatherMapDataItem
 
         // Draw the label, if any
         if ($this->label != '') {
+            $textPoint->translate(-$totalBoundingBox->topLeft->x, -$totalBoundingBox->topLeft->y);
+            $textPoint->translate($this->labeloffsetx+$dx, $this->labeloffsety+$dy);
             $txt_x -= $bbox_x1;
             $txt_x += ($this->labeloffsetx + $dx);
             $txt_y -= $bbox_y1;

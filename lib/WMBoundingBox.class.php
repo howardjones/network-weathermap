@@ -17,12 +17,18 @@ class WMBoundingBox
         $this->minimumY = null;
     }
 
+    /**
+     * @param WMRectangle $rect
+     */
     public function addRectangle($rect)
     {
         $this->addWMPoint($rect->topLeft);
         $this->addWMPoint($rect->bottomRight);
     }
 
+    /**
+     * @param WMPoint $point
+     */
     public function addWMPoint($point)
     {
         $this->addPoint($point->x, $point->y);

@@ -317,6 +317,8 @@ class WeatherMapNode extends WeatherMapDataItem
             # print "TEXT at $txt_x , $txt_y\n";
         }
 
+        //********************************
+
         // figure out a bounding rectangle for the icon
         if ($this->iconfile != '') {
             $icon_im = NULL;
@@ -324,205 +326,12 @@ class WeatherMapNode extends WeatherMapDataItem
             $icon_h = 0;
 
             if ($this->iconfile == 'rbox' || $this->iconfile == 'box' || $this->iconfile == 'round' || $this->iconfile == 'inpie' || $this->iconfile == 'outpie' || $this->iconfile == 'gauge' || $this->iconfile == 'nink') {
-                wm_debug("Artificial Icon type " . $this->iconfile . " for $this->name\n");
-                // this is an artificial icon - we don't load a file for it
-
-                $icon_im = imagecreatetruecolor($this->iconscalew, $this->iconscaleh);
-                imagesavealpha($icon_im, TRUE);
-
-                $nothing = imagecolorallocatealpha($icon_im, 128, 0, 0, 127);
-                imagefill($icon_im, 0, 0, $nothing);
-
-                $fill = NULL;
-                $ink = NULL;
-
-                $aifill = $this->aiconfillcolour;
-                $aiink = $this->aiconoutlinecolour;
-
-                // if useiconscale isn't set, then use the static
-                // colour defined, or copy the colour from the label
-                if ($this->useiconscale == "none") {
-
-                    if ($aifill->isCopy() && !$col->isNone()) {
-                        $fill = $col;
-                    } else {
-                        if ($aifill->isRealColour()) {
-                            $fill = $aifill;
-                        }
-                    }
-                } else {
-                    // if useiconscale IS defined, use that to figure out
-                    // the fill colour
-                    $pc = 0;
-                    $val = 0;
-
-                    if ($this->iconscalevar == 'in') {
-                        $pc = $this->percentUsages[IN];
-                        $val = $this->absoluteUsages[IN];
-                    }
-
-                    if ($this->iconscalevar == 'out') {
-                        $pc = $this->percentUsages[OUT];
-                        $val = $this->absoluteUsages[OUT];
-                    }
-
-                    if ($this->iconscaletype == 'percent') {
-                        list($fill, $junk, $junk) =
-                            $this->owner->scales[$this->useiconscale]->ColourFromValue($pc, $this->name);
-
-                    } else {
-                        // use the absolute value if we aren't doing percentage scales.
-                        list($fill, $junk, $junk) =
-                            $this->owner->scales[$this->useiconscale]->ColourFromValue($val, $this->name, false);
-                    }
-                }
-
-                if ($this->aiconoutlinecolour != array(-1, -1, -1)) {
-                    $ink = $aiink;
-                }
-
-                wm_debug("ink is: $ink\n");
-                wm_debug("fill is: $fill\n");
-
-                if ($this->iconfile == 'box') {
-                    if ($fill !== NULL && !$fill->isNone()) {
-                        imagefilledrectangle($icon_im, 0, 0, $this->iconscalew - 1, $this->iconscaleh - 1, $fill->gdallocate($icon_im));
-                    }
-
-                    if ($ink !== NULL && !$ink->isNone()) {
-                        imagerectangle($icon_im, 0, 0, $this->iconscalew - 1, $this->iconscaleh - 1, $ink->gdallocate($icon_im));
-                    }
-                }
-
-                if ($this->iconfile == 'rbox') {
-                    if ($fill !== NULL && !$fill->isNone()) {
-                        imagefilledroundedrectangle($icon_im, 0, 0, $this->iconscalew - 1, $this->iconscaleh - 1, 4, $fill->gdallocate($icon_im));
-                    }
-
-                    if ($ink !== NULL && !$ink->isNone()) {
-                        imageroundedrectangle($icon_im, 0, 0, $this->iconscalew - 1, $this->iconscaleh - 1, 4, $ink->gdallocate($icon_im));
-                    }
-                }
-
-                if ($this->iconfile == 'round') {
-                    $rx = $this->iconscalew / 2 - 1;
-                    $ry = $this->iconscaleh / 2 - 1;
-
-                    if ($fill !== NULL && !$fill->isNone()) {
-                        imagefilledellipse($icon_im, $rx, $ry, $rx * 2, $ry * 2, $fill->gdallocate($icon_im));
-                    }
-
-                    if ($ink !== NULL && !$ink->isNone()) {
-                        imageellipse($icon_im, $rx, $ry, $rx * 2, $ry * 2, $ink->gdallocate($icon_im));
-                    }
-                }
-
-                if ($this->iconfile == 'nink') {
-                    $rx = $this->iconscalew / 2 - 1;
-                    $ry = $this->iconscaleh / 2 - 1;
-                    $size = $this->iconscalew;
-                    $quarter = $size / 4;
-
-                    $col1 = $this->colours[OUT];
-                    $col2 = $this->colours[IN];
-
-                    assert('!is_null($col1)');
-                    assert('!is_null($col2)');
-
-                    imagefilledarc($icon_im, $rx - 1, $ry, $size, $size, 270, 90, $col1->gdallocate($icon_im), IMG_ARC_PIE);
-                    imagefilledarc($icon_im, $rx + 1, $ry, $size, $size, 90, 270, $col2->gdallocate($icon_im), IMG_ARC_PIE);
-
-                    imagefilledarc($icon_im, $rx - 1, $ry + $quarter, $quarter * 2, $quarter * 2, 0, 360, $col1->gdallocate($icon_im), IMG_ARC_PIE);
-                    imagefilledarc($icon_im, $rx + 1, $ry - $quarter, $quarter * 2, $quarter * 2, 0, 360, $col2->gdallocate($icon_im), IMG_ARC_PIE);
-
-                    if ($ink !== NULL && !$ink->isNone()) {
-                        // XXX - need a font definition from somewhere for NINK text
-                        $font = 1;
-
-                        $instr = $map->ProcessString("{node:this:bandwidth_in:%.1k}", $this);
-                        $outstr = $map->ProcessString("{node:this:bandwidth_out:%.1k}", $this);
-
-                        $fontObject = $this->owner->fonts->getFont($font);
-                        list($twid, $thgt) = $fontObject->calculateImageStringSize($instr);
-                        $fontObject->drawImageString($icon_im, $rx - $twid / 2, $ry - $quarter + ($thgt / 2), $instr, $ink->gdallocate($icon_im));
-
-                        list($twid, $thgt) = $fontObject->calculateImageStringSize($outstr);
-                        $fontObject->drawImageString($icon_im, $rx - $twid / 2, $ry + $quarter + ($thgt / 2), $outstr, $ink->gdallocate($icon_im));
-
-                        imageellipse($icon_im, $rx, $ry, $rx * 2, $ry * 2, $ink->gdallocate($icon_im));
-                    }
-                }
-
-                // XXX - needs proper colours
-                if ($this->iconfile == 'inpie' || $this->iconfile == 'outpie') {
-
-                    $segment_angle = 0;
-                    if ($this->iconfile == 'inpie') {
-                        $segment_angle = (($this->percentUsages[IN]) / 100) * 360;
-                    }
-                    if ($this->iconfile == 'outpie') {
-                        $segment_angle = (($this->percentUsages[OUT]) / 100) * 360;
-                    }
-
-                    $rx = $this->iconscalew / 2 - 1;
-                    $ry = $this->iconscaleh / 2 - 1;
-
-                    if ($fill !== null && !$fill->isNone()) {
-                        imagefilledellipse($icon_im, $rx, $ry, $rx * 2, $ry * 2, $fill->gdallocate($icon_im));
-                    }
-
-                    if ($ink !== null && !$ink->isNone()) {
-                        imagefilledarc($icon_im, $rx, $ry, $rx * 2, $ry * 2, 0, $segment_angle,
-                            $ink->gdallocate($icon_im), IMG_ARC_PIE);
-                    }
-
-                    if ($fill !== null && !$fill->isNone()) {
-                        imageellipse($icon_im, $rx, $ry, $rx * 2, $ry * 2, $fill->gdallocate($icon_im));
-                    }
-                }
-
-                if ($this->iconfile == 'gauge') {
-                    wm_warn('gauge AICON not implemented yet [WMWARN99]');
-                }
-
-            } else {
-                $this->iconfile = $map->ProcessString($this->iconfile, $this);
-
-                if (is_readable($this->iconfile)) {
-                    imagealphablending($im, true);
-                    // draw the supplied icon, instead of the labelled box
-                    if (isset($colicon)) {
-                        $colour_method = "imagecolorize";
-                        if (function_exists("imagefilter") && $map->get_hint("use_imagefilter") == 1) {
-                            $colour_method = "imagefilter";
-                        }
-
-                        $icon_im = $this->owner->imagecache->imagecreatescaledcolourizedfromfile(
-                            $this->iconfile,
-                            $this->iconscalew,
-                            $this->iconscaleh,
-                            $colicon,
-                            $colour_method);
-
-                    } else {
-                        $icon_im = $this->owner->imagecache->imagecreatescaledfromfile(
-                            $this->iconfile,
-                            $this->iconscalew,
-                            $this->iconscaleh);
-                    }
-
-                    if (!$icon_im) {
-                        wm_warn("Couldn't open ICON: '" . $this->iconfile . "' - is it a PNG, JPEG or GIF? [WMWARN37]\n");
-                    }
-
-                    // TODO - this needs to happen BEFORE rescaling
-
-                } else {
-                    if ($this->iconfile != 'none') {
-                        wm_warn("ICON '" . $this->iconfile . "' does not exist, or is not readable. Check path and permissions. [WMARN38]\n");
-                    }
-                }
+                $icon_im = $this->drawArtificialIcon($map, $col);
+            }  else {
+                $icon_im = $this->drawRealIcon($map, $colicon);
             }
+
+            //********************************
 
             if ($icon_im) {
                 $icon_w = imagesx($icon_im);
@@ -538,7 +347,6 @@ class WeatherMapNode extends WeatherMapDataItem
 
                 $this->boundingboxes[] = array($icon_x1, $icon_y1, $icon_x2, $icon_y2);
             }
-
         }
 
         // do any offset calculations
@@ -578,7 +386,7 @@ class WeatherMapNode extends WeatherMapDataItem
         // create an image of that size and draw into it
         $node_im = imagecreatetruecolor($temp_width, $temp_height);
         // ImageAlphaBlending($node_im, FALSE);
-        imagesavealpha($node_im, true);
+        //imagesavealpha($node_im, true);
 
         $nothing = imagecolorallocatealpha($node_im, 128, 0, 0, 127);
         imagefill($node_im, 0, 0, $nothing);
@@ -595,6 +403,7 @@ class WeatherMapNode extends WeatherMapDataItem
 
         // Draw the icon, if any
         if (isset($icon_im)) {
+            imagealphablending($node_im, true);
             imagecopy($node_im, $icon_im, $icon_x1, $icon_y1, 0, 0, imagesx($icon_im), imagesy($icon_im));
             imagedestroy($icon_im);
         }
@@ -1042,6 +851,224 @@ class WeatherMapNode extends WeatherMapDataItem
         return $this->owner->getNode($this->template);
     }
 
+    /**
+     * @param $map
+     * @param $labelColour
+     * @return resource
+     */
+    private function drawArtificialIcon(&$map, $labelColour)
+    {
+        wm_debug("Artificial Icon type " . $this->iconfile . " for $this->name\n");
+        // this is an artificial icon - we don't load a file for it
+
+        $icon_im = imagecreatetruecolor($this->iconscalew, $this->iconscaleh);
+        imagesavealpha($icon_im, TRUE);
+
+        $nothing = imagecolorallocatealpha($icon_im, 128, 0, 0, 127);
+        imagefill($icon_im, 0, 0, $nothing);
+
+        $fill = NULL;
+        $ink = NULL;
+
+        $aifill = $this->aiconfillcolour;
+        $aiink = $this->aiconoutlinecolour;
+
+        // if useiconscale isn't set, then use the static
+        // colour defined, or copy the colour from the label
+        if ($this->useiconscale == "none") {
+
+            if ($aifill->isCopy() && !$labelColour->isNone()) {
+                $fill = $labelColour;
+            } else {
+                if ($aifill->isRealColour()) {
+                    $fill = $aifill;
+                }
+            }
+        } else {
+            // if useiconscale IS defined, use that to figure out
+            // the fill colour
+            $pc = 0;
+            $val = 0;
+
+            if ($this->iconscalevar == 'in') {
+                $pc = $this->percentUsages[IN];
+                $val = $this->absoluteUsages[IN];
+            }
+
+            if ($this->iconscalevar == 'out') {
+                $pc = $this->percentUsages[OUT];
+                $val = $this->absoluteUsages[OUT];
+            }
+
+            if ($this->iconscaletype == 'percent') {
+                list($fill, $junk, $junk) =
+                    $this->owner->scales[$this->useiconscale]->ColourFromValue($pc, $this->name);
+
+            } else {
+                // use the absolute value if we aren't doing percentage scales.
+                list($fill, $junk, $junk) =
+                    $this->owner->scales[$this->useiconscale]->ColourFromValue($val, $this->name, false);
+            }
+        }
+
+        if ($this->aiconoutlinecolour != array(-1, -1, -1)) {
+            $ink = $aiink;
+        }
+//********************************
+
+        wm_debug("ink is: $ink\n");
+        wm_debug("fill is: $fill\n");
+
+        if ($this->iconfile == 'box') {
+            if ($fill !== NULL && !$fill->isNone()) {
+                imagefilledrectangle($icon_im, 0, 0, $this->iconscalew - 1, $this->iconscaleh - 1, $fill->gdallocate($icon_im));
+            }
+
+            if ($ink !== NULL && !$ink->isNone()) {
+                imagerectangle($icon_im, 0, 0, $this->iconscalew - 1, $this->iconscaleh - 1, $ink->gdallocate($icon_im));
+            }
+        }
+
+        if ($this->iconfile == 'rbox') {
+            if ($fill !== NULL && !$fill->isNone()) {
+                imagefilledroundedrectangle($icon_im, 0, 0, $this->iconscalew - 1, $this->iconscaleh - 1, 4, $fill->gdallocate($icon_im));
+            }
+
+            if ($ink !== NULL && !$ink->isNone()) {
+                imageroundedrectangle($icon_im, 0, 0, $this->iconscalew - 1, $this->iconscaleh - 1, 4, $ink->gdallocate($icon_im));
+            }
+        }
+
+        if ($this->iconfile == 'round') {
+            $rx = $this->iconscalew / 2 - 1;
+            $ry = $this->iconscaleh / 2 - 1;
+
+            if ($fill !== NULL && !$fill->isNone()) {
+                imagefilledellipse($icon_im, $rx, $ry, $rx * 2, $ry * 2, $fill->gdallocate($icon_im));
+            }
+
+            if ($ink !== NULL && !$ink->isNone()) {
+                imageellipse($icon_im, $rx, $ry, $rx * 2, $ry * 2, $ink->gdallocate($icon_im));
+            }
+        }
+
+        if ($this->iconfile == 'nink') {
+            $rx = $this->iconscalew / 2 - 1;
+            $ry = $this->iconscaleh / 2 - 1;
+            $size = $this->iconscalew;
+            $quarter = $size / 4;
+
+            $col1 = $this->colours[OUT];
+            $col2 = $this->colours[IN];
+
+            assert('!is_null($col1)');
+            assert('!is_null($col2)');
+
+            imagefilledarc($icon_im, $rx - 1, $ry, $size, $size, 270, 90, $col1->gdallocate($icon_im), IMG_ARC_PIE);
+            imagefilledarc($icon_im, $rx + 1, $ry, $size, $size, 90, 270, $col2->gdallocate($icon_im), IMG_ARC_PIE);
+
+            imagefilledarc($icon_im, $rx - 1, $ry + $quarter, $quarter * 2, $quarter * 2, 0, 360, $col1->gdallocate($icon_im), IMG_ARC_PIE);
+            imagefilledarc($icon_im, $rx + 1, $ry - $quarter, $quarter * 2, $quarter * 2, 0, 360, $col2->gdallocate($icon_im), IMG_ARC_PIE);
+
+            if ($ink !== NULL && !$ink->isNone()) {
+                // XXX - need a font definition from somewhere for NINK text
+                $font = 1;
+
+                $instr = $map->ProcessString("{node:this:bandwidth_in:%.1k}", $this);
+                $outstr = $map->ProcessString("{node:this:bandwidth_out:%.1k}", $this);
+
+                $fontObject = $this->owner->fonts->getFont($font);
+                list($twid, $thgt) = $fontObject->calculateImageStringSize($instr);
+                $fontObject->drawImageString($icon_im, $rx - $twid / 2, $ry - $quarter + ($thgt / 2), $instr, $ink->gdallocate($icon_im));
+
+                list($twid, $thgt) = $fontObject->calculateImageStringSize($outstr);
+                $fontObject->drawImageString($icon_im, $rx - $twid / 2, $ry + $quarter + ($thgt / 2), $outstr, $ink->gdallocate($icon_im));
+
+                imageellipse($icon_im, $rx, $ry, $rx * 2, $ry * 2, $ink->gdallocate($icon_im));
+            }
+        }
+
+        // XXX - needs proper colours
+        if ($this->iconfile == 'inpie' || $this->iconfile == 'outpie') {
+
+            $segment_angle = 0;
+            if ($this->iconfile == 'inpie') {
+                $segment_angle = (($this->percentUsages[IN]) / 100) * 360;
+            }
+            if ($this->iconfile == 'outpie') {
+                $segment_angle = (($this->percentUsages[OUT]) / 100) * 360;
+            }
+
+            $rx = $this->iconscalew / 2 - 1;
+            $ry = $this->iconscaleh / 2 - 1;
+
+            if ($fill !== null && !$fill->isNone()) {
+                imagefilledellipse($icon_im, $rx, $ry, $rx * 2, $ry * 2, $fill->gdallocate($icon_im));
+            }
+
+            if ($ink !== null && !$ink->isNone()) {
+                imagefilledarc($icon_im, $rx, $ry, $rx * 2, $ry * 2, 0, $segment_angle,
+                    $ink->gdallocate($icon_im), IMG_ARC_PIE);
+            }
+
+            if ($fill !== null && !$fill->isNone()) {
+                imageellipse($icon_im, $rx, $ry, $rx * 2, $ry * 2, $fill->gdallocate($icon_im));
+            }
+        }
+
+        if ($this->iconfile == 'gauge') {
+            wm_warn('gauge AICON not implemented yet [WMWARN99]');
+        }
+
+        return $icon_im;
+    }
+
+    /**
+     * @param $map
+     * @param $colicon
+     * @return resource
+     */
+    private function drawRealIcon(&$map, $colicon)
+    {
+        $this->iconfile = $map->ProcessString($this->iconfile, $this);
+
+        wm_debug("Actual image-based icon from " . $this->iconfile . " for $this->name\n");
+
+        $icon_im = null;
+
+        if (is_readable($this->iconfile)) {
+            // draw the supplied icon, instead of the labelled box
+            if (isset($colicon)) {
+                $colour_method = "imagecolorize";
+                if (function_exists("imagefilter") && $map->get_hint("use_imagefilter") == 1) {
+                    $colour_method = "imagefilter";
+                }
+
+                $icon_im = $this->owner->imagecache->imagecreatescaledcolourizedfromfile(
+                    $this->iconfile,
+                    $this->iconscalew,
+                    $this->iconscaleh,
+                    $colicon,
+                    $colour_method);
+
+            } else {
+                $icon_im = $this->owner->imagecache->imagecreatescaledfromfile(
+                    $this->iconfile,
+                    $this->iconscalew,
+                    $this->iconscaleh);
+            }
+
+            if (!$icon_im) {
+                wm_warn("Couldn't open ICON: '" . $this->iconfile . "' - is it a PNG, JPEG or GIF? [WMWARN37]\n");
+            }
+
+        } else {
+            if ($this->iconfile != 'none') {
+                wm_warn("ICON '" . $this->iconfile . "' does not exist, or is not readable. Check path and permissions. [WMARN38]\n");
+            }
+        }
+        return $icon_im;
+    }
 
 }
 

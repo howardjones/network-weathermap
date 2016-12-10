@@ -66,11 +66,14 @@ function wm_editor_validate_one_of($input, $valid = array(), $case_sensitive = f
         $input = strtolower($input);
     }
 
+
     foreach ($valid as $v) {
         if (!$case_sensitive) {
             $v = strtolower($v);
         }
-        if ($v == $input) return true;
+        if ($v == $input) {
+            return true;
+        }
     }
 
     return false;

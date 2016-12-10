@@ -12,7 +12,7 @@ class WeatherMapNode extends WeatherMapDataItem
     var $x, $y;
     var $original_x, $original_y, $relative_resolved;
     var $width, $height;
-    var $label, $proclabel;
+    var $label, $processedLabel;
     var $labelangle;
     var $selected = 0;
     var $position;
@@ -75,7 +75,7 @@ class WeatherMapNode extends WeatherMapDataItem
         $this->inherit_fieldlist = array
         (
             'boundingboxes' => array(),
-            'my_default' => NULL,
+            'my_default' => null,
             'label' => '',
             'proclabel' => '',
             'usescale' => 'DEFAULT',
@@ -87,9 +87,9 @@ class WeatherMapNode extends WeatherMapDataItem
             'iconscalevar' => 'in',
             'labelfont' => 3,
             'relative_to' => '',
-            'relative_resolved' => FALSE,
-            'x' => NULL,
-            'y' => NULL,
+            'relative_resolved' => false,
+            'x' => null,
+            'y' => null,
             'inscalekey' => '', 'outscalekey' => '',
             #'incolour'=>-1,'outcolour'=>-1,
             'original_x' => 0,
@@ -127,9 +127,9 @@ class WeatherMapNode extends WeatherMapDataItem
         $this->reset($owner);
     }
 
-    function Reset(&$newowner)
+    function Reset(&$newOwner)
     {
-        $this->owner = $newowner;
+        $this->owner = $newOwner;
         $template = $this->template;
 
         if ($template == '') $template = "DEFAULT";
@@ -152,7 +152,7 @@ class WeatherMapNode extends WeatherMapDataItem
         $this->colours[IN] = new WMColour(192, 192, 192);
         $this->colours[OUT] = new WMColour(192, 192, 192);
 
-        $this->id = $newowner->next_id++;
+        $this->id = $newOwner->next_id++;
     }
 
     function my_type()
@@ -191,52 +191,31 @@ class WeatherMapNode extends WeatherMapDataItem
         $iconWidth = 0;
         $iconHeight = 0;
 
-        $col = new WMColour('none');
+        $labelColour = new WMColour('none');
 
         // if a target is specified, and you haven't forced no background, then the background will
         // come from the SCALE in USESCALE
         if (!empty($this->targets) && $this->usescale != 'none') {
-            $pc = 0;
+            $percentValue = 0;
 
             if ($this->scalevar == 'in') {
-                $pc = $this->percentUsages[IN];
-                $col = $this->colours[IN];
+                $percentValue = $this->percentUsages[IN];
+                $labelColour = $this->colours[IN];
             }
 
             if ($this->scalevar == 'out') {
-                $pc = $this->percentUsages[OUT];
-                $col = $this->colours[OUT];
+                $percentValue = $this->percentUsages[OUT];
+                $labelColour = $this->colours[OUT];
             }
         } elseif (!$this->labelbgcolour->isNone()) {
             wm_debug("labelbgcolour=%s\n", $this->labelbgcolour);
-            $col = $this->labelbgcolour;
+            $labelColour = $this->labelbgcolour;
         }
 
-        $colicon = null;
+        $iconColour = null;
         if (!empty($this->targets) && $this->useiconscale != 'none') {
             wm_debug("Colorising the icon\n");
-            $pc = 0;
-            $val = 0;
-
-            if ($this->iconscalevar == 'in') {
-                $pc = $this->percentUsages[IN];
-                //$col = $this->colours[IN];
-                $val = $this->absoluteUsages[IN];
-            }
-            if ($this->iconscalevar == 'out') {
-                $pc = $this->percentUsages[OUT];
-                //$col = $this->colours[OUT];
-                $val = $this->absoluteUsages[OUT];
-            }
-
-            if ($this->iconscaletype == 'percent') {
-                list($colicon, $node_iconscalekey, $icontag) =
-                    $map->scales[$this->useiconscale]->colourFromValue($pc, $this->name);
-            } else {
-                // use the absolute value if we aren't doing percentage scales.
-                list($colicon, $node_iconscalekey, $icontag) =
-                    $map->scales[$this->useiconscale]->colourFromValue($val, $this->name, false);
-            }
+            $iconColour = $this->calculateIconColour($map);
         }
 
         // figure out a bounding rectangle for the label
@@ -244,47 +223,44 @@ class WeatherMapNode extends WeatherMapDataItem
             $paddingConstant = 4.0;
             $paddingFactor = 1.0;
 
-            $this->proclabel = $map->ProcessString($this->label, $this, TRUE, TRUE);
+            $this->processedLabel = $map->ProcessString($this->label, $this, true, true);
 
             // if screenshot_mode is enabled, wipe any letters to X and wipe any IP address to 127.0.0.1
             // hopefully that will preserve enough information to show cool stuff without leaking info
             if ($map->get_hint('screenshot_mode') == 1) {
-                $this->proclabel = WMUtility::stringAnonymise($this->proclabel);
+                $this->processedLabel = WMUtility::stringAnonymise($this->processedLabel);
             }
 
             $fontObject = $this->owner->fonts->getFont($this->labelfont);
-            list($stringWidth, $stringHeight) = $fontObject->calculateImageStringSize($this->proclabel);
+            list($stringWidth, $stringHeight) = $fontObject->calculateImageStringSize($this->processedLabel);
 
             if ($this->labelangle == 90 || $this->labelangle == 270) {
                 $labelBoxWidth = $stringHeight * $paddingFactor + $paddingConstant;
                 $labelBoxHeight = $stringWidth * $paddingFactor + $paddingConstant;
-                wm_debug("Node->pre_render: " . $this->name . " Label Metrics are: $stringWidth x $stringHeight -> $labelBoxWidth x $labelBoxHeight\n");
-
-                if ($this->labelangle == 90) {
-                    $textPoint = new WMPoint($stringHeight/2, $stringWidth/2);
-                }
-                if ($this->labelangle == 270) {
-                    $textPoint = new WMPoint(-$stringHeight/2, -$stringWidth/2);
-                }
             }
-
             if ($this->labelangle == 0 || $this->labelangle == 180) {
                 $labelBoxWidth = $stringWidth * $paddingFactor + $paddingConstant;
                 $labelBoxHeight = $stringHeight * $paddingFactor + $paddingConstant;
-                wm_debug("Node->pre_render: " . $this->name . " Label Metrics are: $stringWidth x $stringHeight -> $labelBoxWidth x $labelBoxHeight\n");
+            }
 
-                if ($this->labelangle == 0) {
-                    $textPoint = new WMPoint(-$stringWidth / 2, $stringHeight / 2);
-                }
+            wm_debug("Node->pre_render: " . $this->name . " Label Metrics are: $stringWidth x $stringHeight -> $labelBoxWidth x $labelBoxHeight\n");
 
-                if ($this->labelangle == 180) {
-                    $textPoint = new WMPoint($stringWidth/2, -$stringHeight/2);
-                }
+            if ($this->labelangle == 90) {
+                $textPoint = new WMPoint($stringHeight / 2, $stringWidth / 2);
+            }
+            if ($this->labelangle == 270) {
+                $textPoint = new WMPoint(-$stringHeight / 2, -$stringWidth / 2);
+            }
+            if ($this->labelangle == 0) {
+                $textPoint = new WMPoint(-$stringWidth / 2, $stringHeight / 2);
+            }
+            if ($this->labelangle == 180) {
+                $textPoint = new WMPoint($stringWidth / 2, -$stringHeight / 2);
             }
 
             $textPoint->translate($this->x, $this->y);
 
-            $labelBox = new WMRectangle(-$labelBoxWidth/2, -$labelBoxHeight/2, $labelBoxWidth/2, $labelBoxHeight/2);
+            $labelBox = new WMRectangle(-$labelBoxWidth / 2, -$labelBoxHeight / 2, $labelBoxWidth / 2, $labelBoxHeight / 2);
             $labelBox->translate($this->x, $this->y);
 
             wm_debug("LABEL at %s\n", $labelBox);
@@ -294,27 +270,23 @@ class WeatherMapNode extends WeatherMapDataItem
 
         }
 
-        //********************************
-
         // figure out a bounding rectangle for the icon
         if ($this->iconfile != '') {
-            $icon_im = NULL;
+            $icon_im = null;
             $iconWidth = 0;
             $iconHeight = 0;
 
             if ($this->iconfile == 'rbox' || $this->iconfile == 'box' || $this->iconfile == 'round' || $this->iconfile == 'inpie' || $this->iconfile == 'outpie' || $this->iconfile == 'gauge' || $this->iconfile == 'nink') {
-                $icon_im = $this->drawArtificialIcon($map, $col);
-            }  else {
-                $icon_im = $this->drawRealIcon($map, $colicon);
+                $icon_im = $this->drawArtificialIcon($map, $labelColour);
+            } else {
+                $icon_im = $this->drawRealIcon($map, $iconColour);
             }
-
-            //********************************
 
             if ($icon_im) {
                 $iconWidth = imagesx($icon_im);
                 $iconHeight = imagesy($icon_im);
 
-                $iconBox = new WMRectangle(-$iconWidth/2, -$iconHeight/2, $iconWidth/2, $iconHeight/2);
+                $iconBox = new WMRectangle(-$iconWidth / 2, -$iconHeight / 2, $iconWidth / 2, $iconHeight / 2);
                 $iconBox->translate($this->x, $this->y);
 
                 $this->width = $iconWidth;
@@ -339,7 +311,9 @@ class WeatherMapNode extends WeatherMapDataItem
         }
 
         $labelBox->translate($this->labeloffsetx + $dx, $this->labeloffsety + $dy);
+        $textPoint->translate($this->labeloffsetx + $dx, $this->labeloffsety + $dy);
 
+        // now we have the labelBox in the final position, add it to the bounding box list
         if ($this->label != '') {
             $this->boundingboxes[] = $labelBox->asArray();
             $boundingBox->addRectangle($labelBox);
@@ -348,14 +322,14 @@ class WeatherMapNode extends WeatherMapDataItem
         // work out the bounding box of the whole thing
 
         $totalBoundingBox = $boundingBox->getBoundingRectangle();
-        $totalBoundingBox->bottomRight->translate(1,1);
+        $totalBoundingBox->bottomRight->translate(1, 1);
 
         // create TWO imagemap entries - one for the label and one for the icon
         // (so we can have close-spaced icons better)
 
         // create an image of that size and draw into it
         $node_im = imagecreatetruecolor($totalBoundingBox->width(), $totalBoundingBox->height());
-        // ImageAlphaBlending($node_im, FALSE);
+        // ImageAlphaBlending($node_im, false);
         //imagesavealpha($node_im, true);
 
         $nothing = imagecolorallocatealpha($node_im, 128, 0, 0, 127);
@@ -374,64 +348,7 @@ class WeatherMapNode extends WeatherMapDataItem
         // Draw the label, if any
         if ($this->label != '') {
             $textPoint->translate(-$totalBoundingBox->topLeft->x, -$totalBoundingBox->topLeft->y);
-            $textPoint->translate($this->labeloffsetx+$dx, $this->labeloffsety+$dy);
-
-            wm_debug("Label colour is $col\n");
-
-            // if there's an icon, then you can choose to have no background
-            if (!$this->labelbgcolour->isNone()) {
-                imagefilledrectangle($node_im,
-                    $labelBox->topLeft->x,
-                    $labelBox->topLeft->y,
-                    $labelBox->bottomRight->x,
-                    $labelBox->bottomRight->y,
-                    $col->gdallocate($node_im));
-            }
-
-            if ($this->selected) {
-                imagerectangle($node_im,
-                    $labelBox->topLeft->x,
-                    $labelBox->topLeft->y,
-                    $labelBox->bottomRight->x,
-                    $labelBox->bottomRight->y,
-                    $map->selected);
-                // would be nice if it was thicker, too...
-                imagerectangle($node_im,
-                    $labelBox->topLeft->x - 1,
-                    $labelBox->topLeft->y - 1,
-                    $labelBox->bottomRight->x + 1,
-                    $labelBox->bottomRight->y + 1,
-                    $map->selected);
-            } else {
-                $outlineColour = $this->labeloutlinecolour;
-                if ($outlineColour->isRealColour()) {
-                    imagerectangle($node_im,
-                        $labelBox->topLeft->x,
-                        $labelBox->topLeft->y,
-                        $labelBox->bottomRight->x,
-                        $labelBox->bottomRight->y,
-                        $outlineColour->gdAllocate($node_im));
-                }
-            }
-
-            $fontObject = $this->owner->fonts->getFont($this->labelfont);
-
-            $shadowColour = $this->labelfontshadowcolour;
-            if ($shadowColour->isRealColour()) {
-                $fontObject->drawImageString($node_im, $textPoint->x + 1, $textPoint->y + 1, $this->proclabel, $shadowColour->gdAllocate($node_im), $this->labelangle);
-            }
-
-            $textColour = $this->labelfontcolour;
-
-            if ($textColour->isContrast()) {
-                if ($col->isRealColour()) {
-                    $textColour = $col->getContrastingColour();
-                } else {
-                    wm_warn("You can't make a contrast with 'none'. Guessing black. [WMWARN43]\n");
-                    $textColour = new WMColour(0, 0, 0);
-                }
-            }
-            $fontObject->drawImageString($node_im,  $textPoint->x, $textPoint->y , $this->proclabel, $textColour->gdAllocate($node_im), $this->labelangle);
+            $this->drawLabel($map, $textPoint, $labelColour, $node_im, $labelBox);
         }
 
         $this->centre_x = $this->x - $totalBoundingBox->topLeft->x;
@@ -562,7 +479,6 @@ class WeatherMapNode extends WeatherMapDataItem
             }
 
             $output .= $this->getSimpleConfig($basic_params, $dd, $output);
-
 
             // IN/OUT are the same, so we can use the simpler form here
             if ($this->infourl[IN] != $dd->infourl[IN]) {
@@ -799,7 +715,7 @@ class WeatherMapNode extends WeatherMapDataItem
             imagedestroy($this->image);
         }
         $this->owner = null;
-     //   $this->parent = null;
+        //   $this->parent = null;
         $this->descendents = null;
         $this->image = null;
     }
@@ -812,7 +728,6 @@ class WeatherMapNode extends WeatherMapDataItem
         }
         throw new WeathermapInternalFail("NoSuchProperty");
     }
-
 
     private function getDirectionList()
     {
@@ -829,8 +744,8 @@ class WeatherMapNode extends WeatherMapDataItem
     }
 
     /**
-     * @param $map
-     * @param $labelColour
+     * @param WeatherMap $map
+     * @param WMColour $labelColour
      * @return resource
      */
     private function drawArtificialIcon(&$map, $labelColour)
@@ -839,158 +754,64 @@ class WeatherMapNode extends WeatherMapDataItem
         // this is an artificial icon - we don't load a file for it
 
         $icon_im = imagecreatetruecolor($this->iconscalew, $this->iconscaleh);
-        imagesavealpha($icon_im, TRUE);
+        imagesavealpha($icon_im, true);
 
         $nothing = imagecolorallocatealpha($icon_im, 128, 0, 0, 127);
         imagefill($icon_im, 0, 0, $nothing);
 
-        $fill = NULL;
-        $ink = NULL;
+        $finalFillColour = new WMColour('none');
+        $finalInkColour = new WMColour('none');
 
-        $aifill = $this->aiconfillcolour;
-        $aiink = $this->aiconoutlinecolour;
+        $configuredAIFillColour = $this->aiconfillcolour;
+        $configuredAIOutlineColour = $this->aiconoutlinecolour;
 
         // if useiconscale isn't set, then use the static
         // colour defined, or copy the colour from the label
         if ($this->useiconscale == "none") {
 
-            if ($aifill->isCopy() && !$labelColour->isNone()) {
-                $fill = $labelColour;
+            if ($configuredAIFillColour->isCopy() && !$labelColour->isNone()) {
+                $finalFillColour = $labelColour;
             } else {
-                if ($aifill->isRealColour()) {
-                    $fill = $aifill;
+                if ($configuredAIFillColour->isRealColour()) {
+                    $finalFillColour = $configuredAIFillColour;
                 }
             }
         } else {
-            // if useiconscale IS defined, use that to figure out
-            // the fill colour
-            $pc = 0;
-            $val = 0;
-
-            if ($this->iconscalevar == 'in') {
-                $pc = $this->percentUsages[IN];
-                $val = $this->absoluteUsages[IN];
-            }
-
-            if ($this->iconscalevar == 'out') {
-                $pc = $this->percentUsages[OUT];
-                $val = $this->absoluteUsages[OUT];
-            }
-
-            if ($this->iconscaletype == 'percent') {
-                list($fill, $junk, $junk) =
-                    $this->owner->scales[$this->useiconscale]->ColourFromValue($pc, $this->name);
-
-            } else {
-                // use the absolute value if we aren't doing percentage scales.
-                list($fill, $junk, $junk) =
-                    $this->owner->scales[$this->useiconscale]->ColourFromValue($val, $this->name, false);
-            }
+            // if useiconscale IS defined, use that to figure out the fill colour
+            $finalFillColour = $this->calculateIconColour($map);
         }
 
-        if ($this->aiconoutlinecolour != array(-1, -1, -1)) {
-            $ink = $aiink;
+        if (!$this->aiconoutlinecolour->isNone()) {
+            $finalInkColour = $configuredAIOutlineColour;
         }
-//********************************
+        //********************************
 
-        wm_debug("ink is: $ink\n");
-        wm_debug("fill is: $fill\n");
+        wm_debug("ink is: $finalInkColour\n");
+        wm_debug("fill is: $finalFillColour\n");
 
         if ($this->iconfile == 'box') {
-            if ($fill !== NULL && !$fill->isNone()) {
-                imagefilledrectangle($icon_im, 0, 0, $this->iconscalew - 1, $this->iconscaleh - 1, $fill->gdallocate($icon_im));
-            }
-
-            if ($ink !== NULL && !$ink->isNone()) {
-                imagerectangle($icon_im, 0, 0, $this->iconscalew - 1, $this->iconscaleh - 1, $ink->gdallocate($icon_im));
-            }
+            $this->drawArtificialIconBox($icon_im, $finalFillColour, $finalInkColour);
         }
 
         if ($this->iconfile == 'rbox') {
-            if ($fill !== NULL && !$fill->isNone()) {
-                imagefilledroundedrectangle($icon_im, 0, 0, $this->iconscalew - 1, $this->iconscaleh - 1, 4, $fill->gdallocate($icon_im));
-            }
-
-            if ($ink !== NULL && !$ink->isNone()) {
-                imageroundedrectangle($icon_im, 0, 0, $this->iconscalew - 1, $this->iconscaleh - 1, 4, $ink->gdallocate($icon_im));
-            }
+            $this->drawArtificialIconRoundedBox($icon_im, $finalFillColour, $finalInkColour);
         }
 
         if ($this->iconfile == 'round') {
-            $rx = $this->iconscalew / 2 - 1;
-            $ry = $this->iconscaleh / 2 - 1;
-
-            if ($fill !== NULL && !$fill->isNone()) {
-                imagefilledellipse($icon_im, $rx, $ry, $rx * 2, $ry * 2, $fill->gdallocate($icon_im));
-            }
-
-            if ($ink !== NULL && !$ink->isNone()) {
-                imageellipse($icon_im, $rx, $ry, $rx * 2, $ry * 2, $ink->gdallocate($icon_im));
-            }
+            $this->drawArtificialIconRound($icon_im, $finalFillColour, $finalInkColour);
         }
 
         if ($this->iconfile == 'nink') {
-            $rx = $this->iconscalew / 2 - 1;
-            $ry = $this->iconscaleh / 2 - 1;
-            $size = $this->iconscalew;
-            $quarter = $size / 4;
-
-            $col1 = $this->colours[OUT];
-            $col2 = $this->colours[IN];
-
-            assert('!is_null($col1)');
-            assert('!is_null($col2)');
-
-            imagefilledarc($icon_im, $rx - 1, $ry, $size, $size, 270, 90, $col1->gdallocate($icon_im), IMG_ARC_PIE);
-            imagefilledarc($icon_im, $rx + 1, $ry, $size, $size, 90, 270, $col2->gdallocate($icon_im), IMG_ARC_PIE);
-
-            imagefilledarc($icon_im, $rx - 1, $ry + $quarter, $quarter * 2, $quarter * 2, 0, 360, $col1->gdallocate($icon_im), IMG_ARC_PIE);
-            imagefilledarc($icon_im, $rx + 1, $ry - $quarter, $quarter * 2, $quarter * 2, 0, 360, $col2->gdallocate($icon_im), IMG_ARC_PIE);
-
-            if ($ink !== NULL && !$ink->isNone()) {
-                // XXX - need a font definition from somewhere for NINK text
-                $font = 1;
-
-                $instr = $map->ProcessString("{node:this:bandwidth_in:%.1k}", $this);
-                $outstr = $map->ProcessString("{node:this:bandwidth_out:%.1k}", $this);
-
-                $fontObject = $this->owner->fonts->getFont($font);
-                list($twid, $thgt) = $fontObject->calculateImageStringSize($instr);
-                $fontObject->drawImageString($icon_im, $rx - $twid / 2, $ry - $quarter + ($thgt / 2), $instr, $ink->gdallocate($icon_im));
-
-                list($twid, $thgt) = $fontObject->calculateImageStringSize($outstr);
-                $fontObject->drawImageString($icon_im, $rx - $twid / 2, $ry + $quarter + ($thgt / 2), $outstr, $ink->gdallocate($icon_im));
-
-                imageellipse($icon_im, $rx, $ry, $rx * 2, $ry * 2, $ink->gdallocate($icon_im));
-            }
+            $this->drawArtificialIconNINK($icon_im, $finalInkColour, $map);
         }
 
         // XXX - needs proper colours
-        if ($this->iconfile == 'inpie' || $this->iconfile == 'outpie') {
+        if ($this->iconfile == 'inpie') {
+            $this->drawArtificialIconPie($icon_im, $finalFillColour, $finalInkColour, IN);
+        }
 
-            $segment_angle = 0;
-            if ($this->iconfile == 'inpie') {
-                $segment_angle = (($this->percentUsages[IN]) / 100) * 360;
-            }
-            if ($this->iconfile == 'outpie') {
-                $segment_angle = (($this->percentUsages[OUT]) / 100) * 360;
-            }
-
-            $rx = $this->iconscalew / 2 - 1;
-            $ry = $this->iconscaleh / 2 - 1;
-
-            if ($fill !== null && !$fill->isNone()) {
-                imagefilledellipse($icon_im, $rx, $ry, $rx * 2, $ry * 2, $fill->gdallocate($icon_im));
-            }
-
-            if ($ink !== null && !$ink->isNone()) {
-                imagefilledarc($icon_im, $rx, $ry, $rx * 2, $ry * 2, 0, $segment_angle,
-                    $ink->gdallocate($icon_im), IMG_ARC_PIE);
-            }
-
-            if ($fill !== null && !$fill->isNone()) {
-                imageellipse($icon_im, $rx, $ry, $rx * 2, $ry * 2, $fill->gdallocate($icon_im));
-            }
+        if ($this->iconfile == 'outpie') {
+            $this->drawArtificialIconPie($icon_im, $finalFillColour, $finalInkColour, OUT);
         }
 
         if ($this->iconfile == 'gauge') {
@@ -1045,6 +866,223 @@ class WeatherMapNode extends WeatherMapDataItem
             }
         }
         return $icon_im;
+    }
+
+    /**
+     * @param $map
+     * @param $textPoint
+     * @param $totalBoundingBox
+     * @param $col
+     * @param $node_im
+     * @param $labelBox
+     */
+    private function drawLabel(&$map, $textPoint, $col, $node_im, $labelBox)
+    {
+
+        wm_debug("Label colour is $col\n");
+
+        // if there's an icon, then you can choose to have no background
+        if (!$this->labelbgcolour->isNone()) {
+            imagefilledrectangle($node_im,
+                $labelBox->topLeft->x,
+                $labelBox->topLeft->y,
+                $labelBox->bottomRight->x,
+                $labelBox->bottomRight->y,
+                $col->gdallocate($node_im));
+        }
+
+        if ($this->selected) {
+            imagerectangle($node_im,
+                $labelBox->topLeft->x,
+                $labelBox->topLeft->y,
+                $labelBox->bottomRight->x,
+                $labelBox->bottomRight->y,
+                $map->selected);
+            // would be nice if it was thicker, too...
+            imagerectangle($node_im,
+                $labelBox->topLeft->x - 1,
+                $labelBox->topLeft->y - 1,
+                $labelBox->bottomRight->x + 1,
+                $labelBox->bottomRight->y + 1,
+                $map->selected);
+        } else {
+            $outlineColour = $this->labeloutlinecolour;
+            if ($outlineColour->isRealColour()) {
+                imagerectangle($node_im,
+                    $labelBox->topLeft->x,
+                    $labelBox->topLeft->y,
+                    $labelBox->bottomRight->x,
+                    $labelBox->bottomRight->y,
+                    $outlineColour->gdAllocate($node_im));
+            }
+        }
+
+        $fontObject = $this->owner->fonts->getFont($this->labelfont);
+
+        $shadowColour = $this->labelfontshadowcolour;
+        if ($shadowColour->isRealColour()) {
+            $fontObject->drawImageString($node_im, $textPoint->x + 1, $textPoint->y + 1, $this->processedLabel, $shadowColour->gdAllocate($node_im), $this->labelangle);
+        }
+
+        $textColour = $this->labelfontcolour;
+
+        if ($textColour->isContrast()) {
+            if ($col->isRealColour()) {
+                $textColour = $col->getContrastingColour();
+            } else {
+                wm_warn("You can't make a contrast with 'none'. Guessing black. [WMWARN43]\n");
+                $textColour = new WMColour(0, 0, 0);
+            }
+        }
+        $fontObject->drawImageString($node_im, $textPoint->x, $textPoint->y, $this->processedLabel, $textColour->gdAllocate($node_im), $this->labelangle);
+    }
+
+    /**
+     * @param $map
+     * @return WMColour
+     */
+    private function calculateIconColour(&$map)
+    {
+        $percentValue = 0;
+        $absoluteValue = 0;
+
+        if ($this->iconscalevar == 'in' || $this->iconscalevar == 'out') {
+            $channel = constant(strtoupper($this->iconscalevar));
+            $percentValue = $this->percentUsages[$channel];
+            $absoluteValue = $this->absoluteUsages[$channel];
+        }
+
+        if ($this->iconscaletype == 'percent') {
+            list($iconColour, $junk, $junk) =
+                $map->scales[$this->useiconscale]->colourFromValue($percentValue, $this->name);
+        } else {
+            // use the absolute value if we aren't doing percentage scales.
+            list($iconColour, $junk, $junk) =
+                $map->scales[$this->useiconscale]->colourFromValue($absoluteValue, $this->name, false);
+        }
+        return $iconColour;
+    }
+
+    /**
+     * @param WMColour $finalFillColour
+     * @param resource $icon_im
+     * @param WMColour $finalInkColour
+     */
+    private function drawArtificialIconBox($icon_im, $finalFillColour, $finalInkColour)
+    {
+        if (!$finalFillColour->isNone()) {
+            imagefilledrectangle($icon_im, 0, 0, $this->iconscalew - 1, $this->iconscaleh - 1, $finalFillColour->gdallocate($icon_im));
+        }
+
+        if (!$finalInkColour->isNone()) {
+            imagerectangle($icon_im, 0, 0, $this->iconscalew - 1, $this->iconscaleh - 1, $finalInkColour->gdallocate($icon_im));
+        }
+    }
+
+    /**
+     * @param WMColour $finalFillColour
+     * @param resource $icon_im
+     * @param WMColour $finalInkColour
+     */
+    private function drawArtificialIconRoundedBox($icon_im, $finalFillColour, $finalInkColour)
+    {
+        if (!$finalFillColour->isNone()) {
+            imagefilledroundedrectangle($icon_im, 0, 0, $this->iconscalew - 1, $this->iconscaleh - 1, 4, $finalFillColour->gdallocate($icon_im));
+        }
+
+        if (!$finalInkColour->isNone()) {
+            imageroundedrectangle($icon_im, 0, 0, $this->iconscalew - 1, $this->iconscaleh - 1, 4, $finalInkColour->gdallocate($icon_im));
+        }
+    }
+
+    /**
+     * @param WMColour $finalFillColour
+     * @param resource $icon_im
+     * @param WMColour $finalInkColour
+     */
+    private function drawArtificialIconRound($icon_im, $finalFillColour, $finalInkColour)
+    {
+        $xRadius = $this->iconscalew / 2 - 1;
+        $yRadius = $this->iconscaleh / 2 - 1;
+
+        if (!$finalFillColour->isNone()) {
+            imagefilledellipse($icon_im, $xRadius, $yRadius, $xRadius * 2, $yRadius * 2, $finalFillColour->gdallocate($icon_im));
+        }
+
+        if (!$finalInkColour->isNone()) {
+            imageellipse($icon_im, $xRadius, $yRadius, $xRadius * 2, $yRadius * 2, $finalInkColour->gdallocate($icon_im));
+        }
+    }
+
+    /**
+     * @param $map
+     * @param resource $icon_im
+     * @param WMColour $finalInkColour
+     */
+    private function drawArtificialIconNINK($icon_im, $finalInkColour, &$map)
+    {
+        $xRadius = $this->iconscalew / 2 - 1;
+        $yRadius = $this->iconscaleh / 2 - 1;
+        $size = $this->iconscalew;
+        $quarter = $size / 4;
+
+        $col1 = $this->colours[OUT];
+        $col2 = $this->colours[IN];
+
+        assert('!is_null($col1)');
+        assert('!is_null($col2)');
+
+        imagefilledarc($icon_im, $xRadius - 1, $yRadius, $size, $size, 270, 90, $col1->gdallocate($icon_im), IMG_ARC_PIE);
+        imagefilledarc($icon_im, $xRadius + 1, $yRadius, $size, $size, 90, 270, $col2->gdallocate($icon_im), IMG_ARC_PIE);
+
+        imagefilledarc($icon_im, $xRadius - 1, $yRadius + $quarter, $quarter * 2, $quarter * 2, 0, 360, $col1->gdallocate($icon_im), IMG_ARC_PIE);
+        imagefilledarc($icon_im, $xRadius + 1, $yRadius - $quarter, $quarter * 2, $quarter * 2, 0, 360, $col2->gdallocate($icon_im), IMG_ARC_PIE);
+
+        if (!$finalInkColour->isNone()) {
+            // XXX - need a font definition from somewhere for NINK text
+            $font = 1;
+
+            $instr = $map->ProcessString("{node:this:bandwidth_in:%.1k}", $this);
+            $outstr = $map->ProcessString("{node:this:bandwidth_out:%.1k}", $this);
+
+            $fontObject = $this->owner->fonts->getFont($font);
+            list($textWidth, $textHeight) = $fontObject->calculateImageStringSize($instr);
+            $fontObject->drawImageString($icon_im, $xRadius - $textWidth / 2, $yRadius - $quarter + ($textHeight / 2), $instr, $finalInkColour->gdallocate($icon_im));
+
+            list($textWidth, $textHeight) = $fontObject->calculateImageStringSize($outstr);
+            $fontObject->drawImageString($icon_im, $xRadius - $textWidth / 2, $yRadius + $quarter + ($textHeight / 2), $outstr, $finalInkColour->gdallocate($icon_im));
+
+            imageellipse($icon_im, $xRadius, $yRadius, $xRadius * 2, $yRadius * 2, $finalInkColour->gdallocate($icon_im));
+        }
+    }
+
+    /**
+     * @param $which
+     * @param WMColour $finalFillColour
+     * @param resource $icon_im
+     * @param WMColour $finalInkColour
+     */
+    private function drawArtificialIconPie($icon_im, $finalFillColour, $finalInkColour, $which)
+    {
+        $percentValue = $this->percentUsages[$which];
+
+        $segmentAngle = ($percentValue / 100) * 360;
+
+        $xRadius = $this->iconscalew / 2 - 1;
+        $yRadius = $this->iconscaleh / 2 - 1;
+
+        if (!$finalFillColour->isNone()) {
+            imagefilledellipse($icon_im, $xRadius, $yRadius, $xRadius * 2, $yRadius * 2, $finalFillColour->gdallocate($icon_im));
+        }
+
+        if (!$finalInkColour->isNone()) {
+            imagefilledarc($icon_im, $xRadius, $yRadius, $xRadius * 2, $yRadius * 2, 0, $segmentAngle,
+                $finalInkColour->gdallocate($icon_im), IMG_ARC_PIE);
+        }
+
+        if (!$finalFillColour->isNone()) {
+            imageellipse($icon_im, $xRadius, $yRadius, $xRadius * 2, $yRadius * 2, $finalFillColour->gdallocate($icon_im));
+        }
     }
 
 }

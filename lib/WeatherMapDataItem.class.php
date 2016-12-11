@@ -225,7 +225,6 @@ class WeatherMapDataItem extends WeatherMapItem
 
     /**
      * @param $channels
-     * @param $nFails
      * @return array
      */
     private function collectDataFromTargets($channels)
@@ -370,7 +369,6 @@ class WeatherMapDataItem extends WeatherMapItem
     }
 
     /**
-     * @param $output
      * @param $basic_params
      * @param $default_default
      * @return string

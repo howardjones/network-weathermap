@@ -6,7 +6,6 @@
  * debug mode.
  */
 
-
 /**
  * Class WMDebugNull - the stubbed do-nothing version for a normal run
  */
@@ -15,7 +14,7 @@ class WMDebugNull
     protected $onlyReadData;
     protected $contextName;
 
-    public function __construct($contextName, $onlyReadData=false)
+    public function __construct($contextName, $onlyReadData = false)
     {
         $this->contextName = $contextName;
         $this->onlyReadData = $onlyReadData;
@@ -45,7 +44,7 @@ class WMDebugLogging extends WMDebugNull
 {
     public function log($string)
     {
-        if (! $this->shouldLog($string)) {
+        if (!$this->shouldLog($string)) {
             return;
         }
 

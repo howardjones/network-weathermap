@@ -869,16 +869,14 @@ class WeatherMapNode extends WeatherMapDataItem
     }
 
     /**
-     * @param $map
-     * @param $textPoint
-     * @param $totalBoundingBox
-     * @param $col
-     * @param $node_im
-     * @param $labelBox
+     * @param WeatherMap $map
+     * @param WMPoint $textPoint
+     * @param WMColour $col
+     * @param resource $node_im
+     * @param WMRectangle $labelBox
      */
     private function drawLabel(&$map, $textPoint, $col, $node_im, $labelBox)
     {
-
         wm_debug("Label colour is $col\n");
 
         // if there's an icon, then you can choose to have no background

@@ -119,7 +119,7 @@ class HTML_ImageMap_Area_Polygon extends HTML_ImageMap_Area
 
 		if( intval($this->npoints) != ($this->npoints))
 		{
-			die("Odd number of points!");
+			throw new Exception("Odd number of points!");
 		}
 
 		for ($i=0; $i<count($c); $i+=2)

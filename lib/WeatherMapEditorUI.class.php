@@ -605,6 +605,8 @@ class WeatherMapEditorUI extends WeatherMapUIBase
     /**
      * @param string[] $params
      * @param WeatherMapEditor $editor
+     *
+     * @returns bool
      */
     function cmdGetItemConfig($params, $editor)
     {
@@ -683,6 +685,8 @@ class WeatherMapEditorUI extends WeatherMapUIBase
     /**
      * Attempt to load Cacti's config file - we'll need this to do integration like
      * the target picker.
+     *
+     * @param string $cacti_base
      */
     function loadCacti($cacti_base)
     {
@@ -724,7 +728,7 @@ class WeatherMapEditorUI extends WeatherMapUIBase
 
             // If there's something funny with the config filename, just stop.
             if ($mapname != wmeSanitizeConfigFile($mapname)) {
-                exit();
+                throw new WeathermapInternalFail("Don't like this config filename");
             }
 
             $this->mapfile = $this->mapDirectory . "/" . $mapname;

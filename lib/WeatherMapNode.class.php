@@ -329,8 +329,8 @@ class WeatherMapNode extends WeatherMapDataItem
 
         // create an image of that size and draw into it
         $node_im = imagecreatetruecolor($totalBoundingBox->width(), $totalBoundingBox->height());
-        // ImageAlphaBlending($node_im, false);
-        //imagesavealpha($node_im, true);
+        Imagealphablending($node_im, false);
+        imagesavealpha($node_im, true);
 
         $nothing = imagecolorallocatealpha($node_im, 128, 0, 0, 127);
         imagefill($node_im, 0, 0, $nothing);
@@ -340,7 +340,7 @@ class WeatherMapNode extends WeatherMapDataItem
 
         // Draw the icon, if any
         if (isset($icon_im)) {
-            imagealphablending($node_im, true);
+//            imagesavealpha(true);
             imagecopy($node_im, $icon_im, $iconBox->topLeft->x, $iconBox->topLeft->y, 0, 0, imagesx($icon_im), imagesy($icon_im));
             imagedestroy($icon_im);
         }
@@ -381,6 +381,7 @@ class WeatherMapNode extends WeatherMapDataItem
 
     function update_cache($cachedir, $mapname)
     {
+        throw new WeathermapDeprecatedException("blorp");
         $cachename = $cachedir . "/node_" . md5($mapname . "/" . $this->name) . ".png";
         // save this image to a cache, for the editor
         imagepng($this->image, $cachename);
@@ -437,6 +438,7 @@ class WeatherMapNode extends WeatherMapDataItem
 
     function WriteToCache()
     {
+        throw new WeathermapDeprecatedException("blorp");
     }
 
     // take the pre-rendered node and write it to a file so that

@@ -17,8 +17,8 @@
 
 
 require_once dirname(__FILE__) . "/lib/database.php";
-require_once dirname(__FILE__) . "lib/cacti-plugin-hooks.php";
-require_once dirname(__FILE__) . "lib/cacti-plugin-poller.php";
+require_once dirname(__FILE__) . "/lib/cacti-plugin-hooks.php";
+require_once dirname(__FILE__) . "/lib/cacti-plugin-poller.php";
 
 function plugin_weathermap_install()
 {
@@ -54,17 +54,6 @@ function plugin_weathermap_version()
     global $config;
     $info = parse_ini_file($config['base_path'] . '/plugins/weathermap/INFO', true);
     return $info['info'];
-    return array(
-        'name' => 'weathermap',
-        'version' => '0.98a',
-        'compat' => '0.8.8a',
-        'longname' => 'PHP Network Weathermap',
-        'author' => 'Howard Jones',
-        'homepage' => 'http://www.network-weathermap.com/',
-        'webpage' => 'http://www.network-weathermap.com/',
-        'email' => 'howie@thingy.com',
-        'url' => 'http://www.network-weathermap.com/versions.php'
-    );
 }
 
 /* somehow this function is still required in PA 3.x, even though it checks for plugin_weathermap_version() */

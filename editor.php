@@ -9,6 +9,9 @@ require_once 'lib/WMLine.class.php';
 
 // so that you can't have the editor active, and not know about it.
 $ENABLED=true;
+$FROM_CACTI = true;
+
+include "/var/www/html/cacti-0.8.8h/include/global.php";
 
 // If we're embedded in the Cacti UI (included from weathermap-cacti-plugin-editor.php), then authentication has happened. Enable the editor.
 if (isset($FROM_CACTI) && $FROM_CACTI == true) {
@@ -34,20 +37,20 @@ if (! $ENABLED)
 
 // sensible defaults
 $mapdir='configs';
-$ignore_cacti=FALSE;
+$ignore_cacti=false;
 $configerror = '';
 
 // these are all set via the Editor Settings dialog, in the editor, now.
-$use_overlay = FALSE; // set to TRUE to enable experimental overlay showing VIAs
-$use_relative_overlay = FALSE; // set to TRUE to enable experimental overlay showing relative-positioning
+$use_overlay = false; // set to true to enable experimental overlay showing VIAs
+$use_relative_overlay = false; // set to true to enable experimental overlay showing relative-positioning
 $grid_snap_value = 0; // set non-zero to snap to a grid of that spacing
 
 if (isset($_COOKIE['wmeditor']))
 {
     $parts = explode(":",$_COOKIE['wmeditor']);
     
-    if ((isset($parts[0])) && (intval($parts[0]) == 1) ) { $use_overlay = TRUE; }
-    if ((isset($parts[1])) && (intval($parts[1]) == 1) ) { $use_relative_overlay = TRUE; }
+    if ((isset($parts[0])) && (intval($parts[0]) == 1) ) { $use_overlay = true; }
+    if ((isset($parts[1])) && (intval($parts[1]) == 1) ) { $use_relative_overlay = true; }
     if ((isset($parts[2])) && (intval($parts[2]) != 0) ) { $grid_snap_value = intval($parts[2]); }   
 }
 
@@ -59,7 +62,7 @@ if (is_dir($cacti_base) && file_exists($cacti_base."include/global.php") )
 	// include the cacti-config, so we know about the database
 	include_once $cacti_base."include/global.php";
 	$config['base_url'] = $cacti_url;
-	$cacti_found = TRUE;
+	$cacti_found = true;
 }
 elseif (is_dir($cacti_base) && file_exists($cacti_base."include/config.php") )
 {
@@ -67,11 +70,11 @@ elseif (is_dir($cacti_base) && file_exists($cacti_base."include/config.php") )
 	include_once $cacti_base."/include/config.php";
 
 	$config['base_url'] = $cacti_url;
-	$cacti_found = TRUE;
+	$cacti_found = true;
 }
 else
 {
-	$cacti_found = FALSE;
+	$cacti_found = false;
 }
 }
 
@@ -106,7 +109,7 @@ if (isset($_REQUEST['action'])) { $action = $_REQUEST['action']; }
 if (isset($_REQUEST['mapname'])) { $mapname = $_REQUEST['mapname'];  $mapname = wm_editor_sanitize_conffile($mapname); }
 if (isset($_REQUEST['selected'])) { $selected = wm_editor_sanitize_selected($_REQUEST['selected']); }
 
-$weathermap_debugging=FALSE;
+$weathermap_debugging=false;
 
 
 if ($mapname == '')
@@ -129,10 +132,10 @@ else
 	$map = new WeatherMap;
 	$map->context = 'editor';
 	
-	$fromplug = FALSE;
-	if (isset($_REQUEST['plug']) && (intval($_REQUEST['plug'])==1) ) { $fromplug = TRUE; }
+	$fromplug = false;
+	if (isset($_REQUEST['plug']) && (intval($_REQUEST['plug'])==1) ) { $fromplug = true; }
 	if ($FROM_CACTI) {
-		$fromplug = TRUE;
+		$fromplug = true;
 	}
 	
 	switch($action)
@@ -186,8 +189,8 @@ else
 			}
 		}
 
-		$map->sizedebug = TRUE;		
-		$map->DrawMap('','',250,TRUE,$use_overlay,$use_relative_overlay);
+		$map->sizedebug = true;		
+		$map->DrawMap('','',250,true,$use_overlay,$use_relative_overlay);
 		exit();
 		break;
 
@@ -211,18 +214,18 @@ else
 	    $item_name = $_REQUEST['item_name'];
 	    $item_type = $_REQUEST['item_type'];
 	    
-	    $ok=FALSE;
+	    $ok=false;
 
 	    if ($item_type == 'node'){
 		if (isset($map->nodes[$item_name])) {
 		    print $map->nodes[$item_name]->WriteConfig();
-		    $ok = TRUE;
+		    $ok = true;
 		}
 	    }
 	    if ($item_type == 'link') {
 		if (isset($map->links[$item_name])) {
 		    print $map->links[$item_name]->WriteConfig();
-		    $ok = TRUE;
+		    $ok = true;
 		}
 	    }
 		
@@ -714,7 +717,7 @@ else
 
 		// draw a map and throw it away, to calculate all the bounding boxes
 		$map->DrawMap('null');
-		retidy_links($map,TRUE);
+		retidy_links($map,true);
 
 		$map->WriteConfig($mapfile);
 
@@ -783,8 +786,8 @@ else
             // have to do this, otherwise the editor will be unresponsive afterwards - not actually going to change anything!
             $map->ReadConfig($mapfile);
 
-	    $use_overlay = (isset($_REQUEST['editorsettings_showvias']) ? intval($_REQUEST['editorsettings_showvias']) : FALSE);
-	    $use_relative_overlay = (isset($_REQUEST['editorsettings_showrelative']) ? intval($_REQUEST['editorsettings_showrelative']) : FALSE);
+	    $use_overlay = (isset($_REQUEST['editorsettings_showvias']) ? intval($_REQUEST['editorsettings_showvias']) : false);
+	    $use_relative_overlay = (isset($_REQUEST['editorsettings_showrelative']) ? intval($_REQUEST['editorsettings_showrelative']) : false);
 	    $grid_snap_value = (isset($_REQUEST['editorsettings_gridsnap']) ? intval($_REQUEST['editorsettings_gridsnap']) : 0);
 			    
 	    break;
@@ -901,7 +904,7 @@ else
 <script src="editor-resources/editor.js" type="text/javascript"></script>
 	<script type="text/javascript">
 	
-	var fromplug=<?php echo ($fromplug==TRUE ? 1:0); ?>;
+	var fromplug=<?php echo ($fromplug==true ? 1:0); ?>;
 	var editor_url = '<?php echo $editor_name; ?>';
 	
 	// the only javascript in here should be the objects representing the map itself
@@ -943,24 +946,24 @@ else
   </div>
   <form action="<?php echo $editor_name ?>" method="post" name="frmMain">
 	<div align="center" id="mainarea">
-		<input type="hidden" name="plug" value="<?php echo ($fromplug==TRUE ? 1 : 0) ?>" />
+		<input type="hidden" name="plug" value="<?php echo ($fromplug==true ? 1 : 0) ?>" />
 	 <input style="display:none" type="image"
 	  src="<?php echo $imageurl; ?>" id="xycapture" /><img src=
 	  "<?php echo $imageurl; ?>" id="existingdata" alt="Weathermap" usemap="#weathermap_imap"
 	   />
 	   <div class="debug"><p><strong>Debug:</strong>
-			   <a href="?<?php echo ($fromplug==TRUE ? 'plug=1&amp;' : ''); ?>action=retidy_all&amp;mapname=<?php echo  htmlspecialchars($mapname) ?>">Re-tidy ALL</a>
-			   <a href="?<?php echo ($fromplug==TRUE ? 'plug=1&amp;' : ''); ?>action=retidy&amp;mapname=<?php echo  htmlspecialchars($mapname) ?>">Re-tidy</a>
-			   <a href="?<?php echo ($fromplug==TRUE ? 'plug=1&amp;' : ''); ?>action=untidy&amp;mapname=<?php echo  htmlspecialchars($mapname) ?>">Un-tidy</a>
+			   <a href="?<?php echo ($fromplug==true ? 'plug=1&amp;' : ''); ?>action=retidy_all&amp;mapname=<?php echo  htmlspecialchars($mapname) ?>">Re-tidy ALL</a>
+			   <a href="?<?php echo ($fromplug==true ? 'plug=1&amp;' : ''); ?>action=retidy&amp;mapname=<?php echo  htmlspecialchars($mapname) ?>">Re-tidy</a>
+			   <a href="?<?php echo ($fromplug==true ? 'plug=1&amp;' : ''); ?>action=untidy&amp;mapname=<?php echo  htmlspecialchars($mapname) ?>">Un-tidy</a>
 
 
-			   <a href="?<?php echo ($fromplug==TRUE ? 'plug=1&amp;' : ''); ?>action=nothing&amp;mapname=<?php echo  htmlspecialchars($mapname) ?>">Do Nothing</a>
+			   <a href="?<?php echo ($fromplug==true ? 'plug=1&amp;' : ''); ?>action=nothing&amp;mapname=<?php echo  htmlspecialchars($mapname) ?>">Do Nothing</a>
 	   <span><label for="mapname">mapfile</label><input type="text" name="mapname" value="<?php echo htmlspecialchars($mapname); ?>" /></span>
 	   <span><label for="action">action</label><input type="text" id="action" name="action" value="<?php echo htmlspecialchars($newaction); ?>" /></span>
 	  <span><label for="param">param</label><input type="text" name="param" id="param" value="" /></span>
             <span><label for="param2">param2</label><input type="text" name="param2" id="param2" value="<?php echo htmlspecialchars($param2); ?>" /></span> 
 	  <span><label for="debug">debug</label><input id="debug" value="" name="debug" /></span> 
-	  <a target="configwindow" href="?<?php echo ($fromplug==TRUE ? 'plug=1&amp;':''); ?>action=show_config&amp;mapname=<?php echo  urlencode($mapname) ?>">See config</a></p>
+	  <a target="configwindow" href="?<?php echo ($fromplug==true ? 'plug=1&amp;':''); ?>action=show_config&amp;mapname=<?php echo  urlencode($mapname) ?>">See config</a></p>
 	<pre><?php echo  htmlspecialchars($log) ?></pre>
 	  </div>
 <?php        	
@@ -1196,7 +1199,7 @@ else
 
 		<tr>
 			<th>Default Link Bandwidth</th>
-			<td><input name="map_linkdefaultbwin" size="6" type="text" value="<?php echo  htmlspecialchars($map->links['DEFAULT']->max_bandwidth_in_cfg) ?>" /> bit/sec in, <input name="map_linkdefaultbwout" size="6" type="text" value="<?php echo  htmlspecialchars($map->links['DEFAULT']->max_bandwidth_out_cfg) ?>" /> bit/sec out</td>
+			<td><input name="map_linkdefaultbwin" size="6" type="text" value="<?php echo  htmlspecialchars($map->links['DEFAULT']->maxValuesConfigured[IN]) ?>" /> bit/sec in, <input name="map_linkdefaultbwout" size="6" type="text" value="<?php echo  htmlspecialchars($map->links['DEFAULT']->maxValuesConfigured[OUT]) ?>" /> bit/sec out</td>
 		  </tr>
 
 

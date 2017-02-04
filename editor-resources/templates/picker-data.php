@@ -14,6 +14,7 @@
 
         $(document).ready(function() {
             $("select#host_id").val(<?php echo $selected_host ?>);
+            console.log("Selecting host");
         });
     </script>
 
@@ -31,6 +32,14 @@
 <body class="data-picker">
 
 <h3><?php echo $title ?></h3>
+
+<?php if (sizeof($recents) > 0) {
+    print "recent";
+    foreach ($recents as $id => $name) {
+        print "<a href=cacti-pick.php?host_id=" . $id . "&action=link_step1&overlib=1&aggregate=0>[" . $name . "]</a><br>";
+    }
+}
+?>
 
 <form name="mini">
     Host: <select id="host_id" name="host_id">

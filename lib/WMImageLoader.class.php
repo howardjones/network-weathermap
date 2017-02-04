@@ -4,13 +4,8 @@ class WMImageLoader
 {
     var $cache = array();
 
-    function load_image($filename)
-    {
-
-    }
-
     // we don't want to be caching huge images (they are probably the background, and won't be re-used)
-    function cacheable($width, $height)
+    function isCacheable($width, $height)
     {
         // for now, disable this. The imageduplicate() function doesn't work in all cases.
         return false;
@@ -18,148 +13,88 @@ class WMImageLoader
         if ($width * $height > 65536) {
             return false;
         }
+        
         return true;
     }
 
     /**
      * @param string $filename
-     * @param int $scalew
-     * @param int $scaleh
+     * @param int $scaleWidth
+     * @param int $scaleHeight
      * @param WMColour $colour
-     * @param string $colour_method
+     * @param string $colourMethod
      * @return null|resource
      */
-    function imagecreatescaledcolourizedfromfile($filename, $scalew, $scaleh, $colour, $colour_method)
+    function imagecreatescaledcolourizedfromfile($filename, $scaleWidth, $scaleHeight, $colour, $colourMethod)
     {
 
-        wm_debug("Getting a (maybe cached) scaled coloured image for $filename at $scalew x $scaleh with $colour\n");
+        wm_debug("Getting a (maybe cached) scaled coloured image for $filename at $scaleWidth x $scaleHeight with $colour\n");
 
-        $key = sprintf("%s:%d:%d:%s:%s", $filename, $scalew, $scaleh,
-            $colour->asString(), $colour_method);
+        $key = sprintf("%s:%d:%d:%s:%s", $filename, $scaleWidth, $scaleHeight,
+            $colour->asString(), $colourMethod);
         wm_debug("$key\n");
 
         if (array_key_exists($key, $this->cache)) {
             wm_debug("Cache hit for $key\n");
-            $icon_im = $this->cache[$key];
-            wm_debug("From cache: $icon_im\n");
-            $real_im = $this->imageduplicate($icon_im);
+            $iconImageRef = $this->cache[$key];
+            wm_debug("From cache: $iconImageRef\n");
+            $finalImageRef = $this->imageduplicate($iconImageRef);
         } else {
             wm_debug("Cache miss - processing\n");
-            $icon_im = $this->imagecreatefromfile($filename);
+            $iconImageRef = $this->imagecreatefromfile($filename);
             //    imagealphablending($icon_im, true);
 
-            $icon_w = imagesx($icon_im);
-            $icon_h = imagesy($icon_im);
+            $this->colourizeImage($colour, $colourMethod, $iconImageRef);
 
-            wm_debug("$colour_method\n");
-            if ($colour_method == 'imagefilter') {
-                wm_debug("Colorizing (imagefilter)...\n");
-                list ($red, $green, $blue) = $colour->getComponents();
-                imagefilter($icon_im, IMG_FILTER_COLORIZE, $red, $green, $blue);
-            }
+            $iconImageRef = $this->scaleImage($scaleWidth, $scaleHeight, $iconImageRef);
 
-            if ($colour_method == 'imagecolorize') {
-                wm_debug("Colorizing (imagecolorize)...\n");
-                list ($red, $green, $blue) = $colour->getComponents();
-                imagecolorize($icon_im, $red, $green, $blue);
-            }
-
-            if ($scalew > 0 && $scaleh > 0) {
-
-                wm_debug("If this is the last thing in your logs, you probably have a buggy GD library. Get > 2.0.33 or use PHP builtin.\n");
-
-                wm_debug("SCALING ICON here\n");
-                if ($icon_w > $icon_h) {
-                    $scalefactor = $icon_w / $scalew;
-                } else {
-                    $scalefactor = $icon_h / $scaleh;
-                }
-                if ($scalefactor != 1.0) {
-                    $new_width = $icon_w / $scalefactor;
-                    $new_height = $icon_h / $scalefactor;
-
-                    $scaled = imagecreatetruecolor($new_width, $new_height);
-                    imagealphablending($scaled, false);
-                    imagecopyresampled($scaled, $icon_im, 0, 0, 0, 0, $new_width, $new_height, $icon_w,
-                        $icon_h);
-                    imagedestroy($icon_im);
-                    $icon_im = $scaled;
-                }
-            }
-            if ($this->cacheable($scalew, $scaleh)) {
-                wm_debug("Caching $key $icon_im\n");
-                $this->cache[$key] = $icon_im;
-                $real_im = $this->imageduplicate($icon_im);
-            } else {
-                $real_im = $icon_im;
-            }
+            $finalImageRef = $this->updateCache($scaleWidth, $scaleHeight, $key, $iconImageRef);
         }
 
-        wm_debug("Returning $real_im\n");
-        return $real_im;
+        wm_debug("Returning $finalImageRef\n");
+        return $finalImageRef;
     }
 
-    function imagecreatescaledfromfile($filename, $scalew, $scaleh)
+    /**
+     * @param string $filename
+     * @param int $scaleWidth
+     * @param int $scaleHeight
+     * @return null|resource
+     */
+    function imagecreatescaledfromfile($filename, $scaleWidth, $scaleHeight)
     {
         list($width, $height, $type, $attr) = getimagesize($filename);
 
-        wm_debug("Getting a (maybe cached) image for $filename at $scalew x $scaleh\n");
+        wm_debug("Getting a (maybe cached) image for $filename at $scaleWidth x $scaleHeight\n");
 
         // do the non-scaling version if no scaling is required
-        if ($scalew == 0 && $scaleh == 0) {
+        if ($scaleWidth == 0 && $scaleHeight == 0) {
             wm_debug("No scaling, punt to regular\n");
             return $this->imagecreatefromfile($filename);
         }
 
-        if ($width == $scalew && $height == $scaleh) {
+        if ($width == $scaleWidth && $height == $scaleHeight) {
             wm_debug("No scaling, punt to regular\n");
             return $this->imagecreatefromfile($filename);
         }
-        $key = sprintf("%s:%d:%d", $filename, $scalew, $scaleh);
+        $key = sprintf("%s:%d:%d", $filename, $scaleWidth, $scaleHeight);
 
         if (array_key_exists($key, $this->cache)) {
             wm_debug("Cache hit for $key\n");
-            $icon_im = $this->cache[$key];
-            wm_debug("From cache: $icon_im\n");
-            $real_im = $this->imageduplicate($icon_im);
+            $iconImageRef = $this->cache[$key];
+            wm_debug("From cache: $iconImageRef\n");
+            $finalImageRef = $this->imageduplicate($iconImageRef);
         } else {
             wm_debug("Cache miss - processing\n");
-            $icon_im = $this->imagecreatefromfile($filename);
+            $iconImageRef = $this->imagecreatefromfile($filename);
 
-            $icon_w = imagesx($icon_im);
-            $icon_h = imagesy($icon_im);
+            $iconImageRef = $this->scaleImage($scaleWidth, $scaleHeight, $iconImageRef);
 
-            wm_debug("If this is the last thing in your logs, you probably have a buggy GD library. Get > 2.0.33 or use PHP builtin.\n");
-
-            wm_debug("SCALING ICON here\n");
-            if ($icon_w > $icon_h) {
-                $scalefactor = $icon_w / $scalew;
-            } else {
-                $scalefactor = $icon_h / $scaleh;
-            }
-            if ($scalefactor != 1.0) {
-                $new_width = $icon_w / $scalefactor;
-                $new_height = $icon_h / $scalefactor;
-
-                $scaled = imagecreatetruecolor($new_width, $new_height);
-                imagesavealpha($scaled, true);
-                imagealphablending($scaled, false);
-                imagecopyresampled($scaled, $icon_im, 0, 0, 0, 0, $new_width, $new_height, $icon_w,
-                    $icon_h);
-                imagedestroy($icon_im);
-                $icon_im = $scaled;
-            }
-            if ($this->cacheable($scalew, $scaleh)) {
-                wm_debug("Caching $key $icon_im\n");
-                $this->cache[$key] = $icon_im;
-                $real_im = $this->imageduplicate($icon_im);
-            } else {
-                $real_im = $icon_im;
-            }
+            $finalImageRef = $this->updateCache($scaleWidth, $scaleHeight, $key, $iconImageRef);
         }
 
-        wm_debug("Returning $real_im\n");
-        return $real_im;
+        wm_debug("Returning $finalImageRef\n");
+        return $finalImageRef;
     }
 
     function imageduplicate($source_im)
@@ -190,6 +125,10 @@ class WMImageLoader
         return $new_im;
     }
 
+    /**
+     * @param $filename
+     * @return null|resource
+     */
     function imagecreatefromfile($filename)
     {
         $result_image = NULL;
@@ -240,7 +179,7 @@ class WMImageLoader
                         break;
                 }
             }
-            if (!is_null($new_image) && $this->cacheable($width, $height)) {
+            if (!is_null($new_image) && $this->isCacheable($width, $height)) {
                 wm_debug("Caching $key $new_image\n");
                 $this->cache[$key] = $new_image;
                 $result_image = $this->imageduplicate($new_image);
@@ -254,4 +193,81 @@ class WMImageLoader
         return $result_image;
     }
 
+    /**
+     * @param int $scaleWidth
+     * @param int $scaleHeight
+     * @param resource $iconImageRef
+     * @return resource
+     */
+    private function scaleImage($scaleWidth, $scaleHeight, $iconImageRef)
+    {
+        $iconWidth = imagesx($iconImageRef);
+        $iconHeight = imagesy($iconImageRef);
+
+        wm_debug("If this is the last thing in your logs, you probably have a buggy GD library. Get > 2.0.33 or use PHP builtin.\n");
+
+        if ($scaleWidth > 0 && $scaleHeight > 0) {
+
+            wm_debug("SCALING ICON here\n");
+            if ($iconWidth > $iconHeight) {
+                $scaleFactor = $iconWidth / $scaleWidth;
+            } else {
+                $scaleFactor = $iconHeight / $scaleHeight;
+            }
+            if ($scaleFactor != 1.0) {
+                $new_width = $iconWidth / $scaleFactor;
+                $new_height = $iconHeight / $scaleFactor;
+
+                $scaledImageRef = imagecreatetruecolor($new_width, $new_height);
+                imagesavealpha($scaledImageRef, true);
+                imagealphablending($scaledImageRef, false);
+                imagecopyresampled($scaledImageRef, $iconImageRef, 0, 0, 0, 0, $new_width, $new_height, $iconWidth,
+                    $iconHeight);
+                imagedestroy($iconImageRef);
+                $iconImageRef = $scaledImageRef;
+            }
+        }
+        return $iconImageRef;
+    }
+
+    /**
+     * @param int $scaleWidth
+     * @param int $scaleHeight
+     * @param string $key
+     * @param resource $iconImageRef
+     * @return resource
+     */
+    private function updateCache($scaleWidth, $scaleHeight, $key, $iconImageRef)
+    {
+        if ($this->isCacheable($scaleWidth, $scaleHeight)) {
+            wm_debug("Caching $key $iconImageRef\n");
+            $this->cache[$key] = $iconImageRef;
+            $finalImageRef = $this->imageduplicate($iconImageRef);
+            return $finalImageRef;
+        } else {
+            $finalImageRef = $iconImageRef;
+            return $finalImageRef;
+        }
+    }
+
+    /**
+     * @param WMColour $colour
+     * @param string $colourMethod
+     * @param resource $iconImageRef
+     */
+    private function colourizeImage($colour, $colourMethod, $iconImageRef)
+    {
+        wm_debug("$colourMethod\n");
+        if ($colourMethod == 'imagefilter') {
+            wm_debug("Colorizing (imagefilter)...\n");
+            list ($red, $green, $blue) = $colour->getComponents();
+            imagefilter($iconImageRef, IMG_FILTER_COLORIZE, $red, $green, $blue);
+        }
+
+        if ($colourMethod == 'imagecolorize') {
+            wm_debug("Colorizing (imagecolorize)...\n");
+            list ($red, $green, $blue) = $colour->getComponents();
+            imagecolorize($iconImageRef, $red, $green, $blue);
+        }
+    }
 }

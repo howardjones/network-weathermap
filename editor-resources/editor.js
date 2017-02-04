@@ -231,7 +231,7 @@ function cactipicker() {
     }
 
     // newWindow.location = "cacti-pick.php?command=link_step1";
-    newWindow.location = "cacti-pick.php?command=link_step1";
+    newWindow.location = "cacti-pick.php?action=link_step1";
 }
 
 
@@ -246,7 +246,7 @@ function nodecactipicker() {
         newWindow.focus();
     }
 
-    newWindow.location = "cacti-pick.php?command=node_step1";
+    newWindow.location = "cacti-pick.php?action=node_step1";
 }
 
 function show_context_help(itemid, targetid) {

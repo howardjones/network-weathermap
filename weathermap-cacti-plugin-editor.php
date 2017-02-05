@@ -15,7 +15,6 @@
 
     require_once $config['library_path'] . '/database.php';
 
-
     $FROM_CACTI = true;
 
     require_once dirname(__FILE__).'/editor.php';

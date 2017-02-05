@@ -195,8 +195,8 @@ function weathermap_singleview($mapid)
 
         if ($is_wm_admin) {
             print "<span style='font-size: 80%'>";
-            print "[ <a href='weathermap-cacti-plugin-mgmt.php?action=map_settings&id=".$mapid."'>Map Settings</a> |";
-            print "<a href='weathermap-cacti-plugin-mgmt.php?action=perms_edit&id=".$mapid."'>Map Permissions</a> |";
+            print "[ <a href='weathermap-cacti88-plugin-mgmt.php?action=map_settings&id=".$mapid."'>Map Settings</a> |";
+            print "<a href='weathermap-cacti88-plugin-mgmt.php?action=perms_edit&id=".$mapid."'>Map Permissions</a> |";
             print "<a href=''>Edit Map</a> ]";
             print "</span>";
         }
@@ -229,8 +229,8 @@ function weathermap_is_admin()
 
 	$realm_id = 0;
 
-	if (isset($user_auth_realm_filenames['weathermap-cacti-plugin-mgmt.php'])) {
-		$realm_id = $user_auth_realm_filenames['weathermap-cacti-plugin-mgmt.php'];
+	if (isset($user_auth_realm_filenames['weathermap-cacti88-plugin-mgmt.php'])) {
+		$realm_id = $user_auth_realm_filenames['weathermap-cacti88-plugin-mgmt.php'];
 	}
 	$userid = (isset($_SESSION["sess_user_id"]) ? intval($_SESSION["sess_user_id"]) : 1);
 	$allowed = $manager->checkUserForRealm($userid, $realm_id);
@@ -247,7 +247,7 @@ function weathermap_show_manage_tab()
 	global $config;
 
 	if (weathermap_is_admin()) {
-		print '<a href="' . $config['url_path'] . 'plugins/weathermap/weathermap-cacti-plugin-mgmt.php">Manage Maps</a>';
+		print '<a href="' . $config['url_path'] . 'plugins/weathermap/weathermap-cacti88-plugin-mgmt.php">Manage Maps</a>';
 	}
 }
 
@@ -332,7 +332,7 @@ function weathermap_thumbview($limit_to_group = -1)
 			print "<div align=\"center\" style=\"padding:20px\"><em>You Have No Maps</em>";
 
 			if ($total_map_count == 0) {
-				print '<p>To add a map to the schedule, go to the <a href="weathermap-cacti-plugin-mgmt.php">Manage...Weathermaps page</a> and add one.</p>';
+				print '<p>To add a map to the schedule, go to the <a href="weathermap-cacti88-plugin-mgmt.php">Manage...Weathermaps page</a> and add one.</p>';
 			}
 			print "</div>";
 		}
@@ -511,7 +511,7 @@ function weathermap_versionbox()
 	
 	if (weathermap_is_admin())
 	{
-		$pagefoot .= " --- <a href='weathermap-cacti-plugin-mgmt.php' title='Go to the map management page'>Weathermap Management</a>";
+		$pagefoot .= " --- <a href='weathermap-cacti88-plugin-mgmt.php' title='Go to the map management page'>Weathermap Management</a>";
 		$pagefoot .= " | <a target=\"_blank\" href=\"docs/\">Local Documentation</a>";
 		$pagefoot .= " | <a target=\"_blank\" href=\"weathermap-cacti-plugin-editor.php\">Editor</a>";
 	}

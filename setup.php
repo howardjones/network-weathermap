@@ -12,13 +12,13 @@
 /**
  * This file now contains only the functions for registering the plugin and doing plugin-admin stuff
  *
- * All the real work is in lib/cacti-plugin-hooks.php and lib/cacti-plugin-poller.php
+ * All the real work is in lib/cacti88-plugin-hooks.php and lib/cacti88-plugin-poller.php
  */
 
 
 require_once dirname(__FILE__) . "/lib/database.php";
-require_once dirname(__FILE__) . "/lib/cacti-plugin-hooks.php";
-require_once dirname(__FILE__) . "/lib/cacti-plugin-poller.php";
+require_once dirname(__FILE__) . "/lib/cacti88-plugin-hooks.php";
+require_once dirname(__FILE__) . "/lib/cacti88-plugin-poller.php";
 
 function plugin_weathermap_install()
 {
@@ -51,9 +51,16 @@ function plugin_weathermap_uninstall()
 
 function plugin_weathermap_version()
 {
-    global $config;
-    $info = parse_ini_file($config['base_path'] . '/plugins/weathermap/INFO', true);
-    return $info['info'];
+    return array(       'name'          => 'weathermap',
+        'version'       => '0.98dev',
+        'longname'      => 'PHP Network Weathermap for Cacti 0.8.x',
+        'author'        => 'Howard Jones',
+        'homepage'      => 'http://www.network-weathermap.com/',
+        'webpage'      => 'http://www.network-weathermap.com/',
+        'email'         => 'howie@thingy.com',
+        'url'           => 'http://www.network-weathermap.com/versions.php'
+    );
+
 }
 
 /* somehow this function is still required in PA 3.x, even though it checks for plugin_weathermap_version() */

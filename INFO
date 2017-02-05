@@ -1,9 +1,9 @@
 [info]
-compat = 0.8.8a
+compat = 1.0.0
 author=Howard Jones
 homepage=http://www.network-weathermap.com/
 webpage=http://www.network-weathermap.com/
-longname=Network Weathermap
+longname=Network Weathermap for Cacti 1.x
 name=weathermap
 version=0.98a
 email=howie@thingy.com

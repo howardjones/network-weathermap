@@ -1,0 +1,9 @@
+./cacti-pick.php
+./editor.php
+./editor-resources/editor.css
+./editor-resources/editor.js
+./editor-resources/index.php
+./editor-resources/jquery-latest.min.js
+./editor-resources/jquery.event.drag-1.0.js
+./editor-resources/jquery.fastTrigger-min.js
+./editor-resources/oldeditor.css

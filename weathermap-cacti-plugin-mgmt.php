@@ -14,7 +14,7 @@ include_once dirname(__FILE__) . "/lib/database.php";
 include_once dirname(__FILE__) . "/lib/WeathermapManager.class.php";
 
 $i_understand_file_permissions_and_how_to_fix_them = FALSE;
-$my_name = "weathermap-cacti-plugin-mgmt.php";
+$my_name = "weathermap-cacti88-plugin-mgmt.php";
 
 $manager = new WeathermapManager(weathermap_get_pdo(), $weathermap_confdir);
 
@@ -223,7 +223,7 @@ switch ($action) {
 
     case 'delete_map':
         if (isset($_REQUEST['id']) && is_numeric($_REQUEST['id'])) map_delete($_REQUEST['id']);
-        header("Location: weathermap-cacti-plugin-mgmt.php");
+        header("Location: weathermap-cacti88-plugin-mgmt.php");
         break;
 
     case 'deactivate_map':
@@ -301,7 +301,7 @@ switch ($action) {
 
         print "<p>It is recommended that you don't use this feature, unless you understand and accept the problems it may cause.</p>";
         print "<h4><a href=\"?action=rebuildnow2\">YES</a></h4>";
-        print "<h1><a href=\"weathermap-cacti-plugin-mgmt.php\">NO</a></h1>";
+        print "<h1><a href=\"weathermap-cacti88-plugin-mgmt.php\">NO</a></h1>";
         include_once $config["base_path"] . "/include/bottom_footer.php";
         break;
 
@@ -980,7 +980,7 @@ function weathermap_group_form($id = 0)
         $groupName = $group->name;
     }
 
-    print "<form action=weathermap-cacti-plugin-mgmt.php>\n<input type=hidden name=action value=group_update />\n";
+    print "<form action=weathermap-cacti88-plugin-mgmt.php>\n<input type=hidden name=action value=group_update />\n";
 
     print "Group Name: <input name=gname value='" . htmlspecialchars($groupName) . "'/>\n";
     if ($id > 0) {

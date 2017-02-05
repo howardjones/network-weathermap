@@ -82,7 +82,7 @@ function attach_click_events() {
 
     if (fromplug === 1) {
         jQuery("#tb_newfile").html('Return to<br>Cacti').click(function () {
-            window.location = "weathermap-cacti-plugin-mgmt.php";
+            window.location = "../weathermap-cacti88-plugin-mgmt.php";
         })
     }
     else {

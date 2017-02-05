@@ -12,7 +12,7 @@ function weathermap_page_title($t)
     if (preg_match('/plugins\/weathermap\//', $_SERVER['REQUEST_URI'], $matches)) {
         $t .= " - Weathermap";
 
-        if (preg_match('/plugins\/weathermap\/weathermap-cacti-plugin.php\?action=viewmap&id=([^&]+)/',
+        if (preg_match('/plugins\/weathermap\/weathermap-cacti88-plugin.php\?action=viewmap&id=([^&]+)/',
             $_SERVER['REQUEST_URI'], $matches)) {
             $mapid = $matches[1];
             $pdo = weathermap_get_pdo();
@@ -36,13 +36,13 @@ function weathermap_page_title($t)
 
 function weathermap_top_graph_refresh($refresh)
 {
-    if (basename($_SERVER["PHP_SELF"]) != "weathermap-cacti-plugin.php") {
+    if (basename($_SERVER["PHP_SELF"]) != "weathermap-cacti88-plugin.php") {
         return $refresh;
     }
 
     // if we're cycling maps, then we want to handle reloads ourselves, thanks
     if (isset($_REQUEST["action"]) && $_REQUEST["action"] == 'viewmapcycle') {
-        return (86400);
+        return 86400;
     }
     return ($refresh);
 }
@@ -354,16 +354,16 @@ function weathermap_config_arrays()
     global $menu;
 
     if (function_exists('api_plugin_register_realm')) {
-        api_plugin_register_realm('weathermap', 'weathermap-cacti-plugin.php', 'Plugin -> Weathermap: View', 1);
+        api_plugin_register_realm('weathermap', 'weathermap-cacti88-plugin.php', 'Plugin -> Weathermap: View', 1);
         api_plugin_register_realm('weathermap', 'weathermap-cacti88-plugin-mgmt.php',
             'Plugin -> Weathermap: Configure/Manage', 1);
-        api_plugin_register_realm('weathermap', 'weathermap-cacti-plugin-editor.php', 'Plugin -> Weathermap: Edit Maps',
+        api_plugin_register_realm('weathermap', 'weathermap-cacti88-plugin-editor.php', 'Plugin -> Weathermap: Edit Maps',
             1);
     }
 
     $wm_menu = array(
         'plugins/weathermap/weathermap-cacti88-plugin-mgmt.php' => "Weathermaps",
-        'plugins/weathermap/weathermap-cacti-plugin-mgmt-groups.php' => "Groups"
+        'plugins/weathermap/weathermap-cacti88-plugin-mgmt-groups.php' => "Groups"
     );
 
     $menu["Management"]['plugins/weathermap/weathermap-cacti88-plugin-mgmt.php'] = $wm_menu;
@@ -374,8 +374,8 @@ function weathermap_show_tab()
     global $config, $user_auth_realm_filenames;
     $realm_id = 0;
 
-    if (isset($user_auth_realm_filenames[basename('weathermap-cacti-plugin.php')])) {
-        $realm_id = $user_auth_realm_filenames[basename('weathermap-cacti-plugin.php')];
+    if (isset($user_auth_realm_filenames[basename('weathermap-cacti88-plugin.php')])) {
+        $realm_id = $user_auth_realm_filenames[basename('weathermap-cacti88-plugin.php')];
     }
 
     $tabstyle = intval(read_config_option("superlinks_tabstyle"));
@@ -395,9 +395,9 @@ function weathermap_show_tab()
         }
         $tab_name = $prefix . "tab_weathermap.gif";
         $weathermap_base = $config['url_path'] . 'plugins/weathermap';
-        $weathermap_url = $weathermap_base . '/weathermap-cacti-plugin.php';
+        $weathermap_url = $weathermap_base . '/weathermap-cacti88-plugin.php';
 
-        if (preg_match('/plugins\/weathermap\/weathermap-cacti-plugin.php/', $_SERVER['REQUEST_URI'], $matches)) {
+        if (preg_match('/plugins\/weathermap\/weathermap-cacti88-plugin.php/', $_SERVER['REQUEST_URI'], $matches)) {
             $tab_name = $prefix . "tab_weathermap_red.gif";
         }
         $tab_url = $weathermap_base . "/images/" . $tab_name;
@@ -411,52 +411,52 @@ function weathermap_show_tab()
 
 function weathermap_draw_navigation_text($nav)
 {
-    $nav["weathermap-cacti-plugin.php:"] = array(
+    $nav["weathermap-cacti88-plugin.php:"] = array(
         "title" => "Weathermap",
         "mapping" => "index.php:",
-        "url" => "weathermap-cacti-plugin.php",
+        "url" => "weathermap-cacti88-plugin.php",
         "level" => "1"
     );
-    $nav["weathermap-cacti-plugin.php:viewmap"] = array(
+    $nav["weathermap-cacti88-plugin.php:viewmap"] = array(
         "title" => "Weathermap",
         "mapping" => "index.php:",
-        "url" => "weathermap-cacti-plugin.php",
+        "url" => "weathermap-cacti88-plugin.php",
         "level" => "1"
     );
-    $nav["weathermap-cacti-plugin.php:liveview"] = array(
+    $nav["weathermap-cacti88-plugin.php:liveview"] = array(
         "title" => "Weathermap",
         "mapping" => "index.php:",
-        "url" => "weathermap-cacti-plugin.php",
+        "url" => "weathermap-cacti88-plugin.php",
         "level" => "1"
     );
-    $nav["weathermap-cacti-plugin.php:liveviewimage"] = array(
+    $nav["weathermap-cacti88-plugin.php:liveviewimage"] = array(
         "title" => "Weathermap",
         "mapping" => "index.php:",
-        "url" => "weathermap-cacti-plugin.php",
+        "url" => "weathermap-cacti88-plugin.php",
         "level" => "1"
     );
-    $nav["weathermap-cacti-plugin.php:viewmapcycle"] = array(
+    $nav["weathermap-cacti88-plugin.php:viewmapcycle"] = array(
         "title" => "Weathermap",
         "mapping" => "index.php:",
-        "url" => "weathermap-cacti-plugin.php",
+        "url" => "weathermap-cacti88-plugin.php",
         "level" => "1"
     );
-    $nav["weathermap-cacti-plugin.php:mrss"] = array(
+    $nav["weathermap-cacti88-plugin.php:mrss"] = array(
         "title" => "Weathermap",
         "mapping" => "index.php:",
-        "url" => "weathermap-cacti-plugin.php",
+        "url" => "weathermap-cacti88-plugin.php",
         "level" => "1"
     );
-    $nav["weathermap-cacti-plugin.php:viewimage"] = array(
+    $nav["weathermap-cacti88-plugin.php:viewimage"] = array(
         "title" => "Weathermap",
         "mapping" => "index.php:",
-        "url" => "weathermap-cacti-plugin.php",
+        "url" => "weathermap-cacti88-plugin.php",
         "level" => "1"
     );
-    $nav["weathermap-cacti-plugin.php:viewthumb"] = array(
+    $nav["weathermap-cacti88-plugin.php:viewthumb"] = array(
         "title" => "Weathermap",
         "mapping" => "index.php:",
-        "url" => "weathermap-cacti-plugin.php",
+        "url" => "weathermap-cacti88-plugin.php",
         "level" => "1"
     );
 

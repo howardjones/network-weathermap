@@ -12,7 +12,7 @@ function weathermap_page_title($t)
     if (preg_match('/plugins\/weathermap\//', $_SERVER['REQUEST_URI'], $matches)) {
         $t .= " - Weathermap";
 
-        if (preg_match('/plugins\/weathermap\/weathermap-cacti88-plugin.php\?action=viewmap&id=([^&]+)/',
+        if (preg_match('/plugins\/weathermap\/weathermap-cacti\d\d-plugin.php\?action=viewmap&id=([^&]+)/',
             $_SERVER['REQUEST_URI'], $matches)) {
             $mapid = $matches[1];
             $pdo = weathermap_get_pdo();

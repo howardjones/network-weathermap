@@ -22,20 +22,20 @@ require_once dirname(__FILE__) . "/lib/cacti88-plugin-poller.php";
 
 function plugin_weathermap_install()
 {
-    api_plugin_register_hook('weathermap', 'config_arrays', 'weathermap_config_arrays', 'setup.php');
-    api_plugin_register_hook('weathermap', 'config_settings', 'weathermap_config_settings', 'setup.php');
+    api_plugin_register_hook('weathermap', 'config_arrays', 'weathermap_config_arrays', 'setup88.php');
+    api_plugin_register_hook('weathermap', 'config_settings', 'weathermap_config_settings', 'setup88.php');
 
-    api_plugin_register_hook('weathermap', 'top_header_tabs', 'weathermap_show_tab', 'setup.php');
-    api_plugin_register_hook('weathermap', 'top_graph_header_tabs', 'weathermap_show_tab', 'setup.php');
-    api_plugin_register_hook('weathermap', 'draw_navigation_text', 'weathermap_draw_navigation_text', 'setup.php');
+    api_plugin_register_hook('weathermap', 'top_header_tabs', 'weathermap_show_tab', 'setup88.php');
+    api_plugin_register_hook('weathermap', 'top_graph_header_tabs', 'weathermap_show_tab', 'setup88.php');
+    api_plugin_register_hook('weathermap', 'draw_navigation_text', 'weathermap_draw_navigation_text', 'setup88.php');
 
-    api_plugin_register_hook('weathermap', 'top_graph_refresh', 'weathermap_top_graph_refresh', 'setup.php');
-    api_plugin_register_hook('weathermap', 'page_title', 'weathermap_page_title', 'setup.php');
-    api_plugin_register_hook('weathermap', 'page_head', 'weathermap_page_head', 'setup.php');
+    api_plugin_register_hook('weathermap', 'top_graph_refresh', 'weathermap_top_graph_refresh', 'setup88.php');
+    api_plugin_register_hook('weathermap', 'page_title', 'weathermap_page_title', 'setup88.php');
+    api_plugin_register_hook('weathermap', 'page_head', 'weathermap_page_head', 'setup88.php');
 
-    api_plugin_register_hook('weathermap', 'poller_top', 'weathermap_poller_top', 'setup.php');
-    api_plugin_register_hook('weathermap', 'poller_output', 'weathermap_poller_output', 'setup.php');
-    api_plugin_register_hook('weathermap', 'poller_bottom', 'weathermap_poller_bottom', 'setup.php');
+    api_plugin_register_hook('weathermap', 'poller_top', 'weathermap_poller_top', 'setup88.php');
+    api_plugin_register_hook('weathermap', 'poller_output', 'weathermap_poller_output', 'setup88.php');
+    api_plugin_register_hook('weathermap', 'poller_bottom', 'weathermap_poller_bottom', 'setup88.php');
 
     weathermap_setup_table();
 }

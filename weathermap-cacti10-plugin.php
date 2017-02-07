@@ -180,8 +180,8 @@ function weathermap_singleview($mapid) {
 
         if ($is_wm_admin) {
             print "<span style='font-size: 80%'>";
-            print "[ <a class='hyperLink' href='weathermap-cacti-plugin-mgmt.php?action=map_settings&id=".$mapid."'>" . __('Map Settings') . "</a> |";
-            print "<a class='hyperLink' href='weathermap-cacti-plugin-mgmt.php?action=perms_edit&id=".$mapid."'>" . __('Map Permissions') . "</a> |";
+            print "[ <a class='hyperLink' href='weathermap-cacti10-plugin-mgmt.php?action=map_settings&id=".$mapid."'>" . __('Map Settings') . "</a> |";
+            print "<a class='hyperLink' href='weathermap-cacti10-plugin-mgmt.php?action=perms_edit&id=".$mapid."'>" . __('Map Permissions') . "</a> |";
             print "<a class='hyperLink' href=''>" . __('Edit Map') . "</a> ]";
             print "</span>";
         } ?>
@@ -214,8 +214,8 @@ function weathermap_is_admin() {
 
 	$realm_id = 0;
 
-	if (isset($user_auth_realm_filenames['weathermap-cacti-plugin-mgmt.php'])) {
-		$realm_id = $user_auth_realm_filenames['weathermap-cacti-plugin-mgmt.php'];
+	if (isset($user_auth_realm_filenames['weathermap-cacti10-plugin-mgmt.php'])) {
+		$realm_id = $user_auth_realm_filenames['weathermap-cacti10-plugin-mgmt.php'];
 	}
 
 	$userid  = (isset($_SESSION['sess_user_id']) ? intval($_SESSION['sess_user_id']) : 1);
@@ -232,7 +232,7 @@ function weathermap_show_manage_tab() {
 	global $config;
 
 	if (weathermap_is_admin()) {
-		print '<a class="hyperLink" href="' . $config['url_path'] . 'plugins/weathermap/weathermap-cacti-plugin-mgmt.php">' . __('Manage Maps') . '</a>';
+		print '<a class="hyperLink" href="' . $config['url_path'] . 'plugins/weathermap/weathermap-cacti10-plugin-mgmt.php">' . __('Manage Maps') . '</a>';
 	}
 }
 
@@ -301,7 +301,7 @@ function weathermap_thumbview($limit_to_group = -1) {
 
 				print '<div class="wm_thumbcontainer" style="margin: 2px; border: 1px solid #bbbbbb; padding: 2px; float:left;">';
 				if (file_exists($thumbfile)) {
-					print '<div class="wm_thumbtitle" style="font-size: 1.2em; font-weight: bold; text-align: center">' . $maptitle . '</div><a class="hyperLink" href="weathermap-cacti-plugin.php?action=viewmap&id=' . $map->filehash . '"><img class="wm_thumb" ' . $imgsize . 'src="' . $thumburl . '" alt="' . $maptitle . '" border="0" hspace="5" vspace="5" title="' . $maptitle . '"/></a>';
+					print '<div class="wm_thumbtitle" style="font-size: 1.2em; font-weight: bold; text-align: center">' . $maptitle . '</div><a class="hyperLink" href="weathermap-cacti10-plugin.php?action=viewmap&id=' . $map->filehash . '"><img class="wm_thumb" ' . $imgsize . 'src="' . $thumburl . '" alt="' . $maptitle . '" border="0" hspace="5" vspace="5" title="' . $maptitle . '"/></a>';
 				} else {
 					print __('(thumbnail for map not created yet)');
 				}
@@ -316,7 +316,7 @@ function weathermap_thumbview($limit_to_group = -1) {
 			print "<div align=\"center\" style=\"padding:20px\"><em>" . __('You Have No Maps') . "</em>";
 
 			if ($total_map_count == 0) {
-				print '<p>' . __('To add a map to the schedule, go to the <a class="hyperLink" href="weathermap-cacti-plugin-mgmt.php">Manage...Weathermaps page</a> and add one.') . '</p>';
+				print '<p>' . __('To add a map to the schedule, go to the <a class="hyperLink" href="weathermap-cacti10-plugin-mgmt.php">Manage...Weathermaps page</a> and add one.') . '</p>';
 			}
 
 			print '</div>';
@@ -488,9 +488,9 @@ function weathermap_versionbox() {
 	$pagefoot = __('Powered by <a href="http://www.network-weathermap.com/?v=%s">PHP Weathermap version %s</a>', $WEATHERMAP_VERSION, $WEATHERMAP_VERSION);
 	
 	if (weathermap_is_admin()) {
-		$pagefoot .= ' --- <a href="weathermap-cacti-plugin-mgmt.php" title="' . __('Go to the map management page') . '">' . __('Weathermap Management') . "</a>";
+		$pagefoot .= ' --- <a href="weathermap-cacti10-plugin-mgmt.php" title="' . __('Go to the map management page') . '">' . __('Weathermap Management') . "</a>";
 		$pagefoot .= ' | <a target="_blank" href="docs/">' . __('Local Documentation') . '</a>';
-		$pagefoot .= ' | <a target="_blank" href="weathermap-cacti-plugin-editor.php">' . __('Editor') . '</a>';
+		$pagefoot .= ' | <a target="_blank" href="weathermap-cacti10-plugin-editor.php">' . __('Editor') . '</a>';
 	}
 
 	html_start_box('Weathermap Info', '100%', '', '3', 'center', '');
@@ -513,7 +513,7 @@ function weathermap_versionbox() {
 function weathermap_footer_links() {
 	global $WEATHERMAP_VERSION;
 	print '<br />'; 
-    html_start_box('<center><a target="_blank" class="linkOverDark" href="docs/">' . __('Local Documentation') . '</a> -- <a target="_blank" class="linkOverDark" href="http://www.network-weathermap.com/">' . __('Weathermap Website') . '</a> -- <a target="_target" class="linkOverDark" href="weathermap-cacti-plugin-editor.php?plug=1">' . __('Weathermap Editor') . '</a>' . __(' -- This is version %s', $WEATHERMAP_VERSION) . '</center>', '100%', '', '2', 'center', '');
+    html_start_box('<center><a target="_blank" class="linkOverDark" href="docs/">' . __('Local Documentation') . '</a> -- <a target="_blank" class="linkOverDark" href="http://www.network-weathermap.com/">' . __('Weathermap Website') . '</a> -- <a target="_target" class="linkOverDark" href="weathermap-cacti10-plugin-editor.php?plug=1">' . __('Weathermap Editor') . '</a>' . __(' -- This is version %s', $WEATHERMAP_VERSION) . '</center>', '100%', '', '2', 'center', '');
 	html_end_box(); 
 }
 
@@ -618,7 +618,7 @@ function weathermap_tabs($current_tab) {
 
 		foreach ($tabs as $tab_short_name => $tab_name) {
 			print '<li><a class="tab' . (($tab_short_name == $current_tab) ? ' selected"' : '"') . " href='" . htmlspecialchars($config['url_path'] .
-				'plugins/weathermap/weathermap-cacti-plugin.php?group_id=' . $tab_short_name) . "'>$tab_name</a></li>\n";
+				'plugins/weathermap/weathermap-cacti10-plugin.php?group_id=' . $tab_short_name) . "'>$tab_name</a></li>\n";
 		}
 
 		print "</ul></nav></div>\n";

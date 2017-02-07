@@ -319,7 +319,7 @@ function weathermap_thumbview($limit_to_group = -1)
 
 				print '<div class="wm_thumbcontainer" style="margin: 2px; border: 1px solid #bbbbbb; padding: 2px; float:left;">';
 				if (file_exists($thumbfile)) {
-					print '<div class="wm_thumbtitle" style="font-size: 1.2em; font-weight: bold; text-align: center">' . $maptitle . '</div><a href="weathermap-cacti-plugin.php?action=viewmap&id=' . $map->filehash . '"><img class="wm_thumb" ' . $imgsize . 'src="' . $thumburl . '" alt="' . $maptitle . '" border="0" hspace="5" vspace="5" title="' . $maptitle . '"/></a>';
+					print '<div class="wm_thumbtitle" style="font-size: 1.2em; font-weight: bold; text-align: center">' . $maptitle . '</div><a href="weathermap-cacti88-plugin.php?action=viewmap&id=' . $map->filehash . '"><img class="wm_thumb" ' . $imgsize . 'src="' . $thumburl . '" alt="' . $maptitle . '" border="0" hspace="5" vspace="5" title="' . $maptitle . '"/></a>';
 				} else {
 					print "(thumbnail for map not created yet)";
 				}
@@ -513,7 +513,7 @@ function weathermap_versionbox()
 	{
 		$pagefoot .= " --- <a href='weathermap-cacti88-plugin-mgmt.php' title='Go to the map management page'>Weathermap Management</a>";
 		$pagefoot .= " | <a target=\"_blank\" href=\"docs/\">Local Documentation</a>";
-		$pagefoot .= " | <a target=\"_blank\" href=\"weathermap-cacti-plugin-editor.php\">Editor</a>";
+		$pagefoot .= " | <a target=\"_blank\" href=\"weathermap-cacti88-plugin-editor.php\">Editor</a>";
 	}
 
 	html_graph_start_box(1,true);
@@ -539,7 +539,7 @@ function weathermap_footer_links()
 	global $colors;
 	global $WEATHERMAP_VERSION;
 	print '<br />'; 
-    html_start_box("<center><a target=\"_blank\" class=\"linkOverDark\" href=\"docs/\">Local Documentation</a> -- <a target=\"_blank\" class=\"linkOverDark\" href=\"http://www.network-weathermap.com/\">Weathermap Website</a> -- <a target=\"_target\" class=\"linkOverDark\" href=\"weathermap-cacti-plugin-editor.php?plug=1\">Weathermap Editor</a> -- This is version $WEATHERMAP_VERSION</center>", "78%", $colors["header"], "2", "center", "");
+    html_start_box("<center><a target=\"_blank\" class=\"linkOverDark\" href=\"docs/\">Local Documentation</a> -- <a target=\"_blank\" class=\"linkOverDark\" href=\"http://www.network-weathermap.com/\">Weathermap Website</a> -- <a target=\"_target\" class=\"linkOverDark\" href=\"weathermap-cacti88-plugin-editor.php?plug=1\">Weathermap Editor</a> -- This is version $WEATHERMAP_VERSION</center>", "78%", $colors["header"], "2", "center", "");
 	html_end_box(); 
 }
 
@@ -644,7 +644,7 @@ function weathermap_tabs($current_tab)
 
 	        foreach (array_keys($tabs) as $tab_short_name) {
 	                print "<td " . (($tab_short_name == $current_tab) ? "bgcolor='silver'" : "bgcolor='#DFDFDF'") . " nowrap='nowrap' width='" . (strlen($tabs[$tab_short_name]) * 9) . "' align='center' class='tab'>
-	                                <span class='textHeader'><a href='weathermap-cacti-plugin.php?group_id=$tab_short_name'>$tabs[$tab_short_name]</a></span>
+	                                <span class='textHeader'><a href='weathermap-cacti88-plugin.php?group_id=$tab_short_name'>$tabs[$tab_short_name]</a></span>
 	                                </td>\n
 	                                <td width='1'></td>\n";
 	        }

@@ -130,7 +130,7 @@ function weathermap_poller_bottom()
     global $WEATHERMAP_VERSION;
 
     include_once $config["library_path"] . DIRECTORY_SEPARATOR . "database.php";
-    include_once dirname(__FILE__) . DIRECTORY_SEPARATOR . "lib" . DIRECTORY_SEPARATOR . "poller-common.php";
+    include_once dirname(__FILE__) . DIRECTORY_SEPARATOR . "poller-common.php";
 
     $pdo = weathermap_get_pdo();
 

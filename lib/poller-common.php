@@ -56,14 +56,23 @@ function weathermap_run_maps($mydir)
 
 	include_once $mydir . DIRECTORY_SEPARATOR . "lib" . DIRECTORY_SEPARATOR . "HTML_ImageMap.class.php";
 	include_once $mydir . DIRECTORY_SEPARATOR . "lib" . DIRECTORY_SEPARATOR . "Weathermap.class.php";
-	include_once $mydir . "/lib/database.php";
-	include_once $mydir . "/lib/WeathermapManager.class.php";
+	include_once $mydir . DIRECTORY_SEPARATOR . "lib" . DIRECTORY_SEPARATOR . "database.php";
+	include_once $mydir . DIRECTORY_SEPARATOR . "lib" . DIRECTORY_SEPARATOR . "WeathermapManager.class.php";
 
-	$weathermap_confdir = realpath($mydir . '/configs');
+	$weathermap_confdir = realpath($mydir . DIRECTORY_SEPARATOR . 'configs');
 
 	$manager = new WeathermapManager(weathermap_get_pdo(), $weathermap_confdir);
 
-	$total_warnings = 0;
+    $plugin_name = "weathermap-cacti-plugin.php";
+    if (substr($config['cacti_version'], 0, 3) == "0.8") {
+        $plugin_name = "weathermap-cacti88-plugin.php";
+    }
+    if (substr($config['cacti_version'], 0, 2) == "1.") {
+        $plugin_name = "weathermap-cacti10-plugin.php";
+    }
+
+
+    $total_warnings = 0;
 	$warning_notes = "";
 
 	$start_time = time();
@@ -214,7 +223,7 @@ function weathermap_run_maps($mydir)
 								// why did I change this before? It's useful...
 								// $wmap->imageuri = $config['url_path'].'/plugins/weathermap/output/weathermap_'.$map->id.".".$imageformat;
 								$configured_imageuri = $wmap->imageuri;
-								$wmap->imageuri = 'weathermap-cacti-plugin.php?action=viewimage&id=' . $map->filehash . "&time=" . time();
+								$wmap->imageuri = $plugin_name . '?action=viewimage&id=' . $map->filehash . "&time=" . time();
 
 								if ($quietlogging == 0) {
 									wm_warn("About to write image file. If this is the last message in your log, increase memory_limit in php.ini [WMPOLL01]\n",

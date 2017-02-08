@@ -653,11 +653,10 @@ function weathermap_tabs($current_tab)
 
         print "<td></td>\n</tr></table>\n";
 		
-		return(true);
+		return true;
 	} else {
-		return (false);
+		return false;
 	}
 }
 
 // vim:ts=4:sw=4:
-?>

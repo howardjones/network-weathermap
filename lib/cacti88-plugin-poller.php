@@ -149,7 +149,7 @@ function weathermap_poller_bottom()
     } else {
         // if we're due, run the render updates
         if (($renderperiod == 0) || (($rendercounter % $renderperiod) == 0)) {
-            weathermap_run_maps(dirname(__FILE__));
+            weathermap_run_maps(dirname(dirname(__FILE__)));
         } else {
             if ($quietlogging == 0) {
                 cacti_log("Weathermap $WEATHERMAP_VERSION - no update in this cycle ($rendercounter)", true,

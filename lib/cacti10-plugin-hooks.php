@@ -57,7 +57,7 @@ function weathermap_setup_table()
         } else {
             # Check that all the table columns exist for weathermap_maps
             # There have been a number of changes over versions.
-            $statement = $pdo->query('show columns from weathermap_maps from ' . $database_default);
+            $statement = $pdo->query('show columns from weathermap_maps from `' . $database_default . '`');
             $result = $statement->fetchAll(PDO::FETCH_ASSOC);
 
             $field_changes = array(
@@ -138,7 +138,7 @@ function weathermap_setup_table()
         } else {
             $found_ldi = false;
 
-            $statement = $pdo->query('SHOW COLUMNS FROM weathermap_data FROM ' . $database_default);
+            $statement = $pdo->query('SHOW COLUMNS FROM weathermap_data FROM `' . $database_default . '`');
             $result = $statement->fetchAll(PDO::FETCH_ASSOC);
 
             foreach ($result as $row) {

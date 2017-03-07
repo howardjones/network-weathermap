@@ -35,7 +35,7 @@ case 'viewimage':
 
 		if (sizeof($map)) {
 			$imagefile = dirname(__FILE__) . '/output/' . '/' . $map[0]->filehash . '.' . $imageformat;
-			if ($action == 'viewthumb') {
+			if (get_request_var('action') == 'viewthumb') {
 				$imagefile = dirname(__FILE__) . '/output/' . $map[0]->filehash . '.thumb.' . $imageformat;
 			}
 			$orig_cwd = getcwd();

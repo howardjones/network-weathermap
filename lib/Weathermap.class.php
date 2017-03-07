@@ -269,7 +269,8 @@ class WeatherMap extends WeatherMapBase
         if (isset($this->scales[$name])) {
             return $this->scales[$name];
         }
-        throw new WeathermapInternalFail("NoSuchScale");
+	wm_warn("Scale $name doesn't exist. Returning DEFAULT");
+	return $this->scales['DEFAULT'];
     }
 
 

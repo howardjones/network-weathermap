@@ -62,6 +62,7 @@ case 'viewmapcycle':
 	    print "<!DOCTYPE html>\n";
 		print "<html><head>";
 		print '<LINK rel="stylesheet" type="text/css" media="screen" href="cacti-resources/weathermap.css">';		
+		print '<script src="vendor/jquery.min.js"></script>';
 		print "</head><body id='wm_fullscreen'>";
 	} else {
 		general_header();
@@ -69,6 +70,7 @@ case 'viewmapcycle':
 
 	print "<div id=\"overDiv\" style=\"position:absolute; visibility:hidden; z-index:1000;\"></div>\n";
 	print "<script type=\"text/javascript\" src=\"overlib.js\"><!-- overLIB (c) Erik Bosrup --></script> \n";
+
 
 	$groupid = -1;
 	if (isset_request_var('group')) {

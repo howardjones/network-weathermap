@@ -334,7 +334,7 @@ function weathermap_footer_links()
     global $colors;
     global $WEATHERMAP_VERSION;
     print '<br />';
-    html_start_box("<center><a target=\"_blank\" class=\"linkOverDark\" href=\"docs/\">Local Documentation</a> -- <a target=\"_blank\" class=\"linkOverDark\" href=\"http://www.network-weathermap.com/\">Weathermap Website</a> -- <a target=\"_target\" class=\"linkOverDark\" href=\"weathermap-cacti-plugin-editor.php\">Weathermap Editor</a> -- This is version $WEATHERMAP_VERSION</center>", "78%", $colors["header"], "2", "center", "");
+    html_start_box("<center><a target=\"_blank\" class=\"linkOverDark\" href=\"docs/\">Local Documentation</a> -- <a target=\"_blank\" class=\"linkOverDark\" href=\"http://www.network-weathermap.com/\">Weathermap Website</a> -- <a target=\"_target\" class=\"linkOverDark\" href=\"weathermap-cacti88-plugin-editor.php\">Weathermap Editor</a> -- This is version $WEATHERMAP_VERSION</center>", "78%", $colors["header"], "2", "center", "");
     html_end_box();
 }
 
@@ -448,7 +448,7 @@ function maplist()
         foreach ($maps as $map) {
             form_alternate_row_color($colors["alternate"], $colors["light"], $i);
 
-            print '<td><a title="Click to start editor with this file" href="weathermap-cacti-plugin-editor.php?action=nothing&mapname=' . htmlspecialchars($map->configfile) . '">' . htmlspecialchars($map->configfile) . '</a>';
+            print '<td><a title="Click to start editor with this file" href="weathermap-cacti88-plugin-editor.php?action=nothing&mapname=' . htmlspecialchars($map->configfile) . '">' . htmlspecialchars($map->configfile) . '</a>';
             if ($map->warncount > 0) {
                 $had_warnings++;
 

@@ -27,6 +27,7 @@ if (isset($FROM_CACTI) && $FROM_CACTI == true) {
 	$cacti_base = dirname(__FILE__) . "/../../";
 	$cacti_url = '/';
 	$cacti_found = false;
+	$CACTI_PLUGIN_URL="";
 }
 
 if (! $ENABLED)
@@ -906,6 +907,7 @@ else
 	<script type="text/javascript">
 	
 	var fromplug=<?php echo ($fromplug==true ? 1:0); ?>;
+	var cacti_url=<?php echo $CACTI_PLUGIN_URL; ?>;
 	var editor_url = '<?php echo $editor_name; ?>';
 	
 	// the only javascript in here should be the objects representing the map itself

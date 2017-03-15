@@ -907,7 +907,7 @@ else
 	<script type="text/javascript">
 	
 	var fromplug=<?php echo ($fromplug==true ? 1:0); ?>;
-	var cacti_url=<?php echo $CACTI_PLUGIN_URL; ?>;
+	var cacti_url='<?php echo $CACTI_PLUGIN_URL; ?>';
 	var editor_url = '<?php echo $editor_name; ?>';
 	
 	// the only javascript in here should be the objects representing the map itself

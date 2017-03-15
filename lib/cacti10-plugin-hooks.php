@@ -309,7 +309,7 @@ function weathermap_config_arrays()
     if (function_exists('api_plugin_register_realm')) {
         api_plugin_register_realm('weathermap', 'weathermap-cacti10-plugin.php', __('Weathermap: View'), 1);
         api_plugin_register_realm('weathermap', 'weathermap-cacti10-plugin-mgmt.php', __('Weathermap: Configure/Manage'), 1);
-        api_plugin_register_realm('weathermap', 'weathermap-cacti-plugin-editor.php', __('Weathermap: Edit Maps'), 1);
+        api_plugin_register_realm('weathermap', 'weathermap-cacti10-plugin-editor.php', __('Weathermap: Edit Maps'), 1);
     }
 
     $wm_menu = array(

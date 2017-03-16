@@ -145,12 +145,16 @@ var WMcycler = {
 
             // when to reload the whole page (with new map data)
             this.timer_reloader = setTimeout(function () {
-                that.reload();
+                that.reloadPage();
             }, this.poller_cycle);
 
             this.initIdle(that);
         }
     },
+	
+	reloadPage: function() {
+		location.reload(true);
+	},
 
     initKeys: function (that) {
         $(document).keyup(function (event) {

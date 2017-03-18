@@ -81,9 +81,8 @@ case 'viewmapcycle':
 
 	if ($fullscreen == 0) {
 		weathermap_versionbox();
+		bottom_footer();
 	}
-
-	bottom_footer();
 
 	break;
 case 'viewmap':

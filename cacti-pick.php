@@ -9,7 +9,10 @@ $ignore_cacti = false;
 
 $config['base_url'] = $cacti_url;
 
-$cacti_base = "/var/www/html/cacti-0.8.8h";
+# if your installation keeps plugins separate from the cacti install, you might need to manually set this
+# (e.g. Debian/ubuntu package-based installs probably need it)
+
+# $cacti_base = "/var/www/html/cacti-0.8.8h";
 
 @include_once 'editor-config.php';
 

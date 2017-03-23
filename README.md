@@ -22,6 +22,18 @@ I'm trying managing feature requests with FeatHub. You can add features here, an
 
 [![Feature Requests](http://feathub.com/howardjones/network-weathermap?format=svg)](http://feathub.com/howardjones/network-weathermap)
 
+## Using the dev version
+
+This git repo deliberately DOES NOT contain third party libraries (and if it does now, it won't soon).
+
+Dependencies are managed with bower. If you have never used it before, you will need to:
+
+* Install nodejs (and npm - which should come with it)
+* Install bower: `npm install -g bower`
+* Go to the weathermap checkout directory
+* `bower install` should install all the necessary dependencies to the vendor/ directory.
+
+The release process collects up these files and puts them in the zip file, via the packing.list file(s). You only need to do this if you are working with the current development code.
 
 ## Credits
 

@@ -8,6 +8,7 @@ $cacti_url = '/';
 $ignore_cacti = false;
 
 $config['base_url'] = $cacti_url;
+$config['cacti_version'] = "NONE";
 
 # if your installation keeps plugins separate from the cacti install, you might need to manually set this
 # (e.g. Debian/ubuntu package-based installs probably need it)
@@ -30,6 +31,11 @@ if (is_dir($cacti_base) && file_exists($cacti_base . "/include/global.php")) {
     exit();
 }
 
+$jquery = '<script type="text/javascript" src="vendor/jquery.min.js"></script>';
+if (substr($config['cacti_version'], 0, 2) == "1.") {
+    $jquery = "";
+}
+
 $pdo = weathermap_get_pdo();
 
 require_once dirname(__FILE__) . "/lib/cacti-pick.php";
@@ -38,7 +44,12 @@ $ui = new EditorDataPicker();
 $ui->main($_REQUEST);
 exit();
 
-// ******************************************
+
+
+// *************************************************************************************************************************************
+
+
+
 if (isset($_SESSION['cacti']['weathermap']['last_used_host_id'][0])) {
     print "<b>Last Host Selected:</b><br>";
     $last['id'] = array_reverse($_SESSION['cacti']['weathermap']['last_used_host_id']);
@@ -169,8 +180,8 @@ if (isset($_REQUEST['command']) && $_REQUEST["command"] == 'node_step1') {
     $hosts = $hosts_stmt->fetchAll(PDO::FETCH_ASSOC);
     ?>
     <html>
-    <head>
-        <script type="text/javascript" src="editor-resources/jquery-latest.min.js"></script>
+      <head>
+        <?php echo $jquery ?>
         <script type="text/javascript">
 
             function filterlist(previous) {

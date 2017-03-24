@@ -8,7 +8,6 @@ $cacti_url = '/';
 $ignore_cacti = false;
 
 $config['base_url'] = $cacti_url;
-$config['cacti_version'] = "NONE";
 
 # if your installation keeps plugins separate from the cacti install, you might need to manually set this
 # (e.g. Debian/ubuntu package-based installs probably need it)
@@ -32,8 +31,10 @@ if (is_dir($cacti_base) && file_exists($cacti_base . "/include/global.php")) {
 }
 
 $jquery = '<script type="text/javascript" src="vendor/jquery.min.js"></script>';
-if (substr($config['cacti_version'], 0, 2) == "1.") {
-    $jquery = "";
+if (isset($config['cacti_version'])) {
+	if (substr($config['cacti_version'], 0, 2) == "1.") {
+		$jquery = "";
+	}
 }
 
 $pdo = weathermap_get_pdo();

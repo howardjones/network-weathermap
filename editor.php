@@ -14,10 +14,10 @@ $ENABLED=false;
 # $FROM_CACTI = false;
 # include "/var/www/html/cacti-0.8.8h/include/global.php";
 
-// If we're embedded in the Cacti UI (included from weathermap-cacti-plugin-editor.php), then authentication has happened. Enable the editor.
+// If we're embedded in the Cacti UI (included from weathermap-cacti-pluginXX-editor.php), then authentication has happened. Enable the editor.
 if (isset($FROM_CACTI) && $FROM_CACTI == true) {
     $ENABLED = true;
-	$editor_name = "weathermap-cacti-plugin-editor.php";
+	$editor_name = $CACTI_EDITOR_URL;
 	$cacti_base = $config["base_path"];
 	$cacti_url = $config['url_path'];
 	$cacti_found = true;

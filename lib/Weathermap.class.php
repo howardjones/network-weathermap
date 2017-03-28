@@ -99,6 +99,9 @@ class WeatherMap extends WeatherMapBase
     var $fonts;
     // var $numscales;
 
+    /** @var WMStats $stats - a generic place to keep various statistics about the map */
+    var $stats;
+
     public function __construct()
     {
         parent::__construct();
@@ -172,6 +175,8 @@ class WeatherMap extends WeatherMapBase
 
         $this->fonts = new WMFontTable();
         $this->fonts->init();
+
+        $this->stats = new WMStats();
 
         $this->Reset();
     }

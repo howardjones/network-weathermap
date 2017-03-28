@@ -14,6 +14,7 @@ require_once dirname(__FILE__) . '/exceptions.php';
 # require_once dirname(__FILE__) . '/php-compat.php';
 
 require_once dirname(__FILE__) . '/WMDebug.php';
+require_once dirname(__FILE__) . '/WMStats.php';
 
 require_once dirname(__FILE__) . '/HTML_ImageMap.class.php';
 

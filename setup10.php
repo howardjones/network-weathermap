@@ -20,6 +20,15 @@ require_once dirname(__FILE__) . "/lib/database.php";
 require_once dirname(__FILE__) . "/lib/cacti10-plugin-hooks.php";
 require_once dirname(__FILE__) . "/lib/cacti10-plugin-poller.php";
 
+
+function plugin_weathermap_version()
+{
+    global $config;
+    $info = parse_ini_file($config['base_path'] . '/plugins/weathermap/INFO', true);
+    return $info['info'];
+}
+
+
 function plugin_weathermap_install()
 {
     api_plugin_register_hook('weathermap', 'config_arrays', 'weathermap_config_arrays', 'setup10.php');
@@ -40,36 +49,8 @@ function plugin_weathermap_install()
     weathermap_setup_table();
 }
 
-
-function plugin_weathermap_uninstall()
+function plugin_init_weathermap()
 {
-    // This function doesn't seem to ever be called, in Cacti 0.8.8b
-    // on the assumption that it will one day work, clear the stored version number from the settings
-    // so that an uninstall/reinstall on the plugin would force the db schema to be checked
-    $pdo = weathermap_get_pdo();
-    $pdo->query("REPLACE INTO settings VALUES('weathermap_version','')");
-}
-
-function plugin_weathermap_version() {
-    global $config;
-    $info = parse_ini_file($config['base_path'] . '/plugins/weathermap/INFO', true);
-    return $info['info'];
-}
-
-/* somehow this function is still required in PA 3.x, even though it checks for plugin_weathermap_version() */
-function weathermap_version() {
-    return plugin_weathermap_version();
-}
-
-function plugin_weathermap_check_config() {
-    return true;
-}
-
-function plugin_weathermap_upgrade() {
-    return false;
-}
-
-function plugin_init_weathermap() {
     global $plugin_hooks;
 
     $plugin_hooks['top_header_tabs']['weathermap'] = 'weathermap_show_tab';
@@ -87,3 +68,29 @@ function plugin_init_weathermap() {
     $plugin_hooks['page_head']['weathermap'] = 'weathermap_page_head';
 }
 
+
+function plugin_weathermap_uninstall()
+{
+    // This function doesn't seem to ever be called, in Cacti 0.8.8b
+    // on the assumption that it will one day work, clear the stored version number from the settings
+    // so that an uninstall/reinstall on the plugin would force the db schema to be checked
+    $pdo = weathermap_get_pdo();
+    $pdo->query("REPLACE INTO settings VALUES('weathermap_version','')");
+}
+
+
+/* somehow this function is still required in PA 3.x, even though it checks for plugin_weathermap_version() */
+function weathermap_version()
+{
+    return plugin_weathermap_version();
+}
+
+function plugin_weathermap_check_config()
+{
+    return true;
+}
+
+function plugin_weathermap_upgrade()
+{
+    return false;
+}

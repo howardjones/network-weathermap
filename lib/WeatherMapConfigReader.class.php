@@ -1595,7 +1595,7 @@ class WeatherMapConfigReader
         // Now loop through all the rest
         foreach ($args as $arg) {
             $newTarget = new WMTarget($arg, $this->currentSource, $this->lineCount);
-
+            $this->mapObject->stats->increment('total_targets');
             if ($this->currentObject) {
                 wm_debug("  TARGET: $arg\n");
                 $this->currentObject->targets[] = $newTarget;

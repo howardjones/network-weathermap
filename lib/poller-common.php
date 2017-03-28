@@ -75,7 +75,7 @@ function weathermap_run_maps($mydir)
     $total_warnings = 0;
 	$warning_notes = "";
 
-	$start_time = time();
+	$start_time = microtime(true);
 	if ($weathermap_poller_start_time == 0) {
 		$weathermap_poller_start_time = $start_time;
 	}
@@ -144,6 +144,8 @@ function weathermap_run_maps($mydir)
 							$resultsfile = $outdir . DIRECTORY_SEPARATOR . $map->filehash . '.results.txt';
 							$tempfile = $outdir . DIRECTORY_SEPARATOR . $map->filehash . '.tmp.png';
 
+							$map_duration = 0;
+
 							if (file_exists($mapfile)) {
 								if ($quietlogging == 0) {
 									wm_warn("Map: $mapfile -> $htmlfile & $imagefile\n", true);
@@ -151,7 +153,7 @@ function weathermap_run_maps($mydir)
 //								db_execute("replace into settings values('weathermap_last_started_file','".mysql_real_escape_string($weathermap_map)."')");
 								$manager->setAppSetting("weathermap_last_started_file", $weathermap_map);
 
-								$map_start = time();
+								$map_start = microtime(true);
 								weathermap_memory_check("MEM starting $mapcount");
 								$wmap = new Weathermap;
 								$wmap->context = "cacti";
@@ -301,6 +303,7 @@ function weathermap_run_maps($mydir)
 								// db_execute("update weathermap_maps set titlecache='".mysql_real_escape_string($processed_title)."' where id=".intval($map->id));
 								$manager->updateMap($map->id, array('titlecache' => $processed_title));
 
+								$wmap->stats->dump();
 
 								if (intval($wmap->thumb_width) > 0) {
 									//db_execute("update weathermap_maps set thumb_width=".intval($wmap->thumb_width).", thumb_height=".intval($wmap->thumb_height)." where id=".intval($map->id));
@@ -311,10 +314,17 @@ function weathermap_run_maps($mydir)
 								}
 
 								$wmap->CleanUp();
-								unset($wmap);
 
-								$map_duration = time() - $map_start;
+
+								$map_duration = microtime(true) - $map_start;
 								wm_debug("TIME: $mapfile took $map_duration seconds.\n");
+								$wmap->stats->set("duration", $map_duration);
+								$wmap->stats->set("warnings", $weathermap_warncount);
+                                if ($quietlogging == 0) {
+                                    wm_warn("MAPINFO: " . $wmap->stats->dump(), true);
+                                }
+                                unset($wmap);
+
 								weathermap_memory_check("MEM after $mapcount");
 								$mapcount++;
 //								db_execute("replace into settings values('weathermap_last_finished_file','".mysql_real_escape_string($weathermap_map)."')");
@@ -324,7 +334,7 @@ function weathermap_run_maps($mydir)
 								wm_warn("Mapfile $mapfile is not readable or doesn't exist [WMPOLL04]\n");
 							}
 							// db_execute("update weathermap_maps set warncount=".intval($weathermap_warncount)." where id=".intval($map->id));
-							$manager->updateMap($map->id, array('warncount' => intval($weathermap_warncount)));
+							$manager->updateMap($map->id, array('warncount' => intval($weathermap_warncount), 'runtime' => floatval($map_duration)));
 
 							$total_warnings += $weathermap_warncount;
 							$weathermap_warncount = 0;
@@ -351,9 +361,9 @@ function weathermap_run_maps($mydir)
 		}
 		weathermap_memory_check("MEM Final");
 		chdir($orig_cwd);
-		$duration = time() - $start_time;
+		$duration = microtime(true) - $start_time;
 
-		$stats_string = date(DATE_RFC822) . ": $mapcount maps were run in $duration seconds with $total_warnings warnings." . $warning_notes;
+        $stats_string = sprintf('%s: %d maps were run in %.2f seconds with %d warnings. %s', date(DATE_RFC822),$mapcount, $duration, $total_warnings, $warning_notes);
 		if ($quietlogging == 0) {
 			wm_warn("STATS: Weathermap $WEATHERMAP_VERSION run complete - $stats_string\n", true);
 		}

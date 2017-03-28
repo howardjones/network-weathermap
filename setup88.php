@@ -20,6 +20,22 @@ require_once dirname(__FILE__) . "/lib/database.php";
 require_once dirname(__FILE__) . "/lib/cacti88-plugin-hooks.php";
 require_once dirname(__FILE__) . "/lib/cacti88-plugin-poller.php";
 
+
+function plugin_weathermap_version()
+{
+    return array('name' => 'weathermap',
+        'version' => '0.98dev',
+        'longname' => 'PHP Network Weathermap for Cacti 0.8.x',
+        'author' => 'Howard Jones',
+        'homepage' => 'http://www.network-weathermap.com/',
+        'webpage' => 'http://www.network-weathermap.com/',
+        'email' => 'howie@thingy.com',
+        'url' => 'http://www.network-weathermap.com/versions.php'
+    );
+
+}
+
+
 function plugin_weathermap_install()
 {
     api_plugin_register_hook('weathermap', 'config_arrays', 'weathermap_config_arrays', 'setup88.php');
@@ -40,48 +56,10 @@ function plugin_weathermap_install()
     weathermap_setup_table();
 }
 
-function plugin_weathermap_uninstall()
-{
-    // This function doesn't seem to ever be called, in Cacti 0.8.8b
-    // on the assumption that it will one day work, clear the stored version number from the settings
-    // so that an uninstall/reinstall on the plugin would force the db schema to be checked
-    $pdo = weathermap_get_pdo();
-    $pdo->query("REPLACE INTO settings VALUES('weathermap_version','')");
-}
-
-function plugin_weathermap_version()
-{
-    return array(       'name'          => 'weathermap',
-        'version'       => '0.98dev',
-        'longname'      => 'PHP Network Weathermap for Cacti 0.8.x',
-        'author'        => 'Howard Jones',
-        'homepage'      => 'http://www.network-weathermap.com/',
-        'webpage'      => 'http://www.network-weathermap.com/',
-        'email'         => 'howie@thingy.com',
-        'url'           => 'http://www.network-weathermap.com/versions.php'
-    );
-
-}
-
-/* somehow this function is still required in PA 3.x, even though it checks for plugin_weathermap_version() */
-function weathermap_version()
-{
-    return plugin_weathermap_version();
-}
-
-function plugin_weathermap_check_config()
-{
-    return true;
-}
-
-function plugin_weathermap_upgrade()
-{
-    return false;
-}
-
 function plugin_init_weathermap()
 {
     global $plugin_hooks;
+
     $plugin_hooks['top_header_tabs']['weathermap'] = 'weathermap_show_tab';
     $plugin_hooks['top_graph_header_tabs']['weathermap'] = 'weathermap_show_tab';
     $plugin_hooks['config_arrays']['weathermap'] = 'weathermap_config_arrays';
@@ -98,6 +76,29 @@ function plugin_init_weathermap()
 }
 
 
+function plugin_weathermap_uninstall()
+{
+    // This function doesn't seem to ever be called, in Cacti 0.8.8b
+    // on the assumption that it will one day work, clear the stored version number from the settings
+    // so that an uninstall/reinstall on the plugin would force the db schema to be checked
+    $pdo = weathermap_get_pdo();
+    $pdo->query("REPLACE INTO settings VALUES('weathermap_version','')");
+}
 
 
+/* somehow this function is still required in PA 3.x, even though it checks for plugin_weathermap_version() */
+function weathermap_version()
+{
+    return plugin_weathermap_version();
+}
+
+function plugin_weathermap_check_config()
+{
+    return true;
+}
+
+function plugin_weathermap_upgrade()
+{
+    return false;
+}
 // vim:ts=4:sw=4:

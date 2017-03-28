@@ -181,6 +181,9 @@ function weathermap_setup_table()
 				titlecache TEXT NOT NULL,
 				filehash VARCHAR (40) NOT NULL DEFAULT '',
 				warncount INT(11) NOT NULL DEFAULT 0,
+				debug set('on','off','once') NOT NULL default 'off',
+                runtime double NOT NULL default 0,
+                lastrun datetime,
 				config TEXT NOT NULL,
 				thumb_width INT(11) NOT NULL DEFAULT 0,
 				thumb_height INT(11) NOT NULL DEFAULT 0,
@@ -200,7 +203,8 @@ function weathermap_setup_table()
                 'warncount' => false,
                 'config' => false,
                 'thumb_width' => false,
-                'group_id' => false
+                'group_id' => false,
+                'debug' => false
             );
 
             foreach ($result as $row) {
@@ -230,6 +234,11 @@ function weathermap_setup_table()
             if (!$field_changes['group_id']) {
                 $database_updates[] = "ALTER TABLE weathermap_maps ADD group_id INT(11) NOT NULL DEFAULT 1 AFTER sortorder";
                 $database_updates[] = "ALTER TABLE `weathermap_settings` ADD `groupid` INT NOT NULL DEFAULT '0' AFTER `mapid`";
+            }
+            if (!$field_changes['debug']) {
+                $database_updates[] = "alter table weathermap_maps add runtime double NOT NULL default 0 after warncount";
+                $database_updates[] = "alter table weathermap_maps add lastrun datetime after runtime";
+                $database_updates[] = "alter table weathermap_maps add debug set('on','off','once') NOT NULL default 'off' after warncount";
             }
         }
 

@@ -11,6 +11,8 @@
 
         <xi:include href = "node_position.xml" />
 
+        <xi:include href = "node_defineoffset.xml" />
+
         <xi:include href = "node_label.xml" />
 
         <xi:include href = "node_target.xml" />

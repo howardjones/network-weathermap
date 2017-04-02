@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configentry>
+    <keyword>DEFINEOFFSET</keyword>
+
+    <scope>NODE</scope>
+
+    <anchor>NODE_DEFINEOFFSET</anchor>
+
+    <definition>DEFINEOFFSET
+
+        <meta>offsetname</meta>
+
+        <meta>x-offset</meta>
+
+        <meta>y-offset</meta>
+
+    </definition>
+
+    <description xmlns="http://www.w3.org/1999/xhtml">
+
+        <p>Define a relative offset within this node, that can be used by name in POSITION and NODES commands.</p>
+        <p>TODO - write this up!</p>
+
+    </description>
+
+    <changes>
+
+    </changes>
+</configentry>

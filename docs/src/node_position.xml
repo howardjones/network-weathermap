@@ -22,6 +22,17 @@
         <meta>y-coord</meta>
     </definition>
 
+    <definition>POSITION
+
+        <meta>nodename</meta>
+
+        <meta>angle</meta>r<meta>distance</meta>
+    </definition>
+
+    <definition>POSITION
+        <meta>nodename</meta>:<meta>offsetname</meta>
+    </definition>
+
     <description xmlns="http://www.w3.org/1999/xhtml">
         <p>Specifies where to place the node on the map. Coordinates are in pixel units,
         with the origin at the top-left of the map.</p>
@@ -31,6 +42,14 @@
         around as you alter the map. Relative nodes can be relative to other relative
         nodes, as long as the node at the end of the chain is not relatively
         positioned!</p>
+
+        <p>You can also specify a relative position to another node in polar coordinates, with an angle and a distance. This
+        can make it simpler to arrange child nodes in a circle around a parent.</p>
+
+        <p>Finally, you can also position a node relative to another using <em>named offsets</em>. These are defined in the
+        parent node (or a template node it uses) using the DEFINEOFFSET command. This can be useful for things like
+        switch ports - a single node can have offsets defined for each port in a large icon of the switch, and then smaller
+        per-port status icons can be specified to overlay 'switch1:p1'.</p>
     </description>
 
     <examples>

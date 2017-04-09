@@ -18,7 +18,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   end
 
   config.vm.define :u1604 do |u1604|
-#	  u1604.vm.provision :shell, :path => "vagrant-cacti-u1604.sh"
+	  u1604.vm.provision :shell, :path => "vagrant-cacti-u1604.sh"
 	  u1604.vm.box = "ubuntu/xenial64"
 	  u1604.vm.network "forwarded_port", guest:80, host: 8016
   end

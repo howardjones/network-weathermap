@@ -1,5 +1,5 @@
 VERSION=0.98a
-RELBASE=../releases
+RELBASE=./releases
 RELNAME=php-weathermap-$(VERSION)
 RELDIR=$(RELBASE)/weathermap
 
@@ -20,6 +20,7 @@ manual:	docs/index.html
 	
 clean:
 	rm random-bits/suite-1.png random-bits/suite-2.png docs/src/contents.xml
+	rm -rf $(RELBASE)
 
 release: 
 	#sql
@@ -29,7 +30,7 @@ release:
 	tar cTf packing.list-core - | (cd $(RELDIR); tar xvf -)
 	cd $(RELBASE); zip -r $(RELNAME).zip weathermap/*
 	cd $(RELBASE); tar cvfz $(RELNAME).tgz weathermap
-	cd $(RELBASE); mv $(RELDIR) $(RELNAME)
+	cd $(RELBASE); mv weathermap $(RELNAME)
 	echo $(RENAME) built in $(RELBASE)
 
 test:	

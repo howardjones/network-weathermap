@@ -3,8 +3,14 @@ sudo apt-get update -y
 ## For 'real' install:
 sudo DEBIAN_FRONTEND=noninteractive apt-get install -y mysql-server-5.7 snmp rrdtool php7.0 php5.6 php5.6-common php5.6-cli php5.6-mysql apache2 libapache2-mod-php5.6 libapache2-mod-php7.0 unzip php5.6-snmp php5.6-gd php-gettext php5.6-mbstring php-xdebug unzip php5.6-xml
 # ## For dev/test, we need these too
-sudo DEBIAN_FRONTEND=noninteractive apt-get install -y git subversion make xsltproc imagemagick zip curl phpunit
+sudo DEBIAN_FRONTEND=noninteractive apt-get install -y git subversion make xsltproc imagemagick zip curl phpunit nodejs npm pandoc
 #
+
+#Install and run bower
+sudo npm install -g bower
+sudo ln -s /usr/bin/nodejs /usr/bin/node
+cd /network-weathermap
+bower install --allow-root
 
 #Change to php 5.6
 sudo a2dismod php7.0

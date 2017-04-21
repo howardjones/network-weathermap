@@ -92,7 +92,7 @@ class EditorDataPicker extends WeatherMapUIBase
         $tpl->set("sources", $sources);
         $tpl->set("overlib", ($overlib ? 1 : 0));
         $tpl->set("aggregate", ($aggregate ? 1 : 0));
-        $tpl->set("base_url", isset($config['base_url']) ? $config['base_url'] : '');
+        $tpl->set("base_url", jsEscape(isset($config['base_url']) ? $config['base_url'] : ''));
         $tpl->set("rra_path", jsEscape($config['rra_path']));
 
         echo $tpl->fetch("editor-resources/templates/picker-data.php");

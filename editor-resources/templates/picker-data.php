@@ -6,7 +6,7 @@
 
     <script type="text/javascript">
 
-        var base_url = <?php echo $base_url ?>;
+        var base_url = <?php echo  $base_url ?>;
         var rra_path = <?php echo $rra_path ?>;
         var aggregate = <?php echo $aggregate ?>;
         var overlib = <?php echo $overlib ?>;

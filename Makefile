@@ -35,6 +35,7 @@ release:
 
 test:	
 	vendor/bin/phpunit -c build/phpunit.xml
+#	phpunit -c build/phpunit.xml
 	grep  Output test-suite/diffs/*.txt | grep -v '|0|' | awk -F: '{ print $1;}' | sed -e 's/.png.txt//' -e 's/test-suite\/diffs\///' > test-suite/failing-images.txt
 	php test-suite/make-failing-summary.php > test-suite/summary-failing.html
 

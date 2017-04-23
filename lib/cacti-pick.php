@@ -48,7 +48,54 @@ class EditorDataPicker extends WeatherMapUIBase
         }
     }
 
-    public function handleLinkStep1($request, $context=null)
+    public function handleNodeStep1($request, $context = null)
+    {
+        global $config; // Cacti config object
+
+        $host_id = -1;
+
+        $overlib = false;
+        $aggregate = false;
+
+        $pdo = weathermap_get_pdo();
+
+        if (isset($request['host_id'])) {
+            $host_id = intval($request['host_id']);
+        }
+
+        if ($host_id >= 0) {
+            $SQL_picklist = "SELECT graph_templates_graph.id, graph_local.host_id, graph_templates_graph.local_graph_id, graph_templates_graph.height, graph_templates_graph.width, graph_templates_graph.title_cache as description, graph_templates.name, graph_local.host_id	FROM (graph_local,graph_templates_graph) LEFT JOIN graph_templates ON (graph_local.graph_template_id=graph_templates.id) WHERE graph_local.id=graph_templates_graph.local_graph_id ";
+            $SQL_picklist .= " and graph_local.host_id=? ";
+            $SQL_picklist .= " order by title_cache";
+            $statement = $pdo->prepare($SQL_picklist);
+            $statement->execute(array($host_id));
+        } else {
+            $SQL_picklist = "SELECT graph_templates_graph.id, graph_local.host_id, graph_templates_graph.local_graph_id, graph_templates_graph.height, graph_templates_graph.width, graph_templates_graph.title_cache as description, graph_templates.name, graph_local.host_id	FROM (graph_local,graph_templates_graph) LEFT JOIN graph_templates ON (graph_local.graph_template_id=graph_templates.id) WHERE graph_local.id=graph_templates_graph.local_graph_id ";
+            $SQL_picklist .= " order by title_cache";
+            $statement = $pdo->prepare($SQL_picklist);
+            $statement->execute();
+        }
+
+        $sources = $statement->fetchAll(PDO::FETCH_ASSOC);
+
+        uasort($sources, "usortNaturalDescriptions");
+
+        $hosts = $this->cactiHostList($pdo);
+
+        $tpl = new SimpleTemplate();
+        $tpl->set("title", "Pick a graph");
+        $tpl->set("hosts", $hosts);
+        $tpl->set("sources", $sources);
+        $tpl->set("overlib", ($overlib ? 1 : 0));
+        $tpl->set("selected_host", $host_id);
+        $tpl->set("aggregate", ($aggregate ? 1 : 0));
+        $tpl->set("base_url", isset($config['base_url']) ? $config['base_url'] : '');
+        $tpl->set("rra_path", jsEscape($config['rra_path']));
+
+        echo $tpl->fetch("editor-resources/templates/picker-graph.php");
+    }
+
+    public function handleLinkStep1($request, $context = null)
     {
         global $config;
 
@@ -79,10 +126,7 @@ class EditorDataPicker extends WeatherMapUIBase
         $sources = $statement->fetchAll(PDO::FETCH_ASSOC);
         uasort($sources, "usortNaturalDescriptions");
 
-        $hosts_stmt = $pdo->prepare("SELECT id,CONCAT_WS('',description,' (',hostname,')') AS name FROM host ORDER BY description,hostname");
-        $hosts_stmt->execute();
-        $hosts = $hosts_stmt->fetchAll(PDO::FETCH_ASSOC);
-        uasort($hosts, "usortNaturalNames");
+        $hosts = $this->cactiHostList($pdo);
 
         $tpl = new SimpleTemplate();
         $tpl->set("title", "Pick a data source");
@@ -100,7 +144,7 @@ class EditorDataPicker extends WeatherMapUIBase
     }
 
 
-    public function handleLinkStep2($request, $context=null)
+    public function handleLinkStep2($request, $context = null)
     {
         $dataId = intval($_REQUEST['dataid']);
         $hostId = $_REQUEST['host_id'];
@@ -118,7 +162,7 @@ class EditorDataPicker extends WeatherMapUIBase
     }
 
 
-        public function updateRecentHosts($hostId, $name)
+    public function updateRecentHosts($hostId, $name)
     {
         if ($hostId > 0 && !in_array($hostId, $_SESSION['cacti']['weathermap']['last_used_host_id'])) {
             $_SESSION['cacti']['weathermap']['last_used_host_id'][] = $hostId;
@@ -157,6 +201,20 @@ class EditorDataPicker extends WeatherMapUIBase
         return array($line['local_graph_id'], $line['title_cache']);
     }
 
+    /**
+     * @param $pdo
+     * @return mixed
+     */
+    protected function cactiHostList($pdo)
+    {
+        $statement = $pdo->prepare("SELECT id,CONCAT_WS('',description,' (',hostname,')') AS name FROM host ORDER BY description,hostname");
+        $statement->execute();
+
+        $hosts = $statement->fetchAll(PDO::FETCH_ASSOC);
+        uasort($hosts, "usortNaturalNames");
+
+        return $hosts;
+    }
 }
 
 function jsEscape($str)

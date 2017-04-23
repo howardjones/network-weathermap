@@ -274,9 +274,9 @@ function weathermap_setup_table()
 
         if (!in_array('weathermap_data', $tables)) {
             $database_updates[] = "CREATE TABLE IF NOT EXISTS weathermap_data (id INT(11) NOT NULL AUTO_INCREMENT,
-				rrdfile VARCHAR(255) NOT NULL,data_source_name VARCHAR(19) NOT NULL,
-				  last_time INT(11) NOT NULL,last_value VARCHAR(255) NOT NULL,
-				last_calc VARCHAR(255) NOT NULL, sequence INT(11) NOT NULL, local_data_id INT(11) NOT NULL DEFAULT 0, PRIMARY KEY  (id), KEY rrdfile (rrdfile),
+				rrdfile VARCHAR(190) NOT NULL,data_source_name VARCHAR(19) NOT NULL,
+				  last_time INT(11) NOT NULL,last_value VARCHAR(190) NOT NULL,
+				last_calc VARCHAR(190) NOT NULL, sequence INT(11) NOT NULL, local_data_id INT(11) NOT NULL DEFAULT 0, PRIMARY KEY  (id), KEY rrdfile (rrdfile),
 				  KEY local_data_id (local_data_id), KEY data_source_name (data_source_name) )";
         } else {
             $found_ldi = false;

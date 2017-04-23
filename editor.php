@@ -1392,6 +1392,7 @@ else
 
 	  <div class="dlgBody">
 		<p>You can edit the map items directly here.</p>
+          <p>NOTE: Any changes are NOT checked! This will simply replace the whole configuration for this item.</p>
                 <textarea wrap="no" id="item_configtext" name="item_configtext" cols=40 rows=15></textarea>
 	  </div>
 

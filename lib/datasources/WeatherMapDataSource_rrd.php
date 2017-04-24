@@ -54,6 +54,7 @@ class WeatherMapDataSource_rrd extends WeatherMapDataSource
     function wmrrd_read_from_poller_output($rrdfile, $cf, $start, $end, $dsnames, &$data, &$map, &$data_time, &$item)
     {
         global $config;
+        $pdo = weathermap_get_pdo();
 
         wm_debug("RRD ReadData: poller_output style\n");
 
@@ -69,10 +70,10 @@ class WeatherMapDataSource_rrd extends WeatherMapDataSource
                 if ($dsnames[$dir] != '-') {
                     wm_debug("RRD ReadData: poller_output - DS name is " . $dsnames[$dir] . "\n");
 
-                    $SQL = "select * from weathermap_data where rrdfile='" . mysql_real_escape_string($db_rrdname) . "' and data_source_name='" . mysql_real_escape_string($dsnames[$dir]) . "'";
+                    $SQL = "select * from weathermap_data where rrdfile=" . $pdo->quote($db_rrdname) . " and data_source_name=" . $pdo->quote($dsnames[$dir]);
 
-                    $SQLcheck = "select data_template_data.local_data_id from data_template_data,data_template_rrd where data_template_data.local_data_id=data_template_rrd.local_data_id and data_template_data.data_source_path='" . mysql_real_escape_string($db_rrdname) . "' and data_template_rrd.data_source_name='" . mysql_real_escape_string($dsnames[$dir]) . "'";
-                    $SQLvalid = "select data_template_rrd.data_source_name from data_template_data,data_template_rrd where data_template_data.local_data_id=data_template_rrd.local_data_id and data_template_data.data_source_path='" . mysql_real_escape_string($db_rrdname) . "'";
+                    $SQLcheck = "select data_template_data.local_data_id from data_template_data,data_template_rrd where data_template_data.local_data_id=data_template_rrd.local_data_id and data_template_data.data_source_path=" . $pdo->quote($db_rrdname) . " and data_template_rrd.data_source_name=" . $pdo->quote($dsnames[$dir]);
+                    $SQLvalid = "select data_template_rrd.data_source_name from data_template_data,data_template_rrd where data_template_data.local_data_id=data_template_rrd.local_data_id and data_template_data.data_source_path=" . $pdo->quote($db_rrdname);
 
                     $worst_time = time() - 8 * 60;
                     $result = db_fetch_row($SQL);
@@ -95,7 +96,7 @@ class WeatherMapDataSource_rrd extends WeatherMapDataSource
                             // add the new data source (which we just checked exists) to the table.
                             // Include the local_data_id as well, to make life easier in poller_output
                             // (and to allow the cacti: DS plugin to use the same table, too)
-                            $SQLins = "insert into weathermap_data (rrdfile, data_source_name, sequence, local_data_id) values ('" . mysql_real_escape_string($db_rrdname) . "','" . mysql_real_escape_string($dsnames[$dir]) . "', 0," . $result['local_data_id'] . ")";
+                            $SQLins = "insert into weathermap_data (rrdfile, data_source_name, sequence, local_data_id) values (" . $pdo->quote($db_rrdname) . "," . $pdo->quote($dsnames[$dir]) . ", 0," . $result['local_data_id'] . ")";
                             wm_debug("RRD ReadData: poller_output - Adding new weathermap_data row for data source ID " . $result['local_data_id'] . "\n");
                             db_execute($SQLins);
                         }

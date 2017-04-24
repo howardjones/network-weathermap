@@ -6,9 +6,27 @@
 /*global aggregate:false */
 /*global selected_host:false */
 
+function getUrlParameter(sParam) {
+    var sPageURL = decodeURIComponent(window.location.search.substring(1)),
+        sURLVariables = sPageURL.split('&'),
+        sParameterName,
+        i;
+
+    for (i = 0; i < sURLVariables.length; i++) {
+        sParameterName = sURLVariables[i].split('=');
+
+        if (sParameterName[0] === sParam) {
+            return sParameterName[1] === undefined ? true : sParameterName[1];
+        }
+    }
+}
+
 function applyDSFilterChange(objForm) {
     var strURL = '?host_id=' + objForm.host_id.value;
-    strURL = strURL + '&action=link_step1';
+
+    // This changes!
+    strURL = strURL + '&action=' + getUrlParameter('action');
+
     if (objForm.overlib.checked) {
         strURL = strURL + "&overlib=1";
     } else {
@@ -80,7 +98,7 @@ function nodeGraphSelected(event) {
         }
         opener.document.forms.frmMain.node_hover.value = graph_url;
     }
-    this.close();
+    window.close();
 }
 
 $(document).ready(function () {

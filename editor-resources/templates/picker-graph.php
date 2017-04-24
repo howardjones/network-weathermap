@@ -25,6 +25,7 @@
         ul li.row1 { background: #ccc;}
         ul li { border-bottom: 1px solid #aaa; border-top: 1px solid #eee; padding: 2px;}
         ul li a { text-decoration: none; color: black; }
+        ul#dslist li { cursor: hand; }
     </style>
     <title><?php echo $title ?></title>
 </head>

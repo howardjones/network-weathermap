@@ -24,6 +24,8 @@
 class WeatherMapDataSource_cactithold extends WeatherMapDataSource
 {
 
+    private $thold10;
+
     public function __construct()
     {
         parent::__construct();
@@ -32,7 +34,8 @@ class WeatherMapDataSource_cactithold extends WeatherMapDataSource
             '/^cacti(thold|monitor):(\d+)$/',
             '/^cactithold:(\d+):(\d+)$/'
         );
-        $this->name= "CactiTHold";
+        $this->name = "CactiTHold";
+        $this->thold10 = false;
     }
 
     function Init(&$map)
@@ -40,6 +43,7 @@ class WeatherMapDataSource_cactithold extends WeatherMapDataSource
         global $plugins;
 
         if ($map->context == 'cacti') {
+
             if (!function_exists('db_fetch_row')) {
                 wm_debug("ReadData CactiTHold: Cacti database library not found. [THOLD001]\n");
                 return (FALSE);
@@ -76,6 +80,9 @@ class WeatherMapDataSource_cactithold extends WeatherMapDataSource
                 return false;
             }
 
+            // TODO: Check for thold >1.0 or earlier (field names changed)
+            // and update $this->thold10 appropriately
+
             return true;
         } else {
             wm_debug("ReadData CactiTHold: Can only run from Cacti environment. [THOLD004]\n");
@@ -94,6 +101,8 @@ class WeatherMapDataSource_cactithold extends WeatherMapDataSource
     {
         $this->dataTime = time();
 
+        $pdo = weathermap_get_pdo();
+
         if (preg_match('/^cactithold:(\d+):(\d+)$/', $targetstring, $matches)) {
             // Returns 0 if threshold is not breached, 1 if it is.
             // use target aggregation to build these up into a 'badness' percentage
@@ -102,8 +111,13 @@ class WeatherMapDataSource_cactithold extends WeatherMapDataSource
             $rra_id = intval($matches[1]);
             $data_id = intval($matches[2]);
 
-            $SQL2 = "select thold_alert from thold_data where rra_id=$rra_id and data_id=$data_id and thold_enabled='on'";
-            $result = db_fetch_row($SQL2);
+//            $SQL2 = "select thold_alert from thold_data where rra_id=$rra_id and data_id=$data_id and thold_enabled='on'";
+
+            $statement = $pdo->prepare("select thold_alert from thold_data where rra_id=? and data_id=? and thold_enabled='on'");
+            $statement->execute(array($rra_id, $data_id));
+            $result = $statement->fetch(PDO::FETCH_ASSOC);
+
+//            $result = db_fetch_row($SQL2);
             if (isset($result)) {
                 if ($result['thold_alert'] > 0) {
                     $this->data[IN] = 1;
@@ -119,8 +133,12 @@ class WeatherMapDataSource_cactithold extends WeatherMapDataSource
             if ($type == 'thold') {
                 // VERY simple. Returns 0 if threshold is not breached, 1 if it is.
                 // use target aggregation to build these up into a 'badness' percentage
-                $SQL2 = "select thold_alert from thold_data where id=$id and thold_enabled='on'";
-                $result = db_fetch_row($SQL2);
+//                $SQL2 = "select thold_alert from thold_data where id=$id and thold_enabled='on'";
+                $statement = $pdo->prepare("select thold_alert from thold_data where id=? and thold_enabled='on'");
+                $statement->execute(array($id));
+                $result = $statement->fetch(PDO::FETCH_ASSOC);
+
+//                $result = db_fetch_row($SQL2);
                 if (isset($result)) {
                     if ($result['thold_alert'] > 0) {
                         $this->data[IN] = 1;
@@ -133,7 +151,11 @@ class WeatherMapDataSource_cactithold extends WeatherMapDataSource
 
             if ($type == 'monitor') {
                 wm_debug("CactiTHold ReadData: Getting cacti basic state for host $id\n");
-                $SQL = "select * from host where id=$id";
+//                $SQL = "select * from host where id=$id";
+
+                $statement = $pdo->prepare("select * from host where id=?");
+                $statement->execute(array($id));
+                $result = $statement->fetch(PDO::FETCH_ASSOC);
 
                 // 0=disabled
                 // 1=down
@@ -143,7 +165,7 @@ class WeatherMapDataSource_cactithold extends WeatherMapDataSource
 
                 $state = -1;
                 $statename = '';
-                $result = db_fetch_row($SQL);
+//                $result = db_fetch_row($SQL);
                 if (isset($result)) {
                     // create a note, which can be used in icon filenames or labels more nicely
                     if ($result['status'] == 1) {
@@ -183,9 +205,19 @@ class WeatherMapDataSource_cactithold extends WeatherMapDataSource
                 wm_debug("CactiTHold ReadData: Checking threshold states for host $id\n");
                 $numthresh = 0;
                 $numfailing = 0;
-                $SQL2 = "select rra_id, data_id, thold_alert from thold_data,data_local where thold_data.rra_id=data_local.id and data_local.host_id=$id and thold_enabled='on'";
+                // $SQL2 = "select rra_id, data_id, thold_alert from thold_data,data_local where thold_data.rra_id=data_local.id and data_local.host_id=$id and thold_enabled='on'";
+
+                $statement = $pdo->prepare("select rra_id, data_id, thold_alert from thold_data,data_local where thold_data.rra_id=data_local.id and data_local.host_id=? and thold_enabled='on'");
+
+                if ($this->thold10) {
+                    $statement = $pdo->prepare("select local_data_id as rra_id, data_template_rrd_id as data_id, thold_alert from thold_data,data_local where thold_data.local_data_id=data_local.id and data_local.host_id=? and thold_enabled='on'");
+                }
+
+                $statement->execute(array($id));
+                $queryrows = $statement->fetchAll(PDO::FETCH_ASSOC);
+
                 # $result = db_fetch_row($SQL2);
-                $queryrows = db_fetch_assoc($SQL2);
+                // $queryrows = db_fetch_assoc($SQL2);
                 if (is_array($queryrows)) {
                     foreach ($queryrows as $th) {
                         $desc = $th['rra_id'] . "/" . $th['data_id'];

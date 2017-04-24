@@ -43,7 +43,7 @@
         nodes, as long as the node at the end of the chain is not relatively
         positioned!</p>
 
-        <p>You can also specify a relative position to another node in polar coordinates, with an angle and a distance. This
+        <p>You can also specify a relative position to another node in polar coordinates, with an angle (in degrees) and a distance. This
         can make it simpler to arrange child nodes in a circle around a parent.</p>
 
         <p>Finally, you can also position a node relative to another using <em>named offsets</em>. These are defined in the

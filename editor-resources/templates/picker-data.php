@@ -6,7 +6,7 @@
 
     <script type="text/javascript">
 
-        var base_url = <?php echo  $base_url ?>;
+        var base_url = <?php echo $base_url ?>;
         var rra_path = <?php echo $rra_path ?>;
         var aggregate = <?php echo $aggregate ?>;
         var overlib = <?php echo $overlib ?>;
@@ -26,6 +26,7 @@
         ul li.row1 { background: #ccc;}
         ul li { border-bottom: 1px solid #aaa; border-top: 1px solid #eee; padding: 2px;}
         ul li a { text-decoration: none; color: black; }
+        ul#dslist li { cursor: hand; }
     </style>
     <title><?php echo $title ?></title>
 </head>

@@ -1,6 +1,6 @@
 <?php
 
-require_once dirname(__FILE__) . "../database.php";
+require_once dirname(__FILE__) . "/../database.php";
 
 
 class WeatherMapDataSource_cactihost extends WeatherMapDataSource

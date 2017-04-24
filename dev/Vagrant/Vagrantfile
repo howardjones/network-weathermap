@@ -17,10 +17,11 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 	  u1404.vm.network "forwarded_port", guest: 80, host: 8014
   end
 
-  config.vm.define :u1604 do |u1604|
-	  u1604.vm.provision :shell, :path => "vagrant-cacti-u1604.sh"
-	  u1604.vm.box = "ubuntu/xenial64"
-	  u1604.vm.network "forwarded_port", guest:80, host: 8016
+  config.vm.define :develop do |develop|
+	  develop.vm.provision :shell, :path => "vagrant-cacti-develop.sh", privileged: false
+	  develop.vm.box = "ubuntu/xenial64"
+	  develop.vm.network "forwarded_port", guest:80, host: 8016
+	  develop.vm.hostname = "weathermap-dev"
   end
 #  config.vm.define :u1204 do |u1204|
 #        u1204.vm.provision :shell, :path => "vagrant-cacti-u1204.sh"

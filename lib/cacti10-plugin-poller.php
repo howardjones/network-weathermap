@@ -17,7 +17,7 @@ function weathermap_poller_output($rrd_update_array)
 
     $pdo = weathermap_get_pdo();
 
-    $weathermap_data_update = $pdo->prepare("\"UPDATE weathermap_data SET last_time=?, last_calc='?', last_value='?',sequence=sequence+1  where id = ?");
+    $weathermap_data_update = $pdo->prepare("UPDATE weathermap_data SET last_time=?, last_calc=?, last_value=?,sequence=sequence+1  where id = ?");
 
     $log_verbosity = read_config_option("log_verbosity");
 

@@ -45,7 +45,7 @@ class WeatherMapDataSource_cactihost extends WeatherMapDataSource
 
             $pdo = weathermap_get_pdo();
 
-            $statement=$pdo->prepare("\"select * from host where id=?");
+            $statement=$pdo->prepare("select * from host where id=?");
 
             // 0=disabled
             // 1=down

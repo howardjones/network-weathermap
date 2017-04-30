@@ -315,7 +315,6 @@ function weathermap_run_maps($mydir)
 
 								$wmap->CleanUp();
 
-
 								$map_duration = microtime(true) - $map_start;
 								wm_debug("TIME: $mapfile took $map_duration seconds.\n");
 								$wmap->stats->set("duration", $map_duration);
@@ -350,9 +349,17 @@ function weathermap_run_maps($mydir)
 					}
 				}
 			} else {
-				wm_warn("Output directory ($outdir) isn't writable (tried to create '$testfile'). No maps created. You probably need to make it writable by the poller process (like you did with the RRA directory) [WMPOLL06]\n");
+			    $NOTE = "";
+                if (function_exists("posix_geteuid") && function_exists("posix_getpwuid")) {
+                    $processUser = posix_getpwuid(posix_geteuid());
+                    $username =  $processUser['name'];
+                    $NOTE=" ($username)";
+                }
+
+
+				wm_warn("Output directory ($outdir) isn't writable (tried to create '$testfile'). No maps created. You probably need to make it writable by the poller process user$NOTE (like you did with the RRA directory) [WMPOLL06]\n");
 				$total_warnings++;
-				$warning_notes .= " (Permissions problem prevents any maps running WMPOLL06)";
+				$warning_notes .= " (Permissions problem prevents any maps running - check cacti.log for WMPOLL06)";
 			}
 		} else {
 			wm_warn("Output directory ($outdir) doesn't exist!. No maps created. You probably need to create that directory, and make it writable by the poller process (like you did with the RRA directory) [WMPOLL07]\n");

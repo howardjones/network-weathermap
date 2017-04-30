@@ -42,7 +42,9 @@ class WeatherMapDataSource_cactithold extends WeatherMapDataSource
     {
         global $plugins;
 
+
         if ($map->context == 'cacti') {
+            $pdo = weathermap_get_pdo();
 
             if (!function_exists('db_fetch_row')) {
                 wm_debug("ReadData CactiTHold: Cacti database library not found. [THOLD001]\n");
@@ -57,17 +59,13 @@ class WeatherMapDataSource_cactithold extends WeatherMapDataSource
                 }
             }
 
-            if (isset($plugins) && in_array('thold', $plugins)) {
-                $thold_present = true;
-            }
-
             if (!$thold_present) {
                 wm_debug("ReadData CactiTHold: THold plugin not enabled. [THOLD002]\n");
             }
 
-            $sql = "show tables";
-            $result = db_fetch_assoc($sql) or die (mysql_error());
-            $tables = array();
+            $statement = $pdo->prepare("show tables");
+            $statement->execute();
+            $result = $statement->fetch_all(PDO::FETCH_ASSOC);
 
             foreach ($result as $index => $arr) {
                 foreach ($arr as $t) {
@@ -82,6 +80,16 @@ class WeatherMapDataSource_cactithold extends WeatherMapDataSource
 
             // TODO: Check for thold >1.0 or earlier (field names changed)
             // and update $this->thold10 appropriately
+
+            $statement = $pdo->prepare("select * from plugin_config where directory='thold'");
+            $statement->execute();
+            $result = $statement->fetch_all(PDO::FETCH_ASSOC);
+            if(sizeof($result)==1) {
+                $version = $result['version'];
+                if(substr($version,0,1) != "0") {
+                    $this->thold10 = true;
+                }
+            }
 
             return true;
         } else {

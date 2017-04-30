@@ -82,9 +82,21 @@ else
 
 chdir(dirname(__FILE__));
 
+$readonly_file = false;
+$readonly_dir = false;
 if (! is_writable($mapdir))
 {
-	$configerror = "The map config directory ($mapdir) is not writable by the web server user. You will not be able to edit any files until this is corrected. [WMEDIT01]";
+    $NOTE="";
+    if (function_exists("posix_geteuid") && function_exists("posix_getpwuid")) {
+
+        $processUser = posix_getpwuid(posix_geteuid());
+        $username =  $processUser['name'];
+        $NOTE=" ($username)";
+    }
+
+
+    $configerror = "The map config directory ($mapdir) is not writable by the web server user$NOTE. You will not be able to edit any files with the editor until this is corrected. [WMEDIT01]";
+    $readonly_dir = true;
 }
 
 
@@ -124,6 +136,19 @@ else
 	// everything else in this file is inside this else
 	$mapfile = $mapdir.'/'.$mapname;        
 
+	if (!$readonly_dir && is_file($mapfile) && ! is_writable($mapfile)) {
+        $NOTE="";
+        if (function_exists("posix_geteuid") && function_exists("posix_getpwuid")) {
+
+            $processUser = posix_getpwuid(posix_geteuid());
+            $username =  $processUser['name'];
+            $NOTE=" ($username)";
+        }
+
+        $configerror = "The map file($mapfile) is not writable by the web server user$NOTE. You will not be able to edit this file with the editor until this is corrected. [WMEDIT01A]";
+        $readonly_file = true;
+    }
+
 	wm_debug("==========================================================================================================\n");
 	wm_debug("Starting Edit Run: action is $action on $mapname\n");
 	wm_debug("==========================================================================================================\n");
@@ -136,6 +161,7 @@ else
 	
 	$fromplug = false;
 	if (isset($_REQUEST['plug']) && (intval($_REQUEST['plug'])==1) ) { $fromplug = true; }
+
 	if ($FROM_CACTI) {
 		$fromplug = true;
 	}
@@ -947,6 +973,13 @@ else
 	  <li class="tb_help"><span id="tb_help">or click a Node or Link to edit it's properties</span></li>
 	</ul>
   </div>
+
+  <?php
+    if ($readonly_dir || $readonly_file) {
+        print "<div>" . htmlspecialchars($configerror) . "</div>";
+    }
+  ?>
+
   <form action="<?php echo $editor_name ?>" method="post" name="frmMain">
 	<div align="center" id="mainarea">
 		<input type="hidden" name="plug" value="<?php echo ($fromplug==true ? 1 : 0) ?>" />

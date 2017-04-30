@@ -202,7 +202,7 @@ function show_editor_startpage()
 	$errormessage = "";
 
     if ($configerror!='') {
-        $errormessage .= $configerror.'<p>';
+        $errormessage .= $configerror;
     }
 		
 	if (! $cacti_found && !$ignore_cacti) {

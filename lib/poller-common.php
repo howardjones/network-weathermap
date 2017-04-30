@@ -113,7 +113,7 @@ function weathermap_run_maps($mydir)
 			// next, make sure that we stand a chance of writing files
 			//// $testfile = realpath($outdir."weathermap.permissions.test");
 			$testfile = $outdir . DIRECTORY_SEPARATOR . "weathermap.permissions.test";
-			$testfd = fopen($testfile, 'w');
+			$testfd = @fopen($testfile, 'w');
 			if ($testfd) {
 				fclose($testfd);
 				unlink($testfile);
@@ -355,7 +355,6 @@ function weathermap_run_maps($mydir)
                     $username =  $processUser['name'];
                     $NOTE=" ($username)";
                 }
-
 
 				wm_warn("Output directory ($outdir) isn't writable (tried to create '$testfile'). No maps created. You probably need to make it writable by the poller process user$NOTE (like you did with the RRA directory) [WMPOLL06]\n");
 				$total_warnings++;

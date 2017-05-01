@@ -1,5 +1,5 @@
 VERSION=0.98a
-RELBASE=../releases
+RELBASE=./releases
 RELNAME=php-weathermap-$(VERSION)
 RELDIR=$(RELBASE)/weathermap
 
@@ -20,19 +20,22 @@ manual:	docs/index.html
 	
 clean:
 	rm random-bits/suite-1.png random-bits/suite-2.png docs/src/contents.xml
+	rm -rf $(RELBASE)
 
-release: sql
+release: 
+	#sql
 	echo Building release $(RELNAME)
 	# mv $(RELDIR) $(RELDIR).$$
 	mkdir -p $(RELDIR)
 	tar cTf packing.list-core - | (cd $(RELDIR); tar xvf -)
 	cd $(RELBASE); zip -r $(RELNAME).zip weathermap/*
 	cd $(RELBASE); tar cvfz $(RELNAME).tgz weathermap
-	cd $(RELBASE); mv $(RELDIR) $(RELNAME)
+	cd $(RELBASE); mv weathermap $(RELNAME)
 	echo $(RENAME) built in $(RELBASE)
 
 test:	
 	vendor/bin/phpunit -c build/phpunit.xml
+#	phpunit -c build/phpunit.xml
 	grep  Output test-suite/diffs/*.txt | grep -v '|0|' | awk -F: '{ print $1;}' | sed -e 's/.png.txt//' -e 's/test-suite\/diffs\///' > test-suite/failing-images.txt
 	php test-suite/make-failing-summary.php > test-suite/summary-failing.html
 

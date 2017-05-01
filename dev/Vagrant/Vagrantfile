@@ -7,16 +7,22 @@ VAGRANTFILE_API_VERSION = "2"
 Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   
   # Every Vagrant virtual environment requires a box to build off of.  
-  config.vm.network "forwarded_port", guest: 80, host: 8080
-  config.vm.synced_folder "../data", "/vagrant_data"
+	config.vm.synced_folder "../../", "/network-weathermap"
   
   # just the specialisations for each OS-specific box
   
   config.vm.define :u1404 do |u1404|
-        u1404.vm.provision :shell, :path => "vagrant-cacti-u1404.sh"
-		u1404.vm.box = "ubuntu/trusty64"
+	  u1404.vm.provision :shell, :path => "vagrant-cacti-u1404.sh"
+	  u1404.vm.box = "ubuntu/trusty64"
+	  u1404.vm.network "forwarded_port", guest: 80, host: 8014
   end
-  
+
+  config.vm.define :develop do |develop|
+	  develop.vm.provision :shell, :path => "vagrant-cacti-develop.sh", privileged: false
+	  develop.vm.box = "ubuntu/xenial64"
+	  develop.vm.network "forwarded_port", guest:80, host: 8016
+	  develop.vm.hostname = "weathermap-dev"
+  end
 #  config.vm.define :u1204 do |u1204|
 #        u1204.vm.provision :shell, :path => "vagrant-cacti-u1204.sh"
 #		u1204.vm.box = "ubuntu/precise64"

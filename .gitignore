@@ -10,9 +10,9 @@ composer.lock
 !build/phpcs.xml
 !build/network-weathermap.doxy
 vendor/*
-docs/dev/generated/
-docs/dev/phpcs/
-docs/dev/vagrant-testers/*.zip
+dev/generated/
+dev/phpcs/
+dev/vagrant-testers/*.zip
 node_modules/
 reports/
 output/*
@@ -20,4 +20,6 @@ test-suite/results*
 test-suite/diffs/*
 test-suite/summary.html
 test-suite/summary-failing.html
-docs/dev/vagrant-testers/.vagrant/
+dev/vagrant-testers/.vagrant/
+releases
+releases/*

@@ -1,3 +1,5 @@
+#!/bin/bash
+
 ## TODO:
 # Add error handling. We don't want to strand a potential contributor just because one single package fails
 ##
@@ -36,6 +38,9 @@ sudo php composer-setup.php --install-dir=/usr/local/bin --filename=composer
 cd /network-weathermap
 composer install
 
+# some OK defaults (better than blanks if the settings.sh is missing)
+CACTI_VERSION="0.8.8h"
+WEATHERMAP_VERSION="git"
 
 # Get the common settings (CACTI_VERSION etc)
 . /vagrant/settings.sh
@@ -60,17 +65,70 @@ sudo mysql -uroot <<EOF
 SET GLOBAL sql_mode = 'ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION';
 create database cacti;
 grant all on cacti.* to cactiuser@localhost identified by 'cactiuser';
+grant select on mysql.time_zone_name to cactiuser@localhost identified by 'cactiuser';
 flush privileges;
 EOF
 
+# Cacti 1.x insists on these
+mysql_tzinfo_to_sql /usr/share/zoneinfo | mysql -u root mysql
+
+if [[ $CACTI_VERSION == 1.* ]]; then
+    # Cacti 1.x also makes a few optional modules required.
+    sudo apt-get install -y php5.6-ldap php7.0-ldap php5.6-gmp php7.0-gmp
+
+    # it also suggests a lot of database tweaks. mostly they are for performance, but still
+    sudo bash -c "cat > /etc/mysql/mysql.conf.d/cacti.cnf" <<'EOF'
+[mysqld]
+#collation_server=utf8mb4_unicode_ci
+#character_set_client=utf8mb4
+#character_set_server=utf8mb4
+max_heap_table_size=64M
+join_buffer_size=64M
+tmp_table_size=64M
+innodb_buffer_pool_size=250M
+innodb_doublewrite=off
+innodb_flush_log_at_timeout=3
+innodb_read_io_threads=32
+innodb_write_io_threads=16
+EOF
+
+    sudo service mysql restart
+    sudo service apache2 restart    
+
+    sudo chown -R www-data.cacti $WEBROOT/cacti/resource/ $WEBROOT/cacti/scripts $WEBROOT/cacti/log $WEBROOT/cacti/cache
+    # this isn't in the recommendations, but otherwise you get no logs!
+    sudo chmod g+wrx $WEBROOT/cacti/log
+fi
+
+# optionally seed database with "pre-installed" data instead of empty - can skip the install steps
 if [ -f /vagrant/cacti-${CACTI_VERSION}-post-install.sql ]; then
   sudo mysql -uroot cacti < /vagrant/cacti-${CACTI_VERSION}-post-install.sql
 else
   sudo mysql -uroot cacti < ${WEBROOT}/cacti/cacti.sql
 fi
 
-sudo echo '# */5 * * * * cacti /usr/bin/php ${WEBROOT}/cacti/poller.php > ${WEBROOT}/last-cacti-poll.txt 2>&' > /etc/cron.d/cacti
+sudo echo '# */5 * * * * cacti /usr/bin/php ${WEBROOT}/cacti/poller.php > ${WEBROOT}/last-cacti-poll.txt 2>&1' > /etc/cron.d/cacti
 
-# Install Network Weathermap
-sudo unzip /network-weathermap/releases/php-weathermap-${WEATHERMAP_VERSION}.zip -d /var/www/html/cacti/plugins/
-sudo chown -R cacti ${WEBROOT}/cacti/plugins/weathermap
+if [[ $CACTI_VERSION == 1.* ]]; then
+  # Cacti 1.x doesn't like to install properly with plugins in the plugins dir
+  exit
+fi
+
+if [ -f /network-weathermap/releases/php-weathermap-${WEATHERMAP_VERSION}.zip ]; then
+  # Install Network Weathermap from release zip
+  sudo unzip /network-weathermap/releases/php-weathermap-${WEATHERMAP_VERSION}.zip -d /var/www/html/cacti/plugins/
+  sudo chown -R cacti ${WEBROOT}/cacti/plugins/weathermap
+fi
+
+# alternatively, check out the local git repo into the Cacti dir
+if [ "X$WEATHERMAP_VERSION" = "Xgit" ]; then
+  git clone -b database-refactor /network-weathermap $WEBROOT/cacti/plugins/weathermap
+  cd ${WEBROOT}/cacti/plugins/weathermap
+  bower install
+  composer install
+  sudo chown -R cacti ${WEBROOT}/cacti/plugins/weathermap
+fi
+
+# create the 'last poll' log file
+sudo touch $WEBROOT/last-cacti-poll.txt
+sudo chown -R cacti ${WEBROOT}/last-cacti-poll.txt

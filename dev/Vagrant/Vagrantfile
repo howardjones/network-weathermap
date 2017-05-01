@@ -6,6 +6,16 @@ VAGRANTFILE_API_VERSION = "2"
 
 Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   
+	# If you have the vagrant-cachier plugin installed, it can cache apt packages between rebuilds for you
+	# vagrant plugin install vagrant-cachier
+	if Vagrant.has_plugin?("vagrant-cachier")
+		# Configure cached packages to be shared between instances of the same base box.
+		# More info on http://fgrehm.viewdocs.io/vagrant-cachier/usage
+		config.cache.scope = :box
+		config.cache.auto_detect = false
+		config.cache.enable :apt
+	end
+
   # Every Vagrant virtual environment requires a box to build off of.  
 	config.vm.synced_folder "../../", "/network-weathermap"
   

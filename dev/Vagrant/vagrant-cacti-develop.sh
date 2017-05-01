@@ -16,7 +16,15 @@ sudo DEBIAN_FRONTENT=noninteractive apt-get install -y php-mbstring php5.6-curl
 sudo npm install -g bower
 sudo ln -s /usr/bin/nodejs /usr/bin/node
 cd /network-weathermap
-bower install --allow-root
+bower install
+
+
+#Change to php 5.6
+sudo a2dismod php7.0
+sudo a2enmod php5.6
+sudo rm /etc/alternatives/php
+sudo ln -s /usr/bin/php5.6 /etc/alternatives/php
+sudo service apache2 restart
 
 #Install and run composer (this requires a swap partition for memory as well..)
 sudo /bin/dd if=/dev/zero of=/var/swap.1 bs=1M count=1024
@@ -28,12 +36,6 @@ sudo php composer-setup.php --install-dir=/usr/local/bin --filename=composer
 cd /network-weathermap
 composer install
 
-#Change to php 5.6
-sudo a2dismod php7.0
-sudo a2enmod php5.6
-sudo rm /etc/alternatives/php
-sudo ln -s /usr/bin/php5.6 /etc/alternatives/php
-sudo service apache2 restart
 
 # Get the common settings (CACTI_VERSION etc)
 . /vagrant/settings.sh

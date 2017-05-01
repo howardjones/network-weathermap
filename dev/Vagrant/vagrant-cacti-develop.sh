@@ -57,6 +57,7 @@ if [ ! -f /vagrant/cacti-${CACTI_VERSION}.tar.gz ]; then
    sudo wget http://www.cacti.net/downloads/cacti-${CACTI_VERSION}.tar.gz -O /vagrant/cacti-${CACTI_VERSION}.tar.gz
 fi
 
+echo "Unpacking Cacti"
 sudo tar --strip-components 1 --directory=${WEBROOT}/cacti -xvf /vagrant/cacti-${CACTI_VERSION}.tar.gz 
 sudo chown -R cacti ${WEBROOT}/cacti/rra
 sudo chown -R cacti ${WEBROOT}/cacti/log
@@ -70,7 +71,8 @@ flush privileges;
 EOF
 
 # Cacti 1.x insists on these
-mysql_tzinfo_to_sql /usr/share/zoneinfo | mysql -u root mysql
+echo "Adding mysql timezones"
+mysql_tzinfo_to_sql /usr/share/zoneinfo | sudo mysql -u root mysql
 
 if [[ $CACTI_VERSION == 1.* ]]; then
     # Cacti 1.x also makes a few optional modules required.
@@ -101,27 +103,32 @@ EOF
 fi
 
 # optionally seed database with "pre-installed" data instead of empty - can skip the install steps
+echo "Loading cacti database"
 if [ -f /vagrant/cacti-${CACTI_VERSION}-post-install.sql ]; then
   sudo mysql -uroot cacti < /vagrant/cacti-${CACTI_VERSION}-post-install.sql
 else
   sudo mysql -uroot cacti < ${WEBROOT}/cacti/cacti.sql
 fi
 
+echo "Adding (disabled) cron job"
 sudo bash -c "echo '# */5 * * * * cacti /usr/bin/php ${WEBROOT}/cacti/poller.php > ${WEBROOT}/last-cacti-poll.txt 2>&1' > /etc/cron.d/cacti"
 
 if [[ $CACTI_VERSION == 1.* ]]; then
   # Cacti 1.x doesn't like to install properly with plugins in the plugins dir
+  echo "Can't yet install weathermap automatically with Cacti 1.x"
   exit
 fi
 
 if [ -f /network-weathermap/releases/php-weathermap-${WEATHERMAP_VERSION}.zip ]; then
   # Install Network Weathermap from release zip
+  echo "Unzipping weathermap from local release zip"
   sudo unzip /network-weathermap/releases/php-weathermap-${WEATHERMAP_VERSION}.zip -d /var/www/html/cacti/plugins/
   sudo chown -R cacti ${WEBROOT}/cacti/plugins/weathermap
 fi
 
 # alternatively, check out the local git repo into the Cacti dir
 if [ "X$WEATHERMAP_VERSION" = "Xgit" ]; then
+  echo "Cloning weathermap from local git"
   git clone -b database-refactor /network-weathermap $WEBROOT/cacti/plugins/weathermap
   cd ${WEBROOT}/cacti/plugins/weathermap
   bower install

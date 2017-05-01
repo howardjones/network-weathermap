@@ -4,7 +4,6 @@
       <h4 xmlns="" class="configsection">Node-specific Configuration Directives</h4>
       <p xmlns="" id="context_NODE">
         <a class="tocentry" href="#NODE_COLORS">*COLOR</a>
-        <a class="tocentry" href="#NODE_DEFINEOFFSET">DEFINEOFFSET</a>
         <a class="tocentry" href="#NODE_ICON">ICON</a>
         <a class="tocentry" href="#NODE_INFOURL">INFOURL</a>
         <a class="tocentry" href="#NODE_LABEL">LABEL</a>

@@ -7,7 +7,6 @@
       <h4 xmlns="" class="configsection">Node-specific Configuration Directives</h4>
       <p xmlns="" id="context_NODE">
         <a class="tocentry" href="#NODE_COLORS">*COLOR</a>
-        <a class="tocentry" href="#NODE_DEFINEOFFSET">DEFINEOFFSET</a>
         <a class="tocentry" href="#NODE_ICON">ICON</a>
         <a class="tocentry" href="#NODE_INFOURL">INFOURL</a>
         <a class="tocentry" href="#NODE_LABEL">LABEL</a>
@@ -186,15 +185,6 @@
 
         <em class="meta">y-coord</em>
     </div>
-  <div class="definition">POSITION
-
-        <em class="meta">nodename</em>
-
-        <em class="meta">angle</em>r<em class="meta">distance</em>
-    </div>
-  <div class="definition">POSITION
-        <em class="meta">nodename</em>:<em class="meta">offsetname</em>
-    </div>
   <div class="description">
  <p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Specifies where to place the node on the map. Coordinates are in pixel units, 
  with the origin at the top-left of the map. </p> 
@@ -203,12 +193,6 @@
  around as you alter the map. Relative nodes can be relative to other relative 
  nodes, as long as the node at the end of the chain is not relatively 
  positioned! </p> 
- <p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">You can also specify a relative position to another node in polar coordinates, with an angle and a distance. This 
- can make it simpler to arrange child nodes in a circle around a parent. </p> 
- <p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Finally, you can also position a node relative to another using <em>named offsets</em>. These are defined in the 
- parent node (or a template node it uses) using the <a href="#NODE_DEFINEOFFSET">DEFINEOFFSET</a> command. This can be useful for things like 
- switch ports - a single node can have offsets defined for each port in a large icon of the switch, and then smaller 
- per-port status icons can be specified to overlay 'switch1:p1'. </p> 
   </div>
   <div class="examples">
     <h4>Examples</h4>
@@ -236,27 +220,6 @@ NODE sub_node
       <dd>Add relative position from other nodes.
         </dd>
     </dl>
-  </div>
-</div>
-
-        <div class="referenceentry">
-  <h3 id="NODE_DEFINEOFFSET">DEFINEOFFSET</h3>
-  <div class="definition">DEFINEOFFSET
-
-        <em class="meta">offsetname</em>
-
-        <em class="meta">x-offset</em>
-
-        <em class="meta">y-offset</em>
-
-    </div>
-  <div class="description">
- <p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Define a relative offset within this node, that can be used by name in <a href="#NODE_POSITION">POSITION</a> and <a href="#LINK_NODES">NODES</a> commands. </p> 
- <p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">TODO - write this up! </p> 
-  </div>
-  <div class="changes">
-    <h4>Change History</h4>
-    <dl class="small"/>
   </div>
 </div>
 
@@ -2572,19 +2535,18 @@ LINK secondlink
         <div class="referenceentry">
   <h3 id="GLOBAL_FONTDEFINE">FONTDEFINE</h3>
   <div class="definition">FONTDEFINE
+
         <em class="meta">fontnumber</em>
+
         <em class="meta">gdfontfile</em>
     </div>
   <div class="definition">FONTDEFINE
+
         <em class="meta">fontnumber</em>
+
         <em class="meta">ttffontfile</em>
+
         <em class="meta">fontsize</em>
-    </div>
-  <div class="definition">FONTDEFINE
-        <em class="meta">fontnumber</em>
-        <em class="meta">ttffontfile</em>
-        <em class="meta">fontsize</em>
-        <em class="meta">v_offset</em>
     </div>
   <div class="description">
  <p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">Defines a custom font to be used for text within the map. </p> 
@@ -2599,12 +2561,6 @@ LINK secondlink
  generally a lot nicer! This time, you need to specify the size that the font 
  should be rendered at. The size is in pixels. You can load the same font into 
  multiple fontnumbers with different sizes to use in different parts of a map. </p> 
- <p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">The TrueType format takes an optional 4th component as a vertical offset 
- for all text rendered in this font. Size is in whole-number pixels, relative 
- to the baseline of the font. Negative numbers move the text down, positive 
- numbers move the text up. This can be used to fine-tune text placement in 
- links, and other locations on the map. It may, for example, be used to render 
- the <a href="#LINK_BWLABEL">BWLABEL</a> text above or below a link arrow, instead of on top of it.. </p> 
  <p xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">The freetype library used in PHP makes a somewhat complex set of rules for 
  where it will search for truetype fonts. The two easiest options are: 
 

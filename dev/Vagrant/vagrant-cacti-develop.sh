@@ -107,7 +107,7 @@ else
   sudo mysql -uroot cacti < ${WEBROOT}/cacti/cacti.sql
 fi
 
-sudo echo '# */5 * * * * cacti /usr/bin/php ${WEBROOT}/cacti/poller.php > ${WEBROOT}/last-cacti-poll.txt 2>&1' > /etc/cron.d/cacti
+sudo bash -c "echo '# */5 * * * * cacti /usr/bin/php ${WEBROOT}/cacti/poller.php > ${WEBROOT}/last-cacti-poll.txt 2>&1' > /etc/cron.d/cacti"
 
 if [[ $CACTI_VERSION == 1.* ]]; then
   # Cacti 1.x doesn't like to install properly with plugins in the plugins dir

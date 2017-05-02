@@ -7,11 +7,18 @@
 class WeatherMapDataSource_dbsample extends WeatherMapDataSource
 {
 
+    public function __construct()
+    {
+        parent::__construct();
+
+        $this->regexpsHandled = array(
+            '/^dbplug:([^:]+)$/'
+        );
+        $this->name = "dbsample";
+    }
+
     function Init(&$map)
     {
-        if (!function_exists("mysql_real_escape_string")) {
-            return false;
-        }
         if (!function_exists("mysql_connect")) {
             return false;
         }
@@ -19,20 +26,11 @@ class WeatherMapDataSource_dbsample extends WeatherMapDataSource
         return (true);
     }
 
-    function Recognise($targetstring)
-    {
-        if (preg_match('/^dbplug:([^:]+)$/', $targetstring, $matches)) {
-            return true;
-        } else {
-            return false;
-        }
-    }
 
     function ReadData($targetstring, &$map, &$item)
     {
-        $data[IN] = null;
-        $data[OUT] = null;
-        $data_time = 0;
+        $pdo = null;
+
 
         if (preg_match('/^dbplug:([^:]+)$/', $targetstring, $matches)) {
             $database_user = $map->get_hint('dbplug_dbuser');
@@ -40,33 +38,32 @@ class WeatherMapDataSource_dbsample extends WeatherMapDataSource
             $database_name = $map->get_hint('dbplug_dbname');
             $database_host = $map->get_hint('dbplug_dbhost');
 
-            $key = mysql_real_escape_string($matches[1]);
 
-            $SQL = "select in,out from table where host=$key LIMIT 1";
-            if (mysql_connect($database_host, $database_user, $database_pass)) {
-                if (mysql_select_db($database_name)) {
-                    $result = mysql_query($SQL);
-                    if (!$result) {
-                        wm_warn("dbsample ReadData: Invalid query: " . mysql_error() . "\n");
-                    } else {
-                        $row = mysql_fetch_assoc($result);
-                        $data[IN] = $row['in'];
-                        $data[OUT] = $row['out'];
-                    }
-                } else {
-                    wm_warn("dbsample ReadData: failed to select database: " . mysql_error() . "\n");
-                }
-            } else {
-                wm_warn("dbsample ReadData: failed to connect to database server: " . mysql_error() . "\n");
+            try {
+                # MySQL with PDO_MYSQL
+                $pdo = new PDO("mysql:host=$database_host;dbname=$database_name", $database_user, $database_pass);
+                $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+            } catch (PDOException $e) {
+                wm_warn($e->getMessage());
             }
 
-            $data_time = now();
+            if ($pdo) {
+                $statement = $pdo->prepare("SELECT infield, outfield FROM tablename WHERE host=? LIMIT 1");
+                $result = $statement->execute(array($matches[1]));
+
+                if (!$result) {
+                    wm_warn("dbsample ReadData: Invalid query: " . $pdo->errorCode() . "\n");
+                } else {
+                    $row = $statement->fetch(PDO::FETCH_ASSOC);
+                    $this->data[IN] = $row['infield'];
+                    $this->data[OUT] = $row['outfield'];
+                }
+
+                $this->dataTime = time();
+            }
         }
 
-
-        wm_debug("RRD ReadData: Returning (" . ($data[IN] === null ? 'NULL' : $data[IN]) . "," . ($data[OUT] === null ? 'NULL' : $data[IN]) . ",$data_time)\n");
-
-        return (array($data[IN], $data[OUT], $data_time));
+        return $this->ReturnData();
     }
 }
 

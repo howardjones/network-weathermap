@@ -345,10 +345,6 @@ class MasterCactiPicker
         $statement->execute(array($local_data_id));
         $line = $statement->fetch(PDO::FETCH_ASSOC);
 
-//    $SQL_graphid = sprintf("select graph_templates_item.local_graph_id, title_cache FROM graph_templates_item,graph_templates_graph,data_template_rrd where graph_templates_graph.local_graph_id = graph_templates_item.local_graph_id  and task_item_id=data_template_rrd.id and local_data_id=%d LIMIT 1;", $dataid);
-
-//    $result = mysql_query($SQL_graphid) or die('Query failed: ' . mysql_error());
-//    $line = mysql_fetch_array($result, MYSQL_ASSOC);
         $graph_id = $line['local_graph_id'];
 
         return $graph_id;

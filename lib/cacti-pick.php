@@ -146,6 +146,8 @@ class EditorDataPicker extends WeatherMapUIBase
 
     public function handleLinkStep2($request, $context = null)
     {
+        global $config;
+
         $dataId = intval($_REQUEST['dataid']);
         $hostId = $_REQUEST['host_id'];
 

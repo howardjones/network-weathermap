@@ -155,7 +155,7 @@ class EditorDataPicker extends WeatherMapUIBase
 
         $tpl = new SimpleTemplate();
         $tpl->set("graphId", $graphId);
-        $tpl->set("base_url", isset($config['base_url']) ? $config['base_url'] : '');
+        $tpl->set("base_url", jsEscape(isset($config['base_url']) ? $config['base_url'] : ''));
 
         echo $tpl->fetch("editor-resources/templates/picker-update.php");
 

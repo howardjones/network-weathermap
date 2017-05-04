@@ -4,7 +4,7 @@
         function update_source_step2(graphid) {
             var graph_url, info_url;
 
-            var base_url = '<?php echo $base_url ?>';
+            var base_url = <?php echo $base_url ?>;
 
             if (typeof window.opener == "object") {
 

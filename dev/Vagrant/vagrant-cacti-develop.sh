@@ -67,6 +67,8 @@ SET GLOBAL sql_mode = 'ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_
 create database cacti;
 grant all on cacti.* to cactiuser@localhost identified by 'cactiuser';
 grant select on mysql.time_zone_name to cactiuser@localhost identified by 'cactiuser';
+create database weathermaptest;
+grant all on weathermaptest.* to weathermaptest@localhost identified by 'weathermaptest';
 flush privileges;
 EOF
 

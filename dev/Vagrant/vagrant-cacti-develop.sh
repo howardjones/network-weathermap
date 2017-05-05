@@ -141,3 +141,8 @@ fi
 # create the 'last poll' log file
 sudo touch $WEBROOT/last-cacti-poll.txt
 sudo chown -R cacti ${WEBROOT}/last-cacti-poll.txt
+
+# create the database content for the phpunit database tests, if there is now a weathermap installation with tests
+if [ -d ${WEBROOT}/cacti/plugins/weathermap/test-suite ]; then   
+  sudo mysql -uroot weathermaptest < ${WEBROOT}/cacti/plugins/weathermap/test-suite/data/weathermap-empty.sql
+fi 

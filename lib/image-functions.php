@@ -127,16 +127,70 @@ function imagecolorize($imageRef, $red, $green, $blue)
 
     if (imageistruecolor($imageRef)) {
         wm_warn("imagecolorize requires paletted images - this is a truecolor image. Converting. Results are usually not good if there is transparency [WMIMG05].\n");
-        imagesavealpha($imageRef, true);
-        imagecolortransparent($imageRef, imagecolorat($imageRef, 0, 0));
-        imagetruecolortopalette($imageRef, false, 254);
-        wm_debug("Converted image has %d colours.\n", imagecolorstotal($imageRef));
+//        imagesavealpha($imageRef, true);
+//        imagecolortransparent($imageRef, imagecolorat($imageRef, 0, 0));
+//        imagetruecolortopalette($imageRef, false, 254);
+//        wm_debug("Converted image has %d colours.\n", imagecolorstotal($imageRef));
+        return imagecolorize_truecolor($imageRef, $red, $green, $blue);
     }
 
     // return $imageRef;
+    $pal = createColorizePalette($red, $green, $blue);
 
+    // --- End of palette creation
+
+    // Now,let's change the original palette into the one we created
+    for ($index = 0; $index < imagecolorstotal($imageRef); $index++) {
+        $inputColour = imagecolorsforindex($imageRef, $index);
+        $sourceLuminosity = round(255 * ($inputColour['red'] + $inputColour['green'] + $inputColour['blue']) / 765);
+        $outputColour = $pal[$sourceLuminosity];
+
+        imagecolorset($imageRef, $index, $outputColour['r'], $outputColour['g'], $outputColour['b']);
+    }
+
+    return $imageRef;
+}
+
+function imagecolorize_truecolor($imageRef, $red, $green, $blue)
+{
+    $pal = createColorizePalette($red, $green, $blue);
+
+    imagesavealpha($imageRef, true);
+    imagefilter($imageRef, IMG_FILTER_GRAYSCALE);
+
+    // This monstrosity seems to be the quickest way to map a grayscale image to a palette while preserving alpha :-(
+    for ($y = 0; $y < imagesy($imageRef); $y++) {
+        for ($x = 0; $x < imagesx($imageRef); $x++) {
+            $rgba = imagecolorat($imageRef, $x, $y);
+            $r = ($rgba >> 16) & 0xFF;
+            $alpha     = ($rgba & 0x7F000000) >> 24;
+            $new_r = $pal[$r]['r'];
+            $new_g = $pal[$r]['g'];
+            $new_b = $pal[$r]['b'];
+            $col = imagecolorallocatealpha($imageRef, $new_r, $new_g, $new_b, $alpha);
+            imagesetpixel($imageRef, $x, $y, $col);
+        }
+    }
+
+    return $imageRef;
+}
+
+
+/**
+ * Calculate the palette to map greyscale values to colourized, when colorizing icons
+ *
+ * @param $red
+ * @param $green
+ * @param $blue
+ * @param $pal
+ * @return mixed
+ */
+function createColorizePalette($red, $green, $blue)
+{
     // We will create a monochromatic palette based on the input color
     // which will go from black to white
+
+    $pal = array();
 
     // Input color luminosity: this is equivalent to the
     // position of the input color in the monochromatic palette 765=255*3
@@ -189,17 +243,5 @@ function imagecolorize($imageRef, $red, $green, $blue)
         $pal[$i]['g'] = $green + round($stepSizeGreen * ($i - $inputLuminosity));
         $pal[$i]['b'] = $blue + round($stepSizeBlue * ($i - $inputLuminosity));
     }
-
-    // --- End of palette creation
-
-    // Now,let's change the original palette into the one we created
-    for ($index = 0; $index < imagecolorstotal($imageRef); $index++) {
-        $inputColour = imagecolorsforindex($imageRef, $index);
-        $sourceLuminosity = round(255 * ($inputColour['red'] + $inputColour['green'] + $inputColour['blue']) / 765);
-        $outputColour = $pal[$sourceLuminosity];
-
-        imagecolorset($imageRef, $index, $outputColour['r'], $outputColour['g'], $outputColour['b']);
-    }
-
-    return ($imageRef);
+    return $pal;
 }

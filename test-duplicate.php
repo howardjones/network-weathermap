@@ -75,7 +75,7 @@ draw_icon($im, $icon6a, 170, 100);
 $intermediate = create_intermediate($icon6a);
 draw_icon($im, $intermediate, 240, 95);
 
-if (1 == 0) {
+if (1 == 1) {
 
     $icon7 = $loader->imagecreatescaledcolourizedfromfile($iconFileName, 0, 0, $colour, 'imagefilter');
     draw_icon($im, $icon7, 50, 200);

@@ -8,7 +8,7 @@ class WMImageLoader
     function isCacheable($width, $height)
     {
         // for now, disable this. The imageduplicate() function doesn't work in all cases.
-        return false;
+        // return false;
 
         if ($width * $height > 65536) {
             return false;

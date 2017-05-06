@@ -97,32 +97,32 @@ class WMImageLoader
         return $finalImageRef;
     }
 
-    function imageduplicate($source_im)
+    function imageduplicate($sourceImageRef)
     {
-        $source_width = imagesx($source_im);
-        $source_height = imagesy($source_im);
+        $source_width = imagesx($sourceImageRef);
+        $source_height = imagesy($sourceImageRef);
 
-        if (imageistruecolor($source_im)) {
+        if (imageistruecolor($sourceImageRef)) {
             wm_debug("Duplicating $source_width x $source_height TC image\n");
-            $new_im = imagecreatetruecolor($source_width, $source_height);
-            imagealphablending($new_im, false);
-            imagesavealpha($new_im, true);
+            $newImageRef = imagecreatetruecolor($source_width, $source_height);
+            imagealphablending($newImageRef, false);
+            imagesavealpha($newImageRef, true);
         } else {
             wm_debug("Duplicating $source_width x $source_height palette image\n");
-            $new_im = imagecreate($source_width, $source_height);
-            $trans = imagecolortransparent($source_im);
+            $newImageRef = imagecreate($source_width, $source_height);
+            $trans = imagecolortransparent($sourceImageRef);
             if ($trans >= 0) {
                 wm_debug("Duplicating transparency in indexed image\n");
-                $rgb = imagecolorsforindex($source_im, $trans);
-                $trans_index = imagecolorallocatealpha($new_im, $rgb['red'], $rgb['green'], $rgb['blue'],
+                $rgb = imagecolorsforindex($sourceImageRef, $trans);
+                $trans_index = imagecolorallocatealpha($newImageRef, $rgb['red'], $rgb['green'], $rgb['blue'],
                     $rgb['alpha']);
-                imagefill($new_im, 0, 0, $trans_index);
+                imagefill($newImageRef, 0, 0, $trans_index);
             }
         }
 
-        imagecopy($new_im, $source_im, 0, 0, 0, 0, $source_width, $source_height);
+        imagecopy($newImageRef, $sourceImageRef, 0, 0, 0, 0, $source_width, $source_height);
 
-        return $new_im;
+        return $newImageRef;
     }
 
     /**

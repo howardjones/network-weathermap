@@ -35,8 +35,9 @@ sudo /sbin/swapon /var/swap.1
 cd ~
 curl -sS https://getcomposer.org/installer -o composer-setup.php
 sudo php composer-setup.php --install-dir=/usr/local/bin --filename=composer
-cd /network-weathermap
-composer install
+
+# cd /network-weathermap
+# composer install
 
 # some OK defaults (better than blanks if the settings.sh is missing)
 CACTI_VERSION="0.8.8h"

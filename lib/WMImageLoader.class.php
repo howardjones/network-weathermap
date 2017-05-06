@@ -219,6 +219,7 @@ class WMImageLoader
                 $new_height = $iconHeight / $scaleFactor;
 
                 $scaledImageRef = imagecreatetruecolor($new_width, $new_height);
+
                 imagesavealpha($scaledImageRef, true);
                 imagealphablending($scaledImageRef, false);
                 imagecopyresampled($scaledImageRef, $iconImageRef, 0, 0, 0, 0, $new_width, $new_height, $iconWidth,

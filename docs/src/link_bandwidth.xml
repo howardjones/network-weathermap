@@ -18,6 +18,18 @@
         <meta>max-out-bandwidth</meta>
     </definition>
 
+    <definition>MAXVALUE
+
+        <meta>max-bandwidth</meta>
+    </definition>
+
+    <definition>MAXVALUE
+
+        <meta>max-in-bandwidth</meta>
+
+        <meta>max-out-bandwidth</meta>
+    </definition>
+
     <description xmlns="http://www.w3.org/1999/xhtml">
         <p>Specifies the maximum throughput of this link, in bits per second.</p>
 

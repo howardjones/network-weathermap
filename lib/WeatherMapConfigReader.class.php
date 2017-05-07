@@ -1903,4 +1903,22 @@ class WeatherMapConfigReader
         return $result;
     }
 
+    /**
+     * Get a list of all the scope/keyword combinations
+     * - used by DocTest to verify that there's at least *some* documentation for every keyword.
+     *
+     * @return array
+     */
+    public function getAllKeywords()
+    {
+        $all = array();
+
+        foreach ($this->configKeywords as $scope => $keywords) {
+            foreach ($keywords as $keyword => $matches) {
+                $all [] = strtolower($scope . "_" . $keyword);
+            }
+        }
+
+        return $all;
+    }
 }

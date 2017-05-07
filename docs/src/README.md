@@ -23,3 +23,6 @@ HJ March 2013
 
 check-docs.pl -> Verify that all the config reference sections are actually included
 relink-reference.pl -> Look for mentions of the config keywords, and linkify them
+
+relink-reference.php -> start of a rewrite of relink-reference.pl to avoid having a dependency on perl for building a PHP application.
+

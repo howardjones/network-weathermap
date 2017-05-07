@@ -1,4 +1,4 @@
-VERSION=0.98a
+VERSION=1.0.0
 RELBASE=./releases
 RELNAME=php-weathermap-$(VERSION)
 RELDIR=$(RELBASE)/weathermap
@@ -31,7 +31,7 @@ release:
 	cd $(RELBASE); zip -r $(RELNAME).zip weathermap/*
 	cd $(RELBASE); tar cvfz $(RELNAME).tgz weathermap
 	cd $(RELBASE); mv weathermap $(RELNAME)
-	echo $(RENAME) built in $(RELBASE)
+	echo $(RELNAME) built in $(RELBASE)
 
 test:	
 	vendor/bin/phpunit -c build/phpunit.xml

@@ -26,11 +26,24 @@ class WeatherMapDataSource_dsstats extends WeatherMapDataSource
                 wm_debug("ReadData DSStats: Cacti database library not found. [DSSTATS001]\n");
                 return false;
             }
+
+            $dsstats_running = false;
+
+            if (function_exists("read_config_option")) {
+                if(read_config_option("dsstats_enable") == "on" ) {
+                    $dsstats_running = true;
+                }
+            }
+
             if (function_exists("api_plugin_is_enabled")) {
                 if (!api_plugin_is_enabled('dsstats')) {
                     wm_debug("ReadData DSStats: DSStats plugin not enabled (new-style). [DSSTATS002B]\n");
-                    return false;
+                    $dsstats_running = true;
                 }
+            }
+
+            if (!$dsstats_running) {
+                return false;
             }
 
             $sql = "show tables";
@@ -117,7 +130,7 @@ class WeatherMapDataSource_dsstats extends WeatherMapDataSource
         }
 
         if ($table != "" and $field != "") {
-            $SQL = sprintf("select %s as name, %s as result from %s where local_data_id=%d and (%s='%s' or %s='%s')",
+            $SQL = sprintf("select %s as name, %s as result from %s where local_data_id=%d and (%s=%s or %s=%s)",
                 $keyfield, $field,
                 $table, $local_data_id, $keyfield,
                 $pdo->quote($dsnames[IN]), $keyfield, $pdo->quote($dsnames[OUT])

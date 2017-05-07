@@ -274,8 +274,8 @@ class WeatherMap extends WeatherMapBase
         if (isset($this->scales[$name])) {
             return $this->scales[$name];
         }
-	wm_warn("Scale $name doesn't exist. Returning DEFAULT");
-	return $this->scales['DEFAULT'];
+	    wm_warn("Scale $name doesn't exist. Returning DEFAULT");
+	    return $this->scales['DEFAULT'];
     }
 
 
@@ -662,6 +662,7 @@ class WeatherMap extends WeatherMapBase
     private function replicateScaleSettings()
     {
         foreach ($this->scales as $scaleName => $scaleObject) {
+            // These are currently global settings for a map, not per-scale
             $scaleObject->keyoutlinecolour = $this->colourtable['KEYOUTLINE'];
             $scaleObject->keytextcolour = $this->colourtable['KEYTEXT'];
             $scaleObject->keybgcolour = $this->colourtable['KEYBG'];

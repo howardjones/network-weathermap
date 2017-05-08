@@ -66,7 +66,7 @@ class WMImageLoaderTest extends PHPUnit_Framework_TestCase
             $this->compareImages($src, $copy, $type);
         }
     }
-    
+
     public function testDuplicate()
     {
         $loader = new WMImageLoader();
@@ -93,10 +93,6 @@ class WMImageLoaderTest extends PHPUnit_Framework_TestCase
             array($source3, $result3, "Pal+Tx")
         );
 
-        imagepng($result1, "res1.png");
-        imagepng($result2, "res2.png");
-        imagepng($result3, "res3.png");
-
         foreach ($pairs as $pair) {
             $src = $pair[0];
             $copy = $pair[1];
@@ -116,7 +112,10 @@ class WMImageLoaderTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(imagesx($src), imagesx($copy));
         $this->assertEquals(imagesy($src), imagesy($copy));
         $this->assertEquals(imageistruecolor($src), imageistruecolor($copy));
-        $this->assertEquals(imagecolortransparent($src), imagecolortransparent($copy));
+        $t1 = imagecolortransparent($src);
+        $t2 = imagecolortransparent($copy);
+
+        $this->assertTrue(($t1 >= 0 && $t2 >= 0) || ($t1 < 0 && $t2 < 0), "Both images have same transparency");
 
         $tc = imageistruecolor($src);
 

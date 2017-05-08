@@ -29,18 +29,28 @@ class WeatherMapDataSource_dsstats extends WeatherMapDataSource
 
             $dsstats_running = false;
 
+            wm_debug("ReadData DSStats: Checking for 1.x integrated...\n");
             if (function_exists("read_config_option")) {
-                if(read_config_option("dsstats_enable") == "on" ) {
+                if (read_config_option("dsstats_enable") == "on") {
                     $dsstats_running = true;
+                    wm_debug("ReadData DSStats: Found 1.x integrated DSStats\n");
+                } else {
+                    wm_debug("ReadData DSStats: No 1.x integrated DSStats\n");
                 }
             }
 
-            if (function_exists("api_plugin_is_enabled")) {
-                if (!api_plugin_is_enabled('dsstats')) {
-                    wm_debug("ReadData DSStats: DSStats plugin not enabled (new-style). [DSSTATS002B]\n");
-                    $dsstats_running = true;
+            if (!$dsstats_running) {
+                wm_debug("ReadData DSStats: Checking for 0.8.8 plugin...\n");
+                if (function_exists("api_plugin_is_enabled")) {
+                    if (api_plugin_is_enabled('dsstats')) {
+                        wm_debug("ReadData DSStats: DSStats plugin enabled. [DSSTATS002B]\n");
+                        $dsstats_running = true;
+                    } else {
+                        wm_debug("ReadData DSStats: DSStats plugin NOT enabled. [DSSTATS002B]\n");
+                    }
                 }
             }
+
 
             if (!$dsstats_running) {
                 return false;

@@ -116,6 +116,7 @@ class WMImageLoaderTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(imagesx($src), imagesx($copy));
         $this->assertEquals(imagesy($src), imagesy($copy));
         $this->assertEquals(imageistruecolor($src), imageistruecolor($copy));
+        $this->assertEquals(imagecolortransparent($src), imagecolortransparent($copy));
 
         $tc = imageistruecolor($src);
 

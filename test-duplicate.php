@@ -2,7 +2,10 @@
 
 require_once 'lib/all.php';
 
+$iconFileName = "test-suite/data/grey-ball-64.png";
+
 $loader = new WMImageLoader();
+$loader->cacheEnabled = true;
 
 $im = imagecreatetruecolor(400, 400);
 imagealphablending($im, true);
@@ -37,9 +40,8 @@ function create_intermediate($originalIcon)
     return $intermediate;
 }
 
-$weathermap_debugging = true;
 
-$iconFileName = "images/ledblack.png";
+$weathermap_debugging = true;
 
 if (1 == 1) {
 
@@ -63,6 +65,8 @@ if (1 == 1) {
 $colour = new WMColour(128, 255, 192);
 $colour = new WMColour(64, 128, 96);
 
+
+
 $icon5 = $loader->imagecreatescaledcolourizedfromfile($iconFileName, 0, 0, $colour, 'imagecolorize');
 draw_icon($im, $icon5, 50, 100);
 
@@ -74,6 +78,8 @@ draw_icon($im, $icon6a, 170, 100);
 
 $intermediate = create_intermediate($icon6a);
 draw_icon($im, $intermediate, 240, 95);
+
+$weathermap_debugging = false;
 
 if (1 == 1) {
 

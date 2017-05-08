@@ -3,12 +3,15 @@
 class WMImageLoader
 {
     var $cache = array();
+    // for now, disable caching. The imageduplicate() function doesn't work in all cases.
+    var $cacheEnabled = true;
 
     // we don't want to be caching huge images (they are probably the background, and won't be re-used)
     function isCacheable($width, $height)
     {
-        // for now, disable this. The imageduplicate() function doesn't work in all cases.
-        // return false;
+        if (! $this->cacheEnabled) {
+            return false;
+        }
 
         if ($width * $height > 65536) {
             return false;
@@ -117,6 +120,7 @@ class WMImageLoader
                 $trans_index = imagecolorallocatealpha($newImageRef, $rgb['red'], $rgb['green'], $rgb['blue'],
                     $rgb['alpha']);
                 imagefill($newImageRef, 0, 0, $trans_index);
+                imagecolortransparent($newImageRef, $trans_index);
             }
         }
 
@@ -241,7 +245,7 @@ class WMImageLoader
     private function updateCache($scaleWidth, $scaleHeight, $key, $iconImageRef)
     {
         if ($this->isCacheable($scaleWidth, $scaleHeight)) {
-            wm_debug("Caching $key $iconImageRef\n");
+            wm_debug("Caching [$key]=$iconImageRef\n");
             $this->cache[$key] = $iconImageRef;
             $finalImageRef = $this->imageduplicate($iconImageRef);
             return $finalImageRef;

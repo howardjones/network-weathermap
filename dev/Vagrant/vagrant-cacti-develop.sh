@@ -116,11 +116,11 @@ fi
 echo "Adding (disabled) cron job"
 sudo bash -c "echo '# */5 * * * * cacti /usr/bin/php ${WEBROOT}/cacti/poller.php > ${WEBROOT}/last-cacti-poll.txt 2>&1' > /etc/cron.d/cacti"
 
-if [[ $CACTI_VERSION == 1.* ]]; then
+# if [[ $CACTI_VERSION == 1.* ]]; then
   # Cacti 1.x doesn't like to install properly with plugins in the plugins dir
-  echo "Can't yet install weathermap automatically with Cacti 1.x"
-  exit
-fi
+  # echo "Can't yet install weathermap automatically with Cacti 1.x"
+  # exit
+# fi
 
 if [ -f /network-weathermap/releases/php-weathermap-${WEATHERMAP_VERSION}.zip ]; then
   # Install Network Weathermap from release zip

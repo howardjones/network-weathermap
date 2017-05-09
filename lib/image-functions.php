@@ -118,15 +118,10 @@ function ImageTrueColorToPalette2($image, $dither, $ncolors)
 //
 function imagecolorize($imageRef, $red, $green, $blue)
 {
-    // The function only accepts indexed colour images.
-    // Unfortunately, imagetruecolortopalette is pretty crappy, so you are
-    // probably better off using Paint.NET/Gimp etc to make an indexed colour
-    // version of the icon, rather than rely on this
-
-    // return $imageRef;
+    // The function only accepts indexed colour images, so we pass off to a different method for truecolor images
 
     if (imageistruecolor($imageRef)) {
-        wm_warn("imagecolorize requires paletted images - this is a truecolor image. Converting. Results are usually not good if there is transparency [WMIMG05].\n");
+        // wm_warn("imagecolorize requires paletted images - this is a truecolor image. Converting. Results are usually not good if there is transparency [WMIMG05].\n");
 //        imagesavealpha($imageRef, true);
 //        imagecolortransparent($imageRef, imagecolorat($imageRef, 0, 0));
 //        imagetruecolortopalette($imageRef, false, 254);
@@ -134,7 +129,6 @@ function imagecolorize($imageRef, $red, $green, $blue)
         return imagecolorize_truecolor($imageRef, $red, $green, $blue);
     }
 
-    // return $imageRef;
     $pal = createColorizePalette($red, $green, $blue);
 
     // --- End of palette creation

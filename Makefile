@@ -40,7 +40,7 @@ test:
 	php test-suite/make-failing-summary.php > test-suite/summary-failing.html
 
 testcoverage:	
-	phpunit --coverage-html test-suite/code-coverage/ Tests/
+	vendor/bin/phpunit -c build/phpunit.xml --coverage-html test-suite/code-coverage/
 
 sql:
 	mysqldump -n --add-drop-table --no-data -uroot -p cacti weathermap_maps > weathermap.sql

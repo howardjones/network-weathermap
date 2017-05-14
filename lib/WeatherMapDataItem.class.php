@@ -183,6 +183,15 @@ class WeatherMapDataItem extends WeatherMapItem
         }
     }
 
+    public function zeroData()
+    {
+        $channels = $this->getChannelList();
+
+        foreach ($channels as $channelName => $channel) {
+            $this->absoluteUsages[$channel] = 0;
+        }
+    }
+
     public function performDataCollection()
     {
         $channels = $this->getChannelList();

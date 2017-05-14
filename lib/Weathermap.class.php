@@ -1769,6 +1769,25 @@ function MakeHTML($imagemapname = "weathermap_imap")
         $this->pluginMethod("data", "CleanUp");
     }
 
+    function zeroData()
+    {
+        $allMapItems = $this->buildAllItemsList();
+
+        foreach ($allMapItems as $mapItem) {
+            if ($mapItem->isTemplate()) {
+                wm_debug("zeroData: Skipping $mapItem that looks like a template\n.");
+                continue;
+            }
+
+            $mapItem->zeroData();
+
+            $mapItem->aggregateDataResults();
+            $mapItem->calculateScaleColours();
+
+            unset($mapItem);
+        }
+    }
+
     function readData()
     {
         // we skip readdata completely in sizedebug mode

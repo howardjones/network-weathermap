@@ -187,6 +187,7 @@ else
 
 	case 'font_samples':
 		$map->ReadConfig($mapfile);
+		$map->zeroData();
 
 		header('Content-type: image/png');
 
@@ -200,6 +201,7 @@ else
 	case 'draw':
 		header('Content-type: image/png');
 		$map->ReadConfig($mapfile);
+        $map->zeroData();
 
 		if ($selected != '')
 		{
@@ -810,8 +812,8 @@ else
 		break;
 
 	case "editor_settings":
-            // have to do this, otherwise the editor will be unresponsive afterwards - not actually going to change anything!
-            $map->ReadConfig($mapfile);
+        // have to do this, otherwise the editor will be unresponsive afterwards - not actually going to change anything!
+        $map->ReadConfig($mapfile);
 
 	    $use_overlay = (isset($_REQUEST['editorsettings_showvias']) ? intval($_REQUEST['editorsettings_showvias']) : false);
 	    $use_relative_overlay = (isset($_REQUEST['editorsettings_showrelative']) ? intval($_REQUEST['editorsettings_showrelative']) : false);
@@ -880,6 +882,7 @@ else
 		// no action was defined - starting a new map?
 	default:
 		$map->ReadConfig($mapfile);
+        $map->zeroData();
 		break;   
 	}	
 	

@@ -340,7 +340,6 @@ class WeatherMapNode extends WeatherMapDataItem
 
         // Draw the icon, if any
         if (isset($icon_im)) {
-//            imagesavealpha(true);
             imagecopy($node_im, $icon_im, $iconBox->topLeft->x, $iconBox->topLeft->y, 0, 0, imagesx($icon_im), imagesy($icon_im));
             imagedestroy($icon_im);
         }
@@ -348,6 +347,7 @@ class WeatherMapNode extends WeatherMapDataItem
         // Draw the label, if any
         if ($this->label != '') {
             $textPoint->translate(-$totalBoundingBox->topLeft->x, -$totalBoundingBox->topLeft->y);
+            imagealphablending($node_im, true);
             $this->drawLabel($map, $textPoint, $labelColour, $node_im, $labelBox);
         }
 
@@ -357,6 +357,8 @@ class WeatherMapNode extends WeatherMapDataItem
         $this->image = $node_im;
 
         $this->makeImageMapAreas();
+
+//        imagepng($node_im, "step-".$this->name.".png");
     }
 
     function isTemplate()

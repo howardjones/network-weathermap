@@ -52,9 +52,13 @@ class WMBoundingBox
         }
     }
 
-    public function getBoundingRectangle()
+    public function getBoundingRectangle($default_zero = true)
     {
         if (null === $this->minimumX) {
+            if ($default_zero) {
+                return new WMRectangle(0, 0, 0, 0);
+            }
+
             throw new WeathermapInternalFail("No Bounding Box until points are added");
         }
         return new WMRectangle($this->minimumX, $this->minimumY, $this->maximumX, $this->maximumY);
@@ -63,7 +67,7 @@ class WMBoundingBox
     public function __toString()
     {
         try {
-            $r = $this->getBoundingRectangle();
+            $r = $this->getBoundingRectangle(false);
         } catch (WeathermapInternalFail $e) {
             $r = "[Empty BBox]";
         }

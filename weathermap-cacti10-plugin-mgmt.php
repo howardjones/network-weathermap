@@ -429,7 +429,8 @@ function maplist()
 		__('Config File'), 
 		__('Title'), 
 		__('Group'), 
-		__('Active'), 
+		__('Last Run'),
+		__('Active'),
 		__('Settings'), 
 		__('Sort Order'), 
 		__('Accessible By')
@@ -454,6 +455,7 @@ function maplist()
 		form_alternate_row();
 
 		print '<td>' . __('ALL MAPS') . '</td><td>' . __('(special settings for all maps)') . '</td><td></td><td></td>';
+        print '<td></td>';
 
 		print '<td><a class="hyperLink" href="weathermap-cacti10-plugin-mgmt.php?action=map_settings&id=0">';
 		$setting_count = $manager->getMapSettingCount(0, 0);
@@ -474,15 +476,19 @@ function maplist()
 			form_alternate_row();
 
 			print '<td><a title="'.  __('Click to start editor with this file') . '" href="weathermap-cacti10-plugin-editor.php?action=nothing&mapname=' . htmlspecialchars($map->configfile) . '">' . htmlspecialchars($map->configfile) . '</a>';
-			if ($map->warncount > 0) {
-                $had_warnings++;
-
-                print '<a class="hyperLink" href="../../utilities.php?tail_lines=500&message_type=2&action=view_logfile&header=false&filter=' . urlencode($map->configfile) . '" title="Check cacti.log for this map"><img border=0 src="' . $config['url_path'] . '/plugins/weathermap/images/exclamation.png" title="' . __('%s warnings last time this map was run. Check your logs.', $map->warncount) . '">' . $map->warncount . '</a>';
-			}
 			print '</td>';
 
 			print '<td>' . htmlspecialchars($map->titlecache) . '</td>';
 			print '<td><a class="hyperLink" title="' . __('Click to change group') . '" class="hyperLink" href="weathermap-cacti10-plugin-mgmt.php?action=chgroup&id=' . $map->id . '">' . htmlspecialchars($map->groupname) . '</a></td>';
+
+
+            print "<td>";
+            print sprintf("%.2gs", $map->runtime);
+            if ($map->warncount>0) {
+                $had_warnings++;
+                print '<br><a href="../../utilities.php?tail_lines=500&message_type=2&action=view_logfile&filter='.urlencode($map->configfile).'" title="Check cacti.log for this map"><img border=0 src="cacti-resources/img/exclamation.png" title="'.$map->warncount.' warnings last time this map was run. Check your logs.">'.$map->warncount."</a>";
+            }
+            print "</td>";
 
 			if ($map->active == 'on') {
 				print '<td class="wm_enabled"><a title="' . __('Click to Deactivate') . '" class="hyperLink" href="weathermap-cacti10-plugin-mgmt.php?action=deactivate_map&id=' . $map->id . '"><font color="green">' . __('Yes') . '</font></a>';

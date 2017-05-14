@@ -177,7 +177,7 @@ class WeathermapManager
 
     public function updateMap($mapId, $data)
     {
-        $allowed = array("active", "sortorder", "warncount", "group_id", "thumb_width", "thumb_height", "titlecache"); // allowed fields
+        $allowed = array("active", "sortorder", "warncount", "runtime", "group_id", "thumb_width", "thumb_height", "titlecache"); // allowed fields
         list($set, $values) = $this->make_set($data, $allowed);
 
         $values['id'] = $mapId;

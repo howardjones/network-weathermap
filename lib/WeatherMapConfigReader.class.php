@@ -1438,7 +1438,7 @@ class WeatherMapConfigReader
             $this->currentObject->add_hint($matches[1], trim($matches[2]));
 
             if ($this->currentObject->my_type() == "map" && substr($matches[1], 0, 7) == 'nowarn_') {
-                $weathermap_error_suppress[$matches[1]] = 1;
+                $weathermap_error_suppress[strtoupper($matches[1])] = 1;
             }
             return true;
         }
@@ -1446,7 +1446,7 @@ class WeatherMapConfigReader
         if (preg_match('/^SET\s+(\S+)\s*$/i', $fullcommand, $matches)) {
             $this->currentObject->add_hint($matches[1], '');
             if ($this->currentObject->my_type() == "map" && substr($matches[1], 0, 7) == 'nowarn_') {
-                $weathermap_error_suppress[$matches[1]] = 1;
+                $weathermap_error_suppress[strtoupper($matches[1])] = 1;
             }
             return true;
         }

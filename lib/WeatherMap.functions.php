@@ -8,33 +8,29 @@
 // Check for GD & PNG support This is just in here so that both the editor and CLI can use it without the need for another file
 function wm_module_checks()
 {
-	if (!extension_loaded('gd'))
-	{
-		wm_warn ("\n\nNo image (gd) extension is loaded. This is required by weathermap. [WMWARN20]\n\n");
-		wm_warn ("\nrun check.php to check PHP requirements.\n\n");
+    if (!extension_loaded('gd')) {
+        wm_warn("\n\nNo image (gd) extension is loaded. This is required by weathermap. [WMWARN20]\n\n");
+        wm_warn("\nrun check.php to check PHP requirements.\n\n");
 
-		return (FALSE);
-	}
+        return false;
+    }
 
-	if (!function_exists('imagecreatefrompng'))
-	{
-		wm_warn ("Your GD php module doesn't support PNG format. [WMWARN21]\n");
-		wm_warn ("\nrun check.php to check PHP requirements.\n\n");
-		return (FALSE);
-	}
+    if (!function_exists('imagecreatefrompng')) {
+        wm_warn("Your GD php module doesn't support PNG format. [WMWARN21]\n");
+        wm_warn("\nrun check.php to check PHP requirements.\n\n");
+        return false;
+    }
 
-	if (!function_exists('imagecreatetruecolor'))
-	{
-		wm_warn ("Your GD php module doesn't support truecolor. [WMWARN22]\n");
-		wm_warn ("\nrun check.php to check PHP requirements.\n\n");
-		return (FALSE);
-	}
+    if (!function_exists('imagecreatetruecolor')) {
+        wm_warn("Your GD php module doesn't support truecolor. [WMWARN22]\n");
+        wm_warn("\nrun check.php to check PHP requirements.\n\n");
+        return false;
+    }
 
-	if (!function_exists('imagecopyresampled'))
-	{
-		wm_warn ("Your GD php module doesn't support thumbnail creation (imagecopyresampled). [WMWARN23]\n");
-	}
-	return (TRUE);
+    if (!function_exists('imagecopyresampled')) {
+        wm_warn("Your GD php module doesn't support thumbnail creation (imagecopyresampled). [WMWARN23]\n");
+    }
+    return true;
 }
 
 function wm_debug($string)
@@ -84,43 +80,44 @@ function wm_debug($string)
     }
 }
 
-function wm_warn($string,$notice_only=FALSE)
+function wm_warn($string, $notice_only = FALSE)
 {
-	global $weathermap_map;
-	global $weathermap_warncount;
+    global $weathermap_map;
+    global $weathermap_warncount;
     global $weathermap_error_suppress;
-	
-	$message = "";
-	$code = "";
-	
-	if(preg_match('/\[(WM\w+)\]/', $string, $matches)) {
+
+    $message = "";
+    $code = "";
+
+    if (preg_match('/\[(WM\w+)\]/', $string, $matches)) {
         $code = $matches[1];
     }
 
-    if ( (true === is_array($weathermap_error_suppress))
-                && ( true === in_array(strtoupper($code), $weathermap_error_suppress))) {
-                
-                // This error code has been deliberately disabled.
-                return;
+    if ((true === is_array($weathermap_error_suppress))
+        && (true === array_key_exists(strtoupper($code), $weathermap_error_suppress))
+    ) {
+        wm_debug("$code is suppressed\n");
+        // This error code has been deliberately disabled.
+        return false;
     }
-	
-	if(!$notice_only)
-	{
-		$weathermap_warncount++;
-		$message .= "WARNING: ";
-	}
-	
-	$message .= ($weathermap_map==''?'':$weathermap_map.": ") . rtrim($string);
-	
-	// use Cacti's debug log, if we are running from the poller
-	if (function_exists('cacti_log') && (!function_exists('show_editor_startpage')))
-	{ cacti_log($message, true, "WEATHERMAP"); }
-	else
-	{
-		$stderr=fopen('php://stderr', 'w');
-		fwrite($stderr, $message."\n");
-		fclose ($stderr);
-	}
+
+    if (!$notice_only) {
+        $weathermap_warncount++;
+        $message .= "WARNING: ";
+    }
+
+    $message .= ($weathermap_map == '' ? '' : $weathermap_map . ": ") . rtrim($string);
+
+    // use Cacti's debug log, if we are running from the poller
+    if (function_exists('cacti_log') && (!function_exists('show_editor_startpage'))) {
+        cacti_log($message, true, "WEATHERMAP");
+    } else {
+        $stderr = fopen('php://stderr', 'w');
+        fwrite($stderr, $message . "\n");
+        fclose($stderr);
+    }
+
+    return true;
 }
 
 

@@ -1243,6 +1243,8 @@ function DrawMap($filename = '', $thumbnailfile = '', $thumbnailmax = 250, $with
 
     function CleanUp()
     {
+        global $weathermap_error_suppress;
+
         parent::cleanUp();
 
         $all_layers = array_keys($this->seen_zlayers);
@@ -1266,6 +1268,7 @@ function DrawMap($filename = '', $thumbnailfile = '', $thumbnailmax = 250, $with
         $this->colourtable = null;
     //    $this->usage_stats = null;
         $this->scales = null;
+        $weathermap_error_suppress = array();
     }
 
     function calculateImagemap()

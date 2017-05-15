@@ -1437,16 +1437,20 @@ class WeatherMapConfigReader
         if (preg_match('/^SET\s+(\S+)\s+(.*)\s*$/i', $fullcommand, $matches)) {
             $this->currentObject->add_hint($matches[1], trim($matches[2]));
 
-            if ($this->currentObject->my_type() == "map" && substr($matches[1], 0, 7) == 'nowarn_') {
-                $weathermap_error_suppress[strtoupper($matches[1])] = 1;
+            if ($this->currentObject->my_type() == "MAP" && substr($matches[1], 0, 7) == 'nowarn_') {
+                $key = substr(strtoupper($matches[1]), 7);
+                wm_debug("Suppressing warning $key for this map\n");
+                $weathermap_error_suppress[$key] = 1;
             }
             return true;
         }
         // allow setting a variable to ""
         if (preg_match('/^SET\s+(\S+)\s*$/i', $fullcommand, $matches)) {
             $this->currentObject->add_hint($matches[1], '');
-            if ($this->currentObject->my_type() == "map" && substr($matches[1], 0, 7) == 'nowarn_') {
-                $weathermap_error_suppress[strtoupper($matches[1])] = 1;
+            if ($this->currentObject->my_type() == "MAP" && substr($matches[1], 0, 7) == 'nowarn_') {
+                $key = substr(strtoupper($matches[1]), 7);
+                wm_debug("Suppressing warning $key for this map\n");
+                $weathermap_error_suppress[$key] = 1;
             }
             return true;
         }

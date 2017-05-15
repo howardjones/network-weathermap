@@ -59,7 +59,8 @@ if [ ! -f /vagrant/cacti-${CACTI_VERSION}.tar.gz ]; then
 fi
 
 echo "Unpacking Cacti"
-sudo tar --strip-components 1 --directory=${WEBROOT}/cacti -xvf /vagrant/cacti-${CACTI_VERSION}.tar.gz 
+sudo tar --strip-components 1 --directory=${WEBROOT}/cacti -xvf /vagrant/cacti-${CACTI_VERSION}.tar.gz
+sudo touch ${WEBROOT}/cacti/log/cacti.log
 sudo chown -R cacti ${WEBROOT}/cacti/rra
 sudo chown -R cacti ${WEBROOT}/cacti/log
 
@@ -67,7 +68,6 @@ sudo mysql -uroot <<EOF
 SET GLOBAL sql_mode = 'ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION';
 create database cacti;
 grant all on cacti.* to cactiuser@localhost identified by 'cactiuser';
-grant select on mysql.time_zone_name to cactiuser@localhost identified by 'cactiuser';
 create database weathermaptest;
 grant all on weathermaptest.* to weathermaptest@localhost identified by 'weathermaptest';
 flush privileges;
@@ -81,12 +81,15 @@ if [[ $CACTI_VERSION == 1.* ]]; then
     # Cacti 1.x also makes a few optional modules required.
     sudo apt-get install -y php5.6-ldap php7.0-ldap php5.6-gmp php7.0-gmp
 
+
+    sudo mysql -uroot <<EOF
+grant select on mysql.time_zone_name to cactiuser@localhost identified by 'cactiuser';
+flush privileges;
+ALTER DATABASE cacti CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci;
+EOF
     # it also suggests a lot of database tweaks. mostly they are for performance, but still
     sudo bash -c "cat > /etc/mysql/mysql.conf.d/cacti.cnf" <<'EOF'
 [mysqld]
-#collation_server=utf8mb4_unicode_ci
-#character_set_client=utf8mb4
-#character_set_server=utf8mb4
 max_heap_table_size=64M
 join_buffer_size=64M
 tmp_table_size=64M

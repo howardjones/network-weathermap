@@ -1,9 +1,9 @@
 <?php
+
 /**
  * Class WeatherMapTextItem replaces the random attributes for Title, Timestamp, min/max timestamp in the
  * main Weathermap class. Now they can all be drawn like a node or link with a draw method.
  */
-
 class WeatherMapTextItem extends WeatherMapItem
 {
     var $configuredText;
@@ -13,6 +13,7 @@ class WeatherMapTextItem extends WeatherMapItem
     var $font;
     /** @var  WMColour $colour */
     var $textColour;
+    var $zOrder;
 
     var $prefix;
 
@@ -25,6 +26,7 @@ class WeatherMapTextItem extends WeatherMapItem
         $this->textColour = new WMColour(0, 0, 0);
         $this->configuredText = "";
         $this->processedText = "";
+        $this->zOrder = 1000;
     }
 
     /**
@@ -64,10 +66,10 @@ class WeatherMapTextItem extends WeatherMapItem
             $string = WMUtility::stringAnonymise($string);
         }
 
-        list($boxwidth, $boxheight) = $fontObject->calculateImageStringSize($string);
+        list($boxWidth, $boxHeight) = $fontObject->calculateImageStringSize($string);
 
         $x = 10;
-        $y = $this->position->y - $boxheight;
+        $y = $this->position->y - $boxHeight;
 
         if (($this->position->x >= 0) && ($this->position->y >= 0)) {
             $x = $this->position->x;
@@ -76,7 +78,7 @@ class WeatherMapTextItem extends WeatherMapItem
 
         $fontObject->drawImageString($imageRef, $x, $y, $string, $this->textColour->gdAllocate($imageRef));
 
-        $map->imap->addArea("Rectangle", "TITLE", '', array($x, $y, $x + $boxwidth, $y - $boxheight));
+        $map->imap->addArea("Rectangle", "TITLE", '', array($x, $y, $x + $boxWidth, $y - $boxHeight));
         $map->imap_areas[] = 'TITLE';
     }
 }

@@ -357,7 +357,7 @@ class WeatherMapScale extends WeatherMapItem
         $this->keypos = $newPosition;
     }
 
-    function DrawLegend($gdTargetImage)
+    function draw($gdTargetImage)
     {
         wm_debug("New scale\n");
         // don't draw if the position is the default -1,-1

@@ -1,0 +1,34 @@
+sudo: false
+language: php
+php:
+  - "7.1"
+  - "7.0"
+  - "5.6"
+  - "5.3"
+env:
+  - DB=mysql
+before_install:
+#  - sudo apt-get update -qq
+  - mkdir -p build/log
+install:
+  - pecl install gd
+  - ./dev/Vagrant/
+addons:
+  code_climate:
+    repo_token: 858ba1f597a441ed0b8abfefb2db2ecc09309285da99bd165ebcf1b580ced776
+  apt:
+    packages:
+      - imagemagick
+      - rrdtool
+      - xsltproc
+after_script:
+  - vendor/bin/test-reporter
+script:
+  - vendor/bin/phpunit --configuration build/phpunit.xml
+notifications:
+  webhooks:
+    urls:
+      - https://webhooks.gitter.im/e/7094f12e4b57b80da9ef
+    on_success: change
+    on_failure: change
+    on_start: never

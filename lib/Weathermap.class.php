@@ -73,7 +73,8 @@ class WeatherMap extends WeatherMapBase
 
     /** @var  WMImageLoader $imagecache */
 	var $imagecache;
-	var $black, $white, $grey, $selected;
+//	var $black, $white, $grey;
+        var $selected;
 
 //	var $datasourceclasses;
 //	var $preprocessclasses;
@@ -117,7 +118,7 @@ class WeatherMap extends WeatherMapBase
             'postprocessclasses' => array(),
             'included_files' => array(),
             'context' => '',
-            'dumpconfig' => FALSE,
+            'dumpconfig' => false,
             'rrdtool_check' => '',
             'background' => '',
             'imageoutputfile' => '',
@@ -154,11 +155,11 @@ class WeatherMap extends WeatherMapBase
             'titley' => -1,
             'cachefolder' => 'cached',
             'mapcache' => '',
-            'sizedebug' => FALSE,
-            'debugging' => FALSE,
-            'widthmod' => FALSE,
-            'has_includes' => FALSE,
-            'has_overlibs' => FALSE,
+            'sizedebug' => false,
+            'debugging' => false,
+            'widthmod' => false,
+            'has_includes' => false,
+            'has_overlibs' => false,
             'name' => 'MAP'
         );
 
@@ -195,8 +196,8 @@ class WeatherMap extends WeatherMapBase
 		$this->next_id = 100;
 		foreach (array_keys($this->inherit_fieldlist)as $fld) { $this->$fld=$this->inherit_fieldlist[$fld]; }
 
-		$this->min_ds_time = NULL;
-		$this->max_ds_time = NULL;
+		$this->min_ds_time = null;
+		$this->max_ds_time = null;
 
         $this->nodes=array(); // an array of WeatherMapNodes
 		$this->links=array(); // an array of WeatherMapLinks
@@ -319,7 +320,7 @@ class WeatherMap extends WeatherMapBase
             return $input;
         }
 
-        $the_item = NULL;
+        $the_item = null;
 
         assert('is_scalar($input)');
 
@@ -328,10 +329,9 @@ class WeatherMap extends WeatherMapBase
 
         wm_debug("Trace: ProcessString($input, $context_description)\n");
 
-        if ($multiline == TRUE) {
+        if ($multiline == true) {
             $i = $input;
             $input = str_replace("\\n", "\n", $i);
-            # if($i != $input)  warn("$i into $input\n");
         }
 
         if ($context_description === 'node') {
@@ -377,7 +377,7 @@ class WeatherMap extends WeatherMapBase
 
                         #				debug("ProcessString: item is $itemname, and args are now $args\n");
 
-                        $the_item = NULL;
+                        $the_item = null;
                         if (($itemname == "this") && ($type == strtolower($context->my_type()))) {
                             $the_item = $context;
                         } elseif (strtolower($context->my_type()) == "link" && $type == 'node' && ($itemname == '_linkstart_' || $itemname == '_linkend_')) {
@@ -434,7 +434,7 @@ class WeatherMap extends WeatherMapBase
 
             // format, and sanitise the value string here, before returning it
 
-            if ($value === NULL) $value = 'NULL';
+            if ($value === null) $value = 'null';
             wm_debug("ProcessString: replacing " . $key . " with $value\n");
 
             # if($format != '') $value = sprintf($format,$value);
@@ -952,27 +952,195 @@ class WeatherMap extends WeatherMapBase
         return true;
     }
 
-// pre-allocate colour slots for the colours used by the arrows
-// this way, it's the pretty icons that suffer if there aren't enough colours, and
-// not the actual useful data
-// we skip any gradient scales
-    private function preAllocateScaleColours($im, $refname = 'gdref1')
+    /**
+     * @return resource
+     */
+    protected function prepareOutputImage()
     {
-//        foreach ($this->colours as $scalename => $colours) {
-//
-//            foreach ($colours as $key => $colour) {
-//                // only do this for non-gradients (c2 is null)
-//                if ((!isset($this->colours[$scalename][$key]['c2'])) && (!isset($this->colours[$scalename][$key][$refname]))) {
-//
-//                    wm_debug("AllocateScaleColours: %s/%s %s\n", $scalename, $refname, $key);
-//
-//                    $this->colours[$scalename][$key][$refname] = $this->colours[$scalename][$key]['c1']->gdAllocate($im);
-//                    wm_debug("AllocateScaleColours: %s/%s %s %s\n", $scalename, $refname, $key,
-//                        $this->colours[$scalename][$key]['c1']);
-//                }
-//            }
-//        }
+        $bgImageRef = $this->loadBackgroundImage();
+
+        $imageRef = imagecreatetruecolor($this->width, $this->height);
+
+        if (!$imageRef) {
+            wm_warn("Couldn't create output image in memory (" . $this->width . "x" . $this->height . ").");
+        } else {
+            imagealphablending($imageRef, true);
+            if ($this->get_hint("antialias") == 1) {
+                // Turn on anti-aliasing if it exists and it was requested
+                if (function_exists("imageantialias")) {
+                    imageantialias($imageRef, true);
+                }
+            }
+
+            // by here, we should have a valid image handle
+//        $this->white = myimagecolorallocate($image, 255, 255, 255);
+//        $this->black = myimagecolorallocate($image, 0, 0, 0);
+//        $this->grey = myimagecolorallocate($image, 192, 192, 192);
+            $this->selected = myimagecolorallocate($imageRef, 255, 0, 0); // for selections in the editor
+
+            if ($bgImageRef) {
+                imagecopy($imageRef, $bgImageRef, 0, 0, 0, 0, $this->width, $this->height);
+                imagedestroy($bgImageRef);
+            } else {
+                // fill with background colour anyway, in case the background image failed to load
+                imagefilledrectangle($imageRef, 0, 0, $this->width, $this->height, $this->colourtable['BG']->gdAllocate($imageRef));
+            }
+
+        }
+        return $imageRef;
     }
+
+    /**
+     * @param $imageRef
+     * @param $overlayColor
+     */
+    protected function drawRelativePositionOverlay($imageRef, $overlayColor)
+    {
+        foreach ($this->nodes as $node) {
+            if ($node->relative_to != '') {
+                $parentX = $this->nodes[$node->relative_to]->x;
+                $parentY = $this->nodes[$node->relative_to]->y;
+                imagearc($imageRef, $node->x, $node->y,
+                    15, 15, 0, 360, $overlayColor);
+                imagearc($imageRef, $node->x, $node->y,
+                    16, 16, 0, 360, $overlayColor);
+
+                imageline($imageRef, $node->x, $node->y,
+                    $parentX, $parentY, $overlayColor);
+            }
+        }
+    }
+
+    /**
+     * @param $imageRef
+     * @param $overlayColor
+     */
+    protected function drawViaOverlay($imageRef, $overlayColor)
+    {
+        foreach ($this->links as $link) {
+            foreach ($link->vialist as $via) {
+                if (isset($via[2])) {
+                    $x = $this->nodes[$via[2]]->x + $via[0];
+                    $y = $this->nodes[$via[2]]->y + $via[1];
+                } else {
+                    $x = $via[0];
+                    $y = $via[1];
+                }
+                imagearc($imageRef, $x, $y, 10, 10, 0, 360, $overlayColor);
+                imagearc($imageRef, $x, $y, 12, 12, 0, 360, $overlayColor);
+            }
+        }
+    }
+
+    protected function calculateDatestamp()
+    {
+// if we're running tests, we force the time to a particular value,
+        // so the output can be compared to a reference image more easily
+        $testmode = intval($this->get_hint("testmode"));
+
+        if ($testmode == 1) {
+            $maptime = 1270813792;
+            date_default_timezone_set('UTC');
+        } else {
+            $maptime = time();
+        }
+        $this->datestamp = strftime($this->stamptext, $maptime);
+    }
+
+    /**
+     * @param $showVIAOverlay
+     * @param $showRelativeOverlay
+     * @param $imageRef
+     */
+    protected function drawEditorOverlays($showVIAOverlay, $showRelativeOverlay, $imageRef)
+    {
+        $overlayColor = myimagecolorallocate($imageRef, 200, 0, 0);
+
+        if ($showRelativeOverlay) {
+            // first, we can show relatively positioned NODEs
+            $this->drawRelativePositionOverlay($imageRef, $overlayColor);
+        }
+
+        if ($showVIAOverlay) {
+            // then overlay VIAs, so they can be seen
+            $this->drawViaOverlay($imageRef, $overlayColor);
+        }
+    }
+
+    /**
+     * @param $imageFileName
+     * @param $imageRef
+     * @return bool
+     */
+    protected function writeImageFile($imageFileName, $imageRef)
+    {
+        $result = false;
+        $functions = true;
+        if (function_exists('imagejpeg') && preg_match('/\.jpg/i', $imageFileName)) {
+            wm_debug("Writing JPEG file to $imageFileName\n");
+            $result = imagejpeg($imageRef, $imageFileName);
+        } elseif (function_exists('imagegif') && preg_match('/\.gif/i', $imageFileName)) {
+            wm_debug("Writing GIF file to $imageFileName\n");
+            $result = imagegif($imageRef, $imageFileName);
+        } elseif (function_exists('imagepng') && preg_match('/\.png/i', $imageFileName)) {
+            wm_debug("Writing PNG file to $imageFileName\n");
+            $result = imagepng($imageRef, $imageFileName);
+        } else {
+            wm_warn("Failed to write map image. No function existed for the image format you requested. [WMWARN12]\n");
+            $functions = false;
+        }
+
+        if (($result == false) && ($functions == true)) {
+            if (file_exists($imageFileName)) {
+                wm_warn("Failed to overwrite existing image file $imageFileName - permissions of existing file are wrong? [WMWARN13]");
+            } else {
+                wm_warn("Failed to create image file $imageFileName - permissions of output directory are wrong? [WMWARN14]");
+            }
+        }
+        return $result;
+    }
+
+    /**
+     * @param $thumbnailFileName
+     * @param $thumbnailMaxSize
+     * @param $imageRef
+     */
+    protected function createThumbnailFile($thumbnailFileName, $thumbnailMaxSize, $imageRef)
+    {
+        wm_debug("Writing thumbnail to %s\n", $thumbnailFileName);
+
+        if (!function_exists('imagecopyresampled')) {
+            wm_warn("Skipping thumbnail creation, since we don't have the necessary function. [WMWARN17]");
+            return;
+        }
+
+        // if one is specified, and we can, write a thumbnail too
+        if ($thumbnailFileName != '') {
+            if ($this->width > $this->height) {
+                $factor = ($thumbnailMaxSize / $this->width);
+            } else {
+                $factor = ($thumbnailMaxSize / $this->height);
+            }
+
+            $this->thumb_width = $this->width * $factor;
+            $this->thumb_height = $this->height * $factor;
+
+            $thumbImageRef = imagecreatetruecolor($this->thumb_width, $this->thumb_height);
+            imagecopyresampled($thumbImageRef, $imageRef, 0, 0, 0, 0, $this->thumb_width, $this->thumb_height,
+                $this->width, $this->height);
+            $result = imagepng($thumbImageRef, $thumbnailFileName);
+            imagedestroy($thumbImageRef);
+
+            if (($result == false)) {
+                if (file_exists($thumbnailFileName)) {
+                    wm_warn("Failed to overwrite existing image file $thumbnailFileName - permissions of existing file are wrong? [WMWARN15]");
+                } else {
+                    wm_warn("Failed to create image file $thumbnailFileName - permissions of output directory are wrong? [WMWARN16]");
+                }
+            }
+        }
+    }
+
 
     public function preCalculate()
     {
@@ -985,261 +1153,89 @@ class WeatherMap extends WeatherMapBase
         }
     }
 
-function DrawMap($filename = '', $thumbnailfile = '', $thumbnailmax = 250, $withnodes = TRUE, $use_via_overlay = FALSE, $use_rel_overlay=FALSE)
-{
-    wm_debug("Trace: DrawMap()\n");
-	$bgimage=NULL;
+    function DrawMap($imageFileName = '', $thumbnailFileName = '', $thumbnailMaxSize = 250, $includeNodes = true, $showVIAOverlay = false, $showRelativeOverlay = false)
+    {
+        wm_debug("Trace: DrawMap()\n");
 
-	wm_debug("=====================================\n");
-	wm_debug("Start of Map Drawing\n");
+        wm_debug("=====================================\n");
+        wm_debug("Start of Map Drawing\n");
 
-	// if we're running tests, we force the time to a particular value,
-        // so the output can be compared to a reference image more easily
-        $testmode = intval($this->get_hint("testmode"));
+        $this->calculateDatestamp();
 
-        if ($testmode == 1) {
-            $maptime = 1270813792;
-            date_default_timezone_set('UTC');
-        } else {
-            $maptime = time();
-        }
-        $this->datestamp = strftime($this->stamptext, $maptime);
+        // Create an imageRef to draw into
+        $imageRef = $this->prepareOutputImage();
 
-	// do the basic prep work
-	if ($this->background != '')
-	{
-		if (is_readable($this->background))
-		{
-			$bgimage=imagecreatefromfile($this->background);
+//        $this->preAllocateScaleColours($image);
 
-			if (!$bgimage) { wm_warn
-				("Failed to open background image.  One possible reason: Is your BACKGROUND really a PNG?\n");
-			}
-			else
-			{
-				$this->width=imagesx($bgimage);
-				$this->height=imagesy($bgimage);
-			}
-		}
-		else { wm_warn
-			("Your background image file could not be read. Check the filename, and permissions, for "
-			. $this->background . "\n"); }
-	}
+        // Now it's time to draw a map
 
-	$image=imagecreatetruecolor($this->width, $this->height);
-
-	if (!$image) { wm_warn
-		("Couldn't create output image in memory (" . $this->width . "x" . $this->height . ")."); }
-	else
-	{
-		imagealphablending($image, true);
-		if($this->get_hint("antialias") == 1) {
-			// Turn on anti-aliasing if it exists and it was requested
-			if(function_exists("imageantialias")) {
-				imageantialias($image,true);
-			}
-		}
-
-		// by here, we should have a valid image handle
-
-		// save this away, now
-		//$this->image=$image;
-
-		$this->white=myimagecolorallocate($image, 255, 255, 255);
-		$this->black=myimagecolorallocate($image, 0, 0, 0);
-		$this->grey=myimagecolorallocate($image, 192, 192, 192);
-		$this->selected=myimagecolorallocate($image, 255, 0, 0); // for selections in the editor
-
-		$this->preAllocateScaleColours($image);
-
-		// fill with background colour anyway, in case the background image failed to load
-		imagefilledrectangle($image, 0, 0, $this->width, $this->height, $this->colourtable['BG']->gdAllocate($image));
-
-		if ($bgimage)
-		{
-			imagecopy($image, $bgimage, 0, 0, 0, 0, $this->width, $this->height);
-			imagedestroy ($bgimage);
-		}
-
-		// Now it's time to draw a map
-
-		// do the node rendering stuff first, regardless of where they are actually drawn.
-		// this is so we can get the size of the nodes, which links will need if they use offsets
-    // TODO - the geometry part should be in preCalculate()
-		foreach ($this->nodes as $node)
-		{
-			wm_debug("Pre-rendering ".$node->name." to get bounding boxes.\n");
-			if (! $node->isTemplate()) {
+        // do the node rendering stuff first, regardless of where they are actually drawn.
+        // this is so we can get the size of the nodes, which links will need if they use offsets
+        // TODO - the geometry part should be in preCalculate()
+        foreach ($this->nodes as $node) {
+            wm_debug("Pre-rendering " . $node->name . " to get bounding boxes.\n");
+            if (!$node->isTemplate()) {
                 $node->preCalculate($this);
-                $node->pre_render($image, $this);
+                $node->pre_render($imageRef, $this);
             }
-		}
+        }
 
         $this->preCalculate();
 
+        $all_layers = array_keys($this->seen_zlayers);
+        sort($all_layers);
 
-		$all_layers = array_keys($this->seen_zlayers);
-		sort($all_layers);
-
-		foreach ($all_layers as $z)
-		{
-			$z_items = $this->seen_zlayers[$z];
-			wm_debug("Drawing layer $z\n");
-			// all the map 'furniture' is fixed at z=1000
-			if($z==1000)
-			{
+        foreach ($all_layers as $z) {
+            $z_items = $this->seen_zlayers[$z];
+            wm_debug("Drawing layer $z\n");
+            // all the map 'furniture' is fixed at z=1000
+            if ($z == 1000) {
+                // TODO - these legends should just be other objects in the zlayer, not special cases
                 foreach ($this->scales as $scaleName => $scaleObject) {
                     wm_debug("Drawing KEY for $scaleName if necessary.\n");
 
                     // the new scale object draws its own legend
-                    $this->scales[$scaleName]->drawLegend($image);
+                    $this->scales[$scaleName]->draw($imageRef);
                 }
 
-				$this->DrawTimestamp($image, $this->timefont, $this->colourtable['TIME']);
-				if(! is_null($this->min_data_time))
-				{
-					$this->DrawTimestamp($image, $this->timefont, $this->colourtable['TIME'],"MIN");
-					$this->DrawTimestamp($image, $this->timefont, $this->colourtable['TIME'],"MAX");
-				}
-				$this->DrawTitle($image, $this->titlefont, $this->colourtable['TITLE']);
-			}
-
-			if(is_array($z_items))
-			{
-				foreach($z_items as $it)
-				{
-                    wm_debug("Drawing " . $it->my_type() . " " . $it->name . "\n");
-				    $it->Draw($image, $this);
-				}
-			}
-		}
-
-		$overlay = myimagecolorallocate($image, 200, 0, 0);
-
-		// for the editor, we can optionally overlay some other stuff
-        if ($this->context == 'editor') {
-            if ($use_rel_overlay) {
-                #		$overlay = myimagecolorallocate($image, 200, 0, 0);
-
-                // first, we can show relatively positioned NODEs
-                foreach ($this->nodes as $node) {
-                    if ($node->relative_to != '') {
-                        $rel_x = $this->nodes[$node->relative_to]->x;
-                        $rel_y = $this->nodes[$node->relative_to]->y;
-                        imagearc($image, $node->x, $node->y,
-                            15, 15, 0, 360, $overlay);
-                        imagearc($image, $node->x, $node->y,
-                            16, 16, 0, 360, $overlay);
-
-                        imageline($image, $node->x, $node->y,
-                            $rel_x, $rel_y, $overlay);
-                    }
+                $this->DrawTimestamp($imageRef, $this->timefont, $this->colourtable['TIME']);
+                if (!is_null($this->min_data_time)) {
+                    $this->DrawTimestamp($imageRef, $this->timefont, $this->colourtable['TIME'], "MIN");
+                    $this->DrawTimestamp($imageRef, $this->timefont, $this->colourtable['TIME'], "MAX");
                 }
+                $this->DrawTitle($imageRef, $this->titlefont, $this->colourtable['TITLE']);
             }
 
-            if ($use_via_overlay) {
-                // then overlay VIAs, so they can be seen
-                foreach ($this->links as $link) {
-                    foreach ($link->vialist as $via) {
-                        if (isset($via[2])) {
-                            $x = $this->nodes[$via[2]]->x + $via[0];
-                            $y = $this->nodes[$via[2]]->y + $via[1];
-                        } else {
-                            $x = $via[0];
-                            $y = $via[1];
-                        }
-                        imagearc($image, $x, $y, 10, 10, 0, 360, $overlay);
-                        imagearc($image, $x, $y, 12, 12, 0, 360, $overlay);
-                    }
+            if (is_array($z_items)) {
+                foreach ($z_items as $it) {
+                    wm_debug("Drawing " . $it->my_type() . " " . $it->name . "\n");
+                    $it->Draw($imageRef, $this);
                 }
             }
         }
 
-		// Ready to output the results...
+        // for the editor, we can optionally overlay some other stuff
+        if ($this->context == 'editor') {
+            $this->drawEditorOverlays($showVIAOverlay, $showRelativeOverlay, $imageRef);
+        }
 
-		if($filename == 'null')
-		{
-			// do nothing at all - we just wanted the HTML AREAs for the editor or HTML output
-		}
-		else
-		{
-			if ($filename == '') {
-				imagepng($image);
-			} else {
-				$result = false;
-				$functions = true;
-				if (function_exists('imagejpeg') && preg_match('/\.jpg/i', $filename)) {
-					wm_debug("Writing JPEG file to $filename\n");
-					$result = imagejpeg($image, $filename);
-				} elseif (function_exists('imagegif') && preg_match('/\.gif/i', $filename)) {
-					wm_debug("Writing GIF file to $filename\n");
-					$result = imagegif($image, $filename);
-				} elseif (function_exists('imagepng') && preg_match('/\.png/i', $filename)) {
-					wm_debug("Writing PNG file to $filename\n");
-					$result = imagepng($image, $filename);
-				} else {
-					wm_warn("Failed to write map image. No function existed for the image format you requested. [WMWARN12]\n");
-					$functions = false;
-				}
+        // Ready to output the results...
 
-				if (($result == false) && ($functions == true)) {
-					if (file_exists($filename)) {
-						wm_warn("Failed to overwrite existing image file $filename - permissions of existing file are wrong? [WMWARN13]");
-					} else {
-						wm_warn("Failed to create image file $filename - permissions of output directory are wrong? [WMWARN14]");
-					}
-				}
-			}
-		}
+        if ($imageFileName == 'null') {
+            // do nothing at all - we just wanted the HTML AREAs for the editor or HTML output
+        } else {
+            // write to the standard output (for the editor)
+            if ($imageFileName == '') {
+                imagepng($imageRef);
+            } else {
+                $this->writeImageFile($imageFileName, $imageRef);
+                $this->createThumbnailFile($thumbnailFileName, $thumbnailMaxSize, $imageRef);
+            }
+        }
 
-//		if($this->context == 'editor2')
-//		{
-//			$cachefile = $this->cachefolder.DIRECTORY_SEPARATOR.dechex(crc32($this->configfile))."_bg.".$this->cachefile_version.".png";
-//			imagepng($image, $cachefile);
-//			$cacheuri = $this->cachefolder.'/'.dechex(crc32($this->configfile))."_bg.".$this->cachefile_version.".png";
-//			$this->mapcache = $cacheuri;
-//		}
+        imagedestroy($imageRef);
 
-		if (function_exists('imagecopyresampled'))
-		{
-			// if one is specified, and we can, write a thumbnail too
-			if ($thumbnailfile != '')
-			{
-				$result = FALSE;
-				if ($this->width > $this->height) { $factor=($thumbnailmax / $this->width); }
-				else { $factor=($thumbnailmax / $this->height); }
-
-				$this->thumb_width = $this->width * $factor;
-				$this->thumb_height = $this->height * $factor;
-
-				$imagethumb=imagecreatetruecolor($this->thumb_width, $this->thumb_height);
-				imagecopyresampled($imagethumb, $image, 0, 0, 0, 0, $this->thumb_width, $this->thumb_height,
-					$this->width, $this->height);
-				$result = imagepng($imagethumb, $thumbnailfile);
-				imagedestroy($imagethumb);
-
-
-
-				if(($result==FALSE))
-				{
-					if(file_exists($filename))
-					{
-						wm_warn("Failed to overwrite existing image file $filename - permissions of existing file are wrong? [WMWARN15]");
-					}
-					else
-					{
-						wm_warn("Failed to create image file $filename - permissions of output directory are wrong? [WMWARN16]");
-					}
-				}
-			}
-		}
-		else
-		{
-			wm_warn("Skipping thumbnail creation, since we don't have the necessary function. [WMWARN17]");
-		}
-		imagedestroy ($image);
-	}
-}
+    }
 
     function CleanUp()
     {
@@ -1851,6 +1847,37 @@ function MakeHTML($imagemapname = "weathermap_imap")
             return $this->$name;
         }
         throw new WeathermapInternalFail("NoSuchProperty");
+    }
+
+    /**
+     * @return null|resource
+     */
+    protected function loadBackgroundImage()
+    {
+        $bgImageRef = null;
+
+        // do the basic prep work
+        if ($this->background != '') {
+            if (is_readable($this->background)) {
+                $bgImageRef = imagecreatefromfile($this->background);
+
+                if (!$bgImageRef) {
+                    wm_warn
+                    ("Failed to open background image.  One possible reason: Is your BACKGROUND really a PNG?\n");
+                    return $bgImageRef;
+                }
+
+                $this->width = imagesx($bgImageRef);
+                $this->height = imagesy($bgImageRef);
+
+                return $bgImageRef;
+
+            }
+            wm_warn
+            ("Your background image file could not be read. Check the filename, and permissions, for "
+                . $this->background . "\n");
+            return $bgImageRef;
+        }
     }
 
 };

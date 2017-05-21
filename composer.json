@@ -16,11 +16,11 @@
   },
   "require-dev": {
     "codeclimate/php-test-reporter": "*",
-    "phpunit/phpunit": "~5",
-    "phpmd/phpmd": "~2.1",
-    "sebastian/phpcpd": "~2",
-    "squizlabs/php_codesniffer": "~2",
+    "phpunit/phpunit": "*",
+    "phpmd/phpmd": "*",
+    "sebastian/phpcpd": "*",
+    "squizlabs/php_codesniffer": "*",
     "theseer/phpdox": "*",
-    "phploc/phploc": "~3"
+    "phploc/phploc": "*"
   }
 }

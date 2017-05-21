@@ -381,14 +381,6 @@ class WeatherMapNode extends WeatherMapDataItem
         }
     }
 
-    function update_cache($cachedir, $mapname)
-    {
-        throw new WeathermapDeprecatedException("blorp");
-        $cachename = $cachedir . "/node_" . md5($mapname . "/" . $this->name) . ".png";
-        // save this image to a cache, for the editor
-        imagepng($this->image, $cachename);
-    }
-
     /**
      * precalculate the colours to be used, and the bounding boxes for labels and icons (if they exist)
      *
@@ -482,7 +474,7 @@ class WeatherMapNode extends WeatherMapDataItem
                 $output .= "\tTEMPLATE " . $this->template . "\n";
             }
 
-            $output .= $this->getSimpleConfig($basic_params, $dd, $output);
+            $output .= $this->getSimpleConfig($basic_params, $dd);
 
             // IN/OUT are the same, so we can use the simpler form here
             if ($this->infourl[IN] != $dd->infourl[IN]) {

@@ -1422,43 +1422,42 @@ class WeatherMap extends WeatherMapBase
 // which will populate the ImageMap with regions.
 //
 // imagemapname is a parameter, so we can stack up several maps in the Cacti plugin with their own imagemaps
-function MakeHTML($imagemapname = "weathermap_imap")
-{
-	wm_debug("Trace: MakeHTML()\n");
-	// PreloadMapHTML fills in the ImageMap info, ready for the HTML to be created.
-	$this->calculateImagemap();
+    function MakeHTML($imagemapname = "weathermap_imap")
+    {
+        wm_debug("Trace: MakeHTML()\n");
+        // PreloadMapHTML fills in the ImageMap info, ready for the HTML to be created.
+        $this->calculateImagemap();
 
-	$html='';
+        $html = '';
 
-	$html .= '<div class="weathermapimage" style="margin-left: auto; margin-right: auto; width: '.$this->width.'px;" >';
-	if ( $this->imageuri != '') {
-		$html.=sprintf(
-			'<img id="wmapimage" src="%s" width="%d" height="%d" border="0" usemap="#%s"',
-			$this->imageuri,
-			$this->width,
-			$this->height,
-			$imagemapname
-		);
-		//$html .=  'alt="network weathermap" ';
-		$html .= '/>';
-		}
-	else {
-		$html.=sprintf(
-			'<img id="wmapimage" src="%s" width="%d" height="%d" border="0" usemap="#%s"',
-			$this->imagefile,
-			$this->width,
-			$this->height,
-			$imagemapname
-		);
-		//$html .=  'alt="network weathermap" ';
-		$html .= '/>';
-	}
-	$html .= '</div>';
+        $html .= '<div class="weathermapimage" style="margin-left: auto; margin-right: auto; width: ' . $this->width . 'px;" >';
+        if ($this->imageuri != '') {
+            $html .= sprintf(
+                '<img id="wmapimage" src="%s" width="%d" height="%d" border="0" usemap="#%s"',
+                $this->imageuri,
+                $this->width,
+                $this->height,
+                $imagemapname
+            );
+            //$html .=  'alt="network weathermap" ';
+            $html .= '/>';
+        } else {
+            $html .= sprintf(
+                '<img id="wmapimage" src="%s" width="%d" height="%d" border="0" usemap="#%s"',
+                $this->imagefile,
+                $this->width,
+                $this->height,
+                $imagemapname
+            );
+            //$html .=  'alt="network weathermap" ';
+            $html .= '/>';
+        }
+        $html .= '</div>';
 
-	$html .= $this->generateSortedImagemap($imagemapname);
+        $html .= $this->generateSortedImagemap($imagemapname);
 
-	return $html;
-}
+        return $html;
+    }
 
     function generateSortedImagemap($imagemapname)
     {
@@ -1639,7 +1638,7 @@ function MakeHTML($imagemapname = "weathermap_imap")
             wm_debug("Loading $pluginType Plugin class from $file\n");
 
             $class = preg_replace("/\\.php$/", "", $file);
-            include_once($fullFilePath);
+            include_once $fullFilePath;
 
             wm_debug("Loaded $pluginType Plugin class $class from $file\n");
 
@@ -1763,7 +1762,7 @@ function MakeHTML($imagemapname = "weathermap_imap")
     {
         wm_debug("======================================\n");
         wm_debug("Starting DS plugin cleanup\n");
-        $this->pluginMethod("data", "CleanUp");
+        $this->pluginMethod($type, "CleanUp");
     }
 
     function zeroData()
@@ -1874,8 +1873,9 @@ function MakeHTML($imagemapname = "weathermap_imap")
             wm_warn
             ("Your background image file could not be read. Check the filename, and permissions, for "
                 . $this->background . "\n");
-            return $bgImageRef;
         }
+
+        return $bgImageRef;
     }
 
 };

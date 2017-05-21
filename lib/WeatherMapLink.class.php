@@ -570,7 +570,7 @@ class WeatherMapLink extends WeatherMapDataItem
                 $output .= "\tTEMPLATE " . $this->template . "\n";
             }
 
-            $output .= $this->getSimpleConfig($basic_params, $dd, $output);
+            $output .= $this->getSimpleConfig($basic_params, $dd);
 
             $val = $this->usescale . " " . $this->scaletype;
             $comparison = $dd->usescale . " " . $dd->scaletype;

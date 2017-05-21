@@ -17,7 +17,7 @@ class WeatherMapTextItem extends WeatherMapItem
 
     var $prefix;
 
-    public function __construct()
+    public function __construct($prefix)
     {
         parent::__construct();
 
@@ -27,6 +27,8 @@ class WeatherMapTextItem extends WeatherMapItem
         $this->configuredText = "";
         $this->processedText = "";
         $this->zOrder = 1000;
+
+        $this->prefix = $prefix;
     }
 
     /**
@@ -78,7 +80,9 @@ class WeatherMapTextItem extends WeatherMapItem
 
         $fontObject->drawImageString($imageRef, $x, $y, $string, $this->textColour->gdAllocate($imageRef));
 
-        $map->imap->addArea("Rectangle", "TITLE", '', array($x, $y, $x + $boxWidth, $y - $boxHeight));
-        $map->imap_areas[] = 'TITLE';
+        $map->imap->addArea("Rectangle", $this->prefix, '', array($x, $y, $x + $boxWidth, $y - $boxHeight));
+        $map->imap_areas[] = $this->prefix;
     }
+
 }
+

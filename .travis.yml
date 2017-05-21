@@ -1,5 +1,9 @@
 sudo: false
 language: php
+branches:
+  only:
+  - database-refactor
+  - master
 php:
   - "7.0"
 #  - "5.6"

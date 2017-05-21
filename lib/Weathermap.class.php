@@ -1185,18 +1185,16 @@ class WeatherMap extends WeatherMapBase
         $all_layers = array_keys($this->seen_zlayers);
         sort($all_layers);
 
+        // stuff the scales into the seen-items list, so they are rendered along with everything else
+        foreach ($this->scales as $scaleName => $scaleObject) {
+            array_push($this->seen_zlayers[1000], $scaleObject);
+        }
+
         foreach ($all_layers as $z) {
             $z_items = $this->seen_zlayers[$z];
             wm_debug("Drawing layer $z\n");
             // all the map 'furniture' is fixed at z=1000
             if ($z == 1000) {
-                // TODO - these legends should just be other objects in the zlayer, not special cases
-                foreach ($this->scales as $scaleName => $scaleObject) {
-                    wm_debug("Drawing KEY for $scaleName if necessary.\n");
-
-                    // the new scale object draws its own legend
-                    $this->scales[$scaleName]->draw($imageRef);
-                }
 
                 $this->DrawTimestamp($imageRef, $this->timefont, $this->colourtable['TIME']);
                 if (!is_null($this->min_data_time)) {

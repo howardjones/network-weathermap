@@ -179,7 +179,6 @@ class WeatherMapUIBase
                     $result = false;
                 }
             }
-
         }
         return $result;
     }

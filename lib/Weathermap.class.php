@@ -446,64 +446,6 @@ class WeatherMap extends WeatherMapBase
         return $output;
     }
 
-
-
-// nodename is a vestigal parameter, from the days when nodes were just big labels
-// TODO - this is only used by Link - it doesn't need to be here
-    function DrawLabelRotated($im, $x, $y, $angle, $text, $font, $padding, $linkname, $textcolour, $bgcolour, $outlinecolour, &$map, $direction)
-    {
-        throw new WeathermapDeprecatedException("Does this ever get used?");
-
-        $fontObject = $this->fonts->getFont($font);
-        list($strwidth, $strheight) = $fontObject->calculateImageStringSize($text);
-
-        if (abs($angle) > 90) {
-            $angle -= 180;
-        }
-        if ($angle < -180) {
-            $angle += 360;
-        }
-
-        $rangle = -deg2rad($angle);
-
-        $extra = 3;
-
-        $x1 = $x - ($strwidth / 2) - $padding - $extra;
-        $x2 = $x + ($strwidth / 2) + $padding + $extra;
-        $y1 = $y - ($strheight / 2) - $padding - $extra;
-        $y2 = $y + ($strheight / 2) + $padding + $extra;
-
-        // a box. the last point is the start point for the text.
-        $points = array($x1, $y1, $x1, $y2, $x2, $y2, $x2, $y1, $x - $strwidth / 2, $y + $strheight / 2 + 1);
-
-        rotateAboutPoint($points, $x, $y, $rangle);
-
-        if ($bgcolour->isRealColour()) {
-            $bgcol = $bgcolour->gdAllocate($im);
-            imagefilledpolygon($im, $points, 4, $bgcol);
-        }
-
-        if ($outlinecolour->isRealColour()) {
-            $outlinecol = $outlinecolour->gdAllocate($im);
-            imagepolygon($im, $points, 4, $outlinecol);
-        }
-
-        $textcol = $textcolour->gdAllocate($im);
-        $fontObject->drawImageString($im, $points[8], $points[9], $text, $textcol, $angle);
-
-        $areaname = "LINK:L" . $map->links[$linkname]->id . ':' . ($direction + 2);
-
-        // the rectangle is about half the size in the HTML, and easier to optimise/detect in the browser
-        if ($angle == 0) {
-            $map->imap->addArea("Rectangle", $areaname, '', array($x1, $y1, $x2, $y2));
-            wm_debug("Adding Rectangle imagemap for $areaname\n");
-        } else {
-            $map->imap->addArea("Polygon", $areaname, '', $points);
-            wm_debug("Adding Poly imagemap for $areaname\n");
-        }
-        $this->links[$linkname]->imap_areas[] = $areaname;
-    }
-
     /**
      * @param resource $imageRef
      * @param int $font
@@ -1188,7 +1130,7 @@ class WeatherMap extends WeatherMapBase
             wm_debug("Pre-rendering " . $node->name . " to get bounding boxes.\n");
             if (!$node->isTemplate()) {
                 $node->preCalculate($this);
-                $node->pre_render($imageRef, $this);
+                $node->preRender($imageRef, $this);
             }
         }
 

@@ -81,7 +81,7 @@ class WMPoint
         // TODO: Implement this
     }
 
-    function distanceToLineSegment($l)
+    public function distanceToLineSegment($l)
     {
         // TODO: Implement this
         // Return whichever is the shortest out of:

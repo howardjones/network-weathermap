@@ -26,7 +26,7 @@ class WMUtility
     }
 
     // PHP < 5.3 doesn't support anonymous functions, so here's a little function for wmStringAnonymise (screenshotify)
-    static function stringAnonymiseReplacer($matches)
+    public static function stringAnonymiseReplacer($matches)
     {
         return str_repeat('x', strlen($matches[1]));
     }
@@ -264,7 +264,6 @@ class WMUtility
                 $places = intval($matches[2]);
             }
             return self::formatNumberWithMetricSuffix($value, $kilo, $places);
-
         } elseif (preg_match('/%(-*)(\d*)([Tt])/', $format, $matches)) {
             $precision = ($matches[2] == '' ? 10 : intval($matches[2]));
 

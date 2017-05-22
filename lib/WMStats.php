@@ -3,7 +3,7 @@
 class WMStats
 {
     /** @var integer[] $counters*/
-    var $counters = array();
+    private $counters = array();
 
     public function increment($name, $amount = 1)
     {
@@ -22,5 +22,4 @@ class WMStats
     {
         return json_encode($this->counters);
     }
-
 }

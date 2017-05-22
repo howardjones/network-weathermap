@@ -2,21 +2,21 @@
 
 class WMImageLoader
 {
-    var $cache = array();
+    private $cache = array();
     // for now, disable caching. The imageduplicate() function doesn't work in all cases.
-    var $cacheEnabled = true;
+    private $cacheEnabled = true;
 
     // we don't want to be caching huge images (they are probably the background, and won't be re-used)
-    function isCacheable($width, $height)
+    private function isCacheable($width, $height)
     {
-        if (! $this->cacheEnabled) {
+        if (!$this->cacheEnabled) {
             return false;
         }
 
         if ($width * $height > 65536) {
             return false;
         }
-        
+
         return true;
     }
 
@@ -28,13 +28,11 @@ class WMImageLoader
      * @param string $colourMethod
      * @return null|resource
      */
-    function imagecreatescaledcolourizedfromfile($filename, $scaleWidth, $scaleHeight, $colour, $colourMethod)
+    public function imagecreatescaledcolourizedfromfile($filename, $scaleWidth, $scaleHeight, $colour, $colourMethod)
     {
-
         wm_debug("Getting a (maybe cached) scaled coloured image for $filename at $scaleWidth x $scaleHeight with $colour\n");
 
-        $key = sprintf("%s:%d:%d:%s:%s", $filename, $scaleWidth, $scaleHeight,
-            $colour->asString(), $colourMethod);
+        $key = sprintf("%s:%d:%d:%s:%s", $filename, $scaleWidth, $scaleHeight, $colour->asString(), $colourMethod);
         wm_debug("$key\n");
 
         if (array_key_exists($key, $this->cache)) {
@@ -64,7 +62,7 @@ class WMImageLoader
      * @param int $scaleHeight
      * @return null|resource
      */
-    function imagecreatescaledfromfile($filename, $scaleWidth, $scaleHeight)
+    public function imagecreatescaledfromfile($filename, $scaleWidth, $scaleHeight)
     {
         list($width, $height, $type, $attr) = getimagesize($filename);
 
@@ -100,7 +98,7 @@ class WMImageLoader
         return $finalImageRef;
     }
 
-    function imageduplicate($sourceImageRef)
+    public function imageduplicate($sourceImageRef)
     {
         $source_width = imagesx($sourceImageRef);
         $source_height = imagesy($sourceImageRef);
@@ -117,8 +115,7 @@ class WMImageLoader
             if ($trans >= 0) {
                 wm_debug("Duplicating transparency in indexed image\n");
                 $rgb = imagecolorsforindex($sourceImageRef, $trans);
-                $trans_index = imagecolorallocatealpha($newImageRef, $rgb['red'], $rgb['green'], $rgb['blue'],
-                    $rgb['alpha']);
+                $trans_index = imagecolorallocatealpha($newImageRef, $rgb['red'], $rgb['green'], $rgb['blue'], $rgb['alpha']);
                 imagefill($newImageRef, 0, 0, $trans_index);
                 imagecolortransparent($newImageRef, $trans_index);
             }
@@ -133,10 +130,11 @@ class WMImageLoader
      * @param $filename
      * @return null|resource
      */
-    function imagecreatefromfile($filename)
+    public function imagecreatefromfile($filename)
     {
-        $result_image = NULL;
-        $new_image = NULL;
+        $result_image = null;
+        $new_image = null;
+
         if (is_readable($filename)) {
             list($width, $height, $type, $attr) = getimagesize($filename);
             $key = $filename;
@@ -193,6 +191,7 @@ class WMImageLoader
         } else {
             wm_warn("Image file $filename is unreadable. Check permissions. [WMIMG05]\n");
         }
+
         wm_debug("Returning $result_image\n");
         return $result_image;
     }
@@ -211,7 +210,6 @@ class WMImageLoader
         wm_debug("If this is the last thing in your logs, you probably have a buggy GD library. Get > 2.0.33 or use PHP builtin.\n");
 
         if ($scaleWidth > 0 && $scaleHeight > 0) {
-
             wm_debug("SCALING ICON here\n");
             if ($iconWidth > $iconHeight) {
                 $scaleFactor = $iconWidth / $scaleWidth;
@@ -226,8 +224,7 @@ class WMImageLoader
 
                 imagesavealpha($scaledImageRef, true);
                 imagealphablending($scaledImageRef, false);
-                imagecopyresampled($scaledImageRef, $iconImageRef, 0, 0, 0, 0, $new_width, $new_height, $iconWidth,
-                    $iconHeight);
+                imagecopyresampled($scaledImageRef, $iconImageRef, 0, 0, 0, 0, $new_width, $new_height, $iconWidth, $iconHeight);
                 imagedestroy($iconImageRef);
                 $iconImageRef = $scaledImageRef;
             }

@@ -25,8 +25,8 @@ class WeathermapManagedMap
 class WeathermapManager
 {
 
-    var $pdo;
-    var $configDirectory;
+    private $pdo;
+    private $configDirectory;
 
     public function __construct($pdo, $configDirectory)
     {
@@ -146,7 +146,7 @@ class WeathermapManager
         return $groups;
     }
 
-    private function make_set($data, $allowed)
+    private function buildSet($data, $allowed)
     {
         $values = array();
         $set = "";
@@ -178,7 +178,7 @@ class WeathermapManager
     public function updateMap($mapId, $data)
     {
         $allowed = array("active", "sortorder", "warncount", "runtime", "group_id", "thumb_width", "thumb_height", "titlecache"); // allowed fields
-        list($set, $values) = $this->make_set($data, $allowed);
+        list($set, $values) = $this->buildSet($data, $allowed);
 
         $values['id'] = $mapId;
 
@@ -247,7 +247,6 @@ class WeathermapManager
                 $statement->execute(array($sortOrder, $mapId));
             }
         }
-
     }
 
     public function moveMap($mapId, $direction)
@@ -348,7 +347,7 @@ class WeathermapManager
         $data = array("optname" => $name, "optvalue" => $value);
 
         $allowed = array("optname", "optvalue"); // allowed fields
-        list($set, $values) = $this->make_set($data, $allowed);
+        list($set, $values) = $this->buildSet($data, $allowed);
 
         $values['id'] = $settingId;
 
@@ -380,7 +379,7 @@ class WeathermapManager
         }
 
         $out = new stdClass();
-        foreach ($result as $k=>$v) {
+        foreach ($result as $k => $v) {
             $out->$k = $v;
         }
 
@@ -575,7 +574,6 @@ class WeathermapManager
     {
         $statement = $this->pdo->prepare("REPLACE INTO settings (name, value) VALUES (?,?)");
         $statement->execute(array($name, $value));
-
     }
 
     public function deleteAppSetting($name)

@@ -34,7 +34,6 @@ class WMDebugNull
     {
         return false;
     }
-
 }
 
 /**

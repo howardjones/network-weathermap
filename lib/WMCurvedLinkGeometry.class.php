@@ -2,7 +2,7 @@
 
 class WMCurvedLinkGeometry extends WMLinkGeometry
 {
-    function calculateSpine($pointsPerSpan = 32)
+    protected function calculateSpine($pointsPerSpan = 32)
     {
         // duplicate the first and last points, so that all points are drawn
         // (C-R normally would draw from x[1] to x[n-1]
@@ -23,7 +23,7 @@ class WMCurvedLinkGeometry extends WMLinkGeometry
         }
     }
 
-    function calculateCRSpan($startIndex, $pointsPerSpan = 32)
+    private function calculateCRSpan($startIndex, $pointsPerSpan = 32)
     {
         $cr_x = new CatmullRom1D($this->controlPoints[$startIndex]->x, $this->controlPoints[$startIndex + 1]->x, $this->controlPoints[$startIndex + 2]->x, $this->controlPoints[$startIndex + 3]->x);
         $cr_y = new CatmullRom1D($this->controlPoints[$startIndex]->y, $this->controlPoints[$startIndex + 1]->y, $this->controlPoints[$startIndex + 2]->y, $this->controlPoints[$startIndex + 3]->y);
@@ -38,7 +38,7 @@ class WMCurvedLinkGeometry extends WMLinkGeometry
         }
     }
 
-    function generateOutlines()
+    protected function generateOutlines()
     {
         wm_debug("Calculating curved-style outline\n");
 

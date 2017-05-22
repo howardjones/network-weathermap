@@ -6,16 +6,16 @@
  */
 class WeatherMapTextItem extends WeatherMapItem
 {
-    var $configuredText;
-    var $processedText;
-    /** @var  WMPoint $position */
-    var $position;
-    var $font;
-    /** @var  WMColour $colour */
-    var $textColour;
-    var $zOrder;
+    public $configuredText;
+    public $processedText;
+    /** @public  WMPoint $position */
+    public $position;
+    public $font;
+    /** @public  WMColour $colour */
+    public $textColour;
+    public $zOrder;
 
-    var $prefix;
+    public $prefix;
 
     public function __construct($prefix)
     {
@@ -83,6 +83,5 @@ class WeatherMapTextItem extends WeatherMapItem
         $map->imap->addArea("Rectangle", $this->prefix, '', array($x, $y, $x + $boxWidth, $y - $boxHeight));
         $map->imap_areas[] = $this->prefix;
     }
-
 }
 

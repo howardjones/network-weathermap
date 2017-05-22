@@ -290,7 +290,7 @@ class WeatherMapItem extends WeatherMapBase
     protected $descendents = array();
     protected $dependencies = array();
 
-    function __construct()
+    public function __construct()
     {
         parent::__construct();
 
@@ -298,7 +298,7 @@ class WeatherMapItem extends WeatherMapBase
         $this->imap_areas = array();
     }
 
-    function my_type()
+    public function my_type()
     {
         return "ITEM";
     }

@@ -21,8 +21,8 @@ class WeatherMapDataItem extends WeatherMapItem
     public $scaleTags = array();
     public $scaleKeys = array();
 
-    var $template;
-    var $duplex;
+    public  $template;
+    public $duplex;
 
     public $inscalekey;
     public $outscalekey;
@@ -121,7 +121,7 @@ class WeatherMapDataItem extends WeatherMapItem
         $this->parent->descendents [] = $this;
     }
 
-    function CopyFrom(&$source)
+    public function CopyFrom(&$source)
     {
         wm_debug("Initialising %s $this->name from $source->name\n", $this->my_type());
         assert('is_object($source)');
@@ -142,13 +142,20 @@ class WeatherMapDataItem extends WeatherMapItem
     public function updateMaxValues($kilo)
     {
         foreach ($this->getChannelList() as $name => $const) {
-            $this->maxValues[$const] = WMUtility::interpretNumberWithMetricSuffix($this->maxValuesConfigured[$const],
-                $kilo);
+            $this->maxValues[$const] = WMUtility::interpretNumberWithMetricSuffix($this->maxValuesConfigured[$const], $kilo);
         }
 
-        wm_debug(sprintf("   Setting bandwidth on %s (%s -> %d bps, %s -> %d bps, KILO = %d)\n", $this,
-            $this->maxValuesConfigured[IN], $this->maxValues[IN], $this->maxValuesConfigured[OUT],
-            $this->maxValues[OUT], $kilo));
+        wm_debug(
+            sprintf(
+                "   Setting bandwidth on %s (%s -> %d bps, %s -> %d bps, KILO = %d)\n",
+                $this,
+                $this->maxValuesConfigured[IN],
+                $this->maxValues[IN],
+                $this->maxValuesConfigured[OUT],
+                $this->maxValues[OUT],
+                $kilo
+            )
+        );
     }
 
     public function prepareForDataCollection()
@@ -164,21 +171,25 @@ class WeatherMapDataItem extends WeatherMapItem
                 if ($this->owner->plugins['data'][$matchedBy]['active']) {
                     $target->registerWithPlugin($this, $this->owner);
                 } else {
-                    wm_warn(sprintf(
-                        "ProcessTargets: %s, target: %s was recognised as a valid TARGET by a plugin that is unable to run (%s) [WMWARN07]\n",
-                        $this,
-                        $target,
-                        $matchedBy
-                    ));
+                    wm_warn(
+                        sprintf(
+                            "ProcessTargets: %s, target: %s was recognised as a valid TARGET by a plugin that is unable to run (%s) [WMWARN07]\n",
+                            $this,
+                            $target,
+                            $matchedBy
+                        )
+                    );
                 }
             }
 
             if ($matchedBy == "") {
-                wm_warn(sprintf(
-                    "ProcessTargets: %s, target: %s was not recognised as a valid TARGET [WMWARN08]\n",
-                    $this,
-                    $target
-                ));
+                wm_warn(
+                    sprintf(
+                        "ProcessTargets: %s, target: %s was not recognised as a valid TARGET [WMWARN08]\n",
+                        $this,
+                        $target
+                    )
+                );
             }
         }
     }
@@ -273,7 +284,6 @@ class WeatherMapDataItem extends WeatherMapItem
 
         foreach ($channels as $channelName => $channel) {
             // bodge for now: TODO these should be set in Reset() and readConfig()
-
             $value = $this->absoluteUsages[$channel];
 
             if ($this->duplex == 'half') {
@@ -293,7 +303,6 @@ class WeatherMapDataItem extends WeatherMapItem
             $this->add_note("max_bandwidth_" . $channelName, $this->maxValues[$channel]);
             $this->add_note("max_bandwidth_" . $channelName . "_cfg", $this->maxValuesConfigured[$channel]);
         }
-
     }
 
     public function calculateScaleColours()

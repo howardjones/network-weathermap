@@ -25,7 +25,7 @@ class WMTarget
     private $timestamp;
     private $dataValid = false;
 
-    public function __construct($targetString, $configFile="", $lineNumber=0)
+    public function __construct($targetString, $configFile = "", $lineNumber = 0)
     {
         $this->originalTargetString = $targetString;
         $this->finalTargetString = $targetString;
@@ -44,7 +44,12 @@ class WMTarget
 
     public function __toString()
     {
-        return sprintf("%s on config line %s of %s", $this->finalTargetString, $this->configLineNumber, $this->configFileName);
+        return sprintf(
+            "%s on config line %s of %s",
+            $this->finalTargetString,
+            $this->configLineNumber,
+            $this->configFileName
+        );
     }
 
     /**
@@ -119,7 +124,14 @@ class WMTarget
         list($in, $out, $dataTime) = $this->pluginObject->ReadData($this->finalTargetString, $map, $mapItem);
 
         if ($in === null && $out === null) {
-            wm_warn(sprintf("ReadData: %s, target: %s had no valid data, according to %s [WMWARN70]\n", $mapItem, $this->finalTargetString, $this->pluginName));
+            wm_warn(
+                sprintf(
+                    "ReadData: %s, target: %s had no valid data, according to %s [WMWARN70]\n",
+                    $mapItem,
+                    $this->finalTargetString,
+                    $this->pluginName
+                )
+            );
             return;
         }
 

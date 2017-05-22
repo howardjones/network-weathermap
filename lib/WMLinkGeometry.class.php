@@ -44,7 +44,7 @@ class WMLinkGeometry
      * @param string $arrowStyle
      * @throws WeathermapInternalFail
      */
-    function Init(&$link, $controlPoints, $widths, $directions = 2, $splitPosition = 50, $arrowStyle = "classic")
+    public function Init(&$link, $controlPoints, $widths, $directions = 2, $splitPosition = 50, $arrowStyle = "classic")
     {
         $this->owner = $link;
         $this->name = $link->name;
@@ -83,7 +83,7 @@ class WMLinkGeometry
      * processControlPoints - remove duplicate points, and co-linear points from control point list
      *
      */
-    function processControlPoints()
+    private function processControlPoints()
     {
         $previousPoint = new WMPoint(-101.111, -2345234.333);
 
@@ -104,24 +104,24 @@ class WMLinkGeometry
         }
     }
 
-    function getWidths()
+    public function getWidths()
     {
         return $this->linkWidths;
     }
 
-    function setFillColours($colours)
+    public function setFillColours($colours)
     {
         foreach ($this->directions as $direction) {
             $this->fillColours[$direction] = $colours[$direction];
         }
     }
 
-    function setOutlineColour($colour)
+    public function setOutlineColour($colour)
     {
         $this->outlineColour = $colour;
     }
 
-    function calculateArrowSize($linkWidth, $arrowStyle)
+    private function calculateArrowSize($linkWidth, $arrowStyle)
     {
         // This is the default 'classic' size
         $arrowLengthFactor = 4;
@@ -157,7 +157,7 @@ class WMLinkGeometry
      *
      * @return WMPoint[]
      */
-    function generateArrowhead($startPoint, $endPoint, $linkWidth, $arrowWidth)
+    protected function generateArrowhead($startPoint, $endPoint, $linkWidth, $arrowWidth)
     {
         $points = array();
 
@@ -183,7 +183,7 @@ class WMLinkGeometry
         return $points;
     }
 
-    function totalDistance()
+    public function totalDistance()
     {
         return $this->curvePoints->totalDistance();
     }
@@ -193,17 +193,17 @@ class WMLinkGeometry
      * @return WMVector
      *
      */
-    function findTangentAtIndex($index)
+    public function findTangentAtIndex($index)
     {
         return $this->curvePoints->findTangentAtIndex($index);
     }
 
-    function findPointAndAngleAtPercentageDistance($targetPercentage)
+    public function findPointAndAngleAtPercentageDistance($targetPercentage)
     {
         return $this->curvePoints->findPointAndAngleAtPercentageDistance($targetPercentage);
     }
 
-    function findPointAndAngleAtDistance($targetDistance)
+    public function findPointAndAngleAtDistance($targetDistance)
     {
         return $this->curvePoints->findPointAndAngleAtDistance($targetDistance);
     }
@@ -244,13 +244,13 @@ class WMLinkGeometry
         }
     }
 
-    function preDraw()
+    private function preDraw()
     {
         $this->splitSpine();
         $this->findArrowPoints();
     }
 
-    function getDrawnPolygon($direction)
+    public function getDrawnPolygon($direction)
     {
         $polyPoints = array();
 
@@ -262,7 +262,7 @@ class WMLinkGeometry
         return $polyPoints;
     }
 
-    function draw($gdImage)
+    public function draw($gdImage)
     {
         if (is_null($this->curvePoints)) {
             throw new WeathermapInternalFail("DrawingEmptySpline");
@@ -293,7 +293,6 @@ class WMLinkGeometry
             } else {
                 wm_debug("Not drawing $linkName ($direction) outline because there is no outline colour\n");
             }
-
         }
     }
 

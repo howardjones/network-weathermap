@@ -3,7 +3,7 @@
 class WMAngledLinkGeometry extends WMLinkGeometry
 {
 
-    public function calculateSpine($pointsPerSpan = 5)
+    protected function calculateSpine($pointsPerSpan = 5)
     {
         $nPoints = count($this->controlPoints);
 
@@ -23,7 +23,7 @@ class WMAngledLinkGeometry extends WMLinkGeometry
         wm_debug($this->curvePoints);
     }
 
-    public function generateOutlines()
+    protected function generateOutlines()
     {
         wm_debug("Calculating angled-style outline\n");
 
@@ -148,7 +148,6 @@ class WMAngledLinkGeometry extends WMLinkGeometry
                         array_unshift($back, $crossingPoint4);
                         array_unshift($back, $crossingPoint3);
                     }
-
                 }
                 wm_debug("Next step...\n");
             }

@@ -11,9 +11,9 @@
 class WMSpineElement
 {
     /** @var  WMPoint $point */
-    var $point;
+    public $point;
     /** @var  float $distance */
-    var $distance;
+    public $distance;
 
     public function __construct($point, $distance)
     {
@@ -30,13 +30,13 @@ class WMSpineElement
 class WMSpineSearchResult
 {
     /** @var  WMPoint $point */
-    var $point;
+    public $point;
     /** @var  float $distance */
-    var $distance;
+    public $distance;
     /** @var float $angle */
-    var $angle;
+    public $angle;
     /** @var int $index */
-    var $index;
+    public $index;
 }
 
 class WMSpine
@@ -49,10 +49,10 @@ class WMSpine
      *
      * @param array $newEntry
      */
-    function addRawEntry($newEntry)
-    {
-        $this->addRawElement(new WMSpineElement($newEntry[SPINE_POINT], $newEntry[SPINE_DISTANCE]));
-    }
+//    function addRawEntry($newEntry)
+//    {
+//        $this->addRawElement(new WMSpineElement($newEntry[SPINE_POINT], $newEntry[SPINE_DISTANCE]));
+//    }
 
     /**
      * Add a WMSpineElement as-as, assuming the distance inside is correct
@@ -60,7 +60,7 @@ class WMSpine
      *
      * @param WMSpineElement $newElement
      */
-    function addRawElement($newElement)
+    private function addRawElement($newElement)
     {
         $this->elements[] = $newElement;
     }
@@ -70,13 +70,12 @@ class WMSpine
      *
      * @param WMPoint $newPoint
      */
-    function addPoint($newPoint)
+    public function addPoint($newPoint)
     {
         if (is_null($this->elements)) {
             $this->elements = array();
             $distance = 0;
         } else {
-
             $lastElement = end($this->elements);
 
             reset($this->elements);
@@ -87,11 +86,10 @@ class WMSpine
             $distance = $lastDistance + $lastPoint->distanceToPoint($newPoint);
         }
 
-        // $this->addRawEntry(array($newPoint, $distance));
         $this->addRawElement(new WMSpineElement($newPoint, $distance));
     }
 
-    function pointCount()
+    public function pointCount()
     {
         return count($this->elements);
     }
@@ -100,7 +98,7 @@ class WMSpine
      * @param int $index
      * @return WMPoint
      */
-    function getPoint($index)
+    public function getPoint($index)
     {
         return $this->elements[$index]->point;
     }
@@ -108,7 +106,7 @@ class WMSpine
     /**
      * @return float
      */
-    function totalDistance()
+    public function totalDistance()
     {
         $lastElement = end($this->elements);
         reset($this->elements);
@@ -116,7 +114,7 @@ class WMSpine
         return $lastElement->distance;
     }
 
-    function simplify($epsilon = 1e-10)
+    public function simplify($epsilon = 1e-10)
     {
         $output = new WMSpine();
 
@@ -143,21 +141,22 @@ class WMSpine
         wm_debug("Skipped $skip points of $maxStartIndex\n");
 
         $output->addPoint($this->elements[$maxStartIndex + 1]->point);
+
         return $output;
     }
 
-    function firstPoint()
-    {
-        return $this->elements[0]->point;
-    }
+//    function firstPoint()
+//    {
+//        return $this->elements[0]->point;
+//    }
 
-    function lastPoint()
+    public function lastPoint()
     {
         return $this->elements[$this->pointCount() - 1]->point;
     }
 
     // find the tangent of the spine at a given index (used by DrawComments)
-    function findTangentAtIndex($index)
+    public function findTangentAtIndex($index)
     {
         $maxIndex = $this->pointCount() - 1;
 
@@ -181,7 +180,7 @@ class WMSpine
         return $tangent;
     }
 
-    function findPointAtDistance($targetDistance)
+    public function findPointAtDistance($targetDistance)
     {
         // We find the nearest lower point for each distance,
         // then linearly interpolate to get a more accurate point
@@ -198,13 +197,10 @@ class WMSpine
         // linearly interpolate x and y to get to the actual required distance
         $newPoint = $this->elements[$foundIndex]->point->LERPWith($this->elements[$foundIndex + 1]->point, $ratio);
 
-        return (array(
-            $newPoint,
-            $foundIndex
-        ));
+        return array($newPoint, $foundIndex);
     }
 
-    function findPointAndAngleAtPercentageDistance($targetPercentage)
+    public function findPointAndAngleAtPercentageDistance($targetPercentage)
     {
         $targetDistance = $this->totalDistance() * ($targetPercentage / 100);
 
@@ -217,7 +213,7 @@ class WMSpine
         return $result;
     }
 
-    function findPointAndAngleAtDistance($targetDistance)
+    public function findPointAndAngleAtDistance($targetDistance)
     {
         // This is the point we need
         list($point, $index) = $this->findPointAtDistance($targetDistance);
@@ -238,11 +234,7 @@ class WMSpine
         $vec = $pointLeft->vectorToPoint($pointRight);
         $angle = $vec->getAngle();
 
-        return (array(
-            $point,
-            $index,
-            $angle
-        ));
+        return array($point, $index, $angle);
     }
 
     /**
@@ -255,7 +247,7 @@ class WMSpine
      * @return int - index of the point found
      * @throws WeathermapInternalFail
      */
-    function findIndexNearDistance($targetDistance)
+    public function findIndexNearDistance($targetDistance)
     {
         $left = 0;
         $right = count($this->elements) - 1;
@@ -311,7 +303,7 @@ class WMSpine
      *
      * @returns WMSpine[] two new spines either side of the split
      */
-    function split($splitIndex)
+    private function split($splitIndex)
     {
         $spine1 = new WMSpine();
         $spine2 = new WMSpine();
@@ -335,7 +327,7 @@ class WMSpine
         return array($spine1, $spine2);
     }
 
-    function splitAtDistance($splitDistance)
+    public function splitAtDistance($splitDistance)
     {
         list($halfwayPoint, $halfwayIndex) = $this->findPointAtDistance($splitDistance);
 

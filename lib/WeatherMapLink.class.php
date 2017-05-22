@@ -4,8 +4,6 @@
 // http://www.network-weathermap.com/
 // Released under the GNU Public License
 
-require_once "HTMLImagemap.class.php";
-
 class WeatherMapLink extends WeatherMapDataItem
 {
     const FMT_BITS_IN = "{link:this:bandwidth_in:%2k}";
@@ -14,46 +12,54 @@ class WeatherMapLink extends WeatherMapDataItem
     const FMT_UNFORM_OUT = "{link:this:bandwidth_out}";
     const FMT_PERC_IN = "{link:this:inpercent:%.2f}%";
     const FMT_PERC_OUT = "{link:this:outpercent:%.2f}%";
-    
-    
-//	var $maphtml;
+
+
+//	public $maphtml;
     /** @var  WeatherMapNode $a */
     /** @var  WeatherMapNode $b */
-    var $a, $b; // the ends - references to nodes
-    var $a_offset, $b_offset;
-    var $a_offset_dx, $a_offset_dy, $a_offset_resolved;
-    var $b_offset_dx, $b_offset_dy, $b_offset_resolved;
+    public $a;
+    public $b; // the ends - references to nodes
+    public $a_offset;
+    public $b_offset;
+    public $a_offset_dx;
+    public $a_offset_dy;
+    public $a_offset_resolved;
+    public $b_offset_dx;
+    public $b_offset_dy;
+    public $b_offset_resolved;
 
-    var $labeloffset_in, $labeloffset_out;
-    var $commentoffset_in, $commentoffset_out;
+    public $labeloffset_in;
+    public $labeloffset_out;
+    public $commentoffset_in;
+    public $commentoffset_out;
 
-    var $width;
-    var $arrowstyle;
-    var $linkstyle;
-    var $labelstyle;
-    var $labelboxstyle;
-    var $selected; //TODO - can a link even BE selected?
-    var $vialist = array();
-    var $viastyle;
-    var $commentstyle;
-    var $splitpos;
+    public $width;
+    public $arrowstyle;
+    public $linkstyle;
+    public $labelstyle;
+    public $labelboxstyle;
+    public $selected; //TODO - can a link even BE selected?
+    public $vialist = array();
+    public $viastyle;
+    public $commentstyle;
+    public $splitpos;
 
-    var $bwfont;
-    var $commentfont;
+    public $bwfont;
+    public $commentfont;
 
     /** @var WMColour $outlinecolour */
-    var $outlinecolour;
+    public $outlinecolour;
     /** @var  WMColour $bwoutlinecolour */
-    var $bwoutlinecolour;
+    public $bwoutlinecolour;
     /** @var  WMColour $bwboxcolour */
-    var $bwboxcolour;
+    public $bwboxcolour;
     /** @var  WMColour $commentfontcolour */
-    var $commentfontcolour;
+    public $commentfontcolour;
     /** @var  WMColour $bwfontcolour */
-    var $bwfontcolour;
+    public $bwfontcolour;
 
-    var $bwlabelformats = array();
-    var $comments = array();
+    public $bwlabelformats = array();
+    public $comments = array();
 
     /** @var  WMLinkGeometry $geometry */
     public $geometry;  // contains all the spine-related data (WMLinkGeometry)
@@ -64,7 +70,7 @@ class WeatherMapLink extends WeatherMapDataItem
      * @param string $template
      * @param WeatherMap $owner
      */
-    function __construct($name, $template, $owner)
+    public function __construct($name, $template, $owner)
     {
         parent::__construct();
 
@@ -126,43 +132,17 @@ class WeatherMapLink extends WeatherMapDataItem
         $this->reset($owner);
     }
 
-    function _Reset(&$newowner)
-    {
-        $this->owner = $newowner;
-
-        $template = $this->template;
-        if ($template == '') $template = "DEFAULT";
-
-        wm_debug("Resetting $this->name with $template\n");
-
-        // the internal default-default gets it's values from inherit_fieldlist
-        // everything else comes from a link object - the template.
-        if ($this->name == ':: DEFAULT ::') {
-            foreach (array_keys($this->inherit_fieldlist) as $fld) {
-                $this->$fld = $this->inherit_fieldlist[$fld];
-            }
-        } else {
-            $this->CopyFrom($this->owner->links[$template]);
-        }
-        $this->template = $template;
-
-        // to stop the editor tanking, now that colours are decided earlier in ReadData
-        $this->colours[IN] = new WMColour(192, 192, 192);
-        $this->colours[OUT] = new WMColour(192, 192, 192);
-        $this->id = $newowner->next_id++;
-    }
-
-    function my_type()
+    public function my_type()
     {
         return "LINK";
     }
 
-    function getTemplateObject()
+    public function getTemplateObject()
     {
         return $this->owner->getLink($this->template);
     }
 
-    function isTemplate()
+    public function isTemplate()
     {
         return !isset($this->a);
     }
@@ -176,7 +156,7 @@ class WeatherMapLink extends WeatherMapDataItem
         return array(IN, OUT);
     }
 
-    function drawComments($gdImage)
+    private function drawComments($gdImage)
     {
         wm_debug("Link " . $this->name . ": Drawing comments.\n");
 
@@ -280,7 +260,7 @@ class WeatherMapLink extends WeatherMapDataItem
      * @param WeatherMap $map
      * @throws WeathermapInternalFail
      */
-    function preCalculate(&$map)
+    public function preCalculate(&$map)
     {
         wm_debug("Link " . $this->name . ": Calculating geometry.\n");
 
@@ -360,16 +340,14 @@ class WeatherMapLink extends WeatherMapDataItem
         }
 
         $this->geometry = WMLinkGeometryFactory::create($style);
-        $this->geometry->Init($this, $points, $widths, ($this->linkstyle == 'oneway' ? 1 : 2), $this->splitpos,
-            $this->arrowstyle);
+        $this->geometry->Init($this, $points, $widths, ($this->linkstyle == 'oneway' ? 1 : 2), $this->splitpos, $this->arrowstyle);
     }
 
-    function Draw($im, &$map)
+    public function Draw($im, &$map)
     {
         wm_debug("Link " . $this->name . ": Drawing.\n");
         // If there is geometry to draw, draw it
         if (!is_null($this->geometry)) {
-
             wm_debug(get_class($this->geometry) . "\n");
 
             $this->geometry->setOutlineColour($this->outlinecolour);
@@ -382,13 +360,11 @@ class WeatherMapLink extends WeatherMapDataItem
             }
 
             $this->drawBandwidthLabels($im);
-
         } else {
             wm_debug("Skipping link with no geometry attached\n");
         }
 
         $this->makeImagemapAreas();
-
     }
 
     private function makeImagemapAreas()
@@ -409,7 +385,7 @@ class WeatherMapLink extends WeatherMapDataItem
         }
     }
 
-    function drawBandwidthLabels($gdImage)
+    private function drawBandwidthLabels($gdImage)
     {
         wm_debug("Link " . $this->name . ": Drawing bwlabels.\n");
 
@@ -455,10 +431,9 @@ class WeatherMapLink extends WeatherMapDataItem
                 );
             }
         }
-
     }
 
-    function normaliseAngle($angle)
+    private function normaliseAngle($angle)
     {
         $out = $angle;
 
@@ -530,200 +505,201 @@ class WeatherMapLink extends WeatherMapDataItem
         $this->owner->imap->addArea($newArea);
     }
 
-    function WriteConfig()
+    public function WriteConfig()
     {
+        if ($this->config_override != '') {
+            return $this->config_override . "\n";
+        }
+
         $output = '';
 
-        if ($this->config_override != '') {
-            $output = $this->config_override . "\n";
+        $dd = $this->owner->links[$this->template];
+
+        wm_debug("Writing config for LINK $this->name against $this->template\n");
+
+        $basic_params = array(
+            array('width', 'WIDTH', self::CONFIG_TYPE_LITERAL),
+            array('zorder', 'ZORDER', self::CONFIG_TYPE_LITERAL),
+            array('overlibwidth', 'OVERLIBWIDTH', self::CONFIG_TYPE_LITERAL),
+            array('overlibheight', 'OVERLIBHEIGHT', self::CONFIG_TYPE_LITERAL),
+            array('arrowstyle', 'ARROWSTYLE', self::CONFIG_TYPE_LITERAL),
+            array('viastyle', 'VIASTYLE', self::CONFIG_TYPE_LITERAL),
+            array('linkstyle', 'LINKSTYLE', self::CONFIG_TYPE_LITERAL),
+            array('splitpos', 'SPLITPOS', self::CONFIG_TYPE_LITERAL),
+            array('duplex', 'DUPLEX', self::CONFIG_TYPE_LITERAL),
+            array('commentstyle', 'COMMENTSTYLE', self::CONFIG_TYPE_LITERAL),
+            array('labelboxstyle', 'BWSTYLE', self::CONFIG_TYPE_LITERAL),
+            //		array('usescale','USESCALE',self::CONFIG_TYPE_LITERAL),
+
+            array('bwfont', 'BWFONT', self::CONFIG_TYPE_LITERAL),
+            array('commentfont', 'COMMENTFONT', self::CONFIG_TYPE_LITERAL),
+
+            array('bwoutlinecolour', 'BWOUTLINECOLOR', self::CONFIG_TYPE_COLOR),
+            array('bwboxcolour', 'BWBOXCOLOR', self::CONFIG_TYPE_COLOR),
+            array('outlinecolour', 'OUTLINECOLOR', self::CONFIG_TYPE_COLOR),
+            array('commentfontcolour', 'COMMENTFONTCOLOR', self::CONFIG_TYPE_COLOR),
+            array('bwfontcolour', 'BWFONTCOLOR', self::CONFIG_TYPE_COLOR)
+        );
+
+        # TEMPLATE must come first. DEFAULT
+        if ($this->template != 'DEFAULT' && $this->template != ':: DEFAULT ::') {
+            $output .= "\tTEMPLATE " . $this->template . "\n";
+        }
+
+        $output .= $this->getSimpleConfig($basic_params, $dd);
+
+        $val = $this->usescale . " " . $this->scaletype;
+        $comparison = $dd->usescale . " " . $dd->scaletype;
+
+        if (($val != $comparison)) {
+            $output .= "\tUSESCALE " . $val . "\n";
+        }
+
+        if ($this->infourl[IN] == $this->infourl[OUT]) {
+            $dirs = array(IN => ""); // only use the IN value, since they're both the same, but don't prefix the output keyword
         } else {
-            $dd = $this->owner->links[$this->template];
+            $dirs = array(IN => "IN", OUT => "OUT");// the full monty two-keyword version
+        }
 
-            wm_debug("Writing config for LINK $this->name against $this->template\n");
-
-            $basic_params = array(
-                array('width', 'WIDTH', self::CONFIG_TYPE_LITERAL),
-                array('zorder', 'ZORDER', self::CONFIG_TYPE_LITERAL),
-                array('overlibwidth', 'OVERLIBWIDTH', self::CONFIG_TYPE_LITERAL),
-                array('overlibheight', 'OVERLIBHEIGHT', self::CONFIG_TYPE_LITERAL),
-                array('arrowstyle', 'ARROWSTYLE', self::CONFIG_TYPE_LITERAL),
-                array('viastyle', 'VIASTYLE', self::CONFIG_TYPE_LITERAL),
-                array('linkstyle', 'LINKSTYLE', self::CONFIG_TYPE_LITERAL),
-                array('splitpos', 'SPLITPOS', self::CONFIG_TYPE_LITERAL),
-                array('duplex', 'DUPLEX', self::CONFIG_TYPE_LITERAL),
-                array('commentstyle', 'COMMENTSTYLE', self::CONFIG_TYPE_LITERAL),
-                array('labelboxstyle', 'BWSTYLE', self::CONFIG_TYPE_LITERAL),
-                //		array('usescale','USESCALE',self::CONFIG_TYPE_LITERAL),
-
-                array('bwfont', 'BWFONT', self::CONFIG_TYPE_LITERAL),
-                array('commentfont', 'COMMENTFONT', self::CONFIG_TYPE_LITERAL),
-
-                array('bwoutlinecolour', 'BWOUTLINECOLOR', self::CONFIG_TYPE_COLOR),
-                array('bwboxcolour', 'BWBOXCOLOR', self::CONFIG_TYPE_COLOR),
-                array('outlinecolour', 'OUTLINECOLOR', self::CONFIG_TYPE_COLOR),
-                array('commentfontcolour', 'COMMENTFONTCOLOR', self::CONFIG_TYPE_COLOR),
-                array('bwfontcolour', 'BWFONTCOLOR', self::CONFIG_TYPE_COLOR)
-            );
-
-            # TEMPLATE must come first. DEFAULT
-            if ($this->template != 'DEFAULT' && $this->template != ':: DEFAULT ::') {
-                $output .= "\tTEMPLATE " . $this->template . "\n";
-            }
-
-            $output .= $this->getSimpleConfig($basic_params, $dd);
-
-            $val = $this->usescale . " " . $this->scaletype;
-            $comparison = $dd->usescale . " " . $dd->scaletype;
-
-            if (($val != $comparison)) {
-                $output .= "\tUSESCALE " . $val . "\n";
-            }
-
-            if ($this->infourl[IN] == $this->infourl[OUT]) {
-                $dirs = array(IN => ""); // only use the IN value, since they're both the same, but don't prefix the output keyword
-            } else {
-                $dirs = array(IN => "IN", OUT => "OUT");// the full monty two-keyword version
-            }
-
-            foreach ($dirs as $dir => $tdir) {
-                if ($this->infourl[$dir] != $dd->infourl[$dir]) {
-                    $output .= "\t" . $tdir . "INFOURL " . $this->infourl[$dir] . "\n";
-                }
-            }
-
-            if ($this->overlibcaption[IN] == $this->overlibcaption[OUT]) {
-                $dirs = array(IN => ""); // only use the IN value, since they're both the same, but don't prefix the output keyword
-            } else {
-                $dirs = array(IN => "IN", OUT => "OUT");// the full monty two-keyword version
-            }
-
-            foreach ($dirs as $dir => $tdir) {
-                if ($this->overlibcaption[$dir] != $dd->overlibcaption[$dir]) {
-                    $output .= "\t" . $tdir . "OVERLIBCAPTION " . $this->overlibcaption[$dir] . "\n";
-                }
-            }
-
-            if ($this->notestext[IN] == $this->notestext[OUT]) {
-                $dirs = array(IN => ""); // only use the IN value, since they're both the same, but don't prefix the output keyword
-            } else {
-                $dirs = array(IN => "IN", OUT => "OUT");// the full monty two-keyword version
-            }
-
-            foreach ($dirs as $dir => $tdir) {
-                if ($this->notestext[$dir] != $dd->notestext[$dir]) {
-                    $output .= "\t" . $tdir . "NOTES " . $this->notestext[$dir] . "\n";
-                }
-            }
-
-            if ($this->overliburl[IN] == $this->overliburl[OUT]) {
-                $dirs = array(IN => ""); // only use the IN value, since they're both the same, but don't prefix the output keyword
-            } else {
-                $dirs = array(IN => "IN", OUT => "OUT");// the full monty two-keyword version
-            }
-
-            foreach ($dirs as $dir => $tdir) {
-                if ($this->overliburl[$dir] != $dd->overliburl[$dir]) {
-                    $output .= "\t" . $tdir . "OVERLIBGRAPH " . join(" ", $this->overliburl[$dir]) . "\n";
-                }
-            }
-
-            // if formats have been set, but they're just the longform of the built-in styles, set them back to the built-in styles
-            if ($this->labelstyle == '--' && $this->bwlabelformats[IN] == self::FMT_PERC_IN && $this->bwlabelformats[OUT] == self::FMT_PERC_OUT) {
-                $this->labelstyle = 'percent';
-            }
-            if ($this->labelstyle == '--' && $this->bwlabelformats[IN] == self::FMT_BITS_IN && $this->bwlabelformats[OUT] == self::FMT_BITS_OUT) {
-                $this->labelstyle = 'bits';
-            }
-            if ($this->labelstyle == '--' && $this->bwlabelformats[IN] == self::FMT_UNFORM_IN && $this->bwlabelformats[OUT] == self::FMT_UNFORM_OUT) {
-                $this->labelstyle = 'unformatted';
-            }
-
-            // if specific formats have been set, then the style will be '--'
-            // if it isn't then use the named style
-            if (($this->labelstyle != $dd->labelstyle) && ($this->labelstyle != '--')) {
-                $output .= "\tBWLABEL " . $this->labelstyle . "\n";
-            }
-
-            // if either IN or OUT field changes, then both must be written because a regular BWLABEL can't do it
-            // XXX this looks wrong
-            $comparison = $dd->bwlabelformats[IN];
-            $comparison2 = $dd->bwlabelformats[OUT];
-
-            if (($this->labelstyle == '--') && (($this->bwlabelformats[IN] != $comparison) || ($this->bwlabelformats[OUT] != '--'))) {
-                $output .= "\tINBWFORMAT " . $this->bwlabelformats[IN] . "\n";
-                $output .= "\tOUTBWFORMAT " . $this->bwlabelformats[OUT] . "\n";
-            }
-
-            $comparison = $dd->labeloffset_in;
-            $comparison2 = $dd->labeloffset_out;
-
-            if (($this->labeloffset_in != $comparison) || ($this->labeloffset_out != $comparison2)) {
-                $output .= "\tBWLABELPOS " . $this->labeloffset_in . " " . $this->labeloffset_out . "\n";
-            }
-
-            $comparison = $dd->commentoffset_in . ":" . $dd->commentoffset_out;
-            $mine = $this->commentoffset_in . ":" . $this->commentoffset_out;
-            if ($mine != $comparison) {
-                $output .= "\tCOMMENTPOS " . $this->commentoffset_in . " " . $this->commentoffset_out . "\n";
-            }
-
-            $comparison = $dd->targets;
-
-            if ($this->targets != $comparison) {
-                $output .= "\tTARGET";
-
-                foreach ($this->targets as $target) {
-                    $output .= " " . $target->asConfig();
-                }
-                $output .= "\n";
-            }
-
-            foreach (array("IN", "OUT") as $tdir) {
-                $dir = constant($tdir);
-
-                $comparison = $dd->comments[$dir];
-                if ($this->comments[$dir] != $comparison) {
-                    $output .= "\t" . $tdir . "COMMENT " . $this->comments[$dir] . "\n";
-                }
-            }
-
-            if (isset($this->a) && isset($this->b)) {
-                $output .= "\tNODES " . $this->a->name;
-
-                if ($this->a_offset != 'C') {
-                    $output .= ":" . $this->a_offset;
-                }
-
-                $output .= " " . $this->b->name;
-
-                if ($this->b_offset != 'C') {
-                    $output .= ":" . $this->b_offset;
-                }
-
-                $output .= "\n";
-            }
-
-            if (count($this->vialist) > 0) {
-                foreach ($this->vialist as $via) {
-                    if (isset($via[2])) {
-                        $output .= sprintf("\tVIA %s %d %d\n", $via[2], $via[0], $via[1]);
-                    } else {
-                        $output .= sprintf("\tVIA %d %d\n", $via[0], $via[1]);
-                    }
-                }
-            }
-
-            $output .= $this->getMaxValueConfig($dd, "BANDWIDTH");
-            $output .= $this->getHintConfig($dd);
-
-            if ($output != '') {
-                $output = "LINK " . $this->name . "\n" . $output . "\n";
+        foreach ($dirs as $dir => $tdir) {
+            if ($this->infourl[$dir] != $dd->infourl[$dir]) {
+                $output .= "\t" . $tdir . "INFOURL " . $this->infourl[$dir] . "\n";
             }
         }
-        return ($output);
+
+        if ($this->overlibcaption[IN] == $this->overlibcaption[OUT]) {
+            $dirs = array(IN => ""); // only use the IN value, since they're both the same, but don't prefix the output keyword
+        } else {
+            $dirs = array(IN => "IN", OUT => "OUT");// the full monty two-keyword version
+        }
+
+        foreach ($dirs as $dir => $tdir) {
+            if ($this->overlibcaption[$dir] != $dd->overlibcaption[$dir]) {
+                $output .= "\t" . $tdir . "OVERLIBCAPTION " . $this->overlibcaption[$dir] . "\n";
+            }
+        }
+
+        if ($this->notestext[IN] == $this->notestext[OUT]) {
+            $dirs = array(IN => ""); // only use the IN value, since they're both the same, but don't prefix the output keyword
+        } else {
+            $dirs = array(IN => "IN", OUT => "OUT");// the full monty two-keyword version
+        }
+
+        foreach ($dirs as $dir => $tdir) {
+            if ($this->notestext[$dir] != $dd->notestext[$dir]) {
+                $output .= "\t" . $tdir . "NOTES " . $this->notestext[$dir] . "\n";
+            }
+        }
+
+        if ($this->overliburl[IN] == $this->overliburl[OUT]) {
+            $dirs = array(IN => ""); // only use the IN value, since they're both the same, but don't prefix the output keyword
+        } else {
+            $dirs = array(IN => "IN", OUT => "OUT");// the full monty two-keyword version
+        }
+
+        foreach ($dirs as $dir => $tdir) {
+            if ($this->overliburl[$dir] != $dd->overliburl[$dir]) {
+                $output .= "\t" . $tdir . "OVERLIBGRAPH " . join(" ", $this->overliburl[$dir]) . "\n";
+            }
+        }
+
+        // if formats have been set, but they're just the longform of the built-in styles, set them back to the built-in styles
+        if ($this->labelstyle == '--' && $this->bwlabelformats[IN] == self::FMT_PERC_IN && $this->bwlabelformats[OUT] == self::FMT_PERC_OUT) {
+            $this->labelstyle = 'percent';
+        }
+        if ($this->labelstyle == '--' && $this->bwlabelformats[IN] == self::FMT_BITS_IN && $this->bwlabelformats[OUT] == self::FMT_BITS_OUT) {
+            $this->labelstyle = 'bits';
+        }
+        if ($this->labelstyle == '--' && $this->bwlabelformats[IN] == self::FMT_UNFORM_IN && $this->bwlabelformats[OUT] == self::FMT_UNFORM_OUT) {
+            $this->labelstyle = 'unformatted';
+        }
+
+        // if specific formats have been set, then the style will be '--'
+        // if it isn't then use the named style
+        if (($this->labelstyle != $dd->labelstyle) && ($this->labelstyle != '--')) {
+            $output .= "\tBWLABEL " . $this->labelstyle . "\n";
+        }
+
+        // if either IN or OUT field changes, then both must be written because a regular BWLABEL can't do it
+        // XXX this looks wrong
+        $comparison = $dd->bwlabelformats[IN];
+        $comparison2 = $dd->bwlabelformats[OUT];
+
+        if (($this->labelstyle == '--') && (($this->bwlabelformats[IN] != $comparison) || ($this->bwlabelformats[OUT] != '--'))) {
+            $output .= "\tINBWFORMAT " . $this->bwlabelformats[IN] . "\n";
+            $output .= "\tOUTBWFORMAT " . $this->bwlabelformats[OUT] . "\n";
+        }
+
+        $comparison = $dd->labeloffset_in;
+        $comparison2 = $dd->labeloffset_out;
+
+        if (($this->labeloffset_in != $comparison) || ($this->labeloffset_out != $comparison2)) {
+            $output .= "\tBWLABELPOS " . $this->labeloffset_in . " " . $this->labeloffset_out . "\n";
+        }
+
+        $comparison = $dd->commentoffset_in . ":" . $dd->commentoffset_out;
+        $mine = $this->commentoffset_in . ":" . $this->commentoffset_out;
+        if ($mine != $comparison) {
+            $output .= "\tCOMMENTPOS " . $this->commentoffset_in . " " . $this->commentoffset_out . "\n";
+        }
+
+        $comparison = $dd->targets;
+
+        if ($this->targets != $comparison) {
+            $output .= "\tTARGET";
+
+            foreach ($this->targets as $target) {
+                $output .= " " . $target->asConfig();
+            }
+            $output .= "\n";
+        }
+
+        foreach (array("IN", "OUT") as $tdir) {
+            $dir = constant($tdir);
+
+            $comparison = $dd->comments[$dir];
+            if ($this->comments[$dir] != $comparison) {
+                $output .= "\t" . $tdir . "COMMENT " . $this->comments[$dir] . "\n";
+            }
+        }
+
+        if (isset($this->a) && isset($this->b)) {
+            $output .= "\tNODES " . $this->a->name;
+
+            if ($this->a_offset != 'C') {
+                $output .= ":" . $this->a_offset;
+            }
+
+            $output .= " " . $this->b->name;
+
+            if ($this->b_offset != 'C') {
+                $output .= ":" . $this->b_offset;
+            }
+
+            $output .= "\n";
+        }
+
+        if (count($this->vialist) > 0) {
+            foreach ($this->vialist as $via) {
+                if (isset($via[2])) {
+                    $output .= sprintf("\tVIA %s %d %d\n", $via[2], $via[0], $via[1]);
+                } else {
+                    $output .= sprintf("\tVIA %d %d\n", $via[0], $via[1]);
+                }
+            }
+        }
+
+        $output .= $this->getMaxValueConfig($dd, "BANDWIDTH");
+        $output .= $this->getHintConfig($dd);
+
+        if ($output != '') {
+            $output = "LINK " . $this->name . "\n" . $output . "\n";
+        }
+
+        return $output;
     }
 
-    function asJSCore()
+    protected function asJSCore()
     {
         $output = "";
 
@@ -787,7 +763,7 @@ class WeatherMapLink extends WeatherMapDataItem
         return $output;
     }
 
-    function asJS($type = "Link", $prefix = "L")
+    public function asJS($type = "Link", $prefix = "L")
     {
         return parent::asJS($type, $prefix);
     }
@@ -799,7 +775,7 @@ class WeatherMapLink extends WeatherMapDataItem
         $this->owner = null;
         $this->a = null;
         $this->b = null;
-       // $this->parent = null;
+        // $this->parent = null;
         $this->descendents = null;
     }
 
@@ -845,9 +821,6 @@ class WeatherMapLink extends WeatherMapDataItem
             $this->b->addDependency($this);
         }
     }
-
 }
-
-;
 
 // vim:ts=4:sw=4:

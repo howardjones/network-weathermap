@@ -378,8 +378,6 @@ class WeatherMapDataSource_rrd extends WeatherMapDataSource
 
         $dsnames[IN] = "traffic_in";
         $dsnames[OUT] = "traffic_out";
-        $this->data[IN] = null;
-        $this->data[OUT] = null;
         $SQL[IN] = 'select null';
         $SQL[OUT] = 'select null';
         $rrdfile = $targetstring;
@@ -394,10 +392,6 @@ class WeatherMapDataSource_rrd extends WeatherMapDataSource
         }
 
         $multiplier = 8; // default bytes-to-bits
-
-        $inbw = null;
-        $outbw = null;
-        $this->dataTime = 0;
 
         if (preg_match('/^(.*\.rrd):([\-a-zA-Z0-9_]+):([\-a-zA-Z0-9_]+)$/', $targetstring, $matches)) {
             $rrdfile = $matches[1];

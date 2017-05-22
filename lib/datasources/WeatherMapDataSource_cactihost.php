@@ -14,10 +14,9 @@ class WeatherMapDataSource_cactihost extends WeatherMapDataSource
         );
 
         $this->name= "CactiHost";
-
     }
 
-    function Init(&$map)
+    public function Init(&$map)
     {
         if ($map->context == 'cacti') {
             if (function_exists('db_fetch_row')) {
@@ -38,7 +37,7 @@ class WeatherMapDataSource_cactihost extends WeatherMapDataSource
      * @param WeatherMapDataItem $item
      * @return array
      */
-    function ReadData($targetstring, &$map, &$item)
+    public function ReadData($targetstring, &$map, &$item)
     {
         if (preg_match($this->regexpsHandled[0], $targetstring, $matches)) {
             $cacti_id = intval($matches[1]);

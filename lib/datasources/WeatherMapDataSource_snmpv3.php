@@ -19,41 +19,37 @@ class WeatherMapDataSource_snmpv3 extends WeatherMapDataSource
 {
     protected $down_cache;
 
-    function Init(&$map)
+    public function __construct()
+    {
+        parent::__construct();
+
+        $this->regexpsHandled = array(
+            '/^snmp3:([^:]+):([^:]+):([^:]+):([^:]+)$/'
+        );
+        $this->name = "SNMP3";
+    }
+
+    public function Init(&$map)
     {
         // We can keep a list of unresponsive nodes, so we can give up earlier
         $this->down_cache = array();
 
         if (function_exists('snmp3_get')) {
-            return TRUE;
+            return true;
         }
         wm_debug("SNMP3 DS: snmp3_get() not found. Do you have the PHP SNMP module?\n");
 
-        return FALSE;
+        return false;
     }
 
-
-    function Recognise($targetstring)
+    public function ReadData($targetstring, &$map, &$item)
     {
-        if (preg_match("/^snmp3:([^:]+):([^:]+):([^:]+):([^:]+)$/", $targetstring, $matches)) {
-            return TRUE;
-        }
-        return FALSE;
-
-    }
-
-    function ReadData($targetstring, &$map, &$item)
-    {
-        $data[IN] = NULL;
-        $data[OUT] = NULL;
-        $data_time = 0;
-
         $timeout = 1000000;
         $retries = 2;
         $abort_count = 0;
 
-        $get_results = NULL;
-        $out_result = NULL;
+        $get_results = null;
+        $out_result = null;
 
         $timeout = intval($map->get_hint("snmp_timeout", $timeout));
         $abort_count = intval($map->get_hint("snmp_abort_count", $abort_count));
@@ -69,8 +65,7 @@ class WeatherMapDataSource_snmpv3 extends WeatherMapDataSource
             $oids[IN] = $matches[3];
             $oids[OUT] = $matches[4];
 
-            if (
-                ($abort_count == 0)
+            if (($abort_count == 0)
                 || (
                     ($abort_count > 0)
                     && (!isset($this->down_cache[$host]) || intval($this->down_cache[$host]) < $abort_count)
@@ -139,7 +134,6 @@ class WeatherMapDataSource_snmpv3 extends WeatherMapDataSource
                         if (! $result) {
                             wm_warn("SNMPv3 ReadData snmp3_" . $profile_name . "_import failed to read data from Cacti host id $import");
                         } else {
-
                             $mapping = array(
                                 "username" => "snmp_username",
                                 "authpass" => "snmp_password",
@@ -158,7 +152,6 @@ class WeatherMapDataSource_snmpv3 extends WeatherMapDataSource
                             }
                             wm_debug("SNMPv3 ReadData Imported Cacti info for device %d into profile named %s\n", $import, $profile_name);
                         }
-
                     } else {
                         wm_warn("SNMPv3 ReadData snmp3_" . $profile_name . "_import is set but not running in Cacti");
                     }
@@ -180,8 +173,8 @@ class WeatherMapDataSource_snmpv3 extends WeatherMapDataSource
                             $oid = $oids[$id];
                             wm_debug("Going to get $oid\n");
                             $results[$id] = snmp3_get($host, $params['username'], $params['seclevel'], $params['authproto'], $params['authpass'], $params['privproto'], $params['privpass'], $oid, $timeout, $retries);
-                            if ($results[$id] !== FALSE) {
-                                $data[$id] = floatval($results[$id]);
+                            if ($results[$id] !== false) {
+                                $this->data[$id] = floatval($results[$id]);
                                 $item->add_hint("snmp_" . $name . "_raw", $results[$id]);
                             } else {
                                 $this->down_cache{$host}++;
@@ -196,12 +189,11 @@ class WeatherMapDataSource_snmpv3 extends WeatherMapDataSource
 
                 wm_debug("SNMPv3 ReadData: Got '%s' and '%s'\n", $results[IN], $results[OUT]);
 
-                $data_time = time();
+                $this->dataTime = time();
 
                 if (function_exists("snmp_set_quick_print")) {
                     snmp_set_quick_print($was);
                 }
-
             } else {
                 wm_warn("SNMP for $host has reached $abort_count failures. Skipping. [WMSNMP01]");
             }
@@ -209,9 +201,7 @@ class WeatherMapDataSource_snmpv3 extends WeatherMapDataSource
             wm_debug("SNMPv3 ReadData: regexp didn't match after Recognise did - this is odd!\n");
         }
 
-        wm_debug("SNMPv3 ReadData: Returning (" . ($data[IN] === NULL ? 'NULL' : $data[IN]) . "," . ($data[OUT] === NULL ? 'NULL' : $data[OUT]) . ",$data_time)\n");
-
-        return array($data[IN], $data[OUT], $data_time);
+        return $this->ReturnData();
     }
 }
 

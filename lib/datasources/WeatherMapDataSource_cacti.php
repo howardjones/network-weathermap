@@ -16,11 +16,10 @@ class WeatherMapDataSource_cacti extends WeatherMapDataSource
         $this->regexpsHandled = array(
             '/^cacti:(\d+)$/'
         );
-
     }
 
 
-    function Init(&$map)
+    public function Init(&$map)
     {
         if ($map->context === 'cacti') {
             if (true === function_exists('db_fetch_row')) {
@@ -35,9 +34,8 @@ class WeatherMapDataSource_cacti extends WeatherMapDataSource
         return false;
     }
 
-    function ReadData($targetstring, &$map, &$item)
+    public function ReadData($targetstring, &$map, &$item)
     {
-
         $data[IN] = null;
         $data[OUT] = null;
         $data_time = 0;
@@ -49,7 +47,6 @@ class WeatherMapDataSource_cacti extends WeatherMapDataSource
             $SQL = 'select * from weathermap_data where local_data_id='.$local_data_id;
 
             $result = db_fetch_row($SQL);
-
         }
 
         wm_debug(
@@ -61,12 +58,7 @@ class WeatherMapDataSource_cacti extends WeatherMapDataSource
             )
         );
 
-
-        return (array (
-            $data[IN],
-            $data[OUT],
-            $data_time
-        ));
+        return array ($data[IN], $data[OUT], $data_time);
     }
 }
 

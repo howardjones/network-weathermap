@@ -16,7 +16,7 @@ class WeatherMapDataSource_static extends WeatherMapDataSource
             '/^static:(\-?\d+\.?\d*[KMGT]?):(\-?\d+\.?\d*[KMGT]?)$/',
             '/^static:(\-?\d+\.?\d*[KMGT]?)$/'
         );
-        $this->name= "Static";
+        $this->name = "Static";
     }
 
     /**
@@ -25,7 +25,7 @@ class WeatherMapDataSource_static extends WeatherMapDataSource
      * @param WeatherMapDataItem $item A reference to the object this target is attached to
      * @return array invalue, outvalue, unix timestamp that the data was valid
      */
-    function ReadData($targetstring, &$map, &$item)
+    public function ReadData($targetstring, &$map, &$item)
     {
         if (preg_match($this->regexpsHandled[0], $targetstring, $matches)) {
             $this->data[IN] = WMUtility::interpretNumberWithMetricSuffix($matches[1], $map->kilo);

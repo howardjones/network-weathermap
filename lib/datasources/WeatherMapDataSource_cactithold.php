@@ -38,17 +38,14 @@ class WeatherMapDataSource_cactithold extends WeatherMapDataSource
         $this->thold10 = false;
     }
 
-    function Init(&$map)
+    public function Init(&$map)
     {
-        global $plugins;
-
-
         if ($map->context == 'cacti') {
             $pdo = weathermap_get_pdo();
 
             if (!function_exists('db_fetch_row')) {
                 wm_debug("ReadData CactiTHold: Cacti database library not found. [THOLD001]\n");
-                return (FALSE);
+                return false;
             }
 
             $thold_present = false;
@@ -84,9 +81,9 @@ class WeatherMapDataSource_cactithold extends WeatherMapDataSource
             $statement = $pdo->prepare("select * from plugin_config where directory='thold'");
             $statement->execute();
             $result = $statement->fetchall(PDO::FETCH_ASSOC);
-            if(sizeof($result)==1) {
+            if (sizeof($result) == 1) {
                 $version = $result[0]['version'];
-                if(substr($version,0,1) != "0") {
+                if (substr($version, 0, 1) != "0") {
                     $this->thold10 = true;
                     wm_debug("ReadData CactiTHold: detected Thold > 1.0, will adjust field names\n");
                 } else {
@@ -108,7 +105,7 @@ class WeatherMapDataSource_cactithold extends WeatherMapDataSource
      * @param WeatherMapDataItem $item A reference to the object this target is attached to
      * @return array invalue, outvalue, unix timestamp that the data was valid
      */
-    function ReadData($targetstring, &$map, &$item)
+    public function ReadData($targetstring, &$map, &$item)
     {
         $this->dataTime = time();
 

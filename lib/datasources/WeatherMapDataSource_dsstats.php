@@ -15,11 +15,9 @@ class WeatherMapDataSource_dsstats extends WeatherMapDataSource
         );
 
         $this->name = "CactiDSStats";
-
     }
 
-
-    function Init(&$map)
+    public function Init(&$map)
     {
         if ($map->context == 'cacti') {
             if (!function_exists('db_fetch_assoc')) {
@@ -83,17 +81,16 @@ class WeatherMapDataSource_dsstats extends WeatherMapDataSource
     // returns a 3-part array (invalue, outvalue and datavalid time_t)
     // invalue and outvalue should be -1,-1 if there is no valid data
     // data_time is intended to allow more informed graphing in the future
-    function ReadData($targetstring, &$map, &$item)
+    public function ReadData($targetstring, &$map, &$item)
     {
-
         $pdo = weathermap_get_pdo();
 
-        $local_data_id = NULL;
+        $local_data_id = null;
         $dsnames[IN] = "traffic_in";
         $dsnames[OUT] = "traffic_out";
 
-        $inbw = NULL;
-        $outbw = NULL;
+        $inbw = null;
+        $outbw = null;
 
         $table = "";
         $keyfield = "rrd_name";
@@ -111,22 +108,35 @@ class WeatherMapDataSource_dsstats extends WeatherMapDataSource
                 $datatype = $map->get_hint("dsstats_default_type");
                 wm_debug("Default datatype changed to " . $datatype . ".\n");
             }
-        } elseif (preg_match('/^dsstats:([a-z]+):(\d+):([\-a-zA-Z0-9_]+):([\-a-zA-Z0-9_]+)$/', $targetstring,
-            $matches)) {
+        } elseif (preg_match('/^dsstats:([a-z]+):(\d+):([\-a-zA-Z0-9_]+):([\-a-zA-Z0-9_]+)$/', $targetstring, $matches)) {
             $dsnames[IN] = $matches[3];
             $dsnames[OUT] = $matches[4];
             $datatype = $matches[1];
             $local_data_id = $matches[2];
         }
 
-        if (substr($datatype, 0, 5) == "daily") $table = "data_source_stats_daily";
-        if (substr($datatype, 0, 6) == "weekly") $table = "data_source_stats_weekly";
-        if (substr($datatype, 0, 7) == "monthly") $table = "data_source_stats_monthly";
-        if (substr($datatype, 0, 6) == "hourly") $table = "data_source_stats_hourly";
-        if (substr($datatype, 0, 6) == "yearly") $table = "data_source_stats_yearly";
+        if (substr($datatype, 0, 5) == "daily") {
+            $table = "data_source_stats_daily";
+        }
+        if (substr($datatype, 0, 6) == "weekly") {
+            $table = "data_source_stats_weekly";
+        }
+        if (substr($datatype, 0, 7) == "monthly") {
+            $table = "data_source_stats_monthly";
+        }
+        if (substr($datatype, 0, 6) == "hourly") {
+            $table = "data_source_stats_hourly";
+        }
+        if (substr($datatype, 0, 6) == "yearly") {
+            $table = "data_source_stats_yearly";
+        }
 
-        if (substr($datatype, -7) == "average") $field = "average";
-        if (substr($datatype, -4) == "peak") $field = "peak";
+        if (substr($datatype, -7) == "average") {
+            $field = "average";
+        }
+        if (substr($datatype, -4) == "peak") {
+            $field = "peak";
+        }
 
         if ($datatype == "last") {
             $field = "calculated";
@@ -140,10 +150,16 @@ class WeatherMapDataSource_dsstats extends WeatherMapDataSource
         }
 
         if ($table != "" and $field != "") {
-            $SQL = sprintf("select %s as name, %s as result from %s where local_data_id=%d and (%s=%s or %s=%s)",
-                $keyfield, $field,
-                $table, $local_data_id, $keyfield,
-                $pdo->quote($dsnames[IN]), $keyfield, $pdo->quote($dsnames[OUT])
+            $SQL = sprintf(
+                "select %s as name, %s as result from %s where local_data_id=%d and (%s=%s or %s=%s)",
+                $keyfield,
+                $field,
+                $table,
+                $local_data_id,
+                $keyfield,
+                $pdo->quote($dsnames[IN]),
+                $keyfield,
+                $pdo->quote($dsnames[OUT])
             );
 
             $results = db_fetch_assoc($SQL);
@@ -157,10 +173,11 @@ class WeatherMapDataSource_dsstats extends WeatherMapDataSource
                 }
             }
 
-            if ($datatype == 'wm' && ($this->data[IN] == NULL || $this->data[OUT] == NULL)) {
+            if ($datatype == 'wm' && ($this->data[IN] == null || $this->data[OUT] == null)) {
                 wm_debug("Didn't get data for 'wm' source. Inserting new tasks for next poller cycle\n");
                 // insert the required details into weathermap_data, so it will be picked up next time
-                $SQL = sprintf("select data_template_data.data_source_path as path from data_template_data,data_template_rrd where data_template_data.local_data_id=data_template_rrd.local_data_id and data_template_rrd.local_data_id=%d",
+                $SQL = sprintf(
+                    "select data_template_data.data_source_path as path from data_template_data,data_template_rrd where data_template_data.local_data_id=data_template_rrd.local_data_id and data_template_rrd.local_data_id=%d",
                     $local_data_id
                 );
                 $result = db_fetch_row($SQL);
@@ -168,7 +185,7 @@ class WeatherMapDataSource_dsstats extends WeatherMapDataSource
                     $db_rrdname = $result['path'];
                     wm_debug("Filename is $db_rrdname");
                     foreach (array(IN, OUT) as $dir) {
-                        if ($this->data[$dir] === NULL) {
+                        if ($this->data[$dir] === null) {
                             $statement = $pdo->prepare("insert into weathermap_data (rrdfile, data_source_name, sequence, local_data_id) values (?,?,?,?)");
                             $statement->execute(array($db_rrdname, $dsnames[$dir], 0, $local_data_id));
                         }
@@ -186,7 +203,6 @@ class WeatherMapDataSource_dsstats extends WeatherMapDataSource
         }
 
         return $this->ReturnData();
-
     }
 }
 

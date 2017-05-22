@@ -16,41 +16,37 @@
 class WeatherMapDataSource_snmp extends WeatherMapDataSource
 {
 
-    function Init(&$map)
+    public function __construct()
+    {
+        parent::__construct();
+
+        $this->regexpsHandled = array(
+            '/^snmp:([^:]+):([^:]+):([^:]+):([^:]+)$/'
+        );
+        $this->name = "SNMP1";
+    }
+
+    public function Init(&$map)
     {
         // We can keep a list of unresponsive nodes, so we can give up earlier
         $this->down_cache = array();
 
         if (function_exists('snmpget')) {
-            return (TRUE);
+            return true;
         }
         wm_debug("SNMP DS: snmpget() not found. Do you have the PHP SNMP module?\n");
 
-        return (FALSE);
+        return false;
     }
 
-
-    function Recognise($targetstring)
+    public function ReadData($targetstring, &$map, &$item)
     {
-        if (preg_match("/^snmp:([^:]+):([^:]+):([^:]+):([^:]+)$/", $targetstring, $matches)) {
-            return TRUE;
-        } else {
-            return FALSE;
-        }
-    }
-
-    function ReadData($targetstring, &$map, &$item)
-    {
-        $data[IN] = NULL;
-        $data[OUT] = NULL;
-        $data_time = 0;
-
         $timeout = 1000000;
         $retries = 2;
         $abort_count = 0;
 
-        $in_result = NULL;
-        $out_result = NULL;
+        $in_result = null;
+        $out_result = null;
 
         $timeout = intval($map->get_hint("snmp_timeout", $timeout));
         $abort_count = intval($map->get_hint("snmp_abort_count", $abort_count));
@@ -66,8 +62,7 @@ class WeatherMapDataSource_snmp extends WeatherMapDataSource
             $in_oid = $matches[3];
             $out_oid = $matches[4];
 
-            if (
-                ($abort_count == 0)
+            if (($abort_count == 0)
                 || (
                     ($abort_count > 0)
                     && (!isset($this->down_cache[$host]) || intval($this->down_cache[$host]) < $abort_count)
@@ -90,8 +85,8 @@ class WeatherMapDataSource_snmp extends WeatherMapDataSource
 
                 if ($in_oid != '-') {
                     $in_result = snmpget($host, $community, $in_oid, $timeout, $retries);
-                    if ($in_result !== FALSE) {
-                        $data[IN] = floatval($in_result);
+                    if ($in_result !== false) {
+                        $this->data[IN] = floatval($in_result);
                         $item->add_hint("snmp_in_raw", $in_result);
                     } else {
                         $this->down_cache{$host}++;
@@ -99,10 +94,10 @@ class WeatherMapDataSource_snmp extends WeatherMapDataSource
                 }
                 if ($out_oid != '-') {
                     $out_result = snmpget($host, $community, $out_oid, $timeout, $retries);
-                    if ($out_result !== FALSE) {
+                    if ($out_result !== false) {
                         // use floatval() here to force the output to be *some* kind of number
                         // just in case the stupid formatting stuff doesn't stop net-snmp returning 'down' instead of 2
-                        $data[OUT] = floatval($out_result);
+                        $this->data[OUT] = floatval($out_result);
                         $item->add_hint("snmp_out_raw", $out_result);
                     } else {
                         $this->down_cache{$host}++;
@@ -111,7 +106,7 @@ class WeatherMapDataSource_snmp extends WeatherMapDataSource
 
                 wm_debug("SNMP ReadData: Got $in_result and $out_result\n");
 
-                $data_time = time();
+                $this->dataTime = time();
 
                 if (function_exists("snmp_set_quick_print")) {
                     snmp_set_quick_print($was);
@@ -121,9 +116,7 @@ class WeatherMapDataSource_snmp extends WeatherMapDataSource
             }
         }
 
-        wm_debug("SNMP ReadData: Returning (" . ($data[IN] === NULL ? 'NULL' : $data[IN]) . "," . ($data[OUT] === NULL ? 'NULL' : $data[OUT]) . ",$data_time)\n");
-
-        return (array($data[IN], $data[OUT], $data_time));
+        return $this->ReturnData();
     }
 }
 

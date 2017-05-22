@@ -17,9 +17,9 @@ class WeatherMapDataSource_time extends WeatherMapDataSource
     {
         if (preg_match('/^[234]\./', phpversion())) {
             wm_debug("Time plugin requires PHP 5+ to run\n");
-            return FALSE;
+            return false;
         }
-        return TRUE;
+        return true;
     }
 
 
@@ -29,7 +29,7 @@ class WeatherMapDataSource_time extends WeatherMapDataSource
      * @param WeatherMapDataItem $item
      * @return array
      */
-    function ReadData($targetstring, &$map, &$item)
+    public function ReadData($targetstring, &$map, &$item)
     {
         $matches = 0;
 

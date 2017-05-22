@@ -17,7 +17,7 @@ class WeatherMapDataSource_dbsample extends WeatherMapDataSource
         $this->name = "dbsample";
     }
 
-    function Init(&$map)
+    public function Init(&$map)
     {
         if (!function_exists("mysql_connect")) {
             return false;
@@ -27,7 +27,7 @@ class WeatherMapDataSource_dbsample extends WeatherMapDataSource
     }
 
 
-    function ReadData($targetstring, &$map, &$item)
+    public function ReadData($targetstring, &$map, &$item)
     {
         $pdo = null;
 

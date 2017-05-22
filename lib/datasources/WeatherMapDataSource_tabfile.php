@@ -10,7 +10,6 @@ class WeatherMapDataSource_tabfile extends WeatherMapDataSource
         $this->regexpsHandled = array(
             '/\.(tsv|txt)$/'
         );
-
     }
 
     /**
@@ -90,7 +89,6 @@ class WeatherMapDataSource_tabfile extends WeatherMapDataSource
         $fileHandle = fopen($fullpath, "r");
         return $fileHandle;
     }
-
 }
 
 // vim:ts=4:sw=4:

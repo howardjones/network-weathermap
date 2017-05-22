@@ -8,11 +8,23 @@
 class WeatherMapDataSource_fping extends WeatherMapDataSource
 {
 
-    var $addresscache = array();
-    var $donepings = false;
-    var $results = array();
+    private $addresscache = array();
+    private $donepings = false;
+    private $results = array();
 
-    function Init(&$map)
+
+    public function __construct()
+    {
+        parent::__construct();
+
+        $this->regexpsHandled = array(
+            '/^fping:(\S+)$/'
+        );
+        $this->name = "FPing";
+    }
+
+
+    public function Init(&$map)
     {
         #
         # You may need to change the line below to have something like "/usr/local/bin/fping" or "/usr/bin/fping" instead.
@@ -22,31 +34,25 @@ class WeatherMapDataSource_fping extends WeatherMapDataSource
         return (true);
     }
 
-    // this function will get called for every datasource, even if we replied FALSE to Init.
-    // (so that we can warn the user that it *would* have worked, if only the plugin could run)
-    // SO... don't do anything in here that relies on the things that Init looked for, because they might not exist!
-    function Recognise($targetstring)
+    /**
+     * pre-register a target + context, to allow a plugin to batch up queries to a slow database, or SNMP for example
+     *
+     * @param string $targetstring A clause from a TARGET line, after being processed by ProcessString
+     * @param WeatherMap $map the WeatherMap main object
+     * @param WeatherMapDataItem $item the specific WeatherMapItem that this target is for
+     */
+    public function Register($targetstring, &$map, &$item)
     {
-        if (preg_match('/^fping:(\S+)$/', $targetstring, $matches)) {   
+        if (preg_match('/^fping:(\S+)$/', $targetstring, $matches)) {
             // save the address. This way, we can do ONE fping call for all the pings in the map.
             // fping does it all in parallel, so 10 hosts takes the same time as 1
+            // TODO - actually implement that!
             $this->addresscache[] = $matches[1];
-            return true;
-        } else {
-            return false;
         }
     }
 
-    function ReadData($targetstring, &$map, &$item)
+    public function ReadData($targetstring, &$map, &$item)
     {
-        $data[IN] = null;
-        $data[OUT] = null;
-        $data_time = 0;
-
-        #debug("-------------------------\n");
-        #print_r($this->addresscache);
-        #debug("-------------------------\n");
-
         $ping_count = intval($map->get_hint("fping_ping_count"));
         if ($ping_count == 0) {
             $ping_count = 5;
@@ -107,21 +113,20 @@ class WeatherMapDataSource_fping extends WeatherMapDataSource
                         if ($hitcount == 0) {
                             wm_warn("FPing ReadData: $count lines read. But nothing returned for target??? ($target) Try running with DEBUG to see output.  [WMFPING02]\n");
                         } else {
-                            $data[IN] = $ave;
-                            $data[OUT] = $loss;
+                            $this->data[IN] = $ave;
+                            $this->data[OUT] = $loss;
                             $item->add_note("fping_min", $min);
                             $item->add_note("fping_max", $max);
                         }
                     }
+                    $this->dataTime = time();
                 }
             } else {
                 wm_warn("FPing ReadData: Can't find fping executable. Check path at line 19 of WeatherMapDataSource_fping.php [WMFPING01]\n");
             }
         }
 
-        wm_debug("FPing ReadData: Returning (" . ($data[IN] === null ? 'NULL' : $data[IN]) . "," . ($data[OUT] === null ? 'NULL' : $data[OUT]) . ",$data_time)\n");
-
-        return (array($data[IN], $data[OUT], $data_time));
+        return $this->ReturnData();
     }
 }
 

@@ -33,7 +33,7 @@ class WeatherMapDataSource
     {
         $this->owner = $map;
 
-        return TRUE;
+        return true;
     }
 
     /**
@@ -67,7 +67,7 @@ class WeatherMapDataSource
      */
     function ReadData($targetstring, &$map, &$item)
     {
-        return (array(-1, -1));
+        return array(-1, -1);
     }
 
     /**
@@ -89,7 +89,7 @@ class WeatherMapDataSource
             )
         );
 
-        return (array($this->data[IN], $this->data[OUT], $this->dataTime));
+        return array($this->data[IN], $this->data[OUT], $this->dataTime);
     }
 
     /**
@@ -101,7 +101,6 @@ class WeatherMapDataSource
      */
     public function Register($targetstring, &$map, &$item)
     {
-
     }
 
     /**
@@ -111,7 +110,6 @@ class WeatherMapDataSource
      */
     public function Prefetch(&$map)
     {
-
     }
 
     /**
@@ -122,10 +120,7 @@ class WeatherMapDataSource
      */
     public function CleanUp(&$map)
     {
-
     }
-
-
 }
 
 

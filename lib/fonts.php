@@ -37,7 +37,6 @@ class WMFont
 
     public function drawImageString($gdImage, $x, $y, $string, $colour, $angle = 0)
     {
-
     }
 
     public function calculateImageStringSize($string)
@@ -92,7 +91,6 @@ class WMTrueTypeFont extends WMFont
         }
         wm_warn("Could not load font - $filename");
         return false;
-
     }
 
     public function calculateImageStringSize($string)
@@ -111,7 +109,7 @@ class WMTrueTypeFont extends WMFont
             $height += ($charHeight * 1.2) - $this->v_offset;  # subtract v_offset, due to coordinate system
         }
 
-        return (array($width, $height));
+        return array($width, $height);
     }
 }
 
@@ -175,7 +173,6 @@ class WMGDFont extends WMFont
             return true;
         }
         return false;
-
     }
 }
 

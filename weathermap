@@ -249,7 +249,7 @@ if ($map->ReadConfig($configfile)) {
 
     if ((isset($options_output['sizedebug']) && !$options_output['sizedebug']) || (!isset($options_output['sizedebug']))) {
         if ($randomdata == 1) {
-            $map->RandomData();
+            $map->randomData();
         } else {
             $map->ReadData();
         }

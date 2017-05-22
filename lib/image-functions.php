@@ -5,18 +5,9 @@ function myimagecolorallocate($image, $red, $green, $blue)
 {
     // it's possible that we're being called early - just return straight away, in that case
     if (!isset($image)) {
-        return (-1);
+        return -1;
     }
-
-    if (1 == 0) {
-        $existing = imagecolorexact($image, $red, $green, $blue);
-
-        if ($existing > -1) {
-            return $existing;
-        }
-    }
-
-    return (imagecolorallocate($image, $red, $green, $blue));
+    return imagecolorallocate($image, $red, $green, $blue);
 }
 
 // take the same set of points that imagepolygon does, but don't close the shape
@@ -157,7 +148,7 @@ function imagecolorize_truecolor($imageRef, $red, $green, $blue)
         for ($x = 0; $x < imagesx($imageRef); $x++) {
             $rgba = imagecolorat($imageRef, $x, $y);
             $r = ($rgba >> 16) & 0xFF;
-            $alpha     = ($rgba & 0x7F000000) >> 24;
+            $alpha = ($rgba & 0x7F000000) >> 24;
             $new_r = $pal[$r]['r'];
             $new_g = $pal[$r]['g'];
             $new_b = $pal[$r]['b'];

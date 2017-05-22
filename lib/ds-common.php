@@ -14,11 +14,12 @@ function UpdateCactiData(&$item, $local_data_id)
 
         $set_speed = intval($item->get_hint("cacti_use_ifspeed"));
 
-        $r3 =
-            db_fetch_assoc(
-                sprintf(
-                    "SELECT data_local.host_id, field_name,field_value FROM data_local,host_snmp_cache  USE INDEX (host_id) WHERE data_local.id=%d AND data_local.host_id=host_snmp_cache.host_id AND data_local.snmp_index=host_snmp_cache.snmp_index AND data_local.snmp_query_id=host_snmp_cache.snmp_query_id",
-                    $local_data_id));
+        $r3 = db_fetch_assoc(
+            sprintf(
+                "SELECT data_local.host_id, field_name,field_value FROM data_local,host_snmp_cache  USE INDEX (host_id) WHERE data_local.id=%d AND data_local.host_id=host_snmp_cache.host_id AND data_local.snmp_index=host_snmp_cache.snmp_index AND data_local.snmp_query_id=host_snmp_cache.snmp_query_id",
+                $local_data_id
+            )
+        );
 
         foreach ($r3 as $vv) {
             $vname = "cacti_" . $vv['field_name'];
@@ -26,7 +27,6 @@ function UpdateCactiData(&$item, $local_data_id)
         }
 
         if ($set_speed != 0) {
-
             $ifSpeed = intval($to_set['cacti_ifSpeed']);
             $ifHighSpeed = intval($to_set['cacti_ifHighSpeed']);
             $speed = 0;
@@ -59,18 +59,18 @@ function UpdateCactiData(&$item, $local_data_id)
             $to_set['cacti_host_id'] = intval($vv['host_id']);
         }
 
-        $r4 =
-            db_fetch_row(
-                sprintf(
-                    "SELECT DISTINCT graph_templates_item.local_graph_id,title_cache FROM graph_templates_item,graph_templates_graph,data_template_rrd WHERE data_template_rrd.id=task_item_id AND graph_templates_graph.local_graph_id = graph_templates_item.local_graph_id AND local_data_id=%d LIMIT 1",
-                    $local_data_id));
+        $r4 = db_fetch_row(
+            sprintf(
+                "SELECT DISTINCT graph_templates_item.local_graph_id,title_cache FROM graph_templates_item,graph_templates_graph,data_template_rrd WHERE data_template_rrd.id=task_item_id AND graph_templates_graph.local_graph_id = graph_templates_item.local_graph_id AND local_data_id=%d LIMIT 1",
+                $local_data_id
+            )
+        );
 
         if (isset($r4['local_graph_id'])) {
             $to_set["cacti_graph_id"] = intval($r4['local_graph_id']);
         }
 
         $map->dsinfocache[$local_data_id] = $to_set;
-
     }
 
     # By now, we have the values, one way or another.
@@ -78,5 +78,4 @@ function UpdateCactiData(&$item, $local_data_id)
     foreach ($to_set as $k => $v) {
         $item->add_note($k, $v);
     }
-
 }

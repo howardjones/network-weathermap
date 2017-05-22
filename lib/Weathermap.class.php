@@ -13,19 +13,20 @@ require_once "all.php";
 class WeatherMap extends WeatherMapBase
 {
     /** @var WeatherMapNode[] $nodes */
-	var $nodes = array();
+    var $nodes = array();
     /** @var WeatherMapLink[] $links */
-	var $links = array();
+    var $links = array();
 
-	// var $texts = array(); // an array containing all the extraneous text bits
-	var $used_images = array(); // an array of image filenames referred to (used by editor ONLY)
-	var $seen_zlayers = array(0=>array(),1000=>array()); // 0 is the background, 1000 is the legends, title, etc
+    // var $texts = array(); // an array containing all the extraneous text bits
+    var $used_images = array(); // an array of image filenames referred to (used by editor ONLY)
+    var $seen_zlayers = array(0=>array(),1000=>array()); // 0 is the background, 1000 is the legends, title, etc
 
-	var $next_id;
+    var $next_id;
 
-	var $background;
+    var $background;
     var $kilo;
-    var $width, $height;
+    var $width;
+    var $height;
     var $htmlstyle;
 
     /** @var  HTMLImagemap $imap */
@@ -34,25 +35,32 @@ class WeatherMap extends WeatherMapBase
 //     var $colours;
     var $rrdtool;
 
-    var $sizedebug,
-		$widthmod,
-		$debugging;
+    var $sizedebug;
+    var $widthmod;
+    var $debugging;
     var $keyfont;
     var $timefont;
 
     var $titlefont;
-    var $timex, $timey;
+    var $timex;
+    var $timey;
 
-    var $keyx, $keyy;
+    var $keyx;
+    var $keyy;
 
-	var $titlex, $titley;
-    var $mintimex, $maxtimex;
-    var $mintimey, $maxtimey;
+    var $titlex;
+    var $titley;
+    var $mintimex;
+    var $maxtimex;
+    var $mintimey;
+    var $maxtimey;
 
     var $min_ds_time;
     var $max_ds_time;
-    var $minstamptext, $maxstamptext;
-    var $stamptext, $datestamp;
+    var $minstamptext;
+    var $maxstamptext;
+    var $stamptext;
+    var $datestamp;
     var $title;
 
     var $keytext;
@@ -64,41 +72,36 @@ class WeatherMap extends WeatherMapBase
     var $imagefile;
 
     var $imageuri;
-    var $keystyle,$keysize;
+    var $keystyle;
+    var $keysize;
 
-    var $min_data_time, $max_data_time;
+    var $min_data_time;
+    var $max_data_time;
     var $context;
 
     var $rrdtool_check;
 
     /** @var  WMImageLoader $imagecache */
-	var $imagecache;
-//	var $black, $white, $grey;
-        var $selected;
+    var $imagecache;
+    var $selected;
 
-//	var $datasourceclasses;
-//	var $preprocessclasses;
-//	var $postprocessclasses;
-//	var $activedatasourceclasses;
-
-	var $thumb_width, $thumb_height;
-	var $has_includes;
-	var $has_overlibs;
-	var $node_template_tree;
-	var $link_template_tree;
+    var $thumb_width, $thumb_height;
+    var $has_includes;
+    var $has_overlibs;
+    var $node_template_tree;
+    var $link_template_tree;
     var $dsinfocache=array();
 
-	var $plugins = array();
-	var $included_files = array();
+    var $plugins = array();
+    var $included_files = array();
 
-	/** @var WMColour[] $colourtable  */
+    /** @var WMColour[] $colourtable  */
     var $colourtable = array();
     var $warncount = 0;
 
     /** @var WeatherMapScale[] $scales */
     var $scales;
     var $fonts;
-    // var $numscales;
 
     /** @var WMStats $stats - a generic place to keep various statistics about the map */
     var $stats;
@@ -183,60 +186,61 @@ class WeatherMap extends WeatherMapBase
     }
 
 
-	function my_type() {  return "MAP"; }
+    public function my_type()
+    {
+        return "MAP";
+    }
 
     public function __toString()
     {
         return "MAP";
     }
 
-	function Reset()
-	{
-		$this->imagecache = new WMImageLoader();
-		$this->next_id = 100;
-		foreach (array_keys($this->inherit_fieldlist)as $fld) { $this->$fld=$this->inherit_fieldlist[$fld]; }
+    private function Reset()
+    {
+        $this->imagecache = new WMImageLoader();
+        $this->next_id = 100;
+        foreach (array_keys($this->inherit_fieldlist)as $fld) {
+            $this->$fld=$this->inherit_fieldlist[$fld];
+        }
 
-		$this->min_ds_time = null;
-		$this->max_ds_time = null;
+        $this->min_ds_time = null;
+        $this->max_ds_time = null;
 
         $this->nodes=array(); // an array of WeatherMapNodes
-		$this->links=array(); // an array of WeatherMapLinks
+        $this->links=array(); // an array of WeatherMapLinks
 
         $this->createDefaultLinks();
         $this->createDefaultNodes();
 
-       	$this->node_template_tree = array();
-       	$this->link_template_tree = array();
+        $this->node_template_tree = array();
+        $this->link_template_tree = array();
 
-		$this->node_template_tree['DEFAULT'] = array();
-		$this->link_template_tree['DEFAULT'] = array();
+        $this->node_template_tree['DEFAULT'] = array();
+        $this->link_template_tree['DEFAULT'] = array();
 
         assert('is_object($this->nodes[":: DEFAULT ::"])');
         assert('is_object($this->links[":: DEFAULT ::"])');
         assert('is_object($this->nodes["DEFAULT"])');
         assert('is_object($this->links["DEFAULT"])');
 
+        $this->imap=new HTMLImagemap('weathermap');
 
+        $this->configfile='';
+        $this->imagefile='';
+        $this->imageuri='';
 
-		$this->imap=new HTMLImagemap('weathermap');
-        // $this->colours = array();
-
-		$this->configfile='';
-		$this->imagefile='';
-		$this->imageuri='';
-
-
-		$this->loadAllPlugins();
+        $this->loadAllPlugins();
 
         $this->scales['DEFAULT'] = new WeatherMapScale("DEFAULT", $this);
         $this->populateDefaultColours();
 
-		wm_debug("WeatherMap class Reset() complete\n");
-	}
+        wm_debug("WeatherMap class Reset() complete\n");
+    }
 
     // Simple accessors to stop the editor from reaching inside objects quite so much
 
-    function getNode($name)
+    public function getNode($name)
     {
         if (isset($this->nodes[$name])) {
             return $this->nodes[$name];
@@ -244,7 +248,7 @@ class WeatherMap extends WeatherMapBase
         throw new WeathermapInternalFail("NoSuchNode");
     }
 
-    function addNode($newObject)
+    public function addNode($newObject)
     {
         if ($this->nodeExists($newObject->name)) {
             throw new WeathermapInternalFail("NodeAlreadyExists");
@@ -253,7 +257,7 @@ class WeatherMap extends WeatherMapBase
         $this->addItemToZLayer($newObject, $newObject->getZIndex());
     }
 
-    function getLink($name)
+    public function getLink($name)
     {
         if (isset($this->links[$name])) {
             return $this->links[$name];
@@ -261,7 +265,7 @@ class WeatherMap extends WeatherMapBase
         throw new WeathermapInternalFail("NoSuchLink");
     }
 
-    function addLink($newObject)
+    public function addLink($newObject)
     {
         if ($this->linkExists($newObject->name)) {
             throw new WeathermapInternalFail("LinkAlreadyExists");
@@ -270,16 +274,14 @@ class WeatherMap extends WeatherMapBase
         $this->addItemToZLayer($newObject, $newObject->getZIndex());
     }
 
-    function getScale($name)
+    public function getScale($name)
     {
         if (isset($this->scales[$name])) {
             return $this->scales[$name];
         }
-	    wm_warn("Scale $name doesn't exist. Returning DEFAULT");
-	    return $this->scales['DEFAULT'];
+        wm_warn("Scale $name doesn't exist. Returning DEFAULT");
+        return $this->scales['DEFAULT'];
     }
-
-
 
     private function loadAllPlugins()
     {
@@ -303,7 +305,6 @@ class WeatherMap extends WeatherMapBase
         foreach ($defaults as $key => $def) {
             $this->colourtable[$key] = new WMColour($def['red'], $def['green'], $def['blue']);
         }
-
     }
 
 
@@ -325,7 +326,9 @@ class WeatherMap extends WeatherMapBase
         assert('is_scalar($input)');
 
         $context_description = strtolower($context->my_type());
-        if ($context_description != "map") $context_description .= ":" . $context->name;
+        if ($context_description != "map") {
+            $context_description .= ":" . $context->name;
+        }
 
         wm_debug("Trace: ProcessString($input, $context_description)\n");
 
@@ -405,11 +408,7 @@ class WeatherMap extends WeatherMapBase
                 if (is_null($the_item)) {
                     wm_warn("ProcessString: $key refers to unknown item (context is $context_description) [WMWARN05]\n");
                 } else {
-                    #	warn($the_item->name.": ".var_dump($the_item->hints)."\n");
                     wm_debug("ProcessString: Found appropriate item: " . get_class($the_item) . " " . $the_item->name . "\n");
-
-                    # warn($the_item->name."/hints: ".var_dump($the_item->hints)."\n");
-                    # warn($the_item->name."/notes: ".var_dump($the_item->notes)."\n");
 
                     // SET and notes have precedent over internal properties
                     // this is my laziness - it saves me having a list of reserved words
@@ -417,14 +416,12 @@ class WeatherMap extends WeatherMapBase
                     if (isset($the_item->hints[$args])) {
                         $value = $the_item->hints[$args];
                         wm_debug("ProcessString: used hint\n");
-                    }
-                    // for some things, we don't want to allow notes to be considered.
-                    // mainly - TARGET (which can define command-lines), shouldn't be
-                    // able to get data from uncontrolled sources (i.e. data sources rather than SET in config files).
-                    elseif ($include_notes && isset($the_item->notes[$args])) {
+                    } elseif ($include_notes && isset($the_item->notes[$args])) {
+                        // for some things, we don't want to allow notes to be considered.
+                        // mainly - TARGET (which can define command-lines), shouldn't be
+                        // able to get data from uncontrolled sources (i.e. data sources rather than SET in config files).
                         $value = $the_item->notes[$args];
                         wm_debug("ProcessString: used note\n");
-
                     } elseif (isset($the_item->$args)) {
                         $value = $the_item->$args;
                         wm_debug("ProcessString: used internal property\n");
@@ -433,8 +430,9 @@ class WeatherMap extends WeatherMapBase
             }
 
             // format, and sanitise the value string here, before returning it
-
-            if ($value === null) $value = 'null';
+            if ($value === null) {
+                $value = 'null';
+            }
             wm_debug("ProcessString: replacing " . $key . " with $value\n");
 
             # if($format != '') $value = sprintf($format,$value);
@@ -448,26 +446,23 @@ class WeatherMap extends WeatherMapBase
         return $output;
     }
 
-    function RandomData()
-    {
-        foreach ($this->links as $link) {
-            $this->links[$link->name]->absoluteUsages[IN] = rand(0, $link->maxValues[IN]);
-            $this->links[$link->name]->absoluteUsages[IN] = rand(0, $link->maxValues[OUT]);
-        }
-    }
-
-
 
 
 // nodename is a vestigal parameter, from the days when nodes were just big labels
 // TODO - this is only used by Link - it doesn't need to be here
     function DrawLabelRotated($im, $x, $y, $angle, $text, $font, $padding, $linkname, $textcolour, $bgcolour, $outlinecolour, &$map, $direction)
     {
+        throw new WeathermapDeprecatedException("Does this ever get used?");
+
         $fontObject = $this->fonts->getFont($font);
         list($strwidth, $strheight) = $fontObject->calculateImageStringSize($text);
 
-        if (abs($angle) > 90) $angle -= 180;
-        if ($angle < -180) $angle += 360;
+        if (abs($angle) > 90) {
+            $angle -= 180;
+        }
+        if ($angle < -180) {
+            $angle += 360;
+        }
 
         $rangle = -deg2rad($angle);
 
@@ -507,7 +502,6 @@ class WeatherMap extends WeatherMapBase
             wm_debug("Adding Poly imagemap for $areaname\n");
         }
         $this->links[$linkname]->imap_areas[] = $areaname;
-
     }
 
     /**
@@ -516,7 +510,7 @@ class WeatherMap extends WeatherMapBase
      * @param WMColour $colour
      * @param string $which
      */
-    function DrawTimestamp($imageRef, $font, $colour, $which = "")
+    private function DrawTimestamp($imageRef, $font, $colour, $which = "")
     {
         // add a timestamp to the corner, so we can tell if it's all being updated
 
@@ -561,7 +555,7 @@ class WeatherMap extends WeatherMapBase
      * @param int $font
      * @param WMColour $colour
      */
-    function DrawTitle($imageRef, $font, $colour)
+    private function DrawTitle($imageRef, $font, $colour)
     {
         $fontObject = $this->fonts->getFont($font);
         $string = $this->ProcessString($this->title, $this);
@@ -595,7 +589,7 @@ class WeatherMap extends WeatherMapBase
      * @return bool indicates success or failure     *
      *
      */
-    function ReadConfig($input)
+    public function ReadConfig($input)
     {
         $reader = new WeatherMapConfigReader($this);
 
@@ -610,7 +604,6 @@ class WeatherMap extends WeatherMapBase
             $filename = "{text insert}";
 
             $reader->readConfigLines($lines);
-
         } else {
             wm_debug("ReadConfig Detected that this is a config filename.\n");
             $reader->readConfigFile($input);
@@ -622,7 +615,7 @@ class WeatherMap extends WeatherMapBase
         return true;
     }
 
-    function postReadConfigTasks()
+    private function postReadConfigTasks()
     {
         if ($this->has_overlibs && $this->htmlstyle == 'static') {
             wm_warn("OVERLIBGRAPH is used, but HTMLSTYLE is static. This is probably wrong. [WMWARN41]\n");
@@ -651,7 +644,6 @@ class WeatherMap extends WeatherMapBase
         }
 
         $this->scales['none'] = new WeatherMapScale("none", $this);
-
     }
 
     /**
@@ -766,24 +758,28 @@ class WeatherMap extends WeatherMapBase
 
 
 
-    function WriteDataFile($filename)
+    public function WriteDataFile($filename)
     {
-        if ($filename != "") {
-            $fd = fopen($filename, 'w');
-            if ($fd) {
-                foreach ($this->nodes as $node) {
-                    if (!preg_match('/^::\s/', $node->name) && sizeof($node->targets) > 0) {
-                        fputs($fd, sprintf("N_%s\t%f\t%f\r\n", $node->name, $node->absoluteUsages[IN], $node->absoluteUsages[OUT]));
-                    }
-                }
-                foreach ($this->links as $link) {
-                    if (!preg_match('/^::\s/', $link->name) && sizeof($link->targets) > 0) {
-                        fputs($fd, sprintf("L_%s\t%f\t%f\r\n", $link->name, $link->absoluteUsages[IN], $link->absoluteUsages[OUT]));
-                    }
-                }
-                fclose($fd);
+        if ($filename == "") {
+            return;
+        }
+
+        $fd = fopen($filename, 'w');
+        if (!$fd) {
+            return;
+        }
+
+        foreach ($this->nodes as $node) {
+            if (!preg_match('/^::\s/', $node->name) && sizeof($node->targets) > 0) {
+                fputs($fd, sprintf("N_%s\t%f\t%f\r\n", $node->name, $node->absoluteUsages[IN], $node->absoluteUsages[OUT]));
             }
         }
+        foreach ($this->links as $link) {
+            if (!preg_match('/^::\s/', $link->name) && sizeof($link->targets) > 0) {
+                fputs($fd, sprintf("L_%s\t%f\t%f\r\n", $link->name, $link->absoluteUsages[IN], $link->absoluteUsages[OUT]));
+            }
+        }
+        fclose($fd);
     }
 
     private function getConfigForPosition($keyword, $fieldnames, $object1, $object2)
@@ -807,7 +803,7 @@ class WeatherMap extends WeatherMapBase
     }
 
 
-    function getConfig()
+    public function getConfig()
     {
         global $WEATHERMAP_VERSION;
 
@@ -849,13 +845,9 @@ class WeatherMap extends WeatherMapBase
             }
         }
 
-
-        $output .= $this->getConfigForPosition("TIMEPOS", array("timex", "timey", "stamptext"), $this,
-            $this->inherit_fieldlist);
-        $output .= $this->getConfigForPosition("MINTIMEPOS", array("mintimex", "mintimey", "minstamptext"), $this,
-            $this->inherit_fieldlist);
-        $output .= $this->getConfigForPosition("MAXTIMEPOS", array("maxtimex", "maxtimey", "maxstamptext"), $this,
-            $this->inherit_fieldlist);
+        $output .= $this->getConfigForPosition("TIMEPOS", array("timex", "timey", "stamptext"), $this, $this->inherit_fieldlist);
+        $output .= $this->getConfigForPosition("MINTIMEPOS", array("mintimex", "mintimey", "minstamptext"), $this, $this->inherit_fieldlist);
+        $output .= $this->getConfigForPosition("MAXTIMEPOS", array("maxtimex", "maxtimey", "maxstamptext"), $this, $this->inherit_fieldlist);
         $output .= $this->getConfigForPosition("TITLEPOS", array("titlex", "titley"), $this, $this->inherit_fieldlist);
 
         $output .= "\n";
@@ -895,7 +887,6 @@ class WeatherMap extends WeatherMapBase
             foreach ($this->nodes as $node) {
                 if (!preg_match('/^::\s/', $node->name)) {
                     if ($node->defined_in == $this->configfile) {
-
                         if ($which == "template" && $node->x === null) {
                             wm_debug("TEMPLATE\n");
                             $output .= $node->WriteConfig();
@@ -910,6 +901,7 @@ class WeatherMap extends WeatherMapBase
             if ($which == "template") {
                 $output .= "\n# TEMPLATE-only LINKs:\n";
             }
+
             if ($which == "normal") {
                 $output .= "\n# regular LINKs:\n";
             }
@@ -933,16 +925,13 @@ class WeatherMap extends WeatherMapBase
         return $output;
     }
 
-    function WriteConfig($filename)
+    public function WriteConfig($filename)
     {
-
         $fd = fopen($filename, "w");
 
         if ($fd) {
             $output = $this->getConfig();
-
             fwrite($fd, $output);
-
             fclose($fd);
         } else {
             wm_warn("Couldn't open config file $filename for writing");
@@ -985,7 +974,6 @@ class WeatherMap extends WeatherMapBase
                 // fill with background colour anyway, in case the background image failed to load
                 imagefilledrectangle($imageRef, 0, 0, $this->width, $this->height, $this->colourtable['BG']->gdAllocate($imageRef));
             }
-
         }
         return $imageRef;
     }
@@ -1000,13 +988,28 @@ class WeatherMap extends WeatherMapBase
             if ($node->relative_to != '') {
                 $parentX = $this->nodes[$node->relative_to]->x;
                 $parentY = $this->nodes[$node->relative_to]->y;
-                imagearc($imageRef, $node->x, $node->y,
-                    15, 15, 0, 360, $overlayColor);
-                imagearc($imageRef, $node->x, $node->y,
-                    16, 16, 0, 360, $overlayColor);
+                imagearc(
+                    $imageRef,
+                    $node->x,
+                    $node->y,
+                    15,
+                    15,
+                    0,
+                    360,
+                    $overlayColor
+                );
+                imagearc(
+                    $imageRef,
+                    $node->x,
+                    $node->y,
+                    16,
+                    16,
+                    0,
+                    360,
+                    $overlayColor
+                );
 
-                imageline($imageRef, $node->x, $node->y,
-                    $parentX, $parentY, $overlayColor);
+                imageline($imageRef, $node->x, $node->y, $parentX, $parentY, $overlayColor);
             }
         }
     }
@@ -1126,8 +1129,18 @@ class WeatherMap extends WeatherMapBase
             $this->thumb_height = $this->height * $factor;
 
             $thumbImageRef = imagecreatetruecolor($this->thumb_width, $this->thumb_height);
-            imagecopyresampled($thumbImageRef, $imageRef, 0, 0, 0, 0, $this->thumb_width, $this->thumb_height,
-                $this->width, $this->height);
+            imagecopyresampled(
+                $thumbImageRef,
+                $imageRef,
+                0,
+                0,
+                0,
+                0,
+                $this->thumb_width,
+                $this->thumb_height,
+                $this->width,
+                $this->height
+            );
             $result = imagepng($thumbImageRef, $thumbnailFileName);
             imagedestroy($thumbImageRef);
 
@@ -1141,7 +1154,6 @@ class WeatherMap extends WeatherMapBase
         }
     }
 
-
     public function preCalculate()
     {
         wm_debug("preCalculating everything\n");
@@ -1153,7 +1165,7 @@ class WeatherMap extends WeatherMapBase
         }
     }
 
-    function DrawMap($imageFileName = '', $thumbnailFileName = '', $thumbnailMaxSize = 250, $includeNodes = true, $showVIAOverlay = false, $showRelativeOverlay = false)
+    public function DrawMap($imageFileName = '', $thumbnailFileName = '', $thumbnailMaxSize = 250, $includeNodes = true, $showVIAOverlay = false, $showRelativeOverlay = false)
     {
         wm_debug("Trace: DrawMap()\n");
 
@@ -1195,7 +1207,6 @@ class WeatherMap extends WeatherMapBase
             wm_debug("Drawing layer $z\n");
             // all the map 'furniture' is fixed at z=1000
             if ($z == 1000) {
-
                 $this->DrawTimestamp($imageRef, $this->timefont, $this->colourtable['TIME']);
                 if (!is_null($this->min_data_time)) {
                     $this->DrawTimestamp($imageRef, $this->timefont, $this->colourtable['TIME'], "MIN");
@@ -1232,10 +1243,9 @@ class WeatherMap extends WeatherMapBase
         }
 
         imagedestroy($imageRef);
-
     }
 
-    function CleanUp()
+    public function CleanUp()
     {
         global $weathermap_error_suppress;
 
@@ -1265,7 +1275,7 @@ class WeatherMap extends WeatherMapBase
         $weathermap_error_suppress = array();
     }
 
-    function calculateImagemap()
+    public function calculateImagemap()
     {
         wm_debug("Trace: calculateImagemap()\n");
 
@@ -1296,9 +1306,7 @@ class WeatherMap extends WeatherMapBase
             }
 
             if ($this->htmlstyle == "overlib") {
-
                 if ($change != '') {
-
                     // find the middle of the map
                     $center_x = $this->width / 2;
                     $center_y = $this->height / 2;
@@ -1393,10 +1401,9 @@ class WeatherMap extends WeatherMapBase
                 }
             }
         }
-
     }
 
-    function asJS()
+    public function asJS()
     {
         $js = '';
 
@@ -1418,11 +1425,11 @@ class WeatherMap extends WeatherMapBase
     }
 
 
-// This method MUST run *after* DrawMap. It relies on DrawMap to call the map-drawing bits
-// which will populate the Imagemap with regions.
-//
-// imagemapname is a parameter, so we can stack up several maps in the Cacti plugin with their own imagemaps
-    function MakeHTML($imagemapname = "weathermap_imap")
+    // This method MUST run *after* DrawMap. It relies on DrawMap to call the map-drawing bits
+    // which will populate the Imagemap with regions.
+    //
+    // imagemapname is a parameter, so we can stack up several maps in the Cacti plugin with their own imagemaps
+    public function MakeHTML($imagemapname = "weathermap_imap")
     {
         wm_debug("Trace: MakeHTML()\n");
         // PreloadMapHTML fills in the Imagemap info, ready for the HTML to be created.
@@ -1439,7 +1446,6 @@ class WeatherMap extends WeatherMapBase
                 $this->height,
                 $imagemapname
             );
-            //$html .=  'alt="network weathermap" ';
             $html .= '/>';
         } else {
             $html .= sprintf(
@@ -1449,7 +1455,6 @@ class WeatherMap extends WeatherMapBase
                 $this->height,
                 $imagemapname
             );
-            //$html .=  'alt="network weathermap" ';
             $html .= '/>';
         }
         $html .= '</div>';
@@ -1459,7 +1464,7 @@ class WeatherMap extends WeatherMapBase
         return $html;
     }
 
-    function generateSortedImagemap($imagemapname)
+    public function generateSortedImagemap($imagemapname)
     {
         $html = "\n<map name=\"" . $imagemapname . '" id="' . $imagemapname . "\">\n";
 
@@ -1765,7 +1770,15 @@ class WeatherMap extends WeatherMapBase
         $this->pluginMethod($type, "CleanUp");
     }
 
-    function zeroData()
+    public function randomData()
+    {
+        foreach ($this->links as $link) {
+            $this->links[$link->name]->absoluteUsages[IN] = rand(0, $link->maxValues[IN]);
+            $this->links[$link->name]->absoluteUsages[OUT] = rand(0, $link->maxValues[OUT]);
+        }
+    }
+
+    public function zeroData()
     {
         $allMapItems = $this->buildAllItemsList();
 
@@ -1784,7 +1797,7 @@ class WeatherMap extends WeatherMapBase
         }
     }
 
-    function readData()
+    public function readData()
     {
         // we skip readdata completely in sizedebug mode
         if ($this->sizedebug != 0) {
@@ -1812,7 +1825,6 @@ class WeatherMap extends WeatherMapBase
 
         wm_debug("ReadData Completed.\n");
         wm_debug("------------------------------\n");
-
     }
 
     public function createDefaultNodes()
@@ -1859,8 +1871,9 @@ class WeatherMap extends WeatherMapBase
                 $bgImageRef = imagecreatefromfile($this->background);
 
                 if (!$bgImageRef) {
-                    wm_warn
-                    ("Failed to open background image.  One possible reason: Is your BACKGROUND really a PNG?\n");
+                    wm_warn(
+                        "Failed to open background image.  One possible reason: Is your BACKGROUND really a PNG?\n"
+                    );
                     return $bgImageRef;
                 }
 
@@ -1868,15 +1881,15 @@ class WeatherMap extends WeatherMapBase
                 $this->height = imagesy($bgImageRef);
 
                 return $bgImageRef;
-
             }
-            wm_warn
-            ("Your background image file could not be read. Check the filename, and permissions, for "
-                . $this->background . "\n");
+
+            wm_warn(
+                "Your background image file could not be read. Check the filename, and permissions, for "
+                . $this->background . "\n"
+            );
         }
 
         return $bgImageRef;
     }
-
-};
+}
 // vim:ts=4:sw=4:

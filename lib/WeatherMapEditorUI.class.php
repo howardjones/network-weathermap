@@ -840,7 +840,7 @@ class WeatherMapEditorUI extends WeatherMapUIBase
                 $buffer = fgets($fileHandle, 4096);
 
                 if (preg_match("/^\s*TITLE\s+(.*)/i", $buffer, $matches)) {
-                    $title = $matches[1];
+                    $title = trim($matches[1]);
                 }
             }
             fclose($fileHandle);

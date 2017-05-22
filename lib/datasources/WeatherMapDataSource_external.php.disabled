@@ -37,7 +37,7 @@ class WeatherMapDataSource_external extends WeatherMapDataSource
         if (preg_match("/^!(.*)$/", $targetstring, $matches)) {
             $command = $matches[1];
             $lines = array();
-            
+
             wm_debug("ExternalScript ReadData: Running $command\n");
             // run the command here
             if (($pipe = popen($command, "r")) === false) {

@@ -253,11 +253,9 @@ class HTMLImagemapAreaCircle extends HTMLImagemapArea
 
 class HTMLImagemap
 {
-    /** @public  HTMLImagemapArea[] $shapes */
+    /** @var HTMLImagemapArea[] $shapes */
     public $shapes;
-    public $nshapes;
     public $name;
-    public $shapetree;
 
     public function __construct($name = "")
     {
@@ -268,15 +266,13 @@ class HTMLImagemap
     public function reset()
     {
         $this->shapes = array();
-        $this->shapetree = array();
-        $this->nshapes = 0;
         $this->name = "";
     }
 
     // add an element to the map - takes an array with the info, in a similar way to HTML_QuickForm
     public function addArea($element)
     {
-        if (is_object($element) && is_subclass_of($element, 'html_imagemap_area')) {
+        if (is_object($element) && is_subclass_of($element, 'htmlimagemaparea')) {
             $elementObject = &$element;
         } else {
             $args = func_get_args();
@@ -285,8 +281,6 @@ class HTMLImagemap
         }
 
         $this->shapes[$elementObject->name] = &$elementObject;
-        $this->nshapes++;
-        //      print $this->nshapes." shapes\n";
     }
 
     // do a hit-test based on the current map

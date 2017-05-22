@@ -4,7 +4,7 @@
 // http://www.network-weathermap.com/
 // Released under the GNU Public License
 
-require_once "HTML_ImageMap.class.php";
+require_once "HTMLImagemap.class.php";
 
 class WeatherMapNode extends WeatherMapDataItem
 {
@@ -356,7 +356,7 @@ class WeatherMapNode extends WeatherMapDataItem
 
         $this->image = $node_im;
 
-        $this->makeImageMapAreas();
+        $this->makeImagemapAreas();
 
 //        imagepng($node_im, "step-".$this->name.".png");
     }
@@ -369,12 +369,12 @@ class WeatherMapNode extends WeatherMapDataItem
     // make a mini-image, containing this node and nothing else
     // figure out where the real NODE centre is, relative to the top-left corner.
 
-    private function makeImageMapAreas()
+    private function makeImagemapAreas()
     {
         $index = 0;
         foreach ($this->boundingboxes as $bbox) {
             $areaName = "NODE:N" . $this->id . ":" . $index;
-            $newArea = new HTML_ImageMap_Area_Rectangle($areaName, "", array($bbox));
+            $newArea = new HTMLImagemapAreaRectangle($areaName, "", array($bbox));
             wm_debug("Adding imagemap area [" . join(",", $bbox) . "] => $newArea \n");
             $this->imap_areas[] = $newArea;
             $index++;

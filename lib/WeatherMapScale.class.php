@@ -399,7 +399,7 @@ class WeatherMapScale extends WeatherMapItem
 
 //        $this->owner->imap->addArea("Rectangle", $areaName, '', array($xTarget, $yTarget, $xTarget + $width, $yTarget + $height));
 
-        $newArea = new HTML_ImageMap_Area_Rectangle($areaName, "", array(array($xTarget, $yTarget, $xTarget + $width, $yTarget + $height)));
+        $newArea = new HTMLImageMapAreaRectangle($areaName, "", array(array($xTarget, $yTarget, $xTarget + $width, $yTarget + $height)));
         $this->owner->imap->addArea($newArea);
 
         // TODO: stop tracking z-order separately. addArea() should take the z layer

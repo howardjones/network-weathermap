@@ -28,7 +28,7 @@ class WeatherMap extends WeatherMapBase
     var $width, $height;
     var $htmlstyle;
 
-    /** @var  HTML_ImageMap $imap */
+    /** @var  HTMLImagemap $imap */
     var $imap;
 
 //     var $colours;
@@ -218,7 +218,7 @@ class WeatherMap extends WeatherMapBase
 
 
 
-		$this->imap=new HTML_ImageMap('weathermap');
+		$this->imap=new HTMLImagemap('weathermap');
         // $this->colours = array();
 
 		$this->configfile='';
@@ -1419,13 +1419,13 @@ class WeatherMap extends WeatherMapBase
 
 
 // This method MUST run *after* DrawMap. It relies on DrawMap to call the map-drawing bits
-// which will populate the ImageMap with regions.
+// which will populate the Imagemap with regions.
 //
 // imagemapname is a parameter, so we can stack up several maps in the Cacti plugin with their own imagemaps
     function MakeHTML($imagemapname = "weathermap_imap")
     {
         wm_debug("Trace: MakeHTML()\n");
-        // PreloadMapHTML fills in the ImageMap info, ready for the HTML to be created.
+        // PreloadMapHTML fills in the Imagemap info, ready for the HTML to be created.
         $this->calculateImagemap();
 
         $html = '';
@@ -1485,7 +1485,7 @@ class WeatherMap extends WeatherMapBase
                     }
 
                     foreach ($this->scales as $it) {
-                        foreach ($it->getImageMapAreas() as $area) {
+                        foreach ($it->getImagemapAreas() as $area) {
                             wm_debug("$area\n");
                             // skip the linkless areas if we are in the editor - they're redundant
                             $html .= "\t" . $area->asHTML();
@@ -1500,7 +1500,7 @@ class WeatherMap extends WeatherMapBase
                 /** @var WeatherMapDataItem $it */
                 foreach (array_reverse($z_items) as $it) {
                     if ($it->name != 'DEFAULT' && $it->name != ":: DEFAULT ::") {
-                        foreach ($it->getImageMapAreas() as $area) {
+                        foreach ($it->getImagemapAreas() as $area) {
                             wm_debug("$area\n");
                             // skip the linkless areas if we are in the editor - they're redundant
                             $html .= "\t" . $area->asHTML();

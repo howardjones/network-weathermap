@@ -4,7 +4,7 @@
 // http://www.network-weathermap.com/
 // Released under the GNU Public License
 
-require_once "HTML_ImageMap.class.php";
+require_once "HTMLImagemap.class.php";
 
 class WeatherMapLink extends WeatherMapDataItem
 {
@@ -387,11 +387,11 @@ class WeatherMapLink extends WeatherMapDataItem
             wm_debug("Skipping link with no geometry attached\n");
         }
 
-        $this->makeImageMapAreas();
+        $this->makeImagemapAreas();
 
     }
 
-    private function makeImageMapAreas()
+    private function makeImagemapAreas()
     {
         if (!isset($this->geometry)) {
             return;
@@ -402,7 +402,7 @@ class WeatherMapLink extends WeatherMapDataItem
 
             $polyPoints = $this->geometry->getDrawnPolygon($direction);
 
-            $newArea = new HTML_ImageMap_Area_Polygon($areaName, "", array($polyPoints));
+            $newArea = new HTMLImagemapAreaPolygon($areaName, "", array($polyPoints));
             wm_debug("Adding Poly imagemap for %s\n", $areaName);
 
             $this->imap_areas[] = $newArea;
@@ -518,10 +518,10 @@ class WeatherMapLink extends WeatherMapDataItem
             $rectanglePoints[] = min($points[1], $points[3]);
             $rectanglePoints[] = max($points[0], $points[2]);
             $rectanglePoints[] = max($points[1], $points[3]);
-            $newArea = new HTML_ImageMap_Area_Rectangle($areaName, "", array($rectanglePoints));
+            $newArea = new HTMLImagemapAreaRectangle($areaName, "", array($rectanglePoints));
             wm_debug("Adding Rectangle imagemap for $areaName\n");
         } else {
-            $newArea = new HTML_ImageMap_Area_Polygon($areaName, "", array($points));
+            $newArea = new HTMLImagemapAreaPolygon($areaName, "", array($points));
             wm_debug("Adding Poly imagemap for $areaName\n");
         }
         // Make a note that we added this area

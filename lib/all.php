@@ -16,7 +16,7 @@ require_once dirname(__FILE__) . '/exceptions.php';
 require_once dirname(__FILE__) . '/WMDebug.php';
 require_once dirname(__FILE__) . '/WMStats.php';
 
-require_once dirname(__FILE__) . '/HTML_ImageMap.class.php';
+require_once dirname(__FILE__) . '/HTMLImagemap.class.php';
 
 require_once dirname(__FILE__) . '/base-classes.php';
 require_once dirname(__FILE__) . '/plugin-base-classes.php';

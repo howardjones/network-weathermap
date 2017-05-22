@@ -62,7 +62,7 @@ function weathermap_run_maps($mydir)
     global $weathermap_warncount;
     global $weathermap_poller_start_time;
 
-    include_once $mydir . DIRECTORY_SEPARATOR . "lib" . DIRECTORY_SEPARATOR . "HTML_ImageMap.class.php";
+    include_once $mydir . DIRECTORY_SEPARATOR . "lib" . DIRECTORY_SEPARATOR . "HTMLImagemap.class.php";
     include_once $mydir . DIRECTORY_SEPARATOR . "lib" . DIRECTORY_SEPARATOR . "Weathermap.class.php";
     include_once $mydir . DIRECTORY_SEPARATOR . "lib" . DIRECTORY_SEPARATOR . "database.php";
     include_once $mydir . DIRECTORY_SEPARATOR . "lib" . DIRECTORY_SEPARATOR . "WeathermapManager.class.php";

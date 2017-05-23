@@ -121,16 +121,7 @@ function attach_click_events() {
     jQuery('#link_cactipick').click(cactipicker).attr("href", "#");
     jQuery('#node_cactipick').click(nodecactipicker).attr("href", "#");
 
-    jQuery('#xycapture').mouseover(function (event) {
-        coord_capture(event);
-    });
-    jQuery('#xycapture').mousemove(function (event) {
-        coord_update(event);
-    });
-    jQuery('#xycapture').mouseout(function (event) {
-        coord_release(event);
-    });
-
+    jQuery('#xycapture').mousemove(coord_update).mouseout(coord_release);
 }
 
 // used by the cancel button on each of the properties dialogs
@@ -140,7 +131,6 @@ function cancel_op() {
 }
 
 function help_handler(e) {
-
     var objectid = jQuery(this).attr('id');
     var section = objectid.slice(0, objectid.indexOf('_'));
     var target = section + '_help';
@@ -150,28 +140,24 @@ function help_handler(e) {
         helptext = helptexts[objectid];
     }
 
-    if ((e.type == 'blur') || (e.type == 'mouseout')) {
+    if ((e.type === 'blur') || (e.type === 'mouseout')) {
 
         helptext = helptexts[section + '_default'];
 
-        if (helptext == 'undefined') {
+        if (helptext === 'undefined') {
             alert('OID is: ' + objectid + ' and target is:' + target + ' and section is: ' + section);
         }
-
     }
 
-    if (helptext != "undefined") {
+    if (helptext !== "undefined") {
         jQuery("#" + target).text(helptext);
     }
-
 }
 
 // Any clicks in the imagemap end up here.
 function click_handler(e) {
-
     var alt, objectname, objecttype, objectid;
 
-    // alt = el.getAttribute('alt');
     alt = jQuery(this).attr("id");
 
     objecttype = alt.slice(0, 4);
@@ -182,12 +168,12 @@ function click_handler(e) {
     if (document.frmMain.action.value === '') {
 
         // if we're waiting for a node specifically (e.g. "make link") then ignore links here
-        if (objecttype == 'NODE') {
+        if (objecttype === 'NODE') {
             objectname = NodeIDs[objectid];
             show_node(objectname);
         }
 
-        if (objecttype == 'LINK') {
+        if (objecttype === 'LINK') {
             objectname = LinkIDs[objectid];
             show_link(objectname);
         }
@@ -195,12 +181,12 @@ function click_handler(e) {
 
     // we've got a command queued, so do the appropriate thing
     else {
-        if (objecttype == 'NODE' && document.getElementById('action').value == 'add_link') {
+        if (objecttype === 'NODE' && document.getElementById('action').value === 'add_link') {
             document.getElementById('param').value = NodeIDs[objectid];
             document.frmMain.submit();
         }
 
-        else if (objecttype == 'NODE' && document.getElementById('action').value == 'add_link2') {
+        else if (objecttype === 'NODE' && document.getElementById('action').value === 'add_link2') {
             document.getElementById('param').value = NodeIDs[objectid];
             document.frmMain.submit();
         }
@@ -210,7 +196,7 @@ function click_handler(e) {
             // reset back to standard state, and see if we can oblige them
             //		alert('A bit confused');
             document.frmMain.action.value = '';
-            hide_all_dialogs()
+            hide_all_dialogs();
             click_handler(e);
         }
     }
@@ -221,7 +207,7 @@ function do_submit() {
     document.frmMain.submit();
 }
 
-function cactipicker() {
+function openpicker(url) {
     // make sure it isn't already opened
     if (!newWindow || newWindow.closed) {
         newWindow = window.open("", "cactipicker", "scrollbars=1,status=1,height=400,width=400,resizable=1");
@@ -232,33 +218,20 @@ function cactipicker() {
         newWindow.focus();
     }
 
-    // newWindow.location = "cacti-pick.php?command=link_step1";
-    newWindow.location = "cacti-pick.php?action=link_step1";
+    newWindow.location = url;
 }
 
+function cactipicker() {
+    openpicker("cacti-pick.php?action=link_step1");
+}
 
 function nodecactipicker() {
-    // make sure it isn't already opened
-    if (!newWindow || newWindow.closed) {
-        newWindow = window.open("", "cactipicker", "scrollbars=1,status=1,height=400,width=400,resizable=1");
-    }
-
-    else if (newWindow.focus) {
-        // window is already open and focusable, so bring it to the front
-        newWindow.focus();
-    }
-
-    newWindow.location = "cacti-pick.php?action=node_step1";
+    openpicker("cacti-pick.php?action=node_step1");
 }
 
 function show_context_help(itemid, targetid) {
-    //    var itemid = item.id;
     var helpbox, helpboxtext, message;
-    //    var ct = document.getElementById(targetid);
-    //    if(ct)
-    //  {
     message = "We'd show helptext for " + itemid + " in the'" + targetid + "' div";
-    // }
     helpbox = document.getElementById(targetid);
     helpboxtext = helpbox.firstChild;
     helpboxtext.nodeValue = message;
@@ -286,30 +259,20 @@ function prefs() {
     show_dialog('dlgEditorSettings');
 }
 
-function default_toolbar() {
-}
-
-function working_toolbar() {
-}
-
 function new_file() {
     self.location = "?action=newfile";
 }
 
 function mapmode(m) {
-    if (m == 'xy') {
+    if (m === 'xy') {
         document.getElementById('debug').value = "xy";
         document.getElementById('xycapture').style.display = 'inline';
         document.getElementById('existingdata').style.display = 'none';
-    }
-
-    else if (m == 'existing') {
+    } else if (m === 'existing') {
         document.getElementById('debug').value = "existing";
         document.getElementById('xycapture').style.display = 'none';
         document.getElementById('existingdata').style.display = 'inline';
-    }
-
-    else {
+    } else {
         alert('invalid mode');
     }
 }
@@ -335,13 +298,11 @@ function clone_node() {
 function edit_node() {
     document.getElementById('action').value = "edit_node";
     show_itemtext('node', document.frmMain.node_name.value);
-    // document.frmMain.submit();
 }
 
 function edit_link() {
     document.getElementById('action').value = "edit_link";
     show_itemtext('link', document.frmMain.link_name.value);
-    // document.frmMain.submit();
 }
 
 function move_node() {
@@ -403,7 +364,7 @@ function position_first_legend() {
 // called from clicking on the existing legends
 function position_legend(e) {
     var el;
-    var alt, objectname, objecttype;
+    var alt, objectname;
 
     if (window.event && window.event.srcElement) {
         el = window.event.srcElement;
@@ -418,18 +379,11 @@ function position_legend(e) {
     }
 
     // we need to figure out WHICH legend, nowadays
-    //alt = el.getAttribute('alt');
     alt = el.id;
 
-    // objecttype = alt.slice(0, 5);
     objectname = alt.slice(7, alt.length);
 
     real_position_legend(objectname);
-
-    //document.getElementById('tb_help').innerText = 'Click on the map where you would like to put the legend.';
-    //document.getElementById('action').value = "place_legend";
-    //document.getElementById('param').value = objectname;
-    //mapmode('xy');
 }
 
 function real_position_legend(scalename) {
@@ -440,14 +394,9 @@ function real_position_legend(scalename) {
 }
 
 function show_itemtext(itemtype, name) {
-    var found = -1;
     mapmode('existing');
 
     hide_all_dialogs();
-
-    // $('#dlgNodeProperties').block();
-
-    //  $.blockUI.defaults.elementMessage = 'Please Wait';
 
     jQuery('textarea#item_configtext').val('');
 
@@ -459,8 +408,6 @@ function show_itemtext(itemtype, name) {
         jQuery('#action').val('set_link_config');
     }
     show_dialog('dlgTextEdit');
-
-//    $('#item_configtext').block();
 
     jQuery.ajax({
         type: "GET",
@@ -474,13 +421,11 @@ function show_itemtext(itemtype, name) {
         success: function (text) {
             jQuery('#item_configtext').val(text);
             document.getElementById('item_configtext').focus();
-            //  jQuery('#dlgTextEdit').unblock();
         }
     });
 }
 
 function show_node(name) {
-    var found = -1;
     mapmode('existing');
 
     hide_all_dialogs();
@@ -501,9 +446,9 @@ function show_node(name) {
         document.frmMain.node_infourl.value = mynode.infourl;
         document.frmMain.node_hover.value = mynode.overliburl;
 
-        if (mynode.iconfile != '') {
+        if (mynode.iconfile !== '') {
             // console.log(mynode.iconfile.substring(0,2));
-            if (mynode.iconfile.substring(0, 2) == '::') {
+            if (mynode.iconfile.substring(0, 2) === '::') {
                 document.frmMain.node_iconfilename.value = '--AICON--';
             }
             else {
@@ -523,7 +468,6 @@ function show_node(name) {
 }
 
 function show_link(name) {
-    var found = -1;
     mapmode('existing');
 
     hide_all_dialogs();
@@ -537,7 +481,7 @@ function show_link(name) {
 
         document.frmMain.link_bandwidth_in.value = mylink.bw_in;
 
-        if (mylink.bw_in == mylink.bw_out) {
+        if (mylink.bw_in === mylink.bw_out) {
             document.frmMain.link_bandwidth_out.value = '';
             document.frmMain.link_bandwidth_out_cb.checked = 1;
         }
@@ -556,12 +500,14 @@ function show_link(name) {
         document.frmMain.link_commentposout.value = mylink.commentposout;
 
         // if that didn't "stick", then we need to add the special value
-        if (jQuery('#link_commentposout').val() != mylink.commentposout) {
-            jQuery('#link_commentposout').prepend("<option selected value='" + mylink.commentposout + "'>" + mylink.commentposout + "%</option>");
+        var comment_pos_out = jQuery('#link_commentposout');
+        if (comment_pos_out.val() !== mylink.commentposout) {
+            comment_pos_out.prepend("<option selected value='" + mylink.commentposout + "'>" + mylink.commentposout + "%</option>");
         }
 
-        if (jQuery('#link_commentposin').val() != mylink.commentposin) {
-            jQuery('#link_commentposin').prepend("<option selected value='" + mylink.commentposin + "'>" + mylink.commentposin + "%</option>");
+        var comment_pos_in = jQuery('#link_commentposin');
+        if (comment_pos_in.val() !== mylink.commentposin) {
+            comment_pos_in.prepend("<option selected value='" + mylink.commentposin + "'>" + mylink.commentposin + "%</option>");
         }
 
         document.getElementById('link_nodename1').firstChild.nodeValue = mylink.a;
@@ -588,7 +534,6 @@ function hide_dialog(dlg) {
     // reset the action. The use pressed Cancel, if this function was called
     // (that, or they're about to open a new Properties dialog, so the value is irrelevant)
     document.frmMain.action.value = '';
-    //	alert('ACTION=' + document.frmMain.action.value);
 }
 
 function hide_all_dialogs() {
@@ -597,12 +542,12 @@ function hide_all_dialogs() {
 
 function ElementPosition(param) {
     var x = 0, y = 0;
-    var obj = (typeof param == "string") ? document.getElementById(param) : param;
+    var obj = (typeof param === "string") ? document.getElementById(param) : param;
     if (obj) {
         x = obj.offsetLeft;
         y = obj.offsetTop;
         var body = document.getElementsByTagName('body')[0];
-        while (obj.offsetParent && obj != body) {
+        while (obj.offsetParent && obj !== body) {
             x += obj.offsetParent.offsetLeft;
             y += obj.offsetParent.offsetTop;
             obj = obj.offsetParent;
@@ -610,10 +555,6 @@ function ElementPosition(param) {
     }
     this.x = x;
     this.y = y;
-}
-
-function coord_capture(event) {
-    // $('#tb_coords').html('+++');
 }
 
 function coord_update(event) {

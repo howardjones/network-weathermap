@@ -1,6 +1,5 @@
 <?php
 
-
 function weathermap_poller_output($rrd_update_array)
 {
     global $config;
@@ -20,7 +19,15 @@ function weathermap_poller_output($rrd_update_array)
 
     // new version works with *either* a local_data_id or rrdfile in the weathermap_data table, and returns BOTH
 
-    $stmt = $pdo->query("select distinct weathermap_data.id, weathermap_data.last_value, weathermap_data.last_time, weathermap_data.data_source_name, data_template_data.data_source_path, data_template_data.local_data_id, data_template_rrd.data_source_type_id from weathermap_data, data_template_data, data_template_rrd where weathermap_data.local_data_id=data_template_data.local_data_id and data_template_rrd.local_data_id=data_template_data.local_data_id and weathermap_data.local_data_id<>0");
+    $stmt = $pdo->query("SELECT DISTINCT weathermap_data.id, weathermap_data.last_value, 
+		weathermap_data.last_time, weathermap_data.data_source_name, 
+		data_template_data.data_source_path, data_template_data.local_data_id, 
+		data_template_rrd.data_source_type_id 
+		FROM weathermap_data, data_template_data, data_template_rrd 
+		WHERE weathermap_data.local_data_id=data_template_data.local_data_id 
+		AND data_template_rrd.local_data_id=data_template_data.local_data_id 
+		AND weathermap_data.local_data_id<>0");
+
     $requiredlist = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
     $path_rra = $config["rra_path"];
@@ -111,8 +118,7 @@ function weathermap_poller_output($rrd_update_array)
 
             $weathermap_data_update->execute(array($newtime, $newvalue, $newlastvalue, $required['id']));
             if ($log_verbosity >= POLLER_VERBOSITY_DEBUG) {
-                cacti_log("WM poller_output: Final value is $newvalue (was $lastval, period was $period)\n", true,
-                    "WEATHERMAP");
+                cacti_log("WM poller_output: Final value is $newvalue (was $lastval, period was $period)\n", true, "WEATHERMAP");
             }
         }
     }
@@ -129,8 +135,8 @@ function weathermap_poller_bottom()
     global $config;
     global $WEATHERMAP_VERSION;
 
-    include_once $config["library_path"] . DIRECTORY_SEPARATOR . "database.php";
-    include_once dirname(__FILE__) . DIRECTORY_SEPARATOR . "poller-common.php";
+    include_once($config["library_path"] . DIRECTORY_SEPARATOR . "database.php");
+    include_once(dirname(__FILE__) . DIRECTORY_SEPARATOR . "poller-common.php");
 
     $pdo = weathermap_get_pdo();
 
@@ -172,6 +178,4 @@ function weathermap_poller_top()
 
     // round to the nearest minute, since that's all we need for the crontab-style stuff
     $weathermap_poller_start_time = $now - ($now % 60);
-
 }
-

@@ -22,6 +22,7 @@
     "squizlabs/php_codesniffer": "~2",
     "theseer/phpdox": "*",
     "phploc/phploc": "~3",
+    "codacy/coverage": "dev-master",
     "phpunit/php-code-coverage": "~4"
   }
 }

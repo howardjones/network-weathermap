@@ -177,11 +177,8 @@ a.dlgTitlebar:hover {
 		font-size: 12pt;
 		font-weight: bold;
 		background: #099;
-		padding-left: 5px;
-		padding-right: 4px;
-		padding-top: 2px;
-		padding-bottom: 2px;
-	}
+        padding: 2px 4px 2px 5px;
+}
 	
 .debug { line-height: 2.5; margin: 10px; font-size: 70%; background: yellow; border: 1px dashed black; padding: 4px;}
 .debug input { font-size: 80%; }

@@ -199,7 +199,7 @@ class WeatherMapDataSource_dsstats extends WeatherMapDataSource
         // fill all that other information (ifSpeed, etc)
         // (but only if it's not switched off!)
         if (($map->get_hint("dsstats_no_cacti_extras") === null) && $local_data_id > 0) {
-            UpdateCactiData($item, $local_data_id);
+            updateCactiData($item, $local_data_id);
         }
 
         return $this->ReturnData();

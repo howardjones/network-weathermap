@@ -12,13 +12,13 @@
 /**
  * This file now contains only the functions for registering the plugin and doing plugin-admin stuff
  *
- * All the real work is in lib/cacti88-plugin-hooks.php and lib/cacti88-plugin-poller.php
+ * All the real work is in lib/cacti88-plugin-hooks.php and lib/cacti-plugin-poller.php
  */
 
 
 require_once dirname(__FILE__) . "/lib/database.php";
 require_once dirname(__FILE__) . "/lib/cacti88-plugin-hooks.php";
-require_once dirname(__FILE__) . "/lib/cacti88-plugin-poller.php";
+require_once dirname(__FILE__) . "/lib/cacti-plugin-poller.php";
 
 
 function plugin_weathermap_version()

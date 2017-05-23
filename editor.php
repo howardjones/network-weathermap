@@ -124,7 +124,7 @@ if (isset($_REQUEST['selected'])) {
     $selected = wm_editor_sanitize_selected($_REQUEST['selected']);
 }
 
-$weathermap_debugging=false;
+$weathermap_debugging = false;
 
 
 if ($mapname == '') {
@@ -318,9 +318,9 @@ if ($mapname == '') {
 
                     // find the references elsewhere to the old node name.
                     // First, relatively-positioned NODEs
-                    foreach ($map->nodes as $node) {
-                        if ($node->relative_to == $node_name) {
-                            $map->nodes[$node->name]->relative_to = $new_node_name;
+                    foreach ($map->nodes as $movingNode) {
+                        if ($movingNode->relative_to == $node_name) {
+                            $map->nodes[$movingNode->name]->relative_to = $new_node_name;
                         }
                     }
                     // Next, LINKs that use this NODE as an end.
@@ -362,6 +362,20 @@ if ($mapname == '') {
 
             $map->nodes[$new_node_name]->x = intval($_REQUEST['node_x']);
             $map->nodes[$new_node_name]->y = intval($_REQUEST['node_y']);
+
+            if ($_REQUEST['node_lock_to'] == "-- NONE --") {
+                // handle case where we're moving from relative to not-relative
+                $map->nodes[$new_node_name]->relative_to = "";
+            } else {
+                $anchor = $_REQUEST['node_lock_to'];
+                $map->nodes[$new_node_name]->relative_to = $anchor;
+
+                $dx = $map->nodes[$new_node_name]->x - $map->nodes[$anchor]->x;
+                $dy = $map->nodes[$new_node_name]->y - $map->nodes[$anchor]->y;
+
+                $map->nodes[$new_node_name]->original_x = $dx;
+                $map->nodes[$new_node_name]->original_y = $dy;
+            }
 
             if ($_REQUEST['node_iconfilename'] == '--NONE--') {
                 $map->nodes[$new_node_name]->iconfile = '';
@@ -600,87 +614,91 @@ if ($mapname == '') {
             $map->ReadConfig($mapfile);
 
             if (isset($map->nodes[$node_name])) {
-                // This is a complicated bit. Find out if this node is involved in any
-                // links that have VIAs. If it is, we want to rotate those VIA points
-                // about the *other* node in the link
-                foreach ($map->links as $link) {
-                    if ((count($link->vialist) > 0) && (($link->a->name == $node_name) || ($link->b->name == $node_name))) {
-                        // get the other node from us
-                        if ($link->a->name == $node_name) {
-                            $pivot = $link->b;
-                        }
-                        if ($link->b->name == $node_name) {
-                            $pivot = $link->a;
-                        }
 
-                        if (($link->a->name == $node_name) && ($link->b->name == $node_name)) {
-                            // this is a weird special case, but it is possible
-                            $dx = $link->a->x - $x;
-                            $dy = $link->a->y - $y;
+                $movingNode = $map->nodes[$node_name];
+                if ($movingNode->relative_to == "") {
 
-                            for ($i = 0; $i < count($link->vialist); $i++) {
-                                $link->vialist[$i][0] = $link->vialist[$i][0] - $dx;
-                                $link->vialist[$i][1] = $link->vialist[$i][1] - $dy;
+                    // This is a complicated bit. Find out if this node is involved in any
+                    // links that have VIAs. If it is, we want to rotate those VIA points
+                    // about the *other* node in the link
+                    foreach ($map->links as $link) {
+                        if ((count($link->vialist) > 0) && (($link->a->name == $node_name) || ($link->b->name == $node_name))) {
+                            // get the other node from us
+                            if ($link->a->name == $node_name) {
+                                $pivot = $link->b;
                             }
-                        } else {
-                            $pivx = $pivot->x;
-                            $pivy = $pivot->y;
-
-                            $dx_old = $pivx - $map->nodes[$node_name]->x;
-                            $dy_old = $pivy - $map->nodes[$node_name]->y;
-                            $dx_new = $pivx - $x;
-                            $dy_new = $pivy - $y;
-                            $l_old = sqrt($dx_old * $dx_old + $dy_old * $dy_old);
-                            $l_new = sqrt($dx_new * $dx_new + $dy_new * $dy_new);
-
-                            $angle_old = rad2deg(atan2(-$dy_old, $dx_old));
-                            $angle_new = rad2deg(atan2(-$dy_new, $dx_new));
-
-                            # $log .= "$pivx,$pivy\n$dx_old $dy_old $l_old => $angle_old\n";
-                            # $log .= "$dx_new $dy_new $l_new => $angle_new\n";
-
-                            // the geometry stuff uses a different point format, helpfully
-                            $points = array();
-                            foreach ($link->vialist as $via) {
-                                $points[] = $via[0];
-                                $points[] = $via[1];
+                            if ($link->b->name == $node_name) {
+                                $pivot = $link->a;
                             }
 
-                            $scalefactor = $l_new / $l_old;
-                            # $log .= "Scale by $scalefactor along link-line";
+                            if (($link->a->name == $node_name) && ($link->b->name == $node_name)) {
+                                // this is a weird special case, but it is possible
+                                $dx = $link->a->x - $x;
+                                $dy = $link->a->y - $y;
 
-                            // rotate so that link is along the axis
-                            rotateAboutPoint($points, $pivx, $pivy, deg2rad($angle_old));
-                            // do the scaling in here
-                            for ($i = 0; $i < (count($points) / 2); $i++) {
-                                $basex = ($points[$i * 2] - $pivx) * $scalefactor + $pivx;
-                                $points[$i * 2] = $basex;
-                            }
-                            // rotate back so that link is along the new direction
-                            rotateAboutPoint($points, $pivx, $pivy, deg2rad(-$angle_new));
-
-                            // now put the modified points back into the vialist again
-                            $v = 0;
-                            $i = 0;
-                            foreach ($points as $p) {
-                                // skip a point if it positioned relative to a node. Those shouldn't be rotated (well, IMHO)
-                                if (!isset($link->vialist[$v][2])) {
-                                    $link->vialist[$v][$i] = $p;
+                                for ($i = 0; $i < count($link->vialist); $i++) {
+                                    $link->vialist[$i][0] = $link->vialist[$i][0] - $dx;
+                                    $link->vialist[$i][1] = $link->vialist[$i][1] - $dy;
                                 }
-                                $i++;
-                                if ($i == 2) {
-                                    $i = 0;
-                                    $v++;
+                            } else {
+                                $pivx = $pivot->x;
+                                $pivy = $pivot->y;
+
+                                $dx_old = $pivx - $map->nodes[$node_name]->x;
+                                $dy_old = $pivy - $map->nodes[$node_name]->y;
+                                $dx_new = $pivx - $x;
+                                $dy_new = $pivy - $y;
+                                $l_old = sqrt($dx_old * $dx_old + $dy_old * $dy_old);
+                                $l_new = sqrt($dx_new * $dx_new + $dy_new * $dy_new);
+
+                                $angle_old = rad2deg(atan2(-$dy_old, $dx_old));
+                                $angle_new = rad2deg(atan2(-$dy_new, $dx_new));
+
+                                # $log .= "$pivx,$pivy\n$dx_old $dy_old $l_old => $angle_old\n";
+                                # $log .= "$dx_new $dy_new $l_new => $angle_new\n";
+
+                                // the geometry stuff uses a different point format, helpfully
+                                $points = array();
+                                foreach ($link->vialist as $via) {
+                                    $points[] = $via[0];
+                                    $points[] = $via[1];
+                                }
+
+                                $scalefactor = $l_new / $l_old;
+                                # $log .= "Scale by $scalefactor along link-line";
+
+                                // rotate so that link is along the axis
+                                rotateAboutPoint($points, $pivx, $pivy, deg2rad($angle_old));
+                                // do the scaling in here
+                                for ($i = 0; $i < (count($points) / 2); $i++) {
+                                    $basex = ($points[$i * 2] - $pivx) * $scalefactor + $pivx;
+                                    $points[$i * 2] = $basex;
+                                }
+                                // rotate back so that link is along the new direction
+                                rotateAboutPoint($points, $pivx, $pivy, deg2rad(-$angle_new));
+
+                                // now put the modified points back into the vialist again
+                                $v = 0;
+                                $i = 0;
+                                foreach ($points as $p) {
+                                    // skip a point if it positioned relative to a node. Those shouldn't be rotated (well, IMHO)
+                                    if (!isset($link->vialist[$v][2])) {
+                                        $link->vialist[$v][$i] = $p;
+                                    }
+                                    $i++;
+                                    if ($i == 2) {
+                                        $i = 0;
+                                        $v++;
+                                    }
                                 }
                             }
                         }
                     }
+
+                    $movingNode->x = $x;
+                    $movingNode->y = $y;
+                    $map->WriteConfig($mapfile);
                 }
-
-                $map->nodes[$node_name]->x = $x;
-                $map->nodes[$node_name]->y = $y;
-
-                $map->WriteConfig($mapfile);
             }
             break;
 
@@ -757,22 +775,22 @@ if ($mapname == '') {
                 $newnodename .= "a";
             }
 
-            $node = new WeatherMapNode($newnodename, "DEFAULT", $map);
+            $movingNode = new WeatherMapNode($newnodename, "DEFAULT", $map);
 
-            $node->x = $x;
-            $node->y = $y;
-            $node->defined_in = $map->configfile;
+            $movingNode->x = $x;
+            $movingNode->y = $y;
+            $movingNode->defined_in = $map->configfile;
 
             # array_push($map->seen_zlayers[$node->zorder], $node);
 
             // only insert a label if there's no LABEL in the DEFAULT node.
             // otherwise, respect the template.
             if ($map->nodes['DEFAULT']->label == $map->nodes[':: DEFAULT ::']->label) {
-                $node->label = "Node";
+                $movingNode->label = "Node";
             }
 
             # $map->nodes[$node->name] = $node;
-            $map->addNode($node);
+            $map->addNode($movingNode);
             $log = "added a node called $newnodename at $x,$y to $mapfile";
 
             $map->WriteConfig($mapfile);
@@ -821,20 +839,20 @@ if ($mapname == '') {
                     $newnodename = $newnodename . "_copy";
                 } while (isset($map->nodes[$newnodename]));
 
-                $node = new WeatherMapNode($newnodename, $map->nodes[$target]->template, $map);
+                $movingNode = new WeatherMapNode($newnodename, $map->nodes[$target]->template, $map);
                 // $node->Reset($map);
-                $node->CopyFrom($map->nodes[$target]);
+                $movingNode->CopyFrom($map->nodes[$target]);
 
                 # CopyFrom skips this one, because it's also the function used by template inheritance
                 # - but for Clone, we DO want to copy the template too
-                $node->template = $map->nodes[$target]->template;
+                $movingNode->template = $map->nodes[$target]->template;
 
                 // $node->name = $newnodename;
-                $node->x += 30;
-                $node->y += 30;
-                $node->defined_in = $mapfile;
+                $movingNode->x += 30;
+                $movingNode->y += 30;
+                $movingNode->defined_in = $mapfile;
 
-                $map->addNode($node);
+                $map->addNode($movingNode);
                 /// $map->nodes[$newnodename] = $node;
                 // array_push($map->seen_zlayers[$node->zorder], $node);
 
@@ -878,589 +896,654 @@ if ($mapname == '') {
 
     setcookie("wmeditor", ($use_overlay ? "1" : "0") . ":" . ($use_relative_overlay ? "1" : "0") . ":" . intval($grid_snap_value), time() + 60 * 60 * 24 * 30);
 
-?>
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
-<head>
-<style type="text/css">
-<?php
-        // if the cacti config was included properly, then
-        // this will be non-empty, and we can unhide the cacti links in the Link Properties box
-        if (!isset($config['cacti_version'])) {
-            echo "    .cactilink { display: none; }\n";
-            echo "    .cactinode { display: none; }\n";
-        }
-?>
-    </style>
-  <link rel="stylesheet" type="text/css" media="screen" href="editor-resources/oldeditor.css" />
-<script src="editor-resources/jquery-latest.min.js" type="text/javascript"></script>
-<script src="editor-resources/editor.js" type="text/javascript"></script>
-    <script type="text/javascript">
+    ?>
+    <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+            "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+    <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+    <head>
+        <style type="text/css">
+            <?php
+                    // if the cacti config was included properly, then
+                    // this will be non-empty, and we can unhide the cacti links in the Link Properties box
+                    if (!isset($config['cacti_version'])) {
+                        echo "    .cactilink { display: none; }\n";
+                        echo "    .cactinode { display: none; }\n";
+                    }
+            ?>
+        </style>
+        <link rel="stylesheet" type="text/css" media="screen" href="editor-resources/oldeditor.css"/>
+        <script src="editor-resources/jquery-latest.min.js" type="text/javascript"></script>
+        <script src="editor-resources/editor.js" type="text/javascript"></script>
+        <script type="text/javascript">
 
-    var fromplug=<?php echo ($fromplug==true ? 1:0); ?>;
-    var cacti_url='<?php echo $CACTI_PLUGIN_URL; ?>';
-    var editor_url = '<?php echo $editor_name; ?>';
+            var fromplug =<?php echo($fromplug == true ? 1 : 0); ?>;
+            var cacti_url = '<?php echo $CACTI_PLUGIN_URL; ?>';
+            var editor_url = '<?php echo $editor_name; ?>';
 
-    // the only javascript in here should be the objects representing the map itself
-    // all code should be in editor.js
-    <?php print $map->asJS() ?>
-<?php
+            // the only javascript in here should be the objects representing the map itself
+            // all code should be in editor.js
+            <?php print $map->asJS() ?>
+            <?php
 
-    // append any images used in the map that aren't in the images folder
-    foreach ($map->used_images as $im) {
-        if (! in_array($im,$imlist)) {
-            $imlist[]=$im;
-        }
-    }
+            // append any images used in the map that aren't in the images folder
+            foreach ($map->used_images as $im) {
+                if (!in_array($im, $imlist)) {
+                    $imlist[] = $im;
+                }
+            }
 
-    sort($imlist);
-?>
-    </script>
-  <title>PHP Weathermap Editor <?php echo $WEATHERMAP_VERSION; ?></title>
-</head>
+            sort($imlist);
+            ?>
+        </script>
+        <title>PHP Weathermap Editor <?php echo $WEATHERMAP_VERSION; ?></title>
+    </head>
 
-<body id="mainview">
-  <div id="toolbar">
-    <ul>
-          <li class="tb_active" id="tb_newfile">Change<br />File</li>
-      <li class="tb_active" id="tb_addnode">Add<br />Node</li>
-      <li class="tb_active" id="tb_addlink">Add<br />Link</li>
-      <li class="tb_active" id="tb_poslegend">Position<br />Legend</li>
-      <li class="tb_active" id="tb_postime">Position<br />Timestamp</li>
-      <li class="tb_active" id="tb_mapprops">Map<br />Properties</li>
-      <li class="tb_active" id="tb_mapstyle">Map<br />Style</li>
-      <li class="tb_active" id="tb_colours">Manage<br />Colors</li>
-      <li class="tb_active" id="tb_manageimages">Manage<br />Images</li>
-      <li class="tb_active" id="tb_prefs">Editor<br />Settings</li>
-          <li class="tb_coords" id="tb_coords">Position<br />---, ---</li>
-      <li class="tb_help"><span id="tb_help">or click a Node or Link to edit it's properties</span></li>
-    </ul>
-  </div>
-
-  <?php
-  if ($readonly_dir || $readonly_file) {
-      print "<div>" . htmlspecialchars($configerror) . "</div>";
-  }
-  ?>
-
-  <form action="<?php echo $editor_name ?>" method="post" name="frmMain">
-    <div align="center" id="mainarea">
-        <input type="hidden" name="plug" value="<?php echo ($fromplug==true ? 1 : 0) ?>" />
-     <input style="display:none" type="image"
-      src="<?php echo $imageurl; ?>" id="xycapture" /><img src=
-      "<?php echo $imageurl; ?>" id="existingdata" alt="Weathermap" usemap="#weathermap_imap"
-       />
-       <div class="debug"><p><strong>Debug:</strong>
-               <a href="?<?php echo ($fromplug==true ? 'plug=1&amp;' : ''); ?>action=retidy_all&amp;mapname=<?php echo  htmlspecialchars($mapname) ?>">Re-tidy ALL</a>
-               <a href="?<?php echo ($fromplug==true ? 'plug=1&amp;' : ''); ?>action=retidy&amp;mapname=<?php echo  htmlspecialchars($mapname) ?>">Re-tidy</a>
-               <a href="?<?php echo ($fromplug==true ? 'plug=1&amp;' : ''); ?>action=untidy&amp;mapname=<?php echo  htmlspecialchars($mapname) ?>">Un-tidy</a>
-
-
-               <a href="?<?php echo ($fromplug==true ? 'plug=1&amp;' : ''); ?>action=nothing&amp;mapname=<?php echo  htmlspecialchars($mapname) ?>">Do Nothing</a>
-       <span><label for="mapname">mapfile</label><input type="text" name="mapname" value="<?php echo htmlspecialchars($mapname); ?>" /></span>
-       <span><label for="action">action</label><input type="text" id="action" name="action" value="<?php echo htmlspecialchars($newaction); ?>" /></span>
-      <span><label for="param">param</label><input type="text" name="param" id="param" value="" /></span>
-            <span><label for="param2">param2</label><input type="text" name="param2" id="param2" value="<?php echo htmlspecialchars($param2); ?>" /></span> 
-      <span><label for="debug">debug</label><input id="debug" value="" name="debug" /></span>
-      <a target="configwindow" href="?<?php echo ($fromplug==true ? 'plug=1&amp;':''); ?>action=show_config&amp;mapname=<?php echo  urlencode($mapname) ?>">See config</a></p>
-    <pre><?php echo  htmlspecialchars($log) ?></pre>
-      </div>
-<?php
-    // we need to draw and throw away a map, to get the
-    // dimensions for the imagemap. Oh well.
-
-    // but save the actual htmlstyle, or the form will be wrong
-    $real_htmlstyle = $map->htmlstyle;
-
-    $map->DrawMap('null');
-    $map->htmlstyle='editor';
-    $map->calculateImagemap();
-
-    print $map->generateSortedImagemap("weathermap_imap");
-
-?>
-    </div><!-- Node Properties -->
-
-    <div id="dlgNodeProperties" class="dlgProperties">
-      <div class="dlgTitlebar">
-        Node Properties
-        <input size="6" name="node_name" type="hidden" />
+    <body id="mainview">
+    <div id="toolbar">
         <ul>
-          <li><a id="tb_node_submit" class="wm_submit" title="Submit any changes made">Submit</a></li>
-          <li><a id="tb_node_cancel" class="wm_cancel" title="Cancel any changes">Cancel</a></li>
+            <li class="tb_active" id="tb_newfile">Change<br/>File</li>
+            <li class="tb_active" id="tb_addnode">Add<br/>Node</li>
+            <li class="tb_active" id="tb_addlink">Add<br/>Link</li>
+            <li class="tb_active" id="tb_poslegend">Position<br/>Legend</li>
+            <li class="tb_active" id="tb_postime">Position<br/>Timestamp</li>
+            <li class="tb_active" id="tb_mapprops">Map<br/>Properties</li>
+            <li class="tb_active" id="tb_mapstyle">Map<br/>Style</li>
+            <li class="tb_active" id="tb_colours">Manage<br/>Colors</li>
+            <li class="tb_active" id="tb_manageimages">Manage<br/>Images</li>
+            <li class="tb_active" id="tb_prefs">Editor<br/>Settings</li>
+            <li class="tb_coords" id="tb_coords">Position<br/>---, ---</li>
+            <li class="tb_help"><span id="tb_help">or click a Node or Link to edit it's properties</span></li>
         </ul>
-      </div>
+    </div>
 
-      <div class="dlgBody">
-        <table>
-        <tr>
-            <th>Position</th>
-            <td><input id="node_x" name="node_x" size=4 type="text" />,<input id="node_y" name="node_y" size=4 type="text" /></td>
-        </tr>
-          <tr>
-            <th>Internal Name</th>
-            <td><input id="node_new_name" name="node_new_name" type="text" /></td>
-          </tr>
-          <tr>
-            <th>Label</th>
-            <td><input id="node_label" name="node_label" type="text" /></td>
-          </tr>
-          <tr>
-            <th>Info URL</th>
-            <td><input id="node_infourl" name="node_infourl" type="text" /></td>
-          </tr>
-          <tr>
-            <th>'Hover' Graph URL</th>
-            <td><input id="node_hover" name="node_hover" type="text" />
-            <span class="cactinode"><a id="node_cactipick">[Pick from Cacti]</a></span></td>
-          </tr>
-          <tr>
-            <th>Icon Filename</th>
-            <td><select id="node_iconfilename" name="node_iconfilename">
-
-<?php
-if (count($imlist) == 0) {
-    print '<option value="--NONE--">(no images are available)</option>';
-} else {
-    print '<option value="--NONE--">--NO ICON--</option>';
-    print '<option value="--AICON--">--ARTIFICIAL ICON--</option>';
-    foreach ($imlist as $im) {
-        print "<option ";
-        print "value=\"" . htmlspecialchars($im) . "\">" . htmlspecialchars($im) . "</option>\n";
+    <?php
+    if ($readonly_dir || $readonly_file) {
+        print "<div>" . htmlspecialchars($configerror) . "</div>";
     }
-}
-?>
-        </select></td>
-          </tr>
-          <tr>
-            <th></th>
-            <td>&nbsp;</td>
-          </tr>
-          <tr>
-            <th></th>
-            <td><a id="node_move" class="dlgTitlebar">Move</a><a class="dlgTitlebar" id="node_delete">Delete</a><a class="dlgTitlebar" id="node_clone">Clone</a><a class="dlgTitlebar" id="node_edit">Edit</a></td>
-          </tr>
-        </table>
-      </div>
+    ?>
 
-      <div class="dlgHelp" id="node_help">
-        Helpful text will appear here, depending on the current
-        item selected. It should wrap onto several lines, if it's
-        necessary for it to do that.
-      </div>
-    </div><!-- Node Properties -->
+    <form action="<?php echo $editor_name ?>" method="post" name="frmMain">
+        <div align="center" id="mainarea">
+            <input type="hidden" name="plug" value="<?php echo($fromplug == true ? 1 : 0) ?>"/>
+            <input style="display:none" type="image"
+                   src="<?php echo $imageurl; ?>" id="xycapture"/><img src=
+                                                                       "<?php echo $imageurl; ?>" id="existingdata"
+                                                                       alt="Weathermap" usemap="#weathermap_imap"
+            />
+            <div class="debug"><p><strong>Debug:</strong>
+                    <a href="?<?php echo($fromplug == true ? 'plug=1&amp;' : ''); ?>action=retidy_all&amp;mapname=<?php echo htmlspecialchars($mapname) ?>">Re-tidy
+                        ALL</a>
+                    <a href="?<?php echo($fromplug == true ? 'plug=1&amp;' : ''); ?>action=retidy&amp;mapname=<?php echo htmlspecialchars($mapname) ?>">Re-tidy</a>
+                    <a href="?<?php echo($fromplug == true ? 'plug=1&amp;' : ''); ?>action=untidy&amp;mapname=<?php echo htmlspecialchars($mapname) ?>">Un-tidy</a>
 
 
+                    <a href="?<?php echo($fromplug == true ? 'plug=1&amp;' : ''); ?>action=nothing&amp;mapname=<?php echo htmlspecialchars($mapname) ?>">Do
+                        Nothing</a>
+                    <span><label for="mapname">mapfile</label><input type="text" name="mapname"
+                                                                     value="<?php echo htmlspecialchars($mapname); ?>"/></span>
+                    <span><label for="action">action</label><input type="text" id="action" name="action"
+                                                                   value="<?php echo htmlspecialchars($newaction); ?>"/></span>
+                    <span><label for="param">param</label><input type="text" name="param" id="param" value=""/></span>
+                    <span><label for="param2">param2</label><input type="text" name="param2" id="param2"
+                                                                   value="<?php echo htmlspecialchars($param2); ?>"/></span>
+                    <span><label for="debug">debug</label><input id="debug" value="" name="debug"/></span>
+                    <a target="configwindow"
+                       href="?<?php echo($fromplug == true ? 'plug=1&amp;' : ''); ?>action=show_config&amp;mapname=<?php echo urlencode($mapname) ?>">See
+                        config</a></p>
+                <pre><?php echo htmlspecialchars($log) ?></pre>
+            </div>
+            <?php
+            // we need to draw and throw away a map, to get the
+            // dimensions for the imagemap. Oh well.
+
+            // but save the actual htmlstyle, or the form will be wrong
+            $real_htmlstyle = $map->htmlstyle;
+
+            $map->DrawMap('null');
+            $map->htmlstyle = 'editor';
+            $map->calculateImagemap();
+
+            print $map->generateSortedImagemap("weathermap_imap");
+
+            ?>
+        </div><!-- Node Properties -->
+
+        <div id="dlgNodeProperties" class="dlgProperties">
+            <div class="dlgTitlebar">
+                Node Properties
+                <input size="6" name="node_name" type="hidden"/>
+                <ul>
+                    <li><a id="tb_node_submit" class="wm_submit" title="Submit any changes made">Submit</a></li>
+                    <li><a id="tb_node_cancel" class="wm_cancel" title="Cancel any changes">Cancel</a></li>
+                </ul>
+            </div>
+
+            <div class="dlgBody">
+                <table>
+                    <tr>
+                        <th>Position</th>
+                        <td><input id="node_x" name="node_x" size=4 type="text"/>,<input id="node_y" name="node_y"
+                                                                                         size=4 type="text"/>
+                            <span id="node_locktext">
+            <br/>Lock to: <select name="node_lock_to" id="node_lock_to"><option>-- NONE --</option> <?php
+
+                                    $nodelist = array();
+
+                                    foreach ($map->nodes as $movingNode) {
+                                        // only show non-template nodes
+                                        if ($movingNode->x !== NULL) {
+                                            $nodelist[] = $movingNode->name;
+                                        }
+                                    }
+                                    sort($nodelist);
+                                    foreach ($nodelist as $movingNode) {
+                                        print "<option>" . htmlspecialchars($movingNode) . "</option>\n";
+                                    }
+                                    ?>
+</select>
+            </span>
 
 
-    <!-- Link Properties -->
-
-    <div id="dlgLinkProperties" class="dlgProperties">
-      <div class="dlgTitlebar">
-        Link Properties
-
-        <ul>
-          <li><a title="Submit any changes made"  class="wm_submit" id="tb_link_submit">Submit</a></li>
-          <li><a title="Cancel any changes" class="wm_cancel" id="tb_link_cancel">Cancel</a></li>
-        </ul>
-      </div>
-
-      <div class="dlgBody">
-        <div class="comment">
-          Link from '<span id="link_nodename1">%NODE1%</span>' to '<span id="link_nodename2">%NODE2%</span>'
-        </div>
-
-        <input size="6" name="link_name" type="hidden" />
-
-          <table width="100%">
-            <tr>
-              <th>Maximum Bandwidth<br />
-              Into '<span id="link_nodename1a">%NODE1%</span>'</th>
-              <td><input size="8" id="link_bandwidth_in" name="link_bandwidth_in" type=
-              "text" /> bits/sec</td>
-            </tr>
-            <tr>
-              <th>Maximum Bandwidth<br />
-              Out of '<span id="link_nodename1b">%NODE1%</span>'</th>
-              <td><input type="checkbox" id="link_bandwidth_out_cb" name=
-              "link_bandwidth_out_cb" value="symmetric" />Same As
-              'In' or <input id="link_bandwidth_out" name="link_bandwidth_out"
-              size="8" type="text" /> bits/sec</td>
-            </tr>
-            <tr>
-              <th>Data Source</th>
-              <td><input id="link_target" name="link_target" type="text" /> <span class="cactilink"><a id="link_cactipick">[Pick
-              from Cacti]</a></span></td>
-            </tr>
-            <tr>
-              <th>Link Width</th>
-              <td><input id="link_width" name="link_width" size="3" type="text" />
-              pixels</td>
-            </tr>
-            <tr>
-              <th>Info URL</th>
-              <td><input id="link_infourl" size="30" name="link_infourl" type="text" /></td>
-            </tr>
-            <tr>
-              <th>'Hover' Graph URL</th>
-              <td><input id="link_hover"  size="30" name="link_hover" type="text" /></td>
-            </tr>
-
-
-                        <tr>
-                               <th>IN Comment</th>
-                               <td><input id="link_commentin" size="25" name="link_commentin" type="text" />
-                                        <select id="link_commentposin" name="link_commentposin">
-                                                    <option value=95>95%</option>
-                                                    <option value=90>90%</option>
-                                                    <option value=80>80%</option>
-                                                    <option value=70>70%</option>
-                                                    <option value=60>60%</option>
-                                        </select>
-                               </td>
-                        </tr>
-                        <tr>
-                               <th>OUT Comment</th>
-                               <td><input id="link_commentout" size="25" name="link_commentout" type="text" />
-                                        <select id="link_commentposout" name="link_commentposout">
-                                                    <option value=5>5%</option>
-                                                    <option value=10>10%</option>
-                                                    <option value=20>20%</option>
-                                                    <option value=30>30%</option>
-                                                    <option value=40>40%</option>
-                                                    <option value=50>50%</option>
-                                        </select>
-                               </td>
-                        </tr> 
-
-            <tr>
-              <th></th>
-              <td>&nbsp;</td>
-            </tr>
-            <tr>
-              <th></th>
-              <td><a class="dlgTitlebar" id="link_delete">Delete
-              Link</a><a class="dlgTitlebar" id="link_edit">Edit</a><a
-                      class="dlgTitlebar" id="link_tidy">Tidy</a><a
-                            class="dlgTitlebar" id="link_via">Via</a>
                         </td>
-            </tr>
-          </table>
-      </div>
+                    </tr>
+                    <tr>
+                        <th>Internal Name</th>
+                        <td><input id="node_new_name" name="node_new_name" type="text"/></td>
+                    </tr>
+                    <tr>
+                        <th>Label</th>
+                        <td><input id="node_label" name="node_label" type="text"/></td>
+                    </tr>
+                    <tr>
+                        <th>Info URL</th>
+                        <td><input id="node_infourl" name="node_infourl" type="text"/></td>
+                    </tr>
+                    <tr>
+                        <th>'Hover' Graph URL</th>
+                        <td><input id="node_hover" name="node_hover" type="text"/>
+                            <span class="cactinode"><a id="node_cactipick">[Pick from Cacti]</a></span></td>
+                    </tr>
+                    <tr>
+                        <th>Icon Filename</th>
+                        <td><select id="node_iconfilename" name="node_iconfilename">
 
-      <div class="dlgHelp" id="link_help">
-        Helpful text will appear here, depending on the current
-        item selected. It should wrap onto several lines, if it's
-        necessary for it to do that.
-      </div>
-    </div><!-- Link Properties -->
+                                <?php
+                                if (count($imlist) == 0) {
+                                    print '<option value="--NONE--">(no images are available)</option>';
+                                } else {
+                                    print '<option value="--NONE--">--NO ICON--</option>';
+                                    print '<option value="--AICON--">--ARTIFICIAL ICON--</option>';
+                                    foreach ($imlist as $im) {
+                                        print "<option ";
+                                        print "value=\"" . htmlspecialchars($im) . "\">" . htmlspecialchars($im) . "</option>\n";
+                                    }
+                                }
+                                ?>
+                            </select></td>
+                    </tr>
+                    <tr>
+                        <th></th>
+                        <td>&nbsp;</td>
+                    </tr>
+                    <tr>
+                        <th></th>
+                        <td><a id="node_move" class="dlgTitlebar">Move</a><a class="dlgTitlebar"
+                                                                             id="node_delete">Delete</a><a
+                                    class="dlgTitlebar" id="node_clone">Clone</a><a class="dlgTitlebar" id="node_edit">Edit</a>
+                        </td>
+                    </tr>
+                </table>
+            </div>
 
-    <!-- Map Properties -->
-
-    <div id="dlgMapProperties" class="dlgProperties">
-      <div class="dlgTitlebar">
-        Map Properties
-
-        <ul>
-          <li><a title="Submit any changes made"  class="wm_submit" id="tb_map_submit">Submit</a></li>
-          <li><a title="Cancel any changes" class="wm_cancel" id="tb_map_cancel">Cancel</a></li>
-        </ul>
-      </div>
-
-      <div class="dlgBody">
-        <table>
-          <tr>
-            <th>Map Title</th>
-            <td><input id="map_title" name="map_title" size="25" type="text" value="<?php echo  htmlspecialchars($map->title) ?>"/></td>
-          </tr>
-        <tr>
-            <th>Legend Text</th>
-            <td><input name="map_legend" size="25" type="text" value="<?php echo  htmlspecialchars($map->keytext['DEFAULT']) ?>" /></td>
-          </tr>
-        <tr>
-            <th>Timestamp Text</th>
-            <td><input name="map_stamp" size="25" type="text" value="<?php echo  htmlspecialchars($map->stamptext) ?>" /></td>
-          </tr>
-
-        <tr>
-            <th>Default Link Width</th>
-            <td><input name="map_linkdefaultwidth" size="6" type="text" value="<?php echo  htmlspecialchars($map->links['DEFAULT']->width) ?>" /> pixels</td>
-          </tr>
-
-        <tr>
-            <th>Default Link Bandwidth</th>
-            <td><input name="map_linkdefaultbwin" size="6" type="text" value="<?php echo  htmlspecialchars($map->links['DEFAULT']->maxValuesConfigured[IN]) ?>" /> bit/sec in, <input name="map_linkdefaultbwout" size="6" type="text" value="<?php echo  htmlspecialchars($map->links['DEFAULT']->maxValuesConfigured[OUT]) ?>" /> bit/sec out</td>
-          </tr>
-
-
-          <tr>
-            <th>Map Size</th>
-            <td><input name="map_width" size="5" type=
-            "text"  value="<?php echo  htmlspecialchars($map->width) ?>" /> x <input name="map_height" size="5" type=
-            "text"  value="<?php echo  htmlspecialchars($map->height) ?>" /> pixels</td>
-          </tr>
-           <tr>
-            <th>Output Image Filename</th>
-            <td><input name="map_pngfile" type="text"  value="<?php echo  htmlspecialchars($map->imageoutputfile) ?>" /></td>
-          </tr>
-          <tr>
-            <th>Output HTML Filename</th>
-            <td><input name="map_htmlfile" type="text" value="<?php echo  htmlspecialchars($map->htmloutputfile) ?>" /></td>
-          </tr>
-          <tr>
-            <th>Background Image Filename</th>
-            <td><select name="map_bgfile">
-
-<?php
-if (count($imlist) == 0) {
-    print '<option value="--NONE--">(no images are available)</option>';
-} else {
-    print '<option value="--NONE--">--NONE--</option>';
-    foreach ($imlist as $im) {
-        print "<option ";
-        if ($map->background == $im) {
-            print " selected ";
-        }
-        print "value=\"" . htmlspecialchars($im) . "\">" . htmlspecialchars($im) . "</option>\n";
-    }
-}
-?>
-            </select></td>
-          </tr>
-
-        </table>
-      </div>
-
-      <div class="dlgHelp" id="map_help">
-        Helpful text will appear here, depending on the current
-        item selected. It should wrap onto several lines, if it's
-        necessary for it to do that.
-      </div>
-    </div><!-- Map Properties -->
-
-    <!-- Map Style -->
-    <div id="dlgMapStyle" class="dlgProperties">
-      <div class="dlgTitlebar">
-        Map Style
-
-        <ul>
-          <li><a title="Submit any changes made" id="tb_mapstyle_submit" class="wm_submit" >Submit</a></li>
-          <li><a title="Cancel any changes" class="wm_cancel" id="tb_mapstyle_cancel">Cancel</a></li>
-        </ul>
-      </div>
-
-        <div class="dlgBody">
-            <table>
-                <tr>
-                    <th>Link Labels</th>
-                    <td><select id="mapstyle_linklabels" name="mapstyle_linklabels">
-                            <option <?php echo($map->links['DEFAULT']->labelstyle == 'bits' ? 'selected' : '') ?>
-                                    value="bits">Bits/sec
-                            </option>
-                            <option <?php echo($map->links['DEFAULT']->labelstyle == 'percent' ? 'selected' : '') ?>
-                                    value="percent">Percentage
-                            </option>
-                            <option <?php echo($map->links['DEFAULT']->labelstyle == 'none' ? 'selected' : '') ?>
-                                    value="none">None
-                            </option>
-                        </select></td>
-                </tr>
-                <tr>
-                    <th>HTML Style</th>
-                    <td><select name="mapstyle_htmlstyle">
-                            <option <?php echo($real_htmlstyle == 'overlib' ? 'selected' : '') ?> value="overlib">
-                                Overlib (DHTML)
-                            </option>
-                            <option <?php echo($real_htmlstyle == 'static' ? 'selected' : '') ?> value="static">Static
-                                HTML
-                            </option>
-                        </select></td>
-                </tr>
-                <tr>
-                    <th>Arrow Style</th>
-                    <td><select name="mapstyle_arrowstyle">
-                            <option <?php echo($map->links['DEFAULT']->arrowstyle == 'classic' ? 'selected' : '') ?>
-                                    value="classic">Classic
-                            </option>
-                            <option <?php echo($map->links['DEFAULT']->arrowstyle == 'compact' ? 'selected' : '') ?>
-                                    value="compact">Compact
-                            </option>
-                        </select></td>
-                </tr>
-                <tr>
-                    <th>Node Font</th>
-                    <td><?php echo get_fontlist($map, 'mapstyle_nodefont', $map->nodes['DEFAULT']->labelfont); ?></td>
-                </tr>
-                <tr>
-                    <th>Link Label Font</th>
-                    <td><?php echo get_fontlist($map, 'mapstyle_linkfont', $map->links['DEFAULT']->bwfont); ?></td>
-                </tr>
-                <tr>
-                    <th>Legend Font</th>
-                    <td><?php echo get_fontlist($map, 'mapstyle_legendfont', $map->keyfont); ?></td>
-                </tr>
-                <tr>
-                    <th>Font Samples:</th>
-                    <td>
-                        <div class="fontsamples"><img alt="Sample of defined fonts"
-                                                      src="?action=font_samples&mapname=<?php echo $mapname ?>"/></div>
-                        <br/>(Drawn using your PHP install)
-                    </td>
-                </tr>
-            </table>
-        </div>
-
-      <div class="dlgHelp" id="mapstyle_help">
-        Helpful text will appear here, depending on the current
-        item selected. It should wrap onto several lines, if it's
-        necessary for it to do that.
-      </div>
-    </div><!-- Map Style -->
+            <div class="dlgHelp" id="node_help">
+                Helpful text will appear here, depending on the current
+                item selected. It should wrap onto several lines, if it's
+                necessary for it to do that.
+            </div>
+        </div><!-- Node Properties -->
 
 
+        <!-- Link Properties -->
 
-    <!-- Colours -->
+        <div id="dlgLinkProperties" class="dlgProperties">
+            <div class="dlgTitlebar">
+                Link Properties
 
-    <div id="dlgColours" class="dlgProperties">
-      <div class="dlgTitlebar">
-        Manage Colors
+                <ul>
+                    <li><a title="Submit any changes made" class="wm_submit" id="tb_link_submit">Submit</a></li>
+                    <li><a title="Cancel any changes" class="wm_cancel" id="tb_link_cancel">Cancel</a></li>
+                </ul>
+            </div>
 
-        <ul>
-          <li><a title="Submit any changes made" id="tb_colours_submit"  class="wm_submit" >Submit</a></li>
-          <li><a title="Cancel any changes" class="wm_cancel" id="tb_colours_cancel">Cancel</a></li>
-        </ul>
-      </div>
+            <div class="dlgBody">
+                <div class="comment">
+                    Link from '<span id="link_nodename1">%NODE1%</span>' to '<span id="link_nodename2">%NODE2%</span>'
+                </div>
 
-      <div class="dlgBody">
-        Nothing in here works yet. The aim is to have a nice color picker somehow.
-        <table>
-          <tr>
-            <th>Background Color</th>
-            <td></td>
-          </tr>
+                <input size="6" name="link_name" type="hidden"/>
 
-          <tr>
-            <th>Link Outline Color</th>
-            <td></td>
-          </tr>
-        <tr>
-        <th>Scale Colors</th>
-        <td>Some pleasant way to design the bandwidth color scale goes in here???</td>
-        </tr>
+                <table width="100%">
+                    <tr>
+                        <th>Maximum Bandwidth<br/>
+                            Into '<span id="link_nodename1a">%NODE1%</span>'
+                        </th>
+                        <td><input size="8" id="link_bandwidth_in" name="link_bandwidth_in" type=
+                            "text"/> bits/sec
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>Maximum Bandwidth<br/>
+                            Out of '<span id="link_nodename1b">%NODE1%</span>'
+                        </th>
+                        <td><input type="checkbox" id="link_bandwidth_out_cb" name=
+                            "link_bandwidth_out_cb" value="symmetric"/>Same As
+                            'In' or <input id="link_bandwidth_out" name="link_bandwidth_out"
+                                           size="8" type="text"/> bits/sec
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>Data Source</th>
+                        <td><input id="link_target" name="link_target" type="text"/> <span class="cactilink"><a
+                                        id="link_cactipick">[Pick
+              from Cacti]</a></span></td>
+                    </tr>
+                    <tr>
+                        <th>Link Width</th>
+                        <td><input id="link_width" name="link_width" size="3" type="text"/>
+                            pixels
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>Info URL</th>
+                        <td><input id="link_infourl" size="30" name="link_infourl" type="text"/></td>
+                    </tr>
+                    <tr>
+                        <th>'Hover' Graph URL</th>
+                        <td><input id="link_hover" size="30" name="link_hover" type="text"/></td>
+                    </tr>
 
-        </table>
-      </div>
 
-      <div class="dlgHelp" id="colours_help">
-        Helpful text will appear here, depending on the current
-        item selected. It should wrap onto several lines, if it's
-        necessary for it to do that.
-      </div>
-    </div><!-- Colours -->
+                    <tr>
+                        <th>IN Comment</th>
+                        <td><input id="link_commentin" size="25" name="link_commentin" type="text"/>
+                            <select id="link_commentposin" name="link_commentposin">
+                                <option value=95>95%</option>
+                                <option value=90>90%</option>
+                                <option value=80>80%</option>
+                                <option value=70>70%</option>
+                                <option value=60>60%</option>
+                            </select>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>OUT Comment</th>
+                        <td><input id="link_commentout" size="25" name="link_commentout" type="text"/>
+                            <select id="link_commentposout" name="link_commentposout">
+                                <option value=5>5%</option>
+                                <option value=10>10%</option>
+                                <option value=20>20%</option>
+                                <option value=30>30%</option>
+                                <option value=40>40%</option>
+                                <option value=50>50%</option>
+                            </select>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <th></th>
+                        <td>&nbsp;</td>
+                    </tr>
+                    <tr>
+                        <th></th>
+                        <td><a class="dlgTitlebar" id="link_delete">Delete
+                                Link</a><a class="dlgTitlebar" id="link_edit">Edit</a><a
+                                    class="dlgTitlebar" id="link_tidy">Tidy</a><a
+                                    class="dlgTitlebar" id="link_via">Via</a>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+
+            <div class="dlgHelp" id="link_help">
+                Helpful text will appear here, depending on the current
+                item selected. It should wrap onto several lines, if it's
+                necessary for it to do that.
+            </div>
+        </div><!-- Link Properties -->
+
+        <!-- Map Properties -->
+
+        <div id="dlgMapProperties" class="dlgProperties">
+            <div class="dlgTitlebar">
+                Map Properties
+
+                <ul>
+                    <li><a title="Submit any changes made" class="wm_submit" id="tb_map_submit">Submit</a></li>
+                    <li><a title="Cancel any changes" class="wm_cancel" id="tb_map_cancel">Cancel</a></li>
+                </ul>
+            </div>
+
+            <div class="dlgBody">
+                <table>
+                    <tr>
+                        <th>Map Title</th>
+                        <td><input id="map_title" name="map_title" size="25" type="text"
+                                   value="<?php echo htmlspecialchars($map->title) ?>"/></td>
+                    </tr>
+                    <tr>
+                        <th>Legend Text</th>
+                        <td><input name="map_legend" size="25" type="text"
+                                   value="<?php echo htmlspecialchars($map->keytext['DEFAULT']) ?>"/></td>
+                    </tr>
+                    <tr>
+                        <th>Timestamp Text</th>
+                        <td><input name="map_stamp" size="25" type="text"
+                                   value="<?php echo htmlspecialchars($map->stamptext) ?>"/></td>
+                    </tr>
+
+                    <tr>
+                        <th>Default Link Width</th>
+                        <td><input name="map_linkdefaultwidth" size="6" type="text"
+                                   value="<?php echo htmlspecialchars($map->links['DEFAULT']->width) ?>"/> pixels
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <th>Default Link Bandwidth</th>
+                        <td><input name="map_linkdefaultbwin" size="6" type="text"
+                                   value="<?php echo htmlspecialchars($map->links['DEFAULT']->maxValuesConfigured[IN]) ?>"/>
+                            bit/sec in, <input name="map_linkdefaultbwout" size="6" type="text"
+                                               value="<?php echo htmlspecialchars($map->links['DEFAULT']->maxValuesConfigured[OUT]) ?>"/>
+                            bit/sec out
+                        </td>
+                    </tr>
 
 
-    <!-- Images -->
+                    <tr>
+                        <th>Map Size</th>
+                        <td><input name="map_width" size="5" type=
+                            "text" value="<?php echo htmlspecialchars($map->width) ?>"/> x <input name="map_height"
+                                                                                                  size="5" type=
+                                                                                                  "text"
+                                                                                                  value="<?php echo htmlspecialchars($map->height) ?>"/>
+                            pixels
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>Output Image Filename</th>
+                        <td><input name="map_pngfile" type="text"
+                                   value="<?php echo htmlspecialchars($map->imageoutputfile) ?>"/></td>
+                    </tr>
+                    <tr>
+                        <th>Output HTML Filename</th>
+                        <td><input name="map_htmlfile" type="text"
+                                   value="<?php echo htmlspecialchars($map->htmloutputfile) ?>"/></td>
+                    </tr>
+                    <tr>
+                        <th>Background Image Filename</th>
+                        <td><select name="map_bgfile">
 
-    <div id="dlgImages" class="dlgProperties">
-      <div class="dlgTitlebar">
-        Manage Images
+                                <?php
+                                if (count($imlist) == 0) {
+                                    print '<option value="--NONE--">(no images are available)</option>';
+                                } else {
+                                    print '<option value="--NONE--">--NONE--</option>';
+                                    foreach ($imlist as $im) {
+                                        print "<option ";
+                                        if ($map->background == $im) {
+                                            print " selected ";
+                                        }
+                                        print "value=\"" . htmlspecialchars($im) . "\">" . htmlspecialchars($im) . "</option>\n";
+                                    }
+                                }
+                                ?>
+                            </select></td>
+                    </tr>
 
-        <ul>
-          <li><a title="Submit any changes made" id="tb_images_submit"  class="wm_submit" >Submit</a></li>
-          <li><a title="Cancel any changes" class="wm_cancel" id="tb_images_cancel">Cancel</a></li>
-        </ul>
-      </div>
+                </table>
+            </div>
 
-      <div class="dlgBody">
-        <p>Nothing in here works yet. </p>
-        The aim is to have some nice way to upload images which can be used as icons or backgrounds.
-        These images are what would appear in the dropdown boxes that don't currently do anything in the Node and Map Properties dialogs. This may end up being a seperate page rather than a dialog box...
-      </div>
+            <div class="dlgHelp" id="map_help">
+                Helpful text will appear here, depending on the current
+                item selected. It should wrap onto several lines, if it's
+                necessary for it to do that.
+            </div>
+        </div><!-- Map Properties -->
 
-      <div class="dlgHelp" id="images_help">
-        Helpful text will appear here, depending on the current
-        item selected. It should wrap onto several lines, if it's
-        necessary for it to do that.
-      </div>
-    </div><!-- Images -->
+        <!-- Map Style -->
+        <div id="dlgMapStyle" class="dlgProperties">
+            <div class="dlgTitlebar">
+                Map Style
+
+                <ul>
+                    <li><a title="Submit any changes made" id="tb_mapstyle_submit" class="wm_submit">Submit</a></li>
+                    <li><a title="Cancel any changes" class="wm_cancel" id="tb_mapstyle_cancel">Cancel</a></li>
+                </ul>
+            </div>
+
+            <div class="dlgBody">
+                <table>
+                    <tr>
+                        <th>Link Labels</th>
+                        <td><select id="mapstyle_linklabels" name="mapstyle_linklabels">
+                                <option <?php echo($map->links['DEFAULT']->labelstyle == 'bits' ? 'selected' : '') ?>
+                                        value="bits">Bits/sec
+                                </option>
+                                <option <?php echo($map->links['DEFAULT']->labelstyle == 'percent' ? 'selected' : '') ?>
+                                        value="percent">Percentage
+                                </option>
+                                <option <?php echo($map->links['DEFAULT']->labelstyle == 'none' ? 'selected' : '') ?>
+                                        value="none">None
+                                </option>
+                            </select></td>
+                    </tr>
+                    <tr>
+                        <th>HTML Style</th>
+                        <td><select name="mapstyle_htmlstyle">
+                                <option <?php echo($real_htmlstyle == 'overlib' ? 'selected' : '') ?> value="overlib">
+                                    Overlib (DHTML)
+                                </option>
+                                <option <?php echo($real_htmlstyle == 'static' ? 'selected' : '') ?> value="static">
+                                    Static
+                                    HTML
+                                </option>
+                            </select></td>
+                    </tr>
+                    <tr>
+                        <th>Arrow Style</th>
+                        <td><select name="mapstyle_arrowstyle">
+                                <option <?php echo($map->links['DEFAULT']->arrowstyle == 'classic' ? 'selected' : '') ?>
+                                        value="classic">Classic
+                                </option>
+                                <option <?php echo($map->links['DEFAULT']->arrowstyle == 'compact' ? 'selected' : '') ?>
+                                        value="compact">Compact
+                                </option>
+                            </select></td>
+                    </tr>
+                    <tr>
+                        <th>Node Font</th>
+                        <td><?php echo get_fontlist($map, 'mapstyle_nodefont', $map->nodes['DEFAULT']->labelfont); ?></td>
+                    </tr>
+                    <tr>
+                        <th>Link Label Font</th>
+                        <td><?php echo get_fontlist($map, 'mapstyle_linkfont', $map->links['DEFAULT']->bwfont); ?></td>
+                    </tr>
+                    <tr>
+                        <th>Legend Font</th>
+                        <td><?php echo get_fontlist($map, 'mapstyle_legendfont', $map->keyfont); ?></td>
+                    </tr>
+                    <tr>
+                        <th>Font Samples:</th>
+                        <td>
+                            <div class="fontsamples"><img alt="Sample of defined fonts"
+                                                          src="?action=font_samples&mapname=<?php echo $mapname ?>"/>
+                            </div>
+                            <br/>(Drawn using your PHP install)
+                        </td>
+                    </tr>
+                </table>
+            </div>
+
+            <div class="dlgHelp" id="mapstyle_help">
+                Helpful text will appear here, depending on the current
+                item selected. It should wrap onto several lines, if it's
+                necessary for it to do that.
+            </div>
+        </div><!-- Map Style -->
+
+
+        <!-- Colours -->
+
+        <div id="dlgColours" class="dlgProperties">
+            <div class="dlgTitlebar">
+                Manage Colors
+
+                <ul>
+                    <li><a title="Submit any changes made" id="tb_colours_submit" class="wm_submit">Submit</a></li>
+                    <li><a title="Cancel any changes" class="wm_cancel" id="tb_colours_cancel">Cancel</a></li>
+                </ul>
+            </div>
+
+            <div class="dlgBody">
+                Nothing in here works yet. The aim is to have a nice color picker somehow.
+                <table>
+                    <tr>
+                        <th>Background Color</th>
+                        <td></td>
+                    </tr>
+
+                    <tr>
+                        <th>Link Outline Color</th>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <th>Scale Colors</th>
+                        <td>Some pleasant way to design the bandwidth color scale goes in here???</td>
+                    </tr>
+
+                </table>
+            </div>
+
+            <div class="dlgHelp" id="colours_help">
+                Helpful text will appear here, depending on the current
+                item selected. It should wrap onto several lines, if it's
+                necessary for it to do that.
+            </div>
+        </div><!-- Colours -->
+
+
+        <!-- Images -->
+
+        <div id="dlgImages" class="dlgProperties">
+            <div class="dlgTitlebar">
+                Manage Images
+
+                <ul>
+                    <li><a title="Submit any changes made" id="tb_images_submit" class="wm_submit">Submit</a></li>
+                    <li><a title="Cancel any changes" class="wm_cancel" id="tb_images_cancel">Cancel</a></li>
+                </ul>
+            </div>
+
+            <div class="dlgBody">
+                <p>Nothing in here works yet. </p>
+                The aim is to have some nice way to upload images which can be used as icons or backgrounds.
+                These images are what would appear in the dropdown boxes that don't currently do anything in the Node
+                and Map Properties dialogs. This may end up being a seperate page rather than a dialog box...
+            </div>
+
+            <div class="dlgHelp" id="images_help">
+                Helpful text will appear here, depending on the current
+                item selected. It should wrap onto several lines, if it's
+                necessary for it to do that.
+            </div>
+        </div><!-- Images -->
 
         <div id="dlgTextEdit" class="dlgProperties">
-      <div class="dlgTitlebar">
-        Edit Map Object
-        <ul>
-          <li><a title="Submit any changes made" id="tb_textedit_submit"  class="wm_submit" >Submit</a></li>
-          <li><a title="Cancel any changes" class="wm_cancel" id="tb_textedit_cancel">Cancel</a></li>
-        </ul>
-      </div>
+            <div class="dlgTitlebar">
+                Edit Map Object
+                <ul>
+                    <li><a title="Submit any changes made" id="tb_textedit_submit" class="wm_submit">Submit</a></li>
+                    <li><a title="Cancel any changes" class="wm_cancel" id="tb_textedit_cancel">Cancel</a></li>
+                </ul>
+            </div>
 
-      <div class="dlgBody">
-        <p>You can edit the map items directly here.</p>
-          <p>NOTE: Any changes are NOT checked! This will simply replace the whole configuration for this item.</p>
+            <div class="dlgBody">
+                <p>You can edit the map items directly here.</p>
+                <p>NOTE: Any changes are NOT checked! This will simply replace the whole configuration for this
+                    item.</p>
                 <textarea wrap="no" id="item_configtext" name="item_configtext" cols=40 rows=15></textarea>
-      </div>
+            </div>
 
-      <div class="dlgHelp" id="images_help">
-        Helpful text will appear here, depending on the current
-        item selected. It should wrap onto several lines, if it's
-        necessary for it to do that.
-      </div>
-    </div><!-- TextEdit -->
+            <div class="dlgHelp" id="images_help">
+                Helpful text will appear here, depending on the current
+                item selected. It should wrap onto several lines, if it's
+                necessary for it to do that.
+            </div>
+        </div><!-- TextEdit -->
 
 
-    <div id="dlgEditorSettings" class="dlgProperties">
-      <div class="dlgTitlebar">
-        Editor Settings
-        <ul>
-          <li><a title="Submit any changes made" id="tb_editorsettings_submit"  class="wm_submit" >Submit</a></li>
-          <li><a title="Cancel any changes" class="wm_cancel" id="tb_editorsettings_cancel">Cancel</a></li>
-        </ul>
-      </div>
+        <div id="dlgEditorSettings" class="dlgProperties">
+            <div class="dlgTitlebar">
+                Editor Settings
+                <ul>
+                    <li><a title="Submit any changes made" id="tb_editorsettings_submit" class="wm_submit">Submit</a>
+                    </li>
+                    <li><a title="Cancel any changes" class="wm_cancel" id="tb_editorsettings_cancel">Cancel</a></li>
+                </ul>
+            </div>
 
-      <div class="dlgBody">
-        <table>
-            <tr>
-            <th>Show VIAs overlay</th>
-            <td><select id="editorsettings_showvias" name="editorsettings_showvias">
-              <option <?php echo ($use_overlay ? 'selected' : '') ?> value="1">Yes</option>
-              <option <?php echo ($use_overlay ? '' : 'selected') ?> value="0">No</option>
-                </select>
-            </td>
-            </tr>
-            <tr>
-            <th>Show Relative Positions overlay</th>
-            <td><select id="editorsettings_showrelative" name="editorsettings_showrelative">
-              <option <?php echo ($use_relative_overlay ? 'selected' : '') ?> value="1">Yes</option>
-              <option <?php echo ($use_relative_overlay ? '' : 'selected') ?> value="0">No</option>
-                </select>
-            </td>
-            </tr>
-            <tr>
-            <th>Snap To Grid</th>
-            <td><select id="editorsettings_gridsnap" name="editorsettings_gridsnap">
-                <option <?php echo ($grid_snap_value==0 ? 'selected' : '') ?> value="NO">No</option>
-                <option <?php echo ($grid_snap_value==5 ? 'selected' : '') ?> value="5">5 pixels</option>
-                <option <?php echo ($grid_snap_value==10 ? 'selected' : '') ?> value="10">10 pixels</option>
-                <option <?php echo ($grid_snap_value==15 ? 'selected' : '') ?> value="15">15 pixels</option>
-                <option <?php echo ($grid_snap_value==20 ? 'selected' : '') ?> value="20">20 pixels</option>
-                <option <?php echo ($grid_snap_value==50 ? 'selected' : '') ?> value="50">50 pixels</option>
-                <option <?php echo ($grid_snap_value==100 ? 'selected' : '') ?> value="100">100 pixels</option>
-                </select>
-            </td>
-            </tr>
-        </table>
-                
-      </div>
+            <div class="dlgBody">
+                <table>
+                    <tr>
+                        <th>Show VIAs overlay</th>
+                        <td><select id="editorsettings_showvias" name="editorsettings_showvias">
+                                <option <?php echo($use_overlay ? 'selected' : '') ?> value="1">Yes</option>
+                                <option <?php echo($use_overlay ? '' : 'selected') ?> value="0">No</option>
+                            </select>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>Show Relative Positions overlay</th>
+                        <td><select id="editorsettings_showrelative" name="editorsettings_showrelative">
+                                <option <?php echo($use_relative_overlay ? 'selected' : '') ?> value="1">Yes</option>
+                                <option <?php echo($use_relative_overlay ? '' : 'selected') ?> value="0">No</option>
+                            </select>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>Snap To Grid</th>
+                        <td><select id="editorsettings_gridsnap" name="editorsettings_gridsnap">
+                                <option <?php echo($grid_snap_value == 0 ? 'selected' : '') ?> value="NO">No</option>
+                                <option <?php echo($grid_snap_value == 5 ? 'selected' : '') ?> value="5">5 pixels
+                                </option>
+                                <option <?php echo($grid_snap_value == 10 ? 'selected' : '') ?> value="10">10 pixels
+                                </option>
+                                <option <?php echo($grid_snap_value == 15 ? 'selected' : '') ?> value="15">15 pixels
+                                </option>
+                                <option <?php echo($grid_snap_value == 20 ? 'selected' : '') ?> value="20">20 pixels
+                                </option>
+                                <option <?php echo($grid_snap_value == 50 ? 'selected' : '') ?> value="50">50 pixels
+                                </option>
+                                <option <?php echo($grid_snap_value == 100 ? 'selected' : '') ?> value="100">100
+                                    pixels
+                                </option>
+                            </select>
+                        </td>
+                    </tr>
+                </table>
 
-      <div class="dlgHelp" id="images_help">
-        Helpful text will appear here, depending on the current
-        item selected. It should wrap onto several lines, if it's
-        necessary for it to do that.
-      </div>
-    </div><!-- TextEdit -->
+            </div>
+
+            <div class="dlgHelp" id="images_help">
+                Helpful text will appear here, depending on the current
+                item selected. It should wrap onto several lines, if it's
+                necessary for it to do that.
+            </div>
+        </div><!-- TextEdit -->
 
     </form>
-</body>
-</html>
-<?php
+    </body>
+    </html>
+    <?php
 } // if mapname != ''
 // vim:ts=4:sw=4:

@@ -13,6 +13,7 @@ more PHP 4 support. Sorry to CentOS 4 users!
              For my test case, I got from 2.5 seconds to 0.6 seconds to render a set of maps - 5x speedup!
     CHANGE - Replaced entire configuration parser (part of performance changes)
     CHANGE - dsstats data plugin can skip looking up additional Cacti data by setting dsstats_no_cacti_extras
+    CHANGE - rrdtool data plugin can skip looking up additional Cacti data by setting rrdtool_no_cacti_extras
     CHANGE - Moved all database access to use PDO, to avoid PHP 7.0 issues.
     CHANGE - lots of internal changes mostly pulled over from refactoring project:
              * New WMTarget, ConfigReader, WMColour and Scale classes

@@ -13,98 +13,98 @@ require_once "all.php";
 class WeatherMap extends WeatherMapBase
 {
     /** @var WeatherMapNode[] $nodes */
-    var $nodes = array();
-    /** @var WeatherMapLink[] $links */
-    var $links = array();
+    public $nodes = array();
+    /** var WeatherMapLink[] $links */
+    public $links = array();
 
-    // var $texts = array(); // an array containing all the extraneous text bits
-    var $used_images = array(); // an array of image filenames referred to (used by editor ONLY)
-    var $seen_zlayers = array(0=>array(),1000=>array()); // 0 is the background, 1000 is the legends, title, etc
+    // public $texts = array(); // an array containing all the extraneous text bits
+    public $used_images = array(); // an array of image filenames referred to (used by editor ONLY)
+    public $seen_zlayers = array(0=>array(),1000=>array()); // 0 is the background, 1000 is the legends, title, etc
 
-    var $next_id;
+    public $next_id;
 
-    var $background;
-    var $kilo;
-    var $width;
-    var $height;
-    var $htmlstyle;
+    public $background;
+    public $kilo;
+    public $width;
+    public $height;
+    public $htmlstyle;
 
-    /** @var  HTMLImagemap $imap */
-    var $imap;
+    /** var  HTMLImagemap $imap */
+    public $imap;
 
-//     var $colours;
-    var $rrdtool;
+//     public $colours;
+    public $rrdtool;
 
-    var $sizedebug;
-    var $widthmod;
-    var $debugging;
-    var $keyfont;
-    var $timefont;
+    public $sizedebug;
+    public $widthmod;
+    public $debugging;
+    public $keyfont;
+    public $timefont;
 
-    var $titlefont;
-    var $timex;
-    var $timey;
+    public $titlefont;
+    public $timex;
+    public $timey;
 
-    var $keyx;
-    var $keyy;
+    public $keyx;
+    public $keyy;
 
-    var $titlex;
-    var $titley;
-    var $mintimex;
-    var $maxtimex;
-    var $mintimey;
-    var $maxtimey;
+    public $titlex;
+    public $titley;
+    public $mintimex;
+    public $maxtimex;
+    public $mintimey;
+    public $maxtimey;
 
-    var $min_ds_time;
-    var $max_ds_time;
-    var $minstamptext;
-    var $maxstamptext;
-    var $stamptext;
-    var $datestamp;
-    var $title;
+    public $min_ds_time;
+    public $max_ds_time;
+    public $minstamptext;
+    public $maxstamptext;
+    public $stamptext;
+    public $datestamp;
+    public $title;
 
-    var $keytext;
-    var $htmloutputfile;
-    var $imageoutputfile;
-    var $dataoutputfile;
-    var $htmlstylesheet;
-    var $configfile;
-    var $imagefile;
+    public $keytext;
+    public $htmloutputfile;
+    public $imageoutputfile;
+    public $dataoutputfile;
+    public $htmlstylesheet;
+    public $configfile;
+    public $imagefile;
 
-    var $imageuri;
-    var $keystyle;
-    var $keysize;
+    public $imageuri;
+    public $keystyle;
+    public $keysize;
 
-    var $min_data_time;
-    var $max_data_time;
-    var $context;
+    public $min_data_time;
+    public $max_data_time;
+    public $context;
 
-    var $rrdtool_check;
+    public $rrdtool_check;
 
-    /** @var  WMImageLoader $imagecache */
-    var $imagecache;
-    var $selected;
+    /** var  WMImageLoader $imagecache */
+    public $imagecache;
+    public $selected;
 
-    var $thumb_width, $thumb_height;
-    var $has_includes;
-    var $has_overlibs;
-    var $node_template_tree;
-    var $link_template_tree;
-    var $dsinfocache=array();
+    public $thumb_width, $thumb_height;
+    public $has_includes;
+    public $has_overlibs;
+    public $node_template_tree;
+    public $link_template_tree;
+    public $dsinfocache=array();
 
-    var $plugins = array();
-    var $included_files = array();
+    public $plugins = array();
+    public $included_files = array();
 
-    /** @var WMColour[] $colourtable  */
-    var $colourtable = array();
-    var $warncount = 0;
+    /** var WMColour[] $colourtable  */
+    public $colourtable = array();
+    public $warncount = 0;
 
-    /** @var WeatherMapScale[] $scales */
-    var $scales;
-    var $fonts;
+    /** var WeatherMapScale[] $scales */
+    public $scales;
+    public $fonts;
 
-    /** @var WMStats $stats - a generic place to keep various statistics about the map */
-    var $stats;
+    /** var WMStats $stats - a generic place to keep various statistics about the map */
+    public $stats;
 
     public function __construct()
     {
@@ -333,8 +333,7 @@ class WeatherMap extends WeatherMapBase
         wm_debug("Trace: ProcessString($input, $context_description)\n");
 
         if ($multiline == true) {
-            $i = $input;
-            $input = str_replace("\\n", "\n", $i);
+            $input = str_replace("\\n", "\n", $input);
         }
 
         if ($context_description === 'node') {
@@ -362,7 +361,6 @@ class WeatherMap extends WeatherMapBase
             if (preg_match('/\{(node|map|link):([^}]+)\}/', $key, $matches)) {
                 $type = $matches[1];
                 $args = $matches[2];
-                # debug("ProcessString: type is ".$type.", arguments are ".$args."\n");
 
                 if ($type == 'map') {
                     $the_item = $this;
@@ -706,22 +704,22 @@ class WeatherMap extends WeatherMapBase
             return;
         }
 
-        $fd = fopen($filename, 'w');
-        if (!$fd) {
+        $fileHandle = fopen($filename, 'w');
+        if (!$fileHandle) {
             return;
         }
 
         foreach ($this->nodes as $node) {
             if (!preg_match('/^::\s/', $node->name) && sizeof($node->targets) > 0) {
-                fputs($fd, sprintf("N_%s\t%f\t%f\r\n", $node->name, $node->absoluteUsages[IN], $node->absoluteUsages[OUT]));
+                fputs($fileHandle, sprintf("N_%s\t%f\t%f\r\n", $node->name, $node->absoluteUsages[IN], $node->absoluteUsages[OUT]));
             }
         }
         foreach ($this->links as $link) {
             if (!preg_match('/^::\s/', $link->name) && sizeof($link->targets) > 0) {
-                fputs($fd, sprintf("L_%s\t%f\t%f\r\n", $link->name, $link->absoluteUsages[IN], $link->absoluteUsages[OUT]));
+                fputs($fileHandle, sprintf("L_%s\t%f\t%f\r\n", $link->name, $link->absoluteUsages[IN], $link->absoluteUsages[OUT]));
             }
         }
-        fclose($fd);
+        fclose($fileHandle);
     }
 
     private function getConfigForPosition($keyword, $fieldnames, $object1, $object2)
@@ -869,12 +867,12 @@ class WeatherMap extends WeatherMapBase
 
     public function WriteConfig($filename)
     {
-        $fd = fopen($filename, "w");
+        $fileHandle = fopen($filename, "w");
 
-        if ($fd) {
+        if ($fileHandle) {
             $output = $this->getConfig();
-            fwrite($fd, $output);
-            fclose($fd);
+            fwrite($fileHandle, $output);
+            fclose($fileHandle);
         } else {
             wm_warn("Couldn't open config file $filename for writing");
             return false;

@@ -61,7 +61,7 @@ class WeatherMapDataItem extends WeatherMapItem
         }
     }
 
-    private function getChannelList()
+    public function getChannelList()
     {
         return array("in" => IN, "out" => OUT);
     }
@@ -141,7 +141,7 @@ class WeatherMapDataItem extends WeatherMapItem
 
     public function updateMaxValues($kilo)
     {
-        foreach ($this->getChannelList() as $name => $const) {
+        foreach ($this->getChannelList() as $const) {
             $this->maxValues[$const] = WMUtility::interpretNumberWithMetricSuffix($this->maxValuesConfigured[$const], $kilo);
         }
 

@@ -126,8 +126,10 @@ class WeatherMapDataSource_rrd extends WeatherMapDataSource
                             $ldi = $result['local_data_id'];
                         }
 
-                        if ($ldi > 0) {
-                            UpdateCactiData($item, $ldi);
+                        // fill all that other information (ifSpeed, etc)
+                        // (but only if it's not switched off!)
+                        if (($map->get_hint("rrdtool_no_cacti_extras") === null) && $ldi > 0) {
+                            updateCactiData($item, $ldi);
                         }
                     }
                 } else {

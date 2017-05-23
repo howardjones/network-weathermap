@@ -154,18 +154,13 @@ class WeatherMapScale extends WeatherMapItem
             }
         }
 
-        if ($isPercentage && $value > 100) {
-            if ($nowarn_clipping == 0) {
-                wm_warn("ColourFromValue: Clipped $value% to 100% for item $itemName [WMWARN33]\n");
+        if ($isPercentage) {
+            $oldValue = $value;
+            $value = min($value, 100);
+            $value = max ($value, 0);
+            if ($value != $oldValue && $nowarn_clipping == 0) {
+                wm_warn("ColourFromValue: Clipped $oldValue% to $value% for item $itemName [WMWARN33]\n");
             }
-            $value = 100;
-        }
-
-        if ($isPercentage && $value < 0) {
-            if ($nowarn_clipping == 0) {
-                wm_warn("ColourFromValue: Clipped $value% to 0% for item $itemName [WMWARN34]\n");
-            }
-            $value = 0;
         }
 
         list ($col, $key, $tag) = $this->findScaleHit($value);
@@ -182,7 +177,7 @@ class WeatherMapScale extends WeatherMapItem
 
         wm_debug("CFV $itemName $scaleName $value '$tag' $key " . $col->asConfig() . "\n");
 
-        return (array($col, $key, $tag));
+        return array($col, $key, $tag);
     }
 
     protected function findScaleHit($value)

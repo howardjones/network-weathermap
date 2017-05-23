@@ -434,7 +434,6 @@ function weathermap_fullview($cycle=FALSE, $firstonly=FALSE, $limit_to_group = -
 		print "<div class='all_map_holder $class'>";
 
 		$outdir = dirname(__FILE__).'/output/';
-		$confdir = dirname(__FILE__).'/configs/';
 		foreach ($maplist as $map)
 		{
 			if ($firstonly && $i > 0) {

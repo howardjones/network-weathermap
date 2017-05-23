@@ -32,7 +32,6 @@ function plugin_weathermap_version()
         'email' => 'howie@thingy.com',
         'url' => 'http://www.network-weathermap.com/versions.php'
     );
-
 }
 
 

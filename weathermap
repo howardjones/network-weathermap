@@ -10,10 +10,8 @@ require_once 'Console/Getopt.php';
 require_once 'lib/Weathermap.class.php';
 
 if (!wm_module_checks()) {
-    die ("Quitting: Module checks failed.\n");
+    die("Quitting: Module checks failed.\n");
 }
-
-//    $weathermap_debugging=TRUE; 
 
 $output = "html";
 $configfile = "weathermap.conf";
@@ -63,7 +61,7 @@ $ret = $cg->getopt($args, $short_opts, $long_opts);
 
 $pear = new PEAR;
 if ($pear->isError($ret)) {
-    die ("Error in command line: " . $ret->getMessage() . "\n (try --help)\n");
+    die("Error in command line: " . $ret->getMessage() . "\n (try --help)\n");
 }
 
 $gopts = $ret[0];
@@ -264,26 +262,19 @@ if ($map->ReadConfig($configfile)) {
         wm_debug("Writing HTML to $htmlfile\n");
 
         $fd = fopen($htmlfile, 'w');
-        fwrite($fd,
-            '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head>');
+        fwrite($fd, '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head>');
         if ($map->htmlstylesheet != '') {
             fwrite($fd, '<link rel="stylesheet" type="text/css" href="' . $map->htmlstylesheet . '" />');
         }
-        fwrite($fd, '<meta http-equiv="refresh" content="300" /><title>' . $map->ProcessString($map->title,
-                $map) . '</title></head><body>');
+        fwrite($fd, '<meta http-equiv="refresh" content="300" /><title>' . $map->ProcessString($map->title, $map) . '</title></head><body>');
 
         if ($map->htmlstyle == "overlib") {
-            fwrite($fd,
-                "<div id=\"overDiv\" style=\"position:absolute; visibility:hidden; z-index:1000;\"></div>\n");
-            fwrite($fd,
-                "<script type=\"text/javascript\" src=\"overlib.js\"><!-- overLIB (c) Erik Bosrup --></script> \n");
+            fwrite($fd, "<div id=\"overDiv\" style=\"position:absolute; visibility:hidden; z-index:1000;\"></div>\n");
+            fwrite($fd, "<script type=\"text/javascript\" src=\"overlib.js\"><!-- overLIB (c) Erik Bosrup --></script> \n");
         }
 
         fwrite($fd, $map->MakeHTML());
-        fwrite($fd,
-            '<hr /><span id="byline">Network Map created with <a href="http://www.network-weathermap.com/?vs='
-            . $WEATHERMAP_VERSION . '">PHP Network Weathermap v' . $WEATHERMAP_VERSION
-            . '</a></span></body></html>');
+        fwrite($fd, '<hr /><span id="byline">Network Map created with <a href="http://www.network-weathermap.com/?vs=' . $WEATHERMAP_VERSION . '">PHP Network Weathermap v' . $WEATHERMAP_VERSION . '</a></span></body></html>');
         fclose($fd);
     }
 
@@ -315,9 +306,8 @@ if ($map->ReadConfig($configfile)) {
             print "\n";
         }
     }
-
 } else {
-    die ("\n\nCould not read Weathermap config file. No output produced. Maybe try --help?\n");
+    die("\n\nCould not read Weathermap config file. No output produced. Maybe try --help?\n");
 }
 
 function my_assert_handler($file, $line, $code)

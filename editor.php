@@ -924,10 +924,10 @@ if ($mapname == '') {
     $iconselection = "";
 
     if (count($imlist) == 0) {
-        print '<option value="--NONE--">(no images are available)</option>';
+        $iconselection .= '<option value="--NONE--">(no images are available)</option>';
     } else {
-        print '<option value="--NONE--">--NO ICON--</option>';
-        print '<option value="--AICON--">--ARTIFICIAL ICON--</option>';
+        $iconselection .= '<option value="--NONE--">--NO ICON--</option>';
+        $iconselection .= '<option value="--AICON--">--ARTIFICIAL ICON--</option>';
         foreach ($imlist as $im) {
             $iconselection .= "<option ";
             $iconselection .= "value=\"" . htmlspecialchars($im) . "\">" . htmlspecialchars($im) . "</option>\n";

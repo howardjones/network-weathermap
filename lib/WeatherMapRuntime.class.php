@@ -13,7 +13,7 @@ class WeatherMapRuntime
 
     public $warncount;
 
-    public function __construct($configDirectory, $outputDirectory, $mapObject)
+    public function __construct($configDirectory, $outputDirectory, $mapObject, $imageFormat)
     {
         $fileHash = $mapObject->filehash;
 

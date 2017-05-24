@@ -32,7 +32,6 @@ class WeatherMap extends WeatherMapBase
     /** var  HTMLImagemap $imap */
     public $imap;
 
-//     public $colours;
     public $rrdtool;
 
     public $sizedebug;
@@ -308,7 +307,7 @@ class WeatherMap extends WeatherMapBase
     }
 
 
-    function ProcessString($input, &$context, $include_notes = true, $multiline = false)
+    public function ProcessString($input, &$context, $include_notes = true, $multiline = false)
     {
         # debug("ProcessString: input is $input\n");
 
@@ -902,9 +901,6 @@ class WeatherMap extends WeatherMapBase
             }
 
             // by here, we should have a valid image handle
-//        $this->white = myimagecolorallocate($image, 255, 255, 255);
-//        $this->black = myimagecolorallocate($image, 0, 0, 0);
-//        $this->grey = myimagecolorallocate($image, 192, 192, 192);
             $this->selected = myimagecolorallocate($imageRef, 255, 0, 0); // for selections in the editor
 
             if ($bgImageRef) {
@@ -977,7 +973,7 @@ class WeatherMap extends WeatherMapBase
 
     protected function calculateDatestamp()
     {
-// if we're running tests, we force the time to a particular value,
+        // if we're running tests, we force the time to a particular value,
         // so the output can be compared to a reference image more easily
         $testmode = intval($this->get_hint("testmode"));
 
@@ -1117,8 +1113,6 @@ class WeatherMap extends WeatherMapBase
         // Create an imageRef to draw into
         $imageRef = $this->prepareOutputImage();
 
-//        $this->preAllocateScaleColours($image);
-
         // Now it's time to draw a map
 
         // do the node rendering stuff first, regardless of where they are actually drawn.
@@ -1210,7 +1204,6 @@ class WeatherMap extends WeatherMapBase
         // Clear up the other random hashes of information
         $this->dsinfocache = null;
         $this->colourtable = null;
-    //    $this->usage_stats = null;
         $this->scales = null;
         $weathermap_error_suppress = array();
     }
@@ -1575,7 +1568,6 @@ class WeatherMap extends WeatherMapBase
     private function loadPlugins($pluginType = "data", $searchDirectory = "lib/datasources")
     {
         wm_debug("Beginning to load $pluginType plugins from $searchDirectory\n");
-
 
         $pluginList = $this->getPluginFileList($pluginType, $searchDirectory);
 

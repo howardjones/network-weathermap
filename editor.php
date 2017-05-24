@@ -896,6 +896,68 @@ if ($mapname == '') {
 
     setcookie("wmeditor", ($use_overlay ? "1" : "0") . ":" . ($use_relative_overlay ? "1" : "0") . ":" . intval($grid_snap_value), time() + 60 * 60 * 24 * 30);
 
+    // All the stuff from here on was embedded in the HTML before
+
+
+    // append any images used in the map that aren't in the images folder
+    foreach ($map->used_images as $im) {
+        if (!in_array($im, $imlist)) {
+            $imlist[] = $im;
+        }
+    }
+
+    sort($imlist);
+
+    $nodelist = array();
+    $nodeselection = "";
+    foreach ($map->nodes as $node) {
+        // only show non-template nodes
+        if ($node->x !== null) {
+            $nodelist[] = $node->name;
+        }
+    }
+    sort($nodelist);
+    foreach ($nodelist as $node) {
+        $nodeselection .= "<option>" . htmlspecialchars($node) . "</option>\n";
+    }
+
+    $iconselection = "";
+
+    if (count($imlist) == 0) {
+        print '<option value="--NONE--">(no images are available)</option>';
+    } else {
+        print '<option value="--NONE--">--NO ICON--</option>';
+        print '<option value="--AICON--">--ARTIFICIAL ICON--</option>';
+        foreach ($imlist as $im) {
+            $iconselection .= "<option ";
+            $iconselection .= "value=\"" . htmlspecialchars($im) . "\">" . htmlspecialchars($im) . "</option>\n";
+        }
+    }
+
+    $imageselection = "";
+
+    if (count($imlist) == 0) {
+        $imageselection .= '<option value="--NONE--">(no images are available)</option>';
+    } else {
+        $imageselection .= '<option value="--NONE--">--NONE--</option>';
+        foreach ($imlist as $im) {
+            $imageselection .= "<option ";
+            if ($map->background == $im) {
+                $imageselection .= " selected ";
+            }
+            $imageselection .= "value=\"" . htmlspecialchars($im) . "\">" . htmlspecialchars($im) . "</option>\n";
+        }
+    }
+
+    // we need to draw and throw away a map, to get the dimensions for the imagemap. Oh well.
+    // but save the actual htmlstyle, or the form will be wrong
+    $real_htmlstyle = $map->htmlstyle;
+
+    $map->DrawMap('null');
+    $map->htmlstyle = 'editor';
+    $map->calculateImagemap();
+    $imagemap = $map->generateSortedImagemap("weathermap_imap");
+
     ?>
     <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
             "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
@@ -923,17 +985,6 @@ if ($mapname == '') {
             // the only javascript in here should be the objects representing the map itself
             // all code should be in editor.js
             <?php print $map->asJS() ?>
-            <?php
-
-            // append any images used in the map that aren't in the images folder
-            foreach ($map->used_images as $im) {
-                if (!in_array($im, $imlist)) {
-                    $imlist[] = $im;
-                }
-            }
-
-            sort($imlist);
-            ?>
         </script>
         <title>PHP Weathermap Editor <?php echo $WEATHERMAP_VERSION; ?></title>
     </head>
@@ -992,20 +1043,7 @@ if ($mapname == '') {
                         config</a></p>
                 <pre><?php echo htmlspecialchars($log) ?></pre>
             </div>
-            <?php
-            // we need to draw and throw away a map, to get the
-            // dimensions for the imagemap. Oh well.
-
-            // but save the actual htmlstyle, or the form will be wrong
-            $real_htmlstyle = $map->htmlstyle;
-
-            $map->DrawMap('null');
-            $map->htmlstyle = 'editor';
-            $map->calculateImagemap();
-
-            print $map->generateSortedImagemap("weathermap_imap");
-
-            ?>
+            <?php print $imagemap ?>
         </div><!-- Node Properties -->
 
         <div id="dlgNodeProperties" class="dlgProperties">
@@ -1025,23 +1063,12 @@ if ($mapname == '') {
                         <td><input id="node_x" name="node_x" size=4 type="text"/>,<input id="node_y" name="node_y"
                                                                                          size=4 type="text"/>
                             <span id="node_locktext">
-            <br/>Lock to: <select name="node_lock_to" id="node_lock_to"><option>-- NONE --</option> <?php
-
-                                    $nodelist = array();
-
-                                    foreach ($map->nodes as $movingNode) {
-                                        // only show non-template nodes
-                                        if ($movingNode->x !== NULL) {
-                                            $nodelist[] = $movingNode->name;
-                                        }
-                                    }
-                                    sort($nodelist);
-                                    foreach ($nodelist as $movingNode) {
-                                        print "<option>" . htmlspecialchars($movingNode) . "</option>\n";
-                                    }
-                                    ?>
-</select>
-            </span>
+                                <br/>Lock to:
+                                <select name="node_lock_to" id="node_lock_to">
+                                    <option>-- NONE --</option>
+                                    <?php echo $nodeselection ?>
+                                </select>
+                            </span>
 
 
                         </td>
@@ -1067,18 +1094,7 @@ if ($mapname == '') {
                         <th>Icon Filename</th>
                         <td><select id="node_iconfilename" name="node_iconfilename">
 
-                                <?php
-                                if (count($imlist) == 0) {
-                                    print '<option value="--NONE--">(no images are available)</option>';
-                                } else {
-                                    print '<option value="--NONE--">--NO ICON--</option>';
-                                    print '<option value="--AICON--">--ARTIFICIAL ICON--</option>';
-                                    foreach ($imlist as $im) {
-                                        print "<option ";
-                                        print "value=\"" . htmlspecialchars($im) . "\">" . htmlspecialchars($im) . "</option>\n";
-                                    }
-                                }
-                                ?>
+                                <?php echo $iconselection; ?>
                             </select></td>
                     </tr>
                     <tr>
@@ -1283,20 +1299,7 @@ if ($mapname == '') {
                         <th>Background Image Filename</th>
                         <td><select name="map_bgfile">
 
-                                <?php
-                                if (count($imlist) == 0) {
-                                    print '<option value="--NONE--">(no images are available)</option>';
-                                } else {
-                                    print '<option value="--NONE--">--NONE--</option>';
-                                    foreach ($imlist as $im) {
-                                        print "<option ";
-                                        if ($map->background == $im) {
-                                            print " selected ";
-                                        }
-                                        print "value=\"" . htmlspecialchars($im) . "\">" . htmlspecialchars($im) . "</option>\n";
-                                    }
-                                }
-                                ?>
+                                <?php print $imageselection; ?>
                             </select></td>
                     </tr>
 

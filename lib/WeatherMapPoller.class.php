@@ -40,18 +40,18 @@ class WeatherMapPoller
         $this->warning_notes = "";
         $this->canRun = false;
 
-
         $this->startTime = microtime(true);
 
         $this->pollerStartTime = $pollerStartTime;
         if ($pollerStartTime == 0) {
             $this->pollerStartTime = intval($this->startTime);
         }
-
     }
 
     public function preFlight()
     {
+        global $WEATHERMAP_VERSION;
+
         if (!wm_module_checks()) {
             wm_warn("Required modules for PHP Weathermap $WEATHERMAP_VERSION were not present. Not running. [WMPOLL08]\n");
 
@@ -99,12 +99,9 @@ class WeatherMapPoller
 
         wm_debug("Iterating all maps.");
 
-        $imageformat = strtolower(read_config_option("weathermap_output_format"));
-        $rrdtool_path = read_config_option("path_rrdtool");
-
         foreach ($maplist as $map) {
 
-            $runner = new WeatherMapRuntime($this->confdir, $this->outdir, $map);
+            $runner = new WeatherMapRuntime($this->confdir, $this->outdir, $map, $this->imageformat);
             $runner->run();
 
             $this->total_warnings += $runner->warncount;

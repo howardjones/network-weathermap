@@ -49,7 +49,6 @@ class WeatherMapDataSource_dsstats extends WeatherMapDataSource
                 }
             }
 
-
             if (!$dsstats_running) {
                 return false;
             }
@@ -75,7 +74,7 @@ class WeatherMapDataSource_dsstats extends WeatherMapDataSource
         return false;
     }
 
-# dsstats:<datatype>:<local_data_id>:<rrd_name_in>:<rrd_name_out>
+    # dsstats:<datatype>:<local_data_id>:<rrd_name_in>:<rrd_name_out>
 
     // Actually read data from a data source, and return it
     // returns a 3-part array (invalue, outvalue and datavalid time_t)

@@ -21,7 +21,7 @@ class WeatherMapDataItem extends WeatherMapItem
     public $scaleTags = array();
     public $scaleKeys = array();
 
-    public  $template;
+    public $template;
     public $duplex;
 
     public $inscalekey;

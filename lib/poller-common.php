@@ -118,7 +118,6 @@ function weathermap_run_maps($mydir)
         $plugin_name = "weathermap-cacti10-plugin.php";
     }
 
-
     $total_warnings = 0;
     $warning_notes = "";
 
@@ -165,8 +164,6 @@ function weathermap_run_maps($mydir)
         if ($testfd) {
             fclose($testfd);
             unlink($testfile);
-
-
 
             $queryrows = $manager->getMapRunList();
 
@@ -363,8 +360,6 @@ function weathermap_run_maps($mydir)
                     } else {
                         wm_debug("Skipping " . $map->id . " (" . $map->configfile . ") due to schedule.\n");
                     }
-
-
                 }
                 wm_debug("Iterated all $mapcount maps.\n");
             } else {

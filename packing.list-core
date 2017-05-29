@@ -201,8 +201,8 @@
 ./setup.php
 ./weathermap
 ./weathermap.conf
-./vendor/jquery.min.js
-./vendor/idle-timer.min.js
+./vendor/jquery/dist/jquery.min.js
+./vendor/jquery-idletimer/dist/idle-timer.min.js
 ./weathermap-cacti-plugin-editor.php
 ./images/hd-gradient-blue.jpg
 ./images/hd-gradient-green.jpg

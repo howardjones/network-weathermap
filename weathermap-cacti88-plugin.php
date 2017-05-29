@@ -372,8 +372,8 @@ function weathermap_fullview($cycle=FALSE, $firstonly=FALSE, $limit_to_group = -
 	}
 
 	if ($cycle) {
-        print "<script src='vendor/jquery.min.js'></script>";
-        print "<script src='vendor/idle-timer.min.js'></script>";
+        print "<script src='vendor/jquery/dist/jquery.min.js'></script>";
+        print "<script src='vendor/jquery-idletimer/dist/idle-timer.min.js'></script>";
         $extra = "";
         if ($limit_to_group > 0) {
 			$extra = " in this group";

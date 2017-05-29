@@ -62,7 +62,7 @@ case 'viewmapcycle':
 	    print "<!DOCTYPE html>\n";
 		print "<html><head>";
 		print '<LINK rel="stylesheet" type="text/css" media="screen" href="cacti-resources/weathermap.css">';		
-		print '<script src="vendor/jquery.min.js"></script>';
+		print '<script src="vendor/jquery/dist/jquery.min.js"></script>';
 		print "</head><body id='wm_fullscreen'>";
 	} else {
 		general_header();
@@ -353,7 +353,7 @@ function weathermap_fullview($cycle=FALSE, $firstonly=FALSE, $limit_to_group = -
 	}
 
 	if ($cycle) {
-        print "<script src='vendor/idle-timer.min.js'></script>";
+        print "<script src='vendor/jquery-idletimer/dist/idle-timer.min.js'></script>";
 
         if ($limit_to_group > 0) {
 			$description = __('Showing <span id="wm_current_map">1</span> of <span id="wm_total_map">1</span>.  Cycling all available maps in this group.');

@@ -5,7 +5,7 @@
 jQuery.fn.center = function () {
     this.css("position", "fixed");
 
-    this.css("top",  Math.max(0, (($(window).height() - this.outerHeight()) / 2) + $(window).scrollTop()) + "px");
+    this.css("top", Math.max(0, (($(window).height() - this.outerHeight()) / 2) + $(window).scrollTop()) + "px");
     this.css("left", Math.max(0, (($(window).width() - this.outerWidth()) / 2) + $(window).scrollLeft()) + "px");
 
     return this;
@@ -13,28 +13,28 @@ jQuery.fn.center = function () {
 
 var WMcycler = {
 
-    KEYCODE_ESCAPE : 27,
-    KEYCODE_LEFT : 37,
-    KEYCODE_RIGHT : 39,
-    KEYCODE_SPACE : 32,
+    KEYCODE_ESCAPE: 27,
+    KEYCODE_LEFT: 37,
+    KEYCODE_RIGHT: 39,
+    KEYCODE_SPACE: 32,
 
-    period : 0,
-    fullscreen : 0,
-    poller_cycle : 0,
-    current : 0,
-    countdown : 0,
-    nmaps : 0,
-    paused : false,
-    timer_counter : null,
-    timer_reloader : null,
+    period: 0,
+    fullscreen: 0,
+    poller_cycle: 0,
+    current: 0,
+    countdown: 0,
+    nmaps: 0,
+    paused: false,
+    timer_counter: null,
+    timer_reloader: null,
 
-    updateProgress : function () {
+    updateProgress: function () {
         // update the countdown bar - 450 is the max width in pixels
         var progress = this.countdown / (this.period / 200) * 450;
         $("#wm_progress").css("width", progress);
     },
 
-    counterHandler : function () {
+    counterHandler: function () {
         if (this.paused) {
             $("#wm_progress").toggleClass("paused");
         } else {
@@ -50,13 +50,14 @@ var WMcycler = {
         var d = new Date(),
             newurl = $(that).find('img').attr("src");
 
-        newurl = newurl.replace(/time=\d+/, "time=" + d.getTime());
-
-        $(that).find('img').attr("src", newurl);
+        if (newurl !== undefined) {
+            newurl = newurl.replace(/time=\d+/, "time=" + d.getTime());
+            $(that).find('img').attr("src", newurl);
+        }
     },
 
     // change to the next (or previous) map, reset the countdown, update the bar
-    switchMap : function (direction) {
+    switchMap: function (direction) {
         var wm_new = this.current + direction;
 
         if (wm_new < 0) {
@@ -107,10 +108,8 @@ var WMcycler = {
         $("#wmcyclecontrolbox").fadeIn(100);
     },
 
-    start : function (initialData) {
-
-
-	$('.weathermapholder').hide();
+    start: function (initialData) {
+        $('.weathermapholder').hide();
 
         this.period = initialData.period;
         this.poller_cycle = initialData.poller_cycle;
@@ -151,10 +150,10 @@ var WMcycler = {
             this.initIdle(that);
         }
     },
-	
-	reloadPage: function() {
-		location.reload(true);
-	},
+
+    reloadPage: function () {
+        location.reload(true);
+    },
 
     initKeys: function (that) {
         $(document).keyup(function (event) {
@@ -215,13 +214,13 @@ var WMcycler = {
         }
     },
 
-    nextAction : function () {
+    nextAction: function () {
         this.switchMap(1);
     },
-    previousAction : function () {
+    previousAction: function () {
         this.switchMap(-1);
     },
-    pauseAction : function () {
+    pauseAction: function () {
         this.paused = !this.paused;
         // remove the paused class on the progress bar, if we're mid-flash and
         // no longer paused

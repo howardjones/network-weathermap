@@ -10,7 +10,8 @@
     }
   ],
   "require": {
-    "ulrichsg/getopt-php": "^2.3"
+    "ulrichsg/getopt-php": "^2.3",
+    "erusev/parsedown": "^1.6"
   },
   "require-dev": {
     "phpdocumentor/phpdocumentor": "~2",

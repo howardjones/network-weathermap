@@ -218,7 +218,7 @@ class WeatherMapDataSource_rrd extends WeatherMapDataSource
         }
         pclose($pipe);
 
-        if (sizeof($lines) > 0) {
+        if (sizeof($lines) == 0) {
             wm_warn("RRD Aggregate ReadData: Not enough output from RRDTool (0 lines). [WMRRD09]\n");
             return;
         }

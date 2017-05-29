@@ -20,6 +20,9 @@ class WeatherMapDataSource_tabfile extends WeatherMapDataSource
      */
     public function ReadData($targetString, &$map, &$mapItem)
     {
+        $this->data[IN] = null;
+        $this->data[OUT] = null;
+
         $itemName = $mapItem->name;
 
         $fullpath = realpath($targetString);

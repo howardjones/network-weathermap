@@ -27,6 +27,9 @@ class WeatherMapDataSource_static extends WeatherMapDataSource
      */
     public function ReadData($targetstring, &$map, &$item)
     {
+        $this->data[IN] = null;
+        $this->data[OUT] = null;
+
         if (preg_match($this->regexpsHandled[0], $targetstring, $matches)) {
             $this->data[IN] = WMUtility::interpretNumberWithMetricSuffix($matches[1], $map->kilo);
             $this->data[OUT] = WMUtility::interpretNumberWithMetricSuffix($matches[2], $map->kilo);

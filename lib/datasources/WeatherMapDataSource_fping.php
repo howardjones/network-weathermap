@@ -53,6 +53,9 @@ class WeatherMapDataSource_fping extends WeatherMapDataSource
 
     public function ReadData($targetstring, &$map, &$item)
     {
+        $this->data[IN] = null;
+        $this->data[OUT] = null;
+
         $ping_count = intval($map->get_hint("fping_ping_count"));
         if ($ping_count == 0) {
             $ping_count = 5;

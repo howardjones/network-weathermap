@@ -30,6 +30,8 @@ class WeatherMapDataSource_dbsample extends WeatherMapDataSource
     public function ReadData($targetstring, &$map, &$item)
     {
         $pdo = null;
+        $this->data[IN] = null;
+        $this->data[OUT] = null;
 
 
         if (preg_match('/^dbplug:([^:]+)$/', $targetstring, $matches)) {

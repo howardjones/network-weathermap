@@ -21,6 +21,9 @@ class WeatherMapDataSource_wmdata extends WeatherMapDataSource
      */
     public function ReadData($targetstring, &$map, &$item)
     {
+        $this->data[IN] = null;
+        $this->data[OUT] = null;
+
         $matches = 0;
         $datafile = "";
         $dataname = "";

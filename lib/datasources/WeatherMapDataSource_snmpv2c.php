@@ -44,6 +44,9 @@ class WeatherMapDataSource_snmpv2c extends WeatherMapDataSource
 
     public function ReadData($targetstring, &$map, &$item)
     {
+        $this->data[IN] = null;
+        $this->data[OUT] = null;
+
         $timeout = 1000000;
         $retries = 2;
         $abort_count = 0;

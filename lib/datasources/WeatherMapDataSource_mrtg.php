@@ -19,6 +19,9 @@ class WeatherMapDataSource_mrtg extends WeatherMapDataSource
 
     public function ReadData($targetstring, &$map, &$item)
     {
+        $this->data[IN] = null;
+        $this->data[OUT] = null;
+
         $matchvalue = $item->get_hint('mrtg_value');
         $matchperiod = $item->get_hint('mrtg_period');
         $swap = intval($item->get_hint('mrtg_swap'));

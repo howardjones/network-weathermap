@@ -31,6 +31,9 @@ class WeatherMapDataSource_time extends WeatherMapDataSource
      */
     public function ReadData($targetstring, &$map, &$item)
     {
+        $this->data[IN] = null;
+        $this->data[OUT] = null;
+
         $matches = 0;
 
         if (preg_match($this->regexpsHandled[0], $targetstring, $matches)) {

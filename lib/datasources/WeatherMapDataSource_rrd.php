@@ -58,86 +58,86 @@ class WeatherMapDataSource_rrd extends WeatherMapDataSource
 
         wm_debug("RRD ReadData: poller_output style\n");
 
-        if (isset($config)) {
-            // take away the cacti bit, to get the appropriate path for the table
-            // $db_rrdname = realpath($rrdfile);
-            $path_rra = $config["rra_path"];
-            $db_rrdname = $rrdfile;
-            $db_rrdname = str_replace($path_rra, "<path_rra>", $db_rrdname);
-            wm_debug("******************************************************************\nChecking weathermap_data\n");
-            foreach (array(IN, OUT) as $dir) {
-                wm_debug("RRD ReadData: poller_output - looking for $dir value\n");
-                if ($dsnames[$dir] != '-') {
-                    wm_debug("RRD ReadData: poller_output - DS name is " . $dsnames[$dir] . "\n");
-
-                    $SQL = "select * from weathermap_data where rrdfile=" . $pdo->quote($db_rrdname) . " and data_source_name=" . $pdo->quote($dsnames[$dir]);
-
-                    $SQLcheck = "select data_template_data.local_data_id from data_template_data,data_template_rrd where data_template_data.local_data_id=data_template_rrd.local_data_id and data_template_data.data_source_path=" . $pdo->quote($db_rrdname) . " and data_template_rrd.data_source_name=" . $pdo->quote($dsnames[$dir]);
-                    $SQLvalid = "select data_template_rrd.data_source_name from data_template_data,data_template_rrd where data_template_data.local_data_id=data_template_rrd.local_data_id and data_template_data.data_source_path=" . $pdo->quote($db_rrdname);
-
-                    $worst_time = time() - 8 * 60;
-                    $result = db_fetch_row($SQL);
-                    // OK, the straightforward query for data failed, let's work out why, and add the new data source if necessary
-                    if (!isset($result['id'])) {
-                        wm_debug("RRD ReadData: poller_output - Adding new weathermap_data row for $db_rrdname:" . $dsnames[$dir] . "\n");
-                        $result = db_fetch_row($SQLcheck);
-                        if (!isset($result['local_data_id'])) {
-                            $fields = array();
-                            $results = db_fetch_assoc($SQLvalid);
-                            foreach ($results as $result) {
-                                $fields[] = $result['data_source_name'];
-                            }
-                            if (count($fields) > 0) {
-                                wm_warn("RRD ReadData: poller_output: " . $dsnames[$dir] . " is not a valid DS name for $db_rrdname - valid names are: " . join(", ", $fields) . " [WMRRD07]\n");
-                            } else {
-                                wm_warn("RRD ReadData: poller_output: $db_rrdname is not a valid RRD filename within this Cacti install. <path_rra> is $path_rra [WMRRD08]\n");
-                            }
-                        } else {
-                            // add the new data source (which we just checked exists) to the table.
-                            // Include the local_data_id as well, to make life easier in poller_output
-                            // (and to allow the cacti: DS plugin to use the same table, too)
-                            $SQLins = "insert into weathermap_data (rrdfile, data_source_name, sequence, local_data_id) values (" . $pdo->quote($db_rrdname) . "," . $pdo->quote($dsnames[$dir]) . ", 0," . $result['local_data_id'] . ")";
-                            wm_debug("RRD ReadData: poller_output - Adding new weathermap_data row for data source ID " . $result['local_data_id'] . "\n");
-                            db_execute($SQLins);
-                        }
-                    } else {    // the data table line already exists
-                        wm_debug("RRD ReadData: poller_output - found weathermap_data row\n");
-                        // if the result is valid, then use it
-                        if (($result['sequence'] > 2) && ($result['last_time'] > $worst_time)) {
-                            $this->data[$dir] = $result['last_calc'];
-                            $this->dataTime = $result['last_time'];
-                            wm_debug("RRD ReadData: poller_output - data looks valid\n");
-                        } else {
-                            $this->data[$dir] = 0;
-                            wm_debug("RRD ReadData: poller_output - data is either too old, or too new\n");
-                        }
-                        // now, we can use the local_data_id to get some other useful info
-                        // first, see if the weathermap_data entry *has* a local_data_id. If not, we need to update this entry.
-                        $ldi = 0;
-                        if (!isset($result['local_data_id']) || $result['local_data_id'] == 0) {
-                            $r2 = db_fetch_row($SQLcheck);
-                            if (isset($r2['local_data_id'])) {
-                                $ldi = $r2['local_data_id'];
-                                wm_debug("RRD ReadData: updated  local_data_id for wmdata.id=" . $result['id'] . "to $ldi\n");
-                                // put that in now, so that we can skip this step next time
-                                db_execute("update weathermap_data set local_data_id=" . $r2['local_data_id'] . " where id=" . $result['id']);
-                            }
-                        } else {
-                            $ldi = $result['local_data_id'];
-                        }
-
-                        // fill all that other information (ifSpeed, etc)
-                        // (but only if it's not switched off!)
-                        if (($map->get_hint("rrdtool_no_cacti_extras") === null) && $ldi > 0) {
-                            updateCactiData($item, $ldi);
-                        }
-                    }
-                } else {
-                    wm_debug("RRD ReadData: poller_output - DS name is '-'\n");
-                }
-            }
-        } else {
+        if (!isset($config)) {
             wm_warn("RRD ReadData: poller_output - Cacti environment is not right [WMRRD12]\n");
+        }
+
+        // take away the cacti bit, to get the appropriate path for the table
+        $path_rra = $config["rra_path"];
+        $db_rrdname = $rrdfile;
+        $db_rrdname = str_replace($path_rra, "<path_rra>", $db_rrdname);
+        wm_debug("******************************************************************\nChecking weathermap_data\n");
+
+        foreach (array(IN, OUT) as $dir) {
+            wm_debug("RRD ReadData: poller_output - looking for $dir value\n");
+            if ($dsnames[$dir] != '-') {
+                wm_debug("RRD ReadData: poller_output - DS name is " . $dsnames[$dir] . "\n");
+
+                $SQL = "select * from weathermap_data where rrdfile=" . $pdo->quote($db_rrdname) . " and data_source_name=" . $pdo->quote($dsnames[$dir]);
+
+                $SQLcheck = "select data_template_data.local_data_id from data_template_data,data_template_rrd where data_template_data.local_data_id=data_template_rrd.local_data_id and data_template_data.data_source_path=" . $pdo->quote($db_rrdname) . " and data_template_rrd.data_source_name=" . $pdo->quote($dsnames[$dir]);
+                $SQLvalid = "select data_template_rrd.data_source_name from data_template_data,data_template_rrd where data_template_data.local_data_id=data_template_rrd.local_data_id and data_template_data.data_source_path=" . $pdo->quote($db_rrdname);
+
+                $worst_time = time() - 8 * 60;
+                $result = db_fetch_row($SQL);
+                // OK, the straightforward query for data failed, let's work out why, and add the new data source if necessary
+                if (!isset($result['id'])) {
+                    wm_debug("RRD ReadData: poller_output - Adding new weathermap_data row for $db_rrdname:" . $dsnames[$dir] . "\n");
+                    $result = db_fetch_row($SQLcheck);
+                    if (!isset($result['local_data_id'])) {
+                        $fields = array();
+                        $results = db_fetch_assoc($SQLvalid);
+                        foreach ($results as $result) {
+                            $fields[] = $result['data_source_name'];
+                        }
+                        if (count($fields) > 0) {
+                            wm_warn("RRD ReadData: poller_output: " . $dsnames[$dir] . " is not a valid DS name for $db_rrdname - valid names are: " . join(", ", $fields) . " [WMRRD07]\n");
+                        } else {
+                            wm_warn("RRD ReadData: poller_output: $db_rrdname is not a valid RRD filename within this Cacti install. <path_rra> is $path_rra [WMRRD08]\n");
+                        }
+                    } else {
+                        // add the new data source (which we just checked exists) to the table.
+                        // Include the local_data_id as well, to make life easier in poller_output
+                        // (and to allow the cacti: DS plugin to use the same table, too)
+                        $SQLins = "insert into weathermap_data (rrdfile, data_source_name, sequence, local_data_id) values (" . $pdo->quote($db_rrdname) . "," . $pdo->quote($dsnames[$dir]) . ", 0," . $result['local_data_id'] . ")";
+                        wm_debug("RRD ReadData: poller_output - Adding new weathermap_data row for data source ID " . $result['local_data_id'] . "\n");
+                        db_execute($SQLins);
+                    }
+                } else {    // the data table line already exists
+                    wm_debug("RRD ReadData: poller_output - found weathermap_data row\n");
+                    // if the result is valid, then use it
+                    if (($result['sequence'] > 2) && ($result['last_time'] > $worst_time)) {
+                        $this->data[$dir] = $result['last_calc'];
+                        $this->dataTime = $result['last_time'];
+                        wm_debug("RRD ReadData: poller_output - data looks valid\n");
+                    } else {
+                        $this->data[$dir] = 0;
+                        wm_debug("RRD ReadData: poller_output - data is either too old, or too new\n");
+                    }
+                    // now, we can use the local_data_id to get some other useful info
+                    // first, see if the weathermap_data entry *has* a local_data_id. If not, we need to update this entry.
+                    $ldi = 0;
+                    if (!isset($result['local_data_id']) || $result['local_data_id'] == 0) {
+                        $r2 = db_fetch_row($SQLcheck);
+                        if (isset($r2['local_data_id'])) {
+                            $ldi = $r2['local_data_id'];
+                            wm_debug("RRD ReadData: updated  local_data_id for wmdata.id=" . $result['id'] . "to $ldi\n");
+                            // put that in now, so that we can skip this step next time
+                            db_execute("update weathermap_data set local_data_id=" . $r2['local_data_id'] . " where id=" . $result['id']);
+                        }
+                    } else {
+                        $ldi = $result['local_data_id'];
+                    }
+
+                    // fill all that other information (ifSpeed, etc)
+                    // (but only if it's not switched off!)
+                    if (($map->get_hint("rrdtool_no_cacti_extras") === null) && $ldi > 0) {
+                        updateCactiData($item, $ldi);
+                    }
+                }
+            } else {
+                wm_debug("RRD ReadData: poller_output - DS name is '-'\n");
+            }
         }
 
         wm_debug("RRD ReadData: poller_output - result is " . ($this->data[IN] === null ? 'null' : $this->data[IN]) . "," . ($this->data[OUT] === null ? 'null' : $this->data[OUT]) . "\n");
@@ -197,51 +197,54 @@ class WeatherMapDataSource_rrd extends WeatherMapDataSource
         $pipe = popen($command, "r");
 
         $lines = array();
-        $linecount = 0;
 
-        if (isset($pipe)) {
-            $buffer = '';
-            $data_ok = false;
-
-            while (!feof($pipe)) {
-                $line = fgets($pipe, 4096);
-                // there might (pre-1.5) or might not (1.5+) be a leading blank line
-                // we don't want to count it if there is
-                if (trim($line) != "") {
-                    wm_debug("> " . $line);
-                    $buffer .= $line;
-                    $lines[] = $line;
-                    $linecount++;
-                }
-            }
-            pclose($pipe);
-            if ($linecount > 0) {
-                foreach ($lines as $line) {
-                    if (preg_match('/^\'(IN|OUT)\s(\-?\d+[\.,]?\d*e?[+-]?\d*:?)\'$/i', $line, $matches)) {
-                        wm_debug("MATCHED: " . $matches[1] . " " . $matches[2] . "\n");
-                        if ($matches[1] == 'IN') {
-                            $this->data[IN] = floatval($matches[2]);
-                        }
-                        if ($matches[1] == 'OUT') {
-                            $this->data[OUT] = floatval($matches[2]);
-                        }
-                        $data_ok = true;
-                    }
-                }
-                if ($data_ok) {
-                    if ($this->data[IN] === null) {
-                        $this->data[IN] = 0;
-                    }
-                    if ($this->data[OUT] === null) {
-                        $this->data[OUT] = 0;
-                    }
-                }
-            } else {
-                wm_warn("RRD Aggregate ReadData: Not enough output from RRDTool ($linecount lines). [WMRRD09]\n");
-            }
-        } else {
+        if (!isset($pipe)) {
             wm_warn("RRD Aggregate ReadData: failed to open pipe to RRDTool: " . $php_errormsg . " [WMRRD04]\n");
+            return;
         }
+
+        $buffer = '';
+        $data_ok = false;
+
+        while (!feof($pipe)) {
+            $line = fgets($pipe, 4096);
+            // there might (pre-1.5) or might not (1.5+) be a leading blank line
+            // we don't want to count it if there is
+            if (trim($line) != "") {
+                wm_debug("> " . $line);
+                $buffer .= $line;
+                $lines[] = $line;
+            }
+        }
+        pclose($pipe);
+
+        if (sizeof($lines) > 0) {
+            wm_warn("RRD Aggregate ReadData: Not enough output from RRDTool (0 lines). [WMRRD09]\n");
+            return;
+        }
+
+        foreach ($lines as $line) {
+            if (preg_match('/^\'(IN|OUT)\s(\-?\d+[\.,]?\d*e?[+-]?\d*:?)\'$/i', $line, $matches)) {
+                wm_debug("MATCHED: " . $matches[1] . " " . $matches[2] . "\n");
+                if ($matches[1] == 'IN') {
+                    $this->data[IN] = floatval($matches[2]);
+                }
+                if ($matches[1] == 'OUT') {
+                    $this->data[OUT] = floatval($matches[2]);
+                }
+                $data_ok = true;
+            }
+        }
+
+        if ($data_ok) {
+            if ($this->data[IN] === null) {
+                $this->data[IN] = 0;
+            }
+            if ($this->data[OUT] === null) {
+                $this->data[OUT] = 0;
+            }
+        }
+
         wm_debug("RRD ReadDataFromRealRRDAggregate: Returning (" . ($this->data[IN] === null ? 'null' : $this->data[IN]) . "," . ($this->data[OUT] === null ? 'null' : $this->data[OUT]) . ",$this->dataTime)\n");
     }
 
@@ -286,82 +289,81 @@ class WeatherMapDataSource_rrd extends WeatherMapDataSource
         $lines = array();
         $linecount = 0;
 
-        if (isset($pipe)) {
-            $headings = fgets($pipe, 4096);
-            // this replace fudges 1.2.x output to look like 1.0.x
-            // then we can treat them both the same.
-            $heads = preg_split('/\s+/', preg_replace('/^\s+/', "timestamp ", $headings));
+        if (!isset($pipe)) {
+            wm_warn("RRD ReadData: failed to open pipe to RRDTool: " . $php_errormsg . " [WMRRD04]\n");
+        }
+        $headings = fgets($pipe, 4096);
+        // this replace fudges 1.2.x output to look like 1.0.x
+        // then we can treat them both the same.
+        $heads = preg_split('/\s+/', preg_replace('/^\s+/', "timestamp ", $headings));
 
-            $buffer = '';
+        $buffer = '';
 
-            while (!feof($pipe)) {
-                $line = fgets($pipe, 4096);
-                // there might (pre-1.5) or might not (1.5+) be a leading blank line
-                // we don't want to count it if there is
-                if (trim($line) != "") {
-                    wm_debug("> " . $line);
-                    $buffer .= $line;
-                    $lines[] = $line;
-                    $linecount++;
-                }
+        while (!feof($pipe)) {
+            $line = fgets($pipe, 4096);
+            // there might (pre-1.5) or might not (1.5+) be a leading blank line
+            // we don't want to count it if there is
+            if (trim($line) != "") {
+                wm_debug("> " . $line);
+                $buffer .= $line;
+                $lines[] = $line;
+                $linecount++;
             }
-            pclose($pipe);
+        }
+        pclose($pipe);
 
-            wm_debug("RRD ReadData: Read $linecount lines from rrdtool\n");
-            wm_debug("RRD ReadData: Headings are: $headings\n");
+        wm_debug("RRD ReadData: Read $linecount lines from rrdtool\n");
+        wm_debug("RRD ReadData: Headings are: $headings\n");
 
-            if ((in_array($dsnames[IN], $heads) || $dsnames[IN] == '-') && (in_array($dsnames[OUT], $heads) || $dsnames[OUT] == '-')) {
-                // deal with the data, starting with the last line of output
-                $rlines = array_reverse($lines);
+        if ((in_array($dsnames[IN], $heads) || $dsnames[IN] == '-') && (in_array($dsnames[OUT], $heads) || $dsnames[OUT] == '-')) {
+            // deal with the data, starting with the last line of output
+            $rlines = array_reverse($lines);
 
-                foreach ($rlines as $line) {
-                    wm_debug("--" . $line . "\n");
-                    $cols = preg_split('/\s+/', $line);
-                    for ($i = 0, $cnt = count($cols) - 1; $i < $cnt; $i++) {
-                        $h = $heads[$i];
-                        $v = $cols[$i];
-                        $values[$h] = trim($v);
-                    }
+            foreach ($rlines as $line) {
+                wm_debug("--" . $line . "\n");
+                $cols = preg_split('/\s+/', $line);
+                for ($i = 0, $cnt = count($cols) - 1; $i < $cnt; $i++) {
+                    $h = $heads[$i];
+                    $v = $cols[$i];
+                    $values[$h] = trim($v);
+                }
 
-                    $data_ok = false;
+                $data_ok = false;
 
-                    foreach (array(IN, OUT) as $dir) {
-                        $n = $dsnames[$dir];
-                        if (array_key_exists($n, $values)) {
-                            $candidate = $values[$n];
-                            if (preg_match('/^\-?\d+[\.,]?\d*e?[+-]?\d*:?$/i', $candidate)) {
-                                $this->data[$dir] = $candidate;
-                                wm_debug("$candidate is OK value for $n\n");
-                                $data_ok = true;
-                            }
+                foreach (array(IN, OUT) as $dir) {
+                    $n = $dsnames[$dir];
+                    if (array_key_exists($n, $values)) {
+                        $candidate = $values[$n];
+                        if (preg_match('/^\-?\d+[\.,]?\d*e?[+-]?\d*:?$/i', $candidate)) {
+                            $this->data[$dir] = $candidate;
+                            wm_debug("$candidate is OK value for $n\n");
+                            $data_ok = true;
                         }
-                    }
-
-                    if ($data_ok) {
-                        // at least one of the named DS had good data
-                        $this->dataTime = intval($values['timestamp']);
-
-                        // 'fix' a -1 value to 0, so the whole thing is valid
-                        // (this needs a proper fix!)
-                        if ($this->data[IN] === null) {
-                            $this->data[IN] = 0;
-                        }
-                        if ($this->data[OUT] === null) {
-                            $this->data[OUT] = 0;
-                        }
-
-                        // break out of the loop here
-                        break;
                     }
                 }
-            } else {
-                // report DS name error
-                $names = join(",", $heads);
-                $names = str_replace("timestamp,", "", $names);
-                wm_warn("RRD ReadData: At least one of your DS names (" . $dsnames[IN] . " and " . $dsnames[OUT] . ") were not found, even though there was a valid data line. Maybe they are wrong? Valid DS names in this file are: $names [WMRRD06]\n");
+
+                if ($data_ok) {
+                    // at least one of the named DS had good data
+                    $this->dataTime = intval($values['timestamp']);
+
+                    // 'fix' a -1 value to 0, so the whole thing is valid
+                    // (this needs a proper fix!)
+                    if ($this->data[IN] === null) {
+                        $this->data[IN] = 0;
+                    }
+                    if ($this->data[OUT] === null) {
+                        $this->data[OUT] = 0;
+                    }
+
+                    // break out of the loop here
+                    break;
+                }
             }
         } else {
-            wm_warn("RRD ReadData: failed to open pipe to RRDTool: " . $php_errormsg . " [WMRRD04]\n");
+            // report DS name error
+            $names = join(",", $heads);
+            $names = str_replace("timestamp,", "", $names);
+            wm_warn("RRD ReadData: At least one of your DS names (" . $dsnames[IN] . " and " . $dsnames[OUT] . ") were not found, even though there was a valid data line. Maybe they are wrong? Valid DS names in this file are: $names [WMRRD06]\n");
         }
         wm_debug("RRD ReadDataFromRealRRD: Returning (" . ($this->data[IN] === null ? 'null' : $this->data[IN]) . "," . ($this->data[OUT] === null ? 'null' : $this->data[OUT]) . ",$this->dataTime)\n");
     }
@@ -373,6 +375,9 @@ class WeatherMapDataSource_rrd extends WeatherMapDataSource
     public function ReadData($targetstring, &$map, &$item)
     {
         global $config;
+
+        $this->data[IN] = null;
+        $this->data[OUT] = null;
 
         $dsnames[IN] = "traffic_in";
         $dsnames[OUT] = "traffic_out";

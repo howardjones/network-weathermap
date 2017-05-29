@@ -39,6 +39,9 @@ class WeatherMapDataSource_cactihost extends WeatherMapDataSource
      */
     public function ReadData($targetstring, &$map, &$item)
     {
+        $this->data[IN] = null;
+        $this->data[OUT] = null;
+
         if (preg_match($this->regexpsHandled[0], $targetstring, $matches)) {
             $cacti_id = intval($matches[1]);
 

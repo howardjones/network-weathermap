@@ -82,6 +82,8 @@ class WeatherMapDataSource_dsstats extends WeatherMapDataSource
     // data_time is intended to allow more informed graphing in the future
     public function ReadData($targetstring, &$map, &$item)
     {
+        $this->data[IN] = null;
+        $this->data[OUT] = null;
         $pdo = weathermap_get_pdo();
 
         $local_data_id = null;

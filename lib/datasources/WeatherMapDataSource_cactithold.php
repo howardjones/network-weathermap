@@ -107,6 +107,8 @@ class WeatherMapDataSource_cactithold extends WeatherMapDataSource
      */
     public function ReadData($targetstring, &$map, &$item)
     {
+        $this->data[IN] = null;
+        $this->data[OUT] = null;
         $this->dataTime = time();
 
         $pdo = weathermap_get_pdo();

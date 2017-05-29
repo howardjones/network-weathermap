@@ -456,4 +456,13 @@ class WeatherMapDataItem extends WeatherMapItem
     {
         return array("in" => IN, "out" => OUT);
     }
+
+    public function asConfigData()
+    {
+        $config = parent::asConfigData();
+
+        $config['template'] = $this->template;
+
+        return $config;
+    }
 }

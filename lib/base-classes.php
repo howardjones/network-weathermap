@@ -12,8 +12,6 @@ class WeatherMapBase
     const CONFIG_TYPE_LITERAL = 0;
     const CONFIG_TYPE_COLOR = 1;
 
-    public $name;
-
     var $notes = array();
     var $hints = array();
     var $inherit_fieldlist;
@@ -284,6 +282,7 @@ class WeatherMapItem extends WeatherMapBase
     var $overlibcaption;
     var $my_default;
     var $defined_in;
+    var $name;
     var $config_override;    # used by the editor to allow text-editing
     public $imap_areas;
     public $zorder;
@@ -328,5 +327,16 @@ class WeatherMapItem extends WeatherMapBase
         $this->config_override = $newConfig;
     }
 
+
+    public function asConfigData()
+    {
+        $config = array(
+            "name"=>$this->name,
+            "type"=>$this->my_type(),
+            'vars'=>$this->hints
+        );
+
+        return $config;
+    }
 }
 

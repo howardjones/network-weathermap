@@ -16,6 +16,8 @@ class WMColour
     // take in an existing value and create a Colour object for it
     public function __construct()
     {
+        $this->alpha = 255;
+
         // a set of 3 colours
         if (func_num_args() === 3) {
             $this->red = func_get_arg(0);
@@ -214,5 +216,10 @@ class WMColour
         }
 
         return '';
+    }
+
+    public function asArray()
+    {
+        return array($this->red, $this->green, $this->blue, $this->alpha);
     }
 }

@@ -43,6 +43,7 @@ class WMFont
     {
         return array(0, 0);
     }
+
 }
 
 class WMTrueTypeFont extends WMFont
@@ -71,6 +72,17 @@ class WMTrueTypeFont extends WMFont
         } else {
             return sprintf("FONTDEFINE %d %s %d\n", $fontNumber, $this->file, $this->size);
         }
+    }
+
+    public function asConfigData($fontNumber)
+    {
+        return array(
+            "number" => $fontNumber,
+            "type" => $this->type,
+            "file" => $this->file,
+            "size" => $this->size,
+            "vertical_offset" => $this->v_offset
+        );
     }
 
     private function initTTF($filename, $size)
@@ -174,6 +186,15 @@ class WMGDFont extends WMFont
         }
         return false;
     }
+
+    public function asConfigData($fontNumber)
+    {
+        return array(
+            "number" => $fontNumber,
+            "type" => $this->type,
+            "file" => $this->file
+        );
+    }
 }
 
 class WMFontTable
@@ -236,6 +257,18 @@ class WMFontTable
         }
 
         return $list;
+    }
+
+    public function asConfigData()
+    {
+        $conf = array();
+
+        foreach ($this->table as $fontNumber => $fontObject) {
+            $font = $fontObject->asConfigData($fontNumber);
+            $conf[] = $font;
+        }
+
+        return $conf;
     }
 
     /**

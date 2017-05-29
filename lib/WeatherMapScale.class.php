@@ -233,6 +233,36 @@ class WeatherMapScale extends WeatherMapItem
         return array($colour, $matchKey, $tag);
     }
 
+    public function asConfigData()
+    {
+        $config = parent::asConfigData();
+
+        $config['pos'] = array($this->keypos->x, $this->keypos->y);
+        $config['font'] = $this->keyfont->asArray;
+        $config['textcolour'] = $this->keytextcolour;
+        $config['bgcolour'] = $this->keybgcolour;
+        $config['outlinecolour'] = $this->keyoutlinecolour;
+        $config['misscolour'] = $this->scalemisscolour;
+        $config['style'] = $this->keystyle;
+        $config['size'] = $this->keysize;
+
+        $config_entries = array();
+        foreach ($this->entries as $k => $entry) {
+
+            $config_entries[] = array(
+                "min"=>$entry['bottom'],
+                "max"=>$entry['top'],
+                "tag"=>$entry['tag'],
+                "c1"=>$entry['c1']->asArray(),
+                "c2"=> (isset($entry['c2']) ? $entry['c2']->asArray() : null)
+            );
+
+        }
+        $config['entries'] = $config_entries;
+
+        return $config;
+    }
+
     function getConfig()
     {
         assert(isset($this->owner));

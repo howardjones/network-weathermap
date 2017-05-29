@@ -22,6 +22,7 @@ $dumpstats = 0;
 $randomdata = 0;
 $setdebug = false;
 $dumpconfig = '';
+$dumpjson = '';
 $defines = array();
 
 // **************************************************************************************
@@ -49,6 +50,7 @@ $long_opts = array
     "randomdata",
     "htmloutput=",
     "dumpafter",
+    "dumpjson=",
     "bulge",
     "sizedebug",
     "setdebug",
@@ -89,9 +91,10 @@ if (sizeof($gopts) > 0) {
                 break;
 
             case '--dumpconfig':
-                //$map->dumpconfig=$o[1];
-                // $options_output['dumpconfig'] = $o[1];
                 $dumpconfig = $o[1];
+                break;
+            case '--dumpjson':
+                $dumpjson = $o[1];
                 break;
 
             case '--randomdata':
@@ -280,6 +283,14 @@ if ($map->ReadConfig($configfile)) {
 
     if ($dumpconfig != '') {
         $map->WriteConfig($dumpconfig);
+    }
+
+    if ($dumpjson != '') {
+        print "===\n";
+        $fd = fopen($dumpjson, "w");
+        fputs($fd, $map->getJSONConfig());
+        fclose($fd);
+        print "===\n";
     }
 
     if ($dumpstats != '') {

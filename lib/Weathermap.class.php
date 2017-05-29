@@ -19,7 +19,7 @@ class WeatherMap extends WeatherMapBase
 
     // public $texts = array(); // an array containing all the extraneous text bits
     public $used_images = array(); // an array of image filenames referred to (used by editor ONLY)
-    public $seen_zlayers = array(0=>array(),1000=>array()); // 0 is the background, 1000 is the legends, title, etc
+    public $seen_zlayers = array(0 => array(), 1000 => array()); // 0 is the background, 1000 is the legends, title, etc
 
     public $next_id;
 
@@ -89,7 +89,7 @@ class WeatherMap extends WeatherMapBase
     public $has_overlibs;
     public $node_template_tree;
     public $link_template_tree;
-    public $dsinfocache=array();
+    public $dsinfocache = array();
 
     public $plugins = array();
     public $included_files = array();
@@ -109,7 +109,7 @@ class WeatherMap extends WeatherMapBase
     {
         parent::__construct();
 
-        $this->inherit_fieldlist=array
+        $this->inherit_fieldlist = array
         (
             'width' => 800,
             'height' => 600,
@@ -199,15 +199,15 @@ class WeatherMap extends WeatherMapBase
     {
         $this->imagecache = new WMImageLoader();
         $this->next_id = 100;
-        foreach (array_keys($this->inherit_fieldlist)as $fld) {
-            $this->$fld=$this->inherit_fieldlist[$fld];
+        foreach (array_keys($this->inherit_fieldlist) as $fld) {
+            $this->$fld = $this->inherit_fieldlist[$fld];
         }
 
         $this->min_ds_time = null;
         $this->max_ds_time = null;
 
-        $this->nodes=array(); // an array of WeatherMapNodes
-        $this->links=array(); // an array of WeatherMapLinks
+        $this->nodes = array(); // an array of WeatherMapNodes
+        $this->links = array(); // an array of WeatherMapLinks
 
         $this->createDefaultLinks();
         $this->createDefaultNodes();
@@ -223,11 +223,11 @@ class WeatherMap extends WeatherMapBase
         assert('is_object($this->nodes["DEFAULT"])');
         assert('is_object($this->links["DEFAULT"])');
 
-        $this->imap=new HTMLImagemap('weathermap');
+        $this->imap = new HTMLImagemap('weathermap');
 
-        $this->configfile='';
-        $this->imagefile='';
-        $this->imageuri='';
+        $this->configfile = '';
+        $this->imagefile = '';
+        $this->imageuri = '';
 
         $this->loadAllPlugins();
 
@@ -520,7 +520,6 @@ class WeatherMap extends WeatherMapBase
     }
 
 
-
     /**
      * ReadConfig reads in either a file or part of a config and modifies the current map.
      *
@@ -694,7 +693,6 @@ class WeatherMap extends WeatherMapBase
             wm_warn("There are probably Circular dependencies in relative POSITION lines for $nSkipped nodes (or $maxIterations levels of relative positioning). [WMWARN11]\n");
         }
     }
-
 
 
     public function WriteDataFile($filename)
@@ -1673,7 +1671,6 @@ class WeatherMap extends WeatherMapBase
     }
 
 
-
     private function prefetchPlugins()
     {
         // give all the plugins a chance to prefetch their results
@@ -1822,6 +1819,44 @@ class WeatherMap extends WeatherMapBase
         }
 
         return $bgImageRef;
+    }
+
+    public function asConfigData()
+    {
+        $conf = array();
+
+        $conf['vars'] = $this->hints;
+        $conf['fonts'] = $this->fonts->asConfigData();
+
+        // title font, pos
+        // time font, pos
+
+        return $conf;
+    }
+
+    public function getJSONConfig()
+    {
+        $conf = array(
+            "global" => $this->asConfigData(),
+            "scales" => array(),
+            "nodes" => array(),
+            "links" => array()
+        );
+
+        foreach ($this->scales as $scale) {
+            $conf['scales'][$scale->name] = $scale->asConfigData();
+        }
+
+        foreach ($this->nodes as $node) {
+            $conf['nodes'][$node->name] = $node->asConfigData();
+        }
+
+        foreach ($this->links as $link) {
+            $conf['links'][$link->name] = $link->asConfigData();
+        }
+
+        return json_encode($conf, JSON_PRETTY_PRINT);
+//        return json_encode($conf);
     }
 }
 // vim:ts=4:sw=4:

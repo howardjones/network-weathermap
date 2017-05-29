@@ -821,6 +821,17 @@ class WeatherMapLink extends WeatherMapDataItem
             $this->b->addDependency($this);
         }
     }
+
+    public function asConfigData()
+    {
+        $config = parent::asConfigData();
+
+        $config['a'] = $this->a->name;
+        $config['b'] = $this->b->name;
+        $config['width'] = $this->width;
+
+        return $config;
+    }
 }
 
 // vim:ts=4:sw=4:

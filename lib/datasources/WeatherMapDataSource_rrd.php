@@ -195,7 +195,6 @@ class WeatherMapDataSource_rrd extends WeatherMapDataSource
         $pipe = popen($command, "r");
 
         $lines = array();
-        $count = 0;
         $linecount = 0;
 
         if (isset($pipe)) {
@@ -236,10 +235,10 @@ class WeatherMapDataSource_rrd extends WeatherMapDataSource
                     }
                 }
             } else {
-                wm_warn("Not enough output from RRDTool. [WMRRD09]\n");
+                wm_warn("RRD Aggregate ReadData: Not enough output from RRDTool ($linecount lines). [WMRRD09]\n");
             }
         } else {
-            wm_warn("RRD ReadData: failed to open pipe to RRDTool: " . $php_errormsg . " [WMRRD04]\n");
+            wm_warn("RRD Aggregate ReadData: failed to open pipe to RRDTool: " . $php_errormsg . " [WMRRD04]\n");
         }
         wm_debug("RRD ReadDataFromRealRRDAggregate: Returning (" . ($this->data[IN] === null ? 'null' : $this->data[IN]) . "," . ($this->data[OUT] === null ? 'null' : $this->data[OUT]) . ",$this->dataTime)\n");
     }
@@ -261,8 +260,6 @@ class WeatherMapDataSource_rrd extends WeatherMapDataSource
         $values = array();
         $args = array();
 
-        #### $command = '"'.$map->rrdtool . '" fetch "'.$rrdfile.'" AVERAGE --start '.$start.' --end '.$end;
-        #$command=$map->rrdtool . " fetch $rrdfile $cf --start $start --end $end $extra_options";
         $args[] = "fetch";
         $args[] = $rrdfile;
         $args[] = $cf;
@@ -285,7 +282,6 @@ class WeatherMapDataSource_rrd extends WeatherMapDataSource
         $pipe = popen($command, "r");
 
         $lines = array();
-        $count = 0;
         $linecount = 0;
 
         if (isset($pipe)) {
@@ -322,7 +318,6 @@ class WeatherMapDataSource_rrd extends WeatherMapDataSource
                     for ($i = 0, $cnt = count($cols) - 1; $i < $cnt; $i++) {
                         $h = $heads[$i];
                         $v = $cols[$i];
-                        # print "|$h|,|$v|\n";
                         $values[$h] = trim($v);
                     }
 
@@ -330,7 +325,6 @@ class WeatherMapDataSource_rrd extends WeatherMapDataSource
 
                     foreach (array(IN, OUT) as $dir) {
                         $n = $dsnames[$dir];
-                        # print "|$n|\n";
                         if (array_key_exists($n, $values)) {
                             $candidate = $values[$n];
                             if (preg_match('/^\-?\d+[\.,]?\d*e?[+-]?\d*:?$/i', $candidate)) {
@@ -471,8 +465,6 @@ class WeatherMapDataSource_rrd extends WeatherMapDataSource
             }
             if (file_exists($rrdfile)) {
                 wm_debug("RRD ReadData: Target DS names are " . $dsnames[IN] . " and " . $dsnames[OUT] . "\n");
-
-                $values = array();
 
                 if ($aggregatefunction != '') {
                     WeatherMapDataSource_rrd::wmrrd_read_from_real_rrdtool_aggregate($rrdfile, $cfname, $aggregatefunction, $start, $end, $dsnames, $map, $item);

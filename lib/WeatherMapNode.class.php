@@ -1058,6 +1058,18 @@ class WeatherMapNode extends WeatherMapDataItem
             imageellipse($icon_im, $xRadius, $yRadius, $xRadius * 2, $yRadius * 2, $finalFillColour->gdallocate($icon_im));
         }
     }
+
+    public function asConfigData()
+    {
+        $config = parent::asConfigData();
+
+        $config['label'] = $this->label;
+        $config['icon'] = array($this->iconfile, $this->iconscalew, $this->iconscaleh);
+        $config['labeloffset'] = $this->labeloffset;
+
+        return $config;
+    }
+
 }
 
 // vim:ts=4:sw=4:

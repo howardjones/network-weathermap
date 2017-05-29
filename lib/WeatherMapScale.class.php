@@ -55,10 +55,10 @@ class WeatherMapScale extends WeatherMapItem
             $this->$fld = $this->inherit_fieldlist[$fld];
         }
 
-//        $this->setColour("KEYBG", new WMColour(255, 255, 255));
-//        $this->setColour("KEYOUTLINE", new WMColour(0, 0, 0));
-//        $this->setColour("KEYTEXT", new WMColour(0, 0, 0));
-//        $this->setColour("SCALEMISS", new WMColour(255, 255, 255));
+        //        $this->setColour("KEYBG", new WMColour(255, 255, 255));
+        //        $this->setColour("KEYOUTLINE", new WMColour(0, 0, 0));
+        //        $this->setColour("KEYTEXT", new WMColour(0, 0, 0));
+        //        $this->setColour("SCALEMISS", new WMColour(255, 255, 255));
 
         assert(isset($owner));
     }
@@ -70,25 +70,25 @@ class WeatherMapScale extends WeatherMapItem
 
     public function populateDefaultsIfNecessary()
     {
-        if ($this->spanCount() == 0) {
-            wm_debug("Adding default SCALE colour set (no SCALE lines seen).\n");
-
-            $this->addSpan(0, 0, new WMColour(192, 192, 192));
-            $this->addSpan(0, 1, new WMColour(255, 255, 255));
-            $this->addSpan(1, 10, new WMColour(140, 0, 255));
-            $this->addSpan(10, 25, new WMColour(32, 32, 255));
-            $this->addSpan(25, 40, new WMColour(0, 192, 255));
-            $this->addSpan(40, 55, new WMColour(0, 240, 0));
-            $this->addSpan(55, 70, new WMColour(240, 240, 0));
-            $this->addSpan(70, 85, new WMColour(255, 192, 0));
-            $this->addSpan(85, 100, new WMColour(255, 0, 0));
-
-            // we have a 0-0 line now, so we need to hide that.
-            $this->owner->add_hint("key_hidezero_" . $this->name, 1);
-
-        } else {
+        if ($this->spanCount() != 0) {
             wm_debug("Already have " . $this->spanCount() . " scales, no defaults added.\n");
+            return;
         }
+
+        wm_debug("Adding default SCALE colour set (no SCALE lines seen).\n");
+
+        $this->addSpan(0, 0, new WMColour(192, 192, 192));
+        $this->addSpan(0, 1, new WMColour(255, 255, 255));
+        $this->addSpan(1, 10, new WMColour(140, 0, 255));
+        $this->addSpan(10, 25, new WMColour(32, 32, 255));
+        $this->addSpan(25, 40, new WMColour(0, 192, 255));
+        $this->addSpan(40, 55, new WMColour(0, 240, 0));
+        $this->addSpan(55, 70, new WMColour(240, 240, 0));
+        $this->addSpan(70, 85, new WMColour(255, 192, 0));
+        $this->addSpan(85, 100, new WMColour(255, 0, 0));
+
+        // we have a 0-0 line now, so we need to hide that.
+        $this->owner->add_hint("key_hidezero_" . $this->name, 1);
     }
 
     public function spanCount()
@@ -106,6 +106,7 @@ class WeatherMapScale extends WeatherMapItem
         $this->entries[$key]['tag'] = $tag;
         $this->entries[$key]['bottom'] = $lowValue;
         $this->entries[$key]['top'] = $highValue;
+        $this->entries[$key]['label'] = "";
 
         wm_debug("%s %s->%s\n", $this->name, $lowValue, $highValue);
     }
@@ -157,7 +158,7 @@ class WeatherMapScale extends WeatherMapItem
         if ($isPercentage) {
             $oldValue = $value;
             $value = min($value, 100);
-            $value = max ($value, 0);
+            $value = max($value, 0);
             if ($value != $oldValue && $nowarn_clipping == 0) {
                 wm_warn("ColourFromValue: Clipped $oldValue% to $value% for item $itemName [WMWARN33]\n");
             }
@@ -182,7 +183,6 @@ class WeatherMapScale extends WeatherMapItem
 
     protected function findScaleHit($value)
     {
-
         $colour = new WMColour(0, 0, 0);
         $tag = '';
         $matchSize = null;
@@ -222,7 +222,6 @@ class WeatherMapScale extends WeatherMapItem
                 } else {
                     wm_debug("But bigger than existing match\n");
                 }
-
             }
         }
 
@@ -247,46 +246,47 @@ class WeatherMapScale extends WeatherMapItem
         $config['size'] = $this->keysize;
 
         $config_entries = array();
-        foreach ($this->entries as $k => $entry) {
-
+        foreach ($this->entries as $entry) {
             $config_entries[] = array(
-                "min"=>$entry['bottom'],
-                "max"=>$entry['top'],
-                "tag"=>$entry['tag'],
-                "c1"=>$entry['c1']->asArray(),
-                "c2"=> (isset($entry['c2']) ? $entry['c2']->asArray() : null)
+                "min" => $entry['bottom'],
+                "max" => $entry['top'],
+                "tag" => $entry['tag'],
+                "c1" => $entry['c1']->asArray(),
+                "c2" => (isset($entry['c2']) ? $entry['c2']->asArray() : null)
             );
-
         }
         $config['entries'] = $config_entries;
 
         return $config;
     }
 
-    function getConfig()
+    public function getConfig()
     {
         assert(isset($this->owner));
 
         $output = "";
 
         if ($this->keypos != $this->inherit_fieldlist['keypos']) {
-            $output .= sprintf("\tKEYPOS %s %d %d %s\n",
+            $output .= sprintf(
+                "\tKEYPOS %s %d %d %s\n",
                 $this->name,
-                $this->keypos->x, $this->keypos->y,
+                $this->keypos->x,
+                $this->keypos->y,
                 $this->keytitle
             );
         }
 
         if ($this->keystyle != $this->inherit_fieldlist['keystyle']) {
             if ($this->keysize != $this->inherit_fieldlist['keysize']) {
-                $output .= sprintf("\tKEYSTYLE %s %s %d\n",
+                $output .= sprintf(
+                    "\tKEYSTYLE %s %s %d\n",
                     $this->name,
                     $this->keystyle,
                     $this->keysize
                 );
-
             } else {
-                $output .= sprintf("\tKEYSTYLE %s %s\n",
+                $output .= sprintf(
+                    "\tKEYSTYLE %s %s\n",
                     $this->name,
                     $this->keystyle
                 );
@@ -294,27 +294,29 @@ class WeatherMapScale extends WeatherMapItem
         }
 
         // TODO - these aren't actually defined per-legend at the moment!
-        if (1 == 0) {
-            $output .= sprintf("\tKEYBGCOLOR %s %s\n",
-                $this->name,
-                $this->keybgcolour->asConfig()
-            );
 
-            $output .= sprintf("\tKEYTEXTCOLOR %s %s\n",
-                $this->name,
-                $this->keytextcolour->asConfig()
-            );
+        /*
+        $output .= sprintf("\tKEYBGCOLOR %s %s\n",
+            $this->name,
+            $this->keybgcolour->asConfig()
+        );
 
-            $output .= sprintf("\tKEYOUTLINECOLOR %s %s\n",
-                $this->name,
-                $this->keyoutlinecolour->asConfig()
-            );
+        $output .= sprintf("\tKEYTEXTCOLOR %s %s\n",
+            $this->name,
+            $this->keytextcolour->asConfig()
+        );
 
-            $output .= sprintf("\tSCALEMISSCOLOR %s %s\n",
-                $this->name,
-                $this->scalemisscolour->asConfig()
-            );
-        }
+        $output .= sprintf("\tKEYOUTLINECOLOR %s %s\n",
+            $this->name,
+            $this->keyoutlinecolour->asConfig()
+        );
+
+        $output .= sprintf("\tSCALEMISSCOLOR %s %s\n",
+            $this->name,
+            $this->scalemisscolour->asConfig()
+        );
+        */
+
         $locale = localeconv();
         $decimal_point = $locale['decimal_point'];
 
@@ -323,11 +325,21 @@ class WeatherMapScale extends WeatherMapItem
         }
 
         foreach ($this->entries as $k => $entry) {
-            $top = rtrim(rtrim(sprintf("%f", $entry['top']), "0"),
-                $decimal_point);
+            $top = rtrim(
+                rtrim(
+                    sprintf("%f", $entry['top']),
+                    "0"
+                ),
+                $decimal_point
+            );
 
-            $bottom = rtrim(rtrim(sprintf("%f", $entry['bottom']), "0"),
-                $decimal_point);
+            $bottom = rtrim(
+                rtrim(
+                    sprintf("%f", $entry['bottom']),
+                    "0"
+                ),
+                $decimal_point
+            );
 
             if ($bottom > $this->owner->kilo) {
                 $bottom = WMUtility::formatNumberWithMetricSuffix($entry['bottom'], $this->owner->kilo);
@@ -340,12 +352,24 @@ class WeatherMapScale extends WeatherMapItem
             $tag = (isset($entry['tag']) ? $entry['tag'] : '');
 
             if (is_null($entry['c2']) || $entry['c1']->equals($entry['c2'])) {
-                $output .= sprintf("\tSCALE %s %-4s %-4s   %s   %s\n",
-                    $this->name, $bottom, $top, $entry['c1']->asConfig(), $tag);
+                $output .= sprintf(
+                    "\tSCALE %s %-4s %-4s   %s   %s\n",
+                    $this->name,
+                    $bottom,
+                    $top,
+                    $entry['c1']->asConfig(),
+                    $tag
+                );
             } else {
-                $output .= sprintf("\tSCALE %s %-4s %-4s   %s  %s  %s\n",
-                    $this->name, $bottom, $top, $entry['c1']->asConfig(),
-                    $entry['c2']->asConfig(), $tag);
+                $output .= sprintf(
+                    "\tSCALE %s %-4s %-4s   %s  %s  %s\n",
+                    $this->name,
+                    $bottom,
+                    $top,
+                    $entry['c1']->asConfig(),
+                    $entry['c2']->asConfig(),
+                    $tag
+                );
             }
         }
 
@@ -356,33 +380,30 @@ class WeatherMapScale extends WeatherMapItem
         return $output;
     }
 
-    function findScaleExtent()
+    public function findScaleExtent()
     {
         $max = -999999999999999999999;
         $min = -$max;
 
         $colours = $this->entries;
 
-        foreach ($colours as $key => $colour) {
+        foreach ($colours as $colour) {
             $min = min($colour['bottom'], $min);
             $max = max($colour['top'], $max);
         }
 
-        return array(
-            $min,
-            $max
-        );
+        return array($min, $max);
     }
 
     /**
      * @param WMPoint $newPosition
      */
-    function setPosition($newPosition)
+    public function setPosition($newPosition)
     {
         $this->keypos = $newPosition;
     }
 
-    function draw($gdTargetImage)
+    public function draw($gdTargetImage)
     {
         wm_debug("New scale\n");
         // don't draw if the position is the default -1,-1
@@ -422,8 +443,6 @@ class WeatherMapScale extends WeatherMapItem
 
         $areaName = "LEGEND:" . $this->name;
 
-//        $this->owner->imap->addArea("Rectangle", $areaName, '', array($xTarget, $yTarget, $xTarget + $width, $yTarget + $height));
-
         $newArea = new HTMLImageMapAreaRectangle($areaName, "", array(array($xTarget, $yTarget, $xTarget + $width, $yTarget + $height)));
         $this->owner->imap->addArea($newArea);
 
@@ -431,19 +450,16 @@ class WeatherMapScale extends WeatherMapItem
         $this->imap_areas[] = $newArea;
     }
 
-    function DrawLegendClassic($useTags = false)
+    private function DrawLegendClassic($useTags = false)
     {
-        $title = $this->keytitle;
-        $scaleName = $this->name;
-
         $this->sortScale();
 
         $nScales = $this->spanCount();
 
         wm_debug("Drawing $nScales colours into SCALE\n");
 
-        $hide_zero = intval($this->owner->get_hint("key_hidezero_" . $scaleName));
-        $hide_percent = intval($this->owner->get_hint("key_hidepercent_" . $scaleName));
+        $hide_zero = intval($this->owner->get_hint("key_hidezero_" . $this->name));
+        $hide_percent = intval($this->owner->get_hint("key_hidepercent_" . $this->name));
 
         // did we actually hide anything?
         $hid_zero = false;
@@ -460,32 +476,33 @@ class WeatherMapScale extends WeatherMapItem
 
         list($minWidth,) = $fontObject->calculateImageStringSize('MMMM 100%-100%');
         list($minMinWidth,) = $fontObject->calculateImageStringSize('MMMM ');
-        list($boxWidth,) = $fontObject->calculateImageStringSize($title);
+        list($boxWidth,) = $fontObject->calculateImageStringSize($this->keytitle);
 
-        // TODO this should happen for numbers too! otherwise absolute scales are knackered
-        if ($useTags) {
-            $maxTagSize = 0;
-            foreach ($this->entries as $scaleEntry) {
+        // pre-calculate all the text for the legend, and its size
+        $maxTextSize = 0;
+        foreach ($this->entries as $index=>$scaleEntry) {
+            $labelString = sprintf("%s-%s", $scaleEntry['bottom'], $scaleEntry['top']);
+            if ($hide_percent == 0) {
+                $labelString .= "%";
+            }
+
+            if ($useTags) {
+                $labelString = "";
                 if (isset($scaleEntry['tag'])) {
-                    list($w,) = $fontObject->calculateImageStringSize($scaleEntry['tag']);
-                    if ($w > $maxTagSize) {
-                        $maxTagSize = $w;
-                    }
+                    $labelString = $scaleEntry['tag'];
                 }
             }
-
-            // now we can tweak the widths, appropriately to allow for the tag strings
-            if (($maxTagSize + $minMinWidth) > $minWidth) {
-                $minWidth = $minMinWidth + $maxTagSize;
-            }
+            $this->entries[$index]['label'] = $labelString;
+            list($w,) = $fontObject->calculateImageStringSize($labelString);
+            $maxTextSize = max($maxTextSize, $w);
         }
+
+        $minWidth = max($minMinWidth + $maxTextSize, $minWidth);
 
         $minWidth += 10;
         $boxWidth += 10;
 
-        if ($boxWidth < $minWidth) {
-            $boxWidth = $minWidth;
-        }
+        $boxWidth = max($boxWidth, $minWidth);
 
         $boxHeight = $tileSpacing * ($nScales + 1) + 10;
 
@@ -498,9 +515,6 @@ class WeatherMapScale extends WeatherMapItem
         $nothing = imagecolorallocatealpha($gdScaleImage, 128, 0, 0, 127);
         imagefill($gdScaleImage, 0, 0, $nothing);
 
-        $scale_ref = 'gdref_legend_' . $scaleName;
-        //    $this->preAllocateScaleColours($gdScaleImage, $scale_ref);
-
         $bgColour = $this->keybgcolour;
         $outlineColour = $this->keyoutlinecolour;
 
@@ -512,71 +526,56 @@ class WeatherMapScale extends WeatherMapItem
             imagerectangle($gdScaleImage, 0, 0, $boxWidth, $boxHeight, $outlineColour->gdAllocate($gdScaleImage));
         }
 
-        // $this->myimagestring($gdScaleImage, $font, 4, 4 + $tileHeight, $title, $this->colourtable['KEYTEXT']->gdAllocate($gdScaleImage));
-        $fontObject->drawImageString($gdScaleImage, 4, 4 + $tileHeight, $title, $this->keytextcolour->gdAllocate($gdScaleImage));
+        $fontObject->drawImageString($gdScaleImage, 4, 4 + $tileHeight, $this->keytitle, $this->keytextcolour->gdAllocate($gdScaleImage));
 
         $rowNumber = 1;
 
         foreach ($this->entries as $key => $scaleEntry) {
-            if (!isset($scaleEntry['special']) || $scaleEntry['special'] == 0) {
-                // pick a value in the middle...
-                $value = ($scaleEntry['bottom'] + $scaleEntry['top']) / 2;
-                wm_debug(sprintf("%f-%f (%f)  %s\n", $scaleEntry['bottom'], $scaleEntry['top'], $value, $scaleEntry['c1']));
+            // pick a value in the middle...
+            $value = ($scaleEntry['bottom'] + $scaleEntry['top']) / 2;
+            wm_debug(sprintf("%f-%f (%f)  %s\n", $scaleEntry['bottom'], $scaleEntry['top'], $value, $scaleEntry['c1']));
 
-                if (($hide_zero == 0) || $key != '0_0') {
-                    $y = $tileSpacing * $rowNumber + 8;
-                    $x = 6;
+            if (($hide_zero == 0) || $key != '0_0') {
+                $y = $tileSpacing * $rowNumber + 8;
+                $x = 6;
 
-                    $fudgeFactor = 0;
-                    if ($hid_zero && $scaleEntry['bottom'] == 0) {
-                        // calculate a small offset that can be added, which will hide the zero-value in a
-                        // gradient, but not make the scale incorrect. A quarter of a pixel should do it.
-                        $fudgeFactor = ($scaleEntry['top'] - $scaleEntry['bottom']) / ($tileWidth * 4);
-                    }
+                $fudgeFactor = 0;
+                if ($hid_zero && $scaleEntry['bottom'] == 0) {
+                    // calculate a small offset that can be added, which will hide the zero-value in a
+                    // gradient, but not make the scale incorrect. A quarter of a pixel should do it.
+                    $fudgeFactor = ($scaleEntry['top'] - $scaleEntry['bottom']) / ($tileWidth * 4);
+                }
 
-                    // if it's a gradient, red2 is defined, and we need to sweep the values
-                    if (isset($scaleEntry['c2']) && !$scaleEntry['c1']->equals($scaleEntry['c2'])) {
-                        for ($n = 0; $n <= $tileWidth; $n++) {
-                            $value = $fudgeFactor + $scaleEntry['bottom'] + ($n / $tileWidth) * ($scaleEntry['top'] - $scaleEntry['bottom']);
-                            list($entryColour,) = $this->findScaleHit($value);
-                            $gdColourRef = $entryColour->gdallocate($gdScaleImage);
-                            imagefilledrectangle($gdScaleImage, $x + $n, $y, $x + $n, $y + $tileHeight, $gdColourRef);
-                        }
-                    } else {
-                        // pick a value in the middle...
+                // if it's a gradient, red2 is defined, and we need to sweep the values
+                if (isset($scaleEntry['c2']) && !$scaleEntry['c1']->equals($scaleEntry['c2'])) {
+                    for ($n = 0; $n <= $tileWidth; $n++) {
+                        $value = $fudgeFactor + $scaleEntry['bottom'] + ($n / $tileWidth) * ($scaleEntry['top'] - $scaleEntry['bottom']);
                         list($entryColour,) = $this->findScaleHit($value);
                         $gdColourRef = $entryColour->gdallocate($gdScaleImage);
-                        imagefilledrectangle($gdScaleImage, $x, $y, $x + $tileWidth, $y + $tileHeight, $gdColourRef);
+                        imagefilledrectangle($gdScaleImage, $x + $n, $y, $x + $n, $y + $tileHeight, $gdColourRef);
                     }
-
-                    if ($useTags) {
-                        $labelString = "";
-                        if (isset($scaleEntry['tag'])) {
-                            $labelString = $scaleEntry['tag'];
-                        }
-                    } else {
-                        $labelString = sprintf("%s-%s", $scaleEntry['bottom'], $scaleEntry['top']);
-                        if ($hide_percent == 0) {
-                            $labelString .= "%";
-                        }
-                    }
-                    $fontObject->drawImageString($gdScaleImage, $x + 4 + $tileWidth, $y + $tileHeight, $labelString, $this->keytextcolour->gdAllocate($gdScaleImage));
-                    $rowNumber++;
+                } else {
+                    // pick a value in the middle...
+                    list($entryColour,) = $this->findScaleHit($value);
+                    $gdColourRef = $entryColour->gdallocate($gdScaleImage);
+                    imagefilledrectangle($gdScaleImage, $x, $y, $x + $tileWidth, $y + $tileHeight, $gdColourRef);
                 }
+
+                $fontObject->drawImageString($gdScaleImage, $x + 4 + $tileWidth, $y + $tileHeight, $scaleEntry['label'], $this->keytextcolour->gdAllocate($gdScaleImage));
+                $rowNumber++;
             }
         }
 
         return $gdScaleImage;
-
     }
 
-    function sortScale()
+    private function sortScale()
     {
         // $colours = $this->colours[$scaleName];
         usort($this->entries, array("WeatherMapScale", "scaleEntrySort"));
     }
 
-    function DrawLegendHorizontal($keyWidth = 400)
+    private function DrawLegendHorizontal($keyWidth = 400)
     {
 
         $title = $this->keytitle;
@@ -607,7 +606,6 @@ class WeatherMapScale extends WeatherMapItem
         wm_debug("Size is %dx%d (From %dx%d tile)\n", $boxRight + 1, $boxBottom + 1, $tileWidth, $tileHeight);
 
         $gdScaleImage = imagecreatetruecolor($boxRight + 1, $boxBottom + 1);
-        $scaleReference = 'gdref_legend_' . $this->name;
 
         // Start with a transparent box, in case the fill or outline colour is 'none'
         imageSaveAlpha($gdScaleImage, true);
@@ -660,7 +658,7 @@ class WeatherMapScale extends WeatherMapItem
      *
 
      */
-    function DrawLegendVertical($keyHeight = 400, $inverted = false)
+    private function DrawLegendVertical($keyHeight = 400, $inverted = false)
     {
         $title = $this->keytitle;
 
@@ -689,14 +687,11 @@ class WeatherMapScale extends WeatherMapItem
         $boxBottom = $scaleBottom + $scaleFactor + $tileHeight / 2 + 4;
 
         $gdScaleImage = imagecreatetruecolor($boxRight + 1, $boxBottom + 1);
-        $scaleReference = 'gdref_legend_' . $this->name;
 
         // Start with a transparent box, in case the fill or outline colour is 'none'
         imagesavealpha($gdScaleImage, true);
         $transparentColour = imagecolorallocatealpha($gdScaleImage, 128, 0, 0, 127);
         imagefill($gdScaleImage, 0, 0, $transparentColour);
-
-        // $this->preAllocateScaleColours($gdScaleImage, $scaleReference)
 
         /** @var WMColour $bgColour */
         $bgColour = $this->keybgcolour;
@@ -722,13 +717,9 @@ class WeatherMapScale extends WeatherMapItem
                 $deltaY = $percentage * $scaleFactor;
             }
 
-            $xOffset = $percentage * $scaleFactor;
-
             if (($percentage % 25) == 0) {
-                // imageline($gdScaleImage, $scale_left - $scalefactor, $scale_top + $delta_y, $scale_right + $scalefactor, $scale_top + $delta_y, $this->colourtable['KEYTEXT']->gdAllocate($gdScaleImage));
                 imageline($gdScaleImage, $scaleLeft - $scaleFactor, $scaleTop + $deltaY, $scaleRight + $scaleFactor, $scaleTop + $deltaY, $this->keytextcolour->gdAllocate($gdScaleImage));
                 $labelString = sprintf("%d%%", $percentage);
-                // $this->myimagestring($gdScaleImage, $font, $scale_right + $scalefactor * 2, $scale_top + $delta_y + $tileheight / 2, $labelstring, $this->colourtable['KEYTEXT']->gdAllocate($gdScaleImage));
                 $fontObject->drawImageString($gdScaleImage, $scaleRight + $scaleFactor * 2, $scaleTop + $deltaY + $tileHeight / 2, $labelString, $this->keytextcolour->gdAllocate($gdScaleImage));
             }
 
@@ -737,11 +728,6 @@ class WeatherMapScale extends WeatherMapItem
 
             if ($col->isRealColour()) {
                 $gdColourRef = $col->gdAllocate($gdScaleImage);
-//                imagefilledrectangle($gdScaleImage,
-//                    $scale_left,
-//                    $scale_top + $delta_y - $scalefactor / 2,
-//                    $scale_right, $scale_top + $delta_y + $scalefactor / 2,
-//                    $col->gdAllocate($gdScaleImage));
                 imagefilledrectangle(
                     $gdScaleImage,
                     $scaleLeft,
@@ -774,5 +760,4 @@ class WeatherMapScale extends WeatherMapItem
 
         return 1;
     }
-
 }

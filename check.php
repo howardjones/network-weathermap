@@ -13,8 +13,10 @@ if (($mem_allowed_int > 0) && ($mem_allowed_int < 32000000)) {
 function return_bytes($val)
 {
     $val = trim($val);
+
     if ($val != '') {
         $last = strtolower($val{strlen($val) - 1});
+        $val = intval($val);
         switch ($last) {
             // The 'G' modifier is available since PHP 5.1.0
             case 'g':
@@ -27,11 +29,10 @@ function return_bytes($val)
                 $val *= 1024;
             // FALL THROUGH
         }
-    } else {
-        $val = 0;
+        return $val;
     }
 
-    return $val;
+    return 0;
 }
 
 /**
@@ -39,14 +40,15 @@ function return_bytes($val)
  */
 function getPhpGeneralInfo()
 {
-// capture the PHP "General Info" table
+    $php_general = array();
+
+    // capture the PHP "General Info" table
     ob_start();
     phpinfo(INFO_GENERAL);
     $s = ob_get_contents();
     ob_end_clean();
 
-// <tr><td class="e">System </td><td class="v">Windows NT BLINKYZERO 6.0 build 6000 </td></tr>
-// since preg_* are potentially missing, we'll have to do this without regexps.
+    // since preg_* are potentially missing, we'll have to do this without regexps.
     foreach (explode("\n", $s) as $line) {
         $line = str_replace('<tr><td class="e">', '', $line);
         $line = str_replace('</td></tr>', '', $line);
@@ -290,4 +292,4 @@ $environment = "web";
     if ($environment == 'web') print "</table></body></html>";
 
 
-    ?>
+

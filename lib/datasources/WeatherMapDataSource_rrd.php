@@ -291,6 +291,7 @@ class WeatherMapDataSource_rrd extends WeatherMapDataSource
 
         if (!isset($pipe)) {
             wm_warn("RRD ReadData: failed to open pipe to RRDTool: " . $php_errormsg . " [WMRRD04]\n");
+            return;
         }
         $headings = fgets($pipe, 4096);
         // this replace fudges 1.2.x output to look like 1.0.x

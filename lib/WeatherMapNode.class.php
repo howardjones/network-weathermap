@@ -141,10 +141,10 @@ class WeatherMapNode extends WeatherMapDataItem
     }
 
     /**
-     * @param resource $im
+     * @param resource $imageRef
      * @param WeatherMap $map
      */
-    public function preRender($im, &$map)
+    public function preRender(&$map)
     {
         if (!$this->drawable) {
             wm_debug("Skipping undrawable %s", $this);
@@ -312,12 +312,7 @@ class WeatherMapNode extends WeatherMapDataItem
         // (so we can have close-spaced icons better)
 
         // create an image of that size and draw into it
-        $node_im = imagecreatetruecolor($totalBoundingBox->width(), $totalBoundingBox->height());
-        Imagealphablending($node_im, false);
-        imagesavealpha($node_im, true);
-
-        $nothing = imagecolorallocatealpha($node_im, 128, 0, 0, 127);
-        imagefill($node_im, 0, 0, $nothing);
+        $node_im = $this->createTransparentImage($totalBoundingBox->width(), $totalBoundingBox->height());
 
         $labelBox->translate(-$totalBoundingBox->topLeft->x, -$totalBoundingBox->topLeft->y);
         $iconBox->translate(-$totalBoundingBox->topLeft->x, -$totalBoundingBox->topLeft->y);
@@ -394,7 +389,7 @@ class WeatherMapNode extends WeatherMapDataItem
     }
 
     // draw the node, using the pre_render() output
-    public function Draw($im, &$map)
+    public function Draw($imageRef)
     {
         if (!$this->drawable) {
             wm_debug("Skipping undrawable %s\n", $this);
@@ -406,8 +401,8 @@ class WeatherMapNode extends WeatherMapDataItem
 
         // it's possible that there is no image, so better check.
         if (isset($this->image)) {
-            imagealphablending($im, true);
-            imagecopy($im, $this->image, $this->x - $this->centre_x, $this->y - $this->centre_y, 0, 0, imagesx($this->image), imagesy($this->image));
+            imagealphablending($imageRef, true);
+            imagecopy($imageRef, $this->image, $this->x - $this->centre_x, $this->y - $this->centre_y, 0, 0, imagesx($this->image), imagesy($this->image));
         }
     }
 
@@ -423,7 +418,7 @@ class WeatherMapNode extends WeatherMapDataItem
 
         // This allows the editor to wholesale-replace a single node's configuration
         // at write-time - it should include the leading NODE xyz line (to allow for renaming)
-        $dd = $this->owner->nodes[$this->template];
+        $template_item = $this->owner->nodes[$this->template];
 
         wm_debug("Writing config for NODE $this->name against $this->template\n");
 
@@ -450,29 +445,29 @@ class WeatherMapNode extends WeatherMapDataItem
             $output .= "\tTEMPLATE " . $this->template . "\n";
         }
 
-        $output .= $this->getSimpleConfig($basic_params, $dd);
+        $output .= $this->getSimpleConfig($basic_params, $template_item);
 
         // IN/OUT are the same, so we can use the simpler form here
-        if ($this->infourl[IN] != $dd->infourl[IN]) {
+        if ($this->infourl[IN] != $template_item->infourl[IN]) {
             $output .= "\tINFOURL " . $this->infourl[IN] . "\n";
         }
 
-        if ($this->overlibcaption[IN] != $dd->overlibcaption[IN]) {
+        if ($this->overlibcaption[IN] != $template_item->overlibcaption[IN]) {
             $output .= "\tOVERLIBCAPTION " . $this->overlibcaption[IN] . "\n";
         }
 
         // IN/OUT are the same, so we can use the simpler form here
-        if ($this->notestext[IN] != $dd->notestext[IN]) {
+        if ($this->notestext[IN] != $template_item->notestext[IN]) {
             $output .= "\tNOTES " . $this->notestext[IN] . "\n";
         }
 
-        if ($this->overliburl[IN] != $dd->overliburl[IN]) {
+        if ($this->overliburl[IN] != $template_item->overliburl[IN]) {
             $output .= "\tOVERLIBGRAPH " . join(" ", $this->overliburl[IN]) . "\n";
         }
 
         $val = $this->iconscalew . " " . $this->iconscaleh . " " . $this->iconfile;
 
-        $comparison = $dd->iconscalew . " " . $dd->iconscaleh . " " . $dd->iconfile;
+        $comparison = $template_item->iconscalew . " " . $template_item->iconscaleh . " " . $template_item->iconfile;
 
         if ($val != $comparison) {
             $output .= "\tICON ";
@@ -482,7 +477,7 @@ class WeatherMapNode extends WeatherMapDataItem
             $output .= ($this->iconfile == '' ? 'none' : $this->iconfile) . "\n";
         }
 
-        if ($this->targets != $dd->targets) {
+        if ($this->targets != $template_item->targets) {
             $output .= "\tTARGET";
 
             foreach ($this->targets as $target) {
@@ -493,28 +488,28 @@ class WeatherMapNode extends WeatherMapDataItem
         }
 
         $val = $this->usescale . " " . $this->scalevar . " " . $this->scaletype;
-        $comparison = $dd->usescale . " " . $dd->scalevar . " " . $dd->scaletype;
+        $comparison = $template_item->usescale . " " . $template_item->scalevar . " " . $template_item->scaletype;
 
         if (($val != $comparison)) {
             $output .= "\tUSESCALE " . $val . "\n";
         }
 
         $val = $this->useiconscale . " " . $this->iconscalevar;
-        $comparison = $dd->useiconscale . " " . $dd->iconscalevar;
+        $comparison = $template_item->useiconscale . " " . $template_item->iconscalevar;
 
         if ($val != $comparison) {
             $output .= "\tUSEICONSCALE " . $val . "\n";
         }
 
         $val = $this->labeloffsetx . " " . $this->labeloffsety;
-        $comparison = $dd->labeloffsetx . " " . $dd->labeloffsety;
+        $comparison = $template_item->labeloffsetx . " " . $template_item->labeloffsety;
 
         if ($comparison != $val) {
             $output .= "\tLABELOFFSET " . $val . "\n";
         }
 
         $val = $this->x . " " . $this->y;
-        $comparison = $dd->x . " " . $dd->y;
+        $comparison = $template_item->x . " " . $template_item->y;
 
         if ($val != $comparison) {
             if ($this->relative_to == '') {
@@ -530,17 +525,17 @@ class WeatherMapNode extends WeatherMapDataItem
             }
         }
 
-        $output .= $this->getMaxValueConfig($dd, "MAXVALUE");
+        $output .= $this->getMaxValueConfig($template_item, "MAXVALUE");
 
-        $output .= $this->getHintConfig($dd);
+        $output .= $this->getHintConfig($template_item);
 
         foreach ($this->named_offsets as $off_name => $off_pos) {
             // if the offset exists with different values, or
             // doesn't exist at all in the template, we need to write
             // some config for it
-            if ((array_key_exists($off_name, $dd->named_offsets))) {
-                $offsetX = $dd->named_offsets[$off_name][0];
-                $offsetY = $dd->named_offsets[$off_name][1];
+            if ((array_key_exists($off_name, $template_item->named_offsets))) {
+                $offsetX = $template_item->named_offsets[$off_name][0];
+                $offsetY = $template_item->named_offsets[$off_name][1];
 
                 if ($offsetX != $off_pos[0] || $offsetY != $off_pos[1]) {
                     $output .= sprintf("\tDEFINEOFFSET %s %d %d\n", $off_name, $off_pos[0], $off_pos[1]);
@@ -559,6 +554,7 @@ class WeatherMapNode extends WeatherMapDataItem
 
     protected function asJSCore()
     {
+        // TODO - this should use json_encode()
         $output = "";
 
         $output .= "x:" . (is_null($this->x) ? "'null'" : $this->x) . ", ";
@@ -723,68 +719,35 @@ class WeatherMapNode extends WeatherMapDataItem
         wm_debug("Artificial Icon type " . $this->iconfile . " for $this->name\n");
         // this is an artificial icon - we don't load a file for it
 
-        $icon_im = imagecreatetruecolor($this->iconscalew, $this->iconscaleh);
-        imagesavealpha($icon_im, true);
+        $icon_im = $this->createTransparentImage($this->iconscalew, $this->iconscaleh);
 
-        $nothing = imagecolorallocatealpha($icon_im, 128, 0, 0, 127);
-        imagefill($icon_im, 0, 0, $nothing);
-
-        $finalFillColour = new WMColour('none');
-        $finalInkColour = new WMColour('none');
-
-        $configuredAIFillColour = $this->aiconfillcolour;
-        $configuredAIOutlineColour = $this->aiconoutlinecolour;
-
-        // if useiconscale isn't set, then use the static
-        // colour defined, or copy the colour from the label
-        if ($this->useiconscale == "none") {
-            if ($configuredAIFillColour->isCopy() && !$labelColour->isNone()) {
-                $finalFillColour = $labelColour;
-            } else {
-                if ($configuredAIFillColour->isRealColour()) {
-                    $finalFillColour = $configuredAIFillColour;
-                }
-            }
-        } else {
-            // if useiconscale IS defined, use that to figure out the fill colour
-            $finalFillColour = $this->calculateIconColour($map);
-        }
-
-        if (!$this->aiconoutlinecolour->isNone()) {
-            $finalInkColour = $configuredAIOutlineColour;
-        }
-        //********************************
+        list($finalFillColour, $finalInkColour) = $this->calculateAICONColours($labelColour, $map);
 
         wm_debug("ink is: $finalInkColour\n");
         wm_debug("fill is: $finalFillColour\n");
 
-        if ($this->iconfile == 'box') {
-            $this->drawArtificialIconBox($icon_im, $finalFillColour, $finalInkColour);
-        }
-
-        if ($this->iconfile == 'rbox') {
-            $this->drawArtificialIconRoundedBox($icon_im, $finalFillColour, $finalInkColour);
-        }
-
-        if ($this->iconfile == 'round') {
-            $this->drawArtificialIconRound($icon_im, $finalFillColour, $finalInkColour);
-        }
-
-        if ($this->iconfile == 'nink') {
-            $this->drawArtificialIconNINK($icon_im, $finalInkColour, $map);
-        }
-
-        // XXX - needs proper colours
-        if ($this->iconfile == 'inpie') {
-            $this->drawArtificialIconPie($icon_im, $finalFillColour, $finalInkColour, IN);
-        }
-
-        if ($this->iconfile == 'outpie') {
-            $this->drawArtificialIconPie($icon_im, $finalFillColour, $finalInkColour, OUT);
-        }
-
-        if ($this->iconfile == 'gauge') {
-            wm_warn('gauge AICON not implemented yet [WMWARN99]');
+        switch ($this->iconfile) {
+            case "box":
+                $this->drawArtificialIconBox($icon_im, $finalFillColour, $finalInkColour);
+                break;
+            case "rbox":
+                $this->drawArtificialIconRoundedBox($icon_im, $finalFillColour, $finalInkColour);
+                break;
+            case "round":
+                $this->drawArtificialIconRound($icon_im, $finalFillColour, $finalInkColour);
+                break;
+            case "nink":
+                $this->drawArtificialIconNINK($icon_im, $finalInkColour, $map);
+                break;
+            case "inpie":
+                $this->drawArtificialIconPie($icon_im, $finalFillColour, $finalInkColour, IN);
+                break;
+            case "outpie":
+                $this->drawArtificialIconPie($icon_im, $finalFillColour, $finalInkColour, OUT);
+                break;
+            case "gauge":
+                wm_warn('gauge AICON not implemented yet [WMWARN99]');
+                break;
         }
 
         return $icon_im;
@@ -1068,6 +1031,52 @@ class WeatherMapNode extends WeatherMapDataItem
         $config['labeloffset'] = $this->labeloffset;
 
         return $config;
+    }
+
+    /**
+     * @param $labelColour
+     * @return array
+     */
+    private function calculateAICONColours($labelColour, &$map)
+    {
+        $finalFillColour = new WMColour('none');
+        $finalInkColour = new WMColour('none');
+
+        $configuredAIFillColour = $this->aiconfillcolour;
+        $configuredAIOutlineColour = $this->aiconoutlinecolour;
+
+        // if useiconscale isn't set, then use the static colour defined, or copy the colour from the label
+        if ($this->useiconscale == "none") {
+            if ($configuredAIFillColour->isCopy() && !$labelColour->isNone()) {
+                $finalFillColour = $labelColour;
+            } else {
+                if ($configuredAIFillColour->isRealColour()) {
+                    $finalFillColour = $configuredAIFillColour;
+                }
+            }
+        } else {
+            // if useiconscale IS defined, use that to figure out the fill colour
+            $finalFillColour = $this->calculateIconColour($map);
+        }
+
+        if (!$this->aiconoutlinecolour->isNone()) {
+            $finalInkColour = $configuredAIOutlineColour;
+        }
+        return array($finalFillColour, $finalInkColour);
+    }
+
+    /**
+     * @return resource
+     */
+    private function createTransparentImage($width, $height)
+    {
+        $icon_im = imagecreatetruecolor($width, $height);
+        imagesavealpha($icon_im, true);
+
+        $nothing = imagecolorallocatealpha($icon_im, 128, 0, 0, 127);
+        imagefill($icon_im, 0, 0, $nothing);
+
+        return $icon_im;
     }
 
 }

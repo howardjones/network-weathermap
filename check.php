@@ -1,8 +1,25 @@
 <?php
+$critical = 0;
+$noncritical = 0;
+
+// This constant was added in PHP 5.2 - since we're actually checking that the version is > 5.3, it might
+// not exist in the user's version, so define it, if not
+if (!defined('PHP_VERSION_ID')) {
+    $version = explode('.', PHP_VERSION);
+
+    define('PHP_VERSION_ID', ($version[0] * 10000 + $version[1] * 100 + $version[2]));
+}
+
 // get some basics...
 $php_version = phpversion();
 $mem_allowed = ini_get("memory_limit");
 $php_os = php_uname();
+
+$php_warning = "";
+if (PHP_VERSION_ID < 50300) {
+    $php_warning = "Weathermap makes use of language features that are only available in PHP 5.3.0 and newer. You will need to upgrade.";
+    $critical++;
+}
 
 $mem_warning = "";
 $mem_allowed_int = return_bytes($mem_allowed);
@@ -99,7 +116,7 @@ if (isset($argv)) {
     print "NOTE: You should run this script as both a web page AND from the\ncommand-line, as the environment can be different in each.\n";
     print "\nThis is the PHP version that is responsible for \n* creating maps from the Cacti poller\n* the command-line weathermap tool\n\n";
     print "PHP Basics\n----------\n";
-    print wordwrap("This is PHP Version $php_version running on \"$php_os\" with a memory_limit of '$mem_allowed'. $mem_warning\n");
+    print wordwrap("This is PHP Version $php_version running on \"$php_os\" with a memory_limit of '$mem_allowed'. $mem_warning $php_warning\n");
     print "\nThe php.ini file was $ini_file\n$extra_ini\n\n";
     print "";
     print "PHP Functions\n-------------\n";
@@ -166,7 +183,7 @@ $environment = "web";
     <li>Building maps with Rebuild Now from Cacti</li>
 </ul>
 <p>This is PHP Version <?php echo $php_version ?> running on "<?php echo $php_os ?>" with a memory_limit of
-    '<?php echo $mem_allowed ?>'. <?php echo $mem_warning ?></p>
+    '<?php echo $mem_allowed ?>'. <?php echo $mem_warning ?><?php echo $php_warning ?></p>
 <p>The php.ini file was <?php echo $ini_file ?></p>
 <p><?php echo $extra_ini ?></p>
 <h2>PHP Functions</h2>
@@ -176,8 +193,6 @@ $environment = "web";
     <?php
     }
 
-    $critical = 0;
-    $noncritical = 0;
 
 
     # critical, what-it-affects, what-it-is
@@ -186,8 +201,8 @@ $environment = "web";
         'imagealphablending' => array(true, false, 'all of Weathermap', 'part of the GD library and the "gd" PHP extension'),
         'imageSaveAlpha' => array(true, false, 'all of Weathermap', 'part of the GD library and the "gd" PHP extension'),
         'preg_match' => array(true, false, 'configuration reading', 'provided by the "pcre" extension'),
+        'json_encode' => array(true, false, 'editor', 'provided by the "json" extension'),
         'imagecreatefrompng' => array(true, false, 'all of Weathermap', 'part of the GD library and the "gd" PHP extension'),
-
         'imagecreatefromjpeg' => array(false, false, 'JPEG input support for ICON and BACKGROUND', 'an optional part of the GD library and the "gd" PHP extension'),
         'imagecreatefromgif' => array(false, false, 'GIF input support for ICON and BACKGROUND', 'an optional part of the GD library and the "gd" PHP extension'),
         'imagejpeg' => array(false, false, 'JPEG output support', 'an optional part of the GD library and the "gd" PHP extension'),

@@ -498,22 +498,12 @@ class WeatherMapScale extends WeatherMapItem
         }
 
         $minWidth = max($minMinWidth + $maxTextSize, $minWidth);
-
-        $minWidth += 10;
-        $boxWidth += 10;
-
-        $boxWidth = max($boxWidth, $minWidth);
-
+        $boxWidth = max($boxWidth + 10, $minWidth + 10);
         $boxHeight = $tileSpacing * ($nScales + 1) + 10;
 
         wm_debug("Scale Box is %dx%d\n", $boxWidth + 1, $boxHeight + 1);
 
-        $gdScaleImage = imagecreatetruecolor($boxWidth + 1, $boxHeight + 1);
-
-        // Start with a transparent box, in case the fill or outline colour is 'none'
-        imagesavealpha($gdScaleImage, true);
-        $nothing = imagecolorallocatealpha($gdScaleImage, 128, 0, 0, 127);
-        imagefill($gdScaleImage, 0, 0, $nothing);
+        $gdScaleImage = $this->createTransparentImage($boxWidth + 1, $boxHeight + 1);
 
         $bgColour = $this->keybgcolour;
         $outlineColour = $this->keyoutlinecolour;
@@ -605,14 +595,7 @@ class WeatherMapScale extends WeatherMapItem
 
         wm_debug("Size is %dx%d (From %dx%d tile)\n", $boxRight + 1, $boxBottom + 1, $tileWidth, $tileHeight);
 
-        $gdScaleImage = imagecreatetruecolor($boxRight + 1, $boxBottom + 1);
-
-        // Start with a transparent box, in case the fill or outline colour is 'none'
-        imageSaveAlpha($gdScaleImage, true);
-        $transparentColour = imagecolorallocatealpha($gdScaleImage, 128, 0, 0, 127);
-        imagefill($gdScaleImage, 0, 0, $transparentColour);
-
-        // $this->preAllocateScaleColours($gdScaleImage, $scaleReference);
+        $gdScaleImage = $this->createTransparentImage($boxRight + 1, $boxBottom + 1);
 
         /** @var WMColour $bgColour */
         $bgColour = $this->keybgcolour;
@@ -686,12 +669,7 @@ class WeatherMapScale extends WeatherMapItem
         $scaleBottom = $scaleTop + $keyHeight;
         $boxBottom = $scaleBottom + $scaleFactor + $tileHeight / 2 + 4;
 
-        $gdScaleImage = imagecreatetruecolor($boxRight + 1, $boxBottom + 1);
-
-        // Start with a transparent box, in case the fill or outline colour is 'none'
-        imagesavealpha($gdScaleImage, true);
-        $transparentColour = imagecolorallocatealpha($gdScaleImage, 128, 0, 0, 127);
-        imagefill($gdScaleImage, 0, 0, $transparentColour);
+        $gdScaleImage = $this->createTransparentImage($boxRight + 1, $boxBottom + 1);
 
         /** @var WMColour $bgColour */
         $bgColour = $this->keybgcolour;
@@ -759,5 +737,23 @@ class WeatherMapScale extends WeatherMapItem
         }
 
         return 1;
+    }
+
+    /**
+     * @param $boxWidth
+     * @param $boxHeight
+     * @return resource
+     */
+    private function createTransparentImage($boxWidth, $boxHeight)
+    {
+        // TODO - there is a similar/identical method in WeatherMapNode
+        $gdScaleImage = imagecreatetruecolor($boxWidth, $boxHeight);
+
+        // Start with a transparent box, in case the fill or outline colour is 'none'
+        imagesavealpha($gdScaleImage, true);
+        $nothing = imagecolorallocatealpha($gdScaleImage, 128, 0, 0, 127);
+        imagefill($gdScaleImage, 0, 0, $nothing);
+
+        return $gdScaleImage;
     }
 }

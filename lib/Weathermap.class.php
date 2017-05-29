@@ -1120,7 +1120,7 @@ class WeatherMap extends WeatherMapBase
             wm_debug("Pre-rendering " . $node->name . " to get bounding boxes.\n");
             if (!$node->isTemplate()) {
                 $node->preCalculate($this);
-                $node->preRender($imageRef, $this);
+                $node->preRender($this);
             }
         }
 
@@ -1148,9 +1148,10 @@ class WeatherMap extends WeatherMapBase
             }
 
             if (is_array($z_items)) {
+                /** @var WeatherMapDataItem $it */
                 foreach ($z_items as $it) {
                     wm_debug("Drawing " . $it->my_type() . " " . $it->name . "\n");
-                    $it->Draw($imageRef, $this);
+                    $it->Draw($imageRef);
                 }
             }
         }

@@ -343,7 +343,7 @@ class WeatherMapLink extends WeatherMapDataItem
         $this->geometry->Init($this, $points, $widths, ($this->linkstyle == 'oneway' ? 1 : 2), $this->splitpos, $this->arrowstyle);
     }
 
-    public function Draw($im, &$map)
+    public function Draw($imageRef)
     {
         wm_debug("Link " . $this->name . ": Drawing.\n");
         // If there is geometry to draw, draw it
@@ -353,13 +353,13 @@ class WeatherMapLink extends WeatherMapDataItem
             $this->geometry->setOutlineColour($this->outlinecolour);
             $this->geometry->setFillColours(array($this->colours[IN], $this->colours[OUT]));
 
-            $this->geometry->draw($im);
+            $this->geometry->draw($imageRef);
 
             if (!$this->commentfontcolour->isNone()) {
-                $this->drawComments($im);
+                $this->drawComments($imageRef);
             }
 
-            $this->drawBandwidthLabels($im);
+            $this->drawBandwidthLabels($imageRef);
         } else {
             wm_debug("Skipping link with no geometry attached\n");
         }
@@ -513,7 +513,7 @@ class WeatherMapLink extends WeatherMapDataItem
 
         $output = '';
 
-        $dd = $this->owner->links[$this->template];
+        $template_item = $this->owner->links[$this->template];
 
         wm_debug("Writing config for LINK $this->name against $this->template\n");
 
@@ -546,10 +546,10 @@ class WeatherMapLink extends WeatherMapDataItem
             $output .= "\tTEMPLATE " . $this->template . "\n";
         }
 
-        $output .= $this->getSimpleConfig($basic_params, $dd);
+        $output .= $this->getSimpleConfig($basic_params, $template_item);
 
         $val = $this->usescale . " " . $this->scaletype;
-        $comparison = $dd->usescale . " " . $dd->scaletype;
+        $comparison = $template_item->usescale . " " . $template_item->scaletype;
 
         if (($val != $comparison)) {
             $output .= "\tUSESCALE " . $val . "\n";
@@ -562,7 +562,7 @@ class WeatherMapLink extends WeatherMapDataItem
         }
 
         foreach ($dirs as $dir => $tdir) {
-            if ($this->infourl[$dir] != $dd->infourl[$dir]) {
+            if ($this->infourl[$dir] != $template_item->infourl[$dir]) {
                 $output .= "\t" . $tdir . "INFOURL " . $this->infourl[$dir] . "\n";
             }
         }
@@ -574,7 +574,7 @@ class WeatherMapLink extends WeatherMapDataItem
         }
 
         foreach ($dirs as $dir => $tdir) {
-            if ($this->overlibcaption[$dir] != $dd->overlibcaption[$dir]) {
+            if ($this->overlibcaption[$dir] != $template_item->overlibcaption[$dir]) {
                 $output .= "\t" . $tdir . "OVERLIBCAPTION " . $this->overlibcaption[$dir] . "\n";
             }
         }
@@ -586,7 +586,7 @@ class WeatherMapLink extends WeatherMapDataItem
         }
 
         foreach ($dirs as $dir => $tdir) {
-            if ($this->notestext[$dir] != $dd->notestext[$dir]) {
+            if ($this->notestext[$dir] != $template_item->notestext[$dir]) {
                 $output .= "\t" . $tdir . "NOTES " . $this->notestext[$dir] . "\n";
             }
         }
@@ -598,7 +598,7 @@ class WeatherMapLink extends WeatherMapDataItem
         }
 
         foreach ($dirs as $dir => $tdir) {
-            if ($this->overliburl[$dir] != $dd->overliburl[$dir]) {
+            if ($this->overliburl[$dir] != $template_item->overliburl[$dir]) {
                 $output .= "\t" . $tdir . "OVERLIBGRAPH " . join(" ", $this->overliburl[$dir]) . "\n";
             }
         }
@@ -616,34 +616,34 @@ class WeatherMapLink extends WeatherMapDataItem
 
         // if specific formats have been set, then the style will be '--'
         // if it isn't then use the named style
-        if (($this->labelstyle != $dd->labelstyle) && ($this->labelstyle != '--')) {
+        if (($this->labelstyle != $template_item->labelstyle) && ($this->labelstyle != '--')) {
             $output .= "\tBWLABEL " . $this->labelstyle . "\n";
         }
 
         // if either IN or OUT field changes, then both must be written because a regular BWLABEL can't do it
         // XXX this looks wrong
-        $comparison = $dd->bwlabelformats[IN];
-        $comparison2 = $dd->bwlabelformats[OUT];
+        $comparison = $template_item->bwlabelformats[IN];
+        $comparison2 = $template_item->bwlabelformats[OUT];
 
         if (($this->labelstyle == '--') && (($this->bwlabelformats[IN] != $comparison) || ($this->bwlabelformats[OUT] != '--'))) {
             $output .= "\tINBWFORMAT " . $this->bwlabelformats[IN] . "\n";
             $output .= "\tOUTBWFORMAT " . $this->bwlabelformats[OUT] . "\n";
         }
 
-        $comparison = $dd->labeloffset_in;
-        $comparison2 = $dd->labeloffset_out;
+        $comparison = $template_item->labeloffset_in;
+        $comparison2 = $template_item->labeloffset_out;
 
         if (($this->labeloffset_in != $comparison) || ($this->labeloffset_out != $comparison2)) {
             $output .= "\tBWLABELPOS " . $this->labeloffset_in . " " . $this->labeloffset_out . "\n";
         }
 
-        $comparison = $dd->commentoffset_in . ":" . $dd->commentoffset_out;
+        $comparison = $template_item->commentoffset_in . ":" . $template_item->commentoffset_out;
         $mine = $this->commentoffset_in . ":" . $this->commentoffset_out;
         if ($mine != $comparison) {
             $output .= "\tCOMMENTPOS " . $this->commentoffset_in . " " . $this->commentoffset_out . "\n";
         }
 
-        $comparison = $dd->targets;
+        $comparison = $template_item->targets;
 
         if ($this->targets != $comparison) {
             $output .= "\tTARGET";
@@ -657,7 +657,7 @@ class WeatherMapLink extends WeatherMapDataItem
         foreach (array("IN", "OUT") as $tdir) {
             $dir = constant($tdir);
 
-            $comparison = $dd->comments[$dir];
+            $comparison = $template_item->comments[$dir];
             if ($this->comments[$dir] != $comparison) {
                 $output .= "\t" . $tdir . "COMMENT " . $this->comments[$dir] . "\n";
             }
@@ -689,8 +689,8 @@ class WeatherMapLink extends WeatherMapDataItem
             }
         }
 
-        $output .= $this->getMaxValueConfig($dd, "BANDWIDTH");
-        $output .= $this->getHintConfig($dd);
+        $output .= $this->getMaxValueConfig($template_item, "BANDWIDTH");
+        $output .= $this->getHintConfig($template_item);
 
         if ($output != '') {
             $output = "LINK " . $this->name . "\n" . $output . "\n";

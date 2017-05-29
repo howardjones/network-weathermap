@@ -149,6 +149,8 @@ class WeatherMapDataSource_rrd extends WeatherMapDataSource
 
     private function wmrrd_read_from_real_rrdtool_aggregate($rrdfile, $cf, $aggregatefn, $start, $end, $dsnames, &$map, &$item)
     {
+        global $php_errormsg;
+
         wm_debug("RRD ReadData: VDEF style, for " . $item->my_type() . " " . $item->name . "\n");
 
         $extra_options = $map->get_hint("rrd_options");
@@ -213,7 +215,7 @@ class WeatherMapDataSource_rrd extends WeatherMapDataSource
                 }
             }
             pclose($pipe);
-            if ($linecount > 1) {
+            if ($linecount > 0) {
                 foreach ($lines as $line) {
                     if (preg_match('/^\'(IN|OUT)\s(\-?\d+[\.,]?\d*e?[+-]?\d*:?)\'$/i', $line, $matches)) {
                         wm_debug("MATCHED: " . $matches[1] . " " . $matches[2] . "\n");

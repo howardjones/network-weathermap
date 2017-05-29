@@ -1856,7 +1856,6 @@ class WeatherMap extends WeatherMapBase
         }
 
         return json_encode($conf, JSON_PRETTY_PRINT);
-//        return json_encode($conf);
     }
 }
 // vim:ts=4:sw=4:

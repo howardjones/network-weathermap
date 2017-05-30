@@ -136,12 +136,10 @@ if (sizeof($gopts) > 0) {
 
             case '--sizedebug':
             case '--no-data':
-                //$map->sizedebug=TRUE;
                 $options_output['sizedebug'] = true;
                 break;
 
             case '--bulge':
-                //$map->widthmod=TRUE;
                 $options_output['widthmod'] = true;
                 break;
 
@@ -169,7 +167,7 @@ if (sizeof($gopts) > 0) {
 
             case '--help':
                 print 'PHP Network Weathermap v' . $WEATHERMAP_VERSION . "\n";
-                print "Copyright Howard Jones, 2005-2007 howie@thingy.com\nReleased under the GNU Public License\nhttp://www.network-weathermap.com/\n\n";
+                print "Copyright Howard Jones, 2005-2017 howie@thingy.com\nReleased under the GNU Public License\nhttp://www.network-weathermap.com/\n\n";
 
                 print "Usage: php weathermap [options]\n\n";
 
@@ -184,7 +182,7 @@ if (sizeof($gopts) > 0) {
                 print "                             (equivalent to global SET in config file)\n\n";
 
                 print " --no-data                -  skip the data-reading process (just a 'grey' map)\n";
-                print " --randomdata            -  as above, but use random data\n";
+                print " --randomdata             -  as above, but use random data\n";
                 print " --debug                  -  produce (LOTS) of debugging information during run\n";
                 print " --no-warn={errorcode}[,{errorcode}] - suppress warnings with listed errorcodes\n";
                 print " --dump-after             -  dump all internal PHP structures (HUGE)\n";

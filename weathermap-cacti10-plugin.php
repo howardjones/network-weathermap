@@ -264,7 +264,15 @@ function weathermap_thumbview($limit_to_group = -1) {
 				<table width='100%' cellpadding='0' cellspacing='0'>
 					<tr>
 						<td class='textHeader' nowrap> <?php print $pagetitle; ?></td>
-						<td align='right'><?php print __('<a class="hyperLink" href="?action=viewmapcycle">automatically cycle</a> between full-size maps');?></td>
+						<td align='right'><?php print __('<a class="hyperLink" href="?action=viewmapcycle">automatically cycle</a> between full-size maps');?>
+                            (<?php
+                            if ($limit_to_group > 0) {
+                                print '<a href = "?action=viewmapcycle&group='.intval($limit_to_group).'">' . __('within this group').'</a>, ' . __('or');
+                            }
+                            print ' <a href = "?action=viewmapcycle">'.__('all maps').'</a>';  ?>)
+
+
+                        </td>
 					</tr>
 				</table>
 			</td>

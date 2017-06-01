@@ -460,7 +460,7 @@ function maplist()
 		print '<td><a class="hyperLink" href="weathermap-cacti10-plugin-mgmt.php?action=map_settings&id=0">';
 		$setting_count = $manager->getMapSettingCount(0, 0);
 		if ($setting_count > 0) {
-			print __n('%s special', '%s specials', $setting_count);
+			print sprintf(__n('%d special', '%d specials', $setting_count), $setting_count);
 		} else {
 			print __('standard');
 		}
@@ -500,7 +500,7 @@ function maplist()
 			print '<a class="hyperLink" href="weathermap-cacti10-plugin-mgmt.php?action=map_settings&id=' . $map->id . '">';
 			$setting_count = $manager->getMapSettingCount($map->id);
 			if ($setting_count > 0) {
-				print __n('%s special', '%s specials', $setting_count);
+                print sprintf(__n('%d special', '%d specials', $setting_count), $setting_count);
 			} else {
 				print __('standard');
 			}
@@ -556,8 +556,9 @@ function maplist()
 	}
 
 	if ($had_warnings > 0) {
-		print '<div align="center" class="wm_warning">' . 
-		__n('%s of your maps had warnings last time it ran. You can try to find these in your Cacti log file or by clicking on the warning sign next to that map (you might need to increase the log line count)', '%s of your maps had warnings last time it ran. You can try to find these in your Cacti log file or by clicking on the warning sign next to that map (you might need to increase the log line count)', $had_warnings) . '</div>';
+		print '<div align="center" class="wm_warning">';
+		print sprintf(__n('%s of your maps had warnings last time it ran. You can try to find these in your Cacti log file or by clicking on the warning sign next to that map (you might need to increase the log line count)', '%s of your maps had warnings last time it ran. You can try to find these in your Cacti log file or by clicking on the warning sign next to that map (you might need to increase the log line count)', $had_warnings), $had_warnings);
+		print '</div>';
 	}
 
 	print '<div class="break"></div>';

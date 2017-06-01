@@ -350,7 +350,7 @@ function weathermap_fullview($cycle=FALSE, $firstonly=FALSE, $limit_to_group = -
 //		$maplist_SQL .= " LIMIT 1";
 //	}
 
-	$pagetitle = __n('Network Weathermap', 'Network Weathermaps', sizeof($maplist));
+	$pagetitle = sprintf(__n('Network Weathermap', 'Network Weathermaps', sizeof($maplist)), sizeof($maplist));
 
 	$class = '';
 	if ($cycle) {

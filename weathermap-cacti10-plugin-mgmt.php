@@ -32,7 +32,7 @@ switch (get_request_var('action')) {
 
 		break;
     case 'enable_poller_output':
-        weathermap_setting_save(0, 'rrd_use_poller_output', 1);
+        $manager->saveMapSetting(0, 'rrd_use_poller_output', 1);
         header('Location: weathermap-cacti10-plugin-mgmt.php?action=map_settings&id=0&header=false');
 
         break;
@@ -43,8 +43,12 @@ switch (get_request_var('action')) {
 		}
 		$newname = get_nfilter_request_var('gname');
 
-        if ($id >= 0 && $newname != '') weathermap_group_update($id, $newname);
-        if ($id < 0 && $newname != '') weathermap_group_create($newname);
+        if ($id >= 0 && $newname != '') {
+            $manager->renameGroup($id, $newname);
+        }
+        if ($id < 0 && $newname != '') {
+            $manager->createGroup($newname);
+        }
 
         header('Location: weathermap-cacti10-plugin-mgmt.php?action=groupadmin&header=false');
 
@@ -56,7 +60,7 @@ switch (get_request_var('action')) {
 		}
 
         if ($id >= 1) {
-            weathermap_group_delete($id);
+            $manager->deleteGroup($id);
         }
 
         header('Location: weathermap-cacti10-plugin-mgmt.php?action=groupadmin&header=false');
@@ -98,7 +102,7 @@ switch (get_request_var('action')) {
         }
 
         if (($groupid > 0) && ($mapid >= 0)) {
-            weathermap_set_group($mapid, $groupid);
+            $manager->setMapGroup($mapid, $groupid);
         }
 
         header('Location: ' . $my_name . (strpos($my_name, '?') === false ? '?':'&') . 'header=false');
@@ -128,7 +132,7 @@ switch (get_request_var('action')) {
 
         if (!is_null($mapid) && !is_null($settingid)) {
             // create setting
-            weathermap_setting_delete($mapid, $settingid);
+            $manager->deleteMapSetting($mapid, $settingid);
         }
 
         header('Location: weathermap-cacti10-plugin-mgmt.php?action=map_settings&id=' . $mapid . '&header=false');
@@ -159,10 +163,10 @@ switch (get_request_var('action')) {
 
         if (!is_null($mapid) && $settingid == 0) {
             // create setting
-            weathermap_setting_save($mapid, $name, $value);
+            $manager->saveMapSetting($mapid, $name, $value);
         } elseif (!is_null($mapid) && !is_null($settingid)) {
             // update setting
-            weathermap_setting_update($mapid, $settingid, $name, $value);
+            $manager->updateMapSetting($settingid, $name, $value);
         }
 
         header('Location: weathermap-cacti10-plugin-mgmt.php?action=map_settings&id=' . $mapid . '&header=false');
@@ -198,7 +202,8 @@ switch (get_request_var('action')) {
 			$mapid  = get_filter_request_var('mapid');
 			$userid = get_filter_request_var('userid');
 
-            perms_add_user($mapid, $userid);
+            $manager->addPermission($mapid, $userid);
+
             header('Location: weathermap-cacti10-plugin-mgmt.php?action=perms_edit&id=' . $mapid . '&header=false');
         }
 
@@ -208,7 +213,8 @@ switch (get_request_var('action')) {
 			$mapid  = get_filter_request_var('mapid');
 			$userid = get_filter_request_var('userid');
 
-            perms_delete_user($mapid, $userid);
+            $manager->removePermission($mapid, $userid);
+
             header('Location: weathermap-cacti10-plugin-mgmt.php?action=perms_edit&id=' . $mapid . '&header=fasle');
         }
 
@@ -225,15 +231,15 @@ switch (get_request_var('action')) {
         break;
     case 'delete_map':
 		if (isset_request_var('id')) {
-			map_delete(get_filter_request_var('id'));
-		}
+            $manager->deleteMap(get_filter_request_var('id'));
+        }
 
         header('Location: weathermap-cacti10-plugin-mgmt.php?header=false');
 
         break;
     case 'deactivate_map':
 		if (isset_request_var('id')) {
-			map_deactivate(get_filter_request_var('id'));
+            $manager->disableMap(get_filter_request_var('id'));
 		}
 
         header('Location: ' . $my_name . (strpos($my_name, '?') === false ? '?':'&') . 'header=false');
@@ -241,7 +247,7 @@ switch (get_request_var('action')) {
         break;
     case 'activate_map':
 		if (isset_request_var('id')) {
-			map_activate(get_filter_request_var('id'));
+            $manager->activateMap(get_filter_request_var('id'));
 		}
 
         header('Location: ' . $my_name . (strpos($my_name, '?') === false ? '?':'&') . 'header=false');
@@ -249,7 +255,7 @@ switch (get_request_var('action')) {
         break;
     case 'move_map_up':
 		if (isset_request_var('id')) {
-            map_move(get_filter_request_var('id'), null, -1);
+            $manager->moveMap(get_filter_request_var('id'), -1);
 		}
 
         header('Location: ' . $my_name . (strpos($my_name, '?') === false ? '?':'&') . 'header=false');
@@ -257,7 +263,7 @@ switch (get_request_var('action')) {
         break;
     case 'move_map_down':
 		if (isset_request_var('id')) {
-            map_move(get_filter_request_var('id'), null, +1);
+            $manager->moveMap(get_filter_request_var('id'), 1);
 		}
 
         header('Location: ' . $my_name . (strpos($my_name, '?') === false ? '?':'&') . 'header=false');
@@ -265,7 +271,7 @@ switch (get_request_var('action')) {
         break;
     case 'move_group_up':
 		if (isset_request_var('id')) {
-			weathermap_group_move(get_filter_request_var('id'), -1);
+            $manager->moveGroup(get_filter_request_var('id'), -1);
 		}
 
         header('Location: weathermap-cacti10-plugin-mgmt.php?action=groupadmin&header=false');
@@ -273,7 +279,7 @@ switch (get_request_var('action')) {
         break;
     case 'move_group_down':
 		if (isset_request_var('id')) {
-            weathermap_group_move(get_filter_request_var('id'), 1);
+            $manager->moveGroup(get_filter_request_var('id'), 1);
 		}
 
         header('Location: weathermap-cacti10-plugin-mgmt.php?action=groupadmin&header=false');
@@ -305,7 +311,7 @@ switch (get_request_var('action')) {
         break;
     case 'addmap':
         if (isset_request_var('file')) {
-            add_config(get_nfilter_request_var('file'));
+            $manager->addMap(get_nfilter_request_var('file'));
             header('Location: ' . $my_name . (strpos($my_name, '?') === false ? '?':'&') . 'header=false');
         } else {
             print __('No such file.');
@@ -1140,108 +1146,3 @@ function weathermap_group_editor() {
 	<?php
 }
 
-function weathermap_group_create($newname) {
-    global $manager;
-
-    $manager->createGroup($newname);
-}
-
-function weathermap_group_update($id, $newname) {
-    global $manager;
-
-    $manager->renameGroup($id, $newname);
-}
-
-function weathermap_group_delete($id) {
-    global $manager;
-
-    $manager->deleteGroup($id);
-}
-
-function weathermap_setting_save($mapid, $name, $value) {
-    global $manager;
-
-    $manager->saveMapSetting($mapid, $name, $value);
-}
-
-function weathermap_setting_update($mapid, $settingid, $name, $value) {
-    global $manager;
-
-    $manager->updateMapSetting($settingid, $name, $value);
-}
-
-function weathermap_setting_delete($mapid, $settingid) {
-    global $manager;
-
-    $manager->deleteMapSetting($mapid, $settingid);
-}
-
-function map_deactivate($id) {
-    global $manager;
-
-    $manager->disableMap($id);
-}
-
-function map_activate($id) {
-    global $manager;
-
-    $manager->activateMap($id);
-}
-
-function map_delete($id) {
-    global $manager;
-
-    $manager->deleteMap($id);
-}
-
-function weathermap_set_group($mapid, $groupid) {
-    global $manager;
-
-    $manager->setMapGroup($mapid, $groupid);
-}
-
-function perms_add_user($mapid, $userid) {
-    global $manager;
-    $manager->addPermission($mapid, $userid);
-}
-
-function perms_delete_user($mapid, $userid) {
-    global $manager;
-    $manager->removePermission($mapid, $userid);
-}
-
-// Repair the sort order column (for when something is deleted or inserted, or moved between groups)
-// our primary concern is to make the sort order consistent, rather than any special 'correctness'
-function map_resort() {
-    global $manager;
-
-    $manager->resortMaps();
-}
-
-// Repair the sort order column (for when something is deleted or inserted)
-function weathermap_group_resort() {
-    global $manager;
-
-    $manager->resortGroups();
-}
-
-function map_move($mapid, $junk, $direction) {
-    global $manager;
-
-    $manager->moveMap($mapid, $direction);
-}
-
-function weathermap_group_move($id, $direction) {
-    global $manager;
-
-    $manager->moveGroup($id, $direction);
-}
-
-function add_config($file) {
-    global $weathermap_confdir;
-    global $manager;
-
-    $manager->addMap($file);
-}
-
-// vim:ts=4:sw=4:

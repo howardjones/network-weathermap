@@ -833,7 +833,7 @@ function weathermap_readonly_settings($id, $title = "Settings")
         $settings = $manager->getMapSettings(0);
     }
     if ($id < 0) {
-        $settings = $manager->getMapSettings(-intval($id));
+        $settings = $manager->getMapSettings(intval($id));
     }
     if ($id > 0) {
         $settings = $manager->getMapSettings(intval($id));

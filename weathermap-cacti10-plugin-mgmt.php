@@ -476,7 +476,7 @@ function maplist()
 			form_alternate_row();
 
 			print '<td><a title="'.  __('Click to start editor with this file') . '" href="weathermap-cacti10-plugin-editor.php?action=nothing&mapname=' . htmlspecialchars($map->configfile) . '">' . htmlspecialchars($map->configfile) . '</a>';
-			print '</td>';
+            print '</td>';
 
 			print '<td>' . htmlspecialchars($map->titlecache) . '</td>';
 			print '<td><a class="hyperLink" title="' . __('Click to change group') . '" class="hyperLink" href="weathermap-cacti10-plugin-mgmt.php?action=chgroup&id=' . $map->id . '">' . htmlspecialchars($map->groupname) . '</a></td>';
@@ -500,7 +500,7 @@ function maplist()
 			print '<a class="hyperLink" href="weathermap-cacti10-plugin-mgmt.php?action=map_settings&id=' . $map->id . '">';
 			$setting_count = $manager->getMapSettingCount($map->id);
 			if ($setting_count > 0) {
-                print sprintf(__n('%d special', '%d specials', $setting_count), $setting_count);
+                print sprintf(__n('%s special', '%s specials', $setting_count), $setting_count);
 			} else {
 				print __('standard');
 			}
@@ -1099,7 +1099,7 @@ function weathermap_group_editor() {
                 print "<a class='hyperLink' href='weathermap-cacti10-plugin-mgmt.php?action=map_settings&id=-" . $group->id . "'>";
                 $setting_count = $manager->getMapSettingCount(0, $group->id);
                 if ($setting_count > 0) {
-                    print __n('%s special', '%s specials', $setting_count);
+                    print sprintf(__n('%s special', '%s specials', $setting_count), $setting_count);
                 } else {
                     print __('standard');
                 }

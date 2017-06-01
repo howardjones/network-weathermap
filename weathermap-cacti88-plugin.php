@@ -344,7 +344,7 @@ function weathermap_thumbview($limit_to_group = -1)
 	}
 }
 
-function weathermap_fullview($cycle=FALSE, $firstonly=FALSE, $limit_to_group = -1, $fullscreen = 0)
+function weathermap_fullview($cycle=false, $firstonly=false, $limit_to_group = -1, $fullscreen = 0)
 {
 	global $colors;
 	global $manager;
@@ -358,10 +358,9 @@ function weathermap_fullview($cycle=FALSE, $firstonly=FALSE, $limit_to_group = -
 		$maplist = $manager->getMapsForUser($userid);
 	}
 
-// TODO deal with this
-//	if ($firstonly) {
-//		$maplist_SQL .= " LIMIT 1";
-//	}
+	if ($firstonly) {
+        $maplist = array($maplist[0]);
+	}
 
 	if (sizeof($maplist) == 1) {
 		$pagetitle = "Network Weathermap";
@@ -563,7 +562,7 @@ function weathermap_mapselector($current_id = 0)
 
 	if (sizeof($maps)>1) {
 		/* include graph view filter selector */
-		html_graph_start_box(3, TRUE);
+		html_graph_start_box(3, true);
 		?>
 	<tr bgcolor="<?php print $colors["panel"];?>" class="noprint">
 			<form name="weathermap_select" method="post" action="">
@@ -621,7 +620,7 @@ function weathermap_mapselector($current_id = 0)
 	</tr>
 	<?php
 
-		html_graph_end_box(FALSE);
+		html_graph_end_box(false);
 	}
 }
 
@@ -652,7 +651,6 @@ function weathermap_tabs($current_tab)
 	                                </td>\n
 	                                <td width='1'></td>\n";
 	        }
-
         }
 
         print "<td></td>\n</tr></table>\n";

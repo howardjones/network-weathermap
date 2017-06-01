@@ -358,10 +358,9 @@ function weathermap_fullview($cycle = FALSE, $firstonly = FALSE, $limit_to_group
         $maplist = $manager->getMapsForUser($userid);
     }
 
-// TODO deal with this
-//	if ($firstonly) {
-//		$maplist_SQL .= " LIMIT 1";
-//	}
+    if ($firstonly) {
+        $maplist = array($maplist[0]);
+    }
 
     $pagetitle = sprintf(__n('Network Weathermap', 'Network Weathermaps', sizeof($maplist)), sizeof($maplist));
 

@@ -21,12 +21,11 @@ $manager = new WeathermapManager(weathermap_get_pdo(), $weathermap_confdir);
 $action = "";
 if (isset($_POST['action'])) {
     $action = $_POST['action'];
-} else if (isset($_GET['action'])) {
+} elseif (isset($_GET['action'])) {
     $action = $_GET['action'];
 }
 
 switch ($action) {
-
     case 'dump_maps':
         Header("Content-type: application/json");
         $data = array(
@@ -34,6 +33,7 @@ switch ($action) {
             "groups" => $manager->getGroups()
         );
         print json_encode($data);
+
         break;
 
     case 'enable_poller_output':
@@ -62,7 +62,6 @@ switch ($action) {
         break;
 
     case 'groupadmin_delete':
-
         $id = -1;
 
         if (isset($_REQUEST['id']) && is_numeric($_REQUEST['id'])) {
@@ -76,7 +75,6 @@ switch ($action) {
         break;
 
     case 'group_form':
-
         $id = -1;
 
         include_once $config["base_path"] . "/include/top_header.php";
@@ -189,6 +187,7 @@ switch ($action) {
             include_once $config["base_path"] . "/include/bottom_footer.php";
         }
         break;
+
     case 'map_settings':
         if (isset($_REQUEST['id']) && is_numeric($_REQUEST['id'])) {
             include_once $config["base_path"] . "/include/top_header.php";
@@ -206,6 +205,7 @@ switch ($action) {
             header("Location: ?action=perms_edit&id=" . intval($_REQUEST['mapid']));
         }
         break;
+
     case 'perms_delete_user':
         if (isset($_REQUEST['mapid']) && is_numeric($_REQUEST['mapid'])
             && isset($_REQUEST['userid']) && is_numeric($_REQUEST['userid'])
@@ -214,6 +214,7 @@ switch ($action) {
             header("Location: ?action=perms_edit&id=" . $_REQUEST['mapid']);
         }
         break;
+
     case 'perms_edit':
         if (isset($_REQUEST['id']) && is_numeric($_REQUEST['id'])) {
             include_once $config["base_path"] . "/include/top_header.php";
@@ -253,6 +254,7 @@ switch ($action) {
 
         header("Location: " . $my_name);
         break;
+
     case 'move_map_down':
         if (isset($_REQUEST['id']) && is_numeric($_REQUEST['id'])) {
             $manager->moveMap($_REQUEST['id'], 1);
@@ -267,6 +269,7 @@ switch ($action) {
         }
         header("Location: ?action=groupadmin");
         break;
+
     case 'move_group_down':
         if (isset($_REQUEST['id']) && is_numeric($_REQUEST['id'])) {
             $manager->moveGroup($_REQUEST['id'], 1);
@@ -285,7 +288,6 @@ switch ($action) {
         break;
 
     case 'addmap_picker':
-
         include_once $config["base_path"] . "/include/top_header.php";
         if (isset($_REQUEST['show']) && $_REQUEST['show'] == 'all') {
             addmap_picker(true);
@@ -306,7 +308,6 @@ switch ($action) {
         break;
 
     case 'rebuildnow':
-
         include_once $config["base_path"] . "/include/top_header.php";
 
         print "<h3>REALLY Rebuild all maps?</h3><strong>NOTE: Because your Cacti poller process probably doesn't run as the same user as your webserver, it's possible this will fail with file permission problems even though the normal poller process runs fine. In some situations, it MAY have memory_limit problems, if your mod_php/ISAPI module uses a different php.ini to your command-line PHP.</strong><hr>";
@@ -376,7 +377,6 @@ function maplist_warnings()
     $boost_enabled = $manager->getAppSetting('boost_rrd_update_enable', 'off');
 
     if ($boost_enabled == 'on') {
-
         $has_global_poller_output = $manager->getMapSettingByName(0, "rrd_use_poller_output", false);
 
         if (!$has_global_poller_output) {
@@ -404,7 +404,6 @@ function maplist_warnings()
             print '</p></div>';
         }
     }
-
 }
 
 function maplist()
@@ -543,8 +542,6 @@ function maplist()
 
     if ($last_stats != "") {
         print "<div align='center'><strong>Last Completed Run:</strong> $last_stats</div>";
-    } else {
-
     }
 
     if ($had_warnings > 0) {
@@ -558,7 +555,6 @@ function maplist()
         print '<br /><a href="?action=rebuildnow"><img src="images/btn_recalc.png" border="0" alt="Rebuild All Maps Right Now"><br />(Experimental - You should NOT need to use this normally)</a><br />';
     }
     print "</div>";
-
 }
 
 function addmap_picker($show_all = false)
@@ -575,7 +571,6 @@ function addmap_picker($show_all = false)
     if (is_array($existing_maps)) {
         foreach ($existing_maps as $map) {
             $loaded[] = $map->configfile;
-
         }
     }
 
@@ -598,7 +593,9 @@ function addmap_picker($show_all = false)
                 if (substr($file, 0, 1) != '.' && $file != "index.php") {
                     $used = in_array($file, $loaded);
                     $flags[$file] = '';
-                    if ($used) $flags[$file] = 'USED';
+                    if ($used) {
+                        $flags[$file] = 'USED';
+                    }
 
                     if (is_file($realfile)) {
                         if ($used && !$show_all) {
@@ -623,7 +620,9 @@ function addmap_picker($show_all = false)
                     print '<td><a href="?action=addmap&amp;file=' . $file . '" title="Add the configuration file">Add</a></td>';
                     print '<td><a href="?action=viewconfig&amp;file=' . $file . '" title="View the configuration file in a new window" target="_blank">View</a></td>';
                     print '<td>' . htmlspecialchars($file);
-                    if ($flags[$file] == 'USED') print ' <b>(USED)</b>';
+                    if ($flags[$file] == 'USED') {
+                        print ' <b>(USED)</b>';
+                    }
                     print '</td>';
                     print '<td><em>' . htmlspecialchars($title) . '</em></td>';
                     print '</tr>';
@@ -653,7 +652,6 @@ function addmap_picker($show_all = false)
     if ($show_all) {
         print "<p align=center>Some files are shown even though they have already been added. You can <a href='?action=addmap_picker'>hide those files too</a>, if you need to.</p>";
     }
-
 }
 
 function preview_config($file)
@@ -719,8 +717,7 @@ function perms_list($id)
         }
     }
 
-    html_start_box("<strong>Edit permissions for Weathermap $id: $title</strong>", "70%", $colors["header"], "2",
-        "center", "");
+    html_start_box("<strong>Edit permissions for Weathermap $id: $title</strong>", "70%", $colors["header"], "2", "center", "");
     html_header(array("Username", ""));
 
     $n = 0;
@@ -776,7 +773,6 @@ function weathermap_map_settings($id)
 
         print "<p>All maps in this group are also affected by the following GLOBAL settings (group overrides global, map overrides group, but BOTH override SET commands within the map config file):</p>";
         weathermap_readonly_settings(0, "Global Settings");
-
     } else {
         $map = $manager->getMap($id);
         $group = $manager->getGroup($map->group_id);
@@ -793,8 +789,7 @@ function weathermap_map_settings($id)
         weathermap_readonly_settings(-$map->group_id, "Group Settings (" . htmlspecialchars($group->name) . ")");
     }
 
-    html_start_box("<strong>$title</strong>", "70%", $colors["header"], "2", "center",
-        "?action=map_settings_form&mapid=" . intval($id));
+    html_start_box("<strong>$title</strong>", "70%", $colors["header"], "2", "center", "?action=map_settings_form&mapid=" . intval($id));
     html_header(array("", "Name", "Value", ""));
 
     $n = 0;
@@ -885,7 +880,6 @@ function weathermap_map_settings_form($mapId = 0, $settingId = 0)
     $value = "";
 
     if ($settingId != 0) {
-
         $setting = $manager->getMapSettingById($settingId);
 
         if ($setting !== false) {
@@ -936,7 +930,6 @@ function weathermap_map_settings_form($mapId = 0, $settingId = 0)
     html_end_box();
 
     form_save_button("?action=map_settings&id=" . $mapId);
-
 }
 
 
@@ -963,7 +956,9 @@ function weathermap_chgroup($id)
 
     foreach ($groups as $grp) {
         print "<option ";
-        if ($grp->id == $curgroup) print " SELECTED ";
+        if ($grp->id == $curgroup) {
+            print " SELECTED ";
+        }
         print "value=" . $grp->id . ">" . htmlspecialchars($grp->name) . "</option>";
     }
 
@@ -1005,7 +1000,6 @@ function weathermap_group_form($id = 0)
     }
 
     print "</form>\n";
-
 }
 
 function weathermap_group_editor()
@@ -1013,11 +1007,9 @@ function weathermap_group_editor()
     global $colors, $config;
     global $manager;
 
-    html_start_box("<strong>Edit Map Groups</strong>", "70%", $colors["header"], "2", "center",
-        "?action=group_form&id=0");
+    html_start_box("<strong>Edit Map Groups</strong>", "70%", $colors["header"], "2", "center", "?action=group_form&id=0");
     html_header(array("", "Group Name", "Settings", "Sort Order", ""));
 
-//    $groups = db_fetch_assoc("select * from weathermap_groups order by sortorder");
     $groups = $manager->getGroups();
     $n = 0;
 
@@ -1041,12 +1033,9 @@ function weathermap_group_editor()
                     print "standard";
                 }
                 print "</a>";
-
                 print "</td>";
 
-
                 print '<td>';
-
                 print '<a href="?action=move_group_up&id=' . $group->id . '"><img src="../../images/move_up.gif" width="14" height="10" border="0" alt="Move Group Up" title="Move Group Up"></a>';
                 print '<a href="?action=move_group_down&id=' . $group->id . '"><img src="../../images/move_down.gif" width="14" height="10" border="0" alt="Move Group Down" title="Move Group Down"></a>';
                 print $group->sortorder;

@@ -1047,8 +1047,7 @@ class WeatherMapConfigReader
         ) // end of link
     );
 
-    public
-    function __construct(&$map, $type = "GLOBAL", $object = null)
+    public function __construct(&$map, $type = "GLOBAL", $object = null)
     {
         $this->mapObject = $map;
         $this->currentType = $type;
@@ -1059,8 +1058,7 @@ class WeatherMapConfigReader
         }
     }
 
-    public
-    function __toString()
+    public function __toString()
     {
         return "ConfigReader for '" . $this->currentSource . "''";
     }
@@ -1068,8 +1066,7 @@ class WeatherMapConfigReader
 
 // parseString is based on code from:
 // http://www.webscriptexpert.com/Php/Space-Separated%20Tag%20Parser/
-    public
-    function parseString($input)
+    public function parseString($input)
     {
         $output = array(); // Array of Output
         $cPhraseQuote = null; // Record of the quote that opened the current phrase
@@ -1130,8 +1127,7 @@ class WeatherMapConfigReader
         return $output;
     }
 
-    private
-    function commitItem()
+    private function commitItem()
     {
         if (is_null($this->currentObject)) {
             return;
@@ -1153,7 +1149,7 @@ class WeatherMapConfigReader
         }
     }
 
-    function readConfigFile($filename)
+    private function readConfigFile($filename)
     {
         $lines = array();
 
@@ -1177,7 +1173,7 @@ class WeatherMapConfigReader
         return $result;
     }
 
-    function readConfigLines($inputLines)
+    private function readConfigLines($inputLines)
     {
         wm_debug("in readConfigLines\n");
 
@@ -1303,18 +1299,24 @@ class WeatherMapConfigReader
         }
     }
 
-    function handleVIA($fullcommand, $args, $matches)
+    private function handleVIA($fullcommand, $args, $matches)
     {
-        if (preg_match('/^\s*VIA\s+([-+]?\d+)\s+([-+]?\d+)\s*$/i', $fullcommand,
-            $matches)) {
+        if (preg_match(
+            '/^\s*VIA\s+([-+]?\d+)\s+([-+]?\d+)\s*$/i',
+            $fullcommand,
+            $matches
+        )) {
             $this->currentObject->vialist[] = array(
                 $matches[1],
                 $matches[2]
             );
             return true;
         }
-        if (preg_match('/^\s*VIA\s+(\S+)\s+([-+]?\d+)\s+([-+]?\d+)\s*$/i', $fullcommand,
-            $matches)) {
+        if (preg_match(
+            '/^\s*VIA\s+(\S+)\s+([-+]?\d+)\s+([-+]?\d+)\s*$/i',
+            $fullcommand,
+            $matches
+        )) {
             $this->currentObject->vialist[] = array(
                 $matches[2],
                 $matches[3],
@@ -1372,7 +1374,7 @@ class WeatherMapConfigReader
         return array($offset_dx, $offset_dy, $nodename, $endoffset, $need_size_precalc);
     }
 
-    function handleNODES($fullcommand, $args, $matches)
+    private function handleNODES($fullcommand, $args, $matches)
     {
         $offset_dx = array();
         $offset_dy = array();
@@ -1382,7 +1384,6 @@ class WeatherMapConfigReader
         if (preg_match('/^NODES\s+(\S+)\s+(\S+)\s*$/i', $fullcommand, $matches)) {
             $valid_nodes = 2;
             foreach (array(1, 2) as $i) {
-
                 list($offset_dx[$i], $offset_dy[$i], $nodeNames[$i], $endOffsets[$i], $need_size_precalc) = $this->interpretNodeSpec($matches[$i]);
 
                 if (!array_key_exists($nodeNames[$i], $this->mapObject->nodes)) {
@@ -1394,9 +1395,6 @@ class WeatherMapConfigReader
             // TODO - really, this should kill the whole link, and reset for the next one
             // XXX this error case will not work in the handler function
             if ($valid_nodes == 2) {
-//                $this->currentObject->a = $this->mapObject->nodes[$nodeNames[1]];
-//                $this->currentObject->b = $this->mapObject->nodes[$nodeNames[2]];
-
                 $this->currentObject->setEndNodes($this->mapObject->getNode($nodeNames[1]), $this->mapObject->getNode($nodeNames[2]));
 
                 $this->currentObject->a_offset = $endOffsets[1];
@@ -1420,7 +1418,6 @@ class WeatherMapConfigReader
                         $this->currentObject->$n3 = true;
                     }
                 }
-
             } else {
                 // this'll stop the current link being added
                 $last_seen = "broken";
@@ -1430,7 +1427,7 @@ class WeatherMapConfigReader
         return false;
     }
 
-    function handleSET($fullcommand, $args, $matches)
+    private function handleSET($fullcommand, $args, $matches)
     {
         global $weathermap_error_suppress;
 
@@ -1457,7 +1454,7 @@ class WeatherMapConfigReader
         return false;
     }
 
-    function handleGLOBALCOLOR($fullcommand, $args, $matches)
+    private function handleGLOBALCOLOR($fullcommand, $args, $matches)
     {
         $key = str_replace("COLOR", "", strtoupper($args[0]));
         $val = strtolower($args[1]);
@@ -1474,7 +1471,7 @@ class WeatherMapConfigReader
         return true;
     }
 
-    function handleNODE_USESCALE($fullcommand, $args, $matches)
+    private function handleNODE_USESCALE($fullcommand, $args, $matches)
     {
         $svar = '';
         $stype = 'percent';
@@ -1511,7 +1508,7 @@ class WeatherMapConfigReader
         return true;
     }
 
-    function handleFONTDEFINE($fullcommand, $args, $matches)
+    private function handleFONTDEFINE($fullcommand, $args, $matches)
     {
         if (isset($args[3])) {
             wm_debug("New TrueType font in slot %d\n", $args[1]);
@@ -1528,7 +1525,6 @@ class WeatherMapConfigReader
             if (!$newFontObject->isLoaded()) {
                 wm_warn("Failed to load ttf font " . $args[2] . " - at config line $this->lineCount\n [WMWARN30]");
             }
-
         } else {
             wm_debug("New GD font in slot %d\n", $args[1]);
 
@@ -1551,7 +1547,7 @@ class WeatherMapConfigReader
         return false;
     }
 
-    function handleOVERLIB($fullcommand, $args, $matches)
+    private function handleOVERLIB($fullcommand, $args, $matches)
     {
 
         $this->has_overlibs = true;
@@ -1573,7 +1569,7 @@ class WeatherMapConfigReader
         return true;
     }
 
-    function handleCOLOR($fullcommand, $args, $matches)
+    private function handleCOLOR($fullcommand, $args, $matches)
     {
         $field = str_replace("color", "colour", strtolower($args[0]));
         $val = strtolower($args[1]);
@@ -1590,7 +1586,7 @@ class WeatherMapConfigReader
         return true;
     }
 
-    function handleTARGET($fullcommand, $args, $matches)
+    private function handleTARGET($fullcommand, $args, $matches)
     {
         // wipe any existing targets, otherwise things in the DEFAULT accumulate with the new ones
         $this->currentObject->targets = array();
@@ -1611,7 +1607,6 @@ class WeatherMapConfigReader
 
     private function handleNODE($fullcommand, $args, $matches)
     {
-
         $this->commitItem();
         unset($this->currentObject);
 
@@ -1622,7 +1617,6 @@ class WeatherMapConfigReader
             if (sizeof($this->mapObject->nodes) > 2) {
                 wm_warn("NODE DEFAULT is not the first NODE. Defaults will not apply to earlier NODEs. [WMWARN27]\n");
             }
-
         } else {
             if (isset($this->mapObject->nodes[$matches[1]])) {
                 wm_warn("Duplicate node name " . $matches[1] . " at line $this->lineCount - only the last one defined is used. [WMWARN24]\n");
@@ -1637,7 +1631,6 @@ class WeatherMapConfigReader
         $this->currentObject->defined_in = $this->currentSource;
 
         return true;
-
     }
 
     private function handleLINK($fullcommand, $args, $matches)
@@ -1652,7 +1645,6 @@ class WeatherMapConfigReader
             if (sizeof($this->mapObject->links) > 2) {
                 wm_warn("$this LINK DEFAULT is not the first LINK. Defaults will not apply to earlier LINKs. [WMWARN26]\n");
             }
-
         } else {
             if (isset($this->mapObject->links[$matches[1]])) {
                 wm_warn("Duplicate link name " . $matches[1] . " at line $this->lineCount - only the last one defined is used. [WMWARN25]\n");
@@ -1837,7 +1829,6 @@ class WeatherMapConfigReader
             foreach ($keywords as $keyword => $matches) {
                 print "\n## $keyword\n";
                 foreach ($matches as $match) {
-
                     $nicer = str_replace("\\", "\\\\", $match[0]);
 
                     print "\n### $nicer\n";
@@ -1877,7 +1868,6 @@ class WeatherMapConfigReader
         foreach ($this->configKeywords as $scope => $keywords) {
             foreach ($keywords as $keyword => $matches) {
                 foreach ($matches as $match) {
-
                     # $match[0] is a regexp or string match
                     // TODO - can we validate a regexp?
                     # $match[1] is either an array of properties to set, or a function to handle it

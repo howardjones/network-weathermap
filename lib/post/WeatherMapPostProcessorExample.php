@@ -7,7 +7,7 @@
 //
 class WeatherMapPostProcessorExample extends WeatherMapPostProcessor
 {
-    function run()
+    public function run()
     {
         $enable = $this->owner->get_hint("post_test_enable");
 
@@ -18,7 +18,7 @@ class WeatherMapPostProcessorExample extends WeatherMapPostProcessor
 
             $orig = $this->owner->get_note("test");
             $this->owner->add_note("test", $orig . " TESTYTEST");
-        // -------------------------
+            // -------------------------
         } else {
             wm_debug(__CLASS__ . " Not Enabled\n");
         }

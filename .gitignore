@@ -3,6 +3,7 @@
 build
 build/*
 dist/*
+composer.phar
 composer.lock
 !build/phpmd.xml
 !build/phpunit.xml

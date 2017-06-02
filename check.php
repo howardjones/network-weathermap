@@ -123,7 +123,7 @@ if (isset($argv)) {
     print "Some parts of Weathermap need special support in your PHP\ninstallation to work.\n\n";
     print wordwrap($gdstring) . "\n";
 } else {
-$environment = "web";
+    $environment = "web";
 ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
@@ -191,7 +191,7 @@ $environment = "web";
 <?php echo $gdstring; ?>
 <table>
     <?php
-    }
+}
 
 
 
@@ -230,34 +230,47 @@ $environment = "web";
     foreach ($functions as $function => $details) {
         $exists = "";
         $notes = "";
-        if ($environment == 'web') print "<tr><td align=right>$function()</td>";
+        if ($environment == 'web') {
+            print "<tr><td align=right>$function()</td>";
+        }
 
         if (function_exists($function)) {
             $exists = "YES";
-            if ($environment == 'web') print "<td><img alt=\"YES\" src=\"images/tick.png\" /></td>";
+            if ($environment == 'web') {
+                print "<td><img alt=\"YES\" src=\"images/tick.png\" /></td>";
+            }
         } else {
             $exists = "NO";
             if ($details[0]) {
                 $notes .= "CRITICAL.   ";
-                if ($environment == 'web') print "<td><img alt=\"NO\" src=\"images/exclamation.png\" /><b>CRITICAL</b> ";
+                if ($environment == 'web') {
+                    print "<td><img alt=\"NO\" src=\"images/exclamation.png\" /><b>CRITICAL</b> ";
+                }
                 $critical++;
             } else {
                 if (!$details[1]) {
                     $notes .= "Non-Critical.   ";
-                    if ($environment == 'web') print "<td><img  alt=\"NO\" src=\"images/cross.png\" /><i>non-critical</i>  ";
+                    if ($environment == 'web') {
+                        print "<td><img  alt=\"NO\" src=\"images/cross.png\" /><i>non-critical</i>  ";
+                    }
                     $noncritical++;
                 } else {
                     $notes .= "Minor.   ";
-                    if ($environment == 'web') print "<td><img alt=\"NO\" src=\"images/cross.png\" /><i>minor</i>  ";
+                    if ($environment == 'web') {
+                        print "<td><img alt=\"NO\" src=\"images/cross.png\" /><i>minor</i>  ";
+                    }
                 }
             }
             $explanation = "This is required for " . $details[2] . ". It is " . $details[3] . ".";
             $notes .= $explanation;
 
-            if ($environment == 'web') print "$explanation</td>";
+            if ($environment == 'web') {
+                print "$explanation</td>";
+            }
         }
-        if ($environment == 'web') print "</tr>\n";
-        else {
+        if ($environment == 'web') {
+            print "</tr>\n";
+        } else {
             $wnotes = wordwrap($notes, 50);
             $lines = explode("\n", $wnotes);
             $i = 0;
@@ -273,7 +286,9 @@ $environment = "web";
         }
     }
 
-    if ($environment == 'web') print "</table>";
+    if ($environment == 'web') {
+        print "</table>";
+    }
 
     if (($critical + $noncritical) > 0) {
         if ($environment == 'web') {
@@ -283,28 +298,45 @@ $environment = "web";
         }
 
         print wordwrap("The details of how this is done will depend on your operating system, and on where you installed (or compiled) your PHP from originally. Usually, you would install an RPM, or other package on Linux systems, a port on *BSD, or a DLL on Windows. If you build PHP from source, you need to add extra options to the './configure' line. Consult your PHP documention for more information.\n");
-        if ($environment == 'web') print "</p>";
-    }
-
-    if ($environment == "CLI") print "\n---------------------------------------------------------------------\n";
-
-    if ($critical > 0) {
-        if ($environment == 'web') print "<div class=\"critical\">";
-        print wordwrap("There are problems with your PHP or server environment that will stop Weathermap from working. You need to correct these issues if you wish to use Weathermap.\n");
-        if ($environment == 'web') print "</div>";
-    } else {
-        if ($noncritical > 0) {
-            if ($environment == 'web') print "<div class=\"noncritical\">";
-            print wordwrap("Some features of Weathermap will not be available to you, due to lack of support in your PHP installation. You can still proceed with Weathermap though.\n");
-            if ($environment == 'web') print "</div>";
-
-        } else {
-            if ($environment == 'web') print "<div class=\"ok\">";
-            print wordwrap("OK! Your PHP and server environment *seems* to have support for ALL of the Weathermap features. Make sure you have run this script BOTH as a web page and from the CLI to be sure, however.\n");
-            if ($environment == 'web') print "</div>";
+        if ($environment == 'web') {
+            print "</p>";
         }
     }
-    if ($environment == 'web') print "</table></body></html>";
+
+    if ($environment == "CLI") {
+        print "\n---------------------------------------------------------------------\n";
+    }
+
+    if ($critical > 0) {
+        if ($environment == 'web') {
+            print "<div class=\"critical\">";
+        }
+        print wordwrap("There are problems with your PHP or server environment that will stop Weathermap from working. You need to correct these issues if you wish to use Weathermap.\n");
+        if ($environment == 'web') {
+            print "</div>";
+        }
+    } else {
+        if ($noncritical > 0) {
+            if ($environment == 'web') {
+                print "<div class=\"noncritical\">";
+            }
+            print wordwrap("Some features of Weathermap will not be available to you, due to lack of support in your PHP installation. You can still proceed with Weathermap though.\n");
+            if ($environment == 'web') {
+                print "</div>";
+            }
+        } else {
+            if ($environment == 'web') {
+                print "<div class=\"ok\">";
+            }
+            print wordwrap("OK! Your PHP and server environment *seems* to have support for ALL of the Weathermap features. Make sure you have run this script BOTH as a web page and from the CLI to be sure, however.\n");
+            if ($environment == 'web') {
+                print "</div>";
+            }
+        }
+    }
+    if ($environment == 'web') {
+        print "</table></body></html>";
+    }
 
 
 

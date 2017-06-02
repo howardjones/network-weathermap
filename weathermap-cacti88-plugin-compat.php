@@ -6,7 +6,6 @@ function __($string)
 {
     // TODO: needs to use varargs
     return $string;
-
 }
 
 function __n($singular, $plural, $number)

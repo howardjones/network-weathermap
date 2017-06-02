@@ -44,7 +44,6 @@ function create_intermediate($originalIcon)
 $weathermap_debugging = true;
 
 if (1 == 1) {
-
     $icon = $loader->imagecreatefromfile($iconFileName);
     print $icon;
 
@@ -66,7 +65,6 @@ $colour = new WMColour(128, 255, 192);
 $colour = new WMColour(64, 128, 96);
 
 
-
 $icon5 = $loader->imagecreatescaledcolourizedfromfile($iconFileName, 0, 0, $colour, 'imagecolorize');
 draw_icon($im, $icon5, 50, 100);
 
@@ -82,7 +80,6 @@ draw_icon($im, $intermediate, 240, 95);
 $weathermap_debugging = false;
 
 if (1 == 1) {
-
     $icon7 = $loader->imagecreatescaledcolourizedfromfile($iconFileName, 0, 0, $colour, 'imagefilter');
     draw_icon($im, $icon7, 50, 200);
 

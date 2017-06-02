@@ -184,13 +184,13 @@ function weathermap_singleview($mapid)
                     <tr>
                         <td class="textHeader nowrap"><?php print $maptitle;
 
-                            if ($is_wm_admin) {
-                                print "<span style='font-size: 80%'>";
-                                print "[ <a class='hyperLink' href='weathermap-cacti10-plugin-mgmt.php?action=map_settings&id=" . $mapid . "'>" . __('Map Settings') . "</a> |";
-                                print "<a class='hyperLink' href='weathermap-cacti10-plugin-mgmt.php?action=perms_edit&id=" . $mapid . "'>" . __('Map Permissions') . "</a> |";
-                                print "<a class='hyperLink' href=''>" . __('Edit Map') . "</a> ]";
-                                print "</span>";
-                            } ?>
+                        if ($is_wm_admin) {
+                            print "<span style='font-size: 80%'>";
+                            print "[ <a class='hyperLink' href='weathermap-cacti10-plugin-mgmt.php?action=map_settings&id=" . $mapid . "'>" . __('Map Settings') . "</a> |";
+                            print "<a class='hyperLink' href='weathermap-cacti10-plugin-mgmt.php?action=perms_edit&id=" . $mapid . "'>" . __('Map Permissions') . "</a> |";
+                            print "<a class='hyperLink' href=''>" . __('Edit Map') . "</a> ]";
+                            print "</span>";
+                        } ?>
                         </td>
                     </tr>
                 </table>
@@ -345,7 +345,7 @@ function weathermap_thumbview($limit_to_group = -1)
     }
 }
 
-function weathermap_fullview($cycle = FALSE, $firstonly = FALSE, $limit_to_group = -1, $fullscreen = 0)
+function weathermap_fullview($cycle = false, $firstonly = false, $limit_to_group = -1, $fullscreen = 0)
 {
     global $manager;
 
@@ -415,7 +415,10 @@ function weathermap_fullview($cycle = FALSE, $firstonly = FALSE, $limit_to_group
                             <?php
                             if (!$cycle) {
                                 if ($limit_to_group > 0) {
-                                    print __('(automatically cycle between full-size maps (<a class="hyperLink" href="?action=viewmapcycle&group=%s">within this group</a>, or <a class="hyperLink" href="?action=viewmapcycle">all maps</a>)', intval($limit_to_group));
+                                    print __(
+                                        '(automatically cycle between full-size maps (<a class="hyperLink" href="?action=viewmapcycle&group=%s">within this group</a>, or <a class="hyperLink" href="?action=viewmapcycle">all maps</a>)',
+                                        intval($limit_to_group)
+                                    );
                                 } else {
                                     print __('(automatically cycle between full-size maps (<a class="hyperLink" href="?action=viewmapcycle">all maps</a>)');
                                 }
@@ -437,28 +440,28 @@ function weathermap_fullview($cycle = FALSE, $firstonly = FALSE, $limit_to_group
 
         $outdir = dirname(__FILE__) . '/output/';
 
-    foreach ($maplist as $map) {
-        if ($firstonly && $i > 0) {
-            break;
-        }
+        foreach ($maplist as $map) {
+            if ($firstonly && $i > 0) {
+                break;
+            }
 
-        $i++;
+            $i++;
 
-        $htmlfile = $outdir . $map->filehash . '.html';
-        $maptitle = $map->titlecache;
+            $htmlfile = $outdir . $map->filehash . '.html';
+            $maptitle = $map->titlecache;
 
-        if ($maptitle == '') {
-            $maptitle = __('Map for config file: %s', $map->configfile);
-        }
+            if ($maptitle == '') {
+                $maptitle = __('Map for config file: %s', $map->configfile);
+            }
 
-        print '<div class="weathermapholder" id="mapholder_' . $map->filehash . '">';
+            print '<div class="weathermapholder" id="mapholder_' . $map->filehash . '">';
 
-    if ($cycle == false || $fullscreen == 0) {
-        html_start_box(__('Map for config file: %s', $map->configfile), '100%', '', '3', 'center', '');
+            if ($cycle == false || $fullscreen == 0) {
+                html_start_box(__('Map for config file: %s', $map->configfile), '100%', '', '3', 'center', '');
 
-        ?>
-        <tr class='even'>
-            <td colspan='3'>
+                ?>
+                <tr class='even'>
+                    <td colspan='3'>
                 <table width='100%' cellspacing='0' cellpadding='3' border='0'>
                     <tr>
                         <td align='left' class='textHeaderDark'>
@@ -467,35 +470,35 @@ function weathermap_fullview($cycle = FALSE, $firstonly = FALSE, $limit_to_group
                         </td>
                     </tr>
                 </table>
-            </td>
-        </tr>
-        <tr>
-        <td><?php
-    }
+                </td>
+            </tr>
+            <tr>
+            <td><?php
+            }
 
-    if (file_exists($htmlfile)) {
-        include($htmlfile);
-    } else {
-        print "<div align=\"center\" style=\"padding:20px\"><em>" . __('This map hasn\'t been created yet.') . "</em></div>";
-    }
+            if (file_exists($htmlfile)) {
+                include($htmlfile);
+            } else {
+                print "<div align=\"center\" style=\"padding:20px\"><em>" . __('This map hasn\'t been created yet.') . "</em></div>";
+            }
 
-    if ($cycle == false || $fullscreen == 0) {
-        print '</td></tr>';
-        html_end_box();
-    }
+            if ($cycle == false || $fullscreen == 0) {
+                print '</td></tr>';
+                html_end_box();
+            }
 
-    print '</div>';
-    }
+            print '</div>';
+        }
 
-    print '</div>';
+        print '</div>';
 
-    if ($cycle) {
-    $refreshtime = read_config_option('weathermap_cycle_refresh');
-    $poller_cycle = read_config_option('poller_interval');
+        if ($cycle) {
+            $refreshtime = read_config_option('weathermap_cycle_refresh');
+            $poller_cycle = read_config_option('poller_interval');
 
-    ?>
-        <script type='text/javascript' src='cacti-resources/map-cycle.js'></script>
-        <script type='text/javascript'>
+            ?>
+            <script type='text/javascript' src='cacti-resources/map-cycle.js'></script>
+            <script type='text/javascript'>
             $(function () {
                 WMcycler.start({
                     fullscreen: <?php echo($fullscreen ? '1' : '0'); ?>,
@@ -503,7 +506,7 @@ function weathermap_fullview($cycle = FALSE, $firstonly = FALSE, $limit_to_group
                     period: <?php echo $refreshtime * 1000; ?>});
             });
         </script><?php
-    }
+        }
     } else {
         print '<div align="center" style="padding:20px"><em>' . __('You Have No Maps') . '</em></div>';
     }
@@ -513,7 +516,11 @@ function weathermap_versionbox()
 {
     global $WEATHERMAP_VERSION;
 
-    $pagefoot = __('Powered by <a href="http://www.network-weathermap.com/?v=%s">PHP Weathermap version %s</a>', $WEATHERMAP_VERSION, $WEATHERMAP_VERSION);
+    $pagefoot = __(
+        'Powered by <a href="http://www.network-weathermap.com/?v=%s">PHP Weathermap version %s</a>',
+        $WEATHERMAP_VERSION,
+        $WEATHERMAP_VERSION
+    );
 
     if (weathermap_is_admin()) {
         $pagefoot .= ' --- <a href="weathermap-cacti10-plugin-mgmt.php" title="' . __('Go to the map management page') . '">' . __('Weathermap Management') . "</a>";
@@ -542,7 +549,10 @@ function weathermap_footer_links()
 {
     global $WEATHERMAP_VERSION;
     print '<br />';
-    html_start_box('<center><a target="_blank" class="linkOverDark" href="docs/">' . __('Local Documentation') . '</a> -- <a target="_blank" class="linkOverDark" href="http://www.network-weathermap.com/">' . __('Weathermap Website') . '</a> -- <a target="_target" class="linkOverDark" href="weathermap-cacti10-plugin-editor.php?plug=1">' . __('Weathermap Editor') . '</a>' . __(' -- This is version %s', $WEATHERMAP_VERSION) . '</center>', '100%', '', '2', 'center', '');
+    html_start_box('<center><a target="_blank" class="linkOverDark" href="docs/">' . __('Local Documentation') . '</a> -- <a target="_blank" class="linkOverDark" href="http://www.network-weathermap.com/">' . __('Weathermap Website') . '</a> -- <a target="_target" class="linkOverDark" href="weathermap-cacti10-plugin-editor.php?plug=1">' . __('Weathermap Editor') . '</a>' . __(
+        ' -- This is version %s',
+        $WEATHERMAP_VERSION
+    ) . '</center>', '100%', '', '2', 'center', '');
     html_end_box();
 }
 
@@ -625,7 +635,7 @@ function weathermap_mapselector($current_id = 0)
         </tr>
         <?php
 
-        html_end_box(FALSE);
+        html_end_box(false);
     }
 }
 

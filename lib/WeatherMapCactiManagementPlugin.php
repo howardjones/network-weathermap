@@ -238,7 +238,7 @@ class WeatherMapCactiManagementPlugin extends WeatherMapUIBase
             && isset($request['userid']) && is_numeric($request['userid'])
         ) {
             $this->manager->addPermission(intval($request['mapid']), intval($request['userid']));
-            header("Location: " . $this->make_url(array("action" => "perms_edit", "id" => $request['mapid'], "header" => "false")));
+            header("Location: " . $this->make_url(array("action" => "perms_edit", "id" => $request['mapid'])));
         }
     }
 
@@ -248,7 +248,7 @@ class WeatherMapCactiManagementPlugin extends WeatherMapUIBase
             && isset($request['userid']) && is_numeric($request['userid'])
         ) {
             $this->manager->removePermission($request['mapid'], $request['userid']);
-            header("Location: " . $this->make_url(array("action" => "perms_edit", "id" => $request['mapid'], "header" => "false")));
+            header("Location: " . $this->make_url(array("action" => "perms_edit", "id" => $request['mapid'])));
         }
     }
 
@@ -350,7 +350,11 @@ class WeatherMapCactiManagementPlugin extends WeatherMapUIBase
     protected function handlePermissionsPage($request, $appObject)
     {
         $this->cacti_header();
-        print __("Unimplemented.");
+        if (isset($request['id']) && is_numeric($request['id'])) {
+            $this->perms_list($request['id']);
+        } else {
+            print "Something got lost back there.";
+        }
         $this->cacti_footer();
     }
 
@@ -669,10 +673,10 @@ class WeatherMapCactiManagementPlugin extends WeatherMapUIBase
                 if ($i > 0) {
                     ksort($titles);
 
+                    $n = 0;
                     foreach ($titles as $file => $title) {
                         $title = $titles[$file];
-                        form_alternate_row();
-
+                        $this->cacti_row_start($n);
 
                         print '<td><a class="hyperLink" href="' . $this->make_url(array("action" => "addmap", "file" => $file)) . '" title="' . __('Add the configuration file') . '">' . __('Add') . '</a></td>';
                         print '<td><a class="hyperLink" href="' . $this->make_url(array("action" => "viewconfig", "file" => $file)) . '" title="' . __('View the configuration file in a new window') . '" target="_blank">' . __('View') . '</a></td>';
@@ -683,6 +687,7 @@ class WeatherMapCactiManagementPlugin extends WeatherMapUIBase
                         print '</td>';
                         print '<td><em>' . htmlspecialchars($title) . '</em></td>';
                         print '</tr>';
+                        $n++;
                     }
                 }
 
@@ -711,6 +716,75 @@ class WeatherMapCactiManagementPlugin extends WeatherMapUIBase
         }
     }
 
+    function perms_list($id)
+    {
+        $map = $this->manager->getMap($id);
+        $title = $map->titlecache;
+
+        $users = $this->manager->getUserList(true);
+        $auth = $this->manager->getMapAuth($id);
+
+        $mapuserids = array();
+
+        // build an array of userids that are allowed to see this map (and that actually exist)
+        foreach ($auth as $user) {
+            if (isset($users[$user->userid])) {
+                $mapuserids[] = $user->userid;
+            }
+        }
+
+        // now build the list of users that exist but aren't currently allowed (for the picklist)
+        $candidate_users = array();
+        foreach ($users as $uid => $user) {
+            if (!in_array($uid, $mapuserids)) {
+                $candidate_users [] = $user;
+            }
+        }
+
+        html_start_box(__('Edit permissions for Weathermap %s: %s', $id, $title), '100%', '', '2', 'center', '');
+
+        html_header(array(__('Username'), ''));
+
+        $n = 0;
+        foreach ($mapuserids as $user) {
+            $this->cacti_row_start($n);
+            print '<td>' . htmlspecialchars($users[$user]->username) . '</td>';
+
+            print '<td>';
+            print '<a href="'.$this->make_url(array("action" => "perms_delete_user", "mapid" => $id, "userid"=>$user, "header"=>"false")). '">';
+            print '<img src="../../images/delete_icon.gif" width="10" height="10" border="0" alt="' . __('Remove permissions for this user to see this map') . '">';
+            print '</a></td>';
+
+            print '</tr>';
+            $n++;
+        }
+
+        if (sizeof($mapuserids) == 0) {
+            print '<tr><td><em>' . __('nobody can see this map') . '</em></td></tr>';
+        }
+
+        html_end_box();
+
+        html_start_box('', '100%', '', '3', 'center', '');
+
+        print '<tr>';
+
+        if (sizeof($candidate_users) == 0) {
+            print '<td><em>' . __('There aren\'t any users left to add!') . '</em></td></tr>';
+        } else {
+            print '<td><form action="">' . __('Allow') . ' <input type="hidden" name="action" value="perms_add_user"><input type="hidden" name="mapid" value="' . $id . '"><select name="userid">';
+            foreach ($candidate_users as $user) {
+                printf('<option value="%s">%s</option>', $user->id, $user->username);
+            }
+
+            print '</select> ' . __('to see this map') . ' <input type="submit" value="' . __('Update') . '"></form></td>';
+            print '</tr>';
+        }
+
+        html_end_box();
+    }
+
+
     public function cacti_footer()
     {
         print "OVERRIDE ME";
@@ -721,7 +795,7 @@ class WeatherMapCactiManagementPlugin extends WeatherMapUIBase
         print "OVERRIDE ME";
     }
 
-    private function cacti_row_start($i)
+    public function cacti_row_start($i)
     {
     }
 }

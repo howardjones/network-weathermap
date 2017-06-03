@@ -58,7 +58,7 @@ class WeatherMapCacti10ManagementPlugin extends WeatherMapCactiManagementPlugin
         bottom_footer();
     }
 
-    private function cacti_row_start($i)
+    public function cacti_row_start($i)
     {
         form_alternate_row();
     }

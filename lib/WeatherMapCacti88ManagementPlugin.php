@@ -40,7 +40,7 @@ class WeatherMapCacti88ManagementPlugin extends WeatherMapCactiManagementPlugin
         include_once $this->cacti_config["base_path"] . "/include/bottom_footer.php";
     }
 
-    private function cacti_row_start($i)
+    public function cacti_row_start($i)
     {
         form_alternate_row_color($this->colours["alternate"], $this->colours["light"], $i);
     }

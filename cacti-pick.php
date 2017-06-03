@@ -32,9 +32,9 @@ if (is_dir($cacti_base) && file_exists($cacti_base . "/include/global.php")) {
 
 $jquery = '<script type="text/javascript" src="vendor/jquery/dist/jquery.min.js"></script>';
 if (isset($config['cacti_version'])) {
-	if (substr($config['cacti_version'], 0, 2) == "1.") {
-		$jquery = "";
-	}
+    if (substr($config['cacti_version'], 0, 2) == "1.") {
+        $jquery = "";
+    }
 }
 
 $pdo = weathermap_get_pdo();
@@ -43,4 +43,3 @@ require_once dirname(__FILE__) . "/lib/cacti-pick.php";
 
 $ui = new EditorDataPicker();
 $ui->main($_REQUEST);
-

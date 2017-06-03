@@ -5,7 +5,6 @@ require_once dirname(__FILE__) . '/WeatherMapEditorUI.class.php';
 
 class EditorDataPicker extends WeatherMapUIBase
 {
-
     var $commands = array(
         "link_step1" => array(
             "args" => array(
@@ -33,7 +32,7 @@ class EditorDataPicker extends WeatherMapUIBase
 
     );
 
-    function main($request, $from_plugin = false)
+    public function main($request, $from_plugin = false)
     {
         $action = "";
 
@@ -43,8 +42,6 @@ class EditorDataPicker extends WeatherMapUIBase
 
         if ($this->validateRequest($action, $request)) {
             $result = $this->dispatchRequest($action, $request, null);
-        } else {
-            echo "POOP";
         }
     }
 
@@ -101,8 +98,6 @@ class EditorDataPicker extends WeatherMapUIBase
 
         $pdo = weathermap_get_pdo();
 
-        $host_id = -1;
-
         $overlib = true;
         $aggregate = false;
 
@@ -121,6 +116,7 @@ class EditorDataPicker extends WeatherMapUIBase
         } else {
             $statement = $pdo->prepare("SELECT data_local.host_id, data_template_data.local_data_id, data_template_data.name_cache as description, data_template_data.active, data_template_data.data_source_path FROM data_local,data_template_data,data_input,data_template WHERE data_local.id=data_template_data.local_data_id AND data_input.id=data_template_data.data_input_id AND data_local.data_template_id=data_template.id  ORDER BY name_cache;");
             $statement->execute();
+            $host_id = -1;
         }
 
         $sources = $statement->fetchAll(PDO::FETCH_ASSOC);
@@ -140,7 +136,6 @@ class EditorDataPicker extends WeatherMapUIBase
         $tpl->set("rra_path", jsEscape($config['rra_path']));
 
         echo $tpl->fetch("editor-resources/templates/picker-data.php");
-
     }
 
 
@@ -160,7 +155,6 @@ class EditorDataPicker extends WeatherMapUIBase
         $tpl->set("base_url", jsEscape(isset($config['base_url']) ? $config['base_url'] : ''));
 
         echo $tpl->fetch("editor-resources/templates/picker-update.php");
-
     }
 
 
@@ -251,8 +245,7 @@ function usortNaturalDescriptions($a, $b)
 
 class MasterCactiPicker
 {
-
-    function pickerDispatch($request)
+    public function pickerDispatch($request)
     {
         if (isset($request['command'])) {
             if ($request["command"] == 'link_step1') {
@@ -269,7 +262,7 @@ class MasterCactiPicker
         }
     }
 
-    function last_used()
+    public function last_used()
     {
         if (isset($_SESSION['cacti']['weathermap']['last_used_host_id'][0])) {
             print "<b>Last Host Selected:</b><br>";
@@ -283,7 +276,7 @@ class MasterCactiPicker
         }
     }
 
-    function link_pick_step1($request)
+    public function link_pick_step1($request)
     {
         global $config; // Cacti config object
 
@@ -328,7 +321,7 @@ class MasterCactiPicker
         echo $tpl->fetch("editor-resources/templates/picker-data.php");
     }
 
-    function cactiHostList()
+    public function cactiHostList()
     {
         $pdo = weathermap_get_pdo();
 
@@ -338,7 +331,7 @@ class MasterCactiPicker
         return $hosts;
     }
 
-    function cactiGraphFromDSID($local_data_id)
+    public function cactiGraphFromDSID($local_data_id)
     {
 
         $pdo = weathermap_get_pdo();
@@ -357,7 +350,7 @@ class MasterCactiPicker
      *
      * @param $local_data_id
      */
-    function link_pick_step2($local_data_id)
+    public function link_pick_step2($local_data_id)
     {
         global $config;
 
@@ -379,7 +372,7 @@ class MasterCactiPicker
         <?php
     }
 
-    function node_pick_step1($request)
+    public function node_pick_step1($request)
     {
         global $config; // Cacti config object
 
@@ -417,5 +410,4 @@ class MasterCactiPicker
 
         echo $tpl->fetch("editor-resources/templates/picker-graph.php");
     }
-
 }

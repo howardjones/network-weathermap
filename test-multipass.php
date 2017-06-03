@@ -32,10 +32,7 @@ function has_transparency($imageRef)
         imagecolorallocate($im2, 128, 255, 128)
     );
 
-
-    $black =
-
-    imagefill($im2, 0, 0, $white);
+    $black = imagefill($im2, 0, 0, $white);
 
     $step = 7;
     $start = 0;
@@ -54,5 +51,4 @@ function has_transparency($imageRef)
 
     imagepng($im2, "test.png");
     return false;
-
 }

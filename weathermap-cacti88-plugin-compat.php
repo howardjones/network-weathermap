@@ -5,7 +5,6 @@
 function __()
 {
     $args = func_get_args();
-
     if (func_num_args() == 1) {
         return $args[0];
     }

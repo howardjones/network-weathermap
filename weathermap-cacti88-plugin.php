@@ -1,10 +1,9 @@
 <?php
+
 $guest_account = true;
 
 chdir('../../');
 require_once "./include/auth.php";
-require_once "./include/config.php";
-include_once($config['library_path'] . '/database.php');
 
 $weathermap_confdir = realpath(dirname(__FILE__) . '/configs');
 
@@ -13,12 +12,14 @@ require_once dirname(__FILE__)."/lib/Weathermap.class.php";
 require_once dirname(__FILE__) . "/lib/database.php";
 require_once dirname(__FILE__) . "/lib/WeathermapManager.class.php";
 
-$i_understand_file_permissions_and_how_to_fix_them = false;
-$my_name = 'weathermap-cacti10-plugin-mgmt.php';
+$action = "";
+if (isset($_POST['action'])) {
+	$action = $_POST['action'];
+} else if (isset($_GET['action'])) {
+	$action = $_GET['action'];
+}
 
 $manager = new WeathermapManager(weathermap_get_pdo(), $weathermap_confdir);
-
-$action = get_request_var("action");
 
 switch($action)
 {
@@ -659,7 +660,5 @@ function weathermap_tabs($current_tab)
 		return false;
 	}
 }
-
-include 'weathermap-cacti88-plugin-compat.php';
 
 // vim:ts=4:sw=4:

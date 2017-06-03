@@ -614,10 +614,8 @@ if ($mapname == '') {
             $map->ReadConfig($mapfile);
 
             if (isset($map->nodes[$node_name])) {
-
                 $movingNode = $map->nodes[$node_name];
                 if ($movingNode->relative_to == "") {
-
                     // This is a complicated bit. Find out if this node is involved in any
                     // links that have VIAs. If it is, we want to rotate those VIA points
                     // about the *other* node in the link

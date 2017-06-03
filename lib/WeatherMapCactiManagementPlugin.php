@@ -364,7 +364,11 @@ class WeatherMapCactiManagementPlugin extends WeatherMapUIBase
     protected function handleMapPicker($request, $appObject)
     {
         $this->cacti_header();
-        $this->addmap_picker();
+        if (isset($request['show_all']) && $request['show_all'] == 1) {
+            $this->addmap_picker(true);
+        } else {
+            $this->addmap_picker(false);
+        }
         $this->cacti_footer();
     }
 
@@ -384,7 +388,7 @@ class WeatherMapCactiManagementPlugin extends WeatherMapUIBase
 
     // *****************************************************************************************
 
-    function maplist_warnings()
+    protected function maplist_warnings()
     {
         if (!wm_module_checks()) {
             print '<div align="center" class="wm_warning"><p>';
@@ -434,9 +438,8 @@ class WeatherMapCactiManagementPlugin extends WeatherMapUIBase
         }
     }
 
-    function maplist()
+    protected function maplist()
     {
-
         html_start_box(__('Weathermaps'), '100%', '', '3', 'center', $this->make_url(array("action" => "addmap_picker")));
 
         $headers = array(
@@ -581,7 +584,7 @@ class WeatherMapCactiManagementPlugin extends WeatherMapUIBase
     }
 
 
-    function preview_config($file)
+    protected function preview_config($file)
     {
         chdir($this->configPath);
 
@@ -615,7 +618,7 @@ class WeatherMapCactiManagementPlugin extends WeatherMapUIBase
         }
     }
 
-    function addmap_picker($show_all = false)
+    protected function addmap_picker($show_all = false)
     {
         $loaded = array();
         $flags = array();
@@ -700,7 +703,7 @@ class WeatherMapCactiManagementPlugin extends WeatherMapUIBase
         html_end_box();
 
         if ($skipped > 0) {
-            print '<p align="center">' . __('Some files are not shown because they have already been added. You can <a href="%s">show these files too</a>, if you need to.', $this->make_url(array("action" => "addmap_picker", "show" => "all"))) . '</p>';
+            print '<p align="center">' . __('Some files are not shown because they have already been added. You can <a href="%s">show these files too</a>, if you need to.', $this->make_url(array("action" => "addmap_picker", "show_all" => "1"))) . '</p>';
         }
 
         if ($show_all) {
@@ -708,13 +711,14 @@ class WeatherMapCactiManagementPlugin extends WeatherMapUIBase
         }
     }
 
-
     public function cacti_footer()
     {
+        print "OVERRIDE ME";
     }
 
-    private function cacti_header()
+    public function cacti_header()
     {
+        print "OVERRIDE ME";
     }
 
     private function cacti_row_start($i)

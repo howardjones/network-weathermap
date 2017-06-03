@@ -29,14 +29,15 @@ class WeatherMapCacti88ManagementPlugin extends WeatherMapCactiManagementPlugin
         $this->cacti_footer();
     }
 
+
+    public function cacti_header()
+    {
+        include_once $this->cacti_config["base_path"] . "/include/top_header.php";
+    }
+
     public function cacti_footer()
     {
         include_once $this->cacti_config["base_path"] . "/include/bottom_footer.php";
-    }
-
-    private function cacti_header()
-    {
-        include_once $this->cacti_config["base_path"] . "/include/top_header.php";
     }
 
     private function cacti_row_start($i)

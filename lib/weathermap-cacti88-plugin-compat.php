@@ -9,7 +9,7 @@ function __()
         return $args[0];
     }
 
-    return call_user_func("sprintf", $args);
+    return call_user_func_array("sprintf", $args);
 }
 
 function __n($singular, $plural, $number)
@@ -34,12 +34,4 @@ function get_filter_request_var($name, $default = '')
 function isset_request_var($variable)
 {
     return isset($_REQUEST[$variable]);
-}
-
-function get_request_var($name, $default = '')
-{
-    if (isset_request_var($name)) {
-        return $_REQUEST['$name'];
-    }
-    return $default;
 }

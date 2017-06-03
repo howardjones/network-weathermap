@@ -9,7 +9,7 @@ include_once dirname(__FILE__) . '/lib/WeatherMapCacti88ManagementPlugin.php';
 
 $action = get_request_var("action");
 
-$plugin = new WeatherMapCacti88ManagementPlugin($config, null);
+$plugin = new WeatherMapCacti88ManagementPlugin($config, $colors);
 
 $plugin->dispatchRequest($action, $_REQUEST, null);
 

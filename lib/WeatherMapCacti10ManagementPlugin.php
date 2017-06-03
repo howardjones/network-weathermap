@@ -48,14 +48,14 @@ class WeatherMapCacti10ManagementPlugin extends WeatherMapCactiManagementPlugin
         $this->cacti_footer();
     }
 
+    public function cacti_header()
+    {
+        top_header();
+    }
+
     public function cacti_footer()
     {
         bottom_footer();
-    }
-
-    private function cacti_header()
-    {
-        top_header();
     }
 
     private function cacti_row_start($i)

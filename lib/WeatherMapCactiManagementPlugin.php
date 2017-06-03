@@ -364,7 +364,7 @@ class WeatherMapCactiManagementPlugin extends WeatherMapUIBase
     protected function handleMapPicker($request, $appObject)
     {
         $this->cacti_header();
-        print __("Unimplemented.");
+        $this->addmap_picker();
         $this->cacti_footer();
     }
 
@@ -614,6 +614,100 @@ class WeatherMapCactiManagementPlugin extends WeatherMapUIBase
             html_end_box();
         }
     }
+
+    function addmap_picker($show_all = false)
+    {
+        $loaded = array();
+        $flags = array();
+
+        // find out what maps are already in the database, so we can skip those
+        $existing_maps = $this->manager->getMaps();
+        if (is_array($existing_maps)) {
+            foreach ($existing_maps as $map) {
+                $loaded[] = $map->configfile;
+            }
+        }
+
+        html_start_box(__('Available Weathermap Configuration Files'), '100%', '', '1', 'center', '');
+
+        if (is_dir($this->configPath)) {
+            $dh = opendir($this->configPath);
+            if ($dh) {
+                $i = 0;
+                $skipped = 0;
+                html_header(array('', '', __('Config File'), __('Title'), ''), 2);
+
+                while ($file = readdir($dh)) {
+                    $realfile = $this->configPath . '/' . $file;
+
+                    // skip .-prefixed files like .htaccess, since it seems
+                    // that otherwise people will add them as map config files.
+                    // and the index.php too - for the same reason
+                    if (substr($file, 0, 1) != '.' && $file != 'index.php') {
+                        $used = in_array($file, $loaded);
+                        $flags[$file] = '';
+                        if ($used) {
+                            $flags[$file] = 'USED';
+                        }
+
+                        if (is_file($realfile)) {
+                            if ($used && !$show_all) {
+                                $skipped++;
+                            } else {
+                                $title = $this->manager->extractMapTitle($realfile);
+                                $titles[$file] = $title;
+                                $i++;
+                            }
+                        }
+                    }
+                }
+                closedir($dh);
+
+                if ($i > 0) {
+                    ksort($titles);
+
+                    foreach ($titles as $file => $title) {
+                        $title = $titles[$file];
+                        form_alternate_row();
+
+
+                        print '<td><a class="hyperLink" href="' . $this->make_url(array("action" => "addmap", "file" => $file)) . '" title="' . __('Add the configuration file') . '">' . __('Add') . '</a></td>';
+                        print '<td><a class="hyperLink" href="' . $this->make_url(array("action" => "viewconfig", "file" => $file)) . '" title="' . __('View the configuration file in a new window') . '" target="_blank">' . __('View') . '</a></td>';
+                        print '<td>' . htmlspecialchars($file);
+                        if ($flags[$file] == 'USED') {
+                            print ' <b>' . __('(USED)') . '</b>';
+                        }
+                        print '</td>';
+                        print '<td><em>' . htmlspecialchars($title) . '</em></td>';
+                        print '</tr>';
+                    }
+                }
+
+                if (($i + $skipped) == 0) {
+                    print '<tr><td>' . __('No files were found in the configs directory.') . '</td></tr>';
+                }
+
+                if (($i == 0) && $skipped > 0) {
+                    print '<tr><td>' . __('(%s files weren\'t shown because they are already in the database.', $skipped) . '</td></tr>';
+                }
+            } else {
+                print '<tr><td>' . __('Can\'t open %s to read - you should set it to be readable by the webserver.', $this->configPath) . '</td></tr>';
+            }
+        } else {
+            print '<tr><td>' . __('There is no directory named %s - you will need to create it, and set it to be readable by the webserver. If you want to upload configuration files from inside Cacti, then it should be <i>writable</i> by the webserver too.', $this->configPath) . '</td></tr>';
+        }
+
+        html_end_box();
+
+        if ($skipped > 0) {
+            print '<p align="center">' . __('Some files are not shown because they have already been added. You can <a href="%s">show these files too</a>, if you need to.', $this->make_url(array("action" => "addmap_picker", "show" => "all"))) . '</p>';
+        }
+
+        if ($show_all) {
+            print '<p align="center">' . __('Some files are shown even though they have already been added. You can <a href="%s">hide those files too</a>, if you need to.', $this->make_url(array("action" => "addmap_picker"))) . '</p>';
+        }
+    }
+
 
     public function cacti_footer()
     {

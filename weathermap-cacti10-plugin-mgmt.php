@@ -238,7 +238,6 @@ function maplist()
     print '<div align="center">';
     print '<input type="button" id="edit" value="' . __('Edit Groups') . '">';
     print '<input type="button" id="settings" value="' . __('Settings') . '">';
-
     print '</div>';
 
     ?>

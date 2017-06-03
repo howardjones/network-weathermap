@@ -34,7 +34,7 @@ class WeatherMapCacti10ManagementPlugin extends WeatherMapCactiManagementPlugin
 
                 $('#edit').click(function (event) {
                     event.preventDefault();
-                    loadPageNoHeader('?action=groupadmin&header=false');
+                    loadPageNoHeader('weathermap-cacti10-plugin-mgmt.php?action=groupadmin&header=false');
                 });
 
                 $('.remover').click(function () {

@@ -342,9 +342,12 @@ class WeatherMapCactiManagementPlugin extends WeatherMapUIBase
 
     protected function handleMapSettingsPage($request, $appObject)
     {
-        $this->cacti_header();
-        print __("Unimplemented.");
-        $this->cacti_footer();
+        if (isset($request['id']) && is_numeric($request['id'])) {
+            $this->cacti_header();
+            $this->map_settings(intval($request['id']));
+            // wmGenerateFooterLinks();
+            $this->cacti_footer();
+        }
     }
 
     protected function handlePermissionsPage($request, $appObject)
@@ -751,7 +754,7 @@ class WeatherMapCactiManagementPlugin extends WeatherMapUIBase
             print '<td>' . htmlspecialchars($users[$user]->username) . '</td>';
 
             print '<td>';
-            print '<a href="'.$this->make_url(array("action" => "perms_delete_user", "mapid" => $id, "userid"=>$user, "header"=>"false")). '">';
+            print '<a href="' . $this->make_url(array("action" => "perms_delete_user", "mapid" => $id, "userid" => $user, "header" => "false")) . '">';
             print '<img src="../../images/delete_icon.gif" width="10" height="10" border="0" alt="' . __('Remove permissions for this user to see this map') . '">';
             print '</a></td>';
 
@@ -784,6 +787,116 @@ class WeatherMapCactiManagementPlugin extends WeatherMapUIBase
         html_end_box();
     }
 
+
+    function map_settings($id)
+    {
+        if ($id == 0) {
+            $title = __('Additional settings for ALL maps');
+            $nonemsg = __('There are no settings for all maps yet. You can add some by clicking Add up in the top-right, or choose a single map from the management screen to add settings for that map.');
+            $type = 'global';
+            $settingrows = $this->manager->getMapSettings(0);
+        } elseif ($id < 0) {
+            $group_id = -intval($id);
+            $group = $this->manager->getGroup($group_id);
+
+            $title = __('Edit per-map settings for Group %s: %s', $group->id, $group->name);
+            $nonemsg = __('There are no per-group settings for this group yet. You can add some by clicking Add up in the top-right.');
+            $type = 'group';
+            $settingrows = $this->manager->getMapSettings(-$group_id);
+
+            print '<p>' . __('All maps in this group are also affected by the following GLOBAL settings (group overrides global, map overrides group, but BOTH override SET commands within the map config file):') . '</p>';
+            $this->map_readonly_settings(0, __('Global Settings'));
+        } else {
+            $map = $this->manager->getMap($id);
+            $group = $this->manager->getGroup($map->group_id);
+
+            $title = __('Edit per-map settings for Weathermap %s: %s', $id, $map->titlecache);
+            $nonemsg = __('There are no per-map settings for this map yet. You can add some by clicking Add up in the top-right.');
+            $type = 'map';
+            $settingrows = $this->manager->getMapSettings(intval($id));
+
+            print '<p>' . __('This map is also affected by the following GLOBAL and GROUP settings (group overrides global, map overrides group, but BOTH override SET commands within the map config file):') . '</p>';
+
+            $this->map_readonly_settings(0, __('Global Settings'));
+            $this->map_readonly_settings(-$map->group_id, __('Group Settings (%s)', htmlspecialchars($group->name)));
+        }
+
+        html_start_box($title, '100%', '', '2', 'center', 'weathermap-cacti10-plugin-mgmt.php?action=map_settings_form&mapid=' . intval($id));
+        html_header(array(__('Actions'), __('Name'), __('Value')), 2);
+
+        $n = 0;
+        if (is_array($settingrows)) {
+            if (sizeof($settingrows) > 0) {
+                foreach ($settingrows as $setting) {
+                    $this->cacti_row_start($n);
+
+                    print '<td style="width:4%"><a href="' . $this->make_url(array("action" => "map_settings_form", "mapid" => $id, "id" => intval($setting->id))) . '"><img src="../../images/graph_properties.gif" width="16" height="16" border="0" alt="' . __('Edit this definition') . '">' . __('Edit') . '</a></td>';
+                    print "<td>" . htmlspecialchars($setting->optname) . "</td>";
+                    print "<td>" . htmlspecialchars($setting->optvalue) . "</td>";
+                    print '<td><a class="hyperLink" href="' . $this->make_url(array("action" => "map_settings_delete", "mapid" => $id, "header" => "false", "id" => intval($setting->id))) . '"><img src="../../images/delete_icon_large.gif" width="12" height="12" border="0" alt="' . __('Remove this definition from this map') . '"></a></td>';
+                    print "</tr>";
+                    $n++;
+                }
+            } else {
+                print '<tr>';
+                print "<td colspan=2><em>$nonemsg</em></td>";
+                print '</tr>';
+            }
+        }
+
+        html_end_box();
+
+        print '<div align=center>';
+
+        if ($type == 'group') {
+            print '<a class="hyperLink" href="weathermap-cacti10-plugin-mgmt.php?action=groupadmin">' . __('Back to Group Admin') . '</a>';
+        }
+
+        if ($type == 'global') {
+            print '<a class="hyperLink" href="weathermap-cacti10-plugin-mgmt.php?action=">' . __('Back to Map Admin') . '</a>';
+        }
+
+        print '</div>';
+    }
+
+    function map_readonly_settings($id, $title = '')
+    {
+        if ($title == '') {
+            $title = __('Settings');
+        }
+
+        if ($id == 0) {
+            $settings = $this->manager->getMapSettings(0);
+        }
+
+        if ($id < 0) {
+            $settings = $this->manager->getMapSettings(intval($id));
+        }
+
+        if ($id > 0) {
+            $settings = $this->manager->getMapSettings(intval($id));
+        }
+
+        html_start_box($title, '100%', '', '2', 'center', '');
+        html_header(array(__('Name'), __('Value')));
+
+        $n = 0;
+        if (sizeof($settings) > 0) {
+            foreach ($settings as $setting) {
+                $this->cacti_row_start($n);
+                print '<td>' . htmlspecialchars($setting->optname) . '</td>';
+                print '<td>' . htmlspecialchars($setting->optvalue) . '</td>';
+                print '</tr>';
+                $n++;
+            }
+        } else {
+            $this->cacti_row_start($n);
+            print '<td colspan=4><em>' . __('No Settings') . '</em></td>';
+            print '</tr>';
+        }
+
+        html_end_box();
+    }
 
     public function cacti_footer()
     {

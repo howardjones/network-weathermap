@@ -26,6 +26,7 @@ class WeatherMapCacti88ManagementPlugin extends WeatherMapCactiManagementPlugin
         $this->cacti_header();
         $this->maplist_warnings();
         $this->maplist();
+        $this->footer_links();
         $this->cacti_footer();
     }
 

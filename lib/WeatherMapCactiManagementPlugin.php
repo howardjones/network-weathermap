@@ -1,6 +1,7 @@
 <?php
 
 require_once "database.php";
+require_once "Weathermap.class.php";
 require_once "WeatherMap.functions.php";
 require_once "WeatherMapUIBase.class.php";
 include_once 'WeathermapManager.class.php';
@@ -323,6 +324,7 @@ class WeatherMapCactiManagementPlugin extends WeatherMapUIBase
     {
         $this->cacti_header();
         print __("Unimplemented.");
+
         $this->cacti_footer();
     }
 
@@ -346,6 +348,7 @@ class WeatherMapCactiManagementPlugin extends WeatherMapUIBase
             $this->cacti_header();
             $this->map_settings(intval($request['id']));
             // wmGenerateFooterLinks();
+            $this->footer_links();
             $this->cacti_footer();
         }
     }
@@ -910,5 +913,21 @@ class WeatherMapCactiManagementPlugin extends WeatherMapUIBase
 
     public function cacti_row_start($i)
     {
+    }
+
+    public function footer_links()
+    {
+        global $WEATHERMAP_VERSION;
+
+        $html = "";
+
+        $html .= '<a class="linkOverDark" href="manual/">Local Documentation</a>';
+        $html .= ' -- <a class="linkOverDark" href="http://www.network-weathermap.com/">Weathermap Website</a>';
+        $html .= ' -- <a class="linkOverDark" href="'.$this->make_url(array(), $this->editor_url).'">Weathermap Editor</a>';
+        $html .= " -- This is version $WEATHERMAP_VERSION";
+
+        print "<br />";
+        html_start_box($html, '78%', '', '4','center','');
+        html_end_box();
     }
 }

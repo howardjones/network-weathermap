@@ -25,6 +25,7 @@ class WeatherMapCacti10ManagementPlugin extends WeatherMapCactiManagementPlugin
         $this->cacti_header();
         $this->maplist_warnings();
         $this->maplist();
+        $this->footer_links();
         ?>
         <script type='text/javascript'>
             $(function () {

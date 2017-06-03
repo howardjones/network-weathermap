@@ -1,23 +1,35 @@
 <?php
 
 chdir('../../');
-include_once('./include/auth.php');
-include_once('./include/config.php');
-include_once($config['library_path'] . '/database.php');
+include_once './include/auth.php';
+include_once './include/config.php';
+include_once $config['library_path'] . '/database.php';
 
 // include the weathermap class so that we can get the version
-include_once(dirname(__FILE__) . '/lib/Weathermap.class.php');
-include_once(dirname(__FILE__) . '/lib/database.php');
-include_once(dirname(__FILE__) . '/lib/WeathermapManager.class.php');
+//include_once dirname(__FILE__) . '/lib/Weathermap.class.php';
+//include_once dirname(__FILE__) . '/lib/database.php';
+//include_once dirname(__FILE__) . '/lib/WeathermapManager.class.php';
 
-$weathermap_confdir = realpath(dirname(__FILE__) . '/configs');
+include_once dirname(__FILE__) . '/lib/WeatherMapCacti10ManagementPlugin.php';
 
-$i_understand_file_permissions_and_how_to_fix_them = false;
-$my_name = 'weathermap-cacti10-plugin-mgmt.php';
 
-$manager = new WeathermapManager(weathermap_get_pdo(), $weathermap_confdir);
 
-set_default_action();
+//$weathermap_confdir = realpath(dirname(__FILE__) . '/configs');
+//
+//$i_understand_file_permissions_and_how_to_fix_them = false;
+//$my_name = 'weathermap-cacti10-plugin-mgmt.php';
+//
+//$manager = new WeathermapManager(weathermap_get_pdo(), $weathermap_confdir);
+//
+//set_default_action();
+
+$action = get_request_var("action");
+
+$plugin = new WeatherMapCacti10ManagementPlugin($config, null);
+
+$plugin->dispatchRequest($action, $_REQUEST, null);
+
+exit();
 
 switch (get_request_var('action')) {
     case 'dump_maps':
@@ -417,7 +429,7 @@ function maplist_warnings()
     $last_finish_time = intval($manager->getAppSetting('weathermap_last_finish_time', true));
     $poller_interval = intval($manager->getAppSetting('poller_interval'));
 
-    maplist_warnings();
+//    maplist_warnings();
 
     if (($last_finish_time - $last_start_time) > $poller_interval) {
         if (($last_started != $last_finished) && ($last_started != '')) {
@@ -439,7 +451,7 @@ function maplist()
 
     html_start_box(__('Weathermaps'), '100%', '', '3', 'center', 'weathermap-cacti10-plugin-mgmt.php?action=addmap_picker');
 
-    $display_array = array(
+    $headers = array(
         __('Config File'),
         __('Title'),
         __('Group'),
@@ -449,9 +461,6 @@ function maplist()
         __('Sort Order'),
         __('Accessible By')
     );
-
-    html_header($display_array, 2);
-
     $userlist = $manager->getUserList();
     $users[0] = __('Anyone');
 
@@ -462,9 +471,10 @@ function maplist()
     $i = 0;
 
     $maps = $manager->getMapsWithGroups();
-
-    $previous_id = -2;
     $had_warnings = 0;
+
+    html_header($headers, 2);
+
     if (is_array($maps)) {
         form_alternate_row();
 
@@ -528,8 +538,7 @@ function maplist()
 
             print '<td>';
 
-            $userlist = $manager->
-            getMapAuthUsers($map->id);
+            $userlist = $manager->getMapAuthUsers($map->id);
             $mapusers = array();
             foreach ($userlist as $user) {
                 if (array_key_exists($user->userid, $users)) {
@@ -549,7 +558,6 @@ function maplist()
             print '<td class="right">';
             print '<span class="remover fa fa-remove deleteMarker" href="weathermap-cacti10-plugin-mgmt.php?action=delete_map&id=' . $map->id . '" title="' . __('Delete Map') . '"></span>';
             print '</td>';
-
             print '</tr>';
             $i++;
         }
@@ -578,10 +586,6 @@ function maplist()
     print '<input type="button" id="edit" value="' . __('Edit Groups') . '">';
     print '<input type="button" id="settings" value="' . __('Settings') . '">';
 
-    if ($i > 0 && $i_understand_file_permissions_and_how_to_fix_them) {
-        print '<input type="button" id="recalc" value="' . __('Rebuild All') . '" title="' . __('Note: Experimental - You should NOT need to use this normally') . '">';
-    }
-
     print '</div>';
 
     ?>
@@ -594,11 +598,6 @@ function maplist()
             $('#edit').click(function (event) {
                 event.preventDefault();
                 loadPageNoHeader('weathermap-cacti10-plugin-mgmt.php?action=groupadmin&header=false');
-            });
-
-            $('#recalc').click(function (event) {
-                event.preventDefault();
-                loadPageNoHeader('weathermap-cacti10-plugin-mgmt.php?action=recalc&header=false');
             });
 
             $('.remover').click(function () {

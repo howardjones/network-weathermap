@@ -3,27 +3,35 @@
 chdir('../../');
 include_once "./include/auth.php";
 include_once "./include/config.php";
-
 include_once $config["library_path"] . "/database.php";
 
-$weathermap_confdir = realpath(dirname(__FILE__) . '/configs');
+//$weathermap_confdir = realpath(dirname(__FILE__) . '/configs');
 
 // include the weathermap class so that we can get the version
-include_once dirname(__FILE__) . "/lib/Weathermap.class.php";
-include_once dirname(__FILE__) . "/lib/database.php";
-include_once dirname(__FILE__) . "/lib/WeathermapManager.class.php";
+//include_once dirname(__FILE__) . "/lib/Weathermap.class.php";
+//include_once dirname(__FILE__) . "/lib/database.php";
+//include_once dirname(__FILE__) . "/lib/WeathermapManager.class.php";
+include_once dirname(__FILE__) . '/lib/WeatherMapCacti88ManagementPlugin.php';
 
-$i_understand_file_permissions_and_how_to_fix_them = false;
-$my_name = "weathermap-cacti88-plugin-mgmt.php";
+//$i_understand_file_permissions_and_how_to_fix_them = false;
+//$my_name = "weathermap-cacti88-plugin-mgmt.php";
 
-$manager = new WeathermapManager(weathermap_get_pdo(), $weathermap_confdir);
+//$manager = new WeathermapManager(weathermap_get_pdo(), $weathermap_confdir);
 
-$action = "";
-if (isset($_POST['action'])) {
-    $action = $_POST['action'];
-} elseif (isset($_GET['action'])) {
-    $action = $_GET['action'];
-}
+//$action = "";
+//if (isset($_POST['action'])) {
+//    $action = $_POST['action'];
+//} elseif (isset($_GET['action'])) {
+//    $action = $_GET['action'];
+//}
+
+$action = get_request_var("action");
+
+$plugin = new WeatherMapCacti10ManagementPlugin($config, null);
+
+$plugin->dispatchRequest($action, $_REQUEST, null);
+
+exit();
 
 switch ($action) {
     case 'dump_maps':
@@ -392,7 +400,7 @@ function maplist_warnings()
     $last_finish_time = intval($manager->getAppSetting("weathermap_last_finish_time", true));
     $poller_interval = intval($manager->getAppSetting("poller_interval"));
 
-    maplist_warnings();
+//    maplist_warnings();
 
 
     if (($last_finish_time - $last_start_time) > $poller_interval) {
@@ -415,10 +423,19 @@ function maplist()
 
     html_start_box("<strong>Weathermaps</strong>", "78%", $colors["header"], "3", "center", "?action=addmap_picker");
 
-    html_header(array("Config File", "Title", "Group", "Last Run", "Active", "Settings", "Sort Order", "Accessible By", ""));
-
+    $headers = array(
+        __('Config File'),
+        __('Title'),
+        __('Group'),
+        __('Last Run'),
+        __('Active'),
+        __('Settings'),
+        __('Sort Order'),
+        __('Accessible By')
+    );
     $userlist = $manager->getUserList();
     $users[0] = 'Anyone';
+
 
     foreach ($userlist as $user) {
         $users[$user->id] = $user->username;
@@ -428,22 +445,22 @@ function maplist()
 
     $maps = $manager->getMapsWithGroups();
 
-    $previous_id = -2;
     $had_warnings = 0;
+
+    html_header($headers, 2);
+
     if (is_array($maps)) {
         form_alternate_row_color($colors["alternate"], $colors["light"], $i);
-        print "<td>ALL MAPS</td><td>(special settings for all maps)</td><td></td><td></td>";
-        print "<td></td>";
 
-        print "<td><a href='?action=map_settings&id=0'>";
+        print '<td>' . __('ALL MAPS') . '</td><td>' . __('(special settings for all maps)') . '</td><td></td><td></td>';
+        print '<td></td>';
+
+        print '<td><a class="hyperLink" href="?action=map_settings&id=0">';
         $setting_count = $manager->getMapSettingCount(0, 0);
         if ($setting_count > 0) {
-            print $setting_count . " special";
-            if ($setting_count > 1) {
-                print "s";
-            }
+            print sprintf(__n('%d special', '%d specials', $setting_count), $setting_count);
         } else {
-            print "standard";
+            print __('standard');
         }
         print "</a>";
 
@@ -551,9 +568,6 @@ function maplist()
     print "<div align='center'>";
     print "<a href='?action=groupadmin'><img src='images/button_editgroups.png' border=0 alt='Edit Groups' /></a>";
     print "&nbsp;<a href='../../settings.php?tab=misc'><img src='images/button_settings.gif' border=0 alt='Settings' /></a>";
-    if ($i > 0 && $i_understand_file_permissions_and_how_to_fix_them) {
-        print '<br /><a href="?action=rebuildnow"><img src="images/btn_recalc.png" border="0" alt="Rebuild All Maps Right Now"><br />(Experimental - You should NOT need to use this normally)</a><br />';
-    }
     print "</div>";
 }
 

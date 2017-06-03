@@ -18,6 +18,11 @@ class WeatherMapUIBase
     );
     public $commands;
 
+    public function __construct()
+    {
+
+    }
+
     /**
      * Given an array of request variables (usually $_REQUEST), check that the
      * request is a valid one. Does the action exist? Do the arguments match the action?
@@ -110,6 +115,7 @@ class WeatherMapUIBase
         $params = array();
         foreach ($command_info['args'] as $arg) {
             if (isset($request[$arg[self::ARG_NAME]])) {
+                // TODO - VALIDATE HERE!
                 $params[$arg[self::ARG_NAME]] = $request[$arg[self::ARG_NAME]];
             }
         }
@@ -126,25 +132,25 @@ class WeatherMapUIBase
         return false;
     }
 
-    public function dispatch($action, $request)
-    {
-        $handler = null;
-
-        if (array_key_exists($action, $this->commands)) {
-            $handler = $this->commands[$action];
-        }
-        if (array_key_exists(":: DEFAULT ::", $this->commands)) {
-            $handler = $this->commands[":: DEFAULT ::"];
-        }
-        if (null === $handler) {
-            return null;
-        }
-
-        // TODO - add argument parse/validation in here
-
-        $handlerMethod = $handler['handler'];
-        return $this->$handlerMethod($request);
-    }
+//    public function dispatch($action, $request)
+//    {
+//        $handler = null;
+//
+//        if (array_key_exists($action, $this->commands)) {
+//            $handler = $this->commands[$action];
+//        }
+//        if (array_key_exists(":: DEFAULT ::", $this->commands)) {
+//            $handler = $this->commands[":: DEFAULT ::"];
+//        }
+//        if (null === $handler) {
+//            return null;
+//        }
+//
+//        // TODO - add argument parse/validation in here
+//
+//        $handlerMethod = $handler['handler'];
+//        return $this->$handlerMethod($request);
+//    }
 
     /**
      * Run through the command list, making sure all the handler functions actually exist

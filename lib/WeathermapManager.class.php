@@ -421,7 +421,7 @@ class WeathermapManager
         $statement->execute(array($mapId, $name));
         $setting = $statement->fetch(PDO::FETCH_OBJ);
 
-        if ($setting !== false) {
+        if ($setting === false) {
             $setting = $defaultValue;
         } else {
             $setting = $setting->optvalue;

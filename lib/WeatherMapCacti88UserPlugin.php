@@ -17,6 +17,8 @@ class WeatherMapCacti88UserPlugin extends WeatherMapCactiUserPlugin
         $this->colours = $colours;
         $this->my_url = "weathermap-cacti88-plugin.php";
         $this->editor_url = "weathermap-cacti88-plugin-editor.php";
+        $this->management_realm = "weathermap-cacti88-plugin-mgmt.php";
+        $this->editor_realm = "weathermap-cacti88-plugin-editor.php";
     }
 
 

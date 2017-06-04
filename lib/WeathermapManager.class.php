@@ -618,4 +618,10 @@ class WeathermapManager
 
         return false;
     }
+
+    public function getUserId()
+    {
+        return (isset($_SESSION['sess_user_id']) ? intval($_SESSION['sess_user_id']) : 1);
+    }
+
 }

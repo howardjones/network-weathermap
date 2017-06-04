@@ -41,7 +41,7 @@ class WeatherMapCactiManagementPlugin extends WeatherMapUIBase
         'activate_map' => array('handler' => 'handleActivateMap', 'args' => array(array("id", "int"))),
 
         'addmap' => array('handler' => 'handleMapListAdd', 'args' => array(array("file", "mapfile"))),
-        'addmap_picker' => array('handler' => 'handleMapPicker', 'args' => array(array("show_all", "bool"))),
+        'addmap_picker' => array('handler' => 'handleMapPicker', 'args' => array(array("show_all", "bool", true))),
 
         'move_map_up' => array('handler' => 'handleMapOrderUp', 'args' => array(array("id", "int"), array("order", "int"))),
         'move_map_down' => array('handler' => 'handleMapOrderDown', 'args' => array(array("id", "int"), array("order", "int"))),
@@ -510,6 +510,8 @@ class WeatherMapCactiManagementPlugin extends WeatherMapUIBase
             print '<td></td>';
             print '<td></td>';
             print '</tr>';
+
+            $i++;
 
             foreach ($maps as $map) {
                 $this->cacti_row_start($i);

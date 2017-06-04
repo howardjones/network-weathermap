@@ -68,6 +68,20 @@ class WeatherMapCactiManagementPlugin extends WeatherMapUIBase
         $this->manager = new WeathermapManager(weathermap_get_pdo(), $this->configPath);
     }
 
+    function main($request)
+    {
+        $action = ":: DEFAULT ::";
+        if (isset($request['action'])) {
+            $action = strtolower(trim($request['action']));
+        }
+
+        if ($this->validateRequest($action, $request)) {
+            $result = $this->dispatchRequest($action, $request, null);
+        } else {
+            print "INPUT VALIDATION FAIL";
+        }
+    }
+
     public function make_url($params, $alt_url = "")
     {
         $base_url = $this->my_url;
@@ -921,13 +935,13 @@ class WeatherMapCactiManagementPlugin extends WeatherMapUIBase
 
         $html = "";
 
-        $html .= '<a class="linkOverDark" href="manual/">Local Documentation</a>';
+        $html .= '<a class="linkOverDark" href="docs/">Local Documentation</a>';
         $html .= ' -- <a class="linkOverDark" href="http://www.network-weathermap.com/">Weathermap Website</a>';
-        $html .= ' -- <a class="linkOverDark" href="'.$this->make_url(array(), $this->editor_url).'">Weathermap Editor</a>';
+        $html .= ' -- <a class="linkOverDark" href="' . $this->make_url(array(), $this->editor_url) . '">Weathermap Editor</a>';
         $html .= " -- This is version $WEATHERMAP_VERSION";
 
         print "<br />";
-        html_start_box($html, '78%', '', '4','center','');
+        html_start_box($html, '78%', '', '4', 'center', '');
         html_end_box();
     }
 }

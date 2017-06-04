@@ -1149,7 +1149,7 @@ class WeatherMapConfigReader
         }
     }
 
-    private function readConfigFile($filename)
+    public function readConfigFile($filename)
     {
         $lines = array();
 
@@ -1173,7 +1173,7 @@ class WeatherMapConfigReader
         return $result;
     }
 
-    private function readConfigLines($inputLines)
+    public function readConfigLines($inputLines)
     {
         wm_debug("in readConfigLines\n");
 

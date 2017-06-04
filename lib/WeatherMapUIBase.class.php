@@ -115,7 +115,6 @@ class WeatherMapUIBase
         $params = array();
         foreach ($command_info['args'] as $arg) {
             if (isset($request[$arg[self::ARG_NAME]])) {
-                // TODO - VALIDATE HERE!
                 $params[$arg[self::ARG_NAME]] = $request[$arg[self::ARG_NAME]];
             }
         }

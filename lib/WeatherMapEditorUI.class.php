@@ -245,7 +245,6 @@ class WeatherMapEditorUI extends WeatherMapUIBase
     {
         $this->unpackCookie();
         $this->editor = new WeatherMapEditor();
-
     }
 
     function unpackCookie($cookiename = "wmeditor")

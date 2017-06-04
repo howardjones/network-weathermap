@@ -25,6 +25,7 @@ class WeathermapManagedMap
 class WeathermapManager
 {
 
+    /** @var PDO $pdo */
     private $pdo;
     private $configDirectory;
 

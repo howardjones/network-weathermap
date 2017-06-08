@@ -1059,11 +1059,11 @@ class WeatherMapNode extends WeatherMapDataItem
             $finalFillColour = $this->calculateIconColour($map);
         }
 
-        if (!$this->aiconoutlinecolour->isNone()) {
+        if (!$configuredAIOutlineColour->isNone()) {
             if ($configuredAIOutlineColour->isCopy() && !$labelColour->isNone()) {
                 $finalInkColour = $labelColour;
             } else {
-                if ($configuredAIFillColour->isRealColour()) {
+                if ($configuredAIOutlineColour->isRealColour()) {
                     $finalInkColour = $configuredAIOutlineColour;
                 }
             }

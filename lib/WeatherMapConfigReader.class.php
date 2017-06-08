@@ -328,6 +328,11 @@ class WeatherMapConfigReader
                     '/^AICONOUTLINECOLOR\s+(none)$/i',
                     'handleCOLOR'
                 ),
+                array(
+
+                    '/^AICONOUTLINECOLOR\s+(copy)$/i',
+                    'handleCOLOR'
+                ),
             ),
             'AICONFILLCOLOR' => array(
                 array(

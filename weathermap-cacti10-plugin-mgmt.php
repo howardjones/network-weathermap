@@ -5,33 +5,15 @@ include_once './include/auth.php';
 include_once './include/config.php';
 include_once $config['library_path'] . '/database.php';
 
-// include the weathermap class so that we can get the version
-//include_once dirname(__FILE__) . '/lib/Weathermap.class.php';
-//include_once dirname(__FILE__) . '/lib/database.php';
-//include_once dirname(__FILE__) . '/lib/WeathermapManager.class.php';
-
 include_once dirname(__FILE__) . '/lib/WeatherMapCacti10ManagementPlugin.php';
-
-
-//$weathermap_confdir = realpath(dirname(__FILE__) . '/configs');
-//
-//$i_understand_file_permissions_and_how_to_fix_them = false;
-//$my_name = 'weathermap-cacti10-plugin-mgmt.php';
-//
-//$manager = new WeathermapManager(weathermap_get_pdo(), $weathermap_confdir);
-//
-// set_default_action();
-
-// $action = get_request_var("action");
 
 $plugin = new WeatherMapCacti10ManagementPlugin($config);
 
 $plugin->main($_REQUEST);
 
-
 ///////////////////////////////////////////////////////////////////////////
 
-class RedundantCode10
+class RedundantCode10m
 {
     function weathermap_footer_links()
     {

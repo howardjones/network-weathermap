@@ -31,12 +31,6 @@ class WeatherMapCactiUserPlugin extends WeatherMapUIBase
 
         'viewcycle' => array('handler' => 'handleViewCycle', 'args' => array()),
         'viewcycle_filtered' => array('handler' => 'handleViewCycleFiltered', 'args' => array(array("group_id", "int", true))),
-
-//        'viewmapcycle' => array(
-//            'handler' => 'handleViewCycle', 'args' => array(
-//                array("fullscreen", "int", true),
-//                array("group", "int", true)
-//            )),
         ':: DEFAULT ::' => array(
             'handler' => 'handleDefaultView',
             'args' => array(

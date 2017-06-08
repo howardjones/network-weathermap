@@ -1,51 +1,13 @@
 <?php
 
 $guest_account = true;
-//
-//chdir('../../');
-//require_once "./include/auth.php";
-//
-//$weathermap_confdir = realpath(dirname(__FILE__) . '/configs');
-//
-//// include the weathermap class so that we can get the version
-//require_once dirname(__FILE__)."/lib/Weathermap.class.php";
-//require_once dirname(__FILE__) . "/lib/database.php";
-//require_once dirname(__FILE__) . "/lib/WeathermapManager.class.php";
-//
-//$action = "";
-//if (isset($_POST['action'])) {
-//	$action = $_POST['action'];
-//} else if (isset($_GET['action'])) {
-//	$action = $_GET['action'];
-//}
-//
-//$manager = new WeathermapManager(weathermap_get_pdo(), $weathermap_confdir);
-
-
 
 chdir('../../');
 include_once './include/auth.php';
 include_once './include/config.php';
 include_once $config['library_path'] . '/database.php';
 
-// include the weathermap class so that we can get the version
-//include_once dirname(__FILE__) . '/lib/Weathermap.class.php';
-//include_once dirname(__FILE__) . '/lib/database.php';
-//include_once dirname(__FILE__) . '/lib/WeathermapManager.class.php';
-
 include_once dirname(__FILE__) . '/lib/WeatherMapCacti88UserPlugin.php';
-
-
-//$weathermap_confdir = realpath(dirname(__FILE__) . '/configs');
-//
-//$i_understand_file_permissions_and_how_to_fix_them = false;
-//$my_name = 'weathermap-cacti10-plugin-mgmt.php';
-//
-//$manager = new WeathermapManager(weathermap_get_pdo(), $weathermap_confdir);
-//
-// set_default_action();
-
-// $action = get_request_var("action");
 
 $plugin = new WeatherMapCacti88UserPlugin($config, $colors, "png");
 

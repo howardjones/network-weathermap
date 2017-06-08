@@ -1060,7 +1060,13 @@ class WeatherMapNode extends WeatherMapDataItem
         }
 
         if (!$this->aiconoutlinecolour->isNone()) {
-            $finalInkColour = $configuredAIOutlineColour;
+            if ($configuredAIOutlineColour->isCopy() && !$labelColour->isNone()) {
+                $finalInkColour = $labelColour;
+            } else {
+                if ($configuredAIFillColour->isRealColour()) {
+                    $finalInkColour = $configuredAIOutlineColour;
+                }
+            }
         }
         return array($finalFillColour, $finalInkColour);
     }

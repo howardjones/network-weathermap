@@ -1004,7 +1004,8 @@ class WeatherMapNode extends WeatherMapDataItem
     {
         $percentValue = $this->percentUsages[$which];
 
-        $segmentAngle = ($percentValue / 100) * 360;
+        $segmentAngle = min((($percentValue / 100) * 360), 360);
+        $segmentAngle = max(1, $segmentAngle);
 
         $xRadius = $this->iconscalew / 2 - 1;
         $yRadius = $this->iconscaleh / 2 - 1;

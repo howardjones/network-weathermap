@@ -330,14 +330,14 @@ class WeatherMapCactiManagementPlugin extends WeatherMapUIBase
     public function handleMapSettingsForm($request, $appObject)
     {
         $this->cacti_header();
-        print __("Unimplemented.");
+        print __("Unimplemented (overidden).");
         $this->cacti_footer();
     }
 
     public function handleGroupSelect($request, $appObject)
     {
         $this->cacti_header();
-        print __("Unimplemented.");
+        print __("Unimplemented (overidden).");
 
         $this->cacti_footer();
     }
@@ -345,14 +345,71 @@ class WeatherMapCactiManagementPlugin extends WeatherMapUIBase
     public function handleGroupForm($request, $appObject)
     {
         $this->cacti_header();
-        print __("Unimplemented.");
+
+        html_start_box(__('Edit Map Groups'), '100%', '', '2', 'center', 'weathermap-cacti10-plugin-mgmt.php?action=group_form&id=0');
+        html_header(array(__('Actions'), __('Group Name'), __('Settings'), __('Sort Order')), 2);
+
+        $groups = $this->manager->getGroups();
+
+        if (is_array($groups)) {
+            if (sizeof($groups) > 0) {
+                foreach ($groups as $group) {
+                    form_alternate_row();
+
+
+                    print '<td style="width:4%"><a class="hyperLink" href="';
+                    print $this->make_url(array("action" => "group_form", "id" => $group->id));
+                    print '"><img src="../../images/graph_properties.gif" width="16" height="16" border="0" alt="" title="' . __('Rename This Group') . '"></a></td>';
+                    print '<td>' . htmlspecialchars($group->name) . '</td>';
+
+                    print '<td>';
+                    print "<a class='hyperLink' href='weathermap-cacti10-plugin-mgmt.php?action=map_settings&id=-" . $group->id . "'>";
+                    $setting_count = $this->manager->getMapSettingCount(0, $group->id);
+                    if ($setting_count > 0) {
+                        print sprintf(__n('%s special', '%s specials', $setting_count), $setting_count);
+                    } else {
+                        print __('standard');
+                    }
+                    print '</a>';
+                    print '</td>';
+
+                    print '<td>';
+
+
+                    print '<span class="remover fa fa-caret-up moveArrow" href="';
+                    print $this->make_url(array("action" => "move_group_up", "id" => $group->id));
+                    print '" title="' . __('Move Group Up') . '"></span>';
+                    print '<span class="remover fa fa-caret-down moveArrow" href="';
+                    print $this->make_url(array("action" => "move_group_down", "id" => $group->id));
+                    print '" title="' . __('Move Group Down') . '"></span>';
+                    print '</td>';
+
+                    print '<td class="right">';
+                    if ($group->id > 1) {
+                        print '<span class="remover fa fa-remove deleteMarker" href="';
+                        print $this->make_url(array("action" => "groupadmin_delete", "id" => $group->id));
+                        print '" title="' . __('Remove this definition from this map') . '"></span>';
+                    }
+                    print '</td>';
+
+                    print '</tr>';
+                }
+            } else {
+                print '<tr>';
+                print '<td colspan=2>' . __('No groups are defined.') . '</td>';
+                print '</tr>';
+            }
+        }
+
+        html_end_box();
+
         $this->cacti_footer();
     }
 
     public function handleMapGroupChangeForm($request, $appObject)
     {
         $this->cacti_header();
-        print __("Unimplemented.");
+        print __("Unimplemented Group Change Form.");
         $this->cacti_footer();
     }
 
@@ -399,14 +456,14 @@ class WeatherMapCactiManagementPlugin extends WeatherMapUIBase
     public function handleDumpSettings($request, $appObject)
     {
         $this->cacti_header();
-        print __("Unimplemented.");
+        print __("Unimplemented Dump Settings.");
         $this->cacti_footer();
     }
 
     public function handleManagementMainScreen($request, $appObject)
     {
         $this->cacti_header();
-        print __("Unimplemented.");
+        print __("Unimplemented (overridden in subclasses though).");
         $this->cacti_footer();
     }
 

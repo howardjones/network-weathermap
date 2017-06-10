@@ -108,6 +108,7 @@ class WeatherMapDataSource_snmp extends WeatherMapDataSource
                         $this->down_cache[$host]++;
                     }
                 }
+
                 if ($out_oid != '-') {
                     $out_result = snmpget($host, $community, $out_oid, $timeout, $retries);
                     if ($out_result !== false) {

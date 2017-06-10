@@ -440,7 +440,63 @@ class WeatherMapCactiManagementPlugin extends WeatherMapUIBase
     public function handleMapGroupChangeForm($request, $appObject)
     {
         $this->cacti_header();
-        print __("Unimplemented Group Change Form.");
+
+        $mapId = $request['id'];
+        $map = $this->manager->getMap($mapId);
+        $title = $map->titlecache;
+        $curgroup = $map->group_id;
+
+        form_start('weathermap-cacti10-plugin-mgmt.php', 'editme');
+
+        html_start_box(__('Edit map group for Weathermap %s: %s', $mapId, $title), '100%', '', '2', 'center', '');
+
+        print "<td>" . __('Choose an existing Group:') . "&nbsp;<select name='new_group'>";
+
+        $groups = $this->manager->getGroups();
+
+        foreach ($groups as $grp) {
+            print '<option ';
+            if ($grp->id == $curgroup) {
+                print ' SELECTED ';
+            }
+            print 'value=' . $grp->id . '>' . htmlspecialchars($grp->name) . '</option>';
+        }
+
+        print '</select>';
+        print "&nbsp;<input type='button' id='save' name='save' value='" . __('Save') . "' title='" . __('Change Group') . "'>";
+        print '</td>';
+        print "</tr>\n";
+        print '<tr><td></td></tr>';
+
+
+        print "<tr><td><p>" . __('or create a new group in the <b><a href=\'%s\'>group management screen</a>', $this->make_url(array('action'=>'groupadmin')));
+        print "</b></p></td></tr>";
+
+        print "<tr><td><input type=hidden name='map_id' value='" . $mapId . "'></td></td>";
+        print "<tr><td><input type=hidden name='action' value='chgroup_update'></td></td>";
+
+        html_end_box();
+
+        form_end();
+
+        ?>
+        <script type='text/javascript'>
+            $(function () {
+                $('#save').click(function () {
+                    strURL = 'weathermap-cacti10-plugin-mgmt.php';
+                    strURL += (strURL.indexOf('?') >= 0 ? '&' : '?') + 'header=false';
+                    json = $('#editme').serializeObject();
+                    $.post(strURL, json).done(function (data) {
+                        $('#main').html(data);
+                        applySkin();
+                        window.scrollTo(0, 0);
+                    });
+                });
+            });
+        </script>
+        <?php
+
+
         $this->cacti_footer();
     }
 

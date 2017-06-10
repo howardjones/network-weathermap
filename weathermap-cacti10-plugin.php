@@ -1,3 +1,4 @@
+pwd
 <?php
 
 $guest_account = true;

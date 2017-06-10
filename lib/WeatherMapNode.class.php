@@ -1004,8 +1004,7 @@ class WeatherMapNode extends WeatherMapDataItem
     {
         $percentValue = $this->percentUsages[$which];
 
-        $segmentAngle = min((($percentValue / 100) * 360), 360);
-        $segmentAngle = max(1, $segmentAngle);
+        $segmentAngle = clip(($percentValue / 100) * 360, 1, 360);
 
         $xRadius = $this->iconscalew / 2 - 1;
         $yRadius = $this->iconscaleh / 2 - 1;
@@ -1060,6 +1059,7 @@ class WeatherMapNode extends WeatherMapDataItem
             $finalFillColour = $this->calculateIconColour($map);
         }
 
+        # Same kind of thing for the outline colour
         if (!$configuredAIOutlineColour->isNone()) {
             if ($configuredAIOutlineColour->isCopy() && !$labelColour->isNone()) {
                 $finalInkColour = $labelColour;

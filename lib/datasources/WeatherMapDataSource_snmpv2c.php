@@ -42,6 +42,17 @@ class WeatherMapDataSource_snmpv2c extends WeatherMapDataSource
         return false;
     }
 
+    public function Register($targetstring, &$map, &$item)
+    {
+        parent::Register($targetstring, $map, $item);
+
+        if (preg_match($this->regexpsHandled[0], $targetstring, $matches)) {
+            // make sure there is a key for every host in the down_cache
+            $host = $matches[2];
+            $this->down_cache[$host] = 0;
+        }
+    }
+
     public function ReadData($targetstring, &$map, &$item)
     {
         $this->data[IN] = null;

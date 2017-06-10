@@ -12,6 +12,7 @@ class WeatherMapUIBase
         "jsname" => "validateArgJavascriptName",
         "mapfile" => "validateArgMapFilename",
         "string" => "validateArgString",
+        "non-empty-string" => "validateArgNonEmptyString",
         "bool" => "validateArgBool",
         "item_type" => "validateArgItemType",
         "maphash" => "validateArgMapHash"
@@ -211,7 +212,17 @@ class WeatherMapUIBase
 
     private function validateArgString($value)
     {
+        // everything is a string
         return true;
+    }
+
+    private function validateArgNonEmptyString($value)
+    {
+        if (strlen($value) > 0) {
+            return true;
+        }
+
+        return false;
     }
 
     private function validateArgMapFilename($value)

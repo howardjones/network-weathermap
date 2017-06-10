@@ -20,7 +20,7 @@ class WeatherMapCactiManagementPlugin extends WeatherMapUIBase
         'groupadmin_delete' => array('handler' => 'handleGroupDelete', 'args' => array(array("id", "int"))),
         'groupadmin' => array('handler' => 'handleGroupSelect', 'args' => array()),
         'group_form' => array('handler' => 'handleGroupForm', 'args' => array(array("id", "int"))),
-        'group_update' => array('handler' => 'handleGroupUpdate', 'args' => array(array("id", "int"), array("gname", "non-empty-string"))),
+        'group_update' => array('handler' => 'handleGroupUpdate', 'args' => array(array("id", "int", true), array("gname", "non-empty-string"))),
         'move_group_up' => array('handler' => 'handleGroupOrderUp', 'args' => array(array("id", "int"), array("order", "int"))),
         'move_group_down' => array('handler' => 'handleGroupOrderDown', 'args' => array(array("id", "int"), array("order", "int"))),
 
@@ -79,6 +79,7 @@ class WeatherMapCactiManagementPlugin extends WeatherMapUIBase
             $result = $this->dispatchRequest($action, $request, null);
         } else {
             print "INPUT VALIDATION FAIL";
+//            print_r($request);
         }
     }
 
@@ -135,6 +136,7 @@ class WeatherMapCactiManagementPlugin extends WeatherMapUIBase
     {
         $id = -1;
         $newname = "";
+
         if (isset($request['id']) && is_numeric($request['id'])) {
             $id = intval($request['id']);
         }
@@ -337,14 +339,6 @@ class WeatherMapCactiManagementPlugin extends WeatherMapUIBase
     public function handleGroupSelect($request, $appObject)
     {
         $this->cacti_header();
-        print __("Unimplemented (overidden).");
-
-        $this->cacti_footer();
-    }
-
-    public function handleGroupForm($request, $appObject)
-    {
-        $this->cacti_header();
 
         html_start_box(__('Edit Map Groups'), '100%', '', '2', 'center', 'weathermap-cacti10-plugin-mgmt.php?action=group_form&id=0');
         html_header(array(__('Actions'), __('Group Name'), __('Settings'), __('Sort Order')), 2);
@@ -375,7 +369,6 @@ class WeatherMapCactiManagementPlugin extends WeatherMapUIBase
 
                     print '<td>';
 
-
                     print '<span class="remover fa fa-caret-up moveArrow" href="';
                     print $this->make_url(array("action" => "move_group_up", "id" => $group->id));
                     print '" title="' . __('Move Group Up') . '"></span>';
@@ -402,6 +395,44 @@ class WeatherMapCactiManagementPlugin extends WeatherMapUIBase
         }
 
         html_end_box();
+
+        $this->cacti_footer();
+    }
+
+    public function handleGroupForm($request, $appObject)
+    {
+        $id = $request['id'];
+
+        $this->cacti_header();
+
+        form_start('weathermap-cacti10-plugin-mgmt.php');
+
+        $groupName = '';
+        // if id==0, it's an Add, otherwise it's an editor.
+        if ($id == 0) {
+            html_start_box(__('Adding a Group...'), '100%', '', '2', 'center', '');
+        } else {
+            html_start_box(__('Editing Group %s', $id), '100%', '', '2', 'center', '');
+            $group = $this->manager->getGroup($id);
+            $groupName = $group->name;
+        }
+
+        print '<td>' . __('Group Name:') . "<input type='text' name='gname' value='" . htmlspecialchars($groupName) . "'/>\n";
+
+        if ($id > 0) {
+            print " <input type='submit' value='" . __('Update') . "' /></td>\n";
+        } else {
+            print " <input type='submit' value='" . __('Add') . "' /></td>\n";
+        }
+
+        print "<td><input type='hidden' name='action' value='group_update'/></td>";
+        if ($id > 0) {
+            print "<td><input type='hidden' name='id' value='$id' /></td>\n";
+        }
+
+        html_end_box();
+
+        form_end();
 
         $this->cacti_footer();
     }

@@ -1,5 +1,5 @@
 <?php
-    $WEATHERMAP_VERSION="0.98";
+    $WEATHERMAP_VERSION="1.0.0";
     $weathermap_debugging=false;
     $weathermap_debugging_readdata=false;
     $weathermap_map="";

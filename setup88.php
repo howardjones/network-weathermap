@@ -24,7 +24,7 @@ require_once dirname(__FILE__) . "/lib/cacti-plugin-poller.php";
 function plugin_weathermap_version()
 {
     return array('name' => 'weathermap',
-        'version' => '0.98dev',
+        'version' => '1.0.0',
         'longname' => 'PHP Network Weathermap for Cacti 0.8.x',
         'author' => 'Howard Jones',
         'homepage' => 'http://www.network-weathermap.com/',

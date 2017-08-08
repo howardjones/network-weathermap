@@ -10,6 +10,3 @@ include_once dirname(__FILE__) . '/lib/WeatherMapCacti10ManagementPlugin.php';
 $plugin = new WeatherMapCacti10ManagementPlugin($config);
 
 $plugin->main($_REQUEST);
-
-///////////////////////////////////////////////////////////////////////////
-

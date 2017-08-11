@@ -308,7 +308,7 @@ class WeatherMapCactiManagementPlugin extends WeatherMapUIBase
         if (isset($request['id']) && is_numeric($request['id']) &&
             isset($request['order']) && is_numeric($request['order'])
         ) {
-            $this->manager->moveMap($request['id'], $request['order'], -1);
+            $this->manager->moveMap($request['id'], -1);
         }
         header("Location: " . $this->make_url(array("header" => "false")));
     }
@@ -321,7 +321,7 @@ class WeatherMapCactiManagementPlugin extends WeatherMapUIBase
         if (isset($request['id']) && is_numeric($request['id']) &&
             isset($request['order']) && is_numeric($request['order'])
         ) {
-            $this->manager->moveMap($request['id'], $request['order'], +1);
+            $this->manager->moveMap($request['id'], +1);
         }
         header("Location: " . $this->make_url(array("header" => "false")));
     }

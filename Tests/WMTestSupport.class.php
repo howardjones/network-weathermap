@@ -80,7 +80,8 @@ class WMTestSupport
                     "0.97b",
                     "0.97c",
                     "0.98",
-                    "0.98a"
+                    "0.98a",
+                    "1.0.0"
                 );
                 $my_version = array_search($WEATHERMAP_VERSION, $known_versions);
                 $req_version = array_search($required_version, $known_versions);

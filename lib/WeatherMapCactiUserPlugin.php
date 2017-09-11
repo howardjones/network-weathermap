@@ -20,6 +20,9 @@ class WeatherMapCactiUserPlugin extends WeatherMapUIBase
     public $editor_realm;
 
     public $commands = array(
+        'maplist' => array('handler' => 'handleMapList', 'args' => array()),
+        'settings' => array('handler' => 'handleSettings', 'args' => array()),
+
         'viewthumb' => array('handler' => 'handleBigThumb', 'args' => array(array("id", "maphash"), array("time", "int", true))),
         'viewthumb48' => array('handler' => 'handleLittleThumb', 'args' => array(array("id", "maphash"))),
         'viewimage' => array('handler' => 'handleImage', 'args' => array(array("id", "maphash"))),
@@ -84,6 +87,50 @@ class WeatherMapCactiUserPlugin extends WeatherMapUIBase
         $url .= join("&", $parts);
 
         return $url;
+    }
+
+    public function handleMapList($request, $appObject)
+    {
+        header('Content-type: application/json');
+
+        $userId = $this->manager->getUserId();
+        $mapList = $this->manager->getMapsForUser($userId);
+
+        $data = array(
+            'maps' => $mapList,
+            'groups' => $this->manager->getGroups()
+        );
+
+        print json_encode($data);
+    }
+
+    public function handleSettings($request, $appObject)
+    {
+        global $WEATHERMAP_VERSION;
+
+        header('Content-type: application/json');
+
+        $style = $this->manager->getAppSetting("weathermap_pagestyle", 0);
+        $style_text = array("thumbs", "full", "full-first-only");
+        $cycle_time = $this->manager->getAppSetting("weathermap_cycle_refresh", 0);
+        if ($cycle_time == 0) {
+            $cycle_time = 'auto';
+        }
+
+        $data = array(
+            'wm_version' => $WEATHERMAP_VERSION,
+            'page_style' => $style_text[$style],
+            'cycle_time' => (string)$cycle_time,
+            'show_all_tab' => '',
+            'map_selector' => '',
+            'thumb_url' => $this->make_url(array("action" => "viewthumb")),
+            'image_url' => $this->make_url(array("action" => "viewimage")),
+            'editor_url' => '',
+            'docs_url' => '',
+            'management_url' => ''
+        );
+
+        print json_encode($data);
     }
 
     public function handleBigThumb($request, $appObject)

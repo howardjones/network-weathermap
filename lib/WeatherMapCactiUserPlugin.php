@@ -95,10 +95,25 @@ class WeatherMapCactiUserPlugin extends WeatherMapUIBase
 
         $userId = $this->manager->getUserId();
         $mapList = $this->manager->getMapsForUser($userId);
+        $groups = $this->manager->getGroups();
+
+        // filter groups to only contain groups used in $mapList
+        // (no leaking other groups - could be things like customer or project names)
+
+        $seen_group = array();
+        foreach ($mapList as $map) {
+            $seen_group[$map->group_id] = 1;
+        }
+        $new_groups = array();
+        foreach ($groups as $group) {
+            if (array_key_exists($group->id, $seen_group)) {
+                $new_groups []= $group;
+            }
+        }
 
         $data = array(
             'maps' => $mapList,
-            'groups' => $this->manager->getGroups()
+            'groups' => $groups
         );
 
         print json_encode($data);
@@ -116,13 +131,15 @@ class WeatherMapCactiUserPlugin extends WeatherMapUIBase
         if ($cycle_time == 0) {
             $cycle_time = 'auto';
         }
+        $show_all_tab = $this->manager->getAppSetting("weathermap_all_tab", 0);
+        $show_map_selector = $this->manager->getAppSetting("weathermap_map_selector", 0);
 
         $data = array(
             'wm_version' => $WEATHERMAP_VERSION,
             'page_style' => $style_text[$style],
             'cycle_time' => (string)$cycle_time,
-            'show_all_tab' => '',
-            'map_selector' => '',
+            'show_all_tab' => (string)$show_all_tab,
+            'map_selector' => (string)$show_map_selector,
             'thumb_url' => $this->make_url(array("action" => "viewthumb")),
             'image_url' => $this->make_url(array("action" => "viewimage")),
             'editor_url' => '',

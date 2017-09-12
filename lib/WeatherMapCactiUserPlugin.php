@@ -113,7 +113,7 @@ class WeatherMapCactiUserPlugin extends WeatherMapUIBase
 
         $data = array(
             'maps' => $mapList,
-            'groups' => $groups
+            'groups' => $new_groups
         );
 
         print json_encode($data);
@@ -125,26 +125,30 @@ class WeatherMapCactiUserPlugin extends WeatherMapUIBase
 
         header('Content-type: application/json');
 
+        $style_text_options = array("thumbs", "full", "full-first-only");
+        $true_false= array(false, true);
+
         $style = $this->manager->getAppSetting("weathermap_pagestyle", 0);
-        $style_text = array("thumbs", "full", "full-first-only");
+
         $cycle_time = $this->manager->getAppSetting("weathermap_cycle_refresh", 0);
         if ($cycle_time == 0) {
             $cycle_time = 'auto';
         }
+
         $show_all_tab = $this->manager->getAppSetting("weathermap_all_tab", 0);
         $show_map_selector = $this->manager->getAppSetting("weathermap_map_selector", 0);
 
         $data = array(
             'wm_version' => $WEATHERMAP_VERSION,
-            'page_style' => $style_text[$style],
+            'page_style' => $style_text_options[$style],
             'cycle_time' => (string)$cycle_time,
-            'show_all_tab' => (string)$show_all_tab,
-            'map_selector' => (string)$show_map_selector,
+            'show_all_tab' => $true_false[$show_all_tab],
+            'map_selector' => $true_false[$show_map_selector],
             'thumb_url' => $this->make_url(array("action" => "viewthumb")),
             'image_url' => $this->make_url(array("action" => "viewimage")),
-            'editor_url' => '',
-            'docs_url' => '',
-            'management_url' => ''
+            'editor_url' => $this->editor_url,
+            'docs_url' => 'docs/',
+            'management_url' => $this->management_url
         );
 
         print json_encode($data);
@@ -164,6 +168,11 @@ class WeatherMapCactiUserPlugin extends WeatherMapUIBase
     {
         $this->outputMapImage($request['id'], ".");
     }
+
+
+
+
+    // Below here are the old server-side functions that are replaced by client components
 
     public function handleViewMap($request, $appObject)
     {

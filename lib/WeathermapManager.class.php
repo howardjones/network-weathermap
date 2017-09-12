@@ -127,10 +127,12 @@ class WeathermapManager
     public function getMapsForUser($userId, $groupId = null)
     {
         if (is_null($groupId)) {
-            $statement = $this->pdo->prepare("SELECT DISTINCT weathermap_maps.* FROM weathermap_auth,weathermap_maps WHERE weathermap_maps.id=weathermap_auth.mapid AND active='on' AND  (userid=? OR userid=0) ORDER BY sortorder, id");
+            // $statement = $this->pdo->prepare("SELECT DISTINCT weathermap_maps.* FROM weathermap_auth,weathermap_maps WHERE weathermap_maps.id=weathermap_auth.mapid AND active='on' AND  (userid=? OR userid=0) ORDER BY sortorder, id");
+            $statement = $this->pdo->prepare("SELECT DISTINCT group_id, titlecache, filehash, thumb_width, thumb_height, sortorder FROM weathermap_auth,weathermap_maps WHERE weathermap_maps.id=weathermap_auth.mapid AND active='on' AND  (userid=? OR userid=0) ORDER BY group_id, sortorder");
             $statement->execute(array($userId));
         } else {
-            $statement = $this->pdo->prepare("SELECT DISTINCT weathermap_maps.* FROM weathermap_auth,weathermap_maps WHERE weathermap_maps.id=weathermap_auth.mapid AND active='on' AND  weathermap_maps.group_id=? AND  (userid=? OR userid=0) ORDER BY sortorder, id");
+            $statement = $this->pdo->prepare("SELECT DISTINCT group_id, titlecache, filehash, thumb_width, thumb_height, sortorder FROM weathermap_auth,weathermap_maps WHERE weathermap_maps.id=weathermap_auth.mapid AND active='on' AND  weathermap_maps.group_id=? AND  (userid=? OR userid=0) ORDER BY group_id, sortorder");
+            //$statement = $this->pdo->prepare("SELECT DISTINCT weathermap_maps.* FROM weathermap_auth,weathermap_maps WHERE weathermap_maps.id=weathermap_auth.mapid AND active='on' AND  weathermap_maps.group_id=? AND  (userid=? OR userid=0) ORDER BY sortorder, id");
             $statement->execute(array($groupId, $userId));
         }
         $maps = $statement->fetchAll(PDO::FETCH_OBJ);

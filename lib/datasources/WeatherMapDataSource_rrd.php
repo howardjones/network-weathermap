@@ -111,7 +111,7 @@ class WeatherMapDataSource_rrd extends WeatherMapDataSource
                         $this->dataTime = $result['last_time'];
                         wm_debug("RRD ReadData: poller_output - data looks valid\n");
                     } else {
-                        $this->data[$dir] = 0;
+                        $this->data[$dir] = 0.0;
                         wm_debug("RRD ReadData: poller_output - data is either too old, or too new\n");
                     }
                     // now, we can use the local_data_id to get some other useful info
@@ -238,10 +238,10 @@ class WeatherMapDataSource_rrd extends WeatherMapDataSource
 
         if ($data_ok) {
             if ($this->data[IN] === null) {
-                $this->data[IN] = 0;
+                $this->data[IN] = 0.0;
             }
             if ($this->data[OUT] === null) {
-                $this->data[OUT] = 0;
+                $this->data[OUT] = 0.0;
             }
         }
 
@@ -350,10 +350,10 @@ class WeatherMapDataSource_rrd extends WeatherMapDataSource
                     // 'fix' a -1 value to 0, so the whole thing is valid
                     // (this needs a proper fix!)
                     if ($this->data[IN] === null) {
-                        $this->data[IN] = 0;
+                        $this->data[IN] = 0.0;
                     }
                     if ($this->data[OUT] === null) {
-                        $this->data[OUT] = 0;
+                        $this->data[OUT] = 0.0;
                     }
 
                     // break out of the loop here
@@ -379,11 +379,8 @@ class WeatherMapDataSource_rrd extends WeatherMapDataSource
 
         $this->data[IN] = null;
         $this->data[OUT] = null;
+        $dsnames = array(IN=>"traffic_in", OUT=>"traffic_out");
 
-        $dsnames[IN] = "traffic_in";
-        $dsnames[OUT] = "traffic_out";
-        $SQL[IN] = 'select null';
-        $SQL[OUT] = 'select null';
         $rrdfile = $targetstring;
 
         if ($map->get_hint("rrd_default_in_ds") != '') {
@@ -490,12 +487,10 @@ class WeatherMapDataSource_rrd extends WeatherMapDataSource
         // any , with . (there are never thousands separators, luckily)
         //
         if ($this->data[IN] !== null) {
-            $this->data[IN] = floatval(str_replace(",", ".", $this->data[IN]));
-            $this->data[IN] = $this->data[IN] * $multiplier;
+            $this->data[IN] = $multiplier * floatval(str_replace(",", ".", $this->data[IN]));
         }
         if ($this->data[OUT] !== null) {
-            $this->data[OUT] = floatval(str_replace(",", ".", $this->data[OUT]));
-            $this->data[OUT] = $this->data[OUT] * $multiplier;
+            $this->data[OUT] = $multiplier * floatval(str_replace(",", ".", $this->data[OUT]));
         }
 
         return $this->ReturnData();

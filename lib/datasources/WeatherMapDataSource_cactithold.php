@@ -63,6 +63,7 @@ class WeatherMapDataSource_cactithold extends WeatherMapDataSource
             $statement = $pdo->prepare("show tables");
             $statement->execute();
             $result = $statement->fetchall(PDO::FETCH_ASSOC);
+            $tables = array();
 
             foreach ($result as $index => $arr) {
                 foreach ($arr as $t) {

@@ -21,6 +21,12 @@ test-suite/results*
 test-suite/diffs/*
 test-suite/summary.html
 test-suite/summary-failing.html
+test-suite/failing-images.txt
 dev/vagrant-testers/.vagrant/
 releases
 releases/*
+.phan
+*.tar.gz
+dev/Vagrant/settings.sh
+dev/Vagrant/.vagrant
+dev/Vagrant/*.log

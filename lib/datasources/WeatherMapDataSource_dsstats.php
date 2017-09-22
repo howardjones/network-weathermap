@@ -87,8 +87,7 @@ class WeatherMapDataSource_dsstats extends WeatherMapDataSource
         $pdo = weathermap_get_pdo();
 
         $local_data_id = null;
-        $dsnames[IN] = "traffic_in";
-        $dsnames[OUT] = "traffic_out";
+        $dsnames = array(IN => "traffic_in", OUT => "traffic_out");
 
         $inbw = null;
         $outbw = null;

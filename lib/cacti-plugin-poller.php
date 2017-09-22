@@ -34,6 +34,7 @@ function weathermap_poller_output($rrd_update_array)
 
     # especially on Windows, it seems that filenames are not reliable (sometimes \ and sometimes / even though path_rra is always /) .
     # let's make an index from local_data_id to filename, and then use local_data_id as the key...
+    $knownfiles = array();
 
     foreach (array_keys($rrd_update_array) as $key) {
         if (isset($rrd_update_array[$key]['times']) && is_array($rrd_update_array[$key]['times'])) {

@@ -77,8 +77,7 @@ class WeatherMapDataSource_snmpv3 extends WeatherMapDataSource
         if (preg_match('/^snmp3:([^:]+):([^:]+):([^:]+):([^:]+)$/', $targetstring, $matches)) {
             $profile_name = $matches[1];
             $host = $matches[2];
-            $oids[IN] = $matches[3];
-            $oids[OUT] = $matches[4];
+            $oids = array(IN=>$matches[3], OUT=>$matches[4]);
 
             if (($abort_count == 0)
                 || (

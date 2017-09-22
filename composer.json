@@ -24,6 +24,7 @@
     "theseer/phpdox": "*",
     "phploc/phploc": "~3",
     "codacy/coverage": "dev-master",
-    "phpunit/php-code-coverage": "~4"
+    "phpunit/php-code-coverage": "~4",
+    "etsy/phan": "^0.9.4"
   }
 }

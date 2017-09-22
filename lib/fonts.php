@@ -129,6 +129,10 @@ class WMGDFont extends WMFont
 {
     public $gdnumber;
 
+    /**
+     * WMGDFont constructor.
+     * @param int|string $filename
+     */
     public function __construct($filename)
     {
         parent::__construct();
@@ -173,6 +177,10 @@ class WMGDFont extends WMFont
         return true;
     }
 
+    /**
+     * @param string $filename
+     * @return bool
+     */
     private function initGD($filename)
     {
         $gdFontID = imageloadfont($filename);

@@ -483,6 +483,8 @@ class WeatherMapLink extends WeatherMapDataItem
 
         $fontObject->drawImageString($imageRef, $textX, $textY, $text, $this->bwfontcolour->gdallocate($imageRef), $angle);
 
+        // ------
+
         $areaName = "LINK:L" . $this->id . ':' . ($direction + 2);
 
         // the rectangle is about half the size in the HTML, and easier to optimise/detect in the browser

@@ -12,7 +12,7 @@
  *
  * @param string $input String to fix
  *
- * @returns string Fixed string
+ * @return string Fixed string
  *
  */
 function fix_gpc_string($input)

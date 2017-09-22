@@ -174,6 +174,7 @@ class EditorDataPicker extends WeatherMapUIBase
     public function getRecentHosts()
     {
         $recents = array();
+        $last = array();
         if (isset($_SESSION['cacti']['weathermap']['last_used_host_id'][0])) {
             $last['id'] = array_reverse($_SESSION['cacti']['weathermap']['last_used_host_id']);
             $last['name'] = array_reverse($_SESSION['cacti']['weathermap']['last_used_host_name']);
@@ -264,6 +265,7 @@ class MasterCactiPicker
 
     public function last_used()
     {
+        $last = array();
         if (isset($_SESSION['cacti']['weathermap']['last_used_host_id'][0])) {
             print "<b>Last Host Selected:</b><br>";
             $last['id'] = array_reverse($_SESSION['cacti']['weathermap']['last_used_host_id']);

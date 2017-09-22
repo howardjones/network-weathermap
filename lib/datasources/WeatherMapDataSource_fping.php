@@ -11,6 +11,7 @@ class WeatherMapDataSource_fping extends WeatherMapDataSource
     private $addresscache = array();
     private $donepings = false;
     private $results = array();
+    private $fping_cmd;
 
 
     public function __construct()

@@ -767,6 +767,9 @@ class WeatherMapEditorUI extends WeatherMapUIBase
 
         list($titles, $notes, $errorstring) = $this->getExistingConfigs($this->mapDirectory);
 
+        $nicetitles = array();
+        $nicenotes = array();
+
         foreach ($titles as $file => $title) {
             $nicenote = htmlspecialchars($notes[$file]);
             $nicefile = htmlspecialchars($file);

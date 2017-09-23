@@ -1,11 +1,11 @@
 <?php
 
 require_once 'lib/editor.inc.php';
-require_once 'lib/Weathermap.class.php';
+require_once 'lib/Map.php';
 require_once 'lib/geometry.php';
-require_once 'lib/WMPoint.class.php';
+require_once 'lib/Point.php';
 require_once 'lib/WMVector.class.php';
-require_once 'lib/WMLine.class.php';
+require_once 'lib/Line.php';
 
 // so that you can't have the editor active, and not know about it.
 $ENABLED = false;
@@ -573,7 +573,7 @@ if ($mapname == '') {
             // $map->keyx[$scalename] = $x;
             // $map->keyy[$scalename] = $y;
 
-            $map->scales[$scalename]->keypos = new WMPoint($x, $y);
+            $map->scales[$scalename]->keypos = new Point($x, $y);
 
             $map->WriteConfig($mapfile);
             break;

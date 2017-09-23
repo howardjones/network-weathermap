@@ -1,7 +1,7 @@
 <?php
 
 require_once dirname(__FILE__) . '/../lib/all.php';
-require_once dirname(__FILE__) . '/../lib/WeatherMapEditor.class.php';
+require_once dirname(__FILE__) . '/../lib/Editor.php';
 include_once dirname(__FILE__)."/WMTestSupport.class.php";
 
 class WeatherMapEditorTest extends PHPUnit_Framework_TestCase {

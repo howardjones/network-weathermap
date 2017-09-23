@@ -4,7 +4,7 @@
 
 require_once dirname(__FILE__).'/lib/all.php';
 
-require_once dirname(__FILE__).'/lib/WeatherMapEditorUI.class.php';
+require_once dirname(__FILE__) . '/lib/EditorUI.php';
 
 // so that you can't have the editor active, and not know about it.
 $ENABLED = true;
@@ -24,7 +24,7 @@ if (! $ENABLED) {
     exit();
 }
 
-$ui = new WeatherMapEditorUI();
+$ui = new EditorUI();
 $ui->moduleChecks();
 
 chdir(dirname(__FILE__));

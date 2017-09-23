@@ -1,7 +1,7 @@
 <?php
 // require_once 'PHPUnit/Framework.php';
 
-require_once dirname(__FILE__) . '/../lib/HTMLImagemap.class.php';
+require_once dirname(__FILE__) . '/../lib/HTMLImagemap.php';
 
 /**
  * Test class for HTML_Imagemap_Area_Rectangle.

@@ -14,7 +14,7 @@ class DocsTest extends PHPUnit_Framework_TestCase
         $this->assertFileExists($docsIndex);
 
         $map = new WeatherMap();
-        $reader = new WeatherMapConfigReader($map);
+        $reader = new ConfigReader($map);
 
         $keywords = $reader->getAllKeywords();
 

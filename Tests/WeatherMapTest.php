@@ -40,8 +40,8 @@ class WeatherMapTest extends PHPUnit_Framework_TestCase
 
     /**
      * @throws WeathermapInternalFail
-     * @covers WeatherMap::getNode
-     * @covers WeatherMap::getLink
+     * @covers Map::getNode
+     * @covers Map::getLink
      */
     public function testAccessors()
     {
@@ -78,7 +78,7 @@ class WeatherMapTest extends PHPUnit_Framework_TestCase
     }
 
     /**
-     * @covers WeatherMap::processString
+     * @covers Map::processString
      */
     public function testProcessString()
     {

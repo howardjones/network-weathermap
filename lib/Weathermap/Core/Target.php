@@ -1,5 +1,7 @@
 <?php
 
+namespace Weathermap\Core;
+
 /**
  * Class WMTarget
  *
@@ -7,7 +9,7 @@
  * This is to replace an ugly array that gets passed around with mysterious fields.
  *
  */
-class WMTarget
+class Target
 {
     private $finalTargetString;
     private $originalTargetString;
@@ -54,7 +56,7 @@ class WMTarget
 
     /**
      * @param WeatherMapDataItem $mapItem
-     * @param WeatherMap $map
+     * @param Map $map
      */
     public function preProcess(&$mapItem, &$map)
     {

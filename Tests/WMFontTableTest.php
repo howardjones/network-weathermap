@@ -1,6 +1,6 @@
 <?php
 
-require_once dirname(__FILE__) . '/../lib/Weathermap.class.php';
+require_once dirname(__FILE__) . '/../lib/Map.php';
 
 class WMFontTableTest extends PHPUnit_Framework_TestCase
 {

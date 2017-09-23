@@ -21,7 +21,7 @@ if (is_dir($cacti_base) && file_exists($cacti_base . '/include/global.php')) {
         . "\n");
 }
 
-require_once 'Weathermap.class.php';
+require_once 'Map.php';
 require_once 'Console/Getopt.php';
 
 $reverse = 0;

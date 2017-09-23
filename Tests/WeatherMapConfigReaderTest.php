@@ -8,7 +8,7 @@ class WeatherMapConfigReaderTest extends PHPUnit_Framework_TestCase
     public function testInternals()
     {
         $map = new WeatherMap();
-        $reader = new WeatherMapConfigReader($map);
+        $reader = new ConfigReader($map);
 
         $this->assertTrue($reader->selfValidate());
     }

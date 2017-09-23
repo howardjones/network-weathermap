@@ -1,5 +1,5 @@
 <?php
-require_once "lib/Weathermap.class.php";
+require_once "lib/Map.php";
 
 print $WEATHERMAP_VERSION;
 

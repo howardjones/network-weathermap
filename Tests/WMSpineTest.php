@@ -14,15 +14,15 @@ class WMSpineTest extends PHPUnit_Framework_TestCase {
     {
         $testSpine = new WMSpine();
 
-        $testSpine->addPoint(new WMPoint(50,50));
-        $testSpine->addPoint(new WMPoint(70,50)); // redundant
-        $testSpine->addPoint(new WMPoint(150,50));
-        $testSpine->addPoint(new WMPoint(150,100)); // redundant
-        $testSpine->addPoint(new WMPoint(150,150));
-        $testSpine->addPoint(new WMPoint(0,150));
-        $testSpine->addPoint(new WMPoint(0,0));
-        $testSpine->addPoint(new WMPoint(50,50)); // redundant
-        $testSpine->addPoint(new WMPoint(100,100));
+        $testSpine->addPoint(new Point(50,50));
+        $testSpine->addPoint(new Point(70,50)); // redundant
+        $testSpine->addPoint(new Point(150,50));
+        $testSpine->addPoint(new Point(150,100)); // redundant
+        $testSpine->addPoint(new Point(150,150));
+        $testSpine->addPoint(new Point(0,150));
+        $testSpine->addPoint(new Point(0,0));
+        $testSpine->addPoint(new Point(50,50)); // redundant
+        $testSpine->addPoint(new Point(100,100));
 
         $newSpine = $testSpine->simplify();
 
@@ -34,13 +34,13 @@ class WMSpineTest extends PHPUnit_Framework_TestCase {
     {
         $testSpine = new WMSpine();
 
-        $testSpine->addPoint(new WMPoint(50,50));
-        $testSpine->addPoint(new WMPoint(150,50));
-        $testSpine->addPoint(new WMPoint(150,150));
-        $testSpine->addPoint(new WMPoint(0,150));
-        $testSpine->addPoint(new WMPoint(0,0));
+        $testSpine->addPoint(new Point(50,50));
+        $testSpine->addPoint(new Point(150,50));
+        $testSpine->addPoint(new Point(150,150));
+        $testSpine->addPoint(new Point(0,150));
+        $testSpine->addPoint(new Point(0,0));
 
-        $testSpine->addPoint(new WMPoint(100,100));
+        $testSpine->addPoint(new Point(100,100));
 
         /*
       \
@@ -66,22 +66,22 @@ class WMSpineTest extends PHPUnit_Framework_TestCase {
  **/
         // A
         $result = $testSpine->findPointAndAngleAtDistance(100);
-        $this->assertTrue( $result[0]->identical(new WMPoint(150,50)) );
+        $this->assertTrue( $result[0]->identical(new Point(150,50)) );
 
         // B
         $result = $testSpine->findPointAndAngleAtDistance(90);
-        $this->assertTrue( $result[0]->identical(new WMPoint(140,50)) );
+        $this->assertTrue( $result[0]->identical(new Point(140,50)) );
         $this->assertEquals(0, $result[2]);
 
         //C
         $result = $testSpine->findPointAndAngleAtDistance(110);
-        $this->assertTrue( $result[0]->identical(new WMPoint(150,60)) );
+        $this->assertTrue( $result[0]->identical(new Point(150,60)) );
         $this->assertEquals(-90, $result[2]);
 
         // D
         $result = $testSpine->findPointAndAngleAtDistance(300);
 
-        $this->assertTrue( $result[0]->closeEnough(new WMPoint(50,150)), $result[0]." isn't right" );
+        $this->assertTrue( $result[0]->closeEnough(new Point(50,150)), $result[0]." isn't right" );
         $this->assertEquals(180, $result[2]);
 
         // E
@@ -93,16 +93,16 @@ class WMSpineTest extends PHPUnit_Framework_TestCase {
     {
         $testSpine = new WMSpine();
 
-        $testSpine->addPoint(new WMPoint(50,50));
-        $testSpine->addPoint(new WMPoint(150,50));
-        $testSpine->addPoint(new WMPoint(150,150));
-        $testSpine->addPoint(new WMPoint(0,150));
-        $testSpine->addPoint(new WMPoint(0,0));
+        $testSpine->addPoint(new Point(50,50));
+        $testSpine->addPoint(new Point(150,50));
+        $testSpine->addPoint(new Point(150,150));
+        $testSpine->addPoint(new Point(0,150));
+        $testSpine->addPoint(new Point(0,0));
 
 
 
         $result = $testSpine->findPointAtDistance(0);
-        $this->assertTrue( $result[0]->identical(new WMPoint(50,50)) );
+        $this->assertTrue( $result[0]->identical(new Point(50,50)) );
 
     }
 
@@ -110,9 +110,9 @@ class WMSpineTest extends PHPUnit_Framework_TestCase {
     {
         $testSpine = new WMSpine();
 
-        $testSpine->addPoint(new WMPoint(50,50));
-        $testSpine->addPoint(new WMPoint(150,50));
-        $testSpine->addPoint(new WMPoint(150,150));
+        $testSpine->addPoint(new Point(50,50));
+        $testSpine->addPoint(new Point(150,50));
+        $testSpine->addPoint(new Point(150,150));
 
         $this->assertEquals(200, $testSpine->totalDistance());
         $this->assertEquals(3, $testSpine->pointCount());
@@ -123,8 +123,8 @@ class WMSpineTest extends PHPUnit_Framework_TestCase {
         $index = $testSpine->findIndexNearDistance(90);
         $this->assertEquals(0, $index);
 
-        $testSpine->addPoint(new WMPoint(0,150));
-        $testSpine->addPoint(new WMPoint(0,0));
+        $testSpine->addPoint(new Point(0,150));
+        $testSpine->addPoint(new Point(0,0));
 
         $this->assertEquals(500, $testSpine->totalDistance());
 

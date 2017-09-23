@@ -1,14 +1,14 @@
 <?php
 
 require_once dirname(__FILE__) . '/../lib/all.php';
-require_once dirname(__FILE__) . '/../lib/WeatherMapEditor.class.php';
-require_once dirname(__FILE__) . '/../lib/WeatherMapEditorUI.class.php';
+require_once dirname(__FILE__) . '/../lib/Editor.php';
+require_once dirname(__FILE__) . '/../lib/EditorUI.php';
 
 class WeatherMapEditorUITest extends PHPUnit_Framework_TestCase
 {
     function testParameterValidation()
     {
-        $ui = new WeatherMapEditorUI();
+        $ui = new EditorUI();
 
         $this->assertTrue($ui->validateArgument("int", 10), "Actual integer IS an integer");
         $this->assertTrue($ui->validateArgument("int", "10"), "String containing integer IS an integer");
@@ -41,7 +41,7 @@ class WeatherMapEditorUITest extends PHPUnit_Framework_TestCase
      */
     function testValidateArgsException()
     {
-        $ui = new WeatherMapEditorUI();
+        $ui = new EditorUI();
 
         // there is no type called 'black'
         $this->assertFalse($ui->validateArgument("black", "white"), "Black is not a recognised type");
@@ -49,7 +49,7 @@ class WeatherMapEditorUITest extends PHPUnit_Framework_TestCase
 
     function testValidCommandMap()
     {
-        $ui = new WeatherMapEditorUI();
+        $ui = new EditorUI();
 
         foreach ($ui->commands as $action => $command) {
 
@@ -78,7 +78,7 @@ class WeatherMapEditorUITest extends PHPUnit_Framework_TestCase
 
     function testUIInternals()
     {
-        $ui = new WeatherMapEditorUI();
+        $ui = new EditorUI();
 
         $this->assertEquals("New Title", $ui->getTitleFromConfig(dirname(__FILE__) . "/../test-suite/tests/conf_title.conf"));
         $this->assertEquals("New <b>Title</b>", $ui->getTitleFromConfig(dirname(__FILE__) . "/../test-suite/tests/conf_title2.conf"));

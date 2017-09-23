@@ -11,8 +11,8 @@ class WMPointTest extends PHPUnit_Framework_TestCase
 
     public function testLERP()
     {
-        $p1 =  new WMPoint(100,200);
-        $p2 = new WMPoint(200,100);
+        $p1 =  new Point(100,200);
+        $p2 = new Point(200,100);
 
         $p3 = $p1->LERPWith($p2, 0);
         $this->assertTrue($p3->identical($p1));

@@ -16,40 +16,40 @@ require_once dirname(__FILE__) . '/exceptions.php';
 require_once dirname(__FILE__) . '/WMDebug.php';
 require_once dirname(__FILE__) . '/WMStats.php';
 
-require_once dirname(__FILE__) . '/HTMLImagemap.class.php';
+require_once dirname(__FILE__) . '/HTMLImagemap.php';
 
-require_once dirname(__FILE__) . '/base-classes.php';
-require_once dirname(__FILE__) . '/plugin-base-classes.php';
-require_once dirname(__FILE__) . '/WeatherMapDataItem.class.php';
+require_once dirname(__FILE__) . '/MapBase.php';
+require_once dirname(__FILE__) . '/plugin-MapBase.php';
+require_once dirname(__FILE__) . '/MapDataItem.php';
 
-require_once dirname(__FILE__) . "/WeatherMapConfigReader.class.php";
+require_once dirname(__FILE__) . "/ConfigReader.php";
 
-require_once dirname(__FILE__) . '/fonts.php';
-require_once dirname(__FILE__) . '/WeatherMapTextItem.class.php';
-require_once dirname(__FILE__) . '/WeatherMapScale.class.php';
-require_once dirname(__FILE__) . '/Weathermap.class.php';
+require_once dirname(__FILE__) . '/WMFont.php';
+require_once dirname(__FILE__) . '/MapTextItem.php';
+require_once dirname(__FILE__) . '/MapScale.php';
+require_once dirname(__FILE__) . '/Map.php';
 
 require_once dirname(__FILE__) . '/WeatherMap.functions.php';
-require_once dirname(__FILE__) . '/WMUtility.class.php';
+require_once dirname(__FILE__) . '/Utility.php';
 //require_once dirname(__FILE__) . '/WMImageUtility.php';
 require_once dirname(__FILE__) . '/WMImageLoader.class.php';
 
 require_once dirname(__FILE__) . '/image-functions.php';
 require_once dirname(__FILE__) . '/geometry.php';
-require_once dirname(__FILE__) . '/WMPoint.class.php';
+require_once dirname(__FILE__) . '/Point.php';
 require_once dirname(__FILE__) . '/WMVector.class.php';
-require_once dirname(__FILE__) . '/WMLine.class.php';
-require_once dirname(__FILE__) . '/WMRectangle.class.php';
+require_once dirname(__FILE__) . '/Line.php';
+require_once dirname(__FILE__) . '/Rectangle.php';
 require_once dirname(__FILE__) . '/WMBoundingBox.class.php';
 require_once dirname(__FILE__) . '/CatmullRom.class.php';
 
-require_once dirname(__FILE__) . '/WMSpine.class.php';
-require_once dirname(__FILE__) . '/WMLinkGeometry.class.php';
-require_once dirname(__FILE__) . '/WMAngledLinkGeometry.class.php';
-require_once dirname(__FILE__) . '/WMCurvedLinkGeometry.class.php';
-require_once dirname(__FILE__) . '/WMLinkGeometryFactory.class.php';
+require_once dirname(__FILE__) . '/Spine.php';
+require_once dirname(__FILE__) . '/LinkGeometry.php';
+require_once dirname(__FILE__) . '/AngledLinkGeometry.php';
+require_once dirname(__FILE__) . '/CurvedLinkGeometry.php';
+require_once dirname(__FILE__) . '/LinkGeometryFactory.php';
 
-require_once dirname(__FILE__) . '/WMColour.class.php';
+require_once dirname(__FILE__) . '/Colour.php';
 require_once dirname(__FILE__) . '/WMTarget.class.php';
 
 # require_once dirname(__FILE__) . '/WMNodeIcon.class.php';

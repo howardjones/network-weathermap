@@ -10,7 +10,7 @@
     }
   ],
   "require": {
-    "ulrichsg/getopt-php": "^2.3",
+    "ulrichsg/getopt-php": "~3",
     "erusev/parsedown": "^1.6"
   },
   "require-dev": {
@@ -26,5 +26,8 @@
     "codacy/coverage": "dev-master",
     "phpunit/php-code-coverage": "~4",
     "etsy/phan": "^0.9.4"
+  },
+  "autoload": {
+    "psr-0": {"Weathermap": "lib/"}
   }
 }

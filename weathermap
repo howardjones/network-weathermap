@@ -1,17 +1,179 @@
 #!/usr/bin/php
 <?php
 
+use GetOpt\GetOpt;
+use GetOpt\Option;
+use GetOpt\Command;
+use GetOpt\ArgumentException;
+
+require_once __DIR__ . '/vendor/autoload.php';
+
+// TODO - this should come from the Core
+define('NAME', 'PHP Network Weathermap');
+define('VERSION', '1.0.0');
+
 // PHP Weathermap 0.98
 // Copyright Howard Jones, 2005-2016 howie@thingy.com
 // http://www.network-weathermap.com/
 // Released under the GNU Public License
-require_once 'Console/Getopt.php';
+//require_once 'Console/Getopt.php';
 
-require_once 'lib/Map.php';
+//if (!wm_module_checks()) {
+//    die("Quitting: Module checks failed.\n");
+//}
 
-if (!wm_module_checks()) {
-    die("Quitting: Module checks failed.\n");
+$getOpt = new \GetOpt\GetOpt(null, [\GetOpt\GetOpt::SETTING_STRICT_OPERANDS => true]);
+
+$getOpt->addOptions(array(
+        Option::create(null, 'version', GetOpt::NO_ARGUMENT)
+            ->setDescription('Show version info and quit'),
+        Option::create('h', 'help', GetOpt::NO_ARGUMENT)
+            ->setDescription('Show this help and quit'),
+
+        Option::create(null, 'config', GetOpt::REQUIRED_ARGUMENT)
+            ->setDescription('filename to read from. Default weathermap.conf')
+            ->setArgumentName('filename')
+            ->setDefaultValue('weathermap.conf'),
+        Option::create(null, 'output', GetOpt::REQUIRED_ARGUMENT)
+            ->setDescription('filename to write image. Default weathermap.png')
+            ->setArgumentName('filename')
+            ->setDefaultValue('weathermap.png'),
+        Option::create(null, 'htmloutput', GetOpt::REQUIRED_ARGUMENT)
+            ->setDescription('filename to write HTML. Default weathermap.html')
+            ->setArgumentName('filename')
+            ->setDefaultValue('weathermap.html'),
+
+        Option::create(null, 'image-uri', GetOpt::REQUIRED_ARGUMENT)
+            ->setArgumentName('uri')
+            ->setDescription('URI to prefix <img> tags in HTML output'),
+
+        Option::create(null, 'define', GetOpt::MULTIPLE_ARGUMENT)
+            ->setArgumentName('name=value')
+            ->setDescription('Define internal variables (equivalent to global SET in config file)'),
+        Option::create(null, 'stats', GetOpt::NO_ARGUMENT)
+            ->setDescription('produce statistics for map after completion'),
+
+        Option::create(null, 'bulge', GetOpt::NO_ARGUMENT)
+            ->setDescription('Enable link-bulging mode. See manual.'),
+        Option::create(null, 'no-data', GetOpt::NO_ARGUMENT)
+            ->setDescription('skip the data-reading process (just a \'grey\' map)'),
+        Option::create(null, 'randomdata', GetOpt::NO_ARGUMENT)
+            ->setDescription('skip the data-reading process, generate random data'),
+
+        Option::create(null, 'debug', GetOpt::NO_ARGUMENT)
+            ->setDescription('produce (LOTS) of debugging information during run'),
+        Option::create(null, 'no-warn', GetOpt::REQUIRED_ARGUMENT)
+            ->setDescription('suppress warnings with listed errorcodes (comma-separated)')
+            ->setArgumentName('WMxxx_errorcode'),
+        Option::create(null, 'dump-after', GetOpt::NO_ARGUMENT)
+            ->setDescription('(development) dump all internal PHP structures (HUGE)'),
+        Option::create(null, 'uberdebug', GetOpt::NO_ARGUMENT)
+            ->setDescription('produce even more debug information'),
+        Option::create(null, 'setdebug', GetOpt::NO_ARGUMENT)
+            ->setDescription('produce debug information related to map variables (SET)'),
+
+        Option::create(null, 'dump-config', GetOpt::REQUIRED_ARGUMENT)
+            ->setArgumentName('filename')
+            ->setDescription('(development) dump config to a new file (testing editor)'),
+        Option::create(null, 'dump-json', GetOpt::REQUIRED_ARGUMENT)
+            ->setArgumentName('filename')
+            ->setDescription('(development) dump JSON config to a new file'),
+
+
+    )
+);
+
+// process arguments and catch user errors
+try {
+    $getOpt->process();
+} catch (ArgumentException $exception) {
+    file_put_contents('php://stderr', $exception->getMessage() . PHP_EOL);
+    echo PHP_EOL . $getOpt->getHelpText();
+    exit;
 }
+
+// show version and quit
+if ($getOpt->getOption('version')) {
+    echo sprintf('%s: %s' . PHP_EOL, NAME, VERSION);
+    exit;
+}
+
+// show help and quit
+if ($getOpt->getOption('help')) {
+    echo $getOpt->getHelpText();
+    exit;
+}
+
+print_r($getOpt->getOptions());
+
+print $getOpt->getOption('bulge');
+
+$options_output = array();
+
+$configfile = $getOpt->getOption('config');
+$htmlfile = $getOpt->getOption('htmloutput');
+$imagefile = $getOpt->getOption('output');
+$options_output['imageuri'] = $getOpt->getOption('image-uri');
+
+if ($getOpt->getOption('bulge') === 1) {
+    $options_output['widthmod'] = true;
+}
+if ($getOpt->getOption('sizedebug') === 1) {
+    $options_output['sizedebug'] = true;
+}
+if ($getOpt->getOption('no-data') === 1) {
+    $options_output['sizedebug'] = true;
+}
+if ($getOpt->getOption('debug') === 1) {
+    $options_output['debugging'] = true;
+}
+if ($getOpt->getOption('uberdebug') === 1) {
+    $options_output['debugging'] = true;
+    // allow ALL trace messages (normally we block some of the chatty ones)
+    $weathermap_debug_suppress = array();
+}
+
+if ($getOpt->getOption('no-warn') != '') {
+    // allow disabling of warnings from the command-line, too (mainly for the rrdtool warning)
+    $suppress_warnings = explode(",", $getOpt->getOption('no-warn'));
+    foreach ($suppress_warnings as $s) {
+        $weathermap_error_suppress[] = strtoupper($s);
+    }
+}
+
+$define_array = $getOpt->getOption('define');
+foreach ($define_array as $define) {
+    preg_match("/^([^=]+)=(.*)\s*$/", $define, $matches);
+    if (isset($matches[2])) {
+        $varname = $matches[1];
+        $value = $matches[2];
+        wm_debug(">> $varname = '$value'\n");
+        // save this for later, so that when the map object exists, it can be defined
+        $defines[$varname] = $value;
+    } else {
+        print "WARNING: --define format is:  --define name=value\n";
+    }
+}
+
+// set this BEFORE we create the map object, so we get the debug output from Reset(), as well
+if (isset($options_output['debugging']) && $options_output['debugging']) {
+    $weathermap_debugging = true;
+
+    $weathermap_debugging = true;
+    // enable assertion handling
+    assert_options(ASSERT_ACTIVE, 1);
+    assert_options(ASSERT_WARNING, 0);
+    assert_options(ASSERT_QUIET_EVAL, 1);
+
+    // Set up the callback
+    assert_options(ASSERT_CALLBACK, 'my_assert_handler');
+
+    wm_debug("------------------------------------\n");
+    wm_debug("Starting PHP-Weathermap run, with config: $configfile\n");
+    wm_debug("------------------------------------\n");
+}
+
+exit();
 
 $output = "html";
 $configfile = "weathermap.conf";
@@ -73,78 +235,8 @@ $options_output = array();
 if (sizeof($gopts) > 0) {
     foreach ($gopts as $o) {
         switch ($o[0]) {
-            case '--config':
-                $configfile = $o[1];
-                break;
-
-            case '--htmloutput':
-                $htmlfile = $o[1];
-                break;
-
-            case '--dumpafter':
-                $dumpafter = 1;
-                break;
-
-            case '--image-uri':
-                // $map->imageuri=$o[1];
-                $options_output['imageuri'] = $o[1];
-                break;
-
-            case '--dumpconfig':
-                $dumpconfig = $o[1];
-                break;
-            case '--dumpjson':
-                $dumpjson = $o[1];
-                break;
-
             case '--randomdata':
                 $randomdata = 1;
-                break;
-
-            case '--stats':
-                $dumpstats = 1;
-                break;
-            case '--no-warn':
-                // allow disabling of warnings from the command-line, too (mainly for the rrdtool warning)
-                $suppress_warnings = explode(",", $o[1]);
-                foreach ($suppress_warnings as $s) {
-                    $weathermap_error_suppress[] = strtoupper($s);
-                }
-                break;
-
-            case '--uberdebug':
-                // allow ALL trace messages (normally we block some of the chatty ones)
-                $weathermap_debug_suppress = array();
-            // FALL THROUGH
-            case '--debug':
-                $options_output['debugging'] = true;
-                $weathermap_debugging = true;
-
-                // enable assertion handling
-                assert_options(ASSERT_ACTIVE, 1);
-                assert_options(ASSERT_WARNING, 0);
-                assert_options(ASSERT_QUIET_EVAL, 1);
-
-                // Set up the callback
-                assert_options(ASSERT_CALLBACK, 'my_assert_handler');
-
-                break;
-
-            case '--setdebug':
-                $setdebug = true;
-                break;
-
-            case '--sizedebug':
-            case '--no-data':
-                $options_output['sizedebug'] = true;
-                break;
-
-            case '--bulge':
-                $options_output['widthmod'] = true;
-                break;
-
-            case '--output':
-                $imagefile = $o[1];
                 break;
 
             case '--define':
@@ -160,39 +252,6 @@ if (sizeof($gopts) > 0) {
                 }
                 break;
 
-            case '--version':
-                print 'PHP Network Weathermap v' . $WEATHERMAP_VERSION . "\n";
-                exit();
-                break;
-
-            case '--help':
-                print 'PHP Network Weathermap v' . $WEATHERMAP_VERSION . "\n";
-                print "Copyright Howard Jones, 2005-2017 howie@thingy.com\nReleased under the GNU Public License\nhttp://www.network-weathermap.com/\n\n";
-
-                print "Usage: php weathermap [options]\n\n";
-
-                print " --config {filename}      -  filename to read from. Default weathermap.conf\n";
-                print " --output {filename}      -  filename to write image. Default weathermap.png\n";
-                print " --htmloutput {filename}  -  filename to write HTML. Default weathermap.html\n\n";
-
-                print " --image-uri {uri}        -  URI to prefix <img> tags in HTML.\n";
-                print " --bulge                  -  Enable link-bulging mode. See manual.\n\n";
-
-                print " --define name=value      -  Define internal variables\n";
-                print "                             (equivalent to global SET in config file)\n\n";
-
-                print " --no-data                -  skip the data-reading process (just a 'grey' map)\n";
-                print " --randomdata             -  as above, but use random data\n";
-                print " --debug                  -  produce (LOTS) of debugging information during run\n";
-                print " --no-warn={errorcode}[,{errorcode}] - suppress warnings with listed errorcodes\n";
-                print " --dump-after             -  dump all internal PHP structures (HUGE)\n";
-                print " --dumpconfig {filename}  -  filename to write a new config to (for testing)\n\n";
-
-                print " --help                   -  show this help\n";
-                print " --version                -  show version number\n\n";
-                print "More info at http://www.network-weathermap.com/\n";
-                exit();
-                break;
         }
     }
 }
@@ -279,19 +338,19 @@ if ($map->ReadConfig($configfile)) {
         fclose($fd);
     }
 
-    if ($dumpconfig != '') {
-        $map->WriteConfig($dumpconfig);
+    if ($getOpt->getOption('dump-config') != '') {
+        $map->WriteConfig($getOpt->getOption('dump-config'));
     }
 
-    if ($dumpjson != '') {
+    if ($getOpt->getOption('dump-json') != '') {
         print "===\n";
-        $fd = fopen($dumpjson, "w");
+        $fd = fopen($getOpt->getOption('dump-json'), "w");
         fputs($fd, $map->getJSONConfig());
         fclose($fd);
         print "===\n";
     }
 
-    if ($dumpstats != '') {
+    if ($getOpt->getOption('stats') === 1) {
         $map->DumpStats();
     }
 
@@ -299,11 +358,11 @@ if ($map->ReadConfig($configfile)) {
         $map->WriteDataFile($map->dataoutputfile);
     }
 
-    if ($dumpafter == 1) {
+    if ($getOpt->getOption('dump-after') === 1) {
         print_r($map);
     }
 
-    if ($setdebug) {
+    if ($getOpt->getOption('setdebug') === 1) {
         foreach ($map->buildAllItemsList() as $item) {
             print "$item->name :\n";
             foreach ($item->hints as $n => $v) {

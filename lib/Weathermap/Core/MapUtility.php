@@ -214,7 +214,7 @@ class MapUtility
     {
         if (preg_match('/^([-+]?\d+):([-+]?\d+)$/', $offsetstring, $matches)) {
             self::wm_debug("Numeric Offset found\n");
-            return (array($matches[1], $matches[2]));
+            return array($matches[1], $matches[2]);
         }
 
         if (preg_match('/(NE|SE|NW|SW|N|S|E|W|C)(\d+)?$/i', $offsetstring, $matches)) {
@@ -224,14 +224,15 @@ class MapUtility
         if (preg_match('/(-?\d+)r(\d+)$/i', $offsetstring, $matches)) {
             $angle = intval($matches[1]);
             $distance = intval($matches[2]);
-            $rangle = deg2rad($angle);
+            $radianAngle = deg2rad($angle);
 
-            $offsets = array($distance * sin($rangle), -$distance * cos($rangle));
+            $offsets = array($distance * sin($radianAngle), -$distance * cos($radianAngle));
 
             return $offsets;
         }
 
         self::wm_warn("Got a position offset that didn't make sense ($offsetstring).");
-        return (array(0, 0));
+
+        return array(0, 0);
     }
 }

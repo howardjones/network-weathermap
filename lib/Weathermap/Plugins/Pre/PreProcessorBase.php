@@ -8,6 +8,9 @@
 
 namespace Weathermap\Plugins\Pre;
 
+use Weathermap\Core\Map;
+
+
 /**
  * Class WeatherMapPreProcessor
  *
@@ -15,9 +18,10 @@ namespace Weathermap\Plugins\Pre;
  */
 class PreProcessorBase
 {
+    /** @var  Map */
     protected $owner;
 
-    public function Init(&$map)
+    public function init(&$map)
     {
         $this->owner = $map;
 
@@ -27,7 +31,7 @@ class PreProcessorBase
     /**
      * The only API for a PreProcessor - do whatever it is that you are supposed to do.
      *
-     * @param WeatherMap $map the WeatherMap main object
+     * @param Map $map the WeatherMap main object
      * @return bool Success/Failure? Not currently interpreted.
      */
     public function run()

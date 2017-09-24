@@ -24,6 +24,9 @@
 namespace Weathermap\Plugins\Datasources;
 
 use Weathermap\Core\MapUtility;
+use Weathermap\Core\Map;
+use Weathermap\Core\MapDataItem;
+use PDO;
 
 class WeatherMapDataSource_cactithold extends DatasourceBase
 {
@@ -106,8 +109,8 @@ class WeatherMapDataSource_cactithold extends DatasourceBase
 
     /**
      * @param string $targetstring The string from the config file
-     * @param WeatherMap $map A reference to the map object (redundant)
-     * @param WeatherMapDataItem $item A reference to the object this target is attached to
+     * @param Map $map A reference to the map object (redundant)
+     * @param MapDataItem $item A reference to the object this target is attached to
      * @return array invalue, outvalue, unix timestamp that the data was valid
      */
     public function readData($targetstring, &$map, &$item)
@@ -202,18 +205,18 @@ class WeatherMapDataSource_cactithold extends DatasourceBase
 
                     $this->data[IN] = $state;
                     $this->data[OUT] = 0;
-                    $item->add_note("state", $statename);
-                    $item->add_note("cacti_description", $result['description']);
+                    $item->addNote("state", $statename);
+                    $item->addNote("cacti_description", $result['description']);
 
-                    $item->add_note("cacti_hostname", $result['hostname']);
-                    $item->add_note("cacti_curtime", $result['cur_time']);
-                    $item->add_note("cacti_avgtime", $result['avg_time']);
-                    $item->add_note("cacti_mintime", $result['min_time']);
-                    $item->add_note("cacti_maxtime", $result['max_time']);
-                    $item->add_note("cacti_availability", $result['availability']);
+                    $item->addNote("cacti_hostname", $result['hostname']);
+                    $item->addNote("cacti_curtime", $result['cur_time']);
+                    $item->addNote("cacti_avgtime", $result['avg_time']);
+                    $item->addNote("cacti_mintime", $result['min_time']);
+                    $item->addNote("cacti_maxtime", $result['max_time']);
+                    $item->addNote("cacti_availability", $result['availability']);
 
-                    $item->add_note("cacti_faildate", $result['status_fail_date']);
-                    $item->add_note("cacti_recdate", $result['status_rec_date']);
+                    $item->addNote("cacti_faildate", $result['status_fail_date']);
+                    $item->addNote("cacti_recdate", $result['status_rec_date']);
                 }
                 MapUtility::wm_debug("CactiTHold ReadData: Basic state for host $id is $state/$statename\n");
 
@@ -254,15 +257,15 @@ class WeatherMapDataSource_cactithold extends DatasourceBase
                 if (($numfailing > 0) && ($numthresh > 0) && ($state == 3)) {
                     $state = 4;
                     $statename = "tholdbreached";
-                    $item->add_note("state", $statename);
-                    $item->add_note("thold_failcount", $numfailing);
-                    $item->add_note("thold_failpercent", ($numfailing / $numthresh) * 100);
+                    $item->addNote("state", $statename);
+                    $item->addNote("thold_failcount", $numfailing);
+                    $item->addNote("thold_failpercent", ($numfailing / $numthresh) * 100);
                     $this->data[IN] = $state;
                     $this->data[OUT] = $numfailing;
                     MapUtility::wm_debug("CactiTHold ReadData: State is $state/$statename\n");
                 } elseif ($numthresh > 0) {
-                    $item->add_note("thold_failcount", 0);
-                    $item->add_note("thold_failpercent", 0);
+                    $item->addNote("thold_failcount", 0);
+                    $item->addNote("thold_failpercent", 0);
                     MapUtility::wm_debug("CactiTHold ReadData: Leaving state as $state\n");
                 }
             }

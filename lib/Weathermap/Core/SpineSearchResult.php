@@ -15,7 +15,7 @@ namespace Weathermap\Core;
  */
 class SpineSearchResult
 {
-    /** @var  WMPoint $point */
+    /** @var  Point $point */
     public $point;
     /** @var  float $distance */
     public $distance;

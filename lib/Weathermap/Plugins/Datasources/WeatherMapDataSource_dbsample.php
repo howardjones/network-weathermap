@@ -6,6 +6,12 @@
 
 namespace Weathermap\Plugins\Datasources;
 
+use Weathermap\Core\MapUtility;
+use Weathermap\Core\Map;
+use Weathermap\Core\MapDataItem;
+use PDO;
+use PDOException;
+
 class WeatherMapDataSource_dbsample extends DatasourceBase
 {
 
@@ -28,7 +34,12 @@ class WeatherMapDataSource_dbsample extends DatasourceBase
         return (true);
     }
 
-
+    /**
+     * @param string $targetstring
+     * @param Map $map
+     * @param MapDataItem $item
+     * @return array
+     */
     public function readData($targetstring, &$map, &$item)
     {
         $pdo = null;
@@ -37,10 +48,10 @@ class WeatherMapDataSource_dbsample extends DatasourceBase
 
 
         if (preg_match('/^dbplug:([^:]+)$/', $targetstring, $matches)) {
-            $database_user = $map->get_hint('dbplug_dbuser');
-            $database_pass = $map->get_hint('dbplug_dbpass');
-            $database_name = $map->get_hint('dbplug_dbname');
-            $database_host = $map->get_hint('dbplug_dbhost');
+            $database_user = $map->getHint('dbplug_dbuser');
+            $database_pass = $map->getHint('dbplug_dbpass');
+            $database_name = $map->getHint('dbplug_dbname');
+            $database_host = $map->getHint('dbplug_dbhost');
 
 
             try {
@@ -48,7 +59,7 @@ class WeatherMapDataSource_dbsample extends DatasourceBase
                 $pdo = new PDO("mysql:host=$database_host;dbname=$database_name", $database_user, $database_pass);
                 $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
             } catch (PDOException $e) {
-                wm_warn($e->getMessage());
+                MapUtility::wm_warn($e->getMessage());
             }
 
             if ($pdo) {
@@ -56,7 +67,7 @@ class WeatherMapDataSource_dbsample extends DatasourceBase
                 $result = $statement->execute(array($matches[1]));
 
                 if (!$result) {
-                    wm_warn("dbsample ReadData: Invalid query: " . $pdo->errorCode() . "\n");
+                    MapUtility::wm_warn("dbsample ReadData: Invalid query: " . $pdo->errorCode() . "\n");
                 } else {
                     $row = $statement->fetch(PDO::FETCH_ASSOC);
                     $this->data[IN] = $row['infield'];

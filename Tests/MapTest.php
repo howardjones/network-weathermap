@@ -108,8 +108,8 @@ class MapTest extends PHPUnit_Framework_TestCase
 
         // $weathermap_debugging = TRUE;
 
-        $n1->add_note("note1","Data from another plugin");
-        $n1->add_hint("note2","User input");
+        $n1->addNote("note1","Data from another plugin");
+        $n1->addHint("note2","User input");
 
         // testing notes-inclusion/exclusion
         $this->assertEquals("[UNKNOWN]", $this->object->processString("{node:this:note1}", $n1, false, false));
@@ -123,12 +123,12 @@ class MapTest extends PHPUnit_Framework_TestCase
         $this->assertEquals("Some Simple Links and Nodes", $this->object->processString("{map:title}", $l1, true, false));
 
         // hints "overwrite" internal variables
-        $this->object->add_hint("title", "fish");
+        $this->object->addHint("title", "fish");
         $this->assertEquals("fish", $this->object->processString("{map:title}", $n1, true, false));
 
         // and notes might "overwrite" internal variables depending on where we are (not in TARGETs for example)
-        $this->object->delete_hint("title");
-        $this->object->add_note("title", "cat");
+        $this->object->deleteHint("title");
+        $this->object->addNote("title", "cat");
         $this->assertEquals("cat", $this->object->processString("{map:title}", $n1, true, false));
         $this->assertEquals("Some Simple Links and Nodes", $this->object->processString("{map:title}", $n1, false, false));
 

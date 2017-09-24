@@ -10,9 +10,9 @@ namespace Weathermap\Core;
 class LinkGeometry
 {
     protected $linkWidths;
-    /** @var  WMColour[] $fillColours */
+    /** @var  Colour[] $fillColours */
     protected $fillColours;
-    /** @var WMColour $outlineColour */
+    /** @var Colour $outlineColour */
     protected $outlineColour;
     protected $directions;
     protected $splitPosition;
@@ -22,10 +22,10 @@ class LinkGeometry
     protected $name;
 
     protected $controlPoints; // the points defined by the user for this link
-    /** @var  WMSpine $curvePoints the calculated spine for the whole link, used for distance calculations */
+    /** @var  Spine $curvePoints the calculated spine for the whole link, used for distance calculations */
     protected $curvePoints;
 
-    /** @var  WMSpine[] $splitCurves */
+    /** @var  Spine[] $splitCurves */
     protected $splitCurves; // The spines for each direction of the link
     protected $drawnCurves; // The actual list of WMPoints that will be drawn
     protected $midDistance; // The distance along to link where the split for arrowheads will be
@@ -37,7 +37,7 @@ class LinkGeometry
     /***
      * Get things started for link geometry
      *
-     * @param WeatherMapLink $link
+     * @param MapLink $link
      * @param Point[] $controlPoints
      * @param int[] $widths
      * @param int $directions

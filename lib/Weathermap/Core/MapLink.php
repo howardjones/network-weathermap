@@ -6,6 +6,8 @@
 
 namespace Weathermap\Core;
 
+use Weathermap\Core\Point;
+
 class MapLink extends MapDataItem
 {
     const FMT_BITS_IN = "{link:this:bandwidth_in:%2k}";
@@ -16,35 +18,35 @@ class MapLink extends MapDataItem
     const FMT_PERC_OUT = "{link:this:outpercent:%.2f}%";
 
 
-//	public $maphtml;
-    /** @var  MapNode $a */
-    /** @var  MapNode $b */
-    public $a;
-    public $b; // the ends - references to nodes
-    public $a_offset;
-    public $b_offset;
-    public $a_offset_dx;
-    public $a_offset_dy;
-    public $a_offset_resolved;
-    public $b_offset_dx;
-    public $b_offset_dy;
-    public $b_offset_resolved;
+    public $endpoints = array();
 
-    public $labeloffset_in;
-    public $labeloffset_out;
-    public $commentoffset_in;
-    public $commentoffset_out;
+//    /** @var  MapNode $a */
+//    /** @var  MapNode $b */
+//    public $a;
+//    public $b; // the ends - references to nodes
+
+//    public $a_offset;
+//    public $b_offset;
+//    public $a_offset_dx;
+//    public $a_offset_dy;
+//    public $a_offset_resolved;
+//    public $b_offset_dx;
+//    public $b_offset_dy;
+//    public $b_offset_resolved;
+
+    public $commentOffsets = array();
+    public $bwlabelOffsets = array();
 
     public $width;
-    public $arrowstyle;
-    public $linkstyle;
-    public $labelstyle;
-    public $labelboxstyle;
+    public $arrowStyle;
+    public $linkStyle;
+    public $labelStyle;
+    public $labelBoxStyle;
     public $selected; //TODO - can a link even BE selected?
-    public $vialist = array();
-    public $viastyle;
-    public $commentstyle;
-    public $splitpos;
+    public $viaList = array();
+    public $viaStyle;
+    public $commentStyle;
+    public $splitPosition;
 
     public $bwfont;
     public $commentfont;
@@ -79,21 +81,21 @@ class MapLink extends MapDataItem
         $this->name = $name;
         $this->owner = $owner;
         $this->template = $template;
+        $this->endpoints = array(
+            new MapLinkEndpoint(),
+            new MapLinkEndpoint()
+        );
 
-        $this->inherit_fieldlist = array(
+        $this->inheritedFieldList = array(
             'my_default' => null,
             'width' => 7,
             'commentfont' => 1,
             'bwfont' => 2,
             'template' => ':: DEFAULT ::',
-            'splitpos' => 50,
-            'labeloffset_out' => 25,
-            'labeloffset_in' => 75,
-            'commentoffset_out' => 5,
-            'commentoffset_in' => 95,
-            'commentstyle' => 'edge',
-            'arrowstyle' => 'classic',
-            'viastyle' => 'curved',
+            'splitPosition' => 50,
+            'commentStyle' => 'edge',
+            'arrowStyle' => 'classic',
+            'viaStyle' => 'curved',
             'usescale' => 'DEFAULT',
             'scaletype' => 'percent',
             'targets' => array(),
@@ -102,14 +104,16 @@ class MapLink extends MapDataItem
             'notes' => array(),
             'hints' => array(),
             'comments' => array('', ''),
+            'commentOffsets' => array(IN => 95, OUT => 5),
+            'bwlabelOffsets' => array(IN => 75, OUT => 25),
             'bwlabelformats' => array(self::FMT_PERC_IN, self::FMT_PERC_OUT),
             'overliburl' => array(array(), array()),
             'notestext' => array(IN => '', OUT => ''),
             'maxValuesConfigured' => array(IN => "100M", OUT => "100M"),
             'maxValues' => array(IN => null, OUT => null),
-            'labelstyle' => 'percent',
-            'labelboxstyle' => 'classic',
-            'linkstyle' => 'twoway',
+            'labelStyle' => 'percent',
+            'labelBoxStyle' => 'classic',
+            'linkStyle' => 'twoway',
             'overlibwidth' => 0,
             'overlibheight' => 0,
             'outlinecolour' => new Colour(0, 0, 0),
@@ -119,14 +123,14 @@ class MapLink extends MapDataItem
             'commentfontcolour' => new Colour(192, 192, 192),
             'inscalekey' => '',
             'outscalekey' => '',
-            'a_offset' => 'C',
-            'b_offset' => 'C',
-            'a_offset_dx' => 0,
-            'a_offset_dy' => 0,
-            'b_offset_dx' => 0,
-            'b_offset_dy' => 0,
-            'a_offset_resolved' => false,
-            'b_offset_resolved' => false,
+//            'a_offset' => 'C',
+//            'b_offset' => 'C',
+//            'a_offset_dx' => 0,
+//            'a_offset_dy' => 0,
+//            'b_offset_dx' => 0,
+//            'b_offset_dy' => 0,
+//            'a_offset_resolved' => false,
+//            'b_offset_resolved' => false,
             'zorder' => 300,
             'overlibcaption' => array('', '')
         );
@@ -134,7 +138,7 @@ class MapLink extends MapDataItem
         $this->reset($owner);
     }
 
-    public function my_type()
+    public function myType()
     {
         return "LINK";
     }
@@ -146,12 +150,12 @@ class MapLink extends MapDataItem
 
     public function isTemplate()
     {
-        return !isset($this->a);
+        return !isset($this->endpoints[0]->node);
     }
 
     private function getDirectionList()
     {
-        if ($this->linkstyle == "oneway") {
+        if ($this->linkStyle == "oneway") {
             return array(OUT);
         }
 
@@ -163,13 +167,9 @@ class MapLink extends MapDataItem
         MapUtility::wm_debug("Link " . $this->name . ": Drawing comments.\n");
 
         $directions = $this->getDirectionList();
-        $commentPositions = array();
 
         $commentColours = array();
         $gdCommentColours = array();
-
-        $commentPositions[OUT] = $this->commentoffset_out;
-        $commentPositions[IN] = $this->commentoffset_in;
 
         $widthList = $this->geometry->getWidths();
 
@@ -183,7 +183,7 @@ class MapLink extends MapDataItem
             // Time to deal with Link Comments, if any
             $comment = $this->owner->ProcessString($this->comments[$direction], $this);
 
-            if ($this->owner->get_hint('screenshot_mode') == 1) {
+            if ($this->owner->getHint('screenshot_mode') == 1) {
                 $comment = StringUtility::stringAnonymise($comment);
             }
 
@@ -205,18 +205,18 @@ class MapLink extends MapDataItem
 
             // nudge pushes the comment out along the link arrow a little bit
             // (otherwise there are more problems with text disappearing underneath links)
-            $nudgeAlong = intval($this->get_hint("comment_nudgealong"));
-            $nudgeOut = intval($this->get_hint("comment_nudgeout"));
+            $nudgeAlong = intval($this->getHint("comment_nudgealong"));
+            $nudgeOut = intval($this->getHint("comment_nudgeout"));
 
-            /** @var WMPoint $position */
-            list ($position, $comment_index, $angle, $distance) = $this->geometry->findPointAndAngleAtPercentageDistance($commentPositions[$direction]);
+            /** @var Point $position */
+            list ($position, $commentIndex, $angle, $distance) = $this->geometry->findPointAndAngleAtPercentageDistance($this->commentOffsets[$direction]);
 
-            $tangent = $this->geometry->findTangentAtIndex($comment_index);
+            $tangent = $this->geometry->findTangentAtIndex($commentIndex);
             $tangent->normalise();
 
             $centreDistance = $widthList[$direction] + 4 + $nudgeOut;
 
-            if ($this->commentstyle == 'center') {
+            if ($this->commentStyle == 'center') {
                 $centreDistance = $nudgeOut - ($textHeight / 2);
             }
             // find the normal to our link, so we can get outside the arrow
@@ -273,23 +273,14 @@ class MapLink extends MapDataItem
 
         $points = array();
 
-        MapUtility::wm_debug("Offsets are %s and %s\n", $this->a_offset, $this->b_offset);
-        MapUtility::wm_debug("A node is %sx%s\n", $this->a->width, $this->a->height);
+        $this->endpoints[0]->resolve('A');
+        $this->endpoints[1]->resolve('B');
 
-        if ($this->a_offset_dx != 0 || $this->a_offset_dy != 0) {
-            MapUtility::wm_debug("Using offsets from earlier\n");
-            $dx = $this->a_offset_dx;
-            $dy = $this->a_offset_dy;
-        } else {
-            list($dx, $dy) = MapUtility::calculateOffset($this->a_offset, $this->a->width, $this->a->height);
-        }
-
-        MapUtility::wm_debug("A offset: $dx, $dy\n");
-        $points[] = new Point($this->a->x + $dx, $this->a->y + $dy);
+        $points [] = $this->endpoints[0]->point;
 
         MapUtility::wm_debug("POINTS SO FAR:" . join(" ", $points) . "\n");
 
-        foreach ($this->vialist as $via) {
+        foreach ($this->viaList as $via) {
             MapUtility::wm_debug("VIALIST...\n");
             // if the via has a third element, the first two are relative to that node
             if (isset($via[2])) {
@@ -300,24 +291,15 @@ class MapLink extends MapDataItem
                 $point = new Point($via[0], $via[1]);
             }
             MapUtility::wm_debug("Adding $point\n");
-            $points[] = $point;
+            $points [] = $point;
         }
         MapUtility::wm_debug("POINTS SO FAR:" . join(" ", $points) . "\n");
 
-        MapUtility::wm_debug("B node is %sx%s\n", $this->b->width, $this->b->height);
-        if ($this->b_offset_dx != 0 || $this->b_offset_dy != 0) {
-            MapUtility::wm_debug("Using offsets from earlier\n");
-            $dx = $this->b_offset_dx;
-            $dy = $this->b_offset_dy;
-        } else {
-            list($dx, $dy) = MapUtility::calculateOffset($this->b_offset, $this->b->width, $this->b->height);
-        }
-        MapUtility::wm_debug("B offset: $dx, $dy\n");
-        $points[] = new Point($this->b->x + $dx, $this->b->y + $dy);
+        $points [] = $this->endpoints[1]->point;
 
         MapUtility::wm_debug("POINTS SO FAR:" . join(" ", $points) . "\n");
 
-        if ($points[0]->closeEnough($points[1]) && sizeof($this->vialist) == 0) {
+        if ($points[0]->closeEnough($points[1]) && sizeof($this->viaList) == 0) {
             MapUtility::wm_warn("Zero-length link " . $this->name . " skipped. [WMWARN45]");
             $this->geometry = null;
             return;
@@ -326,26 +308,33 @@ class MapLink extends MapDataItem
         $widths = array($this->width, $this->width);
 
         // for bulging animations, modulate the width with the percentage value
-        if (($map->widthmod) || ($map->get_hint('link_bulge') == 1)) {
+        if (($map->widthmod) || ($map->getHint('link_bulge') == 1)) {
             // a few 0.1s and +1s to fix div-by-zero, and invisible links
 
             $widths[IN] = (($widths[IN] * $this->percentUsages[IN] * 1.5 + 0.1) / 100) + 1;
             $widths[OUT] = (($widths[OUT] * $this->percentUsages[OUT] * 1.5 + 0.1) / 100) + 1;
         }
 
-        $style = $this->viastyle;
+        $style = $this->viaStyle;
 
         // don't bother with any curve stuff if there aren't any Vias defined, even if the style is 'curved'
-        if (count($this->vialist) == 0) {
+        if (count($this->viaList) == 0) {
             MapUtility::wm_debug("Forcing to angled (no vias)\n");
             $style = "angled";
         }
 
         $this->geometry = LinkGeometryFactory::create($style);
-        $this->geometry->Init($this, $points, $widths, ($this->linkstyle == 'oneway' ? 1 : 2), $this->splitpos, $this->arrowstyle);
+        $this->geometry->Init(
+            $this,
+            $points,
+            $widths,
+            ($this->linkStyle == 'oneway' ? 1 : 2),
+            $this->splitPosition,
+            $this->arrowStyle
+        );
     }
 
-    public function Draw($imageRef)
+    public function draw($imageRef)
     {
         MapUtility::wm_debug("Link " . $this->name . ": Drawing.\n");
         // If there is geometry to draw, draw it
@@ -383,7 +372,7 @@ class MapLink extends MapDataItem
             $newArea = new HTMLImagemapAreaPolygon($areaName, "", array($polyPoints));
             MapUtility::wm_debug("Adding Poly imagemap for %s\n", $areaName);
 
-            $this->imap_areas[] = $newArea;
+            $this->imagemapAreas[] = $newArea;
         }
     }
 
@@ -392,34 +381,28 @@ class MapLink extends MapDataItem
         MapUtility::wm_debug("Link " . $this->name . ": Drawing bwlabels.\n");
 
         $directions = $this->getDirectionList();
-        $labelOffsets = array();
-
-        // TODO - this stuff should all be in arrays already!
-        $labelOffsets[IN] = $this->labeloffset_in;
-        $labelOffsets[OUT] = $this->labeloffset_out;
 
         foreach ($directions as $direction) {
-            list ($position, $index, $angle, $distance) = $this->geometry->findPointAndAngleAtPercentageDistance($labelOffsets[$direction]);
+            list ($position, $index, $angle, $distance) = $this->geometry->findPointAndAngleAtPercentageDistance($this->bwlabelOffsets[$direction]);
 
-            $percentage = $this->percentUsages[$direction];
             $bandwidth = $this->absoluteUsages[$direction];
 
             if ($this->owner->sizedebug) {
                 $bandwidth = $this->maxValues[$direction];
             }
 
-            $label_text = $this->owner->ProcessString($this->bwlabelformats[$direction], $this);
-            if ($label_text != '') {
-                MapUtility::wm_debug("Bandwidth for label is " . StringUtility::valueOrNull($bandwidth) . " (label is '$label_text')\n");
-                $padding = intval($this->get_hint('bwlabel_padding'));
+            $bwlabelText = $this->owner->ProcessString($this->bwlabelformats[$direction], $this);
+            if ($bwlabelText != '') {
+                MapUtility::wm_debug("Bandwidth for label is " . StringUtility::valueOrNull($bandwidth) . " (label is '$bwlabelText')\n");
+                $padding = intval($this->getHint('bwlabel_padding'));
 
                 // if screenshot_mode is enabled, wipe any letters to X and wipe any IP address to 127.0.0.1
                 // hopefully that will preserve enough information to show cool stuff without leaking info
-                if ($this->owner->get_hint('screenshot_mode') == 1) {
-                    $label_text = StringUtility::stringAnonymise($label_text);
+                if ($this->owner->getHint('screenshot_mode') == 1) {
+                    $bwlabelText = StringUtility::stringAnonymise($bwlabelText);
                 }
 
-                if ($this->labelboxstyle != 'angled') {
+                if ($this->labelBoxStyle != 'angled') {
                     $angle = 0;
                 }
 
@@ -427,7 +410,7 @@ class MapLink extends MapDataItem
                     $gdImage,
                     $position,
                     $angle,
-                    $label_text,
+                    $bwlabelText,
                     $padding,
                     $direction
                 );
@@ -459,14 +442,25 @@ class MapLink extends MapDataItem
 
         $extra = 3;
 
-        $topleft_x = $centre->x - ($strWidth / 2) - $padding - $extra;
-        $topleft_y = $centre->y - ($strHeight / 2) - $padding - $extra;
+        $minX = $centre->x - ($strWidth / 2) - $padding - $extra;
+        $minY = $centre->y - ($strHeight / 2) - $padding - $extra;
 
-        $botright_x = $centre->x + ($strWidth / 2) + $padding + $extra;
-        $botright_y = $centre->y + ($strHeight / 2) + $padding + $extra;
+        $maxX = $centre->x + ($strWidth / 2) + $padding + $extra;
+        $maxY = $centre->y + ($strHeight / 2) + $padding + $extra;
 
         // a box. the last point is the start point for the text.
-        $points = array($topleft_x, $topleft_y, $topleft_x, $botright_y, $botright_x, $botright_y, $botright_x, $topleft_y, $centre->x - $strWidth / 2, $centre->y + $strHeight / 2 + 1);
+        $points = array(
+            $minX,
+            $minY,
+            $minX,
+            $maxY,
+            $maxX,
+            $maxY,
+            $maxX,
+            $minY,
+            $centre->x - $strWidth / 2,
+            $centre->y + $strHeight / 2 + 1
+        );
 
         if ($radianAngle != 0) {
             MathUtility::rotateAboutPoint($points, $centre->x, $centre->y, $radianAngle);
@@ -483,7 +477,14 @@ class MapLink extends MapDataItem
             imagepolygon($imageRef, $points, 4, $this->bwoutlinecolour->gdAllocate($imageRef));
         }
 
-        $fontObject->drawImageString($imageRef, $textX, $textY, $text, $this->bwfontcolour->gdallocate($imageRef), $angle);
+        $fontObject->drawImageString(
+            $imageRef,
+            $textX,
+            $textY,
+            $text,
+            $this->bwfontcolour->gdallocate($imageRef),
+            $angle
+        );
 
         // ------
 
@@ -504,35 +505,34 @@ class MapLink extends MapDataItem
             MapUtility::wm_debug("Adding Poly imagemap for $areaName\n");
         }
         // Make a note that we added this area
-        $this->imap_areas[] = $newArea;
-        // $this->imageMapAreas[] = $newArea;
+        $this->imagemapAreas[] = $newArea;
         $this->owner->imap->addArea($newArea);
     }
 
-    public function WriteConfig()
+    public function getConfig()
     {
-        if ($this->config_override != '') {
-            return $this->config_override . "\n";
+        if ($this->configOverride != '') {
+            return $this->configOverride . "\n";
         }
 
         $output = '';
 
-        $template_item = $this->owner->links[$this->template];
+        $templateSource = $this->owner->links[$this->template];
 
         MapUtility::wm_debug("Writing config for LINK $this->name against $this->template\n");
 
-        $basic_params = array(
+        $simpleParameters = array(
             array('width', 'WIDTH', self::CONFIG_TYPE_LITERAL),
             array('zorder', 'ZORDER', self::CONFIG_TYPE_LITERAL),
             array('overlibwidth', 'OVERLIBWIDTH', self::CONFIG_TYPE_LITERAL),
             array('overlibheight', 'OVERLIBHEIGHT', self::CONFIG_TYPE_LITERAL),
-            array('arrowstyle', 'ARROWSTYLE', self::CONFIG_TYPE_LITERAL),
-            array('viastyle', 'VIASTYLE', self::CONFIG_TYPE_LITERAL),
-            array('linkstyle', 'LINKSTYLE', self::CONFIG_TYPE_LITERAL),
-            array('splitpos', 'SPLITPOS', self::CONFIG_TYPE_LITERAL),
+            array('arrowStyle', 'ARROWSTYLE', self::CONFIG_TYPE_LITERAL),
+            array('viaStyle', 'VIASTYLE', self::CONFIG_TYPE_LITERAL),
+            array('linkStyle', 'LINKSTYLE', self::CONFIG_TYPE_LITERAL),
+            array('splitPosition', 'SPLITPOS', self::CONFIG_TYPE_LITERAL),
             array('duplex', 'DUPLEX', self::CONFIG_TYPE_LITERAL),
-            array('commentstyle', 'COMMENTSTYLE', self::CONFIG_TYPE_LITERAL),
-            array('labelboxstyle', 'BWSTYLE', self::CONFIG_TYPE_LITERAL),
+            array('commentStyle', 'COMMENTSTYLE', self::CONFIG_TYPE_LITERAL),
+            array('labelBoxStyle', 'BWSTYLE', self::CONFIG_TYPE_LITERAL),
             //		array('usescale','USESCALE',self::CONFIG_TYPE_LITERAL),
 
             array('bwfont', 'BWFONT', self::CONFIG_TYPE_LITERAL),
@@ -550,10 +550,10 @@ class MapLink extends MapDataItem
             $output .= "\tTEMPLATE " . $this->template . "\n";
         }
 
-        $output .= $this->getSimpleConfig($basic_params, $template_item);
+        $output .= $this->getSimpleConfig($simpleParameters, $templateSource);
 
         $val = $this->usescale . " " . $this->scaletype;
-        $comparison = $template_item->usescale . " " . $template_item->scaletype;
+        $comparison = $templateSource->usescale . " " . $templateSource->scaletype;
 
         if (($val != $comparison)) {
             $output .= "\tUSESCALE " . $val . "\n";
@@ -566,7 +566,7 @@ class MapLink extends MapDataItem
         }
 
         foreach ($dirs as $dir => $tdir) {
-            if ($this->infourl[$dir] != $template_item->infourl[$dir]) {
+            if ($this->infourl[$dir] != $templateSource->infourl[$dir]) {
                 $output .= "\t" . $tdir . "INFOURL " . $this->infourl[$dir] . "\n";
             }
         }
@@ -578,7 +578,7 @@ class MapLink extends MapDataItem
         }
 
         foreach ($dirs as $dir => $tdir) {
-            if ($this->overlibcaption[$dir] != $template_item->overlibcaption[$dir]) {
+            if ($this->overlibcaption[$dir] != $templateSource->overlibcaption[$dir]) {
                 $output .= "\t" . $tdir . "OVERLIBCAPTION " . $this->overlibcaption[$dir] . "\n";
             }
         }
@@ -590,7 +590,7 @@ class MapLink extends MapDataItem
         }
 
         foreach ($dirs as $dir => $tdir) {
-            if ($this->notestext[$dir] != $template_item->notestext[$dir]) {
+            if ($this->notestext[$dir] != $templateSource->notestext[$dir]) {
                 $output .= "\t" . $tdir . "NOTES " . $this->notestext[$dir] . "\n";
             }
         }
@@ -602,52 +602,52 @@ class MapLink extends MapDataItem
         }
 
         foreach ($dirs as $dir => $tdir) {
-            if ($this->overliburl[$dir] != $template_item->overliburl[$dir]) {
+            if ($this->overliburl[$dir] != $templateSource->overliburl[$dir]) {
                 $output .= "\t" . $tdir . "OVERLIBGRAPH " . join(" ", $this->overliburl[$dir]) . "\n";
             }
         }
 
         // if formats have been set, but they're just the longform of the built-in styles, set them back to the built-in styles
-        if ($this->labelstyle == '--' && $this->bwlabelformats[IN] == self::FMT_PERC_IN && $this->bwlabelformats[OUT] == self::FMT_PERC_OUT) {
-            $this->labelstyle = 'percent';
+        if ($this->labelStyle == '--' && $this->bwlabelformats[IN] == self::FMT_PERC_IN && $this->bwlabelformats[OUT] == self::FMT_PERC_OUT) {
+            $this->labelStyle = 'percent';
         }
-        if ($this->labelstyle == '--' && $this->bwlabelformats[IN] == self::FMT_BITS_IN && $this->bwlabelformats[OUT] == self::FMT_BITS_OUT) {
-            $this->labelstyle = 'bits';
+        if ($this->labelStyle == '--' && $this->bwlabelformats[IN] == self::FMT_BITS_IN && $this->bwlabelformats[OUT] == self::FMT_BITS_OUT) {
+            $this->labelStyle = 'bits';
         }
-        if ($this->labelstyle == '--' && $this->bwlabelformats[IN] == self::FMT_UNFORM_IN && $this->bwlabelformats[OUT] == self::FMT_UNFORM_OUT) {
-            $this->labelstyle = 'unformatted';
+        if ($this->labelStyle == '--' && $this->bwlabelformats[IN] == self::FMT_UNFORM_IN && $this->bwlabelformats[OUT] == self::FMT_UNFORM_OUT) {
+            $this->labelStyle = 'unformatted';
         }
 
         // if specific formats have been set, then the style will be '--'
         // if it isn't then use the named style
-        if (($this->labelstyle != $template_item->labelstyle) && ($this->labelstyle != '--')) {
-            $output .= "\tBWLABEL " . $this->labelstyle . "\n";
+        if (($this->labelStyle != $templateSource->labelStyle) && ($this->labelStyle != '--')) {
+            $output .= "\tBWLABEL " . $this->labelStyle . "\n";
         }
 
         // if either IN or OUT field changes, then both must be written because a regular BWLABEL can't do it
         // XXX this looks wrong
-        $comparison = $template_item->bwlabelformats[IN];
-        $comparison2 = $template_item->bwlabelformats[OUT];
+        $comparison = $templateSource->bwlabelformats[IN];
+        $comparison2 = $templateSource->bwlabelformats[OUT];
 
-        if (($this->labelstyle == '--') && (($this->bwlabelformats[IN] != $comparison) || ($this->bwlabelformats[OUT] != '--'))) {
+        if (($this->labelStyle == '--') && (($this->bwlabelformats[IN] != $comparison) || ($this->bwlabelformats[OUT] != '--'))) {
             $output .= "\tINBWFORMAT " . $this->bwlabelformats[IN] . "\n";
             $output .= "\tOUTBWFORMAT " . $this->bwlabelformats[OUT] . "\n";
         }
 
-        $comparison = $template_item->labeloffset_in;
-        $comparison2 = $template_item->labeloffset_out;
+        $comparison = $templateSource->bwlabelOffsets[IN];
+        $comparison2 = $templateSource->bwlabelOffsets[OUT];
 
-        if (($this->labeloffset_in != $comparison) || ($this->labeloffset_out != $comparison2)) {
-            $output .= "\tBWLABELPOS " . $this->labeloffset_in . " " . $this->labeloffset_out . "\n";
+        if (($this->bwlabelOffsets[IN] != $comparison) || ($this->bwlabelOffsets[OUT] != $comparison2)) {
+            $output .= "\tBWLABELPOS " . $this->bwlabelOffsets[IN] . " " . $this->bwlabelOffsets[OUT] . "\n";
         }
 
-        $comparison = $template_item->commentoffset_in . ":" . $template_item->commentoffset_out;
-        $mine = $this->commentoffset_in . ":" . $this->commentoffset_out;
+        $comparison = $templateSource->commentOffsets[IN] . ":" . $templateSource->commentOffsets[OUT];
+        $mine = $this->commentOffsets[IN] . ":" . $this->commentOffsets[OUT];
         if ($mine != $comparison) {
-            $output .= "\tCOMMENTPOS " . $this->commentoffset_in . " " . $this->commentoffset_out . "\n";
+            $output .= "\tCOMMENTPOS " . $this->commentOffsets[IN] . " " . $this->commentOffsets[OUT] . "\n";
         }
 
-        $comparison = $template_item->targets;
+        $comparison = $templateSource->targets;
 
         if ($this->targets != $comparison) {
             $output .= "\tTARGET";
@@ -661,30 +661,18 @@ class MapLink extends MapDataItem
         foreach (array("IN", "OUT") as $tdir) {
             $dir = constant($tdir);
 
-            $comparison = $template_item->comments[$dir];
+            $comparison = $templateSource->comments[$dir];
             if ($this->comments[$dir] != $comparison) {
                 $output .= "\t" . $tdir . "COMMENT " . $this->comments[$dir] . "\n";
             }
         }
 
-        if (isset($this->a) && isset($this->b)) {
-            $output .= "\tNODES " . $this->a->name;
-
-            if ($this->a_offset != 'C') {
-                $output .= ":" . $this->a_offset;
-            }
-
-            $output .= " " . $this->b->name;
-
-            if ($this->b_offset != 'C') {
-                $output .= ":" . $this->b_offset;
-            }
-
-            $output .= "\n";
+        if (isset($this->endpoints[0]->node) && isset($this->endpoints[1]->node)) {
+            $output .= sprintf("\tNODES %s %s\n", $this->endpoints[0], $this->endpoints[1]);
         }
 
-        if (count($this->vialist) > 0) {
-            foreach ($this->vialist as $via) {
+        if (count($this->viaList) > 0) {
+            foreach ($this->viaList as $via) {
                 if (isset($via[2])) {
                     $output .= sprintf("\tVIA %s %d %d\n", $via[2], $via[0], $via[1]);
                 } else {
@@ -693,8 +681,8 @@ class MapLink extends MapDataItem
             }
         }
 
-        $output .= $this->getMaxValueConfig($template_item, "BANDWIDTH");
-        $output .= $this->getHintConfig($template_item);
+        $output .= $this->getMaxValueConfig($templateSource, "BANDWIDTH");
+        $output .= $this->getHintConfig($templateSource);
 
         if ($output != '') {
             $output = "LINK " . $this->name . "\n" . $output . "\n";
@@ -708,9 +696,9 @@ class MapLink extends MapDataItem
         $output = "";
 
         $output .= "\"id\":" . $this->id . ", ";
-        if (isset($this->a)) {
-            $output .= "a:'" . $this->a->name . "', ";
-            $output .= "b:'" . $this->b->name . "', ";
+        if (isset($this->endpoints[0]->node)) {
+            $output .= "a:'" . $this->endpoints[0]->node->name . "', ";
+            $output .= "b:'" . $this->endpoints[1]->node->name . "', ";
         }
 
         $output .= "width:'" . $this->width . "', ";
@@ -739,17 +727,17 @@ class MapLink extends MapDataItem
         $output .= "overlibcaption:" . StringUtility::jsEscape($this->overlibcaption[IN]) . ", ";
 
         $output .= "commentin:" . StringUtility::jsEscape($this->comments[IN]) . ", ";
-        $output .= "commentposin:" . intval($this->commentoffset_in) . ", ";
+        $output .= "commentposin:" . intval($this->commentOffsets[IN]) . ", ";
 
         $output .= "commentout:" . StringUtility::jsEscape($this->comments[OUT]) . ", ";
-        $output .= "commentposout:" . intval($this->commentoffset_out) . ", ";
+        $output .= "commentposout:" . intval($this->commentOffsets[OUT]) . ", ";
 
         $output .= "infourl:" . StringUtility::jsEscape($this->infourl[IN]) . ", ";
         $output .= "overliburl:" . StringUtility::jsEscape(join(" ", $this->overliburl[IN])) . ", ";
 
         $output .= "via: [";
         $nItem = 0;
-        foreach ($this->vialist as $via) {
+        foreach ($this->viaList as $via) {
             if ($nItem > 0) {
                 $output .= ", ";
             }
@@ -777,8 +765,8 @@ class MapLink extends MapDataItem
         parent::cleanUp();
 
         $this->owner = null;
-        $this->a = null;
-        $this->b = null;
+        $this->endpoints[0]->node = null;
+        $this->endpoints[1]->node = null;
         // $this->parent = null;
         $this->descendents = null;
     }
@@ -809,20 +797,20 @@ class MapLink extends MapDataItem
             throw new WeathermapInternalFail("PartiallyRealLink");
         }
 
-        if (null !== $this->a) {
-            $this->a->removeDependency($this);
+        if (null !== $this->endpoints[0]->node) {
+            $this->endpoints[0]->node->removeDependency($this);
         }
-        if (null !== $this->b) {
-            $this->b->removeDependency($this);
+        if (null !== $this->endpoints[1]->node) {
+            $this->endpoints[1]->node->removeDependency($this);
         }
-        $this->a = $node1;
-        $this->b = $node2;
+        $this->endpoints[0]->node = $node1;
+        $this->endpoints[1]->node = $node2;
 
-        if (null !== $this->a) {
-            $this->a->addDependency($this);
+        if (null !== $this->endpoints[0]->node) {
+            $this->endpoints[0]->node->addDependency($this);
         }
-        if (null !== $this->b) {
-            $this->b->addDependency($this);
+        if (null !== $this->endpoints[1]->node) {
+            $this->endpoints[1]->node->addDependency($this);
         }
     }
 
@@ -830,11 +818,26 @@ class MapLink extends MapDataItem
     {
         $config = parent::asConfigData();
 
-        $config['a'] = $this->a->name;
-        $config['b'] = $this->b->name;
+        $config['a'] = $this->endpoints[0]->node->name;
+        $config['b'] = $this->endpoints[1]->node->name;
         $config['width'] = $this->width;
 
         return $config;
+    }
+
+
+    public function selfValidate()
+    {
+        $failed = false;
+        $class = get_class();
+
+        foreach (array_keys($this->inheritedFieldList) as $fld) {
+            if (!property_exists($class, $fld)) {
+                $failed = true;
+                MapUtility::wm_warn("$fld is in $class inherit list, but not in object");
+            }
+        }
+        return $failed;
     }
 }
 

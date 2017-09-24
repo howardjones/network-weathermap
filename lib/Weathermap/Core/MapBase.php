@@ -16,8 +16,8 @@ class MapBase
 
     var $notes = array();
     var $hints = array();
-    var $inherit_fieldlist;
-    var $imap_areas = array();
+    var $inheritedFieldList;
+    var $imagemapAreas = array();
     var $parent;
 
     protected $config = array();
@@ -33,21 +33,21 @@ class MapBase
 
     function __toString()
     {
-        return $this->my_type() . " " . (isset($this->name) ? $this->name : "[unnamed]");
+        return $this->myType() . " " . (isset($this->name) ? $this->name : "[unnamed]");
     }
 
-    public function my_type()
+    public function myType()
     {
         return "BASE";
     }
 
-    function add_note($name, $value)
+    function addNote($name, $value)
     {
         MapUtility::wm_debug("Adding note $name='$value' to " . $this->name . "\n");
         $this->notes[$name] = $value;
     }
 
-    function get_note($name, $default = null)
+    function getNote($name, $default = null)
     {
         if (isset($this->notes[$name])) {
             //	debug("Found note $name in ".$this->name." with value of ".$this->notes[$name].".\n");
@@ -58,14 +58,14 @@ class MapBase
         }
     }
 
-    function add_hint($name, $value)
+    function addHint($name, $value)
     {
         MapUtility::wm_debug("Adding hint $name='$value' to " . $this->name . "\n");
         $this->hints[$name] = $value;
         # warn("Adding hint $name to ".$this->my_type()."/".$this->name."\n");
     }
 
-    function get_hint($name, $default = null)
+    function getHint($name, $default = null)
     {
         if (isset($this->hints[$name])) {
             //	debug("Found hint $name in ".$this->name." with value of ".$this->hints[$name].".\n");
@@ -76,12 +76,12 @@ class MapBase
         }
     }
 
-    public function delete_hint($name)
+    public function deleteHint($name)
     {
         unset($this->hints[$name]);
     }
 
-    public function delete_note($name)
+    public function deleteNote($name)
     {
         unset($this->notes[$name]);
     }
@@ -237,7 +237,7 @@ class MapBase
     }
 
     /**
-     * @param array basic_params
+     * @param array $basic_params
      * @param MapBase $reference
      * @return string
      */

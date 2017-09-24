@@ -24,14 +24,14 @@ class WeatherMapCacti10ManagementPlugin extends WeatherMapCactiManagementPlugin
      */
     public function handleManagementMainScreen($request, $appObject)
     {
-        $this->cacti_header();
+        $this->cactiHeader();
         $this->maplist_warnings();
         $this->maplist();
-        $this->footer_links();
+        $this->footerLinks();
         ?>
         <script type='text/javascript'>
             $(function () {
-                $('#settings').click(function (event) {
+                $('#settings').click(function () {
                     document.location = urlPath + 'settings.php?tab=maps';
                 });
 
@@ -41,27 +41,27 @@ class WeatherMapCacti10ManagementPlugin extends WeatherMapCactiManagementPlugin
                 });
 
                 $('.remover').click(function () {
-                    href = $(this).attr('href');
+                    var href = $(this).attr('href');
                     loadPageNoHeader(href);
                 });
             });
         </script>
         <?php
 
-        $this->cacti_footer();
+        $this->cactiFooter();
     }
 
-    public function cacti_header()
+    public function cactiHeader()
     {
         top_header();
     }
 
-    public function cacti_footer()
+    public function cactiFooter()
     {
         bottom_footer();
     }
 
-    public function cacti_row_start($i)
+    public function cactiRowStart($i)
     {
         form_alternate_row();
     }

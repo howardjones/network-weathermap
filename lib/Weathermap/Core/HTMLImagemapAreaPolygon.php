@@ -85,7 +85,7 @@ class HTMLImagemapAreaPolygon extends HTMLImagemapArea
         $this->npoints = count($c) / 2;
 
         if (intval($this->npoints) != ($this->npoints)) {
-            throw new Exception("Odd number of points!");
+            throw new \Exception("Odd number of points!");
         }
 
         $xlist = array();

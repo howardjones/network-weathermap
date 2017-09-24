@@ -284,7 +284,25 @@ class UIBase
  */
 function wmeSanitizeURI($str)
 {
-    static $drop_char_match = array(' ', '^', '$', '<', '>', '`', '\'', '"', '|', '+', '[', ']', '{', '}', ';', '!', '%');
+    static $drop_char_match = array(
+        ' ',
+        '^',
+        '$',
+        '<',
+        '>',
+        '`',
+        '\'',
+        '"',
+        '|',
+        '+',
+        '[',
+        ']',
+        '{',
+        '}',
+        ';',
+        '!',
+        '%'
+    );
     static $drop_char_replace = array('', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '');
 
     return str_replace($drop_char_match, $drop_char_replace, urldecode($str));

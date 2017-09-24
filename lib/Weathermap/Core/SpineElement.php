@@ -8,6 +8,8 @@
 
 namespace Weathermap\Core;
 
+use Weathermap\Core\Point;
+
 /**
  * Class WMSpineElement - a single item in a spine.
  *
@@ -16,7 +18,7 @@ namespace Weathermap\Core;
  */
 class SpineElement
 {
-    /** @var  WMPoint $point */
+    /** @var  Point $point */
     public $point;
     /** @var  float $distance */
     public $distance;

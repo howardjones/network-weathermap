@@ -11,7 +11,7 @@ class Spine
     private $elements;
 
     /**
-     * Add a WMSpineElement as-as, assuming the distance inside is correct
+     * Add a SpineElement as-as, assuming the distance inside is correct
      * (used for copying spines around)
      *
      * @param SpineElement $newElement
@@ -24,7 +24,7 @@ class Spine
     /**
      * Add a point to the end of the spine, calculating the new distance
      *
-     * @param WMPoint $newPoint
+     * @param Point $newPoint
      */
     public function addPoint($newPoint)
     {
@@ -52,7 +52,7 @@ class Spine
 
     /**
      * @param int $index
-     * @return WMPoint
+     * @return Point
      */
     public function getPoint($index)
     {

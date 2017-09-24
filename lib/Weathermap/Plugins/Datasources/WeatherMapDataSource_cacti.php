@@ -49,7 +49,7 @@ class WeatherMapDataSource_cacti extends DatasourceBase
             // This is very unlikely to work - nothing is ADDING the correct lines to weathermap_data!
             $SQL = 'select * from weathermap_data where local_data_id='.$local_data_id;
 
-            $result = db_fetch_row($SQL);
+            $result = \db_fetch_row($SQL);
         }
 
         return $this->returnData();

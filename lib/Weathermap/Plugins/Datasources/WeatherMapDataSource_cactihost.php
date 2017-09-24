@@ -5,6 +5,9 @@
 namespace Weathermap\Plugins\Datasources;
 
 use Weathermap\Core\MapUtility;
+use Weathermap\Core\Map;
+use Weathermap\Core\MapDataItem;
+use PDO;
 
 class WeatherMapDataSource_cactihost extends DatasourceBase
 {
@@ -36,8 +39,8 @@ class WeatherMapDataSource_cactihost extends DatasourceBase
 
     /**
      * @param string $targetstring
-     * @param WeatherMap $map
-     * @param WeatherMapDataItem $item
+     * @param Map $map
+     * @param MapDataItem $item
      * @return array
      */
     public function readData($targetstring, &$map, &$item)
@@ -82,18 +85,18 @@ class WeatherMapDataSource_cactihost extends DatasourceBase
 
                 $this->data[IN] = $state;
                 $this->data[OUT] = $state;
-                $item->add_note("state", $statename);
-                $item->add_note("cacti_description", $result['description']);
+                $item->addNote("state", $statename);
+                $item->addNote("cacti_description", $result['description']);
 
-                $item->add_note("cacti_hostname", $result['hostname']);
-                $item->add_note("cacti_curtime", $result['cur_time']);
-                $item->add_note("cacti_avgtime", $result['avg_time']);
-                $item->add_note("cacti_mintime", $result['min_time']);
-                $item->add_note("cacti_maxtime", $result['max_time']);
-                $item->add_note("cacti_availability", $result['availability']);
+                $item->addNote("cacti_hostname", $result['hostname']);
+                $item->addNote("cacti_curtime", $result['cur_time']);
+                $item->addNote("cacti_avgtime", $result['avg_time']);
+                $item->addNote("cacti_mintime", $result['min_time']);
+                $item->addNote("cacti_maxtime", $result['max_time']);
+                $item->addNote("cacti_availability", $result['availability']);
 
-                $item->add_note("cacti_faildate", $result['status_fail_date']);
-                $item->add_note("cacti_recdate", $result['status_rec_date']);
+                $item->addNote("cacti_faildate", $result['status_fail_date']);
+                $item->addNote("cacti_recdate", $result['status_rec_date']);
             }
         }
         return $this->returnData();

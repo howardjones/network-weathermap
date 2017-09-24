@@ -2,25 +2,29 @@
 
 namespace Weathermap\Plugins\Datasources;
 
+use Weathermap\Core\MapDataItem;
+use Weathermap\Core\MapUtility;
+
+
 class DatasourceUtility
 {
 
     /**
      * Shared code for DSStats and RRD DS plugins
      *
-     * @param WeatherMapDataItem $item
+     * @param MapDataItem $item
      * @param int $local_data_id
      */
     public static function updateCactiData(&$item, $local_data_id)
     {
 
-        wm_debug("fetching for $local_data_id\n");
+        MapUtility::wm_debug("fetching for $local_data_id\n");
 
         $hintsToSet = getCactiHintData($item, $local_data_id);
 
         // By now, we have the values, one way or another.
         foreach ($hintsToSet as $k => $v) {
-            $item->add_note($k, $v);
+            $item->addNote($k, $v);
         }
     }
 
@@ -32,7 +36,7 @@ class DatasourceUtility
      *
      * Result is an assoc array of hints to push into the map item.
      *
-     * @param WeatherMapDataItem $item
+     * @param MapDataItem $item
      * @param int $local_data_id
      * @return array
      */
@@ -44,7 +48,7 @@ class DatasourceUtility
             return $map->dsinfocache[$local_data_id];
         }
 
-        $set_speed = intval($item->get_hint("cacti_use_ifspeed"));
+        $set_speed = intval($item->getHint("cacti_use_ifspeed"));
 
         $hintsToSet = getCactiSnmpCache($local_data_id);
 
@@ -52,7 +56,7 @@ class DatasourceUtility
             determineCactiInterfaceSpeed($item, $hintsToSet);
         }
 
-        $results = db_fetch_row(
+        $results = \db_fetch_row(
             sprintf(
                 "SELECT DISTINCT graph_templates_item.local_graph_id,title_cache FROM graph_templates_item,graph_templates_graph,data_template_rrd WHERE data_template_rrd.id=task_item_id AND graph_templates_graph.local_graph_id = graph_templates_item.local_graph_id AND local_data_id=%d LIMIT 1",
                 $local_data_id
@@ -110,7 +114,7 @@ class DatasourceUtility
     {
         $to_set = array();
 
-        $results = db_fetch_assoc(
+        $results = \db_fetch_assoc(
             sprintf(
                 "SELECT data_local.host_id, field_name,field_value FROM data_local,host_snmp_cache  USE INDEX (host_id) WHERE data_local.id=%d AND data_local.host_id=host_snmp_cache.host_id AND data_local.snmp_index=host_snmp_cache.snmp_index AND data_local.snmp_query_id=host_snmp_cache.snmp_query_id",
                 $local_data_id
@@ -120,10 +124,10 @@ class DatasourceUtility
         foreach ($results as $vv) {
             $vname = "cacti_" . $vv['field_name'];
             $to_set[$vname] = $vv['field_value'];
-        }
 
-        if (isset($vv['host_id'])) {
-            $to_set['cacti_host_id'] = intval($vv['host_id']);
+            if (isset($vv['host_id'])) {
+                $to_set['cacti_host_id'] = intval($vv['host_id']);
+            }
         }
 
         return $to_set;

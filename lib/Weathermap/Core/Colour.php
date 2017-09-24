@@ -145,13 +145,13 @@ class Colour
 
     // allocate a colour in the appropriate image context
     // - things like scale colours are used in multiple images now (the scale, several nodes, the main map...)
-    public function gdAllocate($image_ref)
+    public function gdAllocate($gdImageRef)
     {
         if (false === $this->isRealColour()) {
             return null;
         }
 
-        return ImageUtility::myimagecolorallocate($image_ref, $this->red, $this->green, $this->blue);
+        return ImageUtility::myimagecolorallocate($gdImageRef, $this->red, $this->green, $this->blue);
     }
 
     // based on an idea from: http://www.bennadel.com/index.cfm?dax=blog:902.view

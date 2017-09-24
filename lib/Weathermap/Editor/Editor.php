@@ -72,14 +72,14 @@ class Editor
         if ($item_type == 'node') {
             if ($this->map->nodeExists($item_name)) {
                 $node = $this->map->getNode($item_name);
-                return $node->WriteConfig();
+                return $node->getConfig();
             }
         }
 
         if ($item_type == 'link') {
             if ($this->map->linkExists($item_name)) {
                 $link = $this->map->getlink($item_name);
-                return $link->WriteConfig();
+                return $link->getConfig();
             }
         }
 
@@ -166,27 +166,29 @@ class Editor
         // links that have VIAs. If it is, we want to rotate those VIA points
         // about the *other* node in the link
         foreach ($this->map->links as $link) {
-            if ((count($link->vialist) > 0) && (($link->a->name == $nodeName) || ($link->b->name == $nodeName))) {
+            if ((count($link->viaList) > 0) && (($link->endpoints[0]->node->name == $nodeName) || ($link->endpoints[1]->node->name == $nodeName))) {
                 $affected_links[] = $link->name;
 
+                $pivot = null;
+
                 // get the other node from us
-                if ($link->a->name == $nodeName) {
-                    $pivot = $link->b;
+                if ($link->endpoints[0]->node->name == $nodeName) {
+                    $pivot = $link->endpoints[1]->node;
                 }
 
-                if ($link->b->name == $nodeName) {
-                    $pivot = $link->a;
+                if ($link->endpoints[1]->node->name == $nodeName) {
+                    $pivot = $link->endpoints[0]->node;
                 }
 
                 // this is a weird special case, but it is possible, with link offsets
                 // if the link starts and ends on this node, translate any VIAs
-                if (($link->a->name == $nodeName) && ($link->b->name == $nodeName)) {
-                    $dx = $link->a->x - $newX;
-                    $dy = $link->a->y - $newY;
+                if (($link->endpoints[0]->node->name == $nodeName) && ($link->endpoints[1]->node->name == $nodeName)) {
+                    $dx = $link->endpoints[0]->node->x - $newX;
+                    $dy = $link->endpoints[0]->node->y - $newY;
 
-                    for ($count = 0; $count < count($link->vialist); $count++) {
-                        $link->vialist[$count][0] = $link->vialist[$count][0] - $dx;
-                        $link->vialist[$count][1] = $link->vialist[$count][1] - $dy;
+                    for ($count = 0; $count < count($link->viaList); $count++) {
+                        $link->viaList[$count][0] = $link->viaList[$count][0] - $dx;
+                        $link->viaList[$count][1] = $link->viaList[$count][1] - $dy;
                     }
                 } else {
                     $pivotX = $pivot->x;
@@ -199,27 +201,14 @@ class Editor
                     $oldVector = $pivotPoint->vectorToPoint($movingPoint);
                     $newVector = $pivotPoint->vectorToPoint($newPoint);
 
-//                    $dx_old = $pivotX - $movingNode->x;
-//                    $dy_old = $pivotY - $movingNode->y;
-//                    $dx_new = $pivotX - $newX;
-//                    $dy_new = $pivotY - $newY;
-//                    $l_old = sqrt($dx_old*$dx_old + $dy_old*$dy_old);
-//                    $l_new = sqrt($dx_new*$dx_new + $dy_new*$dy_new);
-//
-//                    $angle_old = rad2deg(atan2(-$dy_old, $dx_old));
-//                    $angle_new = rad2deg(atan2(-$dy_new, $dx_new));
-
                     $angle_old = $oldVector->getAngle();
                     $angle_new = $newVector->getAngle();
                     $l_new = $newVector->length();
                     $l_old = $oldVector->length();
 
-                    # $log .= "$pivx,$pivy\n$dx_old $dy_old $l_old => $angle_old\n";
-                    # $log .= "$dx_new $dy_new $l_new => $angle_new\n";
-
                     // the geometry stuff uses a different point format, helpfully
                     $points = array();
-                    foreach ($link->vialist as $via) {
+                    foreach ($link->viaList as $via) {
                         $points[] = $via[0];
                         $points[] = $via[1];
                     }
@@ -241,8 +230,8 @@ class Editor
                     $count = 0;
                     foreach ($points as $p) {
                         // skip a point if it positioned relative to a node. Those shouldn't be rotated (well, IMHO)
-                        if (!isset($link->vialist[$viaCount][2])) {
-                            $link->vialist[$viaCount][$count] = $p;
+                        if (!isset($link->viaList[$viaCount][2])) {
+                            $link->viaList[$viaCount][$count] = $p;
                         }
                         $count++;
                         if ($count == 2) {
@@ -322,8 +311,8 @@ class Editor
             $log = "delete node " . $nodename;
 
             foreach ($this->map->links as $link) {
-                if (isset($link->a)) {
-                    if (($nodename == $link->a->name) || ($nodename == $link->b->name)) {
+                if (isset($link->endpoints[0]->node)) {
+                    if (($nodename == $link->endpoints[0]->node->name) || ($nodename == $link->endpoints[1]->node->name)) {
                         $affected_links[] = $link->name;
                         unset($this->map->links[$link->name]);
                     }
@@ -465,7 +454,8 @@ class Editor
      * @param string $linkname
      * @param number $x
      * @param number $y
-     * @return boolean - successful or not
+     * @return bool - successful or not
+     * @throws WeathermapInternalFail
      */
     function setLinkVia($linkname, $x, $y)
     {
@@ -474,7 +464,7 @@ class Editor
         }
 
         if (isset($this->map->links[$linkname])) {
-            $this->map->links[$linkname]->vialist = array(array(0 => $x, 1 => $y));
+            $this->map->links[$linkname]->viaList = array(array(0 => $x, 1 => $y));
 
             return true;
         }
@@ -488,7 +478,7 @@ class Editor
         }
 
         if (isset($this->map->links[$linkname])) {
-            $this->map->links[$linkname]->vialist = array();
+            $this->map->links[$linkname]->viaList = array();
 
             return true;
         }
@@ -511,7 +501,7 @@ class Editor
      * tidyOneLink - change link offsets so that link is horizonal or vertical, if possible.
      *  if not possible, change offsets to the closest facing compass points
      *
-     * @param WeatherMapLink $link - the link to tidy
+     * @param MapLink $link - the link to tidy
      * @param int $linknumber - if this is part of a group, which number in the group
      * @param int $linktotal - if this is part of a group, how many total in the group
      * @param bool $ignore_tidied - whether to take notice of the "_tidied" hint
@@ -522,8 +512,8 @@ class Editor
             return;
         }
 
-        $node_a = $link->a;
-        $node_b = $link->b;
+        $node_a = $link->endpoints[0]->node;
+        $node_b = $link->endpoints[1]->node;
 
         // Update TODO: if the nodes are already directly left/right or up/down, then use compass-points, not pixel offsets
         // (e.g. N90) so if the label changes, they won't need to be re-tidied
@@ -560,8 +550,8 @@ class Editor
         // unwritten/implied - if both overlap, you're doing something weird and you're on your own
 
         // make the simplest possible offset string and finally, update the offsets
-        $link->a_offset = $this->simplifyOffset($a_x_offset, $a_y_offset);
-        $link->b_offset = $this->simplifyOffset($b_x_offset, $b_y_offset);
+        $link->endpoints[0]->offset = $this->simplifyOffset($a_x_offset, $a_y_offset);
+        $link->endpoints[1]->offset = $this->simplifyOffset($b_x_offset, $b_y_offset);
 
         // and also add a note that this link was tidied, and is eligible for automatic retidying
         $link->add_hint("_tidied", 1);
@@ -817,8 +807,8 @@ class Editor
         }
 
         foreach ($this->map->links as $link) {
-            $link->a_offset = "C";
-            $link->b_offset = "C";
+            $link->endpoints[0]->offset = "C";
+            $link->endpoints[1]->offset = "C";
         }
     }
 

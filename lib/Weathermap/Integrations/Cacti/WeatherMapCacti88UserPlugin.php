@@ -23,17 +23,17 @@ class WeatherMapCacti88UserPlugin extends WeatherMapCactiUserPlugin
     }
 
 
-    public function cacti_header()
+    public function cactiHeader()
     {
         include_once $this->cacti_config["base_path"] . "/include/top_header.php";
     }
 
-    public function cacti_footer()
+    public function cactiFooter()
     {
         include_once $this->cacti_config["base_path"] . "/include/bottom_footer.php";
     }
 
-    public function cacti_row_start($i)
+    public function cactiRowStart($i)
     {
         form_alternate_row_color($this->colours["alternate"], $this->colours["light"], $i);
     }

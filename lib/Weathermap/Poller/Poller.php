@@ -1,6 +1,8 @@
 <?php
 namespace Weathermap\Poller;
 
+use Weathermap\Integrations\MapManager;
+
 /**
  *
  * All the global environment required to run through the map list in the poller.
@@ -34,7 +36,7 @@ class Poller
         $this->rrdtool_path = read_config_option("path_rrdtool");
         $this->confdir = realpath($mydir . DIRECTORY_SEPARATOR . 'configs');
         $this->outdir = realpath($mydir . DIRECTORY_SEPARATOR . 'output');
-        $this->manager = new WeathermapManager(weathermap_get_pdo(), $this->confdir);
+        $this->manager = new MapManager(weathermap_get_pdo(), $this->confdir);
         $this->plugin_name = "weathermap-cacti-plugin.php";
 
         $this->total_warnings = 0;

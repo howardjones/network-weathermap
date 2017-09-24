@@ -72,7 +72,7 @@ class WMTestSupport
             // Allow tests to be from the future. Global SET in test file can exempt test from running
             // SET REQUIRES_VERSION 0.98
             // but don't check if the current version is a dev version
-            $required_version = $map->get_hint("REQUIRES_VERSION");
+            $required_version = $map->getHint("REQUIRES_VERSION");
 
             if ($required_version != "") {
                 // doesn't need to be complete, just in the right order

@@ -21,17 +21,17 @@ class WeatherMapCacti10UserPlugin extends WeatherMapCactiUserPlugin
         $this->editor_realm = "weathermap-cacti10-plugin-editor.php";
     }
 
-    public function cacti_header()
+    public function cactiHeader()
     {
         top_header();
     }
 
-    public function cacti_footer()
+    public function cactiFooter()
     {
         bottom_footer();
     }
 
-    public function cacti_row_start($i)
+    public function cactiRowStart($i)
     {
         form_alternate_row();
     }

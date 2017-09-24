@@ -446,10 +446,10 @@ class ConfigReader
                     array(
                         'x' => 2,
                         'y' => 3,
-                        'original_x' => 2,
-                        'original_y' => 3,
-                        'relative_to' => 1,
-                        'relative_resolved' => false
+                        'originalX' => 2,
+                        'originalY' => 3,
+                        'positionRelativeTo' => 1,
+                        'relativePositionResolved' => false
                     )
                 ),
                 array(
@@ -458,22 +458,22 @@ class ConfigReader
                     array(
                         'x' => 2,
                         'y' => 3,
-                        'original_x' => 2,
-                        'original_y' => 3,
-                        'relative_to' => 1,
+                        'originalX' => 2,
+                        'originalY' => 3,
+                        'positionRelativeTo' => 1,
                         'polar' => true,
-                        'relative_resolved' => false
+                        'relativePositionResolved' => false
                     )
                 ),
                 array( # named offset
 
                     '/^POSITION\s+([A-Za-z][A-Za-z0-9\-_]*):([A-Za-z][A-Za-z0-9_]*)$/i',
                     array(
-                        'relative_to' => 1,
+                        'positionRelativeTo' => 1,
                         'relative_name' => 2,
-                        'pos_named' => true,
+                        'positionedByName' => true,
                         'polar' => false,
-                        'relative_resolved' => false
+                        'relativePositionResolved' => false
                     )
                 ),
             ),
@@ -772,7 +772,7 @@ class ConfigReader
                 array(
 
                     '/^SPLITPOS\s+(\d+)\s*$/i',
-                    array('splitpos' => 1)
+                    array('splitPosition' => 1)
                 ),
             ),
             'BWLABEL' => array(
@@ -780,7 +780,7 @@ class ConfigReader
 
                     '/^BWLABEL\s+bits\s*$/i',
                     array(
-                        'labelstyle' => 'bits',
+                        'labelStyle' => 'bits',
                         'bwlabelformats[IN]' => MapLink::FMT_BITS_IN,
                         'bwlabelformats[OUT]' => MapLink::FMT_BITS_OUT,
                     )
@@ -789,7 +789,7 @@ class ConfigReader
 
                     '/^BWLABEL\s+percent\s*$/i',
                     array(
-                        'labelstyle' => 'percent',
+                        'labelStyle' => 'percent',
                         'bwlabelformats[IN]' => MapLink::FMT_PERC_IN,
                         'bwlabelformats[OUT]' => MapLink::FMT_PERC_OUT,
                     )
@@ -798,7 +798,7 @@ class ConfigReader
 
                     '/^BWLABEL\s+unformatted\s*$/i',
                     array(
-                        'labelstyle' => 'unformatted',
+                        'labelStyle' => 'unformatted',
                         'bwlabelformats[IN]' => MapLink::FMT_UNFORM_IN,
                         'bwlabelformats[OUT]' => MapLink::FMT_UNFORM_OUT,
                     )
@@ -807,7 +807,7 @@ class ConfigReader
 
                     '/^BWLABEL\s+none\s*$/i',
                     array(
-                        'labelstyle' => 'none',
+                        'labelStyle' => 'none',
                         'bwlabelformats[IN]' => '',
                         'bwlabelformats[OUT]' => '',
                     )
@@ -818,8 +818,8 @@ class ConfigReader
 
                     '/^BWLABELPOS\s+(\d+)\s(\d+)\s*$/i',
                     array(
-                        'labeloffset_in' => 1,
-                        'labeloffset_out' => 2
+                        'bwlabelOffsets[IN]' => 1,
+                        'bwlabelOffsets[OUT]' => 2
                     )
                 ),
             ),
@@ -828,8 +828,8 @@ class ConfigReader
 
                     '/^COMMENTPOS\s+(\d+)\s(\d+)\s*$/i',
                     array(
-                        'commentoffset_in' => 1,
-                        'commentoffset_out' => 2
+                        'commentOffsets[IN]' => 1,
+                        'commentOffsets[OUT]' => 2
                     )
                 ),
             ),
@@ -844,28 +844,28 @@ class ConfigReader
                 array(
 
                     '/^BWSTYLE\s+(classic|angled)\s*$/i',
-                    array('labelboxstyle' => 1)
+                    array('labelBoxStyle' => 1)
                 ),
             ),
             'LINKSTYLE' => array(
                 array(
 
                     '/^LINKSTYLE\s+(twoway|oneway)\s*$/i',
-                    array('linkstyle' => 1)
+                    array('linkStyle' => 1)
                 ),
             ),
             'COMMENTSTYLE' => array(
                 array(
 
                     '/^COMMENTSTYLE\s+(edge|center)\s*$/i',
-                    array('commentstyle' => 1)
+                    array('commentStyle' => 1)
                 ),
             ),
             'ARROWSTYLE' => array(
                 array(
 
                     '/^ARROWSTYLE\s+(classic|compact)\s*$/i',
-                    array('arrowstyle' => 1)
+                    array('arrowStyle' => 1)
                 ),
                 array('/^\s*ARROWSTYLE\s+(\d+)\s+(\d+)\s*$/i', 'handleARROWSTYLE'),
             ),
@@ -873,7 +873,7 @@ class ConfigReader
                 array(
 
                     '/^VIASTYLE\s+(curved|angled)\s*$/i',
-                    array('viastyle' => 1)
+                    array('viaStyle' => 1)
                 ),
             ),
             'INCOMMENT' => array(
@@ -954,7 +954,7 @@ class ConfigReader
                     '/^OUTBWFORMAT\s+(.*)\s*$/i',
                     array(
                         'bwlabelformats[OUT]' => 1,
-                        'labelstyle' => '--'
+                        'labelStyle' => '--'
                     )
                 ),
             ),
@@ -964,7 +964,7 @@ class ConfigReader
                     '/^INBWFORMAT\s+(.*)\s*$/i',
                     array(
                         'bwlabelformats[IN]' => 1,
-                        'labelstyle' => '--'
+                        'labelStyle' => '--'
                     )
                 ),
             ),
@@ -1313,7 +1313,7 @@ class ConfigReader
             $fullcommand,
             $matches
         )) {
-            $this->currentObject->vialist[] = array(
+            $this->currentObject->viaList[] = array(
                 $matches[1],
                 $matches[2]
             );
@@ -1324,7 +1324,7 @@ class ConfigReader
             $fullcommand,
             $matches
         )) {
-            $this->currentObject->vialist[] = array(
+            $this->currentObject->viaList[] = array(
                 $matches[2],
                 $matches[3],
                 $matches[1]
@@ -1336,49 +1336,49 @@ class ConfigReader
 
     private function interpretNodeSpec($input)
     {
-        $endoffset = 'C';
-        $nodename = $input;
-        $offset_dx = 0;
-        $offset_dy = 0;
-        $need_size_precalc = false;
+        $endOffset = 'C';
+        $nodeName = $input;
+        $xOffset = 0;
+        $yOffset = 0;
+        $needSizePrecalculate = false;
 
         // percentage of compass - must be first
         if (preg_match('/:(NE|SE|NW|SW|N|S|E|W|C)(\d+)$/i', $input, $submatches)) {
             MapUtility::wm_debug("Matching partial compass offset\n");
-            $endoffset = $submatches[1] . $submatches[2];
-            $nodename = preg_replace('/:(NE|SE|NW|SW|N|S|E|W|C)\d+$/i', '', $input);
-            $need_size_precalc = true;
+            $endOffset = $submatches[1] . $submatches[2];
+            $nodeName = preg_replace('/:(NE|SE|NW|SW|N|S|E|W|C)\d+$/i', '', $input);
+            $needSizePrecalculate = true;
         } elseif (preg_match("/:(NE|SE|NW|SW|N|S|E|W|C)$/i", $input, $submatches)) {
             MapUtility::wm_debug("Matching 100% compass offset\n");
-            $endoffset = $submatches[1];
-            $nodename = preg_replace('/:(NE|SE|NW|SW|N|S|E|W|C)$/i', '', $input);
-            $need_size_precalc = true;
+            $endOffset = $submatches[1];
+            $nodeName = preg_replace('/:(NE|SE|NW|SW|N|S|E|W|C)$/i', '', $input);
+            $needSizePrecalculate = true;
         } elseif (preg_match('/:(-?\d+r\d+)$/i', $input, $submatches)) {
             MapUtility::wm_debug("Matching radial offset\n");
-            $endoffset = $submatches[1];
-            $nodename = preg_replace('/:(-?\d+r\d+)$/i', '', $input);
-            $need_size_precalc = true;
+            $endOffset = $submatches[1];
+            $nodeName = preg_replace('/:(-?\d+r\d+)$/i', '', $input);
+            $needSizePrecalculate = true;
         } elseif (preg_match('/:([-+]?\d+):([-+]?\d+)$/i', $input, $submatches)) {
             MapUtility::wm_debug("Matching regular x,y link offset\n");
             $xoff = $submatches[1];
             $yoff = $submatches[2];
-            $endoffset = $xoff . ":" . $yoff;
-            $nodename = preg_replace("/:$xoff:$yoff$/i", '', $input);
-            $need_size_precalc = true;
+            $endOffset = $xoff . ":" . $yoff;
+            $nodeName = preg_replace("/:$xoff:$yoff$/i", '', $input);
+            $needSizePrecalculate = true;
         } elseif (preg_match('/^([^:]+):([A-Za-z][A-Za-z0-9\-_]*)$/i', $input, $submatches)) {
             MapUtility::wm_debug("Matching node namedoffset %s on node %s\n", $submatches[2], $submatches[1]);
             $otherNode = $this->mapObject->getNode($submatches[1]);
-            if (array_key_exists($submatches[2], $otherNode->named_offsets)) {
-                $named_offset = $submatches[2];
-                $nodename = preg_replace("/:$named_offset$/i", '', $input);
+            if (array_key_exists($submatches[2], $otherNode->namedOffsets)) {
+                $namedOffset = $submatches[2];
+                $nodeName = preg_replace("/:$namedOffset$/i", '', $input);
 
-                $endoffset = $named_offset;
-                $offset_dx = $otherNode->named_offsets[$named_offset][0];
-                $offset_dy = $otherNode->named_offsets[$named_offset][1];
+                $endOffset = $namedOffset;
+                $xOffset = $otherNode->namedOffsets[$namedOffset][0];
+                $yOffset = $otherNode->namedOffsets[$namedOffset][1];
             }
         }
 
-        return array($offset_dx, $offset_dy, $nodename, $endoffset, $need_size_precalc);
+        return array($xOffset, $yOffset, $nodeName, $endOffset, $needSizePrecalculate);
     }
 
     private function handleNODES($fullcommand, $args, $matches)
@@ -1404,8 +1404,8 @@ class ConfigReader
             if ($valid_nodes == 2) {
                 $this->currentObject->setEndNodes($this->mapObject->getNode($nodeNames[1]), $this->mapObject->getNode($nodeNames[2]));
 
-                $this->currentObject->a_offset = $endOffsets[1];
-                $this->currentObject->b_offset = $endOffsets[2];
+                $this->currentObject->endpoints[0]->offset = $endOffsets[1];
+                $this->currentObject->endpoints[1]->offset = $endOffsets[2];
 
                 // lash-up to avoid having to pass loads of context to calc_offset
                 // - named offsets require access to the internals of the node, when they are
@@ -1415,14 +1415,9 @@ class ConfigReader
                     if ($offset_dx[$index] != 0 || $offset_dy[$index] != 0) {
                         MapUtility::wm_debug("Applying offset for $name end %s,%s\n", $offset_dx[$index], $offset_dy[$index]);
 
-                        // TODO - these should be arrays, not named properties
-                        $n1 = $name . "_offset_dx";
-                        $n2 = $name . "_offset_dy";
-                        $n3 = $name . "_offset_resolved";
-
-                        $this->currentObject->$n1 = $offset_dx[$index];
-                        $this->currentObject->$n2 = $offset_dy[$index];
-                        $this->currentObject->$n3 = true;
+                        $this->currentObject->endpoints[$index-1]->dx = $offset_dx[$index];
+                        $this->currentObject->endpoints[$index-1]->dy = $offset_dy[$index];
+                        $this->currentObject->endpoints[$index-1]->resolved = true;
                     }
                 }
             } else {
@@ -1439,9 +1434,9 @@ class ConfigReader
         global $weathermap_error_suppress;
 
         if (preg_match('/^SET\s+(\S+)\s+(.*)\s*$/i', $fullcommand, $matches)) {
-            $this->currentObject->add_hint($matches[1], trim($matches[2]));
+            $this->currentObject->addHint($matches[1], trim($matches[2]));
 
-            if ($this->currentObject->my_type() == "MAP" && substr($matches[1], 0, 7) == 'nowarn_') {
+            if ($this->currentObject->myType() == "MAP" && substr($matches[1], 0, 7) == 'nowarn_') {
                 $key = substr(strtoupper($matches[1]), 7);
                 MapUtility::wm_debug("Suppressing warning $key for this map\n");
                 $weathermap_error_suppress[$key] = 1;
@@ -1450,8 +1445,8 @@ class ConfigReader
         }
         // allow setting a variable to ""
         if (preg_match('/^SET\s+(\S+)\s*$/i', $fullcommand, $matches)) {
-            $this->currentObject->add_hint($matches[1], '');
-            if ($this->currentObject->my_type() == "MAP" && substr($matches[1], 0, 7) == 'nowarn_') {
+            $this->currentObject->addHint($matches[1], '');
+            if ($this->currentObject->myType() == "MAP" && substr($matches[1], 0, 7) == 'nowarn_') {
                 $key = substr(strtoupper($matches[1]), 7);
                 MapUtility::wm_debug("Suppressing warning $key for this map\n");
                 $weathermap_error_suppress[$key] = 1;
@@ -1669,8 +1664,8 @@ class ConfigReader
 
     private function handleARROWSTYLE($fullcommand, $args, $matches)
     {
-        $this->currentObject->arrowstyle = $matches[1] . ' ' . $matches[2];
-        $this->currentObject->setConfigValue("arrowstyle", $matches[1] . ' ' . $matches[2]);
+        $this->currentObject->arrowStyle = $matches[1] . ' ' . $matches[2];
+        $this->currentObject->setConfigValue("arrowStyle", $matches[1] . ' ' . $matches[2]);
         return true;
     }
 
@@ -1736,7 +1731,7 @@ class ConfigReader
     private function handleDEFINEOFFSET($fullcommand, $args, $matches)
     {
         MapUtility::wm_debug("Defining a named offset: " . $matches[1] . "\n");
-        $this->currentObject->named_offsets[$matches[1]] = array(intval($matches[2]), intval($matches[3]));
+        $this->currentObject->namedOffsets[$matches[1]] = array(intval($matches[2]), intval($matches[3]));
 
         return true;
     }

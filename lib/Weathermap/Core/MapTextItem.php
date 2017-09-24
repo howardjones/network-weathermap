@@ -40,7 +40,7 @@ class MapTextItem extends MapItem
         $this->processedText = $owner->ProcessString($this->configuredText, $owner, true);
     }
 
-    public function my_type()
+    public function myType()
     {
         return "TEXT";
     }
@@ -65,7 +65,7 @@ class MapTextItem extends MapItem
         $fontObject = $map->fonts->getFont($this->font);
         $string = $map->ProcessString($this->configuredText, $map);
 
-        if ($map->get_hint('screenshot_mode') == 1) {
+        if ($map->getHint('screenshot_mode') == 1) {
             $string = StringUtility::stringAnonymise($string);
         }
 
@@ -82,6 +82,6 @@ class MapTextItem extends MapItem
         $fontObject->drawImageString($imageRef, $x, $y, $string, $this->textColour->gdAllocate($imageRef));
 
         $map->imap->addArea("Rectangle", $this->prefix, '', array($x, $y, $x + $boxWidth, $y - $boxHeight));
-        $map->imap_areas[] = $this->prefix;
+        $map->imagemapAreas[] = $this->prefix;
     }
 }

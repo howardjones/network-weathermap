@@ -8,6 +8,8 @@
 
 namespace Weathermap\Plugins\Post;
 
+use Weathermap\Core\Map;
+
 /**
  * Class WeatherMapPostProcessor
  *
@@ -15,9 +17,10 @@ namespace Weathermap\Plugins\Post;
  */
 class PostProcessorBase
 {
+    /** @var  Map */
     protected $owner;
 
-    public function Init(&$map)
+    public function init(&$map)
     {
         $this->owner = $map;
 
@@ -27,7 +30,7 @@ class PostProcessorBase
     /**
      * The only API for a PostProcessor - do whatever it is that you are supposed to do.
      *
-     * @param WeatherMap $map the WeatherMap main object
+     * @param Map $map the WeatherMap main object
      * @return bool Success/Failure? Not currently interpreted.
      */
     public function run()

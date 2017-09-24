@@ -3,6 +3,8 @@ namespace Weathermap\Plugins\Datasources;
 
 use Weathermap\Core\MapUtility;
 use Weathermap\Core\StringUtility;
+use Weathermap\Core\Map;
+use Weathermap\Core\MapDataItem;
 
 // template class for data sources. All data sources extend this class.
 // I really wish PHP4 would just die overnight
@@ -100,8 +102,8 @@ class DatasourceBase
      * pre-register a target + context, to allow a plugin to batch up queries to a slow database, or SNMP for example
      *
      * @param string $targetstring A clause from a TARGET line, after being processed by ProcessString
-     * @param WeatherMap $map the WeatherMap main object
-     * @param WeatherMapDataItem $item the specific WeatherMapItem that this target is for
+     * @param Map $map the WeatherMap main object
+     * @param MapDataItem $item the specific WeatherMapItem that this target is for
      */
     public function register($targetstring, &$map, &$item)
     {
@@ -110,7 +112,7 @@ class DatasourceBase
     /**
      * called before ReadData, to allow plugins to DO the prefetch of targets known from Register
      *
-     * @param WeatherMap $map the WeatherMap main object
+     * @param Map $map the WeatherMap main object
      */
     public function preFetch(&$map)
     {

@@ -25,25 +25,25 @@ class WeatherMapCacti88ManagementPlugin extends WeatherMapCactiManagementPlugin
      */
     public function handleManagementMainScreen($request, $appObject)
     {
-        $this->cacti_header();
+        $this->cactiHeader();
         $this->maplist_warnings();
         $this->maplist();
-        $this->footer_links();
-        $this->cacti_footer();
+        $this->footerLinks();
+        $this->cactiFooter();
     }
 
 
-    public function cacti_header()
+    public function cactiHeader()
     {
         include_once $this->cacti_config["base_path"] . "/include/top_header.php";
     }
 
-    public function cacti_footer()
+    public function cactiFooter()
     {
         include_once $this->cacti_config["base_path"] . "/include/bottom_footer.php";
     }
 
-    public function cacti_row_start($i)
+    public function cactiRowStart($i)
     {
         form_alternate_row_color($this->colours["alternate"], $this->colours["light"], $i);
     }

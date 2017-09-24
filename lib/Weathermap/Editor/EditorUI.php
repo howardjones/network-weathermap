@@ -8,9 +8,9 @@ namespace Weathermap\Editor;
 
 use Weathermap\UI\UIBase;
 
-//require_once "WeatherMapUIBase.class.php";
-//require_once "Editor.php";
-//require_once 'SimpleTemplate.php';
+use Weathermap\UI\SimpleTemplate;
+use Weathermap\Core\WeathermapInternalFail;
+use Weathermap\Core\Map;
 
 /** The various functions concerned with the actual presentation of the supplied editor, and
  *  validation of input etc. Mostly class methods.
@@ -360,7 +360,7 @@ class EditorUI extends UIBase
     // cmd* methods below here translate form inputs into Editor API calls, which do the real work
 
     /**
-     * @param WeatherMap $map
+     * @param Map $map
      * @return resource
      */
     function generateFontSampleImage($map)
@@ -498,7 +498,7 @@ class EditorUI extends UIBase
      */
     function cmdAddLinkVia($params, $editor)
     {
-        $editor->setLinkVia($params['param'], $params['x'], $params['y']);
+        $editor->setLinkVia($params['param'], floatval($params['x']), floatval($params['y']));
     }
 
     /**

@@ -7,6 +7,9 @@
 namespace Weathermap\Plugins\Datasources;
 
 use Weathermap\Core\StringUtility;
+use Weathermap\Core\Map;
+use Weathermap\Core\MapDataItem;
+
 
 class WeatherMapDataSource_static extends DatasourceBase
 {
@@ -24,8 +27,8 @@ class WeatherMapDataSource_static extends DatasourceBase
 
     /**
      * @param string $targetstring The string from the config file
-     * @param WeatherMap $map A reference to the map object (redundant)
-     * @param WeatherMapDataItem $item A reference to the object this target is attached to
+     * @param Map $map A reference to the map object (redundant)
+     * @param MapDataItem $item A reference to the object this target is attached to
      * @return array invalue, outvalue, unix timestamp that the data was valid
      */
     public function readData($targetstring, &$map, &$item)

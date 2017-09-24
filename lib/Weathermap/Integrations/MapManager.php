@@ -1,4 +1,5 @@
 <?php
+
 namespace Weathermap\Integrations;
 
 use \PDO;
@@ -73,9 +74,9 @@ class MapManager
     {
         $statement = $this->pdo->query("SELECT count(*) AS total FROM weathermap_maps");
         $statement->execute();
-        $total_map_count = $statement->fetchColumn();
+        $totalMapCount = $statement->fetchColumn();
 
-        return $total_map_count;
+        return $totalMapCount;
     }
 
     public function getMapsInGroup($groupId)
@@ -161,7 +162,16 @@ class MapManager
 
     public function updateMap($mapId, $data)
     {
-        $allowed = array("active", "sortorder", "warncount", "runtime", "group_id", "thumb_width", "thumb_height", "titlecache"); // allowed fields
+        $allowed = array(
+            "active",
+            "sortorder",
+            "warncount",
+            "runtime",
+            "group_id",
+            "thumb_width",
+            "thumb_height",
+            "titlecache"
+        ); // allowed fields
         list($set, $values) = $this->buildSet($data, $allowed);
 
         $values['id'] = $mapId;
@@ -248,15 +258,19 @@ class MapManager
         if ($target !== false) {
             $otherId = $target->id;
             // move $mapid in direction $direction
-            $this->pdo->prepare("UPDATE weathermap_maps SET sortorder =? WHERE id=?")->execute(array(
-                $newOrder,
-                $mapId
-            ));
+            $this->pdo->prepare("UPDATE weathermap_maps SET sortorder =? WHERE id=?")->execute(
+                array(
+                    $newOrder,
+                    $mapId
+                )
+            );
             // then find the other one with the same sortorder and move that in the opposite direction
-            $this->pdo->prepare("UPDATE weathermap_maps SET sortorder =? WHERE id=?")->execute(array(
-                $oldOrder,
-                $otherId
-            ));
+            $this->pdo->prepare("UPDATE weathermap_maps SET sortorder =? WHERE id=?")->execute(
+                array(
+                    $oldOrder,
+                    $otherId
+                )
+            );
         }
     }
 
@@ -274,15 +288,19 @@ class MapManager
         if ($target !== false) {
             $otherId = $target->id;
             // move $mapid in direction $direction
-            $this->pdo->prepare("UPDATE weathermap_groups SET sortorder = ? WHERE id=?")->execute(array(
-                $newOrder,
-                $groupId
-            ));
+            $this->pdo->prepare("UPDATE weathermap_groups SET sortorder = ? WHERE id=?")->execute(
+                array(
+                    $newOrder,
+                    $groupId
+                )
+            );
             // then find the other one with the same sortorder and move that in the opposite direction
-            $this->pdo->prepare("UPDATE weathermap_groups SET sortorder = ? WHERE id=?")->execute(array(
-                $oldOrder,
-                $otherId
-            ));
+            $this->pdo->prepare("UPDATE weathermap_groups SET sortorder = ? WHERE id=?")->execute(
+                array(
+                    $oldOrder,
+                    $otherId
+                )
+            );
         }
     }
 
@@ -341,10 +359,12 @@ class MapManager
 
     public function deleteMapSetting($mapId, $settingId)
     {
-        $this->pdo->prepare("DELETE FROM weathermap_settings WHERE id=? AND mapid=?")->execute(array(
-            $settingId,
-            $mapId
-        ));
+        $this->pdo->prepare("DELETE FROM weathermap_settings WHERE id=? AND mapid=?")->execute(
+            array(
+                $settingId,
+                $mapId
+            )
+        );
     }
 
     // This isn't actually used anywhere...
@@ -431,10 +451,12 @@ class MapManager
     public function createGroup($groupName)
     {
         $sortOrder = $this->pdo->query("SELECT max(sortorder)+1 AS next_id FROM weathermap_groups")->fetchColumn();
-        $this->pdo->prepare("INSERT INTO weathermap_groups(name, sortorder) VALUES(?,?)")->execute(array(
-            $groupName,
-            $sortOrder
-        ));
+        $this->pdo->prepare("INSERT INTO weathermap_groups(name, sortorder) VALUES(?,?)")->execute(
+            array(
+                $groupName,
+                $sortOrder
+            )
+        );
     }
 
     public function deleteGroup($groupId)
@@ -459,7 +481,7 @@ class MapManager
         $this->pdo->prepare("UPDATE weathermap_groups SET name=? WHERE id=?")->execute(array($newName, $groupId));
     }
 
-    function extractMapTitle($filename)
+    public function extractMapTitle($filename)
     {
         $title = "(no file)";
 
@@ -528,10 +550,10 @@ class MapManager
         return $users;
     }
 
-    public function translateFileHash($id_or_filename)
+    public function translateFileHash($idOrFilename)
     {
         $statement = $this->pdo->prepare("SELECT id FROM weathermap_maps WHERE configfile=? OR filehash=?");
-        $statement->execute(array($id_or_filename, $id_or_filename));
+        $statement->execute(array($idOrFilename, $idOrFilename));
 
         $result = $statement->fetchColumn();
 
@@ -541,14 +563,14 @@ class MapManager
     // Below here will migrate into a Cacti API class at some point soon
     // (to allow for other hosts to have equivalent functions)
 
-    public function getAppSetting($name, $default_value = "")
+    public function getAppSetting($name, $defaultValue = "")
     {
         $statement = $this->pdo->prepare("SELECT value FROM settings WHERE name=?");
         $statement->execute(array($name));
         $result = $statement->fetchColumn();
 
         if ($result === false) {
-            return $default_value;
+            return $defaultValue;
         }
 
         return $result;
@@ -566,7 +588,7 @@ class MapManager
         $statement->execute(array($name));
     }
 
-    public function getUserList($include_anyone = false)
+    public function getUserList($includeAnyone = false)
     {
         $statement = $this->pdo->query("SELECT id, username, full_name, enabled FROM user_auth");
         $statement->execute();
@@ -578,7 +600,7 @@ class MapManager
             $users[$user->id] = $user;
         }
 
-        if ($include_anyone) {
+        if ($includeAnyone) {
             $users[0] = new \stdClass();
             $users[0]->id = 0;
             $users[0]->username = "Anyone";

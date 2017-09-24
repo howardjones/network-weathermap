@@ -30,7 +30,7 @@ class MapScale extends MapItem
 
         $this->name = $name;
 
-        $this->inherit_fieldlist = array(
+        $this->inheritedFieldList = array(
             "scaleType" => "percent",
             "keystyle" => "classic",
             "entries" => array(),
@@ -43,17 +43,17 @@ class MapScale extends MapItem
             "keysize" => 0
         );
 
-        $this->Reset($owner);
+        $this->reset($owner);
     }
 
-    public function Reset(&$owner)
+    public function reset(&$owner)
     {
         $this->owner = $owner;
 
         assert($this->owner->kilo != 0);
 
-        foreach (array_keys($this->inherit_fieldlist) as $fld) {
-            $this->$fld = $this->inherit_fieldlist[$fld];
+        foreach (array_keys($this->inheritedFieldList) as $fld) {
+            $this->$fld = $this->inheritedFieldList[$fld];
         }
 
         //        $this->setColour("KEYBG", new Colour(255, 255, 255));
@@ -64,7 +64,7 @@ class MapScale extends MapItem
         assert(isset($owner));
     }
 
-    public function my_type()
+    public function myType()
     {
         return "SCALE";
     }
@@ -89,7 +89,7 @@ class MapScale extends MapItem
         $this->addSpan(85, 100, new Colour(255, 0, 0));
 
         // we have a 0-0 line now, so we need to hide that.
-        $this->owner->add_hint("key_hidezero_" . $this->name, 1);
+        $this->owner->addHint("key_hidezero_" . $this->name, 1);
     }
 
     public function spanCount()
@@ -141,8 +141,8 @@ class MapScale extends MapItem
 
         MapUtility::wm_debug("Finding a colour for value %s in scale %s\n", $value, $this->name);
 
-        $nowarn_clipping = intval($this->owner->get_hint("nowarn_clipping"));
-        $nowarn_scalemisses = (!$showScaleWarnings) || intval($this->owner->get_hint("nowarn_scalemisses"));
+        $nowarnClipping = intval($this->owner->getHint("nowarn_clipping"));
+        $nowarnScaleMisses = (!$showScaleWarnings) || intval($this->owner->getHint("nowarn_scalemisses"));
 
         if (!isset($this->entries)) {
             throw new WeathermapInternalFail("ColourFromValue: SCALE $scaleName used with no spans defined?");
@@ -160,7 +160,7 @@ class MapScale extends MapItem
             $oldValue = $value;
             $value = min($value, 100);
             $value = max($value, 0);
-            if ($value != $oldValue && $nowarn_clipping == 0) {
+            if ($value != $oldValue && $nowarnClipping == 0) {
                 MapUtility::wm_warn("ColourFromValue: Clipped $oldValue% to $value% for item $itemName [WMWARN33]\n");
             }
         }
@@ -168,7 +168,7 @@ class MapScale extends MapItem
         list ($col, $key, $tag) = $this->findScaleHit($value);
 
         if (null === $col) {
-            if ($nowarn_scalemisses == 0) {
+            if ($nowarnScaleMisses == 0) {
                 MapUtility::wm_warn(
                     "ColourFromValue: Scale $scaleName doesn't include a line for $value"
                     . ($isPercentage ? "%" : "") . " while drawing item $itemName [WMWARN29]\n"
@@ -246,9 +246,9 @@ class MapScale extends MapItem
         $config['style'] = $this->keystyle;
         $config['size'] = $this->keysize;
 
-        $config_entries = array();
+        $configEntries = array();
         foreach ($this->entries as $entry) {
-            $config_entries[] = array(
+            $configEntries[] = array(
                 "min" => $entry['bottom'],
                 "max" => $entry['top'],
                 "tag" => $entry['tag'],
@@ -256,7 +256,7 @@ class MapScale extends MapItem
                 "c2" => (isset($entry['c2']) ? $entry['c2']->asArray() : null)
             );
         }
-        $config['entries'] = $config_entries;
+        $config['entries'] = $configEntries;
 
         return $config;
     }
@@ -267,7 +267,7 @@ class MapScale extends MapItem
 
         $output = "";
 
-        if ($this->keypos != $this->inherit_fieldlist['keypos']) {
+        if ($this->keypos != $this->inheritedFieldList['keypos']) {
             $output .= sprintf(
                 "\tKEYPOS %s %d %d %s\n",
                 $this->name,
@@ -277,8 +277,8 @@ class MapScale extends MapItem
             );
         }
 
-        if ($this->keystyle != $this->inherit_fieldlist['keystyle']) {
-            if ($this->keysize != $this->inherit_fieldlist['keysize']) {
+        if ($this->keystyle != $this->inheritedFieldList['keystyle']) {
+            if ($this->keysize != $this->inheritedFieldList['keysize']) {
                 $output .= sprintf(
                     "\tKEYSTYLE %s %s %d\n",
                     $this->name,
@@ -319,7 +319,7 @@ class MapScale extends MapItem
         */
 
         $locale = localeconv();
-        $decimal_point = $locale['decimal_point'];
+        $decimalPoint = $locale['decimal_point'];
 
         if ($output != "") {
             $output .= "\n";
@@ -331,7 +331,7 @@ class MapScale extends MapItem
                     sprintf("%f", $entry['top']),
                     "0"
                 ),
-                $decimal_point
+                $decimalPoint
             );
 
             $bottom = rtrim(
@@ -339,7 +339,7 @@ class MapScale extends MapItem
                     sprintf("%f", $entry['bottom']),
                     "0"
                 ),
-                $decimal_point
+                $decimalPoint
             );
 
             if ($bottom > $this->owner->kilo) {
@@ -418,19 +418,19 @@ class MapScale extends MapItem
 
         switch ($this->keystyle) {
             case 'classic':
-                $gdScaleImage = $this->DrawLegendClassic(false);
+                $gdScaleImage = $this->drawLegendClassic(false);
                 break;
             case 'horizontal':
-                $gdScaleImage = $this->DrawLegendHorizontal($this->keysize);
+                $gdScaleImage = $this->drawLegendHorizontal($this->keysize);
                 break;
             case 'vertical':
-                $gdScaleImage = $this->DrawLegendVertical($this->keysize);
+                $gdScaleImage = $this->drawLegendVertical($this->keysize);
                 break;
             case 'inverted':
-                $gdScaleImage = $this->DrawLegendVertical($this->keysize, true);
+                $gdScaleImage = $this->drawLegendVertical($this->keysize, true);
                 break;
             case 'tags':
-                $gdScaleImage = $this->DrawLegendClassic(true);
+                $gdScaleImage = $this->drawLegendClassic(true);
                 break;
         }
 
@@ -448,10 +448,10 @@ class MapScale extends MapItem
         $this->owner->imap->addArea($newArea);
 
         // TODO: stop tracking z-order separately. addArea() should take the z layer
-        $this->imap_areas[] = $newArea;
+        $this->imagemapAreas[] = $newArea;
     }
 
-    private function DrawLegendClassic($useTags = false)
+    private function drawLegendClassic($useTags = false)
     {
         $this->sortScale();
 
@@ -459,14 +459,14 @@ class MapScale extends MapItem
 
         MapUtility::wm_debug("Drawing $nScales colours into SCALE\n");
 
-        $hide_zero = intval($this->owner->get_hint("key_hidezero_" . $this->name));
-        $hide_percent = intval($this->owner->get_hint("key_hidepercent_" . $this->name));
+        $hideZero = intval($this->owner->getHint("key_hidezero_" . $this->name));
+        $hidePercentSign = intval($this->owner->getHint("key_hidepercent_" . $this->name));
 
         // did we actually hide anything?
-        $hid_zero = false;
-        if (($hide_zero == 1) && isset($this->entries['0_0'])) {
+        $didHideZero = false;
+        if (($hideZero == 1) && isset($this->entries['0_0'])) {
             $nScales--;
-            $hid_zero = true;
+            $didHideZero = true;
         }
 
         $fontObject = $this->keyfont;
@@ -483,7 +483,7 @@ class MapScale extends MapItem
         $maxTextSize = 0;
         foreach ($this->entries as $index => $scaleEntry) {
             $labelString = sprintf("%s-%s", $scaleEntry['bottom'], $scaleEntry['top']);
-            if ($hide_percent == 0) {
+            if ($hidePercentSign == 0) {
                 $labelString .= "%";
             }
 
@@ -526,12 +526,12 @@ class MapScale extends MapItem
             $value = ($scaleEntry['bottom'] + $scaleEntry['top']) / 2;
             MapUtility::wm_debug(sprintf("%f-%f (%f)  %s\n", $scaleEntry['bottom'], $scaleEntry['top'], $value, $scaleEntry['c1']));
 
-            if (($hide_zero == 0) || $key != '0_0') {
+            if (($hideZero == 0) || $key != '0_0') {
                 $y = $tileSpacing * $rowNumber + 8;
                 $x = 6;
 
                 $fudgeFactor = 0;
-                if ($hid_zero && $scaleEntry['bottom'] == 0) {
+                if ($didHideZero && $scaleEntry['bottom'] == 0) {
                     // calculate a small offset that can be added, which will hide the zero-value in a
                     // gradient, but not make the scale incorrect. A quarter of a pixel should do it.
                     $fudgeFactor = ($scaleEntry['top'] - $scaleEntry['bottom']) / ($tileWidth * 4);
@@ -566,7 +566,7 @@ class MapScale extends MapItem
         usort($this->entries, array('Weathermap\\Core\\MapScale', "scaleEntrySort"));
     }
 
-    private function DrawLegendHorizontal($keyWidth = 400)
+    private function drawLegendHorizontal($keyWidth = 400)
     {
 
         $title = $this->keytitle;
@@ -642,7 +642,7 @@ class MapScale extends MapItem
      *
 
      */
-    private function DrawLegendVertical($keyHeight = 400, $inverted = false)
+    private function drawLegendVertical($keyHeight = 400, $inverted = false)
     {
         $title = $this->keytitle;
 

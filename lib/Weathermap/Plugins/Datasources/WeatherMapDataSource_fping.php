@@ -6,6 +6,9 @@
 // TARGET fping:hostname
 namespace Weathermap\Plugins\Datasources;
 
+use Weathermap\Core\Map;
+use Weathermap\Core\MapDataItem;
+
 class WeatherMapDataSource_fping extends DatasourceBase
 {
 
@@ -40,8 +43,8 @@ class WeatherMapDataSource_fping extends DatasourceBase
      * pre-register a target + context, to allow a plugin to batch up queries to a slow database, or SNMP for example
      *
      * @param string $targetstring A clause from a TARGET line, after being processed by ProcessString
-     * @param WeatherMap $map the WeatherMap main object
-     * @param WeatherMapDataItem $item the specific WeatherMapItem that this target is for
+     * @param Map $map the WeatherMap main object
+     * @param MapDataItem $item the specific WeatherMapItem that this target is for
      */
     public function register($targetstring, &$map, &$item)
     {

@@ -16,8 +16,8 @@ class MapItem extends MapBase
     var $my_default;
     var $defined_in;
     var $name;
-    var $config_override;    # used by the editor to allow text-editing
-    public $imap_areas;
+    var $configOverride;    # used by the editor to allow text-editing
+    public $imagemapAreas;
     public $zorder;
     protected $descendents = array();
     protected $dependencies = array();
@@ -27,10 +27,10 @@ class MapItem extends MapBase
         parent::__construct();
 
         $this->zorder = 1000;
-        $this->imap_areas = array();
+        $this->imagemapAreas = array();
     }
 
-    public function my_type()
+    public function myType()
     {
         return "ITEM";
     }
@@ -42,7 +42,7 @@ class MapItem extends MapBase
 
     public function getImageMapAreas()
     {
-        return $this->imap_areas;
+        return $this->imagemapAreas;
     }
 
     public function setDefined($source)
@@ -57,7 +57,7 @@ class MapItem extends MapBase
 
     public function replaceConfig($newConfig)
     {
-        $this->config_override = $newConfig;
+        $this->configOverride = $newConfig;
     }
 
 
@@ -65,7 +65,7 @@ class MapItem extends MapBase
     {
         $config = array(
             "name"=>$this->name,
-            "type"=>$this->my_type(),
+            "type"=>$this->myType(),
             'vars'=>$this->hints
         );
 

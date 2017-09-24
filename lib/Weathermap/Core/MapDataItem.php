@@ -2,6 +2,8 @@
 
 namespace Weathermap\Core;
 
+use Weathermap\Core\MapUtility;
+
 /**
  * Class WeatherMapDataItem - Everything that collects data from DS plugins,
  * uses scales, etc, inherits from here.
@@ -19,6 +21,7 @@ class MapDataItem extends MapItem
     public $absoluteUsages = array();
     public $maxValuesConfigured = array();
     public $channelScaleColours = array();
+    public $inheritedFieldList = array();
 
     public $scaleTags = array();
     public $scaleKeys = array();
@@ -75,11 +78,11 @@ class MapDataItem extends MapItem
     public function setTemplate($template_name, $owner)
     {
         $this->template = $template_name;
-        MapUtility::wm_debug("Resetting to template %s %s\n", $this->my_type(), $template_name);
+        MapUtility::wm_debug("Resetting to template %s %s\n", $this->myType(), $template_name);
         $this->reset($owner);
     }
 
-    public function Draw($imageRef)
+    public function draw($imageRef)
     {
     }
 
@@ -113,8 +116,8 @@ class MapDataItem extends MapItem
 
     private function resetDefault()
     {
-        foreach (array_keys($this->inherit_fieldlist) as $fld) {
-            $this->$fld = $this->inherit_fieldlist[$fld];
+        foreach (array_keys($this->inheritedFieldList) as $fld) {
+            $this->$fld = $this->inheritedFieldList[$fld];
         }
         $this->parent = null;
     }
@@ -129,10 +132,10 @@ class MapDataItem extends MapItem
 
     public function CopyFrom(&$source)
     {
-        MapUtility::wm_debug("Initialising %s $this->name from $source->name\n", $this->my_type());
+        MapUtility::wm_debug("Initialising %s $this->name from $source->name\n", $this->myType());
         assert('is_object($source)');
 
-        foreach (array_keys($this->inherit_fieldlist) as $fld) {
+        foreach (array_keys($this->inheritedFieldList) as $fld) {
             if ($fld != 'template') {
                 $this->$fld = $source->$fld;
                 if ($fld == 'targets') {
@@ -305,9 +308,9 @@ class MapDataItem extends MapItem
             $this->percentUsages[$channel] = ($value / $this->maxValues[$channel]) * 100;
 
             # set notes with the old names, so the properties are no longer necessary
-            $this->add_note($channelName . "percent", $this->percentUsages[$channel]);
-            $this->add_note("max_bandwidth_" . $channelName, $this->maxValues[$channel]);
-            $this->add_note("max_bandwidth_" . $channelName . "_cfg", $this->maxValuesConfigured[$channel]);
+            $this->addNote($channelName . "percent", $this->percentUsages[$channel]);
+            $this->addNote("max_bandwidth_" . $channelName, $this->maxValues[$channel]);
+            $this->addNote("max_bandwidth_" . $channelName . "_cfg", $this->maxValuesConfigured[$channel]);
         }
     }
 
@@ -335,9 +338,9 @@ class MapDataItem extends MapItem
             list($col, $scalekey, $scaletag) = $scale->colourFromValue($value, $this->name, $isPercent, $logWarnings);
             $this->channelScaleColours[$channel] = $col;
             $this->colours[$channel] = $col;
-            $this->add_note($channelName . "scalekey", $scalekey);
-            $this->add_note($channelName . "scaletag", $scaletag);
-            $this->add_note($channelName . "scalecolor", $col->asHTML());
+            $this->addNote($channelName . "scalekey", $scalekey);
+            $this->addNote($channelName . "scaletag", $scaletag);
+            $this->addNote($channelName . "scalecolor", $col->asHTML());
         }
     }
 

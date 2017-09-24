@@ -3,6 +3,8 @@ namespace Weathermap\Plugins\Datasources;
 
 use Weathermap\Core\MapUtility;
 use Weathermap\Core\StringUtility;
+use Weathermap\Core\Map;
+use Weathermap\Core\MapDataItem;
 
 class WeatherMapDataSource_tabfile extends DatasourceBase
 {
@@ -18,8 +20,8 @@ class WeatherMapDataSource_tabfile extends DatasourceBase
 
     /**
      * @param string $targetString The string from the config file
-     * @param WeatherMap $map A reference to the map object (redundant)
-     * @param WeatherMapDataItem $mapItem A reference to the object this target is attached to
+     * @param Map $map A reference to the map object (redundant)
+     * @param MapDataItem $mapItem A reference to the object this target is attached to
      * @return array invalue, outvalue, unix timestamp that the data was valid
      */
     public function readData($targetString, &$map, &$mapItem)

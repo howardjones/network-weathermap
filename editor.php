@@ -334,12 +334,12 @@ if ($mapname == '') {
                             }
                             // while we're here, VIAs can also be relative to a NODE,
                             // so check if any of those need to change
-                            if ((count($link->vialist) > 0)) {
+                            if ((count($link->viaList) > 0)) {
                                 $vv = 0;
-                                foreach ($link->vialist as $v) {
+                                foreach ($link->viaList as $v) {
                                     if (isset($v[2]) && $v[2] == $node_name) {
                                         // die PHP4, die!
-                                        $map->links[$link->name]->vialist[$vv][2] = $new_node_name;
+                                        $map->links[$link->name]->viaList[$vv][2] = $new_node_name;
                                     }
                                     $vv++;
                                 }
@@ -599,7 +599,7 @@ if ($mapname == '') {
             $map->ReadConfig($mapfile);
 
             if (isset($map->links[$link_name])) {
-                $map->links[$link_name]->vialist = array(array(0 => $x, 1 => $y));
+                $map->links[$link_name]->viaList = array(array(0 => $x, 1 => $y));
                 $map->WriteConfig($mapfile);
             }
 
@@ -620,7 +620,7 @@ if ($mapname == '') {
                     // links that have VIAs. If it is, we want to rotate those VIA points
                     // about the *other* node in the link
                     foreach ($map->links as $link) {
-                        if ((count($link->vialist) > 0) && (($link->a->name == $node_name) || ($link->b->name == $node_name))) {
+                        if ((count($link->viaList) > 0) && (($link->a->name == $node_name) || ($link->b->name == $node_name))) {
                             // get the other node from us
                             if ($link->a->name == $node_name) {
                                 $pivot = $link->b;
@@ -634,9 +634,9 @@ if ($mapname == '') {
                                 $dx = $link->a->x - $x;
                                 $dy = $link->a->y - $y;
 
-                                for ($i = 0; $i < count($link->vialist); $i++) {
-                                    $link->vialist[$i][0] = $link->vialist[$i][0] - $dx;
-                                    $link->vialist[$i][1] = $link->vialist[$i][1] - $dy;
+                                for ($i = 0; $i < count($link->viaList); $i++) {
+                                    $link->vialist[$i][0] = $link->viaList[$i][0] - $dx;
+                                    $link->vialist[$i][1] = $link->viaList[$i][1] - $dy;
                                 }
                             } else {
                                 $pivx = $pivot->x;
@@ -657,7 +657,7 @@ if ($mapname == '') {
 
                                 // the geometry stuff uses a different point format, helpfully
                                 $points = array();
-                                foreach ($link->vialist as $via) {
+                                foreach ($link->viaList as $via) {
                                     $points[] = $via[0];
                                     $points[] = $via[1];
                                 }
@@ -675,13 +675,13 @@ if ($mapname == '') {
                                 // rotate back so that link is along the new direction
                                 rotateAboutPoint($points, $pivx, $pivy, deg2rad(-$angle_new));
 
-                                // now put the modified points back into the vialist again
+                                // now put the modified points back into the viaList again
                                 $v = 0;
                                 $i = 0;
                                 foreach ($points as $p) {
                                     // skip a point if it positioned relative to a node. Those shouldn't be rotated (well, IMHO)
-                                    if (!isset($link->vialist[$v][2])) {
-                                        $link->vialist[$v][$i] = $p;
+                                    if (!isset($link->viaList[$v][2])) {
+                                        $link->viaList[$v][$i] = $p;
                                     }
                                     $i++;
                                     if ($i == 2) {

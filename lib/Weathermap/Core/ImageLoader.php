@@ -25,7 +25,7 @@ class ImageLoader
      * @param string $filename
      * @param int $scaleWidth
      * @param int $scaleHeight
-     * @param WMColour $colour
+     * @param Colour $colour
      * @param string $colourMethod
      * @return null|resource
      */
@@ -254,7 +254,7 @@ class ImageLoader
     }
 
     /**
-     * @param WMColour $colour
+     * @param Colour $colour
      * @param string $colourMethod
      * @param resource $iconImageRef
      */

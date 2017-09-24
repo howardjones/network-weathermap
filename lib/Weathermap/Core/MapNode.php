@@ -7,7 +7,6 @@
 
 namespace Weathermap\Core;
 
-
 class MapNode extends MapDataItem
 {
     public $drawable;
@@ -35,13 +34,13 @@ class MapNode extends MapDataItem
     public $labeloffsetx;
     public $labeloffsety;
 
-    /** @var  WMColour $labelbgcolour */
+    /** @var  Colour $labelbgcolour */
     public $labelbgcolour;
-    /** @var  WMColour $labeloutlinecolour */
+    /** @var  Colour $labeloutlinecolour */
     public $labeloutlinecolour;
-    /** @var  WMColour $labelfontcolour */
+    /** @var  Colour $labelfontcolour */
     public $labelfontcolour;
-    /** @var  WMColour $labelfontshadowcolour */
+    /** @var  Colour $labelfontshadowcolour */
     public $labelfontshadowcolour;
 
     public $labelfont;
@@ -55,9 +54,9 @@ class MapNode extends MapDataItem
     public $relative_to;
     public $polar;
     public $boundingboxes = array();
-    /** @var  WMColour $aiconfillcolour */
+    /** @var  Colour $aiconfillcolour */
     public $aiconfillcolour;
-    /** @var  WMColour $aiconoutlinecolour */
+    /** @var  Colour $aiconoutlinecolour */
     public $aiconoutlinecolour;
 
     /**
@@ -123,12 +122,12 @@ class MapNode extends MapDataItem
             'overlibheight' => 0,
             'overlibcaption' => array(IN => '', OUT => ''),
 
-            'labeloutlinecolour' => new WMColour(0, 0, 0),
-            'labelbgcolour' => new WMColour(255, 255, 255),
-            'labelfontcolour' => new WMColour(0, 0, 0),
-            'labelfontshadowcolour' => new WMColour('none'),
-            'aiconoutlinecolour' => new WMColour(0, 0, 0),
-            'aiconfillcolour' => new WMColour('copy'), // copy from the node label
+            'labeloutlinecolour' => new Colour(0, 0, 0),
+            'labelbgcolour' => new Colour(255, 255, 255),
+            'labelfontcolour' => new Colour(0, 0, 0),
+            'labelfontshadowcolour' => new Colour('none'),
+            'aiconoutlinecolour' => new Colour(0, 0, 0),
+            'aiconfillcolour' => new Colour('copy'), // copy from the node label
 
             'labeloffset' => '',
             'labeloffsetx' => 0,
@@ -151,7 +150,7 @@ class MapNode extends MapDataItem
     public function preRender(&$map)
     {
         if (!$this->drawable) {
-            wm_debug("Skipping undrawable %s", $this);
+            MapUtility::wm_debug("Skipping undrawable %s", $this);
             return;
         }
 
@@ -169,17 +168,17 @@ class MapNode extends MapDataItem
         // start these off with sensible values, so that bbox
         // calculations are easier.
 
-        $boundingBox = new WMBoundingBox();
-        $labelBox = new WMRectangle($this->x, $this->y, $this->x, $this->y);
-        $iconBox = new WMRectangle($this->x, $this->y, $this->x, $this->y);
-        $textPoint = new WMPoint($this->x, $this->y);
+        $boundingBox = new BoundingBox();
+        $labelBox = new Rectangle($this->x, $this->y, $this->x, $this->y);
+        $iconBox = new Rectangle($this->x, $this->y, $this->x, $this->y);
+        $textPoint = new Point($this->x, $this->y);
 
         $labelBoxWidth = 0;
         $labelBoxHeight = 0;
         $iconWidth = 0;
         $iconHeight = 0;
 
-        $labelColour = new WMColour('none');
+        $labelColour = new Colour('none');
 
         // if a target is specified, and you haven't forced no background, then the background will
         // come from the SCALE in USESCALE
@@ -196,13 +195,13 @@ class MapNode extends MapDataItem
                 $labelColour = $this->colours[OUT];
             }
         } elseif (!$this->labelbgcolour->isNone()) {
-            wm_debug("labelbgcolour=%s\n", $this->labelbgcolour);
+            MapUtility::wm_debug("labelbgcolour=%s\n", $this->labelbgcolour);
             $labelColour = $this->labelbgcolour;
         }
 
         $iconColour = null;
         if (!empty($this->targets) && $this->useiconscale != 'none') {
-            wm_debug("Colorising the icon\n");
+            MapUtility::wm_debug("Colorising the icon\n");
             $iconColour = $this->calculateIconColour($map);
         }
 
@@ -216,7 +215,7 @@ class MapNode extends MapDataItem
             // if screenshot_mode is enabled, wipe any letters to X and wipe any IP address to 127.0.0.1
             // hopefully that will preserve enough information to show cool stuff without leaking info
             if ($map->get_hint('screenshot_mode') == 1) {
-                $this->processedLabel = Utility::stringAnonymise($this->processedLabel);
+                $this->processedLabel = StringUtility::stringAnonymise($this->processedLabel);
             }
 
             $fontObject = $this->owner->fonts->getFont($this->labelfont);
@@ -231,27 +230,27 @@ class MapNode extends MapDataItem
                 $labelBoxHeight = $stringHeight * $paddingFactor + $paddingConstant;
             }
 
-            wm_debug("Node->pre_render: " . $this->name . " Label Metrics are: $stringWidth x $stringHeight -> $labelBoxWidth x $labelBoxHeight\n");
+            MapUtility::wm_debug("Node->pre_render: " . $this->name . " Label Metrics are: $stringWidth x $stringHeight -> $labelBoxWidth x $labelBoxHeight\n");
 
             if ($this->labelangle == 90) {
-                $textPoint = new WMPoint($stringHeight / 2, $stringWidth / 2);
+                $textPoint = new Point($stringHeight / 2, $stringWidth / 2);
             }
             if ($this->labelangle == 270) {
-                $textPoint = new WMPoint(-$stringHeight / 2, -$stringWidth / 2);
+                $textPoint = new Point(-$stringHeight / 2, -$stringWidth / 2);
             }
             if ($this->labelangle == 0) {
-                $textPoint = new WMPoint(-$stringWidth / 2, $stringHeight / 2);
+                $textPoint = new Point(-$stringWidth / 2, $stringHeight / 2);
             }
             if ($this->labelangle == 180) {
-                $textPoint = new WMPoint($stringWidth / 2, -$stringHeight / 2);
+                $textPoint = new Point($stringWidth / 2, -$stringHeight / 2);
             }
 
             $textPoint->translate($this->x, $this->y);
 
-            $labelBox = new WMRectangle(-$labelBoxWidth / 2, -$labelBoxHeight / 2, $labelBoxWidth / 2, $labelBoxHeight / 2);
+            $labelBox = new Rectangle(-$labelBoxWidth / 2, -$labelBoxHeight / 2, $labelBoxWidth / 2, $labelBoxHeight / 2);
             $labelBox->translate($this->x, $this->y);
 
-            wm_debug("LABEL at %s\n", $labelBox);
+            MapUtility::wm_debug("LABEL at %s\n", $labelBox);
 
             $this->width = $labelBoxWidth;
             $this->height = $labelBoxHeight;
@@ -273,7 +272,7 @@ class MapNode extends MapDataItem
                 $iconWidth = imagesx($icon_im);
                 $iconHeight = imagesy($icon_im);
 
-                $iconBox = new WMRectangle(-$iconWidth / 2, -$iconHeight / 2, $iconWidth / 2, $iconHeight / 2);
+                $iconBox = new Rectangle(-$iconWidth / 2, -$iconHeight / 2, $iconWidth / 2, $iconHeight / 2);
                 $iconBox->translate($this->x, $this->y);
 
                 $this->width = $iconWidth;
@@ -291,7 +290,7 @@ class MapNode extends MapDataItem
             $this->labeloffsetx = 0;
             $this->labeloffsety = 0;
 
-            list($dx, $dy) = Utility::calculateOffset(
+            list($dx, $dy) = MapUtility::calculateOffset(
                 $this->labeloffset,
                 ($iconWidth + $labelBoxWidth - 1),
                 ($iconHeight + $labelBoxHeight)
@@ -356,7 +355,7 @@ class MapNode extends MapDataItem
         foreach ($this->boundingboxes as $bbox) {
             $areaName = "NODE:N" . $this->id . ":" . $index;
             $newArea = new HTMLImagemapAreaRectangle($areaName, "", array($bbox));
-            wm_debug("Adding imagemap area [" . join(",", $bbox) . "] => $newArea \n");
+            MapUtility::wm_debug("Adding imagemap area [" . join(",", $bbox) . "] => $newArea \n");
             $this->imap_areas[] = $newArea;
             $index++;
         }
@@ -372,20 +371,20 @@ class MapNode extends MapDataItem
      */
     public function preCalculate(&$owner)
     {
-        wm_debug("------------------------------------------------\n");
-        wm_debug("Calculating node geometry for %s\n", $this);
+        MapUtility::wm_debug("------------------------------------------------\n");
+        MapUtility::wm_debug("Calculating node geometry for %s\n", $this);
 
         $this->drawable = false;
 
         // don't bother drawing if it's a template
         if ($this->isTemplate()) {
-            wm_debug("%s is a pure template. Skipping.\n", $this);
+            MapUtility::wm_debug("%s is a pure template. Skipping.\n", $this);
             return;
         }
 
         // apparently, some versions of the gd extension will crash if we continue...
         if ($this->label == '' && $this->iconfile == '') {
-            wm_debug("%s has no label OR icon. Skipping.\n", $this);
+            MapUtility::wm_debug("%s has no label OR icon. Skipping.\n", $this);
             return;
         }
 
@@ -396,7 +395,7 @@ class MapNode extends MapDataItem
     public function Draw($imageRef)
     {
         if (!$this->drawable) {
-            wm_debug("Skipping undrawable %s\n", $this);
+            MapUtility::wm_debug("Skipping undrawable %s\n", $this);
             return;
         }
 
@@ -424,7 +423,7 @@ class MapNode extends MapDataItem
         // at write-time - it should include the leading NODE xyz line (to allow for renaming)
         $template_item = $this->owner->nodes[$this->template];
 
-        wm_debug("Writing config for NODE $this->name against $this->template\n");
+        MapUtility::wm_debug("Writing config for NODE $this->name against $this->template\n");
 
         $basic_params = array(
             # array('template','TEMPLATE',self::CONFIG_TYPE_LITERAL),
@@ -566,12 +565,12 @@ class MapNode extends MapDataItem
         $output .= "\"id\":" . $this->id . ", ";
         $output .= "ox:" . $this->original_x . ", ";
         $output .= "oy:" . $this->original_y . ", ";
-        $output .= "relative_to:" . Utility::jsEscape($this->relative_to) . ", ";
-        $output .= "label:" . Utility::jsEscape($this->label) . ", ";
-        $output .= "name:" . Utility::jsEscape($this->name) . ", ";
-        $output .= "infourl:" . Utility::jsEscape($this->infourl[IN]) . ", ";
-        $output .= "overlibcaption:" . Utility::jsEscape($this->overlibcaption[IN]) . ", ";
-        $output .= "overliburl:" . Utility::jsEscape(join(" ", $this->overliburl[IN])) . ", ";
+        $output .= "relative_to:" . StringUtility::jsEscape($this->relative_to) . ", ";
+        $output .= "label:" . StringUtility::jsEscape($this->label) . ", ";
+        $output .= "name:" . StringUtility::jsEscape($this->name) . ", ";
+        $output .= "infourl:" . StringUtility::jsEscape($this->infourl[IN]) . ", ";
+        $output .= "overlibcaption:" . StringUtility::jsEscape($this->overlibcaption[IN]) . ", ";
+        $output .= "overliburl:" . StringUtility::jsEscape(join(" ", $this->overliburl[IN])) . ", ";
         $output .= "overlibwidth:" . $this->overlibheight . ", ";
         $output .= "overlibheight:" . $this->overlibwidth . ", ";
         if (sizeof($this->boundingboxes) > 0) {
@@ -581,9 +580,9 @@ class MapNode extends MapDataItem
         }
 
         if (preg_match("/^(none|nink|inpie|outpie|box|rbox|gauge|round)$/", $this->iconfile)) {
-            $output .= "iconfile:" . Utility::jsEscape("::" . $this->iconfile);
+            $output .= "iconfile:" . StringUtility::jsEscape("::" . $this->iconfile);
         } else {
-            $output .= "iconfile:" . Utility::jsEscape($this->iconfile);
+            $output .= "iconfile:" . StringUtility::jsEscape($this->iconfile);
         }
 
         return $output;
@@ -629,7 +628,7 @@ class MapNode extends MapDataItem
 
             $now = $anchorPosition->copy();
             $now->translatePolar($angle, $distance);
-            wm_debug("POLAR $this -> $now\n");
+            MapUtility::wm_debug("POLAR $this -> $now\n");
             $this->setPosition($now);
             $this->relative_resolved = true;
 
@@ -644,13 +643,13 @@ class MapNode extends MapDataItem
                     $anchorNode->named_offsets[$off_name][0],
                     $anchorNode->named_offsets[$off_name][1]
                 );
-                wm_debug("NAMED OFFSET $this -> $now\n");
+                MapUtility::wm_debug("NAMED OFFSET $this -> $now\n");
                 $this->setPosition($now);
                 $this->relative_resolved = true;
 
                 return true;
             }
-            wm_debug("Fell through named offset.\n");
+            MapUtility::wm_debug("Fell through named offset.\n");
 
             return false;
         }
@@ -659,7 +658,7 @@ class MapNode extends MapDataItem
         $now = $this->getPosition();
         $now->translate($anchorPosition->x, $anchorPosition->y);
 
-        wm_debug("OFFSET $this -> $now\n");
+        MapUtility::wm_debug("OFFSET $this -> $now\n");
         $this->setPosition($now);
         $this->relative_resolved = true;
 
@@ -692,7 +691,7 @@ class MapNode extends MapDataItem
 
     public function getValue($name)
     {
-        wm_debug("Fetching %s\n", $name);
+        MapUtility::wm_debug("Fetching %s\n", $name);
         if (property_exists($this, $name)) {
             return $this->$name;
         }
@@ -715,20 +714,20 @@ class MapNode extends MapDataItem
 
     /**
      * @param Map $map
-     * @param WMColour $labelColour
+     * @param Colour $labelColour
      * @return resource
      */
     private function drawArtificialIcon(&$map, $labelColour)
     {
-        wm_debug("Artificial Icon type " . $this->iconfile . " for $this->name\n");
+        MapUtility::wm_debug("Artificial Icon type " . $this->iconfile . " for $this->name\n");
         // this is an artificial icon - we don't load a file for it
 
         $icon_im = $this->createTransparentImage($this->iconscalew, $this->iconscaleh);
 
         list($finalFillColour, $finalInkColour) = $this->calculateAICONColours($labelColour, $map);
 
-        wm_debug("ink is: $finalInkColour\n");
-        wm_debug("fill is: $finalFillColour\n");
+        MapUtility::wm_debug("ink is: $finalInkColour\n");
+        MapUtility::wm_debug("fill is: $finalFillColour\n");
 
         switch ($this->iconfile) {
             case "box":
@@ -750,7 +749,7 @@ class MapNode extends MapDataItem
                 $this->drawArtificialIconPie($icon_im, $finalFillColour, $finalInkColour, OUT);
                 break;
             case "gauge":
-                wm_warn('gauge AICON not implemented yet [WMWARN99]');
+                MapUtility::wm_warn('gauge AICON not implemented yet [WMWARN99]');
                 break;
         }
 
@@ -766,7 +765,7 @@ class MapNode extends MapDataItem
     {
         $this->iconfile = $map->ProcessString($this->iconfile, $this);
 
-        wm_debug("Actual image-based icon from " . $this->iconfile . " for $this->name\n");
+        MapUtility::wm_debug("Actual image-based icon from " . $this->iconfile . " for $this->name\n");
 
         $icon_im = null;
 
@@ -794,11 +793,11 @@ class MapNode extends MapDataItem
             }
 
             if (!$icon_im) {
-                wm_warn("Couldn't open ICON: '" . $this->iconfile . "' - is it a PNG, JPEG or GIF? [WMWARN37]\n");
+                MapUtility::wm_warn("Couldn't open ICON: '" . $this->iconfile . "' - is it a PNG, JPEG or GIF? [WMWARN37]\n");
             }
         } else {
             if ($this->iconfile != 'none') {
-                wm_warn("ICON '" . $this->iconfile . "' does not exist, or is not readable. Check path and permissions. [WMARN38]\n");
+                MapUtility::wm_warn("ICON '" . $this->iconfile . "' does not exist, or is not readable. Check path and permissions. [WMARN38]\n");
             }
         }
         return $icon_im;
@@ -807,13 +806,13 @@ class MapNode extends MapDataItem
     /**
      * @param Map $map
      * @param WMPoint $textPoint
-     * @param WMColour $col
+     * @param Colour $col
      * @param resource $node_im
      * @param WMRectangle $labelBox
      */
     private function drawLabel(&$map, $textPoint, $col, $node_im, $labelBox)
     {
-        wm_debug("Label colour is $col\n");
+        MapUtility::wm_debug("Label colour is $col\n");
 
         // if there's an icon, then you can choose to have no background
         if (!$this->labelbgcolour->isNone()) {
@@ -872,8 +871,8 @@ class MapNode extends MapDataItem
             if ($col->isRealColour()) {
                 $textColour = $col->getContrastingColour();
             } else {
-                wm_warn("You can't make a contrast with 'none'. Guessing black. [WMWARN43]\n");
-                $textColour = new WMColour(0, 0, 0);
+                MapUtility::wm_warn("You can't make a contrast with 'none'. Guessing black. [WMWARN43]\n");
+                $textColour = new Colour(0, 0, 0);
             }
         }
         $fontObject->drawImageString($node_im, $textPoint->x, $textPoint->y, $this->processedLabel, $textColour->gdAllocate($node_im), $this->labelangle);
@@ -881,7 +880,7 @@ class MapNode extends MapDataItem
 
     /**
      * @param $map
-     * @return WMColour
+     * @return Colour
      */
     private function calculateIconColour(&$map)
     {
@@ -906,9 +905,9 @@ class MapNode extends MapDataItem
     }
 
     /**
-     * @param WMColour $finalFillColour
+     * @param Colour $finalFillColour
      * @param resource $icon_im
-     * @param WMColour $finalInkColour
+     * @param Colour $finalInkColour
      */
     private function drawArtificialIconBox($icon_im, $finalFillColour, $finalInkColour)
     {
@@ -922,9 +921,9 @@ class MapNode extends MapDataItem
     }
 
     /**
-     * @param WMColour $finalFillColour
+     * @param Colour $finalFillColour
      * @param resource $icon_im
-     * @param WMColour $finalInkColour
+     * @param Colour $finalInkColour
      */
     private function drawArtificialIconRoundedBox($icon_im, $finalFillColour, $finalInkColour)
     {
@@ -938,9 +937,9 @@ class MapNode extends MapDataItem
     }
 
     /**
-     * @param WMColour $finalFillColour
+     * @param Colour $finalFillColour
      * @param resource $icon_im
-     * @param WMColour $finalInkColour
+     * @param Colour $finalInkColour
      */
     private function drawArtificialIconRound($icon_im, $finalFillColour, $finalInkColour)
     {
@@ -959,7 +958,7 @@ class MapNode extends MapDataItem
     /**
      * @param $map
      * @param resource $icon_im
-     * @param WMColour $finalInkColour
+     * @param Colour $finalInkColour
      */
     private function drawArtificialIconNINK($icon_im, $finalInkColour, &$map)
     {
@@ -1000,9 +999,9 @@ class MapNode extends MapDataItem
 
     /**
      * @param $which
-     * @param WMColour $finalFillColour
+     * @param Colour $finalFillColour
      * @param resource $icon_im
-     * @param WMColour $finalInkColour
+     * @param Colour $finalInkColour
      */
     private function drawArtificialIconPie($icon_im, $finalFillColour, $finalInkColour, $which)
     {
@@ -1043,8 +1042,8 @@ class MapNode extends MapDataItem
      */
     private function calculateAICONColours($labelColour, &$map)
     {
-        $finalFillColour = new WMColour('none');
-        $finalInkColour = new WMColour('none');
+        $finalFillColour = new Colour('none');
+        $finalInkColour = new Colour('none');
 
         $configuredAIFillColour = $this->aiconfillcolour;
         $configuredAIOutlineColour = $this->aiconoutlinecolour;

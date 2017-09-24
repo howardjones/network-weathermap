@@ -21,12 +21,12 @@ class AngledLinkGeometry extends LinkGeometry
 
         $this->curvePoints->addPoint($this->controlPoints[$nPoints - 1]);
 
-        wm_debug($this->curvePoints);
+        MapUtility::wm_debug($this->curvePoints);
     }
 
     protected function generateOutlines()
     {
-        wm_debug("Calculating angled-style outline\n");
+        MapUtility::wm_debug("Calculating angled-style outline\n");
 
         foreach ($this->directions as $direction) {
             // we build up two sets of points here. One is "above" the central spine, and the other below.
@@ -53,7 +53,7 @@ class AngledLinkGeometry extends LinkGeometry
 
             $maxStartingIndex = $simple->pointCount() - 2;
 
-            wm_debug("We'll loop through %d steps.", $maxStartingIndex + 1);
+            MapUtility::wm_debug("We'll loop through %d steps.", $maxStartingIndex + 1);
 
             for ($index = 0; $index < $maxStartingIndex; $index++) {
                 $point = $simple->getPoint($index);
@@ -95,14 +95,14 @@ class AngledLinkGeometry extends LinkGeometry
                 $point3 = $nextPoint->copy()->addVector($nextNormal, $width);
                 $point4 = $nextNextPoint->copy()->addVector($nextNormal, $width);
 
-                wm_debug("%s->%s crossing %s->%s\n", $point1, $point2, $point3, $point4);
+                MapUtility::wm_debug("%s->%s crossing %s->%s\n", $point1, $point2, $point3, $point4);
 
                 $line1 = $point1->lineToPoint($point2);
                 $line2 = $point3->lineToPoint($point4);
 
                 $crossingPoint1 = $line1->findCrossingPoint($line2);
 
-                wm_debug("C1 - Crosses at %s\n", $crossingPoint1);
+                MapUtility::wm_debug("C1 - Crosses at %s\n", $crossingPoint1);
 
                 // Now do all that again, with the points on the other side
 
@@ -111,14 +111,14 @@ class AngledLinkGeometry extends LinkGeometry
                 $point3 = $nextPoint->copy()->addVector($nextNormal, -$width);
                 $point4 = $nextNextPoint->copy()->addVector($nextNormal, -$width);
 
-                wm_debug("%s->%s crossing %s->%s\n", $point1, $point2, $point3, $point4);
+                MapUtility::wm_debug("%s->%s crossing %s->%s\n", $point1, $point2, $point3, $point4);
 
                 $line3 = $point1->lineToPoint($point2);
                 $line4 = $point3->lineToPoint($point4);
 
                 $crossingPoint2 = $line3->findCrossingPoint($line4);
 
-                wm_debug("C2 - Crosses at %s\n", $crossingPoint2);
+                MapUtility::wm_debug("C2 - Crosses at %s\n", $crossingPoint2);
 
                 // the easy (and most common) case - we'll use these points.
                 if (!$capping) {
@@ -130,36 +130,36 @@ class AngledLinkGeometry extends LinkGeometry
                     // diamond, and now we need the other two (C3, C4). Joining these up in the right way
                     // gives us the capped-off corner that we need for sharp angles.
 
-                    wm_debug("Finding the additional Miter Capping points...\n");
+                    MapUtility::wm_debug("Finding the additional Miter Capping points...\n");
                     $crossingPoint3 = $line1->findCrossingPoint($line4);
                     $crossingPoint4 = $line2->findCrossingPoint($line3);
-                    wm_debug("C3 - Crosses at %s\n", $crossingPoint3);
-                    wm_debug("C4 - Crosses at %s\n", $crossingPoint4);
+                    MapUtility::wm_debug("C3 - Crosses at %s\n", $crossingPoint3);
+                    MapUtility::wm_debug("C4 - Crosses at %s\n", $crossingPoint4);
 
                     if ($angle < 0) {
-                        wm_debug("Negative angle\n");
+                        MapUtility::wm_debug("Negative angle\n");
                         $there[] = $crossingPoint3;
                         $there[] = $crossingPoint4;
 
                         array_unshift($back, $crossingPoint2);
                     } else {
-                        wm_debug("Positive angle\n");
+                        MapUtility::wm_debug("Positive angle\n");
                         $there[] = $crossingPoint1;
 
                         array_unshift($back, $crossingPoint4);
                         array_unshift($back, $crossingPoint3);
                     }
                 }
-                wm_debug("Next step...\n");
+                MapUtility::wm_debug("Next step...\n");
             }
 
-            wm_debug("Arrowhead\n");
+            MapUtility::wm_debug("Arrowhead\n");
             $arrow = $this->generateArrowhead($this->arrowPoints[$direction], $this->midPoint, $this->linkWidths[$direction], $this->arrowWidths[$direction]);
 
             $outline = array_merge($there, $arrow, $back);
             $this->drawnCurves[$direction] = $outline;
-            wm_debug("Finished with this direction\n");
+            MapUtility::wm_debug("Finished with this direction\n");
         }
-        wm_debug("Finished with geometry\n");
+        MapUtility::wm_debug("Finished with geometry\n");
     }
 }

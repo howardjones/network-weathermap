@@ -1,6 +1,7 @@
 <?php
+namespace Weathermap\Plugins\Datasources;
 
-class WeatherMapDataSource_wmdata extends WeatherMapDataSource
+class WeatherMapDataSource_wmdata extends DatasourceBase
 {
 
     public function __construct()

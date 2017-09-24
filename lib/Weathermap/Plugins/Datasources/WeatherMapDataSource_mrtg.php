@@ -4,7 +4,10 @@
 
 // TARGET dbplug:databasename:username:pass:hostkey
 
-class WeatherMapDataSource_mrtg extends WeatherMapDataSource
+namespace Weathermap\Plugins\Datasources;
+
+
+class WeatherMapDataSource_mrtg extends DatasourceBase
 {
 
     public function __construct()

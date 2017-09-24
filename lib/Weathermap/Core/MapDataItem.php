@@ -2,7 +2,6 @@
 
 namespace Weathermap\Core;
 
-
 /**
  * Class WeatherMapDataItem - Everything that collects data from DS plugins,
  * uses scales, etc, inherits from here.
@@ -76,7 +75,7 @@ class MapDataItem extends MapItem
     public function setTemplate($template_name, $owner)
     {
         $this->template = $template_name;
-        wm_debug("Resetting to template %s %s\n", $this->my_type(), $template_name);
+        MapUtility::wm_debug("Resetting to template %s %s\n", $this->my_type(), $template_name);
         $this->reset($owner);
     }
 
@@ -98,7 +97,7 @@ class MapDataItem extends MapItem
             $this->template = $templateName;
         }
 
-        wm_debug("Resetting $this with $templateName\n");
+        MapUtility::wm_debug("Resetting $this with $templateName\n");
 
         // the internal default-default gets it's values from inherit_fieldlist
         // everything else comes from a node object - the template.
@@ -131,7 +130,7 @@ class MapDataItem extends MapItem
 
     public function CopyFrom(&$source)
     {
-        wm_debug("Initialising %s $this->name from $source->name\n", $this->my_type());
+        MapUtility::wm_debug("Initialising %s $this->name from $source->name\n", $this->my_type());
         assert('is_object($source)');
 
         foreach (array_keys($this->inherit_fieldlist) as $fld) {
@@ -150,10 +149,10 @@ class MapDataItem extends MapItem
     public function updateMaxValues($kilo)
     {
         foreach ($this->getChannelList() as $const) {
-            $this->maxValues[$const] = Utility::interpretNumberWithMetricSuffix($this->maxValuesConfigured[$const], $kilo);
+            $this->maxValues[$const] = StringUtility::interpretNumberWithMetricSuffix($this->maxValuesConfigured[$const], $kilo);
         }
 
-        wm_debug(
+        MapUtility::wm_debug(
             sprintf(
                 "   Setting bandwidth on %s (%s -> %d bps, %s -> %d bps, KILO = %d)\n",
                 $this,
@@ -170,7 +169,7 @@ class MapDataItem extends MapItem
     {
         /** @var Target $target */
         foreach ($this->targets as $target) {
-            wm_debug("ProcessTargets: New Target: $target\n");
+            MapUtility::wm_debug("ProcessTargets: New Target: $target\n");
 
             $target->preProcess($this, $this->owner);
             $matchedBy = $target->findHandlingPlugin($this->owner->plugins['data']);
@@ -215,8 +214,8 @@ class MapDataItem extends MapItem
     {
         $channels = $this->getChannelList();
 
-        wm_debug("-------------------------------------------------------------\n");
-        wm_debug("ReadData for $this: \n");
+        MapUtility::wm_debug("-------------------------------------------------------------\n");
+        MapUtility::wm_debug("ReadData for $this: \n");
 
         foreach ($channels as $channelName => $channel) {
             $this->absoluteUsages[$channel] = 0;
@@ -242,11 +241,11 @@ class MapDataItem extends MapItem
             $this->$bwvar = $this->absoluteUsages[$channel];
         }
 
-        wm_debug("ReadData complete for %s: %s\n", $this, join(" ", $this->absoluteUsages));
-        wm_debug(
+        MapUtility::wm_debug("ReadData complete for %s: %s\n", $this, join(" ", $this->absoluteUsages));
+        MapUtility::wm_debug(
             "ReadData: Setting %s,%s for %s\n",
-            Utility::valueOrNull($this->absoluteUsages[IN]),
-            Utility::valueOrNull($this->absoluteUsages[OUT]),
+            StringUtility::valueOrNull($this->absoluteUsages[IN]),
+            StringUtility::valueOrNull($this->absoluteUsages[OUT]),
             $this
         );
     }
@@ -261,7 +260,7 @@ class MapDataItem extends MapItem
         $dataTime = 0;
 
         foreach ($this->targets as $target) {
-            wm_debug("ReadData: New Target: $target\n");
+            MapUtility::wm_debug("ReadData: New Target: $target\n");
             $target->readData($this->owner, $this);
 
             if ($target->hasValidData()) {
@@ -269,12 +268,12 @@ class MapDataItem extends MapItem
                 $dataTime = array_shift($results);
 
                 foreach ($channels as $channel) {
-                    wm_debug("Adding %f to total for channel %d\n", $results[$channel], $channel);
+                    MapUtility::wm_debug("Adding %f to total for channel %d\n", $results[$channel], $channel);
                     $this->absoluteUsages[$channel] += $results[$channel];
                 }
-                wm_debug("Running totals: %s\n", join(" ", $this->absoluteUsages));
+                MapUtility::wm_debug("Running totals: %s\n", join(" ", $this->absoluteUsages));
             } else {
-                wm_debug("Invalid data?\n");
+                MapUtility::wm_debug("Invalid data?\n");
                 $nFails++;
             }
 
@@ -295,7 +294,7 @@ class MapDataItem extends MapItem
             $value = $this->absoluteUsages[$channel];
 
             if ($this->duplex == 'half') {
-                wm_debug("Calculating percentage using half-duplex\n");
+                MapUtility::wm_debug("Calculating percentage using half-duplex\n");
                 // in a half duplex link, in and out share a common bandwidth pool, so percentages need to include both
                 $value = ($this->absoluteUsages[IN] + $this->absoluteUsages[OUT]);
 
@@ -445,12 +444,12 @@ class MapDataItem extends MapItem
     protected function asJS($type = "Thing", $prefix = "T")
     {
         $output = '';
-        $output .= $type . "s[" . Utility::jsEscape($this->name) . "] = {";
+        $output .= $type . "s[" . StringUtility::jsEscape($this->name) . "] = {";
 
         $output .= $this->asJSCore();
 
         $output .= "};\n";
-        $output .= $type . "IDs[\"" . $prefix . $this->id . "\"] = " . Utility::jsEscape($this->name) . ";\n";
+        $output .= $type . "IDs[\"" . $prefix . $this->id . "\"] = " . StringUtility::jsEscape($this->name) . ";\n";
 
         return $output;
     }

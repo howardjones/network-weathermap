@@ -66,7 +66,7 @@ class MapTextItem extends MapItem
         $string = $map->ProcessString($this->configuredText, $map);
 
         if ($map->get_hint('screenshot_mode') == 1) {
-            $string = Utility::stringAnonymise($string);
+            $string = StringUtility::stringAnonymise($string);
         }
 
         list($boxWidth, $boxHeight) = $fontObject->calculateImageStringSize($string);

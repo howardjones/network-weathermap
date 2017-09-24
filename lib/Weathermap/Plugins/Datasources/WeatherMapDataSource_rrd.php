@@ -5,9 +5,12 @@
 //     filename.rrd:ds_in:ds_out
 //
 
-include_once dirname(__FILE__) . "/../ds-common.php";
+//include_once dirname(__FILE__) . "/../DatasourceUtility.php";
 
-class WeatherMapDataSource_rrd extends WeatherMapDataSource
+namespace Weathermap\Plugins\Datasources;
+
+
+class WeatherMapDataSource_rrd extends DatasourceBase
 {
 
     public function __construct()

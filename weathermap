@@ -1,26 +1,28 @@
 #!/usr/bin/php
 <?php
 
-use GetOpt\GetOpt;
-use GetOpt\Option;
-use GetOpt\Command;
-use GetOpt\ArgumentException;
-
-require_once __DIR__ . '/vendor/autoload.php';
-
-// TODO - this should come from the Core
-define('NAME', 'PHP Network Weathermap');
-define('VERSION', '1.0.0');
-
 // PHP Weathermap 0.98
 // Copyright Howard Jones, 2005-2016 howie@thingy.com
 // http://www.network-weathermap.com/
 // Released under the GNU Public License
-//require_once 'Console/Getopt.php';
 
-//if (!wm_module_checks()) {
-//    die("Quitting: Module checks failed.\n");
-//}
+use GetOpt\GetOpt;
+use GetOpt\Option;
+use GetOpt\ArgumentException;
+use Weathermap\Core\Map;
+use Weathermap\Core\MapUtility;
+
+require_once __DIR__ . '/lib/all.php';
+
+// **************************************************************************************
+// THIS IS THE ONE LINE IN HERE YOU MIGHT HAVE TO CHANGE!
+$rrdtool = "/usr/bin/rrdtool";
+// (on Windows, use / instead of \ in pathnames - c:/rrdtool/bin/rrdtool.exe for example)
+// **************************************************************************************
+
+if (!Weathermap\Core\MapUtility::wm_module_checks()) {
+    die("Quitting: Module checks failed.\n");
+}
 
 $getOpt = new \GetOpt\GetOpt(null, [\GetOpt\GetOpt::SETTING_STRICT_OPERANDS => true]);
 
@@ -94,7 +96,7 @@ try {
 
 // show version and quit
 if ($getOpt->getOption('version')) {
-    echo sprintf('%s: %s' . PHP_EOL, NAME, VERSION);
+    echo sprintf('PHP Network Weathermap: %s' . PHP_EOL, \Weathermap\Core\WEATHERMAP_VERSION);
     exit;
 }
 
@@ -104,11 +106,8 @@ if ($getOpt->getOption('help')) {
     exit;
 }
 
-print_r($getOpt->getOptions());
-
-print $getOpt->getOption('bulge');
-
 $options_output = array();
+$defines = array();
 
 $configfile = $getOpt->getOption('config');
 $htmlfile = $getOpt->getOption('htmloutput');
@@ -147,7 +146,7 @@ foreach ($define_array as $define) {
     if (isset($matches[2])) {
         $varname = $matches[1];
         $value = $matches[2];
-        wm_debug(">> $varname = '$value'\n");
+        MapUtility::wm_debug(">> $varname = '$value'\n");
         // save this for later, so that when the map object exists, it can be defined
         $defines[$varname] = $value;
     } else {
@@ -168,103 +167,12 @@ if (isset($options_output['debugging']) && $options_output['debugging']) {
     // Set up the callback
     assert_options(ASSERT_CALLBACK, 'my_assert_handler');
 
-    wm_debug("------------------------------------\n");
-    wm_debug("Starting PHP-Weathermap run, with config: $configfile\n");
-    wm_debug("------------------------------------\n");
+    MapUtility::wm_debug("------------------------------------\n");
+    MapUtility::wm_debug("Starting PHP-Weathermap run, with config: $configfile\n");
+    MapUtility::wm_debug("------------------------------------\n");
 }
 
-exit();
-
-$output = "html";
-$configfile = "weathermap.conf";
-$htmlfile = '';
-$imagefile = '';
-$dumpafter = 0;
-$dumpstats = 0;
-$randomdata = 0;
-$setdebug = false;
-$dumpconfig = '';
-$dumpjson = '';
-$defines = array();
-
-// **************************************************************************************
-// THIS IS THE ONE LINE IN HERE YOU MIGHT HAVE TO CHANGE!
-$rrdtool = "/usr/bin/rrdtool";
-// (on Windows, use / instead of \ in pathnames - c:/rrdtool/bin/rrdtool.exe for example)
-// **************************************************************************************
-
-// initialize object
-$cg = new Console_Getopt();
-$short_opts = '';
-$long_opts = array
-(
-    "version",
-    "help",
-    "image-uri=",
-    "config=",
-    "output=",
-    "debug",
-    "uberdebug",
-    "stats",
-    "define=",
-    "no-data",
-    "no-warn=",
-    "randomdata",
-    "htmloutput=",
-    "dumpafter",
-    "dumpjson=",
-    "bulge",
-    "sizedebug",
-    "setdebug",
-    "dumpconfig="
-);
-
-$args = $cg->readPHPArgv();
-
-$ret = $cg->getopt($args, $short_opts, $long_opts);
-
-$pear = new PEAR;
-if ($pear->isError($ret)) {
-    die("Error in command line: " . $ret->getMessage() . "\n (try --help)\n");
-}
-
-$gopts = $ret[0];
-
-$options_output = array();
-
-if (sizeof($gopts) > 0) {
-    foreach ($gopts as $o) {
-        switch ($o[0]) {
-            case '--randomdata':
-                $randomdata = 1;
-                break;
-
-            case '--define':
-                preg_match("/^([^=]+)=(.*)\s*$/", $o[1], $matches);
-                if (isset($matches[2])) {
-                    $varname = $matches[1];
-                    $value = $matches[2];
-                    wm_debug(">> $varname = '$value'\n");
-                    // save this for later, so that when the map object exists, it can be defined
-                    $defines[$varname] = $value;
-                } else {
-                    print "WARNING: --define format is:  --define name=value\n";
-                }
-                break;
-
-        }
-    }
-}
-
-// set this BEFORE we create the map object, so we get the debug output from Reset(), as well
-if (isset($options_output['debugging']) && $options_output['debugging']) {
-    $weathermap_debugging = true;
-    wm_debug("------------------------------------\n");
-    wm_debug("Starting PHP-Weathermap run, with config: $configfile\n");
-    wm_debug("------------------------------------\n");
-}
-
-$map = new Weathermap;
+$map = new Map();
 $map->rrdtool = $rrdtool;
 $map->context = "cli";
 
@@ -306,7 +214,7 @@ if ($map->ReadConfig($configfile)) {
     }
 
     if ((isset($options_output['sizedebug']) && !$options_output['sizedebug']) || (!isset($options_output['sizedebug']))) {
-        if ($randomdata == 1) {
+        if ($getOpt->getOption('randomdata') === 1) {
             $map->randomData();
         } else {
             $map->ReadData();
@@ -319,7 +227,7 @@ if ($map->ReadConfig($configfile)) {
     }
 
     if ($htmlfile != '') {
-        wm_debug("Writing HTML to $htmlfile\n");
+        MapUtility::wm_debug("Writing HTML to $htmlfile\n");
 
         $fd = fopen($htmlfile, 'w');
         fwrite($fd, '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head>');

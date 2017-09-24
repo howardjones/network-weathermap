@@ -11,6 +11,7 @@
   ],
   "require": {
     "ulrichsg/getopt-php": "~3",
+    "monolog/monolog": "^1",
     "erusev/parsedown": "^1.6"
   },
   "require-dev": {
@@ -28,6 +29,6 @@
     "etsy/phan": "^0.9.4"
   },
   "autoload": {
-    "psr-0": {"Weathermap": "lib/"}
+    "psr-4": {"Weathermap\\": "lib/Weathermap"}
   }
 }

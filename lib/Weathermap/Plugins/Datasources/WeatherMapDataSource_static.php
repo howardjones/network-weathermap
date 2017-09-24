@@ -4,8 +4,11 @@
 
 // TARGET static:10M
 // TARGET static:2M:256K
+namespace Weathermap\Plugins\Datasources;
 
-class WeatherMapDataSource_static extends WeatherMapDataSource
+use Weathermap\Core\StringUtility;
+
+class WeatherMapDataSource_static extends DatasourceBase
 {
 
     public function __construct()
@@ -31,13 +34,13 @@ class WeatherMapDataSource_static extends WeatherMapDataSource
         $this->data[OUT] = null;
 
         if (preg_match($this->regexpsHandled[0], $targetstring, $matches)) {
-            $this->data[IN] = WMUtility::interpretNumberWithMetricSuffix($matches[1], $map->kilo);
-            $this->data[OUT] = WMUtility::interpretNumberWithMetricSuffix($matches[2], $map->kilo);
+            $this->data[IN] = StringUtility::interpretNumberWithMetricSuffix($matches[1], $map->kilo);
+            $this->data[OUT] = StringUtility::interpretNumberWithMetricSuffix($matches[2], $map->kilo);
             $this->dataTime = time();
         }
 
         if (preg_match($this->regexpsHandled[1], $targetstring, $matches)) {
-            $this->data[IN] = WMUtility::interpretNumberWithMetricSuffix($matches[1], $map->kilo);
+            $this->data[IN] = StringUtility::interpretNumberWithMetricSuffix($matches[1], $map->kilo);
             $this->data[OUT] = $this->data[IN];
             $this->dataTime = time();
         }

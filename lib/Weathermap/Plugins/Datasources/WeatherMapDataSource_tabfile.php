@@ -1,6 +1,7 @@
 <?php
+namespace Weathermap\Plugins\Datasources;
 
-class WeatherMapDataSource_tabfile extends WeatherMapDataSource
+class WeatherMapDataSource_tabfile extends DatasourceBase
 {
     public function __construct()
     {

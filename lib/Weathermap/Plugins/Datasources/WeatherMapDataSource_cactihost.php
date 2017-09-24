@@ -1,9 +1,12 @@
 <?php
 
-require_once dirname(__FILE__) . "/../database.php";
+//require_once dirname(__FILE__) . "/../database.php";
 
+namespace Weathermap\Plugins\Datasources;
 
-class WeatherMapDataSource_cactihost extends WeatherMapDataSource
+use Weathermap\Core\MapUtility;
+
+class WeatherMapDataSource_cactihost extends DatasourceBase
 {
     public function __construct()
     {
@@ -22,10 +25,10 @@ class WeatherMapDataSource_cactihost extends WeatherMapDataSource
             if (function_exists('db_fetch_row')) {
                 return true;
             } else {
-                wm_debug('ReadData CactiHost: Cacti database library not found.\n');
+                MapUtility::wm_debug('ReadData CactiHost: Cacti database library not found.\n');
             }
         } else {
-            wm_debug("ReadData CactiHost: Can only run from Cacti environment.\n");
+            MapUtility::wm_debug("ReadData CactiHost: Can only run from Cacti environment.\n");
         }
 
         return false;

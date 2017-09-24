@@ -14,8 +14,9 @@
 // (that is, TARGET snmp:community:host:in_oid:out_oid
 
 // http://feathub.com/howardjones/network-weathermap/+2
+namespace Weathermap\Plugins\Datasources;
 
-class WeatherMapDataSource_snmpv2c extends WeatherMapDataSource
+class WeatherMapDataSource_snmpv2c extends DatasourceBase
 {
     protected $down_cache;
 

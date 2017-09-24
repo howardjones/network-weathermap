@@ -72,11 +72,11 @@ class MapScale extends MapItem
     public function populateDefaultsIfNecessary()
     {
         if ($this->spanCount() != 0) {
-            wm_debug("Already have " . $this->spanCount() . " scales, no defaults added.\n");
+            MapUtility::wm_debug("Already have " . $this->spanCount() . " scales, no defaults added.\n");
             return;
         }
 
-        wm_debug("Adding default SCALE colour set (no SCALE lines seen).\n");
+        MapUtility::wm_debug("Adding default SCALE colour set (no SCALE lines seen).\n");
 
         $this->addSpan(0, 0, new Colour(192, 192, 192));
         $this->addSpan(0, 1, new Colour(255, 255, 255));
@@ -109,7 +109,7 @@ class MapScale extends MapItem
         $this->entries[$key]['top'] = $highValue;
         $this->entries[$key]['label'] = "";
 
-        wm_debug("%s %s->%s\n", $this->name, $lowValue, $highValue);
+        MapUtility::wm_debug("%s %s->%s\n", $this->name, $lowValue, $highValue);
     }
 
     public function setColour($name, $colour)
@@ -139,7 +139,7 @@ class MapScale extends MapItem
     {
         $scaleName = $this->name;
 
-        wm_debug("Finding a colour for value %s in scale %s\n", $value, $this->name);
+        MapUtility::wm_debug("Finding a colour for value %s in scale %s\n", $value, $this->name);
 
         $nowarn_clipping = intval($this->owner->get_hint("nowarn_clipping"));
         $nowarn_scalemisses = (!$showScaleWarnings) || intval($this->owner->get_hint("nowarn_scalemisses"));
@@ -177,7 +177,7 @@ class MapScale extends MapItem
             return array($this->scalemisscolour, '', '');
         }
 
-        wm_debug("CFV $itemName $scaleName $value '$tag' $key " . $col->asConfig() . "\n");
+        MapUtility::wm_debug("CFV $itemName $scaleName $value '$tag' $key " . $col->asConfig() . "\n");
 
         return array($col, $key, $tag);
     }
@@ -192,7 +192,7 @@ class MapScale extends MapItem
 
         foreach ($this->entries as $key => $scaleEntry) {
             if (($value >= $scaleEntry['bottom']) and ($value <= $scaleEntry['top'])) {
-                wm_debug("HIT for %s-%s\n", $scaleEntry["bottom"], $scaleEntry['top']);
+                MapUtility::wm_debug("HIT for %s-%s\n", $scaleEntry["bottom"], $scaleEntry['top']);
 
                 $range = $scaleEntry['top'] - $scaleEntry['bottom'];
 
@@ -212,7 +212,7 @@ class MapScale extends MapItem
 
                 // change in behaviour - with multiple matching ranges for a value, the smallest range wins
                 if (is_null($matchSize) || ($range < $matchSize)) {
-                    wm_debug("Smallest match seen so far\n");
+                    MapUtility::wm_debug("Smallest match seen so far\n");
                     $colour = $candidate;
                     $matchSize = $range;
                     $matchKey = $key;
@@ -221,7 +221,7 @@ class MapScale extends MapItem
                         $tag = $scaleEntry['tag'];
                     }
                 } else {
-                    wm_debug("But bigger than existing match\n");
+                    MapUtility::wm_debug("But bigger than existing match\n");
                 }
             }
         }
@@ -343,11 +343,11 @@ class MapScale extends MapItem
             );
 
             if ($bottom > $this->owner->kilo) {
-                $bottom = Utility::formatNumberWithMetricSuffix($entry['bottom'], $this->owner->kilo);
+                $bottom = StringUtility::formatNumberWithMetricSuffix($entry['bottom'], $this->owner->kilo);
             }
 
             if ($top > $this->owner->kilo) {
-                $top = Utility::formatNumberWithMetricSuffix($entry['top'], $this->owner->kilo);
+                $top = StringUtility::formatNumberWithMetricSuffix($entry['top'], $this->owner->kilo);
             }
 
             $tag = (isset($entry['tag']) ? $entry['tag'] : '');
@@ -406,13 +406,13 @@ class MapScale extends MapItem
 
     public function draw($gdTargetImage)
     {
-        wm_debug("New scale\n");
+        MapUtility::wm_debug("New scale\n");
         // don't draw if the position is the default -1,-1
         if (null === $this->keypos || $this->keypos->x == -1 && $this->keypos->y == -1) {
             return;
         }
 
-        wm_debug("New scale - still drawing\n");
+        MapUtility::wm_debug("New scale - still drawing\n");
 
         $gdScaleImage = null;
 
@@ -439,7 +439,7 @@ class MapScale extends MapItem
         $width = imagesx($gdScaleImage);
         $height = imagesy($gdScaleImage);
 
-        wm_debug("New scale - blitting\n");
+        MapUtility::wm_debug("New scale - blitting\n");
         imagecopy($gdTargetImage, $gdScaleImage, $xTarget, $yTarget, 0, 0, $width, $height);
 
         $areaName = "LEGEND:" . $this->name;
@@ -457,7 +457,7 @@ class MapScale extends MapItem
 
         $nScales = $this->spanCount();
 
-        wm_debug("Drawing $nScales colours into SCALE\n");
+        MapUtility::wm_debug("Drawing $nScales colours into SCALE\n");
 
         $hide_zero = intval($this->owner->get_hint("key_hidezero_" . $this->name));
         $hide_percent = intval($this->owner->get_hint("key_hidepercent_" . $this->name));
@@ -502,7 +502,7 @@ class MapScale extends MapItem
         $boxWidth = max($boxWidth + 10, $minWidth + 10);
         $boxHeight = $tileSpacing * ($nScales + 1) + 10;
 
-        wm_debug("Scale Box is %dx%d\n", $boxWidth + 1, $boxHeight + 1);
+        MapUtility::wm_debug("Scale Box is %dx%d\n", $boxWidth + 1, $boxHeight + 1);
 
         $gdScaleImage = $this->createTransparentImage($boxWidth + 1, $boxHeight + 1);
 
@@ -524,7 +524,7 @@ class MapScale extends MapItem
         foreach ($this->entries as $key => $scaleEntry) {
             // pick a value in the middle...
             $value = ($scaleEntry['bottom'] + $scaleEntry['top']) / 2;
-            wm_debug(sprintf("%f-%f (%f)  %s\n", $scaleEntry['bottom'], $scaleEntry['top'], $value, $scaleEntry['c1']));
+            MapUtility::wm_debug(sprintf("%f-%f (%f)  %s\n", $scaleEntry['bottom'], $scaleEntry['top'], $value, $scaleEntry['c1']));
 
             if (($hide_zero == 0) || $key != '0_0') {
                 $y = $tileSpacing * $rowNumber + 8;
@@ -573,7 +573,7 @@ class MapScale extends MapItem
 
         $nScales = $this->spanCount();
 
-        wm_debug("Drawing $nScales colours into SCALE\n");
+        MapUtility::wm_debug("Drawing $nScales colours into SCALE\n");
 
         /** @var Font $fontObject */
         $fontObject = $this->keyfont;
@@ -594,7 +594,7 @@ class MapScale extends MapItem
         $scaleBottom = $scaleTop + $tileHeight * 1.5;
         $boxBottom = $scaleBottom + $tileHeight * 2 + 6;
 
-        wm_debug("Size is %dx%d (From %dx%d tile)\n", $boxRight + 1, $boxBottom + 1, $tileWidth, $tileHeight);
+        MapUtility::wm_debug("Size is %dx%d (From %dx%d tile)\n", $boxRight + 1, $boxBottom + 1, $tileWidth, $tileHeight);
 
         $gdScaleImage = $this->createTransparentImage($boxRight + 1, $boxBottom + 1);
 
@@ -603,7 +603,7 @@ class MapScale extends MapItem
         /** @var Colour $outlineColour */
         $outlineColour = $this->keyoutlinecolour;
 
-        wm_debug("BG is $bgColour, Outline is $outlineColour\n");
+        MapUtility::wm_debug("BG is $bgColour, Outline is $outlineColour\n");
 
         if ($bgColour->isRealColour()) {
             imagefilledrectangle($gdScaleImage, $boxLeft, $boxTop, $boxRight, $boxBottom, $bgColour->gdAllocate($gdScaleImage));
@@ -648,7 +648,7 @@ class MapScale extends MapItem
 
         $nScales = $this->spanCount();
 
-        wm_debug("Drawing $nScales colours into SCALE\n");
+        MapUtility::wm_debug("Drawing $nScales colours into SCALE\n");
 
         /** @var Font $fontObject */
         $fontObject = $this->keyfont;
@@ -677,7 +677,7 @@ class MapScale extends MapItem
         /** @var Colour $outlineColour */
         $outlineColour = $this->keyoutlinecolour;
 
-        wm_debug("BG is $bgColour, Outline is $outlineColour\n");
+        MapUtility::wm_debug("BG is $bgColour, Outline is $outlineColour\n");
 
         if ($bgColour->isRealColour()) {
             imagefilledrectangle($gdScaleImage, 0, 0, $boxRight, $boxBottom, $bgColour->gdAllocate($gdScaleImage));

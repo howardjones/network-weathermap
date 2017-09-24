@@ -2,7 +2,6 @@
 
 namespace Weathermap\Core;
 
-
 // Links, Nodes and the Map object inherit from this class ultimately.
 // Just to make some common code common.
 class MapBase
@@ -44,7 +43,7 @@ class MapBase
 
     function add_note($name, $value)
     {
-        wm_debug("Adding note $name='$value' to " . $this->name . "\n");
+        MapUtility::wm_debug("Adding note $name='$value' to " . $this->name . "\n");
         $this->notes[$name] = $value;
     }
 
@@ -61,7 +60,7 @@ class MapBase
 
     function add_hint($name, $value)
     {
-        wm_debug("Adding hint $name='$value' to " . $this->name . "\n");
+        MapUtility::wm_debug("Adding hint $name='$value' to " . $this->name . "\n");
         $this->hints[$name] = $value;
         # warn("Adding hint $name to ".$this->my_type()."/".$this->name."\n");
     }
@@ -160,7 +159,7 @@ class MapBase
      */
     public function setConfigValue($keyname, $value, $recalculate = false)
     {
-        wm_debug("Settings config %s = %s\n", $keyname, $value);
+        MapUtility::wm_debug("Settings config %s = %s\n", $keyname, $value);
         if (is_null($value)) {
             unset($this->config[$keyname]);
         } else {
@@ -190,7 +189,7 @@ class MapBase
 
     public function addConfigValue($keyname, $value, $recalculate = false)
     {
-        wm_debug("Appending config %s = %s\n", $keyname, $value);
+        MapUtility::wm_debug("Appending config %s = %s\n", $keyname, $value);
         if (is_null($this->config[$keyname])) {
             // create a new array, with this as the only item
             $this->config[$keyname] = array($value);

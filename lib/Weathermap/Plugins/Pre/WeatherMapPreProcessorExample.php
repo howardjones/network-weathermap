@@ -4,13 +4,14 @@
 
 namespace Weathermap\Plugins\Pre;
 
+use Weathermap\Core\MapUtility;
 
 class WeatherMapPreProcessorExample extends PreProcessorBase
 {
     public function run()
     {
         $this->owner->add_note('test', 'TEST!');
-        wm_debug("Example Preprocessor in the hizouse\n");
+        MapUtility::wm_debug("Example Preprocessor in the hizouse\n");
     }
 }
 

@@ -1,8 +1,10 @@
 <?php
 
-include_once dirname(__FILE__) . "/../ds-common.php";
+//include_once dirname(__FILE__) . "/../DatasourceUtility.php";
 
-class WeatherMapDataSource_dsstats extends WeatherMapDataSource
+namespace Weathermap\Plugins\Datasources;
+
+class WeatherMapDataSource_dsstats extends DatasourceBase
 {
 
     public function __construct()

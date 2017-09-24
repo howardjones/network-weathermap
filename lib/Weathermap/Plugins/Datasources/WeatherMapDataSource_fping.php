@@ -4,8 +4,10 @@
 
 // TARGET fping:ipaddress
 // TARGET fping:hostname
+namespace Weathermap\Plugins\Datasources;
 
-class WeatherMapDataSource_fping extends WeatherMapDataSource
+
+class WeatherMapDataSource_fping extends DatasourceBase
 {
 
     private $addresscache = array();

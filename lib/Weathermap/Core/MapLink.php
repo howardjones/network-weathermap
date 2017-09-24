@@ -4,9 +4,7 @@
 // http://www.network-weathermap.com/
 // Released under the GNU Public License
 
-
 namespace Weathermap\Core;
-
 
 class MapLink extends MapDataItem
 {
@@ -162,7 +160,7 @@ class MapLink extends MapDataItem
 
     private function drawComments($gdImage)
     {
-        wm_debug("Link " . $this->name . ": Drawing comments.\n");
+        MapUtility::wm_debug("Link " . $this->name . ": Drawing comments.\n");
 
         $directions = $this->getDirectionList();
         $commentPositions = array();
@@ -178,7 +176,7 @@ class MapLink extends MapDataItem
         $fontObject = $this->owner->fonts->getFont($this->commentfont);
 
         foreach ($directions as $direction) {
-            wm_debug("Link " . $this->name . ": Drawing comments for direction $direction\n");
+            MapUtility::wm_debug("Link " . $this->name . ": Drawing comments for direction $direction\n");
 
             $widthList[$direction] *= 1.1;
 
@@ -186,11 +184,11 @@ class MapLink extends MapDataItem
             $comment = $this->owner->ProcessString($this->comments[$direction], $this);
 
             if ($this->owner->get_hint('screenshot_mode') == 1) {
-                $comment = Utility::stringAnonymise($comment);
+                $comment = StringUtility::stringAnonymise($comment);
             }
 
             if ($comment == '') {
-                wm_debug("Link " . $this->name . " no text for direction $direction\n");
+                MapUtility::wm_debug("Link " . $this->name . " no text for direction $direction\n");
                 break;
             }
 
@@ -253,7 +251,7 @@ class MapLink extends MapDataItem
                 $edge->addVector($tangent, $textWidth);
             }
 
-            wm_debug("Link " . $this->name . " writing $comment at $edge and angle $angle for direction $direction\n");
+            MapUtility::wm_debug("Link " . $this->name . " writing $comment at $edge and angle $angle for direction $direction\n");
 
             // FINALLY, draw the text!
             $fontObject->drawImageString($gdImage, $edge->x, $edge->y, $comment, $gdCommentColours[$direction], $angle);
@@ -266,7 +264,7 @@ class MapLink extends MapDataItem
      */
     public function preCalculate(&$map)
     {
-        wm_debug("Link " . $this->name . ": Calculating geometry.\n");
+        MapUtility::wm_debug("Link " . $this->name . ": Calculating geometry.\n");
 
         // don't bother doing anything if it's a template
         if ($this->isTemplate()) {
@@ -275,52 +273,52 @@ class MapLink extends MapDataItem
 
         $points = array();
 
-        wm_debug("Offsets are %s and %s\n", $this->a_offset, $this->b_offset);
-        wm_debug("A node is %sx%s\n", $this->a->width, $this->a->height);
+        MapUtility::wm_debug("Offsets are %s and %s\n", $this->a_offset, $this->b_offset);
+        MapUtility::wm_debug("A node is %sx%s\n", $this->a->width, $this->a->height);
 
         if ($this->a_offset_dx != 0 || $this->a_offset_dy != 0) {
-            wm_debug("Using offsets from earlier\n");
+            MapUtility::wm_debug("Using offsets from earlier\n");
             $dx = $this->a_offset_dx;
             $dy = $this->a_offset_dy;
         } else {
-            list($dx, $dy) = Utility::calculateOffset($this->a_offset, $this->a->width, $this->a->height);
+            list($dx, $dy) = MapUtility::calculateOffset($this->a_offset, $this->a->width, $this->a->height);
         }
 
-        wm_debug("A offset: $dx, $dy\n");
-        $points[] = new WMPoint($this->a->x + $dx, $this->a->y + $dy);
+        MapUtility::wm_debug("A offset: $dx, $dy\n");
+        $points[] = new Point($this->a->x + $dx, $this->a->y + $dy);
 
-        wm_debug("POINTS SO FAR:" . join(" ", $points) . "\n");
+        MapUtility::wm_debug("POINTS SO FAR:" . join(" ", $points) . "\n");
 
         foreach ($this->vialist as $via) {
-            wm_debug("VIALIST...\n");
+            MapUtility::wm_debug("VIALIST...\n");
             // if the via has a third element, the first two are relative to that node
             if (isset($via[2])) {
                 $relativeTo = $map->getNode($via[2]);
-                wm_debug("Relative to $relativeTo\n");
-                $point = new WMPoint($relativeTo->x + $via[0], $relativeTo->y + $via[1]);
+                MapUtility::wm_debug("Relative to $relativeTo\n");
+                $point = new Point($relativeTo->x + $via[0], $relativeTo->y + $via[1]);
             } else {
-                $point = new WMPoint($via[0], $via[1]);
+                $point = new Point($via[0], $via[1]);
             }
-            wm_debug("Adding $point\n");
+            MapUtility::wm_debug("Adding $point\n");
             $points[] = $point;
         }
-        wm_debug("POINTS SO FAR:" . join(" ", $points) . "\n");
+        MapUtility::wm_debug("POINTS SO FAR:" . join(" ", $points) . "\n");
 
-        wm_debug("B node is %sx%s\n", $this->b->width, $this->b->height);
+        MapUtility::wm_debug("B node is %sx%s\n", $this->b->width, $this->b->height);
         if ($this->b_offset_dx != 0 || $this->b_offset_dy != 0) {
-            wm_debug("Using offsets from earlier\n");
+            MapUtility::wm_debug("Using offsets from earlier\n");
             $dx = $this->b_offset_dx;
             $dy = $this->b_offset_dy;
         } else {
-            list($dx, $dy) = Utility::calculateOffset($this->b_offset, $this->b->width, $this->b->height);
+            list($dx, $dy) = MapUtility::calculateOffset($this->b_offset, $this->b->width, $this->b->height);
         }
-        wm_debug("B offset: $dx, $dy\n");
-        $points[] = new WMPoint($this->b->x + $dx, $this->b->y + $dy);
+        MapUtility::wm_debug("B offset: $dx, $dy\n");
+        $points[] = new Point($this->b->x + $dx, $this->b->y + $dy);
 
-        wm_debug("POINTS SO FAR:" . join(" ", $points) . "\n");
+        MapUtility::wm_debug("POINTS SO FAR:" . join(" ", $points) . "\n");
 
         if ($points[0]->closeEnough($points[1]) && sizeof($this->vialist) == 0) {
-            wm_warn("Zero-length link " . $this->name . " skipped. [WMWARN45]");
+            MapUtility::wm_warn("Zero-length link " . $this->name . " skipped. [WMWARN45]");
             $this->geometry = null;
             return;
         }
@@ -339,7 +337,7 @@ class MapLink extends MapDataItem
 
         // don't bother with any curve stuff if there aren't any Vias defined, even if the style is 'curved'
         if (count($this->vialist) == 0) {
-            wm_debug("Forcing to angled (no vias)\n");
+            MapUtility::wm_debug("Forcing to angled (no vias)\n");
             $style = "angled";
         }
 
@@ -349,10 +347,10 @@ class MapLink extends MapDataItem
 
     public function Draw($imageRef)
     {
-        wm_debug("Link " . $this->name . ": Drawing.\n");
+        MapUtility::wm_debug("Link " . $this->name . ": Drawing.\n");
         // If there is geometry to draw, draw it
         if (!is_null($this->geometry)) {
-            wm_debug(get_class($this->geometry) . "\n");
+            MapUtility::wm_debug(get_class($this->geometry) . "\n");
 
             $this->geometry->setOutlineColour($this->outlinecolour);
             $this->geometry->setFillColours(array($this->colours[IN], $this->colours[OUT]));
@@ -365,7 +363,7 @@ class MapLink extends MapDataItem
 
             $this->drawBandwidthLabels($imageRef);
         } else {
-            wm_debug("Skipping link with no geometry attached\n");
+            MapUtility::wm_debug("Skipping link with no geometry attached\n");
         }
 
         $this->makeImagemapAreas();
@@ -383,7 +381,7 @@ class MapLink extends MapDataItem
             $polyPoints = $this->geometry->getDrawnPolygon($direction);
 
             $newArea = new HTMLImagemapAreaPolygon($areaName, "", array($polyPoints));
-            wm_debug("Adding Poly imagemap for %s\n", $areaName);
+            MapUtility::wm_debug("Adding Poly imagemap for %s\n", $areaName);
 
             $this->imap_areas[] = $newArea;
         }
@@ -391,7 +389,7 @@ class MapLink extends MapDataItem
 
     private function drawBandwidthLabels($gdImage)
     {
-        wm_debug("Link " . $this->name . ": Drawing bwlabels.\n");
+        MapUtility::wm_debug("Link " . $this->name . ": Drawing bwlabels.\n");
 
         $directions = $this->getDirectionList();
         $labelOffsets = array();
@@ -412,13 +410,13 @@ class MapLink extends MapDataItem
 
             $label_text = $this->owner->ProcessString($this->bwlabelformats[$direction], $this);
             if ($label_text != '') {
-                wm_debug("Bandwidth for label is " . Utility::valueOrNull($bandwidth) . " (label is '$label_text')\n");
+                MapUtility::wm_debug("Bandwidth for label is " . StringUtility::valueOrNull($bandwidth) . " (label is '$label_text')\n");
                 $padding = intval($this->get_hint('bwlabel_padding'));
 
                 // if screenshot_mode is enabled, wipe any letters to X and wipe any IP address to 127.0.0.1
                 // hopefully that will preserve enough information to show cool stuff without leaking info
                 if ($this->owner->get_hint('screenshot_mode') == 1) {
-                    $label_text = Utility::stringAnonymise($label_text);
+                    $label_text = StringUtility::stringAnonymise($label_text);
                 }
 
                 if ($this->labelboxstyle != 'angled') {
@@ -500,10 +498,10 @@ class MapLink extends MapDataItem
             $rectanglePoints[] = max($points[0], $points[2]);
             $rectanglePoints[] = max($points[1], $points[3]);
             $newArea = new HTMLImagemapAreaRectangle($areaName, "", array($rectanglePoints));
-            wm_debug("Adding Rectangle imagemap for $areaName\n");
+            MapUtility::wm_debug("Adding Rectangle imagemap for $areaName\n");
         } else {
             $newArea = new HTMLImagemapAreaPolygon($areaName, "", array($points));
-            wm_debug("Adding Poly imagemap for $areaName\n");
+            MapUtility::wm_debug("Adding Poly imagemap for $areaName\n");
         }
         // Make a note that we added this area
         $this->imap_areas[] = $newArea;
@@ -521,7 +519,7 @@ class MapLink extends MapDataItem
 
         $template_item = $this->owner->links[$this->template];
 
-        wm_debug("Writing config for LINK $this->name against $this->template\n");
+        MapUtility::wm_debug("Writing config for LINK $this->name against $this->template\n");
 
         $basic_params = array(
             array('width', 'WIDTH', self::CONFIG_TYPE_LITERAL),
@@ -729,25 +727,25 @@ class MapLink extends MapDataItem
             $i++;
         }
 
-        $output .= Utility::jsEscape(trim($tgt));
+        $output .= StringUtility::jsEscape(trim($tgt));
         $output .= ",";
 
-        $output .= "bw_in:" . Utility::jsEscape($this->maxValuesConfigured[IN]) . ", ";
-        $output .= "bw_out:" . Utility::jsEscape($this->maxValuesConfigured[OUT]) . ", ";
+        $output .= "bw_in:" . StringUtility::jsEscape($this->maxValuesConfigured[IN]) . ", ";
+        $output .= "bw_out:" . StringUtility::jsEscape($this->maxValuesConfigured[OUT]) . ", ";
 
-        $output .= "name:" . Utility::jsEscape($this->name) . ", ";
+        $output .= "name:" . StringUtility::jsEscape($this->name) . ", ";
         $output .= "overlibwidth:'" . $this->overlibheight . "', ";
         $output .= "overlibheight:'" . $this->overlibwidth . "', ";
-        $output .= "overlibcaption:" . Utility::jsEscape($this->overlibcaption[IN]) . ", ";
+        $output .= "overlibcaption:" . StringUtility::jsEscape($this->overlibcaption[IN]) . ", ";
 
-        $output .= "commentin:" . Utility::jsEscape($this->comments[IN]) . ", ";
+        $output .= "commentin:" . StringUtility::jsEscape($this->comments[IN]) . ", ";
         $output .= "commentposin:" . intval($this->commentoffset_in) . ", ";
 
-        $output .= "commentout:" . Utility::jsEscape($this->comments[OUT]) . ", ";
+        $output .= "commentout:" . StringUtility::jsEscape($this->comments[OUT]) . ", ";
         $output .= "commentposout:" . intval($this->commentoffset_out) . ", ";
 
-        $output .= "infourl:" . Utility::jsEscape($this->infourl[IN]) . ", ";
-        $output .= "overliburl:" . Utility::jsEscape(join(" ", $this->overliburl[IN])) . ", ";
+        $output .= "infourl:" . StringUtility::jsEscape($this->infourl[IN]) . ", ";
+        $output .= "overliburl:" . StringUtility::jsEscape(join(" ", $this->overliburl[IN])) . ", ";
 
         $output .= "via: [";
         $nItem = 0;
@@ -757,7 +755,7 @@ class MapLink extends MapDataItem
             }
             $output .= sprintf("[%d,%d", $via[0], $via[1]);
             if (isset($via[2])) {
-                $output .= "," . Utility::jsEscape($via[2]);
+                $output .= "," . StringUtility::jsEscape($via[2]);
             }
             $output .= "]";
 
@@ -787,7 +785,7 @@ class MapLink extends MapDataItem
 
     public function getValue($name)
     {
-        wm_debug("Fetching %s\n", $name);
+        MapUtility::wm_debug("Fetching %s\n", $name);
         if (property_exists($this, $name)) {
             return $this->$name;
         }

@@ -13,7 +13,10 @@
 // TARGET snmp:public:hostname:1.3.6.1.4.1.3711.1.1:1.3.6.1.4.1.3711.1.2
 // (that is, TARGET snmp:community:host:in_oid:out_oid
 
-class WeatherMapDataSource_snmp extends WeatherMapDataSource
+namespace Weathermap\Plugins\Datasources;
+
+
+class WeatherMapDataSource_snmp extends DatasourceBase
 {
     protected $down_cache;
 

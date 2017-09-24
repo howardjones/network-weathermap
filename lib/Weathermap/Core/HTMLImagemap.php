@@ -36,11 +36,11 @@ class HTMLImagemap
     // add an element to the map - takes an array with the info, in a similar way to HTML_QuickForm
     public function addArea($element)
     {
-        if (is_object($element) && is_subclass_of($element, 'htmlimagemaparea')) {
+        if (is_object($element) && is_subclass_of($element, 'Weathermap\Core\HTMLImagemapArea')) {
             $elementObject = &$element;
         } else {
             $args = func_get_args();
-            $className = "HTMLImagemapArea" . $element;
+            $className = 'Weathermap\Core\HTMLImagemapArea' . $element;
             $elementObject = new $className($args[1], $args[2], array_slice($args, 3));
         }
 

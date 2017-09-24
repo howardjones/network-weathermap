@@ -151,14 +151,14 @@ class Colour
             return null;
         }
 
-        return (myimagecolorallocate($image_ref, $this->red, $this->green, $this->blue));
+        return ImageUtility::myimagecolorallocate($image_ref, $this->red, $this->green, $this->blue);
     }
 
     // based on an idea from: http://www.bennadel.com/index.cfm?dax=blog:902.view
     public function getContrastingColourAsArray()
     {
         if (!$this->isRealColour()) {
-            wm_warn("You can't make a contrast with 'none' - guessing black. [WMWARN43]\n");
+            MapUtility::wm_warn("You can't make a contrast with 'none' - guessing black. [WMWARN43]\n");
             return (array(0, 0, 0));
         }
 

@@ -4,7 +4,7 @@ namespace Weathermap\Core;
 /**
  * Class WMUtility - string-handling/formatting utility functions
  */
-class Utility
+class StringUtility
 {
     /**
      * Aka 'screenshotify' - takes a string and masks out any word longer than 2 characters
@@ -71,62 +71,7 @@ class Utility
     }
 
 
-    public static function calculateCompassOffset($compassPoint, $factor, $width, $height)
-    {
-        $compassPoints = array(
-            "N" => array(0, -1),
-            "S" => array(0, 1),
-            "E" => array(1, 0),
-            "W" => array(-1, 0),
-            "NE" => array(1, -1),
-            "NW" => array(-1, -1),
-            "SE" => array(1, 1),
-            "SW" => array(-1, 1),
-            "C" => array(0, 0)
-        );
-        $multiply = 1;
-        if (null !== $factor) {
-            $multiply = intval($factor) / 100;
-            wm_debug("Percentage compass offset: multiply by $multiply");
-        }
-
-        // divide by 2, since the actual offset will only ever be half of the
-        // width and height
-        $height = ($height * $multiply) / 2;
-        $width = ($width * $multiply) / 2;
-
-        $offsets = $compassPoints[strtoupper($compassPoint)];
-        $offsets[0] *= $width;
-        $offsets[1] *= $height;
-
-        return $offsets;
-    }
-
     // given a compass-point, and a width & height, return a tuple of the x,y offsets
-    public static function calculateOffset($offsetstring, $width, $height)
-    {
-        if (preg_match('/^([-+]?\d+):([-+]?\d+)$/', $offsetstring, $matches)) {
-            wm_debug("Numeric Offset found\n");
-            return (array($matches[1], $matches[2]));
-        }
-
-        if (preg_match('/(NE|SE|NW|SW|N|S|E|W|C)(\d+)?$/i', $offsetstring, $matches)) {
-            return self::calculateCompassOffset($matches[1], (isset($matches[2]) ? $matches[2] : null), $width, $height);
-        }
-
-        if (preg_match('/(-?\d+)r(\d+)$/i', $offsetstring, $matches)) {
-            $angle = intval($matches[1]);
-            $distance = intval($matches[2]);
-            $rangle = deg2rad($angle);
-
-            $offsets = array($distance * sin($rangle), -$distance * cos($rangle));
-
-            return $offsets;
-        }
-
-        wm_warn("Got a position offset that didn't make sense ($offsetstring).");
-        return (array(0, 0));
-    }
 
     public static function interpretNumberWithMetricSuffixOrNull($inputString, $kilo = 1000)
     {
@@ -287,7 +232,7 @@ class Utility
 
         $str = '"' . $str . '"';
 
-        return ($str);
+        return $str;
     }
 
     /**

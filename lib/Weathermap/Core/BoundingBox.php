@@ -37,7 +37,7 @@ class BoundingBox
 
     public function addPoint($x, $y)
     {
-        wm_debug("Adding point $x,$y to '$this->name'\n");
+        MapUtility::wm_debug("Adding point $x,$y to '$this->name'\n");
 
         if (is_null($this->minimumX) || $x < $this->minimumX) {
             $this->minimumX = $x;

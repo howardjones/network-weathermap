@@ -5,7 +5,11 @@
 // * Doesn't add any rows to weathermap_data, so nothing would be collected anyway
 
 
-class WeatherMapDataSource_cacti extends WeatherMapDataSource
+namespace Weathermap\Plugins\Datasources;
+
+use Weathermap\Core\MapUtility;
+
+class WeatherMapDataSource_cacti extends DatasourceBase
 {
     protected $name = "Cacti";
 
@@ -25,10 +29,10 @@ class WeatherMapDataSource_cacti extends WeatherMapDataSource
             if (true === function_exists('db_fetch_row')) {
                 return true;
             } else {
-                wm_debug('ReadData cacti: Cacti database library not found.\n');
+                MapUtility::wm_debug('ReadData cacti: Cacti database library not found.\n');
             }
         } else {
-            wm_debug("ReadData cacti: Can only run from Cacti environment.\n");
+            MapUtility::wm_debug("ReadData cacti: Can only run from Cacti environment.\n");
         }
 
         return false;

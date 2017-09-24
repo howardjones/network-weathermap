@@ -12,16 +12,6 @@ class Spine
     private $elements;
 
     /**
-     * Add a raw spine entry, assuming it's correct - used for copying spines around
-     *
-     * @param array $newEntry
-     */
-//    function addRawEntry($newEntry)
-//    {
-//        $this->addRawElement(new WMSpineElement($newEntry[SPINE_POINT], $newEntry[SPINE_DISTANCE]));
-//    }
-
-    /**
      * Add a WMSpineElement as-as, assuming the distance inside is correct
      * (used for copying spines around)
      *
@@ -91,7 +81,7 @@ class Spine
 
         for ($n = 1; $n <= $maxStartIndex; $n++) {
             // figure out the area of the triangle formed by this point, and the one before and after
-            $area = getTriangleArea(
+            $area = MathUtility::getTriangleArea(
                 $this->elements[$n - 1]->point,
                 $this->elements[$n]->point,
                 $this->elements[$n + 1]->point
@@ -105,17 +95,12 @@ class Spine
             }
         }
 
-        wm_debug("Skipped $skip points of $maxStartIndex\n");
+        MapUtility::wm_debug("Skipped $skip points of $maxStartIndex\n");
 
         $output->addPoint($this->elements[$maxStartIndex + 1]->point);
 
         return $output;
     }
-
-//    function firstPoint()
-//    {
-//        return $this->elements[0]->point;
-//    }
 
     public function lastPoint()
     {
@@ -286,7 +271,7 @@ class Spine
         // Recalculate the distance from the other end as we go
         for ($i = $endCursor; $i > $splitIndex; $i--) {
             $newElement = clone $this->elements[$i];
-            //     wm_debug("  $totalDistance => $newDistance  \n");
+            //     MapUtility::wm_debug("  $totalDistance => $newDistance  \n");
             $newElement->distance = $totalDistance - $this->elements[$i]->distance;
             $spine2->addRawElement($newElement);
         }
@@ -298,8 +283,8 @@ class Spine
     {
         list($halfwayPoint, $halfwayIndex) = $this->findPointAtDistance($splitDistance);
 
-        wm_debug($this . "\n");
-        wm_debug("Halfway split (%d) is at index %d %s\n", $splitDistance, $halfwayIndex, $halfwayPoint);
+        MapUtility::wm_debug($this . "\n");
+        MapUtility::wm_debug("Halfway split (%d) is at index %d %s\n", $splitDistance, $halfwayIndex, $halfwayPoint);
 
         list($spine1, $spine2) = $this->split($halfwayIndex);
 
@@ -307,8 +292,8 @@ class Spine
         $spine1->addRawElement(new SpineElement($halfwayPoint, $splitDistance));
         $spine2->addRawElement(new SpineElement($halfwayPoint, $this->totalDistance() - $splitDistance));
 
-        wm_debug($spine1 . "\n");
-        wm_debug($spine2 . "\n");
+        MapUtility::wm_debug($spine1 . "\n");
+        MapUtility::wm_debug($spine2 . "\n");
 
         return array($spine1, $spine2);
     }

@@ -1,4 +1,5 @@
 <?php
+namespace Weathermap\Core;
 
 /*
  * Refactoring of all the ReadConfig code out of the giant Weathermap class
@@ -779,8 +780,8 @@ class ConfigReader
                     '/^BWLABEL\s+bits\s*$/i',
                     array(
                         'labelstyle' => 'bits',
-                        'bwlabelformats[IN]' => WeatherMapLink::FMT_BITS_IN,
-                        'bwlabelformats[OUT]' => WeatherMapLink::FMT_BITS_OUT,
+                        'bwlabelformats[IN]' => MapLink::FMT_BITS_IN,
+                        'bwlabelformats[OUT]' => MapLink::FMT_BITS_OUT,
                     )
                 ),
                 array(
@@ -788,8 +789,8 @@ class ConfigReader
                     '/^BWLABEL\s+percent\s*$/i',
                     array(
                         'labelstyle' => 'percent',
-                        'bwlabelformats[IN]' => WeatherMapLink::FMT_PERC_IN,
-                        'bwlabelformats[OUT]' => WeatherMapLink::FMT_PERC_OUT,
+                        'bwlabelformats[IN]' => MapLink::FMT_PERC_IN,
+                        'bwlabelformats[OUT]' => MapLink::FMT_PERC_OUT,
                     )
                 ),
                 array(
@@ -797,8 +798,8 @@ class ConfigReader
                     '/^BWLABEL\s+unformatted\s*$/i',
                     array(
                         'labelstyle' => 'unformatted',
-                        'bwlabelformats[IN]' => WeatherMapLink::FMT_UNFORM_IN,
-                        'bwlabelformats[OUT]' => WeatherMapLink::FMT_UNFORM_OUT,
+                        'bwlabelformats[IN]' => MapLink::FMT_UNFORM_IN,
+                        'bwlabelformats[OUT]' => MapLink::FMT_UNFORM_OUT,
                     )
                 ),
                 array(
@@ -1143,7 +1144,7 @@ class ConfigReader
             return;
         }
 
-        wm_debug("-> Committing a $this->currentType named " . $this->currentObject->name . "\n");
+        MapUtility::wm_debug("-> Committing a $this->currentType named " . $this->currentObject->name . "\n");
 
         if ($this->currentType == 'NODE') {
             $this->mapObject->nodes[$this->currentObject->name] = $this->currentObject;
@@ -1180,10 +1181,10 @@ class ConfigReader
 
     public function readConfigLines($inputLines)
     {
-        wm_debug("in readConfigLines\n");
+        MapUtility::wm_debug("in readConfigLines\n");
 
         foreach ($inputLines as $buffer) {
-            wm_debug("Processing: $buffer\n");
+            MapUtility::wm_debug("Processing: $buffer\n");
             $this->lineCount++;
 
             $buffer = trim($buffer);
@@ -1196,7 +1197,7 @@ class ConfigReader
             $this->objectLineCount++;
             // break out the line into words (quoted strings are one word)
             $args = $this::parseString($buffer);
-            wm_debug("  First: $args[0] in $this->currentType\n");
+            MapUtility::wm_debug("  First: $args[0] in $this->currentType\n");
 
             // From here, the aim of the game is to get out of this loop as
             // early as possible, without running more preg_match calls than
@@ -1214,8 +1215,8 @@ class ConfigReader
         // Commit the last item
         $this->commitItem();
 
-        wm_debug("ReadConfig has finished reading the config ($this->lineCount lines)\n");
-        wm_debug("------------------------------------------\n");
+        MapUtility::wm_debug("ReadConfig has finished reading the config ($this->lineCount lines)\n");
+        MapUtility::wm_debug("------------------------------------------\n");
 
         return $this->lineCount;
     }
@@ -1233,12 +1234,12 @@ class ConfigReader
             // check if there is even an entry in this context for the current keyword
             if (true === isset($this->configKeywords[$this->currentType][$args[0]])) {
                 // if there is, then the entry is an array of arrays - iterate them to validate the config
-                wm_debug("    Possible!\n");
+                MapUtility::wm_debug("    Possible!\n");
                 foreach ($this->configKeywords[$this->currentType][$args[0]] as $keyword) {
                     unset($matches);
-                    wm_debug("      Trying $keyword[0]\n");
+                    MapUtility::wm_debug("      Trying $keyword[0]\n");
                     if ((substr($keyword[0], 0, 1) != '/') || (1 === preg_match($keyword[0], $buffer, $matches))) {
-                        #   wm_debug("Might be $args[0]\n");
+                        #   MapUtility::wm_debug("Might be $args[0]\n");
 
                         // if we came here without a regexp, then the \1 etc
                         // refer to arg numbers, not match numbers
@@ -1297,7 +1298,7 @@ class ConfigReader
             } else {
                 // otherwise, it's just the name of a property on the
                 // appropriate object.
-                # wm_debug("      DONE! ($key, $val)\n");
+                # MapUtility::wm_debug("      DONE! ($key, $val)\n");
                 $this->currentObject->$key = $val;
                 $this->currentObject->setConfigValue($key, $val);
             }
@@ -1342,29 +1343,29 @@ class ConfigReader
 
         // percentage of compass - must be first
         if (preg_match('/:(NE|SE|NW|SW|N|S|E|W|C)(\d+)$/i', $input, $submatches)) {
-            wm_debug("Matching partial compass offset\n");
+            MapUtility::wm_debug("Matching partial compass offset\n");
             $endoffset = $submatches[1] . $submatches[2];
             $nodename = preg_replace('/:(NE|SE|NW|SW|N|S|E|W|C)\d+$/i', '', $input);
             $need_size_precalc = true;
         } elseif (preg_match("/:(NE|SE|NW|SW|N|S|E|W|C)$/i", $input, $submatches)) {
-            wm_debug("Matching 100% compass offset\n");
+            MapUtility::wm_debug("Matching 100% compass offset\n");
             $endoffset = $submatches[1];
             $nodename = preg_replace('/:(NE|SE|NW|SW|N|S|E|W|C)$/i', '', $input);
             $need_size_precalc = true;
         } elseif (preg_match('/:(-?\d+r\d+)$/i', $input, $submatches)) {
-            wm_debug("Matching radial offset\n");
+            MapUtility::wm_debug("Matching radial offset\n");
             $endoffset = $submatches[1];
             $nodename = preg_replace('/:(-?\d+r\d+)$/i', '', $input);
             $need_size_precalc = true;
         } elseif (preg_match('/:([-+]?\d+):([-+]?\d+)$/i', $input, $submatches)) {
-            wm_debug("Matching regular x,y link offset\n");
+            MapUtility::wm_debug("Matching regular x,y link offset\n");
             $xoff = $submatches[1];
             $yoff = $submatches[2];
             $endoffset = $xoff . ":" . $yoff;
             $nodename = preg_replace("/:$xoff:$yoff$/i", '', $input);
             $need_size_precalc = true;
         } elseif (preg_match('/^([^:]+):([A-Za-z][A-Za-z0-9\-_]*)$/i', $input, $submatches)) {
-            wm_debug("Matching node namedoffset %s on node %s\n", $submatches[2], $submatches[1]);
+            MapUtility::wm_debug("Matching node namedoffset %s on node %s\n", $submatches[2], $submatches[1]);
             $otherNode = $this->mapObject->getNode($submatches[1]);
             if (array_key_exists($submatches[2], $otherNode->named_offsets)) {
                 $named_offset = $submatches[2];
@@ -1411,7 +1412,7 @@ class ConfigReader
 
                 foreach (array(1 => "a", 2 => "b") as $index => $name) {
                     if ($offset_dx[$index] != 0 || $offset_dy[$index] != 0) {
-                        wm_debug("Applying offset for $name end %s,%s\n", $offset_dx[$index], $offset_dy[$index]);
+                        MapUtility::wm_debug("Applying offset for $name end %s,%s\n", $offset_dx[$index], $offset_dy[$index]);
 
                         // TODO - these should be arrays, not named properties
                         $n1 = $name . "_offset_dx";
@@ -1441,7 +1442,7 @@ class ConfigReader
 
             if ($this->currentObject->my_type() == "MAP" && substr($matches[1], 0, 7) == 'nowarn_') {
                 $key = substr(strtoupper($matches[1]), 7);
-                wm_debug("Suppressing warning $key for this map\n");
+                MapUtility::wm_debug("Suppressing warning $key for this map\n");
                 $weathermap_error_suppress[$key] = 1;
             }
             return true;
@@ -1451,7 +1452,7 @@ class ConfigReader
             $this->currentObject->add_hint($matches[1], '');
             if ($this->currentObject->my_type() == "MAP" && substr($matches[1], 0, 7) == 'nowarn_') {
                 $key = substr(strtoupper($matches[1]), 7);
-                wm_debug("Suppressing warning $key for this map\n");
+                MapUtility::wm_debug("Suppressing warning $key for this map\n");
                 $weathermap_error_suppress[$key] = 1;
             }
             return true;
@@ -1466,10 +1467,10 @@ class ConfigReader
 
         // this is a regular colour setting thing
         if (isset($args[2])) {
-            $wmc = new WMColour($args[1], $args[2], $args[3]);
+            $wmc = new Colour($args[1], $args[2], $args[3]);
         } else {
             // it's a special colour
-            $wmc = new WMColour($val);
+            $wmc = new Colour($val);
         }
         $this->mapObject->colourtable[$key] = $wmc;
 
@@ -1516,7 +1517,7 @@ class ConfigReader
     private function handleFONTDEFINE($fullcommand, $args, $matches)
     {
         if (isset($args[3])) {
-            wm_debug("New TrueType font in slot %d\n", $args[1]);
+            MapUtility::wm_debug("New TrueType font in slot %d\n", $args[1]);
 
             $newFontObject = $this->mapObject->fonts->makeFontObject("truetype", $args[2], $args[3]);
 
@@ -1531,7 +1532,7 @@ class ConfigReader
                 wm_warn("Failed to load ttf font " . $args[2] . " - at config line $this->lineCount\n [WMWARN30]");
             }
         } else {
-            wm_debug("New GD font in slot %d\n", $args[1]);
+            MapUtility::wm_debug("New GD font in slot %d\n", $args[1]);
 
             $newFontObject = $this->mapObject->fonts->makeFontObject("gd", $args[2]);
             # $newFontObject = new WMFont();
@@ -1581,9 +1582,9 @@ class ConfigReader
 
         // this is a regular colour setting thing
         if (isset($args[2])) {
-            $wmc = new WMColour($args[1], $args[2], $args[3]);
+            $wmc = new Colour($args[1], $args[2], $args[3]);
         } else {
-            $wmc = new WMColour($val);
+            $wmc = new Colour($val);
         }
 
         $this->currentObject->$field = $wmc;
@@ -1599,10 +1600,10 @@ class ConfigReader
 
         // Now loop through all the rest
         foreach ($args as $arg) {
-            $newTarget = new WMTarget($arg, $this->currentSource, $this->lineCount);
+            $newTarget = new Target($arg, $this->currentSource, $this->lineCount);
             $this->mapObject->stats->increment('total_targets');
             if ($this->currentObject) {
-                wm_debug("  TARGET: $arg\n");
+                MapUtility::wm_debug("  TARGET: $arg\n");
                 $this->currentObject->targets[] = $newTarget;
             }
         }
@@ -1617,7 +1618,7 @@ class ConfigReader
 
         if ($args[1] == 'DEFAULT') {
             $this->currentObject = $this->mapObject->nodes['DEFAULT'];
-            wm_debug("Loaded default NODE\n");
+            MapUtility::wm_debug("Loaded default NODE\n");
 
             if (sizeof($this->mapObject->nodes) > 2) {
                 wm_warn("NODE DEFAULT is not the first NODE. Defaults will not apply to earlier NODEs. [WMWARN27]\n");
@@ -1627,8 +1628,8 @@ class ConfigReader
                 wm_warn("Duplicate node name " . $matches[1] . " at line $this->lineCount - only the last one defined is used. [WMWARN24]\n");
             }
 
-            $this->currentObject = new WeatherMapNode($matches[1], "DEFAULT", $this->mapObject);
-            wm_debug("Created new NODE\n");
+            $this->currentObject = new MapNode($matches[1], "DEFAULT", $this->mapObject);
+            MapUtility::wm_debug("Created new NODE\n");
         }
         $this->objectLineCount = 0;
         $this->currentType = "NODE";
@@ -1645,7 +1646,7 @@ class ConfigReader
 
         if ($args[1] == 'DEFAULT') {
             $this->currentObject = $this->mapObject->links['DEFAULT'];
-            wm_debug("Loaded default LINK\n");
+            MapUtility::wm_debug("Loaded default LINK\n");
 
             if (sizeof($this->mapObject->links) > 2) {
                 wm_warn("$this LINK DEFAULT is not the first LINK. Defaults will not apply to earlier LINKs. [WMWARN26]\n");
@@ -1654,8 +1655,8 @@ class ConfigReader
             if (isset($this->mapObject->links[$matches[1]])) {
                 wm_warn("Duplicate link name " . $matches[1] . " at line $this->lineCount - only the last one defined is used. [WMWARN25]\n");
             }
-            $this->currentObject = new WeatherMapLink($matches[1], "DEFAULT", $this->mapObject);
-            wm_debug("Created new LINK\n");
+            $this->currentObject = new MapLink($matches[1], "DEFAULT", $this->mapObject);
+            MapUtility::wm_debug("Created new LINK\n");
         }
         $this->currentType = "LINK";
         $this->objectLineCount = 0;
@@ -1697,15 +1698,15 @@ class ConfigReader
         $top = WMUtility::interpretNumberWithMetricSuffix($matches[3], $this->mapObject->kilo);
 
         if (isset($matches[10]) && $matches[10] == 'none') {
-            $colour1 = new WMColour("none");
+            $colour1 = new Colour("none");
         } else {
-            $colour1 = new WMColour((int)($matches[4]), (int)($matches[5]), (int)($matches[6]));
+            $colour1 = new Colour((int)($matches[4]), (int)($matches[5]), (int)($matches[6]));
             $colour2 = $colour1;
         }
 
         // this is the second colour, if there is one
         if (isset($matches[7]) && $matches[7] != '') {
-            $colour2 = new WMColour((int)($matches[7]), (int)($matches[8]), (int)($matches[9]));
+            $colour2 = new Colour((int)($matches[7]), (int)($matches[8]), (int)($matches[9]));
         }
 
         $newscale->AddSpan($bottom, $top, $colour1, $colour2, $tag);
@@ -1733,7 +1734,7 @@ class ConfigReader
 
     private function handleDEFINEOFFSET($fullcommand, $args, $matches)
     {
-        wm_debug("Defining a named offset: " . $matches[1] . "\n");
+        MapUtility::wm_debug("Defining a named offset: " . $matches[1] . "\n");
         $this->currentObject->named_offsets[$matches[1]] = array(intval($matches[2]), intval($matches[3]));
 
         return true;
@@ -1793,7 +1794,7 @@ class ConfigReader
         $filename = $matches[1];
 
         if (file_exists($filename)) {
-            wm_debug("Including '{$filename}'\n");
+            MapUtility::wm_debug("Including '{$filename}'\n");
 
             if (in_array($filename, $this->mapObject->included_files)) {
                 wm_warn("Attempt to include '$filename' twice! Skipping it.\n");
@@ -1863,9 +1864,9 @@ class ConfigReader
     public function selfValidate()
     {
         $classes = array(
-            "GLOBAL" => "WeatherMap",
-            "LINK" => "WeatherMapLink",
-            "NODE" => "WeatherMapNode"
+            "GLOBAL" => "Map",
+            "LINK" => "MapLink",
+            "NODE" => "MapNode"
         );
 
         $result = true;

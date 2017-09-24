@@ -8,6 +8,7 @@
 
 namespace Weathermap\Plugins\Post;
 
+use Weathermap\Core\MapUtility;
 
 class WeatherMapPostProcessorExample extends PostProcessorBase
 {
@@ -16,7 +17,7 @@ class WeatherMapPostProcessorExample extends PostProcessorBase
         $enable = $this->owner->get_hint("post_test_enable");
 
         if ($enable) {
-            wm_debug(__CLASS__ . " is here\n");
+            MapUtility::wm_debug(__CLASS__ . " is here\n");
 
             // do your work in here...
 
@@ -24,7 +25,7 @@ class WeatherMapPostProcessorExample extends PostProcessorBase
             $this->owner->add_note("test", $orig . " TESTYTEST");
             // -------------------------
         } else {
-            wm_debug(__CLASS__ . " Not Enabled\n");
+            MapUtility::wm_debug(__CLASS__ . " Not Enabled\n");
         }
     }
 }

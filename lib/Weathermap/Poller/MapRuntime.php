@@ -31,6 +31,5 @@ class MapRuntime
 
     public function run()
     {
-
     }
 }

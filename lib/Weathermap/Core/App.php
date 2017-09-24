@@ -8,7 +8,6 @@
 
 namespace Weathermap\Core;
 
-
 class App
 {
 

@@ -14,7 +14,7 @@ class WeatherMapDataSource_time extends DatasourceBase
         $this->name = "Time";
     }
 
-    public function Init(&$map)
+    public function init(&$map)
     {
         if (preg_match('/^[234]\./', phpversion())) {
             wm_debug("Time plugin requires PHP 5+ to run\n");
@@ -30,7 +30,7 @@ class WeatherMapDataSource_time extends DatasourceBase
      * @param WeatherMapDataItem $item
      * @return array
      */
-    public function ReadData($targetstring, &$map, &$item)
+    public function readData($targetstring, &$map, &$item)
     {
         $this->data[IN] = null;
         $this->data[OUT] = null;
@@ -66,7 +66,7 @@ class WeatherMapDataSource_time extends DatasourceBase
             wm_warn("Time ReadData: Couldn't recognize $targetstring \n");
         }
 
-        return $this->ReturnData();
+        return $this->returnData();
     }
 }
 

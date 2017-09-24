@@ -23,7 +23,7 @@ class WeatherMapDataSource_cacti extends DatasourceBase
     }
 
 
-    public function Init(&$map)
+    public function init(&$map)
     {
         if ($map->context === 'cacti') {
             if (true === function_exists('db_fetch_row')) {
@@ -38,7 +38,7 @@ class WeatherMapDataSource_cacti extends DatasourceBase
         return false;
     }
 
-    public function ReadData($targetstring, &$map, &$item)
+    public function readData($targetstring, &$map, &$item)
     {
         $this->data[IN] = null;
         $this->data[OUT] = null;
@@ -52,7 +52,7 @@ class WeatherMapDataSource_cacti extends DatasourceBase
             $result = db_fetch_row($SQL);
         }
 
-        return $this->ReturnData();
+        return $this->returnData();
     }
 }
 

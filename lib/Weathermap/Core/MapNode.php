@@ -1088,7 +1088,6 @@ class MapNode extends MapDataItem
 
         return $icon_im;
     }
-
 }
 
 // vim:ts=4:sw=4:

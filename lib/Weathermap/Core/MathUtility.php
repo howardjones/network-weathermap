@@ -8,7 +8,6 @@
 
 namespace Weathermap\Core;
 
-
 class MathUtility
 {
     /**
@@ -58,6 +57,4 @@ class MathUtility
             $points[$i * 2 + 1] = $rotated_y + $centre_y;
         }
     }
-
-
 }

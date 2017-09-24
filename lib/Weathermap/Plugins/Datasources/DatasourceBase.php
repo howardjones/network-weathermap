@@ -33,7 +33,7 @@ class DatasourceBase
 // but just before ReadData. Used to allow plugins to verify their dependencies
 // (if any) and bow out gracefully. Return FALSE to signal that the plugin is not
 // in a fit state to run at the moment.
-    function Init(&$map)
+    function init(&$map)
     {
         $this->owner = $map;
 
@@ -48,7 +48,7 @@ class DatasourceBase
      * @return bool Returns true or false, depending on whether it wants to handle this TARGET
      *
      */
-    public function Recognise($targetString)
+    public function recognise($targetString)
     {
         foreach ($this->regexpsHandled as $regexp) {
             if (preg_match($regexp, $targetString)) {
@@ -69,7 +69,7 @@ class DatasourceBase
      * @param MapDataItem $item
      * @return array
      */
-    function ReadData($targetstring, &$map, &$item)
+    function readData($targetstring, &$map, &$item)
     {
         return array(-1, -1);
     }
@@ -81,7 +81,7 @@ class DatasourceBase
      *
      * @return array
      */
-    function ReturnData()
+    function returnData()
     {
         MapUtility::wm_debug(
             sprintf(
@@ -103,7 +103,7 @@ class DatasourceBase
      * @param WeatherMap $map the WeatherMap main object
      * @param WeatherMapDataItem $item the specific WeatherMapItem that this target is for
      */
-    public function Register($targetstring, &$map, &$item)
+    public function register($targetstring, &$map, &$item)
     {
     }
 
@@ -112,7 +112,7 @@ class DatasourceBase
      *
      * @param WeatherMap $map the WeatherMap main object
      */
-    public function Prefetch(&$map)
+    public function preFetch(&$map)
     {
     }
 
@@ -122,11 +122,7 @@ class DatasourceBase
      *
      * @param Map $map the WeatherMap main object
      */
-    public function CleanUp(&$map)
+    public function cleanUp(&$map)
     {
     }
 }
-
-
-
-

@@ -20,7 +20,7 @@ class WeatherMapDataSource_wmdata extends DatasourceBase
      * @param WeatherMapDataItem $item A reference to the object this target is attached to
      * @return array invalue, outvalue, unix timestamp that the data was valid
      */
-    public function ReadData($targetstring, &$map, &$item)
+    public function readData($targetstring, &$map, &$item)
     {
         $this->data[IN] = null;
         $this->data[OUT] = null;
@@ -64,7 +64,7 @@ class WeatherMapDataSource_wmdata extends DatasourceBase
             wm_warn("WMData ReadData: $datafile doesn't exist [WMWMDATA01]");
         }
 
-        return $this->ReturnData();
+        return $this->returnData();
     }
 }
 

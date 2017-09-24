@@ -8,7 +8,6 @@
 
 namespace Weathermap\Integrations;
 
-
 class ManagedMap
 {
     /**

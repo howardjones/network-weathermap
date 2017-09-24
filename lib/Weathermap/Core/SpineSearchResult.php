@@ -8,7 +8,6 @@
 
 namespace Weathermap\Core;
 
-
 /**
  * Class SpineSearchResult - A 'struct' effectively for the results of the Spine search functions.
  *

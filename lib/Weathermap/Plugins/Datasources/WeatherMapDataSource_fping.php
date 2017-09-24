@@ -6,7 +6,6 @@
 // TARGET fping:hostname
 namespace Weathermap\Plugins\Datasources;
 
-
 class WeatherMapDataSource_fping extends DatasourceBase
 {
 
@@ -27,7 +26,7 @@ class WeatherMapDataSource_fping extends DatasourceBase
     }
 
 
-    public function Init(&$map)
+    public function init(&$map)
     {
         #
         # You may need to change the line below to have something like "/usr/local/bin/fping" or "/usr/bin/fping" instead.
@@ -44,7 +43,7 @@ class WeatherMapDataSource_fping extends DatasourceBase
      * @param WeatherMap $map the WeatherMap main object
      * @param WeatherMapDataItem $item the specific WeatherMapItem that this target is for
      */
-    public function Register($targetstring, &$map, &$item)
+    public function register($targetstring, &$map, &$item)
     {
         if (preg_match('/^fping:(\S+)$/', $targetstring, $matches)) {
             // save the address. This way, we can do ONE fping call for all the pings in the map.
@@ -54,7 +53,7 @@ class WeatherMapDataSource_fping extends DatasourceBase
         }
     }
 
-    public function ReadData($targetstring, &$map, &$item)
+    public function readData($targetstring, &$map, &$item)
     {
         $this->data[IN] = null;
         $this->data[OUT] = null;
@@ -132,7 +131,7 @@ class WeatherMapDataSource_fping extends DatasourceBase
             }
         }
 
-        return $this->ReturnData();
+        return $this->returnData();
     }
 }
 

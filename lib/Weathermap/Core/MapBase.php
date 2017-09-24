@@ -47,7 +47,7 @@ class MapBase
         $this->notes[$name] = $value;
     }
 
-    function get_note($name, $default = NULL)
+    function get_note($name, $default = null)
     {
         if (isset($this->notes[$name])) {
             //	debug("Found note $name in ".$this->name." with value of ".$this->notes[$name].".\n");
@@ -65,7 +65,7 @@ class MapBase
         # warn("Adding hint $name to ".$this->my_type()."/".$this->name."\n");
     }
 
-    function get_hint($name, $default = NULL)
+    function get_hint($name, $default = null)
     {
         if (isset($this->hints[$name])) {
             //	debug("Found hint $name in ".$this->name." with value of ".$this->hints[$name].".\n");
@@ -96,8 +96,7 @@ class MapBase
         foreach ($this->hints as $hintName => $hint) {
             // all hints for DEFAULT node are for writing
             // only changed ones, or unique ones, otherwise
-            if (
-                ($this->name == 'DEFAULT')
+            if (($this->name == 'DEFAULT')
                 ||
                 (isset($dd->hints[$hintName])
                     &&
@@ -260,5 +259,4 @@ class MapBase
         }
         return $output;
     }
-
 }

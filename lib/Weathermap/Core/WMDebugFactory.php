@@ -7,7 +7,6 @@
  */
 namespace Weathermap\Core;
 
-
 /**
  * Class WMDebugFactory - pick which of the debug-logging classes to use. We call wm_debug() thousands of
  * times in a map run, so having the minimum possible decision-making done inside it is useful, especially when

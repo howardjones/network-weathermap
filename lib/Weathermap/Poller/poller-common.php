@@ -1,6 +1,7 @@
 <?php
 
 namespace Weathermap\Poller;
+
 // common code used by the poller, the manual-run from the Cacti UI, and from the command-line manual-run.
 // this is the easiest way to keep it all consistent!
 
@@ -176,8 +177,6 @@ function weathermap_run_maps($mydir)
                 $rrdtool_path = read_config_option("path_rrdtool");
 
                 foreach ($queryrows as $map) {
-
-
                     // reset the warning counter
                     $weathermap_warncount = 0;
                     // this is what will prefix log entries for this map
@@ -250,8 +249,10 @@ function weathermap_run_maps($mydir)
                             $wmap->imageuri = $plugin_name . '?action=viewimage&id=' . $map->filehash . "&time=" . time();
 
                             if ($quietlogging == 0) {
-                                wm_warn("About to write image file. If this is the last message in your log, increase memory_limit in php.ini [WMPOLL01]\n",
-                                    true);
+                                wm_warn(
+                                    "About to write image file. If this is the last message in your log, increase memory_limit in php.ini [WMPOLL01]\n",
+                                    true
+                                );
                             }
                             weathermap_memory_check("MEM pre-render $mapcount");
 
@@ -300,8 +301,10 @@ function weathermap_run_maps($mydir)
                                 $fd = @fopen($htmlfile, 'w');
 
                                 if ($fd !== false) {
-                                    fwrite($fd,
-                                        $wmap->MakeHTML('weathermap_' . $map->filehash . '_imap'));
+                                    fwrite(
+                                        $fd,
+                                        $wmap->MakeHTML('weathermap_' . $map->filehash . '_imap')
+                                    );
                                     fclose($fd);
                                     wm_debug("Wrote HTML to %s\n", $htmlfile);
                                 } else {
@@ -347,7 +350,6 @@ function weathermap_run_maps($mydir)
                             weathermap_memory_check("MEM after $mapcount");
                             $mapcount++;
                             $manager->setAppSetting("weathermap_last_finished_file", $weathermap_map);
-
                         } else {
                             wm_warn("Mapfile $mapfile is not readable or doesn't exist [WMPOLL04]\n");
                         }
@@ -390,14 +392,19 @@ function weathermap_run_maps($mydir)
     chdir($orig_cwd);
     $duration = microtime(true) - $start_time;
 
-    $stats_string = sprintf('%s: %d maps were run in %.2f seconds with %d warnings. %s', date(DATE_RFC822),
-        $mapcount, $duration, $total_warnings, $warning_notes);
+    $stats_string = sprintf(
+        '%s: %d maps were run in %.2f seconds with %d warnings. %s',
+        date(DATE_RFC822),
+        $mapcount,
+        $duration,
+        $total_warnings,
+        $warning_notes
+    );
     if ($quietlogging == 0) {
         wm_warn("STATS: Weathermap $WEATHERMAP_VERSION run complete - $stats_string\n", true);
     }
     $manager->setAppSetting("weathermap_last_stats", $stats_string);
     $manager->setAppSetting("weathermap_last_finish_time", time());
-
 }
 
 // vim:ts=4:sw=4:

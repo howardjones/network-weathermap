@@ -6,7 +6,6 @@
 
 namespace Weathermap\Plugins\Datasources;
 
-
 class WeatherMapDataSource_mrtg extends DatasourceBase
 {
 
@@ -20,7 +19,7 @@ class WeatherMapDataSource_mrtg extends DatasourceBase
         $this->name = "MRTG";
     }
 
-    public function ReadData($targetstring, &$map, &$item)
+    public function readData($targetstring, &$map, &$item)
     {
         $this->data[IN] = null;
         $this->data[OUT] = null;
@@ -74,7 +73,7 @@ class WeatherMapDataSource_mrtg extends DatasourceBase
             $this->data[IN] = -$this->data[IN];
         }
 
-        return $this->ReturnData();
+        return $this->returnData();
     }
 }
 

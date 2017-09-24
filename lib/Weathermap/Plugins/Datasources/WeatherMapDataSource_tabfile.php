@@ -4,7 +4,6 @@ namespace Weathermap\Plugins\Datasources;
 use Weathermap\Core\MapUtility;
 use Weathermap\Core\StringUtility;
 
-
 class WeatherMapDataSource_tabfile extends DatasourceBase
 {
     public function __construct()
@@ -23,7 +22,7 @@ class WeatherMapDataSource_tabfile extends DatasourceBase
      * @param WeatherMapDataItem $mapItem A reference to the object this target is attached to
      * @return array invalue, outvalue, unix timestamp that the data was valid
      */
-    public function ReadData($targetString, &$map, &$mapItem)
+    public function readData($targetString, &$map, &$mapItem)
     {
         $this->data[IN] = null;
         $this->data[OUT] = null;
@@ -44,7 +43,7 @@ class WeatherMapDataSource_tabfile extends DatasourceBase
             wm_warn("TabText ReadData: Couldn't open ($fullpath). [WMTABDATA01]\n");
         }
 
-        return $this->ReturnData();
+        return $this->returnData();
     }
 
     /**

@@ -8,7 +8,6 @@
 
 namespace Weathermap\Plugins\Post;
 
-
 /**
  * Class WeatherMapPostProcessor
  *

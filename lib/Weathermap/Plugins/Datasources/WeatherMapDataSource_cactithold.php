@@ -42,7 +42,7 @@ class WeatherMapDataSource_cactithold extends DatasourceBase
         $this->thold10 = false;
     }
 
-    public function Init(&$map)
+    public function init(&$map)
     {
         if ($map->context == 'cacti') {
             $pdo = weathermap_get_pdo();
@@ -110,7 +110,7 @@ class WeatherMapDataSource_cactithold extends DatasourceBase
      * @param WeatherMapDataItem $item A reference to the object this target is attached to
      * @return array invalue, outvalue, unix timestamp that the data was valid
      */
-    public function ReadData($targetstring, &$map, &$item)
+    public function readData($targetstring, &$map, &$item)
     {
         $this->data[IN] = null;
         $this->data[OUT] = null;
@@ -268,7 +268,7 @@ class WeatherMapDataSource_cactithold extends DatasourceBase
             }
         }
 
-        return $this->ReturnData();
+        return $this->returnData();
     }
 }
 

@@ -168,10 +168,14 @@ class EditorDataPicker extends UIBase
             $_SESSION['cacti']['weathermap']['last_used_host_id'][] = $hostId;
             $_SESSION['cacti']['weathermap']['last_used_host_name'][] = $name; // $line['title_cache']
 
-            $_SESSION['cacti']['weathermap']['last_used_host_id'] = array_slice($_SESSION['cacti']['weathermap']['last_used_host_id'],
-                -5);
-            $_SESSION['cacti']['weathermap']['last_used_host_name'] = array_slice($_SESSION['cacti']['weathermap']['last_used_host_name'],
-                -5);
+            $_SESSION['cacti']['weathermap']['last_used_host_id'] = array_slice(
+                $_SESSION['cacti']['weathermap']['last_used_host_id'],
+                -5
+            );
+            $_SESSION['cacti']['weathermap']['last_used_host_name'] = array_slice(
+                $_SESSION['cacti']['weathermap']['last_used_host_name'],
+                -5
+            );
         }
     }
 

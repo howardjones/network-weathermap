@@ -28,7 +28,7 @@ class WeatherMapDataSource_static extends DatasourceBase
      * @param WeatherMapDataItem $item A reference to the object this target is attached to
      * @return array invalue, outvalue, unix timestamp that the data was valid
      */
-    public function ReadData($targetstring, &$map, &$item)
+    public function readData($targetstring, &$map, &$item)
     {
         $this->data[IN] = null;
         $this->data[OUT] = null;
@@ -45,7 +45,7 @@ class WeatherMapDataSource_static extends DatasourceBase
             $this->dataTime = time();
         }
 
-        return $this->ReturnData();
+        return $this->returnData();
     }
 }
 

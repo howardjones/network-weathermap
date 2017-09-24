@@ -8,8 +8,6 @@
 
 namespace Weathermap\Core;
 
-
-
 /**
  * Class WMDebugNull - the stubbed do-nothing version for a normal run
  */

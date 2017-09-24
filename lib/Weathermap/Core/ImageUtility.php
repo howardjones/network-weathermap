@@ -291,6 +291,4 @@ class ImageUtility
         }
         return $pal;
     }
-
-
 }

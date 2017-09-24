@@ -8,7 +8,6 @@
 
 namespace Weathermap\Plugins\Pre;
 
-
 /**
  * Class WeatherMapPreProcessor
  *

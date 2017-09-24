@@ -8,7 +8,6 @@
 
 namespace Weathermap\Core;
 
-
 class WeathermapInternalFail extends \Exception
 {
     // this is an assertion failure, to make testing easier

@@ -21,7 +21,6 @@ function weathermap_setup_table()
     // only bother with all this if it's a new install, a new version, or we're in a development version
     // - saves a handful of db hits per request!
     if (($dbversion == '') || (preg_match('/dev$/', $myversion)) || ($dbversion != $myversion)) {
-
         $statement = $pdo->query('show tables');
         $result = $statement->fetchAll(PDO::FETCH_ASSOC);
 
@@ -230,8 +229,11 @@ function weathermap_page_title($t)
     if (preg_match('/plugins\/weathermap\//', $_SERVER['REQUEST_URI'], $matches)) {
         $t .= " - Weathermap";
 
-        if (preg_match('/plugins\/weathermap\/weathermap-cacti\d\d-plugin.php\?action=viewmap&id=([^&]+)/',
-            $_SERVER['REQUEST_URI'], $matches)) {
+        if (preg_match(
+            '/plugins\/weathermap\/weathermap-cacti\d\d-plugin.php\?action=viewmap&id=([^&]+)/',
+            $_SERVER['REQUEST_URI'],
+            $matches
+        )) {
             $mapid = $matches[1];
             $pdo = weathermap_get_pdo();
             if (preg_match('/^\d+$/', $mapid)) {
@@ -247,7 +249,6 @@ function weathermap_page_title($t)
                 $t .= " - $title";
             }
         }
-
     }
     return ($t);
 }
@@ -290,7 +291,6 @@ function weathermap_show_tab()
     $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
     if ((sizeof($result) > 0) || (empty($realm_id))) {
-
         if ($tabstyle > 0) {
             $prefix = 's_';
         } else {
@@ -306,7 +306,6 @@ function weathermap_show_tab()
         $tab_url = $weathermap_base . '/images/' . $tab_name;
 
         printf('<a href="%s"><img src="%s" alt="' . __('Weathermap') . '" align="absmiddle" border="0" /></a>', $weathermap_url, $tab_url);
-
     }
 
     weathermap_setup_table();

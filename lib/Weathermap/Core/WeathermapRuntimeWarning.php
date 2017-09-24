@@ -8,7 +8,6 @@
 
 namespace Weathermap\Core;
 
-
 class WeathermapRuntimeWarning extends \Exception
 {
     // These should become warnings in the log for a map

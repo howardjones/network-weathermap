@@ -481,7 +481,7 @@ class MapScale extends MapItem
 
         // pre-calculate all the text for the legend, and its size
         $maxTextSize = 0;
-        foreach ($this->entries as $index=>$scaleEntry) {
+        foreach ($this->entries as $index => $scaleEntry) {
             $labelString = sprintf("%s-%s", $scaleEntry['bottom'], $scaleEntry['top']);
             if ($hide_percent == 0) {
                 $labelString .= "%";

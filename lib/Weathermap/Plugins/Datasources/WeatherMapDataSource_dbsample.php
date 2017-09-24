@@ -6,7 +6,6 @@
 
 namespace Weathermap\Plugins\Datasources;
 
-
 class WeatherMapDataSource_dbsample extends DatasourceBase
 {
 
@@ -20,7 +19,7 @@ class WeatherMapDataSource_dbsample extends DatasourceBase
         $this->name = "dbsample";
     }
 
-    public function Init(&$map)
+    public function init(&$map)
     {
         if (!function_exists("mysql_connect")) {
             return false;
@@ -30,7 +29,7 @@ class WeatherMapDataSource_dbsample extends DatasourceBase
     }
 
 
-    public function ReadData($targetstring, &$map, &$item)
+    public function readData($targetstring, &$map, &$item)
     {
         $pdo = null;
         $this->data[IN] = null;
@@ -68,7 +67,7 @@ class WeatherMapDataSource_dbsample extends DatasourceBase
             }
         }
 
-        return $this->ReturnData();
+        return $this->returnData();
     }
 }
 

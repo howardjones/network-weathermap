@@ -85,4 +85,3 @@ class MapTextItem extends MapItem
         $map->imap_areas[] = $this->prefix;
     }
 }
-

@@ -15,7 +15,6 @@
 
 namespace Weathermap\Plugins\Datasources;
 
-
 class WeatherMapDataSource_snmp extends DatasourceBase
 {
     protected $down_cache;
@@ -30,7 +29,7 @@ class WeatherMapDataSource_snmp extends DatasourceBase
         $this->name = "SNMP1";
     }
 
-    public function Init(&$map)
+    public function init(&$map)
     {
         // We can keep a list of unresponsive nodes, so we can give up earlier
         $this->down_cache = array();
@@ -43,9 +42,9 @@ class WeatherMapDataSource_snmp extends DatasourceBase
         return false;
     }
 
-    public function Register($targetstring, &$map, &$item)
+    public function register($targetstring, &$map, &$item)
     {
-        parent::Register($targetstring, $map, $item);
+        parent::register($targetstring, $map, $item);
 
         if (preg_match($this->regexpsHandled[0], $targetstring, $matches)) {
             // make sure there is a key for every host in the down_cache
@@ -55,7 +54,7 @@ class WeatherMapDataSource_snmp extends DatasourceBase
     }
 
 
-    public function ReadData($targetstring, &$map, &$item)
+    public function readData($targetstring, &$map, &$item)
     {
         $this->data[IN] = null;
         $this->data[OUT] = null;
@@ -136,7 +135,7 @@ class WeatherMapDataSource_snmp extends DatasourceBase
             }
         }
 
-        return $this->ReturnData();
+        return $this->returnData();
     }
 }
 

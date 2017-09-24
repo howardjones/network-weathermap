@@ -19,7 +19,7 @@ class WeatherMapDataSource_dsstats extends DatasourceBase
         $this->name = "CactiDSStats";
     }
 
-    public function Init(&$map)
+    public function init(&$map)
     {
         if ($map->context == 'cacti') {
             if (!function_exists('db_fetch_assoc')) {
@@ -82,7 +82,7 @@ class WeatherMapDataSource_dsstats extends DatasourceBase
     // returns a 3-part array (invalue, outvalue and datavalid time_t)
     // invalue and outvalue should be -1,-1 if there is no valid data
     // data_time is intended to allow more informed graphing in the future
-    public function ReadData($targetstring, &$map, &$item)
+    public function readData($targetstring, &$map, &$item)
     {
         $this->data[IN] = null;
         $this->data[OUT] = null;
@@ -204,7 +204,7 @@ class WeatherMapDataSource_dsstats extends DatasourceBase
             updateCactiData($item, $local_data_id);
         }
 
-        return $this->ReturnData();
+        return $this->returnData();
     }
 }
 

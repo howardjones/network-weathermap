@@ -8,7 +8,6 @@
 
 namespace Weathermap\Core;
 
-
 class HTMLImagemapAreaRectangle extends HTMLImagemapArea
 {
     public $x1;

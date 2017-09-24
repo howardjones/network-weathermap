@@ -516,7 +516,6 @@ class EditorUI extends UIBase
      */
     function cmdEditLink($params, $editor)
     {
-
     }
 
     /**

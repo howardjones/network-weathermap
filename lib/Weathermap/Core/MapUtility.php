@@ -65,7 +65,7 @@ class MapUtility
         }
     }
 
-    public static function wm_warn($string, $notice_only = FALSE)
+    public static function wm_warn($string, $notice_only = false)
     {
         global $weathermap_map;
         global $weathermap_warncount;
@@ -119,23 +119,33 @@ class MapUtility
         global $WEATHERMAP_VERSION;
 
         $fd = fopen($htmlfile, 'w');
-        fwrite($fd,
-            '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head>');
-        if ($map->htmlstylesheet != '') fwrite($fd, '<link rel="stylesheet" type="text/css" href="' . $map->htmlstylesheet . '" />');
+        fwrite(
+            $fd,
+            '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head>'
+        );
+        if ($map->htmlstylesheet != '') {
+            fwrite($fd, '<link rel="stylesheet" type="text/css" href="' . $map->htmlstylesheet . '" />');
+        }
         fwrite($fd, '<meta http-equiv="refresh" content="300" /><title>' . $map->ProcessString($map->title, $map) . '</title></head><body>');
 
         if ($map->htmlstyle == "overlib") {
-            fwrite($fd,
-                "<div id=\"overDiv\" style=\"position:absolute; visibility:hidden; z-index:1000;\"></div>\n");
-            fwrite($fd,
-                "<script type=\"text/javascript\" src=\"overlib.js\"><!-- overLIB (c) Erik Bosrup --></script> \n");
+            fwrite(
+                $fd,
+                "<div id=\"overDiv\" style=\"position:absolute; visibility:hidden; z-index:1000;\"></div>\n"
+            );
+            fwrite(
+                $fd,
+                "<script type=\"text/javascript\" src=\"overlib.js\"><!-- overLIB (c) Erik Bosrup --></script> \n"
+            );
         }
 
         fwrite($fd, $map->MakeHTML());
-        fwrite($fd,
+        fwrite(
+            $fd,
             '<hr /><span id="byline">Network Map created with <a href="http://www.network-weathermap.com/?vs='
             . $WEATHERMAP_VERSION . '">PHP Network Weathermap v' . $WEATHERMAP_VERSION
-            . '</a></span></body></html>');
+            . '</a></span></body></html>'
+        );
         fclose($fd);
     }
 

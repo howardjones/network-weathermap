@@ -1,5 +1,6 @@
 <?php
 namespace Weathermap\Poller;
+
 /**
  *
  * All the global environment required to run through the map list in the poller.
@@ -100,7 +101,6 @@ class Poller
         wm_debug("Iterating all maps.");
 
         foreach ($maplist as $map) {
-
             $runner = new MapRuntime($this->confdir, $this->outdir, $map, $this->imageformat);
             $runner->run();
 
@@ -147,5 +147,4 @@ class Poller
 
         return $username;
     }
-
 }

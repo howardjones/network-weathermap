@@ -55,8 +55,11 @@ function weathermap_poller_output($rrd_update_array)
         }
 
         if ($log_verbosity >= POLLER_VERBOSITY_DEBUG) {
-            cacti_log("WM poller_output: Looking for $file ($local_data_id) (" . $required['data_source_path'] . ")\n",
-                true, "WEATHERMAP");
+            cacti_log(
+                "WM poller_output: Looking for $file ($local_data_id) (" . $required['data_source_path'] . ")\n",
+                true,
+                "WEATHERMAP"
+            );
         }
 
         if (isset($rrd_update_array[$file]) && is_array($rrd_update_array[$file]) && isset($rrd_update_array[$file]['times']) && is_array($rrd_update_array[$file]['times']) && isset($rrd_update_array{$file}['times'][key($rrd_update_array[$file]['times'])]{$dsname})) {
@@ -159,8 +162,11 @@ function weathermap_poller_bottom()
             weathermap_run_maps(dirname(dirname(__FILE__)));
         } else {
             if ($quietlogging == 0) {
-                cacti_log("Weathermap $WEATHERMAP_VERSION - no update in this cycle ($rendercounter)", true,
-                    "WEATHERMAP");
+                cacti_log(
+                    "Weathermap $WEATHERMAP_VERSION - no update in this cycle ($rendercounter)",
+                    true,
+                    "WEATHERMAP"
+                );
             }
         }
         // increment the counter

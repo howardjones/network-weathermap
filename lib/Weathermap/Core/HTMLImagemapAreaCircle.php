@@ -8,7 +8,6 @@
 
 namespace Weathermap\Core;
 
-
 class HTMLImagemapAreaCircle extends HTMLImagemapArea
 {
     public $centx;

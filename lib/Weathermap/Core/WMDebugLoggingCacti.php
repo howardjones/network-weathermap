@@ -8,8 +8,6 @@
 
 namespace Weathermap\Core;
 
-
-
 /**
  * Class WMDebugLoggingCacti - debug logging enabled, and we're running in the Cacti poller.
  */

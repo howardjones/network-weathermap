@@ -81,7 +81,6 @@ class MapDataItem extends MapItem
 
     public function Draw($imageRef)
     {
-
     }
 
     // by tracking which objects depend on each other, we can reduce the number of full-table searches for a single object

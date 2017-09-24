@@ -9,12 +9,16 @@ namespace Weathermap\Core;
  * This is to replace an ugly array that gets passed around with mysterious fields.
  *
  */
+
+use Weathermap\Plugins\Datasources\DatasourceBase;
+
 class Target
 {
     private $finalTargetString;
     private $originalTargetString;
 
     private $pluginName;
+    /** @var DatasourceBase */
     private $pluginObject;
     private $scaleFactor = 1.0;
     private $pluginRunnable = true;
@@ -55,7 +59,7 @@ class Target
     }
 
     /**
-     * @param WeatherMapDataItem $mapItem
+     * @param MapDataItem $mapItem
      * @param Map $map
      */
     public function preProcess(&$mapItem, &$map)
@@ -92,7 +96,7 @@ class Target
     {
         MapUtility::wm_debug("Finding handler for %s '%s'\n", $this->mapItem, $this->finalTargetString);
         foreach ($pluginList as $name => $pluginEntry) {
-            $isRecognised = $pluginEntry['object']->Recognise($this->finalTargetString);
+            $isRecognised = $pluginEntry['object']->recognise($this->finalTargetString);
 
             if ($isRecognised) {
                 MapUtility::wm_debug("plugin %s says it can handle it (state=%s)\n", $name, $pluginEntry['active']);
@@ -108,7 +112,7 @@ class Target
 
     public function registerWithPlugin(&$map, &$mapItem)
     {
-        $this->pluginObject->Register($this->finalTargetString, $map, $mapItem);
+        $this->pluginObject->register($this->finalTargetString, $map, $mapItem);
     }
 
     public function readData(&$map, &$mapItem)
@@ -123,7 +127,7 @@ class Target
             MapUtility::wm_debug("Will multiply result by %f\n", $this->scaleFactor);
         }
 
-        list($in, $out, $dataTime) = $this->pluginObject->ReadData($this->finalTargetString, $map, $mapItem);
+        list($in, $out, $dataTime) = $this->pluginObject->readData($this->finalTargetString, $map, $mapItem);
 
         if ($in === null && $out === null) {
             MapUtility::wm_warn(

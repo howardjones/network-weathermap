@@ -388,8 +388,6 @@ class WeatherMapCactiUserPlugin extends UIBase
                 }
 
                 foreach (array_keys($tabs) as $tab_short_name) {
-
-
                     print "<td " . (($tab_short_name == $current_tab) ? "bgcolor='silver'" : "bgcolor='#DFDFDF'")
                         . " nowrap='nowrap' width='" . (strlen($tabs[$tab_short_name]) * 9) . "' align='center' class='tab'>
                     <span class='textHeader'><a

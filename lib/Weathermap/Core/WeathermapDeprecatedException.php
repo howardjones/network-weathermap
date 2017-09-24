@@ -8,7 +8,6 @@
 
 namespace Weathermap\Core;
 
-
 class WeathermapDeprecatedException extends \Exception
 {
 // this is to fence off old code when refactoring

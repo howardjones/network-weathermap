@@ -45,7 +45,4 @@ class Font
     {
         return array(0, 0);
     }
-
 }
-
-

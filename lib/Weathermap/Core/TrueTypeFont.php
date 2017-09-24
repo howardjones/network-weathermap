@@ -8,7 +8,6 @@
 
 namespace Weathermap\Core;
 
-
 class TrueTypeFont extends Font
 {
     public $file;

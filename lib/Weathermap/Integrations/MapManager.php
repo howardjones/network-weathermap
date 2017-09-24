@@ -606,5 +606,4 @@ class MapManager
     {
         return (isset($_SESSION['sess_user_id']) ? intval($_SESSION['sess_user_id']) : 1);
     }
-
 }

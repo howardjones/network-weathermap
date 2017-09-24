@@ -25,7 +25,6 @@ class UIBase
 
     public function __construct()
     {
-
     }
 
     /**

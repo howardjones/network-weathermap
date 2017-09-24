@@ -2,7 +2,6 @@
 
 namespace Weathermap\Core;
 
-
 class ConfigItem
 {
     var $defined_in;

@@ -8,7 +8,6 @@
 
 namespace Weathermap\Core;
 
-
 class GDFont extends Font
 {
     public $gdnumber;
@@ -88,5 +87,3 @@ class GDFont extends Font
         );
     }
 }
-
-

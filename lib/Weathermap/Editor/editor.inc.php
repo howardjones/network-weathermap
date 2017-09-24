@@ -1,5 +1,6 @@
 <?php
 namespace Weathermap\Editor;
+
 /** editor.inc.php
  *
  * All the functions used by the editor.

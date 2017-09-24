@@ -72,4 +72,3 @@ class MapItem extends MapBase
         return $config;
     }
 }
-

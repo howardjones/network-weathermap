@@ -25,7 +25,7 @@ class WeatherMapDataSource_rrd extends DatasourceBase
         $this->name = "RRD";
     }
 
-    public function Init(&$map)
+    public function init(&$map)
     {
         global $config;
 
@@ -377,7 +377,7 @@ class WeatherMapDataSource_rrd extends DatasourceBase
     // returns a 3-part array (invalue, outvalue and datavalid time_t)
     // invalue and outvalue should be -1,-1 if there is no valid data
     // data_time is intended to allow more informed graphing in the future
-    public function ReadData($targetstring, &$map, &$item)
+    public function readData($targetstring, &$map, &$item)
     {
         $this->data[IN] = null;
         $this->data[OUT] = null;
@@ -495,7 +495,7 @@ class WeatherMapDataSource_rrd extends DatasourceBase
             $this->data[OUT] = $multiplier * floatval(str_replace(",", ".", $this->data[OUT]));
         }
 
-        return $this->ReturnData();
+        return $this->returnData();
     }
 }
 

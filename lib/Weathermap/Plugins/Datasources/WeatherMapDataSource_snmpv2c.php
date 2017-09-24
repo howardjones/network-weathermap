@@ -16,6 +16,8 @@
 // http://feathub.com/howardjones/network-weathermap/+2
 namespace Weathermap\Plugins\Datasources;
 
+use Weathermap\Core\MapUtility;
+
 class WeatherMapDataSource_snmpv2c extends DatasourceBase
 {
     protected $down_cache;
@@ -30,7 +32,7 @@ class WeatherMapDataSource_snmpv2c extends DatasourceBase
         $this->name = "SNMP2C";
     }
 
-    public function Init(&$map)
+    public function init(&$map)
     {
         // We can keep a list of unresponsive nodes, so we can give up earlier
         $this->down_cache = array();
@@ -38,14 +40,14 @@ class WeatherMapDataSource_snmpv2c extends DatasourceBase
         if (function_exists('snmp2_get')) {
             return true;
         }
-        wm_debug("SNMP2c DS: snmp2_get() not found. Do you have the PHP SNMP module?\n");
+        MapUtility::wm_debug("SNMP2c DS: snmp2_get() not found. Do you have the PHP SNMP module?\n");
 
         return false;
     }
 
-    public function Register($targetstring, &$map, &$item)
+    public function register($targetstring, &$map, &$item)
     {
-        parent::Register($targetstring, $map, $item);
+        parent::register($targetstring, $map, $item);
 
         if (preg_match($this->regexpsHandled[0], $targetstring, $matches)) {
             // make sure there is a key for every host in the down_cache
@@ -54,7 +56,7 @@ class WeatherMapDataSource_snmpv2c extends DatasourceBase
         }
     }
 
-    public function ReadData($targetstring, &$map, &$item)
+    public function readData($targetstring, &$map, &$item)
     {
         $this->data[IN] = null;
         $this->data[OUT] = null;
@@ -70,9 +72,9 @@ class WeatherMapDataSource_snmpv2c extends DatasourceBase
         $abort_count = intval($map->get_hint("snmp_abort_count", $abort_count));
         $retries = intval($map->get_hint("snmp_retries", $retries));
 
-        wm_debug("Timeout changed to " . $timeout . " microseconds.\n");
-        wm_debug("Will abort after $abort_count failures for a given host.\n");
-        wm_debug("Number of retries changed to " . $retries . ".\n");
+        MapUtility::wm_debug("Timeout changed to " . $timeout . " microseconds.\n");
+        MapUtility::wm_debug("Will abort after $abort_count failures for a given host.\n");
+        MapUtility::wm_debug("Number of retries changed to " . $retries . ".\n");
 
         if (preg_match("/^snmp2c:([^:]+):([^:]+):([^:]+):([^:]+)$/", $targetstring, $matches)) {
             $community = $matches[1];
@@ -122,7 +124,7 @@ class WeatherMapDataSource_snmpv2c extends DatasourceBase
                     }
                 }
 
-                wm_debug("SNMP2c ReadData: Got $in_result and $out_result\n");
+                MapUtility::wm_debug("SNMP2c ReadData: Got $in_result and $out_result\n");
 
                 $this->dataTime = time();
 
@@ -130,11 +132,11 @@ class WeatherMapDataSource_snmpv2c extends DatasourceBase
                     snmp_set_quick_print($was);
                 }
             } else {
-                wm_warn("SNMP for $host has reached $abort_count failures. Skipping. [WMSNMP01]");
+                MapUtility::wm_warn("SNMP for $host has reached $abort_count failures. Skipping. [WMSNMP01]");
             }
         }
 
-        return $this->ReturnData();
+        return $this->returnData();
     }
 }
 

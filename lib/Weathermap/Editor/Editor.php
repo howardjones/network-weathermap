@@ -418,7 +418,6 @@ class Editor
         }
 
         return array($newLinkName, $success, $log);
-
     }
 
     function updateLink()

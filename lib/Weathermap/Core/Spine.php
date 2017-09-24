@@ -3,7 +3,6 @@
 
 namespace Weathermap\Core;
 
-
 // TODO - use SpineSearchResult to make results array meaning explicit
 
 class Spine

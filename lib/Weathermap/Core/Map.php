@@ -1532,7 +1532,7 @@ class Map extends MapBase
         MapUtility::wm_debug("======================================\n");
         MapUtility::wm_debug("Starting main collection loop\n");
 
-        /** @var WeatherMapDataItem $mapItem */
+        /** @var MapDataItem $mapItem */
         foreach ($itemList as $mapItem) {
             if ($mapItem->isTemplate()) {
                 MapUtility::wm_debug("ReadData: Skipping $mapItem that looks like a template\n.");
@@ -1661,7 +1661,7 @@ class Map extends MapBase
             foreach ($this->plugins[$type] as $name => $pluginEntry) {
                 MapUtility::wm_debug("Running $name" . "->Init()\n");
 
-                $ret = $pluginEntry['object']->Init($this);
+                $ret = $pluginEntry['object']->init($this);
 
                 if (!$ret) {
                     MapUtility::wm_debug("Marking $name plugin as inactive, since Init() failed\n");
@@ -1688,7 +1688,7 @@ class Map extends MapBase
         // give all the plugins a chance to prefetch their results
         MapUtility::wm_debug("======================================\n");
         MapUtility::wm_debug("Starting DS plugin prefetch\n");
-        $this->pluginMethod("data", "Prefetch");
+        $this->pluginMethod("data", "preFetch");
     }
 
     private function pluginMethod($type, $method)
@@ -1708,7 +1708,7 @@ class Map extends MapBase
     {
         MapUtility::wm_debug("======================================\n");
         MapUtility::wm_debug("Starting DS plugin cleanup\n");
-        $this->pluginMethod($type, "CleanUp");
+        $this->pluginMethod($type, "cleanUp");
     }
 
     public function randomData()

@@ -30,8 +30,8 @@ class MapUtility
         }
 
         if ($weathermap_debugging) {
-            $calling_fn = "";
-            if (function_exists("debug_backtrace")) {
+            $callingFunction = '';
+            if (function_exists('debug_backtrace')) {
                 $bt = debug_backtrace();
                 $index = 1;
                 # 	$class = (isset($bt[$index]['class']) ? $bt[$index]['class'] : '');
@@ -40,7 +40,7 @@ class MapUtility
                 $file = (isset($bt[$index]['file']) ? basename($bt[$index]['file']) : '');
                 $line = (isset($bt[$index]['line']) ? $bt[$index]['line'] : '');
 
-                $calling_fn = " [$function@$file:$line]";
+                $callingFunction = " [$function@$file:$line]";
 
                 if (is_array($weathermap_debug_suppress) && in_array(strtolower($function), $weathermap_debug_suppress)) {
                     return;
@@ -49,30 +49,30 @@ class MapUtility
 
             // use Cacti's debug log, if we are running from the poller
             if (function_exists('debug_log_insert') && (!function_exists('show_editor_startpage'))) {
-                \cacti_log("DEBUG:$calling_fn " . ($weathermap_map == '' ? '' : $weathermap_map . ": ") . rtrim($string), true, "WEATHERMAP");
+                \cacti_log("DEBUG:$callingFunction " . ($weathermap_map == '' ? '' : $weathermap_map . ': ') . rtrim($string), true, 'WEATHERMAP');
             } else {
                 $stderr = fopen('php://stderr', 'w');
-                fwrite($stderr, "DEBUG:$calling_fn " . ($weathermap_map == '' ? '' : $weathermap_map . ": ") . $string);
+                fwrite($stderr, "DEBUG:$callingFunction " . ($weathermap_map == '' ? '' : $weathermap_map . ': ') . $string);
                 fclose($stderr);
 
                 // mostly this is overkill, but it's sometimes useful (mainly in the editor)
                 if (1 == 0) {
                     $log = fopen('debug.log', 'a');
-                    fwrite($log, "DEBUG:$calling_fn " . ($weathermap_map == '' ? '' : $weathermap_map . ": ") . $string);
+                    fwrite($log, "DEBUG:$callingFunction " . ($weathermap_map == '' ? '' : $weathermap_map . ': ') . $string);
                     fclose($log);
                 }
             }
         }
     }
 
-    public static function wm_warn($string, $notice_only = false)
+    public static function wm_warn($string, $noticeOnly = false)
     {
         global $weathermap_map;
         global $weathermap_warncount;
         global $weathermap_error_suppress;
 
-        $message = "";
-        $code = "";
+        $message = '';
+        $code = '';
 
         if (preg_match('/\[(WM\w+)\]/', $string, $matches)) {
             $code = $matches[1];
@@ -86,16 +86,16 @@ class MapUtility
             return false;
         }
 
-        if (!$notice_only) {
+        if (!$noticeOnly) {
             $weathermap_warncount++;
-            $message .= "WARNING: ";
+            $message .= 'WARNING: ';
         }
 
-        $message .= ($weathermap_map == '' ? '' : $weathermap_map . ": ") . rtrim($string);
+        $message .= ($weathermap_map == '' ? '' : $weathermap_map . ': ') . rtrim($string);
 
         // use Cacti's debug log, if we are running from the poller
         if (function_exists('cacti_log') && (!function_exists('show_editor_startpage'))) {
-            cacti_log($message, true, "WEATHERMAP");
+            cacti_log($message, true, 'WEATHERMAP');
         } else {
             $stderr = fopen('php://stderr', 'w');
             fwrite($stderr, $message . "\n");
@@ -128,7 +128,7 @@ class MapUtility
         }
         fwrite($fd, '<meta http-equiv="refresh" content="300" /><title>' . $map->ProcessString($map->title, $map) . '</title></head><body>');
 
-        if ($map->htmlstyle == "overlib") {
+        if ($map->htmlstyle == 'overlib') {
             fwrite(
                 $fd,
                 "<div id=\"overDiv\" style=\"position:absolute; visibility:hidden; z-index:1000;\"></div>\n"
@@ -182,15 +182,15 @@ class MapUtility
     public static function calculateCompassOffset($compassPoint, $factor, $width, $height)
     {
         $compassPoints = array(
-            "N" => array(0, -1),
-            "S" => array(0, 1),
-            "E" => array(1, 0),
-            "W" => array(-1, 0),
-            "NE" => array(1, -1),
-            "NW" => array(-1, -1),
-            "SE" => array(1, 1),
-            "SW" => array(-1, 1),
-            "C" => array(0, 0)
+            'N' => array(0, -1),
+            'S' => array(0, 1),
+            'E' => array(1, 0),
+            'W' => array(-1, 0),
+            'NE' => array(1, -1),
+            'NW' => array(-1, -1),
+            'SE' => array(1, 1),
+            'SW' => array(-1, 1),
+            'C' => array(0, 0)
         );
         $multiply = 1;
         if (null !== $factor) {

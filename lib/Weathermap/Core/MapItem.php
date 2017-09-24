@@ -6,17 +6,18 @@ namespace Weathermap\Core;
 class MapItem extends MapBase
 {
     /** @var  Map $owner */
-    var $owner;
+    public $owner;
 
-    var $configline;
-    var $infourl;
-    var $overliburl;
-    var $overlibwidth, $overlibheight;
-    var $overlibcaption;
-    var $my_default;
-    var $defined_in;
-    var $name;
-    var $configOverride;    # used by the editor to allow text-editing
+    public $configline;
+    public $infourl;
+    public $overliburl;
+    public $overlibwidth;
+    public $overlibheight;
+    public $overlibcaption;
+//    public $my_default;
+    public $defined_in;
+    public $name;
+    public $configOverride;    # used by the editor to allow text-editing
     public $imagemapAreas;
     public $zorder;
     protected $descendents = array();
@@ -32,7 +33,7 @@ class MapItem extends MapBase
 
     public function myType()
     {
-        return "ITEM";
+        return 'ITEM';
     }
 
     public function getZIndex()
@@ -64,11 +65,25 @@ class MapItem extends MapBase
     public function asConfigData()
     {
         $config = array(
-            "name"=>$this->name,
-            "type"=>$this->myType(),
+            'name'=>$this->name,
+            'type'=>$this->myType(),
             'vars'=>$this->hints
         );
 
         return $config;
+    }
+
+    /**
+     * Used by processString to get internal properties of mapitems.
+     * This used to be done by grabbing object properties directly, but they
+     * are being renamed and cleaned up, so this function provides some
+     * access-control (not everything should be accessible) and some translation.
+     *
+     * @param $name
+     * @return null
+     */
+    public function getProperty($name)
+    {
+        return null;
     }
 }

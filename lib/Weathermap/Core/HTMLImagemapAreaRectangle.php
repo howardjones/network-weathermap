@@ -15,7 +15,7 @@ class HTMLImagemapAreaRectangle extends HTMLImagemapArea
     public $y1;
     public $y2;
 
-    public function __construct($name = "", $href = "", $coords)
+    public function __construct($name = '', $href = '', $coords)
     {
 
         $c = $coords[0];
@@ -53,21 +53,21 @@ class HTMLImagemapAreaRectangle extends HTMLImagemapArea
 
     public function asHTML()
     {
-        $coordstring = join(",", array($this->x1, $this->y1, $this->x2, $this->y2));
+        $coordstring = join(',', array($this->x1, $this->y1, $this->x2, $this->y2));
         return '<area ' . $this->commonHTML() . 'shape="rect" coords="' . $coordstring . '" />';
     }
 
     public function asJSON()
     {
         $json = "{ \"shape\":'rect', ";
-        $json .= " \"x1\":" . $this->x1 . ", \"y1\":" . $this->y1 . ",";
-        $json .= " \"x2\":" . $this->x2 . ", \"y2\":" . $this->y2 . ", \"name\":'" . $this->name . "'}";
+        $json .= ' "x1":' . $this->x1 . ', "y1":' . $this->y1 . ',';
+        $json .= ' "x2":' . $this->x2 . ', "y2":' . $this->y2 . ", \"name\":'" . $this->name . "'}";
 
         return $json;
     }
 
     public function __toString()
     {
-        return sprintf("Rectangle[%d,%d-%d,%d]", $this->x1, $this->y1, $this->x2, $this->y2);
+        return sprintf('Rectangle[%d,%d-%d,%d]', $this->x1, $this->y1, $this->x2, $this->y2);
     }
 }

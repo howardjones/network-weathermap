@@ -16,8 +16,8 @@ class ConfigReader
     private $lineCount = 0;
     /** @var MapDataItem $currentObject */
     private $currentObject = null;
-    private $currentType = "GLOBAL";
-    private $currentSource = "";
+    private $currentType = 'GLOBAL';
+    private $currentSource = '';
     /** @var Map $mapObject */
     private $mapObject = null;
     private $objectLineCount = 0;
@@ -582,7 +582,7 @@ class ConfigReader
                 array(
 
                     '/^DEFINEOFFSET\s+([A-Za-z][A-Za-z0-9_]*)\s+([-+]?\d+)\s+([-+]?\d+)/i',
-                    "handleDEFINEOFFSET"
+                    'handleDEFINEOFFSET'
                 ),
             ),
             'LABELOFFSET' => array(
@@ -1054,11 +1054,11 @@ class ConfigReader
         ) // end of link
     );
 
-    public function __construct(&$map, $type = "GLOBAL", $object = null)
+    public function __construct(&$map, $type = 'GLOBAL', $object = null)
     {
         $this->mapObject = $map;
         $this->currentType = $type;
-        if ($type == "GLOBAL") {
+        if ($type == 'GLOBAL') {
             $this->currentObject = $map;
         } else {
             $this->currentObject = $object;
@@ -1141,7 +1141,7 @@ class ConfigReader
         }
 
         if (get_class($this->currentObject) == 'stdClass') {
-            MapUtility::wm_warn("INTERNAL - avoided a stdClass");
+            MapUtility::wm_warn('INTERNAL - avoided a stdClass');
             return;
         }
 
@@ -1160,7 +1160,7 @@ class ConfigReader
     {
         $lines = array();
 
-        $fileHandle = fopen($filename, "r");
+        $fileHandle = fopen($filename, 'r');
 
         if (!$fileHandle) {
             return false;
@@ -1169,7 +1169,7 @@ class ConfigReader
         while (!feof($fileHandle)) {
             $buffer = fgets($fileHandle, 16384);
             // strip out any Windows line-endings that have gotten in here
-            $buffer = str_replace("\r", "", $buffer);
+            $buffer = str_replace("\r", '', $buffer);
             $lines[] = $buffer;
         }
         fclose($fileHandle);
@@ -1289,8 +1289,8 @@ class ConfigReader
                 $index = constant($m[2]);
                 $key = $m[1];
                 $this->currentObject->{$key}[$index] = $val;
-                $this->currentObject->setConfigValue($key . "." . $index, $val);
-            } elseif (substr($key, -1, 1) == "+") {
+                $this->currentObject->setConfigValue($key . '.' . $index, $val);
+            } elseif (substr($key, -1, 1) == '+') {
                 // if the key ends in a plus, it's an array we should append to
                 $key = substr($key, 0, -1);
                 array_push($this->currentObject->$key, $val);
@@ -1348,7 +1348,7 @@ class ConfigReader
             $endOffset = $submatches[1] . $submatches[2];
             $nodeName = preg_replace('/:(NE|SE|NW|SW|N|S|E|W|C)\d+$/i', '', $input);
             $needSizePrecalculate = true;
-        } elseif (preg_match("/:(NE|SE|NW|SW|N|S|E|W|C)$/i", $input, $submatches)) {
+        } elseif (preg_match('/:(NE|SE|NW|SW|N|S|E|W|C)$/i', $input, $submatches)) {
             MapUtility::wm_debug("Matching 100% compass offset\n");
             $endOffset = $submatches[1];
             $nodeName = preg_replace('/:(NE|SE|NW|SW|N|S|E|W|C)$/i', '', $input);
@@ -1362,7 +1362,7 @@ class ConfigReader
             MapUtility::wm_debug("Matching regular x,y link offset\n");
             $xoff = $submatches[1];
             $yoff = $submatches[2];
-            $endOffset = $xoff . ":" . $yoff;
+            $endOffset = $xoff . ':' . $yoff;
             $nodeName = preg_replace("/:$xoff:$yoff$/i", '', $input);
             $needSizePrecalculate = true;
         } elseif (preg_match('/^([^:]+):([A-Za-z][A-Za-z0-9\-_]*)$/i', $input, $submatches)) {
@@ -1383,25 +1383,27 @@ class ConfigReader
 
     private function handleNODES($fullcommand, $args, $matches)
     {
-        $offset_dx = array();
-        $offset_dy = array();
+        $offsetDX = array();
+        $offsetDY = array();
         $nodeNames = array();
         $endOffsets = array();
 
         if (preg_match('/^NODES\s+(\S+)\s+(\S+)\s*$/i', $fullcommand, $matches)) {
-            $valid_nodes = 2;
+            $validNodeCount = 2;
             foreach (array(1, 2) as $i) {
-                list($offset_dx[$i], $offset_dy[$i], $nodeNames[$i], $endOffsets[$i], $need_size_precalc) = $this->interpretNodeSpec($matches[$i]);
+                list($offsetDX[$i], $offsetDY[$i], $nodeNames[$i], $endOffsets[$i], $need_size_precalc) = $this->interpretNodeSpec($matches[$i]);
 
                 if (!array_key_exists($nodeNames[$i], $this->mapObject->nodes)) {
-                    MapUtility::wm_warn("Unknown node '" . $nodeNames[$i]
-                        . "' on line $this->lineCount of config\n");
-                    $valid_nodes--;
+                    MapUtility::wm_warn(
+                        "Unknown node '" . $nodeNames[$i]
+                        . "' on line $this->lineCount of config\n"
+                    );
+                    $validNodeCount--;
                 }
             }
             // TODO - really, this should kill the whole link, and reset for the next one
             // XXX this error case will not work in the handler function
-            if ($valid_nodes == 2) {
+            if ($validNodeCount == 2) {
                 $this->currentObject->setEndNodes($this->mapObject->getNode($nodeNames[1]), $this->mapObject->getNode($nodeNames[2]));
 
                 $this->currentObject->endpoints[0]->offset = $endOffsets[1];
@@ -1411,18 +1413,18 @@ class ConfigReader
                 // - named offsets require access to the internals of the node, when they are
                 //   resolved. Luckily we can resolve them here, and skip that.
 
-                foreach (array(1 => "a", 2 => "b") as $index => $name) {
-                    if ($offset_dx[$index] != 0 || $offset_dy[$index] != 0) {
-                        MapUtility::wm_debug("Applying offset for $name end %s,%s\n", $offset_dx[$index], $offset_dy[$index]);
+                foreach (array(1 => 'a', 2 => 'b') as $index => $name) {
+                    if ($offsetDX[$index] != 0 || $offsetDY[$index] != 0) {
+                        MapUtility::wm_debug("Applying offset for $name end %s,%s\n", $offsetDX[$index], $offsetDY[$index]);
 
-                        $this->currentObject->endpoints[$index-1]->dx = $offset_dx[$index];
-                        $this->currentObject->endpoints[$index-1]->dy = $offset_dy[$index];
+                        $this->currentObject->endpoints[$index-1]->dx = $offsetDX[$index];
+                        $this->currentObject->endpoints[$index-1]->dy = $offsetDY[$index];
                         $this->currentObject->endpoints[$index-1]->resolved = true;
                     }
                 }
             } else {
                 // this'll stop the current link being added
-                $last_seen = "broken";
+                $last_seen = 'broken';
             }
             return true;
         }
@@ -1436,7 +1438,7 @@ class ConfigReader
         if (preg_match('/^SET\s+(\S+)\s+(.*)\s*$/i', $fullcommand, $matches)) {
             $this->currentObject->addHint($matches[1], trim($matches[2]));
 
-            if ($this->currentObject->myType() == "MAP" && substr($matches[1], 0, 7) == 'nowarn_') {
+            if ($this->currentObject->myType() == 'MAP' && substr($matches[1], 0, 7) == 'nowarn_') {
                 $key = substr(strtoupper($matches[1]), 7);
                 MapUtility::wm_debug("Suppressing warning $key for this map\n");
                 $weathermap_error_suppress[$key] = 1;
@@ -1446,7 +1448,7 @@ class ConfigReader
         // allow setting a variable to ""
         if (preg_match('/^SET\s+(\S+)\s*$/i', $fullcommand, $matches)) {
             $this->currentObject->addHint($matches[1], '');
-            if ($this->currentObject->myType() == "MAP" && substr($matches[1], 0, 7) == 'nowarn_') {
+            if ($this->currentObject->myType() == 'MAP' && substr($matches[1], 0, 7) == 'nowarn_') {
                 $key = substr(strtoupper($matches[1]), 7);
                 MapUtility::wm_debug("Suppressing warning $key for this map\n");
                 $weathermap_error_suppress[$key] = 1;
@@ -1458,7 +1460,7 @@ class ConfigReader
 
     private function handleGLOBALCOLOR($fullcommand, $args, $matches)
     {
-        $key = str_replace("COLOR", "", strtoupper($args[0]));
+        $key = str_replace('COLOR', '', strtoupper($args[0]));
         $val = strtolower($args[1]);
 
         // this is a regular colour setting thing
@@ -1515,28 +1517,23 @@ class ConfigReader
         if (isset($args[3])) {
             MapUtility::wm_debug("New TrueType font in slot %d\n", $args[1]);
 
-            $newFontObject = $this->mapObject->fonts->makeFontObject("truetype", $args[2], $args[3]);
+            $newFontObject = $this->mapObject->fonts->makeFontObject('truetype', $args[2], $args[3]);
 
             if (isset($args[4])) {
-                $newFontObject->v_offset = $args[4];
+                $newFontObject->verticalOffset = $args[4];
             }
 
-            # $newFontObject = new WMFont();
-            # $fontOK = $newFontObject->initTTF($args[2], $args[3]);
-
             if (!$newFontObject->isLoaded()) {
-                MapUtility::wm_warn("Failed to load ttf font " . $args[2] . " - at config line $this->lineCount\n [WMWARN30]");
+                MapUtility::wm_warn('Failed to load ttf font ' . $args[2] . " - at config line $this->lineCount\n [WMWARN30]");
+                $newFontObject = null;
             }
         } else {
             MapUtility::wm_debug("New GD font in slot %d\n", $args[1]);
 
-            $newFontObject = $this->mapObject->fonts->makeFontObject("gd", $args[2]);
-            # $newFontObject = new WMFont();
-            # $fontOK = $newFontObject->initGD($args[2]);
+            $newFontObject = $this->mapObject->fonts->makeFontObject('gd', $args[2]);
 
-            // XXX - why do we do this with GD fonts but not truetype?
             if (!$newFontObject->isLoaded()) {
-                MapUtility::wm_warn("Failed to load GD font: " . $args[2] . " ($args[1]) at config line $this->lineCount [WMWARN32]\n");
+                MapUtility::wm_warn('Failed to load GD font: ' . $args[2] . " ($args[1]) at config line $this->lineCount [WMWARN32]\n");
                 $newFontObject = null;
             }
         }
@@ -1573,7 +1570,7 @@ class ConfigReader
 
     private function handleCOLOR($fullcommand, $args, $matches)
     {
-        $field = str_replace("color", "colour", strtolower($args[0]));
+        $field = str_replace('color', 'colour', strtolower($args[0]));
         $val = strtolower($args[1]);
 
         // this is a regular colour setting thing
@@ -1616,19 +1613,19 @@ class ConfigReader
             $this->currentObject = $this->mapObject->nodes['DEFAULT'];
             MapUtility::wm_debug("Loaded default NODE\n");
 
-            if (sizeof($this->mapObject->nodes) > 2) {
+            if (count($this->mapObject->nodes) > 2) {
                 MapUtility::wm_warn("NODE DEFAULT is not the first NODE. Defaults will not apply to earlier NODEs. [WMWARN27]\n");
             }
         } else {
             if (isset($this->mapObject->nodes[$matches[1]])) {
-                MapUtility::wm_warn("Duplicate node name " . $matches[1] . " at line $this->lineCount - only the last one defined is used. [WMWARN24]\n");
+                MapUtility::wm_warn('Duplicate node name ' . $matches[1] . " at line $this->lineCount - only the last one defined is used. [WMWARN24]\n");
             }
 
-            $this->currentObject = new MapNode($matches[1], "DEFAULT", $this->mapObject);
+            $this->currentObject = new MapNode($matches[1], 'DEFAULT', $this->mapObject);
             MapUtility::wm_debug("Created new NODE\n");
         }
         $this->objectLineCount = 0;
-        $this->currentType = "NODE";
+        $this->currentType = 'NODE';
         $this->currentObject->configline = $this->lineCount;
         $this->currentObject->defined_in = $this->currentSource;
 
@@ -1644,17 +1641,17 @@ class ConfigReader
             $this->currentObject = $this->mapObject->links['DEFAULT'];
             MapUtility::wm_debug("Loaded default LINK\n");
 
-            if (sizeof($this->mapObject->links) > 2) {
+            if (count($this->mapObject->links) > 2) {
                 MapUtility::wm_warn("$this LINK DEFAULT is not the first LINK. Defaults will not apply to earlier LINKs. [WMWARN26]\n");
             }
         } else {
             if (isset($this->mapObject->links[$matches[1]])) {
-                MapUtility::wm_warn("Duplicate link name " . $matches[1] . " at line $this->lineCount - only the last one defined is used. [WMWARN25]\n");
+                MapUtility::wm_warn('Duplicate link name ' . $matches[1] . " at line $this->lineCount - only the last one defined is used. [WMWARN25]\n");
             }
-            $this->currentObject = new MapLink($matches[1], "DEFAULT", $this->mapObject);
+            $this->currentObject = new MapLink($matches[1], 'DEFAULT', $this->mapObject);
             MapUtility::wm_debug("Created new LINK\n");
         }
-        $this->currentType = "LINK";
+        $this->currentType = 'LINK';
         $this->objectLineCount = 0;
         $this->currentObject->configline = $this->lineCount;
         $this->currentObject->defined_in = $this->currentSource;
@@ -1665,7 +1662,7 @@ class ConfigReader
     private function handleARROWSTYLE($fullcommand, $args, $matches)
     {
         $this->currentObject->arrowStyle = $matches[1] . ' ' . $matches[2];
-        $this->currentObject->setConfigValue("arrowStyle", $matches[1] . ' ' . $matches[2]);
+        $this->currentObject->setConfigValue('arrowStyle', $matches[1] . ' ' . $matches[2]);
         return true;
     }
 
@@ -1694,7 +1691,7 @@ class ConfigReader
         $top = StringUtility::interpretNumberWithMetricSuffix($matches[3], $this->mapObject->kilo);
 
         if (isset($matches[10]) && $matches[10] == 'none') {
-            $colour1 = new Colour("none");
+            $colour1 = new Colour('none');
         } else {
             $colour1 = new Colour((int)($matches[4]), (int)($matches[5]), (int)($matches[6]));
             $colour2 = $colour1;
@@ -1730,7 +1727,7 @@ class ConfigReader
 
     private function handleDEFINEOFFSET($fullcommand, $args, $matches)
     {
-        MapUtility::wm_debug("Defining a named offset: " . $matches[1] . "\n");
+        MapUtility::wm_debug('Defining a named offset: ' . $matches[1] . "\n");
         $this->currentObject->namedOffsets[$matches[1]] = array(intval($matches[2]), intval($matches[3]));
 
         return true;
@@ -1755,11 +1752,11 @@ class ConfigReader
         // it's possible to have keypos before the scale is defined.
         // this is to make it at least mostly consistent internally
         if (!isset($this->mapObject->keytext[$whichKey])) {
-            $this->mapObject->keytext[$whichKey] = "DEFAULT TITLE";
+            $this->mapObject->keytext[$whichKey] = 'DEFAULT TITLE';
         }
 
         if (!isset($this->mapObject->keystyle[$whichKey])) {
-            $this->mapObject->keystyle[$whichKey] = "classic";
+            $this->mapObject->keystyle[$whichKey] = 'classic';
         }
 
         return true;
@@ -1803,7 +1800,7 @@ class ConfigReader
             $reader = new ConfigReader($this->mapObject);
             $reader->readConfigFile($matches[1]);
 
-            $this->currentType = "GLOBAL";
+            $this->currentType = 'GLOBAL';
             $this->currentObject = $this->mapObject;
 
             return true;
@@ -1831,14 +1828,14 @@ class ConfigReader
             foreach ($keywords as $keyword => $matches) {
                 print "\n## $keyword\n";
                 foreach ($matches as $match) {
-                    $nicer = str_replace("\\", "\\\\", $match[0]);
+                    $nicer = str_replace('\\', '\\\\', $match[0]);
 
                     print "\n### $nicer\n";
                     if (is_array($match[1])) {
                         foreach ($match[1] as $key => $val) {
                             $escval = $val;
-                            if (substr($val, 0, 1) == "#") {
-                                $escval = "\"" . substr($val, 1.) . "\"";
+                            if (substr($val, 0, 1) == '#') {
+                                $escval = '"' . substr($val, 1.) . '"';
                             }
 
                             print "\n* $escval &#x21d2; `$scope->$key`\n";
@@ -1860,9 +1857,9 @@ class ConfigReader
     public function selfValidate()
     {
         $classes = array(
-            "GLOBAL" => "Weathermap\\Core\\Map",
-            "LINK" => "Weathermap\\Core\\MapLink",
-            "NODE" => "Weathermap\\Core\\MapNode"
+            'GLOBAL' => 'Weathermap\\Core\\Map',
+            'LINK' => 'Weathermap\\Core\\MapLink',
+            'NODE' => 'Weathermap\\Core\\MapNode'
         );
 
         $result = true;
@@ -1911,7 +1908,7 @@ class ConfigReader
 
         foreach ($this->configKeywords as $scope => $keywords) {
             foreach ($keywords as $keyword => $matches) {
-                $all [] = strtolower($scope . "_" . $keyword);
+                $all [] = strtolower($scope . '_' . $keyword);
             }
         }
 

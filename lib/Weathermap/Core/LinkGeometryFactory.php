@@ -20,6 +20,6 @@ class LinkGeometryFactory
             return new CurvedLinkGeometry();
         }
 
-        throw new WeathermapInternalFail("UnexpectedViaStyle");
+        throw new WeathermapInternalFail('UnexpectedViaStyle');
     }
 }

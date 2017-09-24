@@ -17,7 +17,7 @@ class HTMLImagemapAreaCircle extends HTMLImagemapArea
 
     public function asHTML()
     {
-        $coordstring = join(",", array($this->centx, $this->centy, $this->edgex, $this->edgey));
+        $coordstring = join(',', array($this->centx, $this->centy, $this->edgex, $this->edgey));
         return '<area ' . $this->commonHTML() . 'shape="circle" coords="' . $coordstring . '" />';
     }
 
@@ -32,7 +32,7 @@ class HTMLImagemapAreaCircle extends HTMLImagemapArea
         return ($radius2 <= $radius1);
     }
 
-    public function __construct($name = "", $href = "", $coords)
+    public function __construct($name = '', $href = '', $coords)
     {
         $c = $coords[0];
 
@@ -46,6 +46,6 @@ class HTMLImagemapAreaCircle extends HTMLImagemapArea
 
     public function __toString()
     {
-        return "Circle";
+        return 'Circle';
     }
 }

@@ -38,7 +38,7 @@ class GDFont extends Font
     public function getConfig($fontNumber)
     {
         if ($fontNumber < 6) {
-            return "";
+            return '';
         }
         return sprintf("FONTDEFINE %d %s\n", $fontNumber, $this->file);
     }
@@ -46,7 +46,7 @@ class GDFont extends Font
     public function calculateImageStringSize($string)
     {
         $lines = explode("\n", $string);
-        $lineCount = sizeof($lines);
+        $lineCount = count($lines);
         $maxLineLength = $this->calculateMaxLineLength($lines);
 
         return array(imagefontwidth($this->gdnumber) * $maxLineLength, $lineCount * imagefontheight($this->gdnumber));
@@ -55,7 +55,7 @@ class GDFont extends Font
     private function initGDBuiltin($gdNumber)
     {
         $this->gdnumber = $gdNumber;
-        $this->type = "GD builtin";
+        $this->type = 'GD builtin';
 
         return true;
     }
@@ -71,7 +71,7 @@ class GDFont extends Font
         if ($gdFontID) {
             $this->gdnumber = $gdFontID;
             $this->file = $filename;
-            $this->type = "gd";
+            $this->type = 'gd';
 
             return true;
         }
@@ -81,9 +81,9 @@ class GDFont extends Font
     public function asConfigData($fontNumber)
     {
         return array(
-            "number" => $fontNumber,
-            "type" => $this->type,
-            "file" => $this->file
+            'number' => $fontNumber,
+            'type' => $this->type,
+            'file' => $this->file
         );
     }
 }

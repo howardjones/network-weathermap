@@ -19,18 +19,18 @@ class HTMLImagemapArea
 
     protected function commonHTML()
     {
-        $h = "";
-        if ($this->name != "") {
+        $h = '';
+        if ($this->name != '') {
             // $h .= " alt=\"".$this->name."\" ";
-            $h .= "id=\"" . $this->name . "\" ";
+            $h .= 'id="' . $this->name . '" ';
         }
-        if ($this->href != "") {
-            $h .= "href=\"" . $this->href . "\" ";
+        if ($this->href != '') {
+            $h .= 'href="' . $this->href . '" ';
         } else {
-            $h .= "nohref ";
+            $h .= 'nohref ';
         }
-        if ($this->extrahtml != "") {
-            $h .= $this->extrahtml . " ";
+        if ($this->extrahtml != '') {
+            $h .= $this->extrahtml . ' ';
         }
         return $h;
     }

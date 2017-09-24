@@ -91,9 +91,9 @@ class MapTest extends PHPUnit_Framework_TestCase
         $this->assertEquals("", $this->object->processString("", $this->object, true, false));
         $this->assertEquals("dog", $this->object->processString("dog", $this->object, true, false));
 
-        $this->assertEquals("[UNKNOWN]", $this->object->processString("{map:randomstring}", $this->object, true, false));
-        $this->assertEquals("[UNKNOWN]", $this->object->processString("{node:randomstring}", $this->object, true, false));
-        $this->assertEquals("[UNKNOWN]", $this->object->processString("{link:randomstring}", $this->object, true, false));
+        $this->assertEquals("[UNKNOWN]", $this->object->processString("{map:randomstring}", $this->object, true, false), "Map getProperty() can return UNKNOWN");
+        $this->assertEquals("[UNKNOWN]", $this->object->processString("{node:randomstring}", $this->object, true, false), "Node getProperty() can return UNKNOWN");
+        $this->assertEquals("[UNKNOWN]", $this->object->processString("{link:randomstring}", $this->object, true, false), "Link getProperty() can return UNKNOWN");
 
         // load a config file, so there are map objects to talk about
         $this->object->ReadConfig(dirname(__FILE__).'/../test-suite/tests/simple-link-1.conf');

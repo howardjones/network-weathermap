@@ -31,7 +31,7 @@ class Target
     private $timestamp;
     private $dataValid = false;
 
-    public function __construct($targetString, $configFile = "", $lineNumber = 0)
+    public function __construct($targetString, $configFile = '', $lineNumber = 0)
     {
         $this->originalTargetString = $targetString;
         $this->finalTargetString = $targetString;
@@ -51,7 +51,7 @@ class Target
     public function __toString()
     {
         return sprintf(
-            "%s on config line %s of %s",
+            '%s on config line %s of %s',
             $this->finalTargetString,
             $this->configLineNumber,
             $this->configFileName
@@ -154,7 +154,7 @@ class Target
 
     public function asConfig()
     {
-        if (strpos($this->originalTargetString, " ") !== false) {
+        if (strpos($this->originalTargetString, ' ') !== false) {
             return '"' . $this->originalTargetString . '"';
         }
         return $this->originalTargetString;

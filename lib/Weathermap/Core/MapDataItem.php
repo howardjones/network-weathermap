@@ -29,11 +29,6 @@ class MapDataItem extends MapItem
     public $template;
     public $duplex;
 
-    public $inscalekey;
-    public $outscalekey;
-    public $inscaletag;
-    public $outscaletag;
-
     public $usescale;
     public $scaletype;
     public $scalevar;
@@ -68,17 +63,17 @@ class MapDataItem extends MapItem
 
     public function getChannelList()
     {
-        return array("in" => IN, "out" => OUT);
+        return array('in' => IN, 'out' => OUT);
     }
 
     /**
-     * @param string $template_name
+     * @param string $templateName
      * @param Map $owner
      */
-    public function setTemplate($template_name, $owner)
+    public function setTemplate($templateName, $owner)
     {
-        $this->template = $template_name;
-        MapUtility::wm_debug("Resetting to template %s %s\n", $this->myType(), $template_name);
+        $this->template = $templateName;
+        MapUtility::wm_debug("Resetting to template %s %s\n", $this->myType(), $templateName);
         $this->reset($owner);
     }
 
@@ -95,7 +90,7 @@ class MapDataItem extends MapItem
         $templateName = $this->template;
 
         if ($templateName == '') {
-            $templateName = "DEFAULT";
+            $templateName = 'DEFAULT';
             $this->template = $templateName;
         }
 
@@ -110,7 +105,7 @@ class MapDataItem extends MapItem
         }
 
         if (null !== $newOwner) {
-            $this->id = $newOwner->next_id++;
+            $this->id = $newOwner->nextAvailableID++;
         }
     }
 
@@ -130,7 +125,7 @@ class MapDataItem extends MapItem
         $this->parent->descendents [] = $this;
     }
 
-    public function CopyFrom(&$source)
+    public function copyFrom(&$source)
     {
         MapUtility::wm_debug("Initialising %s $this->name from $source->name\n", $this->myType());
         assert('is_object($source)');
@@ -176,7 +171,7 @@ class MapDataItem extends MapItem
             $target->preProcess($this, $this->owner);
             $matchedBy = $target->findHandlingPlugin($this->owner->plugins['data']);
 
-            if ($matchedBy != "") {
+            if ($matchedBy != '') {
                 if ($this->owner->plugins['data'][$matchedBy]['active']) {
                     $target->registerWithPlugin($this, $this->owner);
                 } else {
@@ -191,7 +186,7 @@ class MapDataItem extends MapItem
                 }
             }
 
-            if ($matchedBy == "") {
+            if ($matchedBy == '') {
                 MapUtility::wm_warn(
                     sprintf(
                         "ProcessTargets: %s, target: %s was not recognised as a valid TARGET [WMWARN08]\n",
@@ -238,12 +233,12 @@ class MapDataItem extends MapItem
         }
 
         // copy to the old named variables, for now. XXX - remove these
-        foreach ($channels as $channelName => $channel) {
-            $bwvar = "bandwidth_" . $channelName;
-            $this->$bwvar = $this->absoluteUsages[$channel];
-        }
+//        foreach ($channels as $channelName => $channel) {
+//            $bwvar = 'bandwidth_' . $channelName;
+//            $this->$bwvar = $this->absoluteUsages[$channel];
+//        }
 
-        MapUtility::wm_debug("ReadData complete for %s: %s\n", $this, join(" ", $this->absoluteUsages));
+        MapUtility::wm_debug("ReadData complete for %s: %s\n", $this, join(' ', $this->absoluteUsages));
         MapUtility::wm_debug(
             "ReadData: Setting %s,%s for %s\n",
             StringUtility::valueOrNull($this->absoluteUsages[IN]),
@@ -273,7 +268,7 @@ class MapDataItem extends MapItem
                     MapUtility::wm_debug("Adding %f to total for channel %d\n", $results[$channel], $channel);
                     $this->absoluteUsages[$channel] += $results[$channel];
                 }
-                MapUtility::wm_debug("Running totals: %s\n", join(" ", $this->absoluteUsages));
+                MapUtility::wm_debug("Running totals: %s\n", join(' ', $this->absoluteUsages));
             } else {
                 MapUtility::wm_debug("Invalid data?\n");
                 $nFails++;
@@ -308,9 +303,9 @@ class MapDataItem extends MapItem
             $this->percentUsages[$channel] = ($value / $this->maxValues[$channel]) * 100;
 
             # set notes with the old names, so the properties are no longer necessary
-            $this->addNote($channelName . "percent", $this->percentUsages[$channel]);
-            $this->addNote("max_bandwidth_" . $channelName, $this->maxValues[$channel]);
-            $this->addNote("max_bandwidth_" . $channelName . "_cfg", $this->maxValuesConfigured[$channel]);
+            // $this->addNote($channelName . 'percent', $this->percentUsages[$channel]);
+//            $this->addNote('max_bandwidth_' . $channelName, $this->maxValues[$channel]);
+//            $this->addNote('max_bandwidth_' . $channelName . '_cfg', $this->maxValuesConfigured[$channel]);
         }
     }
 
@@ -338,26 +333,26 @@ class MapDataItem extends MapItem
             list($col, $scalekey, $scaletag) = $scale->colourFromValue($value, $this->name, $isPercent, $logWarnings);
             $this->channelScaleColours[$channel] = $col;
             $this->colours[$channel] = $col;
-            $this->addNote($channelName . "scalekey", $scalekey);
-            $this->addNote($channelName . "scaletag", $scaletag);
-            $this->addNote($channelName . "scalecolor", $col->asHTML());
+            $this->addNote($channelName . 'scalekey', $scalekey);
+            $this->addNote($channelName . 'scaletag', $scaletag);
+            $this->addNote($channelName . 'scalecolor', $col->asHTML());
         }
     }
 
     /**
-     * @param mixed $default_default
+     * @param mixed $comparison
      * @return string
      */
-    protected function getConfigHints($default_default)
+    protected function getConfigHints($comparison)
     {
-        $output = "";
+        $output = '';
         foreach ($this->hints as $hintname => $hint) {
             // all hints for DEFAULT node are for writing
             // only changed ones, or unique ones, otherwise
             if (($this->name == 'DEFAULT')
-                || (isset($default_default->hints[$hintname])
-                    && $default_default->hints[$hintname] != $hint)
-                || (!isset($default_default->hints[$hintname]))
+                || (isset($comparison->hints[$hintname])
+                    && $comparison->hints[$hintname] != $hint)
+                || (!isset($comparison->hints[$hintname]))
             ) {
                 $output .= "\tSET $hintname $hint\n";
             }
@@ -366,58 +361,58 @@ class MapDataItem extends MapItem
     }
 
     /**
-     * @param mixed $default_default
+     * @param mixed $comparison
      * @param string $configKeyword
      * @param string $fieldName
      * @return string
      */
-    protected function getConfigInOutOrBoth($default_default, $configKeyword, $fieldName)
+    protected function getConfigInOutOrBoth($comparison, $configKeyword, $fieldName)
     {
-        $output = "";
+        $output = '';
         $myArray = $this->$fieldName;
-        $theirArray = $default_default->$fieldName;
+        $theirArray = $comparison->$fieldName;
 
         if ($myArray[IN] == $myArray[OUT]) {
-            $dirs = array(IN => ""); // only use the IN value, since they're both the same, but don't prefix the output keyword
+            $dirs = array(IN => ''); // only use the IN value, since they're both the same, but don't prefix the output keyword
         } else {
-            $dirs = array(IN => "IN", OUT => "OUT");// the full monty two-keyword version
+            $dirs = array(IN => 'IN', OUT => 'OUT');// the full monty two-keyword version
         }
 
         foreach ($dirs as $dir => $dirText) {
             if ($myArray[$dir] != $theirArray[$dir]) {
                 $value = $myArray[$dir];
                 if (is_array($value)) {
-                    $value = join(" ", $value);
+                    $value = join(' ', $value);
                 }
-                $output .= "\t" . $dirText . $configKeyword . " " . $value . "\n";
+                $output .= "\t" . $dirText . $configKeyword . ' ' . $value . "\n";
             }
         }
         return $output;
     }
 
     /**
-     * @param $basic_params
-     * @param $default_default
+     * @param $simpleParameters
+     * @param $comparison
      * @return string
      */
-    protected function getConfigSimple($basic_params, $default_default)
+    protected function getConfigSimple($simpleParameters, $comparison)
     {
-        $output = "";
+        $output = '';
 
         # TEMPLATE must come first. DEFAULT
         if ($this->template != 'DEFAULT' && $this->template != ':: DEFAULT ::') {
             $output .= "\tTEMPLATE " . $this->template . "\n";
         }
 
-        foreach ($basic_params as $param) {
-            $field = $param["fieldName"];
-            $keyword = $param["configKeyword"];
+        foreach ($simpleParameters as $param) {
+            $field = $param['fieldName'];
+            $keyword = $param['configKeyword'];
 
-            if ($this->$field != $default_default->$field) {
-                if ($param["type"] == CONFIG_TYPE_COLOR) {
+            if ($this->$field != $comparison->$field) {
+                if ($param['type'] == CONFIG_TYPE_COLOR) {
                     $output .= "\t$keyword " . $this->$field->asConfig() . "\n";
                 }
-                if ($param["type"] == CONFIG_TYPE_LITERAL) {
+                if ($param['type'] == CONFIG_TYPE_LITERAL) {
                     $output .= "\t$keyword " . $this->$field . "\n";
                 }
             }
@@ -425,45 +420,45 @@ class MapDataItem extends MapItem
         return $output;
     }
 
-    protected function getMaxValueConfig($default_default, $keyword = "MAXVALUE")
+    protected function getMaxValueConfig($comparison, $keyword = 'MAXVALUE')
     {
-        $output = "";
+        $output = '';
 
-        if (($this->maxValues[IN] != $default_default->maxValues[IN])
-            || ($this->maxValues[OUT] != $default_default->maxValues[OUT])
+        if (($this->maxValues[IN] != $comparison->maxValues[IN])
+            || ($this->maxValues[OUT] != $comparison->maxValues[OUT])
             || ($this->name == 'DEFAULT')
         ) {
             if ($this->maxValues[IN] == $this->maxValues[OUT]) {
                 $output .= "\t$keyword " . $this->maxValuesConfigured[IN] . "\n";
             } else {
-                $output .= "\t$keyword " . $this->maxValuesConfigured[IN] . " " . $this->maxValuesConfigured[OUT] . "\n";
+                $output .= "\t$keyword " . $this->maxValuesConfigured[IN] . ' ' . $this->maxValuesConfigured[OUT] . "\n";
             }
         }
 
         return $output;
     }
 
-    protected function asJS($type = "Thing", $prefix = "T")
+    protected function asJS($type = 'Thing', $prefix = 'T')
     {
         $output = '';
-        $output .= $type . "s[" . StringUtility::jsEscape($this->name) . "] = {";
+        $output .= $type . 's[' . StringUtility::jsEscape($this->name) . '] = {';
 
         $output .= $this->asJSCore();
 
         $output .= "};\n";
-        $output .= $type . "IDs[\"" . $prefix . $this->id . "\"] = " . StringUtility::jsEscape($this->name) . ";\n";
+        $output .= $type . 'IDs["' . $prefix . $this->id . '"] = ' . StringUtility::jsEscape($this->name) . ";\n";
 
         return $output;
     }
 
     protected function asJSCore()
     {
-        return "";
+        return '';
     }
 
     private function getDirectionList()
     {
-        return array("in" => IN, "out" => OUT);
+        return array('in' => IN, 'out' => OUT);
     }
 
     public function asConfigData()
@@ -473,5 +468,15 @@ class MapDataItem extends MapItem
         $config['template'] = $this->template;
 
         return $config;
+    }
+
+    public function getProperty($name)
+    {
+        MapUtility::wm_debug("Fetching %s from %s\n", $name, $this);
+        if (property_exists($this, $name)) {
+            return $this->$name;
+        }
+
+        return null;
     }
 }

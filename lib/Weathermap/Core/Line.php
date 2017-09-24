@@ -35,7 +35,7 @@ class Line
 
     public function __toString()
     {
-        return sprintf("/%s-%s/", $this->point, $this->vector);
+        return sprintf('/%s-%s/', $this->point, $this->vector);
     }
 
     /**
@@ -53,7 +53,7 @@ class Line
         if ($slope1 == $slope2) {
             // for a general case, this should probably be handled better
             // but for our use, there should never be parallel lines
-            throw new WeathermapInternalFail("ParallelLinesNeverCross");
+            throw new WeathermapInternalFail('ParallelLinesNeverCross');
         }
 
         $intercept1 = $this->getYIntercept();

@@ -2,10 +2,10 @@
 
 namespace Weathermap\Core;
 
-$WEATHERMAP_VERSION = "1.0.0";
+$WEATHERMAP_VERSION = '1.0.0';
 $weathermap_debugging = false;
 $weathermap_debugging_readdata = false;
-$weathermap_map = "";
+$weathermap_map = '';
 $weathermap_warncount = 0;
 $weathermap_lazycounter = 0;
 

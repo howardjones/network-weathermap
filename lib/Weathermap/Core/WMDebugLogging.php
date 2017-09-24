@@ -25,9 +25,9 @@ class WMDebugLogging extends WMDebugNull
             $string = call_user_func_array('sprintf', $args);
         }
 
-        $calling_fn = $this->getCallingFunction();
+        $callingFunction = $this->getCallingFunction();
 
-        $message = "DEBUG:$calling_fn " . ($this->contextName == '' ? '' : $this->contextName . ": ") . rtrim($string) . "\n";
+        $message = "DEBUG:$callingFunction " . ($this->contextName == '' ? '' : $this->contextName . ': ') . rtrim($string) . "\n";
 
         $this->doLog($message);
     }
@@ -44,9 +44,9 @@ class WMDebugLogging extends WMDebugNull
      */
     private function getCallingFunction()
     {
-        $callingFunction = "";
+        $callingFunction = '';
 
-        if (function_exists("debug_backtrace")) {
+        if (function_exists('debug_backtrace')) {
             $backtrace = debug_backtrace();
             $index = 3;
 
@@ -68,7 +68,7 @@ class WMDebugLogging extends WMDebugNull
 
         $isReadData = false;
 
-        if (($weathermap_debugging_readdata) and (false !== strpos("ReadData", $string))) {
+        if (($weathermap_debugging_readdata) and (false !== strpos('ReadData', $string))) {
             $isReadData = true;
         }
 

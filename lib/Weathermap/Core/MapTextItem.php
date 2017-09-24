@@ -25,8 +25,8 @@ class MapTextItem extends MapItem
         $this->font = 3;
         $this->position = new Point(-1000, -1000);
         $this->textColour = new Colour(0, 0, 0);
-        $this->configuredText = "";
-        $this->processedText = "";
+        $this->configuredText = '';
+        $this->processedText = '';
         $this->zOrder = 1000;
 
         $this->prefix = $prefix;
@@ -42,12 +42,12 @@ class MapTextItem extends MapItem
 
     public function myType()
     {
-        return "TEXT";
+        return 'TEXT';
     }
 
-    function getConfig(&$map)
+    public function getConfig(&$map)
     {
-        $output = "";
+        $output = '';
 
         $output .= "# $this->prefix POS\n";
         $output .= "# $this->prefix FONT\n";
@@ -60,7 +60,7 @@ class MapTextItem extends MapItem
      * @param resource $imageRef
      * @param Map $map
      */
-    function draw($imageRef, &$map)
+    public function draw($imageRef, &$map)
     {
         $fontObject = $map->fonts->getFont($this->font);
         $string = $map->ProcessString($this->configuredText, $map);
@@ -81,7 +81,7 @@ class MapTextItem extends MapItem
 
         $fontObject->drawImageString($imageRef, $x, $y, $string, $this->textColour->gdAllocate($imageRef));
 
-        $map->imap->addArea("Rectangle", $this->prefix, '', array($x, $y, $x + $boxWidth, $y - $boxHeight));
+        $map->imap->addArea('Rectangle', $this->prefix, '', array($x, $y, $x + $boxWidth, $y - $boxHeight));
         $map->imagemapAreas[] = $this->prefix;
     }
 }

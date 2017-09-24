@@ -24,6 +24,6 @@ class LineSegment
 
     public function __toString()
     {
-        return sprintf("{%s--%s}", $this->point1, $this->point2);
+        return sprintf('{%s--%s}', $this->point1, $this->point2);
     }
 }

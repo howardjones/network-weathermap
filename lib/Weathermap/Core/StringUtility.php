@@ -21,7 +21,7 @@ class StringUtility
         $output = $input;
 
         $output = preg_replace('/\b\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}\b/', '127.0.0.1', $output);
-        $output = preg_replace_callback("/([A-Za-z]{3,})/", array('self', 'stringAnonymiseReplacer'), $output);
+        $output = preg_replace_callback('/([A-Za-z]{3,})/', array('self', 'stringAnonymiseReplacer'), $output);
 
         return ($output);
     }
@@ -35,23 +35,23 @@ class StringUtility
 
     public static function formatTimeTicks($value, $prefix, $tokenCharacter, $precision)
     {
-        $joinCharacter = " ";
-        if ($prefix == "-") {
-            $joinCharacter = "";
+        $joinCharacter = ' ';
+        if ($prefix == '-') {
+            $joinCharacter = '';
         }
 
         // special formatting for time_t (t) and SNMP TimeTicks (T)
-        if ($tokenCharacter == "T") {
+        if ($tokenCharacter == 'T') {
             $value = $value / 100;
         }
 
         $results = array();
         $periods = array(
-            "y" => 24 * 60 * 60 * 365,
-            "d" => 24 * 60 * 60,
-            "h" => 60 * 60,
-            "m" => 60,
-            "s" => 1
+            'y' => 24 * 60 * 60 * 365,
+            'd' => 24 * 60 * 60,
+            'h' => 60 * 60,
+            'm' => 60,
+            's' => 1
         );
 
         foreach ($periods as $periodSuffix => $timePeriod) {
@@ -59,12 +59,12 @@ class StringUtility
             $value = $value - $slot * $timePeriod;
 
             if ($slot > 0) {
-                $results [] = sprintf("%d%s", $slot, $periodSuffix);
+                $results [] = sprintf('%d%s', $slot, $periodSuffix);
             }
         }
 
-        if (sizeof($results) == 0) {
-            return "0s";
+        if (count($results) == 0) {
+            return '0s';
         }
 
         return implode($joinCharacter, array_slice($results, 0, $precision));
@@ -92,12 +92,12 @@ class StringUtility
     public static function interpretNumberWithMetricSuffix($inputString, $kilo = 1000)
     {
         $lookup = array(
-            "K" => $kilo,
-            "M" => $kilo * $kilo,
-            "G" => $kilo * $kilo * $kilo,
-            "T" => $kilo * $kilo * $kilo * $kilo,
-            "m" => 1 / $kilo,
-            "u" => 1 / ($kilo * $kilo)
+            'K' => $kilo,
+            'M' => $kilo * $kilo,
+            'G' => $kilo * $kilo * $kilo,
+            'T' => $kilo * $kilo * $kilo * $kilo,
+            'm' => 1 / $kilo,
+            'u' => 1 / ($kilo * $kilo)
         );
 
         if (preg_match('/([0-9\.]+)(M|G|K|T|m|u)/', $inputString, $matches)) {
@@ -121,14 +121,14 @@ class StringUtility
     public static function formatNumberWithMetricSuffix($number, $kilo = 1000, $decimals = 1)
     {
         $lookup = array(
-            "T" => $kilo * $kilo * $kilo * $kilo,
-            "G" => $kilo * $kilo * $kilo,
-            "M" => $kilo * $kilo,
-            "K" => $kilo,
-            "" => 1,
-            "m" => 1 / $kilo,
-            "u" => 1 / ($kilo * $kilo),
-            "n" => 1 / ($kilo * $kilo * $kilo)
+            'T' => $kilo * $kilo * $kilo * $kilo,
+            'G' => $kilo * $kilo * $kilo,
+            'M' => $kilo * $kilo,
+            'K' => $kilo,
+            '' => 1,
+            'm' => 1 / $kilo,
+            'u' => 1 / ($kilo * $kilo),
+            'n' => 1 / ($kilo * $kilo * $kilo)
         );
 
         $prefix = '';
@@ -153,7 +153,7 @@ class StringUtility
 
     // These next two are based on perl's Number::Format module
     // by William R. Ward, chopped down to just what I needed
-    public static function formatNumber($number, $precision = 2, $trailing_zeroes = 0)
+    public static function formatNumber($number, $precision = 2, $trailingZeroes = 0)
     {
         $sign = 1;
 
@@ -176,10 +176,10 @@ class StringUtility
         $integer = $sign * $integer;
 
         if ($decimal == '') {
-            return ($integer);
+            return $integer;
         }
 
-        return ($integer . "." . $decimal);
+        return $integer . '.' . $decimal;
     }
 
     /**
@@ -200,13 +200,13 @@ class StringUtility
         // if we get a null, it probably means no-data from the datasource plugin
         // don't coerce that into a zero
         if ($value === null) {
-            return "?";
+            return '?';
         }
 
         if (preg_match('/%(\d*)\.?(\d*)k/', $format, $matches)) {
             $places = 2;
             // we don't really need the justification (pre-.) part...
-            if ($matches[2] != "") {
+            if ($matches[2] != '') {
                 $places = intval($matches[2]);
             }
             return self::formatNumberWithMetricSuffix($value, $kilo, $places);

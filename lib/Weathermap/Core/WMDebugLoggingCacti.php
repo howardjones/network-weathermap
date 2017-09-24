@@ -15,6 +15,6 @@ class WMDebugLoggingCacti extends WMDebugLogging
 {
     protected function doLog($message)
     {
-        cacti_log($message, true, "WEATHERMAP");
+        cacti_log($message, true, 'WEATHERMAP');
     }
 }

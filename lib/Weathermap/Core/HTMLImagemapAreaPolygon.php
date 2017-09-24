@@ -23,7 +23,7 @@ class HTMLImagemapAreaPolygon extends HTMLImagemapArea
             $flatpoints[] = $point[0];
             $flatpoints[] = $point[1];
         }
-        $coordstring = join(",", $flatpoints);
+        $coordstring = join(',', $flatpoints);
 
         return '<area ' . $this->commonHTML() . 'shape="poly" coords="' . $coordstring . '" />';
     }
@@ -35,14 +35,14 @@ class HTMLImagemapAreaPolygon extends HTMLImagemapArea
         $xlist = '';
         $ylist = '';
         foreach ($this->points as $point) {
-            $xlist .= $point[0] . ",";
-            $ylist .= $point[1] . ",";
+            $xlist .= $point[0] . ',';
+            $ylist .= $point[1] . ',';
         }
-        $xlist = rtrim($xlist, ", ");
-        $ylist = rtrim($ylist, ", ");
+        $xlist = rtrim($xlist, ', ');
+        $ylist = rtrim($ylist, ', ');
         $json .= " \"x\": [ $xlist ], \"y\":[ $ylist ],";
-        $json .= " \"minx\": " . $this->minx . ", \"miny\": " . $this->miny . ",";
-        $json .= " \"maxx\":" . $this->maxx . ", \"maxy\":" . $this->maxy . "}";
+        $json .= ' "minx": ' . $this->minx . ', "miny": ' . $this->miny . ',';
+        $json .= ' "maxx":' . $this->maxx . ', "maxy":' . $this->maxy . '}';
 
         return $json;
     }
@@ -76,7 +76,7 @@ class HTMLImagemapAreaPolygon extends HTMLImagemapArea
         return $c;
     }
 
-    public function __construct($name = "", $href = "", $coords)
+    public function __construct($name = '', $href = '', $coords)
     {
         $c = $coords[0];
 
@@ -85,7 +85,7 @@ class HTMLImagemapAreaPolygon extends HTMLImagemapArea
         $this->npoints = count($c) / 2;
 
         if (intval($this->npoints) != ($this->npoints)) {
-            throw new \Exception("Odd number of points!");
+            throw new \Exception('Odd number of points!');
         }
 
         $xlist = array();
@@ -108,6 +108,6 @@ class HTMLImagemapAreaPolygon extends HTMLImagemapArea
 
     public function __toString()
     {
-        return "Polygon";
+        return 'Polygon';
     }
 }

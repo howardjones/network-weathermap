@@ -137,7 +137,7 @@ class Spine
         // then linearly interpolate to get a more accurate point
         // this saves having quite so many points-per-curve
         if (count($this->elements) === 0) {
-            throw new WeathermapInternalFail("Called findPointAtDistance with an empty WMSpline");
+            throw new WeathermapInternalFail('Called findPointAtDistance with an empty WMSpline');
         }
 
         $foundIndex = $this->findIndexNearDistance($targetDistance);
@@ -299,11 +299,11 @@ class Spine
 
     public function __toString()
     {
-        $output = "SPINE:[";
+        $output = 'SPINE:[';
         for ($i = 0; $i < $this->pointCount(); $i++) {
-            $output .= sprintf("%s[%s]--", $this->elements[$i]->point, $this->elements[$i]->distance);
+            $output .= sprintf('%s[%s]--', $this->elements[$i]->point, $this->elements[$i]->distance);
         }
-        $output .= "]";
+        $output .= ']';
 
         return $output;
     }

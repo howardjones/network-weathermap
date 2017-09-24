@@ -6,7 +6,8 @@
 
 use Weathermap\Editor\Editor;
 
-class EditorTest extends PHPUnit_Framework_TestCase {
+class EditorTest extends PHPUnit_Framework_TestCase
+{
 
     protected static $testdir;
     protected static $result1dir;
@@ -26,7 +27,7 @@ class EditorTest extends PHPUnit_Framework_TestCase {
 
         $c = $editor->getConfig();
 
-        $fh = fopen(self::$result1dir.DIRECTORY_SEPARATOR."editortest-addnode.conf", "w");
+        $fh = fopen(self::$result1dir . DIRECTORY_SEPARATOR . "editortest-addnode.conf", "w");
         fputs($fh, $c);
         fclose($fh);
     }
@@ -46,7 +47,7 @@ class EditorTest extends PHPUnit_Framework_TestCase {
 
         $c = $editor->getConfig();
 
-        $fh = fopen(self::$result1dir.DIRECTORY_SEPARATOR."editortest-addlink.conf", "w");
+        $fh = fopen(self::$result1dir . DIRECTORY_SEPARATOR . "editortest-addlink.conf", "w");
         fputs($fh, $c);
         fclose($fh);
     }
@@ -65,7 +66,7 @@ class EditorTest extends PHPUnit_Framework_TestCase {
 
         $c = $editor->getConfig();
 
-        $fh = fopen(self::$result1dir.DIRECTORY_SEPARATOR."editortest-clone.conf", "w");
+        $fh = fopen(self::$result1dir . DIRECTORY_SEPARATOR . "editortest-clone.conf", "w");
         fputs($fh, $c);
         fclose($fh);
     }
@@ -89,38 +90,38 @@ class EditorTest extends PHPUnit_Framework_TestCase {
 
         $nDeps = $n1->getDependencies();
         $nDepsString = join(" ", array_map(array("EditorTest", "makeString"), $nDeps));
-        $this->assertEquals("LINK node1-node2", $nDepsString, "Dependency created for new link");
+        $this->assertEquals("[LINK node1-node2]", $nDepsString, "Dependency created for new link");
 
         $editor->addLink("node1", "node3");
 
         $nDeps = $n1->getDependencies();
         $nDepsString = join(" ", array_map(array("EditorTest", "makeString"), $nDeps));
-        $this->assertEquals("LINK node1-node2 LINK node1-node3", $nDepsString, "Two dependencies with two links");
+        $this->assertEquals("[LINK node1-node2] [LINK node1-node3]", $nDepsString, "Two dependencies with two links");
 
         $link = $editor->map->getLink("node1-node2");
         $link->setEndNodes($n2, $n3);
 
         $nDeps = $n1->getDependencies();
         $nDepsString = join(" ", array_map(array("EditorTest", "makeString"), $nDeps));
-        $this->assertEquals("LINK node1-node3", $nDepsString, "Dependency removed when link moves");
+        $this->assertEquals("[LINK node1-node3]", $nDepsString, "Dependency removed when link moves");
 
         $nDeps = $n2->getDependencies();
         $nDepsString = join(" ", array_map(array("EditorTest", "makeString"), $nDeps));
-        $this->assertEquals("LINK node1-node2", $nDepsString, "Dependency added when link moves");
+        $this->assertEquals("[LINK node1-node2]", $nDepsString, "Dependency added when link moves");
     }
 
     public function setUp()
     {
         self::$previouswd = getcwd();
-        chdir(dirname(__FILE__).DIRECTORY_SEPARATOR."..");
+        chdir(dirname(__FILE__) . DIRECTORY_SEPARATOR . "..");
 
         $version = explode('.', PHP_VERSION);
-        $phptag = "php".$version[0];
+        $phptag = "php" . $version[0];
 
-        self::$phptag = "php".$version[0];
-        self::$result1dir = "test-suite".DIRECTORY_SEPARATOR."results1-$phptag";
+        self::$phptag = "php" . $version[0];
+        self::$result1dir = "test-suite" . DIRECTORY_SEPARATOR . "results1-$phptag";
 
-        if (! file_exists(self::$result1dir)) {
+        if (!file_exists(self::$result1dir)) {
             mkdir(self::$result1dir);
         }
     }
@@ -132,21 +133,21 @@ class EditorTest extends PHPUnit_Framework_TestCase {
 
     public function makeString($object)
     {
-        return "$object";
+        return (string)$object;
     }
 
     public function testInternals()
     {
-        $this->assertTrue(Editor::rangeOverlaps(array(1,5), array(4,7)));
-        $this->assertTrue(Editor::rangeOverlaps(array(4,7), array(1,5)));
+        $this->assertTrue(Editor::rangeOverlaps(array(1, 5), array(4, 7)));
+        $this->assertTrue(Editor::rangeOverlaps(array(4, 7), array(1, 5)));
 
-        $this->assertFalse(Editor::rangeOverlaps(array(1,5), array(6,7)));
+        $this->assertFalse(Editor::rangeOverlaps(array(1, 5), array(6, 7)));
 
-        $this->assertEquals(array(5,10), Editor::findCommonRange(array(1,10), array(5,20)));
+        $this->assertEquals(array(5, 10), Editor::findCommonRange(array(1, 10), array(5, 20)));
 
-        $this->assertEquals(array(4,5), Editor::findCommonRange(array(1,5), array(4,7)));
+        $this->assertEquals(array(4, 5), Editor::findCommonRange(array(1, 5), array(4, 7)));
 
-        $this->assertEquals(array(4,5), Editor::findCommonRange(array(4,7), array(1,5)));
+        $this->assertEquals(array(4, 5), Editor::findCommonRange(array(4, 7), array(1, 5)));
 
         $this->assertEquals("", Editor::simplifyOffset(0, 0));
         $this->assertEquals("1:2", Editor::simplifyOffset(1, 2));

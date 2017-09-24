@@ -26,14 +26,14 @@ class CurvedLinkGeometry extends LinkGeometry
 
     private function calculateCRSpan($startIndex, $pointsPerSpan = 32)
     {
-        $cr_x = new CatmullRom1D($this->controlPoints[$startIndex]->x, $this->controlPoints[$startIndex + 1]->x, $this->controlPoints[$startIndex + 2]->x, $this->controlPoints[$startIndex + 3]->x);
-        $cr_y = new CatmullRom1D($this->controlPoints[$startIndex]->y, $this->controlPoints[$startIndex + 1]->y, $this->controlPoints[$startIndex + 2]->y, $this->controlPoints[$startIndex + 3]->y);
+        $xGenerator = new CatmullRom1D($this->controlPoints[$startIndex]->x, $this->controlPoints[$startIndex + 1]->x, $this->controlPoints[$startIndex + 2]->x, $this->controlPoints[$startIndex + 3]->x);
+        $yGenerator = new CatmullRom1D($this->controlPoints[$startIndex]->y, $this->controlPoints[$startIndex + 1]->y, $this->controlPoints[$startIndex + 2]->y, $this->controlPoints[$startIndex + 3]->y);
 
         for ($i = 1; $i <= $pointsPerSpan; $i++) {
             $t = $i / $pointsPerSpan;
 
-            $x = $cr_x->calculate($t);
-            $y = $cr_y->calculate($t);
+            $x = $xGenerator->calculate($t);
+            $y = $yGenerator->calculate($t);
 
             $this->curvePoints->addPoint(new Point($x, $y));
         }

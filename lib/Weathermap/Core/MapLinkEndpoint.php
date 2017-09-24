@@ -49,7 +49,7 @@ class MapLinkEndpoint
         $output = $this->node->name;
 
         if ($this->offset != 'C') {
-            $output .= ":" . $this->offset;
+            $output .= ':' . $this->offset;
         }
 
         return $output;
@@ -63,12 +63,14 @@ class MapLinkEndpoint
         if ($this->dx != 0 || $this->dy != 0) {
             MapUtility::wm_debug("Using offsets from earlier\n");
         } else {
-            list($this->dx, $this->dy) = MapUtility::calculateOffset($this->offset, $this->node->width,
-                $this->node->height);
+            list($this->dx, $this->dy) = MapUtility::calculateOffset(
+                $this->offset,
+                $this->node->width,
+                $this->node->height
+            );
             $this->offsetResolved = true;
         }
         $this->point = new Point($this->node->x + $this->dx, $this->node->y + $this->dy);
-        MapUtility::wm_debug("%s point is %s", $name, $this->point);
-
+        MapUtility::wm_debug('%s point is %s', $name, $this->point);
     }
 }

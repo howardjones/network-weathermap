@@ -21,7 +21,7 @@ class HTMLImagemap
     public $shapes;
     public $name;
 
-    public function __construct($name = "")
+    public function __construct($name = '')
     {
         $this->Reset();
         $this->name = $name;
@@ -30,7 +30,7 @@ class HTMLImagemap
     public function reset()
     {
         $this->shapes = array();
-        $this->name = "";
+        $this->name = '';
     }
 
     // add an element to the map - takes an array with the info, in a similar way to HTML_QuickForm
@@ -50,12 +50,12 @@ class HTMLImagemap
     // do a hit-test based on the current map
     // - can be limited to only match elements whose names match the filter
     //   (e.g. pick a building, in a campus map)
-    public function hitTest($x, $y, $namefilter = "")
+    public function hitTest($x, $y, $namefilter = '')
     {
         $preg = '/' . $namefilter . '/';
         foreach ($this->shapes as $shape) {
             if ($shape->hitTest($x, $y)) {
-                if (($namefilter == "") || (preg_match($preg, $shape->name))) {
+                if (($namefilter == '') || (preg_match($preg, $shape->name))) {
                     return $shape->name;
                 }
             }
@@ -95,7 +95,7 @@ class HTMLImagemap
     {
         $count = 0;
         foreach ($this->shapes as $shape) {
-            if (($where == "") || (strstr($shape->name, $where) != false)) {
+            if (($where == '') || (strstr($shape->name, $where) != false)) {
                 switch ($which) {
                     case 'href':
                         $shape->href = $what;
@@ -114,7 +114,7 @@ class HTMLImagemap
     public function asHTML()
     {
         $html = '<map';
-        if ($this->name != "") {
+        if ($this->name != '') {
             $html .= ' name="' . $this->name . '"';
         }
         $html .= ">\n";
@@ -127,13 +127,13 @@ class HTMLImagemap
         return $html;
     }
 
-    public function subJSON($namefilter = "", $reverseorder = false)
+    public function subJSON($namefilter = '', $reverseorder = false)
     {
         $json = '';
 
         $preg = '/' . $namefilter . '/';
         foreach ($this->shapes as $shape) {
-            if (($namefilter == "") || (preg_match($preg, $shape->name))) {
+            if (($namefilter == '') || (preg_match($preg, $shape->name))) {
                 if ($reverseorder) {
                     $json = $shape->asJSON() . ",\n" . $json;
                 } else {
@@ -152,16 +152,16 @@ class HTMLImagemap
     // - the imagemap is checked from top-to-bottom in the HTML)
     // - skipnolinks -> in normal HTML output, we don't need areas for things with no href
     // - reverseorder -> produce the map in the opposite order to the order the items were created
-    public function subHTML($namefilter = "", $reverseorder = false, $skipnolinks = false)
+    public function subHTML($namefilter = '', $reverseorder = false, $skipnolinks = false)
     {
-        $html = "";
+        $html = '';
 
         $n = 0;
         $i = 0;
         foreach ($this->shapes as $shape) {
             $i++;
-            if (($namefilter == "") || (strpos($shape->name, $namefilter) === 0)) {
-                if ($shape->href != "" || !$skipnolinks || $shape->extrahtml != "") {
+            if (($namefilter == '') || (strpos($shape->name, $namefilter) === 0)) {
+                if ($shape->href != '' || !$skipnolinks || $shape->extrahtml != '') {
                     $n++;
                     if ($reverseorder) {
                         $html = $shape->asHTML() . "\n" . $html;

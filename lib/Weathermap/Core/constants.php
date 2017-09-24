@@ -9,8 +9,8 @@
 
 namespace Weathermap\Core;
 
-define("WEATHERMAP_VERSION", "1.0.0");
+define('WEATHERMAP_VERSION', '1.0.0');
 
 // parameterise the in/out stuff a bit
-define("IN", 0);
-define("OUT", 1);
+define('IN', 0);
+define('OUT', 1);

@@ -22,7 +22,7 @@ class FontTable
 
     public function count()
     {
-        return sizeof($this->table);
+        return count($this->table);
     }
 
     public function addFont($fontNumber, $font)
@@ -64,7 +64,7 @@ class FontTable
         $list = array();
 
         foreach ($this->table as $fontNumber => $fontObject) {
-            $list[$fontNumber] = array("type" => $fontObject->type);
+            $list[$fontNumber] = array('type' => $fontObject->type);
         }
 
         return $list;
@@ -87,7 +87,7 @@ class FontTable
      */
     public function getConfig()
     {
-        $output = "";
+        $output = '';
         if (count($this->table) > 0) {
             foreach ($this->table as $fontNumber => $fontObject) {
                 $output .= $fontObject->getConfig($fontNumber);
@@ -107,14 +107,14 @@ class FontTable
      */
     public function makeFontObject($type, $file, $size = 0)
     {
-        if ($type == "truetype") {
+        if ($type == 'truetype') {
             return new TrueTypeFont($file, $size);
         }
 
-        if ($type == "gd") {
+        if ($type == 'gd') {
             return new GDFont($file);
         }
 
-        throw new WeathermapInternalFail("Requested non-existent font type");
+        throw new WeathermapInternalFail('Requested non-existent font type');
     }
 }

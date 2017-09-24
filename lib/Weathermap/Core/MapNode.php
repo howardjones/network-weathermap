@@ -101,8 +101,10 @@ class MapNode extends MapDataItem
             'relativePositionResolved' => false,
             'x' => null,
             'y' => null,
-            'inscalekey' => '',
-            'outscalekey' => '',
+            'scaleKeys' => array(IN=>'', OUT=>''),
+            'scaleTags' => array(IN=>'', OUT=>''),
+//            'inscalekey' => '',
+//            'outscalekey' => '',
             #'incolour'=>-1,'outcolour'=>-1,
             'originalX' => 0,
             'originalY' => 0,
@@ -113,7 +115,7 @@ class MapNode extends MapDataItem
             'targets' => array(),
             'namedOffsets' => array(),
             'infourl' => array(IN => '', OUT => ''),
-            'maxValuesConfigured' => array(IN => "100", OUT => "100"),
+            'maxValuesConfigured' => array(IN => '100', OUT => '100'),
             'maxValues' => array(IN => null, OUT => null),
             'notestext' => array(IN => '', OUT => ''),
             'notes' => array(),
@@ -141,7 +143,7 @@ class MapNode extends MapDataItem
 
     public function myType()
     {
-        return "NODE";
+        return 'NODE';
     }
 
     /**
@@ -151,7 +153,7 @@ class MapNode extends MapDataItem
     public function preRender(&$map)
     {
         if (!$this->drawable) {
-            MapUtility::wm_debug("Skipping undrawable %s", $this);
+            MapUtility::wm_debug('Skipping undrawable %s', $this);
             return;
         }
 
@@ -231,7 +233,7 @@ class MapNode extends MapDataItem
                 $labelBoxHeight = $stringHeight * $paddingFactor + $paddingConstant;
             }
 
-            MapUtility::wm_debug("Node->pre_render: " . $this->name . " Label Metrics are: $stringWidth x $stringHeight -> $labelBoxWidth x $labelBoxHeight\n");
+            MapUtility::wm_debug('Node->pre_render: ' . $this->name . " Label Metrics are: $stringWidth x $stringHeight -> $labelBoxWidth x $labelBoxHeight\n");
 
             if ($this->labelangle == 90) {
                 $textPoint = new Point($stringHeight / 2, $stringWidth / 2);
@@ -368,9 +370,9 @@ class MapNode extends MapDataItem
     {
         $index = 0;
         foreach ($this->boundingboxes as $bbox) {
-            $areaName = "NODE:N" . $this->id . ":" . $index;
-            $newArea = new HTMLImagemapAreaRectangle($areaName, "", array($bbox));
-            MapUtility::wm_debug("Adding imagemap area [" . join(",", $bbox) . "] => $newArea \n");
+            $areaName = 'NODE:N' . $this->id . ':' . $index;
+            $newArea = new HTMLImagemapAreaRectangle($areaName, '', array($bbox));
+            MapUtility::wm_debug('Adding imagemap area [' . join(',', $bbox) . "] => $newArea \n");
             $this->imagemapAreas[] = $newArea;
             $index++;
         }
@@ -489,17 +491,17 @@ class MapNode extends MapDataItem
         }
 
         if ($this->overliburl[IN] != $templateSource->overliburl[IN]) {
-            $output .= "\tOVERLIBGRAPH " . join(" ", $this->overliburl[IN]) . "\n";
+            $output .= "\tOVERLIBGRAPH " . join(' ', $this->overliburl[IN]) . "\n";
         }
 
-        $val = $this->iconscalew . " " . $this->iconscaleh . " " . $this->iconfile;
+        $val = $this->iconscalew . ' ' . $this->iconscaleh . ' ' . $this->iconfile;
 
-        $comparison = $templateSource->iconscalew . " " . $templateSource->iconscaleh . " " . $templateSource->iconfile;
+        $comparison = $templateSource->iconscalew . ' ' . $templateSource->iconscaleh . ' ' . $templateSource->iconfile;
 
         if ($val != $comparison) {
             $output .= "\tICON ";
             if ($this->iconscalew > 0) {
-                $output .= $this->iconscalew . " " . $this->iconscaleh . " ";
+                $output .= $this->iconscalew . ' ' . $this->iconscaleh . ' ';
             }
             $output .= ($this->iconfile == '' ? 'none' : $this->iconfile) . "\n";
         }
@@ -508,51 +510,51 @@ class MapNode extends MapDataItem
             $output .= "\tTARGET";
 
             foreach ($this->targets as $target) {
-                $output .= " " . $target->asConfig();
+                $output .= ' ' . $target->asConfig();
             }
 
             $output .= "\n";
         }
 
-        $val = $this->usescale . " " . $this->scalevar . " " . $this->scaletype;
-        $comparison = $templateSource->usescale . " " . $templateSource->scalevar . " " . $templateSource->scaletype;
+        $val = $this->usescale . ' ' . $this->scalevar . ' ' . $this->scaletype;
+        $comparison = $templateSource->usescale . ' ' . $templateSource->scalevar . ' ' . $templateSource->scaletype;
 
         if (($val != $comparison)) {
             $output .= "\tUSESCALE " . $val . "\n";
         }
 
-        $val = $this->useiconscale . " " . $this->iconscalevar;
-        $comparison = $templateSource->useiconscale . " " . $templateSource->iconscalevar;
+        $val = $this->useiconscale . ' ' . $this->iconscalevar;
+        $comparison = $templateSource->useiconscale . ' ' . $templateSource->iconscalevar;
 
         if ($val != $comparison) {
             $output .= "\tUSEICONSCALE " . $val . "\n";
         }
 
-        $val = $this->labeloffsetx . " " . $this->labeloffsety;
-        $comparison = $templateSource->labeloffsetx . " " . $templateSource->labeloffsety;
+        $val = $this->labeloffsetx . ' ' . $this->labeloffsety;
+        $comparison = $templateSource->labeloffsetx . ' ' . $templateSource->labeloffsety;
 
         if ($comparison != $val) {
             $output .= "\tLABELOFFSET " . $val . "\n";
         }
 
-        $val = $this->x . " " . $this->y;
-        $comparison = $templateSource->x . " " . $templateSource->y;
+        $val = $this->x . ' ' . $this->y;
+        $comparison = $templateSource->x . ' ' . $templateSource->y;
 
         if ($val != $comparison) {
             if ($this->positionRelativeTo == '') {
                 $output .= "\tPOSITION " . $val . "\n";
             } else {
                 if ($this->polar) {
-                    $output .= "\tPOSITION " . $this->positionRelativeTo . " " . $this->originalX . "r" . $this->originalY . "\n";
+                    $output .= "\tPOSITION " . $this->positionRelativeTo . ' ' . $this->originalX . 'r' . $this->originalY . "\n";
                 } elseif ($this->positionedByName) {
-                    $output .= "\tPOSITION " . $this->positionRelativeTo . ":" . $this->relative_name . "\n";
+                    $output .= "\tPOSITION " . $this->positionRelativeTo . ':' . $this->relative_name . "\n";
                 } else {
-                    $output .= "\tPOSITION " . $this->positionRelativeTo . " " . $this->originalX . " " . $this->originalY . "\n";
+                    $output .= "\tPOSITION " . $this->positionRelativeTo . ' ' . $this->originalX . ' ' . $this->originalY . "\n";
                 }
             }
         }
 
-        $output .= $this->getMaxValueConfig($templateSource, "MAXVALUE");
+        $output .= $this->getMaxValueConfig($templateSource, 'MAXVALUE');
 
         $output .= $this->getHintConfig($templateSource);
 
@@ -578,7 +580,7 @@ class MapNode extends MapDataItem
         }
 
         if ($output != '') {
-            $output = "NODE " . $this->name . "\n$output\n";
+            $output = 'NODE ' . $this->name . "\n$output\n";
         }
 
         return $output;
@@ -587,43 +589,43 @@ class MapNode extends MapDataItem
     protected function asJSCore()
     {
         // TODO - this should use json_encode()
-        $output = "";
+        $output = '';
 
-        $output .= "x:" . (is_null($this->x) ? "'null'" : $this->x) . ", ";
-        $output .= "y:" . (is_null($this->y) ? "'null'" : $this->y) . ", ";
-        $output .= "\"id\":" . $this->id . ", ";
-        $output .= "ox:" . $this->originalX . ", ";
-        $output .= "oy:" . $this->originalY . ", ";
-        $output .= "relative_to:" . StringUtility::jsEscape($this->positionRelativeTo) . ", ";
-        $output .= "label:" . StringUtility::jsEscape($this->label) . ", ";
-        $output .= "name:" . StringUtility::jsEscape($this->name) . ", ";
-        $output .= "infourl:" . StringUtility::jsEscape($this->infourl[IN]) . ", ";
-        $output .= "overlibcaption:" . StringUtility::jsEscape($this->overlibcaption[IN]) . ", ";
-        $output .= "overliburl:" . StringUtility::jsEscape(join(" ", $this->overliburl[IN])) . ", ";
-        $output .= "overlibwidth:" . $this->overlibheight . ", ";
-        $output .= "overlibheight:" . $this->overlibwidth . ", ";
-        if (sizeof($this->boundingboxes) > 0) {
+        $output .= 'x:' . (is_null($this->x) ? "'null'" : $this->x) . ', ';
+        $output .= 'y:' . (is_null($this->y) ? "'null'" : $this->y) . ', ';
+        $output .= '"id":' . $this->id . ', ';
+        $output .= 'ox:' . $this->originalX . ', ';
+        $output .= 'oy:' . $this->originalY . ', ';
+        $output .= 'relative_to:' . StringUtility::jsEscape($this->positionRelativeTo) . ', ';
+        $output .= 'label:' . StringUtility::jsEscape($this->label) . ', ';
+        $output .= 'name:' . StringUtility::jsEscape($this->name) . ', ';
+        $output .= 'infourl:' . StringUtility::jsEscape($this->infourl[IN]) . ', ';
+        $output .= 'overlibcaption:' . StringUtility::jsEscape($this->overlibcaption[IN]) . ', ';
+        $output .= 'overliburl:' . StringUtility::jsEscape(join(' ', $this->overliburl[IN])) . ', ';
+        $output .= 'overlibwidth:' . $this->overlibheight . ', ';
+        $output .= 'overlibheight:' . $this->overlibwidth . ', ';
+        if (count($this->boundingboxes) > 0) {
             $output .= sprintf(
-                "bbox:[%d,%d, %d,%d], ",
+                'bbox:[%d,%d, %d,%d], ',
                 $this->boundingboxes[0][0],
                 $this->boundingboxes[0][1],
                 $this->boundingboxes[0][2],
                 $this->boundingboxes[0][3]
             );
         } else {
-            $output .= "bbox: [], ";
+            $output .= 'bbox: [], ';
         }
 
-        if (preg_match("/^(none|nink|inpie|outpie|box|rbox|gauge|round)$/", $this->iconfile)) {
-            $output .= "iconfile:" . StringUtility::jsEscape("::" . $this->iconfile);
+        if (preg_match('/^(none|nink|inpie|outpie|box|rbox|gauge|round)$/', $this->iconfile)) {
+            $output .= 'iconfile:' . StringUtility::jsEscape('::' . $this->iconfile);
         } else {
-            $output .= "iconfile:" . StringUtility::jsEscape($this->iconfile);
+            $output .= 'iconfile:' . StringUtility::jsEscape($this->iconfile);
         }
 
         return $output;
     }
 
-    public function asJS($type = "Node", $prefix = "N")
+    public function asJS($type = 'Node', $prefix = 'N')
     {
         return parent::asJS($type, $prefix);
     }
@@ -635,7 +637,7 @@ class MapNode extends MapDataItem
 
     public function isRelativePositioned()
     {
-        if ($this->positionRelativeTo != "") {
+        if ($this->positionRelativeTo != '') {
             return true;
         }
 
@@ -724,14 +726,6 @@ class MapNode extends MapDataItem
         $this->imageRef = null;
     }
 
-    public function getValue($name)
-    {
-        MapUtility::wm_debug("Fetching %s\n", $name);
-        if (property_exists($this, $name)) {
-            return $this->$name;
-        }
-        throw new WeathermapInternalFail("NoSuchProperty");
-    }
 
     private function getDirectionList()
     {
@@ -754,7 +748,7 @@ class MapNode extends MapDataItem
      */
     private function drawArtificialIcon(&$map, $labelColour)
     {
-        MapUtility::wm_debug("Artificial Icon type " . $this->iconfile . " for $this->name\n");
+        MapUtility::wm_debug('Artificial Icon type ' . $this->iconfile . " for $this->name\n");
         // this is an artificial icon - we don't load a file for it
 
         $iconImageRef = $this->createTransparentImage($this->iconscalew, $this->iconscaleh);
@@ -765,25 +759,25 @@ class MapNode extends MapDataItem
         MapUtility::wm_debug("fill is: $finalFillColour\n");
 
         switch ($this->iconfile) {
-            case "box":
+            case 'box':
                 $this->drawArtificialIconBox($iconImageRef, $finalFillColour, $finalInkColour);
                 break;
-            case "rbox":
+            case 'rbox':
                 $this->drawArtificialIconRoundedBox($iconImageRef, $finalFillColour, $finalInkColour);
                 break;
-            case "round":
+            case 'round':
                 $this->drawArtificialIconRound($iconImageRef, $finalFillColour, $finalInkColour);
                 break;
-            case "nink":
+            case 'nink':
                 $this->drawArtificialIconNINK($iconImageRef, $finalInkColour, $map);
                 break;
-            case "inpie":
+            case 'inpie':
                 $this->drawArtificialIconPie($iconImageRef, $finalFillColour, $finalInkColour, IN);
                 break;
-            case "outpie":
+            case 'outpie':
                 $this->drawArtificialIconPie($iconImageRef, $finalFillColour, $finalInkColour, OUT);
                 break;
-            case "gauge":
+            case 'gauge':
                 MapUtility::wm_warn('gauge AICON not implemented yet [WMWARN99]');
                 break;
         }
@@ -800,16 +794,16 @@ class MapNode extends MapDataItem
     {
         $this->iconfile = $map->ProcessString($this->iconfile, $this);
 
-        MapUtility::wm_debug("Actual image-based icon from " . $this->iconfile . " for $this->name\n");
+        MapUtility::wm_debug('Actual image-based icon from ' . $this->iconfile . " for $this->name\n");
 
         $iconImageRef = null;
 
         if (is_readable($this->iconfile)) {
             // draw the supplied icon, instead of the labelled box
             if (isset($iconColour)) {
-                $colourisationMethod = "imagecolorize";
-                if (function_exists("imagefilter") && $map->getHint("use_imagefilter") == 1) {
-                    $colourisationMethod = "imagefilter";
+                $colourisationMethod = 'imagecolorize';
+                if (function_exists('imagefilter') && $map->getHint('use_imagefilter') == 1) {
+                    $colourisationMethod = 'imagefilter';
                 }
 
                 $iconImageRef = $this->owner->imagecache->imagecreatescaledcolourizedfromfile(
@@ -1116,8 +1110,8 @@ class MapNode extends MapDataItem
             // XXX - need a font definition from somewhere for NINK text
             $font = 1;
 
-            $instr = $map->ProcessString("{node:this:bandwidth_in:%.1k}", $this);
-            $outstr = $map->ProcessString("{node:this:bandwidth_out:%.1k}", $this);
+            $instr = $map->ProcessString('{node:this:bandwidth_in:%.1k}', $this);
+            $outstr = $map->ProcessString('{node:this:bandwidth_out:%.1k}', $this);
 
             $fontObject = $this->owner->fonts->getFont($font);
             list($textWidth, $textHeight) = $fontObject->calculateImageStringSize($instr);
@@ -1226,7 +1220,7 @@ class MapNode extends MapDataItem
         $configuredAIOutlineColour = $this->aiconoutlinecolour;
 
         // if useiconscale isn't set, then use the static colour defined, or copy the colour from the label
-        if ($this->useiconscale == "none") {
+        if ($this->useiconscale == 'none') {
             if ($configuredAIFillColour->isCopy() && !$labelColour->isNone()) {
                 $finalFillColour = $labelColour;
             } else {
@@ -1279,6 +1273,41 @@ class MapNode extends MapDataItem
             }
         }
         return $failed;
+    }
+
+    public function getProperty($name)
+    {
+        MapUtility::wm_debug("Fetching %s\n", $name);
+
+        $translations = array(
+            "inscalekey"=>$this->scaleKeys[IN],
+            "outscalekey"=>$this->scaleKeys[OUT],
+            "inscaletag"=>$this->scaleTags[IN],
+            "outscaletag"=>$this->scaleTags[OUT],
+            "bandwidth_in"=>$this->absoluteUsages[IN],
+            "inpercent"=>$this->percentUsages[IN],
+            "bandwidth_out"=>$this->absoluteUsages[OUT],
+            "outpercent"=>$this->percentUsages[OUT],
+            "max_bandwidth_in"=>$this->maxValues[IN],
+            'max_bandwidth_in_cfg'=>$this->maxValuesConfigured[IN],
+            "max_bandwidth_out"=>$this->maxValues[OUT],
+            'max_bandwidth_out_cfg'=>$this->maxValuesConfigured[OUT],
+        );
+
+        if (array_key_exists($name, $translations)) {
+            return $translations[$name];
+        }
+        // TODO - at some point, we can remove this bit, and limit access to ONLY the things listed above
+        if (property_exists($this, $name)) {
+            return $this->$name;
+        }
+
+        throw new WeathermapRuntimeWarning("NoSuchProperty");
+    }
+
+    public function __toString()
+    {
+        return sprintf("[NODE %s]", $this->name);
     }
 }
 

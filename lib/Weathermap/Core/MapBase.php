@@ -33,12 +33,12 @@ class MapBase
 
     function __toString()
     {
-        return $this->myType() . " " . (isset($this->name) ? $this->name : "[unnamed]");
+        return $this->myType() . ' ' . (isset($this->name) ? $this->name : '[unnamed]');
     }
 
     public function myType()
     {
-        return "BASE";
+        return 'BASE';
     }
 
     function addNote($name, $value)
@@ -92,7 +92,7 @@ class MapBase
      */
     public function getHintConfig($dd)
     {
-        $output = "";
+        $output = '';
         foreach ($this->hints as $hintName => $hint) {
             // all hints for DEFAULT node are for writing
             // only changed ones, or unique ones, otherwise
@@ -181,7 +181,7 @@ class MapBase
          * In the future it would allow a client-side drawing editor to know which items are "dirty" after a change, too.
          *
          */
-        throw new WeathermapUnimplementedException("Dynamic dependencies not implemented yet");
+        throw new WeathermapUnimplementedException('Dynamic dependencies not implemented yet');
 
         return 0;
     }
@@ -243,7 +243,7 @@ class MapBase
      */
     protected function getSimpleConfig($basic_params, $reference)
     {
-        $output = "";
+        $output = '';
         foreach ($basic_params as $param) {
             $field = $param[0];
             $keyword = $param[1];

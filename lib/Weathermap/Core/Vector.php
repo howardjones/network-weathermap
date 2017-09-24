@@ -117,6 +117,6 @@ class Vector
      */
     public function __toString()
     {
-        return sprintf("[%.2f,%.2f]", $this->dx, $this->dy);
+        return sprintf('[%.2f,%.2f]', $this->dx, $this->dy);
     }
 }

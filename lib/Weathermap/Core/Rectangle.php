@@ -97,6 +97,6 @@ class Rectangle
 
     public function __toString()
     {
-        return sprintf("[%sx%s]", $this->topLeft, $this->bottomRight);
+        return sprintf('[%sx%s]', $this->topLeft, $this->bottomRight);
     }
 }

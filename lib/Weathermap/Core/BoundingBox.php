@@ -9,7 +9,7 @@ class BoundingBox
     private $minimumY;
     private $name;
 
-    public function __construct($name = "")
+    public function __construct($name = '')
     {
         $this->name = $name;
         $this->minimumX = null;
@@ -60,7 +60,7 @@ class BoundingBox
                 return new Rectangle(0, 0, 0, 0);
             }
 
-            throw new WeathermapInternalFail("No Bounding Box until points are added");
+            throw new WeathermapInternalFail('No Bounding Box until points are added');
         }
         return new Rectangle($this->minimumX, $this->minimumY, $this->maximumX, $this->maximumY);
     }
@@ -70,7 +70,7 @@ class BoundingBox
         try {
             $r = $this->getBoundingRectangle(false);
         } catch (WeathermapInternalFail $e) {
-            $r = "[Empty BBox]";
+            $r = '[Empty BBox]';
         }
         return "$r";
     }

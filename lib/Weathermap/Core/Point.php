@@ -145,12 +145,12 @@ class Point
 
     public function asConfig()
     {
-        return sprintf("%d %d", $this->x, $this->y);
+        return sprintf('%d %d', $this->x, $this->y);
     }
 
     public function __toString()
     {
-        return sprintf("(%.2f,%.2f)", floatval($this->x), floatval($this->y));
+        return sprintf('(%.2f,%.2f)', floatval($this->x), floatval($this->y));
     }
 
     public function translate($deltaX, $deltaY)

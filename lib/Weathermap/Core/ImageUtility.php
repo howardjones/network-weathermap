@@ -6,7 +6,7 @@ class ImageUtility
 {
     public static function wmDrawMarkerCross($gdImage, $colour, $point, $size = 5)
     {
-        $relative_moves = array(
+        $relativeMoves = array(
             array(-1, 0),
             array(2, 0),
             array(-1, 0),
@@ -14,7 +14,7 @@ class ImageUtility
             array(0, 2)
         );
 
-        self::wmDrawMarkerPolygon($gdImage, $colour, $point, $size, $relative_moves);
+        self::wmDrawMarkerPolygon($gdImage, $colour, $point, $size, $relativeMoves);
     }
 
     /**
@@ -22,43 +22,43 @@ class ImageUtility
      * @param resource $colour
      * @param Point $point
      * @param float $size
-     * @param float[][] $relative_moves
+     * @param float[][] $relativeMoves
      */
-    public static function wmDrawMarkerPolygon($gdImage, $colour, $point, $size, $relative_moves)
+    public static function wmDrawMarkerPolygon($gdImage, $colour, $point, $size, $relativeMoves)
     {
         $points = array();
 
-        foreach ($relative_moves as $move) {
+        foreach ($relativeMoves as $move) {
             $point->translate($move[0] * $size, $move[1] * $size);
             $points[] = $point->x;
             $points[] = $point->y;
         }
 
-        imagepolygon($gdImage, $points, count($relative_moves), $colour);
+        imagepolygon($gdImage, $points, count($relativeMoves), $colour);
     }
 
     public static function wmDrawMarkerDiamond($gdImage, $colour, $point, $size = 10)
     {
-        $relative_moves = array(
+        $relativeMoves = array(
             array(-1, 0),
             array(1, -1),
             array(1, 1),
             array(-1, 1),
         );
 
-        self::wmDrawMarkerPolygon($gdImage, $colour, $point, $size, $relative_moves);
+        self::wmDrawMarkerPolygon($gdImage, $colour, $point, $size, $relativeMoves);
     }
 
     public static function wmDrawMarkerBox($gdImage, $colour, $point, $size = 10)
     {
-        $relative_moves = array(
+        $relativeMoves = array(
             array(-1, -1),
             array(2, 0),
             array(0, 2),
             array(-2, 0),
         );
 
-        self::wmDrawMarkerPolygon($gdImage, $colour, $point, $size, $relative_moves);
+        self::wmDrawMarkerPolygon($gdImage, $colour, $point, $size, $relativeMoves);
     }
 
     public static function wmDrawMarkerCircle($gdImage, $colour, $point, $size = 10)
@@ -117,9 +117,9 @@ class ImageUtility
         $imageRef = null;
 
         $conversion = array(
-            IMAGETYPE_GIF => array(IMG_GIF, "GIF", "Image file $filename is GIF, but GIF is not supported by your GD library. [WMIMG01]\n"),
-            IMAGETYPE_JPEG => array(IMG_JPEG, "JPEG", "Image file $filename is JPEG, but JPEG is not supported by your GD library. [WMIMG02]\n"),
-            IMAGETYPE_PNG => array(IMG_PNG, "PNG", "Image file $filename is PNG, but PNG is not supported by your GD library. [WMIMG03]\n")
+            IMAGETYPE_GIF => array(IMG_GIF, 'GIF', "Image file $filename is GIF, but GIF is not supported by your GD library. [WMIMG01]\n"),
+            IMAGETYPE_JPEG => array(IMG_JPEG, 'JPEG', "Image file $filename is JPEG, but JPEG is not supported by your GD library. [WMIMG02]\n"),
+            IMAGETYPE_PNG => array(IMG_PNG, 'PNG', "Image file $filename is PNG, but PNG is not supported by your GD library. [WMIMG03]\n")
         );
 
         if (!is_readable($filename)) {
@@ -156,15 +156,15 @@ class ImageUtility
         return $imageRef;
     }
 
-    public static function ImageTrueColorToPalette2($image, $dither, $ncolors)
+    public static function ImageTrueColorToPalette2($image, $dither, $numColours)
     {
         $width = imagesx($image);
         $height = imagesy($image);
-        $colors_handle = ImageCreateTrueColor($width, $height);
-        ImageCopyMerge($colors_handle, $image, 0, 0, 0, 0, $width, $height, 100);
-        ImageTrueColorToPalette($image, $dither, $ncolors);
-        ImageColorMatch($colors_handle, $image);
-        ImageDestroy($colors_handle);
+        $imageTCRef = ImageCreateTrueColor($width, $height);
+        ImageCopyMerge($imageTCRef, $image, 0, 0, 0, 0, $width, $height, 100);
+        ImageTrueColorToPalette($image, $dither, $numColours);
+        ImageColorMatch($imageTCRef, $image);
+        ImageDestroy($imageTCRef);
     }
 
 // taken from here:
@@ -210,10 +210,10 @@ class ImageUtility
                 $rgba = imagecolorat($imageRef, $x, $y);
                 $r = ($rgba >> 16) & 0xFF;
                 $alpha = ($rgba & 0x7F000000) >> 24;
-                $new_r = $pal[$r]['r'];
-                $new_g = $pal[$r]['g'];
-                $new_b = $pal[$r]['b'];
-                $col = imagecolorallocatealpha($imageRef, $new_r, $new_g, $new_b, $alpha);
+                $newR = $pal[$r]['r'];
+                $newG = $pal[$r]['g'];
+                $newB = $pal[$r]['b'];
+                $col = imagecolorallocatealpha($imageRef, $newR, $newG, $newB, $alpha);
                 imagesetpixel($imageRef, $x, $y, $col);
             }
         }

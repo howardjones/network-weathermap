@@ -1,6 +1,9 @@
 <?php
 namespace Weathermap\Plugins\Datasources;
 
+use Weathermap\Core\MapUtility;
+use Weathermap\Core\StringUtility;
+
 // template class for data sources. All data sources extend this class.
 // I really wish PHP4 would just die overnight
 class DatasourceBase
@@ -62,8 +65,8 @@ class DatasourceBase
      * returns an array of two values (in,out). -1,-1 if it couldn't get valid data
      *
      * @param string $targetstring
-     * @param WeatherMap $map
-     * @param WeatherMapDataItem $item
+     * @param Map $map
+     * @param MapDataItem $item
      * @return array
      */
     function ReadData($targetstring, &$map, &$item)
@@ -80,12 +83,12 @@ class DatasourceBase
      */
     function ReturnData()
     {
-        wm_debug(
+        MapUtility::wm_debug(
             sprintf(
                 "%s ReadData: Returning (%s, %s, %s)\n",
                 $this->name,
-                WMUtility::valueOrNull($this->data[IN]),
-                WMUtility::valueOrNull($this->data[OUT]),
+                StringUtility::valueOrNull($this->data[IN]),
+                StringUtility::valueOrNull($this->data[OUT]),
                 $this->dataTime
             )
         );
@@ -117,7 +120,7 @@ class DatasourceBase
      * Run after all data collection
      * some plugin might need to update a local cache, close files, or other state
      *
-     * @param WeatherMap $map the WeatherMap main object
+     * @param Map $map the WeatherMap main object
      */
     public function CleanUp(&$map)
     {

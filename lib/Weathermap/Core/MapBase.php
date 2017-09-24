@@ -137,7 +137,7 @@ class MapBase
 
             // if we got to the top of the tree without finding it, that's probably a typo in the original getConfig()
             if (is_null($value) && is_null($this->parent)) {
-                wm_warn("Tried to get config keyword '$keyname' with no result. [WMWARN300]");
+                MapUtility::wm_warn("Tried to get config keyword '$keyname' with no result. [WMWARN300]");
             }
             return array($value, $direct);
         }

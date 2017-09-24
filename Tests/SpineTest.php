@@ -6,13 +6,16 @@
  * Time: 07:35
  */
 
-require_once dirname(__FILE__) . '/../lib/all.php';
+//require_once dirname(__FILE__) . '/../lib/all.php';
 
-class WMSpineTest extends PHPUnit_Framework_TestCase {
+use Weathermap\Core\Spine;
+use Weathermap\Core\Point;
+
+class SpineTest extends PHPUnit_Framework_TestCase {
 
     function testSimplify()
     {
-        $testSpine = new WMSpine();
+        $testSpine = new Spine();
 
         $testSpine->addPoint(new Point(50,50));
         $testSpine->addPoint(new Point(70,50)); // redundant
@@ -32,7 +35,7 @@ class WMSpineTest extends PHPUnit_Framework_TestCase {
 
     function testPointAngleSearch()
     {
-        $testSpine = new WMSpine();
+        $testSpine = new Spine();
 
         $testSpine->addPoint(new Point(50,50));
         $testSpine->addPoint(new Point(150,50));
@@ -91,7 +94,7 @@ class WMSpineTest extends PHPUnit_Framework_TestCase {
 
     function testPointSearch()
     {
-        $testSpine = new WMSpine();
+        $testSpine = new Spine();
 
         $testSpine->addPoint(new Point(50,50));
         $testSpine->addPoint(new Point(150,50));
@@ -108,7 +111,7 @@ class WMSpineTest extends PHPUnit_Framework_TestCase {
 
     function testDistanceSearch()
     {
-        $testSpine = new WMSpine();
+        $testSpine = new Spine();
 
         $testSpine->addPoint(new Point(50,50));
         $testSpine->addPoint(new Point(150,50));

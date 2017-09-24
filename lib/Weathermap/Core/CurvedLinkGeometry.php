@@ -41,7 +41,7 @@ class CurvedLinkGeometry extends LinkGeometry
 
     protected function generateOutlines()
     {
-        wm_debug("Calculating curved-style outline\n");
+        MapUtility::wm_debug("Calculating curved-style outline\n");
 
         foreach ($this->directions as $direction) {
             $there = array();

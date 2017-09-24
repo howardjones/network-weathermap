@@ -667,7 +667,7 @@ class MapNode extends MapDataItem
 
     public function getPosition()
     {
-        return new WMPoint($this->x, $this->y);
+        return new Point($this->x, $this->y);
     }
 
     public function setPosition($point)
@@ -805,10 +805,10 @@ class MapNode extends MapDataItem
 
     /**
      * @param Map $map
-     * @param WMPoint $textPoint
+     * @param Point $textPoint
      * @param Colour $col
      * @param resource $node_im
-     * @param WMRectangle $labelBox
+     * @param Rectangle $labelBox
      */
     private function drawLabel(&$map, $textPoint, $col, $node_im, $labelBox)
     {
@@ -928,11 +928,11 @@ class MapNode extends MapDataItem
     private function drawArtificialIconRoundedBox($icon_im, $finalFillColour, $finalInkColour)
     {
         if (!$finalFillColour->isNone()) {
-            imagefilledroundedrectangle($icon_im, 0, 0, $this->iconscalew - 1, $this->iconscaleh - 1, 4, $finalFillColour->gdallocate($icon_im));
+            ImageUtility::imagefilledroundedrectangle($icon_im, 0, 0, $this->iconscalew - 1, $this->iconscaleh - 1, 4, $finalFillColour->gdallocate($icon_im));
         }
 
         if (!$finalInkColour->isNone()) {
-            imageroundedrectangle($icon_im, 0, 0, $this->iconscalew - 1, $this->iconscaleh - 1, 4, $finalInkColour->gdallocate($icon_im));
+            ImageUtility::imageroundedrectangle($icon_im, 0, 0, $this->iconscalew - 1, $this->iconscaleh - 1, 4, $finalInkColour->gdallocate($icon_im));
         }
     }
 
@@ -956,7 +956,7 @@ class MapNode extends MapDataItem
     }
 
     /**
-     * @param $map
+     * @param Map $map
      * @param resource $icon_im
      * @param Colour $finalInkColour
      */
@@ -1007,7 +1007,7 @@ class MapNode extends MapDataItem
     {
         $percentValue = $this->percentUsages[$which];
 
-        $segmentAngle = clip(($percentValue / 100) * 360, 1, 360);
+        $segmentAngle = MathUtility::clip(($percentValue / 100) * 360, 1, 360);
 
         $xRadius = $this->iconscalew / 2 - 1;
         $yRadius = $this->iconscaleh / 2 - 1;

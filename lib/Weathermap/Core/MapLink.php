@@ -469,7 +469,7 @@ class MapLink extends MapDataItem
         $points = array($topleft_x, $topleft_y, $topleft_x, $botright_y, $botright_x, $botright_y, $botright_x, $topleft_y, $centre->x - $strWidth / 2, $centre->y + $strHeight / 2 + 1);
 
         if ($radianAngle != 0) {
-            rotateAboutPoint($points, $centre->x, $centre->y, $radianAngle);
+            MathUtility::rotateAboutPoint($points, $centre->x, $centre->y, $radianAngle);
         }
 
         $textY = array_pop($points);

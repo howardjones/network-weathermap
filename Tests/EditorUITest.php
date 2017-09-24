@@ -1,10 +1,11 @@
 <?php
 
-require_once dirname(__FILE__) . '/../lib/all.php';
-require_once dirname(__FILE__) . '/../lib/Editor.php';
-require_once dirname(__FILE__) . '/../lib/EditorUI.php';
+// Weathermap\UI\wmeSanitize_xxxx all live in here at the moment as loose functions
+require_once dirname(__FILE__) . '/../lib/Weathermap/UI/UIBase.php';
 
-class WeatherMapEditorUITest extends PHPUnit_Framework_TestCase
+use Weathermap\Editor\EditorUI;
+
+class EditorUITest extends PHPUnit_Framework_TestCase
 {
     function testParameterValidation()
     {
@@ -36,8 +37,8 @@ class WeatherMapEditorUITest extends PHPUnit_Framework_TestCase
     }
 
     /**
-     * @throws WeathermapInternalFail
-     * @expectedException WeathermapInternalFail
+     * @throws Weathermap\Core\WeathermapInternalFail
+     * @expectedException Weathermap\Core\WeathermapInternalFail
      */
     function testValidateArgsException()
     {
@@ -61,19 +62,19 @@ class WeatherMapEditorUITest extends PHPUnit_Framework_TestCase
 
     function testSanitizers()
     {
-        $this->assertEquals("test.conf", wmeSanitizeConfigFile("test.conf"));
-        $this->assertEquals("te-st.conf", wmeSanitizeConfigFile("te-st.conf"));
-        $this->assertEquals("", wmeSanitizeConfigFile("test"));
-        $this->assertEquals("", wmeSanitizeConfigFile("test.png"));
-        $this->assertEquals("", wmeSanitizeConfigFile("index.php"));
-        $this->assertEquals("", wmeSanitizeConfigFile(".htaccess"));
-        $this->assertEquals("", wmeSanitizeConfigFile("../../conf/apache.conf"));
-        $this->assertEquals("", wmeSanitizeConfigFile("../../etc/passwd"));
-        $this->assertEquals("", wmeSanitizeConfigFile("file*.conf"));
+        $this->assertEquals("test.conf", Weathermap\UI\wmeSanitizeConfigFile("test.conf"));
+        $this->assertEquals("te-st.conf", Weathermap\UI\wmeSanitizeConfigFile("te-st.conf"));
+        $this->assertEquals("", Weathermap\UI\wmeSanitizeConfigFile("test"));
+        $this->assertEquals("", Weathermap\UI\wmeSanitizeConfigFile("test.png"));
+        $this->assertEquals("", Weathermap\UI\wmeSanitizeConfigFile("index.php"));
+        $this->assertEquals("", Weathermap\UI\wmeSanitizeConfigFile(".htaccess"));
+        $this->assertEquals("", Weathermap\UI\wmeSanitizeConfigFile("../../conf/apache.conf"));
+        $this->assertEquals("", Weathermap\UI\wmeSanitizeConfigFile("../../etc/passwd"));
+        $this->assertEquals("", Weathermap\UI\wmeSanitizeConfigFile("file*.conf"));
 
-        $this->assertEquals("fish.ext1", wmeSanitizeFile("fish.ext1", array("ext1", "ext2")));
-        $this->assertEquals("", wmeSanitizeFile("fish.ext1", array("ext2", "ext3")));
-        $this->assertEquals("", wmeSanitizeFile("fish", array("ext2", "ext3")));
+        $this->assertEquals("fish.ext1", Weathermap\UI\wmeSanitizeFile("fish.ext1", array("ext1", "ext2")));
+        $this->assertEquals("", Weathermap\UI\wmeSanitizeFile("fish.ext1", array("ext2", "ext3")));
+        $this->assertEquals("", Weathermap\UI\wmeSanitizeFile("fish", array("ext2", "ext3")));
     }
 
     function testUIInternals()

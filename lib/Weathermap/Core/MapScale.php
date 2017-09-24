@@ -130,7 +130,7 @@ class MapScale extends MapItem
                 $this->scalemisscolour = $colour;
                 break;
             default:
-                wm_warn("Unexpected colour name in WeatherMapScale->SetColour");
+                MapUtility::wm_warn("Unexpected colour name in WeatherMapScale->SetColour");
                 break;
         }
     }
@@ -150,7 +150,7 @@ class MapScale extends MapItem
 
         if ($this->spanCount() == 0) {
             if ($this->name != 'none') {
-                wm_warn(sprintf("ColourFromValue: Attempted to use non-existent scale: %s for item %s [WMWARN09]\n", $this->name, $itemName));
+                MapUtility::wm_warn(sprintf("ColourFromValue: Attempted to use non-existent scale: %s for item %s [WMWARN09]\n", $this->name, $itemName));
             } else {
                 return array(new Colour(255, 255, 255), '', '');
             }
@@ -161,7 +161,7 @@ class MapScale extends MapItem
             $value = min($value, 100);
             $value = max($value, 0);
             if ($value != $oldValue && $nowarn_clipping == 0) {
-                wm_warn("ColourFromValue: Clipped $oldValue% to $value% for item $itemName [WMWARN33]\n");
+                MapUtility::wm_warn("ColourFromValue: Clipped $oldValue% to $value% for item $itemName [WMWARN33]\n");
             }
         }
 
@@ -169,7 +169,7 @@ class MapScale extends MapItem
 
         if (null === $col) {
             if ($nowarn_scalemisses == 0) {
-                wm_warn(
+                MapUtility::wm_warn(
                     "ColourFromValue: Scale $scaleName doesn't include a line for $value"
                     . ($isPercentage ? "%" : "") . " while drawing item $itemName [WMWARN29]\n"
                 );
@@ -563,7 +563,7 @@ class MapScale extends MapItem
     private function sortScale()
     {
         // $colours = $this->colours[$scaleName];
-        usort($this->entries, array("WeatherMapScale", "scaleEntrySort"));
+        usort($this->entries, array('Weathermap\\Core\\MapScale', "scaleEntrySort"));
     }
 
     private function DrawLegendHorizontal($keyWidth = 400)

@@ -1,6 +1,17 @@
 <?php
 
-require_once dirname(__FILE__).'/../lib/all.php';
+//require_once dirname(__FILE__).'/../lib/all.php';
+
+use Weathermap\Core\Point;
+use Weathermap\Core\Rectangle;
+use Weathermap\Core\Line;
+use Weathermap\Core\LineSegment;
+use Weathermap\Core\Vector;
+use Weathermap\Core\BoundingBox;
+use Weathermap\Core\CatmullRom1D;
+use Weathermap\Core\MathUtility;
+
+use Weathermap\Core\WeathermapInternalFail;
 
 class GeometryTest  extends PHPUnit_Framework_TestCase {
 
@@ -16,7 +27,7 @@ class GeometryTest  extends PHPUnit_Framework_TestCase {
         $this->assertTrue($point1->identical(new Point(25, 36)));
 
         $point2 = $point1->translate(-15, -16);
-        $this->assertInstanceOf("WMPoint", $point2);
+        $this->assertInstanceOf("Weathermap\\Core\\Point", $point2);
 
         $this->assertTrue($point1->identical(new Point(10, 20)));
         $this->assertTrue($point2->identical(new Point(10, 20)));
@@ -32,7 +43,7 @@ class GeometryTest  extends PHPUnit_Framework_TestCase {
 
         $point2 = $point1->translatePolar(0, 20);
 
-        $this->assertInstanceOf("WMPoint", $point2, "translatePolar() returns itself for chaining");
+        $this->assertInstanceOf("Weathermap\\Core\\Point", $point2, "translatePolar() returns itself for chaining");
         $this->assertEquals($point1, $point2);
         $this->assertTrue($point1->closeEnough(new Point(20, 10)), "The new point is 20 units up");
         $this->assertTrue($point2->closeEnough(new Point(20, 10)), "The new point is 20 units up");
@@ -64,13 +75,13 @@ class GeometryTest  extends PHPUnit_Framework_TestCase {
         $point2 = new Point(10,0);
         $point3 = new Point(0,10);
 
-        $this->assertEquals(50, getTriangleArea($ooint1, $point2, $point3));
+        $this->assertEquals(50, MathUtility::getTriangleArea($ooint1, $point2, $point3));
 
         $ooint1 = new Point(6,35);
         $point2 = new Point(15,10);
         $point3 = new Point(50,29);
 
-        $this->assertEquals(523, getTriangleArea($ooint1, $point2, $point3));
+        $this->assertEquals(523, MathUtility::getTriangleArea($ooint1, $point2, $point3));
     }
 
     public function testCatmullRom()
@@ -113,7 +124,7 @@ class GeometryTest  extends PHPUnit_Framework_TestCase {
         $this->assertEquals(20, $point8->distanceToPoint($point1));
 
 
-        $vector1 = new WMVector(10,40);
+        $vector1 = new Vector(10,40);
         $vector2 = $point1->vectorToPoint($point2);
 
         $point9 = $point1->LERPWith($point3, 0.5);
@@ -150,11 +161,11 @@ class GeometryTest  extends PHPUnit_Framework_TestCase {
     {
         $infiniteSlope = 10000000000.0;
 
-        $vector1 = new WMVector(0,0);
-        $vector2 = new WMVector(10,0);
-        $vector3 = new WMVector(0,5);
-        $vector4 = new WMVector(-20,20);
-        $vector5 = new WMVector(10,20);
+        $vector1 = new Vector(0,0);
+        $vector2 = new Vector(10,0);
+        $vector3 = new Vector(0,5);
+        $vector4 = new Vector(-20,20);
+        $vector5 = new Vector(10,20);
 
         $this->assertEquals(0, $vector1->length());
         $this->assertEquals(10, $vector2->length());
@@ -218,25 +229,25 @@ class GeometryTest  extends PHPUnit_Framework_TestCase {
 
     public function testLineException()
     {
-        $line1 = new Line(new Point(50,50), new WMVector(1,0) );
-        $line3 = new Line(new Point(70,0), new WMVector(1,0) );
+        $line1 = new Line(new Point(50,50), new Vector(1,0) );
+        $line3 = new Line(new Point(70,0), new Vector(1,0) );
 
-        $this->setExpectedException("WeathermapInternalFail");
+        $this->setExpectedException("Weathermap\\Core\\WeathermapInternalFail");
         $line1->findCrossingPoint($line3);
     }
 
     public function testLineSegment()
     {
-        $lineseg1 = new WMLineSegment( new Point(12,36), new Point(72,19));
+        $lineseg1 = new LineSegment( new Point(12,36), new Point(72,19));
         $this->assertEquals("{(12.00,36.00)--(72.00,19.00)}","$lineseg1");
     }
 
     public function testLine()
     {
-        $line1 = new Line(new Point(50,50), new WMVector(1,0) );
-        $line2 = new Line(new Point(100,0), new WMVector(0,1) );
-        $line3 = new Line(new Point(30,0), new WMVector(3,1) );
-        $line4 = new Line(new Point(0,0), new WMVector(1,1) );
+        $line1 = new Line(new Point(50,50), new Vector(1,0) );
+        $line2 = new Line(new Point(100,0), new Vector(0,1) );
+        $line3 = new Line(new Point(30,0), new Vector(3,1) );
+        $line4 = new Line(new Point(0,0), new Vector(1,1) );
 
         $this->assertEquals(0, $line1->getSlope());
         $this->assertEquals(1e10, $line2->getSlope()); // this is our "INFINITE" value
@@ -288,7 +299,7 @@ class GeometryTest  extends PHPUnit_Framework_TestCase {
         $this->assertTrue($rect1->identical($rect1a));
 
         $rect1b = $rect1a->copy();
-        $this->assertInstanceOf("WMRectangle", $rect1b);
+        $this->assertInstanceOf("Weathermap\\Core\\Rectangle", $rect1b);
         $this->assertTrue($rect1a->identical($rect1b));
 
     }

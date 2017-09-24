@@ -1,7 +1,9 @@
 <?php
 // require_once 'PHPUnit/Framework.php';
 
-require_once dirname(__FILE__) . '/../lib/HTMLImagemap.php';
+//require_once dirname(__FILE__) . '/../lib/HTMLImagemap.php';
+
+use Weathermap\Core\HTMLImagemapAreaRectangle;
 
 /**
  * Test class for HTML_Imagemap_Area_Rectangle.

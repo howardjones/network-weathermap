@@ -1809,7 +1809,7 @@ class Map extends MapBase
         // do the basic prep work
         if ($this->background != '') {
             if (is_readable($this->background)) {
-                $bgImageRef = imagecreatefromfile($this->background);
+                $bgImageRef = ImageUtility::imagecreatefromfile($this->background);
 
                 if (!$bgImageRef) {
                     MapUtility::wm_warn(

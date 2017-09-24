@@ -1,12 +1,17 @@
 <?php
 
-require_once "database.php";
-require_once "Map.php";
-require_once "WeatherMap.functions.php";
-require_once "WeatherMapUIBase.class.php";
-include_once 'WeathermapManager.class.php';
+namespace Weathermap\Integrations\Cacti;
 
-class WeatherMapCactiUserPlugin extends WeatherMapUIBase
+use Weathermap\UI\UIBase;
+
+//require_once "database.php";
+//require_once "Map.php";
+//require_once "WeatherMap.functions.php";
+//require_once "WeatherMapUIBase.class.php";
+//include_once 'WeathermapManager.php';
+use Weathermap\Integrations\MapManager;
+
+class WeatherMapCactiUserPlugin extends UIBase
 {
     public $manager;
     public $my_url;
@@ -55,7 +60,7 @@ class WeatherMapCactiUserPlugin extends WeatherMapUIBase
         $this->configPath = realpath(dirname(__FILE__) . '/../configs');
         $this->outputDirectory = realpath(dirname(__FILE__) . '/../output/');
         $this->imageFormat = $imageFormat;
-        $this->manager = new WeathermapManager(weathermap_get_pdo(), $this->configPath);
+        $this->manager = new MapManager(weathermap_get_pdo(), $this->configPath);
     }
 
     function main($request)

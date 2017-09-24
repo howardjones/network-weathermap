@@ -1,12 +1,20 @@
 <?php
 
-require_once dirname(__FILE__) . '/../lib/WeathermapManager.class.php';
+//require_once dirname(__FILE__) . '/../lib/WeathermapManager.php';
 
-class WeathermapManagerTest extends PHPUnit_Extensions_Database_TestCase
+use Weathermap\Integrations\MapManager;
+
+class MapManagerTest extends PHPUnit_Extensions_Database_TestCase
 {
 
     // only instantiate pdo once for test clean-up/fixture load
     static private $pdo = null;
+
+    /** @var MapManager  */
+    private $manager;
+
+    private $confdir;
+    private $testsuite;
 
     // only instantiate PHPUnit_Extensions_Database_DB_IDatabaseConnection once per test
     private $conn = null;
@@ -35,7 +43,7 @@ class WeathermapManagerTest extends PHPUnit_Extensions_Database_TestCase
         $this->confdir = $weathermap_confdir;
         $this->testsuite = $test_suite;
 
-        $this->manager = new WeathermapManager(self::$pdo, $weathermap_confdir);
+        $this->manager = new MapManager(self::$pdo, $weathermap_confdir);
     }
 
     /**
@@ -384,7 +392,7 @@ class WeathermapManagerTest extends PHPUnit_Extensions_Database_TestCase
         $this->assertEquals(3, sizeof($users), "via API with Anyone");
 
         $user1 = $users[1];
-        $this->assertInstanceOf(stdClass::class, $user1);
+        $this->assertInstanceOf(\stdClass::class, $user1);
         $this->assertEquals("admin", $user1->username);
         $this->assertEquals(1, $user1->id);
     }

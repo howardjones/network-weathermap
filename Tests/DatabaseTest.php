@@ -1,7 +1,7 @@
 <?php
 
 
-require_once dirname(__FILE__) . '/../lib/database.php';
+require_once dirname(__FILE__) . '/../lib/Weathermap/Integrations/Cacti/database.php';
 
 
 class DatabaseTest extends PHPUnit_Extensions_Database_TestCase

@@ -6,7 +6,10 @@
  * Date: 02/10/2016
  * Time: 14:33
  */
-class WMPointTest extends PHPUnit_Framework_TestCase
+
+use Weathermap\Core\Point;
+
+class PointTest extends PHPUnit_Framework_TestCase
 {
 
     public function testLERP()

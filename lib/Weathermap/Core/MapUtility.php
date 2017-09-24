@@ -49,7 +49,7 @@ class MapUtility
 
             // use Cacti's debug log, if we are running from the poller
             if (function_exists('debug_log_insert') && (!function_exists('show_editor_startpage'))) {
-                cacti_log("DEBUG:$calling_fn " . ($weathermap_map == '' ? '' : $weathermap_map . ": ") . rtrim($string), true, "WEATHERMAP");
+                \cacti_log("DEBUG:$calling_fn " . ($weathermap_map == '' ? '' : $weathermap_map . ": ") . rtrim($string), true, "WEATHERMAP");
             } else {
                 $stderr = fopen('php://stderr', 'w');
                 fwrite($stderr, "DEBUG:$calling_fn " . ($weathermap_map == '' ? '' : $weathermap_map . ": ") . $string);
@@ -81,7 +81,7 @@ class MapUtility
         if ((true === is_array($weathermap_error_suppress))
             && (true === array_key_exists(strtoupper($code), $weathermap_error_suppress))
         ) {
-            wm_debug("$code is suppressed\n");
+            self::wm_debug("$code is suppressed\n");
             // This error code has been deliberately disabled.
             return false;
         }
@@ -185,7 +185,7 @@ class MapUtility
         $multiply = 1;
         if (null !== $factor) {
             $multiply = intval($factor) / 100;
-            wm_debug("Percentage compass offset: multiply by $multiply");
+            self::wm_debug("Percentage compass offset: multiply by $multiply");
         }
 
         // divide by 2, since the actual offset will only ever be half of the
@@ -203,7 +203,7 @@ class MapUtility
     public static function calculateOffset($offsetstring, $width, $height)
     {
         if (preg_match('/^([-+]?\d+):([-+]?\d+)$/', $offsetstring, $matches)) {
-            wm_debug("Numeric Offset found\n");
+            self::wm_debug("Numeric Offset found\n");
             return (array($matches[1], $matches[2]));
         }
 
@@ -221,7 +221,7 @@ class MapUtility
             return $offsets;
         }
 
-        wm_warn("Got a position offset that didn't make sense ($offsetstring).");
+        self::wm_warn("Got a position offset that didn't make sense ($offsetstring).");
         return (array(0, 0));
     }
 }

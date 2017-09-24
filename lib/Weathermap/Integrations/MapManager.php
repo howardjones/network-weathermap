@@ -1,28 +1,9 @@
 <?php
+namespace Weathermap\Integrations;
 
-class WeathermapManagedMap
-{
-    /**
-     * Some day we'll migrate to using this for the managed maps, and the various mutators below will be
-     * methods here instead.
-     */
-    public $sortorder;
-    public $group_id;
-    public $active;
-    public $configfile;
-    public $imagefile;
-    public $htmlfile;
-    public $titlecache;
-    public $filehash;
-    public $warncount;
-    public $config;
-    public $thumb_width;
-    public $thumb_height;
-    public $schedule;
-    public $archiving;
-}
+use \PDO;
 
-class WeathermapManager
+class MapManager
 {
 
     /** @var PDO $pdo */
@@ -381,7 +362,7 @@ class WeathermapManager
             }
         }
 
-        $out = new stdClass();
+        $out = new \stdClass();
         foreach ($result as $k => $v) {
             $out->$k = $v;
         }
@@ -515,7 +496,7 @@ class WeathermapManager
 
         if ($fileDirectory != $this->configDirectory) {
             // someone is trying to read arbitrary files?
-            throw new Exception("Path mismatch - $fileDirectory != " . $this->configDirectory);
+            throw new \Exception("Path mismatch - $fileDirectory != " . $this->configDirectory);
         } else {
             $realfile = $this->configDirectory . DIRECTORY_SEPARATOR . $mapFilename;
             $title = $this->extractMapTitle($realfile);
@@ -598,7 +579,7 @@ class WeathermapManager
         }
 
         if ($include_anyone) {
-            $users[0] = new stdClass();
+            $users[0] = new \stdClass();
             $users[0]->id = 0;
             $users[0]->username = "Anyone";
             $users[0]->full_name = "Anyone";

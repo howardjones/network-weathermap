@@ -1,6 +1,10 @@
 <?php
 namespace Weathermap\Plugins\Datasources;
 
+use Weathermap\Core\MapUtility;
+use Weathermap\Core\StringUtility;
+
+
 class WeatherMapDataSource_tabfile extends DatasourceBase
 {
     public function __construct()
@@ -64,8 +68,8 @@ class WeatherMapDataSource_tabfile extends DatasourceBase
             $parts = explode("\t", $buffer);
 
             if ($parts[0] == $itemName) {
-                $data[IN] = WMUtility::interpretNumberWithMetricSuffixOrNull($parts[1]);
-                $data[OUT] = WMUtility::interpretNumberWithMetricSuffixOrNull($parts[2]);
+                $data[IN] = StringUtility::interpretNumberWithMetricSuffixOrNull($parts[1]);
+                $data[OUT] = StringUtility::interpretNumberWithMetricSuffixOrNull($parts[2]);
             }
         }
 
@@ -78,7 +82,7 @@ class WeatherMapDataSource_tabfile extends DatasourceBase
      */
     protected function validateAndOpenFile($fullpath)
     {
-        wm_debug("Opening $fullpath\n");
+        MapUtility::wm_debug("Opening $fullpath\n");
 
         if (!file_exists($fullpath)) {
             wm_warn("File '$fullpath' doesn't exist.");

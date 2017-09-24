@@ -178,7 +178,7 @@ class MapDataItem extends MapItem
                 if ($this->owner->plugins['data'][$matchedBy]['active']) {
                     $target->registerWithPlugin($this, $this->owner);
                 } else {
-                    wm_warn(
+                    MapUtility::wm_warn(
                         sprintf(
                             "ProcessTargets: %s, target: %s was recognised as a valid TARGET by a plugin that is unable to run (%s) [WMWARN07]\n",
                             $this,
@@ -190,7 +190,7 @@ class MapDataItem extends MapItem
             }
 
             if ($matchedBy == "") {
-                wm_warn(
+                MapUtility::wm_warn(
                     sprintf(
                         "ProcessTargets: %s, target: %s was not recognised as a valid TARGET [WMWARN08]\n",
                         $this,
@@ -299,7 +299,7 @@ class MapDataItem extends MapItem
                 $value = ($this->absoluteUsages[IN] + $this->absoluteUsages[OUT]);
 
                 if ($this->maxValues[OUT] != $this->maxValues[IN]) {
-                    wm_warn("ReadData: $this: You're using asymmetric bandwidth AND half-duplex in the same link. That makes no sense. [WMWARN44]\n");
+                    MapUtility::wm_warn("ReadData: $this: You're using asymmetric bandwidth AND half-duplex in the same link. That makes no sense. [WMWARN44]\n");
                 }
             }
 

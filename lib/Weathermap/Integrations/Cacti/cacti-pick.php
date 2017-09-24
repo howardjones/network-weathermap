@@ -1,9 +1,13 @@
 <?php
 
-require_once dirname(__FILE__) . '/SimpleTemplate.php';
-require_once dirname(__FILE__) . '/EditorUI.php';
+//require_once dirname(__FILE__) . '/SimpleTemplate.php';
+//require_once dirname(__FILE__) . '/EditorUI.php';
 
-class EditorDataPicker extends WeatherMapUIBase
+
+use Weathermap\UI\UIBase;
+use Weathermap\UI\SimpleTemplate;
+
+class EditorDataPicker extends UIBase
 {
     var $commands = array(
         "link_step1" => array(

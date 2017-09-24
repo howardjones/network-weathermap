@@ -7,15 +7,17 @@
  * Time: 12:55
  */
 
-require_once dirname(__FILE__) . '/../lib/all.php';
+//require_once dirname(__FILE__) . '/../lib/all.php';
 
+use Weathermap\Core\ImageLoader;
+use Weathermap\Core\ImageUtility;
 
-class WMImageLoaderTest extends PHPUnit_Framework_TestCase
+class ImageLoaderTest extends PHPUnit_Framework_TestCase
 {
 
     public function testBasicCaching()
     {
-        $loader = new WMImageLoader();
+        $loader = new ImageLoader();
 
         $source1 = $loader->imagecreatefromfile(dirname(__FILE__) . "/../test-suite/data/greybox32.png");
         $source2 = $loader->imagecreatefromfile(dirname(__FILE__) . "/../test-suite/data/pal-48.png");
@@ -42,7 +44,7 @@ class WMImageLoaderTest extends PHPUnit_Framework_TestCase
 
     public function testScaledCaching()
     {
-        $loader = new WMImageLoader();
+        $loader = new ImageLoader();
 
         $source1 = $loader->imagecreatescaledfromfile(dirname(__FILE__) . "/../test-suite/data/greybox32.png", 64, 64);
         $source2 = $loader->imagecreatescaledfromfile(dirname(__FILE__) . "/../test-suite/data/pal-48.png", 64, 64);
@@ -69,16 +71,16 @@ class WMImageLoaderTest extends PHPUnit_Framework_TestCase
 
     public function testDuplicate()
     {
-        $loader = new WMImageLoader();
+        $loader = new ImageLoader();
 
         // load a truecolor with alpha image
-        $source1 = imagecreatefromfile(dirname(__FILE__) . "/../test-suite/data/greybox32.png");
+        $source1 = ImageUtility::imagecreatefromfile(dirname(__FILE__) . "/../test-suite/data/greybox32.png");
 
         // load a paletted image
-        $source2 = imagecreatefromfile(dirname(__FILE__) . "/../test-suite/data/pal-48.png");
+        $source2 = ImageUtility::imagecreatefromfile(dirname(__FILE__) . "/../test-suite/data/pal-48.png");
 
         // load a paletted (with transparency) image
-        $source3 = imagecreatefromfile(dirname(__FILE__) . "/../test-suite/data/pal-tx-48.png");
+        $source3 = ImageUtility::imagecreatefromfile(dirname(__FILE__) . "/../test-suite/data/pal-tx-48.png");
 
         // duplicate them
         $result1 = $loader->imageduplicate($source1);

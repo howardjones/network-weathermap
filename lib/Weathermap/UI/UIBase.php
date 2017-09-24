@@ -2,6 +2,8 @@
 
 namespace Weathermap\UI;
 
+use Weathermap\Core\WeathermapInternalFail;
+
 class UIBase
 {
     const ARG_OPTIONAL = 2;

@@ -4,13 +4,21 @@
 // http://www.network-weathermap.com/
 // Released under the GNU Public License
 namespace Weathermap\Editor;
+
+use Weathermap\Core\Map;
+use Weathermap\Core\MapNode;
+use Weathermap\Core\MapLink;
+use Weathermap\Core\WeathermapInternalFail;
+use Weathermap\Core\Point;
+use Weathermap\Core\MathUtility;
+
 /** Wrapper API around WeatherMap to provide the relevant operations to manipulate
  *  the map contents that an editor will need, without it needing to see inside the map object.
  *  (a second class, WeatherMapEditorUI, is concerned with the actual presentation of the supplied editor)
  */
 class Editor
 {
-    /** @var WeatherMap $map */
+    /** @var Map $map */
     var $map;
     /** @var string $mapfile */
     var $mapfile;
@@ -22,14 +30,14 @@ class Editor
 
     function newConfig()
     {
-        $this->map = new WeatherMap();
+        $this->map = new Map();
         $this->map->context = "editor";
         $this->mapfile = "untitled";
     }
 
     function loadConfig($filename)
     {
-        $this->map = new WeatherMap();
+        $this->map = new Map();
         $this->map->context = 'editor';
         $this->map->ReadConfig($filename);
         $this->mapfile = $filename;
@@ -98,7 +106,7 @@ class Editor
 
         // Check again - if they are specifying a name, it's possible for it to exist
         if (!$this->map->nodeExists($newNodeName)) {
-            $newNode = new WeatherMapNode($newNodeName, $template, $this->map);
+            $newNode = new MapNode($newNodeName, $template, $this->map);
 
             $newNode->setPosition(new Point($x, $y));
             $newNode->setDefined($this->map->configfile);
@@ -219,14 +227,14 @@ class Editor
                     $scaleFactor = $l_new / $l_old;
 
                     // rotate so that link is along the axis
-                    rotateAboutPoint($points, $pivotX, $pivotY, deg2rad($angle_old));
+                    MathUtility::rotateAboutPoint($points, $pivotX, $pivotY, deg2rad($angle_old));
                     // do the scaling in here
                     for ($count = 0; $count < (count($points) / 2); $count++) {
                         $basex = ($points[$count * 2] - $pivotX) * $scaleFactor + $pivotX;
                         $points[$count * 2] = $basex;
                     }
                     // rotate back so that link is along the new direction
-                    rotateAboutPoint($points, $pivotX, $pivotY, deg2rad(-$angle_new));
+                    MathUtility::rotateAboutPoint($points, $pivotX, $pivotY, deg2rad(-$angle_new));
 
                     // now put the modified points back into the vialist again
                     $viaCount = 0;
@@ -358,7 +366,7 @@ class Editor
 
             $log .= " into $newNodeName";
 
-            $newNode = new WeatherMapNode($newNodeName, $sourceNode->template, $this->map);
+            $newNode = new MapNode($newNodeName, $sourceNode->template, $this->map);
             $newNode->copyFrom($sourceNode);
 
             # CopyFrom skips this one, because it's also the function used by template inheritance
@@ -398,7 +406,7 @@ class Editor
                 $newLinkName .= "a";
             }
 
-            $newLink = new WeatherMapLink($newLinkName, $template, $this->map);
+            $newLink = new MapLink($newLinkName, $template, $this->map);
             $newLink->defined_in = $this->map->configfile;
 
             $newLink->setEndNodes($this->map->getNode($nodeName1), $this->map->getNode($nodeName2));
@@ -761,7 +769,7 @@ class Editor
      * _tidy_links - for a group of links between the same two nodes, distribute them
      * nicely.
      *
-     * @param WeatherMapLink[] $links - the links to treat as a group
+     * @param MapLink[] $links - the links to treat as a group
      * @param bool $ignore_tidied - whether to take notice of the "_tidied" hint
      *
      */

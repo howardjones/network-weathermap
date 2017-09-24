@@ -1,6 +1,9 @@
 <?php
 
-require_once dirname(__FILE__) . '/../lib/WeatherMapCacti88UserPlugin.php';
+//require_once dirname(__FILE__) . '/../lib/WeatherMapCacti88UserPlugin.php';
+
+use Weathermap\Integrations\Cacti\WeatherMapCacti88UserPlugin;
+
 
 class Cacti88UserTest extends PHPUnit_Framework_TestCase
 {

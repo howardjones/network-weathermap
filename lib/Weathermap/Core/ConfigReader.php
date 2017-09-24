@@ -10,14 +10,15 @@ namespace Weathermap\Core;
  *
  */
 
+
 class ConfigReader
 {
     private $lineCount = 0;
-    /** @var WeatherMapDataItem $currentObject */
+    /** @var MapDataItem $currentObject */
     private $currentObject = null;
     private $currentType = "GLOBAL";
     private $currentSource = "";
-    /** @var WeatherMap $mapObject */
+    /** @var Map $mapObject */
     private $mapObject = null;
     private $objectLineCount = 0;
 
@@ -1140,7 +1141,7 @@ class ConfigReader
         }
 
         if (get_class($this->currentObject) == 'stdClass') {
-            wm_warn("INTERNAL - avoided a stdClass");
+            MapUtility::wm_warn("INTERNAL - avoided a stdClass");
             return;
         }
 
@@ -1208,7 +1209,7 @@ class ConfigReader
             $lineMatched = $this->readConfigLine($args, $buffer);
 
             if ((!$lineMatched) && ($buffer != '')) {
-                wm_warn("Unrecognised config on line $this->lineCount: $buffer\n");
+                MapUtility::wm_warn("Unrecognised config on line $this->lineCount: $buffer\n");
             }
         }
 
@@ -1393,7 +1394,7 @@ class ConfigReader
                 list($offset_dx[$i], $offset_dy[$i], $nodeNames[$i], $endOffsets[$i], $need_size_precalc) = $this->interpretNodeSpec($matches[$i]);
 
                 if (!array_key_exists($nodeNames[$i], $this->mapObject->nodes)) {
-                    wm_warn("Unknown node '" . $nodeNames[$i]
+                    MapUtility::wm_warn("Unknown node '" . $nodeNames[$i]
                         . "' on line $this->lineCount of config\n");
                     $valid_nodes--;
                 }
@@ -1529,7 +1530,7 @@ class ConfigReader
             # $fontOK = $newFontObject->initTTF($args[2], $args[3]);
 
             if (!$newFontObject->isLoaded()) {
-                wm_warn("Failed to load ttf font " . $args[2] . " - at config line $this->lineCount\n [WMWARN30]");
+                MapUtility::wm_warn("Failed to load ttf font " . $args[2] . " - at config line $this->lineCount\n [WMWARN30]");
             }
         } else {
             MapUtility::wm_debug("New GD font in slot %d\n", $args[1]);
@@ -1540,7 +1541,7 @@ class ConfigReader
 
             // XXX - why do we do this with GD fonts but not truetype?
             if (!$newFontObject->isLoaded()) {
-                wm_warn("Failed to load GD font: " . $args[2] . " ($args[1]) at config line $this->lineCount [WMWARN32]\n");
+                MapUtility::wm_warn("Failed to load GD font: " . $args[2] . " ($args[1]) at config line $this->lineCount [WMWARN32]\n");
                 $newFontObject = null;
             }
         }
@@ -1621,11 +1622,11 @@ class ConfigReader
             MapUtility::wm_debug("Loaded default NODE\n");
 
             if (sizeof($this->mapObject->nodes) > 2) {
-                wm_warn("NODE DEFAULT is not the first NODE. Defaults will not apply to earlier NODEs. [WMWARN27]\n");
+                MapUtility::wm_warn("NODE DEFAULT is not the first NODE. Defaults will not apply to earlier NODEs. [WMWARN27]\n");
             }
         } else {
             if (isset($this->mapObject->nodes[$matches[1]])) {
-                wm_warn("Duplicate node name " . $matches[1] . " at line $this->lineCount - only the last one defined is used. [WMWARN24]\n");
+                MapUtility::wm_warn("Duplicate node name " . $matches[1] . " at line $this->lineCount - only the last one defined is used. [WMWARN24]\n");
             }
 
             $this->currentObject = new MapNode($matches[1], "DEFAULT", $this->mapObject);
@@ -1649,11 +1650,11 @@ class ConfigReader
             MapUtility::wm_debug("Loaded default LINK\n");
 
             if (sizeof($this->mapObject->links) > 2) {
-                wm_warn("$this LINK DEFAULT is not the first LINK. Defaults will not apply to earlier LINKs. [WMWARN26]\n");
+                MapUtility::wm_warn("$this LINK DEFAULT is not the first LINK. Defaults will not apply to earlier LINKs. [WMWARN26]\n");
             }
         } else {
             if (isset($this->mapObject->links[$matches[1]])) {
-                wm_warn("Duplicate link name " . $matches[1] . " at line $this->lineCount - only the last one defined is used. [WMWARN25]\n");
+                MapUtility::wm_warn("Duplicate link name " . $matches[1] . " at line $this->lineCount - only the last one defined is used. [WMWARN25]\n");
             }
             $this->currentObject = new MapLink($matches[1], "DEFAULT", $this->mapObject);
             MapUtility::wm_debug("Created new LINK\n");
@@ -1684,7 +1685,7 @@ class ConfigReader
         }
 
         if (!isset($this->mapObject->scales[$matches[1]])) {
-            $this->mapObject->scales[$matches[1]] = new WeatherMapScale($matches[1], $this->mapObject);
+            $this->mapObject->scales[$matches[1]] = new MapScale($matches[1], $this->mapObject);
         }
         $newscale = $this->mapObject->scales[$matches[1]];
 
@@ -1694,8 +1695,8 @@ class ConfigReader
         $colour1 = null;
         $colour2 = null;
 
-        $bottom = WMUtility::interpretNumberWithMetricSuffix($matches[2], $this->mapObject->kilo);
-        $top = WMUtility::interpretNumberWithMetricSuffix($matches[3], $this->mapObject->kilo);
+        $bottom = StringUtility::interpretNumberWithMetricSuffix($matches[2], $this->mapObject->kilo);
+        $top = StringUtility::interpretNumberWithMetricSuffix($matches[3], $this->mapObject->kilo);
 
         if (isset($matches[10]) && $matches[10] == 'none') {
             $colour1 = new Colour("none");
@@ -1779,12 +1780,12 @@ class ConfigReader
             $this->currentObject->setTemplate($matches[1], $this->mapObject);
 
             if ($this->objectLineCount > 1) {
-                wm_warn("line $this->lineCount: TEMPLATE is not first line of object. Some data may be lost. [WMWARN39]\n");
+                MapUtility::wm_warn("line $this->lineCount: TEMPLATE is not first line of object. Some data may be lost. [WMWARN39]\n");
             }
             return true;
         }
 
-        wm_warn("line $this->lineCount: $this->currentType TEMPLATE '$templateName' doesn't exist! (if it does exist, check it's defined first) [WMWARN40]\n");
+        MapUtility::wm_warn("line $this->lineCount: $this->currentType TEMPLATE '$templateName' doesn't exist! (if it does exist, check it's defined first) [WMWARN40]\n");
 
         return false;
     }
@@ -1797,7 +1798,7 @@ class ConfigReader
             MapUtility::wm_debug("Including '{$filename}'\n");
 
             if (in_array($filename, $this->mapObject->included_files)) {
-                wm_warn("Attempt to include '$filename' twice! Skipping it.\n");
+                MapUtility::wm_warn("Attempt to include '$filename' twice! Skipping it.\n");
                 return (false);
             }
 
@@ -1813,7 +1814,7 @@ class ConfigReader
             return true;
         }
 
-        wm_warn("INCLUDE File '{$matches[1]}' not found!\n");
+        MapUtility::wm_warn("INCLUDE File '{$matches[1]}' not found!\n");
         return false;
     }
 
@@ -1864,9 +1865,9 @@ class ConfigReader
     public function selfValidate()
     {
         $classes = array(
-            "GLOBAL" => "Map",
-            "LINK" => "MapLink",
-            "NODE" => "MapNode"
+            "GLOBAL" => "Weathermap\\Core\\Map",
+            "LINK" => "Weathermap\\Core\\MapLink",
+            "NODE" => "Weathermap\\Core\\MapNode"
         );
 
         $result = true;
@@ -1885,14 +1886,14 @@ class ConfigReader
                             }
 
                             if (!property_exists($classes[$scope], $key)) {
-                                wm_warn("$scope:$keyword tries to set nonexistent property $key");
+                                MapUtility::wm_warn("$scope:$keyword tries to set nonexistent property $key");
                                 $result = false;
                             }
                         }
                     } else {
                         # TODO: if it's a handleXXXX function, check that exists
                         if (!method_exists($this, $match[1])) {
-                            wm_warn("$scope:$keyword has a missing handler ($match[1])");
+                            MapUtility::wm_warn("$scope:$keyword has a missing handler ($match[1])");
                             $result = false;
                         }
                     }

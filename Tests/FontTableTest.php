@@ -1,8 +1,10 @@
 <?php
 
-require_once dirname(__FILE__) . '/../lib/Map.php';
+//require_once dirname(__FILE__) . '/../lib/Map.php';
 
-class WMFontTableTest extends PHPUnit_Framework_TestCase
+use Weathermap\Core\FontTable;
+
+class FontTableTest extends PHPUnit_Framework_TestCase
 {
     function setUp()
     {
@@ -17,7 +19,7 @@ class WMFontTableTest extends PHPUnit_Framework_TestCase
 
     function testObjects()
     {
-        $table = new WMFontTable();
+        $table = new FontTable();
         $this->assertEquals(0, $table->count());
 
         $table->init();
@@ -32,13 +34,13 @@ class WMFontTableTest extends PHPUnit_Framework_TestCase
         $this->assertTrue($table->isValid(5));
 
         $f = $table->getFont(1);
-        $this->assertInstanceOf("WMFont", $f);
+        $this->assertInstanceOf("Weathermap\\Core\\Font", $f);
         $this->assertEquals("GD builtin", $f->type);
         $this->assertEquals(1, $f->gdnumber);
 
         // a non-existent font should return built-in font 5
         $f = $table->getFont(6);
-        $this->assertInstanceOf("WMFont", $f);
+        $this->assertInstanceOf("Weathermap\\Core\\Font", $f);
         $this->assertEquals("GD builtin", $f->type);
         $this->assertEquals(5, $f->gdnumber);
 
@@ -47,7 +49,7 @@ class WMFontTableTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(6, $table->count());
 
         $f = $table->getFont(10);
-        $this->assertInstanceOf("WMFont", $f);
+        $this->assertInstanceOf("Weathermap\\Core\\Font", $f);
         $this->assertEquals("truetype", $f->type);
         $this->assertNull($f->gdnumber);
 

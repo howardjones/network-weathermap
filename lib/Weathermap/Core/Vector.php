@@ -31,7 +31,7 @@ class Vector
     {
         if ($this->dx == 0) {
             // special case - if slope is infinite, fudge it to be REALLY BIG instead. Close enough for TV.
-            wm_debug("Slope is infinite.\n");
+            MapUtility::wm_debug("Slope is infinite.\n");
             return 1e10;
         }
         return ($this->dy / $this->dx);
@@ -46,7 +46,7 @@ class Vector
         $points[0] = $this->dx;
         $points[1] = $this->dy;
 
-        rotateAboutPoint($points, 0, 0, $angle);
+        MathUtility::rotateAboutPoint($points, 0, 0, $angle);
 
         $this->dx = $points[0];
         $this->dy = $points[1];

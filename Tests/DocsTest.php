@@ -1,7 +1,9 @@
 <?php
 
-require_once dirname(__FILE__) . '/../lib/all.php';
+//require_once dirname(__FILE__) . '/../lib/all.php';
 
+use Weathermap\Core\Map;
+use Weathermap\Core\ConfigReader;
 
 class DocsTest extends PHPUnit_Framework_TestCase
 {
@@ -13,7 +15,7 @@ class DocsTest extends PHPUnit_Framework_TestCase
         $this->assertDirectoryExists($docsDir);
         $this->assertFileExists($docsIndex);
 
-        $map = new WeatherMap();
+        $map = new Map();
         $reader = new ConfigReader($map);
 
         $keywords = $reader->getAllKeywords();

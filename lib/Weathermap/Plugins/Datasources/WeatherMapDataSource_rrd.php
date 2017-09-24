@@ -9,6 +9,7 @@
 
 namespace Weathermap\Plugins\Datasources;
 
+use Weathermap\Core\MapUtility;
 
 class WeatherMapDataSource_rrd extends DatasourceBase
 {
@@ -29,14 +30,14 @@ class WeatherMapDataSource_rrd extends DatasourceBase
         global $config;
 
         if ($map->context == 'cacti') {
-            wm_debug("RRD DS: path_rra is " . $config["rra_path"] . " - your rrd pathname must be exactly this to use poller_output\n");
+            MapUtility::wm_debug("RRD DS: path_rra is " . $config["rra_path"] . " - your rrd pathname must be exactly this to use poller_output\n");
             // save away a couple of useful global SET variables
             $map->add_hint("cacti_path_rra", $config["rra_path"]);
             $map->add_hint("cacti_url", $config['url_path']);
         }
         if (file_exists($map->rrdtool)) {
             if ((function_exists('is_executable')) && (!is_executable($map->rrdtool))) {
-                wm_warn("RRD DS: RRDTool exists but is not executable? [WMRRD01]\n");
+                MapUtility::wm_warn("RRD DS: RRDTool exists but is not executable? [WMRRD01]\n");
                 return false;
             }
             $map->rrdtool_check = "FOUND";
@@ -45,10 +46,10 @@ class WeatherMapDataSource_rrd extends DatasourceBase
         // normally, DS plugins shouldn't really pollute the logs
         // this particular one is important to most users though...
         if ($map->context == 'cli') {
-            wm_warn("RRD DS: Can't find RRDTOOL. Check line 29 of the 'weathermap' script.\nRRD-based TARGETs will fail. [WMRRD02]\n");
+            MapUtility::wm_warn("RRD DS: Can't find RRDTOOL. Check line 29 of the 'weathermap' script.\nRRD-based TARGETs will fail. [WMRRD02]\n");
         }
         if ($map->context == 'cacti') {    // unlikely to ever occur
-            wm_warn("RRD DS: Can't find RRDTOOL. Check your Cacti config. [WMRRD03]\n");
+            MapUtility::wm_warn("RRD DS: Can't find RRDTOOL. Check your Cacti config. [WMRRD03]\n");
         }
 
         return false;
@@ -59,22 +60,22 @@ class WeatherMapDataSource_rrd extends DatasourceBase
         global $config;
         $pdo = weathermap_get_pdo();
 
-        wm_debug("RRD ReadData: poller_output style\n");
+        MapUtility::wm_debug("RRD ReadData: poller_output style\n");
 
         if (!isset($config)) {
-            wm_warn("RRD ReadData: poller_output - Cacti environment is not right [WMRRD12]\n");
+            MapUtility::wm_warn("RRD ReadData: poller_output - Cacti environment is not right [WMRRD12]\n");
         }
 
         // take away the cacti bit, to get the appropriate path for the table
         $path_rra = $config["rra_path"];
         $db_rrdname = $rrdfile;
         $db_rrdname = str_replace($path_rra, "<path_rra>", $db_rrdname);
-        wm_debug("******************************************************************\nChecking weathermap_data\n");
+        MapUtility::wm_debug("******************************************************************\nChecking weathermap_data\n");
 
         foreach (array(IN, OUT) as $dir) {
-            wm_debug("RRD ReadData: poller_output - looking for $dir value\n");
+            MapUtility::wm_debug("RRD ReadData: poller_output - looking for $dir value\n");
             if ($dsnames[$dir] != '-') {
-                wm_debug("RRD ReadData: poller_output - DS name is " . $dsnames[$dir] . "\n");
+                MapUtility::wm_debug("RRD ReadData: poller_output - DS name is " . $dsnames[$dir] . "\n");
 
                 $SQL = "select * from weathermap_data where rrdfile=" . $pdo->quote($db_rrdname) . " and data_source_name=" . $pdo->quote($dsnames[$dir]);
 
@@ -85,7 +86,7 @@ class WeatherMapDataSource_rrd extends DatasourceBase
                 $result = db_fetch_row($SQL);
                 // OK, the straightforward query for data failed, let's work out why, and add the new data source if necessary
                 if (!isset($result['id'])) {
-                    wm_debug("RRD ReadData: poller_output - Adding new weathermap_data row for $db_rrdname:" . $dsnames[$dir] . "\n");
+                    MapUtility::wm_debug("RRD ReadData: poller_output - Adding new weathermap_data row for $db_rrdname:" . $dsnames[$dir] . "\n");
                     $result = db_fetch_row($SQLcheck);
                     if (!isset($result['local_data_id'])) {
                         $fields = array();
@@ -94,28 +95,28 @@ class WeatherMapDataSource_rrd extends DatasourceBase
                             $fields[] = $result['data_source_name'];
                         }
                         if (count($fields) > 0) {
-                            wm_warn("RRD ReadData: poller_output: " . $dsnames[$dir] . " is not a valid DS name for $db_rrdname - valid names are: " . join(", ", $fields) . " [WMRRD07]\n");
+                            MapUtility::wm_warn("RRD ReadData: poller_output: " . $dsnames[$dir] . " is not a valid DS name for $db_rrdname - valid names are: " . join(", ", $fields) . " [WMRRD07]\n");
                         } else {
-                            wm_warn("RRD ReadData: poller_output: $db_rrdname is not a valid RRD filename within this Cacti install. <path_rra> is $path_rra [WMRRD08]\n");
+                            MapUtility::wm_warn("RRD ReadData: poller_output: $db_rrdname is not a valid RRD filename within this Cacti install. <path_rra> is $path_rra [WMRRD08]\n");
                         }
                     } else {
                         // add the new data source (which we just checked exists) to the table.
                         // Include the local_data_id as well, to make life easier in poller_output
                         // (and to allow the cacti: DS plugin to use the same table, too)
                         $SQLins = "insert into weathermap_data (rrdfile, data_source_name, sequence, local_data_id) values (" . $pdo->quote($db_rrdname) . "," . $pdo->quote($dsnames[$dir]) . ", 0," . $result['local_data_id'] . ")";
-                        wm_debug("RRD ReadData: poller_output - Adding new weathermap_data row for data source ID " . $result['local_data_id'] . "\n");
+                        MapUtility::wm_debug("RRD ReadData: poller_output - Adding new weathermap_data row for data source ID " . $result['local_data_id'] . "\n");
                         db_execute($SQLins);
                     }
                 } else {    // the data table line already exists
-                    wm_debug("RRD ReadData: poller_output - found weathermap_data row\n");
+                    MapUtility::wm_debug("RRD ReadData: poller_output - found weathermap_data row\n");
                     // if the result is valid, then use it
                     if (($result['sequence'] > 2) && ($result['last_time'] > $worst_time)) {
                         $this->data[$dir] = $result['last_calc'];
                         $this->dataTime = $result['last_time'];
-                        wm_debug("RRD ReadData: poller_output - data looks valid\n");
+                        MapUtility::wm_debug("RRD ReadData: poller_output - data looks valid\n");
                     } else {
                         $this->data[$dir] = 0.0;
-                        wm_debug("RRD ReadData: poller_output - data is either too old, or too new\n");
+                        MapUtility::wm_debug("RRD ReadData: poller_output - data is either too old, or too new\n");
                     }
                     // now, we can use the local_data_id to get some other useful info
                     // first, see if the weathermap_data entry *has* a local_data_id. If not, we need to update this entry.
@@ -124,7 +125,7 @@ class WeatherMapDataSource_rrd extends DatasourceBase
                         $r2 = db_fetch_row($SQLcheck);
                         if (isset($r2['local_data_id'])) {
                             $ldi = $r2['local_data_id'];
-                            wm_debug("RRD ReadData: updated  local_data_id for wmdata.id=" . $result['id'] . "to $ldi\n");
+                            MapUtility::wm_debug("RRD ReadData: updated  local_data_id for wmdata.id=" . $result['id'] . "to $ldi\n");
                             // put that in now, so that we can skip this step next time
                             db_execute("update weathermap_data set local_data_id=" . $r2['local_data_id'] . " where id=" . $result['id']);
                         }
@@ -139,12 +140,12 @@ class WeatherMapDataSource_rrd extends DatasourceBase
                     }
                 }
             } else {
-                wm_debug("RRD ReadData: poller_output - DS name is '-'\n");
+                MapUtility::wm_debug("RRD ReadData: poller_output - DS name is '-'\n");
             }
         }
 
-        wm_debug("RRD ReadData: poller_output - result is " . ($this->data[IN] === null ? 'null' : $this->data[IN]) . "," . ($this->data[OUT] === null ? 'null' : $this->data[OUT]) . "\n");
-        wm_debug("RRD ReadData: poller_output - ended\n");
+        MapUtility::wm_debug("RRD ReadData: poller_output - result is " . ($this->data[IN] === null ? 'null' : $this->data[IN]) . "," . ($this->data[OUT] === null ? 'null' : $this->data[OUT]) . "\n");
+        MapUtility::wm_debug("RRD ReadData: poller_output - ended\n");
     }
 
 
@@ -154,7 +155,7 @@ class WeatherMapDataSource_rrd extends DatasourceBase
     {
         global $php_errormsg;
 
-        wm_debug("RRD ReadData: VDEF style, for " . $item->my_type() . " " . $item->name . "\n");
+        MapUtility::wm_debug("RRD ReadData: VDEF style, for " . $item->my_type() . " " . $item->name . "\n");
 
         $extra_options = $map->get_hint("rrd_options");
 
@@ -196,13 +197,13 @@ class WeatherMapDataSource_rrd extends DatasourceBase
         }
         $command .= " " . $extra_options;
 
-        wm_debug("RRD ReadData: Running: $command\n");
+        MapUtility::wm_debug("RRD ReadData: Running: $command\n");
         $pipe = popen($command, "r");
 
         $lines = array();
 
         if (!isset($pipe)) {
-            wm_warn("RRD Aggregate ReadData: failed to open pipe to RRDTool: " . $php_errormsg . " [WMRRD04]\n");
+            MapUtility::wm_warn("RRD Aggregate ReadData: failed to open pipe to RRDTool: " . $php_errormsg . " [WMRRD04]\n");
             return;
         }
 
@@ -214,7 +215,7 @@ class WeatherMapDataSource_rrd extends DatasourceBase
             // there might (pre-1.5) or might not (1.5+) be a leading blank line
             // we don't want to count it if there is
             if (trim($line) != "") {
-                wm_debug("> " . $line);
+                MapUtility::wm_debug("> " . $line);
                 $buffer .= $line;
                 $lines[] = $line;
             }
@@ -222,13 +223,13 @@ class WeatherMapDataSource_rrd extends DatasourceBase
         pclose($pipe);
 
         if (sizeof($lines) == 0) {
-            wm_warn("RRD Aggregate ReadData: Not enough output from RRDTool (0 lines). [WMRRD09]\n");
+            MapUtility::wm_warn("RRD Aggregate ReadData: Not enough output from RRDTool (0 lines). [WMRRD09]\n");
             return;
         }
 
         foreach ($lines as $line) {
             if (preg_match('/^\'(IN|OUT)\s(\-?\d+[\.,]?\d*e?[+-]?\d*:?)\'$/i', $line, $matches)) {
-                wm_debug("MATCHED: " . $matches[1] . " " . $matches[2] . "\n");
+                MapUtility::wm_debug("MATCHED: " . $matches[1] . " " . $matches[2] . "\n");
                 if ($matches[1] == 'IN') {
                     $this->data[IN] = floatval($matches[2]);
                 }
@@ -248,12 +249,12 @@ class WeatherMapDataSource_rrd extends DatasourceBase
             }
         }
 
-        wm_debug("RRD ReadDataFromRealRRDAggregate: Returning (" . ($this->data[IN] === null ? 'null' : $this->data[IN]) . "," . ($this->data[OUT] === null ? 'null' : $this->data[OUT]) . ",$this->dataTime)\n");
+        MapUtility::wm_debug("RRD ReadDataFromRealRRDAggregate: Returning (" . ($this->data[IN] === null ? 'null' : $this->data[IN]) . "," . ($this->data[OUT] === null ? 'null' : $this->data[OUT]) . ",$this->dataTime)\n");
     }
 
     private function wmrrd_read_from_real_rrdtool($rrdfile, $cf, $start, $end, $dsnames, &$map, &$item)
     {
-        wm_debug("RRD ReadData: traditional style\n");
+        MapUtility::wm_debug("RRD ReadData: traditional style\n");
 
         // we get the last 800 seconds of data - this might be 1 or 2 lines, depending on when in the
         // cacti polling cycle we get run. This ought to stop the 'some lines are grey' problem that some
@@ -286,14 +287,14 @@ class WeatherMapDataSource_rrd extends DatasourceBase
         }
         $command .= " " . $extra_options;
 
-        wm_debug("RRD ReadData: Running: $command\n");
+        MapUtility::wm_debug("RRD ReadData: Running: $command\n");
         $pipe = popen($command, "r");
 
         $lines = array();
         $linecount = 0;
 
         if (!isset($pipe)) {
-            wm_warn("RRD ReadData: failed to open pipe to RRDTool: " . $php_errormsg . " [WMRRD04]\n");
+            MapUtility::wm_warn("RRD ReadData: failed to open pipe to RRDTool: " . $php_errormsg . " [WMRRD04]\n");
             return;
         }
         $headings = fgets($pipe, 4096);
@@ -308,7 +309,7 @@ class WeatherMapDataSource_rrd extends DatasourceBase
             // there might (pre-1.5) or might not (1.5+) be a leading blank line
             // we don't want to count it if there is
             if (trim($line) != "") {
-                wm_debug("> " . $line);
+                MapUtility::wm_debug("> " . $line);
                 $buffer .= $line;
                 $lines[] = $line;
                 $linecount++;
@@ -316,15 +317,15 @@ class WeatherMapDataSource_rrd extends DatasourceBase
         }
         pclose($pipe);
 
-        wm_debug("RRD ReadData: Read $linecount lines from rrdtool\n");
-        wm_debug("RRD ReadData: Headings are: $headings\n");
+        MapUtility::wm_debug("RRD ReadData: Read $linecount lines from rrdtool\n");
+        MapUtility::wm_debug("RRD ReadData: Headings are: $headings\n");
 
         if ((in_array($dsnames[IN], $heads) || $dsnames[IN] == '-') && (in_array($dsnames[OUT], $heads) || $dsnames[OUT] == '-')) {
             // deal with the data, starting with the last line of output
             $rlines = array_reverse($lines);
 
             foreach ($rlines as $line) {
-                wm_debug("--" . $line . "\n");
+                MapUtility::wm_debug("--" . $line . "\n");
                 $cols = preg_split('/\s+/', $line);
                 for ($i = 0, $cnt = count($cols) - 1; $i < $cnt; $i++) {
                     $h = $heads[$i];
@@ -340,7 +341,7 @@ class WeatherMapDataSource_rrd extends DatasourceBase
                         $candidate = $values[$n];
                         if (preg_match('/^\-?\d+[\.,]?\d*e?[+-]?\d*:?$/i', $candidate)) {
                             $this->data[$dir] = $candidate;
-                            wm_debug("$candidate is OK value for $n\n");
+                            MapUtility::wm_debug("$candidate is OK value for $n\n");
                             $data_ok = true;
                         }
                     }
@@ -367,9 +368,9 @@ class WeatherMapDataSource_rrd extends DatasourceBase
             // report DS name error
             $names = join(",", $heads);
             $names = str_replace("timestamp,", "", $names);
-            wm_warn("RRD ReadData: At least one of your DS names (" . $dsnames[IN] . " and " . $dsnames[OUT] . ") were not found, even though there was a valid data line. Maybe they are wrong? Valid DS names in this file are: $names [WMRRD06]\n");
+            MapUtility::wm_warn("RRD ReadData: At least one of your DS names (" . $dsnames[IN] . " and " . $dsnames[OUT] . ") were not found, even though there was a valid data line. Maybe they are wrong? Valid DS names in this file are: $names [WMRRD06]\n");
         }
-        wm_debug("RRD ReadDataFromRealRRD: Returning (" . ($this->data[IN] === null ? 'null' : $this->data[IN]) . "," . ($this->data[OUT] === null ? 'null' : $this->data[OUT]) . ",$this->dataTime)\n");
+        MapUtility::wm_debug("RRD ReadDataFromRealRRD: Returning (" . ($this->data[IN] === null ? 'null' : $this->data[IN]) . "," . ($this->data[OUT] === null ? 'null' : $this->data[OUT]) . ",$this->dataTime)\n");
     }
 
     // Actually read data from a data source, and return it
@@ -378,8 +379,6 @@ class WeatherMapDataSource_rrd extends DatasourceBase
     // data_time is intended to allow more informed graphing in the future
     public function ReadData($targetstring, &$map, &$item)
     {
-        global $config;
-
         $this->data[IN] = null;
         $this->data[OUT] = null;
         $dsnames = array(IN=>"traffic_in", OUT=>"traffic_out");
@@ -388,11 +387,11 @@ class WeatherMapDataSource_rrd extends DatasourceBase
 
         if ($map->get_hint("rrd_default_in_ds") != '') {
             $dsnames[IN] = $map->get_hint("rrd_default_in_ds");
-            wm_debug("Default 'in' DS name changed to " . $dsnames[IN] . ".\n");
+            MapUtility::wm_debug("Default 'in' DS name changed to " . $dsnames[IN] . ".\n");
         }
         if ($map->get_hint("rrd_default_out_ds") != '') {
             $dsnames[OUT] = $map->get_hint("rrd_default_out_ds");
-            wm_debug("Default 'out' DS name changed to " . $dsnames[OUT] . ".\n");
+            MapUtility::wm_debug("Default 'out' DS name changed to " . $dsnames[OUT] . ".\n");
         }
 
         $multiplier = 8; // default bytes-to-bits
@@ -403,7 +402,7 @@ class WeatherMapDataSource_rrd extends DatasourceBase
             $dsnames[IN] = $matches[2];
             $dsnames[OUT] = $matches[3];
 
-            wm_debug("Special DS names seen (" . $dsnames[IN] . " and " . $dsnames[OUT] . ").\n");
+            MapUtility::wm_debug("Special DS names seen (" . $dsnames[IN] . " and " . $dsnames[OUT] . ").\n");
         }
 
         if (preg_match("/^rrd:(.*)/", $rrdfile, $matches)) {
@@ -420,7 +419,7 @@ class WeatherMapDataSource_rrd extends DatasourceBase
             $multiplier = $matches[1];
         }
 
-        wm_debug("SCALING result by $multiplier\n");
+        MapUtility::wm_debug("SCALING result by $multiplier\n");
 
         // try and make a complete path, if we've been given a clue
         // (if the path starts with a . or a / then assume the user knows what they are doing)
@@ -455,12 +454,12 @@ class WeatherMapDataSource_rrd extends DatasourceBase
         if ($aggregatefunction != '' && $use_poller_output == 1) {
             $use_poller_output = 0;
             if ($nowarn_po_agg == 0) {
-                wm_warn("Can't use poller_output for rrd-aggregated data - disabling rrd_use_poller_output [WMRRD10]\n");
+                MapUtility::wm_warn("Can't use poller_output for rrd-aggregated data - disabling rrd_use_poller_output [WMRRD10]\n");
             }
         }
 
         if ($use_poller_output == 1) {
-            wm_debug("Going to try poller_output, as requested.\n");
+            MapUtility::wm_debug("Going to try poller_output, as requested.\n");
             WeatherMapDataSource_rrd::wmrrd_read_from_poller_output($rrdfile, "AVERAGE", $start, $end, $dsnames, $map, $item);
         }
 
@@ -469,10 +468,10 @@ class WeatherMapDataSource_rrd extends DatasourceBase
         //   because there won't be valid data in the weathermap_data table yet.
         if (($dsnames[IN] != '-' && $this->data[IN] === null) || ($dsnames[OUT] != '-' && $this->data[OUT] === null)) {
             if ($use_poller_output == 1) {
-                wm_debug("poller_output didn't get anything useful. Kicking it old skool.\n");
+                MapUtility::wm_debug("poller_output didn't get anything useful. Kicking it old skool.\n");
             }
             if (file_exists($rrdfile)) {
-                wm_debug("RRD ReadData: Target DS names are " . $dsnames[IN] . " and " . $dsnames[OUT] . "\n");
+                MapUtility::wm_debug("RRD ReadData: Target DS names are " . $dsnames[IN] . " and " . $dsnames[OUT] . "\n");
 
                 if ($aggregatefunction != '') {
                     WeatherMapDataSource_rrd::wmrrd_read_from_real_rrdtool_aggregate($rrdfile, $cfname, $aggregatefunction, $start, $end, $dsnames, $map, $item);
@@ -481,7 +480,7 @@ class WeatherMapDataSource_rrd extends DatasourceBase
                     WeatherMapDataSource_rrd::wmrrd_read_from_real_rrdtool($rrdfile, $cfname, $start, $end, $dsnames, $map, $item);
                 }
             } else {
-                wm_warn("Target $rrdfile doesn't exist. Is it a file? [WMRRD06]\n");
+                MapUtility::wm_warn("Target $rrdfile doesn't exist. Is it a file? [WMRRD06]\n");
             }
         }
 

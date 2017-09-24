@@ -6,6 +6,8 @@
 
 namespace Weathermap\Editor;
 
+use Weathermap\UI\UIBase;
+
 //require_once "WeatherMapUIBase.class.php";
 //require_once "Editor.php";
 //require_once 'SimpleTemplate.php';
@@ -13,7 +15,7 @@ namespace Weathermap\Editor;
 /** The various functions concerned with the actual presentation of the supplied editor, and
  *  validation of input etc. Mostly class methods.
  */
-class EditorUI extends Weathermap\UI\UIBase
+class EditorUI extends UIBase
 {
     var $editor;
 

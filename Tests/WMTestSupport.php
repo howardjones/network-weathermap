@@ -1,5 +1,7 @@
 <?php
 
+use Weathermap\Core\Map;
+use Weathermap\Core\MapUtility;
 
 class WMTestSupport
 {
@@ -60,7 +62,7 @@ class WMTestSupport
     {
         global $WEATHERMAP_VERSION;
 
-        $map = new WeatherMap();
+        $map = new Map();
 
         $map->ReadConfig($conffile);
         $skip = 0;
@@ -99,7 +101,7 @@ class WMTestSupport
             $map->imagefile = $imagefile;
 
             if ($htmlfile != '') {
-                TestOutput_HTML($htmlfile, $map);
+                MapUtility::TestOutput_HTML($htmlfile, $map);
             }
             if ($newconffile != '') {
                 $map->WriteConfig($newconffile);

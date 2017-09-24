@@ -1,8 +1,10 @@
 <?php
 
-require_once "WeatherMapUIBase.class.php";
-require_once 'WeathermapManager.class.php';
-require_once 'WeatherMapCactiManagementPlugin.php';
+namespace Weathermap\Integrations\Cacti;
+
+//require_once "WeatherMapUIBase.class.php";
+//require_once 'WeathermapManager.php';
+//require_once 'WeatherMapCactiManagementPlugin.php';
 
 
 class WeatherMapCacti10ManagementPlugin extends WeatherMapCactiManagementPlugin

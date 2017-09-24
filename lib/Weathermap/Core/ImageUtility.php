@@ -177,17 +177,11 @@ class ImageUtility
     public static function imagecolorize($imageRef, $red, $green, $blue)
     {
         // The function only accepts indexed colour images, so we pass off to a different method for truecolor images
-
         if (imageistruecolor($imageRef)) {
-            // wm_warn("imagecolorize requires paletted images - this is a truecolor image. Converting. Results are usually not good if there is transparency [WMIMG05].\n");
-//        imagesavealpha($imageRef, true);
-//        imagecolortransparent($imageRef, imagecolorat($imageRef, 0, 0));
-//        imagetruecolortopalette($imageRef, false, 254);
-//        wm_debug("Converted image has %d colours.\n", imagecolorstotal($imageRef));
-            return imagecolorize_truecolor($imageRef, $red, $green, $blue);
+            return self::imagecolorize_truecolor($imageRef, $red, $green, $blue);
         }
 
-        $pal = createColorizePalette($red, $green, $blue);
+        $pal = self::createColorizePalette($red, $green, $blue);
 
         // --- End of palette creation
 
@@ -205,7 +199,7 @@ class ImageUtility
 
     public static function imagecolorize_truecolor($imageRef, $red, $green, $blue)
     {
-        $pal = createColorizePalette($red, $green, $blue);
+        $pal = self::createColorizePalette($red, $green, $blue);
 
         imagesavealpha($imageRef, true);
         imagefilter($imageRef, IMG_FILTER_GRAYSCALE);
@@ -246,7 +240,7 @@ class ImageUtility
 
         // Input color luminosity: this is equivalent to the
         // position of the input color in the monochromatic palette 765=255*3
-        $inputLuminosity = round(255 * ($red + $green + $blue) / 765);
+        $inputLuminosity = intval(round(255 * ($red + $green + $blue) / 765));
 
         // We fill the palette entry with the input color at its
         // corresponding position

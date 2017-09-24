@@ -1,7 +1,7 @@
 <?php
 
-require_once dirname(__FILE__) . '/../lib/Map.php';
-require_once dirname(__FILE__) . '/WMTestSupport.class.php';
+require_once dirname(__FILE__) . '/../lib/all.php';
+require_once dirname(__FILE__) . '/WMTestSupport.php';
 
 class ConfigTest extends PHPUnit_Framework_TestCase
 {

@@ -55,15 +55,15 @@ class WeatherMapDataSource_cactithold extends DatasourceBase
                 return false;
             }
 
-            $thold_present = false;
+            $tholdPresent = false;
 
             if (function_exists("api_plugin_is_enabled")) {
                 if (api_plugin_is_enabled('thold')) {
-                    $thold_present = true;
+                    $tholdPresent = true;
                 }
             }
 
-            if (!$thold_present) {
+            if (!$tholdPresent) {
                 MapUtility::wm_debug("ReadData CactiTHold: THold plugin not enabled. [THOLD002]\n");
             }
 
@@ -89,7 +89,7 @@ class WeatherMapDataSource_cactithold extends DatasourceBase
             $statement = $pdo->prepare("select * from plugin_config where directory='thold'");
             $statement->execute();
             $result = $statement->fetchall(PDO::FETCH_ASSOC);
-            if (sizeof($result) == 1) {
+            if (count($result) == 1) {
                 $version = $result[0]['version'];
                 if (substr($version, 0, 1) != "0") {
                     $this->thold10 = true;
@@ -126,13 +126,13 @@ class WeatherMapDataSource_cactithold extends DatasourceBase
             // use target aggregation to build these up into a 'badness' percentage
             // takes the same two values that are visible in thold's own URLs (the actual thold ID isn't shown anywhere)
 
-            $rra_id = intval($matches[1]);
-            $data_id = intval($matches[2]);
+            $rraId = intval($matches[1]);
+            $dataId = intval($matches[2]);
 
 //            $SQL2 = "select thold_alert from thold_data where rra_id=$rra_id and data_id=$data_id and thold_enabled='on'";
 
             $statement = $pdo->prepare("select thold_alert from thold_data where rra_id=? and data_id=? and thold_enabled='on'");
-            $statement->execute(array($rra_id, $data_id));
+            $statement->execute(array($rraId, $dataId));
             $result = $statement->fetch(PDO::FETCH_ASSOC);
 
 //            $result = db_fetch_row($SQL2);
@@ -221,8 +221,8 @@ class WeatherMapDataSource_cactithold extends DatasourceBase
                 MapUtility::wm_debug("CactiTHold ReadData: Basic state for host $id is $state/$statename\n");
 
                 MapUtility::wm_debug("CactiTHold ReadData: Checking threshold states for host $id\n");
-                $numthresh = 0;
-                $numfailing = 0;
+                $numThresholds = 0;
+                $numFailing = 0;
                 // $SQL2 = "select rra_id, data_id, thold_alert from thold_data,data_local where thold_data.rra_id=data_local.id and data_local.host_id=$id and thold_enabled='on'";
 
                 $statement = $pdo->prepare("select rra_id, data_id, thold_alert from thold_data,data_local where thold_data.rra_id=data_local.id and data_local.host_id=? and thold_enabled='on'");
@@ -240,10 +240,10 @@ class WeatherMapDataSource_cactithold extends DatasourceBase
                     foreach ($queryrows as $th) {
                         $desc = $th['rra_id'] . "/" . $th['data_id'];
                         $v = $th['thold_alert'];
-                        $numthresh++;
+                        $numThresholds++;
                         if (intval($th['thold_alert']) > 0) {
                             MapUtility::wm_debug("CactiTHold ReadData: Seen threshold $desc failing ($v)for host $id\n");
-                            $numfailing++;
+                            $numFailing++;
                         } else {
                             MapUtility::wm_debug("CactiTHold ReadData: Seen threshold $desc OK ($v) for host $id\n");
                         }
@@ -252,18 +252,18 @@ class WeatherMapDataSource_cactithold extends DatasourceBase
                     MapUtility::wm_debug("CactiTHold ReadData: Failed to get thold info for host $id\n");
                 }
 
-                MapUtility::wm_debug("CactiTHold ReadData: Checked $numthresh and found $numfailing failing\n");
+                MapUtility::wm_debug("CactiTHold ReadData: Checked $numThresholds and found $numFailing failing\n");
 
-                if (($numfailing > 0) && ($numthresh > 0) && ($state == 3)) {
+                if (($numFailing > 0) && ($numThresholds > 0) && ($state == 3)) {
                     $state = 4;
                     $statename = "tholdbreached";
                     $item->addNote("state", $statename);
-                    $item->addNote("thold_failcount", $numfailing);
-                    $item->addNote("thold_failpercent", ($numfailing / $numthresh) * 100);
+                    $item->addNote("thold_failcount", $numFailing);
+                    $item->addNote("thold_failpercent", ($numFailing / $numThresholds) * 100);
                     $this->data[IN] = $state;
-                    $this->data[OUT] = $numfailing;
+                    $this->data[OUT] = $numFailing;
                     MapUtility::wm_debug("CactiTHold ReadData: State is $state/$statename\n");
-                } elseif ($numthresh > 0) {
+                } elseif ($numThresholds > 0) {
                     $item->addNote("thold_failcount", 0);
                     $item->addNote("thold_failpercent", 0);
                     MapUtility::wm_debug("CactiTHold ReadData: Leaving state as $state\n");

@@ -44,10 +44,10 @@ class WeatherMapDataSource_cacti extends DatasourceBase
         $this->data[OUT] = null;
 
         if (1 === preg_match($this->regexpsHandled[0], $targetstring, $matches)) {
-            $local_data_id = intval($matches[1]);
+            $localDataId = intval($matches[1]);
 
             // This is very unlikely to work - nothing is ADDING the correct lines to weathermap_data!
-            $SQL = 'select * from weathermap_data where local_data_id='.$local_data_id;
+            $SQL = 'select * from weathermap_data where local_data_id='.$localDataId;
 
             $result = \db_fetch_row($SQL);
         }

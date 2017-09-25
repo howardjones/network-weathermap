@@ -8,6 +8,7 @@ namespace Weathermap\Plugins\Datasources;
 
 use Weathermap\Core\Map;
 use Weathermap\Core\MapDataItem;
+use Weathermap\Core\MapUtility;
 
 class WeatherMapDataSource_fping extends DatasourceBase
 {
@@ -15,7 +16,7 @@ class WeatherMapDataSource_fping extends DatasourceBase
     private $addresscache = array();
     private $donepings = false;
     private $results = array();
-    private $fping_cmd;
+    private $fpingCommand;
 
 
     public function __construct()
@@ -34,9 +35,9 @@ class WeatherMapDataSource_fping extends DatasourceBase
         #
         # You may need to change the line below to have something like "/usr/local/bin/fping" or "/usr/bin/fping" instead.
         #
-        $this->fping_cmd = "/usr/local/sbin/fping";
+        $this->fpingCommand = "/usr/local/sbin/fping";
 
-        return (true);
+        return true;
     }
 
     /**
@@ -61,45 +62,45 @@ class WeatherMapDataSource_fping extends DatasourceBase
         $this->data[IN] = null;
         $this->data[OUT] = null;
 
-        $ping_count = intval($map->get_hint("fping_ping_count"));
-        if ($ping_count == 0) {
-            $ping_count = 5;
+        $pingCount = intval($map->getHint("fping_ping_count"));
+        if ($pingCount == 0) {
+            $pingCount = 5;
         }
 
         if (preg_match('/^fping:(\S+)$/', $targetstring, $matches)) {
             $target = $matches[1];
 
             $pattern = '/^$target\s:';
-            for ($i = 0; $i < $ping_count; $i++) {
+            for ($i = 0; $i < $pingCount; $i++) {
                 $pattern .= '\s(\S+)';
             }
             $pattern .= "/";
 
-            if (is_executable($this->fping_cmd)) {
-                $command = $this->fping_cmd . " -t100 -r1 -p20 -u -C $ping_count -i10 -q $target 2>&1";
-                wm_debug("Running $command\n");
+            if (is_executable($this->fpingCommand)) {
+                $command = $this->fpingCommand . " -t100 -r1 -p20 -u -C $pingCount -i10 -q $target 2>&1";
+                MapUtility::wm_debug("Running $command\n");
                 $pipe = popen($command, "r");
 
                 $count = 0;
-                $hitcount = 0;
+                $hitCount = 0;
                 if (isset($pipe)) {
                     while (!feof($pipe)) {
                         $line = fgets($pipe, 4096);
                         $count++;
-                        wm_debug("Output: $line");
+                        MapUtility::wm_debug("Output: $line");
 
                         if (preg_match($pattern, $line, $matches)) {
-                            wm_debug("Found output line for $target\n");
-                            $hitcount++;
+                            MapUtility::wm_debug("Found output line for $target\n");
+                            $hitCount++;
                             $loss = 0;
                             $ave = 0;
                             $total = 0;
                             $cnt = 0;
                             $min = 999999;
                             $max = 0;
-                            for ($i = 1; $i <= $ping_count; $i++) {
+                            for ($i = 1; $i <= $pingCount; $i++) {
                                 if ($matches[$i] == '-') {
-                                    $loss += (100 / $ping_count);
+                                    $loss += (100 / $pingCount);
                                 } else {
                                     $cnt++;
                                     $total += $matches[$i];
@@ -111,26 +112,26 @@ class WeatherMapDataSource_fping extends DatasourceBase
                                 $ave = $total / $cnt;
                             }
 
-                            wm_debug("Result: $cnt $min -> $max $ave $loss\n");
+                            MapUtility::wm_debug("Result: $cnt $min -> $max $ave $loss\n");
                         }
                     }
                     pclose($pipe);
                     if ($count == 0) {
-                        wm_warn("FPing ReadData: No lines read. Bad hostname? ($target) [WMFPING03]\n");
+                        MapUtility::wm_warn("FPing ReadData: No lines read. Bad hostname? ($target) [WMFPING03]\n");
                     } else {
-                        if ($hitcount == 0) {
-                            wm_warn("FPing ReadData: $count lines read. But nothing returned for target??? ($target) Try running with DEBUG to see output.  [WMFPING02]\n");
+                        if ($hitCount == 0) {
+                            MapUtility::wm_warn("FPing ReadData: $count lines read. But nothing returned for target??? ($target) Try running with DEBUG to see output.  [WMFPING02]\n");
                         } else {
                             $this->data[IN] = $ave;
                             $this->data[OUT] = $loss;
-                            $item->add_note("fping_min", $min);
-                            $item->add_note("fping_max", $max);
+                            $item->addNote("fping_min", $min);
+                            $item->addNote("fping_max", $max);
                         }
                     }
                     $this->dataTime = time();
                 }
             } else {
-                wm_warn("FPing ReadData: Can't find fping executable. Check path at line 19 of WeatherMapDataSource_fping.php [WMFPING01]\n");
+                MapUtility::wm_warn("FPing ReadData: Can't find fping executable. Check path at line 19 of WeatherMapDataSource_fping.php [WMFPING01]\n");
             }
         }
 

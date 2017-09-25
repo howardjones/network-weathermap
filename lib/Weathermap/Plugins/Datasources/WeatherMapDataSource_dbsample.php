@@ -31,7 +31,7 @@ class WeatherMapDataSource_dbsample extends DatasourceBase
             return false;
         }
 
-        return (true);
+        return true;
     }
 
     /**
@@ -48,15 +48,15 @@ class WeatherMapDataSource_dbsample extends DatasourceBase
 
 
         if (preg_match('/^dbplug:([^:]+)$/', $targetstring, $matches)) {
-            $database_user = $map->getHint('dbplug_dbuser');
-            $database_pass = $map->getHint('dbplug_dbpass');
-            $database_name = $map->getHint('dbplug_dbname');
-            $database_host = $map->getHint('dbplug_dbhost');
+            $databaseUser = $map->getHint('dbplug_dbuser');
+            $databasePassword = $map->getHint('dbplug_dbpass');
+            $databaseName = $map->getHint('dbplug_dbname');
+            $databaseHostname = $map->getHint('dbplug_dbhost');
 
 
             try {
                 # MySQL with PDO_MYSQL
-                $pdo = new PDO("mysql:host=$database_host;dbname=$database_name", $database_user, $database_pass);
+                $pdo = new PDO("mysql:host=$databaseHostname;dbname=$databaseName", $databaseUser, $databasePassword);
                 $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
             } catch (PDOException $e) {
                 MapUtility::wm_warn($e->getMessage());

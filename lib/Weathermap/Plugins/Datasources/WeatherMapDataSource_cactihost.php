@@ -49,18 +49,18 @@ class WeatherMapDataSource_cactihost extends DatasourceBase
         $this->data[OUT] = null;
 
         if (preg_match($this->regexpsHandled[0], $targetstring, $matches)) {
-            $cacti_id = intval($matches[1]);
+            $cactiHostId = intval($matches[1]);
 
             $pdo = weathermap_get_pdo();
 
-            $statement =$pdo->prepare("select * from host where id=?");
+            $statement = $pdo->prepare("select * from host where id=?");
 
             // 0=disabled
             // 1=down
             // 2=recovering
             // 3=up
 
-            $statement->execute(array($cacti_id));
+            $statement->execute(array($cactiHostId));
 
             $state = -1;
             $result = $statement->fetch(PDO::FETCH_ASSOC);

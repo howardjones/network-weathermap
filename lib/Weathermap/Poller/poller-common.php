@@ -314,11 +314,15 @@ function weathermap_run_maps($mydir)
                                     MapUtility::wm_debug("Wrote HTML to %s\n", $htmlfile);
                                 } else {
                                     if (true === file_exists($htmlfile)) {
-                                        MapUtility::wm_warn('Failed to overwrite ' . $htmlfile
-                                            . " - permissions of existing file are wrong? [WMPOLL02]\n");
+                                        MapUtility::wm_warn(
+                                            'Failed to overwrite ' . $htmlfile
+                                            . " - permissions of existing file are wrong? [WMPOLL02]\n"
+                                        );
                                     } else {
-                                        MapUtility::wm_warn('Failed to create ' . $htmlfile
-                                            . " - permissions of output directory are wrong? [WMPOLL03]\n");
+                                        MapUtility::wm_warn(
+                                            'Failed to create ' . $htmlfile
+                                            . " - permissions of output directory are wrong? [WMPOLL03]\n"
+                                        );
                                     }
                                 }
                             }
@@ -335,10 +339,13 @@ function weathermap_run_maps($mydir)
                             $wmap->stats->dump();
 
                             if (intval($wmap->thumbWidth) > 0) {
-                                $manager->updateMap($map->id, array(
+                                $manager->updateMap(
+                                    $map->id,
+                                    array(
                                     'thumb_width' => intval($wmap->thumbWidth),
                                     'thumb_height' => intval($wmap->thumbHeight)
-                                ));
+                                    )
+                                );
                             }
 
                             $wmap->cleanUp();
@@ -358,10 +365,13 @@ function weathermap_run_maps($mydir)
                         } else {
                             MapUtility::wm_warn("Mapfile $mapfile is not readable or doesn't exist [WMPOLL04]\n");
                         }
-                        $manager->updateMap($map->id, array(
+                        $manager->updateMap(
+                            $map->id,
+                            array(
                             'warncount' => intval($weathermap_warncount),
                             'runtime' => floatval($map_duration)
-                        ));
+                            )
+                        );
 
                         $total_warnings += $weathermap_warncount;
                         $weathermap_warncount = 0;

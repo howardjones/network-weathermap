@@ -112,7 +112,7 @@ class WeatherMapCactiUserPlugin extends UIBase
         $new_groups = array();
         foreach ($groups as $group) {
             if (array_key_exists($group->id, $seen_group)) {
-                $new_groups []= $group;
+                $new_groups [] = $group;
             }
         }
 

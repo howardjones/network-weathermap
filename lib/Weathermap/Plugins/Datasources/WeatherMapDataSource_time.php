@@ -44,12 +44,12 @@ class WeatherMapDataSource_time extends DatasourceBase
 
         if (preg_match($this->regexpsHandled[0], $targetstring, $matches)) {
             $timezone = $matches[1];
-            $timezone_l = strtolower($timezone);
+            $timezoneLowerCase = strtolower($timezone);
 
-            $timezone_identifiers = DateTimeZone::listIdentifiers();
+            $allTimezones = DateTimeZone::listIdentifiers();
 
-            foreach ($timezone_identifiers as $tz) {
-                if (strtolower($tz) == $timezone_l) {
+            foreach ($allTimezones as $tz) {
+                if (strtolower($tz) == $timezoneLowerCase) {
                     MapUtility::wm_debug("Time ReadData: Timezone exists: $tz\n");
                     $dateTime = new DateTime("now", new DateTimeZone($tz));
 

@@ -31,31 +31,31 @@ class WeatherMapDataSource_dsstats extends DatasourceBase
                 return false;
             }
 
-            $dsstats_running = false;
+            $dsstatsRunning = false;
 
             MapUtility::wm_debug("ReadData DSStats: Checking for 1.x integrated...\n");
             if (function_exists("read_config_option")) {
                 if (read_config_option("dsstats_enable") == "on") {
-                    $dsstats_running = true;
+                    $dsstatsRunning = true;
                     MapUtility::wm_debug("ReadData DSStats: Found 1.x integrated DSStats\n");
                 } else {
                     MapUtility::wm_debug("ReadData DSStats: No 1.x integrated DSStats\n");
                 }
             }
 
-            if (!$dsstats_running) {
+            if (!$dsstatsRunning) {
                 MapUtility::wm_debug("ReadData DSStats: Checking for 0.8.8 plugin...\n");
                 if (function_exists("api_plugin_is_enabled")) {
                     if (api_plugin_is_enabled('dsstats')) {
                         MapUtility::wm_debug("ReadData DSStats: DSStats plugin enabled. [DSSTATS002B]\n");
-                        $dsstats_running = true;
+                        $dsstatsRunning = true;
                     } else {
                         MapUtility::wm_debug("ReadData DSStats: DSStats plugin NOT enabled. [DSSTATS002B]\n");
                     }
                 }
             }
 
-            if (!$dsstats_running) {
+            if (!$dsstatsRunning) {
                 return false;
             }
 
@@ -100,11 +100,11 @@ class WeatherMapDataSource_dsstats extends DatasourceBase
         $this->data[OUT] = null;
         $pdo = weathermap_get_pdo();
 
-        $local_data_id = null;
-        $dsnames = array(IN => "traffic_in", OUT => "traffic_out");
+        $localDataId = null;
+        $dsNames = array(IN => "traffic_in", OUT => "traffic_out");
 
-        $inbw = null;
-        $outbw = null;
+        $inBandwidth = null;
+        $outBandwidth = null;
 
         $table = "";
         $keyfield = "rrd_name";
@@ -112,9 +112,9 @@ class WeatherMapDataSource_dsstats extends DatasourceBase
         $field = "";
 
         if (preg_match('/^dsstats:(\d+):([\-a-zA-Z0-9_]+):([\-a-zA-Z0-9_]+)$/', $targetstring, $matches)) {
-            $local_data_id = $matches[1];
-            $dsnames[IN] = $matches[2];
-            $dsnames[OUT] = $matches[3];
+            $localDataId = $matches[1];
+            $dsNames[IN] = $matches[2];
+            $dsNames[OUT] = $matches[3];
 
             $datatype = "last";
 
@@ -123,10 +123,10 @@ class WeatherMapDataSource_dsstats extends DatasourceBase
                 MapUtility::wm_debug("Default datatype changed to " . $datatype . ".\n");
             }
         } elseif (preg_match('/^dsstats:([a-z]+):(\d+):([\-a-zA-Z0-9_]+):([\-a-zA-Z0-9_]+)$/', $targetstring, $matches)) {
-            $dsnames[IN] = $matches[3];
-            $dsnames[OUT] = $matches[4];
+            $dsNames[IN] = $matches[3];
+            $dsNames[OUT] = $matches[4];
             $datatype = $matches[1];
-            $local_data_id = $matches[2];
+            $localDataId = $matches[2];
         }
 
         if (substr($datatype, 0, 5) == "daily") {
@@ -169,18 +169,18 @@ class WeatherMapDataSource_dsstats extends DatasourceBase
                 $keyfield,
                 $field,
                 $table,
-                $local_data_id,
+                $localDataId,
                 $keyfield,
-                $pdo->quote($dsnames[IN]),
+                $pdo->quote($dsNames[IN]),
                 $keyfield,
-                $pdo->quote($dsnames[OUT])
+                $pdo->quote($dsNames[OUT])
             );
 
             $results = \db_fetch_assoc($SQL);
-            if (sizeof($results) > 0) {
+            if (count($results) > 0) {
                 foreach ($results as $result) {
                     foreach (array(IN, OUT) as $dir) {
-                        if (($dsnames[$dir] == $result['name']) && ($result['result'] != -90909090909) && ($result['result'] != 'U')) {
+                        if (($dsNames[$dir] == $result['name']) && ($result['result'] != -90909090909) && ($result['result'] != 'U')) {
                             $this->data[$dir] = $result['result'];
                         }
                     }
@@ -192,28 +192,28 @@ class WeatherMapDataSource_dsstats extends DatasourceBase
                 // insert the required details into weathermap_data, so it will be picked up next time
                 $SQL = sprintf(
                     "select data_template_data.data_source_path as path from data_template_data,data_template_rrd where data_template_data.local_data_id=data_template_rrd.local_data_id and data_template_rrd.local_data_id=%d",
-                    $local_data_id
+                    $localDataId
                 );
                 $result = \db_fetch_row($SQL);
-                if (sizeof($result) > 0) {
-                    $db_rrdname = $result['path'];
-                    MapUtility::wm_debug("Filename is $db_rrdname");
+                if (count($result) > 0) {
+                    $databaseRRDName = $result['path'];
+                    MapUtility::wm_debug("Filename is $databaseRRDName");
                     foreach (array(IN, OUT) as $dir) {
                         if ($this->data[$dir] === null) {
                             $statement = $pdo->prepare("insert into weathermap_data (rrdfile, data_source_name, sequence, local_data_id) values (?,?,?,?)");
-                            $statement->execute(array($db_rrdname, $dsnames[$dir], 0, $local_data_id));
+                            $statement->execute(array($databaseRRDName, $dsNames[$dir], 0, $localDataId));
                         }
                     }
                 } else {
-                    MapUtility::wm_warn("DSStats ReadData: Failed to find a filename for DS id $local_data_id [WMDSTATS01]");
+                    MapUtility::wm_warn("DSStats ReadData: Failed to find a filename for DS id $localDataId [WMDSTATS01]");
                 }
             }
         }
 
         // fill all that other information (ifSpeed, etc)
         // (but only if it's not switched off!)
-        if (($map->getHint("dsstats_no_cacti_extras") === null) && $local_data_id > 0) {
-            updateCactiData($item, $local_data_id);
+        if (($map->getHint("dsstats_no_cacti_extras") === null) && $localDataId > 0) {
+            updateCactiData($item, $localDataId);
         }
 
         return $this->returnData();

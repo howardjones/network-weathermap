@@ -36,7 +36,7 @@ class DatasourceBase
 // but just before ReadData. Used to allow plugins to verify their dependencies
 // (if any) and bow out gracefully. Return FALSE to signal that the plugin is not
 // in a fit state to run at the moment.
-    function init(&$map)
+    public function init(&$map)
     {
         $this->owner = $map;
 
@@ -72,7 +72,7 @@ class DatasourceBase
      * @param MapDataItem $item
      * @return array
      */
-    function readData($targetstring, &$map, &$item)
+    public function readData($targetstring, &$map, &$item)
     {
         return array(-1, -1);
     }
@@ -84,7 +84,7 @@ class DatasourceBase
      *
      * @return array
      */
-    function returnData()
+    protected function returnData()
     {
         MapUtility::wm_debug(
             sprintf(

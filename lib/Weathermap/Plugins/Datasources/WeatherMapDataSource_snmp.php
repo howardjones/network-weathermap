@@ -15,9 +15,11 @@
 
 namespace Weathermap\Plugins\Datasources;
 
+use Weathermap\Core\MapUtility;
+
 class WeatherMapDataSource_snmp extends DatasourceBase
 {
-    protected $down_cache;
+    protected $downCache;
 
     public function __construct()
     {
@@ -32,12 +34,12 @@ class WeatherMapDataSource_snmp extends DatasourceBase
     public function init(&$map)
     {
         // We can keep a list of unresponsive nodes, so we can give up earlier
-        $this->down_cache = array();
+        $this->downCache = array();
 
         if (function_exists('snmpget')) {
             return true;
         }
-        wm_debug("SNMP DS: snmpget() not found. Do you have the PHP SNMP module?\n");
+        MapUtility::wm_debug("SNMP DS: snmpget() not found. Do you have the PHP SNMP module?\n");
 
         return false;
     }
@@ -49,7 +51,7 @@ class WeatherMapDataSource_snmp extends DatasourceBase
         if (preg_match($this->regexpsHandled[0], $targetstring, $matches)) {
             // make sure there is a key for every host in the down_cache
             $host = $matches[2];
-            $this->down_cache[$host] = 0;
+            $this->downCache[$host] = 0;
         }
     }
 
@@ -61,29 +63,29 @@ class WeatherMapDataSource_snmp extends DatasourceBase
 
         $timeout = 1000000;
         $retries = 2;
-        $abort_count = 0;
+        $abortCount = 0;
 
-        $in_result = null;
-        $out_result = null;
+        $inResult = null;
+        $outResult = null;
 
         $timeout = intval($map->get_hint("snmp_timeout", $timeout));
-        $abort_count = intval($map->get_hint("snmp_abort_count", $abort_count));
+        $abortCount = intval($map->get_hint("snmp_abort_count", $abortCount));
         $retries = intval($map->get_hint("snmp_retries", $retries));
 
-        wm_debug("Timeout changed to " . $timeout . " microseconds.\n");
-        wm_debug("Will abort after $abort_count failures for a given host.\n");
-        wm_debug("Number of retries changed to " . $retries . ".\n");
+        MapUtility::wm_debug("Timeout changed to " . $timeout . " microseconds.\n");
+        MapUtility::wm_debug("Will abort after $abortCount failures for a given host.\n");
+        MapUtility::wm_debug("Number of retries changed to " . $retries . ".\n");
 
         if (preg_match("/^snmp:([^:]+):([^:]+):([^:]+):([^:]+)$/", $targetstring, $matches)) {
             $community = $matches[1];
             $host = $matches[2];
-            $in_oid = $matches[3];
-            $out_oid = $matches[4];
+            $inOID = $matches[3];
+            $outOID = $matches[4];
 
-            if (($abort_count == 0)
+            if (($abortCount == 0)
                 || (
-                    ($abort_count > 0)
-                    && (!isset($this->down_cache[$host]) || intval($this->down_cache[$host]) < $abort_count)
+                    ($abortCount > 0)
+                    && (!isset($this->downCache[$host]) || intval($this->downCache[$host]) < $abortCount)
                 )
             ) {
                 if (function_exists("snmp_get_quick_print")) {
@@ -101,29 +103,29 @@ class WeatherMapDataSource_snmp extends DatasourceBase
                     snmp_set_valueretrieval(SNMP_VALUE_PLAIN);
                 }
 
-                if ($in_oid != '-') {
-                    $in_result = snmpget($host, $community, $in_oid, $timeout, $retries);
-                    if ($in_result !== false) {
-                        $this->data[IN] = floatval($in_result);
-                        $item->add_hint("snmp_in_raw", $in_result);
+                if ($inOID != '-') {
+                    $inResult = snmpget($host, $community, $inOID, $timeout, $retries);
+                    if ($inResult !== false) {
+                        $this->data[IN] = floatval($inResult);
+                        $item->addHint("snmp_in_raw", $inResult);
                     } else {
-                        $this->down_cache[$host]++;
+                        $this->downCache[$host]++;
                     }
                 }
 
-                if ($out_oid != '-') {
-                    $out_result = snmpget($host, $community, $out_oid, $timeout, $retries);
-                    if ($out_result !== false) {
+                if ($outOID != '-') {
+                    $outResult = snmpget($host, $community, $outOID, $timeout, $retries);
+                    if ($outResult !== false) {
                         // use floatval() here to force the output to be *some* kind of number
                         // just in case the stupid formatting stuff doesn't stop net-snmp returning 'down' instead of 2
-                        $this->data[OUT] = floatval($out_result);
-                        $item->add_hint("snmp_out_raw", $out_result);
+                        $this->data[OUT] = floatval($outResult);
+                        $item->addHint("snmp_out_raw", $outResult);
                     } else {
-                        $this->down_cache[$host]++;
+                        $this->downCache[$host]++;
                     }
                 }
 
-                wm_debug("SNMP ReadData: Got $in_result and $out_result\n");
+                MapUtility::wm_debug("SNMP ReadData: Got $inResult and $outResult\n");
 
                 $this->dataTime = time();
 
@@ -131,7 +133,7 @@ class WeatherMapDataSource_snmp extends DatasourceBase
                     snmp_set_quick_print($was);
                 }
             } else {
-                wm_warn("SNMP for $host has reached $abort_count failures. Skipping. [WMSNMP01]");
+                MapUtility::wm_warn("SNMP for $host has reached $abortCount failures. Skipping. [WMSNMP01]");
             }
         }
 

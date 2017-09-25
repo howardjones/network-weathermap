@@ -3,6 +3,7 @@
 namespace Weathermap\UI;
 
 use Weathermap\Core\WeathermapInternalFail;
+use Weathermap\Core\MapUtility;
 
 class UIBase
 {
@@ -114,17 +115,17 @@ class UIBase
             }
         }
 
-        $command_info = $this->commands[$action];
+        $command = $this->commands[$action];
 
         $params = array();
-        foreach ($command_info['args'] as $arg) {
+        foreach ($command['args'] as $arg) {
             if (isset($request[$arg[self::ARG_NAME]])) {
                 $params[$arg[self::ARG_NAME]] = $request[$arg[self::ARG_NAME]];
             }
         }
 
-        if (isset($command_info['handler'])) {
-            $handler = $command_info['handler'];
+        if (isset($command['handler'])) {
+            $handler = $command['handler'];
             $result = $this->$handler($params, $appObject);
 
             return $result;
@@ -165,7 +166,7 @@ class UIBase
 
         foreach ($this->types as $type => $validator) {
             if (!method_exists($this, $validator)) {
-                wm_warn("$type has a missing validator ($validator)");
+                MapUtility::wm_warn("$type has a missing validator ($validator)");
                 $result = false;
             }
         }
@@ -173,18 +174,18 @@ class UIBase
         foreach ($this->commands as $command => $detail) {
             if (!isset($detail['handler'])) {
                 $result = false;
-                wm_warn("$command doesn't specify handler");
+                MapUtility::wm_warn("$command doesn't specify handler");
             } else {
                 $handler = $detail['handler'];
                 if (!method_exists($this, $handler)) {
-                    wm_warn("$command has a missing handler ($handler)");
+                    MapUtility::wm_warn("$command has a missing handler ($handler)");
                     $result = false;
                 }
             }
             foreach ($detail['args'] as $spec) {
                 $type = $spec[1];
                 if (!array_key_exists($type, $this->types)) {
-                    wm_warn("$command uses type $type which isn't defined");
+                    MapUtility::wm_warn("$command uses type $type which isn't defined");
                     $result = false;
                 }
             }
@@ -284,7 +285,7 @@ class UIBase
  */
 function wmeSanitizeURI($str)
 {
-    static $drop_char_match = array(
+    static $dropMatchingCharacters = array(
         ' ',
         '^',
         '$',
@@ -303,18 +304,18 @@ function wmeSanitizeURI($str)
         '!',
         '%'
     );
-    static $drop_char_replace = array('', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '');
+    static $dropCharactersReplacements = array('', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '');
 
-    return str_replace($drop_char_match, $drop_char_replace, urldecode($str));
+    return str_replace($dropMatchingCharacters, $dropCharactersReplacements, urldecode($str));
 }
 
 // much looser sanitise for general strings that shouldn't have HTML in them
 function wmeSanitizeString($str)
 {
-    static $drop_char_match = array('<', '>');
-    static $drop_char_replace = array('', '');
+    static $dropMatchingCharacters = array('<', '>');
+    static $dropCharactersReplacements = array('', '');
 
-    return str_replace($drop_char_match, $drop_char_replace, urldecode($str));
+    return str_replace($dropMatchingCharacters, $dropCharactersReplacements, urldecode($str));
 }
 
 function wmeValidateBandwidth($bandwidth)
@@ -359,7 +360,7 @@ function wmeSanitizeSelected($str)
     return wmeSanitizeName($result);
 }
 
-function wmeSanitizeFile($filename, $allowed_exts = array())
+function wmeSanitizeFile($filename, $allowedExtensions = array())
 {
     $filename = wmeSanitizeURI($filename);
 
@@ -368,7 +369,7 @@ function wmeSanitizeFile($filename, $allowed_exts = array())
     }
 
     $clean = false;
-    foreach ($allowed_exts as $ext) {
+    foreach ($allowedExtensions as $ext) {
         $match = "." . $ext;
 
         if (substr($filename, -strlen($match), strlen($match)) == $match) {

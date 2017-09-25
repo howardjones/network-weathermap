@@ -213,7 +213,7 @@ class MapNode extends MapDataItem
             $paddingConstant = 4.0;
             $paddingFactor = 1.0;
 
-            $this->processedLabel = $map->ProcessString($this->label, $this, true, true);
+            $this->processedLabel = $map->processString($this->label, $this, true, true);
 
             // if screenshot_mode is enabled, wipe any letters to X and wipe any IP address to 127.0.0.1
             // hopefully that will preserve enough information to show cool stuff without leaking info
@@ -792,7 +792,7 @@ class MapNode extends MapDataItem
      */
     private function drawRealIcon(&$map, $iconColour)
     {
-        $this->iconfile = $map->ProcessString($this->iconfile, $this);
+        $this->iconfile = $map->processString($this->iconfile, $this);
 
         MapUtility::wm_debug('Actual image-based icon from ' . $this->iconfile . " for $this->name\n");
 
@@ -1110,8 +1110,8 @@ class MapNode extends MapDataItem
             // XXX - need a font definition from somewhere for NINK text
             $font = 1;
 
-            $instr = $map->ProcessString('{node:this:bandwidth_in:%.1k}', $this);
-            $outstr = $map->ProcessString('{node:this:bandwidth_out:%.1k}', $this);
+            $instr = $map->processString('{node:this:bandwidth_in:%.1k}', $this);
+            $outstr = $map->processString('{node:this:bandwidth_out:%.1k}', $this);
 
             $fontObject = $this->owner->fonts->getFont($font);
             list($textWidth, $textHeight) = $fontObject->calculateImageStringSize($instr);

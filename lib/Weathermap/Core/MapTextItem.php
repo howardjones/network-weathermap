@@ -37,7 +37,7 @@ class MapTextItem extends MapItem
      */
     public function preCalculate(&$owner)
     {
-        $this->processedText = $owner->ProcessString($this->configuredText, $owner, true);
+        $this->processedText = $owner->processString($this->configuredText, $owner, true);
     }
 
     public function myType()
@@ -63,7 +63,7 @@ class MapTextItem extends MapItem
     public function draw($imageRef, &$map)
     {
         $fontObject = $map->fonts->getFont($this->font);
-        $string = $map->ProcessString($this->configuredText, $map);
+        $string = $map->processString($this->configuredText, $map);
 
         if ($map->getHint('screenshot_mode') == 1) {
             $string = StringUtility::stringAnonymise($string);

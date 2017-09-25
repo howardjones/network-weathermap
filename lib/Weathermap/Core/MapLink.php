@@ -161,7 +161,7 @@ class MapLink extends MapDataItem
             $widthList[$direction] *= 1.1;
 
             // Time to deal with Link Comments, if any
-            $comment = $this->owner->ProcessString($this->comments[$direction], $this);
+            $comment = $this->owner->processString($this->comments[$direction], $this);
 
             if ($this->owner->getHint('screenshot_mode') == 1) {
                 $comment = StringUtility::stringAnonymise($comment);
@@ -371,7 +371,7 @@ class MapLink extends MapDataItem
                 $bandwidth = $this->maxValues[$direction];
             }
 
-            $bwlabelText = $this->owner->ProcessString($this->bwlabelformats[$direction], $this);
+            $bwlabelText = $this->owner->processString($this->bwlabelformats[$direction], $this);
             if ($bwlabelText != '') {
                 MapUtility::wm_debug('Bandwidth for label is ' . StringUtility::valueOrNull($bandwidth) . " (label is '$bwlabelText')\n");
                 $padding = intval($this->getHint('bwlabel_padding'));

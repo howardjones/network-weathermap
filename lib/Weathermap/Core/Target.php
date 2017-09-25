@@ -68,7 +68,7 @@ class Target
 
         // We're excluding notes from other plugins here
         // to stop plugin A from messing with plugin B
-        $this->finalTargetString = $map->ProcessString($this->originalTargetString, $mapItem, false, false);
+        $this->finalTargetString = $map->processString($this->originalTargetString, $mapItem, false, false);
 
         if ($this->originalTargetString != $this->finalTargetString) {
             MapUtility::wm_debug("%s: Targetstring is now %s\n", $mapItem, $this->finalTargetString);

@@ -263,7 +263,7 @@ function weathermap_run_maps($mydir)
 
                             // Write the image to a temporary file first - it turns out that libpng is not that fast
                             // and this way we avoid showing half a map
-                            $wmap->DrawMap($tempfile, $thumbimagefile, \read_config_option("weathermap_thumbsize"));
+                            $wmap->drawMap($tempfile, $thumbimagefile, \read_config_option("weathermap_thumbsize"));
 
                             // Firstly, don't move or delete anything if the image saving failed
                             if (file_exists($tempfile)) {
@@ -279,7 +279,7 @@ function weathermap_run_maps($mydir)
                             }
                             $fd = @fopen($htmlfile, 'w');
                             if ($fd != false) {
-                                fwrite($fd, $wmap->MakeHTML('weathermap_' . $map->filehash . '_imap'));
+                                fwrite($fd, $wmap->makeHTML('weathermap_' . $map->filehash . '_imap'));
                                 fclose($fd);
                                 MapUtility::wm_debug("Wrote HTML to $htmlfile");
                             } else {
@@ -290,10 +290,10 @@ function weathermap_run_maps($mydir)
                                 }
                             }
 
-                            $wmap->WriteDataFile($resultsfile);
+                            $wmap->writeDataFile($resultsfile);
                             // if the user explicitly defined a data file, write it there too
                             if ($wmap->dataoutputfile) {
-                                $wmap->WriteDataFile($wmap->dataoutputfile);
+                                $wmap->writeDataFile($wmap->dataoutputfile);
                             }
 
                             // put back the configured imageuri
@@ -308,7 +308,7 @@ function weathermap_run_maps($mydir)
                                 if ($fd !== false) {
                                     fwrite(
                                         $fd,
-                                        $wmap->MakeHTML('weathermap_' . $map->filehash . '_imap')
+                                        $wmap->makeHTML('weathermap_' . $map->filehash . '_imap')
                                     );
                                     fclose($fd);
                                     MapUtility::wm_debug("Wrote HTML to %s\n", $htmlfile);
@@ -328,20 +328,20 @@ function weathermap_run_maps($mydir)
                                 @copy($imagefile, $wmap->imageoutputfile);
                             }
 
-                            $processed_title = $wmap->ProcessString($wmap->title, $wmap);
+                            $processed_title = $wmap->processString($wmap->title, $wmap);
 
                             $manager->updateMap($map->id, array('titlecache' => $processed_title));
 
                             $wmap->stats->dump();
 
-                            if (intval($wmap->thumb_width) > 0) {
+                            if (intval($wmap->thumbWidth) > 0) {
                                 $manager->updateMap($map->id, array(
-                                    'thumb_width' => intval($wmap->thumb_width),
-                                    'thumb_height' => intval($wmap->thumb_height)
+                                    'thumb_width' => intval($wmap->thumbWidth),
+                                    'thumb_height' => intval($wmap->thumbHeight)
                                 ));
                             }
 
-                            $wmap->CleanUp();
+                            $wmap->cleanUp();
 
                             $map_duration = microtime(true) - $map_start;
                             MapUtility::wm_debug("TIME: $mapfile took $map_duration seconds.\n");

@@ -1627,7 +1627,7 @@ class ConfigReader
         $this->objectLineCount = 0;
         $this->currentType = 'NODE';
         $this->currentObject->configline = $this->lineCount;
-        $this->currentObject->defined_in = $this->currentSource;
+        $this->currentObject->definedIn = $this->currentSource;
 
         return true;
     }
@@ -1654,7 +1654,7 @@ class ConfigReader
         $this->currentType = 'LINK';
         $this->objectLineCount = 0;
         $this->currentObject->configline = $this->lineCount;
-        $this->currentObject->defined_in = $this->currentSource;
+        $this->currentObject->definedIn = $this->currentSource;
 
         return true;
     }
@@ -1789,13 +1789,13 @@ class ConfigReader
         if (file_exists($filename)) {
             MapUtility::wm_debug("Including '{$filename}'\n");
 
-            if (in_array($filename, $this->mapObject->included_files)) {
+            if (in_array($filename, $this->mapObject->includedFiles)) {
                 MapUtility::wm_warn("Attempt to include '$filename' twice! Skipping it.\n");
                 return (false);
             }
 
-            $this->mapObject->included_files[] = $filename;
-            $this->mapObject->has_includes = true;
+            $this->mapObject->includedFiles[] = $filename;
+            $this->mapObject->hasIncludes = true;
 
             $reader = new ConfigReader($this->mapObject);
             $reader->readConfigFile($matches[1]);

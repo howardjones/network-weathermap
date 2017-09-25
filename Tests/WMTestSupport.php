@@ -64,7 +64,7 @@ class WMTestSupport
 
         $map = new Map();
 
-        $map->ReadConfig($conffile);
+        $map->readConfig($conffile);
         $skip = 0;
         $nwarns = 0;
 
@@ -97,19 +97,19 @@ class WMTestSupport
         if ($skip == 0) {
             $map->readData();
 //            $map->preCalculate($map);
-            $map->DrawMap($imagefile);
+            $map->drawMap($imagefile);
             $map->imagefile = $imagefile;
 
             if ($htmlfile != '') {
                 MapUtility::TestOutput_HTML($htmlfile, $map);
             }
             if ($newconffile != '') {
-                $map->WriteConfig($newconffile);
+                $map->writeConfig($newconffile);
             }
             $nwarns = $map->warncount;
         }
 
-        $map->CleanUp();
+        $map->cleanUp();
         unset($map);
 
         return intval($nwarns);

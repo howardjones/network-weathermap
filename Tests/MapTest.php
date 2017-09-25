@@ -1,6 +1,6 @@
 <?php
 
-//require_once dirname(__FILE__) . '/../lib/all.php';
+require_once dirname(__FILE__) . '/../lib/all.php';
 
 use Weathermap\Core\Map;
 use Weathermap\Core\WeathermapInternalFail;
@@ -48,7 +48,7 @@ class MapTest extends PHPUnit_Framework_TestCase
      */
     public function testAccessors()
     {
-        $this->object->ReadConfig(dirname(__FILE__).'/../test-suite/tests/simple-link-1.conf');
+        $this->object->readConfig(dirname(__FILE__).'/../test-suite/tests/simple-link-1.conf');
 
         $n1 = $this->object->getNode("n1");
         $l1 = $this->object->getLink("l1");
@@ -91,12 +91,13 @@ class MapTest extends PHPUnit_Framework_TestCase
         $this->assertEquals("", $this->object->processString("", $this->object, true, false));
         $this->assertEquals("dog", $this->object->processString("dog", $this->object, true, false));
 
+
         $this->assertEquals("[UNKNOWN]", $this->object->processString("{map:randomstring}", $this->object, true, false), "Map getProperty() can return UNKNOWN");
         $this->assertEquals("[UNKNOWN]", $this->object->processString("{node:randomstring}", $this->object, true, false), "Node getProperty() can return UNKNOWN");
         $this->assertEquals("[UNKNOWN]", $this->object->processString("{link:randomstring}", $this->object, true, false), "Link getProperty() can return UNKNOWN");
 
         // load a config file, so there are map objects to talk about
-        $this->object->ReadConfig(dirname(__FILE__).'/../test-suite/tests/simple-link-1.conf');
+        $this->object->readConfig(dirname(__FILE__).'/../test-suite/tests/simple-link-1.conf');
         // initialise the data, otherwise we'll get "" instead of 0 for bandwidth, etc
         $this->object->readData();
 

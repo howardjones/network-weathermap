@@ -15,7 +15,7 @@ class MapItem extends MapBase
     public $overlibheight;
     public $overlibcaption;
 //    public $my_default;
-    public $defined_in;
+    public $definedIn;
     public $name;
     public $configOverride;    # used by the editor to allow text-editing
     public $imagemapAreas;
@@ -48,12 +48,12 @@ class MapItem extends MapBase
 
     public function setDefined($source)
     {
-        $this->defined_in = $source;
+        $this->definedIn = $source;
     }
 
     public function getDefined()
     {
-        return $this->defined_in;
+        return $this->definedIn;
     }
 
     public function replaceConfig($newConfig)

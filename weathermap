@@ -184,7 +184,7 @@ foreach ($options_output as $key => $value) {
 
 $weathermap_map = $configfile;
 
-if ($map->ReadConfig($configfile)) {
+if ($map->readConfig($configfile)) {
     // allow command-lines to override the config file, but provide a default if neither are present
     if ($imagefile == '') {
         if ($map->imageoutputfile == '') {
@@ -222,7 +222,7 @@ if ($map->ReadConfig($configfile)) {
     }
 
     if ($imagefile != '') {
-        $map->DrawMap($imagefile);
+        $map->drawMap($imagefile);
         $map->imagefile = $imagefile;
     }
 
@@ -234,20 +234,20 @@ if ($map->ReadConfig($configfile)) {
         if ($map->htmlstylesheet != '') {
             fwrite($fd, '<link rel="stylesheet" type="text/css" href="' . $map->htmlstylesheet . '" />');
         }
-        fwrite($fd, '<meta http-equiv="refresh" content="300" /><title>' . $map->ProcessString($map->title, $map) . '</title></head><body>');
+        fwrite($fd, '<meta http-equiv="refresh" content="300" /><title>' . $map->processString($map->title, $map) . '</title></head><body>');
 
         if ($map->htmlstyle == "overlib") {
             fwrite($fd, "<div id=\"overDiv\" style=\"position:absolute; visibility:hidden; z-index:1000;\"></div>\n");
             fwrite($fd, "<script type=\"text/javascript\" src=\"overlib.js\"><!-- overLIB (c) Erik Bosrup --></script> \n");
         }
 
-        fwrite($fd, $map->MakeHTML());
+        fwrite($fd, $map->makeHTML());
         fwrite($fd, '<hr /><span id="byline">Network Map created with <a href="http://www.network-weathermap.com/?vs=' . $WEATHERMAP_VERSION . '">PHP Network Weathermap v' . $WEATHERMAP_VERSION . '</a></span></body></html>');
         fclose($fd);
     }
 
     if ($getOpt->getOption('dump-config') != '') {
-        $map->WriteConfig($getOpt->getOption('dump-config'));
+        $map->writeConfig($getOpt->getOption('dump-config'));
     }
 
     if ($getOpt->getOption('dump-json') != '') {
@@ -263,7 +263,7 @@ if ($map->ReadConfig($configfile)) {
     }
 
     if ($map->dataoutputfile != '') {
-        $map->WriteDataFile($map->dataoutputfile);
+        $map->writeDataFile($map->dataoutputfile);
     }
 
     if ($getOpt->getOption('dump-after') === 1) {

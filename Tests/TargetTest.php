@@ -20,7 +20,7 @@ class TargetTest extends PHPUnit_Framework_TestCase
         # load a blank config - this should be enough to initialise plugins
         $map = new Map();
         $map->context = "cli";
-        $map->ReadConfig("SET test1 10M\nNODE n1\n");
+        $map->readConfig("SET test1 10M\nNODE n1\n");
 
         $node = $map->getNode("n1");
         $tg1 = new Target("static:20M:10M", "myfile.conf", 22);
@@ -50,7 +50,7 @@ class TargetTest extends PHPUnit_Framework_TestCase
         # load a blank config - this should be enough to initialise plugins
         $map = new Map();
         $map->context = "cli";
-        $map->ReadConfig("\nNODE n1\n");
+        $map->readConfig("\nNODE n1\n");
 
         $node = $map->getNode("n1");
         $plugins = $map->plugins['data'];

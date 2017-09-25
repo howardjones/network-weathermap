@@ -39,7 +39,7 @@ class Editor
     {
         $this->map = new Map();
         $this->map->context = 'editor';
-        $this->map->ReadConfig($filename);
+        $this->map->readConfig($filename);
         $this->mapfile = $filename;
     }
 
@@ -396,7 +396,7 @@ class Editor
             }
 
             $newLink = new MapLink($newLinkName, $template, $this->map);
-            $newLink->defined_in = $this->map->configfile;
+            $newLink->definedIn = $this->map->configfile;
 
             $newLink->setEndNodes($this->map->getNode($nodeName1), $this->map->getNode($nodeName2));
 

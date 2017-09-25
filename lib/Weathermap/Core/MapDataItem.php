@@ -472,11 +472,18 @@ class MapDataItem extends MapItem
 
     public function getProperty($name)
     {
-        MapUtility::wm_debug("Fetching %s from %s\n", $name, $this);
+        MapUtility::wm_debug("MDI Fetching %s\n", $name);
+
+        $translations = array(
+        );
+
+        if (array_key_exists($name, $translations)) {
+            return $translations[$name];
+        }
+        // TODO - at some point, we can remove this bit, and limit access to ONLY the things listed above
         if (property_exists($this, $name)) {
             return $this->$name;
         }
 
-        return null;
-    }
-}
+        throw new WeathermapRuntimeWarning("NoSuchProperty");
+    }}

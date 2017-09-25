@@ -326,7 +326,7 @@ class EditorUI extends UIBase
             $editor->map->nodes[$nodename]->selected = 1;
         }
 
-        $editor->map->DrawMap('', '', 250, true, false, false);
+        $editor->map->drawMap('', '', 250, true, false, false);
 
         return false;
     }

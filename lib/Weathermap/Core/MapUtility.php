@@ -126,7 +126,7 @@ class MapUtility
         if ($map->htmlstylesheet != '') {
             fwrite($fd, '<link rel="stylesheet" type="text/css" href="' . $map->htmlstylesheet . '" />');
         }
-        fwrite($fd, '<meta http-equiv="refresh" content="300" /><title>' . $map->ProcessString($map->title, $map) . '</title></head><body>');
+        fwrite($fd, '<meta http-equiv="refresh" content="300" /><title>' . $map->processString($map->title, $map) . '</title></head><body>');
 
         if ($map->htmlstyle == 'overlib') {
             fwrite(
@@ -139,7 +139,7 @@ class MapUtility
             );
         }
 
-        fwrite($fd, $map->MakeHTML());
+        fwrite($fd, $map->makeHTML());
         fwrite(
             $fd,
             '<hr /><span id="byline">Network Map created with <a href="http://www.network-weathermap.com/?vs='

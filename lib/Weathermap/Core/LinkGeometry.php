@@ -1,4 +1,5 @@
 <?php
+
 namespace Weathermap\Core;
 
 /***
@@ -141,10 +142,7 @@ class LinkGeometry
         $arrowLength = $linkWidth * $arrowLengthFactor;
         $arrowWidth = $linkWidth * $arrowWidthFactor;
 
-        return (array(
-            $arrowLength,
-            $arrowWidth
-        ));
+        return array($arrowLength, $arrowWidth);
     }
 
 
@@ -232,7 +230,10 @@ class LinkGeometry
         foreach ($this->directions as $direction) {
             $totalDistance = $this->splitCurves[$direction]->totalDistance();
 
-            list($arrowSize, $this->arrowWidths[$direction]) = $this->calculateArrowSize($this->linkWidths[$direction], $this->arrowStyle);
+            list($arrowSize, $this->arrowWidths[$direction]) = $this->calculateArrowSize(
+                $this->linkWidths[$direction],
+                $this->arrowStyle
+            );
 
             MapUtility::wm_debug("Arrow size is $arrowSize and width is " . $this->arrowWidths[$direction] . "\n");
 
@@ -284,7 +285,12 @@ class LinkGeometry
             $polyline = $this->getDrawnPolygon($direction);
 
             if (!$this->fillColours[$direction]->isNone()) {
-                imagefilledpolygon($gdImage, $polyline, count($polyline) / 2, $this->fillColours[$direction]->gdAllocate($gdImage));
+                imagefilledpolygon(
+                    $gdImage,
+                    $polyline,
+                    count($polyline) / 2,
+                    $this->fillColours[$direction]->gdAllocate($gdImage)
+                );
             } else {
                 MapUtility::wm_debug("Not drawing $linkName ($direction) fill because there is no fill colour\n");
             }

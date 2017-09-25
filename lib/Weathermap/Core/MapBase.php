@@ -14,24 +14,24 @@ class MapBase
     const CONFIG_TYPE_LITERAL = 0;
     const CONFIG_TYPE_COLOR = 1;
 
-    var $notes = array();
-    var $hints = array();
-    var $inheritedFieldList;
-    var $imagemapAreas = array();
-    var $parent;
+    public $notes = array();
+    public $hints = array();
+    public $inheritedFieldList;
+    public $imagemapAreas = array();
+    public $parent;
 
     protected $config = array();
     protected $descendents = array();
     protected $dependencies = array();
 
-    function __construct()
+    public function __construct()
     {
         $this->config = array();
         $this->descendents = array();
         $this->dependencies = array();
     }
 
-    function __toString()
+    public function __toString()
     {
         return $this->myType() . ' ' . (isset($this->name) ? $this->name : '[unnamed]');
     }
@@ -41,13 +41,13 @@ class MapBase
         return 'BASE';
     }
 
-    function addNote($name, $value)
+    public function addNote($name, $value)
     {
         MapUtility::wm_debug("Adding note $name='$value' to " . $this->name . "\n");
         $this->notes[$name] = $value;
     }
 
-    function getNote($name, $default = null)
+    public function getNote($name, $default = null)
     {
         if (isset($this->notes[$name])) {
             //	debug("Found note $name in ".$this->name." with value of ".$this->notes[$name].".\n");
@@ -58,14 +58,14 @@ class MapBase
         }
     }
 
-    function addHint($name, $value)
+    public function addHint($name, $value)
     {
         MapUtility::wm_debug("Adding hint $name='$value' to " . $this->name . "\n");
         $this->hints[$name] = $value;
         # warn("Adding hint $name to ".$this->my_type()."/".$this->name."\n");
     }
 
-    function getHint($name, $default = null)
+    public function getHint($name, $default = null)
     {
         if (isset($this->hints[$name])) {
             //	debug("Found hint $name in ".$this->name." with value of ".$this->hints[$name].".\n");
@@ -237,14 +237,14 @@ class MapBase
     }
 
     /**
-     * @param array $basic_params
+     * @param array $simpleParameters
      * @param MapBase $reference
      * @return string
      */
-    protected function getSimpleConfig($basic_params, $reference)
+    protected function getSimpleConfig($simpleParameters, $reference)
     {
         $output = '';
-        foreach ($basic_params as $param) {
+        foreach ($simpleParameters as $param) {
             $field = $param[0];
             $keyword = $param[1];
 

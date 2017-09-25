@@ -5,15 +5,14 @@
         <?php
                 // if the cacti config was included properly, then
                 // this will be non-empty, and we can unhide the cacti links in the Link Properties box
-                if (! isset($config['cacti_version']) )
-                {
-                    echo "    .cactilink { display: none; }\n";
-                    echo "    .cactinode { display: none; }\n";
-                }
+        if (!isset($config['cacti_version'])) {
+            echo "    .cactilink { display: none; }\n";
+            echo "    .cactinode { display: none; }\n";
+        }
         ?>
     </style>
     <link rel="stylesheet" type="text/css" media="screen" href="editor-resources/oldeditor.css"/>
-    <script src="editor-resources/jquery-latest.min.js" type="text/javascript"></script>
+    <script type="text/javascript" src="vendor/jquery/dist/jquery.min.js"></script>
     <script src="editor-resources/editor.js" type="text/javascript"></script>
     <script src="editor-resources/editor16.js" type="text/javascript"></script>
     <script type="text/javascript">
@@ -46,20 +45,18 @@
 </div>
 <form action="<?php echo $editor_name ?>" method="post" name="frmMain">
     <div align="center" id="mainarea">
-        <input type="hidden" name="plug" value="<?php echo($fromplug == TRUE ? 1 : 0) ?>"/>
+        <input type="hidden" name="plug" value="<?php echo($fromplug == true ? 1 : 0) ?>"/>
         <input style="display:none" type="image"
                src="<?php echo $imageurl; ?>" id="xycapture"/><img src=
                                                                    "<?php echo $imageurl; ?>" id="existingdata"
                                                                    alt="Weathermap" usemap="#weathermap_imap"
         />
         <div class="debug"><p><strong>Debug:</strong>
-                <a href="?<?php echo($fromplug == TRUE ? 'plug=1&amp;' : ''); ?>action=retidy_all&amp;mapname=<?php echo htmlspecialchars($mapname) ?>">Re-tidy
+                <a href="?<?php echo($fromplug == true ? 'plug=1&amp;' : ''); ?>action=retidy_all&amp;mapname=<?php echo htmlspecialchars($mapname) ?>">Re-tidy
                     ALL</a>
-                <a href="?<?php echo($fromplug == TRUE ? 'plug=1&amp;' : ''); ?>action=retidy&amp;mapname=<?php echo htmlspecialchars($mapname) ?>">Re-tidy</a>
-                <a href="?<?php echo($fromplug == TRUE ? 'plug=1&amp;' : ''); ?>action=untidy&amp;mapname=<?php echo htmlspecialchars($mapname) ?>">Un-tidy</a>
-
-
-                <a href="?<?php echo($fromplug == TRUE ? 'plug=1&amp;' : ''); ?>action=nothing&amp;mapname=<?php echo htmlspecialchars($mapname) ?>">Do
+                <a href="?<?php echo($fromplug == true ? 'plug=1&amp;' : ''); ?>action=retidy&amp;mapname=<?php echo htmlspecialchars($mapname) ?>">Re-tidy</a>
+                <a href="?<?php echo($fromplug == true ? 'plug=1&amp;' : ''); ?>action=untidy&amp;mapname=<?php echo htmlspecialchars($mapname) ?>">Un-tidy</a>
+                <a href="?<?php echo($fromplug == true ? 'plug=1&amp;' : ''); ?>action=nothing&amp;mapname=<?php echo htmlspecialchars($mapname) ?>">Do
                     Nothing</a>
                 <span><label for="mapname">mapfile</label><input type="text" name="mapname"
                                                                  value="<?php echo htmlspecialchars($mapname); ?>"/></span>
@@ -70,7 +67,7 @@
                                                                value="<?php echo htmlspecialchars($param2); ?>"/></span>
                 <span><label for="debug">debug</label><input id="debug" value="" name="debug"/></span>
                 <a target="configwindow"
-                   href="?<?php echo($fromplug == TRUE ? 'plug=1&amp;' : ''); ?>action=show_config&amp;mapname=<?php echo urlencode($mapname) ?>">See
+                   href="?<?php echo($fromplug == true ? 'plug=1&amp;' : ''); ?>action=show_config&amp;mapname=<?php echo urlencode($mapname) ?>">See
                     config</a></p>
             <pre><?php echo htmlspecialchars($log) ?></pre>
         </div>
@@ -92,7 +89,16 @@
                 <tr>
                     <th>Position</th>
                     <td><input id="node_x" name="node_x" size=4 type="text"/>,<input id="node_y" name="node_y" size=4
-                                                                                     type="text"/></td>
+                                                                                     type="text"/>
+                        <span id="node_locktext">
+                                <br/>Lock to:
+                                <select name="node_lock_to" id="node_lock_to">
+                                    <option>-- NONE --</option>
+                                    <?php echo $nodeselection ?>
+                                </select>
+                            </span>
+
+                    </td>
                 </tr>
                 <tr>
                     <th>Internal Name</th>
@@ -180,8 +186,7 @@
                 <tr>
                     <th>Data Source</th>
                     <td><input id="link_target" name="link_target" type="text"/> <span class="cactilink"><a
-                                    id="link_cactipick">[Pick
-			  from Cacti]</a></span></td>
+                                    id="link_cactipick">[Pick from Cacti]</a></span></td>
                 </tr>
                 <tr>
                     <th>Link Width</th>
@@ -360,10 +365,10 @@
                 <tr>
                     <th>HTML Style</th>
                     <td><select name="mapstyle_htmlstyle">
-                            <option  value="overlib">
+                            <option value="overlib">
                                 Overlib (DHTML)
                             </option>
-                            <option  value="static">Static
+                            <option value="static">Static
                                 HTML
                             </option>
                         </select></td>

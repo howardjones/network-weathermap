@@ -159,22 +159,14 @@ class Colour
     {
         if (!$this->isRealColour()) {
             MapUtility::wm_warn("You can't make a contrast with 'none' - guessing black. [WMWARN43]\n");
-            return (array(0, 0, 0));
+            return array(0, 0, 0);
         }
 
         if ((($this->red + $this->green + $this->blue) > 500) || ($this->green > 140)) {
-            return (array(
-                0,
-                0,
-                0
-            ));
+            return array(0, 0, 0);
         }
 
-        return (array(
-            255,
-            255,
-            255
-        ));
+        return array(255, 255, 255);
     }
 
     public function getContrastingColour()
@@ -195,7 +187,7 @@ class Colour
         if ($this->isContrast()) {
             return 'contrast';
         }
-        return (sprintf($format, $this->red, $this->green, $this->blue));
+        return sprintf($format, $this->red, $this->green, $this->blue);
     }
 
     public function __toString()

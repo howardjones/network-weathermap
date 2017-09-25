@@ -299,7 +299,7 @@ function snap($coord, $gridsnap = 0)
         return $coord;
     } else {
         $rest = $coord % $gridsnap;
-        return ($coord - $rest + round($rest / $gridsnap) * $gridsnap);
+        return $coord - $rest + round($rest / $gridsnap) * $gridsnap;
     }
 }
 

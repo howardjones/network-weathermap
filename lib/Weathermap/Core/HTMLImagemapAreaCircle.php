@@ -29,7 +29,7 @@ class HTMLImagemapAreaCircle extends HTMLImagemapArea
         $radius2 = ($this->centy - $y) * ($this->centy - $y)
             + ($this->centx - $x) * ($this->centx - $x);
 
-        return ($radius2 <= $radius1);
+        return $radius2 <= $radius1;
     }
 
     public function __construct($name = '', $href = '', $coords)

@@ -45,4 +45,18 @@ class Font
     {
         return array(0, 0);
     }
+
+    public function asConfigData($fontNumber)
+    {
+        return array(
+            'number' => $fontNumber,
+            'type' => $this->type,
+            'file' => $this->file
+        );
+    }
+
+    public function getConfig($fontNumber)
+    {
+        return '';
+    }
 }

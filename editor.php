@@ -1,14 +1,10 @@
 <?php
 
-require_once 'lib/editor.inc.php';
-require_once 'lib/Map.php';
-require_once 'lib/geometry.php';
-require_once 'lib/Point.php';
-require_once 'lib/WMVector.class.php';
-require_once 'lib/Line.php';
+require_once 'lib/Weathermap/Editor/editor.inc.php';
+require_once 'lib/all.php';
 
 // so that you can't have the editor active, and not know about it.
-$ENABLED = false;
+$ENABLED = true;
 
 # Hardcoded for testing. Disable for release.
 # $FROM_CACTI = false;

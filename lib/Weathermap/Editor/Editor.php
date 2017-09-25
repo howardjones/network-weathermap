@@ -5,9 +5,11 @@
 // Released under the GNU Public License
 namespace Weathermap\Editor;
 
+use Weathermap\Core\BoundingBox;
 use Weathermap\Core\Map;
 use Weathermap\Core\MapNode;
 use Weathermap\Core\MapLink;
+use Weathermap\Core\Rectangle;
 use Weathermap\Core\WeathermapInternalFail;
 use Weathermap\Core\Point;
 use Weathermap\Core\MathUtility;
@@ -19,28 +21,28 @@ use Weathermap\Core\MathUtility;
 class Editor
 {
     /** @var Map $map */
-    var $map;
-    /** @var string $mapfile */
-    var $mapfile;
+    public $map;
+    /** @var string $mapFileName */
+    public $mapFileName;
 
-    function __construct()
+    public function __construct()
     {
         $this->map = null;
     }
 
-    function newConfig()
+    public function newConfig()
     {
         $this->map = new Map();
         $this->map->context = "editor";
-        $this->mapfile = "untitled";
+        $this->mapFileName = "untitled";
     }
 
-    function loadConfig($filename)
+    public function loadConfig($fileName)
     {
         $this->map = new Map();
         $this->map->context = 'editor';
-        $this->map->readConfig($filename);
-        $this->mapfile = $filename;
+        $this->map->readConfig($fileName);
+        $this->mapFileName = $fileName;
     }
 
     /**
@@ -48,37 +50,37 @@ class Editor
      *
      * Optionally, save to a different file from the one loaded.
      *
-     * @param string $filename
+     * @param string $fileName
      */
-    function saveConfig($filename = "")
+    public function saveConfig($fileName = "")
     {
-        if ($filename != "") {
-            $this->mapfile = $filename;
+        if ($fileName != "") {
+            $this->mapFileName = $fileName;
         }
-        $this->map->writeConfig($this->mapfile);
+        $this->map->writeConfig($this->mapFileName);
     }
 
     /**
      * Return the config that would have been saved. Mainly for tests.
      *
      */
-    function getConfig()
+    public function getConfig()
     {
         return $this->map->getConfig();
     }
 
-    function getItemConfig($item_type, $item_name)
+    public function getItemConfig($itemType, $itemName)
     {
-        if ($item_type == 'node') {
-            if ($this->map->nodeExists($item_name)) {
-                $node = $this->map->getNode($item_name);
+        if ($itemType == 'node') {
+            if ($this->map->nodeExists($itemName)) {
+                $node = $this->map->getNode($itemName);
                 return $node->getConfig();
             }
         }
 
-        if ($item_type == 'link') {
-            if ($this->map->linkExists($item_name)) {
-                $link = $this->map->getlink($item_name);
+        if ($itemType == 'link') {
+            if ($this->map->linkExists($itemName)) {
+                $link = $this->map->getlink($itemName);
                 return $link->getConfig();
             }
         }
@@ -86,7 +88,7 @@ class Editor
         return false;
     }
 
-    function addNode($x, $y, $nodeName = "", $template = "DEFAULT")
+    public function addNode($x, $y, $nodeName = "", $template = "DEFAULT")
     {
         if (!$this->isLoaded()) {
             throw new WeathermapInternalFail("Map must be loaded before editing API called.");
@@ -114,14 +116,14 @@ class Editor
             // only insert a label if there's no LABEL in the DEFAULT node.
             // otherwise, respect the template.
             $default = $this->map->getNode("DEFAULT");
-            $default_default = $this->map->getNode(":: DEFAULT ::");
+            $defaultDefault = $this->map->getNode(":: DEFAULT ::");
 
-            if ($default->label == $default_default->label) {
+            if ($default->label == $defaultDefault->label) {
                 $newNode->label = "Node";
             }
 
             $this->map->addNode($newNode);
-            $log = "added a node called $newNodeName at $x,$y to $this->mapfile";
+            $log = "added a node called $newNodeName at $x,$y to $this->mapFileName";
             $success = true;
         } else {
             $log = "Requested node name already exists";
@@ -131,7 +133,7 @@ class Editor
         return array($newNodeName, $success, $log);
     }
 
-    function isLoaded()
+    public function isLoaded()
     {
         return !is_null($this->map);
     }
@@ -146,7 +148,7 @@ class Editor
      * @return array
      * @throws WeathermapInternalFail
      */
-    function moveNode($nodeName, $newX, $newY)
+    public function moveNode($nodeName, $newX, $newY)
     {
         if (!$this->isLoaded()) {
             throw new WeathermapInternalFail("Map must be loaded before editing API called.");
@@ -159,17 +161,15 @@ class Editor
 
         $movingNode = $this->map->getNode($nodeName);
 
-        $affected_nodes = array();
-        $affected_links = array();
+        $affectedNodes = array();
+        $affectedLinks = array();
 
         // This is a complicated bit. Find out if this node is involved in any
         // links that have VIAs. If it is, we want to rotate those VIA points
         // about the *other* node in the link
         foreach ($this->map->links as $link) {
             if ((count($link->viaList) > 0) && (($link->endpoints[0]->node->name == $nodeName) || ($link->endpoints[1]->node->name == $nodeName))) {
-                $affected_links[] = $link->name;
-
-                $pivot = null;
+                $affectedLinks[] = $link->name;
 
                 // get the other node from us
                 if ($link->endpoints[0]->node->name == $nodeName) {
@@ -195,16 +195,17 @@ class Editor
                     $pivotY = $pivot->y;
 
                     $newPoint = new Point($newX, $newY);
+                    /** @var Point $pivotPoint */
                     $pivotPoint = $pivot->getPosition();
                     $movingPoint = $movingNode->getPosition();
 
                     $oldVector = $pivotPoint->vectorToPoint($movingPoint);
                     $newVector = $pivotPoint->vectorToPoint($newPoint);
 
-                    $angle_old = $oldVector->getAngle();
-                    $angle_new = $newVector->getAngle();
-                    $l_new = $newVector->length();
-                    $l_old = $oldVector->length();
+                    $oldAngle = $oldVector->getAngle();
+                    $newAngle = $newVector->getAngle();
+                    $oldLength = $oldVector->length();
+                    $newLength = $newVector->length();
 
                     // the geometry stuff uses a different point format, helpfully
                     $points = array();
@@ -213,17 +214,17 @@ class Editor
                         $points[] = $via[1];
                     }
 
-                    $scaleFactor = $l_new / $l_old;
+                    $scaleFactor = $newLength / $oldLength;
 
                     // rotate so that link is along the axis
-                    MathUtility::rotateAboutPoint($points, $pivotX, $pivotY, deg2rad($angle_old));
+                    MathUtility::rotateAboutPoint($points, $pivotX, $pivotY, deg2rad($oldAngle));
                     // do the scaling in here
                     for ($count = 0; $count < (count($points) / 2); $count++) {
                         $basex = ($points[$count * 2] - $pivotX) * $scaleFactor + $pivotX;
                         $points[$count * 2] = $basex;
                     }
                     // rotate back so that link is along the new direction
-                    MathUtility::rotateAboutPoint($points, $pivotX, $pivotY, deg2rad(-$angle_new));
+                    MathUtility::rotateAboutPoint($points, $pivotX, $pivotY, deg2rad(-$newAngle));
 
                     // now put the modified points back into the vialist again
                     $viaCount = 0;
@@ -246,13 +247,13 @@ class Editor
         $movingNode->x = $newX;
         $movingNode->y = $newY;
 
-        $n_links = count($affected_links);
-        $n_nodes = count($affected_nodes);
+        $nLinks = count($affectedLinks);
+        $nNodes = count($affectedNodes);
 
-        return array($n_nodes, $n_links, $affected_nodes, $affected_links);
+        return array($nNodes, $nLinks, $affectedNodes, $affectedLinks);
     }
 
-    function updateNode($nodename)
+    public function updateNode($nodeName)
     {
         if (!$this->isLoaded()) {
             throw new WeathermapInternalFail("Map must be loaded before editing API called.");
@@ -261,7 +262,7 @@ class Editor
         throw new WeathermapInternalFail("unimplemented");
     }
 
-    function replaceNodeConfig($nodeName, $newConfig)
+    public function replaceNodeConfig($nodeName, $newConfig)
     {
         if (!$this->isLoaded()) {
             throw new WeathermapInternalFail("Map must be loaded before editing API called.");
@@ -277,7 +278,7 @@ class Editor
         return true;
     }
 
-    function replaceLinkConfig($linkName, $newConfig)
+    public function replaceLinkConfig($linkName, $newConfig)
     {
         if (!$this->isLoaded()) {
             throw new WeathermapInternalFail("Map must be loaded before editing API called.");
@@ -293,43 +294,40 @@ class Editor
         return true;
     }
 
-    function deleteNode($nodename)
+    public function deleteNode($nodeName)
     {
         if (!$this->isLoaded()) {
             throw new WeathermapInternalFail("Map must be loaded before editing API called.");
         }
 
         $log = "";
-        $n_links = 0;
-        $n_nodes = 0;
-        $affected_nodes = array();
-        $affected_links = array();
+        $affectedNodes = array();
+        $affectedLinks = array();
 
-        if (isset($this->map->nodes[$nodename])) {
-            $affected_nodes[] = $nodename;
+        if (isset($this->map->nodes[$nodeName])) {
+            $affectedNodes[] = $nodeName;
 
-            $log = "delete node " . $nodename;
+            $log = "delete node " . $nodeName;
 
             foreach ($this->map->links as $link) {
                 if (isset($link->endpoints[0]->node)) {
-                    if (($nodename == $link->endpoints[0]->node->name) || ($nodename == $link->endpoints[1]->node->name)) {
-                        $affected_links[] = $link->name;
+                    if (($nodeName == $link->endpoints[0]->node->name) || ($nodeName == $link->endpoints[1]->node->name)) {
+                        $affectedLinks[] = $link->name;
                         unset($this->map->links[$link->name]);
                     }
                 }
             }
 
-            unset($this->map->nodes[$nodename]);
-            $n_nodes++;
+            unset($this->map->nodes[$nodeName]);
         }
         // TODO - look for relative positioned nodes, and un-relative them
 
-        $n_nodes = count($affected_nodes);
-        $n_links = count($affected_links);
-        return array($n_nodes, $n_links, $affected_nodes, $affected_links, $log);
+        $nNodes = count($affectedNodes);
+        $nLinks = count($affectedLinks);
+        return array($nNodes, $nLinks, $affectedNodes, $affectedLinks, $log);
     }
 
-    function cloneNode($sourceNodeName, $targetName = "", $or_fail = false)
+    public function cloneNode($sourceNodeName, $targetName = "", $orFail = false)
     {
         if (!$this->isLoaded()) {
             throw new WeathermapInternalFail("Map must be loaded before editing API called.");
@@ -342,7 +340,7 @@ class Editor
             // Try to use the requested name, if possible, and if specified
             $newNodeName = ($targetName != "" ? $targetName : $sourceNodeName);
 
-            if ($targetName != "" && $or_fail && $this->map->nodeExists($newNodeName)) {
+            if ($targetName != "" && $orFail && $this->map->nodeExists($newNodeName)) {
                 return array(false, null, "Requested name already exists");
             }
 
@@ -375,7 +373,7 @@ class Editor
         return array(false, null, "Request source does not exist");
     }
 
-    function addLink($nodeName1, $nodeName2, $linkName = "", $template = "DEFAULT")
+    public function addLink($nodeName1, $nodeName2, $linkName = "", $template = "DEFAULT")
     {
         if (!$this->isLoaded()) {
             throw new WeathermapInternalFail("Map must be loaded before editing API called.");
@@ -409,7 +407,7 @@ class Editor
         return array($newLinkName, $success, $log);
     }
 
-    function updateLink()
+    public function updateLink()
     {
         if (!$this->isLoaded()) {
             throw new WeathermapInternalFail("Map must be loaded before editing API called.");
@@ -418,14 +416,14 @@ class Editor
         throw new WeathermapInternalFail("unimplemented");
     }
 
-    function deleteLink($linkname)
+    public function deleteLink($linkName)
     {
         if (!$this->isLoaded()) {
             throw new WeathermapInternalFail("Map must be loaded before editing API called.");
         }
 
-        if (isset($this->map->links[$linkname])) {
-            unset($this->map->links[$linkname]);
+        if (isset($this->map->links[$linkName])) {
+            unset($this->map->links[$linkName]);
             return true;
         }
         return false;
@@ -435,10 +433,11 @@ class Editor
      * cloneLink - create a copy of an existing link
      * Not as useful as cloneNode, but still sometimes handy.
      *
-     * @param string $sourcename
-     * @param string $targetname
+     * @param string $sourceName
+     * @param string $targetName
+     * @throws WeathermapInternalFail
      */
-    function cloneLink($sourcename, $targetname = "")
+    public function cloneLink($sourceName, $targetName = "")
     {
         if (!$this->isLoaded()) {
             throw new WeathermapInternalFail("Map must be loaded before editing API called.");
@@ -451,48 +450,48 @@ class Editor
      * setLinkVia - simple-minded add/replacement of a single VIA for a link.
      * Should be replaced by addLinkVia with intelligent handling of multiple VIAs
      *
-     * @param string $linkname
+     * @param string $linkName
      * @param number $x
      * @param number $y
      * @return bool - successful or not
      * @throws WeathermapInternalFail
      */
-    function setLinkVia($linkname, $x, $y)
+    public function setLinkVia($linkName, $x, $y)
     {
         if (!$this->isLoaded()) {
             throw new WeathermapInternalFail("Map must be loaded before editing API called.");
         }
 
-        if (isset($this->map->links[$linkname])) {
-            $this->map->links[$linkname]->viaList = array(array(0 => $x, 1 => $y));
+        if (isset($this->map->links[$linkName])) {
+            $this->map->links[$linkName]->viaList = array(array(0 => $x, 1 => $y));
 
             return true;
         }
         return false;
     }
 
-    function clearLinkVias($linkname)
+    public function clearLinkVias($linkName)
     {
         if (!$this->isLoaded()) {
             throw new WeathermapInternalFail("Map must be loaded before editing API called.");
         }
 
-        if (isset($this->map->links[$linkname])) {
-            $this->map->links[$linkname]->viaList = array();
+        if (isset($this->map->links[$linkName])) {
+            $this->map->links[$linkName]->viaList = array();
 
             return true;
         }
         return false;
     }
 
-    function tidyLink($linkName)
+    public function tidyLink($linkName)
     {
         if (!$this->isLoaded()) {
             throw new WeathermapInternalFail("Map must be loaded before editing API called.");
         }
 
         // draw a map and throw it away, to calculate all the bounding boxes
-        $this->map->drawMapImage('null');
+        $this->map->drawMap('null');
         $link = $this->map->getLink($linkName);
         $this->tidyOneLink($link);
     }
@@ -504,43 +503,77 @@ class Editor
      * @param MapLink $link - the link to tidy
      * @param int $linknumber - if this is part of a group, which number in the group
      * @param int $linktotal - if this is part of a group, how many total in the group
-     * @param bool $ignore_tidied - whether to take notice of the "_tidied" hint
+     * @param bool $ignoreTidied - whether to take notice of the "_tidied" hint
      */
-    private function tidyOneLink($link, $linknumber = 1, $linktotal = 1, $ignore_tidied = false)
+    private function tidyOneLink($link, $linknumber = 1, $linktotal = 1, $ignoreTidied = false)
     {
         if ($link->isTemplate()) {
             return;
         }
 
-        $node_a = $link->endpoints[0]->node;
-        $node_b = $link->endpoints[1]->node;
+        $nodeA = $link->endpoints[0]->node;
+        $nodeB = $link->endpoints[1]->node;
 
         // Update TODO: if the nodes are already directly left/right or up/down, then use compass-points, not pixel offsets
         // (e.g. N90) so if the label changes, they won't need to be re-tidied
 
         // First bounding box in the node's boundingbox array is the icon, if there is one, or the label if not.
-        $bb_a = $node_a->boundingboxes[0];
-        $bb_b = $node_b->boundingboxes[0];
+        $boundingBoxA = $nodeA->boundingboxes[0];
+        $boundingBoxB = $nodeB->boundingboxes[0];
 
         // figure out if they share any x or y coordinates
-        $xOverlaps = $this->rangeOverlaps(array($bb_a[0], $bb_a[2]), array($bb_b[0], $bb_b[2]));
-        $yOverlaps = $this->rangeOverlaps(array($bb_a[1], $bb_a[3]), array($bb_b[1], $bb_b[3]));
+        $xOverlaps = $this->rangeOverlaps(array($boundingBoxA[0], $boundingBoxA[2]),
+            array($boundingBoxB[0], $boundingBoxB[2]));
+        $yOverlaps = $this->rangeOverlaps(array($boundingBoxA[1], $boundingBoxA[3]),
+            array($boundingBoxB[1], $boundingBoxB[3]));
 
-        $a_x_offset = 0;
-        $a_y_offset = 0;
-        $b_x_offset = 0;
-        $b_y_offset = 0;
+        $aXOffset = 0;
+        $aYOffset = 0;
+        $bXOffset = 0;
+        $bYOffset = 0;
 
         // if they are side by side, and there's some common y coords, make link horizontal
         if (!$xOverlaps && $yOverlaps) {
-            list($a_x_offset, $b_x_offset) = $this->tidySimpleDimension($bb_a, $bb_b, $node_a, $node_b, 0, "x");
-            list($a_y_offset, $b_y_offset) = $this->tidyComplexDimension($bb_a, $bb_b, $node_a, $node_b, 1, "y", $linknumber, $linktotal);
+            list($aXOffset, $bXOffset) = $this->tidySimpleDimension(
+                $boundingBoxA,
+                $boundingBoxB,
+                $nodeA,
+                $nodeB,
+                0,
+                "x"
+            );
+            list($aYOffset, $bYOffset) = $this->tidyComplexDimension(
+                $boundingBoxA,
+                $boundingBoxB,
+                $nodeA,
+                $nodeB,
+                1,
+                "y",
+                $linknumber,
+                $linktotal
+            );
         }
 
         // if they are above and below, and there's some common x coords, make link vertical
         if (!$yOverlaps && $xOverlaps) {
-            list($a_x_offset, $b_x_offset) = $this->tidyComplexDimension($bb_a, $bb_b, $node_a, $node_b, 0, "x", $linknumber, $linktotal);
-            list($a_y_offset, $b_y_offset) = $this->tidySimpleDimension($bb_a, $bb_b, $node_a, $node_b, 1, "y");
+            list($aXOffset, $bXOffset) = $this->tidyComplexDimension(
+                $boundingBoxA,
+                $boundingBoxB,
+                $nodeA,
+                $nodeB,
+                0,
+                "x",
+                $linknumber,
+                $linktotal
+            );
+            list($aYOffset, $bYOffset) = $this->tidySimpleDimension(
+                $boundingBoxA,
+                $boundingBoxB,
+                $nodeA,
+                $nodeB,
+                1,
+                "y"
+            );
         }
 
         if (!$xOverlaps && !$yOverlaps) {
@@ -550,11 +583,11 @@ class Editor
         // unwritten/implied - if both overlap, you're doing something weird and you're on your own
 
         // make the simplest possible offset string and finally, update the offsets
-        $link->endpoints[0]->offset = $this->simplifyOffset($a_x_offset, $a_y_offset);
-        $link->endpoints[1]->offset = $this->simplifyOffset($b_x_offset, $b_y_offset);
+        $link->endpoints[0]->offset = $this->simplifyOffset($aXOffset, $aYOffset);
+        $link->endpoints[1]->offset = $this->simplifyOffset($bXOffset, $bYOffset);
 
         // and also add a note that this link was tidied, and is eligible for automatic retidying
-        $link->add_hint("_tidied", 1);
+        $link->addHint("_tidied", 1);
     }
 
     /**
@@ -564,7 +597,7 @@ class Editor
      * @param float[] $rangeB
      * @return bool
      */
-    static function rangeOverlaps($rangeA, $rangeB)
+    public static function rangeOverlaps($rangeA, $rangeB)
     {
         if ($rangeA[0] > $rangeB[1]) {
             return false;
@@ -577,55 +610,72 @@ class Editor
     }
 
     /**
-     * @param $bb_a
-     * @param $bb_b
-     * @param $node_a
-     * @param $node_b
+     * @param Rectangle $boundingBoxA
+     * @param Rectangle $boundingBoxB
+     * @param MapNode $nodeA
+     * @param MapNode $nodeB
      * @param $simpleIndex
-     * @param $simpleCoordinate
+     * @param string $simpleCoordinate
      * @return array
      */
-    private function tidySimpleDimension($bb_a, $bb_b, $node_a, $node_b, $simpleIndex, $simpleCoordinate)
+    private function tidySimpleDimension($boundingBoxA, $boundingBoxB, $nodeA, $nodeB, $simpleIndex, $simpleCoordinate)
     {
         // snap the easy coord to the appropriate edge of the node
         // [A] [B]
-        if ($bb_a[$simpleIndex + 2] < $bb_b[$simpleIndex]) {
-            $a_x_offset = $bb_a[$simpleIndex + 2] - $node_a->$simpleCoordinate;
-            $b_x_offset = $bb_b[$simpleIndex] - $node_b->$simpleCoordinate;
+        if ($boundingBoxA[$simpleIndex + 2] < $boundingBoxB[$simpleIndex]) {
+            $aOffset = $boundingBoxA[$simpleIndex + 2] - $nodeA->$simpleCoordinate;
+            $bOffset = $boundingBoxB[$simpleIndex] - $nodeB->$simpleCoordinate;
         }
 
         // [B] [A]
-        if ($bb_b[$simpleIndex + 2] < $bb_a[$simpleIndex]) {
-            $a_x_offset = $bb_a[$simpleIndex] - $node_a->$simpleCoordinate;
-            $b_x_offset = $bb_b[$simpleIndex + 2] - $node_b->$simpleCoordinate;
-            return array($a_x_offset, $b_x_offset);
+        if ($boundingBoxB[$simpleIndex + 2] < $boundingBoxA[$simpleIndex]) {
+            $aOffset = $boundingBoxA[$simpleIndex] - $nodeA->$simpleCoordinate;
+            $bOffset = $boundingBoxB[$simpleIndex + 2] - $nodeB->$simpleCoordinate;
+            return array($aOffset, $bOffset);
         }
-        return array($a_x_offset, $b_x_offset);
+        return array($aOffset, $bOffset);
     }
 
     /**
-     * @param $bb_a
-     * @param $bb_b
-     * @param $node_a
-     * @param $node_b
+     * @param $boundingBoxA
+     * @param $boundingBoxB
+     * @param $nodeA
+     * @param $nodeB
      * @param $hardIndex
      * @param $hardCoordinate
      * @param $linkIndex
      * @param $linkCount
      * @return array
      */
-    private function tidyComplexDimension($bb_a, $bb_b, $node_a, $node_b, $hardIndex, $hardCoordinate, $linkIndex, $linkCount)
-    {
+    private function tidyComplexDimension(
+        $boundingBoxA,
+        $boundingBoxB,
+        $nodeA,
+        $nodeB,
+        $hardIndex,
+        $hardCoordinate,
+        $linkIndex,
+        $linkCount
+    ) {
         // find the overlapping span for the 'hard' coordinate, then divide it into $linkTotal equal steps
         // this should be true whichever way around they are
-        list($min_overlap, $max_overlap) = $this->findCommonRange(array($bb_a[$hardIndex], $bb_a[$hardIndex + 2]), array($bb_b[$hardIndex], $bb_b[$hardIndex + 2]));
-        $overlap = $max_overlap - $min_overlap;
+        list($minimumOverlap, $maximumOverlap) = $this->findCommonRange(
+            array(
+                $boundingBoxA[$hardIndex],
+                $boundingBoxA[$hardIndex + 2]
+            ),
+            array(
+                $boundingBoxB[$hardIndex],
+                $boundingBoxB[$hardIndex + 2]
+            )
+        );
+        $overlap = $maximumOverlap - $minimumOverlap;
         $stepPerLink = $overlap / ($linkCount + 1);
 
-        $a_y_offset = $min_overlap + ($linkIndex * $stepPerLink) - $node_a->$hardCoordinate;
-        $b_y_offset = $min_overlap + ($linkIndex * $stepPerLink) - $node_b->$hardCoordinate;
+        $aOffset = $minimumOverlap + ($linkIndex * $stepPerLink) - $nodeA->$hardCoordinate;
+        $bOffset = $minimumOverlap + ($linkIndex * $stepPerLink) - $nodeB->$hardCoordinate;
 
-        return array($a_y_offset, $b_y_offset);
+        return array($aOffset, $bOffset);
     }
 
     /**
@@ -635,55 +685,55 @@ class Editor
      * @param number[] $rangeB
      * @return number[] list($min,$max)
      */
-    static function findCommonRange($rangeA, $rangeB)
+    public static function findCommonRange($rangeA, $rangeB)
     {
-        $min_overlap = max($rangeA[0], $rangeB[0]);
-        $max_overlap = min($rangeA[1], $rangeB[1]);
+        $minimumOverlap = max($rangeA[0], $rangeB[0]);
+        $maximumOverlap = min($rangeA[1], $rangeB[1]);
 
-        return array($min_overlap, $max_overlap);
+        return array($minimumOverlap, $maximumOverlap);
     }
 
     /**
      * Turn the offsets produced during Tidy into simpler ones, if possible.
      * (including ':0:0' into '')
      *
-     * @param int $x_offset
-     * @param int $y_offset
+     * @param int $xOffset
+     * @param int $yOffset
      * @return string
      */
-    static function simplifyOffset($x_offset, $y_offset)
+    public static function simplifyOffset($xOffset, $yOffset)
     {
-        if ($x_offset == 0 && $y_offset == 0) {
+        if ($xOffset == 0 && $yOffset == 0) {
             return "";
         }
 
-        if ($x_offset == 0) {
-            if ($y_offset < 0) {
+        if ($xOffset == 0) {
+            if ($yOffset < 0) {
                 return "N95";
             } else {
                 return "S95";
             }
         }
 
-        if ($y_offset == 0) {
-            if ($x_offset < 0) {
+        if ($yOffset == 0) {
+            if ($xOffset < 0) {
                 return "W95";
             } else {
                 return "E95";
             }
         }
 
-        return sprintf("%d:%d", $x_offset, $y_offset);
+        return sprintf("%d:%d", $xOffset, $yOffset);
     }
 
-    function tidyAllLinks()
+    public function tidyAllLinks()
     {
         if (!$this->isLoaded()) {
             throw new WeathermapInternalFail("Map must be loaded before editing API called.");
         }
 
         // draw a map and throw it away, to calculate all the bounding boxes
-        $this->map->drawMapImage('null');
+        $this->map->drawMap('null');
         $this->_retidyLinks(true);
     }
 
@@ -692,15 +742,16 @@ class Editor
      * UNLESS $ignore_tidied is set, then do every single link (for editor testing)
      *
      * @param boolean $ignoreTidied
+     * @throws WeathermapInternalFail
      */
-    function _retidyLinks($ignoreTidied = false)
+    private function _retidyLinks($ignoreTidied = false)
     {
         if (!$this->isLoaded()) {
             throw new WeathermapInternalFail("Map must be loaded before editing API called.");
         }
 
         // draw a map and throw it away, to calculate all the bounding boxes
-        $this->map->drawMapImage('null');
+        $this->map->drawMap('null');
 
         $routes = array();
 //        $done = array();
@@ -710,7 +761,7 @@ class Editor
         foreach ($this->map->links as $link) {
             if (!$link->isTemplate()) {
                 $route = $this->makeRouteKey($link);
-                if ((!$ignoreTidied || $link->get_hint("_tidied") == 0)) {
+                if ((!$ignoreTidied || $link->getHint("_tidied") == 0)) {
                     $routes[$route][] = $link;
                 }
             }
@@ -724,8 +775,8 @@ class Editor
 //                    $route = $link->b->name . " " . $link->a->name;
 //                }
 
-//                if (($ignoreTidied || $linkList->get_hint("_tidied") == 1)) {
-            if (sizeof($linkList) == 1) {
+//                if (($ignoreTidied || $linkList->getHint("_tidied") == 1)) {
+            if (count($linkList) == 1) {
                 $this->tidyOneLink($linkList[0]);
 //                        $done[$route] = 1;
             } else {
@@ -759,40 +810,40 @@ class Editor
      * nicely.
      *
      * @param MapLink[] $links - the links to treat as a group
-     * @param bool $ignore_tidied - whether to take notice of the "_tidied" hint
+     * @param bool $ignoreTidied - whether to take notice of the "_tidied" hint
      *
      */
-    function _tidy_links($links, $ignore_tidied = false)
+    public function _tidy_links($links, $ignoreTidied = false)
     {
         // not very efficient, but it saves looking for special cases (a->b & b->a together)
         $nTargets = count($links);
 
         $i = 1;
         foreach ($links as $link) {
-            $this->tidyOneLink($link, $i, $nTargets, $ignore_tidied);
+            $this->tidyOneLink($link, $i, $nTargets, $ignoreTidied);
             $i++;
         }
     }
 
-    function retidyAllLinks()
+    public function retidyAllLinks()
     {
         if (!$this->isLoaded()) {
             throw new WeathermapInternalFail("Map must be loaded before editing API called.");
         }
 
         // draw a map and throw it away, to calculate all the bounding boxes
-        $this->map->drawMapImage('null');
+        $this->map->drawMap('null');
         $this->_retidyLinks(false);
     }
 
-    function retidyLinks()
+    public function retidyLinks()
     {
         if (!$this->isLoaded()) {
             throw new WeathermapInternalFail("Map must be loaded before editing API called.");
         }
 
         // draw a map and throw it away, to calculate all the bounding boxes
-        $this->map->drawMapImage('null');
+        $this->map->drawMap('null');
         $this->_retidyLinks();
     }
 
@@ -800,7 +851,7 @@ class Editor
      * untidyLinks - remove all link offsets from the map. Used mainly for testing.
      *
      */
-    function untidyLinks()
+    public function untidyLinks()
     {
         if (!$this->isLoaded()) {
             throw new WeathermapInternalFail("Map must be loaded before editing API called.");
@@ -812,16 +863,16 @@ class Editor
         }
     }
 
-    function placeLegend($x, $y, $scalename = "DEFAULT")
+    public function placeLegend($x, $y, $scaleName = "DEFAULT")
     {
         if (!$this->isLoaded()) {
             throw new WeathermapInternalFail("Map must be loaded before editing API called.");
         }
 
-        $this->map->scales[$scalename]->setPosition(new Point($x, $y));
+        $this->map->scales[$scaleName]->setPosition(new Point($x, $y));
     }
 
-    function placeTitle($x, $y)
+    public function placeTitle($x, $y)
     {
         if (!$this->isLoaded()) {
             throw new WeathermapInternalFail("Map must be loaded before editing API called.");
@@ -831,7 +882,7 @@ class Editor
         $this->map->titley = $y;
     }
 
-    function placeTimestamp($x, $y)
+    public function placeTimestamp($x, $y)
     {
         if (!$this->isLoaded()) {
             throw new WeathermapInternalFail("Map must be loaded before editing API called.");
@@ -841,7 +892,7 @@ class Editor
         $this->map->timey = $y;
     }
 
-    function asJS()
+    public function asJS()
     {
         if (!$this->isLoaded()) {
             throw new WeathermapInternalFail("Map must be loaded before editing API called.");

@@ -40,7 +40,7 @@ class SimpleTemplate
 
         extract($this->vars);          // Extract the vars to local namespace
         ob_start();                    // Start output buffering
-        include($file);                // Include the file
+        include $file;                // Include the file
         $contents = ob_get_contents(); // Get the contents of the buffer
         ob_end_clean();                // End buffering and discard
         return $contents;              // Return the contents

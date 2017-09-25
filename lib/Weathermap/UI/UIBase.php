@@ -231,7 +231,7 @@ class UIBase
 
     private function validateArgMapFilename($value)
     {
-        if ($value == wmeSanitizeConfigFile($value)) {
+        if ($value == self::wmeSanitizeConfigFile($value)) {
             return true;
         }
         return false;
@@ -239,7 +239,7 @@ class UIBase
 
     private function validateArgJavascriptName($value)
     {
-        if ($value == wmeSanitizeName($value)) {
+        if ($value == self::wmeSanitizeName($value)) {
             return true;
         }
         return false;
@@ -247,7 +247,7 @@ class UIBase
 
     private function validateArgName($value)
     {
-        if ($value == wmeSanitizeName($value)) {
+        if ($value == self::wmeSanitizeName($value)) {
             return true;
         }
         return false;
@@ -274,129 +274,134 @@ class UIBase
 
         return false;
     }
-}
 
-/**
- * Clean up URI (function taken from Cacti) to protect against XSS
- *
- * @param string $str
- * @return string
- *
- */
-function wmeSanitizeURI($str)
-{
-    static $dropMatchingCharacters = array(
-        ' ',
-        '^',
-        '$',
-        '<',
-        '>',
-        '`',
-        '\'',
-        '"',
-        '|',
-        '+',
-        '[',
-        ']',
-        '{',
-        '}',
-        ';',
-        '!',
-        '%'
-    );
-    static $dropCharactersReplacements = array('', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '');
 
-    return str_replace($dropMatchingCharacters, $dropCharactersReplacements, urldecode($str));
-}
+    /**
+     * Clean up URI (function taken from Cacti) to protect against XSS
+     *
+     * @param string $str
+     * @return string
+     *
+     */
+    public static function wmeSanitizeURI($str)
+    {
+        static $dropMatchingCharacters = array(
+            ' ',
+            '^',
+            '$',
+            '<',
+            '>',
+            '`',
+            '\'',
+            '"',
+            '|',
+            '+',
+            '[',
+            ']',
+            '{',
+            '}',
+            ';',
+            '!',
+            '%'
+        );
+        static $dropCharactersReplacements = array('', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '');
+
+        return str_replace($dropMatchingCharacters, $dropCharactersReplacements, urldecode($str));
+    }
 
 // much looser sanitise for general strings that shouldn't have HTML in them
-function wmeSanitizeString($str)
-{
-    static $dropMatchingCharacters = array('<', '>');
-    static $dropCharactersReplacements = array('', '');
+    public static function wmeSanitizeString($str)
+    {
+        static $dropMatchingCharacters = array('<', '>');
+        static $dropCharactersReplacements = array('', '');
 
-    return str_replace($dropMatchingCharacters, $dropCharactersReplacements, urldecode($str));
-}
-
-function wmeValidateBandwidth($bandwidth)
-{
-    if (preg_match('/^(\d+\.?\d*[KMGT]?)$/', $bandwidth)) {
-        return true;
-    }
-    return false;
-}
-
-function wmeValidateOneOf($input, $validChoices = array(), $caseSensitive = false)
-{
-    if (!$caseSensitive) {
-        $input = strtolower($input);
+        return str_replace($dropMatchingCharacters, $dropCharactersReplacements, urldecode($str));
     }
 
-    foreach ($validChoices as $choice) {
-        if (!$caseSensitive) {
-            $choice = strtolower($choice);
-        }
-        if ($choice == $input) {
+    public static function wmeValidateBandwidth($bandwidth)
+    {
+        if (preg_match('/^(\d+\.?\d*[KMGT]?)$/', $bandwidth)) {
             return true;
         }
+        return false;
     }
 
-    return false;
-}
+    public static function wmeValidateOneOf($input, $validChoices = array(), $caseSensitive = false)
+    {
+        if (!$caseSensitive) {
+            $input = strtolower($input);
+        }
+
+        foreach ($validChoices as $choice) {
+            if (!$caseSensitive) {
+                $choice = strtolower($choice);
+            }
+            if ($choice == $input) {
+                return true;
+            }
+        }
+
+        return false;
+    }
 
 // Labels for Nodes, Links and Scales shouldn't have spaces in
-function wmeSanitizeName($str)
-{
-    return str_replace(array(" "), "", $str);
-}
-
-function wmeSanitizeSelected($str)
-{
-    $result = urldecode($str);
-
-    if (!preg_match('/^(LINK|NODE):/', $result)) {
-        return "";
-    }
-    return wmeSanitizeName($result);
-}
-
-function wmeSanitizeFile($filename, $allowedExtensions = array())
-{
-    $filename = wmeSanitizeURI($filename);
-
-    if ($filename == "") {
-        return "";
+    public static function wmeSanitizeName($str)
+    {
+        return str_replace(array(" "), "", $str);
     }
 
-    $clean = false;
-    foreach ($allowedExtensions as $ext) {
-        $match = "." . $ext;
+    public static function wmeSanitizeSelected($str)
+    {
+        $result = urldecode($str);
 
-        if (substr($filename, -strlen($match), strlen($match)) == $match) {
-            $clean = true;
+        if (!preg_match('/^(LINK|NODE):/', $result)) {
+            return "";
         }
+        return self::wmeSanitizeName($result);
     }
-    if (!$clean) {
-        return "";
+
+    public static function wmeSanitizeFile($filename, $allowedExtensions = array())
+    {
+        $filename = self::wmeSanitizeURI($filename);
+
+        if ($filename == "") {
+            return "";
+        }
+
+        $clean = false;
+        foreach ($allowedExtensions as $ext) {
+            $match = "." . $ext;
+
+            if (substr($filename, -strlen($match), strlen($match)) == $match) {
+                $clean = true;
+            }
+        }
+        if (!$clean) {
+            return "";
+        }
+        return $filename;
     }
-    return $filename;
+
+    public static function wmeSanitizeConfigFile($filename)
+    {
+        # If we've been fed something other than a .conf filename, just pretend it didn't happen
+        $filename = self::wmeSanitizeFile($filename, array("conf"));
+
+        # on top of the url stuff, we don't ever need to see a / in a config filename
+        # (CVE-2013-3739)
+        if (strstr($filename, "/") !== false) {
+            $filename = "";
+        }
+        if (strstr($filename, "?") !== false) {
+            $filename = "";
+        }
+        if (strstr($filename, "*") !== false) {
+            $filename = "";
+        }
+        return $filename;
+    }
+
+
+
 }
 
-function wmeSanitizeConfigFile($filename)
-{
-    # If we've been fed something other than a .conf filename, just pretend it didn't happen
-    $filename = wmeSanitizeFile($filename, array("conf"));
-
-    # on top of the url stuff, we don't ever need to see a / in a config filename
-    # (CVE-2013-3739)
-    if (strstr($filename, "/") !== false) {
-        $filename = "";
-    }
-    if (strstr($filename, "?") !== false) {
-        $filename = "";
-    }
-    if (strstr($filename, "*") !== false) {
-        $filename = "";
-    }
-    return $filename;
-}

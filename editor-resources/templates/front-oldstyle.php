@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
     <link rel="stylesheet" type="text/css" media="screen" href="editor-resources/oldeditor.css"/>
-    <script type="text/javascript" src="editor-resources/jquery-latest.min.js"></script>
+    <script type="text/javascript" src="vendor/jquery/dist/jquery.min.js"></script>
     <script src="editor-resources/editor.js" type="text/javascript"></script>
     <script src="editor-resources/editor16.js" type="text/javascript"></script>
     <title>PHP Weathermap Editor <?php echo $WEATHERMAP_VERSION; ?></title></head>
@@ -54,7 +54,7 @@
             </ul>
         </div>
         <div class="dlgHelp" id="start_help">PHP Weathermap <?php echo $WEATHERMAP_VERSION; ?> Copyright &copy;
-            2005-2016
+            2005-2017
             Howard Jones -
             howie@thingy.com<br/>The current version should always be <a href="http://www.network-weathermap.com/">available
                 here</a>, along with other related software. PHP Weathermap is licensed under the GNU Public License,

@@ -48,7 +48,7 @@ class HTMLImagemapAreaRectangle extends HTMLImagemapArea
 
     public function hitTest($x, $y)
     {
-        return (($x > $this->x1) && ($x < $this->x2) && ($y > $this->y1) && ($y < $this->y2));
+        return ($x > $this->x1) && ($x < $this->x2) && ($y > $this->y1) && ($y < $this->y2);
     }
 
     public function asHTML()

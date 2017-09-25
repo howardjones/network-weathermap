@@ -53,10 +53,10 @@ class BoundingBox
         }
     }
 
-    public function getBoundingRectangle($default_zero = true)
+    public function getBoundingRectangle($defaultZero = true)
     {
         if (null === $this->minimumX) {
-            if ($default_zero) {
+            if ($defaultZero) {
                 return new Rectangle(0, 0, 0, 0);
             }
 

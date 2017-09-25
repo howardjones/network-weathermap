@@ -10,6 +10,7 @@ namespace Weathermap\Core;
 
 class FontTable
 {
+    /** @var Font[] $table  */
     private $table = array();
 
     public function init()
@@ -33,7 +34,7 @@ class FontTable
     /**
      * isValid - verify if a font number is valid in the current font table
      *
-     * @param $fontNumber int Number of font in table
+     * @param int $fontNumber Number of font in table
      * @return bool true if font number is for a valid font
      */
     public function isValid($fontNumber)

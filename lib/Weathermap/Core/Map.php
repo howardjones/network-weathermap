@@ -97,7 +97,7 @@ class Map extends MapBase
     public $colourtable = array();
     public $warncount = 0;
 
-    /** var WeatherMapScale[] $scales */
+    /** var MapScale[] $scales */
     public $scales;
     public $fonts;
 
@@ -1062,7 +1062,7 @@ class Map extends MapBase
      */
     protected function drawEditorOverlays($showVIAOverlay, $showRelativeOverlay, $imageRef)
     {
-        $overlayColor = myimagecolorallocate($imageRef, 200, 0, 0);
+        $overlayColor = ImageUtility::myimagecolorallocate($imageRef, 200, 0, 0);
 
         if ($showRelativeOverlay) {
             // first, we can show relatively positioned NODEs

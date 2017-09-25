@@ -4,6 +4,7 @@
 // http://www.network-weathermap.com/
 // Released under the GNU Public License
 
+
 namespace Weathermap\Editor;
 
 use Weathermap\UI\UIBase;
@@ -11,35 +12,36 @@ use Weathermap\UI\UIBase;
 use Weathermap\UI\SimpleTemplate;
 use Weathermap\Core\WeathermapInternalFail;
 use Weathermap\Core\Map;
+use Weathermap\Core\MapUtility;
 
 /** The various functions concerned with the actual presentation of the supplied editor, and
  *  validation of input etc. Mostly class methods.
  */
 class EditorUI extends UIBase
 {
-    var $editor;
+    private $editor;
 
-    var $selected = "";
-    var $mapfile;
-    var $mapname;
+    private $selected = "";
+    private $mapFileName;
+    private $mapShortName;
 
-    var $fromPlugin;
-    var $foundCacti = false;
-    var $cactiBase = "../..";
-    var $cactiURL = "/";
-    var $ignoreCacti = false;
-    var $configError = "";
-    var $next_action = "";
-    var $log_message = "";
-    var $param2 = "";
-    var $mapDirectory = "configs";
+    private $fromPlugin;
+    private $foundCacti = false;
+    private $cactiBase = "../..";
+    private $cactiURL = "/";
+    private $ignoreCacti = false;
+    private $configError = "";
+    private $nextAction = "";
+    private $logMessage = "";
+    private $param2 = "";
+    private $mapDirectory = "configs";
 
-    var $useOverlay = false;
-    var $useOverlayRelative = false;
-    var $gridSnapValue = 0;
+    private $useOverlay = false;
+    private $useOverlayRelative = false;
+    private $gridSnapValue = 0;
 
     // All the valid commands, and their expected parameters, so we can centralise the validation
-    var $commands = array(
+    public $commands = array(
         "add_node" => array(
             "args" => array(
                 array("mapname", "mapfile"),
@@ -242,19 +244,20 @@ class EditorUI extends UIBase
                 array("mapname", "mapfile")
             ),
             "handler" => "cmdDoNothing",
-            "no_save" => true)
+            "no_save" => true
+        )
     );
 
-    function __construct()
+    public function __construct()
     {
         $this->unpackCookie();
         $this->editor = new Editor();
     }
 
-    function unpackCookie($cookiename = "wmeditor")
+    public function unpackCookie($cookieName = "wmeditor")
     {
-        if (isset($_COOKIE[$cookiename])) {
-            $parts = explode(":", $_COOKIE[$cookiename]);
+        if (isset($_COOKIE[$cookieName])) {
+            $parts = explode(":", $_COOKIE[$cookieName]);
 
             if ((isset($parts[0])) && (intval($parts[0]) == 1)) {
                 $this->useOverlay = true;
@@ -274,7 +277,7 @@ class EditorUI extends UIBase
      *
      * @return bool
      */
-    function cmdDoNothing($params, $editor)
+    public function cmdDoNothing($params, $editor)
     {
         return true;
     }
@@ -284,7 +287,7 @@ class EditorUI extends UIBase
      * @param Editor $editor
      * @return bool
      */
-    function cmdShowConfig($params, $editor)
+    public function cmdShowConfig($params, $editor)
     {
         header("Content-type: text/plain");
 
@@ -298,11 +301,11 @@ class EditorUI extends UIBase
      * @param Editor $editor
      * @return bool
      */
-    function cmdDrawMap($params, $editor)
+    public function cmdDrawMap($params, $editor)
     {
         header("Content-type: image/png");
         // If the config file hasn't changed, then the image produced shouldn't have, either
-        $etag = md5_file($this->mapfile);
+        $etag = md5_file($this->mapFileName);
         header("Etag: $etag");
 
         if (isset($_SERVER['HTTP_IF_NONE_MATCH']) && trim($_SERVER['HTTP_IF_NONE_MATCH']) == $etag) {
@@ -317,7 +320,7 @@ class EditorUI extends UIBase
          * image files or font files are not reflected. To counteract that, the URL used by the editor has a
          * random addition so that it only matches between multiple URLs on the same page.
          */
-        $editor->loadConfig($this->mapfile);
+        $editor->loadConfig($this->mapFileName);
 
         // TODO - add in checks for overlays
 
@@ -336,19 +339,19 @@ class EditorUI extends UIBase
      * @param Editor $editor
      * @return bool
      */
-    function cmdDrawFontSamples($params, $editor)
+    public function cmdDrawFontSamples($params, $editor)
     {
         header("Content-type: image/png");
 
         // If the config file hasn't changed, then the image produced shouldn't have, either
-        $etag = md5_file($this->mapfile);
+        $etag = md5_file($this->mapFileName);
         header("Etag: $etag");
 
         if (isset($_SERVER['HTTP_IF_NONE_MATCH']) && trim($_SERVER['HTTP_IF_NONE_MATCH']) == $etag) {
             header("HTTP/1.1 304 Not Modified");
             return false;
         }
-        $editor->loadConfig($this->mapfile);
+        $editor->loadConfig($this->mapFileName);
 
         $imageRef = $this->generateFontSampleImage($editor->map);
         imagepng($imageRef);
@@ -363,87 +366,85 @@ class EditorUI extends UIBase
      * @param Map $map
      * @return resource
      */
-    function generateFontSampleImage($map)
+    public function generateFontSampleImage($map)
     {
-        $keyfont = 2;
-        $keyfont_obj = $map->fonts->getFont($keyfont);
-        $keyheight = imagefontheight($keyfont) + 2;
-        $sampleheight = 32;
+        $keyFontNumber = 2;
+        $keyFont = $map->fonts->getFont($keyFontNumber);
+        $keyHeight = imagefontheight($keyFontNumber) + 2;
+        $sampleHeight = 32;
 
-        $im_fonts = imagecreate(2000, $sampleheight);
-        $im_key = imagecreate(2000, $keyheight);
+        $fontsImageRef = imagecreate(2000, $sampleHeight);
+        $keyImageRef = imagecreate(2000, $keyHeight);
 
-        $white = imagecolorallocate($im_fonts, 255, 255, 255);
-        $black = imagecolorallocate($im_fonts, 0, 0, 0);
+        $white = imagecolorallocate($fontsImageRef, 255, 255, 255);
+        $black = imagecolorallocate($fontsImageRef, 0, 0, 0);
 
-        $whitekey = imagecolorallocate($im_key, 255, 255, 255);
-        $blackkey = imagecolorallocate($im_key, 0, 0, 0);
+        $whitekey = imagecolorallocate($keyImageRef, 255, 255, 255);
+        $blackkey = imagecolorallocate($keyImageRef, 0, 0, 0);
 
         $fonts = $map->fonts->getList();
         ksort($fonts);
 
         $x = 3;
-        foreach ($fonts as $fontnumber => $font) {
+        foreach ($fonts as $fontNumber => $font) {
             $string = "Abc123%";
-            $keystring = "Font $fontnumber";
+            $keyString = "Font $fontNumber";
 
-            $font_obj = $map->fonts->getFont($fontnumber);
+            $font = $map->fonts->getFont($fontNumber);
 
-            list($width, $height) = $font_obj->calculateImageStringSize($string);
-            list($kwidth, $kheight) = $keyfont_obj->calculateImageStringSize($keystring);
+            list($width, $height) = $font->calculateImageStringSize($string);
+            list($kwidth, $kheight) = $keyFont->calculateImageStringSize($keyString);
 
-            if ($kwidth > $width) {
-                $width = $kwidth;
-            }
+            $width = max($kwidth, $width);
 
-            $y = ($sampleheight / 2) + $height / 2;
-            $font_obj->drawImageString($im_fonts, $x, $y, $string, $black);
-            $keyfont_obj->drawImageString($im_key, $x, $keyheight, "Font $fontnumber", $blackkey);
+            $y = ($sampleHeight / 2) + $height / 2;
+            $font->drawImageString($fontsImageRef, $x, $y, $string, $black);
+            $keyFont->drawImageString($keyImageRef, $x, $keyHeight, "Font $fontNumber", $blackkey);
 
             $x = $x + $width + 6;
         }
 
-        $final_image = imagecreate($x, $sampleheight + $keyheight);
-        imagecopy($final_image, $im_fonts, 0, 0, 0, 0, $x, $sampleheight);
-        imagecopy($final_image, $im_key, 0, $sampleheight, 0, 0, $x, $keyheight);
-        imagedestroy($im_fonts);
+        $finalImageRef = imagecreate($x, $sampleHeight + $keyHeight);
+        imagecopy($finalImageRef, $fontsImageRef, 0, 0, 0, 0, $x, $sampleHeight);
+        imagecopy($finalImageRef, $keyImageRef, 0, $sampleHeight, 0, 0, $x, $keyHeight);
+        imagedestroy($fontsImageRef);
 
-        return $final_image;
+        return $finalImageRef;
     }
 
     /**
      * @param string[] $params
      * @param Editor $editor
      */
-    function cmdAddNode($params, $editor)
+    public function cmdAddNode($params, $editor)
     {
         $nodeX = $this->snap($params['x']);
         $nodeY = $this->snap($params['y']);
 
-        list($newname, $success, $log) = $editor->addNode($nodeX, $nodeY);
+        list($newName, $success, $log) = $editor->addNode($nodeX, $nodeY);
         $this->setLogMessage($log);
     }
 
-    function snap($coord)
+    public function snap($coord)
     {
         if ($this->gridSnapValue == 0) {
             return $coord;
         } else {
             $rest = $coord % $this->gridSnapValue;
-            return ($coord - $rest + round($rest / $this->gridSnapValue) * $this->gridSnapValue);
+            return $coord - $rest + round($rest / $this->gridSnapValue) * $this->gridSnapValue;
         }
     }
 
-    function setLogMessage($message)
+    public function setLogMessage($message)
     {
-        $this->log_message = $message;
+        $this->logMessage = $message;
     }
 
     /**
      * @param string[] $params
      * @param Editor $editor
      */
-    function cmdCloneNode($params, $editor)
+    public function cmdCloneNode($params, $editor)
     {
         list($result, $affected, $log) = $editor->cloneNode($params['param']);
         $this->setLogMessage($log);
@@ -455,7 +456,7 @@ class EditorUI extends UIBase
      * @param string[] $params
      * @param Editor $editor
      */
-    function cmdAddLinkInitial($params, $editor)
+    public function cmdAddLinkInitial($params, $editor)
     {
         $selected = 'NODE:' . $params['param'];
         // mark the node so that it will be drawn in red next time
@@ -467,18 +468,18 @@ class EditorUI extends UIBase
         $this->setLogMessage("Waiting for second node");
     }
 
-    function setSelected($item)
+    public function setSelected($item)
     {
         $this->selected = $item;
     }
 
-    function setNextAction($action)
+    public function setNextAction($action)
     {
-        $this->next_action = $action;
+        $this->nextAction = $action;
     }
 
 
-    function setParam2($value)
+    public function setParam2($value)
     {
         $this->param2 = $value;
     }
@@ -487,7 +488,7 @@ class EditorUI extends UIBase
      * @param string[] $params
      * @param Editor $editor
      */
-    function cmdAddLinkFinal($params, $editor)
+    public function cmdAddLinkFinal($params, $editor)
     {
         $editor->addLink($params['param'], $params['param2']);
     }
@@ -496,7 +497,7 @@ class EditorUI extends UIBase
      * @param string[] $params
      * @param Editor $editor
      */
-    function cmdAddLinkVia($params, $editor)
+    public function cmdAddLinkVia($params, $editor)
     {
         $editor->setLinkVia($params['param'], floatval($params['x']), floatval($params['y']));
     }
@@ -505,7 +506,7 @@ class EditorUI extends UIBase
      * @param string[] $params
      * @param Editor $editor
      */
-    function cmdLinkStraighten($params, $editor)
+    public function cmdLinkStraighten($params, $editor)
     {
         $editor->clearLinkVias($params['param']);
     }
@@ -514,7 +515,7 @@ class EditorUI extends UIBase
      * @param string[] $params
      * @param Editor $editor
      */
-    function cmdEditLink($params, $editor)
+    public function cmdEditLink($params, $editor)
     {
     }
 
@@ -522,7 +523,7 @@ class EditorUI extends UIBase
      * @param string[] $params
      * @param Editor $editor
      */
-    function cmdDeleteLink($params, $editor)
+    public function cmdDeleteLink($params, $editor)
     {
         $editor->deleteLink($params['param']);
     }
@@ -531,7 +532,7 @@ class EditorUI extends UIBase
      * @param string[] $params
      * @param Editor $editor
      */
-    function cmdDeleteNode($params, $editor)
+    public function cmdDeleteNode($params, $editor)
     {
         $editor->deleteNode($params['param']);
     }
@@ -540,7 +541,7 @@ class EditorUI extends UIBase
      * @param string[] $params
      * @param Editor $editor
      */
-    function cmdMoveNode($params, $editor)
+    public function cmdMoveNode($params, $editor)
     {
         $x = $this->snap($params['x']);
         $y = $this->snap($params['y']);
@@ -552,7 +553,7 @@ class EditorUI extends UIBase
      * @param string[] $params
      * @param Editor $editor
      */
-    function cmdTidyLink($params, $editor)
+    public function cmdTidyLink($params, $editor)
     {
         $editor->tidyLink($params['param']);
     }
@@ -561,7 +562,7 @@ class EditorUI extends UIBase
      * @param string[] $params
      * @param Editor $editor
      */
-    function cmdTidyAllLinks($params, $editor)
+    public function cmdTidyAllLinks($params, $editor)
     {
         $editor->tidyAllLinks();
     }
@@ -570,7 +571,7 @@ class EditorUI extends UIBase
      * @param string[] $params
      * @param Editor $editor
      */
-    function cmdReTidyAllLinks($params, $editor)
+    public function cmdReTidyAllLinks($params, $editor)
     {
         $editor->retidyAllLinks();
     }
@@ -579,7 +580,7 @@ class EditorUI extends UIBase
      * @param string[] $params
      * @param Editor $editor
      */
-    function cmdUnTidyAllLinks($params, $editor)
+    public function cmdUnTidyAllLinks($params, $editor)
     {
         $editor->untidyLinks();
     }
@@ -588,20 +589,20 @@ class EditorUI extends UIBase
      * @param string[] $params
      * @param Editor $editor
      */
-    function cmdNewMap($params, $editor)
+    public function cmdNewMap($params, $editor)
     {
         $editor->newConfig();
-        $editor->saveConfig($this->mapfile);
+        $editor->saveConfig($this->mapFileName);
     }
 
     /**
      * @param string[] $params
      * @param Editor $editor
      */
-    function cmdNewMapCopy($params, $editor)
+    public function cmdNewMapCopy($params, $editor)
     {
         $editor->loadConfig($this->mapDirectory . "/" . $params['sourcemap']);
-        $editor->saveConfig($this->mapfile);
+        $editor->saveConfig($this->mapFileName);
     }
 
     /**
@@ -610,16 +611,16 @@ class EditorUI extends UIBase
      *
      * @returns bool
      */
-    function cmdGetItemConfig($params, $editor)
+    public function cmdGetItemConfig($params, $editor)
     {
         header('Content-type: text/plain');
 
         $map = $editor->map;
 
-        $item_name = $params['item_name'];
-        $item_type = $params['item_type'];
+        $itemName = $params['item_name'];
+        $itemType = $params['item_type'];
 
-        print $editor->getItemConfig($item_type, $item_name);
+        print $editor->getItemConfig($itemType, $itemName);
 
         return false;
     }
@@ -628,7 +629,7 @@ class EditorUI extends UIBase
      * @param string[] $params
      * @param Editor $editor
      */
-    function cmdReplaceNodeConfig($params, $editor)
+    public function cmdReplaceNodeConfig($params, $editor)
     {
         $editor->replaceNodeConfig($params['node_name'], $params['item_configtext']);
     }
@@ -637,7 +638,7 @@ class EditorUI extends UIBase
      * @param string[] $params
      * @param Editor $editor
      */
-    function cmdReplaceLinkConfig($params, $editor)
+    public function cmdReplaceLinkConfig($params, $editor)
     {
         $editor->replaceLinkConfig($params['link_name'], $params['item_configtext']);
     }
@@ -646,20 +647,20 @@ class EditorUI extends UIBase
      * @param string[] $params
      * @param Editor $editor
      */
-    function cmdMoveLegend($params, $editor)
+    public function cmdMoveLegend($params, $editor)
     {
         $x = $this->snap($params['x']);
         $y = $this->snap($params['y']);
-        $scalename = $params['param'];
+        $scaleName = $params['param'];
 
-        $editor->placeLegend($x, $y, $scalename);
+        $editor->placeLegend($x, $y, $scaleName);
     }
 
     /**
      * @param string[] $params
      * @param Editor $editor
      */
-    function cmdMoveTimestamp($params, $editor)
+    public function cmdMoveTimestamp($params, $editor)
     {
         $x = $this->snap($params['x']);
         $y = $this->snap($params['y']);
@@ -668,19 +669,19 @@ class EditorUI extends UIBase
     }
 
     // Labels for Nodes, Links and Scales shouldn't have spaces in
-    function sanitizeName($str)
+    public function sanitizeName($str)
     {
         return str_replace(array(" "), "", $str);
     }
 
-    function moduleChecks()
+    public function moduleChecks()
     {
-        if (!wm_module_checks()) {
+        if (!MapUtility::wm_module_checks()) {
             print "<b>Required PHP extensions are not present in your mod_php/ISAPI PHP module. Please check your PHP setup to ensure you have the GD extension installed and enabled.</b><p>";
             print "If you find that the weathermap tool itself is working, from the command-line or Cacti poller, then it is possible that you have two different PHP installations. The Editor uses the same PHP that webpages on your server use, but the main weathermap tool uses the command-line PHP interpreter.<p>";
             print "<p>You should also run <a href=\"check.php\">check.php</a> to help make sure that there are no problems.</p><hr/>";
 
-            exit();
+            exit;
         }
     }
 
@@ -688,20 +689,21 @@ class EditorUI extends UIBase
      * Attempt to load Cacti's config file - we'll need this to do integration like
      * the target picker.
      *
-     * @param string $cacti_base
+     * @param string $cactiBaseDirectory
+     * @return bool did it work?
      */
-    function loadCacti($cacti_base)
+    public function loadCacti($cactiBaseDirectory)
     {
         $this->foundCacti = false;
         // check if the goalposts have moved
-        if (is_dir($cacti_base) && file_exists($cacti_base . "/include/global.php")) {
+        if (is_dir($cactiBaseDirectory) && file_exists($cactiBaseDirectory . "/include/global.php")) {
             // include the cacti-config, so we know about the database
-            include_once($cacti_base . "/include/global.php");
+            include_once $cactiBaseDirectory . "/include/global.php";
             $config['base_url'] = $cacti_url;
             $cacti_found = true;
-        } elseif (is_dir($cacti_base) && file_exists($cacti_base . "/include/config.php")) {
+        } elseif (is_dir($cactiBaseDirectory) && file_exists($cactiBaseDirectory . "/include/config.php")) {
             // include the cacti-config, so we know about the database
-            include_once($cacti_base . "/include/config.php");
+            include_once $cactiBaseDirectory . "/include/config.php";
 
             $config['base_url'] = $cacti_url;
             $cacti_found = true;
@@ -713,38 +715,38 @@ class EditorUI extends UIBase
         return $this->foundCacti;
     }
 
-    function main($request, $from_plugin = false)
+    public function main($request, $fromPlugin = false)
     {
-        $mapname = "";
+        $mapFileName = "";
         $action = "";
 
         if (isset($request['action'])) {
             $action = strtolower(trim($request['action']));
         }
         if (isset($request['mapname'])) {
-            $mapname = $request['mapname'];
+            $mapFileName = $request['mapname'];
 
             if ($action == "newmap" || $action == "newmap_copy") {
-                $mapname .= ".conf";
+                $mapFileName .= ".conf";
             }
 
             // If there's something funny with the config filename, just stop.
-            if ($mapname != wmeSanitizeConfigFile($mapname)) {
+            if ($mapFileName != UIBase::wmeSanitizeConfigFile($mapFileName)) {
                 throw new WeathermapInternalFail("Don't like this config filename");
             }
 
-            $this->mapfile = $this->mapDirectory . "/" . $mapname;
-            $this->mapname = $mapname;
+            $this->mapFileName = $this->mapDirectory . "/" . $mapFileName;
+            $this->mapShortName = $mapFileName;
         }
 
-        if ($mapname == '') {
+        if ($mapFileName == '') {
             $this->showStartPage();
         } else {
             if ($this->validateRequest($action, $request)) {
                 $editor = new Editor();
-                $this->setEmbedded($from_plugin);
+                $this->setEmbedded($fromPlugin);
                 if (!isset($this->commands[$action]['late_load'])) {
-                    $editor->loadConfig($this->mapfile);
+                    $editor->loadConfig($this->mapFileName);
                 }
                 $result = $this->dispatchRequest($action, $request, $editor);
                 if (!isset($this->commands[$action]['no_save'])) {
@@ -759,7 +761,7 @@ class EditorUI extends UIBase
         }
     }
 
-    function showStartPage()
+    public function showStartPage()
     {
         global $WEATHERMAP_VERSION;
 
@@ -770,26 +772,26 @@ class EditorUI extends UIBase
 
         list($titles, $notes, $errorstring) = $this->getExistingConfigs($this->mapDirectory);
 
-        $nicetitles = array();
-        $nicenotes = array();
+        $niceTitles = array();
+        $niceNotes = array();
 
         foreach ($titles as $file => $title) {
-            $nicenote = htmlspecialchars($notes[$file]);
-            $nicefile = htmlspecialchars($file);
-            $nicetitle = htmlspecialchars($title);
+            $niceNote = htmlspecialchars($notes[$file]);
+            $niceFileName = htmlspecialchars($file);
+            $niceTitle = htmlspecialchars($title);
 
-            $nicetitles[$nicefile] = $nicetitle;
-            $nicenotes[$nicefile] = $nicenote;
+            $niceTitles[$niceFileName] = $niceTitle;
+            $niceNotes[$niceFileName] = $niceNote;
         }
 
         $tpl->set("errorstring", $errorstring);
-        $tpl->set("titles", $nicetitles);
-        $tpl->set("notes", $nicenotes);
+        $tpl->set("titles", $niceTitles);
+        $tpl->set("notes", $niceNotes);
 
         echo $tpl->fetch("editor-resources/templates/front-oldstyle.php");
     }
 
-    function getExistingConfigs($mapDirectory)
+    public function getExistingConfigs($mapDirectory)
     {
         $titles = array();
         $notes = array();
@@ -810,16 +812,20 @@ class EditorUI extends UIBase
         }
 
         while (false !== ($file = readdir($directoryHandle))) {
-            $realfile = $mapDirectory . DIRECTORY_SEPARATOR . $file;
+            $fullFileName = $mapDirectory . DIRECTORY_SEPARATOR . $file;
             $note = "";
 
             // skip directories, unreadable files, .files and anything that doesn't come through the sanitiser unchanged
-            if ((is_file($realfile)) && (is_readable($realfile)) && (!preg_match('/^\./', $file)) && (wmeSanitizeConfigFile($file) == $file)) {
-                if (!is_writable($realfile)) {
+            if (is_file($fullFileName)
+                && is_readable($fullFileName)
+                && !preg_match('/^\./', $file)
+                && UIBase::wmeSanitizeConfigFile($file) == $file
+            ) {
+                if (!is_writable($fullFileName)) {
                     $note .= "(read-only)";
                 }
 
-                $titles[$file] = $this->getTitleFromConfig($realfile, "(no title)");
+                $titles[$file] = $this->getTitleFromConfig($fullFileName, "(no title)");
                 $notes[$file] = $note;
                 $numListed++;
             }
@@ -835,7 +841,7 @@ class EditorUI extends UIBase
         return array($titles, $notes, $errorString);
     }
 
-    function getTitleFromConfig($filename, $defaultTitle = "")
+    public static function getTitleFromConfig($filename, $defaultTitle = "")
     {
         $title = "";
 
@@ -858,30 +864,30 @@ class EditorUI extends UIBase
         return $title;
     }
 
-    function setEmbedded($state)
+    public function setEmbedded($state)
     {
         $this->fromPlugin = $state;
     }
 
-    function showMainPage($editor)
+    public function showMainPage($editor)
     {
         global $WEATHERMAP_VERSION;
 
         /* add a random bit onto the URL so that the next request won't get the same URL/ETag combo
            even if the config file contents don't change, but the two requests for the same editor page WILL */
 
-        $map_url = "?action=draw&mapname=" . $this->mapname . "&rand=" . rand(0, 100000);
+        $mapURL = "?action=draw&mapname=" . $this->mapShortName . "&rand=" . rand(0, 100000);
 
         $tpl = new SimpleTemplate();
         $tpl->set("WEATHERMAP_VERSION", $WEATHERMAP_VERSION);
         $tpl->set("fromplug", ($this->isEmbedded() ? 1 : 0));
 
-        $tpl->set("imageurl", htmlspecialchars($map_url));
+        $tpl->set("imageurl", htmlspecialchars($mapURL));
         if ($this->selected != "") {
-            $tpl->set("imageurl", htmlspecialchars($map_url . "&selected=" . urlencode($this->selected)));
+            $tpl->set("imageurl", htmlspecialchars($mapURL . "&selected=" . urlencode($this->selected)));
         }
-        $tpl->set("mapname", htmlspecialchars($this->mapname));
-        $tpl->set("newaction", htmlspecialchars($this->next_action));
+        $tpl->set("mapname", htmlspecialchars($this->mapShortName));
+        $tpl->set("newaction", htmlspecialchars($this->nextAction));
         $tpl->set("param2", htmlspecialchars($this->param2));
 
         // draw a map to throw away, just to get the imagemap updated
@@ -896,42 +902,40 @@ class EditorUI extends UIBase
 
         $tpl->set("map_width", $editor->map->width);
         $tpl->set("map_height", $editor->map->height);
-        $tpl->set("log", $this->log_message);
+        $tpl->set("log", $this->logMessage);
         $tpl->set("editor_name", "editor16.php");
 
-        $imlist = $this->getAvailableImages("images", $editor->map);
-        $images_json = "\nvar imlist = " . json_encode($imlist) . ";\n";
-        $tpl->set("images_json", $images_json);
+        $imageList = $this->getAvailableImages("images", $editor->map);
+        $imagesJSON = "\nvar imlist = " . json_encode($imageList) . ";\n";
+        $tpl->set("images_json", $imagesJSON);
 
         $fonts = $editor->map->fonts->getList();
         ksort($fonts);
-        $fonts_json = "\nvar fontlist = " . json_encode($fonts) . ";\n";
-        $tpl->set("fonts_json", $fonts_json);
+        $fontsJSON = "\nvar fontlist = " . json_encode($fonts) . ";\n";
+        $tpl->set("fonts_json", $fontsJSON);
 
         echo $tpl->fetch("editor-resources/templates/main-oldstyle.php");
     }
 
-    function isEmbedded()
+    public function isEmbedded()
     {
         return $this->fromPlugin;
     }
 
-    function getAvailableImages($imagedir, $map)
+    public function getAvailableImages($imageDirectory, $map)
     {
-        $imagelist = array();
+        $imageList = array();
 
-        if (is_dir($imagedir)) {
-            $n = 0;
-            $dh = opendir($imagedir);
+        if (is_dir($imageDirectory)) {
+            $dh = opendir($imageDirectory);
 
             if ($dh) {
                 while ($file = readdir($dh)) {
-                    $realfile = $imagedir . DIRECTORY_SEPARATOR . $file;
-                    $uri = $imagedir . "/" . $file;
+                    $realFile = $imageDirectory . DIRECTORY_SEPARATOR . $file;
+                    $uri = $imageDirectory . "/" . $file;
 
-                    if (is_readable($realfile) && (preg_match('/\.(gif|jpg|png)$/i', $file))) {
-                        $imagelist[] = $uri;
-                        $n++;
+                    if (is_readable($realFile) && (preg_match('/\.(gif|jpg|png)$/i', $file))) {
+                        $imageList[] = $uri;
                     }
                 }
 
@@ -939,13 +943,13 @@ class EditorUI extends UIBase
             }
         }
 
-        foreach ($map->used_images as $im) {
-            if (!in_array($im, $imagelist)) {
-                $imagelist[] = $im;
+        foreach ($map->usedImages as $im) {
+            if (!in_array($im, $imageList)) {
+                $imageList[] = $im;
             }
         }
-        sort($imagelist);
+        sort($imageList);
 
-        return $imagelist;
+        return $imageList;
     }
 }

@@ -19,7 +19,7 @@ class PickerBase
 {
     private $owner;
 
-    public function Init(&$map)
+    public function init(&$map)
     {
         $this->owner = $map;
 

@@ -10,7 +10,6 @@ use Weathermap\Core\StringUtility;
 use Weathermap\Core\Map;
 use Weathermap\Core\MapDataItem;
 
-
 class WeatherMapDataSource_static extends DatasourceBase
 {
 

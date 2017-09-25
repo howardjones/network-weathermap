@@ -10,7 +10,6 @@ namespace Weathermap\Plugins\Pre;
 
 use Weathermap\Core\Map;
 
-
 /**
  * Class WeatherMapPreProcessor
  *

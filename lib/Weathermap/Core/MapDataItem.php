@@ -486,4 +486,5 @@ class MapDataItem extends MapItem
         }
 
         throw new WeathermapRuntimeWarning("NoSuchProperty");
-    }}
+    }
+}

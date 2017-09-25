@@ -127,7 +127,10 @@ class Target
             MapUtility::wm_debug("Will multiply result by %f\n", $this->scaleFactor);
         }
 
-        list($in, $out, $dataTime) = $this->pluginObject->readData($this->finalTargetString, $map, $mapItem);
+        list($data, $dataTime) = $this->pluginObject->readData($this->finalTargetString, $map, $mapItem);
+
+        $in = $data[IN];
+        $out = $data[OUT];
 
         if ($in === null && $out === null) {
             MapUtility::wm_warn(

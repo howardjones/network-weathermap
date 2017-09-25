@@ -8,7 +8,6 @@ use Weathermap\Core\MapUtility;
 use Weathermap\Core\Map;
 use Weathermap\Core\MapDataItem;
 
-
 class WeatherMapDataSource_dsstats extends DatasourceBase
 {
 

@@ -19,7 +19,7 @@ class WeatherMapDataSource_cactihost extends DatasourceBase
             '/^cactihost:(\d+)$/'
         );
 
-        $this->name= "CactiHost";
+        $this->name = "CactiHost";
     }
 
     public function init(&$map)
@@ -53,7 +53,7 @@ class WeatherMapDataSource_cactihost extends DatasourceBase
 
             $pdo = weathermap_get_pdo();
 
-            $statement=$pdo->prepare("select * from host where id=?");
+            $statement =$pdo->prepare("select * from host where id=?");
 
             // 0=disabled
             // 1=down

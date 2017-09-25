@@ -1,4 +1,5 @@
 <?php
+
 namespace Weathermap\Plugins\Datasources;
 
 use Weathermap\Core\MapUtility;
@@ -95,7 +96,7 @@ class DatasourceBase
             )
         );
 
-        return array($this->data[IN], $this->data[OUT], $this->dataTime);
+        return array(array($this->data[IN], $this->data[OUT]), $this->dataTime);
     }
 
     /**

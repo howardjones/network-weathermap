@@ -1,7 +1,6 @@
 <?php
 namespace Weathermap\Plugins\Datasources;
 
-
 use Weathermap\Core\Map;
 use Weathermap\Core\MapDataItem;
 use Weathermap\Core\MapUtility;

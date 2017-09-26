@@ -1,6 +1,6 @@
-## PHP Network Weathermap 0.98a
+## PHP Network Weathermap 1.0.0 (dev)
 
-This is PHP Network Weathermap, version 0.98a by Howard Jones (howie@thingy.com)
+This is PHP Network Weathermap, version 1.0.0 by Howard Jones (howie@thingy.com)
 
 See the docs sub-directory for full HTML documentation, FAQ and example config.
 
@@ -30,9 +30,10 @@ Dependencies are managed with bower. If you have never used it before, you will 
 
 * Install nodejs (and npm - which should come with it)
 * Install bower: `npm install -g bower`
+* Install [composer](https://getcomposer.org/)
 * Go to the weathermap checkout directory
-* `bower install` should install all the necessary dependencies to the vendor/ directory.
-
+* `bower install` should install all the necessary javascript dependencies to the vendor/ directory.
+* `composer update` will grab the PHP dependencies for both the runtime and testing environments
 The release process collects up these files and puts them in the zip file, via the packing.list file(s). You only need to do this if you are working with the current development code.
 
 ## Credits
@@ -56,3 +57,6 @@ from the excellent Fam Fam Fam Silk icon collection by Mark James:
    http://www.famfamfam.com/lab/icons/silk/
 These are released under the Creative Commons Attribution 2.5 License
    http://creativecommons.org/licenses/by/2.5/
+
+Other libraries in the vendor/ directory are provided by third-parties. `composer info` will
+provide licensing information per component.

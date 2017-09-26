@@ -44,10 +44,9 @@ class Rectangle
 
     public function identical($otherRect)
     {
-        return (
+        return
             $this->topLeft->identical($otherRect->topLeft) &&
-            $this->bottomRight->identical($otherRect->bottomRight)
-        );
+            $this->bottomRight->identical($otherRect->bottomRight);
     }
 
     public function copy()
@@ -69,12 +68,12 @@ class Rectangle
 
     public function width()
     {
-        return ($this->bottomRight->x - $this->topLeft->x);
+        return $this->bottomRight->x - $this->topLeft->x;
     }
 
     public function height()
     {
-        return ($this->bottomRight->y - $this->topLeft->y);
+        return $this->bottomRight->y - $this->topLeft->y;
     }
 
     public function containsPoint($testPoint)

@@ -11,24 +11,23 @@
   ],
   "require": {
     "ulrichsg/getopt-php": "~3",
-    "monolog/monolog": "^1",
+    "monolog/monolog": "^1.23",
     "erusev/parsedown": "^1.6"
   },
   "require-dev": {
     "slevomat/coding-standard": "~4.0",
-    "phpdocumentor/phpdocumentor": "*",
-    "phpunit/dbunit": "^2.0",
+    "phpunit/dbunit": "*",
     "codeclimate/php-test-reporter": "*",
     "phpunit/phpunit": "~5",
     "phpmd/phpmd": "*",
     "sebastian/phpcpd": "*",
     "squizlabs/php_codesniffer": "*",
     "theseer/phpdox": "*",
-    "phploc/phploc": "~3",
     "codacy/coverage": "dev-master",
     "phpunit/php-code-coverage": "~4",
     "phan/phan": "*",
-    "jakub-onderka/php-parallel-lint": "^0.9.2"
+    "jakub-onderka/php-parallel-lint": "^0.9.2",
+    "johnkary/phpunit-speedtrap": "^1.1"
   },
   "autoload": {
     "psr-4": {"Weathermap\\": "lib/Weathermap"}

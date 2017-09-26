@@ -1791,7 +1791,7 @@ class ConfigReader
 
             if (in_array($filename, $this->mapObject->includedFiles)) {
                 MapUtility::wm_warn("Attempt to include '$filename' twice! Skipping it.\n");
-                return (false);
+                return false;
             }
 
             $this->mapObject->includedFiles[] = $filename;

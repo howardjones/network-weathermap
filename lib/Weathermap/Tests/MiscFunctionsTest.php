@@ -1,11 +1,13 @@
 <?php
 
+namespace Weathermap\Tests;
+
 //require_once dirname(__FILE__) . '/../lib/all.php';
 
 use Weathermap\Core\MapUtility;
 use Weathermap\Core\StringUtility;
 
-class MiscFunctionsTest extends PHPUnit_Framework_TestCase
+class MiscFunctionsTest extends \PHPUnit_Framework_TestCase
 {
 
     public function testStringHandling()
@@ -19,7 +21,10 @@ class MiscFunctionsTest extends PHPUnit_Framework_TestCase
 
         $this->assertEquals('xxx xxx is 127.0.0.1 xxxxx', StringUtility::stringAnonymise("the DNS is 8.8.8.8 right"));
         $this->assertEquals('xxx xxx is 127.0.0.1', StringUtility::stringAnonymise("the DNS is 8.8.8.8"));
-        $this->assertEquals('127.0.0.1 is xxx xxx xxx 127.0.0.1', StringUtility::stringAnonymise("8.8.8.8 is the DNS not 8.8.4.4"));
+        $this->assertEquals(
+            '127.0.0.1 is xxx xxx xxx 127.0.0.1',
+            StringUtility::stringAnonymise("8.8.8.8 is the DNS not 8.8.4.4")
+        );
         $this->assertEquals('127.0.0.1', StringUtility::stringAnonymise("8.8.8.8"));
 
         $this->assertEquals('a bb xxx xxxx xxxxx', StringUtility::stringAnonymise("a bb ccc dddd eeeee"));
@@ -95,7 +100,6 @@ class MiscFunctionsTest extends PHPUnit_Framework_TestCase
 
         $this->assertEquals("0", StringUtility::formatNumber(0));
         $this->assertEquals("0", StringUtility::formatNumber(0.0));
-
     }
 
     public function testNumberParsing()
@@ -122,8 +126,6 @@ class MiscFunctionsTest extends PHPUnit_Framework_TestCase
         $this->assertNull(StringUtility::interpretNumberWithMetricSuffixOrNull("-"));
         $this->assertEquals(10 * 1000 * 1000, StringUtility::interpretNumberWithMetricSuffixOrNull("10M"));
         $this->assertEquals(10 * 1024 * 1024, StringUtility::interpretNumberWithMetricSuffixOrNull("10M", 1024));
-
-
     }
 
     public function testWeathermapInternals()

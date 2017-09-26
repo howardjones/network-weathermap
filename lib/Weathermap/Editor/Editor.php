@@ -522,10 +522,14 @@ class Editor
         $boundingBoxB = $nodeB->boundingboxes[0];
 
         // figure out if they share any x or y coordinates
-        $xOverlaps = $this->rangeOverlaps(array($boundingBoxA[0], $boundingBoxA[2]),
-            array($boundingBoxB[0], $boundingBoxB[2]));
-        $yOverlaps = $this->rangeOverlaps(array($boundingBoxA[1], $boundingBoxA[3]),
-            array($boundingBoxB[1], $boundingBoxB[3]));
+        $xOverlaps = $this->rangeOverlaps(
+            array($boundingBoxA[0], $boundingBoxA[2]),
+            array($boundingBoxB[0], $boundingBoxB[2])
+        );
+        $yOverlaps = $this->rangeOverlaps(
+            array($boundingBoxA[1], $boundingBoxA[3]),
+            array($boundingBoxB[1], $boundingBoxB[3])
+        );
 
         $aXOffset = 0;
         $aYOffset = 0;

@@ -114,8 +114,14 @@ class Poller
 
     public function calculateStats()
     {
-        $stats_string = sprintf('%s: %d maps were run in %.2f seconds with %d warnings. %s', date(DATE_RFC822),
-            $this->mapcount, $this->duration, $this->total_warnings, $this->warning_notes);
+        $stats_string = sprintf(
+            '%s: %d maps were run in %.2f seconds with %d warnings. %s',
+            date(DATE_RFC822),
+            $this->mapcount,
+            $this->duration,
+            $this->total_warnings,
+            $this->warning_notes
+        );
         if ($this->quietlogging == 0) {
             wm_warn("STATS: Weathermap " . WEATHERMAP_VERSION . " run complete - $stats_string\n", true);
         }

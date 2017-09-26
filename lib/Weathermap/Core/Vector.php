@@ -34,7 +34,7 @@ class Vector
             MapUtility::wm_debug("Slope is infinite.\n");
             return 1e10;
         }
-        return ($this->dy / $this->dx);
+        return $this->dy / $this->dx;
     }
 
     /**
@@ -104,7 +104,7 @@ class Vector
             return 0;
         }
 
-        return (sqrt($this->squaredLength()));
+        return sqrt($this->squaredLength());
     }
 
     public function asString()

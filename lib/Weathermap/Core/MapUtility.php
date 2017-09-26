@@ -42,27 +42,36 @@ class MapUtility
 
                 $callingFunction = " [$function@$file:$line]";
 
-                if (is_array($weathermap_debug_suppress) && in_array(strtolower($function),
-                        $weathermap_debug_suppress)) {
+                if (is_array($weathermap_debug_suppress) && in_array(
+                    strtolower($function),
+                    $weathermap_debug_suppress
+                )) {
                     return;
                 }
             }
 
             // use Cacti's debug log, if we are running from the poller
             if (function_exists('debug_log_insert') && (!function_exists('show_editor_startpage'))) {
-                \cacti_log("DEBUG:$callingFunction " . ($weathermap_map == '' ? '' : $weathermap_map . ': ') . rtrim($string),
-                    true, 'WEATHERMAP');
+                \cacti_log(
+                    "DEBUG:$callingFunction " . ($weathermap_map == '' ? '' : $weathermap_map . ': ') . rtrim($string),
+                    true,
+                    'WEATHERMAP'
+                );
             } else {
                 $stderr = fopen('php://stderr', 'w');
-                fwrite($stderr,
-                    "DEBUG:$callingFunction " . ($weathermap_map == '' ? '' : $weathermap_map . ': ') . $string);
+                fwrite(
+                    $stderr,
+                    "DEBUG:$callingFunction " . ($weathermap_map == '' ? '' : $weathermap_map . ': ') . $string
+                );
                 fclose($stderr);
 
                 // mostly this is overkill, but it's sometimes useful (mainly in the editor)
                 if (1 == 0) {
                     $log = fopen('debug.log', 'a');
-                    fwrite($log,
-                        "DEBUG:$callingFunction " . ($weathermap_map == '' ? '' : $weathermap_map . ': ') . $string);
+                    fwrite(
+                        $log,
+                        "DEBUG:$callingFunction " . ($weathermap_map == '' ? '' : $weathermap_map . ': ') . $string
+                    );
                     fclose($log);
                 }
             }
@@ -127,8 +136,13 @@ class MapUtility
         if ($map->htmlstylesheet != '') {
             fwrite($fd, '<link rel="stylesheet" type="text/css" href="' . $map->htmlstylesheet . '" />');
         }
-        fwrite($fd, '<meta http-equiv="refresh" content="300" /><title>' . $map->processString($map->title,
-                $map) . '</title></head><body>');
+        fwrite(
+            $fd,
+            '<meta http-equiv="refresh" content="300" /><title>' . $map->processString(
+                $map->title,
+                $map
+            ) . '</title></head><body>'
+        );
 
         if ($map->htmlstyle == 'overlib') {
             fwrite(
@@ -220,8 +234,12 @@ class MapUtility
         }
 
         if (preg_match('/(NE|SE|NW|SW|N|S|E|W|C)(\d+)?$/i', $offsetstring, $matches)) {
-            return self::calculateCompassOffset($matches[1], (isset($matches[2]) ? $matches[2] : null), $width,
-                $height);
+            return self::calculateCompassOffset(
+                $matches[1],
+                (isset($matches[2]) ? $matches[2] : null),
+                $width,
+                $height
+            );
         }
 
         if (preg_match('/(-?\d+)r(\d+)$/i', $offsetstring, $matches)) {

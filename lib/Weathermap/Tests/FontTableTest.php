@@ -2,22 +2,28 @@
 
 //require_once dirname(__FILE__) . '/../lib/Map.php';
 
+namespace Weathermap\Tests;
+
 use Weathermap\Core\FontTable;
 
-class FontTableTest extends PHPUnit_Framework_TestCase
+class FontTableTest extends \PHPUnit_Framework_TestCase
 {
-    function setUp()
+
+    protected $projectRoot;
+
+    public function setUp()
     {
         parent::setUp();
+        $this->projectRoot = realpath(dirname(__FILE__) . "/../../../");
 
     }
 
-    function tearDown()
+    public function tearDown()
     {
         parent::tearDown();
     }
 
-    function testObjects()
+    public function testObjects()
     {
         $table = new FontTable();
         $this->assertEquals(0, $table->count());
@@ -44,7 +50,7 @@ class FontTableTest extends PHPUnit_Framework_TestCase
         $this->assertEquals("GD builtin", $f->type);
         $this->assertEquals(5, $f->gdnumber);
 
-        $f2 = $table->makeFontObject("truetype", dirname(__FILE__)."/../test-suite/data/Vera.ttf", 10);
+        $f2 = $table->makeFontObject("truetype", $this->projectRoot."/test-suite/data/Vera.ttf", 10);
         $table->addFont(10, $f2);
         $this->assertEquals(6, $table->count());
 
@@ -54,9 +60,7 @@ class FontTableTest extends PHPUnit_Framework_TestCase
         $this->assertNull($f->gdnumber);
 
         $l = $table->getList();
-        $this->assertEquals(6, sizeof($l));
+        $this->assertEquals(6, count($l));
         $this->assertEquals("truetype", $l[10]['type']);
-
     }
-
 }

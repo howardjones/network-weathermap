@@ -626,6 +626,6 @@ class MapManager
 
     public function getUserId()
     {
-        return (isset($_SESSION['sess_user_id']) ? intval($_SESSION['sess_user_id']) : 1);
+        return isset($_SESSION['sess_user_id']) ? intval($_SESSION['sess_user_id']) : 1;
     }
 }

@@ -6,10 +6,12 @@
  * Time: 18:38
  */
 
+namespace Weathermap\Tests;
+
 use Weathermap\Core\Map;
 use Weathermap\Core\MapNode;
 
-class MapNodeTest extends PHPUnit_Framework_TestCase
+class MapNodeTest extends \PHPUnit_Framework_TestCase
 {
     public function testInheritedFieldList()
     {

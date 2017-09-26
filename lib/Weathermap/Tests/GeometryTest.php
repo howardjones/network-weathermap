@@ -1,6 +1,7 @@
 <?php
 
 //require_once dirname(__FILE__).'/../lib/all.php';
+namespace Weathermap\Tests;
 
 use Weathermap\Core\Point;
 use Weathermap\Core\Rectangle;
@@ -13,7 +14,8 @@ use Weathermap\Core\MathUtility;
 
 use Weathermap\Core\WeathermapInternalFail;
 
-class GeometryTest  extends PHPUnit_Framework_TestCase {
+class GeometryTest extends \PHPUnit_Framework_TestCase
+{
 
     protected function setUp()
     {
@@ -71,15 +73,15 @@ class GeometryTest  extends PHPUnit_Framework_TestCase {
 
     public function testMisc()
     {
-        $ooint1 = new Point(0,0);
-        $point2 = new Point(10,0);
-        $point3 = new Point(0,10);
+        $ooint1 = new Point(0, 0);
+        $point2 = new Point(10, 0);
+        $point3 = new Point(0, 10);
 
         $this->assertEquals(50, MathUtility::getTriangleArea($ooint1, $point2, $point3));
 
-        $ooint1 = new Point(6,35);
-        $point2 = new Point(15,10);
-        $point3 = new Point(50,29);
+        $ooint1 = new Point(6, 35);
+        $point2 = new Point(15, 10);
+        $point3 = new Point(50, 29);
 
         $this->assertEquals(523, MathUtility::getTriangleArea($ooint1, $point2, $point3));
     }
@@ -88,22 +90,22 @@ class GeometryTest  extends PHPUnit_Framework_TestCase {
     {
 
         // simple straight line case (both ends have duplicated control points)
-        $curve = new CatmullRom1D(0,0,10,10);
+        $curve = new CatmullRom1D(0, 0, 10, 10);
 
-        $this->assertEquals(0,$curve->calculate(0));
-        $this->assertEquals(5,$curve->calculate(0.5));
-        $this->assertEquals(10,$curve->calculate(1));
+        $this->assertEquals(0, $curve->calculate(0));
+        $this->assertEquals(5, $curve->calculate(0.5));
+        $this->assertEquals(10, $curve->calculate(1));
     }
 
     public function testPoint()
     {
-        $point1 = new Point(10,13);
-        $point2 = new Point(-40,40);
-        $point3 = new Point(30,33);
-        $point4 = new Point(10,13);
-        $point5 = new Point(10.001,13.001);
-        $point6 = new Point(10.1,13.1);
-        $point8 = new Point(-10,13);
+        $point1 = new Point(10, 13);
+        $point2 = new Point(-40, 40);
+        $point3 = new Point(30, 33);
+        $point4 = new Point(10, 13);
+        $point5 = new Point(10.001, 13.001);
+        $point6 = new Point(10.1, 13.1);
+        $point8 = new Point(-10, 13);
 
         $this->assertTrue($point1->identical($point4));
         $this->assertTrue($point4->identical($point1));
@@ -118,23 +120,23 @@ class GeometryTest  extends PHPUnit_Framework_TestCase {
         $point7 = $point1->copy();
         $this->assertTrue($point1->identical($point7));
 
-        $this->assertEquals( sqrt(800), $point1->distanceToPoint($point3));
-        $this->assertEquals( sqrt(800), $point3->distanceToPoint($point1));
+        $this->assertEquals(sqrt(800), $point1->distanceToPoint($point3));
+        $this->assertEquals(sqrt(800), $point3->distanceToPoint($point1));
         $this->assertEquals(20, $point1->distanceToPoint($point8));
         $this->assertEquals(20, $point8->distanceToPoint($point1));
 
 
-        $vector1 = new Vector(10,40);
+        $vector1 = new Vector(10, 40);
         $vector2 = $point1->vectorToPoint($point2);
 
         $point9 = $point1->LERPWith($point3, 0.5);
-        $this->assertTrue( $point9->identical(new Point(20,23)));
+        $this->assertTrue($point9->identical(new Point(20, 23)));
 
         $point9 = $point1->LERPWith($point3, -0.5);
-        $this->assertTrue( $point9->identical(new Point(0,3)));
+        $this->assertTrue($point9->identical(new Point(0, 3)));
 
         $point9 = $point1->LERPWith($point3, 2.0);
-        $this->assertTrue( $point9->identical(new Point(50,53)));
+        $this->assertTrue($point9->identical(new Point(50, 53)));
 
 
         $this->assertEquals("(10.00,13.00)", $point1->asString());
@@ -144,28 +146,27 @@ class GeometryTest  extends PHPUnit_Framework_TestCase {
         $this->assertEquals("(30.00,33.00)", "$point3");
 
         $point9->addVector($vector1, 1.0);
-        $this->assertTrue( $point9->identical(new Point(60,93)));
+        $this->assertTrue($point9->identical(new Point(60, 93)));
 
         $point9->addVector($vector1, -2.0);
-        $this->assertTrue( $point9->identical(new Point(40,13)));
+        $this->assertTrue($point9->identical(new Point(40, 13)));
 
         $point9->addVector($vector1, 0);
-        $this->assertTrue( $point9->identical(new Point(40,13)));
+        $this->assertTrue($point9->identical(new Point(40, 13)));
 
         $line1 = $point9->lineToPoint($point1);
         $this->assertEquals("/(40.00,13.00)-[-30.00,0.00]/", "$line1");
-
     }
 
     public function testVector()
     {
         $infiniteSlope = 10000000000.0;
 
-        $vector1 = new Vector(0,0);
-        $vector2 = new Vector(10,0);
-        $vector3 = new Vector(0,5);
-        $vector4 = new Vector(-20,20);
-        $vector5 = new Vector(10,20);
+        $vector1 = new Vector(0, 0);
+        $vector2 = new Vector(10, 0);
+        $vector3 = new Vector(0, 5);
+        $vector4 = new Vector(-20, 20);
+        $vector5 = new Vector(10, 20);
 
         $this->assertEquals(0, $vector1->length());
         $this->assertEquals(10, $vector2->length());
@@ -223,14 +224,12 @@ class GeometryTest  extends PHPUnit_Framework_TestCase {
 
         $vector2->rotate(90);
         $this->assertEquals(1, $vector2->length());
-
-
     }
 
     public function testLineException()
     {
-        $line1 = new Line(new Point(50,50), new Vector(1,0) );
-        $line3 = new Line(new Point(70,0), new Vector(1,0) );
+        $line1 = new Line(new Point(50, 50), new Vector(1, 0));
+        $line3 = new Line(new Point(70, 0), new Vector(1, 0));
 
         $this->setExpectedException("Weathermap\\Core\\WeathermapInternalFail");
         $line1->findCrossingPoint($line3);
@@ -238,31 +237,31 @@ class GeometryTest  extends PHPUnit_Framework_TestCase {
 
     public function testLineSegment()
     {
-        $lineseg1 = new LineSegment( new Point(12,36), new Point(72,19));
-        $this->assertEquals("{(12.00,36.00)--(72.00,19.00)}","$lineseg1");
+        $lineseg1 = new LineSegment(new Point(12, 36), new Point(72, 19));
+        $this->assertEquals("{(12.00,36.00)--(72.00,19.00)}", "$lineseg1");
     }
 
     public function testLine()
     {
-        $line1 = new Line(new Point(50,50), new Vector(1,0) );
-        $line2 = new Line(new Point(100,0), new Vector(0,1) );
-        $line3 = new Line(new Point(30,0), new Vector(3,1) );
-        $line4 = new Line(new Point(0,0), new Vector(1,1) );
+        $line1 = new Line(new Point(50, 50), new Vector(1, 0));
+        $line2 = new Line(new Point(100, 0), new Vector(0, 1));
+        $line3 = new Line(new Point(30, 0), new Vector(3, 1));
+        $line4 = new Line(new Point(0, 0), new Vector(1, 1));
 
         $this->assertEquals(0, $line1->getSlope());
         $this->assertEquals(1e10, $line2->getSlope()); // this is our "INFINITE" value
 
         $point = $line1->findCrossingPoint($line2);
-        $this->assertTrue($point->closeEnough(new Point(100,50)));
+        $this->assertTrue($point->closeEnough(new Point(100, 50)));
 
         $point = $line1->findCrossingPoint($line4);
-        $this->assertTrue($point->closeEnough(new Point(50,50)));
+        $this->assertTrue($point->closeEnough(new Point(50, 50)));
 
         $point = $line2->findCrossingPoint($line4);
-        $this->assertTrue($point->closeEnough(new Point(100,100)));
+        $this->assertTrue($point->closeEnough(new Point(100, 100)));
 
         $point = $line3->findCrossingPoint($line4);
-        $this->assertTrue($point->closeEnough(new Point(-15,-15)));
+        $this->assertTrue($point->closeEnough(new Point(-15, -15)));
     }
 
     public function testRectangle()
@@ -301,7 +300,6 @@ class GeometryTest  extends PHPUnit_Framework_TestCase {
         $rect1b = $rect1a->copy();
         $this->assertInstanceOf("Weathermap\\Core\\Rectangle", $rect1b);
         $this->assertTrue($rect1a->identical($rect1b));
-
     }
 
     public function testBoundingBox()
@@ -322,7 +320,5 @@ class GeometryTest  extends PHPUnit_Framework_TestCase {
         $rect1 = $boundingbox1->getBoundingRectangle();
 
         $this->assertEquals("[(-10.00,-10.00)x(10.00,10.00)]", "$rect1");
-
     }
-
-} 
+}

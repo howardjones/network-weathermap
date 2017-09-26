@@ -1,9 +1,13 @@
 <?php
 
-require_once dirname(__FILE__) . '/../lib/all.php';
-require_once dirname(__FILE__) . '/WMTestSupport.php';
+//require_once dirname(__FILE__) . '/TestSupport.php';
 
-class ConfigTest extends PHPUnit_Framework_TestCase
+namespace Weathermap\Tests;
+
+//require_once dirname(__FILE__) . '/../lib/all.php';
+
+
+class ConfigTest extends \PHPUnit_Framework_TestCase
 {
     protected static $testdir;
     protected static $result1dir;
@@ -17,6 +21,9 @@ class ConfigTest extends PHPUnit_Framework_TestCase
 
     protected static $testsuite;
     protected static $confdir;
+
+    protected $projectRoot;
+
 
     /**
      * Read a config file, write an image.
@@ -47,8 +54,12 @@ class ConfigTest extends PHPUnit_Framework_TestCase
 
         $this->assertFileExists($referenceImageFileName, "reference image missing");
 
-        $warningCount = WMTestSupport::TestOutput_RunTest(self::$testdir . DIRECTORY_SEPARATOR . $configFileName,
-            $outputImageFileName, $outputHTMLFileName, '');
+        $warningCount = TestSupport::runOutputTest(
+            self::$testdir . DIRECTORY_SEPARATOR . $configFileName,
+            $outputImageFileName,
+            $outputHTMLFileName,
+            ''
+        );
 
         // if REQUIRES_VERSION was set, and set to a newer version, then this test is known to fail
         if ($warningCount < 0) {
@@ -60,7 +71,8 @@ class ConfigTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(0, $warningCount, "Warnings were generated");
 
         # $COMPARE -metric AE $reference $result $destination  > $destination2 2>&1
-        $cmd = sprintf("%s -metric AE -dissimilarity-threshold 1 \"%s\" \"%s\" \"%s\"",
+        $cmd = sprintf(
+            "%s -metric AE -dissimilarity-threshold 1 \"%s\" \"%s\" \"%s\"",
             self::$compare,
             $referenceImageFileName,
             $outputImageFileName,
@@ -68,7 +80,6 @@ class ConfigTest extends PHPUnit_Framework_TestCase
         );
 
         if (file_exists(self::$compare)) {
-
             $fd2 = fopen($comparisonImageFileName . ".txt", "w");
             fwrite($fd2, $cmd . "\r\n\r\n");
             fwrite($fd2, getcwd() . "\r\n\r\n");
@@ -88,8 +99,8 @@ class ConfigTest extends PHPUnit_Framework_TestCase
                 fclose($pipes[0]);
                 fclose($pipes[1]);
                 fclose($pipes[2]);
-                $return_value = proc_close($process);
-                fwrite($fd2, "Returned $return_value\r\n");
+                $returnValue = proc_close($process);
+                fwrite($fd2, "Returned $returnValue\r\n");
                 fwrite($fd2, "Output: |" . $output . "|\r\n");
             }
 
@@ -110,72 +121,92 @@ class ConfigTest extends PHPUnit_Framework_TestCase
      * (both are written by the same GD/png combo, so they should be
      * byte-identical this time)
      *
-     * @param string $conffile config file to run
-     * @param string $referenceimagefile reference image (not used, just here because we share a dataprovider)
+     * @param string $configFileName config file to run
+     * @param string $referenceImageFileName reference image (not used, just here because we share a dataprovider)
      *
      * @dataProvider configlist
      */
-    public function testWriteConfigConsistency($conffile, $referenceimagefile)
+    public function testWriteConfigConsistency($configFileName, $referenceImageFileName)
     {
-        $output_image_round1 = self::$result1dir . DIRECTORY_SEPARATOR . $conffile . ".png";
-        $output_image_round2 = self::$result2dir . DIRECTORY_SEPARATOR . $conffile . ".png";
+        $outputImageFileName1 = self::$result1dir . DIRECTORY_SEPARATOR . $configFileName . ".png";
+        $outputImageFileName2 = self::$result2dir . DIRECTORY_SEPARATOR . $configFileName . ".png";
 
-        $outputconfigfile = self::$result1dir . DIRECTORY_SEPARATOR . $conffile;
+        $outputConfigFileName = self::$result1dir . DIRECTORY_SEPARATOR . $configFileName;
 
-        WMTestSupport::TestOutput_RunTest(self::$testdir . DIRECTORY_SEPARATOR . $conffile, $output_image_round1, '',
-            $outputconfigfile);
-        WMTestSupport::TestOutput_RunTest(self::$result1dir . DIRECTORY_SEPARATOR . $conffile, $output_image_round2, '',
-            '');
+        TestSupport::runOutputTest(
+            self::$testdir . DIRECTORY_SEPARATOR . $configFileName,
+            $outputImageFileName1,
+            '',
+            $outputConfigFileName
+        );
+        TestSupport::runOutputTest(
+            self::$result1dir . DIRECTORY_SEPARATOR . $configFileName,
+            $outputImageFileName2,
+            '',
+            ''
+        );
 
-        $ref_output1 = md5_file($output_image_round1);
-        $ref_output2 = md5_file($output_image_round2);
+        $imageFileHash1 = md5_file($outputImageFileName1);
+        $imageFileHash2 = md5_file($outputImageFileName2);
 
-        $this->assertEquals($ref_output1, $ref_output2,
-            "Config Output from WriteConfig did not match original for $conffile");
+        $this->assertEquals(
+            $imageFileHash1,
+            $imageFileHash2,
+            "Config Output from WriteConfig did not match original for $configFileName"
+        );
     }
 
     public function configlist()
     {
         self::checkPaths();
 
-        $summary_file = self::$testsuite . DIRECTORY_SEPARATOR . "summary.html";
-        $fileHandle = fopen($summary_file, "w");
+        $summaryFileName = self::$testsuite . DIRECTORY_SEPARATOR . "summary.html";
+        $fileHandle = fopen($summaryFileName, "w");
         if ($fileHandle === false) {
-            throw new Exception("Failed to open summary file: $summary_file");
+            throw new \Exception("Failed to open summary file: $summaryFileName");
         }
-        fputs($fileHandle,
-            "<html><head><title>Test summary</title><style>img {border: 1px solid black; }</style></head><body><h3>Test Summary</h3>(result - reference - diff)<br/>\n");
+        fputs(
+            $fileHandle,
+            "<html><head><title>Test summary</title><style>img {border: 1px solid black; }</style></head><body><h3>Test Summary</h3>(result - reference - diff)<br/>\n"
+        );
         fputs($fileHandle, "<p>" . date("Y-m-d H:i:s") . "</p>\n");
 
-        $conflist = array();
+        $configList = array();
 
+        $testFiles = array();
         if (is_dir(self::$testdir)) {
             $dh = opendir(self::$testdir);
-            $files = array();
-            while ($files[] = readdir($dh)) {
+
+            while ($testFiles[] = readdir($dh)) {
             };
-            sort($files);
+            sort($testFiles);
             closedir($dh);
         } else {
             throw new Exception("Test directory " . self::$testdir . " doesn't exist!");
         }
 
-        foreach ($files as $file) {
+        foreach ($testFiles as $file) {
             if (substr($file, -5, 5) == '.conf') {
                 $reference = self::$referencedir . DIRECTORY_SEPARATOR . $file . ".png";
 
                 # if (file_exists($reference)) {
-                    $conflist[] = array($file, $reference);
+                $configList[$file] = array($file, $reference);
 
-                    $title = WMTestSupport::get_map_title(self::$testdir . DIRECTORY_SEPARATOR . $file);
+                $title = TestSupport::getMapTitle(self::$testdir . DIRECTORY_SEPARATOR . $file);
 
-                    fputs($fileHandle,
-                        sprintf("<h4>%s <a href=\"tests/%s\">[conf]</a> <em>%s</em></h4><p><nobr>Out:<img align=middle src='results1-%s/%s.png'> Ref:<img src='references/%s.png' align=middle> Diff:<img align=middle src='diffs/%s.png'></nobr></p>\n",
-                            $file, $file, htmlspecialchars($title),
-                            self::$phptag, $file,
-                            $file,
-                            $file
-                        ));
+                fputs(
+                    $fileHandle,
+                    sprintf(
+                        "<h4>%s <a href=\"tests/%s\">[conf]</a> <em>%s</em></h4><p><nobr>Out:<img align=middle src='results1-%s/%s.png'> Ref:<img src='references/%s.png' align=middle> Diff:<img align=middle src='diffs/%s.png'></nobr></p>\n",
+                        $file,
+                        $file,
+                        htmlspecialchars($title),
+                        self::$phptag,
+                        $file,
+                        $file,
+                        $file
+                    )
+                );
 
                 # }
             }
@@ -184,7 +215,7 @@ class ConfigTest extends PHPUnit_Framework_TestCase
         fputs($fileHandle, "</body></html>");
         fclose($fileHandle);
 
-        return $conflist;
+        return $configList;
     }
 
     protected function tearDown()
@@ -198,34 +229,35 @@ class ConfigTest extends PHPUnit_Framework_TestCase
 
         parent::setUp();
 
+        $this->projectRoot = realpath(dirname(__FILE__) . "/../../../");
+
         // sometimes useful to figure out what's going on!
         $WEATHERMAP_DEBUGGING = false;
 
         self::$previouswd = getcwd();
-        chdir(dirname(__FILE__) . DIRECTORY_SEPARATOR . "..");
-
-
+        chdir($this->projectRoot);
     }
 
     // this has to happen before the dataprovider runs, but
     // setUp and setUpBeforeClass are both called *after* the dataprovider
-    function checkPaths()
+    private function checkPaths()
     {
         $version = explode('.', PHP_VERSION);
         $phptag = "php" . $version[0];
 
         $here = dirname(__FILE__);
-        $test_suite = $here . DIRECTORY_SEPARATOR . ".." . DIRECTORY_SEPARATOR . "test-suite";
+        $testSuiteRoot = realpath(dirname(__FILE__) . "/../../../") . "/test-suite";
+//        $testSuiteRoot = $here . DIRECTORY_SEPARATOR . ".." . DIRECTORY_SEPARATOR . "test-suite";
 
         self::$phptag = "php" . $version[0];
-        self::$result1dir = $test_suite . DIRECTORY_SEPARATOR . "results1-$phptag";
-        self::$result2dir = $test_suite . DIRECTORY_SEPARATOR . "results2-$phptag";
-        self::$diffdir = $test_suite . DIRECTORY_SEPARATOR . "diffs";
+        self::$result1dir = $testSuiteRoot . DIRECTORY_SEPARATOR . "results1-$phptag";
+        self::$result2dir = $testSuiteRoot . DIRECTORY_SEPARATOR . "results2-$phptag";
+        self::$diffdir = $testSuiteRoot . DIRECTORY_SEPARATOR . "diffs";
 
-        self::$testdir = $test_suite . DIRECTORY_SEPARATOR . "tests";
-        self::$referencedir = $test_suite . DIRECTORY_SEPARATOR . "references";
+        self::$testdir = $testSuiteRoot . DIRECTORY_SEPARATOR . "tests";
+        self::$referencedir = $testSuiteRoot . DIRECTORY_SEPARATOR . "references";
 
-        self::$testsuite = $test_suite;
+        self::$testsuite = $testSuiteRoot;
 
 
         if (!file_exists(self::$result1dir)) {
@@ -243,7 +275,7 @@ class ConfigTest extends PHPUnit_Framework_TestCase
         $compares = array(
             "/usr/bin/compare",
             "/usr/local/bin/compare",
-            $test_suite . DIRECTORY_SEPARATOR . "tools" . DIRECTORY_SEPARATOR . "compare.exe"
+            $testSuiteRoot . DIRECTORY_SEPARATOR . "tools" . DIRECTORY_SEPARATOR . "compare.exe"
         );
 
         foreach ($compares as $c) {
@@ -254,8 +286,7 @@ class ConfigTest extends PHPUnit_Framework_TestCase
         }
 
         if (!file_exists(self::$compare)) {
-            throw new Exception("Compare path doesn't exist (or isn't executable) - do you have Imagemagick? \n");
+            throw new \Exception("Compare path doesn't exist (or isn't executable) - do you have Imagemagick? \n");
         }
     }
 }
-

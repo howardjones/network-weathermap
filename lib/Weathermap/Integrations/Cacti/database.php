@@ -2,6 +2,9 @@
 
 // NOTE: this is included in setup.php, so stuff in here pollutes the Cacti namespace
 
+/**
+ * @return null|PDO
+ */
 function weathermap_get_pdo()
 {
     // This is the Cacti standard settings
@@ -21,7 +24,7 @@ function weathermap_get_pdo()
 
     try {
         # MySQL with PDO_MYSQL
-        $pdo = new PDO("mysql:host=$host;dbname=$dbname", $user, $pass);
+        $pdo = new \PDO("mysql:host=$host;dbname=$dbname", $user, $pass);
         $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
     } catch (PDOException $e) {
         echo $e->getMessage();
@@ -30,7 +33,10 @@ function weathermap_get_pdo()
     return $pdo;
 }
 
-
+/**
+ * @param PDO $pdo
+ * @return string[]
+ */
 function weathermap_get_table_list($pdo)
 {
 

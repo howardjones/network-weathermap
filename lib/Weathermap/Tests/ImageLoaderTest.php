@@ -6,26 +6,34 @@
  * Date: 06/05/2017
  * Time: 12:55
  */
+namespace Weathermap\Tests;
 
 //require_once dirname(__FILE__) . '/../lib/all.php';
 
 use Weathermap\Core\ImageLoader;
 use Weathermap\Core\ImageUtility;
 
-class ImageLoaderTest extends PHPUnit_Framework_TestCase
+class ImageLoaderTest extends \PHPUnit_Framework_TestCase
 {
+
+    protected $projectRoot;
+
+    public function setUp()
+    {
+        $this->projectRoot = realpath(dirname(__FILE__) . "/../../../");
+    }
 
     public function testBasicCaching()
     {
         $loader = new ImageLoader();
 
-        $source1 = $loader->imagecreatefromfile(dirname(__FILE__) . "/../test-suite/data/greybox32.png");
-        $source2 = $loader->imagecreatefromfile(dirname(__FILE__) . "/../test-suite/data/pal-48.png");
-        $source3 = $loader->imagecreatefromfile(dirname(__FILE__) . "/../test-suite/data/pal-tx-48.png");
+        $source1 = $loader->imagecreatefromfile($this->projectRoot . "/test-suite/data/greybox32.png");
+        $source2 = $loader->imagecreatefromfile($this->projectRoot . "/test-suite/data/pal-48.png");
+        $source3 = $loader->imagecreatefromfile($this->projectRoot . "/test-suite/data/pal-tx-48.png");
 
-        $dupe1 = $loader->imagecreatefromfile(dirname(__FILE__) . "/../test-suite/data/greybox32.png");
-        $dupe2 = $loader->imagecreatefromfile(dirname(__FILE__) . "/../test-suite/data/pal-48.png");
-        $dupe3 = $loader->imagecreatefromfile(dirname(__FILE__) . "/../test-suite/data/pal-tx-48.png");
+        $dupe1 = $loader->imagecreatefromfile($this->projectRoot . "/test-suite/data/greybox32.png");
+        $dupe2 = $loader->imagecreatefromfile($this->projectRoot . "/test-suite/data/pal-48.png");
+        $dupe3 = $loader->imagecreatefromfile($this->projectRoot . "/test-suite/data/pal-tx-48.png");
 
         $pairs = array(
             array($source1, $dupe1, "Cached TC"),
@@ -46,13 +54,13 @@ class ImageLoaderTest extends PHPUnit_Framework_TestCase
     {
         $loader = new ImageLoader();
 
-        $source1 = $loader->imagecreatescaledfromfile(dirname(__FILE__) . "/../test-suite/data/greybox32.png", 64, 64);
-        $source2 = $loader->imagecreatescaledfromfile(dirname(__FILE__) . "/../test-suite/data/pal-48.png", 64, 64);
-        $source3 = $loader->imagecreatescaledfromfile(dirname(__FILE__) . "/../test-suite/data/pal-tx-48.png", 64, 64);
+        $source1 = $loader->imagecreatescaledfromfile($this->projectRoot . "/test-suite/data/greybox32.png", 64, 64);
+        $source2 = $loader->imagecreatescaledfromfile($this->projectRoot . "/test-suite/data/pal-48.png", 64, 64);
+        $source3 = $loader->imagecreatescaledfromfile($this->projectRoot . "/test-suite/data/pal-tx-48.png", 64, 64);
 
-        $dupe1 = $loader->imagecreatescaledfromfile(dirname(__FILE__) . "/../test-suite/data/greybox32.png", 64, 64);
-        $dupe2 = $loader->imagecreatescaledfromfile(dirname(__FILE__) . "/../test-suite/data/pal-48.png", 64, 64);
-        $dupe3 = $loader->imagecreatescaledfromfile(dirname(__FILE__) . "/../test-suite/data/pal-tx-48.png", 64, 64);
+        $dupe1 = $loader->imagecreatescaledfromfile($this->projectRoot . "/test-suite/data/greybox32.png", 64, 64);
+        $dupe2 = $loader->imagecreatescaledfromfile($this->projectRoot . "/test-suite/data/pal-48.png", 64, 64);
+        $dupe3 = $loader->imagecreatescaledfromfile($this->projectRoot . "/test-suite/data/pal-tx-48.png", 64, 64);
 
         $pairs = array(
             array($source1, $dupe1, "Cached Scaled TC"),
@@ -74,13 +82,13 @@ class ImageLoaderTest extends PHPUnit_Framework_TestCase
         $loader = new ImageLoader();
 
         // load a truecolor with alpha image
-        $source1 = ImageUtility::imagecreatefromfile(dirname(__FILE__) . "/../test-suite/data/greybox32.png");
+        $source1 = ImageUtility::imagecreatefromfile($this->projectRoot . "/test-suite/data/greybox32.png");
 
         // load a paletted image
-        $source2 = ImageUtility::imagecreatefromfile(dirname(__FILE__) . "/../test-suite/data/pal-48.png");
+        $source2 = ImageUtility::imagecreatefromfile($this->projectRoot . "/test-suite/data/pal-48.png");
 
         // load a paletted (with transparency) image
-        $source3 = ImageUtility::imagecreatefromfile(dirname(__FILE__) . "/../test-suite/data/pal-tx-48.png");
+        $source3 = ImageUtility::imagecreatefromfile($this->projectRoot . "/test-suite/data/pal-tx-48.png");
 
         // duplicate them
         $result1 = $loader->imageduplicate($source1);

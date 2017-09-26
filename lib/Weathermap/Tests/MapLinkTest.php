@@ -6,10 +6,12 @@
  * Time: 18:38
  */
 
+namespace Weathermap\Tests;
+
 use Weathermap\Core\MapLink;
 use Weathermap\Core\Map;
 
-class MapLinkTest extends PHPUnit_Framework_TestCase
+class MapLinkTest extends \PHPUnit_Framework_TestCase
 {
 
     public function testInheritedFieldList()
@@ -19,5 +21,4 @@ class MapLinkTest extends PHPUnit_Framework_TestCase
         $link = new MapLink("test", ":: DEFAULT ::", $map);
         $link->selfValidate();
     }
-    
 }

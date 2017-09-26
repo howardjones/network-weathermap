@@ -250,7 +250,7 @@ function weathermap_page_title($t)
             }
         }
     }
-    return ($t);
+    return $t;
 }
 
 function weathermap_page_head()
@@ -268,9 +268,9 @@ function weathermap_top_graph_refresh($refresh)
 
     // if we're cycling maps, then we want to handle reloads ourselves, thanks
     if (isset($_REQUEST['action']) && $_REQUEST['action'] == 'viewmapcycle') {
-        return (86400);
+        return 86400;
     }
-    return ($refresh);
+    return $refresh;
 }
 
 function weathermap_show_tab()

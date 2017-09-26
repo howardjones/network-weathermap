@@ -6,26 +6,29 @@
  * Time: 07:35
  */
 
+namespace Weathermap\Tests;
+
 //require_once dirname(__FILE__) . '/../lib/all.php';
 
 use Weathermap\Core\Spine;
 use Weathermap\Core\Point;
 
-class SpineTest extends PHPUnit_Framework_TestCase {
+class SpineTest extends \PHPUnit_Framework_TestCase
+{
 
-    function testSimplify()
+    public function testSimplify()
     {
         $testSpine = new Spine();
 
-        $testSpine->addPoint(new Point(50,50));
-        $testSpine->addPoint(new Point(70,50)); // redundant
-        $testSpine->addPoint(new Point(150,50));
-        $testSpine->addPoint(new Point(150,100)); // redundant
-        $testSpine->addPoint(new Point(150,150));
-        $testSpine->addPoint(new Point(0,150));
-        $testSpine->addPoint(new Point(0,0));
-        $testSpine->addPoint(new Point(50,50)); // redundant
-        $testSpine->addPoint(new Point(100,100));
+        $testSpine->addPoint(new Point(50, 50));
+        $testSpine->addPoint(new Point(70, 50)); // redundant
+        $testSpine->addPoint(new Point(150, 50));
+        $testSpine->addPoint(new Point(150, 100)); // redundant
+        $testSpine->addPoint(new Point(150, 150));
+        $testSpine->addPoint(new Point(0, 150));
+        $testSpine->addPoint(new Point(0, 0));
+        $testSpine->addPoint(new Point(50, 50)); // redundant
+        $testSpine->addPoint(new Point(100, 100));
 
         $newSpine = $testSpine->simplify();
 
@@ -33,17 +36,17 @@ class SpineTest extends PHPUnit_Framework_TestCase {
         $this->assertEquals(6, $newSpine->pointCount());
     }
 
-    function testPointAngleSearch()
+    public function testPointAngleSearch()
     {
         $testSpine = new Spine();
 
-        $testSpine->addPoint(new Point(50,50));
-        $testSpine->addPoint(new Point(150,50));
-        $testSpine->addPoint(new Point(150,150));
-        $testSpine->addPoint(new Point(0,150));
-        $testSpine->addPoint(new Point(0,0));
+        $testSpine->addPoint(new Point(50, 50));
+        $testSpine->addPoint(new Point(150, 50));
+        $testSpine->addPoint(new Point(150, 150));
+        $testSpine->addPoint(new Point(0, 150));
+        $testSpine->addPoint(new Point(0, 0));
 
-        $testSpine->addPoint(new Point(100,100));
+        $testSpine->addPoint(new Point(100, 100));
 
         /*
       \
@@ -69,22 +72,22 @@ class SpineTest extends PHPUnit_Framework_TestCase {
  **/
         // A
         $result = $testSpine->findPointAndAngleAtDistance(100);
-        $this->assertTrue( $result[0]->identical(new Point(150,50)) );
+        $this->assertTrue($result[0]->identical(new Point(150, 50)));
 
         // B
         $result = $testSpine->findPointAndAngleAtDistance(90);
-        $this->assertTrue( $result[0]->identical(new Point(140,50)) );
+        $this->assertTrue($result[0]->identical(new Point(140, 50)));
         $this->assertEquals(0, $result[2]);
 
         //C
         $result = $testSpine->findPointAndAngleAtDistance(110);
-        $this->assertTrue( $result[0]->identical(new Point(150,60)) );
+        $this->assertTrue($result[0]->identical(new Point(150, 60)));
         $this->assertEquals(-90, $result[2]);
 
         // D
         $result = $testSpine->findPointAndAngleAtDistance(300);
 
-        $this->assertTrue( $result[0]->closeEnough(new Point(50,150)), $result[0]." isn't right" );
+        $this->assertTrue($result[0]->closeEnough(new Point(50, 150)), $result[0] . " isn't right");
         $this->assertEquals(180, $result[2]);
 
         // E
@@ -92,30 +95,28 @@ class SpineTest extends PHPUnit_Framework_TestCase {
         $this->assertEquals(-45, $result[2]);
     }
 
-    function testPointSearch()
+    public function testPointSearch()
     {
         $testSpine = new Spine();
 
-        $testSpine->addPoint(new Point(50,50));
-        $testSpine->addPoint(new Point(150,50));
-        $testSpine->addPoint(new Point(150,150));
-        $testSpine->addPoint(new Point(0,150));
-        $testSpine->addPoint(new Point(0,0));
-
+        $testSpine->addPoint(new Point(50, 50));
+        $testSpine->addPoint(new Point(150, 50));
+        $testSpine->addPoint(new Point(150, 150));
+        $testSpine->addPoint(new Point(0, 150));
+        $testSpine->addPoint(new Point(0, 0));
 
 
         $result = $testSpine->findPointAtDistance(0);
-        $this->assertTrue( $result[0]->identical(new Point(50,50)) );
-
+        $this->assertTrue($result[0]->identical(new Point(50, 50)));
     }
 
-    function testDistanceSearch()
+    public function testDistanceSearch()
     {
         $testSpine = new Spine();
 
-        $testSpine->addPoint(new Point(50,50));
-        $testSpine->addPoint(new Point(150,50));
-        $testSpine->addPoint(new Point(150,150));
+        $testSpine->addPoint(new Point(50, 50));
+        $testSpine->addPoint(new Point(150, 50));
+        $testSpine->addPoint(new Point(150, 150));
 
         $this->assertEquals(200, $testSpine->totalDistance());
         $this->assertEquals(3, $testSpine->pointCount());
@@ -126,8 +127,8 @@ class SpineTest extends PHPUnit_Framework_TestCase {
         $index = $testSpine->findIndexNearDistance(90);
         $this->assertEquals(0, $index);
 
-        $testSpine->addPoint(new Point(0,150));
-        $testSpine->addPoint(new Point(0,0));
+        $testSpine->addPoint(new Point(0, 150));
+        $testSpine->addPoint(new Point(0, 0));
 
         $this->assertEquals(500, $testSpine->totalDistance());
 
@@ -146,5 +147,4 @@ class SpineTest extends PHPUnit_Framework_TestCase {
         $index = $testSpine->findIndexNearDistance(-100);
         $this->assertEquals(0, $index);
     }
-
 }

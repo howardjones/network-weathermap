@@ -23,11 +23,11 @@ class CatmullRom1D
         $parameterSquared = $parameter * $parameter;
         $parameterCubed = $parameterSquared * $parameter;
 
-        return ((
+        return (
                 ($this->aParam * $parameterCubed)
                 + ($this->bParam * $parameterSquared)
                 + ($this->cParam * $parameter)
                 + $this->dParam
-            ) / 2);
+            ) / 2;
     }
 }

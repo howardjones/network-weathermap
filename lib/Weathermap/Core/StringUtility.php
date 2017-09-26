@@ -23,7 +23,7 @@ class StringUtility
         $output = preg_replace('/\b\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}\b/', '127.0.0.1', $output);
         $output = preg_replace_callback('/([A-Za-z]{3,})/', array('self', 'stringAnonymiseReplacer'), $output);
 
-        return ($output);
+        return $output;
     }
 
     // PHP < 5.3 doesn't support anonymous functions, so here's a little function for wmStringAnonymise (screenshotify)
@@ -245,6 +245,6 @@ class StringUtility
      */
     public static function valueOrNull($value)
     {
-        return ($value === null ? '{null}' : $value);
+        return $value === null ? '{null}' : $value;
     }
 }

@@ -33,7 +33,7 @@ function weathermap_page_title($t)
             }
         }
     }
-    return ($t);
+    return $t;
 }
 
 function weathermap_top_graph_refresh($refresh)
@@ -46,7 +46,7 @@ function weathermap_top_graph_refresh($refresh)
     if (isset($_REQUEST["action"]) && $_REQUEST["action"] == 'viewmapcycle') {
         return 86400;
     }
-    return ($refresh);
+    return $refresh;
 }
 
 function weathermap_config_settings()

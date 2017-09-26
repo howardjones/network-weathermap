@@ -400,8 +400,4 @@ class UIBase
         }
         return $filename;
     }
-
-
-
 }
-

@@ -3,10 +3,11 @@
 //require_once dirname(__FILE__) . '/../lib/all.php';
 //require_once dirname(__FILE__) . '/../lib/Editor.php';
 //include_once dirname(__FILE__) . "/WMTestSupport.php";
+namespace Weathermap\Tests;
 
 use Weathermap\Editor\Editor;
 
-class EditorTest extends PHPUnit_Framework_TestCase
+class EditorTest extends \PHPUnit_Framework_TestCase
 {
 
     protected static $testdir;
@@ -15,6 +16,8 @@ class EditorTest extends PHPUnit_Framework_TestCase
     protected static $phptag;
 
     protected static $previouswd;
+
+    protected $projectRoot;
 
     public function testNodeAdd()
     {
@@ -89,31 +92,33 @@ class EditorTest extends PHPUnit_Framework_TestCase
         $editor->addLink("node1", "node2");
 
         $nDeps = $n1->getDependencies();
-        $nDepsString = join(" ", array_map(array("EditorTest", "makeString"), $nDeps));
+        $nDepsString = join(" ", array_map(array("Weathermap\\Tests\\EditorTest", "makeString"), $nDeps));
         $this->assertEquals("[LINK node1-node2]", $nDepsString, "Dependency created for new link");
 
         $editor->addLink("node1", "node3");
 
         $nDeps = $n1->getDependencies();
-        $nDepsString = join(" ", array_map(array("EditorTest", "makeString"), $nDeps));
+        $nDepsString = join(" ", array_map(array("Weathermap\\Tests\\EditorTest", "makeString"), $nDeps));
         $this->assertEquals("[LINK node1-node2] [LINK node1-node3]", $nDepsString, "Two dependencies with two links");
 
         $link = $editor->map->getLink("node1-node2");
         $link->setEndNodes($n2, $n3);
 
         $nDeps = $n1->getDependencies();
-        $nDepsString = join(" ", array_map(array("EditorTest", "makeString"), $nDeps));
+        $nDepsString = join(" ", array_map(array("Weathermap\\Tests\\EditorTest", "makeString"), $nDeps));
         $this->assertEquals("[LINK node1-node3]", $nDepsString, "Dependency removed when link moves");
 
         $nDeps = $n2->getDependencies();
-        $nDepsString = join(" ", array_map(array("EditorTest", "makeString"), $nDeps));
+        $nDepsString = join(" ", array_map(array("Weathermap\\Tests\\EditorTest", "makeString"), $nDeps));
         $this->assertEquals("[LINK node1-node2]", $nDepsString, "Dependency added when link moves");
     }
 
     public function setUp()
     {
+        $this->projectRoot = realpath(dirname(__FILE__) . "/../../../");
+
         self::$previouswd = getcwd();
-        chdir(dirname(__FILE__) . DIRECTORY_SEPARATOR . "..");
+        chdir($this->projectRoot);
 
         $version = explode('.', PHP_VERSION);
         $phptag = "php" . $version[0];
@@ -157,6 +162,5 @@ class EditorTest extends PHPUnit_Framework_TestCase
 
         $this->assertEquals("N95", Editor::simplifyOffset(0, -5));
         $this->assertEquals("S95", Editor::simplifyOffset(0, 9));
-
     }
 }

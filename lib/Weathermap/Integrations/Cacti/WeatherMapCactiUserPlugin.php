@@ -365,14 +365,18 @@ class WeatherMapCactiUserPlugin extends UIBase
                                 (automatically cycle between full-size maps (<?php
 
                                 if ($limitingToGroup > 0) {
-                                    $this->makeURL(array(
+                                    $this->makeURL(
+                                        array(
                                         "action" => "viewcycle_filtered",
                                         "group" => $limitingToGroup
-                                    ));
-                                    print '<a href = "' . $this->makeURL(array(
+                                        )
+                                    );
+                                    print '<a href = "' . $this->makeURL(
+                                        array(
                                             "action" => "viewcycle_filtered",
                                             "group" => $limitingToGroup
-                                        )) . '">within this group</a>, or ';
+                                        )
+                                    ) . '">within this group</a>, or ';
                                 }
                                 print ' <a href = "' . $this->makeURL(array("action" => "viewcycle")) . '">all maps</a>';
                                 ?>)

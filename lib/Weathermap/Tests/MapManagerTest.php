@@ -1,18 +1,21 @@
 <?php
 
-//require_once dirname(__FILE__) . '/../lib/WeathermapManager.php';
+namespace Weathermap\Tests;
 
+require_once dirname(__FILE__) . '/../../all.php';
+
+use PDO;
 use Weathermap\Integrations\MapManager;
 
-class MapManagerTest extends PHPUnit_Extensions_Database_TestCase
+class MapManagerTest extends \PHPUnit_Extensions_Database_TestCase
 {
 
     // only instantiate pdo once for test clean-up/fixture load
     static private $pdo = null;
 
-    /** @var MapManager  */
+    /** @var MapManager */
     private $manager;
-
+    private $projectRoot;
     private $confdir;
     private $testsuite;
 
@@ -35,30 +38,29 @@ class MapManagerTest extends PHPUnit_Extensions_Database_TestCase
     {
         parent::setUp();
 
+        $this->projectRoot = realpath(dirname(__FILE__) . "/../../../");
+
         $here = realpath(dirname(__FILE__));
-        $test_suite = $here . DIRECTORY_SEPARATOR . ".." . DIRECTORY_SEPARATOR . "test-suite";
 
-        $weathermap_confdir = realpath($here . DIRECTORY_SEPARATOR . ".." . DIRECTORY_SEPARATOR . 'configs');
+        $this->confdir = $this->projectRoot . '/configs';
+        $this->testsuite = $this->projectRoot . "/test-suite";
 
-        $this->confdir = $weathermap_confdir;
-        $this->testsuite = $test_suite;
-
-        $this->manager = new MapManager(self::$pdo, $weathermap_confdir);
+        $this->manager = new MapManager(self::$pdo, $this->confdir);
     }
 
     /**
-     * @return PHPUnit_Extensions_Database_DataSet_IDataSet
+     * @return \PHPUnit_Extensions_Database_DataSet_IDataSet
      */
     public function getDataSet()
     {
-        return $this->createMySQLXMLDataSet(dirname(__FILE__) . '/../test-suite/data/weathermap-seed.xml');
+        return $this->createMySQLXMLDataSet(realpath(dirname(__FILE__) . '/weathermap-seed.xml'));
     }
 
     public function testAddBadMap()
     {
         $pos = $this->getMapOrder();
         $this->assertEquals(array(7, 6, 5, 4, 1, 2), $pos);
-        $this->expectException(Exception::class);
+        $this->expectException(\Exception::class);
         $this->manager->addMap($this->testsuite . DIRECTORY_SEPARATOR . "tests" . DIRECTORY_SEPARATOR . "simple-node-1.conf");
         $pos = $this->getMapOrder();
         $this->assertEquals(array(7, 6, 5, 4, 1, 2, 8), $pos);
@@ -75,7 +77,7 @@ class MapManagerTest extends PHPUnit_Extensions_Database_TestCase
         $map = $this->manager->getMap(8);
 
         $this->assertNotNull($map);
-        $this->assertInstanceOf(stdClass::class, $map);
+        $this->assertInstanceOf(\stdClass::class, $map);
 
         $this->assertNotEmpty($map->filehash);
         $this->assertNotEmpty($map->titlecache);
@@ -95,7 +97,6 @@ class MapManagerTest extends PHPUnit_Extensions_Database_TestCase
         $this->assertEquals("(no title)", $this->manager->extractMapTitle($file2));
         $this->assertEquals("(no file)", $this->manager->extractMapTitle($file3));
         $this->assertEquals("New Title", $this->manager->extractMapTitle($file4));
-
     }
 
     private function getMapOrder()
@@ -132,8 +133,8 @@ class MapManagerTest extends PHPUnit_Extensions_Database_TestCase
         $this->assertEquals($pos, array(7, 6, 5, 4, 1, 2));
 
         $maps = $this->manager->getMaps();
-        $this->assertEquals(sizeof($pos), sizeof($maps));
-        $this->assertInstanceOf(stdClass::class, $maps[0]);
+        $this->assertEquals(count($pos), count($maps));
+        $this->assertInstanceOf(\stdClass::class, $maps[0]);
     }
 
     public function testMoveMapUp()
@@ -154,8 +155,6 @@ class MapManagerTest extends PHPUnit_Extensions_Database_TestCase
         $this->manager->moveMap(6, 1);
         $pos = $this->getMapOrder();
         $this->assertEquals($pos, array(7, 6, 5, 4, 1, 2));
-
-
     }
 
     public function testMoveMapDown()
@@ -230,7 +229,6 @@ class MapManagerTest extends PHPUnit_Extensions_Database_TestCase
         $this->assertEquals(2, $this->getConnection()->getRowCount('weathermap_groups'), "Group delete failed");
         $pos = $this->getGroupOrder();
         $this->assertEquals($pos, array(1, 3));
-
     }
 
     public function testGroupMove()
@@ -267,8 +265,8 @@ class MapManagerTest extends PHPUnit_Extensions_Database_TestCase
     public function testGroupGet()
     {
         $groups = $this->manager->getGroups();
-        $this->assertEquals(3, sizeof($groups));
-        $this->assertInstanceOf(stdClass::class, $groups[0]);
+        $this->assertEquals(3, count($groups));
+        $this->assertInstanceOf(\stdClass::class, $groups[0]);
         $this->assertEquals("g1", $groups[0]->name);
         $this->assertEquals(2, $groups[0]->id);
     }
@@ -276,40 +274,39 @@ class MapManagerTest extends PHPUnit_Extensions_Database_TestCase
     public function testGetTabs()
     {
         $tabs = $this->manager->getTabs(1);
-        $this->assertEquals(1, sizeof($tabs));
+        $this->assertEquals(1, count($tabs));
 
         $this->manager->setMapGroup(7, 3);
         $tabs = $this->manager->getTabs(1);
-        $this->assertEquals(2, sizeof($tabs));
+        $this->assertEquals(2, count($tabs));
 
         $this->manager->setMapGroup(6, 2);
         $tabs = $this->manager->getTabs(1);
-        $this->assertEquals(3, sizeof($tabs));
+        $this->assertEquals(3, count($tabs));
 
         $tabs = $this->manager->getTabs(2);
-        $this->assertEquals(1, sizeof($tabs));
+        $this->assertEquals(1, count($tabs));
 
         $tabs = $this->manager->getTabs(3);
-        $this->assertEquals(0, sizeof($tabs));
-
+        $this->assertEquals(0, count($tabs));
     }
 
     public function testMapSettings()
     {
 
         $settings = $this->manager->getMapSettings(0);
-        $this->assertEquals(1, sizeof($settings));
+        $this->assertEquals(1, count($settings));
 
         $settings = $this->manager->getMapSettings(-1);
-        $this->assertEquals(0, sizeof($settings));
+        $this->assertEquals(0, count($settings));
 
         $settings = $this->manager->getMapSettings(1);
-        $this->assertEquals(0, sizeof($settings));
+        $this->assertEquals(0, count($settings));
 
         $this->manager->saveMapSetting(1, "fish", "trout");
 
         $settings = $this->manager->getMapSettings(1);
-        $this->assertEquals(1, sizeof($settings));
+        $this->assertEquals(1, count($settings));
         $this->assertEquals("trout", $settings[0]->optvalue);
         $this->assertEquals("fish", $settings[0]->optname);
 
@@ -318,11 +315,11 @@ class MapManagerTest extends PHPUnit_Extensions_Database_TestCase
         $settings = $this->manager->getMapSettings(1);
         # print_r($settings);
 
-        $this->assertEquals(1, sizeof($settings));
+        $this->assertEquals(1, count($settings));
         $this->assertEquals("carp", $settings[0]->optvalue);
         $this->assertEquals("fish", $settings[0]->optname);
 
-        $delete_id = $settings[0]->id;
+        $deleteId = $settings[0]->id;
 
         $settings = $this->manager->getAllMapSettings(1);
         $this->assertEquals("carp", $settings->fish->optvalue);
@@ -334,10 +331,10 @@ class MapManagerTest extends PHPUnit_Extensions_Database_TestCase
         $this->assertEquals("carp", $settings->fish->optvalue);
 
         // delete the map-specific setting, revealing the group setting
-        $this->manager->deleteMapSetting(1, $delete_id);
+        $this->manager->deleteMapSetting(1, $deleteId);
 
         $settings = $this->manager->getMapSettings(1);
-        $this->assertEquals(0, sizeof($settings));
+        $this->assertEquals(0, count($settings));
 
         $settings = $this->manager->getAllMapSettings(1);
         $this->assertEquals("eel", $settings->fish->optvalue);
@@ -378,7 +375,6 @@ class MapManagerTest extends PHPUnit_Extensions_Database_TestCase
         $this->assertEquals(40, $this->getConnection()->getRowCount('settings'), "Update failed");
         $result = $this->manager->getAppSetting("fish", "tuna");
         $this->assertEquals("tuna", $result);
-
     }
 
     public function testCactiUsers()
@@ -386,10 +382,10 @@ class MapManagerTest extends PHPUnit_Extensions_Database_TestCase
         $this->assertEquals(2, $this->getConnection()->getRowCount('user_auth'), "Pre-Condition");
 
         $users = $this->manager->getUserList();
-        $this->assertEquals(2, sizeof($users), "via API");
+        $this->assertEquals(2, count($users), "via API");
 
         $users = $this->manager->getUserList(true);
-        $this->assertEquals(3, sizeof($users), "via API with Anyone");
+        $this->assertEquals(3, count($users), "via API with Anyone");
 
         $user1 = $users[1];
         $this->assertInstanceOf(\stdClass::class, $user1);
@@ -400,15 +396,14 @@ class MapManagerTest extends PHPUnit_Extensions_Database_TestCase
     public function testCactiPerms()
     {
         $users = $this->manager->getUserList();
-        $this->assertEquals(2, sizeof($users));
+        $this->assertEquals(2, count($users));
 
         $this->assertTrue($this->manager->checkUserForRealm(1, 1));
         $this->assertFalse($this->manager->checkUserForRealm(1, 33));
         $this->assertFalse($this->manager->checkUserForRealm(19, 1));
-
     }
 
-    private function objarray_includes($arr, $field, $value)
+    private function objectArrayIncludes($arr, $field, $value)
     {
         foreach ($arr as $obj) {
             if ($obj->$field == $value) {
@@ -424,32 +419,31 @@ class MapManagerTest extends PHPUnit_Extensions_Database_TestCase
         $mapId = 1;
 
         $maps = $this->manager->getMapsForUser($guestUser);
-        $this->assertEquals(1, sizeof($maps));
+        $this->assertEquals(1, count($maps));
 
         $this->manager->addPermission($mapId, $guestUser);
         $maps = $this->manager->getMapsForUser($guestUser);
-        $this->assertEquals(2, sizeof($maps));
-        $maps = $this->manager->getMapsForUser($guestUser,2);
-        $this->assertEquals(0, sizeof($maps));
+        $this->assertEquals(2, count($maps));
+        $maps = $this->manager->getMapsForUser($guestUser, 2);
+        $this->assertEquals(0, count($maps));
 
 
         $users = $this->manager->getMapAuthUsers($mapId);
-        $this->assertEquals(2, sizeof($users));
-        $this->assertTrue($this->objarray_includes($users, "userid", $guestUser));
-        $this->assertTrue($this->objarray_includes($users, "userid", 1));
+        $this->assertEquals(2, count($users));
+        $this->assertTrue($this->objectArrayIncludes($users, "userid", $guestUser));
+        $this->assertTrue($this->objectArrayIncludes($users, "userid", 1));
 
         $this->manager->removePermission($mapId, $guestUser);
         $maps = $this->manager->getMapsForUser($guestUser);
-        $this->assertEquals(1, sizeof($maps));
+        $this->assertEquals(1, count($maps));
 
         $users = $this->manager->getMapAuthUsers($mapId);
-        $this->assertEquals(1, sizeof($users));
-        $this->assertFalse($this->objarray_includes($users, "userid", $guestUser));
-        $this->assertTrue($this->objarray_includes($users, "userid", 1));
+        $this->assertEquals(1, count($users));
+        $this->assertFalse($this->objectArrayIncludes($users, "userid", $guestUser));
+        $this->assertTrue($this->objectArrayIncludes($users, "userid", 1));
 
         $users = $this->manager->getMapAuth(7);
-        $this->assertEquals(2, sizeof($users));
-
+        $this->assertEquals(2, count($users));
     }
 
     public function testHash()
@@ -465,28 +459,27 @@ class MapManagerTest extends PHPUnit_Extensions_Database_TestCase
         $nosuchUser = 17;
 
         $maps = $this->manager->getMapWithAccess($adminUser, 1);
-        $this->assertEquals(1, sizeof($maps));
+        $this->assertEquals(1, count($maps));
 
         $maps = $this->manager->getMapWithAccess($guestUser, 1);
-        $this->assertEquals(0, sizeof($maps));
+        $this->assertEquals(0, count($maps));
 
         $maps = $this->manager->getMapWithAccess($guestUser, 7);
-        $this->assertEquals(1, sizeof($maps));
+        $this->assertEquals(1, count($maps));
 
         $maps = $this->manager->getMapWithAccess($nosuchUser, 1);
-        $this->assertEquals(0, sizeof($maps));
+        $this->assertEquals(0, count($maps));
 
         ####
 
         $maps = $this->manager->getMapsWithAccessAndGroups($adminUser);
-        $this->assertEquals(6, sizeof($maps));
+        $this->assertEquals(6, count($maps));
 
         $maps = $this->manager->getMapsWithAccessAndGroups($guestUser);
-        $this->assertEquals(1, sizeof($maps));
+        $this->assertEquals(1, count($maps));
 
         $maps = $this->manager->getMapsWithAccessAndGroups($nosuchUser);
-        $this->assertEquals(0, sizeof($maps));
-
+        $this->assertEquals(0, count($maps));
     }
 
     public function testListManagement()
@@ -495,29 +488,27 @@ class MapManagerTest extends PHPUnit_Extensions_Database_TestCase
         $this->assertEquals(6, $count);
 
         $maps = $this->manager->getMapsInGroup(1);
-        $this->assertEquals(6, sizeof($maps));
-        $this->assertInstanceOf(stdClass::class, $maps[0]);
+        $this->assertEquals(6, count($maps));
+        $this->assertInstanceOf(\stdClass::class, $maps[0]);
 
         $maps = $this->manager->getMapsInGroup(2);
-        $this->assertEquals(0, sizeof($maps));
+        $this->assertEquals(0, count($maps));
 
 
         $maps = $this->manager->getMapsWithGroups();
-        $this->assertEquals(6, sizeof($maps));
-        $this->assertInstanceOf(stdClass::class, $maps[0]);
+        $this->assertEquals(6, count($maps));
+        $this->assertInstanceOf(\stdClass::class, $maps[0]);
         $this->assertObjectHasAttribute("groupname", $maps[0]);
 
         $maps = $this->manager->getMapRunList();
-        $this->assertEquals(6, sizeof($maps));
-        $this->assertInstanceOf(stdClass::class, $maps[0]);
+        $this->assertEquals(6, count($maps));
+        $this->assertInstanceOf(\stdClass::class, $maps[0]);
         // TODO - check ordering!
 
         $this->manager->disableMap(1);
 
         $maps = $this->manager->getMapRunList();
-        $this->assertEquals(5, sizeof($maps));
-        $this->assertInstanceOf(stdClass::class, $maps[0]);
-
+        $this->assertEquals(5, count($maps));
+        $this->assertInstanceOf(\stdClass::class, $maps[0]);
     }
-
 }

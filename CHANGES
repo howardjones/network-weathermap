@@ -2,8 +2,9 @@ After planning to only add small fixes to 0.98, some changes turned out to be la
 something I knew was already taken care of in the larger rewrite, I've pulled over a lot of the code from that rewrite, and will
 probably discard the remains, making this the master branch again, at some point soon.
 
-POSSIBLE BREAKING CHANGE: Weathermap now makes use of PHP 5.3 features, so that is now the minimum version supported. No
-more PHP 4 support. Sorry to CentOS 4 users!
+BREAKING CHANGES: Weathermap now makes use of PHP 5.6 features, so that is now the minimum version supported. No
+more PHP 4 support. Sorry to CentOS 4 users! PHP 5.3 was an option, but that's also been end-of-life for several years now,
+and makes using current development tools (like phpunit) more difficult.
 
 1.0.0
     Special thanks to arjanoosting, YATV and hawson for code contributions on github, and especially

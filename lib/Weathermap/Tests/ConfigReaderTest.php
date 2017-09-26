@@ -2,11 +2,12 @@
 
 
 //require_once dirname(__FILE__) . '/../lib/all.php';
+namespace Weathermap\Tests;
 
 use Weathermap\Core\Map;
 use Weathermap\Core\ConfigReader;
 
-class ConfigReaderTest extends PHPUnit_Framework_TestCase
+class ConfigReaderTest extends \PHPUnit_Framework_TestCase
 {
     public function testInternals()
     {
@@ -15,6 +16,4 @@ class ConfigReaderTest extends PHPUnit_Framework_TestCase
 
         $this->assertTrue($reader->selfValidate());
     }
-
-
 }

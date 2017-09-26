@@ -1,4 +1,4 @@
-VERSION=1.0.0
+VERSION=1.0.0dev
 RELBASE=./releases
 RELNAME=php-weathermap-$(VERSION)
 RELDIR=$(RELBASE)/weathermap
@@ -24,6 +24,8 @@ clean:
 
 release: 
 	#sql
+	# remove the dev-only dependencies from vendor
+	composer --no-dev update
 	echo Building release $(RELNAME)
 	# mv $(RELDIR) $(RELDIR).$$
 	mkdir -p $(RELDIR)
@@ -33,9 +35,10 @@ release:
 	cd $(RELBASE); mv weathermap $(RELNAME)
 	echo $(RELNAME) built in $(RELBASE)
 
-test:	
+test:
+	vendor/bin/parallel-lint -p php5.6 --exclude app --exclude vendor .
+	vendor/bin/parallel-lint -p php7.1 --exclude app --exclude vendor .
 	vendor/bin/phpunit -c build/phpunit.xml
-#	phpunit -c build/phpunit.xml
 	grep  Output test-suite/diffs/*.txt | grep -v '|0|' | awk -F: '{ print $1;}' | sed -e 's/.png.txt//' -e 's/test-suite\/diffs\///' > test-suite/failing-images.txt
 	php test-suite/make-failing-summary.php > test-suite/summary-failing.html
 
@@ -49,6 +52,4 @@ sql:
 	mysqldump -n --add-drop-table --no-data -uroot -p cacti weathermap_settings >> weathermap.sql
 	mysqldump -n --add-drop-table --no-data -uroot -p cacti weathermap_data >> weathermap.sql
 
-tag:
-	svn copy http://www.network-weathermap.com/svn/repos/trunk http://www.network-weathermap.com/svn/repos/tags/version-$(VERSION) -m "Tagging $(VERSION) for release"
 

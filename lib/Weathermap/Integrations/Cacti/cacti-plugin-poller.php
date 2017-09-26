@@ -124,8 +124,11 @@ function weathermap_poller_output($rrd_update_array)
 
             $weathermap_data_update->execute(array($newtime, $newvalue, $newlastvalue, $required['id']));
             if ($log_verbosity >= POLLER_VERBOSITY_DEBUG) {
-                cacti_log("WM poller_output: Final value is $newvalue (was $lastval, period was $period)\n", true,
-                    "WEATHERMAP");
+                cacti_log(
+                    "WM poller_output: Final value is $newvalue (was $lastval, period was $period)\n",
+                    true,
+                    "WEATHERMAP"
+                );
             }
         }
     }
@@ -141,8 +144,8 @@ function weathermap_poller_bottom()
 {
     global $config;
 
-    include_once($config["library_path"] . DIRECTORY_SEPARATOR . "database.php");
-    include_once(dirname(__FILE__) . DIRECTORY_SEPARATOR . "poller-common.php");
+    include_once $config["library_path"] . DIRECTORY_SEPARATOR . "database.php";
+    include_once dirname(__FILE__) . DIRECTORY_SEPARATOR . "poller-common.php";
 
     $pdo = weathermap_get_pdo();
 

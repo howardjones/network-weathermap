@@ -1,9 +1,11 @@
 <?php
 
+namespace Weathermap\Tests;
+
 use Weathermap\Core\Map;
 use Weathermap\Core\MapUtility;
 
-class WMTestSupport
+class TestSupport
 {
 
     /**
@@ -24,7 +26,7 @@ class WMTestSupport
         return $method->invokeArgs($object, $parameters);
     }
 
-    public static function get_map_title($fileName)
+    public static function getMapTitle($fileName)
     {
         $title = "";
         $fileHandle = fopen($fileName, "r");
@@ -51,32 +53,30 @@ class WMTestSupport
      *
      * From: https://jtreminio.com/2013/03/unit-testing-tutorial-part-3-testing-protected-private-methods-coverage-reports-and-crap/
      *
-     * @param string $conffile
-     * @param string $imagefile
-     * @param string $htmlfile
-     * @param string $newconffile
+     * @param string $iconFileName
+     * @param string $imageFileName
+     * @param string $htmlFileName
+     * @param string $newConfigFileName
      *
      * @return int number of warnings
      */
-    public static function TestOutput_RunTest($conffile, $imagefile, $htmlfile, $newconffile)
+    public static function runOutputTest($iconFileName, $imageFileName, $htmlFileName, $newConfigFileName)
     {
-        global WEATHERMAP_VERSION;
-
         $map = new Map();
 
-        $map->readConfig($conffile);
+        $map->readConfig($iconFileName);
         $skip = 0;
-        $nwarns = 0;
+        $numWarnings = 0;
 
         if (!strstr(WEATHERMAP_VERSION, "dev")) {
             // Allow tests to be from the future. Global SET in test file can exempt test from running
             // SET REQUIRES_VERSION 0.98
             // but don't check if the current version is a dev version
-            $required_version = $map->getHint("REQUIRES_VERSION");
+            $requiredVersion = $map->getHint("REQUIRES_VERSION");
 
-            if ($required_version != "") {
+            if ($requiredVersion != "") {
                 // doesn't need to be complete, just in the right order
-                $known_versions = array(
+                $knownVersions = array(
                     "0.97",
                     "0.97a",
                     "0.97b",
@@ -85,11 +85,11 @@ class WMTestSupport
                     "0.98a",
                     "1.0.0"
                 );
-                $my_version = array_search(WEATHERMAP_VERSION, $known_versions);
-                $req_version = array_search($required_version, $known_versions);
-                if ($req_version > $my_version) {
+                $myVersionIndex = array_search(WEATHERMAP_VERSION, $knownVersions);
+                $requiredVersionIndex = array_search($requiredVersion, $knownVersions);
+                if ($requiredVersionIndex > $myVersionIndex) {
                     $skip = 1;
-                    $nwarns = -1;
+                    $numWarnings = -1;
                 }
             }
         }
@@ -97,22 +97,21 @@ class WMTestSupport
         if ($skip == 0) {
             $map->readData();
 //            $map->preCalculate($map);
-            $map->drawMap($imagefile);
-            $map->imagefile = $imagefile;
+            $map->drawMap($imageFileName);
+            $map->imagefile = $imageFileName;
 
-            if ($htmlfile != '') {
-                MapUtility::TestOutput_HTML($htmlfile, $map);
+            if ($htmlFileName != '') {
+                MapUtility::TestOutput_HTML($htmlFileName, $map);
             }
-            if ($newconffile != '') {
-                $map->writeConfig($newconffile);
+            if ($newConfigFileName != '') {
+                $map->writeConfig($newConfigFileName);
             }
-            $nwarns = $map->warncount;
+            $numWarnings = $map->warncount;
         }
 
         $map->cleanUp();
         unset($map);
 
-        return intval($nwarns);
+        return intval($numWarnings);
     }
-
 }

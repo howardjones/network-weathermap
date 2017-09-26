@@ -573,7 +573,7 @@ class WeatherMapCactiManagementPlugin extends UIBase
 
 
             print '</p></div>';
-            exit();
+            exit;
         }
 
         $tables = weathermap_get_table_list(weathermap_get_pdo());

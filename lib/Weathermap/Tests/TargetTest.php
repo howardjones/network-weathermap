@@ -1,11 +1,13 @@
 <?php
 
+namespace Weathermap\Tests;
+
 //require_once dirname(__FILE__) . '/../lib/all.php';
 
 use Weathermap\Core\Target;
 use Weathermap\Core\Map;
 
-class TargetTest extends PHPUnit_Framework_TestCase
+class TargetTest extends \PHPUnit_Framework_TestCase
 {
     public function testBasics()
     {
@@ -42,7 +44,6 @@ class TargetTest extends PHPUnit_Framework_TestCase
         $tg5->preProcess($node, $map);
 
         // TODO - figure out how to test this!! (scaleFactor is private)
-
     }
 
     public function testPluginRecognise()
@@ -72,8 +73,5 @@ class TargetTest extends PHPUnit_Framework_TestCase
         $matchedBy = $tg3->findHandlingPlugin($plugins);
 
         $this->assertEquals("WeatherMapDataSource_rrd", $matchedBy);
-
     }
-
-
 }

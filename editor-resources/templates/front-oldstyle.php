@@ -5,7 +5,7 @@
     <script type="text/javascript" src="vendor/jquery/dist/jquery.min.js"></script>
     <script src="editor-resources/editor.js" type="text/javascript"></script>
     <script src="editor-resources/editor16.js" type="text/javascript"></script>
-    <title>PHP Weathermap Editor <?php echo $WEATHERMAP_VERSION; ?></title></head>
+    <title>PHP Weathermap Editor <?php echo WEATHERMAP_VERSION; ?></title></head>
 <body>
 <div id="nojs" class="alert"><b>WARNING</b> - Sorry, it's partly laziness on my part, but you really need JavaScript
     enabled and DOM support in your browser to use this editor. It's a visual tool, so accessibility is already an
@@ -17,7 +17,7 @@
 <div id="withjs">
     <div id="dlgStart" class="dlgProperties">
         <div class="dlgTitlebar">Welcome</div>
-        <div class="dlgBody">Welcome to the PHP Weathermap 0.98 editor.<p>
+        <div class="dlgBody">Welcome to the PHP Weathermap <?php echo WEATHERMAP_VERSION; ?> editor.<p>
             <div style="border: 3px dashed red; background: #055; padding: 5px; font-size: 90%;"><b>NOTE:</b> This
                 editor is not finished! There are many features of Weathermap that you will be missing out on if you
                 choose to use the editor only.These include: curves, node offsets, font definitions, colour changing,
@@ -53,7 +53,7 @@
                 <?php endforeach ?>
             </ul>
         </div>
-        <div class="dlgHelp" id="start_help">PHP Weathermap <?php echo $WEATHERMAP_VERSION; ?> Copyright &copy;
+        <div class="dlgHelp" id="start_help">PHP Weathermap <?php echo WEATHERMAP_VERSION; ?> Copyright &copy;
             2005-2017
             Howard Jones -
             howie@thingy.com<br/>The current version should always be <a href="http://www.network-weathermap.com/">available

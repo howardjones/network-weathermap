@@ -124,7 +124,8 @@ function weathermap_poller_output($rrd_update_array)
 
             $weathermap_data_update->execute(array($newtime, $newvalue, $newlastvalue, $required['id']));
             if ($log_verbosity >= POLLER_VERBOSITY_DEBUG) {
-                cacti_log("WM poller_output: Final value is $newvalue (was $lastval, period was $period)\n", true, "WEATHERMAP");
+                cacti_log("WM poller_output: Final value is $newvalue (was $lastval, period was $period)\n", true,
+                    "WEATHERMAP");
             }
         }
     }
@@ -139,7 +140,6 @@ function weathermap_poller_output($rrd_update_array)
 function weathermap_poller_bottom()
 {
     global $config;
-    global $WEATHERMAP_VERSION;
 
     include_once($config["library_path"] . DIRECTORY_SEPARATOR . "database.php");
     include_once(dirname(__FILE__) . DIRECTORY_SEPARATOR . "poller-common.php");
@@ -155,7 +155,7 @@ function weathermap_poller_bottom()
     if ($renderperiod < 0) {
         // manual updates only
         if ($quietlogging == 0) {
-            cacti_log("Weathermap $WEATHERMAP_VERSION - no updates ever", true, "WEATHERMAP");
+            cacti_log("Weathermap " . WEATHERMAP_VERSION . " - no updates ever", true, "WEATHERMAP");
         }
         return;
     } else {
@@ -165,7 +165,7 @@ function weathermap_poller_bottom()
         } else {
             if ($quietlogging == 0) {
                 cacti_log(
-                    "Weathermap $WEATHERMAP_VERSION - no update in this cycle ($rendercounter)",
+                    "Weathermap " . WEATHERMAP_VERSION . " - no update in this cycle ($rendercounter)",
                     true,
                     "WEATHERMAP"
                 );

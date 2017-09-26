@@ -60,7 +60,7 @@ class WMTestSupport
      */
     public static function TestOutput_RunTest($conffile, $imagefile, $htmlfile, $newconffile)
     {
-        global $WEATHERMAP_VERSION;
+        global WEATHERMAP_VERSION;
 
         $map = new Map();
 
@@ -68,7 +68,7 @@ class WMTestSupport
         $skip = 0;
         $nwarns = 0;
 
-        if (!strstr($WEATHERMAP_VERSION, "dev")) {
+        if (!strstr(WEATHERMAP_VERSION, "dev")) {
             // Allow tests to be from the future. Global SET in test file can exempt test from running
             // SET REQUIRES_VERSION 0.98
             // but don't check if the current version is a dev version
@@ -85,7 +85,7 @@ class WMTestSupport
                     "0.98a",
                     "1.0.0"
                 );
-                $my_version = array_search($WEATHERMAP_VERSION, $known_versions);
+                $my_version = array_search(WEATHERMAP_VERSION, $known_versions);
                 $req_version = array_search($required_version, $known_versions);
                 if ($req_version > $my_version) {
                     $skip = 1;

@@ -1083,14 +1083,12 @@ class WeatherMapCactiManagementPlugin extends UIBase
 
     public function footerLinks()
     {
-        global $WEATHERMAP_VERSION;
-
         $html = "";
 
         $html .= '<a class="linkOverDark" href="docs/">Local Documentation</a>';
         $html .= ' -- <a class="linkOverDark" href="http://www.network-weathermap.com/">Weathermap Website</a>';
         $html .= ' -- <a class="linkOverDark" href="' . $this->makeURL(array(), $this->editor_url) . '">Weathermap Editor</a>';
-        $html .= " -- This is version $WEATHERMAP_VERSION";
+        $html .= " -- This is version ". WEATHERMAP_VERSION;
 
         print "<br />";
         html_start_box($html, '78%', '', '4', 'center', '');

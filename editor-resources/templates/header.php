@@ -6,5 +6,5 @@
 
     <script type="text/javascript" src="vendor/jquery/dist/jquery.min.js"></script>
     <script src="editor-resources/editor.js" type="text/javascript"></script>
-    <title>PHP Weathermap Editor <?php echo $WEATHERMAP_VERSION ?></title>
+    <title>PHP Weathermap Editor <?php echo WEATHERMAP_VERSION ?></title>
 </head>

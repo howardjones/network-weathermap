@@ -203,13 +203,19 @@ class EditorUI extends UIBase
             ),
             "handler" => "cmdTidyAllLinks"
         ),
-        "retidy" => array(
+        "retidy_all" => array(
             "args" => array(
                 array("mapname", "mapfile")
             ),
             "handler" => "cmdReTidyAllLinks"
         ),
-        "untidy_all" => array(
+        "retidy" => array(
+            "args" => array(
+                array("mapname", "mapfile")
+            ),
+            "handler" => "cmdReTidyLinks"
+        ),
+        "untidy" => array(
             "args" => array(
                 array("mapname", "mapfile")
             ),
@@ -571,6 +577,15 @@ class EditorUI extends UIBase
      * @param string[] $params
      * @param Editor $editor
      */
+    public function cmdReTidyLinks($params, $editor)
+    {
+        $editor->retidyLinks();
+    }
+
+    /**
+     * @param string[] $params
+     * @param Editor $editor
+     */
     public function cmdReTidyAllLinks($params, $editor)
     {
         $editor->retidyAllLinks();
@@ -763,11 +778,9 @@ class EditorUI extends UIBase
 
     public function showStartPage()
     {
-        global $WEATHERMAP_VERSION;
-
         $tpl = new SimpleTemplate();
 
-        $tpl->set("WEATHERMAP_VERSION", $WEATHERMAP_VERSION);
+        $tpl->set("WEATHERMAP_VERSION", WEATHERMAP_VERSION);
         $tpl->set("fromplug", 1);
 
         list($titles, $notes, $errorstring) = $this->getExistingConfigs($this->mapDirectory);
@@ -871,15 +884,13 @@ class EditorUI extends UIBase
 
     public function showMainPage($editor)
     {
-        global $WEATHERMAP_VERSION;
-
         /* add a random bit onto the URL so that the next request won't get the same URL/ETag combo
            even if the config file contents don't change, but the two requests for the same editor page WILL */
 
         $mapURL = "?action=draw&mapname=" . $this->mapShortName . "&rand=" . rand(0, 100000);
 
         $tpl = new SimpleTemplate();
-        $tpl->set("WEATHERMAP_VERSION", $WEATHERMAP_VERSION);
+        $tpl->set("WEATHERMAP_VERSION", WEATHERMAP_VERSION);
         $tpl->set("fromplug", ($this->isEmbedded() ? 1 : 0));
 
         $tpl->set("imageurl", htmlspecialchars($mapURL));

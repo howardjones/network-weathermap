@@ -187,14 +187,14 @@ function get_config_files($mapdir)
 
 function show_editor_startpage()
 {
-    global $mapdir, $WEATHERMAP_VERSION, $config_loaded, $cacti_found, $ignore_cacti, $configerror;
+    global $mapdir, $config_loaded, $cacti_found, $ignore_cacti, $configerror;
 
     $fromplug = false;
     if (isset($_REQUEST['plug']) && (intval($_REQUEST['plug']) == 1)) {
         $fromplug = true;
     }
 
-    print '<html xmlns="http://www.w3.org/1999/xhtml"><head><link rel="stylesheet" type="text/css" media="screen" href="editor-resources/oldeditor.css" /><script type="text/javascript" src="vendor/jquery/dist/jquery.min.js"></script><script src="editor-resources/editor.js" type="text/javascript"></script><title>PHP Weathermap Editor ' . $WEATHERMAP_VERSION
+    print '<html xmlns="http://www.w3.org/1999/xhtml"><head><link rel="stylesheet" type="text/css" media="screen" href="editor-resources/oldeditor.css" /><script type="text/javascript" src="vendor/jquery/dist/jquery.min.js"></script><script src="editor-resources/editor.js" type="text/javascript"></script><title>PHP Weathermap Editor ' . WEATHERMAP_VERSION
         . '</title></head><body>';
 
     print '<div id="nojs" class="alert"><b>WARNING</b> - ';
@@ -221,7 +221,7 @@ function show_editor_startpage()
 
     print '<div id="withjs">';
     print '<div id="dlgStart" class="dlgProperties" ><div class="dlgTitlebar">Welcome</div><div class="dlgBody">';
-    print 'Welcome to the PHP Weathermap ' . $WEATHERMAP_VERSION . ' editor.<p>';
+    print 'Welcome to the PHP Weathermap ' . WEATHERMAP_VERSION . ' editor.<p>';
     print '<div style="border: 3px dashed red; background: #055; padding: 5px; font-size: 90%;"><b>NOTE:</b> This editor is not finished! There are many features of ';
     print 'Weathermap that you will be missing out on if you choose to use the editor only.';
     print 'These include: curves, node offsets, font definitions, colour changing, per-node/per-link settings and image uploading. You CAN use the editor without damaging these features if you added them by hand, however.</div><p>';
@@ -285,8 +285,8 @@ function show_editor_startpage()
     print "</ul>";
 
     print "</div>"; // dlgbody
-    print '<div class="dlgHelp" id="start_help">PHP Weathermap ' . $WEATHERMAP_VERSION
-        . ' Copyright &copy; 2005-2016 Howard Jones - howie@thingy.com<br />The current version should always be <a href="http://www.network-weathermap.com/">available here</a>, along with other related software. PHP Weathermap is licensed under the GNU Public License, version 2. See COPYING for details. This distribution also includes the Overlib library by Erik Bosrup.</div>';
+    print '<div class="dlgHelp" id="start_help">PHP Weathermap ' . WEATHERMAP_VERSION
+        . ' Copyright &copy; 2005-2017 Howard Jones - howie@thingy.com<br />The current version should always be <a href="http://www.network-weathermap.com/">available here</a>, along with other related software. PHP Weathermap is licensed under the GNU Public License, version 2. See COPYING for details. This distribution also includes the Overlib library by Erik Bosrup.</div>';
 
     print "</div>"; // dlgStart
     print "</div>"; // withjs

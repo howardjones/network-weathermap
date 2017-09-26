@@ -28,17 +28,32 @@ class WeatherMapCactiUserPlugin extends UIBase
         'maplist' => array('handler' => 'handleMapList', 'args' => array()),
         'settings' => array('handler' => 'handleSettings', 'args' => array()),
 
-        'viewthumb' => array('handler' => 'handleBigThumb', 'args' => array(array("id", "maphash"), array("time", "int", true))),
+        'viewthumb' => array(
+            'handler' => 'handleBigThumb',
+            'args' => array(array("id", "maphash"), array("time", "int", true))
+        ),
         'viewthumb48' => array('handler' => 'handleLittleThumb', 'args' => array(array("id", "maphash"))),
         'viewimage' => array('handler' => 'handleImage', 'args' => array(array("id", "maphash"))),
 
-        'viewmap' => array('handler' => 'handleViewMap', 'args' => array(array("id", "maphash"), array("group_id", "int", true))),
+        'viewmap' => array(
+            'handler' => 'handleViewMap',
+            'args' => array(array("id", "maphash"), array("group_id", "int", true))
+        ),
 
-        'viewcycle_fullscreen' => array('handler' => 'handleViewCycleFullscreen', 'args' => array(array("id", "maphash"))),
-        'viewcycle_filtered_fullscreen' => array('handler' => 'handleViewCycleFilteredFullscreen', 'args' => array(array("id", "maphash"), array("group_id", "int", true))),
+        'viewcycle_fullscreen' => array(
+            'handler' => 'handleViewCycleFullscreen',
+            'args' => array(array("id", "maphash"))
+        ),
+        'viewcycle_filtered_fullscreen' => array(
+            'handler' => 'handleViewCycleFilteredFullscreen',
+            'args' => array(array("id", "maphash"), array("group_id", "int", true))
+        ),
 
         'viewcycle' => array('handler' => 'handleViewCycle', 'args' => array()),
-        'viewcycle_filtered' => array('handler' => 'handleViewCycleFiltered', 'args' => array(array("group_id", "int", true))),
+        'viewcycle_filtered' => array(
+            'handler' => 'handleViewCycleFiltered',
+            'args' => array(array("group_id", "int", true))
+        ),
         ':: DEFAULT ::' => array(
             'handler' => 'handleDefaultView',
             'args' => array(
@@ -131,7 +146,7 @@ class WeatherMapCactiUserPlugin extends UIBase
         header('Content-type: application/json');
 
         $style_text_options = array("thumbs", "full", "full-first-only");
-        $true_false= array(false, true);
+        $true_false = array(false, true);
 
         $style = $this->manager->getAppSetting("weathermap_pagestyle", 0);
 
@@ -173,8 +188,6 @@ class WeatherMapCactiUserPlugin extends UIBase
     {
         $this->outputMapImage($request['id'], ".");
     }
-
-
 
 
     // Below here are the old server-side functions that are replaced by client components
@@ -309,10 +322,8 @@ class WeatherMapCactiUserPlugin extends UIBase
 
     protected function outputVersionBox()
     {
-        global $WEATHERMAP_VERSION;
-
-        $pageFooter = "Powered by <a href=\"http://www.network-weathermap.com/?v=$WEATHERMAP_VERSION\">"
-            . "PHP Weathermap version $WEATHERMAP_VERSION</a>";
+        $pageFooter = "Powered by <a href=\"http://www.network-weathermap.com/?v=" . WEATHERMAP_VERSION . "\">"
+            . "PHP Weathermap version " . WEATHERMAP_VERSION . "</a>";
 
         $isAdmin = $this->isWeathermapAdmin();
 
@@ -354,8 +365,14 @@ class WeatherMapCactiUserPlugin extends UIBase
                                 (automatically cycle between full-size maps (<?php
 
                                 if ($limitingToGroup > 0) {
-                                    $this->makeURL(array("action" => "viewcycle_filtered", "group" => $limitingToGroup));
-                                    print '<a href = "' . $this->makeURL(array("action" => "viewcycle_filtered", "group" => $limitingToGroup)) . '">within this group</a>, or ';
+                                    $this->makeURL(array(
+                                        "action" => "viewcycle_filtered",
+                                        "group" => $limitingToGroup
+                                    ));
+                                    print '<a href = "' . $this->makeURL(array(
+                                            "action" => "viewcycle_filtered",
+                                            "group" => $limitingToGroup
+                                        )) . '">within this group</a>, or ';
                                 }
                                 print ' <a href = "' . $this->makeURL(array("action" => "viewcycle")) . '">all maps</a>';
                                 ?>)

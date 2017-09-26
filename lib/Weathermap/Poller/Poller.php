@@ -1,4 +1,5 @@
 <?php
+
 namespace Weathermap\Poller;
 
 use Weathermap\Integrations\MapManager;
@@ -53,10 +54,8 @@ class Poller
 
     public function preFlight()
     {
-        global $WEATHERMAP_VERSION;
-
         if (!wm_module_checks()) {
-            wm_warn("Required modules for PHP Weathermap $WEATHERMAP_VERSION were not present. Not running. [WMPOLL08]\n");
+            wm_warn("Required modules for PHP Weathermap " . WEATHERMAP_VERSION . " were not present. Not running. [WMPOLL08]\n");
 
             return;
         }
@@ -115,11 +114,10 @@ class Poller
 
     public function calculateStats()
     {
-        global $WEATHERMAP_VERSION;
-
-        $stats_string = sprintf('%s: %d maps were run in %.2f seconds with %d warnings. %s', date(DATE_RFC822), $this->mapcount, $this->duration, $this->total_warnings, $this->warning_notes);
+        $stats_string = sprintf('%s: %d maps were run in %.2f seconds with %d warnings. %s', date(DATE_RFC822),
+            $this->mapcount, $this->duration, $this->total_warnings, $this->warning_notes);
         if ($this->quietlogging == 0) {
-            wm_warn("STATS: Weathermap $WEATHERMAP_VERSION run complete - $stats_string\n", true);
+            wm_warn("STATS: Weathermap " . WEATHERMAP_VERSION . " run complete - $stats_string\n", true);
         }
         $this->manager->setAppSetting("weathermap_last_stats", $stats_string);
     }

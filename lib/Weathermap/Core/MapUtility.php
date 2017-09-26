@@ -42,23 +42,27 @@ class MapUtility
 
                 $callingFunction = " [$function@$file:$line]";
 
-                if (is_array($weathermap_debug_suppress) && in_array(strtolower($function), $weathermap_debug_suppress)) {
+                if (is_array($weathermap_debug_suppress) && in_array(strtolower($function),
+                        $weathermap_debug_suppress)) {
                     return;
                 }
             }
 
             // use Cacti's debug log, if we are running from the poller
             if (function_exists('debug_log_insert') && (!function_exists('show_editor_startpage'))) {
-                \cacti_log("DEBUG:$callingFunction " . ($weathermap_map == '' ? '' : $weathermap_map . ': ') . rtrim($string), true, 'WEATHERMAP');
+                \cacti_log("DEBUG:$callingFunction " . ($weathermap_map == '' ? '' : $weathermap_map . ': ') . rtrim($string),
+                    true, 'WEATHERMAP');
             } else {
                 $stderr = fopen('php://stderr', 'w');
-                fwrite($stderr, "DEBUG:$callingFunction " . ($weathermap_map == '' ? '' : $weathermap_map . ': ') . $string);
+                fwrite($stderr,
+                    "DEBUG:$callingFunction " . ($weathermap_map == '' ? '' : $weathermap_map . ': ') . $string);
                 fclose($stderr);
 
                 // mostly this is overkill, but it's sometimes useful (mainly in the editor)
                 if (1 == 0) {
                     $log = fopen('debug.log', 'a');
-                    fwrite($log, "DEBUG:$callingFunction " . ($weathermap_map == '' ? '' : $weathermap_map . ': ') . $string);
+                    fwrite($log,
+                        "DEBUG:$callingFunction " . ($weathermap_map == '' ? '' : $weathermap_map . ': ') . $string);
                     fclose($log);
                 }
             }
@@ -110,14 +114,11 @@ class MapUtility
      * A duplicate of the HTML output code in the weathermap CLI utility,
      * for use by the test-output stuff.
      *
-     * @global string $WEATHERMAP_VERSION
      * @param string $htmlfile
      * @param Map $map
      */
     public static function TestOutput_HTML($htmlfile, &$map)
     {
-        global $WEATHERMAP_VERSION;
-
         $fd = fopen($htmlfile, 'w');
         fwrite(
             $fd,
@@ -126,7 +127,8 @@ class MapUtility
         if ($map->htmlstylesheet != '') {
             fwrite($fd, '<link rel="stylesheet" type="text/css" href="' . $map->htmlstylesheet . '" />');
         }
-        fwrite($fd, '<meta http-equiv="refresh" content="300" /><title>' . $map->processString($map->title, $map) . '</title></head><body>');
+        fwrite($fd, '<meta http-equiv="refresh" content="300" /><title>' . $map->processString($map->title,
+                $map) . '</title></head><body>');
 
         if ($map->htmlstyle == 'overlib') {
             fwrite(
@@ -143,7 +145,7 @@ class MapUtility
         fwrite(
             $fd,
             '<hr /><span id="byline">Network Map created with <a href="http://www.network-weathermap.com/?vs='
-            . $WEATHERMAP_VERSION . '">PHP Network Weathermap v' . $WEATHERMAP_VERSION
+            . WEATHERMAP_VERSION . '">PHP Network Weathermap v' . WEATHERMAP_VERSION
             . '</a></span></body></html>'
         );
         fclose($fd);
@@ -218,7 +220,8 @@ class MapUtility
         }
 
         if (preg_match('/(NE|SE|NW|SW|N|S|E|W|C)(\d+)?$/i', $offsetstring, $matches)) {
-            return self::calculateCompassOffset($matches[1], (isset($matches[2]) ? $matches[2] : null), $width, $height);
+            return self::calculateCompassOffset($matches[1], (isset($matches[2]) ? $matches[2] : null), $width,
+                $height);
         }
 
         if (preg_match('/(-?\d+)r(\d+)$/i', $offsetstring, $matches)) {

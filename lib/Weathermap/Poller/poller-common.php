@@ -104,7 +104,7 @@ function weathermap_directory_writeable($directory_path)
 function weathermap_run_maps($mydir)
 {
     global $config;
-    global $weathermap_debugging, $WEATHERMAP_VERSION;
+    global $weathermap_debugging;
     global $weathermap_map;
     global $weathermap_warncount;
     global $weathermap_poller_start_time;
@@ -149,11 +149,11 @@ function weathermap_run_maps($mydir)
     $quietlogging = \read_config_option("weathermap_quiet_logging");
     // moved this outside the module_checks, so there should always be something in the logs!
     if ($quietlogging == 0) {
-        \cacti_log("Weathermap $WEATHERMAP_VERSION starting - $mode_message\n", true, "WEATHERMAP");
+        \cacti_log("Weathermap " . WEATHERMAP_VERSION . " starting - $mode_message\n", true, "WEATHERMAP");
     }
 
     if (!MapUtility::wm_module_checks()) {
-        MapUtility::wm_warn("Required modules for PHP Weathermap $WEATHERMAP_VERSION were not present. Not running. [WMPOLL08]\n");
+        MapUtility::wm_warn("Required modules for PHP Weathermap " . WEATHERMAP_VERSION . " were not present. Not running. [WMPOLL08]\n");
         return;
     }
     weathermap_memory_check("MEM Initial");
@@ -342,8 +342,8 @@ function weathermap_run_maps($mydir)
                                 $manager->updateMap(
                                     $map->id,
                                     array(
-                                    'thumb_width' => intval($wmap->thumbWidth),
-                                    'thumb_height' => intval($wmap->thumbHeight)
+                                        'thumb_width' => intval($wmap->thumbWidth),
+                                        'thumb_height' => intval($wmap->thumbHeight)
                                     )
                                 );
                             }
@@ -368,8 +368,8 @@ function weathermap_run_maps($mydir)
                         $manager->updateMap(
                             $map->id,
                             array(
-                            'warncount' => intval($weathermap_warncount),
-                            'runtime' => floatval($map_duration)
+                                'warncount' => intval($weathermap_warncount),
+                                'runtime' => floatval($map_duration)
                             )
                         );
 
@@ -416,7 +416,7 @@ function weathermap_run_maps($mydir)
         $warning_notes
     );
     if ($quietlogging == 0) {
-        MapUtility::wm_warn("STATS: Weathermap $WEATHERMAP_VERSION run complete - $stats_string\n", true);
+        MapUtility::wm_warn("STATS: Weathermap ".WEATHERMAP_VERSION." run complete - $stats_string\n", true);
     }
     $manager->setAppSetting("weathermap_last_stats", $stats_string);
     $manager->setAppSetting("weathermap_last_finish_time", time());

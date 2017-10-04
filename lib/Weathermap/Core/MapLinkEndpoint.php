@@ -57,11 +57,11 @@ class MapLinkEndpoint
 
     public function resolve($name)
     {
-        MapUtility::wm_debug("%s Offset is %s\n", $name, $this->offset);
-        MapUtility::wm_debug("%s node is %sx%s\n", $name, $this->node->width, $this->node->height);
+        MapUtility::debug("%s Offset is %s\n", $name, $this->offset);
+        MapUtility::debug("%s node is %sx%s\n", $name, $this->node->width, $this->node->height);
 
         if ($this->dx != 0 || $this->dy != 0) {
-            MapUtility::wm_debug("Using offsets from earlier\n");
+            MapUtility::debug("Using offsets from earlier\n");
         } else {
             list($this->dx, $this->dy) = MapUtility::calculateOffset(
                 $this->offset,
@@ -71,6 +71,6 @@ class MapLinkEndpoint
             $this->offsetResolved = true;
         }
         $this->point = new Point($this->node->x + $this->dx, $this->node->y + $this->dy);
-        MapUtility::wm_debug('%s point is %s', $name, $this->point);
+        MapUtility::debug('%s point is %s', $name, $this->point);
     }
 }

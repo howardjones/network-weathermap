@@ -45,7 +45,7 @@ class Target
         $this->values[OUT] = null;
         $this->timestamp = null;
 
-        MapUtility::wm_debug("New Target Created: $this\n");
+        MapUtility::debug("New Target Created: $this\n");
     }
 
     public function __toString()
@@ -71,7 +71,7 @@ class Target
         $this->finalTargetString = $map->processString($this->originalTargetString, $mapItem, false, false);
 
         if ($this->originalTargetString != $this->finalTargetString) {
-            MapUtility::wm_debug("%s: Targetstring is now %s\n", $mapItem, $this->finalTargetString);
+            MapUtility::debug("%s: Targetstring is now %s\n", $mapItem, $this->finalTargetString);
         }
 
         // if the targetstring starts with a -, then we're taking this value OFF the aggregate
@@ -88,25 +88,25 @@ class Target
             $this->scaleFactor = $this->scaleFactor * floatval($matches[1]);
         }
         if ($this->scaleFactor != 1.0) {
-            MapUtility::wm_debug("%s: will scale by %f\n", $mapItem, $this->scaleFactor);
+            MapUtility::debug("%s: will scale by %f\n", $mapItem, $this->scaleFactor);
         }
     }
 
     public function findHandlingPlugin($pluginList)
     {
-        MapUtility::wm_debug("Finding handler for %s '%s'\n", $this->mapItem, $this->finalTargetString);
+        MapUtility::debug("Finding handler for %s '%s'\n", $this->mapItem, $this->finalTargetString);
         foreach ($pluginList as $name => $pluginEntry) {
             $isRecognised = $pluginEntry['object']->recognise($this->finalTargetString);
 
             if ($isRecognised) {
-                MapUtility::wm_debug("plugin %s says it can handle it (state=%s)\n", $name, $pluginEntry['active']);
+                MapUtility::debug("plugin %s says it can handle it (state=%s)\n", $name, $pluginEntry['active']);
                 $this->pluginName = $name;
                 $this->pluginObject = $pluginEntry['object'];
                 $this->pluginRunnable = $pluginEntry['active'];
                 return $name;
             }
         }
-        MapUtility::wm_debug("Failed to find a plugin\n");
+        MapUtility::debug("Failed to find a plugin\n");
         return false;
     }
 
@@ -117,14 +117,14 @@ class Target
 
     public function readData(&$map, &$mapItem)
     {
-        MapUtility::wm_debug("ReadData for $mapItem ($this->pluginName $this->pluginRunnable)\n");
+        MapUtility::debug("ReadData for $mapItem ($this->pluginName $this->pluginRunnable)\n");
         if (!$this->pluginRunnable) {
-            MapUtility::wm_debug("Plugin %s isn't runnable\n", $this->pluginName);
+            MapUtility::debug("Plugin %s isn't runnable\n", $this->pluginName);
             return;
         }
 
         if ($this->scaleFactor != 1) {
-            MapUtility::wm_debug("Will multiply result by %f\n", $this->scaleFactor);
+            MapUtility::debug("Will multiply result by %f\n", $this->scaleFactor);
         }
 
         list($data, $dataTime) = $this->pluginObject->readData($this->finalTargetString, $map, $mapItem);
@@ -133,7 +133,7 @@ class Target
         $out = $data[OUT];
 
         if ($in === null && $out === null) {
-            MapUtility::wm_warn(
+            MapUtility::warn(
                 sprintf(
                     "ReadData: %s, target: %s had no valid data, according to %s [WMWARN70]\n",
                     $mapItem,
@@ -144,7 +144,7 @@ class Target
             return;
         }
 
-        MapUtility::wm_debug("Collected data %f,%f\n", $in, $out);
+        MapUtility::debug("Collected data %f,%f\n", $in, $out);
 
         $in *= $this->scaleFactor;
         $out *= $this->scaleFactor;

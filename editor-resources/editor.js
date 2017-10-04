@@ -278,6 +278,7 @@ function mapmode(m) {
 }
 
 function add_node() {
+
     document.getElementById('tb_help').innerText = 'Click on the map where you would like to add a new node.';
     document.getElementById('action').value = "add_node";
     mapmode('xy');

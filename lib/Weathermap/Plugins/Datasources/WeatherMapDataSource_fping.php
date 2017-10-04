@@ -78,7 +78,7 @@ class WeatherMapDataSource_fping extends DatasourceBase
 
             if (is_executable($this->fpingCommand)) {
                 $command = $this->fpingCommand . " -t100 -r1 -p20 -u -C $pingCount -i10 -q $target 2>&1";
-                MapUtility::wm_debug("Running $command\n");
+                MapUtility::debug("Running $command\n");
                 $pipe = popen($command, "r");
 
                 $count = 0;
@@ -87,10 +87,10 @@ class WeatherMapDataSource_fping extends DatasourceBase
                     while (!feof($pipe)) {
                         $line = fgets($pipe, 4096);
                         $count++;
-                        MapUtility::wm_debug("Output: $line");
+                        MapUtility::debug("Output: $line");
 
                         if (preg_match($pattern, $line, $matches)) {
-                            MapUtility::wm_debug("Found output line for $target\n");
+                            MapUtility::debug("Found output line for $target\n");
                             $hitCount++;
                             $loss = 0;
                             $ave = 0;
@@ -112,15 +112,15 @@ class WeatherMapDataSource_fping extends DatasourceBase
                                 $ave = $total / $cnt;
                             }
 
-                            MapUtility::wm_debug("Result: $cnt $min -> $max $ave $loss\n");
+                            MapUtility::debug("Result: $cnt $min -> $max $ave $loss\n");
                         }
                     }
                     pclose($pipe);
                     if ($count == 0) {
-                        MapUtility::wm_warn("FPing ReadData: No lines read. Bad hostname? ($target) [WMFPING03]\n");
+                        MapUtility::warn("FPing ReadData: No lines read. Bad hostname? ($target) [WMFPING03]\n");
                     } else {
                         if ($hitCount == 0) {
-                            MapUtility::wm_warn("FPing ReadData: $count lines read. But nothing returned for target??? ($target) Try running with DEBUG to see output.  [WMFPING02]\n");
+                            MapUtility::warn("FPing ReadData: $count lines read. But nothing returned for target??? ($target) Try running with DEBUG to see output.  [WMFPING02]\n");
                         } else {
                             $this->data[IN] = $ave;
                             $this->data[OUT] = $loss;
@@ -131,7 +131,7 @@ class WeatherMapDataSource_fping extends DatasourceBase
                     $this->dataTime = time();
                 }
             } else {
-                MapUtility::wm_warn("FPing ReadData: Can't find fping executable. Check path at line 19 of WeatherMapDataSource_fping.php [WMFPING01]\n");
+                MapUtility::warn("FPing ReadData: Can't find fping executable. Check path at line 19 of WeatherMapDataSource_fping.php [WMFPING01]\n");
             }
         }
 

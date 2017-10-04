@@ -89,8 +89,8 @@ class MapLink extends MapDataItem
             'infourl' => array('', ''),
             'notes' => array(),
             'hints' => array(),
-            'scaleKeys' => array(IN=>'', OUT=>''),
-            'scaleTags' => array(IN=>'', OUT=>''),
+            'scaleKeys' => array(IN => '', OUT => ''),
+            'scaleTags' => array(IN => '', OUT => ''),
             'comments' => array('', ''),
             'commentOffsets' => array(IN => 95, OUT => 5),
             'bwlabelOffsets' => array(IN => 75, OUT => 25),
@@ -144,7 +144,7 @@ class MapLink extends MapDataItem
 
     private function drawComments($gdImage)
     {
-        MapUtility::wm_debug('Link ' . $this->name . ": Drawing comments.\n");
+        MapUtility::debug('Link ' . $this->name . ": Drawing comments.\n");
 
         $directions = $this->getDirectionList();
 
@@ -156,21 +156,9 @@ class MapLink extends MapDataItem
         $fontObject = $this->owner->fonts->getFont($this->commentfont);
 
         foreach ($directions as $direction) {
-            MapUtility::wm_debug('Link ' . $this->name . ": Drawing comments for direction $direction\n");
+            MapUtility::debug('Link ' . $this->name . ": Drawing comments for direction $direction\n");
 
             $widthList[$direction] *= 1.1;
-
-            // Time to deal with Link Comments, if any
-            $comment = $this->owner->processString($this->comments[$direction], $this);
-
-            if ($this->owner->getHint('screenshot_mode') == 1) {
-                $comment = StringUtility::stringAnonymise($comment);
-            }
-
-            if ($comment == '') {
-                MapUtility::wm_debug('Link ' . $this->name . " no text for direction $direction\n");
-                break;
-            }
 
             $commentColours[$direction] = $this->commentfontcolour;
 
@@ -180,58 +168,18 @@ class MapLink extends MapDataItem
 
             $gdCommentColours[$direction] = $commentColours[$direction]->gdAllocate($gdImage);
 
-            # list($textWidth, $textHeight) = $this->owner->myimagestringsize($this->commentfont, $comment);
-            list($textWidth, $textHeight) = $fontObject->calculateImageStringSize($comment);
 
-            // nudge pushes the comment out along the link arrow a little bit
-            // (otherwise there are more problems with text disappearing underneath links)
-            $nudgeAlong = intval($this->getHint('comment_nudgealong'));
-            $nudgeOut = intval($this->getHint('comment_nudgeout'));
 
-            /** @var Point $position */
-            list ($position, $commentIndex, $angle, $distance) = $this->geometry->findPointAndAngleAtPercentageDistance($this->commentOffsets[$direction]);
+            $comment = $this->calculateCommentText($direction);
 
-            $tangent = $this->geometry->findTangentAtIndex($commentIndex);
-            $tangent->normalise();
-
-            $centreDistance = $widthList[$direction] + 4 + $nudgeOut;
-
-            if ($this->commentStyle == 'center') {
-                $centreDistance = $nudgeOut - ($textHeight / 2);
-            }
-            // find the normal to our link, so we can get outside the arrow
-            $normal = $tangent->getNormal();
-
-            $flipped = false;
-
-            $edge = $position;
-
-            // if the text will be upside-down, rotate it, flip it, and right-justify it
-            // not quite as catchy as Missy's version
-            if (abs($angle) > 90) {
-                $angle -= 180;
-                if ($angle < -180) {
-                    $angle += 360;
-                }
-                $edge->addVector($tangent, $nudgeAlong);
-                $edge->addVector($normal, -$centreDistance);
-                $flipped = true;
-            } else {
-                $edge->addVector($tangent, $nudgeAlong);
-                $edge->addVector($normal, $centreDistance);
+            if ($comment == '') {
+                MapUtility::debug('Link ' . $this->name . " no text for direction $direction\n");
+                break;
             }
 
-            $maxLength = $this->geometry->totalDistance();
+            list($angle, $edge) = $this->calculateCommentPosition($fontObject, $comment, $direction, $widthList);
 
-            if (!$flipped && ($distance + $textWidth) > $maxLength) {
-                $edge->addVector($tangent, -$textWidth);
-            }
-
-            if ($flipped && ($distance - $textWidth) < 0) {
-                $edge->addVector($tangent, $textWidth);
-            }
-
-            MapUtility::wm_debug('Link ' . $this->name . " writing $comment at $edge and angle $angle for direction $direction\n");
+            MapUtility::debug('Link ' . $this->name . " writing $comment at $edge and angle $angle for direction $direction\n");
 
             // FINALLY, draw the text!
             $fontObject->drawImageString($gdImage, $edge->x, $edge->y, $comment, $gdCommentColours[$direction], $angle);
@@ -244,7 +192,7 @@ class MapLink extends MapDataItem
      */
     public function preCalculate(&$map)
     {
-        MapUtility::wm_debug('Link ' . $this->name . ": Calculating geometry.\n");
+        MapUtility::debug('Link ' . $this->name . ": Calculating geometry.\n");
 
         // don't bother doing anything if it's a template
         if ($this->isTemplate()) {
@@ -258,29 +206,29 @@ class MapLink extends MapDataItem
 
         $points [] = $this->endpoints[0]->point;
 
-        MapUtility::wm_debug('POINTS SO FAR:' . join(' ', $points) . "\n");
+        MapUtility::debug('POINTS SO FAR:' . join(' ', $points) . "\n");
 
         foreach ($this->viaList as $via) {
-            MapUtility::wm_debug("VIALIST...\n");
+            MapUtility::debug("VIALIST...\n");
             // if the via has a third element, the first two are relative to that node
             if (isset($via[2])) {
                 $relativeTo = $map->getNode($via[2]);
-                MapUtility::wm_debug("Relative to $relativeTo\n");
+                MapUtility::debug("Relative to $relativeTo\n");
                 $point = new Point($relativeTo->x + $via[0], $relativeTo->y + $via[1]);
             } else {
                 $point = new Point($via[0], $via[1]);
             }
-            MapUtility::wm_debug("Adding $point\n");
+            MapUtility::debug("Adding $point\n");
             $points [] = $point;
         }
-        MapUtility::wm_debug('POINTS SO FAR:' . join(' ', $points) . "\n");
+        MapUtility::debug('POINTS SO FAR:' . join(' ', $points) . "\n");
 
         $points [] = $this->endpoints[1]->point;
 
-        MapUtility::wm_debug('POINTS SO FAR:' . join(' ', $points) . "\n");
+        MapUtility::debug('POINTS SO FAR:' . join(' ', $points) . "\n");
 
         if ($points[0]->closeEnough($points[1]) && count($this->viaList) == 0) {
-            MapUtility::wm_warn('Zero-length link ' . $this->name . ' skipped. [WMWARN45]');
+            MapUtility::warn('Zero-length link ' . $this->name . ' skipped. [WMWARN45]');
             $this->geometry = null;
             return;
         }
@@ -299,12 +247,12 @@ class MapLink extends MapDataItem
 
         // don't bother with any curve stuff if there aren't any Vias defined, even if the style is 'curved'
         if (count($this->viaList) == 0) {
-            MapUtility::wm_debug("Forcing to angled (no vias)\n");
+            MapUtility::debug("Forcing to angled (no vias)\n");
             $style = 'angled';
         }
 
         $this->geometry = LinkGeometryFactory::create($style);
-        $this->geometry->Init(
+        $this->geometry->init(
             $this,
             $points,
             $widths,
@@ -316,10 +264,10 @@ class MapLink extends MapDataItem
 
     public function draw($imageRef)
     {
-        MapUtility::wm_debug('Link ' . $this->name . ": Drawing.\n");
+        MapUtility::debug('Link ' . $this->name . ": Drawing.\n");
         // If there is geometry to draw, draw it
         if (!is_null($this->geometry)) {
-            MapUtility::wm_debug(get_class($this->geometry) . "\n");
+            MapUtility::debug(get_class($this->geometry) . "\n");
 
             $this->geometry->setOutlineColour($this->outlinecolour);
             $this->geometry->setFillColours(array($this->colours[IN], $this->colours[OUT]));
@@ -332,7 +280,7 @@ class MapLink extends MapDataItem
 
             $this->drawBandwidthLabels($imageRef);
         } else {
-            MapUtility::wm_debug("Skipping link with no geometry attached\n");
+            MapUtility::debug("Skipping link with no geometry attached\n");
         }
 
         $this->makeImagemapAreas();
@@ -349,8 +297,8 @@ class MapLink extends MapDataItem
 
             $polyPoints = $this->geometry->getDrawnPolygon($direction);
 
-            $newArea = new HTMLImagemapAreaPolygon($areaName, '', array($polyPoints));
-            MapUtility::wm_debug("Adding Poly imagemap for %s\n", $areaName);
+            $newArea = new HTMLImagemapAreaPolygon(array($polyPoints), $areaName, '');
+            MapUtility::debug("Adding Poly imagemap for %s\n", $areaName);
 
             $this->imagemapAreas[] = $newArea;
         }
@@ -358,7 +306,7 @@ class MapLink extends MapDataItem
 
     private function drawBandwidthLabels($gdImage)
     {
-        MapUtility::wm_debug('Link ' . $this->name . ": Drawing bwlabels.\n");
+        MapUtility::debug('Link ' . $this->name . ": Drawing bwlabels.\n");
 
         $directions = $this->getDirectionList();
 
@@ -373,7 +321,7 @@ class MapLink extends MapDataItem
 
             $bwlabelText = $this->owner->processString($this->bwlabelformats[$direction], $this);
             if ($bwlabelText != '') {
-                MapUtility::wm_debug('Bandwidth for label is ' . StringUtility::valueOrNull($bandwidth) . " (label is '$bwlabelText')\n");
+                MapUtility::debug('Bandwidth for label is ' . StringUtility::valueOrNull($bandwidth) . " (label is '$bwlabelText')\n");
                 $padding = intval($this->getHint('bwlabel_padding'));
 
                 // if screenshot_mode is enabled, wipe any letters to X and wipe any IP address to 127.0.0.1
@@ -478,11 +426,11 @@ class MapLink extends MapDataItem
             $rectanglePoints[] = min($points[1], $points[3]);
             $rectanglePoints[] = max($points[0], $points[2]);
             $rectanglePoints[] = max($points[1], $points[3]);
-            $newArea = new HTMLImagemapAreaRectangle($areaName, '', array($rectanglePoints));
-            MapUtility::wm_debug("Adding Rectangle imagemap for $areaName\n");
+            $newArea = new HTMLImagemapAreaRectangle(array($rectanglePoints), $areaName, '');
+            MapUtility::debug("Adding Rectangle imagemap for $areaName\n");
         } else {
-            $newArea = new HTMLImagemapAreaPolygon($areaName, '', array($points));
-            MapUtility::wm_debug("Adding Poly imagemap for $areaName\n");
+            $newArea = new HTMLImagemapAreaPolygon(array($points), $areaName, '');
+            MapUtility::debug("Adding Poly imagemap for $areaName\n");
         }
         // Make a note that we added this area
         $this->imagemapAreas[] = $newArea;
@@ -499,7 +447,7 @@ class MapLink extends MapDataItem
 
         $templateSource = $this->owner->links[$this->template];
 
-        MapUtility::wm_debug("Writing config for LINK $this->name against $this->template\n");
+        MapUtility::debug("Writing config for LINK $this->name against $this->template\n");
 
         $simpleParameters = array(
             array('width', 'WIDTH', self::CONFIG_TYPE_LITERAL),
@@ -753,7 +701,7 @@ class MapLink extends MapDataItem
 
     public function getValue($name)
     {
-        MapUtility::wm_debug("Fetching %s\n", $name);
+        MapUtility::debug("Fetching %s\n", $name);
         if (property_exists($this, $name)) {
             return $this->$name;
         }
@@ -814,7 +762,7 @@ class MapLink extends MapDataItem
         foreach (array_keys($this->inheritedFieldList) as $fld) {
             if (!property_exists($class, $fld)) {
                 $failed = true;
-                MapUtility::wm_warn("$fld is in $class inherit list, but not in object");
+                MapUtility::warn("$fld is in $class inherit list, but not in object");
             }
         }
         return $failed;
@@ -822,21 +770,21 @@ class MapLink extends MapDataItem
 
     public function getProperty($name)
     {
-        MapUtility::wm_debug("Fetching %s from %s\n", $name, $this);
+        MapUtility::debug("Fetching %s from %s\n", $name, $this);
 
         $translations = array(
-            'inscalekey'=>$this->scaleKeys[IN],
-            'outscalekey'=>$this->scaleKeys[OUT],
-            "inscaletag"=>$this->scaleTags[IN],
-            "outscaletag"=>$this->scaleTags[OUT],
-            "bandwidth_in"=>$this->absoluteUsages[IN],
-            "inpercent"=>$this->percentUsages[IN],
-            "bandwidth_out"=>$this->absoluteUsages[OUT],
-            "outpercent"=>$this->percentUsages[OUT],
-            "max_bandwidth_in"=>$this->maxValues[IN],
-            'max_bandwidth_in_cfg'=>$this->maxValuesConfigured[IN],
-            "max_bandwidth_out"=>$this->maxValues[OUT],
-            'max_bandwidth_out_cfg'=>$this->maxValuesConfigured[OUT],
+            'inscalekey' => $this->scaleKeys[IN],
+            'outscalekey' => $this->scaleKeys[OUT],
+            "inscaletag" => $this->scaleTags[IN],
+            "outscaletag" => $this->scaleTags[OUT],
+            "bandwidth_in" => $this->absoluteUsages[IN],
+            "inpercent" => $this->percentUsages[IN],
+            "bandwidth_out" => $this->absoluteUsages[OUT],
+            "outpercent" => $this->percentUsages[OUT],
+            "max_bandwidth_in" => $this->maxValues[IN],
+            'max_bandwidth_in_cfg' => $this->maxValuesConfigured[IN],
+            "max_bandwidth_out" => $this->maxValues[OUT],
+            'max_bandwidth_out_cfg' => $this->maxValuesConfigured[OUT],
         );
 
         if (array_key_exists($name, $translations)) {
@@ -854,6 +802,82 @@ class MapLink extends MapDataItem
     public function __toString()
     {
         return sprintf("[LINK %s]", $this->name);
+    }
+
+    /**
+     * @param $direction
+     * @return mixed|string
+     */
+    private function calculateCommentText($direction)
+    {
+        // Time to deal with Link Comments, if any
+        $comment = $this->owner->processString($this->comments[$direction], $this);
+
+        if ($this->owner->getHint('screenshot_mode') == 1) {
+            $comment = StringUtility::stringAnonymise($comment);
+        }
+        return $comment;
+    }
+
+    /**
+     * @param $fontObject
+     * @param $comment
+     * @param $direction
+     * @param $widthList
+     * @return array
+     */
+    private function calculateCommentPosition($fontObject, $comment, $direction, $widthList)
+    {
+        list($textWidth, $textHeight) = $fontObject->calculateImageStringSize($comment);
+
+        // nudge pushes the comment out along the link arrow a little bit
+        // (otherwise there are more problems with text disappearing underneath links)
+        $nudgeAlong = intval($this->getHint('comment_nudgealong'));
+        $nudgeOut = intval($this->getHint('comment_nudgeout'));
+
+        /** @var Point $position */
+        list ($position, $commentIndex, $angle, $distance) = $this->geometry->findPointAndAngleAtPercentageDistance($this->commentOffsets[$direction]);
+
+        $tangent = $this->geometry->findTangentAtIndex($commentIndex);
+        $tangent->normalise();
+
+        $centreDistance = $widthList[$direction] + 4 + $nudgeOut;
+
+        if ($this->commentStyle == 'center') {
+            $centreDistance = $nudgeOut - ($textHeight / 2);
+        }
+        // find the normal to our link, so we can get outside the arrow
+        $normal = $tangent->getNormal();
+
+        $flipped = false;
+
+        $edge = $position;
+
+        // if the text will be upside-down, rotate it, flip it, and right-justify it
+        // not quite as catchy as Missy's version
+        if (abs($angle) > 90) {
+            $angle -= 180;
+            if ($angle < -180) {
+                $angle += 360;
+            }
+            $edge->addVector($tangent, $nudgeAlong);
+            $edge->addVector($normal, -$centreDistance);
+            $flipped = true;
+        } else {
+            $edge->addVector($tangent, $nudgeAlong);
+            $edge->addVector($normal, $centreDistance);
+        }
+
+        $maxLength = $this->geometry->totalDistance();
+
+        if (!$flipped && ($distance + $textWidth) > $maxLength) {
+            $edge->addVector($tangent, -$textWidth);
+        }
+
+        if ($flipped && ($distance - $textWidth) < 0) {
+            $edge->addVector($tangent, $textWidth);
+        }
+        return array($angle, $edge);
     }
 }
 

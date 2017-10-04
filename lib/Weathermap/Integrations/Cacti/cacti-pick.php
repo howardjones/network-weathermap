@@ -9,7 +9,7 @@ use Weathermap\UI\SimpleTemplate;
 
 class EditorDataPicker extends UIBase
 {
-    var $commands = array(
+    public $commands = array(
         "link_step1" => array(
             "args" => array(
                 array("host_id", "int", true),
@@ -36,7 +36,7 @@ class EditorDataPicker extends UIBase
 
     );
 
-    public function main($request, $from_plugin = false)
+    public function main($request, $fromPlugin = false)
     {
         $action = "";
 
@@ -53,7 +53,7 @@ class EditorDataPicker extends UIBase
     {
         global $config; // Cacti config object
 
-        $host_id = -1;
+        $hostId = -1;
 
         $overlib = false;
         $aggregate = false;
@@ -61,19 +61,19 @@ class EditorDataPicker extends UIBase
         $pdo = weathermap_get_pdo();
 
         if (isset($request['host_id'])) {
-            $host_id = intval($request['host_id']);
+            $hostId = intval($request['host_id']);
         }
 
-        if ($host_id >= 0) {
-            $SQL_picklist = "SELECT graph_templates_graph.id, graph_local.host_id, graph_templates_graph.local_graph_id, graph_templates_graph.height, graph_templates_graph.width, graph_templates_graph.title_cache as description, graph_templates.name, graph_local.host_id	FROM (graph_local,graph_templates_graph) LEFT JOIN graph_templates ON (graph_local.graph_template_id=graph_templates.id) WHERE graph_local.id=graph_templates_graph.local_graph_id ";
-            $SQL_picklist .= " and graph_local.host_id=? ";
-            $SQL_picklist .= " order by title_cache";
-            $statement = $pdo->prepare($SQL_picklist);
-            $statement->execute(array($host_id));
+        if ($hostId >= 0) {
+            $picklistSQL = "SELECT graph_templates_graph.id, graph_local.host_id, graph_templates_graph.local_graph_id, graph_templates_graph.height, graph_templates_graph.width, graph_templates_graph.title_cache as description, graph_templates.name, graph_local.host_id	FROM (graph_local,graph_templates_graph) LEFT JOIN graph_templates ON (graph_local.graph_template_id=graph_templates.id) WHERE graph_local.id=graph_templates_graph.local_graph_id ";
+            $picklistSQL .= " and graph_local.host_id=? ";
+            $picklistSQL .= " order by title_cache";
+            $statement = $pdo->prepare($picklistSQL);
+            $statement->execute(array($hostId));
         } else {
-            $SQL_picklist = "SELECT graph_templates_graph.id, graph_local.host_id, graph_templates_graph.local_graph_id, graph_templates_graph.height, graph_templates_graph.width, graph_templates_graph.title_cache as description, graph_templates.name, graph_local.host_id	FROM (graph_local,graph_templates_graph) LEFT JOIN graph_templates ON (graph_local.graph_template_id=graph_templates.id) WHERE graph_local.id=graph_templates_graph.local_graph_id ";
-            $SQL_picklist .= " order by title_cache";
-            $statement = $pdo->prepare($SQL_picklist);
+            $picklistSQL = "SELECT graph_templates_graph.id, graph_local.host_id, graph_templates_graph.local_graph_id, graph_templates_graph.height, graph_templates_graph.width, graph_templates_graph.title_cache as description, graph_templates.name, graph_local.host_id	FROM (graph_local,graph_templates_graph) LEFT JOIN graph_templates ON (graph_local.graph_template_id=graph_templates.id) WHERE graph_local.id=graph_templates_graph.local_graph_id ";
+            $picklistSQL .= " order by title_cache";
+            $statement = $pdo->prepare($picklistSQL);
             $statement->execute();
         }
 
@@ -88,12 +88,23 @@ class EditorDataPicker extends UIBase
         $tpl->set("hosts", $hosts);
         $tpl->set("sources", $sources);
         $tpl->set("overlib", ($overlib ? 1 : 0));
-        $tpl->set("selected_host", $host_id);
+        $tpl->set("selected_host", $hostId);
         $tpl->set("aggregate", ($aggregate ? 1 : 0));
         $tpl->set("base_url", jsEscape(isset($config['base_url']) ? $config['base_url'] : ''));
         $tpl->set("rra_path", jsEscape($config['rra_path']));
 
         echo $tpl->fetch("editor-resources/templates/picker-graph.php");
+    }
+
+    private function unpackBoolean($request, $name, $default)
+    {
+        if (!isset($request[$name])) {
+            return $default;
+        }
+        if ($request[$name] == 0) {
+            return false;
+        }
+        return true;
     }
 
     public function handleLinkStep1($request, $context = null)
@@ -102,25 +113,17 @@ class EditorDataPicker extends UIBase
 
         $pdo = weathermap_get_pdo();
 
-        $overlib = true;
-        $aggregate = false;
-
-        if (isset($request['aggregate'])) {
-            $aggregate = ($request['aggregate'] == 0 ? false : true);
-        }
-
-        if (isset($request['overlib'])) {
-            $overlib = ($request['overlib'] == 0 ? false : true);
-        }
+        $overlib = $this->unpackBoolean($request, 'overlib', true);
+        $aggregate = $this->unpackBoolean($request, 'aggregate', false);
 
         if (isset($request['host_id']) && intval($request['host_id']) >= 0) {
-            $host_id = intval($request['host_id']);
+            $hostID = intval($request['host_id']);
             $statement = $pdo->prepare("SELECT data_local.host_id, data_template_data.local_data_id, data_template_data.name_cache as description, data_template_data.active, data_template_data.data_source_path FROM data_local,data_template_data,data_input,data_template WHERE data_local.id=data_template_data.local_data_id AND data_input.id=data_template_data.data_input_id AND data_local.data_template_id=data_template.id  AND data_local.host_id=?  ORDER BY name_cache;");
             $statement->execute(array(intval($request['host_id'])));
         } else {
             $statement = $pdo->prepare("SELECT data_local.host_id, data_template_data.local_data_id, data_template_data.name_cache as description, data_template_data.active, data_template_data.data_source_path FROM data_local,data_template_data,data_input,data_template WHERE data_local.id=data_template_data.local_data_id AND data_input.id=data_template_data.data_input_id AND data_local.data_template_id=data_template.id  ORDER BY name_cache;");
             $statement->execute();
-            $host_id = -1;
+            $hostID = -1;
         }
 
         $sources = $statement->fetchAll(PDO::FETCH_ASSOC);
@@ -130,7 +133,7 @@ class EditorDataPicker extends UIBase
 
         $tpl = new SimpleTemplate();
         $tpl->set("title", "Pick a data source");
-        $tpl->set("selected_host", $host_id);
+        $tpl->set("selected_host", $hostID);
         $tpl->set("hosts", $hosts);
         $tpl->set("recents", self::getRecentHosts());
         $tpl->set("sources", $sources);
@@ -147,8 +150,8 @@ class EditorDataPicker extends UIBase
     {
         global $config;
 
-        $dataId = intval($_REQUEST['dataid']);
-        $hostId = $_REQUEST['host_id'];
+        $dataId = intval($request['dataid']);
+        $hostId = $request['host_id'];
 
         list($graphId, $name) = self::getCactiGraphForDataSource($dataId);
 
@@ -235,7 +238,7 @@ function jsEscape($str)
 /** usortNaturalNames - sorts two values naturally (ie. ab1, ab2, ab7, ab10, ab20)
  * @arg $a - the first string to compare
  * @arg $b - the second string to compare
- * @returns - '1' if $a is greater than $b, '-1' if $a is less than $b, or '0' if
+ * @returns int - '1' if $a is greater than $b, '-1' if $a is less than $b, or '0' if
  * $b is equal to $b */
 function usortNaturalNames($a, $b)
 {
@@ -245,7 +248,7 @@ function usortNaturalNames($a, $b)
 /** usortNaturalDescriptions - sorts two values naturally (ie. ab1, ab2, ab7, ab10, ab20)
  * @arg $a - the first string to compare
  * @arg $b - the second string to compare
- * @returns - '1' if $a is greater than $b, '-1' if $a is less than $b, or '0' if
+ * @returns int - '1' if $a is greater than $b, '-1' if $a is less than $b, or '0' if
  * $b is equal to $b */
 function usortNaturalDescriptions($a, $b)
 {
@@ -258,20 +261,20 @@ class MasterCactiPicker
     {
         if (isset($request['command'])) {
             if ($request["command"] == 'link_step1') {
-                link_pick_step1($request);
+                $this->linkPickStep1($request);
             }
 
             if ($request["command"] == 'link_step2') {
-                link_pick_step2(intval($request['dataid']));
+                $this->linkPickStep2(intval($request['dataid']));
             }
 
             if ($request["command"] == 'node_step1') {
-                node_pick_step1($request);
+                $this->nodePickStep1($request);
             }
         }
     }
 
-    public function last_used()
+    public function lastUsed()
     {
         $last = array();
         if (isset($_SESSION['cacti']['weathermap']['last_used_host_id'][0])) {
@@ -286,11 +289,11 @@ class MasterCactiPicker
         }
     }
 
-    public function link_pick_step1($request)
+    public function linkPickStep1($request)
     {
         global $config; // Cacti config object
 
-        $host_id = -1;
+        $hostID = -1;
 
         $overlib = true;
         $aggregate = false;
@@ -302,25 +305,25 @@ class MasterCactiPicker
             $overlib = ($request['overlib'] == 0 ? false : true);
         }
 
-        $SQL_picklist = "select data_local.host_id, data_template_data.local_data_id, data_template_data.name_cache as description, data_template_data.active, data_template_data.data_source_path from data_local,data_template_data,data_input,data_template where data_local.id=data_template_data.local_data_id and data_input.id=data_template_data.data_input_id and data_local.data_template_id=data_template.id ";
+        $picklistSQL = "select data_local.host_id, data_template_data.local_data_id, data_template_data.name_cache as description, data_template_data.active, data_template_data.data_source_path from data_local,data_template_data,data_input,data_template where data_local.id=data_template_data.local_data_id and data_input.id=data_template_data.data_input_id and data_local.data_template_id=data_template.id ";
 
         if (isset($request['host_id'])) {
-            $host_id = intval($request['host_id']);
-            if ($host_id >= 0) {
-                $SQL_picklist .= " and data_local.host_id=$host_id ";
+            $hostID = intval($request['host_id']);
+            if ($hostID >= 0) {
+                $picklistSQL .= " and data_local.host_id=$hostID ";
             }
         }
 
-        $SQL_picklist .= " order by name_cache;";
+        $picklistSQL .= " order by name_cache;";
 
-        $sources = db_fetch_assoc($SQL_picklist);
+        $sources = db_fetch_assoc($picklistSQL);
         uasort($sources, "usortNaturalDescriptions");
 
         $hosts = cactiHostList();
 
         $tpl = new SimpleTemplate();
         $tpl->set("title", "Pick a data source");
-        $tpl->set("selected_host", $host_id);
+        $tpl->set("selected_host", $hostID);
         $tpl->set("hosts", $hosts);
         $tpl->set("sources", $sources);
         $tpl->set("overlib", ($overlib ? 1 : 0));
@@ -341,30 +344,29 @@ class MasterCactiPicker
         return $hosts;
     }
 
-    public function cactiGraphFromDSID($local_data_id)
+    public function cactiGraphFromDSID($localDataID)
     {
-
         $pdo = weathermap_get_pdo();
 
         $statement = $pdo->prepare("SELECT graph_templates_item.local_graph_id, title_cache FROM graph_templates_item,graph_templates_graph,data_template_rrd WHERE graph_templates_graph.local_graph_id = graph_templates_item.local_graph_id  AND task_item_id=data_template_rrd.id AND local_data_id=? LIMIT 1;");
-        $statement->execute(array($local_data_id));
+        $statement->execute(array($localDataID));
         $line = $statement->fetch(PDO::FETCH_ASSOC);
 
-        $graph_id = $line['local_graph_id'];
+        $graphID = $line['local_graph_id'];
 
-        return $graph_id;
+        return $graphID;
     }
 
     /**
      * Take the data ID that was picked in step 1, and figure out the graph_id that is related to it.
      *
-     * @param $local_data_id
+     * @param $localDataID
      */
-    public function link_pick_step2($local_data_id)
+    public function linkPickStep2($localDataID)
     {
         global $config;
 
-        $graph_id = cactiGraphFromDSID($local_data_id);
+        $graphID = cactiGraphFromDSID($localDataID);
 
         // TODO: this should be a 3rd template.
         ?>
@@ -374,7 +376,7 @@ class MasterCactiPicker
             <script type="text/javascript" src="editor-resources/cacti-pick.js"></script>
             <script type="text/javascript">
                 var base_url = <?php echo isset($config['base_url']) ? $config['base_url'] : ''; ?>;
-                window.onload = update_source_link_step2(<?php echo $graph_id ?>);
+                window.onload = update_source_link_step2(<?php echo $graphID ?>);
             </script>
         </head>
         <body>This window should disappear in a moment.</body>
@@ -382,28 +384,28 @@ class MasterCactiPicker
         <?php
     }
 
-    public function node_pick_step1($request)
+    public function nodePickStep1($request)
     {
         global $config; // Cacti config object
 
-        $host_id = -1;
+        $hostID = -1;
 
         $overlib = false;
         $aggregate = false;
 
-        $SQL_picklist = "SELECT graph_templates_graph.id, graph_local.host_id, graph_templates_graph.local_graph_id, graph_templates_graph.height, graph_templates_graph.width, graph_templates_graph.title_cache as description, graph_templates.name, graph_local.host_id	FROM (graph_local,graph_templates_graph) LEFT JOIN graph_templates ON (graph_local.graph_template_id=graph_templates.id) WHERE graph_local.id=graph_templates_graph.local_graph_id ";
+        $picklistSQL = "SELECT graph_templates_graph.id, graph_local.host_id, graph_templates_graph.local_graph_id, graph_templates_graph.height, graph_templates_graph.width, graph_templates_graph.title_cache as description, graph_templates.name, graph_local.host_id	FROM (graph_local,graph_templates_graph) LEFT JOIN graph_templates ON (graph_local.graph_template_id=graph_templates.id) WHERE graph_local.id=graph_templates_graph.local_graph_id ";
 
         if (isset($request['host_id'])) {
-            $host_id = intval($request['host_id']);
-            if ($host_id >= 0) {
-                $SQL_picklist .= " and graph_local.host_id=$host_id ";
+            $hostID = intval($request['host_id']);
+            if ($hostID >= 0) {
+                $picklistSQL .= " and graph_local.host_id=$hostID ";
             }
         }
-        $SQL_picklist .= " order by title_cache";
+        $picklistSQL .= " order by title_cache";
 
         $pdo = weathermap_get_pdo();
 
-        $sources = db_fetch_assoc($SQL_picklist);
+        $sources = db_fetch_assoc($picklistSQL);
         uasort($sources, "usortNaturalDescriptions");
 
         $hosts = cactiHostList();
@@ -413,7 +415,7 @@ class MasterCactiPicker
         $tpl->set("hosts", $hosts);
         $tpl->set("sources", $sources);
         $tpl->set("overlib", ($overlib ? 1 : 0));
-        $tpl->set("selected_host", $host_id);
+        $tpl->set("selected_host", $hostID);
         $tpl->set("aggregate", ($aggregate ? 1 : 0));
         $tpl->set("base_url", isset($config['base_url']) ? $config['base_url'] : '');
         $tpl->set("rra_path", jsEscape($config['rra_path']));

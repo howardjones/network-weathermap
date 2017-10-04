@@ -23,7 +23,7 @@ class HTMLImagemapAreaCircleTest extends \PHPUnit_Framework_TestCase
      */
     protected function setUp()
     {
-        $this->object = new HTMLImagemapAreaCircle("testname", "testhref", array(array(100, 100, 150, 100)));
+        $this->object = new HTMLImagemapAreaCircle(array(array(100, 100, 150, 100)), "testname", "testhref");
     }
 
     /**

@@ -7,7 +7,6 @@ require_once dirname(__FILE__) . '/../Integrations/Cacti/database.php';
 use PDO;
 use PHPUnit_Extensions_Database_TestCase;
 
-
 class DatabaseTest extends PHPUnit_Extensions_Database_TestCase
 {
 

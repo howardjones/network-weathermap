@@ -3,6 +3,7 @@
 namespace Weathermap\Poller;
 
 use Weathermap\Integrations\MapManager;
+use Weathermap\Core\MapUtility;
 
 /**
  *
@@ -12,36 +13,36 @@ use Weathermap\Integrations\MapManager;
 class Poller
 {
 
-    public $imageformat;
-    public $rrdtool_path;
-    public $confdir;
+    public $imageFormat;
+    public $rrdtoolPath;
+    public $configDirectory;
     public $manager;
-    public $plugin_name;
+    public $pluginName;
 
-    public $total_warnings;
-    public $warning_notes;
+    public $totalWarnings;
+    public $warningNotes;
 
     public $startTime;
     public $pollerStartTime;
     public $duration;
-    public $mapcount;
-    public $quietlogging;
+    public $mapCount;
+    public $quietLogging;
 
-    public $outdir;
+    public $outputDirectory;
 
     public $canRun;
 
     public function __construct($mydir, $pollerStartTime = 0)
     {
-        $this->imageformat = strtolower(read_config_option("weathermap_output_format"));
-        $this->rrdtool_path = read_config_option("path_rrdtool");
-        $this->confdir = realpath($mydir . DIRECTORY_SEPARATOR . 'configs');
-        $this->outdir = realpath($mydir . DIRECTORY_SEPARATOR . 'output');
-        $this->manager = new MapManager(weathermap_get_pdo(), $this->confdir);
-        $this->plugin_name = "weathermap-cacti-plugin.php";
+        $this->imageFormat = strtolower(\read_config_option("weathermap_output_format"));
+        $this->rrdtoolPath = \read_config_option("path_rrdtool");
+        $this->configDirectory = realpath($mydir . DIRECTORY_SEPARATOR . 'configs');
+        $this->outputDirectory = realpath($mydir . DIRECTORY_SEPARATOR . 'output');
+        $this->manager = new MapManager(weathermap_get_pdo(), $this->configDirectory);
+        $this->pluginName = "weathermap-cacti-plugin.php";
 
-        $this->total_warnings = 0;
-        $this->warning_notes = "";
+        $this->totalWarnings = 0;
+        $this->warningNotes = "";
         $this->canRun = false;
 
         $this->startTime = microtime(true);
@@ -54,8 +55,8 @@ class Poller
 
     public function preFlight()
     {
-        if (!wm_module_checks()) {
-            wm_warn("Required modules for PHP Weathermap " . WEATHERMAP_VERSION . " were not present. Not running. [WMPOLL08]\n");
+        if (!MapUtility::moduleChecks()) {
+            MapUtility::warn("Required modules for PHP Weathermap " . WEATHERMAP_VERSION . " were not present. Not running. [WMPOLL08]\n");
 
             return;
         }
@@ -66,19 +67,19 @@ class Poller
             $userNote = "($username)";
         }
 
-        if (!is_dir($this->outdir)) {
-            wm_warn("Output directory ($this->outdir) doesn't exist!. No maps created. You probably need to create that directory, and make it writable by the poller process user$userNote (like you did with the RRA directory) [WMPOLL07]\n");
-            $this->total_warnings++;
-            $this->warning_notes .= " (Output directory problem prevents any maps running WMPOLL07)";
+        if (!is_dir($this->outputDirectory)) {
+            MapUtility::warn("Output directory ($this->outputDirectory) doesn't exist!. No maps created. You probably need to create that directory, and make it writable by the poller process user$userNote (like you did with the RRA directory) [WMPOLL07]\n");
+            $this->totalWarnings++;
+            $this->warningNotes .= " (Output directory problem prevents any maps running WMPOLL07)";
 
             return;
         }
 
         // next, make sure that we stand a chance of writing files
-        if (!$this->testWritable($this->outdir)) {
-            wm_warn("Output directory ($this->outdir) isn't writable (tried to create a file). No maps created. You probably need to make it writable by the poller process user$userNote (like you did with the RRA directory) [WMPOLL06]\n");
-            $this->total_warnings++;
-            $this->warning_notes .= " (Permissions problem prevents any maps running - check cacti.log for WMPOLL06)";
+        if (!$this->testWritable($this->outputDirectory)) {
+            MapUtility::warn("Output directory ($this->outputDirectory) isn't writable (tried to create a file). No maps created. You probably need to make it writable by the poller process user$userNote (like you did with the RRA directory) [WMPOLL06]\n");
+            $this->totalWarnings++;
+            $this->warningNotes .= " (Permissions problem prevents any maps running - check cacti.log for WMPOLL06)";
 
             return;
         }
@@ -99,13 +100,13 @@ class Poller
             return;
         }
 
-        wm_debug("Iterating all maps.");
+        MapUtility::debug("Iterating all maps.");
 
         foreach ($maplist as $map) {
-            $runner = new MapRuntime($this->confdir, $this->outdir, $map, $this->imageformat);
+            $runner = new MapRuntime($this->configDirectory, $this->outputDirectory, $map, $this->imageFormat);
             $runner->run();
 
-            $this->total_warnings += $runner->warncount;
+            $this->totalWarnings += $runner->warncount;
         }
 
         $this->calculateStats();
@@ -114,18 +115,18 @@ class Poller
 
     public function calculateStats()
     {
-        $stats_string = sprintf(
+        $statsString = sprintf(
             '%s: %d maps were run in %.2f seconds with %d warnings. %s',
             date(DATE_RFC822),
-            $this->mapcount,
+            $this->mapCount,
             $this->duration,
-            $this->total_warnings,
-            $this->warning_notes
+            $this->totalWarnings,
+            $this->warningNotes
         );
-        if ($this->quietlogging == 0) {
-            wm_warn("STATS: Weathermap " . WEATHERMAP_VERSION . " run complete - $stats_string\n", true);
+        if ($this->quietLogging == 0) {
+            MapUtility::warn("STATS: Weathermap " . WEATHERMAP_VERSION . " run complete - $statsString\n", true);
         }
-        $this->manager->setAppSetting("weathermap_last_stats", $stats_string);
+        $this->manager->setAppSetting("weathermap_last_stats", $statsString);
     }
 
     /**

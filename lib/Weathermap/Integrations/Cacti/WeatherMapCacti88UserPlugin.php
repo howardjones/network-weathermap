@@ -16,21 +16,21 @@ class WeatherMapCacti88UserPlugin extends WeatherMapCactiUserPlugin
         parent::__construct($config, $imageformat);
 
         $this->colours = $colours;
-        $this->my_url = "weathermap-cacti88-plugin.php";
-        $this->editor_url = "weathermap-cacti88-plugin-editor.php";
-        $this->management_realm = "weathermap-cacti88-plugin-mgmt.php";
-        $this->editor_realm = "weathermap-cacti88-plugin-editor.php";
+        $this->myURL = "weathermap-cacti88-plugin.php";
+        $this->editorURL = "weathermap-cacti88-plugin-editor.php";
+        $this->managementRealm = "weathermap-cacti88-plugin-mgmt.php";
+        $this->editorRealm = "weathermap-cacti88-plugin-editor.php";
     }
 
 
     public function cactiHeader()
     {
-        include_once $this->cacti_config["base_path"] . "/include/top_header.php";
+        include_once $this->cactiConfig["base_path"] . "/include/top_header.php";
     }
 
     public function cactiFooter()
     {
-        include_once $this->cacti_config["base_path"] . "/include/bottom_footer.php";
+        include_once $this->cactiConfig["base_path"] . "/include/bottom_footer.php";
     }
 
     public function cactiRowStart($i)

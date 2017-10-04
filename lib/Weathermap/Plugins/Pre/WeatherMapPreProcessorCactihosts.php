@@ -9,7 +9,7 @@ class WeatherMapPreProcessorCactihosts extends PreProcessorBase
 {
     public function run()
     {
-        MapUtility::wm_debug("Cactihosts Preprocessor in the hizouse\n");
+        MapUtility::debug("Cactihosts Preprocessor in the hizouse\n");
 
         # http://feathub.com/howardjones/network-weathermap/+9
     }

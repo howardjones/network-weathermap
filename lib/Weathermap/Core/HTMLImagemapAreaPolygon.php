@@ -19,6 +19,7 @@ class HTMLImagemapAreaPolygon extends HTMLImagemapArea
 
     public function asHTML()
     {
+        $flatpoints = array();
         foreach ($this->points as $point) {
             $flatpoints[] = $point[0];
             $flatpoints[] = $point[1];
@@ -76,7 +77,7 @@ class HTMLImagemapAreaPolygon extends HTMLImagemapArea
         return $c;
     }
 
-    public function __construct($name = '', $href = '', $coords)
+    public function __construct($coords, $name = '', $href = '')
     {
         $c = $coords[0];
 

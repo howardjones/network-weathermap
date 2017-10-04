@@ -17,7 +17,7 @@ class DatasourceUtility
     public static function updateCactiData(&$item, $localDataId)
     {
 
-        MapUtility::wm_debug("fetching for $localDataId\n");
+        MapUtility::debug("fetching for $localDataId\n");
 
         $hintsToSet = getCactiHintData($item, $localDataId);
 

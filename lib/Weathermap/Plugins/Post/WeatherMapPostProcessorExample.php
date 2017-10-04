@@ -17,7 +17,7 @@ class WeatherMapPostProcessorExample extends PostProcessorBase
         $enable = $this->owner->getHint("post_test_enable");
 
         if ($enable) {
-            MapUtility::wm_debug(__CLASS__ . " is here\n");
+            MapUtility::debug(__CLASS__ . " is here\n");
 
             // do your work in here...
 
@@ -25,7 +25,7 @@ class WeatherMapPostProcessorExample extends PostProcessorBase
             $this->owner->addNote("test", $orig . " TESTYTEST");
             // -------------------------
         } else {
-            MapUtility::wm_debug(__CLASS__ . " Not Enabled\n");
+            MapUtility::debug(__CLASS__ . " Not Enabled\n");
         }
     }
 }

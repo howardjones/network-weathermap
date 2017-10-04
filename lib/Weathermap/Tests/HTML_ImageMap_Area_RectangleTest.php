@@ -24,8 +24,8 @@ class HTMLImagemapAreaRectangleTest extends \PHPUnit_Framework_TestCase
     protected function setUp()
     {
         $this->objects = array();
-        $this->objects[] = new HTMLImagemapAreaRectangle("testarea", "testhref", array(array(50, 20, 150, 170)));
-        $this->objects[] = new HTMLImagemapAreaRectangle("testarea", "testhref", array(array(150, 170, 50, 20)));
+        $this->objects[] = new HTMLImagemapAreaRectangle(array(array(50, 20, 150, 170)), "testarea", "testhref");
+        $this->objects[] = new HTMLImagemapAreaRectangle(array(array(150, 170, 50, 20)), "testarea", "testhref");
     }
 
     /**

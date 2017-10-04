@@ -31,18 +31,18 @@ class ImageLoader
      */
     public function imagecreatescaledcolourizedfromfile($filename, $scaleWidth, $scaleHeight, $colour, $colourMethod)
     {
-        MapUtility::wm_debug("Getting a (maybe cached) scaled coloured image for $filename at $scaleWidth x $scaleHeight with $colour\n");
+        MapUtility::debug("Getting a (maybe cached) scaled coloured image for $filename at $scaleWidth x $scaleHeight with $colour\n");
 
         $key = sprintf('%s:%d:%d:%s:%s', $filename, $scaleWidth, $scaleHeight, $colour->asString(), $colourMethod);
-        MapUtility::wm_debug("$key\n");
+        MapUtility::debug("$key\n");
 
         if (array_key_exists($key, $this->cache)) {
-            MapUtility::wm_debug("Cache hit for $key\n");
+            MapUtility::debug("Cache hit for $key\n");
             $iconImageRef = $this->cache[$key];
-            MapUtility::wm_debug("From cache: $iconImageRef\n");
+            MapUtility::debug("From cache: $iconImageRef\n");
             $finalImageRef = $this->imageduplicate($iconImageRef);
         } else {
-            MapUtility::wm_debug("Cache miss - processing\n");
+            MapUtility::debug("Cache miss - processing\n");
             $iconImageRef = $this->imagecreatefromfile($filename);
             //    imagealphablending($icon_im, true);
 
@@ -53,7 +53,7 @@ class ImageLoader
             $finalImageRef = $this->updateCache($scaleWidth, $scaleHeight, $key, $iconImageRef);
         }
 
-        MapUtility::wm_debug("Returning $finalImageRef\n");
+        MapUtility::debug("Returning $finalImageRef\n");
         return $finalImageRef;
     }
 
@@ -67,27 +67,27 @@ class ImageLoader
     {
         list($width, $height, $type, $attr) = getimagesize($filename);
 
-        MapUtility::wm_debug("Getting a (maybe cached) image for $filename at $scaleWidth x $scaleHeight\n");
+        MapUtility::debug("Getting a (maybe cached) image for $filename at $scaleWidth x $scaleHeight\n");
 
         // do the non-scaling version if no scaling is required
         if ($scaleWidth == 0 && $scaleHeight == 0) {
-            MapUtility::wm_debug("No scaling, punt to regular\n");
+            MapUtility::debug("No scaling, punt to regular\n");
             return $this->imagecreatefromfile($filename);
         }
 
         if ($width == $scaleWidth && $height == $scaleHeight) {
-            MapUtility::wm_debug("No scaling, punt to regular\n");
+            MapUtility::debug("No scaling, punt to regular\n");
             return $this->imagecreatefromfile($filename);
         }
         $key = sprintf('%s:%d:%d', $filename, $scaleWidth, $scaleHeight);
 
         if (array_key_exists($key, $this->cache)) {
-            MapUtility::wm_debug("Cache hit for $key\n");
+            MapUtility::debug("Cache hit for $key\n");
             $iconImageRef = $this->cache[$key];
-            MapUtility::wm_debug("From cache: $iconImageRef\n");
+            MapUtility::debug("From cache: $iconImageRef\n");
             $finalImageRef = $this->imageduplicate($iconImageRef);
         } else {
-            MapUtility::wm_debug("Cache miss - processing\n");
+            MapUtility::debug("Cache miss - processing\n");
             $iconImageRef = $this->imagecreatefromfile($filename);
 
             $iconImageRef = $this->scaleImage($scaleWidth, $scaleHeight, $iconImageRef);
@@ -95,7 +95,7 @@ class ImageLoader
             $finalImageRef = $this->updateCache($scaleWidth, $scaleHeight, $key, $iconImageRef);
         }
 
-        MapUtility::wm_debug("Returning $finalImageRef\n");
+        MapUtility::debug("Returning $finalImageRef\n");
         return $finalImageRef;
     }
 
@@ -105,16 +105,16 @@ class ImageLoader
         $sourceHeight = imagesy($sourceImageRef);
 
         if (imageistruecolor($sourceImageRef)) {
-            MapUtility::wm_debug("Duplicating $sourceWidth x $sourceHeight TC image\n");
+            MapUtility::debug("Duplicating $sourceWidth x $sourceHeight TC image\n");
             $newImageRef = imagecreatetruecolor($sourceWidth, $sourceHeight);
             imagealphablending($newImageRef, false);
             imagesavealpha($newImageRef, true);
         } else {
-            MapUtility::wm_debug("Duplicating $sourceWidth x $sourceHeight palette image\n");
+            MapUtility::debug("Duplicating $sourceWidth x $sourceHeight palette image\n");
             $newImageRef = imagecreate($sourceWidth, $sourceHeight);
             $trans = imagecolortransparent($sourceImageRef);
             if ($trans >= 0) {
-                MapUtility::wm_debug("Duplicating transparency in indexed image\n");
+                MapUtility::debug("Duplicating transparency in indexed image\n");
                 $rgb = imagecolorsforindex($sourceImageRef, $trans);
                 $transparentIndex = imagecolorallocatealpha($newImageRef, $rgb['red'], $rgb['green'], $rgb['blue'], $rgb['alpha']);
                 imagefill($newImageRef, 0, 0, $transparentIndex);
@@ -141,59 +141,59 @@ class ImageLoader
             $key = $filename;
 
             if (array_key_exists($key, $this->cache)) {
-                MapUtility::wm_debug("Cache hit! for $key\n");
+                MapUtility::debug("Cache hit! for $key\n");
                 $cacheImage = $this->cache[$key];
-                MapUtility::wm_debug("From cache: $cacheImage\n");
+                MapUtility::debug("From cache: $cacheImage\n");
                 $newImage = $this->imageduplicate($cacheImage);
-                MapUtility::wm_debug("$newImage\n");
+                MapUtility::debug("$newImage\n");
             } else {
-                MapUtility::wm_debug("Cache miss - processing\n");
+                MapUtility::debug("Cache miss - processing\n");
 
                 switch ($type) {
                     case IMAGETYPE_GIF:
                         if (imagetypes() & IMG_GIF) {
-                            MapUtility::wm_debug("Load gif\n");
+                            MapUtility::debug("Load gif\n");
                             $newImage = imagecreatefromgif($filename);
                         } else {
-                            MapUtility::wm_warn("Image file $filename is GIF, but GIF is not supported by your GD library. [WMIMG01]\n");
+                            MapUtility::warn("Image file $filename is GIF, but GIF is not supported by your GD library. [WMIMG01]\n");
                         }
                         break;
 
                     case IMAGETYPE_JPEG:
                         if (imagetypes() & IMG_JPEG) {
-                            MapUtility::wm_debug("Load jpg\n");
+                            MapUtility::debug("Load jpg\n");
                             $newImage = imagecreatefromjpeg($filename);
                         } else {
-                            MapUtility::wm_warn("Image file $filename is JPEG, but JPEG is not supported by your GD library. [WMIMG02]\n");
+                            MapUtility::warn("Image file $filename is JPEG, but JPEG is not supported by your GD library. [WMIMG02]\n");
                         }
                         break;
 
                     case IMAGETYPE_PNG:
                         if (imagetypes() & IMG_PNG) {
-                            MapUtility::wm_debug("Load png\n");
+                            MapUtility::debug("Load png\n");
                             $newImage = imagecreatefrompng($filename);
                         } else {
-                            MapUtility::wm_warn("Image file $filename is PNG, but PNG is not supported by your GD library. [WMIMG03]\n");
+                            MapUtility::warn("Image file $filename is PNG, but PNG is not supported by your GD library. [WMIMG03]\n");
                         }
                         break;
 
                     default:
-                        MapUtility::wm_warn("Image file $filename wasn't recognised (type=$type). Check format is supported by your GD library. [WMIMG04]\n");
+                        MapUtility::warn("Image file $filename wasn't recognised (type=$type). Check format is supported by your GD library. [WMIMG04]\n");
                         break;
                 }
             }
             if (!is_null($newImage) && $this->isCacheable($width, $height)) {
-                MapUtility::wm_debug("Caching $key $newImage\n");
+                MapUtility::debug("Caching $key $newImage\n");
                 $this->cache[$key] = $newImage;
                 $resultImage = $this->imageduplicate($newImage);
             } else {
                 $resultImage = $newImage;
             }
         } else {
-            MapUtility::wm_warn("Image file $filename is unreadable. Check permissions. [WMIMG05]\n");
+            MapUtility::warn("Image file $filename is unreadable. Check permissions. [WMIMG05]\n");
         }
 
-        MapUtility::wm_debug("Returning $resultImage\n");
+        MapUtility::debug("Returning $resultImage\n");
         return $resultImage;
     }
 
@@ -208,10 +208,10 @@ class ImageLoader
         $iconWidth = imagesx($iconImageRef);
         $iconHeight = imagesy($iconImageRef);
 
-        MapUtility::wm_debug("If this is the last thing in your logs, you probably have a buggy GD library. Get > 2.0.33 or use PHP builtin.\n");
+        MapUtility::debug("If this is the last thing in your logs, you probably have a buggy GD library. Get > 2.0.33 or use PHP builtin.\n");
 
         if ($scaleWidth > 0 && $scaleHeight > 0) {
-            MapUtility::wm_debug("SCALING ICON here\n");
+            MapUtility::debug("SCALING ICON here\n");
             if ($iconWidth > $iconHeight) {
                 $scaleFactor = $iconWidth / $scaleWidth;
             } else {
@@ -243,7 +243,7 @@ class ImageLoader
     private function updateCache($scaleWidth, $scaleHeight, $key, $iconImageRef)
     {
         if ($this->isCacheable($scaleWidth, $scaleHeight)) {
-            MapUtility::wm_debug("Caching [$key]=$iconImageRef\n");
+            MapUtility::debug("Caching [$key]=$iconImageRef\n");
             $this->cache[$key] = $iconImageRef;
             $finalImageRef = $this->imageduplicate($iconImageRef);
             return $finalImageRef;
@@ -260,17 +260,17 @@ class ImageLoader
      */
     private function colourizeImage($colour, $colourMethod, $iconImageRef)
     {
-        MapUtility::wm_debug("$colourMethod\n");
+        MapUtility::debug("$colourMethod\n");
         if ($colourMethod == 'imagefilter') {
-            MapUtility::wm_debug("Colorizing (imagefilter)...\n");
+            MapUtility::debug("Colorizing (imagefilter)...\n");
             list ($red, $green, $blue) = $colour->getComponents();
             imagefilter($iconImageRef, IMG_FILTER_COLORIZE, $red, $green, $blue);
         }
 
         if ($colourMethod == 'imagecolorize') {
-            MapUtility::wm_debug("Colorizing (imagecolorize)...\n");
+            MapUtility::debug("Colorizing (imagecolorize)...\n");
             list ($red, $green, $blue) = $colour->getComponents();
-            ImageUtility::imagecolorize($iconImageRef, $red, $green, $blue);
+            ImageUtility::imageColorize($iconImageRef, $red, $green, $blue);
         }
     }
 }

@@ -83,7 +83,7 @@ class WeatherMapDataSource_tabfile extends DatasourceBase
      */
     protected function validateAndOpenFile($fullpath)
     {
-        MapUtility::wm_debug("Opening $fullpath\n");
+        MapUtility::debug("Opening $fullpath\n");
 
         if (!file_exists($fullpath)) {
             wm_warn("File '$fullpath' doesn't exist.");

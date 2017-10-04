@@ -40,7 +40,7 @@ class WeatherMapDataSource_snmpv3 extends DatasourceBase
         if (function_exists('snmp3_get')) {
             return true;
         }
-        MapUtility::wm_debug("SNMP3 DS: snmp3_get() not found. Do you have the PHP SNMP module?\n");
+        MapUtility::debug("SNMP3 DS: snmp3_get() not found. Do you have the PHP SNMP module?\n");
 
         return false;
     }
@@ -73,9 +73,9 @@ class WeatherMapDataSource_snmpv3 extends DatasourceBase
         $abortCount = intval($map->getHint("snmp_abort_count", $abortCount));
         $retries = intval($map->getHint("snmp_retries", $retries));
 
-        MapUtility::wm_debug("Timeout changed to " . $timeout . " microseconds.\n");
-        MapUtility::wm_debug("Will abort after $abortCount failures for a given host.\n");
-        MapUtility::wm_debug("Number of retries changed to " . $retries . ".\n");
+        MapUtility::debug("Timeout changed to " . $timeout . " microseconds.\n");
+        MapUtility::debug("Will abort after $abortCount failures for a given host.\n");
+        MapUtility::debug("Number of retries changed to " . $retries . ".\n");
 
         if (preg_match('/^snmp3:([^:]+):([^:]+):([^:]+):([^:]+)$/', $targetstring, $matches)) {
             $profileName = $matches[1];
@@ -105,7 +105,7 @@ class WeatherMapDataSource_snmpv3 extends DatasourceBase
                 }
                 $params = $this->buildSNMPParams($map, $profileName);
 
-                MapUtility::wm_debug("SNMPv3 ReadData: SNMP settings are %s\n", json_encode($params));
+                MapUtility::debug("SNMPv3 ReadData: SNMP settings are %s\n", json_encode($params));
 
                 $channels = array(
                     'in' => IN,
@@ -119,7 +119,7 @@ class WeatherMapDataSource_snmpv3 extends DatasourceBase
                     foreach ($channels as $name => $id) {
                         if ($oids[$id] != '-') {
                             $oid = $oids[$id];
-                            MapUtility::wm_debug("Going to get $oid\n");
+                            MapUtility::debug("Going to get $oid\n");
                             $results[$id] = snmp3_get(
                                 $host,
                                 $params['username'],
@@ -139,14 +139,14 @@ class WeatherMapDataSource_snmpv3 extends DatasourceBase
                                 $this->downCache{$host}++;
                             }
                         } else {
-                            MapUtility::wm_debug("SNMPv3 ReadData: skipping $name channel: OID is '-'\n");
+                            MapUtility::debug("SNMPv3 ReadData: skipping $name channel: OID is '-'\n");
                         }
                     }
                 } else {
-                    MapUtility::wm_debug("SNMPv3 ReadData: no username defined, not going to try.\n");
+                    MapUtility::debug("SNMPv3 ReadData: no username defined, not going to try.\n");
                 }
 
-                MapUtility::wm_debug("SNMPv3 ReadData: Got '%s' and '%s'\n", $results[IN], $results[OUT]);
+                MapUtility::debug("SNMPv3 ReadData: Got '%s' and '%s'\n", $results[IN], $results[OUT]);
 
                 $this->dataTime = time();
 
@@ -154,10 +154,10 @@ class WeatherMapDataSource_snmpv3 extends DatasourceBase
                     snmp_set_quick_print($was);
                 }
             } else {
-                MapUtility::wm_warn("SNMP for $host has reached $abortCount failures. Skipping. [WMSNMP01]");
+                MapUtility::warn("SNMP for $host has reached $abortCount failures. Skipping. [WMSNMP01]");
             }
         } else {
-            MapUtility::wm_debug("SNMPv3 ReadData: regexp didn't match after Recognise did - this is odd!\n");
+            MapUtility::debug("SNMPv3 ReadData: regexp didn't match after Recognise did - this is odd!\n");
         }
 
         return $this->returnData();
@@ -196,14 +196,14 @@ class WeatherMapDataSource_snmpv3 extends DatasourceBase
 
         // If they are explicitly defined...
         if (is_null($import)) {
-            MapUtility::wm_debug("SNMPv3 ReadData: no import, defining profile $profileName from SET variables\n");
+            MapUtility::debug("SNMPv3 ReadData: no import, defining profile $profileName from SET variables\n");
             foreach ($parts as $keyname => $default) {
                 $params[$keyname] = $map->getHint("snmp3_" . $profileName . "_" . $keyname, $default);
             }
         } else {
             $import = intval($import);
             // if they are to be copied from a Cacti profile...
-            MapUtility::wm_debug("SNMPv3 ReadData: will try to import profile $profileName from Cacti host id $import\n");
+            MapUtility::debug("SNMPv3 ReadData: will try to import profile $profileName from Cacti host id $import\n");
 
             foreach ($parts as $keyname => $default) {
                 $params[$keyname] = $default;
@@ -219,7 +219,7 @@ class WeatherMapDataSource_snmpv3 extends DatasourceBase
                 );
 
                 if (!$result) {
-                    MapUtility::wm_warn("SNMPv3 ReadData snmp3_" . $profileName . "_import failed to read data from Cacti host id $import");
+                    MapUtility::warn("SNMPv3 ReadData snmp3_" . $profileName . "_import failed to read data from Cacti host id $import");
                 } else {
                     $mapping = array(
                         "username" => "snmp_username",
@@ -237,14 +237,14 @@ class WeatherMapDataSource_snmpv3 extends DatasourceBase
                     } else {
                         $params['seclevel'] = "authPriv";
                     }
-                    MapUtility::wm_debug(
+                    MapUtility::debug(
                         "SNMPv3 ReadData Imported Cacti info for device %d into profile named %s\n",
                         $import,
                         $profileName
                     );
                 }
             } else {
-                MapUtility::wm_warn("SNMPv3 ReadData snmp3_" . $profileName . "_import is set but not running in Cacti");
+                MapUtility::warn("SNMPv3 ReadData snmp3_" . $profileName . "_import is set but not running in Cacti");
             }
         }
         return $params;

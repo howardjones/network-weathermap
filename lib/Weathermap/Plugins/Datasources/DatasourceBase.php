@@ -86,7 +86,7 @@ class DatasourceBase
      */
     protected function returnData()
     {
-        MapUtility::wm_debug(
+        MapUtility::debug(
             sprintf(
                 "%s ReadData: Returning (%s, %s, %s)\n",
                 $this->name,

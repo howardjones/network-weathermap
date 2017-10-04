@@ -14,8 +14,8 @@ class WeatherMapCacti10ManagementPlugin extends WeatherMapCactiManagementPlugin
     public function __construct($config)
     {
         parent::__construct($config);
-        $this->my_url = "weathermap-cacti10-plugin-mgmt.php";
-        $this->editor_url = "weathermap-cacti10-plugin-editor.php";
+        $this->myURL = "weathermap-cacti10-plugin-mgmt.php";
+        $this->editorURL = "weathermap-cacti10-plugin-editor.php";
     }
 
     /**
@@ -25,7 +25,7 @@ class WeatherMapCacti10ManagementPlugin extends WeatherMapCactiManagementPlugin
     public function handleManagementMainScreen($request, $appObject)
     {
         $this->cactiHeader();
-        $this->maplist_warnings();
+        $this->maplistWarnings();
         $this->maplist();
         $this->footerLinks();
         ?>

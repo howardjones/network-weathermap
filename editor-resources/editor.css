@@ -38,8 +38,8 @@ body {
 
 #toolbar {
     position: fixed;
-    top: 0px;
-    left: 0px;
+    top: 0;
+    left: 0;
     height: 32px;
     width: 100%;
     color: white;
@@ -98,8 +98,7 @@ body {
 
 #filelist {
     list-style: none;
-    margin: 0;
-    border: 0;
+    margin: 0 auto 0 auto;
     padding: 0;
     width: 400px;
     background: #ddd;
@@ -107,8 +106,6 @@ body {
     border-right: 2px solid gray;
     border-bottom: 2px solid gray;
     font-size: 110%;
-    margin-left: auto;
-    margin-right: auto;
 }
 
 #filelist li {
@@ -146,7 +143,6 @@ body {
     font-family: serif;
 }
 
-
 /****************************************/
 
 .draggablenode {
@@ -163,7 +159,7 @@ body {
     border-left: white;
 }
 
-ul#tblist {
+#tblist {
     list-style-type: none;
     background-color: whitesmoke;
     width: 100%;
@@ -171,7 +167,7 @@ ul#tblist {
     padding: 0;
 }
 
-ul#tblist li {
+#tblist li {
     float: left;
     display: block;
     text-align: center;
@@ -189,10 +185,10 @@ a.tb_button {
 }
 
 /* Individual icons for the toolbar*/
-a#btn_changefile {
+#btn_changefile {
     background: url(bullet_disk.png) no-repeat left top;
 }
 
-a#btn_refresh {
+#btn_refresh {
     background: url(arrow_refresh.png) no-repeat left top;
 }

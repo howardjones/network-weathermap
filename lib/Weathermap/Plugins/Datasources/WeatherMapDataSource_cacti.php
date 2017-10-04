@@ -29,10 +29,10 @@ class WeatherMapDataSource_cacti extends DatasourceBase
             if (true === function_exists('db_fetch_row')) {
                 return true;
             } else {
-                MapUtility::wm_debug('ReadData cacti: Cacti database library not found.\n');
+                MapUtility::debug('ReadData cacti: Cacti database library not found.\n');
             }
         } else {
-            MapUtility::wm_debug("ReadData cacti: Can only run from Cacti environment.\n");
+            MapUtility::debug("ReadData cacti: Can only run from Cacti environment.\n");
         }
 
         return false;

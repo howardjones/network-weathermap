@@ -50,7 +50,7 @@ class TrueTypeFont extends Font
     private function initTTF($filename, $size)
     {
         if (!function_exists('imagettfbbox')) {
-            MapUtility::wm_warn('Truetype support not available in GD. Unable to load font.');
+            MapUtility::warn('Truetype support not available in GD. Unable to load font.');
             return false;
         }
 
@@ -63,7 +63,7 @@ class TrueTypeFont extends Font
 
             return true;
         }
-        MapUtility::wm_warn("Could not load font - $filename");
+        MapUtility::warn("Could not load font - $filename");
         return false;
     }
 

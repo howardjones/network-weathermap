@@ -153,7 +153,7 @@ class MapNode extends MapDataItem
     public function preRender(&$map)
     {
         if (!$this->drawable) {
-            MapUtility::wm_debug('Skipping undrawable %s', $this);
+            MapUtility::debug('Skipping undrawable %s', $this);
             return;
         }
 
@@ -198,13 +198,13 @@ class MapNode extends MapDataItem
                 $labelColour = $this->colours[OUT];
             }
         } elseif (!$this->labelbgcolour->isNone()) {
-            MapUtility::wm_debug("labelbgcolour=%s\n", $this->labelbgcolour);
+            MapUtility::debug("labelbgcolour=%s\n", $this->labelbgcolour);
             $labelColour = $this->labelbgcolour;
         }
 
         $iconColour = null;
         if (!empty($this->targets) && $this->useiconscale != 'none') {
-            MapUtility::wm_debug("Colorising the icon\n");
+            MapUtility::debug("Colorising the icon\n");
             $iconColour = $this->calculateIconColour($map);
         }
 
@@ -233,7 +233,7 @@ class MapNode extends MapDataItem
                 $labelBoxHeight = $stringHeight * $paddingFactor + $paddingConstant;
             }
 
-            MapUtility::wm_debug('Node->pre_render: ' . $this->name . " Label Metrics are: $stringWidth x $stringHeight -> $labelBoxWidth x $labelBoxHeight\n");
+            MapUtility::debug('Node->pre_render: ' . $this->name . " Label Metrics are: $stringWidth x $stringHeight -> $labelBoxWidth x $labelBoxHeight\n");
 
             if ($this->labelangle == 90) {
                 $textPoint = new Point($stringHeight / 2, $stringWidth / 2);
@@ -258,7 +258,7 @@ class MapNode extends MapDataItem
             );
             $labelBox->translate($this->x, $this->y);
 
-            MapUtility::wm_debug("LABEL at %s\n", $labelBox);
+            MapUtility::debug("LABEL at %s\n", $labelBox);
 
             $this->width = $labelBoxWidth;
             $this->height = $labelBoxHeight;
@@ -371,8 +371,8 @@ class MapNode extends MapDataItem
         $index = 0;
         foreach ($this->boundingboxes as $bbox) {
             $areaName = 'NODE:N' . $this->id . ':' . $index;
-            $newArea = new HTMLImagemapAreaRectangle($areaName, '', array($bbox));
-            MapUtility::wm_debug('Adding imagemap area [' . join(',', $bbox) . "] => $newArea \n");
+            $newArea = new HTMLImagemapAreaRectangle(array($bbox), $areaName, '');
+            MapUtility::debug('Adding imagemap area [' . join(',', $bbox) . "] => $newArea \n");
             $this->imagemapAreas[] = $newArea;
             $index++;
         }
@@ -388,20 +388,20 @@ class MapNode extends MapDataItem
      */
     public function preCalculate(&$owner)
     {
-        MapUtility::wm_debug("------------------------------------------------\n");
-        MapUtility::wm_debug("Calculating node geometry for %s\n", $this);
+        MapUtility::debug("------------------------------------------------\n");
+        MapUtility::debug("Calculating node geometry for %s\n", $this);
 
         $this->drawable = false;
 
         // don't bother drawing if it's a template
         if ($this->isTemplate()) {
-            MapUtility::wm_debug("%s is a pure template. Skipping.\n", $this);
+            MapUtility::debug("%s is a pure template. Skipping.\n", $this);
             return;
         }
 
         // apparently, some versions of the gd extension will crash if we continue...
         if ($this->label == '' && $this->iconfile == '') {
-            MapUtility::wm_debug("%s has no label OR icon. Skipping.\n", $this);
+            MapUtility::debug("%s has no label OR icon. Skipping.\n", $this);
             return;
         }
 
@@ -412,7 +412,7 @@ class MapNode extends MapDataItem
     public function draw($imageRef)
     {
         if (!$this->drawable) {
-            MapUtility::wm_debug("Skipping undrawable %s\n", $this);
+            MapUtility::debug("Skipping undrawable %s\n", $this);
             return;
         }
 
@@ -449,7 +449,7 @@ class MapNode extends MapDataItem
         // at write-time - it should include the leading NODE xyz line (to allow for renaming)
         $templateSource = $this->owner->nodes[$this->template];
 
-        MapUtility::wm_debug("Writing config for NODE $this->name against $this->template\n");
+        MapUtility::debug("Writing config for NODE $this->name against $this->template\n");
 
         $simpleParameters = array(
             # array('template','TEMPLATE',self::CONFIG_TYPE_LITERAL),
@@ -665,7 +665,7 @@ class MapNode extends MapDataItem
 
             $now = $anchorPosition->copy();
             $now->translatePolar($angle, $distance);
-            MapUtility::wm_debug("POLAR $this -> $now\n");
+            MapUtility::debug("POLAR $this -> $now\n");
             $this->setPosition($now);
             $this->relativePositionResolved = true;
 
@@ -680,13 +680,13 @@ class MapNode extends MapDataItem
                     $anchorNode->namedOffsets[$offsetName][0],
                     $anchorNode->namedOffsets[$offsetName][1]
                 );
-                MapUtility::wm_debug("NAMED OFFSET $this -> $now\n");
+                MapUtility::debug("NAMED OFFSET $this -> $now\n");
                 $this->setPosition($now);
                 $this->relativePositionResolved = true;
 
                 return true;
             }
-            MapUtility::wm_debug("Fell through named offset.\n");
+            MapUtility::debug("Fell through named offset.\n");
 
             return false;
         }
@@ -695,7 +695,7 @@ class MapNode extends MapDataItem
         $now = $this->getPosition();
         $now->translate($anchorPosition->x, $anchorPosition->y);
 
-        MapUtility::wm_debug("OFFSET $this -> $now\n");
+        MapUtility::debug("OFFSET $this -> $now\n");
         $this->setPosition($now);
         $this->relativePositionResolved = true;
 
@@ -751,15 +751,15 @@ class MapNode extends MapDataItem
      */
     private function drawArtificialIcon(&$map, $labelColour)
     {
-        MapUtility::wm_debug('Artificial Icon type ' . $this->iconfile . " for $this->name\n");
+        MapUtility::debug('Artificial Icon type ' . $this->iconfile . " for $this->name\n");
         // this is an artificial icon - we don't load a file for it
 
         $iconImageRef = $this->createTransparentImage($this->iconscalew, $this->iconscaleh);
 
         list($finalFillColour, $finalInkColour) = $this->calculateAICONColours($labelColour, $map);
 
-        MapUtility::wm_debug("ink is: $finalInkColour\n");
-        MapUtility::wm_debug("fill is: $finalFillColour\n");
+        MapUtility::debug("ink is: $finalInkColour\n");
+        MapUtility::debug("fill is: $finalFillColour\n");
 
         switch ($this->iconfile) {
             case 'box':
@@ -781,7 +781,7 @@ class MapNode extends MapDataItem
                 $this->drawArtificialIconPie($iconImageRef, $finalFillColour, $finalInkColour, OUT);
                 break;
             case 'gauge':
-                MapUtility::wm_warn('gauge AICON not implemented yet [WMWARN99]');
+                MapUtility::warn('gauge AICON not implemented yet [WMWARN99]');
                 break;
         }
 
@@ -797,7 +797,7 @@ class MapNode extends MapDataItem
     {
         $this->iconfile = $map->processString($this->iconfile, $this);
 
-        MapUtility::wm_debug('Actual image-based icon from ' . $this->iconfile . " for $this->name\n");
+        MapUtility::debug('Actual image-based icon from ' . $this->iconfile . " for $this->name\n");
 
         $iconImageRef = null;
 
@@ -825,11 +825,11 @@ class MapNode extends MapDataItem
             }
 
             if (!$iconImageRef) {
-                MapUtility::wm_warn("Couldn't open ICON: '" . $this->iconfile . "' - is it a PNG, JPEG or GIF? [WMWARN37]\n");
+                MapUtility::warn("Couldn't open ICON: '" . $this->iconfile . "' - is it a PNG, JPEG or GIF? [WMWARN37]\n");
             }
         } else {
             if ($this->iconfile != 'none') {
-                MapUtility::wm_warn("ICON '" . $this->iconfile . "' does not exist, or is not readable. Check path and permissions. [WMARN38]\n");
+                MapUtility::warn("ICON '" . $this->iconfile . "' does not exist, or is not readable. Check path and permissions. [WMARN38]\n");
             }
         }
         return $iconImageRef;
@@ -844,7 +844,7 @@ class MapNode extends MapDataItem
      */
     private function drawLabel(&$map, $textPoint, $backgroundColour, $nodeImageRef, $labelBox)
     {
-        MapUtility::wm_debug("Label colour is $backgroundColour\n");
+        MapUtility::debug("Label colour is $backgroundColour\n");
 
         // if there's an icon, then you can choose to have no background
         if (!$this->labelbgcolour->isNone()) {
@@ -910,7 +910,7 @@ class MapNode extends MapDataItem
             if ($backgroundColour->isRealColour()) {
                 $textColour = $backgroundColour->getContrastingColour();
             } else {
-                MapUtility::wm_warn("You can't make a contrast with 'none'. Guessing black. [WMWARN43]\n");
+                MapUtility::warn("You can't make a contrast with 'none'. Guessing black. [WMWARN43]\n");
                 $textColour = new Colour(0, 0, 0);
             }
         }
@@ -988,7 +988,7 @@ class MapNode extends MapDataItem
     private function drawArtificialIconRoundedBox($iconImageRef, $finalFillColour, $finalInkColour)
     {
         if (!$finalFillColour->isNone()) {
-            ImageUtility::imagefilledroundedrectangle(
+            ImageUtility::imageFilledRoundedRectangle(
                 $iconImageRef,
                 0,
                 0,
@@ -1000,7 +1000,7 @@ class MapNode extends MapDataItem
         }
 
         if (!$finalInkColour->isNone()) {
-            ImageUtility::imageroundedrectangle(
+            ImageUtility::imageRoundedRectangle(
                 $iconImageRef,
                 0,
                 0,
@@ -1272,7 +1272,7 @@ class MapNode extends MapDataItem
         foreach (array_keys($this->inheritedFieldList) as $fld) {
             if (!property_exists($class, $fld)) {
                 $failed = true;
-                MapUtility::wm_warn("$fld is in $class inherit list, but not in object");
+                MapUtility::warn("$fld is in $class inherit list, but not in object");
             }
         }
         return $failed;
@@ -1280,7 +1280,7 @@ class MapNode extends MapDataItem
 
     public function getProperty($name)
     {
-        MapUtility::wm_debug("Fetching %s\n", $name);
+        MapUtility::debug("Fetching %s\n", $name);
 
         $translations = array(
             "inscalekey"=>$this->scaleKeys[IN],

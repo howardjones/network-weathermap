@@ -11,14 +11,14 @@ namespace Weathermap\Core;
 class MapUtility
 {
 
-    public static function wm_debug2($string)
+    public static function debug2($string)
     {
-        global $wm_debug_logger;
+        global $wmDebugLogger;
 
-        $wm_debug_logger->log($string);
+        $wmDebugLogger->log($string);
     }
 
-    public static function wm_debug($string)
+    public static function debug($string)
     {
         global $weathermap_debugging;
         global $weathermap_map;
@@ -78,7 +78,7 @@ class MapUtility
         }
     }
 
-    public static function wm_warn($string, $noticeOnly = false)
+    public static function warn($string, $noticeOnly = false)
     {
         global $weathermap_map;
         global $weathermap_warncount;
@@ -94,7 +94,7 @@ class MapUtility
         if ((true === is_array($weathermap_error_suppress))
             && (true === array_key_exists(strtoupper($code), $weathermap_error_suppress))
         ) {
-            self::wm_debug("$code is suppressed\n");
+            self::debug("$code is suppressed\n");
             // This error code has been deliberately disabled.
             return false;
         }
@@ -126,7 +126,7 @@ class MapUtility
      * @param string $htmlfile
      * @param Map $map
      */
-    public static function TestOutput_HTML($htmlfile, &$map)
+    public static function outputTestHTML($htmlfile, &$map)
     {
         $fd = fopen($htmlfile, 'w');
         fwrite(
@@ -167,29 +167,29 @@ class MapUtility
 
 
 // Check for GD & PNG support This is just in here so that both the editor and CLI can use it without the need for another file
-    public static function wm_module_checks()
+    public static function moduleChecks()
     {
         if (!extension_loaded('gd')) {
-            self::wm_warn("\n\nNo image (gd) extension is loaded. This is required by weathermap. [WMWARN20]\n\n");
-            self::wm_warn("\nrun check.php to check PHP requirements.\n\n");
+            self::warn("\n\nNo image (gd) extension is loaded. This is required by weathermap. [WMWARN20]\n\n");
+            self::warn("\nrun check.php to check PHP requirements.\n\n");
 
             return false;
         }
 
         if (!function_exists('imagecreatefrompng')) {
-            self::wm_warn("Your GD php module doesn't support PNG format. [WMWARN21]\n");
-            self::wm_warn("\nrun check.php to check PHP requirements.\n\n");
+            self::warn("Your GD php module doesn't support PNG format. [WMWARN21]\n");
+            self::warn("\nrun check.php to check PHP requirements.\n\n");
             return false;
         }
 
         if (!function_exists('imagecreatetruecolor')) {
-            self::wm_warn("Your GD php module doesn't support truecolor. [WMWARN22]\n");
-            self::wm_warn("\nrun check.php to check PHP requirements.\n\n");
+            self::warn("Your GD php module doesn't support truecolor. [WMWARN22]\n");
+            self::warn("\nrun check.php to check PHP requirements.\n\n");
             return false;
         }
 
         if (!function_exists('imagecopyresampled')) {
-            self::wm_warn("Your GD php module doesn't support thumbnail creation (imagecopyresampled). [WMWARN23]\n");
+            self::warn("Your GD php module doesn't support thumbnail creation (imagecopyresampled). [WMWARN23]\n");
         }
         return true;
     }
@@ -211,7 +211,7 @@ class MapUtility
         $multiply = 1;
         if (null !== $factor) {
             $multiply = intval($factor) / 100;
-            self::wm_debug("Percentage compass offset: multiply by $multiply");
+            self::debug("Percentage compass offset: multiply by $multiply");
         }
 
         // divide by 2, since the actual offset will only ever be half of the
@@ -229,7 +229,7 @@ class MapUtility
     public static function calculateOffset($offsetstring, $width, $height)
     {
         if (preg_match('/^([-+]?\d+):([-+]?\d+)$/', $offsetstring, $matches)) {
-            self::wm_debug("Numeric Offset found\n");
+            self::debug("Numeric Offset found\n");
             return array($matches[1], $matches[2]);
         }
 
@@ -252,7 +252,7 @@ class MapUtility
             return $offsets;
         }
 
-        self::wm_warn("Got a position offset that didn't make sense ($offsetstring).");
+        self::warn("Got a position offset that didn't make sense ($offsetstring).");
 
         return array(0, 0);
     }

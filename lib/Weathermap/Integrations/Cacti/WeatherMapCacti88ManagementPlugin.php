@@ -15,8 +15,8 @@ class WeatherMapCacti88ManagementPlugin extends WeatherMapCactiManagementPlugin
     {
         parent::__construct($config);
         $this->colours = $colours;
-        $this->my_url = "weathermap-cacti88-plugin-mgmt.php";
-        $this->editor_url = "weathermap-cacti88-plugin-editor.php";
+        $this->myURL = "weathermap-cacti88-plugin-mgmt.php";
+        $this->editorURL = "weathermap-cacti88-plugin-editor.php";
     }
 
     /**
@@ -26,7 +26,7 @@ class WeatherMapCacti88ManagementPlugin extends WeatherMapCactiManagementPlugin
     public function handleManagementMainScreen($request, $appObject)
     {
         $this->cactiHeader();
-        $this->maplist_warnings();
+        $this->maplistWarnings();
         $this->maplist();
         $this->footerLinks();
         $this->cactiFooter();
@@ -35,12 +35,12 @@ class WeatherMapCacti88ManagementPlugin extends WeatherMapCactiManagementPlugin
 
     public function cactiHeader()
     {
-        include_once $this->cacti_config["base_path"] . "/include/top_header.php";
+        include_once $this->cactiConfig["base_path"] . "/include/top_header.php";
     }
 
     public function cactiFooter()
     {
-        include_once $this->cacti_config["base_path"] . "/include/bottom_footer.php";
+        include_once $this->cactiConfig["base_path"] . "/include/bottom_footer.php";
     }
 
     public function cactiRowStart($i)

@@ -691,7 +691,7 @@ class EditorUI extends UIBase
 
     public function moduleChecks()
     {
-        if (!MapUtility::wm_module_checks()) {
+        if (!MapUtility::moduleChecks()) {
             print "<b>Required PHP extensions are not present in your mod_php/ISAPI PHP module. Please check your PHP setup to ensure you have the GD extension installed and enabled.</b><p>";
             print "If you find that the weathermap tool itself is working, from the command-line or Cacti poller, then it is possible that you have two different PHP installations. The Editor uses the same PHP that webpages on your server use, but the main weathermap tool uses the command-line PHP interpreter.<p>";
             print "<p>You should also run <a href=\"check.php\">check.php</a> to help make sure that there are no problems.</p><hr/>";
@@ -738,6 +738,7 @@ class EditorUI extends UIBase
         if (isset($request['action'])) {
             $action = strtolower(trim($request['action']));
         }
+
         if (isset($request['mapname'])) {
             $mapFileName = $request['mapname'];
 
@@ -756,24 +757,26 @@ class EditorUI extends UIBase
 
         if ($mapFileName == '') {
             $this->showStartPage();
-        } else {
-            if ($this->validateRequest($action, $request)) {
-                $editor = new Editor();
-                $this->setEmbedded($fromPlugin);
-                if (!isset($this->commands[$action]['late_load'])) {
-                    $editor->loadConfig($this->mapFileName);
-                }
-                $result = $this->dispatchRequest($action, $request, $editor);
-                if (!isset($this->commands[$action]['no_save'])) {
-                    $editor->saveConfig();
-                }
-                if ($result !== false) {
-                    $this->showMainPage($editor);
-                }
-            } else {
-                print "VALIDATION FAIL";
-            }
+            return;
         }
+
+        if ($this->validateRequest($action, $request)) {
+            $editor = new Editor();
+            $this->setEmbedded($fromPlugin);
+            if (!isset($this->commands[$action]['late_load'])) {
+                $editor->loadConfig($this->mapFileName);
+            }
+            $result = $this->dispatchRequest($action, $request, $editor);
+            if (!isset($this->commands[$action]['no_save'])) {
+                $editor->saveConfig();
+            }
+            if ($result !== false) {
+                $this->showMainPage($editor);
+            }
+            return;
+        }
+
+        print "VALIDATION FAIL";
     }
 
     public function showStartPage()
@@ -829,11 +832,7 @@ class EditorUI extends UIBase
             $note = "";
 
             // skip directories, unreadable files, .files and anything that doesn't come through the sanitiser unchanged
-            if (is_file($fullFileName)
-                && is_readable($fullFileName)
-                && !preg_match('/^\./', $file)
-                && UIBase::wmeSanitizeConfigFile($file) == $file
-            ) {
+            if ($this->isEditableConfigFile($fullFileName)) {
                 if (!is_writable($fullFileName)) {
                     $note .= "(read-only)";
                 }
@@ -938,10 +937,10 @@ class EditorUI extends UIBase
         $imageList = array();
 
         if (is_dir($imageDirectory)) {
-            $dh = opendir($imageDirectory);
+            $dirHandle = opendir($imageDirectory);
 
-            if ($dh) {
-                while ($file = readdir($dh)) {
+            if ($dirHandle) {
+                while ($file = readdir($dirHandle)) {
                     $realFile = $imageDirectory . DIRECTORY_SEPARATOR . $file;
                     $uri = $imageDirectory . "/" . $file;
 
@@ -950,7 +949,7 @@ class EditorUI extends UIBase
                     }
                 }
 
-                closedir($dh);
+                closedir($dirHandle);
             }
         }
 
@@ -962,5 +961,19 @@ class EditorUI extends UIBase
         sort($imageList);
 
         return $imageList;
+    }
+
+    /**
+     * @param string $fullFileName
+     * @return bool
+     */
+    private function isEditableConfigFile($fullFileName)
+    {
+        $file = basename($fullFileName);
+
+        return is_file($fullFileName)
+            && is_readable($fullFileName)
+            && !preg_match('/^\./', $file)
+            && UIBase::wmeSanitizeConfigFile($file) == $file;
     }
 }

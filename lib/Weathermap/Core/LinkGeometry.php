@@ -46,7 +46,7 @@ class LinkGeometry
      * @param string $arrowStyle
      * @throws WeathermapInternalFail
      */
-    public function Init(&$link, $controlPoints, $widths, $directions = 2, $splitPosition = 50, $arrowStyle = 'classic')
+    public function init(&$link, $controlPoints, $widths, $directions = 2, $splitPosition = 50, $arrowStyle = 'classic')
     {
         $this->owner = $link;
         $this->name = $link->name;
@@ -93,7 +93,7 @@ class LinkGeometry
         /* @var $cp Point */
         foreach ($this->controlPoints as $key => $cp) {
             if ($cp->closeEnough($previousPoint)) {
-                MapUtility::wm_debug("Dumping useless duplicate point on curve ($previousPoint =~ $cp)\n");
+                MapUtility::debug("Dumping useless duplicate point on curve ($previousPoint =~ $cp)\n");
                 unset($this->controlPoints[$key]);
                 $removed++;
             }
@@ -160,7 +160,7 @@ class LinkGeometry
     {
         $points = array();
 
-        MapUtility::wm_debug("$startPoint $endPoint $linkWidth $arrowWidth\n");
+        MapUtility::debug("$startPoint $endPoint $linkWidth $arrowWidth\n");
 
         // Calculate a tangent
         $arrowDirection = $startPoint->vectorToPoint($endPoint);
@@ -175,7 +175,7 @@ class LinkGeometry
         $points[] = $startPoint->copy()->addVector($arrowNormal, -$linkWidth);
 
         foreach ($points as $p) {
-            MapUtility::wm_debug('  ' . $p . "\n");
+            MapUtility::debug('  ' . $p . "\n");
         }
 
 
@@ -235,14 +235,14 @@ class LinkGeometry
                 $this->arrowStyle
             );
 
-            MapUtility::wm_debug("Arrow size is $arrowSize and width is " . $this->arrowWidths[$direction] . "\n");
+            MapUtility::debug("Arrow size is $arrowSize and width is " . $this->arrowWidths[$direction] . "\n");
 
             $arrowDistance = $totalDistance - $arrowSize;
 
-            MapUtility::wm_debug("Arrow distance is $arrowDistance\n");
+            MapUtility::debug("Arrow distance is $arrowDistance\n");
             list($this->arrowPoints[$direction], $this->arrowIndexes[$direction]) = $this->splitCurves[$direction]->findPointAtDistance($arrowDistance);
-            MapUtility::wm_debug('Arrow point is ' . $this->arrowPoints[$direction] . "\n");
-            MapUtility::wm_debug('Arrow index is ' . $this->arrowIndexes[$direction] . "\n");
+            MapUtility::debug('Arrow point is ' . $this->arrowPoints[$direction] . "\n");
+            MapUtility::debug('Arrow index is ' . $this->arrowIndexes[$direction] . "\n");
         }
     }
 
@@ -271,7 +271,7 @@ class LinkGeometry
         }
 
         if (($this->arrowWidths[IN] + $this->arrowWidths[OUT] * 1.2) > $this->curvePoints->totalDistance()) {
-            MapUtility::wm_warn('Skipping too-short link [WMWARN50]');
+            MapUtility::warn('Skipping too-short link [WMWARN50]');
 
             return;
         }
@@ -292,13 +292,13 @@ class LinkGeometry
                     $this->fillColours[$direction]->gdAllocate($gdImage)
                 );
             } else {
-                MapUtility::wm_debug("Not drawing $linkName ($direction) fill because there is no fill colour\n");
+                MapUtility::debug("Not drawing $linkName ($direction) fill because there is no fill colour\n");
             }
 
             if (!$this->outlineColour->isNone()) {
                 imagepolygon($gdImage, $polyline, count($polyline) / 2, $this->outlineColour->gdAllocate($gdImage));
             } else {
-                MapUtility::wm_debug("Not drawing $linkName ($direction) outline because there is no outline colour\n");
+                MapUtility::debug("Not drawing $linkName ($direction) outline because there is no outline colour\n");
             }
         }
     }

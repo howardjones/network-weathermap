@@ -15,7 +15,6 @@ class FontTableTest extends \PHPUnit_Framework_TestCase
     {
         parent::setUp();
         $this->projectRoot = realpath(dirname(__FILE__) . "/../../../");
-
     }
 
     public function tearDown()

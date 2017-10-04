@@ -153,7 +153,7 @@ class StringUtility
 
     // These next two are based on perl's Number::Format module
     // by William R. Ward, chopped down to just what I needed
-    public static function formatNumber($number, $precision = 2, $trailingZeroes = 0)
+    public static function formatNumber($number, $precision = 2)
     {
         $sign = 1;
 

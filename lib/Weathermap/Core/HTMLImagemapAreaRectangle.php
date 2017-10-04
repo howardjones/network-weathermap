@@ -15,9 +15,8 @@ class HTMLImagemapAreaRectangle extends HTMLImagemapArea
     public $y1;
     public $y2;
 
-    public function __construct($name = '', $href = '', $coords)
+    public function __construct($coords, $name = '', $href = '')
     {
-
         $c = $coords[0];
 
         $x1 = round($c[0]);

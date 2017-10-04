@@ -82,13 +82,13 @@ class ImageLoaderTest extends \PHPUnit_Framework_TestCase
         $loader = new ImageLoader();
 
         // load a truecolor with alpha image
-        $source1 = ImageUtility::imagecreatefromfile($this->projectRoot . "/test-suite/data/greybox32.png");
+        $source1 = ImageUtility::imageCreateFromFile($this->projectRoot . "/test-suite/data/greybox32.png");
 
         // load a paletted image
-        $source2 = ImageUtility::imagecreatefromfile($this->projectRoot . "/test-suite/data/pal-48.png");
+        $source2 = ImageUtility::imageCreateFromFile($this->projectRoot . "/test-suite/data/pal-48.png");
 
         // load a paletted (with transparency) image
-        $source3 = ImageUtility::imagecreatefromfile($this->projectRoot . "/test-suite/data/pal-tx-48.png");
+        $source3 = ImageUtility::imageCreateFromFile($this->projectRoot . "/test-suite/data/pal-tx-48.png");
 
         // duplicate them
         $result1 = $loader->imageduplicate($source1);

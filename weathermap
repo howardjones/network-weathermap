@@ -20,7 +20,7 @@ $rrdtool = "/usr/bin/rrdtool";
 // (on Windows, use / instead of \ in pathnames - c:/rrdtool/bin/rrdtool.exe for example)
 // **************************************************************************************
 
-if (!Weathermap\Core\MapUtility::wm_module_checks()) {
+if (!Weathermap\Core\MapUtility::moduleChecks()) {
     die("Quitting: Module checks failed.\n");
 }
 
@@ -146,7 +146,7 @@ foreach ($define_array as $define) {
     if (isset($matches[2])) {
         $varname = $matches[1];
         $value = $matches[2];
-        MapUtility::wm_debug(">> $varname = '$value'\n");
+        MapUtility::debug(">> $varname = '$value'\n");
         // save this for later, so that when the map object exists, it can be defined
         $defines[$varname] = $value;
     } else {
@@ -167,9 +167,9 @@ if (isset($options_output['debugging']) && $options_output['debugging']) {
     // Set up the callback
     assert_options(ASSERT_CALLBACK, 'my_assert_handler');
 
-    MapUtility::wm_debug("------------------------------------\n");
-    MapUtility::wm_debug("Starting PHP-Weathermap run, with config: $configfile\n");
-    MapUtility::wm_debug("------------------------------------\n");
+    MapUtility::debug("------------------------------------\n");
+    MapUtility::debug("Starting PHP-Weathermap run, with config: $configfile\n");
+    MapUtility::debug("------------------------------------\n");
 }
 
 $map = new Map();
@@ -227,7 +227,7 @@ if ($map->readConfig($configfile)) {
     }
 
     if ($htmlfile != '') {
-        MapUtility::wm_debug("Writing HTML to $htmlfile\n");
+        MapUtility::debug("Writing HTML to $htmlfile\n");
 
         $fd = fopen($htmlfile, 'w');
         fwrite($fd,

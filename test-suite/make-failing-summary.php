@@ -1,12 +1,19 @@
 #!/usr/bin/php
 <?php
+#
+/***
+ * Usage: test-suites/make-failing-summary.php test-suite/failing-images.txt test-suite/summary.html > test-suite/failing-summary.html
+ *
+ * Take the summary data produced by ConfigTest, and generate an HTML report, showing
+ * the reference, the output from pass 1 and the diff image from ImageMagick.
+ */
 
-# 	test-suites/make-failing-summary.php test-suite/failing-images.txt test-suite/summary.html > test-suite/failing-summary.html
+print "Creating summary info from ConfigTest failures...\n";
 
 $dir = "test-suite/diffs";
-$summary_file = "test-suite/summary.html";
+$summaryFile = "test-suite/summary.html";
 
-$failcount = 0;
+$failCount = 0;
 $fails = array();
 $different = array();
 
@@ -16,7 +23,7 @@ if (is_dir($dir)) {
             $file = "$dir/$file";
 
             if (substr($file, -4, 4) == '.txt') {
-                $fd = fopen($file,"r");
+                $fd = fopen($file, "r");
                 if ($fd) {
                     while (!feof($fd)) {
                         $line = fgets($fd);
@@ -26,7 +33,7 @@ if (is_dir($dir)) {
                                 $realfilename = str_replace(".png.txt", "", $file);
                                 $realfilename = str_replace("test-suite/diffs/", "", $realfilename);
                                 $fails[$realfilename] = 1;
-                                $failcount++;
+                                $failCount++;
                                 $different[$realfilename] = intval($matches[1]);
                             }
                         }
@@ -39,7 +46,7 @@ if (is_dir($dir)) {
     }
 }
 
-$f = fopen($summary_file, "r");
+$f = fopen($summaryFile, "r");
 
 $percents = array();
 
@@ -47,41 +54,31 @@ while (!feof($f)) {
     $line = fgets($f);
 
     if (strstr($line, "<h4>")) {
-
         $parts = explode(" ", $line);
         $conf = $parts[0];
         $conf = str_replace("<h4>", "", $conf);
         $conf = str_replace("<hr>", "", $conf);
 
-//        print "$conf\n";
-
         if (array_key_exists($conf, $fails) && $fails[$conf] == 1) {
             print $line;
 
-            $diff_file = "test-suite/diffs/" . $conf . ".png.txt";
-            $reference_file = "test-suite/references/" . $conf . ".png";
+            $diffFile = "test-suite/diffs/" . $conf . ".png.txt";
+            $referenceFile = "test-suite/references/" . $conf . ".png";
 
-            $pixels_different = $different[$conf];
+            $pixelsDifferent = $different[$conf];
             $percent = 0;
 
-//            $d = fopen($diff_file, "r");
-//            while (!feof($d)) {
-//                $dline = fgets($d);
-//                if (preg_match('/^Output: \\|(\\d+)/', $dline, $matches)) {
-//                    $differences = intval($matches[1]);
-//                }
-//            }
-//            fclose($d);
+            $dimensions = getimagesize($referenceFile);
+            $totalPixels = $dimensions[0] * $dimensions[1];
 
-            $dimensions = getimagesize($reference_file);
-            $totalpixels = $dimensions[0] * $dimensions[1];
-
-            $percent = sprintf("%.2f%%", $pixels_different / $totalpixels * 100);
+            $percent = sprintf("%.2f%%", $pixelsDifferent / $totalPixels * 100);
             array_push($percents, $percent);
 
-            print sprintf("<p><b>To run:</b><code>./weathermap --config test-suite/tests/%s --debug --no-data</code></p>\n",
-                $conf);
-            print "<p>$percent - $pixels_different differences.</p>\n";
+            print sprintf(
+                "<p><b>To run:</b><code>./weathermap --config test-suite/tests/%s --debug --no-data</code></p>\n",
+                $conf
+            );
+            print "<p>$percent - $pixelsDifferent differences.</p>\n";
 
             print "<a href='approve.php?cf=" . $conf . "'>Approve left image as new reference</a>\n";
             print "<hr>";
@@ -93,7 +90,7 @@ while (!feof($f)) {
 
 fclose($f);
 
-$c = sizeof($percents);
+$c = count($percents);
 $summary = "";
 
 if ($c > 0) {
@@ -106,5 +103,4 @@ if ($c > 0) {
 }
 
 error_log($summary);
-error_log("$failcount failing");
-
+error_log("$failCount failing");

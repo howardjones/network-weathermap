@@ -14,15 +14,15 @@ use Weathermap\Integrations\MapManager;
 class WeatherMapCactiUserPlugin extends UIBase
 {
     public $manager;
-    public $my_url;
-    public $editor_url;
-    public $management_url;
+    public $myURL;
+    public $editorURL;
+    public $managementURL;
     private $outputDirectory;
     private $imageFormat;
-    public $cacti_config;
+    public $cactiConfig;
     public $configPath;
-    public $management_realm;
-    public $editor_realm;
+    public $managementRealm;
+    public $editorRealm;
 
     public $commands = array(
         'maplist' => array('handler' => 'handleMapList', 'args' => array()),
@@ -66,12 +66,12 @@ class WeatherMapCactiUserPlugin extends UIBase
     {
         parent::__construct();
 
-        $this->cacti_config = $config;
-        $this->my_url = "SHOULD-BE-OVERRIDDEN";
-        $this->management_url = "SHOULD-BE-OVERRIDDEN";
-        $this->editor_url = "SHOULD-BE-OVERRIDDEN";
-        $this->management_realm = "SHOULD-BE-OVERRIDDEN";
-        $this->editor_realm = "SHOULD-BE-OVERRIDDEN";
+        $this->cactiConfig = $config;
+        $this->myURL = "SHOULD-BE-OVERRIDDEN";
+        $this->managementURL = "SHOULD-BE-OVERRIDDEN";
+        $this->editorURL = "SHOULD-BE-OVERRIDDEN";
+        $this->managementRealm = "SHOULD-BE-OVERRIDDEN";
+        $this->editorRealm = "SHOULD-BE-OVERRIDDEN";
         $this->configPath = realpath(dirname(__FILE__) . '/../configs');
         $this->outputDirectory = realpath(dirname(__FILE__) . '/../output/');
         $this->imageFormat = $imageFormat;
@@ -92,13 +92,13 @@ class WeatherMapCactiUserPlugin extends UIBase
         }
     }
 
-    public function makeURL($params, $alt_url = "")
+    public function makeURL($params, $altURL = "")
     {
-        $base_url = $this->my_url;
-        if ($alt_url != "") {
-            $base_url = $alt_url;
+        $baseURL = $this->myURL;
+        if ($altURL != "") {
+            $baseURL = $altURL;
         }
-        $url = $base_url . (strpos($this->my_url, '?') === false ? '?' : '&');
+        $url = $baseURL . (strpos($this->myURL, '?') === false ? '?' : '&');
 
         $parts = array();
         foreach ($params as $name => $value) {
@@ -120,20 +120,20 @@ class WeatherMapCactiUserPlugin extends UIBase
         // filter groups to only contain groups used in $mapList
         // (no leaking other groups - could be things like customer or project names)
 
-        $seen_group = array();
+        $seenGroup = array();
         foreach ($mapList as $map) {
-            $seen_group[$map->group_id] = 1;
+            $seenGroup[$map->group_id] = 1;
         }
-        $new_groups = array();
+        $newGroups = array();
         foreach ($groups as $group) {
-            if (array_key_exists($group->id, $seen_group)) {
-                $new_groups [] = $group;
+            if (array_key_exists($group->id, $seenGroup)) {
+                $newGroups [] = $group;
             }
         }
 
         $data = array(
             'maps' => $mapList,
-            'groups' => $new_groups
+            'groups' => $newGroups
         );
 
         print json_encode($data);
@@ -141,34 +141,32 @@ class WeatherMapCactiUserPlugin extends UIBase
 
     public function handleSettings($request, $appObject)
     {
-        global $WEATHERMAP_VERSION;
-
         header('Content-type: application/json');
 
-        $style_text_options = array("thumbs", "full", "full-first-only");
-        $true_false = array(false, true);
+        $styleTextOptions = array("thumbs", "full", "full-first-only");
+        $trueFalseLookup = array(false, true);
 
         $style = $this->manager->getAppSetting("weathermap_pagestyle", 0);
 
-        $cycle_time = $this->manager->getAppSetting("weathermap_cycle_refresh", 0);
-        if ($cycle_time == 0) {
-            $cycle_time = 'auto';
+        $cycleTime = $this->manager->getAppSetting("weathermap_cycle_refresh", 0);
+        if ($cycleTime == 0) {
+            $cycleTime = 'auto';
         }
 
-        $show_all_tab = $this->manager->getAppSetting("weathermap_all_tab", 0);
-        $show_map_selector = $this->manager->getAppSetting("weathermap_map_selector", 0);
+        $showAllMapsTab = $this->manager->getAppSetting("weathermap_all_tab", 0);
+        $showMapSelector = $this->manager->getAppSetting("weathermap_map_selector", 0);
 
         $data = array(
-            'wm_version' => $WEATHERMAP_VERSION,
-            'page_style' => $style_text_options[$style],
-            'cycle_time' => (string)$cycle_time,
-            'show_all_tab' => $true_false[$show_all_tab],
-            'map_selector' => $true_false[$show_map_selector],
+            'wm_version' => WEATHERMAP_VERSION,
+            'page_style' => $styleTextOptions[$style],
+            'cycle_time' => (string)$cycleTime,
+            'show_all_tab' => $trueFalseLookup[$showAllMapsTab],
+            'map_selector' => $trueFalseLookup[$showMapSelector],
             'thumb_url' => $this->makeURL(array("action" => "viewthumb")),
             'image_url' => $this->makeURL(array("action" => "viewimage")),
-            'editor_url' => $this->editor_url,
+            'editor_url' => $this->editorURL,
             'docs_url' => 'docs/',
-            'management_url' => $this->management_url
+            'management_url' => $this->managementURL
         );
 
         print json_encode($data);
@@ -231,7 +229,7 @@ class WeatherMapCactiUserPlugin extends UIBase
         if ($pageStyle == 2) {
             $mapList = array($mapList[0]);
         }
-        $mapCount = sizeof($mapList);
+        $mapCount = count($mapList);
 
         $this->outputMapHeader($mapList, false, $limitToGroup);
 
@@ -258,12 +256,12 @@ class WeatherMapCactiUserPlugin extends UIBase
     protected function getGroupFilter($request)
     {
         $tabs = $this->getValidTabs();
-        $tab_ids = array_keys($tabs);
+        $tabIDs = array_keys($tabs);
 
         $limitToGroup = $this->getRequiredGroup($request);
         // XXX - will this ever be true?
-        if (($limitToGroup == -1) && (sizeof($tab_ids) > 0)) {
-            $limitToGroup = $tab_ids[0];
+        if (($limitToGroup == -1) && (count($tabIDs) > 0)) {
+            $limitToGroup = $tabIDs[0];
         }
         return $limitToGroup;
     }
@@ -304,16 +302,16 @@ class WeatherMapCactiUserPlugin extends UIBase
     {
         global $user_auth_realm_filenames;
 
-        $realm_id = 0;
-        $realm_name = $this->management_realm;
+        $realmId = 0;
+        $realmName = $this->managementRealm;
 
-        if (isset($user_auth_realm_filenames[$realm_name])) {
-            $realm_id = $user_auth_realm_filenames[$realm_name];
+        if (isset($user_auth_realm_filenames[$realmName])) {
+            $realmId = $user_auth_realm_filenames[$realmName];
         }
         $userid = (isset($_SESSION["sess_user_id"]) ? intval($_SESSION["sess_user_id"]) : 1);
-        $allowed = $this->manager->checkUserForRealm($userid, $realm_id);
+        $allowed = $this->manager->checkUserForRealm($userid, $realmId);
 
-        if ($allowed || (empty($realm_id))) {
+        if ($allowed || (empty($realmId))) {
             return true;
         }
 
@@ -328,13 +326,13 @@ class WeatherMapCactiUserPlugin extends UIBase
         $isAdmin = $this->isWeathermapAdmin();
 
         if ($isAdmin) {
-            $pageFooter .= ' --- <a href="' . $this->management_url . '" title="Go to the map management page">';
+            $pageFooter .= ' --- <a href="' . $this->managementURL . '" title="Go to the map management page">';
             $pageFooter .= 'Weathermap Management</a> | <a target="_blank" href="docs/">Local Documentation</a>';
-            $pageFooter .= ' | <a target="_blank" href="' . $this->editor_url . '">Editor</a>';
+            $pageFooter .= ' | <a target="_blank" href="' . $this->editorURL . '">Editor</a>';
         }
 
 
-        html_start_box('Weathermap Info', '100%', '', '3', 'center', '');
+        \html_start_box('Weathermap Info', '100%', '', '3', 'center', '');
         ?>
         <tr class='even'>
             <td>
@@ -346,12 +344,12 @@ class WeatherMapCactiUserPlugin extends UIBase
             </td>
         </tr>
         <?php
-        html_end_box();
+        \html_end_box();
     }
 
     protected function outputMapViewHeader($pageTitle, $isCycling, $limitingToGroup)
     {
-        html_start_box($pageTitle, '100%', '', '3', 'center', '');
+        \html_start_box($pageTitle, '100%', '', '3', 'center', '');
         ?>
         <tr class="even">
             <td>
@@ -367,16 +365,16 @@ class WeatherMapCactiUserPlugin extends UIBase
                                 if ($limitingToGroup > 0) {
                                     $this->makeURL(
                                         array(
-                                        "action" => "viewcycle_filtered",
-                                        "group" => $limitingToGroup
-                                        )
-                                    );
-                                    print '<a href = "' . $this->makeURL(
-                                        array(
                                             "action" => "viewcycle_filtered",
                                             "group" => $limitingToGroup
                                         )
-                                    ) . '">within this group</a>, or ';
+                                    );
+                                    print '<a href = "' . $this->makeURL(
+                                            array(
+                                                "action" => "viewcycle_filtered",
+                                                "group" => $limitingToGroup
+                                            )
+                                        ) . '">within this group</a>, or ';
                                 }
                                 print ' <a href = "' . $this->makeURL(array("action" => "viewcycle")) . '">all maps</a>';
                                 ?>)
@@ -389,32 +387,27 @@ class WeatherMapCactiUserPlugin extends UIBase
             </td>
         </tr>
         <?php
-        html_end_box();
+        \html_end_box();
 
         $this->outputGroupTabs($limitingToGroup);
     }
 
-    protected function outputGroupTabs($current_tab)
+    protected function outputGroupTabs($currentTab)
     {
         $tabs = $this->getValidTabs();
 
-        if (sizeof($tabs) > 1) {
+        if (count($tabs) > 1) {
             /* draw the categories tabs on the top of the page */
             print "<p></p><table class='tabs' width='100%' cellspacing='0' cellpadding='3' align='center'><tr>\n";
 
-            if (sizeof($tabs) > 0) {
+            if (count($tabs) > 0) {
                 $showAll = intval($this->manager->getAppSetting("weathermap_all_tab", 0));
                 if ($showAll == 1) {
                     $tabs['-2'] = "All Maps";
                 }
 
-                foreach (array_keys($tabs) as $tab_short_name) {
-                    print "<td " . (($tab_short_name == $current_tab) ? "bgcolor='silver'" : "bgcolor='#DFDFDF'")
-                        . " nowrap='nowrap' width='" . (strlen($tabs[$tab_short_name]) * 9) . "' align='center' class='tab'>
-                    <span class='textHeader'><a
-                    href='" . $this->makeURL(array("group_id" => $tab_short_name)) . "'>$tabs[$tab_short_name]</a></span>
-                    </td>\n
-                    <td width='1'></td>\n";
+                foreach (array_keys($tabs) as $tabShortName) {
+                    print "<td " . (($tabShortName == $currentTab) ? "bgcolor='silver'" : "bgcolor='#DFDFDF'") . " nowrap='nowrap' width='" . (strlen($tabs[$tabShortName]) * 9) . "' align='center' class='tab'>                    <span class='textHeader'><a                    href='" . $this->makeURL(array("group_id" => $tabShortName)) . "'>$tabs[$tabShortName]</a></span>                    </td>\n                    <td width='1'></td>\n";
                 }
             }
 
@@ -428,15 +421,15 @@ class WeatherMapCactiUserPlugin extends UIBase
 
     private function drawThumbnailView($mapList)
     {
-        if (sizeof($mapList) > 0) {
-            html_start_box("", '100%', '', '3', 'center', '');
+        if (count($mapList) > 0) {
+            \html_start_box("", '100%', '', '3', 'center', '');
 
             print "<tr><td class='wm_gallery'>";
             foreach ($mapList as $map) {
                 $this->drawOneThumbnail($map);
             }
             print "</td></tr>";
-            html_end_box();
+            \html_end_box();
         }
     }
 
@@ -491,7 +484,7 @@ class WeatherMapCactiUserPlugin extends UIBase
         $mapTitle = $this->getMapTitle($map);
         print '<div class="weathermapholder" id="mapholder_' . $map->filehash . '">';
 
-        html_start_box(__('Map for config file: %s', $map->configfile), '100%', '', '3', 'center', '');
+        \html_start_box(__('Map for config file: %s', $map->configfile), '100%', '', '3', 'center', '');
 
         ?>
         <tr class="even">
@@ -517,7 +510,7 @@ class WeatherMapCactiUserPlugin extends UIBase
         }
 
         print '</td></tr>';
-        html_end_box();
+        \html_end_box();
 
         print '</div>';
     }
@@ -536,7 +529,7 @@ class WeatherMapCactiUserPlugin extends UIBase
      */
     protected function outputMapHeader($mapList, $cycle, $limitToGroup)
     {
-        $pageTitle = __n("Network Weathermap", "Network Weathermaps", sizeof($mapList));
+        $pageTitle = __n("Network Weathermap", "Network Weathermaps", count($mapList));
 
         $this->outputMapViewHeader($pageTitle, $cycle, $limitToGroup);
     }
@@ -566,14 +559,15 @@ class WeatherMapCactiUserPlugin extends UIBase
 
         if (file_exists($imageFileName)) {
             readfile($imageFileName);
-        } else {
-            $this->outputGreyPNG(48, 48);
+            return;
         }
+
+        $this->outputGreyPNG(48, 48);
     }
 
-    private function outputGreyPNG($w, $h)
+    private function outputGreyPNG($width, $height)
     {
-        $imageRef = imagecreate($w, $h);
+        $imageRef = imagecreate($width, $height);
         $shade = 240;
         // The first colour allocated becomes the background colour of the image. No need to fill
         imagecolorallocate($imageRef, $shade, $shade, $shade);

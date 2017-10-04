@@ -11,35 +11,66 @@ use Weathermap\UI\UIBase;
 //include_once 'WeathermapManager.php';
 
 use Weathermap\Integrations\MapManager;
+use Weathermap\Core\MapUtility;
 
 class WeatherMapCactiManagementPlugin extends UIBase
 {
 
     public $cactiBasePath;
+    /** @var MapManager $manager */
     public $manager;
     public $configPath;
-    public $cacti_config;
-    public $my_url;
-    public $editor_url;
+    public $cactiConfig;
+    public $myURL;
+    public $editorURL;
 
     public $commands = array(
         'groupadmin_delete' => array('handler' => 'handleGroupDelete', 'args' => array(array("id", "int"))),
         'groupadmin' => array('handler' => 'handleGroupSelect', 'args' => array()),
         'group_form' => array('handler' => 'handleGroupForm', 'args' => array(array("id", "int"))),
-        'group_update' => array('handler' => 'handleGroupUpdate', 'args' => array(array("id", "int", true), array("gname", "non-empty-string"))),
-        'move_group_up' => array('handler' => 'handleGroupOrderUp', 'args' => array(array("id", "int"), array("order", "int"))),
-        'move_group_down' => array('handler' => 'handleGroupOrderDown', 'args' => array(array("id", "int"), array("order", "int"))),
+        'group_update' => array(
+            'handler' => 'handleGroupUpdate',
+            'args' => array(array("id", "int", true), array("gname", "non-empty-string"))
+        ),
+        'move_group_up' => array(
+            'handler' => 'handleGroupOrderUp',
+            'args' => array(array("id", "int"), array("order", "int"))
+        ),
+        'move_group_down' => array(
+            'handler' => 'handleGroupOrderDown',
+            'args' => array(array("id", "int"), array("order", "int"))
+        ),
 
-        'chgroup_update' => array('handler' => 'handleMapChangeGroup', 'args' => array(array("map_id", "int"), array("new_group", "int"))),
+        'chgroup_update' => array(
+            'handler' => 'handleMapChangeGroup',
+            'args' => array(array("map_id", "int"), array("new_group", "int"))
+        ),
         'chgroup' => array('handler' => 'handleMapGroupChangeForm', 'args' => array(array("id", "int"))),
 
-        'map_settings_delete' => array('handler' => 'handleMapSettingsDelete', 'args' => array(array("mapid", "int"), array("id", "int"))),
+        'map_settings_delete' => array(
+            'handler' => 'handleMapSettingsDelete',
+            'args' => array(array("mapid", "int"), array("id", "int"))
+        ),
         'map_settings_form' => array('handler' => 'handleMapSettingsForm', 'args' => array(array("mapid", "int"))),
         'map_settings' => array('handler' => 'handleMapSettingsPage', 'args' => array(array("id", "int"))),
-        'save' => array('handler' => 'handleMapSettingsSave', 'args' => array(array("mapid", "int"), array("id", "int"), array("name", "non-empty-string"), array("value", "string"))),
+        'save' => array(
+            'handler' => 'handleMapSettingsSave',
+            'args' => array(
+                array("mapid", "int"),
+                array("id", "int"),
+                array("name", "non-empty-string"),
+                array("value", "string")
+            )
+        ),
 
-        'perms_add_user' => array('handler' => 'handlePermissionsAddUser', 'args' => array(array("mapid", "int"), array("userid", "int"))),
-        'perms_delete_user' => array('handler' => 'handlePermissionsDeleteUser', 'args' => array(array("mapid", "int"), array("userid", "int"))),
+        'perms_add_user' => array(
+            'handler' => 'handlePermissionsAddUser',
+            'args' => array(array("mapid", "int"), array("userid", "int"))
+        ),
+        'perms_delete_user' => array(
+            'handler' => 'handlePermissionsDeleteUser',
+            'args' => array(array("mapid", "int"), array("userid", "int"))
+        ),
         'perms_edit' => array('handler' => 'handlePermissionsPage', 'args' => array(array("id", "int"))),
 
         'delete_map' => array('handler' => 'handleDeleteMap', 'args' => array(array("id", "int"))),
@@ -49,8 +80,14 @@ class WeatherMapCactiManagementPlugin extends UIBase
         'addmap' => array('handler' => 'handleMapListAdd', 'args' => array(array("file", "mapfile"))),
         'addmap_picker' => array('handler' => 'handleMapPicker', 'args' => array(array("show_all", "bool", true))),
 
-        'move_map_up' => array('handler' => 'handleMapOrderUp', 'args' => array(array("id", "int"), array("order", "int"))),
-        'move_map_down' => array('handler' => 'handleMapOrderDown', 'args' => array(array("id", "int"), array("order", "int"))),
+        'move_map_up' => array(
+            'handler' => 'handleMapOrderUp',
+            'args' => array(array("id", "int"), array("order", "int"))
+        ),
+        'move_map_down' => array(
+            'handler' => 'handleMapOrderDown',
+            'args' => array(array("id", "int"), array("order", "int"))
+        ),
 
         'viewconfig' => array('handler' => 'handleViewConfig', 'args' => array(array("file", "mapfile"))),
 
@@ -66,9 +103,9 @@ class WeatherMapCactiManagementPlugin extends UIBase
     {
         parent::__construct();
 
-        $this->my_url = "SHOULD-BE-OVERRIDDEN";
-        $this->editor_url = "SHOULD-BE-OVERRIDDEN";
-        $this->cacti_config = $config;
+        $this->myURL = "SHOULD-BE-OVERRIDDEN";
+        $this->editorURL = "SHOULD-BE-OVERRIDDEN";
+        $this->cactiConfig = $config;
         $this->configPath = realpath(dirname(__FILE__) . '/../configs');
         $this->cactiBasePath = $config["base_path"];
         $this->manager = new MapManager(weathermap_get_pdo(), $this->configPath);
@@ -89,13 +126,13 @@ class WeatherMapCactiManagementPlugin extends UIBase
         }
     }
 
-    public function makeURL($params, $alt_url = "")
+    public function makeURL($params, $altURL = "")
     {
-        $base_url = $this->my_url;
-        if ($alt_url != "") {
-            $base_url = $alt_url;
+        $baseURL = $this->myURL;
+        if ($altURL != "") {
+            $baseURL = $altURL;
         }
-        $url = $base_url . (strpos($this->my_url, '?') === false ? '?' : '&');
+        $url = $baseURL . (strpos($this->myURL, '?') === false ? '?' : '&');
 
         $parts = array();
         foreach ($params as $name => $value) {
@@ -346,15 +383,22 @@ class WeatherMapCactiManagementPlugin extends UIBase
     {
         $this->cactiHeader();
 
-        html_start_box(__('Edit Map Groups'), '100%', '', '2', 'center', 'weathermap-cacti10-plugin-mgmt.php?action=group_form&id=0');
-        html_header(array(__('Actions'), __('Group Name'), __('Settings'), __('Sort Order')), 2);
+        \html_start_box(
+            __('Edit Map Groups'),
+            '100%',
+            '',
+            '2',
+            'center',
+            'weathermap-cacti10-plugin-mgmt.php?action=group_form&id=0'
+        );
+        \html_header(array(__('Actions'), __('Group Name'), __('Settings'), __('Sort Order')), 2);
 
         $groups = $this->manager->getGroups();
 
         if (is_array($groups)) {
-            if (sizeof($groups) > 0) {
+            if (count($groups) > 0) {
                 foreach ($groups as $group) {
-                    form_alternate_row();
+                    \form_alternate_row();
 
 
                     print '<td style="width:4%"><a class="hyperLink" href="';
@@ -364,9 +408,9 @@ class WeatherMapCactiManagementPlugin extends UIBase
 
                     print '<td>';
                     print "<a class='hyperLink' href='weathermap-cacti10-plugin-mgmt.php?action=map_settings&id=-" . $group->id . "'>";
-                    $setting_count = $this->manager->getMapSettingCount(0, $group->id);
-                    if ($setting_count > 0) {
-                        print sprintf(__n('%s special', '%s specials', $setting_count), $setting_count);
+                    $settingCount = $this->manager->getMapSettingCount(0, $group->id);
+                    if ($settingCount > 0) {
+                        print sprintf(__n('%s special', '%s specials', $settingCount), $settingCount);
                     } else {
                         print __('standard');
                     }
@@ -400,7 +444,7 @@ class WeatherMapCactiManagementPlugin extends UIBase
             }
         }
 
-        html_end_box();
+        \html_end_box();
 
         $this->cactiFooter();
     }
@@ -411,14 +455,14 @@ class WeatherMapCactiManagementPlugin extends UIBase
 
         $this->cactiHeader();
 
-        form_start('weathermap-cacti10-plugin-mgmt.php');
+        \form_start('weathermap-cacti10-plugin-mgmt.php');
 
         $groupName = '';
         // if id==0, it's an Add, otherwise it's an editor.
         if ($id == 0) {
-            html_start_box(__('Adding a Group...'), '100%', '', '2', 'center', '');
+            \html_start_box(__('Adding a Group...'), '100%', '', '2', 'center', '');
         } else {
-            html_start_box(__('Editing Group %s', $id), '100%', '', '2', 'center', '');
+            \html_start_box(__('Editing Group %s', $id), '100%', '', '2', 'center', '');
             $group = $this->manager->getGroup($id);
             $groupName = $group->name;
         }
@@ -436,9 +480,9 @@ class WeatherMapCactiManagementPlugin extends UIBase
             print "<td><input type='hidden' name='id' value='$id' /></td>\n";
         }
 
-        html_end_box();
+        \html_end_box();
 
-        form_end();
+        \form_end();
 
         $this->cactiFooter();
     }
@@ -452,9 +496,9 @@ class WeatherMapCactiManagementPlugin extends UIBase
         $title = $map->titlecache;
         $curgroup = $map->group_id;
 
-        form_start('weathermap-cacti10-plugin-mgmt.php', 'editme');
+        \form_start('weathermap-cacti10-plugin-mgmt.php', 'editme');
 
-        html_start_box(__('Edit map group for Weathermap %s: %s', $mapId, $title), '100%', '', '2', 'center', '');
+        \html_start_box(__('Edit map group for Weathermap %s: %s', $mapId, $title), '100%', '', '2', 'center', '');
 
         print "<td>" . __('Choose an existing Group:') . "&nbsp;<select name='new_group'>";
 
@@ -475,15 +519,15 @@ class WeatherMapCactiManagementPlugin extends UIBase
         print '<tr><td></td></tr>';
 
 
-        print "<tr><td><p>" . __('or create a new group in the <b><a href=\'%s\'>group management screen</a>', $this->makeURL(array('action'=>'groupadmin')));
+        print "<tr><td><p>" . __('or create a new group in the <b><a href=\'%s\'>group management screen</a>', $this->makeURL(array('action' => 'groupadmin')));
         print "</b></p></td></tr>";
 
         print "<tr><td><input type=hidden name='map_id' value='" . $mapId . "'></td></td>";
         print "<tr><td><input type=hidden name='action' value='chgroup_update'></td></td>";
 
-        html_end_box();
+        \html_end_box();
 
-        form_end();
+        \form_end();
 
         ?>
         <script type='text/javascript'>
@@ -510,7 +554,7 @@ class WeatherMapCactiManagementPlugin extends UIBase
     {
         if (isset($request['id']) && is_numeric($request['id'])) {
             $this->cactiHeader();
-            $this->map_settings(intval($request['id']));
+            $this->mapSettings(intval($request['id']));
             // wmGenerateFooterLinks();
             $this->footerLinks();
             $this->cactiFooter();
@@ -521,7 +565,7 @@ class WeatherMapCactiManagementPlugin extends UIBase
     {
         $this->cactiHeader();
         if (isset($request['id']) && is_numeric($request['id'])) {
-            $this->perms_list($request['id']);
+            $this->permissionsList($request['id']);
         } else {
             print "Something got lost back there.";
         }
@@ -531,7 +575,7 @@ class WeatherMapCactiManagementPlugin extends UIBase
     protected function handleViewConfig($request, $appObject)
     {
         $this->cactiHeader();
-        $this->preview_config($request['file']);
+        $this->previewConfig($request['file']);
         $this->cactiFooter();
     }
 
@@ -539,9 +583,9 @@ class WeatherMapCactiManagementPlugin extends UIBase
     {
         $this->cactiHeader();
         if (isset($request['show_all']) && $request['show_all'] == 1) {
-            $this->addmap_picker(true);
+            $this->addmapPicker(true);
         } else {
-            $this->addmap_picker(false);
+            $this->addmapPicker(false);
         }
         $this->cactiFooter();
     }
@@ -562,9 +606,9 @@ class WeatherMapCactiManagementPlugin extends UIBase
 
     // *****************************************************************************************
 
-    protected function maplist_warnings()
+    protected function maplistWarnings()
     {
-        if (!wm_module_checks()) {
+        if (!MapUtility::moduleChecks()) {
             print '<div align="center" class="wm_warning"><p>';
 
             print '<b>' . __('Required PHP extensions are not present in your mod_php/ISAPI PHP module. Please check your PHP setup to ensure you have the GD extension installed and enabled.') . '</b><p>';
@@ -583,28 +627,28 @@ class WeatherMapCactiManagementPlugin extends UIBase
             print '</p></div>';
         }
 
-        $boost_enabled = $this->manager->getAppSetting('boost_rrd_update_enable', 'off');
+        $boostEnabled = $this->manager->getAppSetting('boost_rrd_update_enable', 'off');
 
-        if ($boost_enabled == 'on') {
-            $has_global_poller_output = $this->manager->getMapSettingByName(0, 'rrd_use_poller_output', false);
+        if ($boostEnabled == 'on') {
+            $hasGlobalPollerOutput = $this->manager->getMapSettingByName(0, 'rrd_use_poller_output', false);
 
-            if (!$has_global_poller_output) {
+            if (!$hasGlobalPollerOutput) {
                 print '<div align="center" class="wm_warning"><p>';
                 print __('You are using the Boost plugin to update RRD files. Because this delays data being written to the files, it causes issues with Weathermap updates. You can resolve this by using Weathermap\'s \'poller_output\' support, which grabs data directly from the poller. <a href="%s">You can enable that globally by clicking here.</a>', $this->makeURL(array("action" => "enable_poller_output")));
                 print '</p></div>';
             }
         }
 
-        $last_started = $this->manager->getAppSetting('weathermap_last_started_file', true);
-        $last_finished = $this->manager->getAppSetting('weathermap_last_finished_file', true);
-        $last_start_time = intval($this->manager->getAppSetting('weathermap_last_start_time', true));
-        $last_finish_time = intval($this->manager->getAppSetting('weathermap_last_finish_time', true));
-        $poller_interval = intval($this->manager->getAppSetting('poller_interval'));
+        $lastStarted = $this->manager->getAppSetting('weathermap_last_started_file', true);
+        $lastFinished = $this->manager->getAppSetting('weathermap_last_finished_file', true);
+        $lastStartTime = intval($this->manager->getAppSetting('weathermap_last_start_time', true));
+        $lastFinishTime = intval($this->manager->getAppSetting('weathermap_last_finish_time', true));
+        $pollerInterval = intval($this->manager->getAppSetting('poller_interval'));
 
-        if (($last_finish_time - $last_start_time) > $poller_interval) {
-            if (($last_started != $last_finished) && ($last_started != '')) {
+        if (($lastFinishTime - $lastStartTime) > $pollerInterval) {
+            if (($lastStarted != $lastFinished) && ($lastStarted != '')) {
                 print '<div align="center" class="wm_warning"><p>';
-                print __('Last time it ran, Weathermap did NOT complete its run. It failed during processing for \'%s\'', $last_started);
+                print __('Last time it ran, Weathermap did NOT complete its run. It failed during processing for \'%s\'', $lastStarted);
                 print __('This <b>may</b> have affected other plugins that run during the poller process.') . '</p><p>';
                 print __('You should either disable this map, or fault-find. Possible causes include memory_limit issues. The log may have more information.');
                 print '</p></div>';
@@ -614,7 +658,7 @@ class WeatherMapCactiManagementPlugin extends UIBase
 
     protected function maplist()
     {
-        html_start_box(__('Weathermaps'), '100%', '', '3', 'center', $this->makeURL(array("action" => "addmap_picker")));
+        \html_start_box(__('Weathermaps'), '100%', '', '3', 'center', $this->makeURL(array("action" => "addmap_picker")));
 
         $headers = array(
             __('Config File'),
@@ -636,9 +680,9 @@ class WeatherMapCactiManagementPlugin extends UIBase
         $i = 0;
 
         $maps = $this->manager->getMapsWithGroups();
-        $had_warnings = 0;
+        $hadWarnings = 0;
 
-        html_header($headers, 2);
+        \html_header($headers, 2);
 
         if (is_array($maps)) {
             $this->cactiRowStart($i);
@@ -647,9 +691,9 @@ class WeatherMapCactiManagementPlugin extends UIBase
             print '<td></td>';
 
             print '<td><a class="hyperLink" href="' . $this->makeURL(array("action" => "map_settings", "id" => 0)) . '">';
-            $setting_count = $this->manager->getMapSettingCount(0, 0);
-            if ($setting_count > 0) {
-                print sprintf(__n('%d special', '%d specials', $setting_count), $setting_count);
+            $settingCount = $this->manager->getMapSettingCount(0, 0);
+            if ($settingCount > 0) {
+                print sprintf(__n('%d special', '%d specials', $settingCount), $settingCount);
             } else {
                 print __('standard');
             }
@@ -666,18 +710,18 @@ class WeatherMapCactiManagementPlugin extends UIBase
             foreach ($maps as $map) {
                 $this->cactiRowStart($i);
 
-                $editor_url = $this->makeURL(array("action" => "nothing", "mapname" => $map->configfile), $this->editor_url);
-                print '<td><a title="' . __('Click to start editor with this file') . '" href="' . $editor_url . '">' . htmlspecialchars($map->configfile) . '</a>';
+                $editURL = $this->makeURL(array("action" => "nothing", "mapname" => $map->configfile), $this->editorURL);
+                print '<td><a title="' . __('Click to start editor with this file') . '" href="' . $editURL . '">' . htmlspecialchars($map->configfile) . '</a>';
                 print '</td>';
 
                 print '<td>' . htmlspecialchars($map->titlecache) . '</td>';
-                print '<td><a class="hyperLink" title="' . __('Click to change group') . '" class="hyperLink" href="' . $this->makeURL(array("action" => "chgroup", "id" => $map->id)) . '">' . htmlspecialchars($map->groupname) . '</a></td>';
+                print '<td><a title="' . __('Click to change group') . '" class="hyperLink" href="' . $this->makeURL(array("action" => "chgroup", "id" => $map->id)) . '">' . htmlspecialchars($map->groupname) . '</a></td>';
 
 
                 print "<td>";
                 print sprintf("%.2gs", $map->runtime);
                 if ($map->warncount > 0) {
-                    $had_warnings++;
+                    $hadWarnings++;
                     print '<br><a href="../../utilities.php?tail_lines=500&message_type=2&action=view_logfile&filter=' . urlencode($map->configfile) . '" title="Check cacti.log for this map"><img border=0 src="cacti-resources/img/exclamation.png" title="' . $map->warncount . ' warnings last time this map was run. Check your logs.">' . $map->warncount . "</a>";
                 }
                 print "</td>";
@@ -690,9 +734,9 @@ class WeatherMapCactiManagementPlugin extends UIBase
                 print '<td>';
 
                 print '<a class="hyperLink" href="' . $this->makeURL(array("action" => "map_settings", "id" => $map->id)) . '">';
-                $setting_count = $this->manager->getMapSettingCount($map->id);
-                if ($setting_count > 0) {
-                    print sprintf(__n('%s special', '%s specials', $setting_count), $setting_count);
+                $settingCount = $this->manager->getMapSettingCount($map->id);
+                if ($settingCount > 0) {
+                    print sprintf(__n('%s special', '%s specials', $settingCount), $settingCount);
                 } else {
                     print __('standard');
                 }
@@ -737,17 +781,17 @@ class WeatherMapCactiManagementPlugin extends UIBase
             print '<tr><td colspan="4"><em>' . __('No Weathermaps Configured') . '</em></td></tr>';
         }
 
-        html_end_box();
+        \html_end_box();
 
-        $last_stats = $this->manager->getAppSetting('weathermap_last_stats', '');
+        $lastStats = $this->manager->getAppSetting('weathermap_last_stats', '');
 
-        if ($last_stats != '') {
-            print '<div align="center">' . __('Last Completed Run: %s', $last_stats) . '</div>';
+        if ($lastStats != '') {
+            print '<div align="center">' . __('Last Completed Run: %s', $lastStats) . '</div>';
         }
 
-        if ($had_warnings > 0) {
+        if ($hadWarnings > 0) {
             print '<div align="center" class="wm_warning">';
-            print sprintf(__n('%s of your maps had warnings last time it ran. You can try to find these in your Cacti log file or by clicking on the warning sign next to that map (you might need to increase the log line count)', '%s of your maps had warnings last time it ran. You can try to find these in your Cacti log file or by clicking on the warning sign next to that map (you might need to increase the log line count)', $had_warnings), $had_warnings);
+            print sprintf(__n('%s of your maps had warnings last time it ran. You can try to find these in your Cacti log file or by clicking on the warning sign next to that map (you might need to increase the log line count)', '%s of your maps had warnings last time it ran. You can try to find these in your Cacti log file or by clicking on the warning sign next to that map (you might need to increase the log line count)', $hadWarnings), $hadWarnings);
             print '</div>';
         }
 
@@ -760,19 +804,19 @@ class WeatherMapCactiManagementPlugin extends UIBase
     }
 
 
-    protected function preview_config($file)
+    protected function previewConfig($file)
     {
         chdir($this->configPath);
 
-        $path_parts = pathinfo($file);
-        $file_dir = realpath($path_parts['dirname']);
+        $pathParts = pathinfo($file);
+        $fileDirectory = realpath($pathParts['dirname']);
 
-        if ($file_dir != $this->configPath) {
+        if ($fileDirectory != $this->configPath) {
             // someone is trying to read arbitrary files?
             // print '$file_dir != $weathermap_confdir';
             print '<h3>' . __('Path mismatch') . '</h3>';
         } else {
-            html_start_box(__('Preview of %s', $file), '100%', '', '3', 'center', '');
+            \html_start_box(__('Preview of %s', $file), '100%', '', '3', 'center', '');
 
             print '<tr><td class="textArea">';
             print '<pre>';
@@ -790,31 +834,32 @@ class WeatherMapCactiManagementPlugin extends UIBase
 
             print '</pre>';
             print '</td></tr>';
-            html_end_box();
+            \html_end_box();
         }
     }
 
-    protected function addmap_picker($show_all = false)
+    protected function addmapPicker($showAllFiles = false)
     {
         $loaded = array();
         $flags = array();
+        $skipped = 0;
 
         // find out what maps are already in the database, so we can skip those
-        $existing_maps = $this->manager->getMaps();
-        if (is_array($existing_maps)) {
-            foreach ($existing_maps as $map) {
+        $existingMaps = $this->manager->getMaps();
+        if (is_array($existingMaps)) {
+            foreach ($existingMaps as $map) {
                 $loaded[] = $map->configfile;
             }
         }
 
-        html_start_box(__('Available Weathermap Configuration Files'), '100%', '', '1', 'center', '');
+        \html_start_box(__('Available Weathermap Configuration Files'), '100%', '', '1', 'center', '');
 
         if (is_dir($this->configPath)) {
             $dh = opendir($this->configPath);
             if ($dh) {
                 $i = 0;
                 $skipped = 0;
-                html_header(array('', '', __('Config File'), __('Title'), ''), 2);
+                \html_header(array('', '', __('Config File'), __('Title'), ''), 2);
 
                 while ($file = readdir($dh)) {
                     $realfile = $this->configPath . '/' . $file;
@@ -830,7 +875,7 @@ class WeatherMapCactiManagementPlugin extends UIBase
                         }
 
                         if (is_file($realfile)) {
-                            if ($used && !$show_all) {
+                            if ($used && !$showAllFiles) {
                                 $skipped++;
                             } else {
                                 $title = $this->manager->extractMapTitle($realfile);
@@ -877,18 +922,18 @@ class WeatherMapCactiManagementPlugin extends UIBase
             print '<tr><td>' . __('There is no directory named %s - you will need to create it, and set it to be readable by the webserver. If you want to upload configuration files from inside Cacti, then it should be <i>writable</i> by the webserver too.', $this->configPath) . '</td></tr>';
         }
 
-        html_end_box();
+        \html_end_box();
 
         if ($skipped > 0) {
             print '<p align="center">' . __('Some files are not shown because they have already been added. You can <a href="%s">show these files too</a>, if you need to.', $this->makeURL(array("action" => "addmap_picker", "show_all" => "1"))) . '</p>';
         }
 
-        if ($show_all) {
+        if ($showAllFiles) {
             print '<p align="center">' . __('Some files are shown even though they have already been added. You can <a href="%s">hide those files too</a>, if you need to.', $this->makeURL(array("action" => "addmap_picker"))) . '</p>';
         }
     }
 
-    function perms_list($id)
+    public function permissionsList($id)
     {
         $map = $this->manager->getMap($id);
         $title = $map->titlecache;
@@ -906,16 +951,16 @@ class WeatherMapCactiManagementPlugin extends UIBase
         }
 
         // now build the list of users that exist but aren't currently allowed (for the picklist)
-        $candidate_users = array();
+        $candidateUsers = array();
         foreach ($users as $uid => $user) {
             if (!in_array($uid, $mapuserids)) {
-                $candidate_users [] = $user;
+                $candidateUsers [] = $user;
             }
         }
 
-        html_start_box(__('Edit permissions for Weathermap %s: %s', $id, $title), '100%', '', '2', 'center', '');
+        \html_start_box(__('Edit permissions for Weathermap %s: %s', $id, $title), '100%', '', '2', 'center', '');
 
-        html_header(array(__('Username'), ''));
+        \html_header(array(__('Username'), ''));
 
         $n = 0;
         foreach ($mapuserids as $user) {
@@ -923,7 +968,14 @@ class WeatherMapCactiManagementPlugin extends UIBase
             print '<td>' . htmlspecialchars($users[$user]->username) . '</td>';
 
             print '<td>';
-            print '<a href="' . $this->makeURL(array("action" => "perms_delete_user", "mapid" => $id, "userid" => $user, "header" => "false")) . '">';
+            print '<a href="' . $this->makeURL(
+                array(
+                    "action" => "perms_delete_user",
+                    "mapid" => $id,
+                    "userid" => $user,
+                    "header" => "false"
+                )
+            ) . '">';
             print '<img src="../../images/delete_icon.gif" width="10" height="10" border="0" alt="' . __('Remove permissions for this user to see this map') . '">';
             print '</a></td>';
 
@@ -931,21 +983,21 @@ class WeatherMapCactiManagementPlugin extends UIBase
             $n++;
         }
 
-        if (sizeof($mapuserids) == 0) {
+        if (count($mapuserids) == 0) {
             print '<tr><td><em>' . __('nobody can see this map') . '</em></td></tr>';
         }
 
-        html_end_box();
+        \html_end_box();
 
-        html_start_box('', '100%', '', '3', 'center', '');
+        \html_start_box('', '100%', '', '3', 'center', '');
 
         print '<tr>';
 
-        if (sizeof($candidate_users) == 0) {
+        if (count($candidateUsers) == 0) {
             print '<td><em>' . __('There aren\'t any users left to add!') . '</em></td></tr>';
         } else {
             print '<td><form action="">' . __('Allow') . ' <input type="hidden" name="action" value="perms_add_user"><input type="hidden" name="mapid" value="' . $id . '"><select name="userid">';
-            foreach ($candidate_users as $user) {
+            foreach ($candidateUsers as $user) {
                 printf('<option value="%s">%s</option>', $user->id, $user->username);
             }
 
@@ -953,11 +1005,11 @@ class WeatherMapCactiManagementPlugin extends UIBase
             print '</tr>';
         }
 
-        html_end_box();
+        \html_end_box();
     }
 
 
-    function map_settings($id)
+    public function mapSettings($id)
     {
         if ($id == 0) {
             $title = __('Additional settings for ALL maps');
@@ -974,7 +1026,7 @@ class WeatherMapCactiManagementPlugin extends UIBase
             $settingrows = $this->manager->getMapSettings(-$group_id);
 
             print '<p>' . __('All maps in this group are also affected by the following GLOBAL settings (group overrides global, map overrides group, but BOTH override SET commands within the map config file):') . '</p>';
-            $this->map_readonly_settings(0, __('Global Settings'));
+            $this->mapReadOnlySettings(0, __('Global Settings'));
         } else {
             $map = $this->manager->getMap($id);
             $group = $this->manager->getGroup($map->group_id);
@@ -986,16 +1038,23 @@ class WeatherMapCactiManagementPlugin extends UIBase
 
             print '<p>' . __('This map is also affected by the following GLOBAL and GROUP settings (group overrides global, map overrides group, but BOTH override SET commands within the map config file):') . '</p>';
 
-            $this->map_readonly_settings(0, __('Global Settings'));
-            $this->map_readonly_settings(-$map->group_id, __('Group Settings (%s)', htmlspecialchars($group->name)));
+            $this->mapReadOnlySettings(0, __('Global Settings'));
+            $this->mapReadOnlySettings(-$map->group_id, __('Group Settings (%s)', htmlspecialchars($group->name)));
         }
 
-        html_start_box($title, '100%', '', '2', 'center', 'weathermap-cacti10-plugin-mgmt.php?action=map_settings_form&mapid=' . intval($id));
-        html_header(array(__('Actions'), __('Name'), __('Value')), 2);
+        \html_start_box(
+            $title,
+            '100%',
+            '',
+            '2',
+            'center',
+            'weathermap-cacti10-plugin-mgmt.php?action=map_settings_form&mapid=' . intval($id)
+        );
+        \html_header(array(__('Actions'), __('Name'), __('Value')), 2);
 
         $n = 0;
         if (is_array($settingrows)) {
-            if (sizeof($settingrows) > 0) {
+            if (count($settingrows) > 0) {
                 foreach ($settingrows as $setting) {
                     $this->cactiRowStart($n);
 
@@ -1013,7 +1072,7 @@ class WeatherMapCactiManagementPlugin extends UIBase
             }
         }
 
-        html_end_box();
+        \html_end_box();
 
         print '<div align=center>';
 
@@ -1028,7 +1087,7 @@ class WeatherMapCactiManagementPlugin extends UIBase
         print '</div>';
     }
 
-    function map_readonly_settings($id, $title = '')
+    public function mapReadOnlySettings($id, $title = '')
     {
         if ($title == '') {
             $title = __('Settings');
@@ -1046,11 +1105,11 @@ class WeatherMapCactiManagementPlugin extends UIBase
             $settings = $this->manager->getMapSettings(intval($id));
         }
 
-        html_start_box($title, '100%', '', '2', 'center', '');
-        html_header(array(__('Name'), __('Value')));
+        \html_start_box($title, '100%', '', '2', 'center', '');
+        \html_header(array(__('Name'), __('Value')));
 
         $n = 0;
-        if (sizeof($settings) > 0) {
+        if (count($settings) > 0) {
             foreach ($settings as $setting) {
                 $this->cactiRowStart($n);
                 print '<td>' . htmlspecialchars($setting->optname) . '</td>';
@@ -1064,7 +1123,7 @@ class WeatherMapCactiManagementPlugin extends UIBase
             print '</tr>';
         }
 
-        html_end_box();
+        \html_end_box();
     }
 
     public function cactiFooter()
@@ -1087,11 +1146,14 @@ class WeatherMapCactiManagementPlugin extends UIBase
 
         $html .= '<a class="linkOverDark" href="docs/">Local Documentation</a>';
         $html .= ' -- <a class="linkOverDark" href="http://www.network-weathermap.com/">Weathermap Website</a>';
-        $html .= ' -- <a class="linkOverDark" href="' . $this->makeURL(array(), $this->editor_url) . '">Weathermap Editor</a>';
-        $html .= " -- This is version ". WEATHERMAP_VERSION;
+        $html .= ' -- <a class="linkOverDark" href="' . $this->makeURL(
+            array(),
+            $this->editorURL
+        ) . '">Weathermap Editor</a>';
+        $html .= " -- This is version " . WEATHERMAP_VERSION;
 
         print "<br />";
-        html_start_box($html, '78%', '', '4', 'center', '');
-        html_end_box();
+        \html_start_box($html, '78%', '', '4', 'center', '');
+        \html_end_box();
     }
 }

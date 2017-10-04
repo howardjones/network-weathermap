@@ -14,6 +14,11 @@
 
     <listeners>
         <listener class="JohnKary\PHPUnit\Listener\SpeedTrapListener" />
+        <listener class="PHPUnit\Runner\CleverAndSmart\TestListener">
+            <arguments>
+                <object class="PHPUnit\Runner\CleverAndSmart\Storage\Sqlite3Storage"/>
+            </arguments>
+        </listener>
     </listeners>
 
     <testsuites>

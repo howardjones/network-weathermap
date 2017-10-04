@@ -32,7 +32,7 @@ class HTMLImagemapAreaCircle extends HTMLImagemapArea
         return $radius2 <= $radius1;
     }
 
-    public function __construct($name = '', $href = '', $coords)
+    public function __construct($coords, $name = '', $href = '')
     {
         $c = $coords[0];
 

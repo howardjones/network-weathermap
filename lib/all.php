@@ -18,4 +18,4 @@ error_reporting(E_ALL | E_STRICT);
 // error_reporting(E_ALL);
 // error_reporting(E_ALL & ~E_STRICT);
 
-$wm_debug_logger = WMDebugFactory::create();
+$wmDebugLogger = WMDebugFactory::create();

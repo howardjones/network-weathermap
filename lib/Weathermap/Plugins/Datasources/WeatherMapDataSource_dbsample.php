@@ -59,7 +59,7 @@ class WeatherMapDataSource_dbsample extends DatasourceBase
                 $pdo = new PDO("mysql:host=$databaseHostname;dbname=$databaseName", $databaseUser, $databasePassword);
                 $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
             } catch (PDOException $e) {
-                MapUtility::wm_warn($e->getMessage());
+                MapUtility::warn($e->getMessage());
             }
 
             if ($pdo) {
@@ -67,7 +67,7 @@ class WeatherMapDataSource_dbsample extends DatasourceBase
                 $result = $statement->execute(array($matches[1]));
 
                 if (!$result) {
-                    MapUtility::wm_warn("dbsample ReadData: Invalid query: " . $pdo->errorCode() . "\n");
+                    MapUtility::warn("dbsample ReadData: Invalid query: " . $pdo->errorCode() . "\n");
                 } else {
                     $row = $statement->fetch(PDO::FETCH_ASSOC);
                     $this->data[IN] = $row['infield'];

@@ -43,24 +43,22 @@ class MapBase
 
     public function addNote($name, $value)
     {
-        MapUtility::wm_debug("Adding note $name='$value' to " . $this->name . "\n");
+        MapUtility::debug("Adding note $name='$value' to " . $this->name . "\n");
         $this->notes[$name] = $value;
     }
 
     public function getNote($name, $default = null)
     {
         if (isset($this->notes[$name])) {
-            //	debug("Found note $name in ".$this->name." with value of ".$this->notes[$name].".\n");
             return $this->notes[$name];
-        } else {
-            //	debug("Looked for note $name in ".$this->name." which doesn't exist.\n");
-            return $default;
         }
+
+        return $default;
     }
 
     public function addHint($name, $value)
     {
-        MapUtility::wm_debug("Adding hint $name='$value' to " . $this->name . "\n");
+        MapUtility::debug("Adding hint $name='$value' to " . $this->name . "\n");
         $this->hints[$name] = $value;
         # warn("Adding hint $name to ".$this->my_type()."/".$this->name."\n");
     }
@@ -68,12 +66,10 @@ class MapBase
     public function getHint($name, $default = null)
     {
         if (isset($this->hints[$name])) {
-            //	debug("Found hint $name in ".$this->name." with value of ".$this->hints[$name].".\n");
             return $this->hints[$name];
-        } else {
-            //	debug("Looked for hint $name in ".$this->name." which doesn't exist.\n");
-            return $default;
         }
+
+        return $default;
     }
 
     public function deleteHint($name)
@@ -87,10 +83,10 @@ class MapBase
     }
 
     /**
-     * @param MapBase $dd
+     * @param MapBase $comparison
      * @return string
      */
-    public function getHintConfig($dd)
+    public function getHintConfig($comparison)
     {
         $output = '';
         foreach ($this->hints as $hintName => $hint) {
@@ -98,11 +94,11 @@ class MapBase
             // only changed ones, or unique ones, otherwise
             if (($this->name == 'DEFAULT')
                 ||
-                (isset($dd->hints[$hintName])
+                (isset($comparison->hints[$hintName])
                     &&
-                    $dd->hints[$hintName] != $hint)
+                    $comparison->hints[$hintName] != $hint)
                 ||
-                (!isset($dd->hints[$hintName]))
+                (!isset($comparison->hints[$hintName]))
             ) {
                 $output .= "\tSET $hintName $hint\n";
             }
@@ -123,23 +119,25 @@ class MapBase
     {
         if (isset($this->config[$keyname])) {
             return array($this->config[$keyname], self::CONF_FOUND_DIRECT);
-        } else {
-            if (!is_null($this->parent)) {
-                list($value, $direct) = $this->parent->getConfig($keyname);
-                if ($direct != self::CONF_NOT_FOUND) {
-                    $direct = self::CONF_FOUND_INHERITED;
-                }
-            } else {
-                $value = null;
-                $direct = self::CONF_NOT_FOUND;
-            }
-
-            // if we got to the top of the tree without finding it, that's probably a typo in the original getConfig()
-            if (is_null($value) && is_null($this->parent)) {
-                MapUtility::wm_warn("Tried to get config keyword '$keyname' with no result. [WMWARN300]");
-            }
-            return array($value, $direct);
         }
+
+        if (!is_null($this->parent)) {
+            list($value, $direct) = $this->parent->getConfig($keyname);
+            if ($direct != self::CONF_NOT_FOUND) {
+                $direct = self::CONF_FOUND_INHERITED;
+            }
+        } else {
+            $value = null;
+            $direct = self::CONF_NOT_FOUND;
+        }
+
+        // if we got to the top of the tree without finding it, that's probably a typo in the original getConfig()
+        if (is_null($value) && is_null($this->parent)) {
+            MapUtility::warn("Tried to get config keyword '$keyname' with no result. [WMWARN300]");
+        }
+
+        return array($value, $direct);
+
     }
 
     public function getConfigValueWithoutInheritance($keyname)
@@ -158,7 +156,7 @@ class MapBase
      */
     public function setConfigValue($keyname, $value, $recalculate = false)
     {
-        MapUtility::wm_debug("Settings config %s = %s\n", $keyname, $value);
+        MapUtility::debug("Settings config %s = %s\n", $keyname, $value);
         if (is_null($value)) {
             unset($this->config[$keyname]);
         } else {
@@ -188,7 +186,7 @@ class MapBase
 
     public function addConfigValue($keyname, $value, $recalculate = false)
     {
-        MapUtility::wm_debug("Appending config %s = %s\n", $keyname, $value);
+        MapUtility::debug("Appending config %s = %s\n", $keyname, $value);
         if (is_null($this->config[$keyname])) {
             // create a new array, with this as the only item
             $this->config[$keyname] = array($value);

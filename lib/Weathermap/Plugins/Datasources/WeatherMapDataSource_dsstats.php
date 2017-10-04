@@ -27,30 +27,30 @@ class WeatherMapDataSource_dsstats extends DatasourceBase
     {
         if ($map->context == 'cacti') {
             if (!function_exists('db_fetch_assoc')) {
-                MapUtility::wm_debug("ReadData DSStats: Cacti database library not found. [DSSTATS001]\n");
+                MapUtility::debug("ReadData DSStats: Cacti database library not found. [DSSTATS001]\n");
                 return false;
             }
 
             $dsstatsRunning = false;
 
-            MapUtility::wm_debug("ReadData DSStats: Checking for 1.x integrated...\n");
+            MapUtility::debug("ReadData DSStats: Checking for 1.x integrated...\n");
             if (function_exists("read_config_option")) {
                 if (read_config_option("dsstats_enable") == "on") {
                     $dsstatsRunning = true;
-                    MapUtility::wm_debug("ReadData DSStats: Found 1.x integrated DSStats\n");
+                    MapUtility::debug("ReadData DSStats: Found 1.x integrated DSStats\n");
                 } else {
-                    MapUtility::wm_debug("ReadData DSStats: No 1.x integrated DSStats\n");
+                    MapUtility::debug("ReadData DSStats: No 1.x integrated DSStats\n");
                 }
             }
 
             if (!$dsstatsRunning) {
-                MapUtility::wm_debug("ReadData DSStats: Checking for 0.8.8 plugin...\n");
+                MapUtility::debug("ReadData DSStats: Checking for 0.8.8 plugin...\n");
                 if (function_exists("api_plugin_is_enabled")) {
                     if (api_plugin_is_enabled('dsstats')) {
-                        MapUtility::wm_debug("ReadData DSStats: DSStats plugin enabled. [DSSTATS002B]\n");
+                        MapUtility::debug("ReadData DSStats: DSStats plugin enabled. [DSSTATS002B]\n");
                         $dsstatsRunning = true;
                     } else {
-                        MapUtility::wm_debug("ReadData DSStats: DSStats plugin NOT enabled. [DSSTATS002B]\n");
+                        MapUtility::debug("ReadData DSStats: DSStats plugin NOT enabled. [DSSTATS002B]\n");
                     }
                 }
             }
@@ -70,7 +70,7 @@ class WeatherMapDataSource_dsstats extends DatasourceBase
             }
 
             if (!in_array('data_source_stats_hourly_last', $tables)) {
-                MapUtility::wm_debug('ReadData DSStats: data_source_stats_hourly_last database table not found. [DSSTATS003]\n');
+                MapUtility::debug('ReadData DSStats: data_source_stats_hourly_last database table not found. [DSSTATS003]\n');
                 return false;
             }
 
@@ -120,7 +120,7 @@ class WeatherMapDataSource_dsstats extends DatasourceBase
 
             if ($map->getHint("dsstats_default_type") != '') {
                 $datatype = $map->getHint("dsstats_default_type");
-                MapUtility::wm_debug("Default datatype changed to " . $datatype . ".\n");
+                MapUtility::debug("Default datatype changed to " . $datatype . ".\n");
             }
         } elseif (preg_match('/^dsstats:([a-z]+):(\d+):([\-a-zA-Z0-9_]+):([\-a-zA-Z0-9_]+)$/', $targetstring, $matches)) {
             $dsNames[IN] = $matches[3];
@@ -188,7 +188,7 @@ class WeatherMapDataSource_dsstats extends DatasourceBase
             }
 
             if ($datatype == 'wm' && ($this->data[IN] == null || $this->data[OUT] == null)) {
-                MapUtility::wm_debug("Didn't get data for 'wm' source. Inserting new tasks for next poller cycle\n");
+                MapUtility::debug("Didn't get data for 'wm' source. Inserting new tasks for next poller cycle\n");
                 // insert the required details into weathermap_data, so it will be picked up next time
                 $SQL = sprintf(
                     "select data_template_data.data_source_path as path from data_template_data,data_template_rrd where data_template_data.local_data_id=data_template_rrd.local_data_id and data_template_rrd.local_data_id=%d",
@@ -197,7 +197,7 @@ class WeatherMapDataSource_dsstats extends DatasourceBase
                 $result = \db_fetch_row($SQL);
                 if (count($result) > 0) {
                     $databaseRRDName = $result['path'];
-                    MapUtility::wm_debug("Filename is $databaseRRDName");
+                    MapUtility::debug("Filename is $databaseRRDName");
                     foreach (array(IN, OUT) as $dir) {
                         if ($this->data[$dir] === null) {
                             $statement = $pdo->prepare("insert into weathermap_data (rrdfile, data_source_name, sequence, local_data_id) values (?,?,?,?)");
@@ -205,7 +205,7 @@ class WeatherMapDataSource_dsstats extends DatasourceBase
                         }
                     }
                 } else {
-                    MapUtility::wm_warn("DSStats ReadData: Failed to find a filename for DS id $localDataId [WMDSTATS01]");
+                    MapUtility::warn("DSStats ReadData: Failed to find a filename for DS id $localDataId [WMDSTATS01]");
                 }
             }
         }

@@ -101,7 +101,7 @@ class TestSupport
             $map->imagefile = $imageFileName;
 
             if ($htmlFileName != '') {
-                MapUtility::TestOutput_HTML($htmlFileName, $map);
+                MapUtility::outputTestHTML($htmlFileName, $map);
             }
             if ($newConfigFileName != '') {
                 $map->writeConfig($newConfigFileName);

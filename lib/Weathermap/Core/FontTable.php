@@ -53,7 +53,7 @@ class FontTable
     public function getFont($fontNumber)
     {
         if (!$this->isValid($fontNumber)) {
-            MapUtility::wm_warn("Using a non-existent special font ($fontNumber) - falling back to internal GD fonts [WMWARN36]\n");
+            MapUtility::warn("Using a non-existent special font ($fontNumber) - falling back to internal GD fonts [WMWARN36]\n");
             return $this->getFont(5);
         }
 

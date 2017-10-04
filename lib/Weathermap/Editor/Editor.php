@@ -738,7 +738,7 @@ class Editor
 
         // draw a map and throw it away, to calculate all the bounding boxes
         $this->map->drawMap('null');
-        $this->_retidyLinks(true);
+        $this->doRetidyLinks(true);
     }
 
     /**
@@ -748,7 +748,7 @@ class Editor
      * @param boolean $ignoreTidied
      * @throws WeathermapInternalFail
      */
-    private function _retidyLinks($ignoreTidied = false)
+    private function doRetidyLinks($ignoreTidied = false)
     {
         if (!$this->isLoaded()) {
             throw new WeathermapInternalFail("Map must be loaded before editing API called.");
@@ -785,7 +785,7 @@ class Editor
 //                        $done[$route] = 1;
             } else {
                 # handle multi-links specially...
-                $this->_tidy_links($linkList);
+                $this->doTidyLinks($linkList);
 //                        $this->_tidy_links($routes[$route]);
                 // mark it so we don't do it again when the other links come by
 //                        $done[$route] = 1;
@@ -817,7 +817,7 @@ class Editor
      * @param bool $ignoreTidied - whether to take notice of the "_tidied" hint
      *
      */
-    public function _tidy_links($links, $ignoreTidied = false)
+    public function doTidyLinks($links, $ignoreTidied = false)
     {
         // not very efficient, but it saves looking for special cases (a->b & b->a together)
         $nTargets = count($links);
@@ -837,7 +837,7 @@ class Editor
 
         // draw a map and throw it away, to calculate all the bounding boxes
         $this->map->drawMap('null');
-        $this->_retidyLinks(false);
+        $this->doRetidyLinks(false);
     }
 
     public function retidyLinks()
@@ -848,7 +848,7 @@ class Editor
 
         // draw a map and throw it away, to calculate all the bounding boxes
         $this->map->drawMap('null');
-        $this->_retidyLinks();
+        $this->doRetidyLinks();
     }
 
     /**

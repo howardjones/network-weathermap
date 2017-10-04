@@ -31,7 +31,7 @@ class Vector
     {
         if ($this->dx == 0) {
             // special case - if slope is infinite, fudge it to be REALLY BIG instead. Close enough for TV.
-            MapUtility::wm_debug("Slope is infinite.\n");
+            MapUtility::debug("Slope is infinite.\n");
             return 1e10;
         }
         return $this->dy / $this->dx;

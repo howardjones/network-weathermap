@@ -11,7 +11,7 @@ class WeatherMapPreProcessorExample extends PreProcessorBase
     public function run()
     {
         $this->owner->addNote('test', 'TEST!');
-        MapUtility::wm_debug("Example Preprocessor in the hizouse\n");
+        MapUtility::debug("Example Preprocessor in the hizouse\n");
     }
 }
 

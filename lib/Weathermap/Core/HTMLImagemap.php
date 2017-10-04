@@ -1,4 +1,5 @@
 <?php
+
 namespace Weathermap\Core;
 
 // Copyright Howard Jones, 2005 howie@thingy.com
@@ -41,7 +42,7 @@ class HTMLImagemap
         } else {
             $args = func_get_args();
             $className = 'Weathermap\Core\HTMLImagemapArea' . $element;
-            $elementObject = new $className($args[1], $args[2], array_slice($args, 3));
+            $elementObject = new $className(array_slice($args, 3), $args[1], $args[2]);
         }
 
         $this->shapes[$elementObject->name] = &$elementObject;

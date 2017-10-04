@@ -13,12 +13,12 @@ class WeatherMapCacti10UserPlugin extends WeatherMapCactiUserPlugin
     {
         parent::__construct($config, $imageformat);
 
-        $this->my_url = "weathermap-cacti10-plugin.php";
-        $this->editor_url = "weathermap-cacti10-plugin-editor.php";
-        $this->management_url = "weathermap-cacti10-plugin-mgmt.php";
+        $this->myURL = "weathermap-cacti10-plugin.php";
+        $this->editorURL = "weathermap-cacti10-plugin-editor.php";
+        $this->managementURL = "weathermap-cacti10-plugin-mgmt.php";
 
-        $this->management_realm = "weathermap-cacti10-plugin-mgmt.php";
-        $this->editor_realm = "weathermap-cacti10-plugin-editor.php";
+        $this->managementRealm = "weathermap-cacti10-plugin-mgmt.php";
+        $this->editorRealm = "weathermap-cacti10-plugin-editor.php";
     }
 
     public function cactiHeader()

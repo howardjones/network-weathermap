@@ -1,16 +1,16 @@
 <?php
 
-function weathermap_poller_output($rrd_update_array)
+function weathermap_poller_output($rrdUpdateArray)
 {
     global $config;
 
     $pdo = weathermap_get_pdo();
 
-    $weathermap_data_update = $pdo->prepare("UPDATE weathermap_data SET last_time=?, last_calc=?, last_value=?,sequence=sequence+1  where id = ?");
+    $dataUpdateSQL = $pdo->prepare("UPDATE weathermap_data SET last_time=?, last_calc=?, last_value=?,sequence=sequence+1  where id = ?");
 
-    $log_verbosity = read_config_option("log_verbosity");
+    $logVerbosity = read_config_option("log_verbosity");
 
-    if ($log_verbosity >= POLLER_VERBOSITY_DEBUG) {
+    if ($logVerbosity >= POLLER_VERBOSITY_DEBUG) {
         cacti_log("WM poller_output: STARTING\n", true, "WEATHERMAP");
     }
 
@@ -32,42 +32,42 @@ function weathermap_poller_output($rrd_update_array)
 
     $requiredlist = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-    $path_rra = $config["rra_path"];
+    $pathRRA = $config["rra_path"];
 
     # especially on Windows, it seems that filenames are not reliable (sometimes \ and sometimes / even though path_rra is always /) .
     # let's make an index from local_data_id to filename, and then use local_data_id as the key...
     $knownfiles = array();
 
-    foreach (array_keys($rrd_update_array) as $key) {
-        if (isset($rrd_update_array[$key]['times']) && is_array($rrd_update_array[$key]['times'])) {
-            $knownfiles[$rrd_update_array[$key]["local_data_id"]] = $key;
+    foreach (array_keys($rrdUpdateArray) as $key) {
+        if (isset($rrdUpdateArray[$key]['times']) && is_array($rrdUpdateArray[$key]['times'])) {
+            $knownfiles[$rrdUpdateArray[$key]["local_data_id"]] = $key;
         }
     }
 
     foreach ($requiredlist as $required) {
-        $file = str_replace("<path_rra>", $path_rra, $required['data_source_path']);
+        $file = str_replace("<path_rra>", $pathRRA, $required['data_source_path']);
         $dsname = $required['data_source_name'];
-        $local_data_id = $required['local_data_id'];
+        $localDataID = $required['local_data_id'];
 
-        if (isset($knownfiles[$local_data_id])) {
-            $file2 = $knownfiles[$local_data_id];
+        if (isset($knownfiles[$localDataID])) {
+            $file2 = $knownfiles[$localDataID];
             if ($file2 != '') {
                 $file = $file2;
             }
         }
 
-        if ($log_verbosity >= POLLER_VERBOSITY_DEBUG) {
+        if ($logVerbosity >= POLLER_VERBOSITY_DEBUG) {
             cacti_log(
-                "WM poller_output: Looking for $file ($local_data_id) (" . $required['data_source_path'] . ")\n",
+                "WM poller_output: Looking for $file ($localDataID) (" . $required['data_source_path'] . ")\n",
                 true,
                 "WEATHERMAP"
             );
         }
 
-        if (isset($rrd_update_array[$file]) && is_array($rrd_update_array[$file]) && isset($rrd_update_array[$file]['times']) && is_array($rrd_update_array[$file]['times']) && isset($rrd_update_array{$file}['times'][key($rrd_update_array[$file]['times'])]{$dsname})) {
-            $value = $rrd_update_array{$file}['times'][key($rrd_update_array[$file]['times'])]{$dsname};
-            $time = key($rrd_update_array[$file]['times']);
-            if ($log_verbosity >= POLLER_VERBOSITY_MEDIUM) {
+        if (isset($rrdUpdateArray[$file]) && is_array($rrdUpdateArray[$file]) && isset($rrdUpdateArray[$file]['times']) && is_array($rrdUpdateArray[$file]['times']) && isset($rrdUpdateArray{$file}['times'][key($rrdUpdateArray[$file]['times'])]{$dsname})) {
+            $value = $rrdUpdateArray{$file}['times'][key($rrdUpdateArray[$file]['times'])]{$dsname};
+            $time = key($rrdUpdateArray[$file]['times']);
+            if ($logVerbosity >= POLLER_VERBOSITY_MEDIUM) {
                 cacti_log("WM poller_output: Got one! $file:$dsname -> $time $value\n", true, "WEATHERMAP");
             }
 
@@ -122,8 +122,8 @@ function weathermap_poller_output($rrd_update_array)
 
             // db_execute("UPDATE weathermap_data SET last_time=$newtime, last_calc='$newvalue', last_value='$newlastvalue',sequence=sequence+1  where id = " . $required['id']);
 
-            $weathermap_data_update->execute(array($newtime, $newvalue, $newlastvalue, $required['id']));
-            if ($log_verbosity >= POLLER_VERBOSITY_DEBUG) {
+            $dataUpdateSQL->execute(array($newtime, $newvalue, $newlastvalue, $required['id']));
+            if ($logVerbosity >= POLLER_VERBOSITY_DEBUG) {
                 cacti_log(
                     "WM poller_output: Final value is $newvalue (was $lastval, period was $period)\n",
                     true,
@@ -133,11 +133,11 @@ function weathermap_poller_output($rrd_update_array)
         }
     }
 
-    if ($log_verbosity >= POLLER_VERBOSITY_DEBUG) {
+    if ($logVerbosity >= POLLER_VERBOSITY_DEBUG) {
         cacti_log("WM poller_output: ENDING\n", true, "WEATHERMAP");
     }
 
-    return $rrd_update_array;
+    return $rrdUpdateArray;
 }
 
 function weathermap_poller_bottom()

@@ -94,7 +94,7 @@ class Spine
             }
         }
 
-        MapUtility::wm_debug("Skipped $skip points of $maxStartIndex\n");
+        MapUtility::debug("Skipped $skip points of $maxStartIndex\n");
 
         $output->addPoint($this->elements[$maxStartIndex + 1]->point);
 
@@ -208,7 +208,9 @@ class Spine
         }
 
         // if the distance is zero, there's no need to search (and it doesn't work anyway)
-        if ($targetDistance == 0) {
+        // if it's a point before the start of the line, then just return the start of the line
+        // Weathermap should *never* ask for this, anyway, either
+        if ($targetDistance <= 0) {
             return $left;
         }
 
@@ -216,12 +218,6 @@ class Spine
         // Weathermap should *never* ask for this, anyway
         if ($this->elements[$right]->distance < $targetDistance) {
             return $right;
-        }
-
-        // if it's a point before the start of the line, then just return the start of the line
-        // Weathermap should *never* ask for this, anyway, either
-        if ($targetDistance < 0) {
-            return $left;
         }
 
         // if somehow we have a 0-length curve, then don't try and search, just give up
@@ -282,8 +278,8 @@ class Spine
     {
         list($halfwayPoint, $halfwayIndex) = $this->findPointAtDistance($splitDistance);
 
-        MapUtility::wm_debug($this . "\n");
-        MapUtility::wm_debug("Halfway split (%d) is at index %d %s\n", $splitDistance, $halfwayIndex, $halfwayPoint);
+        MapUtility::debug($this . "\n");
+        MapUtility::debug("Halfway split (%d) is at index %d %s\n", $splitDistance, $halfwayIndex, $halfwayPoint);
 
         list($spine1, $spine2) = $this->split($halfwayIndex);
 
@@ -291,8 +287,8 @@ class Spine
         $spine1->addRawElement(new SpineElement($halfwayPoint, $splitDistance));
         $spine2->addRawElement(new SpineElement($halfwayPoint, $this->totalDistance() - $splitDistance));
 
-        MapUtility::wm_debug($spine1 . "\n");
-        MapUtility::wm_debug($spine2 . "\n");
+        MapUtility::debug($spine1 . "\n");
+        MapUtility::debug($spine2 . "\n");
 
         return array($spine1, $spine2);
     }

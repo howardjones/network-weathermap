@@ -166,7 +166,7 @@ class UIBase
 
         foreach ($this->types as $type => $validator) {
             if (!method_exists($this, $validator)) {
-                MapUtility::wm_warn("$type has a missing validator ($validator)");
+                MapUtility::warn("$type has a missing validator ($validator)");
                 $result = false;
             }
         }
@@ -174,18 +174,18 @@ class UIBase
         foreach ($this->commands as $command => $detail) {
             if (!isset($detail['handler'])) {
                 $result = false;
-                MapUtility::wm_warn("$command doesn't specify handler");
+                MapUtility::warn("$command doesn't specify handler");
             } else {
                 $handler = $detail['handler'];
                 if (!method_exists($this, $handler)) {
-                    MapUtility::wm_warn("$command has a missing handler ($handler)");
+                    MapUtility::warn("$command has a missing handler ($handler)");
                     $result = false;
                 }
             }
             foreach ($detail['args'] as $spec) {
                 $type = $spec[1];
                 if (!array_key_exists($type, $this->types)) {
-                    MapUtility::wm_warn("$command uses type $type which isn't defined");
+                    MapUtility::warn("$command uses type $type which isn't defined");
                     $result = false;
                 }
             }

@@ -233,7 +233,7 @@ class Map extends MapBase
         $this->scales['DEFAULT'] = new MapScale('DEFAULT', $this);
         $this->populateDefaultColours();
 
-        MapUtility::wm_debug("WeatherMap class Reset() complete\n");
+        MapUtility::debug("WeatherMap class Reset() complete\n");
     }
 
     // Simple accessors to stop the editor from reaching inside objects quite so much
@@ -277,14 +277,14 @@ class Map extends MapBase
         if (isset($this->scales[$name])) {
             return $this->scales[$name];
         }
-        MapUtility::wm_warn("Scale $name doesn't exist. Returning DEFAULT");
+        MapUtility::warn("Scale $name doesn't exist. Returning DEFAULT");
         return $this->scales['DEFAULT'];
     }
 
 
     private function populateDefaultColours()
     {
-        MapUtility::wm_debug("Adding default map colour set.\n");
+        MapUtility::debug("Adding default map colour set.\n");
         $defaults = array(
             'KEYTEXT' => array('bottom' => -2, 'top' => -1, 'red' => 0, 'green' => 0, 'blue' => 0),
             'KEYOUTLINE' => array('bottom' => -2, 'top' => -1, 'red' => 0, 'green' => 0, 'blue' => 0),
@@ -301,7 +301,7 @@ class Map extends MapBase
 
     /**
      * @param string $input
-     * @param MapItem $context What is this in the input
+     * @param MapItem|Map $context What is this in the input
      * @param bool $includeNotes Whether notes should be searched, or just hints
      * @param bool $multiline Whether to process \n
      * @return mixed|string
@@ -323,7 +323,7 @@ class Map extends MapBase
 
         $contextType = $this->getProcessStringContextName($context);
 
-        MapUtility::wm_debug("Trace: ProcessString($input, $contextType)\n");
+        MapUtility::debug("Trace: ProcessString($input, $contextType)\n");
 
         if ($multiline == true) {
             $input = str_replace("\\n", "\n", $input);
@@ -341,7 +341,7 @@ class Map extends MapBase
             $keyContents = $matches[2];
             $key = "{" . $matches[2] . "}";
 
-            MapUtility::wm_debug('ProcessString: working on ' . $key . "\n");
+            MapUtility::debug('ProcessString: working on ' . $key . "\n");
             $value = $this->processStringToken($includeNotes, $keyContents, $key, $context);
 
             // We track the input and a clean output string separately, to stop people doing
@@ -391,21 +391,21 @@ class Map extends MapBase
         }
 
         if (is_null($theItem)) {
-            MapUtility::wm_warn("ProcessString: $key refers to unknown item (context is $contextDescription) [WMWARN05]\n");
+            MapUtility::warn("ProcessString: $key refers to unknown item (context is $contextDescription) [WMWARN05]\n");
             return $value;
         }
 
-        MapUtility::wm_debug("ProcessString: Found appropriate item: $theItem\n");
+        MapUtility::debug("ProcessString: Found appropriate item: $theItem\n");
 
 
         $value = $this->findItemValue($theItem, $args, $value, $includeNotes);
 
         // format, and sanitise the value string here, before returning it
-        MapUtility::wm_debug("ProcessString: replacing %s with %s \n", $key, $value);
+        MapUtility::debug("ProcessString: replacing %s with %s \n", $key, $value);
 
         if ($format != '') {
             $value = StringUtility::sprintf($format, $value, $this->kilo);
-            MapUtility::wm_debug("ProcessString: formatted $format to $value\n");
+            MapUtility::debug("ProcessString: formatted $format to $value\n");
         }
         return $value;
     }
@@ -423,7 +423,7 @@ class Map extends MapBase
         // this is my laziness - it saves me having a list of reserved words
         // which are currently used for internal props. You can just 'overwrite' any of them.
         if (array_key_exists($variableName, $mapItem->hints)) {
-            MapUtility::wm_debug("ProcessString: used hint\n");
+            MapUtility::debug("ProcessString: used hint\n");
             return $mapItem->hints[$variableName];
         }
 
@@ -431,7 +431,7 @@ class Map extends MapBase
             // for some things, we don't want to allow notes to be considered.
             // mainly - TARGET (which can define command-lines), shouldn't be
             // able to get data from uncontrolled sources (i.e. data sources rather than SET in config files).
-            MapUtility::wm_debug("ProcessString: used note\n");
+            MapUtility::debug("ProcessString: used note\n");
             return $mapItem->notes[$variableName];
         }
 
@@ -443,7 +443,7 @@ class Map extends MapBase
             return $currentValue;
         }
 
-        MapUtility::wm_debug("ProcessString: used internal property\n");
+        MapUtility::debug("ProcessString: used internal property\n");
         return $value;
     }
 
@@ -578,7 +578,7 @@ class Map extends MapBase
         // if it isn't, it's the filename
 
         if ((strchr($input, "\n") != false) || (strchr($input, "\r") != false)) {
-            MapUtility::wm_debug("ReadConfig Detected that this is a config fragment.\n");
+            MapUtility::debug("ReadConfig Detected that this is a config fragment.\n");
             // strip out any Windows line-endings that have gotten in here
             $input = str_replace("\r", '', $input);
             $lines = explode("\n", $input);
@@ -586,7 +586,7 @@ class Map extends MapBase
 
             $reader->readConfigLines($lines);
         } else {
-            MapUtility::wm_debug("ReadConfig Detected that this is a config filename.\n");
+            MapUtility::debug("ReadConfig Detected that this is a config filename.\n");
             $reader->readConfigFile($input);
             $this->configfile = $input;
         }
@@ -599,7 +599,7 @@ class Map extends MapBase
     private function postReadConfigTasks()
     {
         if ($this->hasOverlibs && $this->htmlstyle == 'static') {
-            MapUtility::wm_warn("OVERLIBGRAPH is used, but HTMLSTYLE is static. This is probably wrong. [WMWARN41]\n");
+            MapUtility::warn("OVERLIBGRAPH is used, but HTMLSTYLE is static. This is probably wrong. [WMWARN41]\n");
         }
 
         $this->populateDefaultScales();
@@ -655,7 +655,7 @@ class Map extends MapBase
 
     private function buildZLayers()
     {
-        MapUtility::wm_debug("Building cache of z-layers.\n");
+        MapUtility::debug("Building cache of z-layers.\n");
 
         $allItems = $this->buildAllItemsList();
 
@@ -663,7 +663,7 @@ class Map extends MapBase
             $zIndex = $item->getZIndex();
             $this->addItemToZLayer($item, $zIndex);
         }
-        MapUtility::wm_debug('Found ' . count($this->seenZLayers) . " z-layers including builtins (0,100).\n");
+        MapUtility::debug('Found ' . count($this->seenZLayers) . " z-layers including builtins (0,100).\n");
     }
 
     private function addItemToZLayer($item, $zIndex)
@@ -676,7 +676,7 @@ class Map extends MapBase
 
     private function updateMaxValues()
     {
-        MapUtility::wm_debug("Finalising bandwidth.\n");
+        MapUtility::debug("Finalising bandwidth.\n");
 
         $allItems = $this->buildAllItemsList();
 
@@ -690,7 +690,7 @@ class Map extends MapBase
         // calculate any relative positions here - that way, nothing else
         // really needs to know about them
 
-        MapUtility::wm_debug("Resolving relative positions for NODEs...\n");
+        MapUtility::debug("Resolving relative positions for NODEs...\n");
         // safety net for cyclic dependencies
         $maxIterations = 100;
         $iterations = $maxIterations;
@@ -706,20 +706,20 @@ class Map extends MapBase
 
                 $anchorName = $node->getRelativeAnchor();
 
-                MapUtility::wm_debug("Resolving relative position for $node to $anchorName\n");
+                MapUtility::debug("Resolving relative position for $node to $anchorName\n");
 
                 if (!$this->nodeExists($anchorName)) {
-                    MapUtility::wm_warn('NODE ' . $node->name . " has a relative position to an unknown node ($anchorName)! [WMWARN10]\n");
+                    MapUtility::warn('NODE ' . $node->name . " has a relative position to an unknown node ($anchorName)! [WMWARN10]\n");
                     continue;
                 }
 
                 $anchorNode = $this->getNode($anchorName);
-                MapUtility::wm_debug("Found anchor node: $anchorNode\n");
+                MapUtility::debug("Found anchor node: $anchorNode\n");
 
                 // check if we are relative to another node which is in turn relative to something
                 // we need to resolve that one before we can resolve this one!
                 if (($anchorNode->isRelativePositioned()) && (!$anchorNode->isRelativePositionResolved())) {
-                    MapUtility::wm_debug("Skipping unresolved relative_to. Let's hope it's not a circular one\n");
+                    MapUtility::debug("Skipping unresolved relative_to. Let's hope it's not a circular one\n");
                     $nSkipped++;
                     continue;
                 }
@@ -728,12 +728,12 @@ class Map extends MapBase
                     $nChanged++;
                 }
             }
-            MapUtility::wm_debug("Relative Positions Cycle $iterations/$maxIterations - set $nChanged and Skipped $nSkipped for unresolved dependencies\n");
+            MapUtility::debug("Relative Positions Cycle $iterations/$maxIterations - set $nChanged and Skipped $nSkipped for unresolved dependencies\n");
             $iterations--;
         } while (($nChanged > 0) && ($iterations > 0));
 
         if ($nSkipped > 0) {
-            MapUtility::wm_warn("There are probably Circular dependencies in relative POSITION lines for $nSkipped nodes (or $maxIterations levels of relative positioning). [WMWARN11]\n");
+            MapUtility::warn("There are probably Circular dependencies in relative POSITION lines for $nSkipped nodes (or $maxIterations levels of relative positioning). [WMWARN11]\n");
         }
     }
 
@@ -887,7 +887,7 @@ class Map extends MapBase
                 if (!preg_match('/^::\s/', $node->name)) {
                     if ($node->definedIn == $this->configfile) {
                         if ($which == 'template' && $node->x === null) {
-                            MapUtility::wm_debug("TEMPLATE\n");
+                            MapUtility::debug("TEMPLATE\n");
                             $output .= $node->getConfig();
                         }
                         if ($which == 'normal' && $node->x !== null) {
@@ -933,7 +933,7 @@ class Map extends MapBase
             fwrite($fileHandle, $output);
             fclose($fileHandle);
         } else {
-            MapUtility::wm_warn("Couldn't open config file $filename for writing");
+            MapUtility::warn("Couldn't open config file $filename for writing");
             return false;
         }
 
@@ -950,7 +950,7 @@ class Map extends MapBase
         $imageRef = imagecreatetruecolor($this->width, $this->height);
 
         if (!$imageRef) {
-            MapUtility::wm_warn("Couldn't create output image in memory (" . $this->width . 'x' . $this->height . ').');
+            MapUtility::warn("Couldn't create output image in memory (" . $this->width . 'x' . $this->height . ').');
         } else {
             imagealphablending($imageRef, true);
             if ($this->getHint('antialias') == 1) {
@@ -961,7 +961,7 @@ class Map extends MapBase
             }
 
             // by here, we should have a valid image handle
-            $this->selected = ImageUtility::myimagecolorallocate($imageRef, 255, 0, 0); // for selections in the editor
+            $this->selected = ImageUtility::myImageColorAllocate($imageRef, 255, 0, 0); // for selections in the editor
 
             if ($bgImageRef) {
                 imagecopy($imageRef, $bgImageRef, 0, 0, 0, 0, $this->width, $this->height);
@@ -1060,7 +1060,7 @@ class Map extends MapBase
      */
     protected function drawEditorOverlays($showVIAOverlay, $showRelativeOverlay, $imageRef)
     {
-        $overlayColor = ImageUtility::myimagecolorallocate($imageRef, 200, 0, 0);
+        $overlayColor = ImageUtility::myImageColorAllocate($imageRef, 200, 0, 0);
 
         if ($showRelativeOverlay) {
             // first, we can show relatively positioned NODEs
@@ -1083,24 +1083,24 @@ class Map extends MapBase
         $result = false;
         $functions = true;
         if (function_exists('imagejpeg') && preg_match('/\.jpg/i', $imageFileName)) {
-            MapUtility::wm_debug("Writing JPEG file to $imageFileName\n");
+            MapUtility::debug("Writing JPEG file to $imageFileName\n");
             $result = imagejpeg($imageRef, $imageFileName);
         } elseif (function_exists('imagegif') && preg_match('/\.gif/i', $imageFileName)) {
-            MapUtility::wm_debug("Writing GIF file to $imageFileName\n");
+            MapUtility::debug("Writing GIF file to $imageFileName\n");
             $result = imagegif($imageRef, $imageFileName);
         } elseif (function_exists('imagepng') && preg_match('/\.png/i', $imageFileName)) {
-            MapUtility::wm_debug("Writing PNG file to $imageFileName\n");
+            MapUtility::debug("Writing PNG file to $imageFileName\n");
             $result = imagepng($imageRef, $imageFileName);
         } else {
-            MapUtility::wm_warn("Failed to write map image. No function existed for the image format you requested. [WMWARN12]\n");
+            MapUtility::warn("Failed to write map image. No function existed for the image format you requested. [WMWARN12]\n");
             $functions = false;
         }
 
         if (($result == false) && ($functions == true)) {
             if (file_exists($imageFileName)) {
-                MapUtility::wm_warn("Failed to overwrite existing image file $imageFileName - permissions of existing file are wrong? [WMWARN13]");
+                MapUtility::warn("Failed to overwrite existing image file $imageFileName - permissions of existing file are wrong? [WMWARN13]");
             } else {
-                MapUtility::wm_warn("Failed to create image file $imageFileName - permissions of output directory are wrong? [WMWARN14]");
+                MapUtility::warn("Failed to create image file $imageFileName - permissions of output directory are wrong? [WMWARN14]");
             }
         }
         return $result;
@@ -1113,10 +1113,10 @@ class Map extends MapBase
      */
     protected function createThumbnailFile($thumbnailFileName, $thumbnailMaxSize, $imageRef)
     {
-        MapUtility::wm_debug("Writing thumbnail to %s\n", $thumbnailFileName);
+        MapUtility::debug("Writing thumbnail to %s\n", $thumbnailFileName);
 
         if (!function_exists('imagecopyresampled')) {
-            MapUtility::wm_warn("Skipping thumbnail creation, since we don't have the necessary function. [WMWARN17]");
+            MapUtility::warn("Skipping thumbnail creation, since we don't have the necessary function. [WMWARN17]");
             return;
         }
 
@@ -1149,9 +1149,9 @@ class Map extends MapBase
 
             if (($result == false)) {
                 if (file_exists($thumbnailFileName)) {
-                    MapUtility::wm_warn("Failed to overwrite existing image file $thumbnailFileName - permissions of existing file are wrong? [WMWARN15]");
+                    MapUtility::warn("Failed to overwrite existing image file $thumbnailFileName - permissions of existing file are wrong? [WMWARN15]");
                 } else {
-                    MapUtility::wm_warn("Failed to create image file $thumbnailFileName - permissions of output directory are wrong? [WMWARN16]");
+                    MapUtility::warn("Failed to create image file $thumbnailFileName - permissions of output directory are wrong? [WMWARN16]");
                 }
             }
         }
@@ -1159,7 +1159,7 @@ class Map extends MapBase
 
     public function preCalculate()
     {
-        MapUtility::wm_debug("preCalculating everything\n");
+        MapUtility::debug("preCalculating everything\n");
 
         $allMapItems = $this->buildAllItemsList();
 
@@ -1176,10 +1176,10 @@ class Map extends MapBase
         $showVIAOverlay = false,
         $showRelativeOverlay = false
     ) {
-        MapUtility::wm_debug("Trace: DrawMap()\n");
+        MapUtility::debug("Trace: DrawMap()\n");
 
-        MapUtility::wm_debug("=====================================\n");
-        MapUtility::wm_debug("Start of Map Drawing\n");
+        MapUtility::debug("=====================================\n");
+        MapUtility::debug("Start of Map Drawing\n");
 
         $this->calculateDatestamp();
 
@@ -1192,7 +1192,7 @@ class Map extends MapBase
         // this is so we can get the size of the nodes, which links will need if they use offsets
         // TODO - the geometry part should be in preCalculate()
         foreach ($this->nodes as $node) {
-            MapUtility::wm_debug('Pre-rendering ' . $node->name . " to get bounding boxes.\n");
+            MapUtility::debug('Pre-rendering ' . $node->name . " to get bounding boxes.\n");
             if (!$node->isTemplate()) {
                 $node->preCalculate($this);
                 $node->preRender($this);
@@ -1211,7 +1211,7 @@ class Map extends MapBase
 
         foreach ($allLayers as $z) {
             $zItems = $this->seenZLayers[$z];
-            MapUtility::wm_debug("Drawing layer $z\n");
+            MapUtility::debug("Drawing layer $z\n");
             // all the map 'furniture' is fixed at z=1000
             if ($z == 1000) {
                 $this->drawTimestamp($imageRef, $this->timefont, $this->colourtable['TIME']);
@@ -1225,7 +1225,7 @@ class Map extends MapBase
             if (is_array($zItems)) {
                 /** @var MapDataItem $it */
                 foreach ($zItems as $it) {
-                    MapUtility::wm_debug('Drawing ' . $it->myType() . ' ' . $it->name . "\n");
+                    MapUtility::debug('Drawing ' . $it->myType() . ' ' . $it->name . "\n");
                     $it->draw($imageRef);
                 }
             }
@@ -1284,7 +1284,7 @@ class Map extends MapBase
 
     public function calculateImagemap()
     {
-        MapUtility::wm_debug("Trace: calculateImagemap()\n");
+        MapUtility::debug("Trace: calculateImagemap()\n");
 
         // loop through everything. Figure out along the way if it's a node or a link
         $allItems = $this->buildAllItemsList();
@@ -1440,7 +1440,7 @@ class Map extends MapBase
     // imagemapname is a parameter, so we can stack up several maps in the Cacti plugin with their own imagemaps
     public function makeHTML($imagemapname = 'weathermap_imap')
     {
-        MapUtility::wm_debug("Trace: MakeHTML()\n");
+        MapUtility::debug("Trace: MakeHTML()\n");
         // PreloadMapHTML fills in the Imagemap info, ready for the HTML to be created.
         $this->calculateImagemap();
 
@@ -1480,16 +1480,16 @@ class Map extends MapBase
         $allLayers = array_keys($this->seenZLayers);
         rsort($allLayers);
 
-        MapUtility::wm_debug("Starting to dump imagemap in reverse Z-order...\n");
+        MapUtility::debug("Starting to dump imagemap in reverse Z-order...\n");
         foreach ($allLayers as $z) {
-            MapUtility::wm_debug("Writing HTML for layer $z\n");
+            MapUtility::debug("Writing HTML for layer $z\n");
             $zItems = $this->seenZLayers[$z];
             if (is_array($zItems)) {
-                MapUtility::wm_debug("   Found things for layer $z\n");
+                MapUtility::debug("   Found things for layer $z\n");
 
                 // at z=1000, the legends and timestamps live
                 if ($z == 1000) {
-                    MapUtility::wm_debug("     Builtins fit here.\n");
+                    MapUtility::debug("     Builtins fit here.\n");
 
                     foreach ($this->imagemapAreas as $areaname) {
                         // skip the linkless areas if we are in the editor - they're redundant
@@ -1503,7 +1503,7 @@ class Map extends MapBase
 
                     foreach ($this->scales as $it) {
                         foreach ($it->getImagemapAreas() as $area) {
-                            MapUtility::wm_debug("$area\n");
+                            MapUtility::debug("$area\n");
                             // skip the linkless areas if we are in the editor - they're redundant
                             $html .= "\t" . $area->asHTML();
                             $html .= "\n";
@@ -1518,7 +1518,7 @@ class Map extends MapBase
                 foreach (array_reverse($zItems) as $it) {
                     if ($it->name != 'DEFAULT' && $it->name != ':: DEFAULT ::') {
                         foreach ($it->getImagemapAreas() as $area) {
-                            MapUtility::wm_debug("$area\n");
+                            MapUtility::debug("$area\n");
                             // skip the linkless areas if we are in the editor - they're redundant
                             $html .= "\t" . $area->asHTML();
                             $html .= "\n";
@@ -1582,7 +1582,7 @@ class Map extends MapBase
      */
     private function preProcessTargets($itemList)
     {
-        MapUtility::wm_debug("Preprocessing targets\n");
+        MapUtility::debug("Preprocessing targets\n");
 
         /** @var MapDataItem $mapItem */
         foreach ($itemList as $mapItem) {
@@ -1612,18 +1612,18 @@ class Map extends MapBase
         if ($this->minimumDataTime == null || $dataTime < $this->minimumDataTime) {
             $this->minimumDataTime = $dataTime;
         }
-        MapUtility::wm_debug('Current DataTime MINMAX: ' . $this->minimumDataTime . ' -> ' . $this->maximumDataTime . "\n");
+        MapUtility::debug('Current DataTime MINMAX: ' . $this->minimumDataTime . ' -> ' . $this->maximumDataTime . "\n");
     }
 
     private function readDataFromTargets($itemList)
     {
-        MapUtility::wm_debug("======================================\n");
-        MapUtility::wm_debug("Starting main collection loop\n");
+        MapUtility::debug("======================================\n");
+        MapUtility::debug("Starting main collection loop\n");
 
         /** @var MapDataItem $mapItem */
         foreach ($itemList as $mapItem) {
             if ($mapItem->isTemplate()) {
-                MapUtility::wm_debug("ReadData: Skipping $mapItem that looks like a template\n.");
+                MapUtility::debug("ReadData: Skipping $mapItem that looks like a template\n.");
                 continue;
             }
 
@@ -1661,31 +1661,31 @@ class Map extends MapBase
             'post' => '\\Weathermap\\Plugins\\Post'
         );
 
-        MapUtility::wm_debug("Beginning to load $pluginType plugins from $searchDirectory\n");
+        MapUtility::debug("Beginning to load $pluginType plugins from $searchDirectory\n");
 
         $pluginList = $this->getPluginFileList($pluginType, $searchDirectory);
 
         foreach ($pluginList as $fullFilePath => $file) {
-            MapUtility::wm_debug("Loading $pluginType Plugin class from $file\n");
+            MapUtility::debug("Loading $pluginType Plugin class from $file\n");
 
             $class = preg_replace('/\\.php$/', '', $file);
             // include_once $fullFilePath;
 
-            MapUtility::wm_debug("Loaded $pluginType Plugin class $class from $file\n");
+            MapUtility::debug("Loaded $pluginType Plugin class $class from $file\n");
 
             $classFullPath = $typeToNamespace[$pluginType] . '\\' . $class;
 
-            MapUtility::wm_debug("full class path is $classFullPath");
+            MapUtility::debug("full class path is $classFullPath");
 
             $this->plugins[$pluginType][$class]['object'] = new $classFullPath;
             $this->plugins[$pluginType][$class]['active'] = true;
 
             if (!isset($this->plugins[$pluginType][$class])) {
-                MapUtility::wm_debug("** Failed to create an object for plugin $pluginType/$class\n");
+                MapUtility::debug("** Failed to create an object for plugin $pluginType/$class\n");
                 $this->plugins[$pluginType][$class]['active'] = false;
             }
         }
-        MapUtility::wm_debug("Finished loading plugins.\n");
+        MapUtility::debug("Finished loading plugins.\n");
     }
 
     /**
@@ -1699,7 +1699,7 @@ class Map extends MapBase
 
         $pluginList = array();
         if (!$directoryHandle) {
-            MapUtility::wm_warn("Couldn't open $pluginType Plugin directory ($searchDirectory). Things will probably go wrong. [WMWARN06]\n");
+            MapUtility::warn("Couldn't open $pluginType Plugin directory ($searchDirectory). Things will probably go wrong. [WMWARN06]\n");
         }
 
         while ($file = readdir($directoryHandle)) {
@@ -1721,7 +1721,7 @@ class Map extends MapBase
     {
         if (!file_exists($dir)) {
             $dir = dirname(__FILE__) . DIRECTORY_SEPARATOR . $dir;
-            MapUtility::wm_debug("Relative path didn't exist. Trying $dir\n");
+            MapUtility::debug("Relative path didn't exist. Trying $dir\n");
         }
         $directoryHandle = @opendir($dir);
 
@@ -1744,55 +1744,55 @@ class Map extends MapBase
      */
     private function initialiseAllPlugins()
     {
-        MapUtility::wm_debug("Running Init() for all Plugins...\n");
+        MapUtility::debug("Running Init() for all Plugins...\n");
 
         foreach (array('data', 'pre', 'post') as $type) {
-            MapUtility::wm_debug("Initialising $type Plugins...\n");
+            MapUtility::debug("Initialising $type Plugins...\n");
 
             foreach ($this->plugins[$type] as $name => $pluginEntry) {
-                MapUtility::wm_debug("Running $name" . "->Init()\n");
+                MapUtility::debug("Running $name" . "->Init()\n");
 
                 $ret = $pluginEntry['object']->init($this);
 
                 if (!$ret) {
-                    MapUtility::wm_debug("Marking $name plugin as inactive, since Init() failed\n");
+                    MapUtility::debug("Marking $name plugin as inactive, since Init() failed\n");
                     $this->plugins[$type][$name]['active'] = false;
-                    MapUtility::wm_debug(
+                    MapUtility::debug(
                         "State is now %s\n",
                         ($this->plugins['data'][$name]['active'] ? 'active' : 'inactive')
                     );
                 }
             }
         }
-        MapUtility::wm_debug("Finished Initialising Plugins...\n");
+        MapUtility::debug("Finished Initialising Plugins...\n");
     }
 
     public function runProcessorPlugins($stage = 'pre')
     {
-        MapUtility::wm_debug("Running $stage-processing plugins...\n");
+        MapUtility::debug("Running $stage-processing plugins...\n");
 
         $this->pluginMethod($stage, 'run');
 
-        MapUtility::wm_debug("Finished $stage-processing plugins...\n");
+        MapUtility::debug("Finished $stage-processing plugins...\n");
     }
 
 
     private function prefetchPlugins()
     {
         // give all the plugins a chance to prefetch their results
-        MapUtility::wm_debug("======================================\n");
-        MapUtility::wm_debug("Starting DS plugin prefetch\n");
+        MapUtility::debug("======================================\n");
+        MapUtility::debug("Starting DS plugin prefetch\n");
         $this->pluginMethod('data', 'preFetch');
     }
 
     private function pluginMethod($type, $method)
     {
-        MapUtility::wm_debug("======================================\n");
-        MapUtility::wm_debug("Running $type plugin $method method\n");
+        MapUtility::debug("======================================\n");
+        MapUtility::debug("Running $type plugin $method method\n");
 
         foreach ($this->plugins[$type] as $name => $pluginEntry) {
             if ($pluginEntry['active']) {
-                MapUtility::wm_debug("Running $name->$method()\n");
+                MapUtility::debug("Running $name->$method()\n");
                 $pluginEntry['object']->$method($this);
             }
         }
@@ -1800,8 +1800,8 @@ class Map extends MapBase
 
     private function cleanupPlugins($type)
     {
-        MapUtility::wm_debug("======================================\n");
-        MapUtility::wm_debug("Starting DS plugin cleanup\n");
+        MapUtility::debug("======================================\n");
+        MapUtility::debug("Starting DS plugin cleanup\n");
         $this->pluginMethod($type, 'cleanUp');
     }
 
@@ -1819,7 +1819,7 @@ class Map extends MapBase
 
         foreach ($allMapItems as $mapItem) {
             if ($mapItem->isTemplate()) {
-                MapUtility::wm_debug("zeroData: Skipping $mapItem that looks like a template\n.");
+                MapUtility::debug("zeroData: Skipping $mapItem that looks like a template\n.");
                 continue;
             }
 
@@ -1836,12 +1836,12 @@ class Map extends MapBase
     {
         // we skip readdata completely in sizedebug mode
         if ($this->sizedebug != 0) {
-            MapUtility::wm_debug("Size Debugging is on. Skipping readData.\n");
+            MapUtility::debug("Size Debugging is on. Skipping readData.\n");
             return;
         }
 
-        MapUtility::wm_debug("======================================\n");
-        MapUtility::wm_debug("ReadData: Updating link data for all links and nodes\n");
+        MapUtility::debug("======================================\n");
+        MapUtility::debug("ReadData: Updating link data for all links and nodes\n");
 
         $allMapItems = $this->buildAllItemsList();
 
@@ -1858,16 +1858,16 @@ class Map extends MapBase
 
         $this->runProcessorPlugins('post');
 
-        MapUtility::wm_debug("ReadData Completed.\n");
-        MapUtility::wm_debug("------------------------------\n");
+        MapUtility::debug("ReadData Completed.\n");
+        MapUtility::debug("------------------------------\n");
     }
 
     public function createDefaultNodes()
     {
-        MapUtility::wm_debug("Creating ':: DEFAULT ::' DEFAULT NODE\n");
+        MapUtility::debug("Creating ':: DEFAULT ::' DEFAULT NODE\n");
         $this->addNode(new MapNode(':: DEFAULT ::', ':: DEFAULT ::', $this));
 
-        MapUtility::wm_debug("Creating actual DEFAULT NODE from :: DEFAULT ::\n");
+        MapUtility::debug("Creating actual DEFAULT NODE from :: DEFAULT ::\n");
         $this->addNode(new MapNode('DEFAULT', ':: DEFAULT ::', $this));
     }
 
@@ -1876,17 +1876,17 @@ class Map extends MapBase
         // these are the default defaults
         // by putting them into a normal object, we can use the
         // same code for writing out LINK DEFAULT as any other link.
-        MapUtility::wm_debug("Creating ':: DEFAULT ::' DEFAULT LINK\n");
+        MapUtility::debug("Creating ':: DEFAULT ::' DEFAULT LINK\n");
         // these two are used for default settings
         $this->addLink(new MapLink(':: DEFAULT ::', ':: DEFAULT ::', $this));
 
-        MapUtility::wm_debug("Creating actual DEFAULT LINK from :: DEFAULT ::\n");
+        MapUtility::debug("Creating actual DEFAULT LINK from :: DEFAULT ::\n");
         $this->addLink(new MapLink('DEFAULT', ':: DEFAULT ::', $this));
     }
 
     public function getValue($name)
     {
-        MapUtility::wm_debug("Fetching %s\n", $name);
+        MapUtility::debug("Fetching %s\n", $name);
         if (property_exists($this, $name)) {
             return $this->$name;
         }
@@ -1903,10 +1903,10 @@ class Map extends MapBase
         // do the basic prep work
         if ($this->background != '') {
             if (is_readable($this->background)) {
-                $bgImageRef = ImageUtility::imagecreatefromfile($this->background);
+                $bgImageRef = ImageUtility::imageCreateFromFile($this->background);
 
                 if (!$bgImageRef) {
-                    MapUtility::wm_warn(
+                    MapUtility::warn(
                         "Failed to open background image.  One possible reason: Is your BACKGROUND really a PNG?\n"
                     );
                     return $bgImageRef;
@@ -1918,7 +1918,7 @@ class Map extends MapBase
                 return $bgImageRef;
             }
 
-            MapUtility::wm_warn(
+            MapUtility::warn(
                 'Your background image file could not be read. Check the filename, and permissions, for '
                 . $this->background . "\n"
             );
@@ -1966,7 +1966,7 @@ class Map extends MapBase
 
     public function getProperty($name)
     {
-        MapUtility::wm_debug("Map Fetching %s\n", $name);
+        MapUtility::debug("Map Fetching %s\n", $name);
 
         $translations = array(
             'max_data_time' => $this->maximumDataTime,

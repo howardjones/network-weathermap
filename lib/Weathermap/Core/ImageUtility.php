@@ -4,7 +4,7 @@ namespace Weathermap\Core;
 
 class ImageUtility
 {
-    public static function wmDrawMarkerCross($gdImage, $colour, $point, $size = 5)
+    public static function drawMarkerCross($gdImage, $colour, $point, $size = 5)
     {
         $relativeMoves = array(
             array(-1, 0),
@@ -14,7 +14,7 @@ class ImageUtility
             array(0, 2)
         );
 
-        self::wmDrawMarkerPolygon($gdImage, $colour, $point, $size, $relativeMoves);
+        self::drawMarkerPolygon($gdImage, $colour, $point, $size, $relativeMoves);
     }
 
     /**
@@ -24,7 +24,7 @@ class ImageUtility
      * @param float $size
      * @param float[][] $relativeMoves
      */
-    public static function wmDrawMarkerPolygon($gdImage, $colour, $point, $size, $relativeMoves)
+    public static function drawMarkerPolygon($gdImage, $colour, $point, $size, $relativeMoves)
     {
         $points = array();
 
@@ -37,7 +37,7 @@ class ImageUtility
         imagepolygon($gdImage, $points, count($relativeMoves), $colour);
     }
 
-    public static function wmDrawMarkerDiamond($gdImage, $colour, $point, $size = 10)
+    public static function drawMarkerDiamond($gdImage, $colour, $point, $size = 10)
     {
         $relativeMoves = array(
             array(-1, 0),
@@ -46,7 +46,7 @@ class ImageUtility
             array(-1, 1),
         );
 
-        self::wmDrawMarkerPolygon($gdImage, $colour, $point, $size, $relativeMoves);
+        self::drawMarkerPolygon($gdImage, $colour, $point, $size, $relativeMoves);
     }
 
     public static function wmDrawMarkerBox($gdImage, $colour, $point, $size = 10)
@@ -58,7 +58,7 @@ class ImageUtility
             array(-2, 0),
         );
 
-        self::wmDrawMarkerPolygon($gdImage, $colour, $point, $size, $relativeMoves);
+        self::drawMarkerPolygon($gdImage, $colour, $point, $size, $relativeMoves);
     }
 
     public static function wmDrawMarkerCircle($gdImage, $colour, $point, $size = 10)
@@ -68,7 +68,7 @@ class ImageUtility
 
 
 // wrapper around imagecolorallocate to try and re-use palette slots where possible
-    public static function myimagecolorallocate($image, $red, $green, $blue)
+    public static function myImageColorAllocate($image, $red, $green, $blue)
     {
         // it's possible that we're being called early - just return straight away, in that case
         if (!isset($image)) {
@@ -86,7 +86,7 @@ class ImageUtility
     }
 
 // draw a filled round-cornered rectangle
-    public static function imagefilledroundedrectangle($imageRef, $left, $top, $right, $bottom, $radius, $color)
+    public static function imageFilledRoundedRectangle($imageRef, $left, $top, $right, $bottom, $radius, $color)
     {
         imagefilledrectangle($imageRef, $left, $top + $radius, $right, $bottom - $radius, $color);
         imagefilledrectangle($imageRef, $left + $radius, $top, $right - $radius, $bottom, $color);
@@ -99,7 +99,7 @@ class ImageUtility
     }
 
 // draw a round-cornered rectangle
-    public static function imageroundedrectangle($imageRef, $left, $top, $right, $bottom, $radius, $color)
+    public static function imageRoundedRectangle($imageRef, $left, $top, $right, $bottom, $radius, $color)
     {
         imageline($imageRef, $left + $radius, $top, $right - $radius, $top, $color);
         imageline($imageRef, $left + $radius, $bottom, $right - $radius, $bottom, $color);
@@ -112,7 +112,7 @@ class ImageUtility
         imagearc($imageRef, $right - $radius, $bottom - $radius, $radius * 2, $radius * 2, 0, 90, $color);
     }
 
-    public static function imagecreatefromfile($filename)
+    public static function imageCreateFromFile($filename)
     {
         $imageRef = null;
 
@@ -123,7 +123,7 @@ class ImageUtility
         );
 
         if (!is_readable($filename)) {
-            wm_warn("Image file $filename is unreadable. Check permissions. [WMIMG05]\n");
+            MapUtility::warn("Image file $filename is unreadable. Check permissions. [WMIMG05]\n");
 
             return $imageRef;
         }
@@ -133,7 +133,7 @@ class ImageUtility
         list($typeBitfield, $typeName, $failureMessage) = $conversion[$type];
 
         if (!(imagetypes() & $typeBitfield)) {
-            wm_warn($failureMessage);
+            MapUtility::warn($failureMessage);
 
             return $imageRef;
         }
@@ -149,14 +149,14 @@ class ImageUtility
                 $imageRef = imagecreatefrompng($filename);
                 break;
             default:
-                wm_warn("Image file $filename wasn't recognised (type=$type). Check format is supported by your GD library. [WMIMG04]\n");
+                MapUtility::warn("Image file $filename wasn't recognised (type=$type). Check format is supported by your GD library. [WMIMG04]\n");
                 break;
         }
 
         return $imageRef;
     }
 
-    public static function ImageTrueColorToPalette2($image, $dither, $numColours)
+    public static function imageTrueColorToPalette2($image, $dither, $numColours)
     {
         $width = imagesx($image);
         $height = imagesy($image);
@@ -174,11 +174,11 @@ class ImageUtility
 // Much nicer colorization than imagefilter does, AND no special requirements.
 // Preserves white, black and transparency.
 //
-    public static function imagecolorize($imageRef, $red, $green, $blue)
+    public static function imageColorize($imageRef, $red, $green, $blue)
     {
         // The function only accepts indexed colour images, so we pass off to a different method for truecolor images
         if (imageistruecolor($imageRef)) {
-            return self::imagecolorize_truecolor($imageRef, $red, $green, $blue);
+            return self::imageColorizeTrueColor($imageRef, $red, $green, $blue);
         }
 
         $pal = self::createColorizePalette($red, $green, $blue);
@@ -197,7 +197,7 @@ class ImageUtility
         return $imageRef;
     }
 
-    public static function imagecolorize_truecolor($imageRef, $red, $green, $blue)
+    public static function imageColorizeTrueColor($imageRef, $red, $green, $blue)
     {
         $pal = self::createColorizePalette($red, $green, $blue);
 
@@ -225,10 +225,9 @@ class ImageUtility
     /**
      * Calculate the palette to map greyscale values to colourized, when colorizing icons
      *
-     * @param $red
-     * @param $green
-     * @param $blue
-     * @param $pal
+     * @param int $red
+     * @param int $green
+     * @param int $blue
      * @return mixed
      */
     public static function createColorizePalette($red, $green, $blue)

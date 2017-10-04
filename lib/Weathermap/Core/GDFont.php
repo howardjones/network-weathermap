@@ -31,7 +31,7 @@ class GDFont extends Font
     {
         imagestring($gdImage, $this->gdnumber, $x, $y - imagefontheight($this->gdnumber), $string, $colour);
         if ($angle != 0) {
-            MapUtility::wm_warn("Angled text doesn't work with non-FreeType fonts [WMWARN02]\n");
+            MapUtility::warn("Angled text doesn't work with non-FreeType fonts [WMWARN02]\n");
         }
     }
 

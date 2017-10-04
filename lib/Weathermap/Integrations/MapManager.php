@@ -617,7 +617,7 @@ class MapManager
         $statement->execute(array($userId, $realmId));
         $userlist = $statement->fetchAll(PDO::FETCH_OBJ);
 
-        if (sizeof($userlist) > 0) {
+        if (count($userlist) > 0) {
             return true;
         }
 

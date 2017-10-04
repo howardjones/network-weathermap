@@ -51,7 +51,7 @@ class WeatherMapDataSource_cactithold extends DatasourceBase
             $pdo = weathermap_get_pdo();
 
             if (!function_exists('db_fetch_row')) {
-                MapUtility::wm_debug("ReadData CactiTHold: Cacti database library not found. [THOLD001]\n");
+                MapUtility::debug("ReadData CactiTHold: Cacti database library not found. [THOLD001]\n");
                 return false;
             }
 
@@ -64,7 +64,7 @@ class WeatherMapDataSource_cactithold extends DatasourceBase
             }
 
             if (!$tholdPresent) {
-                MapUtility::wm_debug("ReadData CactiTHold: THold plugin not enabled. [THOLD002]\n");
+                MapUtility::debug("ReadData CactiTHold: THold plugin not enabled. [THOLD002]\n");
             }
 
             $statement = $pdo->prepare("show tables");
@@ -79,7 +79,7 @@ class WeatherMapDataSource_cactithold extends DatasourceBase
             }
 
             if (!in_array('thold_data', $tables)) {
-                MapUtility::wm_debug('ReadData CactiTHold: thold_data database table not found. [THOLD003]\n');
+                MapUtility::debug('ReadData CactiTHold: thold_data database table not found. [THOLD003]\n');
                 return false;
             }
 
@@ -93,15 +93,15 @@ class WeatherMapDataSource_cactithold extends DatasourceBase
                 $version = $result[0]['version'];
                 if (substr($version, 0, 1) != "0") {
                     $this->thold10 = true;
-                    MapUtility::wm_debug("ReadData CactiTHold: detected Thold > 1.0, will adjust field names\n");
+                    MapUtility::debug("ReadData CactiTHold: detected Thold > 1.0, will adjust field names\n");
                 } else {
-                    MapUtility::wm_debug("ReadData CactiTHold: detected Thold < 1.0, using classic field names\n");
+                    MapUtility::debug("ReadData CactiTHold: detected Thold < 1.0, using classic field names\n");
                 }
             }
 
             return true;
         } else {
-            MapUtility::wm_debug("ReadData CactiTHold: Can only run from Cacti environment. [THOLD004]\n");
+            MapUtility::debug("ReadData CactiTHold: Can only run from Cacti environment. [THOLD004]\n");
         }
 
         return false;
@@ -168,7 +168,7 @@ class WeatherMapDataSource_cactithold extends DatasourceBase
             }
 
             if ($type == 'monitor') {
-                MapUtility::wm_debug("CactiTHold ReadData: Getting cacti basic state for host $id\n");
+                MapUtility::debug("CactiTHold ReadData: Getting cacti basic state for host $id\n");
 //                $SQL = "select * from host where id=$id";
 
                 $statement = $pdo->prepare("select * from host where id=?");
@@ -218,9 +218,9 @@ class WeatherMapDataSource_cactithold extends DatasourceBase
                     $item->addNote("cacti_faildate", $result['status_fail_date']);
                     $item->addNote("cacti_recdate", $result['status_rec_date']);
                 }
-                MapUtility::wm_debug("CactiTHold ReadData: Basic state for host $id is $state/$statename\n");
+                MapUtility::debug("CactiTHold ReadData: Basic state for host $id is $state/$statename\n");
 
-                MapUtility::wm_debug("CactiTHold ReadData: Checking threshold states for host $id\n");
+                MapUtility::debug("CactiTHold ReadData: Checking threshold states for host $id\n");
                 $numThresholds = 0;
                 $numFailing = 0;
                 // $SQL2 = "select rra_id, data_id, thold_alert from thold_data,data_local where thold_data.rra_id=data_local.id and data_local.host_id=$id and thold_enabled='on'";
@@ -242,17 +242,17 @@ class WeatherMapDataSource_cactithold extends DatasourceBase
                         $v = $th['thold_alert'];
                         $numThresholds++;
                         if (intval($th['thold_alert']) > 0) {
-                            MapUtility::wm_debug("CactiTHold ReadData: Seen threshold $desc failing ($v)for host $id\n");
+                            MapUtility::debug("CactiTHold ReadData: Seen threshold $desc failing ($v)for host $id\n");
                             $numFailing++;
                         } else {
-                            MapUtility::wm_debug("CactiTHold ReadData: Seen threshold $desc OK ($v) for host $id\n");
+                            MapUtility::debug("CactiTHold ReadData: Seen threshold $desc OK ($v) for host $id\n");
                         }
                     }
                 } else {
-                    MapUtility::wm_debug("CactiTHold ReadData: Failed to get thold info for host $id\n");
+                    MapUtility::debug("CactiTHold ReadData: Failed to get thold info for host $id\n");
                 }
 
-                MapUtility::wm_debug("CactiTHold ReadData: Checked $numThresholds and found $numFailing failing\n");
+                MapUtility::debug("CactiTHold ReadData: Checked $numThresholds and found $numFailing failing\n");
 
                 if (($numFailing > 0) && ($numThresholds > 0) && ($state == 3)) {
                     $state = 4;
@@ -262,11 +262,11 @@ class WeatherMapDataSource_cactithold extends DatasourceBase
                     $item->addNote("thold_failpercent", ($numFailing / $numThresholds) * 100);
                     $this->data[IN] = $state;
                     $this->data[OUT] = $numFailing;
-                    MapUtility::wm_debug("CactiTHold ReadData: State is $state/$statename\n");
+                    MapUtility::debug("CactiTHold ReadData: State is $state/$statename\n");
                 } elseif ($numThresholds > 0) {
                     $item->addNote("thold_failcount", 0);
                     $item->addNote("thold_failpercent", 0);
-                    MapUtility::wm_debug("CactiTHold ReadData: Leaving state as $state\n");
+                    MapUtility::debug("CactiTHold ReadData: Leaving state as $state\n");
                 }
             }
         }

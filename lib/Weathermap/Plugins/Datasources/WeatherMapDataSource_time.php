@@ -22,7 +22,7 @@ class WeatherMapDataSource_time extends DatasourceBase
     public function init(&$map)
     {
         if (preg_match('/^[234]\./', phpversion())) {
-            MapUtility::wm_debug("Time plugin requires PHP 5+ to run\n");
+            MapUtility::debug("Time plugin requires PHP 5+ to run\n");
             return false;
         }
         return true;
@@ -50,7 +50,7 @@ class WeatherMapDataSource_time extends DatasourceBase
 
             foreach ($allTimezones as $tz) {
                 if (strtolower($tz) == $timezoneLowerCase) {
-                    MapUtility::wm_debug("Time ReadData: Timezone exists: $tz\n");
+                    MapUtility::debug("Time ReadData: Timezone exists: $tz\n");
                     $dateTime = new DateTime("now", new DateTimeZone($tz));
 
                     $item->addNote("time_time12", $dateTime->format("h:i"));
@@ -64,11 +64,11 @@ class WeatherMapDataSource_time extends DatasourceBase
                 }
             }
             if ($matches == 0) {
-                MapUtility::wm_warn("Time ReadData: Couldn't recognize $timezone as a valid timezone name [WMTIME02]\n");
+                MapUtility::warn("Time ReadData: Couldn't recognize $timezone as a valid timezone name [WMTIME02]\n");
             }
         } else {
             // some error code to go in here
-            MapUtility::wm_warn("Time ReadData: Couldn't recognize $targetstring \n");
+            MapUtility::warn("Time ReadData: Couldn't recognize $targetstring \n");
         }
 
         return $this->returnData();

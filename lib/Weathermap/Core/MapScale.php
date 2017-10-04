@@ -1,4 +1,5 @@
 <?php
+
 namespace Weathermap\Core;
 
 /**
@@ -72,11 +73,11 @@ class MapScale extends MapItem
     public function populateDefaultsIfNecessary()
     {
         if ($this->spanCount() != 0) {
-            MapUtility::wm_debug('Already have ' . $this->spanCount() . " scales, no defaults added.\n");
+            MapUtility::debug('Already have ' . $this->spanCount() . " scales, no defaults added.\n");
             return;
         }
 
-        MapUtility::wm_debug("Adding default SCALE colour set (no SCALE lines seen).\n");
+        MapUtility::debug("Adding default SCALE colour set (no SCALE lines seen).\n");
 
         $this->addSpan(0, 0, new Colour(192, 192, 192));
         $this->addSpan(0, 1, new Colour(255, 255, 255));
@@ -109,7 +110,7 @@ class MapScale extends MapItem
         $this->entries[$key]['top'] = $highValue;
         $this->entries[$key]['label'] = '';
 
-        MapUtility::wm_debug("%s %s->%s\n", $this->name, $lowValue, $highValue);
+        MapUtility::debug("%s %s->%s\n", $this->name, $lowValue, $highValue);
     }
 
     public function setColour($name, $colour)
@@ -130,7 +131,7 @@ class MapScale extends MapItem
                 $this->scalemisscolour = $colour;
                 break;
             default:
-                MapUtility::wm_warn('Unexpected colour name in WeatherMapScale->SetColour');
+                MapUtility::warn('Unexpected colour name in WeatherMapScale->SetColour');
                 break;
         }
     }
@@ -139,7 +140,7 @@ class MapScale extends MapItem
     {
         $scaleName = $this->name;
 
-        MapUtility::wm_debug("Finding a colour for value %s in scale %s\n", $value, $this->name);
+        MapUtility::debug("Finding a colour for value %s in scale %s\n", $value, $this->name);
 
         $nowarnClipping = intval($this->owner->getHint('nowarn_clipping'));
         $nowarnScaleMisses = (!$showScaleWarnings) || intval($this->owner->getHint('nowarn_scalemisses'));
@@ -150,7 +151,13 @@ class MapScale extends MapItem
 
         if ($this->spanCount() == 0) {
             if ($this->name != 'none') {
-                MapUtility::wm_warn(sprintf("ColourFromValue: Attempted to use non-existent scale: %s for item %s [WMWARN09]\n", $this->name, $itemName));
+                MapUtility::warn(
+                    sprintf(
+                        "ColourFromValue: Attempted to use non-existent scale: %s for item %s [WMWARN09]\n",
+                        $this->name,
+                        $itemName
+                    )
+                );
             } else {
                 return array(new Colour(255, 255, 255), '', '');
             }
@@ -161,7 +168,7 @@ class MapScale extends MapItem
             $value = min($value, 100);
             $value = max($value, 0);
             if ($value != $oldValue && $nowarnClipping == 0) {
-                MapUtility::wm_warn("ColourFromValue: Clipped $oldValue% to $value% for item $itemName [WMWARN33]\n");
+                MapUtility::warn("ColourFromValue: Clipped $oldValue% to $value% for item $itemName [WMWARN33]\n");
             }
         }
 
@@ -169,7 +176,7 @@ class MapScale extends MapItem
 
         if (null === $col) {
             if ($nowarnScaleMisses == 0) {
-                MapUtility::wm_warn(
+                MapUtility::warn(
                     "ColourFromValue: Scale $scaleName doesn't include a line for $value"
                     . ($isPercentage ? '%' : '') . " while drawing item $itemName [WMWARN29]\n"
                 );
@@ -177,7 +184,7 @@ class MapScale extends MapItem
             return array($this->scalemisscolour, '', '');
         }
 
-        MapUtility::wm_debug("CFV $itemName $scaleName $value '$tag' $key " . $col->asConfig() . "\n");
+        MapUtility::debug("CFV $itemName $scaleName $value '$tag' $key " . $col->asConfig() . "\n");
 
         return array($col, $key, $tag);
     }
@@ -192,7 +199,7 @@ class MapScale extends MapItem
 
         foreach ($this->entries as $key => $scaleEntry) {
             if (($value >= $scaleEntry['bottom']) and ($value <= $scaleEntry['top'])) {
-                MapUtility::wm_debug("HIT for %s-%s\n", $scaleEntry['bottom'], $scaleEntry['top']);
+                MapUtility::debug("HIT for %s-%s\n", $scaleEntry['bottom'], $scaleEntry['top']);
 
                 $range = $scaleEntry['top'] - $scaleEntry['bottom'];
 
@@ -212,7 +219,7 @@ class MapScale extends MapItem
 
                 // change in behaviour - with multiple matching ranges for a value, the smallest range wins
                 if (is_null($matchSize) || ($range < $matchSize)) {
-                    MapUtility::wm_debug("Smallest match seen so far\n");
+                    MapUtility::debug("Smallest match seen so far\n");
                     $colour = $candidate;
                     $matchSize = $range;
                     $matchKey = $key;
@@ -221,7 +228,7 @@ class MapScale extends MapItem
                         $tag = $scaleEntry['tag'];
                     }
                 } else {
-                    MapUtility::wm_debug("But bigger than existing match\n");
+                    MapUtility::debug("But bigger than existing match\n");
                 }
             }
         }
@@ -406,13 +413,13 @@ class MapScale extends MapItem
 
     public function draw($gdTargetImage)
     {
-        MapUtility::wm_debug("New scale\n");
+        MapUtility::debug("New scale\n");
         // don't draw if the position is the default -1,-1
         if (null === $this->keypos || $this->keypos->x == -1 && $this->keypos->y == -1) {
             return;
         }
 
-        MapUtility::wm_debug("New scale - still drawing\n");
+        MapUtility::debug("New scale - still drawing\n");
 
         $gdScaleImage = null;
 
@@ -439,12 +446,23 @@ class MapScale extends MapItem
         $width = imagesx($gdScaleImage);
         $height = imagesy($gdScaleImage);
 
-        MapUtility::wm_debug("New scale - blitting\n");
+        MapUtility::debug("New scale - blitting\n");
         imagecopy($gdTargetImage, $gdScaleImage, $xTarget, $yTarget, 0, 0, $width, $height);
 
         $areaName = 'LEGEND:' . $this->name;
 
-        $newArea = new HTMLImageMapAreaRectangle($areaName, '', array(array($xTarget, $yTarget, $xTarget + $width, $yTarget + $height)));
+        $newArea = new HTMLImageMapAreaRectangle(
+            array(
+                array(
+                    $xTarget,
+                    $yTarget,
+                    $xTarget + $width,
+                    $yTarget + $height
+                )
+            ),
+            $areaName,
+            ''
+        );
         $this->owner->imap->addArea($newArea);
 
         // TODO: stop tracking z-order separately. addArea() should take the z layer
@@ -457,7 +475,7 @@ class MapScale extends MapItem
 
         $nScales = $this->spanCount();
 
-        MapUtility::wm_debug("Drawing $nScales colours into SCALE\n");
+        MapUtility::debug("Drawing $nScales colours into SCALE\n");
 
         $hideZero = intval($this->owner->getHint('key_hidezero_' . $this->name));
         $hidePercentSign = intval($this->owner->getHint('key_hidepercent_' . $this->name));
@@ -502,7 +520,7 @@ class MapScale extends MapItem
         $boxWidth = max($boxWidth + 10, $minWidth + 10);
         $boxHeight = $tileSpacing * ($nScales + 1) + 10;
 
-        MapUtility::wm_debug("Scale Box is %dx%d\n", $boxWidth + 1, $boxHeight + 1);
+        MapUtility::debug("Scale Box is %dx%d\n", $boxWidth + 1, $boxHeight + 1);
 
         $gdScaleImage = $this->createTransparentImage($boxWidth + 1, $boxHeight + 1);
 
@@ -517,14 +535,28 @@ class MapScale extends MapItem
             imagerectangle($gdScaleImage, 0, 0, $boxWidth, $boxHeight, $outlineColour->gdAllocate($gdScaleImage));
         }
 
-        $fontObject->drawImageString($gdScaleImage, 4, 4 + $tileHeight, $this->keytitle, $this->keytextcolour->gdAllocate($gdScaleImage));
+        $fontObject->drawImageString(
+            $gdScaleImage,
+            4,
+            4 + $tileHeight,
+            $this->keytitle,
+            $this->keytextcolour->gdAllocate($gdScaleImage)
+        );
 
         $rowNumber = 1;
 
         foreach ($this->entries as $key => $scaleEntry) {
             // pick a value in the middle...
             $value = ($scaleEntry['bottom'] + $scaleEntry['top']) / 2;
-            MapUtility::wm_debug(sprintf("%f-%f (%f)  %s\n", $scaleEntry['bottom'], $scaleEntry['top'], $value, $scaleEntry['c1']));
+            MapUtility::debug(
+                sprintf(
+                    "%f-%f (%f)  %s\n",
+                    $scaleEntry['bottom'],
+                    $scaleEntry['top'],
+                    $value,
+                    $scaleEntry['c1']
+                )
+            );
 
             if (($hideZero == 0) || $key != '0_0') {
                 $y = $tileSpacing * $rowNumber + 8;
@@ -552,7 +584,13 @@ class MapScale extends MapItem
                     imagefilledrectangle($gdScaleImage, $x, $y, $x + $tileWidth, $y + $tileHeight, $gdColourRef);
                 }
 
-                $fontObject->drawImageString($gdScaleImage, $x + 4 + $tileWidth, $y + $tileHeight, $scaleEntry['label'], $this->keytextcolour->gdAllocate($gdScaleImage));
+                $fontObject->drawImageString(
+                    $gdScaleImage,
+                    $x + 4 + $tileWidth,
+                    $y + $tileHeight,
+                    $scaleEntry['label'],
+                    $this->keytextcolour->gdAllocate($gdScaleImage)
+                );
                 $rowNumber++;
             }
         }
@@ -573,7 +611,7 @@ class MapScale extends MapItem
 
         $nScales = $this->spanCount();
 
-        MapUtility::wm_debug("Drawing $nScales colours into SCALE\n");
+        MapUtility::debug("Drawing $nScales colours into SCALE\n");
 
         /** @var Font $fontObject */
         $fontObject = $this->keyfont;
@@ -594,7 +632,7 @@ class MapScale extends MapItem
         $scaleBottom = $scaleTop + $tileHeight * 1.5;
         $boxBottom = $scaleBottom + $tileHeight * 2 + 6;
 
-        MapUtility::wm_debug("Size is %dx%d (From %dx%d tile)\n", $boxRight + 1, $boxBottom + 1, $tileWidth, $tileHeight);
+        MapUtility::debug("Size is %dx%d (From %dx%d tile)\n", $boxRight + 1, $boxBottom + 1, $tileWidth, $tileHeight);
 
         $gdScaleImage = $this->createTransparentImage($boxRight + 1, $boxBottom + 1);
 
@@ -603,32 +641,72 @@ class MapScale extends MapItem
         /** @var Colour $outlineColour */
         $outlineColour = $this->keyoutlinecolour;
 
-        MapUtility::wm_debug("BG is $bgColour, Outline is $outlineColour\n");
+        MapUtility::debug("BG is $bgColour, Outline is $outlineColour\n");
 
         if ($bgColour->isRealColour()) {
-            imagefilledrectangle($gdScaleImage, $boxLeft, $boxTop, $boxRight, $boxBottom, $bgColour->gdAllocate($gdScaleImage));
+            imagefilledrectangle(
+                $gdScaleImage,
+                $boxLeft,
+                $boxTop,
+                $boxRight,
+                $boxBottom,
+                $bgColour->gdAllocate($gdScaleImage)
+            );
         }
 
         if ($outlineColour->isRealColour()) {
-            imagerectangle($gdScaleImage, $boxLeft, $boxTop, $boxRight, $boxBottom, $outlineColour->gdAllocate($gdScaleImage));
+            imagerectangle(
+                $gdScaleImage,
+                $boxLeft,
+                $boxTop,
+                $boxRight,
+                $boxBottom,
+                $outlineColour->gdAllocate($gdScaleImage)
+            );
         }
 
-        $fontObject->drawImageString($gdScaleImage, $scaleLeft, $scaleBottom + $tileHeight * 2 + 2, $title, $this->keytextcolour->gdAllocate($gdScaleImage));
+        $fontObject->drawImageString(
+            $gdScaleImage,
+            $scaleLeft,
+            $scaleBottom + $tileHeight * 2 + 2,
+            $title,
+            $this->keytextcolour->gdAllocate($gdScaleImage)
+        );
 
         for ($percentage = 0; $percentage <= 100; $percentage++) {
             $xOffset = $percentage * $scaleFactor;
 
             if (($percentage % 25) == 0) {
-                imageline($gdScaleImage, $scaleLeft + $xOffset, $scaleTop - $tileHeight, $scaleLeft + $xOffset, $scaleBottom + $tileHeight, $this->keytextcolour->gdAllocate($gdScaleImage));
+                imageline(
+                    $gdScaleImage,
+                    $scaleLeft + $xOffset,
+                    $scaleTop - $tileHeight,
+                    $scaleLeft + $xOffset,
+                    $scaleBottom + $tileHeight,
+                    $this->keytextcolour->gdAllocate($gdScaleImage)
+                );
                 $labelString = sprintf('%d%%', $percentage);
-                $fontObject->drawImageString($gdScaleImage, $scaleLeft + $xOffset + 2, $scaleTop - 2, $labelString, $this->keytextcolour->gdAllocate($gdScaleImage));
+                $fontObject->drawImageString(
+                    $gdScaleImage,
+                    $scaleLeft + $xOffset + 2,
+                    $scaleTop - 2,
+                    $labelString,
+                    $this->keytextcolour->gdAllocate($gdScaleImage)
+                );
             }
 
             list($col,) = $this->findScaleHit($percentage);
 
             if ($col->isRealColour()) {
                 $gdColourRef = $col->gdAllocate($gdScaleImage);
-                imagefilledrectangle($gdScaleImage, $scaleLeft + $xOffset - $scaleFactor / 2, $scaleTop, $scaleLeft + $xOffset + $scaleFactor / 2, $scaleBottom, $gdColourRef);
+                imagefilledrectangle(
+                    $gdScaleImage,
+                    $scaleLeft + $xOffset - $scaleFactor / 2,
+                    $scaleTop,
+                    $scaleLeft + $xOffset + $scaleFactor / 2,
+                    $scaleBottom,
+                    $gdColourRef
+                );
             }
         }
 
@@ -648,7 +726,7 @@ class MapScale extends MapItem
 
         $nScales = $this->spanCount();
 
-        MapUtility::wm_debug("Drawing $nScales colours into SCALE\n");
+        MapUtility::debug("Drawing $nScales colours into SCALE\n");
 
         /** @var Font $fontObject */
         $fontObject = $this->keyfont;
@@ -677,7 +755,7 @@ class MapScale extends MapItem
         /** @var Colour $outlineColour */
         $outlineColour = $this->keyoutlinecolour;
 
-        MapUtility::wm_debug("BG is $bgColour, Outline is $outlineColour\n");
+        MapUtility::debug("BG is $bgColour, Outline is $outlineColour\n");
 
         if ($bgColour->isRealColour()) {
             imagefilledrectangle($gdScaleImage, 0, 0, $boxRight, $boxBottom, $bgColour->gdAllocate($gdScaleImage));
@@ -687,7 +765,13 @@ class MapScale extends MapItem
             imagerectangle($gdScaleImage, 0, 0, $boxRight, $boxBottom, $outlineColour->gdAllocate($gdScaleImage));
         }
 
-        $fontObject->drawImageString($gdScaleImage, $scaleLeft - $scaleFactor, $scaleTop - $tileHeight, $title, $this->keytextcolour->gdAllocate($gdScaleImage));
+        $fontObject->drawImageString(
+            $gdScaleImage,
+            $scaleLeft - $scaleFactor,
+            $scaleTop - $tileHeight,
+            $title,
+            $this->keytextcolour->gdAllocate($gdScaleImage)
+        );
 
         for ($percentage = 0; $percentage <= 100; $percentage++) {
             if ($inverted) {
@@ -697,9 +781,22 @@ class MapScale extends MapItem
             }
 
             if (($percentage % 25) == 0) {
-                imageline($gdScaleImage, $scaleLeft - $scaleFactor, $scaleTop + $deltaY, $scaleRight + $scaleFactor, $scaleTop + $deltaY, $this->keytextcolour->gdAllocate($gdScaleImage));
+                imageline(
+                    $gdScaleImage,
+                    $scaleLeft - $scaleFactor,
+                    $scaleTop + $deltaY,
+                    $scaleRight + $scaleFactor,
+                    $scaleTop + $deltaY,
+                    $this->keytextcolour->gdAllocate($gdScaleImage)
+                );
                 $labelString = sprintf('%d%%', $percentage);
-                $fontObject->drawImageString($gdScaleImage, $scaleRight + $scaleFactor * 2, $scaleTop + $deltaY + $tileHeight / 2, $labelString, $this->keytextcolour->gdAllocate($gdScaleImage));
+                $fontObject->drawImageString(
+                    $gdScaleImage,
+                    $scaleRight + $scaleFactor * 2,
+                    $scaleTop + $deltaY + $tileHeight / 2,
+                    $labelString,
+                    $this->keytextcolour->gdAllocate($gdScaleImage)
+                );
             }
 
             /** @var Colour $col */

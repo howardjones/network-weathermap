@@ -11,8 +11,7 @@ before_install:
 #  - sudo apt-get update -qq
   - mkdir -p build/log
 install:
-  - pecl install gd
-  - ./dev/Vagrant/
+  - ./dev/Vagrant/vagrant-cacti-develop.sh
 addons:
   code_climate:
     repo_token: 858ba1f597a441ed0b8abfefb2db2ecc09309285da99bd165ebcf1b580ced776

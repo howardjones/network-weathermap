@@ -73,6 +73,7 @@ class EditorUI extends UIBase
                 array("mapname", "mapfile"),
                 array("sourcemap", "mapfile"),
             ),
+            "late_load" => true,
             "working"=>true,
             "handler" => "cmdNewMapCopy"
         ),

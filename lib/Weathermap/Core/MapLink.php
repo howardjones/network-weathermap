@@ -17,7 +17,7 @@ class MapLink extends MapDataItem
     const FMT_PERC_IN = '{link:this:inpercent:%.2f}%';
     const FMT_PERC_OUT = '{link:this:outpercent:%.2f}%';
 
-
+    /** @var MapLinkEndpoint[] $endpoints */
     public $endpoints = array();
 
     public $commentOffsets = array();
@@ -596,7 +596,7 @@ class MapLink extends MapDataItem
         }
 
         if (isset($this->endpoints[0]->node) && isset($this->endpoints[1]->node)) {
-            $output .= sprintf("\tNODES %s %s\n", $this->endpoints[0], $this->endpoints[1]);
+            $output .= sprintf("\tNODES %s %s\n", $this->endpoints[0]->node->name, $this->endpoints[1]->node->name);
         }
 
         if (count($this->viaList) > 0) {

@@ -168,8 +168,15 @@ class Editor
         // links that have VIAs. If it is, we want to rotate those VIA points
         // about the *other* node in the link
         foreach ($this->map->links as $link) {
-            if ((count($link->viaList) > 0) && (($link->endpoints[0]->node->name == $nodeName) || ($link->endpoints[1]->node->name == $nodeName))) {
+            if (!$link->isTemplate()
+                && count($link->viaList) > 0
+                && (
+                    ($link->endpoints[0]->node->name == $nodeName)
+                    || ($link->endpoints[1]->node->name == $nodeName)
+                )
+            ) {
                 $affectedLinks[] = $link->name;
+                $pivot = null;
 
                 // get the other node from us
                 if ($link->endpoints[0]->node->name == $nodeName) {
@@ -629,6 +636,7 @@ class Editor
         if ($boundingBoxA[$simpleIndex + 2] < $boundingBoxB[$simpleIndex]) {
             $aOffset = $boundingBoxA[$simpleIndex + 2] - $nodeA->$simpleCoordinate;
             $bOffset = $boundingBoxB[$simpleIndex] - $nodeB->$simpleCoordinate;
+            return array($aOffset, $bOffset);
         }
 
         // [B] [A]
@@ -637,7 +645,7 @@ class Editor
             $bOffset = $boundingBoxB[$simpleIndex + 2] - $nodeB->$simpleCoordinate;
             return array($aOffset, $bOffset);
         }
-        return array($aOffset, $bOffset);
+        return array(0, 0);
     }
 
     /**
@@ -645,8 +653,8 @@ class Editor
      * @param $boundingBoxB
      * @param $nodeA
      * @param $nodeB
-     * @param $hardIndex
-     * @param $hardCoordinate
+     * @param $complexIndex
+     * @param $complexCoordinate
      * @param $linkIndex
      * @param $linkCount
      * @return array
@@ -656,8 +664,8 @@ class Editor
         $boundingBoxB,
         $nodeA,
         $nodeB,
-        $hardIndex,
-        $hardCoordinate,
+        $complexIndex,
+        $complexCoordinate,
         $linkIndex,
         $linkCount
     ) {
@@ -665,19 +673,19 @@ class Editor
         // this should be true whichever way around they are
         list($minimumOverlap, $maximumOverlap) = $this->findCommonRange(
             array(
-                $boundingBoxA[$hardIndex],
-                $boundingBoxA[$hardIndex + 2]
+                $boundingBoxA[$complexIndex],
+                $boundingBoxA[$complexIndex + 2]
             ),
             array(
-                $boundingBoxB[$hardIndex],
-                $boundingBoxB[$hardIndex + 2]
+                $boundingBoxB[$complexIndex],
+                $boundingBoxB[$complexIndex + 2]
             )
         );
         $overlap = $maximumOverlap - $minimumOverlap;
         $stepPerLink = $overlap / ($linkCount + 1);
 
-        $aOffset = $minimumOverlap + ($linkIndex * $stepPerLink) - $nodeA->$hardCoordinate;
-        $bOffset = $minimumOverlap + ($linkIndex * $stepPerLink) - $nodeB->$hardCoordinate;
+        $aOffset = $minimumOverlap + ($linkIndex * $stepPerLink) - $nodeA->$complexCoordinate;
+        $bOffset = $minimumOverlap + ($linkIndex * $stepPerLink) - $nodeB->$complexCoordinate;
 
         return array($aOffset, $bOffset);
     }

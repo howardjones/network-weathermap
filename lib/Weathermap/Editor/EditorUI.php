@@ -68,11 +68,12 @@ class EditorUI extends UIBase
             "working" => true,
             "handler" => "cmdNewMap"
         ),
-        "newmap_copy" => array(
+        "newmapcopy" => array(
             "args" => array(
                 array("mapname", "mapfile"),
                 array("sourcemap", "mapfile"),
             ),
+            "working"=>true,
             "handler" => "cmdNewMapCopy"
         ),
         "font_samples" => array(
@@ -849,13 +850,17 @@ class EditorUI extends UIBase
         if ($this->validateRequest($action, $request)) {
             $editor = new Editor();
             $this->setEmbedded($fromPlugin);
+
             if (!isset($this->commands[$action]['late_load'])) {
                 $editor->loadConfig($this->mapFileName);
             }
+
             $result = $this->dispatchRequest($action, $request, $editor);
+
             if (!isset($this->commands[$action]['no_save'])) {
                 $editor->saveConfig();
             }
+
             if ($result !== false) {
                 $this->showMainPage($editor);
             }
@@ -1009,8 +1014,8 @@ class EditorUI extends UIBase
 
         $todo = "";
         foreach ($this->commands as $cmdname => $cmd) {
-            if (!$cmd['working']) {
-                $todo .= "$cmdname  ";
+            if (!isset($cmd['working']) || !$cmd['working']) {
+                $todo .= "$cmdname ";
             }
         }
         $tpl->set('internal', "Remaining to fix: " . $todo);

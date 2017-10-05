@@ -238,6 +238,21 @@ class Map extends MapBase
 
     // Simple accessors to stop the editor from reaching inside objects quite so much
 
+    public function getRealNodes()
+    {
+        $nodeList = array();
+
+        foreach ($this->nodes as $node) {
+            // only show non-template nodes
+            if (!$node->isTemplate()) {
+                $nodeList[] = $node->name;
+            }
+        }
+        sort($nodeList);
+
+        return $nodeList;
+    }
+
     public function getNode($name)
     {
         if (isset($this->nodes[$name])) {

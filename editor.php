@@ -1,7 +1,19 @@
 <?php
 
-require_once 'lib/Weathermap/Editor/editor.inc.php';
+
+namespace Weathermap\Editor;
+
 require_once 'lib/all.php';
+require_once 'lib/Weathermap/Editor/editor.inc.php';
+
+use Weathermap\Core\MapUtility;
+use Weathermap\Core\MathUtility;
+use Weathermap\Core\StringUtility;
+use Weathermap\Core\Map;
+use Weathermap\Core\MapNode;
+use Weathermap\Core\MapLink;
+use Weathermap\Core\Point;
+use Weathermap\Core\Target;
 
 // so that you can't have the editor active, and not know about it.
 $ENABLED = true;
@@ -100,7 +112,7 @@ $param = '';
 $param2 = '';
 $log = '';
 
-if (!wm_module_checks()) {
+if (!MapUtility::moduleChecks()) {
     print "<b>Required PHP extensions are not present in your mod_php/ISAPI PHP module. Please check your PHP setup to ensure you have the GD extension installed and enabled.</b><p>";
     print "If you find that the weathermap tool itself is working, from the command-line or Cacti poller, then it is possible that you have two different PHP installations. The Editor uses the same PHP that webpages on your server use, but the main weathermap tool uses the command-line PHP interpreter.<p>";
     print "<p>You should also run <a href=\"check.php\">check.php</a> to help make sure that there are no problems.</p><hr/>";
@@ -142,14 +154,14 @@ if ($mapname == '') {
         $readonly_file = true;
     }
 
-    wm_debug("==========================================================================================================\n");
-    wm_debug("Starting Edit Run: action is $action on $mapname\n");
-    wm_debug("==========================================================================================================\n");
+    MapUtility::debug("==========================================================================================================\n");
+    MapUtility::debug("Starting Edit Run: action is $action on $mapname\n");
+    MapUtility::debug("==========================================================================================================\n");
 
     # editor_log("\n\n-----------------------------------------------------------------------------\nNEW REQUEST:\n\n");
     # editor_log(var_log($_REQUEST));
 
-    $map = new WeatherMap;
+    $map = new Map;
     $map->context = 'editor';
 
     $fromplug = false;
@@ -271,7 +283,7 @@ if ($mapname == '') {
                 // now clear and reload the map object, because the in-memory one is out of sync
                 // - we don't know what changes the user made here, so we just have to reload.
                 unset($map);
-                $map = new WeatherMap;
+                $map = new Map;
                 $map->context = 'editor';
                 $map->ReadConfig($mapfile);
             }
@@ -291,7 +303,7 @@ if ($mapname == '') {
                 // now clear and reload the map object, because the in-memory one is out of sync
                 // - we don't know what changes the user made here, so we just have to reload.
                 unset($map);
-                $map = new WeatherMap;
+                $map = new Map;
                 $map->context = 'editor';
                 $map->ReadConfig($mapfile);
             }
@@ -321,12 +333,12 @@ if ($mapname == '') {
                     }
                     // Next, LINKs that use this NODE as an end.
                     foreach ($map->links as $link) {
-                        if (isset($link->a)) {
-                            if ($link->a->name == $node_name) {
-                                $map->links[$link->name]->a = $newnode;
+                        if (isset($link->endpoints[0])) {
+                            if ($link->endpoints[0]->name == $node_name) {
+                                $map->links[$link->name]->endpoints[0] = $newnode;
                             }
-                            if ($link->b->name == $node_name) {
-                                $map->links[$link->name]->b = $newnode;
+                            if ($link->endpoints[1]->name == $node_name) {
+                                $map->links[$link->name]->endpoints[1] = $newnode;
                             }
                             // while we're here, VIAs can also be relative to a NODE,
                             // so check if any of those need to change
@@ -409,7 +421,7 @@ if ($mapname == '') {
                 $new_target_list = array();
 
                 foreach ($targets as $target) {
-                    $new_target_list[] = new WMTarget($target, "", 0);
+                    $new_target_list[] = new Target($target, "", 0);
                 }
                 $map->links[$link_name]->targets = $new_target_list;
 
@@ -422,11 +434,13 @@ if ($mapname == '') {
 
                 if (wm_editor_validate_bandwidth($bwin)) {
                     $map->links[$link_name]->maxValuesConfigured[IN] = $bwin;
-                    $map->links[$link_name]->maxValues[IN] = WMUtility::interpretNumberWithMetricSuffixOrNull($bwin, $map->kilo);
+                    $map->links[$link_name]->maxValues[IN] = StringUtility::interpretNumberWithMetricSuffixOrNull($bwin,
+                        $map->kilo);
                 }
                 if (wm_editor_validate_bandwidth($bwout)) {
                     $map->links[$link_name]->maxValuesConfigured[OUT] = $bwout;
-                    $map->links[$link_name]->maxValues[OUT] = WMUtility::interpretNumberWithMetricSuffixOrNull($bwout, $map->kilo);
+                    $map->links[$link_name]->maxValues[OUT] = StringUtility::interpretNumberWithMetricSuffixOrNull($bwout,
+                        $map->kilo);
                 }
                 // $map->links[$link_name]->SetBandwidth($bwin,$bwout);
 
@@ -442,7 +456,8 @@ if ($mapname == '') {
             $map->stamptext = wm_editor_sanitize_string($_REQUEST['map_stamp']);
 
             $map->htmloutputfile = wm_editor_sanitize_file($_REQUEST['map_htmlfile'], array("html"));
-            $map->imageoutputfile = wm_editor_sanitize_file($_REQUEST['map_pngfile'], array("png", "jpg", "gif", "jpeg"));
+            $map->imageoutputfile = wm_editor_sanitize_file($_REQUEST['map_pngfile'],
+                array("png", "jpg", "gif", "jpeg"));
 
             $map->width = intval($_REQUEST['map_width']);
             $map->height = intval($_REQUEST['map_height']);
@@ -451,7 +466,8 @@ if ($mapname == '') {
             if ($_REQUEST['map_bgfile'] == '--NONE--') {
                 $map->background = '';
             } else {
-                $map->background = wm_editor_sanitize_file(stripslashes($_REQUEST['map_bgfile']), array("png", "jpg", "gif", "jpeg"));
+                $map->background = wm_editor_sanitize_file(stripslashes($_REQUEST['map_bgfile']),
+                    array("png", "jpg", "gif", "jpeg"));
             }
 
             $inheritables = array(
@@ -479,8 +495,10 @@ if ($mapname == '') {
             if (($bwin_old != $bwin) || ($bwout_old != $bwout)) {
                 $map->links['DEFAULT']->maxValuesConfigured[IN] = $bwin;
                 $map->links['DEFAULT']->maxValuesConfigured[OUT] = $bwout;
-                $map->links['DEFAULT']->maxValues[IN] = WMUtility::interpretNumberWithMetricSuffixOrNull($bwin, $map->kilo);
-                $map->links['DEFAULT']->maxValues[OUT] = WMUtility::interpretNumberWithMetricSuffixOrNull($bwout, $map->kilo);
+                $map->links['DEFAULT']->maxValues[IN] = StringUtility::interpretNumberWithMetricSuffixOrNull($bwin,
+                    $map->kilo);
+                $map->links['DEFAULT']->maxValues[OUT] = StringUtility::interpretNumberWithMetricSuffixOrNull($bwout,
+                    $map->kilo);
 
                 // TODO $map->defaultlink->SetBandwidth($bwin,$bwout);
                 foreach ($map->links as $link) {
@@ -489,8 +507,10 @@ if ($mapname == '') {
                         $link_name = $link->name;
                         $map->links[$link_name]->maxValuesConfigured[IN] = $bwin;
                         $map->links[$link_name]->maxValuesConfigured[OUT] = $bwout;
-                        $map->links[$link_name]->maxValues[IN] = WMUtility::interpretNumberWithMetricSuffixOrNull($bwin, $map->kilo);
-                        $map->links[$link_name]->maxValues[OUT] = WMUtility::interpretNumberWithMetricSuffixOrNull($bwout, $map->kilo);
+                        $map->links[$link_name]->maxValues[IN] = StringUtility::interpretNumberWithMetricSuffixOrNull($bwin,
+                            $map->kilo);
+                        $map->links[$link_name]->maxValues[OUT] = StringUtility::interpretNumberWithMetricSuffixOrNull($bwout,
+                            $map->kilo);
                     }
                 }
             }
@@ -508,9 +528,9 @@ if ($mapname == '') {
             $map->keyfont = intval($_REQUEST['mapstyle_legendfont']);
 
             $inheritables = array(
-                array('link', 'labelstyle', 'mapstyle_linklabels', ""),
+                array('link', 'labelStyle', 'mapstyle_linklabels', ""),
                 array('link', 'bwfont', 'mapstyle_linkfont', "int"),
-                array('link', 'arrowstyle', 'mapstyle_arrowstyle', ""),
+                array('link', 'arrowStyle', 'mapstyle_arrowstyle', ""),
                 array('node', 'labelfont', 'mapstyle_nodefont', "int")
             );
 
@@ -534,7 +554,6 @@ if ($mapname == '') {
             $map->ReadConfig($mapfile);
             $a = $_REQUEST['param2'];
             $b = $_REQUEST['param'];
-            # $b = substr($b,0,-2);
             $log = "[$a -> $b]";
 
             if ($a != $b && isset($map->nodes[$a]) && isset($map->nodes[$b])) {
@@ -545,15 +564,13 @@ if ($mapname == '') {
                     $newlinkname .= "a";
                 }
 
-                $newlink = new WeatherMapLink($newlinkname, "DEFAULT", $map);
+                $newlink = new MapLink($newlinkname, "DEFAULT", $map);
 
-                $newlink->a = $map->nodes[$a];
-                $newlink->b = $map->nodes[$b];
+                $newlink->endpoints[0] = $map->nodes[$a];
+                $newlink->endpoints[1] = $map->nodes[$b];
 
                 $newlink->defined_in = $map->configfile;
                 $map->addLink($newlink);
-                # $map->links[$newlinkname] = $newlink;
-                # array_push($map->seen_zlayers[$newlink->zorder], $newlink);
 
                 $map->WriteConfig($mapfile);
             }
@@ -565,9 +582,6 @@ if ($mapname == '') {
             $scalename = wm_editor_sanitize_name($_REQUEST['param']);
 
             $map->ReadConfig($mapfile);
-
-            // $map->keyx[$scalename] = $x;
-            // $map->keyy[$scalename] = $y;
 
             $map->scales[$scalename]->keypos = new Point($x, $y);
 
@@ -616,23 +630,23 @@ if ($mapname == '') {
                     // links that have VIAs. If it is, we want to rotate those VIA points
                     // about the *other* node in the link
                     foreach ($map->links as $link) {
-                        if ((count($link->viaList) > 0) && (($link->a->name == $node_name) || ($link->b->name == $node_name))) {
+                        if ((count($link->viaList) > 0) && (($link->endpoints[0]->name == $node_name) || ($link->endpoints[1]->name == $node_name))) {
                             // get the other node from us
-                            if ($link->a->name == $node_name) {
-                                $pivot = $link->b;
+                            if ($link->endpoints[0]->name == $node_name) {
+                                $pivot = $link->endpoints[0];
                             }
-                            if ($link->b->name == $node_name) {
-                                $pivot = $link->a;
+                            if ($link->endpoints[1]->name == $node_name) {
+                                $pivot = $link->endpoints[1];
                             }
 
-                            if (($link->a->name == $node_name) && ($link->b->name == $node_name)) {
+                            if (($link->endpoints[0]->name == $node_name) && ($link->endpoints[1]->name == $node_name)) {
                                 // this is a weird special case, but it is possible
-                                $dx = $link->a->x - $x;
-                                $dy = $link->a->y - $y;
+                                $dx = $link->endpoints[0]->x - $x;
+                                $dy = $link->endpoints[0]->y - $y;
 
                                 for ($i = 0; $i < count($link->viaList); $i++) {
-                                    $link->vialist[$i][0] = $link->viaList[$i][0] - $dx;
-                                    $link->vialist[$i][1] = $link->viaList[$i][1] - $dy;
+                                    $link->viaList[$i][0] = $link->viaList[$i][0] - $dx;
+                                    $link->viaList[$i][1] = $link->viaList[$i][1] - $dy;
                                 }
                             } else {
                                 $pivx = $pivot->x;
@@ -662,14 +676,14 @@ if ($mapname == '') {
                                 # $log .= "Scale by $scalefactor along link-line";
 
                                 // rotate so that link is along the axis
-                                rotateAboutPoint($points, $pivx, $pivy, deg2rad($angle_old));
+                                MathUtility::rotateAboutPoint($points, $pivx, $pivy, deg2rad($angle_old));
                                 // do the scaling in here
                                 for ($i = 0; $i < (count($points) / 2); $i++) {
                                     $basex = ($points[$i * 2] - $pivx) * $scalefactor + $pivx;
                                     $points[$i * 2] = $basex;
                                 }
                                 // rotate back so that link is along the new direction
-                                rotateAboutPoint($points, $pivx, $pivy, deg2rad(-$angle_new));
+                                MathUtility::rotateAboutPoint($points, $pivx, $pivy, deg2rad(-$angle_new));
 
                                 // now put the modified points back into the viaList again
                                 $v = 0;
@@ -769,7 +783,7 @@ if ($mapname == '') {
                 $newnodename .= "a";
             }
 
-            $movingNode = new WeatherMapNode($newnodename, "DEFAULT", $map);
+            $movingNode = new MapNode($newnodename, "DEFAULT", $map);
 
             $movingNode->x = $x;
             $movingNode->y = $y;
@@ -808,8 +822,8 @@ if ($mapname == '') {
                 $log = "delete node " . $target;
 
                 foreach ($map->links as $link) {
-                    if (isset($link->a)) {
-                        if (($target == $link->a->name) || ($target == $link->b->name)) {
+                    if (isset($link->endpoints[0])) {
+                        if (($target == $link->endpoints[0]->name) || ($target == $link->endpoints[1]->name)) {
                             unset($map->links[$link->name]);
                         }
                     }
@@ -833,7 +847,7 @@ if ($mapname == '') {
                     $newnodename = $newnodename . "_copy";
                 } while (isset($map->nodes[$newnodename]));
 
-                $movingNode = new WeatherMapNode($newnodename, $map->nodes[$target]->template, $map);
+                $movingNode = new MapNode($newnodename, $map->nodes[$target]->template, $map);
                 // $node->Reset($map);
                 $movingNode->CopyFrom($map->nodes[$target]);
 
@@ -862,7 +876,7 @@ if ($mapname == '') {
     }
 
     //by here, there should be a valid $map - either a blank one, the existing one, or the existing one with requested changes
-    wm_debug("Finished modifying\n");
+    MapUtility::debug("Finished modifying\n");
 
     // now we'll just draw the full editor page, with our new knowledge
 
@@ -888,7 +902,9 @@ if ($mapname == '') {
 
     $fontlist = array();
 
-    setcookie("wmeditor", ($use_overlay ? "1" : "0") . ":" . ($use_relative_overlay ? "1" : "0") . ":" . intval($grid_snap_value), time() + 60 * 60 * 24 * 30);
+    setcookie("wmeditor",
+        ($use_overlay ? "1" : "0") . ":" . ($use_relative_overlay ? "1" : "0") . ":" . intval($grid_snap_value),
+        time() + 60 * 60 * 24 * 30);
 
     // All the stuff from here on was embedded in the HTML before
 
@@ -948,7 +964,7 @@ if ($mapname == '') {
     $real_htmlstyle = $map->htmlstyle;
 
     $map->DrawMap('null');
-    $map->htmlstyle = 'editor';
+    $map->htmlStyle = 'editor';
     $map->calculateImagemap();
     $imagemap = $map->generateSortedImagemap("weathermap_imap");
 
@@ -980,7 +996,7 @@ if ($mapname == '') {
             // all code should be in editor.js
             <?php print $map->asJS() ?>
         </script>
-        <title>PHP Weathermap Editor <?php echo $WEATHERMAP_VERSION; ?></title>
+        <title>PHP Weathermap Editor <?php echo WEATHERMAP_VERSION; ?></title>
     </head>
 
     <body id="mainview">
@@ -1323,13 +1339,13 @@ if ($mapname == '') {
                     <tr>
                         <th>Link Labels</th>
                         <td><select id="mapstyle_linklabels" name="mapstyle_linklabels">
-                                <option <?php echo($map->links['DEFAULT']->labelstyle == 'bits' ? 'selected' : '') ?>
+                                <option <?php echo($map->links['DEFAULT']->labelStyle == 'bits' ? 'selected' : '') ?>
                                         value="bits">Bits/sec
                                 </option>
-                                <option <?php echo($map->links['DEFAULT']->labelstyle == 'percent' ? 'selected' : '') ?>
+                                <option <?php echo($map->links['DEFAULT']->labelStyle == 'percent' ? 'selected' : '') ?>
                                         value="percent">Percentage
                                 </option>
-                                <option <?php echo($map->links['DEFAULT']->labelstyle == 'none' ? 'selected' : '') ?>
+                                <option <?php echo($map->links['DEFAULT']->labelStyle == 'none' ? 'selected' : '') ?>
                                         value="none">None
                                 </option>
                             </select></td>
@@ -1349,17 +1365,18 @@ if ($mapname == '') {
                     <tr>
                         <th>Arrow Style</th>
                         <td><select name="mapstyle_arrowstyle">
-                                <option <?php echo($map->links['DEFAULT']->arrowstyle == 'classic' ? 'selected' : '') ?>
+                                <option <?php echo($map->links['DEFAULT']->arrowStyle == 'classic' ? 'selected' : '') ?>
                                         value="classic">Classic
                                 </option>
-                                <option <?php echo($map->links['DEFAULT']->arrowstyle == 'compact' ? 'selected' : '') ?>
+                                <option <?php echo($map->links['DEFAULT']->arrowStyle == 'compact' ? 'selected' : '') ?>
                                         value="compact">Compact
                                 </option>
                             </select></td>
                     </tr>
                     <tr>
                         <th>Node Font</th>
-                        <td><?php echo get_fontlist($map, 'mapstyle_nodefont', $map->nodes['DEFAULT']->labelfont); ?></td>
+                        <td><?php echo get_fontlist($map, 'mapstyle_nodefont',
+                                $map->nodes['DEFAULT']->labelfont); ?></td>
                     </tr>
                     <tr>
                         <th>Link Label Font</th>

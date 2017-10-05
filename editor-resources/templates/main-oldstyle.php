@@ -70,6 +70,7 @@
                    href="?<?php echo($fromplug == true ? 'plug=1&amp;' : ''); ?>action=show_config&amp;mapname=<?php echo urlencode($mapname) ?>">See
                     config</a></p>
             <pre><?php echo htmlspecialchars($log) ?></pre>
+            <pre><?php echo htmlspecialchars($internal) ?></pre>
         </div>
         <?php echo $imagemap ?>
     </div><!-- Node Properties -->

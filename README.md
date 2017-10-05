@@ -11,7 +11,7 @@ is what is working, and what is being worked on:
 
 * __CLI__ - should be working OK
 
-* __Editor__ - Partly (70%) implemented class/template-based version of editor (same UI) currently named `editor16.php`. Old `editor.php` is probably broken, since its files have been moved around. 
+* __Editor__ - Partly (70%) implemented class/template-based version of editor (same UI) currently named `editor16.php`. Old `editor.php` is probably broken, since its files have been moved around. BUT PARTS THAT DON'T YET WORK CAN MANGLE YOUR MAP! (e.g. tidy currently deletes links) 
 
 * __Cacti 0.8 Plugin__ - broken UI, broken poller. Code has all been moved and not even run once yet.
 

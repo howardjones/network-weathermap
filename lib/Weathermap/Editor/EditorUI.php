@@ -48,6 +48,7 @@ class EditorUI extends UIBase
                 array("x", "int"),
                 array("y", "int")
             ),
+            "working" => true,
             "handler" => "cmdAddNode"
         ),
         "move_node" => array(
@@ -57,12 +58,14 @@ class EditorUI extends UIBase
                 array("y", "int"),
                 array("param", "name")
             ),
+            "working" => true,
             "handler" => "cmdMoveNode"
         ),
         "newmap" => array(
             "args" => array(
                 array("mapname", "mapfile"),
             ),
+            "working" => true,
             "handler" => "cmdNewMap"
         ),
         "newmap_copy" => array(
@@ -76,6 +79,7 @@ class EditorUI extends UIBase
             "args" => array(
                 array("mapname", "mapfile"),
             ),
+            "working" => true,
             "handler" => "cmdDrawFontSamples",
             "late_load" => true,
             "no_save" => true
@@ -85,6 +89,7 @@ class EditorUI extends UIBase
                 array("mapname", "mapfile"),
                 array("selected", "jsname", true), // optional
             ),
+            "working" => true,
             "handler" => "cmdDrawMap",
             "late_load" => true,
             "no_save" => true
@@ -93,6 +98,7 @@ class EditorUI extends UIBase
             "args" => array(
                 array("mapname", "mapfile"),
             ),
+            "working" => true,
             "handler" => "cmdShowConfig",
             "no_save" => true
         ),
@@ -102,6 +108,7 @@ class EditorUI extends UIBase
                 array("item_type", "item_type"),
                 array("item_name", "name"),
             ),
+            "working" => true,
             "handler" => "cmdGetItemConfig",
             "no_save" => true
         ),
@@ -111,6 +118,7 @@ class EditorUI extends UIBase
                 array("item_configtext", "string"),
                 array("link_name", "name"),
             ),
+            "working" => true,
             "handler" => "cmdReplaceLinkConfig"
         ),
         "set_node_config" => array(
@@ -119,6 +127,7 @@ class EditorUI extends UIBase
                 array("item_configtext", "string"),
                 array("node_name", "name"),
             ),
+            "working" => true,
             "handler" => "cmdReplaceNodeConfig"
         ),
         "add_link" => array(
@@ -126,6 +135,7 @@ class EditorUI extends UIBase
                 array("mapname", "mapfile"),
                 array("param", "name"),
             ),
+            "working" => true,
             "handler" => "cmdAddLinkInitial"
         ),
         "add_link2" => array(
@@ -134,6 +144,7 @@ class EditorUI extends UIBase
                 array("param", "name"),
                 array("param2", "name"),
             ),
+            "working" => true,
             "handler" => "cmdAddLinkFinal"
         ),
         "place_legend" => array(
@@ -143,6 +154,7 @@ class EditorUI extends UIBase
                 array("x", "int"),
                 array("y", "int"),
             ),
+            "working" => true,
             "handler" => "cmdMoveLegend"
         ),
         "place_stamp" => array(
@@ -151,6 +163,7 @@ class EditorUI extends UIBase
                 array("x", "int"),
                 array("y", "int"),
             ),
+            "working" => true,
             "handler" => "cmdMoveTimestamp"
         ),
         "via_link" => array(
@@ -160,6 +173,7 @@ class EditorUI extends UIBase
                 array("x", "int"),
                 array("y", "int"),
             ),
+            "working" => true,
             "handler" => "cmdAddLinkVia"
         ),
         "straight_link" => array(
@@ -174,6 +188,7 @@ class EditorUI extends UIBase
                 array("mapname", "mapfile"),
                 array("param", "name"),
             ),
+            "working" => true,
             "handler" => "cmdDeleteLink"
         ),
         "delete_node" => array(
@@ -181,6 +196,7 @@ class EditorUI extends UIBase
                 array("mapname", "mapfile"),
                 array("param", "name"),
             ),
+            "working" => true,
             "handler" => "cmdDeleteNode"
         ),
         "clone_node" => array(
@@ -188,6 +204,7 @@ class EditorUI extends UIBase
                 array("mapname", "mapfile"),
                 array("param", "name"),
             ),
+            "working" => true,
             "handler" => "cmdCloneNode"
         ),
         "link_tidy" => array(
@@ -240,16 +257,45 @@ class EditorUI extends UIBase
             ),
             "handler" => "cmdEditLink"
         ),
-//        "editor_settings" => array(),
-//        "set_node_properties" => array(),
-//        "set_link_properties" => array(),
-//        "set_map_properties" => array(),
-//        "set_map_style" => array(),
+        "set_node_properties" => array(
+            "args" => array(
+                array("mapname", "mapfile"),
+                array("param", "name"),
+                array("node_x", "int"),
+                array("node_y", "int"),
+                array("node_lock_to", "name"),
+                array("node_new_name", "name"),
+                array("node_label", "string"),
+                array("node_infourl", "string"),
+                array("node_hover", "string"),
+                array("node_iconfilename", "string")
+            ),
+            "handler" => "cmdEditNode"
+        ),
+        "set_map_style" => array(
+            "args" => array(
+                array("mapname", "mapfile"),
+            ),
+            "handler" => "cmdMapStyle"
+        ),
+        "set_map_properties" => array(
+            "args" => array(
+                array("mapname", "mapfile"),
+            ),
+            "handler" => "cmdMapProperties"
+        ),
+        "editor_settings" => array(
+            "args" => array(
+                array("mapname", "mapfile"),
+            ),
+            "handler" => "cmdEditorSettings"
+        ),
         "nothing" => array(
             "args" => array(
                 array("mapname", "mapfile")
             ),
             "handler" => "cmdDoNothing",
+            "working" => true,
             "no_save" => true
         )
     );
@@ -523,6 +569,7 @@ class EditorUI extends UIBase
      */
     public function cmdEditLink($params, $editor)
     {
+        // TODO: this is empty!!
     }
 
     /**
@@ -554,6 +601,43 @@ class EditorUI extends UIBase
 
         $editor->moveNode($params['param'], $x, $y);
     }
+
+    /**
+     * @param string[] $params
+     * @param Editor $editor
+     */
+    public function cmdEditNode($params, $editor)
+    {
+        // TODO: this is empty!!
+    }
+
+    /**
+     * @param string[] $params
+     * @param Editor $editor
+     */
+    public function cmdMapProperties($params, $editor)
+    {
+        // TODO: this is empty!!
+    }
+
+    /**
+     * @param string[] $params
+     * @param Editor $editor
+     */
+    public function cmdMapStyle($params, $editor)
+    {
+        // TODO: this is empty!!
+    }
+
+    /**
+     * @param string[] $params
+     * @param Editor $editor
+     */
+    public function cmdEditorSettings($params, $editor)
+    {
+        // TODO: this is empty!!
+    }
+
 
     /**
      * @param string[] $params
@@ -743,7 +827,9 @@ class EditorUI extends UIBase
             $mapFileName = $request['mapname'];
 
             if ($action == "newmap" || $action == "newmap_copy") {
-                $mapFileName .= ".conf";
+                if (substr($mapFileName, -5, 5) != '.conf') {
+                    $mapFileName .= ".conf";
+                }
             }
 
             // If there's something funny with the config filename, just stop.
@@ -915,9 +1001,19 @@ class EditorUI extends UIBase
         $tpl->set("log", $this->logMessage);
         $tpl->set("editor_name", "editor16.php");
 
+        $tpl->set("nodeselection", $this->makeNodeSelector($editor->map));
+
         $imageList = $this->getAvailableImages("images", $editor->map);
         $imagesJSON = "\nvar imlist = " . json_encode($imageList) . ";\n";
         $tpl->set("images_json", $imagesJSON);
+
+        $todo = "";
+        foreach ($this->commands as $cmdname => $cmd) {
+            if (!$cmd['working']) {
+                $todo .= "$cmdname  ";
+            }
+        }
+        $tpl->set('internal', "Remaining to fix: " . $todo);
 
         $fonts = $editor->map->fonts->getList();
         ksort($fonts);
@@ -925,6 +1021,22 @@ class EditorUI extends UIBase
         $tpl->set("fonts_json", $fontsJSON);
 
         echo $tpl->fetch("editor-resources/templates/main-oldstyle.php");
+    }
+
+    /**
+     * @param Map $map
+     * @return string
+     */
+    private function makeNodeSelector($map)
+    {
+        $nodeList = $map->getRealNodes();
+
+        $result = "";
+        foreach ($nodeList as $node) {
+            $result .= sprintf("<option>%s</option>", htmlspecialchars($node));
+        }
+
+        return $result;
     }
 
     public function isEmbedded()

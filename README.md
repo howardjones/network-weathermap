@@ -1,4 +1,39 @@
-## PHP Network Weathermap 1.0.0 (dev)
+# PHP Network Weathermap 1.0.0 (dev)
+
+## Current Status
+
+I decided it would be useful to add this section to the top of the README, while things are moving around a lot. Here
+is what is working, and what is being worked on:
+
+### Current Status/Usability
+
+* __Core__ - passing all tests (but one database-related). All code modified to use namespaces, one class per file, most PSR-2 standards.
+
+* __CLI__ - should be working OK
+
+* __Editor__ - Partly (70%) implemented class/template-based version of editor (same UI) currently named `editor16.php`. Old `editor.php` is probably broken, since its files have been moved around. 
+
+* __Cacti 0.8 Plugin__ - broken UI, broken poller. Code has all been moved and not even run once yet.
+
+* __Cacti 1.0 Plugin__ - broken UI, broken poller. Code has all been moved and not even run once yet.
+
+
+### Work currently in progress:
+
+* Move to namespaces - PHP Namespaces help keep our code out of your code. Especially important for something that sits inside other software
+
+* Remove dependency on PEAR - CLI uses a Composer module now for options
+
+* Move to React for Cacti UI, with only JSON/API type stuff in the PHP code
+
+* Update Editor to use same UI classes as Cacti (input validation, one method per 'command', testability)
+
+* Update Editor Data Picker to use same UI classes as Cacti (input validation, one method per 'command', testability)
+
+* Break down 'monster methods' into simpler ones. Identify groups within the larger classes for refactoring (e.g. plugin-related stuff in Map)
+
+
+## Normal README
 
 This is PHP Network Weathermap, version 1.0.0 by Howard Jones (howie@thingy.com)
 

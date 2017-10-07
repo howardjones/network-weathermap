@@ -183,6 +183,7 @@ class EditorUI extends UIBase
                 array("mapname", "mapfile"),
                 array("param", "name")
             ),
+            "working" => true,
             "handler" => "cmdLinkStraighten"
         ),
         "delete_link" => array(
@@ -214,30 +215,35 @@ class EditorUI extends UIBase
                 array("mapname", "mapfile"),
                 array("param", "name"),
             ),
+            "working" => true,
             "handler" => "cmdTidyLink"
         ),
         "tidy_all" => array(
             "args" => array(
                 array("mapname", "mapfile")
             ),
+            "working" => true,
             "handler" => "cmdTidyAllLinks"
         ),
-        "retidy_all" => array(
-            "args" => array(
-                array("mapname", "mapfile")
-            ),
-            "handler" => "cmdReTidyAllLinks"
-        ),
+//        "retidy_all" => array(
+//            "args" => array(
+//                array("mapname", "mapfile")
+//            ),
+//            "working" => true,
+//            "handler" => "cmdReTidyAllLinks"
+//        ),
         "retidy" => array(
             "args" => array(
                 array("mapname", "mapfile")
             ),
+            "working" => true,
             "handler" => "cmdReTidyLinks"
         ),
         "untidy" => array(
             "args" => array(
                 array("mapname", "mapfile")
             ),
+            "working" => true,
             "handler" => "cmdUnTidyAllLinks"
         ),
         "set_link_properties" => array(

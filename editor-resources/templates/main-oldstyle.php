@@ -52,7 +52,7 @@
                                                                    alt="Weathermap" usemap="#weathermap_imap"
         />
         <div class="debug"><p><strong>Debug:</strong>
-                <a href="?<?php echo($fromplug == true ? 'plug=1&amp;' : ''); ?>action=retidy_all&amp;mapname=<?php echo htmlspecialchars($mapname) ?>">Re-tidy
+                <a href="?<?php echo($fromplug == true ? 'plug=1&amp;' : ''); ?>action=tidy_all&amp;mapname=<?php echo htmlspecialchars($mapname) ?>">Tidy
                     ALL</a>
                 <a href="?<?php echo($fromplug == true ? 'plug=1&amp;' : ''); ?>action=retidy&amp;mapname=<?php echo htmlspecialchars($mapname) ?>">Re-tidy</a>
                 <a href="?<?php echo($fromplug == true ? 'plug=1&amp;' : ''); ?>action=untidy&amp;mapname=<?php echo htmlspecialchars($mapname) ?>">Un-tidy</a>
@@ -240,7 +240,8 @@
                     <td><a class="dlgTitlebar" id="link_delete">Delete
                             Link</a><a class="dlgTitlebar" id="link_edit">Edit</a><a
                                 class="dlgTitlebar" id="link_tidy">Tidy</a><a
-                                class="dlgTitlebar" id="link_via">Via</a>
+                                class="dlgTitlebar" id="link_via">Via</a><a
+                                class="dlgTitlebar" id="link_straight">Straight</a>
                     </td>
                 </tr>
             </table>

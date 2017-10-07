@@ -596,7 +596,7 @@ class MapLink extends MapDataItem
         }
 
         if (isset($this->endpoints[0]->node) && isset($this->endpoints[1]->node)) {
-            $output .= sprintf("\tNODES %s %s\n", $this->endpoints[0]->node->name, $this->endpoints[1]->node->name);
+            $output .= sprintf("\tNODES %s %s\n", $this->endpoints[0], $this->endpoints[1]);
         }
 
         if (count($this->viaList) > 0) {

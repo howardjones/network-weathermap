@@ -43,9 +43,9 @@ class MapUtility
                 $callingFunction = " [$function@$file:$line]";
 
                 if (is_array($weathermap_debug_suppress) && in_array(
-                    strtolower($function),
-                    $weathermap_debug_suppress
-                )) {
+                        strtolower($function),
+                        $weathermap_debug_suppress
+                    )) {
                     return;
                 }
             }
@@ -228,6 +228,10 @@ class MapUtility
 
     public static function calculateOffset($offsetstring, $width, $height)
     {
+        if ($offsetstring == "") {
+            return array(0, 0);
+        }
+
         if (preg_match('/^([-+]?\d+):([-+]?\d+)$/', $offsetstring, $matches)) {
             self::debug("Numeric Offset found\n");
             return array($matches[1], $matches[2]);

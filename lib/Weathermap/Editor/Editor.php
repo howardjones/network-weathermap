@@ -429,7 +429,7 @@ class Editor
             throw new WeathermapInternalFail("Map must be loaded before editing API called.");
         }
 
-        if (isset($this->map->links[$linkName])) {
+        if ($this->map->linkExists($linkName)) {
             unset($this->map->links[$linkName]);
             return true;
         }
@@ -469,8 +469,9 @@ class Editor
             throw new WeathermapInternalFail("Map must be loaded before editing API called.");
         }
 
-        if (isset($this->map->links[$linkName])) {
-            $this->map->links[$linkName]->viaList = array(array(0 => $x, 1 => $y));
+        if ($this->map->linkExists($linkName)) {
+            $link = $this->map->getLink($linkName);
+            $link->viaList = array(array(0 => $x, 1 => $y));
 
             return true;
         }
@@ -483,8 +484,9 @@ class Editor
             throw new WeathermapInternalFail("Map must be loaded before editing API called.");
         }
 
-        if (isset($this->map->links[$linkName])) {
-            $this->map->links[$linkName]->viaList = array();
+        if ($this->map->linkExists($linkName)) {
+            $link = $this->map->getLink($linkName);
+            $link->viaList = array();
 
             return true;
         }
@@ -512,7 +514,7 @@ class Editor
      * @param int $linktotal - if this is part of a group, how many total in the group
      * @param bool $ignoreTidied - whether to take notice of the "_tidied" hint
      */
-    private function tidyOneLink($link, $linknumber = 1, $linktotal = 1, $ignoreTidied = false)
+    private function tidyOneLink($link, $linknumber = 1, $linktotal = 1)
     {
         if ($link->isTemplate()) {
             return;
@@ -763,76 +765,55 @@ class Editor
         }
 
         // draw a map and throw it away, to calculate all the bounding boxes
-        $this->map->drawMap('null');
+        // $this->map->drawMap('null');
 
         $routes = array();
-//        $done = array();
 
         // build a list of non-template links with their route - a simple key that we can use to tell if two
         // links go between the same nodes
+        // not very efficient, but it saves looking for special cases (a->b & b->a together)
         foreach ($this->map->links as $link) {
             if (!$link->isTemplate()) {
                 $route = $this->makeRouteKey($link);
-                if ((!$ignoreTidied || $link->getHint("_tidied") == 0)) {
+                if (($ignoreTidied || $link->getHint("_tidied") == 1)) {
                     $routes[$route][] = $link;
                 }
             }
         }
 
         foreach ($routes as $route => $linkList) {
-//            if (!$linkList->isTemplate()) {
-//                $route = $link->a->name . " " . $link->b->name;
-//
-//                if (strcmp($link->a->name, $link->b->name) > 0) {
-//                    $route = $link->b->name . " " . $link->a->name;
-//                }
-
-//                if (($ignoreTidied || $linkList->getHint("_tidied") == 1)) {
-            if (count($linkList) == 1) {
-                $this->tidyOneLink($linkList[0]);
-//                        $done[$route] = 1;
-            } else {
-                # handle multi-links specially...
-                $this->doTidyLinks($linkList);
-//                        $this->_tidy_links($routes[$route]);
-                // mark it so we don't do it again when the other links come by
-//                        $done[$route] = 1;
-//                    }
-            }
+            $this->tidyParallelLinks($linkList);
         }
-//        }
     }
 
     /**
-     * @param $linkList
+     * @param MapLink $link
      * @return string
      */
-    private function makeRouteKey($linkList)
+    private function makeRouteKey($link)
     {
-        $route = $linkList->a->name . " " . $linkList->b->name;
-        if (strcmp($linkList->a->name, $linkList->b->name) > 0) {
-            $route = $linkList->b->name . " " . $linkList->a->name;
+        $route = $link->endpoints[0]->node->name . " " . $link->endpoints[1]->node->name;
+        if (strcmp($link->endpoints[0]->node->name, $link->endpoints[1]->node->name) > 0) {
+            $route = $link->endpoints[1]->node->name . " " . $link->endpoints[0]->node->name;
             return $route;
         }
         return $route;
     }
 
     /**
-     * _tidy_links - for a group of links between the same two nodes, distribute them
+     * tidyParallelLinks - for a group of links between the same two nodes, distribute them
      * nicely.
      *
      * @param MapLink[] $links - the links to treat as a group
-     * @param bool $ignoreTidied - whether to take notice of the "_tidied" hint
      *
      */
-    public function doTidyLinks($links, $ignoreTidied = false)
+    public function tidyParallelLinks($links)
     {
-        // not very efficient, but it saves looking for special cases (a->b & b->a together)
         $nTargets = count($links);
 
         $i = 1;
         foreach ($links as $link) {
-            $this->tidyOneLink($link, $i, $nTargets, $ignoreTidied);
+            $this->tidyOneLink($link, $i, $nTargets);
             $i++;
         }
     }
@@ -845,7 +826,7 @@ class Editor
 
         // draw a map and throw it away, to calculate all the bounding boxes
         $this->map->drawMap('null');
-        $this->doRetidyLinks(false);
+        $this->doRetidyLinks(true);
     }
 
     public function retidyLinks()
@@ -856,7 +837,7 @@ class Editor
 
         // draw a map and throw it away, to calculate all the bounding boxes
         $this->map->drawMap('null');
-        $this->doRetidyLinks();
+        $this->doRetidyLinks(false);
     }
 
     /**

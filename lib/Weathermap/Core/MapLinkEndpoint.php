@@ -48,7 +48,7 @@ class MapLinkEndpoint
     {
         $output = $this->node->name;
 
-        if ($this->offset != 'C') {
+        if ($this->offset != 'C' && $this->offset != '') {
             $output .= ':' . $this->offset;
         }
 

@@ -3,7 +3,10 @@
 //require_once dirname(__FILE__) . '/../lib/all.php';
 //require_once dirname(__FILE__) . '/../lib/Editor.php';
 //include_once dirname(__FILE__) . "/WMTestSupport.php";
+
 namespace Weathermap\Tests;
+
+require '../../all.php';
 
 use Weathermap\Editor\Editor;
 
@@ -113,6 +116,116 @@ class EditorTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals("[LINK node1-node2]", $nDepsString, "Dependency added when link moves");
     }
 
+    public function testTidy()
+    {
+        $editor = new Editor();
+        $editor->newConfig();
+
+        $editor->addNode(100, 100, "node1");
+        $editor->addNode(103, 200, "node2");
+        $editor->addNode(97, 300, "node3");
+        $editor->addNode(200, 298, "node4");
+        $editor->addNode(200, 402, "node5");
+        $editor->addNode(200, 100, "node6");
+
+
+        $editor->addLink("node1", "node2", "l1");
+        $editor->tidyLink("l1");
+        $ll1 = $editor->map->getLink("l1");
+        $this->assertEquals("1:8", $ll1->endpoints[0]->offset);
+        $this->assertEquals("-1:-8", $ll1->endpoints[1]->offset);
+
+        $editor->addLink("node2", "node3", "l2");
+        $editor->tidyLink("l2");
+        $ll2 = $editor->map->getLink("l2");
+        $this->assertEquals($ll2->endpoints[0]->offset, "-3:8");
+        $this->assertEquals("3:-8", $ll2->endpoints[1]->offset);
+
+        $editor->addLink("node4", "node5", "l3");
+        $editor->tidyLink("l3");
+        $ll3 = $editor->map->getLink("l3");
+        $this->assertEquals("S95", $ll3->endpoints[0]->offset);
+        $this->assertEquals("N95", $ll3->endpoints[1]->offset);
+
+        $editor->addLink("node1", "node6", "l4");
+        $editor->tidyLink("l4");
+        $ll4 = $editor->map->getLink("l4");
+        $this->assertEquals("E95", $ll4->endpoints[0]->offset);
+        $this->assertEquals("W95", $ll4->endpoints[1]->offset);
+
+        $editor->addLink("node1", "node5", "l5");
+        $editor->tidyLink("l5");
+        $ll5 = $editor->map->getLink("l5");
+        $this->assertEquals("", $ll5->endpoints[0]->offset);
+        $this->assertEquals("", $ll5->endpoints[1]->offset);
+    }
+
+    public function testTidyAll()
+    {
+        $editor = new Editor();
+        $editor->newConfig();
+
+        $editor->addNode(100, 100, "node1");
+        $editor->addNode(103, 200, "node2");
+        $editor->addNode(97, 300, "node3");
+        $editor->addNode(200, 298, "node4");
+        $editor->addNode(200, 402, "node5");
+        $editor->addNode(200, 100, "node6");
+
+        $editor->addLink("node1", "node2", "l1");
+        $editor->addLink("node2", "node3", "l2");
+        $editor->addLink("node4", "node5", "l3");
+        $editor->addLink("node1", "node6", "l4");
+        $editor->addLink("node1", "node5", "l5");
+
+        $editor->tidyAllLinks();
+
+        // tidy bug that removed all the endpoints
+        foreach ($editor->map->links as $link) {
+            if ($link->name != ":: DEFAULT ::" && $link->name != "DEFAULT") {
+                $this->assertFalse($link->isTemplate());
+            }
+        }
+
+        $editor->retidyAllLinks();
+
+        // tidy bug that removed all the endpoints
+        foreach ($editor->map->links as $link) {
+            if ($link->name != ":: DEFAULT ::" && $link->name != "DEFAULT") {
+                $this->assertFalse($link->isTemplate());
+            }
+        }
+
+        $ll4 = $editor->map->getLink("l4");
+        $this->assertEquals("E95", $ll4->endpoints[0]->offset);
+        $this->assertEquals("W95", $ll4->endpoints[1]->offset);
+
+        $ll1 = $editor->map->getLink("l1");
+        $this->assertEquals("1:8", $ll1->endpoints[0]->offset);
+        $this->assertEquals("-1:-8", $ll1->endpoints[1]->offset);
+    }
+
+    public function testVIA()
+    {
+        $editor = new Editor();
+        $editor->newConfig();
+
+        $editor->addNode(100, 100, "node1");
+        $editor->addNode(103, 200, "node2");
+
+        $editor->addLink("node1", "node2", "l1");
+
+        $link = $editor->map->getLink("l1");
+
+        $editor->setLinkVia("l1", 150, 150);
+
+        $this->assertEquals(1, count($link->viaList));
+
+        $editor->clearLinkVias("l1");
+
+        $this->assertEquals(0, count($link->viaList));
+    }
+
     public function setUp()
     {
         $this->projectRoot = realpath(dirname(__FILE__) . "/../../../");
@@ -136,8 +249,9 @@ class EditorTest extends \PHPUnit_Framework_TestCase
         chdir(self::$previouswd);
     }
 
-    public function makeString($object)
-    {
+    public function makeString(
+        $object
+    ) {
         return (string)$object;
     }
 

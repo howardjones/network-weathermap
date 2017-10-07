@@ -112,6 +112,7 @@ function attach_click_events() {
     jQuery("#link_edit").click(edit_link);
 
     jQuery("#link_tidy").click(tidy_link);
+    jQuery("#link_straight").click(straighten_link);
 
     jQuery("#link_via").click(via_link);
 
@@ -519,6 +520,12 @@ function show_link(name) {
             comment_pos_in.prepend("<option selected value='" + mylink.commentposin + "'>" + mylink.commentposin + "%</option>");
         }
 
+        if (mylink.via.length === 0) {
+            document.getElementById('link_straight').style.display='none';
+        } else {
+            document.getElementById('link_straight').style.display='inline';
+        }
+
         document.getElementById('link_nodename1').firstChild.nodeValue = mylink.a;
         document.getElementById('link_nodename1a').firstChild.nodeValue = mylink.a;
         document.getElementById('link_nodename1b').firstChild.nodeValue = mylink.a;
@@ -585,6 +592,11 @@ function coord_release(event) {
 
 function tidy_link() {
     document.getElementById('action').value = "link_tidy";
+    document.frmMain.submit();
+}
+
+function straighten_link() {
+    document.getElementById('action').value = "straight_link";
     document.frmMain.submit();
 }
 

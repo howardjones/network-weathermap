@@ -440,19 +440,20 @@ class MapDataItem extends MapItem
 
     protected function asJS($type = 'Thing', $prefix = 'T')
     {
+        throw new WeathermapDeprecatedException("This is redundant");
         $output = '';
-        $output .= $type . 's[' . StringUtility::jsEscape($this->name) . '] = {';
+        $output .= $type . 's[' . StringUtility::jsEscape($this->name) . '] = ';
 
         $output .= $this->asJSCore();
 
-        $output .= "};\n";
-        $output .= $type . 'IDs["' . $prefix . $this->id . '"] = ' . StringUtility::jsEscape($this->name) . ";\n";
+        $output .= ";\n";
 
         return $output;
     }
 
     protected function asJSCore()
     {
+        throw new WeathermapDeprecatedException("This is redundant");
         return '';
     }
 

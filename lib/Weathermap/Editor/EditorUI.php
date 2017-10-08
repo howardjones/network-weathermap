@@ -263,7 +263,7 @@ class EditorUI extends UIBase
                 array("link_commentposout", "string"),
                 array("link_commentposin", "string")
             ),
-            "handler" => "cmdEditLink"
+            "handler" => "cmdLinkProperties"
         ),
         "set_node_properties" => array(
             "args" => array(
@@ -272,17 +272,23 @@ class EditorUI extends UIBase
                 array("node_x", "int"),
                 array("node_y", "int"),
                 array("node_lock_to", "name"),
+                array("node_name", "name"),
                 array("node_new_name", "name"),
                 array("node_label", "string"),
                 array("node_infourl", "string"),
                 array("node_hover", "string"),
                 array("node_iconfilename", "string")
             ),
-            "handler" => "cmdEditNode"
+            "handler" => "cmdNodeProperties"
         ),
         "set_map_style" => array(
             "args" => array(
                 array("mapname", "mapfile"),
+                array('mapstyle_linklabels','string'),
+                array('mapstyle_arrowstyle','string'),
+                array('mapstyle_nodefont','int'),
+                array('mapstyle_linkfont','int'),
+                array('mapstyle_legendfont','int'),
             ),
             "handler" => "cmdMapStyle"
         ),
@@ -575,7 +581,7 @@ class EditorUI extends UIBase
      * @param string[] $params
      * @param Editor $editor
      */
-    public function cmdEditLink($params, $editor)
+    public function cmdLinkProperties($params, $editor)
     {
         // TODO: this is empty!!
     }
@@ -614,7 +620,7 @@ class EditorUI extends UIBase
      * @param string[] $params
      * @param Editor $editor
      */
-    public function cmdEditNode($params, $editor)
+    public function cmdNodeProperties($params, $editor)
     {
         // TODO: this is empty!!
     }
@@ -979,6 +985,9 @@ class EditorUI extends UIBase
         $this->fromPlugin = $state;
     }
 
+    /**
+     * @param Editor $editor
+     */
     public function showMainPage($editor)
     {
         /* add a random bit onto the URL so that the next request won't get the same URL/ETag combo
@@ -1029,7 +1038,7 @@ class EditorUI extends UIBase
 
         $fonts = $editor->map->fonts->getList();
         ksort($fonts);
-        $fontsJSON = "\nvar fontlist = " . json_encode($fonts) . ";\n";
+        $fontsJSON = "\nvar fontlist = " . json_encode(array_keys($fonts)) . ";\n";
         $tpl->set("fonts_json", $fontsJSON);
 
         echo $tpl->fetch("editor-resources/templates/main-oldstyle.php");

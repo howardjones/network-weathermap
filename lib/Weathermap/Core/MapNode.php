@@ -101,8 +101,8 @@ class MapNode extends MapDataItem
             'relativePositionResolved' => false,
             'x' => null,
             'y' => null,
-            'scaleKeys' => array(IN=>'', OUT=>''),
-            'scaleTags' => array(IN=>'', OUT=>''),
+            'scaleKeys' => array(IN => '', OUT => ''),
+            'scaleTags' => array(IN => '', OUT => ''),
 //            'inscalekey' => '',
 //            'outscalekey' => '',
             #'incolour'=>-1,'outcolour'=>-1,
@@ -586,42 +586,57 @@ class MapNode extends MapDataItem
         return $output;
     }
 
-    protected function asJSCore()
+    public function editorData()
     {
-        // TODO - this should use json_encode()
-        $output = '';
-
-        $output .= 'x:' . (is_null($this->x) ? "'null'" : $this->x) . ', ';
-        $output .= 'y:' . (is_null($this->y) ? "'null'" : $this->y) . ', ';
-        $output .= '"id":' . $this->id . ', ';
-        $output .= 'ox:' . $this->originalX . ', ';
-        $output .= 'oy:' . $this->originalY . ', ';
-        $output .= 'relative_to:' . StringUtility::jsEscape($this->positionRelativeTo) . ', ';
-        $output .= 'label:' . StringUtility::jsEscape($this->label) . ', ';
-        $output .= 'name:' . StringUtility::jsEscape($this->name) . ', ';
-        $output .= 'infourl:' . StringUtility::jsEscape($this->infourl[IN]) . ', ';
-        $output .= 'overlibcaption:' . StringUtility::jsEscape($this->overlibcaption[IN]) . ', ';
-        $output .= 'overliburl:' . StringUtility::jsEscape(join(' ', $this->overliburl[IN])) . ', ';
-        $output .= 'overlibwidth:' . $this->overlibheight . ', ';
-        $output .= 'overlibheight:' . $this->overlibwidth . ', ';
-        if (count($this->boundingboxes) > 0) {
-            $output .= sprintf(
-                'bbox:[%d,%d, %d,%d], ',
-                $this->boundingboxes[0][0],
-                $this->boundingboxes[0][1],
-                $this->boundingboxes[0][2],
-                $this->boundingboxes[0][3]
-            );
-        } else {
-            $output .= 'bbox: [], ';
-        }
+        $newOutput = array(
+            "id" => "N" . $this->id,
+            "name" => $this->name,
+            "x" => $this->x,
+            "y" => $this->y,
+            "ox" => $this->originalX,
+            "oy" => $this->originalY,
+            "relative_to" => $this->positionRelativeTo,
+            "label" => $this->label,
+            "infourl" => $this->infourl[IN],
+            "overliburl" => $this->overliburl[IN],
+            "overlibcaption" => $this->overlibcaption[IN],
+            "overlibwidth" => $this->overlibwidth,
+            "overlibheight" => $this->overlibheight,
+            "iconfile" => $this->iconfile
+        );
 
         if (preg_match('/^(none|nink|inpie|outpie|box|rbox|gauge|round)$/', $this->iconfile)) {
-            $output .= 'iconfile:' . StringUtility::jsEscape('::' . $this->iconfile);
-        } else {
-            $output .= 'iconfile:' . StringUtility::jsEscape($this->iconfile);
+            $newOutput['iconfile'] ='::' . $this->iconfile;
         }
 
+        return $newOutput;
+    }
+
+    protected function asJSCore()
+    {
+        throw new WeathermapDeprecatedException("This is redundant");
+
+        $newOutput = array(
+            "id" => "N" . $this->id,
+            "name" => $this->name,
+            "x" => $this->x,
+            "y" => $this->y,
+            "ox" => $this->originalX,
+            "oy" => $this->originalY,
+            "relative_to" => $this->positionRelativeTo,
+            "label" => $this->label,
+            "infourl" => $this->infourl[IN],
+            "overliburl" => $this->overliburl[IN],
+            "overlibcaption" => $this->overlibcaption[IN],
+            "overlibwidth" => $this->overlibwidth,
+            "overlibheight" => $this->overlibheight,
+            "iconfile" => $this->iconfile
+        );
+
+        if (preg_match('/^(none|nink|inpie|outpie|box|rbox|gauge|round)$/', $this->iconfile)) {
+            $newOutput['iconfile'] ='::' . $this->iconfile;
+        }
+        $output = json_encode($newOutput);
         return $output;
     }
 
@@ -1283,18 +1298,18 @@ class MapNode extends MapDataItem
         MapUtility::debug("Fetching %s\n", $name);
 
         $translations = array(
-            "inscalekey"=>$this->scaleKeys[IN],
-            "outscalekey"=>$this->scaleKeys[OUT],
-            "inscaletag"=>$this->scaleTags[IN],
-            "outscaletag"=>$this->scaleTags[OUT],
-            "bandwidth_in"=>$this->absoluteUsages[IN],
-            "inpercent"=>$this->percentUsages[IN],
-            "bandwidth_out"=>$this->absoluteUsages[OUT],
-            "outpercent"=>$this->percentUsages[OUT],
-            "max_bandwidth_in"=>$this->maxValues[IN],
-            'max_bandwidth_in_cfg'=>$this->maxValuesConfigured[IN],
-            "max_bandwidth_out"=>$this->maxValues[OUT],
-            'max_bandwidth_out_cfg'=>$this->maxValuesConfigured[OUT],
+            "inscalekey" => $this->scaleKeys[IN],
+            "outscalekey" => $this->scaleKeys[OUT],
+            "inscaletag" => $this->scaleTags[IN],
+            "outscaletag" => $this->scaleTags[OUT],
+            "bandwidth_in" => $this->absoluteUsages[IN],
+            "inpercent" => $this->percentUsages[IN],
+            "bandwidth_out" => $this->absoluteUsages[OUT],
+            "outpercent" => $this->percentUsages[OUT],
+            "max_bandwidth_in" => $this->maxValues[IN],
+            'max_bandwidth_in_cfg' => $this->maxValuesConfigured[IN],
+            "max_bandwidth_out" => $this->maxValues[OUT],
+            'max_bandwidth_out_cfg' => $this->maxValuesConfigured[OUT],
         );
 
         if (array_key_exists($name, $translations)) {

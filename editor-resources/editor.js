@@ -155,27 +155,54 @@ function help_handler(e) {
     }
 }
 
+function getObjectById(obtype, required_id) {
+    var matches = [];
+    // console.log(`finding ${obtype} called ${required_id}`);
+
+    if (obtype === 'LINK') {
+        matches = Object.keys(mapdata.Links).filter(function (item) {
+            return mapdata.Links[item].id === required_id
+        });
+        // console.log(matches);
+    }
+
+    if (obtype === 'NODE') {
+        matches = Object.keys(mapdata.Nodes).filter(function (item) {
+            return mapdata.Nodes[item].id === required_id
+        });
+        // console.log(matches);
+    }
+
+    if (matches.length === 1) {
+        // console.log("Found exactly one match(good!)");
+        return matches[0];
+    }
+    // console.log(`Found ${matches.length} matches (bad!)`);
+    return null;
+}
+
 // Any clicks in the imagemap end up here.
 function click_handler(e) {
-    var alt, objectname, objecttype, objectid;
+    var alt, objectname, objecttype, objectid, map_object;
 
     alt = jQuery(this).attr("id");
 
     objecttype = alt.slice(0, 4);
     objectname = alt.slice(5, alt.length);
     objectid = objectname.slice(0, objectname.length - 2);
+    map_object = null;
 
     // if we're not in a mode yet...
     if (document.frmMain.action.value === '') {
 
         // if we're waiting for a node specifically (e.g. "make link") then ignore links here
         if (objecttype === 'NODE') {
-            objectname = NodeIDs[objectid];
+            objectname = getObjectById(objecttype, objectid);
             show_node(objectname);
         }
 
         if (objecttype === 'LINK') {
-            objectname = LinkIDs[objectid];
+            objectname = getObjectById(objecttype, objectid);
             show_link(objectname);
         }
     }
@@ -432,7 +459,7 @@ function show_node(name) {
 
     hide_all_dialogs();
 
-    var mynode = Nodes[name];
+    var mynode = mapdata.Nodes[name];
 
     if (mynode) {
         document.frmMain.action.value = "set_node_properties";
@@ -463,11 +490,11 @@ function show_node(name) {
 
         console.log(mynode.relative_to);
 
-        if (mynode.relative_to !== '') {
-            document.frmMain.node_lock_to.value = mynode.relative_to;
-        } else {
-            document.frmMain.node_lock_to.value = "-- NONE --";
-        }
+        // if (mynode.relative_to !== '') {
+        document.frmMain.node_lock_to.value = mynode.relative_to;
+        // } else {
+        //     document.frmMain.node_lock_to.value = "";
+        // }
 
         // save this here, just in case they choose delete_node or move_node
         document.getElementById('param').value = mynode.name;
@@ -482,7 +509,7 @@ function show_link(name) {
 
     hide_all_dialogs();
 
-    var mylink = Links[name];
+    var mylink = mapdata.Links[name];
 
     if (mylink) {
         document.frmMain.link_name.value = mylink.name;
@@ -521,9 +548,9 @@ function show_link(name) {
         }
 
         if (mylink.via.length === 0) {
-            document.getElementById('link_straight').style.display='none';
+            document.getElementById('link_straight').style.display = 'none';
         } else {
-            document.getElementById('link_straight').style.display='inline';
+            document.getElementById('link_straight').style.display = 'inline';
         }
 
         document.getElementById('link_nodename1').firstChild.nodeValue = mylink.a;

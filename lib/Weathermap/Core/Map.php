@@ -1429,23 +1429,17 @@ class Map extends MapBase
 
     public function asJS()
     {
-        $js = '';
-
-        $js .= "var Links = new Array();\n";
-        $js .= "var LinkIDs = new Array();\n";
+        $newOutput = array("Nodes"=>array(), "Links"=>array(), "Areas" => array());
 
         foreach ($this->links as $link) {
-            $js .= $link->asJS();
+            $newOutput['Links'][$link->name] = $link->editorData();
         }
-
-        $js .= "var Nodes = new Array();\n";
-        $js .= "var NodeIDs = new Array();\n";
 
         foreach ($this->nodes as $node) {
-            $js .= $node->asJS();
+            $newOutput['Nodes'][$node->name] = $node->editorData();
         }
 
-        return $js;
+        return "var mapdata = " . json_encode($newOutput) . ";";
     }
 
 

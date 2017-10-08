@@ -94,7 +94,7 @@
                         <span id="node_locktext">
                                 <br/>Lock to:
                                 <select name="node_lock_to" id="node_lock_to">
-                                    <option>-- NONE --</option>
+                                    <option value="">-- NONE --</option>
                                     <?php echo $nodeselection ?>
                                 </select>
                             </span>

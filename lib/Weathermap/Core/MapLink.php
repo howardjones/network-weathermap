@@ -169,7 +169,6 @@ class MapLink extends MapDataItem
             $gdCommentColours[$direction] = $commentColours[$direction]->gdAllocate($gdImage);
 
 
-
             $comment = $this->calculateCommentText($direction);
 
             if ($comment == '') {
@@ -619,18 +618,35 @@ class MapLink extends MapDataItem
         return $output;
     }
 
-    protected function asJSCore()
+    public function editorData()
     {
-        $output = '';
+        $newOutput = array(
+            "id" => "L" . $this->id,
+            "name" => $this->name,
+            "a" => null,
+            "b" => null,
+            "width" => $this->width,
+            "target" => array(),
+            "via" => array(),
+            "bw_in" => $this->maxValuesConfigured[IN],
+            "bw_out" => $this->maxValuesConfigured[OUT],
+            "infourl" => $this->infourl[IN],
+            "overliburl" => $this->overliburl[IN],
+            "overlibcaption" => $this->overlibcaption[IN],
+            "overlibwidth" => $this->overlibwidth,
+            "overlibheight" => $this->overlibheight,
+            "commentin" => $this->comments[IN],
+            "commentposin" => $this->commentOffsets[IN],
+            "commentout" => $this->comments[OUT],
+            "commentposout" => $this->commentOffsets[OUT],
+        );
 
-        $output .= '"id":' . $this->id . ', ';
         if (isset($this->endpoints[0]->node)) {
-            $output .= "a:'" . $this->endpoints[0]->node->name . "', ";
-            $output .= "b:'" . $this->endpoints[1]->node->name . "', ";
+            $newOutput['a'] = $this->endpoints[0]->node->name;
         }
-
-        $output .= "width:'" . $this->width . "', ";
-        $output .= 'target:';
+        if (isset($this->endpoints[1]->node)) {
+            $newOutput['b'] = $this->endpoints[1]->node->name;
+        }
 
         $tgt = '';
 
@@ -642,43 +658,53 @@ class MapLink extends MapDataItem
             $tgt .= $target->asConfig();
             $i++;
         }
+        $newOutput["target"] = $tgt;
 
-        $output .= StringUtility::jsEscape(trim($tgt));
-        $output .= ',';
+        $newOutput['via'] = $this->viaList;
 
-        $output .= 'bw_in:' . StringUtility::jsEscape($this->maxValuesConfigured[IN]) . ', ';
-        $output .= 'bw_out:' . StringUtility::jsEscape($this->maxValuesConfigured[OUT]) . ', ';
+        return $newOutput;
+    }
 
-        $output .= 'name:' . StringUtility::jsEscape($this->name) . ', ';
-        $output .= "overlibwidth:'" . $this->overlibheight . "', ";
-        $output .= "overlibheight:'" . $this->overlibwidth . "', ";
-        $output .= 'overlibcaption:' . StringUtility::jsEscape($this->overlibcaption[IN]) . ', ';
+    protected function asJSCore()
+    {
+        throw new WeathermapDeprecatedException("This is redundant");
 
-        $output .= 'commentin:' . StringUtility::jsEscape($this->comments[IN]) . ', ';
-        $output .= 'commentposin:' . intval($this->commentOffsets[IN]) . ', ';
+        $newOutput = array(
+            "id" => "L" . $this->id,
+            "name" => $this->name,
+            "a" => $this->endpoints[0]->node->name,
+            "b" => $this->endpoints[1]->node->name,
+            "width" => $this->width,
+            "target" => array(),
+            "via" => array(),
+            "bw_in" => $this->maxValuesConfigured[IN],
+            "bw_out" => $this->maxValuesConfigured[OUT],
+            "infourl" => $this->infourl[IN],
+            "overliburl" => $this->overliburl[IN],
+            "overlibcaption" => $this->overlibcaption[IN],
+            "overlibwidth" => $this->overlibwidth,
+            "overlibheight" => $this->overlibheight,
+            "commentin" => $this->comments[IN],
+            "commentposin" => $this->commentOffsets[IN],
+            "commentout" => $this->comments[OUT],
+            "commentposout" => $this->commentOffsets[OUT],
+        );
 
-        $output .= 'commentout:' . StringUtility::jsEscape($this->comments[OUT]) . ', ';
-        $output .= 'commentposout:' . intval($this->commentOffsets[OUT]) . ', ';
+        $tgt = '';
 
-        $output .= 'infourl:' . StringUtility::jsEscape($this->infourl[IN]) . ', ';
-        $output .= 'overliburl:' . StringUtility::jsEscape(join(' ', $this->overliburl[IN])) . ', ';
-
-        $output .= 'via: [';
-        $nItem = 0;
-        foreach ($this->viaList as $via) {
-            if ($nItem > 0) {
-                $output .= ', ';
+        $i = 0;
+        foreach ($this->targets as $target) {
+            if ($i > 0) {
+                $tgt .= ' ';
             }
-            $output .= sprintf('[%d,%d', $via[0], $via[1]);
-            if (isset($via[2])) {
-                $output .= ',' . StringUtility::jsEscape($via[2]);
-            }
-            $output .= ']';
-
-            $nItem++;
+            $tgt .= $target->asConfig();
+            $i++;
         }
+        $newOutput["target"] = $tgt;
 
-        $output .= ']';
+        $newOutput['via'] = $this->viaList;
+
+        $output = json_encode($newOutput);
 
         return $output;
     }

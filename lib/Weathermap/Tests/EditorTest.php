@@ -6,7 +6,7 @@
 
 namespace Weathermap\Tests;
 
-require '../../all.php';
+require dirname(__FILE__) . '/../../all.php';
 
 use Weathermap\Editor\Editor;
 

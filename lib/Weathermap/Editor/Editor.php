@@ -13,6 +13,7 @@ use Weathermap\Core\Rectangle;
 use Weathermap\Core\WeathermapInternalFail;
 use Weathermap\Core\Point;
 use Weathermap\Core\MathUtility;
+use Weathermap\Core\MapUtility;
 
 /** Wrapper API around WeatherMap to provide the relevant operations to manipulate
  *  the map contents that an editor will need, without it needing to see inside the map object.
@@ -260,13 +261,76 @@ class Editor
         return array($nNodes, $nLinks, $affectedNodes, $affectedLinks);
     }
 
-    public function updateNode($nodeName)
+    public function updateNode($nodeName, $params)
     {
         if (!$this->isLoaded()) {
             throw new WeathermapInternalFail("Map must be loaded before editing API called.");
         }
 
+        if ($this->map->nodeExists($nodeName)) {
+            // first check if there's a rename...
+            if ($nodeName != $params['node_new_name']) {
+                $nodeName = $this->renameNode($nodeName, $params['node_new_name']);
+            }
+
+            $node = $this->map->getNode($nodeName);
+
+            // TODO: Actually apply the changes in here!
+        }
+
+
         throw new WeathermapInternalFail("unimplemented");
+    }
+
+    public function renameNode($oldName, $newName)
+    {
+        if (!$this->map->nodeExists($oldName)) {
+            return $oldName;
+        }
+
+        if ($this->map->nodeExists($newName)) {
+            return $oldName;
+        }
+
+        // we need to rename the node first.
+        $newNode = $this->map->getNode($oldName);
+        $newNode->name = $newName;
+
+        $this->map->nodes[$newName] = $newNode;
+        unset($this->map->nodes[$oldName]);
+
+        // find the references elsewhere to the old node name.
+        // First, relatively-positioned NODEs
+        foreach ($this->map->nodes as $movingNode) {
+            if ($movingNode->positionRelativeTo == $oldName) {
+                $movingNode->positionRelativeTo = $newName;
+            }
+        }
+
+        // Next, LINKs that use this NODE as an end.
+        foreach ($this->map->links as $link) {
+            if (!$link->isTemplate()) {
+                if ($link->endpoints[0]->node->name == $oldName) {
+                    print "End[0] matches $oldName";
+                    $link->endpoints[0]->node = $newNode;
+                }
+                if ($link->endpoints[1]->node->name == $oldName) {
+                    print "End[1] matches $oldName";
+                    $link->endpoints[1]->node = $newNode;
+                }
+                // while we're here, VIAs can also be relative to a NODE,
+                // so check if any of those need to change
+                $n = 0;
+                foreach ($link->viaList as $via) {
+                    if (isset($via[2]) && $via[2] == $oldName) {
+                        $link->viaList[$n][2] = $newName;
+                    }
+                    $n++;
+                }
+            }
+        }
+
+        return $newName;
     }
 
     public function replaceNodeConfig($nodeName, $newConfig)
@@ -414,11 +478,16 @@ class Editor
         return array($newLinkName, $success, $log);
     }
 
-    public function updateLink()
+    public function updateLink($linkName)
     {
         if (!$this->isLoaded()) {
             throw new WeathermapInternalFail("Map must be loaded before editing API called.");
         }
+
+        if ($this->map->linkExists($linkName)) {
+            $link = $this->map->getLink($linkName);
+        }
+
 
         throw new WeathermapInternalFail("unimplemented");
     }

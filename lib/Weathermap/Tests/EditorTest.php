@@ -22,6 +22,48 @@ class EditorTest extends \PHPUnit_Framework_TestCase
 
     protected $projectRoot;
 
+    public function testNodeRename()
+    {
+        $editor = new Editor();
+        $editor->newConfig();
+
+        $editor->addNode(100, 100, "named_node");
+        $editor->addNode(100, 200, "other_named_node");
+        $editor->addNode(200, 200, "third_named_node", "named_node");
+
+        $n1 = $editor->map->getNode("third_named_node");
+        $n1->positionRelativeTo = "named_node";
+
+        $editor->addLink("other_named_node", "named_node", "linky");
+        $editor->addLink("named_node", "third_named_node", "named_link");
+
+        $l2 = $editor->map->getLink("linky");
+        $l2->viaList = array(array(40, 40, "named_node"));
+
+
+        $newName = $editor->renameNode("named_node", "steve");
+
+
+        $this->assertEquals("steve", $newName, "Rename returns new name");
+
+        $l1 = $editor->map->getLink("named_link");
+        $l2 = $editor->map->getLink("linky");
+
+        $this->assertEquals("steve", $l1->endpoints[0]->node->name, "Link endpoint should be renamed");
+        $this->assertEquals("steve", $l2->endpoints[1]->node->name, "Link endpoint should be renamed");
+
+        $n1 = $editor->map->getNode("third_named_node");
+        $this->assertEquals("steve", $n1->positionRelativeTo);
+
+        $this->assertEquals("steve", $l2->viaList[0][2], "Relative-positioned VIA should be renamed");
+
+        $newName = $editor->renameNode("steve", "other_named_node");
+        $this->assertEquals("steve", $newName, "Rename fails due to existing node");
+
+        $newName = $editor->renameNode("traflorkians", "node3");
+        $this->assertEquals("traflorkians", $newName, "Rename fails due to non-existing node");
+    }
+
     public function testNodeAdd()
     {
         $editor = new Editor();

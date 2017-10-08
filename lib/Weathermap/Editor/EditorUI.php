@@ -583,7 +583,7 @@ class EditorUI extends UIBase
      */
     public function cmdLinkProperties($params, $editor)
     {
-        // TODO: this is empty!!
+        $editor->updateLink($params['param']);
     }
 
     /**
@@ -622,7 +622,7 @@ class EditorUI extends UIBase
      */
     public function cmdNodeProperties($params, $editor)
     {
-        // TODO: this is empty!!
+        $editor->updateNode($params['param']);
     }
 
     /**

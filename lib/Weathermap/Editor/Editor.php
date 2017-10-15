@@ -14,6 +14,8 @@ use Weathermap\Core\WeathermapInternalFail;
 use Weathermap\Core\Point;
 use Weathermap\Core\MathUtility;
 use Weathermap\Core\MapUtility;
+use Weathermap\Core\Target;
+use Weathermap\Core\StringUtility;
 
 /** Wrapper API around WeatherMap to provide the relevant operations to manipulate
  *  the map contents that an editor will need, without it needing to see inside the map object.
@@ -250,6 +252,8 @@ class Editor
                     }
                 }
             }
+
+
         }
 
         $movingNode->x = $newX;
@@ -257,6 +261,9 @@ class Editor
 
         $nLinks = count($affectedLinks);
         $nNodes = count($affectedNodes);
+
+        // TODO: need to redraw image here, to get correct imagemap?
+        // TODO: Also, recalculate any relative positioned nodes? (doesn't matter with current editor, but isn't intuitive)
 
         return array($nNodes, $nLinks, $affectedNodes, $affectedLinks);
     }
@@ -269,17 +276,37 @@ class Editor
 
         if ($this->map->nodeExists($nodeName)) {
             // first check if there's a rename...
-            if ($nodeName != $params['node_new_name']) {
-                $nodeName = $this->renameNode($nodeName, $params['node_new_name']);
+            if ($nodeName != $params['new_name']) {
+                $nodeName = $this->renameNode($nodeName, $params['new_name']);
             }
 
             $node = $this->map->getNode($nodeName);
 
-            // TODO: Actually apply the changes in here!
+            $node->setPosition(new Point($params['x'], $params['y']));
+            $node->label = $params['label'];
+
+            // AICONs mess this up, because they're not fully supported by the editor, but it can still break them
+            if ($params['iconfilename'] != '--AICON--') {
+                $node->iconfile = stripslashes($params['iconfilename']);
+            }
+
+            $node->infourl[IN] = $params['infourl'];
+            $urls = preg_split('/\s+/', $params['hover'], -1, PREG_SPLIT_NO_EMPTY);
+            $node->overliburl[IN] = $urls;
+            $node->overliburl[OUT] = $urls;
+
+            if ($params['lock_to'] == "") {
+                $node->positionRelativeTo = "";
+            } else {
+                if ($this->map->nodeExists($params['lock_to'])) {
+                    $anchor = $this->map->getNode($params['lock_to']);
+
+                    $node->positionRelativeTo = $anchor->name;
+                    $node->originalX = $node->x - $anchor->x;
+                    $node->originalY = $node->y - $anchor->y;
+                }
+            }
         }
-
-
-        throw new WeathermapInternalFail("unimplemented");
     }
 
     public function renameNode($oldName, $newName)
@@ -478,7 +505,7 @@ class Editor
         return array($newLinkName, $success, $log);
     }
 
-    public function updateLink($linkName)
+    public function updateLink($linkName, $params)
     {
         if (!$this->isLoaded()) {
             throw new WeathermapInternalFail("Map must be loaded before editing API called.");
@@ -486,10 +513,37 @@ class Editor
 
         if ($this->map->linkExists($linkName)) {
             $link = $this->map->getLink($linkName);
+
+            // Now deal with params
+
+            $link->infourl[IN] = $params['infourl'];
+            $link->infourl[OUT] = $params['infourl'];
+            $urls = preg_split('/\s+/', $params['hover'], -1, PREG_SPLIT_NO_EMPTY);
+            $link->overliburl[IN] = $urls;
+            $link->overliburl[OUT] = $urls;
+
+            $link->commentOffsets[IN] = intval($params['commentpos_in']);
+            $link->commentOffsets[OUT] = intval($params['commentpos_out']);
+
+            $link->comments[IN] = $params['comment_in'];
+            $link->comments[OUT] = $params['comment_out'];
+
+
+            $link->maxValuesConfigured[IN] = $params['bandwidth_in'];
+            $link->maxValuesConfigured[OUT] = $params['bandwidth_out'];
+            $link->maxValues[IN] = StringUtility::interpretNumberWithMetricSuffixOrNull($params['bandwidth_in'], $this->map->kilo);
+            $link->maxValues[OUT] = StringUtility::interpretNumberWithMetricSuffixOrNull($params['bandwidth_out'], $this->map->kilo);
+
+            $targets = preg_split('/\s+/', $params['target'], -1, PREG_SPLIT_NO_EMPTY);
+            $newTargetList = array();
+
+            foreach ($targets as $target) {
+                $newTargetList[] = new Target($target, "", 0);
+            }
+            $link->targets = $newTargetList;
+
+            $link->width = floatval($params['width']);
         }
-
-
-        throw new WeathermapInternalFail("unimplemented");
     }
 
     public function deleteLink($linkName)
@@ -503,6 +557,26 @@ class Editor
             return true;
         }
         return false;
+    }
+
+    public function renameLink($oldName, $newName)
+    {
+        if (!$this->map->linkExists($oldName)) {
+            return $oldName;
+        }
+
+        if ($this->map->linkExists($newName)) {
+            return $oldName;
+        }
+
+        // we need to rename the link first.
+        $newLink = $this->map->getLink($oldName);
+        $newLink->name = $newName;
+
+        $this->map->links[$newName] = $newLink;
+        unset($this->map->links[$oldName]);
+
+        return $newName;
     }
 
     /**

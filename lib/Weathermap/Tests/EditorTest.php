@@ -319,4 +319,179 @@ class EditorTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals("N95", Editor::simplifyOffset(0, -5));
         $this->assertEquals("S95", Editor::simplifyOffset(0, 9));
     }
+
+    public function testNodeProperties()
+    {
+        $editor = new Editor();
+        $editor->newConfig();
+
+        $editor->addNode(100, 100, "named_node");
+        $editor->addNode(100, 200, "other_named_node");
+        $editor->addNode(200, 200, "third_named_node", "named_node");
+
+        $editor->addLink("other_named_node", "named_node", "linky");
+        $editor->addLink("named_node", "third_named_node", "named_link");
+
+        $update = array(
+            "name" => "named_node",
+            "x" => 110,
+            "y" => 120,
+            "lock_to" => '',
+            "new_name" => 'named_node',
+            "label" => 'Tumblorkian',
+            "infourl" => '',
+            "hover" => '',
+            "iconfilename" => ''
+        );
+        $editor->updateNode("named_node", $update);
+        $n = $editor->map->getNode("named_node");
+        $this->assertEquals(110, $n->x);
+        $this->assertEquals(120, $n->y);
+        $this->assertEquals(0, $n->originalX);
+        $this->assertEquals(0, $n->originalY);
+        $this->assertEquals('', $n->positionRelativeTo);
+        $this->assertEquals('Tumblorkian', $n->label);
+
+        $update['lock_to'] = 'other_named_node';
+        $editor->updateNode("named_node", $update);
+
+        $this->assertEquals('other_named_node', $n->positionRelativeTo);
+        $this->assertEquals(10, $n->originalX);
+        $this->assertEquals(-80, $n->originalY);
+
+        $update['lock_to'] = '';
+        $editor->updateNode("named_node", $update);
+
+        $this->assertEquals('', $n->positionRelativeTo);
+        $this->assertEquals(110, $n->x);
+        $this->assertEquals(120, $n->y);
+    }
+
+    public function testNodeMove()
+    {
+        $editor = new Editor();
+        $editor->newConfig();
+
+        $editor->addNode(100, 100, "named_node");
+        $editor->addNode(100, 200, "other_named_node");
+        $editor->addNode(200, 200, "third_named_node", "named_node");
+
+        $editor->addLink("other_named_node", "named_node", "linky");
+        $editor->addLink("named_node", "third_named_node", "named_link");
+
+        $l = $editor->map->getLink("linky");
+        $n = $editor->map->getNode("named_node");
+        $l->viaList = array(array(150, 150));
+
+        // verify that vias rotate with the node movement
+        $editor->moveNode("named_node", 100, 300);
+        $this->assertEquals(100, $n->x);
+        $this->assertEquals(300, $n->y);
+        $this->assertEquals(50, $l->viaList[0][0]);
+        $this->assertEquals(250, $l->viaList[0][1]);
+
+        // and again, since we didn't change X before
+        $editor->moveNode("named_node", 120, 320);
+        $this->assertEquals(120, $n->x);
+        $this->assertEquals(320, $n->y);
+    }
+
+    public function testLinkRename()
+    {
+        $editor = new Editor();
+        $editor->newConfig();
+
+        $editor->addNode(100, 100, "named_node");
+        $editor->addNode(100, 200, "other_named_node");
+        $editor->addNode(200, 200, "third_named_node", "named_node");
+
+        $editor->addLink("other_named_node", "named_node", "linky");
+        $editor->addLink("named_node", "third_named_node", "named_link");
+
+        $l = $editor->map->getLink("linky");
+
+        $editor->renameLink("linky", "gazorpazorpfield");
+        $this->assertEquals("gazorpazorpfield", $l->name);
+
+        $this->assertTrue($editor->map->linkExists("gazorpazorpfield"));
+        $this->assertFalse($editor->map->linkExists("linky"));
+    }
+
+    public function testLinkProperties()
+    {
+        $editor = new Editor();
+        $editor->newConfig();
+
+        $editor->addNode(100, 100, "named_node");
+        $editor->addNode(100, 200, "other_named_node");
+        $editor->addNode(200, 200, "third_named_node", "named_node");
+
+        $editor->addLink("other_named_node", "named_node", "linky");
+        $editor->addLink("named_node", "third_named_node", "named_link");
+
+        $l = $editor->map->getLink("linky");
+        $ldd = $editor->map->getLink(":: DEFAULT ::");
+
+        $this->assertEquals($ldd->width, $l->width);
+
+        $update = array(
+            "name" => "linky",
+            "width" => 9,
+            "target" => "static:10M:20M static:20M:10M",
+            "bandwidth_in" => "10M",
+            "bandwidth_out" => "15M",
+            "commentpos_in" => 19,
+            "commentpos_out" => 77,
+            "comment_in" => "frik",
+            "comment_out" => "frak",
+            "infourl" => "dog",
+            "hover" => "cat",
+        );
+        $editor->updateLink("linky", $update);
+
+
+        $this->assertEquals(2, count($l->targets));
+        $this->assertEquals("static:10M:20M", $l->targets[0]->asConfig());
+
+        $this->assertEquals(1, count($l->overliburl[IN]));
+        $this->assertEquals(1, count($l->overliburl[OUT]));
+        $this->assertEquals(9, $l->width);
+
+        $this->assertEquals("10M", $l->maxValuesConfigured[IN]);
+        $this->assertEquals("15M", $l->maxValuesConfigured[OUT]);
+
+        $this->assertEquals(10000000, $l->maxValues[IN]);
+        $this->assertEquals(15000000, $l->maxValues[OUT]);
+
+        $this->assertEquals(19, $l->commentOffsets[IN]);
+        $this->assertEquals(77, $l->commentOffsets[OUT]);
+
+        $this->assertEquals("frik", $l->comments[IN]);
+        $this->assertEquals("frak", $l->comments[OUT]);
+
+        $this->assertEquals("cat", $l->overliburl[OUT][0]);
+        $this->assertEquals("cat", $l->overliburl[IN][0]);
+
+        $this->assertEquals("dog", $l->infourl[OUT]);
+        $this->assertEquals("dog", $l->infourl[IN]);
+
+        $update = array(
+            "name" => "linky",
+            "width" => 2,
+            "target" => "static:10M:20M static:20M:10M",
+            "bandwidth_in" => "10M",
+            "bandwidth_out" => "15M",
+            "commentpos_in" => 19,
+            "commentpos_out" => 77,
+            "comment_in" => "frik",
+            "comment_out" => "frak",
+            "infourl" => "dog",
+            "hover" => "cat dog",
+        );
+        $editor->updateLink("linky", $update);
+
+        $this->assertEquals(2, $l->width);
+        $this->assertEquals(2, count($l->overliburl[IN]));
+        $this->assertEquals(2, count($l->overliburl[OUT]));
+    }
 }

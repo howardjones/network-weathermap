@@ -74,7 +74,7 @@ class EditorUI extends UIBase
                 array("sourcemap", "mapfile"),
             ),
             "late_load" => true,
-            "working"=>true,
+            "working" => true,
             "handler" => "cmdNewMapCopy"
         ),
         "font_samples" => array(
@@ -252,17 +252,18 @@ class EditorUI extends UIBase
                 array("param", "name"),
                 array("link_name", "name"),
                 array("link_bandwidth_in", "string"),
-                array("link_bandwidth_out", "string"),
-                array("link_bandwidth_out_cb", "string"),
+                array("link_bandwidth_out", "string", true),
+                array("link_bandwidth_out_cb", "string", true),
                 array("link_width", "int"),
                 array("link_target", "string"),
                 array("link_hover", "string"),
                 array("link_infourl", "string"),
                 array("link_commentin", "string"),
                 array("link_commentout", "string"),
-                array("link_commentposout", "string"),
-                array("link_commentposin", "string")
+                array("link_commentposout", "int"),
+                array("link_commentposin", "int")
             ),
+            "working" => true,
             "handler" => "cmdLinkProperties"
         ),
         "set_node_properties" => array(
@@ -279,16 +280,17 @@ class EditorUI extends UIBase
                 array("node_hover", "string"),
                 array("node_iconfilename", "string")
             ),
+            "working" => true,
             "handler" => "cmdNodeProperties"
         ),
         "set_map_style" => array(
             "args" => array(
                 array("mapname", "mapfile"),
-                array('mapstyle_linklabels','string'),
-                array('mapstyle_arrowstyle','string'),
-                array('mapstyle_nodefont','int'),
-                array('mapstyle_linkfont','int'),
-                array('mapstyle_legendfont','int'),
+                array('mapstyle_linklabels', 'string'),
+                array('mapstyle_arrowstyle', 'string'),
+                array('mapstyle_nodefont', 'int'),
+                array('mapstyle_linkfont', 'int'),
+                array('mapstyle_legendfont', 'int'),
             ),
             "handler" => "cmdMapStyle"
         ),
@@ -583,7 +585,25 @@ class EditorUI extends UIBase
      */
     public function cmdLinkProperties($params, $editor)
     {
-        $editor->updateLink($params['param']);
+        $update = array(
+            "name" => $params['link_name'],
+            "width" => $params['link_width'],
+            "target" => $params['link_target'],
+            "bandwidth_in" => $params['link_bandwidth_in'],
+            "bandwidth_out" => $params['link_bandwidth_out'],
+            "commentpos_in" => $params['link_commentposin'],
+            "commentpos_out" => $params['link_commentposout'],
+            "comment_in" => $params['link_commentin'],
+            "comment_out" => $params['link_commentout'],
+            "infourl" => $params['link_infourl'],
+            "hover" => $params['link_hover']
+        );
+
+        if (isset($params['link_bandwidth_out_cb']) && $params['link_bandwidth_out_cb'] == 'symmetric') {
+            $update['bandwidth_out'] = $update['bandwidth_in'];
+        }
+
+        $editor->updateLink($params['param'], $update);
     }
 
     /**
@@ -622,7 +642,27 @@ class EditorUI extends UIBase
      */
     public function cmdNodeProperties($params, $editor)
     {
-        $editor->updateNode($params['param']);
+        $update = array(
+            "name" => $params['node_name'],
+            "x" => $params['node_x'],
+            "y" => $params['node_y'],
+            "lock_to" => $params['node_lock_to'],
+            "new_name" => $params['node_new_name'],
+            "label" => $params['node_label'],
+            "infourl" => $params['node_infourl'],
+            "hover" => $params['node_hover'],
+            "iconfilename" => $params['node_iconfilename']
+        );
+
+        if ($update['iconfilename'] == '--NONE--') {
+            $update['iconfilename'] = '';
+        }
+
+        if ($update['lock_to'] == '-- NONE --') {
+            $update['lock_to'] = '';
+        }
+
+        $editor->updateNode($params['param'], $update);
     }
 
     /**

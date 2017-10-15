@@ -24,6 +24,12 @@ function initJS16() {
         jQuery(".fontlist").append(newitem);
     });
 
-
+    // TODO: set the selected settings for each font in mapstyle
+    // mapstyle_linklabels
+    // mapstyle_htmlstyle
+    // mapstyle_arrowstyle
+    // mapstyle_nodefont
+    // mapstyle_linkfont
+    // mapstyle_legendfont
 
 }

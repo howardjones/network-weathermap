@@ -531,8 +531,10 @@ class Editor
 
             $link->maxValuesConfigured[IN] = $params['bandwidth_in'];
             $link->maxValuesConfigured[OUT] = $params['bandwidth_out'];
-            $link->maxValues[IN] = StringUtility::interpretNumberWithMetricSuffixOrNull($params['bandwidth_in'], $this->map->kilo);
-            $link->maxValues[OUT] = StringUtility::interpretNumberWithMetricSuffixOrNull($params['bandwidth_out'], $this->map->kilo);
+            $link->maxValues[IN] = StringUtility::interpretNumberWithMetricSuffixOrNull($params['bandwidth_in'],
+                $this->map->kilo);
+            $link->maxValues[OUT] = StringUtility::interpretNumberWithMetricSuffixOrNull($params['bandwidth_out'],
+                $this->map->kilo);
 
             $targets = preg_split('/\s+/', $params['target'], -1, PREG_SPLIT_NO_EMPTY);
             $newTargetList = array();
@@ -1028,6 +1030,24 @@ class Editor
         $this->map->timey = $y;
     }
 
+    public function updateMapStyle($params)
+    {
+        if (!$this->isLoaded()) {
+            throw new WeathermapInternalFail("Map must be loaded before editing API called.");
+        }
+
+        $this->map->htmlstyle = $params['htmlstyle'];
+        $this->map->keyfont = intval($_REQUEST['legendfont']);
+
+        $inheritables = array(
+            array('link', 'labelStyle', 'bwlabels', ""),
+            array('link', 'bwfont', 'linkfont', "int"),
+            array('link', 'arrowStyle', 'arrowstyle', ""),
+            array('node', 'labelfont', 'nodefont', "int")
+        );
+        $this->handleInheritance($inheritables, $params);
+    }
+
     public function asJS()
     {
         if (!$this->isLoaded()) {
@@ -1036,4 +1056,59 @@ class Editor
 
         throw new WeathermapInternalFail("unimplemented");
     }
+
+    /**
+     * Find all the items where a parameter matches the CURRENT default node/link
+     * and change those to match the NEW default node/link, so that the default
+     * settings in the mapstyle page act intuitively.
+     *
+     * @param $inheritables
+     * @param $params
+     */
+    private function handleInheritance($inheritables, $params)
+    {
+        $defaultLink = $this->map->getLink("DEFAULT");
+        $defaultNode = $this->map->getNode("DEFAULT");
+
+        foreach ($inheritables as $inheritable) {
+            $propertyName = $inheritable[1];
+            $parameterName = $inheritable[2];
+            $validationType = $inheritable[3];
+
+            $new = $params[$parameterName];
+            if ($validationType != "") {
+                switch ($validationType) {
+                    case "int":
+                        $new = intval($new);
+                        break;
+                    case "float":
+                        $new = floatval($new);
+                        break;
+                }
+            }
+
+            $default = null;
+            $itemList = array();
+
+            if ($inheritable[0] == 'node') {
+                $itemList = $this->map->nodes;
+                $default = $defaultNode;
+            }
+            if ($inheritable[0] == 'link') {
+                $itemList = $this->map->links;
+                $default = $defaultLink;
+            }
+            $old = $default->$propertyName;
+
+            if ($old != $new) {
+                $default->$propertyName = $new;
+                foreach ($itemList as $item) {
+                    if ($item->name != ":: DEFAULT ::" && $item->$propertyName == $old) {
+                        $item->$propertyName = $new;
+                    }
+                }
+            }
+        }
+    }
+
 }

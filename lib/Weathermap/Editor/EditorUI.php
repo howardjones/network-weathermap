@@ -680,7 +680,16 @@ class EditorUI extends UIBase
      */
     public function cmdMapStyle($params, $editor)
     {
-        // TODO: this is empty!!
+        $update = array(
+            "bwlabels" => $params['mapstyle_linklabels'],
+            "htmlstyle" => $params['mapstyle_htmlstyle'],
+            "arrowstyle" => $params['mapstyle_arrowstyle'],
+            "nodefont" => $params['mapstyle_nodefont'],
+            "linkfont" => $params['mapstyle_linkfont'],
+            "legendfont" => $params['mapstyle_legendfont']
+        );
+
+        $editor->updateMapStyle($update);
     }
 
     /**
@@ -1080,6 +1089,27 @@ class EditorUI extends UIBase
         ksort($fonts);
         $fontsJSON = "\nvar fontlist = " . json_encode(array_keys($fonts)) . ";\n";
         $tpl->set("fonts_json", $fontsJSON);
+
+        $globalData = array(
+            "linklabels"=>$editor->map->links['DEFAULT']->labelStyle,
+            "linkfont"=>$editor->map->links['DEFAULT']->bwfont,
+            "nodefont"=>$editor->map->nodes['DEFAULT']->labelfont,
+            "arrowstyle"=>$editor->map->links['DEFAULT']->arrowStyle,
+            "htmlstyle"=>$editor->map->htmlstyle,
+            "legendfont"=>$editor->map->keyfont,
+            "map_width"=>$editor->map->width,
+            "map_height"=>$editor->map->height,
+            "map_legendtext"=>$editor->map->keytext['DEFAULT'],
+            "map_stamp"=>$editor->map->stamptext,
+            "link_width"=>$editor->map->links['DEFAULT']->width,
+            "link_defaultbwin"=>$editor->map->links['DEFAULT']->maxValuesConfigured[IN],
+            "link_defaultbwout"=>$editor->map->links['DEFAULT']->maxValuesConfigured[OUT],
+            "map_pngfile"=>$editor->map->imageoutputfile,
+            "map_htmlfile"=>$editor->map->htmloutputfile,
+            "map_bgfile"=>$editor->map->background,
+            "title"=>$editor->map->title
+        );
+        $tpl->set("global", json_encode($globalData, JSON_PRETTY_PRINT));
 
         echo $tpl->fetch("editor-resources/templates/main-oldstyle.php");
     }

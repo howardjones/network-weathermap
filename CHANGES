@@ -16,11 +16,14 @@ and makes using current development tools (like phpunit) more difficult.
     CHANGE - dsstats data plugin can skip looking up additional Cacti data by setting dsstats_no_cacti_extras
     CHANGE - rrdtool data plugin can skip looking up additional Cacti data by setting rrdtool_no_cacti_extras
     CHANGE - Moved all database access to use PDO, to avoid PHP 7.0 issues.
-    CHANGE - lots of internal changes mostly pulled over from refactoring project:
-             * New WMTarget, ConfigReader, WMColour and Scale classes
+    CHANGE - LOTS of internal changes mostly pulled over from refactoring project:
+             * New Target, ConfigReader, Colour and Scale classes
              * New Manager class handles all database access for Cacti plugin
              * Data picker is rewritten
              * Rewritten drawing code for links and nodes
+             * Everything uses PHP namespaces now, and standards for format, naming and layout.
+    CHANGE - Totally rewritten editor. I know it looks the same, but the guts is entirely new.
+    CHANGE - Lots more testing. New editor can be automatically tested. Lots of tests for rest of code.
     FIXED - PHP 5.3 bug introduced in command-line tool in 0.98
     FIXED - RRDtool 1.5 blank line issue
     FIXED - external-script datasource cleans up line endings properly

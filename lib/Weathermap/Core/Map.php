@@ -1943,6 +1943,17 @@ class Map extends MapBase
         $conf['vars'] = $this->hints;
         $conf['fonts'] = $this->fonts->asConfigData();
 
+        $conf['title'] = $this->title;
+        $conf['width'] = $this->width;
+        $conf['height'] = $this->height;
+
+        $conf["htmlstyle"] = $this->htmlstyle;
+        $conf["legendfont"] = $this->keyfont;
+        $conf["stamptext"] = $this->stamptext;
+        $conf["pngfile"] = $this->imageoutputfile;
+        $conf["htmlfile"] = $this->htmloutputfile;
+        $conf["bgfile"] = $this->background;
+
         // title font, pos
         // time font, pos
 

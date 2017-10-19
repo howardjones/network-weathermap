@@ -1220,6 +1220,7 @@ class MapNode extends MapDataItem
         $config['label'] = $this->label;
         $config['icon'] = array($this->iconfile, $this->iconscalew, $this->iconscaleh);
         $config['labeloffset'] = $this->labeloffset;
+        $config['id'] = "N" . $this->id;
 
         return $config;
     }

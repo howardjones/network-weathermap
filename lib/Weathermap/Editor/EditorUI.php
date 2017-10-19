@@ -1110,6 +1110,7 @@ class EditorUI extends UIBase
             "title"=>$editor->map->title
         );
         $tpl->set("global", json_encode($globalData, JSON_PRETTY_PRINT));
+        $tpl->set("global2", $editor->map->getJSONConfig());
 
         echo $tpl->fetch("editor-resources/templates/main-oldstyle.php");
     }

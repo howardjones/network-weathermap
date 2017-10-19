@@ -21,6 +21,7 @@
         <?php echo $fonts_json; ?>
         <?php echo $editor_settings; ?>
         var $global_settings = <?php echo $global; ?>;
+        var $global_settings2 = <?php echo $global2; ?>;
         var editor_url = '<?php echo $editor_name; ?>';
         var fromplug = <?php echo $fromplug ?>;
     </script>

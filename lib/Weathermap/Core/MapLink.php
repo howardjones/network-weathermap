@@ -772,6 +772,7 @@ class MapLink extends MapDataItem
     {
         $config = parent::asConfigData();
 
+        $config['id'] = "L" . $this->id;
         $config['a'] = $this->endpoints[0]->node->name;
         $config['b'] = $this->endpoints[1]->node->name;
         $config['width'] = $this->width;

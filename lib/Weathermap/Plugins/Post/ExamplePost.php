@@ -10,7 +10,7 @@ namespace Weathermap\Plugins\Post;
 
 use Weathermap\Core\MapUtility;
 
-class WeatherMapPostProcessorExample extends PostProcessorBase
+class ExamplePost extends Base
 {
     public function run()
     {

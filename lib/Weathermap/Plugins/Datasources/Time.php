@@ -6,7 +6,7 @@ use Weathermap\Core\MapDataItem;
 use Weathermap\Core\MapUtility;
 use DateTimeZone;
 
-class WeatherMapDataSource_time extends DatasourceBase
+class Time extends Base
 {
 
     public function __construct()

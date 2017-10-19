@@ -1,5 +1,7 @@
 <?php
 
+namespace Weathermap\Integrations\Cacti;
+
 // ******************************************
 // sensible defaults
 $mapdir = 'configs';
@@ -38,8 +40,6 @@ if (isset($config['cacti_version'])) {
 }
 
 $pdo = weathermap_get_pdo();
-
-require_once dirname(__FILE__) . "/lib/cacti-pick.php";
 
 $ui = new EditorDataPicker();
 $ui->main($_REQUEST);

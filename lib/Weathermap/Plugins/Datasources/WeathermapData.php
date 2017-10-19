@@ -4,7 +4,7 @@ namespace Weathermap\Plugins\Datasources;
 use Weathermap\Core\Map;
 use Weathermap\Core\MapDataItem;
 
-class WeatherMapDataSource_wmdata extends DatasourceBase
+class WeathermapData extends Base
 {
 
     public function __construct()

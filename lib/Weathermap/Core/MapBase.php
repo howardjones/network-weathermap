@@ -137,7 +137,6 @@ class MapBase
         }
 
         return array($value, $direct);
-
     }
 
     public function getConfigValueWithoutInheritance($keyname)

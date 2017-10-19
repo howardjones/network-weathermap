@@ -60,7 +60,7 @@ class TargetTest extends \PHPUnit_Framework_TestCase
         $tg1->preProcess($node, $map);
         $matchedBy = $tg1->findHandlingPlugin($plugins);
 
-        $this->assertEquals("WeatherMapDataSource_static", $matchedBy);
+        $this->assertEquals("StaticData", $matchedBy);
 
         $tg2 = new Target("garbage-with-no-extension-and-no-prefix", "myfile.conf", 22);
         $tg2->preProcess($node, $map);
@@ -72,6 +72,6 @@ class TargetTest extends \PHPUnit_Framework_TestCase
         $tg3->preProcess($node, $map);
         $matchedBy = $tg3->findHandlingPlugin($plugins);
 
-        $this->assertEquals("WeatherMapDataSource_rrd", $matchedBy);
+        $this->assertEquals("RRDTool", $matchedBy);
     }
 }

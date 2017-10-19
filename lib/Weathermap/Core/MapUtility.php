@@ -43,9 +43,9 @@ class MapUtility
                 $callingFunction = " [$function@$file:$line]";
 
                 if (is_array($weathermap_debug_suppress) && in_array(
-                        strtolower($function),
-                        $weathermap_debug_suppress
-                    )) {
+                    strtolower($function),
+                    $weathermap_debug_suppress
+                )) {
                     return;
                 }
             }

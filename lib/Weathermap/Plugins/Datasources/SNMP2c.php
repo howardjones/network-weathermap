@@ -18,7 +18,7 @@ namespace Weathermap\Plugins\Datasources;
 
 use Weathermap\Core\MapUtility;
 
-class WeatherMapDataSource_snmpv2c extends DatasourceBase
+class SNMP2C extends Base
 {
     protected $downCache;
 

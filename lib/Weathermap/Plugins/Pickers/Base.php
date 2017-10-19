@@ -9,13 +9,13 @@
 namespace Weathermap\Plugins\Pickers;
 
 /**
- * Class PickerBase
+ * Class Base
  *
  * Future plan - the picker in the editor will use this class to present
  * TARGET and OVERLIBGRAPH options from sources other than Cacti.
  *
  */
-class PickerBase
+class Base
 {
     private $owner;
 

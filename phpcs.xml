@@ -4,7 +4,7 @@
 
     <file>lib</file>
     <file>weathermap</file>
-    <file>editor16.php</file>
+    <file>editor.php</file>
 
     <exclude-pattern>vendor/*</exclude-pattern>
 

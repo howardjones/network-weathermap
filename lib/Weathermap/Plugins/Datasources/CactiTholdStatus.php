@@ -28,7 +28,7 @@ use Weathermap\Core\Map;
 use Weathermap\Core\MapDataItem;
 use PDO;
 
-class WeatherMapDataSource_cactithold extends DatasourceBase
+class CactiTholdStatus extends Base
 {
 
     private $thold10;

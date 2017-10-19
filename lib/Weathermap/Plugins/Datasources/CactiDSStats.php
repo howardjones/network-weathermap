@@ -1,14 +1,13 @@
 <?php
 
-//include_once dirname(__FILE__) . "/../DatasourceUtility.php";
-
+//include_once dirname(__FILE__) . "/../Utilitymespace Weathermap\Plugins\Datasources;
 namespace Weathermap\Plugins\Datasources;
 
 use Weathermap\Core\MapUtility;
 use Weathermap\Core\Map;
 use Weathermap\Core\MapDataItem;
 
-class WeatherMapDataSource_dsstats extends DatasourceBase
+class CactiDSStats extends Base
 {
 
     public function __construct()

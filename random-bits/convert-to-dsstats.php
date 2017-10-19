@@ -112,7 +112,7 @@ foreach ($allMapItems as $myobj) {
                 $targetstring = $target[0];
                 $multiply = $target[1];
 
-                if ($reverse == 0 && $target[5] == "WeatherMapDataSource_rrd") {
+                if ($reverse == 0 && $target[5] == "RRDTool") {
                     $candidates++;
                     # list($in,$out,$datatime) =  $map->plugins['data'][ $target[5] ]->ReadData($targetstring, $map, $myobj);
                     wm_debug("ConvertDS: $targetstring is a candidate for conversion.");
@@ -182,7 +182,7 @@ foreach ($allMapItems as $myobj) {
                 }
 
                 // XXX - not implemented yet!
-                if ($reverse == 1 && $target[5] == "WeatherMapDataSource_dsstats" && 1 == 0) {
+                if ($reverse == 1 && $target[5] == "CactiDSStats" && 1 == 0) {
                     $candidates++;
                     # list($in,$out,$datatime) =  $map->plugins['data'][ $target[5] ]->ReadData($targetstring, $map, $myobj);
                     wm_debug("ConvertDS: $targetstring is a candidate for conversion.");

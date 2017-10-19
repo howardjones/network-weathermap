@@ -1,18 +1,16 @@
 <?php
 // a test pre-processor plugin - does nothing but pollute the namespace
 // the run()  method will be called just after the config is read, but before any rendering or data reading is done.
-
 namespace Weathermap\Plugins\Pre;
 
 use Weathermap\Core\MapUtility;
 
-class WeatherMapPreProcessorExample extends PreProcessorBase
+class CactiHosts extends Base
 {
     public function run()
     {
-        $this->owner->addNote('test', 'TEST!');
-        MapUtility::debug("Example Preprocessor in the hizouse\n");
+        MapUtility::debug("Cactihosts Preprocessor in the hizouse\n");
+
+        # http://feathub.com/howardjones/network-weathermap/+9
     }
 }
-
-// vim:ts=4:sw=4:

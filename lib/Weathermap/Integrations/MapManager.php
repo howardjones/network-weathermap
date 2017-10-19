@@ -560,6 +560,12 @@ class MapManager
         return $result;
     }
 
+    private function camelize($input, $separator = '_')
+    {
+        return str_replace($separator, '', ucwords($input, $separator));
+    }
+
+    // *******************************************************************************************
     // Below here will migrate into a Cacti API class at some point soon
     // (to allow for other hosts to have equivalent functions)
 

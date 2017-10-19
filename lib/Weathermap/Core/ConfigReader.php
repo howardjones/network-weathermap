@@ -477,8 +477,8 @@ class ConfigReader
                     '/^POSITION\s+([A-Za-z][A-Za-z0-9\-_]*):([A-Za-z][A-Za-z0-9_]*)$/i',
                     array(
                         'positionRelativeTo' => 1,
-                        'relative_name' => 2,
-                        'positionedByName' => true,
+                        'positionRelativeToNamedOffset' => 2,
+                        'positionedByNamedOffset' => true,
                         'polar' => false,
                         'relativePositionResolved' => false
                     )
@@ -1398,7 +1398,7 @@ class ConfigReader
         if (preg_match('/^NODES\s+(\S+)\s+(\S+)\s*$/i', $fullcommand, $matches)) {
             $validNodeCount = 2;
             foreach (array(1, 2) as $i) {
-                list($offsetDX[$i], $offsetDY[$i], $nodeNames[$i], $endOffsets[$i], $need_size_precalc) = $this->interpretNodeSpec($matches[$i]);
+                list($offsetDX[$i], $offsetDY[$i], $nodeNames[$i], $endOffsets[$i], $needSizePrecalculate) = $this->interpretNodeSpec($matches[$i]);
 
                 if (!array_key_exists($nodeNames[$i], $this->mapObject->nodes)) {
                     MapUtility::warn(

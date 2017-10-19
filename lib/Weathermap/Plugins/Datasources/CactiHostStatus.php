@@ -9,7 +9,7 @@ use Weathermap\Core\Map;
 use Weathermap\Core\MapDataItem;
 use PDO;
 
-class WeatherMapDataSource_cactihost extends DatasourceBase
+class CactiHostStatus extends Base
 {
     public function __construct()
     {

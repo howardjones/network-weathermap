@@ -9,7 +9,7 @@ namespace Weathermap\Plugins\Datasources;
 
 use Weathermap\Core\MapUtility;
 
-class WeatherMapDataSource_cacti extends DatasourceBase
+class Cacti extends Base
 {
     protected $name = "Cacti";
 

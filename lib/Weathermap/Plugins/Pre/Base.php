@@ -6,16 +6,16 @@
  * Time: 11:22
  */
 
-namespace Weathermap\Plugins\Post;
+namespace Weathermap\Plugins\Pre;
 
 use Weathermap\Core\Map;
 
 /**
- * Class WeatherMapPostProcessor
+ * Class WeatherMapPreProcessor
  *
- * Base class for post-processing plugins.
+ * Base class for pre-processing plugins.
  */
-class PostProcessorBase
+class Base
 {
     /** @var  Map */
     protected $owner;
@@ -28,7 +28,7 @@ class PostProcessorBase
     }
 
     /**
-     * The only API for a PostProcessor - do whatever it is that you are supposed to do.
+     * The only API for a PreProcessor - do whatever it is that you are supposed to do.
      *
      * @param Map $map the WeatherMap main object
      * @return bool Success/Failure? Not currently interpreted.

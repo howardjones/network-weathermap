@@ -5,13 +5,12 @@
 //     filename.rrd:ds_in:ds_out
 //
 
-//include_once dirname(__FILE__) . "/../DatasourceUtility.php";
-
+//include_once dirname(__FILE__) . "/../Utility.phpace Weathermap\Plugins\Datasources;
 namespace Weathermap\Plugins\Datasources;
 
 use Weathermap\Core\MapUtility;
 
-class WeatherMapDataSource_rrd extends DatasourceBase
+class RRDTool extends Base
 {
 
     public function __construct()
@@ -461,7 +460,7 @@ class WeatherMapDataSource_rrd extends DatasourceBase
 
         if ($usePollerOutput == 1) {
             MapUtility::debug("Going to try poller_output, as requested.\n");
-            WeatherMapDataSource_rrd::readFromPollerOutput($rrdfile, "AVERAGE", $start, $end, $dsnames, $map, $item);
+            RRDTool::readFromPollerOutput($rrdfile, "AVERAGE", $start, $end, $dsnames, $map, $item);
         }
 
         // if poller_output didn't get anything, or if it couldn't/didn't run, do it the old-fashioned way
@@ -475,10 +474,10 @@ class WeatherMapDataSource_rrd extends DatasourceBase
                 MapUtility::debug("RRD ReadData: Target DS names are " . $dsnames[IN] . " and " . $dsnames[OUT] . "\n");
 
                 if ($aggregateFunction != '') {
-                    WeatherMapDataSource_rrd::readFromRealRRDtoolWithAggregate($rrdfile, $cfname, $aggregateFunction, $start, $end, $dsnames, $map, $item);
+                    RRDTool::readFromRealRRDtoolWithAggregate($rrdfile, $cfname, $aggregateFunction, $start, $end, $dsnames, $map, $item);
                 } else {
                     // do this the tried and trusted old-fashioned way
-                    WeatherMapDataSource_rrd::readFromRealRRDtool($rrdfile, $cfname, $start, $end, $dsnames, $map, $item);
+                    RRDTool::readFromRealRRDtool($rrdfile, $cfname, $start, $end, $dsnames, $map, $item);
                 }
             } else {
                 MapUtility::warn("Target $rrdfile doesn't exist. Is it a file? [WMRRD06]\n");

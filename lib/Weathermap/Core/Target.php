@@ -10,7 +10,7 @@ namespace Weathermap\Core;
  *
  */
 
-use Weathermap\Plugins\Datasources\DatasourceBase;
+use Weathermap\Plugins\Datasources\Base;
 
 class Target
 {
@@ -18,7 +18,7 @@ class Target
     private $originalTargetString;
 
     private $pluginName;
-    /** @var DatasourceBase */
+    /** @var Base */
     private $pluginObject;
     private $scaleFactor = 1.0;
     private $pluginRunnable = true;

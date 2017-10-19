@@ -252,8 +252,6 @@ class Editor
                     }
                 }
             }
-
-
         }
 
         $movingNode->x = $newX;
@@ -531,10 +529,14 @@ class Editor
 
             $link->maxValuesConfigured[IN] = $params['bandwidth_in'];
             $link->maxValuesConfigured[OUT] = $params['bandwidth_out'];
-            $link->maxValues[IN] = StringUtility::interpretNumberWithMetricSuffixOrNull($params['bandwidth_in'],
-                $this->map->kilo);
-            $link->maxValues[OUT] = StringUtility::interpretNumberWithMetricSuffixOrNull($params['bandwidth_out'],
-                $this->map->kilo);
+            $link->maxValues[IN] = StringUtility::interpretNumberWithMetricSuffixOrNull(
+                $params['bandwidth_in'],
+                $this->map->kilo
+            );
+            $link->maxValues[OUT] = StringUtility::interpretNumberWithMetricSuffixOrNull(
+                $params['bandwidth_out'],
+                $this->map->kilo
+            );
 
             $targets = preg_split('/\s+/', $params['target'], -1, PREG_SPLIT_NO_EMPTY);
             $newTargetList = array();
@@ -1110,5 +1112,4 @@ class Editor
             }
         }
     }
-
 }

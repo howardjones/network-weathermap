@@ -14,18 +14,18 @@ class ManagedMap
      * Some day we'll migrate to using this for the managed maps, and the various mutators below will be
      * methods here instead.
      */
-    public $sortorder;
-    public $group_id;
+    public $sortOrder;
+    public $groupId;
     public $active;
-    public $configfile;
-    public $imagefile;
-    public $htmlfile;
-    public $titlecache;
-    public $filehash;
-    public $warncount;
+    public $configFile;
+    public $imageFile;
+    public $htmlFile;
+    public $titleCache;
+    public $fileHash;
+    public $warnCount;
     public $config;
-    public $thumb_width;
-    public $thumb_height;
+    public $thumbWidth;
+    public $thumbHeight;
     public $schedule;
     public $archiving;
 }

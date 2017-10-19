@@ -12,7 +12,7 @@ use Weathermap\Core\MapDataItem;
 use PDO;
 use PDOException;
 
-class WeatherMapDataSource_dbsample extends DatasourceBase
+class DatabaseSample extends Base
 {
 
     public function __construct()

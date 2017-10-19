@@ -370,11 +370,11 @@ class WeatherMapCactiUserPlugin extends UIBase
                                         )
                                     );
                                     print '<a href = "' . $this->makeURL(
-                                            array(
+                                        array(
                                                 "action" => "viewcycle_filtered",
                                                 "group" => $limitingToGroup
                                             )
-                                        ) . '">within this group</a>, or ';
+                                    ) . '">within this group</a>, or ';
                                 }
                                 print ' <a href = "' . $this->makeURL(array("action" => "viewcycle")) . '">all maps</a>';
                                 ?>)

@@ -9,7 +9,7 @@ use Weathermap\Core\MapDataItem;
 
 // template class for data sources. All data sources extend this class.
 // I really wish PHP4 would just die overnight
-class DatasourceBase
+class Base
 {
     protected $owner;
     protected $regexpsHandled;

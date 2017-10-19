@@ -6,7 +6,7 @@
 
 namespace Weathermap\Plugins\Datasources;
 
-class WeatherMapDataSource_mrtg extends DatasourceBase
+class Mrtg extends Base
 {
 
     public function __construct()

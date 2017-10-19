@@ -23,9 +23,9 @@ class MapNode extends MapDataItem
     public $selected = 0;
     public $position;
 
-    public $positionedByName;
+    public $positionedByNamedOffset;
     public $namedOffsets;
-    public $relative_name;
+    public $positionRelativeToNamedOffset;
 
     public $iconfile;
     public $iconscalew;
@@ -79,7 +79,7 @@ class MapNode extends MapDataItem
         $this->centreX = 0;
         $this->centreY = 0;
         $this->polar = false;
-        $this->positionedByName = false;
+        $this->positionedByNamedOffset = false;
         $this->imageRef = null;
         $this->drawable = false;
 
@@ -546,8 +546,8 @@ class MapNode extends MapDataItem
             } else {
                 if ($this->polar) {
                     $output .= "\tPOSITION " . $this->positionRelativeTo . ' ' . $this->originalX . 'r' . $this->originalY . "\n";
-                } elseif ($this->positionedByName) {
-                    $output .= "\tPOSITION " . $this->positionRelativeTo . ':' . $this->relative_name . "\n";
+                } elseif ($this->positionedByNamedOffset) {
+                    $output .= "\tPOSITION " . $this->positionRelativeTo . ':' . $this->positionRelativeToNamedOffset . "\n";
                 } else {
                     $output .= "\tPOSITION " . $this->positionRelativeTo . ' ' . $this->originalX . ' ' . $this->originalY . "\n";
                 }
@@ -687,8 +687,8 @@ class MapNode extends MapDataItem
             return true;
         }
 
-        if ($this->positionedByName) {
-            $offsetName = $this->relative_name;
+        if ($this->positionedByNamedOffset) {
+            $offsetName = $this->positionRelativeToNamedOffset;
             if (isset($anchorNode->namedOffsets[$offsetName])) {
                 $now = $anchorPosition->copy();
                 $now->translate(

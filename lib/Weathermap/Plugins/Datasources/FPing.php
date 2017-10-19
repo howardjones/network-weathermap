@@ -10,7 +10,7 @@ use Weathermap\Core\Map;
 use Weathermap\Core\MapDataItem;
 use Weathermap\Core\MapUtility;
 
-class WeatherMapDataSource_fping extends DatasourceBase
+class FPing extends Base
 {
 
     private $addresscache = array();
@@ -131,7 +131,7 @@ class WeatherMapDataSource_fping extends DatasourceBase
                     $this->dataTime = time();
                 }
             } else {
-                MapUtility::warn("FPing ReadData: Can't find fping executable. Check path at line 19 of WeatherMapDataSource_fping.php [WMFPING01]\n");
+                MapUtility::warn("FPing ReadData: Can't find fping executable. Check path at line 19 of FPing");
             }
         }
 

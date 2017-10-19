@@ -5,7 +5,7 @@ namespace Weathermap\Plugins\Datasources;
 use Weathermap\Core\MapDataItem;
 use Weathermap\Core\MapUtility;
 
-class DatasourceUtility
+class Utility
 {
 
     /**

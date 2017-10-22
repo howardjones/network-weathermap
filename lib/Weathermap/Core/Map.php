@@ -1956,6 +1956,12 @@ class Map extends MapBase
         $conf["pngfile"] = $this->imageoutputfile;
         $conf["htmlfile"] = $this->htmloutputfile;
         $conf["bgfile"] = $this->background;
+        $conf['imagemap'] = array();
+
+        foreach ($this->imagemapAreas as $areaname) {
+            $area = $this->imap->getByName($areaname);
+            $conf['imagemap'] [] = $area->asJSONData();
+        }
 
         // title font, pos
         // time font, pos
@@ -1984,7 +1990,7 @@ class Map extends MapBase
             $conf['links'][$link->name] = $link->asConfigData();
         }
 
-        return json_encode($conf, JSON_PRETTY_PRINT);
+        return json_encode($conf);
     }
 
     public function getProperty($name)

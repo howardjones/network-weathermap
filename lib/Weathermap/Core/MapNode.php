@@ -606,7 +606,7 @@ class MapNode extends MapDataItem
         );
 
         if (preg_match('/^(none|nink|inpie|outpie|box|rbox|gauge|round)$/', $this->iconfile)) {
-            $newOutput['iconfile'] ='::' . $this->iconfile;
+            $newOutput['iconfile'] = '::' . $this->iconfile;
         }
 
         return $newOutput;
@@ -634,7 +634,7 @@ class MapNode extends MapDataItem
         );
 
         if (preg_match('/^(none|nink|inpie|outpie|box|rbox|gauge|round)$/', $this->iconfile)) {
-            $newOutput['iconfile'] ='::' . $this->iconfile;
+            $newOutput['iconfile'] = '::' . $this->iconfile;
         }
         $output = json_encode($newOutput);
         return $output;
@@ -1221,6 +1221,11 @@ class MapNode extends MapDataItem
         $config['icon'] = array($this->iconfile, $this->iconscalew, $this->iconscaleh);
         $config['labeloffset'] = $this->labeloffset;
         $config['id'] = "N" . $this->id;
+        $config['zorder'] = $this->zorder;
+        $config['imagemap'] = array();
+        foreach ($this->getImageMapAreas() as $area) {
+            $config['imagemap'] [] = $area->asJSONData();
+        }
 
         return $config;
     }

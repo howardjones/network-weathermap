@@ -56,13 +56,20 @@ class HTMLImagemapAreaRectangle extends HTMLImagemapArea
         return '<area ' . $this->commonHTML() . 'shape="rect" coords="' . $coordstring . '" />';
     }
 
-    public function asJSON()
+    public function asJSONData()
     {
-        $json = "{ \"shape\":'rect', ";
-        $json .= ' "x1":' . $this->x1 . ', "y1":' . $this->y1 . ',';
-        $json .= ' "x2":' . $this->x2 . ', "y2":' . $this->y2 . ", \"name\":'" . $this->name . "'}";
+        $data = array(
+            'shape' => 'rect',
+            'name' => $this->name,
+            'minx' => $this->x1,
+            'miny' => $this->y1,
+            'maxx' => $this->x2,
+            'maxy' => $this->y2,
+            'href' => $this->href,
+            'extrahtml' => $this->extrahtml
+        );
 
-        return $json;
+        return $data;
     }
 
     public function __toString()

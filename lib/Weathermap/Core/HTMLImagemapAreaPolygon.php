@@ -29,28 +29,30 @@ class HTMLImagemapAreaPolygon extends HTMLImagemapArea
         return '<area ' . $this->commonHTML() . 'shape="poly" coords="' . $coordstring . '" />';
     }
 
-    public function asJSON()
+    public function asJSONData()
     {
-        $json = "{ \"shape\":'poly', \"npoints\":" . $this->npoints . ", \"name\":'" . $this->name . "',";
-
-        $xlist = '';
-        $ylist = '';
+        $data = array(
+            'shape' => 'poly',
+            'npoints' => $this->npoints,
+            'name' => $this->name,
+            'href' => $this->href,
+            'extrahtml' => $this->extrahtml,
+            'points' => array(),
+            'minx' => $this->minx,
+            'miny' => $this->miny,
+            'maxx' => $this->maxx,
+            'maxy' => $this->maxy
+        );
         foreach ($this->points as $point) {
-            $xlist .= $point[0] . ',';
-            $ylist .= $point[1] . ',';
+            $data['points'] [] = array($point[0], $point[1]);
         }
-        $xlist = rtrim($xlist, ', ');
-        $ylist = rtrim($ylist, ', ');
-        $json .= " \"x\": [ $xlist ], \"y\":[ $ylist ],";
-        $json .= ' "minx": ' . $this->minx . ', "miny": ' . $this->miny . ',';
-        $json .= ' "maxx":' . $this->maxx . ', "maxy":' . $this->maxy . '}';
 
-        return $json;
+        return $data;
     }
 
     public function hitTest($x, $y)
     {
-        $c = 0;
+        $c = false;
         // do the easy bounding-box test first.
         if (($x < $this->minx) || ($x > $this->maxx) || ($y < $this->miny) || ($y > $this->maxy)) {
             return false;
@@ -59,13 +61,10 @@ class HTMLImagemapAreaPolygon extends HTMLImagemapArea
         // Algorithm from
         // http://www.ecse.rpi.edu/Homepages/wrf/Research/Short_Notes/pnpoly.html#The%20C%20Code
         for ($i = 0, $j = $this->npoints - 1; $i < $this->npoints; $j = $i++) {
-            // print "Checking: $i, $j\n";
             $x1 = $this->points[$i][0];
             $y1 = $this->points[$i][1];
             $x2 = $this->points[$j][0];
             $y2 = $this->points[$j][1];
-
-            //  print "($x,$y) vs ($x1,$y1)-($x2,$y2)\n";
 
             if (((($y1 <= $y) && ($y < $y2)) || (($y2 <= $y) && ($y < $y1))) &&
                 ($x < ($x2 - $x1) * ($y - $y1) / ($y2 - $y1) + $x1)

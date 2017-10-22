@@ -773,10 +773,16 @@ class MapLink extends MapDataItem
         $config = parent::asConfigData();
 
         $config['id'] = "L" . $this->id;
-        $config['a'] = $this->endpoints[0]->node->name;
-        $config['b'] = $this->endpoints[1]->node->name;
+        if (!$this->isTemplate()) {
+            $config['a'] = $this->endpoints[0]->node->name;
+            $config['b'] = $this->endpoints[1]->node->name;
+        }
         $config['width'] = $this->width;
-
+        $config['zorder'] = $this->zorder;
+        $config['imagemap'] = array();
+        foreach ($this->getImageMapAreas() as $area) {
+            $config['imagemap'] [] = $area->asJSONData();
+        }
         return $config;
     }
 

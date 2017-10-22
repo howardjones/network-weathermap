@@ -256,6 +256,7 @@ if ($map->readConfig($configfile)) {
 
     if ($getOpt->getOption('dump-json') != '') {
         print "===\n";
+
         $fd = fopen($getOpt->getOption('dump-json'), "w");
         fputs($fd, $map->getJSONConfig());
         fclose($fd);

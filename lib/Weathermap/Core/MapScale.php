@@ -21,6 +21,7 @@ class MapScale extends MapItem
     public $keyoutlinecolour;
     public $keybgcolour;
     public $scalemisscolour;
+    /** @var Font */
     public $keyfont;
 
     public $scaleType;
@@ -244,8 +245,8 @@ class MapScale extends MapItem
     {
         $config = parent::asConfigData();
 
-        $config['pos'] = array($this->keypos->x, $this->keypos->y);
-        $config['font'] = $this->keyfont->asArray;
+        // $config['pos'] = array($this->keypos->x, $this->keypos->y);
+        // $config['font'] = $this->keyfont->asConfigData();
         $config['textcolour'] = $this->keytextcolour;
         $config['bgcolour'] = $this->keybgcolour;
         $config['outlinecolour'] = $this->keyoutlinecolour;

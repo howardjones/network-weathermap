@@ -2,6 +2,12 @@
   "name": "cacti-mgmt",
   "version": "0.1.0",
   "private": true,
+  "proxy": {
+    "/cacti": {
+      "target": "http://localhost:8016/",
+      "ws": true
+    }
+  },
   "dependencies": {
     "axios": "^0.17.0",
     "object-path-immutable": "^0.5.2",
@@ -18,6 +24,7 @@
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
+    "postbuild": "node postbuild.js",
     "test": "react-scripts test --env=jsdom",
     "eject": "react-scripts eject"
   }
